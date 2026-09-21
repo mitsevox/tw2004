@@ -14,6 +14,7 @@ Summary
 | Working baseline | **GC/2.5** (2.4.7 build 105, Feb 20 2003) | Medium - GC/2.0 not ruled out |
 | Optimization | `-O4` (`,p` vs `,s` not yet determined) | High |
 | Processor flags | `-proc gekko`, `-fp hardware` | High |
+| Inlining | No automatic inlining (`-inline auto` is wrong) | Medium - one file tested |
 | Second compiler | GCC, unoptimized, for one 38 KiB block (see below) | High |
 | Dolphin SDK | Sep 5 2002 build, CARD patched Apr 2 2003 | Certain (version strings) |
 
@@ -81,11 +82,21 @@ Things that looked like evidence but were not
   every version from GC/1.3.2 up emits under `-proc gekko`. The 210 real paired-single math
   instructions are in 79 small functions and are presumably hand-written assembly.
 
+Inlining
+--------
+
+`fn_80007CE8` calls the small helper `fn_80007C80`, which sits directly before it in the same
+file. With `-inline auto` the compiler pastes the helper into the caller and the function
+cannot match. With `-inline off`, `-inline smart` or `-inline deferred` it matches. None of the
+trivial camera getters at `0x80008320` are inlined into their caller either. The project uses
+`-inline smart`. Not yet determined: whether EA used `-inline deferred` (which would mean the
+functions appear in the binary in the reverse of their source order).
+
 Open questions
 --------------
 
 - GC/2.0 vs GC/2.5.
 - `-O4,p` vs `-O4,s`. Loops separate them, the two matched functions do not contain one that does.
-- `-inline` mode, `-str` pooling, small data thresholds.
+- `-inline deferred` or not, `-str` pooling, small data thresholds.
 - Exact GCC / ProDG version and flags for the `0x8016C718` block.
 - Eleven EA-region functions use the older prologue style; not yet examined.

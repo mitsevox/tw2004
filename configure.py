@@ -202,7 +202,7 @@ cflags_base = [
     "-fp hardware",
     "-Cpp_exceptions off",
     "-O4,p",
-    "-inline auto",
+    "-inline smart",  # EA code shows no automatic inlining; see docs/compiler.md
     '-pragma "cats off"',
     '-pragma "warn_notinlined off"',
     "-maxerrors 1",
@@ -298,6 +298,7 @@ config.libs = [
         "cflags": cflags_base,
         "progress_category": "game",
         "objects": [
+            Object(Matching, "unsorted/code_80007BC4.c"),
             Object(Matching, "unsorted/code_800082F8.c"),
         ],
     },
