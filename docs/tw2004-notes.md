@@ -34,6 +34,19 @@ Memory map of `main.dol`
 The boundary between EA code and the SDK is approximate: it is where dtk's first automatically
 named SDK function appears.
 
+SDK and runtime names
+---------------------
+
+423 SDK / MSL functions were named by matching them byte for byte against Metroid Prime Rev 0's
+split objects (`tools/research/match_sdk_names.py`). Only linker-filled bytes are masked, a name is
+used only if the match is unique both ways, and two self-checks passed: all 180 functions dtk had
+already named agreed, and all 1,906 calls between matched functions pointed at the expected names.
+12 were skipped because the name is shared by several static functions (`OnReset`, `AlarmHandler`,
+`WriteCallback`, `EraseCallback`). By library: gx 128, card 72, dvd 47, runtime 42, os 32, pad 20,
+si 19, exi 13, dsp 11, ar 9, mtx 6, other 36.
+
+The SDK starts earlier than first thought: `VIWaitForRetrace` is at `0x8012F314`.
+
 Leaked source file names
 ------------------------
 

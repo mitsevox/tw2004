@@ -132,6 +132,20 @@ Working with decomp-toolkit (dtk)
 - Strings in the binary are a free source of names: SDK build stamps, assert messages with source
   file names and paths.
 
+Borrowing names from another project
+------------------------------------
+
+- **[verified]** Games built against the same SDK release contain byte-identical SDK functions. Find a
+  decomp project with the same SDK build stamp (`<< Dolphin SDK - OS release build: ... >>`) and match
+  its functions against yours to get names for free.
+- Use the other project's split `.o` files, not its `main.dol`: they contain relocation records, so
+  you can mask exactly the bytes the linker fills in and require everything else to be identical.
+- Accept a name only when the match is unique in both directions. Small functions that differ only in
+  a struct offset (getter families) are the main false-positive risk.
+- Self-check two ways: names the analyzer already assigned must agree, and calls between matched
+  functions must point at the expected names. We got 180/180 and 1,906/1,906.
+- Static functions often share a name across files (`OnReset`, `AlarmHandler`). Skip or suffix them.
+
 Comparing raw bytes yourself
 ----------------------------
 
