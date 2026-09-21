@@ -53,7 +53,7 @@ address (not yet mapped). Meanings of the prefixes are guesses.
 | storage, audio, misc | | `MC_Gc` (memory card) `dvdfs` `SitDevFile` `crcmp_mad_codec` `GCN_Mem_Alloc` (MSL) `gbacable` `GBAXfer` `GBA` `dvd` `OSThread` (SDK) |
 | EA shared library (GCC block) | | `../../../Source/Common/Checksum/ChecksumCRC32.c` `../../../Source/Common/SharedFileIO/SharedFileIO.c` `../../../Source/Common/TagFile/TagFile.c` `../../../Source/NGC/SharedFileIO/llSharedFileIO.c` |
 
-Camera and visibility code (`0x80007BC4` - `0x800083A4`)
+Camera and visibility code (`0x80007BC4` - `0x800083A4`, fully matched)
 --------------------------------------------------------
 
 Probably `GoCamera.c` or `GoViewport.c` (guess; both names are in the binary). Types are in
@@ -65,12 +65,22 @@ Probably `GoCamera.c` or `GoViewport.c` (guess; both names are in the binary). T
 | `0x80007C80` | `fn_80007C80` | Move a point into camera space (`viewMtx * point`) | matched |
 | `0x80007CE8` | `fn_80007CE8` | Same as `fn_80007BC4` without the depth output | matched |
 | `0x80007D74` | `fn_80007D74` | **Sphere vs view frustum test.** Returns 1 fully visible, 2 not visible, 4 touching a side edge, 8 touching the near limit. Separate path for a flat (non-perspective) camera, which only returns 2 or 4 | matched |
+| `0x800080D0`, `0x800081C4` | empty functions | Do nothing. Called from `fn_8006D8E8` and `fn_8006C854` | matched |
+| `0x800080D4` | `fn_800080D4` | Clears two fields of the global at `0x80280DA0`, then eight `GXSetVtxAttrFmt` calls: vertex formats 0 and 4 (position, color, two texture coords, normal) | matched |
+| `0x800081C8`, `0x80008214` | mode dispatch | Store a mode index, look up a function table (16-byte entries at `0x80188E78`, functions at +8), call its first function; second one calls the optional second function | matched |
+| `0x8000827C`, `0x80008248`, `0x800082CC` | type dispatch | Same idea for a type index: 0x44-byte entries at `0x80188E88`, functions at +0x24 (init, optional, third) | matched |
 | `0x800082F8` | `fn_800082F8` | Get a drawable object's bounding sphere (`obj->data + 0x58`) | matched |
 | `0x80008304` | `Vec3Copy` | Copy three floats. **Called 596 times from 110 functions** | matched |
 | `0x80008320` - `0x80008368` | ten getters | Return camera floats `0x220` down to `0x1F4` | matched |
 | `0x80008370`, `0x80008378` | getters | `cam->unk10`, then field 0 of that object; the cull test takes a different path when it is non-zero | matched |
 | `0x80008380` | `fn_80008380` | Calls `fn_800070DC`. Called from 21 functions | matched |
 | `0x800BAD60` | `fn_800BAD60` | 4x4 matrix times 4-float vector, uses paired-single math (hand-written assembly?) | not started |
+
+The dispatch object stores its type index at offset `0x0`. The cull test reads offset `0x0` of
+`cam->unk10` to choose perspective or flat, so these are probably the same object (unconfirmed;
+the two structs are still declared separately).
+
+`fn_80140590` is `GXSetVtxAttrFmt`: byte-identical to the one in Metroid Prime's SDK. Renamed in `symbols.txt`.
 
 Camera fields (guesses from how the cull test uses them): `0x11C` view matrix (4x4 floats);
 `0x1F4` / `0x1F8` near and far clip distances; `0x204`-`0x210` and `0x214`-`0x220` two sets of four
@@ -87,8 +97,10 @@ matched functions), `0.5` at `0x80282A84` (the cull test; in the source it is `/
 Leads and loose ends
 --------------------
 
-- `fn_800AACBC` (15 instructions, C bit-fields): best candidate for settling GC/2.0 vs GC/2.5.
-  Two larger bit-packing functions: `fn_800B8984`, `fn_800B965C`.
+- `fn_800AACBC` (15 instructions, C bit-fields): **does not settle GC/2.0 vs GC/2.5.** The C is known
+  (read the index byte into a local, store into a byte table, set two 1-bit fields from `index == 0`
+  and `index == 1`) and matches exactly, but GC/2.0, 2.5 and 2.6 all produce the same bytes for it.
+  Not yet added to the project. Two larger bit-packing functions remain untested: `fn_800B8984`, `fn_800B965C`.
 - `fn_8000B508`, `fn_8000B54C`, `fn_8000B70C`: linked-list search family (head pointer at
   `0x80281BFC`, `next` at `0xC`, two ID fields at `0x1C` and `0x20`). C for `fn_8000B70C` already
   produces matching bytes; not yet added to the project.

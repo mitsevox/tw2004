@@ -90,6 +90,12 @@ Reading compiler output
 - **[verified] One shared `return` means one combined condition.** Four separate
   `if (...) return 2;` lines each get their own return sequence. If the original has several
   tests all branching to a single shared return, the source was `if (a || b || c || d) return 2;`.
+- **[verified] Check struct sizes against the multiply.** Array indexing shows the element size:
+  `slwi r,r,4` is 16 bytes, `mulli r,r,0x44` is 0x44 bytes. If ours has `mulli` by a different
+  number, the struct is the wrong size (we had three function pointers in a two-pointer entry).
+- **[verified] Reading a field several times vs once.** If the original loads a byte once and keeps
+  it in a register, the source used a local variable. Re-reading `src->index` in each statement
+  produces a reload each time.
 - **[verified] `goto` is fine.** A repeated "fail early, otherwise keep testing" pattern matched
   first time written with `goto done;`. Do not assume it must be nested `if`/`else`.
 - **[verified] Automatic inlining.** With `-inline auto` the compiler pastes small functions into

@@ -299,6 +299,7 @@ config.libs = [
         "progress_category": "game",
         "objects": [
             Object(Matching, "unsorted/code_80007BC4.c"),
+            Object(Matching, "unsorted/code_800080D0.c"),
             Object(Matching, "unsorted/code_800082F8.c"),
         ],
     },

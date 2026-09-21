@@ -67,7 +67,8 @@ candidate and compared function by function:
 - Switch statements, 64-bit integer math and a bounds-check loop did not separate any candidate.
 
 **If a function with byte masking or bit packing sticks one or two instructions short,
-try GC/2.0 before rewriting the C.** Candidate for settling it: `fn_800AACBC`.
+try GC/2.0 before rewriting the C.** `fn_800AACBC` (bit-fields) was tried as a tie-breaker: it
+matches, but identically on GC/2.0, 2.5 and 2.6, so it does not separate them.
 
 Things that looked like evidence but were not
 ---------------------------------------------
