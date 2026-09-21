@@ -107,6 +107,57 @@ get the box edges).
 Float constants for this file sit together in `.sdata2`: `1.0` at `0x80282A80` (owned by the three
 matched functions), `0.5` at `0x80282A84` (the cull test; in the source it is `/ 2.0f`). Both now belong to `code_80007BC4.c`.
 
+Frustum setup and widescreen codes
+----------------------------------
+
+`fn_80013950` (223 instructions, not yet decompiled) builds the camera's view volume each time it
+changes. Read from the disassembly, not yet verified by matching:
+
+- `cam+0x224` = result of `fn_80014280(0.5 * fov)` (looks like a tangent); `cam+0x228` = its reciprocal.
+- `cam+0x1FC` and `cam+0x200` = half-extents of the view, built from `0x224` and viewport values.
+  `0x1FC` feeds the planes the cull test uses with `x`, `0x200` the ones used with `y`.
+- Each edge plane is made by normalizing `(1, extent, 0)` with `fn_800BAF04`; the two results are
+  stored as a pair (set A: `0x204`/`0x20C` and `0x208`/`0x210`).
+- **Set B (`0x214` - `0x220`) is the same thing with the extents multiplied by 2.0** (constant at
+  `0x80282B7C`). So mode 1 of the cull test is a view twice as wide: a loose second-chance test.
+- `cam+0x1F4` / `0x1F8` = near / far limits. Then it builds the projection matrix at `cam+0x5C`
+  (`fn_8000ABE8` for perspective, `fn_8000AC5C` for flat), and a combined matrix at `cam+0xDC`.
+- `fn_800977F8` (424 instructions) also writes both plane sets. Unexamined - maybe another camera type.
+
+How callers use the cull result: all five call sites only ask "was it 2?". `fn_80007B2C` maps
+2 -> 3, 1 -> 2, and for 4 / 8 runs the test again in mode 1.
+
+**Widescreen Gecko codes (GW4E69 Rev 0, both discs). `$Widescreen Culling Fix` is CONFIRMED by an
+A/B test on 2026-09-21** (Dolphin 2606a, Vulkan, widescreen hack on, stretch to 16:9):
+
+- **Code off (hack only):** obvious pop-in. Trees, patches of grass and other objects cut out in the
+  outer ~12.5% of the screen on each side - exactly the strip that lies outside the 4:3 view
+  (4:3 covers the middle 75% of a 16:9 frame). Happens on any camera movement, not only flyovers.
+- **Code on:** full 16:9 view, no pop-in, no glitches, in normal play, hole flyovers, replays, and
+  across a disc swap. Both discs used.
+- So the sphere test at `fn_80007D74` is the culling path for course scenery too (trees, grass), not
+  just small objects, and `x` is the horizontal axis as assumed. No second culling path has shown up.
+- Menus and HUD stay stretched, as with any widescreen-hack setup.
+- All seven call sites pass mode 0 (the tight 4:3 planes) first; only `fn_80007B2C` retries in mode 1.
+- `$Disable Object Culling` has not been tested; it was not needed.
+
+```
+$Widescreen Culling Fix          left / right "outside" (2) becomes "touching the edge" (4)
+04007EC0 3BE00004                was 3BE00002 (li r31, 2)
+04007EF0 3BE00004                was 3BE00002
+
+$Disable Object Culling          whole test returns 4 without testing (enable only one code)
+04007D74 38600004                li r3, 4
+04007D78 4E800020                blr
+```
+
+Assumes `x` is the horizontal axis in camera space. The top / bottom pair is at `0x80007F2C` and
+`0x80007F5C` if that turns out to be wrong. This test has only five call sites and works on bounding
+spheres, so course scenery may be culled by a different path. If pop-in remains with a code on,
+look at `fn_800977F8` and at code using the combined matrix at `cam+0xDC`. The cleaner long-term fix
+is in `fn_80013950`: scale the horizontal extent (`0x1FC`) by 4/3, or change the aspect it feeds
+to the projection matrix for a native 16:9 code that needs no widescreen hack.
+
 Leads and loose ends
 --------------------
 

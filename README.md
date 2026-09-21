@@ -26,6 +26,8 @@ Early days. Last updated 2026-09-21.
 - Named: about 860 functions, mostly SDK and runtime. About 6,940 are still `fn_ADDRESS`.
 - Compiler: CodeWarrior GC/2.5 baseline, `-O4`. GC/2.0 not ruled out. See `docs/compiler.md`.
 - Asset formats: inventoried, none reverse-engineered yet.
+- First practical result: a two-instruction Gecko code that fixes object pop-in under Dolphin's
+  widescreen hack, found by decompiling the frustum cull test. See `docs/tw2004-notes.md`.
 
 Roadmap
 =======

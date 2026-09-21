@@ -53,6 +53,14 @@ Dated log of what was done and decided, newest last. Facts and lessons belong in
 - 423 SDK / MSL functions named by matching against Prime's split objects, with two self-checks
   (180/180 and 1,906/1,906). Tool saved as `tools/research/match_sdk_names.py`.
 
+**Widescreen pivot**
+- Used the decompiled cull test to write two Gecko codes (details in `tw2004-notes.md`). Traced the
+  frustum setup to `fn_80013950`; the second plane set is the first at double width.
+- Play test: full 16:9, no pop-in, no glitches, including flyovers and replays.
+- Control test with the code off: obvious pop-in of trees, grass and objects in the outer 12.5% of
+  the screen on each side, on any camera movement. The two-instruction code is what fixes it.
+- Dolphin only auto-swaps discs when launched from an `.m3u` playlist; we launched Disc 1 directly.
+
 **Working agreements**
 - Show the plain-English logic and the C before building anything non-trivial.
 - One batch of work, then report. No silent fix loops.
