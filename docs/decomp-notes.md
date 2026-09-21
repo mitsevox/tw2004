@@ -81,8 +81,17 @@ Reading compiler output
 - **[verified] Local variables and the stack.** The order locals are declared in changes where
   they sit on the stack. Symptom: a function at ~99% where the only differences are stack offsets
   swapped between two variables. Fix: swap the declarations.
-- **[verified] Multiplication operand order follows the source.** `a * b` and `b * a` produce
-  `fmuls` with the operands in source order. If only the operand order differs, flip the C.
+- **[verified] Multiplication operand order.** With two variables, `a * b` and `b * a` produce
+  `fmuls` with the operands in source order, so flip the C if only that differs. With a constant,
+  flipping the C changed nothing: `x * 0.5f` and `0.5f * x` both came out constant-first.
+- **[verified] Divide by a power of two becomes a multiply.** `x / 2.0f` compiles to `x * 0.5`
+  with the variable first, and the binary stores `0.5`, not `2.0`. If a multiply by 0.5, 0.25 etc.
+  has its operands the "wrong" way round, the source was probably a division.
+- **[verified] One shared `return` means one combined condition.** Four separate
+  `if (...) return 2;` lines each get their own return sequence. If the original has several
+  tests all branching to a single shared return, the source was `if (a || b || c || d) return 2;`.
+- **[verified] `goto` is fine.** A repeated "fail early, otherwise keep testing" pattern matched
+  first time written with `goto done;`. Do not assume it must be nested `if`/`else`.
 - **[verified] Automatic inlining.** With `-inline auto` the compiler pastes small functions into
   callers that come after them in the same file. Symptom: a caller is much longer than the
   original and contains a copy of a helper's body; the original has a plain `bl helper`.

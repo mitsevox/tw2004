@@ -27,7 +27,10 @@ typedef struct {
 } RenderObj;
 
 typedef struct {
-    /* 0x00 */ int unk0;
+    /* 0x00 */ int unk0;  // 0 = perspective camera, non-zero = flat camera
+    /* 0x04 */ char pad4[0xB0];
+    /* 0xB4 */ float unkB4;  // flat view width (guess)
+    /* 0xB8 */ float unkB8;  // flat view height (guess)
 } CameraSub;
 
 typedef struct Camera {
@@ -54,5 +57,17 @@ Sphere* fn_800082F8(RenderObj* obj);
 void Vec3Copy(const Vec3* src, Vec3* dst);
 void fn_800BAD60(float mtx[4][4], Vec4* src, Vec4* dst);
 int fn_80007D74(Sphere* sphere, Camera* cam, int mode);
+float fn_80008320(Camera* cam);
+float fn_80008328(Camera* cam);
+float fn_80008330(Camera* cam);
+float fn_80008338(Camera* cam);
+float fn_80008340(Camera* cam);
+float fn_80008348(Camera* cam);
+float fn_80008350(Camera* cam);
+float fn_80008358(Camera* cam);
+float fn_80008360(Camera* cam);
+float fn_80008368(Camera* cam);
+CameraSub* fn_80008370(Camera* cam);
+int fn_80008378(CameraSub* sub);
 
 #endif

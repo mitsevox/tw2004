@@ -64,7 +64,7 @@ Probably `GoCamera.c` or `GoViewport.c` (guess; both names are in the binary). T
 | `0x80007BC4` | `fn_80007BC4` | Move an object's bounding sphere into camera space, optionally report its depth, scale its radius, cull it | matched |
 | `0x80007C80` | `fn_80007C80` | Move a point into camera space (`viewMtx * point`) | matched |
 | `0x80007CE8` | `fn_80007CE8` | Same as `fn_80007BC4` without the depth output | matched |
-| `0x80007D74` | `fn_80007D74` | **Sphere vs view frustum test.** Returns 1 inside, 2 outside, 4 crossing an edge. Reads all ten camera floats | next |
+| `0x80007D74` | `fn_80007D74` | **Sphere vs view frustum test.** Returns 1 fully visible, 2 not visible, 4 touching a side edge, 8 touching the near limit. Separate path for a flat (non-perspective) camera, which only returns 2 or 4 | matched |
 | `0x800082F8` | `fn_800082F8` | Get a drawable object's bounding sphere (`obj->data + 0x58`) | matched |
 | `0x80008304` | `Vec3Copy` | Copy three floats. **Called 596 times from 110 functions** | matched |
 | `0x80008320` - `0x80008368` | ten getters | Return camera floats `0x220` down to `0x1F4` | matched |
@@ -77,8 +77,12 @@ Camera fields (guesses from how the cull test uses them): `0x11C` view matrix (4
 frustum edge-plane numbers, chosen by a mode argument (0 or 1). Why there are two sets is unknown
 (two aspect ratios? a tight and a loose view?). `fn_80013EA0` also reads the two clip distances.
 
+The camera's sub-object (`cam->unk10`): field `0x0` is 0 for a perspective camera and non-zero for a
+flat one; `0xB4` / `0xB8` are the flat view's width and height (guess - the cull test halves them to
+get the box edges).
+
 Float constants for this file sit together in `.sdata2`: `1.0` at `0x80282A80` (owned by the three
-matched functions), `0.5` at `0x80282A84` (used by the cull test).
+matched functions), `0.5` at `0x80282A84` (the cull test; in the source it is `/ 2.0f`). Both now belong to `code_80007BC4.c`.
 
 Leads and loose ends
 --------------------
