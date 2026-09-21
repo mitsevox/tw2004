@@ -17,6 +17,23 @@ orig/*/*
 *.map
 *.MAP
 
+# Disc images and game data - never commit these
+*.iso
+*.gcm
+*.ciso
+*.rvz
+*.gcz
+*.hog
+*.gcb
+*.sac
+*.sab
+*.fxg
+*.ngc
+*.bnr
+
+# Track B scratch output (extracted / converted assets)
+extracted/
+
 # Build files
 build/
 .ninja_*

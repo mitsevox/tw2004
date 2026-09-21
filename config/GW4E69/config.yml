@@ -1,0 +1,10 @@
+# See config.example.yml for documentation.
+# main.dol is byte-identical on Disc 1 and Disc 2, so there is a single code target.
+object_base: orig/GW4E69
+object: sys/main.dol
+hash: bbbc55485e51973931dee169e7bf87bc7379223f
+symbols: config/GW4E69/symbols.txt
+splits: config/GW4E69/splits.txt
+# Change this to match the linker version.
+# See config.example.yml for a list.
+mw_comment_version: 11
