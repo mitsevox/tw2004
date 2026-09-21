@@ -28,6 +28,23 @@ Track A: Code decompilation (`main.dol`)
 2. **Gameplay logic and physics simulation** - analog swing mechanics, trajectory
    physics, collision, putting / caddy solver, golfer stat math, UI state machines.
 
+Work proceeds bottom-up. The ladder is a priority order, not a dependency chain:
+anything not yet decompiled is linked from the original binary.
+
+| Level | Layer | Contents |
+|------:|-------|----------|
+| 5 | Game systems and AI | Caddy tips, commentary triggers, scorecard state |
+| 4 | Game mechanics and event handlers | Swing input scaling, ball / cup collision, lie penalties |
+| 3 | Core physics simulation | Ball flight integration, green normal queries, wind / drag |
+| 2 | Math and geometry primitives | Vector, matrix, spline interpolation |
+| 1 | EA engine services | Asset loaders (`.hog` / `.gcb`), renderer, animation, audio, UI, saves |
+| 0 | Runtime and Dolphin SDK | Memory allocators, CodeWarrior runtime, OS / GX |
+
+Before climbing: **discovery** - compiler identification, SDK auto-matching, splits,
+and a strings / constants survey. The binary ships without symbols, so the contents
+of levels 2-5 are hypotheses until the code is located. Level 1 loaders are the
+bridge to Track B: each loader decompiled is a file format documented.
+
 Track B: Asset reverse engineering (disc data)
 ----------------------------------------------
 
