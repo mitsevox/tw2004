@@ -55,6 +55,9 @@ Track B: Asset reverse engineering (disc data)
 
 Format notes live in [`docs/formats`](docs/formats/README.md). Compiler findings live in [`docs/compiler.md`](docs/compiler.md).
 
+Knowledge base: [`docs/tw2004-notes.md`](docs/tw2004-notes.md) (what we know about this game) and
+[`docs/decomp-notes.md`](docs/decomp-notes.md) (general CodeWarrior / GameCube pitfalls and good practice).
+
 Project structure
 =================
 
