@@ -5,6 +5,5 @@ object: sys/main.dol
 hash: bbbc55485e51973931dee169e7bf87bc7379223f
 symbols: config/GW4E69/symbols.txt
 splits: config/GW4E69/splits.txt
-# Change this to match the linker version.
-# See config.example.yml for a list.
-mw_comment_version: 11
+# 10 = CodeWarrior for GameCube 1.3.2 - 2.6 (see config.example.yml).
+mw_comment_version: 10

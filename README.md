@@ -53,7 +53,7 @@ Track B: Asset reverse engineering (disc data)
 4. **Course file formats (Disc 1 and Disc 2)** - terrain meshes, green elevation
    grids, spline paths, skyboxes.
 
-Format notes live in [`docs/formats`](docs/formats/README.md).
+Format notes live in [`docs/formats`](docs/formats/README.md). Compiler findings live in [`docs/compiler.md`](docs/compiler.md).
 
 Project structure
 =================

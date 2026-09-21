@@ -192,6 +192,8 @@ config.scratch_preset_id = None
 
 # Base flags, common to most GC/Wii games.
 # Generally leave untouched, with overrides added below.
+# Confirmed against the original binary: -proc gekko, -fp hardware, -O4.
+# Not yet confirmed: -O4,p vs -O4,s, -inline mode, -str, -enum. The rest are template defaults.
 cflags_base = [
     "-nodefaults",
     "-proc gekko",
@@ -247,7 +249,11 @@ cflags_rel = [
     "-sdata2 0",
 ]
 
-config.linker_version = "GC/1.3.2"
+# Compiler / linker baseline. See docs/compiler.md for the evidence.
+# GC/2.5 (mwcc 2.4.7 build 105, Feb 2003) is the working baseline. GC/2.6 and GC/2.7
+# produced identical output in every test; GC/2.0 differs in ~2% of functions
+# (byte masking / bit packing) and is the fallback if such a function refuses to match.
+config.linker_version = "GC/2.5"
 
 
 # Helper function for Dolphin libraries
