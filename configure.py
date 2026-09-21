@@ -292,6 +292,16 @@ config.warn_missing_config = True
 config.warn_missing_source = False
 config.libs = [
     {
+        # EA game code whose original source file is not yet known.
+        "lib": "unsorted",
+        "mw_version": "GC/2.5",
+        "cflags": cflags_base,
+        "progress_category": "game",
+        "objects": [
+            Object(Matching, "unsorted/Vec3Copy.c"),
+        ],
+    },
+    {
         "lib": "Runtime.PPCEABI.H",
         "mw_version": config.linker_version,
         "cflags": cflags_runtime,
