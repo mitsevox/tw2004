@@ -11,5 +11,5 @@ Sections:
 	.sdata2     type:rodata align:32
 	.sbss2      type:bss align:32
 
-unsorted/Vec3Copy.c:
-	.text       start:0x80008304 end:0x80008320
+unsorted/code_800082F8.c:
+	.text       start:0x800082F8 end:0x800083A4

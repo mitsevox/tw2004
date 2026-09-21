@@ -298,7 +298,7 @@ config.libs = [
         "cflags": cflags_base,
         "progress_category": "game",
         "objects": [
-            Object(Matching, "unsorted/Vec3Copy.c"),
+            Object(Matching, "unsorted/code_800082F8.c"),
         ],
     },
     {
