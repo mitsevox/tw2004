@@ -51,6 +51,8 @@ Compilers tested are the `GC/*` builds from the standard decomp compiler pack.
 | `fn_80008304` (Vec3 copy, 7 instrs) | Natural C, compiled unchanged; exact byte match on 2.0 - 2.7 at `-O4` only | GC/1.3.2 and older, GC/3.0, `-O2` and lower |
 | Compiler build dates | `mwcceppc.exe -version` | GC/2.7 (built Jul 22 2004, after the game shipped) |
 
+| `fn_80007D74` (frustum cull test, 215 instrs) | Float math, branches, eight live float registers; exact match on GC/2.5 `-O4,p` | Nothing new, but a gross compiler or flag error would have shown here. Not re-tested on GC/2.0 |
+
 Build dates: GC/2.0 = Sep 16 2002, GC/2.5 = Feb 20 2003, GC/2.6 = Jul 14 2003. The game
 shipped September 2003, so GC/2.6 is possible but unlikely (weeks before gold).
 
@@ -93,10 +95,20 @@ trivial camera getters at `0x80008320` are inlined into their caller either. The
 `-inline smart`. Not yet determined: whether EA used `-inline deferred` (which would mean the
 functions appear in the binary in the reverse of their source order).
 
+Current flags
+-------------
+
+`configure.py` `cflags_base`: `-nodefaults -proc gekko -align powerpc -enum int -fp hardware
+-Cpp_exceptions off -O4,p -inline smart -RTTI off -fp_contract on -str reuse -multibyte`.
+All 28 matched functions were built with exactly these. Confirmed by test: `-proc gekko`,
+`-fp hardware`, `-O4`, no auto-inlining. The rest are inherited from the project template and
+have simply not caused a mismatch yet.
+
 Open questions
 --------------
 
-- GC/2.0 vs GC/2.5.
+- GC/2.0 vs GC/2.5. Parked on purpose: several tie-breakers failed to separate them, and a wrong
+  choice will surface as a byte-masking function that will not match.
 - `-O4,p` vs `-O4,s`. Loops separate them, the two matched functions do not contain one that does.
 - `-inline deferred` or not, `-str` pooling, small data thresholds.
 - Exact GCC / ProDG version and flags for the `0x8016C718` block.

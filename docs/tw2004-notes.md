@@ -126,6 +126,20 @@ Leads and loose ends
 - 79 small functions contain real paired-single math (e.g. `fn_800BAD60`, `fn_800BADF8`,
   `fn_8001EF78`). Probably hand-written assembly; would be matched as assembly, not C.
 
+Suggested next steps
+--------------------
+
+1. **Map the leaked file names to addresses.** Each assert string is referenced from inside a
+   function; tracing them pins ~92 real EA file names to places in the binary and would show
+   whether the camera block is really `GoCamera.c` or `GoViewport.c`.
+2. **Follow the named SDK calls into EA code.** Callers of `PADRead` lead to input and the swing
+   (`YhSwing.c`); callers of `CARD*` to saves (`MC_Gc.c`); callers of `DVD*` to file loading and
+   the asset formats.
+3. **The GCC file library** (`0x8016C718`): needs its own compiler entry (ProDG / GCC, version not
+   yet identified). Easiest code in the binary to read, and it parses the asset containers.
+4. **Add the already-solved small functions** to the project: the linked-list family at
+   `0x8000B508` and `fn_800AACBC`.
+
 Project conventions
 -------------------
 

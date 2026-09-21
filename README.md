@@ -15,6 +15,18 @@ Supported versions:
 (SHA-1 `bbbc55485e51973931dee169e7bf87bc7379223f`), so there is one code target.
 The discs differ only in which course data they carry.
 
+Status
+======
+
+Early days. Last updated 2026-09-21.
+
+- Builds byte-identical to the retail `main.dol`.
+- Matched: 28 of 7,646 functions (2,016 of 1,542,732 code bytes) - the camera visibility code
+  at `0x80007BC4` - `0x800083A4`.
+- Named: about 860 functions, mostly SDK and runtime. About 6,940 are still `fn_ADDRESS`.
+- Compiler: CodeWarrior GC/2.5 baseline, `-O4`. GC/2.0 not ruled out. See `docs/compiler.md`.
+- Asset formats: inventoried, none reverse-engineered yet.
+
 Roadmap
 =======
 
@@ -57,6 +69,7 @@ Format notes live in [`docs/formats`](docs/formats/README.md). Compiler findings
 
 Knowledge base: [`docs/tw2004-notes.md`](docs/tw2004-notes.md) (what we know about this game) and
 [`docs/decomp-notes.md`](docs/decomp-notes.md) (general CodeWarrior / GameCube pitfalls and good practice).
+What happened when, and why: [`docs/journal.md`](docs/journal.md).
 
 Project structure
 =================
@@ -70,6 +83,7 @@ Project structure
 - `docs/formats` - File format documentation (Track B).
 - `docs/*.md` - decomp-toolkit reference docs inherited from the project template.
 - `tools/` - Build scripts shared between decomp-toolkit projects.
+- `tools/research/` - Our own analysis scripts (not part of the build).
 - `build/`, `extracted/` - Generated output. Ignored by `.gitignore`.
 
 Dependencies
