@@ -93,7 +93,9 @@ typedef struct Player {
     s32  unk4;                  // 0x004
     GolferRecord golfer;        // 0x008
     s8   attrMod[NUM_ATTRS];    // 0x148  modifiers on top of the record
-    u8   unk154[0x354 - 0x154];
+    u8   unk154[0x278 - 0x154];
+    s32  nHolesWon;             // 0x278  match play
+    u8   unk27C[0x354 - 0x27C];
     s32  nClub;                 // 0x354
     u8   unk358[0x378 - 0x358];
     f32  fAim;                  // 0x378  aim angle, radians
@@ -141,7 +143,9 @@ typedef struct SurfaceType {
 // The round / session state at gSession (0x5BD0 bytes); only what this file reads.
 typedef struct Session {
     u32  uFlags;                // 0x000  bit 1: use the alternate attribute block everywhere
-    u8   unk4[0x13 - 0x4];
+    u8   unk4[0x10 - 0x4];
+    u8   bNoLuck;               // 0x010  lucky bounces switched off
+    u8   unk11[0x13 - 0x11];
     u8   bNoSpin;               // 0x013  spin control switched off
     u8   unk14[0x2C - 0x14];
     s32  nNumPlayers;           // 0x02C

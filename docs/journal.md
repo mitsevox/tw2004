@@ -147,6 +147,10 @@ Dated log of what was done and decided, newest last. Facts and lessons belong in
   instruction-count exact. New on the way: the spin input is an amount (0..20), not a flag, so
   spin is linear in SPIN; putts over 75% count as full; the driver has a tee sweet spot; and
   mis-hit rumble scales with the attribute. `golfer.h` now holds the shared structs.
+- **LUCK read, and the first real rubber band found.** `Golfer_IsLucky` doubles a human's
+  lucky-bounce odds when 5+ holes down in game mode 4 (match play); CPUs never get lucky
+  events. Hypothesis 3 is answered as "no, except this". Hypothesis 4 is closed: every
+  attribute's readers are now read, most decompiled.
 
 **Working agreements**
 - Show the plain-English logic and the C before building anything non-trivial.

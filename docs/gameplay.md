@@ -132,13 +132,34 @@ branch of `Swing_ComputePower` just takes that power (putts +5%). **No attribute
 CPU's swing itself.** Human and CPU are therefore different mechanisms: the human's stick error
 is *reduced* by attributes; the CPU's perfect aim is *worsened* by them.
 
+Luck
+----
+
+`Golfer_IsLucky(player)` (`0x8002D994`) decides whether a shot gets a lucky event. **CPU golfers
+never do** (early exit), and a session flag turns it off. The odds start at **1 in 12** for every
+player (`gLuckOdds`), and:
+
+- LUCK cuts the "12" by LUCK/2 percent: LUCK 100 makes it 1 in 6 (110 rounds to the same);
+- **in game mode 4, when player 1 has won more than 4 holes more than player 0, the odds are
+  halved again** (1 in 3 at LUCK 100); the same halving applies on one flagged hole;
+- it only fires off the green, never on a putt, and only for a pitch, a shot from lie 1 or 2
+  under 250 units, or one special shot mode; then `Rand_Next(0) % odds == 0` is the roll.
+
+What the event does is in the lie code (`0x80053594`, read, not decompiled): landing in the
+rough is a coin flip between the good rough lie and the bad one, and `(roll & 127) < LUCK/2`
+forces the good one - 50% good at LUCK 0, ~70% at 100. On a worse surface, `(LUCK/4 + 16)/128`
+is the chance of getting the rough treatment instead of the worst lie (12.5% at 0, 32% at 100).
+And in the collision code (`0x80052598`, read) a bounce-direction term has `0.005 x LUCK`
+subtracted, floored at -1: the kinder deflection off trees the tooltip promises.
+
 What none of this reads
 -----------------------
 
-`AI_ChooseTarget`, `AI_ApplyError`, `AI_PlanShot`, both power functions and the forgiveness
-function read: the player's own attributes, the shot geometry (ball, target, pin, distance),
-lie, club tables, and the RNG. None of them reads a score, a hole standing, or another player.
-(Wind generation and the swing meter's own input path are not read yet.)
+`AI_ChooseTarget`, `AI_ApplyError`, `AI_PlanShot`, both power functions, the forgiveness
+function, boost, spin and rumble read: the player's own attributes, the shot geometry (ball,
+target, pin, distance), lie, club tables, and the RNG. None of them reads a score, a hole
+standing, or another player. **The one exception found is in `Golfer_IsLucky`**: the match-play
+holes-won comparison above, in game mode 4 only. (Wind generation is still unread.)
 
 EA's random number generator
 ----------------------------

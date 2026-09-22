@@ -73,13 +73,17 @@ physics, wind or AI-error code. Absence across all of those files would confirm 
 **Where to look:** the AI error injection from hypothesis 2 (the obvious place to hide it), wind
 generation, and the swing meter code in `Swing.c`.
 
-**Result (2026-09-22):** **supported so far.** The complete CPU shot pipeline
-(`AI_ChooseTarget`, `AI_ApplyError`, `AI_PlanShot`, `Swing_ComputePower`) and the human
-forgiveness function read only the player's own attributes, the shot geometry, club tables and
-the RNG. No score, standing or other-player read in any of them. Still to check before calling
-it closed: wind generation and the swing meter's input path.
+**Result (2026-09-22):** **mostly right, with one exception.** The complete CPU shot pipeline,
+the human forgiveness / power / boost / spin functions read only the player's own attributes,
+the shot geometry, club tables and the RNG. But `Golfer_IsLucky` (`0x8002D994`) does read the
+standing: **in game mode 4, when player 1 is more than 4 holes up on player 0, player 0's
+lucky-bounce odds are doubled** (1 in 12 becomes 1 in 6, or 1 in 3 with LUCK 100). CPU golfers
+never get lucky events at all, so this only ever helps the human. Mode 4 is almost certainly
+World Tour (the one-on-one match-play mode), which is also where CPU pros use the flatter
+second attribute block. So: no rubber band on the swing or the AI, one small deliberate one on
+luck in match play. Wind generation is still unread.
 
-**Status:** supported; two files left to check.
+**Status:** answered (with the exception above); wind still to read.
 
 4. Which attributes touch which math, and whether human and CPU are treated alike
 ---------------------------------------------------------------------------------
@@ -136,7 +140,12 @@ ceiling; SPIN scales the spin; POWER sets club reach (shared with the CPU). Two 
 assists found on the way: putts over 75% on the meter count as full power, and a driver off the
 tee gets up to +10% in a tempo window.
 
-**Status:** answered for the swing; LUCK's readers (lies, bounces) still to be read.
+**Update (LUCK):** read all three readers. LUCK is the odds of a lucky event (above, hypothesis
+3), the chance of the good rough lie over the bad one (50% at 0, ~70% at 100), the chance of
+escaping the worst lie on a bad surface (12.5% to 32%), and a kinder bounce term in the
+collision code. Humans only: CPU golfers never roll for luck.
+
+**Status:** answered.
 
 5. Is there hidden putting assistance (a "pull" toward the cup)?
 -----------------------------------------------------------------

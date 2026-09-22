@@ -617,3 +617,54 @@ void AI_DefaultTarget(int nPlayer) {
     AI_PlanShot(nPlayer, pTarget);
     Vec_Copy(pTarget, p->vTarget2);
 }
+
+extern s8 gLuckOdds[8];                 // 0x802810B0  "1 in n" per player: 12 12 12 12
+u8   fn_80101D4C(int nPlayer);          // a CPU in game mode 11 is always lucky
+u8   fn_800DA234(void);                 // the current hole is the flagged one
+f32  fn_800D0478(int nPlayer);          // a distance, compared with 250
+
+// ---- luck -------------------------------------------------------------------------------------
+
+// Does this shot get a lucky bounce? Humans only. One chance in the player's odds (12), the odds
+// cut by LUCK/2 percent, and halved again when 5+ holes down in game mode 4 or on the flagged
+// hole. Only off the green, never a putt, and only for pitches, lies 1/2 under 250, or a
+// special shot mode.
+u8 Golfer_IsLucky(int nPlayer) {
+    u8      bLucky = 0;
+    u32     uOdds;
+    u32     uRoll;
+    if (fn_80101D4C(nPlayer)) {
+        return 1;
+    }
+    if (Player_IsCPU(nPlayer) || gSession.bNoLuck) {
+        return 0;
+    }
+    uOdds = gLuckOdds[nPlayer];
+    if (Game_GetMode() == 4 && gPlayers[1].nHolesWon - gPlayers[0].nHolesWon > 4) {
+        uOdds >>= 1;
+    } else if (fn_800DA234()) {
+        uOdds >>= 1;
+    }
+    if (nPlayer >= 0 && nPlayer <= 3) {
+        int nLuck = (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_LUCK, ATTR_TOTAL);
+        nLuck = nLuck < 0 ? 0 : (nLuck > 110 ? 110 : nLuck);
+        uOdds -= uOdds * (nLuck >> 1) / 100;
+        if (uOdds < 1) uOdds = 1;
+    }
+    uRoll = Rand_Next(0) % uOdds;
+    if (gPlayers[nPlayer].nLie != LIE_GREEN && gPlayers[nPlayer].nShotKind != SHOT_PUTT && !gSession.bNoLuck) {
+        Game_CurrentHole();
+        fn_8000C594();
+        if (fn_800D2B08() == 3) {
+            bLucky = 1;
+        } else if (gPlayers[nPlayer].nShotKind == SHOT_PITCH) {
+            bLucky = 1;
+        } else if ((gPlayers[nPlayer].nLie == 1 || gPlayers[nPlayer].nLie == 2) && fn_800D0478(nPlayer) < 250.0f) {
+            bLucky = 1;
+        }
+    }
+    if (bLucky && uRoll != 0) {
+        bLucky = 0;
+    }
+    return bLucky;
+}
