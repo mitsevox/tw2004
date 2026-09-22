@@ -27,6 +27,17 @@ The pieces
 | `gAITargets` | `0x801C65B8` | table of authored aim points, 12 bytes each |
 | `gForgivenessTable` | `0x80188168` | 27 rows x 3 floats (value at attribute 0 / 100 / 110) |
 
+Human swing: starting it (`Swing_WaitForBackswing`, `Swing_Begin`, in C)
+--------------------------------------------------------------------------
+
+Before the backswing the game polls both sticks every frame and holds their rest positions at
+128. **The swing starts the frame either stick is pulled past 160 of 255** - a quarter of its
+travel - and that stick's rest position becomes the centre sample; the C-stick works as a
+second swing stick (`bUsingCStick`). `Swing_Begin` then starts the animation, reads its three
+timing marks, and fills a **25-sample ring of stick positions** with the centre; the top and
+impact samples are picked out of that ring as the swing goes on (`0x8005934C`, not yet in C).
+A CPU or a replay starts the swing immediately.
+
 Human swing: the miss itself (`Swing_MeterError`, `0x8005BA94`, in C)
 -------------------------------------------------------------------------
 

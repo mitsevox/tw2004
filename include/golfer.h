@@ -83,7 +83,12 @@ typedef struct GolferRecord {
 // The swing meter's per-player state, embedded in Player at 0x3D4 (offsets below are within
 // this struct; add 0x3D4 for the player offset).
 typedef struct SwingData {
-    u8   unk0[0x18];
+    s32  nPhase;                // 0x000  (0x3D4) 1 once the swing is under way
+    f32  fMark1;                // 0x004  animation mark times
+    f32  fMark0;                // 0x008
+    f32  fMark2;                // 0x00C
+    f32  f10;                   // 0x010
+    f32  f14;                   // 0x014
     s32  nTopX;                 // 0x018  (0x3EC) stick at the top of the backswing
     s32  nTopY;                 // 0x01C  (0x3F0)
     s32  nImpactX;              // 0x020  (0x3F4) stick at impact
@@ -97,18 +102,32 @@ typedef struct SwingData {
     u8   unk50[0x378 - 0x50];
     s32  nCentreX;              // 0x378  (0x74C) stick at the start of the swing
     s32  nCentreY;              // 0x37C  (0x750)
-    u8   unk380[0x460 - 0x380];
+    s32  nRestCX;               // 0x380  (0x754) the sticks' rest positions while waiting
+    s32  nRestCY;               // 0x384  (0x758)
+    s32  nRestX;                // 0x388  (0x75C)
+    s32  nRestY;                // 0x38C  (0x760)
+    s32  bUsingCStick;          // 0x390  (0x764)
+    s32  nHistX[25];            // 0x394  (0x768) the last 25 stick samples
+    s32  nHistY[25];            // 0x3F8  (0x7CC)
+    s32  nHistIndex;            // 0x45C  (0x830)
     s32  nRumbleFrames;         // 0x460  (0x834)
     u8   bRumble;               // 0x464  (0x838)
     u8   unk465[0x494 - 0x465];
     s32  nBoostLevel;           // 0x494  (0x868) power boost level pressed, 0..8
-    u8   unk498[0x610 - 0x498];
+    u8   unk498[0x604 - 0x498];
+    f32  f604;                  // 0x604
+    u8   unk608[4];
+    u8   b60C;                  // 0x60C
+    u8   b60D;                  // 0x60D
+    u8   unk60E[2];
     s32  nSpinAmount;           // 0x610  (0x9E4) how much spin was asked for, 0..20
     s32  nSpinStickX;           // 0x614  (0x9E8) 0..255, 128 centre
     s32  nSpinStickY;           // 0x618  (0x9EC)
     f32  fSpinX;                // 0x61C  (0x9F0)
     f32  fSpinY;                // 0x620  (0x9F4)
-    u8   unk624[0x630 - 0x624];
+    u8   unk624[4];
+    f32  f628;                  // 0x628
+    f32  f62C;                  // 0x62C
     u8   unk630;                // 0x630  (0xA04) cleared by Player_SetGolfer
     u8   unk631[3];
 } SwingData;

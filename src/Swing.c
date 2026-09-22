@@ -659,3 +659,90 @@ void SwingState02_Update(int nPlayer) {
         }
     }
 }
+
+
+// ---- starting the swing ---------------------------------------------------------------------------
+
+u8*  fn_80058EB8(int nPlayer, int nController);   // the pad's state: [1] main stick y, [3] C-stick y
+f32  fn_8005CB78(int nHandle, int a, int nMark);   // an animation mark's time
+void fn_80095744(int nHandle, int nAnim);        // play an animation
+void fn_80096690(int nHandle);
+void fn_8005BFC0(int nPlayer);
+void fn_8005A0E0(int nPlayer);
+void fn_8006C5E0(void);
+void fn_80067074(int nPlayer, int nSound, int a, int b);
+
+// The swing is under way: phase 1, the animation started, its three marks read, the 25-sample
+// stick history filled with the centre, the spin stick centred.
+void Swing_Begin(int nPlayer) {
+    Player*    p      = &gPlayers[nPlayer];
+    int        nHandle = p->nShotHandle;
+    SwingData* pSw    = &p->swing;
+    int        i;
+
+    pSw->nPhase = 1;
+    fn_80095744(nHandle, 6);
+    fn_80096690(nHandle);
+    pSw->f10 = 0.0f;
+    pSw->f14 = 0.0f;
+    pSw->fMark0 = fn_8005CB78(nHandle, 0, 0);
+    pSw->fMark1 = fn_8005CB78(nHandle, 0, 1);
+    pSw->fMark2 = fn_8005CB78(nHandle, 0, 2);
+    for (i = 0; i < 25; i++) {
+        pSw->nHistX[i] = pSw->nCentreX;
+        pSw->nHistY[i] = pSw->nCentreY;
+    }
+    pSw->nHistIndex = 0;
+    pSw->f604       = 0.0f;
+    pSw->b60C       = 0;
+    pSw->b60D       = 0;
+    fn_8005BFC0(nPlayer);
+    pSw->nSpinStickX = 128;
+    pSw->nSpinStickY = 128;
+    pSw->f628        = 0.0f;
+    pSw->f62C        = 0.0f;
+}
+
+// Waiting for the backswing. A CPU (or a replay) starts at once. A human starts the frame
+// either stick is pulled past 160 of 255 - more than a quarter of its travel - and that stick's
+// rest position becomes the centre sample; the C-stick can swing too (bUsingCStick). While
+// nothing is pulled the rest positions are held at 128.
+int Swing_WaitForBackswing(int nPlayer) {
+    Player* p          = &gPlayers[nPlayer];
+    int     nController = p->nController;
+    int     nHandle    = p->nShotHandle;
+    u8*     pPad;
+    u8      bMain, bCStick;
+
+    if (Controller_IsCPU(nController) || Game_GetMode() == 10) {
+        gPlayers[nPlayer].swing.nPhase = 1;
+        Swing_Begin(nPlayer);
+        *(u32*)(nHandle + 0x168) &= ~1;
+        fn_8005A0E0(nPlayer);
+        return 0;
+    }
+    pPad    = fn_80058EB8(nPlayer, nController);
+    bMain   = pPad[1] <= 0xFF && pPad[1] > 0xA0;
+    bCStick = pPad[3] <= 0xFF && pPad[3] > 0xA0;
+    if (bMain || bCStick) {
+        if (bCStick) {
+            gPlayers[nPlayer].swing.nCentreY      = gPlayers[nPlayer].swing.nRestCY;
+            gPlayers[nPlayer].swing.nCentreX      = gPlayers[nPlayer].swing.nRestCX;
+            gPlayers[nPlayer].swing.bUsingCStick  = 1;
+        } else {
+            gPlayers[nPlayer].swing.nCentreY      = gPlayers[nPlayer].swing.nRestY;
+            gPlayers[nPlayer].swing.nCentreX      = gPlayers[nPlayer].swing.nRestX;
+            gPlayers[nPlayer].swing.bUsingCStick  = 0;
+        }
+        fn_80067074(nPlayer, 0x2C, 0, 0);
+        Swing_Begin(nPlayer);
+        fn_8005A0E0(nPlayer);
+        fn_8006C5E0();
+    } else {
+        gPlayers[nPlayer].swing.nRestCY = 128;
+        gPlayers[nPlayer].swing.nRestCX = 128;
+        gPlayers[nPlayer].swing.nRestY  = 128;
+        gPlayers[nPlayer].swing.nRestX  = 128;
+    }
+    return 0;
+}
