@@ -61,6 +61,14 @@ Dated log of what was done and decided, newest last. Facts and lessons belong in
   the screen on each side, on any camera movement. The two-instruction code is what fixes it.
 - Dolphin only auto-swaps discs when launched from an `.m3u` playlist; we launched Disc 1 directly.
 
+2026-09-22
+----------
+
+- Widescreen code credited to `mits` (the user's forum handle). Forum post drafted in
+  `docs/publish/dolphin-forum-post.md` and posted to Dolphin forums > Cheats, Hacks & Game Patches;
+  awaiting moderator approval. Wiki entry and GameHacking.org submission still to do.
+- Repo made public.
+
 **Working agreements**
 - Show the plain-English logic and the C before building anything non-trivial.
 - One batch of work, then report. No silent fix loops.
