@@ -93,7 +93,7 @@ typedef struct SwingData {
     f32  fLaunchPower;          // 0x040  (0x414) Swing_ComputePower's result
     f32  fLaunchAX;             // 0x044  (0x418) copy of vLaunchA[0]
     f32  fPowerAfterError;      // 0x048  (0x41C)
-    f32  fTempo;                // 0x04C  (0x420) driver sweet-spot input (negative when armed)
+    f32  fBackAngle;            // 0x04C  (0x420) the backswing's sideways angle, radians (0 on a putt)
     u8   unk50[0x378 - 0x50];
     s32  nCentreX;              // 0x378  (0x74C) stick at the start of the swing
     s32  nCentreY;              // 0x37C  (0x750)

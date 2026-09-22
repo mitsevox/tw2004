@@ -6,10 +6,14 @@
 
 // The swing module's state; only the tuning values read here. Set up in Swing_Init.
 typedef struct SwingState {
-    u8   unk0[0xBC];
-    f32  fTeeWindowLo;          // 0x0BC  0.4
-    u8   unkC0[4];
-    f32  fTeeWindowHi;          // 0x0C4  0.6
+    u8   unk0[0xAC];
+    f32  fCurveMin;             // 0x0AC  a club's shaping range, by gClubCurve
+    f32  fCurveMax;             // 0x0B0
+    u8   unkB4[4];
+    f32  fKnot1Y;               // 0x0B8  } the backswing-angle response curve: two knots
+    f32  fKnot1X;               // 0x0BC  0.4
+    f32  fKnot2Y;               // 0x0C0
+    f32  fKnot2X;               // 0x0C4  0.6
     f32  fTeeBonus;             // 0x0C8  0.1
     u8   unkCC[0x114 - 0xCC];
     f32  fMaxError;             // 0x114  the meter's largest miss, radians
@@ -105,11 +109,11 @@ void Swing_ApplySpin(int nPlayer) {
 f32 Swing_TeeSweetSpot(int nPlayer, f32 fPower) {
     Player* p = &gPlayers[nPlayer];
     f32     fT, fHalf;
-    if (p->nLie == 0 && p->nClub == 0 && p->swing.fTempo < 0.0f) {
-        fT = -p->swing.fTempo / 1.5707964f;
-        if (fT > gpSwing->fTeeWindowLo && fT < gpSwing->fTeeWindowHi) {
-            fHalf = (gpSwing->fTeeWindowHi - gpSwing->fTeeWindowLo) * 0.5f;
-            return fPower + (1.0f - (f32)fn_8000AE94(fHalf - (fT - gpSwing->fTeeWindowLo)) / fHalf) * gpSwing->fTeeBonus;
+    if (p->nLie == 0 && p->nClub == 0 && p->swing.fBackAngle < 0.0f) {
+        fT = -p->swing.fBackAngle / 1.5707964f;
+        if (fT > gpSwing->fKnot1X && fT < gpSwing->fKnot2X) {
+            fHalf = (gpSwing->fKnot2X - gpSwing->fKnot1X) * 0.5f;
+            return fPower + (1.0f - (f32)fn_8000AE94(fHalf - (fT - gpSwing->fKnot1X)) / fHalf) * gpSwing->fTeeBonus;
         }
     }
     return fPower;
@@ -314,9 +318,9 @@ u8   Player_IsController8(int nPlayer);      // Golfer.c
 void fn_8000B1D4(int nStream, u32 uSeed);    // seed an RNG stream
 void fn_8006BF60(int nPlayer);
 void fn_8006C300(int nPlayer);
-void fn_8005B664(int nPlayer, f32* pLaunchA);
+void Swing_FaceVector(int nPlayer, f32* pOut);
 f32  Swing_MeterError(int nPlayer);
-void fn_8005B8C8(int nPlayer, f32* pLaunchB);
+void Swing_ShapeVector(int nPlayer, f32* pOut);
 void fn_8005CCA8(int nPlayer);
 f32  fn_8005CC84(f32 fTan);                  // atanf
 
@@ -348,7 +352,7 @@ void Swing_Launch(int nPlayer) {
     nTrajectory = p->nTrajectory;
     nKind       = p->nShotKind;
     pBall       = p->ball;
-    fn_8005B664(nPlayer, pLaunchA);
+    Swing_FaceVector(nPlayer, pLaunchA);
     if (Player_IsCPU(nPlayer) || gPlayers[nPlayer].bPerfect) {
         gPlayers[nPlayer].swing.fSwingError = 0.0f;
     } else {
@@ -364,7 +368,7 @@ void Swing_Launch(int nPlayer) {
         gPlayers[nPlayer].vLaunchA[3] = 0.0f;
     }
     pLaunchB = p->vLaunchB;
-    fn_8005B8C8(nPlayer, pLaunchB);
+    Swing_ShapeVector(nPlayer, pLaunchB);
     gPlayers[nPlayer].swing.fLaunchAX = gPlayers[nPlayer].vLaunchA[0];
     if (Player_IsController8(nPlayer)) {
         fn_8005CCA8(nPlayer);
@@ -386,7 +390,8 @@ void Swing_Launch(int nPlayer) {
 
 // ---- the meter's miss ----------------------------------------------------------------------------
 
-extern f32 gSwingXScale[8];                  // 0x801882CC  per shot kind: 0.03 for a putt, 0.2 otherwise
+extern f32 gPuttXScale[8];                   // 0x801882AC  per shot kind: 0.03 for a putt, 0.2 otherwise
+extern f32 gSwingXScale[8];                  // 0x801882CC  the same values again
 
 void Vec_Sub(f32* pA, f32* pB, f32* pOut);   // 0x8005CBF4  a - b
 void Vec_Add(f32* pA, f32* pB, f32* pOut);   // 0x8005CBD0  a + b
@@ -441,4 +446,108 @@ f32 Swing_MeterError(int nPlayer) {
         fAngle = fMax;
     }
     return fAngle;
+}
+
+
+// ---- the clubface -------------------------------------------------------------------------------
+
+extern s32 gClubCurve[NUM_CLUBS];            // 0x80183578  per club, 0..26: how much it can shape
+
+void AI_FaceVector(int nPlayer, f32* pOut);  // Golfer.c
+
+// How far the face turns for a backswing angled fBackAngle off vertical: the angle as a fraction
+// of a quarter turn goes through a three-piece curve (knots at gpSwing 0xB8..0xC4), scaled by
+// the club's shaping range (fCurveMin..fCurveMax by gClubCurve/26) and a quarter turn.
+f32 Swing_CurveAngle(s32* pClub, f32 fBackAngle) {
+    f32 fOut   = 0.0f;
+    f32 fT     = fBackAngle / (PI / 2);
+    f32 fRange = gpSwing->fCurveMin + ((f32)gClubCurve[*pClub] / 26.0f) * (gpSwing->fCurveMax - gpSwing->fCurveMin);
+
+    fT = (f32)fn_8000AE94(fT);
+    if (fT < gpSwing->fKnot1X) {
+        fOut = gpSwing->fKnot1Y * fT / gpSwing->fKnot1X;
+    } else {
+        fOut += gpSwing->fKnot1Y;
+        if (fT < gpSwing->fKnot2X) {
+            fOut += (gpSwing->fKnot2Y - gpSwing->fKnot1Y) * ((fT - gpSwing->fKnot1X) / (gpSwing->fKnot2X - gpSwing->fKnot1X));
+        } else {
+            fOut += gpSwing->fKnot2Y - gpSwing->fKnot1Y;
+            fOut += (1.0f - gpSwing->fKnot2Y) * ((fT - gpSwing->fKnot2X) / (1.0f - gpSwing->fKnot2X));
+        }
+    }
+    fOut *= (PI / 2) * fRange;
+    if (fBackAngle < 0.0f) {
+        return -fOut;
+    }
+    return fOut;
+}
+
+// The first launch block: the human's clubface from the stick. A CPU or a perfect shot gets a
+// square face. On a full shot the backswing's sideways angle (kept in fBackAngle for the tee
+// bonus) becomes a face angle through Swing_CurveAngle; on a putt the face is a plain
+// proportion of the stick's sideways offset. Session flags 0x4000 + 0x8000 force it square.
+void Swing_FaceVector(int nPlayer, f32* pOut) {
+    Player* p;
+    f32     fCentreX, fTopX, fTopY, fDY;
+    f32     fAngle, fSin, fCos, fK;
+
+    if (Player_IsCPU(nPlayer) || gPlayers[nPlayer].bPerfect) {
+        pOut[0] = 0.0f;
+        pOut[1] = 0.0f;
+        pOut[2] = 1.0f;
+        pOut[3] = 0.0f;
+        return;
+    }
+    p        = &gPlayers[nPlayer];
+    fCentreX = p->swing.nCentreX;
+    fTopX    = p->swing.nTopX;
+    fTopY    = p->swing.nTopY;
+    if (0.0f == fCentreX) fCentreX = 1.0f;
+    fDY = fTopY - (f32)gPlayers[nPlayer].swing.nCentreY;
+    if (0.0f == fDY) {
+        pOut[0] = 0.0f;
+        pOut[1] = 0.0f;
+        pOut[2] = 1.0f;
+        pOut[3] = 0.0f;
+    } else if (gPlayers[nPlayer].nShotKind != SHOT_PUTT) {
+        fAngle = fn_8005CC84((fTopX - fCentreX) / fDY);
+        gPlayers[nPlayer].swing.fBackAngle = fAngle;
+        fAngle = Swing_CurveAngle(&gPlayers[nPlayer].nClub, fAngle);
+        fSin   = fn_800095F0(fAngle);
+        fCos   = fn_80009638(fAngle);
+        pOut[0] = -fSin;
+        pOut[1] = 0.0f;
+        pOut[2] = fCos;
+        pOut[3] = 0.0f;
+    } else {
+        gPlayers[nPlayer].swing.fBackAngle = 0.0f;
+        if (fTopX > fCentreX) {
+            fK = ((fTopX - fCentreX) / (255.0f - fCentreX)) * gPuttXScale[gPlayers[nPlayer].nShotKind];
+        } else {
+            fK = ((fCentreX - fTopX) / fCentreX) * gPuttXScale[gPlayers[nPlayer].nShotKind];
+        }
+        pOut[0] = fK * (fCentreX - fTopX);
+        pOut[1] = 0.0f;
+        pOut[2] = fDY;
+        pOut[3] = 0.0f;
+    }
+    if ((gSession.uFlags & 0x4000) && (gSession.uFlags & 0x8000)) {
+        pOut[0] = 0.0f;
+        pOut[1] = 0.0f;
+        pOut[2] = 1.0f;
+        pOut[3] = 0.0f;
+    }
+    Vec_Normalize(pOut, pOut);
+}
+
+// The second launch block: a CPU's (or a perfect shot's) shape vector; square for a human.
+void Swing_ShapeVector(int nPlayer, f32* pOut) {
+    if (Player_IsCPU(nPlayer) || gPlayers[nPlayer].bPerfect) {
+        AI_FaceVector(nPlayer, pOut);
+    } else {
+        pOut[0] = 0.0f;
+        pOut[1] = 0.0f;
+        pOut[2] = 1.0f;
+        pOut[3] = 0.0f;
+    }
 }

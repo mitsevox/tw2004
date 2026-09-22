@@ -158,7 +158,8 @@ ACCURACY / BALL STRIKING / APPROACH / PUTTING / RECOVERY each shrink the stick e
 shot type and (driving, recovery) reduce the distance lost to it; POWER BOOST doubles the boost
 ceiling; SPIN scales the spin; POWER sets club reach (shared with the CPU). Two non-attribute
 assists found on the way: putts over 75% on the meter count as full power, and a driver off the
-tee gets up to +10% in a tempo window.
+tee gets up to +10% when the backswing is angled 36..54 degrees off vertical (the same
+angle that shapes the shot - `Swing_FaceVector`).
 
 **Update (LUCK):** read all three readers. LUCK is the odds of a lucky event (above, hypothesis
 3), the chance of the good rough lie over the bad one (50% at 0, ~70% at 100), the chance of

@@ -80,8 +80,27 @@ there. Result clamped to 0.05..1.5.
 
 Two more things in the same function: **a putt meter over 75% is treated as 100%**
 (`gpSwing->fPuttFullPower`), and a **driver from the tee gets up to +10% power**
-(`Swing_TeeSweetSpot`) when the tempo value lands in a 0.4..0.6 window, peaking at the centre.
+(`Swing_TeeSweetSpot`) when the *backswing's sideways angle* is between 0.4 and 0.6 of a
+quarter turn - **36 to 54 degrees off vertical, peaking at 45** - on the side that reads
+negative. We first took the value for a tempo; it is the angle the face code below stores.
 Both are tuning values set in `Swing_Init`, not attributes.
+
+Human swing: draw and fade (`Swing_FaceVector`, `Swing_CurveAngle`, in C)
+--------------------------------------------------------------------------
+
+The shot's curve comes from the same three stick samples. On a full shot the angle of the
+backswing off vertical, `atan((top.x - centre.x) / (top.y - centre.y))`, is kept
+(`SwingData.fBackAngle`) and turned into a clubface angle: the angle as a fraction of a quarter
+turn goes through a three-piece response curve (knots at 0.4 and 0.6, tuning values), is scaled
+by **the club's shaping range** (`gClubCurve[club] / 26` between two tuning values - some clubs
+curve more than others) and by a quarter turn, and keeps the backswing's sign. The face vector
+`(-sin, 0, cos)` is launch block A; `Swing_Launch` adds its angle to the aim. On a putt there is
+no curve: the face is the stick's sideways offset as a plain proportion (x 0.03).
+
+So the driver's tee bonus and the biggest curve live on the same input: a backswing at 45
+degrees is both the +10% power and a strong draw or fade. A CPU or a perfect shot gets a square
+face, and its shape (draw/fade/punch/lob from the aim point) rides in launch block B instead
+(`Swing_ShapeVector` -> `AI_FaceVector`).
 
 Human swing: power boost, spin, rumble
 --------------------------------------
