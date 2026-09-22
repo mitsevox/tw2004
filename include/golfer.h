@@ -281,6 +281,7 @@ typedef struct GameState {
     u8   b284;                  // 0x284
     u8   unk285[0x290 - 0x285];
     s32  n290;                  // 0x290
+    s32  n294;                  // 0x294
 } GameState;
 
 // An authored aim point. pDef points at its position and the up-to-ten other points a golfer

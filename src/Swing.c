@@ -1263,7 +1263,7 @@ void  View_SetCamera(void* pView, int nCamera, int nPlayer, int nView);   // 0x8
 void  fn_800E3D38(int nPlayer, int a);
 void  Ball_SetSimulating(u8 bOn);            // Ball.c
 void  fn_8006AD68(int nPlayer);
-void  fn_800DF280(void);
+void  fn_800DF280(int nPlayer);
 void  fn_800E3C0C(int a);
 u8    fn_80063C90(void* pView);              // the camera is still moving
 void  fn_80063BF4(void* pView, f32 f, f32* pVec);
@@ -1285,7 +1285,7 @@ void SwingState23_Exit(int nPlayer) {
 }
 
 void SwingState23_Update(int nPlayer) {
-    fn_800DF280();
+    fn_800DF280(nPlayer);
 }
 
 void SwingState22_Exit(int nPlayer) {
@@ -2481,4 +2481,66 @@ void SwingState06_Update(int nPlayer) {
             }
         }
     }
+}
+
+
+int   fn_800DF5B4(int nPlayer);
+void  fn_800C7168(View* pView, int a);
+u8    fn_800C7170(View* pView);
+void  fn_800C7158(View* pView, int a);
+int   fn_800DE180(int nPlayer);
+int   fn_8006AA9C(int nPlayer);
+int   fn_80095798(int nHandle);
+u8    fn_800C7160(View* pView);
+u8    fn_800734A0(void* pAnim);
+int   fn_80062C1C(int nHandle);
+int   fn_80062C10(int nHandle);
+u8    fn_800C6604(View* pView);
+void  fn_800C6358(View* pView, int nPlayer);
+
+// State 13: the ball has come to rest and the golfer reacts. On the first frame the result is
+// handed to the view; a good result (gpGame+0x294, not on cameras 1/4) plays the reaction
+// animation 9 or cuts to camera 16. When the view is done and the camera is not 16, flag bit 2
+// is set and it is state 17 (the hole-out sequence). While animation 9 plays, camera 16 is
+// taken once the animation allows, and the reaction shot lines up.
+void SwingState13_Update(int nPlayer) {
+    s32*  pView = &gPlayers[nPlayer].nView0;
+    View* pV    = (View*)fn_80017028(*pView);
+    s32*  pHandle;
+
+    if (lbl_80281E12 != 0) {
+        lbl_80281E12 = 0;
+        fn_800C7168(pV, fn_800DF5B4(nPlayer));
+        if (fn_800C7170(pV)) {
+            fn_800C7158(pV, 1);
+            return;
+        }
+        fn_800C7158(pV, fn_800DE180(nPlayer));
+        if (gpGame->n294 != 0 && pV->nCamera != 1 && pV->nCamera != 4) {
+            if (!(gPlayers[nPlayer].uFlags & 8) || fn_8006AA9C(nPlayer) == 2) {
+                pHandle = &gPlayers[nPlayer].nShotHandle;
+                if (fn_80095780(*pHandle) != 9 && fn_80095798(*pHandle) != 9 && fn_800C7160(pV)) {
+                    fn_80095744(*pHandle, 9);
+                } else {
+                    View_SetCamera(pV, 0x10, nPlayer, *pView);
+                }
+            }
+        }
+    }
+    if (fn_800C7170(pV) && pV->nCurCamera != 0x10 && pV->nCamera != 1 && pV->nCamera != 4) {
+        gPlayers[nPlayer].uFlags |= 2;
+        SwingStack_Push(0x11, nPlayer);
+        return;
+    }
+    pHandle = &gPlayers[nPlayer].nShotHandle;
+    if (fn_80095780(*pHandle) == 9 && pV->nCurCamera != 0x10 && Game_GetMode() != 11 &&
+        !fn_800734A0((u8*)*pHandle + 0x40C)) {
+        View_SetCamera(pV, 0x10, nPlayer, *pView);
+    }
+    if (fn_80095780(*pHandle) == 9) {
+        if ((fn_80062C1C(*pHandle) != 0 || fn_80062C10(*pHandle) != 0) && !fn_800C6604(pV)) {
+            fn_800C6358(pV, nPlayer);
+        }
+    }
+    fn_800DF280(nPlayer);
 }
