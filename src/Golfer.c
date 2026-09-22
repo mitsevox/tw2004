@@ -1876,7 +1876,7 @@ void Session_Init(void) {
     pSession->nSplitScreen = 0;
     pSession->unk11[0]    = 0;
     pSession->unk11[1]    = 0;
-    pSession->bNoSpin     = 0;
+    pSession->bReplay     = 0;
     pSession->unk14       = 0;
     pSession->uFlags     &= ~0x60;
     pSession->fFrameTime  = 0.0f;

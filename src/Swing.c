@@ -86,7 +86,7 @@ void Swing_ApplySpin(int nPlayer) {
     SwingData* pSw = &gPlayers[nPlayer].swing;
     int        nSpin;
     f32        fScale;
-    if (gSession.bNoSpin) return;
+    if (gSession.bReplay) return;
     if (pSw->nSpinAmount == 0) {
         pSw->fSpinX = 0.0f;
         pSw->fSpinY = 0.0f;
@@ -341,7 +341,7 @@ void Swing_Launch(int nPlayer) {
     if (Game_GetMode() == 10) {
         fn_8000B1D4(0, *(u32*)gReplayData);
         fn_80005628(&gPlayers[0].swing, gReplayData + 0x3DC, 0x630);
-    } else if (gSession.bNoSpin == 0) {
+    } else if (gSession.bReplay == 0) {
         Luck_TakePerfectShot(nPlayer);
         fn_8006BF60(nPlayer);
     } else {

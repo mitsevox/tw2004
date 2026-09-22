@@ -102,6 +102,11 @@ degrees is both the +10% power and a strong draw or fade. A CPU or a perfect sho
 face, and its shape (draw/fade/punch/lob from the aim point) rides in launch block B instead
 (`Swing_ShapeVector` -> `AI_FaceVector`).
 
+The launch itself (`Swing_Launch`, in C) runs from swing state 11 once the swing animation
+reaches its impact frame. In a replay (session byte 0x13, set when a saved shot is loaded) the
+RNG is reseeded from the replay, player 0's swing state is restored, and the lucky-shot swap and
+spin are skipped - which is how a replay reproduces the shot exactly.
+
 Human swing: power boost, spin, rumble
 --------------------------------------
 
