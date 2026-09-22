@@ -1459,3 +1459,70 @@ void SwingState03_Enter(int nPlayer) {
     fn_80062D38(0x62, 1, nPlayer);
     lbl_80281E11 = 1;
 }
+
+
+void  fn_8006AAB4(int nPlayer, int a);
+void  fn_80063B98(void* pView, f32 f, f32* pVec);
+extern Vec4 lbl_801835F0;
+extern u8   lbl_80281E12;
+
+// Leaving the aiming states 4, 5 and 7: back to camera 12 if state 10 is underneath, else 0.
+void SwingState04_Exit(int nPlayer) {
+    int nView;
+    if (fn_8005D2A8(nPlayer) == 10) {
+        nView = gPlayers[nPlayer].nView0;
+        View_SetCamera(fn_80017028(nView), 0xC, nPlayer, nView);
+    } else {
+        nView = gPlayers[nPlayer].nView0;
+        View_SetCamera(fn_80017028(nView), 0, nPlayer, nView);
+    }
+    fn_800E3D38(nPlayer, 1);
+}
+
+void SwingState05_Exit(int nPlayer) {
+    int nView;
+    if (fn_8005D2A8(nPlayer) == 10) {
+        nView = gPlayers[nPlayer].nView0;
+        View_SetCamera(fn_80017028(nView), 0xC, nPlayer, nView);
+    } else {
+        nView = gPlayers[nPlayer].nView0;
+        View_SetCamera(fn_80017028(nView), 0, nPlayer, nView);
+    }
+    fn_800E3D38(nPlayer, 1);
+}
+
+void SwingState07_Exit(int nPlayer) {
+    int nView;
+    if (fn_8005D2A8(nPlayer) == 10) {
+        nView = gPlayers[nPlayer].nView0;
+        View_SetCamera(fn_80017028(nView), 0xC, nPlayer, nView);
+    } else {
+        nView = gPlayers[nPlayer].nView0;
+        View_SetCamera(fn_80017028(nView), 0, nPlayer, nView);
+    }
+    fn_800E3D38(nPlayer, 1);
+}
+
+void SwingState13_Enter(int nPlayer) {
+    fn_80017028(gPlayers[nPlayer].nView0);
+    fn_80005628(gPlayers[nPlayer].ballBefore, gPlayers[nPlayer].ball, 0xBC);
+    fn_8006AD68(nPlayer);
+    fn_80067710(nPlayer, 0, 0x21);
+    lbl_80281E12 = 1;
+    if ((gSession.uFlags & 0x4000) && (gSession.uFlags & 0x8000)) {
+        fn_8006AAB4(nPlayer, 2);
+    }
+}
+
+// Leaving the swing: the ball goes back to where it lay; on cameras 1, 3 and 4 a quarter-second
+// camera move.
+void SwingState01_Exit(int nPlayer) {
+    Vec4  vOffset = lbl_801835F0;
+    void* pView   = fn_80017028(gPlayers[nPlayer].nView0);
+    int   nCamera;
+    fn_80005628(gPlayers[nPlayer].ball, gPlayers[nPlayer].ballBefore, 0xBC);
+    nCamera = *(s32*)((u8*)pView + 0x144);
+    if (nCamera == 1 || nCamera == 3 || nCamera == 4) {
+        fn_80063B98(pView, 0.25f, (f32*)&vOffset);
+    }
+}
