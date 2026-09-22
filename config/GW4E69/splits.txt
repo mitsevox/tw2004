@@ -25,6 +25,11 @@ dolphin/exi/EXIUart.c:
 	.text       start:0x80131D08 end:0x80131F78
 	.sbss       start:0x80282618 end:0x80282628
 
+dolphin/si/SISamplingRate.c:
+	.text       start:0x801337D8 end:0x801338E0
+	.data       start:0x80195D08 end:0x80195DA0
+	.sbss       start:0x80282638 end:0x80282640
+
 dolphin/db.c:
 	.text       start:0x801394C0 end:0x801395AC
 	.data       start:0x801998E0 end:0x801998F8
@@ -32,6 +37,11 @@ dolphin/db.c:
 
 dolphin/dsp/dsp_debug.c:
 	.text       start:0x801397FC end:0x8013984C
+
+dolphin/dsp/dsp_task.c:
+	.text       start:0x8013984C end:0x8013A0D0
+	.data       start:0x80199978 end:0x80199AB8
+	.sbss       start:0x80282760 end:0x80282778
 
 dolphin/dvd/dvdqueue.c:
 	.text       start:0x8013DCB4 end:0x8013DEAC
@@ -44,6 +54,14 @@ dolphin/dvd/dvderror.c:
 dolphin/dvd/dvdidutils.c:
 	.text       start:0x8013E044 end:0x8013E13C
 
+dolphin/gx/GXInit.c:
+	.text       start:0x8013E3AC end:0x8013F57C
+	.data       start:0x80199DF0 end:0x80199F20
+	.bss        start:0x8027A6C8 end:0x8027AC40
+	.sdata      start:0x80281A48 end:0x80281A50
+	.sbss       start:0x80282848 end:0x80282858
+	.sdata2     start:0x80284BA8 end:0x80284BD0
+
 dolphin/gx/GXGeometry.c:
 	.text       start:0x801415AC end:0x8014195C
 
@@ -51,6 +69,10 @@ dolphin/gx/GXFrameBuf.c:
 	.text       start:0x8014195C end:0x80142440
 	.data       start:0x8019A080 end:0x8019A170
 	.sdata2     start:0x80284BD0 end:0x80284BD8
+
+dolphin/gx/GXTev.c:
+	.text       start:0x80143AE0 end:0x801442C4
+	.data       start:0x8019A398 end:0x8019A410
 
 dolphin/gx/GXStubs.c:
 	.text       start:0x80144898 end:0x8014489C
@@ -74,6 +96,10 @@ dolphin/os/OSInterrupt.c:
 dolphin/os/OSMutex.c:
 	.text       start:0x8014B4F0 end:0x8014B560
 
+dolphin/os/OSResetSW.c:
+	.text       start:0x8014BCD4 end:0x8014C060
+	.sbss       start:0x80282928 end:0x80282948
+
 dolphin/os/OSSync.c:
 	.text       start:0x8014C9FC end:0x8014CA80
 
@@ -86,6 +112,10 @@ runtime/__va_arg.c:
 
 runtime/buffer_io.c:
 	.text       start:0x80155E48 end:0x80155F40
+
+runtime/ctype.c:
+	.text       start:0x80155F4C end:0x80155F70
+	.data       start:0x8019C688 end:0x8019C988
 
 runtime/mem.c:
 	.text       start:0x80156C78 end:0x80156DE8

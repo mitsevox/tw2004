@@ -321,12 +321,23 @@ config.warn_missing_config = True
 config.warn_missing_source = False
 config.libs = [
     {
+        "lib": "si",
+        "mw_version": "GC/1.2.5n",
+        "cflags": cflags_sdk,
+        "progress_category": "sdk",
+        "src_dir": "extern/sdk",
+        "objects": [
+            Object(Matching, "dolphin/si/SISamplingRate.c"),
+        ],
+    },
+    {
         "lib": "dsp",
         "mw_version": "GC/1.2.5n",
         "cflags": cflags_sdk,
         "progress_category": "sdk",
         "src_dir": "extern/sdk",
         "objects": [
+            Object(Matching, "dolphin/dsp/dsp_task.c"),
             Object(Matching, "dolphin/dsp/dsp_debug.c"),
         ],
     },
@@ -396,6 +407,8 @@ config.libs = [
         "progress_category": "sdk",
         "src_dir": "extern/sdk",
         "objects": [
+            Object(Matching, "dolphin/gx/GXInit.c"),
+            Object(Matching, "dolphin/gx/GXTev.c"),
             Object(Matching, "dolphin/gx/GXStubs.c"),
             Object(Matching, "dolphin/gx/GXFrameBuf.c"),
             Object(Matching, "dolphin/gx/GXPerf.c"),
@@ -410,6 +423,7 @@ config.libs = [
         "progress_category": "sdk",
         "src_dir": "extern/sdk",
         "objects": [
+            Object(Matching, "dolphin/os/OSResetSW.c"),
             Object(Matching, "dolphin/os/OSInterrupt.c"),
             Object(Matching, "dolphin/os/OSAudioSystem.c"),
             Object(Matching, "dolphin/os/OSMutex.c"),
@@ -424,6 +438,7 @@ config.libs = [
         "progress_category": "sdk",
         "src_dir": "extern/sdk",
         "objects": [
+            Object(Matching, "runtime/ctype.c"),
             Object(Matching, "runtime/e_acos.c"),
             Object(Matching, "runtime/e_asin.c"),
             Object(Matching, "runtime/e_atan2.c"),
