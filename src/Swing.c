@@ -1362,10 +1362,10 @@ void SwingState19_Enter(int nPlayer) {
 }
 
 void SwingState07_Update(int nPlayer) {
-    if (Player_IsCPU(nPlayer) || (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(5, 1))) {
-        fn_800E3D38(nPlayer, 0);
-    } else {
+    if (!Player_IsCPU(nPlayer) && !(fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(5, 1))) {
         fn_8005CFD4(nPlayer);
+    } else {
+        fn_800E3D38(nPlayer, 0);
     }
 }
 
