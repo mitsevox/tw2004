@@ -319,7 +319,25 @@ def MatchingFor(*versions):
 
 config.warn_missing_config = True
 config.warn_missing_source = False
+# EA's shared file library was built with SN ProDG (GCC 2.95) without optimization. See
+# docs/compiler.md. tools/prodg/prodgcc.py drives the compiler; tools/project.py selects it when
+# mw_version starts with "ProDG/".
+cflags_gcc = [
+    "-O0",
+    "-nostdinc",
+    "-I include",
+]
+
 config.libs = [
+    {
+        "lib": "EASharedFileLib",
+        "mw_version": "ProDG/3.5",
+        "cflags": cflags_gcc,
+        "progress_category": "game",
+        "objects": [
+            Object(Matching, "Common/Checksum/ChecksumCRC32.c"),
+        ],
+    },
     {
         "lib": "si",
         "mw_version": "GC/1.2.5n",

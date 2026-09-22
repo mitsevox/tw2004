@@ -203,6 +203,12 @@ runtime/s_tan.c:
 	.text       start:0x8015F70C end:0x8015F784
 	.sdata2     start:0x80285190 end:0x80285198
 
+Common/Checksum/ChecksumCRC32.c:
+	.text       start:0x8016C718 end:0x8016CB98
+	.rodata     start:0x80186228 end:0x80186258
+	.data       start:0x8019D1FC end:0x8019D210
+	.sbss       start:0x80282A2C end:0x80282A30
+
 dolphin/card/CARDUnlock.c:
 	.text       start:0x80177DA4 end:0x80179004
 	.data       start:0x8019D3A0 end:0x8019D500

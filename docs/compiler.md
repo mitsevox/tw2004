@@ -15,7 +15,7 @@ Summary
 | Optimization | `-O4` (`,p` vs `,s` not yet determined) | High |
 | Processor flags | `-proc gekko`, `-fp hardware` | High |
 | Inlining | No automatic inlining (`-inline auto` is wrong) | Medium - one file tested |
-| Second compiler | GCC, unoptimized, for one 38 KiB block (see below) | High |
+| Second compiler | SN ProDG (GCC 2.95), `-O0`, for one 38 KiB block; `ProDG/3.5` baseline | High - 8 functions matched; the five pack builds are indistinguishable at -O0 |
 | Dolphin SDK | Sep 5 2002 build, CARD patched Apr 2 2003 | Certain (version strings) |
 
 `main.dol` is a mixed-compiler binary
@@ -35,8 +35,10 @@ stack after each statement. It corresponds to the four source paths left in asse
 - `../../../Source/Common/TagFile/TagFile.c`
 - `../../../Source/NGC/SharedFileIO/llSharedFileIO.c`
 
-Guess: a separately built EA shared library. SN Systems ProDG (GCC based) is the likely
-toolchain; the exact version has not been tested. This block is the file-reading layer,
+A separately built EA shared library. Confirmed SN Systems ProDG: `ChecksumCRC32.c` (8 functions)
+matches byte for byte under every ProDG build in the compiler pack at `-O0`, so the exact version
+cannot be told apart from unoptimized code; the project uses `ProDG/3.5` (2001). Driven by
+`tools/prodg/prodgcc.py` (the `ngccc` front end needs an installed `sn.ini` and is bypassed). This block is the file-reading layer,
 so it matters to the asset track (`docs/formats`).
 
 Evidence for the CodeWarrior version
@@ -111,5 +113,4 @@ Open questions
   choice will surface as a byte-masking function that will not match.
 - `-O4,p` vs `-O4,s`. Loops separate them, the two matched functions do not contain one that does.
 - `-inline deferred` or not, `-str` pooling, small data thresholds.
-- Exact GCC / ProDG version and flags for the `0x8016C718` block.
 - Eleven EA-region functions use the older prologue style; not yet examined.

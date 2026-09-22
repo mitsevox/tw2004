@@ -737,6 +737,14 @@ def generate_build_ninja(
     )
     n.newline()
 
+    # tw2004: SN ProDG (GCC) objects. Selected per library with mw_version = "ProDG/<version>".
+    n.rule(
+        name="prodg",
+        command=f"$python {config.tools_dir / 'prodg' / 'prodgcc.py'} {compilers} $mw_version $cflags -c $in -o $basedir",
+        description="PRODG $out",
+    )
+    n.newline()
+
     n.comment("MWCC build")
     n.rule(
         name="mwcc",
@@ -1050,6 +1058,11 @@ def generate_build_ninja(
                 variables["extab_padding"] = "".join(
                     f"{i:02x}" for i in obj.options["extab_padding"]
                 )
+            if str(obj.options["mw_version"]).replace("\\", "/").startswith("ProDG/"):
+                # tw2004: GCC-built unit, see tools/prodg/prodgcc.py
+                build_rule = "prodg"
+                build_implcit = [compilers_implicit] if compilers_implicit else []
+                variables["cflags"] = make_flags_str(obj.options["cflags"] + obj.options["extra_cflags"])
             n.comment(f"{obj.name}: {lib_name} (linked {obj.completed})")
             n.build(
                 outputs=obj.src_obj_path,

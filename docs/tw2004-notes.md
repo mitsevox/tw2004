@@ -27,7 +27,7 @@ Memory map of `main.dol`
 | `0x80003100` | `.init`: startup, `memcpy`, `memset`, TRK vector table |
 | `0x80005520` - ~`0x8012FFFF` | EA game and engine code (CodeWarrior GC/2.x, `-O4`) |
 | ~`0x80130000` - `0x8016C717` | Dolphin SDK, MSL C library, MetroTRK v2.0 |
-| `0x8016C718` - `0x80175F54` | EA shared file library, 124 functions, **GCC unoptimized** |
+| `0x8016C718` - `0x80175F54` | EA shared file library, 124 functions, **GCC unoptimized** (`src/Common/...`, ProDG) |
 | `0x8017DB60` | `.rodata` (assert strings, jump tables) |
 | `0x801866E0` `.data`, `0x8019D540` `.bss`, `0x80280DA0` `.sdata`, `0x80281B80` `.sbss`, `0x80282A60` `.sdata2` (float constants) | |
 
@@ -198,8 +198,9 @@ Suggested next steps
 2. **Follow the named SDK calls into EA code.** Callers of `PADRead` lead to input and the swing
    (`YhSwing.c`); callers of `CARD*` to saves (`MC_Gc.c`); callers of `DVD*` to file loading and
    the asset formats.
-3. **The GCC file library** (`0x8016C718`): needs its own compiler entry (ProDG / GCC, version not
-   yet identified). Easiest code in the binary to read, and it parses the asset containers.
+3. **The GCC file library** (`0x8016C718`): compiler wired up (`ProDG/3.5`, `EASharedFileLib` in
+   configure.py); `ChecksumCRC32.c` done. Next: `SharedFileIO.c` (94 functions), `llSharedFileIO.c`
+   (40), `TagFile.c` (50). Easiest code in the binary to read, and it parses the asset containers.
 4. **Add the already-solved small functions** to the project: the linked-list family at
    `0x8000B508` and `fn_800AACBC`.
 

@@ -116,6 +116,28 @@ Reading compiler output
   (`mr r31, r1`), every variable written back to the stack after each statement, epilogue through
   `r11`. A binary can contain code from more than one compiler.
 
+GCC 2.95 (SN ProDG) at -O0
+--------------------------
+
+- **[verified]** Every variable is stored to the stack after each statement and reloaded before use;
+  locals sit at increasing offsets in declaration order (first declared = lowest offset after the
+  arguments). Swapping two declarations swaps their stack slots.
+- **[verified] Stray `nop` before a `for` loop.** A `for` loop that follows early-return `if`s gets a
+  `nop` emitted before its init statement. The same logic as `i = 0; while (i < n) { ...; i++; }`, or
+  the `for` wrapped in its own `{ }` block, produces no nop. If a function is exactly one instruction
+  too long and the extra is a `nop`, this is why.
+- **[verified]** Static data with an initializer lands in `.data`; without one it is `.bss`. If the
+  target has a `.data` object and ours does not, the original had an initializer.
+- **[verified]** `__FILE__` / `__LINE__` passed to a call are reproduced with
+  `#line <n> "<original path>"` on the line before the call. The path string then lands in `.rodata`
+  and matches the assert string in the binary.
+- **[verified]** The assembler (`NgcAs.exe`) leaves local branch displacements as relocations, so a
+  raw byte comparison must mask conditional branches (`bc`, opcode 16) as well as `b`/`bl`.
+- The `ngccc.exe` driver refuses to run without an installed `sn.ini`; run `cpp.exe`, `cc1.exe`
+  and `NgcAs.exe` directly (see `tools/prodg/prodgcc.py`). `cc1` takes `-O0 -quiet in.i -o out.s`.
+- The five ProDG builds in the compiler pack (3.5 - 3.9.3, all GCC 2.95.x) produce identical
+  output for unoptimized code; the version cannot be identified from `-O0` functions.
+
 Working with decomp-toolkit (dtk)
 ---------------------------------
 
