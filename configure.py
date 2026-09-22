@@ -210,6 +210,8 @@ cflags_base = [
     "-RTTI off",
     "-fp_contract on",
     "-str reuse",
+    "-common on",         # EA game code: uninitialised globals are COMMON (UStream.c addresses each array separately)
+    "-use_lmw_stmw on",   # EA game code: prologues use stmw/lmw, not _savegpr
     "-multibyte",  # For Wii compilers, replace with `-enc SJIS`
     "-i include",
     f"-i build/{config.version}/include",

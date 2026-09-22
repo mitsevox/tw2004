@@ -22,7 +22,7 @@ unsorted/code_800082F8.c:
 	.text       start:0x800082F8 end:0x800083A4
 
 UStream.c:
-	.text       start:0x8000CDEC end:0x8000D4CC
+	.text       start:0x8000C624 end:0x8000E708
 
 dolphin/exi/EXIUart.c:
 	.text       start:0x80131D08 end:0x80131F78

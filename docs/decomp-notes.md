@@ -95,6 +95,13 @@ Reading compiler output
   A `u8 v = (u8)value` local declared *before* the pointer local gets the `clrlwi` in place.
 - **[verified] A function that returns its pointer argument** keeps r3 untouched and works on a
   copy in another register (`mr r6, r3`); a `void` function advances r3 directly.
+- **[verified] `volatile` shows up as reloads.** A global that is reloaded before every use in
+  one function but loaded once in another is `volatile`. In UStream.c exactly the scalars the
+  DVD-read callback writes (`gbReadPending`, `gpReadBuffer`, the ring indices it advances) are
+  volatile; the main-thread-only indices are not. That is the author's intent, not noise.
+- **[verified] Symbol names matter to objdiff.** Naming a global `gFoo` in C while
+  `symbols.txt` still says `lbl_...` counts every reference as a mismatch; rename the data
+  symbols (with `scope:local` for statics) at the same time as the code.
 - **[verified] Local variables and the stack.** The order locals are declared in changes where
   they sit on the stack. Symptom: a function at ~99% where the only differences are stack offsets
   swapped between two variables. Fix: swap the declarations.

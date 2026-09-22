@@ -178,7 +178,11 @@ The asset loader (UStream.c) and the CTRL container
 `fn_8000D4F0` (the tag switch) and its helpers are `UStream.c` (assert string at
 `0x801868A0`). `src/UStream.c` holds `UStream_Decompress` / `UStream_Copy` / `UStream_Fill`
 (`0x8000CDEC`-`0x8000D4CC`), the `Rdat` decompressor and its helpers; two of three are exact,
-Decompress is at 98.8% (see decomp-notes). The Python transcription
+Decompress is at 98.8% (see decomp-notes). The whole file (`0x8000C624`-`0x8000E708`, 31
+functions: buffer rings, async reads, object allocation, the chunk switch, delivery to type
+handlers, open/close) is written and linked as NonMatching: 18 exact, the rest 74-99% with
+the differences being expression association and register choice, no behaviour. Per-function
+state is in `build/GW4E69/report.json`. The Python transcription
 `tools/research/ctrl_dump.py` extracts every object from every `.hog` / `.gcb` on disc 1 to
 its declared size, which is the proof the reading is right. Full format:
 [`formats/ctrl-container.md`](formats/ctrl-container.md). The rest of the file - buffer ring

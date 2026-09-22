@@ -114,3 +114,15 @@ Open questions
 - `-O4,p` vs `-O4,s`. Loops separate them, the two matched functions do not contain one that does.
 - `-inline deferred` or not, `-str` pooling, small data thresholds.
 - Eleven EA-region functions use the older prologue style; not yet examined.
+
+Game-code flags learned from UStream.c (2026-09-22)
+---------------------------------------------------
+
+Two more flags are needed for EA's own code and are now in `cflags_base`:
+
+- `-common on`: uninitialised globals are COMMON symbols. Without it CodeWarrior lays a file's
+  arrays out itself and addresses them from one base register (`lis/addi` of a `.bss` section
+  symbol plus offsets); the original loads each array's address separately.
+- `-use_lmw_stmw on`: multi-register prologues use `stmw`/`lmw`, not `_savegpr_NN` calls.
+
+The camera/culling units match with both flags, so they are safe for all game code.

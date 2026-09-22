@@ -104,6 +104,13 @@ Dated log of what was done and decided, newest last. Facts and lessons belong in
   decompiled loader then made the extractor a transcription rather than a guess. Track A feeds
   Track B exactly as designed.
 
+- **UStream.c written in full** (31 functions, 18 exact). Two compiler flags came out of it
+  that apply to all EA game code: `-common on` and `-use_lmw_stmw on` (in `compiler.md`). Also:
+  the DVD-callback-shared globals are `volatile` in the original, and the object allocator
+  takes the chunk's flag word as its second argument.
+- Texture format (`TXG`) decoded and PNG export working; game data tables located (attribute
+  table, bios, tour, records).
+
 **Working agreements**
 - Show the plain-English logic and the C before building anything non-trivial.
 - One batch of work, then report. No silent fix loops.
