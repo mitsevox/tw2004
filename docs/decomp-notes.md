@@ -137,6 +137,21 @@ Reading compiler output
 - **[verified] `!(a >= b || c > d)` vs `a < b && c <= d`.** The original's float compares follow
   the source's operator: `>=` gives `cror eq,gt,eq; beq`, `<` gives `bge`, `> d` taken-branch-away
   gives a bare `ble`, `<= d` gives `cror eq,lt,eq`. Match the operator, not just the logic.
+- **[verified] Short string literals live in `.sdata`.** A literal of 8 bytes or less (`"tball"`,
+  `"Glove"`, `"Swing.c"`) is addressed `li rX, sym@sda21`; longer ones `lis/addi`. When the original
+  has an sda21 string, write the literal, not `extern char lbl_...[]` (Swing_LoadTuning exact).
+- **[verified] No automatic inlining in game code.** Calling `SwingStack_Clear()` from a later
+  function stays a `bl`; where the original has the body pasted in, write the body out.
+- **[verified] A signed array element returned as `s8` needs no `extsb` in the callee** (the caller
+  extends). A `u8` element returned as `s8` gets one. (`fn_8005D2A8`: `nState` is `s8[5]`, and
+  `SwingStack_Top` reads it as `(u8)` to keep its own shape.)
+- **[verified] Struct array through a typed local.** `ShotObj* pObj = (ShotObj*)h; pObj->events[i].f`
+  gives `add; lfs off(r)`; the same through raw pointer arithmetic gives `addi; lfsx`.
+- **[verified] Clamp as nested ternaries.** `x = (x < lo) ? lo : ((x > hi) ? hi : x)` gives the
+  original's `bge; b; ...; ble; b` layout (fn_8005AD20).
+- **[observed] `mr r0, r3; ...; mr rN, r0` around a call's result** (the value passing through r0
+  before its home register) is the mark of an inlined helper's return value. Seen in fn_8005A478 with
+  the unexplained `beq L; b L` pairs there; a bool or void inline helper did not reproduce them.
 - **[verified] Chained assignment stores backwards.** `a[0] = a[1] = a[2] = 0` stores 2, 1, 0;
   the original wrote four statements in order.
 - **[verified] A hoisted constant is a local.** `x * (1.0f / 128.0f)` with the constant loaded

@@ -48,7 +48,9 @@ typedef struct SwingState {
 
 // The shot object at Player.nShotHandle; only the fields the swing touches.
 typedef struct ShotObj {
-    u8    unk0[0x38];
+    u8    unk0[0x1C];
+    s32   nAnim;                // 0x01C  the playing animation (6 backswing, 7 downswing)
+    u8    unk20[0x38 - 0x20];
     u8*   pView;                // 0x038  -> +0x38 -> a struct with +0x10E4
     u8    unk3C[0x164 - 0x3C];
     u8    anim[4];              // 0x164  the animation: +0x14 is its playback rate
@@ -66,6 +68,8 @@ typedef struct ShotObj {
     f32   f1634;
     f32   v1638[3];             // 0x1638
     f32   f1644;
+    u8    unk1648[0x1698 - 0x1648];
+    s32   n1698;                // 0x1698
 } ShotObj;
 
 // A view (one per split-screen half); only what the swing states touch.
@@ -1657,6 +1661,71 @@ void Swing_ClearFrameFlag(int nPlayer) {
     gPlayers[nPlayer].swing.n370 = 0;
 }
 
+int fn_8001EE90(ShotObj* pObj);
+void fn_8005AD20(ShotObj* pObj, SwingData* pSw, int nStickX);
+int  fn_8005CC5C(void);
+
+// Pose the golfer from the stick each frame of the backswing (animation 6) and downswing (7): the
+// blend weights at 0x484..0x490 and the twist. A human's stick is read; a CPU only does this in
+// mode 11 (when fn_8005CC5C() is 8 or 9), with the stick hard to one side.
+void fn_8005A478(int nPlayer) {
+    ShotObj*   pObj  = (ShotObj*)gPlayers[nPlayer].nShotHandle;
+    int        nBone = fn_8001EED8(pObj->pView, 0x53);
+    SwingData* pSw;
+    int        nStickX;
+    u8*        pPad;
+    f32        vPos[3];
+    f32        fT;
+
+    if (!Player_IsCPU(nPlayer) || (Game_GetMode() == 11 && (fn_8005CC5C() == 8 || fn_8005CC5C() == 9))) {
+        if ((pObj->nAnim == 6 || pObj->nAnim == 7) && gPlayers[nPlayer].nShotKind != 0 && pObj->n1698 == 0) {
+            if (fn_8001EE90(pObj) == 2) return;
+            if (pObj->nAnim == 6 || pObj->nAnim == 7) {
+                pSw = &gPlayers[nPlayer].swing;
+                if (Game_GetMode() == 11 && Player_IsCPU(nPlayer)) {
+                    if (fn_8005CC5C() == 8) {
+                        nStickX = 0;
+                    } else {
+                        nStickX = 0xFF;
+                    }
+                } else {
+                    pPad    = Pad_State(nPlayer, gPlayers[nPlayer].nController);
+                    nStickX = Swing_StickX(nPlayer, pPad);
+                    Swing_StickY(nPlayer, pPad);
+                }
+                Vec_Copy((*(f32 (**)[4][4])(pObj->pView + 8))[nBone][3], vPos);
+                if (pObj->nAnim == 6) {
+                    if (nStickX < pSw->nCentreX) {
+                        pSw->f488 = 0.0f;
+                        pSw->f48C = 0.0f;
+                        pSw->f484 = 0.5f;
+                        pSw->f490 = gpSwing->fFC * (f32)(pSw->nCentreX - nStickX) / (f32)pSw->nCentreX;
+                    } else {
+                        pSw->f488 = 0.5f;
+                        pSw->f48C = 0.5f;
+                        pSw->f484 = 0.0f;
+                        pSw->f490 = gpSwing->fFC * (f32)(nStickX - pSw->nCentreX) / (f32)(0xFF - pSw->nCentreX);
+                    }
+                    fn_8005AD20(pObj, pSw, nStickX);
+                } else if (pObj->nAnim == 7) {
+                    pSw->f484 = gpSwing->fF4;
+                    pSw->f48C = gpSwing->fF0;
+                    pSw->f488 = gpSwing->fEC;
+                    fT = pObj->fAnimTime - pSw->fMark2;
+                    if (fT >= 0.0f && fT <= 1.0f) {
+                        pSw->f490 = gpSwing->fF8 * (1.0f - fT);
+                    } else if (fT < 0.0f) {
+                        pSw->f490 = gpSwing->fF8;
+                    } else {
+                        pSw->f490 = 0.0f;
+                    }
+                    fn_8005AD20(pObj, pSw, pSw->nTopX);
+                }
+            }
+        }
+    }
+}
+
 void fn_8005A788(int nPlayer, int a) {
     gPlayers[nPlayer].swing.b375 = a;
 }
@@ -1670,6 +1739,45 @@ void fn_8005A7A0(int nPlayer) {
         gSession.unk14 == 0 && !fn_800C6CB0()) {
         fn_800AE3F8(gPlayers[nPlayer].nView0);
     }
+}
+
+void fn_8001EEE4(u8* pSkel, int nBone);
+f32  fn_8000AD9C(f32 x);                       // fabsf
+void fn_80008BB8(f32* pOut, f32 x, f32 y, f32 z);
+void fn_80027808(u8* pSkel, f32* pRot);
+
+// Twist the golfer with the stick: how far through the backswing (animation 6, eased in) or the
+// downswing (7, eased out) the animation is, times a smoothed copy of the stick's X, becomes a
+// rotation on the skeleton (mirrored for a left-hander).
+void fn_8005AD20(ShotObj* pObj, SwingData* pSw, int nStickX) {
+    f32 fAmount = 0.0f;
+    f32 fDelta;
+    f32 fRate;
+    f32 vRot[3];
+    fn_8001EEE4(pObj->pView, 0x24);
+    fn_8001EEE4(pObj->pView, 0x11);
+    fn_8001EED8(pObj->pView, 0x52);
+    if (pObj->nAnim == 6) {
+        fAmount = (pObj->fAnimTime - pSw->fMark0) / (pSw->fMark1 - pSw->fMark0);
+        fAmount *= fAmount;
+    } else if (pObj->nAnim == 7) {
+        fAmount = (pObj->fAnimTime - pSw->fMark1) / (pSw->fMark2 - pSw->fMark1);
+        fAmount *= fAmount;
+        fAmount = 1.0f - fAmount;
+        if (fAmount < 0.0f) fAmount = 0.0f;
+        if (fAmount > 1.0f) fAmount = 1.0f;
+    }
+    pSw->f14 = (f32)nStickX / 255.0f - 0.5f;
+    fDelta = pSw->f14 - pSw->f10;
+    fRate = fn_8000AD9C(fDelta);
+    fRate = (fRate < 0.5f) ? 0.5f : ((fRate > 1.0f) ? 1.0f : fRate);
+    pSw->f10 = 0.33333334f * (fDelta * fRate) + pSw->f10;
+    fAmount = 0.75f * fAmount * pSw->f10;
+    if (fn_8001EDF4((int)pObj)) {
+        fAmount = -fAmount;
+    }
+    fn_80008BB8(vRot, 0.0f, 0.0f, fAmount);
+    fn_80027808(pObj->pView, vRot);
 }
 
 // Bind the swing module's tuning values by name.
