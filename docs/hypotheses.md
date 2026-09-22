@@ -24,6 +24,15 @@ rendered), `GoGreenGrid.c` (`0x8009B68C`; green elevation grid), `PsBallFx.c` / 
 (`0x800A2C6C`; ball physics), `Swing.c` (`0x80058D18`), `CharSliders.c` (`0x8010D614`; golfer
 attribute sliders, 20 assert references - likely where stats scale things).
 
+**Refinement (2026-09-22):** the guess is a *simplified* physics model so the tip populates quickly.
+Supporting observation: on long putts with a lot of break the caddie visibly takes time, and
+sometimes reports the tip as **unavailable**. That means the tip is a search, not a closed-form
+formula. Two ways a search says "unavailable": it exhausted its budget (an iteration cap or a
+frame/time limit) before converging, or it found no aim at its coarsest step that reaches the hole.
+The code will show which: look for a loop counter compared against a constant, or a time check,
+versus a "no candidate passed" exit. Either way the search granularity (step size in aim angle and
+power) is what makes the tip miss.
+
 **Status:** open.
 
 2. AI shots are solved backwards from the pin, then nerfed by skill
@@ -55,6 +64,25 @@ physics, wind or AI-error code. Absence across all of those files would confirm 
 
 **Where to look:** the AI error injection from hypothesis 2 (the obvious place to hide it), wind
 generation, and the swing meter code in `Swing.c`.
+
+**Status:** open.
+
+4. Which attributes touch which math, and whether human and CPU are treated alike
+---------------------------------------------------------------------------------
+
+**Question:** the game's tooltips say what each attribute generally does (e.g. Luck: more
+favourable lies). How does that turn into code, and is it the same code path for the human golfer
+and for CPU golfers? A favourable lie is naturally golfer-agnostic; things like swing error,
+putting read, or wind resistance are the grey area where the human and CPU paths might diverge.
+
+**What would settle it:** for each attribute, the list of functions that read it and what they
+multiply or threshold with it. Then, for each of those functions, whether it is reached from the
+human input path (controller -> swing meter), the CPU path (AI shot solver), or both.
+
+**Where to look:** `CharSliders.c` (`0x8010D614`, 20 assert references: the attribute sliders),
+`EASportsBio.c` (`0x80124B5C`, golfer bio / stats), then the callers of whatever getters they
+expose. Expect attributes to be read through a small set of accessor functions; naming those
+accessors makes every use site searchable.
 
 **Status:** open.
 
