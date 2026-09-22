@@ -392,14 +392,14 @@ character's `Data/Chars/NNchar.gcb` `CHR` object; `tools/research/find_sal.py`,
 `tools/research/sal_dump.py`) give, for the putter, the same clips for every style:
 
     shared male / female       gplptt10, gplptt01   /  fplptt10, fplptt01
-    03 Cedric "Ace" Andrews, 09 G. Capone, 16 S. McGruff, 18 Takeharu "Tsunami" Moto,
-    25 Moa "Big Mo" Ta'a Vatu, 26 Melvin "Yosh" Tanigawa
+    03 Cedric "Ace" Andrews, 09 Dominic "The Don" Donatello, 16 Hamish "Mulligan" McGregor,
+    18 Takeharu "Tsunami" Moto, 25 Moa "Big Mo" Ta'a Vatu, 26 Melvin "Yosh" Tanigawa
                                gplptt10, gplptt01, gplptt12
     15 Edwin B. "Pops" Masterson IV   gplptt12 only
 
-(Capone and McGruff have no bio card; their names survive only as the tail of their files'
-resource paths, `...ICAPONE\EXPORTED/GC.CHG` and `MCGRUFF\EXPORTED/SM.CHG`, so the initials come
-from the file names. They are probably unlockable characters.)
+(The character numbers come from the golfer table: see `formats/game-data.md`. Donatello's and
+McGregor's files are still named for EA's working names, `...ICAPONE\EXPORTED/GC.CHG` and
+`MCGRUFF\EXPORTED/SM.CHG`.)
 
 `gplptt12` is the **pool-cue tap-in** (the golfer drops to the ground, turns the putter round
 and knocks it in with the grip like a cue). **Confirmed in game (2026-09-22)**: with the Gecko code

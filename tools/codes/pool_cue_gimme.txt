@@ -3,7 +3,7 @@ $Pool Cue Gimme For Everyone [mits]
 *(gplptt12) when one of the seven golfers who have it is in the round:
 *  Edwin B. "Pops" Masterson IV (char 15; his only tap-in), Takeharu "Tsunami" Moto (18),
 *  Cedric "Ace" Andrews (03), Moa "Big Mo" Ta'a Vatu (25), Melvin "Yosh" Tanigawa (26),
-*  G. Capone (09) and S. McGruff (16) (initials only in the data; probably unlockables).
+*  Dominic "The Don" Donatello (09) and Hamish "Mulligan" McGregor (16).
 *Source: pool_cue_gimme.c
 *(build: python tools/codes/build_gecko.py tools/codes/pool_cue_gimme.c 80025AD8).
 C2025AD8 00000017

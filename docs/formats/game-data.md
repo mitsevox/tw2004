@@ -42,6 +42,23 @@ u16 header (0), then 34 records of 320 bytes (record i at `2 + i*320`):
                                 (`Golfer_OnStatsLoaded`) byte-swaps them in place in 8-byte units
                                 (`Golfer_TableByteSwap`). Meaning unknown - f64s or u64s.
 
+**Character files.** `fn_8001C558(player)` returns the byte at `gGolferTable + golfer*0x140 + 1`
+(the byte before each record's name, i.e. the last byte of the previous record in the file), and
+the character files are `data/Chars/%02dchar.gcb` and `data/CharSac/%02dchrsac.gcb` with that
+number + 1:
+
+    01 Tiger Woods          02 Sunday Tiger Woods   03 Cedric "Ace" Andrews  04 Stuart Appleby
+    05 Notah Begay III      06 Felicia "Downtown" Brown  07 John Daly       08 created (male)
+    09 Dominic "The Don" Donatello  10 Adam Scott   11 Jim Furyk            12 Charles Howell III
+    13 Justin Leonard       14 Solita Lopez         15 Edwin "Pops" Masterson  16 Hamish "Mulligan" McGregor
+    17 Colin "Monty" Montgomerie  18 Takeharu "Tsunami" Moto  19 Kellie Newman  20 Justin Rose
+    21 Jesper Parnevik      22 Vijay Singh          23 Rich Beem            24 Val "Sunshine" Summers
+    25 Moa "Big Mo" Ta'a Vatu  26 Melvin "Yosh" Tanigawa  27 Ty Tryon       28 Erika "Ice" von Severin
+    29 Retief Goosen        30 created (female)     31 Cedric the Entertainer  32 Natalie Gulbis
+
+(08 and 30 are `MALECRAP` / `FEMALECRAP`, the create-a-player sets; the four created-golfer
+slots in the table read 01.)
+
 **Column names (confirmed from code).** The front-end data (`Data/Fend/FEnd.gcb`, `DATS`
 object) carries the attribute screen's names and tooltips and a debug options menu that lists
 twelve attributes; the attribute screen (`FE_GolferAttributes`, `0x800BBB10`) reads them through
