@@ -6,25 +6,38 @@
 
 // Library state (allocated by SFIOCreate). Fields are named as they are learned.
 typedef struct {
-    int   eState;            // 0x00  0xB/0xC/0xD while an operation is in progress
-    int   eOperation;        // 0x04  0x18/0x19/0x1A
-    void* pUser;             // 0x08  set by SFIOSetUserData; blocked while busy
-    void* pDescriptor;       // 0x0C
-    u8    pad10[2];
-    s16   sCurrentDevice;    // 0x12
+    int   eState;            // 0x00  3 or 6 = idle/ready; 0xB/0xC/0xD = operation in progress
+    u32   eOperation;        // 0x04  which asynchronous step is running (unsigned: switch uses cmplwi)
+    int   eLastError;        // 0x08
+    int   uHandle;           // 0x0C  result of the last mount/open; passed to the device layer
+    int   eDevice;           // 0x10  current device index (read as a short by SFIONextDeviceFromMask)
+    u8    uInfo14;           // 0x14  filled by the device layer (fn_80171744)
+    u8    szInfo15[0x20];    // 0x15
+    u8    szName35[0x1B];    // 0x35  name buffer handed to the device layer
+    int   uSearchDirection;  // 0x50  passed to SFIONextDeviceFromMask
 } SFIOData;
 
-// Function table of the platform layer (llSharedFileIO.c).
+// Function table and data of the platform layer (llSharedFileIO.c). Only the entries used so far.
 typedef struct {
-    u8 pad0[0x14];
-    int (*pfnSelectDevice)(int eDevice);   // 0x14
-    u8 pad18[4];
-    int (*pfnOp19)(void* pDescriptor);     // 0x1C
-    u8 pad20[0x18];
-    int (*pfnOp18)(void* pDescriptor);     // 0x38
+    u16 uAvailableMask;                                            // 0x00
+    u8  pad2[2];
+    int (*pfnProbe)(void* pParams, int eDevice);                   // 0x04
+    u8  pad8[8];
+    int (*pfnStartProbe)(int eDevice);                             // 0x10
+    int (*pfnSelectDevice)(int eDevice);                           // 0x14
+    int (*pfnMount)(u8* pInfo14, u8* pInfo15, int eDevice, u32 uFlags); // 0x18
+    int (*pfnOp19)(int uHandle);                                   // 0x1C
+    u8  pad20[0x18];
+    int (*pfnOp18)(int uHandle);                                   // 0x38
+    u8  pad3C[0x14];
+    u8  uData50[4];                                                // 0x50
 } SFIODeviceFuncs;
 
 extern SFIOData* _SFIO_pData;
+extern void fn_801715B8(void* pParams, void* pDeviceData, void* pName);
+extern void fn_80171744(u8* pInfo14, u8* pInfo15, void* pDeviceData, void* pName);
+int SFIOStartSelectDevice(int eDevice, int* pProcess);
+int SFIONextDeviceFromMask(u16 uDeviceMask, int uDirection);
 extern SFIODeviceFuncs* _SFIO_pDevice;
 
 enum { SFIO_STATE_BUSY_A = 0xB, SFIO_STATE_BUSY_B = 0xC, SFIO_STATE_BUSY_C = 0xD };
@@ -98,7 +111,7 @@ int SFIONextDeviceFromMask(u16 uDeviceMask, int uDirection) {
     s16 sDevice = 0;
     SFIO_ASSERT(SFIOIsInitialized());
     SFIO_ASSERT(uDeviceMask != 0);
-    sDevice = _SFIO_pData->sCurrentDevice;
+    sDevice = _SFIO_pData->eDevice;
     if (uDirection == 0) {
         sDevice++;
         while (sDevice <= SFIO_DEVICE_LAST) {
@@ -135,15 +148,15 @@ int SFIONumDevicesInMask(u16 uDeviceMask) {
     return uNumDevices;
 }
 
-void SFIOSetUserData(void* pUser) {
+void SFIOSetLastError(int eError) {
     if (_SFIO_pData->eState != SFIO_STATE_BUSY_A && _SFIO_pData->eState != SFIO_STATE_BUSY_B &&
         _SFIO_pData->eState != SFIO_STATE_BUSY_C) {
-        _SFIO_pData->pUser = pUser;
+        _SFIO_pData->eLastError = eError;
     }
 }
 
-void* SFIOGetUserData(void) {
-    return _SFIO_pData->pUser;
+int SFIOGetLastError(void) {
+    return _SFIO_pData->eLastError;
 }
 
 #line 535
@@ -153,7 +166,7 @@ int SFIOStartOp18(void* pDescriptor, int* pProcess) {
     *pProcess = 1;
     _SFIO_pData->eState = SFIO_STATE_BUSY_A;
     _SFIO_pData->eOperation = 0x18;
-    _SFIO_pDevice->pfnOp18(_SFIO_pData->pDescriptor);
+    _SFIO_pDevice->pfnOp18(_SFIO_pData->uHandle);
     return 0;
 }
 
@@ -164,7 +177,7 @@ int SFIOStartOp19(void* pDescriptor, int* pProcess) {
     *pProcess = 1;
     _SFIO_pData->eState = SFIO_STATE_BUSY_B;
     _SFIO_pData->eOperation = 0x19;
-    _SFIO_pDevice->pfnOp19(_SFIO_pData->pDescriptor);
+    _SFIO_pDevice->pfnOp19(_SFIO_pData->uHandle);
     return 0;
 }
 
@@ -371,4 +384,101 @@ int SFIOValidateErrorOp17(int eError, void* pArg1, void* pArg2) {
 
 int SFIOValidateErrorPassThrough(int eError, void* pArg1, void* pArg2) {
     return eError;
+}
+
+// Asynchronous probe / mount / select sequence. Called with the result of the previous step.
+// *pProcess: 1 = keep calling, 2 = finished.
+int SFIOContinueSelect(int eError, int* pProcess, int* pResult) {
+    u8 params[0x20];
+    if (pProcess == NULL) return 0x12;
+    if (pResult == NULL) return 0x12;
+    if (!(_SFIO_pData->eState == 3 || _SFIO_pData->eState == 6)) return 0x12;
+    *pProcess = 1;
+    switch (_SFIO_pData->eOperation) {
+    case 1:
+        if (eError == 0) {
+            fn_801715B8(params, _SFIO_pDevice->uData50, _SFIO_pData->szName35);
+            _SFIO_pData->eOperation = 2;
+            _SFIO_pDevice->pfnProbe(params, _SFIO_pData->eDevice);
+        } else if (eError == 3) {
+            if (_SFIO_pData->eState == 3) {
+                _SFIO_pData->eDevice = SFIONextDeviceFromMask(_SFIO_pDevice->uAvailableMask, _SFIO_pData->uSearchDirection);
+                if (_SFIO_pData->eDevice != SFIO_DEVICE_INVALID) {
+                    _SFIO_pData->eOperation = 1;
+                    _SFIO_pDevice->pfnStartProbe(_SFIO_pData->eDevice);
+                    return 0;
+                }
+            }
+            *pProcess = 2;
+            return eError;
+        } else {
+            *pProcess = 2;
+            return eError;
+        }
+        break;
+    case 2:
+        if (eError == 0) {
+            if (*pResult == 1) {
+                fn_80171744(&_SFIO_pData->uInfo14, _SFIO_pData->szInfo15, _SFIO_pDevice->uData50, _SFIO_pData->szName35);
+                _SFIO_pData->eOperation = 0x16;
+                _SFIO_pDevice->pfnMount(&_SFIO_pData->uInfo14, _SFIO_pData->szInfo15, _SFIO_pData->eDevice, 0x80000004);
+            } else if (*pResult == 0) {
+                SFIOSetLastError(4);
+                _SFIO_pData->eOperation = 0x1A;
+                _SFIO_pDevice->pfnSelectDevice(_SFIO_pData->eDevice);
+            } else {
+                *pProcess = 2;
+                return 0xA;
+            }
+        } else {
+            SFIOSetLastError(eError);
+            return SFIOStartSelectDevice(_SFIO_pData->eDevice, pProcess);
+        }
+        break;
+    case 0x16:
+        if (eError == 0) {
+            if (*pResult >= 0) {
+                _SFIO_pData->uHandle = *pResult;
+                *pProcess = 2;
+                return 0;
+            } else {
+                _SFIO_pData->uHandle = *pResult;
+                *pProcess = 2;
+                return 0xA;
+            }
+        } else {
+            SFIOSetLastError(eError);
+            return SFIOStartSelectDevice(_SFIO_pData->eDevice, pProcess);
+        }
+        break;
+    case 0x1A:
+        if (eError == 0) {
+            if (_SFIO_pData->eState == 4 || _SFIO_pData->eState == 6) {
+                *pProcess = 2;
+                return SFIOGetLastError();
+            } else if (SFIOGetLastError() == 0) {
+                *pProcess = 2;
+                return 0;
+            } else {
+                _SFIO_pData->eDevice = SFIONextDeviceFromMask(_SFIO_pDevice->uAvailableMask, _SFIO_pData->uSearchDirection);
+                if (_SFIO_pData->eDevice != SFIO_DEVICE_INVALID) {
+                    _SFIO_pData->eOperation = 1;
+                    _SFIO_pDevice->pfnStartProbe(_SFIO_pData->eDevice);
+                    return 0;
+                } else {
+                    *pProcess = 2;
+                    return SFIOGetLastError();
+                }
+            }
+        } else {
+            *pProcess = 2;
+            return eError;
+        }
+        break;
+    default:
+        *pProcess = 2;
+        return 0x12;
+        break;
+    }
+    return 0;
 }
