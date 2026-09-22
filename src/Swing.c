@@ -1542,7 +1542,8 @@ typedef struct View {
     u8   unkD4[0x114 - 0xD4];
     f32  f114;                  // 0x114
     f32  f118;                  // 0x118
-    u8   unk11C[0x144 - 0x11C];
+    f32  f11C;                  // 0x11C
+    u8   unk120[0x144 - 0x120];
     s32  nCamera;               // 0x144
     u8   unk148[0x25C - 0x148];
     s32  nSavedCamera;          // 0x25C
