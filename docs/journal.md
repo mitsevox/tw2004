@@ -151,6 +151,11 @@ Dated log of what was done and decided, newest last. Facts and lessons belong in
   lucky-bounce odds when 5+ holes down in game mode 4 (match play); CPUs never get lucky
   events. Hypothesis 3 is answered as "no, except this". Hypothesis 4 is closed: every
   attribute's readers are now read, most decompiled.
+- **Hypothesis 5: found the pull.** Located the cup by scanning float pools for 4.25 in in any
+  unit (0.1072 m won), then the one physics function that reads the pin position with angle
+  constants. `Ball_CupPull` bends a ball within 15 cm toward the hole; the cup itself is
+  geometry. New `Ball.c` unit. One trap on the way: stale split asm files from before the new
+  units were shadowing the fresh ones - delete `build/GW4E69/asm` and re-run `dtk dol split`.
 
 **Working agreements**
 - Show the plain-English logic and the C before building anything non-trivial.

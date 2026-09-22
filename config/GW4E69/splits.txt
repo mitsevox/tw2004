@@ -27,6 +27,9 @@ UStream.c:
 Golfer.c:
 	.text       start:0x8002A630 end:0x8002F1D4
 
+Ball.c:
+	.text       start:0x80050C2C end:0x8005620C
+
 Swing.c:
 	.text       start:0x800589F8 end:0x80062E40
 

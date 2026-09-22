@@ -203,7 +203,12 @@ linked NonMatching. Seven functions written: `Swing_ApplyForgiveness`, `Swing_Co
 `Swing_MisHitRumble`. All compile to the original's instruction count; five are within 1% and
 two sit at 84% because CodeWarrior common-subexpressions the player address differently from
 our `gPlayers[nPlayer]` spelling. The shared structs moved to `include/golfer.h`, with the
-swing meter's per-player state as `SwingData` at player+0x3D4. The Python transcription
+swing meter's per-player state as `SwingData` at player+0x3D4.
+
+`src/Ball.c` (our name; `0x80050C2C`-`0x8005620C`) is the ball physics, linked NonMatching:
+`Ball_Holed`, `Ball_DistanceToPin`, `Ball_CupPull` written (instruction-count exact; three
+register numbers off in the pull). `Ball_GroundContact`, `Ball_Collide` and `Ball_SetLie` are
+named and read. The Python transcription
 `tools/research/ctrl_dump.py` extracts every object from every `.hog` / `.gcb` on disc 1 to
 its declared size, which is the proof the reading is right. Full format:
 [`formats/ctrl-container.md`](formats/ctrl-container.md). The rest of the file - buffer ring

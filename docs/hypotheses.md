@@ -171,7 +171,16 @@ the attribute; (2) above that, PUTTING shrinks a stroke error under 0.436 (at 10
 The CPU gets the mirror image: no error on putts under 1.5 units, angle error halved under 5.
 The physics-side question (a pull toward the cup, capture radius) is still open.
 
-**Status:** pre-roll assists found; roll physics still to read.
+**Result (2026-09-22, `Ball_CupPull` in C):** **yes, there is a pull.** Inside 15.3 cm of the pin,
+while the ball is still short of the hole, a ball heading within 30 degrees of the cup (or within
+9.7 cm regardless) gets `0.455 x dt x (pin - ball)` added to its velocity each frame - an
+acceleration toward the cup - limited so it never speeds the ball up while it is more than
+16.8 degrees off line. A ball crossing the cup fast and off line loses up to 67% of its speed
+instead (the lip). The hole itself is geometry: holed means "dropped more than 5.6 cm below the
+pin height" on a cup surface, no capture radius. The pull applies to every ball, human or CPU,
+with no attribute involved. Full numbers in [`gameplay.md`](gameplay.md).
+
+**Status:** answered.
 
 Facts already established that bear on these
 ---------------------------------------------

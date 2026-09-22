@@ -502,6 +502,7 @@ config.libs = [
             Object(Matching, "unsorted/code_800082F8.c"),
             Object(NonMatching, "UStream.c"),
             Object(NonMatching, "Golfer.c"),
+            Object(NonMatching, "Ball.c"),
             Object(NonMatching, "Swing.c"),
         ],
     },

@@ -152,6 +152,40 @@ is the chance of getting the rough treatment instead of the worst lie (12.5% at 
 And in the collision code (`0x80052598`, read) a bounce-direction term has `0.005 x LUCK`
 subtracted, floored at -1: the kinder deflection off trees the tooltip promises.
 
+The cup
+-------
+
+The ball physics (`src/Ball.c`, our name; `0x80050C2C`-`0x8005620C`) works in metres. The ball
+it rolls has radius 0.0257 (a real one is 0.0213); the cup is 0.1072 across (4.22 in). The cup is
+**real geometry**: it is a depression in the green mesh with its own surface kinds (12 and 18,
+type 90), and `Ball_GroundContact` (`0x80054D28`) declares the ball holed when it is on one of
+those and more than 0.0556 m below the pin's height. No speed test, no capture radius: the ball
+has to physically fall in. `Ball_Holed` then parks it 8.3 cm down in the cup.
+
+**There is a pull, though.** `Ball_CupPull` (`0x80054AB0`, in C at the original instruction
+count) runs from the ground-contact step every frame the ball is on the ground, for every
+ball, human or CPU, gated only by a debug flag pair:
+
+- inside **15.3 cm** of the pin (about three cup radii), and only while the ball is still short
+  of the hole along its path from where the shot started;
+- take the angle between the ball's heading and the direction to the cup;
+- **within 6.25 cm** (over the cup): if heading more than 30 degrees off and faster than
+  0.37 m/s, the horizontal velocity is scaled by `1 - 16 x 0.67 x distance` - up to a 67% loss.
+  That is the lip; a slow or straight ball is left alone to drop;
+- otherwise, if heading **within 30 degrees** of the cup, or **within 9.7 cm** regardless:
+  `velocity += 0.455 x dt x (pin - ball)` on x and z - an acceleration toward the cup
+  proportional to the offset - except on any axis where that would speed the ball up while it
+  is more than 16.8 degrees off line.
+
+How much is it? At 10 cm off the line and rolling at 0.3 m/s the ball spends about half a
+second in the zone and picks up ~0.02 m/s sideways: a few degrees of bend, a couple of
+centimetres at the cup. Enough to turn a lip-out into a drop, not enough to save a putt that
+was never close. No attribute and no human/CPU test anywhere in it.
+
+Two other things in the same file, read but not decompiled: hitting a tree (surface kind 17)
+deflects the ball by a random 12..19 degrees in two axes unless the player is flagged perfect
+(`0x800539F8`), and out of bounds is 600 m from the shot's start (`0x80054450`).
+
 What none of this reads
 -----------------------
 
