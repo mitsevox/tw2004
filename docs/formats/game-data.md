@@ -109,6 +109,22 @@ u32 count (26), then records of 562 bytes:
     0x070 char strength[40]     "Power / Forging Drivers", "All Around Player", "Driving Accuracy" ...
     0x098 char bio[...]         the front-end paragraph
 
+CPU aim points (a course chunk, loader `AI_TargetsLoad`)
+---------------------------------------------------------
+
+Registered with `Course_RegisterLoader(0, AI_TargetsLoad)`, so it is chunk kind 0 of whatever
+container the course loader walks (not yet traced to a file). Per hole:
+
+    0x00 s16 ?
+    0x02 s16 count            (at most 25)
+    0x04 AITargetDef[count]   0x30 each: f32 x, y, z; u32 ?; s16 links[10] (indices, self = none);
+                              12 unknown bytes
+    then u8[count][8]         tee set (-1 any), hole (-1 any), skill requirement, aggression
+                              requirement, priority flag, shot shape (0 straight, 1/2 curve,
+                              3/4 punch/lob, 5/6 big curve), power requirement, pad
+
+How the CPU uses it is in `docs/gameplay.md` (`AI_ChooseTarget`).
+
 Tools
 -----
 

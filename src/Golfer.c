@@ -1219,3 +1219,75 @@ void Shot_FitTargetToClub(int nPlayer) {
         AI_PlanShot(nPlayer, &p->fTargetX);
     }
 }
+
+// ---- planning a shot ------------------------------------------------------------------------------
+
+void fn_8002B020(int nPlayer);          // empty in release: a debug hook after the CPU's target choice
+
+// Plan the next shot: a CPU sets its modifiers, everyone picks a target, Shot_Prepare fills in
+// the rest, the rehearsal is reset, and the luck roll decides whether this shot is perfect.
+void Shot_Plan(int nPlayer, u8 bNotify) {
+    if (Player_IsCPU(nPlayer)) AI_SetShotModifiers(nPlayer);
+    AI_ChooseTarget(nPlayer);
+    if (Player_IsCPU(nPlayer)) fn_8002B020(nPlayer);
+    Shot_Prepare(nPlayer, bNotify);
+    gPlayers[nPlayer].nRehearseState = 2;
+    gPlayers[nPlayer].bPerfect       = Golfer_IsLucky(nPlayer);
+}
+
+// ---- the aim point table --------------------------------------------------------------------------
+// Loaded from a course chunk: s16, s16 count, count x AITargetDef (0x30 each), then count x 8 bytes
+// of requirements (tee set, hole, skill, aggression, priority, type, power, pad).
+
+extern u8 gAITargetsLoaded;             // 0x80281D40
+
+void fn_80005AE8(void* p, int c, int n);                    // memset
+u8   Course_RegisterLoader(int nChunk, void (*pfn)(u8*));   // 0x8000C0B4
+
+void AI_TargetsClear(void) {
+    AITarget* t;
+    int       i;
+    t = gAITargets;
+    for (i = 0; i < NUM_AI_TARGETS; i++, t++) {
+        fn_80005AE8(t, 0, sizeof(AITarget));
+        t->nHole    = -1;
+        t->nTeeSet  = -1;
+        t->bEnabled = 1;
+    }
+    gAITargetsLoaded = 0;
+}
+
+void AI_TargetsLoad(u8* pChunk) {
+    int          i, k;
+    AITargetDef* pDef;
+    s8*          pReq;
+
+    gNumAITargets = 0;
+    pDef = (AITargetDef*)(pChunk + 4);
+    for (i = 0; i < *(s16*)(pChunk + 2); pDef++, i++) {
+        gAITargets[i].pDef = pDef;
+        // A point that links to itself links to nothing.
+        for (k = 0; k < NUM_AI_LINKS; k++) {
+            if (pDef->nLinks[k] == i) pDef->nLinks[k] = -1;
+        }
+        gNumAITargets++;
+    }
+    pReq = (s8*)pDef;
+    for (i = 0; i < *(s16*)(pChunk + 2); i++, pReq += 8) {
+        gAITargets[i].nTeeSet   = pReq[0];
+        gAITargets[i].nHole     = pReq[1];
+        gAITargets[i].nSkillReq = pReq[2];
+        gAITargets[i].nAggrReq  = pReq[3];
+        gAITargets[i].bPriority = pReq[4];
+        gAITargets[i].nType     = pReq[5];
+        gAITargets[i].nPowerReq = pReq[6];
+        gAITargets[i].bEnabled  = 1;
+    }
+    gAITargetsLoaded = 1;
+}
+
+void AI_TargetsInit(void) {
+    gAITargetsLoaded = 0;
+    Course_RegisterLoader(0, AI_TargetsLoad);
+    AI_TargetsClear();
+}

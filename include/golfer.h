@@ -52,6 +52,7 @@ enum {
 #define SHOT_PITCH           3
 #define LIE_GREEN            9
 #define NUM_AI_LINKS         10   // candidate aim points per zone
+#define NUM_AI_TARGETS       25   // aim points per hole (gAITargets)
 
 #define PI    3.14159265f
 #define TWOPI 6.28318531f
@@ -194,7 +195,8 @@ typedef struct AITargetDef {
     f32  x, y, z;               // 0x00
     u32  unkC;                  // 0x0C
     s16  nLinks[NUM_AI_LINKS];  // 0x10  indices into gAITargets, -1 = none
-} AITargetDef;
+    u8   unk24[0x30 - 0x24];
+} AITargetDef;                  // 0x30 in the course chunk
 
 typedef struct AITarget {
     AITargetDef* pDef;          // 0x00
