@@ -117,7 +117,13 @@ void __CARDExiHandler(s32 chan, OSContext* context);
 void __CARDExtHandler(s32 chan, OSContext* context);
 void __CARDUnlockedHandler(s32 chan, OSContext* context);
 s32 __CARDAccess(CARDControl* card, CARDDir* ent);
+#if CARD_PATCH_2003
+/* Apr 2 2003 CARD patch: the access checks take the control block as well. */
+s32 __CARDIsWritable(CARDControl* card, CARDDir* ent);
+s32 __CARDIsReadable(CARDControl* card, CARDDir* ent);
+#else
 BOOL __CARDIsWritable(CARDDir* ent);
+#endif
 
 #define TRUNC(n, a) (((u32)(n)) & ~((a)-1))
 #define OFFSET(n, a) (((u32)(n)) & ((a)-1))

@@ -41,6 +41,7 @@ s32 __CARDAccess(CARDControl* card, CARDDir* ent) {
   return CARD_RESULT_NOPERM;
 }
 
+#if !CARD_PATCH_2003
 BOOL __CARDIsWritable(CARDDir* ent) {
   if (ent->gameName[0] == 0xFF) {
     return CARD_RESULT_NOFILE;
@@ -52,6 +53,7 @@ BOOL __CARDIsWritable(CARDDir* ent) {
 
   return CARD_RESULT_NOPERM;
 }
+#endif
 
 s32 __CARDGetFileNo(CARDControl* card, const char* fileName, s32* pfileNo) {
   CARDDir* dir;

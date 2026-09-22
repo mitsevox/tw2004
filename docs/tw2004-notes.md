@@ -91,11 +91,38 @@ none of it in Prime. Identified from callers and neighbours:
 |---|---|---|---|
 | `0x8015F784`-`0x8016C718` | 53 KB, 220 fns | MetroTRK (debugger nub; `TRK_main`, `TRKNubMainLoop` named) | Prime has only `mslsupp.c`/`nubinit.c`; full source in other decomps (Pikmin 2, Twilight Princess) |
 | `0x80135728`-`0x801393D0` | 15.5 KB, 65 fns | AX audio library (calls `AIInitDMA`, `DSPAddTask`, `DSPInit`, `AIStartDMA`) | not in Prime (MusyX); `doldecomp/dolphin`, games using JAudio |
-| `0x80145998`-`0x80147B94` | 8.7 KB, 11 fns | probably DTK, the DVD audio-track player (a 4.2 KB state machine calling `AISetStreamVolLeft/Right`) | same |
+| `0x80145998`-`0x80147B94` | 8.7 KB, 11 fns | MIX, the SDK voice mixer (`MIXInit`, `__MIXSetPan`, `MIXSetSoundMode` named; the two big ones are the settings update and the per-frame mix) | not in Prime; 2004 SDK objects differ |
 | `0x8015444C`-`0x8015C1F8` (pieces) | ~20 KB | MSL: `__ieee754_*`/`__kernel_*` math, `alloc.c`, `mem_funcs`, wide-char | MSL revision differs from Prime's; other games' MSL |
 
 Any of these needs another project's objects run through `tools/research/sdk/` (the scripts only
 assume a directory of split `.o` files plus source), and its compiler version in `configure.py`.
+
+**MetroTRK (2026-09-22).** `extern/trk` is the Pikmin 2 project's MetroTRK source (CC0, see its
+README). Compiled with GC/1.3.2 and Pikmin 2's TRK flags it reproduces 97 of this game's TRK
+functions byte for byte (v2.0 here vs v2.6 there); Melee's older TRK gave 20. The 27 units are
+linked `NonMatching` (`TRK_MINNOW_DOLPHIN` in configure.py, +19 KB). Two TRK functions live in
+`.init` (`TRK_memcpy`, `__TRK_reset`) and are split there. `mutex_TRK` and `target_options` are
+8-16 byte stubs this revision compiles differently.
+
+**Naming from a later SDK's libraries (2026-09-22).** The April 2004 Dolphin SDK library archives
+(reference only, not in the repo) were unpacked to objects and run through `match_sdk_names.py`:
+286 exact matches, 52 new names (CARD, OS mutex/semaphore, AX, MIX, AXFX, GX). Then
+`layout_align.py` aligned each reference object's function order against the game's by size,
+pinned at the exact matches, and named 21 more (`OSCreateThread`, `OSExitThread`, `AXSetVoiceSrc`,
+`DVDChangeDiskAsync`, `GXSetDrawDone`, `__CARDIsWritable`, `__CARDIsReadable`, `CARDOpen`...).
+Proposals of 12 bytes or less are not applied: tiny setters collide (one such false positive,
+`TRKSetBufferUsed` on a game function, was reverted). The remaining unnamed SDK-region code is
+AX/MIX/AXFX whose 2002 bytes differ from 2004's, and the 28 KB after `MWTRACE`, which is not SDK.
+
+**The April 2003 CARD patch, seen in code.** This game's CARD library is stamped Apr 2 2003
+(everything else Sep 5 2002). With the 2004 objects the difference is visible: `__CARDIsWritable`
+and `__CARDIsReadable` take the control block (`card, ent`) and replace the `__CARDAccess` +
+`__CARDIsWritable(ent)` pair; `CARDWriteAsync`, `CARDFastDeleteAsync`, `CARDRenameAsync` call
+`__CARDIsWritable`, `CARDReadAsync` calls `__CARDIsReadable`. Prime's source is guarded with
+`CARD_PATCH_2003` (set in `cflags_sdk`) at those spots; `CARDRead` and `CARDStat` went to 100% once
+the calls were fixed, which confirms it. `OSMutex.c` got its real range (Prime's object had only
+`__OSUnlockAllMutex`; this game has the whole file minus `OSTryLockMutex` and the condition
+variables, so it is `NonMatching`).
 
 Beyond that, Level 0 is done as far as borrowed source goes.
 

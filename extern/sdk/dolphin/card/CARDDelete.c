@@ -46,7 +46,11 @@ s32 CARDFastDeleteAsync(s32 chan, s32 fileNo, CARDCallback callback) {
 
   dir = __CARDGetDirBlock(card);
   ent = &dir[fileNo];
+#if CARD_PATCH_2003
+  result = __CARDIsWritable(card, ent);
+#else
   result = __CARDAccess(card, ent);
+#endif
   if (result < 0) {
     return __CARDPutControlBlock(card, result);
   }

@@ -77,10 +77,14 @@ s32 CARDGetStatus(s32 chan, s32 fileNo, CARDStat* stat) {
 
   dir = __CARDGetDirBlock(card);
   ent = &dir[fileNo];
+#if CARD_PATCH_2003
+  result = __CARDIsWritable(card, ent);
+#else
   result = __CARDAccess(card, ent);
   if (result == CARD_RESULT_NOPERM) {
     result = __CARDIsWritable(ent);
   }
+#endif
 
   if (result >= 0) {
     memcpy(stat->gameName, ent->gameName, sizeof(stat->gameName));

@@ -261,6 +261,33 @@ cflags_sdk = [
     "-i extern/sdk/libc",
     f"-i build/{config.version}/include",
     "-DVERSION=0",  # SDK revision selector for extern/sdk, see include/GameVersions.h
+    "-DCARD_PATCH_2003=1",  # this game's CARD library is the Apr 2 2003 patch (see docs/tw2004-notes.md)
+]
+
+# MetroTRK (extern/trk, from the Pikmin 2 decompilation): its own flags, no game includes
+cflags_trk = [
+    "-nodefaults",
+    "-proc gekko",
+    "-align powerpc",
+    "-enum int",
+    "-fp hardware",
+    "-Cpp_exceptions off",
+    "-w off",
+    "-O4,p",
+    "-nosyspath",
+    "-RTTI off",
+    "-fp_contract on",
+    "-str reuse",
+    "-multibyte",
+    "-i extern/trk/include",
+    "-i extern/trk/include/stl",
+    "-DVERSION_GPVE01",
+    "-use_lmw_stmw on",
+    "-common off",
+    "-inline auto",
+    "-inline deferred",
+    "-sdata 0",
+    "-sdata2 0",
 ]
 
 cflags_runtime = [
@@ -331,6 +358,42 @@ cflags_gcc = [
 ]
 
 config.libs = [
+    {
+        "lib": "TRK_MINNOW_DOLPHIN",
+        "mw_version": "GC/1.3.2",
+        "cflags": cflags_trk,
+        "progress_category": "sdk",
+        "src_dir": "extern/trk",
+        "objects": [
+            Object(NonMatching, "MetroTRK/mainloop.c"),
+            Object(NonMatching, "MetroTRK/nubevent.c"),
+            Object(NonMatching, "MetroTRK/nubinit.c"),
+            Object(NonMatching, "MetroTRK/msg.c"),
+            Object(NonMatching, "MetroTRK/msgbuf.c"),
+            Object(NonMatching, "MetroTRK/serpoll.c"),
+            Object(NonMatching, "MetroTRK/usr_put.c"),
+            Object(NonMatching, "MetroTRK/dispatch.c"),
+            Object(NonMatching, "MetroTRK/msghndlr.c"),
+            Object(NonMatching, "MetroTRK/support.c"),
+            Object(NonMatching, "MetroTRK/mutex_TRK.c"),
+            Object(NonMatching, "MetroTRK/notify.c"),
+            Object(NonMatching, "MetroTRK/flush_cache.c"),
+            Object(NonMatching, "MetroTRK/mem_TRK.c"),
+            Object(NonMatching, "MetroTRK/targimpl.c"),
+            Object(NonMatching, "MetroTRK/mpc_7xx_603e.c"),
+            Object(NonMatching, "MetroTRK/dolphin_trk.c"),
+            Object(NonMatching, "MetroTRK/main_TRK.c"),
+            Object(NonMatching, "MetroTRK/dolphin_trk_glue.c"),
+            Object(NonMatching, "MetroTRK/targcont.c"),
+            Object(NonMatching, "MetroTRK/target_options.c"),
+            Object(NonMatching, "MetroTRK/mslsupp.c"),
+            Object(NonMatching, "MetroTRK/UDP_Stubs.c"),
+            Object(NonMatching, "MetroTRK/ddh/main.c"),
+            Object(NonMatching, "MetroTRK/CircleBuffer.c"),
+            Object(NonMatching, "MetroTRK/gdev/main.c"),
+            Object(NonMatching, "MetroTRK/MWTrace.c"),
+        ],
+    },
     {
         "lib": "vi",
         "mw_version": "GC/1.2.5n",
@@ -527,7 +590,7 @@ config.libs = [
             Object(Matching, "dolphin/os/OSResetSW.c"),
             Object(Matching, "dolphin/os/OSInterrupt.c"),
             Object(Matching, "dolphin/os/OSAudioSystem.c"),
-            Object(Matching, "dolphin/os/OSMutex.c"),
+            Object(NonMatching, "dolphin/os/OSMutex.c"),
             Object(Matching, "dolphin/os/OSSync.c"),
             Object(Matching, "dolphin/os/__start.c"),
         ],

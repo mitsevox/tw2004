@@ -54,7 +54,11 @@ s32 CARDRenameAsync(s32 chan, const char* old, const char* new, CARDCallback cal
   }
 
   ent = &dir[oldNo];
+#if CARD_PATCH_2003
+  result = __CARDIsWritable(card, ent);
+#else
   result = __CARDAccess(card, ent);
+#endif
   if (result < 0) {
     return __CARDPutControlBlock(card, result);
   }
