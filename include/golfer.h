@@ -269,15 +269,18 @@ typedef struct GameState {
     s32  nCurHole;              // 0x064  index into holeOrder
     u8   unk68[0xE4 - 0x68];
     s32  holeOrder[18];         // 0x0E4
-    u8   unk12C[0x22C - 0x12C];
+    u8   unk12C[0x20C - 0x12C];
+    void (*pfn20C)(int nPlayer); // 0x20C  called as a swing begins (state 1)
+    u8   unk210[0x22C - 0x210];
     void (*pfn22C)(int nPlayer); // 0x22C  called after a re-plan in swing state 9
     u8   unk230[0x24C - 0x230];
     void (*pfn24C)(int nPlayer); // 0x24C  called when a swing leaves state 20
     u8   unk250[0x264 - 0x250];
     u8   (*pfn264)(int nPlayer); // 0x264  "aim at the pin?" for a re-plan
     u8   unk268[0x276 - 0x268];
-    u8   b276;                  // 0x276
-    u8   unk277[0x284 - 0x277];
+    u8   b276;                  // 0x276  re-plan the shot as the swing begins
+    u8   b277;                  // 0x277
+    u8   unk278[0x284 - 0x278];
     u8   b284;                  // 0x284
     u8   unk285[0x290 - 0x285];
     s32  n290;                  // 0x290

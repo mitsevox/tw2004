@@ -2619,3 +2619,94 @@ void SwingState11_Enter(int nPlayer) {
         fn_80062CE0(1);
     }
 }
+
+
+void  fn_80062F1C(void* pView);
+void  fn_800CC5C0(int nHandle, char* pA, char* pB);   // an attachment (the glove) on / off
+void  fn_8009B970(int nView);
+int   fn_800DDFB4(int nPlayer);
+void  fn_8007326C(u8* pAnim);
+extern char lbl_802811A8[];
+extern char lbl_802811B0[];
+extern char lbl_8018851C[];                   // "GloveOff"
+
+// State 1 begins: addressing the ball. Camera 25 and the game's 0x20C hook; a fresh Shot_Plan
+// when the game asks (gpGame+0x276, and it ends any replay); the glove comes off for a putt;
+// both views attached; the ball teed up on the tee and kept as it lies; the distance to the
+// pin stored; a CPU (outside game type 8) told to hide its HUD; and if the swing is to be
+// shown, the address animation - 10 for a low-IQ golfer off the tee outside a lesson, else 1 -
+// and camera 11.
+void SwingState01_Enter(int nPlayer) {
+    s32*  pView = &gPlayers[nPlayer].nView0;
+    s32*  pHandle;
+    s32*  pLie;
+    u8*   pBall;
+    int   nView, k;
+
+    fn_80062F1C(fn_80017028(*pView));
+    nView = *pView;
+    View_SetCamera(fn_80017028(nView), 0x19, nPlayer, nView);
+    gpGame->pfn20C(nPlayer);
+    fn_80062B64(nPlayer);
+    fn_80062B60(nPlayer);
+    fn_800DED60(nPlayer);
+    if (gpGame->b276 != 0) {
+        gSession.bReplay = 0;
+        Shot_Plan(nPlayer, 1);
+    }
+    if (gPlayers[nPlayer].nClub == CLUB_PUTTER) {
+        fn_800CC5C0(gPlayers[nPlayer].nShotHandle, lbl_802811A8, lbl_8018851C);
+    } else {
+        fn_800CC5C0(gPlayers[nPlayer].nShotHandle, lbl_802811A8, lbl_802811B0);
+    }
+    gPlayers[nPlayer].fThinkTime = 0.0f;
+    for (k = 0; k < 2; k++) {
+        fn_8001704C(pView[k], nPlayer);
+    }
+    fn_80067074(nPlayer, 0x2A, 0, -1);
+    fn_8001D8DC(nPlayer);
+    fn_8001C804(nPlayer, 1, 1);
+    if (gpGame->b277 != 0) {
+        fn_800957D8(gPlayers[nPlayer].nShotHandle);
+    }
+    fn_800DAE84();
+    fn_800D8D10(nPlayer);
+    fn_80068AA8(nPlayer);
+    pHandle = &gPlayers[nPlayer].nShotHandle;
+    fn_800957FC(*pHandle, 1);
+    fn_8006AD68(nPlayer);
+    if (*(s32*)(*pHandle + 0x2C) == 0) {
+        fn_800957B0(*pHandle, 1);
+    }
+    fn_80045824(nPlayer);
+    Swing_ResetBoostAndSpin(nPlayer);
+    BreakLine_Start(*pView);
+    fn_8009B970(*pView);
+    pLie = &gPlayers[nPlayer].nLie;
+    if (*pLie == 0) {
+        fn_80047EF0(gPlayers[nPlayer].ball, nPlayer, 1);
+    }
+    fn_80016CFC(*pView)[0x275] = 1;
+    if (*pLie != 10 && *pLie != LIE_GREEN && *pLie != LIE_HOLED) {
+        fn_80016CFC(*pView)[0x275] = 0;
+    }
+    pBall = gPlayers[nPlayer].ball;
+    fn_80054A6C(pBall);
+    fn_80005628(gPlayers[nPlayer].ballBefore, pBall, 0xBC);
+    gPlayers[nPlayer].fA64 = fn_800D04AC(nPlayer);
+    fn_80067074(nPlayer, 3, 0, -1);
+    if (gSession.nGameType != 8 && Player_IsCPU(nPlayer)) {
+        fn_800E3D38(nPlayer, 1);
+    }
+    if (fn_800DDFB4(nPlayer) != 0) {
+        fn_8007326C((u8*)*pHandle + 0x164);
+        if (gPlayers[nPlayer].bLowIQPenalty != 0 && *pLie != 0 && !fn_80100294()) {
+            fn_80095744(*pHandle, 10);
+        } else {
+            fn_80095744(*pHandle, 1);
+        }
+        fn_80096690(*pHandle);
+        nView = *pView;
+        View_SetCamera(fn_80017028(nView), 0xB, nPlayer, nView);
+    }
+}
