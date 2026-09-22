@@ -117,6 +117,36 @@ Reading compiler output
   `x + y*z` shows up as `fmadds` where the original has separate `fmuls`/`fadds` - use a
   temporary for the product.
 - **[verified] `abs()` on an int** is emitted inline as `srawi t,v,31; xor; subf` (no call).
+- **[verified] The `lwzu`/`lfsu` idiom is a repeated field access, not a pointer local.** When the
+  same `gPlayers[n].field` is read again after a call, CodeWarrior makes a pointer to the field
+  itself and folds the first read into `lwzu rD, off(rP)`; later reads are `lwz rD, 0(rP)`. An
+  explicit `s32* p = &gPlayers[n].field; ... *p` local blocks that shape (`addi rP; lwz` from the
+  base). Write the field access out each time. Applied to 33 functions of `Swing.c` in one sweep
+  (`C:\dev\scratch	w\ptr_sweep.py`), 10 became exact. Exception: pointers that are indexed
+  (`pViews[k]`) or passed as pointers stay pointers.
+- **[verified] 64-bit arguments skip r4.** `fn(handle, 0, k)` sites where the original sets r5 and
+  r6 but never r4 are `fn(handle, (unsigned long long)k)`: a 64-bit integer goes in an aligned
+  register pair (r5:r6). The animation-event lookups (`fn_8005CB78`, `fn_80048574`,
+  `fn_80062BB0`, `fn_80062B98`) take the 64-bit event id that `fn_8000BEE4` hashes.
+- **[verified] `(fn() & uMask)` operand order.** `and. r0, r3, rM` (call result first) comes from
+  the mask call inline: `if (fn_800136DC(x) & fn_800142AC(k, m))`. A `uMask` local assigned
+  first gives `and. r0, rM, r3`. Still to apply in States 04/05/08/09/10/14.
+- **[verified] Chained assignment stores backwards.** `a[0] = a[1] = a[2] = 0` stores 2, 1, 0;
+  the original wrote four statements in order.
+- **[verified] A hoisted constant is a local.** `x * (1.0f / 128.0f)` with the constant loaded
+  into the "wrong" FPR number: the original declared `f32 fInv = 1.0f / 128.0f;` at the top.
+- **[verified] `(s8)call()` into an `int` vs an `s8` local.** `extsb` register numbering followed
+  `int a = call(); int b = load; s8 c = a;` (the cast as a separate s8 local after the load).
+- **[verified] A branch over a branch (`beq L1; b L2; L1:`) is a `switch` with one `case 0:`.**
+  An `if (x == 0)` gives a single `bne`; an empty then-block is optimised away. The compare is
+  `cmpwi` for a `u8` switch operand; the original's `cmplwi` is still unexplained.
+- **[verified] A shared tail** (`beq L; lfs; fmuls; L:` where ours has two copies of the
+  multiply) is one `if` with the conditions merged: `if ((a && b) || (rand & 1)) x *= -1;`.
+- **[verified] `Player* p = &gPlayers[n]` vs `gPlayers[n].field`** pick different address shapes:
+  the pointer form gives `mulli r5; addi r0, rB, sym@l; add r3, r0, r5`; direct indexing gives
+  `mulli r0; addi r3, r3, sym@l; add r3, r3, r0`. Match whichever the original has per function.
+- **[verified] `u8` returned from an `int` local** gives `clrlwi r3, rX, 24` at the return; a `u8`
+  local gives a plain `mr`.
 - **[verified] The declaration-order rule for callee-saved registers does not hold in
   `AI_ChooseTarget`** (0x8002C2DC, 20 live variables, a loop with eight calls): no ordering tried
   reproduced the original assignment, and hand-hoisting values into named locals made it worse.

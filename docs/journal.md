@@ -68,6 +68,23 @@ Dated log of what was done and decided, newest last. Facts and lessons belong in
   `docs/publish/dolphin-forum-post.md` and posted to Dolphin forums > Cheats, Hacks & Game Patches;
   awaiting moderator approval. Wiki entry and GameHacking.org submission still to do.
 - Repo made public.
+- **SDK sprint.** Matched code 6.69% -> 14.82% in one day, almost all of it borrowed source:
+  Level 1/2 linked 49 partial SDK/MSL units from Prime as NonMatching text spans; Pikmin 2's
+  MetroTRK (CC0) vendored to `extern/trk` (97 functions exact); a later SDK's library objects
+  (reference only, outside the repo at `C:\dev\ext\sdk`) named 134 SDK functions and showed the
+  April 2003 CARD patch in code (`__CARDIsWritable(card, ent)`; `CARDRead`/`CARDStat` now 100%).
+  The 8.7 KB block after `GXClearGPMetric` is MIX, not DTK. Dashboard chart fixed (it counted
+  only fully Matching units) and backfilled with a worktree build per commit.
+- **Game code: the 90-99% band.** 27 KB of already-written `Swing.c`/`Golfer.c` functions that
+  differed by register or statement shape. 27 more exact so far (Golfer 69/91, Swing 55/181).
+  Rules in `decomp-notes.md`: the `lwzu` idiom is a repeated field access; 64-bit event ids;
+  mask calls inline; chained assignment order; hoisted constants as locals; switch-with-one-case.
+- **Next:** apply the inline-mask rule to States 04/05/08/09/10/14 (eight functions, known fix);
+  one-liners in `SwingState02_Update` (`>` vs `<=`), `Luck_TakePerfectShot` (compare operand
+  order), `SwingState20_Exit` (loop counter placement); then `Shot_Prepare` (indexed store with a
+  separate i*4 register), `Swing_MeterError` (FPR order), `AI_ChooseTarget` (frame size). After
+  that `Ball.c`'s 21 KB of unwritten physics. Tools: `C:\dev\scratch	w\sbs2.py` (normalised
+  diff), `fnsrc.py` (print a function), `ptr_sweep.py` (baseline/apply/judge).
 - **SDK import (Level 0).** Copied Prime's `extern/sdk`, gave the SDK its own compiler settings, named
   data symbols by aligning references against Prime's objects, and linked 57 SDK units (162 functions).
   Matched code went 2,016 -> 53,392 bytes in one day. Pipeline in `tools/research/sdk/`.
