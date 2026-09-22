@@ -641,10 +641,10 @@ void SwingState02_Update(int nPlayer) {
         case 6:
         case 7:
             if (fn_800FA118(0, 0)) return;
-            if (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] > 0) {
-                fMax = 3.5f;
-            } else {
+            if (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] <= 0) {
                 fMax = 1.5f;
+            } else {
+                fMax = 3.5f;
             }
             break;
         case 11:

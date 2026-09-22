@@ -1592,7 +1592,7 @@ void Luck_TakePerfectShot(int nPlayer) {
 
     if (gPlayers[nPlayer].bPerfect == 0 || Player_IsCPU(nPlayer) || gSession.nSplitScreen != 0) return;
     {
-        if (gPlayers[CADDIE_SLOT].nClub + 2 < gPlayers[nPlayer].nClub) {
+        if (gPlayers[nPlayer].nClub > gPlayers[CADDIE_SLOT].nClub + 2) {
             gPlayers[nPlayer].bPerfect = 0;
             return;
         }
