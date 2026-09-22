@@ -2048,3 +2048,98 @@ void SwingState08_Update(int nPlayer) {
     }
     fn_80068AC8(nPlayer);
 }
+
+
+void  Caddie_Update(int nPlayer);             // Golfer.c
+void  fn_80062C38(void);
+void  fn_800DAE84(void);
+void  fn_80058FA4(int nPlayer);
+void  fn_80068AA8(int nPlayer);
+void  fn_800689D4(int nPlayer);
+void  fn_800957FC(int nHandle, int a);
+void  fn_800957B0(int nHandle, int a);
+void  fn_80054A6C(u8* pBall);
+f32   fn_800D04AC(int nPlayer);
+
+// State 4: an aiming camera held while button 7 is down (the caddie keeps updating). Buttons
+// 9/10 and 11..14 play the pan sounds.
+void SwingState04_Update(int nPlayer) {
+    u32  uMask;
+    s32* pController;
+    Caddie_Update(nPlayer);
+    uMask       = fn_800142AC(7, 1);
+    pController = &gPlayers[nPlayer].nController;
+    if (!(fn_800136DC(*pController) & uMask)) {
+        fn_8005CFD4(nPlayer);
+    } else {
+        uMask = fn_800142AC(9, 0);
+        if (fn_800136DC(*pController) & uMask) {
+            fn_80067074(nPlayer, 0xD, 0, -1);
+        } else {
+            uMask = fn_800142AC(0xA, 0);
+            if (fn_800136DC(*pController) & uMask) {
+                fn_80067074(nPlayer, 0xE, 0, -1);
+            }
+        }
+        uMask = fn_800142AC(0xB, 1);
+        if (fn_800136DC(*pController) & uMask) {
+            fn_80067074(nPlayer, 0x12, 0, -1);
+        } else {
+            uMask = fn_800142AC(0xC, 1);
+            if (fn_800136DC(*pController) & uMask) {
+                fn_80067074(nPlayer, 0x13, 0, -1);
+            }
+        }
+        uMask = fn_800142AC(0xD, 1);
+        if (fn_800136DC(*pController) & uMask) {
+            fn_80067074(nPlayer, 0x14, 0, -1);
+        } else {
+            uMask = fn_800142AC(0xE, 1);
+            if (fn_800136DC(*pController) & uMask) {
+                fn_80067074(nPlayer, 0x15, 0, -1);
+            }
+        }
+    }
+    fn_80068AC8(nPlayer);
+}
+
+// State 2, a shot begins. A CPU takes camera 0 (with gpGame+0x290) or 12 and, with that flag,
+// animation 2. The ball is kept as it lies and marked stopped, the live ball's state cleared,
+// the player's distance to the pin stored, and the "shot begins" sound played.
+void SwingState02_Enter(int nPlayer) {
+    int   nView;
+    s32*  pHandle;
+    u8*   pBall;
+    if (Player_IsCPU(nPlayer) && gpGame->n290 != 0) {
+        nView = gPlayers[nPlayer].nView0;
+        View_SetCamera(fn_80017028(nView), 0, nPlayer, nView);
+    } else if (Player_IsCPU(nPlayer)) {
+        nView = gPlayers[nPlayer].nView0;
+        View_SetCamera(fn_80017028(nView), 0xC, nPlayer, nView);
+    }
+    if (gpGame->n290 != 0) {
+        pHandle = &gPlayers[nPlayer].nShotHandle;
+        fn_80095744(*pHandle, 2);
+        fn_80096690(*pHandle);
+    }
+    fn_80062C38();
+    pBall = gPlayers[nPlayer].ball;
+    fn_80005628(gPlayers[nPlayer].ballBefore, pBall, 0xBC);
+    *(s32*)(gPlayers[nPlayer].ballBefore + 0x64) = 1;
+    *(s32*)(gPlayers[nPlayer].ball + 0x64)       = 0;
+    fn_800DAE84();
+    fn_80058FA4(nPlayer);
+    gPlayers[nPlayer].swing.unk630 = 1;
+    fn_80068AA8(nPlayer);
+    if (gpGame->b276 != 0) {
+        fn_800689D4(nPlayer);
+    }
+    pHandle = &gPlayers[nPlayer].nShotHandle;
+    if (*(s32*)(*pHandle + 0x2C) == 4 || *(s32*)(*pHandle + 0x2C) == 5) {
+        fn_800957FC(*pHandle, 1);
+        fn_800957B0(*pHandle, 1);
+    }
+    fn_80054A6C(pBall);
+    gPlayers[nPlayer].fA64 = fn_800D04AC(nPlayer);
+    fn_80067074(nPlayer, 6, 0, -1);
+}

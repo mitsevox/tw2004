@@ -266,6 +266,10 @@ typedef struct GameState {
     s32  holeOrder[18];         // 0x0E4
     u8   unk12C[0x24C - 0x12C];
     void (*pfn24C)(int nPlayer); // 0x24C  called when a swing leaves state 20
+    u8   unk250[0x276 - 0x250];
+    u8   b276;                  // 0x276
+    u8   unk277[0x290 - 0x277];
+    s32  n290;                  // 0x290
 } GameState;
 
 // An authored aim point. pDef points at its position and the up-to-ten other points a golfer
