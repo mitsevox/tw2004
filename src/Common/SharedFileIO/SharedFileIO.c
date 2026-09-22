@@ -70,6 +70,7 @@ extern int   fn_8012C98C(void* p);
 extern void* memcpy(void* pDst, const void* pSrc, u32 uLen);
 extern void* memset(void* pDst, int c, u32 uLen);
 extern char* strcpy(char* pDst, const char* pSrc);
+extern u32   strlen(const char* p);
 extern void  fn_80172FA4(int);
 int SFIONumDevicesInMask(u16 uDeviceMask);
 int SFIOFirstDeviceFromMask(u16 uDeviceMask);
@@ -724,7 +725,7 @@ int SFIOGetSessionInfo(void* pOut) {
 }
 
 // Begin a save session: pick the device (or start searching for one) and probe it.
-int SFIOBegin(const char* pName, int eDevice, int uSearchDirection) {
+int SFIOBeginLoad(const char* pName, int eDevice, int uSearchDirection) {
     if (!SFIOIsInitialized()) return 2;
     if (pName == NULL) return 0xC;
     if (!(eDevice == SFIO_DEVICE_INVALID || (eDevice <= SFIO_DEVICE_LAST && eDevice >= SFIO_DEVICE_FIRST))) return 9;
@@ -756,5 +757,91 @@ int SFIOBegin(const char* pName, int eDevice, int uSearchDirection) {
     fn_80172FA4(1);
     _SFIO_pDevice->fn.pfnStartProbe(_SFIO_pData->eDevice);
     _SFIO_pData->eOperation = 1;
+    return 0;
+}
+
+// Three entry points share one body; they differ only in the state they leave behind
+// (single device / searching): Load 5/2, Save 4/1, Delete 6/3. Save also limits the name length.
+int SFIOBeginSave(const char* pName, int eDevice, int uSearchDirection) {
+    if (!SFIOIsInitialized()) return 2;
+    if (pName == NULL) return 0xC;
+    if (strlen(pName) > 25) return 0xC;
+    if (!(eDevice == SFIO_DEVICE_INVALID || (eDevice <= SFIO_DEVICE_LAST && eDevice >= SFIO_DEVICE_FIRST))) return 9;
+    if (eDevice != SFIO_DEVICE_INVALID) {
+        if (!(u16)((1 << eDevice) & _SFIO_pDevice->uAvailableMask)) return 0xB;
+    }
+    if (_SFIO_pData->eState != 0) return 0xD;
+    memset(&_SFIO_pData->uHandle, 0, 0x44);
+    if (eDevice == SFIO_DEVICE_INVALID) {
+        if (SFIONumDevicesInMask(_SFIO_pDevice->uAvailableMask) == 1) {
+            _SFIO_pData->eDevice = SFIOFirstDeviceFromMask(_SFIO_pDevice->uAvailableMask);
+            _SFIO_pData->eState = 4;
+        } else if (uSearchDirection == 0) {
+            _SFIO_pData->eDevice = SFIOFirstDeviceFromMask(_SFIO_pDevice->uAvailableMask);
+            _SFIO_pData->eState = 1;
+        } else if (uSearchDirection == 1) {
+            _SFIO_pData->eDevice = SFIOLastDeviceFromMask(_SFIO_pDevice->uAvailableMask);
+            _SFIO_pData->eState = 1;
+        } else {
+            return 0xC;
+        }
+    } else {
+        _SFIO_pData->eDevice = eDevice;
+        _SFIO_pData->eState = 4;
+    }
+    SFIOSetLastError(0);
+    strcpy((char*)_SFIO_pData->szName35, pName);
+    _SFIO_pData->uSearchDirection = uSearchDirection;
+    fn_80172FA4(1);
+    _SFIO_pDevice->fn.pfnStartProbe(_SFIO_pData->eDevice);
+    _SFIO_pData->eOperation = 1;
+    return 0;
+}
+
+int SFIOBeginDelete(const char* pName, int eDevice, int uSearchDirection) {
+    if (!SFIOIsInitialized()) return 2;
+    if (pName == NULL) return 0xC;
+
+    if (!(eDevice == SFIO_DEVICE_INVALID || (eDevice <= SFIO_DEVICE_LAST && eDevice >= SFIO_DEVICE_FIRST))) return 9;
+    if (eDevice != SFIO_DEVICE_INVALID) {
+        if (!(u16)((1 << eDevice) & _SFIO_pDevice->uAvailableMask)) return 0xB;
+    }
+    if (_SFIO_pData->eState != 0) return 0xD;
+    memset(&_SFIO_pData->uHandle, 0, 0x44);
+    if (eDevice == SFIO_DEVICE_INVALID) {
+        if (SFIONumDevicesInMask(_SFIO_pDevice->uAvailableMask) == 1) {
+            _SFIO_pData->eDevice = SFIOFirstDeviceFromMask(_SFIO_pDevice->uAvailableMask);
+            _SFIO_pData->eState = 6;
+        } else if (uSearchDirection == 0) {
+            _SFIO_pData->eDevice = SFIOFirstDeviceFromMask(_SFIO_pDevice->uAvailableMask);
+            _SFIO_pData->eState = 3;
+        } else if (uSearchDirection == 1) {
+            _SFIO_pData->eDevice = SFIOLastDeviceFromMask(_SFIO_pDevice->uAvailableMask);
+            _SFIO_pData->eState = 3;
+        } else {
+            return 0xC;
+        }
+    } else {
+        _SFIO_pData->eDevice = eDevice;
+        _SFIO_pData->eState = 6;
+    }
+    SFIOSetLastError(0);
+    strcpy((char*)_SFIO_pData->szName35, pName);
+    _SFIO_pData->uSearchDirection = uSearchDirection;
+    fn_80172FA4(1);
+    _SFIO_pDevice->fn.pfnStartProbe(_SFIO_pData->eDevice);
+    _SFIO_pData->eOperation = 1;
+    return 0;
+}
+
+// Close the session: copy the caller's session info back and start the unmount (op 0x18).
+int SFIOEnd(int* pSession) {
+    if (!SFIOIsInitialized()) return 2;
+    if (pSession == NULL) return 0xC;
+    if (_SFIO_pData->eState != 0) return 0xD;
+    memcpy(&_SFIO_pData->uHandle, pSession, 0x44);
+    _SFIO_pData->eState = 7;
+    _SFIO_pData->eOperation = 0x18;
+    _SFIO_pDevice->fn.pfnOp18(*pSession);
     return 0;
 }
