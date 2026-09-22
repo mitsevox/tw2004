@@ -20,3 +20,66 @@ unsorted/code_800080D0.c:
 
 unsorted/code_800082F8.c:
 	.text       start:0x800082F8 end:0x800083A4
+
+dolphin/dvd/dvdidutils.c:
+	.text       start:0x8013E044 end:0x8013E13C
+
+dolphin/gx/GXGeometry.c:
+	.text       start:0x801415AC end:0x8014195C
+
+dolphin/gx/GXDisplayList.c:
+	.text       start:0x80144A38 end:0x80144AA8
+
+dolphin/os/OSMutex.c:
+	.text       start:0x8014B4F0 end:0x8014B560
+
+dolphin/os/OSSync.c:
+	.text       start:0x8014C9FC end:0x8014CA80
+
+runtime/__va_arg.c:
+	.text       start:0x801519A4 end:0x80151A6C
+
+runtime/buffer_io.c:
+	.text       start:0x80155E48 end:0x80155F40
+
+runtime/mem.c:
+	.text       start:0x80156C78 end:0x80156DE8
+
+runtime/misc_io.c:
+	.text       start:0x801570B8 end:0x801570C8
+
+runtime/sscanf.c:
+	.text       start:0x801594CC end:0x8015955C
+
+runtime/wchar_io.c:
+	.text       start:0x8015C1F8 end:0x8015C280
+
+runtime/s_copysign.c:
+	.text       start:0x8015F0A4 end:0x8015F0CC
+
+runtime/s_modf.c:
+	.text       start:0x8015F538 end:0x8015F634
+
+dolphin/card/CARDRdwr.c:
+	.text       start:0x80179004 end:0x80179284
+
+dolphin/card/CARDCheck.c:
+	.text       start:0x80179904 end:0x8017A840
+
+dolphin/card/CARDFormat.c:
+	.text       start:0x8017B2B8 end:0x8017BA9C
+
+dolphin/card/CARDCreate.c:
+	.text       start:0x8017C18C end:0x8017C4DC
+
+dolphin/card/CARDDelete.c:
+	.text       start:0x8017CC84 end:0x8017CF64
+
+dolphin/card/CARDRename.c:
+	.text       start:0x8017D42C end:0x8017D628
+
+dolphin/os/__start.c:
+	.init       start:0x80003100 end:0x80003354
+
+runtime/__mem.c:
+	.init       start:0x800033A8 end:0x800034E0

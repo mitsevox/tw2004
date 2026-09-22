@@ -215,6 +215,7 @@ cflags_base = [
     f"-i build/{config.version}/include",
     f"-DBUILD_VERSION={version_num}",
     f"-DVERSION_{config.version}",
+    "-DVERSION=0",  # SDK revision selector for extern/sdk, see include/GameVersions.h
 ]
 
 # Debug flags
@@ -233,13 +234,41 @@ elif args.warn == "error":
     cflags_base.append("-W error")
 
 # Metrowerks library flags
+# Nintendo prebuilt the SDK with an older compiler than EA used for the game (see docs/compiler.md).
+# Settings taken from the Metroid Prime project, which links the same SDK build.
+# Mirrors the Prime project's cflags_base exactly. Not derived from our cflags_base on purpose:
+# the SDK needs -inline auto, the EA code needs -inline smart.
+cflags_sdk = [
+    "-nodefaults",
+    "-proc gekko",
+    "-align powerpc",
+    "-enum int",
+    "-fp hardware",
+    "-Cpp_exceptions off",
+    "-O4,p",
+    "-inline auto",
+    '-pragma "cats off"',
+    '-pragma "warn_notinlined off"',
+    "-maxerrors 1",
+    "-nosyspath",
+    "-RTTI off",
+    "-fp_contract on",
+    "-str reuse",
+    "-i include",
+    "-i extern/sdk/include",
+    "-i extern/sdk/libc",
+    f"-i build/{config.version}/include",
+    "-DVERSION=0",  # SDK revision selector for extern/sdk, see include/GameVersions.h
+]
+
 cflags_runtime = [
-    *cflags_base,
+    *cflags_sdk,
     "-use_lmw_stmw on",
     "-str reuse,pool,readonly",
     "-gccinc",
     "-common off",
-    "-inline auto",
+    "-char signed",
+    "-inline deferred,auto",
 ]
 
 # REL flags
@@ -291,6 +320,72 @@ def MatchingFor(*versions):
 config.warn_missing_config = True
 config.warn_missing_source = False
 config.libs = [
+    {
+        "lib": "card",
+        "mw_version": "GC/1.2.5n",
+        "cflags": cflags_sdk,
+        "progress_category": "sdk",
+        "src_dir": "extern/sdk",
+        "objects": [
+            Object(Matching, "dolphin/card/CARDCheck.c"),
+            Object(Matching, "dolphin/card/CARDCreate.c"),
+            Object(Matching, "dolphin/card/CARDDelete.c"),
+            Object(Matching, "dolphin/card/CARDFormat.c"),
+            Object(Matching, "dolphin/card/CARDRdwr.c"),
+            Object(Matching, "dolphin/card/CARDRename.c"),
+        ],
+    },
+    {
+        "lib": "dvd",
+        "mw_version": "GC/1.2.5n",
+        "cflags": cflags_sdk,
+        "progress_category": "sdk",
+        "src_dir": "extern/sdk",
+        "objects": [
+            Object(Matching, "dolphin/dvd/dvdidutils.c"),
+        ],
+    },
+    {
+        "lib": "gx",
+        "mw_version": "GC/1.2.5n",
+        "cflags": cflags_sdk,
+        "progress_category": "sdk",
+        "src_dir": "extern/sdk",
+        "objects": [
+            Object(Matching, "dolphin/gx/GXDisplayList.c"),
+            Object(Matching, "dolphin/gx/GXGeometry.c"),
+        ],
+    },
+    {
+        "lib": "os",
+        "mw_version": "GC/1.2.5n",
+        "cflags": cflags_sdk,
+        "progress_category": "sdk",
+        "src_dir": "extern/sdk",
+        "objects": [
+            Object(Matching, "dolphin/os/OSMutex.c"),
+            Object(Matching, "dolphin/os/OSSync.c"),
+            Object(Matching, "dolphin/os/__start.c"),
+        ],
+    },
+    {
+        "lib": "MSL_C.PPCEABI.bare.H",
+        "mw_version": "GC/1.3",
+        "cflags": cflags_runtime,
+        "progress_category": "sdk",
+        "src_dir": "extern/sdk",
+        "objects": [
+            Object(Matching, "runtime/__mem.c"),
+            Object(Matching, "runtime/__va_arg.c"),
+            Object(Matching, "runtime/buffer_io.c"),
+            Object(Matching, "runtime/mem.c"),
+            Object(Matching, "runtime/misc_io.c"),
+            Object(Matching, "runtime/s_copysign.c"),
+            Object(Matching, "runtime/s_modf.c"),
+            Object(Matching, "runtime/sscanf.c"),
+            Object(Matching, "runtime/wchar_io.c"),
+        ],
+    },
     {
         # EA game code whose original source file is not yet known.
         "lib": "unsorted",
