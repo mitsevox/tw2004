@@ -2007,3 +2007,44 @@ void SwingState16_Update(int nPlayer) {
         SwingStack_Push(0xC, nPlayer);
     }
 }
+
+
+void  fn_800C6010(void* pView, int nPlayer);
+void  fn_800C60E8(void* pView, int nPlayer);
+void  fn_80068AC8(int nPlayer);
+
+// State 8: a free camera while button 19 is held (release pops the state). Buttons 11/12 and
+// 13/14 play the four pan sounds; button 4 switches between two camera modes.
+void SwingState08_Update(int nPlayer) {
+    u32  uMask = fn_800142AC(0x13, 1);
+    s32* pController = &gPlayers[nPlayer].nController;
+    if (!(fn_800136DC(*pController) & uMask)) {
+        fn_8005CFD4(nPlayer);
+    } else {
+        uMask = fn_800142AC(0xB, 1);
+        if (fn_800136DC(*pController) & uMask) {
+            fn_80067074(nPlayer, 0x12, 0, -1);
+        } else {
+            uMask = fn_800142AC(0xC, 1);
+            if (fn_800136DC(*pController) & uMask) {
+                fn_80067074(nPlayer, 0x13, 0, -1);
+            }
+        }
+        uMask = fn_800142AC(0xD, 1);
+        if (fn_800136DC(*pController) & uMask) {
+            fn_80067074(nPlayer, 0x14, 0, -1);
+        } else {
+            uMask = fn_800142AC(0xE, 1);
+            if (fn_800136DC(*pController) & uMask) {
+                fn_80067074(nPlayer, 0x15, 0, -1);
+            }
+        }
+    }
+    uMask = fn_800142AC(4, 1);
+    if (fn_800136DC(*pController) & uMask) {
+        fn_800C6010(fn_80017028(gPlayers[nPlayer].nView0), nPlayer);
+    } else {
+        fn_800C60E8(fn_80017028(gPlayers[nPlayer].nView0), nPlayer);
+    }
+    fn_80068AC8(nPlayer);
+}
