@@ -397,8 +397,11 @@ character's `Data/Chars/NNchar.gcb` `CHR` object; `tools/research/find_sal.py`,
     15 Edwin "Pops" Masterson IV   gplptt12 only
 
 `gplptt12` is the **pool-cue tap-in** (the golfer drops to the ground, turns the putter round
-and knocks it in with the grip like a cue): the golfers who have it are the ones remembered
-doing it in TW2003, and Pops, whose only gimme clip it is, did it "a lot". So it is a one-in-three
+and knocks it in with the grip like a cue). **Confirmed in game (2026-09-22)**: with the Gecko code
+in `tools/codes/pool_cue_gimme.txt`, which hands every group-9 lookup the `gplptt12` clip from any
+loaded golfer's library, a created golfer playing alongside Cedric Andrews tapped in with the pool
+cue on the first gimme. A created golfer's own library (character 08) has no group 9, and the
+creator's 111-animation playlist (group 20) has no tap-ins, so without the code they never get it. So it is a one-in-three
 gimme for six golfers, every gimme for Pops, and never for anyone else - including Tiger.
 
 The CPU's shot rehearsal (`AI_RehearseShot`, `0x8002B030`, in C)
