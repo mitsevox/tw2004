@@ -143,6 +143,10 @@ Dated log of what was done and decided, newest last. Facts and lessons belong in
   bag as a bit mask (not cash), `AI_NearestTarget` is literally the nearest authored point,
   and `AI_MaxDistance` interpolates two per-club tables by POWER with a small jump at exactly
   100. Five more compiler rules recorded.
+- **Swing.c started: the human half of hypothesis 4 in C.** The seven attribute readers,
+  instruction-count exact. New on the way: the spin input is an amount (0..20), not a flag, so
+  spin is linear in SPIN; putts over 75% count as full; the driver has a tee sweet spot; and
+  mis-hit rumble scales with the attribute. `golfer.h` now holds the shared structs.
 
 **Working agreements**
 - Show the plain-English logic and the C before building anything non-trivial.

@@ -195,7 +195,15 @@ attribute accessor and helpers. Eleven are exact; `AI_ClubForShot`, `AI_MaxDista
 the float-constant pool is labelled; `AI_PlanShot` 98.8%, `AI_ApplyError` 98.4%,
 `AI_NearestTarget` 99.1%, `Golfer_GetAttribute` 96.8%, `AI_ChooseTarget` 92.7% (register
 numbers). The structs (`GolferRecord`, `Player`, `AITarget`, `Session`, `GameState`) are in
-the file. Roughly 80 functions in the range are still untouched. The Python transcription
+the file. Roughly 80 functions in the range are still untouched.
+
+`src/Swing.c` (`0x800589F8`-`0x80062E40`, named by its assert string) is the human swing,
+linked NonMatching. Seven functions written: `Swing_ApplyForgiveness`, `Swing_ComputePower`,
+`Swing_ApplyPowerBoost`, `Swing_ApplySpin`, `Swing_SpinScale`, `Swing_TeeSweetSpot`,
+`Swing_MisHitRumble`. All compile to the original's instruction count; five are within 1% and
+two sit at 84% because CodeWarrior common-subexpressions the player address differently from
+our `gPlayers[nPlayer]` spelling. The shared structs moved to `include/golfer.h`, with the
+swing meter's per-player state as `SwingData` at player+0x3D4. The Python transcription
 `tools/research/ctrl_dump.py` extracts every object from every `.hog` / `.gcb` on disc 1 to
 its declared size, which is the proof the reading is right. Full format:
 [`formats/ctrl-container.md`](formats/ctrl-container.md). The rest of the file - buffer ring

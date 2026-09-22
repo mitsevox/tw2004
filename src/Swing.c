@@ -1,0 +1,303 @@
+// Swing.c: the human swing - the meter's error and power, and what the golfer's attributes do
+// to them. Named by its assert string at 0x8028118C. CodeWarrior GC/2.5, -O4,p. The formulas
+// and tables are written up in docs/gameplay.md.
+
+#include "golfer.h"
+
+// The swing module's state; only the tuning values read here. Set up in Swing_Init.
+typedef struct SwingState {
+    u8   unk0[0xBC];
+    f32  fTeeWindowLo;          // 0x0BC  0.4
+    u8   unkC0[4];
+    f32  fTeeWindowHi;          // 0x0C4  0.6
+    f32  fTeeBonus;             // 0x0C8  0.1
+    u8   unkCC[0x118 - 0xCC];
+    f32  fPuttFullPower;        // 0x118  0.75: a putt meter over this counts as full
+} SwingState;
+
+extern SwingState* gpSwing;                  // 0x80281188
+extern f32         gForgivenessTable[3][27]; // 0x80188168  rows: value at attribute 0 / 100 / 110
+extern s32         gBoostSteps[8];           // 0x80188148  power boost per level: 1 2 4 6 9 12 16 20
+
+double fn_8000AE94(double x);                // fabs
+f32    fn_80050D34(f32 fDist);               // putt power for a distance
+f32    fn_80050F88(f32 fDist, u8* pParams, int nKind, int nClub);   // chip power
+void   fn_800130F8(int nPad, int n);         // rumble on
+void   fn_80013130(int nPad, int n);         // rumble strength
+
+f32 AI_PowerScale(int nPlayer);              // Golfer.c
+
+// Rows of gForgivenessTable, in pairs (threshold, scale) unless noted.
+enum {
+    ROW_DRIVING     = 0,    // driving accuracy: clubs 0-8
+    ROW_STRIKING_A  = 2,    // ball striking: clubs 9-12
+    ROW_STRIKING_B  = 4,    // 13-16
+    ROW_STRIKING_C  = 6,    // 17-24
+    ROW_DRIVING_PWR = 8,    // distance lost to error, driving
+    ROW_RECOVERY    = 10,
+    ROW_RECOVERY_PWR = 12,
+    ROW_APPROACH_A  = 14,   // shot kind 3
+    ROW_APPROACH_B  = 16,   // shot kind 2
+    ROW_PUTTING     = 20,
+    ROW_BOOST       = 24,   // single: power per boost step
+    ROW_RUMBLE      = 25,   // single: rumble frames per unit of error
+    ROW_SPIN        = 26    // single: spin scale
+};
+
+// A table row interpolated by an attribute: 0..100 between the first two columns, 100..110
+// between the last two.
+#define TABLE_AT(row, attr)                                                                    \
+    ((attr) <= 100                                                                             \
+         ? gForgivenessTable[0][row] + ((f32)(attr) / 100.0f) *                                \
+               (gForgivenessTable[1][row] - gForgivenessTable[0][row])                         \
+         : gForgivenessTable[1][row] + (((f32)(attr) - 100.0f) / 10.0f) *                      \
+               (gForgivenessTable[2][row] - gForgivenessTable[1][row]))
+
+// Two rows at once (threshold and scale), one branch on the attribute.
+#define TABLE_PAIR(rowT, rowS, attr, outT, outS)                                                   if ((attr) <= 100) {                                                                               f32 t = (f32)(attr) / 100.0f;                                                                  outT = gForgivenessTable[0][rowT] + t * (gForgivenessTable[1][rowT] - gForgivenessTable[0][rowT]);         outS = gForgivenessTable[0][rowS] + t * (gForgivenessTable[1][rowS] - gForgivenessTable[0][rowS]);     } else {                                                                                           f32 t = ((f32)(attr) - 100.0f) / 10.0f;                                                        outT = gForgivenessTable[1][rowT] + t * (gForgivenessTable[2][rowT] - gForgivenessTable[1][rowT]);         outS = gForgivenessTable[1][rowS] + t * (gForgivenessTable[2][rowS] - gForgivenessTable[1][rowS]);     }
+
+// How much spin the SPIN attribute allows: 0.15 at 0, 0.6 at 100, 1.0 at 110.
+f32 Swing_SpinScale(int nSpin) {
+    return TABLE_AT(ROW_SPIN, (s8)nSpin);
+}
+
+// Add the power boost: the pressed level's step times a per-point scale from POWER BOOST
+// (0.005 at 0, 0.010 at 100). Base value only - equipment counts, modifiers do not.
+f32 Swing_ApplyPowerBoost(int nPlayer, f32 fPower) {
+    int nBoost = (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_POWER_BOOST, ATTR_BASE);
+    int nLevel = gPlayers[nPlayer].swing.nBoostLevel;
+    if (nLevel > 0) {
+        f32 fScale = TABLE_AT(ROW_BOOST, nBoost);
+        f32 fAdd   = fScale * (f32)gBoostSteps[nLevel - 1];
+        fPower += fAdd;
+        return fPower;
+    }
+    return fPower;
+}
+
+// Turn the spin input into the shot's spin: stick deflection (-1..1) times the amount asked
+// for (0..20, over 20) times the SPIN scale (0.15 at 0, 0.6 at 100, 1.0 at 110).
+void Swing_ApplySpin(int nPlayer) {
+    SwingData* pSw = &gPlayers[nPlayer].swing;
+    int        nSpin;
+    f32        fScale;
+    if (gSession.bNoSpin) return;
+    if (pSw->nSpinAmount == 0) {
+        pSw->fSpinX = 0.0f;
+        pSw->fSpinY = 0.0f;
+        return;
+    }
+    nSpin       = Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_SPIN, ATTR_TOTAL);
+    {
+        f32 fX = (f32)(pSw->nSpinStickX - 128) * (1.0f / 128.0f);
+        f32 fY = (f32)(pSw->nSpinStickY - 128) * (1.0f / 128.0f);
+        pSw->fSpinY = fX * (f32)pSw->nSpinAmount / 20.0f;
+        pSw->fSpinX = fY * (f32)pSw->nSpinAmount / 20.0f;
+    }
+    fScale = Swing_SpinScale(nSpin);
+    pSw->fSpinY *= fScale;
+    pSw->fSpinX *= fScale;
+    pSw->fSpinX *= -1.0f;
+}
+
+// Driver from the tee: up to +10% power when the tempo lands in the sweet-spot window.
+f32 Swing_TeeSweetSpot(int nPlayer, f32 fPower) {
+    Player* p = &gPlayers[nPlayer];
+    f32     fT, fHalf;
+    if (p->nLie == 0 && p->nClub == 0 && p->swing.fTempo < 0.0f) {
+        fT = -p->swing.fTempo / 1.5707964f;
+        if (fT > gpSwing->fTeeWindowLo && fT < gpSwing->fTeeWindowHi) {
+            fHalf = (gpSwing->fTeeWindowHi - gpSwing->fTeeWindowLo) * 0.5f;
+            return fPower + (1.0f - (f32)fn_8000AE94(fHalf - (fT - gpSwing->fTeeWindowLo)) / fHalf) * gpSwing->fTeeBonus;
+        }
+    }
+    return fPower;
+}
+
+// Shrink a human's swing error by the governing attribute: below a threshold the error is
+// multiplied by a scale (at 100, misses under ~0.42 become 82% smaller). CPU players skip this.
+// Putts under 2 units lose their error entirely.
+void Swing_ApplyForgiveness(int nPlayer) {
+    if (Player_IsCPU(nPlayer)) return;
+    if (gPlayers[nPlayer].bPerfect) return;
+    {
+    f32* pError = &gPlayers[nPlayer].swing.fSwingError;
+    f32  fError = *pError;
+    int  nRowScale, nRowThresh;
+    int  nAttr;
+    f32  fThresh, fScale;
+
+    if (gPlayers[nPlayer].nLie == 6 || gPlayers[nPlayer].nLie == 7 || gPlayers[nPlayer].nLie == 8 ||
+        gPlayers[nPlayer].nLie == 3 || gPlayers[nPlayer].nLie == 4) {
+        nRowScale  = ROW_RECOVERY + 1;
+        nRowThresh = ROW_RECOVERY;
+        nAttr      = (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_RECOVERY, ATTR_TOTAL);
+    } else {
+        switch (gPlayers[nPlayer].nShotKind) {
+        case SHOT_PUTT:
+            nRowScale  = ROW_PUTTING + 1;
+            nRowThresh = ROW_PUTTING;
+            nAttr      = (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_PUTTING, ATTR_TOTAL);
+            if (gPlayers[nPlayer].fDistance < 2.0f) {
+                *pError = 0.0f;
+                return;
+            }
+            break;
+        case SHOT_CHIP:
+            nRowScale  = ROW_APPROACH_B + 1;
+            nRowThresh = ROW_APPROACH_B;
+            nAttr      = (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_APPROACH, ATTR_TOTAL);
+            break;
+        case SHOT_PITCH:
+            nRowScale  = ROW_APPROACH_A + 1;
+            nRowThresh = ROW_APPROACH_A;
+            nAttr      = (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_APPROACH, ATTR_TOTAL);
+            break;
+        case 5:
+        case 6:
+        case 7:
+            nRowScale  = ROW_RECOVERY + 1;
+            nRowThresh = ROW_RECOVERY;
+            nAttr      = (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_RECOVERY, ATTR_TOTAL);
+            break;
+        default:
+            if (gPlayers[nPlayer].nClub >= 0 && gPlayers[nPlayer].nClub < 9) {
+                nRowScale  = ROW_DRIVING + 1;
+                nRowThresh = ROW_DRIVING;
+                nAttr      = (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_DRIVING_ACCURACY, ATTR_TOTAL);
+            } else if (gPlayers[nPlayer].nClub >= 9 && gPlayers[nPlayer].nClub < 13) {
+                nRowScale  = ROW_STRIKING_A + 1;
+                nRowThresh = ROW_STRIKING_A;
+                nAttr      = (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_BALL_STRIKING, ATTR_TOTAL);
+            } else if (gPlayers[nPlayer].nClub >= 13 && gPlayers[nPlayer].nClub < 17) {
+                nRowScale  = ROW_STRIKING_B + 1;
+                nRowThresh = ROW_STRIKING_B;
+                nAttr      = (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_BALL_STRIKING, ATTR_TOTAL);
+            } else if (gPlayers[nPlayer].nClub >= 17 && gPlayers[nPlayer].nClub < 25) {
+                nRowScale  = ROW_STRIKING_C + 1;
+                nRowThresh = ROW_STRIKING_C;
+                nAttr      = (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_BALL_STRIKING, ATTR_TOTAL);
+            } else {
+                nRowScale  = ROW_STRIKING_C + 1;
+                nRowThresh = ROW_STRIKING_C;
+                nAttr      = (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_BALL_STRIKING, ATTR_TOTAL);
+            }
+            break;
+        }
+    }
+    TABLE_PAIR(nRowThresh, nRowScale, nAttr, fThresh, fScale);
+    if (fn_8000AE94(fError) < fThresh) {
+        fError *= fScale;
+    }
+    *pError = fError;
+    }
+}
+
+// Rumble the pad on a mis-hit: frames = (135 at attribute 0 .. 35 at 100) x |error|, max 30.
+void Swing_MisHitRumble(int nPlayer) {
+    int nPad = gPlayers[nPlayer].nController;
+    int nAttr;
+    f32 fScale;
+    switch (gPlayers[nPlayer].nShotKind) {
+    case SHOT_PUTT:  nAttr = (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_PUTTING, ATTR_TOTAL); break;
+    case SHOT_CHIP:
+    case SHOT_PITCH: nAttr = (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_APPROACH, ATTR_TOTAL); break;
+    case 5:
+    case 6:
+    case 7:          nAttr = (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_RECOVERY, ATTR_TOTAL); break;
+    default:         nAttr = (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_BALL_STRIKING, ATTR_TOTAL); break;
+    }
+    fScale = TABLE_AT(ROW_RUMBLE, nAttr);
+    gPlayers[nPlayer].swing.nRumbleFrames = (int)(fScale * fn_8000AE94(gPlayers[nPlayer].swing.fSwingError));
+    if (gPlayers[nPlayer].swing.nRumbleFrames > 30) gPlayers[nPlayer].swing.nRumbleFrames = 30;
+    if (gPlayers[nPlayer].swing.nRumbleFrames > 0) {
+        gPlayers[nPlayer].swing.bRumble = 1;
+        fn_800130F8(nPad, 1);
+        fn_80013130(nPad, 0xFF);
+    }
+}
+
+// The final power for the shot. A CPU just scales what it planned (putts +5%). A human gets
+// the boost, then loses distance to the swing error: a scaled part of it under the threshold,
+// all of it above. Putts over 75% on the meter count as full power.
+f32 Swing_ComputePower(int nPlayer) {
+    Player* p;
+    f32*    pPower;
+    f32     fPower, fError;
+    int     nRowScale, nRowThresh;
+    int     nAttr;
+    f32     fThresh, fScale;
+
+    if (Player_IsCPU(nPlayer) || gPlayers[nPlayer].bPerfect) {
+        p      = &gPlayers[nPlayer];
+        fPower = p->fPower * AI_PowerScale(nPlayer);
+        if (p->nShotKind == SHOT_PUTT && !(p->uFlags & 8)) {
+            fPower *= 1.05f;
+            if (fPower < 0.1f) fPower = 0.1f;
+        }
+        goto clamp;
+    }
+    p      = &gPlayers[nPlayer];
+    fPower = p->fPower;
+    pPower = &p->fPower;
+    fError = fn_8000AE94(p->swing.fSwingError);
+    p->swing.fPowerAfterError = Swing_ApplyPowerBoost(nPlayer, fPower) - fError;
+    switch (p->nShotKind) {
+    case SHOT_PUTT: {
+        f32 fDist = p->fDistance < 1.0f ? 1.0f : p->fDistance;
+        if (*pPower > gpSwing->fPuttFullPower) *pPower = 1.0f;
+        fPower = *pPower * fn_80050D34(fDist);
+        Golfer_GetAttribute(p, ATTR_PUTTING, ATTR_TOTAL);
+        if (fPower < 0.1f) fPower = 0.1f;
+        goto clamp;
+    }
+    case SHOT_CHIP:
+    case SHOT_PITCH: {
+        f32 f = *pPower;
+        if (p->nShotKind == SHOT_CHIP) {
+            f = *pPower * fn_80050F88(p->fDistance, p->unkA90, SHOT_CHIP, p->nClub);
+        }
+        fPower = Swing_ApplyPowerBoost(nPlayer, f);
+        Golfer_GetAttribute(p, ATTR_APPROACH, ATTR_TOTAL);
+        if (fPower < 0.1f) fPower = 0.1f;
+        goto clamp;
+    }
+    case 5:
+    case 6:
+    case 7:
+        fPower     = Swing_ApplyPowerBoost(nPlayer, *pPower);
+        nRowScale  = ROW_RECOVERY_PWR + 1;
+        nRowThresh = ROW_RECOVERY_PWR;
+        nAttr      = (s8)Golfer_GetAttribute(p, ATTR_RECOVERY, ATTR_TOTAL);
+        break;
+    default:
+        if (p->nLie == 6 || p->nLie == 7 || p->nLie == 8 || p->nLie == 3 || p->nLie == 4) {
+            nRowScale  = ROW_RECOVERY_PWR + 1;
+            nRowThresh = ROW_RECOVERY_PWR;
+            nAttr      = (s8)Golfer_GetAttribute(p, ATTR_RECOVERY, ATTR_TOTAL);
+        } else {
+            nRowScale  = ROW_DRIVING_PWR + 1;
+            nRowThresh = ROW_DRIVING_PWR;
+            nAttr      = (s8)Golfer_GetAttribute(p, ATTR_DRIVING_ACCURACY, ATTR_TOTAL);
+        }
+        fPower = *pPower * AI_PowerScale(nPlayer);
+        fPower = Swing_ApplyPowerBoost(nPlayer, fPower);
+        fPower = Swing_TeeSweetSpot(nPlayer, fPower);
+        break;
+    }
+    TABLE_PAIR(nRowThresh, nRowScale, nAttr, fThresh, fScale);
+    if (fError < fThresh) {
+        fPower = fPower - fScale * fError;
+    } else {
+        fPower = fPower - fError;
+    }
+clamp:
+    if (!(gPlayers[nPlayer].uFlags & 8)) {
+        if (fPower > 1.5f) {
+            fPower = 1.5f;
+        } else if (fPower < 0.05f) {
+            fPower = 0.05f;
+        }
+    }
+    return fPower;
+}

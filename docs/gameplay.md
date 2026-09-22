@@ -54,11 +54,30 @@ at 0 has no forgiveness at all; at 100 a miss under 0.436 shrinks to an eighth.
 Human swing: power (`Swing_ComputePower`, human branch)
 -------------------------------------------------------
 
-Power boost is applied (reads POWER BOOST), then the swing error also costs distance: rows 8/9
+Power boost is applied (below), then the swing error also costs distance: rows 8/9
 (DRIVING ACCURACY) and 12/13 (RECOVERY) of the same table give a threshold and a scale, and the
 power loses `S * |e|` below the threshold and the full `|e|` above it. At attribute 100 the scale
 is 0.125. Putting and approach shots read their attribute and discard it: no distance penalty
 there. Result clamped to 0.05..1.5.
+
+Two more things in the same function: **a putt meter over 75% is treated as 100%**
+(`gpSwing->fPuttFullPower`), and a **driver from the tee gets up to +10% power**
+(`Swing_TeeSweetSpot`) when the tempo value lands in a 0.4..0.6 window, peaking at the centre.
+Both are tuning values set in `Swing_Init`, not attributes.
+
+Human swing: power boost, spin, rumble
+--------------------------------------
+
+- **Power boost** (`Swing_ApplyPowerBoost`): `power += scale * step[level]`, steps 1 2 4 6 9 12
+  16 20 for levels 1..8, `scale` = table row 24 by POWER BOOST: 0.005 at 0, 0.010 at 100, 0.011
+  at 110. So a full boost is +10% at POWER BOOST 0 and +20% at 100. It reads the *base* value
+  (record plus equipment); the per-player modifiers do not count here.
+- **Spin** (`Swing_ApplySpin`): stick deflection (-1..1) x (amount asked for / 20) x row 26 by
+  SPIN: 0.15 at 0, 0.6 at 100, 1.0 at 110. Linear in the attribute: SPIN 0 gives a quarter of
+  SPIN 100, and 110 gives two thirds more than 100.
+- **Rumble** (`Swing_MisHitRumble`): frames = row 25 (135 at attribute 0, 35 at 100, 30 at
+  110) x |error|, capped at 30, then the pad rumbles. A weak golfer's mistakes shake the pad
+  about four times longer than a pro's.
 
 CPU: choosing a target (`AI_ChooseTarget`)
 ------------------------------------------

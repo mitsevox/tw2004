@@ -128,7 +128,15 @@ sites are mapped in [`formats/game-data.md`](formats/game-data.md). What that ma
   are read elsewhere (lies/bounces, animation, the human power boost). Tables and formulas in
   [`gameplay.md`](gameplay.md).
 
-**Status:** largely answered; per-attribute list in `gameplay.md`, LUCK's readers still to be read.
+**Update (2026-09-22, Swing.c in C):** every human-side reader is now decompiled: forgiveness,
+power, power boost, spin and the mis-hit rumble. Per attribute, on the human side: DRIVING
+ACCURACY / BALL STRIKING / APPROACH / PUTTING / RECOVERY each shrink the stick error for their
+shot type and (driving, recovery) reduce the distance lost to it; POWER BOOST doubles the boost
+ceiling; SPIN scales the spin; POWER sets club reach (shared with the CPU). Two non-attribute
+assists found on the way: putts over 75% on the meter count as full power, and a driver off the
+tee gets up to +10% in a tempo window.
+
+**Status:** answered for the swing; LUCK's readers (lies, bounces) still to be read.
 
 5. Is there hidden putting assistance (a "pull" toward the cup)?
 -----------------------------------------------------------------
