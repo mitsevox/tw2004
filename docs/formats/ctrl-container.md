@@ -68,7 +68,7 @@ Object types on disc 1 (325 files)
 | Type | Count | Total | Where |
 |------|------:|------:|-------|
 | `ter ` | 169 | 472 MiB | one per hole: terrain, starts `OBG ` / `ARRA` |
-| `txf ` | 190 | 221 MiB | textures, starts `TXG ` / `HEAD` / `TXHE` |
+| `txf ` | 190 | 221 MiB | textures, `TXG ` groups: **decoded**, see [txg-textures.md](txg-textures.md) |
 | `tgd ` | 169 | 182 MiB | one per hole, terrain grid / ground data |
 | `gras` | 33 | 16 MiB | grass, only on some holes |
 | `TEO ` | 782 | 7 MiB | several per hole (tee objects?) |
