@@ -182,3 +182,193 @@ int SFIOStartSelectDevice(int eDevice, int* pProcess) {
 int SFIOReturnFirstArg(int a, int b, int c) {
     return a;
 }
+
+// Completion handlers: one per operation family. Each checks that the operation it belongs to is
+// the one in progress, then passes through the error codes that operation may legitimately return.
+// Anything else is a bug (SFIO_ASSERT(0)) and becomes 0x12 (wrong operation) or 0x10 (bad error).
+
+int SFIOValidateErrorOp01(int eError, void* pArg1, void* pArg2) {
+    if (!(_SFIO_pData->eOperation == 0x1)) {
+#line 719
+        SFIO_ASSERT(0);
+        return 0x12;
+    }
+    if (!(eError == 0x0 || eError == 0x3 || eError == 0x11)) {
+#line 727
+        SFIO_ASSERT(0);
+        return 0x10;
+    }
+    return eError;
+}
+
+int SFIOValidateErrorOp02(int eError, void* pArg1, void* pArg2) {
+    if (!(_SFIO_pData->eOperation == 0x2)) {
+#line 767
+        SFIO_ASSERT(0);
+        return 0x12;
+    }
+    if (!(eError == 0x0 || eError == 0x4 || eError == 0x3 || eError == 0x9 || eError == 0x11)) {
+#line 777
+        SFIO_ASSERT(0);
+        return 0x10;
+    }
+    return eError;
+}
+
+int SFIOValidateErrorOpMisc(int eError, void* pArg1, void* pArg2) {
+    if (!(_SFIO_pData->eOperation == 0x1B || _SFIO_pData->eOperation == 0x1D || _SFIO_pData->eOperation == 0x1C || _SFIO_pData->eOperation == 0x7 || _SFIO_pData->eOperation == 0xB || _SFIO_pData->eOperation == 0x18)) {
+#line 822
+        SFIO_ASSERT(0);
+        return 0x12;
+    }
+    if (!(eError == 0x0 || eError == 0x3 || eError == 0x4 || eError == 0x9 || eError == 0xE || eError == 0xD || eError == 0x11 || eError == 0xA)) {
+#line 836
+        SFIO_ASSERT(0);
+        return 0x10;
+    }
+    return eError;
+}
+
+int SFIOValidateErrorOp18(int eError, void* pArg1, void* pArg2) {
+    if (!(_SFIO_pData->eOperation == 0x18 || _SFIO_pData->eOperation == 0x8 || _SFIO_pData->eOperation == 0xC || _SFIO_pData->eOperation == 0x10)) {
+#line 879
+        SFIO_ASSERT(0);
+        return 0x12;
+    }
+    if (!(eError == 0x0 || eError == 0x3 || eError == 0x4 || eError == 0x9 || eError == 0x11)) {
+#line 889
+        SFIO_ASSERT(0);
+        return 0x10;
+    }
+    return eError;
+}
+
+int SFIOValidateErrorOp19(int eError, void* pArg1, void* pArg2) {
+    if (!(_SFIO_pData->eOperation == 0x19 || _SFIO_pData->eOperation == 0x9 || _SFIO_pData->eOperation == 0xD || _SFIO_pData->eOperation == 0x11)) {
+#line 932
+        SFIO_ASSERT(0);
+        return 0x12;
+    }
+    if (!(eError == 0x0 || eError == 0x3 || eError == 0x4 || eError == 0x9 || eError == 0x11)) {
+#line 942
+        SFIO_ASSERT(0);
+        return 0x10;
+    }
+    return eError;
+}
+
+int SFIOValidateErrorOp1A(int eError, void* pArg1, void* pArg2) {
+    if (!(_SFIO_pData->eOperation == 0x1A)) {
+#line 982
+        SFIO_ASSERT(0);
+        return 0x12;
+    }
+    if (!(eError == 0x0 || eError == 0x3 || eError == 0x9 || eError == 0x11)) {
+#line 991
+        SFIO_ASSERT(0);
+        return 0x10;
+    }
+    return eError;
+}
+
+int SFIOValidateErrorOp05(int eError, void* pArg1, void* pArg2) {
+    if (!(_SFIO_pData->eOperation == 0x5)) {
+#line 1031
+        SFIO_ASSERT(0);
+        return 0x12;
+    }
+    if (!(eError == 0x0 || eError == 0x3 || eError == 0x9 || eError == 0xE || eError == 0x8 || eError == 0x11)) {
+#line 1042
+        SFIO_ASSERT(0);
+        return 0x10;
+    }
+    return eError;
+}
+
+int SFIOValidateErrorOp16(int eError, void* pArg1, void* pArg2) {
+    if (!(_SFIO_pData->eOperation == 0x16 || _SFIO_pData->eOperation == 0x6 || _SFIO_pData->eOperation == 0xE || _SFIO_pData->eOperation == 0xA)) {
+#line 1085
+        SFIO_ASSERT(0);
+        return 0x12;
+    }
+    if (!(eError == 0x0 || eError == 0x3 || eError == 0x4 || eError == 0x9 || eError == 0xD || eError == 0x11)) {
+#line 1096
+        SFIO_ASSERT(0);
+        return 0x10;
+    }
+    return eError;
+}
+
+int SFIOValidateErrorOp14(int eError, void* pArg1, void* pArg2) {
+    if (!(_SFIO_pData->eOperation == 0x14 || _SFIO_pData->eOperation == 0x15 || _SFIO_pData->eOperation == 0x13)) {
+#line 1138
+        SFIO_ASSERT(0);
+        return 0x12;
+    }
+    if (!(eError == 0x0 || eError == 0x3 || eError == 0x4 || eError == 0x9 || eError == 0xD || eError == 0x6 || eError == 0x5 || eError == 0x11)) {
+#line 1151
+        SFIO_ASSERT(0);
+        return 0x10;
+    }
+    return eError;
+}
+
+int SFIOValidateErrorOp12(int eError, void* pArg1, void* pArg2) {
+    if (!(_SFIO_pData->eOperation == 0x12)) {
+#line 1191
+        SFIO_ASSERT(0);
+        return 0x12;
+    }
+    if (!(eError == 0x0 || eError == 0x3 || eError == 0x4 || eError == 0x9 || eError == 0xD || eError == 0x11)) {
+#line 1202
+        SFIO_ASSERT(0);
+        return 0x10;
+    }
+    return eError;
+}
+
+int SFIOValidateErrorOp03(int eError, void* pArg1, void* pArg2) {
+    if (!(_SFIO_pData->eOperation == 0x3)) {
+#line 1242
+        SFIO_ASSERT(0);
+        return 0x12;
+    }
+    if (!(eError == 0x0 || eError == 0x3 || eError == 0x11)) {
+#line 1250
+        SFIO_ASSERT(0);
+        return 0x10;
+    }
+    return eError;
+}
+
+int SFIOValidateErrorOp04(int eError, void* pArg1, void* pArg2) {
+    if (!(_SFIO_pData->eOperation == 0x4)) {
+#line 1290
+        SFIO_ASSERT(0);
+        return 0x12;
+    }
+    if (!(eError == 0x0 || eError == 0x3 || eError == 0x11)) {
+#line 1298
+        SFIO_ASSERT(0);
+        return 0x10;
+    }
+    return eError;
+}
+
+int SFIOValidateErrorOp17(int eError, void* pArg1, void* pArg2) {
+    if (!(_SFIO_pData->eOperation == 0x17)) {
+#line 1338
+        SFIO_ASSERT(0);
+        return 0x12;
+    }
+    if (!(eError == 0x0 || eError == 0x3 || eError == 0x4 || eError == 0x9 || eError == 0x11)) {
+#line 1348
+        SFIO_ASSERT(0);
+        return 0x10;
+    }
+    return eError;
+}
+
+int SFIOValidateErrorPassThrough(int eError, void* pArg1, void* pArg2) {
+    return eError;
+}
