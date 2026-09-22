@@ -183,7 +183,15 @@ needed its length to be `long`, not `int` - see decomp-notes). The whole file
 chunk switch, delivery to type handlers, open/close) is written and linked as NonMatching:
 19 exact, the rest 72-99% with
 the differences being expression association and register choice, no behaviour. Per-function
-state is in `build/GW4E69/report.json`. The Python transcription
+state is in `build/GW4E69/report.json`.
+
+`src/Golfer.c` (our name; `0x8002A630`-`0x8002F1D4`, no assert names it) is the golfer record /
+attribute / CPU-golfer file, linked NonMatching. Done so far: `Player_IsCPU`, `Controller_IsCPU`,
+`Game_CurrentHole`, `Golfer_TierBonus`, `Shot_GoverningAttribute`, `Golfer_ClampModifiers`,
+`AI_Pow` exact; `Golfer_GetAttribute` 96.8% (two `extsb` the compiler drops under any cast we
+tried), `AI_ApplyError` 98.4% and `AI_ChooseTarget` 92.7% (register numbers only). The structs
+(`GolferRecord`, `Player`, `AITarget`, `Session`, `GameState`) are in the file. Roughly 90
+functions in the range are still untouched. The Python transcription
 `tools/research/ctrl_dump.py` extracts every object from every `.hog` / `.gcb` on disc 1 to
 its declared size, which is the proof the reading is right. Full format:
 [`formats/ctrl-container.md`](formats/ctrl-container.md). The rest of the file - buffer ring

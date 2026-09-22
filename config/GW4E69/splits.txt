@@ -24,6 +24,9 @@ unsorted/code_800082F8.c:
 UStream.c:
 	.text       start:0x8000C624 end:0x8000E708
 
+Golfer.c:
+	.text       start:0x8002A630 end:0x8002F1D4
+
 dolphin/exi/EXIUart.c:
 	.text       start:0x80131D08 end:0x80131F78
 	.sbss       start:0x80282618 end:0x80282628

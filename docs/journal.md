@@ -133,6 +133,11 @@ Dated log of what was done and decided, newest last. Facts and lessons belong in
   skill (IQ inflates the skill), then worsens its aim by `(100 - skill)`; humans get a
   forgiveness window instead. Nothing in the shot pipeline reads the score. EA's RNG (lagged
   Fibonacci) fell out of the error code. All in `gameplay.md`.
+- **Started `src/Golfer.c`** for that file: ten functions in, seven exact, the two AI routines
+  instruction-for-instruction with only register numbers differing. The structs are laid out from
+  the reads (player record copy at +8, its first byte reused as the golfer index). Four new
+  compiler rules in `decomp-notes.md`, and one anti-rule: declaration order stops predicting
+  callee-saved registers in a large loop function.
 
 **Working agreements**
 - Show the plain-English logic and the C before building anything non-trivial.

@@ -1,9 +1,11 @@
 Gameplay logic, read from the code
 ==================================
 
-What the shot code actually does, in plain English with the numbers. Everything here was read
-from the disassembly on 2026-09-22 (functions named in `config/GW4E69/symbols.txt`); nothing is
-decompiled to C yet, so treat the shapes as certain and the exact arithmetic as "as read".
+What the shot code actually does, in plain English with the numbers. Read from the disassembly
+on 2026-09-22 (functions named in `config/GW4E69/symbols.txt`). The golfer/AI file is being
+decompiled as `src/Golfer.c`: the accessor and its helpers match, `AI_ApplyError` and
+`AI_ChooseTarget` compile to the same instructions with only register numbers differing, so
+the arithmetic below is confirmed, not just read.
 Units: distances compare against constants like 1.5, 5, 50, 100, 200, which fit yards for full
 shots and feet for putts; the code does not say, so they are called "units" below.
 

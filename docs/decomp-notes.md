@@ -105,6 +105,23 @@ Reading compiler output
   compiler deletes the decrement but has already given up folding). A dead write outside a loop
   does not. This costs a copy, though: the first definition is computed into a scratch register
   and moved (`extrwi r3; mr r28, r3`), so it is not what the original did here.
+- **[verified] Float compares.** `if (a < b) return;` gives `fcmpo; blt`; `if (a >= b) return;`
+  gives `fcmpo; cror eq,gt,eq; beq` (the NaN-safe form). When the original has a plain `bge`,
+  the source was `if (a < b) { ...rest... }` - a block, not an early return.
+- **[verified] A value the compiler CSEs into a callee-saved float register** (e.g. `100 - skill`
+  used three times, first computed *after* a call) was a named local in the source, assigned
+  right after the call whose result it is combined with: `r = Rand_Float(0); miss = 100 - skill;
+  err = limit * (miss * r) / 100;`. Computing it before the call moves the `fsubs`.
+- **[verified] `a*a + b*b`** becomes `fmuls` + `fmadds` only when written with the right-hand
+  square first in evaluation order, i.e. `dx*dx + dz*dz` where `dz` was computed first; a fused
+  `x + y*z` shows up as `fmadds` where the original has separate `fmuls`/`fadds` - use a
+  temporary for the product.
+- **[verified] `abs()` on an int** is emitted inline as `srawi t,v,31; xor; subf` (no call).
+- **[verified] The declaration-order rule for callee-saved registers does not hold in
+  `AI_ChooseTarget`** (0x8002C2DC, 20 live variables, a loop with eight calls): no ordering tried
+  reproduced the original assignment, and hand-hoisting values into named locals made it worse.
+  The function is left at 92.7% with only register numbers differing. Something else (spill
+  cost, loop weight) drives allocation once a function is this large.
 - **[verified] Register order for callee-saved locals** follows declaration order (first declared
   gets r31). Parameters used as working pointers come after the locals; to make `pEnd` r31 and the
   destination r30, declare `pEnd` first and copy the parameters into locals declared after it.
