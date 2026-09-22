@@ -88,7 +88,15 @@ Reading compiler output
   `addi r0, rN, 3; cmpwi r0, 8`, ...) even with five uses and even after the `if` that follows; a
   select `n = (c ? a : b) + 3` produces one materialised add but the pre-add value in a scratch
   register. `UStream_Decompress` has an in-place `addi r28, r28, 3` we could not reproduce; the
-  function is left at 98.8% with a comment. Open question.
+  function is left at 98.8% (184/189 instructions) with a comment. **Open question.** Tried:
+  every placement of `+= 3`, `= n + 3`, separate/ternary/if-else/block-scoped result
+  variables, `register`, `u8`/`s8`/`u16`/`s16`/`u32`/`int`, inner loops as `do/while`,
+  `for (; n > 0; n--)`, indexed, single `while (n--)`, a `switch` on the mirror bit, comma
+  and `for (n += 3;;)` forms, `-O3`/`-O4`/`-O4,s`, inline modes. The best forms (ternary,
+  or `{ int nCount = nLen + 3; ... }`) materialise the add but keep the pre-add value in a
+  scratch register. Note the same function's fill path uses the same r28 and *does* fold
+  its `+3`, so the original source treated the two paths differently. Harness for more
+  tries: `C:\dev\scratch	w\cw	ry.py base3.c 8000CDEC UStream_Decompress <variants>`.
 - **[verified] Register order for callee-saved locals** follows declaration order (first declared
   gets r31). Parameters used as working pointers come after the locals; to make `pEnd` r31 and the
   destination r30, declare `pEnd` first and copy the parameters into locals declared after it.

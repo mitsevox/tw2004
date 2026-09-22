@@ -483,34 +483,40 @@ void UStream_Decompress(const void* pSrc, void* pDst, u32 uSize) {
         if ((uCode & 0x8800) != 0x8800) {
             u32 uDist = uCode & 0xFFF;
             const u8* pFrom;
-            // NOT YET EXACT (3 instructions): the original keeps this length in r28 before and
-            // after the +3 and adds in place. Every plain spelling (nLen += 3 after an if) makes
-            // CodeWarrior fold the +3 into each later use instead; the ternary keeps one add but
-            // lets the pre-add value sit in a scratch register. Same behaviour either way.
             nLen = (uCode >> 12) & 7;
-            nLen = ((nLen == 7) ? (nLen + *s++) : nLen) + 3;
-            pFrom = d - uDist;
-            if ((uCode & 0x8000) == 0) {
-                UStream_Copy(d, pFrom, nLen);
-                d += nLen;
-            } else {
-                // Mirrored copy: the reference is read backwards, so a run of bytes comes out
-                // reversed. Eight at a time through temporaries, then the remainder.
-                int nBlocks;
-                pFrom += 2;
-                if (nLen >= 8) {
-                    for (nBlocks = nLen / 8; nBlocks > 0; nBlocks--) {
-                        u8 t7 = pFrom[-7], t6 = pFrom[-6], t5 = pFrom[-5], t4 = pFrom[-4];
-                        u8 t3 = pFrom[-3], t2 = pFrom[-2], t1 = pFrom[-1], t0 = pFrom[0];
-                        d[0] = t0; d[1] = t1; d[2] = t2; d[3] = t3;
-                        d[4] = t4; d[5] = t5; d[6] = t6; d[7] = t7;
-                        d += 8; pFrom -= 8;
+            if (nLen == 7) {
+                nLen += *s++;
+            }
+            {
+                // NOT YET EXACT (5 instructions). The original keeps the length in r28 before
+                // and after the +3 and adds in place; every same-variable spelling makes
+                // CodeWarrior fold the +3 into each later use, and every new-variable spelling
+                // (this one, or a ternary) puts the pre-add value in a scratch register.
+                // See decomp-notes.md. Behaviour is identical either way.
+                int nCount = nLen + 3;
+                pFrom = d - uDist;
+                if ((uCode & 0x8000) == 0) {
+                    UStream_Copy(d, pFrom, nCount);
+                    d += nCount;
+                } else {
+                    // Mirrored copy: the reference is read backwards, so a run of bytes comes
+                    // out reversed. Eight at a time through temporaries, then the remainder.
+                    int nBlocks;
+                    pFrom += 2;
+                    if (nCount >= 8) {
+                        for (nBlocks = nCount / 8; nBlocks > 0; nBlocks--) {
+                            u8 t7 = pFrom[-7], t6 = pFrom[-6], t5 = pFrom[-5], t4 = pFrom[-4];
+                            u8 t3 = pFrom[-3], t2 = pFrom[-2], t1 = pFrom[-1], t0 = pFrom[0];
+                            d[0] = t0; d[1] = t1; d[2] = t2; d[3] = t3;
+                            d[4] = t4; d[5] = t5; d[6] = t6; d[7] = t7;
+                            d += 8; pFrom -= 8;
+                        }
                     }
-                }
-                nBlocks = nLen & 7;
-                while (nBlocks > 0) {
-                    *d++ = *pFrom--;
-                    nBlocks--;
+                    nBlocks = nCount & 7;
+                    while (nBlocks > 0) {
+                        *d++ = *pFrom--;
+                        nBlocks--;
+                    }
                 }
             }
         } else {
