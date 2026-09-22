@@ -186,12 +186,16 @@ the differences being expression association and register choice, no behaviour. 
 state is in `build/GW4E69/report.json`.
 
 `src/Golfer.c` (our name; `0x8002A630`-`0x8002F1D4`, no assert names it) is the golfer record /
-attribute / CPU-golfer file, linked NonMatching. Done so far: `Player_IsCPU`, `Controller_IsCPU`,
-`Game_CurrentHole`, `Golfer_TierBonus`, `Shot_GoverningAttribute`, `Golfer_ClampModifiers`,
-`AI_Pow` exact; `Golfer_GetAttribute` 96.8% (two `extsb` the compiler drops under any cast we
-tried), `AI_ApplyError` 98.4% and `AI_ChooseTarget` 92.7% (register numbers only). The structs
-(`GolferRecord`, `Player`, `AITarget`, `Session`, `GameState`) are in the file. Roughly 90
-functions in the range are still untouched. The Python transcription
+attribute / CPU-golfer file, linked NonMatching. 20 functions written: the whole CPU shot
+pipeline (`AI_ChooseTarget`, `AI_ApplyError`, `AI_PlanShot`, `AI_DefaultTarget`,
+`AI_NearestTarget`, `AI_ShotKindForDistance`, `AI_ClubForShot`, `AI_FirstUsableClub`,
+`Club_UsableForKind`, `AI_MaxDistance`, `AI_PowerForTarget`, `AI_PowerScale`) plus the
+attribute accessor and helpers. Eleven are exact; `AI_ClubForShot`, `AI_MaxDistance`,
+`AI_ShotKindForDistance`, `AI_PowerScale` are instruction-identical and only differ in how
+the float-constant pool is labelled; `AI_PlanShot` 98.8%, `AI_ApplyError` 98.4%,
+`AI_NearestTarget` 99.1%, `Golfer_GetAttribute` 96.8%, `AI_ChooseTarget` 92.7% (register
+numbers). The structs (`GolferRecord`, `Player`, `AITarget`, `Session`, `GameState`) are in
+the file. Roughly 80 functions in the range are still untouched. The Python transcription
 `tools/research/ctrl_dump.py` extracts every object from every `.hog` / `.gcb` on disc 1 to
 its declared size, which is the proof the reading is right. Full format:
 [`formats/ctrl-container.md`](formats/ctrl-container.md). The rest of the file - buffer ring

@@ -138,6 +138,11 @@ Dated log of what was done and decided, newest last. Facts and lessons belong in
   the reads (player record copy at +8, its first byte reused as the golfer index). Four new
   compiler rules in `decomp-notes.md`, and one anti-rule: declaration order stops predicting
   callee-saved registers in a large loop function.
+- **The whole CPU shot pipeline is in C** (20 functions in `Golfer.c`, 11 exact, the rest
+  instruction-identical or off by register numbers). Along the way: `player+0x98` is the club
+  bag as a bit mask (not cash), `AI_NearestTarget` is literally the nearest authored point,
+  and `AI_MaxDistance` interpolates two per-club tables by POWER with a small jump at exactly
+  100. Five more compiler rules recorded.
 
 **Working agreements**
 - Show the plain-English logic and the C before building anything non-trivial.

@@ -28,9 +28,14 @@ enum {
 
 #define FIRST_CREATED_GOLFER 30   // table slots 30..33 are the created golfers
 #define CONTROLLER_CPU       9
-#define CLUB_PUTTER          25   // clubs 0..24 are the bag, 25 the putter
+#define NUM_CLUBS            26   // clubs 0..24 are the bag, 25 the putter
+#define CLUB_PUTTER          25
+#define CLUB_SAND_WEDGE      21
 #define SHOT_PUTT            0    // shot kinds (Player.nShotKind)
 #define SHOT_FULL            1
+#define SHOT_CHIP            2
+#define SHOT_PITCH           3
+#define LIE_GREEN            9
 #define NUM_AI_LINKS         10   // candidate aim points per zone
 
 #define PI    3.14159265f
@@ -53,7 +58,7 @@ typedef struct GolferRecord {
     s8   attrAlt[NUM_ATTRS];    // 0x074  block B: used for CPU pros in game mode 4
     s8   tier[15];              // 0x080  equipment tiers 0..4, one per attribute
     u8   unk8F;                 // 0x08F
-    u32  nCash;                 // 0x090
+    u32  uBagMask;              // 0x090  bit n set = club n is in the bag
     u8   unk94[0x140 - 0x94];
 } GolferRecord;
 
@@ -89,18 +94,30 @@ typedef struct Player {
     f32  fTargetX;              // 0xA14
     f32  fTargetY;              // 0xA18
     f32  fTargetZ;              // 0xA1C
-    u8   unkA20[0xA34 - 0xA20];
-    f32  vTarget2[3];           // 0xA34
-    u8   unkA40[0xA54 - 0xA40];
+    u8   unkA20[0xA24 - 0xA20];
+    f32  vTargetCopy[4];        // 0xA24  copy of the planned target
+    f32  vTarget2[4];           // 0xA34  copy of the chosen aim point
+    u8   unkA44[0xA54 - 0xA44];
     f32  fDistance;             // 0xA54  to the target
-    u8   unkA58[0xAF8 - 0xA58];
+    f32  fDistance2;            // 0xA58
+    u8   unkA5C[0xA68 - 0xA5C];
+    s32  nSurface;              // 0xA68  surface type under the target, -1 none, 16 water
+    u8   unkA6C[0xA90 - 0xA6C];
+    u8   unkA90[0xAF8 - 0xA90]; // 0xA90  club/shot parameters (opaque here)
     s32  nLie;                  // 0xAF8
     u8   unkAFC[0xC29 - 0xAFC];
     u8   bLowIQPenalty;         // 0xC29  quarters the IQ overconfidence term when set
     u8   unkC2A[0xEE8 - 0xC2A];
     u32  uFlags;                // 0xEE8
-    u8   unkEEC[0xEF8 - 0xEEC];
+    u8   unkEEC[0xEF0 - 0xEEC];
+    u32  uFlagsEF0;             // 0xEF0  bit 1: target is over water
+    u8   unkEF4[0xEF8 - 0xEF4];
 } Player;
+
+// Terrain surface descriptors (0x44 bytes each); only the index of one is used here.
+typedef struct SurfaceType {
+    u8   unk[0x44];
+} SurfaceType;
 
 // The round / session state at gSession (0x5BD0 bytes); only what this file reads.
 typedef struct Session {
@@ -162,6 +179,11 @@ extern Session      gSession;           // 0x801CDD80
 extern GameState*   gpGame;             // 0x80281588
 
 extern AITarget     gAITargets[25];     // 0x801C65B8
+extern s32          gNumAITargets;      // 0x80281D44
+extern u8           gClubKindTable[8][NUM_CLUBS];   // 0x801874B0  which clubs each shot kind allows
+extern f32          gClubDistAtPower0[NUM_CLUBS];   // 0x80187580  reach at POWER 0 (245 for the woods)
+extern f32          gClubPowerStep[NUM_CLUBS];      // 0x801875E8  reach gained per POWER point over 100
+extern SurfaceType  gSurfaceTypes[];    // 0x8017E9B8
 
 int  Game_GetMode(void);                // 0x8000BED8
 int  fn_800D2B08(void);
@@ -171,20 +193,30 @@ f32  fn_800095F0(f32 fAngle);           // sin
 f32  fn_80009638(f32 fAngle);           // cos
 double fn_80009680(double x);           // sqrt
 double fn_8015F824(double x, double y); // pow
-void fn_8000AD10(f32* pDst, f32* pSrc); // vector copy
+void Vec_Copy(f32* pSrc, f32* pDst);   // 0x8000AD10
+f32  Terrain_HeightAt(f32* pPos, SurfaceType** ppSurface);   // 0x800447DC
+f32  fn_80050D34(f32 fDist);            // putt power for a distance
+f32  fn_80050F44(int nKind, int nClub); // a club's table reach for a shot kind
+f32  fn_80050F88(f32 fDist, u8* pParams, int nKind, int nClub);   // chip power
+f32  fn_800510EC(u8* pParams);          // distance scale
+u8   fn_8002CEDC(int nPlayer);
+int  fn_80100744(void);                 // shot kind override, 8 = none
+int  fn_801006F0(int nPlayer);          // club override, 26 = none
 CourseInfo* fn_8000C594(void);
 int  fn_80015464(void);
 u8   fn_80101DF4(void);
 f32  fn_8005C418(int nSpin);
 
-int  AI_ShotKindForDistance(int nPlayer, f32 fDist);          // 0x8002CF18
-int  AI_ClubForShot(int nPlayer, int nKind, int nFlag, f32 fDist);   // 0x8002D1B0
-int  fn_8002CC58(int nPlayer, int nKind);
-f32  AI_MaxDistance(int nPlayer, int nKind, int nClubInfo);   // 0x8002D074  reads POWER
-f32  AI_PowerForTarget(int nPlayer);                          // 0x8002D428
-int  AI_ZoneAt(f32* pPos, int nFlag);                         // 0x8002C230  s8: -1 = none
-void AI_DefaultTarget(int nPlayer);                           // 0x8002C1A8
-void AI_PlanShot(int nPlayer, f32* pTarget);                  // 0x8002BDEC
+u8   Club_UsableForKind(int nPlayer, int nClub, int nKind);
+int  AI_FirstUsableClub(int nPlayer, int nKind);
+f32  AI_MaxDistance(int nPlayer, int nKind, int nClub);
+int  AI_ShotKindForDistance(int nPlayer, f32 fDist);
+int  AI_ClubForShot(int nPlayer, int nKind, u8 bUnderOnly, f32 fDist);
+f32  AI_PowerForTarget(int nPlayer);
+u8   AI_WithinOfPin(int nPlayer, f32 fDist);                  // 0x8002CD9C
+s8   AI_NearestTarget(f32* pPos, f32* pOut);
+void AI_DefaultTarget(int nPlayer);
+void AI_PlanShot(int nPlayer, f32* pTarget);
 
 // ---- small accessors ------------------------------------------------------------------------
 
@@ -294,7 +326,7 @@ void AI_ChooseTarget(int nPlayer) {
     nAggr   = Golfer_GetAttribute(p, ATTR_AGGRESSION, ATTR_TOTAL);
     nIQ     = Golfer_GetAttribute(p, ATTR_IQ, ATTR_TOTAL);
     nPower  = Golfer_GetAttribute(p, ATTR_POWER, ATTR_TOTAL);
-    nZone   = AI_ZoneAt(&p->fBallX, 0);
+    nZone   = AI_NearestTarget(&p->fBallX, NULL);
     if (nZone == -1) {
         AI_DefaultTarget(nPlayer);
         return;
@@ -341,7 +373,7 @@ void AI_ChooseTarget(int nPlayer) {
             if ((s8)nAggr < t->nAggrReq) continue;
             if (t->nPowerReq < 0 && (s8)nPower > IABS((int)t->nPowerReq)) continue;
             if ((s8)nPower < t->nPowerReq) continue;
-            if (fDist > AI_MaxDistance(nPlayer, nKind, fn_8002CC58(nPlayer, nKind))) continue;
+            if (fDist > AI_MaxDistance(nPlayer, nKind, AI_FirstUsableClub(nPlayer, nKind))) continue;
 
             if (nBest == -1) {
                 fBestDist2 = fDist2;
@@ -395,7 +427,7 @@ void AI_ChooseTarget(int nPlayer) {
     p->fTargetZ    = pBest->pDef->z;
     p->nTargetType = pBest->nType;
     AI_PlanShot(nPlayer, &p->fTargetX);
-    fn_8000AD10(&p->fTargetX, p->vTarget2);
+    Vec_Copy(&p->fTargetX, p->vTarget2);
 }
 
 // Make the CPU miss: move its aim and distance by up to a shot-type limit scaled by
@@ -532,4 +564,270 @@ void AI_ApplyError(int nPlayer) {
             }
         }
     }
+}
+
+// ---- clubs and distances ----------------------------------------------------------------------
+
+// Can this club be used for this kind of shot? A per-kind table of allowed clubs, then the
+// bag: a CPU golfer in sand never takes a wood, and any golfer only clubs it carries.
+u8 Club_UsableForKind(int nPlayer, int nClub, int nKind) {
+    Player* p = &gPlayers[nPlayer];
+    if (Game_GetMode() == 13 || Game_GetMode() == 14 || Game_GetMode() == 16 || Game_GetMode() == 17) {
+        return gClubKindTable[nKind][nClub];
+    }
+    if (Controller_IsCPU(p->nController)) {
+        if ((p->nLie == 6 || p->nLie == 7 || p->nLie == 8) && nClub < 9) {
+            return 0;
+        }
+    }
+    if (gPlayers[nPlayer].golfer.uBagMask != 0) {
+        u32 uBag = gPlayers[nPlayer].golfer.uBagMask;
+        return gClubKindTable[nKind][nClub] && ((1 << nClub) & uBag);
+    }
+    return gClubKindTable[nKind][nClub];
+}
+
+// The lowest-numbered club usable for this kind of shot; failing that the first club in the
+// bag; failing that the putter.
+int AI_FirstUsableClub(int nPlayer, int nKind) {
+    int nClub = 0;
+    do {
+        if (Club_UsableForKind(nPlayer, nClub, nKind)) break;
+        nClub++;
+    } while (nClub < NUM_CLUBS);
+    if (nClub == NUM_CLUBS) {
+        u32* pBag = &gPlayers[nPlayer].golfer.uBagMask;
+        int  i;
+        for (i = 0; i < NUM_CLUBS; i++) {
+            if ((1 << i) & *pBag) return i;
+        }
+        nClub = CLUB_PUTTER;
+    }
+    return nClub;
+}
+
+// How far this golfer can hit this club for this kind of shot. Chips are 30, putts 60; a full
+// swing interpolates the club's table distance by POWER (below 100 towards the power-0 table,
+// above 100 a fixed step per point).
+f32 AI_MaxDistance(int nPlayer, int nKind, int nClub) {
+    f32 fMax;
+    if (nKind == SHOT_CHIP) {
+        fMax = 30.0f;
+    } else if (nKind == SHOT_PUTT) {
+        fMax = 60.0f;
+    } else {
+        Player* p = &gPlayers[nPlayer];
+        fMax = fn_80050F44(nKind, nClub);
+        if (nKind == SHOT_FULL || nKind == 7 || nKind == 4 || nKind == 6) {
+            f32 fPower = (f32)(s8)Golfer_GetAttribute(p, ATTR_POWER, ATTR_TOTAL);
+            if (fPower < 100.0f) {
+                f32 fRange = fMax - gClubPowerStep[nClub] - gClubDistAtPower0[nClub];
+                fMax = gClubDistAtPower0[nClub] + fRange * fPower / 100.0f;
+            } else if (fPower > 100.0f) {
+                fMax = (fPower - 100.0f) * gClubPowerStep[nClub] + fMax;
+            }
+        }
+    }
+    return fMax;
+}
+
+// The kind of shot the CPU plays from here for a given distance: putt on the green or
+// very close, chip or pitch when a wedge in the bag reaches, otherwise a full swing.
+int AI_ShotKindForDistance(int nPlayer, f32 fDist) {
+    int nOverride = fn_80100744();
+    switch (nOverride) {
+    case 8: {
+        int     nKind = SHOT_FULL;
+        Player* p     = &gPlayers[nPlayer];
+        fDist /= fn_800510EC(p->unkA90);
+        if (p->nLie == LIE_GREEN || AI_WithinOfPin(nPlayer, 1.5f)) {
+            nKind = SHOT_PUTT;
+        } else if ((p->golfer.uBagMask & (1 << 21)) && fDist < 15.0f && AI_WithinOfPin(nPlayer, 5.0f) && fn_8002CEDC(nPlayer)) {
+            nKind = SHOT_CHIP;
+        } else if ((p->golfer.uBagMask & (1 << 23)) && fDist < 20.0f) {
+            nKind = SHOT_PITCH;
+        } else if ((p->golfer.uBagMask & (1 << 21)) && fDist < 35.0f) {
+            nKind = SHOT_PITCH;
+        } else if ((p->golfer.uBagMask & (1 << 19)) && fDist < 50.0f) {
+            nKind = SHOT_PITCH;
+        } else if ((p->golfer.uBagMask & (1 << 18)) && fDist < 65.0f) {
+            nKind = SHOT_PITCH;
+        }
+        return nKind;
+    }
+    }
+    return nOverride;
+}
+
+// The club for a shot of this kind and distance: the one whose reach is nearest the distance
+// (only clubs that reach when bUnderOnly), the putter for putts, the sand wedge for chips.
+int AI_ClubForShot(int nPlayer, int nKind, u8 bUnderOnly, f32 fDist) {
+    Player* p;
+    int     nClub;
+    int     c;
+    f32     fBest;
+    f32     fRatio;
+    if ((gSession.uFlags & 0x4000) && (gSession.uFlags & 0x8000) && gPlayers[nPlayer].nLie == 0) {
+        return 2;
+    }
+    nClub = fn_801006F0(nPlayer);
+    if (nClub != NUM_CLUBS) {
+        return nClub;
+    }
+    fBest = bUnderOnly ? 0.0f : 10000.0f;
+    p     = &gPlayers[nPlayer];
+    if (nKind == SHOT_PUTT) {
+        nClub = CLUB_PUTTER;
+    } else if (nKind == SHOT_CHIP) {
+        nClub = CLUB_SAND_WEDGE;
+        if (!Club_UsableForKind(nPlayer, CLUB_SAND_WEDGE, nKind)) {
+            nClub = AI_FirstUsableClub(nPlayer, nKind);
+        }
+    } else {
+        nClub = AI_FirstUsableClub(nPlayer, nKind);
+        if (Game_GetMode() == 6 || Game_GetMode() == 7 || Game_GetMode() == 8 || Controller_IsCPU(p->nController)) {
+            fDist /= fn_800510EC(p->unkA90);
+        }
+        for (c = 0; c < NUM_CLUBS; c++) {
+            if (c == CLUB_PUTTER) continue;
+            if (!Club_UsableForKind(nPlayer, c, nKind)) continue;
+            if (bUnderOnly) {
+                fRatio = fDist / AI_MaxDistance(nPlayer, nKind, c);
+                if (fRatio > 1.0f) continue;
+                if (fRatio == 1.0f) {
+                    nClub = c;
+                    break;
+                }
+                if (fRatio > fBest) {
+                    fBest = fRatio;
+                    nClub = c;
+                }
+            } else {
+                fRatio = AI_MaxDistance(nPlayer, nKind, c) / fDist;
+                if (fRatio > 1.0f) {
+                    if (fRatio - 1.0f < fBest) {
+                        fBest = fRatio - 1.0f;
+                        nClub = c;
+                    }
+                } else if (fRatio == 1.0f) {
+                    nClub = c;
+                    break;
+                } else if (1.0f - fRatio < fBest) {
+                    fBest = 1.0f - fRatio;
+                    nClub = c;
+                }
+            }
+        }
+    }
+    return nClub;
+}
+
+// Power (0..1) to reach the current target: putts and chips have their own curves, everything
+// else is distance over the club's reach.
+f32 AI_PowerForTarget(int nPlayer) {
+    Player* p = &gPlayers[nPlayer];
+    if (p->nShotKind == SHOT_PUTT) {
+        return fn_80050D34(p->fDistance);
+    }
+    if (p->nShotKind == SHOT_CHIP) {
+        return fn_80050F88(p->fDistance, p->unkA90, SHOT_CHIP, p->nClub);
+    }
+    return p->fDistance / AI_MaxDistance(nPlayer, p->nShotKind, p->nClub);
+}
+
+// Reach for this golfer over the club's table reach; 1 for the shot kinds that do not scale.
+f32 AI_PowerScale(int nPlayer) {
+    Player* p = &gPlayers[nPlayer];
+    f32 fTable;
+    if (p->nShotKind == SHOT_FULL || p->nShotKind == 7 || p->nShotKind == 4 || p->nShotKind == 6) {
+        fTable = fn_80050F44(p->nShotKind, p->nClub);
+        return AI_MaxDistance(nPlayer, p->nShotKind, p->nClub) / fTable;
+    }
+    return 1.0f;
+}
+
+// ---- targets ----------------------------------------------------------------------------------
+
+// The authored aim point nearest a position (its index, -1 if none); optionally its x/z.
+s8 AI_NearestTarget(f32* pPos, f32* pOut) {
+    f32 fBest = 100000000.0f;
+    s8  i;
+    s8  nBest = -1;
+    for (i = 0; i < gNumAITargets; i++) {
+        if (gAITargets[i].pDef != NULL) {
+            f32 fDZ = pPos[2] - gAITargets[i].pDef->z;
+            f32 fDX = pPos[0] - gAITargets[i].pDef->x;
+            f32 fD2 = fDX * fDX + fDZ * fDZ;
+            if (fD2 < fBest) {
+                fBest = fD2;
+                nBest = i;
+            }
+        }
+    }
+    if (pOut != NULL && nBest != -1) {
+        pOut[0] = gAITargets[nBest].pDef->x;
+        pOut[2] = gAITargets[nBest].pDef->z;
+    }
+    return nBest;
+}
+
+// Fill in everything that follows from a target: the landing surface, the target height, the
+// distance, and (for a human) a snap to the club's reach when it is just under.
+void AI_PlanShot(int nPlayer, f32* pTarget) {
+    f32*         pDst;
+    SurfaceType* pSurface = NULL;
+    f32          fHeight;
+    f32          fDX, fDZ;
+    int          nType;
+
+    pDst = &gPlayers[nPlayer].fTargetX;
+    Vec_Copy(pTarget, pDst);
+    fHeight = Terrain_HeightAt(pDst, &pSurface);
+    gPlayers[nPlayer].uFlagsEF0 &= ~2;
+    if (pSurface != NULL) {
+        nType = pSurface - gSurfaceTypes;
+        if (nType == 98 || nType == 105) {
+            // Water: aim at the pin's height instead and flag it.
+            fHeight = fn_8000C594()->pin[Game_CurrentHole()].y;
+            gPlayers[nPlayer].nSurface = 16;
+            gPlayers[nPlayer].uFlagsEF0 |= 2;
+        } else {
+            gPlayers[nPlayer].nSurface = nType;
+        }
+    } else {
+        gPlayers[nPlayer].nSurface = -1;
+    }
+    if (fHeight != -65536.1f) {
+        gPlayers[nPlayer].fTargetY = fHeight + 0.001f;
+    }
+    fDX = gPlayers[nPlayer].fTargetX - gPlayers[nPlayer].fBallX;
+    fDZ = gPlayers[nPlayer].fTargetZ - gPlayers[nPlayer].fBallZ;
+    if (0.0f == fDX && 0.0f == fDZ) {
+        gPlayers[nPlayer].fDistance = 10.0f;
+    } else {
+        gPlayers[nPlayer].fDistance = fn_80009680(fDX * fDX + fDZ * fDZ);
+    }
+    if (!Player_IsCPU(nPlayer)) {
+        // A human whose distance is a hair under the club's reach gets the full reach.
+        f32 fMax = AI_MaxDistance(nPlayer, gPlayers[nPlayer].nShotKind, gPlayers[nPlayer].nClub);
+        if (gPlayers[nPlayer].fDistance / fMax > 0.999f && gPlayers[nPlayer].fDistance / fMax < 1.0f) {
+            gPlayers[nPlayer].fDistance = fMax;
+        }
+    }
+    gPlayers[nPlayer].fDistance2 = gPlayers[nPlayer].fDistance;
+    Vec_Copy(pDst, gPlayers[nPlayer].vTargetCopy);
+}
+
+// Aim at the pin.
+void AI_DefaultTarget(int nPlayer) {
+    int         nHole   = Game_CurrentHole();
+    CourseInfo* pCourse = fn_8000C594();
+    Player*     p       = &gPlayers[nPlayer];
+    f32*        pTarget;
+    p->fTargetX    = pCourse->pin[nHole].x;
+    pTarget        = &p->fTargetX;
+    p->fTargetZ    = pCourse->pin[nHole].z;
+    p->nTargetType = 0;
+    AI_PlanShot(nPlayer, pTarget);
+    Vec_Copy(pTarget, p->vTarget2);
 }

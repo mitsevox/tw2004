@@ -122,6 +122,19 @@ Reading compiler output
   reproduced the original assignment, and hand-hoisting values into named locals made it worse.
   The function is left at 92.7% with only register numbers differing. Something else (spill
   cost, loop weight) drives allocation once a function is this large.
+- **[verified] An initializer in the declaration changes register assignment.** `f32* p = &x;`
+  at the top of the function got r28 while the same pointer declared bare and assigned on the
+  next line got r31 (the original). When a function is otherwise exact but the callee-saved
+  numbers are off, try moving initializers out of the declarations (and vice versa).
+- **[verified] `a()->arr[b()].f`** evaluates `b()` first and scales the index before calling
+  `a()`; splitting `b()` into a local first moves the shift after the call.
+- **[verified] A one-case `switch`** on a call result gives `cmpwi; beq case; b default` and the
+  default path returns the value still in r3; an `if (x != 8) return x;` gives a single `bne`.
+- **[verified] A boolean result** `return a && b;` (u8 function) gives `li r5,0 ... mr r5,r3` where
+  r3 still holds the constant 1 used in the test; nested ifs setting a flag do not.
+- **[verified] A load repeated inside a loop** (`lwz` of the same field every iteration) means the
+  source read the field through a pointer or by name each time; copying it into a local hoists
+  it, which the original did not do.
 - **[verified] Register order for callee-saved locals** follows declaration order (first declared
   gets r31). Parameters used as working pointers come after the locals; to make `pEnd` r31 and the
   destination r30, declare `pEnd` first and copy the parameters into locals declared after it.
