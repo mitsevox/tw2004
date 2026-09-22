@@ -3123,3 +3123,113 @@ void SwingState10_Update(int nPlayer) {
         }
     }
 }
+
+
+u8    fn_800E46B4(void);
+u8    fn_800E4254(int nPlayer);
+u8    fn_80063C7C(View* pView);
+void  fn_800DEA44(int nPlayer);
+f32   fn_80062C28(int nHandle);
+void  fn_80062B78(int nPlayer);
+void  fn_80062B74(int nPlayer);
+void  fn_80062B70(void);
+u8    fn_800E2810(int nPlayer);
+void  fn_80062D0C(int nPlayer);
+void  fn_800E41D4(int nPlayer);
+extern Vec4 lbl_80183620;
+
+// State 14: the ball has come to rest, not holed. First frame: the result to the view and the
+// reaction (animation 9 or camera 15). Camera 15 once the animation allows; the reaction shot
+// lines up. Then, unless the score display is up: with no menu, once the camera has settled
+// (and the reaction animation is far enough along) the hole state is updated and it is either
+// state 15 (the next shot) or a camera move. With the menu: a human outside split screen can
+// take a mulligan (button 25, if allowed), watch the replay (button 24, if recorded and
+// allowed) or continue (button 0); a CPU continues on any pad's button 0.
+void SwingState14_Update(int nPlayer) {
+    s32*  pView = &gPlayers[nPlayer].nView0;
+    View* pV    = (View*)fn_80017028(*pView);
+    s32*  pHandle;
+    Vec4  vOffset;
+    u32   uMask;
+
+    if (lbl_80281E13 != 0) {
+        fn_800C7158(pV, fn_800DE180(nPlayer));
+        pHandle = &gPlayers[nPlayer].nShotHandle;
+        if (fn_80095780(*pHandle) != 9 && fn_80095798(*pHandle) != 9 && fn_800C7160(pV)) {
+            fn_80095744(*pHandle, 9);
+        } else {
+            View_SetCamera(pV, 0xF, nPlayer, *pView);
+        }
+        Swing_RumbleTick(nPlayer);
+        lbl_80281E13 = 0;
+    }
+    vOffset = lbl_80183620;
+    pHandle = &gPlayers[nPlayer].nShotHandle;
+    if (fn_80095780(*pHandle) == 9 && pV->nCurCamera != 0xF && Game_GetMode() != 11 &&
+        !fn_800734A0((u8*)*pHandle + 0x40C)) {
+        View_SetCamera(pV, 0xF, nPlayer, *pView);
+    }
+    if ((fn_80062C1C(*pHandle) != 0 || fn_80062C10(*pHandle) != 0) && fn_80095780(*pHandle) == 9 && !fn_800C6604(pV)) {
+        fn_800C6358(pV, nPlayer);
+    }
+    if (fn_800E46B4()) return;
+    if (!fn_800E4254(nPlayer)) {
+        if (fn_80063C7C(pV)) {
+            if (gPlayers[nPlayer].bLowIQPenalty != 0) {
+                fn_800DEA44(nPlayer);
+            }
+            fn_800DCE5C(nPlayer);
+            return;
+        }
+        if (fn_80063C90(pV)) return;
+        if (!fn_800C6604(pV) && fn_80095780(*pHandle) == 9) {
+            if (fn_80062C28(*pHandle) >= *(f32*)(lbl_80281F78 + 0x170) * 0.5f) {
+                if (pV->f11C <= 1.0f) return;
+            }
+        }
+        fn_80062B78(nPlayer);
+        fn_80062B74(nPlayer);
+        fn_80062B70();
+        if (fn_800E2810(nPlayer)) {
+            SwingStack_Push(0xF, nPlayer);
+        } else {
+            fn_80063BF4(pV, *(f32*)(lbl_80281F78 + 0x170), (f32*)&vOffset);
+        }
+        return;
+    }
+    if (!Player_IsCPU(nPlayer) && gSession.nSplitScreen == 0) {
+        if (gSession.bReplay == 0) {
+            uMask = fn_800142AC(0x19, 0);
+            if (fn_800136DC(gPlayers[nPlayer].nController) & uMask) {
+                if (!fn_800DDDC8(nPlayer)) return;
+                fn_80062D0C(nPlayer);
+                return;
+            }
+        }
+        if (gReplayData[0xF10] != 0) {
+            uMask = fn_800142AC(0x18, 0);
+            if ((fn_800136DC(gPlayers[nPlayer].nController) & uMask) && gpGame->b287 != 0 &&
+                !(gPlayers[nPlayer].uFlags & 8) && (s8)SwingStack_Top(nPlayer) != 0x17 && !fn_800E53B8() &&
+                !(*(u32*)(*pHandle + 0x10) & 0x40)) {
+                lbl_80281E10 = 1;
+                fn_80062D0C(nPlayer);
+                fn_8006C300(nPlayer);
+                SwingStack_Push(0xB, nPlayer);
+                return;
+            }
+        }
+        uMask = fn_800142AC(0, 0);
+        if (fn_800136DC(gPlayers[nPlayer].nController) & uMask) {
+            fn_800E41D4(nPlayer);
+        }
+    } else if (!Player_IsCPU(nPlayer)) {
+        uMask = fn_800142AC(0, 0);
+        if (fn_800136DC(gPlayers[nPlayer].nController) & uMask) {
+            fn_800E41D4(nPlayer);
+        }
+    } else {
+        if (fn_80014300(fn_800142AC(0, 0))) {
+            fn_800E41D4(nPlayer);
+        }
+    }
+}
