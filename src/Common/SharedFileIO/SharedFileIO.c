@@ -31,9 +31,9 @@ typedef struct {
     void* pfn20;
     void* pfn24;
     void* pfn28;
-    void* pfn2C;
-    void* pfn30;
-    void* pfn34;
+    int (*pfnRead)(int uHandle, void* pBuffer, u32 uSize);         // 0x2C
+    int (*pfnWrite)(int uHandle, void* pBuffer, u32 uSize);        // 0x30
+    int (*pfnSeek)(int uHandle, u32 uOffset, u32 uWhence);         // 0x34
     int (*pfnOp18)(int uHandle);                                        // 0x38
     void* pfn3C;
     void* pfn40;
@@ -72,6 +72,7 @@ extern void* memset(void* pDst, int c, u32 uLen);
 extern char* strcpy(char* pDst, const char* pSrc);
 extern u32   strlen(const char* p);
 extern void  fn_80172FA4(int);
+u32 SFIOGetHeaderSize(void);
 int SFIONumDevicesInMask(u16 uDeviceMask);
 int SFIOFirstDeviceFromMask(u16 uDeviceMask);
 int SFIOLastDeviceFromMask(u16 uDeviceMask);
@@ -638,7 +639,7 @@ int SFIOInit(int* pDevices, const SFIOFuncTable* pFuncs, void* pAllocator) {
     if (pFuncs == NULL) return 0xC;
     if (!(pFuncs->pfn00 && pFuncs->pfnProbe && pFuncs->pfn08 && pFuncs->pfn0C && pFuncs->pfnStartProbe &&
           pFuncs->pfnSelectDevice && pFuncs->pfnMount && pFuncs->pfnOp19 && pFuncs->pfn20 && pFuncs->pfn24 &&
-          pFuncs->pfn28 && pFuncs->pfn2C && pFuncs->pfn30 && pFuncs->pfn34 && pFuncs->pfnOp18 &&
+          pFuncs->pfn28 && pFuncs->pfnRead && pFuncs->pfnWrite && pFuncs->pfnSeek && pFuncs->pfnOp18 &&
           pFuncs->pfn3C && pFuncs->pfn40)) return 0xC;
     if (_SFIO_pDevice != NULL || _SFIO_pData != NULL) return 1;
 #line 2157
@@ -675,9 +676,9 @@ int SFIOInit(int* pDevices, const SFIOFuncTable* pFuncs, void* pAllocator) {
     _SFIO_pDevice->fn.pfn20 = pFuncs->pfn20;
     _SFIO_pDevice->fn.pfn24 = pFuncs->pfn24;
     _SFIO_pDevice->fn.pfn28 = pFuncs->pfn28;
-    _SFIO_pDevice->fn.pfn2C = pFuncs->pfn2C;
-    _SFIO_pDevice->fn.pfn30 = pFuncs->pfn30;
-    _SFIO_pDevice->fn.pfn34 = pFuncs->pfn34;
+    _SFIO_pDevice->fn.pfnRead = pFuncs->pfnRead;
+    _SFIO_pDevice->fn.pfnWrite = pFuncs->pfnWrite;
+    _SFIO_pDevice->fn.pfnSeek = pFuncs->pfnSeek;
     _SFIO_pDevice->fn.pfnOp18 = pFuncs->pfnOp18;
     _SFIO_pDevice->fn.pfn3C = pFuncs->pfn3C;
     _SFIO_pDevice->fn.pfn40 = pFuncs->pfn40;
@@ -702,9 +703,9 @@ int SFIOShutdown(void) {
     _SFIO_pDevice->fn.pfn20 = NULL;
     _SFIO_pDevice->fn.pfn24 = NULL;
     _SFIO_pDevice->fn.pfn28 = NULL;
-    _SFIO_pDevice->fn.pfn2C = NULL;
-    _SFIO_pDevice->fn.pfn30 = NULL;
-    _SFIO_pDevice->fn.pfn34 = NULL;
+    _SFIO_pDevice->fn.pfnRead = NULL;
+    _SFIO_pDevice->fn.pfnWrite = NULL;
+    _SFIO_pDevice->fn.pfnSeek = NULL;
     _SFIO_pDevice->fn.pfnOp18 = NULL;
     _SFIO_pDevice->fn.pfn3C = NULL;
     _SFIO_pDevice->fn.pfn40 = NULL;
@@ -843,5 +844,50 @@ int SFIOEnd(int* pSession) {
     _SFIO_pData->eState = 7;
     _SFIO_pData->eOperation = 0x18;
     _SFIO_pDevice->fn.pfnOp18(*pSession);
+    return 0;
+}
+
+// Seek within the open save. uWhence 0 = relative to the header, otherwise absolute.
+int SFIOSeek(int* pSession, u32 uOffset, u32 uWhence) {
+    if (!SFIOIsInitialized()) return 2;
+    if (pSession == NULL) return 0xC;
+    if (_SFIO_pData->eState != 0) return 0xD;
+    _SFIO_pData->eState = 8;
+    _SFIO_pData->eOperation = 0x1B;
+    SFIOSetLastError(0);
+    memcpy(&_SFIO_pData->uHandle, pSession, 0x44);
+    if (uWhence == 0) {
+        _SFIO_pData->uExpected54 = SFIOGetHeaderSize() + uOffset;
+        _SFIO_pDevice->fn.pfnSeek(_SFIO_pData->uHandle, SFIOGetHeaderSize() + uOffset, uWhence);
+    } else {
+        _SFIO_pData->uExpected54 = uOffset;
+        _SFIO_pDevice->fn.pfnSeek(_SFIO_pData->uHandle, uOffset, uWhence);
+    }
+    return 0;
+}
+
+int SFIORead(int* pSession, void* pBuffer, u32 uSize) {
+    if (!SFIOIsInitialized()) return 2;
+    if (pSession == NULL) return 0xC;
+    if (_SFIO_pData->eState != 0) return 0xD;
+    _SFIO_pData->eState = 0xA;
+    _SFIO_pData->eOperation = 0x1D;
+    SFIOSetLastError(0);
+    memcpy(&_SFIO_pData->uHandle, pSession, 0x44);
+    _SFIO_pData->uExpected54 = uSize;
+    _SFIO_pDevice->fn.pfnRead(*pSession, pBuffer, uSize);
+    return 0;
+}
+
+int SFIOWrite(int* pSession, void* pBuffer, u32 uSize) {
+    if (!SFIOIsInitialized()) return 2;
+    if (pSession == NULL) return 0xC;
+    if (_SFIO_pData->eState != 0) return 0xD;
+    _SFIO_pData->eState = 9;
+    _SFIO_pData->eOperation = 0x1C;
+    SFIOSetLastError(0);
+    memcpy(&_SFIO_pData->uHandle, pSession, 0x44);
+    _SFIO_pData->uExpected54 = uSize;
+    _SFIO_pDevice->fn.pfnWrite(*pSession, pBuffer, uSize);
     return 0;
 }
