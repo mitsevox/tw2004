@@ -120,6 +120,14 @@ Dated log of what was done and decided, newest last. Facts and lessons belong in
   plus hidden AGGRESSION, IQ and SPEED. The stat record is two blocks of twelve, and the debug
   order fits the data (SPEED a constant 80, the created golfer's LUCK a neutral 50). Column
   names in `formats/game-data.md`, marked inferred until `CharSliders.c` confirms them.
+- **Confirmed from code the same day, by a different route.** `CharSliders.c` is the face-slider
+  loader (its "20 asserts" were 20 allocator calls). The attribute code was found by building
+  the `'stat'` tag constant and the 320-byte stride: the table at `gGolferTable`, one accessor
+  `Golfer_GetAttribute(player, k, mode)`, and 87 call sites. The attribute screen reads the nine
+  visible indices in debug-menu order, which pins the columns. AGGRESSION and IQ have exactly two
+  readers, neither in `Swing.c`. Pros carry a second attribute block used in game mode 4.
+- Lesson: an assert-string count says where a *file* is, not what it does. A constant the code
+  must build (a four-character tag, a record stride) finds the code that uses the data.
 
 **Working agreements**
 - Show the plain-English logic and the C before building anything non-trivial.

@@ -39,9 +39,10 @@ u16 header (0), then 34 records of 320 bytes (record i at `2 + i*320`):
     0x07E u8  misc[15]          0..4 each (all 0 for the created golfers); flags at 0x08D..
     ...   rest unknown
 
-**Column names (inferred, not yet confirmed from code).** The front-end data
-(`Data/Fend/FEnd.gcb`, `DATS` object) carries the attribute screen's names and tooltips, and a
-debug options menu that lists twelve attributes in this order:
+**Column names (confirmed from code).** The front-end data (`Data/Fend/FEnd.gcb`, `DATS`
+object) carries the attribute screen's names and tooltips and a debug options menu that lists
+twelve attributes; the attribute screen (`FE_GolferAttributes`, `0x800BBB10`) reads them through
+the accessor below with indices 0,1,3,4,5,6,7,10,11 in this order, which fixes the mapping:
 
     0 POWER            "Increases distance on full swing shots."
     1 POWER BOOST      "Increases maximum power boost on your backswing."
@@ -56,23 +57,44 @@ debug options menu that lists twelve attributes in this order:
     10 SPIN            "Increases maximum spin you can generate."
     11 LUCK            "Increases % of favorable lies and bounces in the trees."
 
-Twelve names, and the record has two blocks of twelve. Applying the debug order to the data
-fits two signatures: column 9 (SPEED) is 80 for every golfer in both blocks (one exception at
-85), and the created golfer's column 11 (LUCK) starts at a neutral 50 while everything else
-starts at 10-25. The player screen shows nine of the twelve; AGGRESSION, IQ and SPEED are
-hidden and are the obvious CPU-golfer knobs - and the created golfers have them too (10, 10, 80).
-`CharSliders.c` (`0x8010D614`) will confirm the order and say what block B is.
+In memory the whole file sits at `gGolferTable` (`0x801CB300`, 34 x 0x140), so a record's
+fields are at file offset + 2: block A at record+0x68, block B at +0x74, and the 0..4 bytes at
++0x80 are per-attribute equipment tiers (`Golfer_TierBonus` clamps them to +0..+4 points).
+`gCurGolferRecord` (`0x801CB1C0`) is the created golfer being edited; `Golfer_TableSetup`
+copies it into slot 30 and, when a debug flag is set, writes 105 into all twelve attributes of
+every golfer (the "105%" string on the attribute screen is that cap).
 
-Block A with the names applied (block B in parentheses where it differs a lot):
+**The accessor.** `Golfer_GetAttribute(pPlayer, k, mode)` (`0x8002E15C`) returns for attribute k:
 
-    Woods        100  90 100  95  85 100  90  95 100  80  85 100   (B: all 100)
-    Daly         100 100  90  75  70  75  85  85  90  80  60  75   (B: 100 then 33-40s)
-    Singh         95  95  90 100  80  95  95  95  95  80 100  90   (B: 75, 40s, DRVACC 100)
-    Player One    25  20  10  10  10  10  10  10  10  80  10  50   (B: 20 then 10s)
+    mode 0  base:  block B[k] if (pPlayer->field_A08 == 9 && golfer index < 30 &&
+                                  (Game_GetMode() == 4 || debug bit)) else block A[k];
+                   plus Golfer_TierBonus(tier[k])
+    mode 1  modifiers only: the byte at pPlayer+0x148+k
+    mode 2  both (the screen's "attributes / modifiers / total")
 
-Block B is flatter (Goosen is 71 across the board, Gulbis 50, Montgomerie 39) as if generated
-from one rating; candidates are a difficulty variant or the values used when the pro is the
-CPU opponent rather than the played golfer.
+So block B is the pros' alternative attribute set, used only in game mode 4 for a player whose
+field_A08 is 9 (both still to be named). It is flatter than block A (Goosen 71 across, Gulbis
+50, Montgomerie 39) - a rating-derived set.
+
+**Who reads what** (87 call sites in 19 functions; file names are the nearest named file in
+`filemap.md` and may be wrong for the unnamed ones):
+
+    fn_8002AA74  (28)  POWER IQ AGGRESSION STRIKING APPROACH PUTTING RECOVERY, each in
+                       mode 0 and mode 2, twice     <- the only reader of AGGRESSION and IQ
+    fn_8002C2DC  (4)   AGGRESSION IQ POWER + one variable index
+    fn_8002B59C  (7)   PUTTING RECOVERY SPIN x3 STRIKING APPROACH
+    fn_8002D074/fn_8002D994   POWER / LUCK
+    fn_80052598, fn_80053594  LUCK                       (UKernel.c region: lies / bounces?)
+    fn_800589F8  (6)   PUTTING STRIKING APPROACH RECOVERY SPIN POWER, mode 0   (user.c region)
+    Swing.c: fn_8005B250 PUTT APPR RECOV DRVACC; fn_8005C01C BOOST; fn_8005C4B4 SPIN;
+             fn_8005C5EC RECOV PUTT APPR DRVACC STRIKING x4; fn_8005C960 PUTT APPR RECOV STRIKING
+    fn_80086C78, fn_80086E5C  RECOVERY                   (FE_Manager.c region)
+    FE_GolferAttributes       the nine visible ones      (the attribute screen)
+    fn_800D18D8  RECOVERY x2;  fn_800FBB30, fn_800FBD2C  SPEED   (SkinPart.c region: animation?)
+
+AGGRESSION and IQ are never read by the swing code; their only readers are the
+`0x8002AA74`/`0x8002C2DC` pair, which also sample every shot-relevant attribute twice in both
+modes - the shape of a shot-selection routine. Reading those two functions is the next step.
 
 Golfer bio cards (`BIO `)
 -------------------------

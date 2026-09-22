@@ -88,14 +88,24 @@ accessors makes every use site searchable.
 object (EA's `DATA\STATS_GC.BIN`): 34 golfers x two blocks of 12 values 0..100, plus the
 created golfers' starting rows. See [`formats/game-data.md`](formats/game-data.md).
 
-**Result (2026-09-22, from data, to be confirmed in code):** there are **twelve** attributes,
-not nine. The front-end shows POWER, POWER BOOST, DRIVING ACCURACY, BALL STRIKING, APPROACH,
-PUTTING, RECOVERY, SPIN, LUCK; a debug menu in the same file adds three hidden ones:
-**AGGRESSION, IQ, SPEED**. Those are the CPU-golfer personality knobs this hypothesis was
-looking for - and every record has them, including the created golfers (10, 10, 80), so the
-human and CPU golfers share one record layout. Whether the game *reads* the hidden three for
-the human golfer is the code question that remains. Each record also carries a second block of
-twelve with a flatter profile (meaning unknown - the next thing to settle).
+**Result (2026-09-22):** there are **twelve** attributes, not nine. The front-end shows POWER,
+POWER BOOST, DRIVING ACCURACY, BALL STRIKING, APPROACH, PUTTING, RECOVERY, SPIN, LUCK; a debug
+menu adds three hidden ones, **AGGRESSION, IQ, SPEED**, and the attribute screen's own reads
+confirm the column order. Every golfer record has all twelve, including the created golfers.
+
+All reads go through one accessor, `Golfer_GetAttribute(pPlayer, k, mode)`, and the 87 call
+sites are mapped in [`formats/game-data.md`](formats/game-data.md). What that map says so far:
+
+- **AGGRESSION and IQ are read by exactly two functions** (`0x8002AA74`, `0x8002C2DC`), which
+  also sample POWER / STRIKING / APPROACH / PUTTING / RECOVERY twice each. `Swing.c` never
+  reads them. That is the AI's shot logic or nothing is; reading it settles hypothesis 2 too.
+- **The pros have a second attribute block**, used instead of the first when a player-side
+  field equals 9 and the game mode is 4. It is flatter and mostly lower. Whether "field == 9"
+  means CPU-controlled is the next thing to establish - if it does, human and CPU golfers are
+  *not* treated alike in that mode, by data rather than by code.
+- LUCK is read in three places outside the swing (two in the `UKernel.c` region), consistent
+  with its tooltip (lies and bounces). SPEED is read only by skin/animation code.
+- `CharSliders.c` turned out to be the create-a-golfer *face* slider loader, not attributes.
 
 **Status:** open.
 
