@@ -820,7 +820,7 @@ void UStream_ReleaseObjectBuffer(UStreamBuffer** ppBuffer) {
 
 // Stop the current stream at the end of what has been read. Returns whether a read is pending.
 int UStream_Stop(void) {
-    int nStream = gnCurStream;
+    s32 nStream = gnCurStream;
     if (nStream < 0) nStream = 0;
     gStreams[nStream].bEOF = 1;
     return gbReadPending != 0;
@@ -966,7 +966,7 @@ void UStream_FreeBuffers(void) {
 
 // Reset all state: rings, lists, the buffer free list, the node pool and the handler table.
 void UStream_Init(void) {
-    int i;
+    s32 i;
     UStreamBuffer* p;
     UStreamBuffer* pPrev;
     gbReadPending = 0;
