@@ -1526,3 +1526,96 @@ void SwingState01_Exit(int nPlayer) {
         fn_80063B98(pView, 0.25f, (f32*)&vOffset);
     }
 }
+
+
+// A view (one per split-screen half); only what the swing states touch.
+typedef struct View {
+    u8   unk0[0xC4];
+    f32  vC4[4];                // 0x0C4
+    u8   unkD4[0x114 - 0xD4];
+    f32  f114;                  // 0x114
+    f32  f118;                  // 0x118
+    u8   unk11C[0x144 - 0x11C];
+    s32  nCamera;               // 0x144
+} View;
+
+extern u8*  lbl_80281F78;                    // a game object: +0x1C0 non-zero enables camera 19
+extern u8   gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
+u8    fn_800C4650(View* pView, int nPlayer);
+void  fn_800E5714(int a);
+void  fn_800E5724(int nPlayer);
+void  fn_80017158(int nView);
+void  fn_800170C4(int nView, int a);
+void  fn_800C7178(View* pView, int nPlayer);
+extern Vec4 lbl_80183690;
+extern Vec4 lbl_80183610;
+
+void SwingState18_Exit(int nPlayer) {
+    s32*  pView = &gPlayers[nPlayer].nView0;
+    View* pV;
+    Vec4  vOffset;
+    pV      = (View*)fn_80017028(*pView);
+    vOffset = lbl_80183690;
+    fn_80005628(gPlayers[nPlayer].ballBefore, gPlayers[nPlayer].ball, 0xBC);
+    if (pV->nCamera == 3) {
+        fn_80063B98(fn_80017028(*pView), 0.75f, (f32*)&vOffset);
+    }
+}
+
+void SwingState04_Enter(int nPlayer) {
+    int nView;
+    if (*(s32*)(lbl_80281F78 + 0x1C0) != 0) {
+        s32* pView = &gPlayers[nPlayer].nView0;
+        if (fn_800C4650((View*)fn_80017028(*pView), nPlayer)) {
+            nView = *pView;
+            View_SetCamera(fn_80017028(nView), 0x13, nPlayer, nView);
+            return;
+        }
+    }
+    nView = gPlayers[nPlayer].nView0;
+    View_SetCamera(fn_80017028(nView), 3, nPlayer, nView);
+}
+
+void SwingState03_Exit(int nPlayer) {
+    int nView;
+    fn_80067074(nPlayer, 0x31, 0, -1);
+    if (fn_8005D2A8(nPlayer) == 10) {
+        nView = gPlayers[nPlayer].nView0;
+        View_SetCamera(fn_80017028(nView), 0xC, nPlayer, nView);
+    } else {
+        nView = gPlayers[nPlayer].nView0;
+        View_SetCamera(fn_80017028(nView), 0, nPlayer, nView);
+    }
+    fn_800E5714(0x10);
+    fn_800E5724(nPlayer);
+}
+
+// Leaving state 20: every set-up player's view takes this view's camera.
+void SwingState20_Exit(int nPlayer) {
+    s32*  pView = &gPlayers[nPlayer].nView0;
+    View* pSrc;
+    View* pDst;
+    int   i;
+    fn_80017158(*pView);
+    pSrc = (View*)fn_80017028(*pView);
+    for (i = 0; i < gNumPlayersSetUp; i++) {
+        pDst = (View*)fn_80017028(gPlayers[i].nView0);
+        fn_800170C4(gPlayers[i].nView0, 1);
+        pDst->nCamera = pSrc->nCamera;
+        pDst->f118    = pSrc->f118;
+        Vec_Copy(pSrc->vC4, pDst->vC4);
+        pDst->f114    = pSrc->f114;
+    }
+    gpGame->pfn24C(nPlayer);
+}
+
+void SwingState23_Enter(int nPlayer) {
+    Vec4  vOffset = lbl_80183610;
+    s32*  pView   = &gPlayers[nPlayer].nView0;
+    View* pV      = (View*)fn_80017028(*pView);
+    fn_800C7178(pV, nPlayer);
+    View_SetCamera(pV, 0x19, nPlayer, *pView);
+    if (pV->nCamera == 1 || pV->nCamera == 3 || pV->nCamera == 4) {
+        fn_80063B98(pV, 0.25f, (f32*)&vOffset);
+    }
+}
