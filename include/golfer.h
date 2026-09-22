@@ -360,8 +360,9 @@ void AI_ClubShorter(int nPlayer, s32* pClub, int nStep);
 
 // Game options at gSession + 0xE78 (the wind setting is nWind, at gSession + 0xE88).
 typedef struct GameOptions {
-    u8   unk0[10];              // 0x00
-    u8   unkA[2];
+    u8   unk0[6];               // 0x00
+    u8   bSkipCameras;          // 0x06  (gSession + 0xE7E) camera states end at once (inferred)
+    u8   unk7[5];
     s32  unkC;                  // 0x0C
     s32  nWind;                 // 0x10  0..3 calm..gusty, 4+ none
     s32  unk14;                 // 0x14

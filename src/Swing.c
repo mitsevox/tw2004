@@ -1818,3 +1818,68 @@ void SwingState06_Enter(int nPlayer) {
     fn_8006BF60(nPlayer);
     fn_800E3D38(nPlayer, 0);
 }
+
+
+u8    fn_80100294(void);                      // in a lesson (mode 11)
+u8    fn_800172C4(void* pView);               // the camera move has finished
+u8    fn_80014300(u32 uMask);                 // any pad pressed these buttons
+void  fn_800A76E4(void);
+u8    fn_80062B90(void);
+u8    fn_80062B88(int nPlayer);
+void  fn_80062B84(int a);
+u8    fn_80062B7C(void);
+
+// State 21 (a camera flyover): over when the option skips cameras, the camera finishes, or a
+// button is pressed (any pad for a CPU's shot). Lessons wait for the camera.
+void SwingState21_Update(int nPlayer) {
+    u8  bDone = 0;
+    u32 uMask;
+    if (SESSION_OPTIONS->bSkipCameras) {
+        bDone = 1;
+    } else if (fn_80100294()) {
+        return;
+    }
+    if (fn_800172C4(fn_80017028(gPlayers[nPlayer].nView0))) {
+        bDone = 1;
+    } else if (!Player_IsCPU(nPlayer)) {
+        uMask = fn_800142AC(0, 0);
+        if (fn_800136DC(gPlayers[nPlayer].nController) & uMask) {
+            bDone = 1;
+            fn_800A76E4();
+        }
+    } else {
+        if (fn_80014300(fn_800142AC(0, 0))) {
+            bDone = 1;
+            fn_800A76E4();
+        }
+    }
+    if (bDone) {
+        fn_8005CFD4(nPlayer);
+    }
+}
+
+// State 20 (another camera state), the same idea with a confirm step.
+void SwingState20_Update(int nPlayer) {
+    u8 bDone = 0;
+    if (gSession.unk8[0] != 0 && fn_80014300(0)) {
+        return;
+    }
+    if (SESSION_OPTIONS->bSkipCameras) {
+        bDone = 1;
+    } else if (fn_800172C4(fn_80017028(gPlayers[nPlayer].nView0))) {
+        bDone = 1;
+    } else if (!fn_80100294()) {
+        if (fn_80014300(fn_800142AC(0, 0)) || fn_80062B90()) {
+            if (fn_80062B88(nPlayer)) {
+                bDone = 1;
+                fn_80062B84(0);
+                fn_800A76E4();
+            } else if (fn_80062B7C()) {
+                fn_80062B84(0);
+            }
+        }
+    }
+    if (bDone) {
+        fn_8005CFD4(nPlayer);
+    }
+}
