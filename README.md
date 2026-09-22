@@ -72,6 +72,7 @@ Format notes live in [`docs/formats`](docs/formats/README.md). Compiler findings
 Knowledge base: [`docs/tw2004-notes.md`](docs/tw2004-notes.md) (what we know about this game) and
 [`docs/decomp-notes.md`](docs/decomp-notes.md) (general CodeWarrior / GameCube pitfalls and good practice).
 What happened when, and why: [`docs/journal.md`](docs/journal.md).
+Gameplay predictions to check against the source as it emerges: [`docs/hypotheses.md`](docs/hypotheses.md).
 
 Project structure
 =================
