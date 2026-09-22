@@ -3234,7 +3234,7 @@ void  fn_80047EF0(u8* pBall, int nPlayer, int a);   // tee the ball up
 void  fn_80047B6C(u8* pBall, int nPlayer);
 void  fn_80047BC0(u8* pBall, int nPlayer);
 void  fn_800DAF74(void);
-void  fn_800C6B7C(View* pView);
+f32   fn_800C6B7C(View* pView);
 
 // State 11 begins: the swing animation. The camera is 12 in a replay, else one of the three
 // special swing cameras (20..22) the view offers, else 13. The animation's event hooks are
@@ -3284,11 +3284,58 @@ void SwingState11_Enter(int nPlayer) {
     } else {
         fn_800DAF74();
     }
-    fn_800C6B7C(pV);
-    fn_800DC524(1, nPlayer, 0.0f);
+    fn_800DC524(1, nPlayer, fn_800C6B7C(pV));
     *(s32*)(gPlayers[nPlayer].ball + 0x64) = 0;
     if (gSession.bReplay != 0) {
         fn_80062CE0(1);
+    }
+}
+
+int   fn_800C6B38(View* pView);
+int   fn_800C4518(View* pView);
+void  fn_800C5CEC(View* pView, int nPlayer);
+u8    fn_800C5FE4(View* pView, int nPlayer);
+void  fn_800A573C(u8 nPlayer);
+
+// State 11: the swing animation. Nothing more until it passes its impact event (2). Then in a
+// replay the ball launches and it is state 12; otherwise once the camera has reached its mark the
+// impact sound plays, the special swing camera is chosen, the ball launches and it is state 12;
+// before that the camera keeps moving and one of two follow-through blends plays.
+void SwingState11_Update(int nPlayer) {
+    View* pV    = (View*)fn_80017028(gPlayers[nPlayer].nView0);
+    u8    bSpecial = 0;
+    fn_800DC524(1, nPlayer, fn_800C6B7C((View*)fn_80017028(gPlayers[nPlayer].nView0)));
+    if (!fn_80048574(gPlayers[nPlayer].nShotHandle, 2) ||
+        fn_8005CB78(gPlayers[nPlayer].nShotHandle, 2) < ((ShotObj*)gPlayers[nPlayer].nShotHandle)->fAnimTime) {
+        if (gSession.bReplay) {
+            fn_8002792C(*(u8**)(((ShotObj*)gPlayers[nPlayer].nShotHandle)->pView + 0x38));
+            Swing_Launch(nPlayer);
+            SwingStack_Push(0xC, nPlayer);
+        } else if (fn_800C4518(pV) >= fn_800C6B38(pV)) {
+            fn_80067074(nPlayer, 0xA, (int)gPlayers[nPlayer].ball, 1);
+            fn_800C44A8(pV, nPlayer);
+            fn_8002792C(*(u8**)(((ShotObj*)gPlayers[nPlayer].nShotHandle)->pView + 0x38));
+            Swing_Launch(nPlayer);
+            SwingStack_Push(0xC, nPlayer);
+        } else {
+            fn_800C5CEC(pV, nPlayer);
+            fn_800DC524(1, nPlayer, fn_800C6B7C(pV));
+            if (fn_800C4518(pV) >= fn_800C6B38(pV)) {
+                bSpecial = fn_800C5FE4(pV, nPlayer);
+            }
+            if (bSpecial) {
+                fn_80095B4C(gPlayers[nPlayer].nShotHandle, 1, 0x12, fn_80072ACC, 1, 8, -20000.0f, -30000.0f, -10000.0f, 0.0f, -10000.0f);
+            } else {
+                fn_80095B4C(gPlayers[nPlayer].nShotHandle, 1, 0, fn_80072ACC, 1, 8, -20000.0f, -90000.0f, -10000.0f, 0.0f, -10000.0f);
+            }
+            fn_800957D8(gPlayers[nPlayer].nShotHandle);
+            Swing_ClearFrameFlag(nPlayer);
+            fn_80062D98();
+        }
+        fn_800A5980(nPlayer);
+    }
+    if (gPlayers[nPlayer].nClub != CLUB_PUTTER) {
+        fn_800A573C(nPlayer);
     }
 }
 
