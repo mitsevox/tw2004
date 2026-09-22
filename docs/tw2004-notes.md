@@ -47,13 +47,19 @@ si 19, exi 13, dsp 11, ar 9, mtx 6, other 36.
 
 The SDK starts earlier than first thought: `VIWaitForRetrace` is at `0x8012F314`.
 
-**SDK source (Level 0).** `extern/sdk` is the Metroid Prime project's SDK / MSL source. 47 units are
-linked from it and match (`configure.py`, libs `card dvd gx os pad exi db MSL_C.PPCEABI.bare.H`).
-Compilers: GC/1.2.5n for Dolphin libraries, GC/1.3 for MSL, flags in `cflags_sdk` / `cflags_runtime`.
-Of the 154 Prime units, 57 match completely on code; 47 are in, 10 more are blocked only on data
-symbols that are referenced from other data (string tables etc.). 28 units match partially (the game's
-MSL revision differs from Prime's in places, e.g. `mem_funcs.c`, `printf.c`, the `__ieee754_*` math).
-Scripts: `C:\dev\scratch	w\{sdk_units,name_data,sdk_data_units}.py` (to be moved into tools/research).
+**SDK source (Level 0).** `extern/sdk` is the Metroid Prime project's SDK / MSL source. **57 units
+(162 functions, 51,376 bytes) are linked from it and match.** Compilers: GC/1.2.5n for Dolphin
+libraries, GC/1.3 for MSL, flags in `cflags_sdk` / `cflags_runtime`. The pipeline is in
+`tools/research/sdk/` (run in the order given in each script's header). What is left of Prime's 154 units:
+
+- 4 fully matching on code but blocked on data with no anchor (`fstload`, `EXIBios`, `GXPixel`,
+  `OSError`): their `.data` is referenced only from other data. Would need a byte-pattern search.
+- 27 partially matching: a few functions per unit differ from Prime's source (this game's SDK patch
+  level or MSL revision), e.g. `OSCache` 12/22, `ai` 17/23, `runtime.c` 11/14, `mem_funcs`, `printf`,
+  the `__ieee754_*` math. Each needs per-function work; not automated.
+- The rest are libraries this game does not link or SDK parts Prime never decompiled.
+
+Beyond that, Level 0 is done as far as borrowed source goes.
 
 Leaked source file names
 ------------------------

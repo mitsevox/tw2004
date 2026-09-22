@@ -68,6 +68,13 @@ Dated log of what was done and decided, newest last. Facts and lessons belong in
   `docs/publish/dolphin-forum-post.md` and posted to Dolphin forums > Cheats, Hacks & Game Patches;
   awaiting moderator approval. Wiki entry and GameHacking.org submission still to do.
 - Repo made public.
+- **SDK import (Level 0).** Copied Prime's `extern/sdk`, gave the SDK its own compiler settings, named
+  data symbols by aligning references against Prime's objects, and linked 57 SDK units (162 functions).
+  Matched code went 2,016 -> 53,392 bytes in one day. Pipeline in `tools/research/sdk/`.
+- Local progress dashboard on the LAN (`tools/dashboard/`). Cost an evening: a windowless server that
+  spawns console programs opens a Windows Terminal window per call on this PC, and a process-name
+  mismatch (`pythonw3.13.exe`) meant the "fixed" server was never actually restarted. Both in
+  `decomp-notes.md`.
 
 **Working agreements**
 - Show the plain-English logic and the C before building anything non-trivial.

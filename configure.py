@@ -378,6 +378,7 @@ config.libs = [
         "progress_category": "sdk",
         "src_dir": "extern/sdk",
         "objects": [
+            Object(Matching, "dolphin/card/CARDWrite.c"),
             Object(Matching, "dolphin/card/CARDMount.c"),
             Object(Matching, "dolphin/card/CARDUnlock.c"),
             Object(Matching, "dolphin/card/CARDCheck.c"),
