@@ -613,14 +613,21 @@ f32  Rand_Float(int nStream);                // 0x8000B1B8  0..1
 // to about 1.7 degrees on a full shot; then atan of the deviation, clamped to the meter's
 // maximum (gpSwing->fMaxError).
 f32 Swing_MeterError(int nPlayer) {
-    f32 fTopX    = gPlayers[nPlayer].swing.nTopX;
-    f32 fTopY    = gPlayers[nPlayer].swing.nTopY;
-    f32 fImpactX = gPlayers[nPlayer].swing.nImpactX;
-    f32 fImpactY = gPlayers[nPlayer].swing.nImpactY;
-    f32 fCentreX = gPlayers[nPlayer].swing.nCentreX;
-    f32 fCentreY = gPlayers[nPlayer].swing.nCentreY;
+    f32 fTopX;
+    f32 fTopY;
+    f32 fImpactX;
+    f32 fCentreX;
+    f32 fCentreY;
+    f32 fImpactY;
     f32 vBack[4], vThrough[4], vDiff[4], vDir[4];
     f32 fAngle, fMax;
+
+    fTopX    = gPlayers[nPlayer].swing.nTopX;
+    fTopY    = gPlayers[nPlayer].swing.nTopY;
+    fImpactX = gPlayers[nPlayer].swing.nImpactX;
+    fImpactY = gPlayers[nPlayer].swing.nImpactY;
+    fCentreX = gPlayers[nPlayer].swing.nCentreX;
+    fCentreY = gPlayers[nPlayer].swing.nCentreY;
 
     fTopX    += Rand_Float(0) * 30.0f - 15.0f;
     fImpactX += Rand_Float(0) * 30.0f - 15.0f;
@@ -644,7 +651,7 @@ f32 Swing_MeterError(int nPlayer) {
     }
     Vec_Sub(vThrough, vBack, vDiff);
     Vec_Add(vDir, vDiff, vDir);
-    if (vDir[2] != 0.0f) {
+    if (0.0f != vDir[2]) {
         fAngle = fn_8005CC84(vDir[0] / vDir[2]);
     } else {
         fAngle = (PI / 2) * (vDir[0] >= 0.0f ? 1.0f : -1.0f);
@@ -3617,9 +3624,9 @@ void  fn_800C6DFC(void);
 // (and the game allowing it) replays the shot (state 11 via the replay launch); button 25 with
 // the mulligan allowed takes the shot back.
 void SwingState12_Update(int nPlayer) {
-    View* pV;
     u8    bA = 0;
     u8    bB = 0;
+    View* pV;
 
     pV = (View*)fn_80017028(gPlayers[nPlayer].nView0);
     if (fn_800C6D9C()) return;
