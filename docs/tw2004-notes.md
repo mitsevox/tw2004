@@ -55,8 +55,14 @@ libraries, GC/1.3 for MSL, flags in `cflags_sdk` / `cflags_runtime`. The pipelin
 - 4 fully matching on code but blocked on data with no anchor (`fstload`, `EXIBios`, `GXPixel`,
   `OSError`): their `.data` is referenced only from other data. Would need a byte-pattern search.
 - 27 partially matching: a few functions per unit differ from Prime's source (this game's SDK patch
-  level or MSL revision), e.g. `OSCache` 12/22, `ai` 17/23, `runtime.c` 11/14, `mem_funcs`, `printf`,
-  the `__ieee754_*` math. Each needs per-function work; not automated.
+  level or MSL revision). **Level 1 (2026-09-22): 23 of them are linked as `NonMatching` text-only
+  units** (data left in the auto units; the DOL is linked from the split objects so it stays exact),
+  which credits every function that already matches: +79 KB of code. Only 5 functions in them are
+  short of 100% (`fwrite`, `fseek`, `ftell`, `__close_all`, `CARDReadAsync` - this game's MSL/CARD
+  revision differs) plus `OSMemory`'s local `OnReset`, which dtk names `OnReset_8014B034` in the
+  target object. Most of the "missing" functions in those units simply do not exist in this binary
+  (e.g. the `LC*` locked-cache functions of `OSCache`, `AIStopDMA`, `GXSetVtxDescv`). Not linked:
+  `dvdfatal`, `OSFont`, `OSLink` (one small function each, large unmapped data).
 - The rest are libraries this game does not link or SDK parts Prime never decompiled.
 
 Beyond that, Level 0 is done as far as borrowed source goes.

@@ -332,6 +332,37 @@ cflags_gcc = [
 
 config.libs = [
     {
+        "lib": "mtx",
+        "mw_version": "GC/1.2.5n",
+        "cflags": cflags_sdk,
+        "progress_category": "sdk",
+        "src_dir": "extern/sdk",
+        "objects": [
+            Object(NonMatching, "dolphin/mtx/mtx.c"),
+            Object(NonMatching, "dolphin/mtx/mtx44.c"),
+        ],
+    },
+    {
+        "lib": "ar",
+        "mw_version": "GC/1.2.5n",
+        "cflags": cflags_sdk,
+        "progress_category": "sdk",
+        "src_dir": "extern/sdk",
+        "objects": [
+            Object(NonMatching, "dolphin/ar/arq.c"),
+        ],
+    },
+    {
+        "lib": "ai",
+        "mw_version": "GC/1.2.5n",
+        "cflags": cflags_sdk,
+        "progress_category": "sdk",
+        "src_dir": "extern/sdk",
+        "objects": [
+            Object(NonMatching, "dolphin/ai.c"),
+        ],
+    },
+    {
         "lib": "EASharedFileLib",
         "mw_version": "ProDG/3.5",
         "cflags": cflags_gcc,
@@ -401,6 +432,7 @@ config.libs = [
         "progress_category": "sdk",
         "src_dir": "extern/sdk",
         "objects": [
+            Object(NonMatching, "dolphin/card/CARDRead.c"),
             Object(Matching, "dolphin/card/CARDWrite.c"),
             Object(Matching, "dolphin/card/CARDMount.c"),
             Object(Matching, "dolphin/card/CARDUnlock.c"),
@@ -419,6 +451,7 @@ config.libs = [
         "progress_category": "sdk",
         "src_dir": "extern/sdk",
         "objects": [
+            Object(NonMatching, "dolphin/dvd/dvdfs.c"),
             Object(Matching, "dolphin/dvd/dvderror.c"),
             Object(Matching, "dolphin/dvd/dvdqueue.c"),
             Object(Matching, "dolphin/dvd/dvdidutils.c"),
@@ -431,6 +464,10 @@ config.libs = [
         "progress_category": "sdk",
         "src_dir": "extern/sdk",
         "objects": [
+            Object(NonMatching, "dolphin/gx/GXAttr.c"),
+            Object(NonMatching, "dolphin/gx/GXBump.c"),
+            Object(NonMatching, "dolphin/gx/GXLight.c"),
+            Object(NonMatching, "dolphin/gx/GXTexture.c"),
             Object(Matching, "dolphin/gx/GXInit.c"),
             Object(Matching, "dolphin/gx/GXTev.c"),
             Object(Matching, "dolphin/gx/GXStubs.c"),
@@ -447,6 +484,14 @@ config.libs = [
         "progress_category": "sdk",
         "src_dir": "extern/sdk",
         "objects": [
+            Object(NonMatching, "dolphin/os/OSAlarm.c"),
+            Object(NonMatching, "dolphin/os/OSArena.c"),
+            Object(NonMatching, "dolphin/os/OSCache.c"),
+            Object(NonMatching, "dolphin/os/OSMemory.c"),
+            Object(NonMatching, "dolphin/os/OSReset.c"),
+            Object(NonMatching, "dolphin/os/OSRtc.c"),
+            Object(NonMatching, "dolphin/os/OSTime.c"),
+            Object(NonMatching, "dolphin/PPCArch.c"),
             Object(Matching, "dolphin/os/OSResetSW.c"),
             Object(Matching, "dolphin/os/OSInterrupt.c"),
             Object(Matching, "dolphin/os/OSAudioSystem.c"),
@@ -462,6 +507,11 @@ config.libs = [
         "progress_category": "sdk",
         "src_dir": "extern/sdk",
         "objects": [
+            Object(NonMatching, "runtime/runtime.c"),
+            Object(NonMatching, "runtime/ansi_files.c"),
+            Object(NonMatching, "runtime/direct_io.c"),
+            Object(NonMatching, "runtime/file_io.c"),
+            Object(NonMatching, "runtime/FILE_POS.c"),
             Object(Matching, "runtime/ctype.c"),
             Object(Matching, "runtime/e_acos.c"),
             Object(Matching, "runtime/e_asin.c"),
