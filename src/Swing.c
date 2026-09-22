@@ -1530,13 +1530,19 @@ void SwingState01_Exit(int nPlayer) {
 
 // A view (one per split-screen half); only what the swing states touch.
 typedef struct View {
-    u8   unk0[0xC4];
+    u8   unk0[0x50];
+    f32  f50;                   // 0x050
+    f32  f54;                   // 0x054
+    f32  f58;                   // 0x058
+    u8   unk5C[0xC4 - 0x5C];
     f32  vC4[4];                // 0x0C4
     u8   unkD4[0x114 - 0xD4];
     f32  f114;                  // 0x114
     f32  f118;                  // 0x118
     u8   unk11C[0x144 - 0x11C];
     s32  nCamera;               // 0x144
+    u8   unk148[0x25C - 0x148];
+    s32  nSavedCamera;          // 0x25C
 } View;
 
 extern u8*  lbl_80281F78;                    // a game object: +0x1C0 non-zero enables camera 19
@@ -1618,4 +1624,62 @@ void SwingState23_Enter(int nPlayer) {
     if (pV->nCamera == 1 || pV->nCamera == 3 || pV->nCamera == 4) {
         fn_80063B98(pV, 0.25f, (f32*)&vOffset);
     }
+}
+
+
+void  fn_80039344(View* pView, f32 f);
+void  fn_800DC9D4(int a);
+
+void SwingState06_Exit(int nPlayer) {
+    int nView;
+    fn_80005628(gPlayers[nPlayer].ballBefore, gPlayers[nPlayer].ball, 0xBC);
+    *(s32*)(gPlayers[nPlayer].ballBefore + 0x94) = -1;     // nobody's ball
+    *(s32*)(gPlayers[nPlayer].ballBefore + 0x64) = 1;      // stopped
+    if (fn_8005D2A8(nPlayer) == 10) {
+        nView = gPlayers[nPlayer].nView0;
+        View_SetCamera(fn_80017028(nView), 0xC, nPlayer, nView);
+    } else {
+        nView = gPlayers[nPlayer].nView0;
+        View_SetCamera(fn_80017028(nView), 0, nPlayer, nView);
+    }
+    fn_800E3D38(nPlayer, 1);
+}
+
+void SwingState09_Exit(int nPlayer) {
+    s32* pView = &gPlayers[nPlayer].nView0;
+    int  nView;
+    ((View*)fn_80017028(*pView))->f50 = 1.0f;
+    ((View*)fn_80017028(*pView))->f54 = 1.0f;
+    ((View*)fn_80017028(*pView))->f58 = 1.0f;
+    fn_80039344((View*)fn_80017028(*pView), 0.0f);
+    if (fn_8005D2A8(nPlayer) == 10) {
+        nView = *pView;
+        View_SetCamera(fn_80017028(nView), 0xC, nPlayer, nView);
+    } else {
+        nView = *pView;
+        View_SetCamera(fn_80017028(nView), 0, nPlayer, nView);
+    }
+    fn_800E3D38(nPlayer, 1);
+}
+
+// Each of the player's two views goes back to its saved camera, unless an earlier view of the
+// player's is the same view.
+void SwingState21_Exit(int nPlayer) {
+    s32*  pViews = &gPlayers[nPlayer].nView0;
+    View* pV;
+    int   k, j;
+    u8    bShared;
+    for (k = 0; k < 2; k++) {
+        pV      = (View*)fn_80017028(pViews[k]);
+        bShared = 0;
+        for (j = 0; j < k; j++) {
+            if (pV == (View*)fn_80017028(pViews[j])) bShared = 1;
+        }
+        if (!bShared) {
+            int nView = pViews[k];
+            View_SetCamera(fn_80017028(nView), pV->nSavedCamera, nPlayer, nView);
+        }
+    }
+    fn_800E3D38(nPlayer, 1);
+    fn_800DC9D4(0);
 }
