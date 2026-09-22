@@ -175,3 +175,8 @@ Dated log of what was done and decided, newest last. Facts and lessons belong in
   aim point carries an "if it goes wrong" nudge code, the club search alternates longer/shorter
   by a growing step from the original club, and a forced stop with nothing landed is +25 and a
   fresh target. `Player.ball` is the player's own Ball at 0xA90 (0xBC bytes; `nLie` is its +0x68).
+- **Wind read; hypothesis 3 closed.** Authored per hole, else rolled from the wind setting
+  (0-6 / 2-12 / 5-20 / 12-31), forced up on two courses; no score anywhere. The flight step clamps
+  the wind to +-15 per axis for CPU balls only. Two corrections while in the physics: the ball
+  works in yards (all constants are whole inches - the cup pull is 5.5 in, holed is 2 in below the
+  pin), and the rehearsal steps twelve real 1/60 s ticks per frame, not one coarse 0.2 s step.

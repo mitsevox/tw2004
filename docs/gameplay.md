@@ -155,31 +155,33 @@ subtracted, floored at -1: the kinder deflection off trees the tooltip promises.
 The cup
 -------
 
-The ball physics (`src/Ball.c`, our name; `0x80050C2C`-`0x8005620C`) works in metres. The ball
-it rolls has radius 0.0257 (a real one is 0.0213); the cup is 0.1072 across (4.22 in). The cup is
-**real geometry**: it is a depression in the green mesh with its own surface kinds (12 and 18,
-type 90), and `Ball_GroundContact` (`0x80054D28`) declares the ball holed when it is on one of
-those and more than 0.0556 m below the pin's height. No speed test, no capture radius: the ball
-has to physically fall in. `Ball_Holed` then parks it 8.3 cm down in the cup.
+The ball physics (`src/Ball.c`, our name; `0x80050C2C`-`0x8005620C`) works in **yards**, like
+the rest of the game - we first read it as metres, but every constant in it is a whole number of
+inches (1/36). The ball it rolls has radius 0.92 in (a real one is 0.84); the cup constant is
+3.86 in (a real cup is 4.25). The cup is **real geometry**: it is a depression in the green mesh
+with its own surface kinds (12 and 18, type 90), and `Ball_GroundContact` (`0x80054D28`)
+declares the ball holed when it is on one of those and more than **2 inches** below the pin's
+height. No speed test, no capture radius: the ball has to physically fall in. `Ball_Holed` then
+parks it 3 in down in the cup.
 
 **There is a pull, though.** `Ball_CupPull` (`0x80054AB0`, in C at the original instruction
 count) runs from the ground-contact step every frame the ball is on the ground, for every
 ball, human or CPU, gated only by a debug flag pair:
 
-- inside **15.3 cm** of the pin (about three cup radii), and only while the ball is still short
-  of the hole along its path from where the shot started;
+- inside **5.5 inches** of the pin (under three cup radii), on a putt that started at least 6 in
+  away, and only while the ball is still short of the hole along its path from where it started;
 - take the angle between the ball's heading and the direction to the cup;
-- **within 6.25 cm** (over the cup): if heading more than 30 degrees off and faster than
-  0.37 m/s, the horizontal velocity is scaled by `1 - 16 x 0.67 x distance` - up to a 67% loss.
+- **within 2.25 in** (over the cup): if heading more than 30 degrees off and faster than
+  1.1 ft/s, the horizontal velocity is scaled by `1 - 16 x 0.67 x distance` - up to a 67% loss.
   That is the lip; a slow or straight ball is left alone to drop;
-- otherwise, if heading **within 30 degrees** of the cup, or **within 9.7 cm** regardless:
+- otherwise, if heading **within 30 degrees** of the cup, or **within 3.5 in** regardless:
   `velocity += 0.455 x dt x (pin - ball)` on x and z - an acceleration toward the cup
   proportional to the offset - except on any axis where that would speed the ball up while it
   is more than 16.8 degrees off line.
 
-How much is it? At 10 cm off the line and rolling at 0.3 m/s the ball spends about half a
-second in the zone and picks up ~0.02 m/s sideways: a few degrees of bend, a couple of
-centimetres at the cup. Enough to turn a lip-out into a drop, not enough to save a putt that
+How much is it? At 4 in off the line and rolling at a foot per second the ball spends about
+half a second in the zone and picks up under an inch per second sideways: a few degrees of
+bend, an inch or so at the cup. Enough to turn a lip-out into a drop, not enough to save a putt that
 was never close. No attribute and no human/CPU test anywhere in it.
 
 Two other things in the same file, read but not decompiled: hitting a tree (surface kind 17)
@@ -192,8 +194,9 @@ The CPU's shot rehearsal (`AI_RehearseShot`, `0x8002B030`, in C)
 After choosing an aim point the CPU does not trust its plan: it rehearses it. A private copy of
 the ball (`gSimBall`) is launched with the planned club and aim at **`power x AI_PowerScale`,
 capped at 150%** (the sim may overswing past anything a human can), and the **real ball
-physics** are stepped with randomness switched off (`fn_80050D24(1)`) at a coarse 0.2 s per
-step (0.1 s in "fast" mode), one step per frame. It is a small state machine on
+physics** are stepped with the "simulating" flag up (`Ball_SetSimulating(1)`, which silences sounds,
+effects and the tree-deflection roll), **0.2 s of ball time per frame - twelve real 1/60 s ticks,
+not a coarse step** (six in "fast" mode). It is a small state machine on
 `Player.nRehearseState`: 2 reset, 0 launch, 1 step, 3 "stop now", 4 settled.
 
 Each frame in state 1, after the step:
@@ -231,12 +234,12 @@ rehearsal. `Caddie_Update` steps it once per frame with a tolerance of 0.05 (0.0
 and counts frames. `Caddie_GetTip` hands back slot 4's solved aim point, or **gives up after
 600 frames** (ten seconds) and reports "unavailable" (return value 2).
 
-Why it misreads: the search accepts an aim whose simulated ball *stops within 5 cm of the
-pin* - stopping at the hole, not dropping in; the simulation runs at 0.2 s steps where the real
-roll is integrated far finer, so breaking putts diverge; and it assumes a perfect stroke at the
-power the game computes for the distance. A long, breaking putt needs many rehearsal rounds of
-several seconds of simulated roll each, and hits the ten-second budget: that is the "tip
-unavailable". No random term anywhere in it. The `+5` modifiers from failed rehearsals land on
+Why it misreads: the search accepts an aim whose simulated ball *stops within 1.8 in of the
+pin* - stopping at the hole, not dropping in - and it assumes a perfect stroke at the power the
+game computes for the distance. The physics itself is the real thing at full resolution, twelve
+ticks a frame. A long, breaking putt needs many rehearsal rounds of several seconds of simulated
+roll each (a ten-second putt is 50 frames per round), and hits the ten-second budget: that is
+the "tip unavailable". No random term anywhere in it. The `+5` modifiers from failed rehearsals land on
 slot 4, not on you.
 
 The drawn break line (`BreakLine_Start` / `BreakLine_Step`, `GoBreakLine.c`) is honest in the
@@ -262,13 +265,40 @@ double, +40 at triple - and in match play it gets **worse** by 5 per hole it lea
 attributes never change; these are the modifiers `Golfer_GetAttribute` adds in mode 2, capped
 at 100 (110 for POWER, IQ, AGGRESSION).
 
+Wind (`fn_80055FC8`, `fn_80055F88`, `fn_80055F1C`; the flight step `fn_80051CD0`)
+----------------------------------------------------------------------------------
+
+Each hole carries an authored wind (direction and speed in the course table at `0x801FA2F4`,
+`0x430` bytes per course, `0x38` per hole). A global "wind off" flag (`gpGame + 0x28B`) zeroes
+it. When the authored wind is zero the hole's wind is rolled from the session's wind setting
+(`gSession + 0xE88`), direction one of eight at random:
+
+    setting 0    0 .. 6
+    setting 1    2 .. 12
+    setting 2    5 .. 20
+    setting 3    12 .. 31
+    4 and up     none
+
+On two courses (indices 6 and 15 - Royal Birkdale and Sahalee if the index follows the course
+name table, which we have not verified) the setting is forced up: below 2 becomes 2, otherwise
+3 - except in game mode 4 with no challenge selected. A speed of exactly 0 is stored as 0.1.
+That is the whole generator: the RNG, the course, the setting. **No score, no standing, no
+player in it.**
+
+The flight step reads the wind vector every tick - and this is the one place the wind knows
+who is hitting: **if the ball's player is a CPU, each axis of the wind is clamped to +-15**
+before it is applied. A human's ball takes the full 31. Not a rubber band - it does not move
+with the score - but a fixed leniency for the CPU in strong wind, presumably so its
+rehearsal-tuned shots stay on the course.
+
 What none of this reads
 -----------------------
 
 The swing and physics code reads only the player's own attributes, the shot geometry, club
-tables and the RNG. The score reaches the attributes through two doors: `Golfer_IsLucky`
-(holes-won, mode 4, humans) and `AI_SetShotModifiers` (strokes vs par on the hole, and
-holes-won in mode 4, CPU only). (Wind generation is still unread.)
+tables, the wind and the RNG. The score reaches the attributes through two doors:
+`Golfer_IsLucky` (holes-won, mode 4, humans) and `AI_SetShotModifiers` (strokes vs par on the
+hole, and holes-won in mode 4, CPU only). Wind is generated from the course, the setting and the
+RNG, and is softened for CPU balls regardless of the score.
 
 EA's random number generator
 ----------------------------

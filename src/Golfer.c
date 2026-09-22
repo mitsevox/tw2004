@@ -839,7 +839,7 @@ extern s32 gSimClub[6];             // 0x801C65A0  per player: club the rehearsa
 #define SIM_BALL_X     (*(f32*)&gSimBall[0x00])
 #define SIM_BALL_Z     (*(f32*)&gSimBall[0x08])
 
-void fn_80050D24(u8 bNoRandom);                                   // ball physics: randomness off
+void Ball_SetSimulating(u8 bOn);                                  // 0x80050D24: gSimulating - silences sounds, effects and the tree roll
 void Ball_Launch(void* pBall, int nClub, int nKind, f32 fPower, f32 fAim, int bSim, f32* pA, f32* pB);
 void Ball_SimStep(void* pBall, f32 fDt, f32 fScale);              // 0x8005585C
 f32  fn_8002CD20(int nPlayer);                                    // aim angle to the target
@@ -1003,21 +1003,21 @@ u8 AI_RehearseShot(int nPlayer, f32* pOutDist2, u8 bFast, f32 fTolerance) {
         fn_80005628(gSimBall, p->ball, sizeof(gSimBall));
         fPower = p->fPower * AI_PowerScale(nPlayer);
         if (fPower > 1.5f) fPower = 1.5f;
-        fn_80050D24(1);
+        Ball_SetSimulating(1);
         Ball_Launch(gSimBall, p->nClub, p->nShotKind, fPower, p->fAim, 1, p->vLaunchA, p->vLaunchB);
-        fn_80050D24(0);
+        Ball_SetSimulating(0);
         p->nRehearseState = 1;
         break;
 
     case 1:     // step
         gSimAborted = 0;
-        fn_80050D24(1);
+        Ball_SetSimulating(1);
         if (bFast) {
             Ball_SimStep(gSimBall, 0.1f, 1.0f);
         } else {
             Ball_SimStep(gSimBall, 0.2f, 1.0f);
         }
-        fn_80050D24(0);
+        Ball_SetSimulating(0);
         if (gSimAborted) {
             if (gSimHaveResult) {
                 p->fTargetX       = gSimBestAim[0];

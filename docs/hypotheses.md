@@ -35,10 +35,10 @@ power) is what makes the tip miss.
 
 **Result (2026-09-22, in C):** **a search with a budget, exactly as refined.** The tip is the
 CPU's shot rehearsal (`AI_RehearseShot`) run on a copy of you in player slot 4: the real ball
-physics, randomness off, stepped 0.2 s per frame, aim moved 45% of the miss each round until
-the simulated ball *stops within 5 cm of the pin*. `Caddie_GetTip` gives up after 600 frames -
+physics, randomness off, 0.2 s of ball time per frame (twelve real ticks), aim moved 45% of the
+miss each round until the simulated ball *stops within 1.8 in of the pin*. `Caddie_GetTip` gives up after 600 frames -
 ten seconds - and that is "unavailable". Systematic, not random: it solves for stopping at the
-hole rather than dropping, at a coarse timestep, assuming a perfect stroke. Details in
+hole rather than dropping, assuming a perfect stroke. Details in
 [`gameplay.md`](gameplay.md).
 
 **Status:** answered.
@@ -98,7 +98,12 @@ failed rehearsal of the shot. The human's swing has no such term; the human's on
 effect is the luck doubling above. So: no rubber band on you, a deliberate one on the CPU in
 both directions.
 
-**Status:** answered - refuted for the CPU, upheld for the human swing; wind still to read.
+**Wind (later the same day):** read. Generated from the hole's authored wind, else the session's
+wind setting and the RNG, forced up on two courses; nothing about the score in it. One fixed
+CPU leniency: a CPU's ball has each wind axis clamped to +-15 in flight, a human's takes it
+all. See [`gameplay.md`](gameplay.md).
+
+**Status:** answered - refuted for the CPU, upheld for the human swing.
 
 4. Which attributes touch which math, and whether human and CPU are treated alike
 ---------------------------------------------------------------------------------
@@ -186,12 +191,12 @@ the attribute; (2) above that, PUTTING shrinks a stroke error under 0.436 (at 10
 The CPU gets the mirror image: no error on putts under 1.5 units, angle error halved under 5.
 The physics-side question (a pull toward the cup, capture radius) is still open.
 
-**Result (2026-09-22, `Ball_CupPull` in C):** **yes, there is a pull.** Inside 15.3 cm of the pin,
-while the ball is still short of the hole, a ball heading within 30 degrees of the cup (or within
-9.7 cm regardless) gets `0.455 x dt x (pin - ball)` added to its velocity each frame - an
+**Result (2026-09-22, `Ball_CupPull` in C):** **yes, there is a pull.** Inside 5.5 in of the pin
+(the physics is in yards; we first misread it as metres), while the ball is still short of the
+hole, a ball heading within 30 degrees of the cup (or within 3.5 in regardless) gets `0.455 x dt x (pin - ball)` added to its velocity each frame - an
 acceleration toward the cup - limited so it never speeds the ball up while it is more than
 16.8 degrees off line. A ball crossing the cup fast and off line loses up to 67% of its speed
-instead (the lip). The hole itself is geometry: holed means "dropped more than 5.6 cm below the
+instead (the lip). The hole itself is geometry: holed means "dropped more than 2 in below the
 pin height" on a cup surface, no capture radius. The pull applies to every ball, human or CPU,
 with no attribute involved. Full numbers in [`gameplay.md`](gameplay.md).
 

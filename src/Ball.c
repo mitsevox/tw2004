@@ -1,13 +1,13 @@
 // Ball.c: the ball's flight and roll. No assert names this file; "Ball.c" is our name (the
-// leaked list's PsBallFx.c is elsewhere). CodeWarrior GC/2.5, -O4,p. Units are metres and
-// seconds. The cup is real geometry (surface kinds 12/18, type 90): the ball is holed when it
+// leaked list's PsBallFx.c is elsewhere). CodeWarrior GC/2.5, -O4,p. Units are yards and
+// seconds; every constant below is a whole number of inches (1/36 yd). The cup is real geometry (surface kinds 12/18, type 90): the ball is holed when it
 // has dropped below the pin height. What is written up in docs/gameplay.md is the near-cup
 // pull below.
 
 #include "golfer.h"
 
-#define BALL_RADIUS 0.0256667f      // the ball the game rolls (a real one is 0.0213)
-#define CUP_DIAMETER 0.10717f       // 4.22 in
+#define BALL_RADIUS 0.0256667f      // 0.92 in (a real one is 0.84)
+#define CUP_DIAMETER 0.10717f       // 3.86 in (a real cup is 4.25)
 
 typedef struct Ball {
     f32  vPos[3];               // 0x00
@@ -59,8 +59,8 @@ f32 Ball_DistanceToPin(f32* pPos) {
     return 1000.0f;
 }
 
-// The pull toward the cup. Inside 15.3 cm of the pin, while the ball is still short of it, a
-// ball heading within 30 degrees of the cup (or within 9.7 cm whatever its heading) gets
+// The pull toward the cup. Inside 5.5 in of the pin, while the ball is still short of it, a
+// ball heading within 30 degrees of the cup (or within 3.5 in whatever its heading) gets
 // 0.455 x dt x (pin - ball) added to its velocity - but never on an axis where that would speed
 // it up while it is more than 16.8 degrees off line. A ball crossing over the cup fast and
 // off line loses up to 67% of its speed instead: the lip.
