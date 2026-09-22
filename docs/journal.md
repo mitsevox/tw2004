@@ -169,3 +169,9 @@ Dated log of what was done and decided, newest last. Facts and lessons belong in
 - One batch of work, then report. No silent fix loops.
 - Commit only when asked. No AI attribution in commits.
 - Write lessons into the docs the same day.
+- **`AI_RehearseShot` in C** (instruction-identical; objdiff 99.76 on float-pool labels), with its
+  helpers `Shot_Prepare`, `AI_NudgeAim`, `AI_NudgeDistance`, `AI_ClubLonger`/`AI_ClubShorter`
+  (both exact) and `AI_SimAbort`. New details: the sim power is capped at 150%, each authored
+  aim point carries an "if it goes wrong" nudge code, the club search alternates longer/shorter
+  by a growing step from the original club, and a forced stop with nothing landed is +25 and a
+  fresh target. `Player.ball` is the player's own Ball at 0xA90 (0xBC bytes; `nLie` is its +0x68).

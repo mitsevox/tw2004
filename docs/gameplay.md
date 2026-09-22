@@ -186,22 +186,38 @@ Two other things in the same file, read but not decompiled: hitting a tree (surf
 deflects the ball by a random 12..19 degrees in two axes unless the player is flagged perfect
 (`0x800539F8`), and out of bounds is 600 m from the shot's start (`0x80054450`).
 
-The CPU's shot rehearsal (`AI_RehearseShot`, `0x8002B030`)
--------------------------------------------------------------
+The CPU's shot rehearsal (`AI_RehearseShot`, `0x8002B030`, in C)
+-------------------------------------------------------------------
 
 After choosing an aim point the CPU does not trust its plan: it rehearses it. A private copy of
-the ball (`gSimBall`) is launched with the planned club, aim and power, and the **real ball
+the ball (`gSimBall`) is launched with the planned club and aim at **`power x AI_PowerScale`,
+capped at 150%** (the sim may overswing past anything a human can), and the **real ball
 physics** are stepped with randomness switched off (`fn_80050D24(1)`) at a coarse 0.2 s per
-step (0.1 s in "fast" mode), one step per frame. When the simulated ball stops:
+step (0.1 s in "fast" mode), one step per frame. It is a small state machine on
+`Player.nRehearseState`: 2 reset, 0 launch, 1 step, 3 "stop now", 4 settled.
 
-- its miss from the intended target is measured; if it is over the tolerance, **the aim is
-  moved by 45% of the miss vector** and the shot is re-planned and rehearsed again - a
-  fixed-point search that converges on the aim that lands where the CPU wanted;
-- if the ball never got there (stopped short, or the sim reported failure), the club is
-  swapped up and down by growing steps and **the golfer's attribute modifiers get +5 (aggression
-  -5) for the next attempt**, capped by `Golfer_ClampModifiers`;
-- within tolerance: done, the rehearsed aim becomes the shot, and only then `AI_ApplyError`
-  worsens it by skill (the CPU path in `Swing.c`, `0x8005E0BC`).
+Each frame in state 1, after the step:
+
+- **The hazard hook fired** (`AI_SimAbort`, called from the water/OB code when the ball it is
+  handling is the rehearsal's): if an earlier rehearsal landed, snap the aim back to the best
+  one found and relaunch. Otherwise **+5 on the modifiers** (aggression -5, capped by
+  `Golfer_ClampModifiers`) and a nudge that the *authored aim point itself* prescribes. The
+  byte we had called the target's "type" is really its **if-it-goes-wrong code**: 1/2 turn the
+  aim 1 degree left/right, 3/4 make the shot 5 yards shorter/longer, 5/6 turn 2 degrees.
+  Then re-plan and relaunch.
+- **Ball still moving** (ball state 2, 3 or 4): wait for the next frame.
+- **Ball stopped in a hazard** (ball state 5), and nothing has landed yet: put the original
+  club back and swap **longer by 1, shorter by 1, longer by 2, shorter by 2...** on successive
+  tries (`AI_ClubLonger` / `AI_ClubShorter` walk on until a club usable for the shot kind),
+  +5 on the modifiers (uncapped this time), re-plan, relaunch.
+- **Ball stopped** anywhere else: measure the miss from the intended landing point (x/z only);
+  remember this aim if it is the best so far; if the miss squared is over the tolerance,
+  **aim -= 0.45 x miss** and relaunch. Within tolerance: state 4, done - the rehearsed aim is
+  the shot, and only then `AI_ApplyError` worsens it by skill (the CPU path in `Swing.c`,
+  `0x8005E0BC`).
+
+State 3 is the caller's "enough": use the best aim found, or, if nothing ever landed, **+25 on
+the modifiers** and `AI_ChooseTarget` again from scratch.
 
 So hypothesis 2 was right after all in its first half too: the CPU **does** solve its shot -
 not by inverting a formula, but by simulating it until it lands.

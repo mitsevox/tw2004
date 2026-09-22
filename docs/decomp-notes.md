@@ -160,6 +160,11 @@ Reading compiler output
 - **[verified] One shared `return` means one combined condition.** Four separate
   `if (...) return 2;` lines each get their own return sequence. If the original has several
   tests all branching to a single shared return, the source was `if (a || b || c || d) return 2;`.
+- **[verified] The same rule from the other side: `bge skip; b end` at the last test.** Three
+  early returns written as separate `if (...) return;` lines gave `beq end; beq end; blt end`.
+  The original had `beq end; beq end; bge body; b end` - the last term of an or-chain gets the
+  inverted branch over an unconditional one. `if (a || b || c) return;` matched
+  (`AI_ClubLonger`, `AI_ClubShorter`).
 - **[verified] Check struct sizes against the multiply.** Array indexing shows the element size:
   `slwi r,r,4` is 16 bytes, `mulli r,r,0x44` is 0x44 bytes. If ours has `mulli` by a different
   number, the struct is the wrong size (we had three function pointers in a two-pointer entry).

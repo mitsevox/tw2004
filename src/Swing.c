@@ -255,7 +255,7 @@ f32 Swing_ComputePower(int nPlayer) {
     case SHOT_PITCH: {
         f32 f = *pPower;
         if (p->nShotKind == SHOT_CHIP) {
-            f = *pPower * fn_80050F88(p->fDistance, p->unkA90, SHOT_CHIP, p->nClub);
+            f = *pPower * fn_80050F88(p->fDistance, p->ball, SHOT_CHIP, p->nClub);
         }
         fPower = Swing_ApplyPowerBoost(nPlayer, f);
         Golfer_GetAttribute(p, ATTR_APPROACH, ATTR_TOTAL);

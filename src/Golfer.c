@@ -425,7 +425,7 @@ int AI_ShotKindForDistance(int nPlayer, f32 fDist) {
     case 8: {
         int     nKind = SHOT_FULL;
         Player* p     = &gPlayers[nPlayer];
-        fDist /= fn_800510EC(p->unkA90);
+        fDist /= fn_800510EC(p->ball);
         if (p->nLie == LIE_GREEN || AI_WithinOfPin(nPlayer, 1.5f)) {
             nKind = SHOT_PUTT;
         } else if ((p->golfer.uBagMask & (1 << 21)) && fDist < 15.0f && AI_WithinOfPin(nPlayer, 5.0f) && fn_8002CEDC(nPlayer)) {
@@ -472,7 +472,7 @@ int AI_ClubForShot(int nPlayer, int nKind, u8 bUnderOnly, f32 fDist) {
     } else {
         nClub = AI_FirstUsableClub(nPlayer, nKind);
         if (Game_GetMode() == 6 || Game_GetMode() == 7 || Game_GetMode() == 8 || Controller_IsCPU(p->nController)) {
-            fDist /= fn_800510EC(p->unkA90);
+            fDist /= fn_800510EC(p->ball);
         }
         for (c = 0; c < NUM_CLUBS; c++) {
             if (c == CLUB_PUTTER) continue;
@@ -516,7 +516,7 @@ f32 AI_PowerForTarget(int nPlayer) {
         return fn_80050D34(p->fDistance);
     }
     if (p->nShotKind == SHOT_CHIP) {
-        return fn_80050F88(p->fDistance, p->unkA90, SHOT_CHIP, p->nClub);
+        return fn_80050F88(p->fDistance, p->ball, SHOT_CHIP, p->nClub);
     }
     return p->fDistance / AI_MaxDistance(nPlayer, p->nShotKind, p->nClub);
 }
@@ -816,4 +816,291 @@ int Caddie_GetTip(int nPlayer, f32* pOut) {
     }
     Vec_Copy(&gPlayers[CADDIE_SLOT].fTargetX, pOut);
     return (s8)gCaddieDone;
+}
+
+// ---- the CPU's shot rehearsal ---------------------------------------------------------------------
+// Before a CPU golfer swings (and for the caddie, on a copy of the human in slot 4) the planned shot
+// is rehearsed on a private ball with the real physics, randomness off, one coarse step per frame.
+// When the ball stops, the aim is moved by 45% of the miss and it goes again, until the miss is
+// under the tolerance. Trouble - the hazard hook fires, or the ball ends in a hazard - costs the
+// golfer +5 on its modifiers and a nudge (the authored aim point says which way), or a club swap:
+// longer by one, shorter by one, longer by two... from the club it started with. The caller can
+// force state 3 to make it stop: the best aim found so far, or +25 and a fresh target.
+
+extern u8  gSimAborted;             // 0x80281D30  raised by AI_SimAbort from the hazard code
+extern u8  gSimHaveResult;          // 0x80281D31  at least one rehearsal landed
+extern u8  gSimClubTries[8];        // 0x80281D34  per player: club swaps tried
+extern f32 gSimBestDist;            // 0x802810A8  best miss squared
+extern f32 gSimBestAim[3];          // 0x801C64D8  the aim that produced it
+extern u8  gSimBall[0xBC];          // 0x801C64E4  the private Ball (see Ball.c)
+extern s32 gSimClub[6];             // 0x801C65A0  per player: club the rehearsal started with
+
+#define SIM_BALL_STATE (*(s32*)&gSimBall[0x64])   // 2..4 in motion, 5 in a hazard, 1 stopped
+#define SIM_BALL_X     (*(f32*)&gSimBall[0x00])
+#define SIM_BALL_Z     (*(f32*)&gSimBall[0x08])
+
+void fn_80050D24(u8 bNoRandom);                                   // ball physics: randomness off
+void Ball_Launch(void* pBall, int nClub, int nKind, f32 fPower, f32 fAim, int bSim, f32* pA, f32* pB);
+void Ball_SimStep(void* pBall, f32 fDt, f32 fScale);              // 0x8005585C
+f32  fn_8002CD20(int nPlayer);                                    // aim angle to the target
+void fn_8002D774(int nPlayer);
+int  fn_8002D3EC(int nPlayer);
+void fn_8002D544(int nPlayer, f32* pOut);
+void fn_8002D680(int nPlayer, f32* pOut);
+void fn_8001C774(int nHandle, int nClub);
+void fn_8001C724(int nHandle, int nKind);
+f32  fn_800095F0(f32 x);                                          // sinf
+f32  fn_80009638(f32 x);                                          // cosf
+
+// +n on every modifier the rehearsal cares about (not LUCK), aggression the other way.
+#define BUMP_MODIFIERS(p, n)                                                                       \
+    (p)->attrMod[ATTR_POWER]         += (n);                                                       \
+    (p)->attrMod[ATTR_IQ]            += (n);                                                       \
+    (p)->attrMod[ATTR_AGGRESSION]    -= (n);                                                       \
+    (p)->attrMod[ATTR_BALL_STRIKING] += (n);                                                       \
+    (p)->attrMod[ATTR_APPROACH]      += (n);                                                       \
+    (p)->attrMod[ATTR_PUTTING]       += (n);                                                       \
+    (p)->attrMod[ATTR_RECOVERY]      += (n);
+
+// The hazard code calls this when the ball it is handling is the rehearsal's.
+void AI_SimAbort(void) {
+    gSimAborted = 1;
+}
+
+// Everything that follows from the target and the club choice: aim angle, the club for each shot
+// kind, the shot kind for the distance, the club (a CPU's by reach, one longer when the target is
+// within 30 of its own height), power, and the two launch parameter blocks.
+void Shot_Prepare(int nPlayer, u8 bNotify) {
+    Player* p = &gPlayers[nPlayer];
+    int     i;
+    f32     fRise, fDist;
+
+    p->fAim = fn_8002CD20(nPlayer);
+    for (i = 0; i < 8; i++) {
+        p->nShotKind      = i;
+        p->nClubPerKind[i] = AI_ClubForShot(nPlayer, p->nShotKind, 0, p->fDistance);
+    }
+    p->nShotKind  = AI_ShotKindForDistance(nPlayer, p->fDistance);
+    p->nShotKind2 = p->nShotKind;
+    if (Player_IsCPU(nPlayer)) {
+        fRise = gPlayers[nPlayer].fTargetY - gPlayers[nPlayer].fBallY;
+    } else {
+        fRise = 0.0f;
+    }
+    fDist = p->fDistance;
+    if (Player_IsCPU(nPlayer)) {
+        p->nClub = AI_ClubForShot(nPlayer, p->nShotKind, 1, fDist);
+        if (fRise >= -30.0f && fRise < 30.0f) {
+            AI_ClubLonger(nPlayer, &p->nClub, 1);
+        }
+    } else {
+        p->nClub = AI_ClubForShot(nPlayer, p->nShotKind, 0, fDist);
+    }
+    fn_8002D774(nPlayer);
+    if (!Player_IsCPU(nPlayer)) {
+        Vec_Copy(&p->fTargetX, p->vTarget2);
+        AI_PlanShot(nPlayer, &p->fTargetX);
+    }
+    p->nShotFlag = fn_8002D3EC(nPlayer);
+    p->fPower    = AI_PowerForTarget(nPlayer);
+    fn_8002D544(nPlayer, p->vLaunchA);
+    fn_8002D680(nPlayer, p->vLaunchB);
+    if (bNotify) {
+        fn_8001C774(gPlayers[nPlayer].nShotHandle, gPlayers[nPlayer].nClub);
+        fn_8001C724(gPlayers[nPlayer].nShotHandle, gPlayers[nPlayer].nShotKind);
+    }
+}
+
+// Turn the aim by fDelta radians (wrapped to -pi..pi) and re-plan the target at the same distance.
+void AI_NudgeAim(int nPlayer, f32 fDelta) {
+    Player* p = &gPlayers[nPlayer];
+    f32     vTarget[4];
+    f32     fSin, fCos;
+
+    p->fAim += fDelta;
+    if (p->fAim < -PI) {
+        p->fAim += 2 * PI;
+    } else if (p->fAim > PI) {
+        p->fAim -= 2 * PI;
+    }
+    fSin = fn_800095F0(p->fAim);
+    fCos = fn_80009638(p->fAim);
+    vTarget[0] = gPlayers[nPlayer].fBallX + -fSin * gPlayers[nPlayer].fDistance;
+    vTarget[2] = gPlayers[nPlayer].fBallZ + fCos * gPlayers[nPlayer].fDistance;
+    AI_PlanShot(nPlayer, vTarget);
+}
+
+// Lengthen the shot by fDelta and re-plan the target on the same line.
+void AI_NudgeDistance(int nPlayer, f32 fDelta) {
+    Player* p = &gPlayers[nPlayer];
+    f32*    pAim;
+    f32*    pDist;
+    f32     vTarget[4];
+    f32     fSin, fCos;
+
+    p->fDistance += fDelta;
+    pAim  = &p->fAim;
+    pDist = &p->fDistance;
+    fSin  = fn_800095F0(*pAim);
+    fCos  = fn_80009638(*pAim);
+    vTarget[0] = gPlayers[nPlayer].fBallX + -fSin * *pDist;
+    vTarget[2] = gPlayers[nPlayer].fBallZ + fCos * *pDist;
+    AI_PlanShot(nPlayer, vTarget);
+}
+
+// *pClub goes nStep clubs longer (lower index), then as many shorter as it takes to find one
+// usable for the shot kind. Never the putter, never past the driver.
+void AI_ClubLonger(int nPlayer, s32* pClub, int nStep) {
+    int nClub;
+    u8  bOk;
+    if (nStep == 0 || *pClub == CLUB_PUTTER || *pClub < nStep) return;
+    nClub = *pClub - nStep;
+    bOk   = Club_UsableForKind(nPlayer, nClub, gPlayers[nPlayer].nShotKind);
+    while (nClub > 0 && !bOk) {
+        nClub--;
+        bOk = Club_UsableForKind(nPlayer, nClub, gPlayers[nPlayer].nShotKind);
+    }
+    if (bOk) *pClub = nClub;
+}
+
+// *pClub goes nStep clubs shorter (higher index), then further until one is usable.
+void AI_ClubShorter(int nPlayer, s32* pClub, int nStep) {
+    int nClub;
+    u8  bOk;
+    if (nStep == 0 || *pClub == CLUB_PUTTER || *pClub > CLUB_PUTTER - 1 - nStep) return;
+    nClub = *pClub + nStep;
+    bOk   = Club_UsableForKind(nPlayer, nClub, gPlayers[nPlayer].nShotKind);
+    while (nClub < CLUB_PUTTER - 1 && !bOk) {
+        nClub++;
+        bOk = Club_UsableForKind(nPlayer, nClub, gPlayers[nPlayer].nShotKind);
+    }
+    if (bOk) *pClub = nClub;
+}
+
+// One frame of the rehearsal. Returns 1 once the aim is settled. pOutDist2, when given, receives
+// the miss squared of the last landed rehearsal (1e10 until one lands).
+u8 AI_RehearseShot(int nPlayer, f32* pOutDist2, u8 bFast, f32 fTolerance) {
+    Player* p     = &gPlayers[nPlayer];
+    u8      bDone = 0;
+    f32     fPower;
+    f32     fDX, fDZ, fDist2;
+    int     nState;
+    s8      nTries;
+
+    if (pOutDist2 != NULL) *pOutDist2 = 1e10f;
+
+    switch (p->nRehearseState) {
+    case 2:     // reset
+        gSimHaveResult          = 0;
+        gSimBestDist            = 1e9f;
+        gSimAborted             = 0;
+        gSimClubTries[nPlayer]  = 0;
+        gSimClub[nPlayer]       = gPlayers[nPlayer].nClub;
+        p->nRehearseState       = 0;
+        break;
+
+    case 0:     // launch
+        fn_80005628(gSimBall, p->ball, sizeof(gSimBall));
+        fPower = p->fPower * AI_PowerScale(nPlayer);
+        if (fPower > 1.5f) fPower = 1.5f;
+        fn_80050D24(1);
+        Ball_Launch(gSimBall, p->nClub, p->nShotKind, fPower, p->fAim, 1, p->vLaunchA, p->vLaunchB);
+        fn_80050D24(0);
+        p->nRehearseState = 1;
+        break;
+
+    case 1:     // step
+        gSimAborted = 0;
+        fn_80050D24(1);
+        if (bFast) {
+            Ball_SimStep(gSimBall, 0.1f, 1.0f);
+        } else {
+            Ball_SimStep(gSimBall, 0.2f, 1.0f);
+        }
+        fn_80050D24(0);
+        if (gSimAborted) {
+            if (gSimHaveResult) {
+                p->fTargetX       = gSimBestAim[0];
+                p->fTargetZ       = gSimBestAim[2];
+                p->nRehearseState = 0;
+                break;
+            }
+            BUMP_MODIFIERS(p, 5);
+            Golfer_ClampModifiers(p);
+            switch (p->nTargetType) {
+            case 0: break;
+            case 1: AI_NudgeAim(nPlayer, DEG(-1.0f)); break;
+            case 2: AI_NudgeAim(nPlayer, DEG(1.0f)); break;
+            case 3: AI_NudgeDistance(nPlayer, -5.0f); break;
+            case 4: AI_NudgeDistance(nPlayer, 5.0f); break;
+            case 5: AI_NudgeAim(nPlayer, DEG(-2.0f)); break;
+            case 6: AI_NudgeAim(nPlayer, DEG(2.0f)); break;
+            }
+            Shot_Prepare(nPlayer, 0);
+            p->nRehearseState = 0;
+            break;
+        }
+        nState = SIM_BALL_STATE;
+        if (nState == 2) break;
+        if (nState == 3 || nState == 4) break;
+        if (nState != 5) {
+            // Landed: measure the miss from where the CPU wanted the ball.
+            fDX    = SIM_BALL_X - p->vTarget2[0];
+            fDZ    = SIM_BALL_Z - p->vTarget2[2];
+            fDist2 = fDX * fDX + fDZ * fDZ;
+            if (pOutDist2 != NULL) *pOutDist2 = fDist2;
+            gSimHaveResult = 1;
+            if (fDist2 < gSimBestDist) {
+                gSimBestAim[0] = p->fTargetX;
+                gSimBestDist   = fDist2;
+                gSimBestAim[2] = p->fTargetZ;
+            }
+            if (fDist2 > fTolerance) {
+                p->fTargetX = p->fTargetX - 0.45f * fDX;
+                p->fTargetZ = p->fTargetZ - 0.45f * fDZ;
+            } else {
+                p->nRehearseState = 4;
+                bDone = 1;
+            }
+            AI_PlanShot(nPlayer, &p->fTargetX);
+            Shot_Prepare(nPlayer, 0);
+        } else {
+            // Stopped in a hazard: try another club, from the original, alternating longer and
+            // shorter by a growing step.
+            if (!gSimHaveResult) {
+                gSimClubTries[nPlayer]++;
+                nTries = gSimClubTries[nPlayer];
+                gPlayers[nPlayer].nClub = gSimClub[nPlayer];
+                if (nTries % 2 != 0) {
+                    AI_ClubLonger(nPlayer, &p->nClub, (nTries + 1) / 2);
+                } else {
+                    AI_ClubShorter(nPlayer, &p->nClub, (nTries + 1) / 2);
+                }
+            }
+            BUMP_MODIFIERS(p, 5);
+            AI_PlanShot(nPlayer, &p->fTargetX);
+            Shot_Prepare(nPlayer, 0);
+        }
+        if (!bDone) p->nRehearseState = 0;
+        break;
+
+    case 3:     // told to stop: settle for the best, or start over with a fresh target
+        if (gSimHaveResult) {
+            p->fTargetX = gSimBestAim[0];
+            p->fTargetZ = gSimBestAim[2];
+            AI_PlanShot(nPlayer, &p->fTargetX);
+            p->nRehearseState = 4;
+            bDone = 1;
+        } else {
+            BUMP_MODIFIERS(p, 25);
+            Golfer_ClampModifiers(p);
+            AI_ChooseTarget(nPlayer);
+        }
+        Shot_Prepare(nPlayer, 0);
+        break;
+
+    case 4:
+        return 1;
+    }
+    return bDone;
 }

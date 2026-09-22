@@ -98,14 +98,18 @@ typedef struct Player {
     s32  nHolesWon;             // 0x278  match play
     u8   unk27C[0x354 - 0x27C];
     s32  nClub;                 // 0x354
-    u8   unk358[0x378 - 0x358];
+    s32  nClubPerKind[8];       // 0x358  the club Shot_Prepare would pick for each shot kind
     f32  fAim;                  // 0x378  aim angle, radians
     f32  fPower;                // 0x37C  0..1 (up to 1.5)
     s32  nShotKind;             // 0x380  0 putt, 2/3 approach, 5..7 recovery
-    u8   unk384[0x3A8 - 0x384];
-    s32  nTargetType;           // 0x3A8
+    s32  nShotFlag;             // 0x384
+    f32  vLaunchA[4];           // 0x388  launch parameter blocks handed to Ball_Launch
+    f32  vLaunchB[4];           // 0x398
+    s32  nTargetType;           // 0x3A8  the aim point's "if it goes wrong" code: 1/2 turn 1 degree,
+                                //        3/4 5 yards shorter/longer, 5/6 turn 2 degrees
     u8   bPerfect;              // 0x3AC  no error / no forgiveness when set
-    u8   unk3AD[0x3B4 - 0x3AD];
+    u8   unk3AD[3];
+    s32  nShotKind2;            // 0x3B0
     f32  fBallX;                // 0x3B4
     f32  fBallY;                // 0x3B8
     f32  fBallZ;                // 0x3BC
@@ -125,9 +129,11 @@ typedef struct Player {
     u8   unkA5C[0xA68 - 0xA5C];
     s32  nSurface;              // 0xA68  surface type under the target, -1 none, 16 water
     u8   unkA6C[0xA90 - 0xA6C];
-    u8   unkA90[0xAF8 - 0xA90]; // 0xA90  club/shot parameters (opaque here)
+    u8   ball[0x68];            // 0xA90  the player's Ball (0xBC bytes, see Ball.c) - nLie is its +0x68
     s32  nLie;                  // 0xAF8
-    u8   unkAFC[0xC29 - 0xAFC];
+    u8   unkAFC[0xC18 - 0xAFC];
+    s32  nShotHandle;           // 0xC18
+    u8   unkC1C[0xC29 - 0xC1C];
     u8   bLowIQPenalty;         // 0xC29  quarters the IQ overconfidence term when set
     s8   nLevel;                // 0xC2A  CPU difficulty level: 25 modifier points per level
     u8   unkC2B[0xC30 - 0xC2B];
@@ -246,5 +252,7 @@ u8   AI_WithinOfPin(int nPlayer, f32 fDist);                  // 0x8002CD9C
 s8   AI_NearestTarget(f32* pPos, f32* pOut);
 void AI_DefaultTarget(int nPlayer);
 void AI_PlanShot(int nPlayer, f32* pTarget);
+void AI_ClubLonger(int nPlayer, s32* pClub, int nStep);
+void AI_ClubShorter(int nPlayer, s32* pClub, int nStep);
 
 #endif
