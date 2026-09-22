@@ -24,6 +24,12 @@ unsorted/code_800082F8.c:
 UStream.c:
 	.text       start:0x8000C624 end:0x8000E708
 
+CharClip.c:
+	.text       start:0x800176E8 end:0x800177A0
+
+skalib.c:
+	.text       start:0x80025640 end:0x80025B64
+
 Golfer.c:
 	.text       start:0x8002A630 end:0x8002F1D4
 
@@ -32,6 +38,15 @@ Ball.c:
 
 Swing.c:
 	.text       start:0x800589F8 end:0x80062E40
+
+CharAnim.c:
+	.text       start:0x800965DC end:0x80096690
+
+HoleScore.c:
+	.text       start:0x800D0AA0 end:0x800D0AF4
+
+Gimme.c:
+	.text       start:0x800E2810 end:0x800E292C
 
 dolphin/vi.c:
 	.text       start:0x8012E950 end:0x8013042C

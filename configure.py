@@ -652,6 +652,11 @@ config.libs = [
             Object(NonMatching, "Golfer.c"),
             Object(NonMatching, "Ball.c"),
             Object(NonMatching, "Swing.c"),
+            Object(NonMatching, "CharClip.c"),
+            Object(NonMatching, "skalib.c"),
+            Object(NonMatching, "CharAnim.c"),
+            Object(NonMatching, "HoleScore.c"),
+            Object(NonMatching, "Gimme.c"),
         ],
     },
     {

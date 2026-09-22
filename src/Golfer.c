@@ -1791,7 +1791,7 @@ void Options_SetDefaults(GameOptions* pOpt) {
     pOpt->unk0[4]  = 4;
     pOpt->unk7[1]  = 1;
     pOpt->unk7[2]  = 1;
-    pOpt->unk0[5]  = 1;
+    pOpt->bGimmes  = 1;
     pOpt->bSkipCameras = 0;
     pOpt->unkC     = 2;
     pOpt->nWind    = 0;

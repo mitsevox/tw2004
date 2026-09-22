@@ -274,7 +274,9 @@ typedef struct GameState {
     s32  nCurHole;              // 0x064  index into holeOrder
     u8   unk68[0xE4 - 0x68];
     s32  holeOrder[18];         // 0x0E4
-    u8   unk12C[0x20C - 0x12C];
+    u8   unk12C[0x1D8 - 0x12C];
+    u8   (*pfn1D8)(int nPlayer, int a); // 0x1D8  nonzero blocks a gimme (Gimme_Allowed asks with a = 1)
+    u8   unk1DC[0x20C - 0x1DC];
     void (*pfn20C)(int nPlayer); // 0x20C  called as a swing begins (state 1)
     u8   unk210[0x228 - 0x210];
     void (*pfn228)(int nPlayer); // 0x228  called every frame of the shot setup (state 10)
@@ -286,7 +288,8 @@ typedef struct GameState {
     u8   unk268[0x276 - 0x268];
     u8   b276;                  // 0x276  re-plan the shot as the swing begins
     u8   b277;                  // 0x277
-    u8   unk278[0x281 - 0x278];
+    u8   bGimmesAllowed;        // 0x278  this mode allows gimmes
+    u8   unk279[0x281 - 0x279];
     u8   b281;                  // 0x281  tutorial tips may show at setup
     u8   b282;                  // 0x282
     u8   b283;                  // 0x283  the special swing cameras may be used
@@ -391,7 +394,8 @@ void AI_ClubShorter(int nPlayer, s32* pClub, int nStep);
 
 // Game options at gSession + 0xE78 (the wind setting is nWind, at gSession + 0xE88).
 typedef struct GameOptions {
-    u8   unk0[6];               // 0x00
+    u8   unk0[5];               // 0x00
+    u8   bGimmes;               // 0x05  (gSession + 0xE7D) the Gimmes option, default on
     u8   bSkipCameras;          // 0x06  (gSession + 0xE7E) camera states end at once (inferred)
     u8   unk7[5];
     s32  unkC;                  // 0x0C

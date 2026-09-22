@@ -3444,7 +3444,7 @@ void fn_80062D98(void);
 u8    fn_800C44A8(View* pView, int nPlayer);
 u8    fn_800C44CC(View* pView, int nPlayer);
 u8    fn_800C44E0(View* pView, int nPlayer);
-void  fn_800965DC(int nHandle);
+void  CharAnim_StartTapIn(int nHandle);
 u8    fn_800C6D80(void);
 void  fn_80095B4C(int nHandle, int a, int b, void* pfn, int c, int d, f32 f1, f32 f2, f32 f3, f32 f4, f32 f5);
 void  fn_80072ACC(void);
@@ -3482,7 +3482,7 @@ void SwingState11_Enter(int nPlayer) {
     *(s32*)(gPlayers[nPlayer].nShotHandle + 0x20) = 7;
     *(s32*)(gPlayers[nPlayer].nShotHandle + 0x1C) = 7;
     if (gPlayers[nPlayer].uFlags & 8) {
-        fn_800965DC(gPlayers[nPlayer].nShotHandle);
+        CharAnim_StartTapIn(gPlayers[nPlayer].nShotHandle);
     } else {
         if (fn_800C6D80() || fn_800C44A8(pV, nPlayer) || fn_800C44CC(pV, nPlayer) || fn_800C44E0(pV, nPlayer)) {
             fn_80095B4C(gPlayers[nPlayer].nShotHandle, 1, 0, fn_80072ACC, 1, 8, -20000.0f, -30000.0f, -10000.0f, 0.0f, -10000.0f);
@@ -4043,7 +4043,7 @@ f32 fn_80062C28(int nHandle);
 void fn_80062B78(int nPlayer);
 void fn_80062B74(int nPlayer);
 void fn_80062B70(void);
-u8    fn_800E2810(int nPlayer);
+u8    Gimme_Allowed(int nPlayer);
 void fn_80062D0C(int nPlayer);
 void  fn_800E41D4(int nPlayer);
 extern Vec4 lbl_80183620;
@@ -4095,7 +4095,7 @@ void SwingState14_Update(int nPlayer) {
         fn_80062B78(nPlayer);
         fn_80062B74(nPlayer);
         fn_80062B70();
-        if (fn_800E2810(nPlayer)) {
+        if (Gimme_Allowed(nPlayer)) {
             SwingStack_Push(0xF, nPlayer);
         } else {
             fn_80063BF4(pV, *(f32*)(lbl_80281F78 + 0x170), (f32*)&vOffset);
