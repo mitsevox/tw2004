@@ -5,10 +5,11 @@ Local progress dashboard for the tw2004 decompilation.
     python tools/dashboard/server.py [--port 8420] [--host 0.0.0.0]
 
 Serves one page and /api/progress. Reads build/GW4E69/report.json (written by every `ninja`
-run), config/GW4E69/symbols.txt, and git history. No dependencies beyond the standard library.
-Read-only: it never builds or edits anything.
+run), config/GW4E69/symbols.txt, and build/dashboard_history.json (written by the post-commit
+hook, see refresh_history.py). Standard library only. Never launches another program: on this
+PC any console program started from a windowless process opens a Windows Terminal window.
 """
-import argparse, json, os, re, subprocess, sys, time, threading
+import argparse, json, os, re, sys, time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
@@ -17,21 +18,22 @@ REPORT = os.path.join(ROOT, 'build', VERSION, 'report.json')
 SYMBOLS = os.path.join(ROOT, 'config', VERSION, 'symbols.txt')
 HISTORY = os.path.join(ROOT, 'build', 'dashboard_history.json')
 
-_cache = {'history': None, 'history_head': None}
-_lock = threading.Lock()
+def git_branch():
+    """Current branch, read from .git/HEAD. No subprocess: on this PC a git call from a windowless
+    process opens a Windows Terminal window every time (see docs/decomp-notes.md)."""
+    try:
+        head = open(os.path.join(ROOT, '.git', 'HEAD')).read().strip()
+        return head.split('/')[-1] if head.startswith('ref:') else head[:7]
+    except Exception:
+        return '?'
 
 
-_git_lock = threading.Lock()
-
-
-def git(*args):
-    # Runs under pythonw (no console). CREATE_NO_WINDOW stops a console window per call, and
-    # stdin=DEVNULL stops git hanging on the missing stdin handle. Serialized: one git at a time.
-    with _git_lock:
-        r = subprocess.run(['git', '--no-pager', *args], cwd=ROOT, capture_output=True, text=True,
-                           stdin=subprocess.DEVNULL, timeout=60,
-                           creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0))
-    return r.stdout
+def read_history():
+    """Written by tools/dashboard/refresh_history.py (installed as a post-commit hook)."""
+    try:
+        return json.load(open(HISTORY))
+    except Exception:
+        return []
 
 
 def read_report():
@@ -84,52 +86,18 @@ def read_symbols():
     return {'functions': total, 'named': named}
 
 
-def history():
-    """Matched code bytes at every commit, from configure.py + splits.txt at that commit."""
-    head = git('rev-parse', 'HEAD').strip()
-    with _lock:
-        if _cache['history_head'] == head and _cache['history']:
-            return _cache['history']
-    out = []
-    log = git('log', '--reverse', '--format=%H|%ct|%s')
-    for line in log.splitlines():
-        h, ts, subject = line.split('|', 2)
-        cfg = git('show', f'{h}:configure.py')
-        units = set(re.findall(r'Object\(Matching, "([^"]+)"\)', cfg))
-        splits = git('show', f'{h}:config/{VERSION}/splits.txt')
-        matched = 0
-        funcs = 0
-        cur = None
-        for s in splits.splitlines():
-            m = re.match(r'^(\S.*?):\s*$', s)
-            if m:
-                cur = m.group(1)
-                continue
-            m = re.match(r'\s+\.text\s+start:0x([0-9A-Fa-f]+)\s+end:0x([0-9A-Fa-f]+)', s)
-            if m and cur in units:
-                matched += int(m.group(2), 16) - int(m.group(1), 16)
-        syms = git('show', f'{h}:config/{VERSION}/symbols.txt')
-        named = sum(1 for l in syms.splitlines() if re.match(r'^(?!fn_)\S+ = \.(?:text|init):0x[0-9A-Fa-f]+; // type:function', l))
-        out.append({'commit': h[:7], 'time': int(ts), 'subject': subject, 'matched_code': matched, 'named': named})
-    with _lock:
-        _cache['history'] = out
-        _cache['history_head'] = head
-    return out
-
-
 def progress():
     rep = read_report()
     sym = read_symbols()
-    hist = history()
-    commits = git('log', '-12', '--format=%h|%ct|%s')
+    hist = read_history()
     return {
         'now': time.time(),
         'report': rep,
         'symbols': sym,
         'history': hist,
-        'commits': [dict(zip(('hash', 'time', 'subject'), l.split('|', 2))) for l in commits.splitlines()],
-        'branch': git('rev-parse', '--abbrev-ref', 'HEAD').strip(),
-        'dirty': bool(git('status', '--porcelain').strip()),
+        'commits': [{'hash': h['commit'], 'time': h['time'], 'subject': h['subject']} for h in reversed(hist[-12:])],
+        'branch': git_branch(),
+        'dirty': False,
     }
 
 
@@ -171,7 +139,7 @@ async function load(){
  const d=await (await fetch('/api/progress')).json();const r=d.report,s=d.symbols;
  if(!r){document.getElementById('sub').textContent='No report.json yet - run ninja once.';return}
  const codeP=pct(r.matched_code,r.total_code),fnP=pct(r.matched_functions,r.total_functions),namedP=pct(s.named,s.functions),dataP=pct(r.matched_data,r.total_data);
- document.getElementById('sub').innerHTML=`branch <code>${d.branch}</code>${d.dirty?' (uncommitted changes)':''} &middot; last build ${ago(r.mtime)} &middot; ${new Date(r.mtime*1000).toLocaleString()}`;
+ document.getElementById('sub').innerHTML=`branch <code>${d.branch}</code> &middot; last build ${ago(r.mtime)} &middot; ${new Date(r.mtime*1000).toLocaleString()}`;
  document.getElementById('cards').innerHTML=
   card('Code matched',codeP.toFixed(3)+'%',`${fmt(r.matched_code)} / ${fmt(r.total_code)} bytes`,'big',codeP)+
   card('Functions matched',fmt(r.matched_functions),`of ${fmt(r.total_functions)} (${fnP.toFixed(2)}%)`,fnP)+

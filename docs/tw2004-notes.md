@@ -217,6 +217,10 @@ the Claude session. It does not survive a reboot; restart it with:
     schtasks /run /tn tw2004-dashboard
 
 Inbound port 8420 needs a Windows firewall allow rule (the PC's network is on the Public profile).
+The server launches no programs (see decomp-notes.md); commit history comes from
+`build/dashboard_history.json`, written by the post-commit hook. After cloning, run
+`python tools/dashboard/install_hook.py` once. To stop or restart: kill `pythonw3.13.exe`
+(not `pythonw`), then `schtasks /run /tn tw2004-dashboard`.
 
 Adding a function: the steps
 ----------------------------

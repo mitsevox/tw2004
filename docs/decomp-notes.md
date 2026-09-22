@@ -191,6 +191,16 @@ Tool quirks on Windows
   scripts somewhere plain such as `C:\dev\scratch`.
 - Windows application control may block an old compiler executable the first time. Do not work
   around it; retry or skip that version.
+- **[verified] Console programs from a windowless parent open Terminal windows.** With Windows
+  Terminal as the default console host, every console program (git, a compiler, dtk) started by a
+  process that has no console (pythonw, a scheduled task, a GUI app) gets its own Terminal window,
+  and the window stays open after the program exits. `CREATE_NO_WINDOW` does not prevent it. The
+  only reliable fix is for such a parent to launch nothing at all; do the work from a shell that has
+  a console and hand results over through files. The dashboard reads `.git/HEAD` and a JSON file
+  written by a post-commit hook for this reason.
+- **[verified] Check the real process name before killing.** The Store Python runs as
+  `pythonw3.13.exe`, not `pythonw`. `Get-Process pythonw` matches nothing, and a server you believe
+  you restarted keeps running the old code while the new one fails to bind the port.
 - Git warns about LF/CRLF on every commit. Harmless. `config/**/*.txt` must stay LF (set in `.gitattributes`).
 - In shell heredocs a backslash inside Python source can get eaten. Use `chr(92)` or the Edit tool.
 
