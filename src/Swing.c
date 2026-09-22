@@ -2805,7 +2805,7 @@ f32   fn_80062DCC(View* pView);               // and how far
 void  fn_800DDA14(int nPlayer);
 void  fn_8006C4A0(void);                      // take the shot back (a mulligan)
 void  fn_800DBDA8(int nPlayer);
-void  fn_80058F5C(int nPlayer);
+u8    fn_80058F5C(int nPlayer);              // the per-frame swing poll: the ball was struck
 void  fn_8006BB5C(int nPlayer);
 u8    fn_8004560C(void);
 u8    fn_800E430C(int nPlayer);
@@ -2902,5 +2902,224 @@ void SwingState12_Update(int nPlayer) {
         fn_8006C4A0();
         if (fn_800C6D28()) fn_800C6DE4();
         if (fn_800C6D64()) fn_800C6DFC();
+    }
+}
+
+
+void  fn_800A562C(u8 nPlayer);
+void  fn_8006BAA8(int nPlayer);
+u8    fn_800DA264(void);                      // tips are on
+u8    fn_800DA174(void);
+u8    fn_800DA1D4(void);
+u8    fn_800DA234(void);
+void  fn_800E505C(int nTip);
+void  fn_80062C80(int a, int b);
+void  fn_800D1DAC(int nPlayer);
+u8    fn_800EC550(void);
+u8    fn_800ED540(void);
+u8    fn_800F0818(void);
+void  fn_800EAC7C(void);
+void  fn_800E502C(void);
+void  fn_800E4FFC(void);
+void  fn_800ED548(void);
+void  Caddie_Start(int nPlayer);              // Golfer.c
+void  fn_80062C5C(void);
+void  fn_800DB4E8(int nPlayer);
+void  fn_80062B68(int nPlayer);
+u8    fn_800E5098(void);
+u8    fn_800E3DDC(int nPlayer);
+void  fn_800DD3A4(int nPlayer);
+void  fn_80062B6C(int nPlayer);
+void  fn_800C6618(View* pView, int nPlayer);
+int   fn_800C7138(View* pView);
+u8    fn_800C441C(View* pView, int nPlayer);
+void  fn_800642D0(View* pView, int nPlayer);
+void  fn_8005CF4C(int nState, int nPlayer);   // another stack operation
+
+// State 10 begins: setting up the shot. The address animation and the HUD's club and shot
+// kind; camera 12; the tutorial tips (first tee, first approach, first putt) for a human when
+// tips are on; the caddie starts; on the tee every player's ball is set up; the shot flags
+// are cleared; sound 7.
+void SwingState10_Enter(int nPlayer) {
+    s32*  pView = &gPlayers[nPlayer].nView0;
+    View* pV    = (View*)fn_80017028(*pView);
+    s32*  pHandle;
+    u8*   pFlag;
+    u8*   pC2E;
+    int   nView, i;
+
+    if (pV->nCurCamera == 0 && Player_IsCPU(nPlayer) && Game_GetMode() != 11) {
+        fn_800957D8(gPlayers[nPlayer].nShotHandle);
+    }
+    pHandle = &gPlayers[nPlayer].nShotHandle;
+    fn_80095744(*pHandle, 5);
+    fn_8001C774(*pHandle, gPlayers[nPlayer].nClub);
+    fn_8001C724(*pHandle, gPlayers[nPlayer].nShotKind);
+    fn_80062BFC(*pHandle);
+    fn_80062BE8(*pHandle);
+    fn_8007326C((u8*)*pHandle + 0x164);
+    pFlag = &gPlayers[nPlayer].swing.unk630;
+    if (*pFlag == 0) {
+        fn_80058FA4(nPlayer);
+        *pFlag = 1;
+    }
+    nView = *pView;
+    View_SetCamera(fn_80017028(nView), 0xC, nPlayer, nView);
+    fn_800DAE84();
+    fn_8001C804(nPlayer, 1, 1);
+    fn_80068AA8(nPlayer);
+    fn_800A562C((u8)nPlayer);
+    fn_8006BAA8(nPlayer);
+    fn_80067074(nPlayer, 0x2A, 0, -1);
+    fn_8006AD68(nPlayer);
+    fn_8006ACF8(nPlayer, 5);
+    gPlayers[nPlayer].fC20 = 0.0f;
+    pC2E = &gPlayers[nPlayer].unkC2E;
+    if (*pC2E == 0 && gpGame->b281 != 0 && !Player_IsCPU(nPlayer)) {
+        if (fn_800DA264() && fn_800DA174()) {
+            fn_800E505C(0);
+            fn_800E3D38(nPlayer, 0);
+            fn_80062C80(gPlayers[nPlayer].nC58, 0);
+        } else if (fn_800DA264() && fn_800DA1D4()) {
+            fn_800E505C(1);
+            fn_800E3D38(nPlayer, 0);
+            fn_80062C80(gPlayers[nPlayer].nC58, 0);
+        } else if (fn_800DA264() && fn_800DA234()) {
+            fn_800E505C(2);
+            fn_800E3D38(nPlayer, 0);
+            fn_80062C80(gPlayers[nPlayer].nC58, 0);
+        } else {
+            fn_800D1DAC(nPlayer);
+        }
+    }
+    if (*pC2E == 0 && !Player_IsCPU(nPlayer) && fn_800EC550() && fn_800ED540()) {
+        if (fn_800F0818()) {
+            fn_800EAC7C();
+            fn_800E502C();
+        } else {
+            fn_800EAC7C();
+            fn_800E4FFC();
+        }
+        fn_800E3D38(nPlayer, 0);
+        fn_80062C80(gPlayers[nPlayer].nC58, 0);
+        fn_800ED548();
+    }
+    Caddie_Start(nPlayer);
+    fn_80062C5C();
+    if (gPlayers[nPlayer].nLie == 0) {
+        fn_80047EF0(gPlayers[nPlayer].ball, nPlayer, 1);
+        for (i = 0; i < gSession.nNumPlayers; i++) {
+            fn_80047B6C(gPlayers[i].ball, i);
+            fn_80047BC0(gPlayers[i].ball, i);
+        }
+    }
+    fn_80047B6C(gPlayers[nPlayer].ball, nPlayer);
+    fn_80047BC0(gPlayers[nPlayer].ball, nPlayer);
+    *pC2E = 0;
+    gPlayers[nPlayer].bPlanReady = 0;
+    gPlayers[nPlayer].uFlags     = 0;
+    fn_80067074(nPlayer, 7, 0, -1);
+    fn_800DB4E8(nPlayer);
+    fn_80062B68(nPlayer);
+}
+
+// State 10 every frame: the shot setup. An idle timer (any button or the swing resets it, 10 s
+// wraps). When the swing has been made (the per-frame swing poll says so): the RNG stream 1 is
+// reseeded from the session seed, the view told, and it is state 11 (the swing animation) on a
+// special camera - or state 12 straight away. Otherwise, for a human outside a replay before
+// the swing starts: the caddie updates; button 6 re-plans the shot (the 0x264 hook or a putt
+// aims at the pin, else a fresh target) with the break line and HUD redone; button 5 on a
+// putt goes to the putt-line camera (state 7).
+void SwingState10_Update(int nPlayer) {
+    int   nClub = gPlayers[nPlayer].nClub;
+    u8    bSwung;
+    s32*  pController;
+    f32*  pIdle;
+    u32   uMask;
+
+    if (fn_800E5098()) return;
+    bSwung = fn_80058F5C(nPlayer);
+    gPlayers[nPlayer].fC20 += gSession.fFrameTime;
+    pController = &gPlayers[nPlayer].nController;
+    pIdle       = &gPlayers[nPlayer].fC20;
+    if (fn_80014300(*pController) || gPlayers[nPlayer].swing.nPhase != 0) {
+        *pIdle = 0.0f;
+    }
+    if (*pIdle >= 10.0f) {
+        *pIdle = 0.0f;
+    }
+    if (nClub != CLUB_PUTTER) {
+        fn_800A573C((u8)nPlayer);
+    }
+    if (gpGame->b282 != 0) {
+        if (fn_800E3DDC(nPlayer)) {
+            if (gPlayers[nPlayer].swing.nPhase != 0) fn_800E3D38(nPlayer, 0);
+        } else {
+            if (gPlayers[nPlayer].swing.nPhase == 0) fn_800E3D38(nPlayer, 1);
+        }
+    }
+    gpGame->pfn228(nPlayer);
+    if (bSwung) {
+        View* pV;
+        fn_800DD3A4(nPlayer);
+        fn_80062B6C(nPlayer);
+        fn_8000B1D4(1, gSession.nSeed);
+        pV = (View*)fn_80017028(gPlayers[nPlayer].nView0);
+        fn_800C6618(pV, nPlayer);
+        fn_800A5980((u8)nPlayer);
+        if (fn_800C7138(pV) == 0) {
+            fn_80067074(nPlayer, 0x3B, 0, 0);
+        }
+        if (gpGame->b283 != 0 &&
+            (fn_800C441C(pV, nPlayer) || fn_800C44A8(pV, nPlayer) || fn_800C44CC(pV, nPlayer) || fn_800C44E0(pV, nPlayer))) {
+            SwingStack_Push(0xB, nPlayer);
+        } else {
+            SwingStack_Push(0xC, nPlayer);
+        }
+        return;
+    }
+    if (Player_IsCPU(nPlayer)) return;
+    if (gSession.bReplay != 0) return;
+    if (gPlayers[nPlayer].swing.nPhase != 0) return;
+    Caddie_Update(nPlayer);
+    uMask = fn_800142AC(6, 0);
+    if (fn_800136DC(*pController) & uMask) {
+        if (gpGame->b284 != 0) {
+            s32* pView;
+            s32* pHandle;
+            if (gpGame->pfn264(nPlayer)) {
+                AI_DefaultTarget(nPlayer);
+            } else if (gPlayers[nPlayer].nShotKind == SHOT_PUTT) {
+                AI_DefaultTarget(nPlayer);
+            } else {
+                AI_ChooseTarget(nPlayer);
+            }
+            Shot_Prepare(nPlayer, 1);
+            pView = &gPlayers[nPlayer].nView0;
+            BreakLine_Start(*pView);
+            fn_8009B970(*pView);
+            fn_8001C804(nPlayer, 1, 1);
+            pHandle = &gPlayers[nPlayer].nShotHandle;
+            fn_800957D8(*pHandle);
+            fn_80095744(*pHandle, 5);
+            fn_800689D4(nPlayer);
+            fn_80062C38();
+            if (gSession.nSplitScreen != 0) {
+                fn_80062CB0(gPlayers[nPlayer].nC58, 1);
+            }
+            fn_80068AA8(nPlayer);
+            fn_800642D0((View*)fn_80017028(*pView), nPlayer);
+            fn_800E3D38(nPlayer, 1);
+        } else {
+            fn_80068AA8(nPlayer);
+        }
+        gpGame->pfn22C(nPlayer);
+    } else {
+        uMask = fn_800142AC(5, 0);
+        if ((fn_800136DC(*pController) & uMask) && gPlayers[nPlayer].nShotKind == SHOT_PUTT) {
+            fn_8005CF4C(7, nPlayer);
+        } else {
+            fn_800DEE4C(nPlayer);
+        }
     }
 }

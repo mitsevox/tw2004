@@ -271,7 +271,8 @@ typedef struct GameState {
     s32  holeOrder[18];         // 0x0E4
     u8   unk12C[0x20C - 0x12C];
     void (*pfn20C)(int nPlayer); // 0x20C  called as a swing begins (state 1)
-    u8   unk210[0x22C - 0x210];
+    u8   unk210[0x228 - 0x210];
+    void (*pfn228)(int nPlayer); // 0x228  called every frame of the shot setup (state 10)
     void (*pfn22C)(int nPlayer); // 0x22C  called after a re-plan in swing state 9
     u8   unk230[0x24C - 0x230];
     void (*pfn24C)(int nPlayer); // 0x24C  called when a swing leaves state 20
@@ -280,8 +281,11 @@ typedef struct GameState {
     u8   unk268[0x276 - 0x268];
     u8   b276;                  // 0x276  re-plan the shot as the swing begins
     u8   b277;                  // 0x277
-    u8   unk278[0x284 - 0x278];
-    u8   b284;                  // 0x284
+    u8   unk278[0x281 - 0x278];
+    u8   b281;                  // 0x281  tutorial tips may show at setup
+    u8   b282;                  // 0x282
+    u8   b283;                  // 0x283  the special swing cameras may be used
+    u8   b284;                  // 0x284  the re-plan button works
     u8   unk285;
     u8   b286;                  // 0x286  the flight camera toggles are allowed
     u8   b287;                  // 0x287  in-flight replays are allowed
