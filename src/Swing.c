@@ -1253,3 +1253,86 @@ void Swing_ResetBoostAndSpin(int nPlayer) {
     fn_8005A788(nPlayer, 1);
     fn_800AE3C4(nPlayer);
 }
+
+
+// ---- swing states: the small ones -----------------------------------------------------------------
+// gSwingStates is a table of 27 (enter, update, exit) callbacks; the current state is the top of
+// the player's SwingStack. Most of these drive the camera, HUD and sounds around the swing.
+
+void  View_SetCamera(void* pView, int nCamera, int nPlayer, int nView);   // 0x800632E4
+void  fn_800E3D38(int nPlayer, int a);
+void  fn_8006AD68(int nPlayer);
+void  fn_800DF280(void);
+void  fn_800E3C0C(int a);
+void  fn_80063C90(void* pView);
+void  fn_80063BF4(void* pView, f32 f, f32* pVec);
+void  fn_800DD904(void);
+extern u8  lbl_80281E10;
+typedef struct Vec4 { f32 x, y, z, w; } Vec4;
+extern Vec4 lbl_80183660;
+
+void SwingState15_Exit(int nPlayer) {
+}
+
+void SwingState16_Exit(int nPlayer) {
+}
+
+void SwingState17_Exit(int nPlayer) {
+}
+
+void SwingState23_Exit(int nPlayer) {
+}
+
+void SwingState23_Update(int nPlayer) {
+    fn_800DF280();
+}
+
+void SwingState22_Exit(int nPlayer) {
+    fn_800E3C0C(1);
+}
+
+void SwingState10_Exit(int nPlayer) {
+    u8* pFlag = &gPlayers[nPlayer].swing.unk630;
+    if (*pFlag != 0) {
+        *pFlag = 0;
+    }
+}
+
+void SwingState19_Update(int nPlayer) {
+    fn_80063C90(fn_80017028(gPlayers[nPlayer].nView0));
+}
+
+void SwingState14_Exit(int nPlayer) {
+    if (gPlayers[nPlayer].unkC2E == 0 && lbl_80281E10 == 0) {
+        fn_800DD904();
+    }
+    lbl_80281E10 = 0;
+}
+
+void SwingState07_Enter(int nPlayer) {
+    int nView = gPlayers[nPlayer].nView0;
+    View_SetCamera(fn_80017028(nView), 6, nPlayer, nView);
+}
+
+void SwingState08_Enter(int nPlayer) {
+    int nView = gPlayers[nPlayer].nView0;
+    View_SetCamera(fn_80017028(nView), 7, nPlayer, nView);
+    fn_8006AD68(nPlayer);
+}
+
+void SwingState05_Enter(int nPlayer) {
+    int nView = gPlayers[nPlayer].nView0;
+    View_SetCamera(fn_80017028(nView), 4, nPlayer, nView);
+    fn_800E3D38(nPlayer, 0);
+}
+
+void SwingState09_Enter(int nPlayer) {
+    int nView = gPlayers[nPlayer].nView0;
+    View_SetCamera(fn_80017028(nView), 4, nPlayer, nView);
+    fn_800E3D38(nPlayer, 0);
+}
+
+void SwingState17_Enter(int nPlayer) {
+    Vec4 vOffset = lbl_80183660;
+    fn_80063BF4(fn_80017028(gPlayers[nPlayer].nView0), 0.5f, (f32*)&vOffset);
+}

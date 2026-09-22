@@ -202,7 +202,8 @@ typedef struct Player {
     u8   unkC2B;                // 0xC2B
     u8   unkC2C;                // 0xC2C
     u8   unkC2D;                // 0xC2D
-    u8   unkC2E[2];
+    u8   unkC2E;                // 0xC2E
+    u8   unkC2F;
     s32  nRehearseState;        // 0xC30  AI_RehearseShot state machine
     u8   unkC34[0xEE8 - 0xC34];
     u32  uFlags;                // 0xEE8

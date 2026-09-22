@@ -1634,7 +1634,7 @@ u8    fn_800170A0(int nView);                                   // the view exis
 void  fn_80016D18(int nView, f32 x, f32 y, f32 w, f32 h);       // open it (screen fractions)
 void  fn_8001704C(int nView, int nPlayer);                      // attach a player
 void* fn_80017028(int nView);
-void  fn_800632E4(void* pCam, int nKind, int nPlayer, int nView);
+void  View_SetCamera(void* pView, int nCamera, int nPlayer, int nView);
 void  fn_80009710(f32* pQuat);                                  // identity (0, 0, 0, 1)
 void  fn_8005CE70(int nPlayer);
 void  fn_80095504(int n);
@@ -1697,7 +1697,7 @@ void Player_SetGolfer(int nPlayer, int nGolfer, int nController, u32 uBag, int b
             p->nView1 = 2;
             fn_8001704C(p->nView1, nPlayer);
             nView = p->nView1;
-            fn_800632E4(fn_80017028(nView), 0x19, nPlayer, nView);
+            View_SetCamera(fn_80017028(nView), 0x19, nPlayer, nView);
         } else {
             p->nView1 = 0;
             fn_8001704C(p->nView1, nPlayer);
