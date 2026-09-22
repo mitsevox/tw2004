@@ -186,14 +186,73 @@ Two other things in the same file, read but not decompiled: hitting a tree (surf
 deflects the ball by a random 12..19 degrees in two axes unless the player is flagged perfect
 (`0x800539F8`), and out of bounds is 600 m from the shot's start (`0x80054450`).
 
+The CPU's shot rehearsal (`AI_RehearseShot`, `0x8002B030`)
+-------------------------------------------------------------
+
+After choosing an aim point the CPU does not trust its plan: it rehearses it. A private copy of
+the ball (`gSimBall`) is launched with the planned club, aim and power, and the **real ball
+physics** are stepped with randomness switched off (`fn_80050D24(1)`) at a coarse 0.2 s per
+step (0.1 s in "fast" mode), one step per frame. When the simulated ball stops:
+
+- its miss from the intended target is measured; if it is over the tolerance, **the aim is
+  moved by 45% of the miss vector** and the shot is re-planned and rehearsed again - a
+  fixed-point search that converges on the aim that lands where the CPU wanted;
+- if the ball never got there (stopped short, or the sim reported failure), the club is
+  swapped up and down by growing steps and **the golfer's attribute modifiers get +5 (aggression
+  -5) for the next attempt**, capped by `Golfer_ClampModifiers`;
+- within tolerance: done, the rehearsed aim becomes the shot, and only then `AI_ApplyError`
+  worsens it by skill (the CPU path in `Swing.c`, `0x8005E0BC`).
+
+So hypothesis 2 was right after all in its first half too: the CPU **does** solve its shot -
+not by inverting a formula, but by simulating it until it lands.
+
+The caddie (`Caddie_Start` / `Caddie_Update` / `Caddie_GetTip`, `0x8002DB80`..)
+-----------------------------------------------------------------------------------
+
+The putt tip is that same rehearsal, run for you. On a putt, `Caddie_Start` copies your whole
+player struct into **slot 4**, marks the copy a CPU, aims it at the pin and resets the
+rehearsal. `Caddie_Update` steps it once per frame with a tolerance of 0.05 (0.0025 squared)
+and counts frames. `Caddie_GetTip` hands back slot 4's solved aim point, or **gives up after
+600 frames** (ten seconds) and reports "unavailable" (return value 2).
+
+Why it misreads: the search accepts an aim whose simulated ball *stops within 5 cm of the
+pin* - stopping at the hole, not dropping in; the simulation runs at 0.2 s steps where the real
+roll is integrated far finer, so breaking putts diverge; and it assumes a perfect stroke at the
+power the game computes for the distance. A long, breaking putt needs many rehearsal rounds of
+several seconds of simulated roll each, and hits the ten-second budget: that is the "tip
+unavailable". No random term anywhere in it. The `+5` modifiers from failed rehearsals land on
+slot 4, not on you.
+
+The drawn break line (`BreakLine_Start` / `BreakLine_Step`, `GoBreakLine.c`) is honest in the
+same way: it launches a putt at your *current* aim with the computed power, runs the real
+physics without randomness, and draws 450 samples of the trail, recomputing only once your aim
+has been still for less than an inch of movement.
+
+The CPU's per-shot modifiers (`AI_SetShotModifiers`, `0x8002A630`, exact)
+--------------------------------------------------------------------------
+
+Before every CPU shot, `Player_IsCPU` gated, its eight modifiers (POWER, IQ, AGGRESSION,
+STRIKING, APPROACH, PUTTING, RECOVERY, LUCK; aggression always the opposite sign) are set:
+
+    game mode 11 (scenarios)          all 0
+    per-player level (0xC2A) != 0     25 x level
+    strokes on this hole >= par + 2   20 x (strokes - par - 1)
+    strokes on this hole == par + 1   10
+    game mode 4, CPU leads by N holes -5 x N (POWER: random -5..+4)
+    otherwise                         each a random -5..+4
+
+So a CPU that is having a bad hole gets **better** as it goes - +10 at bogey pace, +20 at
+double, +40 at triple - and in match play it gets **worse** by 5 per hole it leads. The base
+attributes never change; these are the modifiers `Golfer_GetAttribute` adds in mode 2, capped
+at 100 (110 for POWER, IQ, AGGRESSION).
+
 What none of this reads
 -----------------------
 
-`AI_ChooseTarget`, `AI_ApplyError`, `AI_PlanShot`, both power functions, the forgiveness
-function, boost, spin and rumble read: the player's own attributes, the shot geometry (ball,
-target, pin, distance), lie, club tables, and the RNG. None of them reads a score, a hole
-standing, or another player. **The one exception found is in `Golfer_IsLucky`**: the match-play
-holes-won comparison above, in game mode 4 only. (Wind generation is still unread.)
+The swing and physics code reads only the player's own attributes, the shot geometry, club
+tables and the RNG. The score reaches the attributes through two doors: `Golfer_IsLucky`
+(holes-won, mode 4, humans) and `AI_SetShotModifiers` (strokes vs par on the hole, and
+holes-won in mode 4, CPU only). (Wind generation is still unread.)
 
 EA's random number generator
 ----------------------------

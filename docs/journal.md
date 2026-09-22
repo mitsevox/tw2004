@@ -156,6 +156,13 @@ Dated log of what was done and decided, newest last. Facts and lessons belong in
   constants. `Ball_CupPull` bends a ball within 15 cm toward the hole; the cup itself is
   geometry. New `Ball.c` unit. One trap on the way: stale split asm files from before the new
   units were shadowing the fresh ones - delete `build/GW4E69/asm` and re-run `dtk dol split`.
+- **Hypothesis 1 answered, and the biggest find of the day fell out of it.** Following the
+  break line's "no randomness" flag to its other users found `AI_RehearseShot`: the CPU
+  simulates its shot with the real physics and corrects the aim by 45% of the miss until it
+  lands. The caddie is that rehearsal run on a copy of the human in slot 4, with a 600-frame
+  budget. And its per-shot setup, `AI_SetShotModifiers` (exact), is the rubber band hypothesis 3
+  was looking for: +10/+20/+40 as the CPU's hole goes wrong, -5 per hole it leads in match play.
+  Three hypotheses revised in one sitting; all five now answered.
 
 **Working agreements**
 - Show the plain-English logic and the C before building anything non-trivial.

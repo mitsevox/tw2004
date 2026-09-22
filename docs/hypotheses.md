@@ -33,7 +33,15 @@ The code will show which: look for a loop counter compared against a constant, o
 versus a "no candidate passed" exit. Either way the search granularity (step size in aim angle and
 power) is what makes the tip miss.
 
-**Status:** open.
+**Result (2026-09-22, in C):** **a search with a budget, exactly as refined.** The tip is the
+CPU's shot rehearsal (`AI_RehearseShot`) run on a copy of you in player slot 4: the real ball
+physics, randomness off, stepped 0.2 s per frame, aim moved 45% of the miss each round until
+the simulated ball *stops within 5 cm of the pin*. `Caddie_GetTip` gives up after 600 frames -
+ten seconds - and that is "unavailable". Systematic, not random: it solves for stopping at the
+hole rather than dropping, at a coarse timestep, assuming a perfect stroke. Details in
+[`gameplay.md`](gameplay.md).
+
+**Status:** answered.
 
 2. AI shots are solved backwards from the pin, then nerfed by skill
 -------------------------------------------------------------------
@@ -51,13 +59,13 @@ shots per club.
 list, so start from callers of the tip solver once `GoBreakLine.c` / `Swing.c` are understood, and
 from `CharSliders.c` / `EASportsBio.c` (`0x80124B5C`) for attribute reads.
 
-**Result (2026-09-22):** **refuted in its first half, confirmed in its second.** The AI does
-not solve from the pin: `AI_ChooseTarget` (`0x8002C2DC`) picks from a table of *authored aim
-points* per hole, filtered by requirement bytes against POWER, AGGRESSION and the shot's skill,
-and by club reach. Then `AI_ApplyError` (`0x8002B59C`) worsens the aim angle and distance by
-`(100 - skill)` scaled per shot type, with a random blunder roll on approach shots. IQ's only
-job is to inflate the CPU's idea of its own skill when choosing a target. Full detail in
-[`gameplay.md`](gameplay.md).
+**Result (2026-09-22, revised):** **confirmed, with the mechanism.** The *target* comes from
+a table of authored aim points per hole (`AI_ChooseTarget`), filtered against POWER, AGGRESSION
+and the shot's skill. The *shot* to reach it is then solved by rehearsal (`AI_RehearseShot`):
+the real physics simulated with randomness off, the aim corrected by 45% of the miss each
+round until it lands. Only then does `AI_ApplyError` worsen the aim and distance by
+`(100 - skill)` per shot type, with a random blunder roll on approach shots. IQ inflates the
+CPU's idea of its own skill when choosing a target. Full detail in [`gameplay.md`](gameplay.md).
 
 **Status:** answered.
 
@@ -83,7 +91,14 @@ World Tour (the one-on-one match-play mode), which is also where CPU pros use th
 second attribute block. So: no rubber band on the swing or the AI, one small deliberate one on
 luck in match play. Wind generation is still unread.
 
-**Status:** answered (with the exception above); wind still to read.
+**Revised (later the same day):** **refuted for the CPU.** `AI_SetShotModifiers` (`0x8002A630`,
+exact in C) sets every CPU shot's attribute modifiers from its standing: +10 when it is one over
+on the hole, +20 per stroke beyond, and in match play -5 per hole it leads. Plus +5 for every
+failed rehearsal of the shot. The human's swing has no such term; the human's only score-linked
+effect is the luck doubling above. So: no rubber band on you, a deliberate one on the CPU in
+both directions.
+
+**Status:** answered - refuted for the CPU, upheld for the human swing; wind still to read.
 
 4. Which attributes touch which math, and whether human and CPU are treated alike
 ---------------------------------------------------------------------------------

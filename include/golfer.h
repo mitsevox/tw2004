@@ -93,7 +93,8 @@ typedef struct Player {
     s32  unk4;                  // 0x004
     GolferRecord golfer;        // 0x008
     s8   attrMod[NUM_ATTRS];    // 0x148  modifiers on top of the record
-    u8   unk154[0x278 - 0x154];
+    s32  nStrokes[18];          // 0x154  strokes taken per hole
+    u8   unk19C[0x278 - 0x19C];
     s32  nHolesWon;             // 0x278  match play
     u8   unk27C[0x354 - 0x27C];
     s32  nClub;                 // 0x354
@@ -128,7 +129,10 @@ typedef struct Player {
     s32  nLie;                  // 0xAF8
     u8   unkAFC[0xC29 - 0xAFC];
     u8   bLowIQPenalty;         // 0xC29  quarters the IQ overconfidence term when set
-    u8   unkC2A[0xEE8 - 0xC2A];
+    s8   nLevel;                // 0xC2A  CPU difficulty level: 25 modifier points per level
+    u8   unkC2B[0xC30 - 0xC2B];
+    s32  nRehearseState;        // 0xC30  AI_RehearseShot state machine
+    u8   unkC34[0xEE8 - 0xC34];
     u32  uFlags;                // 0xEE8
     u8   unkEEC[0xEF0 - 0xEEC];
     u32  uFlagsEF0;             // 0xEF0  bit 1: target is over water

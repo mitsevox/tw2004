@@ -618,6 +618,8 @@ void AI_DefaultTarget(int nPlayer) {
     Vec_Copy(pTarget, p->vTarget2);
 }
 
+int  fn_8002BBA4(void);                 // gpGame->nCurHole
+void fn_80005628(void* pDst, void* pSrc, int nBytes);   // memcpy
 extern s8 gLuckOdds[8];                 // 0x802810B0  "1 in n" per player: 12 12 12 12
 u8   fn_80101D4C(int nPlayer);          // a CPU in game mode 11 is always lucky
 u8   fn_800DA234(void);                 // the current hole is the flagged one
@@ -667,4 +669,151 @@ u8 Golfer_IsLucky(int nPlayer) {
         bLucky = 0;
     }
     return bLucky;
+}
+
+// ---- per-shot modifiers (CPU only) ------------------------------------------------------------
+
+// Set a CPU golfer's attribute modifiers for the shot it is about to play. A per-player level
+// overrides everything; otherwise the worse its hole is going the better it gets (+10 at one
+// over, +20 per stroke beyond); in game mode 4 it loses 5 per hole it leads the match by;
+// otherwise every modifier is a random -5..+4. Aggression always moves the other way.
+void AI_SetShotModifiers(int nPlayer) {
+    Player* p = &gPlayers[nPlayer];
+    int     nPar, nHole, nStrokes;
+    s8      nLevel;
+    if (Game_GetMode() == 11) {
+        p->attrMod[ATTR_POWER]         = 0;
+        p->attrMod[ATTR_IQ]            = 0;
+        p->attrMod[ATTR_AGGRESSION]    = 0;
+        p->attrMod[ATTR_BALL_STRIKING] = 0;
+        p->attrMod[ATTR_APPROACH]      = 0;
+        p->attrMod[ATTR_PUTTING]       = 0;
+        p->attrMod[ATTR_RECOVERY]      = 0;
+        p->attrMod[ATTR_LUCK]          = 0;
+        return;
+    }
+    nPar     = fn_800D2B08();
+    nHole    = fn_8002BBA4();
+    nLevel   = p->nLevel;
+    nStrokes = p->nStrokes[nHole];
+    if (nLevel != 0) {
+        p->attrMod[ATTR_POWER]         = nLevel * 25;
+        p->attrMod[ATTR_IQ]            = p->nLevel * 25;
+        p->attrMod[ATTR_AGGRESSION]    = p->nLevel * -25;
+        p->attrMod[ATTR_BALL_STRIKING] = p->nLevel * 25;
+        p->attrMod[ATTR_APPROACH]      = p->nLevel * 25;
+        p->attrMod[ATTR_PUTTING]       = p->nLevel * 25;
+        p->attrMod[ATTR_RECOVERY]      = p->nLevel * 25;
+        p->attrMod[ATTR_LUCK]          = p->nLevel * 25;
+    } else if (nStrokes >= nPar + 2) {
+        int n = nStrokes - (nPar + 1);
+        p->attrMod[ATTR_POWER]         = n * 20;
+        p->attrMod[ATTR_IQ]            = n * 20;
+        p->attrMod[ATTR_AGGRESSION]    = n * -20;
+        p->attrMod[ATTR_BALL_STRIKING] = n * 20;
+        p->attrMod[ATTR_APPROACH]      = n * 20;
+        p->attrMod[ATTR_PUTTING]       = n * 20;
+        p->attrMod[ATTR_RECOVERY]      = n * 20;
+        p->attrMod[ATTR_LUCK]          = n * 20;
+    } else if (nStrokes >= nPar + 1) {
+        p->attrMod[ATTR_POWER]         = 10;
+        p->attrMod[ATTR_IQ]            = 10;
+        p->attrMod[ATTR_AGGRESSION]    = -10;
+        p->attrMod[ATTR_BALL_STRIKING] = 10;
+        p->attrMod[ATTR_APPROACH]      = 10;
+        p->attrMod[ATTR_PUTTING]       = 10;
+        p->attrMod[ATTR_RECOVERY]      = 10;
+        p->attrMod[ATTR_LUCK]          = 10;
+    } else if (Game_GetMode() == 4) {
+        int nLead = gPlayers[1].nHolesWon - gPlayers[0].nHolesWon;
+        p->attrMod[ATTR_POWER] = Rand_Next(0) % 10 - 5;
+        if (nLead > 0) {
+            p->attrMod[ATTR_IQ]            = nLead * -5;
+            p->attrMod[ATTR_AGGRESSION]    = nLead * -5;
+            p->attrMod[ATTR_BALL_STRIKING] = nLead * -5;
+            p->attrMod[ATTR_APPROACH]      = nLead * -5;
+            p->attrMod[ATTR_PUTTING]       = nLead * -5;
+            p->attrMod[ATTR_RECOVERY]      = nLead * -5;
+            p->attrMod[ATTR_LUCK]          = nLead * -5;
+        } else {
+            p->attrMod[ATTR_IQ]            = Rand_Next(0) % 10 - 5;
+            p->attrMod[ATTR_AGGRESSION]    = Rand_Next(0) % 10 - 5;
+            p->attrMod[ATTR_BALL_STRIKING] = Rand_Next(0) % 10 - 5;
+            p->attrMod[ATTR_APPROACH]      = Rand_Next(0) % 10 - 5;
+            p->attrMod[ATTR_PUTTING]       = Rand_Next(0) % 10 - 5;
+            p->attrMod[ATTR_RECOVERY]      = Rand_Next(0) % 10 - 5;
+            p->attrMod[ATTR_LUCK]          = Rand_Next(0) % 10 - 5;
+        }
+    } else {
+        p->attrMod[ATTR_POWER]         = Rand_Next(0) % 10 - 5;
+        p->attrMod[ATTR_IQ]            = Rand_Next(0) % 10 - 5;
+        p->attrMod[ATTR_AGGRESSION]    = Rand_Next(0) % 10 - 5;
+        p->attrMod[ATTR_BALL_STRIKING] = Rand_Next(0) % 10 - 5;
+        p->attrMod[ATTR_APPROACH]      = Rand_Next(0) % 10 - 5;
+        p->attrMod[ATTR_PUTTING]       = Rand_Next(0) % 10 - 5;
+        p->attrMod[ATTR_RECOVERY]      = Rand_Next(0) % 10 - 5;
+        p->attrMod[ATTR_LUCK]          = Rand_Next(0) % 10 - 5;
+    }
+    Golfer_ClampModifiers(p);
+}
+
+// ---- the caddie ---------------------------------------------------------------------------------
+// The putt tip is the CPU's shot rehearsal run on a copy of the human in player slot 4: the copy
+// is made a CPU, aimed at the pin, and AI_RehearseShot is stepped once per frame until the
+// simulated ball stops within 0.05 of the target. 600 frames and it gives up.
+
+#define CADDIE_SLOT       4
+#define CADDIE_TOLERANCE  0.0025f   // 0.05 squared
+#define CADDIE_MAX_FRAMES 599
+
+extern u8  gCaddieDone;             // 0x80281D49
+extern u8  gCaddieActive;           // 0x80281D4A
+extern s32 gCaddieFrames;           // 0x80281D4C
+
+u8 AI_RehearseShot(int nPlayer, f32* pOutDist2, u8 bFast, f32 fTolerance);   // 0x8002B030
+
+void Caddie_Start(int nPlayer) {
+    if (!gPlayers[nPlayer].bPerfect && gPlayers[nPlayer].nShotKind != SHOT_PUTT) return;
+    if (Player_IsCPU(nPlayer)) return;
+    if (gSession.bNoLuck == 0) {
+        fn_80005628(&gPlayers[CADDIE_SLOT], &gPlayers[nPlayer], sizeof(Player));
+        gPlayers[CADDIE_SLOT].nController = CONTROLLER_CPU;
+        AI_DefaultTarget(CADDIE_SLOT);
+        gCaddieDone   = 0;
+        gPlayers[CADDIE_SLOT].nRehearseState = 2;
+        gCaddieActive = 1;
+        gCaddieFrames = 0;
+    }
+}
+
+void Caddie_Update(int nPlayer) {
+    if (!gPlayers[nPlayer].bPerfect && gPlayers[nPlayer].nShotKind != SHOT_PUTT) return;
+    if (Player_IsCPU(nPlayer)) return;
+    if (gSession.bNoLuck == 0) {
+        if (!gCaddieActive) return;
+        if (gPlayers[nPlayer].bPerfect) {
+            f32 fDist2;
+            AI_RehearseShot(CADDIE_SLOT, &fDist2, 0, CADDIE_TOLERANCE);
+            if (fDist2 < 0.0625f) gCaddieDone = 1;
+        } else {
+            if (gCaddieDone) return;
+            if (AI_RehearseShot(CADDIE_SLOT, NULL, 0, CADDIE_TOLERANCE)) gCaddieDone = 1;
+        }
+        gCaddieFrames++;
+    }
+}
+
+// 0 = no tip for this shot, 1 = tip ready (the aim point in pOut), 2 = gave up.
+int Caddie_GetTip(int nPlayer, f32* pOut) {
+    if (gPlayers[nPlayer].nShotKind != SHOT_PUTT || Player_IsCPU(nPlayer) || gSession.bNoLuck) {
+        pOut[0] = pOut[1] = pOut[2] = pOut[3] = 0.0f;
+        return 0;
+    }
+    if (gCaddieFrames > CADDIE_MAX_FRAMES) {
+        pOut[0] = pOut[1] = pOut[2] = pOut[3] = 0.0f;
+        gCaddieDone = 1;
+        return 2;
+    }
+    Vec_Copy(&gPlayers[CADDIE_SLOT].fTargetX, pOut);
+    return (s8)gCaddieDone;
 }
