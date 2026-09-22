@@ -282,7 +282,10 @@ typedef struct GameState {
     u8   b277;                  // 0x277
     u8   unk278[0x284 - 0x278];
     u8   b284;                  // 0x284
-    u8   unk285[0x290 - 0x285];
+    u8   unk285;
+    u8   b286;                  // 0x286  the flight camera toggles are allowed
+    u8   b287;                  // 0x287  in-flight replays are allowed
+    u8   unk288[0x290 - 0x288];
     s32  n290;                  // 0x290
     s32  n294;                  // 0x294
 } GameState;

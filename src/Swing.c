@@ -2796,3 +2796,111 @@ void SwingState18_Update(int nPlayer) {
     }
     fn_800DF280(nPlayer);
 }
+
+
+u8    fn_800C6D9C(void);
+void  fn_800DF824(int nPlayer);
+u8    fn_80062DD4(View* pView);               // the view has faded out
+f32   fn_80062DCC(View* pView);               // and how far
+void  fn_800DDA14(int nPlayer);
+void  fn_8006C4A0(void);                      // take the shot back (a mulligan)
+void  fn_800DBDA8(int nPlayer);
+void  fn_80058F5C(int nPlayer);
+void  fn_8006BB5C(int nPlayer);
+u8    fn_8004560C(void);
+u8    fn_800E430C(int nPlayer);
+u8    fn_800E53B8(void);
+u8    fn_800C6D28(void);
+void  fn_800C6DE4(void);
+u8    fn_800C6D64(void);
+void  fn_800C6DFC(void);
+
+// State 12: the ball is in the air. Once the view has faded past half way: holed -> state 13,
+// else state 14. Before the fade, a ball that has come to rest is marked (lie 12 with flag 8)
+// and the fade starts. While flying, buttons 22/23 (any pad for a CPU) drive the two flight
+// camera toggles. A human outside split screen and lessons: button 24 with a replay recorded
+// (and the game allowing it) replays the shot (state 11 via the replay launch); button 25 with
+// the mulligan allowed takes the shot back.
+void SwingState12_Update(int nPlayer) {
+    View* pV;
+    u8    bA = 0;
+    u8    bB = 0;
+    u32   uMask;
+    s32*  pController;
+
+    pV = (View*)fn_80017028(gPlayers[nPlayer].nView0);
+    if (fn_800C6D9C()) return;
+    fn_800DF824(nPlayer);
+    Swing_RumbleTick(nPlayer);
+    if (fn_80062DD4(pV) && fn_80062DCC(pV) > 0.5f) {
+        fn_800DDA14(nPlayer);
+        fn_8006C4A0();
+        fn_800DBDA8(nPlayer);
+        if (gPlayers[nPlayer].nLie == LIE_HOLED) {
+            SwingStack_Push(0xD, nPlayer);
+        } else {
+            SwingStack_Push(0xE, nPlayer);
+        }
+        return;
+    }
+    if (!fn_80062DD4(pV)) {
+        s32* pState = (s32*)(gPlayers[nPlayer].ball + 0x64);
+        if (*pState == 1 || *pState == 5 || *pState == 0) {
+            if (*pState != 5) *pState = 0;
+            if (gPlayers[nPlayer].uFlags & 8) {
+                gPlayers[nPlayer].nLie = LIE_HOLED;
+            }
+            fn_80062DB8(pV, 1);
+            return;
+        }
+    }
+    fn_80058F5C(nPlayer);
+    fn_8006BB5C(nPlayer);
+    if (gpGame->b286 != 0 && !fn_8004560C()) {
+        if (Player_IsCPU(nPlayer)) {
+            if (fn_80014300(fn_800142AC(0x16, 1))) {
+                bA = 1;
+            } else if (fn_80014300(fn_800142AC(0x17, 1))) {
+                bB = 1;
+            }
+        } else {
+            uMask       = fn_800142AC(0x16, 1);
+            pController = &gPlayers[nPlayer].nController;
+            if (fn_800136DC(*pController) & uMask) {
+                bA = 1;
+            } else {
+                uMask = fn_800142AC(0x17, 1);
+                if (fn_800136DC(*pController) & uMask) {
+                    bB = 1;
+                }
+            }
+        }
+        fn_80045558(bA, nPlayer);
+        if (bA) bB = 0;
+        fn_80045494(bB, nPlayer);
+    }
+    if (Player_IsCPU(nPlayer)) return;
+    if (gSession.nSplitScreen != 0) return;
+    if (fn_800E430C(nPlayer)) return;
+    if (fn_80100294()) return;
+    if (gReplayData[0xF10] != 0 && gpGame->b287 != 0) {
+        uMask = fn_800142AC(0x18, 0);
+        if ((fn_800136DC(gPlayers[nPlayer].nController) & uMask) && !(gPlayers[nPlayer].uFlags & 8) &&
+            (s8)SwingStack_Top(nPlayer) != 0x17 && !fn_800E53B8() &&
+            !(*(u32*)(gPlayers[nPlayer].nShotHandle + 0x10) & 0x40)) {
+            s32* pKeptState = (s32*)(gPlayers[nPlayer].ballBefore + 0x64);
+            if (*pKeptState != 0) *pKeptState = 1;
+            if (fn_800C6D28()) fn_800C6DE4();
+            if (fn_800C6D64()) fn_800C6DFC();
+            fn_8006C300(nPlayer);
+            SwingStack_Push(0xB, nPlayer);
+            return;
+        }
+    }
+    uMask = fn_800142AC(0x19, 0);
+    if ((fn_800136DC(gPlayers[nPlayer].nController) & uMask) && !(gPlayers[nPlayer].uFlags & 8) && fn_800DDDC8(nPlayer)) {
+        fn_8006C4A0();
+        if (fn_800C6D28()) fn_800C6DE4();
+        if (fn_800C6D64()) fn_800C6DFC();
+    }
+}
