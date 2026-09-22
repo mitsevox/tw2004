@@ -2544,3 +2544,78 @@ void SwingState13_Update(int nPlayer) {
     }
     fn_800DF280(nPlayer);
 }
+
+
+void  fn_80062D98(void);
+u8    fn_800C44A8(View* pView, int nPlayer);
+u8    fn_800C44CC(View* pView, int nPlayer);
+u8    fn_800C44E0(View* pView, int nPlayer);
+void  fn_800965DC(int nHandle);
+u8    fn_800C6D80(void);
+void  fn_80095B4C(int nHandle, int a, int b, void* pfn, int c, int d, f32 f1, f32 f2, f32 f3, f32 f4, f32 f5);
+void  fn_80072ACC(void);
+void  fn_80027764(u8* p, f32 f);
+void  fn_80047EF0(u8* pBall, int nPlayer, int a);   // tee the ball up
+void  fn_80047B6C(u8* pBall, int nPlayer);
+void  fn_80047BC0(u8* pBall, int nPlayer);
+void  fn_800DAF74(void);
+void  fn_800C6B7C(View* pView);
+
+// State 11 begins: the swing animation. The camera is 12 in a replay, else one of the three
+// special swing cameras (20..22) the view offers, else 13. The animation's event hooks are
+// registered (a wider window on the special cameras), the ball is teed up on the tee, and the
+// live ball's state is cleared for the launch.
+void SwingState11_Enter(int nPlayer) {
+    s32*  pView = &gPlayers[nPlayer].nView0;
+    View* pV    = (View*)fn_80017028(*pView);
+    s32*  pHandle;
+    u8*   pBall;
+
+    if (gSession.bReplay != 0) {
+        View_SetCamera(pV, 0xC, nPlayer, *pView);
+    } else {
+        fn_80062D98();
+        if (fn_800C44A8(pV, nPlayer)) {
+            View_SetCamera(pV, 0x14, nPlayer, *pView);
+        } else if (fn_800C44CC(pV, nPlayer)) {
+            View_SetCamera(pV, 0x15, nPlayer, *pView);
+        } else if (fn_800C44E0(pV, nPlayer)) {
+            View_SetCamera(pV, 0x16, nPlayer, *pView);
+        } else {
+            View_SetCamera(pV, 0xD, nPlayer, *pView);
+        }
+    }
+    fn_8001C804(nPlayer, 1, 1);
+    pHandle = &gPlayers[nPlayer].nShotHandle;
+    fn_800957D8(*pHandle);
+    *(s32*)(*pHandle + 0x20) = 7;
+    *(s32*)(*pHandle + 0x1C) = 7;
+    if (gPlayers[nPlayer].uFlags & 8) {
+        fn_800965DC(*pHandle);
+    } else {
+        if (fn_800C6D80() || fn_800C44A8(pV, nPlayer) || fn_800C44CC(pV, nPlayer) || fn_800C44E0(pV, nPlayer)) {
+            fn_80095B4C(*pHandle, 1, 0, fn_80072ACC, 1, 8, -20000.0f, -30000.0f, -10000.0f, 0.0f, -10000.0f);
+        } else {
+            fn_80095B4C(*pHandle, 1, 0, fn_80072ACC, 1, 8, -20000.0f, -90000.0f, -10000.0f, 0.0f, -10000.0f);
+        }
+        fn_80027764(*(u8**)(*(u8**)(*pHandle + 0x38) + 0x38), 1.0f);
+    }
+    Swing_ClearFrameFlag(nPlayer);
+    if (gPlayers[nPlayer].nLie == 0) {
+        fn_80047EF0(gPlayers[nPlayer].ball, nPlayer, 1);
+    }
+    pBall = gPlayers[nPlayer].ball;
+    fn_80047B6C(pBall, nPlayer);
+    fn_80047BC0(pBall, nPlayer);
+    if (gSession.bReplay != 0) {
+        fn_800DAE84();
+    } else {
+        fn_800DAF74();
+    }
+    fn_800C6B7C(pV);
+    fn_800DC524(1, nPlayer, 0.0f);
+    *(s32*)(gPlayers[nPlayer].ball + 0x64) = 0;
+    if (gSession.bReplay != 0) {
+        fn_80062CE0(1);
+    }
+}
