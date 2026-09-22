@@ -79,12 +79,34 @@ Dated log of what was done and decided, newest last. Facts and lessons belong in
   differed by register or statement shape. 27 more exact so far (Golfer 69/91, Swing 55/181).
   Rules in `decomp-notes.md`: the `lwzu` idiom is a repeated field access; 64-bit event ids;
   mask calls inline; chained assignment order; hoisted constants as locals; switch-with-one-case.
-- **Next:** apply the inline-mask rule to States 04/05/08/09/10/14 (eight functions, known fix);
-  one-liners in `SwingState02_Update` (`>` vs `<=`), `Luck_TakePerfectShot` (compare operand
-  order), `SwingState20_Exit` (loop counter placement); then `Shot_Prepare` (indexed store with a
-  separate i*4 register), `Swing_MeterError` (FPR order), `AI_ChooseTarget` (frame size). After
-  that `Ball.c`'s 21 KB of unwritten physics. Tools: `C:\dev\scratch	w\sbs2.py` (normalised
-  diff), `fnsrc.py` (print a function), `ptr_sweep.py` (baseline/apply/judge).
+- **Swing.c written out** (14.82% -> 15.70%): the inline-mask rule (States 04/05/08/09/10 exact),
+  59 small unwritten functions in one batch (58 exact), the swing state machine (push = replace
+  top, `fn_8005CF4C` push, `fn_8005CFD4` pop, `fn_8005D05C` reset, `fn_8005CCD8` tick), `Swing_Init`
+  (the file really is `Swing.c`: the allocator's file argument), the stick twist, the club trail
+  (25 head/grip samples) and its drawing (the "swing trail" option, textures "clubback" /
+  "clubdown"), State 11. Swing.c ~150/181 exact; left: `SwingState01_Update` (1.6 KB) and
+  register puzzles (`fn_8005CCD8/CD94/D05C`, `SwingStack_Push`, `fn_8005CFD4`, States 20/22 loops,
+  `fn_8005A478` 99.4%, `Swing_MeterError` 99.2%, `SwingState12_Update` 98.7%). Compiler rules
+  found: locals are stacked in reverse declaration order and declaration order picks the saved
+  registers (`tools`: `C:\dev\scratch\tw\permute_decls.py`, `variants.py`); short literals live in
+  .sdata; `beq next; b end` in a chain of tests is a one-case `switch` with `default: return`.
+- **The pool-cue gimme.** From the user's memory of TW2003: gimmes are within 18 in of the pin
+  (`Gimme_Allowed`); animation 11 (`CharAnim_StartTapIn`) picks a random clip from group 9 of the
+  golfer's animation library (`skalib.c`: `AnimLib_Find/Pick`, a played-mask so none repeats).
+  Libraries decoded (`SAL` objects; `tools/research/sal_dump.py`, `find_sal.py`): `gplptt12`, the
+  pool-cue tap-in, is in seven golfers' sets (Pops's only one). A Gecko code
+  (`tools/codes/pool_cue_gimme.txt`, hook at `0x80025AD8`) hands every gimme that clip when one of
+  the seven is in the round: **confirmed in game** (4 of 4). Gimme path decompiled into new units
+  `skalib.c` (EA's name), `CharClip.c`, `CharAnim.c`, `HoleScore.c`, `Gimme.c` (ours): 7/8 exact.
+  Golfer -> character file map in `formats/game-data.md` (Donatello's and McGregor's files keep
+  EA's working names Capone / McGruff).
+- **Next:** finish `skalib.c` (EA's file, ~18 KB, 0x80021C90..0x8002669C by its asserts: the
+  library loader `fn_80025F38`, the merge `fn_80024B18`, clip streaming) - fresh context from the
+  gimme work; then `SwingState01_Update`; then `Ball.c`. Scratch tools in `C:\dev\scratch\tw\`:
+  `sbs2.py` (normalised diff), `fnsrc.py`, `regress.py` (who lost 100%), `insert_fns.py` (add
+  functions at address positions), `unwritten.py`, `find_fn.py` (search asm by regexes),
+  `alldiffs.py`. The extracted discs are in `C:\dev\scratch\tw\disc\d1`, `d2`; the Dolphin install
+  is portable at `C:\Games\Dolphin` (game settings `User\GameSettings\GW4E69.ini`).
 - **SDK import (Level 0).** Copied Prime's `extern/sdk`, gave the SDK its own compiler settings, named
   data symbols by aligning references against Prime's objects, and linked 57 SDK units (162 functions).
   Matched code went 2,016 -> 53,392 bytes in one day. Pipeline in `tools/research/sdk/`.
