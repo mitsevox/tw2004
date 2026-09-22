@@ -1661,6 +1661,85 @@ void Swing_ClearFrameFlag(int nPlayer) {
     gPlayers[nPlayer].swing.n370 = 0;
 }
 
+void fn_8001EF34(f32* pSrc, f32* pDst, f32 fScale);   // scale
+
+// Record the club for its trail: the head (bone 0x53) and grip (0x52) go on the front of the
+// 25-entry history. When the head has moved more than 0.3 since the last entry, five in-between
+// entries are added instead, each blended from the last entry to now with the shaft re-extended
+// to the club's current length.
+void fn_8005A0FC(int nPlayer) {
+    f32        vB8[4];
+    f32        vA8[4];
+    f32        v98[4];
+    f32        v88[4];
+    f32        v78[4];
+    f32        v68[4];
+    f32        v58[4];
+    f32        v48[4];
+    f32        v38[4];
+    f32        v28[4];
+    f32        v18[4];
+    f32        v8[4];
+    ShotObj*   pObj = (ShotObj*)gPlayers[nPlayer].nShotHandle;
+    SwingData* pSw  = &gPlayers[nPlayer].swing;
+    int        nHead = fn_8001EED8(pObj->pView, 0x53);
+    int        nGrip = fn_8001EED8(pObj->pView, 0x52);
+    f32        f;                  // the head's move, then the blend step
+    f32        fLen;
+    int        k;
+    int        i;
+
+    Vec_Copy((*(f32 (**)[4][4])(pObj->pView + 8))[nHead][3], v98);
+    Vec_Sub(v98, pSw->trail[0].vHead, vB8);
+    f = fn_80009680(fn_8005CC18(vB8));
+    Vec_Copy(v98, vA8);
+    if (f > 0.3f && pSw->n370 != 0) {
+        v18[3] = 0.0f;
+        v28[3] = 0.0f;
+        Vec_Copy((*(f32 (**)[4][4])(pObj->pView + 8))[nHead][3], v88);
+        Vec_Copy((*(f32 (**)[4][4])(pObj->pView + 8))[nGrip][3], v68);
+        Vec_Copy(pSw->trail[0].vHead, v78);
+        Vec_Copy(pSw->trail[0].vGrip, v58);
+        Vec_Sub(v68, v58, v48);
+        Vec_Sub(v88, v78, v38);
+        Vec_Sub(v88, v68, v8);
+        fLen = fn_80009680(fn_8005CC18(v8));
+        for (i = 1; i <= 5; i++) {
+            f = (f32)i / 5.0f;
+            fn_8001EF34(v38, v18, f);
+            fn_8001EF34(v48, v28, f);
+            Vec_Add(v18, v78, v18);
+            Vec_Add(v28, v58, v28);
+            Vec_Sub(v18, v28, v8);
+            if (v8[0] != 0.0f || v8[1] != 0.0f || v8[2] != 0.0f || v8[3] != 0.0f) {
+                v8[3] = 0.0f;
+                Vec_Normalize(v8, v8);
+            }
+            fn_8001EF34(v8, v8, fLen);
+            Vec_Add(v8, v28, v8);
+            for (k = 24; k > 0; k--) {
+                fn_80005628(&pSw->trail[k], &pSw->trail[k - 1], 0x20);
+            }
+            Vec_Copy(v8, pSw->trail[0].vHead);
+            pSw->trail[0].vHead[3] = 1.0f;
+            Vec_Copy(v68, pSw->trail[0].vGrip);
+            if (pSw->n370 < 25) {
+                pSw->n370++;
+            }
+        }
+    } else {
+        for (k = 24; k > 0; k--) {
+            fn_80005628(&pSw->trail[k], &pSw->trail[k - 1], 0x20);
+        }
+        Vec_Copy(vA8, pSw->trail[0].vHead);
+        pSw->trail[0].vHead[3] = 1.0f;
+        Vec_Copy((*(f32 (**)[4][4])(pObj->pView + 8))[nGrip][3], pSw->trail[0].vGrip);
+        if (pSw->n370 < 25) {
+            pSw->n370++;
+        }
+    }
+}
+
 int fn_8001EE90(ShotObj* pObj);
 void fn_8005AD20(ShotObj* pObj, SwingData* pSw, int nStickX);
 int  fn_8005CC5C(void);

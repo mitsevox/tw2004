@@ -152,6 +152,13 @@ Reading compiler output
 - **[observed] `mr r0, r3; ...; mr rN, r0` around a call's result** (the value passing through r0
   before its home register) is the mark of an inlined helper's return value. Seen in fn_8005A478 with
   the unexplained `beq L; b L` pairs there; a bool or void inline helper did not reproduce them.
+- **[verified] Stack locals go in reverse declaration order** (the last declared gets the lowest
+  `r1` offset). Twelve 16-byte vectors in fn_8005A0FC matched once declared highest-address first.
+- **[verified] Declaration order picks the saved registers.** Two loop counters in fn_8005A0FC came
+  out swapped (r27/r28) until their declarations were swapped. Try this first on any diff that is
+  only a register permutation.
+- **[verified] One variable, two jobs.** When the original reuses one FPR for two unrelated values
+  (a distance, later a blend step), the source reused one local.
 - **[verified] Chained assignment stores backwards.** `a[0] = a[1] = a[2] = 0` stores 2, 1, 0;
   the original wrote four statements in order.
 - **[verified] A hoisted constant is a local.** `x * (1.0f / 128.0f)` with the constant loaded

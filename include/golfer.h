@@ -102,7 +102,7 @@ typedef struct SwingData {
     f32  fLaunchAX;             // 0x044  (0x418) copy of vLaunchA[0]
     f32  fPowerAfterError;      // 0x048  (0x41C)
     f32  fBackAngle;            // 0x04C  (0x420) the backswing's sideways angle, radians (0 on a putt)
-    u8   unk50[0x370 - 0x50];
+    struct { f32 vHead[4]; f32 vGrip[4]; } trail[25];  // 0x050  (0x424) the club's last 25 positions, newest first
     s32  n370;                  // 0x370  (0x744) cleared each phase step
     u8   unk374;
     u8   b375;                  // 0x375  (0x749) set by fn_8005A788
