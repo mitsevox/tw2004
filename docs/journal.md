@@ -213,3 +213,7 @@ Dated log of what was done and decided, newest last. Facts and lessons belong in
   event with the stick's forward direction as the sample, spin is added after impact (1 a frame
   to 20). `fn_8006BF60` is the replay recorder (fresh seed at every human launch), not spin.
   Swing.c: 30 functions in C.
+- Swing states: 43 of 67 callbacks in C (mostly camera/HUD glue; 28 exact so far in Swing.c).
+  Finds: state 6 is the putt preview, done by launching the caddie's putt with the player
+  briefly made a CPU; state 15 is where `Shot_Plan` runs for the next shot; lie 12 is "holed";
+  `Player.ballBefore` (0xB5C) keeps the ball as it lay and doubles as the preview ghost.

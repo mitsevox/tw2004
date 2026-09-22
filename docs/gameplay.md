@@ -41,6 +41,34 @@ both stick axes every frame: forward of it the reading maps smoothly down to 1, 
 reading jumps to ~179 and runs to 255 - so the first frame past the gate already reads a third
 of the way back. A CPU or a replay starts the swing immediately.
 
+The swing states (`gSwingStates`, 27 x enter/update/exit; 43 of 67 in C)
+--------------------------------------------------------------------------
+
+Around the swing itself sits a state machine on a per-player stack (`SwingStack_*`). What the
+states do, from their code:
+
+    1   the swing (the phase table below runs inside it); leaving it puts the ball back
+    2   a CPU thinks (its rehearsal); a human goes straight to 10
+    3   aiming (camera 1, camera 2 on a putt); the caddie updates here
+    4-7 setup sub-states: cameras 3/4/6, button polling; the caddie updates in 4 and 6
+    6   the putt preview: the caddie's solved putt is launched as a ghost (below)
+    8   camera 7, then back to 12 or 0
+    10  shot setup: starts the caddie, HUD, sounds
+    11  the swing animation plays; Swing_Launch at its impact frame
+    12  the ball is away
+    13, 14  the ball has come to rest (a copy is kept as "before the shot")
+    15  plan the next shot from where the ball lies (Shot_Plan)
+    16  a second setup state: animation 11, flag 8, a distance to the pin stored
+    18  holed out: the ball goes to the pin, lie 12 (LIE_HOLED), animation 12
+    19-23  camera states (saved-camera restore, flyovers, camera 25)
+
+**The putt preview** (state 6, `SwingState06_Enter`, in C) is the one with a trick in it: it
+takes the caddie's solved putt (`Caddie_ApplyTip`), **sets the player's controller to the CPU
+for one call of `Swing_Launch`** - so the launch has no swing error and no luck swap - keeps the
+launched ball as a ghost in the "ball before the shot" slot with no owner, and then restores the
+player's own club, power, aim, ball and controller. The preview you watch is a real shot played
+by the CPU code with your caddie's answer.
+
 Human swing: the phases (`gSwingPhaseFns`, all in C)
 ------------------------------------------------------
 
