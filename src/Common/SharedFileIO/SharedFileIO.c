@@ -35,7 +35,7 @@ typedef struct {
     int (*pfnSeek)(int uHandle, u32 uOffset, u32 uWhence);         // 0x34
     int (*pfnOp18)(int uHandle);                                        // 0x38
     void* pfn3C;
-    void* pfn40;
+    int (*pfnUpdate)(int* pProcess, int* pResult);                    // 0x40
     void* pfn44;
 } SFIOFuncTable;
 
@@ -72,6 +72,10 @@ extern void* memset(void* pDst, int c, u32 uLen);
 extern char* strcpy(char* pDst, const char* pSrc);
 extern u32   strlen(const char* p);
 extern void  fn_80172FA4(int);
+extern void  fn_80171308(int eDevice, void* pInfo);
+extern void  fn_8017124C(void* pDescriptor, void* pA, void* pB);
+extern int   fn_80173024(void* pDescriptor);
+extern BOOL  fn_80172D54(const char* pFilename);
 u32 SFIOGetHeaderSize(void);
 int SFIONumDevicesInMask(u16 uDeviceMask);
 int SFIOFirstDeviceFromMask(u16 uDeviceMask);
@@ -640,7 +644,7 @@ int SFIOInit(int* pDevices, const SFIOFuncTable* pFuncs, void* pAllocator) {
     if (!(pFuncs->pfnProbe && pFuncs->pfn08 && pFuncs->pfn0C && pFuncs->pfnStartProbe &&
           pFuncs->pfnSelectDevice && pFuncs->pfnMount && pFuncs->pfnOp19 && pFuncs->pfn20 && pFuncs->pfn24 &&
           pFuncs->pfn28 && pFuncs->pfnRead && pFuncs->pfnWrite && pFuncs->pfnSeek && pFuncs->pfnOp18 &&
-          pFuncs->pfn3C && pFuncs->pfn40 && pFuncs->pfn44)) return 0xC;
+          pFuncs->pfn3C && pFuncs->pfnUpdate && pFuncs->pfn44)) return 0xC;
     if (_SFIO_pDevice != NULL || _SFIO_pData != NULL) return 1;
 #line 2157
     _SFIO_pDevice = fn_801220D4(pAllocator, sizeof(SFIODevice), 4, __FILE__, __LINE__);
@@ -680,7 +684,7 @@ int SFIOInit(int* pDevices, const SFIOFuncTable* pFuncs, void* pAllocator) {
     _SFIO_pDevice->fn.pfnSeek = pFuncs->pfnSeek;
     _SFIO_pDevice->fn.pfnOp18 = pFuncs->pfnOp18;
     _SFIO_pDevice->fn.pfn3C = pFuncs->pfn3C;
-    _SFIO_pDevice->fn.pfn40 = pFuncs->pfn40;
+    _SFIO_pDevice->fn.pfnUpdate = pFuncs->pfnUpdate;
     _SFIO_pDevice->fn.pfn44 = pFuncs->pfn44;
     _SFIO_pDevice->pData48 = lbl_8019D210;
     _SFIO_pDevice->pData4C = lbl_8019D248;
@@ -707,7 +711,7 @@ int SFIOShutdown(void) {
     _SFIO_pDevice->fn.pfnSeek = NULL;
     _SFIO_pDevice->fn.pfnOp18 = NULL;
     _SFIO_pDevice->fn.pfn3C = NULL;
-    _SFIO_pDevice->fn.pfn40 = NULL;
+    _SFIO_pDevice->fn.pfnUpdate = NULL;
     _SFIO_pDevice->fn.pfn44 = NULL;
     _SFIO_pData->eState = 0;
     _SFIO_pData->eOperation = 0;
@@ -890,4 +894,62 @@ int SFIOWrite(int* pSession, void* pBuffer, u32 uSize) {
     _SFIO_pData->uExpected54 = uSize;
     _SFIO_pDevice->fn.pfnWrite(*pSession, pBuffer, uSize);
     return 0;
+}
+
+// Dispatch tables (in .data): the continuation table is indexed by eState, the error-validation
+// table by eOperation.
+extern int (*const gSFIOContinueTable[])(int eError, int* pProcess, int* pResult);
+extern int (*const gSFIOValidateTable[])(int eError, int uProcess, int uResult);
+
+// Main pump. Drives the platform layer, filters the error, then runs this state's continuation.
+int SFIOUpdate(int* pProcess, int* pResult) {
+    int eError = 0;
+    if (!SFIOIsInitialized()) return 2;
+    if (_SFIO_pDevice->fn.pfnUpdate == NULL) return 0xD;
+    if (pProcess == NULL) return 0xC;
+    if (pResult == NULL) return 0xC;
+    eError = _SFIO_pDevice->fn.pfnUpdate(pProcess, pResult);
+    if (*pProcess == 0 && _SFIO_pData->eState != 0) return 0xF;
+    if (*pProcess == 2) {
+        eError = ((int (*const*)(int, int, int))_SFIO_pDevice->pData4C)[_SFIO_pData->eOperation](eError, *pProcess, *pResult);
+        if (eError == 0xA) {
+            _SFIO_pData->eState = 0;
+            _SFIO_pData->eOperation = 0;
+            return eError;
+        }
+        if (eError == 0x10) return eError;
+        eError = ((int (*const*)(int, int*, int*))_SFIO_pDevice->pData48)[_SFIO_pData->eState](eError, pProcess, pResult);
+        if (*pProcess == 2) {
+            if (_SFIO_pData->eState == 5 || _SFIO_pData->eState == 2 || _SFIO_pData->eState == 7 ||
+                _SFIO_pData->eState == SFIO_STATE_BUSY_A || _SFIO_pData->eState == SFIO_STATE_BUSY_B ||
+                _SFIO_pData->eState == SFIO_STATE_BUSY_C) {
+                fn_80172FA4(0);
+            }
+            _SFIO_pData->eState = 0;
+            _SFIO_pData->eOperation = 0;
+        }
+    }
+    return eError;
+}
+
+int SFIOGetDeviceInfo(int eDevice, void* pInfo) {
+    if (pInfo == NULL) return 0xC;
+    if (!SFIOIsInitialized()) return 2;
+    if (!(eDevice <= SFIO_DEVICE_LAST && eDevice >= SFIO_DEVICE_FIRST)) return 9;
+    fn_80171308(eDevice, pInfo);
+    return 0;
+}
+
+int SFIOSetDescriptor(void* pDescriptor) {
+    if (pDescriptor == NULL) return 0xC;
+    if (!SFIOIsInitialized()) return 2;
+    memcpy(_SFIO_pDevice->uData50, pDescriptor, 0x10);
+    fn_8017124C(pDescriptor, &_SFIO_pDevice->uData50[0x10], &_SFIO_pDevice->uData50[0x14]);
+    return fn_80173024(pDescriptor);
+}
+
+#line 3286
+BOOL SFIOValidateFilename(const char* pFilename) {
+    SFIO_ASSERT(NULL != pFilename);
+    return fn_80172D54(pFilename);
 }
