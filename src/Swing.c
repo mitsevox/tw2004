@@ -10,7 +10,12 @@ typedef struct SwingState {
     f32  fClubBack;             // 0x004  tuning "clubback"
     f32  fClubDown;             // 0x008  tuning "clubdown"
     f32  fTuningC;              // 0x00C
-    u8   unk10[0xAC - 0x10];
+    u8   unk10[0x44 - 0x10];
+    u8   res44[0x28];           // 0x044  released by fn_80058DB4
+    u8   res6C[0x28];           // 0x06C
+    void* p94[2];              // 0x094  handles released by fn_80058DB4
+    void* p9C[2];              // 0x09C
+    void* pA4[2];              // 0x0A4
     f32  fCurveMin;             // 0x0AC  a club's shaping range, by gClubCurve
     f32  fCurveMax;             // 0x0B0
     u8   unkB4[4];
@@ -125,6 +130,27 @@ f32 Swing_ApplyPowerBoost(int nPlayer, f32 fPower) {
         return fPower;
     }
     return fPower;
+}
+
+void fn_8006C2C8(int nPlayer, f32* pX, f32* pY);
+
+// The spin stick's result (a replay reads it back from the recording first).
+void fn_8005C15C(int nPlayer, f32* pSpinY, f32* pSpinX) {
+    if (gSession.bReplay) {
+        fn_8006C2C8(nPlayer, &gPlayers[nPlayer].swing.fSpinX, &gPlayers[nPlayer].swing.fSpinY);
+    }
+    *pSpinX = gPlayers[nPlayer].swing.fSpinX;
+    *pSpinY = gPlayers[nPlayer].swing.fSpinY;
+}
+
+u8 fn_8001EDF4(int nHandle);
+
+// The backswing's sideways angle as a fraction of a quarter turn, mirrored by fn_8001EDF4.
+f32 fn_8005C1EC(int nPlayer) {
+    if (fn_8001EDF4(gPlayers[nPlayer].nShotHandle)) {
+        return gPlayers[nPlayer].swing.fBackAngle / 1.5707964f;
+    }
+    return -(gPlayers[nPlayer].swing.fBackAngle / 1.5707964f);
 }
 
 f32 fn_8005C268(int nPlayer) {
@@ -347,6 +373,17 @@ asm void Vec_Sub(register f32* pA, register f32* pB, register f32* pOut) {
     psq_st f2, 0(pOut), 0, 0
     psq_st f3, 8(pOut), 0, 0
     blr
+}
+
+extern f32 lbl_80281B40[];                   // FLT_MAX
+
+// A 4-vector's squared length, capped.
+f32 fn_8005CC18(f32* pV) {
+    f32 f = pV[0] * pV[0] + pV[1] * pV[1] + pV[2] * pV[2] + pV[3] * pV[3];
+    if (f > lbl_80281B40[0]) {
+        f = lbl_80281B40[0];
+    }
+    return f;
 }
 
 extern int lbl_802823FC;
@@ -737,7 +774,7 @@ s8 fn_8005D2A8(int nPlayer) {
     return pStack->nState[pStack->nTop - 1];
 }
 
-int fn_8005D2DC(void) {
+u8 fn_8005D2DC(void) {
     return 0;
 }
 
@@ -747,6 +784,44 @@ extern u8 lbl_80281E08;
 void fn_8005D2E4(void) {
     lbl_80281E09 = -1;
     lbl_80281E08 = 0;
+}
+
+// A second, single-slot state machine (no player argument): current index lbl_80281E09.
+typedef struct ModeStateDef {
+    void (*pfnEnter)(void);
+    void (*pfnUpdate)(void);
+    void (*pfnExit)(void);
+} ModeStateDef;
+extern ModeStateDef lbl_801883C0[];
+
+void fn_8005D2F8(void) {
+    if (lbl_80281E09 > -1 && lbl_801883C0[lbl_80281E09].pfnUpdate != NULL) {
+        lbl_801883C0[lbl_80281E09].pfnUpdate();
+    }
+}
+
+void fn_8005D348(void) {
+    if (lbl_80281E09 > -1 && lbl_801883C0[lbl_80281E09].pfnExit != NULL) {
+        lbl_801883C0[lbl_80281E09].pfnExit();
+    }
+    lbl_80281E09 = -1;
+    lbl_80281E08 = 0;
+}
+
+void fn_8005D3A8(s8 nState) {
+    void (*pfn)(void);
+    if (lbl_80281E09 > -1 && (pfn = lbl_801883C0[lbl_80281E09].pfnExit) != NULL) {
+        lbl_80281E08 = 1;
+        pfn();
+        lbl_80281E08 = 0;
+    }
+    lbl_80281E09 = nState;
+    pfn = lbl_801883C0[lbl_80281E09].pfnEnter;
+    if (pfn != NULL) {
+        lbl_80281E08 = 1;
+        pfn();
+        lbl_80281E08 = 0;
+    }
 }
 
 // Pop every state, running each one's exit callback.
@@ -764,6 +839,77 @@ void SwingStack_Clear(int nPlayer) {
     }
 }
 
+// Push a state and run its enter callback.
+void fn_8005CF4C(int nState, int nPlayer) {
+    SwingStack* pStack = &gSwingStacks[nPlayer];
+    void (*pfn)(int);
+    pStack->nTop++;
+    pStack->nState[pStack->nTop] = nState;
+    pfn = gSwingStates[pStack->nState[pStack->nTop]].pfnEnter;
+    if (pfn != NULL) {
+        gInSwingExit = 1;
+        pfn(nPlayer);
+        gInSwingExit = 0;
+    }
+}
+
+// Pop the current state, running its exit callback.
+void fn_8005CFD4(int nPlayer) {
+    SwingStack* pStack = &gSwingStacks[nPlayer];
+    s8*         pTop   = &pStack->nTop;
+    void (*pfn)(int)   = gSwingStates[pStack->nState[pStack->nTop]].pfnExit;
+    if (pfn != NULL) {
+        gInSwingExit = 1;
+        pfn(nPlayer);
+        gInSwingExit = 0;
+    }
+    (*pTop)--;
+}
+
+// Pop everything and start again from one state.
+void fn_8005D05C(int nState, int nPlayer) {
+    SwingStack* pStack = &gSwingStacks[nPlayer];
+    void (*pfn)(int);
+    {
+        s8* pTop = &pStack->nTop;
+    while (*pTop > -1) {
+        if (gSwingStates[(s8)pStack->nState[*pTop]].pfnExit != NULL) {
+            gInSwingExit = 1;
+            gSwingStates[(s8)pStack->nState[*pTop]].pfnExit(nPlayer);
+            gInSwingExit = 0;
+        }
+        (*pTop)--;
+    }
+    }
+    pStack->nTop = 0;
+    pStack->nState[pStack->nTop] = nState;
+    pfn = gSwingStates[pStack->nState[pStack->nTop]].pfnEnter;
+    if (pfn != NULL) {
+        gInSwingExit = 1;
+        pfn(nPlayer);
+        gInSwingExit = 0;
+    }
+}
+
+// Replace the current state: its exit, then the new state's enter.
+void SwingStack_Push(int nState, int nPlayer) {
+    SwingStack* pStack = &gSwingStacks[nPlayer];
+    s8*         pTop   = &pStack->nTop;
+    void (*pfn)(int)   = gSwingStates[pStack->nState[pStack->nTop]].pfnExit;
+    if (pfn != NULL) {
+        gInSwingExit = 1;
+        pfn(nPlayer);
+        gInSwingExit = 0;
+    }
+    pStack->nState[*pTop] = nState;
+    pfn = gSwingStates[pStack->nState[*pTop]].pfnEnter;
+    if (pfn != NULL) {
+        gInSwingExit = 1;
+        pfn(nPlayer);
+        gInSwingExit = 0;
+    }
+}
+
 // Empty in release.
 void fn_8005CCA8(int nPlayer) {
 }
@@ -777,13 +923,55 @@ void fn_8005CCAC(void) {
     gInSwingExit = 0;
 }
 
+u8 fn_800E415C(void);
+
+u8   fn_8005D2DC(void);
+
+// Run the current state's update for every player (not while the game is held).
+void fn_8005CCD8(void) {
+    int i;
+    if (fn_800E415C()) return;
+    switch (fn_8005D2DC()) {
+    case 0:
+        for (i = 0; i < 5; i++) {
+            SwingStack* pStack = &gSwingStacks[i];
+            void (*pfn)(int);
+            if (pStack->nTop > -1) {
+                pfn = gSwingStates[pStack->nState[pStack->nTop]].pfnUpdate;
+                if (pfn != NULL) pfn(i);
+            }
+        }
+        break;
+    }
+}
+
+void SwingStack_Clear(int nPlayer);
+
+// Pop every player's states.
+void fn_8005CD94(void) {
+    int i;
+    for (i = 0; i < 5; i++) {
+        SwingStack* pStack = &gSwingStacks[i];
+        s8*         pTop   = &pStack->nTop;
+        while (*pTop > -1) {
+            if (gSwingStates[(s8)pStack->nState[*pTop]].pfnExit != NULL) {
+                gInSwingExit = 1;
+                gSwingStates[(s8)pStack->nState[*pTop]].pfnExit(i);
+                gInSwingExit = 0;
+            }
+            (*pTop)--;
+        }
+    }
+    gInSwingExit = 0;
+}
+
 
 // ---- state 2: thinking ----------------------------------------------------------------------------
 
 void* fn_80017028(int nView);                // the view
 u8    fn_800C7100(void* pView);              // its camera has settled
 u8    fn_800FA118(int a, int b);
-void  SwingStack_Push(int nState, int nPlayer);  // 0x8005D188
+void SwingStack_Push(int nState, int nPlayer);  // 0x8005D188
 void  AI_ApplyError(int nPlayer);            // Golfer.c
 
 #define CPU_TOLERANCE 0.0025f               // 0.05 yd squared: land within 1.8 in of the target
@@ -850,6 +1038,31 @@ void fn_80067074(int nPlayer, int nSound, int a, int b);
 // The swing is under way: phase 1, the animation started, its three marks read, the 25-sample
 // stick history filled with the centre, the spin stick centred.
 // The backswing's top mark, a hair early.
+void fn_800360A0(void* p);
+void fn_80009E70(void* p);
+
+// Release the swing's loaded resources: two blocks in the tuning data and three pairs of handles.
+void fn_80058DB4(void) {
+    int i;
+    fn_800360A0((u8*)gpSwing + 0x44);
+    fn_800360A0((u8*)gpSwing + 0x6C);
+    for (i = 0; i < 2; i++) {
+        fn_80009E70(gpSwing->p94[i]);
+        fn_80009E70(gpSwing->p9C[i]);
+        fn_80009E70(gpSwing->pA4[i]);
+    }
+}
+
+void fn_8005A788(int nPlayer, int a);
+
+// Clear every player's b375.
+void fn_80058E40(void) {
+    int i;
+    for (i = 0; i < gSession.nNumPlayers; i++) {
+        fn_8005A788(i, 0);
+    }
+}
+
 f32 Swing_TopTime(SwingData* pSw) {
     return pSw->fMark1 - 0.0076f;
 }
@@ -857,6 +1070,19 @@ f32 Swing_TopTime(SwingData* pSw) {
 // The start mark, a hair late.
 f32 Swing_StartTime(SwingData* pSw) {
     return 0.0076f + pSw->fMark0;
+}
+
+u8*  fn_800136C4(int nController);
+u8   fn_80100C00(void);
+extern u8 lbl_80281194[4];                   // a neutral pad: both sticks centred (0x80)
+
+// A controller's pad state; the neutral pad when there is none or input is locked.
+u8* Pad_State(int nPlayer, int nController) {
+    u8* pPad = fn_800136C4(nController);
+    if (pPad == NULL || fn_80100C00()) {
+        return lbl_80281194;
+    }
+    return pPad;
 }
 
 // The swing stick's X: the C-stick (pad byte 2) when the player swings with it, else the main stick.
@@ -872,6 +1098,34 @@ int Swing_StickY(int nPlayer, u8* pPad) {
         return pPad[3];
     }
     return pPad[1];
+}
+
+extern u8 (*gSwingPhaseFns[])(int nPlayer);
+
+// Run the swing's current phase; true once the ball is struck.
+u8 fn_80058F5C(int nPlayer) {
+    return gSwingPhaseFns[gPlayers[nPlayer].swing.nPhase](nPlayer);
+}
+
+void Swing_RumbleOff(int nPlayer);
+void Swing_ResetBoostAndSpin(int nPlayer);
+void fn_800AE3C4(int nPlayer);
+
+// Reset a player's swing: phase 0, sticks and spin stick centred, animation 5, no rumble.
+void fn_80058FA4(int nPlayer) {
+    gPlayers[nPlayer].swing.nPhase = 0;
+    gPlayers[nPlayer].swing.nRestCX = gPlayers[nPlayer].swing.nRestCY = 0x80;
+    gPlayers[nPlayer].swing.nRestX = gPlayers[nPlayer].swing.nRestY = 0x80;
+    fn_80095744(gPlayers[nPlayer].nShotHandle, 5);
+    Swing_RumbleOff(nPlayer);
+    Swing_ResetBoostAndSpin(nPlayer);
+    gPlayers[nPlayer].swing.nSpinStickX = 0x80;
+    gPlayers[nPlayer].swing.nSpinStickY = 0x80;
+    gPlayers[nPlayer].swing.f628 = 0.0f;
+    gPlayers[nPlayer].swing.f62C = 0.0f;
+    gPlayers[nPlayer].swing.f10 = 0.0f;
+    gPlayers[nPlayer].swing.f14 = 0.0f;
+    fn_800AE3C4(nPlayer);
 }
 
 void Swing_Begin(int nPlayer) {
@@ -952,7 +1206,7 @@ int Swing_WaitForBackswing(int nPlayer) {
 
 extern f32 gSwingRange[8];                   // 0x801882EC  backswing rate per shot kind: -, 0.85, 0.5, 0.8
 
-u8*  Pad_State(int nPlayer, int nController);          // 0x80058EB8
+u8* Pad_State(int nPlayer, int nController);          // 0x80058EB8
 int Swing_StickX(int nPlayer, u8* pPad);              // 0x80058F04  main or C-stick by bUsingCStick
 int Swing_StickY(int nPlayer, u8* pPad);              // 0x80058F30
 f32 Swing_TopTime(SwingData* pSw);                    // 0x80058E98  fMark1 - 0.0076
@@ -1338,6 +1592,17 @@ void fn_8005A788(int nPlayer, int a) {
     gPlayers[nPlayer].swing.b375 = a;
 }
 
+u8   fn_800C6CB0(void);
+void fn_800AE3F8(int nView);
+
+void fn_8005A7A0(int nPlayer) {
+    if ((gPlayers[nPlayer].swing.nBoostLevel > 0 || gPlayers[nPlayer].swing.nSpinAmount > 0) &&
+        gPlayers[nPlayer].nShotKind != 0 && gPlayers[nPlayer].swing.b375 != 0 && gSession.bReplay == 0 &&
+        gSession.unk14 == 0 && !fn_800C6CB0()) {
+        fn_800AE3F8(gPlayers[nPlayer].nView0);
+    }
+}
+
 // Bind the swing module's tuning values by name.
 void Swing_LoadTuning(void) {
     unsigned long long uHash;
@@ -1673,7 +1938,7 @@ void SwingState17_Enter(int nPlayer) {
 
 
 int   fn_8001707C(int nView);                 // the player a view belongs to
-void  fn_8005CFD4(int nPlayer);
+void fn_8005CFD4(int nPlayer);
 void  fn_80067710(int nPlayer, int a, int b);
 void  fn_80045494(int a, int nPlayer);
 void  fn_800DC524(int a, int nPlayer, f32 f);
@@ -2332,7 +2597,7 @@ void SwingState08_Update(int nPlayer) {
 void  Caddie_Update(int nPlayer);             // Golfer.c
 void fn_80062C38(void);
 void  fn_800DAE84(void);
-void  fn_80058FA4(int nPlayer);
+void fn_80058FA4(int nPlayer);
 void  fn_80068AA8(int nPlayer);
 void  fn_800689D4(int nPlayer);
 void  fn_800957FC(int nHandle, int a);
@@ -3035,7 +3300,7 @@ f32 fn_80062DCC(View* pView);               // and how far
 void  fn_800DDA14(int nPlayer);
 void  fn_8006C4A0(void);                      // take the shot back (a mulligan)
 void  fn_800DBDA8(int nPlayer);
-u8    fn_80058F5C(int nPlayer);              // the per-frame swing poll: the ball was struck
+u8 fn_80058F5C(int nPlayer);              // the per-frame swing poll: the ball was struck
 void  fn_8006BB5C(int nPlayer);
 u8    fn_8004560C(void);
 u8    fn_800E430C(int nPlayer);
@@ -3157,7 +3422,7 @@ void  fn_800C6618(View* pView, int nPlayer);
 int   fn_800C7138(View* pView);
 u8    fn_800C441C(View* pView, int nPlayer);
 void  fn_800642D0(View* pView, int nPlayer);
-void  fn_8005CF4C(int nState, int nPlayer);   // another stack operation
+void fn_8005CF4C(int nState, int nPlayer);   // another stack operation
 
 // State 10 begins: setting up the shot. The address animation and the HUD's club and shot
 // kind; camera 12; the tutorial tips (first tee, first approach, first putt) for a human when
