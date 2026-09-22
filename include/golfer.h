@@ -191,7 +191,7 @@ typedef struct Player {
     s32  nLie;                  // 0xAF8
     u8   unkAFC[0xB4C - 0xAFC];
     f32  vOrient[4];            // 0xB4C  a quaternion, identity at setup
-    u8   unkB5C[0xC18 - 0xB5C];
+    u8   ballBefore[0xBC];      // 0xB5C  copy of the Ball as it lay before the shot
     s32  nShotHandle;           // 0xC18
     f32  fThinkTime;            // 0xC1C  seconds a CPU has spent in state 2
     f32  fC20;                  // 0xC20

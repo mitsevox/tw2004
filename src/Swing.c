@@ -1336,3 +1336,55 @@ void SwingState17_Enter(int nPlayer) {
     Vec4 vOffset = lbl_80183660;
     fn_80063BF4(fn_80017028(gPlayers[nPlayer].nView0), 0.5f, (f32*)&vOffset);
 }
+
+
+int   fn_8001707C(int nView);                 // the player a view belongs to
+void  fn_8005CFD4(int nPlayer);
+void  fn_80067710(int nPlayer, int a, int b);
+void  fn_80045494(int a, int nPlayer);
+void  fn_800DC524(int a, int nPlayer, f32 f);
+void  fn_800C6E14(void);
+extern u8 lbl_80281E13;
+
+void SwingState02_Exit(int nPlayer) {
+    if (gSession.nGameType != 8 && gPlayers[nPlayer].nLie != 12 && !Player_IsCPU(nPlayer)) {
+        fn_800E3D38(nPlayer, 1);
+    }
+}
+
+void SwingState19_Enter(int nPlayer) {
+    s32* pView = &gPlayers[nPlayer].nView0;
+    if (fn_8001707C(*pView) == nPlayer) {
+        int nView = *pView;
+        View_SetCamera(fn_80017028(nView), 0x19, nPlayer, nView);
+    }
+    fn_8006AD68(nPlayer);
+}
+
+void SwingState07_Update(int nPlayer) {
+    if (Player_IsCPU(nPlayer) || (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(5, 1))) {
+        fn_800E3D38(nPlayer, 0);
+    } else {
+        fn_8005CFD4(nPlayer);
+    }
+}
+
+// Keep a copy of the ball as it lies before the shot.
+void SwingState14_Enter(int nPlayer) {
+    fn_80017028(gPlayers[nPlayer].nView0);
+    fn_80005628(gPlayers[nPlayer].ballBefore, gPlayers[nPlayer].ball, 0xBC);
+    fn_8006AD68(nPlayer);
+    fn_80067710(nPlayer, 0, 0x21);
+    lbl_80281E13 = 1;
+}
+
+void SwingState11_Exit(int nPlayer) {
+    fn_80045494(0, nPlayer);
+    fn_800DC524(0, nPlayer, 0.0f);
+    fn_800C6E14();
+    if (gSession.bReplay != 0) {
+        fn_80067074(nPlayer, 0x3B, 0, 0);
+    } else {
+        fn_80067074(nPlayer, 0x3B, 0, 1);
+    }
+}
