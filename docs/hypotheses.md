@@ -178,6 +178,11 @@ shot kind matches and your aim is within 5 degrees, **your shot is replaced by t
 one** and your swing error is zeroed. The human and CPU paths are not just different - the
 human's best shots *are* the CPU's solver. Full account in [`gameplay.md`](gameplay.md).
 
+**Update (`SwingState15_Update` in C):** the human's *default* shot is the CPU path too. While
+the camera flies to the ball the game runs the CPU rehearsal on the human (controller set to
+CPU for the call) and the suggested club and aim are its solution. So the human and CPU share
+the solver twice: for the suggestion, and for a lucky shot.
+
 **Status:** answered.
 
 5. Is there hidden putting assistance (a "pull" toward the cup)?

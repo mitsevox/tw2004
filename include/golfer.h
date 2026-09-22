@@ -201,8 +201,8 @@ typedef struct Player {
     u8   unkC28;                // 0xC28
     u8   bLowIQPenalty;         // 0xC29  quarters the IQ overconfidence term when set
     s8   nLevel;                // 0xC2A  CPU difficulty level: 25 modifier points per level
-    u8   unkC2B;                // 0xC2B
-    u8   unkC2C;                // 0xC2C
+    u8   bPlanReady;            // 0xC2B  the next shot's rehearsal had settled when the camera arrived
+    u8   bRehearsalDone;        // 0xC2C  the next shot's rehearsal (swing state 15) has settled
     u8   unkC2D;                // 0xC2D
     u8   unkC2E;                // 0xC2E
     u8   unkC2F;

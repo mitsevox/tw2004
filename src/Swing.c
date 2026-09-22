@@ -1709,8 +1709,8 @@ void SwingState15_Enter(int nPlayer) {
     Vec3Copy((f32*)gPlayers[nPlayer].ball, pBallPos);
     Shot_Plan(nPlayer, 0);
     Vec3Copy(vSaved, pBallPos);
-    gPlayers[nPlayer].unkC2B = 0;
-    gPlayers[nPlayer].unkC2C = 0;
+    gPlayers[nPlayer].bPlanReady = 0;
+    gPlayers[nPlayer].bRehearsalDone = 0;
 }
 
 // State 18: holed out. The ball goes to the pin, the lie becomes LIE_HOLED, animation 12.
@@ -1882,4 +1882,80 @@ void SwingState20_Update(int nPlayer) {
     if (bDone) {
         fn_8005CFD4(nPlayer);
     }
+}
+
+
+void  fn_8006B2C4(int nPlayer, int a);
+int   fn_80095780(int nHandle);               // the animation playing
+u8    fn_80101738(void);
+u8    fn_800C6CB0(void);
+void  fn_8006ACF8(int nPlayer, int a);
+void  fn_800DB714(int nPlayer);
+void  fn_80062DC0(void* pView);
+void  fn_80050D2C(u8 bOn);                    // Ball.c: the second sim flag
+void  fn_800DCE5C(int nPlayer);
+extern Vec4 lbl_80183640;
+
+// State 12: the ball is away. In a replay with the kept ball unset, a special path; otherwise
+// the ball as it lies is kept. Camera 14 unless the swing animation is 11 or the view says no.
+void SwingState12_Enter(int nPlayer) {
+    s32* pView = &gPlayers[nPlayer].nView0;
+    void* pV   = fn_80017028(*pView);
+    u8*  pBallBefore = gPlayers[nPlayer].ballBefore;
+    if (gSession.bReplay != 0 && *(s32*)(pBallBefore + 0x64) == 0) {
+        fn_8006B2C4(nPlayer, 1);
+    } else {
+        fn_80005628(pBallBefore, gPlayers[nPlayer].ball, 0xBC);
+    }
+    *(s32*)(pBallBefore + 0x94) = -1;
+    if (fn_80095780(gPlayers[nPlayer].nShotHandle) != 11 && fn_80101738() && !fn_800C6CB0()) {
+        int nView = *pView;
+        View_SetCamera(fn_80017028(nView), 0xE, nPlayer, nView);
+    }
+    fn_8006ACF8(nPlayer, 0);
+    fn_800DB714(nPlayer);
+    gPlayers[nPlayer].bRehearsalDone = 0;
+    Swing_RumbleTick(nPlayer);
+    fn_80062DC0(pV);
+    fn_80062DB8(pV, 0);
+}
+
+// State 15: while the camera flies to the ball, the CPU's rehearsal runs on the player - human
+// or not, made a CPU for the call, in fast mode - until it settles. So the club and aim a
+// human is handed on arriving at the ball are the rehearsal's solution for the authored aim
+// point. When the camera finishes: solved -> camera move and state 16; not yet -> a "still
+// working" call and the camera move.
+void SwingState15_Update(int nPlayer) {
+    Vec4  vOffset = lbl_80183640;
+    u8*   pDone;
+    s32*  pView;
+    f32   vSaved[4];
+
+    fn_80050D2C(1);
+    pDone = &gPlayers[nPlayer].bRehearsalDone;
+    if (*pDone == 0) {
+        s32* pController = &gPlayers[nPlayer].nController;
+        f32* pBallPos    = &gPlayers[nPlayer].fBallX;
+        int  nController = *pController;
+        *pController = CONTROLLER_CPU;
+        Vec3Copy(pBallPos, vSaved);
+        Vec3Copy((f32*)gPlayers[nPlayer].ball, pBallPos);
+        *pDone = AI_RehearseShot(nPlayer, NULL, 1, CPU_TOLERANCE);
+        Vec3Copy(vSaved, pBallPos);
+        *pController = nController;
+    }
+    pView = &gPlayers[nPlayer].nView0;
+    if (fn_80063C50(fn_80017028(*pView))) {
+        if (*pDone != 0) {
+            fn_80063CBC(fn_80017028(*pView), (f32*)&vOffset);
+            SwingStack_Push(0x10, nPlayer);
+            gPlayers[nPlayer].bPlanReady = 1;
+        } else {
+            if (gPlayers[nPlayer].bPlanReady == 0) {
+                fn_800DCE5C(nPlayer);
+            }
+            fn_80063CBC(fn_80017028(*pView), (f32*)&vOffset);
+        }
+    }
+    fn_80050D2C(0);
 }

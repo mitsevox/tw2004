@@ -217,3 +217,6 @@ Dated log of what was done and decided, newest last. Facts and lessons belong in
   Finds: state 6 is the putt preview, done by launching the caddie's putt with the player
   briefly made a CPU; state 15 is where `Shot_Plan` runs for the next shot; lie 12 is "holed";
   `Player.ballBefore` (0xB5C) keeps the ball as it lay and doubles as the preview ghost.
+- **The suggested shot is the rehearsal.** Swing state 15 runs `AI_RehearseShot` on every player,
+  humans made CPUs for the call, while the camera flies in; the club and aim you are handed are
+  its solution. Also: state 12 keeps the ball as it lies; `bRehearsalDone`/`bPlanReady` named.

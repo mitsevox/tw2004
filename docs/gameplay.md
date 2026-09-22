@@ -62,6 +62,16 @@ states do, from their code:
     18  holed out: the ball goes to the pin, lie 12 (LIE_HOLED), animation 12
     19-23  camera states (saved-camera restore, flyovers, camera 25)
 
+**Your suggested shot is the CPU's solution** (state 15, `SwingState15_Update`, in C). When
+the camera flies to your ball for the next shot, `Shot_Plan` has just picked an authored aim
+point for you (the same table the CPU uses), and every frame of the flight the game **runs
+`AI_RehearseShot` on you - your controller set to the CPU for the call, in fast mode (six ticks
+a frame)** - until it settles. The rehearsal writes its solved aim and the CPU's club choice
+straight into your player. So the club and aim marker you are handed when you arrive at the
+ball are not a rule of thumb: they are the CPU's simulated answer for that aim point, which is
+why "just hit what it gives you" works as well as it does. If the camera arrives before the
+rehearsal settles, a "still working" call is made and you get whatever it had.
+
 **The putt preview** (state 6, `SwingState06_Enter`, in C) is the one with a trick in it: it
 takes the caddie's solved putt (`Caddie_ApplyTip`), **sets the player's controller to the CPU
 for one call of `Swing_Launch`** - so the launch has no swing error and no luck swap - keeps the

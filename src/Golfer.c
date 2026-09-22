@@ -1715,8 +1715,8 @@ void Player_SetGolfer(int nPlayer, int nGolfer, int nController, u32 uBag, int b
     p->nLevel       = 0;
     p->fC20         = 0.0f;
     p->unkC2D       = 0;
-    p->unkC2B       = 0;
-    p->unkC2C       = 0;
+    p->bPlanReady       = 0;
+    p->bRehearsalDone       = 0;
     p->uFlags       = 0;
     gNumPlayersSetUp++;
 }
