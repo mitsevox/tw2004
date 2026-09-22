@@ -37,7 +37,10 @@ u16 header (0), then 34 records of 320 bytes (record i at `2 + i*320`):
     0x066 u8  attrA[12]         0..100, see column names below
     0x072 u8  attrB[12]         0..100, same columns, second set (meaning unknown)
     0x07E u8  misc[15]          0..4 each (all 0 for the created golfers); flags at 0x08D..
-    ...   rest unknown
+    0x096 u8  ?[8]
+    0x09E u8  swapped[0xA8]     21 eight-byte values stored LITTLE-endian: the 'stat' handler
+                                (`Golfer_OnStatsLoaded`) byte-swaps them in place in 8-byte units
+                                (`Golfer_TableByteSwap`). Meaning unknown - f64s or u64s.
 
 **Column names (confirmed from code).** The front-end data (`Data/Fend/FEnd.gcb`, `DATS`
 object) carries the attribute screen's names and tooltips and a debug options menu that lists

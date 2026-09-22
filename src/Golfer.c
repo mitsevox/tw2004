@@ -426,9 +426,9 @@ int AI_ShotKindForDistance(int nPlayer, f32 fDist) {
         int     nKind = SHOT_FULL;
         Player* p     = &gPlayers[nPlayer];
         fDist /= fn_800510EC(p->ball);
-        if (p->nLie == LIE_GREEN || AI_WithinOfPin(nPlayer, 1.5f)) {
+        if (p->nLie == LIE_GREEN || AI_GreenTowardPin(nPlayer, 1.5f)) {
             nKind = SHOT_PUTT;
-        } else if ((p->golfer.uBagMask & (1 << 21)) && fDist < 15.0f && AI_WithinOfPin(nPlayer, 5.0f) && fn_8002CEDC(nPlayer)) {
+        } else if ((p->golfer.uBagMask & (1 << 21)) && fDist < 15.0f && AI_GreenTowardPin(nPlayer, 5.0f) && Lie_AllowsFullSwing(nPlayer)) {
             nKind = SHOT_CHIP;
         } else if ((p->golfer.uBagMask & (1 << 23)) && fDist < 20.0f) {
             nKind = SHOT_PITCH;
@@ -1245,14 +1245,12 @@ void fn_80005AE8(void* p, int c, int n);                    // memset
 u8   Course_RegisterLoader(int nChunk, void (*pfn)(u8*));   // 0x8000C0B4
 
 void AI_TargetsClear(void) {
-    AITarget* t;
-    int       i;
-    t = gAITargets;
-    for (i = 0; i < NUM_AI_TARGETS; i++, t++) {
-        fn_80005AE8(t, 0, sizeof(AITarget));
-        t->nHole    = -1;
-        t->nTeeSet  = -1;
-        t->bEnabled = 1;
+    int i;
+    for (i = 0; i < NUM_AI_TARGETS; i++) {
+        fn_80005AE8(&gAITargets[i], 0, sizeof(AITarget));
+        gAITargets[i].nHole    = -1;
+        gAITargets[i].nTeeSet  = -1;
+        gAITargets[i].bEnabled = 1;
     }
     gAITargetsLoaded = 0;
 }
@@ -1333,4 +1331,93 @@ u8 Lie_AllowsFullSwing(int nPlayer) {
     Player* p = &gPlayers[nPlayer];
     if (p->nLie == 6 || p->nLie == 7 || p->nLie == 8) return 0;
     return 1;
+}
+
+// ---- ground probes ------------------------------------------------------------------------------
+
+f32          fn_8004D5C0(CourseInfo* pCourse, f32* pPos);          // ground height, -65536.1 if none
+SurfaceType* fn_800CC190(CourseInfo* pCourse, f32* pPos);          // surface type under a point
+
+// Is the ground fDist yards from the ball toward the pin of class 3 (the green)? True when the
+// ball is on the pin. The CPU putts from the fringe when the green starts within 1.5 yards and
+// chips when it starts within 5.
+u8 AI_GreenTowardPin(int nPlayer, f32 fDist) {
+    u8          bGreen  = 0;
+    int         nHole   = Game_CurrentHole();
+    CourseInfo* pCourse = fn_8000C594();
+    Player*     p       = &gPlayers[nPlayer];
+    f32*        pBall   = (f32*)p->ball;
+    f32*        pBallZ  = (f32*)(p->ball + 8);
+    f32         vDir[4];
+    f32         fHeight;
+    SurfaceType* pSurface;
+
+    vDir[1] = 0.0f;
+    vDir[0] = pCourse->pin[nHole].x - *pBall;
+    vDir[3] = 0.0f;
+    vDir[2] = pCourse->pin[nHole].z - *pBallZ;
+    if (0.0f == vDir[0] && 0.0f == vDir[2]) {
+        return 1;
+    }
+    Vec_Normalize(vDir, vDir);
+    vDir[0] = *pBall + vDir[0] * fDist;
+    vDir[2] = *pBallZ + vDir[2] * fDist;
+    fHeight = fn_8004D5C0(pCourse, vDir);
+    if (fHeight != -65536.1f) {
+        vDir[1]  = 10.0f + fHeight;
+        pSurface = fn_800CC190(pCourse, vDir);
+        if (pSurface->nClass == 3) {
+            bGreen = 1;
+        }
+    }
+    return bGreen;
+}
+
+// Stop the caddie.
+void Caddie_Stop(void) {
+    gCaddieActive = 0;
+}
+
+// ---- the golfer table's arrival ---------------------------------------------------------------
+
+typedef struct UStreamObject UStreamObject;     // UStream.c: pData at +0, uSize at +0x24
+int  UStream_RegisterHandler(u32 uType, void (*pfn)(UStreamObject*));
+int  UStream_UnregisterHandler(u32 uType);
+void fn_80009E70(void* p);                                        // free
+void fn_80076158(u8** ppSrc, u8* pDst, int nBytes, int nWidth);   // byte-swap copy, nWidth 2/4/8
+
+// The 0xA8 bytes at +0x98 of every record are 21 eight-byte values stored little-endian:
+// swap them in place.
+void Golfer_TableByteSwap(void) {
+    u8* pSrc;
+    int i;
+    for (i = 0; i < NUM_GOLFERS; i++) {
+        pSrc = (u8*)&gGolferTable[i] + 0x98;
+        fn_80076158(&pSrc, (u8*)&gGolferTable[i] + 0x98, 0xA8, 8);
+    }
+}
+
+// The 'stat' handler: copy the file over the table, fix its endianness, set it up.
+void Golfer_OnStatsLoaded(UStreamObject* pObject) {
+    fn_80005628(gGolferTable, *(u8**)pObject, *(u32*)((u8*)pObject + 0x24));
+    Golfer_TableByteSwap();
+    fn_80009E70(pObject);
+    Golfer_TableSetup();
+}
+
+void Golfer_RegisterStatsHandler(void) {
+    UStream_RegisterHandler('stat', Golfer_OnStatsLoaded);
+}
+
+void Golfer_UnregisterStatsHandler(void) {
+    UStream_UnregisterHandler('stat');
+}
+
+// Take the caddie's solved shot (slot 4) as the player's own.
+void Caddie_ApplyTip(int nPlayer) {
+    gPlayers[nPlayer].nClub       = gPlayers[CADDIE_SLOT].nClub;
+    gPlayers[nPlayer].nTrajectory = gPlayers[CADDIE_SLOT].nTrajectory;
+    gPlayers[nPlayer].nShotKind   = gPlayers[CADDIE_SLOT].nShotKind;
+    gPlayers[nPlayer].fPower      = gPlayers[CADDIE_SLOT].fPower;
+    gPlayers[nPlayer].fAim        = gPlayers[CADDIE_SLOT].fAim;
 }

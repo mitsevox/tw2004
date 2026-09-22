@@ -170,6 +170,11 @@ Reading compiler output
   plus one compare; the same chain through `Player* p` (`p->nLie == 6 || ...`) gave the original's
   three plain `cmpwi/beq` (`Lie_AllowsFullSwing`, exact). A `switch` with the three cases was
   wrong both ways.
+- **[verified] A loop over a global array: index it, don't walk a pointer.** `T* p = gTable;
+  for (...; p++)` gives `addi r0, r3, gTable@l; mr r31, r0` for the pointer; `gTable[i].x` in the
+  loop body (CW strength-reduces it to the same walking pointer) gives the original's direct
+  `addi r31, r3, gTable@l`. Two functions went 93/95 -> 100 (`AI_TargetsClear`,
+  `Golfer_TableByteSwap`).
 - **[verified] Check struct sizes against the multiply.** Array indexing shows the element size:
   `slwi r,r,4` is 16 bytes, `mulli r,r,0x44` is 0x44 bytes. If ours has `mulli` by a different
   number, the struct is the wrong size (we had three function pointers in a two-pointer entry).

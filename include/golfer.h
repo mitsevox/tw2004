@@ -29,6 +29,7 @@ enum {
 #define ATTR_MODIFIERS 1    // the per-player modifier only
 #define ATTR_TOTAL     2    // both
 
+#define NUM_GOLFERS          34   // records in gGolferTable
 #define FIRST_CREATED_GOLFER 30   // table slots 30..33 are the created golfers
 #define CONTROLLER_CPU       9
 #define NUM_CLUBS            26   // clubs 0..24 are the bag, 25 the putter
@@ -159,7 +160,9 @@ typedef struct Player {
 
 // Terrain surface descriptors (0x44 bytes each); only the index of one is used here.
 typedef struct SurfaceType {
-    u8   unk[0x44];
+    u8   unk[0x2C];
+    u32  nClass;                // 0x2C  3 = green
+    u8   unk30[0x44 - 0x30];
 } SurfaceType;
 
 // The round / session state at gSession (0x5BD0 bytes); only what this file reads.
@@ -247,7 +250,6 @@ f32  fn_80050D34(f32 fDist);            // putt power for a distance
 f32  fn_80050F44(int nKind, int nClub); // a club's table reach for a shot kind
 f32  fn_80050F88(f32 fDist, u8* pParams, int nKind, int nClub);   // chip power
 f32  fn_800510EC(u8* pParams);          // distance scale
-u8   fn_8002CEDC(int nPlayer);
 int  fn_80100744(void);                 // shot kind override, 8 = none
 int  fn_801006F0(int nPlayer);          // club override, 26 = none
 CourseInfo* fn_8000C594(void);
@@ -261,10 +263,11 @@ f32  AI_MaxDistance(int nPlayer, int nKind, int nClub);
 int  AI_ShotKindForDistance(int nPlayer, f32 fDist);
 int  AI_ClubForShot(int nPlayer, int nKind, u8 bUnderOnly, f32 fDist);
 f32  AI_PowerForTarget(int nPlayer);
-u8   AI_WithinOfPin(int nPlayer, f32 fDist);                  // 0x8002CD9C
 s8   AI_NearestTarget(f32* pPos, f32* pOut);
 void AI_DefaultTarget(int nPlayer);
 void AI_PlanShot(int nPlayer, f32* pTarget);
+u8   AI_GreenTowardPin(int nPlayer, f32 fDist);
+u8   Lie_AllowsFullSwing(int nPlayer);
 void Shot_FitTargetToClub(int nPlayer);
 int  Shot_Trajectory(int nPlayer);
 void Shot_DefaultSpin(int nPlayer, f32* pOut);
