@@ -1959,3 +1959,51 @@ void SwingState15_Update(int nPlayer) {
     }
     fn_80050D2C(0);
 }
+
+
+int   fn_80048574(int nHandle, int a, int b);
+int   fn_80062BB0(int nHandle, int a, int b);
+void  fn_80062B98(int nHandle, int a, int b);
+void  fn_800A5980(u8 nPlayer);
+void  fn_8006C28C(int nPlayer, int nController);
+extern Vec4 lbl_80183650;
+
+// State 16: a shot the game plays for the player. With animation 11 running and camera 12
+// set, the launch is made with the controller set to the CPU for the call (so no meter, no
+// error, no luck swap), then it is state 12 with the ball away.
+void SwingState16_Update(int nPlayer) {
+    Vec4  vOffset = lbl_80183650;
+    s32*  pView   = &gPlayers[nPlayer].nView0;
+    View* pV      = (View*)fn_80017028(*pView);
+    int   nHandle = gPlayers[nPlayer].nShotHandle;
+    s32*  pController;
+    int   nController;
+
+    if (fn_80095780(nHandle) != 11) return;
+    if (pV->nCurCamera != 0xC) {
+        View_SetCamera(pV, 0xC, nPlayer, *pView);
+        fn_80063B98(pV, 0.75f, (f32*)&vOffset);
+    }
+    if (pV->nCamera == 1 || pV->nCamera == 4 || pV->nCamera == 3) return;
+    if (fn_80048574(nHandle, 0, 2)) {
+        if (!fn_80062BB0(nHandle, 0, 2)) return;
+        fn_80062B98(nHandle, 0, 2);
+        pController  = &gPlayers[nPlayer].nController;
+        nController  = *pController;
+        *pController = CONTROLLER_CPU;
+        Swing_Launch(nPlayer);
+        *pController = nController;
+        fn_800A5980((u8)nPlayer);
+        fn_8006C28C(nPlayer, nController);
+        SwingStack_Push(0xC, nPlayer);
+    } else {
+        pController  = &gPlayers[nPlayer].nController;
+        nController  = *pController;
+        *pController = CONTROLLER_CPU;
+        Swing_Launch(nPlayer);
+        *pController = nController;
+        fn_800A5980((u8)nPlayer);
+        fn_8006C28C(nPlayer, nController);
+        SwingStack_Push(0xC, nPlayer);
+    }
+}
