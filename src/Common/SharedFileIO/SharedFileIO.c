@@ -953,3 +953,35 @@ BOOL SFIOValidateFilename(const char* pFilename) {
     SFIO_ASSERT(NULL != pFilename);
     return fn_80172D54(pFilename);
 }
+
+// Convert an ASCII save name to full-width Shift-JIS (what the memory card directory stores).
+// Letters and digits map arithmetically; punctuation goes through the table. Output is byte-swapped.
+void SFIOAsciiToShiftJIS(const char* pSrc, u16* pDst) {
+    u8 i = 0;
+    u16 c;
+    // An unsized array from a 32-character literal: 33 bytes are copied (the NUL included), and the
+    // lookups can index the terminator. Any other spelling changes the copy sequence.
+    u8 aTable[] = "\x40\x49\x68\x94\x90\x93\x95\x66\x69\x6A\x96\x7B\x43\x7C\x44\x5E"
+                    "\x46\x47\x71\x81\x72\x48\x97\x6D\x8F\x6E\x4F\x51\x65\x6F\x62\x70";
+    while ((c = *pSrc++) != 0) {
+        if (c > 0x80 && c <= 0x98) {
+            c = (c << 8) + *pSrc++;
+        } else if (c > 0x7A) {
+            c = aTable[c - 0x5E] + 0x8100;
+        } else if (c > 0x60) {
+            c = c + 0x8220;
+        } else if (c > 0x5A) {
+            c = aTable[c - 0x44] + 0x8100;
+        } else if (c > 0x40) {
+            c = c + 0x821F;
+        } else if (c > 0x39) {
+            c = aTable[c - 0x2A] + 0x8100;
+        } else if (c > 0x2F) {
+            c = c + 0x821F;
+        } else {
+            c = aTable[c - 0x20] + 0x8100;
+        }
+        c = (c >> 8) + ((c & 0xFF) << 8);
+        pDst[i++] = c;
+    }
+}
