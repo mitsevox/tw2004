@@ -190,7 +190,8 @@ typedef struct Player {
     u8   unkA5C[8];
     f32  fA64;                  // 0xA64  a distance, set when a swing state 16 begins
     s32  nSurface;              // 0xA68  surface type under the target, -1 none, 16 water
-    u8   unkA6C[0xA90 - 0xA6C];
+    f32  vPlacement[4];         // 0xA6C  where the ball may be placed (swing state 22)
+    u8   unkA7C[0xA90 - 0xA7C];
     u8   ball[0x68];            // 0xA90  the player's Ball (0xBC bytes, see Ball.c) - nLie is its +0x68
     s32  nLie;                  // 0xAF8
     u8   unkAFC[0xB4C - 0xAFC];
@@ -209,7 +210,9 @@ typedef struct Player {
     u8   unkC2E;                // 0xC2E
     u8   unkC2F;
     s32  nRehearseState;        // 0xC30  AI_RehearseShot state machine
-    u8   unkC34[0xEE8 - 0xC34];
+    u8   unkC34[0xC58 - 0xC34];
+    s32  nC58;                  // 0xC58
+    u8   unkC5C[0xEE8 - 0xC5C];
     u32  uFlags;                // 0xEE8
     u8   unkEEC[0xEF0 - 0xEEC];
     u32  uFlagsEF0;             // 0xEF0  bit 1: target is over water
@@ -266,11 +269,17 @@ typedef struct GameState {
     s32  nCurHole;              // 0x064  index into holeOrder
     u8   unk68[0xE4 - 0x68];
     s32  holeOrder[18];         // 0x0E4
-    u8   unk12C[0x24C - 0x12C];
+    u8   unk12C[0x22C - 0x12C];
+    void (*pfn22C)(int nPlayer); // 0x22C  called after a re-plan in swing state 9
+    u8   unk230[0x24C - 0x230];
     void (*pfn24C)(int nPlayer); // 0x24C  called when a swing leaves state 20
-    u8   unk250[0x276 - 0x250];
+    u8   unk250[0x264 - 0x250];
+    u8   (*pfn264)(int nPlayer); // 0x264  "aim at the pin?" for a re-plan
+    u8   unk268[0x276 - 0x268];
     u8   b276;                  // 0x276
-    u8   unk277[0x290 - 0x277];
+    u8   unk277[0x284 - 0x277];
+    u8   b284;                  // 0x284
+    u8   unk285[0x290 - 0x285];
     s32  n290;                  // 0x290
 } GameState;
 

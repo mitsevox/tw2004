@@ -1690,7 +1690,7 @@ void SwingState21_Exit(int nPlayer) {
 void  fn_80062B64(int nPlayer);
 void  fn_80062B60(int nPlayer);
 void  fn_80019234(int nHandle, f32* pPos, int a);
-void  fn_8005587C(u8* pBall, f32* pPos);          // put the ball at a point
+u8    fn_8005587C(u8* pBall, f32* pPos);          // put the ball at a point
 void  fn_800C7140(int a);
 void  fn_80045824(int nPlayer);
 extern Vec4 lbl_80183630;
@@ -2251,4 +2251,109 @@ void SwingState22_Enter(int nPlayer) {
     fn_80069330(nPlayer, fTmp);
     fn_8006A6C4(nPlayer);
     Swing_ResetBoostAndSpin(nPlayer);
+}
+
+
+void  BreakLine_Start(int nView);            // GoBreakLine.c
+void  fn_80062CB0(int a, int b);
+void  fn_800DEE4C(int nPlayer);
+void  fn_80055AA8(u8* pBall, u8* pBall2, int nPlayer);
+void  fn_800EDAE0(int nPlayer);
+u8    fn_800DDDC8(int nPlayer);
+void  fn_800694A0(int nPlayer, f32 f);
+
+// State 9: the putt-line view. Pops when neither button 46 nor 48 is held and the view's fade
+// is complete. For a human outside a replay, before the swing starts, the caddie updates and
+// button 6 re-plans: the game's 0x264 callback (with gpGame+0x284) or a putt aims at the pin,
+// anything else re-chooses a target; then Shot_Prepare, the break line, animation 5.
+void SwingState09_Update(int nPlayer) {
+    u32  uMask = fn_800142AC(0x2E, 1);
+    s32* pController = &gPlayers[nPlayer].nController;
+    if (!(fn_800136DC(*pController) & uMask)) {
+        uMask = fn_800142AC(0x30, 1);
+        if (!(fn_800136DC(*pController) & uMask)) {
+            if (1.0f == ((View*)fn_80017028(gPlayers[nPlayer].nView0))->f54) {
+                fn_8005CFD4(nPlayer);
+                return;
+            }
+        }
+    }
+    if (Player_IsCPU(nPlayer)) return;
+    if (gSession.bReplay != 0) return;
+    if (gPlayers[nPlayer].swing.nPhase != 0) return;
+    Caddie_Update(nPlayer);
+    uMask = fn_800142AC(6, 0);
+    if (fn_800136DC(*pController) & uMask) {
+        if (gpGame->b284 != 0) {
+            s32* pHandle;
+            if (gpGame->pfn264(nPlayer)) {
+                AI_DefaultTarget(nPlayer);
+            } else if (gPlayers[nPlayer].nShotKind == SHOT_PUTT) {
+                AI_DefaultTarget(nPlayer);
+            } else {
+                AI_ChooseTarget(nPlayer);
+            }
+            Shot_Prepare(nPlayer, 1);
+            BreakLine_Start(gPlayers[nPlayer].nView0);
+            fn_8001C804(nPlayer, 1, 1);
+            pHandle = &gPlayers[nPlayer].nShotHandle;
+            fn_800957D8(*pHandle);
+            fn_80095744(*pHandle, 5);
+            fn_80062C38();
+            if (gSession.nSplitScreen != 0) {
+                fn_80062CB0(gPlayers[nPlayer].nC58, 1);
+            }
+        }
+        gpGame->pfn22C(nPlayer);
+    } else {
+        fn_800DEE4C(nPlayer);
+    }
+}
+
+// State 22: waiting at the ball. Button 35 with the "ball can be placed" flag: the ball is put
+// at the placement point (a class-1 surface gets the extra placement call), the player's
+// position follows it, and the swing (state 1) begins. Otherwise the cursor moves, buttons
+// 26..29 play the pan sounds, and button 25 off the tee (if allowed) re-does the setup.
+void SwingState22_Update(int nPlayer) {
+    u32  uMask = fn_800142AC(0x23, 0);
+    s32* pController = &gPlayers[nPlayer].nController;
+    if (fn_800136DC(*pController) & uMask) {
+        Player* p = &gPlayers[nPlayer];
+        if (p->uFlagsEF0 & 1) {
+            u8* pBall = p->ball;
+            if (fn_8005587C(pBall, p->vPlacement)) {
+                if (gSurfaceTypes[*(s32*)(gPlayers[nPlayer].ball + 0x74)].nClass == 1) {
+                    fn_80055AA8(pBall, pBall, nPlayer);
+                }
+                Vec_Copy((f32*)pBall, &p->fBallX);
+                SwingStack_Push(1, nPlayer);
+            }
+        }
+    } else {
+        fn_800EDAE0(nPlayer);
+        uMask = fn_800142AC(0x1A, 1);
+        if (fn_800136DC(*pController) & uMask) {
+            fn_80067074(nPlayer, 0x16, 0, -1);
+        } else {
+            uMask = fn_800142AC(0x1B, 1);
+            if (fn_800136DC(*pController) & uMask) {
+                fn_80067074(nPlayer, 0x17, 0, -1);
+            }
+        }
+        uMask = fn_800142AC(0x1C, 1);
+        if (fn_800136DC(*pController) & uMask) {
+            fn_80067074(nPlayer, 0x18, 0, -1);
+        } else {
+            uMask = fn_800142AC(0x1D, 1);
+            if (fn_800136DC(*pController) & uMask) {
+                fn_80067074(nPlayer, 0x19, 0, -1);
+            }
+        }
+        uMask = fn_800142AC(0x19, 0);
+        if ((fn_800136DC(*pController) & uMask) && gPlayers[nPlayer].nLie != 0 && fn_800DDDC8(nPlayer)) {
+            fn_8001D8DC(nPlayer);
+            fn_800689D4(nPlayer);
+        }
+    }
+    fn_800694A0(nPlayer, 1.0f);
 }
