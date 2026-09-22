@@ -207,3 +207,9 @@ Dated log of what was done and decided, newest last. Facts and lessons belong in
   +0x13 is `bReplay` (set only when a saved replay loads), not a spin option. The swing starts
   at a quarter pull on either stick; a 25-sample ring of stick positions feeds the sampler
   (`0x8005934C`, read: dead zone 96..160). Swing.c: 20 functions in C.
+- **The swing phases in C** (`gSwingPhaseFns`, 7 entries): backswing follows the stick with a
+  chasing animation, the top is the furthest-back of the last 25 samples, holding at the top
+  waggles the animation and a slow return to centre cancels the swing, impact is the animation's
+  event with the stick's forward direction as the sample, spin is added after impact (1 a frame
+  to 20). `fn_8006BF60` is the replay recorder (fresh seed at every human launch), not spin.
+  Swing.c: 30 functions in C.

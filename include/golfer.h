@@ -93,13 +93,17 @@ typedef struct SwingData {
     s32  nTopY;                 // 0x01C  (0x3F0)
     s32  nImpactX;              // 0x020  (0x3F4) stick at impact
     s32  nImpactY;              // 0x024  (0x3F8)
-    u8   unk28[0x3C - 0x28];
+    s32  nImpactX2;             // 0x028  (0x3FC)
+    s32  nImpactY2;             // 0x02C  (0x400)
+    u8   unk30[0x3C - 0x30];
     f32  fSwingError;           // 0x03C  (0x410) the stick's miss, after forgiveness
     f32  fLaunchPower;          // 0x040  (0x414) Swing_ComputePower's result
     f32  fLaunchAX;             // 0x044  (0x418) copy of vLaunchA[0]
     f32  fPowerAfterError;      // 0x048  (0x41C)
     f32  fBackAngle;            // 0x04C  (0x420) the backswing's sideways angle, radians (0 on a putt)
-    u8   unk50[0x378 - 0x50];
+    u8   unk50[0x370 - 0x50];
+    s32  n370;                  // 0x370  (0x744) cleared each phase step
+    u8   unk374[4];
     s32  nCentreX;              // 0x378  (0x74C) stick at the start of the swing
     s32  nCentreY;              // 0x37C  (0x750)
     s32  nRestCX;               // 0x380  (0x754) the sticks' rest positions while waiting
@@ -112,9 +116,16 @@ typedef struct SwingData {
     s32  nHistIndex;            // 0x45C  (0x830)
     s32  nRumbleFrames;         // 0x460  (0x834)
     u8   bRumble;               // 0x464  (0x838)
-    u8   unk465[0x494 - 0x465];
+    u8   unk465[0x470 - 0x465];
+    f32  fTopTime;              // 0x470  (0x844) animation time when the backswing settled
+    s32  nTopStickY;            // 0x474
+    f32  fHoldTime;             // 0x478
+    f32  f47C;                  // 0x47C
+    f32  f480;                  // 0x480
+    u8   unk484[0x494 - 0x484];
     s32  nBoostLevel;           // 0x494  (0x868) power boost level pressed, 0..8
-    u8   unk498[0x604 - 0x498];
+    f32  fBackDown;             // 0x498  set to 1/12 when the backswing starts backing down
+    u8   unk49C[0x604 - 0x49C];
     f32  f604;                  // 0x604
     u8   unk608[4];
     u8   b60C;                  // 0x60C
@@ -125,7 +136,8 @@ typedef struct SwingData {
     s32  nSpinStickY;           // 0x618  (0x9EC)
     f32  fSpinX;                // 0x61C  (0x9F0)
     f32  fSpinY;                // 0x620  (0x9F4)
-    u8   unk624[4];
+    u8   bShotTaken;            // 0x624  (0x9F8) a human struck the ball (not in a replay)
+    u8   unk625[3];
     f32  f628;                  // 0x628
     f32  f62C;                  // 0x62C
     u8   unk630;                // 0x630  (0xA04) cleared by Player_SetGolfer
@@ -326,6 +338,9 @@ s8   AI_NearestTarget(f32* pPos, f32* pOut);
 void AI_DefaultTarget(int nPlayer);
 u8   Player_IsCPU(int nPlayer);
 u8   Controller_IsCPU(int nController);
+u8   Player_HasPad(int nPlayer);
+u8   Controller_IsPad(int nController);
+u8   Player_IsController8(int nPlayer);
 void AI_PlanShot(int nPlayer, f32* pTarget);
 u8   AI_GreenTowardPin(int nPlayer, f32 fDist);
 u8   AI_RehearseShot(int nPlayer, f32* pOutDist2, u8 bFast, f32 fTolerance);
@@ -337,5 +352,43 @@ void Shot_FaceVector(int nPlayer, f32* pOut);
 f32  Shot_AimAngle(int nPlayer);
 void AI_ClubLonger(int nPlayer, s32* pClub, int nStep);
 void AI_ClubShorter(int nPlayer, s32* pClub, int nStep);
+
+// Game options at gSession + 0xE78 (the wind setting is nWind, at gSession + 0xE88).
+typedef struct GameOptions {
+    u8   unk0[10];              // 0x00
+    u8   unkA[2];
+    s32  unkC;                  // 0x0C
+    s32  nWind;                 // 0x10  0..3 calm..gusty, 4+ none
+    s32  unk14;                 // 0x14
+    s32  unk18;                 // 0x18  -> fn_80055C40
+    s32  unk1C;                 // 0x1C  -> fn_80055CD0
+    u8   unk20[4];
+    u8   unk24[9];              // 0x24
+    u8   bSpinEnabled;          // 0x2D  (gSession + 0xEA5)
+    u8   rows[4][19];           // 0x2E  four rows of 19 flags
+    u8   unk7A;                 // 0x7A
+    u8   unk7B;
+    u8   unk7C;
+    u8   unk7D;
+    u8   unk7E;
+    u8   unk7F;
+    s32  unk80;                 // 0x80
+    u8   unk84;                 // 0x84
+} GameOptions;
+
+// A player's profile block at gSession + 0xD38, 0x40 each.
+typedef struct PlayerProfile {
+    u8   unk0;                  // 0x00
+    u8   unk1;                  // 0x01
+    u8   unk2;                  // 0x02
+    u8   unk3[5];
+    char szNames[6][8];         // 0x08
+    u8   nOutfit;               // 0x38  the record's byte 0x60
+    u8   nBallType;             // 0x39  0..3, from the SPIN attribute for a pro
+    u8   unk3A[6];
+} PlayerProfile;
+
+#define SESSION_OPTIONS  ((GameOptions*)((u8*)&gSession + 0xE78))
+#define SESSION_PROFILE(i) ((PlayerProfile*)((u8*)&gSession + 0xD38) + (i))
 
 #endif

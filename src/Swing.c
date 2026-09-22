@@ -6,7 +6,11 @@
 
 // The swing module's state; only the tuning values read here. Set up in Swing_Init.
 typedef struct SwingState {
-    u8   unk0[0xAC];
+    u8   unk0[4];
+    f32  fClubBack;             // 0x004  tuning "clubback"
+    f32  fClubDown;             // 0x008  tuning "clubdown"
+    f32  fTuningC;              // 0x00C
+    u8   unk10[0xAC - 0x10];
     f32  fCurveMin;             // 0x0AC  a club's shaping range, by gClubCurve
     f32  fCurveMax;             // 0x0B0
     u8   unkB4[4];
@@ -314,8 +318,9 @@ extern u8 gReplayData[];                     // 0x801D6030  saved seed at +0, sw
 
 void Ball_Launch(void* pBall, int nClub, int nKind, f32 fPower, f32 fAim, int nTrajectory, f32* pA, f32* pB);
 void Luck_TakePerfectShot(int nPlayer);      // Golfer.c
-u8   Player_IsController8(int nPlayer);      // Golfer.c
 void fn_8000B1D4(int nStream, u32 uSeed);    // seed an RNG stream
+void fn_80095744(int nHandle, int nAnim);    // play an animation
+void fn_80096690(int nHandle);
 void fn_8006BF60(int nPlayer);
 void fn_8006C300(int nPlayer);
 void Swing_FaceVector(int nPlayer, f32* pOut);
@@ -665,11 +670,9 @@ void SwingState02_Update(int nPlayer) {
 
 u8*  fn_80058EB8(int nPlayer, int nController);   // the pad's state: [1] main stick y, [3] C-stick y
 f32  fn_8005CB78(int nHandle, int a, int nMark);   // an animation mark's time
-void fn_80095744(int nHandle, int nAnim);        // play an animation
-void fn_80096690(int nHandle);
 void fn_8005BFC0(int nPlayer);
-void fn_8005A0E0(int nPlayer);
 void fn_8006C5E0(void);
+void Swing_ClearFrameFlag(int nPlayer);
 void fn_80067074(int nPlayer, int nSound, int a, int b);
 
 // The swing is under way: phase 1, the animation started, its three marks read, the 25-sample
@@ -718,7 +721,7 @@ int Swing_WaitForBackswing(int nPlayer) {
         gPlayers[nPlayer].swing.nPhase = 1;
         Swing_Begin(nPlayer);
         *(u32*)(nHandle + 0x168) &= ~1;
-        fn_8005A0E0(nPlayer);
+        Swing_ClearFrameFlag(nPlayer);
         return 0;
     }
     pPad    = fn_80058EB8(nPlayer, nController);
@@ -736,7 +739,7 @@ int Swing_WaitForBackswing(int nPlayer) {
         }
         fn_80067074(nPlayer, 0x2C, 0, 0);
         Swing_Begin(nPlayer);
-        fn_8005A0E0(nPlayer);
+        Swing_ClearFrameFlag(nPlayer);
         fn_8006C5E0();
     } else {
         gPlayers[nPlayer].swing.nRestCY = 128;
@@ -745,4 +748,427 @@ int Swing_WaitForBackswing(int nPlayer) {
         gPlayers[nPlayer].swing.nRestX  = 128;
     }
     return 0;
+}
+
+
+// ---- the backswing --------------------------------------------------------------------------------
+
+// The shot object at Player.nShotHandle; only the fields the swing touches.
+typedef struct ShotObj {
+    u8    unk0[0x38];
+    u8*   pView;                // 0x038  -> +0x38 -> a struct with +0x10E4
+    u8    unk3C[0x164 - 0x3C];
+    u8    anim[4];              // 0x164  the animation: +0x14 is its playback rate
+    u32   uFlags;               // 0x168  bit 0x40: the backswing is being backed down
+    u8    unk16C[0x17C - 0x16C];
+    f32   fAnimTime;            // 0x17C
+    u8    unk180[0x5CC - 0x180];
+    s32   n5CC;                 // 0x5CC
+    u8    unk5D0[0x1624 - 0x5D0];
+    u8*   pClip;                // 0x1624 -> +0xCC blend, +0xD4/+0xD8 clips
+    f32   f1628;
+    f32   f162C;
+    f32   f1630;
+    f32   f1634;
+    f32   v1638[3];             // 0x1638
+    f32   f1644;
+} ShotObj;
+
+extern f32 gSwingRange[8];                   // 0x801882EC  backswing rate per shot kind: -, 0.85, 0.5, 0.8
+
+u8*  Pad_State(int nPlayer, int nController);          // 0x80058EB8
+int  Swing_StickX(int nPlayer, u8* pPad);              // 0x80058F04  main or C-stick by bUsingCStick
+int  Swing_StickY(int nPlayer, u8* pPad);              // 0x80058F30
+f32  Swing_TopTime(SwingData* pSw);                    // 0x80058E98  fMark1 - 0.0076
+f32  Swing_StartTime(SwingData* pSw);                  // 0x80058EA8  fMark0 + 0.0076
+f32  ShotObj_GetBlend(ShotObj* pObj);                  // 0x8005CB98  f1628
+void ShotObj_Set162C(ShotObj* pObj, f32 f);            // 0x8005CB88
+void ShotObj_Set1630(ShotObj* pObj, f32 f);            // 0x8005CBB0
+void ShotObj_Set1634(ShotObj* pObj, f32 f);            // 0x8005CBC0
+void Anim_SetRate(u8* pAnim, f32 fRate);               // 0x8001F084
+void Anim_SetTime(u8* pAnim, f32 fTime);               // 0x8007327C
+int  fn_800204A0(u8* pClip, f32* pOut, f32 fTime);
+void fn_80017EF4(ShotObj* pObj, int a, f32 f);
+void fn_8005B154(int nPlayer);
+void fn_8005BE10(int nPlayer);
+u8   fn_80100AF8(void);                                // lesson 5 of mode 11
+
+// Freeze the backswing at the top: the animation stops (rate 0.008) where it is.
+void Swing_HoldAtTop(int nPlayer) {
+    Player*    p    = &gPlayers[nPlayer];
+    SwingData* pSw  = &p->swing;
+    ShotObj*   pObj = (ShotObj*)p->nShotHandle;
+    pSw->fHoldTime = pSw->fTopTime;
+    Anim_SetTime(pObj->anim, pSw->fHoldTime);
+    fn_80017EF4(pObj, 0, 0.0f);
+    Anim_SetRate(pObj->anim, 0.008f);
+    pObj->uFlags |= 0x40;
+    pSw->f480 = 0.0f;
+    pSw->f47C = 0.0f;
+}
+
+// One stick axis through the dead zone: 96..160 reads as centre (128); forward of it runs
+// smoothly down to 1, back of it jumps to ~179 and runs to 255.
+static inline int Swing_DeadZone(int v) {
+    if (v > 160) return 127 + (v - 96) * 128 / 159;
+    if (v < 96) return 128 - (96 - v) * 127 / 96;
+    return 128;
+}
+
+// Phase 1, the backswing. A CPU (or a replay) plays the backswing animation to 98% of the way
+// to the top (65% in lesson 5) and then swings down. A human's backswing follows the stick:
+// the further back it is pulled (dead-zoned magnitude, capped at 100), the further along the
+// backswing the animation is asked to be; the animation chases that at a rate that grows with
+// the gap. While the stick is still back, every frame's sample goes into the 25-sample ring
+// and is provisionally the top. The moment the stick comes forward of 96 (once the backswing
+// is at least 0.1 along) the top is the furthest-back sample in the ring, the downswing
+// animation starts, and it is phase 3 with the impact sample seeded from this frame.
+int Swing_UpdateBackswing(int nPlayer) {
+    Player*    p;
+    ShotObj*   pObj;
+    SwingData* pSw;
+    int        nController;
+    int        nX, nY;
+    u8*        pPad;
+    f32        fAnimTime, fTop, fStart, fMag, fTarget, fDelta, fRate, fRange;
+
+    p           = &gPlayers[nPlayer];
+    pObj        = (ShotObj*)p->nShotHandle;
+    pSw         = &p->swing;
+    nController = p->nController;
+    if (*(u8**)(pObj->pView + 0x38) != NULL) {
+        *(s32*)(*(u8**)(pObj->pView + 0x38) + 0x10E4) = 4;
+    }
+    if (pObj->pClip != NULL) {
+        pObj->f1628 = *(f32*)(pObj->pClip + 0xCC);
+    } else {
+        pObj->f1628 = 0.0f;
+    }
+    fAnimTime = pObj->fAnimTime;
+    if (Controller_IsCPU(nController) || Game_GetMode() == 10) {
+        f32 fFrac;
+        AI_MaxDistance(nPlayer, gPlayers[nPlayer].nShotKind, gPlayers[nPlayer].nClub);
+        if (fn_80100AF8()) {
+            fFrac = 0.65f;
+        } else {
+            fFrac = 0.98f;
+        }
+        if (fAnimTime >= pSw->fMark0 + fFrac * (pSw->fMark1 - pSw->fMark0)) {
+            Anim_SetRate(pObj->anim, 1.0f);
+            fn_80095744((int)pObj, 7);
+            if (fn_800204A0(*(u8**)(pObj->pClip + 0xD8), pObj->v1638, *(f32*)(*(u8**)(pObj->pClip + 0xD8) + 8) + (pObj->fAnimTime - pSw->fMark0))) {
+                pSw->fMark2 = pObj->fAnimTime + (*(f32*)(*(u8**)(pObj->pClip + 0xD4) + 0x24) - pObj->v1638[1]) + pObj->f1644;
+            }
+            fn_80096690((int)pObj);
+            pObj->n5CC = 2;
+            pSw->fMark1 = pObj->fAnimTime;
+            ShotObj_Set1634(pObj, 0.0f);
+            ShotObj_Set1630(pObj, 0.0f);
+            ShotObj_Set162C(pObj, 1.4f * ShotObj_GetBlend(pObj));
+            pSw->nPhase = 3;
+        }
+        return 0;
+    }
+    pPad   = Pad_State(nPlayer, nController);
+    nX     = Swing_StickX(nPlayer, pPad);
+    nY     = Swing_StickY(nPlayer, pPad);
+    fTop   = Swing_TopTime(pSw);
+    fStart = Swing_StartTime(pSw);
+    if ((nY <= 255 && nY > 96) || (ShotObj_GetBlend(pObj) < 0.1f && nY < 96)) {
+        if (nY < 96) {
+            fMag = 0.0f;
+        } else {
+            int nDX = Swing_DeadZone(nX) - 128;
+            int nDY = Swing_DeadZone(nY) - 128;
+            fMag = (f32)fn_80009680(nDX * nDX + nDY * nDY);
+        }
+        if (fMag > 100.0f) fMag = 100.0f;
+        fRange  = fTop - fStart;
+        fTarget = fStart + (fMag / 100.0f) * fRange;
+        fDelta  = fTarget - fAnimTime;
+        fRate   = 1.0f + (f32)fn_8000AE94(fDelta) / fRange;
+        fRate   = fRate * fRate - 1.0f;
+        if (fRate >= 1.0f) fRate = 1.0f;
+        if (gPlayers[nPlayer].nShotKind == 1 || gPlayers[nPlayer].nShotKind == 2 || gPlayers[nPlayer].nShotKind == 3) {
+            fRange = fRange / gSwingRange[gPlayers[nPlayer].nShotKind];
+        } else {
+            fRange = 1.0f;
+        }
+        Anim_SetRate(pObj->anim, fRate * fRange);
+        if (fMag > 93.0f) {
+            Anim_SetRate(pObj->anim, fRange);
+        }
+        if (fDelta > -0.05f && fDelta < 0.05f) {
+            pSw->fTopTime = pObj->fAnimTime;
+            pSw->nTopStickY = nY;
+            Swing_HoldAtTop(nPlayer);
+            pSw->nPhase = 2;
+        } else if (pObj->uFlags & 0x40) {
+            if (fDelta > 0.0f) pObj->uFlags &= ~0x40;
+        } else if (fDelta < 0.0f) {
+            pObj->uFlags |= 0x40;
+            pSw->fBackDown = 1.0f / 12.0f;
+        }
+        pSw->nHistX[pSw->nHistIndex] = nX;
+        pSw->nHistY[pSw->nHistIndex] = nY;
+        pSw->nHistIndex++;
+        pSw->nHistIndex %= 25;
+        fn_8005B154(nPlayer);
+        pSw->nTopX = nX;
+        pSw->nTopY = nY;
+        fn_8005BE10(nPlayer);
+    } else if (nY <= 96) {
+        // The stick has come forward: the top of the backswing is the furthest-back sample.
+        int i;
+        pSw->nTopY = pSw->nCentreY;
+        for (i = 0; i < 25; i++) {
+            if (pSw->nHistY[i] > pSw->nTopY) {
+                pSw->nTopX = pSw->nHistX[i];
+                pSw->nTopY = pSw->nHistY[i];
+            }
+        }
+        fn_8005B154(nPlayer);
+        Anim_SetRate(pObj->anim, 1.0f);
+        fn_80095744((int)pObj, 7);
+        if (fn_800204A0(*(u8**)(pObj->pClip + 0xD8), pObj->v1638, *(f32*)(*(u8**)(pObj->pClip + 0xD8) + 8) + (pObj->fAnimTime - pSw->fMark0))) {
+            pSw->fMark2 = pObj->fAnimTime + (*(f32*)(*(u8**)(pObj->pClip + 0xD4) + 0x24) - pObj->v1638[1]) + pObj->f1644;
+        }
+        fn_80096690((int)pObj);
+        pObj->n5CC = 2;
+        pSw->fMark1 = pObj->fAnimTime;
+        ShotObj_Set1634(pObj, 0.0f);
+        ShotObj_Set1630(pObj, 0.0f);
+        ShotObj_Set162C(pObj, 1.4f * ShotObj_GetBlend(pObj));
+        pSw->nPhase = 3;
+        fn_80067074(nPlayer, 0x2F, 0, 0);
+        pSw->nImpactX = nX;
+        pSw->nImpactY = nY;
+        pSw->nImpactX2 = nX;
+        pSw->nImpactY2 = nY;
+        Swing_ClearFrameFlag(nPlayer);
+    }
+    return 0;
+}
+
+
+// ---- at the top, and the downswing ----------------------------------------------------------------
+
+void fn_8002792C(u8* p);
+
+// Phase 2, holding at the top. Any stick movement drops back to phase 1 (backing down if it
+// came forward). While it is steady the animation waggles +-0.0076 around the top. If the
+// stick sits near centre (y at or below 160, x within 64..192) for over 0.1 s the swing is
+// abandoned: phase 0, the address animation, sound 9.
+int Swing_UpdateAtTop(int nPlayer) {
+    Player*    p;
+    ShotObj*   pObj;
+    SwingData* pSw;
+    int        nController;
+    int        nX, nY;
+    u8*        pPad;
+    f32        fTop, fStart, fAnimTime;
+
+    p           = &gPlayers[nPlayer];
+    pObj        = (ShotObj*)p->nShotHandle;
+    pSw         = &p->swing;
+    nController = p->nController;
+    if (*(u8**)(pObj->pView + 0x38) != NULL) {
+        *(s32*)(*(u8**)(pObj->pView + 0x38) + 0x10E4) = 4;
+    }
+    pPad   = Pad_State(nPlayer, nController);
+    nX     = Swing_StickX(nPlayer, pPad);
+    nY     = Swing_StickY(nPlayer, pPad);
+    fTop   = Swing_TopTime(pSw);
+    fStart = Swing_StartTime(pSw);
+    fAnimTime = pObj->fAnimTime;
+    pSw->f480 += gSession.fFrameTime;
+    if (pSw->nTopStickY != nY) {
+        if (nY < gPlayers[nPlayer].swing.nTopStickY) {
+            pObj->uFlags |= 0x40;
+        } else {
+            pObj->uFlags &= ~0x40;
+        }
+        pSw->fBackDown = 1.0f / 12.0f;
+        pSw->nPhase    = 1;
+    } else if (((pObj->uFlags & 0x40) && fAnimTime < pSw->fHoldTime) || fAnimTime < fStart) {
+        pSw->fHoldTime = 0.0076f + pSw->fTopTime;
+        pObj->uFlags &= ~0x40;
+    } else if ((!(pObj->uFlags & 0x40) && fAnimTime > pSw->fHoldTime) || fAnimTime > fTop) {
+        pSw->fHoldTime = pSw->fTopTime - 0.0076f;
+        pObj->uFlags |= 0x40;
+    } else if (pSw->nTopStickY <= 160 && nX <= 192 && nX >= 64) {
+        pSw->f47C += gSession.fFrameTime;
+        if (pSw->f47C > 0.1f) {
+            pSw->nPhase = 0;
+            fn_80095744((int)pObj, 5);
+            Anim_SetRate(pObj->anim, 1.0f);
+            fn_80067074(nPlayer, 9, 0, 0);
+        }
+    }
+    fn_8005B154(nPlayer);
+    return 0;
+}
+
+// Phase 3, the downswing. Every frame the stick is forward of 96 and more than ~17 units from
+// the centre sample, that reading becomes the impact sample - so what counts is where the
+// stick was pointing on the way through, not when. The ball goes when the animation reports
+// impact (n5CC < 0): phase 5, Swing_Launch, the mis-hit rumble, the putt sound.
+int Swing_UpdateDownswing(int nPlayer) {
+    Player*    p;
+    ShotObj*   pObj;
+    SwingData* pSw;
+    int        nController;
+    int        nX, nY;
+    u8*        pPad;
+
+    p           = &gPlayers[nPlayer];
+    pSw         = &p->swing;
+    pObj        = (ShotObj*)p->nShotHandle;
+    nController = p->nController;
+    if (*(u8**)(pObj->pView + 0x38) != NULL) {
+        *(s32*)(*(u8**)(pObj->pView + 0x38) + 0x10E4) = 4;
+    }
+    if (!Controller_IsCPU(nController) && Game_GetMode() != 10) {
+        int nDX, nDY;
+        pPad = Pad_State(nPlayer, nController);
+        nX   = Swing_StickX(nPlayer, pPad);
+        nY   = Swing_StickY(nPlayer, pPad);
+        nDX  = nX - pSw->nCentreX;
+        nDY  = nY - pSw->nCentreY;
+        if (nY <= 96 && (f32)(nDX * nDX + nDY * nDY) > 300.0f) {
+            pSw->nImpactX  = nX;
+            pSw->nImpactY  = nY;
+            pSw->nImpactX2 = nX;
+            pSw->nImpactY2 = nY;
+        }
+    }
+    if (pObj->n5CC < 0) {
+        fn_8002792C(*(u8**)(pObj->pView + 0x38));
+        gPlayers[nPlayer].swing.nPhase = 5;
+        Swing_Launch(nPlayer);
+        if (!Controller_IsCPU(nController) && gSession.bReplay == 0) {
+            gPlayers[nPlayer].swing.bShotTaken = 1;
+        }
+        if (Controller_IsPad(nController) && gSession.bReplay == 0) {
+            Swing_MisHitRumble(nPlayer);
+        }
+        if (gPlayers[nPlayer].nShotKind == SHOT_PUTT) {
+            fn_80067074(nPlayer, 0x2B, 0, 0);
+        }
+        return 1;
+    }
+    return 0;
+}
+
+
+// ---- after impact ---------------------------------------------------------------------------------
+
+u32  fn_800136DC(int nController);           // buttons held
+u32  fn_800142AC(int nButton, int a);        // a button's mask
+unsigned long long fn_8000BEE4(char* pName);   // a tuning name's 64-bit hash
+void fn_800102DC(unsigned long long uHash, void* pSwing, f32* pOut);   // bind a tuning value
+extern char lbl_801883A8[];                  // "clubback"
+extern char lbl_801883B4[];                  // "clubdown"
+extern char lbl_8028119C[];
+
+int Swing_PhaseIdle4(int nPlayer) {
+    return 0;
+}
+
+int Swing_PhaseIdle6(int nPlayer) {
+    return 0;
+}
+
+// Stop the pad rumble.
+void Swing_RumbleOff(int nPlayer) {
+    Player* p;
+    s32*    pFrames;
+    s32*    pController;
+    if (Player_HasPad(nPlayer)) {
+        p           = &gPlayers[nPlayer];
+        pFrames     = &p->swing.nRumbleFrames;
+        pController = &p->nController;
+        fn_800130F8(p->nController, 0);
+        fn_80013130(*pController, 0);
+        gPlayers[nPlayer].swing.bRumble = 0;
+        *pFrames = 0;
+    }
+}
+
+// Count the mis-hit rumble down and stop it when it runs out.
+void Swing_RumbleTick(int nPlayer) {
+    if (Player_HasPad(nPlayer)) {
+        Player* p = &gPlayers[nPlayer];
+        if (p->swing.bRumble) {
+            s32* pFrames = &p->swing.nRumbleFrames;
+            if (*pFrames <= 0) {
+                Swing_RumbleOff(nPlayer);
+            } else {
+                (*pFrames)--;
+            }
+        }
+    }
+}
+
+// Spin, added after the ball is away: with the spin option on and the spin button (mask
+// 0x20) held after a real shot, the amount grows by one a frame up to 20 - a third of a second
+// for full spin - and the direction is the stick, whenever it is outside the 96..160 dead zone
+// (the first press starts it at straight back, 255).
+void Swing_SpinInput(int nPlayer) {
+    s32*    pController;
+    s32*    pAmount;
+    u32     uButtons;
+    int     nX, nY;
+    if (Player_IsCPU(nPlayer)) return;
+    if (SESSION_OPTIONS->bSpinEnabled == 0) return;
+    pController = &gPlayers[nPlayer].nController;
+    uButtons    = fn_800136DC(*pController);
+    if (!(uButtons & fn_800142AC(0x20, 0))) return;
+    if (gPlayers[nPlayer].swing.bShotTaken == 0) return;
+    fn_80067074(nPlayer, 0x2E, 0, 0);
+    nX = Swing_StickX(nPlayer, Pad_State(nPlayer, *pController));
+    nY = Swing_StickY(nPlayer, Pad_State(nPlayer, *pController));
+    pAmount = &gPlayers[nPlayer].swing.nSpinAmount;
+    if (*pAmount == 0) {
+        gPlayers[nPlayer].swing.nSpinStickX = 128;
+        gPlayers[nPlayer].swing.nSpinStickY = 255;
+    }
+    if (nX < 96 || nX > 160 || nY < 96 || nY > 160) {
+        gPlayers[nPlayer].swing.nSpinStickX = nX;
+        gPlayers[nPlayer].swing.nSpinStickY = nY;
+    }
+    if (*pAmount < 20) {
+        (*pAmount)++;
+    }
+}
+
+// Phase 5, the ball is away: the rumble counts down and spin can be added.
+int Swing_UpdateAfterImpact(int nPlayer) {
+    int nController = gPlayers[nPlayer].nController;
+    u8* pPad;
+    if (Player_IsCPU(nPlayer) || gSession.bReplay != 0) {
+        return 0;
+    }
+    pPad = Pad_State(nPlayer, nController);
+    Swing_StickX(nPlayer, pPad);
+    Swing_StickY(nPlayer, pPad);
+    Swing_RumbleTick(nPlayer);
+    Swing_SpinInput(nPlayer);
+    Swing_ApplySpin(nPlayer);
+    return 0;
+}
+
+void Swing_ClearFrameFlag(int nPlayer) {
+    gPlayers[nPlayer].swing.n370 = 0;
+}
+
+// Bind the swing module's tuning values by name.
+void Swing_LoadTuning(void) {
+    unsigned long long uHash;
+    uHash = fn_8000BEE4(lbl_801883A8);
+    fn_800102DC(uHash, gpSwing, &gpSwing->fClubBack);
+    uHash = fn_8000BEE4(lbl_801883B4);
+    fn_800102DC(uHash, gpSwing, &gpSwing->fClubDown);
+    uHash = fn_8000BEE4(lbl_8028119C);
+    fn_800102DC(uHash, gpSwing, &gpSwing->fTuningC);
 }

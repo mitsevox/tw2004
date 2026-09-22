@@ -1766,42 +1766,6 @@ void fn_8002E25C(void) {
 
 // ---- the session and its options ---------------------------------------------------------------
 
-// Game options at gSession + 0xE78 (the wind setting is nWind, at gSession + 0xE88).
-typedef struct GameOptions {
-    u8   unk0[10];              // 0x00
-    u8   unkA[2];
-    s32  unkC;                  // 0x0C
-    s32  nWind;                 // 0x10  0..3 calm..gusty, 4+ none
-    s32  unk14;                 // 0x14
-    s32  unk18;                 // 0x18  -> fn_80055C40
-    s32  unk1C;                 // 0x1C  -> fn_80055CD0
-    u8   unk20[4];
-    u8   unk24[10];             // 0x24
-    u8   rows[4][19];           // 0x2E  four rows of 19 flags
-    u8   unk7A;                 // 0x7A
-    u8   unk7B;
-    u8   unk7C;
-    u8   unk7D;
-    u8   unk7E;
-    u8   unk7F;
-    s32  unk80;                 // 0x80
-    u8   unk84;                 // 0x84
-} GameOptions;
-
-// A player's profile block at gSession + 0xD38, 0x40 each.
-typedef struct PlayerProfile {
-    u8   unk0;                  // 0x00
-    u8   unk1;                  // 0x01
-    u8   unk2;                  // 0x02
-    u8   unk3[5];
-    char szNames[6][8];         // 0x08
-    u8   nOutfit;               // 0x38  the record's byte 0x60
-    u8   nBallType;             // 0x39  0..3, from the SPIN attribute for a pro
-    u8   unk3A[6];
-} PlayerProfile;
-
-#define SESSION_OPTIONS  ((GameOptions*)((u8*)&gSession + 0xE78))
-#define SESSION_PROFILE(i) ((PlayerProfile*)((u8*)&gSession + 0xD38) + (i))
 
 extern char gszEmpty[];             // 0x802810B8
 extern u8*  gpSaveData;             // 0x80281DF8  created-golfer profiles at +0x54C2 + n * 0x10600
@@ -1831,9 +1795,10 @@ void Options_SetDefaults(GameOptions* pOpt) {
     pOpt->unk14    = 0;
     pOpt->unk18    = 1;
     pOpt->unk1C    = 1;
-    for (i = 0; i < 10; i++) {
+    for (i = 0; i < 9; i++) {
         pOpt->unk24[i] = 1;
     }
+    pOpt->bSpinEnabled = 1;
     pOpt->unk7E = 0;
     pOpt->unk80 = 1;
     for (i = 0; i < 4; i++) {

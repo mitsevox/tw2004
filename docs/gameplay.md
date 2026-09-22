@@ -41,6 +41,50 @@ both stick axes every frame: forward of it the reading maps smoothly down to 1, 
 reading jumps to ~179 and runs to 255 - so the first frame past the gate already reads a third
 of the way back. A CPU or a replay starts the swing immediately.
 
+Human swing: the phases (`gSwingPhaseFns`, all in C)
+------------------------------------------------------
+
+`SwingData.nPhase` drives a table of seven per-frame functions:
+
+    0  Swing_WaitForBackswing  poll both sticks; start at a quarter pull
+    1  Swing_UpdateBackswing   the backswing follows the stick
+    2  Swing_UpdateAtTop       holding at the top
+    3  Swing_UpdateDownswing   the stick's forward reading becomes the impact sample
+    4  (idle)
+    5  Swing_UpdateAfterImpact rumble countdown and spin input while the ball flies
+    6  (idle)
+
+**Backswing (1).** Each frame the stick's dead-zoned magnitude (0..100) says how far along
+the backswing animation should be, and the animation chases that at a rate
+`min(1, (1 + |gap| / range)^2 - 1)`, scaled per shot kind (0.85 full, 0.5 chip, 0.8 pitch); a
+pull past 93 runs the animation at full rate. Every frame's sample goes into the 25-sample
+ring and is provisionally the top. When the animation has caught up (gap under 0.05 of
+animation time) it is phase 2; if the stick backs down first, a flag makes the animation
+back down with it. The moment the stick comes forward of 96 (with the backswing at least 0.1
+along) **the top is the furthest-back sample in the ring** - not the last one - the downswing
+animation starts, and the impact sample is seeded from that frame. A CPU plays the backswing
+to 98% of the way to the top (65% in lesson 5) and swings down.
+
+**At the top (2).** The animation waggles +-0.0076 either side of the top while the stick is
+steady; any change in the stick's y drops back to phase 1. If the stick sits near centre
+(y at or below 160, x within 64..192) for over 0.1 s the swing is **abandoned**: the address
+animation plays again and sound 9 fires. That is the "let it back down slowly to cancel".
+
+**Downswing (3).** Every frame the stick is forward of 96 and more than ~17 units from the
+centre sample, that reading becomes the impact sample. The ball goes when the *animation*
+reports impact - so what counts on the way through is the stick's direction, not its timing.
+Then `Swing_Launch`, the mis-hit rumble on a pad, the putt sound.
+
+**After impact (5).** With the spin option on and the spin button held after a real shot, the
+spin amount grows by one a frame up to 20 (a third of a second for full spin) and its
+direction is the stick whenever it leaves the dead zone; the first press starts at straight
+back (255). `Swing_ApplySpin` then scales it by the SPIN attribute every frame.
+
+**Replays.** At every human launch (`0x8006BF60`, read) the game draws a fresh RNG seed,
+reseeds with it and snapshots the player, profile and a block of globals into the replay
+buffer; a replay reseeds from that and skips the luck swap and spin. That is why a replay
+reproduces the shot exactly, bounces and all.
+
 Human swing: the miss itself (`Swing_MeterError`, `0x8005BA94`, in C)
 -------------------------------------------------------------------------
 
