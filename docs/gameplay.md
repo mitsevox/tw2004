@@ -371,6 +371,36 @@ Two other things in the same file, read but not decompiled: hitting a tree (surf
 deflects the ball by a random 12..19 degrees in two axes unless the player is flagged perfect
 (`0x800539F8`), and out of bounds is 600 m from the shot's start (`0x80054450`).
 
+Gimmes and the pool-cue tap-in
+------------------------------
+
+**When** (`fn_800E2810`, from swing state 14 once the ball has stopped): the gimme option is on
+(options byte 5, default on), not a replay, two mode flags clear, the ball within **0.5 yd (18 in)**
+of the pin (`fn_800D0478`), and either the club is the putter or it is a one-player game. Then
+state 15 (the CPU rehearsal runs on the player until it settles) and state 16: animation 11,
+camera 12, and `Swing_Launch` with the controller set to the CPU for the call.
+
+**Which animation** (animation 11 -> `fn_800965DC`): a style from the score the tap-in will give
+(`fn_800D0AA0` = strokes + 1 - par: under par 6, par 5, over 2) is stored on the golfer, then
+clip group 9 is looked up in the golfer's animation library (`fn_800176E8` -> `fn_800258B4` ->
+`fn_80025640`: group, style, club class, a fourth key; each level falls back to a default). The
+leaf's clips are picked **at random** (`Rand_Next(1) % n`, up to three tries) with a used-mask so
+none repeats until all have played. No other condition applies to group 9.
+
+The libraries (`SAL` objects in `glbchar.gcb` for male/female, and one embedded in each
+character's `Data/Chars/NNchar.gcb` `CHR` object; `tools/research/find_sal.py`,
+`tools/research/sal_dump.py`) give, for the putter, the same clips for every style:
+
+    shared male / female       gplptt10, gplptt01   /  fplptt10, fplptt01
+    03 Cedric Andrews, 09, 16, 18 Takeharu "Tsunami" Moto, 25, 26
+                               gplptt10, gplptt01, gplptt12
+    15 Edwin "Pops" Masterson IV   gplptt12 only
+
+`gplptt12` is the **pool-cue tap-in** (the golfer drops to the ground, turns the putter round
+and knocks it in with the grip like a cue): the golfers who have it are the ones remembered
+doing it in TW2003, and Pops, whose only gimme clip it is, did it "a lot". So it is a one-in-three
+gimme for six golfers, every gimme for Pops, and never for anyone else - including Tiger.
+
 The CPU's shot rehearsal (`AI_RehearseShot`, `0x8002B030`, in C)
 -------------------------------------------------------------------
 
