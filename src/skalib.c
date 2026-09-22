@@ -70,7 +70,175 @@ typedef struct SwapField {
     s32 nSize;
 } SwapField;
 
+void  fn_8001F08C(void** ppSrc, void** ppDst, SwapField* pFormat, int nFields, int nCount);  // byte-swap by format
+void  fn_80076158(void** ppSrc, void* pDst, int nBytes, int nSize);                           // byte-swap a run
+void* fn_80020DD4(void* pClip, void* pOut, int nAlign);
+void* fn_80009B34(u32 uSize, u32 uFlags, u32 uAlign, const char* pFile, int nLine);  // alloc
+void  fn_80009E70(void* p);                                                           // free
+void  fn_80005628(void* pDst, void* pSrc, int nBytes);                                // memcpy
+ClipBank* fn_80021F2C(u32 nSlot);
+u32   fn_800B6564(u32 uSize);                          // ARAM alloc
+void  fn_800B6594(u32 uAram);                          // ARAM free
+void  fn_800B6844(void* pSrc, u32 uAram, u32 uSize);   // copy to ARAM
+void  fn_800B68B4(void* pDst, u32 uAram, u32 uSize);   // copy from ARAM
+void  fn_800B67EC(void);                               // wait for the ARAM copy
+void  fn_80021DF8(void* pLib);
+void  fn_800269E4(struct LibOverlay* pOv, int nSlot, s32 n);
+void  fn_800CA9DC(int nSlot);
+u32   fn_800227BC(void);                               // the current slot
+void  fn_80022828(void);
+int   fn_80023F7C(int nSlot);
+AnimLib* AnimLib_Load(u8* pData, ClipBank* pBank);
+
+// A library that can be layered over a slot's own (0x20 bytes).
+typedef struct LibOverlay {
+    u8*    pWork;               // 0x00  the loaded (swapped) copy
+    void*  pCopy;               // 0x04  the file as it came off the disc
+    u32    nSize;               // 0x08
+    struct { s32 n0; s32 n4; }* p0C;  // 0x0C
+    s32    n10;                 // 0x10
+    s32    n14;                 // 0x14
+    u8     bActive;             // 0x18
+    u8     pad19[7];
+} LibOverlay;
+
+// One of the three animation slots (0x158 bytes).
+typedef struct LibSlot {
+    AnimLib*   pLib;            // 0x000  the loaded (swapped) library
+    void*      pCopy;           // 0x004  the file as it came off the disc
+    u32        nSize;           // 0x008
+    LibOverlay overlays[10];    // 0x00C
+    s32        nOverlays;       // 0x14C
+    s32        n150;            // 0x150
+    u8         unk154[4];
+} LibSlot;
+
+// The start of a clip (only the fields read here).
+typedef struct Clip {
+    u32    uFlags;              // 0x00  4: its data is in ARAM
+    u8     unk04[0x9C];
+    char   name[0x3C];          // 0xA0
+    u32    uAram;               // 0xDC
+} Clip;
+
+extern ClipBank*   lbl_801C6050[3];   // the clip bank of each slot
+extern AnimLib*    lbl_801C605C[3];   // the library of each slot, when its clips are in the bank
+extern LibSlot     lbl_801C6068[3];
+extern u32         lbl_801C6470[3];   // ARAM copy of each slot's bank file
+extern u32         lbl_801C647C[3];   // its size
+extern LoadedFile* lbl_801C6488[3];   // each slot's bank file, while it is in main memory
+extern LoadedFile* lbl_80281CE0;      // the buffer banks are brought back from ARAM into
+extern u8          lbl_80281CE4;
+extern u32         lbl_80281078;      // the current slot
+
+
 extern char (*lbl_80281D14)[2][8][6][16];   // the last clip name played: [player][reaction kind][style][club]
+
+// Frees the working copies of every slot's libraries (only the current slot's while
+// lbl_80281CE4 is set).
+void AnimLib_FreeWorkCopies(void) {
+    LibSlot*    pSlot;
+    int         j;
+    int         k;
+    u32         i;
+    LibOverlay* pOv;
+
+    pSlot = lbl_801C6068;
+    for (i = 0; i < 3; i++, pSlot++) {
+        if (lbl_80281CE4 != 0 && i != lbl_80281078) continue;
+        if (pSlot->nOverlays != 0) {
+            for (k = 0; k < pSlot->nOverlays; k++) {
+            }
+            for (j = 0; j < pSlot->nOverlays; j++) {
+                pOv = &pSlot->overlays[j];
+                fn_80021DF8(pOv->pWork);
+                pOv->pWork = NULL;
+                pOv->n10   = -1;
+            }
+            pSlot->n150 = 0;
+        }
+        if (pSlot->pLib != NULL) fn_80021DF8(pSlot->pLib);
+        pSlot->pLib = NULL;
+    }
+}
+
+// Frees the pristine copies of every slot's libraries.
+void AnimLib_FreeCopies(void) {
+    LibSlot*    pSlot;
+    LibOverlay* pOv;
+    u32         i;
+    int         j;
+
+    pSlot = lbl_801C6068;
+    for (i = 0; i < 3; i++, pSlot++) {
+        if (pSlot->nOverlays != 0) {
+            for (j = 0; j < pSlot->nOverlays; j++) {
+                pOv = &pSlot->overlays[j];
+                fn_80009E70(pOv->pCopy);
+                pOv->pCopy = NULL;
+            }
+        }
+        pSlot->nOverlays = 0;
+        if (pSlot->pCopy != NULL) fn_80009E70(pSlot->pCopy);
+        pSlot->pCopy = NULL;
+    }
+}
+
+// Re-applies a slot's active overlay libraries.
+void AnimLib_ApplyOverlays(int nSlot) {
+    LibSlot*    pSlot = &lbl_801C6068[nSlot];
+    LibOverlay* pOv;
+    int         n     = pSlot->nOverlays;
+    int         i;
+
+    if (n != 0) {
+        pOv = pSlot->overlays;
+        for (i = 0; i < n; pOv++, i++) {
+            if (pOv->bActive) fn_800269E4(pOv, nSlot, pOv->p0C->n4);
+        }
+    }
+}
+
+void fn_80025478(void) {
+    u32 i;
+    int nTotal = 0;
+    fn_80022828();
+    for (i = 0; i < 3; i++) nTotal += fn_80023F7C(i);
+}
+
+// Rebuilds the current slot's libraries from their pristine copies (they are swapped in place
+// when loaded, so a reload starts from the copy), first freeing the bank clips kept in ARAM.
+void AnimLib_ReloadSlot(void) {
+    u32         nSlot = fn_800227BC();
+    u32         i;
+    LibSlot*    pSlot;
+    int         j;
+    LibOverlay* pOv;
+    Clip*       pClip;
+    AnimLib*    pLib;
+
+    for (i = 0; i < lbl_801C6050[nSlot]->nClips; i++) {
+        pClip = lbl_801C6050[nSlot]->ppClips[i];
+        if (pClip != NULL && (pClip->uFlags & 4)) fn_800B6594(pClip->uAram);
+    }
+    pSlot = &lbl_801C6068[nSlot];
+    if (pSlot->nOverlays != 0) {
+        pSlot->pLib = fn_80009B34(pSlot->nSize, 1, 0x40, "skalib.c", 3193);
+        fn_80005628(pSlot->pLib, pSlot->pCopy, pSlot->nSize);
+        pLib = AnimLib_Load((u8*)pSlot->pLib, fn_80021F2C(nSlot));
+        pLib->pFile = pSlot->pLib;
+        for (j = 0; j < pSlot->nOverlays; j++) {
+            pOv        = &pSlot->overlays[j];
+            pOv->pWork = fn_80009B34(pOv->nSize, 1, 0x40, "skalib.c", 3207);
+            fn_80005628(pOv->pWork, pOv->pCopy, pOv->nSize);
+            AnimLib_Load(pOv->pWork, fn_80021F2C(nSlot));
+            pOv->n10 = pOv->n14 + 3;
+        }
+    }
+    AnimLib_ApplyOverlays(nSlot);
+    fn_800CA9DC(nSlot);
+    fn_80023F7C(nSlot);
+}
 
 // The clips for an animation group, style, club class and key: each level falls back to its
 // default (flag 1 when the group, style or club level did, flag 2 when only the key did), and
@@ -223,34 +391,6 @@ int AnimLib_RandomIndex(u32 uUsed, int nCount) {
     } while (++nTries < 3);
     return nPick;
 }
-
-void  fn_8001F08C(void** ppSrc, void** ppDst, SwapField* pFormat, int nFields, int nCount);  // byte-swap by format
-void  fn_80076158(void** ppSrc, void* pDst, int nBytes, int nSize);                           // byte-swap a run
-void* fn_80020DD4(void* pClip, void* pOut, int nAlign);
-void* fn_80009B34(u32 uSize, u32 uFlags, u32 uAlign, const char* pFile, int nLine);  // alloc
-void  fn_80009E70(void* p);                                                           // free
-void  fn_80005628(void* pDst, void* pSrc, int nBytes);                                // memcpy
-ClipBank* fn_80021F2C(int nSlot);
-u32   fn_800B6564(u32 uSize);                          // ARAM alloc
-void  fn_800B6594(u32 uAram);                          // ARAM free
-void  fn_800B6844(void* pSrc, u32 uAram, u32 uSize);   // copy to ARAM
-void  fn_800B68B4(void* pDst, u32 uAram, u32 uSize);   // copy from ARAM
-void  fn_800B67EC(void);                               // wait for the ARAM copy
-
-typedef struct LoadedLib {
-    AnimLib* pLib;              // 0x000
-    void*    pCopy;             // 0x004
-    u32      nSize;             // 0x008
-    u8       unk0C[0x14C];
-} LoadedLib;
-
-extern ClipBank*   lbl_801C6050[3];   // the clip bank of each slot
-extern AnimLib*    lbl_801C605C[3];   // the library of each slot, when its clips are in the bank
-extern LoadedLib   lbl_801C6068[3];
-extern u32         lbl_801C6470[3];   // ARAM copy of each slot's bank file
-extern u32         lbl_801C647C[3];   // its size
-extern LoadedFile* lbl_801C6488[3];   // each slot's bank file, while it is in main memory
-extern LoadedFile* lbl_80281CE0;      // the buffer banks are brought back from ARAM into
 
 // Swaps a clip bank's header.
 void ClipBank_SwapHeader(void* p) {
