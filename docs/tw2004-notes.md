@@ -226,7 +226,8 @@ Suggested next steps
    (`YhSwing.c`); callers of `CARD*` to saves (`MC_Gc.c`); callers of `DVD*` to file loading and
    the asset formats.
 3. **The GCC file library** (`0x8016C718`): compiler wired up (`ProDG/3.5`, `EASharedFileLib` in
-   configure.py); `ChecksumCRC32.c` and the XOR cipher module done. Each module exposes a 7-entry
+   configure.py); `ChecksumCRC32.c`, the XOR cipher module and `SharedFileIO.c` (50 functions) done.
+   Left: `llSharedFileIO.c` (40) and `TagFile.c` (50). Each module exposes a 7-entry
    function-pointer table via `<Module>_GetInterface()`; shared error codes 2 = bad argument,
    3 = wrong state, 6 = not initialised. Next: `SharedFileIO.c` (94 functions), `llSharedFileIO.c`
    (40), `TagFile.c` (50). Easiest code in the binary to read, and it parses the asset containers.

@@ -217,7 +217,8 @@ Common/Cipher/CipherXOR.c:
 Common/SharedFileIO/SharedFileIO.c:
 	.text       start:0x8016CFF8 end:0x80171308
 	.rodata     start:0x80186274 end:0x801863D4
-	.sdata      start:0x80281B54 end:0x80281B58
+	.data       start:0x8019D210 end:0x8019D2C0
+	.sdata      start:0x80281B54 end:0x80281B5C
 
 dolphin/card/CARDUnlock.c:
 	.text       start:0x80177DA4 end:0x80179004

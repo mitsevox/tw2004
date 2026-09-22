@@ -139,6 +139,24 @@ GCC 2.95 (SN ProDG) at -O0
 - **[verified] `crclr cr1eq` before a call means the callee had no prototype** (GCC's marker for a
   possibly-variadic call). Declare the function.
 - **[verified] `x > 0` compiling to `cmpwi; beq` means `x` is unsigned.**
+- **[verified] Local array initializers.** `u8 a[33] = {...}` and `u8 a[] = "..."` copy the same bytes
+  but differ in two visible ways: an *unsized* array adds an `addi rX, r31, off` (address of the
+  array) before the copy, and a *brace* initializer is emitted as unaligned `.byte`s while a string
+  literal is 4-aligned in `.rodata`. Match both the copy prologue and the constant's address.
+- **[verified] Casts vs masks.** `(u8)c` stored to a u16 gives `clrlwi; sth rX`; `c & 0xFF` gives
+  `clrlwi; mr r0,rX; sth r0`. `(x << 8) & ~0xFF` gives `slwi; mr; clrrwi 8`. `while ((c = *p++) != 0)`
+  tests the truncated assigned value; a separate `if (c == 0) break;` reloads it.
+- **[verified] Dead jumps expose structure.** GCC -O0 emits every `break;` and every end-of-block
+  jump, even after a `return`. An unreachable `b` right before the loop-back jump means the loop
+  ended with `else break;`; a `b` after a `return` in a `default:` means `return; break;`.
+- **[verified] A switch on an unsigned value** uses `cmplwi` in its binary search; on a signed
+  one, `cmpwi`. The dispatch order of cases follows the source order of the case bodies.
+- **[verified] Function-pointer call through two globals:** `g1->pfn(g2->field)` loads both
+  globals first, then the function pointer into a spilled temp (8-aligned stack slot), then the
+  argument. A local `pfn` variable adds an extra store/load pair.
+- **[verified] `#line` numbering:** `#line N` applies to the *next* line. To make an assert on the
+  first statement of a function report line L, put `#line L-2` before the function header
+  (header, opening brace/declarations, assert).
 - **[verified] Empty sections shift the link.** `NgcAs.exe` writes empty `.data`/`.bss`/`.sdata`/
   `.sbss` sections into every object. `mwldeppc` rounds the output section up when it meets one,
   even with the ALLOC flag cleared: our `.sbss` came out 2 bytes longer and the DOL hash failed while

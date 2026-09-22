@@ -50,16 +50,18 @@ typedef struct {
     void*         pAllocator;       // 0x68
 } SFIODevice;
 
-extern SFIOData* _SFIO_pData;
+SFIOData* _SFIO_pData = NULL;      // explicit = NULL: GCC 2.95 puts it in .sdata, where the binary has it
+// Dispatch tables (in .data): the continuation table is indexed by eState, the error-validation
+// table by eOperation.
+extern int (*gSFIOContinueTable[14])(int eError, int* pProcess, int* pResult);
+extern int (*gSFIOValidateTable[30])(int eError, int uProcess, int uResult);
 extern void fn_801715B8(void* pParams, void* pDeviceData, void* pName);
 extern void fn_80171744(u8* pInfo14, u8* pInfo15, void* pDeviceData, void* pName);
 int SFIOStartSelectDevice(int eDevice, int* pProcess);
 int SFIOStartOp18(int* pHandle, int* pProcess);
 int SFIOStartOp19(int* pHandle, int* pProcess);
 int SFIONextDeviceFromMask(u16 uDeviceMask, int uDirection);
-extern SFIODevice* _SFIO_pDevice;
-extern u8 lbl_8019D210[];
-extern u8 lbl_8019D248[];
+SFIODevice* _SFIO_pDevice = NULL;
 
 enum { SFIO_STATE_BUSY_A = 0xB, SFIO_STATE_BUSY_B = 0xC, SFIO_STATE_BUSY_C = 0xD };
 
@@ -73,7 +75,10 @@ extern char* strcpy(char* pDst, const char* pSrc);
 extern u32   strlen(const char* p);
 extern void  fn_80172FA4(int);
 extern void  fn_80171308(int eDevice, void* pInfo);
-extern void  fn_8017124C(void* pDescriptor, void* pA, void* pB);
+extern void  fn_80172D7C(void* pDescriptor, void* pA, void* pB);
+extern void  fn_80172F48(void* p);
+extern u32   fn_80173000(void);
+void fn_8017124C(void* pDescriptor, void* pA, void* pB);
 extern int   fn_80173024(void* pDescriptor);
 extern BOOL  fn_80172D54(const char* pFilename);
 u32 SFIOGetHeaderSize(void);
@@ -686,8 +691,8 @@ int SFIOInit(int* pDevices, const SFIOFuncTable* pFuncs, void* pAllocator) {
     _SFIO_pDevice->fn.pfn3C = pFuncs->pfn3C;
     _SFIO_pDevice->fn.pfnUpdate = pFuncs->pfnUpdate;
     _SFIO_pDevice->fn.pfn44 = pFuncs->pfn44;
-    _SFIO_pDevice->pData48 = lbl_8019D210;
-    _SFIO_pDevice->pData4C = lbl_8019D248;
+    _SFIO_pDevice->pData48 = gSFIOContinueTable;
+    _SFIO_pDevice->pData4C = gSFIOValidateTable;
     _SFIO_pData->eState = 0;
     _SFIO_pData->eOperation = 0;
     return 0;
@@ -896,10 +901,6 @@ int SFIOWrite(int* pSession, void* pBuffer, u32 uSize) {
     return 0;
 }
 
-// Dispatch tables (in .data): the continuation table is indexed by eState, the error-validation
-// table by eOperation.
-extern int (*const gSFIOContinueTable[])(int eError, int* pProcess, int* pResult);
-extern int (*const gSFIOValidateTable[])(int eError, int uProcess, int uResult);
 
 // Main pump. Drives the platform layer, filters the error, then runs this state's continuation.
 int SFIOUpdate(int* pProcess, int* pResult) {
@@ -911,14 +912,14 @@ int SFIOUpdate(int* pProcess, int* pResult) {
     eError = _SFIO_pDevice->fn.pfnUpdate(pProcess, pResult);
     if (*pProcess == 0 && _SFIO_pData->eState != 0) return 0xF;
     if (*pProcess == 2) {
-        eError = ((int (*const*)(int, int, int))_SFIO_pDevice->pData4C)[_SFIO_pData->eOperation](eError, *pProcess, *pResult);
+        eError = ((int (**)(int, int, int))_SFIO_pDevice->pData4C)[_SFIO_pData->eOperation](eError, *pProcess, *pResult);
         if (eError == 0xA) {
             _SFIO_pData->eState = 0;
             _SFIO_pData->eOperation = 0;
             return eError;
         }
         if (eError == 0x10) return eError;
-        eError = ((int (*const*)(int, int*, int*))_SFIO_pDevice->pData48)[_SFIO_pData->eState](eError, pProcess, pResult);
+        eError = ((int (**)(int, int*, int*))_SFIO_pDevice->pData48)[_SFIO_pData->eState](eError, pProcess, pResult);
         if (*pProcess == 2) {
             if (_SFIO_pData->eState == 5 || _SFIO_pData->eState == 2 || _SFIO_pData->eState == 7 ||
                 _SFIO_pData->eState == SFIO_STATE_BUSY_A || _SFIO_pData->eState == SFIO_STATE_BUSY_B ||
@@ -959,10 +960,13 @@ BOOL SFIOValidateFilename(const char* pFilename) {
 void SFIOAsciiToShiftJIS(const char* pSrc, u16* pDst) {
     u8 i = 0;
     u16 c;
-    // An unsized array from a 32-character literal: 33 bytes are copied (the NUL included), and the
-    // lookups can index the terminator. Any other spelling changes the copy sequence.
-    u8 aTable[] = "\x40\x49\x68\x94\x90\x93\x95\x66\x69\x6A\x96\x7B\x43\x7C\x44\x5E"
-                    "\x46\x47\x71\x81\x72\x48\x97\x6D\x8F\x6E\x4F\x51\x65\x6F\x62\x70";
+    // Unsized array with a brace initializer: that spelling gives the extra address computation
+    // before the copy and leaves the constant unaligned in .rodata, both as in the binary.
+    u8 aTable[] = {
+        0x40, 0x49, 0x68, 0x94, 0x90, 0x93, 0x95, 0x66, 0x69, 0x6A, 0x96, 0x7B, 0x43, 0x7C, 0x44, 0x5E,
+        0x46, 0x47, 0x71, 0x81, 0x72, 0x48, 0x97, 0x6D, 0x8F, 0x6E, 0x4F, 0x51, 0x65, 0x6F, 0x62, 0x70,
+        0x50,
+    };
     while ((c = *pSrc++) != 0) {
         if (c > 0x80 && c <= 0x98) {
             c = (c << 8) + *pSrc++;
@@ -992,8 +996,11 @@ void SFIOShiftJISToAscii(const u16* pSrc, char* pDst) {
     u8 i = 0;
     signed char j = 0;
     u16 uLow = 0;
-    u8 aTable[] = "\x40\x49\x68\x94\x90\x93\x95\x66\x69\x6A\x96\x7B\x43\x7C\x44\x5E"
-                  "\x46\x47\x71\x81\x72\x48\x97\x6D\x8F\x6E\x4F\x51\x65\x6F\x62\x70";
+    u8 aTable[] = {
+        0x40, 0x49, 0x68, 0x94, 0x90, 0x93, 0x95, 0x66, 0x69, 0x6A, 0x96, 0x7B, 0x43, 0x7C, 0x44, 0x5E,
+        0x46, 0x47, 0x71, 0x81, 0x72, 0x48, 0x97, 0x6D, 0x8F, 0x6E, 0x4F, 0x51, 0x65, 0x6F, 0x62, 0x70,
+        0x50,
+    };
     while ((c = *pSrc++) != 0) {
         uLow = c & 0xFF;
         c = (c >> 8) & 0xFF;
@@ -1032,3 +1039,48 @@ void SFIOShiftJISToAscii(const u16* pSrc, char* pDst) {
     }
     pDst[i] = 0;
 }
+
+// Thin wrappers over the platform layer (llSharedFileIO.c).
+void fn_8017124C(void* pDescriptor, void* pA, void* pB) {
+    fn_80172D7C(pDescriptor, pA, pB);
+}
+
+void SFIOPlatformCall80172F48(void* p) {
+    fn_80172F48(p);
+}
+
+u32 SFIOGetHeaderSize(void) {
+    return fn_80173000();
+}
+
+// Dispatch tables. Two states (1/2 and 4/5) are handled by the platform layer directly.
+extern int fn_80171E94(int eError, int* pProcess, int* pResult);
+extern int fn_801727C8(int eError, int* pProcess, int* pResult);
+
+int (*gSFIOContinueTable[14])(int eError, int* pProcess, int* pResult) = {
+    SFIOValidateErrorPassThrough,   // 0  idle
+    fn_80171E94,                    // 1
+    fn_801727C8,                    // 2
+    SFIOContinueSelect,             // 3
+    fn_80171E94,                    // 4
+    fn_801727C8,                    // 5
+    SFIOContinueSelect,             // 6
+    SFIOContinueUnmount,            // 7
+    SFIOContinueClose,              // 8
+    SFIOContinueClose,              // 9
+    SFIOContinueClose,              // 10
+    SFIOContinueAbort,              // 11
+    SFIOContinueAbort,              // 12
+    SFIOContinueAbort,              // 13
+};
+
+int (*gSFIOValidateTable[30])(int eError, int uProcess, int uResult) = {
+    SFIOReturnFirstArg,       SFIOValidateErrorOp01,   SFIOValidateErrorOp02,   SFIOValidateErrorOp03,
+    SFIOValidateErrorOp04,    SFIOValidateErrorOp05,   SFIOValidateErrorOp16,   SFIOValidateErrorOpMisc,
+    SFIOValidateErrorOp18,    SFIOValidateErrorOp19,   SFIOValidateErrorOp16,   SFIOValidateErrorOpMisc,
+    SFIOValidateErrorOp18,    SFIOValidateErrorOp19,   SFIOValidateErrorOp16,   SFIOValidateErrorOpMisc,
+    SFIOValidateErrorOp18,    SFIOValidateErrorOp19,   SFIOValidateErrorOp12,   SFIOValidateErrorOp14,
+    SFIOValidateErrorOp14,    SFIOValidateErrorOp14,   SFIOValidateErrorOp16,   SFIOValidateErrorOp17,
+    SFIOValidateErrorOp18,    SFIOValidateErrorOp19,   SFIOValidateErrorOp1A,   SFIOValidateErrorOpMisc,
+    SFIOValidateErrorOpMisc,  SFIOValidateErrorOpMisc,
+};
