@@ -91,6 +91,19 @@ Dated log of what was done and decided, newest last. Facts and lessons belong in
   **do a clean build before calling a file done.**
 - Progress: 258 -> 299 functions, 72,832 -> 84,748 bytes.
 
+- **Asset survey and the container cracked.** `tools/research/asset_survey.py` showed every
+  `.hog` / `.gcb` starts with `CTRL`; the tag constants led to one switch, `fn_8000D4F0`
+  (UStream.c). What I first took for a relocation walker (`Rdat`) is a **decompressor** with an
+  unusual mirrored-copy mode. Decompiled it plus its two helpers (`src/UStream.c`, 2 of 3 exact,
+  one at 98.8% over a single `addi` CodeWarrior insists on folding), transcribed it to Python
+  (`tools/research/ctrl_dump.py`), and it reproduces all 325 containers' objects to their
+  declared sizes. Object-type census in `docs/formats/ctrl-container.md`: terrain (`ter`),
+  textures (`txf`, `TXG`), grass, per-hole cameras, and small singletons named `BALF` and
+  `BIO ` in the front-end file - the first concrete leads for the gameplay hypotheses.
+- Lesson: a magic word found by a 30-line survey script located the loader in minutes; the
+  decompiled loader then made the extractor a transcription rather than a guess. Track A feeds
+  Track B exactly as designed.
+
 **Working agreements**
 - Show the plain-English logic and the C before building anything non-trivial.
 - One batch of work, then report. No silent fix loops.

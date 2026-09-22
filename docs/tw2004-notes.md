@@ -172,6 +172,19 @@ look at `fn_800977F8` and at code using the combined matrix at `cam+0xDC`. The c
 is in `fn_80013950`: scale the horizontal extent (`0x1FC`) by 4/3, or change the aspect it feeds
 to the projection matrix for a native 16:9 code that needs no widescreen hack.
 
+The asset loader (UStream.c) and the CTRL container
+-----------------------------------------------------
+
+`fn_8000D4F0` (the tag switch) and its helpers are `UStream.c` (assert string at
+`0x801868A0`). `src/UStream.c` holds `UStream_Decompress` / `UStream_Copy` / `UStream_Fill`
+(`0x8000CDEC`-`0x8000D4CC`), the `Rdat` decompressor and its helpers; two of three are exact,
+Decompress is at 98.8% (see decomp-notes). The Python transcription
+`tools/research/ctrl_dump.py` extracts every object from every `.hog` / `.gcb` on disc 1 to
+its declared size, which is the proof the reading is right. Full format:
+[`formats/ctrl-container.md`](formats/ctrl-container.md). The rest of the file - buffer ring
+(`fn_8000CBFC`), object allocation from `SHDR` (`fn_8000C968`), the tag switch itself - is the
+next decomp target in this area.
+
 What the GCC library actually is
 --------------------------------
 

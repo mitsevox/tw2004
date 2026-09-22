@@ -1,67 +1,92 @@
 CTRL stream container (`.hog`, `.gcb`, `.ngc`)
 ================================================
 
-Status: **chunk layout observed** from the files; **meaning of the payloads inferred**, not yet
-confirmed from code. The reader in the binary is the switch at `fn_8000D4F0` (see below).
+Status: **chunk layout, object framing and the `Rdat` compression are known from the code**
+(`src/UStream.c`, read from the game's loader at `fn_8000D4F0`). The extractor
+`tools/research/ctrl_dump.py` reproduces every object on disc 1 to its declared size.
+What is *inside* each object type is the next layer and is not decoded yet.
 
-Observed layout
----------------
+Chunk layout
+------------
 
-The file is a sequence of chunks. Each chunk starts with a 4-character tag and a big-endian
-u32 length that includes the 16-byte chunk header:
+A file is a sequence of chunks. Each chunk: a 4-character tag, a big-endian u32 length that
+includes the 16-byte header, 8 bytes of zero, then payload.
 
-    char tag[4]
-    u32  uLength        whole chunk, header included
-    u32  zero
-    u32  zero
-    u8   payload[uLength - 16]
+| Tag | Role |
+|-----|------|
+| `CTRL` | file header, always first, length 0x18; its 8-byte payload is `SYNC 00000000` |
+| `SHOC` | a piece of an object (see below) |
+| `SONO` | a piece of a sound object (`shdr` / `samp` sub-types; handled by the audio code) |
+| `PADD` | padding, zero payload |
+| `FILL` | padding to the next 8 KiB boundary; when fewer than 8 bytes remain the tag stands alone |
 
-Top-level tags seen in every `.hog` / `.gcb` (first chunk is always `CTRL`, length 0x18):
+Chunks never cross an 8 KiB (0x2000) boundary: the file is laid out in DVD-sized blocks and
+the loader reads 0x6000 bytes at a time (`fn_8000D4F0` loops while the read offset is below
+0x6000).
 
-| Tag | Seen as | Notes |
-|-----|---------|-------|
-| `CTRL` | first chunk, `CTRL 00000018 00000000 00000000 SYNC 00000000` | file header; the `SYNC` word is part of its 8-byte payload |
-| `SHOC` | most chunks | an object; payload begins with a sub-tag `SHDR` (header) or `SDAT` (data) |
-| `SONO` | many chunks in `.hog` and `.gcb` | same `SHDR` / `SDAT` sub-structure as `SHOC` |
-| `PADD` | occasional | padding, zero payload |
-| `FILL` | before every 0x2000 boundary | padding to the next 8 KiB block; when fewer than 8 bytes remain the tag stands alone with no length field |
+The loader's tag switch also accepts `DSPM`, `MPG2`, `VAGM`, `SWVR` and `XADP` (movie and audio
+streams for GameCube, PS2 and Xbox); only `DSPM` occurs on this disc (`.ngc` movies).
 
-Chunks never cross an 8 KiB boundary (0x2000): the data is laid out in DVD-friendly blocks, and
-big objects are split into consecutive 8192/8188-byte `SHOC` or `SONO` pieces.
+Objects (`SHOC`)
+----------------
 
-`SHDR` payload example (first `SHOC` of `01_peb/Hole_01/hole.hog`):
+An object is delivered as one `SHDR` chunk followed by data chunks. The sub-type is the u32 at
+payload offset 0 (file offset +0x10 of the chunk):
 
-    SHDR 00000002  RPNS 00000001  00000004 E0311800  FFFFFFFF FFFFFFFF FFFFFFFF 00000001 00000001 00000000
+`SHDR` (0x40 bytes of chunk in total), fields at chunk offsets:
 
-`RPNS` and `RLst` appear as sub-tags of headers; `Rdat` and `shdr` (lower case) also occur.
-`SDAT` payloads contain 32-bit values that read as **little-endian** numbers (`81321400` =
-0x00143281, `01000000` = 1) and a build path fragment `...ORT\DATA\SESSION_GC.`: the payload
-looks like a serialised memory image written by a PC tool, with the `R...` sub-tags describing
-pointers to fix up (relocation lists). This is inferred; the reader will settle it.
+    +0x18  char[4]  type      e.g. 'ter ', 'txf ', 'Cact'
+    +0x20  u32      size      decompressed size of the object
+    +0x34  u32      name len  (the object name, if any, is at +0x3C; +0x34 bytes long)
+    +0x3C  char[]   name
 
-The reader in the binary
-------------------------
+`SDAT`: raw bytes; payload starts at chunk offset 0x40.
 
-`fn_8000D4F0` (0x4B4 bytes, CodeWarrior code just after the `UStream.c` asserts at
-`0x8000CA58`) reads the next chunk and switches on its tag. The case list is the complete set
-of tags the engine understands, including ones that never appear on this disc:
+`Rdat`: compressed bytes. u32 at 0x40 = decompressed size of this piece, stream from 0x44.
+Pieces are appended in order until the object reaches its declared size; the last piece may
+overrun by one or two bytes (the loader's buffer is padded; the extractor truncates).
 
-| Constant | Tag | Meaning (best guess) |
-|----------|-----|----------------------|
-| 0x4354524C | `CTRL` | control / file header |
-| 0x53484F43 | `SHOC` | object container ("shape object container"?) |
-| 0x534F4E4F | `SONO` | second object container type |
-| 0x50414444 | `PADD` | padding |
-| 0x46494C4C | `FILL` | block padding |
-| 0x4453504D | `DSPM` | GameCube DSP-ADPCM movie / audio (the `.ngc` movies start with it) |
-| 0x4D504732 | `MPG2` | MPEG-2 video (PS2 build) |
-| 0x5641474D | `VAGM` | PS2 VAG audio |
-| 0x53575652 | `SWVR` | EA streaming wave |
-| 0x58414450 | `XADP` | Xbox ADPCM audio |
+`Rdat` compression (UStream_Decompress)
+---------------------------------------
 
-So this one reader is EA's cross-platform streaming loader; the `.hog` course files, the `.gcb`
-UI/global files and the `.ngc` movies all go through it. Related functions: `fn_8000CBFC`
-(called first, with 1: probably "get the current stream"), `fn_8000DB7C` (builds the `RPNS`
-constant and uses the linked-list helpers at `0x8000B508`), `fn_8000DA94` (calls the reader).
+Two-byte big-endian command words. With bits 0x8800 both set:
 
-Decompiling `fn_8000D4F0` and `fn_8000DB7C` is the path to a reliable extractor.
+    1000 1lll llll llll   literal run: copy the next (low 11 bits) bytes verbatim
+    1nnn 1ooo cccc cccc   fill: nnn != 0; repeat the byte at dst - (ooo<<3 | nnn), (c + 3) times
+
+Otherwise a back-reference of length `lll + 3` (bits 12-14; if the field is 7, add the next
+byte) at distance `dddd dddddddd` (low 12 bits) behind the output:
+
+    0lll dddd dddd dddd   forward copy (may overlap)
+    1lll dddd dddd dddd   mirrored copy: bytes are read backwards starting at dst - d + 2
+
+The mirrored mode is the unusual part and is why this is not a stock LZ variant.
+
+Object types on disc 1 (325 files)
+----------------------------------
+
+| Type | Count | Total | Where |
+|------|------:|------:|-------|
+| `ter ` | 169 | 472 MiB | one per hole: terrain, starts `OBG ` / `ARRA` |
+| `txf ` | 190 | 221 MiB | textures, starts `TXG ` / `HEAD` / `TXHE` |
+| `tgd ` | 169 | 182 MiB | one per hole, terrain grid / ground data |
+| `gras` | 33 | 16 MiB | grass, only on some holes |
+| `TEO ` | 782 | 7 MiB | several per hole (tee objects?) |
+| `Cact`, `Cnet`, `CAMC` | 7641 / 1618 / 157 | small | per hole: actors, nets, camera |
+| `CHR `, `SAC ` | 64 / 34 | 18 / 24 MiB | `Data/chars`, `Data/charsac`: golfers |
+| `RPNS`, `RLst` | 1 each per file | tiny | resource list: names such as `ORT\DATA\SESSION_GC.HDR` |
+| `BALF` | 1 | small | `Data/Fend/FEnd.gcb` - **ball flight?** (hypotheses 1, 2, 5) |
+| `BIO ` | 1 | small | `Data/Fend/FEnd.gcb` - golfer bios (hypothesis 4) |
+| `PGAc` `PGAn` `PGAp` `PGAt` `PGST` `PLY ` `PLYs` `TRAX` `rcrd` `stat` | 1 each | small | `loadonce.gcb`: tour, players, records |
+| `CAMV` `LITE` `MPCS` `eagm` `CR_A` `CR_S` `txf2` `EASI` `TRXT` | 1 each | small | `Data/Fend/FEnd.gcb` (front end) |
+| `LEGL` `GRPS` `TXFS` `FONS` `DATS` `MCB ` `MCI ` | 1-2 | small | `startup.gcb` |
+| `load` | 23 | 2 MiB | `Data/load` (loading screens) |
+
+Extractor
+---------
+
+    python tools/research/ctrl_dump.py <file.hog> -v            # list objects
+    python tools/research/ctrl_dump.py <file.hog> --out DIR     # write each object as .bin
+
+Next: the per-type formats. `txf ` (`TXG `) and `ter ` (`OBG `) have their own tagged
+sub-structure; `BALF` and `BIO ` are the small ones the gameplay hypotheses care about.

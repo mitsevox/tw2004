@@ -78,6 +78,23 @@ CodeWarrior versions (GameCube)
 Reading compiler output
 -----------------------
 
+- **[verified] CodeWarrior -O4,p loop shapes.** A byte/halfword copy loop written as
+  `while (n > 7) { eight explicit copies through temporaries; p += 8; n -= 8; }` followed by
+  `while (n--) *d++ = *s++;` comes out as: count = n >> 3 into `mtctr`, the block unrolled 2x with
+  all eight loads before the stores, `n += -(count << 3)` after, then the remainder loop
+  auto-unrolled 8x. Interleaved load/store pairs mean the copies did *not* go through
+  temporaries (the compiler assumed aliasing). A `do { } while (--n)` is *not* unrolled at all.
+- **[verified] CodeWarrior always folds `n += 3` into the later uses** (`addi r5, rN, 3` at a call,
+  `addi r0, rN, 3; cmpwi r0, 8`, ...) even with five uses and even after the `if` that follows; a
+  select `n = (c ? a : b) + 3` produces one materialised add but the pre-add value in a scratch
+  register. `UStream_Decompress` has an in-place `addi r28, r28, 3` we could not reproduce; the
+  function is left at 98.8% with a comment. Open question.
+- **[verified] Register order for callee-saved locals** follows declaration order (first declared
+  gets r31). Parameters used as working pointers come after the locals; to make `pEnd` r31 and the
+  destination r30, declare `pEnd` first and copy the parameters into locals declared after it.
+  A `u8 v = (u8)value` local declared *before* the pointer local gets the `clrlwi` in place.
+- **[verified] A function that returns its pointer argument** keeps r3 untouched and works on a
+  copy in another register (`mr r6, r3`); a `void` function advances r3 directly.
 - **[verified] Local variables and the stack.** The order locals are declared in changes where
   they sit on the stack. Symptom: a function at ~99% where the only differences are stack offsets
   swapped between two variables. Fix: swap the declarations.

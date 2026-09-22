@@ -9,7 +9,7 @@ Containers and file types
 
 | Extension | Disc 1 | Disc 2 | Seen in | Status |
 |-----------|-------:|-------:|---------|--------|
-| `.hog`    | 198 | 171 | course folders under `Data/` (one per hole, 1.8-5.8 MB) | `CTRL` stream container, see [ctrl-container.md](ctrl-container.md) |
+| `.hog`    | 198 | 171 | course folders under `Data/` (one per hole, 1.8-5.8 MB) | `CTRL` container, **extractable** (`tools/research/ctrl_dump.py`), see [ctrl-container.md](ctrl-container.md) |
 | `.gcb`    | 120 | 120 | disc root (`glbdata`, `glbchar`, `fechar`, `startup`, `loadonce`, `malesac`, `femsac`) and `Data/` | same `CTRL` container as `.hog` |
 | `.sac`    | 34  | 34  | `Data/charstrm/AnimChar`, `AnimGlob` (character animation) | little-endian header, no magic; not yet understood |
 | `.fxg`    | 32  | 32  | `Data/charstrm/CharTex` (`NNalltex.fxg`, ~1.2-1.5 MB each) | no header, looks like raw texture data |
