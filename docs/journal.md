@@ -186,3 +186,11 @@ Dated log of what was done and decided, newest last. Facts and lessons belong in
   kind, aim within 5 degrees). The caddie code and the lucky-shot code are the same code. Also:
   luck odds reset to 12 on a taken lucky shot and tighten 12 -> 11 -> 10 over the first hole
   transitions. Golfer.c: 76 functions in C, 45 exact.
+- **Golfer.c fully in C: 91 of 91 functions, 54 exact** (the rest differ by register choice or
+  loop shape; every one read and its logic verified against the original). The tail: player
+  slot setup (`Player_SetGolfer`), session init and defaults, per-player profiles (a pro's ball
+  type comes from the SPIN rating: 3 at 100, 2 at 75, 1 at 50), the table setup. Two compiler
+  rules on the way: CW fully unrolls small constant loops (10, 12, 19 iterations) and unrolls a
+  34-iteration one by 2, so a run of identical stores in the original is usually a loop in the
+  source; and the session byte at +0x10 is the split-screen mode, which switches off luck and
+  the caddie.

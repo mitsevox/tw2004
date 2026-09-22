@@ -1382,6 +1382,7 @@ void Caddie_Stop(void) {
 
 typedef struct UStreamObject UStreamObject;     // UStream.c: pData at +0, uSize at +0x24
 int  UStream_RegisterHandler(u32 uType, void (*pfn)(UStreamObject*));
+void Golfer_TableSetup(void);
 int  UStream_UnregisterHandler(u32 uType);
 void fn_80009E70(void* p);                                        // free
 void fn_80076158(u8** ppSrc, u8* pDst, int nBytes, int nWidth);   // byte-swap copy, nWidth 2/4/8
@@ -1747,4 +1748,212 @@ void fn_8002E258(void) {
 }
 
 void fn_8002E25C(void) {
+}
+
+// ---- the session and its options ---------------------------------------------------------------
+
+// Game options at gSession + 0xE78 (the wind setting is nWind, at gSession + 0xE88).
+typedef struct GameOptions {
+    u8   unk0[10];              // 0x00
+    u8   unkA[2];
+    s32  unkC;                  // 0x0C
+    s32  nWind;                 // 0x10  0..3 calm..gusty, 4+ none
+    s32  unk14;                 // 0x14
+    s32  unk18;                 // 0x18  -> fn_80055C40
+    s32  unk1C;                 // 0x1C  -> fn_80055CD0
+    u8   unk20[4];
+    u8   unk24[10];             // 0x24
+    u8   rows[4][19];           // 0x2E  four rows of 19 flags
+    u8   unk7A;                 // 0x7A
+    u8   unk7B;
+    u8   unk7C;
+    u8   unk7D;
+    u8   unk7E;
+    u8   unk7F;
+    s32  unk80;                 // 0x80
+    u8   unk84;                 // 0x84
+} GameOptions;
+
+// A player's profile block at gSession + 0xD38, 0x40 each.
+typedef struct PlayerProfile {
+    u8   unk0;                  // 0x00
+    u8   unk1;                  // 0x01
+    u8   unk2;                  // 0x02
+    u8   unk3[5];
+    char szNames[6][8];         // 0x08
+    u8   nOutfit;               // 0x38  the record's byte 0x60
+    u8   nBallType;             // 0x39  0..3, from the SPIN attribute for a pro
+    u8   unk3A[6];
+} PlayerProfile;
+
+#define SESSION_OPTIONS  ((GameOptions*)((u8*)&gSession + 0xE78))
+#define SESSION_PROFILE(i) ((PlayerProfile*)((u8*)&gSession + 0xD38) + (i))
+
+extern char gszEmpty[];             // 0x802810B8
+extern u8*  gpSaveData;             // 0x80281DF8  created-golfer profiles at +0x54C2 + n * 0x10600
+extern char lbl_80187650[];         // "cl_bbsd" ... the default name at +0x1A
+
+void fn_800CB700(char* pDst, char* pSrc);       // string copy
+void fn_8000B1D4(int nStream);                  // reseed the RNG stream
+void fn_80055C40(int n);
+void fn_80055CD0(int n);
+u8   fn_80077B18(void);
+
+// Options_SetDefaults(): the defaults, then the debug "all 105" variant when session flag
+// 0x4000 is set.
+void Options_SetDefaults(GameOptions* pOpt) {
+    int i, j;
+    pOpt->unk0[0]  = 4;
+    pOpt->unk0[1]  = 4;
+    pOpt->unk0[2]  = 5;
+    pOpt->unk0[3]  = 1;
+    pOpt->unk0[4]  = 4;
+    pOpt->unk0[8]  = 1;
+    pOpt->unk0[9]  = 1;
+    pOpt->unk0[5]  = 1;
+    pOpt->unk0[6]  = 0;
+    pOpt->unkC     = 2;
+    pOpt->nWind    = 0;
+    pOpt->unk14    = 0;
+    pOpt->unk18    = 1;
+    pOpt->unk1C    = 1;
+    for (i = 0; i < 10; i++) {
+        pOpt->unk24[i] = 1;
+    }
+    pOpt->unk7E = 0;
+    pOpt->unk80 = 1;
+    for (i = 0; i < 4; i++) {
+        for (j = 0; j < 19; j++) {
+            pOpt->rows[i][j] = 1;
+        }
+    }
+    pOpt->unk7A = 1;
+    pOpt->unk7B = 0;
+    pOpt->unk7C = 1;
+    pOpt->unk7D = 0;
+    pOpt->unk84 = 0;
+    fn_8002EBA4((u8*)pOpt, 1);
+    if (gSession.uFlags & 0x4000) {
+        for (i = 0; i < 4; i++) {
+            for (j = 0; j < 19; j++) {
+                pOpt->rows[i][j] = 0;
+            }
+        }
+        pOpt->unk7A      = 1;
+        pOpt->rows[0][13] = 1;
+        pOpt->rows[0][15] = 1;
+        pOpt->rows[0][17] = 1;
+        pOpt->rows[1][0]  = 1;
+        fn_8002EBA4((u8*)pOpt, 0);
+    }
+    fn_80055C40(pOpt->unk18);
+    fn_80055CD0(pOpt->unk1C);
+}
+
+// A fresh session: one player, every slot a CPU on tee set 2 with an empty profile.
+void Session_Init(void) {
+    Session* pSession = &gSession;
+    int      i, j;
+
+    pSession->uFlags      = 0;
+    pSession->nGameType   = 0;
+    pSession->unk8[0]     = 0;
+    pSession->unkC        = 0;
+    pSession->nSplitScreen = 0;
+    pSession->unk11[0]    = 0;
+    pSession->unk11[1]    = 0;
+    pSession->bNoSpin     = 0;
+    pSession->unk14       = 0;
+    pSession->uFlags     &= ~0x60;
+    pSession->f18         = 0.0f;
+    pSession->f1C         = 0.0f;
+    pSession->unk20       = 0;
+    pSession->unk24       = 0;
+    pSession->unk28       = 0;
+    Options_SetDefaults(SESSION_OPTIONS);
+    gSession.nSeed = Rand_Next(0);
+    fn_8000B1D4(0);
+    gSession.nNumPlayers = 1;
+    gSession.unk5B38     = -1;
+    gSession.unk5B39     = 1;
+    for (i = 0; i < 5; i++) {
+        gSession.nController[i] = CONTROLLER_CPU;
+        gSession.nGolfer[i]     = 0;
+        gSession.nTeeSet[i]     = 2;
+        gSession.uBag[i]        = 0;
+        SESSION_PROFILE(i)->unk0 = 0;
+        SESSION_PROFILE(i)->unk1 = 0;
+        SESSION_PROFILE(i)->unk2 = 0;
+        for (j = 0; j < 6; j++) {
+            fn_800CB700(SESSION_PROFILE(i)->szNames[j], gszEmpty);
+        }
+    }
+    gSession.f5B3C = 0.0f;
+    gSession.f5B40 = 150.0f;
+    gSession.f5B44 = -400.0f;
+    gSession.f5B48 = 1.0f;
+}
+
+// Fill each player's profile from their golfer: a created golfer's from the save, the two
+// default golfers' from a fixed name, a pro's ball type from their SPIN rating.
+void Session_SetupProfiles(void) {
+    Session* pSession = &gSession;
+    int      i, j;
+    s8       nSpin;
+
+    for (i = 0; i < pSession->nNumPlayers; i++) {
+        PlayerProfile* pProf = SESSION_PROFILE(i);
+        int            nGolfer;
+        pProf->unk1 = 0;
+        nSpin = gGolferTable[pSession->nGolfer[i]].attr[ATTR_SPIN];
+        for (j = 0; j < 6; j++) {
+            fn_800CB700(pProf->szNames[j], gszEmpty);
+        }
+        pProf->nOutfit = gGolferTable[pSession->nGolfer[i]].unk62[0];
+        nGolfer = pSession->nGolfer[i];
+        if (nGolfer >= FIRST_CREATED_GOLFER) {
+            u8* pSave = gpSaveData + (nGolfer - FIRST_CREATED_GOLFER) * 0x10600;
+            for (j = 0; j < 6; j++) {
+                ((u32*)pProf->szNames[j])[0] = ((u32*)(pSave + 0x54C8 + j * 8))[0];
+                ((u32*)pProf->szNames[j])[1] = ((u32*)(pSave + 0x54C8 + j * 8))[1];
+            }
+            pProf->unk2      = pSave[0x54C2];
+            pProf->nBallType = pSave[0x54F9];
+            pProf->nOutfit   = pSave[0x54F8];
+        } else if (nGolfer == 0 || nGolfer == 1) {
+            fn_800CB700(pProf->szNames[0], lbl_80187650 + 0x1A);
+            pProf->unk2      = 0;
+            pProf->nBallType = 0;
+        } else if (fn_80077B18()) {
+            pProf->unk2      = 0;
+            pProf->nBallType = 0;
+        } else {
+            pProf->unk2 = 0;
+            if (nSpin >= 100) {
+                pProf->nBallType = 3;
+            } else if (nSpin >= 75) {
+                pProf->nBallType = 2;
+            } else {
+                pProf->nBallType = nSpin >= 50;
+            }
+        }
+    }
+}
+
+// The table after the 'stat' file arrives: the created golfer being edited goes into slot 30
+// when it has one, and the debug "105%" flag (session bit 0x4000) maxes everyone out.
+void Golfer_TableSetup(void) {
+    int i, k;
+    gNumPlayersSetUp = 0;
+    if ((s8)gCurGolferRecord.unk8E != 0) {
+        fn_80005628(&gGolferTable[FIRST_CREATED_GOLFER], &gCurGolferRecord, sizeof(GolferRecord));
+    }
+    if (gSession.uFlags & 0x4000) {
+        for (i = 0; i < NUM_GOLFERS; i++) {
+            for (k = 0; k < NUM_ATTRS; k++) {
+                gGolferTable[i].attr[k] = 105;
+            }
+            gGolferTable[i].uBagMask = 0x02A7FC44;
+        }
+    }
 }

@@ -73,7 +73,8 @@ typedef struct GolferRecord {
     u8   unk62[6];              // 0x062
     s8   attr[NUM_ATTRS];       // 0x068  block A
     s8   attrAlt[NUM_ATTRS];    // 0x074  block B: used for CPU pros in game mode 4
-    s8   tier[15];              // 0x080  equipment tiers 0..4, one per attribute
+    s8   tier[14];              // 0x080  equipment tiers 0..4, one per attribute
+    u8   unk8E;                 // 0x08E  non-zero in gCurGolferRecord when there is one
     u8   unk8F;                 // 0x08F
     u32  uBagMask;              // 0x090  bit n set = club n is in the bag
     u8   unk94[0x140 - 0x94];
@@ -182,20 +183,33 @@ typedef struct Session {
     u32  uFlags;                // 0x000  bit 1: use the alternate attribute block everywhere;
                                 //        bit 9: every club in the bag
     s32  nGameType;             // 0x004  4 gets a second view
-    u8   unk8[0x10 - 0x8];
+    u8   unk8[4];
+    s32  unkC;                  // 0x00C
     u8   nSplitScreen;          // 0x010  0 single view, else split screen (2 = side by side); no luck, no caddie
-    u8   unk11[0x13 - 0x11];
+    u8   unk11[2];
     u8   bNoSpin;               // 0x013  spin control switched off
-    u8   unk14[0x2C - 0x14];
+    s32  unk14;                 // 0x014
+    f32  f18;                   // 0x018
+    f32  f1C;                   // 0x01C
+    s32  unk20;                 // 0x020
+    s32  unk24;                 // 0x024
+    s32  unk28;                 // 0x028
     s32  nNumPlayers;           // 0x02C
-    s32  nController[4];        // 0x030  per player
-    u8   unk40[4];
-    s32  nGolfer[4];            // 0x044  golfer index per player
-    u8   unk54[4];
-    s32  nTeeSet[4];            // 0x058
-    u8   unk68[4];
-    u32  uBag[4];               // 0x06C  per player, 0 = the record's own
-    u8   unk7C[0x5BD0 - 0x7C];
+    s32  nController[5];        // 0x030  per player (slot 4 is the caddie / lucky-shot copy)
+    s32  nGolfer[5];            // 0x044  golfer index per player
+    s32  nTeeSet[5];            // 0x058
+    u32  uBag[5];               // 0x06C  per player, 0 = the record's own
+    u8   unk80[0x5B2C - 0x80];  // profiles at 0xD38 (PlayerProfile x 5), options at 0xE78
+    u32  nSeed;                 // 0x5B2C
+    u8   unk5B30[8];
+    s8   unk5B38;               // 0x5B38
+    u8   unk5B39;               // 0x5B39
+    u8   unk5B3A[2];
+    f32  f5B3C;                 // 0x5B3C
+    f32  f5B40;                 // 0x5B40  150
+    f32  f5B44;                 // 0x5B44  -400
+    f32  f5B48;                 // 0x5B48  1
+    u8   unk5B4C[0x5BD0 - 0x5B4C];
 } Session;
 
 // The game state gpGame points at; only what this file reads.
