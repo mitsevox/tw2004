@@ -84,6 +84,11 @@ human input path (controller -> swing meter), the CPU path (AI shot solver), or 
 expose. Expect attributes to be read through a small set of accessor functions; naming those
 accessors makes every use site searchable.
 
+**Lead (2026-09-22):** the per-golfer attribute values are in `loadonce.gcb` as the `stat`
+object (EA's `DATA\STATS_GC.BIN`): 34 golfers x 18 values 0..100, plus the created golfer's
+starting row (mostly 10s). Column names unknown until `CharSliders.c` is read. See
+[`formats/game-data.md`](formats/game-data.md).
+
 **Status:** open.
 
 5. Is there hidden putting assistance (a "pull" toward the cup)?

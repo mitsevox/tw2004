@@ -74,10 +74,10 @@ Object types on disc 1 (325 files)
 | `TEO ` | 782 | 7 MiB | several per hole (tee objects?) |
 | `Cact`, `Cnet`, `CAMC` | 7641 / 1618 / 157 | small | per hole: actors, nets, camera |
 | `CHR `, `SAC ` | 64 / 34 | 18 / 24 MiB | `Data/chars`, `Data/charsac`: golfers |
-| `RPNS`, `RLst` | 1 each per file | tiny | resource list: names such as `ORT\DATA\SESSION_GC.HDR` |
-| `BALF` | 1 | small | `Data/Fend/FEnd.gcb` - **ball flight?** (hypotheses 1, 2, 5) |
-| `BIO ` | 1 | small | `Data/Fend/FEnd.gcb` - golfer bios (hypothesis 4) |
-| `PGAc` `PGAn` `PGAp` `PGAt` `PGST` `PLY ` `PLYs` `TRAX` `rcrd` `stat` | 1 each | small | `loadonce.gcb`: tour, players, records |
+| `RPNS`, `RLst` | 1 each per file | tiny | resource list: for every object, its type and the original file name (`DATA\STATS_GC.BIN`) |
+| `BALF` | 1 | small | `Data/Fend/FEnd.gcb` - a `TXG ` group of 32 flag textures (not ball flight) |
+| `BIO ` | 1 | small | `Data/Fend/FEnd.gcb` - golfer bio cards, see [game-data.md](game-data.md) |
+| `PGAc` `PGAn` `PGAp` `PGAt` `PGST` `PLY ` `PLYs` `TRAX` `rcrd` `stat` | 1 each | small | `loadonce.gcb`: tour, players, records, **the attribute table** - see [game-data.md](game-data.md) |
 | `CAMV` `LITE` `MPCS` `eagm` `CR_A` `CR_S` `txf2` `EASI` `TRXT` | 1 each | small | `Data/Fend/FEnd.gcb` (front end) |
 | `LEGL` `GRPS` `TXFS` `FONS` `DATS` `MCB ` `MCI ` | 1-2 | small | `startup.gcb` |
 | `load` | 23 | 2 MiB | `Data/load` (loading screens) |
