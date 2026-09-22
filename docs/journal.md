@@ -128,6 +128,11 @@ Dated log of what was done and decided, newest last. Facts and lessons belong in
   readers, neither in `Swing.c`. Pros carry a second attribute block used in game mode 4.
 - Lesson: an assert-string count says where a *file* is, not what it does. A constant the code
   must build (a four-character tag, a record stride) finds the code that uses the data.
+- **Hypotheses 2, 3 and 4 answered in one sitting, from reading rather than matching.** Followed
+  the accessor's callers: the AI picks from authored aim points gated by POWER / AGGRESSION /
+  skill (IQ inflates the skill), then worsens its aim by `(100 - skill)`; humans get a
+  forgiveness window instead. Nothing in the shot pipeline reads the score. EA's RNG (lagged
+  Fibonacci) fell out of the error code. All in `gameplay.md`.
 
 **Working agreements**
 - Show the plain-English logic and the C before building anything non-trivial.

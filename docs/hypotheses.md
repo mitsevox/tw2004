@@ -51,7 +51,15 @@ shots per club.
 list, so start from callers of the tip solver once `GoBreakLine.c` / `Swing.c` are understood, and
 from `CharSliders.c` / `EASportsBio.c` (`0x80124B5C`) for attribute reads.
 
-**Status:** open.
+**Result (2026-09-22):** **refuted in its first half, confirmed in its second.** The AI does
+not solve from the pin: `AI_ChooseTarget` (`0x8002C2DC`) picks from a table of *authored aim
+points* per hole, filtered by requirement bytes against POWER, AGGRESSION and the shot's skill,
+and by club reach. Then `AI_ApplyError` (`0x8002B59C`) worsens the aim angle and distance by
+`(100 - skill)` scaled per shot type, with a random blunder roll on approach shots. IQ's only
+job is to inflate the CPU's idea of its own skill when choosing a target. Full detail in
+[`gameplay.md`](gameplay.md).
+
+**Status:** answered.
 
 3. No rubber-banding
 --------------------
@@ -65,7 +73,13 @@ physics, wind or AI-error code. Absence across all of those files would confirm 
 **Where to look:** the AI error injection from hypothesis 2 (the obvious place to hide it), wind
 generation, and the swing meter code in `Swing.c`.
 
-**Status:** open.
+**Result (2026-09-22):** **supported so far.** The complete CPU shot pipeline
+(`AI_ChooseTarget`, `AI_ApplyError`, `AI_PlanShot`, `Swing_ComputePower`) and the human
+forgiveness function read only the player's own attributes, the shot geometry, club tables and
+the RNG. No score, standing or other-player read in any of them. Still to check before calling
+it closed: wind generation and the swing meter's input path.
+
+**Status:** supported; two files left to check.
 
 4. Which attributes touch which math, and whether human and CPU are treated alike
 ---------------------------------------------------------------------------------
@@ -99,15 +113,22 @@ sites are mapped in [`formats/game-data.md`](formats/game-data.md). What that ma
 - **AGGRESSION and IQ are read by exactly two functions** (`0x8002AA74`, `0x8002C2DC`), which
   also sample POWER / STRIKING / APPROACH / PUTTING / RECOVERY twice each. `Swing.c` never
   reads them. That is the AI's shot logic or nothing is; reading it settles hypothesis 2 too.
-- **The pros have a second attribute block**, used instead of the first when a player-side
-  field equals 9 and the game mode is 4. It is flatter and mostly lower. Whether "field == 9"
-  means CPU-controlled is the next thing to establish - if it does, human and CPU golfers are
-  *not* treated alike in that mode, by data rather than by code.
+- **The pros have a second attribute block**, used instead of the first when the player is
+  CPU-controlled (`Player_IsCPU`, `field_A08 == 9`, the same test the AI code gates on) and the
+  game mode is 4. It is flatter and mostly lower. So in that mode a CPU pro plays with different
+  numbers than the same pro played by a human.
 - LUCK is read in three places outside the swing (two in the `UKernel.c` region), consistent
   with its tooltip (lies and bounces). SPEED is read only by skin/animation code.
 - `CharSliders.c` turned out to be the create-a-golfer *face* slider loader, not attributes.
+- **Human and CPU are different mechanisms, not different numbers.** A human's stick error is
+  *reduced* by the governing attribute (`Swing_ApplyForgiveness`: a threshold and a scale from
+  a table, e.g. at PUTTING 100 a miss under 0.436 shrinks to an eighth; at 0, no help). A CPU's
+  perfect aim is *worsened* by `(100 - skill)` (`AI_ApplyError`); nothing reads an attribute on
+  the CPU's swing. AGGRESSION and IQ are used only in target choice. LUCK, SPEED and POWER BOOST
+  are read elsewhere (lies/bounces, animation, the human power boost). Tables and formulas in
+  [`gameplay.md`](gameplay.md).
 
-**Status:** open.
+**Status:** largely answered; per-attribute list in `gameplay.md`, LUCK's readers still to be read.
 
 5. Is there hidden putting assistance (a "pull" toward the cup)?
 -----------------------------------------------------------------
@@ -127,16 +148,20 @@ CPU or on an attribute.
 (`0x8009B68C`, slope), the hole/cup collision code (unnamed; find it from the constant for the
 cup radius, 0.054 m or 2.125 in, or from what writes the "holed" state).
 
-**Status:** open.
+**Partial result (2026-09-22):** two assists exist *before* the roll, none found yet *during* it.
+(1) `Swing_ApplyForgiveness` zeroes the stroke error for any putt under 2 units, before reading
+the attribute; (2) above that, PUTTING shrinks a stroke error under 0.436 (at 100) to an eighth.
+The CPU gets the mirror image: no error on putts under 1.5 units, angle error halved under 5.
+The physics-side question (a pull toward the cup, capture radius) is still open.
+
+**Status:** pre-roll assists found; roll physics still to read.
 
 Facts already established that bear on these
 ---------------------------------------------
 
-- **The game never calls the C library `rand()` / `srand()`.** Neither function is referenced by any
-  of the 7,646 functions (only the Nintendo CARD library has its own LCG, for memory-card
-  serials). So any randomness in gameplay is EA's own generator. Finding it (look for an LCG
-  multiply, an `xorshift`, or a seeded table) and listing its callers will locate every random
-  decision in the game at once: swing error, wind, AI error, crowd noise. That is the single most
-  useful lead for all three hypotheses.
+- **The game never calls the C library `rand()` / `srand()`.** EA's own generator is
+  `Rand_Next(stream)` (`0x8000B130`), an additive lagged-Fibonacci generator with 20 words of
+  state per stream, and `Rand_Float` (`0x8000B428`) for [0, 1). Found 2026-09-22 through the AI
+  error code; listing its callers locates every random decision in the game.
 - The leaked file names contain no "AI", "CPU" or "opponent" file, so the AI logic lives in a file
   without asserts or under a name that does not say so (`user.c`? `PsMgr.c`?).
