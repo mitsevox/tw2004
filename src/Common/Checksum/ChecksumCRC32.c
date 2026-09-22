@@ -21,6 +21,26 @@ extern void  fn_80122128(void* allocator, void* p, unsigned long size, unsigned 
 CRC32State gCRC = { 0, { 4, 0 }, 0xFFFFFFFF, 0 };   // read directly by SharedFileIO.c, so not static
 static unsigned long gCRCResult;
 
+int CRC32_Init(void* allocator);
+int CRC32_Shutdown(void);
+int CRC32_IsInitialised(void);
+int CRC32_Reset(void);
+int CRC32_Update(const unsigned char* data, unsigned long len);
+int CRC32_Finalise(CRC32Result** out);
+int CRC32_GetResultSize(unsigned long* out);
+
+// The library exposes each module as a table of function pointers. Defined before the functions:
+// in the binary the table precedes the __FILE__ string in .rodata.
+static void* const gCRC32Interface[7] = {
+    (void*)CRC32_Init,
+    (void*)CRC32_Shutdown,
+    (void*)CRC32_IsInitialised,
+    (void*)CRC32_Reset,
+    (void*)CRC32_Update,
+    (void*)CRC32_Finalise,
+    (void*)CRC32_GetResultSize,
+};
+
 unsigned long CRC32_Entry(unsigned long index) {
     unsigned char k;
     unsigned long c = index;
@@ -91,4 +111,15 @@ int CRC32_Finalise(CRC32Result** out) {
     gCRC.result.size = 4;
     *out = &gCRC.result;
     return 0;
+}
+
+int CRC32_GetResultSize(unsigned long* out) {
+    if (gCRC.table == 0) return 6;
+    if (out == 0) return 2;
+    *out = 4;
+    return 0;
+}
+
+void* const* CRC32_GetInterface(void) {
+    return gCRC32Interface;
 }

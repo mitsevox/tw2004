@@ -336,6 +336,7 @@ config.libs = [
         "progress_category": "game",
         "objects": [
             Object(Matching, "Common/Checksum/ChecksumCRC32.c"),
+            Object(Matching, "Common/Cipher/CipherXOR.c"),
         ],
     },
     {

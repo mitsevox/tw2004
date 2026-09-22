@@ -78,7 +78,7 @@ link order. Meanings of the prefixes are guesses.
 | `FE_` / `ui` | front end, menus | `FE_CrAPDB` `FE_LogoDesign` `FE_Manager` `FE_PGATourMessages` `FEgolferanim` `uiLoadFile` `uiProcessInterface` `uiTransform` `EASportsBio` |
 | gameplay | | `YhSwing` `PsBallFx` `PsMgr` `Replay` `shadow` `SunFlr_Gc` `TibExt` `WPvi` `user` `4startUp` |
 | storage, audio, misc | | `MC_Gc` (memory card) `dvdfs` `SitDevFile` `crcmp_mad_codec` `GCN_Mem_Alloc` (MSL) `gbacable` `GBAXfer` `GBA` `dvd` `OSThread` (SDK) |
-| EA shared library (GCC block) | | `../../../Source/Common/Checksum/ChecksumCRC32.c` `../../../Source/Common/SharedFileIO/SharedFileIO.c` `../../../Source/Common/TagFile/TagFile.c` `../../../Source/NGC/SharedFileIO/llSharedFileIO.c` |
+| EA shared library (GCC block) | | (+ an XOR cipher module with no asserts, `src/Common/Cipher/CipherXOR.c`) `../../../Source/Common/Checksum/ChecksumCRC32.c` `../../../Source/Common/SharedFileIO/SharedFileIO.c` `../../../Source/Common/TagFile/TagFile.c` `../../../Source/NGC/SharedFileIO/llSharedFileIO.c` |
 
 Camera and visibility code (`0x80007BC4` - `0x800083A4`, fully matched)
 --------------------------------------------------------
@@ -199,7 +199,9 @@ Suggested next steps
    (`YhSwing.c`); callers of `CARD*` to saves (`MC_Gc.c`); callers of `DVD*` to file loading and
    the asset formats.
 3. **The GCC file library** (`0x8016C718`): compiler wired up (`ProDG/3.5`, `EASharedFileLib` in
-   configure.py); `ChecksumCRC32.c` done. Next: `SharedFileIO.c` (94 functions), `llSharedFileIO.c`
+   configure.py); `ChecksumCRC32.c` and the XOR cipher module done. Each module exposes a 7-entry
+   function-pointer table via `<Module>_GetInterface()`; shared error codes 2 = bad argument,
+   3 = wrong state, 6 = not initialised. Next: `SharedFileIO.c` (94 functions), `llSharedFileIO.c`
    (40), `TagFile.c` (50). Easiest code in the binary to read, and it parses the asset containers.
 4. **Add the already-solved small functions** to the project: the linked-list family at
    `0x8000B508` and `fn_800AACBC`.

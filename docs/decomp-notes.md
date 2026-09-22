@@ -133,6 +133,15 @@ GCC 2.95 (SN ProDG) at -O0
   and matches the assert string in the binary.
 - **[verified]** The assembler (`NgcAs.exe`) leaves local branch displacements as relocations, so a
   raw byte comparison must mask conditional branches (`bc`, opcode 16) as well as `b`/`bl`.
+- **[verified] Empty sections shift the link.** `NgcAs.exe` writes empty `.data`/`.bss`/`.sdata`/
+  `.sbss` sections into every object. `mwldeppc` rounds the output section up when it meets one,
+  even with the ALLOC flag cleared: our `.sbss` came out 2 bytes longer and the DOL hash failed while
+  every function read 100%. `tools/prodg/prodgcc.py` deletes empty sections from the object.
+- **[verified] Small globals vs a struct.** GCC puts objects of 8 bytes or less in `.sdata`/`.sbss`
+  and addresses them with `@sda21`; a struct of four ints goes to `.data` with `lis`/`addi`. If the
+  original uses `@sda21` for each field, they were separate variables.
+- **[verified] Order of read-only data reveals declaration order.** A function-pointer table that
+  precedes the `__FILE__` string in `.rodata` was defined above the functions (with prototypes).
 - The `ngccc.exe` driver refuses to run without an installed `sn.ini`; run `cpp.exe`, `cc1.exe`
   and `NgcAs.exe` directly (see `tools/prodg/prodgcc.py`). `cc1` takes `-O0 -quiet in.i -o out.s`.
 - The five ProDG builds in the compiler pack (3.5 - 3.9.3, all GCC 2.95.x) produce identical
