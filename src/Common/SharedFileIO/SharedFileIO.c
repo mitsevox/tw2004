@@ -67,7 +67,16 @@ enum { SFIO_STATE_BUSY_A = 0xB, SFIO_STATE_BUSY_B = 0xC, SFIO_STATE_BUSY_C = 0xD
 extern void  fn_8012C8D0(void* pLock, int unused);
 extern void* fn_80175C88(void* pParams);
 extern int   fn_8012C98C(void* p);
+extern void* memcpy(void* pDst, const void* pSrc, u32 uLen);
+extern void* memset(void* pDst, int c, u32 uLen);
+extern char* strcpy(char* pDst, const char* pSrc);
+extern void  fn_80172FA4(int);
+int SFIONumDevicesInMask(u16 uDeviceMask);
+int SFIOFirstDeviceFromMask(u16 uDeviceMask);
+int SFIOLastDeviceFromMask(u16 uDeviceMask);
+void SFIOSetLastError(int eError);
 extern void* fn_801220D4(void* pAllocator, u32 uSize, u32 uAlign, const char* pFile, int uLine);
+extern void  fn_80122128(void* pAllocator, void* p, u32 uSize, u32 uAlign);
 
 typedef struct {
     void* pAllocator;
@@ -675,5 +684,77 @@ int SFIOInit(int* pDevices, const SFIOFuncTable* pFuncs, void* pAllocator) {
     _SFIO_pDevice->pData4C = lbl_8019D248;
     _SFIO_pData->eState = 0;
     _SFIO_pData->eOperation = 0;
+    return 0;
+}
+
+int SFIOShutdown(void) {
+    if (!SFIOIsInitialized()) return 2;
+    if (!(_SFIO_pDevice != NULL && _SFIO_pData != NULL)) return 2;
+    _SFIO_pDevice->fn.pfn00 = NULL;
+    _SFIO_pDevice->fn.pfnProbe = NULL;
+    _SFIO_pDevice->fn.pfn08 = NULL;
+    _SFIO_pDevice->fn.pfn0C = NULL;
+    _SFIO_pDevice->fn.pfnStartProbe = NULL;
+    _SFIO_pDevice->fn.pfnSelectDevice = NULL;
+    _SFIO_pDevice->fn.pfnMount = NULL;
+    _SFIO_pDevice->fn.pfnOp19 = NULL;
+    _SFIO_pDevice->fn.pfn20 = NULL;
+    _SFIO_pDevice->fn.pfn24 = NULL;
+    _SFIO_pDevice->fn.pfn28 = NULL;
+    _SFIO_pDevice->fn.pfn2C = NULL;
+    _SFIO_pDevice->fn.pfn30 = NULL;
+    _SFIO_pDevice->fn.pfn34 = NULL;
+    _SFIO_pDevice->fn.pfnOp18 = NULL;
+    _SFIO_pDevice->fn.pfn3C = NULL;
+    _SFIO_pDevice->fn.pfn40 = NULL;
+    _SFIO_pData->eState = 0;
+    _SFIO_pData->eOperation = 0;
+    fn_80122128(_SFIO_pDevice->pAllocator, _SFIO_pData, sizeof(SFIOData), 4);
+    _SFIO_pData = NULL;
+    fn_80122128(_SFIO_pDevice->pAllocator, _SFIO_pDevice, sizeof(SFIODevice), 4);
+    _SFIO_pDevice = NULL;
+    return 0;
+}
+
+// Copies the session part of the state (uHandle .. uExpected54) out to the caller.
+int SFIOGetSessionInfo(void* pOut) {
+    if (pOut == NULL) return 0xC;
+    memcpy(pOut, &_SFIO_pData->uHandle, 0x44);
+    return 0;
+}
+
+// Begin a save session: pick the device (or start searching for one) and probe it.
+int SFIOBegin(const char* pName, int eDevice, int uSearchDirection) {
+    if (!SFIOIsInitialized()) return 2;
+    if (pName == NULL) return 0xC;
+    if (!(eDevice == SFIO_DEVICE_INVALID || (eDevice <= SFIO_DEVICE_LAST && eDevice >= SFIO_DEVICE_FIRST))) return 9;
+    if (eDevice != SFIO_DEVICE_INVALID) {
+        if (!(u16)((1 << eDevice) & _SFIO_pDevice->uAvailableMask)) return 0xB;
+    }
+    if (_SFIO_pData->eState != 0) return 0xD;
+    memset(&_SFIO_pData->uHandle, 0, 0x44);
+    if (eDevice == SFIO_DEVICE_INVALID) {
+        if (SFIONumDevicesInMask(_SFIO_pDevice->uAvailableMask) == 1) {
+            _SFIO_pData->eDevice = SFIOFirstDeviceFromMask(_SFIO_pDevice->uAvailableMask);
+            _SFIO_pData->eState = 5;
+        } else if (uSearchDirection == 0) {
+            _SFIO_pData->eDevice = SFIOFirstDeviceFromMask(_SFIO_pDevice->uAvailableMask);
+            _SFIO_pData->eState = 2;
+        } else if (uSearchDirection == 1) {
+            _SFIO_pData->eDevice = SFIOLastDeviceFromMask(_SFIO_pDevice->uAvailableMask);
+            _SFIO_pData->eState = 2;
+        } else {
+            return 0xC;
+        }
+    } else {
+        _SFIO_pData->eDevice = eDevice;
+        _SFIO_pData->eState = 5;
+    }
+    SFIOSetLastError(0);
+    strcpy((char*)_SFIO_pData->szName35, pName);
+    _SFIO_pData->uSearchDirection = uSearchDirection;
+    fn_80172FA4(1);
+    _SFIO_pDevice->fn.pfnStartProbe(_SFIO_pData->eDevice);
+    _SFIO_pData->eOperation = 1;
     return 0;
 }
