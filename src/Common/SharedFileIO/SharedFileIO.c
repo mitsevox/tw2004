@@ -985,3 +985,50 @@ void SFIOAsciiToShiftJIS(const char* pSrc, u16* pDst) {
         pDst[i++] = c;
     }
 }
+
+// Convert a full-width Shift-JIS name back to ASCII. Inverse of SFIOAsciiToShiftJIS.
+void SFIOShiftJISToAscii(const u16* pSrc, char* pDst) {
+    u16 c;
+    u8 i = 0;
+    signed char j = 0;
+    u16 uLow = 0;
+    u8 aTable[] = "\x40\x49\x68\x94\x90\x93\x95\x66\x69\x6A\x96\x7B\x43\x7C\x44\x5E"
+                  "\x46\x47\x71\x81\x72\x48\x97\x6D\x8F\x6E\x4F\x51\x65\x6F\x62\x70";
+    while ((c = *pSrc++) != 0) {
+        uLow = c & 0xFF;
+        c = (c >> 8) & 0xFF;
+        c = c | ((uLow << 8) & ~0xFF);
+        if ((c & 0x8100) == 0x8100) {
+            c = c & 0xFF;
+            for (j = 0; j <= 0x20; j++) {
+                if (aTable[j] == c) {
+                    c = j;
+                    if (c > 0x1C) {
+                        pDst[i++] = (u8)c + 0x7B;
+                    } else if (c > 0x16) {
+                        pDst[i++] = (u8)c + 0x5B;
+                    } else if (c > 0x0F) {
+                        pDst[i++] = (u8)c + 0x3A;
+                    } else {
+                        pDst[i++] = (u8)c + 0x20;
+                    }
+                    break;
+                }
+            }
+        } else if ((c & 0x8200) == 0x8200) {
+            if (c > 0x8280 && c <= 0x829A) {
+                pDst[i++] = (u8)c - 0x20;
+            } else if (c > 0x825F && c <= 0x8279) {
+                pDst[i++] = (u8)c - 0x1F;
+            } else if (c > 0x824E && c <= 0x8258) {
+                pDst[i++] = (u8)c - 0x1F;
+            } else {
+#line 3458
+                SFIO_ASSERT(0);
+            }
+        } else {
+            break;
+        }
+    }
+    pDst[i] = 0;
+}
