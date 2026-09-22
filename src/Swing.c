@@ -24,6 +24,48 @@ typedef struct SwingState {
     f32  fPuttFullPower;        // 0x118  0.75: a putt meter over this counts as full
 } SwingState;
 
+// The shot object at Player.nShotHandle; only the fields the swing touches.
+typedef struct ShotObj {
+    u8    unk0[0x38];
+    u8*   pView;                // 0x038  -> +0x38 -> a struct with +0x10E4
+    u8    unk3C[0x164 - 0x3C];
+    u8    anim[4];              // 0x164  the animation: +0x14 is its playback rate
+    s32   uFlags;               // 0x168  bit 0x40: the backswing is being backed down (signed: the original tests it with cmpwi)
+    u8    unk16C[0x17C - 0x16C];
+    f32   fAnimTime;            // 0x17C
+    u8    unk180[0x4AC - 0x180];
+    struct { u32 bSet; f32 fTime; u8 unk8[8]; } events[18];   // 0x4AC  animation events, by 64-bit id
+    s32   n5CC;                 // 0x5CC
+    u8    unk5D0[0x1624 - 0x5D0];
+    u8*   pClip;                // 0x1624 -> +0xCC blend, +0xD4/+0xD8 clips
+    f32   f1628;
+    f32   f162C;
+    f32   f1630;
+    f32   f1634;
+    f32   v1638[3];             // 0x1638
+    f32   f1644;
+} ShotObj;
+
+// A view (one per split-screen half); only what the swing states touch.
+typedef struct View {
+    u8   unk0[0x50];
+    f32  f50;                   // 0x050
+    f32  f54;                   // 0x054
+    f32  f58;                   // 0x058
+    u8   unk5C[0x70 - 0x5C];
+    s32  nCurCamera;            // 0x070
+    u8   unk74[0xC4 - 0x74];
+    f32  vC4[4];                // 0x0C4
+    u8   unkD4[0x114 - 0xD4];
+    f32  f114;                  // 0x114
+    f32  f118;                  // 0x118
+    f32  f11C;                  // 0x11C
+    u8   unk120[0x144 - 0x120];
+    s32  nCamera;               // 0x144
+    u8   unk148[0x25C - 0x148];
+    s32  nSavedCamera;          // 0x25C
+} View;
+
 extern SwingState* gpSwing;                  // 0x80281188
 extern f32         gForgivenessTable[3][27]; // 0x80188168  rows: value at attribute 0 / 100 / 110
 extern s32         gBoostSteps[8];           // 0x80188148  power boost per level: 1 2 4 6 9 12 16 20
@@ -83,6 +125,18 @@ f32 Swing_ApplyPowerBoost(int nPlayer, f32 fPower) {
         return fPower;
     }
     return fPower;
+}
+
+f32 fn_8005C268(int nPlayer) {
+    return gPlayers[nPlayer].swing.fSwingError;
+}
+
+f32 fn_8005C280(int nPlayer) {
+    return gPlayers[nPlayer].swing.fPowerAfterError;
+}
+
+void fn_8005C298(int nPlayer) {
+    gPlayers[nPlayer].swing.bShotTaken = 0;
 }
 
 // Turn the spin input into the shot's spin: stick deflection (-1..1) times the amount asked
@@ -229,6 +283,92 @@ void Swing_MisHitRumble(int nPlayer) {
     }
 }
 
+int fn_8005CB48(int nPlayer) {
+    return gPlayers[nPlayer].swing.nBoostLevel;
+}
+
+int fn_8005CB60(int nPlayer) {
+    return gPlayers[nPlayer].swing.nSpinAmount;
+}
+
+// An animation event's time.
+f32 fn_8005CB78(int nHandle, unsigned long long uEvent) {
+    ShotObj* pObj = (ShotObj*)nHandle;
+    return pObj->events[(int)uEvent].fTime;
+}
+
+void ShotObj_Set162C(ShotObj* pObj, f32 f) {
+    if (pObj != NULL) {
+        pObj->f162C = f;
+    }
+}
+
+f32 ShotObj_GetBlend(ShotObj* pObj) {
+    if (pObj == NULL) {
+        return 0.0f;
+    }
+    return pObj->f1628;
+}
+
+void ShotObj_Set1630(ShotObj* pObj, f32 f) {
+    if (pObj != NULL) {
+        pObj->f1630 = f;
+    }
+}
+
+void ShotObj_Set1634(ShotObj* pObj, f32 f) {
+    if (pObj != NULL) {
+        pObj->f1634 = f;
+    }
+}
+
+// Paired-single vector add over four floats (the fourth is carried along).
+asm void Vec_Add(register f32* pA, register f32* pB, register f32* pOut) {
+    nofralloc
+    psq_l  f0, 0(pA), 0, 0
+    psq_l  f1, 8(pA), 0, 0
+    psq_l  f2, 0(pB), 0, 0
+    psq_l  f3, 8(pB), 0, 0
+    ps_add f2, f2, f0
+    ps_add f3, f3, f1
+    psq_st f2, 0(pOut), 0, 0
+    psq_st f3, 8(pOut), 0, 0
+    blr
+}
+
+asm void Vec_Sub(register f32* pA, register f32* pB, register f32* pOut) {
+    nofralloc
+    psq_l  f0, 0(pA), 0, 0
+    psq_l  f1, 8(pA), 0, 0
+    psq_l  f2, 0(pB), 0, 0
+    psq_l  f3, 8(pB), 0, 0
+    ps_sub f2, f0, f2
+    ps_sub f3, f1, f3
+    psq_st f2, 0(pOut), 0, 0
+    psq_st f3, 8(pOut), 0, 0
+    blr
+}
+
+extern int lbl_802823FC;
+
+int fn_8005CC5C(void) {
+    return lbl_802823FC;
+}
+
+extern u8 lbl_801B8980[0x118];
+
+void fn_8005CC64(int a, int b) {
+    *(int*)(lbl_801B8980 + 0x100) = a;
+    *(int*)(lbl_801B8980 + 0x104) = b;
+    *(u32*)(lbl_801B8980 + 0x114) |= 1;
+}
+
+double atan(double x);
+
+f32 fn_8005CC84(f32 fTan) {
+    return atan(fTan);
+}
+
 // The final power for the shot. A CPU just scales what it planned (putts +5%). A human gets
 // the boost, then loses distance to the swing error: a scaled part of it under the threshold,
 // all of it above. Putts over 75% on the meter count as full power.
@@ -314,6 +454,10 @@ clamp:
     return fPower;
 }
 
+f32 fn_8005B64C(int nPlayer) {
+    return gPlayers[nPlayer].swing.fLaunchPower;
+}
+
 
 // ---- the hit -----------------------------------------------------------------------------------
 
@@ -329,7 +473,7 @@ void fn_8006C300(int nPlayer);
 void Swing_FaceVector(int nPlayer, f32* pOut);
 f32  Swing_MeterError(int nPlayer);
 void Swing_ShapeVector(int nPlayer, f32* pOut);
-f32  fn_8005CC84(f32 fTan);                  // atanf
+f32 fn_8005CC84(f32 fTan);                  // atanf
 void fn_8005CCA8(int nPlayer);
 
 // The ball is struck. A replay (mode 10) reseeds the RNG and restores player 0's swing state;
@@ -566,7 +710,7 @@ void Swing_ShapeVector(int nPlayer, f32* pOut) {
 // state's callbacks). The top is the current state; -1 is empty.
 
 typedef struct SwingStack {
-    u8   nState[5];             // 0x00
+    s8   nState[5];             // 0x00
     s8   nTop;                  // 0x05  index of the current state, -1 when empty
 } SwingStack;
 
@@ -584,7 +728,25 @@ extern u8            gInSwingExit;          // 0x80281E00  set while a state's e
 int SwingStack_Top(int nPlayer) {
     SwingStack* pStack = &gSwingStacks[nPlayer];
     if (pStack->nTop == -1) return -1;
-    return pStack->nState[pStack->nTop];
+    return (u8)pStack->nState[pStack->nTop];
+}
+
+s8 fn_8005D2A8(int nPlayer) {
+    SwingStack* pStack = &gSwingStacks[nPlayer];
+    if (pStack->nTop < 1) return -1;
+    return pStack->nState[pStack->nTop - 1];
+}
+
+int fn_8005D2DC(void) {
+    return 0;
+}
+
+extern s8 lbl_80281E09;
+extern u8 lbl_80281E08;
+
+void fn_8005D2E4(void) {
+    lbl_80281E09 = -1;
+    lbl_80281E08 = 0;
 }
 
 // Pop every state, running each one's exit callback.
@@ -604,6 +766,15 @@ void SwingStack_Clear(int nPlayer) {
 
 // Empty in release.
 void fn_8005CCA8(int nPlayer) {
+}
+
+// Empty every player's swing stack.
+void fn_8005CCAC(void) {
+    int i;
+    for (i = 0; i < 5; i++) {
+        gSwingStacks[i].nTop = -1;
+    }
+    gInSwingExit = 0;
 }
 
 
@@ -670,7 +841,7 @@ void SwingState02_Update(int nPlayer) {
 // ---- starting the swing ---------------------------------------------------------------------------
 
 u8*  fn_80058EB8(int nPlayer, int nController);   // the pad's state: [1] main stick y, [3] C-stick y
-f32  fn_8005CB78(int nHandle, unsigned long long uEvent);   // an animation event's time (64-bit id: r5:r6)
+f32 fn_8005CB78(int nHandle, unsigned long long uEvent);   // an animation event's time (64-bit id: r5:r6)
 void Swing_ResetBoostAndSpin(int nPlayer);
 void fn_8006C5E0(void);
 void Swing_ClearFrameFlag(int nPlayer);
@@ -678,6 +849,31 @@ void fn_80067074(int nPlayer, int nSound, int a, int b);
 
 // The swing is under way: phase 1, the animation started, its three marks read, the 25-sample
 // stick history filled with the centre, the spin stick centred.
+// The backswing's top mark, a hair early.
+f32 Swing_TopTime(SwingData* pSw) {
+    return pSw->fMark1 - 0.0076f;
+}
+
+// The start mark, a hair late.
+f32 Swing_StartTime(SwingData* pSw) {
+    return 0.0076f + pSw->fMark0;
+}
+
+// The swing stick's X: the C-stick (pad byte 2) when the player swings with it, else the main stick.
+int Swing_StickX(int nPlayer, u8* pPad) {
+    if (gPlayers[nPlayer].swing.bUsingCStick != 0) {
+        return pPad[2];
+    }
+    return pPad[0];
+}
+
+int Swing_StickY(int nPlayer, u8* pPad) {
+    if (gPlayers[nPlayer].swing.bUsingCStick != 0) {
+        return pPad[3];
+    }
+    return pPad[1];
+}
+
 void Swing_Begin(int nPlayer) {
     Player*    p      = &gPlayers[nPlayer];
     int        nHandle = p->nShotHandle;
@@ -754,35 +950,14 @@ int Swing_WaitForBackswing(int nPlayer) {
 
 // ---- the backswing --------------------------------------------------------------------------------
 
-// The shot object at Player.nShotHandle; only the fields the swing touches.
-typedef struct ShotObj {
-    u8    unk0[0x38];
-    u8*   pView;                // 0x038  -> +0x38 -> a struct with +0x10E4
-    u8    unk3C[0x164 - 0x3C];
-    u8    anim[4];              // 0x164  the animation: +0x14 is its playback rate
-    s32   uFlags;               // 0x168  bit 0x40: the backswing is being backed down (signed: the original tests it with cmpwi)
-    u8    unk16C[0x17C - 0x16C];
-    f32   fAnimTime;            // 0x17C
-    u8    unk180[0x5CC - 0x180];
-    s32   n5CC;                 // 0x5CC
-    u8    unk5D0[0x1624 - 0x5D0];
-    u8*   pClip;                // 0x1624 -> +0xCC blend, +0xD4/+0xD8 clips
-    f32   f1628;
-    f32   f162C;
-    f32   f1630;
-    f32   f1634;
-    f32   v1638[3];             // 0x1638
-    f32   f1644;
-} ShotObj;
-
 extern f32 gSwingRange[8];                   // 0x801882EC  backswing rate per shot kind: -, 0.85, 0.5, 0.8
 
 u8*  Pad_State(int nPlayer, int nController);          // 0x80058EB8
-int  Swing_StickX(int nPlayer, u8* pPad);              // 0x80058F04  main or C-stick by bUsingCStick
-int  Swing_StickY(int nPlayer, u8* pPad);              // 0x80058F30
-f32  Swing_TopTime(SwingData* pSw);                    // 0x80058E98  fMark1 - 0.0076
-f32  Swing_StartTime(SwingData* pSw);                  // 0x80058EA8  fMark0 + 0.0076
-f32  ShotObj_GetBlend(ShotObj* pObj);                  // 0x8005CB98  f1628
+int Swing_StickX(int nPlayer, u8* pPad);              // 0x80058F04  main or C-stick by bUsingCStick
+int Swing_StickY(int nPlayer, u8* pPad);              // 0x80058F30
+f32 Swing_TopTime(SwingData* pSw);                    // 0x80058E98  fMark1 - 0.0076
+f32 Swing_StartTime(SwingData* pSw);                  // 0x80058EA8  fMark0 + 0.0076
+f32 ShotObj_GetBlend(ShotObj* pObj);                  // 0x8005CB98  f1628
 void ShotObj_Set162C(ShotObj* pObj, f32 f);            // 0x8005CB88
 void ShotObj_Set1630(ShotObj* pObj, f32 f);            // 0x8005CBB0
 void ShotObj_Set1634(ShotObj* pObj, f32 f);            // 0x8005CBC0
@@ -1159,6 +1334,10 @@ void Swing_ClearFrameFlag(int nPlayer) {
     gPlayers[nPlayer].swing.n370 = 0;
 }
 
+void fn_8005A788(int nPlayer, int a) {
+    gPlayers[nPlayer].swing.b375 = a;
+}
+
 // Bind the swing module's tuning values by name.
 void Swing_LoadTuning(void) {
     unsigned long long uHash;
@@ -1281,6 +1460,172 @@ void SwingState22_Exit(int nPlayer) {
     fn_800E3C0C(1);
 }
 
+void fn_80062B60(int nPlayer) {
+}
+
+void fn_80062B64(int nPlayer) {
+}
+
+void fn_80062B68(int nPlayer) {
+}
+
+void fn_80062B6C(int nPlayer) {
+}
+
+void fn_80062B70(void) {
+}
+
+void fn_80062B74(int nPlayer) {
+}
+
+void fn_80062B78(int nPlayer) {
+}
+
+u8 fn_80062B7C(void) {
+    return 1;
+}
+
+void fn_80062B84(int a) {
+}
+
+u8 fn_80062B88(int nPlayer) {
+    return 1;
+}
+
+u8 fn_80062B90(void) {
+    return 0;
+}
+
+// Clear an animation event's "reached" flag.
+int fn_80062B98(int nHandle, unsigned long long uEvent) {
+    ShotObj* pObj = (ShotObj*)nHandle;
+    pObj->events[(int)uEvent].bSet = 0;
+    return 0;
+}
+
+// An animation event has been reached: it is set and the animation time is past it.
+int fn_80062BB0(int nHandle, unsigned long long uEvent) {
+    u8* pEvent = (u8*)nHandle + (int)uEvent * 0x10;
+    if (*(u32*)(pEvent + 0x4AC) != 0 && *(f32*)(nHandle + 0x17C) >= *(f32*)(pEvent + 0x4B0)) {
+        return 1;
+    }
+    return 0;
+}
+
+void fn_80062BE8(int nHandle) {
+    if ((u8*)nHandle != NULL) {
+        *(u32*)(nHandle + 0x1794) = 0;
+    }
+}
+
+void fn_80062BFC(int nHandle) {
+    if ((u8*)nHandle != NULL) {
+        *(u32*)(nHandle + 0x1790) = 0;
+    }
+}
+
+int fn_80062C10(int nHandle) {
+    return *(u32*)(nHandle + 0x168) & 4;
+}
+
+int fn_80062C1C(int nHandle) {
+    return *(u32*)(nHandle + 0x168) & 1;
+}
+
+// How far the animation still has to run.
+f32 fn_80062C28(int nHandle) {
+    return *(f32*)(nHandle + 0x184) - *(f32*)(nHandle + 0x17C);
+}
+
+void fn_800E58B4(int a);
+
+void fn_80062C38(void) {
+    fn_800E58B4(7);
+}
+
+void fn_80062C5C(void) {
+    fn_800E58B4(8);
+}
+
+void fn_80062D38(int a, int b, int nPlayer);
+void fn_80062D6C(int a, int nPlayer);
+
+void fn_80062C80(int a, u8 b) {
+    fn_80062D38(0x1E, a, b);
+}
+
+void fn_80062CB0(int a, u8 b) {
+    fn_80062D38(0x14, a, b);
+}
+
+void fn_80062CE0(u8 a) {
+    fn_80062D6C(0x23, a);
+}
+
+void fn_80062D0C(int nPlayer) {
+    fn_80062D6C(9, nPlayer + 1);
+}
+
+void fn_800E5998(int a, int b, int* pC, int* pD);
+
+void fn_80062D38(int a, int b, int nPlayer) {
+    fn_800E5998(a, 0, &b, &nPlayer);
+}
+
+void fn_800E590C(int a, int b, int* pC);
+
+void fn_80062D6C(int a, int nPlayer) {
+    fn_800E590C(a, 0, &nPlayer);
+}
+
+void fn_80098C70(void);
+
+void fn_80062D98(void) {
+    fn_80098C70();
+}
+
+void fn_80062DB8(void* pView, int a) {
+    *((u8*)pView + 0x6C) = a;
+}
+
+void fn_80062DC0(void* pView) {
+    *(f32*)((u8*)pView + 0x68) = 0.0f;
+}
+
+f32 fn_80062DCC(View* pView) {
+    return *(f32*)((u8*)pView + 0x68);
+}
+
+u8 fn_80062DD4(View* pView) {
+    return *((u8*)pView + 0x6C);
+}
+
+// a - b over three floats (paired singles; the third is a single).
+asm void fn_80062DDC(register f32* pA, register f32* pB, register f32* pOut) {
+    nofralloc
+    psq_l  f0, 0(pA), 0, 0
+    psq_l  f1, 8(pA), 1, 0
+    psq_l  f2, 0(pB), 0, 0
+    psq_l  f3, 8(pB), 1, 0
+    ps_sub f2, f0, f2
+    ps_sub f3, f1, f3
+    psq_st f2, 0(pOut), 0, 0
+    psq_st f3, 8(pOut), 1, 0
+    blr
+}
+
+void fn_800BD894(void);
+
+void fn_80062E00(void) {
+    fn_800BD894();
+}
+
+void fn_800BDA04(void);
+
+void fn_80062E20(void) {
+    fn_800BDA04();
+}
+
 void SwingState10_Exit(int nPlayer) {
     if (gPlayers[nPlayer].swing.unk630 != 0) {
         gPlayers[nPlayer].swing.unk630 = 0;
@@ -1378,15 +1723,15 @@ void SwingState11_Exit(int nPlayer) {
 }
 
 
-s8    fn_8005D2A8(int nPlayer);               // the state below the top of the stack
+s8 fn_8005D2A8(int nPlayer);               // the state below the top of the stack
 u8    fn_80063C50(void* pView);
 void  fn_80063CBC(void* pView, f32* pVec);
 void  fn_80045558(int a, int nPlayer);
 void  fn_8006C608(void);
-void  fn_80062CE0(int a);
+void fn_80062CE0(u8 a);
 void  fn_800C1790(void* pView, int nPlayer);
-void  fn_80062DB8(void* pView, int a);
-void  fn_80062D38(int a, int b, int nPlayer);
+void fn_80062DB8(void* pView, int a);
+void fn_80062D38(int a, int b, int nPlayer);
 extern Vec4 lbl_80183670;
 extern u8   lbl_80281E11;
 
@@ -1509,26 +1854,6 @@ void SwingState01_Exit(int nPlayer) {
     }
 }
 
-
-// A view (one per split-screen half); only what the swing states touch.
-typedef struct View {
-    u8   unk0[0x50];
-    f32  f50;                   // 0x050
-    f32  f54;                   // 0x054
-    f32  f58;                   // 0x058
-    u8   unk5C[0x70 - 0x5C];
-    s32  nCurCamera;            // 0x070
-    u8   unk74[0xC4 - 0x74];
-    f32  vC4[4];                // 0x0C4
-    u8   unkD4[0x114 - 0xD4];
-    f32  f114;                  // 0x114
-    f32  f118;                  // 0x118
-    f32  f11C;                  // 0x11C
-    u8   unk120[0x144 - 0x120];
-    s32  nCamera;               // 0x144
-    u8   unk148[0x25C - 0x148];
-    s32  nSavedCamera;          // 0x25C
-} View;
 
 extern u8*  lbl_80281F78;                    // a game object: +0x1C0 non-zero enables camera 19
 extern u8   gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
@@ -1665,8 +1990,8 @@ void SwingState21_Exit(int nPlayer) {
 }
 
 
-void  fn_80062B64(int nPlayer);
-void  fn_80062B60(int nPlayer);
+void fn_80062B64(int nPlayer);
+void fn_80062B60(int nPlayer);
 void  fn_80019234(int nHandle, f32* pPos, int a);
 u8    fn_8005587C(u8* pBall, f32* pPos);          // put the ball at a point
 void  fn_800C7140(int a);
@@ -1738,8 +2063,8 @@ void SwingState21_Enter(int nPlayer) {
 
 
 void  fn_800DED60(int nPlayer);
-void  fn_80062BFC(int nHandle);
-void  fn_80062BE8(int nHandle);
+void fn_80062BFC(int nHandle);
+void fn_80062BE8(int nHandle);
 void  fn_8001C804(int nPlayer, int a, int b);
 f32   fn_800D0478(int nPlayer);               // a distance (compared with 250 in Golfer_IsLucky)
 void  fn_800E4204(void);
@@ -1796,10 +2121,10 @@ u8    fn_80100294(void);                      // in a lesson (mode 11)
 u8    fn_800172C4(void* pView);               // the camera move has finished
 u8    fn_80014300(u32 uMask);                 // any pad pressed these buttons
 void  fn_800A76E4(void);
-u8    fn_80062B90(void);
-u8    fn_80062B88(int nPlayer);
-void  fn_80062B84(int a);
-u8    fn_80062B7C(void);
+u8 fn_80062B90(void);
+u8 fn_80062B88(int nPlayer);
+void fn_80062B84(int a);
+u8 fn_80062B7C(void);
 
 // State 21 (a camera flyover): over when the option skips cameras, the camera finishes, or a
 // button is pressed (any pad for a CPU's shot). Lessons wait for the camera.
@@ -1862,7 +2187,7 @@ u8    fn_80101738(void);
 u8    fn_800C6CB0(void);
 void  fn_8006ACF8(int nPlayer, int a);
 void  fn_800DB714(int nPlayer);
-void  fn_80062DC0(void* pView);
+void fn_80062DC0(void* pView);
 void  fn_80050D2C(u8 bOn);                    // Ball.c: the second sim flag
 void  fn_800DCE5C(int nPlayer);
 extern Vec4 lbl_80183640;
@@ -1927,8 +2252,8 @@ void SwingState15_Update(int nPlayer) {
 
 
 int   fn_80048574(int nHandle, unsigned long long uEvent);
-int   fn_80062BB0(int nHandle, unsigned long long uEvent);
-void  fn_80062B98(int nHandle, unsigned long long uEvent);
+int fn_80062BB0(int nHandle, unsigned long long uEvent);
+int fn_80062B98(int nHandle, unsigned long long uEvent);
 void  fn_800A5980(u8 nPlayer);
 void  fn_8006C28C(int nPlayer, int nController);
 extern Vec4 lbl_80183650;
@@ -2005,7 +2330,7 @@ void SwingState08_Update(int nPlayer) {
 
 
 void  Caddie_Update(int nPlayer);             // Golfer.c
-void  fn_80062C38(void);
+void fn_80062C38(void);
 void  fn_800DAE84(void);
 void  fn_80058FA4(int nPlayer);
 void  fn_80068AA8(int nPlayer);
@@ -2194,7 +2519,7 @@ void SwingState22_Enter(int nPlayer) {
 
 
 void  BreakLine_Start(int nView);            // GoBreakLine.c
-void  fn_80062CB0(int a, int b);
+void fn_80062CB0(int a, u8 b);
 void  fn_800DEE4C(int nPlayer);
 void  fn_80055AA8(u8* pBall, u8* pBall2, int nPlayer);
 void  fn_800EDAE0(int nPlayer);
@@ -2286,7 +2611,7 @@ void SwingState22_Update(int nPlayer) {
 
 
 u8    fn_800C7340(void* pView, int nPlayer);
-void  fn_80062D6C(int a, int nPlayer);
+void fn_80062D6C(int a, int nPlayer);
 
 // State 3: the aiming camera, held while button 8 is down (the caddie keeps updating). Pan
 // sounds on buttons 9/10, 30 and 11..14; once the camera has arrived (flag from the enter) a
@@ -2405,8 +2730,8 @@ int   fn_8006AA9C(int nPlayer);
 int   fn_80095798(int nHandle);
 u8    fn_800C7160(View* pView);
 u8    fn_800734A0(void* pAnim);
-int   fn_80062C1C(int nHandle);
-int   fn_80062C10(int nHandle);
+int fn_80062C1C(int nHandle);
+int fn_80062C10(int nHandle);
 u8    fn_800C6604(View* pView);
 void  fn_800C6358(View* pView, int nPlayer);
 
@@ -2454,7 +2779,7 @@ void SwingState13_Update(int nPlayer) {
 }
 
 
-void  fn_80062D98(void);
+void fn_80062D98(void);
 u8    fn_800C44A8(View* pView, int nPlayer);
 u8    fn_800C44CC(View* pView, int nPlayer);
 u8    fn_800C44E0(View* pView, int nPlayer);
@@ -2621,7 +2946,7 @@ u8    fn_8001DBF4(int nHandle);               // the ball is in the golfer's han
 int   fn_8001EED8(void* pSkel, int nBone);    // a bone's index
 f32   fn_8004D620(CourseInfo* pCourse, f32* pPos);   // ground height, -60000 and below if none
 void  fn_8001D95C(int nHandle, f32* pPos);
-void  fn_80062DDC(f32* pA, f32* pB, f32* pOut);       // a - b
+void fn_80062DDC(f32* pA, f32* pB, f32* pOut);       // a - b
 double fn_80009744(f32* pVec);                // dot with itself
 void  fn_800BAF04(f32* pSrc, f32* pDst);      // normalise (3)
 void  fn_80051A18(u8* pBall, f32* pDir, f32 fSpeed, u8* pFrom);   // Ball.c: launch with a velocity
@@ -2705,8 +3030,8 @@ void SwingState18_Update(int nPlayer) {
 
 u8    fn_800C6D9C(void);
 void  fn_800DF824(int nPlayer);
-u8    fn_80062DD4(View* pView);               // the view has faded out
-f32   fn_80062DCC(View* pView);               // and how far
+u8 fn_80062DD4(View* pView);               // the view has faded out
+f32 fn_80062DCC(View* pView);               // and how far
 void  fn_800DDA14(int nPlayer);
 void  fn_8006C4A0(void);                      // take the shot back (a mulligan)
 void  fn_800DBDA8(int nPlayer);
@@ -2811,7 +3136,7 @@ u8    fn_800DA174(void);
 u8    fn_800DA1D4(void);
 u8    fn_800DA234(void);
 void  fn_800E505C(int nTip);
-void  fn_80062C80(int a, int b);
+void fn_80062C80(int a, u8 b);
 void  fn_800D1DAC(int nPlayer);
 u8    fn_800EC550(void);
 u8    fn_800ED540(void);
@@ -2821,13 +3146,13 @@ void  fn_800E502C(void);
 void  fn_800E4FFC(void);
 void  fn_800ED548(void);
 void  Caddie_Start(int nPlayer);              // Golfer.c
-void  fn_80062C5C(void);
+void fn_80062C5C(void);
 void  fn_800DB4E8(int nPlayer);
-void  fn_80062B68(int nPlayer);
+void fn_80062B68(int nPlayer);
 u8    fn_800E5098(void);
 u8    fn_800E3DDC(int nPlayer);
 void  fn_800DD3A4(int nPlayer);
-void  fn_80062B6C(int nPlayer);
+void fn_80062B6C(int nPlayer);
 void  fn_800C6618(View* pView, int nPlayer);
 int   fn_800C7138(View* pView);
 u8    fn_800C441C(View* pView, int nPlayer);
@@ -3009,12 +3334,12 @@ u8    fn_800E46B4(void);
 u8    fn_800E4254(int nPlayer);
 u8    fn_80063C7C(View* pView);
 void  fn_800DEA44(int nPlayer);
-f32   fn_80062C28(int nHandle);
-void  fn_80062B78(int nPlayer);
-void  fn_80062B74(int nPlayer);
-void  fn_80062B70(void);
+f32 fn_80062C28(int nHandle);
+void fn_80062B78(int nPlayer);
+void fn_80062B74(int nPlayer);
+void fn_80062B70(void);
 u8    fn_800E2810(int nPlayer);
-void  fn_80062D0C(int nPlayer);
+void fn_80062D0C(int nPlayer);
 void  fn_800E41D4(int nPlayer);
 extern Vec4 lbl_80183620;
 

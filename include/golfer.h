@@ -104,7 +104,9 @@ typedef struct SwingData {
     f32  fBackAngle;            // 0x04C  (0x420) the backswing's sideways angle, radians (0 on a putt)
     u8   unk50[0x370 - 0x50];
     s32  n370;                  // 0x370  (0x744) cleared each phase step
-    u8   unk374[4];
+    u8   unk374;
+    u8   b375;                  // 0x375  (0x749) set by fn_8005A788
+    u8   unk376[2];
     s32  nCentreX;              // 0x378  (0x74C) stick at the start of the swing
     s32  nCentreY;              // 0x37C  (0x750)
     s32  nRestCX;               // 0x380  (0x754) the sticks' rest positions while waiting
