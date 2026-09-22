@@ -137,13 +137,20 @@ Luck
 
 `Golfer_IsLucky(player)` (`0x8002D994`) decides whether a shot gets a lucky event. **CPU golfers
 never do** (early exit), and a session flag turns it off. The odds start at **1 in 12** for every
-player (`gLuckOdds`), and:
+player (`gLuckOdds`, reset by `Luck_ResetAllOdds` at the start of a round) and **tighten by one
+at each hole transition until 1 in 10** (`Luck_TightenOdds`, from the game state machine): 1 in
+12 on the first hole, 1 in 11 on the second, 1 in 10 from the third. Then:
 
 - LUCK cuts the "12" by LUCK/2 percent: LUCK 100 makes it 1 in 6 (110 rounds to the same);
 - **in game mode 4, when player 1 has won more than 4 holes more than player 0, the odds are
   halved again** (1 in 3 at LUCK 100); the same halving applies on one flagged hole;
 - it only fires off the green, never on a putt, and only for a pitch, a shot from lie 1 or 2
-  under 250 units, or one special shot mode; then `Rand_Next(0) % odds == 0` is the roll.
+  under 250 yards, or on a par 3; then `Rand_Next(0) % odds == 0` is the roll.
+
+The roll is made once, when the shot is planned (`Shot_Plan`), and its result is
+`Player.bPerfect`: **a lucky shot is a perfect shot.** The swing's error is zeroed and
+forgiveness skipped (`Swing.c`), the tree deflection roll is skipped, and the caddie's search
+accepts a wider miss.
 
 What the event does is in the lie code (`0x80053594`, read, not decompiled): landing in the
 rough is a coin flip between the good rough lie and the bad one, and `(roll & 127) < LUCK/2`

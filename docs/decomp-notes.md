@@ -165,6 +165,11 @@ Reading compiler output
   The original had `beq end; beq end; bge body; b end` - the last term of an or-chain gets the
   inverted branch over an unconditional one. `if (a || b || c) return;` matched
   (`AI_ClubLonger`, `AI_ClubShorter`).
+- **[verified] Three equality tests on one field: pointer vs indexed decides the range trick.**
+  `if (gPlayers[n].nLie == 6 || ... == 7 || ... == 8)` became `subi; cmplwi 1; ble` (a 6..7 range)
+  plus one compare; the same chain through `Player* p` (`p->nLie == 6 || ...`) gave the original's
+  three plain `cmpwi/beq` (`Lie_AllowsFullSwing`, exact). A `switch` with the three cases was
+  wrong both ways.
 - **[verified] Check struct sizes against the multiply.** Array indexing shows the element size:
   `slwi r,r,4` is 16 bytes, `mulli r,r,0x44` is 0x44 bytes. If ours has `mulli` by a different
   number, the struct is the wrong size (we had three function pointers in a two-pointer entry).

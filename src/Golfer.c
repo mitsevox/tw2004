@@ -1291,3 +1291,46 @@ void AI_TargetsInit(void) {
     Course_RegisterLoader(0, AI_TargetsLoad);
     AI_TargetsClear();
 }
+
+// ---- odds and ends ----------------------------------------------------------------------------
+
+// Aim at the pin without changing the shot shape.
+void AI_AimAtPin(int nPlayer) {
+    Player*     p       = &gPlayers[nPlayer];
+    CourseInfo* pCourse = fn_8000C594();
+    int         nHole   = Game_CurrentHole();
+    p->fTargetX = pCourse->pin[nHole].x;
+    p->fTargetZ = pCourse->pin[nHole].z;
+    AI_PlanShot(nPlayer, &p->fTargetX);
+}
+
+// The luck odds: "1 in gLuckOdds[n]". 12 at the start of a round, and every hole transition
+// takes one off any player still above 9 - so 1 in 12, then 1 in 11, then 1 in 10 for the rest.
+void Luck_ResetOdds(int nPlayer) {
+    gLuckOdds[nPlayer] = 12;
+}
+
+void Luck_ResetAllOdds(void) {
+    int i;
+    for (i = 0; i < 5; i++) {
+        Luck_ResetOdds((u8)i);
+    }
+}
+
+void Luck_ResetAllOdds2(void) {
+    Luck_ResetAllOdds();
+}
+
+void Luck_TightenOdds(void) {
+    int i;
+    for (i = 0; i < 5; i++) {
+        if (gLuckOdds[i] > 9) gLuckOdds[i]--;
+    }
+}
+
+// Lies 6, 7 and 8 do not allow a full swing.
+u8 Lie_AllowsFullSwing(int nPlayer) {
+    Player* p = &gPlayers[nPlayer];
+    if (p->nLie == 6 || p->nLie == 7 || p->nLie == 8) return 0;
+    return 1;
+}
