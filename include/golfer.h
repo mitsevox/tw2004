@@ -98,7 +98,9 @@ typedef struct SwingData {
     s32  nSpinStickY;           // 0x618  (0x9EC)
     f32  fSpinX;                // 0x61C  (0x9F0)
     f32  fSpinY;                // 0x620  (0x9F4)
-    u8   unk624[0x634 - 0x624];
+    u8   unk624[0x630 - 0x624];
+    u8   unk630;                // 0x630  (0xA04) cleared by Player_SetGolfer
+    u8   unk631[3];
 } SwingData;
 
 // A player in the current round (human or CPU). 0xEF8 bytes; only the fields read so far.
@@ -126,14 +128,16 @@ typedef struct Player {
     f32  fBallX;                // 0x3B4
     f32  fBallY;                // 0x3B8
     f32  fBallZ;                // 0x3BC
-    u8   unk3C0[0x3D4 - 0x3C0];
+    f32  fBallW;                // 0x3C0
+    u8   unk3C4[0x3D4 - 0x3C4];
     SwingData swing;            // 0x3D4  the swing meter's state for this player
     s32  nController;           // 0xA08  CONTROLLER_CPU for the AI
-    u8   unkA0C[0xA14 - 0xA0C];
+    s32  nView0;                // 0xA0C
+    s32  nView1;                // 0xA10
     f32  fTargetX;              // 0xA14
     f32  fTargetY;              // 0xA18
     f32  fTargetZ;              // 0xA1C
-    u8   unkA20[0xA24 - 0xA20];
+    f32  fTargetW;              // 0xA20
     f32  vTargetCopy[4];        // 0xA24  copy of the planned target
     f32  vTarget2[4];           // 0xA34  copy of the chosen aim point
     u8   unkA44[0xA54 - 0xA44];
@@ -144,12 +148,20 @@ typedef struct Player {
     u8   unkA6C[0xA90 - 0xA6C];
     u8   ball[0x68];            // 0xA90  the player's Ball (0xBC bytes, see Ball.c) - nLie is its +0x68
     s32  nLie;                  // 0xAF8
-    u8   unkAFC[0xC18 - 0xAFC];
+    u8   unkAFC[0xB4C - 0xAFC];
+    f32  vOrient[4];            // 0xB4C  a quaternion, identity at setup
+    u8   unkB5C[0xC18 - 0xB5C];
     s32  nShotHandle;           // 0xC18
-    u8   unkC1C[0xC29 - 0xC1C];
+    u8   unkC1C[4];
+    f32  fC20;                  // 0xC20
+    u8   unkC24[4];
+    u8   unkC28;                // 0xC28
     u8   bLowIQPenalty;         // 0xC29  quarters the IQ overconfidence term when set
     s8   nLevel;                // 0xC2A  CPU difficulty level: 25 modifier points per level
-    u8   unkC2B[0xC30 - 0xC2B];
+    u8   unkC2B;                // 0xC2B
+    u8   unkC2C;                // 0xC2C
+    u8   unkC2D;                // 0xC2D
+    u8   unkC2E[2];
     s32  nRehearseState;        // 0xC30  AI_RehearseShot state machine
     u8   unkC34[0xEE8 - 0xC34];
     u32  uFlags;                // 0xEE8
@@ -167,18 +179,23 @@ typedef struct SurfaceType {
 
 // The round / session state at gSession (0x5BD0 bytes); only what this file reads.
 typedef struct Session {
-    u32  uFlags;                // 0x000  bit 1: use the alternate attribute block everywhere
-    u8   unk4[0x10 - 0x4];
-    u8   bNoLuck;               // 0x010  lucky bounces switched off
+    u32  uFlags;                // 0x000  bit 1: use the alternate attribute block everywhere;
+                                //        bit 9: every club in the bag
+    s32  nGameType;             // 0x004  4 gets a second view
+    u8   unk8[0x10 - 0x8];
+    u8   nSplitScreen;          // 0x010  0 single view, else split screen (2 = side by side); no luck, no caddie
     u8   unk11[0x13 - 0x11];
     u8   bNoSpin;               // 0x013  spin control switched off
     u8   unk14[0x2C - 0x14];
     s32  nNumPlayers;           // 0x02C
-    u8   unk30[0x44 - 0x30];
+    s32  nController[4];        // 0x030  per player
+    u8   unk40[4];
     s32  nGolfer[4];            // 0x044  golfer index per player
-    u8   unk54[0x58 - 0x54];
+    u8   unk54[4];
     s32  nTeeSet[4];            // 0x058
-    u8   unk68[0x5BD0 - 0x68];
+    u8   unk68[4];
+    u32  uBag[4];               // 0x06C  per player, 0 = the record's own
+    u8   unk7C[0x5BD0 - 0x7C];
 } Session;
 
 // The game state gpGame points at; only what this file reads.

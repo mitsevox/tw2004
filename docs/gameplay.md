@@ -136,7 +136,7 @@ Luck
 ----
 
 `Golfer_IsLucky(player)` (`0x8002D994`) decides whether a shot gets a lucky event. **CPU golfers
-never do** (early exit), and a session flag turns it off. The odds start at **1 in 12** for every
+never do** (early exit), and split-screen play turns it off. The odds start at **1 in 12** for every
 player (`gLuckOdds`, reset by `Luck_ResetAllOdds` at the start of a round) and **tighten by one
 at each hole transition until 1 in 10** (`Luck_TightenOdds`, from the game state machine): 1 in
 12 on the first hole, 1 in 11 on the second, 1 in 10 from the third. Then:
@@ -174,8 +174,9 @@ error-free swing.
 So "Luck: increases % of favorable lies and bounces" understates it. The favourable lie and the
 kind bounce are real (below), but the main event is a whole shot handed to you, disguised as a
 great swing. It cannot happen on the green, on a putt, or from the deep stuff - only on par 3s,
-pitches, and shots from lie 1 or 2 inside 250 yards - and the session's "no luck" flag turns the
-whole thing off. A CPU never gets one.
+pitches, and shots from lie 1 or 2 inside 250 yards - and **split-screen play turns the whole
+thing off** (the session byte we first took for a "no luck" option is the split-screen mode;
+the caddie is off in split screen too). A CPU never gets one.
 
 What the event does is in the lie code (`0x80053594`, read, not decompiled): landing in the
 rough is a coin flip between the good rough lie and the bad one, and `(roll & 127) < LUCK/2`

@@ -638,7 +638,7 @@ u8 Golfer_IsLucky(int nPlayer) {
     if (fn_80101D4C(nPlayer)) {
         return 1;
     }
-    if (Player_IsCPU(nPlayer) || gSession.bNoLuck) {
+    if (Player_IsCPU(nPlayer) || gSession.nSplitScreen) {
         return 0;
     }
     uOdds = gLuckOdds[nPlayer];
@@ -654,7 +654,7 @@ u8 Golfer_IsLucky(int nPlayer) {
         if (uOdds < 1) uOdds = 1;
     }
     uRoll = Rand_Next(0) % uOdds;
-    if (gPlayers[nPlayer].nLie != LIE_GREEN && gPlayers[nPlayer].nShotKind != SHOT_PUTT && !gSession.bNoLuck) {
+    if (gPlayers[nPlayer].nLie != LIE_GREEN && gPlayers[nPlayer].nShotKind != SHOT_PUTT && !gSession.nSplitScreen) {
         Game_CurrentHole();
         fn_8000C594();
         if (fn_800D2B08() == 3) {
@@ -775,7 +775,7 @@ u8 AI_RehearseShot(int nPlayer, f32* pOutDist2, u8 bFast, f32 fTolerance);   // 
 void Caddie_Start(int nPlayer) {
     if (!gPlayers[nPlayer].bPerfect && gPlayers[nPlayer].nShotKind != SHOT_PUTT) return;
     if (Player_IsCPU(nPlayer)) return;
-    if (gSession.bNoLuck == 0) {
+    if (gSession.nSplitScreen == 0) {
         fn_80005628(&gPlayers[CADDIE_SLOT], &gPlayers[nPlayer], sizeof(Player));
         gPlayers[CADDIE_SLOT].nController = CONTROLLER_CPU;
         AI_DefaultTarget(CADDIE_SLOT);
@@ -789,7 +789,7 @@ void Caddie_Start(int nPlayer) {
 void Caddie_Update(int nPlayer) {
     if (!gPlayers[nPlayer].bPerfect && gPlayers[nPlayer].nShotKind != SHOT_PUTT) return;
     if (Player_IsCPU(nPlayer)) return;
-    if (gSession.bNoLuck == 0) {
+    if (gSession.nSplitScreen == 0) {
         if (!gCaddieActive) return;
         if (gPlayers[nPlayer].bPerfect) {
             f32 fDist2;
@@ -805,7 +805,7 @@ void Caddie_Update(int nPlayer) {
 
 // 0 = no tip for this shot, 1 = tip ready (the aim point in pOut), 2 = gave up.
 int Caddie_GetTip(int nPlayer, f32* pOut) {
-    if (gPlayers[nPlayer].nShotKind != SHOT_PUTT || Player_IsCPU(nPlayer) || gSession.bNoLuck) {
+    if (gPlayers[nPlayer].nShotKind != SHOT_PUTT || Player_IsCPU(nPlayer) || gSession.nSplitScreen) {
         pOut[0] = pOut[1] = pOut[2] = pOut[3] = 0.0f;
         return 0;
     }
@@ -1568,7 +1568,7 @@ void Luck_TakePerfectShot(int nPlayer) {
     f32* pAim;
     f32  fDiff;
 
-    if (*pPerfect == 0 || Player_IsCPU(nPlayer) || gSession.bNoLuck != 0) return;
+    if (*pPerfect == 0 || Player_IsCPU(nPlayer) || gSession.nSplitScreen != 0) return;
     {
         pClub = &gPlayers[nPlayer].nClub;
         if (gPlayers[CADDIE_SLOT].nClub + 2 < *pClub) {
@@ -1602,4 +1602,149 @@ void Luck_TakePerfectShot(int nPlayer) {
         }
         Caddie_Stop();
     }
+}
+
+// ---- setting up the players ---------------------------------------------------------------------
+
+#define BAG_ALL      0x03FFFFFF     // every club
+#define BAG_DEFAULT  0x01FFFC7F     // a bag with no clubs 7, 8, 9 (the 3-, 4-, 5-woods?) or 25
+
+extern u8 gNumPlayersSetUp;         // 0x80281D48
+
+typedef struct ViewSlot { void* pUnk; void* pShot; } ViewSlot;
+extern ViewSlot gViewSlots[];       // 0x80187124  per player
+
+u8    fn_800170A0(int nView);                                   // the view exists
+void  fn_80016D18(int nView, f32 x, f32 y, f32 w, f32 h);       // open it (screen fractions)
+void  fn_8001704C(int nView, int nPlayer);                      // attach a player
+void* fn_80017028(int nView);
+void  fn_800632E4(void* pCam, int nKind, int nPlayer, int nView);
+void  fn_80009710(f32* pQuat);                                  // identity (0, 0, 0, 1)
+void  fn_8005CE70(int nPlayer);
+void  fn_80095504(int n);
+void  fn_800953C8(int n);
+
+// Fill a player slot from the golfer table and set up its view(s). uBag overrides the record's
+// bag when non-zero (or everything, with session flag 0x200); an empty bag gets the default.
+// In split screen, bRightSide picks the half; otherwise view 0, plus view 2 in game type 4.
+void Player_SetGolfer(int nPlayer, int nGolfer, int nController, u32 uBag, int bRightSide) {
+    Player* p = &gPlayers[nPlayer];
+    int     i;
+
+    p->nIndex = nPlayer;
+    fn_80005628(&p->golfer, &gGolferTable[nGolfer], sizeof(GolferRecord));
+    p->golfer.nIndex = nGolfer;
+    if (gSession.uFlags & 0x200) uBag |= BAG_ALL;
+    if (uBag != 0) p->golfer.uBagMask = uBag;
+    if (p->golfer.uBagMask == 0) p->golfer.uBagMask = BAG_DEFAULT;
+    for (i = 0; i < NUM_ATTRS; i++) {
+        p->attrMod[i] = 0;
+    }
+    p->nClub       = 0;
+    p->fAim        = 0.0f;
+    p->fPower      = 100.0f;
+    p->nShotKind   = SHOT_FULL;
+    p->nTrajectory = 1;
+    p->fBallX      = 0.0f;
+    p->fBallY      = 0.0f;
+    p->fBallZ      = 0.0f;
+    p->fBallW      = 0.0f;
+    p->nLie        = 0;
+    p->fTargetX    = 0.0f;
+    p->fTargetY    = 0.0f;
+    p->fTargetZ    = 0.0f;
+    p->fTargetW    = 0.0f;
+    fn_80009710(p->vOrient);
+    p->nController = nController;
+    p->unkC28      = 0;
+    if (gSession.nSplitScreen) {
+        if (bRightSide == 0) {
+            if (!fn_800170A0(0)) fn_80016D18(0, 0.0f, 0.0f, 0.5f, 1.0f);
+            p->nView0 = 0;
+            p->nView1 = 0;
+            fn_8001704C(p->nView0, nPlayer);
+            fn_8001704C(p->nView1, nPlayer);
+        } else if (bRightSide == 1) {
+            if (!fn_800170A0(1)) fn_80016D18(1, 0.5f, 0.0f, 0.5f, 1.0f);
+            p->nView0 = 1;
+            p->nView1 = 1;
+            fn_8001704C(p->nView0, nPlayer);
+            fn_8001704C(p->nView1, nPlayer);
+        }
+    } else {
+        if (!fn_800170A0(0)) fn_80016D18(0, 0.0f, 0.0f, 1.0f, 1.0f);
+        p->nView0 = 0;
+        fn_8001704C(p->nView0, nPlayer);
+        if (gSession.nGameType == 4) {
+            int nView;
+            if (!fn_800170A0(2)) fn_80016D18(2, 0.0f, 0.0f, 1.0f, 1.0f);
+            p->nView1 = 2;
+            fn_8001704C(p->nView1, nPlayer);
+            nView = p->nView1;
+            fn_800632E4(fn_80017028(nView), 0x19, nPlayer, nView);
+        } else {
+            p->nView1 = 0;
+            fn_8001704C(p->nView1, nPlayer);
+        }
+    }
+    p->nShotHandle = (s32)gViewSlots[nPlayer].pShot;
+    if (p->nShotHandle != 0) {
+        *(s32*)(p->nShotHandle + 4) = nPlayer;
+        if (gSession.nSplitScreen == 2) {
+            *(s32*)(p->nShotHandle + 0x16DC) = gNumPlayersSetUp * 2;
+        }
+    }
+    p->swing.unk630 = 0;
+    p->bLowIQPenalty = 0;
+    p->nLevel       = 0;
+    p->fC20         = 0.0f;
+    p->unkC2D       = 0;
+    p->unkC2B       = 0;
+    p->unkC2C       = 0;
+    p->uFlags       = 0;
+    gNumPlayersSetUp++;
+}
+
+// Every player in the session, from the session's golfer, controller and bag arrays; odd
+// players take the right half of a split screen.
+void Players_SetupAll(void) {
+    u8 i;
+    for (i = 0; i < gSession.nNumPlayers; i++) {
+        if (i % 2 != 0) {
+            Player_SetGolfer(i, gSession.nGolfer[i], gSession.nController[i], gSession.uBag[i], 1);
+        } else {
+            Player_SetGolfer(i, gSession.nGolfer[i], gSession.nController[i], gSession.uBag[i], 0);
+        }
+    }
+}
+
+void Players_Reset(void) {
+    int i;
+    for (i = 0; i < gSession.nNumPlayers; i++) {
+        fn_8005CE70(i);
+        gPlayers[i].nShotHandle = 0;
+    }
+    gNumPlayersSetUp = 0;
+}
+
+void Session_SetNumPlayers(int n) {
+    gSession.nNumPlayers = n;
+}
+
+void Session_SetGolfer(int nGolfer, int nPlayer) {
+    gSession.nGolfer[nPlayer] = nGolfer;
+}
+
+void fn_8002F180(void) {
+    fn_80095504(0);
+    fn_800953C8(0);
+}
+
+void fn_8002C8B4(void) {
+}
+
+void fn_8002E258(void) {
+}
+
+void fn_8002E25C(void) {
 }
