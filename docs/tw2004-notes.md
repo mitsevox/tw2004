@@ -200,6 +200,18 @@ Project conventions
 - Compiler: GC/2.5, flags in `configure.py` (`cflags_base`). Confirmed and unconfirmed flags are
   listed in `compiler.md`.
 
+Progress dashboard
+------------------
+
+`tools/dashboard/server.py` serves a read-only progress page on the LAN (port 8420). It reads
+`build/GW4E69/report.json`, `symbols.txt` and git history; refreshes every 20 s. It runs as the
+Windows scheduled task `tw2004-dashboard` (created with `schtasks`, no admin needed) so it outlives
+the Claude session. It does not survive a reboot; restart it with:
+
+    schtasks /run /tn tw2004-dashboard
+
+Inbound port 8420 needs a Windows firewall allow rule (the PC's network is on the Public profile).
+
 Adding a function: the steps
 ----------------------------
 
