@@ -1421,3 +1421,132 @@ void Caddie_ApplyTip(int nPlayer) {
     gPlayers[nPlayer].fPower      = gPlayers[CADDIE_SLOT].fPower;
     gPlayers[nPlayer].fAim        = gPlayers[CADDIE_SLOT].fAim;
 }
+
+// ---- small queries ------------------------------------------------------------------------------
+
+s8   fn_8005D278(int nPlayer);          // Swing.c: the club-set entry's byte 5, -1 when none
+void fn_80013200(int nPad, u8 nValue);
+
+u8 Player_OnTee(int nPlayer) {
+    return gPlayers[nPlayer].nLie == 0;
+}
+
+u8 Player_LieIs12(int nPlayer) {
+    return gPlayers[nPlayer].nLie == 12;
+}
+
+u8 Player_LieIs12NotClub23(int nPlayer) {
+    u8 bResult = 0;
+    if (gPlayers[nPlayer].nLie == 12 && fn_8005D278(nPlayer) != 0x17) {
+        bResult = 1;
+    }
+    return bResult;
+}
+
+// Team 0 is players 0 and 1, team 1 players 2 and 3.
+u8 Team_IsAllCPU(int nTeam) {
+    int nFirst = 2;
+    if (nTeam == 0) nFirst = 0;
+    if (gPlayers[nFirst].nController == CONTROLLER_CPU && gPlayers[nFirst + 1].nController == CONTROLLER_CPU) return 1;
+    return 0;
+}
+
+u8 Team_IsAllHuman(int nTeam) {
+    int nFirst = 2;
+    if (nTeam == 0) nFirst = 0;
+    if (gPlayers[nFirst].nController != CONTROLLER_CPU && gPlayers[nFirst + 1].nController != CONTROLLER_CPU) return 1;
+    return 0;
+}
+
+u8 Player_IsController8(int nPlayer) {
+    return gPlayers[nPlayer].nController == 8;
+}
+
+// Controllers 0..7 are pads; 8 is something else; 9 is the CPU.
+u8 Player_HasPad(int nPlayer) {
+    return gPlayers[nPlayer].nController <= 7;
+}
+
+u8 Controller_IsPad(int nController) {
+    return nController <= 7;
+}
+
+u8 Player_IsNotCPU(int nPlayer) {
+    return gPlayers[nPlayer].nController <= 8;
+}
+
+u8 Controller_IsNotCPU(int nController) {
+    return nController <= 8;
+}
+
+// The bag: one bit per club in the player's copy of the golfer record.
+u8 Bag_AddClub(int nPlayer, int nBit) {
+    Player* p = &gPlayers[nPlayer];
+    u32     uBit = 1 << nBit;
+    u8      bAdded = 0;
+    if (!(p->golfer.uBagMask & uBit)) {
+        p->golfer.uBagMask |= uBit;
+        bAdded = 1;
+    }
+    return bAdded;
+}
+
+u8 Bag_RemoveClub(int nPlayer, int nBit) {
+    Player* p = &gPlayers[nPlayer];
+    u32     uBit = 1 << nBit;
+    u8      bRemoved = 0;
+    if (p->golfer.uBagMask & uBit) {
+        p->golfer.uBagMask &= ~uBit;
+        bRemoved = 1;
+    }
+    return bRemoved;
+}
+
+u8 Bag_HasClub(int nPlayer, int nBit) {
+    Player* p = &gPlayers[nPlayer];
+    u32     uBit = 1 << nBit;
+    u8      bHas = 0;
+    if (p->golfer.uBagMask & uBit) bHas = 1;
+    return bHas;
+}
+
+int Bag_CountClubs(int nPlayer) {
+    Player* p      = &gPlayers[nPlayer];
+    int     nCount = 0;
+    int     i;
+    for (i = 0; i < NUM_CLUBS; i++) {
+        if (p->golfer.uBagMask & (1 << i)) nCount++;
+    }
+    return nCount;
+}
+
+// The table slot whose record carries this id byte, or -1.
+int Golfer_FindById(int nId) {
+    int i;
+    for (i = 0; i < NUM_GOLFERS; i++) {
+        if (nId == gGolferTable[i].unk1) return i;
+    }
+    return -1;
+}
+
+// The 'rcrd' handler: 0xF00 into the session.
+void Session_OnRecordsLoaded(UStreamObject* pObject) {
+    fn_80005628((u8*)&gSession + 0xF00, *(u8**)pObject, *(u32*)((u8*)pObject + 0x24));
+    fn_80009E70(pObject);
+}
+
+void Session_RegisterRecordsHandler(void) {
+    UStream_RegisterHandler('rcrd', Session_OnRecordsLoaded);
+}
+
+void Session_UnregisterRecordsHandler(void) {
+    UStream_UnregisterHandler('rcrd');
+}
+
+void fn_8002EBA4(u8* pObj, u8 nValue) {
+    int i;
+    pObj[7] = nValue;
+    for (i = 0; i < 4; i++) {
+        fn_80013200(i, pObj[7]);
+    }
+}
