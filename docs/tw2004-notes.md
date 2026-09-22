@@ -172,6 +172,33 @@ look at `fn_800977F8` and at code using the combined matrix at `cam+0xDC`. The c
 is in `fn_80013950`: scale the horizontal extent (`0x1FC`) by 4/3, or change the aspect it feeds
 to the projection matrix for a native 16:9 code that needs no widescreen hack.
 
+What the GCC library actually is
+--------------------------------
+
+The assert strings settle it: the four `../../../Source/...` files are EA's cross-platform
+**memory-card save library**, not the course/asset loader.
+
+- `SFIO` = Shared File I/O: device enumeration (`SFIO_DEVICE_FIRST/LAST`, two memory-card slots),
+  save names, icons, directories, `CARD_RESULT_READY` from the GameCube CARD SDK.
+- `TagFile.c`: a tagged container for save data (`TAG SENTINEL` marker, `TAG_BUFFERSIZE`,
+  `_TagFile_pData->Map.pList`, a checksum).
+- `ChecksumCRC32.c` guards the save data; the XOR cipher scrambles it.
+- The host game calls in through an assert stub `fn_8012214C` (4 bytes in retail) and an allocator
+  `fn_801220D4(pAllocator, size, align, __FILE__, __LINE__)` / `fn_80122128(...)`.
+
+So decompiling it documents the **save-file format**, which is useful (save editors, understanding
+`MC_Gc.c`), but the `.hog` / `.gcb` course formats live elsewhere: look at `LLFileIO_Gc.c`,
+`dvdfs.c` callers, `UStream.c` and the `GoShaderObjectContainer_OBFData_Gc.c` loader instead.
+
+Conventions learned from the asserts: Hungarian notation (`u` unsigned, `e` enum, `p` pointer,
+`b` BOOL, `s` short), `BOOL` is a byte, macro `SFIO_ASSERT(cond)` expands to
+`{ u8 bSkip = 0; if (!((cond) | bSkip)) Assert(__FILE__, __LINE__, #cond, 0); }`, and
+`SFIO_DEVICE_MASK(e)` is `(u16)(1 << (u16)(e))` (the cast is what stops GCC folding it).
+
+In-progress files are kept `NonMatching` (original code is linked) until every function matches,
+because GCC emits the shared assert strings as private labels that the not-yet-written functions
+still reference from the auto units. Per-function progress comes from `report.json`.
+
 Leads and loose ends
 --------------------
 

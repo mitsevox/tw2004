@@ -337,6 +337,7 @@ config.libs = [
         "objects": [
             Object(Matching, "Common/Checksum/ChecksumCRC32.c"),
             Object(Matching, "Common/Cipher/CipherXOR.c"),
+            Object(NonMatching, "Common/SharedFileIO/SharedFileIO.c"),  # in progress; flip to Matching when complete
         ],
     },
     {
