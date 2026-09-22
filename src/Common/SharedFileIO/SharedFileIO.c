@@ -18,21 +18,37 @@ typedef struct {
     int   uExpected54;       // 0x54  compared with the close result
 } SFIOData;
 
-// Function table and data of the platform layer (llSharedFileIO.c). Only the entries used so far.
+// The 17 platform functions the host passes to SFIOInit (llSharedFileIO.c on GameCube).
 typedef struct {
-    u16 uAvailableMask;                                            // 0x00
-    u8  pad2[2];
-    int (*pfnProbe)(void* pParams, int eDevice);                   // 0x04
-    u8  pad8[8];
-    int (*pfnStartProbe)(int eDevice);                             // 0x10
-    int (*pfnSelectDevice)(int eDevice);                           // 0x14
+    void* pfn00;
+    int (*pfnProbe)(void* pParams, int eDevice);                        // 0x04 in SFIODevice
+    void* pfn08;
+    void* pfn0C;
+    int (*pfnStartProbe)(int eDevice);                                  // 0x10
+    int (*pfnSelectDevice)(int eDevice);                                // 0x14
     int (*pfnMount)(u8* pInfo14, u8* pInfo15, int eDevice, u32 uFlags); // 0x18
-    int (*pfnOp19)(int uHandle);                                   // 0x1C
-    u8  pad20[0x18];
-    int (*pfnOp18)(int uHandle);                                   // 0x38
-    u8  pad3C[0x14];
-    u8  uData50[4];                                                // 0x50
-} SFIODeviceFuncs;
+    int (*pfnOp19)(int uHandle);                                        // 0x1C
+    void* pfn20;
+    void* pfn24;
+    void* pfn28;
+    void* pfn2C;
+    void* pfn30;
+    void* pfn34;
+    int (*pfnOp18)(int uHandle);                                        // 0x38
+    void* pfn3C;
+    void* pfn40;
+} SFIOFuncTable;
+
+// Platform-layer state, 0x6C bytes, allocated by SFIOInit.
+typedef struct {
+    u16           uAvailableMask;   // 0x00
+    u8            pad2[2];
+    SFIOFuncTable fn;               // 0x04 .. 0x44
+    void*         pData48;          // 0x48  -> gSFIOData210
+    void*         pData4C;          // 0x4C  -> gSFIOData248
+    u8            uData50[0x18];    // 0x50
+    void*         pAllocator;       // 0x68
+} SFIODevice;
 
 extern SFIOData* _SFIO_pData;
 extern void fn_801715B8(void* pParams, void* pDeviceData, void* pName);
@@ -41,7 +57,9 @@ int SFIOStartSelectDevice(int eDevice, int* pProcess);
 int SFIOStartOp18(int* pHandle, int* pProcess);
 int SFIOStartOp19(int* pHandle, int* pProcess);
 int SFIONextDeviceFromMask(u16 uDeviceMask, int uDirection);
-extern SFIODeviceFuncs* _SFIO_pDevice;
+extern SFIODevice* _SFIO_pDevice;
+extern u8 lbl_8019D210[];
+extern u8 lbl_8019D248[];
 
 enum { SFIO_STATE_BUSY_A = 0xB, SFIO_STATE_BUSY_B = 0xC, SFIO_STATE_BUSY_C = 0xD };
 
@@ -49,6 +67,7 @@ enum { SFIO_STATE_BUSY_A = 0xB, SFIO_STATE_BUSY_B = 0xC, SFIO_STATE_BUSY_C = 0xD
 extern void  fn_8012C8D0(void* pLock, int unused);
 extern void* fn_80175C88(void* pParams);
 extern int   fn_8012C98C(void* p);
+extern void* fn_801220D4(void* pAllocator, u32 uSize, u32 uAlign, const char* pFile, int uLine);
 
 typedef struct {
     void* pAllocator;
@@ -169,7 +188,7 @@ int SFIOStartOp18(int* pDescriptor, int* pProcess) {
     *pProcess = 1;
     _SFIO_pData->eState = SFIO_STATE_BUSY_A;
     _SFIO_pData->eOperation = 0x18;
-    _SFIO_pDevice->pfnOp18(_SFIO_pData->uHandle);
+    _SFIO_pDevice->fn.pfnOp18(_SFIO_pData->uHandle);
     return 0;
 }
 
@@ -180,7 +199,7 @@ int SFIOStartOp19(int* pDescriptor, int* pProcess) {
     *pProcess = 1;
     _SFIO_pData->eState = SFIO_STATE_BUSY_B;
     _SFIO_pData->eOperation = 0x19;
-    _SFIO_pDevice->pfnOp19(_SFIO_pData->uHandle);
+    _SFIO_pDevice->fn.pfnOp19(_SFIO_pData->uHandle);
     return 0;
 }
 
@@ -191,7 +210,7 @@ int SFIOStartSelectDevice(int eDevice, int* pProcess) {
     *pProcess = 1;
     _SFIO_pData->eState = SFIO_STATE_BUSY_C;
     _SFIO_pData->eOperation = 0x1A;
-    _SFIO_pDevice->pfnSelectDevice(eDevice);
+    _SFIO_pDevice->fn.pfnSelectDevice(eDevice);
     return 0;
 }
 
@@ -402,13 +421,13 @@ int SFIOContinueSelect(int eError, int* pProcess, int* pResult) {
         if (eError == 0) {
             fn_801715B8(params, _SFIO_pDevice->uData50, _SFIO_pData->szName35);
             _SFIO_pData->eOperation = 2;
-            _SFIO_pDevice->pfnProbe(params, _SFIO_pData->eDevice);
+            _SFIO_pDevice->fn.pfnProbe(params, _SFIO_pData->eDevice);
         } else if (eError == 3) {
             if (_SFIO_pData->eState == 3) {
                 _SFIO_pData->eDevice = SFIONextDeviceFromMask(_SFIO_pDevice->uAvailableMask, _SFIO_pData->uSearchDirection);
                 if (_SFIO_pData->eDevice != SFIO_DEVICE_INVALID) {
                     _SFIO_pData->eOperation = 1;
-                    _SFIO_pDevice->pfnStartProbe(_SFIO_pData->eDevice);
+                    _SFIO_pDevice->fn.pfnStartProbe(_SFIO_pData->eDevice);
                     return 0;
                 }
             }
@@ -424,11 +443,11 @@ int SFIOContinueSelect(int eError, int* pProcess, int* pResult) {
             if (*pResult == 1) {
                 fn_80171744(&_SFIO_pData->uInfo14, _SFIO_pData->szInfo15, _SFIO_pDevice->uData50, _SFIO_pData->szName35);
                 _SFIO_pData->eOperation = 0x16;
-                _SFIO_pDevice->pfnMount(&_SFIO_pData->uInfo14, _SFIO_pData->szInfo15, _SFIO_pData->eDevice, 0x80000004);
+                _SFIO_pDevice->fn.pfnMount(&_SFIO_pData->uInfo14, _SFIO_pData->szInfo15, _SFIO_pData->eDevice, 0x80000004);
             } else if (*pResult == 0) {
                 SFIOSetLastError(4);
                 _SFIO_pData->eOperation = 0x1A;
-                _SFIO_pDevice->pfnSelectDevice(_SFIO_pData->eDevice);
+                _SFIO_pDevice->fn.pfnSelectDevice(_SFIO_pData->eDevice);
             } else {
                 *pProcess = 2;
                 return 0xA;
@@ -466,7 +485,7 @@ int SFIOContinueSelect(int eError, int* pProcess, int* pResult) {
                 _SFIO_pData->eDevice = SFIONextDeviceFromMask(_SFIO_pDevice->uAvailableMask, _SFIO_pData->uSearchDirection);
                 if (_SFIO_pData->eDevice != SFIO_DEVICE_INVALID) {
                     _SFIO_pData->eOperation = 1;
-                    _SFIO_pDevice->pfnStartProbe(_SFIO_pData->eDevice);
+                    _SFIO_pDevice->fn.pfnStartProbe(_SFIO_pData->eDevice);
                     return 0;
                 } else {
                     *pProcess = 2;
@@ -535,7 +554,7 @@ int SFIOContinueUnmount(int eError, int* pProcess, int* pResult) {
     case 0x18:
         if (eError == 0) {
             _SFIO_pData->eOperation = 0x19;
-            _SFIO_pDevice->pfnOp19(_SFIO_pData->uHandle);
+            _SFIO_pDevice->fn.pfnOp19(_SFIO_pData->uHandle);
         } else {
             SFIOSetLastError(eError);
             return SFIOStartOp19(&_SFIO_pData->uHandle, pProcess);
@@ -544,7 +563,7 @@ int SFIOContinueUnmount(int eError, int* pProcess, int* pResult) {
     case 0x19:
         if (eError == 0) {
             _SFIO_pData->eOperation = 0x1A;
-            _SFIO_pDevice->pfnSelectDevice(_SFIO_pData->eDevice);
+            _SFIO_pDevice->fn.pfnSelectDevice(_SFIO_pData->eDevice);
         } else {
             SFIOSetLastError(eError);
             return SFIOStartSelectDevice(_SFIO_pData->eDevice, pProcess);
@@ -577,11 +596,11 @@ int SFIOContinueAbort(int eError, int* pProcess, int* pResult) {
     switch (_SFIO_pData->eOperation) {
     case 0x18:
         _SFIO_pData->eOperation = 0x19;
-        _SFIO_pDevice->pfnOp19(_SFIO_pData->uHandle);
+        _SFIO_pDevice->fn.pfnOp19(_SFIO_pData->uHandle);
         break;
     case 0x19:
         _SFIO_pData->eOperation = 0x1A;
-        _SFIO_pDevice->pfnSelectDevice(_SFIO_pData->eDevice);
+        _SFIO_pDevice->fn.pfnSelectDevice(_SFIO_pData->eDevice);
         break;
     case 0x1A:
         *pProcess = 2;
@@ -592,5 +611,69 @@ int SFIOContinueAbort(int eError, int* pProcess, int* pResult) {
         return 0x12;
         break;
     }
+    return 0;
+}
+
+BOOL SFIOIsInitialized(void) {
+    return _SFIO_pDevice != NULL;
+}
+
+// pDevices: list of device types terminated by -1 (0..1 = a slot, 3 = both slots).
+int SFIOInit(int* pDevices, const SFIOFuncTable* pFuncs, void* pAllocator) {
+    int* pEntry = NULL;
+    u8 uCount = 0;
+    if (SFIOIsInitialized()) return 1;
+    if (pDevices == NULL) return 0xC;
+    if (*pDevices == -1) return 0xC;
+    if (pFuncs == NULL) return 0xC;
+    if (!(pFuncs->pfn00 && pFuncs->pfnProbe && pFuncs->pfn08 && pFuncs->pfn0C && pFuncs->pfnStartProbe &&
+          pFuncs->pfnSelectDevice && pFuncs->pfnMount && pFuncs->pfnOp19 && pFuncs->pfn20 && pFuncs->pfn24 &&
+          pFuncs->pfn28 && pFuncs->pfn2C && pFuncs->pfn30 && pFuncs->pfn34 && pFuncs->pfnOp18 &&
+          pFuncs->pfn3C && pFuncs->pfn40)) return 0xC;
+    if (_SFIO_pDevice != NULL || _SFIO_pData != NULL) return 1;
+#line 2157
+    _SFIO_pDevice = fn_801220D4(pAllocator, sizeof(SFIODevice), 4, __FILE__, __LINE__);
+    if (_SFIO_pDevice == NULL) return 7;
+#line 2162
+    _SFIO_pData = fn_801220D4(pAllocator, sizeof(SFIOData), 4, __FILE__, __LINE__);
+    if (_SFIO_pData == NULL) return 7;
+    _SFIO_pDevice->pAllocator = pAllocator;
+    _SFIO_pDevice->uAvailableMask = 0;
+    pEntry = pDevices;
+    while (*pEntry != -1) {
+        if (!((*pEntry <= SFIO_DEVICE_LAST && *pEntry >= SFIO_DEVICE_FIRST) || *pEntry == 3)) return 9;
+        if (uCount == 2) return 0xC;
+        if (*pEntry == 3) {
+            signed char i = 0;
+            for (i = 0; i <= SFIO_DEVICE_LAST; i++) {
+                _SFIO_pDevice->uAvailableMask |= SFIO_DEVICE_MASK(i);
+            }
+        } else {
+            _SFIO_pDevice->uAvailableMask |= SFIO_DEVICE_MASK(*pEntry);
+        }
+        pEntry++;
+        uCount++;
+    }
+    _SFIO_pDevice->fn.pfn00 = pFuncs->pfn00;
+    _SFIO_pDevice->fn.pfnProbe = pFuncs->pfnProbe;
+    _SFIO_pDevice->fn.pfn08 = pFuncs->pfn08;
+    _SFIO_pDevice->fn.pfn0C = pFuncs->pfn0C;
+    _SFIO_pDevice->fn.pfnStartProbe = pFuncs->pfnStartProbe;
+    _SFIO_pDevice->fn.pfnSelectDevice = pFuncs->pfnSelectDevice;
+    _SFIO_pDevice->fn.pfnMount = pFuncs->pfnMount;
+    _SFIO_pDevice->fn.pfnOp19 = pFuncs->pfnOp19;
+    _SFIO_pDevice->fn.pfn20 = pFuncs->pfn20;
+    _SFIO_pDevice->fn.pfn24 = pFuncs->pfn24;
+    _SFIO_pDevice->fn.pfn28 = pFuncs->pfn28;
+    _SFIO_pDevice->fn.pfn2C = pFuncs->pfn2C;
+    _SFIO_pDevice->fn.pfn30 = pFuncs->pfn30;
+    _SFIO_pDevice->fn.pfn34 = pFuncs->pfn34;
+    _SFIO_pDevice->fn.pfnOp18 = pFuncs->pfnOp18;
+    _SFIO_pDevice->fn.pfn3C = pFuncs->pfn3C;
+    _SFIO_pDevice->fn.pfn40 = pFuncs->pfn40;
+    _SFIO_pDevice->pData48 = lbl_8019D210;
+    _SFIO_pDevice->pData4C = lbl_8019D248;
+    _SFIO_pData->eState = 0;
+    _SFIO_pData->eOperation = 0;
     return 0;
 }
