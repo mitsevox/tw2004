@@ -1347,7 +1347,7 @@ void  fn_800C6E14(void);
 extern u8 lbl_80281E13;
 
 void SwingState02_Exit(int nPlayer) {
-    if (gSession.nGameType != 8 && gPlayers[nPlayer].nLie != 12 && !Player_IsCPU(nPlayer)) {
+    if (gSession.nGameType != 8 && gPlayers[nPlayer].nLie != LIE_HOLED && !Player_IsCPU(nPlayer)) {
         fn_800E3D38(nPlayer, 1);
     }
 }
@@ -1534,7 +1534,9 @@ typedef struct View {
     f32  f50;                   // 0x050
     f32  f54;                   // 0x054
     f32  f58;                   // 0x058
-    u8   unk5C[0xC4 - 0x5C];
+    u8   unk5C[0x70 - 0x5C];
+    s32  nCurCamera;            // 0x070
+    u8   unk74[0xC4 - 0x74];
     f32  vC4[4];                // 0x0C4
     u8   unkD4[0x114 - 0xD4];
     f32  f114;                  // 0x114
@@ -1682,4 +1684,78 @@ void SwingState21_Exit(int nPlayer) {
     }
     fn_800E3D38(nPlayer, 1);
     fn_800DC9D4(0);
+}
+
+
+void  fn_80062B64(int nPlayer);
+void  fn_80062B60(int nPlayer);
+void  fn_80019234(int nHandle, f32* pPos, int a);
+void  fn_8005587C(u8* pBall, f32* pPos);          // put the ball at a point
+void  fn_800C7140(int a);
+void  fn_80045824(int nPlayer);
+extern Vec4 lbl_80183630;
+
+// State 15: plan the next shot from where the ball lies. The ball position is saved, the
+// player's ball is moved to the lie, Shot_Plan runs, and the ball position is put back.
+void SwingState15_Enter(int nPlayer) {
+    Vec4 vOffset = lbl_80183630;
+    f32  vSaved[4];
+    f32* pBallPos;
+    fn_80062B64(nPlayer);
+    fn_80062B60(nPlayer);
+    fn_80063BF4(fn_80017028(gPlayers[nPlayer].nView0), 0.75f, (f32*)&vOffset);
+    pBallPos = &gPlayers[nPlayer].fBallX;
+    Vec3Copy(pBallPos, vSaved);
+    Vec3Copy((f32*)gPlayers[nPlayer].ball, pBallPos);
+    Shot_Plan(nPlayer, 0);
+    Vec3Copy(vSaved, pBallPos);
+    gPlayers[nPlayer].unkC2B = 0;
+    gPlayers[nPlayer].unkC2C = 0;
+}
+
+// State 18: holed out. The ball goes to the pin, the lie becomes LIE_HOLED, animation 12.
+void SwingState18_Enter(int nPlayer) {
+    u8*  pBall       = gPlayers[nPlayer].ball;
+    u8*  pBallBefore = gPlayers[nPlayer].ballBefore;
+    int  nHole;
+    CourseInfo* pCourse;
+    fn_80005628(pBallBefore, pBall, 0xBC);
+    fn_8006AD68(nPlayer);
+    nHole   = Game_CurrentHole();
+    pCourse = fn_8000C594();
+    if (pCourse != NULL) {
+        f32* pPin = (f32*)&pCourse->pin[nHole];
+        fn_80019234(gPlayers[nPlayer].nShotHandle, pPin, 1);
+        fn_8005587C(pBall, pPin);
+        gPlayers[nPlayer].nLie = LIE_HOLED;
+        Vec3Copy(pBall, pBallBefore);
+    }
+    fn_80095744(gPlayers[nPlayer].nShotHandle, 12);
+}
+
+// State 21: each of the player's views saves its camera and takes camera 10.
+void SwingState21_Enter(int nPlayer) {
+    s32*  pViews;
+    View* pV;
+    int   k, j;
+    u8    bShared;
+    fn_80067074(nPlayer, 0x4A, 0, -1);
+    pViews = &gPlayers[nPlayer].nView0;
+    for (k = 0; k < 2; k++) {
+        pV      = (View*)fn_80017028(pViews[k]);
+        bShared = 0;
+        for (j = 0; j < k; j++) {
+            if (pV == (View*)fn_80017028(pViews[j])) bShared = 1;
+        }
+        if (!bShared) {
+            int nView;
+            pV->nSavedCamera = pV->nCurCamera;
+            nView = pViews[k];
+            View_SetCamera(fn_80017028(nView), 10, nPlayer, nView);
+        }
+    }
+    fn_800C7140(0);
+    fn_800E3D38(nPlayer, 0);
+    fn_80045824(nPlayer);
+    fn_800DC9D4(1);
 }

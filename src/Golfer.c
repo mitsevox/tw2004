@@ -1447,13 +1447,13 @@ u8 Player_OnTee(int nPlayer) {
     return gPlayers[nPlayer].nLie == 0;
 }
 
-u8 Player_LieIs12(int nPlayer) {
-    return gPlayers[nPlayer].nLie == 12;
+u8 Player_IsHoled(int nPlayer) {
+    return gPlayers[nPlayer].nLie == LIE_HOLED;
 }
 
-u8 Player_LieIs12NotState23(int nPlayer) {
+u8 Player_IsHoledNotState23(int nPlayer) {
     u8 bResult = 0;
-    if (gPlayers[nPlayer].nLie == 12 && (s8)SwingStack_Top(nPlayer) != 0x17) {
+    if (gPlayers[nPlayer].nLie == LIE_HOLED && (s8)SwingStack_Top(nPlayer) != 0x17) {
         bResult = 1;
     }
     return bResult;

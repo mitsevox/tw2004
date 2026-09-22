@@ -52,6 +52,7 @@ enum {
 #define SHOT_CHIP            2
 #define SHOT_PITCH           3
 #define LIE_GREEN            9
+#define LIE_HOLED            12   // the ball is in the hole
 #define NUM_AI_LINKS         10   // candidate aim points per zone
 #define NUM_AI_TARGETS       25   // aim points per hole (gAITargets)
 
