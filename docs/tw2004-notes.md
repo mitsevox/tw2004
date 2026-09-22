@@ -47,6 +47,14 @@ si 19, exi 13, dsp 11, ar 9, mtx 6, other 36.
 
 The SDK starts earlier than first thought: `VIWaitForRetrace` is at `0x8012F314`.
 
+**SDK source (Level 0).** `extern/sdk` is the Metroid Prime project's SDK / MSL source. 47 units are
+linked from it and match (`configure.py`, libs `card dvd gx os pad exi db MSL_C.PPCEABI.bare.H`).
+Compilers: GC/1.2.5n for Dolphin libraries, GC/1.3 for MSL, flags in `cflags_sdk` / `cflags_runtime`.
+Of the 154 Prime units, 57 match completely on code; 47 are in, 10 more are blocked only on data
+symbols that are referenced from other data (string tables etc.). 28 units match partially (the game's
+MSL revision differs from Prime's in places, e.g. `mem_funcs.c`, `printf.c`, the `__ieee754_*` math).
+Scripts: `C:\dev\scratch	w\{sdk_units,name_data,sdk_data_units}.py` (to be moved into tools/research).
+
 Leaked source file names
 ------------------------
 

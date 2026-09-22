@@ -146,6 +146,33 @@ Borrowing names from another project
   functions must point at the expected names. We got 180/180 and 1,906/1,906.
 - Static functions often share a name across files (`OnReset`, `AlarmHandler`). Skip or suffix them.
 
+Bringing in another project's SDK source
+----------------------------------------
+
+- **[verified]** A unit can only be linked from source once *all* of its data is mapped too: every
+  global, static and anonymous literal (`@N`) in each section. Code-only units are the easy first batch.
+- **[verified]** Name data by aligning references: for each matched function, the sequence of symbol
+  references in our disassembly lines up 1:1 with the sequence in the other project's split object.
+  Require the same count, require each label to always map to the same name (we had 0 conflicts in
+  635 functions). dtk quotes anonymous names (`"@104"@sda21`), so the regex must accept quotes.
+- **[verified] `@N` names collide.** dtk names its own anonymous strings `@N`, and so does the other
+  project's object. Never look up an `@N` name in symbols.txt; resolve it through the alignment map,
+  per unit. One collision dropped an 8-byte constant and shifted every constant after it.
+- **[verified] Pooled constants belong to one unit.** The linker merges identical read-only constants
+  across objects; the binary holds one copy. Assign it to the unit that owns it in link order and let
+  the other units' references resolve to it. Symptom: dtk reports "overlaps with previous split" or a
+  "Cyclic dependency ... resolving link order" (data order contradicts text order).
+- **[verified] Weak duplicates from inline functions.** An inline `sqrtf` in a header emits weak
+  `_half`/`_three` constants into every object that uses it. The linker keeps the first, so the DOL is
+  exact even though objdiff reports those objects' data sections as partially matched. The original
+  binary kept four separate copies (one per link group), so do not try to merge them all into one.
+- **[verified] Section-by-section DOL diff.** When the hash fails and every function reads 100%,
+  compare the rebuilt DOL with the original section by section and print the first differing
+  address; a constant-pool shift shows up as hundreds of `sda21` offset changes in the code.
+- Per-file compiler settings: the SDK needs the other project's exact flags (`-inline auto` here),
+  not the game's. Keep a separate `cflags_sdk`. Version conditionals in the borrowed source are
+  satisfied by a small `GameVersions.h` plus `-DVERSION=...` rather than editing the source.
+
 Comparing raw bytes yourself
 ----------------------------
 

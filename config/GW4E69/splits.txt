@@ -21,20 +21,54 @@ unsorted/code_800080D0.c:
 unsorted/code_800082F8.c:
 	.text       start:0x800082F8 end:0x800083A4
 
+dolphin/exi/EXIUart.c:
+	.text       start:0x80131D08 end:0x80131F78
+	.sbss       start:0x80282618 end:0x80282628
+
+dolphin/db.c:
+	.text       start:0x801394C0 end:0x801395AC
+	.data       start:0x801998E0 end:0x801998F8
+	.sbss       start:0x80282750 end:0x80282758
+
+dolphin/dvd/dvdqueue.c:
+	.text       start:0x8013DCB4 end:0x8013DEAC
+	.bss        start:0x8027A638 end:0x8027A658
+
+dolphin/dvd/dvderror.c:
+	.text       start:0x8013DEAC end:0x8013E044
+	.data       start:0x80199D38 end:0x80199D80
+
 dolphin/dvd/dvdidutils.c:
 	.text       start:0x8013E044 end:0x8013E13C
 
 dolphin/gx/GXGeometry.c:
 	.text       start:0x801415AC end:0x8014195C
 
+dolphin/gx/GXFrameBuf.c:
+	.text       start:0x8014195C end:0x80142440
+	.data       start:0x8019A080 end:0x8019A170
+	.sdata2     start:0x80284BD0 end:0x80284BD8
+
 dolphin/gx/GXDisplayList.c:
 	.text       start:0x80144A38 end:0x80144AA8
+
+dolphin/gx/GXPerf.c:
+	.text       start:0x80145140 end:0x80145998
+	.data       start:0x8019A430 end:0x8019A520
+
+dolphin/os/OSAudioSystem.c:
+	.text       start:0x80149170 end:0x80149404
+	.data       start:0x8019B2E8 end:0x8019B368
 
 dolphin/os/OSMutex.c:
 	.text       start:0x8014B4F0 end:0x8014B560
 
 dolphin/os/OSSync.c:
 	.text       start:0x8014C9FC end:0x8014CA80
+
+dolphin/pad/PadClamp.c:
+	.text       start:0x8014E944 end:0x8014EB88
+	.rodata     start:0x80184FC0 end:0x80184FD0
 
 runtime/__va_arg.c:
 	.text       start:0x801519A4 end:0x80151A6C
@@ -54,17 +88,94 @@ runtime/sscanf.c:
 runtime/wchar_io.c:
 	.text       start:0x8015C1F8 end:0x8015C280
 
+runtime/e_acos.c:
+	.text       start:0x8015C280 end:0x8015C590
+	.sdata2     start:0x80284CB8 end:0x80284D48
+
+runtime/e_asin.c:
+	.text       start:0x8015C590 end:0x8015C7F4
+	.sdata2     start:0x80284D48 end:0x80284DE0
+
+runtime/e_atan2.c:
+	.text       start:0x8015C7F4 end:0x8015CA84
+	.sdata2     start:0x80284DE0 end:0x80284E38
+
+runtime/e_fmod.c:
+	.text       start:0x8015CA84 end:0x8015CDC0
+	.rodata     start:0x80185578 end:0x80185588
+
+runtime/e_log.c:
+	.text       start:0x8015CDC0 end:0x8015D03C
+	.sbss       start:0x80282A08 end:0x80282A10
+	.sdata2     start:0x80284E38 end:0x80284EB8
+
+runtime/e_rem_pio2.c:
+	.text       start:0x8015D8F0 end:0x8015DC90
+	.rodata     start:0x801855B8 end:0x80185740
+	.sdata2     start:0x80284FC8 end:0x80285020
+
+runtime/k_cos.c:
+	.text       start:0x8015DC90 end:0x8015DD84
+	.sdata2     start:0x80285020 end:0x80285068
+
+runtime/k_rem_pio2.c:
+	.text       start:0x8015DD84 end:0x8015EBD8
+	.rodata     start:0x80185740 end:0x80185790
+	.sdata2     start:0x80285068 end:0x802850A8
+
+runtime/k_sin.c:
+	.text       start:0x8015EBD8 end:0x8015EC78
+	.sdata2     start:0x802850A8 end:0x802850E0
+
+runtime/k_tan.c:
+	.text       start:0x8015EC78 end:0x8015EE8C
+	.rodata     start:0x80185790 end:0x801857F8
+	.sdata2     start:0x802850E0 end:0x80285118
+
 runtime/s_copysign.c:
 	.text       start:0x8015F0A4 end:0x8015F0CC
 
+runtime/s_cos.c:
+	.text       start:0x8015F0CC end:0x8015F1A0
+	.sdata2     start:0x80285140 end:0x80285148
+
+runtime/s_floor.c:
+	.text       start:0x8015F1A0 end:0x8015F2E8
+	.sdata2     start:0x80285148 end:0x80285158
+
+runtime/s_frexp.c:
+	.text       start:0x8015F2E8 end:0x8015F374
+	.sdata2     start:0x80285158 end:0x80285160
+
+runtime/s_ldexp.c:
+	.text       start:0x8015F374 end:0x8015F538
+	.sdata2     start:0x80285160 end:0x80285188
+
 runtime/s_modf.c:
 	.text       start:0x8015F538 end:0x8015F634
+
+runtime/s_sin.c:
+	.text       start:0x8015F634 end:0x8015F70C
+	.sdata2     start:0x80285188 end:0x80285190
+
+runtime/s_tan.c:
+	.text       start:0x8015F70C end:0x8015F784
+	.sdata2     start:0x80285190 end:0x80285198
+
+dolphin/card/CARDUnlock.c:
+	.text       start:0x80177DA4 end:0x80179004
+	.data       start:0x8019D3A0 end:0x8019D500
+	.sdata      start:0x80281B70 end:0x80281B78
 
 dolphin/card/CARDRdwr.c:
 	.text       start:0x80179004 end:0x80179284
 
 dolphin/card/CARDCheck.c:
 	.text       start:0x80179904 end:0x8017A840
+
+dolphin/card/CARDMount.c:
+	.text       start:0x8017A840 end:0x8017B2B8
+	.data       start:0x8019D500 end:0x8019D540
 
 dolphin/card/CARDFormat.c:
 	.text       start:0x8017B2B8 end:0x8017BA9C

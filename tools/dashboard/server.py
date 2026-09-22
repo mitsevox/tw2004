@@ -21,8 +21,17 @@ _cache = {'history': None, 'history_head': None}
 _lock = threading.Lock()
 
 
+_git_lock = threading.Lock()
+
+
 def git(*args):
-    return subprocess.run(['git', *args], cwd=ROOT, capture_output=True, text=True).stdout
+    # Runs under pythonw (no console). CREATE_NO_WINDOW stops a console window per call, and
+    # stdin=DEVNULL stops git hanging on the missing stdin handle. Serialized: one git at a time.
+    with _git_lock:
+        r = subprocess.run(['git', '--no-pager', *args], cwd=ROOT, capture_output=True, text=True,
+                           stdin=subprocess.DEVNULL, timeout=60,
+                           creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0))
+    return r.stdout
 
 
 def read_report():
