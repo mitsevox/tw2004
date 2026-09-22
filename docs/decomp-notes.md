@@ -157,6 +157,12 @@ Reading compiler output
 - **[verified] Declaration order picks the saved registers.** Two loop counters in fn_8005A0FC came
   out swapped (r27/r28) until their declarations were swapped. Try this first on any diff that is
   only a register permutation.
+- **[verified] `beq next; b end` in a chain of tests is a one-case `switch`** with `default: return`.
+  `if (fn() != 8) { switch (fn()) { case 9: break; default: return; } }` matched fn_8005A850's
+  gate exactly; `if`, `||`, `&&` and `goto` spellings all fold to a single `bne end`.
+- **[verified] Register numbering, declared-first-highest in some functions.** In fn_8005A850 the
+  earliest-declared local took r30 and later ones descended; one `s8` (instead of `u8`) on a
+  colour byte fixed the last permutation. When the lowest-first order does not help, try the reverse.
 - **[verified] One variable, two jobs.** When the original reuses one FPR for two unrelated values
   (a distance, later a blend step), the source reused one local.
 - **[verified] Chained assignment stores backwards.** `a[0] = a[1] = a[2] = 0` stores 2, 1, 0;

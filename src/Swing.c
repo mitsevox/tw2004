@@ -1762,7 +1762,18 @@ void fn_8005A478(int nPlayer) {
     f32        vPos[3];
     f32        fT;
 
-    if (!Player_IsCPU(nPlayer) || (Game_GetMode() == 11 && (fn_8005CC5C() == 8 || fn_8005CC5C() == 9))) {
+    if (Player_IsCPU(nPlayer)) {
+        if (Game_GetMode() != 11) return;
+        if (fn_8005CC5C() != 8) {
+            switch (fn_8005CC5C()) {
+            case 9:
+                break;
+            default:
+                return;
+            }
+        }
+    }
+    {
         if ((pObj->nAnim == 6 || pObj->nAnim == 7) && gPlayers[nPlayer].nShotKind != 0 && pObj->n1698 == 0) {
             if (fn_8001EE90(pObj) == 2) return;
             if (pObj->nAnim == 6 || pObj->nAnim == 7) {
@@ -1862,16 +1873,31 @@ void fn_8005A850(int nPlayer) {
     TrailMeshDesc mesh;
     f32           vGrip[4];
     TrailDraw     draw;
-    SwingData*    pSw   = &gPlayers[nPlayer].swing;
-    ShotObj*      pObj  = (ShotObj*)gPlayers[nPlayer].nShotHandle;
-    int           nView = gPlayers[nPlayer].nView0;
-    int           nGrip = fn_8001EED8(pObj->pView, 0x52);
+    ShotObj*      pObj;
     u8            r;
-    u8            g;
+    s8            g;
     u8            b;
+    SwingData*    pSw;
+    int           nView;
+    int           nGrip;
     int           i;
 
-    if (!Player_IsCPU(nPlayer) || (Game_GetMode() == 11 && (fn_8005CC5C() == 8 || fn_8005CC5C() == 9))) {
+    pSw   = &gPlayers[nPlayer].swing;
+    pObj  = (ShotObj*)gPlayers[nPlayer].nShotHandle;
+    nView = gPlayers[nPlayer].nView0;
+    nGrip = fn_8001EED8(pObj->pView, 0x52);
+    if (Player_IsCPU(nPlayer)) {
+        if (Game_GetMode() != 11) return;
+        if (fn_8005CC5C() != 8) {
+            switch (fn_8005CC5C()) {
+            case 9:
+                break;
+            default:
+                return;
+            }
+        }
+    }
+    {
         if ((pObj->nAnim == 6 || pObj->nAnim == 7) && fn_8001EE90(pObj) != 2 && pSw->n370 >= 2 &&
             SESSION_OPTIONS->unk24[7] != 0) {
             Vec_Copy((*(f32 (**)[4][4])(pObj->pView + 8))[nGrip][3], vGrip);
