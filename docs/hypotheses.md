@@ -86,6 +86,26 @@ accessors makes every use site searchable.
 
 **Status:** open.
 
+5. Is there hidden putting assistance (a "pull" toward the cup)?
+-----------------------------------------------------------------
+
+**Question (2026-09-22):** does the ball roll exactly where the player aimed and struck it, or is
+there any assistance: a force or nudge toward the cup when the ball passes near it, a capture
+radius larger than the physical hole, or an aim correction applied before the roll?
+
+**What would settle it:** in the putt physics, any term that depends on the ball-to-cup vector
+besides the geometric hole test (rim collision / drop-in). A steering force, a distance-scaled
+velocity correction, or a capture check with a radius or speed threshold more generous than the
+real hole would all count as assistance. A clean sim has only gravity, slope from the green grid,
+rolling friction, and the hole collision. Also check whether any such term is gated on human vs
+CPU or on an attribute.
+
+**Where to look:** `PsBallFx.c` / `PsMgr.c` (`0x800A2C6C`, ball physics), `GoGreenGrid.c`
+(`0x8009B68C`, slope), the hole/cup collision code (unnamed; find it from the constant for the
+cup radius, 0.054 m or 2.125 in, or from what writes the "holed" state).
+
+**Status:** open.
+
 Facts already established that bear on these
 ---------------------------------------------
 
