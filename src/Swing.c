@@ -2710,3 +2710,89 @@ void SwingState01_Enter(int nPlayer) {
         View_SetCamera(fn_80017028(nView), 0xB, nPlayer, nView);
     }
 }
+
+
+u8    fn_8001DBF4(int nHandle);               // the ball is in the golfer's hand
+int   fn_8001EED8(void* pSkel, int nBone);    // a bone's index
+f32   fn_8004D620(CourseInfo* pCourse, f32* pPos);   // ground height, -60000 and below if none
+void  fn_8001D95C(int nHandle, f32* pPos);
+void  fn_80062DDC(f32* pA, f32* pB, f32* pOut);       // a - b
+double fn_80009744(f32* pVec);                // dot with itself
+void  fn_800BAF04(f32* pSrc, f32* pDst);      // normalise (3)
+void  fn_80051A18(u8* pBall, f32* pDir, f32 fSpeed, u8* pFrom);   // Ball.c: launch with a velocity
+extern Vec4 lbl_80183680;
+extern f32  gRealBallRadiusIn;               // 0x80283300  0.84: a real golf ball, in inches
+
+// State 18, holed out: animation 12, the golfer picks the ball out of the cup and tosses it.
+// While the ball is in the hand it follows the hand bone (kept at least a real ball's radius,
+// 0.84 in, above the ground). At the animation's event 4 the ball is thrown: a real launch of
+// the kept ball along the hand's motion, at 0.5 x 60 x 60 x 59.94 x (yards moved / 1760) - the
+// hand's speed in miles per hour, halved. Then, until event 3, the thrown ball is stepped 20
+// ticks a frame and the live ball follows it. Camera 16 over the whole thing.
+void SwingState18_Update(int nPlayer) {
+    Vec4  vOffset = lbl_80183680;
+    s32*  pView   = &gPlayers[nPlayer].nView0;
+    View* pV      = (View*)fn_80017028(*pView);
+    s32*  pHandle = &gPlayers[nPlayer].nShotHandle;
+    u8*   pBall;
+    f32   vDir[4];
+    f32   vPos[4];
+    f32   fGround, fSpeed;
+
+    if (fn_80095780(*pHandle) == 12 && pV->nCurCamera != 0x10) {
+        int nView = *pView;
+        View_SetCamera(fn_80017028(nView), 0x10, nPlayer, nView);
+        fn_80063B98(fn_80017028(*pView), 0.75f, (f32*)&vOffset);
+    }
+    if (fn_8001DBF4(*pHandle)) {
+        int   nBone = fn_8001EED8(*(u8**)(*pHandle + 0x38), 0x54);
+        f32*  pBallY;
+        pBall = gPlayers[nPlayer].ball;
+        Vec3Copy((f32*)(*(u8**)(*(u8**)(*pHandle + 0x38) + 8) + nBone * 0x40 + 0x30), (f32*)pBall);
+        Vec3Copy((f32*)pBall, vPos);
+        vPos[1] += 30.0f;
+        fGround = fn_8004D620(fn_8000C594(), vPos);
+        if (fGround >= -60000.0f) {
+            pBallY = (f32*)(gPlayers[nPlayer].ball + 4);
+            if (*pBallY - gRealBallRadiusIn / 36.0f < fGround) {
+                *pBallY = fGround + gRealBallRadiusIn / 36.0f;
+            }
+        }
+    } else if (gSession.fFrameTime > 0.0f) {
+        if (fn_80048574(*pHandle, 0, 4) && fn_80062BB0(*pHandle, 0, 4)) {
+            Player* p     = &gPlayers[nPlayer];
+            u8*     pB    = p->ball;
+            f32*    pPrev = (f32*)(p->ball + 0x10);
+            Vec3Copy((f32*)pB, pPrev);
+            fn_8001D95C(*pHandle, (f32*)pB);
+            if (fn_80062BB0(*pHandle, 0, 3)) {
+                f32 fT4 = fn_8005CB78(*pHandle, 0, 4);
+                if (fn_8005CB78(*pHandle, 0, 3) > fT4) {
+                    fn_80062DDC((f32*)pB, pPrev, vDir);
+                    fSpeed = (f32)fn_80009680(fn_80009744(vDir));
+                    if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
+                        fn_800BAF04(vDir, vDir);
+                    }
+                    fSpeed = 60.0f * (60.0f * (59.94f * (fSpeed / 1760.0f))) * 0.5f;
+                    fn_80062B98(*pHandle, 0, 4);
+                    gPlayers[nPlayer].ballBefore[0x98] = 0;
+                    fn_80051A18(p->ballBefore, vDir, fSpeed, pB);
+                }
+            }
+        }
+        if (fn_80048574(*pHandle, 0, 3) && fn_80062BB0(*pHandle, 0, 3)) {
+            f32 fT4 = fn_8005CB78(*pHandle, 0, 4);
+            if (fn_8005CB78(*pHandle, 0, 3) > fT4) {
+                s32 nState = *(s32*)(gPlayers[nPlayer].ballBefore + 0x64);
+                if (nState != 1 && nState != 5 && nState != 0) {
+                    Player* p = &gPlayers[nPlayer];
+                    Ball_SetSimulating(1);
+                    fn_8005567C(p->ballBefore, 20);
+                    Vec3Copy((f32*)p->ballBefore, (f32*)p->ball);
+                    Ball_SetSimulating(0);
+                }
+            }
+        }
+    }
+    fn_800DF280(nPlayer);
+}
