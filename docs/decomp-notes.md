@@ -133,6 +133,12 @@ GCC 2.95 (SN ProDG) at -O0
   and matches the assert string in the binary.
 - **[verified]** The assembler (`NgcAs.exe`) leaves local branch displacements as relocations, so a
   raw byte comparison must mask conditional branches (`bc`, opcode 16) as well as `b`/`bl`.
+- **[verified] Never round the match percentage.** A one-instruction difference in a 300-instruction
+  function reads 99.98%. Treating >= 99.9% as "done" hid wrong struct offsets and off-by-one line
+  numbers across 15 functions. The only acceptable number is exactly 100.
+- **[verified] `crclr cr1eq` before a call means the callee had no prototype** (GCC's marker for a
+  possibly-variadic call). Declare the function.
+- **[verified] `x > 0` compiling to `cmpwi; beq` means `x` is unsigned.**
 - **[verified] Empty sections shift the link.** `NgcAs.exe` writes empty `.data`/`.bss`/`.sdata`/
   `.sbss` sections into every object. `mwldeppc` rounds the output section up when it meets one,
   even with the ALLOC flag cleared: our `.sbss` came out 2 bytes longer and the DOL hash failed while

@@ -20,7 +20,6 @@ typedef struct {
 
 // The 17 platform functions the host passes to SFIOInit (llSharedFileIO.c on GameCube).
 typedef struct {
-    void* pfn00;
     int (*pfnProbe)(void* pParams, int eDevice);                        // 0x04 in SFIODevice
     void* pfn08;
     void* pfn0C;
@@ -37,13 +36,14 @@ typedef struct {
     int (*pfnOp18)(int uHandle);                                        // 0x38
     void* pfn3C;
     void* pfn40;
+    void* pfn44;
 } SFIOFuncTable;
 
 // Platform-layer state, 0x6C bytes, allocated by SFIOInit.
 typedef struct {
     u16           uAvailableMask;   // 0x00
     u8            pad2[2];
-    SFIOFuncTable fn;               // 0x04 .. 0x44
+    SFIOFuncTable fn;               // 0x04 .. 0x47 (17 entries)
     void*         pData48;          // 0x48  -> gSFIOData210
     void*         pData4C;          // 0x4C  -> gSFIOData248
     u8            uData50[0x18];    // 0x50
@@ -138,7 +138,7 @@ int SFIOLastDeviceFromMask(u16 uDeviceMask) {
 }
 
 // Find the next (uDirection 0) or previous (1) device in the mask after the current one.
-#line 336
+#line 335
 int SFIONextDeviceFromMask(u16 uDeviceMask, int uDirection) {
     int eResult = SFIO_DEVICE_INVALID;
     s16 sDevice = 0;
@@ -167,9 +167,9 @@ int SFIONextDeviceFromMask(u16 uDeviceMask, int uDirection) {
     return eResult;
 }
 
-#line 426
+#line 425
 int SFIONumDevicesInMask(u16 uDeviceMask) {
-    int uNumDevices = 0;
+    u32 uNumDevices = 0;
     int eDevice = 0;
     SFIO_ASSERT(SFIOIsInitialized());
     SFIO_ASSERT(uDeviceMask != 0);
@@ -637,10 +637,10 @@ int SFIOInit(int* pDevices, const SFIOFuncTable* pFuncs, void* pAllocator) {
     if (pDevices == NULL) return 0xC;
     if (*pDevices == -1) return 0xC;
     if (pFuncs == NULL) return 0xC;
-    if (!(pFuncs->pfn00 && pFuncs->pfnProbe && pFuncs->pfn08 && pFuncs->pfn0C && pFuncs->pfnStartProbe &&
+    if (!(pFuncs->pfnProbe && pFuncs->pfn08 && pFuncs->pfn0C && pFuncs->pfnStartProbe &&
           pFuncs->pfnSelectDevice && pFuncs->pfnMount && pFuncs->pfnOp19 && pFuncs->pfn20 && pFuncs->pfn24 &&
           pFuncs->pfn28 && pFuncs->pfnRead && pFuncs->pfnWrite && pFuncs->pfnSeek && pFuncs->pfnOp18 &&
-          pFuncs->pfn3C && pFuncs->pfn40)) return 0xC;
+          pFuncs->pfn3C && pFuncs->pfn40 && pFuncs->pfn44)) return 0xC;
     if (_SFIO_pDevice != NULL || _SFIO_pData != NULL) return 1;
 #line 2157
     _SFIO_pDevice = fn_801220D4(pAllocator, sizeof(SFIODevice), 4, __FILE__, __LINE__);
@@ -665,7 +665,6 @@ int SFIOInit(int* pDevices, const SFIOFuncTable* pFuncs, void* pAllocator) {
         pEntry++;
         uCount++;
     }
-    _SFIO_pDevice->fn.pfn00 = pFuncs->pfn00;
     _SFIO_pDevice->fn.pfnProbe = pFuncs->pfnProbe;
     _SFIO_pDevice->fn.pfn08 = pFuncs->pfn08;
     _SFIO_pDevice->fn.pfn0C = pFuncs->pfn0C;
@@ -682,6 +681,7 @@ int SFIOInit(int* pDevices, const SFIOFuncTable* pFuncs, void* pAllocator) {
     _SFIO_pDevice->fn.pfnOp18 = pFuncs->pfnOp18;
     _SFIO_pDevice->fn.pfn3C = pFuncs->pfn3C;
     _SFIO_pDevice->fn.pfn40 = pFuncs->pfn40;
+    _SFIO_pDevice->fn.pfn44 = pFuncs->pfn44;
     _SFIO_pDevice->pData48 = lbl_8019D210;
     _SFIO_pDevice->pData4C = lbl_8019D248;
     _SFIO_pData->eState = 0;
@@ -692,7 +692,6 @@ int SFIOInit(int* pDevices, const SFIOFuncTable* pFuncs, void* pAllocator) {
 int SFIOShutdown(void) {
     if (!SFIOIsInitialized()) return 2;
     if (!(_SFIO_pDevice != NULL && _SFIO_pData != NULL)) return 2;
-    _SFIO_pDevice->fn.pfn00 = NULL;
     _SFIO_pDevice->fn.pfnProbe = NULL;
     _SFIO_pDevice->fn.pfn08 = NULL;
     _SFIO_pDevice->fn.pfn0C = NULL;
@@ -709,6 +708,7 @@ int SFIOShutdown(void) {
     _SFIO_pDevice->fn.pfnOp18 = NULL;
     _SFIO_pDevice->fn.pfn3C = NULL;
     _SFIO_pDevice->fn.pfn40 = NULL;
+    _SFIO_pDevice->fn.pfn44 = NULL;
     _SFIO_pData->eState = 0;
     _SFIO_pData->eOperation = 0;
     fn_80122128(_SFIO_pDevice->pAllocator, _SFIO_pData, sizeof(SFIOData), 4);
@@ -857,8 +857,8 @@ int SFIOSeek(int* pSession, u32 uOffset, u32 uWhence) {
     SFIOSetLastError(0);
     memcpy(&_SFIO_pData->uHandle, pSession, 0x44);
     if (uWhence == 0) {
-        _SFIO_pData->uExpected54 = SFIOGetHeaderSize() + uOffset;
-        _SFIO_pDevice->fn.pfnSeek(_SFIO_pData->uHandle, SFIOGetHeaderSize() + uOffset, uWhence);
+        _SFIO_pData->uExpected54 = uOffset + SFIOGetHeaderSize();
+        _SFIO_pDevice->fn.pfnSeek(_SFIO_pData->uHandle, uOffset + SFIOGetHeaderSize(), uWhence);
     } else {
         _SFIO_pData->uExpected54 = uOffset;
         _SFIO_pDevice->fn.pfnSeek(_SFIO_pData->uHandle, uOffset, uWhence);
