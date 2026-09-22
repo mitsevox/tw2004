@@ -398,10 +398,9 @@ int AI_FirstUsableClub(int nPlayer, int nKind) {
         nClub++;
     } while (nClub < NUM_CLUBS);
     if (nClub == NUM_CLUBS) {
-        u32* pBag = &gPlayers[nPlayer].golfer.uBagMask;
         int  i;
         for (i = 0; i < NUM_CLUBS; i++) {
-            if ((1 << i) & *pBag) return i;
+            if ((1 << i) & gPlayers[nPlayer].golfer.uBagMask) return i;
         }
         nClub = CLUB_PUTTER;
     }
@@ -1589,43 +1588,36 @@ void fn_8002EBA4(u8* pObj, u8 nValue) {
 f32 fn_8000AE94(f32 x);                 // fabsf
 
 void Luck_TakePerfectShot(int nPlayer) {
-    u8*  pPerfect = &gPlayers[nPlayer].bPerfect;
-    s32* pClub;
-    s32* pKind;
-    f32* pAim;
     f32  fDiff;
 
-    if (*pPerfect == 0 || Player_IsCPU(nPlayer) || gSession.nSplitScreen != 0) return;
+    if (gPlayers[nPlayer].bPerfect == 0 || Player_IsCPU(nPlayer) || gSession.nSplitScreen != 0) return;
     {
-        pClub = &gPlayers[nPlayer].nClub;
-        if (gPlayers[CADDIE_SLOT].nClub + 2 < *pClub) {
-            *pPerfect = 0;
+        if (gPlayers[CADDIE_SLOT].nClub + 2 < gPlayers[nPlayer].nClub) {
+            gPlayers[nPlayer].bPerfect = 0;
             return;
         }
-        if (gPlayers[CADDIE_SLOT].nClub > *pClub + 2) {
-            *pPerfect = 0;
+        if (gPlayers[CADDIE_SLOT].nClub > gPlayers[nPlayer].nClub + 2) {
+            gPlayers[nPlayer].bPerfect = 0;
             return;
         }
-        pKind = &gPlayers[nPlayer].nShotKind;
-        if (gPlayers[CADDIE_SLOT].nShotKind != *pKind) {
-            *pPerfect = 0;
+        if (gPlayers[CADDIE_SLOT].nShotKind != gPlayers[nPlayer].nShotKind) {
+            gPlayers[nPlayer].bPerfect = 0;
             return;
         }
-        pAim  = &gPlayers[nPlayer].fAim;
-        fDiff = *pAim - gPlayers[CADDIE_SLOT].fAim;
+        fDiff = gPlayers[nPlayer].fAim - gPlayers[CADDIE_SLOT].fAim;
         while (fDiff < -PI) fDiff += 2 * PI;
         while (fDiff > PI) fDiff -= 2 * PI;
         if (fn_8000AE94(fDiff) > 0.0872665) {
-            *pPerfect = 0;
+            gPlayers[nPlayer].bPerfect = 0;
             return;
         }
         if (gCaddieDone) {
             Luck_ResetOdds(nPlayer);
-            *pClub = gPlayers[CADDIE_SLOT].nClub;
+            gPlayers[nPlayer].nClub = gPlayers[CADDIE_SLOT].nClub;
             gPlayers[nPlayer].nTrajectory = gPlayers[CADDIE_SLOT].nTrajectory;
-            *pKind = gPlayers[CADDIE_SLOT].nShotKind;
+            gPlayers[nPlayer].nShotKind = gPlayers[CADDIE_SLOT].nShotKind;
             gPlayers[nPlayer].fPower = gPlayers[CADDIE_SLOT].fPower;
-            *pAim = gPlayers[CADDIE_SLOT].fAim;
+            gPlayers[nPlayer].fAim = gPlayers[CADDIE_SLOT].fAim;
         }
         Caddie_Stop();
     }

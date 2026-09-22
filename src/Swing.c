@@ -134,8 +134,7 @@ void Swing_ApplyForgiveness(int nPlayer) {
     if (Player_IsCPU(nPlayer)) return;
     if (gPlayers[nPlayer].bPerfect) return;
     {
-    f32* pError = &gPlayers[nPlayer].swing.fSwingError;
-    f32  fError = *pError;
+    f32  fError = gPlayers[nPlayer].swing.fSwingError;
     int  nRowScale, nRowThresh;
     int  nAttr;
     f32  fThresh, fScale;
@@ -152,7 +151,7 @@ void Swing_ApplyForgiveness(int nPlayer) {
             nRowThresh = ROW_PUTTING;
             nAttr      = (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_PUTTING, ATTR_TOTAL);
             if (gPlayers[nPlayer].fDistance < 2.0f) {
-                *pError = 0.0f;
+                gPlayers[nPlayer].swing.fSwingError = 0.0f;
                 return;
             }
             break;
@@ -202,7 +201,7 @@ void Swing_ApplyForgiveness(int nPlayer) {
     if (fn_8000AE94(fError) < fThresh) {
         fError *= fScale;
     }
-    *pError = fError;
+    gPlayers[nPlayer].swing.fSwingError = fError;
     }
 }
 
@@ -624,7 +623,6 @@ void  AI_ApplyError(int nPlayer);            // Golfer.c
 // modes 6 and 7, 3..4 s in mode 11. Out of time, the rehearsal is told to stop (best aim found,
 // or +25 and a fresh target), then the skill error goes on and it is state 10.
 void SwingState02_Update(int nPlayer) {
-    f32*    pTime;
     void*   pView;
     u8      bDone;
     f32     fMax;
@@ -637,7 +635,6 @@ void SwingState02_Update(int nPlayer) {
     }
     if (Player_IsCPU(nPlayer)) {
         gPlayers[nPlayer].fThinkTime += gSession.fFrameTime;
-        pTime = &gPlayers[nPlayer].fThinkTime;
         bDone = AI_RehearseShot(nPlayer, NULL, 0, CPU_TOLERANCE);
         fMin  = 1.0f;
         switch (Game_GetMode()) {
@@ -658,7 +655,7 @@ void SwingState02_Update(int nPlayer) {
             fMax = 4.0f;
             break;
         }
-        if ((bDone && *pTime > fMin && fn_800C7100(pView)) || *pTime > fMax) {
+        if ((bDone && gPlayers[nPlayer].fThinkTime > fMin && fn_800C7100(pView)) || gPlayers[nPlayer].fThinkTime > fMax) {
             if (!bDone) {
                 gPlayers[nPlayer].nRehearseState = 3;
                 AI_RehearseShot(nPlayer, NULL, 0, CPU_TOLERANCE);
@@ -1119,21 +1116,17 @@ void Swing_RumbleTick(int nPlayer) {
 // for full spin - and the direction is the stick, whenever it is outside the 96..160 dead zone
 // (the first press starts it at straight back, 255).
 void Swing_SpinInput(int nPlayer) {
-    s32*    pController;
-    s32*    pAmount;
     u32     uButtons;
     int     nX, nY;
     if (Player_IsCPU(nPlayer)) return;
     if (SESSION_OPTIONS->bSpinEnabled == 0) return;
-    pController = &gPlayers[nPlayer].nController;
-    uButtons    = fn_800136DC(*pController);
+    uButtons    = fn_800136DC(gPlayers[nPlayer].nController);
     if (!(uButtons & fn_800142AC(0x20, 0))) return;
     if (gPlayers[nPlayer].swing.bShotTaken == 0) return;
     fn_80067074(nPlayer, 0x2E, 0, 0);
-    nX = Swing_StickX(nPlayer, Pad_State(nPlayer, *pController));
-    nY = Swing_StickY(nPlayer, Pad_State(nPlayer, *pController));
-    pAmount = &gPlayers[nPlayer].swing.nSpinAmount;
-    if (*pAmount == 0) {
+    nX = Swing_StickX(nPlayer, Pad_State(nPlayer, gPlayers[nPlayer].nController));
+    nY = Swing_StickY(nPlayer, Pad_State(nPlayer, gPlayers[nPlayer].nController));
+    if (gPlayers[nPlayer].swing.nSpinAmount == 0) {
         gPlayers[nPlayer].swing.nSpinStickX = 128;
         gPlayers[nPlayer].swing.nSpinStickY = 255;
     }
@@ -1141,8 +1134,8 @@ void Swing_SpinInput(int nPlayer) {
         gPlayers[nPlayer].swing.nSpinStickX = nX;
         gPlayers[nPlayer].swing.nSpinStickY = nY;
     }
-    if (*pAmount < 20) {
-        (*pAmount)++;
+    if (gPlayers[nPlayer].swing.nSpinAmount < 20) {
+        (gPlayers[nPlayer].swing.nSpinAmount)++;
     }
 }
 
@@ -1186,7 +1179,6 @@ void Swing_LoadTuning(void) {
 void Swing_UpdatePower(int nPlayer) {
     f32  fPower = ((ShotObj*)gPlayers[nPlayer].nShotHandle)->f1628;
     f32  fPenalty;
-    f32* pPower;
     if (!Player_IsCPU(nPlayer)) {
         fPower = (f32)fn_80009680(fPower);
     }
@@ -1199,8 +1191,7 @@ void Swing_UpdatePower(int nPlayer) {
     }
     if (fPenalty < -0.3f) fPenalty = -0.3f;
     gPlayers[nPlayer].fPower = fPower + fPenalty;
-    pPower = &gPlayers[nPlayer].fPower;
-    if (*pPower < 0.0f) *pPower = 0.0f;
+    if (gPlayers[nPlayer].fPower < 0.0f) gPlayers[nPlayer].fPower = 0.0f;
 }
 
 
@@ -1213,31 +1204,25 @@ void fn_800AE3C4(int nPlayer);
 // Once the stick has backed down for 1/12 s (fBackDown, set by the backswing) the level and the
 // spin offsets are cleared.
 void Swing_BoostInput(int nPlayer) {
-    s32* pController;
-    s32* pLevel;
-    f32* pTimer;
     u32  uButtons;
     int  nX, nY;
     f32  fMag;
 
     if (Player_IsCPU(nPlayer)) return;
     if (SESSION_OPTIONS->bBoostEnabled == 0) return;
-    pController = &gPlayers[nPlayer].nController;
-    uButtons    = fn_800136DC(*pController);
-    nY   = Swing_StickY(nPlayer, Pad_State(nPlayer, *pController));
-    nX   = Swing_StickX(nPlayer, Pad_State(nPlayer, *pController));
+    uButtons    = fn_800136DC(gPlayers[nPlayer].nController);
+    nY   = Swing_StickY(nPlayer, Pad_State(nPlayer, gPlayers[nPlayer].nController));
+    nX   = Swing_StickX(nPlayer, Pad_State(nPlayer, gPlayers[nPlayer].nController));
     fMag = (f32)fn_80009680((nX - 128) * (nX - 128) + (nY - 128) * (nY - 128));
     if ((uButtons & fn_800142AC(0x1F, 0)) && fMag > 93.0f) {
-        pLevel = &gPlayers[nPlayer].swing.nBoostLevel;
-        if (*pLevel < 8) {
-            (*pLevel)++;
+        if (gPlayers[nPlayer].swing.nBoostLevel < 8) {
+            (gPlayers[nPlayer].swing.nBoostLevel)++;
             fn_80067074(nPlayer, 0x2D, 0, 0);
         }
     }
-    pTimer = &gPlayers[nPlayer].swing.fBackDown;
-    if (*pTimer > 0.0f) {
-        *pTimer -= gSession.fFrameTime;
-        if (*pTimer <= 0.0f) {
+    if (gPlayers[nPlayer].swing.fBackDown > 0.0f) {
+        gPlayers[nPlayer].swing.fBackDown -= gSession.fFrameTime;
+        if (gPlayers[nPlayer].swing.fBackDown <= 0.0f) {
             gPlayers[nPlayer].swing.nBoostLevel = 0;
             gPlayers[nPlayer].swing.f628 = 0.0f;
             gPlayers[nPlayer].swing.f62C = 0.0f;
@@ -1357,9 +1342,8 @@ void SwingState02_Exit(int nPlayer) {
 }
 
 void SwingState19_Enter(int nPlayer) {
-    s32* pView = &gPlayers[nPlayer].nView0;
-    if (fn_8001707C(*pView) == nPlayer) {
-        int nView = *pView;
+    if (fn_8001707C(gPlayers[nPlayer].nView0) == nPlayer) {
+        int nView = gPlayers[nPlayer].nView0;
         View_SetCamera(fn_80017028(nView), 0x19, nPlayer, nView);
     }
     fn_8006AD68(nPlayer);
@@ -1408,12 +1392,10 @@ extern u8   lbl_80281E11;
 
 // Neither button 2 nor button 3 held: keep polling.
 void SwingState05_Update(int nPlayer) {
-    s32* pController;
     u32  uMask = fn_800142AC(2, 1);
-    pController = &gPlayers[nPlayer].nController;
-    if (!(fn_800136DC(*pController) & uMask)) {
+    if (!(fn_800136DC(gPlayers[nPlayer].nController) & uMask)) {
         uMask = fn_800142AC(3, 1);
-        if (!(fn_800136DC(*pController) & uMask)) {
+        if (!(fn_800136DC(gPlayers[nPlayer].nController) & uMask)) {
             fn_8005CFD4(nPlayer);
         }
     }
@@ -1421,9 +1403,8 @@ void SwingState05_Update(int nPlayer) {
 
 void SwingState17_Update(int nPlayer) {
     Vec4 vOffset = lbl_80183670;
-    s32* pView   = &gPlayers[nPlayer].nView0;
-    if (fn_80063C50(fn_80017028(*pView))) {
-        fn_80063CBC(fn_80017028(*pView), (f32*)&vOffset);
+    if (fn_80063C50(fn_80017028(gPlayers[nPlayer].nView0))) {
+        fn_80063CBC(fn_80017028(gPlayers[nPlayer].nView0), (f32*)&vOffset);
         SwingStack_Push(0x12, nPlayer);
     }
 }
@@ -1440,14 +1421,13 @@ void SwingState08_Exit(int nPlayer) {
 }
 
 void SwingState12_Exit(int nPlayer) {
-    s32*  pView  = &gPlayers[nPlayer].nView0;
-    void* pViewObj = fn_80017028(*pView);
+    void* pViewObj = fn_80017028(gPlayers[nPlayer].nView0);
     fn_80045558(0, nPlayer);
     fn_80045494(0, nPlayer);
     fn_8006C608();
     fn_80062CE0(0);
     Swing_RumbleOff(nPlayer);
-    fn_800C1790(fn_80017028(*pView), nPlayer);
+    fn_800C1790(fn_80017028(gPlayers[nPlayer].nView0), nPlayer);
     fn_80062DB8(pViewObj, 0);
 }
 
@@ -1564,23 +1544,21 @@ extern Vec4 lbl_80183690;
 extern Vec4 lbl_80183610;
 
 void SwingState18_Exit(int nPlayer) {
-    s32*  pView = &gPlayers[nPlayer].nView0;
     View* pV;
     Vec4  vOffset;
-    pV      = (View*)fn_80017028(*pView);
+    pV      = (View*)fn_80017028(gPlayers[nPlayer].nView0);
     vOffset = lbl_80183690;
     fn_80005628(gPlayers[nPlayer].ballBefore, gPlayers[nPlayer].ball, 0xBC);
     if (pV->nCamera == 3) {
-        fn_80063B98(fn_80017028(*pView), 0.75f, (f32*)&vOffset);
+        fn_80063B98(fn_80017028(gPlayers[nPlayer].nView0), 0.75f, (f32*)&vOffset);
     }
 }
 
 void SwingState04_Enter(int nPlayer) {
     int nView;
     if (*(s32*)(lbl_80281F78 + 0x1C0) != 0) {
-        s32* pView = &gPlayers[nPlayer].nView0;
-        if (fn_800C4650((View*)fn_80017028(*pView), nPlayer)) {
-            nView = *pView;
+        if (fn_800C4650((View*)fn_80017028(gPlayers[nPlayer].nView0), nPlayer)) {
+            nView = gPlayers[nPlayer].nView0;
             View_SetCamera(fn_80017028(nView), 0x13, nPlayer, nView);
             return;
         }
@@ -1605,12 +1583,11 @@ void SwingState03_Exit(int nPlayer) {
 
 // Leaving state 20: every set-up player's view takes this view's camera.
 void SwingState20_Exit(int nPlayer) {
-    s32*  pView = &gPlayers[nPlayer].nView0;
     View* pSrc;
     View* pDst;
     int   i;
-    fn_80017158(*pView);
-    pSrc = (View*)fn_80017028(*pView);
+    fn_80017158(gPlayers[nPlayer].nView0);
+    pSrc = (View*)fn_80017028(gPlayers[nPlayer].nView0);
     for (i = 0; i < gNumPlayersSetUp; i++) {
         pDst = (View*)fn_80017028(gPlayers[i].nView0);
         fn_800170C4(gPlayers[i].nView0, 1);
@@ -1624,10 +1601,9 @@ void SwingState20_Exit(int nPlayer) {
 
 void SwingState23_Enter(int nPlayer) {
     Vec4  vOffset = lbl_80183610;
-    s32*  pView   = &gPlayers[nPlayer].nView0;
-    View* pV      = (View*)fn_80017028(*pView);
+    View* pV      = (View*)fn_80017028(gPlayers[nPlayer].nView0);
     fn_800C7178(pV, nPlayer);
-    View_SetCamera(pV, 0x19, nPlayer, *pView);
+    View_SetCamera(pV, 0x19, nPlayer, gPlayers[nPlayer].nView0);
     if (pV->nCamera == 1 || pV->nCamera == 3 || pV->nCamera == 4) {
         fn_80063B98(pV, 0.25f, (f32*)&vOffset);
     }
@@ -1653,17 +1629,16 @@ void SwingState06_Exit(int nPlayer) {
 }
 
 void SwingState09_Exit(int nPlayer) {
-    s32* pView = &gPlayers[nPlayer].nView0;
     int  nView;
-    ((View*)fn_80017028(*pView))->f50 = 1.0f;
-    ((View*)fn_80017028(*pView))->f54 = 1.0f;
-    ((View*)fn_80017028(*pView))->f58 = 1.0f;
-    fn_80039344((View*)fn_80017028(*pView), 0.0f);
+    ((View*)fn_80017028(gPlayers[nPlayer].nView0))->f50 = 1.0f;
+    ((View*)fn_80017028(gPlayers[nPlayer].nView0))->f54 = 1.0f;
+    ((View*)fn_80017028(gPlayers[nPlayer].nView0))->f58 = 1.0f;
+    fn_80039344((View*)fn_80017028(gPlayers[nPlayer].nView0), 0.0f);
     if (fn_8005D2A8(nPlayer) == 10) {
-        nView = *pView;
+        nView = gPlayers[nPlayer].nView0;
         View_SetCamera(fn_80017028(nView), 0xC, nPlayer, nView);
     } else {
-        nView = *pView;
+        nView = gPlayers[nPlayer].nView0;
         View_SetCamera(fn_80017028(nView), 0, nPlayer, nView);
     }
     fn_800E3D38(nPlayer, 1);
@@ -1774,14 +1749,12 @@ u8*   fn_80016CFC(int nView);
 void  Caddie_ApplyTip(int nPlayer);           // Golfer.c
 
 void SwingState16_Enter(int nPlayer) {
-    s32* pHandle;
     fn_800DED60(nPlayer);
-    pHandle = &gPlayers[nPlayer].nShotHandle;
-    fn_80095744(*pHandle, 11);
-    fn_80062BFC(*pHandle);
-    fn_80062BE8(*pHandle);
-    fn_8001C774(*pHandle, gPlayers[nPlayer].nClub);
-    fn_8001C724(*pHandle, gPlayers[nPlayer].nShotKind);
+    fn_80095744(gPlayers[nPlayer].nShotHandle, 11);
+    fn_80062BFC(gPlayers[nPlayer].nShotHandle);
+    fn_80062BE8(gPlayers[nPlayer].nShotHandle);
+    fn_8001C774(gPlayers[nPlayer].nShotHandle, gPlayers[nPlayer].nClub);
+    fn_8001C724(gPlayers[nPlayer].nShotHandle, gPlayers[nPlayer].nShotKind);
     fn_8001C804(nPlayer, 1, 1);
     gPlayers[nPlayer].uFlags |= 8;
     gPlayers[nPlayer].fA64 = fn_800D0478(nPlayer);
@@ -1798,7 +1771,6 @@ void SwingState06_Enter(int nPlayer) {
     u8    ballSaved[0xBC];
     u8*   pShot;
     u8*   pBall;
-    s32*  pController;
     int   nController;
     int   nView;
 
@@ -1809,11 +1781,10 @@ void SwingState06_Enter(int nPlayer) {
     Caddie_ApplyTip(nPlayer);
     pBall = gPlayers[nPlayer].ball;
     fn_80005628(ballSaved, pBall, 0xBC);
-    pController  = &gPlayers[nPlayer].nController;
-    nController  = *pController;
-    *pController = CONTROLLER_CPU;
+    nController  = gPlayers[nPlayer].nController;
+    gPlayers[nPlayer].nController = CONTROLLER_CPU;
     Swing_Launch(nPlayer);
-    *pController = nController;
+    gPlayers[nPlayer].nController = nController;
     fn_80005628(gPlayers[nPlayer].ballBefore, pBall, 0xBC);
     *(s32*)(gPlayers[nPlayer].ballBefore + 0x94) = -1;
     fn_80005628(pBall, ballSaved, 0xBC);
@@ -1901,8 +1872,7 @@ extern Vec4 lbl_80183640;
 // State 12: the ball is away. In a replay with the kept ball unset, a special path; otherwise
 // the ball as it lies is kept. Camera 14 unless the swing animation is 11 or the view says no.
 void SwingState12_Enter(int nPlayer) {
-    s32* pView = &gPlayers[nPlayer].nView0;
-    void* pV   = fn_80017028(*pView);
+    void* pV   = fn_80017028(gPlayers[nPlayer].nView0);
     u8*  pBallBefore = gPlayers[nPlayer].ballBefore;
     if (gSession.bReplay != 0 && *(s32*)(pBallBefore + 0x64) == 0) {
         fn_8006B2C4(nPlayer, 1);
@@ -1911,7 +1881,7 @@ void SwingState12_Enter(int nPlayer) {
     }
     *(s32*)(pBallBefore + 0x94) = -1;
     if (fn_80095780(gPlayers[nPlayer].nShotHandle) != 11 && fn_80101738() && !fn_800C6CB0()) {
-        int nView = *pView;
+        int nView = gPlayers[nPlayer].nView0;
         View_SetCamera(fn_80017028(nView), 0xE, nPlayer, nView);
     }
     fn_8006ACF8(nPlayer, 0);
@@ -1929,34 +1899,29 @@ void SwingState12_Enter(int nPlayer) {
 // working" call and the camera move.
 void SwingState15_Update(int nPlayer) {
     Vec4  vOffset = lbl_80183640;
-    u8*   pDone;
-    s32*  pView;
     f32   vSaved[4];
 
     fn_80050D2C(1);
-    pDone = &gPlayers[nPlayer].bRehearsalDone;
-    if (*pDone == 0) {
-        s32* pController = &gPlayers[nPlayer].nController;
+    if (gPlayers[nPlayer].bRehearsalDone == 0) {
         f32* pBallPos    = &gPlayers[nPlayer].fBallX;
-        int  nController = *pController;
-        *pController = CONTROLLER_CPU;
+        int  nController = gPlayers[nPlayer].nController;
+        gPlayers[nPlayer].nController = CONTROLLER_CPU;
         Vec3Copy(pBallPos, vSaved);
         Vec3Copy((f32*)gPlayers[nPlayer].ball, pBallPos);
-        *pDone = AI_RehearseShot(nPlayer, NULL, 1, CPU_TOLERANCE);
+        gPlayers[nPlayer].bRehearsalDone = AI_RehearseShot(nPlayer, NULL, 1, CPU_TOLERANCE);
         Vec3Copy(vSaved, pBallPos);
-        *pController = nController;
+        gPlayers[nPlayer].nController = nController;
     }
-    pView = &gPlayers[nPlayer].nView0;
-    if (fn_80063C50(fn_80017028(*pView))) {
-        if (*pDone != 0) {
-            fn_80063CBC(fn_80017028(*pView), (f32*)&vOffset);
+    if (fn_80063C50(fn_80017028(gPlayers[nPlayer].nView0))) {
+        if (gPlayers[nPlayer].bRehearsalDone != 0) {
+            fn_80063CBC(fn_80017028(gPlayers[nPlayer].nView0), (f32*)&vOffset);
             SwingStack_Push(0x10, nPlayer);
             gPlayers[nPlayer].bPlanReady = 1;
         } else {
             if (gPlayers[nPlayer].bPlanReady == 0) {
                 fn_800DCE5C(nPlayer);
             }
-            fn_80063CBC(fn_80017028(*pView), (f32*)&vOffset);
+            fn_80063CBC(fn_80017028(gPlayers[nPlayer].nView0), (f32*)&vOffset);
         }
     }
     fn_80050D2C(0);
@@ -1975,35 +1940,31 @@ extern Vec4 lbl_80183650;
 // error, no luck swap), then it is state 12 with the ball away.
 void SwingState16_Update(int nPlayer) {
     Vec4  vOffset = lbl_80183650;
-    s32*  pView   = &gPlayers[nPlayer].nView0;
-    View* pV      = (View*)fn_80017028(*pView);
+    View* pV      = (View*)fn_80017028(gPlayers[nPlayer].nView0);
     int   nHandle = gPlayers[nPlayer].nShotHandle;
-    s32*  pController;
     int   nController;
 
     if (fn_80095780(nHandle) != 11) return;
     if (pV->nCurCamera != 0xC) {
-        View_SetCamera(pV, 0xC, nPlayer, *pView);
+        View_SetCamera(pV, 0xC, nPlayer, gPlayers[nPlayer].nView0);
         fn_80063B98(pV, 0.75f, (f32*)&vOffset);
     }
     if (pV->nCamera == 1 || pV->nCamera == 4 || pV->nCamera == 3) return;
     if (fn_80048574(nHandle, 2)) {
         if (!fn_80062BB0(nHandle, 2)) return;
         fn_80062B98(nHandle, 2);
-        pController  = &gPlayers[nPlayer].nController;
-        nController  = *pController;
-        *pController = CONTROLLER_CPU;
+        nController  = gPlayers[nPlayer].nController;
+        gPlayers[nPlayer].nController = CONTROLLER_CPU;
         Swing_Launch(nPlayer);
-        *pController = nController;
+        gPlayers[nPlayer].nController = nController;
         fn_800A5980((u8)nPlayer);
         fn_8006C28C(nPlayer, nController);
         SwingStack_Push(0xC, nPlayer);
     } else {
-        pController  = &gPlayers[nPlayer].nController;
-        nController  = *pController;
-        *pController = CONTROLLER_CPU;
+        nController  = gPlayers[nPlayer].nController;
+        gPlayers[nPlayer].nController = CONTROLLER_CPU;
         Swing_Launch(nPlayer);
-        *pController = nController;
+        gPlayers[nPlayer].nController = nController;
         fn_800A5980((u8)nPlayer);
         fn_8006C28C(nPlayer, nController);
         SwingStack_Push(0xC, nPlayer);
@@ -2019,31 +1980,30 @@ void  fn_80068AC8(int nPlayer);
 // 13/14 play the four pan sounds; button 4 switches between two camera modes.
 void SwingState08_Update(int nPlayer) {
     u32  uMask = fn_800142AC(0x13, 1);
-    s32* pController = &gPlayers[nPlayer].nController;
-    if (!(fn_800136DC(*pController) & uMask)) {
+    if (!(fn_800136DC(gPlayers[nPlayer].nController) & uMask)) {
         fn_8005CFD4(nPlayer);
     } else {
         uMask = fn_800142AC(0xB, 1);
-        if (fn_800136DC(*pController) & uMask) {
+        if (fn_800136DC(gPlayers[nPlayer].nController) & uMask) {
             fn_80067074(nPlayer, 0x12, 0, -1);
         } else {
             uMask = fn_800142AC(0xC, 1);
-            if (fn_800136DC(*pController) & uMask) {
+            if (fn_800136DC(gPlayers[nPlayer].nController) & uMask) {
                 fn_80067074(nPlayer, 0x13, 0, -1);
             }
         }
         uMask = fn_800142AC(0xD, 1);
-        if (fn_800136DC(*pController) & uMask) {
+        if (fn_800136DC(gPlayers[nPlayer].nController) & uMask) {
             fn_80067074(nPlayer, 0x14, 0, -1);
         } else {
             uMask = fn_800142AC(0xE, 1);
-            if (fn_800136DC(*pController) & uMask) {
+            if (fn_800136DC(gPlayers[nPlayer].nController) & uMask) {
                 fn_80067074(nPlayer, 0x15, 0, -1);
             }
         }
     }
     uMask = fn_800142AC(4, 1);
-    if (fn_800136DC(*pController) & uMask) {
+    if (fn_800136DC(gPlayers[nPlayer].nController) & uMask) {
         fn_800C6010(fn_80017028(gPlayers[nPlayer].nView0), nPlayer);
     } else {
         fn_800C60E8(fn_80017028(gPlayers[nPlayer].nView0), nPlayer);
@@ -2067,37 +2027,35 @@ f32   fn_800D04AC(int nPlayer);
 // 9/10 and 11..14 play the pan sounds.
 void SwingState04_Update(int nPlayer) {
     u32  uMask;
-    s32* pController;
     Caddie_Update(nPlayer);
     uMask       = fn_800142AC(7, 1);
-    pController = &gPlayers[nPlayer].nController;
-    if (!(fn_800136DC(*pController) & uMask)) {
+    if (!(fn_800136DC(gPlayers[nPlayer].nController) & uMask)) {
         fn_8005CFD4(nPlayer);
     } else {
         uMask = fn_800142AC(9, 0);
-        if (fn_800136DC(*pController) & uMask) {
+        if (fn_800136DC(gPlayers[nPlayer].nController) & uMask) {
             fn_80067074(nPlayer, 0xD, 0, -1);
         } else {
             uMask = fn_800142AC(0xA, 0);
-            if (fn_800136DC(*pController) & uMask) {
+            if (fn_800136DC(gPlayers[nPlayer].nController) & uMask) {
                 fn_80067074(nPlayer, 0xE, 0, -1);
             }
         }
         uMask = fn_800142AC(0xB, 1);
-        if (fn_800136DC(*pController) & uMask) {
+        if (fn_800136DC(gPlayers[nPlayer].nController) & uMask) {
             fn_80067074(nPlayer, 0x12, 0, -1);
         } else {
             uMask = fn_800142AC(0xC, 1);
-            if (fn_800136DC(*pController) & uMask) {
+            if (fn_800136DC(gPlayers[nPlayer].nController) & uMask) {
                 fn_80067074(nPlayer, 0x13, 0, -1);
             }
         }
         uMask = fn_800142AC(0xD, 1);
-        if (fn_800136DC(*pController) & uMask) {
+        if (fn_800136DC(gPlayers[nPlayer].nController) & uMask) {
             fn_80067074(nPlayer, 0x14, 0, -1);
         } else {
             uMask = fn_800142AC(0xE, 1);
-            if (fn_800136DC(*pController) & uMask) {
+            if (fn_800136DC(gPlayers[nPlayer].nController) & uMask) {
                 fn_80067074(nPlayer, 0x15, 0, -1);
             }
         }
@@ -2110,7 +2068,6 @@ void SwingState04_Update(int nPlayer) {
 // the player's distance to the pin stored, and the "shot begins" sound played.
 void SwingState02_Enter(int nPlayer) {
     int   nView;
-    s32*  pHandle;
     u8*   pBall;
     if (Player_IsCPU(nPlayer) && gpGame->n290 != 0) {
         nView = gPlayers[nPlayer].nView0;
@@ -2120,9 +2077,8 @@ void SwingState02_Enter(int nPlayer) {
         View_SetCamera(fn_80017028(nView), 0xC, nPlayer, nView);
     }
     if (gpGame->n290 != 0) {
-        pHandle = &gPlayers[nPlayer].nShotHandle;
-        fn_80095744(*pHandle, 2);
-        fn_80096690(*pHandle);
+        fn_80095744(gPlayers[nPlayer].nShotHandle, 2);
+        fn_80096690(gPlayers[nPlayer].nShotHandle);
     }
     fn_80062C38();
     pBall = gPlayers[nPlayer].ball;
@@ -2136,10 +2092,9 @@ void SwingState02_Enter(int nPlayer) {
     if (gpGame->b276 != 0) {
         fn_800689D4(nPlayer);
     }
-    pHandle = &gPlayers[nPlayer].nShotHandle;
-    if (*(s32*)(*pHandle + 0x2C) == 4 || *(s32*)(*pHandle + 0x2C) == 5) {
-        fn_800957FC(*pHandle, 1);
-        fn_800957B0(*pHandle, 1);
+    if (*(s32*)(gPlayers[nPlayer].nShotHandle + 0x2C) == 4 || *(s32*)(gPlayers[nPlayer].nShotHandle + 0x2C) == 5) {
+        fn_800957FC(gPlayers[nPlayer].nShotHandle, 1);
+        fn_800957B0(gPlayers[nPlayer].nShotHandle, 1);
     }
     fn_80054A6C(pBall);
     gPlayers[nPlayer].fA64 = fn_800D04AC(nPlayer);
@@ -2213,7 +2168,6 @@ void SwingState22_Enter(int nPlayer) {
     f32*  pBallPos;
     f32   fTmp[4];
     f32   fHeightA, fHeightB;
-    s32*  pView;
     int   i;
 
     gSession.bReplay = 0;
@@ -2239,16 +2193,15 @@ void SwingState22_Enter(int nPlayer) {
     fn_800D8D10(nPlayer);
     fn_800693A4(nPlayer);
     fn_8006AD68(nPlayer);
-    pView = &gPlayers[nPlayer].nView0;
-    fn_80016CFC(*pView)[0x275] = 1;
+    fn_80016CFC(gPlayers[nPlayer].nView0)[0x275] = 1;
     for (i = 0; i < gSession.nNumPlayers; i++) {
-        if (gPlayers[i].unk28C == 0 && gPlayers[i].nView0 == *pView &&
+        if (gPlayers[i].unk28C == 0 && gPlayers[i].nView0 == gPlayers[nPlayer].nView0 &&
             gPlayers[i].nLie != 10 && gPlayers[i].nLie != LIE_GREEN && gPlayers[i].nLie != LIE_HOLED) {
-            fn_80016CFC(*pView)[0x275] = 0;
+            fn_80016CFC(gPlayers[nPlayer].nView0)[0x275] = 0;
         }
     }
     fn_80045824(nPlayer);
-    View_SetCamera(fn_80017028(*pView), 8, nPlayer, *pView);
+    View_SetCamera(fn_80017028(gPlayers[nPlayer].nView0), 8, nPlayer, gPlayers[nPlayer].nView0);
     Vec_Copy(pBallPos, fTmp);
     fn_80069330(nPlayer, fTmp);
     fn_8006A6C4(nPlayer);
@@ -2270,10 +2223,9 @@ void  fn_800694A0(int nPlayer, f32 f);
 // anything else re-chooses a target; then Shot_Prepare, the break line, animation 5.
 void SwingState09_Update(int nPlayer) {
     u32  uMask = fn_800142AC(0x2E, 1);
-    s32* pController = &gPlayers[nPlayer].nController;
-    if (!(fn_800136DC(*pController) & uMask)) {
+    if (!(fn_800136DC(gPlayers[nPlayer].nController) & uMask)) {
         uMask = fn_800142AC(0x30, 1);
-        if (!(fn_800136DC(*pController) & uMask)) {
+        if (!(fn_800136DC(gPlayers[nPlayer].nController) & uMask)) {
             if (1.0f == ((View*)fn_80017028(gPlayers[nPlayer].nView0))->f54) {
                 fn_8005CFD4(nPlayer);
                 return;
@@ -2285,9 +2237,8 @@ void SwingState09_Update(int nPlayer) {
     if (gPlayers[nPlayer].swing.nPhase != 0) return;
     Caddie_Update(nPlayer);
     uMask = fn_800142AC(6, 0);
-    if (fn_800136DC(*pController) & uMask) {
+    if (fn_800136DC(gPlayers[nPlayer].nController) & uMask) {
         if (gpGame->b284 != 0) {
-            s32* pHandle;
             if (gpGame->pfn264(nPlayer)) {
                 AI_DefaultTarget(nPlayer);
             } else if (gPlayers[nPlayer].nShotKind == SHOT_PUTT) {
@@ -2298,9 +2249,8 @@ void SwingState09_Update(int nPlayer) {
             Shot_Prepare(nPlayer, 1);
             BreakLine_Start(gPlayers[nPlayer].nView0);
             fn_8001C804(nPlayer, 1, 1);
-            pHandle = &gPlayers[nPlayer].nShotHandle;
-            fn_800957D8(*pHandle);
-            fn_80095744(*pHandle, 5);
+            fn_800957D8(gPlayers[nPlayer].nShotHandle);
+            fn_80095744(gPlayers[nPlayer].nShotHandle, 5);
             fn_80062C38();
             if (gSession.nSplitScreen != 0) {
                 fn_80062CB0(gPlayers[nPlayer].nC58, 1);
@@ -2318,8 +2268,7 @@ void SwingState09_Update(int nPlayer) {
 // 26..29 play the pan sounds, and button 25 off the tee (if allowed) re-does the setup.
 void SwingState22_Update(int nPlayer) {
     u32  uMask = fn_800142AC(0x23, 0);
-    s32* pController = &gPlayers[nPlayer].nController;
-    if (fn_800136DC(*pController) & uMask) {
+    if (fn_800136DC(gPlayers[nPlayer].nController) & uMask) {
         Player* p = &gPlayers[nPlayer];
         if (p->uFlagsEF0 & 1) {
             u8* pBall = p->ball;
@@ -2334,25 +2283,25 @@ void SwingState22_Update(int nPlayer) {
     } else {
         fn_800EDAE0(nPlayer);
         uMask = fn_800142AC(0x1A, 1);
-        if (fn_800136DC(*pController) & uMask) {
+        if (fn_800136DC(gPlayers[nPlayer].nController) & uMask) {
             fn_80067074(nPlayer, 0x16, 0, -1);
         } else {
             uMask = fn_800142AC(0x1B, 1);
-            if (fn_800136DC(*pController) & uMask) {
+            if (fn_800136DC(gPlayers[nPlayer].nController) & uMask) {
                 fn_80067074(nPlayer, 0x17, 0, -1);
             }
         }
         uMask = fn_800142AC(0x1C, 1);
-        if (fn_800136DC(*pController) & uMask) {
+        if (fn_800136DC(gPlayers[nPlayer].nController) & uMask) {
             fn_80067074(nPlayer, 0x18, 0, -1);
         } else {
             uMask = fn_800142AC(0x1D, 1);
-            if (fn_800136DC(*pController) & uMask) {
+            if (fn_800136DC(gPlayers[nPlayer].nController) & uMask) {
                 fn_80067074(nPlayer, 0x19, 0, -1);
             }
         }
         uMask = fn_800142AC(0x19, 0);
-        if ((fn_800136DC(*pController) & uMask) && gPlayers[nPlayer].nLie != 0 && fn_800DDDC8(nPlayer)) {
+        if ((fn_800136DC(gPlayers[nPlayer].nController) & uMask) && gPlayers[nPlayer].nLie != 0 && fn_800DDDC8(nPlayer)) {
             fn_8001D8DC(nPlayer);
             fn_800689D4(nPlayer);
         }
@@ -2368,33 +2317,31 @@ void  fn_80062D6C(int a, int nPlayer);
 // sounds on buttons 9/10, 30 and 11..14; once the camera has arrived (flag from the enter) a
 // one-off 0x67 event.
 void SwingState03_Update(int nPlayer) {
-    s32* pController;
     Caddie_Update(nPlayer);
-    pController = &gPlayers[nPlayer].nController;
-    if (!(fn_800136DC(*pController) & fn_800142AC(8, 1))) {
+    if (!(fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(8, 1))) {
         fn_8005CFD4(nPlayer);
     } else {
-        if ((fn_800136DC(*pController) & fn_800142AC(9, 0))) {
+        if ((fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(9, 0))) {
             fn_80067074(nPlayer, 0xD, 0, -1);
         } else {
-            if ((fn_800136DC(*pController) & fn_800142AC(0xA, 0))) {
+            if ((fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0xA, 0))) {
                 fn_80067074(nPlayer, 0xE, 0, -1);
             }
         }
-        if ((fn_800136DC(*pController) & fn_800142AC(0x1E, 0))) {
+        if ((fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x1E, 0))) {
             fn_80067074(nPlayer, 0xF, 0, -1);
         }
-        if ((fn_800136DC(*pController) & fn_800142AC(0xB, 1))) {
+        if ((fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0xB, 1))) {
             fn_80067074(nPlayer, 0x12, 0, -1);
         } else {
-            if ((fn_800136DC(*pController) & fn_800142AC(0xC, 1))) {
+            if ((fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0xC, 1))) {
                 fn_80067074(nPlayer, 0x13, 0, -1);
             }
         }
-        if ((fn_800136DC(*pController) & fn_800142AC(0xD, 1))) {
+        if ((fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0xD, 1))) {
             fn_80067074(nPlayer, 0x14, 0, -1);
         } else {
-            if ((fn_800136DC(*pController) & fn_800142AC(0xE, 1))) {
+            if ((fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0xE, 1))) {
                 fn_80067074(nPlayer, 0x15, 0, -1);
             }
         }
@@ -2496,9 +2443,7 @@ void  fn_800C6358(View* pView, int nPlayer);
 // is set and it is state 17 (the hole-out sequence). While animation 9 plays, camera 16 is
 // taken once the animation allows, and the reaction shot lines up.
 void SwingState13_Update(int nPlayer) {
-    s32*  pView = &gPlayers[nPlayer].nView0;
-    View* pV    = (View*)fn_80017028(*pView);
-    s32*  pHandle;
+    View* pV    = (View*)fn_80017028(gPlayers[nPlayer].nView0);
 
     if (lbl_80281E12 != 0) {
         lbl_80281E12 = 0;
@@ -2510,11 +2455,10 @@ void SwingState13_Update(int nPlayer) {
         fn_800C7158(pV, fn_800DE180(nPlayer));
         if (gpGame->n294 != 0 && pV->nCamera != 1 && pV->nCamera != 4) {
             if (!(gPlayers[nPlayer].uFlags & 8) || fn_8006AA9C(nPlayer) == 2) {
-                pHandle = &gPlayers[nPlayer].nShotHandle;
-                if (fn_80095780(*pHandle) != 9 && fn_80095798(*pHandle) != 9 && fn_800C7160(pV)) {
-                    fn_80095744(*pHandle, 9);
+                if (fn_80095780(gPlayers[nPlayer].nShotHandle) != 9 && fn_80095798(gPlayers[nPlayer].nShotHandle) != 9 && fn_800C7160(pV)) {
+                    fn_80095744(gPlayers[nPlayer].nShotHandle, 9);
                 } else {
-                    View_SetCamera(pV, 0x10, nPlayer, *pView);
+                    View_SetCamera(pV, 0x10, nPlayer, gPlayers[nPlayer].nView0);
                 }
             }
         }
@@ -2524,13 +2468,12 @@ void SwingState13_Update(int nPlayer) {
         SwingStack_Push(0x11, nPlayer);
         return;
     }
-    pHandle = &gPlayers[nPlayer].nShotHandle;
-    if (fn_80095780(*pHandle) == 9 && pV->nCurCamera != 0x10 && Game_GetMode() != 11 &&
-        !fn_800734A0((u8*)*pHandle + 0x40C)) {
-        View_SetCamera(pV, 0x10, nPlayer, *pView);
+    if (fn_80095780(gPlayers[nPlayer].nShotHandle) == 9 && pV->nCurCamera != 0x10 && Game_GetMode() != 11 &&
+        !fn_800734A0((u8*)gPlayers[nPlayer].nShotHandle + 0x40C)) {
+        View_SetCamera(pV, 0x10, nPlayer, gPlayers[nPlayer].nView0);
     }
-    if (fn_80095780(*pHandle) == 9) {
-        if ((fn_80062C1C(*pHandle) != 0 || fn_80062C10(*pHandle) != 0) && !fn_800C6604(pV)) {
+    if (fn_80095780(gPlayers[nPlayer].nShotHandle) == 9) {
+        if ((fn_80062C1C(gPlayers[nPlayer].nShotHandle) != 0 || fn_80062C10(gPlayers[nPlayer].nShotHandle) != 0) && !fn_800C6604(pV)) {
             fn_800C6358(pV, nPlayer);
         }
     }
@@ -2558,39 +2501,36 @@ void  fn_800C6B7C(View* pView);
 // registered (a wider window on the special cameras), the ball is teed up on the tee, and the
 // live ball's state is cleared for the launch.
 void SwingState11_Enter(int nPlayer) {
-    s32*  pView = &gPlayers[nPlayer].nView0;
-    View* pV    = (View*)fn_80017028(*pView);
-    s32*  pHandle;
+    View* pV    = (View*)fn_80017028(gPlayers[nPlayer].nView0);
     u8*   pBall;
 
     if (gSession.bReplay != 0) {
-        View_SetCamera(pV, 0xC, nPlayer, *pView);
+        View_SetCamera(pV, 0xC, nPlayer, gPlayers[nPlayer].nView0);
     } else {
         fn_80062D98();
         if (fn_800C44A8(pV, nPlayer)) {
-            View_SetCamera(pV, 0x14, nPlayer, *pView);
+            View_SetCamera(pV, 0x14, nPlayer, gPlayers[nPlayer].nView0);
         } else if (fn_800C44CC(pV, nPlayer)) {
-            View_SetCamera(pV, 0x15, nPlayer, *pView);
+            View_SetCamera(pV, 0x15, nPlayer, gPlayers[nPlayer].nView0);
         } else if (fn_800C44E0(pV, nPlayer)) {
-            View_SetCamera(pV, 0x16, nPlayer, *pView);
+            View_SetCamera(pV, 0x16, nPlayer, gPlayers[nPlayer].nView0);
         } else {
-            View_SetCamera(pV, 0xD, nPlayer, *pView);
+            View_SetCamera(pV, 0xD, nPlayer, gPlayers[nPlayer].nView0);
         }
     }
     fn_8001C804(nPlayer, 1, 1);
-    pHandle = &gPlayers[nPlayer].nShotHandle;
-    fn_800957D8(*pHandle);
-    *(s32*)(*pHandle + 0x20) = 7;
-    *(s32*)(*pHandle + 0x1C) = 7;
+    fn_800957D8(gPlayers[nPlayer].nShotHandle);
+    *(s32*)(gPlayers[nPlayer].nShotHandle + 0x20) = 7;
+    *(s32*)(gPlayers[nPlayer].nShotHandle + 0x1C) = 7;
     if (gPlayers[nPlayer].uFlags & 8) {
-        fn_800965DC(*pHandle);
+        fn_800965DC(gPlayers[nPlayer].nShotHandle);
     } else {
         if (fn_800C6D80() || fn_800C44A8(pV, nPlayer) || fn_800C44CC(pV, nPlayer) || fn_800C44E0(pV, nPlayer)) {
-            fn_80095B4C(*pHandle, 1, 0, fn_80072ACC, 1, 8, -20000.0f, -30000.0f, -10000.0f, 0.0f, -10000.0f);
+            fn_80095B4C(gPlayers[nPlayer].nShotHandle, 1, 0, fn_80072ACC, 1, 8, -20000.0f, -30000.0f, -10000.0f, 0.0f, -10000.0f);
         } else {
-            fn_80095B4C(*pHandle, 1, 0, fn_80072ACC, 1, 8, -20000.0f, -90000.0f, -10000.0f, 0.0f, -10000.0f);
+            fn_80095B4C(gPlayers[nPlayer].nShotHandle, 1, 0, fn_80072ACC, 1, 8, -20000.0f, -90000.0f, -10000.0f, 0.0f, -10000.0f);
         }
-        fn_80027764(*(u8**)(*(u8**)(*pHandle + 0x38) + 0x38), 1.0f);
+        fn_80027764(*(u8**)(*(u8**)(gPlayers[nPlayer].nShotHandle + 0x38) + 0x38), 1.0f);
     }
     Swing_ClearFrameFlag(nPlayer);
     if (gPlayers[nPlayer].nLie == 0) {
@@ -2818,7 +2758,6 @@ void SwingState12_Update(int nPlayer) {
     u8    bA = 0;
     u8    bB = 0;
     u32   uMask;
-    s32*  pController;
 
     pV = (View*)fn_80017028(gPlayers[nPlayer].nView0);
     if (fn_800C6D9C()) return;
@@ -2857,12 +2796,11 @@ void SwingState12_Update(int nPlayer) {
             }
         } else {
             uMask       = fn_800142AC(0x16, 1);
-            pController = &gPlayers[nPlayer].nController;
-            if (fn_800136DC(*pController) & uMask) {
+            if (fn_800136DC(gPlayers[nPlayer].nController) & uMask) {
                 bA = 1;
             } else {
                 uMask = fn_800142AC(0x17, 1);
-                if (fn_800136DC(*pController) & uMask) {
+                if (fn_800136DC(gPlayers[nPlayer].nController) & uMask) {
                     bB = 1;
                 }
             }
@@ -2933,29 +2871,23 @@ void  fn_8005CF4C(int nState, int nPlayer);   // another stack operation
 // tips are on; the caddie starts; on the tee every player's ball is set up; the shot flags
 // are cleared; sound 7.
 void SwingState10_Enter(int nPlayer) {
-    s32*  pView = &gPlayers[nPlayer].nView0;
-    View* pV    = (View*)fn_80017028(*pView);
-    s32*  pHandle;
-    u8*   pFlag;
-    u8*   pC2E;
+    View* pV    = (View*)fn_80017028(gPlayers[nPlayer].nView0);
     int   nView, i;
 
     if (pV->nCurCamera == 0 && Player_IsCPU(nPlayer) && Game_GetMode() != 11) {
         fn_800957D8(gPlayers[nPlayer].nShotHandle);
     }
-    pHandle = &gPlayers[nPlayer].nShotHandle;
-    fn_80095744(*pHandle, 5);
-    fn_8001C774(*pHandle, gPlayers[nPlayer].nClub);
-    fn_8001C724(*pHandle, gPlayers[nPlayer].nShotKind);
-    fn_80062BFC(*pHandle);
-    fn_80062BE8(*pHandle);
-    fn_8007326C((u8*)*pHandle + 0x164);
-    pFlag = &gPlayers[nPlayer].swing.unk630;
-    if (*pFlag == 0) {
+    fn_80095744(gPlayers[nPlayer].nShotHandle, 5);
+    fn_8001C774(gPlayers[nPlayer].nShotHandle, gPlayers[nPlayer].nClub);
+    fn_8001C724(gPlayers[nPlayer].nShotHandle, gPlayers[nPlayer].nShotKind);
+    fn_80062BFC(gPlayers[nPlayer].nShotHandle);
+    fn_80062BE8(gPlayers[nPlayer].nShotHandle);
+    fn_8007326C((u8*)gPlayers[nPlayer].nShotHandle + 0x164);
+    if (gPlayers[nPlayer].swing.unk630 == 0) {
         fn_80058FA4(nPlayer);
-        *pFlag = 1;
+        gPlayers[nPlayer].swing.unk630 = 1;
     }
-    nView = *pView;
+    nView = gPlayers[nPlayer].nView0;
     View_SetCamera(fn_80017028(nView), 0xC, nPlayer, nView);
     fn_800DAE84();
     fn_8001C804(nPlayer, 1, 1);
@@ -2966,8 +2898,7 @@ void SwingState10_Enter(int nPlayer) {
     fn_8006AD68(nPlayer);
     fn_8006ACF8(nPlayer, 5);
     gPlayers[nPlayer].fC20 = 0.0f;
-    pC2E = &gPlayers[nPlayer].unkC2E;
-    if (*pC2E == 0 && gpGame->b281 != 0 && !Player_IsCPU(nPlayer)) {
+    if (gPlayers[nPlayer].unkC2E == 0 && gpGame->b281 != 0 && !Player_IsCPU(nPlayer)) {
         if (fn_800DA264() && fn_800DA174()) {
             fn_800E505C(0);
             fn_800E3D38(nPlayer, 0);
@@ -2984,7 +2915,7 @@ void SwingState10_Enter(int nPlayer) {
             fn_800D1DAC(nPlayer);
         }
     }
-    if (*pC2E == 0 && !Player_IsCPU(nPlayer) && fn_800EC550() && fn_800ED540()) {
+    if (gPlayers[nPlayer].unkC2E == 0 && !Player_IsCPU(nPlayer) && fn_800EC550() && fn_800ED540()) {
         if (fn_800F0818()) {
             fn_800EAC7C();
             fn_800E502C();
@@ -3007,7 +2938,7 @@ void SwingState10_Enter(int nPlayer) {
     }
     fn_80047B6C(gPlayers[nPlayer].ball, nPlayer);
     fn_80047BC0(gPlayers[nPlayer].ball, nPlayer);
-    *pC2E = 0;
+    gPlayers[nPlayer].unkC2E = 0;
     gPlayers[nPlayer].bPlanReady = 0;
     gPlayers[nPlayer].uFlags     = 0;
     fn_80067074(nPlayer, 7, 0, -1);
@@ -3025,20 +2956,16 @@ void SwingState10_Enter(int nPlayer) {
 void SwingState10_Update(int nPlayer) {
     int   nClub = gPlayers[nPlayer].nClub;
     u8    bSwung;
-    s32*  pController;
-    f32*  pIdle;
     u32   uMask;
 
     if (fn_800E5098()) return;
     bSwung = fn_80058F5C(nPlayer);
     gPlayers[nPlayer].fC20 += gSession.fFrameTime;
-    pController = &gPlayers[nPlayer].nController;
-    pIdle       = &gPlayers[nPlayer].fC20;
-    if (fn_80014300(*pController) || gPlayers[nPlayer].swing.nPhase != 0) {
-        *pIdle = 0.0f;
+    if (fn_80014300(gPlayers[nPlayer].nController) || gPlayers[nPlayer].swing.nPhase != 0) {
+        gPlayers[nPlayer].fC20 = 0.0f;
     }
-    if (*pIdle >= 10.0f) {
-        *pIdle = 0.0f;
+    if (gPlayers[nPlayer].fC20 >= 10.0f) {
+        gPlayers[nPlayer].fC20 = 0.0f;
     }
     if (nClub != CLUB_PUTTER) {
         fn_800A573C((u8)nPlayer);
@@ -3075,10 +3002,8 @@ void SwingState10_Update(int nPlayer) {
     if (gPlayers[nPlayer].swing.nPhase != 0) return;
     Caddie_Update(nPlayer);
     uMask = fn_800142AC(6, 0);
-    if (fn_800136DC(*pController) & uMask) {
+    if (fn_800136DC(gPlayers[nPlayer].nController) & uMask) {
         if (gpGame->b284 != 0) {
-            s32* pView;
-            s32* pHandle;
             if (gpGame->pfn264(nPlayer)) {
                 AI_DefaultTarget(nPlayer);
             } else if (gPlayers[nPlayer].nShotKind == SHOT_PUTT) {
@@ -3087,20 +3012,18 @@ void SwingState10_Update(int nPlayer) {
                 AI_ChooseTarget(nPlayer);
             }
             Shot_Prepare(nPlayer, 1);
-            pView = &gPlayers[nPlayer].nView0;
-            BreakLine_Start(*pView);
-            fn_8009B970(*pView);
+            BreakLine_Start(gPlayers[nPlayer].nView0);
+            fn_8009B970(gPlayers[nPlayer].nView0);
             fn_8001C804(nPlayer, 1, 1);
-            pHandle = &gPlayers[nPlayer].nShotHandle;
-            fn_800957D8(*pHandle);
-            fn_80095744(*pHandle, 5);
+            fn_800957D8(gPlayers[nPlayer].nShotHandle);
+            fn_80095744(gPlayers[nPlayer].nShotHandle, 5);
             fn_800689D4(nPlayer);
             fn_80062C38();
             if (gSession.nSplitScreen != 0) {
                 fn_80062CB0(gPlayers[nPlayer].nC58, 1);
             }
             fn_80068AA8(nPlayer);
-            fn_800642D0((View*)fn_80017028(*pView), nPlayer);
+            fn_800642D0((View*)fn_80017028(gPlayers[nPlayer].nView0), nPlayer);
             fn_800E3D38(nPlayer, 1);
         } else {
             fn_80068AA8(nPlayer);
@@ -3108,7 +3031,7 @@ void SwingState10_Update(int nPlayer) {
         gpGame->pfn22C(nPlayer);
     } else {
         uMask = fn_800142AC(5, 0);
-        if ((fn_800136DC(*pController) & uMask) && gPlayers[nPlayer].nShotKind == SHOT_PUTT) {
+        if ((fn_800136DC(gPlayers[nPlayer].nController) & uMask) && gPlayers[nPlayer].nShotKind == SHOT_PUTT) {
             fn_8005CF4C(7, nPlayer);
         } else {
             fn_800DEE4C(nPlayer);
@@ -3138,30 +3061,26 @@ extern Vec4 lbl_80183620;
 // take a mulligan (button 25, if allowed), watch the replay (button 24, if recorded and
 // allowed) or continue (button 0); a CPU continues on any pad's button 0.
 void SwingState14_Update(int nPlayer) {
-    s32*  pView = &gPlayers[nPlayer].nView0;
-    View* pV    = (View*)fn_80017028(*pView);
-    s32*  pHandle;
+    View* pV    = (View*)fn_80017028(gPlayers[nPlayer].nView0);
     Vec4  vOffset;
     u32   uMask;
 
     if (lbl_80281E13 != 0) {
         fn_800C7158(pV, fn_800DE180(nPlayer));
-        pHandle = &gPlayers[nPlayer].nShotHandle;
-        if (fn_80095780(*pHandle) != 9 && fn_80095798(*pHandle) != 9 && fn_800C7160(pV)) {
-            fn_80095744(*pHandle, 9);
+        if (fn_80095780(gPlayers[nPlayer].nShotHandle) != 9 && fn_80095798(gPlayers[nPlayer].nShotHandle) != 9 && fn_800C7160(pV)) {
+            fn_80095744(gPlayers[nPlayer].nShotHandle, 9);
         } else {
-            View_SetCamera(pV, 0xF, nPlayer, *pView);
+            View_SetCamera(pV, 0xF, nPlayer, gPlayers[nPlayer].nView0);
         }
         Swing_RumbleTick(nPlayer);
         lbl_80281E13 = 0;
     }
     vOffset = lbl_80183620;
-    pHandle = &gPlayers[nPlayer].nShotHandle;
-    if (fn_80095780(*pHandle) == 9 && pV->nCurCamera != 0xF && Game_GetMode() != 11 &&
-        !fn_800734A0((u8*)*pHandle + 0x40C)) {
-        View_SetCamera(pV, 0xF, nPlayer, *pView);
+    if (fn_80095780(gPlayers[nPlayer].nShotHandle) == 9 && pV->nCurCamera != 0xF && Game_GetMode() != 11 &&
+        !fn_800734A0((u8*)gPlayers[nPlayer].nShotHandle + 0x40C)) {
+        View_SetCamera(pV, 0xF, nPlayer, gPlayers[nPlayer].nView0);
     }
-    if ((fn_80062C1C(*pHandle) != 0 || fn_80062C10(*pHandle) != 0) && fn_80095780(*pHandle) == 9 && !fn_800C6604(pV)) {
+    if ((fn_80062C1C(gPlayers[nPlayer].nShotHandle) != 0 || fn_80062C10(gPlayers[nPlayer].nShotHandle) != 0) && fn_80095780(gPlayers[nPlayer].nShotHandle) == 9 && !fn_800C6604(pV)) {
         fn_800C6358(pV, nPlayer);
     }
     if (fn_800E46B4()) return;
@@ -3174,8 +3093,8 @@ void SwingState14_Update(int nPlayer) {
             return;
         }
         if (fn_80063C90(pV)) return;
-        if (!fn_800C6604(pV) && fn_80095780(*pHandle) == 9) {
-            if (fn_80062C28(*pHandle) >= *(f32*)(lbl_80281F78 + 0x170) * 0.5f) {
+        if (!fn_800C6604(pV) && fn_80095780(gPlayers[nPlayer].nShotHandle) == 9) {
+            if (fn_80062C28(gPlayers[nPlayer].nShotHandle) >= *(f32*)(lbl_80281F78 + 0x170) * 0.5f) {
                 if (pV->f11C <= 1.0f) return;
             }
         }
@@ -3202,7 +3121,7 @@ void SwingState14_Update(int nPlayer) {
             uMask = fn_800142AC(0x18, 0);
             if ((fn_800136DC(gPlayers[nPlayer].nController) & uMask) && gpGame->b287 != 0 &&
                 !(gPlayers[nPlayer].uFlags & 8) && (s8)SwingStack_Top(nPlayer) != 0x17 && !fn_800E53B8() &&
-                !(*(u32*)(*pHandle + 0x10) & 0x40)) {
+                !(*(u32*)(gPlayers[nPlayer].nShotHandle + 0x10) & 0x40)) {
                 lbl_80281E10 = 1;
                 fn_80062D0C(nPlayer);
                 fn_8006C300(nPlayer);
