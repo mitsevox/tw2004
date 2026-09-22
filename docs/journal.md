@@ -115,6 +115,11 @@ Dated log of what was done and decided, newest last. Facts and lessons belong in
   the real one: CodeWarrior folds `+= const` for `int` locals unconditionally, and stops as
   soon as the statement carries an int-to-long conversion. One typedef, 189/189. Rule in
   `decomp-notes.md`; the same lever is worth trying on the other near-miss functions.
+- **First answer for hypothesis 4, from data alone:** the attribute names are in the front-end
+  `DATS` object, and a debug menu there lists twelve of them - the nine on the player screen
+  plus hidden AGGRESSION, IQ and SPEED. The stat record is two blocks of twelve, and the debug
+  order fits the data (SPEED a constant 80, the created golfer's LUCK a neutral 50). Column
+  names in `formats/game-data.md`, marked inferred until `CharSliders.c` confirms them.
 
 **Working agreements**
 - Show the plain-English logic and the C before building anything non-trivial.

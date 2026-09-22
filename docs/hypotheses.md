@@ -85,9 +85,17 @@ expose. Expect attributes to be read through a small set of accessor functions; 
 accessors makes every use site searchable.
 
 **Lead (2026-09-22):** the per-golfer attribute values are in `loadonce.gcb` as the `stat`
-object (EA's `DATA\STATS_GC.BIN`): 34 golfers x 18 values 0..100, plus the created golfer's
-starting row (mostly 10s). Column names unknown until `CharSliders.c` is read. See
-[`formats/game-data.md`](formats/game-data.md).
+object (EA's `DATA\STATS_GC.BIN`): 34 golfers x two blocks of 12 values 0..100, plus the
+created golfers' starting rows. See [`formats/game-data.md`](formats/game-data.md).
+
+**Result (2026-09-22, from data, to be confirmed in code):** there are **twelve** attributes,
+not nine. The front-end shows POWER, POWER BOOST, DRIVING ACCURACY, BALL STRIKING, APPROACH,
+PUTTING, RECOVERY, SPIN, LUCK; a debug menu in the same file adds three hidden ones:
+**AGGRESSION, IQ, SPEED**. Those are the CPU-golfer personality knobs this hypothesis was
+looking for - and every record has them, including the created golfers (10, 10, 80), so the
+human and CPU golfers share one record layout. Whether the game *reads* the hidden three for
+the human golfer is the code question that remains. Each record also carries a second block of
+twelve with a flatter profile (meaning unknown - the next thing to settle).
 
 **Status:** open.
 

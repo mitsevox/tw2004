@@ -26,30 +26,53 @@ the original file name the tool packed, so the names below are EA's own.
 Golfer attribute table (`stat`, STATS_GC.BIN)
 --------------------------------------------
 
-u16 header, then 34 records of 320 bytes:
+u16 header (0), then 34 records of 320 bytes (record i at `2 + i*320`):
 
     0x000 char first[32]
     0x020 char last[32]
     0x040 char nickname[32]      "NA" when none
-    0x060 u8[8] zero
-    0x068 u8  a, b              small numbers (0x19 0x18 for Woods, 0x07 0x00 for "Player One")
-    0x06A u8  c, d, e           1 1 1 / 2 2 2 / 0 0 0: a category (gender? model set?)
-    0x06D u8  0
-    0x06E u8  attr[18]          0..100
-    ...   rest zero / unknown
+    0x060 u8  a, b              small numbers (0x19 0x18 for Woods, 0x07 0x00 for "Player One")
+    0x062 u8  c, d, e           1 1 1 for everyone seen so far
+    0x065 u8  0
+    0x066 u8  attrA[12]         0..100, see column names below
+    0x072 u8  attrB[12]         0..100, same columns, second set (meaning unknown)
+    0x07E u8  misc[15]          0..4 each (all 0 for the created golfers); flags at 0x08D..
+    ...   rest unknown
 
-Attribute rows (0..100), column meaning still unknown - the accessors in `CharSliders.c`
-(`0x8010D614`) will name them:
+**Column names (inferred, not yet confirmed from code).** The front-end data
+(`Data/Fend/FEnd.gcb`, `DATS` object) carries the attribute screen's names and tooltips, and a
+debug options menu that lists twelve attributes in this order:
 
-    Woods          100 90 100 95 85 100 90 95 100 80 85 100 100 100 100 100 100 100
-    "Sunday" Woods 100 100 100 100 95 100 100 100 100 80 95 100 100 100 100 100 100 100
-    Daly           100 100 90 75 70 75 85 85 90 80 60 75 100 40 33 40 33 33
-    Singh           95 95 90 100 80 95 95 95 95 80 100 90 75 40 40 40 100 40
-    Player One      25 20 10 10 10 10 10 10 10 80 10 50 20 10 10 10 10 10   (created golfer start)
+    0 POWER            "Increases distance on full swing shots."
+    1 POWER BOOST      "Increases maximum power boost on your backswing."
+    2 AGGRESSION       (hidden - not on the player screen)
+    3 BALL STRIKING    "Improves iron accuracy."
+    4 DRIVING ACCURACY "Improves accuracy off the tee and distance control."
+    5 APPROACH         "Improves chip & pitch shot accuracy."
+    6 PUTTING          "Improves putting accuracy."
+    7 RECOVERY         "Improves accuracy from sand and rough."
+    8 IQ               (hidden)
+    9 SPEED            (hidden)
+    10 SPIN            "Increases maximum spin you can generate."
+    11 LUCK            "Increases % of favorable lies and bounces in the trees."
 
-Two things stand out for hypothesis 4: column 9 is 80 for everyone including the created
-golfer (a fixed value, so probably not a slider), and the last six columns look like a
-second group (the fictional golfers vary them, the pros are mostly flat).
+Twelve names, and the record has two blocks of twelve. Applying the debug order to the data
+fits two signatures: column 9 (SPEED) is 80 for every golfer in both blocks (one exception at
+85), and the created golfer's column 11 (LUCK) starts at a neutral 50 while everything else
+starts at 10-25. The player screen shows nine of the twelve; AGGRESSION, IQ and SPEED are
+hidden and are the obvious CPU-golfer knobs - and the created golfers have them too (10, 10, 80).
+`CharSliders.c` (`0x8010D614`) will confirm the order and say what block B is.
+
+Block A with the names applied (block B in parentheses where it differs a lot):
+
+    Woods        100  90 100  95  85 100  90  95 100  80  85 100   (B: all 100)
+    Daly         100 100  90  75  70  75  85  85  90  80  60  75   (B: 100 then 33-40s)
+    Singh         95  95  90 100  80  95  95  95  95  80 100  90   (B: 75, 40s, DRVACC 100)
+    Player One    25  20  10  10  10  10  10  10  10  80  10  50   (B: 20 then 10s)
+
+Block B is flatter (Goosen is 71 across the board, Gulbis 50, Montgomerie 39) as if generated
+from one rating; candidates are a difficulty variant or the values used when the pro is the
+CPU opponent rather than the played golfer.
 
 Golfer bio cards (`BIO `)
 -------------------------
