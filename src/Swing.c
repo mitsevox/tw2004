@@ -301,3 +301,83 @@ clamp:
     }
     return fPower;
 }
+
+
+// ---- the hit -----------------------------------------------------------------------------------
+
+extern u8 gReplayData[];                     // 0x801D6030  saved seed at +0, swing state at +0x3DC
+
+void Ball_Launch(void* pBall, int nClub, int nKind, f32 fPower, f32 fAim, int nTrajectory, f32* pA, f32* pB);
+void Luck_TakePerfectShot(int nPlayer);      // Golfer.c
+u8   Player_IsController8(int nPlayer);      // Golfer.c
+void fn_8000B1D4(int nStream, u32 uSeed);    // seed an RNG stream
+void fn_8006BF60(int nPlayer);
+void fn_8006C300(int nPlayer);
+void fn_8005B664(int nPlayer, f32* pLaunchA);
+f32  fn_8005BA94(int nPlayer);               // the meter's miss
+void fn_8005B8C8(int nPlayer, f32* pLaunchB);
+void fn_8005CCA8(int nPlayer);
+f32  fn_8005CC84(f32 fTan);                  // atanf
+
+// The ball is struck. A replay (mode 10) reseeds the RNG and restores player 0's swing state;
+// otherwise the lucky-shot swap runs first. Then the meter's miss (zero for a CPU or a perfect
+// shot), the power, forgiveness, the launch blocks, and the aim - the player's aim plus the
+// face vector's angle plus the miss - go to Ball_Launch.
+void Swing_Launch(int nPlayer) {
+    Player* p;
+    f32*    pLaunchB;
+    f32*    pLaunchA;
+    f32*    pPower;
+    u8*     pBall;
+    int     nClub, nTrajectory, nKind;
+    f32     fAim;
+
+    p = &gPlayers[nPlayer];
+    if (Game_GetMode() == 10) {
+        fn_8000B1D4(0, *(u32*)gReplayData);
+        fn_80005628(&gPlayers[0].swing, gReplayData + 0x3DC, 0x630);
+    } else if (gSession.bNoSpin == 0) {
+        Luck_TakePerfectShot(nPlayer);
+        fn_8006BF60(nPlayer);
+    } else {
+        fn_8006C300(nPlayer);
+    }
+    pLaunchA    = p->vLaunchA;
+    nClub       = p->nClub;
+    nTrajectory = p->nTrajectory;
+    nKind       = p->nShotKind;
+    pBall       = p->ball;
+    fn_8005B664(nPlayer, pLaunchA);
+    if (Player_IsCPU(nPlayer) || gPlayers[nPlayer].bPerfect) {
+        gPlayers[nPlayer].swing.fSwingError = 0.0f;
+    } else {
+        gPlayers[nPlayer].swing.fSwingError = fn_8005BA94(nPlayer);
+    }
+    pPower  = &gPlayers[nPlayer].swing.fLaunchPower;
+    *pPower = Swing_ComputePower(nPlayer);
+    Swing_ApplyForgiveness(nPlayer);
+    if (gPlayers[nPlayer].nShotKind == SHOT_PUTT && gPlayers[nPlayer].fDistance < 2.0f) {
+        gPlayers[nPlayer].vLaunchA[0] = 0.0f;
+        gPlayers[nPlayer].vLaunchA[1] = 0.0f;
+        gPlayers[nPlayer].vLaunchA[2] = 1.0f;
+        gPlayers[nPlayer].vLaunchA[3] = 0.0f;
+    }
+    pLaunchB = p->vLaunchB;
+    fn_8005B8C8(nPlayer, pLaunchB);
+    gPlayers[nPlayer].swing.fLaunchAX = gPlayers[nPlayer].vLaunchA[0];
+    if (Player_IsController8(nPlayer)) {
+        fn_8005CCA8(nPlayer);
+        nTrajectory = p->nTrajectory;
+        nClub       = p->nClub;
+        nKind       = p->nShotKind;
+    }
+    if (0.0f == gPlayers[nPlayer].vLaunchA[2]) {
+        fAim = p->fAim + gPlayers[nPlayer].swing.fSwingError;
+    } else {
+        fAim = p->fAim + fn_8005CC84(gPlayers[nPlayer].vLaunchA[0] / gPlayers[nPlayer].vLaunchA[2]);
+        fAim = gPlayers[nPlayer].swing.fSwingError + fAim;
+    }
+    while (fAim < -PI) fAim += 2 * PI;
+    while (fAim > PI) fAim -= 2 * PI;
+    Ball_Launch(pBall, nClub, nKind, *pPower, fAim, nTrajectory, pLaunchA, pLaunchB);
+}

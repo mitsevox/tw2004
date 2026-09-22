@@ -85,7 +85,8 @@ typedef struct GolferRecord {
 typedef struct SwingData {
     u8   unk0[0x3C];
     f32  fSwingError;           // 0x03C  (0x410) the stick's miss, after forgiveness
-    u8   unk40[0x48 - 0x40];
+    f32  fLaunchPower;          // 0x040  (0x414) Swing_ComputePower's result
+    f32  fLaunchAX;             // 0x044  (0x418) copy of vLaunchA[0]
     f32  fPowerAfterError;      // 0x048  (0x41C)
     f32  fTempo;                // 0x04C  (0x420) driver sweet-spot input (negative when armed)
     u8   unk50[0x460 - 0x50];
@@ -296,6 +297,8 @@ int  AI_ClubForShot(int nPlayer, int nKind, u8 bUnderOnly, f32 fDist);
 f32  AI_PowerForTarget(int nPlayer);
 s8   AI_NearestTarget(f32* pPos, f32* pOut);
 void AI_DefaultTarget(int nPlayer);
+u8   Player_IsCPU(int nPlayer);
+u8   Controller_IsCPU(int nController);
 void AI_PlanShot(int nPlayer, f32* pTarget);
 u8   AI_GreenTowardPin(int nPlayer, f32 fDist);
 u8   Lie_AllowsFullSwing(int nPlayer);
