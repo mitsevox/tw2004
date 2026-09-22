@@ -30,6 +30,9 @@ dolphin/db.c:
 	.data       start:0x801998E0 end:0x801998F8
 	.sbss       start:0x80282750 end:0x80282758
 
+dolphin/dsp/dsp_debug.c:
+	.text       start:0x801397FC end:0x8013984C
+
 dolphin/dvd/dvdqueue.c:
 	.text       start:0x8013DCB4 end:0x8013DEAC
 	.bss        start:0x8027A638 end:0x8027A658
@@ -49,6 +52,9 @@ dolphin/gx/GXFrameBuf.c:
 	.data       start:0x8019A080 end:0x8019A170
 	.sdata2     start:0x80284BD0 end:0x80284BD8
 
+dolphin/gx/GXStubs.c:
+	.text       start:0x80144898 end:0x8014489C
+
 dolphin/gx/GXDisplayList.c:
 	.text       start:0x80144A38 end:0x80144AA8
 
@@ -59,6 +65,11 @@ dolphin/gx/GXPerf.c:
 dolphin/os/OSAudioSystem.c:
 	.text       start:0x80149170 end:0x80149404
 	.data       start:0x8019B2E8 end:0x8019B368
+
+dolphin/os/OSInterrupt.c:
+	.text       start:0x8014A7B0 end:0x8014B01C
+	.data       start:0x8019BA90 end:0x8019BAC0
+	.sbss       start:0x802828F8 end:0x80282910
 
 dolphin/os/OSMutex.c:
 	.text       start:0x8014B4F0 end:0x8014B560

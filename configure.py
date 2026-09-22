@@ -321,6 +321,16 @@ config.warn_missing_config = True
 config.warn_missing_source = False
 config.libs = [
     {
+        "lib": "dsp",
+        "mw_version": "GC/1.2.5n",
+        "cflags": cflags_sdk,
+        "progress_category": "sdk",
+        "src_dir": "extern/sdk",
+        "objects": [
+            Object(Matching, "dolphin/dsp/dsp_debug.c"),
+        ],
+    },
+    {
         "lib": "pad",
         "mw_version": "GC/1.2.5n",
         "cflags": cflags_sdk,
@@ -386,6 +396,7 @@ config.libs = [
         "progress_category": "sdk",
         "src_dir": "extern/sdk",
         "objects": [
+            Object(Matching, "dolphin/gx/GXStubs.c"),
             Object(Matching, "dolphin/gx/GXFrameBuf.c"),
             Object(Matching, "dolphin/gx/GXPerf.c"),
             Object(Matching, "dolphin/gx/GXDisplayList.c"),
@@ -399,6 +410,7 @@ config.libs = [
         "progress_category": "sdk",
         "src_dir": "extern/sdk",
         "objects": [
+            Object(Matching, "dolphin/os/OSInterrupt.c"),
             Object(Matching, "dolphin/os/OSAudioSystem.c"),
             Object(Matching, "dolphin/os/OSMutex.c"),
             Object(Matching, "dolphin/os/OSSync.c"),
