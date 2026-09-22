@@ -33,14 +33,26 @@ Ball.c:
 Swing.c:
 	.text       start:0x800589F8 end:0x80062E40
 
+dolphin/vi.c:
+	.text       start:0x8012E950 end:0x8013042C
+
+dolphin/exi/EXIBios.c:
+	.text       start:0x8013042C end:0x80131D08
+
 dolphin/exi/EXIUart.c:
 	.text       start:0x80131D08 end:0x80131F78
 	.sbss       start:0x80282618 end:0x80282628
+
+dolphin/si/SIBios.c:
+	.text       start:0x80131F78 end:0x801337D8
 
 dolphin/si/SISamplingRate.c:
 	.text       start:0x801337D8 end:0x801338E0
 	.data       start:0x80195D08 end:0x80195DA0
 	.sbss       start:0x80282638 end:0x80282640
+
+dolphin/ar/ar.c:
+	.text       start:0x80133918 end:0x8013538C
 
 dolphin/ar/arq.c:
 	.text       start:0x8013538C end:0x80135728
@@ -53,6 +65,9 @@ dolphin/db.c:
 	.data       start:0x801998E0 end:0x801998F8
 	.sbss       start:0x80282750 end:0x80282758
 
+dolphin/dsp/dsp.c:
+	.text       start:0x801395AC end:0x80139734
+
 dolphin/dsp/dsp_debug.c:
 	.text       start:0x801397FC end:0x8013984C
 
@@ -61,8 +76,14 @@ dolphin/dsp/dsp_task.c:
 	.data       start:0x80199978 end:0x80199AB8
 	.sbss       start:0x80282760 end:0x80282778
 
+dolphin/dvd/dvdlow.c:
+	.text       start:0x8013A0D0 end:0x8013AF10
+
 dolphin/dvd/dvdfs.c:
 	.text       start:0x8013AF10 end:0x8013B3C4
+
+dolphin/dvd/dvd.c:
+	.text       start:0x8013B3C8 end:0x8013DCB4
 
 dolphin/dvd/dvdqueue.c:
 	.text       start:0x8013DCB4 end:0x8013DEAC
@@ -75,6 +96,9 @@ dolphin/dvd/dvderror.c:
 dolphin/dvd/dvdidutils.c:
 	.text       start:0x8013E044 end:0x8013E13C
 
+dolphin/dvd/fstload.c:
+	.text       start:0x8013E16C end:0x8013E3AC
+
 dolphin/gx/GXInit.c:
 	.text       start:0x8013E3AC end:0x8013F57C
 	.data       start:0x80199DF0 end:0x80199F20
@@ -83,8 +107,14 @@ dolphin/gx/GXInit.c:
 	.sbss       start:0x80282848 end:0x80282858
 	.sdata2     start:0x80284BA8 end:0x80284BD0
 
+dolphin/gx/GXFifo.c:
+	.text       start:0x8013F57C end:0x8013FF30
+
 dolphin/gx/GXAttr.c:
 	.text       start:0x8013FF38 end:0x801410A8
+
+dolphin/gx/GXMisc.c:
+	.text       start:0x801410A8 end:0x801415AC
 
 dolphin/gx/GXGeometry.c:
 	.text       start:0x801415AC end:0x8014195C
@@ -107,11 +137,17 @@ dolphin/gx/GXTev.c:
 	.text       start:0x80143AE0 end:0x801442C4
 	.data       start:0x8019A398 end:0x8019A410
 
+dolphin/gx/GXPixel.c:
+	.text       start:0x801442C4 end:0x80144898
+
 dolphin/gx/GXStubs.c:
 	.text       start:0x80144898 end:0x8014489C
 
 dolphin/gx/GXDisplayList.c:
 	.text       start:0x80144A38 end:0x80144AA8
+
+dolphin/gx/GXTransform.c:
+	.text       start:0x80144AA8 end:0x80145140
 
 dolphin/gx/GXPerf.c:
 	.text       start:0x80145140 end:0x80145998
@@ -122,6 +158,9 @@ dolphin/mtx/mtx.c:
 
 dolphin/mtx/mtx44.c:
 	.text       start:0x80147DB0 end:0x80147E48
+
+dolphin/os/OS.c:
+	.text       start:0x80147E48 end:0x80148790
 
 dolphin/os/OSAlarm.c:
 	.text       start:0x80148790 end:0x80148E40
@@ -136,6 +175,12 @@ dolphin/os/OSAudioSystem.c:
 dolphin/os/OSCache.c:
 	.text       start:0x80149404 end:0x8014983C
 
+dolphin/os/OSContext.c:
+	.text       start:0x8014983C end:0x8014A0AC
+
+dolphin/os/OSError.c:
+	.text       start:0x8014A0AC end:0x8014A758
+
 dolphin/os/OSInterrupt.c:
 	.text       start:0x8014A7B0 end:0x8014B01C
 	.data       start:0x8019BA90 end:0x8019BAC0
@@ -146,6 +191,9 @@ dolphin/os/OSMemory.c:
 
 dolphin/os/OSMutex.c:
 	.text       start:0x8014B4F0 end:0x8014B560
+
+dolphin/os/OSReboot.c:
+	.text       start:0x8014B70C end:0x8014B8F0
 
 dolphin/os/OSReset.c:
 	.text       start:0x8014B8F0 end:0x8014BCD4
@@ -160,12 +208,18 @@ dolphin/os/OSRtc.c:
 dolphin/os/OSSync.c:
 	.text       start:0x8014C9FC end:0x8014CA80
 
+dolphin/os/OSThread.c:
+	.text       start:0x8014CA84 end:0x8014E48C
+
 dolphin/os/OSTime.c:
 	.text       start:0x8014E48C end:0x8014E8B0
 
 dolphin/pad/PadClamp.c:
 	.text       start:0x8014E944 end:0x8014EB88
 	.rodata     start:0x80184FC0 end:0x80184FD0
+
+dolphin/pad/pad.c:
+	.text       start:0x8014EB88 end:0x80150658
 
 dolphin/ai.c:
 	.text       start:0x80150658 end:0x80150F24
@@ -178,6 +232,9 @@ runtime/runtime.c:
 
 runtime/ansi_files.c:
 	.text       start:0x80152754 end:0x8015286C
+
+runtime/ansi_fp.c:
+	.text       start:0x801538EC end:0x8015444C
 
 runtime/buffer_io.c:
 	.text       start:0x80155E48 end:0x80155F40
@@ -201,8 +258,14 @@ runtime/mem.c:
 runtime/misc_io.c:
 	.text       start:0x801570B8 end:0x801570C8
 
+runtime/printf.c:
+	.text       start:0x801570C8 end:0x8015929C
+
 runtime/sscanf.c:
 	.text       start:0x801594CC end:0x8015955C
+
+runtime/string.c:
+	.text       start:0x8015A5F4 end:0x8015A8D0
 
 runtime/wchar_io.c:
 	.text       start:0x8015C1F8 end:0x8015C280
@@ -303,6 +366,9 @@ Common/TagFile/TagFile.c:
 	.rodata     start:0x8018655C end:0x801866D4
 	.sbss       start:0x80282A30 end:0x80282A38
 
+dolphin/card/CARDBios.c:
+	.text       start:0x80176A38 end:0x80177C34
+
 dolphin/card/CARDUnlock.c:
 	.text       start:0x80177DA4 end:0x80179004
 	.data       start:0x8019D3A0 end:0x8019D500
@@ -310,6 +376,12 @@ dolphin/card/CARDUnlock.c:
 
 dolphin/card/CARDRdwr.c:
 	.text       start:0x80179004 end:0x80179284
+
+dolphin/card/CARDBlock.c:
+	.text       start:0x8017929C end:0x801796A0
+
+dolphin/card/CARDDir.c:
+	.text       start:0x801796A0 end:0x80179904
 
 dolphin/card/CARDCheck.c:
 	.text       start:0x80179904 end:0x8017A840
@@ -320,6 +392,9 @@ dolphin/card/CARDMount.c:
 
 dolphin/card/CARDFormat.c:
 	.text       start:0x8017B2B8 end:0x8017BA9C
+
+dolphin/card/CARDOpen.c:
+	.text       start:0x8017BA9C end:0x8017C18C
 
 dolphin/card/CARDCreate.c:
 	.text       start:0x8017C18C end:0x8017C4DC
@@ -332,6 +407,9 @@ dolphin/card/CARDWrite.c:
 
 dolphin/card/CARDDelete.c:
 	.text       start:0x8017CC84 end:0x8017CF64
+
+dolphin/card/CARDStat.c:
+	.text       start:0x8017CF64 end:0x8017D3E4
 
 dolphin/card/CARDRename.c:
 	.text       start:0x8017D42C end:0x8017D628

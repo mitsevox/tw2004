@@ -6,4 +6,11 @@
 
 #include <dolphin/types.h>
 
+/* Short names used by the borrowed MSL source (extern/sdk/runtime). */
+typedef unsigned int uint;
+typedef signed short sshort;
+typedef unsigned short ushort;
+typedef signed char schar;
+typedef unsigned char uchar;
+
 #endif

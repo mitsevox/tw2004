@@ -332,6 +332,16 @@ cflags_gcc = [
 
 config.libs = [
     {
+        "lib": "vi",
+        "mw_version": "GC/1.2.5n",
+        "cflags": cflags_sdk,
+        "progress_category": "sdk",
+        "src_dir": "extern/sdk",
+        "objects": [
+            Object(NonMatching, "dolphin/vi.c"),
+        ],
+    },
+    {
         "lib": "mtx",
         "mw_version": "GC/1.2.5n",
         "cflags": cflags_sdk,
@@ -349,6 +359,7 @@ config.libs = [
         "progress_category": "sdk",
         "src_dir": "extern/sdk",
         "objects": [
+            Object(NonMatching, "dolphin/ar/ar.c"),
             Object(NonMatching, "dolphin/ar/arq.c"),
         ],
     },
@@ -381,6 +392,7 @@ config.libs = [
         "progress_category": "sdk",
         "src_dir": "extern/sdk",
         "objects": [
+            Object(NonMatching, "dolphin/si/SIBios.c"),
             Object(Matching, "dolphin/si/SISamplingRate.c"),
         ],
     },
@@ -391,6 +403,7 @@ config.libs = [
         "progress_category": "sdk",
         "src_dir": "extern/sdk",
         "objects": [
+            Object(NonMatching, "dolphin/dsp/dsp.c"),
             Object(Matching, "dolphin/dsp/dsp_task.c"),
             Object(Matching, "dolphin/dsp/dsp_debug.c"),
         ],
@@ -402,6 +415,7 @@ config.libs = [
         "progress_category": "sdk",
         "src_dir": "extern/sdk",
         "objects": [
+            Object(NonMatching, "dolphin/pad/pad.c"),
             Object(Matching, "dolphin/pad/PadClamp.c"),
         ],
     },
@@ -412,6 +426,7 @@ config.libs = [
         "progress_category": "sdk",
         "src_dir": "extern/sdk",
         "objects": [
+            Object(NonMatching, "dolphin/exi/EXIBios.c"),
             Object(Matching, "dolphin/exi/EXIUart.c"),
         ],
     },
@@ -432,6 +447,11 @@ config.libs = [
         "progress_category": "sdk",
         "src_dir": "extern/sdk",
         "objects": [
+            Object(NonMatching, "dolphin/card/CARDBios.c"),
+            Object(NonMatching, "dolphin/card/CARDBlock.c"),
+            Object(NonMatching, "dolphin/card/CARDDir.c"),
+            Object(NonMatching, "dolphin/card/CARDOpen.c"),
+            Object(NonMatching, "dolphin/card/CARDStat.c"),
             Object(NonMatching, "dolphin/card/CARDRead.c"),
             Object(Matching, "dolphin/card/CARDWrite.c"),
             Object(Matching, "dolphin/card/CARDMount.c"),
@@ -451,6 +471,9 @@ config.libs = [
         "progress_category": "sdk",
         "src_dir": "extern/sdk",
         "objects": [
+            Object(NonMatching, "dolphin/dvd/fstload.c"),
+            Object(NonMatching, "dolphin/dvd/dvd.c"),
+            Object(NonMatching, "dolphin/dvd/dvdlow.c"),
             Object(NonMatching, "dolphin/dvd/dvdfs.c"),
             Object(Matching, "dolphin/dvd/dvderror.c"),
             Object(Matching, "dolphin/dvd/dvdqueue.c"),
@@ -464,6 +487,10 @@ config.libs = [
         "progress_category": "sdk",
         "src_dir": "extern/sdk",
         "objects": [
+            Object(NonMatching, "dolphin/gx/GXPixel.c"),
+            Object(NonMatching, "dolphin/gx/GXFifo.c"),
+            Object(NonMatching, "dolphin/gx/GXMisc.c"),
+            Object(NonMatching, "dolphin/gx/GXTransform.c"),
             Object(NonMatching, "dolphin/gx/GXAttr.c"),
             Object(NonMatching, "dolphin/gx/GXBump.c"),
             Object(NonMatching, "dolphin/gx/GXLight.c"),
@@ -484,6 +511,11 @@ config.libs = [
         "progress_category": "sdk",
         "src_dir": "extern/sdk",
         "objects": [
+            Object(NonMatching, "dolphin/os/OSError.c"),
+            Object(NonMatching, "dolphin/os/OS.c"),
+            Object(NonMatching, "dolphin/os/OSContext.c"),
+            Object(NonMatching, "dolphin/os/OSReboot.c"),
+            Object(NonMatching, "dolphin/os/OSThread.c"),
             Object(NonMatching, "dolphin/os/OSAlarm.c"),
             Object(NonMatching, "dolphin/os/OSArena.c"),
             Object(NonMatching, "dolphin/os/OSCache.c"),
@@ -507,6 +539,9 @@ config.libs = [
         "progress_category": "sdk",
         "src_dir": "extern/sdk",
         "objects": [
+            Object(NonMatching, "runtime/ansi_fp.c"),
+            Object(NonMatching, "runtime/printf.c"),
+            Object(NonMatching, "runtime/string.c"),
             Object(NonMatching, "runtime/runtime.c"),
             Object(NonMatching, "runtime/ansi_files.c"),
             Object(NonMatching, "runtime/direct_io.c"),

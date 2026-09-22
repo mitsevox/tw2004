@@ -63,7 +63,39 @@ libraries, GC/1.3 for MSL, flags in `cflags_sdk` / `cflags_runtime`. The pipelin
   target object. Most of the "missing" functions in those units simply do not exist in this binary
   (e.g. the `LC*` locked-cache functions of `OSCache`, `AIStopDMA`, `GXSetVtxDescv`). Not linked:
   `dvdfatal`, `OSFont`, `OSLink` (one small function each, large unmapped data).
+- 23 "gappy" (matched functions with unmatched ones between them). **Level 2 (2026-09-22): 22 of
+  them are linked the same way**, each as one text span from its first to its last function
+  (objects are contiguous in the link, so the unnamed functions inside the span belong to the unit;
+  they are this game's revision of the absent ones). Skipped: `__ppc_eabi_init` (Prime has it as
+  .cpp, and it spans .init and .text). +61 KB. Real differences found this way: the CARD library
+  (`__CARDAccess` 31%, `CARDBlock`/`CARDDir`/`CARDOpen` mostly unmatched - the April 2003 CARD
+  patch), MSL `printf` (`vprintf`, `float2str`, `double2hex` differ), `GXSetViewportJitter`,
+  `__num2dec_internal`. Name-collision clusters (`OnReset`, `AlarmHandler`, `WriteCallback`,
+  `EraseCallback`) are other units' locals with the same name and were left out of the spans.
+- **Locals referenced from outside the unit lose their name.** Because these units carry no data
+  yet, a local function whose switch jump table (`getTiming`, `stateBusy`, `SPEC2_MakeStatus`,
+  `parse_format`, `long2str`, `longlong2str`, `__equals_dec`) or reset-function record (`OnReset`)
+  sits in an auto data unit is emitted by dtk as a global named `name_ADDRESS`, so objdiff cannot
+  pair it and it reports 0% although the code matches. Giving each unit its data ranges (Level 3)
+  fixes that and is the route to "linked". About 5 KB.
+- `include/types.h` now also defines `uint`/`ushort`/`sshort`/`schar`/`uchar`, which the borrowed
+  MSL source (`printf.c`) uses; Prime gets them from its own `types.h`.
+- The 4 data-blocked full units (`fstload`, `EXIBios`, `GXPixel`, `OSError`) are linked the same
+  text-only way (2026-09-22), +10 KB. Their data still needs anchoring for "linked".
 - The rest are libraries this game does not link or SDK parts Prime never decompiled.
+
+**What is still unnamed in the SDK region (Level 4 map, 2026-09-22).** 383 functions, 111 KB,
+none of it in Prime. Identified from callers and neighbours:
+
+| Range | Size | What | Where source exists |
+|---|---|---|---|
+| `0x8015F784`-`0x8016C718` | 53 KB, 220 fns | MetroTRK (debugger nub; `TRK_main`, `TRKNubMainLoop` named) | Prime has only `mslsupp.c`/`nubinit.c`; full source in other decomps (Pikmin 2, Twilight Princess) |
+| `0x80135728`-`0x801393D0` | 15.5 KB, 65 fns | AX audio library (calls `AIInitDMA`, `DSPAddTask`, `DSPInit`, `AIStartDMA`) | not in Prime (MusyX); `doldecomp/dolphin`, games using JAudio |
+| `0x80145998`-`0x80147B94` | 8.7 KB, 11 fns | probably DTK, the DVD audio-track player (a 4.2 KB state machine calling `AISetStreamVolLeft/Right`) | same |
+| `0x8015444C`-`0x8015C1F8` (pieces) | ~20 KB | MSL: `__ieee754_*`/`__kernel_*` math, `alloc.c`, `mem_funcs`, wide-char | MSL revision differs from Prime's; other games' MSL |
+
+Any of these needs another project's objects run through `tools/research/sdk/` (the scripts only
+assume a directory of split `.o` files plus source), and its compiler version in `configure.py`.
 
 Beyond that, Level 0 is done as far as borrowed source goes.
 
