@@ -2357,3 +2357,60 @@ void SwingState22_Update(int nPlayer) {
     }
     fn_800694A0(nPlayer, 1.0f);
 }
+
+
+u8    fn_800C7340(void* pView, int nPlayer);
+void  fn_80062D6C(int a, int nPlayer);
+
+// State 3: the aiming camera, held while button 8 is down (the caddie keeps updating). Pan
+// sounds on buttons 9/10, 30 and 11..14; once the camera has arrived (flag from the enter) a
+// one-off 0x67 event.
+void SwingState03_Update(int nPlayer) {
+    u32  uMask;
+    s32* pController;
+    Caddie_Update(nPlayer);
+    uMask       = fn_800142AC(8, 1);
+    pController = &gPlayers[nPlayer].nController;
+    if (!(fn_800136DC(*pController) & uMask)) {
+        fn_8005CFD4(nPlayer);
+    } else {
+        uMask = fn_800142AC(9, 0);
+        if (fn_800136DC(*pController) & uMask) {
+            fn_80067074(nPlayer, 0xD, 0, -1);
+        } else {
+            uMask = fn_800142AC(0xA, 0);
+            if (fn_800136DC(*pController) & uMask) {
+                fn_80067074(nPlayer, 0xE, 0, -1);
+            }
+        }
+        uMask = fn_800142AC(0x1E, 0);
+        if (fn_800136DC(*pController) & uMask) {
+            fn_80067074(nPlayer, 0xF, 0, -1);
+        }
+        uMask = fn_800142AC(0xB, 1);
+        if (fn_800136DC(*pController) & uMask) {
+            fn_80067074(nPlayer, 0x12, 0, -1);
+        } else {
+            uMask = fn_800142AC(0xC, 1);
+            if (fn_800136DC(*pController) & uMask) {
+                fn_80067074(nPlayer, 0x13, 0, -1);
+            }
+        }
+        uMask = fn_800142AC(0xD, 1);
+        if (fn_800136DC(*pController) & uMask) {
+            fn_80067074(nPlayer, 0x14, 0, -1);
+        } else {
+            uMask = fn_800142AC(0xE, 1);
+            if (fn_800136DC(*pController) & uMask) {
+                fn_80067074(nPlayer, 0x15, 0, -1);
+            }
+        }
+    }
+    fn_80068AC8(nPlayer);
+    if (lbl_80281E11 != 0) {
+        if (fn_800C7340(fn_80017028(gPlayers[nPlayer].nView0), nPlayer)) {
+            fn_80062D6C(0x67, nPlayer);
+            lbl_80281E11 = 0;
+        }
+    }
+}
