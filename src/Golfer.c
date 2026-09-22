@@ -1440,7 +1440,7 @@ void Caddie_ApplyTip(int nPlayer) {
 
 // ---- small queries ------------------------------------------------------------------------------
 
-s8   fn_8005D278(int nPlayer);          // Swing.c: the club-set entry's byte 5, -1 when none
+int  SwingStack_Top(int nPlayer);       // Swing.c
 void fn_80013200(int nPad, u8 nValue);
 
 u8 Player_OnTee(int nPlayer) {
@@ -1451,9 +1451,9 @@ u8 Player_LieIs12(int nPlayer) {
     return gPlayers[nPlayer].nLie == 12;
 }
 
-u8 Player_LieIs12NotClub23(int nPlayer) {
+u8 Player_LieIs12NotState23(int nPlayer) {
     u8 bResult = 0;
-    if (gPlayers[nPlayer].nLie == 12 && fn_8005D278(nPlayer) != 0x17) {
+    if (gPlayers[nPlayer].nLie == 12 && (s8)SwingStack_Top(nPlayer) != 0x17) {
         bResult = 1;
     }
     return bResult;
@@ -1737,7 +1737,7 @@ void Players_SetupAll(void) {
 void Players_Reset(void) {
     int i;
     for (i = 0; i < gSession.nNumPlayers; i++) {
-        fn_8005CE70(i);
+        SwingStack_Clear(i);
         gPlayers[i].nShotHandle = 0;
     }
     gNumPlayersSetUp = 0;

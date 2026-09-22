@@ -321,8 +321,8 @@ void fn_8006C300(int nPlayer);
 void Swing_FaceVector(int nPlayer, f32* pOut);
 f32  Swing_MeterError(int nPlayer);
 void Swing_ShapeVector(int nPlayer, f32* pOut);
-void fn_8005CCA8(int nPlayer);
 f32  fn_8005CC84(f32 fTan);                  // atanf
+void fn_8005CCA8(int nPlayer);
 
 // The ball is struck. A replay (mode 10) reseeds the RNG and restores player 0's swing state;
 // otherwise the lucky-shot swap runs first. Then the meter's miss (zero for a CPU or a perfect
@@ -550,4 +550,50 @@ void Swing_ShapeVector(int nPlayer, f32* pOut) {
         pOut[2] = 1.0f;
         pOut[3] = 0.0f;
     }
+}
+
+
+// ---- the swing state stack ----------------------------------------------------------------------
+// Each player has a small stack of swing states (ids into gSwingStates, whose entries carry the
+// state's callbacks). The top is the current state; -1 is empty.
+
+typedef struct SwingStack {
+    u8   nState[5];             // 0x00
+    s8   nTop;                  // 0x05  index of the current state, -1 when empty
+} SwingStack;
+
+typedef struct SwingStateDef {
+    void (*pfnEnter)(int nPlayer);  // 0x00
+    void (*pfnUpdate)(int nPlayer); // 0x04
+    void (*pfnExit)(int nPlayer);   // 0x08
+} SwingStateDef;
+
+extern SwingStack    gSwingStacks[];        // 0x801D5A90
+extern SwingStateDef gSwingStates[];        // 0x801883D8
+extern u8            gInSwingExit;          // 0x80281E00  set while a state's exit callback runs
+
+// The current swing state, or -1.
+int SwingStack_Top(int nPlayer) {
+    SwingStack* pStack = &gSwingStacks[nPlayer];
+    if (pStack->nTop == -1) return -1;
+    return pStack->nState[pStack->nTop];
+}
+
+// Pop every state, running each one's exit callback.
+void SwingStack_Clear(int nPlayer) {
+    s8*         pTop;
+    SwingStack* pStack = &gSwingStacks[nPlayer];
+    pTop = &pStack->nTop;
+    while (*pTop > -1) {
+        if (gSwingStates[(s8)pStack->nState[*pTop]].pfnExit != NULL) {
+            gInSwingExit = 1;
+            gSwingStates[(s8)pStack->nState[*pTop]].pfnExit(nPlayer);
+            gInSwingExit = 0;
+        }
+        (*pTop)--;
+    }
+}
+
+// Empty in release.
+void fn_8005CCA8(int nPlayer) {
 }
