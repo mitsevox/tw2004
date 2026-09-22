@@ -321,7 +321,7 @@ void Luck_TakePerfectShot(int nPlayer);      // Golfer.c
 void fn_8000B1D4(int nStream, u32 uSeed);    // seed an RNG stream
 void fn_80095744(int nHandle, int nAnim);    // play an animation
 void fn_80096690(int nHandle);
-void fn_8006BF60(int nPlayer);
+void fn_8006BF60(int nPlayer);               // the replay recorder
 void fn_8006C300(int nPlayer);
 void Swing_FaceVector(int nPlayer, f32* pOut);
 f32  Swing_MeterError(int nPlayer);
@@ -1758,4 +1758,63 @@ void SwingState21_Enter(int nPlayer) {
     fn_800E3D38(nPlayer, 0);
     fn_80045824(nPlayer);
     fn_800DC9D4(1);
+}
+
+
+void  fn_800DED60(void);
+void  fn_80062BFC(int nHandle);
+void  fn_80062BE8(int nHandle);
+void  fn_8001C804(int nPlayer, int a, int b);
+f32   fn_800D0478(int nPlayer);               // a distance (compared with 250 in Golfer_IsLucky)
+void  fn_800E4204(void);
+u8*   fn_80016CFC(int nView);
+void  Caddie_ApplyTip(int nPlayer);           // Golfer.c
+
+void SwingState16_Enter(int nPlayer) {
+    s32* pHandle;
+    fn_800DED60();
+    pHandle = &gPlayers[nPlayer].nShotHandle;
+    fn_80095744(*pHandle, 11);
+    fn_80062BFC(*pHandle);
+    fn_80062BE8(*pHandle);
+    fn_8001C774(*pHandle, gPlayers[nPlayer].nClub);
+    fn_8001C724(*pHandle, gPlayers[nPlayer].nShotKind);
+    fn_8001C804(nPlayer, 1, 1);
+    gPlayers[nPlayer].uFlags |= 8;
+    gPlayers[nPlayer].fA64 = fn_800D0478(nPlayer);
+    fn_800E4204();
+    fn_80016CFC(gPlayers[nPlayer].nView0)[0x275] = 1;
+}
+
+// State 6: the putt preview. The caddie's solved shot is taken, the player is made a CPU for
+// one call so Swing_Launch fires it clean (no error, no luck swap), and the launched ball is
+// kept in ballBefore as nobody's ball - the ghost that draws the preview. Everything the
+// player had (shot block, ball, controller) is put back afterwards.
+void SwingState06_Enter(int nPlayer) {
+    u8    shotSaved[0x5C];
+    u8    ballSaved[0xBC];
+    u8*   pShot;
+    u8*   pBall;
+    s32*  pController;
+    int   nController;
+    int   nView;
+
+    nView = gPlayers[nPlayer].nView0;
+    View_SetCamera(fn_80017028(nView), 5, nPlayer, nView);
+    pShot = (u8*)&gPlayers[nPlayer].nClub;
+    fn_80005628(shotSaved, pShot, 0x5C);
+    Caddie_ApplyTip(nPlayer);
+    pBall = gPlayers[nPlayer].ball;
+    fn_80005628(ballSaved, pBall, 0xBC);
+    pController  = &gPlayers[nPlayer].nController;
+    nController  = *pController;
+    *pController = CONTROLLER_CPU;
+    Swing_Launch(nPlayer);
+    *pController = nController;
+    fn_80005628(gPlayers[nPlayer].ballBefore, pBall, 0xBC);
+    *(s32*)(gPlayers[nPlayer].ballBefore + 0x94) = -1;
+    fn_80005628(pBall, ballSaved, 0xBC);
+    fn_80005628(pShot, shotSaved, 0x5C);
+    fn_8006BF60(nPlayer);
+    fn_800E3D38(nPlayer, 0);
 }

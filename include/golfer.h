@@ -185,7 +185,8 @@ typedef struct Player {
     u8   unkA44[0xA54 - 0xA44];
     f32  fDistance;             // 0xA54  to the target
     f32  fDistance2;            // 0xA58
-    u8   unkA5C[0xA68 - 0xA5C];
+    u8   unkA5C[8];
+    f32  fA64;                  // 0xA64  a distance, set when a swing state 16 begins
     s32  nSurface;              // 0xA68  surface type under the target, -1 none, 16 water
     u8   unkA6C[0xA90 - 0xA6C];
     u8   ball[0x68];            // 0xA90  the player's Ball (0xBC bytes, see Ball.c) - nLie is its +0x68
