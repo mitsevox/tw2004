@@ -14,6 +14,23 @@ u8 Controller_IsCPU(int nController) {
     return nController == CONTROLLER_CPU;
 }
 
+// The hole index itself (Game_CurrentHole maps it through the hole order).
+int Game_CurHoleIndex(void) {
+    return gpGame->nCurHole;
+}
+
+// Empty in release: a hook after the CPU's target choice.
+void AI_OnTargetChosen(int nPlayer) {
+}
+
+// Empty in release.
+void fn_8002C8B4(void) {
+}
+
+void AI_TargetsHook(void) {
+    fn_8002C8B4();
+}
+
 int Game_CurrentHole(void) {
     return gpGame->holeOrder[gpGame->nCurHole];
 }
@@ -618,7 +635,6 @@ void AI_DefaultTarget(int nPlayer) {
     Vec_Copy(pTarget, p->vTarget2);
 }
 
-int  fn_8002BBA4(void);                 // gpGame->nCurHole
 void fn_80005628(void* pDst, void* pSrc, int nBytes);   // memcpy
 extern s8 gLuckOdds[8];                 // 0x802810B0  "1 in n" per player: 12 12 12 12
 u8   fn_80101D4C(int nPlayer);          // a CPU in game mode 11 is always lucky
@@ -693,7 +709,7 @@ void AI_SetShotModifiers(int nPlayer) {
         return;
     }
     nPar     = fn_800D2B08();
-    nHole    = fn_8002BBA4();
+    nHole    = Game_CurHoleIndex();
     nLevel   = p->nLevel;
     nStrokes = p->nStrokes[nHole];
     if (nLevel != 0) {
@@ -1222,14 +1238,13 @@ void Shot_FitTargetToClub(int nPlayer) {
 
 // ---- planning a shot ------------------------------------------------------------------------------
 
-void fn_8002B020(int nPlayer);          // empty in release: a debug hook after the CPU's target choice
 
 // Plan the next shot: a CPU sets its modifiers, everyone picks a target, Shot_Prepare fills in
 // the rest, the rehearsal is reset, and the luck roll decides whether this shot is perfect.
 void Shot_Plan(int nPlayer, u8 bNotify) {
     if (Player_IsCPU(nPlayer)) AI_SetShotModifiers(nPlayer);
     AI_ChooseTarget(nPlayer);
-    if (Player_IsCPU(nPlayer)) fn_8002B020(nPlayer);
+    if (Player_IsCPU(nPlayer)) AI_OnTargetChosen(nPlayer);
     Shot_Prepare(nPlayer, bNotify);
     gPlayers[nPlayer].nRehearseState = 2;
     gPlayers[nPlayer].bPerfect       = Golfer_IsLucky(nPlayer);
@@ -1741,8 +1756,7 @@ void fn_8002F180(void) {
     fn_800953C8(0);
 }
 
-void fn_8002C8B4(void) {
-}
+
 
 void fn_8002E258(void) {
 }
