@@ -1388,3 +1388,74 @@ void SwingState11_Exit(int nPlayer) {
         fn_80067074(nPlayer, 0x3B, 0, 1);
     }
 }
+
+
+s8    fn_8005D2A8(int nPlayer);               // the state below the top of the stack
+u8    fn_80063C50(void* pView);
+void  fn_80063CBC(void* pView, f32* pVec);
+void  fn_80045558(int a, int nPlayer);
+void  fn_8006C608(void);
+void  fn_80062CE0(int a);
+void  fn_800C1790(void* pView, int nPlayer);
+void  fn_80062DB8(void* pView, int a);
+void  fn_80062D38(int a, int b, int nPlayer);
+extern Vec4 lbl_80183670;
+extern u8   lbl_80281E11;
+
+// Neither button 2 nor button 3 held: keep polling.
+void SwingState05_Update(int nPlayer) {
+    s32* pController;
+    u32  uMask = fn_800142AC(2, 1);
+    pController = &gPlayers[nPlayer].nController;
+    if (!(fn_800136DC(*pController) & uMask)) {
+        uMask = fn_800142AC(3, 1);
+        if (!(fn_800136DC(*pController) & uMask)) {
+            fn_8005CFD4(nPlayer);
+        }
+    }
+}
+
+void SwingState17_Update(int nPlayer) {
+    Vec4 vOffset = lbl_80183670;
+    s32* pView   = &gPlayers[nPlayer].nView0;
+    if (fn_80063C50(fn_80017028(*pView))) {
+        fn_80063CBC(fn_80017028(*pView), (f32*)&vOffset);
+        SwingStack_Push(0x12, nPlayer);
+    }
+}
+
+void SwingState08_Exit(int nPlayer) {
+    int nView;
+    if (fn_8005D2A8(nPlayer) == 10) {
+        nView = gPlayers[nPlayer].nView0;
+        View_SetCamera(fn_80017028(nView), 0xC, nPlayer, nView);
+    } else {
+        nView = gPlayers[nPlayer].nView0;
+        View_SetCamera(fn_80017028(nView), 0, nPlayer, nView);
+    }
+}
+
+void SwingState12_Exit(int nPlayer) {
+    s32*  pView  = &gPlayers[nPlayer].nView0;
+    void* pViewObj = fn_80017028(*pView);
+    fn_80045558(0, nPlayer);
+    fn_80045494(0, nPlayer);
+    fn_8006C608();
+    fn_80062CE0(0);
+    Swing_RumbleOff(nPlayer);
+    fn_800C1790(fn_80017028(*pView), nPlayer);
+    fn_80062DB8(pViewObj, 0);
+}
+
+void SwingState03_Enter(int nPlayer) {
+    int nView;
+    if (gPlayers[nPlayer].nShotKind == SHOT_PUTT) {
+        nView = gPlayers[nPlayer].nView0;
+        View_SetCamera(fn_80017028(nView), 2, nPlayer, nView);
+    } else {
+        nView = gPlayers[nPlayer].nView0;
+        View_SetCamera(fn_80017028(nView), 1, nPlayer, nView);
+    }
+    fn_80062D38(0x62, 1, nPlayer);
+    lbl_80281E11 = 1;
+}
