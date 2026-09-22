@@ -15,6 +15,7 @@ typedef struct {
     u8    szInfo15[0x20];    // 0x15
     u8    szName35[0x1B];    // 0x35  name buffer handed to the device layer
     int   uSearchDirection;  // 0x50  passed to SFIONextDeviceFromMask
+    int   uExpected54;       // 0x54  compared with the close result
 } SFIOData;
 
 // Function table and data of the platform layer (llSharedFileIO.c). Only the entries used so far.
@@ -37,6 +38,8 @@ extern SFIOData* _SFIO_pData;
 extern void fn_801715B8(void* pParams, void* pDeviceData, void* pName);
 extern void fn_80171744(u8* pInfo14, u8* pInfo15, void* pDeviceData, void* pName);
 int SFIOStartSelectDevice(int eDevice, int* pProcess);
+int SFIOStartOp18(int* pHandle, int* pProcess);
+int SFIOStartOp19(int* pHandle, int* pProcess);
 int SFIONextDeviceFromMask(u16 uDeviceMask, int uDirection);
 extern SFIODeviceFuncs* _SFIO_pDevice;
 
@@ -160,7 +163,7 @@ int SFIOGetLastError(void) {
 }
 
 #line 535
-int SFIOStartOp18(void* pDescriptor, int* pProcess) {
+int SFIOStartOp18(int* pDescriptor, int* pProcess) {
     SFIO_ASSERT(NULL != pDescriptor);
     SFIO_ASSERT(NULL != pProcess);
     *pProcess = 1;
@@ -171,7 +174,7 @@ int SFIOStartOp18(void* pDescriptor, int* pProcess) {
 }
 
 #line 581
-int SFIOStartOp19(void* pDescriptor, int* pProcess) {
+int SFIOStartOp19(int* pDescriptor, int* pProcess) {
     SFIO_ASSERT(NULL != pDescriptor);
     SFIO_ASSERT(NULL != pProcess);
     *pProcess = 1;
@@ -474,6 +477,115 @@ int SFIOContinueSelect(int eError, int* pProcess, int* pResult) {
             *pProcess = 2;
             return eError;
         }
+        break;
+    default:
+        *pProcess = 2;
+        return 0x12;
+        break;
+    }
+    return 0;
+}
+
+// Continuation for the close / verify operations (states 8, 9, 0xA).
+int SFIOContinueClose(int eError, int* pProcess, int* pResult) {
+    if (pProcess == NULL) return 0x12;
+    if (pResult == NULL) return 0x12;
+    if (!(_SFIO_pData->eState == 8 || _SFIO_pData->eState == 0xA || _SFIO_pData->eState == 9)) return 0x12;
+    *pProcess = 1;
+    switch (_SFIO_pData->eOperation) {
+    case 0x1B:
+        if (eError == 0) {
+            *pProcess = 2;
+            return 0;
+        } else {
+            SFIOSetLastError(eError);
+            return SFIOStartOp18(&_SFIO_pData->uHandle, pProcess);
+        }
+        break;
+    case 0x1C:
+    case 0x1D:
+        if (eError == 0) {
+            if (_SFIO_pData->uExpected54 == *pResult) {
+                *pProcess = 2;
+                return 0;
+            } else {
+                *pProcess = 2;
+                return 0xA;
+            }
+        } else {
+            SFIOSetLastError(eError);
+            return SFIOStartOp18(&_SFIO_pData->uHandle, pProcess);
+        }
+        break;
+    default:
+        *pProcess = 2;
+        return 0x12;
+        break;
+    }
+    return 0;
+}
+
+// Continuation for the unmount sequence (state 7): op 0x18 -> 0x19 -> 0x1A.
+int SFIOContinueUnmount(int eError, int* pProcess, int* pResult) {
+    if (pProcess == NULL) return 0x12;
+    if (pResult == NULL) return 0x12;
+    if (!(_SFIO_pData->eState == 7)) return 0x12;
+    *pProcess = 1;
+    switch (_SFIO_pData->eOperation) {
+    case 0x18:
+        if (eError == 0) {
+            _SFIO_pData->eOperation = 0x19;
+            _SFIO_pDevice->pfnOp19(_SFIO_pData->uHandle);
+        } else {
+            SFIOSetLastError(eError);
+            return SFIOStartOp19(&_SFIO_pData->uHandle, pProcess);
+        }
+        break;
+    case 0x19:
+        if (eError == 0) {
+            _SFIO_pData->eOperation = 0x1A;
+            _SFIO_pDevice->pfnSelectDevice(_SFIO_pData->eDevice);
+        } else {
+            SFIOSetLastError(eError);
+            return SFIOStartSelectDevice(_SFIO_pData->eDevice, pProcess);
+        }
+        break;
+    case 0x1A:
+        if (eError == 0) {
+            *pProcess = 2;
+            return 0;
+        } else {
+            *pProcess = 2;
+            return eError;
+        }
+        break;
+    default:
+        *pProcess = 2;
+        return 0x12;
+        break;
+    }
+    return 0;
+}
+
+// Continuation after a failure while busy (states 0xB, 0xC, 0xD): unwind op 0x18 -> 0x19 -> 0x1A.
+int SFIOContinueAbort(int eError, int* pProcess, int* pResult) {
+    if (pProcess == NULL) return 0x12;
+    if (pResult == NULL) return 0x12;
+    if (!(_SFIO_pData->eState == SFIO_STATE_BUSY_A || _SFIO_pData->eState == SFIO_STATE_BUSY_B ||
+          _SFIO_pData->eState == SFIO_STATE_BUSY_C)) return 0x12;
+    *pProcess = 1;
+    switch (_SFIO_pData->eOperation) {
+    case 0x18:
+        _SFIO_pData->eOperation = 0x19;
+        _SFIO_pDevice->pfnOp19(_SFIO_pData->uHandle);
+        break;
+    case 0x19:
+        _SFIO_pData->eOperation = 0x1A;
+        _SFIO_pDevice->pfnSelectDevice(_SFIO_pData->eDevice);
+        break;
+    case 0x1A:
+        *pProcess = 2;
+        return SFIOGetLastError();
         break;
     default:
         *pProcess = 2;
