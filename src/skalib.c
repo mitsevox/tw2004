@@ -89,6 +89,8 @@ u32   fn_800227BC(void);                               // the current slot
 void  fn_80022828(void);
 int   fn_80023F7C(int nSlot);
 AnimLib* AnimLib_Load(u8* pData, ClipBank* pBank);
+u32   fn_8009EF90(void);
+int   strcmp(const char* pA, const char* pB);
 
 // A library that can be layered over a slot's own (0x20 bytes).
 typedef struct LibOverlay {
@@ -130,9 +132,57 @@ extern LoadedFile* lbl_801C6488[3];   // each slot's bank file, while it is in m
 extern LoadedFile* lbl_80281CE0;      // the buffer banks are brought back from ARAM into
 extern u8          lbl_80281CE4;
 extern u32         lbl_80281078;      // the current slot
+extern u32         lbl_80281D04[2];   // ARAM copy of each scratch area
+extern u32         lbl_80281D0C[2];   // its size
 
 
 extern char (*lbl_80281D14)[2][8][6][16];   // the last clip name played: [player][reaction kind][style][club]
+
+// The clip with this name (at +0xA0 in each clip), or NULL.
+void* AnimLib_FindByName(AnimLib* pLib, const char* pName) {
+    int i;
+    for (i = 0; i < pLib->nClips; i++) {
+        if (pLib->ppClips[i] != NULL && strcmp((char*)pLib->ppClips[i] + 0xA0, pName) == 0) return pLib->ppClips[i];
+    }
+    return NULL;
+}
+
+// The scratch area for slot n, uSize bytes: while only one of the first two slots has a bank,
+// it is carved out of that bank; otherwise it is the slot's own bank.
+static inline u8* Skalib_Scratch(int n, u32 uSize) {
+    if (lbl_801C6050[0] != NULL && lbl_801C6050[1] == NULL) return (u8*)lbl_801C6050[0] + n * uSize;
+    if (lbl_801C6050[0] == NULL && lbl_801C6050[1] != NULL) return (u8*)lbl_801C6050[1] + n * uSize;
+    return (u8*)lbl_801C6050[n];
+}
+
+// Copies slot n's scratch area to ARAM.
+u8* Skalib_ScratchToAram(int n) {
+    u32 uSize = fn_8009EF90();
+    u8* p;
+    if (lbl_801C6050[0] != NULL && lbl_801C6050[1] == NULL) {
+        p = (u8*)lbl_801C6050[0] + n * uSize;
+    } else if (lbl_801C6050[0] == NULL && lbl_801C6050[1] != NULL) {
+        p = (u8*)lbl_801C6050[1] + n * uSize;
+    } else {
+        p = (u8*)lbl_801C6050[n];
+    }
+    lbl_80281D0C[n] = uSize;
+    if (lbl_80281D04[n] == 0) lbl_80281D04[n] = fn_800B6564(lbl_80281D0C[n]);
+    fn_800B6844(p, lbl_80281D04[n], lbl_80281D0C[n]);
+    fn_800B67EC();
+    return p;
+}
+
+// Brings slot n's scratch area back from ARAM and frees the ARAM.
+void Skalib_ScratchFromAram(int n) {
+    u32 uSize = fn_8009EF90();
+    fn_800B68B4(Skalib_Scratch(n, uSize), lbl_80281D04[n], lbl_80281D0C[n]);
+    fn_800B67EC();
+    if (lbl_80281D04[n] != 0) {
+        fn_800B6594(lbl_80281D04[n]);
+        lbl_80281D04[n] = 0;
+    }
+}
 
 // Frees the working copies of every slot's libraries (only the current slot's while
 // lbl_80281CE4 is set).
@@ -325,7 +375,6 @@ u8 AnimLib_WasLastPlayed(int nPlayer, const char* pName, char** ppSlot, int nGro
 int   AnimLib_RandomIndex(u32 uUsed, int nCount);
 u8    fn_800C9828(int nGroup, int nStyle, int nClub, int nKey);
 void* fn_800CAA7C(int nPlayer, int nGroup, int nStyle, int nClub);
-void* fn_80021ADC(AnimLib* pLib, const char* pName);
 
 // The clip a player plays for a group and style. A named clip (lessons) is looked up by name.
 // Otherwise one of the leaf's clips at random, never the reaction played last time, and - through
@@ -375,7 +424,7 @@ void* AnimLib_Pick(int nPlayer, AnimLib* pLib, int nGroup, int nStyle, int nClub
                 }
                 return ppClips[nPick];
             }
-            return fn_80021ADC(pLib, pName);
+            return AnimLib_FindByName(pLib, pName);
         }
     }
     return NULL;
@@ -655,4 +704,18 @@ void ClipBank_FreeAram(void) {
         fn_80009E70(lbl_80281CE0);
         lbl_80281CE0 = NULL;
     }
+}
+
+int UStream_RegisterHandler(u32 uType, void (*pfn)(LoadedFile*));
+int UStream_UnregisterHandler(u32 uType);
+
+// Hooks the loaders up to the file streamer: 'SAL ' animation libraries and 'BNK ' clip banks.
+void Skalib_Register(void) {
+    UStream_RegisterHandler('SAL ', AnimLib_OnLoaded);
+    UStream_RegisterHandler('BNK ', ClipBank_OnLoaded);
+}
+
+void Skalib_Unregister(void) {
+    UStream_UnregisterHandler('SAL ');
+    UStream_UnregisterHandler('BNK ');
 }
