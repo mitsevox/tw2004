@@ -670,7 +670,7 @@ void SwingState02_Update(int nPlayer) {
 
 u8*  fn_80058EB8(int nPlayer, int nController);   // the pad's state: [1] main stick y, [3] C-stick y
 f32  fn_8005CB78(int nHandle, int a, int nMark);   // an animation mark's time
-void fn_8005BFC0(int nPlayer);
+void Swing_ResetBoostAndSpin(int nPlayer);
 void fn_8006C5E0(void);
 void Swing_ClearFrameFlag(int nPlayer);
 void fn_80067074(int nPlayer, int nSound, int a, int b);
@@ -699,7 +699,7 @@ void Swing_Begin(int nPlayer) {
     pSw->f604       = 0.0f;
     pSw->b60C       = 0;
     pSw->b60D       = 0;
-    fn_8005BFC0(nPlayer);
+    Swing_ResetBoostAndSpin(nPlayer);
     pSw->nSpinStickX = 128;
     pSw->nSpinStickY = 128;
     pSw->f628        = 0.0f;
@@ -1240,4 +1240,16 @@ void Swing_BoostInput(int nPlayer) {
             fn_800AE3C4(nPlayer);
         }
     }
+}
+
+
+void fn_8005A788(int nPlayer, int a);
+
+// At the start of a swing: no boost, no spin, no back-down timer.
+void Swing_ResetBoostAndSpin(int nPlayer) {
+    gPlayers[nPlayer].swing.nBoostLevel = 0;
+    gPlayers[nPlayer].swing.nSpinAmount = 0;
+    gPlayers[nPlayer].swing.fBackDown   = 0.0f;
+    fn_8005A788(nPlayer, 1);
+    fn_800AE3C4(nPlayer);
 }

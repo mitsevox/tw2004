@@ -65,6 +65,18 @@ along) **the top is the furthest-back sample in the ring** - not the last one - 
 animation starts, and the impact sample is seeded from that frame. A CPU plays the backswing
 to 98% of the way to the top (65% in lesson 5) and swings down.
 
+**Power** (`Swing_UpdatePower`, every backswing frame): a human's power is the **square root**
+of how far along the backswing is - half a backswing is 71% power - snapping to 100% within
+3% of the top (a CPU's is linear). **Holding at the top of a full backswing costs power**: on
+anything but a putt, `(hold - 0.05)^2` comes off, at most 0.3 - so a 0.6 s pause is -30%.
+`Swing_ComputePower` then applies boost, the error's cost and the tee bonus.
+
+**Power boost** (`Swing_BoostInput`, every backswing frame): with the boost option on, a boost
+button held while the stick is pulled past 93 of its range adds one level **per frame**, to a
+maximum of 8 - about an eighth of a second of holding at the top. Backing the stick down for
+1/12 s clears it. `Swing_ApplyPowerBoost` turns the level into power through the POWER BOOST
+attribute.
+
 **At the top (2).** The animation waggles +-0.0076 either side of the top while the stick is
 steady; any change in the stick's y drops back to phase 1. If the stick sits near centre
 (y at or below 160, x within 64..192) for over 0.1 s the swing is **abandoned**: the address
