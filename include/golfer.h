@@ -162,7 +162,7 @@ typedef struct Player {
     f32  vOrient[4];            // 0xB4C  a quaternion, identity at setup
     u8   unkB5C[0xC18 - 0xB5C];
     s32  nShotHandle;           // 0xC18
-    u8   unkC1C[4];
+    f32  fThinkTime;            // 0xC1C  seconds a CPU has spent in state 2
     f32  fC20;                  // 0xC20
     u8   unkC24[4];
     u8   unkC28;                // 0xC28
@@ -198,7 +198,7 @@ typedef struct Session {
     u8   unk11[2];
     u8   bNoSpin;               // 0x013  spin control switched off
     s32  unk14;                 // 0x014
-    f32  f18;                   // 0x018
+    f32  fFrameTime;            // 0x018  seconds per frame
     f32  f1C;                   // 0x01C
     s32  unk20;                 // 0x020
     s32  unk24;                 // 0x024
@@ -309,6 +309,7 @@ u8   Player_IsCPU(int nPlayer);
 u8   Controller_IsCPU(int nController);
 void AI_PlanShot(int nPlayer, f32* pTarget);
 u8   AI_GreenTowardPin(int nPlayer, f32 fDist);
+u8   AI_RehearseShot(int nPlayer, f32* pOutDist2, u8 bFast, f32 fTolerance);
 u8   Lie_AllowsFullSwing(int nPlayer);
 void Shot_FitTargetToClub(int nPlayer);
 int  Shot_Trajectory(int nPlayer);

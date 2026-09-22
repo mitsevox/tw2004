@@ -194,3 +194,12 @@ Dated log of what was done and decided, newest last. Facts and lessons belong in
   34-iteration one by 2, so a run of identical stores in the original is usually a loop in the
   source; and the session byte at +0x10 is the split-screen mode, which switches off luck and
   the caddie.
+- **Swing.c: the swing state machine found** - 27 states x (enter, update, exit) at
+  `gSwingStates`, a per-player stack (`SwingStack_Top/Clear`, exact), all 67 callbacks named
+  `SwingStateNN_*`. In C so far: `Swing_Launch` (the hit: replay reseed, lucky-shot swap, error,
+  power, face angle, `Ball_Launch`), `Swing_MeterError` (the stick-path error with a random +-15
+  wobble on both x samples), `Swing_FaceVector`/`Swing_CurveAngle`/`Swing_ShapeVector` (the
+  human draw/fade: the backswing's sideways angle through a response curve and a per-club range;
+  the driver's tee bonus is the same angle at 36..54 degrees), and `SwingState02_Update` (the
+  CPU's think time: 1..4 s of rehearsal, tolerance 1.8 in). Corrections: the "tempo" was the
+  backswing angle; `Ball_Launch`'s fourth argument is the trajectory.

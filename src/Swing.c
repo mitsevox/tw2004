@@ -597,3 +597,65 @@ void SwingStack_Clear(int nPlayer) {
 // Empty in release.
 void fn_8005CCA8(int nPlayer) {
 }
+
+
+// ---- state 2: thinking ----------------------------------------------------------------------------
+
+void* fn_80017028(int nView);                // the view
+u8    fn_800C7100(void* pView);              // its camera has settled
+u8    fn_800FA118(int a, int b);
+void  SwingStack_Push(int nState, int nPlayer);  // 0x8005D188
+void  AI_ApplyError(int nPlayer);            // Golfer.c
+
+#define CPU_TOLERANCE 0.0025f               // 0.05 yd squared: land within 1.8 in of the target
+
+// A human goes straight on to state 10 (setting up). A CPU rehearses its shot here, one frame
+// at a time, and moves on once the rehearsal has settled, at least a second has passed and the
+// camera has settled - or when its time is up: 4 s, 1.5 s for a tee shot and 3.5 s after in
+// modes 6 and 7, 3..4 s in mode 11. Out of time, the rehearsal is told to stop (best aim found,
+// or +25 and a fresh target), then the skill error goes on and it is state 10.
+void SwingState02_Update(int nPlayer) {
+    f32*    pTime;
+    void*   pView;
+    u8      bDone;
+    f32     fMax;
+    f32     fMin;
+
+    pView = fn_80017028(gPlayers[nPlayer].nView0);
+    if (!Player_IsCPU(nPlayer)) {
+        SwingStack_Push(10, nPlayer);
+        return;
+    }
+    if (Player_IsCPU(nPlayer)) {
+        gPlayers[nPlayer].fThinkTime += gSession.fFrameTime;
+        pTime = &gPlayers[nPlayer].fThinkTime;
+        bDone = AI_RehearseShot(nPlayer, NULL, 0, CPU_TOLERANCE);
+        fMin  = 1.0f;
+        switch (Game_GetMode()) {
+        case 6:
+        case 7:
+            if (fn_800FA118(0, 0)) return;
+            if (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] > 0) {
+                fMax = 3.5f;
+            } else {
+                fMax = 1.5f;
+            }
+            break;
+        case 11:
+            fMin = 3.0f;
+            fMax = 4.0f;
+            break;
+        default:
+            fMax = 4.0f;
+            break;
+        }
+        if ((bDone && *pTime > fMin && fn_800C7100(pView)) || *pTime > fMax) {
+            if (!bDone) {
+                gPlayers[nPlayer].nRehearseState = 3;
+                AI_RehearseShot(nPlayer, NULL, 0, CPU_TOLERANCE);
+            }
+            AI_ApplyError(nPlayer);
+            SwingStack_Push(10, nPlayer);
+        }
+    }
+}

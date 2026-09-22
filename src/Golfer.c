@@ -1879,7 +1879,7 @@ void Session_Init(void) {
     pSession->bNoSpin     = 0;
     pSession->unk14       = 0;
     pSession->uFlags     &= ~0x60;
-    pSession->f18         = 0.0f;
+    pSession->fFrameTime  = 0.0f;
     pSession->f1C         = 0.0f;
     pSession->unk20       = 0;
     pSession->unk24       = 0;

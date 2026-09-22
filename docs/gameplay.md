@@ -292,6 +292,15 @@ Each frame in state 1, after the step:
 State 3 is the caller's "enough": use the best aim found, or, if nothing ever landed, **+25 on
 the modifiers** and `AI_ChooseTarget` again from scratch.
 
+**The caller is swing state 2, "thinking"** (`SwingState02_Update`, in C). The CPU rehearses
+one frame at a time with the same tolerance as the caddie - **land within 1.8 inches** of the
+chosen point - and moves on once the rehearsal has settled, at least **1 second** has passed and
+the camera has settled; or when its time is up: **4 seconds**, 1.5 s for a tee shot and 3.5 s
+after it in modes 6 and 7, 3..4 s in mode 11. Four seconds is 240 frames x 0.2 s = 48 s of
+simulated ball time, enough for a few full rehearsals. Time up with no landing is what forces
+state 3. Then `AI_ApplyError` and on to state 10 like a human. So the CPU's "pause to think"
+before a shot is exactly its simulation running.
+
 So hypothesis 2 was right after all in its first half too: the CPU **does** solve its shot -
 not by inverting a formula, but by simulating it until it lands.
 
