@@ -1392,10 +1392,8 @@ extern u8   lbl_80281E11;
 
 // Neither button 2 nor button 3 held: keep polling.
 void SwingState05_Update(int nPlayer) {
-    u32  uMask = fn_800142AC(2, 1);
-    if (!(fn_800136DC(gPlayers[nPlayer].nController) & uMask)) {
-        uMask = fn_800142AC(3, 1);
-        if (!(fn_800136DC(gPlayers[nPlayer].nController) & uMask)) {
+    if (!(fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(2, 1))) {
+        if (!(fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(3, 1))) {
             fn_8005CFD4(nPlayer);
         }
     }
@@ -1979,31 +1977,25 @@ void  fn_80068AC8(int nPlayer);
 // State 8: a free camera while button 19 is held (release pops the state). Buttons 11/12 and
 // 13/14 play the four pan sounds; button 4 switches between two camera modes.
 void SwingState08_Update(int nPlayer) {
-    u32  uMask = fn_800142AC(0x13, 1);
-    if (!(fn_800136DC(gPlayers[nPlayer].nController) & uMask)) {
+    if (!(fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x13, 1))) {
         fn_8005CFD4(nPlayer);
     } else {
-        uMask = fn_800142AC(0xB, 1);
-        if (fn_800136DC(gPlayers[nPlayer].nController) & uMask) {
+        if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0xB, 1)) {
             fn_80067074(nPlayer, 0x12, 0, -1);
         } else {
-            uMask = fn_800142AC(0xC, 1);
-            if (fn_800136DC(gPlayers[nPlayer].nController) & uMask) {
+            if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0xC, 1)) {
                 fn_80067074(nPlayer, 0x13, 0, -1);
             }
         }
-        uMask = fn_800142AC(0xD, 1);
-        if (fn_800136DC(gPlayers[nPlayer].nController) & uMask) {
+        if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0xD, 1)) {
             fn_80067074(nPlayer, 0x14, 0, -1);
         } else {
-            uMask = fn_800142AC(0xE, 1);
-            if (fn_800136DC(gPlayers[nPlayer].nController) & uMask) {
+            if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0xE, 1)) {
                 fn_80067074(nPlayer, 0x15, 0, -1);
             }
         }
     }
-    uMask = fn_800142AC(4, 1);
-    if (fn_800136DC(gPlayers[nPlayer].nController) & uMask) {
+    if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(4, 1)) {
         fn_800C6010(fn_80017028(gPlayers[nPlayer].nView0), nPlayer);
     } else {
         fn_800C60E8(fn_80017028(gPlayers[nPlayer].nView0), nPlayer);
@@ -2026,36 +2018,28 @@ f32   fn_800D04AC(int nPlayer);
 // State 4: an aiming camera held while button 7 is down (the caddie keeps updating). Buttons
 // 9/10 and 11..14 play the pan sounds.
 void SwingState04_Update(int nPlayer) {
-    u32  uMask;
     Caddie_Update(nPlayer);
-    uMask       = fn_800142AC(7, 1);
-    if (!(fn_800136DC(gPlayers[nPlayer].nController) & uMask)) {
+    if (!(fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(7, 1))) {
         fn_8005CFD4(nPlayer);
     } else {
-        uMask = fn_800142AC(9, 0);
-        if (fn_800136DC(gPlayers[nPlayer].nController) & uMask) {
+        if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(9, 0)) {
             fn_80067074(nPlayer, 0xD, 0, -1);
         } else {
-            uMask = fn_800142AC(0xA, 0);
-            if (fn_800136DC(gPlayers[nPlayer].nController) & uMask) {
+            if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0xA, 0)) {
                 fn_80067074(nPlayer, 0xE, 0, -1);
             }
         }
-        uMask = fn_800142AC(0xB, 1);
-        if (fn_800136DC(gPlayers[nPlayer].nController) & uMask) {
+        if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0xB, 1)) {
             fn_80067074(nPlayer, 0x12, 0, -1);
         } else {
-            uMask = fn_800142AC(0xC, 1);
-            if (fn_800136DC(gPlayers[nPlayer].nController) & uMask) {
+            if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0xC, 1)) {
                 fn_80067074(nPlayer, 0x13, 0, -1);
             }
         }
-        uMask = fn_800142AC(0xD, 1);
-        if (fn_800136DC(gPlayers[nPlayer].nController) & uMask) {
+        if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0xD, 1)) {
             fn_80067074(nPlayer, 0x14, 0, -1);
         } else {
-            uMask = fn_800142AC(0xE, 1);
-            if (fn_800136DC(gPlayers[nPlayer].nController) & uMask) {
+            if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0xE, 1)) {
                 fn_80067074(nPlayer, 0x15, 0, -1);
             }
         }
@@ -2222,10 +2206,8 @@ void  fn_800694A0(int nPlayer, f32 f);
 // button 6 re-plans: the game's 0x264 callback (with gpGame+0x284) or a putt aims at the pin,
 // anything else re-chooses a target; then Shot_Prepare, the break line, animation 5.
 void SwingState09_Update(int nPlayer) {
-    u32  uMask = fn_800142AC(0x2E, 1);
-    if (!(fn_800136DC(gPlayers[nPlayer].nController) & uMask)) {
-        uMask = fn_800142AC(0x30, 1);
-        if (!(fn_800136DC(gPlayers[nPlayer].nController) & uMask)) {
+    if (!(fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x2E, 1))) {
+        if (!(fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x30, 1))) {
             if (1.0f == ((View*)fn_80017028(gPlayers[nPlayer].nView0))->f54) {
                 fn_8005CFD4(nPlayer);
                 return;
@@ -2236,8 +2218,7 @@ void SwingState09_Update(int nPlayer) {
     if (gSession.bReplay != 0) return;
     if (gPlayers[nPlayer].swing.nPhase != 0) return;
     Caddie_Update(nPlayer);
-    uMask = fn_800142AC(6, 0);
-    if (fn_800136DC(gPlayers[nPlayer].nController) & uMask) {
+    if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(6, 0)) {
         if (gpGame->b284 != 0) {
             if (gpGame->pfn264(nPlayer)) {
                 AI_DefaultTarget(nPlayer);
@@ -2267,8 +2248,7 @@ void SwingState09_Update(int nPlayer) {
 // position follows it, and the swing (state 1) begins. Otherwise the cursor moves, buttons
 // 26..29 play the pan sounds, and button 25 off the tee (if allowed) re-does the setup.
 void SwingState22_Update(int nPlayer) {
-    u32  uMask = fn_800142AC(0x23, 0);
-    if (fn_800136DC(gPlayers[nPlayer].nController) & uMask) {
+    if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x23, 0)) {
         Player* p = &gPlayers[nPlayer];
         if (p->uFlagsEF0 & 1) {
             u8* pBall = p->ball;
@@ -2282,26 +2262,21 @@ void SwingState22_Update(int nPlayer) {
         }
     } else {
         fn_800EDAE0(nPlayer);
-        uMask = fn_800142AC(0x1A, 1);
-        if (fn_800136DC(gPlayers[nPlayer].nController) & uMask) {
+        if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x1A, 1)) {
             fn_80067074(nPlayer, 0x16, 0, -1);
         } else {
-            uMask = fn_800142AC(0x1B, 1);
-            if (fn_800136DC(gPlayers[nPlayer].nController) & uMask) {
+            if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x1B, 1)) {
                 fn_80067074(nPlayer, 0x17, 0, -1);
             }
         }
-        uMask = fn_800142AC(0x1C, 1);
-        if (fn_800136DC(gPlayers[nPlayer].nController) & uMask) {
+        if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x1C, 1)) {
             fn_80067074(nPlayer, 0x18, 0, -1);
         } else {
-            uMask = fn_800142AC(0x1D, 1);
-            if (fn_800136DC(gPlayers[nPlayer].nController) & uMask) {
+            if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x1D, 1)) {
                 fn_80067074(nPlayer, 0x19, 0, -1);
             }
         }
-        uMask = fn_800142AC(0x19, 0);
-        if ((fn_800136DC(gPlayers[nPlayer].nController) & uMask) && gPlayers[nPlayer].nLie != 0 && fn_800DDDC8(nPlayer)) {
+        if ((fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x19, 0)) && gPlayers[nPlayer].nLie != 0 && fn_800DDDC8(nPlayer)) {
             fn_8001D8DC(nPlayer);
             fn_800689D4(nPlayer);
         }
@@ -2367,7 +2342,6 @@ extern Vec4 lbl_80183600;
 void SwingState06_Update(int nPlayer) {
     Vec4        vOffset = lbl_80183600;
     CourseInfo* pCourse = fn_8000C594();
-    u32         uMask;
     int         nSteps, i;
     Player*     p;
     u8*         pGhost;
@@ -2377,8 +2351,7 @@ void SwingState06_Update(int nPlayer) {
 
     Caddie_Update(nPlayer);
     if (!Player_IsCPU(nPlayer)) {
-        uMask = fn_800142AC(0, 0);
-        if (fn_800136DC(gPlayers[nPlayer].nController) & uMask) {
+        if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0, 0)) {
             fn_8005CFD4(nPlayer);
             return;
         }
@@ -2757,7 +2730,6 @@ void SwingState12_Update(int nPlayer) {
     View* pV;
     u8    bA = 0;
     u8    bB = 0;
-    u32   uMask;
 
     pV = (View*)fn_80017028(gPlayers[nPlayer].nView0);
     if (fn_800C6D9C()) return;
@@ -2795,12 +2767,10 @@ void SwingState12_Update(int nPlayer) {
                 bB = 1;
             }
         } else {
-            uMask       = fn_800142AC(0x16, 1);
-            if (fn_800136DC(gPlayers[nPlayer].nController) & uMask) {
+            if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x16, 1)) {
                 bA = 1;
             } else {
-                uMask = fn_800142AC(0x17, 1);
-                if (fn_800136DC(gPlayers[nPlayer].nController) & uMask) {
+                if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x17, 1)) {
                     bB = 1;
                 }
             }
@@ -2814,8 +2784,7 @@ void SwingState12_Update(int nPlayer) {
     if (fn_800E430C(nPlayer)) return;
     if (fn_80100294()) return;
     if (gReplayData[0xF10] != 0 && gpGame->b287 != 0) {
-        uMask = fn_800142AC(0x18, 0);
-        if ((fn_800136DC(gPlayers[nPlayer].nController) & uMask) && !(gPlayers[nPlayer].uFlags & 8) &&
+        if ((fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x18, 0)) && !(gPlayers[nPlayer].uFlags & 8) &&
             (s8)SwingStack_Top(nPlayer) != 0x17 && !fn_800E53B8() &&
             !(*(u32*)(gPlayers[nPlayer].nShotHandle + 0x10) & 0x40)) {
             s32* pKeptState = (s32*)(gPlayers[nPlayer].ballBefore + 0x64);
@@ -2827,8 +2796,7 @@ void SwingState12_Update(int nPlayer) {
             return;
         }
     }
-    uMask = fn_800142AC(0x19, 0);
-    if ((fn_800136DC(gPlayers[nPlayer].nController) & uMask) && !(gPlayers[nPlayer].uFlags & 8) && fn_800DDDC8(nPlayer)) {
+    if ((fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x19, 0)) && !(gPlayers[nPlayer].uFlags & 8) && fn_800DDDC8(nPlayer)) {
         fn_8006C4A0();
         if (fn_800C6D28()) fn_800C6DE4();
         if (fn_800C6D64()) fn_800C6DFC();
@@ -2956,7 +2924,6 @@ void SwingState10_Enter(int nPlayer) {
 void SwingState10_Update(int nPlayer) {
     int   nClub = gPlayers[nPlayer].nClub;
     u8    bSwung;
-    u32   uMask;
 
     if (fn_800E5098()) return;
     bSwung = fn_80058F5C(nPlayer);
@@ -3001,8 +2968,7 @@ void SwingState10_Update(int nPlayer) {
     if (gSession.bReplay != 0) return;
     if (gPlayers[nPlayer].swing.nPhase != 0) return;
     Caddie_Update(nPlayer);
-    uMask = fn_800142AC(6, 0);
-    if (fn_800136DC(gPlayers[nPlayer].nController) & uMask) {
+    if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(6, 0)) {
         if (gpGame->b284 != 0) {
             if (gpGame->pfn264(nPlayer)) {
                 AI_DefaultTarget(nPlayer);
@@ -3030,8 +2996,7 @@ void SwingState10_Update(int nPlayer) {
         }
         gpGame->pfn22C(nPlayer);
     } else {
-        uMask = fn_800142AC(5, 0);
-        if ((fn_800136DC(gPlayers[nPlayer].nController) & uMask) && gPlayers[nPlayer].nShotKind == SHOT_PUTT) {
+        if ((fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(5, 0)) && gPlayers[nPlayer].nShotKind == SHOT_PUTT) {
             fn_8005CF4C(7, nPlayer);
         } else {
             fn_800DEE4C(nPlayer);
@@ -3063,7 +3028,6 @@ extern Vec4 lbl_80183620;
 void SwingState14_Update(int nPlayer) {
     View* pV    = (View*)fn_80017028(gPlayers[nPlayer].nView0);
     Vec4  vOffset;
-    u32   uMask;
 
     if (lbl_80281E13 != 0) {
         fn_800C7158(pV, fn_800DE180(nPlayer));
@@ -3094,8 +3058,8 @@ void SwingState14_Update(int nPlayer) {
         }
         if (fn_80063C90(pV)) return;
         if (!fn_800C6604(pV) && fn_80095780(gPlayers[nPlayer].nShotHandle) == 9) {
-            if (fn_80062C28(gPlayers[nPlayer].nShotHandle) >= *(f32*)(lbl_80281F78 + 0x170) * 0.5f) {
-                if (pV->f11C <= 1.0f) return;
+            if (!(fn_80062C28(gPlayers[nPlayer].nShotHandle) >= *(f32*)(lbl_80281F78 + 0x170) / 2.0f || pV->f11C > 1.0f)) {
+                return;
             }
         }
         fn_80062B78(nPlayer);
@@ -3110,16 +3074,14 @@ void SwingState14_Update(int nPlayer) {
     }
     if (!Player_IsCPU(nPlayer) && gSession.nSplitScreen == 0) {
         if (gSession.bReplay == 0) {
-            uMask = fn_800142AC(0x19, 0);
-            if (fn_800136DC(gPlayers[nPlayer].nController) & uMask) {
+            if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x19, 0)) {
                 if (!fn_800DDDC8(nPlayer)) return;
                 fn_80062D0C(nPlayer);
                 return;
             }
         }
         if (gReplayData[0xF10] != 0) {
-            uMask = fn_800142AC(0x18, 0);
-            if ((fn_800136DC(gPlayers[nPlayer].nController) & uMask) && gpGame->b287 != 0 &&
+            if ((fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x18, 0)) && gpGame->b287 != 0 &&
                 !(gPlayers[nPlayer].uFlags & 8) && (s8)SwingStack_Top(nPlayer) != 0x17 && !fn_800E53B8() &&
                 !(*(u32*)(gPlayers[nPlayer].nShotHandle + 0x10) & 0x40)) {
                 lbl_80281E10 = 1;
@@ -3129,13 +3091,11 @@ void SwingState14_Update(int nPlayer) {
                 return;
             }
         }
-        uMask = fn_800142AC(0, 0);
-        if (fn_800136DC(gPlayers[nPlayer].nController) & uMask) {
+        if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0, 0)) {
             fn_800E41D4(nPlayer);
         }
     } else if (!Player_IsCPU(nPlayer)) {
-        uMask = fn_800142AC(0, 0);
-        if (fn_800136DC(gPlayers[nPlayer].nController) & uMask) {
+        if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0, 0)) {
             fn_800E41D4(nPlayer);
         }
     } else {

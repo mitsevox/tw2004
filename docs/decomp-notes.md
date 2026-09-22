@@ -130,7 +130,13 @@ Reading compiler output
   `fn_80062BB0`, `fn_80062B98`) take the 64-bit event id that `fn_8000BEE4` hashes.
 - **[verified] `(fn() & uMask)` operand order.** `and. r0, r3, rM` (call result first) comes from
   the mask call inline: `if (fn_800136DC(x) & fn_800142AC(k, m))`. A `uMask` local assigned
-  first gives `and. r0, rM, r3`. Still to apply in States 04/05/08/09/10/14.
+  first gives `and. r0, rM, r3`, and swapping the operands in the source changes nothing. Applied
+  to every single-use mask in Swing.c (States 04/05/08/09/10 exact, 06/12/14/22 closer).
+- **[verified] `x / 2.0f` becomes `x * 0.5f`** with the constant loaded first (`lfs f0, 0.5;
+  lfs f2, x`). Writing `x * 0.5f` loads them the other way round. (SwingState14_Update.)
+- **[verified] `!(a >= b || c > d)` vs `a < b && c <= d`.** The original's float compares follow
+  the source's operator: `>=` gives `cror eq,gt,eq; beq`, `<` gives `bge`, `> d` taken-branch-away
+  gives a bare `ble`, `<= d` gives `cror eq,lt,eq`. Match the operator, not just the logic.
 - **[verified] Chained assignment stores backwards.** `a[0] = a[1] = a[2] = 0` stores 2, 1, 0;
   the original wrote four statements in order.
 - **[verified] A hoisted constant is a local.** `x * (1.0f / 128.0f)` with the constant loaded
