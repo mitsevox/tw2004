@@ -50,8 +50,8 @@ The SDK starts earlier than first thought: `VIWaitForRetrace` is at `0x8012F314`
 Leaked source file names
 ------------------------
 
-Found in assert strings. Each assert sits inside a function, so each name is pinned to a real
-address (not yet mapped). Meanings of the prefixes are guesses.
+Found in assert strings. **All 94 are now pinned to addresses in [`filemap.md`](filemap.md)**, in
+link order. Meanings of the prefixes are guesses.
 
 | Prefix | Guess | Files |
 |--------|-------|-------|
@@ -69,8 +69,8 @@ address (not yet mapped). Meanings of the prefixes are guesses.
 Camera and visibility code (`0x80007BC4` - `0x800083A4`, fully matched)
 --------------------------------------------------------
 
-Probably `GoCamera.c` or `GoViewport.c` (guess; both names are in the binary). Types are in
-`include/unsorted/cull.h`.
+File unknown. It is **not** `GoCamera.c` (that is at `0x80076408`, see `filemap.md`); it sits
+between `LLObj_Gc.c` and `GoEntry.c`. Types are in `include/unsorted/cull.h`.
 
 | Address | Name | What it does | Status |
 |---------|------|--------------|--------|
@@ -180,9 +180,7 @@ Leads and loose ends
 Suggested next steps
 --------------------
 
-1. **Map the leaked file names to addresses.** Each assert string is referenced from inside a
-   function; tracing them pins ~92 real EA file names to places in the binary and would show
-   whether the camera block is really `GoCamera.c` or `GoViewport.c`.
+1. ~~Map the leaked file names to addresses.~~ Done: `docs/filemap.md`.
 2. **Follow the named SDK calls into EA code.** Callers of `PADRead` lead to input and the swing
    (`YhSwing.c`); callers of `CARD*` to saves (`MC_Gc.c`); callers of `DVD*` to file loading and
    the asset formats.
