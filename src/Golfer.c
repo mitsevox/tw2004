@@ -334,9 +334,8 @@ void AI_ApplyError(int nPlayer) {
         fDistErr  = fDist1 * (fMiss * fRand) / 100.0f;
         fRand     = Rand_Float(0);
         fDistErr += fDist2 * (fMiss * fRand) / 100.0f;
-        if (p->nShotKind != SHOT_FULL || fn_800D2B08() == 3) {
-            if (Rand_Next(0) & 1) fDistErr *= -1.0f;
-        } else {
+        // (A full swing outside lesson 3 always comes up short; otherwise a coin flip.)
+        if ((p->nShotKind == SHOT_FULL && fn_800D2B08() != 3) || (Rand_Next(0) & 1)) {
             fDistErr *= -1.0f;
         }
         p->fDistance = p->fDistance * ((100.0f + fDistErr) / 100.0f);
@@ -349,7 +348,7 @@ void AI_ApplyError(int nPlayer) {
 
         // Spin in proportion to the error, scaled by the SPIN attribute. (Both clamps store +1.)
         if ((s8)nSpin != 0 && fn_80101DF4()) {
-            f32 fScale = fn_8005C418(nSpin);
+            f32 fScale = Swing_SpinScale(nSpin);
             p->swing.fSpinX  = fDistErr / fDist1;
             p->swing.fSpinX *= fScale;
             p->swing.fSpinY  = fAimErr / fMaxAngle;
@@ -558,8 +557,8 @@ s8 AI_NearestTarget(f32* pPos, f32* pOut) {
     s8  nBest = -1;
     for (i = 0; i < gNumAITargets; i++) {
         if (gAITargets[i].pDef != NULL) {
-            f32 fDZ = pPos[2] - gAITargets[i].pDef->z;
             f32 fDX = pPos[0] - gAITargets[i].pDef->x;
+            f32 fDZ = pPos[2] - gAITargets[i].pDef->z;
             f32 fD2 = fDX * fDX + fDZ * fDZ;
             if (fD2 < fBest) {
                 fBest = fD2;
@@ -791,7 +790,8 @@ u8 AI_RehearseShot(int nPlayer, f32* pOutDist2, u8 bFast, f32 fTolerance);   // 
 void Caddie_Start(int nPlayer) {
     if (!gPlayers[nPlayer].bPerfect && gPlayers[nPlayer].nShotKind != SHOT_PUTT) return;
     if (Player_IsCPU(nPlayer)) return;
-    if (gSession.nSplitScreen == 0) {
+    switch ((u32)gSession.nSplitScreen) {   // a switch, not an if: the original branches over a branch
+    case 0:
         fn_80005628(&gPlayers[CADDIE_SLOT], &gPlayers[nPlayer], sizeof(Player));
         gPlayers[CADDIE_SLOT].nController = CONTROLLER_CPU;
         AI_DefaultTarget(CADDIE_SLOT);
@@ -799,13 +799,15 @@ void Caddie_Start(int nPlayer) {
         gPlayers[CADDIE_SLOT].nRehearseState = 2;
         gCaddieActive = 1;
         gCaddieFrames = 0;
+        break;
     }
 }
 
 void Caddie_Update(int nPlayer) {
     if (!gPlayers[nPlayer].bPerfect && gPlayers[nPlayer].nShotKind != SHOT_PUTT) return;
     if (Player_IsCPU(nPlayer)) return;
-    if (gSession.nSplitScreen == 0) {
+    switch ((u32)gSession.nSplitScreen) {   // a switch, not an if: the original branches over a branch
+    case 0:
         if (!gCaddieActive) return;
         if (gPlayers[nPlayer].bPerfect) {
             f32 fDist2;
@@ -816,17 +818,24 @@ void Caddie_Update(int nPlayer) {
             if (AI_RehearseShot(CADDIE_SLOT, NULL, 0, CADDIE_TOLERANCE)) gCaddieDone = 1;
         }
         gCaddieFrames++;
+        break;
     }
 }
 
 // 0 = no tip for this shot, 1 = tip ready (the aim point in pOut), 2 = gave up.
 int Caddie_GetTip(int nPlayer, f32* pOut) {
     if (gPlayers[nPlayer].nShotKind != SHOT_PUTT || Player_IsCPU(nPlayer) || gSession.nSplitScreen) {
-        pOut[0] = pOut[1] = pOut[2] = pOut[3] = 0.0f;
+        pOut[0] = 0.0f;
+        pOut[1] = 0.0f;
+        pOut[2] = 0.0f;
+        pOut[3] = 0.0f;
         return 0;
     }
     if (gCaddieFrames > CADDIE_MAX_FRAMES) {
-        pOut[0] = pOut[1] = pOut[2] = pOut[3] = 0.0f;
+        pOut[0] = 0.0f;
+        pOut[1] = 0.0f;
+        pOut[2] = 0.0f;
+        pOut[3] = 0.0f;
         gCaddieDone = 1;
         return 2;
     }
@@ -901,7 +910,8 @@ void Shot_Prepare(int nPlayer, u8 bNotify) {
     fDist = p->fDistance;
     if (Player_IsCPU(nPlayer)) {
         p->nClub = AI_ClubForShot(nPlayer, p->nShotKind, 1, fDist);
-        if (fRise >= -30.0f && fRise < 30.0f) {
+        if (fRise < -30.0f) {
+        } else if (fRise < 30.0f) {
             AI_ClubLonger(nPlayer, &p->nClub, 1);
         }
     } else {
@@ -1197,7 +1207,8 @@ void AI_FaceVector(int nPlayer, f32* pOut) {
 
 // The second launch block: a CPU's shaped clubface, a human's square one.
 void Shot_FaceVector(int nPlayer, f32* pOut) {
-    if (Controller_IsCPU(gPlayers[nPlayer].nController)) {
+    Player* p = &gPlayers[nPlayer];
+    if (Controller_IsCPU(p->nController)) {
         AI_FaceVector(nPlayer, pOut);
     } else {
         pOut[0] = 0.0f;
@@ -1287,6 +1298,7 @@ void AI_TargetsLoad(u8* pChunk) {
     }
     pReq = (s8*)pDef;
     for (i = 0; i < *(s16*)(pChunk + 2); i++, pReq += 8) {
+        gAITargets[i].bEnabled  = 1;
         gAITargets[i].nTeeSet   = pReq[0];
         gAITargets[i].nHole     = pReq[1];
         gAITargets[i].nSkillReq = pReq[2];
@@ -1294,7 +1306,6 @@ void AI_TargetsLoad(u8* pChunk) {
         gAITargets[i].bPriority = pReq[4];
         gAITargets[i].nType     = pReq[5];
         gAITargets[i].nPowerReq = pReq[6];
-        gAITargets[i].bEnabled  = 1;
     }
     gAITargetsLoaded = 1;
 }
@@ -1452,7 +1463,7 @@ u8 Player_IsHoled(int nPlayer) {
 }
 
 u8 Player_IsHoledNotState23(int nPlayer) {
-    u8 bResult = 0;
+    int bResult = 0;
     if (gPlayers[nPlayer].nLie == LIE_HOLED && (s8)SwingStack_Top(nPlayer) != 0x17) {
         bResult = 1;
     }

@@ -73,8 +73,9 @@ f32 Swing_SpinScale(int nSpin) {
 // Add the power boost: the pressed level's step times a per-point scale from POWER BOOST
 // (0.005 at 0, 0.010 at 100). Base value only - equipment counts, modifiers do not.
 f32 Swing_ApplyPowerBoost(int nPlayer, f32 fPower) {
-    int nBoost = (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_POWER_BOOST, ATTR_BASE);
+    int nAttr  = Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_POWER_BOOST, ATTR_BASE);
     int nLevel = gPlayers[nPlayer].swing.nBoostLevel;
+    s8  nBoost = nAttr;
     if (nLevel > 0) {
         f32 fScale = TABLE_AT(ROW_BOOST, nBoost);
         f32 fAdd   = fScale * (f32)gBoostSteps[nLevel - 1];
@@ -88,6 +89,7 @@ f32 Swing_ApplyPowerBoost(int nPlayer, f32 fPower) {
 // for (0..20, over 20) times the SPIN scale (0.15 at 0, 0.6 at 100, 1.0 at 110).
 void Swing_ApplySpin(int nPlayer) {
     SwingData* pSw = &gPlayers[nPlayer].swing;
+    f32        fInv = 1.0f / 128.0f;
     int        nSpin;
     f32        fScale;
     if (gSession.bReplay) return;
@@ -98,8 +100,8 @@ void Swing_ApplySpin(int nPlayer) {
     }
     nSpin       = Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_SPIN, ATTR_TOTAL);
     {
-        f32 fX = (f32)(pSw->nSpinStickX - 128) * (1.0f / 128.0f);
-        f32 fY = (f32)(pSw->nSpinStickY - 128) * (1.0f / 128.0f);
+        f32 fX = (f32)(pSw->nSpinStickX - 128) * fInv;
+        f32 fY = (f32)(pSw->nSpinStickY - 128) * fInv;
         pSw->fSpinY = fX * (f32)pSw->nSpinAmount / 20.0f;
         pSw->fSpinX = fY * (f32)pSw->nSpinAmount / 20.0f;
     }
@@ -116,8 +118,10 @@ f32 Swing_TeeSweetSpot(int nPlayer, f32 fPower) {
     if (p->nLie == 0 && p->nClub == 0 && p->swing.fBackAngle < 0.0f) {
         fT = -p->swing.fBackAngle / 1.5707964f;
         if (fT > gpSwing->fKnot1X && fT < gpSwing->fKnot2X) {
-            fHalf = (gpSwing->fKnot2X - gpSwing->fKnot1X) * 0.5f;
-            return fPower + (1.0f - (f32)fn_8000AE94(fHalf - (fT - gpSwing->fKnot1X)) / fHalf) * gpSwing->fTeeBonus;
+            f32 fBonus;
+            fHalf  = 0.5f * (gpSwing->fKnot2X - gpSwing->fKnot1X);
+            fBonus = (1.0f - (f32)fn_8000AE94(fHalf - (fT - gpSwing->fKnot1X)) / fHalf) * gpSwing->fTeeBonus;
+            return fPower + fBonus;
         }
     }
     return fPower;
@@ -669,7 +673,7 @@ void SwingState02_Update(int nPlayer) {
 // ---- starting the swing ---------------------------------------------------------------------------
 
 u8*  fn_80058EB8(int nPlayer, int nController);   // the pad's state: [1] main stick y, [3] C-stick y
-f32  fn_8005CB78(int nHandle, int a, int nMark);   // an animation mark's time
+f32  fn_8005CB78(int nHandle, unsigned long long uEvent);   // an animation event's time (64-bit id: r5:r6)
 void Swing_ResetBoostAndSpin(int nPlayer);
 void fn_8006C5E0(void);
 void Swing_ClearFrameFlag(int nPlayer);
@@ -688,9 +692,9 @@ void Swing_Begin(int nPlayer) {
     fn_80096690(nHandle);
     pSw->f10 = 0.0f;
     pSw->f14 = 0.0f;
-    pSw->fMark0 = fn_8005CB78(nHandle, 0, 0);
-    pSw->fMark1 = fn_8005CB78(nHandle, 0, 1);
-    pSw->fMark2 = fn_8005CB78(nHandle, 0, 2);
+    pSw->fMark0 = fn_8005CB78(nHandle, 0);
+    pSw->fMark1 = fn_8005CB78(nHandle, 1);
+    pSw->fMark2 = fn_8005CB78(nHandle, 2);
     for (i = 0; i < 25; i++) {
         pSw->nHistX[i] = pSw->nCentreX;
         pSw->nHistY[i] = pSw->nCentreY;
@@ -759,7 +763,7 @@ typedef struct ShotObj {
     u8*   pView;                // 0x038  -> +0x38 -> a struct with +0x10E4
     u8    unk3C[0x164 - 0x3C];
     u8    anim[4];              // 0x164  the animation: +0x14 is its playback rate
-    u32   uFlags;               // 0x168  bit 0x40: the backswing is being backed down
+    s32   uFlags;               // 0x168  bit 0x40: the backswing is being backed down (signed: the original tests it with cmpwi)
     u8    unk16C[0x17C - 0x16C];
     f32   fAnimTime;            // 0x17C
     u8    unk180[0x5CC - 0x180];
@@ -1293,9 +1297,8 @@ void SwingState22_Exit(int nPlayer) {
 }
 
 void SwingState10_Exit(int nPlayer) {
-    u8* pFlag = &gPlayers[nPlayer].swing.unk630;
-    if (*pFlag != 0) {
-        *pFlag = 0;
+    if (gPlayers[nPlayer].swing.unk630 != 0) {
+        gPlayers[nPlayer].swing.unk630 = 0;
     }
 }
 
@@ -1669,18 +1672,18 @@ void SwingState09_Exit(int nPlayer) {
 // Each of the player's two views goes back to its saved camera, unless an earlier view of the
 // player's is the same view.
 void SwingState21_Exit(int nPlayer) {
-    s32*  pViews = &gPlayers[nPlayer].nView0;
     View* pV;
     int   k, j;
     u8    bShared;
+    int   nView;
     for (k = 0; k < 2; k++) {
-        pV      = (View*)fn_80017028(pViews[k]);
+        pV      = (View*)fn_80017028((&gPlayers[nPlayer].nView0)[k]);
         bShared = 0;
         for (j = 0; j < k; j++) {
-            if (pV == (View*)fn_80017028(pViews[j])) bShared = 1;
+            if (pV == (View*)fn_80017028((&gPlayers[nPlayer].nView0)[j])) bShared = 1;
         }
         if (!bShared) {
-            int nView = pViews[k];
+            nView = (&gPlayers[nPlayer].nView0)[k];
             View_SetCamera(fn_80017028(nView), pV->nSavedCamera, nPlayer, nView);
         }
     }
@@ -1702,15 +1705,13 @@ extern Vec4 lbl_80183630;
 void SwingState15_Enter(int nPlayer) {
     Vec4 vOffset = lbl_80183630;
     f32  vSaved[4];
-    f32* pBallPos;
     fn_80062B64(nPlayer);
     fn_80062B60(nPlayer);
     fn_80063BF4(fn_80017028(gPlayers[nPlayer].nView0), 0.75f, (f32*)&vOffset);
-    pBallPos = &gPlayers[nPlayer].fBallX;
-    Vec3Copy(pBallPos, vSaved);
-    Vec3Copy((f32*)gPlayers[nPlayer].ball, pBallPos);
+    Vec3Copy(&gPlayers[nPlayer].fBallX, vSaved);
+    Vec3Copy((f32*)gPlayers[nPlayer].ball, &gPlayers[nPlayer].fBallX);
     Shot_Plan(nPlayer, 0);
-    Vec3Copy(vSaved, pBallPos);
+    Vec3Copy(vSaved, &gPlayers[nPlayer].fBallX);
     gPlayers[nPlayer].bPlanReady = 0;
     gPlayers[nPlayer].bRehearsalDone = 0;
 }
@@ -1844,8 +1845,7 @@ void SwingState21_Update(int nPlayer) {
     if (fn_800172C4(fn_80017028(gPlayers[nPlayer].nView0))) {
         bDone = 1;
     } else if (!Player_IsCPU(nPlayer)) {
-        uMask = fn_800142AC(0, 0);
-        if (fn_800136DC(gPlayers[nPlayer].nController) & uMask) {
+        if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0, 0)) {
             bDone = 1;
             fn_800A76E4();
         }
@@ -1963,9 +1963,9 @@ void SwingState15_Update(int nPlayer) {
 }
 
 
-int   fn_80048574(int nHandle, int a, int b);
-int   fn_80062BB0(int nHandle, int a, int b);
-void  fn_80062B98(int nHandle, int a, int b);
+int   fn_80048574(int nHandle, unsigned long long uEvent);
+int   fn_80062BB0(int nHandle, unsigned long long uEvent);
+void  fn_80062B98(int nHandle, unsigned long long uEvent);
 void  fn_800A5980(u8 nPlayer);
 void  fn_8006C28C(int nPlayer, int nController);
 extern Vec4 lbl_80183650;
@@ -1987,9 +1987,9 @@ void SwingState16_Update(int nPlayer) {
         fn_80063B98(pV, 0.75f, (f32*)&vOffset);
     }
     if (pV->nCamera == 1 || pV->nCamera == 4 || pV->nCamera == 3) return;
-    if (fn_80048574(nHandle, 0, 2)) {
-        if (!fn_80062BB0(nHandle, 0, 2)) return;
-        fn_80062B98(nHandle, 0, 2);
+    if (fn_80048574(nHandle, 2)) {
+        if (!fn_80062BB0(nHandle, 2)) return;
+        fn_80062B98(nHandle, 2);
         pController  = &gPlayers[nPlayer].nController;
         nController  = *pController;
         *pController = CONTROLLER_CPU;
@@ -2368,42 +2368,33 @@ void  fn_80062D6C(int a, int nPlayer);
 // sounds on buttons 9/10, 30 and 11..14; once the camera has arrived (flag from the enter) a
 // one-off 0x67 event.
 void SwingState03_Update(int nPlayer) {
-    u32  uMask;
     s32* pController;
     Caddie_Update(nPlayer);
-    uMask       = fn_800142AC(8, 1);
     pController = &gPlayers[nPlayer].nController;
-    if (!(fn_800136DC(*pController) & uMask)) {
+    if (!(fn_800136DC(*pController) & fn_800142AC(8, 1))) {
         fn_8005CFD4(nPlayer);
     } else {
-        uMask = fn_800142AC(9, 0);
-        if (fn_800136DC(*pController) & uMask) {
+        if ((fn_800136DC(*pController) & fn_800142AC(9, 0))) {
             fn_80067074(nPlayer, 0xD, 0, -1);
         } else {
-            uMask = fn_800142AC(0xA, 0);
-            if (fn_800136DC(*pController) & uMask) {
+            if ((fn_800136DC(*pController) & fn_800142AC(0xA, 0))) {
                 fn_80067074(nPlayer, 0xE, 0, -1);
             }
         }
-        uMask = fn_800142AC(0x1E, 0);
-        if (fn_800136DC(*pController) & uMask) {
+        if ((fn_800136DC(*pController) & fn_800142AC(0x1E, 0))) {
             fn_80067074(nPlayer, 0xF, 0, -1);
         }
-        uMask = fn_800142AC(0xB, 1);
-        if (fn_800136DC(*pController) & uMask) {
+        if ((fn_800136DC(*pController) & fn_800142AC(0xB, 1))) {
             fn_80067074(nPlayer, 0x12, 0, -1);
         } else {
-            uMask = fn_800142AC(0xC, 1);
-            if (fn_800136DC(*pController) & uMask) {
+            if ((fn_800136DC(*pController) & fn_800142AC(0xC, 1))) {
                 fn_80067074(nPlayer, 0x13, 0, -1);
             }
         }
-        uMask = fn_800142AC(0xD, 1);
-        if (fn_800136DC(*pController) & uMask) {
+        if ((fn_800136DC(*pController) & fn_800142AC(0xD, 1))) {
             fn_80067074(nPlayer, 0x14, 0, -1);
         } else {
-            uMask = fn_800142AC(0xE, 1);
-            if (fn_800136DC(*pController) & uMask) {
+            if ((fn_800136DC(*pController) & fn_800142AC(0xE, 1))) {
                 fn_80067074(nPlayer, 0x15, 0, -1);
             }
         }
@@ -2760,30 +2751,30 @@ void SwingState18_Update(int nPlayer) {
             }
         }
     } else if (gSession.fFrameTime > 0.0f) {
-        if (fn_80048574(*pHandle, 0, 4) && fn_80062BB0(*pHandle, 0, 4)) {
+        if (fn_80048574(*pHandle, 4) && fn_80062BB0(*pHandle, 4)) {
             Player* p     = &gPlayers[nPlayer];
             u8*     pB    = p->ball;
             f32*    pPrev = (f32*)(p->ball + 0x10);
             Vec3Copy((f32*)pB, pPrev);
             fn_8001D95C(*pHandle, (f32*)pB);
-            if (fn_80062BB0(*pHandle, 0, 3)) {
-                f32 fT4 = fn_8005CB78(*pHandle, 0, 4);
-                if (fn_8005CB78(*pHandle, 0, 3) > fT4) {
+            if (fn_80062BB0(*pHandle, 3)) {
+                f32 fT4 = fn_8005CB78(*pHandle, 4);
+                if (fn_8005CB78(*pHandle, 3) > fT4) {
                     fn_80062DDC((f32*)pB, pPrev, vDir);
                     fSpeed = (f32)fn_80009680(fn_80009744(vDir));
                     if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
                         fn_800BAF04(vDir, vDir);
                     }
                     fSpeed = 60.0f * (60.0f * (59.94f * (fSpeed / 1760.0f))) * 0.5f;
-                    fn_80062B98(*pHandle, 0, 4);
+                    fn_80062B98(*pHandle, 4);
                     gPlayers[nPlayer].ballBefore[0x98] = 0;
                     fn_80051A18(p->ballBefore, vDir, fSpeed, pB);
                 }
             }
         }
-        if (fn_80048574(*pHandle, 0, 3) && fn_80062BB0(*pHandle, 0, 3)) {
-            f32 fT4 = fn_8005CB78(*pHandle, 0, 4);
-            if (fn_8005CB78(*pHandle, 0, 3) > fT4) {
+        if (fn_80048574(*pHandle, 3) && fn_80062BB0(*pHandle, 3)) {
+            f32 fT4 = fn_8005CB78(*pHandle, 4);
+            if (fn_8005CB78(*pHandle, 3) > fT4) {
                 s32 nState = *(s32*)(gPlayers[nPlayer].ballBefore + 0x64);
                 if (nState != 1 && nState != 5 && nState != 0) {
                     Player* p = &gPlayers[nPlayer];
