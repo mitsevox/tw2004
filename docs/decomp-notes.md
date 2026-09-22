@@ -84,19 +84,27 @@ Reading compiler output
   all eight loads before the stores, `n += -(count << 3)` after, then the remainder loop
   auto-unrolled 8x. Interleaved load/store pairs mean the copies did *not* go through
   temporaries (the compiler assumed aliasing). A `do { } while (--n)` is *not* unrolled at all.
-- **[verified] CodeWarrior always folds `n += 3` into the later uses** (`addi r5, rN, 3` at a call,
-  `addi r0, rN, 3; cmpwi r0, 8`, ...) even with five uses and even after the `if` that follows; a
-  select `n = (c ? a : b) + 3` produces one materialised add but the pre-add value in a scratch
-  register. `UStream_Decompress` has an in-place `addi r28, r28, 3` we could not reproduce; the
-  function is left at 98.8% (184/189 instructions) with a comment. **Open question.** Tried:
-  every placement of `+= 3`, `= n + 3`, separate/ternary/if-else/block-scoped result
-  variables, `register`, `u8`/`s8`/`u16`/`s16`/`u32`/`int`, inner loops as `do/while`,
-  `for (; n > 0; n--)`, indexed, single `while (n--)`, a `switch` on the mirror bit, comma
-  and `for (n += 3;;)` forms, `-O3`/`-O4`/`-O4,s`, inline modes. The best forms (ternary,
-  or `{ int nCount = nLen + 3; ... }`) materialise the add but keep the pre-add value in a
-  scratch register. Note the same function's fill path uses the same r28 and *does* fold
-  its `+3`, so the original source treated the two paths differently. Harness for more
-  tries: `C:\dev\scratch	w\cw	ry.py base3.c 8000CDEC UStream_Decompress <variants>`.
+- **[verified] `int` vs `long` changes the code.** For an `int` local CodeWarrior folds
+  `n += 3` into every later use (`addi r5, rN, 3` at a call, `addi r0, rN, 3; cmpwi r0, 8`, ...),
+  even when that costs instructions, and treats `n += *p` / `n = n + *p` as an in-place update.
+  For a `long` (`s32`) local the promoted operand (`int`) needs an int-to-long conversion node,
+  the statement is no longer the pure-`int` update pattern, and the adds stay in place:
+  `addi rN, rN, 3` followed by plain `mr r5, rN` / `add rD, rD, rN` uses. `UStream_Decompress`
+  went from 184/189 to exact by changing one declaration from `int nLen` to `s32 nLen`; nothing
+  else in the function moved. Same size, same signedness, different type - so when a `+= const`
+  is folded in our build but in place in the original (or the reverse), try the other of
+  `int`/`long` before restructuring anything. The two are different types to the front end even
+  though both are 32-bit. (What does *not* work: `register`, `#pragma optimization_level 3`,
+  `optimize_for_size`, any placement of the add, a separate result variable, a ternary, a cast
+  to `int` or `u8` - those are no-ops the front end drops - and every GC/2.x version behaves the
+  same. A cast to `u32`/`s32` on one operand of `n = n + x` also blocks the fold, which is how the
+  rule was found: `s32` is `long` in `game_types.h`.)
+- **[verified] What else forces an in-place `+= const`:** the post-add value flowing into a phi
+  with another definition of the same variable - a loop that decrements it, or a redefinition in
+  one branch plus a use after the join. Even a *dead* decrement inside a later loop does it (the
+  compiler deletes the decrement but has already given up folding). A dead write outside a loop
+  does not. This costs a copy, though: the first definition is computed into a scratch register
+  and moved (`extrwi r3; mr r28, r3`), so it is not what the original did here.
 - **[verified] Register order for callee-saved locals** follows declaration order (first declared
   gets r31). Parameters used as working pointers come after the locals; to make `pEnd` r31 and the
   destination r30, declare `pEnd` first and copy the parameters into locals declared after it.

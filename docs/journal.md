@@ -110,6 +110,11 @@ Dated log of what was done and decided, newest last. Facts and lessons belong in
   takes the chunk's flag word as its second argument.
 - Texture format (`TXG`) decoded and PNG export working; game data tables located (attribute
   table, bios, tour, records).
+- **The `UStream_Decompress` +3 puzzle is solved: the length variable is `long`, not `int`.**
+  Found by isolating the compiler behaviour in ten-line test functions instead of re-spelling
+  the real one: CodeWarrior folds `+= const` for `int` locals unconditionally, and stops as
+  soon as the statement carries an int-to-long conversion. One typedef, 189/189. Rule in
+  `decomp-notes.md`; the same lever is worth trying on the other near-miss functions.
 
 **Working agreements**
 - Show the plain-English logic and the C before building anything non-trivial.
