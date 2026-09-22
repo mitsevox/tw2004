@@ -6,16 +6,15 @@
 
 // The swing module's state; only the tuning values read here. Set up in Swing_Init.
 typedef struct SwingState {
-    u8   unk0[4];
-    f32  fClubBack;             // 0x004  tuning "clubback"
-    f32  fClubDown;             // 0x008  tuning "clubdown"
-    f32  fTBall;                // 0x00C  tuning "tball"
+    u32  uTexture0;             // 0x000  passed with the trail texture to fn_8005CC64
+    u32  uClubBack;             // 0x004  resource "clubback": the backswing trail's texture
+    u32  uClubDown;             // 0x008  resource "clubdown": the downswing trail's texture
+    u32  uTBall;                // 0x00C  resource "tball"
     u8   unk10[0x44 - 0x10];
-    u8   res44[0x28];           // 0x044  released by fn_80058DB4
-    u8   res6C[0x28];           // 0x06C
-    void* p94[2];              // 0x094  handles released by fn_80058DB4
-    void* p9C[2];              // 0x09C
-    void* pA4[2];              // 0x0A4
+    u8   mesh[2][0x28];         // 0x044  the trail mesh, per view
+    f32* p94[2];               // 0x094  the trail's vertex positions, per view
+    u8*  p9C[2];               // 0x09C  its vertex colours (RGBA)
+    f32* pA4[2];               // 0x0A4  its texture coordinates
     f32  fCurveMin;             // 0x0AC  a club's shaping range, by gClubCurve
     f32  fCurveMax;             // 0x0B0
     f32  fB4;                   // 0x0B4
@@ -1108,8 +1107,8 @@ void Swing_Init(void) {
     gpSwing->fPuttFullPower = 0.75f;
     desc[0] = 0x1A;
     desc[1] = 1;
-    fn_80036054(gpSwing->res44, 0, desc);
-    fn_80036054(gpSwing->res6C, 0, desc);
+    fn_80036054(gpSwing->mesh[0], 0, desc);
+    fn_80036054(gpSwing->mesh[1], 0, desc);
     for (i = 0; i < gSession.nNumPlayers; i++) {
         Swing_LoadTuning(i);
         Swing_ResetBoostAndSpin(i);
@@ -1127,8 +1126,8 @@ void Swing_Init(void) {
 
 void fn_80058DB4(void) {
     int i;
-    fn_800360A0((u8*)gpSwing + 0x44);
-    fn_800360A0((u8*)gpSwing + 0x6C);
+    fn_800360A0(gpSwing->mesh[0]);
+    fn_800360A0(gpSwing->mesh[1]);
     for (i = 0; i < 2; i++) {
         fn_80009E70(gpSwing->p94[i]);
         fn_80009E70(gpSwing->p9C[i]);
@@ -1579,7 +1578,7 @@ int Swing_UpdateDownswing(int nPlayer) {
 u32  fn_800136DC(int nController);           // buttons held
 u32  fn_800142AC(int nButton, int a);        // a button's mask
 unsigned long long fn_8000BEE4(char* pName);   // a tuning name's 64-bit hash
-void fn_800102DC(unsigned long long uHash, void* pSwing, f32* pOut);   // bind a tuning value
+void fn_800102DC(unsigned long long uHash, void* pOwner, u32* pOut);   // bind a named resource
 
 int Swing_PhaseIdle4(int nPlayer) {
     return 0;
@@ -1827,6 +1826,114 @@ void fn_8005A7A0(int nPlayer) {
     }
 }
 
+void fn_80035138(int a);
+void fn_80016B9C(void);
+void fn_8001614C(void);
+void fn_80013EEC(void);
+void fn_80014118(int a);
+void fn_80035118(int a, int b);
+void fn_80012F50(int a, int b, int c);
+void fn_80012F34(int a);
+void fn_80012EF8(void);
+void fn_80036100(u8* pMesh, void* pDesc, int n);
+void fn_800360D4(u8* pMesh);
+
+typedef struct TrailDraw {
+    s32  nPrims;                // 0x0
+    s16  nFirst;                // 0x4
+    s16  nCount;                // 0x6
+} TrailDraw;
+
+typedef struct TrailMeshDesc {
+    s16        n0;              // 0x00
+    s16        nVerts;          // 0x02
+    TrailDraw* pDraw;           // 0x04
+    s16*       pIndices;        // 0x08
+    f32*       pPos;            // 0x0C
+    u8*        pColour;         // 0x10
+    f32*       pUV;             // 0x14
+} TrailMeshDesc;
+
+// Draw the club's trail (the swing-trail option): a ribbon from the grip through the recorded
+// club-head positions, coloured by the swing's blend weights and fading along its length,
+// textured "clubback" on the backswing and "clubdown" on the downswing.
+void fn_8005A850(int nPlayer) {
+    s16           idx[26];
+    TrailMeshDesc mesh;
+    f32           vGrip[4];
+    TrailDraw     draw;
+    SwingData*    pSw   = &gPlayers[nPlayer].swing;
+    ShotObj*      pObj  = (ShotObj*)gPlayers[nPlayer].nShotHandle;
+    int           nView = gPlayers[nPlayer].nView0;
+    int           nGrip = fn_8001EED8(pObj->pView, 0x52);
+    u8            r;
+    u8            g;
+    u8            b;
+    int           i;
+
+    if (!Player_IsCPU(nPlayer) || (Game_GetMode() == 11 && (fn_8005CC5C() == 8 || fn_8005CC5C() == 9))) {
+        if ((pObj->nAnim == 6 || pObj->nAnim == 7) && fn_8001EE90(pObj) != 2 && pSw->n370 >= 2 &&
+            SESSION_OPTIONS->unk24[7] != 0) {
+            Vec_Copy((*(f32 (**)[4][4])(pObj->pView + 8))[nGrip][3], vGrip);
+            r = 255.0f * pSw->f484;
+            g = 255.0f * pSw->f488;
+            b = 255.0f * pSw->f48C;
+            Vec3Copy(vGrip, gpSwing->p94[nView]);
+            gpSwing->p94[nView][0] = vGrip[0];
+            gpSwing->p94[nView][1] = vGrip[1];
+            gpSwing->p94[nView][2] = vGrip[2];
+            gpSwing->pA4[nView][0] = 1.0f;
+            gpSwing->pA4[nView][1] = 1.0f;
+            gpSwing->p9C[nView][0] = 0x80;
+            gpSwing->p9C[nView][1] = 0x80;
+            gpSwing->p9C[nView][2] = 0x80;
+            gpSwing->p9C[nView][3] = 128.0f * pSw->f490 * (1.0f / pSw->n370);
+            idx[0] = 0;
+            for (i = 0; i < pSw->n370; i++) {
+                gpSwing->p94[nView][i * 3 + 3] = pSw->trail[i].vHead[0];
+                gpSwing->p94[nView][i * 3 + 4] = pSw->trail[i].vHead[1];
+                gpSwing->p94[nView][i * 3 + 5] = pSw->trail[i].vHead[2];
+                gpSwing->pA4[nView][i * 2 + 2] = 0.0f;
+                gpSwing->pA4[nView][i * 2 + 3] = 1.0f - 0.2f * i / pSw->n370;
+                gpSwing->p9C[nView][i * 4 + 4] = g;
+                gpSwing->p9C[nView][i * 4 + 5] = b;
+                gpSwing->p9C[nView][i * 4 + 6] = r;
+                gpSwing->p9C[nView][i * 4 + 7] = 128.0f * pSw->f490 * (1.0f - (f32)i / pSw->n370);
+                idx[i + 1] = i + 1;
+            }
+            fn_80035138(0);
+            fn_80016B9C();
+            fn_8001614C();
+            fn_80013EEC();
+            fn_80014118(0x50);
+            fn_80035118(4, 5);
+            fn_80012F50(0, 6, 0x80);
+            fn_80012F34(0);
+            if (pObj->nAnim == 6) {
+                fn_8005CC64(gpSwing->uTexture0, gpSwing->uClubBack);
+            } else if (pObj->nAnim == 7) {
+                fn_8005CC64(gpSwing->uTexture0, gpSwing->uClubDown);
+            }
+            fn_80012EF8();
+            draw.nPrims   = 1;
+            draw.nFirst   = 0;
+            draw.nCount   = pSw->n370 + 1;
+            mesh.n0       = 1;
+            mesh.nVerts   = pSw->n370 + 1;
+            mesh.pDraw    = &draw;
+            mesh.pIndices = idx;
+            mesh.pPos     = gpSwing->p94[nView];
+            mesh.pColour  = gpSwing->p9C[nView];
+            mesh.pUV      = gpSwing->pA4[nView];
+            fn_80036100(gpSwing->mesh[nView], &mesh, 1);
+            fn_800360D4(gpSwing->mesh[nView]);
+            fn_80012F50(1, 6, 0x80);
+            fn_80012F34(1);
+            fn_80012EF8();
+        }
+    }
+}
+
 void fn_8001EEE4(u8* pSkel, int nBone);
 f32  fn_8000AD9C(f32 x);                       // fabsf
 void fn_80008BB8(f32* pOut, f32 x, f32 y, f32 z);
@@ -1870,11 +1977,11 @@ void fn_8005AD20(ShotObj* pObj, SwingData* pSw, int nStickX) {
 void Swing_LoadTuning(int nPlayer) {
     unsigned long long uHash;
     uHash = fn_8000BEE4("clubback");
-    fn_800102DC(uHash, gpSwing, &gpSwing->fClubBack);
+    fn_800102DC(uHash, gpSwing, &gpSwing->uClubBack);
     uHash = fn_8000BEE4("clubdown");
-    fn_800102DC(uHash, gpSwing, &gpSwing->fClubDown);
+    fn_800102DC(uHash, gpSwing, &gpSwing->uClubDown);
     uHash = fn_8000BEE4("tball");
-    fn_800102DC(uHash, gpSwing, &gpSwing->fTBall);
+    fn_800102DC(uHash, gpSwing, &gpSwing->uTBall);
 }
 
 
