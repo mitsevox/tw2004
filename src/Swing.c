@@ -11,7 +11,8 @@ typedef struct SwingState {
     u8   unkC0[4];
     f32  fTeeWindowHi;          // 0x0C4  0.6
     f32  fTeeBonus;             // 0x0C8  0.1
-    u8   unkCC[0x118 - 0xCC];
+    u8   unkCC[0x114 - 0xCC];
+    f32  fMaxError;             // 0x114  the meter's largest miss, radians
     f32  fPuttFullPower;        // 0x118  0.75: a putt meter over this counts as full
 } SwingState;
 
@@ -314,7 +315,7 @@ void fn_8000B1D4(int nStream, u32 uSeed);    // seed an RNG stream
 void fn_8006BF60(int nPlayer);
 void fn_8006C300(int nPlayer);
 void fn_8005B664(int nPlayer, f32* pLaunchA);
-f32  fn_8005BA94(int nPlayer);               // the meter's miss
+f32  Swing_MeterError(int nPlayer);
 void fn_8005B8C8(int nPlayer, f32* pLaunchB);
 void fn_8005CCA8(int nPlayer);
 f32  fn_8005CC84(f32 fTan);                  // atanf
@@ -351,7 +352,7 @@ void Swing_Launch(int nPlayer) {
     if (Player_IsCPU(nPlayer) || gPlayers[nPlayer].bPerfect) {
         gPlayers[nPlayer].swing.fSwingError = 0.0f;
     } else {
-        gPlayers[nPlayer].swing.fSwingError = fn_8005BA94(nPlayer);
+        gPlayers[nPlayer].swing.fSwingError = Swing_MeterError(nPlayer);
     }
     pPower  = &gPlayers[nPlayer].swing.fLaunchPower;
     *pPower = Swing_ComputePower(nPlayer);
@@ -380,4 +381,64 @@ void Swing_Launch(int nPlayer) {
     while (fAim < -PI) fAim += 2 * PI;
     while (fAim > PI) fAim -= 2 * PI;
     Ball_Launch(pBall, nClub, nKind, *pPower, fAim, nTrajectory, pLaunchA, pLaunchB);
+}
+
+
+// ---- the meter's miss ----------------------------------------------------------------------------
+
+extern f32 gSwingXScale[8];                  // 0x801882CC  per shot kind: 0.03 for a putt, 0.2 otherwise
+
+void Vec_Sub(f32* pA, f32* pB, f32* pOut);   // 0x8005CBF4  a - b
+void Vec_Add(f32* pA, f32* pB, f32* pOut);   // 0x8005CBD0  a + b
+f32  Rand_Float(int nStream);                // 0x8000B1B8  0..1
+
+// The analog swing's error: the angle between the stick's path back (centre to the top of the
+// backswing) and its path through (top to impact). Both x samples get a random +-15 (of a
+// +-128 stick) before the x axis is scaled by 0.2 - 0.03 on a putt - so the wobble is worth up
+// to about 1.7 degrees on a full shot; then atan of the deviation, clamped to the meter's
+// maximum (gpSwing->fMaxError).
+f32 Swing_MeterError(int nPlayer) {
+    f32 fTopX    = gPlayers[nPlayer].swing.nTopX;
+    f32 fTopY    = gPlayers[nPlayer].swing.nTopY;
+    f32 fImpactX = gPlayers[nPlayer].swing.nImpactX;
+    f32 fImpactY = gPlayers[nPlayer].swing.nImpactY;
+    f32 fCentreX = gPlayers[nPlayer].swing.nCentreX;
+    f32 fCentreY = gPlayers[nPlayer].swing.nCentreY;
+    f32 vBack[4], vThrough[4], vDiff[4], vDir[4];
+    f32 fAngle, fMax;
+
+    fTopX    += Rand_Float(0) * 30.0f - 15.0f;
+    fImpactX += Rand_Float(0) * 30.0f - 15.0f;
+    vDir[0] = 0.0f;
+    vDir[1] = 0.0f;
+    vDir[2] = 1.0f;
+    vDir[3] = 0.0f;
+    vBack[0] = (fCentreX - fTopX) * gSwingXScale[gPlayers[nPlayer].nShotKind];
+    vBack[1] = 0.0f;
+    vBack[2] = fTopY - fCentreY;
+    vBack[3] = 0.0f;
+    vThrough[0] = (fImpactX - fCentreX) * gSwingXScale[gPlayers[nPlayer].nShotKind];
+    vThrough[1] = 0.0f;
+    vThrough[2] = fCentreY - fImpactY;
+    vThrough[3] = 0.0f;
+    if (0.0f != vThrough[0] || 0.0f != vThrough[2]) {
+        Vec_Normalize(vThrough, vThrough);
+    }
+    if (0.0f != vBack[0] || 0.0f != vBack[2]) {
+        Vec_Normalize(vBack, vBack);
+    }
+    Vec_Sub(vThrough, vBack, vDiff);
+    Vec_Add(vDir, vDiff, vDir);
+    if (vDir[2] != 0.0f) {
+        fAngle = fn_8005CC84(vDir[0] / vDir[2]);
+    } else {
+        fAngle = (PI / 2) * (vDir[0] >= 0.0f ? 1.0f : -1.0f);
+    }
+    fMax = gpSwing->fMaxError;
+    if (fAngle < -fMax) {
+        fAngle = -fMax;
+    } else if (fAngle > fMax) {
+        fAngle = fMax;
+    }
+    return fAngle;
 }

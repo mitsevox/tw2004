@@ -27,6 +27,24 @@ The pieces
 | `gAITargets` | `0x801C65B8` | table of authored aim points, 12 bytes each |
 | `gForgivenessTable` | `0x80188168` | 27 rows x 3 floats (value at attribute 0 / 100 / 110) |
 
+Human swing: the miss itself (`Swing_MeterError`, `0x8005BA94`, in C)
+-------------------------------------------------------------------------
+
+The raw error is the analog stick's path. Three stick samples are kept (each -128..127): where
+the swing started (centre), the top of the backswing, and impact. The path back is
+`(centre - top)` and the path through is `(impact - centre)`, each with its x scaled by **0.2
+(0.03 on a putt)** and then normalised; the error is `atan` of the sideways deviation between
+the two unit directions, clamped to the meter's maximum (`gpSwing + 0x114`). Straight back and
+straight through is zero.
+
+**Both x samples get a random +-15 added first** (`Rand_Float x 30 - 15`) - on a +-128 stick
+that is up to ~1.7 degrees of wobble on a full shot after the 0.2 scale, ~0.25 degrees on a putt.
+That is the only random term in the human swing, and forgiveness (next) then shrinks whatever
+is left. A CPU or a perfect shot never gets here: `Swing_Launch` stores an error of 0 instead.
+
+At launch the ball's direction is the aim plus the angle of the clubface vector (spin input)
+plus this error.
+
 Human swing: forgiveness (`Swing_ApplyForgiveness`)
 ----------------------------------------------------
 

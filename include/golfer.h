@@ -83,13 +83,21 @@ typedef struct GolferRecord {
 // The swing meter's per-player state, embedded in Player at 0x3D4 (offsets below are within
 // this struct; add 0x3D4 for the player offset).
 typedef struct SwingData {
-    u8   unk0[0x3C];
+    u8   unk0[0x18];
+    s32  nTopX;                 // 0x018  (0x3EC) stick at the top of the backswing
+    s32  nTopY;                 // 0x01C  (0x3F0)
+    s32  nImpactX;              // 0x020  (0x3F4) stick at impact
+    s32  nImpactY;              // 0x024  (0x3F8)
+    u8   unk28[0x3C - 0x28];
     f32  fSwingError;           // 0x03C  (0x410) the stick's miss, after forgiveness
     f32  fLaunchPower;          // 0x040  (0x414) Swing_ComputePower's result
     f32  fLaunchAX;             // 0x044  (0x418) copy of vLaunchA[0]
     f32  fPowerAfterError;      // 0x048  (0x41C)
     f32  fTempo;                // 0x04C  (0x420) driver sweet-spot input (negative when armed)
-    u8   unk50[0x460 - 0x50];
+    u8   unk50[0x378 - 0x50];
+    s32  nCentreX;              // 0x378  (0x74C) stick at the start of the swing
+    s32  nCentreY;              // 0x37C  (0x750)
+    u8   unk380[0x460 - 0x380];
     s32  nRumbleFrames;         // 0x460  (0x834)
     u8   bRumble;               // 0x464  (0x838)
     u8   unk465[0x494 - 0x465];

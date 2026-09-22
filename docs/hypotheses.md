@@ -165,6 +165,11 @@ tee gets up to +10% in a tempo window.
 escaping the worst lie on a bad surface (12.5% to 32%), and a kinder bounce term in the
 collision code. Humans only: CPU golfers never roll for luck.
 
+**Update (`Swing_MeterError` in C):** the human's raw error is the angle between the stick's
+path back and its path through, with a random +-15 (of +-128) added to both x samples first:
+up to ~1.7 degrees of wobble on a full shot, ~0.25 on a putt, before forgiveness. The one
+random term in the human swing; not attribute-scaled.
+
 **Update (the lucky event itself, `Luck_TakePerfectShot` in C):** the "lucky event" is not a
 bounce. When the roll succeeds the game runs the CPU's shot rehearsal on a copy of you, aimed
 at the pin, while you set up; at launch, if your club is within two of the rehearsed one, the
