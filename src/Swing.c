@@ -1761,7 +1761,7 @@ void SwingState21_Enter(int nPlayer) {
 }
 
 
-void  fn_800DED60(void);
+void  fn_800DED60(int nPlayer);
 void  fn_80062BFC(int nHandle);
 void  fn_80062BE8(int nHandle);
 void  fn_8001C804(int nPlayer, int a, int b);
@@ -1772,7 +1772,7 @@ void  Caddie_ApplyTip(int nPlayer);           // Golfer.c
 
 void SwingState16_Enter(int nPlayer) {
     s32* pHandle;
-    fn_800DED60();
+    fn_800DED60(nPlayer);
     pHandle = &gPlayers[nPlayer].nShotHandle;
     fn_80095744(*pHandle, 11);
     fn_80062BFC(*pHandle);
@@ -2142,4 +2142,113 @@ void SwingState02_Enter(int nPlayer) {
     fn_80054A6C(pBall);
     gPlayers[nPlayer].fA64 = fn_800D04AC(nPlayer);
     fn_80067074(nPlayer, 6, 0, -1);
+}
+
+
+void  fn_800170F4(int nView);
+void  fn_80017004(int nView);
+void  fn_80012EF0(void);
+void  fn_800171D8(f32 x, f32 y, f32 w, f32 h);
+void  fn_8001D8DC(int nPlayer);
+void  fn_800957D8(int nHandle);
+void  fn_8003349C(f32 a, f32 b, f32 c);
+void  fn_8004D9A8(CourseInfo* pCourse, f32* pPos, f32* pOutA, f32* pOutB);
+void  fn_800D8D10(int nPlayer);
+void  fn_800693A4(int nPlayer);
+void  fn_80069330(int nPlayer, f32* pPos);
+void  fn_8006A6C4(int nPlayer);
+extern Vec4 lbl_801836A0;
+
+// State 20: the walk to the tee. Camera 10 on this player's view, every other player's views
+// detached, this player attached to both of its views, Shot_Plan with the HUD told, animation 1.
+void SwingState20_Enter(int nPlayer) {
+    Vec4  vOffset = lbl_801836A0;
+    s32*  pView;
+    s32*  pHandle;
+    int   nView;
+    int   i, k;
+
+    fn_80067074(nPlayer, 0x4A, 0, -1);
+    pView = &gPlayers[nPlayer].nView0;
+    fn_800170C4(*pView, 1);
+    nView = *pView;
+    View_SetCamera(fn_80017028(nView), 10, nPlayer, nView);
+    fn_80063B98(fn_80017028(*pView), 0.5f, (f32*)&vOffset);
+    fn_800C7140(0);
+    fn_800170F4(*pView);
+    fn_80017004(*pView);
+    fn_80012EF0();
+    fn_800171D8(0.0f, 0.0f, 1.0f, 1.0f);
+    for (i = 0; i < gNumPlayersSetUp; i++) {
+        for (k = 0; k < 2; k++) {
+            if ((&gPlayers[i].nView0)[k] != *pView) {
+                fn_800170C4((&gPlayers[i].nView0)[k], 0);
+            }
+        }
+    }
+    for (k = 0; k < 2; k++) {
+        fn_8001704C(pView[k], nPlayer);
+    }
+    fn_80045824(nPlayer);
+    fn_800DED60(nPlayer);
+    Shot_Plan(nPlayer, 1);
+    fn_8001D8DC(nPlayer);
+    fn_8001C804(nPlayer, 1, 1);
+    pHandle = &gPlayers[nPlayer].nShotHandle;
+    fn_800957D8(*pHandle);
+    fn_80095744(*pHandle, 1);
+    fn_8003349C(1.0f, 12.0f, 0.1f);
+    fn_800DAE84();
+    for (i = 0; i < gNumPlayersSetUp; i++) {
+        fn_80016CFC(gPlayers[i].nView0)[0x275] = 0;
+    }
+}
+
+// State 22: arriving at the ball for a new shot. The ball is put on the ground (the higher of
+// two surface heights if it is more than 0.25 above the ball), Shot_Plan with the HUD told, the
+// think timer cleared, camera 8, boost and spin reset.
+void SwingState22_Enter(int nPlayer) {
+    f32*  pBallPos;
+    f32   fTmp[4];
+    f32   fHeightA, fHeightB;
+    s32*  pView;
+    int   i;
+
+    gSession.bReplay = 0;
+    pBallPos = &gPlayers[nPlayer].fBallX;
+    Vec3Copy((f32*)gPlayers[nPlayer].ball, pBallPos);
+    if (fn_8000C594() != NULL) {
+        f32 fY;
+        fn_8004D9A8(fn_8000C594(), pBallPos, &fHeightA, &fHeightB);
+        fY = fHeightB;
+        if (-65536.1f == fHeightB || fHeightB <= 0.25f + gPlayers[nPlayer].fBallY) {
+            fY = fHeightA;
+            if (-65536.1f == fHeightA) {
+                fY = gPlayers[nPlayer].fBallY;
+            }
+        }
+        gPlayers[nPlayer].fBallY = fY;
+    }
+    Shot_Plan(nPlayer, 1);
+    gPlayers[nPlayer].fThinkTime = 0.0f;
+    fn_8001C804(nPlayer, 1, 1);
+    fn_800957D8(gPlayers[nPlayer].nShotHandle);
+    fn_800DAE84();
+    fn_800D8D10(nPlayer);
+    fn_800693A4(nPlayer);
+    fn_8006AD68(nPlayer);
+    pView = &gPlayers[nPlayer].nView0;
+    fn_80016CFC(*pView)[0x275] = 1;
+    for (i = 0; i < gSession.nNumPlayers; i++) {
+        if (gPlayers[i].unk28C == 0 && gPlayers[i].nView0 == *pView &&
+            gPlayers[i].nLie != 10 && gPlayers[i].nLie != LIE_GREEN && gPlayers[i].nLie != LIE_HOLED) {
+            fn_80016CFC(*pView)[0x275] = 0;
+        }
+    }
+    fn_80045824(nPlayer);
+    View_SetCamera(fn_80017028(*pView), 8, nPlayer, *pView);
+    Vec_Copy(pBallPos, fTmp);
+    fn_80069330(nPlayer, fTmp);
+    fn_8006A6C4(nPlayer);
+    Swing_ResetBoostAndSpin(nPlayer);
 }

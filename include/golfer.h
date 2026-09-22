@@ -154,7 +154,9 @@ typedef struct Player {
     s32  nStrokes[18];          // 0x154  strokes taken per hole
     u8   unk19C[0x278 - 0x19C];
     s32  nHolesWon;             // 0x278  match play
-    u8   unk27C[0x354 - 0x27C];
+    u8   unk27C[0x28C - 0x27C];
+    u8   unk28C;                // 0x28C
+    u8   unk28D[0x354 - 0x28D];
     s32  nClub;                 // 0x354
     s32  nClubPerKind[8];       // 0x358  the club Shot_Prepare would pick for each shot kind
     f32  fAim;                  // 0x378  aim angle, radians
