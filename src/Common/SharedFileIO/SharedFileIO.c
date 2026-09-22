@@ -67,8 +67,8 @@ enum { SFIO_STATE_BUSY_A = 0xB, SFIO_STATE_BUSY_B = 0xC, SFIO_STATE_BUSY_C = 0xD
 
 // Host (CodeWarrior side) and TagFile functions. Signatures inferred from the calls.
 extern void  fn_8012C8D0(void* pLock, int unused);
-extern void* fn_80175C88(void* pParams);
-extern int   fn_8012C98C(void* p);
+extern int   TagFile_SetDescriptor(void* pDescriptor);
+extern int   fn_8012C98C(int eError);
 extern void* memcpy(void* pDst, const void* pSrc, u32 uLen);
 extern void* memset(void* pDst, int c, u32 uLen);
 extern char* strcpy(char* pDst, const char* pSrc);
@@ -104,15 +104,15 @@ static const u32 gSFIODefaultDescriptor[14] = {
 
 int SFIOCreate(void* pAllocator) {
     SFIOCreateParams params;
-    void* p = NULL;
+    int eTagError = 0;   // same type as the callee's return: the result goes through r0
     int eError = 0;
     if (pAllocator == NULL) return 3;
     params.pAllocator = pAllocator;
     params.uSize = 0x2000;
     params.uUnk8 = 0;
     fn_8012C8D0(&params.uLock, 0);
-    p = fn_80175C88(&params);
-    eError = fn_8012C98C(p);
+    eTagError = TagFile_SetDescriptor(&params);
+    eError = fn_8012C98C(eTagError);
     return eError;
 }
 

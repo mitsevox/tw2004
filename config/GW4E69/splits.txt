@@ -220,6 +220,11 @@ Common/SharedFileIO/SharedFileIO.c:
 	.data       start:0x8019D210 end:0x8019D2C0
 	.sdata      start:0x80281B54 end:0x80281B5C
 
+Common/TagFile/TagFile.c:
+	.text       start:0x801730C8 end:0x80175F54
+	.rodata     start:0x8018655C end:0x801866D4
+	.sbss       start:0x80282A30 end:0x80282A38
+
 dolphin/card/CARDUnlock.c:
 	.text       start:0x80177DA4 end:0x80179004
 	.data       start:0x8019D3A0 end:0x8019D500

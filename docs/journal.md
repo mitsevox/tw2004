@@ -76,6 +76,21 @@ Dated log of what was done and decided, newest last. Facts and lessons belong in
   mismatch (`pythonw3.13.exe`) meant the "fixed" server was never actually restarted. Both in
   `decomp-notes.md`.
 
+- **TagFile.c done** (41/41 exact, linked, DOL byte-identical): the save-data container. Format,
+  error codes and file boundaries written up in `tw2004-notes.md`. The `llSharedFileIO.c` /
+  `TagFile.c` boundary is `0x801730C8`; the 40/50 counts in the file map were assert sites.
+- 37 of 41 matched on the first build. The last four took longer than the other 37: a `u32`
+  switch (`cmplwi`), operand order in a return expression, a rounding expression GCC
+  reassociates unless it goes through a pointer cast, and a folded-away `if (TRUE)`. Then the
+  DOL still failed twice: an unreferenced static (4 bytes of `.sbss`) and a *regression in
+  SharedFileIO.c* caused by giving `TagFile_SetDescriptor` its real return type (the result
+  variable's type must match the callee's for `mr r0, r3`). All six are new rules in
+  `decomp-notes.md`, verified against the compiler rather than guessed.
+- A clean rebuild caught that `TagFile_AllocBuffer` / `TagFile_FreeBuffer` are called from the
+  game side, so they cannot be `static`. Incremental builds did not relink the auto units;
+  **do a clean build before calling a file done.**
+- Progress: 258 -> 299 functions, 72,832 -> 84,748 bytes.
+
 **Working agreements**
 - Show the plain-English logic and the C before building anything non-trivial.
 - One batch of work, then report. No silent fix loops.

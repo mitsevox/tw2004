@@ -161,6 +161,32 @@ GCC 2.95 (SN ProDG) at -O0
   `.sbss` sections into every object. `mwldeppc` rounds the output section up when it meets one,
   even with the ALLOC flag cleared: our `.sbss` came out 2 bytes longer and the DOL hash failed while
   every function read 100%. `tools/prodg/prodgcc.py` deletes empty sections from the object.
+- **[verified] A call result stored straight from `r3`.** `x = f()` normally goes `mr r0, r3; stw r0`.
+  When the variable's type differs from the function's declared return type (an `int` result
+  into a `u32`, or into a pointer) GCC stores `stw r3` directly. So a direct store means the
+  types disagree; `mr r0, r3` means they agree. Fixing one side of a call changes the other file
+  (`SFIOCreate` regressed when `TagFile_SetDescriptor` gained its real `int` return type).
+- **[verified] GCC 2.95 reassociates `a - (b - C)` into `(a + C) - b`** (fold-const.c
+  `split_tree` / `associate`), even at -O0, for every integer spelling: casts, `+ 0`, `- 0`, a
+  comma, `?:`, unary plus, identity `& | ^ >> * /`. Nothing wrapped survives because `fold`
+  strips no-op conversions first. If the binary computes `b - C` first and then `a - that`,
+  the original went through something `fold` cannot split: a pointer (`(u8*)a - (b - C)` -
+  typical of an alignment macro) or a GNU statement expression. Both reproduce it exactly.
+- **[verified] A constant-true `if`.** `if (TRUE) { ...; return 0; } else { return 4; }` compiles
+  to the then-block, a dead jump over the else, then the else body - with no compare at all.
+  Symptom: an unreachable `return` or assert after a `return`, preceded by a dead `b` to the
+  end of the chain. `TagFile_FreeBuffer` and the last branch of `TagFile_Update` have it.
+- **[verified] Unused `static` variables are still emitted at -O0**, in declaration order, into
+  `.sbss`/`.sdata` like any other. If a file's `.sbss` is bigger than its referenced globals,
+  add a dummy static of the missing size; the DOL will not hash otherwise. Uninitialised
+  non-static globals become COMMON symbols instead and land elsewhere, so use `static` (or an
+  explicit `= 0` for `.sdata`) to control the section.
+- **[verified] Comparison operand order.** `a == p->x` loads `p` first, then `a` into `r0`, then
+  `p->x` into `r9`, and compares `r0, r9`. `p->x == a` gives `lwz r0, 0(r9)` then `lwz r9, a`.
+  For two stack variables the left one is always `r0`. So the register order of a `cmpw`
+  recovers which operand was written first.
+- **[verified] `(*p)++` vs `*p = *p + 1` vs `*p += 1`.** The post-increment loads `p` three times
+  (one dead load into `r0`); the other two load it twice.
 - **[verified] Small globals vs a struct.** GCC puts objects of 8 bytes or less in `.sdata`/`.sbss`
   and addresses them with `@sda21`; a struct of four ints goes to `.data` with `lis`/`addi`. If the
   original uses `@sda21` for each field, they were separate variables.

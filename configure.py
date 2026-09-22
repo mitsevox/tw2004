@@ -338,6 +338,7 @@ config.libs = [
             Object(Matching, "Common/Checksum/ChecksumCRC32.c"),
             Object(Matching, "Common/Cipher/CipherXOR.c"),
             Object(Matching, "Common/SharedFileIO/SharedFileIO.c"),
+            Object(Matching, "Common/TagFile/TagFile.c"),
         ],
     },
     {

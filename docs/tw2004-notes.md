@@ -180,11 +180,43 @@ The assert strings settle it: the four `../../../Source/...` files are EA's cros
 
 - `SFIO` = Shared File I/O: device enumeration (`SFIO_DEVICE_FIRST/LAST`, two memory-card slots),
   save names, icons, directories, `CARD_RESULT_READY` from the GameCube CARD SDK.
-- `TagFile.c`: a tagged container for save data (`TAG SENTINEL` marker, `TAG_BUFFERSIZE`,
-  `_TagFile_pData->Map.pList`, a checksum).
+- `TagFile.c` (`src/Common/TagFile/TagFile.c`, 41 functions, done): the save-data container.
+  See "Save file format" below.
 - `ChecksumCRC32.c` guards the save data; the XOR cipher scrambles it.
 - The host game calls in through an assert stub `fn_8012214C` (4 bytes in retail) and an allocator
   `fn_801220D4(pAllocator, size, align, __FILE__, __LINE__)` / `fn_80122128(...)`.
+
+Save file format (from TagFile.c)
+---------------------------------
+
+A save is a sequence of **records**. Each record is a 12-byte header followed by the payload,
+and the whole record is padded to the device block size (8 KiB on the memory card, 512 bytes
+for buffer type 1, 1 byte for type 4 = memory):
+
+    u32 uTag        record identifier (the game's tag values are not yet known)
+    u32 uSize       payload size in bytes
+    u32 uChecksum   CRC32 of the payload (ChecksumCRC32.c)
+
+An unused header slot holds the 12-byte string `"TAG SENTINEL"` (`TAG_BUFFERSIZE` = 12; the
+constant in the binary is the string three times over, 37 bytes, so the assert
+`sizeof(TAG_SENTINEL) >= TAG_BUFFERSIZE` holds). Header and payload are XOR-ciphered
+(CipherXOR.c) with a key the game passes to `TagFile_Init`; the key itself is copied out of the
+init parameters, so it will be found in whichever CodeWarrior file calls `TagFile_Init`.
+
+In memory the library keeps a **map**: an array of `{tag, offset, size, checksum}` (16 bytes
+each, `_TagFile_pData->Map.pList`) built as records are written or, on load, as the file is
+walked header by header (`TagFile_Update`, operation 4/5 = "delete/read map"). `TagFile_End`
+stores the CRC32 of the map into the session block at +0x44; on the read side the library
+recomputes it and returns error 9 if it differs. Records with the same tag are addressed by
+index (`TagFile_Read(pSession, uTag, uIndex, ...)`).
+
+Error codes: 1 already initialised, 2 not initialised, 4 bad parameter, 5 map full, 6 out of
+memory, 7 tag not found, 8 busy, 9 bad map checksum, 0xA bad payload checksum, 0xB bad header,
+0x6E size mismatch. Errors from the layers below are re-based: SFIO + 100, cipher + 200,
+checksum + 300.
+
+Boundary note: `llSharedFileIO.c` is `0x80171308`-`0x801730C8` (17 functions) and `TagFile.c`
+`0x801730C8`-`0x80175F54` (41). The "40 / 50" in filemap.md were assert-site counts.
 
 So decompiling it documents the **save-file format**, which is useful (save editors, understanding
 `MC_Gc.c`), but the `.hog` / `.gcb` course formats live elsewhere: look at `LLFileIO_Gc.c`,
@@ -226,11 +258,11 @@ Suggested next steps
    (`YhSwing.c`); callers of `CARD*` to saves (`MC_Gc.c`); callers of `DVD*` to file loading and
    the asset formats.
 3. **The GCC file library** (`0x8016C718`): compiler wired up (`ProDG/3.5`, `EASharedFileLib` in
-   configure.py); `ChecksumCRC32.c`, the XOR cipher module and `SharedFileIO.c` (50 functions) done.
-   Left: `llSharedFileIO.c` (40) and `TagFile.c` (50). Each module exposes a 7-entry
-   function-pointer table via `<Module>_GetInterface()`; shared error codes 2 = bad argument,
-   3 = wrong state, 6 = not initialised. Next: `SharedFileIO.c` (94 functions), `llSharedFileIO.c`
-   (40), `TagFile.c` (50). Easiest code in the binary to read, and it parses the asset containers.
+   configure.py); `ChecksumCRC32.c`, the XOR cipher module, `SharedFileIO.c` (50 functions) and
+   `TagFile.c` (41) done. Left: `llSharedFileIO.c` (17 functions, `0x80171308`-`0x801730C8`, the
+   GameCube CARD platform layer). Each module exposes a 7-entry function-pointer table via
+   `<Module>_GetInterface()`; shared error codes 2 = bad argument, 3 = wrong state,
+   6 = not initialised.
 4. **Add the already-solved small functions** to the project: the linked-list family at
    `0x8000B508` and `fn_800AACBC`.
 
