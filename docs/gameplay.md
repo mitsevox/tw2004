@@ -16,7 +16,7 @@ The pieces
 |----------|---------|------|
 | `Golfer_GetAttribute(p, k, mode)` | `0x8002E15C` | every attribute read (see `formats/game-data.md`) |
 | `Player_IsCPU(i)` | `0x8002E760` | `gPlayers[i].field_A08 == 9` |
-| `Shot_GoverningAttribute(kind, lie, club)` | `0x8002C8F4` | putt -> PUTTING; rough/sand lie -> RECOVERY; one club/kind case -> BALL STRIKING; else APPROACH |
+| `Shot_GoverningAttribute(i, club, lie, kind)` | `0x8002C8F4` | putter (club 25) -> PUTTING; rough/sand lie -> RECOVERY; full swing with a club under 13 from a good lie -> BALL STRIKING; else APPROACH |
 | `AI_ChooseTarget(i)` | `0x8002C2DC` | picks where the CPU aims |
 | `AI_ApplyError(i)` | `0x8002B59C` | perturbs the CPU's aim and distance by its attributes |
 | `AI_PlanShot(i, target)` | `0x8002BDEC` | turns a target into club / power |
