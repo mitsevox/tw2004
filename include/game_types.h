@@ -8,6 +8,8 @@ typedef unsigned long  u32;
 typedef signed char    s8;
 typedef short          s16;
 typedef long           s32;
+typedef unsigned long long u64;
+typedef long long      s64;
 typedef float          f32;
 #ifndef NULL
 #define NULL 0

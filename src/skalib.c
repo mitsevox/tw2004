@@ -15,7 +15,7 @@ int   strcmp(const char* pA, const char* pB);
 //   leaf:        [0] clip count, [1] first entry in ppClips, then a u32 "played" mask
 typedef struct AnimLib {
     s32    groups[64];          // 0x000  byte offset of each group's node, -1 none (21 used)
-    u32    id[2];               // 0x100
+    u64    uId;                 // 0x100  must match the clip bank's when the clips live there
     s32    n108;                // 0x108
     s32    nDefault;            // 0x10C  the leaf used when a group has nothing
     s32    nTreeSize;           // 0x110
@@ -23,7 +23,52 @@ typedef struct AnimLib {
     s32    nRecords;            // 0x118  36-byte clip records (a 16-character name first)
     u8*    pTree;               // 0x11C
     void** ppClips;             // 0x120  clip pointers; a clip's name is at +0xA0
+    s16*   pIndex;              // 0x124  record of each clip
+    void*  pFile;               // 0x128  the loaded file this library sits in
+    s32    n12C;                // 0x12C
+    struct ClipRecord* pRecords;  // 0x130
+    u8*    pClipData;           // 0x134  the library's own clips
+    struct ClipBank* pBank;     // 0x138  set in the file: the clips are in a bank instead
+    u32    uFlags;              // 0x13C  1: the library carries its own clips
+    s32    n140;                // 0x140
+    s16    n144;                // 0x144
+    s16    nClips2;             // 0x146
 } AnimLib;
+
+typedef struct ClipRecord {
+    char   name[16];            // 0x00
+    s16    n10;                 // 0x10
+    s16    n12;                 // 0x12
+    s32    n14;                 // 0x14
+    s32    n18;                 // 0x18
+    void*  pClip;               // 0x1C  offset into the clip data on disc, pointer once loaded
+    s32    n20;                 // 0x20
+} ClipRecord;
+
+// A clip bank: clips shared by several libraries (a 0x20-byte header, the clip offsets, then the
+// clips, each 16-aligned).
+typedef struct ClipBank {
+    u64    uId;                 // 0x00
+    s32    nClips;              // 0x08
+    s32    n0C;                 // 0x0C
+    void** ppClips;             // 0x10
+    void*  pFile;               // 0x14  the loaded file, while the bank owns it
+} ClipBank;
+
+// A loaded file as the streaming code hands it over: the data, which of the three slots it is
+// for (0x20) and its size (0x24).
+typedef struct LoadedFile {
+    u8*    pData;               // 0x00
+    u8     unk04[0x1C];
+    u32    nSlot;               // 0x20
+    u32    nSize;               // 0x24
+} LoadedFile;
+
+// One field of a byte-swap description: nBytes bytes made of nSize-byte values (negative: not swapped).
+typedef struct SwapField {
+    s32 nBytes;
+    s32 nSize;
+} SwapField;
 
 extern char (*lbl_80281D14)[2][8][6][16];   // the last clip name played: [player][reaction kind][style][club]
 
@@ -177,4 +222,297 @@ int AnimLib_RandomIndex(u32 uUsed, int nCount) {
         if (!((1 << nPick) & uUsed)) break;
     } while (++nTries < 3);
     return nPick;
+}
+
+void  fn_8001F08C(void** ppSrc, void** ppDst, SwapField* pFormat, int nFields, int nCount);  // byte-swap by format
+void  fn_80076158(void** ppSrc, void* pDst, int nBytes, int nSize);                           // byte-swap a run
+void* fn_80020DD4(void* pClip, void* pOut, int nAlign);
+void* fn_80009B34(u32 uSize, u32 uFlags, u32 uAlign, const char* pFile, int nLine);  // alloc
+void  fn_80009E70(void* p);                                                           // free
+void  fn_80005628(void* pDst, void* pSrc, int nBytes);                                // memcpy
+ClipBank* fn_80021F2C(int nSlot);
+u32   fn_800B6564(u32 uSize);                          // ARAM alloc
+void  fn_800B6594(u32 uAram);                          // ARAM free
+void  fn_800B6844(void* pSrc, u32 uAram, u32 uSize);   // copy to ARAM
+void  fn_800B68B4(void* pDst, u32 uAram, u32 uSize);   // copy from ARAM
+void  fn_800B67EC(void);                               // wait for the ARAM copy
+
+typedef struct LoadedLib {
+    AnimLib* pLib;              // 0x000
+    void*    pCopy;             // 0x004
+    u32      nSize;             // 0x008
+    u8       unk0C[0x14C];
+} LoadedLib;
+
+extern ClipBank*   lbl_801C6050[3];   // the clip bank of each slot
+extern AnimLib*    lbl_801C605C[3];   // the library of each slot, when its clips are in the bank
+extern LoadedLib   lbl_801C6068[3];
+extern u32         lbl_801C6470[3];   // ARAM copy of each slot's bank file
+extern u32         lbl_801C647C[3];   // its size
+extern LoadedFile* lbl_801C6488[3];   // each slot's bank file, while it is in main memory
+extern LoadedFile* lbl_80281CE0;      // the buffer banks are brought back from ARAM into
+
+// Swaps a clip bank's header.
+void ClipBank_SwapHeader(void* p) {
+    SwapField fmt[5] = {{8, -8}, {4, 4}, {4, 4}, {4, 4}, {4, 4}};
+    void*     pSrc = p;
+    void*     pDst = p;
+    fn_8001F08C(&pSrc, &pDst, fmt, 5, 1);
+}
+
+// Swap one node of the clip tree (see AnimLib).
+void AnimLib_SwapGroupNode(void* pSrc, void* pDst) {
+    SwapField fmt[3] = {{2, 2}, {0x10, 2}, {2, 1}};
+    fn_8001F08C(&pSrc, &pDst, fmt, 3, 1);
+}
+
+void AnimLib_SwapStyleNode(void* pSrc, void* pDst) {
+    SwapField fmt[2] = {{12, 2}, {2, 1}};
+    fn_8001F08C(&pSrc, &pDst, fmt, 2, 1);
+}
+
+void AnimLib_SwapClubNode(void* pSrc, void* pDst) {
+    SwapField fmt[5] = {{2, 2}, {2, 2}, {0x16, 2}, {2, 2}, {4, 4}};
+    fn_8001F08C(&pSrc, &pDst, fmt, 5, 1);
+}
+
+void AnimLib_SwapLeaf(void* pSrc, void* pDst) {
+    SwapField fmt[3] = {{2, 2}, {2, 2}, {4, 4}};
+    fn_8001F08C(&pSrc, &pDst, fmt, 3, 1);
+}
+
+// Swaps the whole clip tree, walking it the way AnimLib_Find does.
+void AnimLib_SwapTree(AnimLib* pLib, u8* pSrc, u8* pDst) {
+    int  nGroup;
+    int  nStyle;
+    int  nClub;
+    int  nKey;
+    s32  nOff;
+    s16* pNode;
+    s16* pStyle;
+    s16* pClub;
+
+    if (pLib->nDefault >= 0) AnimLib_SwapLeaf(pSrc + pLib->nDefault, pDst + pLib->nDefault);
+    for (nGroup = 0; nGroup < 21; nGroup++) {
+        nOff = pLib->groups[nGroup];
+        if (nOff < 0) continue;
+        pNode = (s16*)(pDst + nOff);
+        AnimLib_SwapGroupNode(pSrc + nOff, pNode);
+        if (pNode[0] >= 0) AnimLib_SwapLeaf(pSrc + pNode[0], pDst + pNode[0]);
+        for (nStyle = 0; nStyle < 8; nStyle++) {
+            nOff = pNode[1 + nStyle];
+            if (nOff <= 0) continue;
+            pStyle = (s16*)(pDst + nOff);
+            AnimLib_SwapStyleNode(pSrc + nOff, pStyle);
+            for (nClub = 0; nClub < 6; nClub++) {
+                nOff = pStyle[nClub];
+                if (nOff <= 0) continue;
+                pClub = (s16*)(pDst + nOff);
+                AnimLib_SwapClubNode(pSrc + nOff, pClub);
+                if (pClub[1] >= 0) AnimLib_SwapLeaf(pSrc + pClub[1], pDst + pClub[1]);
+                for (nKey = 0; nKey < 11; nKey++) {
+                    nOff = pClub[2 + nKey];
+                    if (nOff > 0) AnimLib_SwapLeaf(pSrc + nOff, pDst + nOff);
+                }
+            }
+        }
+    }
+}
+
+// Sets up an animation library loaded at pData (swapping it in place). Its clips come either from
+// the clip bank pBank, or (flag 1) from the library itself; a library whose id does not match the
+// bank's plays the bank's first clip for everything. NULL when it needs a bank and there is none.
+AnimLib* AnimLib_Load(u8* pData, ClipBank* pBank) {
+
+
+    SwapField hdrFmt[19] = {{0x100, 4}, {8, -8}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, -4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {2, 2}, {2, 2}};
+    SwapField recFmt[7]  = {{0x10, -1}, {2, 2}, {2, 2}, {4, 4}, {4, 4}, {4, 4}, {4, 4}};
+    void*     pDst;
+    void*     pSrc;
+    u32       uPad;
+    AnimLib*  pLib;
+    u8*       p;
+    int       i;
+
+    uPad = 16 - ((u32)pData & 15);
+    if (uPad == 16) uPad = 0;
+    pLib        = (AnimLib*)(pData + uPad);
+    pLib->pFile = pData;
+    p           = (u8*)pLib + sizeof(AnimLib);
+    pDst = pSrc = pLib;
+    fn_8001F08C(&pSrc, &pDst, hdrFmt, 19, 1);
+    if (pLib->pBank != NULL) {
+        if (pBank == NULL) return NULL;
+        pLib->pClipData = NULL;
+        pLib->ppClips   = (void**)p;
+        p += pLib->nClips * 4;
+        pLib->nClips2   = pLib->nClips;
+        pLib->pTree = p;
+        pDst = pSrc = pLib->ppClips;
+        fn_80076158(&pSrc, pDst, pLib->nClips * 4, 4);
+        if (pLib->uId != pBank->uId) {
+            for (i = 0; i < pLib->nClips; i++) pLib->ppClips[i] = pBank->ppClips[0];
+        } else {
+            for (i = 0; i < pLib->nClips; i++) pLib->ppClips[i] = pBank->ppClips[(u32)pLib->ppClips[i]];
+        }
+        pLib->pBank = pBank;
+    } else {
+        pLib->pIndex  = (s16*)p;
+        p += pLib->nClips * 2;
+        pLib->nClips2 = pLib->nClips;
+        if ((u32)p & 15) p = (u8*)((((u32)p >> 4) + 1) << 4);
+        pLib->pRecords = (ClipRecord*)p;
+        p += pLib->nRecords * sizeof(ClipRecord);
+        pLib->pTree = p;
+        p += pLib->nTreeSize;
+        pDst = pSrc = pLib->pIndex;
+        fn_80076158(&pSrc, pDst, pLib->nClips * 2, 2);
+        pDst = pSrc = pLib->pRecords;
+        fn_8001F08C(&pSrc, &pDst, recFmt, 7, pLib->nRecords);
+        if (pLib->uFlags & 1) {
+            if ((u32)p & 15) p = (u8*)((((u32)p >> 4) + 1) << 4);
+            pLib->pClipData = p;
+            pLib->ppClips   = fn_80009B34(pLib->nClips * 4, 2, 0x40, "skalib.c", 4164);
+            for (i = 0; i < pLib->nRecords; i++) {
+                pLib->pRecords[i].pClip = fn_80020DD4(pLib->pClipData + (u32)pLib->pRecords[i].pClip, NULL, 16);
+            }
+            for (i = 0; i < pLib->nClips; i++) pLib->ppClips[i] = pLib->pRecords[pLib->pIndex[i]].pClip;
+        } else {
+            pLib->pClipData = NULL;
+            pLib->ppClips   = NULL;
+        }
+        pLib->pBank = NULL;
+    }
+    pDst = pSrc = pLib->pTree;
+    AnimLib_SwapTree(pLib, pSrc, pDst);
+    return pLib;
+}
+
+// Sets up a clip bank loaded at pData, aligned to uAlign.
+ClipBank* ClipBank_Load(u8* pFile, u32 uAlign) {
+    u32       uUnused;
+    void*     pSrc;
+    u32       uPad;
+    ClipBank* pBank;
+    int       i;
+    u8*       pData;
+
+    pData = pFile;
+    uPad = uAlign - ((u32)pData & (uAlign - 1));
+    if (uPad == uAlign) uPad = 0;
+    pBank = (ClipBank*)(pData + uPad);
+    ClipBank_SwapHeader(pBank);
+    pBank->pFile   = NULL;
+    pData += 0x20;
+    pBank->ppClips = (void**)pData;
+    pSrc = pBank->ppClips;
+    fn_80076158(&pSrc, pBank->ppClips, pBank->nClips * 4, 4);
+    pData += pBank->nClips * 4;
+    uPad = 16 - ((u32)pData & 15);
+    if (uPad == 16) uPad = 0;
+    pData += uPad;
+    for (i = 0; i < pBank->nClips; i++) {
+        pBank->ppClips[i] = fn_80020DD4(pData + (u32)pBank->ppClips[i], &uUnused, 16);
+    }
+    return pBank;
+}
+
+// A slot's animation library has loaded: keep a copy and set it up against the slot's bank.
+void AnimLib_OnLoaded(LoadedFile* pFile) {
+    u8       bFree = 1;
+    u32      nSlot = pFile->nSlot;
+    AnimLib* pLib;
+
+    if (nSlot < 3 && lbl_801C605C[nSlot] == NULL) {
+        lbl_801C6068[nSlot].pCopy = fn_80009B34(pFile->nSize, 2, 0x40, "skalib.c", 4520);
+        fn_80005628(lbl_801C6068[nSlot].pCopy, pFile->pData, pFile->nSize);
+        lbl_801C6068[nSlot].nSize = pFile->nSize;
+        pLib = AnimLib_Load(pFile->pData, fn_80021F2C(nSlot));
+        pLib->pFile = pFile;
+        if (pLib->pBank != NULL) {
+            lbl_801C605C[nSlot] = pLib;
+        } else {
+            lbl_801C6068[nSlot].pLib = pLib;
+        }
+        bFree = 0;
+    }
+    if (bFree) fn_80009E70(pFile);
+}
+
+void ClipBank_Stash(int nSlot);
+
+// A slot's clip bank file has loaded: park it in ARAM.
+void ClipBank_OnLoaded(LoadedFile* pFile) {
+    u32 nSlot = pFile->nSlot;
+    lbl_801C6488[nSlot] = pFile;
+    ClipBank_Stash(nSlot);
+}
+
+// Makes a loaded clip bank file the slot's bank.
+void ClipBank_Install(LoadedFile* pFile) {
+    u8  bFree = 1;
+    u32 nSlot = pFile->nSlot;
+
+    if (nSlot < 3 && lbl_801C6050[nSlot] == NULL) {
+        lbl_801C6050[nSlot]        = ClipBank_Load(pFile->pData, 16);
+        bFree                      = 0;
+        lbl_801C6050[nSlot]->pFile = pFile;
+    }
+    if (bFree) fn_80009E70(pFile);
+}
+
+// Forgets a slot's bank.
+void ClipBank_Release(int nSlot) {
+    if (lbl_801C6050[nSlot] != NULL) {
+        if (lbl_801C6050[nSlot]->pFile != NULL) {
+            lbl_801C6050[nSlot]->pFile = NULL;
+            lbl_801C6050[nSlot]        = NULL;
+            lbl_801C6488[nSlot]        = NULL;
+        } else {
+            lbl_801C6050[nSlot] = NULL;
+        }
+    }
+    if (lbl_801C6488[nSlot] != NULL) lbl_801C6488[nSlot] = NULL;
+}
+
+// Copies a slot's bank file to ARAM and frees it; the first time, allocates the buffer it is
+// brought back into.
+void ClipBank_Stash(int nSlot) {
+    if (lbl_801C6488[nSlot] != NULL) {
+        lbl_801C647C[nSlot] = ((lbl_801C6488[nSlot]->nSize + 0x80) / 32 + 1) * 32;
+        if (lbl_801C6470[nSlot] == 0) lbl_801C6470[nSlot] = fn_800B6564(lbl_801C647C[nSlot]);
+        fn_800B6844(lbl_801C6488[nSlot], lbl_801C6470[nSlot], lbl_801C647C[nSlot]);
+        fn_800B67EC();
+        if (lbl_801C6488[nSlot] != lbl_80281CE0) fn_80009E70(lbl_801C6488[nSlot]);
+        lbl_801C6488[nSlot] = NULL;
+        if (nSlot == 0 && lbl_80281CE0 == NULL) {
+            lbl_80281CE0 = fn_80009B34(lbl_801C647C[nSlot], 2, 0x20, "skalib.c", 4671);
+        }
+    }
+}
+
+// Brings a slot's bank back from ARAM and installs it.
+void ClipBank_Restore(int nSlot) {
+    if (lbl_801C6488[nSlot] == NULL) {
+        lbl_801C6488[nSlot] = lbl_80281CE0;
+        fn_800B68B4(lbl_801C6488[nSlot], lbl_801C6470[nSlot], lbl_801C647C[nSlot]);
+        fn_800B67EC();
+        lbl_801C6488[nSlot]->pData = (u8*)lbl_801C6488[nSlot] + 0x80;
+        ClipBank_Install(lbl_801C6488[nSlot]);
+    }
+}
+
+// Frees the banks' ARAM and the restore buffer.
+void ClipBank_FreeAram(void) {
+    int i;
+    for (i = 0; i < 3; i++) {
+        if (lbl_801C6470[i] != 0) {
+            fn_800B6594(lbl_801C6470[i]);
+            lbl_801C6470[i] = 0;
+        }
+    }
+    if (lbl_80281CE0 != NULL) {
+        fn_80009E70(lbl_80281CE0);
+        lbl_80281CE0 = NULL;
+    }
 }
