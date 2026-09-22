@@ -1261,10 +1261,11 @@ void Swing_ResetBoostAndSpin(int nPlayer) {
 
 void  View_SetCamera(void* pView, int nCamera, int nPlayer, int nView);   // 0x800632E4
 void  fn_800E3D38(int nPlayer, int a);
+void  Ball_SetSimulating(u8 bOn);            // Ball.c
 void  fn_8006AD68(int nPlayer);
 void  fn_800DF280(void);
 void  fn_800E3C0C(int a);
-void  fn_80063C90(void* pView);
+u8    fn_80063C90(void* pView);              // the camera is still moving
 void  fn_80063BF4(void* pView, f32 f, f32* pVec);
 void  fn_800DD904(void);
 extern u8  lbl_80281E10;
@@ -2411,6 +2412,73 @@ void SwingState03_Update(int nPlayer) {
         if (fn_800C7340(fn_80017028(gPlayers[nPlayer].nView0), nPlayer)) {
             fn_80062D6C(0x67, nPlayer);
             lbl_80281E11 = 0;
+        }
+    }
+}
+
+
+int   fn_800DB1C4(int nPlayer);               // preview speed: ghost steps per frame
+void  fn_8005567C(u8* pBall, int nTicks);     // Ball.c: step a ball
+extern Vec4 lbl_80183600;
+
+// State 6, the putt preview playing. Any button ends it (any pad for a CPU). Otherwise the
+// ghost ball (in ballBefore) is stepped preview-speed times a frame, 20 ticks each, with the
+// simulating flag up; the camera follows with quarter-second moves while the ghost is still
+// closing on the pin, and the state pops once the ghost has stopped and the camera settled.
+void SwingState06_Update(int nPlayer) {
+    Vec4        vOffset = lbl_80183600;
+    CourseInfo* pCourse = fn_8000C594();
+    u32         uMask;
+    int         nSteps, i;
+    Player*     p;
+    u8*         pGhost;
+    s32*        pGhostState;
+    s32*        pView;
+    f32*        pGhostMinDist;
+
+    Caddie_Update(nPlayer);
+    if (!Player_IsCPU(nPlayer)) {
+        uMask = fn_800142AC(0, 0);
+        if (fn_800136DC(gPlayers[nPlayer].nController) & uMask) {
+            fn_8005CFD4(nPlayer);
+            return;
+        }
+    } else {
+        if (fn_80014300(fn_800142AC(0, 0))) {
+            fn_8005CFD4(nPlayer);
+            return;
+        }
+    }
+    nSteps = fn_800DB1C4(nPlayer);
+    p = &gPlayers[nPlayer];
+    if (*(s32*)(p->ballBefore + 0x64) == 1 || *(s32*)(p->ballBefore + 0x64) == 5) {
+        if (fn_80063C50(fn_80017028(p->nView0))) {
+            fn_8005CFD4(nPlayer);
+        }
+        return;
+    }
+    if (fn_80063C50(fn_80017028(p->nView0))) {
+        fn_8005CFD4(nPlayer);
+        return;
+    }
+    pGhost        = p->ballBefore;
+    pGhostState   = (s32*)(p->ballBefore + 0x64);
+    pView         = &p->nView0;
+    pGhostMinDist = (f32*)(p->ballBefore + 0x60);
+    for (i = 0; i < nSteps; i++) {
+        Ball_SetSimulating(1);
+        fn_8005567C(pGhost, 20);
+        Ball_SetSimulating(0);
+        if (*pGhostState == 1 || *pGhostState == 5) {
+            if (!fn_80063C90(fn_80017028(*pView))) {
+                fn_80063BF4(fn_80017028(*pView), 0.25f, (f32*)&vOffset);
+            }
+        } else if (!fn_80063C90(fn_80017028(*pView)) && pCourse != NULL) {
+            int nHole = Game_CurrentHole();
+            if (*pGhostMinDist < 0.5f ||
+                !(*pGhostMinDist < Vec_Distance((f32*)pGhost, (f32*)&pCourse->pin[nHole]) - 0.1f)) {
+                fn_80063BF4(fn_80017028(*pView), 0.25f, (f32*)&vOffset);
+            }
         }
     }
 }
