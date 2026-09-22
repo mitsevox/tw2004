@@ -165,6 +165,13 @@ tee gets up to +10% in a tempo window.
 escaping the worst lie on a bad surface (12.5% to 32%), and a kinder bounce term in the
 collision code. Humans only: CPU golfers never roll for luck.
 
+**Update (the lucky event itself, `Luck_TakePerfectShot` in C):** the "lucky event" is not a
+bounce. When the roll succeeds the game runs the CPU's shot rehearsal on a copy of you, aimed
+at the pin, while you set up; at launch, if your club is within two of the rehearsed one, the
+shot kind matches and your aim is within 5 degrees, **your shot is replaced by the rehearsed
+one** and your swing error is zeroed. The human and CPU paths are not just different - the
+human's best shots *are* the CPU's solver. Full account in [`gameplay.md`](gameplay.md).
+
 **Status:** answered.
 
 5. Is there hidden putting assistance (a "pull" toward the cup)?

@@ -180,3 +180,9 @@ Dated log of what was done and decided, newest last. Facts and lessons belong in
   the wind to +-15 per axis for CPU balls only. Two corrections while in the physics: the ball
   works in yards (all constants are whole inches - the cup pull is 5.5 in, holed is 2 in below the
   pin), and the rehearsal steps twelve real 1/60 s ticks per frame, not one coarse 0.2 s step.
+- **The lucky shot.** `Luck_TakePerfectShot` (`0x8002DE14`): a human's successful luck roll
+  starts the CPU rehearsal on a copy of them aimed at the pin, and at launch swaps the rehearsed
+  club/kind/power/aim in for theirs if they were playing roughly that shot (club within 2, same
+  kind, aim within 5 degrees). The caddie code and the lucky-shot code are the same code. Also:
+  luck odds reset to 12 on a taken lucky shot and tighten 12 -> 11 -> 10 over the first hole
+  transitions. Golfer.c: 76 functions in C, 45 exact.

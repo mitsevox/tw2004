@@ -1550,3 +1550,56 @@ void fn_8002EBA4(u8* pObj, u8 nValue) {
         fn_80013200(i, pObj[7]);
     }
 }
+
+// ---- the lucky shot ---------------------------------------------------------------------------
+// When a human wins the luck roll (Player.bPerfect), Caddie_Start has been running the CPU's
+// rehearsal on a copy of them in slot 4, aimed at the pin, since the shot was planned. At the
+// moment the ball is struck this swaps the rehearsed shot in for theirs - club, trajectory, kind,
+// power and aim - provided they were playing roughly the same shot: a club within two of the
+// rehearsed one, the same shot kind, an aim within 5 degrees. Otherwise the shot is not perfect
+// after all. A taken lucky shot puts the player's odds back to 1 in 12.
+
+f32 fn_8000AE94(f32 x);                 // fabsf
+
+void Luck_TakePerfectShot(int nPlayer) {
+    u8*  pPerfect = &gPlayers[nPlayer].bPerfect;
+    s32* pClub;
+    s32* pKind;
+    f32* pAim;
+    f32  fDiff;
+
+    if (*pPerfect == 0 || Player_IsCPU(nPlayer) || gSession.bNoLuck != 0) return;
+    {
+        pClub = &gPlayers[nPlayer].nClub;
+        if (gPlayers[CADDIE_SLOT].nClub + 2 < *pClub) {
+            *pPerfect = 0;
+            return;
+        }
+        if (gPlayers[CADDIE_SLOT].nClub > *pClub + 2) {
+            *pPerfect = 0;
+            return;
+        }
+        pKind = &gPlayers[nPlayer].nShotKind;
+        if (gPlayers[CADDIE_SLOT].nShotKind != *pKind) {
+            *pPerfect = 0;
+            return;
+        }
+        pAim  = &gPlayers[nPlayer].fAim;
+        fDiff = *pAim - gPlayers[CADDIE_SLOT].fAim;
+        while (fDiff < -PI) fDiff += 2 * PI;
+        while (fDiff > PI) fDiff -= 2 * PI;
+        if (fn_8000AE94(fDiff) > 0.0872665) {
+            *pPerfect = 0;
+            return;
+        }
+        if (gCaddieDone) {
+            Luck_ResetOdds(nPlayer);
+            *pClub = gPlayers[CADDIE_SLOT].nClub;
+            gPlayers[nPlayer].nTrajectory = gPlayers[CADDIE_SLOT].nTrajectory;
+            *pKind = gPlayers[CADDIE_SLOT].nShotKind;
+            gPlayers[nPlayer].fPower = gPlayers[CADDIE_SLOT].fPower;
+            *pAim = gPlayers[CADDIE_SLOT].fAim;
+        }
+        Caddie_Stop();
+    }
+}

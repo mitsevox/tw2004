@@ -148,9 +148,34 @@ at each hole transition until 1 in 10** (`Luck_TightenOdds`, from the game state
   under 250 yards, or on a par 3; then `Rand_Next(0) % odds == 0` is the roll.
 
 The roll is made once, when the shot is planned (`Shot_Plan`), and its result is
-`Player.bPerfect`: **a lucky shot is a perfect shot.** The swing's error is zeroed and
-forgiveness skipped (`Swing.c`), the tree deflection roll is skipped, and the caddie's search
-accepts a wider miss.
+`Player.bPerfect`. What that flag does turned out to be the best-hidden mechanic in the game:
+
+**A lucky shot is the CPU's rehearsal, played for you** (`Luck_TakePerfectShot`,
+`0x8002DE14`, in C). The moment the roll succeeds, `Caddie_Start` - the same code that runs the
+putt tip - copies you into player slot 4, marks the copy a CPU, **aims it at the pin**, and
+starts rehearsing (`AI_RehearseShot`, twelve physics ticks a frame) while you line up your
+shot. The rehearsal converges when its ball stops within 9 inches of the pin (0.0625 yd
+squared in `Caddie_Update`'s perfect branch). Then, at the instant your swing launches
+(`Swing_Launch`, `0x8005AEE0`), the game checks that you were playing roughly the shot it
+solved:
+
+- your club within **two** of the rehearsed club;
+- the **same shot kind** (full, chip, pitch...);
+- your aim within **5 degrees** of the rehearsed aim.
+
+If so, and the rehearsal had converged, **your club, trajectory, shot kind, power and aim are
+silently replaced by the rehearsed ones** - a shot the physics has already shown lands at the
+pin - your swing error is zeroed and forgiveness skipped (`Swing.c`), the tree-deflection roll
+is skipped, and your luck odds go back to 1 in 12. If you were playing something else (a
+different club, a lay-up, a punch), the flag is cleared and the shot is ordinary. If the
+rehearsal had not converged in time, the flag stays but nothing is swapped - you just get the
+error-free swing.
+
+So "Luck: increases % of favorable lies and bounces" understates it. The favourable lie and the
+kind bounce are real (below), but the main event is a whole shot handed to you, disguised as a
+great swing. It cannot happen on the green, on a putt, or from the deep stuff - only on par 3s,
+pitches, and shots from lie 1 or 2 inside 250 yards - and the session's "no luck" flag turns the
+whole thing off. A CPU never gets one.
 
 What the event does is in the lie code (`0x80053594`, read, not decompiled): landing in the
 rough is a coin flip between the good rough lie and the bad one, and `(roll & 127) < LUCK/2`
