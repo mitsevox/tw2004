@@ -196,7 +196,7 @@ typedef struct Session {
     s32  unkC;                  // 0x00C
     u8   nSplitScreen;          // 0x010  0 single view, else split screen (2 = side by side); no luck, no caddie
     u8   unk11[2];
-    u8   bNoSpin;               // 0x013  spin control switched off
+    u8   bReplay;               // 0x013  a saved replay is playing: no luck swap, no spin, instant launch
     s32  unk14;                 // 0x014
     f32  fFrameTime;            // 0x018  seconds per frame
     f32  f1C;                   // 0x01C
