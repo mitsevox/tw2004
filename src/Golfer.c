@@ -211,7 +211,7 @@ void AI_ChooseTarget(int nPlayer) {
     pBest          = &gAITargets[nBest];
     p->fTargetX    = pBest->pDef->x;
     p->fTargetZ    = pBest->pDef->z;
-    p->nTargetType = pBest->nType;
+    p->nShotShape = pBest->nType;
     AI_PlanShot(nPlayer, &p->fTargetX);
     Vec_Copy(&p->fTargetX, p->vTarget2);
 }
@@ -613,7 +613,7 @@ void AI_DefaultTarget(int nPlayer) {
     p->fTargetX    = pCourse->pin[nHole].x;
     pTarget        = &p->fTargetX;
     p->fTargetZ    = pCourse->pin[nHole].z;
-    p->nTargetType = 0;
+    p->nShotShape = 0;
     AI_PlanShot(nPlayer, pTarget);
     Vec_Copy(pTarget, p->vTarget2);
 }
@@ -842,11 +842,6 @@ extern s32 gSimClub[6];             // 0x801C65A0  per player: club the rehearsa
 void Ball_SetSimulating(u8 bOn);                                  // 0x80050D24: gSimulating - silences sounds, effects and the tree roll
 void Ball_Launch(void* pBall, int nClub, int nKind, f32 fPower, f32 fAim, int bSim, f32* pA, f32* pB);
 void Ball_SimStep(void* pBall, f32 fDt, f32 fScale);              // 0x8005585C
-f32  fn_8002CD20(int nPlayer);                                    // aim angle to the target
-void fn_8002D774(int nPlayer);
-int  fn_8002D3EC(int nPlayer);
-void fn_8002D544(int nPlayer, f32* pOut);
-void fn_8002D680(int nPlayer, f32* pOut);
 void fn_8001C774(int nHandle, int nClub);
 void fn_8001C724(int nHandle, int nKind);
 f32  fn_800095F0(f32 x);                                          // sinf
@@ -875,7 +870,7 @@ void Shot_Prepare(int nPlayer, u8 bNotify) {
     int     i;
     f32     fRise, fDist;
 
-    p->fAim = fn_8002CD20(nPlayer);
+    p->fAim = Shot_AimAngle(nPlayer);
     for (i = 0; i < 8; i++) {
         p->nShotKind      = i;
         p->nClubPerKind[i] = AI_ClubForShot(nPlayer, p->nShotKind, 0, p->fDistance);
@@ -896,15 +891,15 @@ void Shot_Prepare(int nPlayer, u8 bNotify) {
     } else {
         p->nClub = AI_ClubForShot(nPlayer, p->nShotKind, 0, fDist);
     }
-    fn_8002D774(nPlayer);
+    Shot_FitTargetToClub(nPlayer);
     if (!Player_IsCPU(nPlayer)) {
         Vec_Copy(&p->fTargetX, p->vTarget2);
         AI_PlanShot(nPlayer, &p->fTargetX);
     }
-    p->nShotFlag = fn_8002D3EC(nPlayer);
+    p->nTrajectory = Shot_Trajectory(nPlayer);
     p->fPower    = AI_PowerForTarget(nPlayer);
-    fn_8002D544(nPlayer, p->vLaunchA);
-    fn_8002D680(nPlayer, p->vLaunchB);
+    Shot_DefaultSpin(nPlayer, p->vLaunchA);
+    Shot_FaceVector(nPlayer, p->vLaunchB);
     if (bNotify) {
         fn_8001C774(gPlayers[nPlayer].nShotHandle, gPlayers[nPlayer].nClub);
         fn_8001C724(gPlayers[nPlayer].nShotHandle, gPlayers[nPlayer].nShotKind);
@@ -1027,14 +1022,14 @@ u8 AI_RehearseShot(int nPlayer, f32* pOutDist2, u8 bFast, f32 fTolerance) {
             }
             BUMP_MODIFIERS(p, 5);
             Golfer_ClampModifiers(p);
-            switch (p->nTargetType) {
-            case 0: break;
-            case 1: AI_NudgeAim(nPlayer, DEG(-1.0f)); break;
-            case 2: AI_NudgeAim(nPlayer, DEG(1.0f)); break;
-            case 3: AI_NudgeDistance(nPlayer, -5.0f); break;
-            case 4: AI_NudgeDistance(nPlayer, 5.0f); break;
-            case 5: AI_NudgeAim(nPlayer, DEG(-2.0f)); break;
-            case 6: AI_NudgeAim(nPlayer, DEG(2.0f)); break;
+            switch (p->nShotShape) {
+            case SHAPE_STRAIGHT:    break;
+            case SHAPE_CURVE_A:     AI_NudgeAim(nPlayer, DEG(-1.0f)); break;
+            case SHAPE_CURVE_B:     AI_NudgeAim(nPlayer, DEG(1.0f)); break;
+            case SHAPE_LOW:         AI_NudgeDistance(nPlayer, -5.0f); break;
+            case SHAPE_HIGH:        AI_NudgeDistance(nPlayer, 5.0f); break;
+            case SHAPE_BIG_CURVE_A: AI_NudgeAim(nPlayer, DEG(-2.0f)); break;
+            case SHAPE_BIG_CURVE_B: AI_NudgeAim(nPlayer, DEG(2.0f)); break;
             }
             Shot_Prepare(nPlayer, 0);
             p->nRehearseState = 0;
@@ -1103,4 +1098,124 @@ u8 AI_RehearseShot(int nPlayer, f32* pOutDist2, u8 bFast, f32 fTolerance) {
         return 1;
     }
     return bDone;
+}
+
+// ---- shot setup helpers -------------------------------------------------------------------------
+
+double fn_8015F7C4(double y, double x);   // atan2
+void Vec_Normalize(f32* pSrc, f32* pDst);   // 0x800BAEB0
+int  Scenario_RequiredShape(void);      // 0x8010069C  the lesson's shape in mode 11, else 7 (none)
+
+// The aim angle from the ball to the target, wrapped to -pi..pi. 0 is +z; positive turns left.
+f32 Shot_AimAngle(int nPlayer) {
+    f32 fDX = gPlayers[nPlayer].fTargetX - gPlayers[nPlayer].fBallX;
+    f32 fDZ = gPlayers[nPlayer].fTargetZ - gPlayers[nPlayer].fBallZ;
+    f32 fAngle = fn_8015F7C4(-fDX, fDZ);
+    if (fAngle > PI) {
+        fAngle -= 2 * PI;
+    } else if (fAngle < -PI) {
+        fAngle += 2 * PI;
+    }
+    return fAngle;
+}
+
+// The trajectory the shot shape asks for: 3 and 4 are the two alternatives, anything else normal.
+int Shot_Trajectory(int nPlayer) {
+    Player* p = &gPlayers[nPlayer];
+    if (p->nShotShape == SHAPE_LOW) {
+        return 2;
+    }
+    if (p->nShotShape == SHAPE_HIGH) {
+        return 0;
+    } else {
+        return 1;
+    }
+}
+
+// The first launch block: no spin offset.
+void Shot_DefaultSpin(int nPlayer, f32* pOut) {
+    pOut[0] = 0.0f;
+    pOut[1] = 0.0f;
+    pOut[2] = 1.0f;
+    pOut[3] = 0.0f;
+}
+
+// A CPU's clubface vector from its shot shape (a lesson in mode 11 can dictate the shape):
+// x = +-0.02 for a slight curve, +-0.04 for a big one, normalised.
+void AI_FaceVector(int nPlayer, f32* pOut) {
+    Player* p = &gPlayers[nPlayer];
+    int     nShape = Scenario_RequiredShape();
+    if (nShape != 7) p->nShotShape = nShape;
+    pOut[0] = 0.0f;
+    pOut[1] = 0.0f;
+    pOut[2] = 1.0f;
+    pOut[3] = 0.0f;
+    if (p->nShotShape == SHAPE_STRAIGHT) {
+        pOut[0] = 0.0f;
+        pOut[1] = 0.0f;
+        pOut[2] = 1.0f;
+        pOut[3] = 0.0f;
+    } else if (p->nShotShape == SHAPE_CURVE_A) {
+        pOut[0] = 0.02f;
+        pOut[1] = 0.0f;
+        pOut[2] = 0.98f;
+        pOut[3] = 0.0f;
+    } else if (p->nShotShape == SHAPE_CURVE_B) {
+        pOut[0] = -0.02f;
+        pOut[1] = 0.0f;
+        pOut[2] = 0.98f;
+        pOut[3] = 0.0f;
+    } else if (p->nShotShape == SHAPE_BIG_CURVE_A) {
+        pOut[0] = 0.04f;
+        pOut[1] = 0.0f;
+        pOut[2] = 0.96f;
+        pOut[3] = 0.0f;
+    } else if (p->nShotShape == SHAPE_BIG_CURVE_B) {
+        pOut[0] = -0.04f;
+        pOut[1] = 0.0f;
+        pOut[2] = 0.96f;
+        pOut[3] = 0.0f;
+    }
+    Vec_Normalize(pOut, pOut);
+}
+
+// The second launch block: a CPU's shaped clubface, a human's square one.
+void Shot_FaceVector(int nPlayer, f32* pOut) {
+    if (Controller_IsCPU(gPlayers[nPlayer].nController)) {
+        AI_FaceVector(nPlayer, pOut);
+    } else {
+        pOut[0] = 0.0f;
+        pOut[1] = 0.0f;
+        pOut[2] = 1.0f;
+        pOut[3] = 0.0f;
+    }
+}
+
+// Fit the target to the club: past its reach, pull the target in to the reach; short of it, a
+// human's target (not with the putter, not on a chip) is pushed out to the full reach - the aim
+// marker always sits at the club's distance and power does the rest. A CPU keeps a short target.
+void Shot_FitTargetToClub(int nPlayer) {
+    Player* p    = &gPlayers[nPlayer];
+    f32     fMax = AI_MaxDistance(nPlayer, p->nShotKind, p->nClub);
+    f32     fSin, fCos, fDX, fDZ;
+    if (p->fDistance > fMax) {
+        fSin = fn_800095F0(p->fAim);
+        fCos = fn_80009638(p->fAim);
+        fDZ  = fMax * fCos;
+        fDX  = fMax * -fSin;
+        p->fTargetX = p->fBallX + fDX;
+        p->fTargetZ = p->fBallZ + fDZ;
+        AI_PlanShot(nPlayer, &p->fTargetX);
+    } else if (p->fDistance < fMax) {
+        if (Controller_IsCPU(p->nController)) return;
+        if (p->nClub == CLUB_PUTTER) return;
+        if (p->nShotKind == SHOT_CHIP) return;
+        fSin = fn_800095F0(p->fAim);
+        fCos = fn_80009638(p->fAim);
+        fDZ  = fMax * fCos;
+        fDX  = fMax * -fSin;
+        p->fTargetX = p->fBallX + fDX;
+        p->fTargetZ = p->fBallZ + fDZ;
+        AI_PlanShot(nPlayer, &p->fTargetX);
+    }
 }
