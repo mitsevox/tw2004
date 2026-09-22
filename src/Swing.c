@@ -9,7 +9,7 @@ typedef struct SwingState {
     u8   unk0[4];
     f32  fClubBack;             // 0x004  tuning "clubback"
     f32  fClubDown;             // 0x008  tuning "clubdown"
-    f32  fTuningC;              // 0x00C
+    f32  fTBall;                // 0x00C  tuning "tball"
     u8   unk10[0x44 - 0x10];
     u8   res44[0x28];           // 0x044  released by fn_80058DB4
     u8   res6C[0x28];           // 0x06C
@@ -18,13 +18,30 @@ typedef struct SwingState {
     void* pA4[2];              // 0x0A4
     f32  fCurveMin;             // 0x0AC  a club's shaping range, by gClubCurve
     f32  fCurveMax;             // 0x0B0
-    u8   unkB4[4];
+    f32  fB4;                   // 0x0B4
     f32  fKnot1Y;               // 0x0B8  } the backswing-angle response curve: two knots
     f32  fKnot1X;               // 0x0BC  0.4
     f32  fKnot2Y;               // 0x0C0
     f32  fKnot2X;               // 0x0C4  0.6
     f32  fTeeBonus;             // 0x0C8  0.1
-    u8   unkCC[0x114 - 0xCC];
+    f32  fCC;                   // 0x0CC  40
+    s32  nD0;                   // 0x0D0  1
+    f32  fPutting;              // 0x0D4  player 1's golfer ratings, as floats
+    f32  fBallStriking;         // 0x0D8
+    f32  fApproach;             // 0x0DC
+    f32  fRecovery;             // 0x0E0
+    f32  fSpin;                 // 0x0E4
+    f32  fPower;                // 0x0E8
+    f32  fEC;                   // 0x0EC  0.5
+    f32  fF0;                   // 0x0F0  0.5
+    f32  fF4;                   // 0x0F4  0.5
+    f32  fF8;                   // 0x0F8  0.05
+    f32  fFC;                   // 0x0FC  0.5
+    f32  f100;                  // 0x100  0.02395
+    f32  f104;                  // 0x104  0.00161
+    f32  f108;                  // 0x108  0.95
+    f32  f10C;                  // 0x10C  0.95
+    f32  f110;                  // 0x110  0.01
     f32  fMaxError;             // 0x114  the meter's largest miss, radians
     f32  fPuttFullPower;        // 0x118  0.75: a putt meter over this counts as full
 } SwingState;
@@ -1042,6 +1059,61 @@ void fn_800360A0(void* p);
 void fn_80009E70(void* p);
 
 // Release the swing's loaded resources: two blocks in the tuning data and three pairs of handles.
+void Swing_LoadTuning(int nPlayer);
+void Swing_ResetBoostAndSpin(int nPlayer);
+void fn_80036054(void* p, int a, s32* pDesc);
+void* fn_80009B34(u32 uSize, u32 uFlags, u32 uAlign, const char* pFile, int nLine);  // alloc
+
+// Set the swing module up: player 1's ratings and the fixed tuning into gpSwing, the two resource
+// blocks, each player's tuning and swing state, and three pairs of buffers.
+void Swing_Init(void) {
+    s32 desc[2];
+    int i;
+    gpSwing->fCC = 40.0f;
+    gpSwing->nD0 = 1;
+    gpSwing->fPutting      = (s8)Golfer_GetAttribute(&gPlayers[0], ATTR_PUTTING, ATTR_BASE);
+    gpSwing->fBallStriking = (s8)Golfer_GetAttribute(&gPlayers[0], ATTR_BALL_STRIKING, ATTR_BASE);
+    gpSwing->fApproach     = (s8)Golfer_GetAttribute(&gPlayers[0], ATTR_APPROACH, ATTR_BASE);
+    gpSwing->fRecovery     = (s8)Golfer_GetAttribute(&gPlayers[0], ATTR_RECOVERY, ATTR_BASE);
+    gpSwing->fSpin         = (s8)Golfer_GetAttribute(&gPlayers[0], ATTR_SPIN, ATTR_BASE);
+    gpSwing->fPower        = (s8)Golfer_GetAttribute(&gPlayers[0], ATTR_POWER, ATTR_BASE);
+    gpSwing->fEC = gpSwing->fF0 = gpSwing->fF4 = 0.5f;
+    gpSwing->fF8 = 0.05f;
+    gpSwing->fFC = 0.5f;
+    gpSwing->f104 = 0.00161f;
+    gpSwing->f100 = 0.02395f;
+    gpSwing->f108 = 0.95f;
+    gpSwing->f10C = 0.95f;
+    gpSwing->f110 = 0.01f;
+    gpSwing->fMaxError = 1.5f;
+    gpSwing->fCurveMin = 0.13f;
+    gpSwing->fCurveMax = 0.4f;
+    gpSwing->fB4 = 0.143f;
+    gpSwing->fKnot1Y = 0.22f;
+    gpSwing->fKnot1X = 0.4f;
+    gpSwing->fKnot2Y = 0.22f;
+    gpSwing->fKnot2X = 0.6f;
+    gpSwing->fTeeBonus = 0.1f;
+    gpSwing->fPuttFullPower = 0.75f;
+    desc[0] = 0x1A;
+    desc[1] = 1;
+    fn_80036054(gpSwing->res44, 0, desc);
+    fn_80036054(gpSwing->res6C, 0, desc);
+    for (i = 0; i < gSession.nNumPlayers; i++) {
+        Swing_LoadTuning(i);
+        Swing_ResetBoostAndSpin(i);
+        gPlayers[i].swing.f484 = 0.5f;
+        gPlayers[i].swing.f488 = 0.5f;
+        gPlayers[i].swing.f48C = 0.5f;
+        gPlayers[i].swing.f490 = 0.0f;
+    }
+    for (i = 0; i < 2; i++) {
+        gpSwing->p94[i] = fn_80009B34(0x138, 2, 0x10, "Swing.c", 555);
+        gpSwing->p9C[i] = fn_80009B34(0x68, 2, 0x10, "Swing.c", 556);
+        gpSwing->pA4[i] = fn_80009B34(0xD0, 2, 0x10, "Swing.c", 557);
+    }
+}
+
 void fn_80058DB4(void) {
     int i;
     fn_800360A0((u8*)gpSwing + 0x44);
@@ -1497,9 +1569,6 @@ u32  fn_800136DC(int nController);           // buttons held
 u32  fn_800142AC(int nButton, int a);        // a button's mask
 unsigned long long fn_8000BEE4(char* pName);   // a tuning name's 64-bit hash
 void fn_800102DC(unsigned long long uHash, void* pSwing, f32* pOut);   // bind a tuning value
-extern char lbl_801883A8[];                  // "clubback"
-extern char lbl_801883B4[];                  // "clubdown"
-extern char lbl_8028119C[];
 
 int Swing_PhaseIdle4(int nPlayer) {
     return 0;
@@ -1604,14 +1673,14 @@ void fn_8005A7A0(int nPlayer) {
 }
 
 // Bind the swing module's tuning values by name.
-void Swing_LoadTuning(void) {
+void Swing_LoadTuning(int nPlayer) {
     unsigned long long uHash;
-    uHash = fn_8000BEE4(lbl_801883A8);
+    uHash = fn_8000BEE4("clubback");
     fn_800102DC(uHash, gpSwing, &gpSwing->fClubBack);
-    uHash = fn_8000BEE4(lbl_801883B4);
+    uHash = fn_8000BEE4("clubdown");
     fn_800102DC(uHash, gpSwing, &gpSwing->fClubDown);
-    uHash = fn_8000BEE4(lbl_8028119C);
-    fn_800102DC(uHash, gpSwing, &gpSwing->fTuningC);
+    uHash = fn_8000BEE4("tball");
+    fn_800102DC(uHash, gpSwing, &gpSwing->fTBall);
 }
 
 
@@ -3121,9 +3190,6 @@ void  fn_800CC5C0(int nHandle, char* pA, char* pB);   // an attachment (the glov
 void  fn_8009B970(int nView);
 int   fn_800DDFB4(int nPlayer);
 void  fn_8007326C(u8* pAnim);
-extern char lbl_802811A8[];
-extern char lbl_802811B0[];
-extern char lbl_8018851C[];                   // "GloveOff"
 
 // State 1 begins: addressing the ball. Camera 25 and the game's 0x20C hook; a fresh Shot_Plan
 // when the game asks (gpGame+0x276, and it ends any replay); the glove comes off for a putt;
@@ -3150,9 +3216,9 @@ void SwingState01_Enter(int nPlayer) {
         Shot_Plan(nPlayer, 1);
     }
     if (gPlayers[nPlayer].nClub == CLUB_PUTTER) {
-        fn_800CC5C0(gPlayers[nPlayer].nShotHandle, lbl_802811A8, lbl_8018851C);
+        fn_800CC5C0(gPlayers[nPlayer].nShotHandle, "Glove", "GloveOff");
     } else {
-        fn_800CC5C0(gPlayers[nPlayer].nShotHandle, lbl_802811A8, lbl_802811B0);
+        fn_800CC5C0(gPlayers[nPlayer].nShotHandle, "Glove", "GloveOn");
     }
     gPlayers[nPlayer].fThinkTime = 0.0f;
     for (k = 0; k < 2; k++) {

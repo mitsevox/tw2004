@@ -125,7 +125,10 @@ typedef struct SwingData {
     f32  fHoldTime;             // 0x478
     f32  f47C;                  // 0x47C
     f32  fHoldAtTop;            // 0x480  (0x854) seconds held at the top
-    u8   unk484[0x494 - 0x484];
+    f32  f484;                  // 0x484  (0x858) 0.5 at start
+    f32  f488;                  // 0x488  0.5
+    f32  f48C;                  // 0x48C  0.5
+    f32  f490;                  // 0x490  0
     s32  nBoostLevel;           // 0x494  (0x868) power boost level pressed, 0..8
     f32  fBackDown;             // 0x498  set to 1/12 when the backswing starts backing down
     u8   unk49C[0x604 - 0x49C];
