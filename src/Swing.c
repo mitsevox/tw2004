@@ -789,8 +789,8 @@ void Anim_SetRate(u8* pAnim, f32 fRate);               // 0x8001F084
 void Anim_SetTime(u8* pAnim, f32 fTime);               // 0x8007327C
 int  fn_800204A0(u8* pClip, f32* pOut, f32 fTime);
 void fn_80017EF4(ShotObj* pObj, int a, f32 f);
-void fn_8005B154(int nPlayer);
-void fn_8005BE10(int nPlayer);
+void Swing_UpdatePower(int nPlayer);
+void Swing_BoostInput(int nPlayer);
 u8   fn_80100AF8(void);                                // lesson 5 of mode 11
 
 // Freeze the backswing at the top: the animation stops (rate 0.008) where it is.
@@ -803,7 +803,7 @@ void Swing_HoldAtTop(int nPlayer) {
     fn_80017EF4(pObj, 0, 0.0f);
     Anim_SetRate(pObj->anim, 0.008f);
     pObj->uFlags |= 0x40;
-    pSw->f480 = 0.0f;
+    pSw->fHoldAtTop = 0.0f;
     pSw->f47C = 0.0f;
 }
 
@@ -913,10 +913,10 @@ int Swing_UpdateBackswing(int nPlayer) {
         pSw->nHistY[pSw->nHistIndex] = nY;
         pSw->nHistIndex++;
         pSw->nHistIndex %= 25;
-        fn_8005B154(nPlayer);
+        Swing_UpdatePower(nPlayer);
         pSw->nTopX = nX;
         pSw->nTopY = nY;
-        fn_8005BE10(nPlayer);
+        Swing_BoostInput(nPlayer);
     } else if (nY <= 96) {
         // The stick has come forward: the top of the backswing is the furthest-back sample.
         int i;
@@ -927,7 +927,7 @@ int Swing_UpdateBackswing(int nPlayer) {
                 pSw->nTopY = pSw->nHistY[i];
             }
         }
-        fn_8005B154(nPlayer);
+        Swing_UpdatePower(nPlayer);
         Anim_SetRate(pObj->anim, 1.0f);
         fn_80095744((int)pObj, 7);
         if (fn_800204A0(*(u8**)(pObj->pClip + 0xD8), pObj->v1638, *(f32*)(*(u8**)(pObj->pClip + 0xD8) + 8) + (pObj->fAnimTime - pSw->fMark0))) {
@@ -981,7 +981,7 @@ int Swing_UpdateAtTop(int nPlayer) {
     fTop   = Swing_TopTime(pSw);
     fStart = Swing_StartTime(pSw);
     fAnimTime = pObj->fAnimTime;
-    pSw->f480 += gSession.fFrameTime;
+    pSw->fHoldAtTop += gSession.fFrameTime;
     if (pSw->nTopStickY != nY) {
         if (nY < gPlayers[nPlayer].swing.nTopStickY) {
             pObj->uFlags |= 0x40;
@@ -1005,7 +1005,7 @@ int Swing_UpdateAtTop(int nPlayer) {
             fn_80067074(nPlayer, 9, 0, 0);
         }
     }
-    fn_8005B154(nPlayer);
+    Swing_UpdatePower(nPlayer);
     return 0;
 }
 
@@ -1171,4 +1171,73 @@ void Swing_LoadTuning(void) {
     fn_800102DC(uHash, gpSwing, &gpSwing->fClubDown);
     uHash = fn_8000BEE4(lbl_8028119C);
     fn_800102DC(uHash, gpSwing, &gpSwing->fTuningC);
+}
+
+
+// ---- the power meter -----------------------------------------------------------------------------
+
+// Every frame of the backswing: power is the square root of how far along the backswing is
+// (a CPU takes it straight), snapping to 1 within 3% of the top. Holding at the top of a full
+// backswing on anything but a putt costs (hold - 0.05)^2, at most 0.3.
+void Swing_UpdatePower(int nPlayer) {
+    f32  fPower = ((ShotObj*)gPlayers[nPlayer].nShotHandle)->f1628;
+    f32  fPenalty;
+    f32* pPower;
+    if (!Player_IsCPU(nPlayer)) {
+        fPower = (f32)fn_80009680(fPower);
+    }
+    if (1.0f - fPower < 0.03f) fPower = 1.0f;
+    if (gPlayers[nPlayer].swing.fHoldAtTop < 0.05f || gPlayers[nPlayer].nShotKind == SHOT_PUTT || 1.0f != fPower) {
+        fPenalty = 0.0f;
+    } else {
+        fPenalty = gPlayers[nPlayer].swing.fHoldAtTop - 0.05f;
+        fPenalty = -(fPenalty * fPenalty);
+    }
+    if (fPenalty < -0.3f) fPenalty = -0.3f;
+    gPlayers[nPlayer].fPower = fPower + fPenalty;
+    pPower = &gPlayers[nPlayer].fPower;
+    if (*pPower < 0.0f) *pPower = 0.0f;
+}
+
+
+// ---- the power boost input --------------------------------------------------------------------
+
+void fn_800AE3C4(int nPlayer);
+
+// Every backswing frame for a human with the boost option on: while a boost button (mask 0x1F)
+// is held with the stick pulled past 93 of its range, the boost level rises one a frame to 8.
+// Once the stick has backed down for 1/12 s (fBackDown, set by the backswing) the level and the
+// spin offsets are cleared.
+void Swing_BoostInput(int nPlayer) {
+    s32* pController;
+    s32* pLevel;
+    f32* pTimer;
+    u32  uButtons;
+    int  nX, nY;
+    f32  fMag;
+
+    if (Player_IsCPU(nPlayer)) return;
+    if (SESSION_OPTIONS->bBoostEnabled == 0) return;
+    pController = &gPlayers[nPlayer].nController;
+    uButtons    = fn_800136DC(*pController);
+    nY   = Swing_StickY(nPlayer, Pad_State(nPlayer, *pController));
+    nX   = Swing_StickX(nPlayer, Pad_State(nPlayer, *pController));
+    fMag = (f32)fn_80009680((nX - 128) * (nX - 128) + (nY - 128) * (nY - 128));
+    if ((uButtons & fn_800142AC(0x1F, 0)) && fMag > 93.0f) {
+        pLevel = &gPlayers[nPlayer].swing.nBoostLevel;
+        if (*pLevel < 8) {
+            (*pLevel)++;
+            fn_80067074(nPlayer, 0x2D, 0, 0);
+        }
+    }
+    pTimer = &gPlayers[nPlayer].swing.fBackDown;
+    if (*pTimer > 0.0f) {
+        *pTimer -= gSession.fFrameTime;
+        if (*pTimer <= 0.0f) {
+            gPlayers[nPlayer].swing.nBoostLevel = 0;
+            gPlayers[nPlayer].swing.f628 = 0.0f;
+            gPlayers[nPlayer].swing.f62C = 0.0f;
+            fn_800AE3C4(nPlayer);
+        }
+    }
 }

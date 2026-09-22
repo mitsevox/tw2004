@@ -1795,10 +1795,11 @@ void Options_SetDefaults(GameOptions* pOpt) {
     pOpt->unk14    = 0;
     pOpt->unk18    = 1;
     pOpt->unk1C    = 1;
-    for (i = 0; i < 9; i++) {
+    for (i = 0; i < 8; i++) {
         pOpt->unk24[i] = 1;
     }
-    pOpt->bSpinEnabled = 1;
+    pOpt->bBoostEnabled = 1;
+    pOpt->bSpinEnabled  = 1;
     pOpt->unk7E = 0;
     pOpt->unk80 = 1;
     for (i = 0; i < 4; i++) {

@@ -121,7 +121,7 @@ typedef struct SwingData {
     s32  nTopStickY;            // 0x474
     f32  fHoldTime;             // 0x478
     f32  f47C;                  // 0x47C
-    f32  f480;                  // 0x480
+    f32  fHoldAtTop;            // 0x480  (0x854) seconds held at the top
     u8   unk484[0x494 - 0x484];
     s32  nBoostLevel;           // 0x494  (0x868) power boost level pressed, 0..8
     f32  fBackDown;             // 0x498  set to 1/12 when the backswing starts backing down
@@ -363,7 +363,8 @@ typedef struct GameOptions {
     s32  unk18;                 // 0x18  -> fn_80055C40
     s32  unk1C;                 // 0x1C  -> fn_80055CD0
     u8   unk20[4];
-    u8   unk24[9];              // 0x24
+    u8   unk24[8];              // 0x24
+    u8   bBoostEnabled;         // 0x2C  (gSession + 0xEA4)
     u8   bSpinEnabled;          // 0x2D  (gSession + 0xEA5)
     u8   rows[4][19];           // 0x2E  four rows of 19 flags
     u8   unk7A;                 // 0x7A
