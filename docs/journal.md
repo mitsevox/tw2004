@@ -203,3 +203,7 @@ Dated log of what was done and decided, newest last. Facts and lessons belong in
   the driver's tee bonus is the same angle at 36..54 degrees), and `SwingState02_Update` (the
   CPU's think time: 1..4 s of rehearsal, tolerance 1.8 in). Corrections: the "tempo" was the
   backswing angle; `Ball_Launch`'s fourth argument is the trajectory.
+- Swing.c continued: `Swing_WaitForBackswing` (exact), `Swing_Begin`; the session byte at
+  +0x13 is `bReplay` (set only when a saved replay loads), not a spin option. The swing starts
+  at a quarter pull on either stick; a 25-sample ring of stick positions feeds the sampler
+  (`0x8005934C`, read: dead zone 96..160). Swing.c: 20 functions in C.

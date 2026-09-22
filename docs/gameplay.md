@@ -35,8 +35,11 @@ Before the backswing the game polls both sticks every frame and holds their rest
 travel - and that stick's rest position becomes the centre sample; the C-stick works as a
 second swing stick (`bUsingCStick`). `Swing_Begin` then starts the animation, reads its three
 timing marks, and fills a **25-sample ring of stick positions** with the centre; the top and
-impact samples are picked out of that ring as the swing goes on (`0x8005934C`, not yet in C).
-A CPU or a replay starts the swing immediately.
+impact samples are picked out of that ring as the swing goes on (`0x8005934C`, read, not yet
+in C). That update applies a **dead zone of 96..160** (about +-32 around the 128 centre) to
+both stick axes every frame: forward of it the reading maps smoothly down to 1, back of it the
+reading jumps to ~179 and runs to 255 - so the first frame past the gate already reads a third
+of the way back. A CPU or a replay starts the swing immediately.
 
 Human swing: the miss itself (`Swing_MeterError`, `0x8005BA94`, in C)
 -------------------------------------------------------------------------
