@@ -5,6 +5,7 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include "golfer.h"
 #include "ball.h"
 
 // ---- the round -------------------------------------------------------------------------------
@@ -294,7 +295,18 @@ u8   fn_800FDF60(void);
 // GameModeStroke.c: stroke play (mode 0)
 void fn_800FF7DC(void);
 s32  fn_800FF894(int nPlayer);          // TW06 GetHonors: who plays next (5: nobody)
+u8   fn_800FFCCC(int nPlayer, int a);   // TW06 HoleFinished
+u8   fn_800FFD54(int a);                // TW06 GameFinished
 s32  fn_800FFDB0(void);                 // TW06 GoToPlayoff: stroke play has none
+
+// GetHonors' tee-order sort (GameModeStroke.c, GameModeStableford.c): appends nPlayer to aList
+// (*pnCount entries) if their score on hole nHole is nScore.
+static inline void AddIfScore(s32* aList, int* pnCount, int nPlayer, int nHole, s32 nScore) {
+    if (gPlayers[nPlayer].nStrokes[nHole] == nScore) {
+        aList[*pnCount] = nPlayer;
+        (*pnCount)++;
+    }
+}
 
 // GameMode11.c: the lessons
 u8   fn_80100294(void);                 // in a lesson (mode 11)

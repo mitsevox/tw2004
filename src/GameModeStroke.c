@@ -31,9 +31,6 @@ typedef struct TeeOrder {
 } TeeOrder;
 extern TeeOrder lbl_80184DF0;
 
-s32  fn_800FF894(int nPlayer);
-u8   fn_800FFCCC(int nPlayer, int a);
-u8   fn_800FFD54(int a);
 s32  fn_800FFDB0(void);
 void fn_800FFDB8(void);
 
@@ -72,14 +69,6 @@ void fn_800FF7DC(void) {
         } else {
             GOLFERSTATE_Set(GS_WAIT, i);
         }
-    }
-}
-
-// Appends nPlayer to aList (*pnCount entries) if their score on hole nHole is nScore.
-static inline void AddIfScore(s32* aList, int* pnCount, int nPlayer, int nHole, s32 nScore) {
-    if (gPlayers[nPlayer].nStrokes[nHole] == nScore) {
-        aList[*pnCount] = nPlayer;
-        (*pnCount)++;
     }
 }
 

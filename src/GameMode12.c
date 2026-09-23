@@ -6,14 +6,9 @@
 
 #include "golfer.h"
 #include "game.h"
+#include "engine.h"
 
-s32   fn_800FF894(int nPlayer);
-u8    fn_800FFCCC(int nPlayer, int a);
-u8    fn_800FFD54(int a);
 extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
-void* fn_80017004(int nView);
-void  fn_8006434C(void* pView, f32* pPos, f32* pX, f32* pY, int a);
-void  fn_8006A8D4(void* pView, f32* pX, f32* pY);
 extern u8* gpSaveData;
 extern s32 lbl_802823DC;                    // the surface the ball stopped on (-1: none)
 
