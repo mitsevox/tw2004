@@ -64,15 +64,6 @@ typedef struct GolfCamState {
     s32     n1EC[5];            // 0x1EC
 } GolfCamState;
 
-// The camera tuning values.
-typedef struct CamTuning {
-    u8   unk0[0x94];
-    f32  f94;                   // 0x94  the elevator camera's first blend value
-    u8   unk98[0x178 - 0x98];
-    f32  f178;                  // 0x178
-    f32  v17C[4];               // 0x17C
-} CamTuning;
-
 // A view (one per split-screen half); only what this file touches. The fields Swing.c also uses
 // keep its names.
 typedef struct View {
@@ -117,7 +108,6 @@ typedef struct View {
 } View;
 
 extern GolfCamState* lbl_80282220;
-extern CamTuning*    lbl_80281F78;
 
 void*    fn_80008370(void* pCamera);
 void     fn_80045470(void* pLens, f32 fFov);
@@ -266,8 +256,8 @@ void fn_800C0364(View* pView, int nPlayer) {
     pSub = fn_80017314(pView);
     pCourse = fn_8000C594();
     if (pCourse != NULL) {
-        int nHole = Game_CurrentHole();
-        Vec3Copy(&pCourse->pin[nHole].x, pSub);
+        int nPinSet = Game_CurrentPinSet();
+        Vec3Copy(&pCourse->pin[nPinSet].x, pSub);
         pView->p130 = NULL;
         pView->p134 = NULL;
         fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView0)), DEG(30.0f));

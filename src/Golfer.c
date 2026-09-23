@@ -17,7 +17,7 @@ u8 Controller_IsCPU(int nController) {
     return nController == CONTROLLER_CPU;
 }
 
-// The hole index itself (Game_CurrentHole maps it through the hole order).
+// The hole of the round being played, 0..17.
 int Game_CurHoleIndex(void) {
     return gpGame->nCurHole;
 }
@@ -34,8 +34,9 @@ void AI_TargetsHook(void) {
     fn_8002C8B4();
 }
 
-int Game_CurrentHole(void) {
-    return gpGame->holeOrder[gpGame->nCurHole];
+// The current hole's pin position, 0..3: which of CourseInfo.pin it uses.
+int Game_CurrentPinSet(void) {
+    return gpGame->nPinSet[gpGame->nCurHole];
 }
 
 // Equipment tier -> bonus points. Tiers are 0..4; anything else counts as nothing.
@@ -110,7 +111,7 @@ void AI_ChooseTarget(int nPlayer) {
     int         nKind;
     int         nPower;
     int         nAggr;
-    int         nHole;
+    int         nPinSet;
     s8          k;
     s8          nBest;
     s8          nCand;
@@ -126,7 +127,7 @@ void AI_ChooseTarget(int nPlayer) {
     f32         fDX, fDZ;
     AITarget*   pBest;
 
-    nHole   = Game_CurrentHole();
+    nPinSet = Game_CurrentPinSet();
     pCourse = fn_8000C594();
     p       = &gPlayers[nPlayer];
     nAggr   = Golfer_GetAttribute(p, ATTR_AGGRESSION, ATTR_TOTAL);
@@ -146,11 +147,11 @@ void AI_ChooseTarget(int nPlayer) {
             if (nCand == -1) continue;
             t = &gAITargets[nCand];
             if (!t->bEnabled) continue;
-            fDZ    = pCourse->pin[nHole].z - t->pDef->z;
-            fDX    = pCourse->pin[nHole].x - t->pDef->x;
+            fDZ    = pCourse->pin[nPinSet].z - t->pDef->z;
+            fDX    = pCourse->pin[nPinSet].x - t->pDef->x;
             fDist2 = fDX * fDX + fDZ * fDZ;
             if (t->nTeeSet != -1 && t->nTeeSet != gSession.nTeeSet[nPlayer]) continue;
-            if (t->nHole != -1 && t->nHole != nHole) continue;
+            if (t->nPinSet != -1 && t->nPinSet != nPinSet) continue;
             if (nBest == -1 && t->bPriority) {
                 fBestDist2 = fDist2;
                 nBest      = nCand;
@@ -163,7 +164,8 @@ void AI_ChooseTarget(int nPlayer) {
             fDist  = fn_80009680(fDX * fDX + fDZ * fDZ);
             nKind  = AI_ShotKindForDistance(nPlayer, fDist);
             nClub  = AI_ClubForShot(nPlayer, nKind, 0, fDist);
-            nSkill = Golfer_GetAttribute(p, Shot_GoverningAttribute(nPlayer, nClub, p->nLie, nKind), ATTR_TOTAL);
+            nSkill = Golfer_GetAttribute(p, Shot_GoverningAttribute(nPlayer, nClub, p->ball.nLie, nKind),
+                                         ATTR_TOTAL);
             if (Player_IsCPU(nPlayer)) {
                 // Low IQ makes the golfer think it is better than it is.
                 if (p->bLowIQPenalty) {
@@ -222,8 +224,8 @@ void AI_ChooseTarget(int nPlayer) {
         return;
     }
     // Already closer to the pin than the chosen point: aim normally instead.
-    fDZ = p->fBallZ - pCourse->pin[nHole].z;
-    fDX = p->fBallX - pCourse->pin[nHole].x;
+    fDZ = p->fBallZ - pCourse->pin[nPinSet].z;
+    fDX = p->fBallX - pCourse->pin[nPinSet].x;
     if (fDX * fDX + fDZ * fDZ < fBestDist2 && !(gpGame->nCurCourse == 3 && fn_80015464() == 17)) {
         AI_DefaultTarget(nPlayer);
         return;
@@ -258,7 +260,7 @@ void AI_ApplyError(int nPlayer) {
     if (p->fDistance < 1.0f) return;
     if (p->bPerfect) return;
 
-    nAttr = Shot_GoverningAttribute(nPlayer, p->nClub, p->nLie, p->nShotKind);
+    nAttr = Shot_GoverningAttribute(nPlayer, p->nClub, p->ball.nLie, p->nShotKind);
     if (nAttr == ATTR_PUTTING) {
         fSkill    = (f32)(s8)Golfer_GetAttribute(p, ATTR_PUTTING, ATTR_TOTAL);
         nSpin     = 0;
@@ -381,7 +383,7 @@ u8 Club_UsableForKind(int nPlayer, int nClub, int nKind) {
         return gClubKindTable[nKind][nClub];
     }
     if (Controller_IsCPU(p->nController)) {
-        if ((p->nLie == 6 || p->nLie == 7 || p->nLie == 8) && nClub < 9) {
+        if ((p->ball.nLie == 6 || p->ball.nLie == 7 || p->ball.nLie == 8) && nClub < 9) {
             return 0;
         }
     }
@@ -443,8 +445,8 @@ int AI_ShotKindForDistance(int nPlayer, f32 fDist) {
     case 8: {
         int     nKind = SHOT_FULL;
         Player* p     = &gPlayers[nPlayer];
-        fDist /= fn_800510EC(p->ball);
-        if (p->nLie == LIE_GREEN || AI_GreenTowardPin(nPlayer, 1.5f)) {
+        fDist /= fn_800510EC(&p->ball);
+        if (p->ball.nLie == LIE_GREEN || AI_GreenTowardPin(nPlayer, 1.5f)) {
             nKind = SHOT_PUTT;
         } else if ((p->golfer.uBagMask & (1 << 21)) && fDist < 15.0f && AI_GreenTowardPin(nPlayer, 5.0f) && Lie_AllowsFullSwing(nPlayer)) {
             nKind = SHOT_CHIP;
@@ -471,7 +473,7 @@ int AI_ClubForShot(int nPlayer, int nKind, u8 bUnderOnly, f32 fDist) {
     int     c;
     f32     fBest;
     f32     fRatio;
-    if ((gSession.uFlags & 0x4000) && (gSession.uFlags & 0x8000) && gPlayers[nPlayer].nLie == 0) {
+    if ((gSession.uFlags & 0x4000) && (gSession.uFlags & 0x8000) && gPlayers[nPlayer].ball.nLie == 0) {
         return 2;
     }
     nClub = fn_801006F0(nPlayer);
@@ -490,7 +492,7 @@ int AI_ClubForShot(int nPlayer, int nKind, u8 bUnderOnly, f32 fDist) {
     } else {
         nClub = AI_FirstUsableClub(nPlayer, nKind);
         if (Game_GetMode() == 6 || Game_GetMode() == 7 || Game_GetMode() == 8 || Controller_IsCPU(p->nController)) {
-            fDist /= fn_800510EC(p->ball);
+            fDist /= fn_800510EC(&p->ball);
         }
         for (c = 0; c < NUM_CLUBS; c++) {
             if (c == CLUB_PUTTER) continue;
@@ -534,7 +536,7 @@ f32 AI_PowerForTarget(int nPlayer) {
         return fn_80050D34(p->fDistance);
     }
     if (p->nShotKind == SHOT_CHIP) {
-        return fn_80050F88(p->fDistance, p->ball, SHOT_CHIP, p->nClub);
+        return fn_80050F88(p->fDistance, &p->ball, SHOT_CHIP, p->nClub);
     }
     return p->fDistance / AI_MaxDistance(nPlayer, p->nShotKind, p->nClub);
 }
@@ -591,7 +593,7 @@ void AI_PlanShot(int nPlayer, f32* pTarget) {
         if (nType == 98 || nType == 105) {
             // The cup (surfaces 98 and 105 hole the ball, see Ball.c): aim at the pin's height
             // instead and flag it.
-            fHeight = fn_8000C594()->pin[Game_CurrentHole()].y;
+            fHeight = fn_8000C594()->pin[Game_CurrentPinSet()].y;
             gPlayers[nPlayer].nSurface = 16;
             gPlayers[nPlayer].uFlagsEF0 |= 2;
         } else {
@@ -623,13 +625,13 @@ void AI_PlanShot(int nPlayer, f32* pTarget) {
 
 // Aim at the pin.
 void AI_DefaultTarget(int nPlayer) {
-    int         nHole   = Game_CurrentHole();
+    int         nPinSet = Game_CurrentPinSet();
     CourseInfo* pCourse = fn_8000C594();
     Player*     p       = &gPlayers[nPlayer];
     f32*        pTarget;
-    p->fTargetX    = pCourse->pin[nHole].x;
+    p->fTargetX    = pCourse->pin[nPinSet].x;
     pTarget        = &p->fTargetX;
-    p->fTargetZ    = pCourse->pin[nHole].z;
+    p->fTargetZ    = pCourse->pin[nPinSet].z;
     p->nShotShape = 0;
     AI_PlanShot(nPlayer, pTarget);
     Vec_Copy(pTarget, p->vTarget2);
@@ -666,14 +668,16 @@ u8 Golfer_IsLucky(int nPlayer) {
         if (uOdds < 1) uOdds = 1;
     }
     uRoll = Rand_Next(0) % uOdds;
-    if (gPlayers[nPlayer].nLie != LIE_GREEN && gPlayers[nPlayer].nShotKind != SHOT_PUTT && !gSession.nSplitScreen) {
-        Game_CurrentHole();
+    if (gPlayers[nPlayer].ball.nLie != LIE_GREEN && gPlayers[nPlayer].nShotKind != SHOT_PUTT &&
+        !gSession.nSplitScreen) {
+        Game_CurrentPinSet();
         fn_8000C594();
         if (fn_800D2B08() == 3) {
             bLucky = 1;
         } else if (gPlayers[nPlayer].nShotKind == SHOT_PITCH) {
             bLucky = 1;
-        } else if ((gPlayers[nPlayer].nLie == 1 || gPlayers[nPlayer].nLie == 2) && fn_800D0478(nPlayer) < 250.0f) {
+        } else if ((gPlayers[nPlayer].ball.nLie == 1 || gPlayers[nPlayer].ball.nLie == 2) &&
+                   fn_800D0478(nPlayer) < 250.0f) {
             bLucky = 1;
         }
     }
@@ -852,12 +856,8 @@ extern u8  gSimHaveResult;          // 0x80281D31  at least one rehearsal landed
 extern u8  gSimClubTries[8];        // 0x80281D34  per player: club swaps tried
 extern f32 gSimBestDist;            // 0x802810A8  best miss squared
 extern f32 gSimBestAim[3];          // 0x801C64D8  the aim that produced it
-extern u8  gSimBall[0xBC];          // 0x801C64E4  the private Ball (see Ball.c)
+extern Ball gSimBall;               // 0x801C64E4  the rehearsal's own ball
 extern s32 gSimClub[6];             // 0x801C65A0  per player: club the rehearsal started with
-
-#define SIM_BALL_STATE (*(s32*)&gSimBall[0x64])   // 2..4 in motion, 5 in a hazard, 1 stopped
-#define SIM_BALL_X     (*(f32*)&gSimBall[0x00])
-#define SIM_BALL_Z     (*(f32*)&gSimBall[0x08])
 
 
 // +n on every modifier the rehearsal cares about (not LUCK), aggression the other way.
@@ -1003,12 +1003,12 @@ u8 AI_RehearseShot(int nPlayer, f32* pOutDist2, u8 bFast, f32 fTolerance) {
         break;
 
     case 0:     // launch
-        Mem_cpy(gSimBall, p->ball, sizeof(gSimBall));
+        Mem_cpy(&gSimBall, &p->ball, sizeof(gSimBall));
         fPower = p->fPower * AI_PowerScale(nPlayer);
         if (fPower > 1.5f) fPower = 1.5f;
         Ball_SetSimulating(1);
         // Always the normal trajectory.
-        Ball_Launch((Ball*)gSimBall, p->nClub, p->nShotKind, fPower, p->fAim, 1, p->vLaunchA, p->vLaunchB);
+        Ball_Launch(&gSimBall, p->nClub, p->nShotKind, fPower, p->fAim, 1, p->vLaunchA, p->vLaunchB);
         Ball_SetSimulating(0);
         p->nRehearseState = 1;
         break;
@@ -1017,9 +1017,9 @@ u8 AI_RehearseShot(int nPlayer, f32* pOutDist2, u8 bFast, f32 fTolerance) {
         gSimAborted = 0;
         Ball_SetSimulating(1);
         if (bFast) {
-            Ball_SimStep((Ball*)gSimBall, 0.1f, 1.0f);
+            Ball_SimStep(&gSimBall, 0.1f, 1.0f);
         } else {
-            Ball_SimStep((Ball*)gSimBall, 0.2f, 1.0f);
+            Ball_SimStep(&gSimBall, 0.2f, 1.0f);
         }
         Ball_SetSimulating(0);
         if (gSimAborted) {
@@ -1044,13 +1044,13 @@ u8 AI_RehearseShot(int nPlayer, f32* pOutDist2, u8 bFast, f32 fTolerance) {
             p->nRehearseState = 0;
             break;
         }
-        nState = SIM_BALL_STATE;
+        nState = gSimBall.nState;        // 2..4 in motion, 5 in a hazard, 1 stopped
         if (nState == 2) break;
         if (nState == 3 || nState == 4) break;
         if (nState != 5) {
             // Landed: measure the miss from where the CPU wanted the ball.
-            fDX    = SIM_BALL_X - p->vTarget2[0];
-            fDZ    = SIM_BALL_Z - p->vTarget2[2];
+            fDX    = gSimBall.vPos[0] - p->vTarget2[0];
+            fDZ    = gSimBall.vPos[2] - p->vTarget2[2];
             fDist2 = fDX * fDX + fDZ * fDZ;
             if (pOutDist2 != NULL) *pOutDist2 = fDist2;
             gSimHaveResult = 1;
@@ -1256,7 +1256,7 @@ void AI_TargetsClear(void) {
     int i;
     for (i = 0; i < NUM_AI_TARGETS; i++) {
         fn_80005AE8(&gAITargets[i], 0, sizeof(AITarget));
-        gAITargets[i].nHole    = -1;
+        gAITargets[i].nPinSet  = -1;
         gAITargets[i].nTeeSet  = -1;
         gAITargets[i].bEnabled = 1;
     }
@@ -1282,7 +1282,7 @@ void AI_TargetsLoad(u8* pChunk) {
     for (i = 0; i < *(s16*)(pChunk + 2); i++, pReq += 8) {
         gAITargets[i].bEnabled  = 1;
         gAITargets[i].nTeeSet   = pReq[0];
-        gAITargets[i].nHole     = pReq[1];
+        gAITargets[i].nPinSet   = pReq[1];
         gAITargets[i].nSkillReq = pReq[2];
         gAITargets[i].nAggrReq  = pReq[3];
         gAITargets[i].bPriority = pReq[4];
@@ -1304,9 +1304,9 @@ void AI_TargetsInit(void) {
 void AI_AimAtPin(int nPlayer) {
     Player*     p       = &gPlayers[nPlayer];
     CourseInfo* pCourse = fn_8000C594();
-    int         nHole   = Game_CurrentHole();
-    p->fTargetX = pCourse->pin[nHole].x;
-    p->fTargetZ = pCourse->pin[nHole].z;
+    int         nPinSet = Game_CurrentPinSet();
+    p->fTargetX = pCourse->pin[nPinSet].x;
+    p->fTargetZ = pCourse->pin[nPinSet].z;
     AI_PlanShot(nPlayer, &p->fTargetX);
 }
 
@@ -1337,7 +1337,7 @@ void Luck_TightenOdds(void) {
 // Lies 6, 7 and 8 do not allow a full swing.
 u8 Lie_AllowsFullSwing(int nPlayer) {
     Player* p = &gPlayers[nPlayer];
-    if (p->nLie == 6 || p->nLie == 7 || p->nLie == 8) return 0;
+    if (p->ball.nLie == 6 || p->ball.nLie == 7 || p->ball.nLie == 8) return 0;
     return 1;
 }
 
@@ -1349,19 +1349,19 @@ u8 Lie_AllowsFullSwing(int nPlayer) {
 // chips when it starts within 5.
 u8 AI_GreenTowardPin(int nPlayer, f32 fDist) {
     u8          bGreen  = 0;
-    int         nHole   = Game_CurrentHole();
+    int         nPinSet = Game_CurrentPinSet();
     CourseInfo* pCourse = fn_8000C594();
     Player*     p       = &gPlayers[nPlayer];
-    f32*        pBall   = (f32*)p->ball;
-    f32*        pBallZ  = (f32*)(p->ball + 8);
+    f32*        pBall   = p->ball.vPos;
+    f32*        pBallZ  = &p->ball.vPos[2];
     f32         vDir[4];
     f32         fHeight;
     SurfaceType* pSurface;
 
     vDir[1] = 0.0f;
-    vDir[0] = pCourse->pin[nHole].x - *pBall;
+    vDir[0] = pCourse->pin[nPinSet].x - *pBall;
     vDir[3] = 0.0f;
-    vDir[2] = pCourse->pin[nHole].z - *pBallZ;
+    vDir[2] = pCourse->pin[nPinSet].z - *pBallZ;
     if (0.0f == vDir[0] && 0.0f == vDir[2]) {
         return 1;
     }
@@ -1430,16 +1430,16 @@ void Caddie_ApplyTip(int nPlayer) {
 void fn_80013200(int nPad, u8 nValue);
 
 u8 Player_OnTee(int nPlayer) {
-    return gPlayers[nPlayer].nLie == 0;
+    return gPlayers[nPlayer].ball.nLie == 0;
 }
 
 u8 Player_IsHoled(int nPlayer) {
-    return gPlayers[nPlayer].nLie == LIE_HOLED;
+    return gPlayers[nPlayer].ball.nLie == LIE_HOLED;
 }
 
 u8 Player_IsHoledNotState23(int nPlayer) {
     int bResult = 0;
-    if (gPlayers[nPlayer].nLie == LIE_HOLED && (s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_CONCEDED) {
+    if (gPlayers[nPlayer].ball.nLie == LIE_HOLED && (s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_CONCEDED) {
         bResult = 1;
     }
     return bResult;
@@ -1647,7 +1647,7 @@ void Player_SetGolfer(int nPlayer, int nGolfer, int nController, u32 uBag, int b
     p->fBallY      = 0.0f;
     p->fBallZ      = 0.0f;
     p->fBallW      = 0.0f;
-    p->nLie        = 0;
+    p->ball.nLie        = 0;
     p->fTargetX    = 0.0f;
     p->fTargetY    = 0.0f;
     p->fTargetZ    = 0.0f;
@@ -1833,7 +1833,7 @@ void Session_Init(void) {
     gSession.nSeed = Rand_Next(0);
     fn_8000B1D4(0, gSession.nSeed);
     gSession.nNumPlayers = 1;
-    gSession.unk5B38     = -1;
+    gSession.nPinSet     = -1;
     gSession.unk5B39     = 1;
     for (i = 0; i < 5; i++) {
         gSession.nController[i] = CONTROLLER_CPU;

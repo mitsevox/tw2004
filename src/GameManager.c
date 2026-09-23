@@ -18,7 +18,6 @@ void  fn_800E2470(void);
 void  fn_8006F4B4(void);
 void  fn_800170C4(int nView, int a);
 void  fn_800E299C(void);
-void  Wind_Generate(void);
 void  fn_800E3B28(void);
 void  fn_800DA36C(void);
 void  GM_FlyByMode_Init(void);
@@ -38,10 +37,7 @@ void  GM_EndOfGolferTurn_GameFinished(int nPlayer);
 void  GM_HoleFinished_GameNotFinished(int nPlayer);
 u8    GM_CheckForAIConcede(int nPlayer);
 
-u8    Ter_PointInFreeDropNetwork(u8* pBall);
 void  fn_800E4164(int nMessage, int nPlayer, f32 f);
-u8    Ter_CheckObjectAndHazardObstruction(u8* pBall, int a, int b, int c, f32 f1, f32 f2, f32 f3);
-u8    Ter_SearchAreaForDropLocation(int nPlayer, int a, int b, f32* pOut);
 
 void  fn_800E0AC4(int a);
 void  fn_800E0A98(int a);
@@ -68,13 +64,6 @@ u8*   fn_80016CFC(int nView);
 void  fn_800E0AF0(f32* pFrom, f32* pTo, f32* pOut);
 
 extern u8  gReplayData[];                   // 0x801D6030
-extern u8* lbl_80281F78;
-
-// The tee positions follow the pins in the per-hole data (fn_8000C594).
-typedef struct HoleTees {
-    u8     unk0[0xB0];
-    PinPos tee[4];                          // 0xB0  one per tee set
-} HoleTees;
 
 f32   fn_800336E4(void);
 f32   fn_800336F4(void);
@@ -86,7 +75,6 @@ void  fn_800E2A88(void);
 void  fn_800E1018(int nPlayer, int nHole);
 void  fn_800C6C8C(void);
 void  fn_800E41C8(void);
-u8    Ter_PointInOOBNetwork(u8* pBall);
 
 int   fn_8006AA9C(int nPlayer);             // how the shot turned out (0..4, 8+)
 void  fn_8006AAB4(int nPlayer, int a);
@@ -125,8 +113,6 @@ void  fn_8006B2C4(int nPlayer, int a);
 u8    fn_800BB1F8(int nPlayer);
 
 void  fn_8001DB04(int nHandle, f32* pOut);  // the golfer's position
-void  Ter_GetEnclosingGroundData(CourseInfo* pCourse, f32* pPos, f32* pHighA, SurfaceType** ppSurfA, f32* pNormA,
-                                 f32* pHighB, SurfaceType** ppSurfB, f32* pNormB);
 void  fn_800E0B14(f32* pA, f32* pB, f32* pOut);
 u8    fn_8004560C(void);
 int   fn_80095798(int nHandle);
@@ -405,13 +391,13 @@ u8 GM_CheckForAIConcede(int nPlayer) {
     int i;
     if (Player_IsCPU(nPlayer)) {
         Player* p = &gPlayers[nPlayer];
-        if (p->nLie != LIE_HOLED) {
+        if (p->ball.nLie != LIE_HOLED) {
             if (p->nLevel > 2) {
                 bConcede = 1;
             } else {
                 for (i = 0; i < gSession.nNumPlayers; i++) {
                     if (i == nPlayer) break;
-                    if (gPlayers[i].nLie == LIE_GREEN && p->nLie != LIE_GREEN &&
+                    if (gPlayers[i].ball.nLie == LIE_GREEN && p->ball.nLie != LIE_GREEN &&
                         p->nStrokes[gpGame->nCurHole] > gPlayers[i].nStrokes[gpGame->nCurHole] + 3) {
                         bConcede = 1;
                     }
@@ -449,24 +435,23 @@ void GM_PlayerAddStroke(int nPlayer) {
 // stroke, and shows "water" or "out of bounds" - unless the mode caps the hole at 10 strokes and
 // that is reached. Any other shot resets the run of penalties.
 u8 GM_CheckForBallOOB(int nPlayer) {
-    u8*          pBall = gPlayers[nPlayer].ball;
-    u8           bOut  = fn_800E2B40(nPlayer, (Ball*)pBall);
-    SurfaceType* pSurf = Ter_GetSupportingWorldMaterial(*(CourseInfo**)(gPlayers[nPlayer].ball + 0x7C),
-                                                        (f32*)pBall);
+    Ball*        pBall = &gPlayers[nPlayer].ball;
+    u8           bOut  = fn_800E2B40(nPlayer, pBall);
+    SurfaceType* pSurf = Ter_GetSupportingWorldMaterial(gPlayers[nPlayer].ball.pCourse, pBall->vPos);
     u8           bDrop;
     Player*      p;
 
     if (pSurf == NULL) {
         bOut  = 1;
         bDrop = 0;
-    } else if ((pSurf->u34 & 1) && !Ter_PointInFreeDropNetwork(pBall)) {
+    } else if ((pSurf->u34 & 1) && !Ter_PointInFreeDropNetwork(pBall->vPos)) {
         bDrop = 0;
     } else {
         bDrop = 1;
     }
     gPlayers[nPlayer].bLowIQPenalty = 0;
     if (bOut || bDrop) {
-        *(s32*)(gPlayers[nPlayer].ball + 0x64) = 0;
+        gPlayers[nPlayer].ball.nState = 0;
         if (bOut || (bDrop && (pSurf->u34 & 2))) {
             gPlayers[nPlayer].bLowIQPenalty = 1;
             p = &gPlayers[nPlayer];
@@ -529,8 +514,8 @@ void GM_ShowYardage(int nPlayer) {
         Player* p = &gPlayers[nPlayer];
         f32     dx;
         f32     dz;
-        dx = *(f32*)(p->ball + 0) - p->fBallX;
-        dz = *(f32*)(p->ball + 8) - p->fBallZ;
+        dx = p->ball.vPos[0] - p->fBallX;
+        dz = p->ball.vPos[2] - p->fBallZ;
         fn_800E4164(1, nPlayer, fn_80009680(dx * dx + dz * dz));
     }
 }
@@ -542,19 +527,19 @@ void GM_BumpBallForObstructions(int nPlayer) {
     f32 vDrop[4];
     if (gpGame->bBumpObstructions) {
         Player* p;
-        u8*     pBall;
+        Ball*   pBall;
         p = &gPlayers[nPlayer];
         n = nPlayer;
-        if (p->nLie != 0) {
-            pBall = p->ball;
-            if (Ter_CheckObjectAndHazardObstruction(pBall, 0, 1, 1, 1.5f, 2.0f, 0.577f)) {
+        if (p->ball.nLie != 0) {
+            pBall = &p->ball;
+            if (Ter_CheckObjectAndHazardObstruction(pBall->vPos, 1.5f, 0, 1, 2.0f, 1, 0.577f)) {
                 if (Ter_SearchAreaForDropLocation(n, 0, 0, vDrop)) {
-                    Physics_DropBall((Ball*)pBall, vDrop);
+                    Physics_DropBall(pBall, vDrop);
                     return;
                 }
-                Physics_DropBall((Ball*)pBall, gPlayers[nPlayer].vPreShot);
+                Physics_DropBall(pBall, gPlayers[nPlayer].vPreShot);
                 if (gPlayers[n].vA44[0] == gPlayers[n].fBallX && gPlayers[n].vA44[2] == gPlayers[n].fBallZ) {
-                    fn_80055AA8((Ball*)pBall, gPlayers[nPlayer].vPreShot, n);
+                    fn_80055AA8(pBall, gPlayers[nPlayer].vPreShot, n);
                 }
             }
         }
@@ -597,7 +582,7 @@ void GM_PlayerTookShot(int nPlayer) {
             gpGame->pfn218(nPlayer);
         } else {
             if (fn_800E23B0(nPlayer, gPlayers[nPlayer].nStrokes[gpGame->nCurHole])) {
-                gPlayers[nPlayer].nLie = LIE_HOLED;
+                gPlayers[nPlayer].ball.nLie = LIE_HOLED;
                 gPlayers[nPlayer].unkC2D = 1;
                 if (fn_800EE470()) {
                     gPlayers[nPlayer].nStrokes[gpGame->nCurHole] = 10;
@@ -676,7 +661,7 @@ u8 GM_PlayerTakeMulligan(int nPlayer) {
     fn_80016CFC(gPlayers[nPlayer].nView0)[0x275] = 1;
     for (i = 0, q = gPlayers; i < gSession.nNumPlayers; i++, q++) {
         if (q->bPlayerCut == 0 && q->nView0 == gPlayers[nPlayer].nView0 &&
-            q->nLie != 10 && q->nLie != LIE_GREEN && q->nLie != LIE_HOLED) {
+            q->ball.nLie != 10 && q->ball.nLie != LIE_GREEN && q->ball.nLie != LIE_HOLED) {
             fn_80016CFC(gPlayers[nPlayer].nView0)[0x275] = 0;
         }
     }
@@ -690,13 +675,13 @@ u8 GM_PlayerTakeMulligan(int nPlayer) {
 int fn_800DDFB4(int nPlayer) {
     f32 v[4];
     if ((gSession.uFlags & 0x4000) && (gSession.uFlags & 0x8000)) {
-        return gPlayers[nPlayer].nLie == 0;
+        return gPlayers[nPlayer].ball.nLie == 0;
     }
     if (gpGame->n290 == 0) {
         return 0;
     }
     if (Game_GetCourse() == 0x12 && fn_80015464() == 10) {
-        fn_800E0AF0(&gPlayers[nPlayer].fBallX, &((HoleTees*)fn_8000C594())->tee[gSession.nTeeSet[nPlayer]].x, v);
+        fn_800E0AF0(&gPlayers[nPlayer].fBallX, &fn_8000C594()->tee[gSession.nTeeSet[nPlayer]].x, v);
         v[1] = 0.0f;
         if ((f32)fn_80009680(fn_80009744(v)) < 40.0f) {
             return 0;
@@ -705,13 +690,14 @@ int fn_800DDFB4(int nPlayer) {
     if (gpGame->n290 == 1) {
         return 1;
     }
-    if (gPlayers[nPlayer].nLie == 0) {
+    if (gPlayers[nPlayer].ball.nLie == 0) {
         return 1;
     }
-    if (gPlayers[nPlayer].nLie != 0 && gPlayers[nPlayer].nClub < 9) {
+    if (gPlayers[nPlayer].ball.nLie != 0 && gPlayers[nPlayer].nClub < 9) {
         return 0;
     }
-    if (Ter_CheckObjectAndHazardObstruction(gPlayers[nPlayer].ball, 0, 1, 1, *(f32*)(lbl_80281F78 + 0x16C), 4.0f, 0.577f)) {
+    if (Ter_CheckObjectAndHazardObstruction(gPlayers[nPlayer].ball.vPos, lbl_80281F78->f16C, 0, 1, 4.0f, 1,
+                                            0.577f)) {
         return 0;
     }
     return (Rand_Next(1) % 100) < 85;
@@ -745,13 +731,14 @@ int GM_ShowPostShotAnimation(int nPlayer) {
         return 0;
     }
     if (Game_GetCourse() == 0x12 && fn_80015464() == 10) {
-        fn_800E0AF0(&gPlayers[nPlayer].fBallX, &((HoleTees*)fn_8000C594())->tee[gSession.nTeeSet[nPlayer]].x, vTee);
+        fn_800E0AF0(&gPlayers[nPlayer].fBallX, &fn_8000C594()->tee[gSession.nTeeSet[nPlayer]].x, vTee);
         vTee[1] = 0.0f;
         if ((f32)fn_80009680(fn_80009744(vTee)) < 40.0f) {
             return 0;
         }
     }
-    if (*(s32*)((u8*)gPlayers[nPlayer].nShotHandle + 0x438) == 11 && *(s32*)(gPlayers[nPlayer].ball + 0x78) == 0x2D) {
+    if (((ShotObj*)gPlayers[nPlayer].nShotHandle)->n438 == 11 &&
+        gPlayers[nPlayer].ball.nStartSurface == 0x2D) {
         return 0;
     }
     pCourse = fn_8000C594();
@@ -786,13 +773,13 @@ int GM_ShowPostShotAnimation(int nPlayer) {
         } else {
             fSlope = 0.0f;
         }
-        if (!Ter_PointInOOBNetwork((u8*)vPos) || (pSurf != NULL && !(pSurf->u34 & 1)) || pSurf->nClass == 7 ||
+        if (!Ter_PointInOOBNetwork(vPos) || (pSurf != NULL && !(pSurf->u34 & 1)) || pSurf->nClass == 7 ||
             pSurf->nClass == 16 || (fn_8000AD9C(fSlope) > 0.1f && fRise > 0.2f)) {
             return 0;
         }
     }
     if ((gSession.uFlags & 0x4000) && (gSession.uFlags & 0x8000)) {
-        if (gPlayers[nPlayer].nLie == LIE_HOLED || gPlayers[nPlayer].nBallStartSurface == 16 ||
+        if (gPlayers[nPlayer].ball.nLie == LIE_HOLED || gPlayers[nPlayer].ball.nStartSurface == 16 ||
             nResult == 2 || nResult == 1) {
             return 1;
         }
@@ -894,39 +881,39 @@ f32 GM_GetGolferDistanceToPin(int nPlayer) {
 // TW06: GM_ReplaceOOBBall. A ball out of bounds (or flagged at 0x30E) is dropped at a legal point
 // nearby when there is one; otherwise it goes back where it was before the shot.
 void GM_ReplaceOOBBall(int nPlayer) {
-    f32  v[4];
-    f32* pPre;
-    u8*  pBall;
+    f32   v[4];
+    f32*  pPre;
+    Ball* pBall;
     if ((gPlayers[nPlayer].b30E ||
-         (Ter_PointInOOBNetwork(gPlayers[nPlayer].ball) && !gPlayers[nPlayer].bLowIQPenalty)) &&
+         (Ter_PointInOOBNetwork(gPlayers[nPlayer].ball.vPos) && !gPlayers[nPlayer].bLowIQPenalty)) &&
         Ter_SearchAreaForDropLocation(nPlayer, 1, 1, v)) {
-        Physics_DropBall((Ball*)gPlayers[nPlayer].ball, v);
+        Physics_DropBall(&gPlayers[nPlayer].ball, v);
         return;
     }
-    pBall = gPlayers[nPlayer].ball;
+    pBall = &gPlayers[nPlayer].ball;
     pPre  = gPlayers[nPlayer].vPreShot;
-    Physics_DropBall((Ball*)pBall, pPre);
+    Physics_DropBall(pBall, pPre);
     if (gPlayers[nPlayer].vA44[0] == gPlayers[nPlayer].fBallX &&
         gPlayers[nPlayer].vA44[2] == gPlayers[nPlayer].fBallZ) {
-        fn_80055AA8((Ball*)pBall, pPre, nPlayer);
+        fn_80055AA8(pBall, pPre, nPlayer);
     }
 }
 
 // The same drop without the out-of-bounds test.
 void fn_800DEB5C(int nPlayer) {
-    f32  v[4];
-    f32* pPre;
-    u8*  pBall;
+    f32   v[4];
+    f32*  pPre;
+    Ball* pBall;
     if (Ter_SearchAreaForDropLocation(nPlayer, 1, 1, v)) {
-        Physics_DropBall((Ball*)gPlayers[nPlayer].ball, v);
+        Physics_DropBall(&gPlayers[nPlayer].ball, v);
         return;
     }
-    pBall = gPlayers[nPlayer].ball;
+    pBall = &gPlayers[nPlayer].ball;
     pPre  = gPlayers[nPlayer].vPreShot;
-    Physics_DropBall((Ball*)pBall, pPre);
+    Physics_DropBall(pBall, pPre);
     if (gPlayers[nPlayer].vA44[0] == gPlayers[nPlayer].fBallX &&
         gPlayers[nPlayer].vA44[2] == gPlayers[nPlayer].fBallZ) {
-        fn_80055AA8((Ball*)pBall, pPre, nPlayer);
+        fn_80055AA8(pBall, pPre, nPlayer);
     }
 }
 
@@ -940,23 +927,23 @@ void GM_GolferConcede_Hole(int nPlayer) {
     int     n;
     fn_800E3D38(nPlayer, 0);
     p = &gPlayers[nPlayer];
-    gPlayers[nPlayer].nLie = LIE_HOLED;
+    gPlayers[nPlayer].ball.nLie = LIE_HOLED;
     gPlayers[nPlayer].nStrokes[gpGame->nCurHole] = 999;
     p->nPutts[gpGame->nCurHole] = 999;
-    *(s32*)(gPlayers[nPlayer].ball + 0x64) = 0;
+    gPlayers[nPlayer].ball.nState = 0;
     if (Game_GetMode() != 0x12) {
         nPlayers = gNumPlayersSetUp;
         n = 0;
         for (i = 0; i < nPlayers; i++) {
-            if (PLAYER(i)->nLie != LIE_HOLED) {
+            if (PLAYER(i)->ball.nLie != LIE_HOLED) {
                 n++;
             }
         }
         if (n == 1) {
             for (i = 0; i < nPlayers; i++) {
                 if (i != nPlayer) {
-                    PLAYER(i)->nLie = LIE_HOLED;
-                    *(s32*)(PLAYER(i)->ball + 0x64) = 0;
+                    PLAYER(i)->ball.nLie = LIE_HOLED;
+                    PLAYER(i)->ball.nState = 0;
                 }
             }
         }
@@ -974,12 +961,12 @@ void GM_MovePlayerToBall(int nPlayer) {
     f32         fLow;
     f32         fHigh;
     Player*     p     = &gPlayers[nPlayer];
-    u8*         pBall = p->ball;
+    Ball*       pBall = &p->ball;
     f32*        pPos  = &p->fBallX;
     CourseInfo* pCourse;
     f32         f;
-    Vec3Copy((f32*)pBall, pPos);
-    Vec_Copy((f32*)pBall, p->vPreShot);
+    Vec3Copy(pBall->vPos, pPos);
+    Vec_Copy(pBall->vPos, p->vPreShot);
     pCourse = fn_8000C594();
     if (pCourse) {
         Ter_GetEnclosingGroundHeight(pCourse, pPos, &fLow, &fHigh);
@@ -1095,7 +1082,7 @@ void GM_DoPostShotInHoleUI(int nPlayer) {
         fn_80062B78(nPlayer);
         fn_80062B74(nPlayer);
         fn_80062B70();
-        fn_80063BF4(pView, *(f32*)(lbl_80281F78 + 0x170), (f32*)&vOffset);
+        fn_80063BF4(pView, lbl_80281F78->f170, (f32*)&vOffset);
         return;
     }
     if (Player_IsNotCPU(nPlayer) && gSession.nSplitScreen == 0) {
@@ -1162,8 +1149,8 @@ int GM_ChooseRemoveBallState(int nPlayer) {
     if (gPlayers[nPlayer].fA64 > 5.0f) {
         return 0;
     }
-    if (gPlayers[nPlayer].nBallStartSurface < 0 || gPlayers[nPlayer].nBallStartSurface >= 156 ||
-        gSurfaceTypes[gPlayers[nPlayer].nBallStartSurface].nClass != 3) {
+    if (gPlayers[nPlayer].ball.nStartSurface < 0 || gPlayers[nPlayer].ball.nStartSurface >= 156 ||
+        gSurfaceTypes[gPlayers[nPlayer].ball.nStartSurface].nClass != 3) {
         return 0;
     }
     if (gPlayers[nPlayer].uFlags & 1) {
@@ -1194,7 +1181,7 @@ void GM_SimulateBallMovement(int nPlayer) {
     f32     fBudget;
     f32     fMs;
     Player* p;
-    u8*     pBall;
+    Ball*   pBall;
     s32*    pState;
     u64     t1;
     u8      bReact;
@@ -1210,9 +1197,9 @@ void GM_SimulateBallMovement(int nPlayer) {
         nUpdates = 0;
     }
     p = &gPlayers[nPlayer];
-    pBall = p->ball;
+    pBall = &p->ball;
     for (i = 0; i < nUpdates; i++) {
-        Physics_Simulate((Ball*)pBall, 20);
+        Physics_Simulate(pBall, 20);
     }
     fMs = 1000.0f * fn_8006E118(fn_800954A4(0), t0);
     fBudget = 0.83f - fMs;
@@ -1222,11 +1209,11 @@ void GM_SimulateBallMovement(int nPlayer) {
     if (gSession.nSplitScreen == 0 && gSession.fFrameTime > 0.0f) {
         Ball_SetSimulating(1);
         fn_80050D2C(1);
-        pBall = p->ballBefore;
-        pState = (s32*)(p->ballBefore + 0x64);
+        pBall = &p->ballBefore;
+        pState = &p->ballBefore.nState;
         while (*pState != 1 && *pState != 5 && *pState != 0 && fBudget > 0.1f) {
             t1 = fn_800954A4(0);
-            Physics_Simulate((Ball*)pBall, 20);
+            Physics_Simulate(pBall, 20);
             fMs = 1000.0f * fn_8006E118(fn_800954A4(0), t1);
             nSteps++;
             fBudget -= fMs;
@@ -1260,15 +1247,15 @@ void GM_SimulateBallMovement(int nPlayer) {
                 } else if (bReact) {
                     pDone = &gPlayers[nPlayer].bRehearsalDone;
                     if (!*pDone && fDist < 5.5f && fDist > 2.0f &&
-                        fDist - *(f32*)(gPlayers[nPlayer].ball + 0x60) < 0.3f) {
-                        pLie = (s32*)(gPlayers[nPlayer].ballBefore + 0x68);
+                        fDist - gPlayers[nPlayer].ball.fClosest < 0.3f) {
+                        pLie = &gPlayers[nPlayer].ballBefore.nLie;
                         if (*pLie == LIE_HOLED && Hole_ScoreAfterTapIn(nPlayer) <= 0) {
                             if (Rand_Next(1) % 100 < 50) {
                                 *pFlags |= 4;
                                 gPlayers[nPlayer].fEEC = fDist;
                                 fn_80095744(gPlayers[nPlayer].nShotHandle, 9);
                             }
-                        } else if (*pLie != LIE_HOLED && *(f32*)(gPlayers[nPlayer].ballBefore + 0x60) < 0.2f) {
+                        } else if (*pLie != LIE_HOLED && gPlayers[nPlayer].ballBefore.fClosest < 0.2f) {
                             *pFlags |= 4;
                             gPlayers[nPlayer].fEEC = fDist;
                             fn_80095744(gPlayers[nPlayer].nShotHandle, 9);

@@ -9,9 +9,6 @@
 
 typedef struct View View;                   // GoGolfCam.c, Swing.c
 
-typedef struct CourseInfo CourseInfo;       // golfer.h
-typedef struct SurfaceType SurfaceType;     // golfer.h
-
 // ---- memory and strings ----------------------------------------------------------------------
 
 void* Mem_cpy(void* pDst, const void* pSrc, u32 uLen);    // returns pDst
@@ -39,12 +36,6 @@ u32  Rand_Next(int nStream);            // 0x8000B130  EA's lagged-Fibonacci gen
 void fn_8000B1D4(int nStream, u32 uSeed);   // seed a random stream
 f32  Rand_Float(int nStream);           // 0x8000B428  [0, 1)
 double fn_8015F824(double x, double y); // pow
-
-// ---- the course ------------------------------------------------------------------------------
-
-CourseInfo* fn_8000C594(void);          // the current course
-SurfaceType* fn_800CC190(CourseInfo* pCourse, f32* pPos);   // surface type under a point
-f32  Terrain_HeightAt(f32* pPos, SurfaceType** ppSurface);   // 0x800447DC
 
 // ---- the file streamer (UStream.c) -----------------------------------------------------------
 
@@ -89,6 +80,54 @@ u8   fn_80014300(u32 uMask);            // any pad pressed these buttons
 
 // ---- views, events, sound, animation ---------------------------------------------------------
 
+// The golfer's character object at Player.nShotHandle; only the fields read so far.
+typedef struct ShotObj {
+    u8    unk0[0x1C];
+    s32   nAnim;                // 0x01C  the playing animation (6 backswing, 7 downswing)
+    u8    unk20[0x2C - 0x20];
+    s32   n2C;                  // 0x02C  tested for 0 (PreShotInit) and for 4 or 5 (ShotSetupInit)
+    u8    unk30[0x38 - 0x30];
+    u8*   pView;                // 0x038  -> +0x38 -> a struct with +0x10E4
+    u8    unk3C[0x164 - 0x3C];
+    u8    anim[4];              // 0x164  the animation: +0x14 is its playback rate
+    s32   uFlags;               // 0x168  bit 0x40: the backswing is being backed down (signed: the original tests it with cmpwi)
+    u8    unk16C[0x17C - 0x16C];
+    f32   fAnimTime;            // 0x17C
+    u8    unk180[0x184 - 0x180];
+    f32   fAnimEnd;             // 0x184  the animation's end time
+    u8    unk188[0x438 - 0x188];
+    s32   n438;                 // 0x438  compared with 11 (GM_ShowPostShotAnimation)
+    u8    unk43C[0x4AC - 0x43C];
+    struct { u32 bSet; f32 fTime; u8 unk8[8]; } events[18];   // 0x4AC  animation events, by 64-bit id
+    s32   n5CC;                 // 0x5CC
+    u8    unk5D0[0x1624 - 0x5D0];
+    u8*   pClip;                // 0x1624 -> +0xCC blend, +0xD4/+0xD8 clips
+    f32   f1628;
+    f32   f162C;
+    f32   f1630;
+    f32   f1634;
+    f32   v1638[3];             // 0x1638
+    f32   f1644;
+    u8    unk1648[0x1698 - 0x1648];
+    s32   n1698;                // 0x1698
+} ShotObj;
+
+// The camera tuning values (GoGolfCam.c); only the fields read so far.
+typedef struct CamTuning {
+    u8   unk0[0x94];
+    f32  f94;                   // 0x094  the elevator camera's first blend value
+    u8   unk98[0x16C - 0x98];
+    f32  f16C;                  // 0x16C  the obstruction radius around the ball for the pre-shot routine
+    f32  f170;                  // 0x170  fn_80063BF4's blend
+    u8   unk174[0x178 - 0x174];
+    f32  f178;                  // 0x178
+    f32  v17C[4];               // 0x17C
+    u8   unk18C[0x1C0 - 0x18C];
+    s32  n1C0;                  // 0x1C0  nonzero enables camera 19
+} CamTuning;
+
+extern CamTuning* lbl_80281F78;
+
 u8*  fn_80016CFC(int nView);
 void* fn_80017004(int nView);
 void* fn_80017028(int nView);           // the view
@@ -117,7 +156,8 @@ u8   fn_80063C90(void* pView);          // the camera is still moving
 void fn_80063CF0(View* pView, int nCamera, int nPlayer);
 void fn_8006434C(void* pView, f32* pPos, f32* pX, f32* pY, int a);   // a world position on screen (0..1)
 void fn_8006A8D4(void* pView, f32* pX, f32* pY);
-void EVENT_Trigger(int nPlayer, int nEvent, int a, int b);    // through the event table at lbl_80188628
+void EVENT_Trigger(int nPlayer, int nEvent, void* pData, int b);   // through the event table at
+                                        // lbl_80188628; pData: the ball, a position, or NULL
 void fn_800689D4(int nPlayer);
 u8   fn_80068AC8(int nPlayer);
 void fn_80069330(int nPlayer, f32* pPos);
@@ -145,7 +185,6 @@ void CharacterState_AddSKABlendData(u8* pChar, int a, int nGroup, void* pfn, int
 void CharAnim_StartTapIn(u8* pChar);
 void fn_8009B970(int nView);
 void fn_8009EF98(void);
-void fn_800A30E4(int nKind, u8* pBall, int nPlayer, int a, f32 f);
 void fn_800A6278(void);
 void fn_800A62A4(void);
 void fn_800A62E0(void);

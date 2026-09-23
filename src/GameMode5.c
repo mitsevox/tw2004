@@ -585,8 +585,8 @@ void fn_800EBEF0(void) {
         v[1] = lbl_80203170[lbl_802822F4].f4;
         v[2] = lbl_80203170[lbl_802822F4].f8;
         v[3] = 1.0f;
-        fn_80055AA8((Ball*)gPlayers[0].ball, v, 0);
-        Physics_DropBall((Ball*)gPlayers[0].ball, v);
+        fn_80055AA8(&gPlayers[0].ball, v, 0);
+        Physics_DropBall(&gPlayers[0].ball, v);
         Vec_Copy(v, &gPlayers[0].fBallX);
     }
     if (lbl_80281664[lbl_802822F4].uClubs) {

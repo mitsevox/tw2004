@@ -7,6 +7,7 @@
 
 #include "game_types.h"
 #include "engine.h"
+#include "ball.h"
 
 // ---- attributes -----------------------------------------------------------------------------
 
@@ -297,22 +298,10 @@ typedef struct Player {
     f32  fA84;                  // 0xA84
     f32  fA88;                  // 0xA88  an angle (speed golf: the run's heading)
     f32  fA8C;                  // 0xA8C  pad stick y, -1..1 (GameMode8 fn_800FB460)
-    u8   ball[0x64];            // 0xA90  the player's Ball (0xBC bytes, see Ball.c) - nLie is its +0x68
-    s32  nBallState;            // 0xAF4  the ball's nState (Ball + 0x64)
-    s32  nLie;                  // 0xAF8
-    u8   unkAFC[0xB04 - 0xAFC];
-    s32  nBallSurface;          // 0xB04  the ball's nSurface (Ball + 0x74)
-    s32  nBallStartSurface;     // 0xB08  the ball's nStartSurface (Ball + 0x78)
-    void* pBallCourse;          // 0xB0C  the ball's pCourse (Ball + 0x7C)
-    u8   unkB10[0xB18 - 0xB10];
-    struct SurfaceType* pBallHitSurface;   // 0xB18  the ball's pHitSurface (Ball + 0x88)
-    u8   unkB1C[0xB24 - 0xB1C];
-    s32  nBallOwner;            // 0xB24  the ball's nPlayer (Ball + 0x94)
-    u8   unkB28[0xB4C - 0xB28];
+    Ball ball;                  // 0xA90  the player's ball
     f32  vOrient[4];            // 0xB4C  a quaternion, identity at setup. TW06: ballRot
-    u8   ballBefore[0x94];      // 0xB5C  copy of the Ball as it lay before the shot (0xBC bytes)
-    s32  nBallBeforeOwner;      // 0xBF0  the copy's nPlayer (Ball + 0x94), -1 for nobody's
-    u8   unkBF4[0xC18 - 0xBF4];
+    Ball ballBefore;            // 0xB5C  a copy of the ball: as it lay before the shot, then the look-ahead
+                                //        copy launched with it (STATEFUNC_SimulateInit)
     s32  nShotHandle;           // 0xC18
     f32  fThinkTime;            // 0xC1C  seconds a CPU has spent in state 2
     f32  fC20;                  // 0xC20
@@ -384,7 +373,7 @@ typedef struct Replay {
     s32    nCourse;             // 0xF00
     s16    nHole;               // 0xF04
     s8     nTeeSet;             // 0xF06
-    s8     nF07;                // 0xF07
+    s8     nPinSet;             // 0xF07  the session's pin set when the shot was saved
     f32    fF08;                // 0xF08
     f32    fF0C;                // 0xF0C
     u8     bF10;                // 0xF10  in-flight replays are on (GameManager.c)
@@ -398,25 +387,6 @@ typedef struct Replay {
     s16    nF1E;                // 0xF1E  -> fn_80055CD0
     s16    nStrokes;            // 0xF20  strokes on the hole before the shot
 } Replay;
-
-// Terrain surface descriptors (0x44 bytes each); only the index of one is used here.
-typedef struct SurfaceType {
-    f32  f00;                   // 0x00  launch: share of the speed kept; + the ball's f70 (fn_800510EC)
-    f32  f04;                   // 0x04  lie: size of the random lie quality (Ball_SetLie)
-    f32  f08;                   // 0x08  launch: spin factor
-    f32  f0C;                   // 0x0C  bounce restitution; below 0: branches/leaves (randomised, LUCK)
-    f32  f10;                   // 0x10  bounce: friction at the contact
-    f32  f14;                   // 0x14  skid: 1 - this scales the slope pull
-    f32  f18;                   // 0x18  skid: friction building roll spin
-    f32  f1C;                   // 0x1C  0.375 on surfaces a ball may stop on; roll: break strength
-    f32  f20;                   // 0x20  roll: rolling friction
-    f32  f24;                   // 0x24  bounce: how hard a landing it takes to bend the normal (softness)
-    f32  f28;                   // 0x28  bounce: base softness
-    u32  nClass;                // 0x2C  2, 3 = green, 4, 5 = rough, 6 = sand, 7/16 = water, 11, 12/18 = the cup, 17 = tree
-    u8   unk30[4];
-    u32  u34;                   // 0x34  bit 0x10: event 0x25 on landing
-    u8   unk38[0x44 - 0x38];
-} SurfaceType;
 
 // An all-time record: the value and who holds it (gSession.recA/B/C).
 typedef struct RecordEntry {
@@ -452,7 +422,8 @@ typedef struct Session {
     u32  nSeed;                 // 0x5B2C
     u8   unk5B30[4];
     s32  unk5B34;               // 0x5B34
-    s8   unk5B38;               // 0x5B38
+    s8   nPinSet;               // 0x5B38  the pin position every hole uses (0..3; -1 = 0), copied to
+                                //         gpGame->nPinSet[] at the start of a round
     u8   unk5B39;               // 0x5B39
     u8   unk5B3A[2];
     f32  f5B3C;                 // 0x5B3C
@@ -483,7 +454,7 @@ typedef struct GameState {
     s32  nD8;                   // 0x0D8
     s32  nDC;                   // 0x0DC
     s32  nE0;                   // 0x0E0
-    s32  holeOrder[18];         // 0x0E4
+    s32  nPinSet[18];           // 0x0E4  per hole: which of its four pin positions (CourseInfo.pin) is used
     s32  n12C;                  // 0x12C
     f32* p130;                  // 0x130  a position: speed golf measures the ball's distance to it
     u8   b134;                  // 0x134  cleared at the start of a hole
@@ -592,25 +563,13 @@ typedef struct AITarget {
     AITargetDef* pDef;          // 0x00
     u8   bEnabled;              // 0x04
     s8   nTeeSet;               // 0x05  -1 = any
-    s8   nHole;                 // 0x06  -1 = any
+    s8   nPinSet;               // 0x06  the pin position it is for, -1 = any
     s8   nSkillReq;             // 0x07
     s8   nAggrReq;              // 0x08
     s8   bPriority;             // 0x09  taken when nothing else qualifies (and by humans)
     s8   nType;                 // 0x0A
     s8   nPowerReq;             // 0x0B
 } AITarget;
-
-// Per-course data: only the pin positions are read here.
-typedef struct PinPos {
-    f32  x, y, z, w;
-} PinPos;
-
-typedef struct CourseInfo {
-    u8     unk0[0x6C];
-    f32    fFloor;              // 0x6C  a ball in the air above this with no ground under it is still in play
-
-    PinPos pin[18];             // 0x70
-} CourseInfo;
 
 extern GolferRecord gGolferTable[34];   // 0x801CB300  STATS_GC.BIN as loaded
 extern GolferRecord gCurGolferRecord;   // 0x801CB1C0  the created golfer being edited
@@ -627,14 +586,9 @@ extern s32          gNumAITargets;      // 0x80281D44
 extern u8           gClubKindTable[8][NUM_CLUBS];   // 0x801874B0  which clubs each shot kind allows
 extern f32          gClubDistAtPower0[NUM_CLUBS];   // 0x80187580  reach at POWER 0 (245 for the woods)
 extern f32          gClubPowerStep[NUM_CLUBS];      // 0x801875E8  reach gained per POWER point over 100
-extern SurfaceType  gSurfaceTypes[];    // 0x8017E9B8
 
 int  Game_GetMode(void);                // 0x8000BED8
 int  fn_800D2B08(void);
-f32  fn_80050D34(f32 fDist);            // putt power for a distance
-f32  fn_80050F44(int nKind, int nClub); // a club's table reach for a shot kind
-f32  fn_80050F88(f32 fDist, u8* pParams, int nKind, int nClub);   // chip power
-f32  fn_800510EC(u8* pBall);            // the ball's f70 + its surface's +0x00
 int  fn_80100744(void);                 // shot kind override, 8 = none
 int  fn_801006F0(int nPlayer);          // club override, 26 = none
 int  fn_80015464(void);

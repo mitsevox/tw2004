@@ -74,12 +74,6 @@ typedef struct Vec4 {
 } Vec4;
 extern Vec4 lbl_80184E00;                   // 0, 0, 0, 0.5
 
-// The tee positions follow the pins in the per-hole data (fn_8000C594).
-typedef struct HoleTees {
-    u8     unk0[0xB0];
-    PinPos tee[4];                          // 0xB0  one per tee set
-} HoleTees;
-
 extern s32 lbl_802816D8;                    // the options' unkC, saved while the mode runs
 extern u8  lbl_802823E0;
 extern u8  lbl_802823E1;
@@ -114,8 +108,6 @@ void  fn_800A6EC8(void);
 void  fn_800E5200(int a);
 void  AI_ChooseTarget(int nPlayer);
 void  fn_80058FA4(int nPlayer);
-void  fn_80047B6C(u8* pBall, int nPlayer);
-void  fn_80047BC0(u8* pBall, int nPlayer);
 void  fn_800A6DCC(int nMusic, int a);
 u8    fn_800A7720(void);
 f32   fn_8005C1EC(int nPlayer);
@@ -213,8 +205,8 @@ void fn_80100160(void) {
     fn_800E1434();
     gSession.nTeeSet[0] = 0;
     gSession.nTeeSet[1] = 0;
-    gSession.unk5B38 = 0;
-    gpGame->holeOrder[Game_CurHoleIndex()] = 0;
+    gSession.nPinSet = 0;
+    gpGame->nPinSet[Game_CurHoleIndex()] = 0;
     lbl_802816D8 = SESSION_OPTIONS->unkC;
     lbl_802823EC = SESSION_OPTIONS->nWind;
     SESSION_OPTIONS->unkC = 4;
@@ -340,11 +332,11 @@ void fn_80100328(void) {
 void fn_80100508(void) {
     int n = lbl_802823FC - 1;
     f32 fHeight;
-    HoleTees* pTees;
+    CourseInfo* pCourse;
     if (-1.0f == lbl_80192DF8[n].vPos[0] && -1.0f == lbl_80192DF8[n].vPos[1] &&
         -1.0f == lbl_80192DF8[n].vPos[2]) {
-        pTees = (HoleTees*)fn_8000C594();
-        Vec_Copy(&pTees->tee[gSession.nTeeSet[0]].x, &gPlayers[0].fBallX);
+        pCourse = fn_8000C594();
+        Vec_Copy(&pCourse->tee[gSession.nTeeSet[0]].x, &gPlayers[0].fBallX);
     } else {
         fHeight = Terrain_HeightAt(lbl_80192DF8[n].vPos, NULL);
         if (-65536.125f != fHeight) {
@@ -353,11 +345,11 @@ void fn_80100508(void) {
         Vec_Copy(lbl_80192DF8[n].vPos, &gPlayers[0].fBallX);
     }
     Vec_Copy(&gPlayers[0].fBallX, gPlayers[0].vPreShot);
-    Vec_Copy(&gPlayers[0].fBallX, (f32*)gPlayers[0].ball);
-    fn_80055AA8((Ball*)gPlayers[0].ball, &gPlayers[0].fBallX, 0);
+    Vec_Copy(&gPlayers[0].fBallX, gPlayers[0].ball.vPos);
+    fn_80055AA8(&gPlayers[0].ball, &gPlayers[0].fBallX, 0);
     // EA bug: always true (|| where && was meant), so the ball is always dropped.
     if (lbl_802823FC != 1 || lbl_802823FC != 8 || lbl_802823FC != 9 || lbl_802823FC != 11) {
-        Physics_DropBall((Ball*)gPlayers[0].ball, &gPlayers[0].fBallX);
+        Physics_DropBall(&gPlayers[0].ball, &gPlayers[0].fBallX);
     }
     gPlayers[0].attrMod[0] = 0;
     gPlayers[0].attrMod[8] = 0;
@@ -887,7 +879,7 @@ void fn_8010179C(void) {
     }
     fLength = fn_800D0550(0);
     nLesson = lbl_802823FC;
-    nLie = gPlayers[0].nLie;
+    nLie = gPlayers[0].ball.nLie;
     switch (nLesson) {
     case 1:
         if (fLength < 260.0f) {

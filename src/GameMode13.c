@@ -109,7 +109,7 @@ void fn_800F6A60(void) {
     fn_800E1480(0);
     lbl_80282360 = 0;
     gSession.nSplitScreen = 0;
-    gSession.unk5B38 = 0;
+    gSession.nPinSet = 0;
 }
 
 void fn_800F6CC4(void) {
@@ -158,10 +158,10 @@ s32 fn_800F6D14(int nPlayer) {
 void fn_800F6DFC(int nPlayer) {
     fn_800ED710(nPlayer);
     if (gReplayData.bF10) {
-        Mem_cpy(gPlayers[nPlayer].ball, gReplayData.player.ball, 0xBC);
+        Mem_cpy(&gPlayers[nPlayer].ball, &gReplayData.player.ball, sizeof(Ball));
     } else {
-        fn_80055AA8((Ball*)gPlayers[nPlayer].ball,
-                    (f32*)((u8*)gPlayers[nPlayer].pBallCourse + gSession.nTeeSet[nPlayer] * 0x10 + 0xB0), nPlayer);
+        fn_80055AA8(&gPlayers[nPlayer].ball,
+                    &gPlayers[nPlayer].ball.pCourse->tee[gSession.nTeeSet[nPlayer]].x, nPlayer);
     }
     gPlayers[nPlayer].nDC0++;
     if (gPlayers[nPlayer].nDBC > 1) {
@@ -181,11 +181,11 @@ void fn_800F6ED4(int nPlayer) {
     f32 fLength;
     f32 fScale;
     s32 nMult;
-    u8* pBall;
+    Ball* pBall;
     long j;
     s32 nHits;
     nMsg = -1;
-    nSurface = gPlayers[nPlayer].nBallSurface;
+    nSurface = gPlayers[nPlayer].ball.nSurface;
     fn_800F7A4C(nSurface, &lbl_802823BC, &lbl_802823B8, &nBalls);
     fScale = 1.0f;
     nAdded = 0;
@@ -281,7 +281,7 @@ void fn_800F6ED4(int nPlayer) {
             if (nSurface == 0x85 || nSurface == 0x88 || nSurface == 0x8C) {
                 gPlayers[nPlayer].nDE0++;
                 fn_800A62E0();
-                pBall = gPlayers[nPlayer].ball;
+                pBall = &gPlayers[nPlayer].ball;
                 fn_800A30E4(8, pBall, nPlayer, 0, 0.0f);
                 nMult = gPlayers[nPlayer].nDBC;
                 if (nMult > 1) {
@@ -291,7 +291,7 @@ void fn_800F6ED4(int nPlayer) {
                 fn_800A6358();
                 nMult = gPlayers[nPlayer].nDBC;
                 if (nMult > 1) {
-                    fn_800A30E4(nMult + 7, gPlayers[nPlayer].ball, nPlayer, 0, 0.0f);
+                    fn_800A30E4(nMult + 7, &gPlayers[nPlayer].ball, nPlayer, 0, 0.0f);
                 }
             }
         }
@@ -408,7 +408,7 @@ void fn_800F6ED4(int nPlayer) {
             nMsg = 0x14;
         }
     }
-    if (fLength > gPlayers[nPlayer].nDDC && !fn_800E2B40(nPlayer, (Ball*)gPlayers[nPlayer].ball)) {
+    if (fLength > gPlayers[nPlayer].nDDC && !fn_800E2B40(nPlayer, &gPlayers[nPlayer].ball)) {
         gPlayers[nPlayer].nDDC = fLength;
     }
     if (nMsg != -1) {
@@ -520,7 +520,7 @@ void fn_800F7DE8(void) {
     if ((s8)GOLFERSTATE_GetCurrentState(lbl_80282278) == 1 || (s8)GOLFERSTATE_GetCurrentState(lbl_80282278) == 2 ||
         (s8)GOLFERSTATE_GetCurrentState(lbl_80282278) == 3 || (s8)GOLFERSTATE_GetCurrentState(lbl_80282278) == 4 ||
         (s8)GOLFERSTATE_GetCurrentState(lbl_80282278) == 10) {
-        gPlayers[lbl_80282278].nLie = 12;
+        gPlayers[lbl_80282278].ball.nLie = 12;
         gPlayers[lbl_80282278].nC3C |= 0x04000000;
         fn_800F80D4(0);
         fn_800ED710(lbl_80282278);
@@ -559,7 +559,7 @@ u8 fn_800F7F70(int nPlayer, int a) {
 // A bonus was collected: the multiplier goes up.
 void fn_800F7FF4(int nPlayer, int nId) {
     s32 n = fn_800F2810(nId);
-    fn_800A30E4(8, gPlayers[nPlayer].ball, nPlayer, 0, 0.0f);
+    fn_800A30E4(8, &gPlayers[nPlayer].ball, nPlayer, 0, 0.0f);
     lbl_802823B4 += n + 2;
 }
 

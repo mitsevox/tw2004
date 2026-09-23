@@ -96,7 +96,7 @@ void fn_800F4B40(void) {
     gpGame->n294 = 0;
     gpGame->nDC = 0;
     lbl_80282360 = 0;
-    gSession.unk5B38 = 0;
+    gSession.nPinSet = 0;
     fn_800E1480(0);
 }
 
@@ -145,10 +145,10 @@ s32 fn_800F4DBC(int nPlayer) {
 // End of a golfer's turn: the ball goes back to the tee, one ball fewer; count multiplied shots.
 void fn_800F4F40(int nPlayer) {
     if (gReplayData.bF10) {
-        Mem_cpy(gPlayers[nPlayer].ball, gReplayData.player.ball, 0xBC);
+        Mem_cpy(&gPlayers[nPlayer].ball, &gReplayData.player.ball, sizeof(Ball));
     } else {
-        fn_80055AA8((Ball*)gPlayers[nPlayer].ball,
-                    (f32*)((u8*)gPlayers[nPlayer].pBallCourse + gSession.nTeeSet[nPlayer] * 0x10 + 0xB0), nPlayer);
+        fn_80055AA8(&gPlayers[nPlayer].ball,
+                    &gPlayers[nPlayer].ball.pCourse->tee[gSession.nTeeSet[nPlayer]].x, nPlayer);
     }
     gPlayers[nPlayer].nDC0--;
     if (gPlayers[nPlayer].nDBC > 1) {
@@ -163,9 +163,9 @@ void fn_800F5014(int nPlayer) {
     s32 nMsg;
     f32 fLength;
     s32 nMult;
-    u8* pBall;
+    Ball* pBall;
     nMsg = -1;
-    nSurface = gPlayers[nPlayer].nBallSurface;
+    nSurface = gPlayers[nPlayer].ball.nSurface;
     fLength = fn_800D0550(nPlayer);
     fn_800F58B4(nSurface, &lbl_80282398);
     if (nSurface >= 0x85 && nSurface <= 0x90 && !fn_800F2788(nPlayer, fLength)) {
@@ -204,7 +204,7 @@ void fn_800F5014(int nPlayer) {
             if (nSurface == 0x85 || nSurface == 0x88 || nSurface == 0x8C) {
                 gPlayers[nPlayer].nDE0++;
                 fn_800A62E0();
-                pBall = gPlayers[nPlayer].ball;
+                pBall = &gPlayers[nPlayer].ball;
                 fn_800A30E4(8, pBall, nPlayer, 0, 0.0f);
                 nMult = gPlayers[nPlayer].nDBC;
                 if (nMult > 1) {
@@ -214,7 +214,7 @@ void fn_800F5014(int nPlayer) {
                 fn_800A6358();
                 nMult = gPlayers[nPlayer].nDBC;
                 if (nMult > 1) {
-                    fn_800A30E4(nMult + 7, gPlayers[nPlayer].ball, nPlayer, 0, 0.0f);
+                    fn_800A30E4(nMult + 7, &gPlayers[nPlayer].ball, nPlayer, 0, 0.0f);
                 }
             }
             if (nMsg == -1) {
@@ -416,7 +416,7 @@ s32 fn_800F59DC(int nPlayer, int i) {
 // A bonus was collected: the multiplier goes up.
 void fn_800F5A14(int nPlayer, int nId) {
     s32 n = fn_800F2810(nId);
-    fn_800A30E4(8, gPlayers[nPlayer].ball, nPlayer, 0, 0.0f);
+    fn_800A30E4(8, &gPlayers[nPlayer].ball, nPlayer, 0, 0.0f);
     lbl_80282394 += n + 2;
 }
 

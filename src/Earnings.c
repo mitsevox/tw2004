@@ -22,7 +22,7 @@ typedef struct EarningsTable {
     SkinsValue aSkins[26];      // 0x2A4  a skin's value, per the best earnings rating in the game
     u8   unk4AC[0x980 - 0x4AC];
     s32  aTeePct[3];            // 0x980  the tee multiplier, as [2 - nTeeSet] (tee set 3 pays as 1)
-    s32  a98C[4];               // 0x98C  the multiplier for the hole's gpGame->holeOrder value 0..3
+    s32  a98C[4];               // 0x98C  the multiplier for the hole's gpGame->nPinSet value 0..3
     s32  aTourPct[6];           // 0x99C  the TOUR card multiplier per level 1..6 (level 0 pays as 1)
     u8   unk9B4[0x22F0 - 0x9B4];
 } EarningsTable;
@@ -104,7 +104,7 @@ int   fn_800584DC(int nProfile);
 int   fn_801020C0(void);
 
 int   fn_800D3CF8(int nRating);
-s32   fn_800D477C(int nPlayer, u8* pBall, u8 b);
+s32   fn_800D477C(int nPlayer, Ball* pBall, u8 b);
 void  fn_800D4F14(int nPlayer, u8 b);
 f32   fn_800D6EEC(void);
 u8    fn_800D76AC(int nPlayer, int nAward);
@@ -392,7 +392,7 @@ u8 fn_800D69B8(int nPlayer, u8 bCheck) {
 }
 
 // TW06: GM_Earnings_ComputeBonusModifiers. The points, rounded to $25, earn a bonus on top for the
-// course, the tees played and the hole's gpGame->holeOrder value (each flag switches one on).
+// course, the tees played and the hole's gpGame->nPinSet value (each flag switches one on).
 // Each part is rounded to $25 by itself; the total is at least 0.
 s32 fn_800D6A70(s32 nPoints, int nPlayer, u8 bCourse, u8 bTee, u8 bHole, CourseMoneyTracking* pMoney) {
     f32 fCourseBonus;
@@ -422,7 +422,7 @@ s32 fn_800D6A70(s32 nPoints, int nPlayer, u8 bCourse, u8 bTee, u8 bHole, CourseM
         fTee = 1.0f;
         break;
     }
-    switch (gpGame->holeOrder[Game_CurHoleIndex()]) {
+    switch (gpGame->nPinSet[Game_CurHoleIndex()]) {
     case 0:
         fHole = (f32)lbl_80200538.a98C[0] / 100.0f;
         break;
@@ -550,7 +550,7 @@ u8 fn_800D750C(int nPlayer, int nAward) {
     return 0;
 }
 
-s32 fn_800D7660(int nPlayer, u8* pBall, u8 b) {
+s32 fn_800D7660(int nPlayer, Ball* pBall, u8 b) {
     fn_800D477C(nPlayer, pBall, b);
     return fn_800D9954();
 }
@@ -666,7 +666,7 @@ void fn_800D9350(int nPlayer) {
     int nPar;
 
     if (fn_800E177C() == 0) {
-        nLie = gPlayers[nPlayer].nLie;
+        nLie = gPlayers[nPlayer].ball.nLie;
         if (gPlayers[nPlayer].b30F) {
             gPlayers[nPlayer].b310 = 1;
         }

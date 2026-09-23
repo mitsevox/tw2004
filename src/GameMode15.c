@@ -108,7 +108,7 @@ void fn_800F39F4(void) {
     fn_800E1480(0);
     lbl_80282360 = 0;
     gSession.nSplitScreen = 0;
-    gSession.unk5B38 = 0;
+    gSession.nPinSet = 0;
 }
 
 void fn_800F3C2C(void) {
@@ -156,10 +156,10 @@ s32 fn_800F3C7C(int nPlayer) {
 // End of a golfer's turn: the ball goes back to the tee (or to the replay's ball).
 void fn_800F3E00(int nPlayer) {
     if (gReplayData.bF10) {
-        Mem_cpy(gPlayers[nPlayer].ball, gReplayData.player.ball, 0xBC);
+        Mem_cpy(&gPlayers[nPlayer].ball, &gReplayData.player.ball, sizeof(Ball));
     } else {
-        fn_80055AA8((Ball*)gPlayers[nPlayer].ball,
-                    (f32*)((u8*)gPlayers[nPlayer].pBallCourse + gSession.nTeeSet[nPlayer] * 0x10 + 0xB0), nPlayer);
+        fn_80055AA8(&gPlayers[nPlayer].ball,
+                    &gPlayers[nPlayer].ball.pCourse->tee[gSession.nTeeSet[nPlayer]].x, nPlayer);
     }
     gPlayers[nPlayer].nDC0++;
 }
@@ -172,7 +172,7 @@ void fn_800F3EBC(int nPlayer) {
     s32 nMsg;
     f32 fLength;
     s32 nMult;
-    u8* pBall;
+    Ball* pBall;
     f32 x;
     f32 y;
     nMsg = -1;
@@ -180,7 +180,7 @@ void fn_800F3EBC(int nPlayer) {
         fn_800F3980(0x33, 0, 0, 0, 0xD1, 1);
         nMsg = 0x14;
     } else {
-        nSurface = gPlayers[nPlayer].nBallSurface;
+        nSurface = gPlayers[nPlayer].ball.nSurface;
         fLength = fn_800D0550(nPlayer);
         fn_800F49E8(nSurface, &lbl_80282380);
         if (nSurface >= 0x85 && nSurface <= 0x90 && !fn_800F2788(nPlayer, fLength)) {
@@ -198,7 +198,8 @@ void fn_800F3EBC(int nPlayer) {
                     gPlayers[nPlayer].nDD8 = 0;
                 }
                 if (!gSession.bReplay) {
-                    fn_8006434C(fn_80017004(gPlayers[nPlayer].nView0), (f32*)(gPlayers[nPlayer].ball + 0x10), &x, &y, 0);
+                    fn_8006434C(fn_80017004(gPlayers[nPlayer].nView0), gPlayers[nPlayer].ball.vPrev, &x, &y,
+                                0);
                     fn_8006A8D4(fn_80017004(gPlayers[nPlayer].nView0), &x, &y);
                     fn_800F3980(0x33, lbl_80282380, 512.0f * x, 448.0f * y, nSurface, 1);
                 }
@@ -209,7 +210,7 @@ void fn_800F3EBC(int nPlayer) {
                     if (nRank == 0) {
                         fn_800A62E0();
                         nMsg = 0x32;
-                        pBall = gPlayers[nPlayer].ball;
+                        pBall = &gPlayers[nPlayer].ball;
                         fn_800A30E4(8, pBall, nPlayer, 0, 0.0f);
                         nMult = gPlayers[nPlayer].nDBC;
                         if (nMult > 1) {
@@ -220,7 +221,7 @@ void fn_800F3EBC(int nPlayer) {
                         nMsg = 0x11;
                         nMult = gPlayers[nPlayer].nDBC;
                         if (nMult > 1) {
-                            fn_800A30E4(nMult + 7, gPlayers[nPlayer].ball, nPlayer, 0, 0.0f);
+                            fn_800A30E4(nMult + 7, &gPlayers[nPlayer].ball, nPlayer, 0, 0.0f);
                         }
                     }
                 } else if (nTarget == lbl_80282384 && nRank < lbl_80282388) {
@@ -232,7 +233,7 @@ void fn_800F3EBC(int nPlayer) {
                     if (nRank == 0) {
                         fn_800A62E0();
                         nMsg = 0x31;
-                        pBall = gPlayers[nPlayer].ball;
+                        pBall = &gPlayers[nPlayer].ball;
                         fn_800A30E4(8, pBall, nPlayer, 0, 0.0f);
                         nMult = gPlayers[nPlayer].nDBC;
                         if (nMult > 1) {
@@ -243,7 +244,7 @@ void fn_800F3EBC(int nPlayer) {
                         nMsg = 0x33;
                         nMult = gPlayers[nPlayer].nDBC;
                         if (nMult > 1) {
-                            fn_800A30E4(nMult + 7, gPlayers[nPlayer].ball, nPlayer, 0, 0.0f);
+                            fn_800A30E4(nMult + 7, &gPlayers[nPlayer].ball, nPlayer, 0, 0.0f);
                         }
                     }
                 } else {
@@ -274,7 +275,7 @@ void fn_800F3EBC(int nPlayer) {
                 fn_800F3980(0x33, 0, 0, 0, nSurface, 1);
                 if (nRank == 0) {
                     fn_800A62E0();
-                    pBall = gPlayers[nPlayer].ball;
+                    pBall = &gPlayers[nPlayer].ball;
                     fn_800A30E4(8, pBall, nPlayer, 0, 0.0f);
                     nMult = gPlayers[nPlayer].nDBC;
                     if (nMult > 1) {
@@ -284,7 +285,7 @@ void fn_800F3EBC(int nPlayer) {
                     fn_800A6358();
                     nMult = gPlayers[nPlayer].nDBC;
                     if (nMult > 1) {
-                        fn_800A30E4(nMult + 7, gPlayers[nPlayer].ball, nPlayer, 0, 0.0f);
+                        fn_800A30E4(nMult + 7, &gPlayers[nPlayer].ball, nPlayer, 0, 0.0f);
                     }
                 }
                 switch (fn_800F1E58(nSurface)) {
