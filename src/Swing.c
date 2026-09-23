@@ -3707,6 +3707,7 @@ void STATEFUNC_SwingInit(int nPlayer) {
     View* pV    = fn_80017028(gPlayers[nPlayer].nView[0]);
     int   nView;
     Ball* pBall;
+    Ball* pOwnBall;
     int   i;
 
     if (pV->nCurCamera == 0 && Player_IsCPU(nPlayer) && Game_GetMode() != 11) {
@@ -3770,9 +3771,9 @@ void STATEFUNC_SwingInit(int nPlayer) {
             fn_80047BC0(pBall, i);
         }
     }
-    pBall = &gPlayers[nPlayer].ball;
-    fn_80047B6C(pBall, nPlayer);
-    fn_80047BC0(pBall, nPlayer);
+    pOwnBall = &gPlayers[nPlayer].ball;
+    fn_80047B6C(pOwnBall, nPlayer);
+    fn_80047BC0(pOwnBall, nPlayer);
     gPlayers[nPlayer].bC2E = 0;
     gPlayers[nPlayer].bPlanReady = 0;
     gPlayers[nPlayer].uFlags     = 0;
