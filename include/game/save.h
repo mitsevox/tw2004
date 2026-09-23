@@ -217,9 +217,11 @@ typedef struct SaveProfile {
     char szGolferNames[6][8];   // 0x054C8  -> PlayerProfile.szNames
     u8   nGolferOutfit;         // 0x054F8  -> PlayerProfile.nOutfit
     u8   nGolferBallType;       // 0x054F9  -> PlayerProfile.nBallType
-    u8   unk54FA[0x5614 - 0x54FA];
-    // The created golfer's skins: copies of their p10B4 and p10C4 entries, 8 bytes each, for the
-    // body (fn_80103D6C) and its six attachments (fn_80103DE0).
+    u8   unk54FA[0x5613 - 0x54FA];
+    s8   n5613;                 // 0x05613  set by fn_8008DD34; FEgolferanim.c passes it to the
+                                //          character (fn_8008EA44)
+    // The created golfer's skin choices (SkinChoice, 8 bytes each; charstate.h's SkinChoices from
+    // 0x5500 on): the body's parts and sets (fn_80103D6C), and its six other skins' (fn_80103DE0).
     u8   a5614[0x5754 - 0x5614];    // 0x05614
     u8   a5754[0x5AF4 - 0x5754];    // 0x05754
     u8   a5AF4[6][0x50];            // 0x05AF4

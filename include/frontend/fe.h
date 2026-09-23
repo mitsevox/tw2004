@@ -59,7 +59,9 @@ typedef struct FEScreen {
     s32 n38;                    // 0x38  a menu message reads it (fn_8007DAD4)
     u8  unk3C[0x44 - 0x3C];
     f32 fFade;                  // 0x44  the fade to black before a movie, 0 to 1
-    u8  unk48[0x4C - 0x48];
+    u8  unk48;
+    u8  b49;                    // 0x49  FEgolferanim.c's fn_8008EB10 tests it
+    u8  unk4A[0x4C - 0x4A];
 } FEScreen;
 LAYOUT_ASSERT(FEScreen, 0x4C);
 
@@ -144,6 +146,31 @@ void fn_800B6594(u32 uAram);                          // ARAM free
 void fn_800B6844(void* pSrc, u32 uAram, u32 uSize);   // copy to ARAM
 void fn_800B68B4(void* pDst, u32 uAram, u32 uSize);   // copy from ARAM
 void fn_800B67EC(void);                               // wait for the ARAM copy
+
+// ---- the golfers animated on menu screens (FEgolferanim.c) -----------------------------------
+
+// A state of the golfer loader (lbl_80189AA0): run by fn_8008B864.
+typedef struct FEGolferState {
+    void (*pfnEnter)(void);     // 0x00
+    void (*pfnUpdate)(void);    // 0x04  every frame
+    void (*pfnExit)(void);      // 0x08
+    void (*pfnAbort)(void);     // 0x0C  fn_8008B704
+    s32  nNext;                 // 0x10  the state that follows it
+} FEGolferState;
+LAYOUT_ASSERT(FEGolferState, 0x14);
+
+#define FE_NUM_GOLFER_STATES 5  // state 0 is empty
+
+// The golfer loader's state machine (lbl_801D8708).
+typedef struct FEGolferMachine {
+    s32 nNext;                  // 0x0  the state after this one
+    s32 nState;                 // 0x4  the running state (0: stopped)
+    u8  bDone;                  // 0x8  the state is finished: go to nNext
+    u8  bEnter;                 // 0x9  the state's pfnEnter is still to run
+    u8  bAbort;                 // 0xA  set by fn_8008B704
+    u8  bPaused;                // 0xB
+} FEGolferMachine;
+LAYOUT_ASSERT(FEGolferMachine, 0xC);
 
 // ---- the Create-A-Player database (FE_CrAPDB.c) ----------------------------------------------
 
@@ -261,16 +288,16 @@ extern s32 lbl_80281FFC;                // set by fn_80084FF0: the lbl_8018C7D8 
 
 // ---- the golfers animated on menu screens (FEgolferanim.c) ------------------------------------
 
-s32  fn_8008B990(void);
+int  fn_8008B990(void);
 void fn_8008DAEC(void);
 void fn_8008E244(void);
 void fn_8008E364(int n);
-s32  fn_8008E420(void);
-s32  fn_8008E44C(void);
+int  fn_8008E420(void);
+int  fn_8008E44C(void);
 void fn_8008E6D4(int n);
-void fn_8008E724(u32 a, u32 b, s8 c, u8 d);
+void fn_8008E724(char* szAnim, char* szShot, s8 n, u8 bLoop);
 void fn_8008E824(void);
-void fn_8008E860(s32 n);
+void fn_8008E860(int n);
 
 // ---- the logo editor (FE_LogoDesign.c) -------------------------------------------------------
 

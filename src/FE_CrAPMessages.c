@@ -287,7 +287,7 @@ void fn_80109EAC(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_8010A208(MsgArg* pArgs, MsgArg* pResult) {
-    fn_8008E724(0, 0, 0, 0);
+    fn_8008E724(NULL, NULL, 0, 0);
 }
 
 void fn_8010A35C(MsgArg* pArgs, MsgArg* pResult) {

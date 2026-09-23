@@ -310,25 +310,97 @@ typedef struct GolfCamState {
     s32     n1EC[5];            // 0x1EC  per player: the next swing camera kind (View.n260) to use, 1..11 in turn
 } GolfCamState;
 
-// The create-a-player (CrAP) screen's state at lbl_80281EE0; only what the CrAP camera reads.
+// The golfer shown on the menu screens (FEgolferanim.c): the create-a-player (CrAP) screen's
+// state at lbl_80281EE0 (0x1E0 bytes, allocated by fn_8008AD80). The golfers are kept in a ring
+// of CRAP_NUM_GOLFERS slots (the code is written for more than one; the game uses one).
+#define CRAP_NUM_GOLFERS 1
+
 typedef struct CrAPGolfer {
-    u8   unk0[8];
+    struct CrAPGolfer* pPrev;   // 0x00  } the ring
+    struct CrAPGolfer* pNext;   // 0x04  }
     struct Character* pChar;    // 0x08  the golfer being edited (character.h)
-    s32  nC;                    // 0x0C
-    u8   unk10[8];
+    s32  nC;                    // 0x0C  the golfer's id (-1: none)
+    s32  n10;                   // 0x10
+    s32  n14;                   // 0x14  nC once its stream was opened
     u8   b18;                   // 0x18  the camera script runs
+    u8   b19;                   // 0x19
+    u8   unk1A[2];
+    s32  n1C;                   // 0x1C
 } CrAPGolfer;
+
 typedef struct CrAPState {
-    s32  n0;                    // 0x00  0..4: picks the shot the CrAP camera frames (fn_800C39A8)
-    s32  n4;                    // 0x04  the CrAP camera's nShot (GolfCamera_SwitchCrAPCamera)
-    u8   unk8[0x83 - 0x8];
-    u8   b83;                   // 0x83  set by a menu message (FE_MessageTable.c)
-    u8   unk84[2];
-    u8   b86;                   // 0x86  set by a menu message; a change while n0 is 3 calls
-                                //       fn_8008E354
-    u8   unk87[0xB4 - 0x87];
-    CrAPGolfer* pB4;            // 0xB4
+    s32  n0;                    // 0x000  0..4: picks the shot the CrAP camera frames (fn_800C39A8)
+    s32  n4;                    // 0x004  the CrAP camera's kind (GolfCamera_SwitchCrAPCamera)
+    s32  n8;                    // 0x008
+    s32  nC;                    // 0x00C
+    char sz10[0x10];            // 0x010  the animation fn_8008E468 started
+    char sz20[0x10];            // 0x020
+    char sz30[0x20];            // 0x030
+    s32  n50;                   // 0x050
+    char sz54[0x20];            // 0x054
+    s32  n74;                   // 0x074
+    u8   b78;                   // 0x078
+    u8   unk79[3];
+    f32  f7C;                   // 0x07C
+    u8   b80;                   // 0x080
+    u8   b81;                   // 0x081
+    u8   b82;                   // 0x082
+    u8   b83;                   // 0x083  set by a menu message (FE_MessageTable.c)
+    u8   b84;                   // 0x084
+    u8   b85;                   // 0x085
+    u8   b86;                   // 0x086  set by a menu message; a change while n0 is 3 calls
+                                //        fn_8008E354
+    u8   b87;                   // 0x087
+    u8   b88;                   // 0x088
+    u8   b89;                   // 0x089
+    u8   b8A;                   // 0x08A
+    u8   unk8B;
+    s32  n8C;                   // 0x08C  the golfer id whose stream was opened last (-1: none)
+    u8   b90;                   // 0x090
+    u8   b91;                   // 0x091
+    u8   unk92[2];
+    CrAPGolfer aGolfer[CRAP_NUM_GOLFERS];   // 0x094
+    CrAPGolfer* pB4;            // 0x0B4  the golfer shown
+    CrAPGolfer* pB8;            // 0x0B8  the golfer being loaded
+    s32  nBC;                   // 0x0BC  which of pB4, its pNext or its pPrev pB8 is (0..2)
+    f32  mC0[4][4];             // 0x0C0
+    f32  v100[4];               // 0x100
+    f32  v110[4];               // 0x110
+    f32  v120[4];               // 0x120
+    f32  v130[4];               // 0x130
+    f32  f140;                  // 0x140
+    f32  f144;                  // 0x144
+    f32  f148;                  // 0x148
+    f32  f14C;                  // 0x14C
+    u8   unk150[0x18C - 0x150];
+    u8   b18C;                  // 0x18C
+    u8   unk18D[3];
+    s32  n190;                  // 0x190  counts the golfers loaded
+    s32  n194;                  // 0x194  } the next golfer to show: a column and row of
+    s32  n198;                  // 0x198  } lbl_801899E0
+    f32  f19C;                  // 0x19C
+    f32  f1A0;                  // 0x1A0
+    u8   unk1A4[0x1B0 - 0x1A4];
+    u8   b1B0;                  // 0x1B0
+    u8   unk1B1[3];
+    s32  n1B4;                  // 0x1B4
+    s32  n1B8;                  // 0x1B8
+    s32  n1BC;                  // 0x1BC
+    s32  n1C0;                  // 0x1C0
+    s32  n1C4;                  // 0x1C4
+    u8   b1C8;                  // 0x1C8
+    u8   unk1C9[3];
+    f32  f1CC;                  // 0x1CC
+    s8   n1D0;                  // 0x1D0
+    u8   b1D1;                  // 0x1D1
+    u8   b1D2;                  // 0x1D2
+    u8   unk1D3;
+    s32  n1D4;                  // 0x1D4
+    s32  n1D8;                  // 0x1D8
+    u8   b1DC;                  // 0x1DC
+    u8   unk1DD[3];
 } CrAPState;
+LAYOUT_ASSERT(CrAPState, 0x1E0);
 
 extern CrAPState* lbl_80281EE0;
 
@@ -441,7 +513,7 @@ u8     fn_800C5FE4(View* pView, int nPlayer);
 void   fn_800C6010(View* pView, int nPlayer);
 void   fn_800C60E8(View* pView, int nPlayer);
 void   GolfCamera_CutToGolferDoneAnimatingCam(View* pView, int nPlayer);
-// Every caller passes a sixth argument (0) that the camera does not read.
+// Every caller passes a sixth argument (0 or 1) that the camera does not read.
 void   GolfCamera_SwitchCrAPCamera(View* pView, char* szName, int nShot, u8 bBlend, u8 bForce, int n6);
 u8     fn_800C6604(View* pView);
 void   fn_800C6618(View* pView, int nPlayer);

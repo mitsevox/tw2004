@@ -67,7 +67,6 @@ f32      fn_800C5A70(View* pView, f32* pCam, f32* pSub, int nPlayer);
 u8       fn_800C7450(void);
 void     CameraScript_LagAimMarker(int nPlayer, f32* pSub, f32* pCam, CamShot* pShot, int a, int b, f32 f1,
                                    f32 f2, f32 f3);
-void     fn_800130F8(int nPad, int n);                 // the pad's rumble (Swing.c's declaration)
 u8       fn_8012022C(void);                            // (sweep code) lbl_80281900's +0x370 is nonzero
 void     fn_8001966C(Character* pChar);                 // char.c
 void     fn_8007325C(u8* pAnim);                        // set bit 2 of the animation player's flags
@@ -2467,7 +2466,7 @@ void fn_800C39A8(View* pView, int nPlayer) {
 
 // Switch the CrAP camera to a named shot (with an 'f' in front for some models), else to shot
 // 0x2F/0x37/0x39/0x3B/0x3C by nShot; bBlend records the current camera and blends from it. The
-// callers pass a sixth argument, n6 (always 0), that is not read.
+// callers pass a sixth argument, n6 (0 or 1), that is not read.
 void GolfCamera_SwitchCrAPCamera(View* pView, char* szName, int nShot, u8 bBlend, u8 bForce, int n6) {
     f32* pCam;
     f32* pSub;

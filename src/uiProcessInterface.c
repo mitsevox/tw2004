@@ -5,6 +5,7 @@
 #include "golfer.h"
 #include "game/frontend.h"
 
+u8 lbl_80281F19;
 u8 lbl_80281F1B;
 
 void fn_800B1D3C(s32 nCmd, s32 a, s32 b);

@@ -134,7 +134,8 @@ typedef struct Clip {
     u8     unk90[0x10];
     char   name[0x30];          // 0xA0
     u8*    pD0;                 // 0xD0
-    u8     unkD4[8];
+    u8     unkD4[4];
+    u32    uD8;                 // 0xD8  nonzero: FEgolferanim.c turns the golfer round for it
     u32    uAram;               // 0xDC
     u8     unkE0[4];
     u8*    pE4;                 // 0xE4
@@ -205,8 +206,8 @@ typedef struct Character {
                                 //        characters fn_8001D324 finds by id
     u32   uId;                  // 0x008  the id of the 'SKLO' object it was built from (fn_8001D3EC);
                                 //        fn_8001D324 finds it by this
-    u8    unkC[0x10 - 0xC];
-    u32   u10;                  // 0x010  bit 0x40 tested by the game manager and the swing; bit 0x8000
+    s32   nC;                   // 0x00C  the golfer's id (FEgolferanim.c: 7 and 29 are special)
+    u32   u10;                 // 0x010  bit 0x40 tested by the game manager and the swing; bit 0x8000
                                 //        cleared by CharacterState_AddSKABlendData
     u8    unk14[0x1C - 0x14];
     s32   nAnim;                // 0x01C  the playing animation (6 backswing, 7 downswing)

@@ -165,7 +165,7 @@ double tan();
 f32 fn_80014280(f32 x0);
 extern u8 lbl_80281C98;
 void fn_800142A4(s8 v);
-s32 fn_800131C4(s32);
+void fn_800131C4(int nController);
 void fn_8001437C(void);
 
 void fn_8001425C(s32 v) {

@@ -15,7 +15,6 @@
 void fn_80075FB8(char* pPath, int (*pfnSkip)(void), int a, int b);
 void fn_80037FB4(u8 a, f32* pColor);    // a full-screen colour (GoPostFx.c)
 void fn_80010284(void);
-void fn_80013400(void);                 // read the controllers
 void fn_8008B704(void);
 void fn_8008B754(int a);
 void fn_8008B7D0(int a);
