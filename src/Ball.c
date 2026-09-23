@@ -96,6 +96,12 @@ extern s32 gClubStep[26];                        // 0x80181464  0 for the woods,
 extern f32 gChipLoft[26];                        // 0x801814CC  launch angle for a chip
 extern f32 gChipSpeed[26];                       // 0x80181534  launch speed for a chip
 extern f32 gClubSpin[26];                        // 0x8018159C  spin, per club
+extern f32 gTurfSpeedMul[5];                     // 0x80183488  by gTurfSpeed: 0.6 .. 1.4 (classes 2, 3, 4)
+extern f32 gGreenSpeedMul[3];                    // 0x8018349C  by options +0x18: 1.0 1.1 1.2 (class 3)
+extern f32 gFairwaySpeedMul[3];                  // 0x801834A8  by gFairwaySetting: 1.0 1.1 1.2 (class 2)
+extern f32 gRoughMul[3];                         // 0x801834B4  by options +0x1C: 1.3 1.0 0.7 (class 5)
+void   fn_800A3980(Ball* pBall, int nPlayer);    // rolling sound / effect
+void   Ball_CupPull(Ball* pBall, f32 fDt);
 void   fn_800BAF04(f32* pSrc, f32* pDst);        // normalise
 f32    fn_8000C5FC(f32* pA, f32* pB);            // dot product
 void   fn_8000C5D4(f32* pA, f32* pB, f32 f, f32* pOut);   // a + f x b
@@ -103,6 +109,7 @@ void   fn_8001EF78(f32* pA, f32* pB, f32* pOut); // cross product
 void   fn_80055E7C(f32* pA, f32* pB, f32* pOut);
 void   fn_80055EA0(f32* pA, f32* pB, f32* pOut);
 void   fn_80055EC4(f32* pA, f32* pB, f32* pOut);
+void   fn_80055EF8(f32* pA, f32* pOut);
 f32    fn_80051124(Ball* pBall, f32 fAim, f32* pNormal);
 f32    fn_800511F0(Ball* pBall, f32 fAim, f32* pNormal);
 int    Game_GetCourse(void);                     // 0x80008830
@@ -141,12 +148,12 @@ u8     fn_80054040(Ball* pBall, f32 fTicks);
 f32    Wind_Get(f32* pOut);
 
 extern u8  gSimulating;                          // 0x80281DD0  a rehearsal: no sounds or effects
-extern u8  lbl_80281DD1;
+extern u8  gSimFullCup;                          // a sim that still gets the cup pull and the near-cup gravity (state 15, look-ahead)
 extern u8  lbl_80281DD2;
-extern s32 lbl_80281DD4;                         // course setting (options +0x18), 0..2
-extern s32 lbl_80281DD8;                         // course setting, 0..2
-extern s32 lbl_80281130;                         // green speed, 0..4, default 2 (gPuttSpeedScale)
-extern s32 lbl_80281134;                         // course setting (options +0x1C), 0..2, default 1
+extern s32 gGreenSpeedSetting;                   // options +0x18 (GREEN SPEED?), 0..2: green friction x 1.0 / 0.9 / 0.8
+extern s32 gFairwaySetting;                      // 0..2: class-2 friction x 1.0 / 0.9 / 0.8
+extern s32 gTurfSpeed;                           // 0..4, default 2; rain sets 1 (light) or 0 (heavy): putt table and friction
+extern s32 gRoughSetting;                        // options +0x1C (ROUGH LENGTH?), 0..2: class-5 friction x 0.7 / 1.0 / 1.3
 extern u8  lbl_80281DE4;                          // the two ground heights below are current
 extern f32 lbl_80281DE0;                         // ground height under the ball
 extern f32 lbl_80281DDC;                         // the other ground height (fn_8004D9E0)
@@ -198,13 +205,13 @@ void Ball_SetSimulating(u8 bOn) {
 }
 
 void fn_80050D2C(u8 b) {
-    lbl_80281DD1 = b;
+    gSimFullCup = b;
 }
 
 // Putt power for a distance: the putt table (22 steps of 0.05 power, distance ~ 43.4 x power
 // squared on a medium green) scaled by the green-speed setting, interpolated; 1.1 beyond it.
 f32 fn_80050D34(f32 fDist) {
-    f32 fScale = gPuttSpeedScale[lbl_80281130];
+    f32 fScale = gPuttSpeedScale[gTurfSpeed];
     int i;
     for (i = 1; i < 23; i++) {
         f32 fHi = fScale * gPuttDist[i];
@@ -629,7 +636,7 @@ void fn_80051C84(Ball* pBall, f32 fX, f32 fY) {
 // ground: x (0.25 + 0.75 x height / 25 ft) below 25 ft. Air speed is the velocity less 0.19 x
 // the wind. Drag and lift are quadratic in air speed with coefficients that depend on speed and
 // spin; lift is along spin x air velocity. Gravity 0.10717 - and, for a real ball (or a sim
-// with lbl_80281DD1 set), three times that within 2.25 in of the top of the cup. Event 0x1C
+// with gSimFullCup set), three times that within 2.25 in of the top of the cup. Event 0x1C
 // at the top of the flight. Spin decays 0.3% a tick, faster flying into the wind.
 void Ball_FlightStep(Ball* pBall, f32 fTicks) {
     f32 vWind[4];
@@ -669,7 +676,7 @@ void Ball_FlightStep(Ball* pBall, f32 fTicks) {
     fn_8001EF34(vLift, fLen != 0.0f ? fLift / fLen : 0.0f, vAccel);
     fn_80055E7C(vDrag, vAccel, vAccel);
     vAccel[1] -= 0.107170001f;
-    if (!gSimulating || lbl_80281DD1) {
+    if (!gSimulating || gSimFullCup) {
         Vec_Copy(PIN(pBall), vPin);
         vPin[1] += BALL_RADIUS;
         if (Vec_Distance(vPin, pBall->vPos) < 0.0625f) {
@@ -740,6 +747,57 @@ check:
     *ppSurface = pSurface;
     Vec3Copy(vNormal, pNormal);
     return 1;
+}
+
+// State 3, skidding: a ball on the ground whose spin has not caught up with its speed. Gravity
+// along the ground plane (x (1 - surface +0x14) and the course settings) accelerates it; it is
+// kept on the plane at its speed; friction (1.5 x surface +0x18 x the normal force, same
+// settings) builds roll spin about dir x normal. Once 0.84 x the spin reaches the speed it
+// is rolling (state 4).
+void fn_80052268(Ball* pBall, f32 fTicks) {
+    f32          vNormal[4];
+    f32          vAccel[4];
+    f32          vTmp[4];
+    f32          vDir[4];
+    f32          vSpinAdd[4];
+    SurfaceType* pSurface;
+    f32          fPull, fDot, fFric;
+    if (!fn_80052088(pBall, &pSurface, vNormal)) return;
+    pBall->nSurface = fn_80050BEC(pSurface);
+    fn_800BAF04(vNormal, vNormal);
+    fPull = 1.0f - pSurface->f14;
+    if (pSurface->nClass == 3) fPull *= 2.0f - gGreenSpeedMul[gGreenSpeedSetting];
+    if (pSurface->nClass == 2) fPull *= 2.0f - gFairwaySpeedMul[gFairwaySetting];
+    if (pSurface->nClass == 5) fPull *= 2.0f - gRoughMul[gRoughSetting];
+    if (pSurface->nClass == 3 || pSurface->nClass == 4 || pSurface->nClass == 2) {
+        fPull *= 2.0f - gTurfSpeedMul[gTurfSpeed];
+    }
+    fDot = -0.107170001f * vNormal[1];
+    vAccel[0] = -(fPull * (vNormal[0] * fDot));
+    vAccel[1] = fPull * (-0.107170001f - vNormal[1] * fDot);
+    vAccel[2] = -(fPull * (vNormal[2] * fDot));
+    fn_8000C5D4(pBall->vVel, vNormal, -fn_8000C5FC(pBall->vVel, vNormal), vTmp);
+    fn_800BAF04(vTmp, vDir);
+    fn_8001EF34(vDir, fn_80009680(fn_80009744(pBall->vVel)), pBall->vVel);
+    fFric = 1.5f * (pSurface->f18 * (-0.107170001f * vNormal[1]));
+    if (pSurface->nClass == 3) fFric *= 2.0f - gGreenSpeedMul[gGreenSpeedSetting];
+    if (pSurface->nClass == 2) fFric *= 2.0f - gFairwaySpeedMul[gFairwaySetting];
+    if (pSurface->nClass == 5) fFric *= 2.0f - gRoughMul[gRoughSetting];
+    if (pSurface->nClass == 3 || pSurface->nClass == 4 || pSurface->nClass == 2) {
+        fFric *= 2.0f - gTurfSpeedMul[gTurfSpeed];
+    }
+    fFric = 2.97619057f * fFric;
+    fn_8001EF78(vDir, vNormal, vSpinAdd);
+    fn_8001EF34(vSpinAdd, fFric, vSpinAdd);
+    fn_8000C5D4(pBall->vVel, vAccel, fTicks, pBall->vVel);
+    fn_8000C5D4(pBall->vSpin, vSpinAdd, fTicks, pBall->vSpin);
+    fTicks = fn_80009680(fn_80009744(pBall->vVel));
+    if (0.84f * (f32)fn_80009680(fn_80009744(pBall->vSpin)) >= fTicks) {
+        pBall->nState = 4;
+    }
+    if (pBall->nPlayer >= 0) {
+        fn_800A3980(pBall, pBall->nPlayer);
+    }
 }
 
 // Did the ball hit something (a tree, an object) between last tick and this one? fn_800B1B18
@@ -902,6 +960,137 @@ void Ball_CupPull(Ball* pBall, f32 fDt) {
             if (fn_8000AD9C(fAngle) > 0.293333f) fPull = 0.0f;
         }
         pBall->vVel[2] += fPull;
+    }
+}
+
+// State 4, rolling. Holed when on a cup surface (class 12 or 18, or surface 90 within 2 yd of
+// the pin) more than 2 in below the pin. Otherwise the velocity is laid onto the ground plane
+// at its speed, then:
+// - break: the slope's sideways part (surface +0x1C, x 0.6 on a green) turns the velocity by
+//   slope / (0.457 x spin) a tick about an axis built from the spin and the slope - so a slow
+//   ball breaks more;
+// - gravity along the direction of travel, x 5/7 (a rolling sphere);
+// - the cup pull (real ball; sims only with gSimFullCup);
+// - rolling friction: normal x 0.0766 x surface +0x20 (capped on slopes over 30 degrees),
+//   x 0.575 on a green, x the course settings, x the tick; when the speed is below it the ball
+//   stops;
+// - spin set to pure roll.
+void Ball_GroundContact(Ball* pBall, f32 fTicks) {
+    f32          vNormal[4];
+    f32          vAccel[4];
+    f32          vTmp[4];
+    f32          vDown[4];
+    f32          vDir[4];
+    f32          vAxis[4];
+    SurfaceType* pSurface;
+    f32          fSin, fCos;
+    f32          fA, fB;
+    f32          fTurn, fZ, fX, fLen, fAngle, fK, fV, fRough;
+    u8           bFlip;
+    if (!fn_80052088(pBall, &pSurface, vNormal)) return;
+    pBall->nSurface = fn_80050BEC(pSurface);
+    if (pSurface->nClass == 12 || pSurface->nClass == 18 ||
+        (pBall->nSurface == 90 && Vec_Distance(pBall->vPos, PIN(pBall)) < 2.0f)) {
+        if (pBall->pCourse->pin[Game_CurrentHole()].y - pBall->vPos[1] > 0.055555556f) {
+            Ball_Holed(pBall);
+            return;
+        }
+    }
+    fn_800BAF04(vNormal, vNormal);
+    fn_8000C5D4(pBall->vVel, vNormal, -fn_8000C5FC(pBall->vVel, vNormal), vTmp);
+    fn_800BAF04(vTmp, vDir);
+    fn_8001EF34(vDir, fn_80009680(fn_80009744(pBall->vVel)), pBall->vVel);
+    fn_8001EF34(vNormal, -0.839999974f, vDown);
+    fZ   = -0.173615396f * vDown[2];
+    fX   = 0.173615396f * vDown[0];
+    fLen = fn_80009680(fZ * fZ + fX * fX);
+    if (fLen != 0.0f) {
+        fK = fn_8000AD9C(fZ * vDir[0] + fX * vDir[2]) / fLen;
+        fX *= fK;
+        fZ *= fK;
+        fLen = pSurface->f1C * (f32)fn_80009680(fZ * fZ + fX * fX);
+        if (pSurface->nClass == 3) {
+            fLen *= 0.6f;
+        }
+        fn_8001EF78(pBall->vVel, vDown, pBall->vSpin);
+        fn_8001EF34(pBall->vSpin, 1.41723347f, pBall->vSpin);
+        fAngle = 0.45722881f * (f32)fn_80009680(fn_80009744(pBall->vSpin));
+        fTurn = 0.0f;
+        if (fTurn != fAngle) {
+            fTurn = fLen / fAngle;
+        }
+        vAxis[0] = pBall->vSpin[1] * fX;
+        vAxis[1] = pBall->vSpin[2] * fZ - pBall->vSpin[0] * fX;
+        vAxis[2] = -(pBall->vSpin[1] * fZ);
+        vAxis[3] = 1.0f;
+        if (vAxis[1] < 0.0f) {
+            fn_80055EF8(vAxis, vAxis);
+            bFlip = 1;
+        } else {
+            bFlip = 0;
+        }
+        fX = fn_8000AD78(vAxis[0], vAxis[1]);
+        fn_80055E28(fX, &fSin, &fCos);
+        fA   = vAxis[0];
+        fAngle = vAxis[2];
+        fB   = vAxis[1];
+        fn_80055D70(&fA, &fB, fSin, fCos);
+        fn_80055D70(&pBall->vVel[0], &pBall->vVel[1], fSin, fCos);
+        fAngle = -fn_8000AD78(fAngle, fB);
+        fn_80055E28(fAngle, &fSin, &fCos);
+        fn_80055D70(&pBall->vVel[1], &pBall->vVel[2], fSin, fCos);
+        if (!bFlip) {
+            fTurn = -fTurn;
+        }
+        fn_80055E28(fTurn, &fSin, &fCos);
+        fn_80055D70(&pBall->vVel[0], &pBall->vVel[2], fSin, fCos);
+        fn_80055E28(-fAngle, &fSin, &fCos);
+        fn_80055D70(&pBall->vVel[1], &pBall->vVel[2], fSin, fCos);
+        fn_80055E28(-fX, &fSin, &fCos);
+        fn_80055D70(&pBall->vVel[0], &pBall->vVel[1], fSin, fCos);
+    }
+    fn_8001EF34(vDir, -(0.714285731f * (0.107170001f * vDir[1])), vAccel);
+    fn_8000C5D4(pBall->vVel, vAccel, fTicks, pBall->vVel);
+    if (!gSimulating || gSimFullCup) {
+        Ball_CupPull(pBall, fTicks);
+    }
+    fRough = pSurface->f20;
+    if (vNormal[1] < 0.866f) {
+        fRough *= 0.5f * vNormal[1];
+        if (fRough > 0.14f) fRough = 0.14f;
+    }
+    fTurn = vNormal[1] * (0.0765499994f * fRough);
+    if (pSurface->nClass == 3) {
+        fTurn *= 0.575f;
+    }
+    if (pSurface->nClass == 3 || pSurface->nClass == 4 || pSurface->nClass == 2) {
+        fV = gTurfSpeedMul[gTurfSpeed];
+        if (fV > 1.0f) {
+            fTurn *= 2.0f - (1.16f * (fV - 1.0f) + 1.0f);
+        } else if (fV < 1.0f) {
+            fTurn *= 0.55f * -fV + 2.0f;
+        } else {
+            fTurn *= 2.0f - fV;
+        }
+    }
+    if (pSurface->nClass == 3) fTurn *= 2.0f - gGreenSpeedMul[gGreenSpeedSetting];
+    if (pSurface->nClass == 2) fTurn *= 2.0f - gFairwaySpeedMul[gFairwaySetting];
+    if (pSurface->nClass == 5) fTurn *= 2.0f - gRoughMul[gRoughSetting];
+    fTurn *= fTicks;
+    if ((f32)fn_80009680(fn_80009744(pBall->vVel)) < fTurn) {
+        Ball_Stop(pBall);
+        return;
+    }
+    fB = pBall->vVel[1];
+    fn_8000C5D4(pBall->vVel, vDir, -fTurn, pBall->vVel);
+    if (pBall->nSurface == 98) {
+        pBall->vVel[1] = 0.9f * fB;
+    }
+    pBall->vSpin[0] = -1.41723347f * (pBall->vVel[2] * vDown[1]);
+    pBall->vSpin[1] = 0.0f;
+    pBall->vSpin[2] = 1.41723347f * (pBall->vVel[0] * vDown[1]);
+    if (pBall->nPlayer >= 0) {
+        fn_800A3980(pBall, pBall->nPlayer);
     }
 }
 
@@ -1152,7 +1341,7 @@ void fn_80055C1C(u8 b) {
 // Course setting (0..4, else 2).
 void fn_80055C24(int n) {
     if (n < 0 || n >= 5) n = 2;
-    lbl_80281130 = n;
+    gTurfSpeed = n;
 }
 
 // Course setting from options +0x18 (0..2, else 0); courses 6 and 15 take it one lower, not
@@ -1165,21 +1354,21 @@ void fn_80055C40(int n) {
         if (n > 1) n--;
         break;
     }
-    lbl_80281DD4 = n;
+    gGreenSpeedSetting = n;
 }
 
 int fn_80055CA4(void) {
-    return lbl_80281DD4;
+    return gGreenSpeedSetting;
 }
 
 // Course setting (0..2, else 0).
 void fn_80055CAC(int n) {
     if (n < 0 || n >= 3) n = 0;
-    lbl_80281DD8 = n;
+    gFairwaySetting = n;
 }
 
 int fn_80055CC8(void) {
-    return lbl_80281DD8;
+    return gFairwaySetting;
 }
 
 // Course setting from options +0x1C (0..2, else 1); courses 6 and 15 take it one higher, not
@@ -1192,21 +1381,21 @@ void fn_80055CD0(int n) {
         if (n < 2) n++;
         break;
     }
-    lbl_80281134 = n;
+    gRoughSetting = n;
 }
 
 int fn_80055D34(void) {
-    return lbl_80281134;
+    return gRoughSetting;
 }
 
 void fn_80055D3C(void) {
-    lbl_80281DD4 = 0;
-    lbl_80281DD8 = 0;
-    lbl_80281134 = 1;
+    gGreenSpeedSetting = 0;
+    gFairwaySetting = 0;
+    gRoughSetting = 1;
 }
 
 void fn_80055D54(void) {
-    lbl_80281130 = 2;
+    gTurfSpeed = 2;
     lbl_80281DE4 = 0;
     lbl_80281DD2 = 0;
 }

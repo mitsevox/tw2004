@@ -229,10 +229,13 @@ typedef struct SurfaceType {
     f32  f00;                   // 0x00  launch: share of the speed kept; + the ball's f70 (fn_800510EC)
     u8   unk4[4];
     f32  f08;                   // 0x08  launch: spin factor
-    u8   unkC[0x1C - 0xC];
-    f32  f1C;                   // 0x1C  0.375 on surfaces a ball may stop on (Ball_Stop)
-    u8   unk20[0x2C - 0x20];
-    u32  nClass;                // 0x2C  3 = green
+    u8   unkC[0x14 - 0xC];
+    f32  f14;                   // 0x14  skid: 1 - this scales the slope pull
+    f32  f18;                   // 0x18  skid: friction building roll spin
+    f32  f1C;                   // 0x1C  0.375 on surfaces a ball may stop on; roll: break strength
+    f32  f20;                   // 0x20  roll: rolling friction
+    u8   unk24[0x2C - 0x24];
+    u32  nClass;                // 0x2C  2, 3 = green, 4, 5 = rough (course settings); 12 and 18 = the cup
     u8   unk30[0x44 - 0x30];
 } SurfaceType;
 

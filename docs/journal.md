@@ -157,9 +157,15 @@ Dated log of what was done and decided, newest last. Facts and lessons belong in
   wind scaled down near the ground, quadratic drag/lift with spin terms, gravity x3 within
   2.25 in above the cup for the real ball but not the CPU rehearsal, 4-second stall check, a
   probable `n < 156` typo in the coasting surface.
-- **Next:** `Ball.c` checkpoint 5 = rolling and ground contact (`fn_80052268`,
-  `Ball_GroundContact`, `fn_80053240`, `Ball_Collide`, `Ball_SetLie`, the tree hit
-  `fn_800539F8` / `fn_80053E98`); then `fn_80052598` (bounce); optional register polish in `skalib.c`
+- **`Ball.c` checkpoint 5a: skid and roll (56 of 68 exact).** `fn_80052268` (skid) exact,
+  `Ball_GroundContact` (roll) 99%. Break = slope / spin per tick (slow balls break more), 5/7 g
+  along the line, rolling friction x 0.575 on greens. **The cup pull is skipped in sims** unless
+  `gSimFullCup` (was `lbl_80281DD1`): the CPU rehearsal and the caddie run without it
+  (`gameplay.md` "The cup" corrected, hypotheses 6 and 9 updated). Course settings identified:
+  `gTurfSpeed` (was `lbl_80281130`) is the weather - rain sets 1/0, slower turf and a shorter
+  putt table; options +0x18 / +0x1C are green friction / rough friction.
+- **Next:** `Ball.c` checkpoint 5b = `Ball_Collide`, `fn_80053240`, `Ball_SetLie`, the tree hit
+  (`fn_800539F8`, `fn_80053E98`); then `fn_80052598` (bounce); optional register polish in `skalib.c`
   (`AnimLib_MergeOverlay`, `AnimLib_PlanBank`, `AnimLib_WalkPair`). Scratch tools in `C:\dev\scratch\tw\`:
   `sbs2.py` (normalised diff), `fnsrc.py`, `regress.py` (who lost 100%), `insert_fns.py` (add
   functions at address positions), `unwritten.py`, `find_fn.py` (search asm by regexes),

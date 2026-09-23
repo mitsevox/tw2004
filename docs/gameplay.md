@@ -360,8 +360,11 @@ height. No speed test, no capture radius: the ball has to physically fall in. `B
 parks it 3 in down in the cup.
 
 **There is a pull, though.** `Ball_CupPull` (`0x80054AB0`, in C at the original instruction
-count) runs from the ground-contact step every frame the ball is on the ground, for every
-ball, human or CPU, gated only by a debug flag pair:
+count) runs from the rolling step (`Ball_GroundContact`, state 4) every tick, for every *real*
+ball, human or CPU. **It is skipped in simulations** (`gSimulating`) unless `gSimFullCup` is set -
+so the CPU's shot rehearsal and the caddie's putt read run *without* it, while the state-15
+rehearsal (your suggested shot, the gimme) and the look-ahead ball get it (corrected
+2026-09-23; this used to say "gated only by a debug flag pair"):
 
 - inside **5.5 inches** of the pin (under three cup radii), on a putt that started at least 6 in
   away, and only while the ball is still short of the hole along its path from where it started;
@@ -651,6 +654,58 @@ own surface index is below 156 - i.e. always; the test reads `n < 0 || n < 156`,
 a typo for `n >= 156`. A ball in the air with no ground under it within 8 ft of the pin is set
 down on the other ground height (`fn_80055324`); elsewhere it stays in play while above the
 course floor (`CourseInfo +0x6C`) and is a hazard below it.
+
+Skidding and rolling: how a putt breaks (`fn_80052268`, `Ball_GroundContact`)
+----------------------------------------------------------------------------
+
+A ball on the ground is **skidding** (state 3) until its spin catches up with its speed, then
+**rolling** (state 4). Putts start in state 3.
+
+**Skid** (`fn_80052268`, exact): gravity along the ground plane, x (1 - surface `+0x14`) and
+the course settings below, accelerates the ball; the velocity is kept on the plane at its
+speed; friction (1.5 x surface `+0x18` x the normal force, same settings) builds roll spin.
+When 0.84 x the spin reaches the speed, it is rolling.
+
+**Roll** (`Ball_GroundContact`, 99%), every tick:
+
+1. **Holed** if it is on a cup surface (class 12 or 18, or surface 90 within 2 yd of the pin)
+   and more than 2 in below the pin. That is the only "in" test.
+2. The velocity is laid onto the ground plane at its speed.
+3. **Break.** The sideways part of the slope (the ground normal's horizontal part, x surface
+   `+0x1C`, **x 0.6 on a green**) turns the velocity by `slope / (0.457 x spin)` radians a tick.
+   A rolling ball's spin is proportional to its speed, so **the turn per tick is inversely
+   proportional to speed: a slow ball breaks much more**, which is why a putt breaks most as it
+   dies at the hole, and why hitting a breaking putt firmer takes break out of it.
+4. **Slope along the line**: gravity along the direction of travel x 5/7 - the textbook factor
+   for a rolling solid ball. Uphill slows, downhill speeds up.
+5. **The cup pull** (real ball only, see "The cup").
+6. **Rolling friction**: normal force x 0.0766 x surface `+0x20` (on slopes over 30 degrees,
+   x half the normal and capped at 0.14), **x 0.575 on a green**, x the course settings, x the
+   tick. When the speed is less than that, the ball stops (`Ball_Stop`).
+7. Spin is set to pure roll.
+
+**Course conditions** (the four settings from checkpoint 1, now identified by what they touch;
+surface classes: 3 = green, 2 and 4 = other short grass, 5 = rough):
+
+    setting                  values          what it multiplies
+    options +0x18            0 / 1 / 2       green (class 3) friction x 1.0 / 0.9 / 0.8,
+      (likely GREEN SPEED)                   and the skid's slope pull the same;
+                                             courses 6 and 15 cap it at 1
+    gFairwaySetting          0 / 1 / 2       class 2 friction x 1.0 / 0.9 / 0.8
+    options +0x1C            0 / 1 / 2       rough (class 5) friction x 0.7 / 1.0 / 1.3;
+      (likely ROUGH LENGTH)                  courses 6 and 15 add 1 (longer rough)
+    gTurfSpeed (weather)     0 1 2 3 4       classes 2-4 friction x 1.67 1.56 1.0 0.77 0.54,
+                                             and the putt table x 0.606 0.65 1.0 1.3 1.82
+
+**Rain slows the greens.** `gTurfSpeed` is 2 in dry weather; when it rains (`fn_8006FB10`) it is
+set to 1 for light rain (intensity under 0.5) and 0 for heavy rain - greens, fringes and
+fairways about 1.6x as sticky, and the putt table shortened to match, so your putt meter and the
+CPU both know. Settings 3 and 4 (faster) are never set by anything we have found.
+
+**The menu green speed is not in the putt table.** Options `+0x18` makes greens up to 20% less
+sticky, but `fn_80050D34` (putt power for a distance) ignores it. That does not break the aim
+marker - the caddie and the CPU rehearse on the real physics - but a putt struck at the power the
+table gives for a distance rolls further on faster menu greens than the table says.
 
 CPU putts are hit 5% firm (`Swing_ComputePower`)
 -----------------------------------------------

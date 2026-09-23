@@ -274,6 +274,12 @@ harness (not built yet).
 **Status:** answered - partly confirmed (break misses: yes, by a hidden +5% pace; distance: also
 counts).
 
+**Update (2026-09-23, rolling code in C):** two more things push the same way. (1) The break per
+tick is `slope / spin`, and spin is proportional to speed, so a firmer ball really does take
+less break - the +5% pace is a line error on every breaking putt. (2) The CPU's rehearsal runs
+**without the cup pull** (`Ball_CupPull` is skipped when simulating), so the real putt has help
+at the hole that the rehearsal never counted; that only rescues putts that arrive close.
+
 7. Power boost's full meter needs a non-linear number of Z presses
 -------------------------------------------------------------------
 
@@ -408,6 +414,12 @@ check in the ball code.
 
 **Status:** answered - gimme half confirmed; caddie half refuted (the read is real physics, the
 misses come from a random wobble on your stroke).
+
+**Update (2026-09-23):** one refinement to "the read is real physics": it is the real physics
+**minus the cup pull and the near-cup gravity**, which the caddie's simulation skips. The real
+ball has both. Near the hole a real putt is pulled toward the cup (and slowed if it crosses the
+lip fast and off line), so the ball you hit and the ball the caddie simulated can part ways in
+the last few inches - mostly in your favour, but not always.
 
 Facts already established that bear on these
 ---------------------------------------------
