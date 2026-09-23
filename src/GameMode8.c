@@ -883,7 +883,7 @@ void fn_800FBB30(Player* p) {
     while (fAngle > PI) {
         fAngle -= TWOPI;
     }
-    fOff = fn_8000AD9C(fAngle);
+    fOff = fabsf(fAngle);
     if (fOff > DEG(1.0f) && fOff < DEG(15.0f)) {
         fOff *= 3.0f;
         fAngle *= 3.0f;

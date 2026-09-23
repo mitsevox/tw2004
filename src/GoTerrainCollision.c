@@ -8,12 +8,13 @@
 #include "golfer.h"
 #include "game.h"
 #include "engine.h"
+#include "endian.h"
 
 #define AXIS3(n) ((n) == 0 ? 0 : 2)    // grid axis 0 (x) or 1 (z) as an index into a 3D vector
 #define PIN_RADIUS_SQ 0.00077160494f   // the flagstick's radius squared: (1 inch)^2 in square yards
 // port: the course file keeps each list's offset from its start in the pointer field itself, and
 // loading turns it into the pointer in place; with 64-bit pointers the file needs its own layout.
-#define TER_RELOCATE(pCourse, field) ((pCourse)->field = (void*)((u8*)(pCourse) + (uptr)(pCourse)->field))
+#define TER_RELOCATE(pCourse, field) ((pCourse)->field = (void*)((u8*)(pCourse) + BE32(&(pCourse)->field)))
 
 u8    Course_RegisterLoader(int nChunk, void (*pfn)(u8*));   // 0x8000C0B4
 s32   fn_8000C140(f32* pPos, TNetwork* pNet, s32 nNodes);   // point in outline. TW06: wn_PnPoly
@@ -125,6 +126,9 @@ void fn_8004B1EC(CourseInfo* pCourse) {
     int nPinSet;
     f32 (*pVert)[3];
 
+    // port: the course data is big-endian and read in place through CourseInfo, TerCell, TerPolyRef,
+    // TerObject and the vertex list: a little-endian port converts it here, before the offsets
+    // are turned into pointers (docs/format-byteorder.md)
     TER_RELOCATE(pCourse, pVerts);
     TER_RELOCATE(pCourse, pTriFlags);
     TER_RELOCATE(pCourse, pLight);
@@ -403,7 +407,7 @@ f32 Ter_CheckForDropLocation(CourseInfo* pCourse, f32* pPos, u8 bOnDropSurface, 
             *ppSurface = pSurface;
         }
         bOk = fHeight != TER_NO_GROUND && pSurface != NULL && (pSurface->u34 & 1)
-              && pSurface->nClass != 10 && fn_8000AD9C(vNormal[1]) > 0.86603f
+              && pSurface->nClass != 10 && fabsf(vNormal[1]) > 0.86603f
               && Ter_PointInOOBNetwork(vPos) && !Ter_PointInFreeDropNetwork(vPos)
               // fake match: bOnDropSurface is always 0 here, but the original tests it again
               && (bOnDropSurface || !Ter_CheckObjectAndHazardObstruction(vPos, 1.5f, 0, 1, 2.0f, 1, 0.577f));
@@ -1226,7 +1230,7 @@ u8 fn_8004E558(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit
     vDelta[1] = pTo[2] - pFrom[2];
     vStart[0] = pFrom[0];
     vStart[1] = pFrom[2];
-    if (fn_8000AD9C(vDelta[0]) > fn_8000AD9C(vDelta[1])) {
+    if (fabsf(vDelta[0]) > fabsf(vDelta[1])) {
         nMajor = 0;
         nMinor = 1;
         fSlope = vDelta[1] / vDelta[0];
@@ -1271,7 +1275,7 @@ u8 fn_8004E558(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit
             } else {
                 fRatio = 1000000.0f;
             }
-            if (fn_8000AD9C(fSlope) < fn_8000AD9C(fRatio)) {
+            if (fabsf(fSlope) < fabsf(fRatio)) {
                 fRun = vEdge[nMajor] - vStart[nMajor];
                 vPos[AXIS3(nMajor)] = vEdge[nMajor];
                 nLast = nMajor;
@@ -1423,7 +1427,7 @@ u8 fn_8004EE20(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit
     vDelta[1] = pTo[2] - pFrom[2];
     vStart[0] = pFrom[0];
     vStart[1] = pFrom[2];
-    if (fn_8000AD9C(vDelta[0]) > fn_8000AD9C(vDelta[1])) {
+    if (fabsf(vDelta[0]) > fabsf(vDelta[1])) {
         nMajor = 0;
         nMinor = 1;
         fSlope = vDelta[1] / vDelta[0];
@@ -1468,7 +1472,7 @@ u8 fn_8004EE20(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit
             } else {
                 fRatio = 1000000.0f;
             }
-            if (fn_8000AD9C(fSlope) < fn_8000AD9C(fRatio)) {
+            if (fabsf(fSlope) < fabsf(fRatio)) {
                 fRun = vEdge[nMajor] - vStart[nMajor];
                 vPos[AXIS3(nMajor)] = vEdge[nMajor];
                 nLast = nMajor;
@@ -1613,7 +1617,7 @@ u8 Ter_CheckForGroundCollision(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* p
     vDelta[1] = pTo[2] - pFrom[2];
     vStart[0] = pFrom[0];
     vStart[1] = pFrom[2];
-    if (fn_8000AD9C(vDelta[0]) > fn_8000AD9C(vDelta[1])) {
+    if (fabsf(vDelta[0]) > fabsf(vDelta[1])) {
         nMajor = 0;
         nMinor = 1;
         fSlope = vDelta[1] / vDelta[0];
@@ -1658,7 +1662,7 @@ u8 Ter_CheckForGroundCollision(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* p
             } else {
                 fRatio = 1000000.0f;
             }
-            if (fn_8000AD9C(fSlope) < fn_8000AD9C(fRatio)) {
+            if (fabsf(fSlope) < fabsf(fRatio)) {
                 fRun = vEdge[nMajor] - vStart[nMajor];
                 vPos[AXIS3(nMajor)] = vEdge[nMajor];
                 nLast = nMajor;
@@ -1798,7 +1802,7 @@ u8 fn_8004FF34(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNorma
     vDelta[1] = pTo[2] - pFrom[2];
     vStart[0] = pFrom[0];
     vStart[1] = pFrom[2];
-    if (fn_8000AD9C(vDelta[0]) > fn_8000AD9C(vDelta[1])) {
+    if (fabsf(vDelta[0]) > fabsf(vDelta[1])) {
         nMajor = 0;
         nMinor = 1;
         fSlope = vDelta[1] / vDelta[0];
@@ -1843,7 +1847,7 @@ u8 fn_8004FF34(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNorma
             } else {
                 fRatio = 1000000.0f;
             }
-            if (fn_8000AD9C(fSlope) < fn_8000AD9C(fRatio)) {
+            if (fabsf(fSlope) < fabsf(fRatio)) {
                 fRun = vEdge[nMajor] - vStart[nMajor];
                 vPos[AXIS3(nMajor)] = vEdge[nMajor];
                 nLast = nMajor;

@@ -1961,7 +1961,7 @@ void fn_8005AD20(Character* pObj, SwingData* pSw, int nStickX) {
     }
     pSw->f14 = (f32)nStickX / 255.0f - 0.5f;
     fDelta = pSw->f14 - pSw->f10;
-    fRate = fn_8000AD9C(fDelta);
+    fRate = fabsf(fDelta);
     fRate = (fRate < 0.5f) ? 0.5f : ((fRate > 1.0f) ? 1.0f : fRate);
     pSw->f10 = 0.33333334f * (fDelta * fRate) + pSw->f10;
     fAmount = 0.75f * fAmount * pSw->f10;
