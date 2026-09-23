@@ -97,6 +97,9 @@ void fn_800D3424(void) {
 }
 
 void fn_800D344C(UStreamObject* pObject) {
+    // port: the 'ERN ' object is copied straight into the prize table (EarningsTable); it is
+    // big-endian on disc, so a little-endian port converts it field by field here
+    // (docs/format-byteorder.md)
     fn_8000E790(pObject, sizeof(lbl_80200538), &lbl_80200538);
 }
 

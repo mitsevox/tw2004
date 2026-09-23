@@ -171,6 +171,9 @@ void fn_80102354(void) {
 }
 
 void fn_8010237C(UStreamObject* pObject) {
+    // port: the 'TCM ' object is copied straight into the ladder events (LadderEvent[25]); it is
+    // big-endian on disc, so a little-endian port converts it field by field here
+    // (docs/format-byteorder.md)
     fn_8000E790(pObject, sizeof(lbl_802124B8), lbl_802124B8);
 }
 
