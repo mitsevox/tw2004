@@ -886,9 +886,10 @@ void GameModeDriverPGATour_GetCurrentEventLeader(char* pDst) {
     }
 }
 
-void fn_800F009C(void) {
+// The leader's score in the current tournament.
+int fn_800F009C(void) {
     s32 nLeader = fn_801197CC(0, 0);
-    fn_8011937C(0, nLeader, fn_8011908C(0, nLeader) == 0);
+    return fn_8011937C(0, nLeader, fn_8011908C(0, nLeader) == 0);
 }
 
 // The same for the purse.
@@ -904,8 +905,9 @@ void GameModeDriverPGATour_GetPurseString(s32 i, char* pDst) {
     fn_800907AC(GameModeDriverPGATour_ComputePurseForBracket(i, nBracket), pDst);
 }
 
-void fn_800F018C(void) {
-    fn_8011937C(0, 0, fn_8011908C(0, 0) == 0);
+// The player's own score in the current tournament.
+int fn_800F018C(void) {
+    return fn_8011937C(0, 0, fn_8011908C(0, 0) == 0);
 }
 
 // A tournament's result for the season screen:
