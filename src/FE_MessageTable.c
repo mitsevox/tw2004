@@ -2722,6 +2722,28 @@ void fn_8007EE80(MsgArg* pArgs, MsgArg* pResult) {
     lbl_80281ED4->profile.createdGolfer.nModelID = pArgs[1].i;
 }
 
+// Save the profile being worked on into slot pArgs[0] and mark the slot loaded (with session flag
+// 0x4000, only into a slot that has none). A profile without a TOUR card level gets level 1.
+void fn_8007EE90(MsgArg* pArgs, MsgArg* pResult) {
+    s32 nSlot = pArgs[0].i;
+
+    if (!(gSession.uFlags & 0x4000) || lbl_801D7148.aLoaded[nSlot] == 0) {
+        Mem_cpy(&gpSaveData[nSlot], &lbl_80281ED4->profile, sizeof(SaveProfile));
+        gpSaveData[nSlot].bActive = 1;
+        if (gpSaveData[nSlot].nTourCardLevel == 0 && lbl_801D7148.b18 == 0) {
+            gpSaveData[nSlot].nTourCardLevel = 1;
+        }
+        lbl_801D7148.aLoaded[nSlot] = 1;
+        fn_80077808(nSlot);
+    }
+}
+
+// Slot pArgs[0]'s money, and its golfer's TOUR career winnings.
+void fn_8007EF54(MsgArg* pArgs, MsgArg* pResult) {
+    *(s32*)pArgs[1].p = gpSaveData[pArgs[0].i].n64;
+    *(u32*)pArgs[2].p = gpSaveData[pArgs[0].i].tour.aStats[PGA_USER_GOLFER].nCareerWinnings;
+}
+
 void fn_8007EF9C(MsgArg* pArgs, MsgArg* pResult) {
 }
 
@@ -2739,8 +2761,52 @@ void fn_8007EFA0(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = n;
 }
 
+// How many of the awards after the first 23 the slot's profile has won.
+void fn_8007EFEC(MsgArg* pArgs, MsgArg* pResult) {
+    int n;
+    int i;
+
+    n = 0;
+    // EA bug: counts 39 awards from award 23, so aAward[39..61] read the first saved replay's
+    // bytes (aReplay[0]); the 16 real ones end at aAward[38].
+    for (i = 23; i < 62; i++) {
+        if (gpSaveData[pArgs[0].i].aAward[i].bWon == 1) {
+            n++;
+        }
+    }
+    pResult->i = n;
+}
+
 void fn_8007F088(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = GM_vGetAllTimeRecordsHeld(&gpSaveData[pArgs[0].i]);
+}
+
+// How many of the 71 marked holes the slot's profile has (fn_800588F4's kind 0).
+void fn_8007F5CC(MsgArg* pArgs, MsgArg* pResult) {
+    int n;
+    int i;
+
+    n = 0;
+    for (i = 0; i < 71; i++) {
+        if (fn_800588F4(&gpSaveData[pArgs[0].i], 0, i) == 1) {
+            n++;
+        }
+    }
+    pResult->i = n;
+}
+
+// How many ladder events the slot's profile has won.
+void fn_8007F640(MsgArg* pArgs, MsgArg* pResult) {
+    int n;
+    int i;
+
+    n = 0;
+    for (i = 0; i < 25; i++) {
+        if (gpSaveData[pArgs[0].i].aLadderAward[i].bWon != 0) {
+            n++;
+        }
+    }
+    pResult->i = n;
 }
 
 // One for a TOUR card, plus one per challenge group with a medal.
