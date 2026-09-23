@@ -11,8 +11,16 @@
 #include "game/modes/pgatoursim.h"
 
 PgaEntrantMC* GetEntrantMCPtr(int nPlayer, int nEntrant);
+void fn_80117BF4(int nPlayer, int nEntrant);
+s32  fn_80119A50(int nPlayer);
+void fn_801187F0(PgaEntrantMC* aEntrant, s16* pnEntrants, u8 bUser);
+void fn_80118B0C(int nPlayer, int n);
+void fn_80119B54(int nPlayer, int nRound, int nEntrant, int nHole);
+void fn_80119E28(int nPlayer, int nEntrant, int nRound);
+s32  fn_80119AE0(int nPlayer);
+s32  fn_8011BDF8(const void* pA, const void* pB);
+s32  fn_8011BF74(const void* pA, const void* pB);
 s32  fn_80118664(int nPlayer);
-s32  fn_801191D0(int nPlayer, int nEntrant, u8 b);
 s32  TotalEntrantHoleScores(int nEntrant);
 void fn_8011A074(int nPlayer, int nRound, int nEntrant, int nHole);
 void fn_8011A890(int nPlayer);
@@ -26,8 +34,15 @@ void CalcScoreRankingsIfDirty(int nPlayer);
 void CalcAllStats(int nPlayer);
 void fn_80117694(UStreamObject* pObject);
 
-f32  fn_8000B318(int nStream);          // a normally distributed random number (mean 0, deviation 1)
 int  fn_800D31A4(int nPar);             // the number of the 18 holes with that par
+char* fn_800EFE60(s32 i);               // GameModeDriverPGATour.c: a tournament's first champion
+s32  fn_800EFE78(s32 i);                // and the champion's score
+s32  fn_800EF0E0(s32 nPlayer);          // GameModeDriverPGATour.c: the player's bracket
+s32  fn_800D2FB4(s32 nTeeSet);          // the course's par from the tee set
+
+PgaEntrantMC* GetEntrantMCPtr(int nPlayer, int nEntrant) {
+    return &gpSaveData[nPlayer].tour.field.aEntrant[nEntrant];
+}
 
 PgaEntrant* GetEntrantNonMCPtr(int nEntrant) {
     return &lbl_80224070[nEntrant];
@@ -46,12 +61,196 @@ void fn_80117694(UStreamObject* pObject) {
     fn_8000E790(pObject, sizeof(lbl_8024B9CC), lbl_8024B9CC);
 }
 
+// A new PGA TOUR in the profile: everything cleared, the tournaments' champions from the tour data,
+// and each pro's career winnings to date.
+void fn_801176C0(TourSeason* pTour) {
+    int i;
+
+    fn_80005AE8(pTour, 0, sizeof(*pTour));
+    for (i = 0; i < 31; i++) {
+        strcpy(pTour->aEvent[i].szChampName, fn_800EFE60(i));
+        pTour->aEvent[i].nChampScore = fn_800EFE78(i);
+    }
+    for (i = 0; i < PGA_NUM_PROS; i++) {
+        pTour->aStats[i].nCareerWinnings = lbl_8024B9CC[i].nCareerWinnings;
+    }
+}
+
+// A new season: every golfer's season counts cleared (up to nPlayerOfYearPoints; the consecutive
+// cuts and the career totals go on).
+void fn_80117860(TourSeason* pTour) {
+    int i;
+
+    for (i = 0; i < PGA_NUM_GOLFERS; i++) {
+        fn_80005AE8(&pTour->aStats[i], 0, (u8*)&pTour->aStats[0].unk4B - (u8*)&pTour->aStats[0]);
+    }
+}
+
+// A round of a tournament for the field (TW06: GM_PgaTourSim_SimRound). The first round also
+// picks the field. uFlags: 1 the player is in the field, 2 the player's round is simulated too,
+// 4 the round only starts: no scores or statistics are kept and the other entrants are put on
+// random holes. 97.9%: with nPlayer an int it is exact, but GameModeDriverPGATour fn_800EF130 (linked)
+// needs this prototype's s32 to match; only saved registers differ here.
+void fn_801178C8(s32 nPlayer, SeasonEvent* pEvent, int nRound, int n, int uFlags) {
+    s32 nEntrants;
+    s32 nHole;
+    int i;
+    PgaEntrant* pEntrant;
+
+    fn_80005AE8(&lbl_80223C70, 0, sizeof(lbl_80223C70));
+    gbScoresDirty = 1;
+    fn_80005AE8(lbl_80224070, 0, sizeof(lbl_80224070));
+    if (nRound == 0) {
+        pEvent->nEventPar = 0;
+        pEvent->nUserBracket = fn_800EF0E0(nPlayer);
+        fn_80117AF8(nPlayer);
+        fn_801187F0(gpSaveData[nPlayer].tour.field.aEntrant, &gpSaveData[nPlayer].tour.field.nEntrants,
+                    uFlags & 1);
+        fn_80118B0C(nPlayer, n);
+    }
+    pEvent->nEventPar += (u16)fn_800D2FB4(gSession.nTeeSet[0]);
+    nEntrants = fn_80118664(nPlayer);
+    for (i = 0; i < nEntrants; i++) {
+        if (!fn_801197A4(nPlayer, i) && (!fn_8011908C(nPlayer, i) || (uFlags & 2))) {
+            for (nHole = 0; nHole < 18; nHole++) {
+                fn_80119B54(nPlayer, nRound, i, nHole);
+            }
+            fn_80119E28(nPlayer, i, nRound);
+        }
+    }
+    if (!(uFlags & 4)) {
+        fn_8011A538(nPlayer);
+    }
+    if (!(uFlags & 4)) {
+        for (i = 0; i < nEntrants; i++) {
+            GetEntrantNonMCPtr(i)->nCurrentHole = 18;
+        }
+        fn_80117D80(nPlayer);
+        fn_80117DF0(nPlayer);
+    }
+    if (nRound == 1 && !(uFlags & 4)) {
+        fn_80117B58(nPlayer);
+    }
+    if (uFlags & 4) {
+        pEntrant = GetEntrantNonMCPtr(0);
+        pEntrant->nCurrentHole = 0;
+        for (i = 1; i < nEntrants; i++) {
+            pEntrant = GetEntrantNonMCPtr(i);
+            pEntrant->nCurrentHole = Rand_Next(0) % 18;
+        }
+    }
+}
+
+// A new tournament: the field emptied, no winner yet.
+void fn_80117AF8(int nPlayer) {
+    fn_80005AE8(&gpSaveData[nPlayer].tour.field, 0, sizeof(PgaField));
+    gpSaveData[nPlayer].tour.field.nWinner = -1;
+}
+
+// The cut: the entrants above the cut row make it, the rest are out. TW06: GM_PgaTourSim_CutBadGolfers.
+void fn_80117B58(int nPlayer) {
+    s32 i;
+    s32 nEntrants = fn_80118664(nPlayer);
+    s32 nCutRow = fn_80119A50(nPlayer);
+
+    for (i = 0; i < nCutRow; i++) {
+        fn_80117BF4(nPlayer, lbl_80223C70.aEntrant[i]);
+    }
+    for (i = nCutRow; i < nEntrants; i++) {
+        fn_80117C50(nPlayer, lbl_80223C70.aEntrant[i]);
+    }
+}
+
+// An entrant made the cut. TW06: GM_PgaTourSim_PassEntrant.
+void fn_80117BF4(int nPlayer, int nEntrant) {
+    PgaEntrantMC* pEntrantMC = GetEntrantMCPtr(nPlayer, nEntrant);
+    PgaStatCounts* pStats = &gpSaveData[nPlayer].tour.aStats[pEntrantMC->nGolfer];
+
+    pStats->nConsecutiveCuts++;
+}
+
+// An entrant missed the cut. TW06: GM_PgaTourSim_CutEntrant.
+void fn_80117C50(int nPlayer, int nEntrant) {
+    PgaEntrantMC* pEntrantMC = GetEntrantMCPtr(nPlayer, nEntrant);
+    PgaStatCounts* pStats = &gpSaveData[nPlayer].tour.aStats[pEntrantMC->nGolfer];
+
+    pEntrantMC->bWasCut = 1;
+    pStats->nConsecutiveCuts = 0;
+    gbScoresDirty = 1;
+}
+
+// The entrant's strokes on the holes played go down as the current round's score.
+void fn_80117CB8(int nPlayer, int nEntrant) {
+    PgaEntrantMC* pEntrantMC = GetEntrantMCPtr(nPlayer, nEntrant);
+    PgaEntrant* pEntrant = GetEntrantNonMCPtr(nEntrant);
+    s32 i;
+
+    pEntrantMC->aRoundStrokes[gpSaveData[nPlayer].tour.nRound] = 0;
+    // The (s16) is in the original (an extsh before each add).
+    for (i = 0; i < pEntrant->nCurrentHole; i++) {
+        pEntrantMC->aRoundStrokes[gpSaveData[nPlayer].tour.nRound] += (s16)pEntrant->aHoleStrokes[i];
+    }
+    gbScoresDirty = 1;
+}
+
+// Every entrant's round score. TW06: GM_PgaTourSim_CommitRoundScores.
+void fn_80117D80(int nPlayer) {
+    s32 nEntrants = fn_80118664(nPlayer);
+    s32 i;
+
+    for (i = 0; i < nEntrants; i++) {
+        fn_80117CB8(nPlayer, i);
+    }
+}
+
 u8 fn_80117DE0(void) {
     return lbl_80282500;
 }
 
 void fn_80117DE8(int nPlayer, u8 b) {
     lbl_80282500 = b;
+}
+
+// Every entrant back to the first tee with no strokes. TW06: GM_PgaTourSim_ResetHoleScores.
+void fn_80117DF0(int nPlayer) {
+    s32 nEntrants = fn_80118664(nPlayer);
+    s32 i;
+    PgaEntrant* pEntrant;
+    int nHole;
+
+    for (i = 0; i < nEntrants; i++) {
+        pEntrant = GetEntrantNonMCPtr(i);
+        pEntrant->nCurrentHole = 0;
+        for (nHole = 0; nHole < 18; nHole++) {
+            pEntrant->aHoleStrokes[nHole] = 0;
+        }
+    }
+    gbScoresDirty = 1;
+}
+
+// The size of the field. TW06: GM_PgaTourSim_GetNumEntrants.
+s32 fn_80118664(int nPlayer) {
+    return gpSaveData[nPlayer].tour.field.nEntrants;
+}
+
+// The number of entrants in first place: the leading rows of the score order that were not cut
+// and are placed first. TW06: GM_PgaTourSim_GetNumFirstPlaceEntrants.
+s32 fn_80118684(int nPlayer) {
+    s32 nEntrants = fn_80118664(nPlayer);
+    s32 i;
+    s32 nEntrant;
+    s32 nCount = 0;
+
+    for (i = 0; i < nEntrants; i++) {
+        nEntrant = lbl_80223C70.aEntrant[i];
+        if (!fn_801197A4(nPlayer, nEntrant)) {
+            if (lbl_80223C70.aRank[nEntrant] != 1) {
+                break;
+            }
+            nCount++;
+        }
+    }
+    return nCount;
 }
 
 // A statistic's value as text, with the statistic's number of decimal places.
@@ -75,6 +274,37 @@ void GM_PgaTourSim_GetStatValString(GM_Pga_StatTypes_t nStat, f32 fValue, char* 
         sprintf(szFormat, "%%.%df", lbl_801940F0[nStat]);
         sprintf(szOut, szFormat, fValue);
         break;
+    }
+}
+
+// Picks a tournament's field: 100 to 127 of the pros in random order (a shuffle of all of them),
+// the first one replaced by the player's golfer when the player plays; the rest of the table empty.
+void fn_801187F0(PgaEntrantMC* aEntrant, s16* pnEntrants, u8 bUser) {
+    s32 aGolfer[PGA_NUM_PROS];
+    int i;
+    s32 j;
+    s32 nSwap;
+
+    for (i = 0; i < PGA_NUM_PROS; i++) {
+        aGolfer[i] = i;
+    }
+    for (i = 0; i < PGA_NUM_PROS - 1; i++) {
+        j = i + Rand_Next(0) % (PGA_NUM_PROS - i);
+        if (j != i) {
+            nSwap = aGolfer[j];
+            aGolfer[j] = aGolfer[i];
+            aGolfer[i] = nSwap;
+        }
+    }
+    *pnEntrants = Rand_Next(0) % 28 + 100;
+    if (bUser) {
+        aGolfer[0] = PGA_USER_GOLFER;
+    }
+    for (i = 0; i < *pnEntrants; i++) {
+        aEntrant[i].nGolfer = aGolfer[i];
+    }
+    for (i = *pnEntrants; i < PGA_MAX_ENTRANTS; i++) {
+        aEntrant[i].nGolfer = -1;
     }
 }
 
@@ -482,6 +712,83 @@ void CalcAllStatsIfDirty(int nPlayer) {
     }
 }
 
+// The score order: every entrant sorted by score (fn_8011BDF8), then each given a place, entrants
+// with the same score sharing it. A cut entrant counts as the worst score, the winner as the best.
+void fn_8011A890(int nPlayer) {
+    s32 i;
+    s32 nEntrant;
+    s32 nScore;
+    s32 nRank;
+    s32 nPrevScore;
+    s32 nEntrants = fn_80118664(nPlayer);
+
+    if (nEntrants == 0) return;
+    for (i = 0; i < nEntrants; i++) {
+        lbl_80223C70.aEntrant[i] = i;
+    }
+    for (i = nEntrants; i < PGA_MAX_ENTRANTS; i++) {
+        lbl_80223C70.aEntrant[i] = -1;
+    }
+    lbl_80281848 = nPlayer;
+    fn_8015929C(lbl_80223C70.aEntrant, nEntrants, sizeof(lbl_80223C70.aEntrant[0]), fn_8011BDF8);
+    lbl_80281848 = 0;
+    nPrevScore = 0;
+    nRank = 0;
+    for (i = 0; i < nEntrants; i++) {
+        nEntrant = lbl_80223C70.aEntrant[i];
+        if (fn_801197A4(nPlayer, nEntrant)) {
+            nScore = PGA_SCORE_CUT;
+        } else if (nEntrant == gpSaveData[nPlayer].tour.field.nWinner) {
+            nScore = PGA_SCORE_WINNER;
+        } else {
+            nScore = fn_8011937C(nPlayer, nEntrant, !fn_8011908C(nPlayer, nEntrant));
+        }
+        if (i == 0 || nPrevScore != nScore) {
+            nRank = i + 1;
+            nPrevScore = nScore;
+        }
+        lbl_80223C70.aRank[nEntrant] = nRank;
+    }
+}
+
+// The same after the cut: the cut entrants, from the first cut row on, sorted among themselves
+// (fn_8011BF74), then every place worked out again.
+void fn_8011AAC0(int nPlayer) {
+    s32 nEntrants = fn_80118664(nPlayer);
+    s32 nCutRow;
+    s32 i;
+    s32 nEntrant;
+    s32 nScore;
+    s32 nRank;
+    s32 nPrevScore;
+
+    if (nEntrants == 0) return;
+    lbl_80281848 = nPlayer;
+    nCutRow = fn_80119AE0(nPlayer);
+    if (nCutRow != -1) {
+        fn_8015929C(&lbl_80223C70.aEntrant[nCutRow], nEntrants - nCutRow, sizeof(lbl_80223C70.aEntrant[0]),
+                    fn_8011BF74);
+    }
+    lbl_80281848 = 0;
+    nPrevScore = 0;
+    nRank = 0;
+    for (i = 0; i < nEntrants; i++) {
+        nEntrant = lbl_80223C70.aEntrant[i];
+        if (fn_801197A4(nPlayer, nEntrant)) {
+            nScore = PGA_SCORE_CUT;
+        } else if (nEntrant == gpSaveData[nPlayer].tour.field.nWinner) {
+            nScore = PGA_SCORE_WINNER;
+        } else {
+            nScore = fn_8011937C(nPlayer, nEntrant, !fn_8011908C(nPlayer, nEntrant));
+        }
+        if (i == 0 || nPrevScore != nScore) {
+            nRank = i + 1;
+            nPrevScore = nScore;
+        }
+        lbl_80223C70.aRank[nEntrant] = nRank;
+    }
+}
+
 void CalcScoreRankingsIfDirty(int nPlayer) {
     if (gbScoresDirty) {
         fn_8011A890(nPlayer);
@@ -804,6 +1111,59 @@ s32 fn_8011BCFC(const void* pA, const void* pB) {
         nRet = strcmp(fn_80118E30(nPlayer, nGolferA), fn_80118E30(nPlayer, nGolferB));
     }
     return nRet;
+}
+
+// The score sort comparisons (lbl_80281848 is the player). Lower scores first, then by name.
+
+// All entrants: a cut entrant sorts last, the winner first. 97.4%: only nPlayer and nEntrantA/nScoreB
+// swap saved registers (declaration orders, int/s32, an inline score helper and the permuter tried).
+s32 fn_8011BDF8(const void* pA, const void* pB) {
+    s32 nEntrantA = *(const s32*)pA;
+    s32 nEntrantB = *(const s32*)pB;
+    s32 nPlayer = lbl_80281848;
+    PgaEntrantMC* pEntrantA = GetEntrantMCPtr(nPlayer, nEntrantA);
+    PgaEntrantMC* pEntrantB = GetEntrantMCPtr(nPlayer, nEntrantB);
+    s32 nScoreA;
+    s32 nScoreB;
+
+    nScoreA = fn_8011937C(nPlayer, nEntrantA, !fn_8011908C(nPlayer, nEntrantA));
+    if (fn_801197A4(nPlayer, nEntrantA)) {
+        nScoreA = PGA_SCORE_CUT;
+    } else if (nEntrantA == gpSaveData[nPlayer].tour.field.nWinner) {
+        nScoreA = PGA_SCORE_WINNER;
+    }
+    nScoreB = fn_8011937C(nPlayer, nEntrantB, !fn_8011908C(nPlayer, nEntrantB));
+    if (fn_801197A4(nPlayer, nEntrantB)) {
+        nScoreB = PGA_SCORE_CUT;
+    } else if (nEntrantB == gpSaveData[nPlayer].tour.field.nWinner) {
+        nScoreB = PGA_SCORE_WINNER;
+    }
+    if (nScoreA < nScoreB) {
+        return -1;
+    }
+    if (nScoreA > nScoreB) {
+        return 1;
+    }
+    return strcmp(fn_80118E30(nPlayer, pEntrantA->nGolfer), fn_80118E30(nPlayer, pEntrantB->nGolfer));
+}
+
+// The cut entrants among themselves.
+s32 fn_8011BF74(const void* pA, const void* pB) {
+    s32 nEntrantA = *(const s32*)pA;
+    s32 nEntrantB = *(const s32*)pB;
+    s32 nPlayer = lbl_80281848;
+    PgaEntrantMC* pEntrantA = GetEntrantMCPtr(nPlayer, nEntrantA);
+    PgaEntrantMC* pEntrantB = GetEntrantMCPtr(nPlayer, nEntrantB);
+    s32 nScoreA = fn_8011937C(nPlayer, nEntrantA, !fn_8011908C(nPlayer, nEntrantA));
+    s32 nScoreB = fn_8011937C(nPlayer, nEntrantB, !fn_8011908C(nPlayer, nEntrantB));
+
+    if (nScoreA < nScoreB) {
+        return -1;
+    }
+    if (nScoreA > nScoreB) {
+        return 1;
+    }
+    return strcmp(fn_80118E30(nPlayer, pEntrantA->nGolfer), fn_80118E30(nPlayer, pEntrantB->nGolfer));
 }
 
 // Called from fn_801180C4; empty in this build.
