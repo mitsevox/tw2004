@@ -568,9 +568,11 @@ Because roll grows with the *square* of power, **the CPU's +5% putt pace (above)
 distance**: a putt planned to die at the hole would finish about 10% of its length past it.
 
 **Full shots, chips and the rest** (`fn_80050DE4` picks the table, `fn_80050F88` interpolates):
-seven tables, one per shot kind 1..7, of 25 clubs x 11 distances at power 0.0, 0.1 .. 1.0
-(`gClubRows1..7`). The tenth column (power 0.9) is the club's "reach" that `AI_PowerScale`
-divides a golfer's own distance by. Some rows, in yards at power 0.5 / 0.9 / 1.0:
+seven tables, one per shot kind 1..7, of 25 clubs x 11 distances at power 0.1, 0.2 .. 1.1
+(`gClubRows1..7`; corrected 2026-09-23 - the columns were first read as 0.0 .. 1.0, one step
+low). The tenth column (full power, 1.0) is the club's "reach" that `AI_PowerScale` divides a
+golfer's own distance by; the last is 110%, the same cap as putts. Some rows, in yards at
+power 0.6 / 1.0 / 1.1:
 
     kind            club 0         club 10        club 22
     1 full swing    184 310 334    131 219 236    50 100 112

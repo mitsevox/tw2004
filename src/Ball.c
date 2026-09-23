@@ -69,8 +69,8 @@ f32    fn_8004D620(CourseInfo* pCourse, f32* pPos);   // ground height, -60000 a
 f32    fn_8004D5C0(CourseInfo* pCourse, f32* pPos);   // the same from another source
 u8     fn_8004C798(s32 nSurface);
 void   fn_8004C590(CourseInfo* pCourse, Ball* pBall, int a, u8* pA, u8* pB, int b);
-// One club's distances for a shot kind: power 0.0, 0.1 .. 1.0 (fDist[9], "the reach", is what
-// AI_PowerScale divides by).
+// One club's distances for a shot kind: power 0.1, 0.2 .. 1.1 (fDist[9], full power, is "the
+// reach" AI_PowerScale divides by).
 typedef struct ClubRow {
     f32  fDist[11];
 } ClubRow;
@@ -262,7 +262,8 @@ f32 fn_80050D34(f32 fDist) {
         f32 fHi = fScale * gPuttDist[i];
         if (fDist <= fHi) {
             f32 fLo = fScale * gPuttDist[i - 1];
-            return 0.05f * ((fDist - fLo) / (fHi - fLo)) + 0.05f * (i - 1);
+            f32 fT = (fDist - fLo) / (fHi - fLo);
+            return 0.05f * fT + 0.05f * (i - 1);
         }
     }
     return 1.1f;
@@ -317,28 +318,27 @@ f32 fn_80050F44(int nKind, int nClub) {
     return 1.0f;
 }
 
-// Power for a distance with a club: the row's 11 distances are power 0.0 to 1.0, interpolated,
+// Power for a distance with a club: the row's 11 distances are power 0.1 to 1.1, interpolated,
 // plus the difference between the table's surface and the one under the ball (a surface that
 // is not a stopping surface counts as 14); 1.1 beyond the row.
 f32 fn_80050F88(f32 fDist, u8* p, int nKind, int nClub) {
-    Ball*        pBall = (Ball*)p;
     s32          nSurface;
     SurfaceType* pSurface;
     ClubRow*     pRow;
     f32          vNormal[4];
     f32          fBase, fAdj, fFrac;
     int          i;
-    if (pBall == NULL) return 0.0f;
+    if (p == NULL) return 0.0f;
     if (!fn_80050DE4(nKind, nClub, 0, &pRow, &nSurface)) return 1.0f;
     fBase = gSurfaceTypes[nSurface].f00;
-    if (fn_8004D890(pBall->pCourse, pBall, &pSurface, vNormal) < -60000.0f || 0.375f != pSurface->f1C) {
+    if (fn_8004D890(((Ball*)p)->pCourse, (Ball*)p, &pSurface, vNormal) < -60000.0f || 0.375f != pSurface->f1C) {
         pSurface = &gSurfaceTypes[14];
     }
     fAdj = fBase - pSurface->f00;
     for (i = 1; i < 12; i++) {
         if (fDist <= pRow->fDist[i]) {
             fFrac = (fDist - pRow->fDist[i - 1]) / (pRow->fDist[i] - pRow->fDist[i - 1]);
-            return 0.1f * fFrac + 0.1f * (i - 1) + fAdj;
+            return fAdj + (0.1f * fFrac + 0.1f * i);
         }
     }
     return 1.1f;
