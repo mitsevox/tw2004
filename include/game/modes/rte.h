@@ -37,4 +37,13 @@ char* GameModeDriverRTE_GetName(s32 i);
 s32  fn_800F1008(s32 i);
 u8   fn_800F102C(void);                 // always 0 (the calendar's cell look for today)
 
+// GameModeDriverRTE.c, as the calendar's event details (EventInfo.c) use it
+s32  fn_800F0F30(s32 i);
+u16  fn_800F0FBC(s32 i);
+s32  GameModeDriverRTE_GetNextEvent(void);
+s32  fn_800F1154(s32 nId);
+void fn_800F11A0(s32 nId, char* pDst);
+s32  fn_800F120C(s32 i);
+u8   GameModeDriverRTE_IsEventComplete(s32 nProfile, s32 i);
+
 #endif

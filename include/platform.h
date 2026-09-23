@@ -84,5 +84,6 @@ LAYOUT_ASSERT(OSCalendarTime, 0x28);
 s64  OSGetTime(void);           // the time base, in ticks
 void OSTicksToCalendarTime(s64 nTicks, OSCalendarTime* pTime);
 u32  OSGetTick(void);           // the low 32 bits of the time base
+void OSReport(const char* pFmt, ...);   // debug print (nothing in the retail build)
 
 #endif
