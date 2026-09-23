@@ -24,13 +24,14 @@ Status
 Last updated 2026-09-23.
 
 - Builds byte-identical to the retail `main.dol`.
-- Matched code: **25.8%** (399,836 of 1,550,720 bytes), **3,695 of 7,647 functions** (48.3%).
-  Counting partial matches: 29.4%.
+- Matched code: **26.1%** (404,100 of 1,550,720 bytes), **3,714 of 7,647 functions** (48.6%).
+  Counting partial matches: 29.7%.
   - EA's code (the game and EA's engine libraries, 83% of the executable): **14.4%** matched,
-    2,805 of 6,608 functions.
-  - Nintendo SDK, C library and debugger (the other 17%): **81.0%** matched, 890 of 1,039
+    2,806 of 6,608 functions.
+  - Nintendo SDK, C library and debugger (the other 17%): **82.6%** matched, 908 of 1,039
     functions. Most of it is source shared by other GameCube decompilations (Metroid Prime,
-    Final Fantasy Crystal Chronicles, The Wind Waker, Twilight Princess, Melee); see the
+    Final Fantasy Crystal Chronicles, The Wind Waker, Twilight Princess, Melee, Sonic Heroes,
+    Gauntlet: Dark Legacy); see the
     `CREDITS.md` / `README.md` in each `extern/` folder.
 - Game code in C so far: the swing and its state machine (`Swing.c`), golfer attributes and the
   CPU's shot planning (`Golfer.c`), ball physics (`Ball.c`, 63 of 68 functions exact), the

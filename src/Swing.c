@@ -99,7 +99,7 @@ extern SwingState* gpSwing;                  // 0x80281188
 extern f32         gForgivenessTable[3][27]; // 0x80188168  rows: value at attribute 0 / 100 / 110
 extern s32         gBoostSteps[8];           // 0x80188148  power boost per level: 1 2 4 6 9 12 16 20
 
-double fn_8000AE94(double x);                // fabs
+double fabsf(double x);                // fabs
 f32    fn_80050D34(f32 fDist);               // putt power for a distance
 f32    fn_80050F88(f32 fDist, u8* pParams, int nKind, int nClub);   // chip power
 void   fn_800130F8(int nPad, int n);         // rumble on
@@ -224,7 +224,7 @@ f32 Swing_TeeSweetSpot(int nPlayer, f32 fPower) {
         if (fT > gpSwing->fKnot1X && fT < gpSwing->fKnot2X) {
             f32 fBonus;
             fHalf  = 0.5f * (gpSwing->fKnot2X - gpSwing->fKnot1X);
-            fBonus = (1.0f - (f32)fn_8000AE94(fHalf - (fT - gpSwing->fKnot1X)) / fHalf) * gpSwing->fTeeBonus;
+            fBonus = (1.0f - (f32)fabsf(fHalf - (fT - gpSwing->fKnot1X)) / fHalf) * gpSwing->fTeeBonus;
             return fPower + fBonus;
         }
     }
@@ -302,7 +302,7 @@ void Swing_ApplyForgiveness(int nPlayer) {
         }
     }
     TABLE_PAIR(nRowThresh, nRowScale, nAttr, fThresh, fScale);
-    if (fn_8000AE94(fError) < fThresh) {
+    if (fabsf(fError) < fThresh) {
         fError *= fScale;
     }
     gPlayers[nPlayer].swing.fSwingError = fError;
@@ -324,7 +324,7 @@ void Swing_MisHitRumble(int nPlayer) {
     default:         nAttr = (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_BALL_STRIKING, ATTR_TOTAL); break;
     }
     fScale = TABLE_AT(ROW_RUMBLE, nAttr);
-    gPlayers[nPlayer].swing.nRumbleFrames = (int)(fScale * fn_8000AE94(gPlayers[nPlayer].swing.fSwingError));
+    gPlayers[nPlayer].swing.nRumbleFrames = (int)(fScale * fabsf(gPlayers[nPlayer].swing.fSwingError));
     if (gPlayers[nPlayer].swing.nRumbleFrames > 30) gPlayers[nPlayer].swing.nRumbleFrames = 30;
     if (gPlayers[nPlayer].swing.nRumbleFrames > 0) {
         gPlayers[nPlayer].swing.bRumble = 1;
@@ -453,7 +453,7 @@ f32 Swing_ComputePower(int nPlayer) {
     p      = &gPlayers[nPlayer];
     fPower = p->fPower;
     pPower = &p->fPower;
-    fError = fn_8000AE94(p->swing.fSwingError);
+    fError = fabsf(p->swing.fSwingError);
     p->swing.fPowerAfterError = Swing_ApplyPowerBoost(nPlayer, fPower) - fError;
     switch (p->nShotKind) {
     case SHOT_PUTT: {
@@ -683,7 +683,7 @@ f32 Swing_CurveAngle(s32* pClub, f32 fBackAngle) {
     f32 fT     = fBackAngle / (PI / 2);
     f32 fRange = gpSwing->fCurveMin + ((f32)gClubCurve[*pClub] / 26.0f) * (gpSwing->fCurveMax - gpSwing->fCurveMin);
 
-    fT = (f32)fn_8000AE94(fT);
+    fT = (f32)fabsf(fT);
     if (fT < gpSwing->fKnot1X) {
         fOut = gpSwing->fKnot1Y * fT / gpSwing->fKnot1X;
     } else {
@@ -1402,7 +1402,7 @@ int Swing_UpdateBackswing(int nPlayer) {
         fRange  = fTop - fStart;
         fTarget = fStart + (fMag / 100.0f) * fRange;
         fDelta  = fTarget - fAnimTime;
-        fRate   = 1.0f + (f32)fn_8000AE94(fDelta) / fRange;
+        fRate   = 1.0f + (f32)fabsf(fDelta) / fRange;
         fRate   = fRate * fRate - 1.0f;
         if (fRate >= 1.0f) fRate = 1.0f;
         if (gPlayers[nPlayer].nShotKind == 1 || gPlayers[nPlayer].nShotKind == 2 || gPlayers[nPlayer].nShotKind == 3) {

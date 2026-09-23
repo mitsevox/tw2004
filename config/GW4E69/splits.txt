@@ -114,6 +114,9 @@ unsorted/sweep_8000AD34.c:
 unsorted/sweep_8000AD78.c:
 	.text       start:0x8000AD78 end:0x8000ADC0
 
+src/MSL/atanf.c:
+	.text       start:0x8000AE94 end:0x8000AE9C
+
 unsorted/sweep_8000AF1C.c:
 	.text       start:0x8000AF1C end:0x8000AF20
 
@@ -5188,6 +5191,9 @@ unsorted/sweep_801372C0.c:
 unsorted/sweep_80137C2C.c:
 	.text       start:0x80137C2C end:0x80137C38
 
+src/dolphin/ax/AXVPB.c:
+	.text       start:0x80137C38 end:0x80138184
+
 src/ax/AXProf.c:
 	.text       start:0x80138184 end:0x801381CC
 
@@ -5400,6 +5406,9 @@ dolphin/ai.c:
 unsorted/sweep_80150F24.c:
 	.text       start:0x80150F24 end:0x80150F2C
 
+src/dolphin/db/odenotstub.c:
+	.text       start:0x80150F2C end:0x801519A4
+
 runtime/__va_arg.c:
 	.text       start:0x801519A4 end:0x80151A6C
 
@@ -5465,11 +5474,11 @@ runtime/sscanf.c:
 src/MSL_C/PPCEABI/bare/H/string.c:
 	.text       start:0x8015A450 end:0x8015A8D0
 
-libs/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common/Src/strtoul.c:
-	.text       start:0x8015B8DC end:0x8015B99C
+src/MSL_C/strtold.c:
+	.text       start:0x8015A8D0 end:0x8015B8DC
 
-src/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common/Src/strtoul.c:
-	.text       start:0x8015BDA8 end:0x8015C120
+src/MSL_C/strtoul.c:
+	.text       start:0x8015B8DC end:0x8015C120
 
 unsorted/sweep_8015C120.c:
 	.text       start:0x8015C120 end:0x8015C128

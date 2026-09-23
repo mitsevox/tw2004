@@ -474,6 +474,20 @@ SDK side 58.9% -> 69.5%. Scripts in `C:\dev\scratch\tw\` (outside the repo):
   shown as `pad_00_80003534_init`) is Melee's `__exception.s` (assembly), exact. dtk keeps
   `gTRKInterruptVectorTable` as a label, so the table is compared under a function-typed name
   `TRK_exception_vectors`; Pikmin 2's copy (v2.6) is 0x54 bytes longer and does not match.
+- **Second round (2026-09-23), from projects the user suggested.** `extern/sonicheroes` (MIT,
+  licence text kept in the folder): MSL `strtold.c` (4 KB, `__strtold`) and `strtoul.c`
+  (`__strtoull`). `extern/gauntlet` (no licence stated): the `db` debugger-comms library
+  (`odenotstub.c`, 12 functions), two `AXVPB` functions, `fabsf`. Also re-picked flag variants for
+  a few files already in (`CARDWrite`, `Pad`, `OSAlloc`, `ansi_fp`). +4 KB, SDK 81.0% -> 82.6%.
+  `integrate.py` now keeps a replaced unit's data ranges when the new file has the same name, and
+  never renames to another project's own `fn_` placeholder; `rename_fix.py` reverts renames of
+  already-named functions and updates our sources.
+- Checked and not useful for code: Need for Speed Underground / Most Wanted (EA Black Box's C++
+  engine, no shared EA code with Tiburon's C engine; NFSMW's SDK is a 2005 revision and its files
+  need headers it does not ship), The Sims 2 (C++, mostly raw-byte wrappers), EA Nation server
+  (networking; the GameCube version has no online play). BFBB / Incredibles / Sonic Heroes /
+  Gauntlet show the cross-platform symbol method (PS2/Xbox builds with symbols or PDBs): worth
+  trying if a Tiger Woods 2004 build for another platform with symbols turns up.
 - Not done yet: data sections for these units (Level 3), more flag variants for the files that
   compile but fall a few functions short, and other projects (Pikmin 2, Sunshine, Animal Crossing).
 

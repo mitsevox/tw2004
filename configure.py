@@ -359,6 +359,71 @@ cflags_gcc = [
 
 config.libs = [
     {
+        "lib": "sonicheroes_sdk_0",
+        "mw_version": "GC/1.3.2",
+        "cflags": ["-nodefaults", "-proc gekko", "-align powerpc", "-enum int", "-fp hardware", "-Cpp_exceptions off", "-O4,p", "-inline auto", "-pragma \"cats off\"", "-pragma \"warn_notinlined off\"", "-maxerrors 1", "-nosyspath", "-RTTI off", "-str reuse", "-DNDEBUG=1", "-D__GEKKO__", "-fp_contract on", "-use_lmw_stmw on", "-str reuse,pool,readonly", "-common off", "-inline deferred,auto", "-char signed", "-i extern/sonicheroes/include", "-i extern/sonicheroes/include/dolphin", "-i extern/sonicheroes/include/MSL_C", "-i extern/sonicheroes/src", "-ir extern/sonicheroes/src/dolphin", "-i extern/sonicheroes/Include"],
+        "progress_category": "sdk",
+        "src_dir": "extern/sonicheroes",
+        "objects": [
+            Object(NonMatching, "src/MSL_C/strtold.c"),
+            Object(NonMatching, "src/MSL_C/strtoul.c"),
+        ],
+    },
+    {
+        "lib": "gauntlet_sdk_1",
+        "mw_version": "GC/1.2.5n",
+        "cflags": ["-nodefaults", "-proc gekko", "-align powerpc", "-enum int", "-fp hardware", "-Cpp_exceptions off", "-O4,p", "-inline auto", "-pragma \"cats off\"", "-pragma \"warn_notinlined off\"", "-maxerrors 1", "-nosyspath", "-RTTI off", "-str reuse", "-DNDEBUG=1", "-D__GEKKO__", "-fp_contract off", "-i extern/gauntlet/include", "-i extern/gauntlet/include/dolphin", "-i extern/gauntlet/src", "-ir extern/gauntlet/src/dolphin", "-i extern/gauntlet/src/MSL", "-i extern/gauntlet/Include"],
+        "progress_category": "sdk",
+        "src_dir": "extern/gauntlet",
+        "objects": [
+            Object(NonMatching, "src/dolphin/ax/AXVPB.c"),
+            Object(NonMatching, "src/dolphin/db/odenotstub.c"),
+        ],
+    },
+    {
+        "lib": "ffcc_sdk_2",
+        "mw_version": "GC/1.2.5n",
+        "cflags": ["-nodefaults", "-proc gekko", "-align powerpc", "-enum int", "-fp hardware", "-Cpp_exceptions off", "-O4,p", "-inline auto", "-pragma \"cats off\"", "-pragma \"warn_notinlined off\"", "-maxerrors 1", "-nosyspath", "-RTTI off", "-str reuse", "-DNDEBUG=1", "-D__GEKKO__", "-fp_contract off", "-i extern/ffcc/include", "-i extern/ffcc/include/dolphin", "-i extern/ffcc/src", "-i extern/ffcc/include/TRK_MINNOW_DOLPHIN", "-ir extern/ffcc/src", "-i extern/ffcc/Include", "-DBUILD_VERSION=0", "-DVERSION_GCCE6W"],
+        "progress_category": "sdk",
+        "src_dir": "extern/ffcc",
+        "objects": [
+            Object(NonMatching, "src/ax/AXAlloc.c"),
+            Object(NonMatching, "src/os/OSAlloc.c"),
+            Object(NonMatching, "src/card/CARDWrite.c"),
+        ],
+    },
+    {
+        "lib": "tww_sdk_3",
+        "mw_version": "GC/1.2.5n",
+        "cflags": ["-nodefaults", "-proc gekko", "-align powerpc", "-enum int", "-fp hardware", "-Cpp_exceptions off", "-O4,p", "-inline auto", "-pragma \"cats off\"", "-pragma \"warn_notinlined off\"", "-maxerrors 1", "-nosyspath", "-RTTI off", "-str reuse", "-DNDEBUG=1", "-D__GEKKO__", "-fp_contract off", "-i extern/tww/include", "-i extern/tww/src", "-ir extern/tww/src/dolphin", "-i extern/tww/src/PowerPC_EABI_Support/MetroTRK", "-i extern/tww/Include", "-i extern/tww/src/PowerPC_EABI_Support/MSL/MSL_C++/MSL_Common/Include", "-i extern/tww/src/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common/Include", "-i extern/tww/src/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common_Embedded/Math/Include", "-i extern/tww/src/PowerPC_EABI_Support/MSL/MSL_C/PPC_EABI/Include", "-i extern/tww/src/PowerPC_EABI_Support/Runtime/Inc", "-DVERSION=0"],
+        "progress_category": "sdk",
+        "src_dir": "extern/tww",
+        "objects": [
+            Object(NonMatching, "src/dolphin/os/OS.c"),
+            Object(NonMatching, "src/dolphin/pad/Pad.c"),
+        ],
+    },
+    {
+        "lib": "ffcc_sdk_4",
+        "mw_version": "GC/1.3.2",
+        "cflags": ["-nodefaults", "-proc gekko", "-align powerpc", "-enum int", "-fp hardware", "-Cpp_exceptions off", "-O4,p", "-inline auto", "-pragma \"cats off\"", "-pragma \"warn_notinlined off\"", "-maxerrors 1", "-nosyspath", "-RTTI off", "-str reuse", "-DNDEBUG=1", "-D__GEKKO__", "-fp_contract on", "-use_lmw_stmw on", "-str reuse,pool,readonly", "-common off", "-inline deferred,auto", "-char signed", "-i extern/ffcc/include", "-i extern/ffcc/include/dolphin", "-i extern/ffcc/src", "-i extern/ffcc/include/TRK_MINNOW_DOLPHIN", "-ir extern/ffcc/src", "-i extern/ffcc/Include", "-DBUILD_VERSION=0", "-DVERSION_GCCE6W"],
+        "progress_category": "sdk",
+        "src_dir": "extern/ffcc",
+        "objects": [
+            Object(NonMatching, "src/MSL_C/PPCEABI/bare/H/ansi_fp.c"),
+        ],
+    },
+    {
+        "lib": "gauntlet_sdk_5",
+        "mw_version": "GC/1.3.2",
+        "cflags": ["-nodefaults", "-proc gekko", "-align powerpc", "-enum int", "-fp hardware", "-Cpp_exceptions off", "-O4,p", "-inline auto", "-pragma \"cats off\"", "-pragma \"warn_notinlined off\"", "-maxerrors 1", "-nosyspath", "-RTTI off", "-str reuse", "-DNDEBUG=1", "-D__GEKKO__", "-fp_contract on", "-use_lmw_stmw on", "-str reuse,pool,readonly", "-common off", "-inline deferred,auto", "-char signed", "-i extern/gauntlet/include", "-i extern/gauntlet/include/dolphin", "-i extern/gauntlet/src", "-ir extern/gauntlet/src/dolphin", "-i extern/gauntlet/src/MSL", "-i extern/gauntlet/Include"],
+        "progress_category": "sdk",
+        "src_dir": "extern/gauntlet",
+        "objects": [
+            Object(NonMatching, "src/MSL/atanf.c"),
+        ],
+    },
+    {
         "lib": "ffcc_sdk_0",
         "mw_version": "GC/1.3.2",
         "cflags": ["-nodefaults", "-proc gekko", "-align powerpc", "-enum int", "-fp hardware", "-Cpp_exceptions off", "-O4,p", "-inline auto", "-pragma \"cats off\"", "-pragma \"warn_notinlined off\"", "-maxerrors 1", "-nosyspath", "-RTTI off", "-str reuse", "-DNDEBUG=1", "-D__GEKKO__", "-fp_contract on", "-use_lmw_stmw on", "-str reuse,pool,readonly", "-common off", "-inline deferred,auto", "-char signed", "-i extern/ffcc/include", "-i extern/ffcc/include/dolphin", "-i extern/ffcc/src", "-i extern/ffcc/include/TRK_MINNOW_DOLPHIN", "-ir extern/ffcc/src", "-i extern/ffcc/Include", "-DBUILD_VERSION=0", "-DVERSION_GCCE6W"],
@@ -370,7 +435,6 @@ config.libs = [
             Object(NonMatching, "src/MSL_C/PPCEABI/bare/H/abort_exit.c"),
             Object(NonMatching, "src/MSL_C/PPCEABI/bare/H/alloc.c"),
             Object(NonMatching, "src/MSL_C/PPCEABI/bare/H/ansi_files.c"),
-            Object(NonMatching, "src/MSL_C/PPCEABI/bare/H/ansi_fp.c"),
             Object(NonMatching, "src/MSL_C/PPCEABI/bare/H/direct_io.c"),
             Object(NonMatching, "src/MSL_C/PPCEABI/bare/H/file_io.c"),
             Object(NonMatching, "src/MSL_C/PPCEABI/bare/H/mem_funcs.c"),
@@ -387,7 +451,6 @@ config.libs = [
         "objects": [
             Object(NonMatching, "src/vi/vi.c"),
             Object(NonMatching, "src/ax/AX.c"),
-            Object(NonMatching, "src/ax/AXAlloc.c"),
             Object(NonMatching, "src/ax/AXAux.c"),
             Object(NonMatching, "src/ax/AXCL.c"),
             Object(NonMatching, "src/ax/AXSPB.c"),
@@ -398,14 +461,12 @@ config.libs = [
             Object(NonMatching, "src/dvd/dvdFatal.c"),
             Object(NonMatching, "src/gx/GXDisplayList.c"),
             Object(NonMatching, "src/gx/GXTransform.c"),
-            Object(NonMatching, "src/os/OSAlloc.c"),
             Object(NonMatching, "src/os/OSFont.c"),
             Object(NonMatching, "src/os/OSLink.c"),
             Object(NonMatching, "src/os/__ppc_eabi_init.c"),
             Object(NonMatching, "src/gba/GBA.c"),
             Object(NonMatching, "src/card/CARDBios.c"),
             Object(NonMatching, "src/card/CARDRdwr.c"),
-            Object(NonMatching, "src/card/CARDWrite.c"),
         ],
     },
     {
@@ -416,10 +477,8 @@ config.libs = [
         "src_dir": "extern/tww",
         "objects": [
             Object(NonMatching, "src/dolphin/dvd/dvd.c"),
-            Object(NonMatching, "src/dolphin/os/OS.c"),
             Object(NonMatching, "src/dolphin/os/OSMemory.c"),
             Object(NonMatching, "src/dolphin/os/OSThread.c"),
-            Object(NonMatching, "src/dolphin/pad/Pad.c"),
         ],
     },
     {
@@ -430,7 +489,6 @@ config.libs = [
         "src_dir": "extern/tww",
         "objects": [
             Object(NonMatching, "src/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common/Src/mbstring.c"),
-            Object(NonMatching, "src/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common/Src/strtoul.c"),
             Object(NonMatching, "src/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common_Embedded/Math/Double_precision/e_pow.c"),
         ],
     },
@@ -464,7 +522,6 @@ config.libs = [
         "progress_category": "sdk",
         "src_dir": "extern/tp",
         "objects": [
-            Object(NonMatching, "libs/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common/Src/strtoul.c"),
         ],
     },
     {

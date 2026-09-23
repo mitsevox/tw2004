@@ -1586,7 +1586,7 @@ void fn_8002EBA4(u8* pObj, u8 nValue) {
 // rehearsed one, the same shot kind, an aim within 5 degrees. Otherwise the shot is not perfect
 // after all. A taken lucky shot puts the player's odds back to 1 in 12.
 
-f32 fn_8000AE94(f32 x);                 // fabsf
+f32 fabsf(f32 x);                 // fabsf
 
 void Luck_TakePerfectShot(int nPlayer) {
     f32  fDiff;
@@ -1608,7 +1608,7 @@ void Luck_TakePerfectShot(int nPlayer) {
         fDiff = gPlayers[nPlayer].fAim - gPlayers[CADDIE_SLOT].fAim;
         while (fDiff < -PI) fDiff += 2 * PI;
         while (fDiff > PI) fDiff -= 2 * PI;
-        if (fn_8000AE94(fDiff) > 0.0872665) {
+        if (fabsf(fDiff) > 0.0872665) {
             gPlayers[nPlayer].bPerfect = 0;
             return;
         }
