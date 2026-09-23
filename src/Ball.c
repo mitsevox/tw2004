@@ -1170,6 +1170,7 @@ void Ball_SetLie(Ball* pBall, SurfaceType* pSurface) {
     u32          r;
     int          nLuck;
     f32          f;
+    u32          rSign;
     pBall->nSurface = fn_80050BEC(pSurface);
     uLuck = 0;
     if (pBall->nPlayer >= 0 && pBall->nPlayer <= 3) {
@@ -1289,14 +1290,14 @@ void Ball_SetLie(Ball* pBall, SurfaceType* pSurface) {
         if (pLie->f04) {
             if (gSimulating || lbl_80281DD2) {
                 f = 0.0f;
-                r = 0;
+                rSign = 0;
             } else {
-                r = Rand_Next(0);
+                rSign = Rand_Next(0);
                 f = Rand_Float(0) - 0.5f * (0.01f * uLuck);
                 if (f < 0.0f) f = 0.0f;
                 f *= pLie->f04;
             }
-            if (r & 1) f = -f;
+            if (rSign & 1) f = -f;
             pBall->f70 = f;
         }
     }
