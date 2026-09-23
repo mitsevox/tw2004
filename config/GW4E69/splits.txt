@@ -1803,8 +1803,10 @@ runtime/printf.c:
 runtime/qsort.c:
 	.text       start:0x8015929C end:0x80159408
 
-runtime/sscanf.c:
-	.text       start:0x801594CC end:0x8015955C
+src/MSL_C/scanf.c:
+	.text       start:0x80159408 end:0x8015A450
+	.rodata     start:0x80185188 end:0x801851B0
+	.data       start:0x8019CBF0 end:0x8019CCC0
 
 src/MSL_C/PPCEABI/bare/H/string.c:
 	.text       start:0x8015A450 end:0x8015A8D0
