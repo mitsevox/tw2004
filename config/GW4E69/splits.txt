@@ -1843,23 +1843,8 @@ uiTransform.c:
 	.sbss       start:0x80281F38 end:0x80281F40
 	.sdata2     start:0x80283C20 end:0x80283C40
 
-unsorted/sweep_80093824.c:
-	.text       start:0x80093824 end:0x80093854
-
-unsorted/sweep_80093900.c:
-	.text       start:0x80093900 end:0x80093990
-
-unsorted/sweep_80093990.c:
-	.text       start:0x80093990 end:0x800939CC
-
-unsorted/sweep_800939CC.c:
-	.text       start:0x800939CC end:0x80093A04
-
-unsorted/sweep_80093AD4.c:
-	.text       start:0x80093AD4 end:0x80093AE0
-
-unsorted/sweep_80093D14.c:
-	.text       start:0x80093D14 end:0x80093D3C
+goballfx.c:
+	.text       start:0x80093524 end:0x80093D3C
 
 GoShaderObject_Particle_Gc.c:
 	.text       start:0x8009414C end:0x80095088
