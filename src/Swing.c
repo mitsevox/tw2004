@@ -3012,7 +3012,6 @@ void STATEFUNC_ShotSetupInit(int nPlayer) {
 
 
 void  fn_800170F4(int nView);
-void  fn_80017004(int nView);
 void  fn_80012EF0(void);
 void  fn_800171D8(f32 x, f32 y, f32 w, f32 h);
 void  fn_8003349C(f32 a, f32 b, f32 c);

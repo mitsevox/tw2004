@@ -150,6 +150,10 @@ The fixes that come up most often. Each points to its full entry below.
 
 ### Registers, declaration order and the stack
 
+- **[verified] A value computed before a call and kept in a saved register gets its own local.**
+  `nMoney *= 2;` puts the shift after the following call (58.5%); `s32 nPaid = nMoney * 2;` is
+  exact (Earnings `fn_800D39B4`). Reusing locals for a second value swaps float registers
+  (Earnings `fn_800D6A70`, 99.9% until separate locals).
 - **[verified] Locals take the higher volatile registers in declaration order; compiler
   temporaries take the lower ones.** In GetHonors' sort all 5040 orders of 7 variables gave two
   outcomes: only the relative order of `nScore` and `nHigh` mattered.
@@ -416,6 +420,10 @@ The fixes that come up most often. Each points to its full entry below.
 
 ### Compares and conditions
 
+- **[verified] `return !(x == -1);` and `return x != -1;` end in a different instruction order**
+  (GameMode11 `fn_80100798`, 93.9% -> 100).
+- **[verified] A two-value choice `h = (n == 2) ? 6 : 7` compiles branch-free (`subi/nor/srawi`);**
+  the original's `li 7; bne; li 6` is `h = 7; if (n == 2) h = 6;` (GameMode11 `fn_80100C08`).
 - **[verified] A boolean chain assigned to an `int` keeps the original's register order where
   `if (...) b = 1;` does not**: `bDown = (A || B) && (C || D) && (E || F);` (GameMode8
   `fn_800FCC38`, 98.9% -> 100).
@@ -501,6 +509,8 @@ The fixes that come up most often. Each points to its full entry below.
 
 ### Inlining and inline helpers
 
+- **[verified] An inline helper that reads a global itself, rather than being passed it,
+  changes register choice** (GameMode11 `fn_80100C08`'s hint helper).
 - **[verified] An inline helper that takes a value by pointer changes register choice.** The
   GetHonors sort append matched only as `static inline void AddIfScore(s32* aList, int* pnCount,
   ...) { if (...) { aList[*pnCount] = nPlayer; (*pnCount)++; } }` (Stableford `fn_800FE3FC`,

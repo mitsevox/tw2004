@@ -50,6 +50,7 @@ u8   fn_80014300(u32 uMask);            // any pad pressed these buttons
 // ---- views, events, sound, animation ---------------------------------------------------------
 
 u8*  fn_80016CFC(int nView);
+void* fn_80017004(int nView);
 void* fn_80017028(int nView);           // the view
 void fn_8001704C(int nView, int nPlayer);   // attach a player
 void fn_800170C4(int nView, int a);
@@ -70,6 +71,8 @@ void View_SetCamera(void* pView, int nCamera, int nPlayer, int nView);
 void fn_80063B98(void* pView, f32 f, f32* pVec);
 void fn_80063BF4(void* pView, f32 f, f32* pVec);
 u8   fn_80063C90(void* pView);          // the camera is still moving
+void fn_8006434C(void* pView, f32* pPos, f32* pX, f32* pY, int a);   // a world position on screen (0..1)
+void fn_8006A8D4(void* pView, f32* pX, f32* pY);
 void EVENT_Trigger(int nPlayer, int nEvent, int a, int b);    // through the event table at lbl_80188628
 void fn_800689D4(int nPlayer);
 void fn_80069330(int nPlayer, f32* pPos);
