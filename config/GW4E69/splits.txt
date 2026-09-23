@@ -117,17 +117,8 @@ unsorted/sweep_8000B058.c:
 unsorted/sweep_8000B078.c:
 	.text       start:0x8000B078 end:0x8000B0D4
 
-unsorted/sweep_8000B244.c:
-	.text       start:0x8000B244 end:0x8000B264
-
-unsorted/sweep_8000B2B8.c:
-	.text       start:0x8000B2B8 end:0x8000B30C
-
-unsorted/sweep_8000B30C.c:
-	.text       start:0x8000B30C end:0x8000B318
-
-unsorted/sweep_8000B3E8.c:
-	.text       start:0x8000B3E8 end:0x8000B428
+urandom.c:
+	.text       start:0x8000B130 end:0x8000B46C
 
 unsorted/sweep_8000B4B0.c:
 	.text       start:0x8000B4B0 end:0x8000B4B8
