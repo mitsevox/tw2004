@@ -619,6 +619,26 @@ typedef struct AITarget {
     s8   nPowerReq;             // 0x0B
 } AITarget;
 
+// A player's emotion state (our name; 0x24 bytes, one per player at lbl_801D5F78): what the golfer
+// feels about the last shot, which picks his reaction (TW06's emotion.c, golf/ai/emotion.c).
+typedef struct PlayerEmotion {
+    s32  n0;                    // 0x00  0 or 1 from the shot's outcome (fn_8006AAB4), 2 on the green
+    s32  n4;                    // 0x04  0..3 from the shot's outcome
+    s32  n8;                    // 0x08  the shot's outcome as reported
+    s32  nC;                    // 0x0C  n0, n4 and n8 kept after the shot
+    s32  n10;                   // 0x10
+    s32  n14;                   // 0x14  how the shot turned out (0..4, 8+; fn_8006AA9C)
+    s32  n18;                   // 0x18  0..3, the reaction to play (fn_8006B250)
+    u8   b1C;                   // 0x1C
+    u8   b1D;                   // 0x1D
+    u8   b1E;                   // 0x1E  read once, then cleared (fn_8006BAD8)
+    u8   b1F;                   // 0x1F
+    s32  n20;                   // 0x20  -1 = none
+} PlayerEmotion;
+LAYOUT_ASSERT(PlayerEmotion, 0x24);
+
+extern PlayerEmotion lbl_801D5F78[5];   // per player
+
 extern GolferRecord gGolferTable[34];   // 0x801CB300  STATS_GC.BIN as loaded
 extern GolferRecord gCurGolferRecord;   // 0x801CB1C0  the created golfer being edited
 extern Player       gPlayers[5];        // 0x801C66E8
