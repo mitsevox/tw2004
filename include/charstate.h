@@ -21,7 +21,7 @@ void  fn_8001EA34(u32* aBits, u32 n);
 void  fn_8001EB6C(u32* aBits, u32 n);
 u8    fn_8001E9F4(u32* aA, u32* aB, u32 nBits);  // two bit arrays share a set bit
 
-// 4-vectors (the quaternion copy, fn_8001E85C, is declared with the skeleton code).
+// 4-vectors (the quaternion copy, fn_8001E85C, is in character.h).
 void  fn_8001E880(f32* pSrc, f32* pDst);  // a point to a 4-vector with w = 1
 f32   fn_8001EEA4(f32* pA, f32* pB);      // dot product
 
