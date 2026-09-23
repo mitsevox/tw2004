@@ -208,6 +208,14 @@ extern s32       lbl_80281DC4;        // free-drop networks loaded
 extern s32       lbl_80281DC8;        // out-of-bounds networks loaded
 
 CourseInfo* fn_8000C594(void);          // the current hole's terrain data
+u8   Course_RegisterLoader(int nChunk, void (*pfn)(u8*));   // 0x8000C0B4: pfn gets the hole's chunk nChunk
+s32  fn_8000C140(f32* pPos, TNetwork* pNet, s32 nNodes);   // point in outline. TW06: wn_PnPoly
+s32  Ter_iNumOOBNetworksLoaded(void);
+
+// target.c: placing the ball (TW06's PlaceBall_* functions, names not proven here)
+u8   fn_80069218(f32* pPos);            // a ball may be placed here. TW06: PlaceBall_IsValidDropLocation?
+u8   fn_80069428(f32* pPos);            // the point is in bounds. TW06: PlaceBall_CheckInBounds?
+TNetwork* fn_80069498(void);            // the hole's placement outline (lbl_80281E30), if any
 SurfaceType* fn_800CC190(CourseInfo* pCourse, f32* pPos);   // surface type under a point
 f32  Terrain_HeightAt(f32* pPos, SurfaceType** ppSurface);   // 0x800447DC
 
