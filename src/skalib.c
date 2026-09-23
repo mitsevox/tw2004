@@ -84,6 +84,8 @@ void  fn_800B6594(u32 uAram);                          // ARAM free
 void  fn_800B6844(void* pSrc, u32 uAram, u32 uSize);   // copy to ARAM
 void  fn_800B68B4(void* pDst, u32 uAram, u32 uSize);   // copy from ARAM
 void  fn_800B67EC(void);                               // wait for the ARAM copy
+void  fn_80020BC8(void* pClip);                        // swaps a clip in place
+void  fn_80020F60(struct Clip* pClip, u32 uAram);
 void  AnimLib_Free(AnimLib* pLib);
 void  fn_800269E4(struct LibOverlay* pOv, int nSlot, s32 n);
 void  fn_800CA9DC(int nSlot);
@@ -103,7 +105,7 @@ typedef struct LibOverlay {
     AnimLib* pWork;             // 0x00  the loaded (swapped) copy
     void*  pCopy;               // 0x04  the file as it came off the disc
     u32    nSize;               // 0x08
-    struct { s32 n0; s32 n4; }* p0C;  // 0x0C
+    struct CharObj* pChar;      // 0x0C  the golfer it was loaded for
     s32    n10;                 // 0x10
     s32    n14;                 // 0x14
     u8     bActive;             // 0x18
@@ -122,13 +124,55 @@ typedef struct LibSlot {
     u8*        pEnd;            // 0x154  the end of the slot's clip bank records
 } LibSlot;
 
-// The start of a clip (only the fields read here).
+// A clip's header (the fields used here). In a file, pD0 marks the end of the header and
+// uAram points at the end of the key data; once a clip's frames are streamed out, uAram is
+// their ARAM address and flag 4 is set.
 typedef struct Clip {
-    u32    uFlags;              // 0x00  4: its data is in ARAM
-    u8     unk04[0x9C];
-    char   name[0x3C];          // 0xA0
+    u32    uFlags;              // 0x00  4: its frame data is in ARAM
+    s32    n04;                 // 0x04  bytes of the second frame stream
+    u8     unk08[4];
+    s16    nFrames;             // 0x0C
+    u8     unk0E[0xE];
+    s32    n1C;                 // 0x1C
+    u8     unk20[0xC];
+    s32    n2C;                 // 0x2C
+    u8     unk30[8];
+    s32    n38;                 // 0x38  bytes of the first frame stream
+    s32    n3C;                 // 0x3C
+    s32    n40;                 // 0x40
+    u8     unk44[8];
+    s32    n4C;                 // 0x4C
+    s32    n50;                 // 0x50
+    u8     unk54[0x10];
+    s32    n64;                 // 0x64
+    u8     unk68[0x24];
+    s16    n8C;                 // 0x8C  halfwords per frame, first stream
+    s16    n8E;                 // 0x8E  bytes per frame, second stream
+    u8     unk90[0x10];
+    char   name[0x30];          // 0xA0
+    u8*    pD0;                 // 0xD0
+    u8     unkD4[8];
     u32    uAram;               // 0xDC
+    u8     unkE0[4];
+    u8*    pE4;                 // 0xE4
+    u8     unkE8[4];
+    u8*    pEC;                 // 0xEC
+    u8*    pF0;                 // 0xF0
+    u8*    pF4;                 // 0xF4
+    u8*    pF8;                 // 0xF8
+    u8*    pFC;                 // 0xFC
 } Clip;
+
+// A golfer's character object (the fields used here).
+typedef struct CharObj {
+    u8                 unk00[4];
+    s32                n4;          // 0x004
+    u8                 unk08[0x2C];
+    u32                nSlot;       // 0x034  the animation slot it uses
+    u8                 unk38[0x3A0];
+    struct AnimLib*    pLib;        // 0x3D8  its animation library
+    struct ClipRecord* pRecords;    // 0x3DC  records for its merged library
+} CharObj;
 
 extern ClipBank*   lbl_801C6050[3];   // the clip bank of each slot
 extern AnimLib*    lbl_801C605C[3];   // the library of each slot, when its clips are in the bank
@@ -1291,6 +1335,223 @@ void Skalib_ScratchFromAram(int n) {
     }
 }
 
+// Copies the clips an overlay library adds into its slot's clip bank (header, keys and curves in
+// main memory, the per-frame data streamed out to ARAM), then, for a golfer's own overlay
+// (nSlot >= 3: the id the overlay was loaded under), builds the merged library into the
+// golfer's character object. Returns 0x2800 for a golfer's overlay, else 0.
+s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
+    u8*         pClipSrc;
+    LibSlot*    pSlot;
+    LibOverlay* pOv;
+    ClipBank*   pBank;
+    AnimLib*    pSrc;
+    u8*         pEnd;
+    u32         uAram;
+    s32         nStride1;
+    s32         nStride2;
+    u8*         pSrc1;
+    u8*         pSrc2;
+    int         f;
+    s32         nCopied;
+    s32         n4C;
+    s32         n50;
+    s32         nHdr;
+    u32         uPad;
+    s32         n;
+    u8*         pOut;
+    s32         n50Al;
+    AnimLib*    pNew;
+    CharObj*    pChar;
+    s32         nSize;
+    Clip*       pHdr;
+    ClipRecord* pRec;
+    s32*        pUsed;
+    int         i;
+    s32         nRet = 0;
+    AnimLib*    pLibFile;
+    u32         k;
+    u32         uAramStart;
+    s32         n4CAl;
+    BuildCtx    ctx;
+    u32         o;
+    int         j;
+    int         p;
+    u8          bFound;
+    u32         s;
+    Player*     pPlayer;
+
+    if (nSlot < 3) {
+        k        = nSlot;
+        pSlot    = &lbl_801C6068[nSlot];
+        pLibFile = pSlot->pLib;
+        pSrc     = pLibFile;
+    } else {
+        for (k = 0; k < 3; k++) {
+            pSlot = &lbl_801C6068[k];
+            for (j = 0; j < pSlot->nOverlays; j++) {
+                pOv = &pSlot->overlays[j];
+                if (pOv->n10 == nSlot) {
+                    k       = pOv->pChar->nSlot;
+                    pOv->n10 = -1;
+                    goto found;
+                }
+            }
+        }
+    found:
+        pLibFile = pSlot->pLib;
+        pSrc     = pOv->pWork;
+    }
+    if (pSrc != NULL && pSlot->nOverlays != 0) {
+        u32 aPad[4] = {0, 0, 0, 0};
+
+        pBank = lbl_801C6050[k];
+        pUsed = &lbl_801C6008[k].n04;
+        pEnd  = pSlot->pEnd;
+        for (i = 0; i < pSrc->nRecords; i++) {
+            pRec = &pSrc->pRecords[i];
+            if (pRec->n10 <= 0 || pRec->n18 == 0) continue;
+            pBank->ppClips[pSlot->n150] = pEnd;
+            fn_80020BC8(pData + (u32)pSrc->pRecords[i].pClip);
+            pClipSrc = pData + (u32)pSrc->pRecords[i].pClip;
+            pHdr     = (Clip*)pEnd;
+            nHdr     = ((Clip*)pClipSrc)->pD0 - pClipSrc;
+            fn_80005628(pEnd, pClipSrc, nHdr);
+            nCopied = nHdr;
+            pOut    = pEnd + nHdr;
+            if (((Clip*)pClipSrc)->n2C != 0) {
+                fn_80005628(pOut, ((Clip*)pClipSrc)->pD0, ((Clip*)pClipSrc)->n2C);
+                pOut += ((Clip*)pClipSrc)->n2C;
+                nCopied = nHdr + ((Clip*)pClipSrc)->n2C;
+            }
+            uPad = 16 - ((u32)pOut & 15);
+            if (uPad == 16) uPad = 0;
+            if (uPad != 0) {
+                fn_80005628(pOut, aPad, uPad);
+                pOut += uPad;
+                nCopied += uPad;
+            }
+            n = ((Clip*)pClipSrc)->n40 + ((Clip*)pClipSrc)->n3C;
+            fn_80005628(pOut, (u8*)((Clip*)pClipSrc)->uAram - n, n);
+            pOut += n;
+            nCopied += n;
+            if (((Clip*)pClipSrc)->n64 != 0) {
+                fn_80005628(pOut, ((Clip*)pClipSrc)->pF4, pHdr->n64);
+                pHdr->pF4 = pOut;
+                pOut += pHdr->n64;
+                nCopied += pHdr->n64;
+            } else {
+                pHdr->pF4 = NULL;
+            }
+            n = (pHdr->n1C * 2 + 31) / 32 * 4;
+            fn_80005628(pOut, ((Clip*)pClipSrc)->pF8, n);
+            pHdr->pF8 = pOut;
+            pOut += n;
+            nCopied += n;
+            fn_80005628(pOut, ((Clip*)pClipSrc)->pFC, n);
+            pHdr->pFC = pOut;
+            nCopied += n;
+            nStride1 = pHdr->n8C * 2;
+            if (nStride1 & 31) nStride1 = ((nStride1 >> 5) + 1) << 5;
+            nStride2 = pHdr->n8E;
+            if (nStride2 & 31) nStride2 = ((nStride2 >> 5) + 1) << 5;
+            pSrc1      = (u8*)((Clip*)pClipSrc)->uAram;
+            pSrc2      = ((Clip*)pClipSrc)->pE4;
+            pHdr->n38  = nStride1 * pHdr->nFrames;
+            pHdr->n04  = nStride2 * pHdr->nFrames;
+            n4C        = pHdr->n4C;
+            n4CAl      = n4C;
+            if (n4C & 31) n4CAl = ((n4C >> 5) + 1) << 5;
+            n50   = pHdr->n50;
+            n50Al = n50;
+            if (n50 & 31) n50Al = ((n50 >> 5) + 1) << 5;
+            uAram      = fn_800B6564(pHdr->n38 + pHdr->n04 + n50Al + n4CAl);
+            uAramStart = uAram;
+            if (pHdr->n38 != 0) {
+                for (f = 0; f < pHdr->nFrames; f++) {
+                    fn_80005628(lbl_80281CC8, pSrc1, pHdr->n8C * 2);
+                    fn_800B6844(lbl_80281CC8, uAram, nStride1);
+                    fn_800B67EC();
+                    uAram += nStride1;
+                    pSrc1 += pHdr->n8C * 2;
+                }
+            }
+            if (pHdr->n04 != 0) {
+                for (f = 0; f < pHdr->nFrames; f++) {
+                    fn_80005628(lbl_80281CC4, pSrc2, pHdr->n8E);
+                    fn_800B6844(lbl_80281CC4, uAram, nStride2);
+                    fn_800B67EC();
+                    uAram += nStride2;
+                    pSrc2 += pHdr->n8E;
+                }
+            }
+            pHdr->n8C = nStride1 / 2;
+            pHdr->n8E = nStride2;
+            if (n50 != 0) {
+                fn_80005628(lbl_80281CCC, ((Clip*)pClipSrc)->pEC, pHdr->n50);
+                fn_800B6844(lbl_80281CCC, uAram, n50Al);
+                fn_800B67EC();
+                uAram += n50Al;
+            }
+            pHdr->n50 = n50Al;
+            if (n4C != 0) {
+                fn_80005628(lbl_80281CD0, ((Clip*)pClipSrc)->pF0, pHdr->n4C);
+                fn_800B6844(lbl_80281CD0, uAram, n4CAl);
+                fn_800B67EC();
+            }
+            pHdr->n4C = n4CAl;
+            fn_80020F60(pHdr, uAramStart);
+            pBank->uId += nCopied;
+            pEnd += nCopied;
+            *pUsed += nCopied;
+            pSrc->pRecords[i].pClip = pBank->ppClips[pSlot->n150];
+            pSrc->pRecords[i].n12 |= 8;
+            pSlot->n150++;
+        }
+        pSlot->pEnd = pEnd;
+        if (nSlot >= 3) {
+            nRet  = 0x2800;
+            pChar = pOv->pChar;
+            pNew  = pChar->pLib;
+            nSize = pSrc->nTreeSize + pSrc->nClips * 4 + sizeof(AnimLib);
+            fn_80005628(pNew, pSrc, 21 * 4);
+            pNew->n108      = pSrc->n108;
+            pNew->nDefault  = pSrc->nDefault;
+            pNew->pTree     = (u8*)pNew + sizeof(AnimLib);
+            pNew->ppClips   = (void**)(pNew->pTree + pSrc->nTreeSize);
+            pNew->pIndex    = NULL;
+            pNew->pFile     = pNew;
+            pNew->n12C      = nSize;
+            pNew->pClipData = NULL;
+            pNew->uFlags    = pSrc->uFlags;
+            pNew->nRecords  = 0;
+            pNew->nTreeSize = 0;
+            pNew->nClips    = 0;
+            pNew->pBank     = pBank;
+            if (pChar->pRecords == NULL) pChar->pRecords = fn_80009B34(pSrc->nClips * sizeof(ClipRecord), 2, 0, "skalib.c", 2943);
+            ctx.pLib     = pNew;
+            ctx.pRecords = pChar->pRecords;
+            AnimLib_WalkPair(pLibFile, pSrc, (AnimLibWalkFn)AnimLib_BuildCb, &ctx);
+            if (pNew->nTreeSize & 15) pNew->nTreeSize = ((pNew->nTreeSize >> 4) + 1) << 4;
+            pChar->pLib = pNew;
+        } else {
+            for (p = 0; p < gSession.nNumPlayers; p++) {
+                bFound = 0;
+                for (s = 0; s < 3; s++) {
+                    if (bFound) break;
+                    for (o = 0; o < lbl_801C6068[k].nOverlays; o++) {
+                        if ((u32)lbl_801C6068[k].overlays[o].pChar == (u32)gPlayers[p].nShotHandle) {
+                            bFound = 1;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+done:
+    return nRet;
+}
+
 // Frees the working copies of every slot's libraries (only the current slot's while
 // lbl_80281CE4 is set).
 void AnimLib_FreeWorkCopies(void) {
@@ -1351,7 +1612,7 @@ void AnimLib_ApplyOverlays(int nSlot) {
     if (n != 0) {
         pOv = pSlot->overlays;
         for (i = 0; i < n; pOv++, i++) {
-            if (pOv->bActive) fn_800269E4(pOv, nSlot, pOv->p0C->n4);
+            if (pOv->bActive) fn_800269E4(pOv, nSlot, pOv->pChar->n4);
         }
     }
 }
