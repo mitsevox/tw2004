@@ -176,7 +176,6 @@ void  fn_80036100(u8* pMesh, void* pDesc, int n);
 void  fn_800360D4(u8* pMesh);
 void  fn_80008BB8(f32* pOut, f32 x, f32 y, f32 z);
 void  fn_80098C70(void);
-int   fn_8001707C(int nView);                    // the player a view belongs to
 void  GOLFERSTATE_Pop(int nPlayer);
 void  fn_80067710(int nPlayer, int a, int b);
 s8    GOLFERSTATE_GetPreviousState(int nPlayer);  // the state below the top of the stack

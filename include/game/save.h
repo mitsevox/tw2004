@@ -123,9 +123,10 @@ LAYOUT_ASSERT(TourSeason, 0x4E9C);
 // A saved custom round (0x70 bytes): 18 holes, each a hole number and the course it is from.
 // A new profile has three, emptied by the profile setup at 0x80057C88.
 typedef struct SavedRound {
-    u8   unk0;                  // 0x00  cleared by the setup
+    s8   n0;                    // 0x00  cleared by the setup; set by a menu message (fn_80083860)
     char szName[0x14];          // 0x01  the round's name, shown as its course (GameUICommands.c)
-    u8   b15;                   // 0x15  set to 1 by the setup
+    s8   n15;                   // 0x15  set to 1 by the setup; menu messages set and read it
+                                //       (read signed: fn_80080C2C)
     s8   nHoleNum[18];          // 0x16  -1 = none
     s32  nCourse[18];           // 0x28
 } SavedRound;
@@ -176,8 +177,14 @@ typedef struct SaveProfile {
     s32  nA0;                   // 0x000A0  the longest of those drives
     s32  nA4;                   // 0x000A4  the longest putt, in feet (fn_800D8FE4)
     s32  nA8;                   // 0x000A8  the best stroke-play round (0: none yet)
-    u8   unkAC[0xC8 - 0xAC];
-    TourWin aC8[31];            // 0x000C8  one per PGA TOUR tournament
+    s32  nAC;                   // 0x000AC  } read by menu messages (FE_MessageTable.c)
+    s32  nB0;                   // 0x000B0  }
+    s32  nB4;                   // 0x000B4  }
+    s32  nB8;                   // 0x000B8  }
+    s32  nBC;                   // 0x000BC  }
+    s32  nC0;                   // 0x000C0  }
+    s32  nC4;                   // 0x000C4  }
+    TourWin aC8[31];           // 0x000C8  one per PGA TOUR tournament
     struct {
         u8 b;
         u8 unk1[3];

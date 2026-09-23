@@ -1673,7 +1673,6 @@ void Luck_TakePerfectShot(int nPlayer) {
 #define BAG_DEFAULT  0x01FFFC7F     // a bag with no clubs 7, 8, 9 (the 3-, 4-, 5-woods?) or 25
 
 
-u8    fn_800170A0(int nView);                                   // the view exists
 void  fn_80016D18(int nView, f32 x, f32 y, f32 w, f32 h);       // open it (screen fractions)
 void  fn_80009710(f32* pQuat);                                  // identity (0, 0, 0, 1)
 void  fn_8005CE70(int nPlayer);

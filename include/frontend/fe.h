@@ -240,7 +240,8 @@ void fn_80084FF0(int n);                // sets lbl_80281FFC
 
 extern char* lbl_80191990[30];          // per course: a string the menus show (a replay's course
                                         // picks it)
-extern s32 lbl_80281FFC;                // set by fn_80084FF0
+extern s32 lbl_80281FFC;                // set by fn_80084FF0: the lbl_8018C7D8 set (memcard.h) the
+                                        // menus' memory-card messages use
 
 // ---- the logo editor (FE_LogoDesign.c) -------------------------------------------------------
 
