@@ -61,16 +61,9 @@ typedef struct RTEData {
 } RTEData;
 extern RTEData gRTEs;
 
-void  GM_vCloseModuleONCE(void);
-void  fn_800EAA40(void);
-void  fn_800E0B38(int nMode);
 void  fn_800EC544(RTEChallenge* pList, s32 n);   // Challenge* in GameMode5.c
-void  fn_800EAE38(s32 i);
-void  fn_800EAF7C(void);
-int   fn_800EC558(void);
 void  fn_800D7770(int nPlayer, u8* pFlag);
 void  fn_8011E020(s32* pMonth, s32* pDay, s32* pYear, s32* pHour, s32* pMinute, s32* pSecond, s32* pMsec);
-void  fn_800D2714(u16* pDate, s32* pMonth, s32* pDay, s32* pYear);
 void  fn_800D2678(u16* pDate, s32 nMonth, s32 nDay, s32 nYear);
 extern void (*lbl_8028235C)(void);
 extern void (*lbl_80282358)(void);

@@ -126,6 +126,12 @@ def changed_lines(rev):
         if m and cur:
             a, n = int(m.group(1)), int(m.group(2) or 1)
             res[cur].update(range(a, a + n))
+    # untracked files (a new unit before `git add`) are all new lines
+    new = subprocess.run(['git', 'ls-files', '--others', '--exclude-standard', '--', 'src'], cwd=ROOT,
+                         capture_output=True, text=True).stdout.split()
+    for f in new:
+        n = len((ROOT / f).read_text(encoding='utf-8', errors='replace').split('\n'))
+        res[pathlib.Path(f).name] = set(range(1, n + 1))
     return res
 
 

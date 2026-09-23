@@ -1,9 +1,7 @@
 // CharClip.c (our name): choosing the clip a character plays.
 
 #include "golfer.h"
-
-void* AnimLib_Pick(int nPlayer, void* pLib, int nGroup, int nStyle, int nClub, int nKey, u32* pFlags,
-                   const char* pName);
+#include "engine.h"
 
 // Pick the character's clip for an animation group and style from its animation library, keyed
 // also by the character's club class (+0x169C; class 1 looks up as 0) and +0x16D4. The lookup's
