@@ -897,10 +897,10 @@ void GOLFERSTATE_Pop(int nPlayer) {
 
 // Pop everything and start again from one state.
 void GOLFERSTATE_Set(int nState, int nPlayer) {
+    s8*         pTop;
     SwingStack* pStack = &gSwingStacks[nPlayer];
     void (*pfn)(int);
-    {
-        s8* pTop = &pStack->nTop;
+    pTop = &pStack->nTop;
     while (*pTop > -1) {
         if (sGolferStateEngineTable[(s8)pStack->nState[*pTop]].pfnExit != NULL) {
             gInSwingExit = 1;
@@ -909,10 +909,9 @@ void GOLFERSTATE_Set(int nState, int nPlayer) {
         }
         (*pTop)--;
     }
-    }
-    pStack->nTop = 0;
-    pStack->nState[pStack->nTop] = nState;
-    pfn = sGolferStateEngineTable[pStack->nState[pStack->nTop]].pfnEnter;
+    gSwingStacks[nPlayer].nTop = 0;
+    gSwingStacks[nPlayer].nState[gSwingStacks[nPlayer].nTop] = nState;
+    pfn = sGolferStateEngineTable[gSwingStacks[nPlayer].nState[gSwingStacks[nPlayer].nTop]].pfnEnter;
     if (pfn != NULL) {
         gInSwingExit = 1;
         pfn(nPlayer);
@@ -922,16 +921,15 @@ void GOLFERSTATE_Set(int nState, int nPlayer) {
 
 // Replace the current state: its exit, then the new state's enter.
 void GOLFERSTATE_Switch(int nState, int nPlayer) {
-    SwingStack* pStack = &gSwingStacks[nPlayer];
-    s8*         pTop   = &pStack->nTop;
-    void (*pfn)(int)   = sGolferStateEngineTable[pStack->nState[pStack->nTop]].pfnExit;
+    void (*pfn)(int);
+    pfn = sGolferStateEngineTable[gSwingStacks[nPlayer].nState[gSwingStacks[nPlayer].nTop]].pfnExit;
     if (pfn != NULL) {
         gInSwingExit = 1;
         pfn(nPlayer);
         gInSwingExit = 0;
     }
-    pStack->nState[*pTop] = nState;
-    pfn = sGolferStateEngineTable[pStack->nState[*pTop]].pfnEnter;
+    gSwingStacks[nPlayer].nState[gSwingStacks[nPlayer].nTop] = nState;
+    pfn = sGolferStateEngineTable[gSwingStacks[nPlayer].nState[gSwingStacks[nPlayer].nTop]].pfnEnter;
     if (pfn != NULL) {
         gInSwingExit = 1;
         pfn(nPlayer);
@@ -3102,25 +3100,26 @@ void STATEFUNC_InitialFlyByInit(int nPlayer) {
     }
 }
 
-// State 22: arriving at the ball for a new shot. The ball is put on the ground (the higher of
-// two surface heights if it is more than 0.25 above the ball), Shot_Plan with the HUD told, the
-// think timer cleared, camera 8, boost and spin reset.
+// State 22: arriving at the ball for a new shot. The ball is put on the ground: the upper of the
+// two ground heights under it, unless there is none or it is more than 0.25 above the ball; then
+// the lower one (or the ball's own height if that is missing too). Then Shot_Plan with the HUD
+// told, the think timer cleared, camera 8, boost and spin reset.
 void STATEFUNC_PlaceBallInit(int nPlayer) {
-    f32*  pBallPos;
-    f32   fTmp[4];
-    f32   fHeightA, fHeightB;
-    int   i;
+    f32         fTmp[4];
+    f32         fLow, fHigh;
+    int         i;
+    CourseInfo* pCourse;
 
     gSession.bReplay = 0;
-    pBallPos = &gPlayers[nPlayer].fBallX;
-    Vec3Copy((f32*)gPlayers[nPlayer].ball, pBallPos);
-    if (fn_8000C594() != NULL) {
+    Vec3Copy((f32*)gPlayers[nPlayer].ball, &gPlayers[nPlayer].fBallX);
+    pCourse = fn_8000C594();
+    if (pCourse != NULL) {
         f32 fY;
-        Ter_GetEnclosingGroundHeight(fn_8000C594(), pBallPos, &fHeightA, &fHeightB);
-        fY = fHeightB;
-        if (-65536.1f == fHeightB || fHeightB <= 0.25f + gPlayers[nPlayer].fBallY) {
-            fY = fHeightA;
-            if (-65536.1f == fHeightA) {
+        Ter_GetEnclosingGroundHeight(pCourse, &gPlayers[nPlayer].fBallX, &fLow, &fHigh);
+        fY = fHigh;
+        if (-65536.1f == fHigh || fHigh > 0.25f + gPlayers[nPlayer].fBallY) {
+            fY = fLow;
+            if (-65536.1f == fLow) {
                 fY = gPlayers[nPlayer].fBallY;
             }
         }
@@ -3143,7 +3142,7 @@ void STATEFUNC_PlaceBallInit(int nPlayer) {
     }
     fn_80045824(nPlayer);
     View_SetCamera(fn_80017028(gPlayers[nPlayer].nView0), 8, nPlayer, gPlayers[nPlayer].nView0);
-    Vec_Copy(pBallPos, fTmp);
+    Vec_Copy(&gPlayers[nPlayer].fBallX, fTmp);
     fn_80069330(nPlayer, fTmp);
     fn_8006A6C4(nPlayer);
     Swing_ResetBoostAndSpin(nPlayer);
@@ -3969,7 +3968,9 @@ void GOLFERSTATE_Push(int nState, int nPlayer);   // another stack operation
 // are cleared; sound 7.
 void STATEFUNC_SwingInit(int nPlayer) {
     View* pV    = (View*)fn_80017028(gPlayers[nPlayer].nView0);
-    int   nView, i;
+    int   nView;
+    u8*   pBall;
+    int   i;
 
     if (pV->nCurCamera == 0 && Player_IsCPU(nPlayer) && Game_GetMode() != 11) {
         fn_800957D8(gPlayers[nPlayer].nShotHandle);
@@ -3979,7 +3980,7 @@ void STATEFUNC_SwingInit(int nPlayer) {
     fn_8001C724(gPlayers[nPlayer].nShotHandle, gPlayers[nPlayer].nShotKind);
     fn_80062BFC(gPlayers[nPlayer].nShotHandle);
     fn_80062BE8(gPlayers[nPlayer].nShotHandle);
-    fn_8007326C((u8*)gPlayers[nPlayer].nShotHandle + 0x164);
+    fn_8007326C(((ShotObj*)gPlayers[nPlayer].nShotHandle)->anim);
     if (gPlayers[nPlayer].swing.unk630 == 0) {
         fn_80058FA4(nPlayer);
         gPlayers[nPlayer].swing.unk630 = 1;
@@ -4029,12 +4030,14 @@ void STATEFUNC_SwingInit(int nPlayer) {
     if (gPlayers[nPlayer].nLie == 0) {
         fn_80047EF0(gPlayers[nPlayer].ball, nPlayer, 1);
         for (i = 0; i < gSession.nNumPlayers; i++) {
-            fn_80047B6C(gPlayers[i].ball, i);
-            fn_80047BC0(gPlayers[i].ball, i);
+            pBall = PLAYER(i)->ball;
+            fn_80047B6C(pBall, i);
+            fn_80047BC0(pBall, i);
         }
     }
-    fn_80047B6C(gPlayers[nPlayer].ball, nPlayer);
-    fn_80047BC0(gPlayers[nPlayer].ball, nPlayer);
+    pBall = gPlayers[nPlayer].ball;
+    fn_80047B6C(pBall, nPlayer);
+    fn_80047BC0(pBall, nPlayer);
     gPlayers[nPlayer].unkC2E = 0;
     gPlayers[nPlayer].bPlanReady = 0;
     gPlayers[nPlayer].uFlags     = 0;
