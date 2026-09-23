@@ -1096,21 +1096,23 @@ void fn_800E3050(int nCourse) {
 // the back (never on neighbouring holes), then four par 5s the same way, then par 4s everywhere
 // else. Each hole comes from a random course, no hole twice, and every course is used once
 // before any is used again.
+// fake match: nCourse starts at 0 though every path sets it before use; without the initializer
+// the par-4 loop's registers come out differently (found by the permuter).
 void fn_800E30D4(void) {
     CourseList courses;
-    s8  holes[18];
+    u8  holes[18];      // the hole numbers (0..17) of the chosen par on the chosen course
     u8  bUsed[20];
     u32 slots[4];
     int nAvail = 0;
     int i;
     int k;
-    u32 nCourse;
+    u32 nCourse = 0;
     int n;
     u32 nPick;
     u32 nHole;
     int h;
     s8  nHoles;
-    s8* p;
+    u8* p;
 
     courses = lbl_80184D40;
     for (i = 0; i < 20; i++) {
@@ -1175,7 +1177,9 @@ void fn_800E30D4(void) {
                 nHoles++;
             }
         }
-        nHole = holes[Rand_Next(1) % nHoles];
+        // fake match: the original sign-extends the picked byte into a register of its own (the
+        // (s8) of a u8); a plain s8 array read loads straight into nHole's register
+        nHole = (s8)holes[Rand_Next(1) % nHoles];
         for (k = 0; k < n; k++) {
             if (nCourse == gpGame->nHoleCourse[slots[k]] && nHole == gpGame->nHoleNum[slots[k]]) {
                 // fake match: a retry jump, as the binary branches; structured retries untried
@@ -1234,7 +1238,7 @@ void fn_800E30D4(void) {
                 nHoles++;
             }
         }
-        nHole = holes[Rand_Next(1) % nHoles];
+        nHole = (s8)holes[Rand_Next(1) % nHoles];
         for (k = 0; k < n; k++) {
             if (nCourse == gpGame->nHoleCourse[slots[k]] && nHole == gpGame->nHoleNum[slots[k]]) {
                 // fake match: a retry jump, as the binary branches; structured retries untried
@@ -1278,7 +1282,7 @@ void fn_800E30D4(void) {
                     nHoles++;
                 }
             }
-            nHole = holes[Rand_Next(1) % nHoles];
+            nHole = (s8)holes[Rand_Next(1) % nHoles];
             for (k = 0; k < i; k++) {
                 if (nCourse == gpGame->nHoleCourse[k] && nHole == gpGame->nHoleNum[k]) {
                     // fake match: a retry jump, as the binary branches; structured retries untried
