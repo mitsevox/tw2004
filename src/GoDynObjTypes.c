@@ -16,10 +16,10 @@ void fn_8004ABBC(DynObj* pObj, DynObjSetup* pSetup) {
     DynObjModelRef* pModel;
 
     pObj->n168 = 0;
-    pObj->b138 = 0;
-    pObj->b13A = 0;
-    pObj->b13C = 0;
-    pObj->b13E = 0;
+    pObj->a138[0].b0 = 0;
+    pObj->a138[1].b0 = 0;
+    pObj->a138[2].b0 = 0;
+    pObj->a138[3].b0 = 0;
     pNames = pSetup->pC;
     pDef = pSetup->pDef;
     if (pNames != NULL) {
@@ -60,17 +60,17 @@ void fn_8004ABBC(DynObj* pObj, DynObjSetup* pSetup) {
         nFlags |= 0x40;
     }
     if (pModel != NULL) {
-        fn_800486F4(pObj->mObj, pModel->p4, nFlags);
+        fn_800486F4(&pObj->obj,pModel->p4, nFlags);
     } else {
-        fn_800486F4(pObj->mObj, NULL, nFlags);
+        fn_800486F4(&pObj->obj,NULL, nFlags);
     }
-    fn_8000ADC0(pObj->mObj);
-    fn_8000ADC0(pObj->m50);
-    fn_8000C5A4(pObj->mObj);
-    pObj->aPos[0] = pDef->aPos[0];
-    pObj->aPos[1] = pDef->aPos[1];
-    pObj->aPos[2] = pDef->aPos[2];
-    pObj->aPos[3] = 1.0f;
+    fn_8000ADC0(pObj->obj.m0);
+    fn_8000ADC0(pObj->obj.m40);
+    fn_8000C5A4(pObj->obj.m0);
+    pObj->obj.m80[3][0] = pDef->aPos[0];
+    pObj->obj.m80[3][1] = pDef->aPos[1];
+    pObj->obj.m80[3][2] = pDef->aPos[2];
+    pObj->obj.m80[3][3] = 1.0f;
     pObj->aRot[0] = 0.0f;
     pObj->aRot[1] = 0.0f;
     pObj->aRot[2] = 0.0f;
@@ -78,7 +78,7 @@ void fn_8004ABBC(DynObj* pObj, DynObjSetup* pSetup) {
     pObj->f158 = 0.0f;
 }
 
-int fn_8004AD54(int nMsg, DynObj* pObj, void* pArg) {
+int fn_8004AD54(int nMsg, DynObj* pObj, void* pArg, void* pArg2) {
     switch (nMsg) {
     case 1:
         return sizeof(DynObj);
@@ -88,8 +88,8 @@ int fn_8004AD54(int nMsg, DynObj* pObj, void* pArg) {
     case 6:
         return 0;
     case 3:
-        if (pObj->p100 != NULL) {
-            fn_80048894(pObj->mObj);
+        if (pObj->obj.pModel != NULL) {
+            fn_80048894(&pObj->obj);
         }
         return 0;
     default:
@@ -103,10 +103,10 @@ void fn_8004ADDC(DynObj* pObj, DynObjSetup* pSetup) {
     DynObjDef* pDef;
 
     pObj->n168 = 0;
-    pObj->b138 = 0;
-    pObj->b13A = 0;
-    pObj->b13C = 0;
-    pObj->b13E = 0;
+    pObj->a138[0].b0 = 0;
+    pObj->a138[1].b0 = 0;
+    pObj->a138[2].b0 = 0;
+    pObj->a138[3].b0 = 0;
     pNames = pSetup->pC;
     pDef = pSetup->pDef;
     if (pNames != NULL) {
@@ -135,14 +135,14 @@ void fn_8004ADDC(DynObj* pObj, DynObjSetup* pSetup) {
     if (pObj->uFlags & 0x400) {
         pObj->uFlags |= 0x02000000;
     }
-    fn_800486F4(pObj->mObj, NULL, 0);
-    fn_8000ADC0(pObj->mObj);
-    fn_8000ADC0(pObj->m50);
-    fn_8000C5A4(pObj->mObj);
-    pObj->aPos[0] = pDef->aPos[0];
-    pObj->aPos[1] = pDef->aPos[1];
-    pObj->aPos[2] = pDef->aPos[2];
-    pObj->aPos[3] = 1.0f;
+    fn_800486F4(&pObj->obj,NULL, 0);
+    fn_8000ADC0(pObj->obj.m0);
+    fn_8000ADC0(pObj->obj.m40);
+    fn_8000C5A4(pObj->obj.m0);
+    pObj->obj.m80[3][0] = pDef->aPos[0];
+    pObj->obj.m80[3][1] = pDef->aPos[1];
+    pObj->obj.m80[3][2] = pDef->aPos[2];
+    pObj->obj.m80[3][3] = 1.0f;
     pObj->aRot[0] = 0.0f;
     pObj->aRot[1] = 0.0f;
     pObj->aRot[2] = 0.0f;
@@ -154,7 +154,7 @@ void fn_8004ADDC(DynObj* pObj, DynObjSetup* pSetup) {
 void fn_8004AF28(DynObj* pObj, void* pArg) {
 }
 
-int fn_8004AF2C(int nMsg, DynObj* pObj, void* pArg) {
+int fn_8004AF2C(int nMsg, DynObj* pObj, void* pArg, void* pArg2) {
     switch (nMsg) {
     case 1:
         return sizeof(DynObj);

@@ -11,8 +11,7 @@ void fn_8000A194(f32 (*pMtx)[4], f32 a, f32 b, f32 c);  // a rotation matrix fro
 void fn_800BADF8(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
 void fn_8000C5A4(f32 (*pMtx)[4]);
 int  fn_8000EA1C(const char* pName, int a, int b, void* pObj);
-int  fn_80049ACC(int nMsg, DynObj* pObj, void* pArg);
-int  fn_8004AAEC(int nMsg, DynObj* pObj, void* pArg);
+int  fn_80049ACC(int nMsg, DynObj* pObj, void* pArg, void* pArg2);
 
 // Set flag 0x04000000 once; the first time, with bNotify, also run fn_800491C4. 1: it was set now.
 int fn_800496E0(DynObj* pObj, u8 bNotify, int nUnused) {
@@ -77,7 +76,7 @@ int fn_800497BC(DynObj* pObj, u32 nWhat) {
     }
 }
 
-int fn_80049820(int nMsg, DynObj* pObj, void* pArg) {
+int fn_80049820(int nMsg, DynObj* pObj, void* pArg, void* pArg2) {
     switch (nMsg) {
     case 1:
         return sizeof(DynObj);
@@ -86,14 +85,14 @@ int fn_80049820(int nMsg, DynObj* pObj, void* pArg) {
         return 0;
     case 3:
         // flag 0x200: not while the flagstick is out
-        if (pObj->p100 != NULL && (!(pObj->uFlags & 0x200) || !fn_80016CF4()->bFlagOut)) {
+        if (pObj->obj.pModel != NULL &&(!(pObj->uFlags & 0x200) || !fn_80016CF4()->bFlagOut)) {
             if (pObj->uFlags & 0x400) {
                 fn_80012F34(0);
             }
             if (pObj->uFlags & 0x800) {
                 fn_80012F50(0, 6, 0x80);
             }
-            fn_80048894(pObj->mObj);
+            fn_80048894(&pObj->obj);
             if (pObj->uFlags & 0x400) {
                 fn_80012F34(1);
                 fn_80012EF8();
@@ -107,7 +106,7 @@ int fn_80049820(int nMsg, DynObj* pObj, void* pArg) {
         }
         return 0;
     case 5:
-        fn_80048804(pObj->mObj);
+        fn_80048804(&pObj->obj);
         return 0;
     case 4:
         return fn_800496E0(pObj, 1, 1);
@@ -149,7 +148,7 @@ DynObjHandler fn_800499B0(int nType) {
 void fn_80049A14(DynObjTurning* pObj, DynObjSetup* pSetup) {
     DynObjDef* pDef = pSetup->pDef;
 
-    fn_80049514(&pObj->obj, pSetup);
+    fn_80049514(&pObj->base, pSetup);
     pObj->fSpeed = pDef->f1C;
 }
 
@@ -159,11 +158,11 @@ void fn_80049A54(DynObjTurning* pObj, void* pArg) {
 
     fn_8000ADC0(mTurn);
     fn_8000A194(mTurn, 2.0f * PI * (pObj->fSpeed / 360.0f) / 60.0f, 0.0f, 0.0f);
-    fn_800BADF8(pObj->obj.mObj, mTurn, pObj->obj.mObj, 4);
-    fn_8000C5A4(pObj->obj.mObj);
+    fn_800BADF8(pObj->base.obj.m0, mTurn, pObj->base.obj.m0, 4);
+    fn_8000C5A4(pObj->base.obj.m0);
 }
 
-int fn_80049ACC(int nMsg, DynObj* pObj, void* pArg) {
+int fn_80049ACC(int nMsg, DynObj* pObj, void* pArg, void* pArg2) {
     switch (nMsg) {
     case 1:
         return sizeof(DynObjTurning);
@@ -174,6 +173,6 @@ int fn_80049ACC(int nMsg, DynObj* pObj, void* pArg) {
         fn_80049A54((DynObjTurning*)pObj, pArg);
         return 0;
     default:
-        return fn_80049820(nMsg, pObj, pArg);
+        return fn_80049820(nMsg, pObj, pArg, pArg2);
     }
 }

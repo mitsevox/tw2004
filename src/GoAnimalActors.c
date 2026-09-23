@@ -2,39 +2,39 @@
 // course (ActAnimal_*). Not yet decompiled; the unit covers the file's certain core, whose
 // functions share its constant block (0x80283218-0x80283280).
 
-#include "game_types.h"
+#include "dynobj.h"
 
-// ---- sweep code (not yet cleaned up) ----
+void fn_8004A24C(DynObjAnimal* pAnimal, DynObjSetup* pSetup);  // message 2: sets it up
+void fn_8004A578(DynObjAnimal* pAnimal, void* pArg);            // message 6: pArg holds the frame
+                                                                // time's bits
 
-s32 fn_80048894(u8*);
-s32 fn_80049820();
-s32 fn_8004A24C(u8*, s32);
-s32 fn_8004A578(u8*, s32);
-s32 fn_8004AAEC(s32 arg0, u8* arg1, s32 arg2);
-s32 fn_8004ABA4(u8* p0, s32 p1);
-s32 fn_8004ABB4(u8* p);
-
-s32 fn_8004AAEC(s32 arg0, u8* arg1, s32 arg2) {
-    switch (arg0) {
+// Type 11's message handler; other messages go to type 0's.
+int fn_8004AAEC(int nMsg, DynObj* pObj, void* pArg, void* pArg2) {
+    switch (nMsg) {
     case 1:
-        return 0x1C0;
+        return sizeof(DynObjAnimal);
     case 2:
-        fn_8004A24C(arg1, arg2);
+        fn_8004A24C((DynObjAnimal*)pObj, pArg);
         return 0;
     case 6:
-        fn_8004A578(arg1, arg2);
+        fn_8004A578((DynObjAnimal*)pObj, pArg);
         return 0;
     case 3:
-        if ((u32) (*(u32*)((u8*)(arg1) + 0x100)) != 0U) {
-            (*(s32*)((u8*)(arg1) + 0x118)) = (s32) (*(s32*)((u8*)(arg1) + 0x1AC));
-            (*(f32*)((u8*)(arg1) + 0x11C)) = (f32) (*(f32*)((u8*)(arg1) + 0x1B4));
-            fn_80048894(arg1 + 0x10);
+        if (pObj->obj.pModel != NULL) {
+            pObj->obj.n108 = ((DynObjAnimal*)pObj)->n1AC;
+            pObj->obj.f10C = ((DynObjAnimal*)pObj)->f1B4;
+            fn_80048894(&pObj->obj);
         }
         return 0;
     default:
-        return fn_80049820();
+        return fn_80049820(nMsg, pObj, pArg, pArg2);
     }
 }
+
+// ---- sweep code (not yet cleaned up) ----
+
+s32 fn_8004ABA4(u8* p0, s32 p1);
+s32 fn_8004ABB4(u8* p);
 
 s32 fn_8004ABA4(u8* p0, s32 p1) {
     return *(s32*)(((u8*)*(s32*)(p0 + 0x8)) + (p1 << 2));
