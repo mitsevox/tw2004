@@ -74,8 +74,6 @@ void fn_800E0AF0(f32* pA, f32* pB, f32* pOut) {
 }
 #endif
 
-int   fn_80110180(void);                    // the current hole can be played (inferred)
-
 // The 20 course ids the mixed rounds pick from (lbl_80184D40).
 typedef struct CourseList {
     u32 a[20];

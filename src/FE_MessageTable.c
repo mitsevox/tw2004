@@ -34,12 +34,7 @@ int  fn_800D3D10(int nGolfer);          // Earnings.c: the golfer's rating
 int  fn_800E2520(int nMode);            // GameRound.c
 void fn_800E25E0(void);                 // GameRound.c
 void fn_800E30D4(void);                 // GameRound.c: builds the mixed rounds
-int  fn_80110180(void);
-s32  fn_8011027C(void);                 // DiscCheck.c
-int  fn_80110450(void);                 // DiscCheck.c (defined there as u8; callers here see int)
-u8*  fn_801104A0(void);                 // DiscCheck.c: the disc read's command block
 s32  DVDGetCommandBlockStatus(u8* pBlock);
-void fn_80110178(u8 v);                 // DiscCheck.c
 void fn_80101EE8(void);                 // GameMode11.c
 void fn_800EE2C8(void);                 // GameModeDriverPGATour.c
 u8*  fn_8010C718(void);                 // CharSliders.c
@@ -62,7 +57,6 @@ int  fn_801020C0(void);                 // GameMode4.c
 void fn_80102308(s32 n);                // GameMode4.c
 void fn_8010D334(s32 v);                // CharSliders.c
 void fn_8008DD34(int nSlot, int n);
-void fn_801102AC(void);
 s32  fn_8009FCFC(MCCardPos* pPos);      // MC.c: load the save from the card
 s32  fn_8009FE90(MCCardPos* pPos);      // } MC.c, in lbl_8018C7D8's set 0
 s32  fn_800A09EC(MCCardPos* pPos);      // }

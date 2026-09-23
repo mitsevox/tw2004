@@ -47,6 +47,7 @@ char*  strncpy(char* pDst, const char* pSrc, u32 uLen);
 char*  strcat(char* pDst, const char* pSrc);
 int    strcmp(const char* a, const char* b);
 int    strncmp(const char* a, const char* b, u32 uLen);
+int    stricmp(const char* a, const char* b);   // 0x8015F844 (MSL): strcmp ignoring case
 char*  strstr(const char* pStr, const char* pFind);
 char*  strchr(const char* pStr, int c);
 char*  strtok(char* pStr, const char* pDelim);
