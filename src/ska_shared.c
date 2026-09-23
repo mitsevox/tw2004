@@ -1,4 +1,10 @@
+// ska_shared.c (TW06's golf/animation/ska_shared.c): the skeletal animation code the golfer's
+// character shares: blending animation clips into bone rotations (quaternions) and reading the
+// clip banks. Not yet decompiled; the code below is the matched small functions.
+
 #include "game_types.h"
+
+// ---- sweep code (not yet cleaned up) ----
 
 void fn_800B68B4();
 void fn_8001FCA8(s32 p0, s32 p1);
@@ -31,3 +37,5 @@ f32 fn_80021A98(void* arg0) {
     }
     return lbl_80282CC0;
 }
+
+// ---- end of sweep code ----
