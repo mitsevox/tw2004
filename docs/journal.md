@@ -197,7 +197,7 @@ Dated log of what was done and decided, newest last. Facts and lessons belong in
   were rerun (same conclusions). Left: `fn_80052598` (bounce, saved-register choice across nine
   reused floats), `Ball_FlightStep` (one hoisted address), `Ball_SetLie` (one `beq; b` branch),
   `Ball_Collide` / `fn_80053240` (the owner chain's base pointer in r5, not r4). Permuter jobs
-  for all five were running at the end of the session (`C:\dev\scratch	w\perm\`).
+  for all five were running at the end of the session (`C:\dev\scratch\tw\perm\`).
 - **Next (agreed with the user, in this order):**
   1. ~~Putt test harness for hypothesis 6~~ (done, entry above). Build a host-side (PC) C or Python model of the roll
      physics now in C (`fn_80052268` skid, `Ball_GroundContact` roll incl. break = slope / (0.457
