@@ -2336,47 +2336,14 @@ unsorted/sweep_800B2250.c:
 unsorted/sweep_800B22D4.c:
 	.text       start:0x800B22D4 end:0x800B2314
 
-unsorted/sweep_800B2314.c:
-	.text       start:0x800B2314 end:0x800B235C
-
-unsorted/sweep_800B235C.c:
-	.text       start:0x800B235C end:0x800B2360
-
-unsorted/sweep_800B2438.c:
-	.text       start:0x800B2438 end:0x800B246C
-
-unsorted/sweep_800B246C.c:
-	.text       start:0x800B246C end:0x800B2470
-
-unsorted/sweep_800B2470.c:
-	.text       start:0x800B2470 end:0x800B24D0
-
 shadow.c:
-	.text       start:0x800B24E0 end:0x800B3438
-
-unsorted/sweep_800B3438.c:
-	.text       start:0x800B3438 end:0x800B3460
-
-unsorted/sweep_800B3484.c:
-	.text       start:0x800B3484 end:0x800B34F0
+	.text       start:0x800B2314 end:0x800B34F0
 
 GoComicCam.c:
-	.text       start:0x800B34F0 end:0x800B4AE0
+	.text       start:0x800B34F0 end:0x800B4B5C
 
 GoShaderObject_Rain_Gc.c:
-	.text       start:0x800B4B5C end:0x800B58B4
-
-unsorted/sweep_800B58B4.c:
-	.text       start:0x800B58B4 end:0x800B58C0
-
-unsorted/sweep_800B58C0.c:
-	.text       start:0x800B58C0 end:0x800B58D4
-
-unsorted/sweep_800B58D4.c:
-	.text       start:0x800B58D4 end:0x800B58E4
-
-unsorted/sweep_800B58E4.c:
-	.text       start:0x800B58E4 end:0x800B58FC
+	.text       start:0x800B4B5C end:0x800B5918
 
 unsorted/sweep_800B5934.c:
 	.text       start:0x800B5934 end:0x800B59BC
@@ -2385,7 +2352,7 @@ unsorted/sweep_800B59EC.c:
 	.text       start:0x800B59EC end:0x800B5A14
 
 UAudMemStack.c:
-	.text       start:0x800B5A14 end:0x800B5AAC
+	.text       start:0x800B5A14 end:0x800B5B80
 
 unsorted/sweep_800B5C30.c:
 	.text       start:0x800B5C30 end:0x800B5C40
@@ -2399,32 +2366,8 @@ unsorted/sweep_800B5F28.c:
 unsorted/sweep_800B6034.c:
 	.text       start:0x800B6034 end:0x800B6060
 
-unsorted/sweep_800B61B4.c:
-	.text       start:0x800B61B4 end:0x800B6214
-
-unsorted/sweep_800B6214.c:
-	.text       start:0x800B6214 end:0x800B62DC
-
 GoARAM.c:
-	.text       start:0x800B62DC end:0x800B64D8
-
-unsorted/sweep_800B64D8.c:
-	.text       start:0x800B64D8 end:0x800B655C
-
-unsorted/sweep_800B655C.c:
-	.text       start:0x800B655C end:0x800B6564
-
-unsorted/sweep_800B6564.c:
-	.text       start:0x800B6564 end:0x800B65C0
-
-unsorted/sweep_800B67B4.c:
-	.text       start:0x800B67B4 end:0x800B67EC
-
-unsorted/sweep_800B67EC.c:
-	.text       start:0x800B67EC end:0x800B6844
-
-unsorted/sweep_800B6844.c:
-	.text       start:0x800B6844 end:0x800B6924
+	.text       start:0x800B61B4 end:0x800B6924
 
 unsorted/sweep_800B6924.c:
 	.text       start:0x800B6924 end:0x800B694C
