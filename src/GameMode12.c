@@ -5,15 +5,11 @@
 // mode 0's.
 
 #include "golfer.h"
+#include "game.h"
 
-u8    fn_800E1BBC(void);
-void  fn_800E1480(int nHole);
-void  fn_800D3548(int nPlayer, int nMoney, int a);
-void  fn_800E4364(u32 nQueue, int a, int b, int c);
 s32   fn_800FF894(int nPlayer);
 u8    fn_800FFCCC(int nPlayer, u8 bCheck);
 u8    fn_800FFD54(u8 bCheck);
-void  fn_800FF7DC(void);
 extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
 extern u8* gpSaveData;
 extern s32 lbl_802823D8;

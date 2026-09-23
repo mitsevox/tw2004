@@ -4,19 +4,10 @@
 // beat double bogey is done with the hole.
 
 #include "golfer.h"
+#include "game.h"
 
-int   Game_CurHoleIndex(void);
-int   Game_CurrentHole(void);
-u8    Player_OnTee(int nPlayer);
-u8    Player_IsHoled(int nPlayer);
-void  GOLFERSTATE_Set(int nState, int nPlayer);
-void  fn_800E1480(int nHole);
-u8    fn_800E1BBC(void);
-u8    fn_800EC550(void);
 int   fn_800E1788(int nPlayer);             // the player's round total
 int   fn_800D3C7C(int nPlayer);             // the player's golfer
-void  fn_800D3548(int nPlayer, int nMoney, int a);
-void  fn_800E4364(u32 nQueue, int a, int b, int c);
 void  fn_80125854(int a);
 extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
 extern s32 lbl_80282278;                    // the player whose turn it is
