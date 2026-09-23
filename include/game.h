@@ -40,6 +40,27 @@ LAYOUT_ASSERT(Replay, 0xF28);
 
 extern Replay gReplayData;              // 0x801D6030
 
+// The replay recorder's buffer (our name; 0x15260 bytes, made by fn_8006BED4 at the start of a
+// round). Only the flag is read so far.
+typedef struct ReplayBuffer {
+    u8   unk0[0x1525C];
+    u8   b1525C;                // 0x1525C  set by fn_8006C5E0, cleared by fn_8006C608 (not in a replay)
+    u8   unk1525D[3];
+} ReplayBuffer;
+LAYOUT_ASSERT(ReplayBuffer, 0x15260);
+
+extern ReplayBuffer* lbl_80281E48;      // 0x80281E48
+
+// Replay.c
+void fn_8006BED4(void);                 // make the replay buffer
+void fn_8006BF20(void);                 // free it
+void fn_8006BF4C(void);                 // in-flight replays off (gReplayData.bF10)
+void fn_8006C28C(int nPlayer, int nController);
+void fn_8006C2A8(int nPlayer, f32 fForwardSpin, f32 fSideSpin);
+void fn_8006C2C8(int nPlayer, f32* pForwardSpin, f32* pSideSpin);
+void fn_8006C5E0(void);
+void fn_8006C608(void);
+
 int  Game_GetCourse(void);              // 0x80008830
 int  Game_CurHoleIndex(void);           // 0..17 in the round (Golfer.c)
 int  Game_CurrentPinSet(void);          // the current hole's pin position, 0..3 (Golfer.c)
