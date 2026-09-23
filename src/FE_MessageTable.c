@@ -2947,6 +2947,30 @@ void fn_8007FF8C(MsgArg* pArgs, MsgArg* pResult) {
     fn_80077808(nSlot);
 }
 
+// Hole pArgs[1]'s par on course pArgs[0]. Below 0 it is the custom round being edited (slot n3,
+// round n4); 22 and 24..29 are built rounds, whose holes come from other courses.
+void fn_80080054(MsgArg* pArgs, MsgArg* pResult) {
+    int nHole;
+
+    if (pArgs[0].i <= -1) {
+        pResult->i = fn_800D2ABC(
+            gpSaveData[lbl_80281ED4->n3].aSavedRound[lbl_80281ED4->n4].nCourse[pArgs[1].i],
+            gpSaveData[lbl_80281ED4->n3].aSavedRound[lbl_80281ED4->n4].nHoleNum[pArgs[1].i]);
+        return;
+    }
+    if (pArgs[0].i == 22) {
+        nHole = fn_800D3118(22, pArgs[1].i);
+        pResult->i = fn_800D2ABC(nHole, fn_800D315C(22, pArgs[1].i) - 1);
+        return;
+    }
+    if (pArgs[0].i >= 24 && pArgs[0].i < 30) {
+        nHole = fn_800D3118(pArgs[0].i, pArgs[1].i);
+        pResult->i = fn_800D2ABC(nHole, fn_800D315C(pArgs[0].i, pArgs[1].i) - 1);
+        return;
+    }
+    pResult->i = fn_800D2ABC(pArgs[0].i, pArgs[1].i);
+}
+
 // The saved replay's course, hole and golfer.
 void fn_8008017C(MsgArg* pArgs, MsgArg* pResult) {
     strcpy(((MsgString*)pArgs[0].p)->pStr, lbl_80191990[gReplayData.nCourse]);
