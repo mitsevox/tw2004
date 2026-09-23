@@ -14,4 +14,5 @@ Changed for this game (so the units link into the DOL):
   `ARQRemoveRequest`, which this game has.
 - `libs/dolphin/src/card/CARDStatEx.c`: `CARDGetAttributes`, `CARDSetAttributesAsync` and
   `CARDSetAttributes` (ours), which TP's copy lacks; this game's build calls `__CARDGetStatusEx`
-  in them instead of inlining it.
+  in them instead of inlining it. The file also holds `__CARDVendorID`, `__CARDPermMask` and
+  `__CARDEnableGlobal` (ours), as this game's copy of the SDK's CARDNet.c does.

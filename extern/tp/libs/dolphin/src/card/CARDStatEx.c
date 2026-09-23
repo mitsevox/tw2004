@@ -3,6 +3,10 @@
 
 #include "__card.h"
 
+// this game's file also holds these two (the SDK's CARDNet.c)
+u16 __CARDVendorID = 0xFFFF;
+u8 __CARDPermMask = CARD_ATTR_PUBLIC | CARD_ATTR_NO_COPY | CARD_ATTR_NO_MOVE;
+
 s32 __CARDGetStatusEx(s32 chan, s32 fileNo, CARDDir* dirent) {
     ASSERTLINE(85, 0 <= chan && chan < 2);
     ASSERTLINE(86, 0 <= fileNo && fileNo < CARD_MAX_FILE);
@@ -174,4 +178,17 @@ s32 __CARDSetStatusEx(s32 chan, s32 fileNo, CARDDir* dirent) {
     }
 
     return __CARDSync(chan);
+}
+
+// Allows or forbids files with the 0x40 permission bit (CARD_ATTR_COMPANY in this header, although
+// the function is named for the global bit); returns whether they were allowed before.
+int __CARDEnableGlobal(int enable) {
+    int prev = (__CARDPermMask & CARD_ATTR_COMPANY) ? TRUE : FALSE;
+
+    if (enable) {
+        __CARDPermMask |= CARD_ATTR_COMPANY;
+    } else {
+        __CARDPermMask &= ~CARD_ATTR_COMPANY;
+    }
+    return prev;
 }
