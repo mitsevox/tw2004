@@ -372,29 +372,8 @@ GoCamCont.c:
 GoStaticCam.c:
 	.text       start:0x8006449C end:0x80065B44
 
-unsorted/sweep_80065B44.c:
-	.text       start:0x80065B44 end:0x80065B50
-
-unsorted/sweep_80065B98.c:
-	.text       start:0x80065B98 end:0x80065B9C
-
-unsorted/sweep_80065C30.c:
-	.text       start:0x80065C30 end:0x80065C6C
-
-unsorted/sweep_80065CB8.c:
-	.text       start:0x80065CB8 end:0x80065CDC
-
-unsorted/sweep_80065D6C.c:
-	.text       start:0x80065D6C end:0x80065D70
-
-unsorted/sweep_80065E70.c:
-	.text       start:0x80065E70 end:0x80065E98
-
-unsorted/sweep_80065E98.c:
-	.text       start:0x80065E98 end:0x80065E9C
-
 event.c:
-	.text       start:0x80065E9C end:0x80067710
+	.text       start:0x80065B44 end:0x80067710
 
 target.c:
 	.text       start:0x80067B80 end:0x8006AA70
