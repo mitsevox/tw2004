@@ -455,6 +455,11 @@ Set up 2026-09-23 following `docs/github_actions.md`.
   build.
 - Pushing workflow files needs the `workflow` scope on the GitHub CLI token
   (`gh auth refresh -h github.com -s workflow`).
+- decomp.dev only updates instantly if its GitHub App (https://github.com/apps/decomp-dev) is
+  installed on the repo. Without it, the site checks for new reports every 30 minutes, and the
+  "Force refresh" button on https://decomp.dev/manage/mitsevox/tw2004 fetches them right away
+  (from decomp.dev's source, `crates/web/src/cron.rs`). If the site lags, first check that the
+  latest CI run's `GW4E69_report` artifact has the new numbers.
 
 The small-function sweep
 ------------------------
