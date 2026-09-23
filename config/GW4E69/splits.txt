@@ -1171,26 +1171,8 @@ unsorted/sweep_800AB374.c:
 unsorted/sweep_800AB39C.c:
 	.text       start:0x800AB39C end:0x800AB3A4
 
-unsorted/sweep_800AB608.c:
-	.text       start:0x800AB608 end:0x800AB658
-
-unsorted/sweep_800ABBC8.c:
-	.text       start:0x800ABBC8 end:0x800ABC34
-
-unsorted/sweep_800ABC34.c:
-	.text       start:0x800ABC34 end:0x800ABC54
-
-unsorted/sweep_800ABC54.c:
-	.text       start:0x800ABC54 end:0x800ABC9C
-
-unsorted/sweep_800ABD7C.c:
-	.text       start:0x800ABD7C end:0x800ABDB0
-
-unsorted/sweep_800AC310.c:
-	.text       start:0x800AC310 end:0x800AC328
-
-unsorted/sweep_800AC328.c:
-	.text       start:0x800AC328 end:0x800AC330
+hlaudtrackstm.c:
+	.text       start:0x800AB3A4 end:0x800AC330
 
 unsorted/sweep_800AC470.c:
 	.text       start:0x800AC470 end:0x800AC494
@@ -1234,11 +1216,8 @@ unsorted/sweep_800ADDC8.c:
 UAudContainers.c:
 	.text       start:0x800ADE70 end:0x800AE1F8
 
-unsorted/sweep_800AE380.c:
-	.text       start:0x800AE380 end:0x800AE3C4
-
-unsorted/sweep_800AF0A8.c:
-	.text       start:0x800AF0A8 end:0x800AF0D4
+uiobject.c:
+	.text       start:0x800AE1F8 end:0x800AF114
 
 unsorted/sweep_800AF140.c:
 	.text       start:0x800AF140 end:0x800AF144
@@ -1298,47 +1277,14 @@ unsorted/sweep_800B2250.c:
 unsorted/sweep_800B22D4.c:
 	.text       start:0x800B22D4 end:0x800B2314
 
-unsorted/sweep_800B2314.c:
-	.text       start:0x800B2314 end:0x800B235C
-
-unsorted/sweep_800B235C.c:
-	.text       start:0x800B235C end:0x800B2360
-
-unsorted/sweep_800B2438.c:
-	.text       start:0x800B2438 end:0x800B246C
-
-unsorted/sweep_800B246C.c:
-	.text       start:0x800B246C end:0x800B2470
-
-unsorted/sweep_800B2470.c:
-	.text       start:0x800B2470 end:0x800B24D0
-
 shadow.c:
-	.text       start:0x800B24E0 end:0x800B3438
-
-unsorted/sweep_800B3438.c:
-	.text       start:0x800B3438 end:0x800B3460
-
-unsorted/sweep_800B3484.c:
-	.text       start:0x800B3484 end:0x800B34F0
+	.text       start:0x800B2314 end:0x800B34F0
 
 GoComicCam.c:
-	.text       start:0x800B34F0 end:0x800B4AE0
+	.text       start:0x800B34F0 end:0x800B4B5C
 
 GoShaderObject_Rain_Gc.c:
-	.text       start:0x800B4B5C end:0x800B58B4
-
-unsorted/sweep_800B58B4.c:
-	.text       start:0x800B58B4 end:0x800B58C0
-
-unsorted/sweep_800B58C0.c:
-	.text       start:0x800B58C0 end:0x800B58D4
-
-unsorted/sweep_800B58D4.c:
-	.text       start:0x800B58D4 end:0x800B58E4
-
-unsorted/sweep_800B58E4.c:
-	.text       start:0x800B58E4 end:0x800B58FC
+	.text       start:0x800B4B5C end:0x800B5918
 
 unsorted/sweep_800B5934.c:
 	.text       start:0x800B5934 end:0x800B59BC
@@ -1347,7 +1293,7 @@ unsorted/sweep_800B59EC.c:
 	.text       start:0x800B59EC end:0x800B5A14
 
 UAudMemStack.c:
-	.text       start:0x800B5A14 end:0x800B5AAC
+	.text       start:0x800B5A14 end:0x800B5B80
 
 unsorted/sweep_800B5C30.c:
 	.text       start:0x800B5C30 end:0x800B5C40
@@ -1361,86 +1307,14 @@ unsorted/sweep_800B5F28.c:
 unsorted/sweep_800B6034.c:
 	.text       start:0x800B6034 end:0x800B6060
 
-unsorted/sweep_800B61B4.c:
-	.text       start:0x800B61B4 end:0x800B6214
-
-unsorted/sweep_800B6214.c:
-	.text       start:0x800B6214 end:0x800B62DC
-
 GoARAM.c:
-	.text       start:0x800B62DC end:0x800B64D8
+	.text       start:0x800B61B4 end:0x800B6924
 
-unsorted/sweep_800B64D8.c:
-	.text       start:0x800B64D8 end:0x800B655C
+DiscError.c:
+	.text       start:0x800B6924 end:0x800B769C
 
-unsorted/sweep_800B655C.c:
-	.text       start:0x800B655C end:0x800B6564
-
-unsorted/sweep_800B6564.c:
-	.text       start:0x800B6564 end:0x800B65C0
-
-unsorted/sweep_800B67B4.c:
-	.text       start:0x800B67B4 end:0x800B67EC
-
-unsorted/sweep_800B67EC.c:
-	.text       start:0x800B67EC end:0x800B6844
-
-unsorted/sweep_800B6844.c:
-	.text       start:0x800B6844 end:0x800B6924
-
-unsorted/sweep_800B6924.c:
-	.text       start:0x800B6924 end:0x800B694C
-
-unsorted/sweep_800B6C0C.c:
-	.text       start:0x800B6C0C end:0x800B6C14
-
-unsorted/sweep_800B6CD0.c:
-	.text       start:0x800B6CD0 end:0x800B6CD8
-
-unsorted/sweep_800B7684.c:
-	.text       start:0x800B7684 end:0x800B769C
-
-unsorted/sweep_800B90F4.c:
-	.text       start:0x800B90F4 end:0x800B9178
-
-unsorted/rcmp_mad_codec/sweep_800B9178.c:
-	.text       start:0x800B9178 end:0x800B91B8
-
-unsorted/rcmp_mad_codec/sweep_800B91B8.c:
-	.text       start:0x800B91B8 end:0x800B920C
-
-unsorted/rcmp_mad_codec/sweep_800B94B0.c:
-	.text       start:0x800B94B0 end:0x800B94CC
-
-unsorted/rcmp_mad_codec/sweep_800B95FC.c:
-	.text       start:0x800B95FC end:0x800B9624
-
-unsorted/rcmp_mad_codec/sweep_800B9700.c:
-	.text       start:0x800B9700 end:0x800B9760
-
-unsorted/rcmp_mad_codec/sweep_800B97A8.c:
-	.text       start:0x800B97A8 end:0x800B9808
-
-unsorted/rcmp_mad_codec/sweep_800B9808.c:
-	.text       start:0x800B9808 end:0x800B9864
-
-unsorted/rcmp_mad_codec/sweep_800B9930.c:
-	.text       start:0x800B9930 end:0x800B9944
-
-unsorted/rcmp_mad_codec/sweep_800B9988.c:
-	.text       start:0x800B9988 end:0x800B99FC
-
-unsorted/rcmp_mad_codec/sweep_800B99FC.c:
-	.text       start:0x800B99FC end:0x800B9A50
-
-unsorted/rcmp_mad_codec/sweep_800B9A50.c:
-	.text       start:0x800B9A50 end:0x800B9A88
-
-unsorted/rcmp_mad_codec/sweep_800B9A88.c:
-	.text       start:0x800B9A88 end:0x800B9AAC
-
-unsorted/rcmp_mad_codec/sweep_800B9B48.c:
-	.text       start:0x800B9B48 end:0x800B9BF4
+rcmp_mad_codec.c:
+	.text       start:0x800B769C end:0x800B9FF0
 
 Trax.c:
 	.text       start:0x800B9FF0 end:0x800BA74C
