@@ -202,7 +202,7 @@ void GameModeStroke_EndGame(void) {
                     if (i != j && Player_IsCPU(j)) {
                         nOther = fn_800E1788(j);
                         if (nScore < nOther) {
-                            nRating = GM_Earnings_RateGolfer(j);
+                            nRating = fn_800D3C7C(j);
                             if (nRating > nBest) {
                                 nBest = nRating;
                                 nMargin = nOther - nScore;

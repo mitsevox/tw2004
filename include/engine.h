@@ -192,6 +192,9 @@ int  fn_8002F260(s32 n0, s32 nWidth, s32 nHeight, s32 nKind, s32 n20, s32 nSurfa
 void fn_8002F38C(s32 nSurface, s32 nC, s32 n10, s32 n14, u32 uFlags, s32 n18);
 s32  fn_8002F454(s32 nSurface);     // the surface's buffer size, 0 if the slot is free
 
+// The graphics helpers at 0x80029FC8 (file name unknown)
+void* fn_8002A624(void);            // the screen-copy texture's pixels (lbl_80281100's first word)
+
 // ---- the file streamer (UStream.c) -----------------------------------------------------------
 
 // An object built from SHOC chunks. The header is 0x34 bytes, then the copied chunk header

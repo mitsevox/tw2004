@@ -36,8 +36,8 @@ void   AXSetVoiceSrcType(AXVPB* pVpb, u32 uType);
 void   AXSetVoiceState(AXVPB* pVpb, u16 uState);   // 0 stopped, 1 running
 
 // MIX: set a new voice's input, aux A and aux B levels (dB x 10), pan, surround pan and fader.
-void   fn_80145B24(AXVPB* pVpb, u32 uMode, int nInput, int nAuxA, int nAuxB, int nPan, int nSPan,
-                   int nFader);
+void   MIXInitChannel(AXVPB* pVpb, u32 uMode, int nInput, int nAuxA, int nAuxB, int nPan, int nSPan,
+                      int nFader);
 
 // Keeps a global the code never uses through the linker's dead-stripping (startUp.c's data has
 // three). `#pragma force_active` does not mark uninitialised data; this does.
@@ -166,8 +166,12 @@ typedef struct MovieSoundBlock {
 #define ARAM_HEAP_SIZE 0x3FC000
 #define ARAM_ZERO_SIZE 0x400            // the silent block at the start of the heap (fn_800B0568)
 
-// DMA nLen bytes from main memory to ARAM; pfnDone is called when it is done. Returns 1.
-int fn_800B044C(u32 uAram, void* pSrc, int nLen, void (*pfnDone)(void), int n);
+// DMA nLen bytes from main memory to ARAM; pfnDone(n) is called when it is done. Returns 1.
+int fn_800B044C(u32 uAram, void* pSrc, int nLen, void (*pfnDone)(u32 n), int n);
+// Hand a streamed block's ADPCM header to voice nVoice (only for the buffer's first half).
+void fn_800B0268(u16 nVoice, StreamChunk* pChunk, u32 uSize, int nBuffer);
+// Cancel the ARAM transfers queued for pOwner.
+void fn_800B04CC(void* pOwner);
 
 // ---- the built-in sounds ----------------------------------------------------------------------
 
