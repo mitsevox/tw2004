@@ -17,6 +17,8 @@ void* fn_80005AE8(void* pDst, int nValue, u32 uLen);      // memset; returns pDs
 // Allocates from the static heap (StaticMemory.c); nMode picks where (see there).
 void* fn_80009B34(int nSize, int nMode, int nAlign, const char* pFile, int nLine);
 void  fn_80009E70(void* p);             // free
+void  fn_8000A0AC(s32 v);               // } a value callers pass on as fn_80009B34's uFlags
+s32   fn_8000A0B4(void);                // } (EASportsBio.c sets 0 while the Bio starts, then 2)
 void* fn_800951A0(u32 uSize, int nAlign, int a);
 void  fn_8009527C(void* p);             // frees what fn_800951A0 allocated
 void  fn_800953C8(int a);
@@ -47,6 +49,12 @@ void  fn_8015929C(void* pBase, u32 nCount, u32 nSize, s32 (*pfnCompare)(const vo
 
 #define FRAME_RATE 59.94f               // frames a second (NTSC)
 #define FRAME_TIME (1.0f / FRAME_RATE)  // one frame, in seconds
+
+// llrtclock.c: the real-time clock as a date: month 1-12, day, year, hour 0-23, minute, second,
+// millisecond. Always TRUE.
+int  fn_8011E020(s32* pnMonth, s32* pnDay, s32* pnYear, s32* pnHour, s32* pnMinute, s32* pnSecond,
+                 s32* pnMsec);
+void RTClock_GetDateTimeString(char* szOut);   // "M/D/YYYY H:MM AM"
 
 // ---- math and random numbers -----------------------------------------------------------------
 
@@ -147,6 +155,25 @@ LAYOUT_ASSERT(RenderState, 0x118);
 extern RenderState lbl_801B8980;
 
 void fn_8005CC64(TexBank* pBank, TexEntry* pTex);  // set the texture of the next draw
+
+// One row of lbl_80188E88 (our name; 20 rows of 0x44 bytes): a module's hooks. The main loop
+// (gomainloop.c) calls each row's pfnC..pfn20 at six points of a frame (fn_8006DDA8 and its
+// neighbours), skipping NULL ones; fn_8003519C calls a row's pfn8 with data. Rows 0 and 1 hold
+// functions of 0x8006FED4-0x80070FB0 from +0x24 on.
+typedef struct ModuleHooks {
+    u8    unk0[8];
+    void  (*pfn8)(void* pData);   // 0x08
+    void  (*pfnC)(void);          // 0x0C  fn_8006E068
+    void  (*pfn10)(void);         // 0x10  fn_8006DDE8
+    void  (*pfn14)(void);         // 0x14  fn_8006DFE8
+    void  (*pfn18)(void);         // 0x18  fn_8006DE68
+    void  (*pfn1C)(void);         // 0x1C  fn_8006DF68
+    void  (*pfn20)(void);         // 0x20  fn_8006DEE8
+    u8    unk24[0x44 - 0x24];
+} ModuleHooks;
+LAYOUT_ASSERT(ModuleHooks, 0x44);
+
+extern ModuleHooks lbl_80188E88[20];
 
 // A render surface (GoRenderSurface.c; our name, after the file): one of five 0x2C-byte slots at
 // lbl_801D3950. A slot whose n0 is not 1 owns a buffer of nSize bytes. Only what the code reads.
@@ -252,7 +279,7 @@ void fn_8006B2C4(int nPlayer, u8 bBefore);   // the shot's outcome from the ball
 void fn_8006BAA8(int nPlayer);
 void fn_8006BF60(int nPlayer);          // the replay recorder
 void fn_8006C300(int nPlayer);
-void fn_8006C4A0(void);                 // take the shot back (a mulligan)
+void fn_8006C4A0(void);                 // clears gSession.bReplay: a saved replay's playback ends
 void fn_8006F4B4(void);
 u8   fn_80095430(int a);
 void fn_8009B970(int nView);

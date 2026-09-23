@@ -4,6 +4,38 @@
 
 #include "frontend/uistudio.h"
 
+// Walks the event stack from the bottom up and, for each type 9 event queued for the given
+// screen, while that screen is still loaded, calls fn_8016B0F8 with the event's first data word
+// and its arguments.
+s32 fn_80165ACC(UIStudio* pStudio, u16 uGroup, u16 uScreen) {
+    s32* p;
+    s32* pData;
+    s32* pArgs;
+    s32 nArgs;
+    s32 nType;
+    u16 uA;
+    u16 uB;
+
+    p = pStudio->pEventBase;
+    while (p > pStudio->pEventTop) {
+        nArgs = p[-8];
+        nType = p[0];
+        uA = p[-1];
+        uB = p[-2];
+        p -= 7;
+        pData = p;
+        p -= 1;
+        p -= nArgs;
+        pArgs = p;
+        p -= 1;
+        if (uA == uGroup && uB == uScreen && nType == 9
+            && fn_8016C6C4(pStudio, uA, uB) < (u32)pStudio->nScreens) {
+            fn_8016B0F8(pStudio, *pData, nArgs, pArgs);
+        }
+    }
+    return 1;
+}
+
 // Pushes an event on the studio's event stack: the event record, with its type on the top word,
 // then its arguments below it, the last one first.
 void fn_80165B90(s16 nA, s16 nB, UIStudio* pStudio, s32 nType, const UISEventData* pData, s32 nArgs,

@@ -1679,34 +1679,19 @@ PGATourSimulation.c:
 	.text       start:0x80117600 end:0x8011C068
 
 SkinMorph.c:
-	.text       start:0x8011C27C end:0x8011CADC
+	.text       start:0x8011C068 end:0x8011CEB0
 
-unsorted/sweep_8011CD84.c:
-	.text       start:0x8011CD84 end:0x8011CDE8
+fe_stats.c:
+	.text       start:0x8011CEB0 end:0x8011D280
 
-unsorted/sweep_8011D05C.c:
-	.text       start:0x8011D05C end:0x8011D09C
+EventInfo.c:
+	.text       start:0x8011D280 end:0x8011E020
 
-unsorted/sweep_8011D09C.c:
-	.text       start:0x8011D09C end:0x8011D0A8
-
-unsorted/sweep_8011D268.c:
-	.text       start:0x8011D268 end:0x8011D280
-
-unsorted/sweep_8011D858.c:
-	.text       start:0x8011D858 end:0x8011D878
+llrtclock.c:
+	.text       start:0x8011E020 end:0x8011E170
 
 GoGrass.c:
-	.text       start:0x8011E170 end:0x80120194
-
-unsorted/sweep_8012022C.c:
-	.text       start:0x8012022C end:0x80120244
-
-unsorted/sweep_80120244.c:
-	.text       start:0x80120244 end:0x80120268
-
-unsorted/sweep_8012028C.c:
-	.text       start:0x8012028C end:0x80120298
+	.text       start:0x8011E170 end:0x80120298
 
 unsorted/sweep_80120298.c:
 	.text       start:0x80120298 end:0x801202F8
@@ -1738,71 +1723,14 @@ unsorted/sweep_80121404.c:
 unsorted/sweep_8012141C.c:
 	.text       start:0x8012141C end:0x80121430
 
-unsorted/sweep_8012172C.c:
-	.text       start:0x8012172C end:0x80121770
-
-unsorted/sweep_801217C4.c:
-	.text       start:0x801217C4 end:0x80121808
-
-unsorted/sweep_80121808.c:
-	.text       start:0x80121808 end:0x8012185C
-
-unsorted/sweep_8012185C.c:
-	.text       start:0x8012185C end:0x801218BC
-
-unsorted/sweep_801218BC.c:
-	.text       start:0x801218BC end:0x801218DC
-
-unsorted/sweep_801218DC.c:
-	.text       start:0x801218DC end:0x801218FC
+GameMode4Menu.c:
+	.text       start:0x80121430 end:0x801220D4
 
 TibExt.c:
-	.text       start:0x80121C80 end:0x80122128
-
-unsorted/sweep_80122128.c:
-	.text       start:0x80122128 end:0x8012214C
-
-unsorted/sweep_8012214C.c:
-	.text       start:0x8012214C end:0x80122150
-
-unsorted/sweep_80122468.c:
-	.text       start:0x80122468 end:0x80122488
-
-unsorted/sweep_80122488.c:
-	.text       start:0x80122488 end:0x80122494
-
-unsorted/sweep_80122630.c:
-	.text       start:0x80122630 end:0x80122654
-
-unsorted/sweep_80122868.c:
-	.text       start:0x80122868 end:0x8012288C
-
-unsorted/sweep_8012288C.c:
-	.text       start:0x8012288C end:0x801228AC
+	.text       start:0x801220D4 end:0x801228E0
 
 gbacable.c:
-	.text       start:0x80122CFC end:0x80123E34
-
-unsorted/sweep_80123FF8.c:
-	.text       start:0x80123FF8 end:0x8012402C
-
-unsorted/sweep_8012402C.c:
-	.text       start:0x8012402C end:0x8012408C
-
-unsorted/sweep_8012408C.c:
-	.text       start:0x8012408C end:0x801240A8
-
-unsorted/sweep_801240A8.c:
-	.text       start:0x801240A8 end:0x8012411C
-
-unsorted/sweep_801241AC.c:
-	.text       start:0x801241AC end:0x80124238
-
-unsorted/sweep_80124238.c:
-	.text       start:0x80124238 end:0x80124280
-
-unsorted/sweep_80124280.c:
-	.text       start:0x80124280 end:0x801242D0
+	.text       start:0x801228E0 end:0x801247C0
 
 unsorted/sweep_801247C0.c:
 	.text       start:0x801247C0 end:0x80124814
@@ -1810,17 +1738,8 @@ unsorted/sweep_801247C0.c:
 unsorted/sweep_80124814.c:
 	.text       start:0x80124814 end:0x80124838
 
-unsorted/sweep_80124A70.c:
-	.text       start:0x80124A70 end:0x80124A98
-
-unsorted/sweep_80124A98.c:
-	.text       start:0x80124A98 end:0x80124AAC
-
-unsorted/sweep_80124B10.c:
-	.text       start:0x80124B10 end:0x80124B54
-
 EASportsBio.c:
-	.text       start:0x80124B54 end:0x8012597C
+	.text       start:0x801249A8 end:0x8012597C
 
 unsorted/sweep_801260B8.c:
 	.text       start:0x801260B8 end:0x801260C0
@@ -1856,10 +1775,7 @@ unsorted/sweep_80127098.c:
 	.text       start:0x80127098 end:0x801270F0
 
 SkinBurn.c:
-	.text       start:0x801270F0 end:0x80127B10
-
-unsorted/sweep_80127B10.c:
-	.text       start:0x80127B10 end:0x80127B4C
+	.text       start:0x801270F0 end:0x80127D84
 
 unsorted/sweep_80127D84.c:
 	.text       start:0x80127D84 end:0x80127E44
