@@ -260,6 +260,10 @@ int  fn_8000633C(int hFile);            // file close
 int  fn_80006444(int hFile, void* pDst, u32 uLen, u32 uOffset, void (*pfnDone)(int nBytes, int nError));
 u32  fn_800065B0(int hFile);            // file size
 
+// ---- fonts (UFont.c) -------------------------------------------------------------------------
+
+f32  fn_80012C30(char* sz);             // fn_80012BDC(sz, 4)
+
 // ---- controller input ------------------------------------------------------------------------
 
 void fn_80012EF8(void);
