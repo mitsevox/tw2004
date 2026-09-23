@@ -35,10 +35,14 @@ f32  fn_80009744(f32* pVec);            // dot with itself
 void Vec_Copy(f32* pSrc, f32* pDst);    // 0x8000AD10
 f32  fn_8000AD78(f32 y, f32 x);         // atan2f
 f32  fabsf(f32 x);                      // 0x8000AD9C: fabs (0x8000AE94, platform.h) rounded to a float
+f32  fn_8000AF7C(f32 x);                // natural logarithm
 u32  Rand_Next(int nStream);            // 0x8000B130  EA's lagged-Fibonacci generator
 f32  fn_8000B318(int nStream);          // a normally distributed random number (mean 0, deviation 1):
                                         // Box-Muller on two Rand_Floats, the second value kept
 void fn_8000B1D4(int nStream, u32 uSeed);   // seed a random stream
+u32  fn_8000B244(void);                 // a random seed from the clock
+void fn_8000B2B8(u32 uSeed);            // seed all three random streams
+void fn_8000B30C(void);                 // drop the kept normal value (fn_8000B318)
 f32  Rand_Float(int nStream);           // 0x8000B428  [0, 1)
 void fn_8000883C(f32* pA, f32* pB, f32 fT);   // quaternion slerp from a to b by fT, into b
 f32  fn_80029B64(f32 x);                // square root (Skeleton.c); x itself when x <= 0
@@ -114,6 +118,31 @@ LAYOUT_ASSERT(RenderState, 0x118);
 extern RenderState lbl_801B8980;
 
 void fn_8005CC64(TexBank* pBank, TexEntry* pTex);  // set the texture of the next draw
+
+// A render surface (GoRenderSurface.c; our name, after the file): one of five 0x2C-byte slots at
+// lbl_801D3950. A slot whose n0 is not 1 owns a buffer of nSize bytes. Only what the code reads.
+typedef struct RenderSurface {
+    s32   n0;                   // 0x00  given when it is made; 0: the slot is free
+    s32   nWidth;               // 0x04  in pixels (512 x 448 for surface 0)
+    s32   nHeight;              // 0x08
+    s32   nC;                   // 0x0C  } fn_8002F38C's four values; made as the width, the
+    s32   n10;                  // 0x10  }   height, 0 and the pixel kind
+    s32   n14;                  // 0x14  }
+    s32   n18;                  // 0x18  }
+    s32   n1C;                  // 0x1C  the pixel kind: 1 or 2 is 4 bytes a pixel, 4 is 2, 8 or 16 is 1
+    s32   n20;                  // 0x20
+    void* pBuffer;              // 0x24
+    s32   nSize;                // 0x28  bytes: width x height x bytes a pixel
+} RenderSurface;
+LAYOUT_ASSERT(RenderSurface, 0x2C);
+
+extern RenderSurface lbl_801D3950[5];
+extern s32 lbl_80281D50;        // the surface fn_8002F38C selected last
+
+// GoRenderSurface.c
+int  fn_8002F260(s32 n0, s32 nWidth, s32 nHeight, s32 nKind, s32 n20, s32 nSurface);   // 0: no memory
+void fn_8002F38C(s32 nSurface, s32 nC, s32 n10, s32 n14, u32 uFlags, s32 n18);
+s32  fn_8002F454(s32 nSurface);     // the surface's buffer size, 0 if the slot is free
 
 // ---- the file streamer (UStream.c) -----------------------------------------------------------
 
@@ -207,6 +236,7 @@ void fn_800A76E4(void);
 void Vec_Normalize(f32* pSrc, f32* pDst);
 void fn_800BAF04(f32* pSrc, f32* pDst);   // normalise
 f32  Vec_Distance(f32* pA, f32* pB);
+void fn_800BD83C(int nSound, int a);      // SitDevFile.c: fn_800A7664(0, nSound, a)
 void BreakLine_Start(int nView);
 int  fn_8011937C(int nPlayer, int a, u8 b);
 // The EA Sports Bio, game side (EASportsBio.c; TW06's names)

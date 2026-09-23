@@ -42,7 +42,6 @@ int  fn_80107444(int nAsset);           // }
 void fn_80105FF8(int nAsset, s16* pKind, s32* pPart, s32* pChoice);    // }
 
 void fn_8011E020(s32* pMonth, s32* pDay, s32* pYear, s32* pHour, s32* pMinute, s32* pSecond, s32* pMsec);
-u32  fn_8000B244(void);                 // a random seed from the clock
 f32  GM_GetGameProgress(SaveProfile* pProfile);         // GameManager.c
 u8   fn_80056480(int a);
 u8   fn_800564AC(int n);

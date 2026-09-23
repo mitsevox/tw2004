@@ -13,7 +13,6 @@
 
 void  fn_800D29E8(void);
 void  GM_Earnings_FreeStreamMemory(void);
-void  fn_800DA36C(void);
 void  fn_800D8D38(int nPlayer);
 u8    fn_800E0A90(int nPlayer);
 void  fn_800D439C(int nPlayer, int a);
@@ -27,9 +26,6 @@ u8    GM_CheckForAIConcede(int nPlayer);
 
 void  fn_800D8FE4(int nPlayer);
 void  fn_800D3DDC(int nPlayer);
-void  fn_800DA48C(int nPlayer);
-u8    fn_800DA2AC(void);
-void  fn_800DAD54(void);
 void  fn_800D9458(int nPlayer);
 void  fn_800D4030(int nPlayer);
 void  GM_CheckBallForUIHints(int nPlayer);
