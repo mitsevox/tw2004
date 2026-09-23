@@ -828,7 +828,7 @@ config.libs = [
             Object(Matching, "GameMode7.c"),
             Object(NonMatching, "GameMode8.c"),
             Object(NonMatching, "GameModeStableford.c"),
-            Object(NonMatching, "GameMode0.c"),
+            Object(NonMatching, "GameModeStroke.c"),
             Object(Matching, "unsorted/sweep_80079974.c"),
             Object(Matching, "unsorted/sweep_80109BA4.c"),
             Object(Matching, "unsorted/sweep_80013070.c"),

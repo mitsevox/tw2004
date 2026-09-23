@@ -1,7 +1,7 @@
-// GameMode0.c (our name): game mode 0, stroke play for up to four players; TW06's GameModeStroke
-// (by position). The lowest score on the last hole played has the honor, the farthest from the pin
-// plays next, and a human who beats CPU golfers wins the best one's prize. Modes 9, 12, 13..17 and
-// 23 reuse some of these callbacks.
+// GameModeStroke.c (TW06's GameModeStroke, matched by method order): game mode 0, stroke play for
+// up to four players. The lowest score on the last hole played has the honor, the farthest from the
+// pin plays next, and a human who beats CPU golfers wins the best one's prize. Modes 9, 12, 13..17
+// and 23 reuse some of these callbacks.
 
 #include "golfer.h"
 
@@ -65,7 +65,7 @@ void fn_800FF700(void) {
     gSession.nSplitScreen = 0;
 }
 
-// TW06: GameModeStroke::SetupNextGolfer (by position). The hole starts: in split screen everyone
+// TW06: GameModeStroke::SetupNextGolfer. The hole starts: in split screen everyone
 // plays at once; otherwise the first golfer gets ready and the others wait.
 void fn_800FF7DC(void) {
     int i;
@@ -132,7 +132,7 @@ s32 fn_800FF894(int nPlayer) {
             }
         }
     }
-    // h doubles as the player counter here: a separate counter gets a different register.
+    // fake match: h doubles as the player counter here; a separate counter gets a different register.
     for (h = 0; h < gNumPlayersSetUp; h++) {
         if (nPlayer != order.a[h] && Player_OnTee(order.a[h]) && !gPlayers[order.a[h]].bPlayerCut) {
             return order.a[h];
