@@ -26,13 +26,11 @@ void  fn_800D8D38(int nPlayer);
 void  Caddie_Stop(void);
 void  fn_8001D7A4(int nHandle);
 u8    fn_800E0A90(int nPlayer);
-u8    fn_800E3A54(void);
-u8    fn_800E1CA8(void);
+u8    fn_800E1CA8(void);                  // int in GameRound.c; the callers here test the byte
 void  fn_800D439C(int nPlayer, int a);
 void  fn_800D9834(int nPlayer);
 u8    fn_8012591C(void);
 void  fn_80125854(int a);
-void  fn_800E3D38(int nPlayer, int a);
 void  fn_8011989C(int nPlayer, int nStrokes);
 void  GM_GolferConcede_Hole(int nPlayer);
 void  GM_EndOfGolferTurn_HoleFinished(int nPlayer);
@@ -40,14 +38,11 @@ void  GM_EndOfGolferTurn_GameFinished(int nPlayer);
 void  GM_HoleFinished_GameNotFinished(int nPlayer);
 u8    GM_CheckForAIConcede(int nPlayer);
 
-SurfaceType* Ter_GetSupportingWorldMaterial(CourseInfo* pCourse, u8* pBall);
 u8    Ter_PointInFreeDropNetwork(u8* pBall);
 void  fn_800E4164(int nMessage, int nPlayer, f32 f);
-void  fn_80063CF0(void* pView, int nCamera, int nPlayer);
 u8    Ter_CheckObjectAndHazardObstruction(u8* pBall, int a, int b, int c, f32 f1, f32 f2, f32 f3);
 u8    Ter_SearchAreaForDropLocation(int nPlayer, int a, int b, f32* pOut);
 
-u8    fn_800E23EC(void);
 void  fn_800E0AC4(int a);
 void  fn_800E0A98(int a);
 void  fn_800D8FE4(int nPlayer);
@@ -68,7 +63,6 @@ void  fn_800BB0A8(void);
 void  fn_800335F8(int a);
 void  fn_8006C4C0(int nPlayer);
 void  fn_8006C4A0(void);
-void  fn_800C70F8(void* pView, int a);
 void  fn_800957FC(int nHandle, int a);
 u8*   fn_80016CFC(int nView);
 void  fn_800E0AF0(f32* pFrom, f32* pTo, f32* pOut);
@@ -93,8 +87,6 @@ void  fn_800E1018(int nPlayer, int nHole);
 void  fn_800C6C8C(void);
 void  fn_800E41C8(void);
 
-void  Vec3Copy(void* pSrc, void* pDst);
-u8    fn_800E27A8(void);
 int   fn_8006AA9C(int nPlayer);             // how the shot turned out (0..4, 8+)
 void  fn_8006AAB4(int nPlayer, int a);
 
@@ -102,7 +94,6 @@ typedef struct Vec4 { f32 x, y, z, w; } Vec4;
 u32   fn_800136DC(int nController);         // buttons: held << 16 | pressed this frame
 u32   fn_800142AC(int nButton, int a);      // a button's mask
 u8    fn_80014300(u32 uMask);               // any pad pressed these buttons
-u8    fn_80063C7C(void* pView);
 u8    fn_80063C90(void* pView);             // the camera is still moving
 void  fn_80063BF4(void* pView, f32 f, f32* pVec);
 void  fn_80062D0C(int nPlayer);
@@ -124,14 +115,11 @@ u8    GM_bIsZoomButtonPressed(int nPlayer);
 u8    GM_bIsElevatorCamButtonPressed(int nPlayer);
 u8    fn_800E012C(int nPlayer);
 u8    fn_800DFF0C(int nPlayer);
-u8    fn_80068AC8(int nPlayer);
 
 u64   fn_800954A4(int a);                   // a time stamp
 f32   fn_8006E118(u64 tEnd, u64 tStart);    // seconds between two time stamps
 int   GameEffects_BallUpdatesThisFrame(int nPlayer);
 u8    fn_800C71A4(void* pView, int nPlayer);
-void  Physics_Simulate(u8* pBall, int nTicks);
-void  fn_80050D2C(int a);
 void  fn_8006B2C4(int nPlayer, int a);
 u8    fn_800BB1F8(int nPlayer);
 
@@ -191,11 +179,11 @@ void fn_800DCAD8(void) {
 void GM_vCloseModuleONCE(void) {
 }
 
-s32 fn_800DCB00(void) {
+u8 fn_800DCB00(void) {
     return 0;
 }
 
-s32 fn_800DCB08(void) {
+u8 fn_800DCB08(void) {
     return 0;
 }
 
@@ -210,7 +198,7 @@ u8 fn_800DCB3C(void) {
     return (*(s32*)(lbl_80202898 + 0x28) % *(s32*)(lbl_80202898 + 0x2C)) == 0;
 }
 
-s32 fn_800DCB74(void) {
+u8 fn_800DCB74(void) {
     return *(u8*)(lbl_80202898 + 0x11);
 }
 
@@ -462,7 +450,8 @@ void GM_PlayerAddStroke(int nPlayer) {
 u8 GM_CheckForBallOOB(int nPlayer) {
     u8*          pBall = gPlayers[nPlayer].ball;
     u8           bOut  = fn_800E2B40(nPlayer, (Ball*)pBall);
-    SurfaceType* pSurf = Ter_GetSupportingWorldMaterial(*(CourseInfo**)(gPlayers[nPlayer].ball + 0x7C), pBall);
+    SurfaceType* pSurf = Ter_GetSupportingWorldMaterial(*(CourseInfo**)(gPlayers[nPlayer].ball + 0x7C),
+                                                        (f32*)pBall);
     u8           bDrop;
     Player*      p;
 
@@ -577,7 +566,7 @@ void GM_BumpBallForObstructions(int nPlayer) {
 // mode message, or the yardage. Out of bounds goes to the mode's hook instead.
 void GM_PlayerTookShot(int nPlayer) {
     u8   bOut;
-    if (fn_800E23EC() && !(gPlayers[nPlayer].uFlags & 8)) {
+    if (fn_800E23EC(nPlayer) && !(gPlayers[nPlayer].uFlags & 8)) {
         fn_800E0AC4(1);
     }
     if (!Player_IsCPU(nPlayer) && gSession.nSplitScreen == 0 && gpGame->b287 && gReplayData[0xF10]) {
@@ -988,7 +977,7 @@ void GM_MovePlayerToBall(int nPlayer) {
     f32*        pPos  = &p->fBallX;
     CourseInfo* pCourse;
     f32         f;
-    Vec3Copy(pBall, pPos);
+    Vec3Copy((f32*)pBall, pPos);
     Vec_Copy((f32*)pBall, p->vPreShot);
     pCourse = fn_8000C594();
     if (pCourse) {
@@ -1222,7 +1211,7 @@ void GM_SimulateBallMovement(int nPlayer) {
     p = &gPlayers[nPlayer];
     pBall = p->ball;
     for (i = 0; i < nUpdates; i++) {
-        Physics_Simulate(pBall, 20);
+        Physics_Simulate((Ball*)pBall, 20);
     }
     fMs = 1000.0f * fn_8006E118(fn_800954A4(0), t0);
     fBudget = 0.83f - fMs;
@@ -1236,7 +1225,7 @@ void GM_SimulateBallMovement(int nPlayer) {
         pState = (s32*)(p->ballBefore + 0x64);
         while (*pState != 1 && *pState != 5 && *pState != 0 && fBudget > 0.1f) {
             t1 = fn_800954A4(0);
-            Physics_Simulate(pBall, 20);
+            Physics_Simulate((Ball*)pBall, 20);
             fMs = 1000.0f * fn_8006E118(fn_800954A4(0), t1);
             nSteps++;
             fBudget -= fMs;

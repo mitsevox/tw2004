@@ -13,13 +13,11 @@
 #define BALL_RADIUS 0.0256667f      // 0.92 in (a real one is 0.84)
 #define CUP_DIAMETER 0.10717f       // 3.86 in (a real cup is 4.25)
 
-void   Vec3Copy(f32* pSrc, f32* pDst);           // 0x80008304
 void   Ball_Stop(Ball* pBall);                   // 0x80054340
 void   fn_8000AE28(f32* pIn, f32 f, f32* pOut);  // scale a vector
 void   Ball_SetLie(Ball* pBall, SurfaceType* pSurface);
 void   Ball_Tick(Ball* pBall, f32 fTicks);
 void   Physics_FixBallHeight(Ball* pBall, u8 bSettle, f32 fTicks);
-SurfaceType* Ter_GetSupportingWorldMaterial(CourseInfo* pCourse, Ball* pBall);   // the surface under a point
 u8     Ter_IsValidDropSurface(s32 nSurface);
 void   Ter_CheckForDropLocation(CourseInfo* pCourse, Ball* pBall, int a, u8* pA, u8* pB, int b);
 // One club's distances for a shot kind: power 0.1, 0.2 .. 1.1 (fDist[9], full power, is "the
@@ -30,7 +28,6 @@ typedef struct ClubRow {
 
 u8     fn_80050DE4(int nKind, int nClub, int a, ClubRow** ppRow, s32* pSurface);
 f32    Ter_GetSupportingGroundData(CourseInfo* pCourse, Ball* pBall, SurfaceType** ppSurface, f32* pNormal);   // ground height, surface and normal
-void   fn_8001EF34(f32* pIn, f32 f, f32* pOut);   // scale a vector
 u8     Physics_GetShotData(Ball* pBall, int nClub, int nKind, f32 fPower, f32 fAim, int nTrajectory, f32* pA, f32* pB, f32* pVel, f32* pSpin);
 extern f32     gPuttDist[23];                    // 0x80181604  putt distance at power 0, 0.05 .. 1.1
 extern f32     gPuttSpeedScale[5];               // 0x80181660  x by the green-speed setting
@@ -1460,7 +1457,7 @@ void Ball_Stop(Ball* pBall) {
         return;
     }
     Physics_FixBallHeight(pBall, 1, 0.0f);
-    pSurface = Ter_GetSupportingWorldMaterial(pBall->pCourse, pBall);
+    pSurface = Ter_GetSupportingWorldMaterial(pBall->pCourse, pBall->vPos);
     if (pSurface == NULL) {
         Physics_OutOfBounds(pBall, 1);
         return;
@@ -1914,7 +1911,7 @@ u8 Physics_DropBall(Ball* pBall, f32* pPos) {
         if (fGround < -60000.0f) return 0;
     }
     v[1] = 0.0013888889f + (BALL_RADIUS + fGround);
-    pSurface = Ter_GetSupportingWorldMaterial(pBall->pCourse, (Ball*)v);
+    pSurface = Ter_GetSupportingWorldMaterial(pBall->pCourse, v);
     if (pSurface == NULL) return 0;
     Vec3Copy(v, pBall->vPos);
     Vec3Copy(v, pBall->vPrev);

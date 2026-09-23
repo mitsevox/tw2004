@@ -53,13 +53,21 @@ typedef struct Ball {
 u8   Ter_PointInOOBNetwork(f32* pPos);   // inside the in-bounds outlines (always, with none loaded)
 f32  fn_8004D5C0(CourseInfo* pCourse, f32* pPos);   // ground height, -65536.1 if none
 f32  fn_8004D620(CourseInfo* pCourse, f32* pPos);   // ground height, -60000 and below if none
+SurfaceType* Ter_GetSupportingWorldMaterial(CourseInfo* pCourse, f32* pPos);   // the surface under a point
 void Ter_GetEnclosingGroundHeight(CourseInfo* pCourse, f32* pPos, f32* pLow, f32* pHigh);
 void Ter_GetEnclosingGroundData(CourseInfo* pCourse, f32* pPos, f32* pHeight, SurfaceType** ppSurface, f32* pNormal,
                                 f32* pHeight2, SurfaceType** ppSurface2, f32* pNormal2);
 
 // Ball.c
 void Ball_SetSimulating(u8 bOn);        // rehearsals and look-aheads: no sounds, effects or tree roll
+void fn_80050D2C(u8 b);
+void fn_80051A18(Ball* pBall, f32* pDir, f32 fSpeed, f32* pFrom);
+void Ball_Launch(Ball* pBall, int nClub, int nKind, f32 fPower, f32 fAim, int nTrajectory, f32* pA, f32* pB);
+void fn_80054A6C(Ball* pBall);
+int  Physics_Simulate(Ball* pBall, int nMs);
 u8   Physics_DropBall(Ball* pBall, f32* pPos);          // put the ball on the ground at a point
+void Ball_SimStep(Ball* pBall, f32 fSeconds, f32 fTick);
+u8   fn_800559BC(Ball* pBall, f32* pPos);
 u8   fn_80055AA8(Ball* pBall, f32* pPos, int nPlayer);  // a fresh ball for a player at a point
 void fn_80055C1C(u8 b);
 void fn_80055C40(int n);
