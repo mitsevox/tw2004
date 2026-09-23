@@ -178,7 +178,7 @@ typedef struct SaveProfile {
     Award aAward[39];           // 0x0039C
     u8   aReplay[5][0xF28];     // 0x00438  a Replay each, saved with awards 0, 6, 9, 3 and 13
     s32  nTourCardLevel;        // 0x05000  0..6: level 1 comes from the lessons (GameMode11), the rest
-                                //          from fn_800D439C; it scales payouts (GM_Earnings_ComputeTOURCardModifiers)
+                                //          from fn_800D439C; it scales payouts (fn_800D7220)
     u8   a5004[71];             // 0x05004  per marked hole 0..70 (fn_800E1CE8): fn_800588F4's kind 0
     u8   unk504B;
     s32  a504C[71];             // 0x0504C  the same, fn_800588F4's kind 1

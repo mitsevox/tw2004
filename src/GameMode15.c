@@ -176,8 +176,8 @@ void fn_800F3EBC(int nPlayer) {
             gPlayers[nPlayer].aDC4[3]++;
             if (lbl_80282380 != 0) {
                 if (lbl_80282380 > 0) {
-                    lbl_80282380 = GM_Earnings_ComputeBonusModifiers(lbl_80282380, nPlayer, 1, 1, 1, 0);
-                    lbl_80282380 = GM_Earnings_ComputeTOURCardModifiers(lbl_80282380, nPlayer, 0);
+                    lbl_80282380 = fn_800D6A70(lbl_80282380, nPlayer, 1, 1, 1, 0);
+                    lbl_80282380 = fn_800D7220(lbl_80282380, nPlayer, 0);
                 }
                 gPlayers[nPlayer].nDD8 += lbl_80282380;
                 if (gPlayers[nPlayer].nDD8 < 0) {
