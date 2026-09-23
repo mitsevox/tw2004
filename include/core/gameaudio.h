@@ -17,9 +17,8 @@ typedef struct GameAudioView {
     u8   unk6[0x8 - 0x6];
     f32  f8;                    // 0x8
     f32  fC;                    // 0xC
-    s32  n10;                   // 0x10
-    s32  n14;                   // 0x14
-    s32  n18;                   // 0x18
+    u64  tLast;                 // 0x10   fn_800954A4(1)'s reading when fn_800A5CA4 last ran
+    s32  n18;                   // 0x18   the swing state fn_800A573C last saw
     u8   unk1C[0x20 - 0x1C];
 } GameAudioView;
 LAYOUT_ASSERT(GameAudioView, 0x20);

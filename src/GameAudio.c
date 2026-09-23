@@ -23,6 +23,11 @@ void fn_800AD790(u8 nId, u8 nTrack, u32 uParams);
 void fn_800AD9AC(u8 nId, u8 nTrack, u8 n);
 void fn_800AD800(u8 nId, f32* pPos, f32* pLast, u8 b);
 void fn_800ADAF0(u8 nId, u8 nTrack, f32 fPitch);
+void fn_800ADBC0(s16 nKind, f32* pPos, f32* pLast, u8 b);  // types unproven
+void fn_800ADD54(s16 nKind, u8 nTrack, f32 fVolume);        // types unproven
+
+f32  fn_8006E118(u64 tEnd, u64 tStart);    // GameManager.c: seconds between two time stamps
+void fn_8010D3D8(int nPlayer);
 void fn_800ADA94(u8 nId, u8 nTrack, f32 fVolume);
 void fn_800ADB4C(s16 nKind, u8 nTrack, u8 bOn);
 void fn_800ADC44(s16 nKind, u8 nTrack, u8 n);
@@ -783,8 +788,7 @@ u8 fn_800A4A88(void) {
         lbl_801F1790[i].n5 = 0;
         lbl_801F1790[i].f8 = 0.0f;
         lbl_801F1790[i].fC = 0.0f;
-        lbl_801F1790[i].n14 = 0;
-        lbl_801F1790[i].n10 = 0;
+        lbl_801F1790[i].tLast = 0;
     }
     lbl_80281418 = 0xFF;
     lbl_80281419 = 0xFF;
@@ -891,8 +895,7 @@ void fn_800A5428(void) {
         lbl_801F1790[i].n5 = 0;
         lbl_801F1790[i].f8 = 0.0f;
         lbl_801F1790[i].fC = 0.0f;
-        lbl_801F1790[i].n14 = 0;
-        lbl_801F1790[i].n10 = 0;
+        lbl_801F1790[i].tLast = 0;
     }
     lbl_80281419 = 0xFF;
     lbl_80281418 = 0xFF;
@@ -990,6 +993,62 @@ void fn_800A573C(u8 nPlayer) {
             pView->fC = gSession.fFrameTime;
         }
     }
+}
+
+// The ball's impact sound, by the surface it hit (its nSoundId) and scaled by its speed; on
+// course 7's hole 2 a surface with a swing sound plays that instead.
+void fn_800A5CA4(u8 nPlayer) {
+    Player* pPlayer;
+    GameAudioView* pView;
+    SurfaceType* pSurface;
+    u64 tNow;
+    f32 fElapsed;
+    f32 fSpeed;
+    f32 fVolume;
+    u8 nId;
+
+    pPlayer = &gPlayers[nPlayer];
+    pSurface = pPlayer->ball.pHitSurface;
+    pView = &lbl_801F1790[pPlayer->nView[0]];
+    tNow = fn_800954A4(1);
+    fElapsed = fn_8006E118(tNow, pView->tLast);
+    pView->tLast = tNow;
+    if ((pPlayer->ball.nCollideCount == 0
+         || (pPlayer->ball.nCollideCount > 0 && fElapsed >= 0.2f))
+        && pSurface != NULL) {
+        fSpeed = pPlayer->ball.fSpeed;
+        if (fSpeed < 0.0f) {
+            fSpeed = -fSpeed;
+        }
+        fVolume = lbl_8028144C * fSpeed;
+        fVolume = fVolume * fVolume;
+        if (fVolume > 0.1f) {
+            if (Game_GetCourse() == 7 && fn_80015464() == 2 && pSurface->nSwingSoundId != 0) {
+                fVolume *= 2.0f;
+                if (fVolume > 2.0f) {
+                    fVolume = 2.0f;
+                }
+                fn_800ADBC0(4, pPlayer->ball.vPos, NULL, 0);
+                fn_800ADCD0(4, 0, pSurface->nSwingSoundId - 1, 0);
+                fn_800ADD54(4, 0, fVolume);
+            } else {
+                nId = lbl_801F1790[pPlayer->nView[0]].n1;
+                if (pSurface->nSoundId == 4) {
+                    fVolume = 1.0f;
+                }
+                if (fVolume > 1.0f) {
+                    fVolume = 1.0f;
+                }
+                fn_800AD800(nId, pPlayer->ball.vPos, NULL, 0);
+                fn_800ADA28(nId, 0, pSurface->nSoundId, 0);
+                fn_800ADA94(nId, 0, fVolume);
+            }
+            if (Game_GetMode() == 26 || Game_GetMode() == 22) {
+                fn_8010D3D8(nPlayer);
+            }
+        }
+    }
+    fn_800A707C();
 }
 
 void fn_800A5EC0(u8 nPlayer) {
