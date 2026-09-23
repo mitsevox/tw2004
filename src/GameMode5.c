@@ -923,3 +923,62 @@ int fn_800EC558(void) {
     }
     return 3;
 }
+
+// The number shown against the target: the match margin (mode 1), a count (mode 8), nD8 (mode 2),
+// nDD8, or the group's strokes so far minus its target.
+int fn_800ECC14(void) {
+    int nTarget;
+    int nScore;
+    int i;
+    int k;
+    int h;
+    if (Game_GetMode() == 1) {
+        if (gpGame->bD4) {
+            return 0;
+        }
+        return gPlayers[0].nHolesWon - gPlayers[1].nHolesWon;
+    }
+    if (Game_GetMode() == 8) {
+        nScore = 0;
+        for (h = 0; h < 18; h++) {
+            if (gpGame->bHoleSelected[h]) {
+                nScore += gPlayers[0].n290[h];
+            }
+        }
+        return nScore;
+    }
+    if (Game_GetMode() == 2) {
+        return gpGame->nD8;
+    }
+    if (fn_800E39F0()) {
+        return gPlayers[0].nDD8;
+    }
+    nTarget = 0;
+    for (i = 0; i <= lbl_802822F4; i++) {
+        if (lbl_80281664[i].nGroup == lbl_80281664[lbl_802822F4].nGroup) {
+            nTarget += fn_800ED028(i);
+        }
+    }
+    k = 0;
+    nScore = lbl_80281664[lbl_802822F4].nTargetKind != 1 ? lbl_8028230C : 0;
+    if (Game_GetMode() == 0 && lbl_80281664[lbl_802822F4].nTargetKind == 7) {
+        if (fn_800E4BF8()) {
+            k = 1;
+        }
+        for (h = 0; h < k + Game_CurHoleIndex(); h++) {
+            if (gpGame->bHoleSelected[h]) {
+                nScore += gPlayers[0].nStrokes[h];
+            }
+        }
+    } else {
+        for (h = 0; h < 18; h++) {
+            if (gpGame->bHoleSelected[h] || lbl_80281664[lbl_802822F4].nTargetKind == 1) {
+                nScore += gPlayers[0].nStrokes[h];
+            }
+        }
+    }
+    if (lbl_80281664[lbl_802822F4].nTargetKind == 1) {
+        nTarget = 0;
+    }
+    return nScore - nTarget;
+}
