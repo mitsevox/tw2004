@@ -393,6 +393,21 @@ u8 fn_801061F8(s16 nPart, int nCategory, int nWanted) {
     return nCategory == nWanted;
 }
 
+// The asset in the first of the profile's slots whose asset is of the part (-1: none).
+int fn_80106244(s16 nPart) {
+    s16 i;
+    int nAsset;
+
+    fn_80077ACC();
+    for (i = 0; i < 53; i++) {
+        nAsset = fn_80103D14(i);
+        if (nAsset >= 0 && nPart == lbl_80282460->pAssets[nAsset].nPart) {
+            return nAsset;
+        }
+    }
+    return -1;
+}
+
 // Copy the name at nOffset in the 'CR_S' strings into pDst ("" for "NONE").
 u8 fn_8010645C(int nOffset, char* pDst) {
     char* pStrings = lbl_80282460->pStrings;
@@ -420,6 +435,36 @@ char* fn_801064EC(int nCategory) {
         return NULL;
     }
     return lbl_80282460->pStrings + nCategory;
+}
+
+// How many of the profile's slots hold an asset whose n2C is n.
+int fn_80106E48(s16 n) {
+    s16 i;
+    int nAsset;
+    int nCount = 0;
+
+    fn_80077ACC();
+    for (i = 0; i < 53; i++) {
+        nAsset = fn_80103D14(i);
+        if (nAsset >= 0 && n == lbl_80282460->pAssets[nAsset].n2C) {
+            nCount++;
+        }
+    }
+    return nCount;
+}
+
+// How many offered assets have lock kind nKind and lock number nLock.
+s32 fn_80106ED8(s32 nKind, s32 nLock) {
+    int i;
+    int nCount = 0;
+
+    for (i = 0; i < lbl_80282460->nAssets; i++) {
+        if (nKind == lbl_80282460->pAssets[i].nLockKind && nLock == lbl_80282460->pAssets[i].nLock &&
+            fn_801061C8(lbl_80282460->pAssets[i].n40)) {
+            nCount++;
+        }
+    }
+    return nCount;
 }
 
 // The lowest nLock above nAfter among the assets of lock kind nKind (-1: none).

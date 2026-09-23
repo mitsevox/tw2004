@@ -241,7 +241,7 @@ u8   fn_80104DB8(s16 nPart, int n, char* pDst); // copy the name of a part's ent
                                         // "All ..." entry when it has one); 0 if there is none
 int  fn_80105C44(s16 nPart, int b);
 u8   fn_801061C8(s8 n);                 // an asset with this n40 is offered
-int  fn_80106244(s16 nPart);            // the first slot of aAF80 whose asset is of the part
+int  fn_80106244(s16 nPart);            // the asset in the first slot of aAF80 whose asset is of the part
                                         // (-1: none)
 u8   fn_8010645C(int nOffset, char* pDst);  // copy a 'CR_S' name ("" for "NONE")
 void fn_801072CC(s16 nPart, s32* pLocked, s32* pB1CC, s32* pB344, s32* pAll);  // count a part's
