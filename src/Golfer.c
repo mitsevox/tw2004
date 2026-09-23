@@ -928,18 +928,17 @@ void Shot_Prepare(int nPlayer, u8 bNotify) {
 
 // Turn the aim by fDelta radians (wrapped to -pi..pi) and re-plan the target at the same distance.
 void AI_NudgeAim(int nPlayer, f32 fDelta) {
-    Player* p = &gPlayers[nPlayer];
     f32     vTarget[4];
     f32     fSin, fCos;
 
-    p->fAim += fDelta;
-    if (p->fAim < -PI) {
-        p->fAim += 2 * PI;
-    } else if (p->fAim > PI) {
-        p->fAim -= 2 * PI;
+    gPlayers[nPlayer].fAim += fDelta;
+    if (gPlayers[nPlayer].fAim < -PI) {
+        gPlayers[nPlayer].fAim += 2 * PI;
+    } else if (gPlayers[nPlayer].fAim > PI) {
+        gPlayers[nPlayer].fAim -= 2 * PI;
     }
-    fSin = fn_800095F0(p->fAim);
-    fCos = fn_80009638(p->fAim);
+    fSin = fn_800095F0(gPlayers[nPlayer].fAim);
+    fCos = fn_80009638(gPlayers[nPlayer].fAim);
     vTarget[0] = gPlayers[nPlayer].fBallX + -fSin * gPlayers[nPlayer].fDistance;
     vTarget[2] = gPlayers[nPlayer].fBallZ + fCos * gPlayers[nPlayer].fDistance;
     AI_PlanShot(nPlayer, vTarget);
@@ -947,19 +946,14 @@ void AI_NudgeAim(int nPlayer, f32 fDelta) {
 
 // Lengthen the shot by fDelta and re-plan the target on the same line.
 void AI_NudgeDistance(int nPlayer, f32 fDelta) {
-    Player* p = &gPlayers[nPlayer];
-    f32*    pAim;
-    f32*    pDist;
     f32     vTarget[4];
     f32     fSin, fCos;
 
-    p->fDistance += fDelta;
-    pAim  = &p->fAim;
-    pDist = &p->fDistance;
-    fSin  = fn_800095F0(*pAim);
-    fCos  = fn_80009638(*pAim);
-    vTarget[0] = gPlayers[nPlayer].fBallX + -fSin * *pDist;
-    vTarget[2] = gPlayers[nPlayer].fBallZ + fCos * *pDist;
+    gPlayers[nPlayer].fDistance += fDelta;
+    fSin = fn_800095F0(gPlayers[nPlayer].fAim);
+    fCos = fn_80009638(gPlayers[nPlayer].fAim);
+    vTarget[0] = gPlayers[nPlayer].fBallX + -fSin * gPlayers[nPlayer].fDistance;
+    vTarget[2] = gPlayers[nPlayer].fBallZ + fCos * gPlayers[nPlayer].fDistance;
     AI_PlanShot(nPlayer, vTarget);
 }
 
