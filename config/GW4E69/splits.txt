@@ -1528,10 +1528,7 @@ GameUICommands.c:
 	.text       start:0x800850E4 end:0x8008AD80
 
 FEgolferanim.c:
-	.text       start:0x8008AD80 end:0x8008EBB4
-
-unsorted/sweep_8008EBB4.c:
-	.text       start:0x8008EBB4 end:0x8008EC0C
+	.text       start:0x8008AD80 end:0x8008EC30
 
 uiLoadFile.c:
 	.text       start:0x8008EC30 end:0x8008F39C
@@ -1539,32 +1536,8 @@ uiLoadFile.c:
 uiProcessInterface.c:
 	.text       start:0x8008F39C end:0x80090940
 
-unsorted/sweep_80091454.c:
-	.text       start:0x80091454 end:0x80091460
-
-unsorted/sweep_80091708.c:
-	.text       start:0x80091708 end:0x8009170C
-
-unsorted/sweep_80091B98.c:
-	.text       start:0x80091B98 end:0x80091BDC
-
-unsorted/sweep_80091D84.c:
-	.text       start:0x80091D84 end:0x80091DB8
-
-unsorted/sweep_80091EE4.c:
-	.text       start:0x80091EE4 end:0x80091EE8
-
-unsorted/sweep_8009220C.c:
-	.text       start:0x8009220C end:0x80092210
-
-unsorted/sweep_80092210.c:
-	.text       start:0x80092210 end:0x8009222C
-
-unsorted/sweep_80092274.c:
-	.text       start:0x80092274 end:0x800922A0
-
-unsorted/sweep_800922A0.c:
-	.text       start:0x800922A0 end:0x800922A8
+fe_movies.c:
+	.text       start:0x80090B80 end:0x800922A8
 
 unsorted/sweep_800929E0.c:
 	.text       start:0x800929E0 end:0x800929E4
