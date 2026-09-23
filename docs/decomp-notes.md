@@ -312,7 +312,9 @@ The fixes that come up most often. Each points to its full entry below.
   for (...; p++)` gives `addi r0, r3, gTable@l; mr r31, r0` for the pointer; `gTable[i].x` in the
   loop body (CW strength-reduces it to the same walking pointer) gives the original's direct
   `addi r31, r3, gTable@l`. Two functions went 93/95 -> 100 (`AI_TargetsClear`,
-  `Golfer_TableByteSwap`).
+  `Golfer_TableByteSwap`). A local set at the top of each iteration, `pSlot = &gTable[i];`, is
+  as good as indexing and gives the same direct `addi` (skalib `AnimLib_FreeCopies`, 96.0 -> 100;
+  fully indexed was worse there).
 - **[verified] A loop over the players with a separate base and offset register** (`addi rB,
   gPlayers@l` before the loop, `add rP, rB, rOff` inside, `addi rOff, rOff, 0xEF8`) comes from
   byte arithmetic: `(Player*)((u8*)gPlayers + i * sizeof(Player))` (the `PLAYER(i)` macro in
@@ -391,6 +393,12 @@ The fixes that come up most often. Each points to its full entry below.
 
 ### Function calls and parameters
 
+- **[verified] Pass the expression, not the variable just stored.** `p = x + n; f(p);` gives
+  `add r30; mr r3, r30`; `p = x + n` used later with the call written `f(x + n)` gives the
+  original's `add r3; mr r30, r3` (skalib `ClipBank_Load`, 99.76 -> 100).
+- **[verified] Assign-then-fix each global in turn.** `a = x; a = align(a); b = y; b = align(b);`
+  and `a = x; b = y; a = align(a); b = align(b);` schedule the same, but only the first gives the
+  original's temporary registers (skalib `Skalib_Init`, 98.54 -> 100).
 - **[verified] A wrong prototype can hide the real call shape and still score in the 80s-90s.**
   Check each prototype against the real definition, then check r3/r4 are set or kept live
   before each `bl`: `fn_80039344(View*, f32)` was really `(int nView, f32)` (Swing
@@ -575,7 +583,8 @@ The fixes that come up most often. Each points to its full entry below.
 - **[verified] Float locals coalesce by live range, not by name.** Two slopes computed in two
   halves of a function got different registers until they were two variables declared in the
   right place; the product `a *= t; b = p * (k * a)` in place of `p * (k * (a * t))` fixed the
-  register numbers of a multiply chain.
+  register numbers of a multiply chain. Integers too: one `s32 nCount` reused for two leaves
+  became `nCountA`/`nCountB`, declared in that order (skalib `AnimLib_TrimCb`, 99.93 -> 100).
 - **[verified] A float parameter reused as the running value.** When the original's product
   lands in a different callee-saved register than ours and the operands of `fmuls` are swapped
   (`f1, f0` vs `f0, f1`), the source overwrote the parameter: `fSeconds *= 60.0f; do { ...
