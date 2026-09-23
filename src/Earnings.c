@@ -71,7 +71,6 @@ u8    fn_800D76AC(int nPlayer, int nAward);
 int   fn_800D782C(int nPlayer, Ball* pBall, int a, u8 bCountStroke, u8 bAll);
 int   fn_800D7B1C(int nPlayer, Ball* pBall, int a, u8 bCountStroke, u8 bAll);
 int   fn_800D7DA0(int nPlayer, u8 a, u8 b, u8 c);
-int   fn_800D8750(int nKind, int nValue, int a, const char* szName, int nPlayer);
 u8    fn_800D8DB4(int nKind);
 s32   fn_800D9954(void);
 s32   fn_800D9E00(s32 i);
