@@ -7,6 +7,9 @@
 #include "charstate.h"
 #include "frontend/fe.h"
 
+s32  fn_800CCA40(Skin* pSkin);          // SkinPart.c: how many choices aParts[3] holds
+s32  fn_800CCEA0(Skin* pSkin);          // SkinPart.c: and aSets[3]
+
 // This file, in address order.
 int  fn_80104F7C(CrAPAsset* pAsset);
 void fn_80105188(UStreamObject* pObject);
@@ -40,8 +43,8 @@ void fn_80103D6C(void) {
     SaveProfile* pProfile = fn_80077ACC();
     Skin* pSkin = lbl_80281EE0->pB4->pChar->pSkin;
 
-    Mem_cpy(pProfile->a5614, pSkin->p10B4, fn_800CCA40(pSkin) * 8);
-    Mem_cpy(pProfile->a5754, pSkin->p10C4, fn_800CCEA0(pSkin) * 8);
+    Mem_cpy(pProfile->a5614, pSkin->aParts[3], fn_800CCA40(pSkin) * sizeof(SkinChoice));
+    Mem_cpy(pProfile->a5754, pSkin->aSets[3], fn_800CCEA0(pSkin) * sizeof(SkinChoice));
 }
 
 // The asset may be picked: it was not locked when last checked, and its aB1CC bit is set.
@@ -324,7 +327,7 @@ u8 fn_8010645C(int nOffset, char* pDst) {
         return 0;
     }
     strcpy(pDst, pStrings + nOffset);
-    if (fn_8015F844(pDst, "NONE") == 0) {
+    if (stricmp(pDst, "NONE") == 0) {
         *pDst = '\0';
     }
     return 1;

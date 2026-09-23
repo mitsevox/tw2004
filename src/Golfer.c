@@ -113,7 +113,7 @@ void Golfer_ClampModifiers(Player* pPlayer) {
 
 // The binary's only powf: the SDK's reverb effect (reverb_hi.c) calls this same function.
 f32 powf(f32 x, f32 y) {
-    return fn_8015F824(x, y);
+    return pow(x, y);
 }
 
 // Pick where the CPU aims: the most demanding authored aim point it qualifies for. A human
@@ -1157,7 +1157,7 @@ u8 AI_RehearseShot(int nPlayer, f32* pOutDist2, u8 bFast, f32 fTolerance) {
 f32 Shot_AimAngle(int nPlayer) {
     f32 fDX = gPlayers[nPlayer].vTarget[0] - gPlayers[nPlayer].vBall[0];
     f32 fDZ = gPlayers[nPlayer].vTarget[2] - gPlayers[nPlayer].vBall[2];
-    f32 fAngle = fn_8015F7C4(-fDX, fDZ);
+    f32 fAngle = atan2(-fDX, fDZ);
     if (fAngle > PI) {
         fAngle -= 2 * PI;
     } else if (fAngle < -PI) {
@@ -1294,7 +1294,6 @@ void Shot_Plan(int nPlayer, u8 bNotify) {
 
 extern u8 gAITargetsLoaded;             // 0x80281D40
 
-u8   Course_RegisterLoader(int nChunk, void (*pfn)(u8*));   // 0x8000C0B4
 
 void AI_TargetsClear(void) {
     int i;
@@ -1674,7 +1673,6 @@ void Luck_TakePerfectShot(int nPlayer) {
 #define BAG_DEFAULT  0x01FFFC7F     // a bag with no clubs 7, 8, 9 (the 3-, 4-, 5-woods?) or 25
 
 
-u8    fn_800170A0(int nView);                                   // the view exists
 void  fn_80016D18(int nView, f32 x, f32 y, f32 w, f32 h);       // open it (screen fractions)
 void  fn_80009710(f32* pQuat);                                  // identity (0, 0, 0, 1)
 void  fn_8005CE70(int nPlayer);

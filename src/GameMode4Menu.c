@@ -10,7 +10,6 @@
 #include "frontend/fe.h"
 #include "game/modes/ladder.h"
 
-GolferRecord* fn_80077A80(int nGolfer);
 int fn_80121A38(int nNode);
 int fn_80121B8C(int nNode);
 int fn_80121C08(int nNode);

@@ -152,7 +152,7 @@ void fn_8011FDC4(s32 p0) {
 // ---- sweep code (not yet cleaned up) ----
 
 s32 fn_8012022C(void);
-double fn_8015F7E4();
+double fmod();
 f32 fn_80120244(f32 x0);
 s32 fn_8012028C(u8* p0);
 
@@ -162,7 +162,7 @@ s32 fn_8012022C(void) {
 
 f32 fn_80120244(f32 x0) {
     f32 t0;
-    t0 = fn_8015F7E4(x0);
+    t0 = fmod(x0);
     return t0;
 }
 

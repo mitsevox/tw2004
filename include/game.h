@@ -54,6 +54,16 @@ LAYOUT_ASSERT(ReplayBuffer, 0x15260);
 
 extern ReplayBuffer* lbl_80281E48;      // 0x80281E48
 
+// gomainloop.c
+extern u8    lbl_80281B8E;              // the reset button was pressed (OSGetResetButtonState)
+extern u8    lbl_80281E50;              // set after a create-a-player frame, cleared otherwise
+extern void*       lbl_80281E54;        // the render camera made from the three below (fn_8001371C)
+extern void*       lbl_80281E58;        // } made by fn_80076ACC,
+extern GoFrameBuf* lbl_80281E5C;        // }   fn_8006E1C8
+extern void*       lbl_80281E60;        // }   and fn_80076400 when a game type starts
+extern s32   lbl_801888D0[4];           // the order the views are drawn in (0, 1, 2, 3)
+extern u8*   lbl_802811E8;              // [1]: the round is over (fn_8006DC34)
+
 // Replay.c
 void fn_8006BED4(void);                 // make the replay buffer
 void fn_8006BF20(void);                 // free it
@@ -188,17 +198,14 @@ f32  fn_800D0478(int nPlayer);          // the ball's distance from the pin (yar
 f32  fn_800D0550(int nPlayer);          // the shot's length
 int  Hole_ScoreAfterTapIn(int nPlayer); // HoleScore.c
 void fn_800D2714(u16* pDate, s32* pMonth, s32* pDay, s32* pYear);
-void fn_800D2678(u16* pDate, s32 nMonth, s32 nDay, s32 nYear);    // make a date
+void fn_800D2678(u16* pDate, s32 nMonth, s32 nDay, u32 nYear);    // make a date
 void fn_800D27CC(u16* pDate, s32 nDays);        // move a date on by nDays
 s32  fn_800D27E0(u16* pDate);                   // its day of the week, 1..7
-s32  fn_800D2814(s32 nMonth, s32 nYear);        // the days in a month
+s32  fn_800D2814(u32 nMonth, u32 nYear);        // the days in a month (compared unsigned: cmplwi)
 void fn_800D2884(s32 nMonth, s32 nYear, s32* pMonth, s32* pYear);  // the month before
 void fn_800D28B0(s32 nMonth, s32 nYear, s32* pMonth, s32* pYear);  // the month after
 void fn_800D28DC(u16 nDate, char* szOut);       // a date as text
 u16  fn_800D2994(void);                 // today's date
-u8   fn_800D256C(u32 nYear);            // a leap year (1900 counts as one)
-s32  fn_800D2608(u16 nDate);            // a date's day of the month
-s32  fn_800D2640(u16 nDate);            // a date's month
 int  fn_800D2ABC(int nCourse, int nHole);   // a hole's par on a course
 int  fn_800D2AD8(int nHole);            // a hole's par
 void fn_800D3548(int nPlayer, int nMoney, CourseMoneyTracking* pMoney);   // pMoney may be NULL
@@ -604,6 +611,13 @@ void fn_800F9844(void);
 // GameMode8.c (modes 6, 7 and 8 share it)
 extern u8  lbl_802823C9;
 extern s32 lbl_802823D0;                // the next entry of the event log lbl_802120F8 (0..99)
+
+// One entry of the event log: the last 100 events (GameMode8.c writes it, a menu command reads it).
+typedef struct SGLog {
+    s32 nEvent;
+    s32 nPlayer;
+} SGLog;
+extern SGLog lbl_802120F8[100];
 extern s32 lbl_802823D4;
 void fn_800F9A58(void);
 void fn_800F9AB0(void);

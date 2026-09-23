@@ -1,6 +1,7 @@
 // #include <cctype>
 #include <ansi_files.h>
 #include <ansi_fp.h>
+#include <critical_regions.h>
 #include <ctype.h>
 #include <locale.h>
 #include <math.h>
@@ -1223,9 +1224,11 @@ int printf(const char* format, ...) {
     return -1;
   }
 
+  __begin_critical_region(files_access);
   va_start(l, format);
   ret = __pformatter(&__FileWrite, (void*)stdout, format, l);
   va_end(l);
+  __end_critical_region(files_access);
   return ret;
 }
 
@@ -1258,7 +1261,9 @@ size_t vprintf(const char* pFormat, va_list arg) {
     return -1;
   }
 
+  __begin_critical_region(files_access);
   ret = __pformatter(&__FileWrite, (void*)stdout, pFormat, arg);
+  __end_critical_region(files_access);
   return ret;
 }
 

@@ -20,6 +20,7 @@ int  fn_800797E0(SaveProfile* pProfile, s16 nPart, int b, int nChance);
 void fn_80103B74(u8 b);                 // FE_CrAPDB.c: set the database's b14
 void fn_801073DC(s16 nSlot);            // FE_CrAPDB.c
 void fn_800A73F0(s32 n);
+u8   fn_800D256C(u32 nYear);            // Calendar.c: a leap year (1900 counts as one)
 
 // ---- sweep code (not yet cleaned up) ----
 

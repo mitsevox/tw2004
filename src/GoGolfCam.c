@@ -40,8 +40,6 @@ void     fn_800B5918(f32* pSrc, f32* pDst);             // copy three floats
 void     fn_800636B4(int nPlayer);
 void     fn_800C4AB0(f32* pFrom, f32* pTo, f32* pOut);
 int      fn_800C4D2C(f32* pFrom, f32* pTo, f32* pOut, f32 fMax);
-u8       fn_80069428(f32* pPos);                        // the point is in bounds
-TNetwork* fn_80069498(void);                            // the course's boundary outline, if any
 // The segment crosses the outline (at pHit).
 u8       fn_8000C3C8(f32* pFrom, f32* pTo, TNetwork* pNet, s32 nNodes, f32* pHit);
 u8       fn_8004B6F8(f32* pFrom, f32* pTo, f32* pHit);
@@ -926,8 +924,8 @@ void fn_800BF658(View* pView, int nPlayer) {
             }
             if (nClass != 7) {
                 // the step: the length of three times vCBC's x and z, per 60th of a second
-                fStep = (f32)fn_80009680((f32)(fn_8015F824(3.0f * gPlayers[nPlayer].vCBC[2], 2.0)
-                                                + fn_8015F824(3.0f * gPlayers[nPlayer].vCBC[0], 2.0)))
+                fStep = (f32)fn_80009680((f32)(pow(3.0f * gPlayers[nPlayer].vCBC[2], 2.0)
+                                                + pow(3.0f * gPlayers[nPlayer].vCBC[0], 2.0)))
                         / (FRAME_RATE / 60.0f);
                 lbl_80191334[nPlayer] += fStep;
                 lbl_80191348[nPlayer] += fStep;

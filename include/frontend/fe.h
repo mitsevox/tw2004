@@ -232,7 +232,7 @@ s16  fn_80105610(int nAsset);           // } asset)
 s32  fn_80105C00(void);                 // how many assets there are
 u8   fn_80105C30(void);                 // the Create-A-Player database is allocated
 char* fn_801064EC(int nCategory);       // a category's name
-int  fn_8015F844(const char* a, const char* b);       // strcmp ignoring case (MSL's __lower_map)
+int  stricmp(const char* a, const char* b);           // 0x8015F844 (MSL): strcmp ignoring case
 
 void FE_MakeMoviePath(char* pName, char* pPath);        // "data/movies/<name>.NGC"
 void FE_MakeCameoMoviePath(char* pName, char* pPath);   // "data/movies/cameos/<name>.NGC"
@@ -256,7 +256,8 @@ void fn_80084FF0(int n);                // sets lbl_80281FFC
 
 extern char* lbl_80191990[30];          // per course: a string the menus show (a replay's course
                                         // picks it)
-extern s32 lbl_80281FFC;                // set by fn_80084FF0
+extern s32 lbl_80281FFC;                // set by fn_80084FF0: the lbl_8018C7D8 set (memcard.h) the
+                                        // menus' memory-card messages use
 
 // ---- the golfers animated on menu screens (FEgolferanim.c) ------------------------------------
 
@@ -286,10 +287,8 @@ typedef struct LogoEdit {
 } LogoEdit;
 LAYOUT_ASSERT(LogoEdit, 0xC);
 
-extern LogoEdit* lbl_802824B8;
-
-// A logo as it is kept (0x1022 bytes): the profile holds them from 0x5ED0 and fn_8010FB70 picks
-// the one LogoEdit.n0 names.
+// A saved logo (0x1022 bytes): the profile holds five (ProfileLogos) and fn_8010FB70 picks the
+// one LogoEdit.n0 names.
 typedef struct LogoRecord {
     u8   aPixels[0x1000];       // 0x0000  64 x 64 or 128 x 32 colour indexes
     char szName[0x20];          // 0x1000
@@ -297,6 +296,15 @@ typedef struct LogoRecord {
     u8   nShape;                // 0x1021  LOGO_SQUARE or LOGO_RECT
 } LogoRecord;
 LAYOUT_ASSERT(LogoRecord, 0x1022);
+
+// The part of the save profile from 0x5500 that char_tex_manager.c is given (fn_80077ACC() +
+// 0x5500); only the logos are known.
+typedef struct ProfileLogos {
+    u8  unk0[0x9D0];
+    LogoRecord aLogo[5];        // 0x09D0  the user logos ("_usrtextr0".."_usrtextr4")
+} ProfileLogos;
+
+extern LogoEdit* lbl_802824B8;
 extern s16* lbl_802824BC;               // the palette: 256 colours, 1-bit alpha (the sign bit)
                                         // and 5-5-5 RGB; read signed (lha)
 extern u8 lbl_802824C0;                 // the palette has been copied from "__LogoSquare"
