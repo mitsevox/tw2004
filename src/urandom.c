@@ -6,24 +6,6 @@
 #include "engine.h"
 #include "golfer.h"                     // PI
 
-// port: the GameCube OS library: the clock and its conversion to a calendar date.
-struct OSCalendarTime {
-    s32 nSec;                   // 0x00  0-59
-    s32 nMin;                   // 0x04  0-59
-    s32 nHour;                  // 0x08  0-23
-    s32 nMday;                  // 0x0C
-    s32 nMon;                   // 0x10
-    s32 nYear;                  // 0x14
-    s32 nWday;                  // 0x18
-    s32 nYday;                  // 0x1C
-    s32 nMsec;                  // 0x20
-    s32 nUsec;                  // 0x24
-};
-
-s64  OSGetTime(void);
-void OSTicksToCalendarTime(s64 nTicks, struct OSCalendarTime* pTime);
-u32  OSGetTick(void);
-
 // Written in reverse address order (CodeWarrior lays out .bss last-defined-first).
 u32 lbl_801A24C4[3][20];        // each stream's table
 s32 lbl_801A24B8[3];            // each stream's position in its table, counting down
@@ -85,7 +67,7 @@ u32 fn_8000B244(void) {
 
 // The seconds, minutes and hours of the date, plus 10, mixed with the CPU's tick counter.
 u32 fn_8000B264(void) {
-    struct OSCalendarTime time;
+    OSCalendarTime time;
     u32 uSeed;
 
     OSTicksToCalendarTime(OSGetTime(), &time);
