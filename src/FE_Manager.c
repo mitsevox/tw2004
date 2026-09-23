@@ -1,7 +1,13 @@
-// FE_Manager.c (EA's name, from its asserts; also in EA's 2002 source tree): not yet decompiled;
-// the sweep code below is the matched small functions.
+// FE_Manager.c (EA's name, from its asserts; also in EA's 2002 source tree): the front end's
+// manager, which runs the menu screens. Partly decompiled: the movie paths are clean, the sweep
+// code around them is the matched small functions.
 
 #include "game_types.h"
+#include "platform.h"
+#include "frontend/fe.h"
+
+void fn_8007706C(char* pName, char* pDir, char* pPath);
+void fn_800770D4(char* pName, char* pPath);
 
 // ---- sweep code (not yet cleaned up) ----
 
@@ -82,6 +88,28 @@ loop_1:
     }
     goto loop_1;
 }
+
+// ---- end of sweep code ----
+
+// A movie's path on the disc: "data/movies/<name>.NGC".
+void FE_MakeMoviePath(char* pName, char* pPath) {
+    sprintf(pPath, "data/movies/%s.%s", pName, "NGC");
+}
+
+// The same in a subfolder: "data/movies/<dir>/<name>.NGC".
+void fn_8007706C(char* pName, char* pDir, char* pPath) {
+    sprintf(pPath, "data/movies/%s/%s.%s", pDir, pName, "NGC");
+}
+
+void FE_MakeCameoMoviePath(char* pName, char* pPath) {
+    fn_8007706C(pName, "cameos", pPath);
+}
+
+void fn_800770D4(char* pName, char* pPath) {
+    fn_8007706C(pName, "bios", pPath);
+}
+
+// ---- sweep code (not yet cleaned up) ----
 
 s32 fn_80077148(void) {
     return (((u32)__cntlzw((*(s32*)(lbl_801D7148 + 0x20) - *(s32*)(lbl_801D7148 + 0x24))) >> 5) & 0xFF);

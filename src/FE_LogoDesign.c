@@ -1,101 +1,180 @@
-// FE_LogoDesign.c (EA's name, from its asserts): not yet decompiled; the sweep code below is the
-// matched small functions.
+// FE_LogoDesign.c (EA's name, from its asserts): the logo editor. A logo is a 64 x 64 or 128 x 32
+// grid of colour indexes into a 256-colour palette; the palette comes from the texture
+// "__LogoSquare", and the logo is copied into the texture "__LogoSquare" or "__LogoRect" to be drawn.
 
-#include "game_types.h"
+#include "engine.h"
+#include "frontend/fe.h"
 
-// ---- sweep code (not yet cleaned up) ----
+u8   fn_8000BD80(char* pName, u8** ppPixels);   // a texture's pixels by name; 0 if none
+int  fn_8000BDF8(char* pName, TexBank** ppBank, TexEntry** ppTex);  // find a texture by name
 
-extern u8 lbl_80193D28[];
-extern s32 lbl_802824B8;
-extern s32 lbl_802824BC;
-extern u8 lbl_802824C0;
-void fn_80005AE8();
-s32 fn_80009B34();
-void fn_80009E70();
-void fn_8010FAF4();
 void fn_8010F6C8(void);
 void fn_8010F718(void);
 void fn_8010F748(void);
 void fn_8010F794(void);
-void fn_8010F7C0(s32 p0);
-s32 fn_8010F7D8(void);
-void fn_8010F7E4(s32 p0);
+void fn_8010F7C0(s32 n);
+s32  fn_8010F7D8(void);
+void fn_8010F7E4(s32 nShape);
+void fn_8010F7FC(int nColor, u32* pR, u32* pG, u32* pB, u32* pA);
 void fn_8010F880(void);
-s32 fn_8010F978(s32 arg0, s32 arg1);
-s32 fn_8010FB70();
-void fn_8010F90C(s32 p0, s32 p1, s32 p2);
+void fn_8010F890(char* pName);
+void fn_8010F90C(int nX, int nY, int nColor);
+int  fn_8010F978(int nX, int nY);
+void fn_8010FA00(void);
+void fn_8010FAF4(void);
 
+// Last address first: CodeWarrior lays out uninitialised globals in reverse order of definition.
+u8 lbl_802824C0;
+s16* lbl_802824BC;
+LogoEdit* lbl_802824B8;
+
+// Allocate the palette, empty. (The allocator records EA's file name and line.)
 void fn_8010F6C8(void) {
-    s32 t0;
-    t0 = fn_80009B34(512, 0, 0, lbl_80193D28, 47);
-    lbl_802824BC = t0;
-    fn_80005AE8(t0, 0, 512);
+    lbl_802824BC = fn_80009B34(256 * sizeof(s16), 0, 0, "FE_LogoDesign.c", 47);
+    fn_80005AE8(lbl_802824BC, 0, 256 * sizeof(s16));
     lbl_802824C0 = 0;
 }
 
 void fn_8010F718(void) {
     fn_80009E70(lbl_802824BC);
-    lbl_802824BC = 0;
+    lbl_802824BC = NULL;
     lbl_802824C0 = 0;
 }
 
+// Start editing: a cleared logo, and the palette if it is not loaded yet.
 void fn_8010F748(void) {
-    s32 t0;
-    t0 = fn_80009B34(12, 2, 0, lbl_80193D28, 67);
-    lbl_802824B8 = t0;
-    fn_80005AE8(t0, 0, 12);
+    lbl_802824B8 = fn_80009B34(sizeof(LogoEdit), 2, 0, "FE_LogoDesign.c", 67);
+    fn_80005AE8(lbl_802824B8, 0, sizeof(LogoEdit));
     fn_8010FAF4();
 }
 
 void fn_8010F794(void) {
     fn_80009E70(lbl_802824B8);
-    lbl_802824B8 = 0;
+    lbl_802824B8 = NULL;
 }
 
-void fn_8010F7C0(s32 p0) {
-    *(s32*)((u8*)lbl_802824B8) = p0;
-    *(u8*)(((u8*)lbl_802824B8) + 0x8) = 1;
+void fn_8010F7C0(s32 n) {
+    lbl_802824B8->n0 = n;
+    lbl_802824B8->bDirty = 1;
 }
 
 s32 fn_8010F7D8(void) {
-    return *(s32*)(lbl_802824B8 + 0x0);
+    return lbl_802824B8->n0;
 }
 
-void fn_8010F7E4(s32 p0) {
-    *(s32*)(((u8*)lbl_802824B8) + 0x4) = p0;
-    *(u8*)(((u8*)lbl_802824B8) + 0x8) = 1;
+void fn_8010F7E4(s32 nShape) {
+    lbl_802824B8->nShape = nShape;
+    lbl_802824B8->bDirty = 1;
+}
+
+// A palette colour as 0-255 components; alpha is 0 or 255.
+void fn_8010F7FC(int nColor, u32* pR, u32* pG, u32* pB, u32* pA) {
+    s16* pPalette = fn_8010FBC4();
+    *pR = (pPalette[nColor] >> 7) & 0xF8;
+    *pB = (pPalette[nColor] << 3) & 0xF8;
+    *pG = (pPalette[nColor] >> 2) & 0xF8;
+    *pA = (pPalette[nColor] >> 15) & 1;
+    if (*pA) {
+        *pA = 0xFF;
+    }
 }
 
 void fn_8010F880(void) {
-    *(u8*)(((u8*)lbl_802824B8) + 0x8) = 1;
+    lbl_802824B8->bDirty = 1;
 }
 
-void fn_8010F90C(s32 p0, s32 p1, s32 p2) {
-    s32 t0;
-    s32 t1;
-    t0 = fn_8010FB70();
-    t1 = fn_8010F978(p0, p1);
-    *(u8*)(((u8*)t0) + t1) = p2;
-    *(u8*)(((u8*)lbl_802824B8) + 0x8) = 1;
-}
-
-s32 fn_8010F978(s32 arg0, s32 arg1) {
-    s32 temp_r0;
-
-    temp_r0 = (*(s32*)((u8*)(lbl_802824B8) + 4));
-    if (temp_r0 == 0) {
-        if ((arg0 < 0) || (arg0 >= 0x40) || (arg1 < 0) || (arg1 >= 0x40)) {
-            return -1;
+// Load the logo from a texture.
+void fn_8010F890(char* pName) {
+    u8* pLogo = fn_8010FB70();
+    u8* pPixels;
+    int nWidth;
+    int nHeight;
+    if (fn_8000BD80(pName, &pPixels)) {
+        if (lbl_802824B8->nShape == LOGO_SQUARE) {
+            nWidth = 64;
+            nHeight = 64;
+        } else {
+            nWidth = 128;
+            nHeight = 32;
         }
-        return arg0 + (arg1 << 6);
+        fn_8010FC3C(pLogo, pPixels, 0, nWidth, nHeight);
     }
-    if (temp_r0 == 1) {
-        if ((arg0 < 0) || (arg0 >= 0x80) || (arg1 < 0) || (arg1 >= 0x20)) {
+}
+
+// EA bug: a pixel off the logo (fn_8010F978 returns -1) writes the byte before it.
+void fn_8010F90C(int nX, int nY, int nColor) {
+    u8* pLogo;
+    int n;
+    pLogo = fn_8010FB70();
+    n = fn_8010F978(nX, nY);
+    pLogo[n] = nColor;
+    lbl_802824B8->bDirty = 1;
+}
+
+// A pixel's index in the logo, or -1 if it is off the logo.
+int fn_8010F978(int nX, int nY) {
+    s32 nShape = lbl_802824B8->nShape;
+    if (nShape == LOGO_SQUARE) {
+        if (nX < 0 || nX >= 64 || nY < 0 || nY >= 64) {
             return -1;
         }
-        return arg0 + (arg1 << 7);
+        return nX + (nY << 6);
+    }
+    if (nShape == LOGO_RECT) {
+        if (nX < 0 || nX >= 128 || nY < 0 || nY >= 32) {
+            return -1;
+        }
+        return nX + (nY << 7);
     }
     return -1;
 }
 
-// ---- end of sweep code ----
+// Once a frame: if the logo changed, copy it into its texture and draw with that.
+void fn_8010FA00(void) {
+    u8* pLogo = fn_8010FB70();
+    char* pName;
+    TexBank* pBank;
+    TexEntry* pTex;
+    u8* pPixels;
+    int nWidth;
+    int nHeight;
+    if (lbl_802824B8->bDirty) {
+        lbl_802824B8->bDirty = 0;
+        if (lbl_802824B8->nShape == LOGO_SQUARE) {
+            pName = "__LogoSquare";
+        } else {
+            pName = "__LogoRect";
+        }
+        fn_800102DC(fn_8000BEE4(pName), &pBank, &pTex);
+        if (pTex == NULL) {
+            fn_8000BDF8(pName, &pBank, &pTex);
+        }
+        if (pTex != NULL) {
+            pPixels = pBank->p18 + pTex->uPixels;
+            if (lbl_802824B8->nShape == LOGO_SQUARE) {
+                nWidth = 64;
+                nHeight = 64;
+            } else {
+                nWidth = 128;
+                nHeight = 32;
+            }
+            fn_8010FC3C(pPixels, pLogo, 1, nWidth, nHeight);
+            fn_8005CC64(pBank, pTex);
+        }
+    }
+}
+
+// Copy the palette of "__LogoSquare", once.
+void fn_8010FAF4(void) {
+    TexBank* pBank;
+    TexEntry* pTex;
+    s16* pPalette;
+    if (lbl_802824C0 == 0) {
+        fn_8000BDF8("__LogoSquare", &pBank, &pTex);
+        if (pTex != NULL) {
+            pPalette = fn_8010FBC4();
+            Mem_cpy(pPalette, pBank->p20 + pBank->pC[pTex->nPalette].uColors, pBank->u24);
+            lbl_802824C0 = 1;
+        }
+    }
+}

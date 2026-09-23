@@ -199,7 +199,12 @@ second copy. The steps:
    prints the differing ranges. A shifted block inside the unit's `.text` means a function is
    defined out of address order (objdiff scores by name, so it still showed 100%); differences
    only in data mean a range is wrong.
-5. Stop and report, don't force it, when one of our constants maps to two original symbols (the
+5. Uninitialised globals (`.bss`/`.sbss`): define each one the unit owns in the unit's file, with
+   its true type and size, non-static, in REVERSE address order (CodeWarrior lays an object's `.bss`
+   out last-defined-first), then add the unit's `.bss` range to splits.txt by hand (graduate.py only
+   takes `.sdata2`/`.data`). Remove the matching `extern` from the header only if no other file
+   uses it; otherwise the header keeps the `extern` and the owner file has the definition.
+6. Stop and report, don't force it, when one of our constants maps to two original symbols (the
    original was two files) or the constants are shared with neighbouring code (the unit is a
    slice of a larger file).
 
