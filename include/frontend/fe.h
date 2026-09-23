@@ -52,7 +52,9 @@ extern FEState lbl_801D7148;
 // The front end's screen state (lbl_801D87C0, 0x4C bytes). Only what the cleaned code reads.
 typedef struct FEScreen {
     u8  b0;                     // 0x00  set by fn_80079AD4
-    u8  unk1[0x44 - 0x1];
+    u8  unk1[0x38 - 0x1];
+    s32 n38;                    // 0x38  a menu message reads it (fn_8007DAD4)
+    u8  unk3C[0x44 - 0x3C];
     f32 fFade;                  // 0x44  the fade to black before a movie, 0 to 1
     u8  unk48[0x4C - 0x48];
 } FEScreen;
@@ -72,6 +74,16 @@ LAYOUT_ASSERT(FE801D8858, 0x38);
 
 extern FE801D8858 lbl_801D8858;
 
+// lbl_801D880C (0xC bytes), also read by uiProcessInterface.c. A menu message sets n4 and clears n0.
+typedef struct FE801D880C {
+    s32 n0;                     // 0x0  0..2; uiProcessInterface.c sets it to -1
+    s32 n4;                     // 0x4
+    u8  unk8[4];
+} FE801D880C;
+LAYOUT_ASSERT(FE801D880C, 0xC);
+
+extern FE801D880C lbl_801D880C;
+
 // One of 200 entries (lbl_801D8890); uiProcessInterface.c sets them from lbl_801D8ED0.
 typedef struct FE801D8890 {
     u8  b0;                     // 0x0
@@ -90,9 +102,14 @@ typedef struct FEProfile {
     u8  b0;                     // 0x00000  with game mode 10, the menus start in mode 27
     s8  n1;                    // 0x00001  -1 when it is set up
     s8  nSlot;                  // 0x00002  the player slot whose profile it is
-    u8  unk3[0x10 - 0x3];
+    s8  n3;                     // 0x00003  } set and read by menu messages (FE_MessageTable.c)
+    s8  n4;                     // 0x00004  }
+    s8  n5;                     // 0x00005  }
+    u8  unk6[0x10 - 0x6];
     SaveProfile profile;        // 0x00010  a working copy
-    u8  unk10610[0x1063F - 0x10610];
+    u8  unk10610[0x10620 - 0x10610];
+    s8  n10620;                 // 0x10620  read and cleared by menu messages
+    u8  unk10621[0x1063F - 0x10621];
     u8  bCopy;                  // 0x1063F  the working copy is the profile, not the slot's own
     u8  b10640;                 // 0x10640
     u8  unk10641[3];
@@ -205,6 +222,22 @@ SaveProfile* fn_80077ACC(void);         // the profile being worked on
 int  fn_80077B08(void);                 // its player slot
 u8   fn_80077B18(int nGolfer);          // a yes/no list over golfers 0..28 (Golfer.c asks it)
 void fn_80077B78(void);                 // pick the day's random assets (fn_80077C1C)
+FEMovie* fn_800770FC(void);             // the next free place in the movie queue
+void fn_80077780(void);
+void fn_80077808(int nSlot);
+void fn_80077968(int nSlot);
+GolferRecord* fn_80077A80(int nGolfer); // a golfer's record (created golfers: the profile's)
+void fn_80079AD4(void);
+void fn_800A75B4(void);                 // (0x800A75B4) FE_Manager.c calls it after queueing a movie
+
+// ---- the menus' message table (FE_MessageTable.c) --------------------------------------------
+
+void fn_80079EA8(void);                 // fill the table
+void fn_80084FF0(int n);                // sets lbl_80281FFC
+
+extern char* lbl_80191990[30];          // per course: a string the menus show (a replay's course
+                                        // picks it)
+extern s32 lbl_80281FFC;                // set by fn_80084FF0
 
 // ---- the logo editor (FE_LogoDesign.c) -------------------------------------------------------
 

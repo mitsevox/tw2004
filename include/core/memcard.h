@@ -191,6 +191,7 @@ s32  fn_8009F6A0(s32 nPort, s32 nSlot);
 // The card's state as an error code: -4 no card, -1 when uFlags bit 0x08 is clear (a mount sets it,
 // a format in progress or an encoding error clears it), -35 not mounted, else 0.
 s32  fn_8009F734(s32 nPort, s32 nSlot);
+s32  fn_8009F728(int nPort);        // lbl_80281FD0[nPort] (the menus read it as a whole word)
 u8   fn_8009F7E8(int nPort);        // lbl_80282008[nPort]
 void fn_8009F7F4(MCCardState* pState, int nPort, int nSlot);   // copy out lbl_801F1510[nPort][nSlot]
 MCCardState* fn_8009F834(s32 nPort, s32 nSlot);                 // &lbl_801F1510[nPort][nSlot]
@@ -204,6 +205,8 @@ s32  fn_800A0A7C(s32 nPort, s32 nSlot);
 void fn_800A1BE0(void);
 void fn_800A1D4C(UStreamObject* pObject);  // the 'eagm' handler
 s32  fn_800A2100(s32 nPort, s32 nSlot);
+s32  fn_800A218C(s32 nPort, s32 nSlot);    // always MC_ERR_NOFILE
+s32  fn_800A2194(s32 nPort, s32 nSlot);
 
 // ---- the save file's checksum (0x800A233C) -------------------------------------------------------
 

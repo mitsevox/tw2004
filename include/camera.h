@@ -310,7 +310,12 @@ typedef struct CrAPGolfer {
 } CrAPGolfer;
 typedef struct CrAPState {
     s32  n0;                    // 0x00  0..4: picks the shot the CrAP camera frames (fn_800C39A8)
-    u8   unk4[0xB4 - 0x4];
+    u8   unk4[0x83 - 0x4];
+    u8   b83;                   // 0x83  set by a menu message (FE_MessageTable.c)
+    u8   unk84[2];
+    u8   b86;                   // 0x86  set by a menu message; a change while n0 is 3 calls
+                                //       fn_8008E354
+    u8   unk87[0xB4 - 0x87];
     CrAPGolfer* pB4;            // 0xB4
 } CrAPState;
 

@@ -5,1509 +5,1132 @@
 // profile's stats and records, the Create-A-Player choices. TW06 has GetGolferName in
 // apt_fe_gamemessages.c. Rounds have their own table (fn_800850E4).
 
-#include "game_types.h"
-#include "platform.h"
+#include "game.h"
+#include "camera.h"
+#include "game/frontend.h"
+#include "frontend/fe.h"
+#include "core/memcard.h"
+#include "core/easb.h"
 
-// ---- sweep code (not yet cleaned up) ----
+// Outside this file.
+u32  fn_80013050(int nChan);            // the pad's device type (SIProbe)
+void fn_800142A4(s8 n);                 // sets lbl_80281C98
+void fn_80057438(SaveProfile* pProfile);
+void fn_8008E354(void);                 // FEgolferanim.c
+void fn_8008F80C(s32 p0, s32 p1);       // uiProcessInterface.c
+void fn_8009CD80(s32 nPort, s32 nSlot); // MC_Gc.c
+s32  fn_8009D390(s32 nPort, s32 nSlot); // MC_Gc.c
+s32  fn_8009EB44(s32 nPort, s32 nSlot); // MC_Gc.c
+s32  fn_800A1164(s32 nPort, s32 nSlot, char* pName, s32 n);     // MC.c
+u8   fn_800A2604(int n);                // lbl_80281FF0: a 0x4C-byte record's first byte
+char* fn_800A2614(int n);               // and the string at its 0xC
+s32  fn_800A2628(void);                 // lbl_80281FF4
+s32  fn_800A27F4(void);                 // lbl_80281FF8
+u8   fn_800E22E4(int nSlot, int a, int b);      // GameRound.c
+int  fn_800E2520(int nMode);            // GameRound.c
+void fn_800E25E0(void);                 // GameRound.c
+void GM_SetupCustomHoleSelection(void); // GameManager.c
+int  GM_vGetAllTimeRecordsHeld(SaveProfile* pProfile);  // GameManager.c
+void fn_800EAE44(int nId);              // GameMode5.c
+s32  fn_800EAE6C(void);                 // GameMode5.c
+char* fn_800ED280(int nId);             // GameMode5.c
+char* fn_800ED2C8(int nId);             // GameMode5.c
+void fn_800ED650(int i, s32* pA, s32* pB, s32* pC);     // GameMode5.c
+int  fn_801020C0(void);                 // GameMode4.c
+void fn_80102308(s32 n);                // GameMode4.c
+void fn_8010D334(s32 v);                // CharSliders.c
+void fn_8010F2FC(MsgArg* pArgs, MsgArg* pResult);
+void fn_8010F3A4(MsgArg* pArgs, MsgArg* pResult);
+void fn_8011DF90(MsgArg* pArgs, MsgArg* pResult);
+void fn_80123FF8(void);
+void fn_8012408C(s32 v);
+s32  fn_8012411C(void);
+void fn_80124138(s32 n);
+s32  fn_80124174(void);
+s32  fn_801241CC(void);
+f32  fn_80012C30(char* sz);             // UFont.c
 
-void Session_SetNumPlayers();
-void fn_800E0B38();
-s32 fn_800E2520();
-void fn_800E25E0();
-void fn_8007BBA0(u8* p0, u8* p1);
-void fn_8007BBD8(u8* p0, u8* p1);
-void fn_8007BC10(u8* p0, u8* p1);
-void fn_8007BC48(u8* p0);
-void fn_8007BC74(u8* p0);
-void fn_80079AD4();
-void fn_8007BCA0(void);
-void fn_8007BCA4(void);
-void fn_8007BD18(void);
-s32 fn_80077A80();
-void fn_800E1260();
-void fn_800E1404();
-void fn_800E14E0();
-void fn_8007BD1C(u8* p0);
-void fn_8007BD44(u8* p0);
-void fn_8007BD84(u8* p0);
-void GetGolferName();
-void fn_8007BDFC(u8* p0);
-void fn_8007BEEC(void);
-s32 Game_GetMode();
-s32 Session_SetGolfer(s32, s32);
-extern u8* lbl_80281ED4;
-void fn_8007C12C(void* arg0);
-extern u8 gSession[];
-u8* fn_8007C17C(s32 p0, u8* p1);
-void fn_8007C218(s32 p0, u8* p1);
-void fn_8007C248(s32 a, u8* p);
-s32 fn_8008E354();
-extern u8* lbl_80281EE0;
-void fn_8007C254(s32* arg0);
-void fn_8007C330(u8* p0, u8* p1);
-void fn_8007C488(void);
-void fn_8008F80C();
-void fn_8007C48C(u8* p0);
-void fn_8009CD10();
-void fn_8009CD7C();
-void fn_8007C4B8(void);
-void fn_8007C4D8(void);
-s32 fn_800A2100(s32, s32, void*);
-void fn_8007C698(void* arg0, s32* arg1);
-void fn_8007C784(s32 a, u8* p);
-void fn_8007C790(s32 a, u8* p);
-void fn_8007C79C(u8* p0, u8* p1);
-void fn_8007C7AC(void);
-void fn_8007C7B0(u8* p0, u8* p1);
-void fn_8007C94C(void);
-s32 fn_8009F7E8();
-void fn_8007C950(u8* p0, u8* p1);
-extern u8 lbl_801D880C[];
-u8* fn_8007C988(u8* p0);
-f32 fn_80012C30(s32);
-extern f32 lbl_80283AE8;
-void fn_8007CD58(void** arg0, f32* arg1);
-void fn_8007CDF0(void);
-void fn_800EAC94();
-void fn_800EAE38();
-void fn_8007CDF4(u8* p0);
-void fn_8007CE1C(void);
-void fn_8007CE20(u8* p0, u8* p1);
-void fn_80102308();
-void fn_8007CE58(u8* p);
-void fn_8007D25C(void);
-void fn_8007D260(void);
-void fn_8007D264(void);
-void fn_8007D268(void);
-void fn_8007D26C(void);
-void fn_8007D270(s32* arg0);
-void fn_8007D2D0(void);
-s32 fn_80077ACC();
-void fn_8007D380(s32 p0, u8* p1);
-void fn_80057438();
-void fn_8007D3B4(void);
-s32 fn_801020C0();
-void fn_8007D3D8(s32 p0, u8* p1);
-void fn_8007D408(void);
-void fn_8007D40C(void);
-void fn_8007D410(void);
-void fn_8007D414(void);
-void fn_8007D418(void);
-void fn_8007D41C(void);
-void fn_8007D420(void);
-void fn_8007D424(void);
-void fn_8007D6D8(void);
-void fn_8007D6DC(void);
-void fn_8007D6E0(void* arg0, s32* arg1);
-void fn_8007D76C(u8* p0);
-s32 fn_800770FC();
-void fn_800A75B4();
-void fn_8007D7E4(void);
-u8* fn_8007D924(u8* p0);
-void fn_8007D938(u8* p0);
-void fn_8007D964(void);
-void fn_8007D9D0(s32 p0, u8* p1);
-extern s32 gpSaveData;
-void fn_8007DAB0(u8* p0, u8* p1);
-void fn_8007DAD0(void);
-extern u8 lbl_801D87C0[];
-u8* fn_8007DAD4(s32 p0, u8* p1);
-void fn_8007DB28(void);
-void fn_8007DB2C(void);
-void fn_8007DB30(void);
-void fn_8007DB34(void);
-void fn_8007DB38(void);
-u8* fn_8007E0BC(u8* p0);
-void fn_800142A4();
-void fn_8007E0D0(u8* p0);
-extern void* gpGame;
-void fn_8007E194(s32* arg0);
-void fn_8007E200(void);
-void fn_8007E288(void);
-void fn_8007E354(void);
-void fn_8007E458();
-void fn_8007E51C(s32 p0, s32 p1);
-void fn_8007E548(s32 p0, s32 p1);
-void fn_8007E574(s32 p0, s32 p1);
-void fn_8007E5A0(s32 p0, s32 p1);
-void fn_8007E5CC(s32 p0, s32 p1);
-void fn_8007E5F8(s32 p0, s32 p1);
-void fn_8007E624(s32 p0, s32 p1);
-void fn_8007E650(s32 p0, s32 p1);
-void fn_8007E744(void);
-void fn_8007E748(void);
-void fn_8007E798(void);
-s32 fn_800A1164(s32, s32, s32, s32);
-void fn_8007E85C(void* arg0, s32* arg1);
-void fn_8007E8B4(s32 a, u8* p);
-void fn_8007E8C0(void);
-extern u8 lbl_801D7148[];
-u8* fn_8007E8C4(u8* p0, u8* p1);
-u8* fn_8007E8DC(s32 p0, u8* p1);
-u8* fn_8007E8F0(u8* p0);
-void fn_8007E92C(u8* p0);
-void fn_8007E9A0(void);
-void fn_8007E9A4(void);
-u8* fn_8007E9A8(s32 p0, u8* p1);
-void fn_8007EE7C(void);
-void fn_8007EE80(u8* p0);
-void fn_8007EF9C(void);
-s32 GM_vGetAllTimeRecordsHeld();
-void fn_8007F088(u8* p0, u8* p1);
-u8* fn_8007FCC0(s32 p0, u8* p1);
-u8* fn_8007FCD4(u8* p0);
-void fn_800907AC();
-void fn_8007FEAC(u8* p0);
-u8* fn_8007FED8(s32 p0, u8* p1);
-void fn_8007FF3C(s32 p0, u8* p1);
-extern u8 gReplayData[];
-extern u8 lbl_80191990[];
-void fn_8008017C(u8* p0);
-u8* fn_800801C0(s32 p0, u8* p1);
-void fn_800801D4(u8* p0);
-void fn_80080300(void);
-void fn_8009CD80();
-void fn_80080358(u8* p0);
-void fn_800804D8(s32 a, u8* p);
-s32 fn_800E22E4();
-void fn_800804E4(u8* p0, u8* p1);
-void fn_800805C4(void);
-void fn_800805F0(void);
-void fn_800807D0(s32 a, u8* p);
-void fn_80080AD0(u8* p0, u8* p1);
-void fn_80080C60(s32 p0, u8* p1);
-void fn_80080C74(u8* p0);
-void fn_80080C84(s32 p0, u8* p1);
-void fn_80080C98(u8* p0);
-void fn_80080CA8(u8* p0);
-s32 GM_SetupCustomHoleSelection();
-s32 fn_800E1434();
-void fn_800819FC(void* arg0);
-void fn_80077780();
-void fn_80077808();
-void fn_80081BD4(void);
-void fn_80081BF4(u8* p);
-void fn_80081CF8(void);
-void fn_80081F98(u8* p0);
-void fn_80081FA8(s32 p0, u8* p1);
-void fn_80082608(s32 p0, u8* p1);
-void fn_8008266C(void);
-s32 fn_8009EB44();
-s32 fn_800A218C();
-s32 fn_800A2194();
-s32 fn_800A2604();
-s32 fn_800A2614();
-s32 fn_800A2628();
-void fn_80082680(u8* p0, u8* p1);
-void fn_800826C4(u8* p0, u8* p1);
-void fn_80082708(u8* p0, u8* p1);
-void fn_80082758(u8* p0, u8* p1);
-void fn_80082790(u8* p0);
-void fn_80082800(u8* p0);
-void fn_8008281C(s32 a, u8* p);
-u8* fn_80082928(void);
-void fn_8008293C(u8* p0);
-void fn_80082978(void);
-void fn_8008297C(void);
-void fn_80082980(u8* p0);
-void fn_800829D4(s32 a, u8* p);
-void fn_800829E0(s32 a, u8* p);
-void fn_80077968();
-void fn_800829EC(u8* p);
-void fn_80082A10(void** arg0, s32* arg1);
-void fn_80082A44(void);
-void fn_80082A48(void);
-void fn_80082A4C(void);
-void fn_80082C74(u8* p0);
-void fn_80082CA4(void);
-void fn_800ED650();
-void fn_80082CA8(u8* p0);
-void fn_80082CDC(u8* p0, u8* p1);
-void fn_80082D98(s32* arg0);
-s32 fn_8009EE28(s32, s32, void*);
-void fn_80082DBC(void* arg0, s32* arg1);
-s32 fn_800A0A7C(s32, s32, void*);
-void fn_80082E10(void* arg0, s32* arg1);
-void fn_80083354(void);
-void fn_80083358(s32* arg0);
-void fn_800833A4(void);
-void fn_800833C4(s32 a, u8* p);
-s32 fn_80013050(s32);
-void fn_80083430(s32* arg0, s32* arg1);
-u8* fn_80083480(s32 p0, u8* p1);
-u8* fn_80083494(u8* p0);
-s32 fn_8009F728();
-void fn_800834A8(u8* p0, u8* p1);
-void fn_800834DC(s32 a, u8* p);
-void fn_800835B8(void);
-void fn_800835BC(s32 a, u8* p);
-void fn_800835C8(s32 a, u8* p);
-void fn_80083890(s32 a, u8* p);
-void fn_8008389C(void);
-void fn_800838A0(void);
-void fn_800838A4(void);
-void fn_800838A8(void);
-void fn_800838AC(void);
-void fn_800838B0(void);
-void fn_800838B4(void);
-void fn_800838B8(void);
-void fn_800838BC(void);
-void fn_800838C0(void);
-void fn_800838C4(u8* p0, u8* p1);
-void fn_80083904(void);
-void fn_80083908(void);
-void fn_8008390C(void);
-void fn_80083910(void);
-void fn_80083914(void);
-void fn_80083918(void);
-void fn_8008391C(void);
-void fn_80083920(void);
-void fn_80083924(void);
-void fn_80083928(void);
-void fn_8008392C(void);
-void fn_80083930(void);
-void fn_80083970(void);
-void fn_80083974(void* arg0);
-void fn_80083A44(void);
-void fn_80083A48(void);
-void fn_8010D334();
-void fn_80083BA4(u8* p);
-void fn_80123FF8();
-void fn_8012408C();
-void fn_80083E48(void);
-void fn_80083E70(void);
-void fn_80083E94(void);
-void fn_80083EB8(void);
-void fn_80083EBC(void);
-void fn_80083F54(s32 a, u8* p);
-s32 fn_8012411C(s32*);
-s32 fn_80124138(s32);
-void fn_8008410C(s32** arg0, s32* arg1);
-void fn_80084158(void);
-void fn_8008415C(void);
-s32 fn_80124174();
-s32 fn_801241CC();
-void fn_80084160(s32 p0, u8* p1);
-void fn_80084190(s32 p0, u8* p1);
-void fn_80084208(void);
-void fn_80125600();
-void fn_80125648();
-void fn_8008422C(u8* p0);
-void fn_80084258(u8* p0);
-void fn_8012566C();
-void fn_80125680();
-void fn_80084288(u8* p);
-void fn_800842AC(u8* p);
-s32 fn_80125354(s32, s32);
-s32 fn_801253F0(s32, s32);
-void fn_800842D0(void* arg0, s32* arg1);
-s32 fn_80125434(s32, s32, void*);
-void fn_800844E0(void* arg0, s32* arg1);
-s32 EASBio_IsBioLoaded();
-void fn_80084544(s32 p0, u8* p1);
-s32 fn_80125528();
-void fn_800845D4(u8* p0, u8* p1);
-s32 fn_80125280();
-void fn_80084678(u8* p0, u8* p1);
-void fn_800846C8(s32 a, u8* p);
-s32 fn_80125928();
-void fn_800846D4(s32** arg0);
-void fn_80084750(void);
-f32 fn_80124BDC();
-s32 fn_801254B8();
-s32 fn_801254EC();
-void fn_80084754(s32 p0, u8* p1);
-void fn_8008478C(s32 p0, u8* p1);
-void fn_800847BC(u8* p);
-void fn_800848E4(void);
-void fn_800EAE44();
-s32 fn_800EAE6C();
-s32 fn_800ED280();
-s32 fn_800ED2C8();
-void fn_800848E8(s32 p0, u8* p1);
-void fn_80084918(u8* p0);
-void fn_80084940(u8* p0);
-void fn_80084984(u8* p0);
-s32 fn_8010F2FC();
-s32 fn_8010F3A4();
-s32 fn_8011DF90();
-void fn_80084B88(s32* arg0);
-void fn_80084BE4(void);
-void fn_80084D6C(void* arg0);
-void fn_80084DF4(void* arg0);
-void fn_80084E7C(s32 p0, u8* p1);
-s32 fn_8009D390();
-s32 fn_80125194();
-void fn_80084E90(s32 p0, u8* p1);
-void fn_80084EC8(u8* p0, u8* p1);
-void fn_80084F04(void);
-void fn_80084F08(void);
-s32 fn_800A27F4();
-void fn_80084F0C(s32 p0, u8* p1);
-void fn_80084F3C(void);
-s32 fn_801252D0();
-s32 EASBio_GetCurrentRewardMessage();
-void fn_80084F40(u8* p0, u8* p1);
-void fn_80084F84(s32 p0, u8* p1);
-extern s32 lbl_80281FFC;
-void fn_80084FF0(s32 v);
+// This file.
+void GetGolferName(int nGolfer, char* szName);
+void fn_8007E458(int n, MsgArg* pArgs, MsgArg* pResult);
 
-void fn_8007BBA0(u8* p0, u8* p1) {
-    s32 t0;
-    t0 = fn_800E2520((*(s32*)p0 & 0xFF));
-    *(s32*)p1 = t0;
+void fn_8007BBA0(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = fn_800E2520((u8)pArgs[0].i);
 }
 
-void fn_8007BBD8(u8* p0, u8* p1) {
-    s32 t0;
-    t0 = fn_800E2520((*(s32*)p0 & 0xFF));
-    *(s32*)p1 = t0;
+void fn_8007BBD8(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = fn_800E2520((u8)pArgs[0].i);
 }
 
-void fn_8007BC10(u8* p0, u8* p1) {
-    s32 t0;
-    t0 = fn_800E2520((*(s32*)p0 & 0xFF));
-    *(s32*)p1 = t0;
+void fn_8007BC10(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = fn_800E2520((u8)pArgs[0].i);
 }
 
-void fn_8007BC48(u8* p0) {
-    fn_800E0B38((*(s32*)p0 & 0xFF));
+void fn_8007BC48(MsgArg* pArgs, MsgArg* pResult) {
+    fn_800E0B38((u8)pArgs[0].i);
     fn_800E25E0();
 }
 
-void fn_8007BC74(u8* p0) {
-    Session_SetNumPlayers((*(s32*)p0 & 0xFF));
+void fn_8007BC74(MsgArg* pArgs, MsgArg* pResult) {
+    Session_SetNumPlayers((u8)pArgs[0].i);
     fn_800E25E0();
 }
 
-void fn_8007BCA0(void) {
+void fn_8007BCA0(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007BCA4(void) {
+void fn_8007BCA4(MsgArg* pArgs, MsgArg* pResult) {
     fn_80079AD4();
 }
 
-void fn_8007BD18(void) {
+void fn_8007BD18(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007BD1C(u8* p0) {
-    fn_800E14E0((*(s32*)p0 & 0xFF));
+void fn_8007BD1C(MsgArg* pArgs, MsgArg* pResult) {
+    fn_800E14E0((u8)pArgs[0].i);
 }
 
-void fn_8007BD44(u8* p0) {
+void fn_8007BD44(MsgArg* pArgs, MsgArg* pResult) {
     fn_800E1260(0);
-    fn_800E1404(((*(s32*)p0 & 0xFF) - 1));
+    fn_800E1404((u8)pArgs[0].i - 1);
 }
 
-void fn_8007BD84(u8* p0) {
-    fn_800E1260((*(s32*)p0 & 0xFF));
+void fn_8007BD84(MsgArg* pArgs, MsgArg* pResult) {
+    fn_800E1260((u8)pArgs[0].i);
 }
 
-void fn_8007BDFC(u8* p0) {
-    GetGolferName(*(s32*)p0, *(s32*)(((u8*)*(s32*)(p0 + 0x4)) + 0x8));
+void fn_8007BDFC(MsgArg* pArgs, MsgArg* pResult) {
+    GetGolferName(pArgs[0].i, ((MsgString*)pArgs[1].p)->pStr);
 }
 
-void fn_8007BEEC(void) {
+void fn_8007BEEC(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007C12C(void* arg0) {
+void fn_8007C12C(MsgArg* pArgs, MsgArg* pResult) {
     if (Game_GetMode() == 5) {
-        (*(s8*)((u8*)(lbl_80281ED4) + 0x11703)) = 1;
+        lbl_80281ED4->b11703 = 1;
     }
-    Session_SetGolfer((*(s32*)((u8*)(arg0) + 4)), (*(s32*)((u8*)(arg0) + 0)));
+    Session_SetGolfer(pArgs[1].i, pArgs[0].i);
 }
 
-u8* fn_8007C17C(s32 p0, u8* p1) {
-    *(s32*)p1 = *(s32*)(gSession + 0x2C);
-    return gSession;
+void fn_8007C17C(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = gSession.nNumPlayers;
 }
 
-void fn_8007C218(s32 p0, u8* p1) {
-    s32 t0;
-    t0 = Game_GetMode();
-    *(s32*)p1 = t0;
+void fn_8007C218(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = Game_GetMode();
 }
 
-void fn_8007C248(s32 a, u8* p) {
-    *(s32*)(p + 0x0) = 1;
+void fn_8007C248(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = 1;
 }
 
-void fn_8007C254(s32* arg0) {
-    u8 temp_r5;
+void fn_8007C254(MsgArg* pArgs, MsgArg* pResult) {
+    u8 bOld;
 
-    temp_r5 = (*(u8*)((u8*)(lbl_80281EE0) + 0x86));
-    (*(u8*)((u8*)(lbl_80281EE0) + 0x86)) = (u8) *arg0;
-    if ((temp_r5 != (u8) (*(u8*)((u8*)(lbl_80281EE0) + 0x86))) && ((s32) (*(s32*)((u8*)(lbl_80281EE0) + 0)) == 3)) {
+    bOld = lbl_80281EE0->b86;
+    lbl_80281EE0->b86 = pArgs[0].i;
+    if (bOld != lbl_80281EE0->b86 && lbl_80281EE0->n0 == 3) {
         fn_8008E354();
     }
 }
 
-void fn_8007C330(u8* p0, u8* p1) {
-    s32 t0;
-    t0 = fn_80077A80(*(s32*)p0);
-    strcpy(*(char**)(*(u8**)p1 + 0x8), (char*)t0 + 34);
+void fn_8007C330(MsgArg* pArgs, MsgArg* pResult) {
+    strcpy(((MsgString*)pResult->p)->pStr, fn_80077A80(pArgs[0].i)->szLast);
 }
 
-void fn_8007C488(void) {
+void fn_8007C488(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007C48C(u8* p0) {
-    fn_8008F80C(*(s32*)p0, (*(s32*)(p0 + 0x4) & 0xFF));
+void fn_8007C48C(MsgArg* pArgs, MsgArg* pResult) {
+    fn_8008F80C(pArgs[0].i, (u8)pArgs[1].i);
 }
 
-void fn_8007C4B8(void) {
+void fn_8007C4B8(MsgArg* pArgs, MsgArg* pResult) {
     fn_8009CD10();
 }
 
-void fn_8007C4D8(void) {
+void fn_8007C4D8(MsgArg* pArgs, MsgArg* pResult) {
     fn_8009CD7C();
 }
 
-void fn_8007C698(void* arg0, s32* arg1) {
-    s32 temp_r3;
-    s32 var_r0;
+void fn_8007C698(MsgArg* pArgs, MsgArg* pResult) {
+    s32 nError;
+    s32 n;
 
-    temp_r3 = fn_800A2100((*(s32*)((u8*)(arg0) + 0)), (*(s32*)((u8*)(arg0) + 4)), arg0);
-    var_r0 = 1;
-    if (temp_r3 != 0) {
-        var_r0 = temp_r3;
+    nError = fn_800A2100(pArgs[0].i, pArgs[1].i);
+    n = 1;
+    if (nError != 0) {
+        n = nError;
     }
-    *arg1 = var_r0;
+    pResult->i = n;
 }
 
-void fn_8007C784(s32 a, u8* p) {
-    *(s32*)(p + 0x0) = 30;
+void fn_8007C784(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = 30;
 }
 
-void fn_8007C790(s32 a, u8* p) {
-    *(s32*)(p + 0x0) = 1;
+void fn_8007C790(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = 1;
 }
 
-void fn_8007C79C(u8* p0, u8* p1) {
-    *(s32*)p1 = (*(s32*)p0 + 30);
+void fn_8007C79C(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = pArgs[0].i + 30;
 }
 
-void fn_8007C7AC(void) {
+void fn_8007C7AC(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007C7B0(u8* p0, u8* p1) {
-    s32 t0;
-    t0 = fn_80077A80(*(s32*)p0);
-    *(s32*)p1 = ((s8)*(u8*)(((u8*)t0) + 0x8E));
+void fn_8007C7B0(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = (s8)fn_80077A80(pArgs[0].i)->bAvailable;
 }
 
-void fn_8007C94C(void) {
+void fn_8007C94C(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007C950(u8* p0, u8* p1) {
-    s32 t0;
-    t0 = fn_8009F7E8(*(s32*)p0);
-    *(s32*)p1 = (t0 & 0xFF);
+void fn_8007C950(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = fn_8009F7E8(pArgs[0].i);
 }
 
-u8* fn_8007C988(u8* p0) {
-    *(s32*)(lbl_801D880C + 0x4) = *(s32*)p0;
-    *(s32*)lbl_801D880C = 0;
-    return lbl_801D880C;
+void fn_8007C988(MsgArg* pArgs, MsgArg* pResult) {
+    lbl_801D880C.n4 = pArgs[0].i;
+    lbl_801D880C.n0 = 0;
 }
 
-void fn_8007CD58(void** arg0, f32* arg1) {
-    *arg1 = lbl_80283AE8 * fn_80012C30((*(s32*)((u8*)(*arg0) + 8)));
+// A string's width, scaled.
+void fn_8007CD58(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->f = 512.0f * fn_80012C30(((MsgString*)pArgs[0].p)->pStr);
 }
 
-void fn_8007CDF0(void) {
+void fn_8007CDF0(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007CDF4(u8* p0) {
-    fn_800EAC94(*(s32*)p0);
-    fn_800EAE38();
+void fn_8007CDF4(MsgArg* pArgs, MsgArg* pResult) {
+    fn_800EAE38(fn_800EAC94(pArgs[0].i));
 }
 
-void fn_8007CE1C(void) {
+void fn_8007CE1C(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007CE20(u8* p0, u8* p1) {
-    s32 t0;
-    t0 = fn_80077A80(*(s32*)p0);
-    *(s32*)p1 = *(u8*)(((u8*)t0) + 0x1);
+void fn_8007CE20(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = fn_80077A80(pArgs[0].i)->nModelID;
 }
 
-void fn_8007CE58(u8* p) {
-    fn_80102308(*(s32*)(p + 0x0));
+void fn_8007CE58(MsgArg* pArgs, MsgArg* pResult) {
+    fn_80102308(pArgs[0].i);
 }
 
-void fn_8007D25C(void) {
+void fn_8007D25C(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007D260(void) {
+void fn_8007D260(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007D264(void) {
+void fn_8007D264(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007D268(void) {
+void fn_8007D268(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007D26C(void) {
+void fn_8007D26C(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007D270(s32* arg0) {
-    if ((s32) *arg0 != 0) {
-        (*(s8*)((u8*)(lbl_80281ED4) + 0x11702)) = 1;
-        return;
+void fn_8007D270(MsgArg* pArgs, MsgArg* pResult) {
+    if (pArgs[0].i != 0) {
+        lbl_80281ED4->b11702 = 1;
+    } else {
+        lbl_80281ED4->b11702 = 0;
     }
-    (*(s8*)((u8*)(lbl_80281ED4) + 0x11702)) = 0;
 }
 
-void fn_8007D2D0(void) {
+void fn_8007D2D0(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007D380(s32 p0, u8* p1) {
-    s32 t0;
-    t0 = fn_80077ACC();
-    *(s32*)p1 = *(s32*)(((u8*)t0) + 0x6C);
+void fn_8007D380(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = fn_80077ACC()->n6C;
 }
 
-void fn_8007D3B4(void) {
-    fn_80077ACC();
-    fn_80057438();
+void fn_8007D3B4(MsgArg* pArgs, MsgArg* pResult) {
+    fn_80057438(fn_80077ACC());
 }
 
-void fn_8007D3D8(s32 p0, u8* p1) {
-    s32 t0;
-    t0 = fn_801020C0();
-    *(s32*)p1 = t0;
+void fn_8007D3D8(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = fn_801020C0();
 }
 
-void fn_8007D408(void) {
+void fn_8007D408(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007D40C(void) {
+void fn_8007D40C(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007D410(void) {
+void fn_8007D410(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007D414(void) {
+void fn_8007D414(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007D418(void) {
+void fn_8007D418(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007D41C(void) {
+void fn_8007D41C(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007D420(void) {
+void fn_8007D420(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007D424(void) {
+void fn_8007D424(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007D6D8(void) {
+void fn_8007D6D8(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007D6DC(void) {
+void fn_8007D6DC(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007D6E0(void* arg0, s32* arg1) {
-    if ((s32) (*(s32*)((u8*)(arg0) + 4)) != 0) {
-        *arg1 = 0;
-        return;
+void fn_8007D6E0(MsgArg* pArgs, MsgArg* pResult) {
+    if (pArgs[1].i != 0) {
+        pResult->i = 0;
+    } else {
+        pResult->i = pArgs[0].i + 30;
     }
-    *arg1 = (*(s32*)((u8*)(arg0) + 0)) + 0x1E;
 }
 
-void fn_8007D76C(u8* p0) {
-    s32 t0;
-    t0 = fn_80077ACC();
-    *(s32*)(((u8*)t0) + 0x6C) = *(s32*)(p0 + 0x4);
+void fn_8007D76C(MsgArg* pArgs, MsgArg* pResult) {
+    SaveProfile* pProfile;
+
+    pProfile = fn_80077ACC();
+    pProfile->n6C = pArgs[1].i;
 }
 
-void fn_8007D7E4(void) {
-    s32 t0;
-    t0 = fn_800770FC();
-    *(s32*)((u8*)t0) = 2;
+void fn_8007D7E4(MsgArg* pArgs, MsgArg* pResult) {
+    FEMovie* pMovie;
+
+    pMovie = fn_800770FC();
+    pMovie->nKind = 2;
     fn_800A75B4();
 }
 
-u8* fn_8007D924(u8* p0) {
-    *(u8*)(gSession + 0x10) = *(s32*)p0;
-    return gSession;
+void fn_8007D924(MsgArg* pArgs, MsgArg* pResult) {
+    gSession.nSplitScreen = pArgs[0].i;
 }
 
-void fn_8007D938(u8* p0) {
-    fn_800E1404(((*(s32*)p0 & 0xFF) - 1));
+void fn_8007D938(MsgArg* pArgs, MsgArg* pResult) {
+    fn_800E1404((u8)pArgs[0].i - 1);
 }
 
-void fn_8007D964(void) {
+void fn_8007D964(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007D9D0(s32 p0, u8* p1) {
-    *(s32*)p1 = ((s8)*(u8*)(((u8*)lbl_80281ED4) + 0x2));
+void fn_8007D9D0(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = lbl_80281ED4->nSlot;
 }
 
-void fn_8007DAB0(u8* p0, u8* p1) {
-    *(s32*)p1 = *(u8*)(((u8*)gpSaveData) + (*(s32*)p0 * 67072));
+void fn_8007DAB0(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = gpSaveData[pArgs[0].i].bActive;
 }
 
-void fn_8007DAD0(void) {
+void fn_8007DAD0(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-u8* fn_8007DAD4(s32 p0, u8* p1) {
-    *(s32*)p1 = *(s32*)(lbl_801D87C0 + 0x38);
-    return lbl_801D87C0;
+void fn_8007DAD4(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = lbl_801D87C0.n38;
 }
 
-void fn_8007DB28(void) {
+void fn_8007DB28(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007DB2C(void) {
+void fn_8007DB2C(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007DB30(void) {
+void fn_8007DB30(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007DB34(void) {
+void fn_8007DB34(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007DB38(void) {
+void fn_8007DB38(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-u8* fn_8007E0BC(u8* p0) {
-    *(u8*)(gSession + 0x5B38) = *(s32*)p0;
-    return gSession;
+void fn_8007E0BC(MsgArg* pArgs, MsgArg* pResult) {
+    gSession.nPinSet = pArgs[0].i;
 }
 
-void fn_8007E0D0(u8* p0) {
-    fn_800142A4(((s8)*(s32*)p0));
+void fn_8007E0D0(MsgArg* pArgs, MsgArg* pResult) {
+    fn_800142A4(pArgs[0].i);
 }
 
-void fn_8007E194(s32* arg0) {
+// The mulligan rule: none in game mode 7, any number in mode 9, else the one picked.
+void fn_8007E194(MsgArg* pArgs, MsgArg* pResult) {
     if (Game_GetMode() == 7) {
-        (*(s32*)((u8*)(gpGame) + 8)) = 0;
+        gpGame->nMulligans = 0;
         return;
     }
     if (Game_GetMode() == 9) {
-        (*(s32*)((u8*)(gpGame) + 8)) = 1;
+        gpGame->nMulligans = 1;
         return;
     }
-    (*(s32*)((u8*)(gpGame) + 8)) = (s32) *arg0;
+    gpGame->nMulligans = pArgs[0].i;
 }
 
-void fn_8007E200(void) {
+void fn_8007E200(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007E288(void) {
+void fn_8007E288(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007E354(void) {
+void fn_8007E354(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007E51C(s32 p0, s32 p1) {
-    fn_8007E458(0, p0, p1);
+void fn_8007E51C(MsgArg* pArgs, MsgArg* pResult) {
+    fn_8007E458(0, pArgs, pResult);
 }
 
-void fn_8007E548(s32 p0, s32 p1) {
-    fn_8007E458(1, p0, p1);
+void fn_8007E548(MsgArg* pArgs, MsgArg* pResult) {
+    fn_8007E458(1, pArgs, pResult);
 }
 
-void fn_8007E574(s32 p0, s32 p1) {
-    fn_8007E458(2, p0, p1);
+void fn_8007E574(MsgArg* pArgs, MsgArg* pResult) {
+    fn_8007E458(2, pArgs, pResult);
 }
 
-void fn_8007E5A0(s32 p0, s32 p1) {
-    fn_8007E458(3, p0, p1);
+void fn_8007E5A0(MsgArg* pArgs, MsgArg* pResult) {
+    fn_8007E458(3, pArgs, pResult);
 }
 
-void fn_8007E5CC(s32 p0, s32 p1) {
-    fn_8007E458(4, p0, p1);
+void fn_8007E5CC(MsgArg* pArgs, MsgArg* pResult) {
+    fn_8007E458(4, pArgs, pResult);
 }
 
-void fn_8007E5F8(s32 p0, s32 p1) {
-    fn_8007E458(5, p0, p1);
+void fn_8007E5F8(MsgArg* pArgs, MsgArg* pResult) {
+    fn_8007E458(5, pArgs, pResult);
 }
 
-void fn_8007E624(s32 p0, s32 p1) {
-    fn_8007E458(6, p0, p1);
+void fn_8007E624(MsgArg* pArgs, MsgArg* pResult) {
+    fn_8007E458(6, pArgs, pResult);
 }
 
-void fn_8007E650(s32 p0, s32 p1) {
-    fn_8007E458(7, p0, p1);
+void fn_8007E650(MsgArg* pArgs, MsgArg* pResult) {
+    fn_8007E458(7, pArgs, pResult);
 }
 
-void fn_8007E744(void) {
+void fn_8007E744(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007E748(void) {
+void fn_8007E748(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007E798(void) {
+void fn_8007E798(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007E85C(void* arg0, s32* arg1) {
-    s32 temp_r3;
-    s32 var_r0;
+void fn_8007E85C(MsgArg* pArgs, MsgArg* pResult) {
+    s32 nError;
+    s32 n;
 
-    temp_r3 = fn_800A1164((*(s32*)((u8*)(arg0) + 0)), (*(s32*)((u8*)(arg0) + 4)), (*(s32*)((u8*)((*(void**)((u8*)(arg0) + 8))) + 8)), (*(s32*)((u8*)(arg0) + 0xC)));
-    var_r0 = 1;
-    if (temp_r3 != 0) {
-        var_r0 = temp_r3;
+    nError = fn_800A1164(pArgs[0].i, pArgs[1].i, ((MsgString*)pArgs[2].p)->pStr, pArgs[3].i);
+    n = 1;
+    if (nError != 0) {
+        n = nError;
     }
-    *arg1 = var_r0;
+    pResult->i = n;
 }
 
-void fn_8007E8B4(s32 a, u8* p) {
-    *(s32*)(p + 0x0) = 1;
+void fn_8007E8B4(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = 1;
 }
 
-void fn_8007E8C0(void) {
+void fn_8007E8C0(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-u8* fn_8007E8C4(u8* p0, u8* p1) {
-    *(s32*)p1 = *(u8*)(lbl_801D7148 + *(s32*)p0);
-    return lbl_801D7148;
+void fn_8007E8C4(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = lbl_801D7148.aLoaded[pArgs[0].i];
 }
 
-u8* fn_8007E8DC(s32 p0, u8* p1) {
-    *(s32*)p1 = *(u8*)(lbl_801D7148 + 0xF);
-    return lbl_801D7148;
+void fn_8007E8DC(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = lbl_801D7148.b0F;
 }
 
-u8* fn_8007E8F0(u8* p0) {
-    *(u8*)(lbl_801D7148 + 0xF) = *(s32*)p0;
-    return lbl_801D7148;
+void fn_8007E8F0(MsgArg* pArgs, MsgArg* pResult) {
+    lbl_801D7148.b0F = pArgs[0].i;
 }
 
-void fn_8007E92C(u8* p0) {
-    *(u8*)(((u8*)lbl_80281EE0) + 0x83) = *(s32*)p0;
+void fn_8007E92C(MsgArg* pArgs, MsgArg* pResult) {
+    lbl_80281EE0->b83 = pArgs[0].i;
 }
 
-void fn_8007E9A0(void) {
+void fn_8007E9A0(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007E9A4(void) {
+void fn_8007E9A4(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-u8* fn_8007E9A8(s32 p0, u8* p1) {
-    *(s32*)p1 = *(u8*)(lbl_801D7148 + 0x11);
-    return lbl_801D7148;
+void fn_8007E9A8(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = lbl_801D7148.b11;
 }
 
-void fn_8007EE7C(void) {
+void fn_8007EE7C(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007EE80(u8* p0) {
-    *(u8*)(((u8*)lbl_80281ED4) + 0x5391) = *(s32*)(p0 + 0x4);
+void fn_8007EE80(MsgArg* pArgs, MsgArg* pResult) {
+    lbl_80281ED4->profile.createdGolfer.nModelID = pArgs[1].i;
 }
 
-void fn_8007EF9C(void) {
+void fn_8007EF9C(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007F088(u8* p0, u8* p1) {
-    s32 t0;
-    t0 = GM_vGetAllTimeRecordsHeld((gpSaveData + (*(s32*)p0 * 67072)), p1, gpSaveData);
-    *(s32*)p1 = t0;
+void fn_8007F088(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = GM_vGetAllTimeRecordsHeld(&gpSaveData[pArgs[0].i]);
 }
 
-u8* fn_8007FCC0(s32 p0, u8* p1) {
-    *(s32*)p1 = *(s32*)(lbl_801D7148 + 0x14);
-    return lbl_801D7148;
+void fn_8007FCC0(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = lbl_801D7148.nMode;
 }
 
-u8* fn_8007FCD4(u8* p0) {
-    *(s32*)(lbl_801D7148 + 0x14) = *(s32*)p0;
-    return lbl_801D7148;
+void fn_8007FCD4(MsgArg* pArgs, MsgArg* pResult) {
+    lbl_801D7148.nMode = pArgs[0].i;
 }
 
-void fn_8007FEAC(u8* p0) {
-    fn_800907AC(*(s32*)p0, *(s32*)(((u8*)*(s32*)(p0 + 0x4)) + 0x8));
+void fn_8007FEAC(MsgArg* pArgs, MsgArg* pResult) {
+    fn_800907AC(pArgs[0].i, ((MsgString*)pArgs[1].p)->pStr);
 }
 
-u8* fn_8007FED8(s32 p0, u8* p1) {
-    *(s32*)p1 = *(u8*)(lbl_801D7148 + 0x18);
-    return lbl_801D7148;
+void fn_8007FED8(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = lbl_801D7148.b18;
 }
 
-void fn_8007FF3C(s32 p0, u8* p1) {
-    *(s32*)p1 = *(u8*)(((u8*)lbl_80281EE0) + 0x86);
+void fn_8007FF3C(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = lbl_80281EE0->b86;
 }
 
-void fn_8008017C(u8* p0) {
-    strcpy(*(char**)(*(u8**)p0 + 0x8), *(char**)(lbl_80191990 + (*(s32*)(gReplayData + 0xF00) << 2)));
+// The saved replay's course, hole and golfer.
+void fn_8008017C(MsgArg* pArgs, MsgArg* pResult) {
+    strcpy(((MsgString*)pArgs[0].p)->pStr, lbl_80191990[gReplayData.nCourse]);
 }
 
-u8* fn_800801C0(s32 p0, u8* p1) {
-    *(s32*)p1 = *(s16*)(gReplayData + 0xF04);
-    return gReplayData;
+void fn_800801C0(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = gReplayData.nHole;
 }
 
-void fn_800801D4(u8* p0) {
-    strcpy(*(char**)(*(u8**)p0 + 0x8), (char*)(gReplayData + 0x32));
+void fn_800801D4(MsgArg* pArgs, MsgArg* pResult) {
+    strcpy(((MsgString*)pArgs[0].p)->pStr, gReplayData.player.golfer.szLast);
 }
 
-void fn_80080300(void) {
+void fn_80080300(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_80080358(u8* p0) {
-    fn_8009CD80(*(s32*)p0, *(s32*)(p0 + 0x4));
+void fn_80080358(MsgArg* pArgs, MsgArg* pResult) {
+    fn_8009CD80(pArgs[0].i, pArgs[1].i);
     fn_8009CD7C();
 }
 
-void fn_800804D8(s32 a, u8* p) {
-    *(s32*)(p + 0x0) = 0;
+void fn_800804D8(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = 0;
 }
 
-void fn_800804E4(u8* p0, u8* p1) {
-    s32 t0;
-    t0 = fn_800E22E4(*(s32*)p0, *(s32*)(p0 + 0x4), (*(s32*)(p0 + 0x8) - 1), p0);
-    *(s32*)p1 = (t0 & 0xFF);
+void fn_800804E4(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = fn_800E22E4(pArgs[0].i, pArgs[1].i, pArgs[2].i - 1);
 }
 
-void fn_800805C4(void) {
-    s32 t0;
-    t0 = fn_800770FC();
-    *(s32*)((u8*)t0) = 1;
+void fn_800805C4(MsgArg* pArgs, MsgArg* pResult) {
+    FEMovie* pMovie;
+
+    pMovie = fn_800770FC();
+    pMovie->nKind = FE_MOVIE_CREDITS;
     fn_800A75B4();
 }
 
-void fn_800805F0(void) {
+void fn_800805F0(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_800807D0(s32 a, u8* p) {
-    *(s32*)(p + 0x0) = 0;
+void fn_800807D0(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = 0;
 }
 
-void fn_80080AD0(u8* p0, u8* p1) {
-    *(s32*)p1 = ((s8)*(u8*)((u8*)*(s32*)(((u8*)*(s32*)p0) + 0x8)));
+// A string's first character.
+void fn_80080AD0(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = ((MsgString*)pArgs[0].p)->pStr[0];
 }
 
-void fn_80080C60(s32 p0, u8* p1) {
-    *(s32*)p1 = ((s8)*(u8*)(((u8*)lbl_80281ED4) + 0x4));
+void fn_80080C60(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = lbl_80281ED4->n4;
 }
 
-void fn_80080C74(u8* p0) {
-    *(u8*)(((u8*)lbl_80281ED4) + 0x4) = *(s32*)p0;
+void fn_80080C74(MsgArg* pArgs, MsgArg* pResult) {
+    lbl_80281ED4->n4 = pArgs[0].i;
 }
 
-void fn_80080C84(s32 p0, u8* p1) {
-    *(s32*)p1 = ((s8)*(u8*)(((u8*)lbl_80281ED4) + 0x5));
+void fn_80080C84(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = lbl_80281ED4->n5;
 }
 
-void fn_80080C98(u8* p0) {
-    *(u8*)(((u8*)lbl_80281ED4) + 0x5) = *(s32*)p0;
+void fn_80080C98(MsgArg* pArgs, MsgArg* pResult) {
+    lbl_80281ED4->n5 = pArgs[0].i;
 }
 
-void fn_80080CA8(u8* p0) {
-    *(s32*)((u8*)*(s32*)(p0 + 0x8)) = 0;
-    *(s32*)((u8*)*(s32*)(p0 + 0xC)) = 0;
-    *(s32*)((u8*)*(s32*)(p0 + 0x10)) = 0;
+void fn_80080CA8(MsgArg* pArgs, MsgArg* pResult) {
+    *(s32*)pArgs[2].p = 0;
+    *(s32*)pArgs[3].p = 0;
+    *(s32*)pArgs[4].p = 0;
 }
 
-void fn_800819FC(void* arg0) {
-    (*(u8*)((u8*)(gpGame) + 0x136)) = (u8) (*(s32*)((u8*)(arg0) + 0));
-    (*(s32*)((u8*)(gpGame) + 0x13C)) = (s32) (*(s32*)((u8*)(arg0) + 4));
-    (*(s32*)((u8*)(gpGame) + 0x140)) = (s32) (*(s32*)((u8*)(arg0) + 8));
-    if ((u8) (*(u8*)((u8*)(gpGame) + 0x136)) != 0) {
+// Pick the saved custom round the holes come from.
+void fn_800819FC(MsgArg* pArgs, MsgArg* pResult) {
+    gpGame->b136 = pArgs[0].i;
+    gpGame->nSaveSlot = pArgs[1].i;
+    gpGame->nSaveCourse = pArgs[2].i;
+    if (gpGame->b136 != 0) {
         GM_SetupCustomHoleSelection();
         fn_800E1434();
     }
 }
 
-void fn_80081BD4(void) {
+void fn_80081BD4(MsgArg* pArgs, MsgArg* pResult) {
     fn_80077780();
 }
 
-void fn_80081BF4(u8* p) {
-    fn_80077808(*(s32*)(p + 0x0));
+void fn_80081BF4(MsgArg* pArgs, MsgArg* pResult) {
+    fn_80077808(pArgs[0].i);
 }
 
-void fn_80081CF8(void) {
+void fn_80081CF8(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_80081F98(u8* p0) {
-    *(u8*)(((u8*)lbl_80281ED4) + 0x1) = *(s32*)p0;
+void fn_80081F98(MsgArg* pArgs, MsgArg* pResult) {
+    lbl_80281ED4->n1 = pArgs[0].i;
 }
 
-void fn_80081FA8(s32 p0, u8* p1) {
-    *(s32*)p1 = ((s8)*(u8*)(((u8*)lbl_80281ED4) + 0x1));
+void fn_80081FA8(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = lbl_80281ED4->n1;
 }
 
-void fn_80082608(s32 p0, u8* p1) {
-    *(s32*)p1 = ((s8)*(u8*)(((u8*)(lbl_80281ED4 + 0x10000)) + 0x620));
+void fn_80082608(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = lbl_80281ED4->n10620;
 }
 
-void fn_8008266C(void) {
-    *(u8*)(((u8*)(lbl_80281ED4 + 0x10000)) + 0x620) = 0;
+void fn_8008266C(MsgArg* pArgs, MsgArg* pResult) {
+    lbl_80281ED4->n10620 = 0;
 }
 
-void fn_80082680(u8* p0, u8* p1) {
-    s32 t0;
-    t0 = fn_800A218C(*(s32*)p0, *(s32*)(p0 + 0x4), p0);
-    *(s32*)p1 = ((u32)__cntlzw(t0) >> 5);
+void fn_80082680(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = fn_800A218C(pArgs[0].i, pArgs[1].i) == 0;
 }
 
-void fn_800826C4(u8* p0, u8* p1) {
-    s32 t0;
-    t0 = fn_800A2194(*(s32*)p0, *(s32*)(p0 + 0x4), p0);
-    *(s32*)p1 = ((u32)__cntlzw(t0) >> 5);
+void fn_800826C4(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = fn_800A2194(pArgs[0].i, pArgs[1].i) == 0;
 }
 
-void fn_80082708(u8* p0, u8* p1) {
-    s32 t0;
-    s32 t1;
-    t0 = fn_8009EB44(*(s32*)p0, *(s32*)(p0 + 0x4));
-    *(s32*)p1 = t0;
-    t1 = fn_800A2628();
-    *(s32*)((u8*)*(s32*)(p0 + 0x8)) = t1;
+void fn_80082708(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = fn_8009EB44(pArgs[0].i, pArgs[1].i);
+    *(s32*)pArgs[2].p = fn_800A2628();
 }
 
-void fn_80082758(u8* p0, u8* p1) {
-    s32 t0;
-    t0 = fn_800A2604(*(s32*)p0);
-    *(s32*)p1 = (t0 & 0xFF);
+void fn_80082758(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = fn_800A2604(pArgs[0].i);
 }
 
-void fn_80082790(u8* p0) {
-    s32 t0;
-    t0 = fn_800A2614(*(s32*)p0);
-    strcpy(*(char**)(*(u8**)(p0 + 0x4) + 0x8), (char*)t0);
+void fn_80082790(MsgArg* pArgs, MsgArg* pResult) {
+    strcpy(((MsgString*)pArgs[1].p)->pStr, fn_800A2614(pArgs[0].i));
 }
 
-void fn_80082800(u8* p0) {
-    *(s32*)((u8*)*(s32*)p0) = 2;
-    *(s32*)((u8*)*(s32*)(p0 + 0x4)) = 1;
+void fn_80082800(MsgArg* pArgs, MsgArg* pResult) {
+    *(s32*)pArgs[0].p = 2;
+    *(s32*)pArgs[1].p = 1;
 }
 
-void fn_8008281C(s32 a, u8* p) {
-    *(s32*)(p + 0x0) = 7;
+void fn_8008281C(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = 7;
 }
 
-u8* fn_80082928(void) {
-    *(s32*)(gSession + 0xC) = 2;
-    return gSession;
+void fn_80082928(MsgArg* pArgs, MsgArg* pResult) {
+    gSession.nC = 2;
 }
 
-void fn_8008293C(u8* p0) {
-    strcpy(*(char**)(*(u8**)(p0 + 0x4) + 0x8), *(char**)(lbl_80191990 + (*(s32*)p0 << 2)));
+void fn_8008293C(MsgArg* pArgs, MsgArg* pResult) {
+    strcpy(((MsgString*)pArgs[1].p)->pStr, lbl_80191990[pArgs[0].i]);
 }
 
-void fn_80082978(void) {
+void fn_80082978(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8008297C(void) {
+void fn_8008297C(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_80082980(u8* p0) {
-    *(s32*)((u8*)*(s32*)(p0 + 0x4)) = *(s32*)p0;
-    *(s32*)((u8*)*(s32*)(p0 + 0x8)) = 0;
+void fn_80082980(MsgArg* pArgs, MsgArg* pResult) {
+    *(s32*)pArgs[1].p = pArgs[0].i;
+    *(s32*)pArgs[2].p = 0;
 }
 
-void fn_800829D4(s32 a, u8* p) {
-    *(s32*)(p + 0x0) = 2;
+void fn_800829D4(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = 2;
 }
 
-void fn_800829E0(s32 a, u8* p) {
-    *(s32*)(p + 0x0) = 4;
+void fn_800829E0(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = 4;
 }
 
-void fn_800829EC(u8* p) {
-    fn_80077968(*(s32*)(p + 0x0));
+void fn_800829EC(MsgArg* pArgs, MsgArg* pResult) {
+    fn_80077968(pArgs[0].i);
 }
 
-void fn_80082A10(void** arg0, s32* arg1) {
-    *arg1 = 0;
-    strcpy(*(char**)((u8*)(*arg0) + 8), "");
+void fn_80082A10(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = 0;
+    strcpy(((MsgString*)pArgs[0].p)->pStr, "");
 }
 
-void fn_80082A44(void) {
+void fn_80082A44(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_80082A48(void) {
+void fn_80082A48(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_80082A4C(void) {
+void fn_80082A4C(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_80082C74(u8* p0) {
-    *(u8*)(((u8*)gpSaveData) + (*(s32*)p0 * 67072)) = 0;
-    *(u8*)(lbl_801D7148 + *(s32*)p0) = 0;
+// Empty a player slot: no profile in it, none loaded.
+void fn_80082C74(MsgArg* pArgs, MsgArg* pResult) {
+    gpSaveData[pArgs[0].i].bActive = 0;
+    lbl_801D7148.aLoaded[pArgs[0].i] = 0;
 }
 
-void fn_80082CA4(void) {
+void fn_80082CA4(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_80082CA8(u8* p0) {
-    fn_800ED650(*(s32*)(p0 + 0x0), *(s32*)(p0 + 0x4), *(s32*)(p0 + 0x8), *(s32*)(p0 + 0xC));
+void fn_80082CA8(MsgArg* pArgs, MsgArg* pResult) {
+    fn_800ED650(pArgs[0].i, pArgs[1].p, pArgs[2].p, pArgs[3].p);
 }
 
-void fn_80082CDC(u8* p0, u8* p1) {
-    s32 t0;
-    t0 = strlen(*(char**)(*(u8**)p0 + 0x8));
-    *(s32*)p1 = t0;
+void fn_80082CDC(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = strlen(((MsgString*)pArgs[0].p)->pStr);
 }
 
-void fn_80082D98(s32* arg0) {
-    (*(s8*)((u8*)(lbl_80281ED4) + 3)) = (s8) *arg0;
+void fn_80082D98(MsgArg* pArgs, MsgArg* pResult) {
+    lbl_80281ED4->n3 = pArgs[0].i;
 }
 
-void fn_80082DBC(void* arg0, s32* arg1) {
-    if (fn_8009EE28((*(s32*)((u8*)(arg0) + 0)), (*(s32*)((u8*)(arg0) + 4)), arg0) == -0x12) {
-        *arg1 = 1;
-        return;
+void fn_80082DBC(MsgArg* pArgs, MsgArg* pResult) {
+    if (fn_8009EE28(pArgs[0].i, pArgs[1].i) == MC_ERR_BADDATA) {
+        pResult->i = 1;
+    } else {
+        pResult->i = 0;
     }
-    *arg1 = 0;
 }
 
-void fn_80082E10(void* arg0, s32* arg1) {
-    s32 temp_r3;
-    s32 var_r0;
+void fn_80082E10(MsgArg* pArgs, MsgArg* pResult) {
+    s32 nError;
+    s32 n;
 
-    temp_r3 = fn_800A0A7C((*(s32*)((u8*)(arg0) + 0)), (*(s32*)((u8*)(arg0) + 4)), arg0);
-    var_r0 = 1;
-    if (temp_r3 != 0) {
-        var_r0 = temp_r3;
+    nError = fn_800A0A7C(pArgs[0].i, pArgs[1].i);
+    n = 1;
+    if (nError != 0) {
+        n = nError;
     }
-    *arg1 = var_r0;
+    pResult->i = n;
 }
 
-void fn_80083354(void) {
+void fn_80083354(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_80083358(s32* arg0) {
-    s32* temp_r3;
+// Play a golfer's bio movie, or the credits for -1.
+void fn_80083358(MsgArg* pArgs, MsgArg* pResult) {
+    FEMovie* pMovie;
 
-    temp_r3 = (s32*)fn_800770FC();
-    *temp_r3 = 3;
-    if ((s32) *arg0 == -1) {
-        *temp_r3 = 1;
+    pMovie = fn_800770FC();
+    pMovie->nKind = FE_MOVIE_BIO;
+    if (pArgs[0].i == -1) {
+        pMovie->nKind = FE_MOVIE_CREDITS;
     }
     fn_800A75B4();
 }
 
-void fn_800833A4(void) {
+void fn_800833A4(MsgArg* pArgs, MsgArg* pResult) {
     fn_800A75B4();
 }
 
-void fn_800833C4(s32 a, u8* p) {
-    *(s32*)(p + 0x0) = 0;
+void fn_800833C4(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = 0;
 }
 
-void fn_80083430(s32* arg0, s32* arg1) {
-    if ((u32) (fn_80013050(*arg0) + 0x74F00000) == 0U) {
-        *arg1 = 1;
-        return;
+// The pad in port pArgs[0] is a WaveBird (its SI device type).
+void fn_80083430(MsgArg* pArgs, MsgArg* pResult) {
+    if (fn_80013050(pArgs[0].i) == 0x8B100000) {
+        pResult->i = 1;
+    } else {
+        pResult->i = 0;
     }
-    *arg1 = 0;
 }
 
-u8* fn_80083480(s32 p0, u8* p1) {
-    *(s32*)p1 = *(u8*)(lbl_801D7148 + 0x10);
-    return lbl_801D7148;
+void fn_80083480(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = lbl_801D7148.b10;
 }
 
-u8* fn_80083494(u8* p0) {
-    *(u8*)(lbl_801D7148 + 0x10) = *(s32*)p0;
-    return lbl_801D7148;
+void fn_80083494(MsgArg* pArgs, MsgArg* pResult) {
+    lbl_801D7148.b10 = pArgs[0].i;
 }
 
-void fn_800834A8(u8* p0, u8* p1) {
-    s32 t0;
-    t0 = fn_8009F728(*(s32*)p0);
-    *(s32*)p1 = t0;
+void fn_800834A8(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = fn_8009F728(pArgs[0].i);
 }
 
-void fn_800834DC(s32 a, u8* p) {
-    *(s32*)(p + 0x0) = 0;
+void fn_800834DC(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = 0;
 }
 
-void fn_800835B8(void) {
+void fn_800835B8(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_800835BC(s32 a, u8* p) {
-    *(s32*)(p + 0x0) = 0;
+void fn_800835BC(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = 0;
 }
 
-void fn_800835C8(s32 a, u8* p) {
-    *(s32*)(p + 0x0) = 0;
+void fn_800835C8(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = 0;
 }
 
-void fn_80083890(s32 a, u8* p) {
-    *(s32*)(p + 0x0) = 150;
+void fn_80083890(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = 150;
 }
 
-void fn_8008389C(void) {
+void fn_8008389C(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_800838A0(void) {
+void fn_800838A0(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_800838A4(void) {
+void fn_800838A4(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_800838A8(void) {
+void fn_800838A8(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_800838AC(void) {
+void fn_800838AC(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_800838B0(void) {
+void fn_800838B0(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_800838B4(void) {
+void fn_800838B4(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_800838B8(void) {
+void fn_800838B8(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_800838BC(void) {
+void fn_800838BC(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_800838C0(void) {
+void fn_800838C0(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_800838C4(u8* p0, u8* p1) {
-    s32 t0;
-    t0 = strcmp(*(char**)(*(u8**)p0 + 0x8), *(char**)(*(u8**)(p0 + 0x4) + 0x8));
-    *(s32*)p1 = t0;
+void fn_800838C4(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = strcmp(((MsgString*)pArgs[0].p)->pStr, ((MsgString*)pArgs[1].p)->pStr);
 }
 
-void fn_80083904(void) {
+void fn_80083904(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_80083908(void) {
+void fn_80083908(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8008390C(void) {
+void fn_8008390C(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_80083910(void) {
+void fn_80083910(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_80083914(void) {
+void fn_80083914(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_80083918(void) {
+void fn_80083918(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8008391C(void) {
+void fn_8008391C(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_80083920(void) {
+void fn_80083920(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_80083924(void) {
+void fn_80083924(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_80083928(void) {
+void fn_80083928(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8008392C(void) {
+void fn_8008392C(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_80083930(void) {
+void fn_80083930(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_80083970(void) {
+void fn_80083970(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_80083974(void* arg0) {
-    s32 temp_r0;
-    s32 temp_r5;
+// Three values out: 50, 50 and a level of 25..250 (the tenth of pArgs[3] plus one, times 25), the
+// level going to the one of the three pArgs[2] picks.
+void fn_80083974(MsgArg* pArgs, MsgArg* pResult) {
+    s32 nWhich;
+    s32 nLevel;
 
-    temp_r0 = (*(s32*)((u8*)(arg0) + 8)) % 3;
-    temp_r5 = (((*(s32*)((u8*)(arg0) + 0xC)) % 10) + 1) * 0x19;
-    switch (temp_r0) {
+    nWhich = pArgs[2].i % 3;
+    nLevel = (pArgs[3].i % 10 + 1) * 25;
+    switch (nWhich) {
     case 0:
-        *(*(s32**)((u8*)(arg0) + 0x10)) = temp_r5;
-        *(*(s32**)((u8*)(arg0) + 0x14)) = 0x32;
-        *(*(s32**)((u8*)(arg0) + 0x18)) = 0x32;
+        *(s32*)pArgs[4].p = nLevel;
+        *(s32*)pArgs[5].p = 50;
+        *(s32*)pArgs[6].p = 50;
         return;
     case 1:
-        *(*(s32**)((u8*)(arg0) + 0x10)) = 0x32;
-        *(*(s32**)((u8*)(arg0) + 0x14)) = temp_r5;
-        *(*(s32**)((u8*)(arg0) + 0x18)) = 0x32;
+        *(s32*)pArgs[4].p = 50;
+        *(s32*)pArgs[5].p = nLevel;
+        *(s32*)pArgs[6].p = 50;
         return;
     case 2:
-        *(*(s32**)((u8*)(arg0) + 0x10)) = 0x32;
-        *(*(s32**)((u8*)(arg0) + 0x14)) = 0x32;
-        *(*(s32**)((u8*)(arg0) + 0x18)) = temp_r5;
+        *(s32*)pArgs[4].p = 50;
+        *(s32*)pArgs[5].p = 50;
+        *(s32*)pArgs[6].p = nLevel;
         return;
     }
 }
 
-void fn_80083A44(void) {
+void fn_80083A44(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_80083A48(void) {
+void fn_80083A48(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_80083BA4(u8* p) {
-    fn_8010D334(*(s32*)(p + 0x0));
+void fn_80083BA4(MsgArg* pArgs, MsgArg* pResult) {
+    fn_8010D334(pArgs[0].i);
 }
 
-void fn_80083E48(void) {
+void fn_80083E48(MsgArg* pArgs, MsgArg* pResult) {
     fn_80123FF8();
     fn_8012408C(0);
 }
 
-void fn_80083E70(void) {
+void fn_80083E70(MsgArg* pArgs, MsgArg* pResult) {
     fn_8012408C(6);
 }
 
-void fn_80083E94(void) {
+void fn_80083E94(MsgArg* pArgs, MsgArg* pResult) {
     fn_8012408C(8);
 }
 
-void fn_80083EB8(void) {
+void fn_80083EB8(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_80083EBC(void) {
+void fn_80083EBC(MsgArg* pArgs, MsgArg* pResult) {
     fn_8012408C(18);
 }
 
-void fn_80083F54(s32 a, u8* p) {
-    *(s32*)(p + 0x0) = 0;
+void fn_80083F54(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = 0;
 }
 
-void fn_8008410C(s32** arg0, s32* arg1) {
-    s32 temp_r31;
-    s32* temp_r3;
+void fn_8008410C(MsgArg* pArgs, MsgArg* pResult) {
+    s32 n;
 
-    temp_r3 = *arg0;
-    temp_r31 = *temp_r3;
-    *arg1 = temp_r31 + fn_8012411C(temp_r3);
-    fn_80124138(*arg1);
+    n = *(s32*)pArgs[0].p;
+    pResult->i = n + fn_8012411C();
+    fn_80124138(pResult->i);
 }
 
-void fn_80084158(void) {
+void fn_80084158(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8008415C(void) {
+void fn_8008415C(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_80084160(s32 p0, u8* p1) {
-    s32 t0;
-    t0 = fn_801241CC();
-    *(s32*)p1 = t0;
+void fn_80084160(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = fn_801241CC();
 }
 
-void fn_80084190(s32 p0, u8* p1) {
-    s32 t0;
-    t0 = fn_80124174();
-    *(s32*)p1 = t0;
+void fn_80084190(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = fn_80124174();
 }
 
-void fn_80084208(void) {
+void fn_80084208(MsgArg* pArgs, MsgArg* pResult) {
     fn_8012408C(5);
 }
 
-void fn_8008422C(u8* p0) {
-    fn_80125600(*(s32*)(p0 + 0x0), *(s32*)(p0 + 0x4));
+// ---- the EA Sports Bio screens (EASportsBio.c does the work) ----
+
+void fn_8008422C(MsgArg* pArgs, MsgArg* pResult) {
+    fn_80125600(pArgs[0].i, pArgs[1].i);
 }
 
-void fn_80084258(u8* p0) {
-    fn_80125648(*(s32*)(p0 + 0x0), *(s32*)(p0 + 0x4), *(s32*)(p0 + 0x8));
+void fn_80084258(MsgArg* pArgs, MsgArg* pResult) {
+    fn_80125648(pArgs[0].i, pArgs[1].i, pArgs[2].i);
 }
 
-void fn_80084288(u8* p) {
-    fn_8012566C(*(s32*)(p + 0x0));
+void fn_80084288(MsgArg* pArgs, MsgArg* pResult) {
+    fn_8012566C(pArgs[0].i);
 }
 
-void fn_800842AC(u8* p) {
-    fn_80125680(*(s32*)(p + 0x0));
+void fn_800842AC(MsgArg* pArgs, MsgArg* pResult) {
+    fn_80125680(pArgs[0].i);
 }
 
-void fn_800842D0(void* arg0, s32* arg1) {
-    s32 temp_r3;
-    s32 temp_r3_2;
+void fn_800842D0(MsgArg* pArgs, MsgArg* pResult) {
+    s32 nError;
 
-    temp_r3 = fn_80125354((*(s32*)((u8*)(arg0) + 0)), (*(s32*)((u8*)(arg0) + 4)));
-    (*(s32*)((u8*)(lbl_80281ED4) + 0x11704)) = temp_r3;
-    if (temp_r3 != 0) {
-        *arg1 = 0;
+    nError = fn_80125354(pArgs[0].i, pArgs[1].i);
+    lbl_80281ED4->n11704 = nError;
+    if (nError != 0) {
+        pResult->i = 0;
         return;
     }
-    temp_r3_2 = fn_801253F0((*(s32*)((u8*)(arg0) + 0)), (*(s32*)((u8*)(arg0) + 4)));
-    (*(s32*)((u8*)(lbl_80281ED4) + 0x11704)) = temp_r3_2;
-    *arg1 = temp_r3_2 == 0;
+    nError = fn_801253F0(pArgs[0].i, pArgs[1].i);
+    lbl_80281ED4->n11704 = nError;
+    pResult->i = nError == 0;
 }
 
-void fn_800844E0(void* arg0, s32* arg1) {
-    s32 temp_r3;
+void fn_800844E0(MsgArg* pArgs, MsgArg* pResult) {
+    s32 nError;
 
-    temp_r3 = fn_80125434((*(s32*)((u8*)(arg0) + 0)), (*(s32*)((u8*)(arg0) + 4)), arg0);
-    (*(s32*)((u8*)(lbl_80281ED4) + 0x11704)) = temp_r3;
-    if (temp_r3 != 0) {
-        *arg1 = 0;
+    nError = fn_80125434(pArgs[0].i, pArgs[1].i);
+    lbl_80281ED4->n11704 = nError;
+    if (nError != 0) {
+        pResult->i = 0;
         return;
     }
-    *arg1 = temp_r3 == 0;
+    pResult->i = nError == 0;
 }
 
-void fn_80084544(s32 p0, u8* p1) {
-    s32 t0;
-    t0 = EASBio_IsBioLoaded();
-    *(s32*)p1 = (t0 & 0xFF);
+void fn_80084544(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = EASBio_IsBioLoaded();
 }
 
-void fn_800845D4(u8* p0, u8* p1) {
-    s32 t0;
-    t0 = fn_80125528(*(s32*)p0, *(s32*)(p0 + 0x4), p0);
-    *(s32*)p1 = (t0 & 0xFF);
+void fn_800845D4(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = fn_80125528(pArgs[0].i, pArgs[1].i);
 }
 
-void fn_80084678(u8* p0, u8* p1) {
-    s32 t0;
-    t0 = fn_80125280(*(s32*)p0, *(s32*)(p0 + 0x4), p0);
-    *(s32*)(((u8*)(lbl_80281ED4 + 0x10000)) + 0x1704) = t0;
-    *(s32*)p1 = ((u32)__cntlzw(t0) >> 5);
+void fn_80084678(MsgArg* pArgs, MsgArg* pResult) {
+    s32 nError;
+
+    nError = fn_80125280(pArgs[0].i, pArgs[1].i);
+    lbl_80281ED4->n11704 = nError;
+    pResult->i = nError == 0;
 }
 
-void fn_800846C8(s32 a, u8* p) {
-    *(s32*)(p + 0x0) = 0;
+void fn_800846C8(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = 0;
 }
 
-void fn_800846D4(s32** arg0) {
-    s32* temp_r31;
+void fn_800846D4(MsgArg* pArgs, MsgArg* pResult) {
+    s32* pN;
 
-    temp_r31 = *arg0;
-    *temp_r31 = fn_80125928();
+    pN = pArgs[0].p;
+    *pN = fn_80125928();
 }
 
-void fn_80084750(void) {
+void fn_80084750(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_80084754(s32 p0, u8* p1) {
-    s32 t0;
-    s32 t1;
-    t0 = fn_801254EC();
-    *(s32*)p1 = t0;
-    t1 = fn_801254B8();
-    *(s32*)p1 = t1;
+void fn_80084754(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = fn_801254EC();
+    pResult->i = fn_801254B8();
 }
 
-void fn_8008478C(s32 p0, u8* p1) {
-    f32 t0;
-    t0 = fn_80124BDC();
-    *(f32*)p1 = t0;
+void fn_8008478C(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->f = fn_80124BDC();
 }
 
-void fn_800847BC(u8* p) {
-    fn_80084FF0(*(s32*)(p + 0x0));
+void fn_800847BC(MsgArg* pArgs, MsgArg* pResult) {
+    fn_80084FF0(pArgs[0].i);
 }
 
-void fn_800848E4(void) {
+void fn_800848E4(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_800848E8(s32 p0, u8* p1) {
-    s32 t0;
-    t0 = fn_800EAE6C();
-    *(s32*)p1 = t0;
+void fn_800848E8(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = fn_800EAE6C();
 }
 
-void fn_80084918(u8* p0) {
-    fn_800EAE44((*(s32*)p0 - 1));
+void fn_80084918(MsgArg* pArgs, MsgArg* pResult) {
+    fn_800EAE44(pArgs[0].i - 1);
 }
 
-void fn_80084940(u8* p0) {
-    s32 t0;
-    t0 = fn_800ED280((*(s32*)(p0 + 0x4) - 1));
-    strcpy(*(char**)(*(u8**)p0 + 0x8), (char*)t0);
+void fn_80084940(MsgArg* pArgs, MsgArg* pResult) {
+    strcpy(((MsgString*)pArgs[0].p)->pStr, fn_800ED280(pArgs[1].i - 1));
 }
 
-void fn_80084984(u8* p0) {
-    s32 t0;
-    t0 = fn_800ED2C8((*(s32*)(p0 + 0x4) - 1));
-    strcpy(*(char**)(*(u8**)p0 + 0x8), (char*)t0);
+void fn_80084984(MsgArg* pArgs, MsgArg* pResult) {
+    strcpy(((MsgString*)pArgs[0].p)->pStr, fn_800ED2C8(pArgs[1].i - 1));
 }
 
-void fn_80084B88(s32* arg0) {
-    s32 temp_r0;
-
-    temp_r0 = *arg0;
-    switch (temp_r0) {
+// Passes the message on to one of three handlers, by pArgs[0].
+void fn_80084B88(MsgArg* pArgs, MsgArg* pResult) {
+    switch (pArgs[0].i) {
     case 0:
-        fn_8010F2FC();
+        fn_8010F2FC(pArgs, pResult);
         return;
     case 1:
-        fn_8010F3A4();
+        fn_8010F3A4(pArgs, pResult);
         return;
     case 3:
-        fn_8011DF90();
-        /* fallthrough */
+        fn_8011DF90(pArgs, pResult);
+        return;
     case 2:
         return;
     }
 }
 
-void fn_80084BE4(void) {
+void fn_80084BE4(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_80084D6C(void* arg0) {
-    strcpy((*(char**)((u8*)((*(void**)((u8*)(arg0) + 4))) + 8)), (*(char**)((u8*)((*(void**)((u8*)(arg0) + 0))) + 8)));
-    if (strlen((*(char**)((u8*)((*(void**)((u8*)(arg0) + 0))) + 8))) > 0xCU) {
-        (*(s8*)((u8*)((*(void**)((u8*)((*(void**)((u8*)(arg0) + 4))) + 8))) + 0xB)) = 0;
-        (*(s8*)((u8*)((*(void**)((u8*)((*(void**)((u8*)(arg0) + 4))) + 8))) + 0xA)) = 0x2E;
-        (*(s8*)((u8*)((*(void**)((u8*)((*(void**)((u8*)(arg0) + 4))) + 8))) + 9)) = 0x2E;
-        (*(s8*)((u8*)((*(void**)((u8*)((*(void**)((u8*)(arg0) + 4))) + 8))) + 8)) = 0x2E;
+// Copy a string, cut to eight characters and "..." when it is longer than 12.
+void fn_80084D6C(MsgArg* pArgs, MsgArg* pResult) {
+    strcpy(((MsgString*)pArgs[1].p)->pStr, ((MsgString*)pArgs[0].p)->pStr);
+    if (strlen(((MsgString*)pArgs[0].p)->pStr) > 12) {
+        ((MsgString*)pArgs[1].p)->pStr[11] = '\0';
+        ((MsgString*)pArgs[1].p)->pStr[10] = '.';
+        ((MsgString*)pArgs[1].p)->pStr[9] = '.';
+        ((MsgString*)pArgs[1].p)->pStr[8] = '.';
     }
 }
 
-void fn_80084DF4(void* arg0) {
-    strcpy((*(char**)((u8*)((*(void**)((u8*)(arg0) + 4))) + 8)), (*(char**)((u8*)((*(void**)((u8*)(arg0) + 0))) + 8)));
-    if (strlen((*(char**)((u8*)((*(void**)((u8*)(arg0) + 0))) + 8))) > 0x20U) {
-        (*(s8*)((u8*)((*(void**)((u8*)((*(void**)((u8*)(arg0) + 4))) + 8))) + 0x1F)) = 0;
-        (*(s8*)((u8*)((*(void**)((u8*)((*(void**)((u8*)(arg0) + 4))) + 8))) + 0x1E)) = 0x2E;
-        (*(s8*)((u8*)((*(void**)((u8*)((*(void**)((u8*)(arg0) + 4))) + 8))) + 0x1D)) = 0x2E;
-        (*(s8*)((u8*)((*(void**)((u8*)((*(void**)((u8*)(arg0) + 4))) + 8))) + 0x1C)) = 0x2E;
+// The same, to 28 characters and "..." when it is longer than 32.
+void fn_80084DF4(MsgArg* pArgs, MsgArg* pResult) {
+    strcpy(((MsgString*)pArgs[1].p)->pStr, ((MsgString*)pArgs[0].p)->pStr);
+    if (strlen(((MsgString*)pArgs[0].p)->pStr) > 32) {
+        ((MsgString*)pArgs[1].p)->pStr[31] = '\0';
+        ((MsgString*)pArgs[1].p)->pStr[30] = '.';
+        ((MsgString*)pArgs[1].p)->pStr[29] = '.';
+        ((MsgString*)pArgs[1].p)->pStr[28] = '.';
     }
 }
 
-void fn_80084E7C(s32 p0, u8* p1) {
-    *(s32*)p1 = *(s32*)(((u8*)(lbl_80281ED4 + 0x10000)) + 0x1704);
+void fn_80084E7C(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = lbl_80281ED4->n11704;
 }
 
-void fn_80084E90(s32 p0, u8* p1) {
-    s32 t0;
-    t0 = fn_80125194(0, 0);
-    *(s32*)p1 = t0;
+void fn_80084E90(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = fn_80125194(0, 0);
 }
 
-void fn_80084EC8(u8* p0, u8* p1) {
-    s32 t0;
-    t0 = fn_8009D390(*(s32*)p0, *(s32*)(p0 + 0x4), p0);
-    *(s32*)p1 = t0;
+void fn_80084EC8(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = fn_8009D390(pArgs[0].i, pArgs[1].i);
 }
 
-void fn_80084F04(void) {
+void fn_80084F04(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_80084F08(void) {
+void fn_80084F08(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_80084F0C(s32 p0, u8* p1) {
-    s32 t0;
-    t0 = fn_800A27F4();
-    *(s32*)p1 = t0;
+void fn_80084F0C(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = fn_800A27F4();
 }
 
-void fn_80084F3C(void) {
+void fn_80084F3C(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_80084F40(u8* p0, u8* p1) {
-    s32 t0;
-    t0 = fn_801252D0(*(s32*)p0, *(s32*)(p0 + 0x4), p0);
-    *(s32*)p1 = ((u32)__cntlzw(t0) >> 5);
+void fn_80084F40(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = fn_801252D0(pArgs[0].i, pArgs[1].i) == 0;
 }
 
-void fn_80084F84(s32 p0, u8* p1) {
-    s32 t0;
-    t0 = EASBio_GetCurrentRewardMessage();
-    *(s32*)p1 = t0;
+void fn_80084F84(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = EASBio_GetCurrentRewardMessage();
 }
 
-void fn_80084FF0(s32 v) {
-    lbl_80281FFC = v;
+void fn_80084FF0(int n) {
+    lbl_80281FFC = n;
 }
-
-// ---- end of sweep code ----

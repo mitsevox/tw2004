@@ -53,6 +53,10 @@ typedef struct MsgString {
     char* pStr;
 } MsgString;
 
+// A handler in the menus' message tables (FE_MessageTable.c, GameUICommands.c): the message's
+// values, and where its answers go (an int or float, or a string to fill in).
+typedef void (*MsgHandler)(MsgArg* pArgs, MsgArg* pResult);
+
 // Send message nMsg with nArgs values to a front-end handler (fn_8016B09C also sends through it).
 void fn_8016B0F8(void* pHandler, int nMsg, int nArgs, MsgArg* pArgs);
 
