@@ -54,18 +54,10 @@ typedef struct PgaData {
     char*      pNames;          // 0x704C  'PGAn'. TW06: pStrTable
     u8         unk7050[4];
 } PgaData;
-extern PgaData gPgaData;
 
 // The current round's statistics: cleared as each round of a tournament starts (fn_800EE2C8),
 // added to the player's season counts in the profile as it ends (fn_800EED0C).
 extern PgaStatCounts lbl_80205ED8;
-
-extern s32 lbl_80281670;        // the options' nC from before the tour (fn_800EE02C puts it back)
-extern s32 lbl_80281674;        // the options' n18 from before a tour round (fn_800EE0A0 keeps it)
-extern s32 lbl_80282338;        // the options' nWind from before the tour (fn_800EE02C puts it back)
-extern u8  lbl_8028233C;        // 1 while the tour runs
-extern s32 lbl_80282340;        // the playoff hole index: set to 16, each playoff moves it on
-                                //   (17, 15, 16, 17, ...; fn_800EF720)
 
 typedef struct Pga80205F30 {
     u8   b0;                    // 0x0
@@ -73,6 +65,5 @@ typedef struct Pga80205F30 {
     s32  n4;                    // 0x4
     s32  n8;                    // 0x8
 } Pga80205F30;
-extern Pga80205F30 lbl_80205F30;
 
 #endif

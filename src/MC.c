@@ -1,7 +1,24 @@
-// MC.c (EA's name, from its asserts; also in EA's 2002 source tree): not yet decompiled; the sweep
-// code below is the matched small functions.
+// MC.c (EA's name, from its asserts; also in EA's 2002 source tree): the game side of the memory
+// card: finding the save file on either card, loading and saving it, and the results the menus turn
+// into messages. The GameCube calls are in MC_Gc.c (include/core/memcard.h).
 
-#include "game_types.h"
+#include "core/memcard.h"
+
+// Delete the save file from the card: mount it if it is not mounted yet, and unmount it again
+// after.
+s32 fn_800A0A7C(s32 nPort, s32 nSlot) {
+    s32 nMount;
+    s32 nResult;
+    nMount = fn_8009D74C(nPort, nSlot);
+    if (nMount != 0 && nMount != -22) return nMount;
+    nResult = fn_8009F734(nPort, nSlot);
+    if (nResult != 0) return nResult;
+    nResult = fn_8009F5E4(nPort, nSlot, MC_DIR_NAME);
+    if (nMount == 0) {
+        fn_8009DBAC(nPort, nSlot);
+    }
+    return nResult;
+}
 
 // ---- sweep code (not yet cleaned up) ----
 

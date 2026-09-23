@@ -26,9 +26,15 @@ LAYOUT_ASSERT(FEMovie, 0x108);
 // The front end's state (lbl_801D7148, 0x660 bytes). Only what the cleaned code reads.
 typedef struct FEState {
     u8  aLoaded[5];             // 0x000  per player slot: a profile is loaded (its name is shown)
-    u8  a5[5];                  // 0x005
+    u8  aCPU[5];                // 0x005  per player slot: a CPU player (fn_80079AD4 gives it
+                                //        CONTROLLER_CPU and no profile)
     s8  aBackup[5];             // 0x00A  per player slot: its row in p658 (-1: none)
-    u8  unkF[0x20 - 0xF];
+    u8  unkF[0x11 - 0xF];
+    u8  b11;                    // 0x011  cleared by fn_80079AD4
+    u8  unk12[2];
+    s32 nMode;                  // 0x014  the game mode the menus start in (fn_80079AD4): the
+                                //        session's, or 4, 23, 27 or 28
+    u8  unk18[0x20 - 0x18];
     s32 nMovieNext;             // 0x020  } the movie queue: the next to play, and where the next
     s32 nMovieFree;             // 0x024  } one is added (equal when it is empty)
     FEMovie aMovies[FE_NUM_MOVIES];     // 0x028
@@ -42,7 +48,8 @@ extern FEState lbl_801D7148;
 
 // The front end's screen state (lbl_801D87C0, 0x4C bytes). Only what the cleaned code reads.
 typedef struct FEScreen {
-    u8  unk0[0x44];
+    u8  b0;                     // 0x00  set by fn_80079AD4
+    u8  unk1[0x44 - 0x1];
     f32 fFade;                  // 0x44  the fade to black before a movie, 0 to 1
     u8  unk48[0x4C - 0x48];
 } FEScreen;
@@ -50,15 +57,55 @@ LAYOUT_ASSERT(FEScreen, 0x4C);
 
 extern FEScreen lbl_801D87C0;
 
-// The profile being worked on in the menus (lbl_80281ED4 points to it).
+// lbl_801D8858 (0x38 bytes), also used by the code at 0x8009170C. Only what the cleaned code reads.
+typedef struct FE801D8858 {
+    u8  unk0[0x18];
+    u8  b18;                    // 0x18
+    u8  unk19[0x30 - 0x19];
+    s32 n30;                    // 0x30  from fn_8002FD00 (0x8009170C's code)
+    u8  unk34[0x38 - 0x34];
+} FE801D8858;
+LAYOUT_ASSERT(FE801D8858, 0x38);
+
+extern FE801D8858 lbl_801D8858;
+
+// One of 200 entries (lbl_801D8890); uiProcessInterface.c sets them from lbl_801D8ED0.
+typedef struct FE801D8890 {
+    u8  b0;                     // 0x0
+    u8  b1;                     // 0x1
+    u8  unk2[2];
+    s32 n4;                     // 0x4
+} FE801D8890;
+LAYOUT_ASSERT(FE801D8890, 0x8);
+
+#define FE_NUM_801D8890 200
+extern FE801D8890 lbl_801D8890[FE_NUM_801D8890];
+
+// The profile being worked on in the menus (lbl_80281ED4 points to it; 0x11708 bytes, allocated
+// and cleared by fn_8007744C).
 typedef struct FEProfile {
-    u8  unk0[2];
+    u8  b0;                     // 0x00000  with game mode 10, the menus start in mode 27
+    s8  n1;                    // 0x00001  -1 when it is set up
     s8  nSlot;                  // 0x00002  the player slot whose profile it is
     u8  unk3[0x10 - 0x3];
     SaveProfile profile;        // 0x00010  a working copy
     u8  unk10610[0x1063F - 0x10610];
     u8  bCopy;                  // 0x1063F  the working copy is the profile, not the slot's own
+    u8  b10640;                 // 0x10640
+    u8  unk10641[3];
+    s32 nDateSeed;              // 0x10644  } fn_80077C1C, from today's date: per b (0, 1) and
+    s16 aKind[2][3];            // 0x10648  } category (-1, -2, -3), a random asset kind, and up
+    s16 aPart[2][3][5];         // 0x10654  } to five random assets of it (fn_80105FF8's part
+    s16 aChoice[2][3][5];       // 0x10690  } and choice; -1: none)
+    u8  unk106CC[0x106D0 - 0x106CC];
+    u64 uSquareHash;            // 0x106D0  the hash of "__LogoSquare" (the square logo's texture)
+    u64 uRectHash;              // 0x106D8  the hash of "__LogoRect"
+    u8  unk106E0[0x11702 - 0x106E0];
+    u8  b11702;                 // 0x11702
+    u8  b11703;                 // 0x11703
+    s32 n11704;                 // 0x11704
 } FEProfile;
+LAYOUT_ASSERT(FEProfile, 0x11708);
 
 extern FEProfile* lbl_80281ED4;
 extern u8* lbl_80281EC8;                // a copy of the 'BIO ' stream object's data (fn_80076F80)
