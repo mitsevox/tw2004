@@ -11,6 +11,8 @@
 
 #define AXIS3(n) ((n) == 0 ? 0 : 2)    // grid axis 0 (x) or 1 (z) as an index into a 3D vector
 #define PIN_RADIUS_SQ 0.00077160494f   // the flagstick's radius squared: (1 inch)^2 in square yards
+// port: the course file keeps each list's offset from its start in the pointer field itself, and
+// loading turns it into the pointer in place; with 64-bit pointers the file needs its own layout.
 #define TER_RELOCATE(pCourse, field) ((pCourse)->field = (void*)((u8*)(pCourse) + (u32)(pCourse)->field))
 
 u8    Course_RegisterLoader(int nChunk, void (*pfn)(u8*));   // 0x8000C0B4
@@ -59,7 +61,7 @@ u8    fn_800504F4(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32
                   f32* pNormal, SurfaceType** ppSurface, TerObject** ppObj);
 u8    fn_8004E0D4(f32* pFrom, f32* pDir, f32 fRange, f32* pCentre, f32 fRadius);
 u8    fn_80050A9C(f32* pA, f32* pB, f32* pC, f32 fX, f32 fZ);
-void  fn_800509D8(f32* pTri, f32* pPos, f32* pA, f32* pB, f32* pC);
+void  fn_800509D8(f32 (*pTri)[3], f32* pPos, f32* pA, f32* pB, f32* pC);
 
 // TW06: bool Ter_LineTriangleIntersection(f32*, f32*, f32, f32**, f32*, f32[4]*, f32[4]*). Where the
 // line from pFrom along pDir meets a triangle, as a fraction t of pDir (0 < t < fMax): t, the point
@@ -486,8 +488,9 @@ f32 Ter_CalcLowestPlayableWorldHeight(CourseInfo* pCourse) {
 
 // The highest ground triangle under a point (x, z): its height there, the grid cell, the strip,
 // the triangle's vertices and its number in the strip; TER_NO_GROUND when there is none. Only
-// ground strips count (not objects), and only those used on the current hole: a strip with
-// hole bits in its flags is skipped on other holes, and one with 0x10 in split screen.
+// ground strips count (not objects), and only those in use: a strip flagged as the cup geometry of
+// some pin positions (bits 1, 2, 4, 8) is skipped unless the current one is among them, and one
+// with 0x10 in split screen.
 f32 fn_8004C8E0(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** ppRef, f32 (**ppTri)[3],
                 s32* pTri) {
     u32 uPinSet = 1 << Game_CurrentPinSet();
@@ -520,7 +523,7 @@ f32 fn_8004C8E0(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** p
                 for (j = pRef->nTris - 1; j >= 0; j--) {
                     if ((pFlags[2] & 7) && fBest < pVert[(pFlags[2] >> 4) & 3][1]
                         && fn_80050A9C(pVert[0], pVert[1], pVert[2], pPos[0], pPos[2])) {
-                        fn_800509D8(pVert[0], pPos, &fA, &fB, &fC);
+                        fn_800509D8(pVert, pPos, &fA, &fB, &fC);
                         fHeight = fA * pVert[0][1] + fB * pVert[1][1] + fC * pVert[2][1];
                         if (fHeight > fBest) {
                             *ppCell = pCell;
@@ -575,7 +578,7 @@ f32 fn_8004CB30(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** p
                 for (j = pRef->nTris - 1; j >= 0; j--) {
                     if ((pFlags[2] & 7) && fBest > pVert[(pFlags[2] >> 6) & 3][1]
                         && fn_80050A9C(pVert[0], pVert[1], pVert[2], pPos[0], pPos[2])) {
-                        fn_800509D8(pVert[0], pPos, &fA, &fB, &fC);
+                        fn_800509D8(pVert, pPos, &fA, &fB, &fC);
                         fHeight = fA * pVert[0][1] + fB * pVert[1][1] + fC * pVert[2][1];
                         if (fHeight < fBest) {
                             *ppCell = pCell;
@@ -631,7 +634,7 @@ f32 fn_8004CD94(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** p
                         && (pPos[1] > pVert[(pFlags[2] >> 6) & 3][1]
                             || fBest < pVert[(pFlags[2] >> 4) & 3][1])
                         && fn_80050A9C(pVert[0], pVert[1], pVert[2], pPos[0], pPos[2])) {
-                        fn_800509D8(pVert[0], pPos, &fA, &fB, &fC);
+                        fn_800509D8(pVert, pPos, &fA, &fB, &fC);
                         fHeight = fA * pVert[0][1] + fB * pVert[1][1] + fC * pVert[2][1];
                         if (fHeight > fBest && fHeight <= pPos[1]) {
                             *ppCell = pCell;
@@ -688,7 +691,7 @@ f32 fn_8004D01C(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** p
                         && (fBest > pVert[(pFlags[2] >> 6) & 3][1]
                             || pPos[1] < pVert[(pFlags[2] >> 4) & 3][1])
                         && fn_80050A9C(pVert[0], pVert[1], pVert[2], pPos[0], pPos[2])) {
-                        fn_800509D8(pVert[0], pPos, &fA, &fB, &fC);
+                        fn_800509D8(pVert, pPos, &fA, &fB, &fC);
                         fHeight = fA * pVert[0][1] + fB * pVert[1][1] + fC * pVert[2][1];
                         if (fHeight < fBest && fHeight >= pPos[1]) {
                             *ppCell = pCell;
@@ -748,7 +751,7 @@ void fn_8004D2E0(CourseInfo* pCourse, f32* pPos, TerPolyRef** ppRefLow, f32* pLo
                     if ((pFlags[2] & 7)
                         && (fHigh > pVert[(pFlags[2] >> 6) & 3][1] || fLow < pVert[(pFlags[2] >> 4) & 3][1])
                         && fn_80050A9C(pVert[0], pVert[1], pVert[2], pPos[0], pPos[2])) {
-                        fn_800509D8(pVert[0], pPos, &fA, &fB, &fC);
+                        fn_800509D8(pVert, pPos, &fA, &fB, &fC);
                         fHeight = fA * pVert[0][1] + fB * pVert[1][1] + fC * pVert[2][1];
                         if (fHeight < fHigh && fHeight >= pPos[1]) {
                             *ppRefHigh = pRef;
@@ -1048,7 +1051,7 @@ u32 fn_8004DCC4(CourseInfo* pCourse, f32* pPos, SurfaceType** ppSurfaces, f32* p
                 pFlags = pCourse->pTriFlags + TER_FIRST_VERTEX(pRef);
                 for (j = pRef->nTris - 1; j >= 0; j--) {
                     if ((pFlags[2] & 7) && fn_80050A9C(pVert[0], pVert[1], pVert[2], pPos[0], pPos[2])) {
-                        fn_800509D8(pVert[0], pPos, &fA, &fB, &fC);
+                        fn_800509D8(pVert, pPos, &fA, &fB, &fC);
                         pHeights[nFound] = fA * pVert[0][1] + fB * pVert[1][1] + fC * pVert[2][1];
                         ppSurfaces[nFound] = &gSurfaceTypes[pRef->nSurface];
                         nFound++;
@@ -2057,17 +2060,18 @@ asm void fn_800509BC(register f32* pA, register f32* pOut) {
 
 // TW06: Ter_GetBarycentricCoords (an inline in goterrainutils.h there). The weights of a point
 // against a triangle's three corners, in the x-z plane.
-void fn_800509D8(f32* pTri, f32* pPos, f32* pA, f32* pB, f32* pC) {
+void fn_800509D8(f32 (*pTri)[3], f32* pPos, f32* pA, f32* pB, f32* pC) {
     f32 fX;
     f32 fZ;
     f32 fInv;
 
     fX = pPos[0];
     fZ = pPos[2];
-    fInv = 1.0f / ((pTri[3] - pTri[0]) * (pTri[8] - pTri[2]) - (pTri[6] - pTri[0]) * (pTri[5] - pTri[2]));
-    *pA = fInv * ((pTri[3] - fX) * (pTri[8] - fZ) - (pTri[6] - fX) * (pTri[5] - fZ));
-    *pB = fInv * ((pTri[6] - fX) * (pTri[2] - fZ) - (pTri[0] - fX) * (pTri[8] - fZ));
-    *pC = fInv * ((pTri[0] - fX) * (pTri[5] - fZ) - (pTri[3] - fX) * (pTri[2] - fZ));
+    fInv = 1.0f / ((pTri[1][0] - pTri[0][0]) * (pTri[2][2] - pTri[0][2])
+                   - (pTri[2][0] - pTri[0][0]) * (pTri[1][2] - pTri[0][2]));
+    *pA = fInv * ((pTri[1][0] - fX) * (pTri[2][2] - fZ) - (pTri[2][0] - fX) * (pTri[1][2] - fZ));
+    *pB = fInv * ((pTri[2][0] - fX) * (pTri[0][2] - fZ) - (pTri[0][0] - fX) * (pTri[2][2] - fZ));
+    *pC = fInv * ((pTri[0][0] - fX) * (pTri[1][2] - fZ) - (pTri[1][0] - fX) * (pTri[0][2] - fZ));
 }
 
 // TW06: bool Ter_PointInTriangleXZpY(f32*, f32*, f32*, f32, f32, f32*). Whether (x, z) lies inside
@@ -2094,8 +2098,10 @@ u8 fn_80050A9C(f32* pA, f32* pB, f32* pC, f32 fX, f32 fZ) {
     return 1;
 }
 
-// A signed byte of an object's data: its +0x24 + n. Called with n = 0 from
-// Ter_CheckObjectAndHazardObstruction, which tests bit 0x40 of it.
+// A signed byte of a course object's model data: byte 0x24 + n of the block the model's first
+// word points at. Ter_CheckObjectAndHazardObstruction finds the model with fn_80034A20 (from the
+// object's nPatch and nObjList) and tests bit 0x40 of byte n = 0. The block's layout is not known
+// yet (its other accessors, from 0x800354E4, are still sweep code), so the offset stays raw.
 int fn_80050BD8(s8** ppData, int n) {
     return (*ppData)[n + 0x24];
 }
