@@ -31,7 +31,9 @@ typedef struct CamShot {
     struct CamShot* p44;        // 0x44  in View.shot19C: the shot camera 13 goes back to
     f32  f48;                   // 0x48  how long the shot lasts
     f32  f4C;                   // 0x4C
-    u8   unk50[0x60 - 0x50];
+    u32  u50;                   // 0x50  on the CrAP screen: bit n for CrAPGolfer.nC = n up to 32
+    u32  u54;                   // 0x54  ... bit n - 32 above that (fn_8003D294)
+    u8   unk58[0x60 - 0x58];
     f32  f60;                   // 0x60
     f32  f64;                   // 0x64
     f32  f68;                   // 0x68
@@ -51,7 +53,7 @@ typedef struct CamShot {
     u8   unkA0[0xA4 - 0xA0];
     s32  nA4;                   // 0xA4
     u8   bA8;                   // 0xA8
-    u8   unkA9;
+    u8   bA9;                   // 0xA9  another shot's p40 leads here (fn_80039C5C)
     u8   bAA;                   // 0xAA
     u8   bAB;                   // 0xAB
     u8   bAC;                   // 0xAC
@@ -79,9 +81,14 @@ typedef struct CamSequence {
     s32  nChoices;              // 0x3C  how many shot choices p4C holds
     u32  uCourses;              // 0x40  one bit per course it is used on
     u8   b44;                   // 0x44  its kind
-    u8   unk45;
+    u8   b45;                   // 0x45  the clubs it is for (fn_8003CBE8)
     u8   b46;                   // 0x46  6: the ball-flight camera keeps one for shot kind 5
-    u8   unk47[0x4B - 0x47];
+    u8   b47;                   // 0x47  0 humans, 1 CPU players, 2 not in a replay, 3 in a replay,
+                                //       4 in a replay or a CPU player (fn_8003CEEC)
+    u8   b48;                   // 0x48  0 single-view play outside modes 9 and 11 and fn_800E39F0;
+                                //       1 split screen or modes 9 and 11; 2 fn_800E39F0 (fn_8003D140)
+    u8   b49;                   // 0x49  a bit mask
+    u8   b4A;                   // 0x4A  a bit mask
     s8   n4B;                   // 0x4B  one bit per value of fn_800D2B08
     struct CamChoice* p4C;      // 0x4C  its shot choices (dyncam.h)
 } CamSequence;
@@ -291,6 +298,10 @@ extern CrAPState* lbl_80281EE0;
 
 // ---- the views ------------------------------------------------------------------------------
 
+// Points at the slot holding the current render camera (lbl_80281C90): fn_8001614C reads it,
+// fn_80013D5C sets it.
+extern void** lbl_80280DF0;
+
 ViewController* fn_80016CFC(int nView);
 void*  fn_80017004(int nView);          // the view's render camera
 View*  fn_80017028(int nView);
@@ -311,15 +322,40 @@ void   fn_8006A8D4(void* pCamera, f32* pX, f32* pY);
 
 // ---- camera shots and sequences (0x8003A7C8..) ----------------------------------------------
 
+CamShot* fn_8003A7C8(int nPlayer, int nKind, CamShot* pShot);
+CamShot* fn_8003A8C4(char* szName);     // the shot with this name (case ignored), or NULL
 // A shot of kind nKind from the sequence, picked at random, and its blend values (each out
 // pointer may be NULL).
 CamShot* fn_8003A950(CamSequence* pSequence, int nKind, int* pA, f32* pF1, f32* pF2, int* pB, f32* pF3,
                      int nPlayer);
 CamSequence* fn_8003BDBC(int nPlayer, int nLie, int nClass, int nKind, int a, f32 fDist);
+CamSequence* DynamicCam_ChoosePreFlightSequence(int nPlayer, int nLie, int nKind);
+u8       fn_8003C9D0(int nPlayer, int a, CamSequence** ppSeq, CamShot** ppShot);
+u8       fn_8003D7A0(CamSequence* pSequence, int nPlayer);   // it suits the player's club and shot
 u8     fn_8003DC78(CamShot* pShot);     // the shot's bAC is 1..6 or 7
 // 0 when gSession.nGameType is 3, else fn_8001EDF4 of the player's golfer (Player.pChar) as a flag;
 // the shot is not read.
 u8     fn_800453C8(int nPlayer, CamShot* pShot);
+
+// ---- the camera scripts (gocamscripts.c, 0x8003DCE8..) ----------------------------------------
+
+void     fn_8003DCE8(int nPlayer, void* pCam, void* pSub, void* pScript, CamShot* pShot, int a,
+                     f32 fFrameTime);
+void     fn_8003E624(int nPlayer, void* pCam, void* pSub, void* pScript, CamShot* pShot, int a,
+                     f32 fFrameTime);
+void     fn_8003EA50(int nPlayer, void* pCam, void* pSub, void* pScript, CamShot* pShot, int a,
+                     f32 fFrameTime);
+void     fn_8003F2E0(void* pScript, f32 fTime);
+void     CameraScript_RecordCurrentCam(CamShot* pShot, void* pCam, void* pSub, int nPlayer, void* pScript,
+                                       int a);
+void     CameraScript_InterpToNewScript(void* pScript, CamShot* pShot, int nPlayer, void* pCam, void* pSub,
+                                        int nA, f32 f1, f32 f2, int nB, f32 f3);
+u8       CameraScript_IsDefaultSwingCam(CamShot* pShot, int nPlayer, f32* pCam);
+// Keep pNew above the ground (by fClearance); the out values are optional (NULL): two flags and a
+// float.
+u8       CamScript_KeepAboveGround(int nPlayer, f32* pNew, f32* pOld, int a, u8* pb1, f32* pf, u8* pb2,
+                                   f32 fClearance);
+u8       CameraScript_WillGolferBeOccludedInThisView(int nPlayer, CamShot* pShot, void* pScript);
 
 // ---- the camera controller (0x80062F38..) ---------------------------------------------------
 

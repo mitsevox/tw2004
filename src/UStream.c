@@ -31,7 +31,7 @@ static UStreamBuffer*   gFreeRing[USTREAM_NUM_BUFFERS];         // 0x801A3094
 static UStream          gStreams[USTREAM_MAX_STREAMS];          // 0x801A2AD4
 static UStreamSound     gSoundHeader;                           // 0x801A2AC0 (SONO state)
 
-static u32  gRPNSBase;            // 0x80281C5C  value of the last RPNS object
+static uptr gRPNSBase;            // 0x80281C5C  data address of the last RPNS object
 static UStreamBuffer* volatile gpReadBuffer;  // 0x80281C58  buffer of the read in flight
 static volatile s8 gReadyRingHead;       // 0x80281C57
 static volatile s8 gFreeRingTail;        // 0x80281C56
@@ -51,7 +51,7 @@ static volatile s8 gbReadPending;        // 0x80281C28
 static UStreamObject* gpQueueHead;   // 0x80281C24
 static UStreamObject* gpQueueTail;   // 0x80281C20
 static int  gnReadErrors;         // 0x80281C1C
-static s8   gbAutoRead;           // 0x80281C19  keep reading after each completed read
+static u8   gbAutoRead;           // 0x80281C19  keep reading after each completed read
 static s8   gbPaused;             // 0x80281C18
 
 int gnNumHandlers = -1;           // 0x80280DB8 (.sdata): -1 until UStream_Init
@@ -59,11 +59,6 @@ int gnNumHandlers = -1;           // 0x80280DB8 (.sdata): -1 until UStream_Init
 // ---- other files' functions -----------------------------------------------------------
 
 int   fn_80005BC8(const void* pA, const void* pB);           // string/name compare
-int   fn_800060E0(const char* pName);                        // file open
-int   fn_8000633C(int hFile);                                // file close
-// async read
-int   fn_80006444(int hFile, void* pDst, u32 uLen, u32 uOffset, void (*pfnDone)(int, int));
-u32   fn_800065B0(int hFile);                                // file size
 void* fn_8000AFA0(u32 uNodeSize, u32 uAlign, int a, int b);  // UMemPool create
 void  fn_8000B058(void* pPool);                              // UMemPool destroy
 void* fn_8000B078(void* pPool);                              // UMemPool take node
@@ -171,7 +166,8 @@ static void UStream_ReadDone(int nBytes, int nError) {
             }
         }
         bDropped = 0;
-        if (BE32(gpReadBuffer->data) == TAG('S', 'W', 'V', 'R')) {
+        // fake match: the original turns the test into a 0/1 value (cntlzw) before branching
+        if ((BE32(gpReadBuffer->data) == TAG('S', 'W', 'V', 'R')) ? 1 : 0) {
             if (pStream->bWaitingForSWVR) {
                 pStream->bEOF = 1;
                 bDropped = 1;
@@ -260,16 +256,16 @@ static void UStream_RetireCurrentBuffer(void) {
     gpCurList = pBuffer->pNext;
     pBuffer->pNext = NULL;
     pBuffer->uPos = 0;
-    if (pBuffer->nRefs <= 0) {
+    if (pBuffer->nRefs > 0) {
+        if (gpUsedList == NULL) {
+            gpUsedList = pBuffer;
+        } else {
+            for (p = gpUsedList; p->pNext != NULL; p = p->pNext) {}
+            p->pNext = pBuffer;
+        }
+    } else {
         UStream_ReleaseBuffer(pBuffer);
-        return;
     }
-    if (gpUsedList == NULL) {
-        gpUsedList = pBuffer;
-        return;
-    }
-    for (p = gpUsedList; p->pNext != NULL; p = p->pNext) {}
-    p->pNext = pBuffer;
 }
 
 // An object is complete: put it on the done list for UStream_Update to deliver.
@@ -318,12 +314,15 @@ static UStreamBuffer* UStream_PumpBuffers(u8 bTakeReady) {
                 gReadyRingTail = 0;
             }
             p->pNext = NULL;
-            if (gpCurList == NULL) {
+            q = gpCurList;
+            if (q == NULL) {
                 gpCurList = p;
-                continue;
+            } else {
+                while (q->pNext != NULL) {
+                    q = q->pNext;
+                }
+                q->pNext = p;
             }
-            for (q = gpCurList; q->pNext != NULL; q = q->pNext) {}
-            q->pNext = p;
         }
     }
     return gpCurList;
@@ -736,25 +735,28 @@ int UStream_Update(void) {
         pObject->uRef28 += gRPNSBase;
         pObject->uRef2C += gRPNSBase;
         pObject->uRef30 += gRPNSBase;
-        if (pObject->uType == TAG('R', 'P', 'N', 'S')) {
+        switch ((int)pObject->uType) {   // the original compares the tag signed (cmpw)
+        case TAG('C', 'c', 't', 'r'):
+            fn_80009E70(pObject);
+            break;
+        case TAG('R', 'P', 'N', 'S'):
             if (fn_8000B508(pObject)) {
                 UStreamObject* pOld = fn_8000B70C(pObject->uType, pObject->uId);
                 if (pOld != NULL) {
-                    if (pOld->uSize == pObject->uSize && fn_80005BC8(pObject->pData, pOld->pData) == 0) {
+                    if (pObject->uSize == pOld->uSize && fn_80005BC8(pObject->pData, pOld->pData) == 0) {
                         fn_80009E70(pObject);
-                        goto next;  // fake match: the original branches straight to the loop's step;
-                                    // advancing and continuing here scores 85.3% against 87.1%
+                        break;
                     }
                     fn_8000B588(pOld);
                 }
             }
             fn_8000B4B8(pObject);
-            gRPNSBase = BE32(pObject->pData);
-        } else if (pObject->uType == TAG('C', 'c', 't', 'r')) {
-            fn_80009E70(pObject);
-        } else {
+            // port: the references of later objects are rebased by this object's data address
+            gRPNSBase = (uptr)pObject->pData;
+            break;
+        default:
             for (i = 0; i < gnNumHandlers; i++) {
-                if (gHandlers[i].uType == pObject->uType) {
+                if (gHandlers[i].nType == pObject->uType) {
                     gHandlers[i].pfnHandler(pObject);
                     break;
                 }
@@ -762,8 +764,8 @@ int UStream_Update(void) {
             if (i >= gnNumHandlers) {
                 fn_80009E70(pObject);
             }
+            break;
         }
-    next:
         pObject = pNext;
     } while (pObject != NULL);
     return 1;
@@ -777,9 +779,10 @@ void UStream_ReleaseObjectBuffer(UStreamBuffer** ppBuffer) {
     (*ppBuffer)->nRefs--;
     pPrev = gpUsedList;
     if (pPrev == NULL) return;
-    for (p = pPrev->pNext; p != NULL; p = pPrev->pNext) {
+    while ((p = pPrev->pNext) != NULL) {
         if (p->nRefs == 0) {
             pPrev->pNext = p->pNext;
+            p->pNext = NULL;
             UStream_ReleaseBuffer(p);
         } else {
             pPrev = p;
@@ -793,14 +796,14 @@ void UStream_ReleaseObjectBuffer(UStreamBuffer** ppBuffer) {
     }
 }
 
-// Stop the current stream at the end of what has been read. Returns whether a read is pending.
+// Stop the current stream at the end of what has been read. Returns whether a read is still
+// pending (0 when no stream is open).
 int UStream_Stop(void) {
-    s32 nStream = gnCurStream;
-    if (nStream < 0) {
-        nStream = 0;
-    }
-    gStreams[nStream].bEOF = 1;
-    return gbReadPending != 0;
+    UStream* pStream;
+    if (gnCurStream < 0) return 0;
+    pStream = &gStreams[gnCurStream];
+    pStream->bEOF = 1;
+    return gbReadPending ? 1 : 0;
 }
 
 // Close everything: the open file, the streams, the node pool.
@@ -832,7 +835,6 @@ void UStream_CloseAll(void) {
 // Close stream nStream. Only the most recently opened stream can be closed, and only when
 // nothing is in flight. Returns nStream or -1.
 int UStream_Close(int nStream) {
-    UStream* pStream;
     int i;
     if (gnCurStream == -1) return -1;
     if (nStream > gnNumStreams || nStream < 0) return -1;
@@ -840,17 +842,16 @@ int UStream_Close(int nStream) {
     if (gbReadPending) return -1;
     if (gpCurList != NULL && nStream > 0) return -1;
     if (gpUsedList != NULL && nStream > 0) return -1;
-    if (fn_8000633C(gStreams[nStream].hFile) != 0) return -1;
+    if (fn_8000633C(gStreams[(u32)nStream].hFile) != 0) return -1;
     if (gpCurObject != NULL) {
         fn_80009E70(gpCurObject);
         gpCurObject = NULL;
     }
-    pStream = &gStreams[nStream];
     gnCurStream--;
     gnNumStreams--;
-    i = pStream->nFileIndex;
-    if (pStream->params.apfnClosed[i] != NULL) {
-        pStream->params.apfnClosed[i](pStream->params.apClosedArg[i]);
+    i = gStreams[(u32)nStream].nFileIndex;
+    if (gStreams[(u32)nStream].params.apfnClosed[i] != NULL) {
+        gStreams[(u32)nStream].params.apfnClosed[i](gStreams[(u32)nStream].params.apClosedArg[i]);
     }
     return nStream;
 }
@@ -891,29 +892,29 @@ int UStream_OpenFileByName(const char* pName) {
 }
 
 // Register (or reference again) the handler for an object type.
-int UStream_RegisterHandler(u32 uType, void (*pfnHandler)(UStreamObject*)) {
+int UStream_RegisterHandler(int nType, void (*pfnHandler)(UStreamObject*)) {
     int i;
     int n = gnNumHandlers;
     if (n >= USTREAM_MAX_HANDLERS) return 0;
     for (i = 0; i < n; i++) {
-        if (gHandlers[i].uType == uType && gHandlers[i].pfnHandler == pfnHandler) {
+        if (gHandlers[i].nType == nType && gHandlers[i].pfnHandler == pfnHandler) {
             gHandlers[i].nRefs++;
             return 1;
         }
     }
-    gHandlers[n].uType = uType;
+    gHandlers[n].nType = nType;
     gHandlers[n].pfnHandler = pfnHandler;
     gHandlers[n].nRefs = 1;
-    gnNumHandlers = n + 1;
+    gnNumHandlers++;
     return 1;
 }
 
 // Drop one reference to a type's handler; remove it when the count reaches zero.
-int UStream_UnregisterHandler(u32 uType) {
-    int i;
+int UStream_UnregisterHandler(int nType) {
     int n = gnNumHandlers;
+    int i;
     for (i = 0; i < n; i++) {
-        if (gHandlers[i].uType == uType) {
+        if (gHandlers[i].nType == nType) {
             gHandlers[i].nRefs--;
             if (gHandlers[i].nRefs == 0) {
                 int k;

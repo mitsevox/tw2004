@@ -1,8 +1,9 @@
 // Ball.c (our name): the ball's flight and roll. No assert names this file (the leaked list's
-// PsBallFx.c is elsewhere). Units are yards and seconds; every constant below is a whole number
-// of inches (1/36 yd). The cup is real geometry (surface classes 12/18, surface type 90): the ball
-// is holed when it has dropped below the pin height. What is written up in docs/gameplay.md is
-// the near-cup pull below.
+// PsBallFx.c is elsewhere). Units are yards and seconds. Many constants are inches or miles per
+// hour converted to yards (INCHES, MPH): the original's float bits are exactly those quotients,
+// not the rounded decimals. The cup is real geometry (surface classes 12/18, surface type 90): the
+// ball is holed when it has dropped below the pin height. What is written up in docs/gameplay.md
+// is the near-cup pull below.
 
 #include "golfer.h"
 #include "physics.h"
@@ -10,8 +11,11 @@
 #include "game.h"
 #include "engine.h"
 
-#define BALL_RADIUS 0.0256667f      // 0.92 in (a real one is 0.84)
-#define CUP_DIAMETER 0.10717f       // 3.86 in (a real cup is 4.25)
+#define INCHES(x) ((x) / 36.0f)                  // inches to yards
+#define MPH(x)    ((x) * (1760.0f / 3600.0f))    // miles per hour to yards per second
+
+#define BALL_RADIUS  INCHES(0.924f)   // 1.1 x a real ball's 0.84 in
+#define CUP_DIAMETER 0.10717f         // 3.86 in (a real cup is 4.25)
 
 void   Ball_Stop(Ball* pBall);                   // 0x80054340
 void   fn_8000AE28(f32* pIn, f32 f, f32* pOut);  // scale a vector
@@ -392,7 +396,6 @@ void   fn_80052268(Ball* pBall, f32 fTicks);
 void   Ball_FlightStep(Ball* pBall, f32 fTicks);
 f32    fn_80055324(Ball* pBall);
 u8     fn_80054040(Ball* pBall, f32 fTicks);
-f32    Wind_Get(f32* pOut);
 
 extern u8  gSimulating;                          // 0x80281DD0  a rehearsal: no sounds or effects
 extern u8  gSimFullCup;                          // a sim that still gets the cup pull and near-cup gravity
@@ -463,9 +466,9 @@ static inline f32 Ball_Clamp(f32 x, f32 fLo, f32 fHi) {
 // The ball dropped in: park it in the cup and stop it.
 void Ball_Holed(Ball* pBall) {
     Vec3Copy(PIN(pBall), pBall->vPos);
-    pBall->vPos[0] += 0.0138889f;
-    pBall->vPos[1] -= 0.0833333f;
-    pBall->vPos[2] += 0.0138889f;
+    pBall->vPos[0] += INCHES(0.5f);
+    pBall->vPos[1] -= INCHES(3.0f);
+    pBall->vPos[2] += INCHES(0.5f);
     pBall->bHoled = 1;
     Ball_Stop(pBall);
 }
@@ -513,6 +516,15 @@ f32 fn_80050D34(f32 fDist) {
     return fPower;
 }
 
+// fake match: stands in for a function the original linker stripped. The file's pool has 20.0,
+// 0.5, 2.0, 1.0, 0.0, 0.1 in that order right after fn_80050D34's constants, before the
+// functions below use them (fn_80050F88 would put -60000 and 0.375 before 0.1); its body is
+// unknown, this one only reproduces the order.
+static f32 Ball_StrippedFn(f32 x) {
+    x = (x + 2.0f) * 0.5f + 20.0f;
+    if (x < 0.1f) return 1.0f;
+    return 0.0f;
+}
 
 // A club's distance row for a shot kind (1..7, clubs 0..24): the row, and the surface the
 // table assumes (45; 14 for the chip table). 0 for a putt or a bad club.
@@ -600,6 +612,8 @@ f32 fn_80050F88(f32 fDist, Ball* pBall, int nKind, int nClub) {
         pSurface = &gSurfaceTypes[14];
     }
     fAdj = fBase - pSurface->f00;
+    // EA bug: a row has 11 entries (0..10), but a distance beyond fDist[10] reads fDist[11]: the
+    // next club's first carry (for club 24, the start of whatever follows the table)
     for (i = 1; i < 12; i++) {
         if (fDist <= ClubRow_Dist(pRow, i)) {
             fFrac = (fDist - ClubRow_Dist(pRow, i - 1)) / (ClubRow_Dist(pRow, i) - ClubRow_Dist(pRow, i - 1));
@@ -824,7 +838,7 @@ u8 Physics_GetShotData(Ball* pBall, int nClub, int nKind, f32 fPower, f32 fAim, 
     }
     fn_80055EC4(vDir, vAxis, vAlong);
     fn_80055EA0(vDir, vAlong, vOff);
-    fn_8001EF34(vOff, 0.10000002f, vOffPart);
+    fn_8001EF34(vOff, 1.0f - 0.9f, vOffPart);   // 0x3DCCCCD0, one bit above 0.1f
     nLie = pBall->nLie;
     switch (nLie) {
     case LIE_SAND_HIGH_e:
@@ -1975,21 +1989,21 @@ void fn_80054A6C(Ball* pBall) {
 // The pull toward the cup. Inside 5.5 in of the pin, while the ball is still short of it, a
 // ball heading within 30 degrees of the cup (or within 3.5 in whatever its heading) gets
 // 0.455 x dt x (pin - ball) added to its velocity - but never on an axis where that would speed
-// it up while it already moves faster than 0.293 (about 1.5 ft/s) along that axis. A ball
-// crossing over the cup fast and off line loses up to 67% of its speed instead: the lip.
+// it up while it already moves faster than 0.6 mph along that axis. A ball crossing over the cup
+// faster than 0.75 mph and off line loses up to 67% of its speed instead: the lip.
 void Ball_CupPull(Ball* pBall, f32 fDt) {
     f32 vPin[3];
     f32 fDist;
 
     fDist = Vec_Distance(PIN(pBall), (f32*)pBall);
-    if (fDist >= 0.152778f) return;
+    if (fDist >= INCHES(5.5f)) return;
     Vec_Copy(PIN(pBall), vPin);
     vPin[1] += BALL_RADIUS;
     {
         f32 fStartDist = Vec_Distance(pBall->vStart, vPin);
         f32 fAngle, fK, fPull;
-        if (fStartDist < 0.166667f) return;
-        if (Vec_Distance(pBall->vStart, (f32*)pBall) > fStartDist - 0.0416667f) return;
+        if (fStartDist < INCHES(6.0f)) return;
+        if (Vec_Distance(pBall->vStart, (f32*)pBall) > fStartDist - INCHES(1.5f)) return;
 
         fAngle = fn_8000AD78(pBall->vPos[0] - pBall->vPrev[0], pBall->vPos[2] - pBall->vPrev[2]);
         fAngle = fabsf(fAngle - fn_8000AD78(vPin[0] - pBall->vPos[0], vPin[2] - pBall->vPos[2]));
@@ -1997,25 +2011,25 @@ void Ball_CupPull(Ball* pBall, f32 fDt) {
             fAngle -= 3.14159265f;
         }
         if (fDist < 0.0625f) {
-            if (fAngle > 0.523599f && pBall->fSpeed > 0.366667f) {
+            if (fAngle > DEG(30.0f) && pBall->fSpeed > MPH(0.75f)) {
                 f32 fSlow = 1.0f - 16.0f * (0.67f * fDist);
                 pBall->vVel[0] *= fSlow;
                 pBall->vVel[2] *= fSlow;
             }
             return;
         }
-        if (fAngle < 0.523599f || fDist < 0.0972222f) {
-            fK    = 0.455472f * fDt;
+        if (fAngle < DEG(30.0f) || fDist < INCHES(3.5f)) {
+            fK    = (CUP_DIAMETER * 4.25f) * fDt;   // the bits are exactly this product (0x3EE933B1)
             fPull = fK * (vPin[0] - pBall->vPos[0]);
             if ((pBall->vVel[0] < 0.0f && fPull < 0.0f) || (pBall->vVel[0] > 0.0f && fPull > 0.0f)) {
-                if (fabsf(pBall->vVel[0]) > 0.293333f) {
+                if (fabsf(pBall->vVel[0]) > MPH(0.6f)) {
                     fPull = 0.0f;
                 }
             }
             pBall->vVel[0] += fPull;
             fPull = fK * (vPin[2] - pBall->vPos[2]);
             if ((pBall->vVel[2] < 0.0f && fPull < 0.0f) || (pBall->vVel[2] > 0.0f && fPull > 0.0f)) {
-                if (fabsf(pBall->vVel[2]) > 0.293333f) {
+                if (fabsf(pBall->vVel[2]) > MPH(0.6f)) {
                     fPull = 0.0f;
                 }
             }
@@ -2307,7 +2321,7 @@ u8 Physics_DropBall(Ball* pBall, f32* pPos) {
     SurfaceType* pSurface;
     f32          fGround;
     Vec3Copy(pPos, v);
-    v[1] += 0.0555556f;
+    v[1] += INCHES(2.0f);
     fGround = fn_8004D620(pBall->pCourse, v);
     if (fGround < -60000.0f) {
         fGround = fn_8004D5C0(pBall->pCourse, v);

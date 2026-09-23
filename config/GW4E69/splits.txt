@@ -591,17 +591,8 @@ GoDynamicCam.c:
 unsorted/sweep_8003DC78.c:
 	.text       start:0x8003DC78 end:0x8003DCAC
 
-unsorted/sweep_80043920.c:
-	.text       start:0x80043920 end:0x800439E4
-
-unsorted/sweep_80044AA8.c:
-	.text       start:0x80044AA8 end:0x80044B0C
-
-unsorted/sweep_80044E2C.c:
-	.text       start:0x80044E2C end:0x80044E74
-
-unsorted/sweep_80044E74.c:
-	.text       start:0x80044E74 end:0x80044EA8
+gocamscripts.c:
+	.text       start:0x8003DCE8 end:0x800453C8
 
 unsorted/sweep_80045470.c:
 	.text       start:0x80045470 end:0x80045494
@@ -1133,6 +1124,12 @@ unsorted/sweep_80076F58.c:
 
 FE_Manager.c:
 	.text       start:0x80076F80 end:0x80079E44
+	.rodata     start:0x80183858 end:0x80183870
+	.data       start:0x80189560 end:0x801896F0
+	.bss        start:0x801D7148 end:0x801D77A8
+	.sdata      start:0x80281208 end:0x802812A0
+	.sbss       start:0x80281EC8 end:0x80281ED8
+	.sdata2     start:0x80283AC0 end:0x80283AD8
 
 unsorted/sweep_80079E44.c:
 	.text       start:0x80079E44 end:0x80079E6C
@@ -1942,11 +1939,11 @@ unsorted/sweep_80092C38.c:
 	.text       start:0x80092C38 end:0x80092CE8
 
 uiTransform.c:
-	.text       start:0x80092F8C end:0x8009349C
+	.text       start:0x80092CE8 end:0x80093524
+	.data       start:0x80189CA0 end:0x80189CB0
+	.bss        start:0x801D91F0 end:0x801D9278
+	.sbss       start:0x80281F38 end:0x80281F40
 	.sdata2     start:0x80283C20 end:0x80283C40
-
-unsorted/sweep_800934F8.c:
-	.text       start:0x800934F8 end:0x80093524
 
 unsorted/sweep_80093824.c:
 	.text       start:0x80093824 end:0x80093854
@@ -1999,20 +1996,8 @@ unsorted/sweep_800957B0.c:
 unsorted/sweep_800957D8.c:
 	.text       start:0x800957D8 end:0x800957FC
 
-unsorted/sweep_800958EC.c:
-	.text       start:0x800958EC end:0x800958F8
-
-unsorted/sweep_800962F8.c:
-	.text       start:0x800962F8 end:0x80096338
-
-unsorted/sweep_8009637C.c:
-	.text       start:0x8009637C end:0x80096398
-
-unsorted/sweep_80096508.c:
-	.text       start:0x80096508 end:0x80096530
-
 CharAnim.c:
-	.text       start:0x800965DC end:0x80096690
+	.text       start:0x800957FC end:0x80097208
 
 GoShaderObjectCommon_MorphAnimManager_Gc.c:
 	.text       start:0x80097208 end:0x800975B0
@@ -2093,19 +2078,10 @@ GoGreenGrid.c:
 	.text       start:0x8009B630 end:0x8009C914
 
 MC_Gc.c:
-	.text       start:0x8009CC00 end:0x8009F6A0
-
-unsorted/sweep_8009F780.c:
-	.text       start:0x8009F780 end:0x8009F7E4
-
-unsorted/sweep_8009F7E4.c:
-	.text       start:0x8009F7E4 end:0x8009F7E8
-
-unsorted/sweep_8009F834.c:
-	.text       start:0x8009F834 end:0x8009F850
+	.text       start:0x8009CB9C end:0x8009F850
 
 MC.c:
-	.text       start:0x8009FAD0 end:0x800A233C
+	.text       start:0x8009F850 end:0x800A233C
 
 unsorted/sweep_800A2604.c:
 	.text       start:0x800A2604 end:0x800A2614
@@ -2451,6 +2427,10 @@ unsorted/sweep_800AF31C.c:
 
 startUp.c:
 	.text       start:0x800AF324 end:0x800B1A40
+	.data       start:0x8018FE98 end:0x8018FF68
+	.sdata      start:0x80281498 end:0x802814A8
+	.sbss       start:0x802820E8 end:0x80282158
+	.sdata2     start:0x80284070 end:0x802840B0
 
 unsorted/sweep_800B1A88.c:
 	.text       start:0x800B1A88 end:0x800B1A9C
@@ -2840,6 +2820,10 @@ GameMode9.c:
 
 GameModeDriverPGATour.c:
 	.text       start:0x800EDD18 end:0x800F0448
+	.data       start:0x801926A8 end:0x80192810
+	.bss        start:0x80205ED8 end:0x8020CF90
+	.sdata      start:0x80281670 end:0x80281680
+	.sbss       start:0x80282338 end:0x80282348
 
 GameModeDriverRTE.c:
 	.text       start:0x800F0448 end:0x800F125C
@@ -3649,6 +3633,8 @@ dolphin/os/OSAlarm.c:
 
 src/os/OSAlloc.c:
 	.text       start:0x80148E40 end:0x80149150
+	.sdata      start:0x80281AB0 end:0x80281AB8
+	.sbss       start:0x802828E0 end:0x802828F0
 
 dolphin/os/OSArena.c:
 	.text       start:0x80149150 end:0x80149170
@@ -3770,9 +3756,14 @@ src/MSL_C/PPCEABI/bare/H/abort_exit.c:
 
 src/MSL_C/PPCEABI/bare/H/alloc.c:
 	.text       start:0x801522A0 end:0x80152754
+	.rodata     start:0x80185060 end:0x80185078
+	.bss        start:0x8027D5C0 end:0x8027D5F8
+	.sbss       start:0x802829F0 end:0x802829F8
 
 src/MSL_C/PPCEABI/bare/H/ansi_files.c:
 	.text       start:0x80152754 end:0x8015286C
+	.data       start:0x8019C3E0 end:0x8019C520
+	.bss        start:0x8027D5F8 end:0x8027D8F8
 
 src/MSL_C/PPCEABI/bare/H/ansi_fp.c:
 	.text       start:0x801538EC end:0x80155BD0
@@ -3817,6 +3808,8 @@ runtime/sscanf.c:
 
 src/MSL_C/PPCEABI/bare/H/string.c:
 	.text       start:0x8015A450 end:0x8015A8D0
+	.rodata     start:0x801851B0 end:0x80185540
+	.sdata      start:0x80281B10 end:0x80281B18
 
 src/MSL_C/strtold.c:
 	.text       start:0x8015A8D0 end:0x8015B8DC

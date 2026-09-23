@@ -20,7 +20,7 @@ void fn_800360A0(void* arg0);
 void fn_8006E7A4();
 s32 Vec_Copy(s32);
 void fn_8003614C(void* arg0);
-void fn_80036460(void);
+void fn_80036460(int n);
 s32 fn_80009E70();
 extern u32 lbl_80281D70;
 extern s32 lbl_80281D74;
@@ -78,7 +78,7 @@ void fn_8003614C(void* arg0) {
     }
 }
 
-void fn_80036460(void) {
+void fn_80036460(int n) {
 }
 
 void fn_80036464(void) {

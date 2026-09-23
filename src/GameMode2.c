@@ -343,7 +343,7 @@ void fn_800F9100(void) {
                 if (gpSaveData[nProfile].bActive) {
                     if (PLAYER(i)->n274 != 0) {
                         if (bFirst) {
-                            fn_80125854(1);
+                            EASBio_IncrementGamesWon(1);
                             bFirst = 0;
                         }
                         fn_800E4364(0, 0x6C, PLAYER(i)->n274, nProfile);

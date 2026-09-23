@@ -15,7 +15,6 @@ void     fn_800352BC(void);
 void     fn_80035240(int a);
 void     CameraScript_RecordCurrentCam(CamShot* pShot, void* pCam, void* pSub, int nPlayer, void* pScript,
                                        int a);
-void     fn_8003F2E0(void* pScript, f32 fTime);
 u8       fn_800635D0(int nPlayer);
 u8       fn_800B36F4(View* pView, int nPlayer, f32 fFrameTime);
 void     fn_800C73B8(f32* pA, f32* pB, f32* pOut);
@@ -26,12 +25,10 @@ f32      fn_800C741C(Character* pChar, u64 uEvent);
 void     fn_800C6110(View* pView, int nPlayer, int a);
 void     fn_8003E624(int nPlayer, void* pCam, void* pSub, void* pScript, CamShot* pShot, int a,
                      f32 fFrameTime);
-CamShot* fn_8003A8C4(char* szName);
 void     fn_8003DCE8(int nPlayer, void* pCam, void* pSub, void* pScript, CamShot* pShot, int a,
                      f32 fFrameTime);
 void     fn_8003EA50(int nPlayer, void* pCam, void* pSub, void* pScript, CamShot* pShot, int a,
                      f32 fFrameTime);
-CamShot* fn_8003A7C8(int nPlayer, int nKind, CamShot* pShot);
 void     CameraScript_InterpToNewScript(void* pScript, CamShot* pShot, int nPlayer, void* pCam, void* pSub,
                                         int nA, f32 f1, f32 f2, int nB, f32 f3);
 CamShot* fn_8006509C(s32 n);
@@ -40,7 +37,6 @@ void     fn_800B3550(int a, View* pView, int nPlayer);
 u8       fn_800B4908(void);
 void     GolfCamera_ComputeSteepSlopeCamVectors(View* pView, int nPlayer);
 void     fn_800C5D64(View* pView, f32* pCam, f32* pSub, int nPlayer);
-u8       CameraScript_WillGolferBeOccludedInThisView(int nPlayer, CamShot* pShot, void* pScript);
 u8       fn_800C708C(View* pView);
 void     fn_80038010(u8 a, int n, f32* pVec);
 void     fn_800380A8(u8 a, f32* pVec, u8 b, int nSlot, f32 f1, f32 f2);
@@ -65,10 +61,8 @@ void     fn_80038054(u8 a, int n, f32 f1, f32 f2);
 u8       CamScript_KeepAboveGround(int nPlayer, f32* pNew, f32* pOld, int a, u8* pb1, f32* pf, u8* pb2,
                                    f32 fClearance);
 CamShot* fn_80064F7C(int nPlayer, int nKind, int a, CamShot* pShot);
-u8       fn_8003C9D0(int nPlayer, int a, CamSequence** ppSeq, CamShot** ppShot);
 CamShot* fn_800C4DF8(int nFirst, int nPlayer);
 void     fn_800C5EC0(View* pView, f32* pCam, f32* pSub, int nPlayer);
-CamSequence* DynamicCam_ChoosePreFlightSequence(int nPlayer, int nLie, int nKind);
 f32      fn_800C7394(View* pView);
 f32      fn_80009614(f32 x);                            // arc cosine
 void     fn_8000AE28(f32* pIn, f32 f, f32* pOut);       // scale a vector
@@ -76,8 +70,6 @@ void     fn_8000923C(f32* pRot, f32* pQuat);            // a rotation vector (ax
 void     fn_800090E4(f32* pQuat, f32* pIn, f32* pOut);  // rotate a vector by a quaternion
 u8       fn_8006BEA4(void);                             // the GameBreaker letterbox is up, scripted
 void     fn_800A68C0(u8 nPlayer);
-u8       CameraScript_IsDefaultSwingCam(CamShot* pShot, int nPlayer, f32* pCam);
-u8       fn_8003D7A0(CamSequence* pSequence, int nPlayer);
 void     fn_8001966C(Character* pChar);                 // char.c
 void     fn_8007325C(u8* pAnim);                        // set bit 2 of the animation player's flags
 u8       fn_800C43C0(View* pView, int nPlayer);
