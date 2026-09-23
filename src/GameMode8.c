@@ -17,7 +17,6 @@ void  STATEFUNC_SimulateUpdate(int nPlayer);
 void  STATEFUNC_SimulateExit(int nPlayer);
 int   Game_CurHoleIndex(void);
 u8    Player_IsHoled(int nPlayer);
-u8    Player_IsCPU(int nPlayer);
 int   GOLFERSTATE_GetCurrentState(int nPlayer);
 void  GOLFERSTATE_Set(int nState, int nPlayer);
 void  Session_SetNumPlayers(int n);
@@ -58,8 +57,14 @@ extern u8  lbl_802823C9;
 extern u8  lbl_802823CA;
 extern s32 lbl_802823D0;
 extern s32 lbl_802823D4;
-extern u8  lbl_80192C00[];
 extern u16 lbl_80192BA8[];                  // per event, a sound (0xFFFF = none)
+// Three values per course, largest first (750, 675 and 600 for the first course).
+typedef struct SGCourse {
+    s32 n0;                     // 0x0
+    s32 n4;                     // 0x4
+    s32 n8;                     // 0x8
+} SGCourse;
+extern SGCourse lbl_80192C00[];
 
 // The events of the two-player game: flags set on the player and points won from the other player.
 typedef struct SGEvent {
@@ -556,22 +561,22 @@ void fn_800FA998(int nPlayer) {
 
 // States 12 and 24, enter: the shot starts; the ball is saved and the shot clock set.
 void fn_800FA9E0(int nPlayer) {
-    Mem_cpy(gPlayers[nPlayer].ballBefore, gPlayers[nPlayer].ball, 0xBC);
-    *(s32*)(gPlayers[nPlayer].ballBefore + 0x94) = -1;
+    Player* p = &gPlayers[nPlayer];
+    Mem_cpy(p->ballBefore, p->ball, 0xBC);
+    p->nBallBeforeOwner = -1;
     fn_8006ACF8(nPlayer, 0);
     fn_8006BAA8(nPlayer);
     fn_800FA554(nPlayer);
     gPlayers[nPlayer].nC40 = gPlayers[nPlayer].nLie;
 }
 
-// An event's sound.
+// An event's sound, if it has one: only the first 37 events play one.
 void fn_800FAA70(int nEvent) {
-    if (nEvent < 37) {
-        if (lbl_80192BA8[nEvent] == 0xFFFF) {
-            return;
-        }
-        fn_800FE164(lbl_80192BA8[nEvent], 1);
+    u16 nSound = lbl_80192BA8[nEvent];
+    if (nEvent >= 37 || nSound == 0xFFFF) {
+        return;
     }
+    fn_800FE164(nSound, 1);
 }
 
 // An event for a player: its flags, and its points taken from the other player. A player whose
@@ -579,6 +584,7 @@ void fn_800FAA70(int nEvent) {
 void fn_800FAAB8(int nPlayer, int nEvent) {
     int nOther;
     s32 nPoints;
+    SGEvent* pEvent;
     if ((!(gPlayers[nPlayer].nC3C & 0x6000) || nEvent == 0x28 || nEvent == 0x29) && nEvent <= 0x2A) {
         if (nEvent == 0x25) {
             lbl_802823CC++;
@@ -586,12 +592,14 @@ void fn_800FAAB8(int nPlayer, int nEvent) {
         if (nEvent == 0x27) {
             fn_80062C80(gPlayers[nPlayer].nC58, 1);
         }
-        gPlayers[nPlayer].nC4C |= lbl_80192908[nEvent].uFlags2;
-        nOther = nPlayer == 0;
-        nPoints = lbl_80192908[nEvent].nPoints;
-        gPlayers[nPlayer].nC48 |= lbl_80192908[nEvent].uFlags;
+        pEvent = &lbl_80192908[nEvent];
+        gPlayers[nPlayer].nC4C |= pEvent->uFlags2;
+        nOther = nPlayer ? 0 : 1;
+        nPoints = pEvent->nPoints;
+        gPlayers[nPlayer].nC48 |= pEvent->uFlags;
         gPlayers[nPlayer].nC44 += nPoints;
-        if (gPlayers[nPlayer].nC44 <= 0 && !(gPlayers[nPlayer].nC3C & 0x2000) && !(gPlayers[nPlayer].nC3C & 0x8000)) {
+        if (gPlayers[nPlayer].nC44 <= 0 && !(gPlayers[nPlayer].nC3C & 0x2000) &&
+            !(gPlayers[nPlayer].nC3C & 0x8000)) {
             gPlayers[nPlayer].nC44 = 0;
             gPlayers[nOther].nC44 = 6000;
             gPlayers[nPlayer].nC3C |= 0xC000;
@@ -637,9 +645,9 @@ void fn_800FD6A0(int nPlayer) {
 }
 
 void fn_800FDC0C(s32* p0, s32* p1, s32* p2) {
-    *p0 = *(s32*)(lbl_80192C00 + gpGame->nCurCourse * 12);
-    *p1 = *(s32*)((lbl_80192C00 + gpGame->nCurCourse * 12) + 0x4);
-    *p2 = *(s32*)((lbl_80192C00 + gpGame->nCurCourse * 12) + 0x8);
+    *p0 = lbl_80192C00[gpGame->nCurCourse].n0;
+    *p1 = lbl_80192C00[gpGame->nCurCourse].n4;
+    *p2 = lbl_80192C00[gpGame->nCurCourse].n8;
 }
 
 void fn_800FDF38(void) {
