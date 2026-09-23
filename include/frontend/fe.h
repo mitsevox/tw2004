@@ -7,6 +7,7 @@
 
 #include "game_types.h"
 #include "platform.h"
+#include "endian.h"
 #include "game/save.h"
 
 // ---- the menu screens (FE_Manager.c) ---------------------------------------------------------
@@ -193,7 +194,7 @@ LAYOUT_ASSERT(FEGolferMachine, 0xC);
 // A Create-A-Player asset (0x118 bytes): a hat, a shirt, a colour... The 'CR_A' stream object is
 // the array of them all (fn_80105188). Only what the cleaned code reads.
 typedef struct CrAPAsset {
-    u8   unk0[4];
+    s32  n0;                    // 0x000  part 18's assets pass it to fn_8008EAE0 (fn_801042D0)
     char szName[0x28 - 0x4];    // 0x004  "White", "Bright Red", "... backwards" ...
     s16  nPart;                 // 0x028  the part it is a choice for
     s16  nCategory;             // 0x02A  its category: where the category's name ("Hats",
@@ -213,17 +214,22 @@ typedef struct CrAPAsset {
     s16  n44;                   // 0x044
     s16  n46;                   // 0x046
     s16  n48;                   // 0x048
-    s8   a4A[0x58 - 0x4A];      // 0x04A  indexed by fn_80105644's last argument
-    u8   unk58[0x70 - 0x58];
-    u64  aPart[4];              // 0x070  } the ids of four skin parts it sets (fn_800CDAFC finds
+    s8   a4A[6];                // 0x04A  indexed by fn_80105644's last argument
+    s8   aColorKind[6];         // 0x050  per colour: 0..2 take the skin option's colour of that
+                                //        kind (fn_8010568C); -1 and others use aColor
+    u8   unk56[2];
+    u8   aColor[6][4];          // 0x058  its colours, RGBA; assets of a category whose first
+                                //        colour differs are different choices (fn_80105C44)
+    u64  aPart[4];            // 0x070  } the ids of four skin parts it sets (fn_800CDAFC finds
     u64  aVariant[4];           // 0x090  } them) and the id of each one's variant (fn_80106A64)
     u64  aSet[4];               // 0x0B0  the ids of four skin sets; taking the asset off puts
                                 //        them back to "Defaults" (fn_80106DA0)
-    u8   unkD0[0x110 - 0xD0];
+    u64  aSetVariant[4];        // 0x0D0  } putting it on gives each set the variant and option
+    u64  aSetOption[4];         // 0x0F0  } with these ids (fn_80106B04)
     s16  n110;                  // 0x110  the offset in 'CR_S' of its unlock text (-1: none; fn_8010651C)
     s16  n112;                 // 0x112  } offsets of strings in 'CR_S' (fn_801064EC); n114 is
     s16  n114;                  // 0x114  } passed to fn_8008E724 with the asset's name (fn_80104094)
-    u8   unk116[2];
+    s16  n116;                  // 0x116  (swapped by fn_80105DAC)
 } CrAPAsset;
 LAYOUT_ASSERT(CrAPAsset, 0x118);
 
@@ -240,15 +246,30 @@ typedef struct CrAPDB {
 } CrAPDB;
 LAYOUT_ASSERT(CrAPDB, 0x18);
 
+// A 0x2C-byte record of the Create-A-Player database's table lbl_80282470 (64 of them,
+// fn_801037F8); fn_80107244 copies one out.
+typedef struct CrAPRecord {
+    s16  n0;                    // 0x00
+    u8   unk2[2];
+    s32  n4;                    // 0x04
+    char sz8[0x2C - 0x8];       // 0x08
+} CrAPRecord;
+LAYOUT_ASSERT(CrAPRecord, 0x2C);
+
 extern CrAPDB* lbl_80282460;
 extern UStreamObject* lbl_80282464;     // the 'CR_A' object (the assets), kept until freed
 extern UStreamObject* lbl_80282468;     // the 'CR_S' object (their names)
-extern void* lbl_80282470;              // 0x2C-byte records (fn_80107244); freed by fn_80103A64
+extern s32 lbl_8028246C;                // cleared by fn_801037F8
+extern CrAPRecord* lbl_80282470;        // 64 records (fn_80107244); freed by fn_80103A64
 extern s32* lbl_80282474;               // per part: the index of its first asset
 extern s32* lbl_80282478;               // per part, 24 entries: the categories fn_80104AF4 found
-extern void* lbl_8028247C;              // freed by fn_80103A64
-extern void* lbl_80282480;              // freed by fn_80103A64
+extern s32* lbl_8028247C;               // 0x600 entries, rows 24 apart (fn_80103920 clears 64 from
+                                        // each row's start); fn_801048EC stores a part's choice count
+extern s32* lbl_80282480;               // 24 entries (fn_80103920 sets them to -1)
+extern SwapField lbl_80193228[20];      // an asset's byte-swap layout (fn_80105DAC)
 extern char lbl_801935C8[16][32];      // 16 names (fn_80107294)
+extern char lbl_801937C8[11][32];      // the skin sets a logo can go on ("ushirtlogof",
+                                        // "uhatlogof", "uarmtattool"...; sTurnOnLogo)
 extern s32 lbl_802816E8;                // } an asset to put on and one to take off when
 extern s32 lbl_802816EC;                // } fn_80104804 runs (-1: none)
 extern char lbl_801932C8[CRAP_NUM_PARTS][32];   // per part: the name of its "All ..." entry that
@@ -266,8 +287,9 @@ int  fn_801049C8(s16 nPart);
 void fn_80104804(void);
 u8   fn_80104DB8(s16 nPart, int n, char* pDst); // copy the name of a part's entry n (for 0 its
                                         // "All ..." entry when it has one); 0 if there is none
-int  fn_80105C44(s16 nPart, int b);
-void fn_80105FF8(int nAsset, s16* pKind, s32* pPart, s32* pChoice);
+int  fn_80105C44(s16 nPart, int b);     // how many different choices fit a part's entry b
+void fn_80105FF8(int nAsset, s16* pnPart, s32* pnEntry, s32* pnPlace); // where an asset is listed:
+                                        // its part, the entry of its category, its place there
 u8   fn_801061C8(s8 n);                 // an asset with this n40 is offered
 int  fn_80106244(s16 nPart);            // the asset in the first slot of aAF80 whose asset is of the part
                                         // (-1: none)
@@ -292,12 +314,12 @@ s16  fn_80105610(int nAsset);           // } asset)
 s32  fn_80105C00(void);                 // how many assets there are
 u8   fn_80105C30(void);                 // the Create-A-Player database is allocated
 char* fn_801064EC(int nCategory);       // a category's name
-int  stricmp(const char* a, const char* b);           // 0x8015F844 (MSL): strcmp ignoring case
 
 void FE_MakeMoviePath(char* pName, char* pPath);        // "data/movies/<name>.NGC"
 void FE_MakeCameoMoviePath(char* pName, char* pPath);   // "data/movies/cameos/<name>.NGC"
 void FE_CrAP_TurnOnPart(s16 nPart, int b, int c);      // FE_CrAPDB.c
 SaveProfile* fn_80077ACC(void);         // the profile being worked on
+u8   fn_80078008(s32 nAsset, SaveProfile* pProfile);  // the asset is locked (FE_Manager.c)
 int  fn_80078604(int a, int b, int c);  // a date (month, day, year from fn_8011E020) packed
 int  fn_80077B08(void);                 // its player slot
 u8   fn_80077B18(int nGolfer);          // a yes/no list over golfers 0..28 (Golfer.c asks it)
@@ -327,23 +349,34 @@ extern s32 lbl_80281FFC;                // set by fn_80084FF0: the lbl_8018C7D8 
 int  fn_8008B990(void);
 void fn_8008DAEC(void);
 void fn_8008E244(void);
+void fn_8008E2F8(u8 bTarget, f32 fAngle);
 void fn_8008E364(int n);
 int  fn_8008E420(void);
 int  fn_8008E44C(void);
+u8   fn_8008E468(char* szAnim, char* szShot, u8 bNoBlend);  // 1: the animation was started
 char* fn_8008E6BC(void);
 void fn_8008E6D4(int n);
+void fn_8008E718(int n);
 void fn_8008E724(char* szAnim, char* szShot, s8 n, u8 bLoop);
+void fn_8008E818(int n);
 void fn_8008E824(void);
 void fn_8008E860(int n);
+void fn_8008E8D0(int n);
 u8   fn_8008E944(u8 b, f32 f);
+void fn_8008E960(char* sz);
+int  fn_8008E9A8(void);
+void fn_8008E9B4(void);
+void fn_8008EA38(u8 b);
+void fn_8008EABC(u8 b);
+void fn_8008EAE0(int n);
+int  fn_8008EAEC(void);
+void fn_8008EAF8(int n);
+int  fn_8008EB04(void);
 void fn_8008EB70(void);
 
 // ---- the logo editor (FE_LogoDesign.c) -------------------------------------------------------
 
-// A logo is 8-bit colour indexes into a 256-colour palette, either 64 x 64 (shape 0, drawn into
-// the texture "__LogoSquare") or 128 x 32 (shape 1, "__LogoRect").
-#define LOGO_SQUARE 0
-#define LOGO_RECT   1
+// A logo (LogoRecord, game/save.h) is 8-bit colour indexes into a 256-colour palette.
 
 // The logo being edited (12 bytes, allocated by fn_8010F748).
 typedef struct LogoEdit {
@@ -352,16 +385,6 @@ typedef struct LogoEdit {
     u8  bDirty;                 // 0x8  changed since it was last copied into its texture
 } LogoEdit;
 LAYOUT_ASSERT(LogoEdit, 0xC);
-
-// A saved logo (0x1022 bytes): the profile holds five (ProfileLogos) and fn_8010FB70 picks the
-// one LogoEdit.n0 names.
-typedef struct LogoRecord {
-    u8   aPixels[0x1000];       // 0x0000  64 x 64 or 128 x 32 colour indexes
-    char szName[0x20];          // 0x1000
-    u8   b1020;                 // 0x1020
-    u8   nShape;                // 0x1021  LOGO_SQUARE or LOGO_RECT
-} LogoRecord;
-LAYOUT_ASSERT(LogoRecord, 0x1022);
 
 // The part of the save profile from 0x5500 that char_tex_manager.c is given (fn_80077ACC() +
 // 0x5500); only the logos are known.

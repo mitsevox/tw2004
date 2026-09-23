@@ -284,7 +284,6 @@ void fn_8010F718(void);
 void fn_8010F748(void);
 void fn_8010F794(void);
 void fn_8010FA00(void);
-void fn_8010FF9C(void);
 void fn_80110390(void);
 void fn_8011407C(void);
 void fn_8011E170(void);

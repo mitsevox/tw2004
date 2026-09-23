@@ -271,12 +271,19 @@ extern Character* lbl_80281EE8;   // a character fn_8001C37C clears and fn_8001C
 
 // SkinPart.c, as FE_CrAPDB.c uses it: find a part (or set) by id, a variant by id or name, and
 // pick a part's (or set's) variant.
+void  fn_800CC9D8(Character* pChar, int nSet, int nVariant, int nOption);
 void  fn_800CCB08(Skin* pSkin, int nPart, int nVariant);
 void  fn_800CCF90(Skin* pSkin, int nSet, int nVariant, int nOption);
+u8*   fn_800CD248(Skin* pSkin, int nSet, int nVariant, int nOption);    // SkinDesc8C.a08, or NULL
 s32   fn_800CDAFC(Skin* pSkin, u64 uId);
 s32   fn_800CDBB0(Skin* pSkin, int nPart, u64 uId);
 s32   fn_800CDC2C(Skin* pSkin, u64 uId);
+s32   fn_800CDCA0(Skin* pSkin, const char* pName);
+s32   fn_800CDCE0(Skin* pSkin, int nSet, u64 uId);
 s32   fn_800CDD5C(Skin* pSkin, int nSet, const char* pName);
+s32   fn_800CDDB0(Skin* pSkin, int nSet, int nVariant, u64 uId);
+void  fn_800CECE0(Skin* pSkin, int nSet, int nVariant, int nOption, u8* p);
+u8    fn_800CEE90(void);
 
 // Bit n of a bit array of 32-bit words: test, set, clear.
 u8    fn_8001E9CC(u32* aBits, u32 n);

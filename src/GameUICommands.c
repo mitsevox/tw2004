@@ -246,7 +246,6 @@ void fn_8008AD28(int nMsg, int a);
 void fn_8008AD54(int nMsg, int a);
 
 // Other files' functions no header declares yet.
-s32   DVDGetDriveStatus(void);
 f32   GM_GetGolferDistanceToPin(int nPlayer);                 // GameManager.c
 void  GM_GolferConcede_Hole(int nPlayer);                     // GameManager.c
 void  GM_RestartHole(void);                                   // GameManager.c
@@ -353,11 +352,6 @@ void  fn_801002C0(void);
 void  fn_80100B38(void);
 void  fn_80101CFC(void);
 void  fn_80101D24(void);
-void  fn_80110178(u8 v);
-int   fn_80110180(void);
-s32   fn_8011027C(void);
-void  fn_801102AC(void);
-int   fn_80110450(void);
 s32   fn_80118664(int nPlayer);
 u8    fn_80119808(int nPlayer, int nEntrant);
 s32   fn_80126FA0(void);

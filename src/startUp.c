@@ -61,7 +61,6 @@ void   MIXUnMute(AXVPB* pVpb);
 void   MIXUpdateSettings(void);         // MIX: pass the settings to the hardware
 void   fn_800B1A88(f32* pA, f32* pB);   // swap two floats
 void   fn_800B1A9C(f32* v, f32 x, f32 y);
-void   fn_80110458(u8 b);
 
 // The save kinds (a table of functions at lbl_8018C7D8).
 void   fn_80084FF0(s32 nKind);          // pick a save kind
