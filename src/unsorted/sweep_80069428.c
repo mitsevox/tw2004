@@ -4,7 +4,7 @@
 
 s32 fn_8000C140();
 s32 fn_8004B65C();
-s32 fn_8004B664();
+s32 Ter_PointInOOBNetwork();
 extern void* lbl_80281E30;
 
 s32 fn_80069428(s32 arg0);
@@ -14,9 +14,9 @@ s32 fn_80069428(s32 arg0) {
             return 1;
         }
         if (fn_8004B65C() > 0) {
-            return fn_8004B664(arg0);
+            return Ter_PointInOOBNetwork(arg0);
         }
         return 0;
     }
-    return fn_8004B664();
+    return Ter_PointInOOBNetwork();
 }

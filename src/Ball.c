@@ -68,11 +68,11 @@ void   EVENT_Trigger(int nPlayer, int nEvent, int a, int b);   // the game-event
 void   Ball_SetLie(Ball* pBall, SurfaceType* pSurface);
 void   Ball_Tick(Ball* pBall, f32 fTicks);
 void   Physics_FixBallHeight(Ball* pBall, u8 bSettle, f32 fTicks);
-SurfaceType* fn_8004D838(CourseInfo* pCourse, Ball* pBall);   // the surface under a point
+SurfaceType* Ter_GetSupportingWorldMaterial(CourseInfo* pCourse, Ball* pBall);   // the surface under a point
 f32    fn_8004D620(CourseInfo* pCourse, f32* pPos);   // ground height, -60000 and below if none
 f32    fn_8004D5C0(CourseInfo* pCourse, f32* pPos);   // the same from another source
-u8     fn_8004C798(s32 nSurface);
-void   fn_8004C590(CourseInfo* pCourse, Ball* pBall, int a, u8* pA, u8* pB, int b);
+u8     Ter_IsValidDropSurface(s32 nSurface);
+void   Ter_CheckForDropLocation(CourseInfo* pCourse, Ball* pBall, int a, u8* pA, u8* pB, int b);
 // One club's distances for a shot kind: power 0.1, 0.2 .. 1.1 (fDist[9], full power, is "the
 // reach" AI_PowerScale divides by).
 typedef struct ClubRow {
@@ -80,7 +80,7 @@ typedef struct ClubRow {
 } ClubRow;
 
 u8     fn_80050DE4(int nKind, int nClub, int a, ClubRow** ppRow, s32* pSurface);
-f32    fn_8004D890(CourseInfo* pCourse, Ball* pBall, SurfaceType** ppSurface, f32* pNormal);   // ground height, surface and normal
+f32    Ter_GetSupportingGroundData(CourseInfo* pCourse, Ball* pBall, SurfaceType** ppSurface, f32* pNormal);   // ground height, surface and normal
 void   fn_8001EF34(f32* pIn, f32 f, f32* pOut);   // scale a vector
 u8     Physics_GetShotData(Ball* pBall, int nClub, int nKind, f32 fPower, f32 fAim, int nTrajectory, f32* pA, f32* pB, f32* pVel, f32* pSpin);
 extern f32     gPuttDist[23];                    // 0x80181604  putt distance at power 0, 0.05 .. 1.1
@@ -136,9 +136,9 @@ void   Ball_SimSeconds(Ball* pBall, f32 fSeconds, f32 fTick);
 
 f32    fn_80009744(f32* pVec);                   // dot with itself
 double fn_80009680(double x);                    // sqrt
-void   fn_8004D9E0(CourseInfo* pCourse, Ball* pBall, f32* pHeight, SurfaceType** ppSurface, f32* pNormal,
+void   Ter_GetEnclosingGroundData(CourseInfo* pCourse, Ball* pBall, f32* pHeight, SurfaceType** ppSurface, f32* pNormal,
                    f32* pHeight2, SurfaceType** ppSurface2, f32* pNormal2);
-void   fn_8004D9A8(CourseInfo* pCourse, Ball* pBall, f32* pHeight, f32* pHeight2);
+void   Ter_GetEnclosingGroundHeight(CourseInfo* pCourse, Ball* pBall, f32* pHeight, f32* pHeight2);
 int    fn_80050BEC(SurfaceType* pSurface);       // a surface's index
 u8     fn_800E2B40(int nPlayer, Ball* pBall);
 u8     fn_800B1B18(int nPlayer, f32* pTo, f32* pFrom, f32* pHit, f32* pNormal, s32* pWhat);
@@ -148,7 +148,7 @@ u8     fn_80053240(Ball* pBall, f32 fTicks);
 f32    Physics_HandleCollision(Ball* pBall, f32* pNormal, SurfaceType* pSurface);   // the bounce; returns the impact
 f32    fn_800BB028(f32* pA, f32* pB);            // squared distance
 u8     fn_8004FF34(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal, SurfaceType** ppSurface, s32* pWhat);
-u8     fn_8004E1B0(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal, SurfaceType** ppSurface, s32* pWhat);
+u8     Ter_CheckForPinCollision(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal, SurfaceType** ppSurface, s32* pWhat);
 u8     fn_8004E558(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal, SurfaceType** ppSurface, s32* pWhat, u8* pOut);
 u8     fn_8004EE20(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal, SurfaceType** ppSurface, s32* pWhat);
 void   fn_800B1AB0(u8* pObj, f32* pPos, f32* pRadius);   // the flagstick's position and radius
@@ -170,12 +170,12 @@ extern s32 gTurfSpeed;                           // 0..4, default 2; rain sets 1
 extern s32 gRoughSetting;                        // options +0x1C (ROUGH LENGTH?), 0..2: class-5 friction x 0.7 / 1.0 / 1.3
 extern u8  lbl_80281DE4;                          // the two ground heights below are current
 extern f32 lbl_80281DE0;                         // ground height under the ball
-extern f32 lbl_80281DDC;                         // the other ground height (fn_8004D9E0)
+extern f32 lbl_80281DDC;                         // the other ground height (Ter_GetEnclosingGroundData)
 extern f32 gWindSpeed;                           // 0x80281DE8
 extern s32 gWindDir;                             // 0x80281DEC  0..7
 extern f32 gWindDirs[8][4];                      // 0x80187EF8  unit vectors, 45 degrees apart
 extern f32 lbl_801D5888[4][4];                   // per player: where the ball was last on ...
-extern f32 lbl_801D58C8[4][4];                   // ... two kinds of surface (fn_8004C590)
+extern f32 lbl_801D58C8[4][4];                   // ... two kinds of surface (Ter_CheckForDropLocation)
 
 static inline u8 Ball_NoGround(f32 fHeight) {
     return fHeight < -60000.0f;
@@ -346,7 +346,7 @@ f32 fn_80050F88(f32 fDist, u8* p, int nKind, int nClub) {
     if (p == NULL) return 0.0f;
     if (!fn_80050DE4(nKind, nClub, 0, &pRow, &nSurface)) return 1.0f;
     fBase = gSurfaceTypes[nSurface].f00;
-    if (fn_8004D890(((Ball*)p)->pCourse, (Ball*)p, &pSurface, vNormal) < -60000.0f || 0.375f != pSurface->f1C) {
+    if (Ter_GetSupportingGroundData(((Ball*)p)->pCourse, (Ball*)p, &pSurface, vNormal) < -60000.0f || 0.375f != pSurface->f1C) {
         pSurface = &gSurfaceTypes[14];
     }
     fAdj = fBase - pSurface->f00;
@@ -458,7 +458,7 @@ u8 Physics_GetShotData(Ball* pBall, int nClub, int nKind, f32 fPower, f32 fAim, 
     f32          fSpeed, fSlope, fSide, fMax, fLaunch, fKeep, fSpin;
     int          nLie;
 
-    if (fn_8004D890(pBall->pCourse, pBall, &pSurface, vNormal) < -60000.0f) return 0;
+    if (Ter_GetSupportingGroundData(pBall->pCourse, pBall, &pSurface, vNormal) < -60000.0f) return 0;
     if (0.375f != pSurface->f1C) {
         pSurface = &gSurfaceTypes[14];
     }
@@ -782,7 +782,7 @@ u8 Physics_GetSurfaceInfo(Ball* pBall, SurfaceType** ppSurface, f32* pNormal) {
     f32          vNormal2[4];
     f32          fDrop;
     int          nPlayer;
-    fn_8004D9E0(pBall->pCourse, pBall, &lbl_80281DE0, &pSurface, vNormal, &lbl_80281DDC, &pSurface2, vNormal2);
+    Ter_GetEnclosingGroundData(pBall->pCourse, pBall, &lbl_80281DE0, &pSurface, vNormal, &lbl_80281DDC, &pSurface2, vNormal2);
     lbl_80281DE4 = 1;
     if (lbl_80281DE0 < -60000.0f) {
         if (!Ball_NoGround(lbl_80281DDC)) {
@@ -1111,7 +1111,7 @@ f32 Physics_HandleCollision(Ball* pBall, f32* pNormal, SurfaceType* pSurface) {
 
 // A ball on the ground: did it run into anything between last tick and this one? Out of
 // bounds (600 yd from the start) is a hazard. Within 10 ft of the pin the detailed test
-// (fn_8004E1B0) runs, elsewhere fn_8004FF34. On a hit: the landing events, the bounce, and a
+// (Ter_CheckForPinCollision) runs, elsewhere fn_8004FF34. On a hit: the landing events, the bounce, and a
 // nudge along the velocity. Returns 1 on a hit.
 u8 fn_80053240(Ball* pBall, f32 fTicks) {
     f32          vHit[4];
@@ -1134,7 +1134,7 @@ u8 fn_80053240(Ball* pBall, f32 fTicks) {
     if (fn_800BB028(PIN(pBall), pBall->vPos) > 11.1111107f) {
         if (!fn_8004FF34(pBall->pCourse, vFrom, vTo, vHit, vNormal, &pSurface, (s32*)&nWhat)) return 0;
     } else {
-        if (!fn_8004E1B0(pBall->pCourse, pBall->nPlayer, vFrom, vTo, vHit, vNormal, &pSurface, (s32*)&nWhat)) return 0;
+        if (!Ter_CheckForPinCollision(pBall->pCourse, pBall->nPlayer, vFrom, vTo, vHit, vNormal, &pSurface, (s32*)&nWhat)) return 0;
     }
     if (pSurface == NULL) return 0;
     if (0.375f != pSurface->f1C) {
@@ -1475,7 +1475,7 @@ void Physics_FixBallHeight(Ball* pBall, u8 bSettle, f32 fTicks) {
     bRetried = 0;
 retry:
     if (!lbl_80281DE4) {
-        fn_8004D9A8(pBall->pCourse, pBall, &lbl_80281DE0, &lbl_80281DDC);
+        Ter_GetEnclosingGroundHeight(pBall->pCourse, pBall, &lbl_80281DE0, &lbl_80281DDC);
     }
     fGround = lbl_80281DE0;
     if (fGround < -60000.0f) {
@@ -1520,7 +1520,7 @@ void Ball_Stop(Ball* pBall) {
         return;
     }
     Physics_FixBallHeight(pBall, 1, 0.0f);
-    pSurface = fn_8004D838(pBall->pCourse, pBall);
+    pSurface = Ter_GetSupportingWorldMaterial(pBall->pCourse, pBall);
     if (pSurface == NULL) {
         Physics_OutOfBounds(pBall, 1);
         return;
@@ -1841,7 +1841,7 @@ f32 fn_80055324(Ball* pBall) {
     SurfaceType* pSurface;
     SurfaceType* pSurface2;
     if (pBall->nState != 2) return 0.0f;
-    fn_8004D9E0(pBall->pCourse, pBall, &fHeight, &pSurface, vNormal, &fHeight2, &pSurface2, vNormal2);
+    Ter_GetEnclosingGroundData(pBall->pCourse, pBall, &fHeight, &pSurface, vNormal, &fHeight2, &pSurface2, vNormal2);
     if (fHeight < -60000.0f) {
         Vec_Copy(PIN(pBall), vPin);
         vPin[1] += BALL_RADIUS;
@@ -1925,17 +1925,17 @@ done:
 }
 
 // Step a ball by nMs milliseconds (at least 20; one tick is 20 ms) unless it is placed, stopped
-// or in a hazard. For players 0..3, fn_8004C590 may record the position in one of two tables.
-int fn_8005567C(Ball* pBall, int nMs) {
+// or in a hazard. For players 0..3, Ter_CheckForDropLocation may record the position in one of two tables.
+int Physics_Simulate(Ball* pBall, int nMs) {
     u8 bA, bB;
     if (nMs < 20) return 0;
     if (pBall->nState == 0 || pBall->nState == 1 || pBall->nState == 5) return 0;
     Ball_Tick(pBall, (f32)nMs / 20.0f);
     if (pBall->nPlayer >= 0 && pBall->nPlayer <= 3) {
-        if (fn_8004C798(pBall->nSurface)) {
-            fn_8004C590(pBall->pCourse, pBall, 1, &bA, &bB, 0);
+        if (Ter_IsValidDropSurface(pBall->nSurface)) {
+            Ter_CheckForDropLocation(pBall->pCourse, pBall, 1, &bA, &bB, 0);
         } else {
-            fn_8004C590(pBall->pCourse, pBall, 0, &bA, &bB, 0);
+            Ter_CheckForDropLocation(pBall->pCourse, pBall, 0, &bA, &bB, 0);
         }
         if (bA) Vec3Copy(pBall->vPos, lbl_801D5888[pBall->nPlayer]);
         if (bB) Vec3Copy(pBall->vPos, lbl_801D58C8[pBall->nPlayer]);
@@ -1961,7 +1961,7 @@ void Ball_SimStep(Ball* pBall, f32 fSeconds, f32 fTick) {
 
 // Put the ball on the ground at a point: find the ground under it (from 2 in up), sit the ball
 // on it (radius + 0.05 in), placed, with the lie of the surface there and f70 halved.
-u8 fn_8005587C(Ball* pBall, f32* pPos) {
+u8 Physics_DropBall(Ball* pBall, f32* pPos) {
     f32          v[4];
     SurfaceType* pSurface;
     f32          fGround;
@@ -1973,7 +1973,7 @@ u8 fn_8005587C(Ball* pBall, f32* pPos) {
         if (fGround < -60000.0f) return 0;
     }
     v[1] = 0.0013888889f + (BALL_RADIUS + fGround);
-    pSurface = fn_8004D838(pBall->pCourse, (Ball*)v);
+    pSurface = Ter_GetSupportingWorldMaterial(pBall->pCourse, (Ball*)v);
     if (pSurface == NULL) return 0;
     Vec3Copy(v, pBall->vPos);
     Vec3Copy(v, pBall->vPrev);

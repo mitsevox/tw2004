@@ -522,6 +522,14 @@ Downloaded from debugging.games to `C:\dev\ext\symbols\` (reference only, never 
   of callee lists). Limits: the retail GameCube build has only 772 strings left (asserts
   stripped), so anchors are few; the Xbox build is a debug build (no inlining, assert calls), so
   call lists differ; functions under 48 bytes are too ambiguous to pair by calls.
+- **Second pass with the PS2 build (2026-09-23).** debugging.games also has TW06 PS2
+  (SLUS-21264, 2005-07-12): `SLUS_212.64` (release ELF, MIPS) + `MAPFILE.TXT` (11,930 global
+  functions with address, size and full C++ signature; statics are not listed, `ps2side.py`
+  finds them from `jal` targets). Optimized like this game, so its call graph is closer to ours.
+  Seeded with the Xbox pairs, `callgraph.py ps2` added 122 pairs; the two builds were merged
+  (agree -> strong, disagree -> conflict, not applied). 77 more names applied: 123 in all.
+  Known wrong PS2-only pairing: `Rand_Float` -> `Physics_ComputeBallLieModifier` (hand-named, so
+  not applied).
   Next: more seeds from functions we decompile by hand.
 - **Types (2026-09-23).** `C:\dev\scratch\tw\tpiread.py` reads the PDB's type records
   (`struct <name>`, `func <function>`, `find <text>`). TW06's `PhysicsBall_t` (0xCC bytes) is this

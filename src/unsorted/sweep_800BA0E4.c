@@ -5,7 +5,7 @@
 extern u8 lbl_801F8458[];
 extern u8 lbl_801F846C[];
 void UStream_UnregisterHandler();
-void fn_80005628();
+void Mem_cpy();
 void fn_80009E70();
 s32 fn_800107C0();
 
@@ -18,7 +18,7 @@ void fn_800BA0E4(void) {
 }
 
 void fn_800BA118(u8* p0) {
-    fn_80005628(lbl_801F846C, *(s32*)p0, 7296);
+    Mem_cpy(lbl_801F846C, *(s32*)p0, 7296);
     fn_80009E70(p0);
 }
 

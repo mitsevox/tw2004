@@ -7,13 +7,13 @@ void GXInvalidateTexAll();
 void GXSetTexCopyDst();
 void GXSetTexCopySrc();
 s32 fn_8002A624();
-void fn_80045908();
+void DF_vDrawBufferToScreen();
 
 void fn_80045880(s32 p0);
 void fn_800458B4(void);
 void fn_80045880(s32 p0) {
     fn_800458B4();
-    fn_80045908(p0);
+    DF_vDrawBufferToScreen(p0);
 }
 
 void fn_800458B4(void) {

@@ -129,7 +129,7 @@ int gnNumHandlers = 0;            // lbl_80280DB8 (.sdata)
 
 // ---- externals ---------------------------------------------------------------------------
 
-extern void* fn_80005628(void* pDst, const void* pSrc, u32 uLen);   // memcpy
+extern void* Mem_cpy(void* pDst, const void* pSrc, u32 uLen);   // memcpy
 extern int   fn_80005BC8(const void* pA, const void* pB);           // string/name compare
 extern int   fn_800060E0(const char* pName);                        // file open
 extern int   fn_8000633C(int hFile);                                // file close
@@ -304,7 +304,7 @@ static int UStream_BeginObject(UStreamObject** ppObject, u8* pChunk) {
         *ppObject = pObject;
         pObject->nUnk14 = 0;
         ppObject[1] = NULL;
-        fn_80005628(&pObject->uFlags, pChunk + 0x14, uExtra + 0x1C);
+        Mem_cpy(&pObject->uFlags, pChunk + 0x14, uExtra + 0x1C);
         pObject->pData = (u8*)pObject + uExtra + uPad + 0x34;
         pObject->uUnk4 = 0;
         pObject->uUnk8 = 0;
@@ -572,7 +572,7 @@ static void UStream_ParseChunks(void) {
                     if (gpCurObject != NULL) {
                         u32 uCopy = uLen;
                         if (gCurObjectPos + uLen > gpCurObject->uSize) uCopy = gpCurObject->uSize - gCurObjectPos;
-                        fn_80005628(gpCurObject->pData + gCurObjectPos, pChunk + 0x40, uCopy);
+                        Mem_cpy(gpCurObject->pData + gCurObjectPos, pChunk + 0x40, uCopy);
                         gCurObjectPos += uCopy;
                         if (gCurObjectPos == gpCurObject->uSize) {
                             UStream_FinishObject(gpCurObject);
@@ -622,7 +622,7 @@ static void UStream_ParseChunks(void) {
                         u8* pDst = (u8*)gSoundHeader[0] + gSoundHeader[2];
                         if (gSoundHeader[2] + uCopy > gSoundHeader[1]) uCopy = gSoundHeader[1] - gSoundHeader[2];
                         if (gSoundHeader[3] == TAG('s', 'h', 'd', 'r')) {
-                            fn_80005628(pDst, pChunk + 0x40, uCopy);
+                            Mem_cpy(pDst, pChunk + 0x40, uCopy);
                         } else if (gSoundHeader[3] == TAG('s', 'a', 'm', 'p')) {
                             fn_800B044C(pDst, pChunk + 0x40, uCopy, UStream_NullCallback, 0);
                         }
@@ -896,7 +896,7 @@ int UStream_Open(const UStreamParams* pParams) {
     pStream->nChunkBudget = -1;
     pStream->nUnkC = -2;
     pStream->nFileIndex = 0;
-    fn_80005628(&pStream->params, pParams, sizeof(UStreamParams));
+    Mem_cpy(&pStream->params, pParams, sizeof(UStreamParams));
     UStream_OpenFile(pStream);
     gnCurStream = nStream;
     gnNumStreams++;

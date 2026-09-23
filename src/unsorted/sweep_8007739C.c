@@ -4,7 +4,7 @@
 
 extern u8 gReplayData[];
 void Session_SetGolfer();
-void fn_80005628();
+void Mem_cpy();
 void fn_80010284();
 void fn_8007744C();
 void fn_80079DAC();
@@ -16,7 +16,7 @@ void fn_800E14E0();
 void fn_8007739C(s32 p0);
 void fn_800773F8(void);
 void fn_8007739C(s32 p0) {
-    fn_80005628(gReplayData, p0, 3880);
+    Mem_cpy(gReplayData, p0, 3880);
     fn_800E0B38(10);
     Session_SetGolfer(*(u8*)(gReplayData + 0x10), 0);
     fn_800E14E0(*(s32*)(gReplayData + 0xF00));

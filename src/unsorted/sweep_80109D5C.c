@@ -10,7 +10,7 @@ s32 fn_80077ACC();
 void fn_80078E34();
 void fn_8008E244();
 void fn_8008E364();
-void fn_800C3C40();
+void GolfCamera_SwitchCrAPCamera();
 void fn_80103B74();
 
 void fn_80109D5C(void);
@@ -22,7 +22,7 @@ void fn_80109D5C(void) {
     t2 = fn_80017028();
     fn_8008E244();
     fn_8008E364(1);
-    fn_800C3C40(t2, lbl_80193AD4, *(s32*)(((u8*)lbl_80281EE0) + 0x4), 0, 0, 0);
+    GolfCamera_SwitchCrAPCamera(t2, lbl_80193AD4, *(s32*)(((u8*)lbl_80281EE0) + 0x4), 0, 0, 0);
     fn_80103B74(0);
     fn_80078E34(t0);
 }

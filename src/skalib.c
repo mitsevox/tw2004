@@ -77,7 +77,7 @@ void  fn_80076158(void** ppSrc, void* pDst, int nBytes, int nSize);             
 void* fn_80020DD4(void* pClip, void* pOut, int nAlign);
 void* fn_80009B34(u32 uSize, u32 uFlags, u32 uAlign, const char* pFile, int nLine);  // alloc
 void  fn_80009E70(void* p);                                                           // free
-void  fn_80005628(void* pDst, void* pSrc, int nBytes);                                // memcpy
+void  Mem_cpy(void* pDst, void* pSrc, int nBytes);                                // memcpy
 ClipBank* ClipBank_Get(u32 nSlot);
 u32   fn_800B6564(u32 uSize);                          // ARAM alloc
 void  fn_800B6594(u32 uAram);                          // ARAM free
@@ -979,7 +979,7 @@ void* AnimLib_ResolveRecord(AnimLib* pLib, int nRec, ClipRecord* pOut, u8 bLink)
         if (bMove) bMoved = 1;
         pRec = (ClipRecord*)pRec->pClip;
     }
-    fn_80005628(pOut, pRec, sizeof(ClipRecord));
+    Mem_cpy(pOut, pRec, sizeof(ClipRecord));
     if (bMoved) pOut->n12 |= 2;
     if (bLinked) pOut->n12 |= 4;
     if (bLinked && !bMoved) pOut->n20 = n20;
@@ -1227,18 +1227,18 @@ u32 AnimLib_PlanBank(u32 nSlot) {
             ctx.nBytes  += nHdr;
             nBytesBefore = ctx.nBytes;
             pRecordsCopy = fn_80009B34(pLib->nRecords * sizeof(ClipRecord), 1, 0, "skalib.c", 2078);
-            fn_80005628(pRecordsCopy, pLib->pRecords, pLib->nRecords * sizeof(ClipRecord));
+            Mem_cpy(pRecordsCopy, pLib->pRecords, pLib->nRecords * sizeof(ClipRecord));
             pIndexCopy = fn_80009B34(pLib->nClips2 * 2, 1, 0, "skalib.c", 2080);
-            fn_80005628(pIndexCopy, pLib->pIndex, pLib->nClips2 * 2);
+            Mem_cpy(pIndexCopy, pLib->pIndex, pLib->nClips2 * 2);
             pTreeCopy = fn_80009B34(pLib->nTreeSize, 1, 0, "skalib.c", 2082);
-            fn_80005628(pTreeCopy, pLib->pTree, pLib->nTreeSize);
+            Mem_cpy(pTreeCopy, pLib->pTree, pLib->nTreeSize);
             for (i = 0; i < nOvs; i++) {
                 apRecords[i] = fn_80009B34(pOvs[i].pWork->nRecords * sizeof(ClipRecord), 1, 0, "skalib.c", 2086);
-                fn_80005628(apRecords[i], pOvs[i].pWork->pRecords, pOvs[i].pWork->nRecords * sizeof(ClipRecord));
+                Mem_cpy(apRecords[i], pOvs[i].pWork->pRecords, pOvs[i].pWork->nRecords * sizeof(ClipRecord));
                 apIndex[i] = fn_80009B34(pOvs[i].pWork->nClips2 * 2, 1, 0, "skalib.c", 2088);
-                fn_80005628(apIndex[i], pOvs[i].pWork->pIndex, pOvs[i].pWork->nClips2 * 2);
+                Mem_cpy(apIndex[i], pOvs[i].pWork->pIndex, pOvs[i].pWork->nClips2 * 2);
                 apTree[i] = fn_80009B34(pOvs[i].nTree, 1, 0, "skalib.c", 2090);
-                fn_80005628(apTree[i], pOvs[i].pWork->pTree, pOvs[i].nTree);
+                Mem_cpy(apTree[i], pOvs[i].pWork->pTree, pOvs[i].nTree);
             }
             if (!AnimLib_TrimToFit(&ctx, pLib, pOvs, nOvs, 0)) {
                 lbl_801C6008[nSlot].nKeep    = lbl_80281074;
@@ -1247,13 +1247,13 @@ u32 AnimLib_PlanBank(u32 nSlot) {
                 lbl_801C6008[nSlot].nBytes   = ctx.nBytes;
                 nClips           = nClipsAll;
                 ctx.nBytes       = nBytesBefore;
-                fn_80005628(pLib->pRecords, pRecordsCopy, pLib->nRecords * sizeof(ClipRecord));
-                fn_80005628(pLib->pIndex, pIndexCopy, pLib->nClips2 * 2);
-                fn_80005628(pLib->pTree, pTreeCopy, pLib->nTreeSize);
+                Mem_cpy(pLib->pRecords, pRecordsCopy, pLib->nRecords * sizeof(ClipRecord));
+                Mem_cpy(pLib->pIndex, pIndexCopy, pLib->nClips2 * 2);
+                Mem_cpy(pLib->pTree, pTreeCopy, pLib->nTreeSize);
                 for (i = 0; i < nOvs; i++) {
-                    fn_80005628(pOvs[i].pWork->pRecords, apRecords[i], pOvs[i].pWork->nRecords * sizeof(ClipRecord));
-                    fn_80005628(pOvs[i].pWork->pIndex, apIndex[i], pOvs[i].pWork->nClips2 * 2);
-                    fn_80005628(pOvs[i].pWork->pTree, apTree[i], pOvs[i].nTree);
+                    Mem_cpy(pOvs[i].pWork->pRecords, apRecords[i], pOvs[i].pWork->nRecords * sizeof(ClipRecord));
+                    Mem_cpy(pOvs[i].pWork->pIndex, apIndex[i], pOvs[i].pWork->nClips2 * 2);
+                    Mem_cpy(pOvs[i].pWork->pTree, apTree[i], pOvs[i].nTree);
                 }
                 if (!AnimLib_TrimToFit(&ctx, pLib, pOvs, nOvs, 1)) {
                     if (nSlot == 1 || !bBoth) {
@@ -1415,27 +1415,27 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
             pClipSrc = pData + (u32)pSrc->pRecords[i].pClip;
             pHdr     = (Clip*)pEnd;
             nHdr     = ((Clip*)pClipSrc)->pD0 - pClipSrc;
-            fn_80005628(pEnd, pClipSrc, nHdr);
+            Mem_cpy(pEnd, pClipSrc, nHdr);
             nCopied = nHdr;
             pOut    = pEnd + nHdr;
             if (((Clip*)pClipSrc)->n2C != 0) {
-                fn_80005628(pOut, ((Clip*)pClipSrc)->pD0, ((Clip*)pClipSrc)->n2C);
+                Mem_cpy(pOut, ((Clip*)pClipSrc)->pD0, ((Clip*)pClipSrc)->n2C);
                 pOut += ((Clip*)pClipSrc)->n2C;
                 nCopied = nHdr + ((Clip*)pClipSrc)->n2C;
             }
             uPad = 16 - ((u32)pOut & 15);
             if (uPad == 16) uPad = 0;
             if (uPad != 0) {
-                fn_80005628(pOut, aPad, uPad);
+                Mem_cpy(pOut, aPad, uPad);
                 pOut += uPad;
                 nCopied += uPad;
             }
             n = ((Clip*)pClipSrc)->n40 + ((Clip*)pClipSrc)->n3C;
-            fn_80005628(pOut, (u8*)((Clip*)pClipSrc)->uAram - n, n);
+            Mem_cpy(pOut, (u8*)((Clip*)pClipSrc)->uAram - n, n);
             pOut += n;
             nCopied += n;
             if (((Clip*)pClipSrc)->n64 != 0) {
-                fn_80005628(pOut, ((Clip*)pClipSrc)->pF4, pHdr->n64);
+                Mem_cpy(pOut, ((Clip*)pClipSrc)->pF4, pHdr->n64);
                 pHdr->pF4 = pOut;
                 pOut += pHdr->n64;
                 nCopied += pHdr->n64;
@@ -1443,11 +1443,11 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
                 pHdr->pF4 = NULL;
             }
             n = (pHdr->n1C * 2 + 31) / 32 * 4;
-            fn_80005628(pOut, ((Clip*)pClipSrc)->pF8, n);
+            Mem_cpy(pOut, ((Clip*)pClipSrc)->pF8, n);
             pHdr->pF8 = pOut;
             pOut += n;
             nCopied += n;
-            fn_80005628(pOut, ((Clip*)pClipSrc)->pFC, n);
+            Mem_cpy(pOut, ((Clip*)pClipSrc)->pFC, n);
             pHdr->pFC = pOut;
             nCopied += n;
             nStride1 = pHdr->n8C * 2;
@@ -1468,7 +1468,7 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
             uAramStart = uAram;
             if (pHdr->n38 != 0) {
                 for (f = 0; f < pHdr->nFrames; f++) {
-                    fn_80005628(lbl_80281CC8, pSrc1, pHdr->n8C * 2);
+                    Mem_cpy(lbl_80281CC8, pSrc1, pHdr->n8C * 2);
                     fn_800B6844(lbl_80281CC8, uAram, nStride1);
                     fn_800B67EC();
                     uAram += nStride1;
@@ -1477,7 +1477,7 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
             }
             if (pHdr->n04 != 0) {
                 for (f = 0; f < pHdr->nFrames; f++) {
-                    fn_80005628(lbl_80281CC4, pSrc2, pHdr->n8E);
+                    Mem_cpy(lbl_80281CC4, pSrc2, pHdr->n8E);
                     fn_800B6844(lbl_80281CC4, uAram, nStride2);
                     fn_800B67EC();
                     uAram += nStride2;
@@ -1487,14 +1487,14 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
             pHdr->n8C = nStride1 / 2;
             pHdr->n8E = nStride2;
             if (n50 != 0) {
-                fn_80005628(lbl_80281CCC, ((Clip*)pClipSrc)->pEC, pHdr->n50);
+                Mem_cpy(lbl_80281CCC, ((Clip*)pClipSrc)->pEC, pHdr->n50);
                 fn_800B6844(lbl_80281CCC, uAram, n50Al);
                 fn_800B67EC();
                 uAram += n50Al;
             }
             pHdr->n50 = n50Al;
             if (n4C != 0) {
-                fn_80005628(lbl_80281CD0, ((Clip*)pClipSrc)->pF0, pHdr->n4C);
+                Mem_cpy(lbl_80281CD0, ((Clip*)pClipSrc)->pF0, pHdr->n4C);
                 fn_800B6844(lbl_80281CD0, uAram, n4CAl);
                 fn_800B67EC();
             }
@@ -1513,7 +1513,7 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
             pChar = pOv->pChar;
             pNew  = pChar->pLib;
             nSize = pSrc->nTreeSize + pSrc->nClips * 4 + sizeof(AnimLib);
-            fn_80005628(pNew, pSrc, 21 * 4);
+            Mem_cpy(pNew, pSrc, 21 * 4);
             pNew->n108      = pSrc->n108;
             pNew->nDefault  = pSrc->nDefault;
             pNew->pTree     = (u8*)pNew + sizeof(AnimLib);
@@ -1642,13 +1642,13 @@ void AnimLib_ReloadSlot(void) {
     pSlot = &lbl_801C6068[nSlot];
     if (pSlot->nOverlays != 0) {
         pSlot->pLib = fn_80009B34(pSlot->nSize, 1, 0x40, "skalib.c", 3193);
-        fn_80005628(pSlot->pLib, pSlot->pCopy, pSlot->nSize);
+        Mem_cpy(pSlot->pLib, pSlot->pCopy, pSlot->nSize);
         pLib = AnimLib_Load((u8*)pSlot->pLib, ClipBank_Get(nSlot));
         pLib->pFile = pSlot->pLib;
         for (j = 0; j < pSlot->nOverlays; j++) {
             pOv        = &pSlot->overlays[j];
             pOv->pWork = fn_80009B34(pOv->nSize, 1, 0x40, "skalib.c", 3207);
-            fn_80005628(pOv->pWork, pOv->pCopy, pOv->nSize);
+            Mem_cpy(pOv->pWork, pOv->pCopy, pOv->nSize);
             AnimLib_Load((u8*)pOv->pWork, ClipBank_Get(nSlot));
             pOv->n10 = pOv->n14 + 3;
         }
@@ -1980,7 +1980,7 @@ void AnimLib_OnLoaded(LoadedFile* pFile) {
 
     if (nSlot < 3 && lbl_801C605C[nSlot] == NULL) {
         lbl_801C6068[nSlot].pCopy = fn_80009B34(pFile->nSize, 2, 0x40, "skalib.c", 4520);
-        fn_80005628(lbl_801C6068[nSlot].pCopy, pFile->pData, pFile->nSize);
+        Mem_cpy(lbl_801C6068[nSlot].pCopy, pFile->pData, pFile->nSize);
         lbl_801C6068[nSlot].nSize = pFile->nSize;
         pLib = AnimLib_Load(pFile->pData, ClipBank_Get(nSlot));
         pLib->pFile = pFile;

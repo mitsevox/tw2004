@@ -6,7 +6,7 @@ s32 Game_GetMode();
 s32 fn_80062D38(s32, s32, s32);
 s32 EVENT_Trigger(s32, s32, s32, s32);
 s32 fn_800A72EC(s32, s32);
-s32 fn_800DAE84();
+s32 GameEffects_ResetGameEffectSettings();
 extern s8 lbl_80282281;
 extern s32 lbl_80282288;
 extern s32 lbl_8028228C;
@@ -38,7 +38,7 @@ void fn_800E4C20(u8 arg0) {
             fn_800A72EC(1, 0);
         }
         lbl_80282281 = 1;
-        fn_800DAE84();
+        GameEffects_ResetGameEffectSettings();
         if (arg0 != 0) {
             fn_80062D38(0xE, 1, 1);
             EVENT_Trigger(0xFF, 0x41, 0, -1);

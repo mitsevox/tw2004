@@ -634,7 +634,7 @@ void AI_DefaultTarget(int nPlayer) {
     Vec_Copy(pTarget, p->vTarget2);
 }
 
-void fn_80005628(void* pDst, void* pSrc, int nBytes);   // memcpy
+void Mem_cpy(void* pDst, void* pSrc, int nBytes);   // memcpy
 extern s8 gLuckOdds[8];                 // 0x802810B0  "1 in n" per player: 12 12 12 12
 u8   fn_80101D4C(int nPlayer);          // a CPU in game mode 11 is always lucky
 u8   fn_800DA234(void);                 // the current hole is the flagged one
@@ -792,7 +792,7 @@ void Caddie_Start(int nPlayer) {
     if (Player_IsCPU(nPlayer)) return;
     switch ((u32)gSession.nSplitScreen) {   // a switch, not an if: the original branches over a branch
     case 0:
-        fn_80005628(&gPlayers[CADDIE_SLOT], &gPlayers[nPlayer], sizeof(Player));
+        Mem_cpy(&gPlayers[CADDIE_SLOT], &gPlayers[nPlayer], sizeof(Player));
         gPlayers[CADDIE_SLOT].nController = CONTROLLER_CPU;
         AI_DefaultTarget(CADDIE_SLOT);
         gCaddieDone   = 0;
@@ -1021,7 +1021,7 @@ u8 AI_RehearseShot(int nPlayer, f32* pOutDist2, u8 bFast, f32 fTolerance) {
         break;
 
     case 0:     // launch
-        fn_80005628(gSimBall, p->ball, sizeof(gSimBall));
+        Mem_cpy(gSimBall, p->ball, sizeof(gSimBall));
         fPower = p->fPower * AI_PowerScale(nPlayer);
         if (fPower > 1.5f) fPower = 1.5f;
         Ball_SetSimulating(1);
@@ -1426,7 +1426,7 @@ void Golfer_TableByteSwap(void) {
 
 // The 'stat' handler: copy the file over the table, fix its endianness, set it up.
 void Golfer_OnStatsLoaded(UStreamObject* pObject) {
-    fn_80005628(gGolferTable, *(u8**)pObject, *(u32*)((u8*)pObject + 0x24));
+    Mem_cpy(gGolferTable, *(u8**)pObject, *(u32*)((u8*)pObject + 0x24));
     Golfer_TableByteSwap();
     fn_80009E70(pObject);
     Golfer_TableSetup();
@@ -1558,7 +1558,7 @@ int Golfer_FindById(int nId) {
 
 // The 'rcrd' handler: 0xF00 into the session.
 void Session_OnRecordsLoaded(UStreamObject* pObject) {
-    fn_80005628((u8*)&gSession + 0xF00, *(u8**)pObject, *(u32*)((u8*)pObject + 0x24));
+    Mem_cpy((u8*)&gSession + 0xF00, *(u8**)pObject, *(u32*)((u8*)pObject + 0x24));
     fn_80009E70(pObject);
 }
 
@@ -1652,7 +1652,7 @@ void Player_SetGolfer(int nPlayer, int nGolfer, int nController, u32 uBag, int b
     int     i;
 
     p->nIndex = nPlayer;
-    fn_80005628(&p->golfer, &gGolferTable[nGolfer], sizeof(GolferRecord));
+    Mem_cpy(&p->golfer, &gGolferTable[nGolfer], sizeof(GolferRecord));
     p->golfer.nIndex = nGolfer;
     if (gSession.uFlags & 0x200) uBag |= BAG_ALL;
     if (uBag != 0) p->golfer.uBagMask = uBag;
@@ -1930,7 +1930,7 @@ void Golfer_TableSetup(void) {
     int i, k;
     gNumPlayersSetUp = 0;
     if ((s8)gCurGolferRecord.unk8E != 0) {
-        fn_80005628(&gGolferTable[FIRST_CREATED_GOLFER], &gCurGolferRecord, sizeof(GolferRecord));
+        Mem_cpy(&gGolferTable[FIRST_CREATED_GOLFER], &gCurGolferRecord, sizeof(GolferRecord));
     }
     if (gSession.uFlags & 0x4000) {
         for (i = 0; i < NUM_GOLFERS; i++) {
