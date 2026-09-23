@@ -7,6 +7,20 @@
 DynObj* fn_80049018(void* pType);  // a new object; pType's first word is its handler (asked for message 1)
 int  fn_8000EA1C(const char* pName, int a, int b, void* pObj);
 
+void fn_80048BDC(UStreamObject* pObject);
+void fn_800490EC(void);
+
+// Sets the kernel up: the 'Cact' stream handler, the two node pools and an empty list.
+void fn_80048DD0(void) {
+    UStream_RegisterHandler('Cact', fn_80048BDC);
+    lbl_80281DAC = fn_8000AFA0(256, 400, 2, 16);
+    lbl_80281DA8 = fn_8000AFA0(256, 528, 2, 16);
+    lbl_80281DBC = NULL;
+    lbl_80281DB8 = NULL;
+    lbl_80281DB4 = 0;
+    lbl_80281DB0 = 0;
+}
+
 DynObj* fn_80048E44(void) {
     return lbl_80281DBC;
 }
@@ -20,6 +34,42 @@ DynObj* fn_80048E4C(int nId) {
         }
     }
     return NULL;
+}
+
+// Shuts the kernel down: every object with an id gives it up (flag 0x10000000 set first), the
+// list is swept twice (fn_800490EC) and the pools are freed.
+void fn_80048E7C(void) {
+    DynObj* pObj;
+
+    for (pObj = lbl_80281DBC; pObj != NULL; pObj = pObj->pNext) {
+        if (pObj->n134 != 0) {
+            pObj->uFlags |= 0x10000000;
+            fn_800491C4(pObj);
+        }
+    }
+    fn_800490EC();
+    fn_800490EC();
+    lbl_80281DB4 = 0;
+    fn_8000B058(lbl_80281DAC);
+    fn_8000B058(lbl_80281DA8);
+}
+
+// The same, keeping the pools, and the list starts over empty.
+void fn_80048EF4(void) {
+    DynObj* pObj;
+
+    for (pObj = lbl_80281DBC; pObj != NULL; pObj = pObj->pNext) {
+        if (pObj->n134 != 0) {
+            pObj->uFlags |= 0x10000000;
+            fn_800491C4(pObj);
+        }
+    }
+    fn_800490EC();
+    fn_800490EC();
+    lbl_80281DBC = NULL;
+    lbl_80281DB8 = NULL;
+    lbl_80281DB4 = 0;
+    lbl_80281DB0 = 0;
 }
 
 void fn_80048FEC(DynObj* pObj) {

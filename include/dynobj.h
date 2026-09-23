@@ -100,9 +100,15 @@ LAYOUT_ASSERT(DynObjTurning, 0x194);
 
 typedef int (*DynObjHandler)(int nMsg, DynObj* pObj, void* pArg);
 
-// UKernel.c's list of the objects, first and last.
+// UKernel.c's list of the objects, first and last, the last id given out (DynObj.n134), a bit
+// mask of the used entries of lbl_801D5228 (fn_80049230), and two node pools (400- and 528-byte
+// nodes).
 extern DynObj* lbl_80281DBC;
 extern DynObj* lbl_80281DB8;
+extern s32 lbl_80281DB4;
+extern u32 lbl_80281DB0;
+extern UMemPool* lbl_80281DAC;
+extern UMemPool* lbl_80281DA8;
 
 // UKernel.c, UObject.c. The UObject functions take the object part (&DynObj.mObj).
 DynObj* fn_80048E44(void);                                  // the first object
