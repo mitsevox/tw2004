@@ -6,6 +6,7 @@
 #include "engine.h"
 #include "golfer.h"
 #include "sitdev.h"
+#include "game.h"
 
 // Defined here, last address first (CodeWarrior lays out .sbss in reverse).
 u8    lbl_80282200;     // 0x80282200  the watched ball has reached surface 105
@@ -332,3 +333,41 @@ void fn_800BB4B0(void) {
 void fn_800BBADC(int nValue) {
     fn_80067B1C(lbl_802811B8->aValue, 5, (u16)nValue, lbl_802811B8->aSetBits);
 }
+
+// ---- sweep code (not yet cleaned up) ----
+
+void fn_800BCB74(s32* arg0, s32 arg1);
+u8 fn_800BCD50(void);
+s32 fn_800BCD5C(void);
+void fn_800BD7D0(u8 nMusic);
+void fn_800BD83C(int nSound, int a);
+void fn_800BD868(int nSound, int a);
+
+void fn_800BCB74(s32* arg0, s32 arg1) {
+    if (arg1 == 0x97) {
+        *arg0 = 0x15;
+    }
+}
+
+u8 fn_800BCD50(void) {
+    return gpGame->bD4;
+}
+
+s32 fn_800BCD5C(void) {
+    return gpGame->nDC;
+}
+
+void fn_800BD7D0(u8 nMusic) {
+    lbl_80202898.b4E = 1;
+    lbl_80202898.n4F = nMusic;
+}
+
+void fn_800BD83C(int nSound, int a) {
+    fn_800A7664(0, nSound, a);
+}
+
+void fn_800BD868(int nSound, int a) {
+    fn_800A7664(2, nSound, a);
+}
+
+// ---- end of sweep code ----
