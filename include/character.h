@@ -417,6 +417,7 @@ u8    fn_800C9828(int nGroup, int nStyle, int nClub, int nKey);   // the clips a
 void  fn_800CA9DC(int nSlot);
 
 void  Character_SetPosition(Character* pChar, f32* pPos, u8 bPlace);
+int   fn_8001C558(int nPlayer);          // the model id of the player's golfer
 void  fn_8001C724(Character* pChar, int nKind);
 void  fn_8001C774(Character* pChar, int nClub);
 void  fn_8001C7FC(Character* pChar, int nStyle);   // the animation style (nStyle)
@@ -560,6 +561,16 @@ typedef struct AnimLeaf {
     s16 nFirst;                 // 0x2
     u32 uMask;                  // 0x4
 } AnimLeaf;
+
+// A club node of the clip tree (see AnimLib).
+typedef struct AnimClubNode {
+    s16 n0;                     // 0x00
+    s16 nDefault;               // 0x02  the default leaf
+    s16 aKeys[11];              // 0x04  the leaf of each key
+    u8  unk1A[2];
+    u32 uFlags;                 // 0x1C  1: AnimStream also takes the character's base clips here
+} AnimClubNode;
+LAYOUT_ASSERT(AnimClubNode, 0x20);
 
 // What the merge adds up as it walks.
 typedef struct MergeCtx {
