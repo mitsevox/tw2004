@@ -159,15 +159,6 @@ typedef struct View {
     u8       b26A;              // 0x26A
 } View;
 
-// The game-breaker part of the effects state (GameEffects.c has the whole struct).
-typedef struct GameEffects {
-    u8   unk0[0x12];
-    u8   bGameBreaker;          // 0x12  the letterbox is up
-    u8   unk13;
-    s32  nGBType;               // 0x14  0 scripted, 1 predicted
-} GameEffects;
-
-extern GameEffects   lbl_80202898;
 extern GolfCamState* lbl_80282220;
 extern CrAPState*    lbl_80281EE0;
 
