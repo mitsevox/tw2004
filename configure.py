@@ -849,7 +849,7 @@ config.libs = [
             Object(NonMatching, "GoCamera.c"),
             Object(NonMatching, "GoViewport.c"),
             Object(NonMatching, "GoShaderObjectCommon_TexAnimManager_Gc.c"),
-            Object(NonMatching, "FE_Manager.c"),
+            Object(Matching, "FE_Manager.c"),
             Object(NonMatching, "FEgolferanim.c"),
             Object(NonMatching, "uiLoadFile.c"),
             Object(NonMatching, "uiProcessInterface.c"),
