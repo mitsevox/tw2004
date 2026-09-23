@@ -154,6 +154,51 @@ u8 fn_801281B4(u16 uLanguage, u16* aLanguages, u8 nLanguages) {
     return bFound;
 }
 
+#define EASB_ICON_SIZE 0x2000       // the save's banner and icon block: one card block
+#define EASB_ICON_CRC 0x8F73F54A    // the CRC32 the block must have
+
+// Checks the save's banner and icon block against its CRC32, starting the checksum library
+// for the check if it is not running.
+EASBErrorE fn_80128200(void* pIcon, u32 uHeapID) {
+    const ChecksumInterface* pCrc;
+    ChecksumResult* pResult;
+    EASBErrorE eError;
+    int eCrcError;
+    BOOL bRunning;
+
+    eError = EASB_ERROR_NONE;
+    eCrcError = 0;
+    pCrc = (const ChecksumInterface*)CRC32_GetInterface();
+    bRunning = pCrc->pfnIsInitialised();
+    if (!bRunning) {
+        eCrcError = pCrc->pfnInit((void*)uHeapID);
+    }
+    if (eCrcError == 0) {
+        eCrcError = pCrc->pfnReset();
+        if (eError == EASB_ERROR_NONE) {
+            eCrcError = pCrc->pfnUpdate(pIcon, EASB_ICON_SIZE);
+            if (eCrcError == 0) {
+                eCrcError = pCrc->pfnFinalise(&pResult);
+                if (eCrcError == 0 && *(u32*)pResult->pData != EASB_ICON_CRC) {
+                    eError = EASB_ERROR_INVALID_ICON;
+                }
+            }
+        }
+        if (eCrcError != 0) {
+            eError = EASB_ERROR_UNKNOWN;
+        }
+        if (!bRunning) {
+            eCrcError = pCrc->pfnShutdown();
+            if (eCrcError != 0) {
+                eError = EASB_ERROR_UNKNOWN;
+            }
+        }
+    } else {
+        eError = EASB_ERROR_UNKNOWN;
+    }
+    return eError;
+}
+
 // The length of sz in *puLength: too large when it fills uSize, too small when empty.
 EASBErrorE fn_8012830C(char* sz, u32 uSize, u32* puLength) {
     *puLength = 0;

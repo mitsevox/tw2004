@@ -33,20 +33,6 @@ enum {
     TAG_ERROR_SIZE_MISMATCH = 0x6E
 };
 
-typedef struct {
-    u32   uSize;   // 4 for CRC32
-    void* pData;   // points at the value
-} ChecksumResult;
-
-typedef struct {
-    int (*pfnInit)(void* pAllocator);
-    int (*pfnShutdown)(void);
-    int (*pfnIsInitialised)(void);
-    int (*pfnReset)(void);
-    int (*pfnUpdate)(const void* pData, u32 uSize);
-    int (*pfnFinalise)(ChecksumResult** ppResult);
-    int (*pfnGetResultSize)(u32* pSize);
-} ChecksumInterface;
 
 typedef struct {
     u32 uTag;
