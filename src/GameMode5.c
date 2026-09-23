@@ -5,37 +5,21 @@
 #include "ball.h"
 #include "game.h"
 #include "engine.h"
+#include "game/save.h"
+#include "game/modes/challenge.h"
 
-extern s32 lbl_802822F4;
 extern s32 lbl_802822F8;
 void fn_800EAE44(int nId);
 s32 fn_800EAE6C(void);
-extern Challenge lbl_80203554[83];
 void fn_800EAEB8(void);
 void fn_800EAEEC(UStreamObject* pObject);
-extern Challenge* lbl_80281664;
-extern s32 lbl_80281668;
 
-// Per challenge: three values from the 'PLYs'... stream (lbl_80203170, 12 bytes each).
-typedef struct ChallengeVals {
-    f32 f0;
-    f32 f4;
-    f32 f8;
-} ChallengeVals;
-extern ChallengeVals lbl_80203170[83];
-// A 'PLYs' stream record: where challenge nChallenge (1-based) places the ball.
-typedef struct ChallengeSpotRecord {
-    u8  unk0[0x10];
-    f32 v[3];                   // 0x10
-    u8  nChallenge;             // 0x1C
-} ChallengeSpotRecord;
 extern char* lbl_80282310;                  // the challenge text block
 extern s32 lbl_80281660;
 extern s32 lbl_802822F0;
 extern void (*lbl_8028232C)(void);
 extern void (*lbl_80282324)(void);
 extern void (*lbl_80282318)(int nPlayer);
-extern u8* gpSaveData;
 int   fn_800ED028(int i);
 void  fn_80019648(void);
 void  fn_800EBEF0(void);
@@ -51,23 +35,10 @@ extern s32 lbl_80282308;
 extern s32 lbl_8028230C;
 extern u8 gNumPlayersSetUp;                 // 0x80281D48 (Golfer.c)
 extern void (*lbl_80282328)(void);
-s16   fn_800D2994(void);
 u8    fn_800D9998(int nPlayer, int nAward);
 u8    fn_800D750C(int nPlayer, int nAward);
 extern u8 lbl_80200538[];                   // prize data: bonuses at +0x9E4 and +0xA24
 #define PRIZE_AT(off) (*(s32*)(lbl_80200538 + (off)))
-// A profile's best medal per challenge (3 = none) and a date stamp for it, in the save.
-typedef struct ChallengeSave {
-    u8  unk0[0x5000];
-    s32 n5000;                  // 0x5000
-    u8  unk5004[0x516C - 0x5004];
-    s32 aMedal[29];             // 0x516C
-    u8  unk51E0[4];
-    s16 aStamp[29];             // 0x51E4
-    u8  unk521E[0x10600 - 0x521E];
-} ChallengeSave;
-#define PROFILE_MEDAL(n, i) ((ChallengeSave*)gpSaveData)[n].aMedal[i]
-#define PROFILE_STAMP(n, i) ((ChallengeSave*)gpSaveData)[n].aStamp[i]
 int   fn_800ECF9C(int i);
 void  fn_800EC170(int n);
 u8    fn_800EC4F0(int n);
@@ -91,7 +62,6 @@ typedef struct Unk802811F0 {
     u8  b1C;                    // 0x1C
 } Unk802811F0;
 extern Unk802811F0* lbl_802811F0;
-s32   fn_800EAC7C(void);                    // GameModeMatch.c: the current challenge's nGroup
 
 // Game mode 5 starts: its callbacks, one player, the challenge list.
 void fn_800EACD8(void) {
@@ -193,8 +163,8 @@ void fn_800EAF7C(void) {
     lbl_80281660 = SESSION_OPTIONS->unkC;
     lbl_802822F0 = SESSION_OPTIONS->nWind;
     fn_800E1074();
-    if (gpSaveData[gPlayers[0].nIndex * 0x10600]) {
-        gpSaveData[gPlayers[0].nIndex * 0x10600 + 0x70] = 1;
+    if (gpSaveData[gPlayers[0].nIndex].b0) {
+        gpSaveData[gPlayers[0].nIndex].b70 = 1;
     }
     fn_800E0B38(lbl_80281664[lbl_802822F4].nMode);
     lbl_802822FC = 1;
@@ -505,7 +475,7 @@ u8 fn_800EBD60(u8 bCheck) {
     return 0;
 }
 
-// The challenge's setup: the ball placed at its spot, its bag (bit n of uClubs gives the n-th club
+// The challenge's setup: the ball placed at its spot, its bag (bit n of nClubBits gives the n-th club
 // of the list below; club 25 is always in), and fn_800ED6F8's value.
 void fn_800EBEF0(void) {
     f32 v[4];
@@ -518,57 +488,57 @@ void fn_800EBEF0(void) {
         Physics_DropBall(&gPlayers[0].ball, v);
         Vec_Copy(v, &gPlayers[0].fBallX);
     }
-    if (lbl_80281664[lbl_802822F4].uClubs) {
+    if (lbl_80281664[lbl_802822F4].nClubBits) {
         gPlayers[0].golfer.uBagMask = 0x2000000;
-        if (lbl_80281664[lbl_802822F4].uClubs & 1) {
+        if (lbl_80281664[lbl_802822F4].nClubBits & 1) {
             gPlayers[0].golfer.uBagMask |= 0x1;
         }
-        if (lbl_80281664[lbl_802822F4].uClubs & 2) {
+        if (lbl_80281664[lbl_802822F4].nClubBits & 2) {
             gPlayers[0].golfer.uBagMask |= 0x40;
         }
-        if (lbl_80281664[lbl_802822F4].uClubs & 4) {
+        if (lbl_80281664[lbl_802822F4].nClubBits & 4) {
             gPlayers[0].golfer.uBagMask |= 0x80;
         }
-        if (lbl_80281664[lbl_802822F4].uClubs & 8) {
+        if (lbl_80281664[lbl_802822F4].nClubBits & 8) {
             gPlayers[0].golfer.uBagMask |= 0x100;
         }
-        if (lbl_80281664[lbl_802822F4].uClubs & 0x10) {
+        if (lbl_80281664[lbl_802822F4].nClubBits & 0x10) {
             gPlayers[0].golfer.uBagMask |= 0x200;
         }
-        if (lbl_80281664[lbl_802822F4].uClubs & 0x20) {
+        if (lbl_80281664[lbl_802822F4].nClubBits & 0x20) {
             gPlayers[0].golfer.uBagMask |= 0x400;
         }
-        if (lbl_80281664[lbl_802822F4].uClubs & 0x40) {
+        if (lbl_80281664[lbl_802822F4].nClubBits & 0x40) {
             gPlayers[0].golfer.uBagMask |= 0x800;
         }
-        if (lbl_80281664[lbl_802822F4].uClubs & 0x80) {
+        if (lbl_80281664[lbl_802822F4].nClubBits & 0x80) {
             gPlayers[0].golfer.uBagMask |= 0x1000;
         }
-        if (lbl_80281664[lbl_802822F4].uClubs & 0x100) {
+        if (lbl_80281664[lbl_802822F4].nClubBits & 0x100) {
             gPlayers[0].golfer.uBagMask |= 0x2000;
         }
-        if (lbl_80281664[lbl_802822F4].uClubs & 0x200) {
+        if (lbl_80281664[lbl_802822F4].nClubBits & 0x200) {
             gPlayers[0].golfer.uBagMask |= 0x4000;
         }
-        if (lbl_80281664[lbl_802822F4].uClubs & 0x400) {
+        if (lbl_80281664[lbl_802822F4].nClubBits & 0x400) {
             gPlayers[0].golfer.uBagMask |= 0x8000;
         }
-        if (lbl_80281664[lbl_802822F4].uClubs & 0x800) {
+        if (lbl_80281664[lbl_802822F4].nClubBits & 0x800) {
             gPlayers[0].golfer.uBagMask |= 0x10000;
         }
-        if (lbl_80281664[lbl_802822F4].uClubs & 0x1000) {
+        if (lbl_80281664[lbl_802822F4].nClubBits & 0x1000) {
             gPlayers[0].golfer.uBagMask |= 0x20000;
         }
-        if (lbl_80281664[lbl_802822F4].uClubs & 0x2000) {
+        if (lbl_80281664[lbl_802822F4].nClubBits & 0x2000) {
             gPlayers[0].golfer.uBagMask |= 0x40000;
         }
-        if (lbl_80281664[lbl_802822F4].uClubs & 0x4000) {
+        if (lbl_80281664[lbl_802822F4].nClubBits & 0x4000) {
             gPlayers[0].golfer.uBagMask |= 0x80000;
         }
-        if (lbl_80281664[lbl_802822F4].uClubs & 0x8000) {
+        if (lbl_80281664[lbl_802822F4].nClubBits & 0x8000) {
             gPlayers[0].golfer.uBagMask |= 0x200000;
         }
-        if (lbl_80281664[lbl_802822F4].uClubs & 0x10000) {
+        if (lbl_80281664[lbl_802822F4].nClubBits & 0x10000) {
             gPlayers[0].golfer.uBagMask |= 0x800000;
         }
     }
@@ -603,24 +573,24 @@ void fn_800EC1E0(void) {
     if (!fn_800F0818()) {
         nMedal = fn_800EC558();
         if (!fn_801025F4() && nMedal != 3) {
-            if (nMedal < PROFILE_MEDAL(gPlayers[0].nIndex, fn_800EAC7C())) {
-                PROFILE_MEDAL(gPlayers[0].nIndex, fn_800EAC7C()) = nMedal;
-                PROFILE_STAMP(gPlayers[0].nIndex, fn_800EAC7C()) = fn_800D2994();
+            if (nMedal < gpSaveData[gPlayers[0].nIndex].aMedal[fn_800EAC7C()]) {
+                gpSaveData[gPlayers[0].nIndex].aMedal[fn_800EAC7C()] = nMedal;
+                gpSaveData[gPlayers[0].nIndex].aMedalDate[fn_800EAC7C()] = fn_800D2994();
             }
             switch (nMedal) {
             case 0:
-                nReward = lbl_80281664[lbl_802822F4].n64;
+                nReward = lbl_80281664[lbl_802822F4].aMedal[0].nReward;
                 break;
             case 1:
-                nReward = lbl_80281664[lbl_802822F4].n70;
+                nReward = lbl_80281664[lbl_802822F4].aMedal[1].nReward;
                 break;
             case 2:
-                nReward = lbl_80281664[lbl_802822F4].n7C;
+                nReward = lbl_80281664[lbl_802822F4].aMedal[2].nReward;
                 break;
             }
             fn_800EC170(nMedal);
             nProfile = gPlayers[0].nIndex;
-            if (gpSaveData[nProfile * 0x10600]) {
+            if (gpSaveData[nProfile].b0) {
                 nMoney = fn_800D7220(nReward, 0, (CourseMoneyTracking*)aOut);
                 if (nMoney) {
                     switch (nMedal) {
@@ -654,7 +624,7 @@ void fn_800EC1E0(void) {
 // Whether profile n has done every challenge: its n5000 is set and none of the 29 best medals is
 // 3 (none).
 u8 fn_800EC4F0(int n) {
-    ChallengeSave* p = (ChallengeSave*)(gpSaveData + n * 0x10600);
+    SaveProfile* p = &gpSaveData[n];
     int i;
     if (p->n5000 < 1) {
         return 0;
@@ -694,16 +664,16 @@ int fn_800EC558(void) {
     for (m = 0; m < 3; m++) {
         switch (m) {
         case 0:
-            nRule = lbl_80281664[lbl_802822F4].bMedal2;
-            nMark = lbl_80281664[lbl_802822F4].n60;
+            nRule = lbl_80281664[lbl_802822F4].aMedal[0].nRule;
+            nMark = lbl_80281664[lbl_802822F4].aMedal[0].nMark;
             break;
         case 1:
-            nRule = lbl_80281664[lbl_802822F4].bMedal1;
-            nMark = lbl_80281664[lbl_802822F4].n6C;
+            nRule = lbl_80281664[lbl_802822F4].aMedal[1].nRule;
+            nMark = lbl_80281664[lbl_802822F4].aMedal[1].nMark;
             break;
         case 2:
-            nRule = lbl_80281664[lbl_802822F4].bMedal0;
-            nMark = lbl_80281664[lbl_802822F4].n78;
+            nRule = lbl_80281664[lbl_802822F4].aMedal[2].nRule;
+            nMark = lbl_80281664[lbl_802822F4].aMedal[2].nMark;
             break;
         }
         switch (lbl_80281664[lbl_802822F4].nScoring) {
@@ -855,8 +825,8 @@ u8 fn_800ECA08(void) {
     return Game_GetMode() == 8;
 }
 
-// The score for medal k (0..2) over the current group: the last challenge's mark minus the target
-// so far (-1 when the challenge gives no such medal).
+// The score for a medal over the current group, counted from the lowest (k 0 is aMedal[2]): the
+// group's last challenge's mark minus the target so far (-1 when the challenge gives no such medal).
 s32 fn_800ECA34(int k) {
     int i;
     int nLast = lbl_802822F4;
@@ -873,22 +843,22 @@ s32 fn_800ECA34(int k) {
     }
     switch (k) {
     case 0:
-        if (lbl_80281664[lbl_802822F4].bMedal0 == 0) {
+        if (lbl_80281664[lbl_802822F4].aMedal[2].nRule == 0) {
             return -1;
         } else {
-            return lbl_80281664[nLast].n78 - nTarget;
+            return lbl_80281664[nLast].aMedal[2].nMark - nTarget;
         }
     case 1:
-        if (lbl_80281664[lbl_802822F4].bMedal1 == 0) {
+        if (lbl_80281664[lbl_802822F4].aMedal[1].nRule == 0) {
             return -1;
         } else {
-            return lbl_80281664[nLast].n6C - nTarget;
+            return lbl_80281664[nLast].aMedal[1].nMark - nTarget;
         }
     case 2:
-        if (lbl_80281664[lbl_802822F4].bMedal2 == 0) {
+        if (lbl_80281664[lbl_802822F4].aMedal[0].nRule == 0) {
             return -1;
         } else {
-            return lbl_80281664[nLast].n60 - nTarget;
+            return lbl_80281664[nLast].aMedal[0].nMark - nTarget;
         }
     default:
         return 0;
@@ -1181,10 +1151,11 @@ void fn_800ED604(int nPlayer) {
     lbl_80282318(nPlayer);
 }
 
+// Challenge i's three rewards, the lowest medal's first.
 void fn_800ED650(int i, s32* pA, s32* pB, s32* pC) {
-    *pA = lbl_80281664[i].n7C;
-    *pB = lbl_80281664[i].n70;
-    *pC = lbl_80281664[i].n64;
+    *pA = lbl_80281664[i].aMedal[2].nReward;
+    *pB = lbl_80281664[i].aMedal[1].nReward;
+    *pC = lbl_80281664[i].aMedal[0].nReward;
 }
 
 s32 fn_800ED688(int i) {

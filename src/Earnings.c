@@ -6,6 +6,7 @@
 #include "golfer.h"
 #include "game.h"
 #include "engine.h"
+#include "game/save.h"
 
 // The prize table (stream 'ERN ', 0x22F0 bytes); multipliers are percentages (100 = x1).
 typedef struct StrokePrize {
@@ -27,36 +28,6 @@ typedef struct EarningsTable {
     u8   unk9B4[0x22F0 - 0x9B4];
 } EarningsTable;
 extern EarningsTable lbl_80200538;
-
-// A save profile (0x10600 bytes each); only what this file reads.
-// An award in a save profile: whether it is won, and when.
-typedef struct Award {
-    u8   bWon;                  // 0x0
-    u8   unk1;
-    s16  nDate;                 // 0x2  fn_800D2994's date when it was won
-} Award;
-typedef struct Profile {
-    u8   b0;                    // 0x00000  payouts are scaled (and awards given, at 1) only when set
-    u8   unk1[0x70 - 0x1];
-    u8   b70;                   // 0x00070  set when an award is won or a round is counted
-    u8   unk71[3];
-    s32  n74;                   // 0x00074  stroke-play rounds counted
-    s32  n78;                   // 0x00078  their strokes
-    s32  n7C;                   // 0x0007C  full rounds counted
-    u8   unk80[0xA8 - 0x80];
-    s32  nA8;                   // 0x000A8  the best stroke-play round (0: none yet)
-    u8   unkAC[0xC8 - 0xAC];
-    struct {
-        u8 b;
-        u8 unk1[7];
-    } aC8[31];                  // 0x000C8
-    u8   unk1C0[0x39C - 0x1C0];
-    Award aAward[39];           // 0x0039C
-    u8   aReplay[5][0xF28];     // 0x00438  the replays saved with awards 0, 6, 9, 3 and 13
-    s32  n5000;                 // 0x05000  the TOUR card level, 0..6
-    u8   unk5004[0x10600 - 0x5004];
-} Profile;
-extern Profile* gpSaveData;
 
 // The working tables and their saved copies, ten entries each.
 extern s32 lbl_80200010[10];
@@ -96,7 +67,6 @@ extern f32 lbl_80191AA4[70];
 
 void* memcpy(void* pDst, const void* pSrc, u32 uLen);
 
-s16   fn_800D2994(void);                    // today's date
 u8    fn_800CF450(int nPlayer);
 
 void  fn_800D344C(UStreamObject* pObject);
@@ -108,7 +78,6 @@ s32   fn_800D477C(int nPlayer, Ball* pBall, u8 b);
 void  fn_800D4F14(int nPlayer, u8 b);
 f32   fn_800D6EEC(void);
 u8    fn_800D76AC(int nPlayer, int nAward);
-s32   fn_800D7770(int nPlayer, Award* pAward);
 s32   fn_800D9954(void);
 
 // Put the working tables back to their saved copies.
@@ -343,7 +312,7 @@ u8 fn_800D4EF8(u32 uMask, int nBit) {
 // Without bCheck: whether the profile has every one of its 31 aC8 flags. With it: whether this is
 // game mode 23 with 30 of them and fn_800CF450 agrees.
 u8 fn_800D68CC(int nPlayer, u8 bCheck) {
-    Profile* pProfile;
+    SaveProfile* pProfile;
     int i;
     int n;
     u8 bAll;
@@ -372,7 +341,7 @@ u8 fn_800D68CC(int nPlayer, u8 bCheck) {
 // Without bCheck: whether the profile has any of its aC8 flags. With it: whether this is game mode
 // 23 and fn_800CF450 agrees.
 u8 fn_800D69B8(int nPlayer, u8 bCheck) {
-    Profile* pProfile;
+    SaveProfile* pProfile;
     int i;
     u8 bAny;
 

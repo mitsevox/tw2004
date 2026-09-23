@@ -6,23 +6,13 @@
 #include "ball.h"
 #include "game.h"
 #include "engine.h"
+#include "game/modes/challenge.h"
 
 extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
 extern u8* gpSaveData;
 extern s32 lbl_80282278;                    // the player whose turn it is
 extern u8  lbl_80282240;
 extern s32 lbl_80281658;                    // who has the honor in the playoff (5 = nobody yet)
-
-// A list of 0x80-byte entries (lbl_80281664, lbl_80281668 of them, entry lbl_802822F4 current).
-typedef struct ListEntry {
-    s32 n0;
-    s32 n4;
-    s32 n8;
-    u8  unkC[0x80 - 0xC];
-} ListEntry;
-extern ListEntry* lbl_80281664;
-extern s32        lbl_80281668;
-extern s32        lbl_802822F4;
 
 int  fn_800E9F90(int nPlayer);
 void fn_800EAB44(void);
@@ -334,16 +324,17 @@ void fn_800EAB44(void) {
     }
 }
 
+// The current challenge's group.
 s32 fn_800EAC7C(void) {
-    return lbl_80281664[lbl_802822F4].n8;
+    return lbl_80281664[lbl_802822F4].nGroup;
 }
 
-// The index of the entry whose n8 is n (0 if none).
+// The index of the first challenge of group n (0 if none).
 int fn_800EAC94(int n) {
     int i;
     int nFound = 0;
     for (i = 0; i < lbl_80281668; i++) {
-        if (n == lbl_80281664[i].n8) {
+        if (n == lbl_80281664[i].nGroup) {
             nFound = i;
             break;
         }

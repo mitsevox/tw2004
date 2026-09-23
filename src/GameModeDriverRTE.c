@@ -5,6 +5,8 @@
 #include "golfer.h"
 #include "game.h"
 #include "engine.h"
+#include "game/save.h"
+#include "game/modes/rte.h"
 
 void fn_800F0570(void);
 void fn_800F05B0(UStreamObject* pObject);
@@ -18,58 +20,12 @@ void fn_800F0E30(s32 p0, s32 p1);
 s32 fn_800F1008(s32 i);
 s32 fn_800F102C(void);
 
-// An award in a save profile (TW06: AwardInfoBase).
-typedef struct AwardInfo {
-    u8   bWon;                  // 0x0  TW06: bWon
-    u8   unk1;
-    u16  nDateWon;              // 0x2  TW06: dateWon
-} AwardInfo;
-
-// The start of a save profile as this file reads it (the profiles are 0x10600 bytes apart).
-typedef struct RTESave {
-    u8        unk0[0x20C];
-    AwardInfo aAward[75];       // 0x20C  per event id. TW06: rteEventAwardInfo (RealTimeEventUserData)
-} RTESave;
-
-// One calendar event (0x30 bytes). TW06: CalendarEntry_t, which also starts with the name and
-// description and ends with the start dates.
-typedef struct RTEvent {
-    s32 nName;                  // 0x00  offset into the names block. TW06: nameIdx
-    s32 nDesc;                  // 0x04  the same for its description. TW06: descIdx
-    s32 bOff;                   // 0x08  nonzero: not playable
-    s32 nChallenge;             // 0x0C  1-based, in aChallenge
-    s32 nId;                    // 0x10  the event's id (its flag in the save profile)
-    s32 n14;                    // 0x14
-    u8  unk18[4];
-    u16 aDate[10];              // 0x1C  the start date per season (from 2003; 0 = not held). TW06: startDate
-} RTEvent;
-
-// A challenge as this file reads it: GameMode5.c's Challenge (0x80 bytes), which runs it.
-typedef struct RTEChallenge {
-    u8  unk0[0x64];
-    s32 n64;                    // 0x64  the best medal's reward
-    u8  unk68[0x80 - 0x68];
-} RTEChallenge;
-
-// The calendar's data, loaded from the 'RTE' stream objects. TW06: RTEvents
-// (GameModeDriverRTE::m_RTEs), which holds pointers to the same three blocks.
-typedef struct RTEData {
-    RTEvent      aEvent[118];       // 0x0000  'RTEc'. TW06: pCalendar
-    RTEChallenge aChallenge[111];   // 0x1620  'RTEs'. TW06: pScenarios
-    char*        pNames;            // 0x4DA0  'RTEn'. TW06: pStrTable
-    u8           unk4DA4[4];
-} RTEData;
-extern RTEData gRTEs;
-
-void  fn_800D7770(int nPlayer, u8* pFlag);
 void  fn_8011E020(s32* pMonth, s32* pDay, s32* pYear, s32* pHour, s32* pMinute, s32* pSecond, s32* pMsec);
 void  fn_800D2678(u16* pDate, s32 nMonth, s32 nDay, s32 nYear);
 extern void (*lbl_8028235C)(void);
 extern void (*lbl_80282358)(void);
 extern s32 lbl_80281680;
 extern s32 lbl_80282348;
-extern u8* gpSaveData;
-void  fn_800F05DC(UStreamObject* pObject);
 void  fn_800F060C(UStreamObject* pObject);
 void  fn_800F0678(void);
 void  fn_800F0BBC(void);
@@ -156,7 +112,7 @@ void fn_800F06DC(void) {
         if (gRTEs.aEvent[lbl_80282350].nChallenge != 0) {
             gSession.nNumPlayers = 1;
             fn_800E0B38(5);
-            fn_800EC544((Challenge*)gRTEs.aChallenge, 111);
+            fn_800EC544(gRTEs.aChallenge, 111);
             fn_800EAE38(gRTEs.aEvent[lbl_80282350].nChallenge - 1);
             fn_800EAF7C();
             lbl_8028235C = gpGame->pfn1CC;
@@ -183,11 +139,11 @@ u8 fn_800F0818(void) {
 // How many events profile 0 has won.
 s32 fn_800F0820(void) {
     PlayerNumber_t nPlayer = PLR_1_e;
-    RTESave* p = (RTESave*)(gpSaveData + nPlayer * 0x10600);
+    SaveProfile* p = &gpSaveData[nPlayer];
     s32 n = 0;
     s32 i;
     for (i = 0; i < 75; i++) {
-        if (p->aAward[i].bWon == 1) {
+        if (p->aRTEAward[i].bWon == 1) {
             n++;
         }
     }
@@ -278,11 +234,11 @@ void fn_800F0BBC(void) {
     s32 nReward;
     lbl_80282358();
     if (fn_800EC558() != 3) {
-        nReward = gRTEs.aChallenge[gRTEs.aEvent[lbl_80282350].nChallenge - 1].n64;
+        nReward = gRTEs.aChallenge[gRTEs.aEvent[lbl_80282350].nChallenge - 1].aMedal[0].nReward;
         fn_800D3548(0, nReward, 0);
         fn_800E4364(0, 0x6F, nReward, 0);
         fn_800F08A8();
-        fn_800D7770(0, &((RTESave*)gpSaveData)->aAward[gRTEs.aEvent[lbl_80282350].nId].bWon);
+        fn_800D7770(0, &gpSaveData->aRTEAward[gRTEs.aEvent[lbl_80282350].nId]);
     }
 }
 
@@ -393,7 +349,7 @@ char* fn_800F0F10(s32 i) {
 
 // The reward for event i.
 s32 fn_800F0F30(s32 i) {
-    return gRTEs.aChallenge[gRTEs.aEvent[i].nChallenge - 1].n64;
+    return gRTEs.aChallenge[gRTEs.aEvent[i].nChallenge - 1].aMedal[0].nReward;
 }
 
 // This year's season (0..9 from 2003), or 0.
@@ -490,6 +446,6 @@ s32 fn_800F120C(s32 i) {
 
 // TW06: GameModeDriverRTE::IsEventComplete. Whether a profile has done event i.
 u8 fn_800F1224(s32 nProfile, s32 i) {
-    RTESave* p = (RTESave*)(gpSaveData + nProfile * 0x10600);
-    return p->aAward[gRTEs.aEvent[i].nId].bWon;
+    SaveProfile* p = &gpSaveData[nProfile];
+    return p->aRTEAward[gRTEs.aEvent[i].nId].bWon;
 }
