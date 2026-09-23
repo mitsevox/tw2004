@@ -45,6 +45,9 @@ void fn_800EE2C8(void);                 // GameModeDriverPGATour.c
 u8*  fn_8010C718(void);                 // CharSliders.c
 void fn_801260C0(void);                 // GameMode22.c
 s32  fn_80124094(void);                 // gbacable.c
+void fn_8012409C(void);                 // gbacable.c
+void fn_801240A8(void);                 // gbacable.c
+void fn_800582C4(SaveProfile* pProfile, int nBit, u8 bSet);    // set or clear bit nBit of a10548
 s32  fn_801255C4(s32* pPos);            // EASportsBio.c
 void fn_80126F84(s32 n);                // GameMode22.c: sets lbl_80195498.n4
 void fn_80126F94(s32 n);                // GameMode22.c: sets lbl_80195498.n0
@@ -4355,6 +4358,21 @@ void fn_80083EB8(MsgArg* pArgs, MsgArg* pResult) {
 
 void fn_80083EBC(MsgArg* pArgs, MsgArg* pResult) {
     fn_8012408C(18);
+}
+
+// The first time only (bit 1 of the working profile's a10548 not yet set): run fn_801240A8 and
+// fn_8012409C, set the bit and answer 1; else 0.
+void fn_80083EE0(MsgArg* pArgs, MsgArg* pResult) {
+    SaveProfile* pProfile = fn_80077ACC();
+
+    if (!fn_80058304(pProfile, 1)) {
+        fn_801240A8();
+        fn_8012409C();
+        fn_800582C4(pProfile, 1, 1);
+        pResult->i = 1;
+        return;
+    }
+    pResult->i = 0;
 }
 
 void fn_80083F54(MsgArg* pArgs, MsgArg* pResult) {
