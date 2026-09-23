@@ -219,7 +219,7 @@ void fn_800F6DFC(int nPlayer) {
 void fn_800F6ED4(int nPlayer) {
     s32 nBalls;
     s32 nSurface;
-    s8 nTarget;
+    int nTarget;
     s32 nMsg;
     s32 bTime;
     s32 nAdded;
@@ -229,6 +229,7 @@ void fn_800F6ED4(int nPlayer) {
     s32 nMult;
     u8* pBall;
     int j;
+    s32 nHits;
     nMsg = -1;
     nSurface = gPlayers[nPlayer].nBallSurface;
     fn_800F7A4C(nSurface, &lbl_802823BC, &lbl_802823B8, &nBalls);
@@ -242,18 +243,19 @@ void fn_800F6ED4(int nPlayer) {
         if (gPlayers[nPlayer].nE90 > gPlayers[nPlayer].nE8C) {
             gPlayers[nPlayer].nE8C = gPlayers[nPlayer].nE90;
         }
+        nHits = gPlayers[nPlayer].nDE4[nTarget];
         for (j = 0; j < gPlayers[nPlayer].nDE4[nTarget]; j++) {
             fScale *= 0.75f;
         }
-        if (gPlayers[nPlayer].nDE4[nTarget] == 0) {
+        if (nHits == 0) {
             if (lbl_80282360 - 1 == fn_800F20C0(nPlayer)) {
                 fScale = 1.0f;
                 lbl_802823BC = fn_800F2578();
                 lbl_802823BC = fn_800D6A70(lbl_802823BC, nPlayer, 1, 1, 1, 0);
                 lbl_802823BC = fn_800D7220(lbl_802823BC, nPlayer, 0);
                 fn_800D3548(nPlayer, lbl_802823BC, 0);
-                lbl_802823B8 = 0;
                 gPlayers[nPlayer].nD70[Game_CurHoleIndex()]++;
+                lbl_802823B8 = 0;
                 gPlayers[nPlayer].nDD8 += lbl_802823BC;
                 fn_800F3980(0x33, lbl_802823BC, 0, 0, 0xCA, 1);
                 lbl_802823BC = 0;
@@ -276,9 +278,9 @@ void fn_800F6ED4(int nPlayer) {
                 fn_800D3548(nPlayer, lbl_802823BC, 0);
                 gPlayers[nPlayer].aCD4[gPlayers[nPlayer].nCD0] = nSurface;
                 gPlayers[nPlayer].nCD0++;
-                lbl_802823B8 += 5;
                 gPlayers[nPlayer].nD70[Game_CurHoleIndex()]++;
                 gPlayers[nPlayer].nDD8 += lbl_802823BC;
+                lbl_802823B8 += 5;
                 gPlayers[nPlayer].aDC4[4] += lbl_802823B8 * 60;
                 fn_800ED710(nPlayer);
                 fn_800F80D4(gPlayers[nPlayer].n290[Game_CurHoleIndex()] + lbl_802823B8 * 60);
@@ -399,7 +401,7 @@ void fn_800F6ED4(int nPlayer) {
                     break;
                 case 4:
                     break;
-                default:
+                case 5:
                     nMsg = 0x31;
                     break;
                 }
@@ -458,8 +460,7 @@ void fn_800F6ED4(int nPlayer) {
     if (nMsg != -1) {
         fn_800F263C(nMsg);
     }
-    nAddedFrames = nAdded * 60;
-    if (gPlayers[nPlayer].n290[Game_CurHoleIndex()] + nAddedFrames > 600 &&
+    if (gPlayers[nPlayer].n290[Game_CurHoleIndex()] + (nAddedFrames = nAdded * 60) > 600 &&
         gPlayers[nPlayer].n290[Game_CurHoleIndex()] <= 600) {
         fn_800A6278();
     }

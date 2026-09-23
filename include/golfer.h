@@ -335,7 +335,7 @@ typedef struct Player {
     s32  nE94;                  // 0xE94
     s32  nE98;                  // 0xE98  shots in a row without a multiplier
     s8   nNextTarget;           // 0xE9C  the next target to hit, in order (GameMode17)
-    u8   bE9D;                  // 0xE9D
+    s8   bE9D;                  // 0xE9D
     u8   bE9E;                  // 0xE9E
     u8   unkE9F[0xEE0 - 0xE9F];
     u8   bEE0;                  // 0xEE0
