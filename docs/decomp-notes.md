@@ -487,6 +487,16 @@ The fixes that come up most often. Each points to its full entry below.
 
 ### Data, constants and symbols
 
+- **[verified] An exact unit can still fail the link on function order.** objdiff scores each
+  function by name, so a function defined out of address order reads 100% while the linked
+  `.text` shifts. GameUI `fn_800E3ECC` was defined after `fn_800E3EE0`; moving it fixed the DOL.
+- **[verified] A constant the original has twice means the original was two files.**
+  CodeWarrior keeps one copy of each constant per file. GameMode10's code emits one int-to-float
+  conversion double; the original has two (`lbl_80284688`, `lbl_802846A0`), each with the
+  constants of one half of the unit, so the unit is two original files.
+- **[verified] Constants shared with undecompiled neighbours mean the unit is a slice.** CharAnim
+  uses three constants from a pool at 0x80283CD8 that neighbouring code also uses; it can link
+  only once the unit is widened to own the whole pool.
 - **[verified] An exact unit can still break the linked build.** objdiff compares functions; the
   DOL check also needs the data layout. A unit whose C makes the compiler emit its own data (the
   8-byte int-to-float constant `0x4330000080000000` in `.sdata2`, a string literal, a static)
