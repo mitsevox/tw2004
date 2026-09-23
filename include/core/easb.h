@@ -66,17 +66,48 @@ typedef struct EASBImage {
     u8 aData[0x4000];               // 0x0436: 128x128 pixels, 8 bits each
 } EASBImage;
 
+// The text sizes of the records, in characters with the end: a name must be shorter.
+#define EASB_PRODUCT_NAME_SIZE 0x24
+#define EASB_GAMES_PLAYED_TYPE_SIZE 0x14
+#define EASB_ACCOMPLISHMENT_NAME_SIZE 0x40
+
+// Times the library accepts, in seconds since 1970 (TibExt.c's clock).
+#define EASB_TIME_FIRST 0x3E122F80  // 2003-01-01 00:00:00
+#define EASB_TIME_LAST 0x63B0CD00   // 2023-01-01 00:00:00
+
+// One accomplishment in a product record (EASBProduct.aAccomplishments). fn_80128054 checks it.
+typedef struct EASBAccomplishment {
+    u16 szName[EASB_ACCOMPLISHMENT_NAME_SIZE];  // 0x00: wide text
+    u32 uTime;                      // 0x80: when it was set, within 2003-2023
+    u16 uLanguage;                  // 0x84: the language of szName (fn_801298FC)
+    u8 u86;                        // 0x86: 1 to 250; the first sort key unless sorting by time
+    u8 bValid;                      // 0x87
+} EASBAccomplishment;               // size 0x88
+LAYOUT_ASSERT(EASBAccomplishment, 0x88);
+
+#define EASB_MAX_ACCOMPLISHMENTS 32 // per product record
+
+// The Bio's totals over every product record (EASBState.totals; fn_80128580 adds a record in).
+typedef struct EASBTotals {
+    u32 u0;                         // 0x00: EASBProduct.u50
+    u32 u4;                         // 0x04: EASBProduct.u54
+    u32 u8;                         // 0x08: EASBProduct.u58, never below uC
+    u32 uC;                         // 0x0C: EASBProduct.u5C
+    u8 nProducts;                   // 0x10: the records added in
+} EASBTotals;                       // size 0x14
+LAYOUT_ASSERT(EASBTotals, 0x14);
+
 // This game's product record, as stored in the Bio file. Times are seconds since 1970
 // (TibExt.c's clock).
 typedef struct EASBProduct {
-    char szName[0x24];              // 0x0000: EASBInitParams.szProductName
-    u16 szGamesPlayedType[0x14];    // 0x0024: EASBInitParams.szGamesPlayedType
+    char szName[EASB_PRODUCT_NAME_SIZE];                // 0x0000: EASBInitParams.szProductName
+    u16 szGamesPlayedType[EASB_GAMES_PLAYED_TYPE_SIZE]; // 0x0024: EASBInitParams.szGamesPlayedType
     u32 uTime;                      // 0x004C: last update, kept within 2003-2023 by fn_80128BC4
     u32 u50;                        // 0x0050: play time while b11E0 is set
     u32 u54;                        // 0x0054: play time while b11E0 is clear
     u32 u58;                        // 0x0058: counter raised by fn_8012D8C4
     u32 u5C;                        // 0x005C: counter raised by fn_8012D93C
-    u8 unk60[0x1100];               // 0x0060: 32 entries of 0x88 bytes (cleared by fn_8012CD8C)
+    EASBAccomplishment aAccomplishments[EASB_MAX_ACCOMPLISHMENTS];  // 0x0060: cleared by fn_8012CD8C
     u16 u1160;                      // 0x1160
     u16 uLevel;                     // 0x1162: only rises, up to EASB_MAX_LEVEL
     u16 uGamesPlayedTypeLanguage;   // 0x1164: EASBInitParams.uGamesPlayedTypeLanguage
@@ -105,11 +136,7 @@ LAYOUT_ASSERT(EASBImageSlot, 0x4401);
 typedef struct EASBState {
     u32 uHeapID;                    // 0x0000: EASBInitParams.uHeapID, passed to TibExt.c's allocator
     u8 unk4[0x50];
-    u32 u54;                        // 0x0054: the Bio's totals, raised with the product's
-    u32 u58;                        // 0x0058
-    u32 u5C;                        // 0x005C
-    u32 u60;                        // 0x0060
-    u8 unk64[4];
+    EASBTotals totals;              // 0x0054: the Bio's totals, raised with the product's
     EASBProduct product;            // 0x0068: this game's record
     u8 b11D0;                       // 0x11D0: this game's slot in pProductBuffer, or EASB_PRODUCT_NONE
     u8 unk11D1[3];
@@ -155,25 +182,35 @@ LAYOUT_ASSERT(TibExtCard, 0x90);
 extern TibExtCard* lbl_80281970;
 extern s32 lbl_80194758[46];        // the file library's code for each card error (by -error)
 
-// The code before EASB.c (still sweep code).
+// EASBStorage.c: the code before EASB.c.
 EASBErrorE fn_80127F88(EASBProduct* pProduct);  // EASB_ERROR_INVALID_PRODUCT if the record is bad
+EASBErrorE fn_80128054(EASBAccomplishment* pAccomplishment);
+u8 fn_801280F8(u16 uLanguage);      // is it a language the library knows
 u8 fn_801281B4(u16 uLanguage, u16* aLanguages, u8 nLanguages);  // is uLanguage in the list
+EASBErrorE fn_8012835C(u16* sz, u32 uSize, u32* puLength);
+EASBErrorE fn_801283B0(EASBInitParams* pParams);
+void fn_80128488(EASBProduct* pProduct, u8 bValid, char* szName, u16* szGamesPlayedType, u16 uLanguage);
 u32 fn_80128468(u32 uA, u32 uB);    // uA + uB, saturating at 0xFFFFFFFF
+void fn_80128528(EASBTotals* pTotals, EASBProduct* pProduct);
 void fn_80128624(EASBProduct* aProducts, u32 nCount);          // a shell sort of the records
-s32 fn_80128CA0(EASBProduct* pA, EASBProduct* pB, u8 bFlag);    // compares two records (0: same)
-void fn_80128BF8(char* szDest, char* szSrc, u32 uSize);         // bounded string copy
-void fn_80128C4C(u16* szDest, u16* szSrc, u32 uLength);         // the same for wide text
-EASBErrorE fn_80128FD4(u32* pTotals, u16* puLevel, f32* pfProgress);
+void fn_8012872C(EASBAccomplishment** apList, u32 nCount, s32 nSort);
+s32 fn_80128CA0(char* szA, char* szB, u8 bCase);                // compares two texts (0: same)
+char* fn_80128BF8(char* szDest, char* szSrc, u32 uSize);        // bounded string copy
+u16* fn_80128C4C(u16* szDest, u16* szSrc, u32 uLength);         // the same for wide text
+void fn_80128EC0(char* sz);
+void fn_80128F04(u16* sz, u16 uLanguage);
+EASBErrorE fn_80128FD4(EASBTotals* pTotals, u16* puLevel, f32* pfProgress);
 EASBErrorE fn_801291A8(u16 uLevel, u16 u1160, u16* puLevel);
 EASBErrorE fn_80129218(u16 uLevel, u16 u1160, u16* puLevel);
 u32 fn_80128BC4(u32 uTime);         // clamps a time to 2003-01-01..2023-01-01
-s32 fn_8012881C(s32 arg0, s32 arg1, u32 arg2, u32 arg3, u32 arg4);
-s32 fn_801288DC(s32 arg0, s32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5, u32 arg6);
-EASBErrorE fn_8012C5F8(u32* p0, EASBProduct* pProduct, u8* p2);
+EASBErrorE fn_8012881C(u32 uTime, u16* pnDays, u8* pnHours, u8* pnMinutes, u8* pnSeconds);
+EASBErrorE fn_801288DC(u32 uTime, u16* pnYear, u8* pnMonth, u8* pnDay, u8* pnHours, u8* pnMinutes,
+                       u8* pnSeconds);
+EASBErrorE fn_8012C5F8(EASBTotals* pTotals, EASBProduct* pProduct, u8* p2);
 EASBErrorE fn_8012C69C(void);
 EASBErrorE fn_8012C73C(void);
 EASBErrorE fn_8012C774(EASBProduct* pProducts);
-EASBErrorE fn_8012C7BC(u32* p0, EASBProduct* pProduct, void* pImage);
+EASBErrorE fn_8012C7BC(EASBTotals* pTotals, EASBProduct* pProduct, void* pImage);
 u8 fn_8012C83C(void);
 u8 fn_8012C848(void);
 EASBErrorE fn_8012C854(u8* pnSlot);  // the storage code's slot number (EASB_PRODUCT_NONE: none)
@@ -221,8 +258,9 @@ EASBErrorE fn_8012E2D4(u8 nProduct, u32* pOut);
 EASBErrorE fn_8012E34C(u8 nProduct, u32* pOut);
 EASBErrorE fn_8012E3C0(u8 nProduct, u32* pOut);
 EASBErrorE fn_8012E818(u8 n, void* pImage);
-EASBErrorE fn_8012E820(s32 arg0, s32 arg1, u32 arg2, u32 arg3, u32 arg4);
-EASBErrorE fn_8012E8A8(s32 arg0, s32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5, u32 arg6);
+EASBErrorE fn_8012E820(u32 uTime, u16* pnDays, u8* pnHours, u8* pnMinutes, u8* pnSeconds);
+EASBErrorE fn_8012E8A8(u32 uTime, u16* pnYear, u8* pnMonth, u8* pnDay, u8* pnHours, u8* pnMinutes,
+                       u8* pnSeconds);
 
 // ---- EASportsBio.c: the game's side ----
 

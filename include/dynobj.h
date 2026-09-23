@@ -21,17 +21,30 @@ typedef struct DynObjDef {
     f32  f1C;                   // 0x1C  type 2: its turning speed, degrees a second
 } DynObjDef;
 
+typedef struct DynObjModelRef {
+    u8   unk0[4];
+    void* p4;                   // 0x04  goes to fn_800486F4
+} DynObjModelRef;
+
 typedef struct DynObjModel {
     u8   unk0[8];
-    void* p8;                   // 0x08  the model, if any (its +4 goes to fn_800486F4)
+    DynObjModelRef* p8;         // 0x08  the model, if any
 } DynObjModel;
+
+// The names an object passes to fn_8000EA1C (DynObjSetup.pC).
+typedef struct DynObjNames {
+    u8   unk0[0x28];
+    const char* p28;            // 0x28  -> DynObj.p15C
+    const char* p2C;            // 0x2C  -> DynObj.p160
+    const char* p30;            // 0x30  -> DynObj.p164
+} DynObjNames;
 
 // What a type's message 2 gets.
 typedef struct DynObjSetup {
     u8   unk0[4];
     DynObjModel* pModel;        // 0x04
     DynObjDef* pDef;            // 0x08
-    u8*  pC;                    // 0x0C  its words at 0x28..0x30 -> DynObj.p15C..p164
+    DynObjNames* pC;            // 0x0C
 } DynObjSetup;
 
 // A dynamic object (0x16C bytes for type 0; a type may add fields after it).
@@ -46,8 +59,10 @@ typedef struct DynObj {
     u8   unk104[0x118 - 0x104];
     s32  n118;                  // 0x118  type 11 (the animals)
     f32  f11C;                  // 0x11C  type 11
-    u8   unk120[0x134 - 0x120];
-    s32  n134;                  // 0x134
+    u8   unk120[0x128 - 0x120];
+    struct DynObj* pNext;       // 0x128  the next object in UKernel.c's list
+    u8   unk12C[0x134 - 0x12C];
+    s32  n134;                  // 0x134  its id (fn_80048E4C finds it by this; 0 once fn_800491C4 ran)
     u8   b138;                  // 0x138
     u8   unk139;
     u8   b13A;                  // 0x13A
@@ -85,7 +100,20 @@ LAYOUT_ASSERT(DynObjTurning, 0x194);
 
 typedef int (*DynObjHandler)(int nMsg, DynObj* pObj, void* pArg);
 
+// UKernel.c's list of the objects, first and last, the last id given out (DynObj.n134), a bit
+// mask of the used entries of lbl_801D5228 (fn_80049230), and two node pools (400- and 528-byte
+// nodes).
+extern DynObj* lbl_80281DBC;
+extern DynObj* lbl_80281DB8;
+extern s32 lbl_80281DB4;
+extern u32 lbl_80281DB0;
+extern UMemPool* lbl_80281DAC;
+extern UMemPool* lbl_80281DA8;
+
 // UKernel.c, UObject.c. The UObject functions take the object part (&DynObj.mObj).
+DynObj* fn_80048E44(void);                                  // the first object
+DynObj* fn_80048E4C(int nId);                               // the object with this id, or NULL
+void fn_80048FEC(DynObj* pObj);                             // adds it at the end of the list
 void fn_800491C4(DynObj* pObj);
 void fn_80049514(DynObj* pObj, DynObjSetup* pSetup);    // type 0's message 2
 void fn_800486F4(void* pObj, void* pModel, int nFlags);
@@ -95,5 +123,9 @@ void fn_80048894(void* pObj);
 // GoDynObjBase.c
 int  fn_80049820(int nMsg, DynObj* pObj, void* pArg);  // type 0's handler, the others' default
 DynObjHandler fn_800499B0(int nType);
+
+// GoDynObjTypes.c: the handlers of types 6 and 9.
+int  fn_8004AD54(int nMsg, DynObj* pObj, void* pArg);
+int  fn_8004AF2C(int nMsg, DynObj* pObj, void* pArg);
 
 #endif

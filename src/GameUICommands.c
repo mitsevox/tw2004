@@ -259,7 +259,6 @@ u8    GameModeBattle_RemoveClub(int nPlayer, int nClub);
 s32   GameModeDriverPGATour_GetCurrentEventID(void);          // GameModeDriverPGATour.c
 char* GameModeDriverRTE_GetDescription(s32 i);                // GameModeDriverRTE.c
 void  fn_8001A870(void);
-u8    fn_8003DCAC(void);
 void  fn_80062B84(int a);
 void  fn_8006F4E0(void);
 s32   fn_80084FB4(CardPos* pPos);

@@ -184,28 +184,7 @@ GoRenderSurface.c:
 	.text       start:0x8002F1D4 end:0x8002F4FC
 
 LLPict_Gc.c:
-	.text       start:0x8002F4FC end:0x8003001C
-
-unsorted/sweep_8003001C.c:
-	.text       start:0x8003001C end:0x80030040
-
-unsorted/sweep_8003009C.c:
-	.text       start:0x8003009C end:0x800300A0
-
-unsorted/sweep_800301D0.c:
-	.text       start:0x800301D0 end:0x800301F4
-
-unsorted/sweep_800301F4.c:
-	.text       start:0x800301F4 end:0x8003020C
-
-unsorted/sweep_8003020C.c:
-	.text       start:0x8003020C end:0x80030214
-
-unsorted/sweep_80030214.c:
-	.text       start:0x80030214 end:0x8003024C
-
-unsorted/sweep_8003024C.c:
-	.text       start:0x8003024C end:0x80030254
+	.text       start:0x8002F4FC end:0x80030254
 
 GoTerrain.c:
 	.text       start:0x80030254 end:0x80035640
@@ -219,32 +198,11 @@ GoPostFx.c:
 unsorted/sweep_8003944C.c:
 	.text       start:0x8003944C end:0x80039454
 
-unsorted/sweep_800394AC.c:
-	.text       start:0x800394AC end:0x800394F0
-
-unsorted/sweep_80039520.c:
-	.text       start:0x80039520 end:0x8003954C
-
-unsorted/sweep_8003954C.c:
-	.text       start:0x8003954C end:0x80039554
-
 GoDynamicCam.c:
-	.text       start:0x80039554 end:0x8003DC30
-
-unsorted/sweep_8003DC78.c:
-	.text       start:0x8003DC78 end:0x8003DCAC
+	.text       start:0x80039454 end:0x8003DCE8
 
 gocamscripts.c:
-	.text       start:0x8003DCE8 end:0x800453C8
-
-unsorted/sweep_80045470.c:
-	.text       start:0x80045470 end:0x80045494
-
-unsorted/sweep_8004560C.c:
-	.text       start:0x8004560C end:0x8004562C
-
-unsorted/sweep_8004562C.c:
-	.text       start:0x8004562C end:0x80045660
+	.text       start:0x8003DCE8 end:0x80045660
 
 DepthField.c:
 	.text       start:0x80045660 end:0x80045D18
@@ -277,16 +235,10 @@ unsorted/sweep_80045F6C.c:
 	.text       start:0x80045F6C end:0x80045F74
 
 GoDynObj.c:
-	.text       start:0x80045F74 end:0x80048680
-
-unsorted/sweep_800486EC.c:
-	.text       start:0x800486EC end:0x800486F4
+	.text       start:0x80045F74 end:0x800486F4
 
 UObject.c:
-	.text       start:0x800486F4 end:0x80048A84
-
-unsorted/sweep_80048AC4.c:
-	.text       start:0x80048AC4 end:0x80048AD4
+	.text       start:0x800486F4 end:0x80048AF4
 
 UKernel.c:
 	.text       start:0x80048AF4 end:0x800496E0
@@ -299,12 +251,16 @@ GoAnimalActors.c:
 
 GoDynObjTypes.c:
 	.text       start:0x8004ABBC end:0x8004AFA0
+	.sdata2     start:0x80283280 end:0x80283288
 
 GoTerrainCollision.c:
 	.text       start:0x8004AFA0 end:0x80050C2C
 
 Ball.c:
 	.text       start:0x80050C2C end:0x8005620C
+
+LLPictInt.c:
+	.text       start:0x8005620C end:0x800563C4
 
 user.c:
 	.text       start:0x800563C4 end:0x80056480
@@ -1006,11 +962,8 @@ TibExt.c:
 gbacable.c:
 	.text       start:0x801228E0 end:0x801247C0
 
-unsorted/sweep_801247C0.c:
-	.text       start:0x801247C0 end:0x80124814
-
-unsorted/sweep_80124814.c:
-	.text       start:0x80124814 end:0x80124838
+ShaderRow19.c:
+	.text       start:0x801247C0 end:0x801249A8
 
 EASportsBio.c:
 	.text       start:0x801249A8 end:0x8012597C
@@ -1021,56 +974,8 @@ GameMode22.c:
 SkinBurn.c:
 	.text       start:0x801270F0 end:0x80127D84
 
-unsorted/sweep_80127D84.c:
-	.text       start:0x80127D84 end:0x80127E44
-
-unsorted/sweep_80127E44.c:
-	.text       start:0x80127E44 end:0x80127F40
-
-unsorted/sweep_80128468.c:
-	.text       start:0x80128468 end:0x80128488
-
-unsorted/sweep_80128528.c:
-	.text       start:0x80128528 end:0x80128580
-
-unsorted/sweep_80128BC4.c:
-	.text       start:0x80128BC4 end:0x80128BF8
-
-unsorted/sweep_80128F58.c:
-	.text       start:0x80128F58 end:0x80128FD4
-
-unsorted/sweep_8012A2A8.c:
-	.text       start:0x8012A2A8 end:0x8012A364
-
-unsorted/sweep_8012A364.c:
-	.text       start:0x8012A364 end:0x8012A434
-
-unsorted/sweep_8012A434.c:
-	.text       start:0x8012A434 end:0x8012A4C4
-
-unsorted/sweep_8012A900.c:
-	.text       start:0x8012A900 end:0x8012A95C
-
-unsorted/sweep_8012B004.c:
-	.text       start:0x8012B004 end:0x8012B0D8
-
-unsorted/sweep_8012B0D8.c:
-	.text       start:0x8012B0D8 end:0x8012B190
-
-unsorted/sweep_8012C83C.c:
-	.text       start:0x8012C83C end:0x8012C854
-
-unsorted/sweep_8012C854.c:
-	.text       start:0x8012C854 end:0x8012C888
-
-unsorted/sweep_8012C888.c:
-	.text       start:0x8012C888 end:0x8012C8D0
-
-unsorted/sweep_8012CC48.c:
-	.text       start:0x8012CC48 end:0x8012CCC0
-
-unsorted/sweep_8012CCC0.c:
-	.text       start:0x8012CCC0 end:0x8012CCD8
+EASBStorage.c:
+	.text       start:0x80127D84 end:0x8012CCD8
 
 EASB.c:
 	.text       start:0x8012CCD8 end:0x8012E950
