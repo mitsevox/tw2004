@@ -175,6 +175,56 @@ They will be sorted into the sections below.
 - **[verified] Plain `ninja` does not compile NonMatching units.** Build `ninja all_source` (or the unit's
   `.o`) to see compile errors; merge.py does.
 
+### New from the fill-in run (2026-09-24)
+
+- **[verified] Split long arithmetic into statements to keep EA's grouping.** `(a + b - 1)` is regrouped
+  as `a + (b - 1)`; `u = a + b; u = (u - 1) & ~(a - 1);` keeps it (UMemPool fn_8000AFA0 84.0 -> 98.9). A
+  `+`/`-` chain of divisions gets reordered the same way (EASBStorage fn_801288DC 96.7 -> 100, five
+  statements). `d - (d/365)*365` is `d % 365`.
+- **[verified] A ternary loads its else-value first.** `(u > m) ? m : u` -> `(u <= m) ? u : m` when the
+  original is `mr r0,m; bgt; mr r0,u` (UStream fn_8000E790 99.57 -> 100).
+- **[verified] Parameters are copied to saved registers in declaration order, across int and float
+  registers**; swapping `(f32* pOut, f32 fAngle)` flips `fmr f31,f1` / `mr r31,r3` (Quaternion fn_800093AC
+  92.0 -> 100). Only reorder when the callers' asm agrees.
+- **[verified] `if (n > 0) do {...} while (--n > 0);`** gives `mr. rN; ble ... subic. rN; bgt` (char
+  fn_8001F08C 91.7 -> 100).
+- **[verified] In a loop whose condition loads `*p`, write `*p = *p + 1`, not `(*p)++`**: the original
+  reuses the loaded value (EASBStorage fn_8012835C 95.0 -> 100).
+- **[verified] A string copy that walks a copy of its destination returns the destination** (r3 untouched
+  on every path): `char* f(dst, ...) { ...; return szDest; }` (EASBStorage fn_80128BF8 94.3 -> 100).
+- **[verified] Chained stores `p->a->pPrev = p->a->pNext = p->a;`** give load, store to itself, reload,
+  store (GoARAM fn_800B5C40 99.6 -> 100). Popping a list head re-reads through the head field:
+  `pHeap->pSpare = pHeap->pSpare->pNext` (fn_800B5F4C 92.8 -> 100).
+- **[verified] A value compared inside a loop is often computed into a local as the loop's first
+  statement** (GoARAM fn_800B5E88 94.3 -> 100).
+- **[verified] A call result kept in a named local and copied into the loop counter** (`nFirst = f(); for
+  (n = nFirst; ...)`) matches where initialising the counter directly does not (FE_CrAPDB fn_80104FA8,
+  fn_80106374).
+- **[verified] A lone flag test before a non-void return is `if (flag) return X; return X;`** (the void
+  rule above, for value returns; FE_CrAPDB fn_80104FA8 88.7 -> 94.0).
+- **[verified] `!(u & bit)` as an argument gives `rlwinm; cntlzw; srwi 5`; `(u & bit) == 0` gives
+  `extrwi; xori`** (UKernel fn_800491C4 91.9 -> 100).
+- **[verified] `x * (1.0f / 512.0f)` puts the constant first in `fmuls`; `x / 512.0f` puts x first**
+  (uiText fn_800922A8 97.0 -> 98.7).
+- **[verified] `(old & 0xFFFFFF) | (v << 24)` gives `slwi` + `rlwimi` into old; the other operand order
+  inserts v the other way** (Code8009B340 fn_8009B340 96.7 -> 100). A bitfield store gives `stb` instead.
+- **[verified] A shared product kept in a local sets the `fmadds` operand order** (UMemPool fn_8000A194).
+- **[verified] A param compare gives `cmpwi` only when both the parameter and the field it is stored to
+  are `int`** (GoARAM fn_800B65C0: u32 99.3, int param only 97.2, both int 100).
+- **[verified] The stack frame does not fix a local char buffer's size** (GoDynamicCam fn_8003C9D0 exact
+  with 12..0x18 bytes): say in a comment that the size is unknown.
+- **Linking (tools):**
+  - A unit's `.data` range ends at its own 8-byte alignment, not the next object's 32-byte alignment
+    (GoARAM). The last object in `.sdata`/`.sbss` ends at the true section end, not rounded to 8 (CARD).
+  - A linked unit cannot be `--extend`ed over a gap until every gap function is exact (the Matching C
+    must define them all).
+  - The linker strips functions nothing calls, with their constants and `.sbss`; a misnamed caller can
+    make a used function look unreferenced (CARDSetAttributesAsync).
+  - A hand-written asm function whose trailing `blr` dtk split into a gap scores below 100 in objdiff but
+    links (InitMetroTRK).
+- **Shell:** the Bash tool strips backslashes even inside quoted heredocs (`<<'EOF'`). Write scripts with
+  the Write tool.
+
 ### Loops and unrolling
 
 - **[verified] Two tests on players n and n + 1 can be a two-pass loop.** When the second
