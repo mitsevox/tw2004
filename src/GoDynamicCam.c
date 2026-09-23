@@ -7,6 +7,7 @@
 #include "game.h"
 #include "dyncam.h"
 #include "frontend/fe.h"
+#include "endian.h"
 
 u8   fn_8001E9CC(u32* pBits, int nBit);         // the bit is set
 void fn_800399E0(u8* pSrc, CamShot* pDst, u32 nCount);
@@ -94,6 +95,34 @@ void fn_800397EC(UStreamObject* pObject) {
     fn_80039A48(pObject->pData, lbl_80281D88->pSets, pObject->uSize / sizeof(DynCamSet));
     fn_80039EB8(pObject->uSize);
     fn_80009E70(pObject);
+}
+
+// Copies nCount shots from the file (little-endian) into pDst, swapping each value's bytes.
+void fn_800399E0(u8* pSrc, CamShot* pDst, u32 nCount) {
+    SwapField aFormat[] = {
+        { 32, 1 },                                          // szName
+        { 16, 4 }, { 16, 4 },                               // v20, v30
+        { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 },
+        { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 },
+        { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 },
+        { 1, 1 }, { 1, 1 }, { 1, 1 }, { 1, 1 }, { 1, 1 }, { 1, 1 }, { 1, 1 }, { 1, 1 }, { 1, 1 },
+        { 1, 1 }, { 1, 1 },
+        { 13, 1 },
+    };
+
+    fn_8001F08C((void**)&pSrc, (void**)&pDst, aFormat, sizeof(aFormat) / sizeof(aFormat[0]), nCount);
+}
+
+// The same for nCount shot sets.
+void fn_80039A48(u8* pSrc, DynCamSet* pDst, u32 nCount) {
+    SwapField aFormat[] = {
+        { 16, 1 },
+        { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 },
+        { 1, 1 },
+        { 3, 1 },
+    };
+
+    fn_8001F08C((void**)&pSrc, (void**)&pDst, aFormat, sizeof(aFormat) / sizeof(aFormat[0]), nCount);
 }
 
 // Sets up nSize bytes of freshly loaded shots, as fn_80039C5C does, and first keeps f68 at least
