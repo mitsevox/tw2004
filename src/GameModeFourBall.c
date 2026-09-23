@@ -122,14 +122,12 @@ int fn_800E8FC8(int nTeam) {
     if (nTeam == 0) {
         b = 1;
     }
-    n = 9;
     if (gPlayers[a].nStrokes[nHole] + 1 < 9) {
         n = gPlayers[a].nStrokes[nHole] + 1;
+    } else {
+        n = 9;
     }
-    nBest = gPlayers[b].nStrokes[nHole] + 1;
-    if (n <= nBest) {
-        nBest = n;
-    }
+    nBest = n <= gPlayers[b].nStrokes[nHole] + 1 ? n : gPlayers[b].nStrokes[nHole] + 1;
     if (Player_IsHoled(a)) {
         nBest = nBest <= gPlayers[a].nStrokes[nHole] ? nBest : gPlayers[a].nStrokes[nHole];
     }

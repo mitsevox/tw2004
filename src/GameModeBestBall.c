@@ -138,8 +138,8 @@ void fn_800E83F8(void) {
 // player farthest from the pin (off the green first) whose team is still playing.
 s32 fn_800E84B0(int nPlayer) {
     TeeOrder order;
-    int nLead;
     int h;
+    int nLead;
     int a;
     int b;
     int w;

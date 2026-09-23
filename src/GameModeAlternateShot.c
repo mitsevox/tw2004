@@ -125,9 +125,10 @@ int fn_800E6B08(int nTeam) {
     if (nTeam == 0) {
         a = 0;
     }
-    n = 9;
     if (gPlayers[a].nStrokes[nHole] + 1 < 9) {
         n = gPlayers[a].nStrokes[nHole] + 1;
+    } else {
+        n = 9;
     }
     if (Player_IsHoled(a)) {
         n = n <= gPlayers[a].nStrokes[nHole] ? n : gPlayers[a].nStrokes[nHole];
