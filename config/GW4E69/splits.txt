@@ -2771,6 +2771,7 @@ unsorted/sweep_800DAD44.c:
 
 GameEffects.c:
 	.text       start:0x800DAE44 end:0x800DCAD8
+	.sdata2     start:0x80284578 end:0x802845C0
 
 GameManager.c:
 	.text       start:0x800DCAD8 end:0x800E0AF0
