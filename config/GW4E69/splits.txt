@@ -3344,6 +3344,7 @@ GameRound.c:
 
 GameUI.c:
 	.text       start:0x800E3B28 end:0x800E4FFC
+	.rodata     start:0x80184D90 end:0x80184DA0
 	.data       start:0x80192558 end:0x80192588
 	.sdata2     start:0x80284628 end:0x80284630
 

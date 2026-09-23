@@ -67,8 +67,6 @@ u8    fn_80127004(void);
         (q)[i].n8 = c;       \
     }
 
-typedef struct Vec4 { f32 x, y, z, w; } Vec4;
-extern Vec4 lbl_80184D90;
 extern char lbl_80281640[8];
 
 void  fn_80095444(int a);
@@ -539,7 +537,6 @@ void fn_800E4D88(void) {
 // The end-of-hole screen, as fn_800E4C20 does the end-of-round one; in the side-by-side modes
 // 22 and 26 both players' cameras are moved first.
 void fn_800E4D94(u8 bHuman) {
-    Vec4 v;
     if (lbl_802822DC[0] || lbl_802822DC[1] || lbl_802822DC[2] || lbl_802822B8 != 0 || lbl_802822B4 != 0 ||
         lbl_802822B0 != 0 || lbl_802822AC != 0 || lbl_802822A8 != 0 || lbl_802822A4 != 0 ||
         lbl_8028229C != 0 || lbl_80282298 != 0 || lbl_80282294 != 0 || lbl_80282290 != 0 ||
@@ -557,9 +554,9 @@ void fn_800E4D94(u8 bHuman) {
         lbl_80282282 = 1;
         GameEffects_ResetGameEffectSettings();
         if ((Game_GetMode() == 26 || Game_GetMode() == 22) && gSession.nSplitScreen) {
-            v = lbl_80184D90;
-            fn_80063B98(fn_80017028(gPlayers[0].nView0), 0.0f, (f32*)&v);
-            fn_80063B98(fn_80017028(gPlayers[1].nView0), 0.0f, (f32*)&v);
+            f32 v[4] = {0.0f, 0.0f, 0.0f, 1.0f};
+            fn_80063B98(fn_80017028(gPlayers[0].nView0), 0.0f, v);
+            fn_80063B98(fn_80017028(gPlayers[1].nView0), 0.0f, v);
         }
         if (bHuman) {
             fn_80062D38(0xE, 2, 1);
