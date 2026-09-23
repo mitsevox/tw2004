@@ -512,7 +512,7 @@ typedef struct GameState {
     void (*pfn25C)(void);       // 0x25C
     void (*pfn260)(int nPlayer); // 0x260
     u8   (*pfn264)(int nPlayer); // 0x264  "aim at the pin?" for a re-plan
-    void (*pfn268)(void);       // 0x268
+    void (*pfn268)(int nPlayer, int nId); // 0x268  a bonus was collected (GameMode16)
     s32  (*pfn26C)(int a, int nTarget); // 0x26C  a target's state for the HUD (GameMode14)
     u8   bShowYardage;          // 0x270  show how far each shot went
     u8   b271;                  // 0x271
