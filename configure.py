@@ -473,7 +473,7 @@ config.libs = [
             Object(Matching, "src/axfx/delay.c"),
             Object(NonMatching, "src/dsp/dsp.c"),
             Object(Matching, "src/dvd/dvdFatal.c"),
-            Object(NonMatching, "src/gx/GXDisplayList.c"),
+            Object(Matching, "src/gx/GXDisplayList.c"),
             Object(NonMatching, "src/gx/GXTransform.c"),
             Object(Matching, "src/os/OSFont.c"),
             Object(Matching, "src/os/OSLink.c"),
