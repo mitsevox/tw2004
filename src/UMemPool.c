@@ -11,7 +11,6 @@ int  fn_8000A818(f32 (*pA)[4], f32 (*pB)[4]);
 void fn_8000AD34(f32* pA, f32* pB);
 void fn_8000ADC0(f32 (*pDst)[4]);
 void fn_8000AE0C(f32* pSrc, f32* pDst);
-void fn_8000AE28(f32* pIn, f32 fScale, f32* pOut);
 void fn_8000AE6C(f32* pA, f32* pB, f32 fScale, f32* pOut);
 void fn_8000AE9C(void);
 void fn_800BADB4(f32 (*pMtx)[4], f32* pIn, f32* pOut);     // a vector through a matrix

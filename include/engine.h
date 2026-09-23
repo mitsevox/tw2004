@@ -67,7 +67,6 @@ void RTClock_GetDateTimeString(char* szOut);   // "M/D/YYYY H:MM AM"
 
 void Vec3Copy(const f32* pSrc, f32* pDst);   // 0x80008304 (const: see code_800082F8.c)
 f32  fn_800095F0(f32 fAngle);           // sin
-f32  fn_80009614(f32 x);                // acos
 f32  fn_80009638(f32 fAngle);           // cos
 f32  fn_8000965C(f32 x);                // asin
 double fn_80009680(double x);           // sqrt
