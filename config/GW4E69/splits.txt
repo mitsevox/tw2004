@@ -26,8 +26,8 @@ unsorted/sweep_800055D4.c:
 unsorted/sweep_800055D8.c:
 	.text       start:0x800055D8 end:0x80005628
 
-unsorted/sweep_80005BC8.c:
-	.text       start:0x80005BC8 end:0x80005BE8
+LLMem_Gc.c:
+	.text       start:0x80005628 end:0x80005BE8
 
 LLFileIO_Gc.c:
 	.text       start:0x80005BE8 end:0x800066E4
