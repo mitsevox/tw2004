@@ -92,6 +92,9 @@ int  fn_800D38F0(int nWinner, int nLoser, int nMargin, s32* pPrize);   // a ladd
 int  fn_800D3C1C(void);                // TW06 GM_GetHighestRatedGolfer: the best rating among the players
 s32  fn_800D3D64(int nRating, int nHole);   // TW06 GM_Earnings_GetSkinsHoleValue
 u8   fn_800D750C(int nPlayer, int nAward);  // give an award if the player does not have it yet
+void fn_800D8D10(int nPlayer);          // clear the player's flags b30C..b30F
+void fn_800D8D38(int nPlayer);          // clear the flags fn_800D9350 sets (b310..b312)
+void fn_800D8D5C(int nPlayer);          // clear the player's money breakdown for the round
 u8   fn_800D9998(int nPlayer, int nAward);
 
 #endif

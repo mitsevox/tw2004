@@ -639,6 +639,29 @@ u8 fn_800D7770(int nPlayer, Award* pAward) {
     return 1;
 }
 
+// Whether nValue and szName are among the top five of course k's record i. Never on a round whose
+// holes are not one course's 1..18.
+int fn_800D8458(int i, int nValue, const char* szName, int k) {
+    RecordEntry* pRec;
+    int j;
+
+    if (gpGame->b136) return 0;
+    for (j = 0; j < 5; j++) {
+        pRec = &gSession.aCourseRecord[k].aRecord[i][j];
+        if (pRec->nValue == nValue && strcmp(pRec->szName, szName) == 0) {
+            return 1;
+        }
+    }
+    // EA bug: the same five entries are searched again
+    for (j = 0; j < 5; j++) {
+        pRec = &gSession.aCourseRecord[k].aRecord[i][j];
+        if (pRec->nValue == nValue && strcmp(pRec->szName, szName) == 0) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
 // Whether nValue and szName are among the top five of all-time record recB[k][i].
 int fn_800D853C(int i, int nValue, const char* szName, int k) {
     RecordEntry* pRec;
