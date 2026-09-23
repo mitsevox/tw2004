@@ -3663,6 +3663,9 @@ dolphin/os/OSContext.c:
 
 dolphin/os/OSError.c:
 	.text       start:0x8014A0AC end:0x8014A758
+	.data       start:0x8019B770 end:0x8019BA90
+	.bss        start:0x8027C9B0 end:0x8027C9F8
+	.sdata      start:0x80281AC0 end:0x80281AC8
 
 src/os/OSFont.c:
 	.text       start:0x8014A758 end:0x8014A7B0
