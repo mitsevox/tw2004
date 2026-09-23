@@ -92,7 +92,6 @@ void  fn_800E2A88(void);
 void  fn_800E1018(int nPlayer, int nHole);
 void  fn_800C6C8C(void);
 void  fn_800E41C8(void);
-u8    Ter_PointInOOBNetwork(u8* pBall);
 
 void  Vec3Copy(void* pSrc, void* pDst);
 u8    fn_800E27A8(void);
@@ -797,7 +796,7 @@ int GM_ShowPostShotAnimation(int nPlayer) {
         } else {
             fSlope = 0.0f;
         }
-        if (!Ter_PointInOOBNetwork((u8*)vPos) || (pSurf != NULL && !(pSurf->u34 & 1)) || pSurf->nClass == 7 ||
+        if (!Ter_PointInOOBNetwork(vPos) || (pSurf != NULL && !(pSurf->u34 & 1)) || pSurf->nClass == 7 ||
             pSurf->nClass == 16 || (fn_8000AD9C(fSlope) > 0.1f && fRise > 0.2f)) {
             return 0;
         }
@@ -909,7 +908,7 @@ void GM_ReplaceOOBBall(int nPlayer) {
     f32* pPre;
     u8*  pBall;
     if ((gPlayers[nPlayer].b30E ||
-         (Ter_PointInOOBNetwork(gPlayers[nPlayer].ball) && !gPlayers[nPlayer].bLowIQPenalty)) &&
+         (Ter_PointInOOBNetwork((f32*)gPlayers[nPlayer].ball) && !gPlayers[nPlayer].bLowIQPenalty)) &&
         Ter_SearchAreaForDropLocation(nPlayer, 1, 1, v)) {
         Physics_DropBall((Ball*)gPlayers[nPlayer].ball, v);
         return;

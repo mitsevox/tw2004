@@ -55,14 +55,12 @@ s32   fn_8000C140(f32* pPos, TNetwork* pNet, s32 nNodes);   // point in outline.
 u8    fn_8000C3C8(f32* pFrom, f32* pTo, TNetwork* pNet, s32 nNodes, f32* pHit);   // segment crosses outline
 void  fn_8004B588(TNetwork* pNet);
 u8    Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 a, u8 b, f32 f, u8 c, f32 g);
-u8    Ter_PointInOOBNetwork(f32* pPos);
 u8    Ter_PointInFreeDropNetwork(f32* pPos);
 u8    Ter_LieIsPreferred(u32 nLie);
 f32   Ter_GetSupportingGroundData(CourseInfo* pCourse, f32* pPos, SurfaceType** ppSurface, f32* pNormal);
 void  fn_8004B63C(TNetwork* pNet);
 void  Vec3Copy(f32* pSrc, f32* pDst);                     // 0x80008304
 void  vec4flt_CrossProduct(f32* pA, f32* pB, f32* pOut);
-void  fn_800BAF04(f32* pSrc, f32* pDst);                  // normalise
 f32   fn_8000C5FC(f32* pA, f32* pB);                      // dot product
 void  fn_8005097C(f32* pA, f32* pB, f32* pOut);           // a - b (paired-single assembly)
 void  fn_800509A0(f32* pSrc, f32* pDst);                  // negate (paired-single assembly)
@@ -132,7 +130,7 @@ void fn_8004B1A4(void) {
 
 // TW06: bool Ter_Use3DCupGeometry(void). Whether the cup is real geometry the ball drops into;
 // without it, GameRound.c holes a ball that stops within half a yard of the pin.
-u8 fn_8004B580(void) {
+u8 Ter_Use3DCupGeometry(void) {
     return lbl_80281DC0;
 }
 
@@ -160,7 +158,7 @@ void fn_8004B63C(TNetwork* pNet) {
 }
 
 // TW06: s32 Ter_iNumOOBNetworksLoaded(void).
-s32 fn_8004B65C(void) {
+s32 Ter_iNumOOBNetworksLoaded(void) {
     return lbl_80281DC8;
 }
 

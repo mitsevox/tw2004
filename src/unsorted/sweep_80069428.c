@@ -3,7 +3,7 @@
 #include "game_types.h"
 
 s32 fn_8000C140();
-s32 fn_8004B65C();
+s32 Ter_iNumOOBNetworksLoaded();
 s32 Ter_PointInOOBNetwork();
 extern void* lbl_80281E30;
 
@@ -13,7 +13,7 @@ s32 fn_80069428(s32 arg0) {
         if (fn_8000C140(arg0, (void* ) lbl_80281E30, (*(s16*)((u8*)(lbl_80281E30) + 2))) != 0) {
             return 1;
         }
-        if (fn_8004B65C() > 0) {
+        if (Ter_iNumOOBNetworksLoaded() > 0) {
             return Ter_PointInOOBNetwork(arg0);
         }
         return 0;

@@ -80,7 +80,6 @@ void  GM_SimulateBallMovement(int nPlayer);
 u8    fn_80058F5C(int nPlayer);                 // the per-frame swing poll: the ball was struck
 void  fn_800ED710(s32 p0);
 void  Vec_Normalize(f32* pSrc, f32* pDst);
-u8    Ter_PointInOOBNetwork(u8* pBall);
 void  fn_80069330(int nPlayer, f32* pPos);
 void  fn_8006A6C4(int nPlayer);
 void  PlaceBall_UpdateMomentums(int nPlayer, f32 f);
@@ -1086,7 +1085,7 @@ void fn_800FBD2C(int nPlayer) {
                 }
             }
             pBall = p->ball;
-            if (!Ter_PointInOOBNetwork(pBall)) {
+            if (!Ter_PointInOOBNetwork((f32*)pBall)) {
                 gPlayers[nPlayer].nBallState = 5;
             }
             if (gPlayers[nPlayer].nBallState == 5) {
