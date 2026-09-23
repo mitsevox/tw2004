@@ -569,7 +569,7 @@ config.libs = [
             Object(NonMatching, "MetroTRK/mslsupp.c"),
             Object(Matching, "MetroTRK/UDP_Stubs.c"),
             Object(NonMatching, "MetroTRK/ddh/main.c"),
-            Object(NonMatching, "MetroTRK/CircleBuffer.c"),
+            Object(Matching, "MetroTRK/CircleBuffer.c"),
             Object(NonMatching, "MetroTRK/gdev/main.c"),
             Object(Matching, "MetroTRK/MWTrace.c"),
         ],
