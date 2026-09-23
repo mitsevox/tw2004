@@ -1,5 +1,5 @@
 // GameMode14.c (our name): game mode 14, a two-player target game. The targets are 40 spots on the
-// hole (the list in GameMode10.c). Landing on a target claims it for you, unless the other player
+// hole (the list in GameModeReplay.c). Landing on a target claims it for you, unless the other player
 // has one there that is at least as close. The first to hold 5 targets wins. Each target is worth
 // points by how close the claiming shot was.
 
@@ -20,17 +20,13 @@ extern Claim lbl_80211FB8[40];
 extern Replay gReplayData;
 extern u8  gNumPlayersSetUp;
 extern s32 lbl_80282278;                    // the player whose turn it is
-extern s8  lbl_80282360;                    // the number of targets (GameMode10.c)
+extern s8  lbl_80282360;                    // the number of targets (GameModeReplay.c)
 extern s32 lbl_80281688;                    // the options saved while the game runs
 extern s32 lbl_80282368;
 extern s32 lbl_8028236C;                    // who starts: 0 or 1, at random
 extern u8  lbl_80282370;                    // the round was ended
 extern s32 lbl_80282374;                    // the points of the last claim
 extern s32 lbl_801928F0[];                  // points per rank
-
-void  fn_800E5B0C(int nMsg, u32 uFloats, void* p0, void* p1, void* p2, void* p3, void* p4);
-int   fn_800F1D34(int nPlayer);
-s32   fn_800F266C(s32 n, int i);
 
 void  fn_800F2BBC(void);
 void  fn_800F2BD8(void);
@@ -46,13 +42,11 @@ void  fn_800F33D0(int nPlayer);
 u8    fn_800F3410(int a);
 void  fn_800F3418(int nPlayer);
 u8    fn_800F3438(int nPlayer, int a);
-s32   fn_800F354C(int nPlayer);
 s32   fn_800F3668(int n);
 void  fn_800F36A4(void);
 void  fn_800F3800(int nPlayer);
 void  fn_800F3860(void);
 s32   fn_800F392C(int a, int i);
-void  fn_800F39CC(s32 p0);
 
 // Mode 14 starts: two players, no wind, no gimmes, no mulligans.
 void fn_800F2984(void) {
@@ -370,7 +364,7 @@ s32 fn_800F34F0(int nPlayer) {
 }
 
 // How many targets the player holds.
-s32 fn_800F354C(int nPlayer) {
+int fn_800F354C(int nPlayer) {
     s32 n = 0;
     int i;
     for (i = 0; i < 40; i++) {
@@ -415,7 +409,7 @@ void fn_800F36A4(void) {
     }
 }
 
-s32 fn_800F37F8(void) {
+s32 fn_800F37F8(s32 a) {
     return lbl_80282374;
 }
 

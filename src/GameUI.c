@@ -6,13 +6,7 @@
 #include "engine.h"
 
 void  fn_8001437C(void);
-void  fn_800E542C(void);
-void  fn_800E5450(void);
-void  fn_80062C5C(void);
 void  fn_8006A8B0(void);
-void  fn_800E0AC4(int a);
-void  fn_800E0A98(int a);
-void  fn_800E5474(int a);
 
 extern u8  lbl_80282281;                    // the end-of-round screen is up
 extern u8  lbl_80282282;                    // the end-of-hole screen is up
@@ -54,10 +48,7 @@ extern u8  lbl_802822D7;                    // the HUD on screen 3 (split screen
 extern u8  lbl_802822D8;                    // the HUD on screen 2 (split screen, player 1)
 extern u8  lbl_802822D9;                    // the HUD on the single screen
 extern u8  lbl_802822DA;
-void  fn_800E5DA0(void);
-void  fn_800E3B04(void);
 void  fn_800E3E0C(void);
-void  fn_800E5A4C(int a, int b, int* pA, f32* pF, int* pB);
 
 // Clears every display flag and timer at the start of a round.
 void fn_800E3B28(void) {
@@ -136,35 +127,13 @@ extern UIQueueItem lbl_80202B94[10];        // queue 11 (lbl_80282288)
         (q)[i].c = c;       \
     }
 
-void  fn_800E5C08(int a, u8* p);
-void  fn_800E56D0(int a, int b, int c);
-void  fn_800E5698(int a, int b, int c);
-void  fn_800E5660(int a, int b, int c);
-void  fn_800E5628(int a, int b, int c);
-void  fn_800E55F0(int a, int b, int c);
-void  fn_800E55B8(int a, int b, int c);
-void  fn_800E5580(int a, int b, int c);
-void  fn_800E5548(int a, int b, int c);
-void  fn_800E5510(int a, int b, int c);
-void  fn_800E54D8(int a, int b, int c);
-void  fn_800E54A0(int a, int b, int c);
-
 typedef struct Vec4 { f32 x, y, z, w; } Vec4;
 extern Vec4 lbl_80184D90;
-extern u8   lbl_80281640[8];
+extern char lbl_80281640[8];
 
-void  fn_80062CE0(int a);
-u8    fn_80095430(int a);
 void  fn_80095444(int a);
 void  fn_80125814(int a);
-void  fn_800ECBE4(void);
-void  fn_80101EDC(void);
-u8    fn_800E5C84(void);
 void  fn_800A7350(int a);
-void  fn_8009EF98(void);
-void  fn_800E1018(int nPlayer, int nHole);
-void  fn_8006F4B4(void);
-int   GM_GotoNextSelectedHole(void);
 extern u8 gNumPlayersSetUp;                 // 0x80281D48 (Golfer.c)
 
 void fn_800E3BEC(void) {
@@ -393,8 +362,8 @@ void fn_800E42F4(int i) {
     lbl_802822DB = 0;
 }
 
-int fn_800E430C(int nPlayer) {
-    u8 b = 0;
+u8 fn_800E430C(int nPlayer) {
+    int b = 0;
     if (fn_800E415C() || fn_800E4254(nPlayer)) {
         b = 1;
     }
@@ -457,7 +426,7 @@ void fn_800E45C0(void) {
 }
 
 // Whether any of the display timers or flags is still running.
-int fn_800E45CC(void) {
+u8 fn_800E45CC(void) {
     if (lbl_802822B8 != 0 || lbl_802822B4 != 0 || lbl_802822B0 != 0 || lbl_802822AC != 0 || lbl_802822A8 != 0 ||
         lbl_802822A4 != 0 || lbl_802822C3 != 0 || lbl_802822C4 != 0 || lbl_802822C1 != 0 || lbl_802822C2 != 0 ||
         lbl_8028229C != 0 || lbl_80282298 != 0 || lbl_80282294 != 0 || lbl_80282290 != 0 || lbl_8028228C != 0 ||
@@ -474,8 +443,8 @@ int fn_800E45CC(void) {
 // Two copy-and-paste slips in the original are kept: queue 4 reads its item's second and third
 // values with queue 3's count (always 0 here, so from the entry before the queue), and queue 8
 // reads its third value from one entry past the item.
-int fn_800E46B4(void) {
-    int bBusy = 0;
+u8 fn_800E46B4(void) {
+    u8 bBusy = 0;
     if (lbl_802822BC) {
         return 1;
     }
