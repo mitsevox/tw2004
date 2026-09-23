@@ -3616,13 +3616,7 @@ unsorted/sweep_800DC514.c:
 	.text       start:0x800DC514 end:0x800DC524
 
 GameManager.c:
-	.text       start:0x800DCA94 end:0x800DFC18
-
-unsorted/sweep_800E0A84.c:
-	.text       start:0x800E0A84 end:0x800E0A98
-
-unsorted/sweep_800E0A98.c:
-	.text       start:0x800E0A98 end:0x800E0AF0
+	.text       start:0x800DCA94 end:0x800E0AF0
 
 unsorted/sweep_800E177C.c:
 	.text       start:0x800E177C end:0x800E1788

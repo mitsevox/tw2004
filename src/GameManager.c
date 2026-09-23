@@ -8,7 +8,7 @@
 typedef struct View View;
 
 void  fn_800E58B4();
-s32   fn_800E0A84(s32);
+void  fn_800E0A84(u8 v);
 s32   fn_800E1074();
 s32   fn_800E1434();
 u8    fn_800EC550(void);
@@ -167,8 +167,8 @@ void  fn_80095744(int nHandle, int nAnim);   // play an animation
 void  fn_800689D4(int nPlayer);
 void  fn_80062C38(void);
 void  fn_800C4E80(void* pView, int nPlayer);
-u8    fn_800DFFF8(int nPlayer);
-u8    fn_800E0200(int nPlayer);
+u8    GM_bIsZoomButtonPressed(int nPlayer);
+u8    GM_bIsElevatorCamButtonPressed(int nPlayer);
 u8    fn_800E012C(int nPlayer);
 u8    fn_800DFF0C(int nPlayer);
 u8    fn_80068AC8(int nPlayer);
@@ -192,6 +192,8 @@ f32   fn_8000AD9C(f32 x);                   // fabsf
 void  fn_800E0B14(f32* pA, f32* pB, f32* pOut);
 u8    fn_8004560C(void);
 int   fn_80095798(int nHandle);
+
+void  fn_800E5228(void);
 
 extern u8  lbl_80202898[];
 extern s32 lbl_80282278;
@@ -1052,9 +1054,9 @@ void GM_CheckForShotChanges(int nPlayer) {
             fn_800E3D38(nPlayer, 1);
             bChanged = 1;
         }
-        if (fn_800DFFF8(nPlayer)) {
+        if (GM_bIsZoomButtonPressed(nPlayer)) {
             GOLFERSTATE_Push(GS_ZOOM, nPlayer);
-        } else if (!gpGame->b28D && fn_800E0200(nPlayer)) {
+        } else if (!gpGame->b28D && GM_bIsElevatorCamButtonPressed(nPlayer)) {
             GOLFERSTATE_Push(GS_ELEVATOR, nPlayer);
         } else if (gpGame->b28D && (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x2F, 0))) {
             if (gpGame->pfn258(nPlayer)) {
@@ -1310,4 +1312,105 @@ void GM_SimulateBallMovement(int nPlayer) {
             }
         }
     }
+}
+
+// TW06: GM_CheckControllerPulled (by position). When the mode says a controller was pulled and
+// player 1's camera is at rest, the pause for it (fn_800E5228).
+void GM_CheckControllerPulled(void) {
+    if (gpGame->pfn234()) {
+        if (!fn_80063C90(fn_80017028(gPlayers[0].nView0))) {
+            fn_800E5228();
+        }
+    }
+}
+
+// Button 8 tapped: released after 2 to 5 frames of holding (the count is kept by GM_bIsZoomButtonPressed).
+// A tap asks for the mid-hole flyover (when the mode has one, 0x280); a hold is the zoom camera.
+u8 fn_800DFF0C(int nPlayer) {
+    if (!gpGame->b280) {
+        return 0;
+    }
+    if ((fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(8, 0)) ||
+        (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(8, 1))) {
+        return 0;
+    }
+    if (gpGame->n144[nPlayer] <= 1) {
+        gpGame->n144[nPlayer] = 0;
+        return 0;
+    }
+    if (gpGame->n144[nPlayer] < 6) {
+        gpGame->n144[nPlayer] = 0;
+        return 1;
+    }
+    return 0;
+}
+
+// TW06: GM_bIsZoomButtonPressed. Button 8 held: counts frames (at 59.94 a second) and says yes
+// once it has been held for 6.
+u8 GM_bIsZoomButtonPressed(int nPlayer) {
+    if ((fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(8, 0)) && gpGame->n144[nPlayer] == 0) {
+        gpGame->n144[nPlayer]++;
+    } else if (gpGame->n144[nPlayer] > 0) {
+        if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(8, 1)) {
+            gpGame->n144[nPlayer] += (int)(59.94f * gSession.fFrameTime + 0.5f);
+            if (gpGame->n144[nPlayer] >= 6) {
+                gpGame->n144[nPlayer] = 0;
+                return 1;
+            }
+            return 0;
+        }
+        return 0;
+    }
+    return 0;
+}
+
+// Button 47 tapped (2 to 19 frames): the green camera.
+u8 fn_800E012C(int nPlayer) {
+    if ((fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x2F, 0)) ||
+        (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x2F, 1))) {
+        return 0;
+    }
+    if (gpGame->n158[nPlayer] <= 1) {
+        gpGame->n158[nPlayer] = 0;
+        return 0;
+    }
+    if (gpGame->n158[nPlayer] < 20) {
+        gpGame->n158[nPlayer] = 0;
+        return 1;
+    }
+    return 0;
+}
+
+// TW06: GM_bIsElevatorCamButtonPressed. Button 47 held for 20 frames.
+u8 GM_bIsElevatorCamButtonPressed(int nPlayer) {
+    if ((fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x2F, 0)) && gpGame->n158[nPlayer] == 0) {
+        gpGame->n158[nPlayer]++;
+    } else if (gpGame->n158[nPlayer] > 0) {
+        if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x2F, 1)) {
+            gpGame->n158[nPlayer] += (int)(59.94f * gSession.fFrameTime + 0.5f);
+            if (gpGame->n158[nPlayer] >= 20) {
+                gpGame->n158[nPlayer] = 0;
+                return 1;
+            }
+            return 0;
+        }
+        return 0;
+    }
+    return 0;
+}
+
+void fn_800E0A84(u8 v) {
+    gpGame->b135 = v;
+}
+
+u8 fn_800E0A90(int nPlayer) {
+    return 0;
+}
+
+void fn_800E0A98(int a) {
+    fn_80062D6C(46, (u8)a);
+}
+
+void fn_800E0AC4(int a) {
+    fn_80062D6C(29, (u8)a);
 }

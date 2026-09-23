@@ -360,7 +360,8 @@ typedef struct GameState {
     s32  n12C;                  // 0x12C
     u8   unk130[4];
     u8   b134;                  // 0x134  cleared at the start of a hole
-    u8   unk135[0x144 - 0x135];
+    u8   b135;                  // 0x135  set by fn_800E0A84
+    u8   unk136[0x144 - 0x136];
     s32  n144[5];               // 0x144  per player, cleared at the start of a hole
     s32  n158[5];               // 0x158  per player, cleared at the start of a hole
     u8   unk16C[0x1CC - 0x16C];
@@ -387,7 +388,8 @@ typedef struct GameState {
     void (*pfn224)(void);       // 0x224  the hole restarts
     void (*pfn228)(int nPlayer); // 0x228  called every frame of the shot setup (state 10)
     void (*pfn22C)(int nPlayer); // 0x22C  called after a re-plan in swing state 9
-    u8   unk230[0x238 - 0x230];
+    u8   unk230[4];
+    u8   (*pfn234)(void);       // 0x234  a controller was pulled
     u8   (*pfn238)(int nPlayer); // 0x238  nonzero: skip addressing the ball (swing state 1)
     u8   unk23C[0x248 - 0x23C];
     void (*pfn248)(int nPlayer); // 0x248  end of a golfer's turn
@@ -412,7 +414,7 @@ typedef struct GameState {
     u8   unk27B[0x27E - 0x27B];
     u8   b27E;                  // 0x27E
     u8   b27F;                  // 0x27F
-    u8   unk280;
+    u8   b280;                  // 0x280  the mid-hole flyover button works
     u8   b281;                  // 0x281  tutorial tips may show at setup
     u8   b282;                  // 0x282
     u8   b283;                  // 0x283  the special swing cameras may be used
