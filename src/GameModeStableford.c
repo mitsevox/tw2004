@@ -6,24 +6,13 @@
 #include "golfer.h"
 #include "game.h"
 #include "game/save.h"
+#include "game/earnings.h"
 
 void  fn_80125854(int a);
 extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
 extern s32 lbl_80282278;                    // the player whose turn it is
 // The points for 3 under par .. 2 or more over. TW06: GameModeStableford::stablefordPointTable.
 extern s8  lbl_802816D0[6];
-
-// Per golfer (gGolferTable's 34): the prize for beating them (lbl_80200538 + 0x1D4, 8 bytes each).
-typedef struct GolferPrize {
-    s32 nBase;
-    s32 nPerStroke;
-} GolferPrize;
-typedef struct PrizeTable {
-    u8          unk0[0x1D4];
-    GolferPrize prize[34];      // 0x1D4
-} PrizeTable;
-extern PrizeTable lbl_80200538;
-#define GOLFER_PRIZE(n) lbl_80200538.prize[n]
 
 u8   fn_800FE2B4(int nPlayer);
 void fn_800FE344(void);
@@ -225,15 +214,15 @@ void fn_800FE8A8(void) {
 }
 
 // TW06: GameModeStableford::EndGame (empty there). Each human with a profile who finished the round
-// in fewer strokes than a CPU player wins money: the prize of the best such CPU golfer, its base
-// plus its per-stroke prize for up to 5 strokes of margin.
+// in fewer strokes than a CPU player wins money: the prize for the best earnings rating among those
+// CPU players, its base plus its per-stroke prize for up to 5 strokes of margin.
 void fn_800FE980(void) {
     int i;
     int j;
     int nBest;
     int nOurs;
     int nTheirs;
-    int nGolfer;
+    int nRating;
     int nMoney;
     int nMargin;
     int nBase;
@@ -254,9 +243,9 @@ void fn_800FE980(void) {
                     if (i != j && Player_IsCPU(j)) {
                         nTheirs = fn_800E1788(j);
                         if (nOurs < nTheirs) {
-                            nGolfer = fn_800D3C7C(j);
-                            if (nGolfer > nBest) {
-                                nBest = nGolfer;
+                            nRating = fn_800D3C7C(j);
+                            if (nRating > nBest) {
+                                nBest = nRating;
                                 nMargin = nTheirs - nOurs;
                             }
                         }
@@ -266,9 +255,9 @@ void fn_800FE980(void) {
                     if (nMargin > 5) {
                         nMargin = 5;
                     }
-                    nBase = GOLFER_PRIZE(nBest).nBase;
+                    nBase = lbl_80200538.aStrokePrize[nBest].nBase;
                     nProfile = PLAYER(i)->nIndex;
-                    nMoney = nBase + GOLFER_PRIZE(nBest).nPerStroke * nMargin;
+                    nMoney = nBase + lbl_80200538.aStrokePrize[nBest].nPerStroke * nMargin;
                     if (gpSaveData[nProfile].bActive) {
                         if (bFirst) {
                             fn_80125854(1);
