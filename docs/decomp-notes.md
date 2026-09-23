@@ -240,6 +240,9 @@ The fixes that come up most often. Each points to its full entry below.
 
 ### Structs, arrays and pointers
 
+- **[verified] The `(u32)` index habit applies to other global arrays too:** a loop over
+  `gSwingStacks` with a separate base and 6-byte offset is `gSwingStacks[(u32)i]` (Swing
+  `fn_8005CD94` 84.2% -> 100, `GOLFERSTATE_Update` 86.6% -> 100).
 - **[verified] Other global arrays follow the gPlayers rule.** `gSwingStacks[n].nState[
   gSwingStacks[n].nTop]` written out each time, not `SwingStack* p` / `s8* pTop` locals (Swing
   `GOLFERSTATE_Pop` 98.53% -> 100; the permuter found it).
@@ -380,6 +383,12 @@ The fixes that come up most often. Each points to its full entry below.
 
 ### Function calls and parameters
 
+- **[verified] A wrong prototype can hide the real call shape and still score in the 80s-90s.**
+  Check each prototype against the real definition, then check r3/r4 are set or kept live
+  before each `bl`: `fn_80039344(View*, f32)` was really `(int nView, f32)` (Swing
+  `STATEFUNC_GreenMorphExit` 94.8% -> 100); `GM_BumpBallForObstructions(void)` really takes
+  `nPlayer` (`STATEFUNC_ShowYardageExit` 88.8% -> 100). `fabsf` is `double fabsf(double)`: an
+  `f32` declaration changes Swing's calls (`Swing_MisHitRumble` 99.5% -> 100 with `double`).
 - **[verified] A callee that ignores r3, called while r3 still holds the caller's first
   parameter, takes that parameter.** `Scenario_RequiredShape()` -> `(nPlayer)` (Golfer
   `AI_FaceVector` 99.72% -> 100). Likewise a callee starting `clrlwi. r0, r3, 24` has a `u8`
