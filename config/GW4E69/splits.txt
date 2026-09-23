@@ -1123,35 +1123,8 @@ hlaudmovie.c:
 hlaudtrack.c:
 	.text       start:0x800A9808 end:0x800AA4BC
 
-unsorted/sweep_800AA694.c:
-	.text       start:0x800AA694 end:0x800AA698
-
-unsorted/sweep_800AAAA0.c:
-	.text       start:0x800AAAA0 end:0x800AAAA4
-
-unsorted/sweep_800AAB48.c:
-	.text       start:0x800AAB48 end:0x800AAB8C
-
-unsorted/sweep_800AAD14.c:
-	.text       start:0x800AAD14 end:0x800AAD18
-
-unsorted/sweep_800AADE8.c:
-	.text       start:0x800AADE8 end:0x800AAE08
-
-unsorted/sweep_800AAE70.c:
-	.text       start:0x800AAE70 end:0x800AAE90
-
-unsorted/sweep_800AAEEC.c:
-	.text       start:0x800AAEEC end:0x800AAEFC
-
-unsorted/sweep_800AB32C.c:
-	.text       start:0x800AB32C end:0x800AB374
-
-unsorted/sweep_800AB374.c:
-	.text       start:0x800AB374 end:0x800AB384
-
-unsorted/sweep_800AB39C.c:
-	.text       start:0x800AB39C end:0x800AB3A4
+hlaudtrackseq.c:
+	.text       start:0x800AA4BC end:0x800AB3A4
 
 hlaudtrackstm.c:
 	.text       start:0x800AB3A4 end:0x800AC330
