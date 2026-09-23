@@ -311,7 +311,7 @@ void fn_800EAB44(void) {
         if (!Player_IsCPU(nWinner)) {
             nProfile = gPlayers[nWinner].nIndex;
             if (gpSaveData[nProfile].bActive) {
-                fn_80125910(1);
+                EASBio_SetCurrentGameWon(1);
                 if (nMoney) {
                     fn_800E4364(0, 0x6B, nPrize, nProfile);
                     fn_800D3548(nWinner, nMoney, 0);

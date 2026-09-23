@@ -196,11 +196,11 @@ void fn_800DB30C(int nPlayer, int nReason) {
     }
     if (lbl_80202898.bGameBreaker != 1 && !Player_IsCPU(nPlayer)) {
         if (nReason == 12) {
-            if (fn_800E17AC(nPlayer) + 1 >= gSession.aCourseRecord[Game_GetCourse()].n0) {
+            if (fn_800E17AC(nPlayer) + 1 >= gSession.aCourseRecord[Game_GetCourse()].aRecord[0][0].nValue) {
                 return;
             }
-        } else if (nReason == 15 &&
-                   !(3.0f * gPlayers[nPlayer].fA64 > gSession.aCourseRecord[Game_GetCourse()].nC8)) {
+        } else if (nReason == 15 && !(3.0f * gPlayers[nPlayer].fA64 >
+                                      gSession.aCourseRecord[Game_GetCourse()].aRecord[2][0].nValue)) {
             return;
         }
         GB_START(nPlayer, nReason);

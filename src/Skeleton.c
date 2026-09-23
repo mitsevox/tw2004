@@ -3,16 +3,71 @@
 // per-bone factors of the character's model. The types are in character.h.
 
 #include "character.h"
+#include "charstate.h"
 
-void fn_8002703C(Skeleton* pSkel, IKChain* pChain, f32 fWeight);
-void fn_800284DC(Skeleton* pSkel);                      // frees a skeleton
 void fn_80009710(f32* pQuat);                           // identity (0, 0, 0, 1)
+void fn_8000923C(f32* pRot, f32* pQuat);                // a rotation vector (axis * angle) as a quaternion
+void fn_8001E938(u32* aBits, u32 nBits);                // clears a bit array
+void fn_80029BC8(f32* pVec);                            // sets a vector to lbl_80186838
 void fn_800BADF8(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);   // pDst = pSrc's rows
                                                                                 // through pMtx
 void fn_80113E60(void);                                 // DynChain.c
 void fn_80114080(void);                                 // DynChain.c
 void fn_80114398(struct DynChain* pChain);              // DynChain.c: frees a chain
 void fn_8011443C(CharModel* pModel, struct DynChain* pChain, f32 f);   // DynChain.c
+
+// Poses the chain's links (those with f4 above 0) from their rotation vectors.
+void fn_80026B4C(Skeleton* pSkel, IKChain* pChain) {
+    int i;
+    for (i = 0; i < pChain->nLinks; i++) {
+        IKLink* pLink = &pChain->pLinks[i];
+        if (pLink->f4 > 0.0f) {
+            fn_8000923C(pLink->v58, pSkel->p20[pLink->nBone]);
+        }
+    }
+}
+
+// Resets the chain's links (all of them with bAll, else those with f4 above 0) to no rotation and
+// clears their bones' bits.
+void fn_80026F90(Skeleton* pSkel, IKChain* pChain, u8 bAll) {
+    int i;
+    for (i = 0; i < pChain->nLinks; i++) {
+        if (bAll || pChain->pLinks[i].f4 > 0.0f) {
+            int nBone = pChain->pLinks[i].nBone;
+            fn_80009710(pSkel->p20[nBone]);
+            fn_8001EB6C(pSkel->a10, nBone);
+        }
+    }
+}
+
+// Copies the chain's rotations from p20 to p24; below full weight, blends them toward the
+// identity by the weight.
+void fn_8002703C(Skeleton* pSkel, IKChain* pChain, f32 fWeight) {
+    int i;
+    for (i = 0; i < pChain->nLinks; i++) {
+        int nBone = pChain->pLinks[i].nBone;
+        fn_8001E85C(pSkel->p20[nBone], pSkel->p24[nBone]);
+        if (fWeight < 1.0f) {
+            fn_8000883C(lbl_801C6498, pSkel->p24[nBone], fWeight);
+            Vec_Normalize(pSkel->p24[nBone], pSkel->p24[nBone]);
+        }
+    }
+}
+
+// Resets the skeleton: no transition, every bone's bit clear, v10A4 and v10B4 reset, full weight
+// in f10C4, and every chain reset.
+void fn_80027108(Skeleton* pSkel) {
+    int i;
+
+    pSkel->f1074 = 0.0f;
+    fn_8001E938(pSkel->a10, 0x80);
+    fn_80029BC8(pSkel->v10A4);
+    fn_80029BC8(pSkel->v10B4);
+    pSkel->f10C4 = 1.0f;
+    for (i = 0; i < pSkel->nChains; i++) {
+        fn_80026F90(pSkel, &pSkel->pChains[i], 1);
+    }
+}
 
 // Turns the IK on or off.
 void fn_80027738(u8 bOn) {
@@ -77,6 +132,28 @@ void SKEL_TransitionIK(Skeleton* pSkel, u8 b, f32 f) {
     }
 }
 
+// TW06: SKEL_TranslateIKChainY. Moves the chain's bones up by f, in their poses and matrices.
+void SKEL_TranslateIKChainY(CharModel* pModel, IKChain* pChain, f32 f) {
+    int i;
+    for (i = 0; i < pChain->nLinks; i++) {
+        int nBone = pChain->pLinks[i].nBone;
+        pModel->pPoses[nBone].v10[1] += f;
+        pModel->pMatrices[nBone][3][1] += f;
+    }
+}
+
+// Frees a skeleton: its chains' links, the chains, and both rotation sets.
+void fn_800284DC(Skeleton* pSkel) {
+    int i;
+    for (i = 0; i < pSkel->nChains; i++) {
+        fn_80009E70(pSkel->pChains[i].pLinks);
+    }
+    fn_80009E70(pSkel->pChains);
+    fn_80009E70(pSkel->p24);
+    fn_80009E70(pSkel->p20);
+    fn_80009E70(pSkel);
+}
+
 // Resets every bone's factors to 1.
 void fn_80028A3C(CharModel* pModel) {
     int i;
@@ -118,7 +195,7 @@ void fn_8002957C(CharModel* pModel) {
 
     fn_80009E70(pModel->pBones);
     fn_80009E70(pModel->pMatrices);
-    fn_80009E70(pModel->p34);
+    fn_80009E70(pModel->pPoses);
     if (pModel->pF0 != NULL) {
         fn_80114398(pModel->pF0);
     }

@@ -3,7 +3,7 @@
 #include "game_types.h"
 
 
-s32 fn_8015C120(void);
-s32 fn_8015C120(void) {
+s32 __close_console(void);
+s32 __close_console(void) {
     return 0;
 }

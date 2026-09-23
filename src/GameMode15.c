@@ -457,7 +457,7 @@ void fn_800F48C4(void) {
 // Game finished: the players still in are paid their points.
 void fn_800F4950(void) {
     int i;
-    fn_80125910(1);
+    EASBio_SetCurrentGameWon(1);
     for (i = 0; i < gNumPlayersSetUp; i++) {
         if (PLAYER(i)->nE88 < 5) {
             fn_800D3548(i, PLAYER(i)->nDD8, 0);

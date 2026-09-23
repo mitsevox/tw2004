@@ -145,8 +145,12 @@ typedef struct SaveProfile {
     char szName[0x1C - 0x1];    // 0x00001  the profile's name, compared with the record holders'
     u8   aGolferUnlocked[30];   // 0x0001C  per golfer (fn_80058278 sets, fn_8005832C tests)
     u8   aCourseUnlocked[23];   // 0x0003A  per course
-    u8   aRewardUnlocked[0x70 - 0x51];  // 0x00051  per reward (fn_80058428 sets); the
+    u8   aRewardUnlocked[0x64 - 0x51];  // 0x00051  per reward (fn_80058428 sets); the
                                 //          "THEKITCHENSINK" code (0x80056568) sets the first 18
+    s32  n64;                   // 0x00064  money: every payout is added (fn_800D3548); a course unlocks
+                                //          when it reaches the course's price (fn_800D3A20)
+    u8   unk68[4];
+    s32  n6C;                   // 0x0006C  money: every payout is added here too (fn_800D3548)
     u8   b70;                   // 0x00070  set when an award is won, a round is counted or a challenge
                                 //          starts; cleared when a round is set up (GameRound.c)
     u8   unk71[3];
@@ -188,9 +192,22 @@ typedef struct SaveProfile {
     char szGolferNames[6][8];   // 0x054C8  -> PlayerProfile.szNames
     u8   nGolferOutfit;         // 0x054F8  -> PlayerProfile.nOutfit
     u8   nGolferBallType;       // 0x054F9  -> PlayerProfile.nBallType
-    u8   unk54FA[0xB634 - 0x54FA];
+    u8   unk54FA[0xB054 - 0x54FA];
+    // Four bit arrays with a bit per Create-A-Player asset (0x80057F18's loop over them all, which
+    // also clears aB344 and aB4BC; fn_8001E9CC tests a bit).
+    u32  aAssetLocked[94];      // 0x0B054  the asset was locked (fn_80078008) when last checked
+    u32  aB1CC[94];             // 0x0B1CC  set where fn_80105C0C gives 0; an asset of lock kind 0
+                                //          stays locked until the bit its fn_80105610 names is set
+    u32  aB344[94];             // 0x0B344
+    u32  aB4BC[94];             // 0x0B4BC
     TourSeason tour;            // 0x0B634
-    u8   unk104D0[0x10578 - 0x104D0];
+    u8   unk104D0[0x1054C - 0x104D0];
+    struct {
+        u8  b;
+        u8  unk1;
+        s16 n;
+    } a1054C[11];               // 0x1054C  cleared by the profile setup; fn_80078008's lock kinds
+                                //          10 and 11 read them
     u8   a10578[4];             // 0x10578  marked holes 71..74: fn_800588F4's kind 0
     s32  a1057C[4];             // 0x1057C  and kind 1
     u8   unk1058C[0x10600 - 0x1058C];
@@ -199,6 +216,10 @@ LAYOUT_ASSERT(SaveProfile, 0x10600);
 
 extern SaveProfile* gpSaveData;
 extern SaveProfile* lbl_80281DF4;       // unlocks that hold for every profile (the cheat codes set them)
+extern u32 lbl_801D5948[8];             // a bit array the code at 0x80056480 keeps; fn_80078008's lock
+                                        // kind 6 tests bits 1..5 of it
+extern s32 lbl_80189528[14];            // the golfers GM_GetGameProgress counts as unlockable
+extern s32 lbl_801894D0[6];             // the courses GM_GetGameProgress counts as unlockable
 
 // Earnings.c: the awards
 u8   fn_800D7770(int nPlayer, Award* pAward);   // mark an award won today; 1 if it was not won before

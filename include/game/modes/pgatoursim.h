@@ -111,7 +111,7 @@ typedef struct PgaStatSort {
 extern PgaStatSort lbl_80281840;
 extern s32 lbl_80281848;        // the same for the score sorts: the player
 // Per statistic: its sort comparison, fn_8011BCFC (higher is better) or fn_8011BBD8 (lower).
-extern int (*lbl_80193FF8[GM_PGA_STAT_COUNT])(const void* pA, const void* pB);
+extern s32 (*lbl_80193FF8[GM_PGA_STAT_COUNT])(const void* pA, const void* pB);
 extern s32 lbl_80194074[GM_PGA_STAT_COUNT];     // per statistic: GM_PgaTourSim_GetStatView
 extern s32 lbl_801940F0[32];    // per statistic: the decimal places GM_PgaTourSim_GetStatValString prints
 extern u8  gbStatsDirty;        // the statistics need working out again
@@ -123,7 +123,7 @@ extern s32 lbl_80282504;        // the player's playoff strokes (fn_8011989C)
 void  fn_8011763C(void);                        // TW06: PGATourSimulation_OpenONCE
 void  fn_8011766C(void);                        // TW06: PGATourSimulation_CloseONCE
 void  fn_80117860(TourSeason* pTour);
-void  fn_801178C8(int nPlayer, SeasonEvent* pEvent, int nRound, int n, int uFlags);   // TW06: GM_PgaTourSim_SimRound
+void  fn_801178C8(s32 nPlayer, SeasonEvent* pEvent, int nRound, int n, int uFlags);   // TW06: GM_PgaTourSim_SimRound
 void  fn_80117AF8(int nPlayer);
 void  fn_80117B58(int nPlayer);
 void  fn_80117C50(int nPlayer, int nEntrant);

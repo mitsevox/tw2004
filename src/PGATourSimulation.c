@@ -18,8 +18,8 @@ void fn_80118B0C(int nPlayer, int n);
 void fn_80119B54(int nPlayer, int nRound, int nEntrant, int nHole);
 void fn_80119E28(int nPlayer, int nEntrant, int nRound);
 s32  fn_80119AE0(int nPlayer);
-int  fn_8011BDF8(const void* pA, const void* pB);
-int  fn_8011BF74(const void* pA, const void* pB);
+s32  fn_8011BDF8(const void* pA, const void* pB);
+s32  fn_8011BF74(const void* pA, const void* pB);
 s32  fn_80118664(int nPlayer);
 s32  TotalEntrantHoleScores(int nEntrant);
 void fn_8011A074(int nPlayer, int nRound, int nEntrant, int nHole);
@@ -34,8 +34,6 @@ void CalcScoreRankingsIfDirty(int nPlayer);
 void CalcAllStats(int nPlayer);
 void fn_80117694(UStreamObject* pObject);
 
-// qsort (a heap sort). GoTerrain.c declares it the same way; it moves to engine.h once that one goes.
-void fn_8015929C(void* pBase, u32 nCount, u32 nSize, int (*pfnCompare)(const void*, const void*));
 int  fn_800D31A4(int nPar);             // the number of the 18 holes with that par
 char* fn_800EFE60(s32 i);               // GameModeDriverPGATour.c: a tournament's first champion
 s32  fn_800EFE78(s32 i);                // and the champion's score
@@ -91,8 +89,9 @@ void fn_80117860(TourSeason* pTour) {
 // A round of a tournament for the field (TW06: GM_PgaTourSim_SimRound). The first round also
 // picks the field. uFlags: 1 the player is in the field, 2 the player's round is simulated too,
 // 4 the round only starts: no scores or statistics are kept and the other entrants are put on
-// random holes.
-void fn_801178C8(int nPlayer, SeasonEvent* pEvent, int nRound, int n, int uFlags) {
+// random holes. 97.9%: with nPlayer an int it is exact, but GameModeDriverPGATour fn_800EF130 (linked)
+// needs this prototype's s32 to match; only saved registers differ here.
+void fn_801178C8(s32 nPlayer, SeasonEvent* pEvent, int nRound, int n, int uFlags) {
     s32 nEntrants;
     s32 nHole;
     int i;
@@ -309,13 +308,13 @@ void fn_801187F0(PgaEntrantMC* aEntrant, s16* pnEntrants, u8 bUser) {
     }
 }
 
-// A sort comparison for s32s, smallest first. The sort comparisons return int, as qsort takes them.
-int IntCompareIncreasing(const void* pA, const void* pB) {
+// A sort comparison for s32s, smallest first.
+s32 IntCompareIncreasing(const void* pA, const void* pB) {
     return *(const s32*)pA - *(const s32*)pB;
 }
 
 // A sort comparison for entrants: by their pro's f50, smallest first; the player's golfer last.
-int fn_80118A5C(const void* pA, const void* pB) {
+s32 fn_80118A5C(const void* pA, const void* pB) {
     s32 nEntrantB = *(const s32*)pB;
     s32 nGolfer;
     f32 fA;
@@ -1061,7 +1060,7 @@ void CalcBallStriking(int nGolfer, f32* pfValue) {
 // value, a golfer with no value (0) last; the same printed value goes by name.
 
 // Lower is better.
-int fn_8011BBD8(const void* pA, const void* pB) {
+s32 fn_8011BBD8(const void* pA, const void* pB) {
     s32 nGolferA = *(const s32*)pA;
     s32 nGolferB = *(const s32*)pB;
     s32 nRet;
@@ -1092,7 +1091,7 @@ int fn_8011BBD8(const void* pA, const void* pB) {
 }
 
 // Higher is better.
-int fn_8011BCFC(const void* pA, const void* pB) {
+s32 fn_8011BCFC(const void* pA, const void* pB) {
     s32 nGolferA = *(const s32*)pA;
     s32 nGolferB = *(const s32*)pB;
     s32 nRet;
@@ -1118,7 +1117,7 @@ int fn_8011BCFC(const void* pA, const void* pB) {
 
 // All entrants: a cut entrant sorts last, the winner first. 97.4%: only nPlayer and nEntrantA/nScoreB
 // swap saved registers (declaration orders, int/s32, an inline score helper and the permuter tried).
-int fn_8011BDF8(const void* pA, const void* pB) {
+s32 fn_8011BDF8(const void* pA, const void* pB) {
     s32 nEntrantA = *(const s32*)pA;
     s32 nEntrantB = *(const s32*)pB;
     s32 nPlayer = lbl_80281848;
@@ -1149,7 +1148,7 @@ int fn_8011BDF8(const void* pA, const void* pB) {
 }
 
 // The cut entrants among themselves.
-int fn_8011BF74(const void* pA, const void* pB) {
+s32 fn_8011BF74(const void* pA, const void* pB) {
     s32 nEntrantA = *(const s32*)pA;
     s32 nEntrantB = *(const s32*)pB;
     s32 nPlayer = lbl_80281848;

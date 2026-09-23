@@ -22,7 +22,6 @@ f32 lbl_80192880[15] = {
     1.1f, 1.1f, 1.0f, 1.0f, 1.0f, 1.1f, 1.2f, 1.3f, 1.0f, 1.3f, 1.4f, 1.4f, 1.3f, 1.0f, 1.0f,
 };
 
-Character* fn_8001D324(int nId);   // the character with this id (nPlayer 1000), or NULL
 void  fn_800A631C(void);
 
 u8   fn_800F2358(int nPlayer);

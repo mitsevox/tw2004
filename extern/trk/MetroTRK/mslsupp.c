@@ -31,15 +31,6 @@ DSIOResult __TRK_write_console(u32 handle, u8* buffer, size_t* count, void* ref_
 }
 
 /**
- * @note Address: 0x800C0A0C
- * @note Size: 0x84
- */
-DSIOResult __close_console(u32 handle, u8* buffer, size_t* count, void* ref_con)
-{
-	return __close_file(handle, buffer, count, ref_con);
-}
-
-/**
  * @note Address: N/A
  * @note Size: 0xB4
  */
