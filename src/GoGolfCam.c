@@ -8,6 +8,7 @@
 #include "game.h"
 #include "engine.h"
 #include "camera.h"
+#include "dyncam.h"
 
 CamLens* fn_80008370(void* pCamera);                    // the render camera's lens
 void     fn_80045470(CamLens* pLens, f32 fFov);
@@ -80,6 +81,14 @@ u8       CameraScript_IsDefaultSwingCam(CamShot* pShot, int nPlayer, f32* pCam);
 u8       fn_8003D7A0(CamSequence* pSequence, int nPlayer);
 void     fn_80039344(int nView, f32 f);                 // a per-view float (Swing.c's declaration)
 f32      fn_80014280(f32 x);                            // tan, as a float
+void     fn_800638B8(View* pView, int nPlayer);
+f32      fn_80044EA8(int nPlayer, CamScript* pScript);  // how far the ball's flight has run
+u8       fn_800451A8(CamScript* pScript, CamShot* pShot, int nPlayer);   // GameEffects.c's declaration
+f32      fn_800D04AC(int nPlayer);                      // Swing.c's declaration
+void     CameraScript_UpdateLandingEstimate(CamScript* pScript, int nPlayer);
+f32      fn_800C54FC(View* pView, f32* pCam, f32* pSub, int nPlayer);
+f32      fn_800C5A70(View* pView, f32* pCam, f32* pSub, int nPlayer);
+u8       fn_800C7450(void);
 void     CameraScript_LagAimMarker(int nPlayer, f32* pSub, f32* pCam, CamShot* pShot, int a, int b, f32 f1,
                                    f32 f2, f32 f3);
 void     fn_800130F8(int nPad, int n);                 // the pad's rumble (Swing.c's declaration)
@@ -1938,6 +1947,173 @@ void GolfCamera_InitBallFlightCamera(View* pView, int nPlayer) {
     pView->n14C = 9;
     if (pView->nCamera != 0 && pView->nCamera != 2) {
         pView->nCamera = 0;
+    }
+}
+
+// The ball-flight camera's tick: when the current shot has run its time (or the swing camera's
+// shots are done), pick the next one: a CPU's or a replay's shot for the flight, else the
+// sequence's latest kind-0x18 choice the flight has reached, else a shot of the kind asked for.
+// Kind-5 cuts wait for the golfer's follow-through (animation 14). Slow motion comes from the
+// swing camera kinds' ticks (fn_800C54FC, fn_800C5A70).
+void GolfCamera_ProcessBallFlightCamera(View* pView, int nPlayer) {
+    f32 vOld[4];
+    f32 f1;
+    int nA;
+    f32 f2;
+    int nB;
+    CamShot* pAltShot;
+    CamSequence* pAltSeq;
+    f32 f3;
+    f32* pCam;
+    f32* pSub;
+    CamShot* pShot;
+    CamSequence* pSeq;
+    f32 fTime;
+    f32 fBest;
+    f32 fNow;
+    f32 f;
+    int nBest;
+    int i;
+    pCam = fn_8001731C(pView);
+    pSub = fn_80017314(pView);
+    f1 = 0.0f;
+    nA = 5;
+    nB = 0x19;
+    pShot = NULL;
+    f3 = 0.0f;
+    fn_80012EF0(fn_80017004(gPlayers[nPlayer].nView[0]));
+    Vec3Copy(pCam, vOld);
+    fn_800638B8(pView, nPlayer);
+    if (fn_800C6D28()) {
+        fTime = fn_800C54FC(pView, pCam, pSub, nPlayer);
+    } else if (fn_800C6D64()) {
+        fTime = fn_800C5A70(pView, pCam, pSub, nPlayer);
+    } else {
+        fTime = gSession.fFrameTime;
+    }
+    if (gSession.fFrameTime != 0.0f && !pView->b153
+        && ((!lbl_80282220->b5D && fn_800C7450())
+            || ((pView->p130 == NULL || pView->fCamTime > pView->p130->f4C)
+                && (pView->p134 == NULL || pView->p80 != pView->p130)))) {
+        if (gSession.bReplay || Player_IsCPU(nPlayer)) {
+            if (gPlayers[nPlayer].nClub == 25) {
+                pShot = fn_80064F7C(nPlayer, 0x10, 0, pView->p130);
+            } else if (gPlayers[nPlayer].ball.nState == 2) {
+                if (gPlayers[nPlayer].ball.nCollideCount > 0) {
+                    pShot = fn_80064F7C(nPlayer, 4, 0, pView->p130);
+                } else {
+                    pShot = fn_80064F7C(nPlayer, 2, 0, pView->p130);
+                }
+            } else {
+                pShot = fn_80064F7C(nPlayer, 8, 0, pView->p130);
+            }
+        }
+        if (pShot == NULL) {
+            // the latest kind-0x18 choice the flight has already reached
+            fBest = 0.0f;
+            nBest = -1;
+            fNow = fn_80044EA8(nPlayer, &pView->script);
+            pSeq = pView->p74;
+            if (pSeq != NULL) {
+                for (i = 0; i < pSeq->nChoices; i++) {
+                    if (pSeq->p4C[i].b14 == 0x18 && pSeq->p4C[i].fC < fNow && pSeq->p4C[i].fC > fBest) {
+                        fBest = pSeq->p4C[i].fC;
+                        nBest = i;
+                    }
+                }
+            }
+            if (nBest >= 0 && pSeq != NULL && pSeq->p4C[nBest].p10 != pView->p13C) {
+                pShot = pSeq->p4C[nBest].p10;
+                nA = pSeq->p4C[nBest].b15;
+                f1 = pView->p74->p4C[nBest].f0;
+                f2 = pView->p74->p4C[nBest].f4;
+                nB = pView->p74->p4C[nBest].b16;
+                f3 = pView->p74->p4C[nBest].f8;
+            } else {
+                pShot = fn_8003A950(pSeq, pView->n148, &nA, &f1, &f2, &nB, &f3, nPlayer);
+            }
+            if (pShot == NULL && pView->n14C == 9) {
+                pShot = fn_8003A950(pView->p74, 0, &nA, &f1, &f2, &nB, &f3, nPlayer);
+            }
+        }
+        if (pShot != NULL && (pView->b153 || (pShot != pView->p13C && pView->n14C != pView->n148))) {
+            if ((!CameraScript_IsDefaultSwingCam(pView->p130, nPlayer, pCam) && pView->p130->bA8 == 0
+                 && pView->p130->bAD == 4)
+                || pView->b153) {
+                nA = 5;
+                f1 = 0.0f;
+                pView->b153 = 0;
+            }
+            pView->p13C = pShot;
+            if (nA != 5 && pView->p130 != NULL && pView->p130->bAD != 4) {
+                if (!CameraScript_IsDefaultSwingCam(pView->p130, nPlayer, pCam)) {
+                    nA = 5;
+                    f1 = 0.0f;
+                } else {
+                    f = fn_800D04AC(nPlayer);
+                    if (f > 15.0f) {
+                        f1 += 0.05f * (f - 15.0f);
+                    }
+                }
+            }
+            if (!fn_800451A8(&pView->script, pShot, nPlayer)) {
+                if (nA == 5 && fn_8003DC78(pShot) && gPlayers[nPlayer].nShotKind != 0
+                    && fn_80095780(gPlayers[nPlayer].pChar) != 9) {
+                    // a cut: only once the golfer is in animation 14
+                    if (fn_80095780(gPlayers[nPlayer].pChar) == 14) {
+                        if (pView->p130->bA8 == 0 || (pView->p130->bAF != 12 && pView->p130->bB0 != 12)
+                            || nA == 5) {
+                            CameraScript_UpdateLandingEstimate(&pView->script, nPlayer);
+                        }
+                        if (f3 > fn_80062C28(gPlayers[nPlayer].pChar)) {
+                            f3 = fn_80062C28(gPlayers[nPlayer].pChar);
+                        }
+                        if (fn_8003C9D0(nPlayer, 0, &pAltSeq, &pAltShot)) {
+                            if (pAltShot == NULL) {
+                                CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, nA,
+                                                               f1, f2, nB, f3);
+                                if (fn_800C7450()) {
+                                    lbl_80282220->b5D = 1;
+                                }
+                            } else {
+                                CameraScript_InterpToNewScript(&pView->script, pAltShot, nPlayer, pCam, pSub,
+                                                               nA, f1, f2, nB, f3);
+                                if (fn_800C7450()) {
+                                    lbl_80282220->b5D = 1;
+                                }
+                            }
+                        } else {
+                            CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, nA, f1,
+                                                           f2, nB, f3);
+                            if (fn_800C7450()) {
+                                lbl_80282220->b5D = 1;
+                            }
+                        }
+                        pView->n14C = pView->n148;
+                    } else {
+                        fn_80095744(gPlayers[nPlayer].pChar, 14);
+                        pView->p13C = pView->p130;
+                    }
+                } else {
+                    CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, nA, f1, f2,
+                                                   nB, f3);
+                    pView->n14C = pView->n148;
+                    if (fn_800C7450()) {
+                        lbl_80282220->b5D = 1;
+                    }
+                }
+            } else {
+                pView->n14C = pView->n148;
+            }
+        }
+    }
+    if (pView->nCamera == 4) {
+        pView->nCamera = 2;
+        pView->f114 = 0.0f;
+    }
+    fn_8003DCE8(nPlayer, pCam, pSub, &pView->script, &pView->shot19C, 0, fTime);
+    if (fn_800C6D28() && gSession.nPaused == 0) {
+        fn_80038054(1, fn_80016D10(), 0.0f, lbl_80281F78->f64);
     }
 }
 
