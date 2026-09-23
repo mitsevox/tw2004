@@ -61,6 +61,43 @@ def defined(text):
     return out
 
 
+INCLUDE = re.compile(r'^#include\s+"([^"]+)"')
+
+
+def included(lines):
+    """Every header the lines include, directly or through other headers (include/ and the
+    build's generated include/)."""
+    seen, todo = set(), [m.group(1) for m in map(INCLUDE.match, lines) if m]
+    while todo:
+        h = todo.pop()
+        if h in seen:
+            continue
+        seen.add(h)
+        for d in (ROOT / 'include', ROOT / 'build/GW4E69/include'):
+            f = d / h
+            if f.is_file():
+                todo += [m.group(1) for m in map(INCLUDE.match,
+                         f.read_text(encoding='utf-8', errors='replace').split('\n')) if m]
+                break
+    return seen
+
+
+def needed_includes(lines, includes):
+    """The sweeps' includes the unit lacks. A header the unit already gets through its own
+    includes is not added again, and neither is game_types.h when the unit has any include (every
+    game header brings it)."""
+    have = included(lines)
+    has_any = any(INCLUDE.match(l) for l in lines)
+    out = []
+    for inc in includes:
+        m = INCLUDE.match(inc)
+        if inc in lines or (m and m.group(1) in have) \
+                or (has_any and m and m.group(1) == 'game_types.h'):
+            continue
+        out.append(inc)
+    return out
+
+
 def body_addr(body, addr):
     return next((addr[n] for _, n in defined(body) if n in addr), None)
 
@@ -90,12 +127,12 @@ def append(path, includes, decls, bodies):
     mine = [(i, addr[n]) for i, n in defined(text) if n in addr]
     if [a for _, a in mine] != sorted(a for _, a in mine):
         sys.exit('%s\'s functions are not in address order: merge by hand' % path.name)
+    missing = needed_includes(lines, includes)
     keyed = by_address(bodies, addr)
     have = {a for _, a in mine}
     clash = [hex(a) for a, _ in keyed if a in have]
     if clash:
         sys.exit('%s already defines the functions at %s' % (path.name, clash))
-    missing = [inc for inc in includes if inc not in lines]
     decls = [d for d in decls if d not in lines]
     inside = sweepblock.lines_in_blocks(lines)       # 1-based
 
