@@ -256,7 +256,7 @@ void fn_801025FC(void) {
         nMoney = fn_800D38F0(0, 1, nMargin, &nPrize);
         nProfile = gPlayers[0].nIndex;
         if (gpSaveData[nProfile].bActive) {
-            fn_80125910(1);
+            EASBio_SetCurrentGameWon(1);
             fn_800E4364(0, 0x6E, nPrize, nProfile);
             fn_800D3548(0, nMoney, NULL);
             nEvent = fn_801021FC();

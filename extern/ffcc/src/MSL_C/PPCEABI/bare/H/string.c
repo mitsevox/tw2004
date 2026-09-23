@@ -1,11 +1,14 @@
 #include "string.h"
 #include "stddef.h"
+#include "errno.h"
+
+int sprintf(char* s, const char* format, ...);
 
 #define K1 0x80808080
 #define K2 0xFEFEFEFF
 
-char* strtok_null = msl_string_table_1;
-char* strtok_ptr  = msl_string_table_1;
+char* strtok_null = "";
+char* strtok_ptr  = "";
 const unsigned char strtok_delimiter_table_init[32] = { 0 };
 
 size_t strlen(const char* str)
@@ -334,4 +337,63 @@ char* strstr(const char* str, const char* pat)
 	}
 
 	return NULL;
+}
+
+/* Not linked in this game, but its messages stay in the string pool that strtok's "" opens. */
+char* __strerror(int errnum, char* str)
+{
+	switch (errnum) {
+	case E2BIG:        strcpy(str, "Argument list too long"); break;
+	case EACCES:       strcpy(str, "Permission denied"); break;
+	case EAGAIN:       strcpy(str, "Resource temporarily unavailable"); break;
+	case EBADF:        strcpy(str, "Bad file descriptor"); break;
+	case EBUSY:        strcpy(str, "Device busy"); break;
+	case ECHILD:       strcpy(str, "No child processes"); break;
+	case EDEADLK:      strcpy(str, "Resource deadlock avoided"); break;
+	case EDOM:         strcpy(str, "Numerical argument out of domain"); break;
+	case EEXIST:       strcpy(str, "File exists"); break;
+	case EFAULT:       strcpy(str, "Bad address"); break;
+	case EFBIG:        strcpy(str, "File too large"); break;
+	case EFPOS:        strcpy(str, "File Position Error"); break;
+	case EILSEQ:       strcpy(str, "Wide character encoding error"); break;
+	case EINTR:        strcpy(str, "Interrupted system call"); break;
+	case EINVAL:       strcpy(str, "Invalid argument"); break;
+	case EIO:          strcpy(str, "Input/output error"); break;
+	case EISDIR:       strcpy(str, "Is a directory"); break;
+	case EMFILE:       strcpy(str, "Too many open files"); break;
+	case EMLINK:       strcpy(str, "Too many links"); break;
+	case ENAMETOOLONG: strcpy(str, "File name too long"); break;
+	case ENFILE:       strcpy(str, "Too many open files in system"); break;
+	case ENODEV:       strcpy(str, "Operation not supported by device"); break;
+	case ENOENT:       strcpy(str, "No such file or directory"); break;
+	case ENOERR:       strcpy(str, "No error detected"); break;
+	case ENOEXEC:      strcpy(str, "Exec format error"); break;
+	case ENOLCK:       strcpy(str, "No locks available"); break;
+	case ENOMEM:       strcpy(str, "Cannot allocate memory"); break;
+	case ENOSPC:       strcpy(str, "No space left on device"); break;
+	case ENOSYS:       strcpy(str, "Function not implemented"); break;
+	case ENOTDIR:      strcpy(str, "Not a directory"); break;
+	case ENOTEMPTY:    strcpy(str, "Directory not empty"); break;
+	case ENOTTY:       strcpy(str, "Inappropriate ioctl for device"); break;
+	case ENXIO:        strcpy(str, "Device not configured"); break;
+	case EPERM:        strcpy(str, "Operation not permitted"); break;
+	case EPIPE:        strcpy(str, "Broken pipe"); break;
+	case ERANGE:       strcpy(str, "Result too large"); break;
+	case EROFS:        strcpy(str, "Read-only file system"); break;
+	case ESIGPARM:     strcpy(str, "Signal error"); break;
+	case ESPIPE:       strcpy(str, "Illegal seek"); break;
+	case ESRCH:        strcpy(str, "No such process"); break;
+	case EUNKNOWN:     strcpy(str, "Unknown error"); break;
+	case EXDEV:        strcpy(str, "Cross-device link"); break;
+	default:           sprintf(str, "Unknown Error (%d)", errnum); break;
+	}
+
+	return str;
+}
+
+char* strerror(int errnum)
+{
+	static char error_string[64];
+
+	return __strerror(errnum, error_string);
 }

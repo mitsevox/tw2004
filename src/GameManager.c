@@ -18,7 +18,6 @@ void  fn_800D8D38(int nPlayer);
 u8    fn_800E0A90(int nPlayer);
 void  fn_800D439C(int nPlayer, int a);
 void  fn_800D9834(int nPlayer);
-u8    fn_8012591C(void);
 void  fn_8011989C(int nPlayer, int nStrokes);
 void  GM_GolferConcede_Hole(int nPlayer);
 void  GM_EndOfGolferTurn_HoleFinished(int nPlayer);
@@ -51,9 +50,6 @@ u8    fn_800BB1F8(int nPlayer);
 
 int   GM_vGetAllTimeRecordsHeld(SaveProfile* pProfile);
 f32   GM_GetBonusProgress(SaveProfile* pProfile);
-
-extern s32 lbl_80189528[14];
-extern s32 lbl_801894D0[6];
 
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
 // 1.0f (0x802845C0), before every constant the functions below use first (only the progress
@@ -252,10 +248,10 @@ void GM_EndOfGolferTurn_GameFinished(int nPlayer) {
     int nView;
     EVENT_Trigger(nPlayer, 5, 0, -1);
     gpGame->b28E = 1;
-    fn_80125910(0);
+    EASBio_SetCurrentGameWon(0);
     gpGame->pfnEndGame();
-    if (fn_8012591C() && gSession.a8[0] == 0) {
-        fn_80125854(1);
+    if (EASBio_IsCurrentGameWon() && gSession.a8[0] == 0) {
+        EASBio_IncrementGamesWon(1);
     }
     if (gpGame->b273) {
         for (i = 0; i < gNumPlayersSetUp; i++) {

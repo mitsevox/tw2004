@@ -1026,7 +1026,7 @@ u8 fn_80101CC4(u8 bCheck) {
 
 // EndGame.
 void fn_80101CD8(void) {
-    fn_80125854(1);
+    EASBio_IncrementGamesWon(1);
 }
 
 void fn_80101CFC(void) {
