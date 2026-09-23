@@ -4,8 +4,21 @@
 // functions, not yet cleaned up.
 
 #include "golfer.h"
+#include "charstate.h"
 
+void  fn_8001A75C(UStreamObject* pObject);
+void  fn_8001A798(void);
+void  fn_8001A7C8(void);
+Character* fn_8001A9F4(u8* pData, int a, int nPlayer, u32 uId, u8 b, void* p);
+void  fn_8001C0E0(Character* pChar);
+Character* fn_8001C21C(Character* pChar);
+void  fn_8001CCF8(UStreamObject* pObject);
+void  fn_8001CD80(UStreamObject* pObject);
+void  fn_8001CE5C(UStreamObject* pObject);
+void  fn_8001D020(UStreamObject* pObject);
+void  fn_8001D3EC(UStreamObject* pObject);
 void  fn_8001D7EC(void);
+void  fn_8010BFE0(void);
 u8    fn_8001EC48(void);
 f32 (*fn_8001EC6C(Character* pChar, int nBone))[4];
 f32 (*fn_8001ECA8(Character* pChar, int nBone))[4];
@@ -26,12 +39,8 @@ void fn_8001A0FC(s32 arg0);
 void fn_8001A484(void);
 void fn_8010BF68();
 void fn_8001A73C(void);
-void AnimLib_MergeOverlay();
-void fn_8001A75C(u8* p0);
-void fn_8001A7C8(void);
 void fn_80014BB4();
 void fn_80014DC0();
-void fn_8001A798();
 void fn_8001A7F0(void);
 void fn_8001B1DC(s32 p0, u8* p1, s32 p2);
 void fn_8001B1E8(void* p);
@@ -55,21 +64,11 @@ void fn_80112CEC();
 void fn_8001C304(void);
 void fn_8001C350(void);
 void fn_8001C650(void* arg0, s32 arg1);
-void fn_8001CE34(void);
-void fn_8001D268(void);
-void fn_8001A9F4();
-s32 fn_8001C21C();
-void fn_8001D3EC(u8* p0);
-void fn_8001D47C(void);
 void fn_8001DB98(u8* p0);
-void fn_8001E85C(u8* p0, u8* p1);
 f32 fn_8001EFFC(u8* p);
 void* fn_8001F004(void);
 extern f32 lbl_80282BC0;
 extern f32 lbl_80282BF8;
-s32 fn_8001EE88(u8* p);
-void fn_8001EE98(u8* p0, s32 p1);
-f32 fn_8001EEA4(u8* p0, u8* p1);
 extern s32 lbl_80280DF0;
 void* fn_80008370();
 
@@ -101,17 +100,6 @@ void fn_8001A484(void) {
 
 void fn_8001A73C(void) {
     fn_8010BF68();
-}
-
-// port: the 'SAC ' handler; the overlay library is little-endian on disc and AnimLib_MergeOverlay
-//       swaps it (fn_80020BC8 > fn_80076158): a little-endian port does not swap there.
-void fn_8001A75C(u8* p0) {
-    AnimLib_MergeOverlay(*(s32*)p0, *(s32*)(p0 + 0x20));
-    fn_80009E70(p0);
-}
-
-void fn_8001A7C8(void) {
-    UStream_UnregisterHandler(1396785952);
 }
 
 void fn_8001A7F0(void) {
@@ -169,29 +157,6 @@ void fn_8001C650(void* arg0, s32 arg1) {
     (*(s32*)((u8*)(arg0) + 0x16D4)) = arg1;
 }
 
-void fn_8001CE34(void) {
-    UStream_UnregisterHandler(1129071136);
-}
-
-void fn_8001D268(void) {
-    UStream_UnregisterHandler(1128813088);
-}
-
-// port: the 'SKLO' handler; the skeleton is little-endian on disc and fn_8001A9F4 swaps it
-//       (fn_80076158): a little-endian port does not swap there.
-void fn_8001D3EC(u8* p0) {
-    s32 t1;
-    fn_8001A9F4(*(s32*)p0, 0, 0, *(s32*)(p0 + 0x20), 0, 0);
-    t1 = fn_8001C21C();
-    *(s32*)(((u8*)t1) + 0x4) = 1000;
-    *(s32*)(((u8*)t1) + 0x8) = *(s32*)(p0 + 0x20);
-    fn_80009E70(p0);
-}
-
-void fn_8001D47C(void) {
-    UStream_UnregisterHandler(1397443663);
-}
-
 void fn_8001DB98(u8* p0) {
     *(s32*)(p0 + 0x43C) = -1;
     *(s32*)(p0 + 0x440) = 0;
@@ -213,25 +178,6 @@ void fn_8001DB98(u8* p0) {
     *(s32*)(p0 + 0x49C) = 0;
     *(s32*)(p0 + 0x4A0) = 0;
     *(s32*)(p0 + 0x4A4) = 0;
-}
-
-void fn_8001E85C(u8* p0, u8* p1) {
-    *(f32*)(p1 + 0xC) = *(f32*)(p0 + 0xC);
-    *(f32*)p1 = *(f32*)p0;
-    *(f32*)(p1 + 0x4) = *(f32*)(p0 + 0x4);
-    *(f32*)(p1 + 0x8) = *(f32*)(p0 + 0x8);
-}
-
-s32 fn_8001EE88(u8* p) {
-    return *(s32*)(p + 0x1658);
-}
-
-void fn_8001EE98(u8* p0, s32 p1) {
-    *(u8*)(((u8*)*(s32*)(p0 + 0x38)) + 0xEE) = p1;
-}
-
-f32 fn_8001EEA4(u8* p0, u8* p1) {
-    return (*(f32*)(p0 + 0xC) * *(f32*)(p1 + 0xC) + (*(f32*)(p0 + 0x8) * *(f32*)(p1 + 0x8) + (*(f32*)p0 * *(f32*)p1 + (*(f32*)(p0 + 0x4) * *(f32*)(p1 + 0x4)))));
 }
 
 f32 fn_8001EFFC(u8* p) {
@@ -280,8 +226,105 @@ void fn_80018484(Character* pChar, CharModel* pModel) {
     }
 }
 
+void fn_8001A488(void) {
+    if (gSession.nNumPlayers > 2) {
+        fn_8010BFE0();
+    }
+}
+
+// The 'SAC ' handler: an animation library merged over the one of the slot the object's id names.
+// port: the overlay library is little-endian on disc and AnimLib_MergeOverlay swaps it
+//       (fn_80020BC8 > fn_80076158): a little-endian port does not swap there.
+void fn_8001A75C(UStreamObject* pObject) {
+    AnimLib_MergeOverlay(pObject->pData, pObject->uId);
+    fn_80009E70(pObject);
+}
+
+void fn_8001A798(void) {
+    UStream_RegisterHandler('SAC ', fn_8001A75C);
+}
+
+void fn_8001A7C8(void) {
+    UStream_UnregisterHandler('SAC ');
+}
+
+// Add a character to the table of characters (up to five); NULL when it is full.
+Character* fn_8001C21C(Character* pChar) {
+    if (lbl_80281CA8 >= 5) {
+        return NULL;
+    }
+    lbl_801B9624[lbl_80281CA8] = pChar;
+    pChar->nIndex = lbl_80281CA8;
+    lbl_80281CA8++;
+    return pChar;
+}
+
+void fn_8001C518(void) {
+    fn_8001C0E0(lbl_80281EE8);
+    lbl_80281EE8 = NULL;
+}
+
+// The model id of the player's golfer.
+u8 fn_8001C558(int nPlayer) {
+    return gGolferTable[gSession.nGolfer[nPlayer]].nModelID;
+}
+
+// The player's golfer is one of records 30 to 33.
+u8 fn_8001C584(int nPlayer) {
+    u8 b = 0;
+    if (gSession.nGolfer[nPlayer] >= 30 && gSession.nGolfer[nPlayer] <= 33) {
+        b = 1;
+    }
+    return b;
+}
+
 void fn_8001C7FC(Character* pChar, int nStyle) {
     pChar->nStyle = nStyle;
+}
+
+// The 'CLB ' stream objects: two handlers for the same type.
+void fn_8001CDD4(void) {
+    UStream_RegisterHandler('CLB ', fn_8001CCF8);
+}
+
+void fn_8001CE04(void) {
+    UStream_RegisterHandler('CLB ', fn_8001CD80);
+}
+
+void fn_8001CE34(void) {
+    UStream_UnregisterHandler('CLB ');
+}
+
+// The 'CHR ' stream objects: two handlers for the same type.
+void fn_8001CFF0(void) {
+    UStream_RegisterHandler('CHR ', fn_8001CE5C);
+}
+
+void fn_8001D238(void) {
+    UStream_RegisterHandler('CHR ', fn_8001D020);
+}
+
+void fn_8001D268(void) {
+    UStream_UnregisterHandler('CHR ');
+}
+
+// The 'SKLO' handler: a character built from the object with no player (1000), keyed by the
+// object's id.
+// port: the skeleton is little-endian on disc and fn_8001A9F4 swaps it (fn_80076158): a
+//       little-endian port does not swap there.
+void fn_8001D3EC(UStreamObject* pObject) {
+    Character* pChar = fn_8001C21C(fn_8001A9F4(pObject->pData, 0, 0, pObject->uId, 0, NULL));
+    pChar->nPlayer = 1000;
+    pChar->nId     = pObject->uId;
+    fn_80009E70(pObject);
+}
+
+void fn_8001D44C(void) {
+    UStream_RegisterHandler('SKLO', fn_8001D3EC);
+}
+
+void fn_8001D47C(void) {
+    UStream_UnregisterHandler('SKLO');
 }
 
 void fn_8001D624(int n) {
@@ -306,6 +349,33 @@ u8 fn_8001DBF4(Character* pChar) {
         return 1;
     }
     return 0;
+}
+
+// Copy a quaternion (Skeleton.c's use).
+void fn_8001E85C(f32* pSrc, f32* pDst) {
+    pDst[3] = pSrc[3];
+    pDst[0] = pSrc[0];
+    pDst[1] = pSrc[1];
+    pDst[2] = pSrc[2];
+}
+
+void fn_8001E880(f32* pSrc, f32* pDst) {
+    pDst[0] = pSrc[0];
+    pDst[1] = pSrc[1];
+    pDst[2] = pSrc[2];
+    pDst[3] = 1.0f;
+}
+
+u8 fn_8001E9CC(u32* aBits, u32 n) {
+    return (aBits[n >> 5] & (1 << (n & 31))) != 0;
+}
+
+void fn_8001EA34(u32* aBits, u32 n) {
+    aBits[n >> 5] |= 1 << (n & 31);
+}
+
+void fn_8001EB6C(u32* aBits, u32 n) {
+    aBits[n >> 5] &= ~(1 << (n & 31));
 }
 
 f32 (*fn_8001EC6C(Character* pChar, int nBone))[4] {
@@ -351,6 +421,31 @@ void fn_8001EE64(Character* pChar) {
     fn_8001ED08(pChar, 1);
 }
 
+int fn_8001EE88(Character* pChar) {
+    return pChar->n1658;
+}
+
 int fn_8001EE90(Character* pChar) {
     return pChar->n1654;
+}
+
+void fn_8001EE98(Character* pChar, u8 b) {
+    pChar->pModel->bEE = b;
+}
+
+// The dot product of two 4-vectors.
+f32 fn_8001EEA4(f32* pA, f32* pB) {
+    return pA[0] * pB[0] + pA[1] * pB[1] + pA[2] * pB[2] + pA[3] * pB[3];
+}
+
+int fn_8001EED8(CharModel* pModel, int nBone) {
+    return pModel->aBone[nBone];
+}
+
+// A bone's index, through the second table while the model's bEE is set.
+int fn_8001EEE4(CharModel* pModel, int nBone) {
+    if (pModel->bEE) {
+        return pModel->aBone2[pModel->aBone[nBone]];
+    }
+    return pModel->aBone[nBone];
 }

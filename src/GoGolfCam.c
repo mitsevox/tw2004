@@ -74,8 +74,6 @@ f32      fn_80009614(f32 x);                            // arc cosine
 void     fn_8000AE28(f32* pIn, f32 f, f32* pOut);       // scale a vector
 void     fn_8000923C(f32* pRot, f32* pQuat);            // a rotation vector (axis * angle) as a quaternion
 void     fn_800090E4(f32* pQuat, f32* pIn, f32* pOut);  // rotate a vector by a quaternion
-f32      fn_8005C280(int nPlayer);                      // Swing.c: the swing's fNonPowerShotPower
-void     Swing_RumbleOff(int nPlayer);                  // Swing.c
 u8       fn_8006BEA4(void);                             // the GameBreaker letterbox is up, scripted
 void     fn_800A68C0(u8 nPlayer);
 u8       CameraScript_IsDefaultSwingCam(CamShot* pShot, int nPlayer, f32* pCam);
