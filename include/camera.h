@@ -337,6 +337,10 @@ f32*   fn_8001731C(View* pView);        // the camera's position (v0)
 f32*   fn_80017314(View* pView);        // where it looks (v10)
 u8     fn_800172C4(View* pView);        // the camera move has finished
 f32*   fn_80012EF0(void* pCamera);      // a render camera's screen rectangle
+f32    fn_80012ED0(f32* pRect);         // the rectangle's [3]: its height
+f32    fn_80012ED8(f32* pRect);         // [2]: its width
+f32    fn_80012EE0(f32* pRect);         // [1]: its top
+f32    fn_80012EE8(f32* pRect);         // [0]: its left
 void*  fn_8001614C(void);               // the current render camera
 void   fn_80013CCC(void* pCamera);
 void   fn_80013EEC(void* pCamera);
