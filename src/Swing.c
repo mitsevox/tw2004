@@ -524,7 +524,7 @@ f32 fn_8005B64C(int nPlayer) {
 
 // ---- the hit -----------------------------------------------------------------------------------
 
-extern u8 gReplayData[];                     // 0x801D6030  saved seed at +0, swing state at +0x3DC
+extern Replay gReplayData;                   // 0x801D6030
 
 void Ball_Launch(void* pBall, int nClub, int nKind, f32 fPower, f32 fAim, int nTrajectory, f32* pA, f32* pB);
 void Luck_TakePerfectShot(int nPlayer);      // Golfer.c
@@ -545,15 +545,14 @@ void Swing_Launch(int nPlayer) {
     Player* p;
     f32*    pLaunchB;
     f32*    pLaunchA;
-    f32*    pPower;
     u8*     pBall;
     int     nClub, nTrajectory, nKind;
     f32     fAim;
 
     p = &gPlayers[nPlayer];
     if (Game_GetMode() == 10) {
-        fn_8000B1D4(0, *(u32*)gReplayData);
-        Mem_cpy(&gPlayers[0].swing, gReplayData + 0x3DC, 0x630);
+        fn_8000B1D4(0, gReplayData.nSeed);
+        Mem_cpy(&gPlayers[0].swing, &gReplayData.player.swing, 0x630);
     } else if (gSession.bReplay == 0) {
         Luck_TakePerfectShot(nPlayer);
         fn_8006BF60(nPlayer);
@@ -571,8 +570,7 @@ void Swing_Launch(int nPlayer) {
     } else {
         gPlayers[nPlayer].swing.fMishitAngle = Swing_MeterError(nPlayer);
     }
-    pPower  = &gPlayers[nPlayer].swing.fShotPower;
-    *pPower = Swing_ComputePower(nPlayer);
+    gPlayers[nPlayer].swing.fShotPower = Swing_ComputePower(nPlayer);
     Swing_ApplyForgiveness(nPlayer);
     if (gPlayers[nPlayer].nShotKind == SHOT_PUTT && gPlayers[nPlayer].fDistance < 2.0f) {
         gPlayers[nPlayer].vLaunchA[0] = 0.0f;
@@ -592,12 +590,12 @@ void Swing_Launch(int nPlayer) {
     if (0.0f == gPlayers[nPlayer].vLaunchA[2]) {
         fAim = p->fAim + gPlayers[nPlayer].swing.fMishitAngle;
     } else {
-        fAim = p->fAim + fn_8005CC84(gPlayers[nPlayer].vLaunchA[0] / gPlayers[nPlayer].vLaunchA[2]);
-        fAim = gPlayers[nPlayer].swing.fMishitAngle + fAim;
+        fAim = p->fAim + fn_8005CC84(gPlayers[nPlayer].vLaunchA[0] / gPlayers[nPlayer].vLaunchA[2]) +
+               gPlayers[nPlayer].swing.fMishitAngle;
     }
     while (fAim < -PI) fAim += 2 * PI;
     while (fAim > PI) fAim -= 2 * PI;
-    Ball_Launch(pBall, nClub, nKind, *pPower, fAim, nTrajectory, pLaunchA, pLaunchB);
+    Ball_Launch(pBall, nClub, nKind, gPlayers[nPlayer].swing.fShotPower, fAim, nTrajectory, pLaunchA, pLaunchB);
 }
 
 
@@ -2828,14 +2826,14 @@ extern Vec4 lbl_80183640;
 // State 12: the ball is away. In a replay with the kept ball unset, a special path; otherwise
 // the ball as it lies is kept. Camera 14 unless the swing animation is 11 or the view says no.
 void STATEFUNC_SimulateInit(int nPlayer) {
-    void* pV   = fn_80017028(gPlayers[nPlayer].nView0);
-    u8*  pBallBefore = gPlayers[nPlayer].ballBefore;
-    if (gSession.bReplay != 0 && *(s32*)(pBallBefore + 0x64) == 0) {
+    void* pV = fn_80017028(gPlayers[nPlayer].nView0);
+    Player* p = &gPlayers[nPlayer];
+    if (gSession.bReplay != 0 && *(s32*)(p->ballBefore + 0x64) == 0) {
         fn_8006B2C4(nPlayer, 1);
     } else {
-        Mem_cpy(pBallBefore, gPlayers[nPlayer].ball, 0xBC);
+        Mem_cpy(p->ballBefore, p->ball, 0xBC);
     }
-    *(s32*)(pBallBefore + 0x94) = -1;
+    p->nBallBeforeOwner = -1;
     if (fn_80095780(gPlayers[nPlayer].nShotHandle) != 11 && fn_80101738() && !fn_800C6CB0()) {
         int nView = gPlayers[nPlayer].nView0;
         View_SetCamera(fn_80017028(nView), 0xE, nPlayer, nView);
@@ -3915,7 +3913,7 @@ void STATEFUNC_SimulateUpdate(int nPlayer) {
     if (gSession.nSplitScreen != 0) return;
     if (fn_800E430C(nPlayer)) return;
     if (fn_80100294()) return;
-    if (gReplayData[0xF10] != 0 && gpGame->b287 != 0) {
+    if (gReplayData.bF10 != 0 && gpGame->b287 != 0) {
         if ((fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x18, 0)) && !(gPlayers[nPlayer].uFlags & 8) &&
             (s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_CONCEDED && !fn_800E53B8() &&
             !(*(u32*)(gPlayers[nPlayer].nShotHandle + 0x10) & 0x40)) {
@@ -4211,7 +4209,7 @@ void STATEFUNC_ShowYardageUpdate(int nPlayer) {
                 return;
             }
         }
-        if (gReplayData[0xF10] != 0) {
+        if (gReplayData.bF10 != 0) {
             if ((fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x18, 0)) && gpGame->b287 != 0 &&
                 !(gPlayers[nPlayer].uFlags & 8) && (s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_CONCEDED && !fn_800E53B8() &&
                 !(*(u32*)(gPlayers[nPlayer].nShotHandle + 0x10) & 0x40)) {
