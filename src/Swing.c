@@ -174,8 +174,6 @@ void  Swing_BoostInput(int nPlayer);
 void  fn_8005AD20(Character* pObj, SwingData* pSw, int nStickX);
 int   fn_8005CC5C(void);
 void  fn_800AE3F8(int nView);
-void  fn_80035138(int a);
-void  fn_80035118(int a, int b);
 void  fn_80036100(u8* pMesh, void* pDesc, int n);
 void  fn_800360D4(u8* pMesh);
 void  fn_80008BB8(f32* pOut, f32 x, f32 y, f32 z);

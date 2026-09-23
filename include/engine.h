@@ -81,13 +81,29 @@ int  fn_800102DC(u64 uHash, TexBank** ppBank, TexEntry** ppTex);
 // ---- the renderer ----------------------------------------------------------------------------
 
 // The renderer's state (lbl_801B8980, 0x118 bytes); only what the game code writes.
+// GoTerrain.c's setters write one group of fields each and set that group's bit in u110.
 typedef struct RenderState {
-    u8   unk0[0x100];
+    u8   unk0[0x10];
+    s32  n10;                   // 0x010  } set together, bit 0x10
+    s32  n14;                   // 0x014  }
+    u8   unk18[0x1C - 0x18];
+    u8   b1C;                   // 0x01C  bit 0x80
+    u8   b1D;                   // 0x01D  bit 0x80
+    u8   unk1E[0x20 - 0x1E];
+    u32  u20;                   // 0x020  bits cleared and set by fn_80035170, bit 0x20
+    u8   unk24[0x28 - 0x24];
+    f32  f28;                   // 0x028  } bit 0x8, with a30. fn_80035398 sets all three from
+    f32  f2C;                   // 0x02C  } lbl_802811E0
+    u8   a30[4];                // 0x030  a colour: three bytes given, the fourth always 0x80
+    u8   unk34[0xFC - 0x34];
+    s32  nFC;                   // 0x0FC  bit 0x400
     TexBank*  p100;             // 0x100  } the texture of the next draw (fn_8005CC64: the swing
     TexEntry* p104;             // 0x104  } trail's, the logo editor's)
-    u8   unk108[0x114 - 0x108];
+    u8   unk108[0x110 - 0x108];
+    u32  u110;                  // 0x110  which of the groups above changed
     u32  uFlags;                // 0x114  bit 1: p100/p104 are set
 } RenderState;
+LAYOUT_ASSERT(RenderState, 0x118);
 
 extern RenderState lbl_801B8980;
 
@@ -127,6 +143,7 @@ u32  fn_8000E81C(UStreamObject* pObject, void** ppData);          // the data an
 // ---- controller input ------------------------------------------------------------------------
 
 void fn_80012EF8(void);
+void fn_80012F18(int a);
 void fn_80012F34(int a);
 void fn_80012F50(int a, int b, int c);
 void fn_80013130(int nController, int nStrength);   // rumble strength
