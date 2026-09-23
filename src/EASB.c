@@ -39,7 +39,7 @@ EASBErrorE fn_8012CF64(void) {
         fn_80128624(lbl_802825B8->pProductBuffer, EASB_MAX_PRODUCTS);
         lbl_802825B8->b11D0 = EASB_PRODUCT_NONE;
         for (i = 0; i < EASB_MAX_PRODUCTS; i++) {
-            if (fn_80128CA0(&lbl_802825B8->pProductBuffer[i], &lbl_802825B8->product, 1) == 0) {
+            if (fn_80128CA0(lbl_802825B8->pProductBuffer[i].szName, lbl_802825B8->product.szName, 1) == 0) {
                 lbl_802825B8->b11D0 = i;
                 break;
             }
@@ -104,10 +104,10 @@ EASBErrorE fn_8012D1A0(void) {
         if (lbl_802825B8->uLastTime <= uNow) {
             uElapsed = uNow - lbl_802825B8->uLastTime;
             if (lbl_802825B8->b11E0) {
-                lbl_802825B8->u54 = fn_80128468(lbl_802825B8->u54, uElapsed);
+                lbl_802825B8->totals.u0 = fn_80128468(lbl_802825B8->totals.u0, uElapsed);
                 lbl_802825B8->product.u50 = fn_80128468(lbl_802825B8->product.u50, uElapsed);
             } else {
-                lbl_802825B8->u58 = fn_80128468(lbl_802825B8->u58, uElapsed);
+                lbl_802825B8->totals.u4 = fn_80128468(lbl_802825B8->totals.u4, uElapsed);
                 lbl_802825B8->product.u54 = fn_80128468(lbl_802825B8->product.u54, uElapsed);
             }
             lbl_802825B8->uLastTime = uNow;
@@ -153,7 +153,7 @@ EASBErrorE fn_8012D560(void) {
     } else {
         eError = fn_8012D1A0();
         if (eError == EASB_ERROR_NONE) {
-            eError = fn_8012C5F8(&lbl_802825B8->u54, &lbl_802825B8->product, lbl_802825B8->unk4);
+            eError = fn_8012C5F8(&lbl_802825B8->totals,&lbl_802825B8->product, lbl_802825B8->unk4);
         }
         return eError;
     }
@@ -227,7 +227,7 @@ EASBErrorE fn_8012D794(void* pImage) {
     } else {
         eError = fn_8012D1A0();
         if (eError == EASB_ERROR_NONE) {
-            eError = fn_8012C7BC(&lbl_802825B8->u54, &lbl_802825B8->product, pImage);
+            eError = fn_8012C7BC(&lbl_802825B8->totals,&lbl_802825B8->product, pImage);
         }
         return eError;
     }
@@ -247,7 +247,7 @@ EASBErrorE fn_8012D8C4(u32 uCount) {
         return eError;
     } else {
         lbl_802825B8->product.u58 = fn_80128468(lbl_802825B8->product.u58, uCount);
-        lbl_802825B8->u5C = fn_80128468(lbl_802825B8->u5C, uCount);
+        lbl_802825B8->totals.u8 = fn_80128468(lbl_802825B8->totals.u8, uCount);
         return eError;
     }
 }
@@ -261,7 +261,7 @@ EASBErrorE fn_8012D93C(u32 uCount) {
         return eError;
     } else {
         lbl_802825B8->product.u5C = fn_80128468(lbl_802825B8->product.u5C, uCount);
-        lbl_802825B8->u60 = fn_80128468(lbl_802825B8->u60, uCount);
+        lbl_802825B8->totals.uC = fn_80128468(lbl_802825B8->totals.uC, uCount);
         return eError;
     }
 }
@@ -351,7 +351,7 @@ EASBErrorE fn_8012DDE0(u32* pOut) {
     eError = fn_8012CCD8(EASB_NEED_ANY);
     if (eError != EASB_ERROR_NONE) return eError;
     eResult = fn_8012D1A0();
-    *pOut = lbl_802825B8->u54;
+    *pOut = lbl_802825B8->totals.u0;
     return eResult;
 }
 
@@ -363,7 +363,7 @@ EASBErrorE fn_8012DE38(u32* pOut) {
     eError = fn_8012CCD8(EASB_NEED_ANY);
     if (eError != EASB_ERROR_NONE) return eError;
     eResult = fn_8012D1A0();
-    *pOut = lbl_802825B8->u58;
+    *pOut = lbl_802825B8->totals.u4;
     return eResult;
 }
 
@@ -396,7 +396,7 @@ EASBErrorE fn_8012DF4C(u16* puLevel, f32* pfProgress) {
     *pfProgress = 0.0f;
     eError = fn_8012D1A0();
     if (eError != EASB_ERROR_NONE) return eError;
-    return fn_80128FD4(&lbl_802825B8->u54, puLevel, pfProgress);
+    return fn_80128FD4(&lbl_802825B8->totals,puLevel, pfProgress);
 }
 
 // Copies a game's name.
