@@ -205,19 +205,19 @@ u8 fn_800F8624(int nPlayer, int a) {
     if (nBest == 5) {
         return 0;
     }
-    if (nSecond == 5 || gPlayers[nSecond].nStrokes[Game_CurHoleIndex()] > gPlayers[nBest].nStrokes[Game_CurHoleIndex()]) {
+    if (nSecond == 5 || nSecond != 5 && gPlayers[nSecond].nStrokes[Game_CurHoleIndex()] > gPlayers[nBest].nStrokes[Game_CurHoleIndex()]) {
         for (i = 0; i < gNumPlayersSetUp; i++) {
             if (!Player_IsHoled(i) &&
                 PLAYER(i)->nStrokes[Game_CurHoleIndex()] + 1 <= gPlayers[nBest].nStrokes[Game_CurHoleIndex()]) {
                 return 0;
             }
         }
-        return 1;
-    }
-    for (i = 0; i < gNumPlayersSetUp; i++) {
-        if (!Player_IsHoled(i) &&
-            PLAYER(i)->nStrokes[Game_CurHoleIndex()] + 1 < gPlayers[nBest].nStrokes[Game_CurHoleIndex()]) {
-            return 0;
+    } else {
+        for (i = 0; i < gNumPlayersSetUp; i++) {
+            if (!Player_IsHoled(i) &&
+                PLAYER(i)->nStrokes[Game_CurHoleIndex()] + 1 < gPlayers[nBest].nStrokes[Game_CurHoleIndex()]) {
+                return 0;
+            }
         }
     }
     return 1;
@@ -321,8 +321,8 @@ void fn_800F8EDC(void) {
     }
     if (nSecond != 5 && gPlayers[nBest].nStrokes[Game_CurHoleIndex()] == gPlayers[nSecond].nStrokes[Game_CurHoleIndex()]) {
         if (!gpGame->bD4) {
-            nHole = Game_CurHoleIndex();
-            lbl_802823C4 += fn_800D3D64(fn_800D3C1C(), nHole);
+            n = Game_CurHoleIndex();
+            lbl_802823C4 += fn_800D3D64(fn_800D3C1C(), n);
             lbl_802823C0++;
         }
     } else {
