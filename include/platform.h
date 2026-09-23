@@ -88,4 +88,15 @@ void OSTicksToCalendarTime(s64 nTicks, OSCalendarTime* pTime);
 u32  OSGetTick(void);           // the low 32 bits of the time base
 void OSReport(const char* pFmt, ...);   // debug print (nothing in the retail build)
 
+// The OS arena and heaps.
+void* OSGetArenaLo(void);
+void* OSGetArenaHi(void);
+void  OSSetArenaLo(void* pLo);
+void* OSInitAlloc(void* pStart, void* pEnd, int nMaxHeaps);    // returns the arena's new start
+int   OSCreateHeap(void* pStart, void* pEnd);
+int   OSSetCurrentHeap(int hHeap);
+void* OSAllocFromHeap(int hHeap, u32 uSize);
+void  OSFreeToHeap(int hHeap, void* p);
+extern volatile int __OSCurrHeap;
+
 #endif

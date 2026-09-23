@@ -20,9 +20,60 @@ void* fn_80009B34(int nSize, int nMode, int nAlign, const char* pFile, int nLine
 void  fn_80009E70(void* p);             // free
 void  fn_8000A0AC(s32 v);               // } a value callers pass on as fn_80009B34's uFlags
 s32   fn_8000A0B4(void);                // } (EASportsBio.c sets 0 while the Bio starts, then 2)
-void* fn_800951A0(u32 uSize, int nAlign, int a);
+// The main-memory heap (GoShaderObject_Particle_Gc.c): fn_80095108 makes it from the arena.
+// fn_800951A0 returns a block aligned to nAlign (0: 16) that remembers the heap block and its
+// own padding just before and after it (every caller passes 1 as n, which it does not read).
+typedef struct HeapBlockHead {
+    void* pBlock;               // 0x0  the heap block it is in
+    u32   uSize;                // 0x4  what was asked for
+} HeapBlockHead;
+
+void  fn_80095108(void);
+void* fn_800951A0(u32 uSize, u16 nAlign, int n);
 void  fn_8009527C(void* p);             // frees what fn_800951A0 allocated
-void  fn_800953C8(int a);
+
+// The stopwatches (GoShaderObject_Particle_Gc.c, lbl_802813B0): a 64-bit clock made from the
+// 32-bit tick (fn_8000B3E8), and five watches read against it.
+typedef union ProfTime {
+    u64 u;
+    struct {
+        u32 nHi;                // port: the halves in the GameCube's (big-endian) order
+        u32 nLo;
+    } w;
+} ProfTime;
+
+typedef struct ProfWatch {
+    ProfTime tBase;             // 0x00  a running watch reads the clock minus this
+    ProfTime tStop;             // 0x08  when it was stopped
+    u8   bRunning;              // 0x10
+} ProfWatch;
+LAYOUT_ASSERT(ProfWatch, 0x18);
+
+typedef struct ProfClock {
+    ProfTime tStart;            // 0x00  when fn_800952D8 set it up
+    ProfTime tNow;              // 0x08  the last reading
+    ProfWatch aWatches[5];      // 0x10
+} ProfClock;
+
+extern ProfClock* lbl_802813B0;
+
+// The particles' buffers (GoShaderObject_Particle_Gc.c, lbl_802813A8).
+typedef struct ParticleBuffers {
+    void* apBuffers[4];         // 0x00  two of 90000 bytes, two of 10000 (fn_8009414C)
+    u8    b10;                  // 0x10  flipped by fn_80094278
+    s32   n14;                  // 0x14
+} ParticleBuffers;
+
+extern ParticleBuffers* lbl_802813A8;
+
+u32  fn_8000B3E8(void);                 // the tick (urandom.c)
+void fn_800952D8(void);                 // set up, every watch reset and stopped
+u64  fn_80095368(void);                 // the clock, since the set-up
+void fn_800953C8(int nWatch);           // start
+u8   fn_80095430(int nWatch);           // running?
+u64  fn_80095444(int nWatch);           // stop; returns the reading
+u64  fn_800954A4(int nWatch);           // the reading
+void fn_80095504(int nWatch);           // reset to 0
 // Pack up to 12 characters of pName into a 64-bit code (base 40, table lbl_80191520).
 int   fn_800CB700(u64* pId, const char* pName);
 
@@ -413,7 +464,6 @@ void fn_8006BF60(int nPlayer);          // the replay recorder
 void fn_8006C300(int nPlayer);
 void fn_8006C4A0(void);                 // clears gSession.bReplay: a saved replay's playback ends
 void fn_8006F4B4(void);
-u8   fn_80095430(int a);
 void fn_8009B970(int nView);
 void fn_8009EF98(void);
 void fn_800A6278(void);

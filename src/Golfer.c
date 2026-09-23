@@ -1676,7 +1676,6 @@ void Luck_TakePerfectShot(int nPlayer) {
 void  fn_80016D18(int nView, f32 x, f32 y, f32 w, f32 h);       // open it (screen fractions)
 void  fn_80009710(f32* pQuat);                                  // identity (0, 0, 0, 1)
 void  fn_8005CE70(int nPlayer);
-void  fn_80095504(int n);
 
 // Fill a player slot from the golfer table and set up its view(s). uBag overrides the record's
 // bag when non-zero (or everything, with session flag 0x200); an empty bag gets the default.
