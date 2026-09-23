@@ -85,6 +85,23 @@ typedef struct UISRateFn {
 } UISRateFn;
 LAYOUT_ASSERT(UISRateFn, 0x34);
 
+// A 0x28-byte record in UIStudio.p60; the last one in use names the current screen.
+typedef struct UISRecord60 {
+    u8 unk0[0x24];
+    u16 u24;                        // 0x24: a screen ID (fn_8016C6C4's third argument)
+    u16 u26;                        // 0x26: a group ID (its second)
+} UISRecord60;
+LAYOUT_ASSERT(UISRecord60, 0x28);
+
+// A block of words the studio hands out (fn_80169C0C sets p0, p4 and pC to its start).
+typedef struct UISWordStack {
+    s32* p0;                        // 0x00: the start
+    s32* p4;                        // 0x04
+    s32* p8;                        // 0x08: the end
+    s32* pC;                        // 0x0C
+} UISWordStack;
+LAYOUT_ASSERT(UISWordStack, 0x10);
+
 #define UIS_MAGIC 0x5549535F        // "UIS_", while the studio is set up
 
 // The studio (0xBC bytes). fn_80169C0C builds it in one block: this header, then the screen
@@ -116,20 +133,14 @@ typedef struct UIStudio {
     UISRateFn* pRateFns;            // 0x54
     u32 nMax60;                     // 0x58
     s32 n5C;                        // 0x5C: records in use in p60
-    u8* p60;                        // 0x60: 0x28-byte records
-    s32* p64;                       // 0x64: the event stack's words (low end)
-    s32* p68;                       // 0x68
-    s32* p6C;                       // 0x6C: the end of the event stack's words
-    s32* p70;                       // 0x70
+    UISRecord60* p60;               // 0x60
+    UISWordStack stack64;           // 0x64: the event words; the event stack grows down from its end
     u8 unk74[4];
-    s32* p78;                       // 0x78: the second word stack
-    s32* p7C;                       // 0x7C
-    s32* p80;                       // 0x80: its end
-    s32* p84;                       // 0x84
+    UISWordStack stack78;           // 0x78: a second block of words
     u8 unk88[0x24];
     s32* pEventBase;                // 0xAC: the bottom of the event stack; it grows down from here
     s32* pEventTop;                 // 0xB0: the stack's current top (fn_80165B90)
-    s32** pp68;                     // 0xB4: points at p68
+    s32** pp68;                     // 0xB4: points at stack64.p4
     s32 bUnloadingAll;              // 0xB8: set while fn_80169B4C unloads every screen
 } UIStudio;
 LAYOUT_ASSERT(UIStudio, 0xBC);
@@ -146,8 +157,13 @@ void fn_80165E9C(UIStudio* pStudio, UISScreen* pScreen, u32 u18, s32 n30, u32 uI
                  u32 uTime, f32 fTarget, s32 n20);
 u32 fn_8016604C(UIStudio* pStudio, u32 u18, u32 uId);
 
+// UIStudio.c
+void fn_80168B80(UIStudio* pStudio, u32 uEvent);
+
 // UISApi.c
 void fn_80168C24(UIStudio* pStudio, s32 nTicks);
+void fn_80168CD8(UIStudio* pStudio, UISWordStack* pStack, u32 uEvent, s32 n, u8 b, void* p, u8 bAll);
+void fn_80168DB0(UIStudio* pStudio, u32 uEvent, s32 n, u8 b, void* p, u8 bAll);
 void fn_80168EE8(UIStudio* pStudio, u16* puGroup, u16* puScreen);
 void fn_80168F5C(UIStudio* pStudio, s16 nGroup, s16 nScreen);
 s32 fn_801694A0(UIStudio* pStudio, s16 nGroup, s16 nScreen, u8 nArgs, s32* pArgs);
@@ -166,9 +182,13 @@ u8 fn_80169DC4(void* pFile);
 void fn_8016A030(UIStudio* pStudio, u32 uMs);
 
 // The file after UISApi.c (0x8016A2D4-0x8016C718).
+// Sends event uEvent to a screen; *pbOut is set by it.
+void fn_8016A2D4(UIStudio* pStudio, UISScreen* pScreen, UISWordStack* pStack, s32 n3, u32 uEvent, s32 n5, u8 b6,
+                 void* p7, u8* pbOut);
 void fn_8016A510(UIStudio* pStudio, UISScreen* pScreen, void* p, s32 n);
 void fn_8016C15C(f32 f1, f32 f2, f32 f3, f32 f4);
 void fn_8016C174(f32 f1, f32 f2, f32 f3, f32 f4);
+u16 fn_8016C6C4(UIStudio* pStudio, u16 uGroup, u16 uScreen);
 // Returns a pointer to the variable a rate function drives.
 f32* fn_8016C1A4(s32 n20, s32 n30);
 

@@ -21,6 +21,67 @@ void fn_80168C24(UIStudio* pStudio, s32 nTicks) {
     }
 }
 
+// Sends event uEvent to the current screen, or to every screen when bAll is set. Event -8 skips
+// a screen that is being unloaded.
+void fn_80168CD8(UIStudio* pStudio, UISWordStack* pStack, u32 uEvent, s32 n, u8 b, void* p, u8 bAll) {
+    u32 i;
+    u32 nEnd;
+    UISScreen* pScreen;
+    u8 bOut;
+
+    if (bAll) {
+        nEnd = pStudio->nScreens;
+        i = 0;
+    } else {
+        i = pStudio->nCurScreen;
+        nEnd = i + 1;
+        if (i == -1) return;
+    }
+    for (; i < nEnd; i++) {
+        pScreen = &pStudio->pScreens[i];
+        if (n != -8 || pScreen->bUnloading != 1) {
+            bOut = 0;
+            fn_8016A2D4(pStudio, pScreen, pStack, 0, uEvent, n, b, p, &bOut);
+        }
+    }
+}
+
+// Runs the queued events, makes the screen named by the last p60 record current, then sends
+// event uEvent to it (or to every screen when bAll is set) unless the screen has taken it
+// already; with n < 0 it is sent again.
+void fn_80168DB0(UIStudio* pStudio, u32 uEvent, s32 n, u8 b, void* p, u8 bAll) {
+    s32 nLast;
+    u32 i;
+    u32 nEnd;
+    u32 uMask;
+    u32 uTaken;
+    u8 bOut;
+
+    fn_80165528(pStudio, 0);
+    nLast = pStudio->n5C - 1;
+    if (nLast >= 0) {
+        pStudio->nCurScreen = fn_8016C6C4(pStudio, pStudio->p60[nLast].u26, pStudio->p60[nLast].u24);
+    }
+    if (bAll) {
+        nEnd = pStudio->nScreens;
+        i = 0;
+    } else {
+        i = pStudio->nCurScreen;
+        nEnd = i + 1;
+        if (i == -1) return;
+    }
+    uMask = 1 << uEvent;
+    for (; i < nEnd; i++) {
+        uTaken = pStudio->pScreens[i].uMask & uMask;
+        if ((uTaken == 1 && n < 0) || uTaken == 0) {
+            bOut = 0;
+            pStudio->uFlags |= 2;
+            fn_8016A2D4(pStudio, &pStudio->pScreens[i], &pStudio->stack64, 0, uEvent, n, b, p, &bOut);
+            pStudio->uFlags &= ~2;
+        }
+    }
+}
+
 // Returns the current screen's group and screen IDs, 0xFFFF when there is no current screen.
 void fn_80168EE8(UIStudio* pStudio, u16* puGroup, u16* puScreen) {
     if (puGroup != NULL) {
@@ -148,7 +209,7 @@ void fn_80169C0C(UIStudio* pStudio, u32 nScreens, u32 nHandlers, u32 nRateFns, u
     uOffset += nRateFns * sizeof(UISRateFn);
     pStudio->nMax60 = n60;
     pStudio->n5C = 0;
-    pStudio->p60 = (u8*)pStudio + uOffset;
+    pStudio->p60 = (UISRecord60*)((u8*)pStudio + uOffset);
     uOffset += n60 * 0x28;
     pStudio->pCurrent = (UISCurrent*)((u8*)pStudio + uOffset);
     uOffset += sizeof(UISCurrent);
@@ -159,14 +220,14 @@ void fn_80169C0C(UIStudio* pStudio, u32 nScreens, u32 nHandlers, u32 nRateFns, u
     pStudio->pCurrent->u8 = 0xFFFF;
     pStudio->pCurrent->uA = 0xFFFF;
     pStudio->pCurrent->p10 = NULL;
-    pStudio->p64 = pStudio->p68 = pStudio->p70 = (s32*)((u8*)pStudio + uOffset);
-    pStudio->p6C = pStudio->p68 + nEventWords;
-    pStudio->pEventBase = pStudio->p6C - 1;
-    pStudio->pEventTop = pStudio->p6C - 1;
-    pStudio->pp68 = &pStudio->p68;
+    pStudio->stack64.p0 = pStudio->stack64.p4 = pStudio->stack64.pC = (s32*)((u8*)pStudio + uOffset);
+    pStudio->stack64.p8 = pStudio->stack64.p4 + nEventWords;
+    pStudio->pEventBase = pStudio->stack64.p8 - 1;
+    pStudio->pEventTop = pStudio->stack64.p8 - 1;
+    pStudio->pp68 = &pStudio->stack64.p4;
     uOffset += nEventWords * sizeof(s32);
-    pStudio->p78 = pStudio->p7C = pStudio->p84 = (s32*)((u8*)pStudio + uOffset);
-    pStudio->p80 = pStudio->p7C + nWords2;
+    pStudio->stack78.p0 = pStudio->stack78.p4 = pStudio->stack78.pC = (s32*)((u8*)pStudio + uOffset);
+    pStudio->stack78.p8 = pStudio->stack78.p4 + nWords2;
     pStudio->uMsPerTick = uMsPerTick;
     pStudio->nCurScreen = -1;
     pStudio->pfnCommand = NULL;
