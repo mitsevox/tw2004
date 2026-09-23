@@ -6,8 +6,7 @@
 #include "game.h"
 #include "terrain.h"
 #include "sitdev.h"
-
-typedef void (*EventHandler)(int nPlayer, int nEvent, void* pData, int nArg);
+#include "core/easb.h"
 
 u32 lbl_80281E20;               // frames counted by event 26
 
@@ -631,7 +630,8 @@ void fn_800670A8(int nPlayer, int nEvent, void* pData, int nArg) {
         fn_800A3348(pData, nPlayer);
         fn_8006ACF8(nPlayer, 1);
         if (nEvent == 36 && gPlayers[nPlayer].ball.pHitObject != NULL) {
-            fn_80033704(gPlayers[nPlayer].ball.pHitObject->nPatch, gPlayers[nPlayer].ball.pHitObject->nObjList);
+            fn_80033704(gPlayers[nPlayer].ball.pHitObject->nPatch,
+                        gPlayers[nPlayer].ball.pHitObject->nObjList);
         }
         if (nEvent == 38) {
             gPlayers[nPlayer].b30D = 1;

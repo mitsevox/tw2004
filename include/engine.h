@@ -335,6 +335,7 @@ void fn_8001EF34(f32* pIn, f32 f, f32* pOut);   // scale a vector (paired single
 void fn_80045494(u8 bOn, int nPlayer);
 void fn_80045558(u8 bOn, int nPlayer);
 u8   fn_8004560C(void);
+typedef void (*EventHandler)(int nPlayer, int nEvent, void* pData, int nArg);   // event.c's table
 void EVENT_Trigger(int nPlayer, int nEvent, void* pData, int b);   // through the event table at
                                         // lbl_80188628; pData: the ball, a position, or NULL
 void fn_800689D4(int nPlayer);

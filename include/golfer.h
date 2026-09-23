@@ -705,6 +705,7 @@ u8   fn_80101DF4(void);
 f32  Swing_SpinScale(int nSpin);         // how much spin SPIN allows: 0.15 at 0 .. 1.0 at 110 (Swing.c)
 f32  fn_8005C280(int nPlayer);          // the swing's fNonPowerShotPower (Swing.c)
 void Swing_RumbleOff(int nPlayer);      // stops the pad rumble (Swing.c)
+void Swing_ResetBoostAndSpin(int nPlayer);  // Swing.c
 
 u8   Club_UsableForKind(int nPlayer, int nClub, int nKind);
 int  AI_FirstUsableClub(int nPlayer, int nKind);
