@@ -168,8 +168,8 @@ void fn_800E90FC(void) {
 // green first) whose team is still playing.
 s32 fn_800E9178(int nPlayer) {
     TeeOrder order;
-    int nLead;
     int h;
+    int nLead;
     int w;
     int t;
     int i;
@@ -200,8 +200,8 @@ s32 fn_800E9178(int nPlayer) {
                 order.a[1] = order.a[3];
                 order.a[3] = t;
             }
-            t = order.a[0];
-            if (gPlayers[order.a[1]].nStrokes[h] < gPlayers[t].nStrokes[h]) {
+            if (gPlayers[order.a[1]].nStrokes[h] < gPlayers[order.a[0]].nStrokes[h]) {
+                t = order.a[0];
                 order.a[0] = order.a[1];
                 order.a[1] = t;
             }

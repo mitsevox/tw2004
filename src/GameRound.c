@@ -1116,12 +1116,12 @@ void fn_800E30D4(void) {
     int nAvail = 0;
     int i;
     int k;
+    u32 nCourse;
     int n;
     u32 nPick;
-    u32 nCourse;
     u32 nHole;
-    s8  nHoles;
     int h;
+    s8  nHoles;
     s8* p;
 
     courses = lbl_80184D40;
@@ -1136,9 +1136,9 @@ void fn_800E30D4(void) {
             }
         }
     }
-    for (i = 0; i < 18; i++) {
-        gpGame->nHoleCourse[i] = 0;
-        gpGame->nHoleNum[i] = -1;
+    for (n = 0; n < 18; n++) {
+        gpGame->nHoleCourse[n] = 0;
+        gpGame->nHoleNum[n] = -1;
     }
 
     // Par 3s.
@@ -1280,7 +1280,7 @@ void fn_800E30D4(void) {
             for (h = 0; h < 18; h++) {
                 if (fn_800D2ABC(nCourse, h) == 4) {
                     *p++ = h;
-                nHoles++;
+                    nHoles++;
                 }
             }
             nHole = holes[Rand_Next(1) % nHoles];
