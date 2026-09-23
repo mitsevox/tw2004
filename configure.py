@@ -519,7 +519,7 @@ config.libs = [
             Object(Matching, "libs/dolphin/src/ar/arq.c"),
             Object(Matching, "libs/dolphin/src/card/CARDOpen.c"),
             Object(Matching, "libs/dolphin/src/card/CARDStat.c"),
-            Object(NonMatching, "libs/dolphin/src/card/CARDStatEx.c"),
+            Object(Matching, "libs/dolphin/src/card/CARDStatEx.c"),
         ],
     },
     {
