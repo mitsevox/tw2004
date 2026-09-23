@@ -160,13 +160,6 @@ extern FEBio* lbl_80281EC8;             // a copy of the 'BIO ' stream object's 
 extern u32 lbl_80281ECC;                // their size
 extern u32 lbl_80281ED0;                // their ARAM address while they are there (0: not there)
 
-// ARAM (the audio memory, used as spare storage). skalib.c declares its own copies of these.
-u32  fn_800B6564(u32 uSize);                          // ARAM alloc
-void fn_800B6594(u32 uAram);                          // ARAM free
-void fn_800B6844(void* pSrc, u32 uAram, u32 uSize);   // copy to ARAM
-void fn_800B68B4(void* pDst, u32 uAram, u32 uSize);   // copy from ARAM
-void fn_800B67EC(void);                               // wait for the ARAM copy
-
 // ---- the golfers animated on menu screens (FEgolferanim.c) -----------------------------------
 
 // A state of the golfer loader (lbl_80189AA0): run by fn_8008B864.

@@ -7,13 +7,9 @@
 #include "game.h"
 #include "engine.h"
 #include "endian.h"
+#include "core/goaram.h"
 
 ClipBank* ClipBank_Get(u32 nSlot);
-u32   fn_800B6564(u32 uSize);                          // ARAM alloc
-void  fn_800B6594(u32 uAram);                          // ARAM free
-void  fn_800B6844(void* pSrc, u32 uAram, u32 uSize);   // copy to ARAM
-void  fn_800B68B4(void* pDst, u32 uAram, u32 uSize);   // copy from ARAM
-void  fn_800B67EC(void);                               // wait for the ARAM copy
 void  fn_80020BC8(void* pClip);                        // swaps a clip in place
 void  fn_80020F60(struct Clip* pClip, u32 uAram);
 void  AnimLib_Free(AnimLib* pLib);
@@ -1232,16 +1228,14 @@ u8* Skalib_ScratchToAram(int n) {
     if (lbl_80281D04[n] == 0) {
         lbl_80281D04[n] = fn_800B6564(lbl_80281D0C[n]);
     }
-    fn_800B6844(p, lbl_80281D04[n], lbl_80281D0C[n]);
-    fn_800B67EC();
+    fn_800B67EC(fn_800B6844(p, lbl_80281D04[n], lbl_80281D0C[n]));
     return p;
 }
 
 // Brings slot n's scratch area back from ARAM and frees the ARAM.
 void Skalib_ScratchFromAram(int n) {
     u32 uSize = fn_8009EF90();
-    fn_800B68B4(Skalib_Scratch(n, uSize), lbl_80281D04[n], lbl_80281D0C[n]);
-    fn_800B67EC();
+    fn_800B67EC(fn_800B68B4(Skalib_Scratch(n, uSize), lbl_80281D04[n], lbl_80281D0C[n]));
     if (lbl_80281D04[n] != 0) {
         fn_800B6594(lbl_80281D04[n]);
         lbl_80281D04[n] = 0;
@@ -1395,8 +1389,7 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
             if (pHdr->n38 != 0) {
                 for (f = 0; f < pHdr->nFrames; f++) {
                     Mem_cpy(lbl_80281CC8, pSrc1, pHdr->n8C * 2);
-                    fn_800B6844(lbl_80281CC8, uAram, nStride1);
-                    fn_800B67EC();
+                    fn_800B67EC(fn_800B6844(lbl_80281CC8, uAram, nStride1));
                     uAram += nStride1;
                     pSrc1 += pHdr->n8C * 2;
                 }
@@ -1404,8 +1397,7 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
             if (pHdr->n04 != 0) {
                 for (f = 0; f < pHdr->nFrames; f++) {
                     Mem_cpy(lbl_80281CC4, pSrc2, pHdr->n8E);
-                    fn_800B6844(lbl_80281CC4, uAram, nStride2);
-                    fn_800B67EC();
+                    fn_800B67EC(fn_800B6844(lbl_80281CC4, uAram, nStride2));
                     uAram += nStride2;
                     pSrc2 += pHdr->n8E;
                 }
@@ -1414,15 +1406,13 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
             pHdr->n8E = nStride2;
             if (n50 != 0) {
                 Mem_cpy(lbl_80281CCC, ((Clip*)pClipSrc)->pEC, pHdr->n50);
-                fn_800B6844(lbl_80281CCC, uAram, n50Al);
-                fn_800B67EC();
+                fn_800B67EC(fn_800B6844(lbl_80281CCC, uAram, n50Al));
                 uAram += n50Al;
             }
             pHdr->n50 = n50Al;
             if (n4C != 0) {
                 Mem_cpy(lbl_80281CD0, ((Clip*)pClipSrc)->pF0, pHdr->n4C);
-                fn_800B6844(lbl_80281CD0, uAram, n4CAl);
-                fn_800B67EC();
+                fn_800B67EC(fn_800B6844(lbl_80281CD0, uAram, n4CAl));
             }
             pHdr->n4C = n4CAl;
             fn_80020F60(pHdr, uAramStart);
@@ -2048,8 +2038,7 @@ void ClipBank_Stash(int nSlot) {
         if (lbl_801C6470[nSlot] == 0) {
             lbl_801C6470[nSlot] = fn_800B6564(lbl_801C647C[nSlot]);
         }
-        fn_800B6844(lbl_801C6488[nSlot], lbl_801C6470[nSlot], lbl_801C647C[nSlot]);
-        fn_800B67EC();
+        fn_800B67EC(fn_800B6844(lbl_801C6488[nSlot], lbl_801C6470[nSlot], lbl_801C647C[nSlot]));
         if (lbl_801C6488[nSlot] != lbl_80281CE0) {
             fn_80009E70(lbl_801C6488[nSlot]);
         }
@@ -2064,8 +2053,7 @@ void ClipBank_Stash(int nSlot) {
 void ClipBank_Restore(int nSlot) {
     if (lbl_801C6488[nSlot] == NULL) {
         lbl_801C6488[nSlot] = lbl_80281CE0;
-        fn_800B68B4(lbl_801C6488[nSlot], lbl_801C6470[nSlot], lbl_801C647C[nSlot]);
-        fn_800B67EC();
+        fn_800B67EC(fn_800B68B4(lbl_801C6488[nSlot], lbl_801C6470[nSlot], lbl_801C647C[nSlot]));
         lbl_801C6488[nSlot]->pData = (u8*)lbl_801C6488[nSlot] + 0x80;
         ClipBank_Install(lbl_801C6488[nSlot]);
     }

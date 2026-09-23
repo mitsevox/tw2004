@@ -102,7 +102,7 @@ ARAMTransfer* fn_800B65C0(u32 uSource, u32 uDest, u32 uLength, int nType, u32 uP
                           void (*pfnDone)(u32 uOwner), u32 uOwner, u8 uFlags);
 int           fn_800B6728(u32 uOwner);                 // cancel uOwner's transfers
 void          fn_800B67EC(ARAMTransfer* pTransfer);    // wait for a transfer, then free it
-void          fn_800B6844(void* pSrc, u32 uAram, u32 uSize);
-void          fn_800B68B4(void* pDst, u32 uAram, u32 uSize);
+ARAMTransfer* fn_800B6844(void* pSrc, u32 uAram, u32 uSize);   // copy to ARAM
+ARAMTransfer* fn_800B68B4(void* pDst, u32 uAram, u32 uSize);   // copy from ARAM
 
 #endif

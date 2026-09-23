@@ -398,7 +398,7 @@ void fn_8001C518(void) {
 }
 
 // The model id of the player's golfer.
-u8 fn_8001C558(int nPlayer) {
+int fn_8001C558(int nPlayer) {
     return gGolferTable[gSession.nGolfer[nPlayer]].nModelID;
 }
 

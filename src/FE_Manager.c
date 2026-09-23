@@ -9,6 +9,7 @@
 #include "charstate.h"
 #include "core/easb.h"
 #include "frontend/fe.h"
+#include "core/goaram.h"
 
 // Outside this file.
 // The movie player (LLVideo.c): plays a movie file until it ends or pfnSkip returns nonzero.
@@ -1275,8 +1276,7 @@ void fn_80079D30(void) {
         if (lbl_80281ED0 == 0) {
             lbl_80281ED0 = fn_800B6564(FE_BACKUP_SIZE);
         }
-        fn_800B6844(lbl_801D7148.p658, lbl_80281ED0, lbl_80281ECC);
-        fn_800B67EC();
+        fn_800B67EC(fn_800B6844(lbl_801D7148.p658, lbl_80281ED0, lbl_80281ECC));
         fn_80009E70(lbl_801D7148.p658);
         lbl_801D7148.p658 = NULL;
     }
@@ -1289,8 +1289,7 @@ void fn_80079DAC(void) {
         lbl_801D7148.p658 = fn_80009B34(lbl_80281ECC, 2, 32, "FE_Manager.c", 2778);
         memset(lbl_801D7148.p658, 0, lbl_80281ECC);
         if (lbl_80281ED0 != 0) {
-            fn_800B68B4(lbl_801D7148.p658, lbl_80281ED0, lbl_80281ECC);
-            fn_800B67EC();
+            fn_800B67EC(fn_800B68B4(lbl_801D7148.p658, lbl_80281ED0, lbl_80281ECC));
             fn_800B6594(lbl_80281ED0);
             lbl_80281ED0 = 0;
         }

@@ -220,8 +220,9 @@ They will be sorted into the sections below.
     must define them all).
   - The linker strips functions nothing calls, with their constants and `.sbss`; a misnamed caller can
     make a used function look unreferenced (CARDSetAttributesAsync).
-  - A hand-written asm function whose trailing `blr` dtk split into a gap scores below 100 in objdiff but
-    links (InitMetroTRK).
+  - A dead instruction after an asm function's tail branch (`b TRK_main; blr`) must be counted in the
+    function's `symbols.txt` size. Otherwise dtk makes a `gap_` symbol from it and objdiff scores the
+    function below 100 although the DOL links (InitMetroTRK: size 0x94 -> 0x98, 97.3 -> 100).
 - **Shell:** the Bash tool strips backslashes even inside quoted heredocs (`<<'EOF'`). Write scripts with
   the Write tool.
 
