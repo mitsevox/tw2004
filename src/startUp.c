@@ -68,7 +68,6 @@ void   MIXSetSPan(AXVPB* pVpb, int nSPan);
 void   MIXMute(AXVPB* pVpb);
 void   MIXUnMute(AXVPB* pVpb);
 void   fn_80146B18(void);               // MIX: pass the settings to the hardware
-f32    fn_8000AF7C(f32 x);              // natural logarithm
 void   fn_8009527C(void* p);            // frees what fn_800951A0 allocated
 void   fn_800B1A88(f32* pA, f32* pB);   // swap two floats
 void   fn_80110458(u8 b);
