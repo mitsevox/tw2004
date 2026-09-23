@@ -85,6 +85,37 @@ typedef struct GolferRecord {
     u8   unk94[0x140 - 0x94];
 } GolferRecord;
 
+// Golfer states: the rows of sGolferStateEngineTable (init, update, exit), kept on a per-player
+// stack by GOLFERSTATE_Push/Pop/Switch/Set. Names from TW06's table (docs/tw06-names.md); TW06
+// added two cut-scene states after PreShot and dropped the knee cam (our name for state 8).
+enum {
+    GS_NONE                = 0,
+    GS_PRE_SHOT            = 1,     // walking up and addressing the ball
+    GS_SHOT_SETUP          = 2,     // a CPU thinks here; a human goes straight to GS_SWING
+    GS_ZOOM                = 3,     // zoom-to-aim camera
+    GS_ELEVATOR            = 4,     // elevator (raised) camera
+    GS_GREEN               = 5,     // green camera
+    GS_GREEN_WATCH_ROLL    = 6,     // the putt preview
+    GS_GREEN_REVERSE_PUTT  = 7,     // reverse-putt camera
+    GS_KNEE_CAM            = 8,     // camera 7, TW06's kCameraMode_KneeCam; no TW06 state
+    GS_GREEN_MORPH         = 9,     // the putt-line view
+    GS_SWING               = 10,    // over the ball with the HUD: the stick swing
+    GS_REPLAY_SWING        = 11,    // the swing animation playing out to impact
+    GS_SIMULATE            = 12,    // ball in flight
+    GS_IN_THE_HOLE         = 13,
+    GS_SHOW_YARDAGE        = 14,    // ball at rest, not holed
+    GS_FADE_TO_TAP_IN      = 15,    // only when a gimme is allowed: the rehearsal solves the tap-in
+    GS_TAP_IN              = 16,
+    GS_FADE_TO_REMOVE_BALL = 17,
+    GS_REMOVE_BALL         = 18,    // picking the ball out of the cup
+    GS_WAIT                = 19,
+    GS_INITIAL_FLY_BY      = 20,    // the hole flyover
+    GS_MID_HOLE_FLY_BY     = 21,
+    GS_PLACE_BALL          = 22,
+    GS_CONCEDED            = 23,
+    GS_NUM                 = 27     // table rows (24..26 empty)
+};
+
 // Swing states (TW06: SW_eSwingState), the value of SwingData.nState. Stepped by the table
 // gSwingPhaseFns; "fidget" is holding the stick at the top of the backswing.
 enum {
@@ -100,7 +131,7 @@ enum {
 // The swing meter's per-player state, embedded in Player at 0x3D4 (offsets below are within
 // this struct; add 0x3D4 for the player offset). Names are TW06's SW_sSwingData, which is the
 // same struct with a few fields added: 4 bytes after 0x14, 12 after 0x2C (the second stick),
-// 8 after 0x37C, 0x18 in all by 0x390. Every renamed field was checked against our code
+// 8 after 0x37C, 0x18 in all by 0x390. The fields our code uses were checked against it
 // (docs/tw06-names.md, "Structs").
 typedef struct SwingData {
     s32  nState;                // 0x000  (0x3D4) SW_* above
@@ -236,8 +267,8 @@ typedef struct Player {
     u8   unkC28;                // 0xC28
     u8   bLowIQPenalty;         // 0xC29  quarters the IQ overconfidence term when set
     s8   nLevel;                // 0xC2A  CPU difficulty level: 25 modifier points per level
-    u8   bPlanReady;            // 0xC2B  the next shot's rehearsal had settled when the camera arrived
-    u8   bRehearsalDone;        // 0xC2C  the next shot's rehearsal (swing state 15) has settled
+    u8   bPlanReady;            // 0xC2B  the gimme's tap-in was solved when the camera arrived
+    u8   bRehearsalDone;        // 0xC2C  the gimme's tap-in rehearsal (GS_FADE_TO_TAP_IN) has settled
     u8   unkC2D;                // 0xC2D
     u8   unkC2E;                // 0xC2E
     u8   unkC2F;

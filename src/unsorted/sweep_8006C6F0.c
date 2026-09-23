@@ -12,7 +12,7 @@ void fn_8002E25C();
 void fn_80055D3C();
 void fn_800563C4();
 void fn_80056454();
-void fn_8005CCAC();
+void GOLFERSTATE_OpenONCE();
 void fn_8005CD94();
 void fn_8005D2E4();
 void fn_8005D348();
@@ -47,7 +47,7 @@ void fn_8006C720(void) {
     fn_80055D3C();
     fn_800563C4();
     fn_8005D2E4();
-    fn_8005CCAC();
+    GOLFERSTATE_OpenONCE();
     fn_800DCBA8();
     fn_800A2064();
     fn_8010F6C8();

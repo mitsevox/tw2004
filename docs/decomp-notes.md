@@ -182,18 +182,18 @@ Reading compiler output
   first gives `and. r0, rM, r3`, and swapping the operands in the source changes nothing. Applied
   to every single-use mask in Swing.c (States 04/05/08/09/10 exact, 06/12/14/22 closer).
 - **[verified] `x / 2.0f` becomes `x * 0.5f`** with the constant loaded first (`lfs f0, 0.5;
-  lfs f2, x`). Writing `x * 0.5f` loads them the other way round. (SwingState14_Update.)
+  lfs f2, x`). Writing `x * 0.5f` loads them the other way round. (STATEFUNC_ShowYardageUpdate.)
 - **[verified] `!(a >= b || c > d)` vs `a < b && c <= d`.** The original's float compares follow
   the source's operator: `>=` gives `cror eq,gt,eq; beq`, `<` gives `bge`, `> d` taken-branch-away
   gives a bare `ble`, `<= d` gives `cror eq,lt,eq`. Match the operator, not just the logic.
 - **[verified] Short string literals live in `.sdata`.** A literal of 8 bytes or less (`"tball"`,
   `"Glove"`, `"Swing.c"`) is addressed `li rX, sym@sda21`; longer ones `lis/addi`. When the original
   has an sda21 string, write the literal, not `extern char lbl_...[]` (Swing_LoadTuning exact).
-- **[verified] No automatic inlining in game code.** Calling `SwingStack_Clear()` from a later
+- **[verified] No automatic inlining in game code.** Calling `GOLFERSTATE_Kill()` from a later
   function stays a `bl`; where the original has the body pasted in, write the body out.
 - **[verified] A signed array element returned as `s8` needs no `extsb` in the callee** (the caller
-  extends). A `u8` element returned as `s8` gets one. (`fn_8005D2A8`: `nState` is `s8[5]`, and
-  `SwingStack_Top` reads it as `(u8)` to keep its own shape.)
+  extends). A `u8` element returned as `s8` gets one. (`GOLFERSTATE_GetPreviousState`: `nState` is `s8[5]`, and
+  `GOLFERSTATE_GetCurrentState` reads it as `(u8)` to keep its own shape.)
 - **[verified] Struct array through a typed local.** `ShotObj* pObj = (ShotObj*)h; pObj->events[i].f`
   gives `add; lfs off(r)`; the same through raw pointer arithmetic gives `addi; lfsx`.
 - **[verified] Clamp as nested ternaries.** `x = (x < lo) ? lo : ((x > hi) ? hi : x)` gives the

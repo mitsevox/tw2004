@@ -4,7 +4,7 @@
 
 extern s32 lbl_80282278;
 extern u8 lbl_80282370;
-void SwingStack_Push();
+void GOLFERSTATE_Switch();
 void fn_800A6278();
 void fn_800E3D90();
 void fn_800F39CC();
@@ -17,7 +17,7 @@ void fn_800F3800(void) {
 }
 
 void fn_800F3828(void) {
-    SwingStack_Push(12, lbl_80282278);
+    GOLFERSTATE_Switch(12, lbl_80282278);   // GS_SIMULATE
     fn_800E3D90();
     fn_800A6278();
     lbl_80282370 = 1;

@@ -178,10 +178,11 @@ shot kind matches and your aim is within 5 degrees, **your shot is replaced by t
 one** and your swing error is zeroed. The human and CPU paths are not just different - the
 human's best shots *are* the CPU's solver. Full account in [`gameplay.md`](gameplay.md).
 
-**Update (`SwingState15_Update` in C):** the human's *default* shot is the CPU path too. While
-the camera flies to the ball the game runs the CPU rehearsal on the human (controller set to
-CPU for the call) and the suggested club and aim are its solution. So the human and CPU share
-the solver twice: for the suggestion, and for a lucky shot.
+**Update (`STATEFUNC_FadeToTapInUpdate` in C):** a gimme's tap-in is the CPU path too: the game runs
+the CPU rehearsal on the human (controller set to CPU for the call) and plays its solution. So
+the human and CPU share the solver twice: for gimmes, and for a lucky shot. *(Corrected
+2026-09-23: this used to say every suggested shot is the rehearsal's solution. TW06's name for
+the state, FadeToTapIn, prompted a check: it is entered only when a gimme is allowed.)*
 
 **Status:** answered.
 
@@ -446,9 +447,9 @@ check in the ball code.
 **Result (2026-09-22):** **right about gimmes, wrong about the caddie read.**
 
 - **A gimme counts no matter where the ball goes: confirmed, in the code.** A gimme sets player
-  flag 8 (`SwingState16_Enter`), then plays the tap-in as a *real* putt: the CPU's rehearsal
+  flag 8 (`STATEFUNC_TapInInit`), then plays the tap-in as a *real* putt: the CPU's rehearsal
   solution, launched through the normal physics, no skill error, no +5% pace. When that ball comes
-  to rest, `SwingState12_Update` checks flag 8 and **sets the lie to "holed" whatever the ball did**.
+  to rest, `STATEFUNC_SimulateUpdate` checks flag 8 and **sets the lie to "holed" whatever the ball did**.
   The holed-out state then moves the ball to the pin. So if a tap-in lips out, it still counts.
   That is exactly the TW2003 glitch; TW2004 keeps the same rule. In 2004 the tap-in is the
   rehearsed putt (which solved within 1.8 in, run on the same 1-tick physics as the real ball), so

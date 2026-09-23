@@ -1451,7 +1451,7 @@ void Caddie_ApplyTip(int nPlayer) {
 
 // ---- small queries ------------------------------------------------------------------------------
 
-int  SwingStack_Top(int nPlayer);       // Swing.c
+int  GOLFERSTATE_GetCurrentState(int nPlayer);       // Swing.c
 void fn_80013200(int nPad, u8 nValue);
 
 u8 Player_OnTee(int nPlayer) {
@@ -1464,7 +1464,7 @@ u8 Player_IsHoled(int nPlayer) {
 
 u8 Player_IsHoledNotState23(int nPlayer) {
     int bResult = 0;
-    if (gPlayers[nPlayer].nLie == LIE_HOLED && (s8)SwingStack_Top(nPlayer) != 0x17) {
+    if (gPlayers[nPlayer].nLie == LIE_HOLED && (s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_CONCEDED) {
         bResult = 1;
     }
     return bResult;
@@ -1741,7 +1741,7 @@ void Players_SetupAll(void) {
 void Players_Reset(void) {
     int i;
     for (i = 0; i < gSession.nNumPlayers; i++) {
-        SwingStack_Clear(i);
+        GOLFERSTATE_Kill(i);
         gPlayers[i].nShotHandle = 0;
     }
     gNumPlayersSetUp = 0;

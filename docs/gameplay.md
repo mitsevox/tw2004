@@ -41,42 +41,47 @@ both stick axes every frame: forward of it the reading maps smoothly down to 1, 
 reading jumps to ~179 and runs to 255 - so the first frame past the gate already reads a third
 of the way back. A CPU or a replay starts the swing immediately.
 
-The swing states (`gSwingStates`, 27 x enter/update/exit; 44 of 67 in C)
+The swing states (`sGolferStateEngineTable`, 27 x enter/update/exit; 44 of 67 in C)
 --------------------------------------------------------------------------
 
-Around the swing itself sits a state machine on a per-player stack (`SwingStack_*`). What the
-states do, from their code:
+Around the swing itself sits a state machine on a per-player stack (`GOLFERSTATE_*`). EA's
+names for the states come from TW06's copy of the same table (`GS_*` in `include/golfer.h`,
+`tw06-names.md`). What the states do, from their code:
 
-    1   addressing the ball: the golfer's animation places or tees the ball (it rides in the
+    1   PreShot: addressing the ball: the golfer's animation places or tees the ball (it rides in the
         hand until the animation's event 3 fires), a still-moving ball is stepped, a CPU
         rehearses once its ball is still, button 0 hurries the camera; state 2 when the camera
         is done (or after 10 s on it); leaving it puts the ball back
-    2   a CPU thinks (its rehearsal); a human goes straight to 10
-    3   aiming (camera 1, camera 2 on a putt); the caddie updates here
-    4-7 setup sub-states: cameras 3/4/6, button polling; the caddie updates in 4 and 6
-    6   the putt preview: the caddie's solved putt is launched as a ghost (below)
-    8   camera 7, then back to 12 or 0
-    10  shot setup: starts the caddie, HUD, sounds; the swing phase table below runs here
-        (`fn_80058F5C`), and in 12 for the follow-through
-    11  the swing animation plays; Swing_Launch at its impact frame
-    12  the ball is away
-    13, 14  the ball has come to rest (a copy is kept as "before the shot")
-    15  plan the next shot from where the ball lies (Shot_Plan)
-    16  a second setup state: animation 11, flag 8, a distance to the pin stored
-    18  holed out: the ball goes to the pin, lie 12 (LIE_HOLED), animation 12
-    19-23  camera states (saved-camera restore, flyovers, camera 25)
+    2   ShotSetup: a CPU thinks (its rehearsal); a human goes straight to 10
+    3   Zoom: zoom-to-aim camera (camera 1, camera 2 on a putt); the caddie updates here
+    4   Elevator: the raised camera (camera 3)
+    5   Green: the green camera (camera 4)
+    6   GreenWatchRoll: the putt preview: the caddie's solved putt is launched as a ghost (below)
+    7   GreenReversePutt: the reverse-putt camera (camera 6)
+    8   the knee cam (camera 7, TW06's KneeCam), then back to 12 or 0; gone as a state by TW06
+    9   GreenMorph: the putt-line view
+    10  Swing: over the ball with the HUD: starts the caddie, HUD, sounds; the swing phase
+        table below runs here (`fn_80058F5C`), and in 12 for the follow-through
+    11  ReplaySwing: the swing animation plays; Swing_Launch at its impact frame
+    12  Simulate: the ball is away
+    13  InTheHole, 14 ShowYardage: the ball has come to rest (a copy is kept as "before the shot")
+    15  FadeToTapIn: only when a gimme is allowed - plan and solve the tap-in (below)
+    16  TapIn: animation 11, flag 8, a distance to the pin stored; the tap-in is played for you
+    17  FadeToRemoveBall
+    18  RemoveBall: the ball goes to the pin, lie 12 (LIE_HOLED), animation 12
+    19  Wait, 20 InitialFlyBy (the hole flyover), 21 MidHoleFlyBy, 22 PlaceBall, 23 Conceded
 
-**Your suggested shot is the CPU's solution** (state 15, `SwingState15_Update`, in C). When
-the camera flies to your ball for the next shot, `Shot_Plan` has just picked an authored aim
-point for you (the same table the CPU uses), and every frame of the flight the game **runs
-`AI_RehearseShot` on you - your controller set to the CPU for the call, in fast mode (six ticks
-a frame)** - until it settles. The rehearsal writes its solved aim and the CPU's club choice
-straight into your player. So the club and aim marker you are handed when you arrive at the
-ball are not a rule of thumb: they are the CPU's simulated answer for that aim point, which is
-why "just hit what it gives you" works as well as it does. If the camera arrives before the
-rehearsal settles, a "still working" call is made and you get whatever it had.
+**A gimme's tap-in is the CPU's solution** (state 15, `STATEFUNC_FadeToTapInUpdate`, in C).
+*Corrected 2026-09-23: this section used to say every suggested shot comes from here. It does
+not - state 14 enters state 15 only when `Gimme_Allowed` says yes; TW06 names the state
+FadeToTapIn.* When a gimme is given, `Shot_Plan` plans the tap-in, and every frame of the camera
+move the game **runs `AI_RehearseShot` on you - your controller set to the CPU for the call, in
+fast mode (six ticks a frame)** - until it settles. State 16 (TapIn) then plays that solved putt
+for you. If the camera finishes before the rehearsal settles, the turn ends instead. For an
+ordinary shot, the club and aim you are handed come from `Shot_Plan` alone (the authored aim
+point and the club tables), not from a simulation.
 
-**The putt preview** (state 6, `SwingState06_Enter`, in C) is the one with a trick in it: it
+**The putt preview** (state 6, `STATEFUNC_GreenWatchRollInit`, in C) is the one with a trick in it: it
 takes the caddie's solved putt (`Caddie_ApplyTip`), **sets the player's controller to the CPU
 for one call of `Swing_Launch`** - so the launch has no swing error and no luck swap - keeps the
 launched ball as a ghost in the "ball before the shot" slot with no owner, and then restores the
@@ -364,7 +369,7 @@ parks it 3 in down in the cup.
 count) runs from the rolling step (`Ball_GroundContact`, state 4) every tick, for every *real*
 ball, human or CPU. **It is skipped in simulations** (`gSimulating`) unless `gSimFullCup` is set -
 so the CPU's shot rehearsal and the caddie's putt read run *without* it, while the state-15
-rehearsal (your suggested shot, the gimme) and the look-ahead ball get it (corrected
+rehearsal (the gimme's tap-in) and the look-ahead ball get it (corrected
 2026-09-23; this used to say "gated only by a debug flag pair"):
 
 - inside **5.5 inches** of the pin (under three cup radii), on a putt that started at least 6 in
@@ -394,13 +399,13 @@ Gimmes and the pool-cue tap-in
 **When** (`fn_800E2810`, from swing state 14 once the ball has stopped): the gimme option is on
 (options byte 5, default on), not a replay, two mode flags clear, the ball within **0.5 yd (18 in)**
 of the pin (`fn_800D0478`), and either the club is the putter or it is a one-player game. Then
-state 15 (the CPU rehearsal runs on the player until it settles) and state 16: animation 11,
+state 15 (FadeToTapIn: the CPU rehearsal runs on the player until it settles) and state 16 (TapIn): animation 11,
 camera 12, and `Swing_Launch` with the controller set to the CPU for the call.
 
-**It always counts** (hypothesis 9). `SwingState16_Enter` sets player flag 8 (`uFlags` at
+**It always counts** (hypothesis 9). `STATEFUNC_TapInInit` sets player flag 8 (`uFlags` at
 `0xEE8`). The tap-in is a real putt: the rehearsal's solution (tolerance 1.8 in, fast mode) goes
 through `Swing_Launch` with no skill error, and flag 8 skips the CPU's +5% putt pace and the
-power clamp. When the ball comes to rest, `SwingState12_Update` sees flag 8 and **sets the lie
+power clamp. When the ball comes to rest, `STATEFUNC_SimulateUpdate` sees flag 8 and **sets the lie
 to 12 (holed) wherever the ball is**; state 18 then puts the ball at the pin. So a tap-in that
 lips out is still scored as made. This is the rule behind the known TW2003 glitch. Flag 8 also
 stops the look-ahead's in-hole camera cut (below).
@@ -499,7 +504,7 @@ Each frame in state 1, after the step:
 State 3 is the caller's "enough": use the best aim found, or, if nothing ever landed, **+25 on
 the modifiers** and `AI_ChooseTarget` again from scratch.
 
-**The caller is swing state 2, "thinking"** (`SwingState02_Update`, in C). The CPU rehearses
+**The caller is swing state 2, "thinking"** (`STATEFUNC_ShotSetupUpdate`, in C). The CPU rehearses
 one frame at a time with the same tolerance as the caddie - **land within 1.8 inches** of the
 chosen point - and moves on once the rehearsal has settled, at least **1 second** has passed and
 the camera has settled; or when its time is up: **4 seconds**, 1.5 s for a tee shot and 3.5 s
@@ -653,8 +658,8 @@ height above the ground and its closest approach to the pin are updated.
   velocity, also quadratic, with its own speed/spin terms (the exact polynomials are in the C).
 - **Gravity**, and a near-cup extra: **within 2.25 inches of a point one ball radius above the
   pin position, gravity is tripled** - the cup pulls a ball in the air down into it. This runs
-  for the real ball, the look-ahead ball and the state-15 rehearsal (your suggested shot and the
-  gimme tap-in, which set `lbl_80281DD1`), **but not for the CPU's own shot rehearsal or the
+  for the real ball, the look-ahead ball and the state-15 rehearsal (the gimme tap-in, which sets
+  `lbl_80281DD1`), **but not for the CPU's own shot rehearsal or the
   caddie**. It only acts in the air (a putt rolls in state 3), so it matters for chip-ins and
   hops over the hole.
 - Event 0x1C fires once, at the top of the flight.
@@ -818,9 +823,9 @@ breaking putt changes the line too.
 The look-ahead ball and the "this could go in" moment (`fn_800DF824`, read)
 ---------------------------------------------------------------------------
 
-At the strike, `SwingState12_Enter` copies the launched ball into a second ball in the player
+At the strike, `STATEFUNC_SimulateInit` copies the launched ball into a second ball in the player
 (`+0xB5C`; our struct still calls it `ballBefore`). Every frame of the flight, `fn_800DF824`
-(called from `SwingState12_Update`):
+(called from `STATEFUNC_SimulateUpdate`):
 
 1. moves the real ball: `fn_800DB1C4` ticks of 20 ms, each `Ball_Tick(ball, 1.0)`. The
    rehearsal's sim uses the same 1.0 tick, so the rehearsal and the real ball integrate

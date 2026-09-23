@@ -294,3 +294,53 @@ SwingData checks that decided it:
 - `fForwardSpin` / `fSideSpin`: the CPU sets the first from its distance error and the second from its aim error.
 - `bDrawBoostUI`: the boost/spin display is drawn only when it is set.
 - Not renamed (no evidence either way): `f10`/`f14` (TW06 has three floats there), the four stick rest fields at 0x380 (TW06 has six), and `unk630` (not in TW06).
+
+Golfer states
+-------------
+
+Our `gSwingStates` is TW06's `sGolferStateEngineTable` (PS2 `0x00410690`): the same rows of
+(init, update, exit) callbacks, read out of the PS2 executable with `ps2states.py` and named
+from `MAPFILE.TXT`. All 23 of our states are now named `STATEFUNC_<State>Init/Update/Exit` and
+the stack functions `GOLFERSTATE_*` (the `SwingStateNN_*` / `SwingStack_*` names in the table
+above are the old ones). The state ids are `GS_*` in `include/golfer.h`.
+
+| Ours | TW06 row | State | How it was placed |
+|---|---|---|---|
+| 1 | 1 | PreShot | shared callees (8 in init) |
+| 2 | 4 | ShotSetup | sets camera 0 (`kCameraMode_ShotSetup`); matcher pairing |
+| 3 | 5 | Zoom | camera 1 / 2 on a putt (`ZoomToAim` / `GreenZoomToAim`) |
+| 4 | 6 | Elevator | camera 3 (`ElevatorCam`) |
+| 5 | 7 | Green | camera 4 (`GreenCam`) |
+| 6 | 8 | GreenWatchRoll | shared callees (3 / 4 / 2); the putt preview |
+| 7 | 9 | GreenReversePutt | camera 6 (`ReversePuttCam`) |
+| 8 | - | (KneeCam, our name) | camera 7 (`KneeCam`); no such state in TW06 |
+| 9 | 10 | GreenMorph | shared callees; putt-line view |
+| 10 | 11 | Swing | matcher pairing (init, update) |
+| 11 | 12 | ReplaySwing | shared callees (6 / 4 / 2) |
+| 12 | 13 | Simulate | shared callees (3 / 6) |
+| 13 | 14 | InTheHole | the only row with no exit in both tables |
+| 14 | 15 | ShowYardage | shared callees (9, and the exit's 1 is unique) |
+| 15 | 16 | FadeToTapIn | entered only after `Gimme_Allowed` (this corrected our reading) |
+| 16 | 17 | TapIn | plays animation 11, the tap-in |
+| 17 | 18 | FadeToRemoveBall | TW06's update waits for the fade, then switches, like ours |
+| 18 | 19 | RemoveBall | picks the ball out of the cup |
+| 19 | 20 | Wait | position |
+| 20 | 21 | InitialFlyBy | shared callees; the hole flyover |
+| 21 | 22 | MidHoleFlyBy | position; a camera flyover |
+| 22 | 23 | PlaceBall | shared callees (7 / 4) |
+| 23 | 24 | Conceded | position; `Golfer.c` treats state 23 like a holed ball |
+
+TW06 added `TrinityCutSceneNIS` and `CutSceneNIS` (rows 2, 3) and states from row 25 on
+(ellipse orbit, psyche-out, inactivity, shot caller, Skills 18, camera debug). The camera
+numbers match TW06's `CameraMode_t` up to 7 at least; higher ones differ.
+
+The call-graph matcher had paired 22 of these functions before the table was read, and 21
+agree with it. The exception: it named our state-18 update `Character_UpdateBallAnimation`.
+Ours is the full pick-out-and-toss routine (0x3B8 bytes); by TW06 that code had moved into
+`Character_UpdateBallAnimation` and `STATEFUNC_RemoveBallUpdate` is a small camera wrapper, so
+the table name stands.
+
+Stack functions: `GetCurrentState` (was `SwingStack_Top`), `GetPreviousState`, `Push`, `Pop`,
+`Set` (clear, then push one), `Switch` (replace the top; our old name `SwingStack_Push` was
+wrong), `Kill` (was `SwingStack_Clear`), `OpenONCE` (empty all stacks), `Update` (run every
+player's current update).

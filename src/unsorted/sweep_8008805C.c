@@ -2,11 +2,11 @@
 
 #include "game_types.h"
 
-s8 SwingStack_Top(s32);
+s8 GOLFERSTATE_GetCurrentState(s32);
 
 void fn_8008805C(s32* arg0, s32* arg1);
 void fn_8008805C(s32* arg0, s32* arg1) {
-    if (SwingStack_Top(*arg0) == 3) {
+    if (GOLFERSTATE_GetCurrentState(*arg0) == 3) {
         *arg1 = 1;
         return;
     }

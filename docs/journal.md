@@ -251,9 +251,13 @@ Dated log of what was done and decided, newest last. Facts and lessons belong in
      `GamePlayer` regrouped, so TW06 names are comments there. Details: `tw06-names.md`,
      "Structs". The matcher was not re-run: no new functions were decompiled, so nothing it
      uses changed.
-  1b. **Next up: name the 27 swing states.** TW06's `GolferStateFunctionList_t` is our
-     `gSwingStates` row exactly (init, update, close), and the PS2 map has 94 `STATEFUNC_*`
-     names. Line the tables up and our `SwingStateNN_*` get EA's names.
+  1b. ~~Name the swing states~~ **done 2026-09-23**: our table is TW06's
+     `sGolferStateEngineTable`; all 23 states named (`STATEFUNC_*`, 66 callbacks), plus 9 stack
+     functions (`GOLFERSTATE_*`) and a `GS_*` enum. Placed by shared callees, by the camera
+     numbers (TW06's `CameraMode_t` still fits the low ones) and by position. State 8 is the knee
+     cam, which TW06 dropped. **Correction:** state 15 is FadeToTapIn - entered only for a gimme -
+     so the claim that every suggested shot is the CPU rehearsal's solution was wrong; fixed in
+     `gameplay.md` and `hypotheses.md`. Our `SwingStack_Push` was really a switch (replace top).
   2. The plain m2c sweep is exhausted (every size to 512 bytes, plus the repair pass); rerunning
      it unchanged finds nothing. Only two things reopen it: (a) literal-pool functions (float
      constants, strings), never attempted, which need units that own their `.sdata2`/`.rodata`
