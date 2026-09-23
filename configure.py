@@ -423,7 +423,6 @@ config.libs = [
         "progress_category": "sdk",
         "src_dir": "extern/tww",
         "objects": [
-            Object(NonMatching, "src/dolphin/os/OS.c"),
             Object(NonMatching, "src/dolphin/pad/Pad.c"),
         ],
     },
@@ -569,9 +568,10 @@ config.libs = [
             Object(Matching, "MetroTRK/target_options.c"),
             Object(Matching, "MetroTRK/mslsupp.c"),
             Object(Matching, "MetroTRK/UDP_Stubs.c"),
-            Object(NonMatching, "MetroTRK/ddh/main.c"),
+            # the ddh and gdev drivers use small data (gIsInitialized is in .sbss); the rest of TRK does not
+            Object(Matching, "MetroTRK/ddh/main.c", extra_cflags=["-sdata 8", "-sdata2 8"]),
             Object(Matching, "MetroTRK/CircleBuffer.c"),
-            Object(NonMatching, "MetroTRK/gdev/main.c"),
+            Object(Matching, "MetroTRK/gdev/main.c", extra_cflags=["-sdata 8", "-sdata2 8"]),
             Object(Matching, "MetroTRK/MWTrace.c"),
         ],
     },
@@ -743,6 +743,7 @@ config.libs = [
         "progress_category": "sdk",
         "src_dir": "extern/sdk",
         "objects": [
+            Object(Matching, "dolphin/os/OS.c"),
             Object(Matching, "dolphin/os/OSError.c"),
             Object(Matching, "dolphin/os/OSContext.c"),
             Object(NonMatching, "dolphin/os/OSReboot.c"),
@@ -797,6 +798,7 @@ config.libs = [
             Object(Matching, "runtime/s_modf.c"),
             Object(Matching, "runtime/sscanf.c"),
             Object(Matching, "runtime/wchar_io.c"),
+            Object(Matching, "runtime/uart_console_io.c"),
         ],
     },
     {
@@ -987,7 +989,6 @@ config.libs = [
             Object(Matching, "unsorted/sweep_800ADF6C.c"),
             Object(Matching, "unsorted/sweep_800B6214.c"),
             Object(Matching, "unsorted/rcmp_mad_codec/sweep_800B9B48.c"),
-            Object(Matching, "unsorted/sweep_8015C128.c"),
             Object(Matching, "unsorted/sweep_80007328.c"),
             Object(Matching, "unsorted/sweep_80007368.c"),
             Object(Matching, "unsorted/sweep_80008F20.c"),
@@ -1809,7 +1810,6 @@ config.libs = [
             Object(Matching, "unsorted/sweep_8013FF30.c"),
             Object(Matching, "unsorted/sweep_80145B1C.c"),
             Object(Matching, "unsorted/sweep_8014CA80.c"),
-            Object(Matching, "unsorted/sweep_8015C120.c"),
             Object(Matching, "unsorted/sweep_801654D0.c"),
             Object(Matching, "unsorted/sweep_80165524.c"),
             Object(Matching, "unsorted/sweep_80165C6C.c"),
