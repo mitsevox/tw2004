@@ -10,7 +10,7 @@ void fn_800F0570(void);
 void fn_800F05B0(UStreamObject* pObject);
 void fn_800F05DC(UStreamObject* pObject);
 extern u8 lbl_8028234C;
-s32 fn_800F0E18(void);
+s32 fn_800F0E18(s32 i);
 extern s32 lbl_80282350;
 extern s32 lbl_80282354;
 s32 fn_800F0E20(u8* p0);
@@ -307,15 +307,17 @@ u8 fn_800F0CEC(u16 nDate, s32* pId, s32* pRound) {
     s32 nMonth;
     s32 nDay;
     s32 nYear;
-    u8 bFound;
     s32 i;
     s32 d;
+    s32 nSeason;
+    u8 bFound;
     fn_800D2714(&nDate, &nMonth, &nDay, &nYear);
     bFound = 0;
+    nSeason = nYear - 2003;
     for (i = 0; i < 118; i++) {
-        if (gRTEs.aEvent[i].aDate[nYear - 2003] != 0) {
-            d = nDate - gRTEs.aEvent[i].aDate[nYear - 2003];
-            if (d >= 0 && d < fn_800F0E18()) {
+        if (gRTEs.aEvent[i].aDate[nSeason] != 0) {
+            d = nDate - gRTEs.aEvent[i].aDate[nSeason];
+            if (d >= 0 && d < fn_800F0E18(i)) {
                 *pId = i;
                 bFound = 1;
                 *pRound = d + 1;
@@ -336,7 +338,8 @@ u8 fn_800F0DB8(s32 nMonth, s32 nDay, s32 nYear, s32* pId, s32* pRound) {
     return fn_800F0CEC(nDate, pId, pRound);
 }
 
-s32 fn_800F0E18(void) {
+// How many days event i lasts: always one.
+s32 fn_800F0E18(s32 i) {
     return 1;
 }
 
@@ -427,16 +430,16 @@ s32 fn_800F102C(void) {
 
 // TW06: GameModeDriverRTE::GetNextEvent. The next event from today (-1 if none this season).
 s32 fn_800F1034(void) {
-    s32 nBest = -1;
+    s32 nNext;
     s32 nMonth;
     s32 nDay;
     s32 nYear;
     u16 nToday;
     s32 nSeason;
-    s32 nNext;
-    u8 bFound;
+    s32 nBest = -1;
     s32 i;
     s32 d;
+    u8 bFound;
     fn_800F0C74(&nMonth, &nDay, &nYear);
     nSeason = nYear - 2003;
     fn_800D2678(&nToday, nMonth, nDay, nYear);
