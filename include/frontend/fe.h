@@ -223,6 +223,7 @@ extern CrAPDB* lbl_80282460;
 extern UStreamObject* lbl_80282464;     // the 'CR_A' object (the assets), kept until freed
 extern UStreamObject* lbl_80282468;     // the 'CR_S' object (their names)
 extern s32* lbl_80282474;               // per part: the index of its first asset
+extern char lbl_801935C8[16][32];      // 16 names (fn_80107294)
 extern char lbl_801932C8[CRAP_NUM_PARTS][32];   // per part: the name of its "All ..." entry that
                                         // lists every category ("All Headwear"), or ""
 

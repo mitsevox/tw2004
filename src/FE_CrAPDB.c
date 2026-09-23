@@ -13,6 +13,7 @@ s32  fn_800CCEA0(Skin* pSkin);          // SkinPart.c: and aSets[3]
 
 // This file, in address order.
 void fn_80103920(void);
+void fn_80103EFC(CrAPAsset* pAsset);
 int  fn_80104F7C(CrAPAsset* pAsset);
 void fn_80105188(UStreamObject* pObject);
 void fn_801051F4(UStreamObject* pObject);
@@ -110,6 +111,19 @@ void fn_80103D6C(void) {
 
     Mem_cpy(pProfile->a5614, pSkin->aParts[3], fn_800CCA40(pSkin) * sizeof(SkinChoice));
     Mem_cpy(pProfile->a5754, pSkin->aSets[3], fn_800CCEA0(pSkin) * sizeof(SkinChoice));
+}
+
+// And the entries of its six other skins.
+void fn_80103DE0(void) {
+    SaveProfile* pProfile = fn_80077ACC();
+    Skin* pSkin;
+    int i;
+
+    for (i = 0; i < 6; i++) {
+        pSkin = lbl_80281EE0->pB4->pChar->p16D8->apSkins[i];
+        Mem_cpy(pProfile->a5AF4[i], pSkin->aParts[3], fn_800CCA40(pSkin) * sizeof(SkinChoice));
+        Mem_cpy(pProfile->a5CD4[i], pSkin->aSets[3], fn_800CCEA0(pSkin) * sizeof(SkinChoice));
+    }
 }
 
 // The asset may be picked: it was not locked when last checked, and its aB1CC bit is set.
@@ -406,6 +420,43 @@ char* fn_801064EC(int nCategory) {
         return NULL;
     }
     return lbl_80282460->pStrings + nCategory;
+}
+
+// The lowest nLock above nAfter among the assets of lock kind nKind (-1: none).
+s32 fn_80107084(s32 nKind, s32 nAfter) {
+    int i;
+    int nBest = 999999999;
+
+    for (i = 0; i < lbl_80282460->nAssets; i++) {
+        if (nKind == lbl_80282460->pAssets[i].nLockKind) {
+            if (lbl_80282460->pAssets[i].nLock > nAfter && lbl_80282460->pAssets[i].nLock < nBest) {
+                nBest = lbl_80282460->pAssets[i].nLock;
+            }
+        }
+    }
+    if (nBest == 999999999) {
+        return -1;
+    }
+    return nBest;
+}
+
+void fn_80107294(s16 n, char* pDst) {
+    strcpy(pDst, lbl_801935C8[n]);
+}
+
+// Take the asset in the profile's slot nSlot off the golfer being edited.
+void fn_801073DC(s16 nSlot) {
+    int nAsset;
+
+    if (lbl_80281EE0->pB4 != NULL) {
+        if (lbl_80281EE0->pB4->pChar == NULL) {
+            return;
+        }
+        nAsset = fn_80103D14(nSlot);
+        if (nAsset >= 0) {
+            fn_80103EFC(fn_80104F68(nAsset));
+        }
+    }
 }
 
 // The part an asset is a choice for.
