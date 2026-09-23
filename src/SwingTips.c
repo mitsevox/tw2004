@@ -6,6 +6,8 @@
 #include "game.h"
 
 u8 fn_800D1698(int nPlayer);
+u8 fn_800D16F0(int nPlayer);
+u8 fn_800D17E4(int nPlayer);
 u8 fn_800D19F8(int nPlayer);
 u8 fn_800D1A34(int nPlayer);
 u8 fn_800D1A70(int nPlayer);
@@ -22,6 +24,58 @@ u8 fn_800D1D38(int nPlayer);
 u8 fn_800D1698(int nPlayer) {
     if (gPlayers[nPlayer].nShotKind == 0) return 0;
     return Wind_Get(NULL) > 6.0f;
+}
+
+// A tip test: a shot other than a putt, in a wind over 6 blowing from 135 to 225 degrees off the
+// aim (the angle measured like the aim's, from +z).
+u8 fn_800D16F0(int nPlayer) {
+    f32 fAim;
+    f32 fAngle;
+    f32 vWind[4];
+
+    if (gPlayers[nPlayer].nShotKind == 0) return 0;
+    if (Wind_Get(NULL) > 6.0f) {
+        fAim = gPlayers[nPlayer].fAim;
+        Wind_Get(vWind);
+        fAngle = (f32)atan2(-vWind[0], vWind[2]) - fAim;
+        while (fAngle < 0.0f) {
+            fAngle += TWOPI;
+        }
+        while (fAngle > TWOPI) {
+            fAngle -= TWOPI;
+        }
+        if (fAngle > PI * 0.75f && fAngle < PI * 1.25f) {
+            return 1;
+        }
+        return 0;
+    }
+    return 0;
+}
+
+// A tip test: as fn_800D16F0, with the wind from -45 to 45 degrees off the aim.
+u8 fn_800D17E4(int nPlayer) {
+    f32 fAim;
+    f32 fAngle;
+    f32 vWind[4];
+
+    if (gPlayers[nPlayer].nShotKind == 0) return 0;
+    if (Wind_Get(NULL) > 6.0f) {
+        fAim = gPlayers[nPlayer].fAim;
+        Wind_Get(vWind);
+        fAngle = (f32)atan2(-vWind[0], vWind[2]) - fAim;
+        while (fAngle < 0.0f) {
+            fAngle += TWOPI;
+        }
+        while (fAngle > TWOPI) {
+            fAngle -= TWOPI;
+        }
+        // EA bug: the angle was wrapped to 0..2pi, so only 0 to 45 degrees count, not -45 to 0
+        if (fAngle > -PI / 4.0f && fAngle < PI / 4.0f) {
+            return 1;
+        }
+        return 0;
+    }
+    return 0;
 }
 
 // A tip test: the ball lies in lie 3, 4 or 5.
