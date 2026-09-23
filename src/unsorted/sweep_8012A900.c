@@ -2,7 +2,7 @@
 
 #include "game_types.h"
 
-extern void* lbl_802825B0;
+extern u8* lbl_802825B0;
 
 s32 fn_8012A900(s32* arg0);
 s32 fn_8012A900(s32* arg0) {

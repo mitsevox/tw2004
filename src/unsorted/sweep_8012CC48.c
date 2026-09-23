@@ -5,7 +5,7 @@
 s32 TagFile_FreeBuffer();
 s32 TagFile_Shutdown();
 s32 fn_8012C98C();
-extern void* lbl_802825B0;
+extern u8* lbl_802825B0;
 
 void fn_8012CC48(void);
 void fn_8012CC48(void) {
