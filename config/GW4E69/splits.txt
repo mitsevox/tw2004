@@ -2105,28 +2105,22 @@ src/ax/AXCL.c:
 	.bss        start:0x80264260 end:0x80264860
 	.sbss       start:0x802826D0 end:0x802826E8
 
-unsorted/sweep_80136980.c:
-	.text       start:0x80136980 end:0x8013698C
-
-unsorted/sweep_801369E4.c:
-	.text       start:0x801369E4 end:0x801369F0
-
-unsorted/sweep_80136DF4.c:
-	.text       start:0x80136DF4 end:0x80136DFC
+src/ax/AXOut.c:
+	.text       start:0x80136790 end:0x80136DFC
+	.bss        start:0x80264860 end:0x80269080
+	.sbss       start:0x802826E8 end:0x80282708
 
 src/ax/AXSPB.c:
 	.text       start:0x80136DFC end:0x801372C0
 	.bss        start:0x80269080 end:0x802690C0
 	.sbss       start:0x80282708 end:0x80282730
 
-unsorted/sweep_801372C0.c:
-	.text       start:0x801372C0 end:0x801372C8
-
-unsorted/sweep_80137C2C.c:
-	.text       start:0x80137C2C end:0x80137C38
-
-src/dolphin/ax/AXVPB.c:
-	.text       start:0x80137C38 end:0x80138184
+src/ax/AXVPB.c:
+	.text       start:0x801372C0 end:0x80138184
+	.data       start:0x80195E78 end:0x80195F60
+	.bss        start:0x802690C0 end:0x8027A4C0
+	.sbss       start:0x80282730 end:0x80282740
+	.sdata2     start:0x80284B60 end:0x80284B68
 
 src/ax/AXProf.c:
 	.text       start:0x80138184 end:0x801381CC
@@ -2140,8 +2134,9 @@ src/axfx/reverb_hi.c:
 src/axfx/delay.c:
 	.text       start:0x80138EC8 end:0x80139374
 
-unsorted/sweep_801393C4.c:
-	.text       start:0x801393C4 end:0x801393D0
+src/axfx/axfx.c:
+	.text       start:0x80139374 end:0x801393D0
+	.sdata      start:0x802819F8 end:0x80281A00
 
 dolphin/PPCArch.c:
 	.text       start:0x801393D0 end:0x801394C0
@@ -2269,8 +2264,11 @@ dolphin/gx/GXPerf.c:
 	.text       start:0x80145140 end:0x80145998
 	.data       start:0x8019A430 end:0x8019A520
 
-unsorted/sweep_80145B1C.c:
-	.text       start:0x80145B1C end:0x80145B24
+src/mix/mix.c:
+	.text       start:0x80145998 end:0x80147B94
+	.data       start:0x8019A520 end:0x8019B0E0
+	.bss        start:0x8027B160 end:0x8027C960
+	.sbss       start:0x80282898 end:0x802828A8
 
 dolphin/mtx/mtx.c:
 	.text       start:0x80147B94 end:0x80147DB0
@@ -2354,6 +2352,9 @@ dolphin/os/OSRtc.c:
 	.text       start:0x8014C060 end:0x8014C8D4
 	.bss        start:0x8027CA20 end:0x8027CA78
 
+src/os/OSSemaphore.c:
+	.text       start:0x8014C8D4 end:0x8014C9FC
+
 dolphin/os/OSSync.c:
 	.text       start:0x8014C9FC end:0x8014CA80
 
@@ -2427,7 +2428,7 @@ src/MSL_C/PPCEABI/bare/H/ansi_files.c:
 	.bss        start:0x8027D5F8 end:0x8027D8F8
 
 src/MSL_C/PPCEABI/bare/H/ansi_fp.c:
-	.text       start:0x801538EC end:0x80155BD0
+	.text       start:0x8015286C end:0x80155E48
 
 runtime/buffer_io.c:
 	.text       start:0x80155E48 end:0x80155F40
