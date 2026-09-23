@@ -8,12 +8,6 @@
 #include "game/save.h"
 #include "game/earnings.h"
 
-// The tee order before any hole is played (lbl_80184DF0: 0, 1, 2, 3).
-typedef struct TeeOrder {
-    s32 a[4];
-} TeeOrder;
-extern TeeOrder lbl_80184DF0;
-
 void fn_800FFDB8(void);
 
 // TW06: GameModeStroke::Init. Up to four players, one mulligan each.
@@ -58,7 +52,7 @@ void fn_800FF7DC(void) {
 // of the scores on each hole played so far (ties keep the order of the hole before); otherwise the
 // player farthest from the pin (off the green first). Players who were cut do not play.
 s32 fn_800FF894(int nPlayer) {
-    TeeOrder order;
+    s32 aOrder[4] = {0, 1, 2, 3};  // the tee order before any hole is played
     s32 aSorted[4];
     int h;
     int i;
@@ -73,7 +67,6 @@ s32 fn_800FF894(int nPlayer) {
     f32 dx;
     f32 dz;
     f32 d;
-    order = lbl_80184DF0;
     for (h = 0; h < Game_CurHoleIndex(); h++) {
         if (gpGame->bHoleSelected[h]) {
             nLow = gPlayers[0].nStrokes[h];
@@ -90,18 +83,18 @@ s32 fn_800FF894(int nPlayer) {
             k = 0;
             for (n = nLow; n <= nHigh; n++) {
                 for (i = 0; i < gNumPlayersSetUp; i++) {
-                    AddIfScore(aSorted, &k, order.a[i], h, n);
+                    AddIfScore(aSorted, &k, aOrder[i], h, n);
                 }
             }
             for (i = 0; i < gNumPlayersSetUp; i++) {
-                order.a[i] = aSorted[i];
+                aOrder[i] = aSorted[i];
             }
         }
     }
     // fake match: h doubles as the player counter here; a separate counter gets a different register.
     for (h = 0; h < gNumPlayersSetUp; h++) {
-        if (nPlayer != order.a[h] && Player_OnTee(order.a[h]) && !gPlayers[order.a[h]].bPlayerCut) {
-            return order.a[h];
+        if (nPlayer != aOrder[h] && Player_OnTee(aOrder[h]) && !gPlayers[aOrder[h]].bPlayerCut) {
+            return aOrder[h];
         }
     }
     nBest = 5;

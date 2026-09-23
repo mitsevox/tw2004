@@ -375,7 +375,7 @@ typedef struct RecordEntry {
 // The round / session state at gSession (0x5BD0 bytes); only what this file reads.
 // The game options (Session.options, 0x88 bytes).
 typedef struct GameOptions {
-    u8   unk0[5];               // 0x00
+    u8   a0[5];                 // 0x00  [4] (0xE7C): 4 while the lessons run, tested by GameUI
     u8   bGimmes;               // 0x05  (gSession + 0xE7D) the Gimmes option, default on
     u8   bSkipCameras;          // 0x06  (gSession + 0xE7E) camera states end at once (inferred)
     u8   a7[5];                 // 0x07  [1] and [2] default to 1
@@ -428,13 +428,15 @@ typedef struct Session {
     u8   a8[4];                 // 0x008  [0] nonzero: no GameBreaker (GameEffects.c)
     s32  nC;                    // 0x00C
     u8   nSplitScreen;          // 0x010  0 single view, else split screen (2 = side by side); no luck, no caddie
-    u8   unk11[2];
+    u8   b11;                   // 0x011  cleared by Session_Init
+    u8   b12;                   // 0x012  set by the pause menu, a replay and the lessons; GameManager
+                                //        tests it
     u8   bReplay;               // 0x013  a saved replay is playing: no luck swap, no spin, instant launch
     s32  n14;                   // 0x014  nonzero while the game is paused (GameUI.c; GameMessages.c sets 2)
     f32  fFrameTime;            // 0x018  seconds per frame
     f32  f1C;                   // 0x01C
     s32  n20;                   // 0x020
-    s32  unk24;                 // 0x024
+    s32  nFrameCount;           // 0x024  frames counted; GameRound turns a difference of it into seconds
     s32  n28;                   // 0x028
     s32  nNumPlayers;           // 0x02C
     s32  nController[5];        // 0x030  per player (slot 4 is the caddie / lucky-shot copy)
@@ -461,10 +463,6 @@ typedef struct Session {
     f32  f5B48;                 // 0x5B48  1
     u8   unk5B4C[0x5BD0 - 0x5B4C];
 } Session;
-
-// Kept for the files that still use them (Ball.c, GameUI.c, Swing.c); new code writes the fields.
-#define SESSION_OPTIONS    (&gSession.options)
-#define SESSION_PROFILE(i) (&gSession.aProfile[i])
 
 // The game state gpGame points at: the current game mode's rules (data and callbacks; TW06
 // turned this into the GameModeDriver class). Only what our files use is named.

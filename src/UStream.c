@@ -85,7 +85,6 @@ void  fn_800B7490(void);                                     // yield / pump
 void  fn_8009527C(void* p);
 void  fn_8000E708(UStreamParams* p);
 void  fn_8015A7FC(char* pDst, const char* pSrc);             // strcpy
-void* memset(void* p, int c, u32 n);
 
 static void UStream_ReadDone(int nBytes, int nError);
 static void UStream_StartRead(void);

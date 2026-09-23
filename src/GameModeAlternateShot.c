@@ -9,12 +9,6 @@
 
 extern u8  lbl_80281648[2];                 // per team: 1 when the second partner (1 or 3) hits next
 
-// The tee order before anyone has won a hole (lbl_80184DA0: 0, 1, 2, 3).
-typedef struct TeeOrder {
-    s32 a[4];
-} TeeOrder;
-extern TeeOrder lbl_80184DA0;
-
 u8  fn_800E69CC(int nTeam);
 int fn_800E6A48(int nPlayer);
 u8  fn_800E6A98(int nPlayer);
@@ -152,7 +146,7 @@ void fn_800E6C10(void) {
 // team that won the last decided hole goes first; otherwise whoever's turn it is on the team that is
 // farthest from the pin and off the green, then anyone farthest.
 s32 fn_800E6C8C(int nPlayer) {
-    TeeOrder order;
+    s32 aOrder[4] = {0, 1, 2, 3};  // the tee order before anyone has won a hole
     int nBest;
     CourseInfo* pCourse;
     int w;
@@ -166,7 +160,6 @@ s32 fn_800E6C8C(int nPlayer) {
     f32 dz;
     f32 d;
     nLead = 0;
-    order = lbl_80184DA0;
     for (h = 0; h < Game_CurHoleIndex(); h++) {
         if (gpGame->bHoleSelected[h]) {
             int a = gPlayers[0].nModePoints[h] + gPlayers[1].nModePoints[h];
@@ -180,21 +173,21 @@ s32 fn_800E6C8C(int nPlayer) {
             }
             if (w != nLead) {
                 nLead = w;
-                t = order.a[0];
-                order.a[0] = order.a[2];
-                order.a[2] = t;
-                t = order.a[1];
-                order.a[1] = order.a[3];
-                order.a[3] = t;
+                t = aOrder[0];
+                aOrder[0] = aOrder[2];
+                aOrder[2] = t;
+                t = aOrder[1];
+                aOrder[1] = aOrder[3];
+                aOrder[3] = t;
             }
         }
     }
     // fake match: the tee-order loop reuses the hole counter h; a counter of its own gets another
     // register (h, t or w all match)
     for (h = 0; h < gNumPlayersSetUp; h++) {
-        if (nPlayer != order.a[h] && Player_OnTee(order.a[h]) && fn_800E6A98(order.a[h]) &&
-            !fn_800E69CC(fn_800E6AF8(order.a[h]))) {
-            return order.a[h];
+        if (nPlayer != aOrder[h] && Player_OnTee(aOrder[h]) && fn_800E6A98(aOrder[h]) &&
+            !fn_800E69CC(fn_800E6AF8(aOrder[h]))) {
+            return aOrder[h];
         }
     }
     pCourse = fn_8000C594();

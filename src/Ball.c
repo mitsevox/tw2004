@@ -2306,7 +2306,7 @@ void Wind_Generate(void) {
         fSpeed = 0.0f;
         n      = 0;
     } else if (n == 0 && 0.0f == fSpeed) {
-        n = SESSION_OPTIONS->nWind;
+        n = gSession.options.nWind;
         switch (Game_GetCourse()) {
         case 6:
         case 15:
