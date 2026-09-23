@@ -6,7 +6,6 @@
 #include "core/startup.h"
 #include "core/memcard.h"
 #include "game/frontend.h"
-#include "game_types.h"
 
 void   fn_800AF324(void);
 void   fn_800AF93C(void* pVpb);
