@@ -449,7 +449,7 @@ config.libs = [
             Object(Matching, "src/MSL_C/PPCEABI/bare/H/ansi_files.c"),
             Object(Matching, "src/MSL_C/PPCEABI/bare/H/direct_io.c"),
             Object(Matching, "src/MSL_C/PPCEABI/bare/H/file_io.c"),
-            Object(NonMatching, "src/MSL_C/PPCEABI/bare/H/mem_funcs.c"),
+            Object(Matching, "src/MSL_C/PPCEABI/bare/H/mem_funcs.c", mw_version="GC/2.5"),
             Object(Matching, "src/MSL_C/PPCEABI/bare/H/string.c"),
             Object(Matching, "src/MSL_C/PPCEABI/bare/H/s_atan.c"),
         ],
@@ -777,7 +777,7 @@ config.libs = [
             # built with the game's compiler, like ansi_fp.c: GC/1.3 misses long2str, float2str and three more
             Object(Matching, "runtime/printf.c", mw_version="GC/2.5"),
             Object(Matching, "runtime/runtime.c"),
-            Object(NonMatching, "runtime/FILE_POS.c"),
+            Object(Matching, "runtime/FILE_POS.c"),
             Object(Matching, "runtime/ctype.c"),
             Object(Matching, "runtime/e_acos.c"),
             Object(Matching, "runtime/e_asin.c"),
