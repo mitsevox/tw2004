@@ -749,7 +749,7 @@ void fn_800FB204(int nPlayer, int nStrokes) {
 // 20 feet). fn_800FB41C always returns 0, so none of these fire.
 void fn_800FB35C(int nPlayer, int nOther) {
     f32 fDist = fn_800FB41C(gPlayers[nPlayer].vPreShot, gPlayers[nPlayer].ball.vPos);
-    if (gPlayers[nPlayer].nClub == CLUB_PUTTER) {
+    if (gPlayers[nPlayer].nClub == CLUB_PUTTER_e) {
         if (fDist >= 20.0f / 3.0f) {
             fn_800FAAB8(nPlayer, 0x11);
         }
@@ -962,7 +962,7 @@ void fn_800FBD2C(int nPlayer) {
             return;
         }
         nStrokes = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
-        if (gPlayers[nPlayer].ball.nLie == LIE_HOLED) {
+        if (gPlayers[nPlayer].ball.nLie == LIE_INCUP_e) {
             if (Game_GetMode() == 7) {
                 fn_800FB35C(nPlayer, nOther);
                 nStrokes = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
@@ -1049,7 +1049,7 @@ void fn_800FBD2C(int nPlayer) {
                 gPlayers[nPlayer].ball.nState = 0;
                 Mem_cpy(&p->ballBefore, pBall, sizeof(Ball));
                 nPar = fn_800D2B08();
-                if (gPlayers[nPlayer].ball.nLie == LIE_GREEN) {
+                if (gPlayers[nPlayer].ball.nLie == LIE_GREEN_e) {
                     if (Game_GetMode() == 7) {
                         fDist = fn_800FB41C(p->vPreShot, pBall->vPos);
                         if (fn_800FB41C(pBall->vPos, gpGame->p130) <= lbl_80284708[0] && fDist >= 20.0f) {
@@ -1306,7 +1306,7 @@ void fn_800FCCF0(void) {
                     if ((fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x25, 0)) &&
                         !fn_800FCC38(nPlayer) &&
                         ((s8)GOLFERSTATE_GetCurrentState(nPlayer) == 24 ||
-                         (gPlayers[nPlayer].ball.nLie != 0 && gPlayers[nPlayer].ball.nLie != LIE_HOLED &&
+                         (gPlayers[nPlayer].ball.nLie != 0 && gPlayers[nPlayer].ball.nLie != LIE_INCUP_e &&
                           gPlayers[nPlayer].ball.nLie != 16 &&
                           (s8)GOLFERSTATE_GetCurrentState(nPlayer) != 2 &&
                           (s8)GOLFERSTATE_GetCurrentState(nPlayer) != 4 &&
@@ -1336,7 +1336,7 @@ void fn_800FCCF0(void) {
             i = PLR_1_e;
             if ((fn_800136DC(gPlayers[i].nController) & fn_800142AC(0x25, 0)) && !fn_800FCC38(i) &&
                 ((s8)GOLFERSTATE_GetCurrentState(i) == 24 ||
-                 (gPlayers[i].ball.nLie != 0 && gPlayers[i].ball.nLie != LIE_HOLED &&
+                 (gPlayers[i].ball.nLie != 0 && gPlayers[i].ball.nLie != LIE_INCUP_e &&
                   gPlayers[i].ball.nLie != 16))) {
                 pHole = fn_8000C594();
                 fn_80055AA8(&gPlayers[i].ball, &pHole->tee[gSession.nTeeSet[i]].x, i);
@@ -1566,7 +1566,7 @@ void fn_800FDADC(void) {
         ((s8)GOLFERSTATE_GetCurrentState(PLR_2_e) == 1 || (s8)GOLFERSTATE_GetCurrentState(PLR_2_e) == 2 ||
          (s8)GOLFERSTATE_GetCurrentState(PLR_2_e) == 3 || (s8)GOLFERSTATE_GetCurrentState(PLR_2_e) == 4 ||
          (s8)GOLFERSTATE_GetCurrentState(PLR_2_e) == 10)) {
-        gPlayers[nPlayer].ball.nLie = LIE_HOLED;
+        gPlayers[nPlayer].ball.nLie = LIE_INCUP_e;
         gPlayers[nPlayer].nC3C |= 0x4000000;
         fn_800F80D4(0);
         fn_800ED710(nPlayer);

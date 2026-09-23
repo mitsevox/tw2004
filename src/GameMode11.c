@@ -886,27 +886,27 @@ void fn_8010179C(void) {
         }
         break;
     case 2:
-        if (nLie != LIE_GREEN && nLie != 12) {
+        if (nLie != LIE_GREEN_e && nLie != 12) {
             bMissed = 1;
         }
         break;
     case 5:
-        if (nLie != LIE_GREEN && nLie != 12) {
+        if (nLie != LIE_GREEN_e && nLie != 12) {
             bMissed = 1;
         }
         break;
     case 80:
-        if (nLie != LIE_GREEN && nLie != 12) {
+        if (nLie != LIE_GREEN_e && nLie != 12) {
             bMissed = 1;
         }
         break;
     case 3:
-        if (nLie != LIE_GREEN && nLie != 12) {
+        if (nLie != LIE_GREEN_e && nLie != 12) {
             bMissed = 1;
         }
         break;
     case 4:
-        if (nLie != LIE_GREEN && nLie != 12) {
+        if (nLie != LIE_GREEN_e && nLie != 12) {
             bMissed = 1;
         }
         break;
@@ -928,7 +928,7 @@ void fn_8010179C(void) {
         if (!lbl_802823E0) {
             bMissed = 1;
         }
-        if (nLie != LIE_GREEN && nLie != 12) {
+        if (nLie != LIE_GREEN_e && nLie != 12) {
             bFault = 1;
         }
         break;

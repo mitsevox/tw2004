@@ -623,7 +623,7 @@ void fn_800D9350(int nPlayer) {
             gPlayers[nPlayer].b311 = 1;
             gPlayers[nPlayer].n308 |= 2;
         }
-        if (nLie == LIE_GREEN || nLie == LIE_HOLED) {
+        if (nLie == LIE_GREEN_e || nLie == LIE_INCUP_e) {
             gPlayers[nPlayer].b312 = 1;
         }
         nStrokes = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];

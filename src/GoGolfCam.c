@@ -1099,7 +1099,7 @@ u8 fn_800C4604(View* pView, int nPlayer) {
 // fn_800635D0 fails.
 u8 fn_800C4650(View* pView, int nPlayer) {
     u8 bMove;
-    if (gPlayers[nPlayer].nClub == CLUB_PUTTER) {
+    if (gPlayers[nPlayer].nClub == CLUB_PUTTER_e) {
         return 0;
     }
     bMove = 0;

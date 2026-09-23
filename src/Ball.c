@@ -456,7 +456,7 @@ u8 Physics_GetShotData(Ball* pBall, int nClub, int nKind, f32 fPower, f32 fAim, 
     fSpeed *= gKindSpeed[nKind];
     fSpeed = fPower * (8.333333f * fSpeed);
     fn_80055E28(fAim, &fSinAim, &fCosAim);
-    if (nKind == SHOT_PUTT || nClub == CLUB_PUTTER) {
+    if (nKind == SHOT_TYPE_PUTT_e || nClub == CLUB_PUTTER_e) {
         fSpeed *= 7.2f;
         fn_8001EF34(pB, fSpeed, vDir);
         fn_80055D70(&vDir[0], &vDir[2], fSinAim, fCosAim);
@@ -612,7 +612,7 @@ void Ball_Launch(Ball* pBall, int nClub, int nKind, f32 fPower, f32 fAim, int nT
         Physics_OutOfBounds(pBall, 1);
         return;
     }
-    if (nKind == SHOT_PUTT || nClub == CLUB_PUTTER) {
+    if (nKind == SHOT_TYPE_PUTT_e || nClub == CLUB_PUTTER_e) {
         pBall->b99    = 1;
         pBall->b9B    = 1;
         pBall->bHitTopArc    = 1;

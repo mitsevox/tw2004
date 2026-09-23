@@ -570,7 +570,7 @@ int fn_800E184C(int nPlayer, u8 bCurrent) {
     int i;
     int nEnd = gpGame->nCurHole;
     nPar = 0;
-    if (bCurrent && gPlayers[nPlayer].ball.nLie == LIE_HOLED && nEnd < 18) {
+    if (bCurrent && gPlayers[nPlayer].ball.nLie == LIE_INCUP_e && nEnd < 18) {
         nEnd++;
     }
     for (i = 0; i < nEnd; i++) {
@@ -1020,8 +1020,8 @@ u8 fn_800E2DB4(int nPlayer) {
     dz = gPlayers[nPlayer].ball.vPos[2] - pCourse->pin[nPinSet].z;
     fDist = fn_80009680(dx * dx + dz * dz);
     b = Ter_Use3DCupGeometry();
-    if ((b && gPlayers[nPlayer].ball.nLie == LIE_HOLED) || (!b && fDist < 0.5f)) {
-        gPlayers[nPlayer].ball.nLie = LIE_HOLED;
+    if ((b && gPlayers[nPlayer].ball.nLie == LIE_INCUP_e) || (!b && fDist < 0.5f)) {
+        gPlayers[nPlayer].ball.nLie = LIE_INCUP_e;
         return 1;
     }
     return 0;
@@ -1293,7 +1293,7 @@ u8 Gimme_Allowed(int nPlayer) {
     if (!gpGame->bGimmesAllowed) return 0;
     if (gpGame->pfn1D8(nPlayer, 1)) return 0;
     if (fn_800D0478(nPlayer) > 0.5f) return 0;
-    if (gPlayers[nPlayer].nClub != CLUB_PUTTER && gSession.nNumPlayers > 1) return 0;
+    if (gPlayers[nPlayer].nClub != CLUB_PUTTER_e && gSession.nNumPlayers > 1) return 0;
     return 1;
 }
 

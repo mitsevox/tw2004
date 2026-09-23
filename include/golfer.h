@@ -7,6 +7,7 @@
 
 #include "game_types.h"
 #include "engine.h"
+#include "physics.h"
 #include "camera.h"
 #include "character.h"
 #include "ball.h"
@@ -36,9 +37,6 @@ enum {
 #define NUM_GOLFERS          34   // records in gGolferTable
 #define FIRST_CREATED_GOLFER 30   // table slots 30..33 are the created golfers
 #define CONTROLLER_CPU       9
-#define NUM_CLUBS            26   // clubs 0..24 are the bag, 25 the putter
-#define CLUB_PUTTER          25
-#define CLUB_SAND_WEDGE      21
 // A CPU shot's shape (TW06: ShotShape_t), from the authored aim point. The rehearsal compensates
 // each one when it fails: the curves by turning the aim 1 or 2 degrees, the trajectories by 5
 // yards of distance. High/low pick gTrajLoft's +5 / -5 degrees (Shot_Trajectory).
@@ -52,12 +50,6 @@ enum {
     SHAPE_HOOK   = 6        // clubface x -0.04
 };
 
-#define SHOT_PUTT            0    // shot kinds (Player.nShotKind)
-#define SHOT_FULL            1
-#define SHOT_CHIP            2
-#define SHOT_PITCH           3
-#define LIE_GREEN            9
-#define LIE_HOLED            12   // the ball is in the hole
 #define NUM_AI_LINKS         10   // candidate aim points per zone
 #define NUM_AI_TARGETS       25   // aim points per hole (gAITargets)
 
@@ -578,9 +570,9 @@ extern GameState*   gpGame;             // 0x80281588
 
 extern AITarget     gAITargets[25];     // 0x801C65B8
 extern s32          gNumAITargets;      // 0x80281D44
-extern u8           gClubKindTable[8][NUM_CLUBS];   // 0x801874B0  which clubs each shot kind allows
-extern f32          gClubDistAtPower0[NUM_CLUBS];   // 0x80187580  reach at POWER 0 (245 for the woods)
-extern f32          gClubPowerStep[NUM_CLUBS];      // 0x801875E8  reach gained per POWER point over 100
+extern u8           gClubKindTable[8][CLUB_MAX_e];   // 0x801874B0  which clubs each shot kind allows
+extern f32          gClubDistAtPower0[CLUB_MAX_e];   // 0x80187580  reach at POWER 0 (245 for the woods)
+extern f32          gClubPowerStep[CLUB_MAX_e];      // 0x801875E8  reach gained per POWER point over 100
 
 int  Game_GetMode(void);                // 0x8000BED8
 int  fn_800D2B08(void);

@@ -127,7 +127,7 @@ extern f32           lbl_80281B40[];             // FLT_MAX
 extern Replay        gReplayData;                // 0x801D6030
 extern f32           gPuttXScale[8];             // 0x801882AC  per shot kind: 0.03 for a putt, 0.2 otherwise
 extern f32           gSwingXScale[8];            // 0x801882CC  the same values again
-extern s32           gClubCurve[NUM_CLUBS];      // 0x80183578  per club, 0..26: how much it can shape
+extern s32           gClubCurve[CLUB_MAX_e];      // 0x80183578  per club, 0..26: how much it can shape
 extern SwingStack    gSwingStacks[];             // 0x801D5A90
 extern u8            gInSwingExit;               // 0x80281E00  set while a state's exit callback runs
 extern s8            lbl_80281E09;
@@ -344,7 +344,7 @@ void Swing_ApplyForgiveness(int nPlayer) {
         nAttr      = (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_RECOVERY, ATTR_TOTAL);
     } else {
         switch (gPlayers[nPlayer].nShotKind) {
-        case SHOT_PUTT:
+        case SHOT_TYPE_PUTT_e:
             nRowScale  = ROW_PUTTING + 1;
             nRowThresh = ROW_PUTTING;
             nAttr      = (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_PUTTING, ATTR_TOTAL);
@@ -353,12 +353,12 @@ void Swing_ApplyForgiveness(int nPlayer) {
                 return;
             }
             break;
-        case SHOT_CHIP:
+        case SHOT_TYPE_CHIP_e:
             nRowScale  = ROW_APPROACH_B + 1;
             nRowThresh = ROW_APPROACH_B;
             nAttr      = (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_APPROACH, ATTR_TOTAL);
             break;
-        case SHOT_PITCH:
+        case SHOT_TYPE_PITCH_e:
             nRowScale  = ROW_APPROACH_A + 1;
             nRowThresh = ROW_APPROACH_A;
             nAttr      = (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_APPROACH, ATTR_TOTAL);
@@ -409,11 +409,11 @@ void Swing_MisHitRumble(int nPlayer) {
     int nAttr;
     f32 fScale;
     switch (gPlayers[nPlayer].nShotKind) {
-    case SHOT_PUTT:
+    case SHOT_TYPE_PUTT_e:
         nAttr = (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_PUTTING, ATTR_TOTAL);
         break;
-    case SHOT_CHIP:
-    case SHOT_PITCH:
+    case SHOT_TYPE_CHIP_e:
+    case SHOT_TYPE_PITCH_e:
         nAttr = (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_APPROACH, ATTR_TOTAL);
         break;
     case 5:
@@ -539,7 +539,7 @@ f32 Swing_ComputePower(int nPlayer) {
     if (Player_IsCPU(nPlayer) || gPlayers[nPlayer].bPerfect) {
         p      = &gPlayers[nPlayer];
         fPower = p->fPower * AI_PowerScale(nPlayer);
-        if (p->nShotKind == SHOT_PUTT && !(p->uFlags & 8)) {
+        if (p->nShotKind == SHOT_TYPE_PUTT_e && !(p->uFlags & 8)) {
             fPower *= 1.05f;
             if (fPower < 0.1f) {
                 fPower = 0.1f;
@@ -553,7 +553,7 @@ f32 Swing_ComputePower(int nPlayer) {
     fError = fabsf(p->swing.fMishitAngle);
     p->swing.fNonPowerShotPower = Swing_ApplyPowerBoost(nPlayer, fPower) - fError;
     switch (p->nShotKind) {
-    case SHOT_PUTT: {
+    case SHOT_TYPE_PUTT_e: {
         f32 fDist = p->fDistance < 1.0f ? 1.0f : p->fDistance;
         if (*pPower > gpSwing->fPuttFullPower) {
             *pPower = 1.0f;
@@ -565,11 +565,11 @@ f32 Swing_ComputePower(int nPlayer) {
         }
         goto clamp;         // fake match: the shared clamp as a jump (without the gotos: 83.9%, not 84.9%)
     }
-    case SHOT_CHIP:
-    case SHOT_PITCH: {
+    case SHOT_TYPE_CHIP_e:
+    case SHOT_TYPE_PITCH_e: {
         f32 f = *pPower;
-        if (p->nShotKind == SHOT_CHIP) {
-            f = *pPower * fn_80050F88(p->fDistance, &p->ball, SHOT_CHIP, p->nClub);
+        if (p->nShotKind == SHOT_TYPE_CHIP_e) {
+            f = *pPower * fn_80050F88(p->fDistance, &p->ball, SHOT_TYPE_CHIP_e, p->nClub);
         }
         fPower = Swing_ApplyPowerBoost(nPlayer, f);
         Golfer_GetAttribute(p, ATTR_APPROACH, ATTR_TOTAL);
@@ -661,7 +661,7 @@ void Swing_Launch(int nPlayer) {
     }
     gPlayers[nPlayer].swing.fShotPower = Swing_ComputePower(nPlayer);
     Swing_ApplyForgiveness(nPlayer);
-    if (gPlayers[nPlayer].nShotKind == SHOT_PUTT && gPlayers[nPlayer].fDistance < 2.0f) {
+    if (gPlayers[nPlayer].nShotKind == SHOT_TYPE_PUTT_e && gPlayers[nPlayer].fDistance < 2.0f) {
         gPlayers[nPlayer].vLaunchA[0] = 0.0f;
         gPlayers[nPlayer].vLaunchA[1] = 0.0f;
         gPlayers[nPlayer].vLaunchA[2] = 1.0f;
@@ -812,7 +812,7 @@ void Swing_FaceVector(int nPlayer, f32* pOut) {
         pOut[1] = 0.0f;
         pOut[2] = 1.0f;
         pOut[3] = 0.0f;
-    } else if (gPlayers[nPlayer].nShotKind != SHOT_PUTT) {
+    } else if (gPlayers[nPlayer].nShotKind != SHOT_TYPE_PUTT_e) {
         fAngle = fn_8005CC84((fTopX - fCentreX) / fDY);
         gPlayers[nPlayer].swing.fControllerSliceAngle = fAngle;
         fAngle = Swing_CurveAngle(&gPlayers[nPlayer].nClub, fAngle);
@@ -1573,7 +1573,7 @@ int Swing_UpdateDownswing(int nPlayer) {
         if (Controller_IsPad(nController) && gSession.bReplay == 0) {
             Swing_MisHitRumble(nPlayer);
         }
-        if (gPlayers[nPlayer].nShotKind == SHOT_PUTT) {
+        if (gPlayers[nPlayer].nShotKind == SHOT_TYPE_PUTT_e) {
             EVENT_Trigger(nPlayer, 0x2B, 0, 0);
         }
         return 1;
@@ -1990,8 +1990,8 @@ void Swing_UpdatePower(int nPlayer) {
     if (1.0f - fPower < 0.03f) {
         fPower = 1.0f;
     }
-    if (gPlayers[nPlayer].swing.fFidgetTimeElapsed < 0.05f || gPlayers[nPlayer].nShotKind == SHOT_PUTT ||
-        1.0f != fPower) {
+    if (gPlayers[nPlayer].swing.fFidgetTimeElapsed < 0.05f ||
+        gPlayers[nPlayer].nShotKind == SHOT_TYPE_PUTT_e || 1.0f != fPower) {
         fPenalty = 0.0f;
     } else {
         fPenalty = gPlayers[nPlayer].swing.fFidgetTimeElapsed - 0.05f;
@@ -2268,7 +2268,7 @@ void STATEFUNC_FadeToRemoveBallInit(int nPlayer) {
 }
 
 void STATEFUNC_ShotSetupExit(int nPlayer) {
-    if (gSession.nGameType != 8 && gPlayers[nPlayer].ball.nLie != LIE_HOLED && !Player_IsCPU(nPlayer)) {
+    if (gSession.nGameType != 8 && gPlayers[nPlayer].ball.nLie != LIE_INCUP_e && !Player_IsCPU(nPlayer)) {
         fn_800E3D38(nPlayer, 1);
     }
 }
@@ -2350,7 +2350,7 @@ void STATEFUNC_SimulateExit(int nPlayer) {
 
 void STATEFUNC_ZoomInit(int nPlayer) {
     int nView;
-    if (gPlayers[nPlayer].nShotKind == SHOT_PUTT) {
+    if (gPlayers[nPlayer].nShotKind == SHOT_TYPE_PUTT_e) {
         nView = gPlayers[nPlayer].nView[0];
         View_SetCamera(fn_80017028(nView), 2, nPlayer, nView);
     } else {
@@ -2560,7 +2560,7 @@ void STATEFUNC_FadeToTapInInit(int nPlayer) {
     gPlayers[nPlayer].bRehearsalDone = 0;
 }
 
-// State 18: holed out. The ball goes to the pin, the lie becomes LIE_HOLED, animation 12.
+// State 18: holed out. The ball goes to the pin, the lie becomes LIE_INCUP_e, animation 12.
 void STATEFUNC_RemoveBallInit(int nPlayer) {
     Ball* pBall       = &gPlayers[nPlayer].ball;
     Ball* pBallBefore = &gPlayers[nPlayer].ballBefore;
@@ -2573,7 +2573,7 @@ void STATEFUNC_RemoveBallInit(int nPlayer) {
     if (pCourse != NULL) {
         Character_SetPosition(gPlayers[nPlayer].pChar, &pCourse->pin[nPinSet].x, 1);
         Physics_DropBall(pBall, &pCourse->pin[nPinSet].x);
-        gPlayers[nPlayer].ball.nLie = LIE_HOLED;
+        gPlayers[nPlayer].ball.nLie = LIE_INCUP_e;
         Vec3Copy(pBall->vPos, pBallBefore->vPos);
     }
     fn_80095744(gPlayers[nPlayer].pChar, 12);
@@ -2971,8 +2971,8 @@ void STATEFUNC_PlaceBallInit(int nPlayer) {
     fn_80016CFC(gPlayers[nPlayer].nView[0])->bFlagOut = 1;
     for (i = 0; i < gSession.nNumPlayers; i++) {
         if (gPlayers[i].bPlayerCut == 0 && gPlayers[i].nView[0] == gPlayers[nPlayer].nView[0] &&
-            gPlayers[i].ball.nLie != 10 && gPlayers[i].ball.nLie != LIE_GREEN &&
-            gPlayers[i].ball.nLie != LIE_HOLED) {
+            gPlayers[i].ball.nLie != 10 && gPlayers[i].ball.nLie != LIE_GREEN_e &&
+            gPlayers[i].ball.nLie != LIE_INCUP_e) {
             fn_80016CFC(gPlayers[nPlayer].nView[0])->bFlagOut = 0;
         }
     }
@@ -3005,7 +3005,7 @@ void STATEFUNC_GreenMorphUpdate(int nPlayer) {
         if (gpGame->b284 != 0) {
             if (gpGame->pfn264(nPlayer)) {
                 AI_DefaultTarget(nPlayer);
-            } else if (gPlayers[nPlayer].nShotKind == SHOT_PUTT) {
+            } else if (gPlayers[nPlayer].nShotKind == SHOT_TYPE_PUTT_e) {
                 AI_DefaultTarget(nPlayer);
             } else {
                 AI_ChooseTarget(nPlayer);
@@ -3313,7 +3313,7 @@ void STATEFUNC_ReplaySwingUpdate(int nPlayer) {
         }
         fn_800A5980(nPlayer);
     }
-    if (gPlayers[nPlayer].nClub != CLUB_PUTTER) {
+    if (gPlayers[nPlayer].nClub != CLUB_PUTTER_e) {
         fn_800A573C(nPlayer);
     }
 }
@@ -3339,7 +3339,7 @@ void STATEFUNC_PreShotInit(int nPlayer) {
         gSession.bReplay = 0;
         Shot_Plan(nPlayer, 1);
     }
-    if (gPlayers[nPlayer].nClub == CLUB_PUTTER) {
+    if (gPlayers[nPlayer].nClub == CLUB_PUTTER_e) {
         fn_800CC5C0(gPlayers[nPlayer].pChar, "Glove", "GloveOff");
     } else {
         fn_800CC5C0(gPlayers[nPlayer].pChar, "Glove", "GloveOn");
@@ -3370,8 +3370,8 @@ void STATEFUNC_PreShotInit(int nPlayer) {
         fn_80047EF0(&gPlayers[nPlayer].ball, nPlayer, 1);
     }
     fn_80016CFC(gPlayers[nPlayer].nView[0])->bFlagOut = 1;
-    if (gPlayers[nPlayer].ball.nLie != 10 && gPlayers[nPlayer].ball.nLie != LIE_GREEN &&
-        gPlayers[nPlayer].ball.nLie != LIE_HOLED) {
+    if (gPlayers[nPlayer].ball.nLie != 10 && gPlayers[nPlayer].ball.nLie != LIE_GREEN_e &&
+        gPlayers[nPlayer].ball.nLie != LIE_INCUP_e) {
         fn_80016CFC(gPlayers[nPlayer].nView[0])->bFlagOut = 0;
     }
     pBall = &gPlayers[nPlayer].ball;
@@ -3611,7 +3611,7 @@ void STATEFUNC_SimulateUpdate(int nPlayer) {
         GM_PlayerTookShot(nPlayer);
         fn_8006C4A0();
         fn_800DBDA8(nPlayer);
-        if (gPlayers[nPlayer].ball.nLie == LIE_HOLED) {
+        if (gPlayers[nPlayer].ball.nLie == LIE_INCUP_e) {
             GOLFERSTATE_Switch(GS_IN_THE_HOLE, nPlayer);
         } else {
             GOLFERSTATE_Switch(GS_SHOW_YARDAGE, nPlayer);
@@ -3625,7 +3625,7 @@ void STATEFUNC_SimulateUpdate(int nPlayer) {
                 *pState = 0;
             }
             if (gPlayers[nPlayer].uFlags & 8) {
-                gPlayers[nPlayer].ball.nLie = LIE_HOLED;
+                gPlayers[nPlayer].ball.nLie = LIE_INCUP_e;
             }
             fn_80062DB8(pV, 1);
             return;
@@ -3793,7 +3793,7 @@ void STATEFUNC_SwingUpdate(int nPlayer) {
     if (gPlayers[nPlayer].fC20 >= 10.0f) {
         gPlayers[nPlayer].fC20 = 0.0f;
     }
-    if (nClub != CLUB_PUTTER) {
+    if (nClub != CLUB_PUTTER_e) {
         fn_800A573C((u8)nPlayer);
     }
     if (gpGame->b282 != 0) {
@@ -3836,7 +3836,7 @@ void STATEFUNC_SwingUpdate(int nPlayer) {
         if (gpGame->b284 != 0) {
             if (gpGame->pfn264(nPlayer)) {
                 AI_DefaultTarget(nPlayer);
-            } else if (gPlayers[nPlayer].nShotKind == SHOT_PUTT) {
+            } else if (gPlayers[nPlayer].nShotKind == SHOT_TYPE_PUTT_e) {
                 AI_DefaultTarget(nPlayer);
             } else {
                 AI_ChooseTarget(nPlayer);
@@ -3861,7 +3861,7 @@ void STATEFUNC_SwingUpdate(int nPlayer) {
         gpGame->pfn22C(nPlayer);
     } else {
         if ((fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(5, 0)) &&
-            gPlayers[nPlayer].nShotKind == SHOT_PUTT) {
+            gPlayers[nPlayer].nShotKind == SHOT_TYPE_PUTT_e) {
             GOLFERSTATE_Push(GS_GREEN_REVERSE_PUTT, nPlayer);
         } else {
             GM_CheckForShotChanges(nPlayer);

@@ -135,7 +135,7 @@ s32 fn_800FE3FC(int nPlayer) {
     fBest = 0.0f;
     nBest = 5;
     for (i = 0; i < gNumPlayersSetUp; i++) {
-        if (i != nPlayer && PLAYER(i)->ball.nLie != LIE_GREEN && !fn_800FE2B4(i)) {
+        if (i != nPlayer && PLAYER(i)->ball.nLie != LIE_GREEN_e && !fn_800FE2B4(i)) {
             dx = PLAYER(i)->ball.vPos[0] - pCourse->pin[nPinSet].x;
             dz = PLAYER(i)->ball.vPos[2] - pCourse->pin[nPinSet].z;
             d = fn_80009680(dx * dx + dz * dz);

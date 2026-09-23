@@ -351,13 +351,13 @@ u8 GM_CheckForAIConcede(int nPlayer) {
     int i;
     if (Player_IsCPU(nPlayer)) {
         Player* p = &gPlayers[nPlayer];
-        if (p->ball.nLie != LIE_HOLED) {
+        if (p->ball.nLie != LIE_INCUP_e) {
             if (p->nLevel > 2) {
                 bConcede = 1;
             } else {
                 for (i = 0; i < gSession.nNumPlayers; i++) {
                     if (i == nPlayer) break;
-                    if (gPlayers[i].ball.nLie == LIE_GREEN && p->ball.nLie != LIE_GREEN &&
+                    if (gPlayers[i].ball.nLie == LIE_GREEN_e && p->ball.nLie != LIE_GREEN_e &&
                         p->nStrokes[gpGame->nCurHole] > gPlayers[i].nStrokes[gpGame->nCurHole] + 3) {
                         bConcede = 1;
                     }
@@ -380,7 +380,7 @@ void GM_BallHit(int nPlayer) {
 // TW06: GM_PlayerAddStroke. One more stroke on this hole, and one more putt if it was the putter.
 void GM_PlayerAddStroke(int nPlayer) {
     gPlayers[nPlayer].nStrokes[gpGame->nCurHole]++;
-    if (gPlayers[nPlayer].nClub == CLUB_PUTTER) {
+    if (gPlayers[nPlayer].nClub == CLUB_PUTTER_e) {
         gPlayers[nPlayer].nPutts[gpGame->nCurHole]++;
     }
     if (fn_800EE470()) {
@@ -417,7 +417,7 @@ u8 GM_CheckForBallOOB(int nPlayer) {
             p = &gPlayers[nPlayer];
             p->nLevel++;
             p->nStrokes[gpGame->nCurHole]++;
-            if (p->nClub == CLUB_PUTTER) {
+            if (p->nClub == CLUB_PUTTER_e) {
                 p->nPutts[gpGame->nCurHole]++;
             }
             if (fn_800EE470()) {
@@ -543,7 +543,7 @@ void GM_PlayerTookShot(int nPlayer) {
             gpGame->pfn218(nPlayer);
         } else {
             if (fn_800E23B0(nPlayer, gPlayers[nPlayer].nStrokes[gpGame->nCurHole])) {
-                gPlayers[nPlayer].ball.nLie = LIE_HOLED;
+                gPlayers[nPlayer].ball.nLie = LIE_INCUP_e;
                 gPlayers[nPlayer].unkC2D = 1;
                 if (fn_800EE470()) {
                     gPlayers[nPlayer].nStrokes[gpGame->nCurHole] = 10;
@@ -622,7 +622,7 @@ u8 GM_PlayerTakeMulligan(int nPlayer) {
     fn_80016CFC(gPlayers[nPlayer].nView[0])->bFlagOut = 1;
     for (i = 0, q = gPlayers; i < gSession.nNumPlayers; i++, q++) {
         if (q->bPlayerCut == 0 && q->nView[0] == gPlayers[nPlayer].nView[0] &&
-            q->ball.nLie != 10 && q->ball.nLie != LIE_GREEN && q->ball.nLie != LIE_HOLED) {
+            q->ball.nLie != 10 && q->ball.nLie != LIE_GREEN_e && q->ball.nLie != LIE_INCUP_e) {
             fn_80016CFC(gPlayers[nPlayer].nView[0])->bFlagOut = 0;
         }
     }
@@ -740,7 +740,7 @@ int GM_ShowPostShotAnimation(int nPlayer) {
         }
     }
     if ((gSession.uFlags & 0x4000) && (gSession.uFlags & 0x8000)) {
-        if (gPlayers[nPlayer].ball.nLie == LIE_HOLED || gPlayers[nPlayer].ball.nStartSurface == 16 ||
+        if (gPlayers[nPlayer].ball.nLie == LIE_INCUP_e || gPlayers[nPlayer].ball.nStartSurface == 16 ||
             nResult == 2 || nResult == 1) {
             return 1;
         }
@@ -758,7 +758,7 @@ int GM_ShowPostShotAnimation(int nPlayer) {
     if (gPlayers[nPlayer].uFlags & 1) {
         return gPlayers[nPlayer].pChar->p1790 != NULL;
     }
-    if (gPlayers[nPlayer].nShotKind == SHOT_PUTT) {
+    if (gPlayers[nPlayer].nShotKind == SHOT_TYPE_PUTT_e) {
         switch (nResult) {
         case 0:  return Rand_Next(1) % 100 < 80;
         case 1:  return Rand_Next(1) % 100 < 100;
@@ -888,7 +888,7 @@ void GM_GolferConcede_Hole(int nPlayer) {
     int     n;
     fn_800E3D38(nPlayer, 0);
     p = &gPlayers[nPlayer];
-    gPlayers[nPlayer].ball.nLie = LIE_HOLED;
+    gPlayers[nPlayer].ball.nLie = LIE_INCUP_e;
     gPlayers[nPlayer].nStrokes[gpGame->nCurHole] = 999;
     p->nPutts[gpGame->nCurHole] = 999;
     gPlayers[nPlayer].ball.nState = 0;
@@ -896,14 +896,14 @@ void GM_GolferConcede_Hole(int nPlayer) {
         nPlayers = gNumPlayersSetUp;
         n = 0;
         for (i = 0; i < nPlayers; i++) {
-            if (PLAYER(i)->ball.nLie != LIE_HOLED) {
+            if (PLAYER(i)->ball.nLie != LIE_INCUP_e) {
                 n++;
             }
         }
         if (n == 1) {
             for (i = 0; i < nPlayers; i++) {
                 if (i != nPlayer) {
-                    PLAYER(i)->ball.nLie = LIE_HOLED;
+                    PLAYER(i)->ball.nLie = LIE_INCUP_e;
                     PLAYER(i)->ball.nState = 0;
                 }
             }
@@ -1210,13 +1210,13 @@ void GM_SimulateBallMovement(int nPlayer) {
                     if (!*pDone && fDist < 5.5f && fDist > 2.0f &&
                         fDist - gPlayers[nPlayer].ball.fClosest < 0.3f) {
                         pLie = &gPlayers[nPlayer].ballBefore.nLie;
-                        if (*pLie == LIE_HOLED && Hole_ScoreAfterTapIn(nPlayer) <= 0) {
+                        if (*pLie == LIE_INCUP_e && Hole_ScoreAfterTapIn(nPlayer) <= 0) {
                             if (Rand_Next(1) % 100 < 50) {
                                 *pFlags |= 4;
                                 gPlayers[nPlayer].fEEC = fDist;
                                 fn_80095744(gPlayers[nPlayer].pChar, 9);
                             }
-                        } else if (*pLie != LIE_HOLED && gPlayers[nPlayer].ballBefore.fClosest < 0.2f) {
+                        } else if (*pLie != LIE_INCUP_e && gPlayers[nPlayer].ballBefore.fClosest < 0.2f) {
                             *pFlags |= 4;
                             gPlayers[nPlayer].fEEC = fDist;
                             fn_80095744(gPlayers[nPlayer].pChar, 9);

@@ -55,13 +55,13 @@ int Golfer_TierBonus(int nTier) {
 // Which attribute governs a shot: the putter, then bad lies, then a full swing with a long
 // club from a good lie, then everything else is an approach.
 int Shot_GoverningAttribute(int nPlayer, int nClub, int nLie, int nKind) {
-    if (nClub == CLUB_PUTTER) {
+    if (nClub == CLUB_PUTTER_e) {
         return ATTR_PUTTING;
     }
     if (nLie == 8 || nLie == 13 || nLie == 11 || nLie == 3 || nLie == 4 || nLie == 6 || nLie == 7) {
         return ATTR_RECOVERY;
     }
-    if (nKind == SHOT_FULL && nClub < 13 && fn_800D2B08() == 3) {
+    if (nKind == SHOT_TYPE_DRIVE_e && nClub < 13 && fn_800D2B08() == 3) {
         return ATTR_BALL_STRIKING;
     }
     return ATTR_APPROACH;
@@ -346,7 +346,7 @@ void AI_ApplyError(int nPlayer) {
         fRand     = Rand_Float(0);
         fDistErr += fDist2 * (fMiss * fRand) / 100.0f;
         // (A full swing outside lesson 3 always comes up short; otherwise a coin flip.)
-        if ((p->nShotKind == SHOT_FULL && fn_800D2B08() != 3) || (Rand_Next(0) & 1)) {
+        if ((p->nShotKind == SHOT_TYPE_DRIVE_e && fn_800D2B08() != 3) || (Rand_Next(0) & 1)) {
             fDistErr *= -1.0f;
         }
         p->fDistance = p->fDistance * ((100.0f + fDistErr) / 100.0f);
@@ -407,13 +407,13 @@ int AI_FirstUsableClub(int nPlayer, int nKind) {
     do {
         if (Club_UsableForKind(nPlayer, nClub, nKind)) break;
         nClub++;
-    } while (nClub < NUM_CLUBS);
-    if (nClub == NUM_CLUBS) {
+    } while (nClub < CLUB_MAX_e);
+    if (nClub == CLUB_MAX_e) {
         int  i;
-        for (i = 0; i < NUM_CLUBS; i++) {
+        for (i = 0; i < CLUB_MAX_e; i++) {
             if ((1 << i) & gPlayers[nPlayer].golfer.uBagMask) return i;
         }
-        nClub = CLUB_PUTTER;
+        nClub = CLUB_PUTTER_e;
     }
     return nClub;
 }
@@ -423,14 +423,14 @@ int AI_FirstUsableClub(int nPlayer, int nKind) {
 // above 100 a fixed step per point).
 f32 AI_MaxDistance(int nPlayer, int nKind, int nClub) {
     f32 fMax;
-    if (nKind == SHOT_CHIP) {
+    if (nKind == SHOT_TYPE_CHIP_e) {
         fMax = 30.0f;
-    } else if (nKind == SHOT_PUTT) {
+    } else if (nKind == SHOT_TYPE_PUTT_e) {
         fMax = 60.0f;
     } else {
         Player* p = &gPlayers[nPlayer];
         fMax = fn_80050F44(nKind, nClub);
-        if (nKind == SHOT_FULL || nKind == 7 || nKind == 4 || nKind == 6) {
+        if (nKind == SHOT_TYPE_DRIVE_e || nKind == 7 || nKind == 4 || nKind == 6) {
             f32 fPower = (f32)(s8)Golfer_GetAttribute(p, ATTR_POWER, ATTR_TOTAL);
             if (fPower < 100.0f) {
                 f32 fRange = fMax - gClubPowerStep[nClub] - gClubDistAtPower0[nClub];
@@ -449,21 +449,21 @@ int AI_ShotKindForDistance(int nPlayer, f32 fDist) {
     int nOverride = fn_80100744();
     switch (nOverride) {
     case 8: {
-        int     nKind = SHOT_FULL;
+        int     nKind = SHOT_TYPE_DRIVE_e;
         Player* p     = &gPlayers[nPlayer];
         fDist /= fn_800510EC(&p->ball);
-        if (p->ball.nLie == LIE_GREEN || AI_GreenTowardPin(nPlayer, 1.5f)) {
-            nKind = SHOT_PUTT;
+        if (p->ball.nLie == LIE_GREEN_e || AI_GreenTowardPin(nPlayer, 1.5f)) {
+            nKind = SHOT_TYPE_PUTT_e;
         } else if ((p->golfer.uBagMask & (1 << 21)) && fDist < 15.0f && AI_GreenTowardPin(nPlayer, 5.0f) && Lie_AllowsFullSwing(nPlayer)) {
-            nKind = SHOT_CHIP;
+            nKind = SHOT_TYPE_CHIP_e;
         } else if ((p->golfer.uBagMask & (1 << 23)) && fDist < 20.0f) {
-            nKind = SHOT_PITCH;
+            nKind = SHOT_TYPE_PITCH_e;
         } else if ((p->golfer.uBagMask & (1 << 21)) && fDist < 35.0f) {
-            nKind = SHOT_PITCH;
+            nKind = SHOT_TYPE_PITCH_e;
         } else if ((p->golfer.uBagMask & (1 << 19)) && fDist < 50.0f) {
-            nKind = SHOT_PITCH;
+            nKind = SHOT_TYPE_PITCH_e;
         } else if ((p->golfer.uBagMask & (1 << 18)) && fDist < 65.0f) {
-            nKind = SHOT_PITCH;
+            nKind = SHOT_TYPE_PITCH_e;
         }
         return nKind;
     }
@@ -483,16 +483,16 @@ int AI_ClubForShot(int nPlayer, int nKind, u8 bUnderOnly, f32 fDist) {
         return 2;
     }
     nClub = fn_801006F0(nPlayer);
-    if (nClub != NUM_CLUBS) {
+    if (nClub != CLUB_MAX_e) {
         return nClub;
     }
     fBest = bUnderOnly ? 0.0f : 10000.0f;
     p     = &gPlayers[nPlayer];
-    if (nKind == SHOT_PUTT) {
-        nClub = CLUB_PUTTER;
-    } else if (nKind == SHOT_CHIP) {
-        nClub = CLUB_SAND_WEDGE;
-        if (!Club_UsableForKind(nPlayer, CLUB_SAND_WEDGE, nKind)) {
+    if (nKind == SHOT_TYPE_PUTT_e) {
+        nClub = CLUB_PUTTER_e;
+    } else if (nKind == SHOT_TYPE_CHIP_e) {
+        nClub = CLUB_SANDWEDGE_e;
+        if (!Club_UsableForKind(nPlayer, CLUB_SANDWEDGE_e, nKind)) {
             nClub = AI_FirstUsableClub(nPlayer, nKind);
         }
     } else {
@@ -500,8 +500,8 @@ int AI_ClubForShot(int nPlayer, int nKind, u8 bUnderOnly, f32 fDist) {
         if (Game_GetMode() == 6 || Game_GetMode() == 7 || Game_GetMode() == 8 || Controller_IsCPU(p->nController)) {
             fDist /= fn_800510EC(&p->ball);
         }
-        for (c = 0; c < NUM_CLUBS; c++) {
-            if (c == CLUB_PUTTER) continue;
+        for (c = 0; c < CLUB_MAX_e; c++) {
+            if (c == CLUB_PUTTER_e) continue;
             if (!Club_UsableForKind(nPlayer, c, nKind)) continue;
             if (bUnderOnly) {
                 fRatio = fDist / AI_MaxDistance(nPlayer, nKind, c);
@@ -538,11 +538,11 @@ int AI_ClubForShot(int nPlayer, int nKind, u8 bUnderOnly, f32 fDist) {
 // else is distance over the club's reach.
 f32 AI_PowerForTarget(int nPlayer) {
     Player* p = &gPlayers[nPlayer];
-    if (p->nShotKind == SHOT_PUTT) {
+    if (p->nShotKind == SHOT_TYPE_PUTT_e) {
         return fn_80050D34(p->fDistance);
     }
-    if (p->nShotKind == SHOT_CHIP) {
-        return fn_80050F88(p->fDistance, &p->ball, SHOT_CHIP, p->nClub);
+    if (p->nShotKind == SHOT_TYPE_CHIP_e) {
+        return fn_80050F88(p->fDistance, &p->ball, SHOT_TYPE_CHIP_e, p->nClub);
     }
     return p->fDistance / AI_MaxDistance(nPlayer, p->nShotKind, p->nClub);
 }
@@ -551,7 +551,7 @@ f32 AI_PowerForTarget(int nPlayer) {
 f32 AI_PowerScale(int nPlayer) {
     Player* p = &gPlayers[nPlayer];
     f32 fTable;
-    if (p->nShotKind == SHOT_FULL || p->nShotKind == 7 || p->nShotKind == 4 || p->nShotKind == 6) {
+    if (p->nShotKind == SHOT_TYPE_DRIVE_e || p->nShotKind == 7 || p->nShotKind == 4 || p->nShotKind == 6) {
         fTable = fn_80050F44(p->nShotKind, p->nClub);
         return AI_MaxDistance(nPlayer, p->nShotKind, p->nClub) / fTable;
     }
@@ -674,13 +674,13 @@ u8 Golfer_IsLucky(int nPlayer) {
         if (uOdds < 1) uOdds = 1;
     }
     uRoll = Rand_Next(0) % uOdds;
-    if (gPlayers[nPlayer].ball.nLie != LIE_GREEN && gPlayers[nPlayer].nShotKind != SHOT_PUTT &&
+    if (gPlayers[nPlayer].ball.nLie != LIE_GREEN_e && gPlayers[nPlayer].nShotKind != SHOT_TYPE_PUTT_e &&
         !gSession.nSplitScreen) {
         Game_CurrentPinSet();
         fn_8000C594();
         if (fn_800D2B08() == 3) {
             bLucky = 1;
-        } else if (gPlayers[nPlayer].nShotKind == SHOT_PITCH) {
+        } else if (gPlayers[nPlayer].nShotKind == SHOT_TYPE_PITCH_e) {
             bLucky = 1;
         } else if ((gPlayers[nPlayer].ball.nLie == 1 || gPlayers[nPlayer].ball.nLie == 2) &&
                    fn_800D0478(nPlayer) < 250.0f) {
@@ -793,8 +793,8 @@ extern u8  gCaddieActive;           // 0x80281D4A
 extern s32 gCaddieFrames;           // 0x80281D4C
 
 void Caddie_Start(int nPlayer) {
-    if ((!gPlayers[nPlayer].bPerfect && gPlayers[nPlayer].nShotKind != SHOT_PUTT) || Player_IsCPU(nPlayer) ||
-        gSession.nSplitScreen) {
+    if ((!gPlayers[nPlayer].bPerfect && gPlayers[nPlayer].nShotKind != SHOT_TYPE_PUTT_e) ||
+        Player_IsCPU(nPlayer) || gSession.nSplitScreen) {
         return;
     }
     Mem_cpy(&gPlayers[CADDIE_SLOT], &gPlayers[nPlayer], sizeof(Player));
@@ -808,8 +808,8 @@ void Caddie_Start(int nPlayer) {
 
 void Caddie_Update(int nPlayer) {
     f32 fDist2;
-    if ((!gPlayers[nPlayer].bPerfect && gPlayers[nPlayer].nShotKind != SHOT_PUTT) || Player_IsCPU(nPlayer) ||
-        gSession.nSplitScreen) {
+    if ((!gPlayers[nPlayer].bPerfect && gPlayers[nPlayer].nShotKind != SHOT_TYPE_PUTT_e) ||
+        Player_IsCPU(nPlayer) || gSession.nSplitScreen) {
         return;
     }
     if (!gCaddieActive) return;
@@ -829,7 +829,7 @@ void Caddie_Update(int nPlayer) {
 
 // 0 = no tip for this shot, 1 = tip ready (the aim point in pOut), 2 = gave up.
 int Caddie_GetTip(int nPlayer, f32* pOut) {
-    if (gPlayers[nPlayer].nShotKind != SHOT_PUTT || Player_IsCPU(nPlayer) || gSession.nSplitScreen) {
+    if (gPlayers[nPlayer].nShotKind != SHOT_TYPE_PUTT_e || Player_IsCPU(nPlayer) || gSession.nSplitScreen) {
         pOut[0] = 0.0f;
         pOut[1] = 0.0f;
         pOut[2] = 0.0f;
@@ -962,7 +962,7 @@ void AI_NudgeDistance(int nPlayer, f32 fDelta) {
 void AI_ClubLonger(int nPlayer, s32* pClub, int nStep) {
     int nClub;
     u8  bOk;
-    if (nStep == 0 || *pClub == CLUB_PUTTER || *pClub < nStep) return;
+    if (nStep == 0 || *pClub == CLUB_PUTTER_e || *pClub < nStep) return;
     nClub = *pClub - nStep;
     bOk   = Club_UsableForKind(nPlayer, nClub, gPlayers[nPlayer].nShotKind);
     while (nClub > 0 && !bOk) {
@@ -976,10 +976,10 @@ void AI_ClubLonger(int nPlayer, s32* pClub, int nStep) {
 void AI_ClubShorter(int nPlayer, s32* pClub, int nStep) {
     int nClub;
     u8  bOk;
-    if (nStep == 0 || *pClub == CLUB_PUTTER || *pClub > CLUB_PUTTER - 1 - nStep) return;
+    if (nStep == 0 || *pClub == CLUB_PUTTER_e || *pClub > CLUB_PUTTER_e - 1 - nStep) return;
     nClub = *pClub + nStep;
     bOk   = Club_UsableForKind(nPlayer, nClub, gPlayers[nPlayer].nShotKind);
-    while (nClub < CLUB_PUTTER - 1 && !bOk) {
+    while (nClub < CLUB_PUTTER_e - 1 && !bOk) {
         nClub++;
         bOk = Club_UsableForKind(nPlayer, nClub, gPlayers[nPlayer].nShotKind);
     }
@@ -1224,8 +1224,8 @@ void Shot_FitTargetToClub(int nPlayer) {
         AI_PlanShot(nPlayer, p->vTarget);
     } else if (p->fDistance < fMax) {
         if (Controller_IsCPU(p->nController)) return;
-        if (p->nClub == CLUB_PUTTER) return;
-        if (p->nShotKind == SHOT_CHIP) return;
+        if (p->nClub == CLUB_PUTTER_e) return;
+        if (p->nShotKind == SHOT_TYPE_CHIP_e) return;
         fSin = fn_800095F0(p->fAim);
         fCos = fn_80009638(p->fAim);
         fDZ  = fMax * fCos;
@@ -1440,12 +1440,13 @@ u8 Player_OnTee(int nPlayer) {
 }
 
 u8 Player_IsHoled(int nPlayer) {
-    return gPlayers[nPlayer].ball.nLie == LIE_HOLED;
+    return gPlayers[nPlayer].ball.nLie == LIE_INCUP_e;
 }
 
 u8 Player_IsHoledNotState23(int nPlayer) {
     int bResult = 0;
-    if (gPlayers[nPlayer].ball.nLie == LIE_HOLED && (s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_CONCEDED) {
+    if (gPlayers[nPlayer].ball.nLie == LIE_INCUP_e &&
+        (s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_CONCEDED) {
         bResult = 1;
     }
     return bResult;
@@ -1532,7 +1533,7 @@ int Bag_CountClubs(int nPlayer) {
     Player* p      = &gPlayers[nPlayer];
     int     nCount = 0;
     int     i;
-    for (i = 0; i < NUM_CLUBS; i++) {
+    for (i = 0; i < CLUB_MAX_e; i++) {
         if (p->golfer.uBagMask & (1 << i)) nCount++;
     }
     return nCount;
@@ -1644,7 +1645,7 @@ void Player_SetGolfer(int nPlayer, int nGolfer, int nController, u32 uBag, int b
     p->nClub       = 0;
     p->fAim        = 0.0f;
     p->fPower      = 100.0f;
-    p->nShotKind   = SHOT_FULL;
+    p->nShotKind   = SHOT_TYPE_DRIVE_e;
     p->nTrajectory = 1;
     p->vBall[0]      = 0.0f;
     p->vBall[1]      = 0.0f;
