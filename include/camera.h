@@ -181,16 +181,18 @@ LAYOUT_ASSERT(ViewController, 0x288);
 
 // The camera tuning values (GoGolfCam.c); only the fields read so far.
 typedef struct CamTuning {
-    u8   unk0[4];
+    f32  f0;                    // 0x000  the zoom-to-aim camera's base speed
     f32  f4;                    // 0x004  the zoom-to-aim camera's distance back from the target
-    u8   unk8[4];
+    f32  f8;                    // 0x008  the zoom-to-aim camera slows down over this last distance
     f32  fC;                    // 0x00C  ... closer in when the ball is within this of it plus f4
     f32  f10;                   // 0x010  ... as a share of the ball's distance
-    u8   unk14[0x1C - 0x14];
-    f32  f1C;                   // 0x01C  the green zoom-to-aim camera's slow motion at full speed
-    u8   unk20[4];
-    f32  f24;                   // 0x024  ... it has arrived within this of its goal
-    u8   unk28[0x30 - 0x28];
+    f32  f14;                   // 0x014  the zoom-to-aim camera's height over View.f15C
+    f32  f18;                   // 0x018  the zoom-to-aim camera's creep and aim-marker lag
+    f32  f1C;                   // 0x01C  both zoom-to-aim cameras' slow motion at full speed
+    f32  f20;                   // 0x020  the zoom-to-aim camera's slow motion before it sets off
+    f32  f24;                   // 0x024  both: the camera has arrived within this of its goal
+    f32  f28;                   // 0x028  the zoom-to-aim camera's aim-marker lag at the start
+    f32  f2C;                   // 0x02C  ... once there, its height's share of the move a frame
     f32  f30;                   // 0x030  ... it slows down over this last distance
     f32  f34;                   // 0x034  ... its base speed
     f32  f38;                   // 0x038  ... its distance back on a putt

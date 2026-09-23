@@ -242,6 +242,168 @@ void GolfCamera_InitZoomToAimCamera(View* pView, int nPlayer) {
     EVENT_Trigger(nPlayer, 0x30, NULL, -1);
 }
 
+// The zoom-to-aim camera's tick: fly the camera to the goal fn_800C3FC0 works out, fast at first
+// and slowing over the tuning's f8, with slow motion while it moves. f18C runs from below 0 (not
+// set off yet) to 1 (arrived); on the way the height blends from the aim's ground plus the shot's
+// f68 to the tuning's f14 over View.f15C (the ground at the target) in the second half. Arrived, it
+// creeps on towards the goal and eases its height.
+void GolfCamera_ProcessZoomToAimCamera(View* pView, int nPlayer) {
+    f32 vMove[4];
+    f32 vGoal[4];
+    f32 vAimMove[4];
+    f32 vCreep[4];
+    f32 vTarget[4];
+    f32 vStart[4];
+    f32 vOld[4];
+    f32 vAim[4];
+    f32 fLow;
+    f32 fHigh;
+    u8 bHit;
+    f32* pCam;
+    f32* pSub;
+    CourseInfo* pCourse;
+    u8 bMirror;
+    f32 fDist;
+    f32 fTotal;
+    f32 fBase;
+    f32 fSlow;
+    f32 fSpeed;
+    f32 f;
+    f32 fAimY;
+    f32 fCamY;
+    pCam = fn_8001731C(pView);
+    pSub = fn_80017314(pView);
+    Vec3Copy(pCam, vOld);
+    Vec_Copy(gPlayers[nPlayer].vTargetCopy, vTarget);
+    bMirror = fn_800C3FC0(pView, nPlayer, pCam, vAim, vGoal);
+    pCourse = fn_8000C594();
+    fBase = lbl_80281F78->f0;
+    fSlow = lbl_80281F78->f8;
+    // flat distances to the goal: from the camera, from the aim and from where it started
+    fn_800C73DC(vGoal, pCam, vMove);
+    vMove[1] = 0.0f;
+    fDist = fn_80009680(fn_80009744(vMove));
+    fn_800C73DC(vGoal, vAim, vAimMove);
+    vAimMove[1] = 0.0f;
+    fTotal = fn_80009680(fn_80009744(vAimMove));
+    fn_800C73DC(vGoal, pView->shot19C.v30, vStart);
+    vStart[1] = 0.0f;
+    f = fn_80009680(fn_80009744(vStart));
+    if (fTotal < f) {
+        fTotal = f;
+    }
+    if (pView->f18C >= 1.0f) {
+        fn_800C73DC(vGoal, pCam, vCreep);
+        vCreep[1] = 0.0f;
+        fSlow = fn_80009680(fn_80009744(vCreep));
+        if (vCreep[0] != 0.0f || vCreep[1] != 0.0f || vCreep[2] != 0.0f) {
+            fn_800BAF04(vCreep, vCreep);
+        }
+        fSlow /= lbl_80281F78->f18;
+        fn_8001EF34(vCreep, fSlow, vCreep);
+        fn_800C73B8(pCam, vCreep, pCam);
+        fDist = 0.0f;
+    } else if (fDist > lbl_80281F78->f24 && fn_8000C5FC(vMove, vAimMove) > 0.0f && pView->f18C >= 0.0f) {
+        // on the way: faster the further it is
+        if (fDist < 1.0f) {
+            f = fBase;
+        } else {
+            f = fBase * (f32)fn_80009680(fDist);
+        }
+        fSpeed = f;
+        if (fTotal - fDist < fSlow && fSlow > 0.0f) {
+            fSpeed *= (fTotal - fDist) / fSlow;
+            if (fSpeed < fBase) {
+                fSpeed = fBase - (fBase - fSpeed);
+            }
+            if (fSpeed < 0.5f) {
+                fSpeed = 0.5f;
+            }
+        }
+        fSlow = fSpeed * gSession.fFrameTime;
+        if (fDist - fSlow < 0.0f) {
+            fSlow = fDist;
+        }
+        if (vMove[0] != 0.0f || vMove[1] != 0.0f || vMove[2] != 0.0f) {
+            fn_800BAF04(vMove, vMove);
+        }
+        fn_8001EF34(vMove, fSlow, vMove);
+        fn_800C73B8(vMove, pCam, pCam);
+        fSpeed = lbl_80281F78->f1C * (1.0f - fBase / fSpeed);
+        if (fSpeed < 0.0f) {
+            fSpeed = 0.0f;
+        }
+        if (gSession.nPaused == 0) {
+            fn_80038054(1, fn_80016D10(), 0.0f, fSpeed);
+        }
+        pView->f18C = 1.0f - fDist / fTotal;
+    } else if (pView->f18C >= 0.0f) {
+        EVENT_Trigger(nPlayer, 0x31, NULL, -1);
+        pView->f18C = 1.0f;
+    } else if (gSession.nPaused == 0) {
+        fn_80038054(1, fn_80016D10(), 0.0f, lbl_80281F78->f20);
+    }
+    if (pCourse != NULL) {
+        Ter_GetEnclosingGroundHeight(pCourse, vTarget, &fLow, &fHigh);
+        if (fLow < -60000.0f) {
+            if (!(fHigh < -60000.0f)) {
+                pView->f15C = fHigh;
+            }
+        } else {
+            pView->f15C = fLow;
+        }
+    }
+    // before setting off, far from the goal: rise to the course's elevator height
+    if (pView->shot19C.f68 < lbl_80282220->fElevatorHeight[Game_GetCourse()] && pView->f18C < 0.0f
+        && fDist > 20.0f) {
+        pView->shot19C.f68 += 0.25f * (FRAME_RATE * gSession.fFrameTime);
+    } else if (pView->f18C < 0.0f) {
+        pView->f18C = 0.0f;
+    }
+    if (pCourse != NULL) {
+        Ter_GetEnclosingGroundHeight(pCourse, vAim, &fLow, &fHigh);
+        if (fLow < -60000.0f) {
+            if (!(fHigh < -60000.0f)) {
+                fAimY = fHigh;
+            } else {
+                fAimY = gPlayers[nPlayer].vBall[1];
+            }
+        } else {
+            fAimY = fLow;
+        }
+        fAimY += pView->shot19C.f68;
+        fCamY = pView->f15C + lbl_80281F78->f14;
+    } else {
+        fAimY = 0.0f;
+        fCamY = 0.0f;
+    }
+    if (pView->f18C < 0.0f || fDist / fTotal > 0.5f) {
+        f = fAimY;
+    } else {
+        f = fAimY + (1.0f - fDist / fTotal / 0.5f) * (fCamY - fAimY);
+    }
+    if (pView->f18C >= 1.0f) {
+        pCam[1] += lbl_80281F78->f2C * (f - pCam[1]);
+    } else {
+        pCam[1] = f;
+    }
+    CamScript_KeepAboveGround(nPlayer, pCam, vOld, 1, &bHit, NULL, NULL, 0.5f);
+    if (pView->f18C >= 1.0f) {
+        fSlow = 1.0f + lbl_80281F78->f4;
+        fSlow *= 1.0f / fn_8001EFFC((u8*)fn_80008370(fn_80017004(gPlayers[nPlayer].nView[0])));
+    } else {
+        fSlow = 10000.0f;
+    }
+    if (!bHit && pCam[1] < lbl_80281F78->f168 + fn_8000C594()->fFloor) {
+        pCam[1] = lbl_80281F78->f168 + fn_8000C594()->fFloor;
+    }
+    f = lbl_80281F78->f18 + fDist / fTotal * (lbl_80281F78->f28 - lbl_80281F78->f18);
+    if (pView->f18C >= 0.0f) {
+        CameraScript_LagAimMarker(nPlayer, pSub, pCam, &pView->shot19C, 1, bMirror != 0, f, fSlow,
+                                  lbl_80281F78->fDC);
+    }
+}
+
 // The zoom-to-aim camera on the green: as GolfCamera_InitZoomToAimCamera, but the height is the
 // tuning's f168 over the pin or the ground under the camera, whichever is higher (0.5 more over
 // anything but green, fringe or cup, at most 1 under the camera when it is more than 5 over), and
@@ -356,6 +518,7 @@ void GolfCamera_ProcessGreenZoomToAimCamera(View* pView, int nPlayer) {
     CourseInfo* pCourse;
     CamLens* pLens;
     u8 bArrived;
+    int nPinSet;
     f32 fDist;
     f32 fTotal;
     f32 fSpeed;
@@ -390,7 +553,8 @@ void GolfCamera_ProcessGreenZoomToAimCamera(View* pView, int nPlayer) {
         pLens = fn_80008370(fn_80017004(gPlayers[nPlayer].nView[0]));
         fHeight *= 1.0f / fn_8001EFFC((u8*)pLens);
         // high enough to see the pin (up to 20 from the target) through the lens
-        fn_800C73DC(&pCourse->pin[Game_CurrentPinSet()].x, vTarget, vPin);
+        nPinSet = Game_CurrentPinSet();
+        fn_800C73DC(&pCourse->pin[nPinSet].x, vTarget, vPin);
         vPin[1] = 0.0f;
         f = fn_80009680(fn_80009744(vPin));
         f += 1.5f;
@@ -468,7 +632,8 @@ void GolfCamera_ProcessGreenZoomToAimCamera(View* pView, int nPlayer) {
             } else {
                 pView->f18C = 1.0f - fDist / fTotal;
             }
-            f = (fHeight + (pView->shot19C.f68 - pView->shot19C.v30[1])) * (1.0f - fDist / fTotal);
+            f = fHeight + (pView->shot19C.f68 - pView->shot19C.v30[1]);
+            f *= 1.0f - fDist / fTotal;
             pCam[1] = pView->shot19C.v30[1] + f;
         } else {
             EVENT_Trigger(nPlayer, 0x31, NULL, -1);
