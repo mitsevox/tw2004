@@ -231,6 +231,7 @@ extern SaveProfile* lbl_80281DF4;       // unlocks that hold for every profile (
 extern SaveLockEntry lbl_80281DF0;
 extern u32 lbl_801D5948[8];             // a bit array the code at 0x80056480 keeps; fn_80078008's lock
                                         // kind 6 tests bits 1..5 of it
+extern u32 lbl_801D5908[16];            // a bit array the cheat codes of lbl_80188024 set (fn_800564AC)
 extern s32 lbl_80189528[14];            // the golfers GM_GetGameProgress counts as unlockable
 extern s32 lbl_801894D0[6];             // the courses GM_GetGameProgress counts as unlockable
 
