@@ -593,6 +593,7 @@ typedef struct GameState {
     s32  n290;                  // 0x290
     s32  n294;                  // 0x294
 } GameState;
+LAYOUT_ASSERT(GameState, 0x298);
 
 // An authored aim point. pDef points at its position and the up-to-ten other points a golfer
 // standing in its zone may aim at; the bytes are filters and requirements (negative = at most).

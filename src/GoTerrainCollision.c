@@ -31,10 +31,16 @@ f32   fn_800CBEE0(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef**
                   s32* pTri);
 f32   fn_80035074(f32 x);                                 // floor
 
+// Every floor in this file goes through an inline (probably EA's wrapper around floorf):
+// fn_8004DCC4 matches only that way, and every other function matches either way.
+static inline f32 Ter_Floor(f32 x) {
+    return fn_80035074(x);
+}
+
 // The grid cell a coordinate falls in (it may be outside the grid). The four line walkers go
 // through this helper; the point lookups write the cast out (each matches only its own way).
 static inline int Ter_GridCell(f32 fCells) {
-    return (int)fn_80035074(fCells);
+    return (int)Ter_Floor(fCells);
 }
 
 f32   fn_8004C8E0(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** ppRef, f32 (**ppTri)[3],
@@ -60,6 +66,8 @@ u8    fn_800504F4(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32
 u8    fn_8004E0D4(f32* pFrom, f32* pDir, f32 fRange, f32* pCentre, f32 fRadius);
 u8    fn_80050A9C(f32* pA, f32* pB, f32* pC, f32 fX, f32 fZ);
 void  fn_800509D8(f32 (*pTri)[3], f32* pPos, f32* pA, f32* pB, f32* pC);
+s8**  fn_80034A20(u16 nPatch, u16 nObjList);               // a course object's model (GoTerrain.c)
+int   fn_80050BD8(s8** ppData, int n);
 
 // TW06: bool Ter_LineTriangleIntersection(f32*, f32*, f32, f32**, f32*, f32[4]*, f32[4]*). Where the
 // line from pFrom along pDir meets a triangle, as a fraction t of pDir (0 < t < fMax): t, the point
@@ -288,8 +296,181 @@ f32 fn_8004B78C(CourseInfo* pCourse, f32* pPos) {
     return 1.0f;
 }
 
-// 0x8004B89C: Ter_CheckObjectAndHazardObstruction (TW06's name; 0x898 bytes) goes here. Not written
-// yet; its prototype is in ball.h (Ter_CheckForDropLocation calls it).
+// TW06: bool Ter_CheckObjectAndHazardObstruction(f32*, f32, bool, bool, f32, bool, f32). Whether
+// something spoils a spot for a ball. Checked at the spot and at four corners fStep away in x and
+// z, against the highest ground at most 2 x fStep above the spot: an object (with bModels, only
+// one whose model has flag 0x40) standing within fRadius of the spot, or within fRadius + 0.5 when
+// the object is over 4 yards wide, unless the spot is on surface class 2, 3 or 6; with bHazards,
+// no ground or a free-drop area at any of the five points, ground without surface flag 1 at the
+// spot, or at a corner ground that has neither flag 1 nor class 8; with bSlope, a corner more
+// than fStep x fMaxSlope above or below the spot.
+u8 Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 bModels, u8 bHazards, f32 fStep, u8 bSlope,
+                                       f32 fMaxSlope) {
+    f32 aHeight[5];
+    TerPolyRef* apRef[5];
+    f32 vPos[4];
+    u8 abFreeDrop[5];
+    f32 fA;
+    f32 fB;
+    f32 fC;
+    f32 fA2;
+    f32 fB2;
+    f32 fC2;
+    u8 bFirst;
+    u8 bObstructed;
+    CourseInfo* pCourse;
+    f32 fMinX;
+    f32 fMaxX;
+    f32 fMinZ;
+    f32 fMaxZ;
+    f32 fTop;
+    f32 fWide;
+    f32 fDist;
+    f32 fDx;
+    f32 fDz;
+    f32 fObjRadius;
+    f32 fHeight;
+    int nMinZ;
+    int nMaxX;
+    int nMaxZ;
+    int nX;
+    int nZ;
+    int i;
+    int j;
+    int k;
+    int n;
+    int nCorner;
+    TerCell* pCell;
+    TerPolyRef* pRef;
+    u16* pObjRef;
+    f32 (*pVert)[3];
+    u8* pFlags;
+    u8 uFlags;
+    s8** ppModel;
+
+    bObstructed = 0;
+    bFirst = 1;
+    pCourse = fn_8000C594();
+    if (pCourse == NULL) return 0;
+    for (i = 0; i < 5; i++) {
+        aHeight[i] = -50000.0f;
+        abFreeDrop[i] = 0;
+        apRef[i] = NULL;
+    }
+    fMinX = pPos[0] - (fRadius <= fStep ? fStep : fRadius);
+    fMaxX = pPos[0] + (fRadius <= fStep ? fStep : fRadius);
+    fMinZ = pPos[2] - (fRadius <= fStep ? fStep : fRadius);
+    fMaxZ = pPos[2] + (fRadius <= fStep ? fStep : fRadius);
+    fTop = pPos[1] + 2.0f * fStep;
+    nX = (int)Ter_Floor((fMinX - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
+    nMinZ = (int)Ter_Floor((fMinZ - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
+    nMaxX = (int)Ter_Floor((fMaxX - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
+    nMaxZ = (int)Ter_Floor((fMaxZ - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
+    fWide = 0.5f + fRadius;
+    for (; nX <= nMaxX; nX++) {
+        for (nZ = nMinZ; nZ <= nMaxZ; nZ++) {
+            if (nX >= 0 && nX < pCourse->nGridWidth && nZ >= 0 && nZ < pCourse->nGridLength) {
+                pCell = &pCourse->pGrid[nX + nZ * pCourse->nGridWidth];
+                pObjRef = &pCourse->pObjRefs[pCell->nObjRefOffset];
+                for (i = pCell->nObjRefs - 1; i >= 0; i--) {
+                    fDx = pCourse->pObjects[*pObjRef].vBase[0] - pPos[0];
+                    fDz = pCourse->pObjects[*pObjRef].vBase[2] - pPos[2];
+                    fObjRadius = pCourse->pObjects[*pObjRef].fBaseRadius;
+                    fDist = (f32)fn_80009680(fDx * fDx + fDz * fDz) - fObjRadius;
+                    if (fDist < fRadius || (fObjRadius > 4.0f && fDist < fWide)) {
+                        if (bModels) {
+                            ppModel = fn_80034A20(pCourse->pObjects[*pObjRef].nPatch,
+                                                  pCourse->pObjects[*pObjRef].nObjList);
+                            if (ppModel != NULL && (fn_80050BD8(ppModel, 0) & 0x40)) {
+                                bObstructed = 1;
+                            }
+                        } else {
+                            bObstructed = 1;
+                        }
+                    }
+                    pObjRef++;
+                }
+                pRef = &pCourse->pPolyRefs[pCell->uRefs >> 12];
+                for (n = (pCell->uRefs & 0xFFF) - 1; n >= 0; n--) {
+                    if (pRef->n2 != 0) {
+                        pRef++;
+                    } else {
+                        pFlags = pCourse->pTriFlags + TER_FIRST_VERTEX(pRef);
+                        pVert = &pCourse->pVerts[TER_FIRST_VERTEX(pRef)];
+                        for (j = pRef->nTris - 1; j >= 0; j--) {
+                            uFlags = pFlags[2];
+                            if (bFirst) {
+                                abFreeDrop[0] = Ter_PointInFreeDropNetwork(pPos);
+                            }
+                            if ((uFlags & 7)
+                                && (fTop > pVert[(uFlags >> 6) & 3][1]
+                                    || aHeight[0] < pVert[(uFlags >> 4) & 3][1])
+                                && fn_80050A9C(pVert[0], pVert[1], pVert[2], pPos[0], pPos[2])) {
+                                fn_800509D8(pVert, pPos, &fA, &fB, &fC);
+                                fHeight = fA * pVert[0][1] + fB * pVert[1][1] + fC * pVert[2][1];
+                                if (fHeight > aHeight[0] && fHeight <= fTop) {
+                                    aHeight[0] = fHeight;
+                                    apRef[0] = pRef;
+                                }
+                            }
+                            k = 1;
+                            vPos[0] = pPos[0] - fStep;
+                            for (nCorner = 0; nCorner < 2; nCorner++) {
+                                vPos[2] = pPos[2] - fStep;
+                                for (i = 0; i < 2; i++) {
+                                    if (bFirst) {
+                                        abFreeDrop[k] = Ter_PointInFreeDropNetwork(vPos);
+                                    }
+                                    if ((uFlags & 7)
+                                        && (fTop > pVert[(uFlags >> 6) & 3][1]
+                                            || aHeight[k] < pVert[(uFlags >> 4) & 3][1])
+                                        && fn_80050A9C(pVert[0], pVert[1], pVert[2], vPos[0], vPos[2])) {
+                                        fn_800509D8(pVert, vPos, &fA2, &fB2, &fC2);
+                                        fHeight = fA2 * pVert[0][1] + fB2 * pVert[1][1] + fC2 * pVert[2][1];
+                                        if (fHeight > aHeight[k] && fHeight <= fTop) {
+                                            aHeight[k] = fHeight;
+                                            apRef[k] = pRef;
+                                        }
+                                    }
+                                    vPos[2] += 2.0f * fStep;
+                                    k++;
+                                }
+                                vPos[0] += 2.0f * fStep;
+                            }
+                            bFirst = 0;
+                            pVert++;
+                            pFlags++;
+                        }
+                        pRef++;
+                    }
+                }
+            }
+        }
+    }
+    if (apRef[0] != NULL) {
+        if (gSurfaceTypes[apRef[0]->nSurface].nClass == 3 || gSurfaceTypes[apRef[0]->nSurface].nClass == 2
+            || gSurfaceTypes[apRef[0]->nSurface].nClass == 6) {
+            bObstructed = 0;
+        }
+    }
+    if (bObstructed) return 1;
+    if (bHazards) {
+        if ((apRef[0] != NULL && !(gSurfaceTypes[apRef[0]->nSurface].u34 & 1)) || abFreeDrop[0]) return 1;
+        for (k = 1; k < 5; k++) {
+            if (abFreeDrop[k] || apRef[k] == NULL
+                || (apRef[k] != NULL && !(gSurfaceTypes[apRef[k]->nSurface].u34 & 1)
+                    && gSurfaceTypes[apRef[k]->nSurface].nClass != 8)) {
+                return 1;
+            }
+        }
+    }
+    if (bSlope) {
+        for (k = 1; k < 5; k++) {
+            if (apRef[k] != NULL && fabsf(aHeight[k] - aHeight[0]) > fStep * fMaxSlope) return 1;
+        }
+    }
+    return 0;
+}
 
 // TW06: bool Ter_SearchForDropLocation(s32, bool, bool, f32*), with the ring search that TW06 split
 // out as Ter_SearchAreaForDropLocation written inline. Where a player's ball is to be
@@ -299,27 +480,30 @@ f32 fn_8004B78C(CourseInfo* pCourse, f32* pPos) {
 // than the ball, search rings of 1 to 4 yards around the ball, every 45 degrees starting towards
 // the pin, for a drop on the same class, else the nearest. Returns 0 when the spot is where the
 // shot started, or (with bCheck) within 50 yards of vA44.
-// Not exact yet (98.9%): the frame is 0x10 bigger and the saved registers differ; unfinished
-// when work was frozen.
+// Not exact yet (99.86%): only two float registers are swapped, the ring search's fDist (the
+// original's f22) and fLift (f25). Tried: every order of the float declarations, a separate
+// variable for the ring search's distance (declared anywhere), fLift written inline.
 u8 Ter_SearchForDropLocation(int nPlayer, u8 bPreferred, u8 bCheck, f32* pOut) {
     f32 vPos[4];
     f32 vDir[4];
     SurfaceType* pSurface;
     u8 bDrop;
     u8 bPreferredLie;
-    Player* p = &gPlayers[nPlayer];
-    CourseInfo* pCourse = fn_8000C594();
+    CourseInfo* pCourse;
     f32 fDist;
     f32 fDropDist;
     f32 fAngle;
-    f32 fTurn;
     f32 fRadius;
     f32 fLift;
+    f32 fTurn;
     f32 fSin;
     f32 fHeading;
     int nRing;
+    Player* p;
     SurfaceType* pGround;
 
+    p = &gPlayers[nPlayer];
+    pCourse = fn_8000C594();
     fDist = fn_800BB028(&pCourse->pin[Game_CurrentPinSet()].x, p->ball.vStart);
     if (fn_800BB028(p->ball.vPos, p->ball.vStart) > fDist) {
         bPreferred = 0;                 // past the pin
@@ -496,8 +680,8 @@ f32 fn_8004C8E0(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** p
                 s32* pTri) {
     u32 uPinSet = 1 << Game_CurrentPinSet();
     f32 fBest = TER_NO_GROUND;
-    int nX = (int)fn_80035074((pPos[0] - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
-    int nZ = (int)fn_80035074((pPos[2] - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
+    int nX = (int)Ter_Floor((pPos[0] - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
+    int nZ = (int)Ter_Floor((pPos[2] - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
     TerCell* pCell;
     TerPolyRef* pRef;
     f32 (*pVert)[3];
@@ -551,8 +735,8 @@ f32 fn_8004CB30(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** p
                 s32* pTri) {
     u32 uPinSet = 1 << Game_CurrentPinSet();
     f32 fBest = 50000.0f;
-    int nX = (int)fn_80035074((pPos[0] - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
-    int nZ = (int)fn_80035074((pPos[2] - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
+    int nX = (int)Ter_Floor((pPos[0] - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
+    int nZ = (int)Ter_Floor((pPos[2] - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
     TerCell* pCell;
     TerPolyRef* pRef;
     f32 (*pVert)[3];
@@ -607,8 +791,8 @@ f32 fn_8004CB30(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** p
 f32 fn_8004CD94(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** ppRef, f32 (**ppTri)[3]) {
     u32 uPinSet = 1 << Game_CurrentPinSet();
     f32 fBest = TER_NO_GROUND;
-    int nX = (int)fn_80035074((pPos[0] - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
-    int nZ = (int)fn_80035074((pPos[2] - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
+    int nX = (int)Ter_Floor((pPos[0] - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
+    int nZ = (int)Ter_Floor((pPos[2] - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
     TerCell* pCell;
     TerPolyRef* pRef;
     f32 (*pVert)[3];
@@ -661,8 +845,8 @@ f32 fn_8004D01C(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** p
                 s32* pTri) {
     u32 uPinSet = 1 << Game_CurrentPinSet();
     f32 fBest = 65536.0f;
-    int nX = (int)fn_80035074((pPos[0] - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
-    int nZ = (int)fn_80035074((pPos[2] - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
+    int nX = (int)Ter_Floor((pPos[0] - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
+    int nZ = (int)Ter_Floor((pPos[2] - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
     TerCell* pCell;
     TerPolyRef* pRef;
     f32 (*pVert)[3];
@@ -723,8 +907,8 @@ void fn_8004D2E0(CourseInfo* pCourse, f32* pPos, TerPolyRef** ppRefLow, f32* pLo
     u32 uPinSet = 1 << Game_CurrentPinSet();
     f32 fHigh = 65536.0f;
     f32 fLow = -65536.0f;
-    int nX = (int)fn_80035074((pPos[0] - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
-    int nZ = (int)fn_80035074((pPos[2] - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
+    int nX = (int)Ter_Floor((pPos[0] - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
+    int nZ = (int)Ter_Floor((pPos[2] - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
     TerCell* pCell;
     TerPolyRef* pRef;
     f32 (*pVert)[3];
@@ -1026,8 +1210,8 @@ f32 fn_8004DBB0(CourseInfo* pCourse, f32* pPos, SurfaceType** ppSurface, f32* pN
 u32 fn_8004DCC4(CourseInfo* pCourse, f32* pPos, SurfaceType** ppSurfaces, f32* pHeights, u32 nMax) {
     u32 uPinSet = 1 << Game_CurrentPinSet();
     u32 nFound = 0;
-    int nX = (int)fn_80035074((pPos[0] - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
-    int nZ = (int)fn_80035074((pPos[2] - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
+    int nX = (int)Ter_Floor((pPos[0] - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
+    int nZ = (int)Ter_Floor((pPos[2] - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
     TerCell* pCell;
     TerPolyRef* pRef;
     f32 (*pVert)[3];

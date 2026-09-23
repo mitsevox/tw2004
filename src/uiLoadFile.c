@@ -2,6 +2,7 @@
 // the sweep code below is the matched small functions.
 
 #include "game_types.h"
+#include "game/frontend.h"
 
 // ---- sweep code (not yet cleaned up) ----
 
@@ -15,11 +16,10 @@ extern u8 lbl_801D87A8[];
 u8* fn_8008F0F0(void);
 extern s32 lbl_80281F04;
 s32 fn_8008F15C(void);
-void fn_8008F164(u32 arg0);
+void fn_8008F164(void* p);
 extern s32 lbl_80281F08;
 s32 fn_8008F18C(void);
 s32 fn_80090B10();
-extern void* lbl_80281F1C;
 void fn_8008F24C(void);
 
 void fn_8008ED28(void) {
@@ -48,8 +48,8 @@ s32 fn_8008F15C(void) {
     return lbl_80281F04;
 }
 
-void fn_8008F164(u32 arg0) {
-    if (arg0 != 0U) {
+void fn_8008F164(void* p) {
+    if (p != NULL) {
         fn_80009E70();
     }
 }
@@ -59,10 +59,10 @@ s32 fn_8008F18C(void) {
 }
 
 void fn_8008F24C(void) {
-    if ((u32) (*(u32*)((u8*)(lbl_80281F1C) + 0xC)) != 0U) {
+    if (lbl_80281F1C->pC != NULL) {
         fn_80090B10();
-        fn_8008F164((*(u32*)((u8*)(lbl_80281F1C) + 0xC)));
-        (*(u32*)((u8*)(lbl_80281F1C) + 0xC)) = 0U;
+        fn_8008F164(lbl_80281F1C->pC);
+        lbl_80281F1C->pC = NULL;
     }
 }
 
