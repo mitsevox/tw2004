@@ -1096,6 +1096,15 @@ void fn_800E3050(int nCourse) {
 // the back (never on neighbouring holes), then four par 5s the same way, then par 4s everywhere
 // else. Each hole comes from a random course, no hole twice, and every course is used once
 // before any is used again.
+// Not exact yet: in the par-4 loop the counter i, the constant 0/nCourse and the constant 1/p take
+// r24/r26/r22 where the original has r26/r24/r22, and the three hole picks load the byte into the
+// extsb's own register where the original loads it into r0. A no-op (s8) cast on the three picks
+// fixes the loads (32 -> 16 differing) but was left out. Tried without effect on the par-4
+// registers: every declaration order (climb), every choice of i/k/n/h for the loop's three counters,
+// block-scope locals for any subset of its nCourse/p/nHoles/nHole/nPick/k/h, int/s32/u32 on the
+// counters, s8/int/s32 nHole, u8/char holes, casts on the pick, an inline pick helper, the three
+// set-up statements and the three final stores in every order, a `continue` and a `while` form,
+// GC/2.0 to 2.7; the permuter (60 min in all) found nothing.
 void fn_800E30D4(void) {
     CourseList courses;
     s8  holes[18];
