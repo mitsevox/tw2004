@@ -1,5 +1,6 @@
-// GameMode23.c (our name): game mode 23, a run of 31 lessons (lbl_80205F3C, 0x64 bytes each, loaded
-// from a stream object) with the player's progress kept in the save profile (+0xB634..).
+// GameMode23.c (our name): game mode 23, a tour season of 31 tournaments (lbl_80205F3C, 0x64 bytes
+// each, loaded from the 'PGAc' stream object), with the player's results kept in the save profile
+// (+0xB634..): "Did Not Play", "Cut", a finishing place, "Tied (%d players)".
 
 #include "game_types.h"
 
@@ -33,16 +34,16 @@ u8 fn_8011908C(s32, s32);
 s32 fn_8011937C(s32, s32, u8);
 void fn_800F018C(void);
 
-// One lesson (0x64 bytes).
+// One tournament of the season (0x64 bytes).
 typedef struct Lesson {
     s32  n0;
-    s32  nPlan;                 // 0x04  1-based entry in the plan table (0 = one step)
+    s32  nPlan;                 // 0x04  1-based entry in the round table (0 = one round)
     u8   unk8[8];
     s32  n10;                   // 0x10
     char szName[0x10];          // 0x14
     s32  n24;                   // 0x24
-    s16  aTimes[10][2];         // 0x28  per step, in seconds
-    u16  a50[10];               // 0x50  per step
+    s16  aTimes[10][2];         // 0x28  per round, in seconds
+    u16  a50[10];               // 0x50  per season (fn_800EFB88)
 } Lesson;
 extern Lesson lbl_80205F3C[];
 #define LESSONS lbl_80205F3C
@@ -53,24 +54,24 @@ typedef struct Triple {
 } Triple;
 #define TRIPLES ((Triple*)(LESSON_BYTES + 0x6FC8))
 
-// The lesson part of a save profile (0x10600 bytes).
+// The tour-season part of a save profile (0x10600 bytes).
 typedef struct LessonSave {
     char szName[0x10];          // 0x00
     s32  n10;                   // 0x10
     u8   unk14[0x1C - 0x14];
-    s32  n1C;                   // 0x1C  1 = done
-    u8   b20;                   // 0x20
-    u8   unk21[3];
+    s32  nPlace;                // 0x1C  the finishing place
+    s32  nResult;               // 0x20  0 did not play, 1 missed the cut, 2 placed
 } LessonSave;
 typedef struct Profile {
     u8         unk0[0xB634];
     s32        nB634;           // 0xB634
-    s32        nLesson;         // 0xB638
-    s32        nStep;           // 0xB63C
-    LessonSave aLesson[31];     // 0xB640
+    s32        nLesson;         // 0xB638  the current tournament
+    s32        nStep;           // 0xB63C  its round
+    LessonSave aLesson[31];     // 0xB640  per tournament
     u8         unkBA9C[0x10600 - 0xBA9C];
 } Profile;
 #define PROFILES ((Profile*)gpSaveData)
+#define SEASON ((LessonSave*)((u8*)gpSaveData + 0xB640))   // profile 0's results
 
 extern u8  lbl_80281670[];
 extern u8  gSession[];
@@ -80,6 +81,17 @@ void fn_800E4364(u32 nQueue, s32 a, s32 b, s32 c);
 s32  fn_800EFBD0(s32 i);
 u8   fn_800EF83C(u16* pId, s32* pOut);
 char* strcpy(char* pDst, const char* pSrc);
+int   sprintf(char* pDst, const char* pFmt, ...);
+int   UStream_RegisterHandler();
+u32   fn_8000E81C(void* pObj, void** ppData);
+void* fn_800951A0(u32 nSize, int nAlign, int a);
+void  Mem_cpy(void* pDst, void* pSrc, int nBytes);   // memcpy
+void  fn_80009E70(void* p);                 // free
+s32   fn_80118684(s32 a);
+char* fn_80118E30(s32 a, s32 b);
+s32   fn_80119118(s32 a, s32 b);
+s32   fn_801197CC(s32 a, s32 b);
+void  fn_800EDFC0(void* pObj);
 s32  fn_800F02A8(void);
 s32  fn_800EFA9C(s32 i);
 
@@ -293,4 +305,47 @@ s32 fn_800F0304(s32 i) {
 
 s32 fn_800F0428(s32 n) {
     return PROFILES[n].nLesson;
+}
+
+void fn_800EDE7C(void) {
+    UStream_RegisterHandler('PGAc', fn_800EDF34, 'PG\0\0');
+    UStream_RegisterHandler('PGAt', fn_800EDF60, 'PG\0\0');
+    UStream_RegisterHandler('PGAp', fn_800EDF90, 'PG\0\0');
+    UStream_RegisterHandler('PGAn', fn_800EDFC0, 'PG\0\0');
+}
+
+// The 'PGAn' object: the names block is copied out.
+void fn_800EDFC0(void* pObj) {
+    void* pData;
+    u32 nSize = fn_8000E81C(pObj, &pData);
+    if (nSize) {
+        *(void**)(LESSON_BYTES + 0x704C) = fn_800951A0(nSize, 0x10, 1);
+        Mem_cpy(*(void**)(LESSON_BYTES + 0x704C), pData, nSize);
+        fn_80009E70(pObj);
+    }
+}
+
+// The leader's name, or "Tied (%d players)".
+void fn_800F0010(char* pDst) {
+    s32 n = fn_80118684(0);
+    if (n > 1) {
+        sprintf(pDst, "Tied (%d players)", n);
+        return;
+    }
+    strcpy(pDst, fn_80118E30(0, fn_80119118(0, fn_801197CC(0, 0))));
+}
+
+// A tournament's result for the season screen: "Did Not Play", "Cut", or the place.
+void fn_800F01CC(s32 i, char* pDst) {
+    switch (SEASON[i].nResult) {
+    case 0:
+        strcpy(pDst, "Did Not Play");
+        return;
+    case 1:
+        strcpy(pDst, "Cut");
+        return;
+    case 2:
+        sprintf(pDst, "%d", SEASON[i].nPlace);
+        return;
+    }
 }
