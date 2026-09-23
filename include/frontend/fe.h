@@ -244,6 +244,8 @@ u8   fn_8010645C(int nOffset, char* pDst);  // copy a 'CR_S' name ("" for "NONE"
 void fn_801072CC(s16 nPart, s32* pLocked, s32* pB1CC, s32* pB344, s32* pAll);  // count a part's
                                         // offered assets: locked, with each bit set, and all
 u8   fn_801074D4(int nAsset);
+s16  fn_8010742C(int nAsset);           // the part an asset is a choice for
+int  fn_80107444(int nAsset);           // an asset's n38
 u8   fn_80104020(int nAsset);           // the asset may be picked: not locked when last checked,
                                         // and its aB1CC bit is set
 int  fn_801048EC(s16 nPart, int b);     // how many choices a part has

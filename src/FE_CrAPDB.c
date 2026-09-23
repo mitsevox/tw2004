@@ -6,6 +6,7 @@
 #include "game_types.h"
 #include "charstate.h"
 #include "frontend/fe.h"
+#include "game/frontend.h"
 
 s32  fn_800CCA40(Skin* pSkin);          // SkinPart.c: how many choices aParts[3] holds
 s32  fn_800CCEA0(Skin* pSkin);          // SkinPart.c: and aSets[3]
@@ -19,6 +20,11 @@ void fn_80105B80(CrAPAsset* pAsset, char* pName);
 void fn_80105DAC(void);
 void fn_80105EFC(void);
 u8   fn_801061F8(s16 nPart, int nCategory, int nWanted);
+int  fn_8010766C(MsgArg* pArg, char* sz);
+
+// UISScreen.c's sender, with the front end's view of its arguments (as GameMessages.c declares it;
+// uistudio.h has UIStudio* and const s32*, and game/frontend.h cannot be included with it).
+void fn_8016B09C(void* pHandler, int nMsg, int nArgs, MsgArg* pArgs);
 
 // The asset an asset takes its attributes from.
 CrAPAsset* fn_80103B4C(CrAPAsset* pAsset) {
@@ -340,4 +346,138 @@ char* fn_801064EC(int nCategory) {
         return NULL;
     }
     return lbl_80282460->pStrings + nCategory;
+}
+
+// The part an asset is a choice for.
+s16 fn_8010742C(int nAsset) {
+    return lbl_80282460->pAssets[nAsset].nPart;
+}
+
+int fn_80107444(int nAsset) {
+    return lbl_80282460->pAssets[nAsset].n38;
+}
+
+// Copy the name of an asset's category into pDst.
+void fn_8010745C(int nAsset, char* pDst) {
+    strcpy(pDst, lbl_80282460->pStrings + lbl_80282460->pAssets[nAsset].nCategory);
+}
+
+// Copy an asset's name into pDst.
+void fn_8010749C(int nAsset, char* pDst) {
+    strcpy(pDst, lbl_80282460->pAssets[nAsset].szName);
+}
+
+u8 fn_801074D4(int nAsset) {
+    s16 n2E = fn_80104F68(nAsset)->n2E;
+
+    if (fn_8010742C(nAsset) == 13) {
+        return 1;
+    }
+    switch (n2E) {
+    case 2:
+    case 4:
+    case 5:
+    case 6:
+    case 7:
+    case 8:
+    case 9:
+    case 10:
+    case 11:
+    case 12:
+    case 13:
+    case 14:
+        return 1;
+    }
+    return 0;
+}
+
+// Senders the EA Sports Bio screens (EASportsBio.c) use: message nMsg with its values to the front
+// end's handler, when there is a front end. A string value goes as a MsgString.
+
+void fn_80107554(int nMsg, s32 nA) {
+    MsgArg arg;
+
+    if (lbl_80281F1C != NULL) {
+        arg.i = nA;
+        fn_8016B09C(lbl_80281F1C->pHandler, nMsg, 1, &arg);
+    }
+}
+
+void fn_80107594(int nMsg, s32 nA, char* szB) {
+    MsgString str;
+    MsgArg args[2];
+
+    if (lbl_80281F1C != NULL) {
+        args[0].i = nA;
+        args[1].p = &str;
+        fn_8010766C(&args[1], szB);
+        fn_8016B09C(lbl_80281F1C->pHandler, nMsg, 2, args);
+    }
+}
+
+void fn_801075F8(int nMsg, s32 nA, char* szB, s32 nC) {
+    MsgArg args[3];
+    MsgString str;
+
+    if (lbl_80281F1C != NULL) {
+        args[0].i = nA;
+        args[1].p = &str;
+        fn_8010766C(&args[1], szB);
+        args[2].i = nC;
+        fn_8016B09C(lbl_80281F1C->pHandler, nMsg, 3, args);
+    }
+}
+
+// Point the string value pArg holds at sz.
+int fn_8010766C(MsgArg* pArg, char* sz) {
+    ((MsgString*)pArg->p)->pStr = sz;
+    ((MsgString*)pArg->p)->nLen = strlen(sz);
+    return 0;
+}
+
+int fn_801076B0(char* sz, int nMsg) {
+    MsgArg arg;
+    MsgString str;
+
+    if (lbl_80281F1C == NULL) {
+        return -1;
+    }
+    arg.p = &str;
+    fn_8010766C(&arg, sz);
+    fn_8016B09C(lbl_80281F1C->pHandler, nMsg, 1, &arg);
+    return 0;
+}
+
+void fn_8010771C(int nMsg, s32 nA, s32 nB, s32 nC, s32 nD, s32 nE, s32 nF, f32 fG) {
+    MsgArg args[7];
+
+    if (lbl_80281F1C != NULL) {
+        args[0].i = nA;
+        args[1].i = nB;
+        args[2].i = nC;
+        args[3].i = nD;
+        args[4].i = nE;
+        args[5].i = nF;
+        args[6].f = fG;
+        fn_8016B09C(lbl_80281F1C->pHandler, nMsg, 7, args);
+    }
+}
+
+void fn_80107774(int nMsg, s32 nA, s32 nB, s32 nC, s32 nD, s32 nE, s32 nF, s32 nG, s32 nH, s32 nI,
+                 s32 nJ) {
+    MsgArg args[10];
+
+    if (lbl_80281F1C != NULL) {
+        args[0].i = nA;
+        args[1].i = nB;
+        args[2].i = nC;
+        args[3].i = nD;
+        args[4].i = nE;
+        args[5].i = nF;
+        args[6].i = nG;
+        args[7].i = nH;
+        args[8].i = nI;
+        args[9].i = nJ;
+        fn_8016B09C(lbl_80281F1C->pHandler, nMsg, 10, args);
+    }
 }
