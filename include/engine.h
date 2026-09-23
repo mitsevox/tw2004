@@ -139,8 +139,8 @@ typedef struct UStreamObject {
     char  szName[4];              // 0x40  chunk+0x3C
 } UStreamObject;
 
-int  UStream_RegisterHandler(u32 uType, void (*pfnHandler)(UStreamObject*));
-int  UStream_UnregisterHandler(u32 uType);
+int  UStream_RegisterHandler(int nType, void (*pfnHandler)(UStreamObject*));
+int  UStream_UnregisterHandler(int nType);
 u32  fn_8000E790(UStreamObject* pObject, u32 uMax, void* pDst);   // copy the data out, free the object
 u32  fn_8000E81C(UStreamObject* pObject, void** ppData);          // the data and its size
 
