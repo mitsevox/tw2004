@@ -44,6 +44,7 @@ int    memcmp(const void* pA, const void* pB, u32 uLen);
 u32    strlen(const char* p);
 char*  strcpy(char* pDst, const char* pSrc);
 char*  strncpy(char* pDst, const char* pSrc, u32 uLen);
+char*  strcat(char* pDst, const char* pSrc);
 int    strcmp(const char* a, const char* b);
 int    strncmp(const char* a, const char* b, u32 uLen);
 char*  strstr(const char* pStr, const char* pFind);
