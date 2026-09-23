@@ -46,6 +46,14 @@ typedef struct SavedRound {
 
 #define NUM_SAVED_ROUNDS 3      // the setup's loop count
 
+// A PGA TOUR tournament won, in a save profile (8 bytes): filled in when the player finishes first
+// (GameModeDriverPGATour fn_800EEA3C).
+typedef struct TourWin {
+    Award award;                // 0x0  won, and the day (fn_800D7770)
+    u16  nScore;                // 0x4  the player's score (fn_801191D0, as SeasonEvent.nUserScore)
+    s16  n6;                    // 0x6  the tournament's aPrize[bracket][1]
+} TourWin;
+
 // One save profile (0x10600 bytes).
 typedef struct SaveProfile {
     u8   bActive;               // 0x00000  1: the slot holds a profile; payouts are scaled and awards given only then
@@ -63,10 +71,7 @@ typedef struct SaveProfile {
     u8   unk80[0xA8 - 0x80];
     s32  nA8;                   // 0x000A8  the best stroke-play round (0: none yet)
     u8   unkAC[0xC8 - 0xAC];
-    struct {
-        u8 b;                   //          1: the tournament is won (fn_800F02A8)
-        u8 unk1[7];
-    } aC8[31];                  // 0x000C8  one per PGA TOUR tournament
+    TourWin aC8[31];            // 0x000C8  one per PGA TOUR tournament
     struct {
         u8 b;
         u8 unk1[3];
@@ -111,7 +116,7 @@ extern SaveProfile* gpSaveData;
 extern SaveProfile* lbl_80281DF4;       // unlocks that hold for every profile (the cheat codes set them)
 
 // Earnings.c: the awards
-s32  fn_800D7770(int nPlayer, Award* pAward);   // mark an award won today; 1 if it was not won before
+u8   fn_800D7770(int nPlayer, Award* pAward);   // mark an award won today; 1 if it was not won before
 
 // 0x800588F4: marked hole i's kind-0 byte (a5004/a10578) or kind-1 value (a504C/a1057C); -1 for
 // another kind.
