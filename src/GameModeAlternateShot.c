@@ -207,9 +207,9 @@ s32 fn_800E6C8C(int nPlayer) {
     nBest = 5;
     for (i = 0; i < gNumPlayersSetUp; i++) {
         if (i != nPlayer && !Player_IsHoled(i) && fn_800E6A98(i) && !fn_800E69CC(fn_800E6AF8(i)) &&
-            PLAYER(i)->nLie != LIE_GREEN) {
-            dx = *(f32*)(PLAYER(i)->ball + 0) - pCourse->pin[nHole].x;
-            dz = *(f32*)(PLAYER(i)->ball + 8) - pCourse->pin[nHole].z;
+            PLAYER(i)->ball.nLie != LIE_GREEN) {
+            dx = PLAYER(i)->ball.vPos[0] - pCourse->pin[nHole].x;
+            dz = PLAYER(i)->ball.vPos[2] - pCourse->pin[nHole].z;
             d = fn_80009680(dx * dx + dz * dz);
             if (d > fBest) {
                 fBest = d;
@@ -222,8 +222,8 @@ s32 fn_800E6C8C(int nPlayer) {
         nBest = 5;
         for (i = 0; i < gNumPlayersSetUp; i++) {
             if (i != nPlayer && !Player_IsHoled(i) && fn_800E6A98(i) && !fn_800E69CC(fn_800E6AF8(i))) {
-                dx = *(f32*)(PLAYER(i)->ball + 0) - pCourse->pin[nHole].x;
-                dz = *(f32*)(PLAYER(i)->ball + 8) - pCourse->pin[nHole].z;
+                dx = PLAYER(i)->ball.vPos[0] - pCourse->pin[nHole].x;
+                dz = PLAYER(i)->ball.vPos[2] - pCourse->pin[nHole].z;
                 d = fn_80009680(dx * dx + dz * dz);
                 if (d > fBest) {
                     fBest = d;
@@ -243,9 +243,9 @@ s32 fn_800E6C8C(int nPlayer) {
 void fn_800E6F88(int nPlayer) {
     int nPartner = fn_800E6A48(nPlayer);
     int nTeam;
-    Mem_cpy(gPlayers[nPartner].ball, gPlayers[nPlayer].ball, 0xBC);
+    Mem_cpy(&gPlayers[nPartner].ball, &gPlayers[nPlayer].ball, sizeof(Ball));
     gPlayers[nPartner].bLowIQPenalty = gPlayers[nPlayer].bLowIQPenalty;
-    gPlayers[nPartner].nBallOwner = nPartner;
+    gPlayers[nPartner].ball.nPlayer = nPartner;
     gPlayers[nPartner].nStrokes[Game_CurHoleIndex()] = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
     nTeam = fn_800E6AF8(nPlayer);
     lbl_80281648[nTeam] = 1 - lbl_80281648[nTeam];

@@ -149,9 +149,9 @@ s32 fn_800FE3FC(int nPlayer) {
     fBest = 0.0f;
     nBest = 5;
     for (i = 0; i < gNumPlayersSetUp; i++) {
-        if (i != nPlayer && PLAYER(i)->nLie != LIE_GREEN && !fn_800FE2B4(i)) {
-            dx = *(f32*)(PLAYER(i)->ball + 0) - pCourse->pin[nHole].x;
-            dz = *(f32*)(PLAYER(i)->ball + 8) - pCourse->pin[nHole].z;
+        if (i != nPlayer && PLAYER(i)->ball.nLie != LIE_GREEN && !fn_800FE2B4(i)) {
+            dx = PLAYER(i)->ball.vPos[0] - pCourse->pin[nHole].x;
+            dz = PLAYER(i)->ball.vPos[2] - pCourse->pin[nHole].z;
             d = fn_80009680(dx * dx + dz * dz);
             if (d > fBest) {
                 fBest = d;
@@ -164,8 +164,8 @@ s32 fn_800FE3FC(int nPlayer) {
         nBest = 5;
         for (i = 0; i < gNumPlayersSetUp; i++) {
             if (i != nPlayer && !fn_800FE2B4(i)) {
-                dx = *(f32*)(PLAYER(i)->ball + 0) - pCourse->pin[nHole].x;
-                dz = *(f32*)(PLAYER(i)->ball + 8) - pCourse->pin[nHole].z;
+                dx = PLAYER(i)->ball.vPos[0] - pCourse->pin[nHole].x;
+                dz = PLAYER(i)->ball.vPos[2] - pCourse->pin[nHole].z;
                 d = fn_80009680(dx * dx + dz * dz);
                 if (d > fBest) {
                     fBest = d;

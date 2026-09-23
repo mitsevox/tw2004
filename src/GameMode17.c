@@ -145,11 +145,10 @@ s32 fn_800F5D18(int nPlayer) {
 // End of a golfer's turn: the ball goes back to the tee, one ball fewer.
 void fn_800F5E9C(int nPlayer) {
     if (gReplayData.bF10) {
-        Mem_cpy(gPlayers[nPlayer].ball, gReplayData.player.ball, 0xBC);
+        Mem_cpy(&gPlayers[nPlayer].ball, &gReplayData.player.ball, sizeof(Ball));
     } else {
-        fn_80055AA8((Ball*)gPlayers[nPlayer].ball,
-                    (f32*)((u8*)gPlayers[nPlayer].pBallCourse + gSession.nTeeSet[nPlayer] * 0x10 + 0xB0),
-                    nPlayer);
+        fn_80055AA8(&gPlayers[nPlayer].ball,
+                    &gPlayers[nPlayer].ball.pCourse->tee[gSession.nTeeSet[nPlayer]].x, nPlayer);
     }
     gPlayers[nPlayer].nDC0--;
 }
@@ -162,10 +161,10 @@ void fn_800F5F58(int nPlayer) {
     s32 bDone;
     f32 fLength;
     s32 nMult;
-    u8* pBall;
+    Ball* pBall;
     nMsg = -1;
     bDone = 0;
-    nSurface = gPlayers[nPlayer].nBallSurface;
+    nSurface = gPlayers[nPlayer].ball.nSurface;
     fLength = fn_800D0550(nPlayer);
     fn_800F68C4(nSurface, &lbl_802823A8, &lbl_802823A4);
     if (nSurface >= 0x85 && nSurface <= 0x90 && !fn_800F2788(nPlayer, fLength)) {
@@ -285,7 +284,7 @@ void fn_800F5F58(int nPlayer) {
             if (nSurface == 0x85 || nSurface == 0x88 || nSurface == 0x8C) {
                 gPlayers[nPlayer].nDE0++;
                 fn_800A62E0();
-                pBall = gPlayers[nPlayer].ball;
+                pBall = &gPlayers[nPlayer].ball;
                 fn_800A30E4(8, pBall, nPlayer, 0, 0.0f);
                 nMsg = 0x1D;
                 nMult = gPlayers[nPlayer].nDBC;
@@ -296,7 +295,7 @@ void fn_800F5F58(int nPlayer) {
                 fn_800A6358();
                 nMult = gPlayers[nPlayer].nDBC;
                 if (nMult > 1) {
-                    fn_800A30E4(nMult + 7, gPlayers[nPlayer].ball, nPlayer, 0, 0.0f);
+                    fn_800A30E4(nMult + 7, &gPlayers[nPlayer].ball, nPlayer, 0, 0.0f);
                 }
             }
             if (bDone == 0) {

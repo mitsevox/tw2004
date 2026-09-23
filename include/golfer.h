@@ -298,22 +298,10 @@ typedef struct Player {
     f32  fA84;                  // 0xA84
     f32  fA88;                  // 0xA88  an angle (speed golf: the run's heading)
     f32  fA8C;                  // 0xA8C  pad stick y, -1..1 (GameMode8 fn_800FB460)
-    u8   ball[0x64];            // 0xA90  the player's Ball (0xBC bytes, see Ball.c) - nLie is its +0x68
-    s32  nBallState;            // 0xAF4  the ball's nState (Ball + 0x64)
-    s32  nLie;                  // 0xAF8
-    u8   unkAFC[0xB04 - 0xAFC];
-    s32  nBallSurface;          // 0xB04  the ball's nSurface (Ball + 0x74)
-    s32  nBallStartSurface;     // 0xB08  the ball's nStartSurface (Ball + 0x78)
-    void* pBallCourse;          // 0xB0C  the ball's pCourse (Ball + 0x7C)
-    u8   unkB10[0xB18 - 0xB10];
-    SurfaceType* pBallHitSurface;   // 0xB18  the ball's pHitSurface (Ball + 0x88)
-    u8   unkB1C[0xB24 - 0xB1C];
-    s32  nBallOwner;            // 0xB24  the ball's nPlayer (Ball + 0x94)
-    u8   unkB28[0xB4C - 0xB28];
+    Ball ball;                  // 0xA90  the player's ball
     f32  vOrient[4];            // 0xB4C  a quaternion, identity at setup. TW06: ballRot
-    u8   ballBefore[0x94];      // 0xB5C  copy of the Ball as it lay before the shot (0xBC bytes)
-    s32  nBallBeforeOwner;      // 0xBF0  the copy's nPlayer (Ball + 0x94), -1 for nobody's
-    u8   unkBF4[0xC18 - 0xBF4];
+    Ball ballBefore;            // 0xB5C  a copy of the ball: as it lay before the shot, then the look-ahead
+                                //        copy launched with it (STATEFUNC_SimulateInit)
     s32  nShotHandle;           // 0xC18
     f32  fThinkTime;            // 0xC1C  seconds a CPU has spent in state 2
     f32  fC20;                  // 0xC20
@@ -600,10 +588,6 @@ extern f32          gClubPowerStep[NUM_CLUBS];      // 0x801875E8  reach gained 
 
 int  Game_GetMode(void);                // 0x8000BED8
 int  fn_800D2B08(void);
-f32  fn_80050D34(f32 fDist);            // putt power for a distance
-f32  fn_80050F44(int nKind, int nClub); // a club's table reach for a shot kind
-f32  fn_80050F88(f32 fDist, u8* pParams, int nKind, int nClub);   // chip power
-f32  fn_800510EC(u8* pBall);            // the ball's f70 + its surface's +0x00
 int  fn_80100744(void);                 // shot kind override, 8 = none
 int  fn_801006F0(int nPlayer);          // club override, 26 = none
 int  fn_80015464(void);

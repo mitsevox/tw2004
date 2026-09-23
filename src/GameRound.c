@@ -71,7 +71,6 @@ void  fn_8010C4A0(void);
 void  fn_80125E68(void);
 extern s32 lbl_80282278;
 
-u8    Ter_PointInOOBNetwork(u8* pBall);
 u8    fn_800E3AF8(void);
 void  fn_800E0A84(u8 v);
 void  fn_800E1404(int nHole);
@@ -79,12 +78,6 @@ u8    fn_8004B580(void);
 void  fn_80057364(int a);
 int   fn_800D3118(int nRound, int nHole);    // a built round's course for a hole
 int   fn_800D315C(int nRound, int nHole);    // and its hole number (1-based)
-
-// The tee positions follow the pins in the per-hole data (fn_8000C594).
-typedef struct HoleTees {
-    u8     unk0[0xB0];
-    PinPos tee[4];                          // 0xB0  one per tee set
-} HoleTees;
 
 extern u8* gpSaveData;
 extern u8  lbl_8028227C;
@@ -579,7 +572,7 @@ int fn_800E184C(int nPlayer, u8 bCurrent) {
     int i;
     int nEnd = gpGame->nCurHole;
     nPar = 0;
-    if (bCurrent && gPlayers[nPlayer].nLie == LIE_HOLED && nEnd < 18) {
+    if (bCurrent && gPlayers[nPlayer].ball.nLie == LIE_HOLED && nEnd < 18) {
         nEnd++;
     }
     for (i = 0; i < nEnd; i++) {
@@ -939,11 +932,11 @@ void fn_800E299C(void) {
     CourseInfo* pCourse = fn_8000C594();
     int         i;
     for (i = 0; i < gNumPlayersSetUp; i++) {
-        gPlayers[i].nLie = 0;
-        fn_80055AA8((Ball*)gPlayers[i].ball, &((HoleTees*)pCourse)->tee[gSession.nTeeSet[i]].x, i);
-        Mem_cpy(gPlayers[i].ballBefore, gPlayers[i].ball, 0xBC);
-        Vec_Copy(&((HoleTees*)pCourse)->tee[gSession.nTeeSet[i]].x, &gPlayers[i].fBallX);
-        Vec_Copy(&((HoleTees*)pCourse)->tee[gSession.nTeeSet[i]].x, gPlayers[i].vA44);
+        gPlayers[i].ball.nLie = 0;
+        fn_80055AA8(&gPlayers[i].ball, &pCourse->tee[gSession.nTeeSet[i]].x, i);
+        Mem_cpy(&gPlayers[i].ballBefore, &gPlayers[i].ball, sizeof(Ball));
+        Vec_Copy(&pCourse->tee[gSession.nTeeSet[i]].x, &gPlayers[i].fBallX);
+        Vec_Copy(&pCourse->tee[gSession.nTeeSet[i]].x, gPlayers[i].vA44);
         GOLFERSTATE_Set(GS_WAIT, (u8)i);
         gPlayers[i].bLowIQPenalty = 0;
     }
@@ -969,7 +962,7 @@ void fn_800E2A88(void) {
 
 // Out of bounds: outside the in-bounds area, or the ball out (state 5) or in lie 16.
 u8 fn_800E2B40(int nPlayer, Ball* pBall) {
-    if (!Ter_PointInOOBNetwork((u8*)pBall)) {
+    if (!Ter_PointInOOBNetwork(pBall->vPos)) {
         return 1;
     }
     if (pBall->nState == PHYSICS_BALLSTATE_BallOutOfBounds_e || pBall->nLie == LIE_OUT_OF_BOUNDS_e) {
@@ -1023,12 +1016,12 @@ u8 fn_800E2DB4(int nPlayer) {
     }
     pCourse = fn_8000C594();
     nHole = Game_CurrentHole();
-    dx = *(f32*)(gPlayers[nPlayer].ball + 0) - pCourse->pin[nHole].x;
-    dz = *(f32*)(gPlayers[nPlayer].ball + 8) - pCourse->pin[nHole].z;
+    dx = gPlayers[nPlayer].ball.vPos[0] - pCourse->pin[nHole].x;
+    dz = gPlayers[nPlayer].ball.vPos[2] - pCourse->pin[nHole].z;
     fDist = fn_80009680(dx * dx + dz * dz);
     b = fn_8004B580();
-    if ((b && gPlayers[nPlayer].nLie == LIE_HOLED) || (!b && fDist < 0.5f)) {
-        gPlayers[nPlayer].nLie = LIE_HOLED;
+    if ((b && gPlayers[nPlayer].ball.nLie == LIE_HOLED) || (!b && fDist < 0.5f)) {
+        gPlayers[nPlayer].ball.nLie = LIE_HOLED;
         return 1;
     }
     return 0;

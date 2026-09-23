@@ -104,7 +104,7 @@ int   fn_800584DC(int nProfile);
 int   fn_801020C0(void);
 
 int   fn_800D3CF8(int nRating);
-s32   fn_800D477C(int nPlayer, u8* pBall, u8 b);
+s32   fn_800D477C(int nPlayer, Ball* pBall, u8 b);
 void  fn_800D4F14(int nPlayer, u8 b);
 f32   fn_800D6EEC(void);
 u8    fn_800D76AC(int nPlayer, int nAward);
@@ -550,7 +550,7 @@ u8 fn_800D750C(int nPlayer, int nAward) {
     return 0;
 }
 
-s32 fn_800D7660(int nPlayer, u8* pBall, u8 b) {
+s32 fn_800D7660(int nPlayer, Ball* pBall, u8 b) {
     fn_800D477C(nPlayer, pBall, b);
     return fn_800D9954();
 }
@@ -666,7 +666,7 @@ void fn_800D9350(int nPlayer) {
     int nPar;
 
     if (fn_800E177C() == 0) {
-        nLie = gPlayers[nPlayer].nLie;
+        nLie = gPlayers[nPlayer].ball.nLie;
         if (gPlayers[nPlayer].b30F) {
             gPlayers[nPlayer].b310 = 1;
         }

@@ -61,13 +61,7 @@ f32 lbl_802816C4 = 0.25f;
 // instead of folding in its own 1.0f (the original has this constant first in the file's .sdata2)
 const f32 lbl_80284708[1] = {1.0f};
 u8*   fn_80008370(u8* p);
-extern f32 lbl_801D5888[4][4];                  // per player: where the ball was last on the course
 
-// The tee positions follow the pins in the per-hole data (fn_8000C594).
-typedef struct HoleTees {
-    u8     unk0[0xB0];
-    PinPos tee[4];                          // 0xB0  one per tee set
-} HoleTees;
 void  fn_800FE100(s32 p0, s32 p1, s32 p2);
 void  fn_800FA554(int nPlayer);
 
@@ -525,12 +519,12 @@ void fn_800FA998(int nPlayer) {
 // States 12 and 24, enter: the shot starts; the ball is saved and the shot clock set.
 void fn_800FA9E0(int nPlayer) {
     Player* p = &gPlayers[nPlayer];
-    Mem_cpy(p->ballBefore, p->ball, 0xBC);
-    p->nBallBeforeOwner = -1;
+    Mem_cpy(&p->ballBefore, &p->ball, sizeof(Ball));
+    p->ballBefore.nPlayer = -1;
     fn_8006ACF8(nPlayer, 0);
     fn_8006BAA8(nPlayer);
     fn_800FA554(nPlayer);
-    gPlayers[nPlayer].nC40 = gPlayers[nPlayer].nLie;
+    gPlayers[nPlayer].nC40 = gPlayers[nPlayer].ball.nLie;
 }
 
 // An event's sound, if it has one: only the first 37 events play one.
@@ -627,8 +621,8 @@ u8 fn_800FAD54(int nPlayer) {
     if (Game_GetMode() != 7) {
         GM_PlayerAddStroke(nPlayer);
         if (GM_CheckForBallOOB(nPlayer)) {
-            pSurf = Ter_GetSupportingWorldMaterial(gPlayers[nPlayer].pBallCourse,
-                                                   (f32*)gPlayers[nPlayer].ball);
+            pSurf = Ter_GetSupportingWorldMaterial(gPlayers[nPlayer].ball.pCourse,
+                                                   gPlayers[nPlayer].ball.vPos);
             if (pSurf != NULL && pSurf->nClass == 7) {
                 fn_800DEB5C(nPlayer);
                 gPlayers[nPlayer].nC3C &= ~1;
@@ -649,7 +643,7 @@ u8 fn_800FAD54(int nPlayer) {
     nStrokes = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
     nOtherStrokes = gPlayers[nOther].nStrokes[Game_CurHoleIndex()];
     if (GM_CheckForBallOOB(nPlayer)) {
-        pSurf = Ter_GetSupportingWorldMaterial(gPlayers[nPlayer].pBallCourse, (f32*)gPlayers[nPlayer].ball);
+        pSurf = Ter_GetSupportingWorldMaterial(gPlayers[nPlayer].ball.pCourse, gPlayers[nPlayer].ball.vPos);
         if (pSurf != NULL && pSurf->nClass == 7) {
             if (gPlayers[nPlayer].nC3C & 0x10) {
                 fn_800FAAB8(nPlayer, 0x1F);
@@ -682,8 +676,8 @@ u8 fn_800FAD54(int nPlayer) {
     fX = gPlayers[nPlayer].fBallX;
     fZ = gPlayers[nPlayer].fBallZ;
     if (fX == gPlayers[nPlayer].vA44[0] && fZ == gPlayers[nPlayer].vA44[2]) {
-        dx = *(f32*)(gPlayers[nPlayer].ball + 0) - fX;
-        dz = *(f32*)(gPlayers[nPlayer].ball + 8) - fZ;
+        dx = gPlayers[nPlayer].ball.vPos[0] - fX;
+        dz = gPlayers[nPlayer].ball.vPos[2] - fZ;
         fDist = fn_80009680(dx * dx + dz * dz);
         if (!(gPlayers[nPlayer].nC3C & 0x20)) {
             gPlayers[nPlayer].fC50 = fDist;
@@ -761,7 +755,7 @@ void fn_800FB204(int nPlayer, int nStrokes) {
 // shot of 10 or more is event 18, or 19 from 60. The unit is not proven (in yards, 20/3 would be
 // 20 feet). fn_800FB41C always returns 0, so none of these fire.
 void fn_800FB35C(int nPlayer, int nOther) {
-    f32 fDist = fn_800FB41C(gPlayers[nPlayer].vPreShot, (f32*)gPlayers[nPlayer].ball);
+    f32 fDist = fn_800FB41C(gPlayers[nPlayer].vPreShot, gPlayers[nPlayer].ball.vPos);
     if (gPlayers[nPlayer].nClub == CLUB_PUTTER) {
         if (fDist >= 20.0f / 3.0f) {
             fn_800FAAB8(nPlayer, 0x11);
@@ -891,7 +885,7 @@ void fn_800FBB30(Player* p) {
     f32 fOff;
     f32 fScale;
     f32 fLow;
-    fn_800FE190((f32*)p->ball, p->vPlacement, v);
+    fn_800FE190(p->ball.vPos, p->vPlacement, v);
     fDistSq = v[0] * v[0] + v[2] * v[2];
     fn_800BAF04(v, v);
     fAngle = p->fA88 - fn_8000AD78(v[2], v[0]) - PI / 2.0f;
@@ -951,14 +945,14 @@ void fn_800FBD2C(int nPlayer) {
     f32 fAngle;
     f32 fLow;
     f32 fHigh;
-    u8* pBall;
+    Ball* pBall;
     f32* pTarget;
     if (Game_GetMode() == 7) {
 
         if (!(gPlayers[nPlayer].uC48 & 1) && !(gPlayers[nOther].uC48 & 1)) {
             fn_800FAAB8(nPlayer, 0);
         }
-        if (p->vA44[0] == *(f32*)(p->ball + 0) && p->vA44[2] == *(f32*)(p->ball + 8) && (p->nC3C & 8)) {
+        if (p->vA44[0] == p->ball.vPos[0] && p->vA44[2] == p->ball.vPos[2] && (p->nC3C & 8)) {
             if (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] == gPlayers[nPlayer].nC60 &&
                 !(gPlayers[nPlayer].uC48 & 0x4000000000LL)) {
                 fn_800FAAB8(nPlayer, 0x26);
@@ -966,8 +960,8 @@ void fn_800FBD2C(int nPlayer) {
         }
     }
     GM_SimulateBallMovement(nPlayer);
-    if (gPlayers[nPlayer].nBallState == 0) {
-    } else if (gPlayers[nPlayer].nBallState == 1 || gPlayers[nPlayer].nBallState == 5) {
+    if (gPlayers[nPlayer].ball.nState == 0) {
+    } else if (gPlayers[nPlayer].ball.nState == 1 || gPlayers[nPlayer].ball.nState == 5) {
         if (!fn_800FAD54(nPlayer)) {
             if (Game_GetMode() == 7 && (s8)GOLFERSTATE_GetCurrentState(nOther) == 26) {
                 GOLFERSTATE_Set(26, (u8)nPlayer);
@@ -975,7 +969,7 @@ void fn_800FBD2C(int nPlayer) {
             return;
         }
         nStrokes = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
-        if (gPlayers[nPlayer].nLie == LIE_HOLED) {
+        if (gPlayers[nPlayer].ball.nLie == LIE_HOLED) {
             if (Game_GetMode() == 7) {
                 fn_800FB35C(nPlayer, nOther);
                 nStrokes = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
@@ -1009,8 +1003,8 @@ void fn_800FBD2C(int nPlayer) {
                 }
                 if ((gPlayers[nOther].nC3C & 8) || (gPlayers[nPlayer].nC3C & 0x10)) {
                     GOLFERSTATE_Set(26, (u8)nPlayer);
-                    if (gPlayers[nOther].nBallState != 2 && gPlayers[nOther].nBallState != 3 &&
-                        gPlayers[nOther].nBallState != 4) {
+                    if (gPlayers[nOther].ball.nState != 2 && gPlayers[nOther].ball.nState != 3 &&
+                        gPlayers[nOther].ball.nState != 4) {
                         GOLFERSTATE_Set(26, (u8)nOther);
                     }
                     return;
@@ -1019,9 +1013,9 @@ void fn_800FBD2C(int nPlayer) {
                     fn_800FAAB8(nPlayer, 2);
                 }
                 pHole = fn_8000C594();
-                fn_80055AA8((Ball*)p->ball, &((HoleTees*)pHole)->tee[gSession.nTeeSet[nPlayer]].x, nPlayer);
-                Vec_Copy(&((HoleTees*)pHole)->tee[gSession.nTeeSet[nPlayer]].x, &p->fBallX);
-                Vec_Copy(&((HoleTees*)pHole)->tee[gSession.nTeeSet[nPlayer]].x, p->vA44);
+                fn_80055AA8(&p->ball, &pHole->tee[gSession.nTeeSet[nPlayer]].x, nPlayer);
+                Vec_Copy(&pHole->tee[gSession.nTeeSet[nPlayer]].x, &p->fBallX);
+                Vec_Copy(&pHole->tee[gSession.nTeeSet[nPlayer]].x, p->vA44);
                 gPlayers[nPlayer].nC3C &= ~1;
                 if (lbl_802823C8) {
                     GOLFERSTATE_Switch(1, nPlayer);
@@ -1046,11 +1040,11 @@ void fn_800FBD2C(int nPlayer) {
                     fn_800FAAB8(nOther, 0x25);
                 }
             }
-            pBall = p->ball;
-            if (!Ter_PointInOOBNetwork(pBall)) {
-                gPlayers[nPlayer].nBallState = 5;
+            pBall = &p->ball;
+            if (!Ter_PointInOOBNetwork(pBall->vPos)) {
+                gPlayers[nPlayer].ball.nState = 5;
             }
-            if (gPlayers[nPlayer].nBallState == 5) {
+            if (gPlayers[nPlayer].ball.nState == 5) {
                 GM_ReplaceOOBBall(nPlayer);
                 if (lbl_802823C8) {
                     GOLFERSTATE_Switch(1, nPlayer);
@@ -1059,13 +1053,13 @@ void fn_800FBD2C(int nPlayer) {
                     gPlayers[nPlayer].nC3C |= 0x100000;
                 }
             } else {
-                gPlayers[nPlayer].nBallState = 0;
-                Mem_cpy(p->ballBefore, pBall, 0xBC);
+                gPlayers[nPlayer].ball.nState = 0;
+                Mem_cpy(&p->ballBefore, pBall, sizeof(Ball));
                 nPar = fn_800D2B08();
-                if (gPlayers[nPlayer].nLie == LIE_GREEN) {
+                if (gPlayers[nPlayer].ball.nLie == LIE_GREEN) {
                     if (Game_GetMode() == 7) {
-                        fDist = fn_800FB41C(p->vPreShot, (f32*)pBall);
-                        if (fn_800FB41C((f32*)pBall, gpGame->p130) <= lbl_80284708[0] && fDist >= 20.0f) {
+                        fDist = fn_800FB41C(p->vPreShot, pBall->vPos);
+                        if (fn_800FB41C(pBall->vPos, gpGame->p130) <= lbl_80284708[0] && fDist >= 20.0f) {
                             fn_800FAAB8(nPlayer, 0x14);
                         }
                         if (!(gPlayers[nPlayer].nC3C & 0x40)) {
@@ -1074,7 +1068,7 @@ void fn_800FBD2C(int nPlayer) {
                             if (!(gPlayers[nOther].nC3C & 0x40)) {
                                 fn_800FAAB8(nPlayer, 3);
                             }
-                            fn_800FE190((f32*)p->ball, gpGame->p130, v);
+                            fn_800FE190(p->ball.vPos, gpGame->p130, v);
                             p->fC68 = fn_80009680(v[0] * v[0] + v[2] * v[2]);
                             nDiff = nPar - 2 - gPlayers[nPlayer].nC64;
                             if (nDiff == 0) {
@@ -1100,7 +1094,7 @@ void fn_800FBD2C(int nPlayer) {
                                 fn_800FAAB8(nPlayer, 0x16);
                             }
                             if ((gPlayers[nOther].uC48 & 0x600000) && nDiff >= 0) {
-                                fn_800FE190((f32*)p->ball, gpGame->p130, v);
+                                fn_800FE190(p->ball.vPos, gpGame->p130, v);
                                 fDist = fn_80009680(v[0] * v[0] + v[2] * v[2]);
                                 if (gPlayers[nPlayer].uC48 & 0x0C000080) {
                                     if (fDist < gPlayers[nPlayer].fC68) {
@@ -1121,8 +1115,8 @@ void fn_800FBD2C(int nPlayer) {
                         }
                     }
                 } else if (Game_GetMode() == 7 &&
-                           (gPlayers[nPlayer].nLie == 6 || gPlayers[nPlayer].nLie == 7 ||
-                            gPlayers[nPlayer].nLie == 8)) {
+                           (gPlayers[nPlayer].ball.nLie == 6 || gPlayers[nPlayer].ball.nLie == 7 ||
+                            gPlayers[nPlayer].ball.nLie == 8)) {
 
                     if (gPlayers[nPlayer].nC3C & 0x10) {
                         fn_800FAAB8(nPlayer, 0x20);
@@ -1159,7 +1153,7 @@ void fn_800FBD2C(int nPlayer) {
         } else {
             gPlayers[nPlayer].nC54 = 179;
         }
-        fn_800FE190((f32*)p->ball, p->vPlacement, vDir);
+        fn_800FE190(p->ball.vPos, p->vPlacement, vDir);
         Vec_Normalize(vDir, vDir);
         gPlayers[nPlayer].fA88 = PI / 2.0f + fn_8000AD78(vDir[2], vDir[0]);
         break;
@@ -1178,9 +1172,9 @@ void fn_800FBD2C(int nPlayer) {
         fDist = gPlayers[nPlayer].fCB4;
         fDist *= 0.01f * (s8)Golfer_GetAttribute(p, ATTR_SPEED, ATTR_TOTAL);
         PlaceBall_UpdateMomentums(nPlayer, fDist);
-        pBall = p->ball;
+        pBall = &p->ball;
         pTarget = p->vPlacement;
-        fn_800FE190((f32*)pBall, pTarget, vDir);
+        fn_800FE190(pBall->vPos, pTarget, vDir);
         Vec_Normalize(vDir, vDir);
         fAngle = gPlayers[nPlayer].fA88 - fn_8000AD78(vDir[2], vDir[0]) - PI / 2.0f;
         fAngle *= 180.0f / PI;
@@ -1207,19 +1201,19 @@ void fn_800FBD2C(int nPlayer) {
             n = 2;
         }
         fn_800FE0AC(gPlayers[nPlayer].nC58, n);
-        fn_800FE190((f32*)pBall, pTarget, vDir);
+        fn_800FE190(pBall->vPos, pTarget, vDir);
         fToPlace = fn_80009680(vDir[0] * vDir[0] + vDir[2] * vDir[2]);
         // the distance to a position in the view's object (+0x34), if that is nearer; the second
         // square root is written twice, as a MIN() macro would expand
-        fn_800FE190((f32*)pBall, (f32*)(fn_80008370(*(u8**)fn_80016CFC(gPlayers[nPlayer].nView0)) + 0x34),
+        fn_800FE190(pBall->vPos, (f32*)(fn_80008370(*(u8**)fn_80016CFC(gPlayers[nPlayer].nView0)) + 0x34),
                     vDir);
         fDist = (fToPlace <= (f32)fn_80009680(vDir[0] * vDir[0] + vDir[2] * vDir[2]))
 
                     ? fToPlace
                     : (f32)fn_80009680(vDir[0] * vDir[0] + vDir[2] * vDir[2]);
-        if (gPlayers[nPlayer].nBallState == 0) {
+        if (gPlayers[nPlayer].ball.nState == 0) {
             if (fDist < 5.0f) {
-                Vec_Copy((f32*)pBall, &p->fBallX);
+                Vec_Copy(pBall->vPos, &p->fBallX);
                 gPlayers[nPlayer].nC3C &= ~1;
                 fn_80062C80(gPlayers[nPlayer].nC58, 1);
                 fn_800FE0AC(gPlayers[nPlayer].nC58, 0);
@@ -1235,9 +1229,9 @@ void fn_800FBD2C(int nPlayer) {
         } else if (fDist < 5.0f) {
             if (!Player_IsCPU(nPlayer)) {
                 if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x23, 0)) {
-                    if (gPlayers[nPlayer].nBallState != 1) {
-                        Physics_DropBall((Ball*)pBall, lbl_801D5888[nPlayer]);
-                        gPlayers[nPlayer].nBallState = 1;
+                    if (gPlayers[nPlayer].ball.nState != 1) {
+                        Physics_DropBall(pBall, lbl_801D5888[nPlayer]);
+                        gPlayers[nPlayer].ball.nState = 1;
                     }
                 } else {
                     fn_800FE054(gPlayers[nPlayer].nC58, 1);
@@ -1319,8 +1313,8 @@ void fn_800FCCF0(void) {
                     if ((fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x25, 0)) &&
                         !fn_800FCC38(nPlayer) &&
                         ((s8)GOLFERSTATE_GetCurrentState(nPlayer) == 24 ||
-                         (gPlayers[nPlayer].nLie != 0 && gPlayers[nPlayer].nLie != LIE_HOLED &&
-                          gPlayers[nPlayer].nLie != 16 &&
+                         (gPlayers[nPlayer].ball.nLie != 0 && gPlayers[nPlayer].ball.nLie != LIE_HOLED &&
+                          gPlayers[nPlayer].ball.nLie != 16 &&
                           (s8)GOLFERSTATE_GetCurrentState(nPlayer) != 2 &&
                           (s8)GOLFERSTATE_GetCurrentState(nPlayer) != 4 &&
                           (s8)GOLFERSTATE_GetCurrentState(nPlayer) != 3 &&
@@ -1328,11 +1322,11 @@ void fn_800FCCF0(void) {
                           (s8)GOLFERSTATE_GetCurrentState(nPlayer) != 10))) {
                         fn_800FAAB8(nPlayer, 0x27);
                         pHole = fn_8000C594();
-                        fn_80055AA8((Ball*)gPlayers[nPlayer].ball,
-                                    &((HoleTees*)pHole)->tee[gSession.nTeeSet[nPlayer]].x, nPlayer);
-                        Vec_Copy(&((HoleTees*)pHole)->tee[gSession.nTeeSet[nPlayer]].x,
+                        fn_80055AA8(&gPlayers[nPlayer].ball,
+                                    &pHole->tee[gSession.nTeeSet[nPlayer]].x, nPlayer);
+                        Vec_Copy(&pHole->tee[gSession.nTeeSet[nPlayer]].x,
                                  &gPlayers[nPlayer].fBallX);
-                        Vec_Copy(&((HoleTees*)pHole)->tee[gSession.nTeeSet[nPlayer]].x,
+                        Vec_Copy(&pHole->tee[gSession.nTeeSet[nPlayer]].x,
                                  gPlayers[nPlayer].vA44);
                         gPlayers[nPlayer].nC3C &= ~1;
                         fn_800FE0AC(gPlayers[nPlayer].nC58, 0);
@@ -1349,11 +1343,12 @@ void fn_800FCCF0(void) {
             i = PLR_1_e;
             if ((fn_800136DC(gPlayers[i].nController) & fn_800142AC(0x25, 0)) && !fn_800FCC38(i) &&
                 ((s8)GOLFERSTATE_GetCurrentState(i) == 24 ||
-                 (gPlayers[i].nLie != 0 && gPlayers[i].nLie != LIE_HOLED && gPlayers[i].nLie != 16))) {
+                 (gPlayers[i].ball.nLie != 0 && gPlayers[i].ball.nLie != LIE_HOLED &&
+                  gPlayers[i].ball.nLie != 16))) {
                 pHole = fn_8000C594();
-                fn_80055AA8((Ball*)gPlayers[i].ball, &((HoleTees*)pHole)->tee[gSession.nTeeSet[i]].x, i);
-                Vec_Copy(&((HoleTees*)pHole)->tee[gSession.nTeeSet[i]].x, &gPlayers[i].fBallX);
-                Vec_Copy(&((HoleTees*)pHole)->tee[gSession.nTeeSet[i]].x, gPlayers[i].vA44);
+                fn_80055AA8(&gPlayers[i].ball, &pHole->tee[gSession.nTeeSet[i]].x, i);
+                Vec_Copy(&pHole->tee[gSession.nTeeSet[i]].x, &gPlayers[i].fBallX);
+                Vec_Copy(&pHole->tee[gSession.nTeeSet[i]].x, gPlayers[i].vA44);
                 gPlayers[i].nC3C &= ~1;
                 fn_800FE0AC(gPlayers[i].nC58, 0);
                 fn_800FE080(gPlayers[i].nC58, 0);
@@ -1476,7 +1471,7 @@ void fn_800FD534(int nPlayer) {
         gPlayers[nPlayer].nC3C |= 8;
         GM_EndOfGolferTurn(nPlayer);
         nOther = nPlayer ? 0 : 1;
-        if ((s8)GOLFERSTATE_GetCurrentState(nOther) != 26 && gPlayers[nOther].nBallState == 0) {
+        if ((s8)GOLFERSTATE_GetCurrentState(nOther) != 26 && gPlayers[nOther].ball.nState == 0) {
             gPlayers[nOther].nC3C |= 8;
             gPlayers[nPlayer].nC3C |= 8;
             GM_EndOfGolferTurn(nPlayer);
@@ -1578,7 +1573,7 @@ void fn_800FDADC(void) {
         ((s8)GOLFERSTATE_GetCurrentState(PLR_2_e) == 1 || (s8)GOLFERSTATE_GetCurrentState(PLR_2_e) == 2 ||
          (s8)GOLFERSTATE_GetCurrentState(PLR_2_e) == 3 || (s8)GOLFERSTATE_GetCurrentState(PLR_2_e) == 4 ||
          (s8)GOLFERSTATE_GetCurrentState(PLR_2_e) == 10)) {
-        gPlayers[nPlayer].nLie = LIE_HOLED;
+        gPlayers[nPlayer].ball.nLie = LIE_HOLED;
         gPlayers[nPlayer].nC3C |= 0x4000000;
         fn_800F80D4(0);
         fn_800ED710(nPlayer);

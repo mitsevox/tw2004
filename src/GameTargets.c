@@ -51,7 +51,7 @@ void fn_800F19D4(void) {
     f32 tmp[4];
     int i;
     int j;
-    f32* pTee = (f32*)((u8*)fn_8000C594() + gSession.nTeeSet[0] * 0x10 + 0xB0);
+    f32* pTee = &fn_8000C594()->tee[gSession.nTeeSet[0]].x;
     for (i = 0; i < lbl_80282360 - 1; i++) {
         for (j = i + 1; j < lbl_80282360; j++) {
             if (Vec_Distance(lbl_80211D38[i], pTee) > Vec_Distance(lbl_80211D38[j], pTee)) {
@@ -102,7 +102,7 @@ u8 fn_800F1C34(int nPlayer) {
 
 // The target nearest the ball.
 s8 fn_800F1C74(int nPlayer) {
-    f32* pBall = (f32*)gPlayers[nPlayer].ball;
+    f32* pBall = gPlayers[nPlayer].ball.vPos;
     s8 i;
     s8 nBest = 0;
     f32 fBest = Vec_Distance(lbl_80211D38[0], pBall);

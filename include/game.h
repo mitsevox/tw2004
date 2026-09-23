@@ -68,6 +68,7 @@ int  fn_800D37BC(int nWinner, int nLoser, int nMargin, int* pPrize);
 int  fn_800D3C7C(int nPlayer);          // the player's earnings rating, 0..25
 s32  fn_800D6A70(s32 nPoints, int nPlayer, u8 bCourse, u8 bTee, u8 bHole, CourseMoneyTracking* pMoney);
 int  fn_800D7220(int nReward, int nPlayer, CourseMoneyTracking* pMoney);
+s32  fn_800D7660(int nPlayer, Ball* pBall, u8 b);   // one of GameEffects' GameBreaker checks
 u8   fn_800DA174(void);
 u8   fn_800DA1D4(void);
 u8   fn_800DA234(void);                 // the current hole is the flagged one

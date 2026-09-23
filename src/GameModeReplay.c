@@ -128,11 +128,11 @@ void fn_800F15AC(void) {
     gPlayers[0].nStrokes[Game_CurHoleIndex()] = gReplayData.nStrokes;
     gPlayers[0].fDistance = gReplayData.player.fDistance;
     gPlayers[0].fDistance2 = gReplayData.player.fDistance2;
-    Mem_cpy(gPlayers[0].ball, gReplayData.player.ball, 0xBC);
-    fn_80055AA8(&ball, (f32*)gReplayData.player.ball, 0);
-    gPlayers[0].pBallCourse = ball.pCourse;
-    gPlayers[0].nBallOwner = 0;
-    Physics_DropBall(&ball, (f32*)gReplayData.player.ball);
+    Mem_cpy(&gPlayers[0].ball, &gReplayData.player.ball, sizeof(Ball));
+    fn_80055AA8(&ball, gReplayData.player.ball.vPos, 0);
+    gPlayers[0].ball.pCourse = ball.pCourse;
+    gPlayers[0].ball.nPlayer = 0;
+    Physics_DropBall(&ball, gReplayData.player.ball.vPos);
     fn_8001C774(gPlayers[0].nShotHandle, gPlayers[0].nClub);
     fn_8001C724(gPlayers[0].nShotHandle, gPlayers[0].nShotKind);
     gPlayers[0].swing.bUIInit = 0;

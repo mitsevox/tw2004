@@ -292,7 +292,7 @@ void fn_800E3EE0(void) {
             }
             lbl_80282281 = 0;
             for (j = 0; j < gNumPlayersSetUp; j++) {
-                gPlayers[j].nLie = 0;
+                gPlayers[j].ball.nLie = 0;
             }
             fn_800A76E4();
         }

@@ -63,11 +63,10 @@ void  fn_80012EF8(void);
 void  fn_800141F8(f32* pA, f32* pB, f32 x0, f32 y0, f32 x1, f32 y1);
 void  fn_80014194(f32* pColour);
 void  fn_8001644C(int a, f32* pA, int b, f32* pB, int c);
-int   fn_800D7660(int nPlayer, u8* pBall, u8 b);
-int   fn_800D782C(int nPlayer, u8* pBall, int a, u8 b, int c);
+int   fn_800D782C(int nPlayer, Ball* pBall, int a, u8 b, int c);
 u8    fn_800E5344(void);
 u8    fn_800E23B0(int nPlayer, int nStrokes);
-u8    fn_800DC818(u8* pBall, int nPlayer, u8 bNext);
+u8    fn_800DC818(Ball* pBall, int nPlayer, u8 bNext);
 u8    fn_8005D2DC(void);
 void  GM_vCloseModuleONCE(void);
 u8    fn_800C6CCC(void);
@@ -334,19 +333,19 @@ int fn_800DB86C(int nPlayer) {
     if (!pSurface) {
         return 0;
     }
-    if (gPlayers[nPlayer].nLie == LIE_GREEN && nPar - nStrokes >= 2) {
+    if (gPlayers[nPlayer].ball.nLie == LIE_GREEN && nPar - nStrokes >= 2) {
         bPossible = 1;
-    } else if (gPlayers[nPlayer].nLie == LIE_GREEN &&
+    } else if (gPlayers[nPlayer].ball.nLie == LIE_GREEN &&
                fn_800D8750(2, fDist, 0, gpSaveData + nPlayer * 0x10600 + 1, nPlayer)) {
         bPossible = 1;
-    } else if (gPlayers[nPlayer].nLie == LIE_GREEN && fn_800DCB10(nPlayer)) {
+    } else if (gPlayers[nPlayer].ball.nLie == LIE_GREEN && fn_800DCB10(nPlayer)) {
         bPossible = 1;
-    } else if (gPlayers[nPlayer].nLie == LIE_GREEN && fn_800BCD24(nPlayer)) {
+    } else if (gPlayers[nPlayer].ball.nLie == LIE_GREEN && fn_800BCD24(nPlayer)) {
         bPossible = 1;
-    } else if (gPlayers[nPlayer].nLie == LIE_GREEN && fn_800D0620(nPlayer, 0, 0) == 11 &&
+    } else if (gPlayers[nPlayer].ball.nLie == LIE_GREEN && fn_800D0620(nPlayer, 0, 0) == 11 &&
                Hole_ScoreAfterTapIn(nPlayer) < 0) {
         bPossible = 1;
-    } else if (gPlayers[nPlayer].nLie == LIE_GREEN && fn_800D089C(nPlayer, 0) == 1 &&
+    } else if (gPlayers[nPlayer].ball.nLie == LIE_GREEN && fn_800D089C(nPlayer, 0) == 1 &&
                Hole_ScoreAfterTapIn(nPlayer) < -1) {
         bPossible = 1;
     }
@@ -363,9 +362,9 @@ void fn_800DB714(int nPlayer) {
             lbl_80202898.b19 = 1;
             return;
         }
-        nLie = gPlayers[nPlayer].nLie;
+        nLie = gPlayers[nPlayer].ball.nLie;
         fDist = AI_MaxDistance(nPlayer, gPlayers[nPlayer].nShotKind, gPlayers[nPlayer].nClub);
-        fDist *= fn_800510EC(gPlayers[nPlayer].ball);
+        fDist *= fn_800510EC(&gPlayers[nPlayer].ball);
         fDist *= fn_8005B64C(nPlayer);
         fn_80045494(0, nPlayer);
         fn_80045558(0, nPlayer);
@@ -401,7 +400,7 @@ void fn_800DBA50(int nPlayer) {
             return;
         }
         if (!(gPlayers[nPlayer].uFlags & 8) && !Player_IsCPU(nPlayer) && lbl_80202898.bGameBreaker != 1) {
-            fn_800DCB84((f32*)gPlayers[nPlayer].ball, (f32*)gPlayers[nPlayer].ballBefore, v);
+            fn_800DCB84(gPlayers[nPlayer].ball.vPos, gPlayers[nPlayer].ballBefore.vPos, v);
             v[1] = 0.0f;
             fDist = fn_80009680(fn_80009744(v));
             if (gPlayers[nPlayer].nClub == 25) {
@@ -416,12 +415,12 @@ void fn_800DBA50(int nPlayer) {
                 return;
             }
             if (!gPlayers[nPlayer].unk30C[1] && fn_8000C594()) {
-                fn_800DCB84((f32*)(gPlayers[nPlayer].ball + 0x40), (f32*)gPlayers[nPlayer].ballBefore, v2);
+                fn_800DCB84(gPlayers[nPlayer].ball.vStart, gPlayers[nPlayer].ballBefore.vPos, v2);
                 v2[1] = 0.0f;
                 fDist = fn_80009680(fn_80009744(v2));
-                nLie = gPlayers[nPlayer].nLie;
-                if (*(s32*)(gPlayers[nPlayer].ballBefore + 0x74) >= 0) {
-                    nClass = gSurfaceTypes[*(s32*)(gPlayers[nPlayer].ballBefore + 0x74)].nClass;
+                nLie = gPlayers[nPlayer].ball.nLie;
+                if (gPlayers[nPlayer].ballBefore.nSurface >= 0) {
+                    nClass = gSurfaceTypes[gPlayers[nPlayer].ballBefore.nSurface].nClass;
                 } else {
                     nClass = 10;
                 }
@@ -477,7 +476,7 @@ void fn_800DBDA8(int nPlayer) {
             return;
         case 0:
             EVENT_Trigger(lbl_80202898.nPlayer, 0x3E, 0, -1);
-            if (fn_800DC818(gPlayers[lbl_80202898.nPlayer].ball, lbl_80202898.nPlayer, 0)) {
+            if (fn_800DC818(&gPlayers[lbl_80202898.nPlayer].ball, lbl_80202898.nPlayer, 0)) {
                 if (lbl_80202898.b4A) {
                     fn_800BD83C(lbl_80202898.u4C, 0);
                     lbl_80202898.b4A = 0;
@@ -524,7 +523,7 @@ void fn_800DBFAC(void) {
         fHeight = 0.15f;
     }
     pGE = &lbl_80202898;       // steers the register choice (found by the permuter)
-    fn_800DCB84((f32*)gPlayers[pGE->nPlayer].ball, (f32*)gPlayers[pGE->nPlayer].ballBefore, v);
+    fn_800DCB84(gPlayers[pGE->nPlayer].ball.vPos, gPlayers[pGE->nPlayer].ballBefore.vPos, v);
     v[1] = 0.0f;
     fDist = fn_80009680(fn_80009744(v));
     if (!Player_IsCPU(lbl_80202898.nPlayer)) {
@@ -652,9 +651,9 @@ u8 fn_800DC464(int nPlayer) {
 // TW06: GameEffects_SpinWindowDone (by position). The look-ahead copy restarts from the ball.
 void fn_800DC498(int nPlayer) {
     Player* p = &gPlayers[nPlayer];
-    if (!gSession.bReplay || *(s32*)(p->ballBefore + 0x64) != 0) {
-        Mem_cpy(p->ballBefore, p->ball, 0xBC);
-        *(s32*)(p->ballBefore + 0x94) = -1;
+    if (!gSession.bReplay || p->ballBefore.nState != 0) {
+        Mem_cpy(&p->ballBefore, &p->ball, sizeof(Ball));
+        p->ballBefore.nPlayer = -1;
     }
     lbl_80202898.bSpinWindowDone = 1;
 }
@@ -730,7 +729,7 @@ u8 fn_800DC784(void) {
         return 1;
     }
     if (lbl_80202898.bClosing) {
-        return fn_800DC818(gPlayers[lbl_80202898.nPlayer].ball, lbl_80202898.nPlayer, 0);
+        return fn_800DC818(&gPlayers[lbl_80202898.nPlayer].ball, lbl_80202898.nPlayer, 0);
     }
     return lbl_80202898.fGBTime >= 0.8f;
 }
@@ -738,12 +737,12 @@ u8 fn_800DC784(void) {
 // TW06: GameEffects_ScriptedGBDidIt (by position). Whether the shot earned its GameBreaker:
 // holed within the stroke limit, a special eagle on a par 5 (flag 0x4000; on the green in 1 or 2),
 // or one of two score checks.
-u8 fn_800DC818(u8* pBall, int nPlayer, u8 bNext) {
+u8 fn_800DC818(Ball* pBall, int nPlayer, u8 bNext) {
     u8  bEagle;
     int a;
     int b;
     int nStrokes;
-    if (*(s32*)(pBall + 0x68) != LIE_GREEN || !(lbl_80202898.uFlags & 0x4000)) {
+    if (pBall->nLie != LIE_GREEN || !(lbl_80202898.uFlags & 0x4000)) {
         bEagle = 0;
     } else if (fn_800D2B08() != 5) {
         bEagle = 0;
@@ -764,7 +763,7 @@ u8 fn_800DC818(u8* pBall, int nPlayer, u8 bNext) {
     } else {
         nStrokes = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1;
     }
-    if ((*(s32*)(pBall + 0x68) == LIE_HOLED && !fn_800E23B0(nPlayer, nStrokes - 1)) || bEagle || b || a) {
+    if ((pBall->nLie == LIE_HOLED && !fn_800E23B0(nPlayer, nStrokes - 1)) || bEagle || b || a) {
         return 1;
     }
     return 0;

@@ -206,9 +206,10 @@ s32 fn_800E9178(int nPlayer) {
     fBest = 0.0f;
     nBest = 5;
     for (i = 0; i < gNumPlayersSetUp; i++) {
-        if (i != nPlayer && !Player_IsHoled(i) && !fn_800E8E24(fn_800E947C(i)) && PLAYER(i)->nLie != LIE_GREEN) {
-            dx = *(f32*)(PLAYER(i)->ball + 0) - pCourse->pin[nHole].x;
-            dz = *(f32*)(PLAYER(i)->ball + 8) - pCourse->pin[nHole].z;
+        if (i != nPlayer && !Player_IsHoled(i) && !fn_800E8E24(fn_800E947C(i)) &&
+            PLAYER(i)->ball.nLie != LIE_GREEN) {
+            dx = PLAYER(i)->ball.vPos[0] - pCourse->pin[nHole].x;
+            dz = PLAYER(i)->ball.vPos[2] - pCourse->pin[nHole].z;
             d = fn_80009680(dx * dx + dz * dz);
             if (d > fBest) {
                 fBest = d;
@@ -221,8 +222,8 @@ s32 fn_800E9178(int nPlayer) {
         nBest = 5;
         for (i = 0; i < gNumPlayersSetUp; i++) {
             if (i != nPlayer && !Player_IsHoled(i) && !fn_800E8E24(fn_800E947C(i))) {
-                dx = *(f32*)(PLAYER(i)->ball + 0) - pCourse->pin[nHole].x;
-                dz = *(f32*)(PLAYER(i)->ball + 8) - pCourse->pin[nHole].z;
+                dx = PLAYER(i)->ball.vPos[0] - pCourse->pin[nHole].x;
+                dz = PLAYER(i)->ball.vPos[2] - pCourse->pin[nHole].z;
                 d = fn_80009680(dx * dx + dz * dz);
                 if (d > fBest) {
                     fBest = d;

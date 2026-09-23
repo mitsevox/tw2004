@@ -108,7 +108,7 @@ void fn_800FEC80(int nPlayer) {
         fn_800FEF00(lbl_802823DC, &nPoints, &nMeter, &nMult);
         nHits = fn_800FEFF8(nPlayer, lbl_802823DC);
         if (!SurfaceUsedUp(&nPoints, nHits)) {
-            fn_8006434C(fn_80017004(gPlayers[nPlayer].nView0), (f32*)(gPlayers[nPlayer].ball + 0x10),
+            fn_8006434C(fn_80017004(gPlayers[nPlayer].nView0), gPlayers[nPlayer].ball.vPrev,
                         &x, &y, 0);
             fn_8006A8D4(fn_80017004(gPlayers[nPlayer].nView0), &x, &y);
             if (nMult > gPlayers[nPlayer].nDBC) {
@@ -181,7 +181,7 @@ s32 fn_800FF038(int nPlayer) {
     s32 nPoints;
     s32 nMeter;
     s32 nMult;
-    pSurface = PLAYER(nPlayer)->pBallHitSurface;
+    pSurface = PLAYER(nPlayer)->ball.pHitSurface;
     lbl_802823DC = -1;
     if (pSurface) {
         lbl_802823DC = pSurface - gSurfaceTypes;
