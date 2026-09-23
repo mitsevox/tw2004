@@ -1194,13 +1194,14 @@ u8 fn_8010651C(s16 nPart, int b, int i, char* pDst) {
             fn_801061C8(lbl_80282460->pAssets[nAsset].n40) &&
             fn_801061F8(nPart, lbl_80282460->pAssets[nAsset].nCategory, nWanted)) {
             if (n == i) {
-                pAsset = &lbl_80282460->pAssets[nAsset];
+                CrAPDB* pDB = lbl_80282460;
+                pAsset = &pDB->pAssets[nAsset];
                 if (pAsset->nLockKind == 2) {
                     strcpy(pDst, "Game Boy\xAE Advance Link Required");
                     return 1;
                 }
                 if (pAsset->n110 != -1) {
-                    strcpy(pDst, lbl_80282460->pStrings + pAsset->n110);
+                    strcpy(pDst, pDB->pStrings + pAsset->n110);
                 }
                 return 1;
             }
@@ -1551,14 +1552,12 @@ void fn_801072CC(s16 nPart, s32* pLocked, s32* pB1CC, s32* pB344, s32* pAll) {
 void fn_801073DC(s16 nSlot) {
     int nAsset;
 
-    if (lbl_80281EE0->pB4 != NULL) {
-        if (lbl_80281EE0->pB4->pChar == NULL) {
-            return;
-        }
-        nAsset = fn_80103D14(nSlot);
-        if (nAsset >= 0) {
-            fn_80103EFC(fn_80104F68(nAsset));
-        }
+    if (lbl_80281EE0->pB4 == NULL || lbl_80281EE0->pB4->pChar == NULL) {
+        return;
+    }
+    nAsset = fn_80103D14(nSlot);
+    if (nAsset >= 0) {
+        fn_80103EFC(fn_80104F68(nAsset));
     }
 }
 
