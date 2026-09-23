@@ -1,47 +1,205 @@
-#include "game_types.h"
+// goballfx.c (TW06's golf/hi-rendering/goballfx.c; BFX_vInit is paired with TW06's): the scene's
+// light sets and the ball marker (include/lighting.h). It keeps four sets of five lights (four point
+// lights and a directional one), fills the current set from the hole's lights (fn_800935CC) or from
+// a caller's settings (fn_80093854), and draws a small marker quad on the ground under the ball.
 
-s32 fn_8001F004();
-s32 fn_8003532C();
-s32 fn_80093A04(s32, s32);
-void fn_80093824(void);
-void fn_8006F400();
-void fn_8006F430();
-void fn_80093900(u8* p0);
-s32 fn_8006E5A8(s32, s32);
-s32 fn_8006F144(s32);
-void fn_80093990(s32 arg0);
-s32 fn_8006E62C(s32);
-s32 fn_8006F148(s32);
-void fn_800939CC(s32 arg0);
-extern u8 lbl_80281F40;
-void fn_80093AD4(void);
-extern u8 lbl_801D94B0[];
-void fn_800360A0();
-void fn_80093D14(void);
+#include "lighting.h"
+#include "camera.h"
+#include "ball.h"
+
+void fn_80035FFC(void);
+CamLens* fn_8001F004(void);
+void fn_8000AE28(f32* pIn, f32 f, f32* pOut);   // scale a vector (four floats)
+void fn_80093990(LightSet* pSet);
+void fn_800939CC(LightSet* pSet);
+void fn_80093A04(s32 nLight, CamLens* pLens);
+
+// GoLighting.c
+void fn_8006E5A8(GoLight** apLight, s32 nLights);
+void fn_8006E62C(GoLight** apLight);
+void fn_8006F144(LightSet* pSet);
+void fn_8006F148(LightSet* pSet);
+void fn_8006F400(LightSet* pSet, s32 nLight, f32* pVec, f32 f);
+void fn_8006F430(f32 f);
+
+// Skin.c
+void fn_80036054(void* pMesh, int n, s32* pDesc);
+void fn_800360A0(void* pMesh);
+
+void fn_80093524(void) {
+    int i;
+    LightSet* pSet = lbl_80281380->aSet;
+    for (i = 0; i < NUM_LIGHT_SETS; i++) {
+        fn_80093990(pSet);
+        pSet++;
+    }
+    fn_80035338(0);
+    fn_80035FFC();
+    fn_80035308();
+}
+
+void fn_80093580(void) {
+    int i;
+    LightSet* pSet = lbl_80281380->aSet;
+    for (i = 0; i < NUM_LIGHT_SETS; i++) {
+        fn_800939CC(pSet);
+        pSet++;
+    }
+}
+
+// Fill the current set from the hole's lights: the directional light from the first directional
+// record (the fifth record if none of the first four is one), the point lights from the records
+// around it.
+void fn_800935CC(CourseLights* pLights) {
+    LightSet* pSet;
+    GoLight* pLight;
+    CourseLight* pRec;
+    CourseLight* pDir;
+    u8 bSkip;
+    int i;
+
+    pSet = fn_8003532C();
+    for (i = 0; i < 5; i++) {
+        pDir = &pLights->aLight[i];
+        if (pDir->nType == 1) break;
+    }
+    pLight = pSet->apLight[4];
+    pLight->nType = 1;
+    fn_8000AE28(pDir->vColor, 0.5f, pLight->u.dir.vColor);
+    pLight->u.dir.f10 = 1.0f;
+    pLight->u.dir.fC = 1.0f;
+
+    bSkip = 0;
+    if (pLights->aLight[0].nType == 1) {
+        bSkip = 1;
+    }
+    if (bSkip) {
+        pRec = &pLights->aLight[1];
+    } else {
+        pRec = &pLights->aLight[0];
+    }
+    pLight = pSet->apLight[0];
+    pLight->nType = 2;
+    fn_8000AE28(pRec->vColor, 0.5f, pLight->u.point.vColor);
+    Vec_Copy(pRec->vPos, pLight->u.point.vPos);
+    pLight->u.point.fC = 1.0f;
+    pLight->u.point.f10 = 1.0f;
+    pLight->u.point.f14 = 1.0f;
+    pLight->u.point.f18 = 1.0f;
+
+    bSkip = 0;
+    if (pLights->aLight[0].nType == 1) {
+        bSkip = 1;
+    }
+    if (pLights->aLight[1].nType == 1) {
+        bSkip = 1;
+    }
+    if (bSkip) {
+        pRec = &pLights->aLight[2];
+    } else {
+        pRec = &pLights->aLight[1];
+    }
+    pLight = pSet->apLight[1];
+    pLight->nType = 2;
+    fn_8000AE28(pRec->vColor, 0.5f, pLight->u.point.vColor);
+    Vec_Copy(pRec->vPos, pLight->u.point.vPos);
+    pLight->u.point.fC = 1.0f;
+    pLight->u.point.f10 = 1.0f;
+    pLight->u.point.f14 = 1.0f;
+    pLight->u.point.f18 = 1.0f;
+
+    bSkip = 0;
+    if (pLights->aLight[0].nType == 1) {
+        bSkip = 1;
+    }
+    if (pLights->aLight[1].nType == 1) {
+        bSkip = 1;
+    }
+    if (pLights->aLight[2].nType == 1) {
+        bSkip = 1;
+    }
+    if (bSkip) {
+        pRec = &pLights->aLight[3];
+    } else {
+        pRec = &pLights->aLight[2];
+    }
+    pLight = pSet->apLight[2];
+    pLight->nType = 2;
+    fn_8000AE28(pRec->vColor, 0.5f, pLight->u.point.vColor);
+    Vec_Copy(pRec->vPos, pLight->u.point.vPos);
+    pLight->u.point.fC = 1.0f;
+    pLight->u.point.f10 = 1.0f;
+    pLight->u.point.f14 = 1.0f;
+    pLight->u.point.f18 = 1.0f;
+
+    // EA bug: the last point light always takes the fourth record, even when that is the
+    // directional one
+    pLight = pSet->apLight[3];
+    pLight->nType = 2;
+    fn_8000AE28(pLights->aLight[3].vColor, 0.5f, pLight->u.point.vColor);
+    Vec_Copy(pLights->aLight[3].vPos, pLight->u.point.vPos);
+    pLight->u.point.fC = 1.0f;
+    pLight->u.point.f10 = 1.0f;
+    pLight->u.point.f14 = 1.0f;
+    pLight->u.point.f18 = 1.0f;
+}
 
 void fn_80093824(void) {
     fn_8003532C();
     fn_80093A04(0, fn_8001F004());
 }
 
-void fn_80093900(u8* p0) {
-    s32 t0;
-    t0 = fn_8003532C();
-    fn_8006F430(*(f32*)(p0 + 0x80));
-    fn_8006F400(t0, 0, p0, *(f32*)(p0 + 0x10));
-    fn_8006F400(t0, 1, (p0 + 0x20), *(f32*)(p0 + 0x30));
-    fn_8006F400(t0, 2, (p0 + 0x40), *(f32*)(p0 + 0x50));
-    fn_8006F400(t0, 3, (p0 + 0x60), *(f32*)(p0 + 0x70));
+void fn_80093854(LightParams* pParams) {
+    LightSet* pSet;
+    GoLight* pLight;
+    pSet = fn_8003532C();
+    Vec3Copy(pParams->v0, pSet->v7C);
+    pLight = pSet->apLight[4];
+    pLight->u.dir.f10 = pParams->f10;
+    pLight = pSet->apLight[0];
+    pLight->u.point.fC = pParams->f20;
+    pLight->u.point.f10 = pParams->f24;
+    pLight->u.point.f14 = pParams->f24;
+    pLight = pSet->apLight[1];
+    pLight->u.point.fC = pParams->f1C;
+    pLight->u.point.f10 = 1.0f;
+    pLight->u.point.f14 = 1.0f;
+    pLight = pSet->apLight[2];
+    pLight->u.point.fC = pParams->f18;
+    pLight->u.point.f10 = 1.0f;
+    pLight->u.point.f14 = 1.0f;
+    pLight = pSet->apLight[3];
+    pLight->u.point.fC = pParams->f14;
+    pLight->u.point.f10 = 1.0f;
+    pLight->u.point.f14 = 1.0f;
 }
 
-void fn_80093990(s32 arg0) {
-    fn_8006E5A8(arg0 + 0x54, 5);
-    fn_8006F144(arg0);
+void fn_80093900(CourseLightBlock* pBlock) {
+    LightSet* pSet;
+    pSet = fn_8003532C();
+    fn_8006F430(pBlock->f80);
+    fn_8006F400(pSet, 0, pBlock->a[0].v0, pBlock->a[0].f10);
+    fn_8006F400(pSet, 1, pBlock->a[1].v0, pBlock->a[1].f10);
+    fn_8006F400(pSet, 2, pBlock->a[2].v0, pBlock->a[2].f10);
+    fn_8006F400(pSet, 3, pBlock->a[3].v0, pBlock->a[3].f10);
 }
 
-void fn_800939CC(s32 arg0) {
-    fn_8006E62C(arg0 + 0x54);
-    fn_8006F148(arg0);
+void fn_80093990(LightSet* pSet) {
+    fn_8006E5A8(pSet->apLight, NUM_SET_LIGHTS);
+    fn_8006F144(pSet);
+}
+
+void fn_800939CC(LightSet* pSet) {
+    fn_8006E62C(pSet->apLight);
+    fn_8006F148(pSet);
+}
+
+void BFX_vInit(void) {
+    s32 desc[2];
+    fn_800102DC(fn_8000BEE4("marker"), &lbl_80281F44, &lbl_80281F48);
+    desc[0] = 0x10;
+    desc[1] = 4;
+    fn_80036054(lbl_801D94B0, 0, desc);
 }
 
 void fn_80093AD4(void) {
