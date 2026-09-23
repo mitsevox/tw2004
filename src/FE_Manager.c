@@ -34,6 +34,8 @@ u8   fn_80104020(void* pChoice);        // } a part's choices (FE_CrAPDB.c): whe
 int  fn_801048EC(s16 nPart, int a);     // } picked, how many there are, one of them and its
 void* fn_80104FA8(s16 nPart, int a, int i);   // } asset
 CrAPAsset* fn_80104F68(void* pChoice);  // }
+CrAPAsset* fn_80104E84(s16 nPart, int a, int i);   // a part's choice's asset (FE_CrAPDB.c)
+void fn_801073DC(int nPart);            // FE_CrAPDB.c
 int  fn_801049C8(s16 nPart);            // how many b a part has, for fn_800797E0 (FE_CrAPDB.c)
 int  fn_80105494(int nAsset);           // } the two attributes an asset raises (-1: none)
 int  fn_80105504(int nAsset);           // }
@@ -895,6 +897,169 @@ u8 fn_80078D24(CrAPAsset* pAsset) {
         return 1;
     }
     return fn_8015F844(pAsset->szName, "Blue") == 0;
+}
+
+// A random created golfer: random parts 10, 9 and 16; hair (part 3) with a 10% chance of corn
+// rows, an afro or a mohawk; parts 4 to 6 on a random choice now and then; part 14 a plain colour
+// one time in five, and part 15 usually the same choice; a hat (part 0) 40% of the time, a crazy
+// one one time in five; and a few more parts by chance.
+void fn_80078E34(SaveProfile* pProfile) {
+    char szDebug[256];
+    u8 bPicking;
+    u8 bChance;
+    void* pChoice;
+    int nCount;
+    int nPick;
+    int nPrev;
+    CrAPAsset* pAsset;
+    fn_8007975C(pProfile, 10, 0);
+    fn_8007975C(pProfile, 9, 0);
+    fn_8007975C(pProfile, 16, 0);
+
+    bChance = Rand_Next(0) % 100 < 10;
+    bPicking = 1;
+    nCount = fn_801048EC(3, 0);
+    while (bPicking) {
+        nPick = Rand_Next(0) % nCount;
+        pAsset = fn_80104E84(3, 0, nPick);
+        if (bChance && pAsset &&
+            (fn_8015F844(pAsset->szName, "Corn Rows") == 0 || fn_8015F844(pAsset->szName, "Afro") == 0 ||
+             fn_8015F844(pAsset->szName, "Mohawk") == 0)) {
+            FE_CrAP_TurnOnPart(3, 0, nPick);
+            bPicking = 0;
+        }
+        if (!bChance &&
+            (pAsset == NULL || (fn_8015F844(pAsset->szName, "Corn Rows") != 0 &&
+                                fn_8015F844(pAsset->szName, "Afro") != 0 &&
+                                fn_8015F844(pAsset->szName, "Mohawk") != 0))) {
+            FE_CrAP_TurnOnPart(3, 0, nPick);
+            bPicking = 0;
+        }
+    }
+
+    bChance = Rand_Next(0) % 100 < 20;
+    if (bChance) {
+        nCount = fn_801048EC(4, 0);
+        nPick = Rand_Next(0) % (nCount - 1);
+        nPick++;
+        FE_CrAP_TurnOnPart(4, 0, nPick);
+    } else {
+        FE_CrAP_TurnOnPart(4, 0, 0);
+    }
+    bChance = Rand_Next(0) % 100 < 10;
+    if (bChance) {
+        nCount = fn_801048EC(5, 0);
+        nPick = Rand_Next(0) % (nCount - 1);
+        nPick++;
+        FE_CrAP_TurnOnPart(5, 0, nPick);
+    } else {
+        FE_CrAP_TurnOnPart(5, 0, 0);
+    }
+    bChance = Rand_Next(0) % 100 < 10;
+    if (bChance) {
+        nCount = fn_801048EC(6, 0);
+        if (nCount != -1) {
+            if (nCount > 1) {
+                nPick = Rand_Next(0) % (nCount - 1);
+            } else {
+                nPick = Rand_Next(0) % (nCount - 1);   // EA bug: divides by zero for one choice
+                nPick++;
+            }
+            FE_CrAP_TurnOnPart(6, 0, nPick);
+        }
+    } else {
+        FE_CrAP_TurnOnPart(6, 0, 0);
+    }
+
+    bChance = Rand_Next(0) % 100 < 80;
+    bPicking = 1;
+    nCount = fn_801048EC(14, 0);
+    while (bPicking) {
+        nPick = Rand_Next(0) % nCount;
+        pAsset = fn_80104E84(14, 0, nPick);
+        if (bChance && !fn_80078B84(pAsset)) {
+            FE_CrAP_TurnOnPart(14, 0, nPick);
+            bPicking = 0;
+        }
+        if (!bChance && fn_80078B84(pAsset)) {
+            FE_CrAP_TurnOnPart(14, 0, nPick);
+            bPicking = 0;
+        }
+        nPrev = nPick;
+    }
+    bChance = Rand_Next(0) % 100 < 90;
+    if (bChance) {
+        FE_CrAP_TurnOnPart(15, 0, nPrev);
+    } else {
+        bChance = Rand_Next(0) % 100 < 80;
+        bPicking = 1;
+        nCount = fn_801048EC(15, 0);
+        while (bPicking) {
+            nPick = Rand_Next(0) % nCount;
+            pAsset = fn_80104E84(15, 0, nPick);
+            if (bChance && !fn_80078D24(pAsset)) {
+                FE_CrAP_TurnOnPart(15, 0, nPick);
+                bPicking = 0;
+            }
+            if (!bChance && fn_80078D24(pAsset)) {
+                FE_CrAP_TurnOnPart(15, 0, nPick);
+                bPicking = 0;
+            }
+        }
+    }
+
+    bChance = Rand_Next(0) % 100 < 40;
+    if (bChance) {
+        bChance = Rand_Next(0) % 100 < 80;
+        bPicking = 1;
+        nCount = fn_801048EC(0, 0);
+        while (bPicking) {
+            nPick = Rand_Next(0) % nCount;
+            pAsset = fn_80104E84(0, 0, nPick);
+            if (bChance && !FE_CrAP_IsCrazyHat(pAsset)) {
+                FE_CrAP_TurnOnPart(0, 0, nPick);
+                bPicking = 0;
+            }
+            if (!bChance && FE_CrAP_IsCrazyHat(pAsset)) {
+                FE_CrAP_TurnOnPart(0, 0, nPick);
+                bPicking = 0;
+            }
+        }
+        pChoice = fn_80104FA8(0, 0, nPick);
+        sprintf(szDebug, "I hate everone: %d", pChoice);    // EA bug: a pointer printed with %d
+                                                            // (a leftover debug line; never shown)
+    } else {
+        FE_CrAP_TurnOnPart(0, 0, 0);
+    }
+
+    fn_801073DC(5);
+    fn_801073DC(6);
+    fn_801073DC(7);
+    fn_801073DC(8);
+    fn_801073DC(11);
+    fn_801073DC(12);
+    fn_801073DC(13);
+    fn_801073DC(14);
+    if (Rand_Next(0) % 100 < 30) {
+        fn_8007975C(pProfile, 19, 0);
+    }
+    if (Rand_Next(0) % 100 < 30) {
+        fn_8007975C(pProfile, 20, 0);
+    }
+    bChance = Rand_Next(0) % 100 < 20;
+    if (bChance) {
+        nCount = fn_801048EC(19, 3);
+        nPick = Rand_Next(0) % nCount;
+        fn_80104E84(19, 3, nPick);
+        FE_CrAP_TurnOnPart(19, 0, nPick);
+    }
+    bChance = Rand_Next(0) % 100 < 5;
+    if (bChance) {
+        nCount = fn_801048EC(8, 0);
+        FE_CrAP_TurnOnPart(8, 0, Rand_Next(0) % nCount);
+    } else {
+        fn_801073DC(13);
+    }
 }
 
 void fn_80079664(SaveProfile* pProfile) {
