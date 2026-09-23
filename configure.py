@@ -756,7 +756,7 @@ config.libs = [
             Object(NonMatching, "dolphin/os/OSArena.c"),
             Object(NonMatching, "dolphin/os/OSCache.c"),
             Object(NonMatching, "dolphin/os/OSReset.c"),
-            Object(NonMatching, "dolphin/os/OSRtc.c"),
+            Object(Matching, "dolphin/os/OSRtc.c"),
             Object(NonMatching, "dolphin/os/OSTime.c"),
             Object(Matching, "dolphin/PPCArch.c"),
             Object(Matching, "dolphin/os/OSResetSW.c"),
