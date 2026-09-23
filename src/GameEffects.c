@@ -367,7 +367,7 @@ void fn_800DBA50(int nPlayer) {
             } else if (fDist < 5.0f) {
                 return;
             }
-            if (!gPlayers[nPlayer].unk30C[1] && fn_8000C594()) {
+            if (!gPlayers[nPlayer].b30D && fn_8000C594()) {
                 fn_800DCB84(gPlayers[nPlayer].ball.vStart, gPlayers[nPlayer].ballBefore.vPos, v2);
                 v2[1] = 0.0f;
                 fDist = fn_80009680(fn_80009744(v2));

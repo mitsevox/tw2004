@@ -1861,7 +1861,7 @@ void Session_SetupProfiles(void) {
         for (j = 0; j < 6; j++) {
             fn_800CB700(pProf->szNames[j], gszEmpty);
         }
-        pProf->nOutfit = gGolferTable[pSession->nGolfer[i]].unk62[0];
+        pProf->nOutfit = gGolferTable[pSession->nGolfer[i]].nOutfit;
         nGolfer = pSession->nGolfer[i];
         if (nGolfer >= FIRST_CREATED_GOLFER) {
             SaveProfile* pSave = &gpSaveData[nGolfer - FIRST_CREATED_GOLFER];

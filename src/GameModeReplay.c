@@ -106,7 +106,9 @@ void fn_800F15AC(void) {
     Mem_cpy(&gPlayers[0].golfer, &gReplayData.player.golfer, 0x140);
     Mem_cpy(gPlayers[0].attrMod, gReplayData.player.attrMod, 0xC);
     Mem_cpy(gPlayers[0].nStrokes, gReplayData.player.nStrokes, 0x1B8);
-    Mem_cpy(gPlayers[0].unk30C, gReplayData.player.unk30C, 0x48);
+    // b30C up to the shot block at 0x354: the flags and the round's money. Sized as the distance
+    // port: between the two fields the copy scores 96.4%
+    Mem_cpy(&gPlayers[0].b30C, &gReplayData.player.b30C, 0x48);
     Mem_cpy(&gPlayers[0].nClub, &gReplayData.player.nClub, 0x5C);
     Mem_cpy(&gPlayers[0].nShotKind2, &gReplayData.player.nShotKind2, 4);
     Mem_cpy(&gPlayers[0].swing, &gReplayData.player.swing, 0x630);

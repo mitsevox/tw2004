@@ -84,7 +84,7 @@ typedef struct GolferRecord {
     char szFirst[32];           // 0x002
     char szLast[32];            // 0x022
     char szNick[32];            // 0x042
-    u8   unk62[1];              // 0x062  [0] = the outfit. TW06 has ballID here
+    u8   nOutfit;               // 0x062  the outfit (copied to PlayerProfile.nOutfit). TW06 has ballID here
     s8   nEarningsRating;       // 0x063  0..25, what beating this golfer pays (Earnings.c). TW06: earningsRating
     u8   unk64[4];              // 0x064  TW06 has trajectory[3], characteristic, severity, chance here
     s8   attr[NUM_ATTRS];       // 0x068  block A. TW06: baseStats
@@ -262,7 +262,8 @@ typedef struct Player {
     u8   b2E4[18];              // 0x2E4  per hole
     u8   b2F6[18];              // 0x2F6  per hole
     s32  n308;                  // 0x308
-    u8   unk30C[2];
+    u8   b30C;                  // 0x30C  the start of the block GameModeReplay restores from a replay
+    u8   b30D;                  // 0x30D  tested with the course check by GameEffects
     u8   b30E;                  // 0x30E  a replaced ball must be dropped (GM_ReplaceOOBBall)
     u8   b30F;                  // 0x30F  copied to b310 at the end of the hole (fn_800D9350)
     u8   b310;                  // 0x310  cleared by fn_800D8D38
@@ -418,7 +419,7 @@ typedef struct PlayerProfile {
     u8   n2;                    // 0x02  a created golfer's byte 0x54C2 of its save slot, else 0
     u8   unk3[5];
     char szNames[6][8];         // 0x08
-    u8   nOutfit;               // 0x38  the record's byte 0x60
+    u8   nOutfit;               // 0x38  the golfer record's nOutfit, or the created golfer's
     u8   nBallType;             // 0x39  0..3, from the SPIN attribute for a pro
     u8   unk3A[6];
 } PlayerProfile;
