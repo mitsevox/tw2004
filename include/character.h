@@ -157,7 +157,8 @@ typedef struct SKABlendNode {
 typedef struct BlendClip {
     u8   unk0[8];
     f32  f08;                   // 0x08  added to the time fn_800204A0 samples the clip at
-    u8   unkC[0x24 - 0xC];
+    f32  f0C;                   // 0x0C
+    u8   unk10[0x24 - 0x10];
     f32  f24;                   // 0x24  the swing measures the ball-hit time from it
 } BlendClip;
 
@@ -185,6 +186,16 @@ typedef struct CharBuffer {
 } CharBuffer;
 LAYOUT_ASSERT(CharBuffer, 0x1C);
 
+// An animation player; only what is read. Character has two: the one at 0x164, whose fields are
+// named in Character directly, and anim29C.
+typedef struct AnimPlayer {
+    u8    unk0[0xC];
+    s32   nC;                   // 0x0C  } set together by fn_800958EC
+    f32   f10;                  // 0x10  }
+    u8    unk14[4];
+    f32   fTime;                // 0x18
+} AnimPlayer;
+
 // The golfer's character object (0x1798 bytes or more); only the fields read so far. Anim_SetRate,
 // Anim_SetTime and fn_8007326C take the address of its animation player at 0x164, whose fields
 // from 0x168 on are named here directly.
@@ -200,9 +211,13 @@ typedef struct Character {
     u8    unk14[0x1C - 0x14];
     s32   nAnim;                // 0x01C  the playing animation (6 backswing, 7 downswing)
     s32   n20;                  // 0x020
-    u8    unk24[0x2C - 0x24];
+    s8    n24;                  // 0x024  } counters CharacterState's idle update (fn_80096398) runs down
+    s8    n25;                  // 0x025  }
+    s8    n26;                  // 0x026  set while that update's clip plays
+    u8    unk27;
+    s32   u28;                  // 0x028  bit 0: a state change is waiting (fn_80096F0C)
     s32   n2C;                  // 0x02C  tested for 0 (PreShotInit) and for 4 or 5 (ShotSetupInit)
-    u8    unk30[0x34 - 0x30];
+    s32   n30;                  // 0x030
     s32   nSlot;                // 0x034  the animation slot it uses (skalib); the CrAP camera's shot names
                                 //        get an 'f' in front when it is 1
     CharModel* pModel;          // 0x038
@@ -215,7 +230,9 @@ typedef struct Character {
     f32   fAnimTime;            // 0x17C
     u8    unk180[0x184 - 0x180];
     f32   fAnimEnd;             // 0x184  the animation's end time
-    u8    unk188[0x3D8 - 0x188];
+    u8    unk188[0x29C - 0x188];
+    AnimPlayer anim29C;         // 0x29C  a second animation player
+    u8    unk2B8[0x3D8 - 0x2B8];
     AnimLib* pLib;              // 0x3D8  its animation library
     struct ClipRecord* pRecords;    // 0x3DC  records for its merged library (skalib)
     u8    unk3E0[0x40C - 0x3E0];

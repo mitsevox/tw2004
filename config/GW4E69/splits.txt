@@ -1996,20 +1996,8 @@ unsorted/sweep_800957B0.c:
 unsorted/sweep_800957D8.c:
 	.text       start:0x800957D8 end:0x800957FC
 
-unsorted/sweep_800958EC.c:
-	.text       start:0x800958EC end:0x800958F8
-
-unsorted/sweep_800962F8.c:
-	.text       start:0x800962F8 end:0x80096338
-
-unsorted/sweep_8009637C.c:
-	.text       start:0x8009637C end:0x80096398
-
-unsorted/sweep_80096508.c:
-	.text       start:0x80096508 end:0x80096530
-
 CharAnim.c:
-	.text       start:0x800965DC end:0x80096690
+	.text       start:0x800957FC end:0x80097208
 
 GoShaderObjectCommon_MorphAnimManager_Gc.c:
 	.text       start:0x80097208 end:0x800975B0
