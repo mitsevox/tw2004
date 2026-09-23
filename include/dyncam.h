@@ -9,10 +9,15 @@
 
 // One shot a sequence can choose (0x48 bytes; CamSequence.p4C points at nChoices of them).
 typedef struct CamChoice {
-    u8   unk0[0x10];
+    f32  f0;                    // 0x00  the blend's first time (CameraScript_InterpToNewScript's f1)
+    f32  f4;                    // 0x04  its second (f2)
+    f32  f8;                    // 0x08  its third (f3)
+    f32  fC;                    // 0x0C  kind 0x18: the ball-flight camera takes it once the flight has
+                                //       run this far (fn_80044EA8)
     CamShot* p10;               // 0x10  the shot (an index in the file)
     u8   b14;                   // 0x14  the shot kind it is for (9: any kind but 23)
-    u8   unk15[2];
+    u8   b15;                   // 0x15  the blend's first kind (nA)
+    u8   b16;                   // 0x16  its second (nB)
     u8   b17;                    // 0x17  only for some golfers (fn_8003ABEC)
     u32  aNoHoles[12];          // 0x18  one bit per hole of every course (course * 18 + hole): not
                                 //       used there

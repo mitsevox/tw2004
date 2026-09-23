@@ -334,7 +334,9 @@ typedef struct Player {
     s32  nC6C[18];              // 0xC6C  cleared at the start of a round
     f32  fCB4;                  // 0xCB4  speed golf: raised by a button, falls every frame
     s32  nCB8;                  // 0xCB8  speed golf: cleared by that button
-    u8   unkCBC[0xCD0 - 0xCBC];
+    f32  vCBC[3];               // 0xCBC  a vector (the run's velocity?): the first-person camera's step is
+                                //        three times the length of its x and z
+    u8   unkCC8[0xCD0 - 0xCC8];
     s32  nCD0;                  // 0xCD0  cleared per game (fn_800F2030)
     s32  aCD4[20];              // 0xCD4
     s32  nD24;                  // 0xD24  mode 12: a bonus meter, 0..100
