@@ -1936,6 +1936,9 @@ config.progress_report_args = [
 if args.mode == "configure":
     # Write build.ninja and objdiff.json
     generate_build(config)
+    # dtk's gap units below the first SDK unit are uncharted game code: count them in "game"
+    from tools.match.autocat import categorise_auto_units
+    categorise_auto_units("objdiff.json", f"config/{config.version}/splits.txt")
 elif args.mode == "progress":
     # Print progress information
     calculate_progress(config)
