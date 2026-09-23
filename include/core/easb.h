@@ -58,28 +58,41 @@ typedef struct EASBImage {
     u8 aData[0x4000];               // 0x0436: 128x128 pixels, 8 bits each
 } EASBImage;
 
-// This game's product record, as stored in the Bio file.
+// This game's product record, as stored in the Bio file. Times are seconds since 1970
+// (TibExt.c's clock).
 typedef struct EASBProduct {
     u8 unk0[0x4C];
-    u32 uTime;                      // 0x004C: seconds, checked against 2003-2023 by fn_80127F88
-    u8 unk50[0x1116];
+    u32 uTime;                      // 0x004C: last update, kept within 2003-2023 by fn_80128BC4
+    u32 u50;                        // 0x0050: play time while b11E0 is set
+    u32 u54;                        // 0x0054: play time while b11E0 is clear
+    u32 u58;                        // 0x0058: counter raised by fn_8012D8C4
+    u32 u5C;                        // 0x005C: counter raised by fn_8012D93C
+    u8 unk60[0x1102];
+    u16 uLevel;                     // 0x1162: only rises, up to EASB_MAX_LEVEL
+    u8 unk1164[2];
     u8 bValid;                      // 0x1166
     u8 b1167;                       // 0x1167
 } EASBProduct;                      // size 0x1168
+
+#define EASB_MAX_LEVEL 1250         // fn_8012DAB8 also takes 1251
 
 // The library's state, allocated when it starts (lbl_802825B8).
 typedef struct EASBState {
     void* pAllocator;               // 0x0000: what the library allocates from (TibExt.c)
     u8 unk4[0x50];
-    s32 n54;                        // 0x0054
-    s32 n58;                        // 0x0058
-    u8 unk5C[0xC];
+    u32 u54;                        // 0x0054: the Bio's totals, raised with the product's
+    u32 u58;                        // 0x0058
+    u32 u5C;                        // 0x005C
+    u32 u60;                        // 0x0060
+    u8 unk64[4];
     EASBProduct product;            // 0x0068: this game's record
     u8 b11D0;                       // 0x11D0
     u8 unk11D1[3];
     u8* pProductBuffer;             // 0x11D4: EASB_PRODUCT_BUFFER_SIZE bytes, from the heap
     u8* pImageBuffer;               // 0x11D8: color table, pixels, then a "loaded" flag at 0x4400
-    u8 unk11DC[8];
+    u32 uLastTime;                  // 0x11DC: when fn_8012D1A0 last added up play time
+    u8 b11E0;                       // 0x11E0: which play-time counter runs (fn_8012DD7C)
+    u8 unk11E1[3];
     EASBImage* pImage;              // 0x11E4: the game's own picture
 } EASBState;
 
@@ -87,30 +100,77 @@ typedef struct EASBState {
 
 extern EASBState* lbl_802825B8;
 
-// TibExt.c: the library's memory glue.
+// TibExt.c: the library's memory and clock glue.
 void fn_80122128(void* pAllocator, void* p, u32 uSize, u32 uAlign);
-void* fn_80122150(void);
+u32 fn_80122150(void);              // the real-time clock, in seconds since 1970
 
 // The code before EASB.c (still sweep code).
+u32 fn_80128468(u32 uA, u32 uB);    // uA + uB, saturating at 0xFFFFFFFF
+u32 fn_80128BC4(u32 uTime);         // clamps a time to 2003-01-01..2023-01-01
 s32 fn_8012881C(s32 arg0, s32 arg1, u32 arg2, u32 arg3, u32 arg4);
 s32 fn_801288DC(s32 arg0, s32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5, u32 arg6);
+EASBErrorE fn_8012C5F8(u32* p0, EASBProduct* pProduct, u8* p2);
+EASBErrorE fn_8012C69C(void);
+EASBErrorE fn_8012C73C(void);
+EASBErrorE fn_8012C774(u8* pBuffer);
+EASBErrorE fn_8012C7BC(u32* p0, EASBProduct* pProduct, s32 arg2);
 u8 fn_8012C83C(void);
 u8 fn_8012C848(void);
-s32 fn_8012C888(s32 arg0);
+EASBErrorE fn_8012C888(u32* pOut);
 
 // EASB.c
 EASBErrorE fn_8012CCD8(s32 nNeed);
+EASBErrorE fn_8012CD8C(void);
 EASBErrorE fn_8012CF00(void);
 EASBErrorE fn_8012D0D4(void);
-s32 fn_8012D1A0(void);
-EASBErrorE fn_8012D744(s32 arg0);
-s32 fn_8012D7F0(void);
-s32 fn_8012DB30(s32 arg0, s32 arg1, s32 arg2, void* pAllocator);
-void fn_8012DD24(s32 arg0, s32 arg1, s32 arg2);
-EASBErrorE fn_8012DDE0(s32* pOut);
-EASBErrorE fn_8012DE38(s32* pOut);
-s32 fn_8012E818(void);
+EASBErrorE fn_8012D1A0(void);
+EASBErrorE fn_8012D560(void);
+EASBErrorE fn_8012D5B0(void);
+EASBErrorE fn_8012D5E4(void* p0, void* p1);
+EASBErrorE fn_8012D694(void);
+EASBErrorE fn_8012D6C8(void);
+EASBErrorE fn_8012D710(void);
+EASBErrorE fn_8012D744(u32* pOut);
+EASBErrorE fn_8012D794(s32 arg0);
+EASBErrorE fn_8012D7F0(void);
+EASBErrorE fn_8012D8C4(u32 uCount);
+EASBErrorE fn_8012D93C(u32 uCount);
+EASBErrorE fn_8012D9B4(u16* puLevel);
+EASBErrorE fn_8012DAB8(u16 uLevel);
+EASBErrorE fn_8012DB30(u16* szName, s32 arg1, s32 nLanguage, u32 uTime);
+EASBErrorE fn_8012DD24(u16* szName, s32 arg1, s32 nLanguage);
+EASBErrorE fn_8012DD7C(u8 bFlag);
+EASBErrorE fn_8012DDE0(u32* pOut);
+EASBErrorE fn_8012DE38(u32* pOut);
+EASBErrorE fn_8012DF4C(u16* puLevel, f32* pfProgress);
+EASBErrorE fn_8012E818(u8 n, void* pImage);
 EASBErrorE fn_8012E820(s32 arg0, s32 arg1, u32 arg2, u32 arg3, u32 arg4);
 EASBErrorE fn_8012E8A8(s32 arg0, s32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5, u32 arg6);
+
+// ---- EASportsBio.c: the game's side ----
+
+// The game's Bio manager (TW06's EASBio_MgrT; same fields at the same offsets).
+typedef struct EASBioMgr {
+    void* pCurrentGameImage;        // 0x00
+    void* pOurGameImage;            // 0x04
+    void* pIcon;                    // 0x08
+    u8 bBioLoaded;                  // 0x0C
+    u8 bGameWon;                    // 0x0D
+    u16 uCurLevel;                  // 0x0E
+    u8 bNewAccomplishment;          // 0x10
+    u8 unk11[3];
+    s32 eCurrentRewardMessage;      // 0x14
+} EASBioMgr;
+
+extern EASBioMgr* lbl_80281988;
+extern u8 lbl_80282568;
+extern u8 lbl_80282569;
+extern u8 lbl_8028256A;
+extern s32 lbl_8028256C;
+extern s32 lbl_80282570;
+extern s32 lbl_80282574;
+extern s32 lbl_80282578;
+extern u8 lbl_8028257C;
+extern u8 lbl_8028257D;
 
 #endif
