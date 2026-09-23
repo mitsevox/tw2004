@@ -26,6 +26,13 @@ void GXSetAlphaUpdate(u8 bUpdate);
 void GXSetColorUpdate(u8 bUpdate);
 void GXSetZMode(u8 bCompare, int eCompare, u8 bUpdate);
 
+// ---- vertex arrays ----------------------------------------------------------------------------
+
+void GXInvalidateVtxCache(void);
+void GXSetArray(int eAttr, void* pBase, u8 nStride);
+void GXClearVtxDesc(void);
+void GXSetVtxDesc(int eAttr, int eType);
+
 // ---- textures ---------------------------------------------------------------------------------
 
 void GXInitTexObj(GXTexObj* pObj, void* pImage, u16 nWidth, u16 nHeight, int eFormat, int eWrapS,

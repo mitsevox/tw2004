@@ -10,6 +10,13 @@
 
 #define SITDEV_NUM_VALUES 96
 
+// An event queued for the scripts (fn_80067710 adds them, fn_8006795C runs and clears them).
+typedef struct SitDevEvent {
+    s32   nPlayer;              // 0x00
+    u8    nEvent;               // 0x04  event.c's event number
+    u8    unk5[3];
+} SitDevEvent;
+
 // The block lbl_802811B8 points at (lbl_801D5AB0, 0x140 bytes).
 typedef struct SitDevData {
     u16   aValue[SITDEV_NUM_VALUES];            // 0x000  set through fn_80067B1C
@@ -21,7 +28,7 @@ typedef struct SitDevData {
     u8    abPlayed[14];                         // 0x0D8  per kind of action: one has played already
     u8    unkE6[2];
     struct SitDevEntry8* pE8;                   // 0x0E8  the last line played (fn_800BD580 kind 1)
-    u8    unkEC[0x13C - 0xEC];
+    SitDevEvent aEvents[10];                    // 0x0EC  this frame's events, n13C of them
     s32   n13C;                                 // 0x13C  cleared with the block by fn_80067608
 } SitDevData;
 LAYOUT_ASSERT(SitDevData, 0x140);
@@ -42,7 +49,8 @@ typedef union SitDevBits {
 // Its conditions (fn_800BB7AC): for each bit n set in auTests, in order, test k compares
 // SitDevData.aValue[n] with aArg[k] by aOp[k].
 typedef struct SitDevEntry {
-    u8         unk0[2];
+    u8         n0;              // 0x00  its SitDevData.pD4 byte (runs once); 0: none
+    u8         nEvent;          // 0x01  the queued event it waits for; 0: any
     SitDevBits b2;              // 0x02
     u32        auTests[SITDEV_NUM_VALUES / 32];   // 0x04
     u8         aOp[8];          // 0x10  0 always true, 1 ==, 2 !=, 3 <, 4 >, 5 any common bit
@@ -116,7 +124,7 @@ extern s32 lbl_801FA1AC[5];         // per player; 1: fn_800BB1F8 is true
 // Store uValue in pValues[nIndex] and set bit nIndex of pSetBits.
 void fn_80067B1C(u16* pValues, int nIndex, u16 uValue, u32* pSetBits);
 
-void fn_80067710(int nPlayer, int a, int b);    // event.c's handlers call it for most events
+void fn_80067710(int nPlayer, int a, u8 nEvent);    // event.c's handlers call it for most events
 
 // SitDevFile.c
 void fn_800BB0C8(void);
