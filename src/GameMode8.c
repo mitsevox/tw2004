@@ -87,6 +87,7 @@ u8    GM_CheckForBallOOB(int nPlayer);
 void  GM_ReplaceOOBBall(int nPlayer);
 SurfaceType* Ter_GetSupportingWorldMaterial(CourseInfo* pCourse, u8* pBall);
 void  fn_800DEB5C(int nPlayer);
+void  fn_800FE190(f32* pA, f32* pB, f32* pOut);
 void  Mem_cpy(void* pDst, void* pSrc, int nBytes);
 void  fn_8006ACF8(int nPlayer, int a);
 void  fn_8006BAA8(int nPlayer);
@@ -120,6 +121,7 @@ void  fn_800FA844(int nPlayer);
 void  fn_800FA994(int nPlayer);
 void  fn_800FA998(int nPlayer);
 void  fn_800FA9E0(int nPlayer);
+f32   fn_800FB41C(f32* pA, f32* pB);
 void  fn_800FBD2C(int nPlayer);
 void  fn_800FCBDC(int nPlayer);
 void  fn_800FCCF0(void);
@@ -757,6 +759,71 @@ u8 fn_800FAD54(int nPlayer) {
     return 1;
 }
 
+// The hole is finished in nStrokes: its events. fn_800D2B08's value (above 3 for the
+// drive-distance events) less the strokes picks events 8 to 11 (0 to 3 under it); a hole in one
+// is event 12 or 13, and 14 when bit 9 of nC3C is already set.
+void fn_800FB204(int nPlayer, int nStrokes) {
+    int nPar;
+    int nUnder;
+    nPar = fn_800D2B08();
+    nUnder = nPar - nStrokes;
+    if (nUnder >= 0 && (gPlayers[nPlayer].nC3C & 0xC00)) {
+        fn_800FAAB8(nPlayer, 0x17);
+    }
+    gPlayers[nPlayer].nC3C &= ~0xC00;
+    if (nStrokes == 1) {
+        if (nPar == 3) {
+            fn_800FAAB8(nPlayer, 0xC);
+        } else {
+            fn_800FAAB8(nPlayer, 0xD);
+        }
+        if (gPlayers[nPlayer].nC3C & 0x200) {
+            fn_800FAAB8(nPlayer, 0xE);
+        } else {
+            gPlayers[nPlayer].nC3C |= 0x200;
+        }
+    } else if (nUnder >= 0) {
+        switch (nUnder) {
+        case 0:
+            fn_800FAAB8(nPlayer, 8);
+            break;
+        case 1:
+            fn_800FAAB8(nPlayer, 9);
+            break;
+        case 2:
+            fn_800FAAB8(nPlayer, 0xA);
+            break;
+        case 3:
+            fn_800FAAB8(nPlayer, 0xB);
+            break;
+        }
+    }
+}
+
+// A holed shot's length (from vPreShot to the ball): a putt of 20 feet or more is event 17; any
+// other shot of 10 yards or more is event 18, or 19 from 60 yards.
+void fn_800FB35C(int nPlayer) {
+    f32 fDist = fn_800FB41C(gPlayers[nPlayer].vPreShot, (f32*)gPlayers[nPlayer].ball);
+    if (gPlayers[nPlayer].nClub == CLUB_PUTTER) {
+        if (fDist >= 20.0f / 3.0f) {
+            fn_800FAAB8(nPlayer, 0x11);
+        }
+    } else if (fDist >= 10.0f) {
+        if (fDist >= 60.0f) {
+            fn_800FAAB8(nPlayer, 0x13);
+        } else {
+            fn_800FAAB8(nPlayer, 0x12);
+        }
+    }
+}
+
+// The distance from pA to pB on the ground (x and z).
+f32 fn_800FB41C(f32* pA, f32* pB) {
+    f32 v[4];
+    fn_800FE190(pB, pB, v);     // EA bug: pB less itself, so the distance is always 0
+    return fn_80009680(v[0] * v[0] + v[2] * v[2]);
+}
+
 void fn_800FD6A0(int nPlayer) {
 }
 
@@ -812,4 +879,18 @@ void fn_800FE138(s32 p0, s32 p1) {
 
 void fn_800FE164(s32 p0, s32 p1) {
     fn_800A7664(4, p0, p1);
+}
+
+// Four floats of pA less pB into pOut.
+asm void fn_800FE190(register f32* pA, register f32* pB, register f32* pOut) {
+    nofralloc
+    psq_l  f0, 0(pA), 0, 0
+    psq_l  f1, 8(pA), 0, 0
+    psq_l  f2, 0(pB), 0, 0
+    psq_l  f3, 8(pB), 0, 0
+    ps_sub f2, f0, f2
+    ps_sub f3, f1, f3
+    psq_st f2, 0(pOut), 0, 0
+    psq_st f3, 8(pOut), 0, 0
+    blr
 }
