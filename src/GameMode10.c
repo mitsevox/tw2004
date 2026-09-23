@@ -34,9 +34,7 @@ extern f32 lbl_80192844[];
 extern f32 lbl_80192880[];
 extern u8 gNumPlayersSetUp;
 
-void  fn_800E1480(int nHole);
 void  fn_800E14E0(int nCourse);
-void  fn_800E1260(int nPreset);
 void  fn_800E1404(int nHole);
 void  fn_800ED6F8(f32 x0);
 void  Wind_Set(int nDir, f32 fSpeed);

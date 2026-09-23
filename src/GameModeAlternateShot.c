@@ -7,13 +7,8 @@
 
 void  Mem_cpy(void* pDst, void* pSrc, int nBytes);   // memcpy
 CourseInfo* fn_8000C594(void);
-u8    fn_800E1BBC(void);
 u8    fn_800EC550(void);
-void  fn_800E2BA4();
-void  fn_800E45C0();
 int   fn_800D37BC(int nWinner, int nLoser, int nMargin, int* pPrize);
-void  fn_800D3548(int nPlayer, int nMoney, int a);
-void  fn_800E4364(u32 nQueue, int a, int b, int c);
 void  fn_80125910(int a);
 extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
 extern u8* gpSaveData;
@@ -329,7 +324,8 @@ u8 fn_800E723C(u8 bCheck) {
             return 1;
         }
         if (!bCheck) {
-            fn_800E2BA4(gpGame->nD8++);
+            gpGame->nD8++;
+            fn_800E2BA4();
             CLEAR_ROUNDS(PLAYER_AT);
             fn_800E45C0();
         }
@@ -373,7 +369,8 @@ u8 fn_800E7474(u8 bCheck) {
         fn_800E2BA4();
         CLEAR_ROUNDS(PLAYER);
         gpGame->bD4 = 1;
-        fn_800E45C0(gpGame->nD8++);
+        gpGame->nD8++;
+        fn_800E45C0();
         return 1;
     }
     return 0;

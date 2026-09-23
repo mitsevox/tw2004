@@ -5,13 +5,8 @@
 #include "golfer.h"
 #include "game.h"
 
-void  GM_EndOfGolferTurn(int nPlayer);
-void  fn_800E1480(int nHole);
-void  fn_800E3C0C(int a);
-void  fn_800E4D94(u8 bHuman);
 void  fn_800E4D88(void);
 void  fn_800E3EE0(void);
-void  fn_800E4C20(u8 bHuman);
 void  fn_80125910(int a);
 void* fn_80017028(int nView);
 void  fn_80063B98(void* pView, f32* pVec, f32 f);

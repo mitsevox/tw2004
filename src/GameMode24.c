@@ -3,6 +3,7 @@
 // (the mode 5 code in GameMode5.c runs them) on its date, by the console's clock.
 
 #include "golfer.h"
+#include "game.h"
 
 void UStream_UnregisterHandler();
 void fn_8000E790();
@@ -56,8 +57,6 @@ void  fn_800EC544(void* pList, s32 n);
 void  fn_800EAE38(s32 i);
 void  fn_800EAF7C(void);
 int   fn_800EC558(void);
-void  fn_800D3548(int nPlayer, int nMoney, s32* p);
-void  fn_800E4364(u32 nQueue, int a, int b, int c);
 void  fn_800D7770(int nPlayer, u8* pFlag);
 u32   Rand_Next(int nStream);
 void  fn_8011E020(s32* pYear, s32* pMonth, s32* pDay, s32* a, s32* b, s32* c, s32* d);

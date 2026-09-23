@@ -1,8 +1,8 @@
 // CharAnim.c (our name): starting the golfer's animations by id.
 
 #include "golfer.h"
+#include "game.h"
 
-int  Hole_ScoreAfterTapIn(int nPlayer);
 void fn_8001C7FC(u8* pChar, int nStyle);   // the character's animation style (+0x16E0)
 void CharacterState_AddSKABlendData(u8* pChar, int a, int nGroup, void* pfn, int c, int d, f32 f1, f32 f2, f32 f3, f32 f4, f32 f5);
 void fn_80072ACC(void);

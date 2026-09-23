@@ -12,11 +12,8 @@ void  fn_8006A8B0(void);
 void  fn_800E0AC4(int a);
 void  fn_800E0A98(int a);
 void  fn_800E5474(int a);
-void  fn_800E4204(void);
-u8    fn_800E4254(int nPlayer);
 void  EVENT_Trigger(int nPlayer, int nEvent, int a, int b);
 void  fn_800A72EC(int a, int b);
-void  GameEffects_ResetGameEffectSettings(void);
 
 extern u8  lbl_80282281;                    // the end-of-round screen is up
 extern u8  lbl_80282282;                    // the end-of-hole screen is up
@@ -140,9 +137,6 @@ extern UIQueueItem lbl_80202B94[10];        // queue 11 (lbl_80282288)
         (q)[i].c = c;       \
     }
 
-void  fn_800E4D94(u8 bHuman);
-void  fn_800E4C20(u8 bHuman);
-void  fn_800E58B4(int a);
 void  fn_800E5C08(int a, u8* p);
 void  fn_800E56D0(int a, int b, int c);
 void  fn_800E5698(int a, int b, int c);
@@ -162,12 +156,10 @@ typedef struct Vec4 { f32 x, y, z, w; } Vec4;
 extern Vec4 lbl_80184D90;
 extern u8   lbl_80281640[8];
 
-void  fn_800E5714(int a);
 void  fn_80062CE0(int a);
 u8    fn_80095430(int a);
 void  fn_80095444(int a);
 void  fn_800953C8(int a);
-void  fn_800DC9D4(int a);
 void  fn_80125814(int a);
 u8    fn_800EC550(void);
 void  fn_800ECBE4(void);
@@ -176,7 +168,6 @@ void  fn_80101EDC(void);
 u8    fn_800E5C84(void);
 void  fn_800A7350(int a);
 void  fn_8009EF98(void);
-u8    fn_800E39F0(void);
 void  fn_800A76E4(void);
 void  fn_800E1018(int nPlayer, int nHole);
 void  fn_8006F4B4(void);
@@ -590,8 +581,8 @@ int fn_800E46B4(void) {
     return bBusy;
 }
 
-int fn_800E4BF8(void) {
-    u8 b = 0;
+u8 fn_800E4BF8(void) {
+    int b = 0;
     if (lbl_80282282 || lbl_80282281) {
         b = 1;
     }

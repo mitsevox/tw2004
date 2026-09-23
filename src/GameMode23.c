@@ -76,7 +76,6 @@ typedef struct Profile {
 extern u8  lbl_80281670[];
 extern s32 lbl_80282338;
 s32  fn_801190D8(s32 a);
-void fn_800E4364(u32 nQueue, s32 a, s32 b, s32 c);
 s32  fn_800EFBD0(s32 i);
 u8   fn_800EF83C(u16 nDate, s32* pId, s32* pRound);
 void fn_800D2714(u16* pDate, s32* pDay, s32* pMonth, s32* pYear);

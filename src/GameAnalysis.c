@@ -6,7 +6,6 @@
 
 u8    fn_800EC550(void);
 u32   Rand_Next(int nStream);
-int   fn_800D2AD8(int nHole);               // a hole's par
 extern u8 gNumPlayersSetUp;                 // 0x80281D48 (Golfer.c)
 extern u8 lbl_80203138[14];                 // the tips already shown (GameMessages.c)
 

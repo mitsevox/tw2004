@@ -33,10 +33,8 @@ extern s32 lbl_802823B4;                    // the points multiplier from bonuse
 extern s32 lbl_802823B8;                    // the seconds added by the last shot
 extern s32 lbl_802823BC;                    // the points of the last shot
 
-void  fn_800E1480(int nHole);
 u32   Rand_Next(int nStream);
 void  Mem_cpy(void* pDst, void* pSrc, int nBytes);
-f32   fn_800D0550(int nPlayer);             // the shot's length
 void  AI_DefaultTarget(int nPlayer);
 void  fn_800A624C(void);
 void  fn_800A6278(void);
@@ -45,13 +43,6 @@ void  fn_800A62E0(void);
 void  fn_800A6358(void);
 void  fn_800A63D0(void);
 void  fn_800A30E4(int nKind, u8* pBall, int nPlayer, int a, f32 f);
-s32   fn_800D6A70(s32 nPoints, int nPlayer, int a, int b, int c, int d);
-int   fn_800D7220(int nReward, int a, s32* pOut);
-void  fn_800D3548(int nPlayer, int nMoney, s32* p);
-u8    fn_800E2B40(int nPlayer, u8* pBall);
-void  fn_800E3C0C(int a);
-void  fn_800E53F0(int nMsg, int a, int b, int c);
-void  fn_800E58B4(int a);
 void  fn_800ED710(s32 p0);
 void  fn_800FF7DC(void);
 void  fn_80125910(int a);
@@ -451,7 +442,7 @@ void fn_800F6ED4(int nPlayer) {
             nMsg = 0x14;
         }
     }
-    if (fLength > gPlayers[nPlayer].nDDC && !fn_800E2B40(nPlayer, gPlayers[nPlayer].ball)) {
+    if (fLength > gPlayers[nPlayer].nDDC && !fn_800E2B40(nPlayer, (Ball*)gPlayers[nPlayer].ball)) {
         gPlayers[nPlayer].nDDC = fLength;
     }
     if (nMsg != -1) {

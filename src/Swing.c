@@ -2097,7 +2097,6 @@ void  View_SetCamera(void* pView, int nCamera, int nPlayer, int nView);   // 0x8
 void  fn_800E3D38(int nPlayer, int a);
 void  Emotion_UpdatePlayerEmotion(int nPlayer);
 void  GM_DoPostShotInHoleUI(int nPlayer);
-void  fn_800E3C0C(int a);
 u8    fn_80063C90(void* pView);              // the camera is still moving
 void  fn_80063BF4(void* pView, f32 f, f32* pVec);
 void  GM_BumpBallForObstructions(void);
@@ -2201,8 +2200,6 @@ int fn_80062C1C(int nHandle) {
 f32 fn_80062C28(int nHandle) {
     return *(f32*)(nHandle + 0x184) - *(f32*)(nHandle + 0x17C);
 }
-
-void fn_800E58B4(int a);
 
 void fn_80062C38(void) {
     fn_800E58B4(7);
@@ -2519,8 +2516,6 @@ void STATEFUNC_PreShotExit(int nPlayer) {
 extern u8*  lbl_80281F78;                    // a game object: +0x1C0 non-zero enables camera 19
 extern u8   gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
 u8    fn_800C4650(View* pView, int nPlayer);
-void  fn_800E5714(int a);
-void  fn_800E5724(int nPlayer);
 void  fn_80017158(int nView);
 void  fn_800170C4(int nView, int a);
 void  fn_800C7178(View* pView, int nPlayer);
@@ -2595,7 +2590,6 @@ void STATEFUNC_ConcededInit(int nPlayer) {
 
 
 void  fn_80039344(View* pView, f32 f);
-void  fn_800DC9D4(int a);
 
 void STATEFUNC_GreenWatchRollExit(int nPlayer) {
     int nView;
@@ -2727,8 +2721,6 @@ void  GM_MovePlayerToBall(int nPlayer);
 void fn_80062BFC(int nHandle);
 void fn_80062BE8(int nHandle);
 void  fn_8001C804(int nPlayer, int a, int b);
-f32   fn_800D0478(int nPlayer);               // a distance (compared with 250 in Golfer_IsLucky)
-void  fn_800E4204(void);
 u8*   fn_80016CFC(int nView);
 void  Caddie_ApplyTip(int nPlayer);           // Golfer.c
 
@@ -2850,7 +2842,6 @@ void  fn_8006ACF8(int nPlayer, int a);
 void  fn_800DB714(int nPlayer);
 void fn_80062DC0(void* pView);
 void  fn_80050D2C(u8 bOn);                    // Ball.c: the second sim flag
-void  GM_EndOfGolferTurn(int nPlayer);
 extern Vec4 lbl_80183640;
 
 // State 12: the ball is away. In a replay with the kept ball unset, a special path; otherwise
@@ -2990,7 +2981,6 @@ void STATEFUNC_KneeCamUpdate(int nPlayer) {
 
 
 void  Caddie_Update(int nPlayer);             // Golfer.c
-void  GameEffects_ResetGameEffectSettings(void);
 void fn_80058FA4(int nPlayer);
 void  fn_80068AA8(int nPlayer);
 void  fn_800689D4(int nPlayer);
@@ -3875,7 +3865,6 @@ u8 fn_80058F5C(int nPlayer);              // the per-frame swing poll: the ball 
 void  fn_8006BB5C(int nPlayer);
 u8    fn_8004560C(void);
 u8    fn_800E430C(int nPlayer);
-u8    fn_800E53B8(void);
 u8    fn_800C6D28(void);
 void  fn_800C6DE4(void);
 u8    fn_800C6D64(void);
@@ -4166,7 +4155,6 @@ void STATEFUNC_SwingUpdate(int nPlayer) {
 
 
 u8    fn_800E46B4(void);
-u8    fn_800E4254(int nPlayer);
 void  GM_ReplaceOOBBall(int nPlayer);
 f32 fn_80062C28(int nHandle);
 void fn_80062B78(int nPlayer);

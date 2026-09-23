@@ -34,10 +34,8 @@ extern s8  lbl_80282384;                    // the leader's target
 extern s32 lbl_80282388;                    // the leader's rank (0 best .. 4)
 extern s32 lbl_8028238C;                    // the leader (5 = none)
 
-void  fn_800E1480(int nHole);
 u32   Rand_Next(int nStream);
 void  Mem_cpy(void* pDst, void* pSrc, int nBytes);
-f32   fn_800D0550(int nPlayer);             // the shot's length
 void  AI_DefaultTarget(int nPlayer);
 void  fn_800A6278(void);
 void  fn_800A62E0(void);
@@ -45,11 +43,6 @@ void  fn_800A6358(void);
 void  fn_800A6394(void);
 void  fn_800A640C(void);
 void  fn_800A30E4(int nKind, u8* pBall, int nPlayer, int a, f32 f);
-s32   fn_800D6A70(s32 nPoints, int nPlayer, int a, int b, int c, int d);
-int   fn_800D7220(int nReward, int a, s32* pOut);
-void  fn_800D3548(int nPlayer, int nMoney, s32* p);
-void  fn_800E3D90(void);
-void  fn_800E58B4(int a);
 void* fn_80017004(int nView);
 void  fn_8006434C(void* pView, f32* pPos, f32* pX, f32* pY, int a);
 void  fn_8006A8D4(void* pView, f32* pX, f32* pY);

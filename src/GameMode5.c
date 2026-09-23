@@ -75,11 +75,8 @@ void* fn_800951A0(u32 nSize, int nAlign, int a);
 void  Mem_cpy(void* pDst, void* pSrc, int nBytes);   // memcpy
 void  fn_80009E70(void* p);                 // free
 u32   Rand_Next(int nStream);
-void  fn_800E4364(u32 nQueue, int a, int b, int c);
 extern u8* gpSaveData;
 int   fn_800ED028(int i);
-void  GM_EndOfGolferTurn(int nPlayer);
-void  fn_800E5714(int a);
 s32   fn_800E1074();
 u8    fn_800F0818(void);
 void  fn_800F06DC(void);
@@ -97,21 +94,15 @@ extern s32 lbl_80282300;
 extern s32 lbl_80282304;
 extern s32 lbl_80282308;
 extern s32 lbl_8028230C;
-int   fn_800D2AD8(int nHole);               // a hole's par
 int   fn_800D2ABC(int nCourse, int nHole);  // a hole's par on a course
-void  fn_800E1260(int nPreset);
 void  fn_800E0B38(int nMode);
 void  fn_800F07C8(void);
-u8    fn_800E4BF8(void);
 int   fn_800D2B08(void);                    // the hole's par
-u8    fn_800E39F0(void);
 extern u8 gNumPlayersSetUp;                 // 0x80281D48 (Golfer.c)
 extern void (*lbl_80282328)(void);
 int   fn_800EC558(void);
 u8    fn_801025F4(void);
 s16   fn_800D2994();
-int   fn_800D7220(int nReward, int a, s32* pOut);
-void  fn_800D3548(int nPlayer, int nMoney, s32* p);
 u8    fn_800D9998(int nPlayer, int nAward);
 u8    fn_800D750C(int nPlayer, int nAward);
 extern u8 lbl_80200538[];                   // prize data: bonuses at +0x9E4 and +0xA24
@@ -126,7 +117,6 @@ typedef struct ChallengeSave {
 #define PROFILE_MEDAL(n, i) ((ChallengeSave*)(gpSaveData + (n) * 0x10600))->aMedal[i]
 #define PROFILE_STAMP(n, i) ((ChallengeSave*)(gpSaveData + (n) * 0x10600))->aStamp[i]
 int   fn_800ECF9C(int i);
-u8    fn_800E5110(void);
 void  Vec_Copy(f32* pSrc, f32* pDst);
 void fn_800EC544(Challenge* p0, s32 p1);
 extern u8 lbl_802822FC;

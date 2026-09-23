@@ -95,7 +95,6 @@ void   Ter_GetEnclosingGroundData(CourseInfo* pCourse, Ball* pBall, f32* pHeight
                    f32* pHeight2, SurfaceType** ppSurface2, f32* pNormal2);
 void   Ter_GetEnclosingGroundHeight(CourseInfo* pCourse, Ball* pBall, f32* pHeight, f32* pHeight2);
 int    fn_80050BEC(SurfaceType* pSurface);       // a surface's index
-u8     fn_800E2B40(int nPlayer, Ball* pBall);
 u8     fn_800B1B18(int nPlayer, f32* pTo, f32* pFrom, f32* pHit, f32* pNormal, s32* pWhat);
 u8     fn_80053E98(Ball* pBall, void* pObj, f32* pHit, f32* pNormal);
 u8     Physics_ProcessCollision(Ball* pBall, f32* pHit, f32* pNormal, SurfaceType* pSurface, s32 nWhat, f32* pFrac, f32 fTicks);

@@ -99,14 +99,12 @@ int   fn_800F20C0(int nPlayer);
 int   fn_800F1D34(int nPlayer);
 CourseInfo* fn_8000C594(void);
 void* fn_800CC190(CourseInfo* pCourse, f32* pPos);   // surface type under a point
-f32   fn_800D0478(int nPlayer);             // the ball's distance from the pin (yards)
 extern u8* gpSaveData;
 int   fn_800D8750(int a, int b, int c, u8* pProfile, int nPlayer);
 u8    fn_800DCB10(int nPlayer);
 u8    fn_800BCD24(int nPlayer);
 int   fn_800D0620(int nPlayer, int a, int b);
 int   fn_800D089C(int nPlayer, int a);
-int   Hole_ScoreAfterTapIn(int nPlayer);
 void  fn_800BD83C(int nSound, int a);
 void  fn_800A6DCC(int nMusic, int a);
 u32   fn_8003A950(int nCam, int a, s32* pKind, f32* pTime, s32* p3, s32* p4, s32* p5, int nPlayer);
@@ -793,7 +791,7 @@ u8 fn_800DC818(u8* pBall, int nPlayer, u8 bNext) {
 }
 
 // TW06: GameEffects_Pause (by position). Pauses or resumes a GameBreaker, with its sound events.
-void fn_800DC9D4(void) {
+void fn_800DC9D4(int a) {
     if (lbl_80202898.bGameBreaker) {
         if (lbl_80202898.bPaused) {
             lbl_80202898.bPaused = 0;

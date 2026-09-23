@@ -31,17 +31,11 @@ extern s32 lbl_802823A0;
 extern s32 lbl_802823A4;                    // the extra balls of the last shot
 extern s32 lbl_802823A8;                    // the points of the last shot
 
-void  fn_800E1480(int nHole);
 void  Mem_cpy(void* pDst, void* pSrc, int nBytes);
-f32   fn_800D0550(int nPlayer);             // the shot's length
 void  fn_800A62A4(void);
 void  fn_800A62E0(void);
 void  fn_800A6358(void);
 void  fn_800A30E4(int nKind, u8* pBall, int nPlayer, int a, f32 f);
-s32   fn_800D6A70(s32 nPoints, int nPlayer, int a, int b, int c, int d);
-int   fn_800D7220(int nReward, int a, s32* pOut);
-void  fn_800D3548(int nPlayer, int nMoney, s32* p);
-void  fn_800E58B4(int a);
 void  fn_800FF7DC(void);
 void  fn_80125910(int a);
 void  fn_800F19D4(void);

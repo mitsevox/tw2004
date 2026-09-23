@@ -7,14 +7,9 @@
 
 u8    Team_IsAllCPU(int nTeam);
 CourseInfo* fn_8000C594(void);
-u8    fn_800E1BBC(void);
 u8    fn_800EC550(void);
-void  fn_800E1480(int nHole);
 int   fn_800E1788(int nPlayer);             // the player's round total
-int   fn_800D2AD8(int nHole);               // a hole's par
 int   fn_800D3C7C(int nPlayer);             // the player's golfer
-void  fn_800D3548(int nPlayer, int nMoney, int a);
-void  fn_800E4364(u32 nQueue, int a, int b, int c);
 void  fn_80125910(int a);
 extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
 extern u8* gpSaveData;

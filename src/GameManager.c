@@ -9,7 +9,6 @@
 
 typedef struct View View;
 
-void  fn_800E58B4();
 void  fn_800E0A84(u8 v);
 s32   fn_800E1074();
 s32   fn_800E1434();
@@ -19,15 +18,12 @@ s32   fn_800D33F0();
 s32   fn_800E3BEC();
 s32   fn_800EADD8();
 s32   fn_800EDE78();
-f32   fn_800D0478(int nPlayer);             // the ball's distance from the pin (yards)
 int   fn_800E177C(void);
 void  fn_800E2470(void);
-void  fn_800E1480(int nHole);
 void  fn_8006F4B4(void);
 void  fn_800170C4(int nView, int a);
 void  fn_800E299C(void);
 void  Wind_Generate(void);
-void  GameEffects_ResetGameEffectSettings(void);
 void  fn_800E3B28(void);
 void  fn_800DA36C(void);
 void  GM_FlyByMode_Init(void);
@@ -35,7 +31,6 @@ void  fn_800D8D38(int nPlayer);
 void  EVENT_Trigger(int nPlayer, int nEvent, int a, int b);
 void  Caddie_Stop(void);
 void  fn_8001D7A4(int nHandle);
-void  fn_800E4204(void);
 u8    fn_800E0A90(int nPlayer);
 u8    fn_800E3A54(void);
 u8    fn_800E1CA8(void);
@@ -44,12 +39,8 @@ void  fn_800D9834(int nPlayer);
 void  fn_80125910(int a);
 u8    fn_8012591C(void);
 void  fn_80125854(int a);
-void  fn_800E4D94(int a);
-void  fn_800E4C20(int a);
-u8    fn_800E4BF8(void);
 void* fn_80017028(int nView);
 void  View_SetCamera(void* pView, int nCamera, int nPlayer, int nView);
-void  fn_800E3D90(void);
 void  fn_800E3D38(int nPlayer, int a);
 u8    fn_800EE470(void);
 void  fn_8011989C(int nPlayer, int nStrokes);
@@ -59,7 +50,6 @@ void  GM_EndOfGolferTurn_GameFinished(int nPlayer);
 void  GM_HoleFinished_GameNotFinished(int nPlayer);
 u8    GM_CheckForAIConcede(int nPlayer);
 
-u8    fn_800E2B40(int nPlayer, u8* pBall);
 SurfaceType* Ter_GetSupportingWorldMaterial(CourseInfo* pCourse, u8* pBall);
 u8    Ter_PointInFreeDropNetwork(u8* pBall);
 void  fn_800E4164(int nMessage, int nPlayer, f32 f);
@@ -78,7 +68,6 @@ u8    fn_800DA2AC(void);
 void  fn_800DAD54(void);
 u8    fn_800DA174(void);
 u8    fn_800DA1D4(void);
-void  fn_800E4364(int a, int b, int c, int d);
 u8    fn_800E2DB4(int nPlayer);
 void  fn_800D9458(int nPlayer);
 void  fn_800D4030(int nPlayer);
@@ -87,7 +76,6 @@ u8    fn_800E23B0(int nPlayer, int nStrokes);
 u8    fn_8008AC40(void);
 void  fn_800D9350(int nPlayer);
 int   fn_800D2B08(void);                    // the hole's par
-u8    fn_800E53B8(void);
 void  fn_800BB0A8(void);
 void  fn_800335F8(int a);
 void  fn_800A76E4(void);
@@ -116,15 +104,12 @@ f32   fn_800336E4(void);
 f32   fn_800336F4(void);
 void  GOLFERSTATE_Push(int nState, int nPlayer);
 void  fn_8001704C(int nView, int nPlayer);
-u8    fn_800E5110(void);
 u8    fn_800E415C(void);
 u8    fn_800E45CC(void);
 u8    fn_800E46B4(void);
 void  fn_800E2A88(void);
 void  fn_800E1018(int nPlayer, int nHole);
 void  fn_800C6C8C(void);
-void  fn_800E5714(int a);
-void  fn_800E5724(int nPlayer);
 void  fn_800E41C8(void);
 u8    Ter_PointInOOBNetwork(u8* pBall);
 
@@ -146,7 +131,6 @@ void  fn_80062D0C(int nPlayer);
 void  fn_80062B78(int nPlayer);
 void  fn_80062B74(int nPlayer);
 void  fn_80062B70(void);
-u8    fn_800E4254(int nPlayer);
 u8    Player_IsNotCPU(int nPlayer);
 void  fn_800E41D4(int nPlayer);
 void  fn_8006C300(int nPlayer);
@@ -175,7 +159,6 @@ void  Physics_Simulate(u8* pBall, int nTicks);
 void  fn_80050D2C(int a);
 void  fn_8006B2C4(int nPlayer, int a);
 u8    fn_800BB1F8(int nPlayer);
-int   Hole_ScoreAfterTapIn(int nPlayer);
 
 void  fn_8001DB04(int nHandle, f32* pOut);  // the golfer's position
 void  Ter_GetEnclosingGroundData(CourseInfo* pCourse, f32* pPos, f32* pHighA, SurfaceType** ppSurfA, f32* pNormA,
@@ -504,7 +487,7 @@ void GM_PlayerAddStroke(int nPlayer) {
 // that is reached. Any other shot resets the run of penalties.
 u8 GM_CheckForBallOOB(int nPlayer) {
     u8*          pBall = gPlayers[nPlayer].ball;
-    u8           bOut  = fn_800E2B40(nPlayer, pBall);
+    u8           bOut  = fn_800E2B40(nPlayer, (Ball*)pBall);
     SurfaceType* pSurf = Ter_GetSupportingWorldMaterial(*(CourseInfo**)(gPlayers[nPlayer].ball + 0x7C), pBall);
     u8           bDrop;
     Player*      p;

@@ -640,7 +640,6 @@ void Mem_cpy(void* pDst, void* pSrc, int nBytes);   // memcpy
 extern s8 gLuckOdds[8];                 // 0x802810B0  "1 in n" per player: 12 12 12 12
 u8   fn_80101D4C(int nPlayer);          // a CPU in game mode 11 is always lucky
 u8   fn_800DA234(void);                 // the current hole is the flagged one
-f32  fn_800D0478(int nPlayer);          // a distance, compared with 250
 
 // ---- luck -------------------------------------------------------------------------------------
 
