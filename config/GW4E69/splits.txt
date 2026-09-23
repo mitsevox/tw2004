@@ -567,11 +567,8 @@ unsorted/sweep_80048AC4.c:
 UKernel.c:
 	.text       start:0x80048AF4 end:0x800496E0
 
-unsorted/sweep_800496E0.c:
-	.text       start:0x800496E0 end:0x80049728
-
-unsorted/sweep_80049A14.c:
-	.text       start:0x80049A14 end:0x80049A54
+GoDynObjBase.c:
+	.text       start:0x800496E0 end:0x80049B40
 
 GoAnimalActors.c:
 	.text       start:0x80049B40 end:0x8004ABBC
