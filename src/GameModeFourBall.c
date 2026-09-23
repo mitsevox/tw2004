@@ -110,14 +110,12 @@ int fn_800E8FC8(int nTeam) {
     if (nTeam == 0) {
         b = 1;
     }
-    n = 9;
     if (gPlayers[a].nStrokes[nHole] + 1 < 9) {
         n = gPlayers[a].nStrokes[nHole] + 1;
+    } else {
+        n = 9;
     }
-    nBest = gPlayers[b].nStrokes[nHole] + 1;
-    if (n <= nBest) {
-        nBest = n;
-    }
+    nBest = n <= gPlayers[b].nStrokes[nHole] + 1 ? n : gPlayers[b].nStrokes[nHole] + 1;
     if (Player_IsHoled(a)) {
         nBest = nBest <= gPlayers[a].nStrokes[nHole] ? nBest : gPlayers[a].nStrokes[nHole];
     }
@@ -156,8 +154,7 @@ void fn_800E90FC(void) {
 // green first) whose team is still playing.
 s32 fn_800E9178(int nPlayer) {
     TeeOrder order;
-    int nLead;
-    int h;
+    s32* pOrder;        // fake match: the within-team compare reads order.a through a pointer
     int w;
     int t;
     int i;
@@ -165,11 +162,14 @@ s32 fn_800E9178(int nPlayer) {
     int nHole;
     f32 fBest;
     int nBest;
+    int h;
+    int nLead;
     f32 dx;
     f32 dz;
     f32 d;
     nLead = 0;
     order = lbl_80184DC0;
+    pOrder = order.a;
     for (h = 0; h < Game_CurHoleIndex(); h++) {
         if (gpGame->bHoleSelected[h]) {
             if (gPlayers[0].nModePoints[h] != 0) {
@@ -188,16 +188,16 @@ s32 fn_800E9178(int nPlayer) {
                 order.a[1] = order.a[3];
                 order.a[3] = t;
             }
-            t = order.a[0];
-            if (gPlayers[order.a[1]].nStrokes[h] < gPlayers[t].nStrokes[h]) {
+            if (gPlayers[order.a[1]].nStrokes[h] < gPlayers[pOrder[0]].nStrokes[h]) {
+                t = order.a[0];
                 order.a[0] = order.a[1];
                 order.a[1] = t;
             }
         }
     }
-    for (i = 0; i < gNumPlayersSetUp; i++) {
-        if (nPlayer != order.a[i] && Player_OnTee(order.a[i]) && !fn_800E8E24(fn_800E947C(order.a[i]))) {
-            return order.a[i];
+    for (h = 0; h < gNumPlayersSetUp; h++) {
+        if (nPlayer != order.a[h] && Player_OnTee(order.a[h]) && !fn_800E8E24(fn_800E947C(order.a[h]))) {
+            return order.a[h];
         }
     }
     pCourse = fn_8000C594();

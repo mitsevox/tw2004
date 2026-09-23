@@ -5,13 +5,12 @@
 #include "golfer.h"
 #include "ball.h"
 #include "game.h"
+#include "engine.h"
 
 void* fn_800D3C1C(void);
 s32   fn_800D3D64(void* p, int nHole);      // a hole's skin value
-u8    fn_801025F4(void);
 void  fn_80102704(void);
 void  fn_80102874(void);
-void  fn_80125854(int a);
 extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
 extern u8* gpSaveData;
 extern s32 lbl_80282278;                    // the player whose turn it is

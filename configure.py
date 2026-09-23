@@ -138,6 +138,23 @@ config = ProjectConfig()
 config.version = str(args.version)
 version_num = VERSIONS.index(config.version)
 
+# In a git worktree (".git" is a file), use the main checkout's downloaded tools instead of
+# downloading into build/: the worktrees' build tool folders are links to the main checkout, and a
+# download there would rewrite files other builds are using.
+if Path(".git").is_file():
+    import subprocess
+
+    _common = subprocess.run(
+        ["git", "rev-parse", "--path-format=absolute", "--git-common-dir"],
+        capture_output=True, text=True,
+    ).stdout.strip()
+    _main_build = Path(_common).parent / "build"
+    for _attr, _rel in (("dtk", "tools/dtk.exe"), ("objdiff", "tools/objdiff-cli.exe"),
+                        ("sjiswrap", "tools/sjiswrap.exe"), ("compilers", "compilers"),
+                        ("binutils", "binutils")):
+        if getattr(args, _attr) is None and (_main_build / _rel).exists():
+            setattr(args, _attr, _main_build / _rel)
+
 # Apply arguments
 config.build_dir = args.build_dir
 config.dtk_path = args.dtk
@@ -814,7 +831,7 @@ config.libs = [
             Object(Matching, "GameUI.c"),
             Object(Matching, "GameMessages.c"),
             Object(Matching, "GameAnalysis.c"),
-            Object(NonMatching, "GameModeAlternateShot.c"),
+            Object(Matching, "GameModeAlternateShot.c"),
             Object(Matching, "GameModeBattle.c"),
             Object(NonMatching, "GameModeBestBall.c"),
             Object(NonMatching, "GameModeFourBall.c"),
@@ -823,7 +840,7 @@ config.libs = [
             Object(Matching, "GameMode9.c"),
             Object(NonMatching, "GameMode23.c"),
             Object(NonMatching, "GameMode24.c"),
-            Object(Matching, "GameMode10.c"),
+            Object(Matching, "GameModeReplay.c"),
             Object(Matching, "GameTargets.c"),
             Object(Matching, "GameMode14.c"),
             Object(Matching, "GameMode15.c"),
@@ -844,7 +861,6 @@ config.libs = [
             Object(Matching, "unsorted/sweep_80069428.c"),
             Object(Matching, "unsorted/sweep_80079E44.c"),
             Object(Matching, "unsorted/sweep_800A75F4.c"),
-            Object(Matching, "unsorted/sweep_800C6CCC.c"),
             Object(Matching, "unsorted/sweep_80105574.c"),
             Object(Matching, "unsorted/sweep_8010BF3C.c"),
             Object(Matching, "unsorted/sweep_801174B8.c"),
@@ -907,7 +923,6 @@ config.libs = [
             Object(Matching, "unsorted/sweep_800B64D8.c"),
             Object(Matching, "unsorted/sweep_800B9178.c"),
             Object(Matching, "unsorted/sweep_800B9808.c"),
-            Object(Matching, "unsorted/sweep_800C708C.c"),
             Object(Matching, "unsorted/sweep_80105264.c"),
             Object(Matching, "unsorted/sweep_8010A4E8.c"),
             Object(Matching, "unsorted/sweep_801127C4.c"),
@@ -944,7 +959,6 @@ config.libs = [
             Object(Matching, "unsorted/sweep_800ADF6C.c"),
             Object(Matching, "unsorted/sweep_800B6214.c"),
             Object(Matching, "unsorted/sweep_800B9B48.c"),
-            Object(Matching, "unsorted/sweep_800C6E88.c"),
             Object(Matching, "unsorted/sweep_8010645C.c"),
             Object(Matching, "unsorted/sweep_801097FC.c"),
             Object(Matching, "unsorted/sweep_8010F978.c"),
@@ -1162,22 +1176,6 @@ config.libs = [
             Object(Matching, "unsorted/sweep_800BA6CC.c"),
             Object(Matching, "unsorted/sweep_800BA700.c"),
             Object(Matching, "unsorted/sweep_800BCB74.c"),
-            Object(Matching, "unsorted/sweep_800C44A8.c"),
-            Object(Matching, "unsorted/sweep_800C44F4.c"),
-            Object(Matching, "unsorted/sweep_800C5FE4.c"),
-            Object(Matching, "unsorted/sweep_800C6CB0.c"),
-            Object(Matching, "unsorted/sweep_800C6D64.c"),
-            Object(Matching, "unsorted/sweep_800C6D80.c"),
-            Object(Matching, "unsorted/sweep_800C6D9C.c"),
-            Object(Matching, "unsorted/sweep_800C6DE4.c"),
-            Object(Matching, "unsorted/sweep_800C6DFC.c"),
-            Object(Matching, "unsorted/sweep_800C6E14.c"),
-            Object(Matching, "unsorted/sweep_800C6E2C.c"),
-            Object(Matching, "unsorted/sweep_800C6E44.c"),
-            Object(Matching, "unsorted/sweep_800C7100.c"),
-            Object(Matching, "unsorted/sweep_800C72F0.c"),
-            Object(Matching, "unsorted/sweep_800C7394.c"),
-            Object(Matching, "unsorted/sweep_800C741C.c"),
             Object(Matching, "unsorted/sweep_800CCA40.c"),
             Object(Matching, "unsorted/sweep_800CCEA0.c"),
             Object(Matching, "unsorted/sweep_800CE128.c"),
@@ -1267,7 +1265,6 @@ config.libs = [
             Object(Matching, "unsorted/sweep_80098350.c"),
             Object(Matching, "unsorted/sweep_8009A344.c"),
             Object(Matching, "unsorted/sweep_8009A844.c"),
-            Object(Matching, "unsorted/sweep_800BEF28.c"),
             Object(Matching, "unsorted/sweep_8011EE4C.c"),
             Object(Matching, "unsorted/sweep_80012868.c"),
             Object(Matching, "unsorted/sweep_80012B2C.c"),
@@ -1534,11 +1531,6 @@ config.libs = [
             Object(Matching, "unsorted/sweep_800BA0E4.c"),
             Object(Matching, "unsorted/sweep_800BBADC.c"),
             Object(Matching, "unsorted/sweep_800BD7D0.c"),
-            Object(Matching, "unsorted/sweep_800BDA04.c"),
-            Object(Matching, "unsorted/sweep_800BDBA4.c"),
-            Object(Matching, "unsorted/sweep_800BF094.c"),
-            Object(Matching, "unsorted/sweep_800C06C8.c"),
-            Object(Matching, "unsorted/sweep_800C7178.c"),
             Object(Matching, "unsorted/sweep_800C8108.c"),
             Object(Matching, "unsorted/sweep_800C9EFC.c"),
             Object(Matching, "unsorted/sweep_800CB550.c"),
@@ -1664,8 +1656,6 @@ config.libs = [
             Object(Matching, "unsorted/sweep_800B9930.c"),
             Object(Matching, "unsorted/sweep_800BA080.c"),
             Object(Matching, "unsorted/sweep_800BB1F8.c"),
-            Object(Matching, "unsorted/sweep_800C44CC.c"),
-            Object(Matching, "unsorted/sweep_800C6604.c"),
             Object(Matching, "unsorted/sweep_80108300.c"),
             Object(Matching, "unsorted/sweep_80109500.c"),
             Object(Matching, "unsorted/sweep_8010BEC4.c"),
@@ -1750,7 +1740,6 @@ config.libs = [
             Object(Matching, "unsorted/sweep_800B223C.c"),
             Object(Matching, "unsorted/sweep_800B58B4.c"),
             Object(Matching, "unsorted/sweep_800BB1A8.c"),
-            Object(Matching, "unsorted/sweep_800C72DC.c"),
             Object(Matching, "unsorted/sweep_800CD7CC.c"),
             Object(Matching, "unsorted/sweep_800D27CC.c"),
             Object(Matching, "unsorted/sweep_800D2ABC.c"),
@@ -2111,10 +2100,6 @@ config.libs = [
             Object(Matching, "unsorted/sweep_800B6CD0.c"),
             Object(Matching, "unsorted/sweep_800BAA4C.c"),
             Object(Matching, "unsorted/sweep_800BB4B0.c"),
-            Object(Matching, "unsorted/sweep_800C4518.c"),
-            Object(Matching, "unsorted/sweep_800C6C8C.c"),
-            Object(Matching, "unsorted/sweep_800C7080.c"),
-            Object(Matching, "unsorted/sweep_800C70F8.c"),
             Object(Matching, "unsorted/sweep_800D1D30.c"),
             Object(Matching, "unsorted/sweep_800D29E8.c"),
             Object(Matching, "unsorted/sweep_801020BC.c"),
@@ -2309,7 +2294,6 @@ config.libs = [
             Object(Matching, "unsorted/sweep_800B7684.c"),
             Object(Matching, "unsorted/sweep_800BB0A8.c"),
             Object(Matching, "unsorted/sweep_800BCD50.c"),
-            Object(Matching, "unsorted/sweep_800C7138.c"),
             Object(Matching, "unsorted/sweep_800CCA1C.c"),
             Object(Matching, "unsorted/sweep_800CE164.c"),
             Object(Matching, "unsorted/sweep_800CEE88.c"),

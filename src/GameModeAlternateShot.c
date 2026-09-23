@@ -112,9 +112,10 @@ int fn_800E6B08(int nTeam) {
     if (nTeam == 0) {
         a = 0;
     }
-    n = 9;
     if (gPlayers[a].nStrokes[nHole] + 1 < 9) {
         n = gPlayers[a].nStrokes[nHole] + 1;
+    } else {
+        n = 9;
     }
     if (Player_IsHoled(a)) {
         n = n <= gPlayers[a].nStrokes[nHole] ? n : gPlayers[a].nStrokes[nHole];
@@ -192,10 +193,10 @@ s32 fn_800E6C8C(int nPlayer) {
             }
         }
     }
-    for (i = 0; i < gNumPlayersSetUp; i++) {
-        if (nPlayer != order.a[i] && Player_OnTee(order.a[i]) && fn_800E6A98(order.a[i]) &&
-            !fn_800E69CC(fn_800E6AF8(order.a[i]))) {
-            return order.a[i];
+    for (h = 0; h < gNumPlayersSetUp; h++) {
+        if (nPlayer != order.a[h] && Player_OnTee(order.a[h]) && fn_800E6A98(order.a[h]) &&
+            !fn_800E69CC(fn_800E6AF8(order.a[h]))) {
+            return order.a[h];
         }
     }
     pCourse = fn_8000C594();
