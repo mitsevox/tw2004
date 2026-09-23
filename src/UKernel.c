@@ -23,7 +23,6 @@ void fn_800EADDC(void* pObj);
 void fn_80048B70(void* p);
 void fn_80048BDC(UStreamObject* pObject);
 s32  fn_800490B8(DynObjSetup* pSetup);
-void fn_800490EC(void);
 
 // Memory for an object of nSize bytes: a node of the small or the large pool while one is free,
 // else from the heap.

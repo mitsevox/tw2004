@@ -280,7 +280,6 @@ s16  fn_80105610(int nAsset);           // } asset)
 s32  fn_80105C00(void);                 // how many assets there are
 u8   fn_80105C30(void);                 // the Create-A-Player database is allocated
 char* fn_801064EC(int nCategory);       // a category's name
-int  stricmp(const char* a, const char* b);           // 0x8015F844 (MSL): strcmp ignoring case
 
 void FE_MakeMoviePath(char* pName, char* pPath);        // "data/movies/<name>.NGC"
 void FE_MakeCameoMoviePath(char* pName, char* pPath);   // "data/movies/cameos/<name>.NGC"

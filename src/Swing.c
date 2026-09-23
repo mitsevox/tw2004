@@ -6,6 +6,7 @@
 #include "ball.h"
 #include "game.h"
 #include "engine.h"
+#include "dynobj.h"
 
 // The swing module's state; only the tuning values read here. Set up in Swing_Init.
 typedef struct SwingState {
@@ -141,7 +142,6 @@ extern u8            lbl_80281E11;
 extern u8            lbl_80281E12;
 extern Vec4          lbl_80183690;          // 0, 0, 0, 0.5 (assigned, not an initialiser: as one,
                                                 //   STATEFUNC_RemoveBallExit drops to 42.5%)
-extern u8*           lbl_80281DA0;               // per player, 0x104 bytes each
 extern f32           gRealBallRadiusIn;          // 0x80283300  0.84: a real golf ball, in inches
 extern Vec4          lbl_80183620;          // 0, 0, 0, 0.5 (assigned)
 
@@ -3399,13 +3399,13 @@ void STATEFUNC_PreShotUpdate(int nPlayer) {
     Vec4    vOffset = {0.0f, 0.0f, 0.0f, 0.5f};
     u8      bInHand = 0;
     View*   pV;
-    u8*     pSlot;
+    GoDynObjPlayerA* pSlot;
     int     nSteps, i;
     s32*    pState;
     f32     vHand[4];
 
     pV    = fn_80017028(gPlayers[nPlayer].nView[0]);
-    pSlot = lbl_80281DA0 + nPlayer * 0x104;
+    pSlot = &lbl_80281DA0->aA[nPlayer];
     if (pV->nCurCamera != 11 && pV->nCurCamera != 0 && gpGame->pfn238(nPlayer)) {
         GOLFERSTATE_Switch(GS_SHOT_SETUP, nPlayer);
         return;
@@ -3445,7 +3445,7 @@ void STATEFUNC_PreShotUpdate(int nPlayer) {
             fn_80047EF0(&gPlayers[nPlayer].ball, nPlayer, 0);
         } else {
             Character_GetBallOnFingerPosition(gPlayers[nPlayer].pChar, gPlayers[nPlayer].ball.vPos);
-            fn_8001DA04(gPlayers[nPlayer].pChar, pSlot + 0x30, pSlot + 0x50);
+            fn_8001DA04(gPlayers[nPlayer].pChar, pSlot->a30, pSlot->a50);
             bInHand = 1;
         }
     } else if (gPlayers[nPlayer].ball.nLie == 0) {

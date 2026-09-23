@@ -197,6 +197,53 @@ LAYOUT_ASSERT(DynObjSlot, 0xC);
 
 extern DynObjSlot lbl_801D5228[32];
 
+// GoDynObj.c's two records per player (our names; 0x104 and 0x100 bytes, GoDynObjMgr.aA and aB).
+typedef struct GoDynObjPlayerA {
+    u8   unk0[0x30];
+    u8   a30[0x20];             // 0x30  } what Swing.c's STATEFUNC_PreShotUpdate hands fn_8001DA04
+    u8   a50[0x20];             // 0x50  }
+    u8   b70;                   // 0x70  set by fn_8004816C
+    u8   unk71[0xF8 - 0x71];
+    u8   bF8;                   // 0xF8  0 at setup
+    u8   unkF9[0x104 - 0xF9];
+} GoDynObjPlayerA;
+LAYOUT_ASSERT(GoDynObjPlayerA, 0x104);
+
+typedef struct GoDynObjPlayerB {
+    u8   unk0[0xF0];
+    DynObj* pF0;                // 0xF0  an object, given up by fn_80047BC0
+    u8   bF4;                   // 0xF4  pF0 is in use
+    u8   unkF5[0x100 - 0xF5];
+} GoDynObjPlayerB;
+LAYOUT_ASSERT(GoDynObjPlayerB, 0x100);
+
+// GoDynObj.c's state (0xAB0 bytes, lbl_80281DA0, allocated by fn_800461A8): per-player records
+// and objects, and the models of the 'TEO ' stream objects (fn_80046288 makes them).
+typedef struct GoDynObjMgr {
+    GoDynObjPlayerA aA[5];      // 0x000
+    GoDynObjPlayerB aB[5];      // 0x514
+    DynObj* apPlayer[5];        // 0xA14  one object per player (fn_80047B6C gives it up)
+    DynObj* apRing[10];         // 0xA28  ten objects used in turn ...
+    s32  nRing;                 // 0xA50  ... the next one
+    UObject* pTeo10000;         // 0xA54  'TEO ' 10000
+    UObject* apTeo10030[4];     // 0xA58  'TEO ' 10030..10033
+    UObject* apTeo10040[4];     // 0xA68  'TEO ' 10040..10043
+    UObject* apTeo10020[3];     // 0xA78  'TEO ' 10020..10022, only with fn_800E39F0
+    UObject* apTeo10006[4];     // 0xA84  'TEO ' 10006..10009, only with fn_800E39F0
+    f32  fA94;                  // 0xA94
+    f32  fA98;                  // 0xA98
+    f32  fA9C;                  // 0xA9C
+    f32  fAA0;                  // 0xAA0
+    f32  fAA4;                  // 0xAA4
+    f32  fAA8;                  // 0xAA8
+    f32  fAAC;                  // 0xAAC
+} GoDynObjMgr;
+LAYOUT_ASSERT(GoDynObjMgr, 0xAB0);
+
+extern GoDynObjMgr* lbl_80281DA0;
+extern s32  lbl_80187D38[4];            // GoDynObj.c: each player's partner in game mode 21
+extern char lbl_80187B98[27][13];       // GoDynObj.c: 27 names (fn_800484F4 finds one)
+
 // UKernel.c's list of the objects, first and last, the last id given out (DynObj.n134), a bit
 // mask of the used entries of lbl_801D5228 (fn_80049230; 16 at most), and two node pools (400-
 // and 528-byte nodes).
@@ -211,9 +258,12 @@ extern UMemPool* lbl_80281DA8;
 DynObj* fn_80048E44(void);                                  // the first object
 DynObj* fn_80048E4C(int nId);                               // the object with this id, or NULL
 void fn_80048FEC(DynObj* pObj);                             // adds it at the end of the list
+void fn_800490EC(void);                                     // sweeps out the objects given up
 void fn_800491C4(DynObj* pObj);
 void fn_80049514(DynObj* pObj, DynObjSetup* pSetup);    // type 0's message 2
 void fn_800486F4(UObject* pObj, UObjModel* pModel, u32 uFlags);
+UObject* fn_80048808(UObjModel* pModel);
+void fn_80048860(UObject* pObj);
 void fn_80048804(UObject* pObj);
 void fn_80048894(UObject* pObj);
 
