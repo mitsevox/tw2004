@@ -6,12 +6,18 @@
 #include "game_types.h"
 #include "charstate.h"
 #include "frontend/fe.h"
+#include "game/frontend.h"
 
 s32  fn_800CCA40(Skin* pSkin);          // SkinPart.c: how many choices aParts[3] holds
 s32  fn_800CCEA0(Skin* pSkin);          // SkinPart.c: and aSets[3]
 
 // This file, in address order.
+void fn_80103920(void);
+void fn_80103EFC(CrAPAsset* pAsset);
+void FE_CrAP_TurnOnAsset(CrAPAsset* pAsset);
+int  fn_80104AF4(s16 nPart, int n);     // the category of a part's entry n (-1 or 0x40: none)
 int  fn_80104F7C(CrAPAsset* pAsset);
+int  fn_80105140(s16 nPart);
 void fn_80105188(UStreamObject* pObject);
 void fn_801051F4(UStreamObject* pObject);
 void fn_80105240(void);
@@ -19,6 +25,58 @@ void fn_80105B80(CrAPAsset* pAsset, char* pName);
 void fn_80105DAC(void);
 void fn_80105EFC(void);
 u8   fn_801061F8(s16 nPart, int nCategory, int nWanted);
+void fn_80106D24(CrAPAsset* pAsset, Skin* pSkin);
+void fn_80106DA0(CrAPAsset* pAsset, Skin* pSkin);
+int  fn_8010766C(MsgArg* pArg, char* sz);
+
+// UISScreen.c's sender, with the front end's view of its arguments (as GameMessages.c declares it;
+// uistudio.h has UIStudio* and const s32*, and game/frontend.h cannot be included with it).
+void fn_8016B09C(void* pHandler, int nMsg, int nArgs, MsgArg* pArgs);
+
+// Free the database: its stream objects, the database and its tables.
+void fn_80103A64(void) {
+    if (lbl_80282464 != NULL) {
+        fn_80009E70(lbl_80282464);
+    }
+    if (lbl_80282468 != NULL) {
+        fn_80009E70(lbl_80282468);
+    }
+    lbl_80282468 = NULL;
+    lbl_80282464 = NULL;
+    if (lbl_80282460 != NULL) {
+        fn_80009E70(lbl_80282460);
+    }
+    if (lbl_80282480 != NULL) {
+        fn_80009E70(lbl_80282480);
+    }
+    if (lbl_8028247C != NULL) {
+        fn_80009E70(lbl_8028247C);
+    }
+    if (lbl_80282478 != NULL) {
+        fn_80009E70(lbl_80282478);
+    }
+    if (lbl_80282474 != NULL) {
+        fn_80009E70(lbl_80282474);
+    }
+    if (lbl_80282470 != NULL) {
+        fn_80009E70(lbl_80282470);
+    }
+    lbl_80282480 = NULL;
+    lbl_8028247C = NULL;
+    lbl_80282478 = NULL;
+    lbl_80282474 = NULL;
+    lbl_80282470 = NULL;
+    lbl_80282460 = NULL;
+}
+
+int fn_80103B28(int nAsset) {
+    CrAPAsset* pAsset = &lbl_80282460->pAssets[nAsset];
+
+    if (pAsset->nLockKind == 28) {
+        return pAsset->nLock;
+    }
+    return nAsset;
+}
 
 // The asset an asset takes its attributes from.
 CrAPAsset* fn_80103B4C(CrAPAsset* pAsset) {
@@ -33,8 +91,58 @@ u8 fn_80103B80(void) {
     return lbl_80282460->b14;
 }
 
+void fn_80103B8C(s8 n) {
+    lbl_80282460->n4 = n;
+    fn_80103920();
+}
+
 s8 fn_80103BB4(void) {
     return lbl_80282460->n4;
+}
+
+s8 fn_80103BC0(int nAsset) {
+    return lbl_80282460->pAssets[nAsset].n40;
+}
+
+// Empty the profile's slot of the asset.
+void fn_80103BD8(CrAPAsset* pAsset) {
+    SaveProfile* pProfile = fn_80077ACC();
+    s16 nSlot = pAsset->n2E;
+
+    if (nSlot >= 0 && nSlot < 53) {
+        pProfile->aAF80[nSlot] = -1;
+    }
+}
+
+// Put the asset in its slot of the profile.
+void fn_80103C2C(CrAPAsset* pAsset) {
+    SaveProfile* pProfile = fn_80077ACC();
+    s16 nSlot = pAsset->n2E;
+
+    if (nSlot >= 0 && nSlot < 53) {
+        pProfile->aAF80[nSlot] = fn_80104F7C(pAsset);
+    }
+}
+
+// The asset (the one it takes its attributes from) is the one in its slot of the profile.
+u8 fn_80103C98(CrAPAsset* pAsset) {
+    SaveProfile* pProfile = fn_80077ACC();
+    CrAPAsset* pBase = fn_80103B4C(pAsset);
+    s16 nSlot = pBase->n2E;
+
+    if (nSlot >= 0 && nSlot < 53) {
+        return pProfile->aAF80[nSlot] == fn_80104F7C(pBase);
+    }
+    return 0;
+}
+
+int fn_80103D14(s16 nSlot) {
+    SaveProfile* pProfile = fn_80077ACC();
+
+    if (nSlot >= 0 && nSlot < 53) {
+        return pProfile->aAF80[nSlot];
+    }
+    return -1;
 }
 
 // Save the created golfer's body skin entries in the profile.
@@ -46,6 +154,63 @@ void fn_80103D6C(void) {
     Mem_cpy(pProfile->a5754, pSkin->aSets[3], fn_800CCEA0(pSkin) * sizeof(SkinChoice));
 }
 
+// And the entries of its six other skins.
+void fn_80103DE0(void) {
+    SaveProfile* pProfile = fn_80077ACC();
+    Skin* pSkin;
+    int i;
+
+    for (i = 0; i < 6; i++) {
+        pSkin = lbl_80281EE0->pB4->pChar->p16D8->apSkins[i];
+        Mem_cpy(pProfile->a5AF4[i], pSkin->aParts[3], fn_800CCA40(pSkin) * sizeof(SkinChoice));
+        Mem_cpy(pProfile->a5CD4[i], pSkin->aSets[3], fn_800CCEA0(pSkin) * sizeof(SkinChoice));
+    }
+}
+
+// Take the asset's name out of the profile's list b when it is there.
+void fn_80103E88(CrAPAsset* pAsset, int b) {
+    SaveProfile* pProfile = fn_80077ACC();
+    char szName[16];
+
+    fn_80105B80(pAsset, szName);
+    if (fn_800587A8(pProfile, b, szName)) {
+        fn_80058624(pProfile, b, szName);
+    }
+}
+
+// Take the asset (the one it takes its attributes from) off the golfer being edited and out of its
+// slot of the profile.
+void fn_80103EFC(CrAPAsset* pAsset) {
+    Skin* pSkin;
+    CrAPAsset* pBase;
+
+    fn_80077ACC();
+    pBase = fn_80103B4C(pAsset);
+    if (pBase->n2E != -1) {
+        pSkin = lbl_80281EE0->pB4->pChar->pSkin;
+        fn_80106D24(pBase, pSkin);
+        fn_80106DA0(pBase, pSkin);
+        fn_8008E944(0, 0.0f);
+        fn_8001D624(lbl_80281EE0->pB4->n10);
+        fn_80103D6C();
+        fn_80103BD8(pBase);
+    }
+}
+
+// Take a part's choice i off the golfer being edited (part 13 by its name, from the list b).
+void fn_80103F94(s16 nPart, int b, int i) {
+    CrAPAsset* pAsset;
+
+    fn_80077ACC();
+    if (lbl_80281EE0->pB4->pChar != NULL && (pAsset = fn_80104E84(nPart, b, i)) != NULL) {
+        if (nPart == 13) {
+            fn_80103E88(pAsset, b);
+        } else {
+            fn_80103EFC(pAsset);
+        }
+    }
+}
+
 // The asset may be picked: it was not locked when last checked, and its aB1CC bit is set.
 u8 fn_80104020(int nAsset) {
     SaveProfile* pProfile = fn_80077ACC();
@@ -53,6 +218,51 @@ u8 fn_80104020(int nAsset) {
         return 1;
     }
     return 0;
+}
+
+// Switch the asset's name in the profile's list b: take it out when it is there, otherwise add it
+// and have the menu golfer play it (unless it already does).
+void fn_80104094(CrAPAsset* pAsset, int b) {
+    SaveProfile* pProfile = fn_80077ACC();
+    char szName[24];
+
+    fn_80105B80(pAsset, szName);
+    if (fn_800587A8(pProfile, b, szName)) {
+        fn_80058624(pProfile, b, szName);
+    } else {
+        fn_80058560(pProfile, b, szName);
+        if (fn_8008E6BC() == NULL || strcmp(fn_8008E6BC(), szName) != 0) {
+            fn_8008E724(szName, fn_801064EC(pAsset->n114), 1, 0);
+        }
+    }
+    fn_8008E944(0, 0.0f);
+}
+
+// Put on the asset waiting in lbl_802816E8, or else take off the one in lbl_802816EC; then clear
+// both.
+void fn_80104804(void) {
+    CrAPAsset* pAsset;
+    s16 nKind;
+    s32 nPart;
+    s32 nChoice;
+
+    fn_80077ACC();
+    if (lbl_802816E8 != -1) {
+        fn_80103B74(0);
+        FE_CrAP_TurnOnAsset(fn_80104F68(lbl_802816E8));
+        fn_80103B74(1);
+    } else if (lbl_802816EC != -1) {
+        pAsset = fn_80104F68(lbl_802816EC);
+        if (pAsset->nPart == 13) {
+            fn_80105FF8(lbl_802816EC, &nKind, &nPart, &nChoice);
+            fn_80103E88(pAsset, nPart);
+        } else {
+            fn_80103EFC(pAsset);
+        }
+    }
+    fn_8008EB70();
+    lbl_802816E8 = -1;
+    lbl_802816EC = -1;
 }
 
 // The parts whose choices are grouped by category, with an "All ..." entry: headwear, shirts,
@@ -64,12 +274,83 @@ u8 fn_801048B0(int nPart) {
     return 0;
 }
 
+u8 fn_80104DB8(s16 nPart, int n, char* pDst) {
+    int nCategory;
+
+    if (lbl_80282460->pStrings == NULL) {
+        return 0;
+    }
+    if (pDst == NULL) {
+        return 0;
+    }
+    if (lbl_801932C8[nPart][0] != '\0' && n == 0) {
+        strcpy(pDst, lbl_801932C8[nPart]);
+        return 1;
+    }
+    nCategory = fn_80104AF4(nPart, n);
+    if (nCategory == 0x40) {
+        return 0;
+    }
+    if (nCategory == -1) {
+        return 0;
+    }
+    strcpy(pDst, lbl_80282460->pStrings + nCategory);
+    return 1;
+}
+
+CrAPAsset* fn_80104E84(s16 nPart, int b, int i) {
+    int nAsset;
+    int n;
+    int nWanted;
+    int nFirst;
+
+    nFirst = fn_80105140(nPart);
+    nWanted = fn_80104AF4(nPart, b);
+    n = 0;
+    for (nAsset = nFirst; nAsset < lbl_80282460->nAssets; nAsset++) {
+        if (nPart == lbl_80282460->pAssets[nAsset].nPart &&
+            fn_801061C8(lbl_80282460->pAssets[nAsset].n40) &&
+            fn_801061F8(nPart, lbl_80282460->pAssets[nAsset].nCategory, nWanted)) {
+            if (n == i) {
+                return &lbl_80282460->pAssets[nAsset];
+            }
+            n++;
+        }
+    }
+    return NULL;
+}
+
 CrAPAsset* fn_80104F68(int nAsset) {
     return &lbl_80282460->pAssets[nAsset];
 }
 
 int fn_80104F7C(CrAPAsset* pAsset) {
     return pAsset - lbl_80282460->pAssets;
+}
+
+int fn_80104FA8(s16 nPart, int b, int i) {
+    int nAsset;
+    int n;
+    int nWanted;
+    int nFirst;
+
+    nFirst = fn_80105140(nPart);
+    nWanted = fn_80104AF4(nPart, b);
+    n = 0;
+    for (nAsset = nFirst; nAsset < lbl_80282460->nAssets; nAsset++) {
+        if (nPart == lbl_80282460->pAssets[nAsset].nPart && fn_801061C8(lbl_80282460->pAssets[nAsset].n40) &&
+            fn_801061F8(nPart, lbl_80282460->pAssets[nAsset].nCategory, nWanted)) {
+            if (n == i) {
+                return nAsset;
+            }
+            n++;
+        }
+    }
+    // The original tests this flag here although both ways end the same.
+    if (gSession.uFlags & 0x4000) {
+        return -1;
+    }
+    return -1;
 }
 
 // Take the database's stream objects as they load.
@@ -296,6 +577,25 @@ u8 fn_80105C30(void) {
 void fn_80105EFC(void) {
 }
 
+// How many offered assets of the part that fit its entry n come before the asset in the part's
+// list: the asset's place in that list.
+void fn_801060F0(int nAsset, s16 nPart, int n, s32* pnPlace) {
+    int i;
+    int nCount = 0;
+    int nWanted;
+
+    i = fn_80105140(lbl_80282460->pAssets[nAsset].nPart);
+    nWanted = fn_80104AF4(nPart, n);
+
+    for (; i < nAsset; i++) {
+        if (nPart == lbl_80282460->pAssets[i].nPart && fn_801061C8(lbl_80282460->pAssets[i].n40) &&
+            fn_801061F8(nPart, lbl_80282460->pAssets[i].nCategory, nWanted)) {
+            nCount++;
+        }
+    }
+    *pnPlace = nCount;
+}
+
 // An asset with this n40 is offered: it matches the database's n4, or 2 (any).
 u8 fn_801061C8(s8 n) {
     if (n == lbl_80282460->n4 || n == 2) {
@@ -311,6 +611,67 @@ u8 fn_801061F8(s16 nPart, int nCategory, int nWanted) {
         return nWanted == -1 || nCategory == nWanted;
     }
     return nCategory == nWanted;
+}
+
+// The asset in the first of the profile's slots whose asset is of the part (-1: none).
+int fn_80106244(s16 nPart) {
+    s16 i;
+    int nAsset;
+
+    fn_80077ACC();
+    for (i = 0; i < 53; i++) {
+        nAsset = fn_80103D14(i);
+        if (nAsset >= 0 && nPart == lbl_80282460->pAssets[nAsset].nPart) {
+            return nAsset;
+        }
+    }
+    return -1;
+}
+
+// The asset in the first of the profile's slots whose asset is of the part and fits the part's
+// entry n (-1: none).
+int fn_801062C8(s16 nPart, int n) {
+    s16 i;
+    int nAsset;
+    int nWanted;
+    CrAPAsset* pAsset;
+
+    fn_80077ACC();
+    nWanted = fn_80104AF4(nPart, n);
+    for (i = 0; i < 53; i++) {
+        nAsset = fn_80103D14(i);
+        if (nAsset >= 0) {
+            pAsset = &lbl_80282460->pAssets[nAsset];
+            if (nPart == pAsset->nPart && fn_801061F8(nPart, pAsset->nCategory, nWanted)) {
+                return nAsset;
+            }
+        }
+    }
+    return -1;
+}
+
+// A part's choice i is the asset in its slot of the profile.
+u8 fn_80106374(s16 nPart, int b, int i) {
+    int nWanted;
+    int nAsset;
+    int n;
+    int nFirst;
+
+    fn_80077ACC();
+    nFirst = fn_80105140(nPart);
+    nWanted = fn_80104AF4(nPart, b);
+    n = -1;
+    for (nAsset = nFirst; nAsset < lbl_80282460->nAssets; nAsset++) {
+        if (nPart == lbl_80282460->pAssets[nAsset].nPart &&
+            fn_801061F8(nPart, lbl_80282460->pAssets[nAsset].nCategory, nWanted) &&
+            fn_801061C8(lbl_80282460->pAssets[nAsset].n40)) {
+            n++;
+            if (n == i) {
+                return fn_80103C98(fn_80104F68(nAsset));
+            }
+        }
+    }
+    return 0;
 }
 
 // Copy the name at nOffset in the 'CR_S' strings into pDst ("" for "NONE").
@@ -340,4 +701,291 @@ char* fn_801064EC(int nCategory) {
         return NULL;
     }
     return lbl_80282460->pStrings + nCategory;
+}
+
+// Copy how a part's choice i is unlocked into pDst: the Game Boy Advance link for lock kind 2,
+// otherwise its text in 'CR_S' (pDst is left as it is when it has none).
+u8 fn_8010651C(s16 nPart, int b, int i, char* pDst) {
+    int nAsset;
+    int nWanted = fn_80104AF4(nPart, b);
+    int n;
+    CrAPAsset* pAsset;
+
+    if (lbl_80282460->pStrings == NULL) {
+        return 0;
+    }
+    if (pDst == NULL) {
+        return 0;
+    }
+    n = 0;
+    for (nAsset = 0; nAsset < lbl_80282460->nAssets; nAsset++) {
+        if (nPart == lbl_80282460->pAssets[nAsset].nPart &&
+            fn_801061C8(lbl_80282460->pAssets[nAsset].n40) &&
+            fn_801061F8(nPart, lbl_80282460->pAssets[nAsset].nCategory, nWanted)) {
+            if (n == i) {
+                pAsset = &lbl_80282460->pAssets[nAsset];
+                if (pAsset->nLockKind == 2) {
+                    strcpy(pDst, "Game Boy\xAE Advance Link Required");
+                    return 1;
+                }
+                if (pAsset->n110 != -1) {
+                    strcpy(pDst, lbl_80282460->pStrings + pAsset->n110);
+                }
+                return 1;
+            }
+            n++;
+        }
+    }
+    return 0;
+}
+
+// Put the asset on a skin: each of its parts the skin has gets the asset's variant.
+void fn_80106A64(CrAPAsset* pAsset, Skin* pSkin) {
+    int i;
+    s32 nPart;
+    s32 nVariant;
+
+    for (i = 0; i < 4; i++) {
+        nPart = fn_800CDAFC(pSkin, pAsset->aPart[i]);
+        nVariant = fn_800CDBB0(pSkin, nPart, pAsset->aVariant[i]);
+        if (nPart >= 0 && nVariant >= 0) {
+            fn_800CCB08(pSkin, nPart, nVariant);
+        }
+    }
+}
+
+// Take the asset's parts off a skin: each goes back to variant 0.
+void fn_80106D24(CrAPAsset* pAsset, Skin* pSkin) {
+    int i;
+    s32 nPart;
+
+    if (pAsset != NULL) {
+        for (i = 0; i < 4; i++) {
+            nPart = fn_800CDAFC(pSkin, pAsset->aPart[i]);
+            if (nPart >= 0) {
+                fn_800CCB08(pSkin, nPart, 0);
+            }
+        }
+    }
+}
+
+// And its sets: each goes back to its "Defaults" variant (or 0).
+void fn_80106DA0(CrAPAsset* pAsset, Skin* pSkin) {
+    int i;
+    int nSet;
+    s32 nVariant;
+
+    if (pAsset != NULL) {
+        for (i = 0; i < 4; i++) {
+            nSet = fn_800CDC2C(pSkin, pAsset->aSet[i]);
+            if (nSet >= 0) {
+                nVariant = fn_800CDD5C(pSkin, nSet, "Defaults");
+                if (nVariant < 0) {
+                    nVariant = 0;
+                }
+                fn_800CCF90(pSkin, nSet, nVariant, 0);
+            }
+        }
+    }
+}
+
+// How many of the profile's slots hold an asset whose n2C is n.
+int fn_80106E48(s16 n) {
+    s16 i;
+    int nAsset;
+    int nCount = 0;
+
+    fn_80077ACC();
+    for (i = 0; i < 53; i++) {
+        nAsset = fn_80103D14(i);
+        if (nAsset >= 0 && n == lbl_80282460->pAssets[nAsset].n2C) {
+            nCount++;
+        }
+    }
+    return nCount;
+}
+
+// How many offered assets have lock kind nKind and lock number nLock.
+s32 fn_80106ED8(s32 nKind, s32 nLock) {
+    int i;
+    int nCount = 0;
+
+    for (i = 0; i < lbl_80282460->nAssets; i++) {
+        if (nKind == lbl_80282460->pAssets[i].nLockKind && nLock == lbl_80282460->pAssets[i].nLock &&
+            fn_801061C8(lbl_80282460->pAssets[i].n40)) {
+            nCount++;
+        }
+    }
+    return nCount;
+}
+
+// The lowest nLock above nAfter among the assets of lock kind nKind (-1: none).
+s32 fn_80107084(s32 nKind, s32 nAfter) {
+    int i;
+    int nBest = 999999999;
+
+    for (i = 0; i < lbl_80282460->nAssets; i++) {
+        if (nKind == lbl_80282460->pAssets[i].nLockKind) {
+            if (lbl_80282460->pAssets[i].nLock > nAfter && lbl_80282460->pAssets[i].nLock < nBest) {
+                nBest = lbl_80282460->pAssets[i].nLock;
+            }
+        }
+    }
+    if (nBest == 999999999) {
+        return -1;
+    }
+    return nBest;
+}
+
+void fn_80107294(s16 n, char* pDst) {
+    strcpy(pDst, lbl_801935C8[n]);
+}
+
+// Take the asset in the profile's slot nSlot off the golfer being edited.
+void fn_801073DC(s16 nSlot) {
+    int nAsset;
+
+    if (lbl_80281EE0->pB4 != NULL) {
+        if (lbl_80281EE0->pB4->pChar == NULL) {
+            return;
+        }
+        nAsset = fn_80103D14(nSlot);
+        if (nAsset >= 0) {
+            fn_80103EFC(fn_80104F68(nAsset));
+        }
+    }
+}
+
+// The part an asset is a choice for.
+s16 fn_8010742C(int nAsset) {
+    return lbl_80282460->pAssets[nAsset].nPart;
+}
+
+int fn_80107444(int nAsset) {
+    return lbl_80282460->pAssets[nAsset].n38;
+}
+
+// Copy the name of an asset's category into pDst.
+void fn_8010745C(int nAsset, char* pDst) {
+    strcpy(pDst, lbl_80282460->pStrings + lbl_80282460->pAssets[nAsset].nCategory);
+}
+
+// Copy an asset's name into pDst.
+void fn_8010749C(int nAsset, char* pDst) {
+    strcpy(pDst, lbl_80282460->pAssets[nAsset].szName);
+}
+
+u8 fn_801074D4(int nAsset) {
+    s16 n2E = fn_80104F68(nAsset)->n2E;
+
+    if (fn_8010742C(nAsset) == 13) {
+        return 1;
+    }
+    switch (n2E) {
+    case 2:
+    case 4:
+    case 5:
+    case 6:
+    case 7:
+    case 8:
+    case 9:
+    case 10:
+    case 11:
+    case 12:
+    case 13:
+    case 14:
+        return 1;
+    }
+    return 0;
+}
+
+// Senders the EA Sports Bio screens (EASportsBio.c) use: message nMsg with its values to the front
+// end's handler, when there is a front end. A string value goes as a MsgString.
+
+void fn_80107554(int nMsg, s32 nA) {
+    MsgArg arg;
+
+    if (lbl_80281F1C != NULL) {
+        arg.i = nA;
+        fn_8016B09C(lbl_80281F1C->pHandler, nMsg, 1, &arg);
+    }
+}
+
+void fn_80107594(int nMsg, s32 nA, char* szB) {
+    MsgString str;
+    MsgArg args[2];
+
+    if (lbl_80281F1C != NULL) {
+        args[0].i = nA;
+        args[1].p = &str;
+        fn_8010766C(&args[1], szB);
+        fn_8016B09C(lbl_80281F1C->pHandler, nMsg, 2, args);
+    }
+}
+
+void fn_801075F8(int nMsg, s32 nA, char* szB, s32 nC) {
+    MsgArg args[3];
+    MsgString str;
+
+    if (lbl_80281F1C != NULL) {
+        args[0].i = nA;
+        args[1].p = &str;
+        fn_8010766C(&args[1], szB);
+        args[2].i = nC;
+        fn_8016B09C(lbl_80281F1C->pHandler, nMsg, 3, args);
+    }
+}
+
+// Point the string value pArg holds at sz.
+int fn_8010766C(MsgArg* pArg, char* sz) {
+    ((MsgString*)pArg->p)->pStr = sz;
+    ((MsgString*)pArg->p)->nLen = strlen(sz);
+    return 0;
+}
+
+int fn_801076B0(char* sz, int nMsg) {
+    MsgArg arg;
+    MsgString str;
+
+    if (lbl_80281F1C == NULL) {
+        return -1;
+    }
+    arg.p = &str;
+    fn_8010766C(&arg, sz);
+    fn_8016B09C(lbl_80281F1C->pHandler, nMsg, 1, &arg);
+    return 0;
+}
+
+void fn_8010771C(int nMsg, s32 nA, s32 nB, s32 nC, s32 nD, s32 nE, s32 nF, f32 fG) {
+    MsgArg args[7];
+
+    if (lbl_80281F1C != NULL) {
+        args[0].i = nA;
+        args[1].i = nB;
+        args[2].i = nC;
+        args[3].i = nD;
+        args[4].i = nE;
+        args[5].i = nF;
+        args[6].f = fG;
+        fn_8016B09C(lbl_80281F1C->pHandler, nMsg, 7, args);
+    }
+}
+
+void fn_80107774(int nMsg, s32 nA, s32 nB, s32 nC, s32 nD, s32 nE, s32 nF, s32 nG, s32 nH, s32 nI,
+                 s32 nJ) {
+    MsgArg args[10];
+
+    if (lbl_80281F1C != NULL) {
+        args[0].i = nA;
+        args[1].i = nB;
+        args[2].i = nC;
+        args[3].i = nD;
+        args[4].i = nE;
+        args[5].i = nF;
+        args[6].i = nG;
+        args[7].i = nH;
+        args[8].i = nI;
+        args[9].i = nJ;
+        fn_8016B09C(lbl_80281F1C->pHandler, nMsg, 10, args);
+    }
 }

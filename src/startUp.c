@@ -4,6 +4,7 @@
 // Most of it talks to the GameCube's audio libraries; see core/startup.h.
 
 #include "core/startup.h"
+#include "core/goaram.h"
 #include "core/memcard.h"
 #include "game/frontend.h"
 
@@ -18,8 +19,6 @@ s16    fn_800AFF9C(s16 nVolume);
 void   fn_800B00A4(u16 nVoice, u32 u, int a);
 void   fn_800B0114(u16 nVoice, VoiceEnvelope* pEnv);
 void   fn_800B01B4(u16 nVoice, u8 bA, u8 bB);
-void   fn_800B04EC(void* p, u32 uLen, int nDir);
-void   fn_800B051C(void* p, u32 uLen, int nDir);
 void   fn_800B055C(u32 n);
 s32    fn_800B09C8(int nPort, int nSlot);
 void   fn_800B0DB8(void);
@@ -49,13 +48,6 @@ u32    OSGetSoundMode(void);
 void   MIXSetSoundMode(u32 uMode);      // the output mode (mono, stereo, surround)
 void   AXRegisterCallback(void (*pfn)(void));  // the callback run after each audio frame
 void*  fn_800B5BD8(u32 uSize);
-u32    fn_800B5D34(void* pHeap, u32 uSize, u32 uAlign);   // ARAM heap: allocate, returns the address
-void   fn_800B5E88(void* pHeap, u32 uAddr);               // ARAM heap: free
-void   fn_800B6728(void* pOwner);
-u32    fn_800B6564(u32 uSize);          // take ARAM, returns its address
-void*  fn_800B5C40(u32 uSize, u32 uAram, u32 uAlign, void* pInfo);   // ARAM heap: create
-void   fn_800B65C0(void* pSrc, u32 uAram, u32 uLen, int a, int b, void (*pfnDone)(u32 n), int n,
-                   int c);                                            // ARAM DMA
 void   AXSetVoiceSrcRatio(AXVPB* pVpb, f32 fRatio);     // the playback rate
 void   AXSetVoiceAdpcm(AXVPB* pVpb, u32* pCoefs);
 void   AXSetVoiceAdpcmLoop(AXVPB* pVpb, u16* pLoop);
@@ -124,7 +116,7 @@ u32    lbl_80282108;            // the ARAM address of the eight 0xFE00-byte blo
 void*  lbl_80282104;            // the zeroes DMA'd into the silent block, freed once it is done
 u32    lbl_80282100;            // the silent block's ARAM address
 u32    lbl_802820FC;            // the heap's ARAM address
-void*  lbl_802820F8;            // the heap
+ARAMHeap* lbl_802820F8;         // the heap
 s32    lbl_802820F4;            // how many of the eight blocks are taken
 u32    lbl_802820F0;            // which of them are taken
 KEEP_UNUSED u32 lbl_802820EC;
@@ -637,13 +629,13 @@ void fn_800B0448(void) {
 // DMA nLen bytes from main memory to ARAM; pfnDone is called when it is done.
 int fn_800B044C(u32 uAram, void* pSrc, int nLen, void (*pfnDone)(u32 n), int n) {
     fn_800B051C(pSrc, nLen, 0);
-    fn_800B65C0(pSrc, uAram, nLen, 0, 1, pfnDone, n, 3);
+    fn_800B65C0((u32)pSrc, uAram, nLen, 0, 1, pfnDone, n, 3);  // port: the ARQ library takes addresses as u32
     fn_800B04EC(pSrc, nLen, 0);
     return 1;
 }
 
 void fn_800B04CC(void* pOwner) {
-    fn_800B6728(pOwner);
+    fn_800B6728((u32)pOwner);  // port: the ARQ library keeps owners as u32
 }
 
 // After a DMA between main memory and ARAM: when the data came into main memory (nDir 1), drop
@@ -679,7 +671,7 @@ void fn_800B055C(u32 n) {
 // Set up the ARAM heap: a silent block at its start, then the eight blocks of fn_800B06F4.
 int fn_800B0568(void) {
     lbl_802820FC = fn_800B6564(ARAM_HEAP_SIZE);
-    lbl_8028210C = fn_800B5BD8(0x2A4);
+    lbl_8028210C = fn_800B5BD8(sizeof(ARAMHeap) + 32 * sizeof(ARAMBlock));
     lbl_802820F8 = fn_800B5C40(ARAM_HEAP_SIZE, lbl_802820FC, 32, lbl_8028210C);
     lbl_80282100 = fn_800B5D34(lbl_802820F8, ARAM_ZERO_SIZE, 32);
     lbl_80282104 = fn_800951A0(ARAM_ZERO_SIZE, 32, 1);

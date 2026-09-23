@@ -25,6 +25,11 @@ void  fn_8009527C(void* p);             // frees what fn_800951A0 allocated
 void  fn_800953C8(int a);
 // Pack up to 12 characters of pName into a 64-bit code (base 40, table lbl_80191520).
 int   fn_800CB700(u64* pId, const char* pName);
+// And back: the 12 characters a code was made from (table lbl_80191720); szName takes 13 bytes.
+void  fn_800CB868(u64* pId, char* szName);
+void  fn_800CB8F0(u64* pId, char* szName);      // for a code stored with its bytes reversed
+extern char lbl_80191720[40];                   // the 40 characters a name code is made of
+extern s32  lbl_80191520[128];                  // each character's code, -1 for none
 
 // A pool of fixed-size nodes carved from one allocation (UMemPool.c): the header, then the nodes.
 // A free node holds the next free one in its first word.
