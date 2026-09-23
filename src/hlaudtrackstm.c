@@ -7,27 +7,13 @@
 #include "core/audtrack.h"
 #include "core/startup.h"
 
-// The audio locks (0x800B5934): the name is EA's label for who holds them.
-void fn_800B596C(const char* szWho);    // take the stream lock
-void fn_800B5994(const char* szWho);    // give it back
-void fn_800B59BC(const char* szWho);    // take the read-queue lock
-void fn_800B59EC(const char* szWho);    // give it back
-
 int  fn_80006478(s32 hFile, u8* pDst, u32 uLen, u32 uOffset,
                  void (*pfnDone)(int nBytes, int nError, AudTrack* pTrack, u8 nId), int n,
                  AudTrack* pTrack, u8 nId, int n19);                 // read from disc, not waiting
-f32  fn_800A85FC(f32 fVolume, f32 fCurve);
-u8*  fn_800A942C(u32 uSize, u8 nPlayList);                          // the stream buffer
-void fn_800A9434(u8* pBuffer, u32 uSize, u8 nPlayList);             // give it back
-AudStream* fn_800A9438(AudPlayList* pList, u16 nStream, u32* puLength);
-u32  fn_800A955C(u8 nPlayList);                                      // the buffer size it needs
-AudPlayList* fn_800A9564(u8 nPlayList);
 void fn_800AA1B8(AudTrack* pTrack, int n);
 void fn_800AA400(void);
 f32  fn_800AA44C(u8 nCurve);
 u16  fn_800AB32C(u16 nRange);                                        // a random number below nRange
-AudVoice* fn_800AC4A0(AudVoiceRequest* pRequest);
-void fn_800AC7DC(AudVoice* pVoice, u32 uLen, u16 n4, int bLoud);
 void fn_800ACA5C(AudVoice* pVoice, int bPause);
 u8   fn_800ACE38(AudVoice* pVoice, u32* puPos);
 s32  DVDGetDriveStatus(void);

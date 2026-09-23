@@ -2,10 +2,10 @@
 
 #include "game_types.h"
 
-void fn_800A882C();
+void Mov_Init();
 void Mov_Exit();
-void fn_800A89E8();
-void fn_800A8C44();
+void Mov_Start();
+void Mov_Tick();
 void fn_800B0858();
 
 void fn_800A7994(void);
@@ -14,7 +14,7 @@ void fn_800A79D4(void);
 void fn_800A79F4(void);
 void fn_800A7A14(void);
 void fn_800A7994(void) {
-    fn_800A882C();
+    Mov_Init();
 }
 
 void fn_800A79B4(void) {
@@ -22,11 +22,11 @@ void fn_800A79B4(void) {
 }
 
 void fn_800A79D4(void) {
-    fn_800A89E8();
+    Mov_Start();
 }
 
 void fn_800A79F4(void) {
-    fn_800A8C44();
+    Mov_Tick();
 }
 
 void fn_800A7A14(void) {

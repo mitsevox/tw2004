@@ -196,6 +196,7 @@ void fn_8009EAF0(void);
 s32  fn_8009EE28(s32 nPort, s32 nSlot);
 u32  fn_8009EF90(void);
 void fn_8009F02C(void);             // bring the images back from ARAM (fn_8009EF98 parks them)
+s32  fn_8009F208(s32 nFile, void* pBuf, s32 nLen, s32 arg3);  // read on from the last read
 // Create pName with nLen bytes, but only when it is the save directory's name (the PS2's mkdir).
 s32  fn_8009F514(s32 nPort, s32 nSlot, const char* pName, s32 nLen);
 s32  fn_8009F5E4(s32 nPort, s32 nSlot, const char* pName);    // delete the save file
