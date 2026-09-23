@@ -1,4 +1,13 @@
-#include "game_types.h"
+// PGATourSimulation.c (TW06's pgatoursimulation.c): the PGA TOUR simulation behind game mode 23
+// (GameModeDriverPGATour.c). It keeps the tour field (an entrant table in the save profile and
+// one in memory) and the season statistics of every tour golfer: the counts in the save profile
+// (PgaStatCounts), each statistic worked out from them (driving distance, greens in regulation,
+// scoring average, ...), the rankings, and the text fe_stats.c prints. Most of it is still
+// assembly; the sweep code below is the matched small functions.
+
+#include "game/modes/pgatoursim.h"
+
+// ---- sweep code (not yet cleaned up) ----
 
 extern u8 lbl_80224070[];
 u8* fn_80117628(s32 p0);
@@ -41,29 +50,9 @@ void fn_8011AF14(s32 arg0);
 s32 fn_8011AF60(s32);
 void fn_8011B00C(void);
 void fn_8011B048(s32 arg0);
+void fn_8011B094(s32 p0);
 void fn_8011B100(void);
 void fn_8011B13C(s32 p0);
-void fn_8011B1DC();
-void fn_8011B1AC(u8* p0, s32 p1);
-void fn_8011B264();
-void fn_8011B234(u8* p0, s32 p1);
-void fn_8011B2C4(u8* p0, s32 p1);
-void fn_8011B2F4(u8* p0, s32 p1);
-void fn_8011B324(u8* p0, s32 p1);
-void fn_8011B354(u8* p0, s32 p1);
-void fn_8011B384(u8* p0, s32 p1);
-void fn_8011B3B8(u8* p0, s32 p1);
-void fn_8011B3E8(u8* p0, s32 p1);
-void fn_8011B418(u8* p0, s32 p1);
-void fn_8011B448(u8* p0, s32 p1);
-void fn_8011B478(u8* p0, s32 p1);
-void fn_8011B4A8(u8* p0, s32 p1);
-void fn_8011B4D8(u8* p0, s32 p1);
-void fn_8011B508(u8* p0, s32 p1);
-void fn_8011B538(u8* p0, s32 p1);
-void fn_8011B56C(u8* p0, s32 p1);
-void fn_8011B59C(u8* p0, s32 p1);
-void fn_8011B5CC(u8* p0, s32 p1);
 void fn_8011C054(void);
 void fn_8011C058(u8 v);
 void fn_8011C060(u8 v);
@@ -240,81 +229,158 @@ void fn_8011B160(s32 p0) {
     fn_8011B13C(p0);
 }
 
-void fn_8011B1AC(u8* p0, s32 p1) {
-    fn_8011B1DC(*(s32*)(p0 + 0x8), *(u16*)(p0 + 0x6), p1, p0);
+// ---- end of sweep code ----
+
+// The tour statistics. Each takes a golfer's season counts and puts the statistic in *pfValue;
+// the table at 0x80193F88 lists them in this order, one per statistic. A statistic with nothing
+// to divide by is 0 and returns 0.
+
+u8 SafeDivide(u32 nCount, u32 nOutOf, f32* pfValue);
+u8 SafeDividePct(u32 nCount, u32 nOutOf, f32* pfValue);
+
+u8 CalcDrivingDistance(PgaStatCounts* pCounts, f32* pfValue) {
+    return SafeDivide(pCounts->nDriveDistance, pCounts->nDrives, pfValue);
 }
 
-void fn_8011B234(u8* p0, s32 p1) {
-    fn_8011B264(*(u16*)(p0 + 0xE), *(u16*)(p0 + 0x10), p1, p0);
+u8 SafeDivide(u32 nCount, u32 nOutOf, f32* pfValue) {
+    if (nOutOf == 0) {
+        *pfValue = 0.0f;
+        return 0;
+    }
+    *pfValue = (f32)nCount / (f32)nOutOf;
+    return 1;
 }
 
-void fn_8011B2C4(u8* p0, s32 p1) {
-    fn_8011B264(*(u16*)(p0 + 0x12), *(u16*)(p0 + 0x14), p1, p0);
+u8 CalcAccuracy(PgaStatCounts* pCounts, f32* pfValue) {
+    return SafeDividePct(pCounts->nFairwaysHit, pCounts->nFairways, pfValue);
 }
 
-void fn_8011B2F4(u8* p0, s32 p1) {
-    fn_8011B1DC(*(u16*)(p0 + 0x16), *(u16*)(p0 + 0x2), p1, p0);
+// The same as a percentage.
+u8 SafeDividePct(u32 nCount, u32 nOutOf, f32* pfValue) {
+    if (nOutOf == 0) {
+        *pfValue = 0.0f;
+        return 0;
+    }
+    *pfValue = 100.0f * ((f32)nCount / (f32)nOutOf);
+    return 1;
 }
 
-void fn_8011B324(u8* p0, s32 p1) {
-    fn_8011B1DC(*(u16*)(p0 + 0x18), *(u16*)(p0 + 0x12), p1, p0);
+u8 CalcGIR(PgaStatCounts* pCounts, f32* pfValue) {
+    return SafeDividePct(pCounts->nGreensHit, pCounts->nHoles, pfValue);
 }
 
-void fn_8011B354(u8* p0, s32 p1) {
-    fn_8011B264(*(u16*)(p0 + 0x1A), *(u16*)(p0 + 0x1C), p1, p0);
+u8 CalcPuttsPerRound(PgaStatCounts* pCounts, f32* pfValue) {
+    return SafeDivide(pCounts->nPutts, pCounts->nRounds, pfValue);
 }
 
-void fn_8011B384(u8* p0, s32 p1) {
-    fn_8011B264(*(u16*)(p0 + 0x1E), (*(u16*)(p0 + 0x14) - *(u16*)(p0 + 0x12)), p1, *(u16*)(p0 + 0x12));
+u8 CalcPuttingAvg(PgaStatCounts* pCounts, f32* pfValue) {
+    return SafeDivide(pCounts->nGIRPutts, pCounts->nGreensHit, pfValue);
 }
 
-void fn_8011B3B8(u8* p0, s32 p1) {
-    fn_8011B264(*(u16*)(p0 + 0x20), *(u16*)(p0 + 0x22), p1, p0);
+u8 CalcSandSave(PgaStatCounts* pCounts, f32* pfValue) {
+    return SafeDividePct(pCounts->nBunkerSaves, pCounts->nBunkers, pfValue);
 }
 
-void fn_8011B3E8(u8* p0, s32 p1) {
-    fn_8011B1DC(*(u16*)(p0 + 0x14), *(u16*)(p0 + 0x24), p1, p0);
+// Pars saved on the greens missed in regulation.
+u8 CalcScrambling(PgaStatCounts* pCounts, f32* pfValue) {
+    return SafeDividePct(pCounts->nNonGIRPars, pCounts->nHoles - pCounts->nGreensHit, pfValue);
 }
 
-void fn_8011B418(u8* p0, s32 p1) {
-    fn_8011B1DC(*(u16*)(p0 + 0x26), *(u16*)(p0 + 0x2), p1, p0);
+u8 CalcBounceBack(PgaStatCounts* pCounts, f32* pfValue) {
+    return SafeDividePct(pCounts->nBirdiesAfterBogey, pCounts->nBogeys, pfValue);
 }
 
-void fn_8011B448(u8* p0, s32 p1) {
-    fn_8011B264(*(u16*)(p0 + 0x28), *(u16*)(p0 + 0x2A), p1, p0);
+u8 CalcHolesPerEagle(PgaStatCounts* pCounts, f32* pfValue) {
+    return SafeDivide(pCounts->nHoles, pCounts->nEagles, pfValue);
 }
 
-void fn_8011B478(u8* p0, s32 p1) {
-    fn_8011B264(*(u16*)(p0 + 0x2C), *(u16*)(p0 + 0x2E), p1, p0);
+u8 CalcBirdieAvg(PgaStatCounts* pCounts, f32* pfValue) {
+    return SafeDivide(pCounts->nBirdies, pCounts->nRounds, pfValue);
 }
 
-void fn_8011B4A8(u8* p0, s32 p1) {
-    fn_8011B264(*(u16*)(p0 + 0x30), *(u16*)(p0 + 0x32), p1, p0);
+u8 CalcPar3BirdieAvg(PgaStatCounts* pCounts, f32* pfValue) {
+    return SafeDividePct(pCounts->nPar3Birdies, pCounts->nPar3Holes, pfValue);
 }
 
-void fn_8011B4D8(u8* p0, s32 p1) {
-    fn_8011B264(*(u16*)(p0 + 0x34), *(u16*)(p0 + 0x12), p1, p0);
+u8 CalcPar4BirdieAvg(PgaStatCounts* pCounts, f32* pfValue) {
+    return SafeDividePct(pCounts->nPar4Birdies, pCounts->nPar4Holes, pfValue);
 }
 
-void fn_8011B508(u8* p0, s32 p1) {
-    fn_8011B1DC(*(u16*)(p0 + 0x36), *(u16*)(p0 + 0x2), p1, p0);
+u8 CalcPar5BirdieAvg(PgaStatCounts* pCounts, f32* pfValue) {
+    return SafeDividePct(pCounts->nPar5Birdies, pCounts->nPar5Holes, pfValue);
 }
 
-void fn_8011B538(u8* p0, s32 p1) {
-    fn_8011B264((*(u16*)(p0 + 0x26) + *(u16*)(p0 + 0x24)), *(u16*)(p0 + 0x14), p1, *(u16*)(p0 + 0x26));
+u8 CalcBirdieConversion(PgaStatCounts* pCounts, f32* pfValue) {
+    return SafeDividePct(pCounts->nGIRBirdies, pCounts->nGreensHit, pfValue);
 }
 
-void fn_8011B56C(u8* p0, s32 p1) {
-    fn_8011B1DC(*(u16*)(p0 + 0x38), *(u16*)(p0 + 0x2A), p1, p0);
+u8 CalcScoringAvg(PgaStatCounts* pCounts, f32* pfValue) {
+    return SafeDivide(pCounts->nStrokes, pCounts->nRounds, pfValue);
 }
 
-void fn_8011B59C(u8* p0, s32 p1) {
-    fn_8011B1DC(*(u16*)(p0 + 0x3A), *(u16*)(p0 + 0x2E), p1, p0);
+// Holes under par.
+u8 CalcParBreakers(PgaStatCounts* pCounts, f32* pfValue) {
+    return SafeDividePct(pCounts->nBirdies + pCounts->nEagles, pCounts->nHoles, pfValue);
 }
 
-void fn_8011B5CC(u8* p0, s32 p1) {
-    fn_8011B1DC(*(u16*)(p0 + 0x3C), *(u16*)(p0 + 0x32), p1, p0);
+u8 CalcPar3ScoringAvg(PgaStatCounts* pCounts, f32* pfValue) {
+    return SafeDivide(pCounts->nPar3Strokes, pCounts->nPar3Holes, pfValue);
 }
+
+u8 CalcPar4ScoringAvg(PgaStatCounts* pCounts, f32* pfValue) {
+    return SafeDivide(pCounts->nPar4Strokes, pCounts->nPar4Holes, pfValue);
+}
+
+u8 CalcPar5ScoringAvg(PgaStatCounts* pCounts, f32* pfValue) {
+    return SafeDivide(pCounts->nPar5Strokes, pCounts->nPar5Holes, pfValue);
+}
+
+u8 CalcLongestDrive(PgaStatCounts* pCounts, f32* pfValue) {
+    *pfValue = pCounts->nLongestDrive;
+    return 1;
+}
+
+u8 CalcLongestPutt(PgaStatCounts* pCounts, f32* pfValue) {
+    *pfValue = pCounts->nLongestPutt;
+    return 1;
+}
+
+u8 CalcTotalEagles(PgaStatCounts* pCounts, f32* pfValue) {
+    *pfValue = pCounts->nEagles;
+    return 1;
+}
+
+u8 CalcTotalBirdies(PgaStatCounts* pCounts, f32* pfValue) {
+    *pfValue = pCounts->nBirdies;
+    return 1;
+}
+
+u8 CalcConsecutiveCuts(PgaStatCounts* pCounts, f32* pfValue) {
+    *pfValue = pCounts->nConsecutiveCuts;
+    return 1;
+}
+
+u8 CalcSeasonWinnings(PgaStatCounts* pCounts, f32* pfValue) {
+    *pfValue = pCounts->nSeasonWinnings;
+    return 1;
+}
+
+u8 CalcCareerWinnings(PgaStatCounts* pCounts, f32* pfValue) {
+    *pfValue = pCounts->nCareerWinnings;
+    return 1;
+}
+
+u8 CalcRounds(PgaStatCounts* pCounts, f32* pfValue) {
+    *pfValue = pCounts->nRounds;
+    return 1;
+}
+
+u8 CalcPlayerOfYearPoints(PgaStatCounts* pCounts, f32* pfValue) {
+    *pfValue = pCounts->nPlayerOfYearPoints;
+    return 1;
+}
+
+// ---- sweep code (not yet cleaned up) ----
 
 void fn_8011C054(void) {
 }
@@ -326,3 +392,5 @@ void fn_8011C058(u8 v) {
 void fn_8011C060(u8 v) {
     lbl_8028184D = v;
 }
+
+// ---- end of sweep code ----
