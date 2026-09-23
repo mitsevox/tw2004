@@ -810,9 +810,18 @@ config.libs = [
             Object(Matching, "runtime/s_copysign.c"),
             Object(Matching, "runtime/s_modf.c"),
             Object(Matching, "runtime/qsort.c", mw_version="GC/2.5"),
-            Object(Matching, "runtime/sscanf.c"),
             Object(Matching, "runtime/wchar_io.c"),
             Object(Matching, "runtime/uart_console_io.c"),
+        ],
+    },
+    {
+        "lib": "pikmin2_msl",
+        "mw_version": "GC/2.5",
+        "cflags": cflags_runtime,
+        "progress_category": "sdk",
+        "src_dir": "extern/pikmin2",
+        "objects": [
+            Object(Matching, "src/MSL_C/scanf.c"),
         ],
     },
     {
