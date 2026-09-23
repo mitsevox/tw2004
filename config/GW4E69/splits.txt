@@ -3540,6 +3540,9 @@ dolphin/ar/ar.c:
 
 libs/dolphin/src/ar/arq.c:
 	.text       start:0x8013538C end:0x80135810
+	.data       start:0x80195DE8 end:0x80195E30
+	.sdata      start:0x802819E0 end:0x802819E8
+	.sbss       start:0x80282660 end:0x80282690
 
 src/ax/AX.c:
 	.text       start:0x80135810 end:0x8013584C
