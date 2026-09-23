@@ -39,6 +39,11 @@ s32  fn_8011027C(void);                 // DiscCheck.c
 int  fn_80110450(void);                 // DiscCheck.c (defined there as u8; callers here see int)
 u8*  fn_801104A0(void);                 // DiscCheck.c: the disc read's command block
 s32  DVDGetCommandBlockStatus(u8* pBlock);
+void fn_80110178(u8 v);                 // DiscCheck.c
+void fn_80101EE8(void);                 // GameMode11.c
+void fn_800EE2C8(void);                 // GameModeDriverPGATour.c
+u8*  fn_8010C718(void);                 // CharSliders.c
+void fn_801260C0(void);                 // GameMode22.c
 void fn_80126F84(s32 n);                // GameMode22.c: sets lbl_80195498.n4
 void fn_80126F94(s32 n);                // GameMode22.c: sets lbl_80195498.n0
 void GM_SetupCustomHoleSelection(void); // GameManager.c
@@ -4256,6 +4261,48 @@ void fn_80083BC8(MsgArg* pArgs, MsgArg* pResult) {
     if (pResult->i == 0) {
         fn_801102AC();
     }
+}
+
+// Start the current game mode's event (modes 11, 5, 23, 26, 22, 24) and answer fn_80110180. In
+// modes 5 and 11 player 0 gets the created golfer (a loaded profile) or golfer 0 first.
+void fn_80083BFC(MsgArg* pArgs, MsgArg* pResult) {
+    if (Game_GetMode() == 11) {
+        if (Game_GetMode() == 5 || Game_GetMode() == 11) {
+            if (gpSaveData[0].bActive) {
+                lbl_801D7148.aBackup[0] = 0;
+                if (lbl_80281ED4->b11703 == 0) {
+                    Session_SetGolfer(FIRST_CREATED_GOLFER, 0);
+                }
+            } else {
+                Session_SetGolfer(0, 0);
+            }
+        }
+        fn_80101EE8();
+        fn_80110178(1);
+    } else if (Game_GetMode() == 5) {
+        if (Game_GetMode() == 5 || Game_GetMode() == 11) {
+            if (gpSaveData[0].bActive) {
+                lbl_801D7148.aBackup[0] = 0;
+                if (lbl_80281ED4->b11703 == 0) {
+                    Session_SetGolfer(FIRST_CREATED_GOLFER, 0);
+                }
+            } else {
+                Session_SetGolfer(0, 0);
+            }
+        }
+        fn_800EAF7C();
+        fn_80110178(1);
+    } else if (Game_GetMode() == 23) {
+        fn_800EE2C8();
+    } else if (Game_GetMode() == 26) {
+        fn_8010C718();
+    } else if (Game_GetMode() == 22) {
+        fn_801260C0();
+    } else if (Game_GetMode() == 24) {
+        GameModeDriverRTE_StartEvent();
+    }
+    pResult->i = fn_80110180();
+    fn_80110178(0);
 }
 
 // The disc read's state for the menus (100: fn_80110450 says so), like GameUICommands.c's
