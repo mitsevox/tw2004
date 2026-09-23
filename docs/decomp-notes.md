@@ -207,6 +207,25 @@ The fixes that come up most often. Each points to its full entry below.
   argument that was never used (`fn_800E5DA0(lbl)` vs `fn_800E5DA0()`) changes the code.
 - **[verified] Chained assignment stores backwards.** `a[0] = a[1] = a[2] = 0` stores 2, 1, 0;
   the original wrote four statements in order.
+- **[verified] ...but a chain gets its zero register first.** A run of zero stores whose only
+  difference is the loop's volatile registers (the zero in `r7` instead of `r4`, pointers shifted
+  by one) matched as one chain written last field first, so the stores still come out in field
+  order: GameMode2 `fn_800F8880`, 96.9% -> 100 (in field order the chain scores 94.8). The
+  permuter's 30 exact variants all made the zero one shared value. It is per function, not EA
+  style: the same seven stores in `fn_800F8B08` and GameModeMatch `fn_800EA548` match only as
+  separate statements. Mark the chain as a fake match.
+- **[verified] Nested call arguments are evaluated last argument first.** In
+  `f(g(), Game_CurHoleIndex())` the hole index is fetched before `g()`. Writing it into a local
+  first keeps the same call order but a different saved register (GameMode2 `fn_800F8EDC`,
+  99.93% -> 100 with the call inline).
+- **[verified] A call result used once stays inline.** `n = f(); x = 0; y = 0; p->a += n;` and
+  `p->a += f(); x = 0; y = 0;` schedule the same, but the local changes the scratch registers
+  (GameMode2 `fn_800F8EDC`, 99.56% -> 99.93).
+- **[verified] A table read before its range check was a local.** When the original loads
+  `table[n]` before testing `n`, the source read it into a local at the top:
+  `u16 nSound = lbl_80192BA8[nEvent]; if (nEvent >= 37 || nSound == 0xFFFF) return;` (GameMode8
+  `fn_800FAA70`, 71.7% -> 93.9, then exact with the or-chain). Check the table is big enough for
+  every index the callers pass; if not, it is an EA bug and gets a comment.
 
 ### Structs, arrays and pointers
 
@@ -220,6 +239,10 @@ The fixes that come up most often. Each points to its full entry below.
   player field means EA repeated `gPlayers[n].field`; a local `Player* p` or `s8* pField` gives
   `lwz 0xOFF(rN)` instead, and the add comes out in a different place (GameMode10 fn_800F1ABC,
   fn_800F1B60, fn_800F21B4).
+- **[verified] One function can use both.** When the original keeps `&gPlayers[n]` in one saved
+  register for the first statements and computes the player offset afresh after the calls, the
+  source used a `Player* p` for the first part and `gPlayers[n].field` at the end (GameMode8
+  `fn_800FA9E0`, 77% -> 100; `p` throughout gives 83.7%).
 - **[verified] `Player* p = &gPlayers[n]` vs `gPlayers[n].field`** pick different address shapes:
   the pointer form gives `mulli r5; addi r0, rB, sym@l; add r3, r0, r5`; direct indexing gives
   `mulli r0; addi r3, r3, sym@l; add r3, r3, r0`. Match whichever the original has per function.
@@ -266,6 +289,16 @@ The fixes that come up most often. Each points to its full entry below.
 
 ### Types, casts and sign extension
 
+- **[verified] Two neighbouring words handled with 64-bit operations are one `u64`.** When the
+  code ORs, ANDs and tests two adjacent words together (`and`/`xor`/`or.` on both halves, an AND
+  with `li -1` for the upper word), declare one `u64` field. Player 0xC48/0xC4C as two `s32`s
+  could not match in any statement order; as `u64 uC48` GameMode8 `fn_800FAAB8` went 93.3% ->
+  99.2%, then exact with statement order.
+- **[verified] The ball position is read as bytes of the Player, not through a `Ball*`.**
+  `*(f32*)(gPlayers[n].ball + 0)` / `+ 8` matches; `((Ball*)gPlayers[n].ball)->vPos[0]` and
+  `((f32*)gPlayers[n].ball)[0]` add an `addi r3, r3, 0xa90` pointer temp (GameMode8
+  `fn_800FAD54`, 99.66%). Same rule as the GetHonors shape above, for `gPlayers[n]`. It is the
+  one sanctioned raw offset until `Player.ball` gets a real type that matches.
 - **[verified] `int` vs `long` changes the code.** For an `int` local CodeWarrior folds
   `n += 3` into every later use (`addi r5, rN, 3` at a call, `addi r0, rN, 3; cmpwi r0, 8`, ...),
   even when that costs instructions, and treats `n += *p` / `n = n + *p` as an in-place update.
@@ -280,7 +313,11 @@ The fixes that come up most often. Each points to its full entry below.
   `optimize_for_size`, any placement of the add, a separate result variable, a ternary, a cast
   to `int` or `u8` - those are no-ops the front end drops - and every GC/2.x version behaves the
   same. A cast to `u32`/`s32` on one operand of `n = n + x` also blocks the fold, which is how the
-  rule was found: `s32` is `long` in `game_types.h`.)
+  rule was found: `s32` is `long` in `game_types.h`.) The same choice decides loop hoisting: in
+  Stableford's `fn_800FE8A8`, `int nPar` had `nPar + 2` hoisted into its own saved register before
+  the player loop (one saved register more than the original); `s32 nPar` keeps the `addi` in the
+  loop body. All 8 `int`/`s32` combinations of the other locals with `s32 nPar` are exact, all 7
+  with `int nPar` stay at 75.4%. The `long j` counter in GameMode13 `fn_800F6ED4` is the same rule.
 - **[verified] What else forces an in-place `+= const`:** the post-add value flowing into a phi
   with another definition of the same variable - a loop that decrements it, or a redefinition in
   one branch plus a use after the join. Even a *dead* decrement inside a later loop does it (the
@@ -295,8 +332,10 @@ The fixes that come up most often. Each points to its full entry below.
 - **[verified] `u8` returned from an `int` local** gives `clrlwi r3, rX, 24` at the return; a `u8`
   local gives a plain `mr`.
 - **[verified] Array index cast to `u32` moves the hoisting.** In the GameMode2 (Skins) honors
-  loop (`fn_800F8278`), `gPlayers[(u32)i].field[h]` is what gives the original's base + h*4 hoisted out of the
-  loop; the plain `int` index computes it differently.
+  loop (`fn_800F8278`), `gPlayers[(u32)i].field[h]` is what gives the original's base + h*4
+  hoisted out of the loop; the plain `int` index computes it differently. The same `(u32)` index
+  matched in GameModeMatch.c and in Stableford `fn_800FE8A8`: it is EA's habit (likely from a
+  macro of theirs), so it is written without a fake-match comment.
 
 ### Function calls and parameters
 
@@ -320,6 +359,9 @@ The fixes that come up most often. Each points to its full entry below.
 
 ### Compares and conditions
 
+- **[verified] `n ? 0 : 1` and `n == 0` give the same instructions, different saved registers.**
+  GameMode8 `fn_800FAAB8`: `nOther = nPlayer ? 0 : 1;` put `nOther` in the original's register
+  (91.7% -> 93.1); `nOther = nPlayer == 0;` and `!nPlayer` (89.4%) did not.
 - **[verified] Float compares.** `if (a < b) return;` gives `fcmpo; blt`; `if (a >= b) return;`
   gives `fcmpo; cror eq,gt,eq; beq` (the NaN-safe form). When the original has a plain `bge`,
   the source was `if (a < b) { ...rest... }` - a block, not an early return.
@@ -455,6 +497,16 @@ The fixes that come up most often. Each points to its full entry below.
 
 ### Data, constants and symbols
 
+- **[verified] An exact unit can still fail the link on function order.** objdiff scores each
+  function by name, so a function defined out of address order reads 100% while the linked
+  `.text` shifts. GameUI `fn_800E3ECC` was defined after `fn_800E3EE0`; moving it fixed the DOL.
+- **[verified] A constant the original has twice means the original was two files.**
+  CodeWarrior keeps one copy of each constant per file. GameMode10's code emits one int-to-float
+  conversion double; the original has two (`lbl_80284688`, `lbl_802846A0`), each with the
+  constants of one half of the unit, so the unit is two original files.
+- **[verified] Constants shared with undecompiled neighbours mean the unit is a slice.** CharAnim
+  uses three constants from a pool at 0x80283CD8 that neighbouring code also uses; it can link
+  only once the unit is widened to own the whole pool.
 - **[verified] An exact unit can still break the linked build.** objdiff compares functions; the
   DOL check also needs the data layout. A unit whose C makes the compiler emit its own data (the
   8-byte int-to-float constant `0x4330000080000000` in `.sdata2`, a string literal, a static)

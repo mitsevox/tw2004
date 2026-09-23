@@ -106,7 +106,11 @@ def ub_check(path, lines):
 def changed_lines(rev):
     """file name -> set of line numbers added or changed since rev (working tree included)."""
     import subprocess
-    out = subprocess.run(['git', 'diff', '-U0', rev, '--', 'src'], cwd=ROOT,
+    # Diff against the merge base, so lines that changed on `rev` after this branch left it are
+    # not counted as this branch's.
+    base = subprocess.run(['git', 'merge-base', rev, 'HEAD'], cwd=ROOT,
+                          capture_output=True, text=True).stdout.strip() or rev
+    out = subprocess.run(['git', 'diff', '-U0', base, '--', 'src'], cwd=ROOT,
                          capture_output=True, text=True).stdout
     res, cur = {}, None
     for l in out.splitlines():

@@ -350,7 +350,7 @@ void fn_800E1074(void) {
         for (j = 0; j < 4; j++) {
             p->nRoundScore[j] = 0;
         }
-        p->unk28C = 0;
+        p->bPlayerCut = 0;
         p->nHolesWon = 0;
         p->n274 = 0;
         p->n2D8 = 0;
@@ -359,8 +359,7 @@ void fn_800E1074(void) {
         p->n308 = 0;
         p->nC44 = 3000;
         p->nC3C = 0;
-        p->nC4C = 0;
-        p->nC48 = 0;
+        p->uC48 = 0;
         for (j = 0; j < 18; j++) {
             p->nC6C[j] = 0;
         }

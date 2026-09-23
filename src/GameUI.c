@@ -287,6 +287,11 @@ void fn_800E3E3C(void) {
     }
 }
 
+void fn_800E3ECC(void) {
+    lbl_80282282 = 1;
+    lbl_80282281 = 0;
+}
+
 // Unpauses, and finishes whatever the pause was covering: the end-of-hole screen (the hole is
 // marked done) or the end-of-round screen (the mode is told; mode 12 replays the same hole,
 // otherwise the next selected hole, and every ball goes back on the tee lie).
@@ -345,11 +350,6 @@ void fn_800E3EE0(void) {
             fn_800A76E4();
         }
     }
-}
-
-void fn_800E3ECC(void) {
-    lbl_80282282 = 1;
-    lbl_80282281 = 0;
 }
 
 u8 fn_800E415C(void) {

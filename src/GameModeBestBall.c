@@ -193,7 +193,7 @@ s32 fn_800E84B0(int nPlayer) {
         }
     }
     for (i = 0; i < gNumPlayersSetUp; i++) {
-        if (nPlayer != order.a[i] && Player_OnTee(order.a[i]) && !gPlayers[order.a[i]].unk28C &&
+        if (nPlayer != order.a[i] && Player_OnTee(order.a[i]) && !gPlayers[order.a[i]].bPlayerCut &&
             !fn_800E82AC(fn_800E8848(order.a[i]))) {
             return order.a[i];
         }
@@ -203,7 +203,7 @@ s32 fn_800E84B0(int nPlayer) {
     fBest = 0.0f;
     nBest = 5;
     for (i = 0; i < gNumPlayersSetUp; i++) {
-        if (i != nPlayer && !Player_IsHoled(i) && !PLAYER(i)->unk28C && !fn_800E82AC(fn_800E8848(i)) &&
+        if (i != nPlayer && !Player_IsHoled(i) && !PLAYER(i)->bPlayerCut && !fn_800E82AC(fn_800E8848(i)) &&
             PLAYER(i)->nLie != LIE_GREEN) {
             dx = *(f32*)(PLAYER(i)->ball + 0) - pCourse->pin[nHole].x;
             dz = *(f32*)(PLAYER(i)->ball + 8) - pCourse->pin[nHole].z;
@@ -218,7 +218,8 @@ s32 fn_800E84B0(int nPlayer) {
         fBest = 0.0f;
         nBest = 5;
         for (i = 0; i < gNumPlayersSetUp; i++) {
-            if (i != nPlayer && !Player_IsHoled(i) && !PLAYER(i)->unk28C && !fn_800E82AC(fn_800E8848(i))) {
+            if (i != nPlayer && !Player_IsHoled(i) && !PLAYER(i)->bPlayerCut &&
+                !fn_800E82AC(fn_800E8848(i))) {
                 dx = *(f32*)(PLAYER(i)->ball + 0) - pCourse->pin[nHole].x;
                 dz = *(f32*)(PLAYER(i)->ball + 8) - pCourse->pin[nHole].z;
                 d = fn_80009680(dx * dx + dz * dz);

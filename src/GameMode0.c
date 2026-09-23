@@ -134,13 +134,13 @@ s32 fn_800FF894(int nPlayer) {
     }
     // h doubles as the player counter here: a separate counter gets a different register.
     for (h = 0; h < gNumPlayersSetUp; h++) {
-        if (nPlayer != order.a[h] && Player_OnTee(order.a[h]) && !gPlayers[order.a[h]].unk28C) {
+        if (nPlayer != order.a[h] && Player_OnTee(order.a[h]) && !gPlayers[order.a[h]].bPlayerCut) {
             return order.a[h];
         }
     }
     nBest = 5;
     for (i = 0; i < gNumPlayersSetUp; i++) {
-        if (i != nPlayer && !Player_IsHoled(i) && !PLAYER(i)->unk28C) {
+        if (i != nPlayer && !Player_IsHoled(i) && !PLAYER(i)->bPlayerCut) {
             nBest = i;
             break;
         }
@@ -153,7 +153,7 @@ s32 fn_800FF894(int nPlayer) {
     fBest = 0.0f;
     nBest = 5;
     for (i = 0; i < gNumPlayersSetUp; i++) {
-        if (i != nPlayer && !Player_IsHoled(i) && !PLAYER(i)->unk28C && PLAYER(i)->nLie != LIE_GREEN) {
+        if (i != nPlayer && !Player_IsHoled(i) && !PLAYER(i)->bPlayerCut && PLAYER(i)->nLie != LIE_GREEN) {
             dx = *(f32*)(PLAYER(i)->ball + 0) - pCourse->pin[nHole].x;
             dz = *(f32*)(PLAYER(i)->ball + 8) - pCourse->pin[nHole].z;
             d = fn_80009680(dx * dx + dz * dz);
@@ -167,7 +167,7 @@ s32 fn_800FF894(int nPlayer) {
         fBest = 0.0f;
         nBest = 5;
         for (i = 0; i < gNumPlayersSetUp; i++) {
-            if (i != nPlayer && !Player_IsHoled(i) && !PLAYER(i)->unk28C) {
+            if (i != nPlayer && !Player_IsHoled(i) && !PLAYER(i)->bPlayerCut) {
                 dx = *(f32*)(PLAYER(i)->ball + 0) - pCourse->pin[nHole].x;
                 dz = *(f32*)(PLAYER(i)->ball + 8) - pCourse->pin[nHole].z;
                 d = fn_80009680(dx * dx + dz * dz);
@@ -188,7 +188,7 @@ s32 fn_800FF894(int nPlayer) {
 u8 fn_800FFCCC(int nPlayer, int a) {
     int i;
     for (i = 0; i < gNumPlayersSetUp; i++) {
-        if (!Player_IsHoled(i) && !PLAYER(i)->unk28C) {
+        if (!Player_IsHoled(i) && !PLAYER(i)->bPlayerCut) {
             return 0;
         }
     }
