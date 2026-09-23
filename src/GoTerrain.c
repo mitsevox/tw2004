@@ -788,8 +788,6 @@ s32 fn_80035508(u8* p0);
 s32 fn_80035554(u8* p0);
 f32 fn_80035560(u8* p0);
 s32 fn_8003556C(u8* p);
-extern s32* lbl_802811F0;
-s32 fn_80035574(void);
 extern u8* lbl_802813B8;
 void fn_80035584(s32 v);
 void fn_80035590(f32* p0);
@@ -916,8 +914,8 @@ s32 fn_8003556C(u8* p) {
     return *(s32*)(p + 0xC);
 }
 
-s32 fn_80035574(void) {
-    return *lbl_802811F0 & 2;
+u8 fn_80035574(void) {
+    return lbl_802811F0->uFlags & 2;
 }
 
 void fn_80035584(s32 v) {

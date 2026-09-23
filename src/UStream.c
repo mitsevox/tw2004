@@ -42,7 +42,7 @@ static UStreamBuffer* gpCurList;  // 0x80281C4C  buffers being parsed
 static UStreamBuffer* gpUsedList; // 0x80281C48  parsed buffers that objects still reference
 static u32  gCurObjectPos;        // 0x80281C44
 static UStreamObject* gpCurObject;   // 0x80281C40  object being filled
-static void* gpNodePool;          // 0x80281C3C
+static UMemPool* gpNodePool;      // 0x80281C3C
 static UStreamNode* gpDoneList;   // 0x80281C38  objects finished by the parser
 static void* gpBufferMemory;      // 0x80281C34
 static int  gnCurStream;          // 0x80281C30  -1 = none
@@ -59,10 +59,6 @@ int gnNumHandlers = -1;           // 0x80280DB8 (.sdata): -1 until UStream_Init
 // ---- other files' functions -----------------------------------------------------------
 
 int   fn_80005BC8(const void* pA, const void* pB);           // string/name compare
-void* fn_8000AFA0(u32 uNodeSize, u32 uAlign, int a, int b);  // UMemPool create
-void  fn_8000B058(void* pPool);                              // UMemPool destroy
-void* fn_8000B078(void* pPool);                              // UMemPool take node
-void  fn_8000B0D4(void* pPool, void* pNode);                 // UMemPool return node
 void  fn_8000B4B8(UStreamObject* p);
 u8    fn_8000B508(UStreamObject* p);
 void  fn_8000B588(UStreamObject* p);
@@ -78,7 +74,6 @@ void  fn_800A929C(u32 uType);
 void* fn_800A9374(u32 uSize);
 void  fn_800A93AC(void);
 void  fn_800B7490(void);                                     // yield / pump
-void  fn_8009527C(void* p);
 void  fn_8000E708(UStreamParams* p);
 void  fn_8015A7FC(char* pDst, const char* pSrc);             // strcpy
 
@@ -478,7 +473,7 @@ void UStream_Decompress(const void* pSrc, void* pDst, u32 uSize) {
 }
 
 // A buffer's data was handed to an object: count the reference.
-static void UStream_AddBufferRef(UStreamBuffer** ppList) {
+void UStream_AddBufferRef(UStreamBuffer** ppList) {
     if (gnCurStream == -1) return;
     (*ppList)->nRefs++;
 }
