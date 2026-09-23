@@ -2,43 +2,72 @@
 // course (ActAnimal_*). Not yet decompiled; the unit covers the file's certain core, whose
 // functions share its constant block (0x80283218-0x80283280).
 
-#include "game_types.h"
+#include "dynobj.h"
 
-// ---- sweep code (not yet cleaned up) ----
+void fn_8004A24C(DynObjAnimal* pAnimal, DynObjSetup* pSetup);  // message 2: sets it up
+void fn_8004A578(DynObjAnimal* pAnimal, void* pArg);            // message 6: pArg holds the frame
+                                                                // time's bits
 
-s32 fn_80048894(u8*);
-s32 fn_80049820();
-s32 fn_8004A24C(u8*, s32);
-s32 fn_8004A578(u8*, s32);
-s32 fn_8004AAEC(s32 arg0, u8* arg1, s32 arg2);
-s32 fn_8004ABA4(u8* p0, s32 p1);
-s32 fn_8004ABB4(u8* p);
+// Scales f16C and f174 by the length of the animal's route (once round its points).
+void fn_8004A14C(DynObjAnimal* pAnimal) {
+    f32 vStep[4];
+    f32 fLength = 0.0f;
+    AnimalNode* pNode;
+    int i;
+    AnimalNode* pNext;
 
-s32 fn_8004AAEC(s32 arg0, u8* arg1, s32 arg2) {
-    switch (arg0) {
-    case 1:
-        return 0x1C0;
-    case 2:
-        fn_8004A24C(arg1, arg2);
-        return 0;
-    case 6:
-        fn_8004A578(arg1, arg2);
-        return 0;
-    case 3:
-        if ((u32) (*(u32*)((u8*)(arg1) + 0x100)) != 0U) {
-            (*(s32*)((u8*)(arg1) + 0x118)) = (s32) (*(s32*)((u8*)(arg1) + 0x1AC));
-            (*(f32*)((u8*)(arg1) + 0x11C)) = (f32) (*(f32*)((u8*)(arg1) + 0x1B4));
-            fn_80048894(arg1 + 0x10);
+    if (pAnimal->pRoute != NULL) {
+        pNode = &pAnimal->pRoute->aNodes[0];
+        for (i = 0; i < pAnimal->pRoute->nNodes; i++) {
+            pNext = &pAnimal->pRoute->aNodes[pNode->nNext];
+            vStep[0] = pNext->vPos[0] - pNode->vPos[0];
+            vStep[1] = pNext->vPos[1] - pNode->vPos[1];
+            vStep[2] = pNext->vPos[2] - pNode->vPos[2];
+            vStep[3] = 1.0f;
+            fLength += (f32)fn_80009680(fn_80009744(vStep));
+            pNode = pNext;
         }
-        return 0;
-    default:
-        return fn_80049820();
+        pAnimal->f16C /= fLength;
+        pAnimal->f174 /= fLength;
     }
 }
 
-s32 fn_8004ABA4(u8* p0, s32 p1) {
-    return *(s32*)(((u8*)*(s32*)(p0 + 0x8)) + (p1 << 2));
+// Type 11's message handler; other messages go to type 0's.
+int fn_8004AAEC(int nMsg, DynObj* pObj, void* pArg, void* pArg2) {
+    switch (nMsg) {
+    case 1:
+        return sizeof(DynObjAnimal);
+    case 2:
+        fn_8004A24C((DynObjAnimal*)pObj, pArg);
+        return 0;
+    case 6:
+        fn_8004A578((DynObjAnimal*)pObj, pArg);
+        return 0;
+    case 3:
+        if (pObj->obj.pModel != NULL) {
+            pObj->obj.n108 = ((DynObjAnimal*)pObj)->n1AC;
+            pObj->obj.f10C = ((DynObjAnimal*)pObj)->f1B4;
+            fn_80048894(&pObj->obj);
+        }
+        return 0;
+    default:
+        return fn_80049820(nMsg, pObj, pArg, pArg2);
+    }
 }
+
+// The same as UObject.c's fn_80048AD4, compiled into this file too.
+int fn_8004AB90(UObjMesh* pMesh, int i) {
+    return pMesh->pInfo->a24[i];
+}
+
+// The same as UObject.c's fn_80048AC4, compiled into this file too.
+UObjMesh* fn_8004ABA4(UObjMesh* pMesh, int i) {
+    return pMesh->p8[i];
+}
+
+// ---- sweep code (not yet cleaned up) ----
+
+s32 fn_8004ABB4(u8* p);
 
 s32 fn_8004ABB4(u8* p) {
     return *(s32*)(p + 0xEC);

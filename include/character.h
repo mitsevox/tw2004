@@ -424,7 +424,7 @@ void  fn_8001C7FC(Character* pChar, int nStyle);   // the animation style (nStyl
 Character* fn_8001D324(int nId);        // the character with this id (100: the flag, by its clips), or NULL
 void  fn_8001D624(int n);               // set gSession.aD2D[n]
 void  fn_8001D7A4(Character* pChar);
-void  fn_8001DA04(Character* pChar, u8* pA, u8* pB);
+void  fn_8001DA04(Character* pChar, f32* pA, f32* pB);   // pA gets a bone's position
 void  fn_8001DB04(Character* pChar, f32* pOut);    // the golfer's position
 void  fn_8001DB98(Character* pChar);    // empty the character's four data buffers
 u8    fn_8001DBF4(Character* pChar);    // the ball is in the golfer's hand
