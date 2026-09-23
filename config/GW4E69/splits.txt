@@ -3847,6 +3847,8 @@ src/Runtime.PPCEABI.H/GCN_mem_alloc.c:
 
 src/MSL_C/PPCEABI/bare/H/abort_exit.c:
 	.text       start:0x801521B0 end:0x801522A0
+	.bss        start:0x8027D4C0 end:0x8027D5C0
+	.sbss       start:0x802829E0 end:0x802829F0
 
 src/MSL_C/PPCEABI/bare/H/alloc.c:
 	.text       start:0x801522A0 end:0x80152754
