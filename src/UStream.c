@@ -990,3 +990,29 @@ void fn_8000E708(UStreamParams* p) {
         p->apOpenedArg[i] = NULL;   // EA bug: clears apOpenedArg twice; apClosedArg is never cleared
     }
 }
+
+// Copies a delivered object's data into pDst (at most uMax bytes) and frees the object. Returns
+// the number of bytes copied.
+u32 fn_8000E790(UStreamObject* pObject, u32 uMax, void* pDst) {
+    void* pData;
+    u32 uSize;
+
+    uSize = fn_8000E81C(pObject, &pData);
+    if (uSize != 0) {
+        if (uSize != uMax) {
+            uSize = (uSize <= uMax) ? uSize : uMax;
+        }
+        Mem_cpy(pDst, pObject->pData, uSize);
+    }
+    fn_80009E70(pObject);
+    return uSize;
+}
+
+// An object's data and its size.
+u32 fn_8000E81C(UStreamObject* pObject, void** ppData) {
+    u32 uSize;
+
+    uSize = pObject->uSize;
+    *ppData = pObject->pData;
+    return uSize;
+}
