@@ -47,6 +47,11 @@ Names
 Data access
 -----------
 
+- **One declaration per global, one definition per type.** A global's `extern` lives in a header,
+  with one type everywhere; a struct used by two files is defined once, in a header. A private
+  local view of shared data (a partial struct, a `u8*` where others see a struct) is how files
+  drift apart: `python tools/match/typeaudit.py` lists them, and merges may not add any.
+
 - **Use struct fields, never raw offsets.** `gPlayers[n].nC38`, not `*(s32*)((u8*)p + 0xC38)`. If
   the field is missing, add it to the struct (with its offset comment) in the right header.
 - Write player access the way EA did, `gPlayers[nPlayer].field` each time; see

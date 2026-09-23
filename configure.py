@@ -499,7 +499,7 @@ config.libs = [
         "objects": [
             Object(NonMatching, "src/dolphin/dvd/dvd.c"),
             Object(Matching, "src/dolphin/os/OSMemory.c"),
-            Object(NonMatching, "src/dolphin/os/OSThread.c"),
+            Object(Matching, "src/dolphin/os/OSThread.c"),
         ],
     },
     {
@@ -533,7 +533,7 @@ config.libs = [
         "progress_category": "sdk",
         "src_dir": "extern/ffcc",
         "objects": [
-            Object(NonMatching, "src/TRK_MINNOW_DOLPHIN/dolphin_trk_glue.c"),
+            Object(Matching, "src/TRK_MINNOW_DOLPHIN/dolphin_trk_glue.c"),
         ],
     },
     {
@@ -618,7 +618,7 @@ config.libs = [
         "progress_category": "sdk",
         "src_dir": "extern/sdk",
         "objects": [
-            Object(NonMatching, "dolphin/ai.c"),
+            Object(Matching, "dolphin/ai.c"),
         ],
     },
     {
@@ -640,7 +640,7 @@ config.libs = [
         "progress_category": "sdk",
         "src_dir": "extern/sdk",
         "objects": [
-            Object(NonMatching, "dolphin/si/SIBios.c"),
+            Object(Matching, "dolphin/si/SIBios.c"),
             Object(Matching, "dolphin/si/SISamplingRate.c"),
         ],
     },
@@ -672,7 +672,7 @@ config.libs = [
         "progress_category": "sdk",
         "src_dir": "extern/sdk",
         "objects": [
-            Object(NonMatching, "dolphin/exi/EXIBios.c"),
+            Object(Matching, "dolphin/exi/EXIBios.c"),
             Object(Matching, "dolphin/exi/EXIUart.c"),
         ],
     },
@@ -713,7 +713,7 @@ config.libs = [
         "src_dir": "extern/sdk",
         "objects": [
             Object(NonMatching, "dolphin/dvd/fstload.c"),
-            Object(NonMatching, "dolphin/dvd/dvdlow.c"),
+            Object(Matching, "dolphin/dvd/dvdlow.c"),
             Object(NonMatching, "dolphin/dvd/dvdfs.c"),
             Object(Matching, "dolphin/dvd/dvderror.c"),
             Object(Matching, "dolphin/dvd/dvdqueue.c"),
@@ -752,12 +752,12 @@ config.libs = [
             Object(NonMatching, "dolphin/os/OSError.c"),
             Object(NonMatching, "dolphin/os/OSContext.c"),
             Object(NonMatching, "dolphin/os/OSReboot.c"),
-            Object(NonMatching, "dolphin/os/OSAlarm.c"),
+            Object(Matching, "dolphin/os/OSAlarm.c"),
             Object(NonMatching, "dolphin/os/OSArena.c"),
             Object(NonMatching, "dolphin/os/OSCache.c"),
-            Object(NonMatching, "dolphin/os/OSReset.c"),
-            Object(NonMatching, "dolphin/os/OSRtc.c"),
-            Object(NonMatching, "dolphin/os/OSTime.c"),
+            Object(Matching, "dolphin/os/OSReset.c"),
+            Object(Matching, "dolphin/os/OSRtc.c"),
+            Object(Matching, "dolphin/os/OSTime.c"),
             Object(Matching, "dolphin/PPCArch.c"),
             Object(Matching, "dolphin/os/OSResetSW.c"),
             Object(Matching, "dolphin/os/OSInterrupt.c"),
@@ -775,7 +775,7 @@ config.libs = [
         "src_dir": "extern/sdk",
         "objects": [
             Object(NonMatching, "runtime/printf.c"),
-            Object(NonMatching, "runtime/runtime.c"),
+            Object(Matching, "runtime/runtime.c"),
             Object(NonMatching, "runtime/FILE_POS.c"),
             Object(Matching, "runtime/ctype.c"),
             Object(Matching, "runtime/e_acos.c"),
@@ -854,7 +854,7 @@ config.libs = [
             Object(Matching, "GameModeStableford.c"),
             Object(Matching, "GameMode12.c"),
             Object(Matching, "GameModeStroke.c"),
-            Object(NonMatching, "GameMode11.c"),
+            Object(Matching, "GameMode11.c"),
             Object(Matching, "unsorted/sweep_80079974.c"),
             Object(Matching, "unsorted/sweep_80109BA4.c"),
             Object(Matching, "unsorted/sweep_80013070.c"),

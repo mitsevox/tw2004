@@ -27,7 +27,6 @@ s32 fn_800EFE3C(s32 i);
 u8* fn_800EFE60(s32 p0);
 void fn_800F009C(void);
 u8 fn_8011908C(s32, s32);
-s32 fn_8011937C(s32, s32, u8);
 void fn_800F018C(void);
 
 // One tournament of the season (0x64 bytes).
@@ -77,7 +76,6 @@ u8   fn_800EF83C(u16 nDate, s32* pId, s32* pRound);
 void fn_800D2714(u16* pDate, s32* pDay, s32* pMonth, s32* pYear);
 s32  fn_8011A7C8(s32 nPlayer, s32 nHole);
 s32  fn_80119588(s32 a);
-s32  fn_800E1904(s32 nPlayer, s32 a);
 int   sprintf(char* pDst, const char* pFmt, ...);
 s32   fn_80118684(s32 a);
 char* fn_80118E30(s32 a, s32 b);

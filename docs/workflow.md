@@ -162,7 +162,9 @@ second copy. The steps:
    original was two files) or the constants are shared with neighbouring code (the unit is a
    slice of a larger file).
 
-Leave the unit `NonMatching` until the DOL passes.
+Leave the unit `NonMatching` until the DOL passes. Linking is also the only real check of
+`switch` statements: objdiff masks relocations, so a jump table pointing at the wrong case bodies
+still scores 100% until the DOL comparison catches it.
 
 When stuck
 ----------

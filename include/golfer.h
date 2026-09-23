@@ -6,6 +6,7 @@
 #define GOLFER_H
 
 #include "game_types.h"
+#include "engine.h"
 
 // ---- attributes -----------------------------------------------------------------------------
 
@@ -630,24 +631,15 @@ extern SurfaceType  gSurfaceTypes[];    // 0x8017E9B8
 
 int  Game_GetMode(void);                // 0x8000BED8
 int  fn_800D2B08(void);
-u32  Rand_Next(int nStream);            // 0x8000B130  EA's lagged-Fibonacci generator
-f32  Rand_Float(int nStream);           // 0x8000B428  [0, 1)
-f32  fn_800095F0(f32 fAngle);           // sin
-f32  fn_80009638(f32 fAngle);           // cos
-double fn_80009680(double x);           // sqrt
-double fn_8015F824(double x, double y); // pow
-void Vec_Copy(f32* pSrc, f32* pDst);   // 0x8000AD10
-f32  Terrain_HeightAt(f32* pPos, SurfaceType** ppSurface);   // 0x800447DC
 f32  fn_80050D34(f32 fDist);            // putt power for a distance
 f32  fn_80050F44(int nKind, int nClub); // a club's table reach for a shot kind
 f32  fn_80050F88(f32 fDist, u8* pParams, int nKind, int nClub);   // chip power
 f32  fn_800510EC(u8* pBall);            // the ball's f70 + its surface's +0x00
 int  fn_80100744(void);                 // shot kind override, 8 = none
 int  fn_801006F0(int nPlayer);          // club override, 26 = none
-CourseInfo* fn_8000C594(void);
 int  fn_80015464(void);
 u8   fn_80101DF4(void);
-f32  fn_8005C418(int nSpin);
+f32  Swing_SpinScale(int nSpin);         // how much spin SPIN allows: 0.15 at 0 .. 1.0 at 110 (Swing.c)
 
 u8   Club_UsableForKind(int nPlayer, int nClub, int nKind);
 int  AI_FirstUsableClub(int nPlayer, int nKind);
@@ -671,6 +663,7 @@ u8   AI_RehearseShot(int nPlayer, f32* pOutDist2, u8 bFast, f32 fTolerance);
 void AI_ApplyError(int nPlayer);
 u8   Lie_AllowsFullSwing(int nPlayer);
 void Shot_FitTargetToClub(int nPlayer);
+void Shot_Plan(int nPlayer, u8 bNotify);
 void Shot_Prepare(int nPlayer, u8 bNotify);
 int  Shot_Trajectory(int nPlayer);
 void Shot_DefaultSpin(int nPlayer, f32* pOut);
@@ -678,6 +671,8 @@ void Shot_FaceVector(int nPlayer, f32* pOut);
 f32  Shot_AimAngle(int nPlayer);
 void AI_ClubLonger(int nPlayer, s32* pClub, int nStep);
 void AI_ClubShorter(int nPlayer, s32* pClub, int nStep);
+void AI_ChooseTarget(int nPlayer);
+void GOLFERSTATE_Kill(int nPlayer);      // Swing.c: pop every state
 f32  AI_PowerScale(int nPlayer);
 void AI_FaceVector(int nPlayer, f32* pOut);
 void Caddie_Start(int nPlayer);
@@ -733,7 +728,8 @@ typedef struct PlayerProfile {
     u8   unk3A[6];
 } PlayerProfile;
 
-#define SESSION_OPTIONS  ((GameOptions*)((u8*)&gSession + 0xE78))
+#define SESSION_OPTIONS_OF(pSession) ((GameOptions*)((u8*)(pSession) + 0xE78))
+#define SESSION_OPTIONS  SESSION_OPTIONS_OF(&gSession)
 #define SESSION_PROFILE(i) ((PlayerProfile*)((u8*)&gSession + 0xD38) + (i))
 
 #endif
