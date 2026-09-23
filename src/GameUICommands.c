@@ -7,6 +7,9 @@
 #include "game/frontend.h"
 #include "game/modes/pgatoursim.h"
 
+void GM_GolferConcede_Hole(int nPlayer);           // GameManager.c
+u8   GameModeBattle_IsClubStealingFinished(void);  // GameModeBattle.c
+
 // ---- sweep code (not yet cleaned up) ----
 
 void fn_80086208(s32 p0, u8* p1);
@@ -280,6 +283,11 @@ void fn_800864D8(s32* pArgs, s32* pResult) {
     *pResult = gPlayers[pArgs[0]].ball.n6C;
 }
 
+// The wind's speed.
+void fn_800865A0(s32* pArgs, s32* pResult) {
+    *pResult = Wind_Get(NULL);
+}
+
 // ---- sweep code (not yet cleaned up) ----
 
 void fn_800865E0(s32 p0, u8* p1) {
@@ -540,6 +548,16 @@ void fn_80087790(u8* p0, u8* p1) {
     *(f32*)p1 = t0;
 }
 
+// ---- end of sweep code ----
+
+// The player whose turn it is concedes the hole.
+void fn_80087BE8(s32* pArgs, s32* pResult) {
+    gSession.bReplay = 0;
+    GM_GolferConcede_Hole(lbl_80282278);
+}
+
+// ---- sweep code (not yet cleaned up) ----
+
 void fn_80087D14(void) {
     fn_8009CD10();
 }
@@ -590,6 +608,20 @@ void fn_800880AC(void) {
 
 void fn_800880CC(void) {
 }
+
+// ---- end of sweep code ----
+
+// Whether the player's swing is in states 1 to 3.
+void fn_80088160(s32* pArgs, s32* pResult) {
+    if (gPlayers[pArgs[0]].swing.nState == 2 || gPlayers[pArgs[0]].swing.nState == 3 ||
+        gPlayers[pArgs[0]].swing.nState == 1) {
+        *pResult = 1;
+        return;
+    }
+    *pResult = 0;
+}
+
+// ---- sweep code (not yet cleaned up) ----
 
 void fn_800881A8(void) {
     fn_80101CFC();
@@ -751,6 +783,18 @@ void fn_80089590(s32* arg0, s32* arg1) {
         return;
     }
 }
+
+// ---- end of sweep code ----
+
+void fn_80089600(s32* pArgs, s32* pResult) {
+    if (fn_801025F4() != 0) {
+        *pResult = 1;
+        return;
+    }
+    *pResult = 0;
+}
+
+// ---- sweep code (not yet cleaned up) ----
 
 void fn_80089648(s32 p0, u8* p1) {
     s32 t0;
@@ -1003,6 +1047,19 @@ void fn_8008A838(s32 p0, u8* p1) {
 void fn_8008A86C(void) {
 }
 
+// ---- end of sweep code ----
+
+// Battle mode: whether the club stealing is over.
+void fn_8008A870(s32* pArgs, s32* pResult) {
+    if (GameModeBattle_IsClubStealingFinished() != 0) {
+        *pResult = 1;
+        return;
+    }
+    *pResult = 0;
+}
+
+// ---- sweep code (not yet cleaned up) ----
+
 void fn_8008A8B8(s32 p0, u8* p1) {
     s32 t0;
     t0 = GameModeBattle_GetWinner();
@@ -1037,6 +1094,18 @@ void fn_8008A964(s32* arg0) {
     }
     fn_800E53E8(1);
 }
+
+// ---- end of sweep code ----
+
+void fn_8008A9A0(s32* pArgs, s32* pResult) {
+    if (fn_800F0818() != 0) {
+        *pResult = 1;
+        return;
+    }
+    *pResult = 0;
+}
+
+// ---- sweep code (not yet cleaned up) ----
 
 void fn_8008AAAC(s32 a, u8* p) {
     *(s32*)(p + 0x0) = -1;
