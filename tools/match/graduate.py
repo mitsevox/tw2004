@@ -15,17 +15,18 @@ try:
 except TypeError:
     sys.exit('each range must be "<section> <start> <end>"')
 sp = sp0[:m.end()] + add + sp0[m.end():]
-a = 'Object(NonMatching, "%s")' % unit
-if cf0.count(a) != 1: sys.exit('%s: expected exactly one %s in configure.py' % (unit, a))
+a = 'Object(NonMatching, "%s"' % unit      # may go on with extra arguments (extra_cflags=...)
+if cf0.count(a) != 1: sys.exit('%s: expected exactly one %s...) in configure.py' % (unit, a))
 open(SP, 'w', encoding='utf-8', newline='').write(sp)
-open(CF, 'w', encoding='utf-8', newline='').write(cf0.replace(a, 'Object(Matching, "%s")' % unit))
+open(CF, 'w', encoding='utf-8', newline='').write(cf0.replace(a, 'Object(Matching, "%s"' % unit))
 subprocess.run('python configure.py', shell=True, cwd=ROOT, capture_output=True)
 subprocess.run('rm -f build/GW4E69/ok', shell=True, cwd=ROOT)
 r = subprocess.run('ninja', shell=True, cwd=ROOT, capture_output=True, text=True)
 ok = 'main.dol: OK' in r.stdout
 print(unit, 'OK' if ok else 'FAILED')
 if not ok:
-    print('\n'.join(l for l in r.stdout.splitlines() if 'WARN' not in l and ('rror' in l or 'FAIL' in l))[:3000])
+    print('\n'.join(l for l in r.stdout.splitlines()
+                    if 'WARN' not in l and ('rror' in l or 'FAIL' in l or l.startswith('#   ')))[:3000])
     open(SP, 'w', encoding='utf-8', newline='').write(sp0)
     open(CF, 'w', encoding='utf-8', newline='').write(cf0)
     subprocess.run('python configure.py', shell=True, cwd=ROOT, capture_output=True)

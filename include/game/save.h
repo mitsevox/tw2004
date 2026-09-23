@@ -27,13 +27,98 @@ typedef struct SeasonEvent {
     s32  nUserRankType;         // 0x20  0 did not play, 1 missed the cut, 2 placed. TW06: eUserRankType
 } SeasonEvent;
 
-// The PGA TOUR season in a save profile (TW06: PGATourSeason_t, which has 29 tournaments).
+// The tour golfers: 174 pros (the table the 'PGST' stream object fills) and the player.
+#define PGA_NUM_PROS        174
+#define PGA_USER_GOLFER     174     // the player's golfer id
+#define PGA_NUM_GOLFERS     175
+#define PGA_MAX_ENTRANTS    128     // a tournament's field
+
+// One golfer's season counts, from which each tour statistic is worked out (0x58 bytes). The
+// profile keeps one per tour golfer (PGATourSimulation.c simulates the pros'); the player's round
+// is counted in lbl_80205ED8 and added to the player's own (GameModeDriverPGATour fn_800EED0C).
+// TW06: GM_Pga_StatCounts, which has three more counts (water saves, water hits, long putts)
+// between nNonGIRPars and nEagles.
+typedef struct PgaStatCounts {
+    u16  nEvents;               // 0x00  tournaments started (counted in a first round)
+    u16  nRounds;               // 0x02  TW06: nRounds
+    u16  nLongestDrive;         // 0x04  TW06: longestDrive
+    u16  nDrives;               // 0x06  TW06: nDrives
+    u32  nDriveDistance;        // 0x08  all drives together. TW06: totalDriveDistance
+    u16  nLongestPutt;          // 0x0C  TW06: longestPutt
+    u16  nFairwaysHit;          // 0x0E  TW06: nFairwaysHit
+    u16  nFairways;             // 0x10  TW06: nFairwaysPossible
+    u16  nGreensHit;            // 0x12  greens in regulation. TW06: nGreensHit
+    u16  nHoles;                // 0x14  TW06: nHoles
+    u16  nPutts;                // 0x16  TW06: nPutts
+    u16  nGIRPutts;             // 0x18  putts on greens hit in regulation. TW06: nGIRPutts
+    u16  nBunkerSaves;          // 0x1A  TW06: nBunkerSaves
+    u16  nBunkers;              // 0x1C  TW06: nBunkers
+    u16  nNonGIRPars;           // 0x1E  pars on greens missed in regulation. TW06: nNonGIRPars
+    u16  nBirdiesAfterBogey;    // 0x20  TW06: nBirdiesAfterBogey
+    u16  nBogeys;               // 0x22  bogeys or worse. TW06: nBogeysOrWorse
+    u16  nEagles;               // 0x24  TW06: nEagles
+    u16  nBirdies;              // 0x26  birdies or better. TW06: nBirdies
+    u16  nPar3Birdies;          // 0x28  TW06: nPar3Birdies
+    u16  nPar3Holes;            // 0x2A  TW06: nPar3Holes
+    u16  nPar4Birdies;          // 0x2C  TW06: nPar4Birdies
+    u16  nPar4Holes;            // 0x2E  TW06: nPar4Holes
+    u16  nPar5Birdies;          // 0x30  TW06: nPar5Birdies
+    u16  nPar5Holes;            // 0x32  TW06: nPar5Holes
+    u16  nGIRBirdies;           // 0x34  birdies on greens hit in regulation. TW06: nGIRBirdies
+    u16  nStrokes;              // 0x36  TW06: nStrokes
+    u16  nPar3Strokes;          // 0x38  TW06: nPar3Strokes
+    u16  nPar4Strokes;          // 0x3A  TW06: nPar4Strokes
+    u16  nPar5Strokes;          // 0x3C  TW06: nPar5Strokes
+    u8   unk3E[2];
+    u32  nSeasonWinnings;       // 0x40  TW06: seasonWinnings
+    s32  n44;                   // 0x44
+    u16  nSeasonWins;           // 0x48  (0x80117E98; a new season clears 0x00-0x4A, 0x80117860)
+    u8   nPlayerOfYearPoints;   // 0x4A  1 a win, 3 more where fn_800EFA70's nC is set. TW06: playerOfYearPoints
+    u8   unk4B;
+    u16  nConsecutiveCuts;      // 0x4C  TW06: nConsecutiveCuts
+    u8   unk4E[2];
+    u32  nCareerWinnings;       // 0x50  TW06: careerWinnings
+    u16  nCareerWins;           // 0x54  (0x80117E98; kept from season to season)
+    u8   unk56[2];
+} PgaStatCounts;
+LAYOUT_ASSERT(PgaStatCounts, 0x58);
+
+// An entrant of the current tournament in a save profile (0x1C bytes; GetEntrantMCPtr). TW06:
+// PgaTourSim_Entrant_MC_t, laid out differently.
+typedef struct PgaEntrantMC {
+    s16  nGolfer;               // 0x00  golfer id (PGA_USER_GOLFER: the player)
+    s16  nTargetScore;          // 0x02  the four-round total the simulation aims at (0x80119E28)
+    s32  aRoundStrokes[4];      // 0x04  per round (0x80117CB8)
+    s32  bWasCut;               // 0x14  set with the golfer's consecutive-cuts count cleared (0x80117C50)
+    s32  n18;                   // 0x18
+} PgaEntrantMC;
+LAYOUT_ASSERT(PgaEntrantMC, 0x1C);
+
+// The current tournament's field in a save profile (0xE04 bytes, cleared as one by 0x80117AF8).
+typedef struct PgaField {
+    s16  nEntrants;             // 0x000  (GM_PgaTourSim_GetNumEntrants)
+    s16  nWinner;               // 0x002  the winning entrant, -1 while the tournament is on (0x80117E98)
+    PgaEntrantMC aEntrant[PGA_MAX_ENTRANTS];    // 0x004
+} PgaField;
+LAYOUT_ASSERT(PgaField, 0xE04);
+
+// The PGA TOUR in a save profile (0x4E9C bytes, cleared as one by 0x801176C0): the season (TW06:
+// PGATourSeason_t, which has 29 tournaments), every tour golfer's season counts, and the current
+// tournament's field.
 typedef struct TourSeason {
-    s32  nSeason;               // 0x00  0 = 2004. TW06: season
-    s32  nEvent;                // 0x04  the current tournament. TW06: eventID
-    s32  nRound;                // 0x08  its round. TW06: round
-    SeasonEvent aEvent[31];     // 0x0C
+    s32  nSeason;               // 0x0000  0 = 2004. TW06: season
+    s32  nEvent;                // 0x0004  the current tournament. TW06: eventID
+    s32  nRound;                // 0x0008  its round. TW06: round
+    SeasonEvent aEvent[31];     // 0x000C
+    PgaStatCounts aStats[PGA_NUM_GOLFERS];      // 0x0468  per golfer id
+    PgaField field;             // 0x4090
+    u16  n4E94;                 // 0x4E94  counts the tournaments started
+    u8   unk4E96[2];
+    u16  n4E98;                 // 0x4E98  a run of tour rounds, counted on each 18th hole
+                                //         (fn_800EF2B8); reset to 0 when the run breaks
+    u8   unk4E9A[2];
 } TourSeason;
+LAYOUT_ASSERT(TourSeason, 0x4E9C);
 
 // A saved custom round (0x70 bytes): 18 holes, each a hole number and the course it is from.
 // A new profile has three, emptied by the profile setup at 0x80057C88.
@@ -54,51 +139,6 @@ typedef struct TourWin {
     s16  n6;                    // 0x6  the tournament's aPrize[bracket][1]
 } TourWin;
 
-// PGA TOUR statistics (0x58 bytes): counted for the current tournament round in lbl_80205ED8
-// (GameModeDriverPGATour.c) and added to the profile's career totals as each round ends (fn_800EED0C).
-typedef struct TourStats {
-    u16  n0;                    // 0x00  tournaments started (the round counted was a first round)
-    u16  n2;                    // 0x02  rounds played
-    u16  n4;                    // 0x04  the career keeps the highest
-    u16  n6;                    // 0x06
-    s32  n8;                    // 0x08
-    u16  nC;                    // 0x0C  the career keeps the highest
-    u16  nE;                    // 0x0E
-    u16  n10;                   // 0x10
-    u16  n12;                   // 0x12
-    u16  n14;                   // 0x14
-    u16  n16;                   // 0x16
-    u16  n18;                   // 0x18
-    u16  n1A;                   // 0x1A
-    u16  n1C;                   // 0x1C
-    u16  n1E;                   // 0x1E
-    u16  n20;                   // 0x20
-    u16  n22;                   // 0x22
-    u16  n24;                   // 0x24
-    u16  n26;                   // 0x26
-    u16  n28;                   // 0x28
-    u16  n2A;                   // 0x2A
-    u16  n2C;                   // 0x2C
-    u16  n2E;                   // 0x2E
-    u16  n30;                   // 0x30
-    u16  n32;                   // 0x32
-    u16  n34;                   // 0x34
-    u16  n36;                   // 0x36
-    u16  n38;                   // 0x38
-    u16  n3A;                   // 0x3A
-    u16  n3C;                   // 0x3C
-    u8   unk3E[2];
-    s32  n40;                   // 0x40
-    s32  n44;                   // 0x44
-    u16  n48;                   // 0x48
-    u8   n4A;                   // 0x4A
-    u8   unk4B[5];
-    s32  n50;                   // 0x50
-    u16  n54;                   // 0x54
-    u8   unk56[2];
-} TourStats;
-LAYOUT_ASSERT(TourStats, 0x58);
-
 // One save profile (0x10600 bytes).
 typedef struct SaveProfile {
     u8   bActive;               // 0x00000  1: the slot holds a profile; payouts are scaled and awards given only then
@@ -117,7 +157,13 @@ typedef struct SaveProfile {
     s32  n74;                   // 0x00074  stroke-play rounds counted
     s32  n78;                   // 0x00078  their strokes
     s32  n7C;                   // 0x0007C  full rounds counted
-    u8   unk80[0xA8 - 0x80];
+    u8   unk80[8];
+    s32  n88;                   // 0x00088  drives counted (the tee shot of a par 4 or 5 off class-1
+                                //          ground; fn_800D8FE4)
+    s32  n8C;                   // 0x0008C  their distance together
+    u8   unk90[0xA0 - 0x90];
+    s32  nA0;                   // 0x000A0  the longest of those drives
+    s32  nA4;                   // 0x000A4  the longest putt, in feet (fn_800D8FE4)
     s32  nA8;                   // 0x000A8  the best stroke-play round (0: none yet)
     u8   unkAC[0xC8 - 0xAC];
     TourWin aC8[31];            // 0x000C8  one per PGA TOUR tournament
@@ -161,14 +207,7 @@ typedef struct SaveProfile {
     u32  aB344[94];             // 0x0B344
     u32  aB4BC[94];             // 0x0B4BC
     TourSeason tour;            // 0x0B634
-    u8   unkBA9C[0xF66C - 0xBA9C];
-    TourStats tourStats;        // 0x0F66C  the career totals
-    u8   unkF6C4[0x104C8 - 0xF6C4];
-    u16  n104C8;                // 0x104C8  counts the tournaments started
-    u8   unk104CA[2];
-    u16  n104CC;                // 0x104CC  a run of tour rounds, counted on each 18th hole
-                                //          (fn_800EF2B8); reset to 0 when the run breaks
-    u8   unk104CE[0x1054C - 0x104CE];
+    u8   unk104D0[0x1054C - 0x104D0];
     struct {
         u8  b;
         u8  unk1;
@@ -187,6 +226,9 @@ extern u32 lbl_801D5948[8];             // a bit array the code at 0x80056480 ke
                                         // kind 6 tests bits 1..5 of it
 extern s32 lbl_80189528[14];            // the golfers GM_GetGameProgress counts as unlockable
 extern s32 lbl_801894D0[6];             // the courses GM_GetGameProgress counts as unlockable
+
+// GameManager.c: the profile's completion score (fn_800D439C raises the TOUR card level with it)
+f32  GM_GetGameProgress(SaveProfile* pProfile);
 
 // Earnings.c: the awards
 u8   fn_800D7770(int nPlayer, Award* pAward);   // mark an award won today; 1 if it was not won before

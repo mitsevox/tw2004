@@ -36,6 +36,8 @@ void Vec_Copy(f32* pSrc, f32* pDst);    // 0x8000AD10
 f32  fn_8000AD78(f32 y, f32 x);         // atan2f
 f32  fabsf(f32 x);                      // 0x8000AD9C: fabs (0x8000AE94, platform.h) rounded to a float
 u32  Rand_Next(int nStream);            // 0x8000B130  EA's lagged-Fibonacci generator
+f32  fn_8000B318(int nStream);          // a normally distributed random number (mean 0, deviation 1):
+                                        // Box-Muller on two Rand_Floats, the second value kept
 void fn_8000B1D4(int nStream, u32 uSeed);   // seed a random stream
 f32  Rand_Float(int nStream);           // 0x8000B428  [0, 1)
 void fn_8000883C(f32* pA, f32* pB, f32 fT);   // quaternion slerp from a to b by fT, into b
