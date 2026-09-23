@@ -273,6 +273,9 @@ extern GameEffects lbl_80202898;        // 0x80202898
 
 int  fn_800DB86C(int nPlayer);          // this lie is worth a GameBreaker (GameEffects.c)
 u8   fn_800DC818(Ball* pBall, int nPlayer, u8 bNext);
+u8   fn_800DC784(void);                 // TW06: GameEffects_SkipOtherCommentary
+void fn_800DB30C(int nPlayer, int nReason);
+void fn_800DBA50(int nPlayer);
 GameEffects* fn_800DAF74(void);
 void GameEffects_ResetGameEffectSettings(void);
 int  GameEffects_BallUpdatesThisFrame(int nPlayer);   // preview speed: ghost steps per frame
@@ -663,6 +666,7 @@ int  fn_8010069C(int nPlayer); // the lesson's shape in mode 11, else 7 (none); 
 u8   fn_80100AF8(void);                 // lesson 5 of mode 11
 u8   fn_80100C00(void);
 u8   fn_80101738(void);
+u8   fn_80101AA8(int nPlayer, int nEvent);  // an event (event.c's numbers) in a lesson; nonzero blocks it
 u8   fn_80101D4C(int nPlayer);          // a CPU in game mode 11 is always lucky
 u8   fn_80101E34(char* szName);         // one of the lessons' demonstration animations
 void fn_80101EDC(void);

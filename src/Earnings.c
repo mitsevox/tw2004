@@ -653,13 +653,13 @@ s32 fn_800D6A70(s32 nPoints, int nPlayer, u8 bCourse, u8 bTee, u8 bHole,
     fCourse = fn_800D6EEC();
     switch (gSession.nTeeSet[nPlayer]) {
     case 0:
-        fTee = (f32)lbl_80200538.aTeePct[2] / 100.0f;
+        fTee = (f32)lbl_80200538.aMult[EARN_MULT_TEE +2] / 100.0f;
         break;
     case 1:
-        fTee = (f32)lbl_80200538.aTeePct[1] / 100.0f;
+        fTee = (f32)lbl_80200538.aMult[EARN_MULT_TEE +1] / 100.0f;
         break;
     case 2:
-        fTee = (f32)lbl_80200538.aTeePct[0] / 100.0f;
+        fTee = (f32)lbl_80200538.aMult[EARN_MULT_TEE +0] / 100.0f;
         break;
     case 3:
         fTee = 1.0f;
@@ -667,16 +667,16 @@ s32 fn_800D6A70(s32 nPoints, int nPlayer, u8 bCourse, u8 bTee, u8 bHole,
     }
     switch (gpGame->nPinSet[Game_CurHoleIndex()]) {
     case 0:
-        fHole = (f32)lbl_80200538.aPinSetPct[0] / 100.0f;
+        fHole = (f32)lbl_80200538.aMult[EARN_MULT_PINSET +0] / 100.0f;
         break;
     case 1:
-        fHole = (f32)lbl_80200538.aPinSetPct[1] / 100.0f;
+        fHole = (f32)lbl_80200538.aMult[EARN_MULT_PINSET +1] / 100.0f;
         break;
     case 2:
-        fHole = (f32)lbl_80200538.aPinSetPct[2] / 100.0f;
+        fHole = (f32)lbl_80200538.aMult[EARN_MULT_PINSET +2] / 100.0f;
         break;
     case 3:
-        fHole = (f32)lbl_80200538.aPinSetPct[3] / 100.0f;
+        fHole = (f32)lbl_80200538.aMult[EARN_MULT_PINSET +3] / 100.0f;
         break;
     }
     nBase = fn_800D33A8(nPoints);
@@ -722,53 +722,53 @@ f32 fn_800D6EEC(void) {
     fMult = 1.0f;
     switch (gpGame->nCurCourse) {
     case 0:
-        fMult = lbl_80200538.aCourseMult[0];
+        fMult = lbl_80200538.aMult[EARN_MULT_COURSE +0];
         break;
     case 2:
-        fMult = lbl_80200538.aCourseMult[1];
+        fMult = lbl_80200538.aMult[EARN_MULT_COURSE +1];
         break;
     case 1:
-        fMult = lbl_80200538.aCourseMult[2];
+        fMult = lbl_80200538.aMult[EARN_MULT_COURSE +2];
         break;
     case 6:
-        fMult = lbl_80200538.aCourseMult[3];
+        fMult = lbl_80200538.aMult[EARN_MULT_COURSE +3];
         break;
     case 10:
-        fMult = lbl_80200538.aCourseMult[4];
+        fMult = lbl_80200538.aMult[EARN_MULT_COURSE +4];
         break;
     case 11:
-        fMult = lbl_80200538.aCourseMult[5];
+        fMult = lbl_80200538.aMult[EARN_MULT_COURSE +5];
         break;
     case 13:
-        fMult = lbl_80200538.aCourseMult[6];
+        fMult = lbl_80200538.aMult[EARN_MULT_COURSE +6];
         break;
     case 15:
-        fMult = lbl_80200538.aCourseMult[7];
+        fMult = lbl_80200538.aMult[EARN_MULT_COURSE +7];
         break;
     case 14:
-        fMult = lbl_80200538.aCourseMult[8];
+        fMult = lbl_80200538.aMult[EARN_MULT_COURSE +8];
         break;
     case 3:
-        fMult = lbl_80200538.aCourseMult[9];
+        fMult = lbl_80200538.aMult[EARN_MULT_COURSE +9];
         break;
     case 12:
-        fMult = lbl_80200538.aCourseMult[10];
+        fMult = lbl_80200538.aMult[EARN_MULT_COURSE +10];
         break;
     case 9:
-        fMult = lbl_80200538.aCourseMult[11];
+        fMult = lbl_80200538.aMult[EARN_MULT_COURSE +11];
         break;
     case 22:
-        fMult = lbl_80200538.aCourseMult[12];
+        fMult = lbl_80200538.aMult[EARN_MULT_COURSE +12];
         break;
     case 7:
         if (fn_80015464() == 0) {
-            fMult = lbl_80200538.aCourseMult[13];
+            fMult = lbl_80200538.aMult[EARN_MULT_COURSE +13];
         }
         if (fn_80015464() == 1) {
-            fMult = lbl_80200538.aCourseMult[14];
+            fMult = lbl_80200538.aMult[EARN_MULT_COURSE +14];
         }
         if (fn_80015464() == 2) {
-            fMult = lbl_80200538.aCourseMult[15];
+            fMult = lbl_80200538.aMult[EARN_MULT_COURSE +15];
         }
         break;
     }
@@ -788,22 +788,22 @@ int fn_800D7220(int nReward, int nPlayer, CourseMoneyTracking* pMoney) {
         switch (gpSaveData[gPlayers[nPlayer].nIndex].nTourCardLevel) {
         case 0:
         case 1:
-            fMult = (f32)lbl_80200538.aTourPct[0] / 100.0f;
+            fMult = (f32)lbl_80200538.aMult[EARN_MULT_TOUR +0] / 100.0f;
             break;
         case 2:
-            fMult = (f32)lbl_80200538.aTourPct[1] / 100.0f;
+            fMult = (f32)lbl_80200538.aMult[EARN_MULT_TOUR +1] / 100.0f;
             break;
         case 3:
-            fMult = (f32)lbl_80200538.aTourPct[2] / 100.0f;
+            fMult = (f32)lbl_80200538.aMult[EARN_MULT_TOUR +2] / 100.0f;
             break;
         case 4:
-            fMult = (f32)lbl_80200538.aTourPct[3] / 100.0f;
+            fMult = (f32)lbl_80200538.aMult[EARN_MULT_TOUR +3] / 100.0f;
             break;
         case 5:
-            fMult = (f32)lbl_80200538.aTourPct[4] / 100.0f;
+            fMult = (f32)lbl_80200538.aMult[EARN_MULT_TOUR +4] / 100.0f;
             break;
         case 6:
-            fMult = (f32)lbl_80200538.aTourPct[5] / 100.0f;
+            fMult = (f32)lbl_80200538.aMult[EARN_MULT_TOUR +5] / 100.0f;
             break;
         }
     }

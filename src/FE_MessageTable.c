@@ -14,11 +14,13 @@
 #include "game/earnings.h"
 
 // Outside this file.
-u32  fn_80013050(int nChan);            // the pad's device type (SIProbe)
 void fn_800142A4(s8 n);                 // sets lbl_80281C98
 void fn_80057438(SaveProfile* pProfile);
 void fn_8008E354(void);                 // FEgolferanim.c
 void fn_8008F80C(s32 p0, s32 p1);       // uiProcessInterface.c
+void fn_8008E358(s32 p0);               // FEgolferanim.c
+s32  fn_800A0C6C(MCCardPosStr* pPos);   // MC.c
+void fn_800A78F0(f32 f);
 void fn_8009CD80(s32 nPort, s32 nSlot); // MC_Gc.c
 s32  fn_8009D390(s32 nPort, s32 nSlot); // MC_Gc.c
 s32  fn_8009EB44(s32 nPort, s32 nSlot); // MC_Gc.c
@@ -54,7 +56,6 @@ s32  fn_8012411C(void);
 void fn_80124138(s32 n);
 s32  fn_80124174(void);
 s32  fn_801241CC(void);
-f32  fn_80012C30(char* sz);             // UFont.c
 
 // The other files' message handlers in the table (the Create-A-Player screens, the logo editor,
 // the PGA TOUR screens, the stats screen, the EA Sports Bio...).
@@ -1362,7 +1363,60 @@ void fn_8007BDFC(MsgArg* pArgs, MsgArg* pResult) {
     GetGolferName(pArgs[0].i, ((MsgString*)pArgs[1].p)->pStr);
 }
 
+// A golfer's full name: "First "Nick" Last" when the golfer has a nickname ("NA" is none), else
+// "First Last". Golfer 18 never shows a nickname.
+void GetGolferName(int nGolfer, char* szName) {
+    int bNick;
+    GolferRecord* pRecord;
+
+    pRecord = fn_80077A80(nGolfer);
+    bNick = 0;
+    if (strcmp(pRecord->szNick, "NA") != 0 && strlen(pRecord->szNick) > 1 && nGolfer != 18) {
+        bNick = 1;
+    }
+    if (bNick != 0) {
+        sprintf(szName, "%s \"%s\" %s", pRecord->szFirst, pRecord->szNick, pRecord->szLast);
+    } else {
+        sprintf(szName, "%s %s", pRecord->szFirst, pRecord->szLast);
+    }
+}
+
 void fn_8007BEEC(MsgArg* pArgs, MsgArg* pResult) {
+}
+
+// The custom round's hole list: four holes to start with, or, with both session flags 0x4000
+// and 0x8000 set, all 18 holes of course 0.
+void fn_8007BEF0(MsgArg* pArgs, MsgArg* pResult) {
+    s32 i;
+
+    gpGame->nHoleCourse[0] = 8;
+    gpGame->nHoleNum[0] = 16;
+    gpGame->nHoleCourse[1] = 5;
+    gpGame->nHoleNum[1] = 3;
+    gpGame->nHoleCourse[2] = 17;
+    gpGame->nHoleNum[2] = 1;
+    gpGame->nHoleCourse[3] = 18;
+    gpGame->nHoleNum[3] = 8;
+    for (i = 0; i < 18; i++) {
+        gpGame->bHoleSelected[i] = 0;
+    }
+    gpGame->bHoleSelected[0] = 1;
+    gpGame->bHoleSelected[1] = 1;
+    gpGame->bHoleSelected[2] = 1;
+    gpGame->bHoleSelected[3] = 1;
+    if ((gSession.uFlags & 0x4000) && (gSession.uFlags & 0x8000)) {
+        gSession.options.a0[4] = 0;
+        for (i = 0; i < 18; i++) {
+            gpGame->nHoleCourse[i] = 0;
+            gpGame->nHoleNum[i] = 17;
+            gpGame->bHoleSelected[i] = 1;
+        }
+    }
+    gpGame->b136 = 1;
+}
+
+void fn_8007C118(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = (gSession.uFlags >> 14) & 1;
 }
 
 void fn_8007C12C(MsgArg* pArgs, MsgArg* pResult) {
@@ -1372,12 +1426,21 @@ void fn_8007C12C(MsgArg* pArgs, MsgArg* pResult) {
     Session_SetGolfer(pArgs[1].i, pArgs[0].i);
 }
 
-void fn_8007C118(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = (gSession.uFlags >> 14) & 1;
-}
-
 void fn_8007C17C(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gSession.nNumPlayers;
+}
+
+// A player's controller: -1 and 9 mean none (9); a real one is marked in use.
+void fn_8007C190(MsgArg* pArgs, MsgArg* pResult) {
+    s32 nController;
+
+    nController = pArgs[1].i;
+    if (nController == -1 || nController == 9) {
+        gSession.nController[pArgs[0].i] = 9;
+        return;
+    }
+    gSession.nController[pArgs[0].i] = nController;
+    lbl_801D87C0.a2C[pArgs[1].i] = 1;
 }
 
 void fn_8007C1F8(MsgArg* pArgs, MsgArg* pResult) {
@@ -1402,8 +1465,47 @@ void fn_8007C254(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
+// The CrAP screen's state: leaving state 0, or entering state 3, calls fn_8008DAEC; fn_8008E358
+// is told whether it is now 0.
+void fn_8007C2A0(MsgArg* pArgs, MsgArg* pResult) {
+    s32 nOld;
+
+    nOld = lbl_80281EE0->n0;
+    lbl_80281EE0->n0 = pArgs[0].i;
+    if (nOld != 0 && lbl_80281EE0->n0 == 0) {
+        fn_8008DAEC();
+    }
+    if (lbl_80281EE0->n0 == 3 && nOld != 3) {
+        fn_8008DAEC();
+    }
+    if (lbl_80281EE0->n0 == 0) {
+        fn_8008E358(1);
+    } else {
+        fn_8008E358(0);
+    }
+}
+
 void fn_8007C330(MsgArg* pArgs, MsgArg* pResult) {
     strcpy(((MsgString*)pResult->p)->pStr, fn_80077A80(pArgs[0].i)->szLast);
+}
+
+// One of the four names the card's state holds.
+void fn_8007C370(MsgArg* pArgs, MsgArg* pResult) {
+    MCCardState state;
+
+    fn_8009F7F4(&state, pArgs[1].i, pArgs[2].i);
+    strcpy(((MsgString*)pArgs[0].p)->pStr, state.aszName[pArgs[3].i]);
+}
+
+// All four of them.
+void fn_8007C3C8(MsgArg* pArgs, MsgArg* pResult) {
+    MCCardState state;
+
+    fn_8009F7F4(&state, pArgs[0].i, pArgs[1].i);
+    strcpy(((MsgString*)pArgs[2].p)->pStr, state.aszName[0]);
+    strcpy(((MsgString*)pArgs[3].p)->pStr, state.aszName[1]);
+    strcpy(((MsgString*)pArgs[4].p)->pStr, state.aszName[2]);
+    strcpy(((MsgString*)pArgs[5].p)->pStr, state.aszName[3]);
 }
 
 // The card's state: a flag of it, or its free space.
@@ -1427,6 +1529,29 @@ void fn_8007C4B8(MsgArg* pArgs, MsgArg* pResult) {
 
 void fn_8007C4D8(MsgArg* pArgs, MsgArg* pResult) {
     fn_8009CD7C();
+}
+
+// fn_800A0C6C with a card, a profile slot and a string, then the slot's profile is marked loaded
+// (the test never fails: the result is 1 or an error, never 0).
+void fn_8007C4F8(MsgArg* pArgs, MsgArg* pResult) {
+    MCCardPosStr pos;
+    s32 nError;
+    s32 n;
+
+    pos.pos.nPort = pArgs[0].i;
+    pos.pos.nSlot = pArgs[1].i;
+    pos.pos.n8 = pArgs[2].i;
+    pos.szC = ((MsgString*)pArgs[3].p)->pStr;
+    nError = fn_800A0C6C(&pos);
+    n = 1;
+    if (nError != 0) {
+        n = nError;
+    }
+    pResult->i = n;
+    if (pResult->i != 0) {
+        fn_80077808(pArgs[2].i);
+        lbl_801D7148.aLoaded[pArgs[2].i] = 1;
+    }
 }
 
 void fn_8007C594(MsgArg* pArgs, MsgArg* pResult) {
@@ -1616,6 +1741,50 @@ void fn_8007C9F8(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // The on/off options: the menus send and read 1 for on and 2 for off.
+void fn_8007CA4C(MsgArg* pArgs, MsgArg* pResult) {
+    switch (pArgs[0].i) {
+    case 1:
+        gSession.options.a7[1] = 1;
+        break;
+    case 2:
+        gSession.options.a7[1] = 0;
+        break;
+    }
+    switch (pArgs[1].i) {
+    case 1:
+        gSession.options.a7[2] = 1;
+        return;
+    case 2:
+        gSession.options.a7[2] = 0;
+        return;
+    }
+}
+
+// Option a0[4]: the menus' choices 1..6 are the values 5, 0, 1, 2, 3, 4; it is passed on times 0.2.
+void fn_8007CACC(MsgArg* pArgs, MsgArg* pResult) {
+    switch (pArgs[0].i) {
+    case 1:
+        gSession.options.a0[4] = 5;
+        break;
+    case 2:
+        gSession.options.a0[4] = 0;
+        break;
+    case 3:
+        gSession.options.a0[4] = 1;
+        break;
+    case 4:
+        gSession.options.a0[4] = 2;
+        break;
+    case 5:
+        gSession.options.a0[4] = 3;
+        break;
+    case 6:
+        gSession.options.a0[4] = 4;
+        break;
+    }
+    fn_800A78F0(0.2f * (s8)gSession.options.a0[4]);
+}
+
 void fn_8007CBCC(MsgArg* pArgs, MsgArg* pResult) {
     switch (pArgs[0].i) {
     case 1:
@@ -1623,6 +1792,48 @@ void fn_8007CBCC(MsgArg* pArgs, MsgArg* pResult) {
         return;
     case 2:
         gSession.options.bGimmes = 0;
+        return;
+    }
+}
+
+void fn_8007CC0C(MsgArg* pArgs, MsgArg* pResult) {
+    switch (gSession.options.a7[1]) {
+    case 1:
+        *(s32*)pArgs[0].p = 1;
+        break;
+    case 0:
+        *(s32*)pArgs[0].p = 2;
+        break;
+    }
+    switch (gSession.options.a7[2]) {
+    case 1:
+        *(s32*)pArgs[1].p = 1;
+        return;
+    case 0:
+        *(s32*)pArgs[1].p = 2;
+        return;
+    }
+}
+
+void fn_8007CC90(MsgArg* pArgs, MsgArg* pResult) {
+    switch ((s8)gSession.options.a0[4]) {
+    case 0:
+        pResult->i = 2;
+        return;
+    case 1:
+        pResult->i = 3;
+        return;
+    case 2:
+        pResult->i = 4;
+        return;
+    case 3:
+        pResult->i = 5;
+        return;
+    case 4:
+        pResult->i = 6;
+        return;
+    case 5:
+        pResult->i = 1;
         return;
     }
 }

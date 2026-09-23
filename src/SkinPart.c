@@ -7,7 +7,6 @@
 #include "terrain.h"
 #include "camera.h"
 
-int   fn_800CB700(u64* pId, const char* pName);        // a name's code
 void  fn_8001E938(u32* aBits, u32 nBits);               // clears a bit array
 SkinIter* fn_80113B34(u8* pBuf, SkinIterArgs* pArgs);
 void  fn_80113BAC(SkinIter* pIter);

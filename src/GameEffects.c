@@ -9,11 +9,6 @@
 
 // fake match: the (s8) on GOLFERSTATE_GetCurrentState (see game.h).
 
-void  fn_800131C4(int nController);
-void  fn_8001425C(int a);
-void  fn_800141F8(f32* pA, f32* pB, f32 x0, f32 y0, f32 x1, f32 y1);
-void  fn_80014194(f32* pColour);
-void  fn_8001644C(int a, f32* pA, int b, f32* pB, int c);
 int   fn_800D782C(int nPlayer, Ball* pBall, int a, u8 b, int c);
 u8    fn_800B4AE0(void);
 void  fn_800DBFAC(void);
@@ -23,7 +18,6 @@ int   fn_800D8750(int a, int b, int c, char* szName, int nPlayer);   // szName: 
 u8    fn_800BCD24(int nPlayer);
 int   fn_800D0620(int nPlayer, int a, int b);
 int   fn_800D089C(int nPlayer, int a);
-void  fn_800A6DCC(int nMusic, int a);
 u8    fn_800451A8(CamScript* pScript, CamShot* pShot, int nPlayer);
 
 GameEffects lbl_80202898;   // the effects state (game.h; GameManager, GoGolfCam and others read it)

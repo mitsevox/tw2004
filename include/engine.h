@@ -23,6 +23,8 @@ s32   fn_8000A0B4(void);                // } (EASportsBio.c sets 0 while the Bio
 void* fn_800951A0(u32 uSize, int nAlign, int a);
 void  fn_8009527C(void* p);             // frees what fn_800951A0 allocated
 void  fn_800953C8(int a);
+// Pack up to 12 characters of pName into a 64-bit code (base 40, table lbl_80191520).
+int   fn_800CB700(u64* pId, const char* pName);
 
 // A pool of fixed-size nodes carved from one allocation (UMemPool.c): the header, then the nodes.
 // A free node holds the next free one in its first word.
@@ -197,9 +199,10 @@ typedef struct RenderState {
     s32  nFC;                   // 0x0FC  bit 0x400
     TexBank*  p100;             // 0x100  } the texture of the next draw (fn_8005CC64: the swing
     TexEntry* p104;             // 0x104  } trail's, the logo editor's)
-    u8   unk108[0x110 - 0x108];
+    struct GxTexture* pTex108;  // 0x108  or this texture (fn_8002A608)
+    u8   unk10C[0x110 - 0x10C];
     u32  u110;                  // 0x110  which of the groups above changed
-    u32  uFlags;                // 0x114  bit 1: p100/p104 are set
+    u32  uFlags;                // 0x114  bit 1: p100/p104 are set; bit 2: pTex108 is
 } RenderState;
 LAYOUT_ASSERT(RenderState, 0x118);
 
@@ -251,8 +254,8 @@ int  fn_8002F260(s32 n0, s32 nWidth, s32 nHeight, s32 nKind, s32 n20, s32 nSurfa
 void fn_8002F38C(s32 nSurface, s32 nC, s32 n10, s32 n14, u32 uFlags, s32 n18);
 s32  fn_8002F454(s32 nSurface);     // the surface's buffer size, 0 if the slot is free
 
-// The graphics helpers at 0x80029FC8 (file name unknown)
-void* fn_8002A624(void);            // the screen-copy texture's pixels (lbl_80281100's first word)
+// The graphics helpers (GxUtil.c, 0x80029FC8; the rest are in gx.h)
+void* fn_8002A624(void);            // the screen copy's pixels (lbl_80281100->pPixels)
 
 // The screen copy (our name; what lbl_80281100 points at): render surface 1, set up by gomainloop
 // fn_8006DCA8 for each game type and filled by PostFx_CopyScreenToBuffer.
@@ -306,16 +309,79 @@ int  fn_8000633C(int hFile);            // file close
 int  fn_80006444(int hFile, void* pDst, u32 uLen, u32 uOffset, void (*pfnDone)(int nBytes, int nError));
 u32  fn_800065B0(int hFile);            // file size
 
+// ---- fonts -----------------------------------------------------------------------------------
+
+f32  fn_80012C30(char* sz);             // UFont.c: a string's width
+
 // ---- controller input ------------------------------------------------------------------------
 
+// One controller as the pad library reads it (12 bytes a pad, filled by PADRead).
+typedef struct PadStatus {
+    u16 uButtons;                 // 0x00
+    s8  nStickX;                  // 0x02
+    s8  nStickY;                  // 0x03
+    s8  nSubStickX;               // 0x04  the C stick
+    s8  nSubStickY;               // 0x05
+    u8  nTriggerL;                // 0x06
+    u8  nTriggerR;                // 0x07
+    u8  nAnalogA;                 // 0x08
+    u8  nAnalogB;                 // 0x09
+    s8  nError;                   // 0x0A  0: read, -1: no controller
+    u8  unkB;                     // 0x0B
+} PadStatus;
+
+// A pad's sticks and triggers rescaled to 0-255 with a dead zone; 0x80 is the centre. Y grows
+// downwards.
+typedef struct PadAnalog {
+    u8  nSubStickX;               // 0x00
+    u8  nSubStickY;               // 0x01
+    u8  nStickX;                  // 0x02
+    u8  nStickY;                  // 0x03
+    u8  nTriggerL;                // 0x04
+    u8  nTriggerR;                // 0x05
+} PadAnalog;
+
+typedef struct PadRumble {
+    u8  bOn;                      // 0x00  cleared while rumble is switched off (fn_80013200)
+    u8  bAllowed;                 // 0x01
+    s16 nFrames;                  // 0x02  frames the motor has run; it stops after 60
+} PadRumble;
+
+// Controller_Gc.c's state: the four pads.
+typedef struct Controllers {
+    u8  bStickAsDpad;             // 0x00  the main stick also presses the D-pad
+    u32 uConnected;               // 0x04  one bit a pad, 0x80000000 >> n
+    PadStatus aStatus[4];         // 0x08
+    PadAnalog aAnalog[4];         // 0x38
+    u32 auButtons[4];             // 0x50  held << 16 | pressed this frame
+    u32 auHeld[4];                // 0x60  last frame's held buttons
+    PadRumble aRumble[4];         // 0x70
+    s8  nRead;                    // 0x80  one bit a pad (1 << n): it answered this frame
+} Controllers;
+LAYOUT_ASSERT(Controllers, 0x84);
+
+int  fn_80012FA4(void);                 // controller init
 void fn_80012EF8(void);
 void fn_80012F18(int a);
 void fn_80012F34(int a);
 void fn_80012F50(int a, int b, int c);
+void fn_80013030(void);
+u32  fn_80013050(int nChan);            // the pad's device type (SIProbe)
+s32  fn_80013070(int nChan);            // a controller the game takes is plugged in
+void fn_800130EC(u8 bOn);               // the main stick also presses the D-pad
+void fn_800130F8(int nController, int bOn);         // rumble on or off
 void fn_80013130(int nController, int nStrength);   // rumble strength
+void fn_800131C4(int nController);      // rumble off
+void fn_80013400(void);                 // read the controllers
 u8*  fn_800136C4(int nController);      // the pad's state: stick bytes at +0, +2, +3
 u32  fn_800136DC(int nController);      // buttons: held << 16 | pressed this frame
 void fn_80014118(int a);
+// A screen quad (GameEffects' letter boxes, GxUtil.c's alpha clear): fn_800141F8 fills its corners
+// (x0, y0)-(x1, y1), fn_80014194 sets its colour (four floats), fn_8001644C draws it.
+void fn_80014194(f32* pColour);
+void fn_800141F8(f32* pXY, f32* pUV, f32 x0, f32 y0, f32 x1, f32 y1);
+void fn_8001425C(int a);
+void fn_8001644C(int a, f32* pXY, int b, f32* pUV, int c);
 u32  fn_800142AC(int nButton, int a);   // a button's mask
 u8   fn_80014300(u32 uMask);            // any pad pressed these buttons
 
@@ -328,6 +394,7 @@ void fn_8001EF34(f32* pIn, f32 f, f32* pOut);   // scale a vector (paired single
 void fn_80045494(u8 bOn, int nPlayer);
 void fn_80045558(u8 bOn, int nPlayer);
 u8   fn_8004560C(void);
+typedef void (*EventHandler)(int nPlayer, int nEvent, void* pData, int nArg);   // event.c's table
 void EVENT_Trigger(int nPlayer, int nEvent, void* pData, int b);   // through the event table at
                                         // lbl_80188628; pData: the ball, a position, or NULL
 void fn_800689D4(int nPlayer);
@@ -337,6 +404,7 @@ void PlaceBall_UpdateMomentums(int nPlayer, f32 f);
 void fn_8006A6C4(int nPlayer);
 int  fn_8006AA9C(int nPlayer);          // how the shot turned out (0..4, 8+)
 void fn_8006AAB4(int nPlayer, int a);
+void fn_8006ACE0(int nPlayer, int nResult);
 void fn_8006ACF8(int nPlayer, int a);
 void Emotion_UpdatePlayerEmotion(int nPlayer);
 void fn_8006B2C4(int nPlayer, u8 bBefore);   // the shot's outcome from the ball (bBefore: ballBefore)
@@ -355,6 +423,7 @@ void fn_800A62A4(void);
 void fn_800A62E0(void);
 void fn_800A6358(void);
 void fn_800A63D0(void);
+void fn_800A6DCC(int nMusic, int a);
 void fn_800A72EC(u8 a, u8 b);
 void fn_800A7664(int nKind, int nMsg, int a);
 void fn_800A76E4(void);

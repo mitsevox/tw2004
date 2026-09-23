@@ -1,4 +1,4 @@
-// AudTable.c (our name): the sound engine's table of 256 playing sounds (AudTableEntry, 0x7C bytes
+// AudTable.c (our name): the sound engine's table of 256 playing sounds (AudSource, 0x7C bytes
 // each), allocated from the audio memory stack (UAudMemStack.c's fn_800B5BD8) by fn_800A7AF0 and
 // reached through lbl_80282058. Each entry plays a bank sound's tracks and, for a sound placed in
 // the world, works out its volume, pan and doppler pitch from its distance to the listeners. Its
@@ -7,34 +7,25 @@
 
 #include "core/audtrack.h"
 
-AudTrack* fn_800A9BC8(AudTableEntry* pEntry, AudTrackTmpl* pTmpl, u8 nTrack, f32 fVolume);
-void fn_800A9D7C(AudTrack* pTrack);
-void fn_800A9E7C(AudTableEntry* pEntry, AudTrack* pTrack, AudTrackTmpl* pTmpl, u8 nTrack, int bA,
-                 int bB, f32 fVolume);
-void fn_800AA2EC(AudTrack* pTrack, s32 n, int b);
-void fn_800AA30C(AudTrack* pTrack, s32 n);
-void fn_800AA32C(AudTrack* pTrack, s32 n);
-void fn_800AA3D4(AudTrackTmpl* pTmpl);
-void fn_800ADDC8(s32 nEntry, u8 nTrack, s32 n);
 f32  fn_800B1A40(f32* pVec);                     // its length
 
-void fn_800A7E44(AudTableEntry* pEntry);
+void fn_800A7E44(AudSource* pSource);
 f32  fn_800A7EA4(f32 fDist, f32 fScale);
-void fn_800A7F2C(AudTableEntry* pEntry);
-void fn_800A7FA8(AudTableEntry* pEntry);
-f32  fn_800A809C(AudTableEntry* pEntry, s32 n);
-void fn_800A8134(AudTableEntry* pEntry, u32* auStreams, u16 uMask);
+void fn_800A7F2C(AudSource* pSource);
+void fn_800A7FA8(AudSource* pSource);
+f32  fn_800A809C(AudSource* pSource, s32 n);
+void fn_800A8134(AudSource* pSource, u32* auStreams, u16 uMask);
 
-AudTableEntry* lbl_80282058;
+AudSource* lbl_80282058;
 
 int fn_800A7AF0(void) {
     int bOk;
     s32 i;
 
     bOk = 0;
-    lbl_80282058 = fn_800B5BD8(256 * sizeof(AudTableEntry));
+    lbl_80282058 = fn_800B5BD8(256 * sizeof(AudSource));
     if (lbl_80282058 != NULL) {
-        fn_80005AE8(lbl_80282058, 0, 256 * sizeof(AudTableEntry));
+        fn_80005AE8(lbl_80282058, 0, 256 * sizeof(AudSource));
         for (i = 0; i < 256; i++) {
             lbl_80282058[i].fPitch = 1.0f;
         }
@@ -51,21 +42,21 @@ void fn_800A7C2C(void) {
 }
 
 // Starts entry nEntry on sound nSound.
-AudTableEntry* fn_800A7C30(u8 nEntry, s16 nSound) {
+AudSource* fn_800A7C30(u8 nEntry, s16 nSound) {
     AudSound* pSound;
-    AudTableEntry* pEntry;
+    AudSource* pSource;
 
     pSound = fn_800A85CC(nSound);
-    pEntry = &lbl_80282058[nEntry];
-    fn_80005AE8(pEntry, 0, sizeof(AudTableEntry));
-    pEntry->nSound = nSound;
-    pEntry->pSound = pSound;
-    return pEntry;
+    pSource = &lbl_80282058[nEntry];
+    fn_80005AE8(pSource, 0, sizeof(AudSource));
+    pSource->nSound = nSound;
+    pSource->pSound = pSound;
+    return pSource;
 }
 
 // Updates entry nEntry's tracks. A placed sound out of earshot is stopped.
 void fn_800A7CA4(u8 nEntry, u8 uMaskA, u8 uMaskB, u32* auStreams, s32 n, u16 uMask) {
-    AudTableEntry* pEntry;
+    AudSource* pSource;
     f32 fDist;
     u8 bHeard;
     AudTrack** ppTrack;
@@ -75,49 +66,49 @@ void fn_800A7CA4(u8 nEntry, u8 uMaskA, u8 uMaskB, u32* auStreams, s32 n, u16 uMa
     u8 i;
     u8 uBit;
     AudTrack* pTrack;
-    int bA;
-    int bB;
+    u8 bOn;
+    u8 bOff;
 
-    pEntry = &lbl_80282058[nEntry];
+    pSource = &lbl_80282058[nEntry];
     if (uMask & 7) {
-        fn_800A8134(pEntry, auStreams, uMask);
+        fn_800A8134(pSource, auStreams, uMask);
     }
-    if (pEntry->pSound->n3 & 1) {
-        fDist = fn_800A809C(pEntry, n);
-        bHeard = fDist - pEntry->pSound->f4 < 0.0f;
+    if (pSource->pSound->n3 & 1) {
+        fDist = fn_800A809C(pSource, n);
+        bHeard = fDist - pSource->pSound->f4 < 0.0f;
         if (bHeard) {
-            pEntry->fDist = fDist;
-            fn_800A7FA8(pEntry);
-            fn_800A7F2C(pEntry);
+            pSource->fDist = fDist;
+            fn_800A7FA8(pSource);
+            fn_800A7F2C(pSource);
         }
     } else {
         bHeard = 1;
     }
     if (bHeard) {
-        ppTrack = pEntry->apTracks;
+        ppTrack = pSource->apTracks;
         fVolume = 1.0f;
-        nTracks = pEntry->pSound->nTracks;
-        pTmpl = pEntry->pSound->aTracks;
+        nTracks = pSource->pSound->nTracks;
+        pTmpl = pSource->pSound->aTracks;
         for (i = 0, uBit = 1; i < nTracks; i++, uBit <<= 1, pTmpl++, ppTrack++) {
             pTrack = *ppTrack;
-            bA = (uMaskA & uBit) != 0;
-            bB = (uMaskB & uBit) != 0;
-            if (pEntry->pSound->n3 & 1) {
+            bOn = (uMaskA & uBit) != 0;
+            bOff = (uMaskB & uBit) != 0;
+            if (pSource->pSound->n3 & 1) {
                 fVolume = fn_800A7EA4(fDist, pTmpl->f10);
             }
-            fn_800A9E7C(pEntry, pTrack, pTmpl, i, bA, bB, fVolume);
+            fn_800A9E7C(pSource, pTrack, pTmpl, i, bOn, bOff, fVolume);
         }
         return;
     }
-    fn_800A7E44(pEntry);
+    fn_800A7E44(pSource);
 }
 
 // Stops every track of an entry.
-void fn_800A7E44(AudTableEntry* pEntry) {
+void fn_800A7E44(AudSource* pSource) {
     u8 i;
 
-    for (i = 0; i < pEntry->pSound->nTracks; i++) {
-        fn_800A9D7C(pEntry->apTracks[i]);
+    for (i = 0; i < pSource->pSound->nTracks; i++) {
+        fn_800A9D7C(pSource->apTracks[i]);
     }
 }
 
@@ -142,64 +133,64 @@ f32 fn_800A7EA4(f32 fDist, f32 fScale) {
 }
 
 // The doppler pitch from how fast the sound nears the nearest listener (345: the speed of sound).
-void fn_800A7F2C(AudTableEntry* pEntry) {
+void fn_800A7F2C(AudSource* pSource) {
     f32 fDist;
     u8 uFlags;
     f32 fSpeed;
     f32 fPitch;
 
-    fDist = pEntry->afDist[0];
-    uFlags = pEntry->pSound->n3;
+    fDist = pSource->afDist[0];
+    uFlags = pSource->pSound->n3;
     if ((uFlags & 2) || !(uFlags & 1)) {
         fPitch = 1.0f;
     } else {
-        if (lbl_80282068 >= 2 && pEntry->afDist[1] < fDist) {
-            fDist = pEntry->afDist[1];
+        if (lbl_80282068 >= 2 && pSource->afDist[1] < fDist) {
+            fDist = pSource->afDist[1];
         }
-        fSpeed = 32.0f * (pEntry->fDist - fDist);
+        fSpeed = 32.0f * (pSource->fDist - fDist);
         if (fSpeed > 1.0f) {
             fSpeed = 1.0f;
         }
         fPitch = 345.0f / (345.0f - fSpeed);
     }
-    pEntry->fPitch = fPitch;
-    pEntry->fDist = fDist;
+    pSource->fPitch = fPitch;
+    pSource->fDist = fDist;
 }
 
 // The pan from where the sound is: with one listener, its side and its front or back; with two
 // (split screen) the sound is centred.
-void fn_800A7FA8(AudTableEntry* pEntry) {
+void fn_800A7FA8(AudSource* pSource) {
     f32 fInv;
     f32 fPan;
     f32 f68;
 
-    if (lbl_80282068 < 2 && (pEntry->pSound->n3 & 1)) {
+    if (lbl_80282068 < 2 && (pSource->pSound->n3 & 1)) {
         fInv = 0.0f;
-        if (pEntry->afDist[0] > fInv) {
-            fInv = 1.0f / pEntry->afDist[0];
+        if (pSource->afDist[0] > fInv) {
+            fInv = 1.0f / pSource->afDist[0];
         }
-        fPan = fn_800A85FC(-pEntry->aPos[0][0], fInv);
-        f68 = fn_800A85FC(pEntry->aPos[0][2], fInv);
+        fPan = fn_800A85FC(-pSource->aPos[0][0], fInv);
+        f68 = fn_800A85FC(pSource->aPos[0][2], fInv);
         fPan = fPan < -1.0f ? -1.0f : fPan > 1.0f ? 1.0f : fPan;
         f68 = f68 < -1.0f ? -1.0f : f68 > 1.0f ? 1.0f : f68;
-        pEntry->fPan = fPan;
-        pEntry->f68 = f68;
+        pSource->fPan = fPan;
+        pSource->f68 = f68;
         return;
     }
-    pEntry->fPan = 0.0f;
-    pEntry->f68 = 1.0f;
+    pSource->fPan = 0.0f;
+    pSource->f68 = 1.0f;
 }
 
 // Measures the sound's distance from each listener; returns the nearest.
-f32 fn_800A809C(AudTableEntry* pEntry, s32 n) {
+f32 fn_800A809C(AudSource* pSource, s32 n) {
     f32 fNearest;
     u8 i;
     f32 fDist;
 
     fNearest = 32768.0f;
     for (i = 0; i < lbl_80282068; i++) {
-        fDist = fn_800B1A40(pEntry->aPos[i]);
-        pEntry->afDist[i] = fDist;
+        fDist = fn_800B1A40(pSource->aPos[i]);
+        pSource->afDist[i] = fDist;
         if (fNearest > fDist) {
             fNearest = fDist;
         }
@@ -209,7 +200,7 @@ f32 fn_800A809C(AudTableEntry* pEntry, s32 n) {
 
 // Sets the play list and stream of each streamed track in uMask: auStreams[i] holds the stream in
 // its low 16 bits, the play list above it and the mode in the top byte.
-void fn_800A8134(AudTableEntry* pEntry, u32* auStreams, u16 uMask) {
+void fn_800A8134(AudSource* pSource, u32* auStreams, u16 uMask) {
     u8 i;
     u16 uBit;
     AudTrack* pTrack;
@@ -217,9 +208,9 @@ void fn_800A8134(AudTableEntry* pEntry, u32* auStreams, u16 uMask) {
 
     for (i = 0, uBit = 1; i < 8; i++, uBit <<= 1) {
         if (uMask & uBit) {
-            pTrack = pEntry->apTracks[i];
+            pTrack = pSource->apTracks[i];
             if (pTrack == NULL) {
-                pTrack = fn_800A9BC8(pEntry, &pEntry->pSound->aTracks[i], i, 1.0f);
+                pTrack = fn_800A9BC8(pSource, &pSource->pSound->aTracks[i], i, 1.0f);
                 if (pTrack == NULL) return;
             }
             if (pTrack->pTmpl->n0 & 8) {
@@ -233,68 +224,68 @@ void fn_800A8134(AudTableEntry* pEntry, u32* auStreams, u16 uMask) {
 
 // Stops entry nEntry and frees it.
 void fn_800A8200(u8 nEntry) {
-    AudTableEntry* pEntry;
+    AudSource* pSource;
 
-    pEntry = &lbl_80282058[nEntry];
-    fn_800A7E44(pEntry);
-    pEntry->pSound = NULL;
-    pEntry->nSound = 0;
+    pSource = &lbl_80282058[nEntry];
+    fn_800A7E44(pSource);
+    pSource->pSound = NULL;
+    pSource->nSound = 0;
 }
 
-void fn_800A8248(u8 nEntry, u8 nTrack, s32 n) {
-    AudTableEntry* pEntry;
+void fn_800A8248(u8 nEntry, u8 nTrack, u8 n) {
+    AudSource* pSource;
     AudTrackTmpl* pTmpl;
     AudTrack* pTrack;
 
-    pEntry = &lbl_80282058[nEntry];
-    pTmpl = &pEntry->pSound->aTracks[nTrack];
-    pTrack = pEntry->apTracks[nTrack];
+    pSource = &lbl_80282058[nEntry];
+    pTmpl = &pSource->pSound->aTracks[nTrack];
+    pTrack = pSource->apTracks[nTrack];
     if (pTrack == NULL) {
-        pTrack = fn_800A9BC8(pEntry, pTmpl, nTrack, 1.0f);
+        pTrack = fn_800A9BC8(pSource, pTmpl, nTrack, 1.0f);
         if (pTrack == NULL) return;
     }
     fn_800AA30C(pTrack, n);
 }
 
-void fn_800A82CC(u8 nEntry, u8 nTrack, s32 n) {
-    AudTableEntry* pEntry;
+void fn_800A82CC(u8 nEntry, u8 nTrack, u8 n) {
+    AudSource* pSource;
     AudTrack* pTrack;
 
-    pEntry = &lbl_80282058[nEntry];
-    pTrack = pEntry->apTracks[nTrack];
+    pSource = &lbl_80282058[nEntry];
+    pTrack = pSource->apTracks[nTrack];
     if (pTrack == NULL) {
-        pTrack = fn_800A9BC8(pEntry, &pEntry->pSound->aTracks[nTrack], nTrack, 1.0f);
+        pTrack = fn_800A9BC8(pSource, &pSource->pSound->aTracks[nTrack], nTrack, 1.0f);
         if (pTrack == NULL) return;
     }
     fn_800AA32C(pTrack, n);
 }
 
-void fn_800A834C(s16 nSound, u8 nTrack, s8 n) {
+void fn_800A834C(s16 nSound, u8 nTrack, u8 n) {
     fn_800A85CC(nSound)->aTracks[nTrack].nA = n;
 }
 
-void fn_800A8394(u8 nEntry, u8 nTrack, s32 n, u8 b) {
-    AudTableEntry* pEntry;
+void fn_800A8394(u8 nEntry, u8 nTrack, u8 n, int bCheck) {
+    AudSource* pSource;
     AudTrack* pTrack;
 
-    pEntry = &lbl_80282058[nEntry];
-    pTrack = pEntry->apTracks[nTrack];
+    pSource = &lbl_80282058[nEntry];
+    pTrack = pSource->apTracks[nTrack];
     if (pTrack == NULL) {
-        pTrack = fn_800A9BC8(pEntry, &pEntry->pSound->aTracks[nTrack], nTrack, 1.0f);
+        pTrack = fn_800A9BC8(pSource, &pSource->pSound->aTracks[nTrack], nTrack, 1.0f);
         if (pTrack == NULL) return;
     }
-    fn_800AA2EC(pTrack, n, b);
+    fn_800AA2EC(pTrack, n, bCheck);
 }
 
 // Sets a track's volume.
 void fn_800A8424(u8 nEntry, u8 nTrack, f32 fVolume) {
-    AudTableEntry* pEntry;
+    AudSource* pSource;
     AudTrack* pTrack;
 
-    pEntry = &lbl_80282058[nEntry];
-    pTrack = pEntry->apTracks[nTrack];
+    pSource = &lbl_80282058[nEntry];
+    pTrack = pSource->apTracks[nTrack];
     if (pTrack == NULL) {
-        pTrack = fn_800A9BC8(pEntry, &pEntry->pSound->aTracks[nTrack], nTrack, 1.0f);
+        pTrack = fn_800A9BC8(pSource, &pSource->pSound->aTracks[nTrack], nTrack, 1.0f);
         if (pTrack == NULL) return;
     }
     pTrack->f44 = fVolume;
@@ -302,13 +293,13 @@ void fn_800A8424(u8 nEntry, u8 nTrack, f32 fVolume) {
 
 // Sets a track's pitch.
 void fn_800A84A4(u8 nEntry, u8 nTrack, f32 fPitch) {
-    AudTableEntry* pEntry;
+    AudSource* pSource;
     AudTrack* pTrack;
 
-    pEntry = &lbl_80282058[nEntry];
-    pTrack = pEntry->apTracks[nTrack];
+    pSource = &lbl_80282058[nEntry];
+    pTrack = pSource->apTracks[nTrack];
     if (pTrack == NULL) {
-        pTrack = fn_800A9BC8(pEntry, &pEntry->pSound->aTracks[nTrack], nTrack, 1.0f);
+        pTrack = fn_800A9BC8(pSource, &pSource->pSound->aTracks[nTrack], nTrack, 1.0f);
         if (pTrack == NULL) return;
     }
     pTrack->f4C = fPitch;
@@ -322,6 +313,6 @@ void fn_800A8524(AudSound* pSound, int n) {
     }
 }
 
-void fn_800A8584(AudTableEntry* pEntry, u8 nTrack, s32 n) {
-    fn_800ADDC8((u8)(pEntry - lbl_80282058), nTrack, n);
+void fn_800A8584(AudSource* pSource, u8 nTrack, s32 n) {
+    fn_800ADDC8((u8)(pSource - lbl_80282058), nTrack, n);
 }

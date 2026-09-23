@@ -64,7 +64,7 @@ void fn_8011D280(int nLine, char* szLabel, char* szValue) {
         }
         break;
     case 8:
-        nScore = fn_800F018C();
+        nScore = fn_800F018C(nId);
         strcpy(szLabel, "Your Score:");
         if (nScore == 0) {
             sprintf(szValue, "E");

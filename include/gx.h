@@ -7,6 +7,18 @@
 #define GX_H
 
 #include "game_types.h"
+#include "platform.h"
+
+// GX's objects, filled in by GX and only passed back to it: their contents are GX's own.
+typedef struct GXTexObj {
+    u32 unk0[8];
+} GXTexObj;                     // a texture (0x20 bytes)
+typedef struct GXTlutObj {
+    u32 unk0[3];
+} GXTlutObj;                    // a texture's palette (0xC bytes)
+typedef struct GXColor {
+    u8 r, g, b, a;
+} GXColor;
 
 // ---- what drawing writes ----------------------------------------------------------------------
 
@@ -14,8 +26,19 @@ void GXSetAlphaUpdate(u8 bUpdate);
 void GXSetColorUpdate(u8 bUpdate);
 void GXSetZMode(u8 bCompare, int eCompare, u8 bUpdate);
 
+// ---- textures ---------------------------------------------------------------------------------
+
+void GXInitTexObj(GXTexObj* pObj, void* pImage, u16 nWidth, u16 nHeight, int eFormat, int eWrapS,
+                  int eWrapT, u8 bMipmap);
+void GXInitTexObjCI(GXTexObj* pObj, void* pImage, u16 nWidth, u16 nHeight, int eFormat, int eWrapS,
+                    int eWrapT, u8 bMipmap, u32 nTlut);
+void GXInitTlutObj(GXTlutObj* pObj, void* pLut, int eFormat, u16 nEntries);
+
 // ---- the texture environment (TEV) ------------------------------------------------------------
 
+void GXSetNumTevStages(u8 nStages);
+void GXSetTevOrder(int eStage, int eCoord, int eMap, int eColour);
+void GXSetTevColor(int eReg, GXColor colour);
 void GXSetTevColorIn(int eStage, int eA, int eB, int eC, int eD);
 void GXSetTevAlphaIn(int eStage, int eA, int eB, int eC, int eD);
 void GXSetTevColorOp(int eStage, int eOp, int eBias, int eScale, u8 bClamp, int eOutReg);
@@ -28,5 +51,22 @@ void GXSetTexCopyDst(u16 nWidth, u16 nHeight, int eFormat, u8 bMipmap);
 void GXCopyTex(void* pDest, u8 bClear);
 void GXPixModeSync(void);
 void GXInvalidateTexAll(void);
+
+// ---- the game's own GX helpers (GxUtil.c) ----------------------------------------------------
+
+// A texture ready to draw (0x30 bytes; our name): GX's texture object and, for a palette
+// (colour-index) texture, its palette object. fn_8002A528 fills one in.
+typedef struct GxTexture {
+    GXTexObj  tex;              // 0x00
+    GXTlutObj tlut;             // 0x20  only for a palette texture
+    u8        bPalette;         // 0x2C  1: tex is a palette texture
+    u8        unk2D[3];
+} GxTexture;
+LAYOUT_ASSERT(GxTexture, 0x30);
+
+// Fill in pTex for an image of nWidth x nHeight; with a palette pLut, a palette texture.
+void fn_8002A528(GxTexture* pTex, int nWidth, int nHeight, void* pImage, void* pLut, int eFormat,
+                 int eLutFormat, int eWrapS, int eWrapT);
+void fn_8002A608(GxTexture* pTex);  // make pTex the texture of the next draw
 
 #endif

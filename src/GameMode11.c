@@ -92,7 +92,6 @@ extern s32 lbl_80282428;                    // the lesson's step
 
 void  fn_800A6EC8(void);
 void  fn_800E5200(int a);
-void  fn_800A6DCC(int nMusic, int a);
 u8    fn_800A7720(void);
 f32   fn_8005C1EC(int nPlayer);
 

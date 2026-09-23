@@ -258,7 +258,6 @@ int   GameModeBattle_NumRemovableClubsLeft(int nPlayer);
 u8    GameModeBattle_RemoveClub(int nPlayer, int nClub);
 s32   GameModeDriverPGATour_GetCurrentEventID(void);          // GameModeDriverPGATour.c
 char* GameModeDriverRTE_GetDescription(s32 i);                // GameModeDriverRTE.c
-f32   fn_80012C30(char* sz);                                  // UFont.c: a string's width
 void  fn_8001A870(void);
 u8    fn_8003DCAC(void);
 void  fn_80062B84(int a);
@@ -1969,7 +1968,7 @@ void fn_80088CF0(MsgArg* pArgs, MsgArg* pResult) {
             break;
         }
         fn_801025F4();
-        pResult->i = lbl_80200538.aTourPct[nMult];
+        pResult->i = lbl_80200538.aMult[EARN_MULT_TOUR + nMult];
         return;
     case 104:
         if (gpSaveData[gPlayers[pArgs[0].i].nIndex].bActive != 1) {

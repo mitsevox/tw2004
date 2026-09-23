@@ -58,6 +58,7 @@ double sin(double x);
 double cos(double x);
 double fabs(double x);                  // 0x8000AE94
 double floor(double x);
+double fmod(double x, double m);
 #else
 #include <math.h>
 #include <stdio.h>

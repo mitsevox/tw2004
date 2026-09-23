@@ -12,13 +12,6 @@ void fn_8010F6C8(void);
 void fn_8010F718(void);
 void fn_8010F748(void);
 void fn_8010F794(void);
-void fn_8010F7C0(s32 n);
-s32  fn_8010F7D8(void);
-void fn_8010F7E4(s32 nShape);
-void fn_8010F7FC(int nColor, u32* pR, u32* pG, u32* pB, u32* pA);
-void fn_8010F880(void);
-void fn_8010F890(char* pName);
-void fn_8010F90C(int nX, int nY, int nColor);
 int  fn_8010F978(int nX, int nY);
 void fn_8010FA00(void);
 void fn_8010FAF4(void);
@@ -85,7 +78,7 @@ void fn_8010F880(void) {
 
 // Load the logo from a texture.
 void fn_8010F890(char* pName) {
-    u8* pLogo = fn_8010FB70();
+    u8* pLogo = fn_8010FB70()->aPixels;
     u8* pPixels;
     int nWidth;
     int nHeight;
@@ -105,7 +98,7 @@ void fn_8010F890(char* pName) {
 void fn_8010F90C(int nX, int nY, int nColor) {
     u8* pLogo;
     int n;
-    pLogo = fn_8010FB70();
+    pLogo = fn_8010FB70()->aPixels;
     n = fn_8010F978(nX, nY);
     pLogo[n] = nColor;
     lbl_802824B8->bDirty = 1;
@@ -131,7 +124,7 @@ int fn_8010F978(int nX, int nY) {
 
 // Once a frame: if the logo changed, copy it into its texture and draw with that.
 void fn_8010FA00(void) {
-    u8* pLogo = fn_8010FB70();
+    u8* pLogo = fn_8010FB70()->aPixels;
     char* pName;
     TexBank* pBank;
     TexEntry* pTex;

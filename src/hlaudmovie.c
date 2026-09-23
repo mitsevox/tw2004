@@ -10,10 +10,6 @@
 #include "core/audtrack.h"
 #include "core/startup.h"
 
-u8   fn_800A9A50(u8 a, u8 b);
-void fn_800A9AC4(void);
-u8   fn_800AC494(void);
-void fn_800AC49C(void);
 void fn_800ACCF4(void);
 u8   fn_800AF264(u8 a, u8 b);
 void fn_800AF2D8(void);
@@ -398,8 +394,9 @@ void fn_800A8FFC(u32 uMemory) {
         pTrack = pSound->aTracks;
         pEnd = pTrack + pSound->nTracks;
         for (; pTrack < pEnd; pTrack++) {
-            pTrack->pPlayList = (AudPlayList*)(pData + (uptr)pTrack->pPlayList);
-            pTrack->p18 = pSampleData + (uptr)pTrack->p18;
+            // a sequenced track's data.pBank is the same kind of offset
+            pTrack->data.pPlayList = (AudPlayList*)(pData + (uptr)pTrack->data.pPlayList);
+            pTrack->pEvents = (AudSeqEvent*)(pSampleData + (uptr)pTrack->pEvents);
         }
         fn_800A8524(pSound, i);
         pBank->apSounds[i] = pSound;
@@ -539,7 +536,7 @@ AudPlayList* fn_800A9564(u8 nPlayList) {
 }
 
 // Sets a placed track's voices: volume, pan and doppler pitch from the sound's place.
-void fn_800A9590(AudTableEntry* pEntry, AudTrack* pTrack, f32 fVolume) {
+void fn_800A9590(AudSource* pSource, AudTrack* pTrack, f32 fVolume) {
     AudVoiceParams params;
     AudVoice** ppVoice;
     AudVoice** ppEnd;
@@ -549,7 +546,7 @@ void fn_800A9590(AudTableEntry* pEntry, AudTrack* pTrack, f32 fVolume) {
     ppVoice = pTrack->apVoices;
     ppEnd = &pTrack->apVoices[pTrack->pTmpl->n2];
     fVolume = fn_800A85FC(pTrack->f48, fVolume);
-    fPitch = fn_800A85FC(pEntry->fPitch, pTrack->f4C);
+    fPitch = fn_800A85FC(pSource->fPitch, pTrack->f4C);
     params.flags.n = 0;
     params.flags.b.bVolume = 1;
     params.flags.b.bPitch = 1;
@@ -558,8 +555,8 @@ void fn_800A9590(AudTableEntry* pEntry, AudTrack* pTrack, f32 fVolume) {
         pVoice = *ppVoice;
         if (pVoice != NULL) {
             params.nVolume = fn_800A85FC(fVolume, pVoice->n14 << 7);
-            params.nPan = 64.0f * pEntry->fPan + 64.0f;
-            params.n7 = 64.0f * pEntry->f68 + 64.0f;
+            params.nPan = 64.0f * pSource->fPan + 64.0f;
+            params.n7 = 64.0f * pSource->f68 + 64.0f;
             fn_800AC91C(pVoice, &params);
         }
     }
@@ -567,7 +564,7 @@ void fn_800A9590(AudTableEntry* pEntry, AudTrack* pTrack, f32 fVolume) {
 
 // Sets a track's voices when the sound is not placed: a mono track in the centre, a stereo one's
 // channels left and right in turn.
-void fn_800A96DC(AudTableEntry* pEntry, AudTrack* pTrack, f32 fVolume) {
+void fn_800A96DC(AudSource* pSource, AudTrack* pTrack, f32 fVolume) {
     AudVoiceParams params;
     AudVoice** ppVoice;
     AudVoice** ppEnd;

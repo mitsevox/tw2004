@@ -425,7 +425,7 @@ typedef struct PlayerProfile {
     u8   n1;                    // 0x01  cleared by Session_Init and the golfer setup
     u8   n2;                    // 0x02  a created golfer's byte 0x54C2 of its save slot, else 0
     u8   unk3[5];
-    char szNames[6][8];         // 0x08
+    u64  aNames[6];             // 0x08  names, each packed into 64 bits (fn_800CB700)
     u8   nOutfit;               // 0x38  the golfer record's nOutfit, or the created golfer's
     u8   nBallType;             // 0x39  0..3, from the SPIN attribute for a pro
     u8   unk3A[6];
@@ -705,6 +705,7 @@ u8   fn_80101DF4(void);
 f32  Swing_SpinScale(int nSpin);         // how much spin SPIN allows: 0.15 at 0 .. 1.0 at 110 (Swing.c)
 f32  fn_8005C280(int nPlayer);          // the swing's fNonPowerShotPower (Swing.c)
 void Swing_RumbleOff(int nPlayer);      // stops the pad rumble (Swing.c)
+void Swing_ResetBoostAndSpin(int nPlayer);  // Swing.c
 
 u8   Club_UsableForKind(int nPlayer, int nClub, int nKind);
 int  AI_FirstUsableClub(int nPlayer, int nKind);

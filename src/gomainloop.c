@@ -37,7 +37,6 @@ void fn_8001058C(void);
 void fn_8001260C(void);
 void fn_800126C0(void);
 void fn_80012A78(void);
-void fn_80013400(void);
 void* fn_8001371C(void* pA, GoFrameBuf* pBuf, void* pC);   // a render camera from three parts
 void fn_800136F4(void);
 void fn_80013718(void);

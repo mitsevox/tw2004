@@ -10,12 +10,6 @@
 int  fn_80006478(s32 hFile, u8* pDst, u32 uLen, u32 uOffset,
                  void (*pfnDone)(int nBytes, int nError, AudTrack* pTrack, u8 nId), int n,
                  AudTrack* pTrack, u8 nId, int n19);                 // read from disc, not waiting
-void fn_800AA1B8(AudTrack* pTrack, int n);
-void fn_800AA400(void);
-f32  fn_800AA44C(u8 nCurve);
-u16  fn_800AB32C(u16 nRange);                                        // a random number below nRange
-void fn_800ACA5C(AudVoice* pVoice, int bPause);
-u8   fn_800ACE38(AudVoice* pVoice, u32* puPos);
 s32  DVDGetDriveStatus(void);
 
 void fn_800AB860(AudTrack* pTrack);
@@ -30,17 +24,17 @@ u8 fn_800AB3A4(AudTrack* pTrack) {
     u8 bChanged;
 
     bChanged = 0;
-    if (pTrack->nNextPlayList != 0xFF) {
-        Stm_SetPlayList(pTrack, pTrack->nNextPlayList);
+    if (pTrack->u.stm.nNextPlayList != 0xFF) {
+        Stm_SetPlayList(pTrack, pTrack->u.stm.nNextPlayList);
         bChanged = 1;
-        pTrack->nNextPlayList = 0xFF;
+        pTrack->u.stm.nNextPlayList = 0xFF;
     }
-    if (pTrack->nNextStream != 0xFFFF) {
-        if (pTrack->pTmpl->pPlayList != NULL) {
-            Stm_SetStream(pTrack, pTrack->nNextStream, 0);
+    if (pTrack->u.stm.nNextStream != 0xFFFF) {
+        if (pTrack->pTmpl->data.pPlayList != NULL) {
+            Stm_SetStream(pTrack, pTrack->u.stm.nNextStream, 0);
             bChanged = 1;
         }
-        pTrack->nNextStream = 0xFFFF;
+        pTrack->u.stm.nNextStream = 0xFFFF;
     }
     return bChanged;
 }
@@ -51,7 +45,7 @@ void fn_800AB428(AudTrack* pTrack) {
     u8 i;
     int bLoud;
 
-    pList = pTrack->pTmpl->pPlayList;
+    pList = pTrack->pTmpl->data.pPlayList;
     fn_800A85FC(pTrack->f44, fn_800AA44C(pList->n3));
     bLoud = pList->n3 == 15;
     for (i = 0; i < pList->nChannels; i++) {
@@ -147,8 +141,8 @@ void fn_800AB72C(AudTrack* pTrack, void (*pfnDone)(u32 bLast), u32 uStep, u8 bSk
     u32 uAram;
 
     i = 0;
-    pSrc = pTrack->pBuffer;
-    pList = pTrack->pTmpl->pPlayList;
+    pSrc = pTrack->u.stm.pBuffer;
+    pList = pTrack->pTmpl->data.pPlayList;
     lbl_802820AC = pTrack;
     while (i < (nChannels = pList->nChannels)) {
         pVoice = pTrack->apVoices[i];
@@ -168,7 +162,7 @@ void fn_800AB818(u32 bLast) {
     AudTrack* pTrack;
 
     pTrack = lbl_802820AC;
-    pTrack->uFilled += 0x8000;
+    pTrack->u.stm.uFilled += 0x8000;
     if (bLast) {
         lbl_802820AC = NULL;
         RemoveFromAudStreamQueue(pTrack);
@@ -177,19 +171,19 @@ void fn_800AB818(u32 bLast) {
 
 // Refills the whole buffer from its start (after the stream looped).
 void fn_800AB860(AudTrack* pTrack) {
-    fn_80005AE8(pTrack->pBuffer, 0, sizeof(StreamChunk));
+    fn_80005AE8(pTrack->u.stm.pBuffer, 0, sizeof(StreamChunk));
     fn_800AB72C(pTrack, fn_800AB818, 0, 0);
 }
 
 // At the stream's end: loop back, or mark it ended when it does not loop.
 void fn_800AB8B4(AudTrack* pTrack) {
-    if (pTrack->uFilled < pTrack->uLength) return;
-    if (pTrack->pStream->uLoop == 0xFFFFFFFF) {
-        pTrack->flags.b.bEnded = 1;
+    if (pTrack->u.stm.uFilled < pTrack->u.stm.uLength) return;
+    if (pTrack->u.stm.pStream->uLoop == 0xFFFFFFFF) {
+        pTrack->u.stm.flags.b.bEnded = 1;
         return;
     }
-    pTrack->uFilled = 0;
-    pTrack->uPlayed = 0;
+    pTrack->u.stm.uFilled = 0;
+    pTrack->u.stm.uPlayed = 0;
 }
 
 // A block's DMA callback.
@@ -197,7 +191,7 @@ void fn_800AB8FC(u32 bLast) {
     AudTrack* pTrack;
 
     pTrack = lbl_802820AC;
-    lbl_802820AC->uFilled += 0x8000;
+    lbl_802820AC->u.stm.uFilled += 0x8000;
     if (bLast) {
         fn_800AB8B4(lbl_802820AC);
         lbl_802820AC = NULL;
@@ -209,18 +203,18 @@ void fn_800AB8FC(u32 bLast) {
 void fn_800AB958(AudTrack* pTrack, u32 uLen) {
     u32 uLoop;
 
-    pTrack->uRead += uLen;
-    pTrack->uReadPos += uLen;
-    if (pTrack->uReadPos < pTrack->uLength) return;
-    uLoop = pTrack->pStream->uLoop;
+    pTrack->u.stm.uRead += uLen;
+    pTrack->u.stm.uReadPos += uLen;
+    if (pTrack->u.stm.uReadPos < pTrack->u.stm.uLength) return;
+    uLoop = pTrack->u.stm.pStream->uLoop;
     if (uLoop == 0xFFFFFFFF) return;
-    pTrack->uReadPos = uLoop;
+    pTrack->u.stm.uReadPos = uLoop;
 }
 
 // A disc read is done: DMA it to the voices, unless the track moved on meanwhile.
 void fn_800AB99C(int nBytes, int nError, AudTrack* pTrack, u8 nId) {
-    if (pTrack->nReadId != nId || pTrack->pTmpl == NULL || pTrack->pTmpl->pPlayList == NULL ||
-        pTrack->pStream == NULL) {
+    if (pTrack->u.stm.nReadId != nId || pTrack->pTmpl == NULL || pTrack->pTmpl->data.pPlayList == NULL ||
+        pTrack->u.stm.pStream == NULL) {
         RemoveFromAudStreamQueue(pTrack);
         return;
     }
@@ -236,11 +230,11 @@ void fn_800ABA28(AudTrack* pTrack) {
     u8 i;
     AudVoice* pVoice;
 
-    pList = pTrack->pTmpl->pPlayList;
+    pList = pTrack->pTmpl->data.pPlayList;
     hFile = fn_800AC328();
     if (pList == NULL) return;
     if (pTrack->nState == 5) return;
-    if (pTrack->pStream == NULL) return;
+    if (pTrack->u.stm.pStream == NULL) return;
     request.flags.n = 0;
     request.flags.b.b14 = 1;
     request.nPriority = 0x3FFF;
@@ -259,21 +253,21 @@ void fn_800ABA28(AudTrack* pTrack) {
     if (++lbl_802820A8 == 0) {
         lbl_802820A8 = 1;
     }
-    pTrack->uReadPos = 0;
-    pTrack->uRead = 0;
-    pTrack->uFilled = 0;
-    pTrack->uPlayed = 0;
-    pTrack->b5C = 0;
+    pTrack->u.stm.uReadPos = 0;
+    pTrack->u.stm.uRead = 0;
+    pTrack->u.stm.uFilled = 0;
+    pTrack->u.stm.uPlayed = 0;
+    pTrack->bits.b.b7 = 0;
     pTrack->nState = 4;
-    pTrack->nReadId = lbl_802820A8;
+    pTrack->u.stm.nReadId = lbl_802820A8;
     pTrack->n5D += pList->nChannels;
-    pTrack->flags.n = 0;
-    fn_800AB4C0(hFile, pTrack->pBuffer, (pTrack->uBufferSize >> 1) * pList->nChannels,
-                pTrack->pStream->uOffset, fn_800AB99C, pTrack, pTrack->nReadId, 0);
+    pTrack->u.stm.flags.n = 0;
+    fn_800AB4C0(hFile, pTrack->u.stm.pBuffer, (pTrack->u.stm.uBufferSize >> 1) * pList->nChannels,
+                pTrack->u.stm.pStream->uOffset, fn_800AB99C, pTrack, pTrack->u.stm.nReadId, 0);
 }
 
 // Sets up the read queue (the module's start-up).
-s32 fn_800ABBC8(void) {
+u8 fn_800ABBC8(void) {
     fn_80005AE8(lbl_801F18B8.aReads, 0, sizeof(lbl_801F18B8.aReads));
     fn_800AE00C(&lbl_801F18B8.queue, lbl_801F18B8.aReads, 8, sizeof(AudStreamRead));
     lbl_801F18B8.bBusy = 0;
@@ -286,33 +280,33 @@ void fn_800ABC34(AudTrack* pTrack) {
 
 // Clears a track's stream state.
 void fn_800ABC54(AudTrack* pTrack) {
-    pTrack->pStream = NULL;
-    pTrack->pBuffer = NULL;
-    pTrack->uBufferSize = 0;
-    pTrack->uReadPos = 0;
-    pTrack->uRead = 0;
-    pTrack->uFilled = 0;
-    pTrack->uPlayed = 0;
-    pTrack->uLength = 0;
-    pTrack->nLastStream = 0xFFFF;
-    pTrack->nNextStream = 0xFFFF;
-    pTrack->nNextPlayList = 0xFF;
-    pTrack->nReadId = 0;
-    pTrack->flags.n = 0;
+    pTrack->u.stm.pStream = NULL;
+    pTrack->u.stm.pBuffer = NULL;
+    pTrack->u.stm.uBufferSize = 0;
+    pTrack->u.stm.uReadPos = 0;
+    pTrack->u.stm.uRead = 0;
+    pTrack->u.stm.uFilled = 0;
+    pTrack->u.stm.uPlayed = 0;
+    pTrack->u.stm.uLength = 0;
+    pTrack->u.stm.nLastStream = 0xFFFF;
+    pTrack->u.stm.nNextStream = 0xFFFF;
+    pTrack->u.stm.nNextPlayList = 0xFF;
+    pTrack->u.stm.nReadId = 0;
+    pTrack->u.stm.flags.n = 0;
 }
 
 void Stm_Exit(AudTrack* pTrack) {
     fn_800B596C("Stm_Exit");
     fn_800B04CC(pTrack);
-    if (pTrack->pBuffer != NULL) {
-        fn_800A9434(pTrack->pBuffer, pTrack->uBufferSize, pTrack->pTmpl->pPlayList->nId);
+    if (pTrack->u.stm.pBuffer != NULL) {
+        fn_800A9434(pTrack->u.stm.pBuffer, pTrack->u.stm.uBufferSize, pTrack->pTmpl->data.pPlayList->nId);
     }
     fn_800ABC54(pTrack);
     fn_800B5994("Stm_Exit");
 }
 
 void Stm_Start(AudTrack* pTrack) {
-    if (pTrack->pTmpl->pPlayList == NULL) return;
+    if (pTrack->pTmpl->data.pPlayList == NULL) return;
     fn_800B596C("Stm_Start");
     if (pTrack->nState != 5) {
         fn_800ABA28(pTrack);
@@ -324,7 +318,7 @@ void Stm_Start(AudTrack* pTrack) {
 
 void fn_800ABD7C(AudTrack* pTrack) {
     fn_800AC310(pTrack);
-    pTrack->nReadId = 0;
+    pTrack->u.stm.nReadId = 0;
 }
 
 // Once a frame: resume voices after a disc error, start the voices once the buffer is full, pause
@@ -343,7 +337,7 @@ u8 Stm_Tick(AudTrack* pTrack) {
 
     bFed = 0;
     fn_800B596C("Stm_Tick");
-    pList = pTrack->pTmpl->pPlayList;
+    pList = pTrack->pTmpl->data.pPlayList;
     if (DVDGetDriveStatus() == 0) {
         ppVoice = pTrack->apVoices;
         for (i = 0; i < pList->nChannels; i++, ppVoice++) {
@@ -356,13 +350,13 @@ u8 Stm_Tick(AudTrack* pTrack) {
     switch (pTrack->nState) {
     case 4:
         uFull = pList->nChannels * 0x7F00;
-        if (pTrack->uLength <= uFull) {
-            uFull = pTrack->uLength;
+        if (pTrack->u.stm.uLength <= uFull) {
+            uFull = pTrack->u.stm.uLength;
         }
-        if (pTrack->uFilled != 0 && pTrack->uFilled >= uFull) {
-            if (pTrack->flags.b.b6) {
+        if (pTrack->u.stm.uFilled != 0 && pTrack->u.stm.uFilled >= uFull) {
+            if (pTrack->u.stm.flags.b.b6) {
                 bFed = 1;
-                pTrack->flags.b.b6 = 0;
+                pTrack->u.stm.flags.b.b6 = 0;
                 pTrack->nState = 5;
             } else {
                 bFed = 1;
@@ -377,25 +371,25 @@ u8 Stm_Tick(AudTrack* pTrack) {
         uOld = (*ppVoice)->uPlayPos;
         bFed = fn_800ACE38(*ppVoice, &uPos);
         if (uOld != 0) {
-            pTrack->uPlayed += (*ppVoice)->uPlayPos - uOld;
+            pTrack->u.stm.uPlayed += (*ppVoice)->uPlayPos - uOld;
             if ((*ppVoice)->uPlayPos < uOld) {
-                pTrack->uPlayed += 0xFE00;
+                pTrack->u.stm.uPlayed += 0xFE00;
             }
         }
         if (bFed) break;
         bBehind = 0;
-        if (pTrack->uPlayed > (pTrack->uFilled >> 15) / pList->nChannels * 0x7F00 - 0xCB3) {
+        if (pTrack->u.stm.uPlayed > (pTrack->u.stm.uFilled >> 15) / pList->nChannels * 0x7F00 - 0xCB3) {
             bBehind = 1;
         }
         if (bBehind) {
-            if (!pTrack->flags.b.bStarved) {
-                pTrack->flags.b.bStarved = 1;
+            if (!pTrack->u.stm.flags.b.bStarved) {
+                pTrack->u.stm.flags.b.bStarved = 1;
                 for (i = 0; i < pList->nChannels; i++) {
                     fn_800ACA5C(pTrack->apVoices[i], 1);
                 }
             }
-        } else if (pTrack->flags.b.bStarved) {
-            pTrack->flags.b.bStarved = 0;
+        } else if (pTrack->u.stm.flags.b.bStarved) {
+            pTrack->u.stm.flags.b.bStarved = 0;
             for (i = 0; i < pList->nChannels; i++) {
                 fn_800ACA5C(pTrack->apVoices[i], 0);
             }
@@ -403,25 +397,26 @@ u8 Stm_Tick(AudTrack* pTrack) {
         break;
     }
     if (bFed) {
-        if (pTrack->flags.b.bEnded) {
+        if (pTrack->u.stm.flags.b.bEnded) {
             if (fn_800AB570(pTrack)) {
-                pTrack->flags.b.bEnded = 0;
-                pTrack->flags.b.b3 = 1;
+                pTrack->u.stm.flags.b.bEnded = 0;
+                pTrack->u.stm.flags.b.b3 = 1;
             }
-        } else if (pTrack->flags.b.b3) {
-            pTrack->flags.b.b3 = 0;
-            if (pTrack->pStream->uLoop == 0xFFFFFFFF) {
+        } else if (pTrack->u.stm.flags.b.b3) {
+            pTrack->u.stm.flags.b.b3 = 0;
+            if (pTrack->u.stm.pStream->uLoop == 0xFFFFFFFF) {
                 fn_800AA1B8(pTrack, 1);
             } else {
-                pTrack->uFilled = 0;
+                pTrack->u.stm.uFilled = 0;
             }
         } else if (pTrack->nState != 3) {
-            uLen = pTrack->uLength - pTrack->uReadPos;
+            uLen = pTrack->u.stm.uLength - pTrack->u.stm.uReadPos;
             if (pList->nChannels << 15 <= uLen) {
                 uLen = pList->nChannels << 15;
             }
-            fn_800AB4C0(fn_800AC328(), pTrack->pBuffer, uLen, pTrack->pStream->uOffset + pTrack->uReadPos,
-                        fn_800AB99C, pTrack, pTrack->nReadId, 0);
+            fn_800AB4C0(fn_800AC328(), pTrack->u.stm.pBuffer, uLen,
+                        pTrack->u.stm.pStream->uOffset + pTrack->u.stm.uReadPos, fn_800AB99C, pTrack,
+                        pTrack->u.stm.nReadId, 0);
         }
     }
     ProcessAudStreamReadQueue();
@@ -444,23 +439,23 @@ void Stm_SetPlayList(AudTrack* pTrack, u8 nPlayList) {
     pTmpl = pTrack->pTmpl;
     fn_800B596C("Stm_SetPlayList");
     if (pTrack->nState > 2) {
-        pTrack->nNextPlayList = nPlayList;
+        pTrack->u.stm.nNextPlayList = nPlayList;
     } else {
         pList = fn_800A9564(nPlayList);
         if (pTrack->nState == 2) {
-            pOld = pTmpl->pPlayList;
+            pOld = pTmpl->data.pPlayList;
             nOld = pOld->nId;
         } else {
             pOld = NULL;
         }
         if (pList != pOld) {
             uSize = fn_800A955C(pList->nId);
-            if (pTrack->pBuffer != NULL) {
-                fn_800A9434(pTrack->pBuffer, pTrack->uBufferSize, nOld);
+            if (pTrack->u.stm.pBuffer != NULL) {
+                fn_800A9434(pTrack->u.stm.pBuffer, pTrack->u.stm.uBufferSize, nOld);
             }
-            pTmpl->pPlayList = pList;
-            pTrack->pBuffer = fn_800A942C(uSize, pList->nId);
-            pTrack->uBufferSize = uSize;
+            pTmpl->data.pPlayList = pList;
+            pTrack->u.stm.pBuffer = fn_800A942C(uSize, pList->nId);
+            pTrack->u.stm.uBufferSize = uSize;
             pTmpl->n2 = pList->nChannels;
         }
     }
@@ -480,33 +475,33 @@ void Stm_SetStream(AudTrack* pTrack, u16 nStream, int nMode) {
             if (nMode == 2) {
                 fn_800AA1B8(pTrack, 0);
             }
-            pTrack->nNextStream = nStream;
+            pTrack->u.stm.nNextStream = nStream;
         } else {
-            pTrack->nNextStream = 0xFFFF;
-            pTrack->nNextPlayList = 0xFF;
+            pTrack->u.stm.nNextStream = 0xFFFF;
+            pTrack->u.stm.nNextPlayList = 0xFF;
         }
     } else {
-        pList = pTmpl->pPlayList;
+        pList = pTmpl->data.pPlayList;
         if (pList != NULL) {
             if (nStream == 0xFFFE) {
                 nStream = fn_800AB32C(pList->nStreams);
-                if (nStream == pTrack->nLastStream) {
+                if (nStream == pTrack->u.stm.nLastStream) {
                     nStream++;
                     if (nStream >= pList->nStreams) {
                         nStream = 0;
                     }
                 }
-                pTrack->nLastStream = nStream;
+                pTrack->u.stm.nLastStream = nStream;
             }
-            pTrack->pStream = fn_800A9438(pList, nStream, &pTrack->uLength);
+            pTrack->u.stm.pStream = fn_800A9438(pList, nStream, &pTrack->u.stm.uLength);
         }
     }
     fn_800B5994("Stm_SetStream");
 }
 
 void fn_800AC310(AudTrack* pTrack) {
-    pTrack->nNextPlayList = 0xFF;
-    pTrack->nNextStream = 0xFFFF;
+    pTrack->u.stm.nNextPlayList = 0xFF;
+    pTrack->u.stm.nNextStream = 0xFFFF;
 }
 
 // The stream file.
