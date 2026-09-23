@@ -1,7 +1,19 @@
-// GoShaderObjectCommon_ShaderObjectsData_Gc.c (EA's name, from its asserts): not yet decompiled;
-// the sweep code below is the matched small functions.
+// GoShaderObjectCommon_ShaderObjectsData_Gc.c (EA's name, from its asserts): builds the display
+// lists that draw the shader objects (the grass and other course objects drawn through GX
+// texture and colour stages). Partly decompiled.
 
-#include "game_types.h"
+#include "engine.h"
+
+int fn_80073878(TexBank* pBank, TexEntry* pTex);
+
+// Another texture in pTex's bank with the same u0 as pTex: its index, or -1.
+int fn_80073878(TexBank* pBank, TexEntry* pTex) {
+    int i;
+    for (i = 0; i < pBank->n2; i++) {
+        if (pBank->p8[i].u0 == pTex->u0 && pTex != &pBank->p8[i]) return i;
+    }
+    return -1;
+}
 
 // ---- sweep code (not yet cleaned up) ----
 
