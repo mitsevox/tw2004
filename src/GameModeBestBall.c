@@ -126,8 +126,7 @@ void fn_800E83F8(void) {
 // player farthest from the pin (off the green first) whose team is still playing.
 s32 fn_800E84B0(int nPlayer) {
     TeeOrder order;
-    int nLead;
-    int h;
+    s32* pOrder;        // fake match: the within-team compares read order.a through a pointer
     int a;
     int b;
     int w;
@@ -137,11 +136,14 @@ s32 fn_800E84B0(int nPlayer) {
     int nHole;
     f32 fBest;
     int nBest;
+    int h;
+    int nLead;
     f32 dx;
     f32 dz;
     f32 d;
     nLead = 0;
     order = lbl_80184DB0;
+    pOrder = order.a;
     for (h = 0; h < Game_CurHoleIndex(); h++) {
         if (gpGame->bHoleSelected[h]) {
             a = gPlayers[1].nStrokes[h];
@@ -169,21 +171,21 @@ s32 fn_800E84B0(int nPlayer) {
                 order.a[3] = t;
             }
             t = order.a[0];
-            if (gPlayers[t].nStrokes[h] > gPlayers[order.a[1]].nStrokes[h]) {
+            if (gPlayers[t].nStrokes[h] > gPlayers[pOrder[1]].nStrokes[h]) {
                 order.a[0] = order.a[1];
                 order.a[1] = t;
             }
             t = order.a[2];
-            if (gPlayers[t].nStrokes[h] > gPlayers[order.a[3]].nStrokes[h]) {
+            if (gPlayers[t].nStrokes[h] > gPlayers[pOrder[3]].nStrokes[h]) {
                 order.a[2] = order.a[3];
                 order.a[3] = t;
             }
         }
     }
-    for (i = 0; i < gNumPlayersSetUp; i++) {
-        if (nPlayer != order.a[i] && Player_OnTee(order.a[i]) && !gPlayers[order.a[i]].bPlayerCut &&
-            !fn_800E82AC(fn_800E8848(order.a[i]))) {
-            return order.a[i];
+    for (h = 0; h < gNumPlayersSetUp; h++) {
+        if (nPlayer != order.a[h] && Player_OnTee(order.a[h]) && !gPlayers[order.a[h]].bPlayerCut &&
+            !fn_800E82AC(fn_800E8848(order.a[h]))) {
+            return order.a[h];
         }
     }
     pCourse = fn_8000C594();

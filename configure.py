@@ -138,6 +138,23 @@ config = ProjectConfig()
 config.version = str(args.version)
 version_num = VERSIONS.index(config.version)
 
+# In a git worktree (".git" is a file), use the main checkout's downloaded tools instead of
+# downloading into build/: the worktrees' build tool folders are links to the main checkout, and a
+# download there would rewrite files other builds are using.
+if Path(".git").is_file():
+    import subprocess
+
+    _common = subprocess.run(
+        ["git", "rev-parse", "--path-format=absolute", "--git-common-dir"],
+        capture_output=True, text=True,
+    ).stdout.strip()
+    _main_build = Path(_common).parent / "build"
+    for _attr, _rel in (("dtk", "tools/dtk.exe"), ("objdiff", "tools/objdiff-cli.exe"),
+                        ("sjiswrap", "tools/sjiswrap.exe"), ("compilers", "compilers"),
+                        ("binutils", "binutils")):
+        if getattr(args, _attr) is None and (_main_build / _rel).exists():
+            setattr(args, _attr, _main_build / _rel)
+
 # Apply arguments
 config.build_dir = args.build_dir
 config.dtk_path = args.dtk
@@ -813,7 +830,7 @@ config.libs = [
             Object(Matching, "GameUI.c"),
             Object(Matching, "GameMessages.c"),
             Object(Matching, "GameAnalysis.c"),
-            Object(NonMatching, "GameModeAlternateShot.c"),
+            Object(Matching, "GameModeAlternateShot.c"),
             Object(Matching, "GameModeBattle.c"),
             Object(NonMatching, "GameModeBestBall.c"),
             Object(NonMatching, "GameModeFourBall.c"),
@@ -822,7 +839,7 @@ config.libs = [
             Object(Matching, "GameMode9.c"),
             Object(NonMatching, "GameMode23.c"),
             Object(NonMatching, "GameMode24.c"),
-            Object(Matching, "GameMode10.c"),
+            Object(Matching, "GameModeReplay.c"),
             Object(Matching, "GameTargets.c"),
             Object(Matching, "GameMode14.c"),
             Object(Matching, "GameMode15.c"),
