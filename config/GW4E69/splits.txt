@@ -1326,6 +1326,9 @@ dolphin/db.c:
 
 src/dsp/dsp.c:
 	.text       start:0x801395AC end:0x801397FC
+	.data       start:0x801998F8 end:0x80199978
+	.sdata      start:0x80281A00 end:0x80281A08
+	.sbss       start:0x80282758 end:0x80282760
 
 dolphin/dsp/dsp_debug.c:
 	.text       start:0x801397FC end:0x8013984C
