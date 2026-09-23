@@ -448,19 +448,10 @@ unsorted/sweep_80026B34.c:
 	.text       start:0x80026B34 end:0x80026B4C
 
 Skeleton.c:
-	.text       start:0x80026B4C end:0x80029BC8
+	.text       start:0x80026B4C end:0x80029FC8
 
-unsorted/sweep_8002A020.c:
-	.text       start:0x8002A020 end:0x8002A024
-
-unsorted/sweep_8002A2FC.c:
-	.text       start:0x8002A2FC end:0x8002A3A4
-
-unsorted/sweep_8002A3A4.c:
-	.text       start:0x8002A3A4 end:0x8002A3AC
-
-unsorted/sweep_8002A624.c:
-	.text       start:0x8002A624 end:0x8002A630
+GxUtil.c:
+	.text       start:0x80029FC8 end:0x8002A630
 
 Golfer.c:
 	.text       start:0x8002A630 end:0x8002F1D4
