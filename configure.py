@@ -533,7 +533,7 @@ config.libs = [
         "progress_category": "sdk",
         "src_dir": "extern/ffcc",
         "objects": [
-            Object(NonMatching, "src/TRK_MINNOW_DOLPHIN/dolphin_trk_glue.c"),
+            Object(Matching, "src/TRK_MINNOW_DOLPHIN/dolphin_trk_glue.c"),
         ],
     },
     {
