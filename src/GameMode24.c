@@ -4,7 +4,6 @@
 
 #include "golfer.h"
 
-extern u8 lbl_8020CF90[];
 void UStream_UnregisterHandler();
 void fn_8000E790();
 void fn_800F0570(void);
@@ -35,8 +34,10 @@ typedef struct RTEvent {
     u8  unk18[4];
     u16 aDate[10];              // 0x1C  the start date per season (from 2003; 0 = not held)
 } RTEvent;
-#define EVENTS ((RTEvent*)lbl_8020CF90)
-#define EVENT_NAMES (*(char**)(lbl_8020CF90 + 0x4DA0))
+extern RTEvent lbl_8020CF90[];
+#define EVENTS lbl_8020CF90
+#define EVENT_BYTES ((u8*)lbl_8020CF90)
+#define EVENT_NAMES (*(char**)(EVENT_BYTES + 0x4DA0))
 
 void  GM_vCloseModuleONCE(void);
 int   UStream_RegisterHandler();
@@ -84,11 +85,11 @@ void fn_800F0570(void) {
 }
 
 void fn_800F05B0(s32 p0) {
-    fn_8000E790(p0, 5664, lbl_8020CF90);
+    fn_8000E790(p0, 5664, EVENT_BYTES);
 }
 
 void fn_800F05DC(s32 p0) {
-    fn_8000E790(p0, 14208, (lbl_8020CF90 + 0x1620));
+    fn_8000E790(p0, 14208, (EVENT_BYTES + 0x1620));
 }
 
 u8 fn_800F0818(void) {
@@ -110,19 +111,19 @@ void fn_800F0E30(s32 p0, s32 p1) {
 }
 
 u8* fn_800F0EA0(s32 p0) {
-    return (lbl_8020CF90 + (p0 * 48));
+    return (EVENT_BYTES + (p0 * 48));
 }
 
 s32 fn_800F0EF4(s32 p0) {
-    return (*(s32*)(lbl_8020CF90 + 0x4DA0) + *(s32*)(lbl_8020CF90 + (p0 * 48)));
+    return (*(s32*)(EVENT_BYTES + 0x4DA0) + *(s32*)(EVENT_BYTES + (p0 * 48)));
 }
 
 s32 fn_800F0F10(s32 p0) {
-    return (*(s32*)(lbl_8020CF90 + 0x4DA0) + *(s32*)((lbl_8020CF90 + (p0 * 48)) + 0x4));
+    return (*(s32*)(EVENT_BYTES + 0x4DA0) + *(s32*)((EVENT_BYTES + (p0 * 48)) + 0x4));
 }
 
 s32 fn_800F0F30(s32 p0) {
-    return *(s32*)((lbl_8020CF90 + (*(s32*)((lbl_8020CF90 + (p0 * 48)) + 0xC) << 7)) + 0x1604);
+    return *(s32*)((EVENT_BYTES + (*(s32*)((EVENT_BYTES + (p0 * 48)) + 0xC) << 7)) + 0x1604);
 }
 
 s32 fn_800F1008(s32 i) {
@@ -193,7 +194,7 @@ void fn_800F06DC(void) {
         if (EVENTS[lbl_80282350].nChallenge != 0) {
             gSession.nNumPlayers = 1;
             fn_800E0B38(5);
-            fn_800EC544(lbl_8020CF90 + 0x1620, 111);
+            fn_800EC544(EVENT_BYTES + 0x1620, 111);
             fn_800EAE38(EVENTS[lbl_80282350].nChallenge - 1);
             fn_800EAF7C();
             lbl_8028235C = gpGame->pfn1CC;
@@ -308,7 +309,7 @@ void fn_800F0BBC(void) {
     s32 nReward;
     lbl_80282358();
     if (fn_800EC558() != 3) {
-        nReward = *(s32*)(lbl_8020CF90 + (EVENTS[lbl_80282350].nChallenge << 7) + 0x1604);
+        nReward = *(s32*)(EVENT_BYTES + (EVENTS[lbl_80282350].nChallenge << 7) + 0x1604);
         fn_800D3548(0, nReward, 0);
         fn_800E4364(0, 0x6F, nReward, 0);
         fn_800F08A8();
