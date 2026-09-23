@@ -26,7 +26,7 @@ typedef struct MCCardState {
     u8   unk8[0x84 - 0x8];
     s32  nFreeFiles;            // 0x84  free directory entries (CARDFreeBlocks)
     s32  nSectorSize;           // 0x88  CARDProbeEx
-    u32  u8C;                   // 0x8C  CARDGetXferredBytes when an operation starts (fn_8009CB9C)
+    s32  nXferStart;            // 0x8C  CARDGetXferredBytes when an operation starts (fn_8009CB9C)
     s32  nMemSize;              // 0x90  the card's size (CARDProbeEx)
     u8   b94;                   // 0x94  set when a format fails with an I/O error; a mount clears
                                 //       it, but puts it back when the card turns out broken
@@ -109,11 +109,11 @@ void fn_8009CC00(void);
 void fn_8009CC88(void);
 void fn_8009CD10(void);
 void fn_8009CD7C(void);
+s32  fn_8009D3DC(s32 nPort, s32 nSlot);
+s32  fn_8009D50C(s32 nPort, s32 nSlot);     // new files an EA Sports Bio save needs (0 or 1)
 s32  fn_8009D614(s32 nPort, s32 nSlot, const char* pName);
 s32  fn_8009D74C(s32 nPort, s32 nSlot);     // mount the card; 0, or -22 when it was mounted already
 s32  fn_8009DBAC(s32 nPort, s32 nSlot);     // unmount it
-s32  fn_8009D3DC(s32 nPort, s32 nSlot);
-s32  fn_8009D50C(s32 nPort, s32 nSlot);
 void fn_8009DCEC(s32 nPort, s32 nSlot);
 s32  fn_8009DD44(s32 nPort, s32 nSlot, const char* pName);
 s32  fn_8009E918(s32 nPort, s32 nSlot);     // format the card
@@ -123,8 +123,6 @@ s32  fn_8009EE28(s32 nPort, s32 nSlot);
 u32  fn_8009EF90(void);
 s32  fn_8009F5E4(s32 nPort, s32 nSlot, const char* pName);    // delete the save file
 
-// ---- between MC_Gc.c and MC.c (0x8009F6A0..0x8009FAD0, not yet in a unit) ------------------------
-
 // Look through the card's files for one whose name holds "BASLUS-20572": 0 if there is one, else
 // MC_ERR_NOFILE. nSlot is not used.
 s32  fn_8009F6A0(s32 nPort, s32 nSlot);
@@ -133,9 +131,11 @@ s32  fn_8009F6A0(s32 nPort, s32 nSlot);
 s32  fn_8009F734(s32 nPort, s32 nSlot);
 u8   fn_8009F7E8(int nPort);        // lbl_80282008[nPort]
 void fn_8009F7F4(MCCardState* pState, int nPort, int nSlot);   // copy out lbl_801F1510[nPort][nSlot]
-u8   fn_8009F850(void);
+MCCardState* fn_8009F834(s32 nPort, s32 nSlot);                 // &lbl_801F1510[nPort][nSlot]
 
 // ---- MC.c ---------------------------------------------------------------------------------------
+
+u8   fn_8009F850(void);             // at boot: fn_800A13E8 on each card until one succeeds
 
 s32  fn_8009FAD0(void);
 s32  fn_800A0A7C(s32 nPort, s32 nSlot);
@@ -183,6 +183,7 @@ LAYOUT_ASSERT(CARDStat, 0x6C);
 
 s32  CARDClose(CARDFileInfo* pFile);
 s32  CARDGetStatus(s32 nChan, s32 nFileNo, CARDStat* pStat);
+s32  CARDGetXferredBytes(s32 nChan);
 s32  CARDOpen(s32 nChan, const char* pName, CARDFileInfo* pFile);
 s32  CARDProbeEx(s32 nChan, s32* pnMemSize, s32* pnSectorSize);
 s32  CARDRead(CARDFileInfo* pFile, void* pBuf, s32 nLen, s32 nOffset);
@@ -191,5 +192,6 @@ s32  CARDUnmount(s32 nChan);
 extern CARDFileInfo lbl_801E3180[127];  // the open files, by file number
 extern s32   lbl_802813D8;      // the file open through fn_8009F3D4 (-1: none)
 extern s32   lbl_80281FC8;      // where the next fn_8009F208 read starts
+extern s32   lbl_80281FB4;      // the size of the operation in progress (fn_8009CB9C)
 
 #endif
