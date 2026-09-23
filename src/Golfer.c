@@ -74,7 +74,8 @@ int Golfer_GetAttribute(Player* pPlayer, int nAttr, int nMode) {
     if (nMode == ATTR_BASE || nMode == ATTR_TOTAL) {
         if (Controller_IsCPU(pPlayer->nController) && pPlayer->golfer.nIndex < FIRST_CREATED_GOLFER &&
             (Game_GetMode() == 4 || (gSession.uFlags & 2))) {
-            nValue = (s8)((s32)pPlayer->golfer.attrAlt[nAttr] + Golfer_TierBonus(pPlayer->golfer.tier[nAttr]));
+            nValue =
+                (s8)((s32)pPlayer->golfer.attrAlt[nAttr] + Golfer_TierBonus(pPlayer->golfer.tier[nAttr]));
         } else {
             nValue = (s8)((s32)pPlayer->golfer.attr[nAttr] + Golfer_TierBonus(pPlayer->golfer.tier[nAttr]));
         }
@@ -466,7 +467,8 @@ int AI_ShotKindForDistance(int nPlayer, f32 fDist) {
         fDist /= fn_800510EC(&p->ball);
         if (p->ball.nLie == LIE_GREEN_e || AI_GreenTowardPin(nPlayer, 1.5f)) {
             nKind = SHOT_TYPE_PUTT_e;
-        } else if ((p->golfer.uBagMask & (1 << 21)) && fDist < 15.0f && AI_GreenTowardPin(nPlayer, 5.0f) && Lie_AllowsFullSwing(nPlayer)) {
+        } else if ((p->golfer.uBagMask & (1 << 21)) && fDist < 15.0f && AI_GreenTowardPin(nPlayer, 5.0f) &&
+                   Lie_AllowsFullSwing(nPlayer)) {
             nKind = SHOT_TYPE_CHIP_e;
         } else if ((p->golfer.uBagMask & (1 << 23)) && fDist < 20.0f) {
             nKind = SHOT_TYPE_PITCH_e;
@@ -509,7 +511,8 @@ int AI_ClubForShot(int nPlayer, int nKind, u8 bUnderOnly, f32 fDist) {
         }
     } else {
         nClub = AI_FirstUsableClub(nPlayer, nKind);
-        if (Game_GetMode() == 6 || Game_GetMode() == 7 || Game_GetMode() == 8 || Controller_IsCPU(p->nController)) {
+        if (Game_GetMode() == 6 || Game_GetMode() == 7 || Game_GetMode() == 8 ||
+            Controller_IsCPU(p->nController)) {
             fDist /= fn_800510EC(&p->ball);
         }
         for (c = 0; c < CLUB_MAX_e; c++) {
@@ -841,7 +844,8 @@ void Caddie_Update(int nPlayer) {
     gCaddieFrames++;
 }
 
-// 0 = no tip for this shot, 1 = tip ready (the aim point in pOut), 2 = gave up.
+// Returns 0 when there is no tip for this shot, 1 when a tip is ready (the aim point in pOut), 2 when
+// it gave up.
 int Caddie_GetTip(int nPlayer, f32* pOut) {
     if (gPlayers[nPlayer].nShotKind != SHOT_TYPE_PUTT_e || Player_IsCPU(nPlayer) || gSession.nSplitScreen) {
         pOut[0] = 0.0f;
@@ -1179,7 +1183,7 @@ void Shot_DefaultSpin(int nPlayer, f32* pOut) {
 }
 
 // A CPU's clubface vector from its shot shape (a lesson in mode 11 can dictate the shape):
-// x = +-0.02 for a slight curve, +-0.04 for a big one, normalised.
+// The x part is 0.02 either way for a slight curve and 0.04 for a big one, then the vector is normalised.
 void AI_FaceVector(int nPlayer, f32* pOut) {
     Player* p = &gPlayers[nPlayer];
     int     nShape = Scenario_RequiredShape(nPlayer);
@@ -1439,7 +1443,7 @@ void Golfer_TableByteSwap(void) {
 
 // The 'stat' handler: copy the file over the table, fix its endianness, set it up.
 void Golfer_OnStatsLoaded(UStreamObject* pObject) {
-    Mem_cpy(gGolferTable, *(u8**)pObject, *(u32*)((u8*)pObject + 0x24));
+    Mem_cpy(gGolferTable, pObject->pData, pObject->uSize);
     Golfer_TableByteSwap();
     fn_80009E70(pObject);
     Golfer_TableSetup();

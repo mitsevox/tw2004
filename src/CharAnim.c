@@ -21,5 +21,6 @@ void CharAnim_StartTapIn(Character* pChar) {
     } else {
         fn_8001C7FC(pChar, 2);
     }
-    CharacterState_AddSKABlendData(pChar, 1, 9, fn_80072ACC, 1, 8, -10000.0f, -30000.0f, -10000.0f, 0.0f, -10000.0f);
+    CharacterState_AddSKABlendData(pChar, 1, 9, fn_80072ACC, 1, 8, -10000.0f, -30000.0f, -10000.0f, 0.0f,
+                                   -10000.0f);
 }
