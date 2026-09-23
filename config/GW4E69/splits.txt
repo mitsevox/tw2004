@@ -3937,6 +3937,9 @@ Common/SharedFileIO/SharedFileIO.c:
 	.data       start:0x8019D210 end:0x8019D2C0
 	.sdata      start:0x80281B54 end:0x80281B5C
 
+NGC/SharedFileIO/llSharedFileIO.c:
+	.text       start:0x80171308 end:0x801730C8
+
 Common/TagFile/TagFile.c:
 	.text       start:0x801730C8 end:0x80175F54
 	.rodata     start:0x8018655C end:0x801866D4

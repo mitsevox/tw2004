@@ -4,63 +4,11 @@
 
 #include "Common/SharedFileIO.h"
 
-// Library state (allocated by SFIOCreate). Fields are named as they are learned.
-typedef struct {
-    int   eState;            // 0x00  3 or 6 = idle/ready; 0xB/0xC/0xD = operation in progress
-    u32   eOperation;        // 0x04  which asynchronous step is running (unsigned: switch uses cmplwi)
-    int   eLastError;        // 0x08
-    int   uHandle;           // 0x0C  result of the last mount/open; passed to the device layer
-    int   eDevice;           // 0x10  current device index (read as a short by SFIONextDeviceFromMask)
-    u8    uInfo14;           // 0x14  filled by the device layer (fn_80171744)
-    u8    szInfo15[0x20];    // 0x15
-    u8    szName35[0x1B];    // 0x35  name buffer handed to the device layer
-    int   uSearchDirection;  // 0x50  passed to SFIONextDeviceFromMask
-    int   uExpected54;       // 0x54  compared with the close result
-} SFIOData;
-
-// The 17 platform functions the host passes to SFIOInit (llSharedFileIO.c on GameCube).
-typedef struct {
-    int (*pfnProbe)(void* pParams, int eDevice);                        // 0x04 in SFIODevice
-    void* pfn08;
-    void* pfn0C;
-    int (*pfnStartProbe)(int eDevice);                                  // 0x10
-    int (*pfnSelectDevice)(int eDevice);                                // 0x14
-    int (*pfnMount)(u8* pInfo14, u8* pInfo15, int eDevice, u32 uFlags); // 0x18
-    int (*pfnOp19)(int uHandle);                                        // 0x1C
-    void* pfn20;
-    void* pfn24;
-    void* pfn28;
-    int (*pfnRead)(int uHandle, void* pBuffer, u32 uSize);         // 0x2C
-    int (*pfnWrite)(int uHandle, void* pBuffer, u32 uSize);        // 0x30
-    int (*pfnSeek)(int uHandle, u32 uOffset, u32 uWhence);         // 0x34
-    int (*pfnOp18)(int uHandle);                                        // 0x38
-    void* pfn3C;
-    int (*pfnUpdate)(int* pProcess, int* pResult);                    // 0x40
-    void* pfn44;
-} SFIOFuncTable;
-
-// Platform-layer state, 0x6C bytes, allocated by SFIOInit.
-typedef struct {
-    u16           uAvailableMask;   // 0x00
-    u8            pad2[2];
-    SFIOFuncTable fn;               // 0x04 .. 0x47 (17 entries)
-    void*         pData48;          // 0x48  -> gSFIOData210
-    void*         pData4C;          // 0x4C  -> gSFIOData248
-    u8            uData50[0x18];    // 0x50
-    void*         pAllocator;       // 0x68
-} SFIODevice;
-
 SFIOData* _SFIO_pData = NULL;      // explicit = NULL: GCC 2.95 puts it in .sdata, where the binary has it
 // Dispatch tables (in .data): the continuation table is indexed by eState, the error-validation
 // table by eOperation.
 extern int (*gSFIOContinueTable[14])(int eError, int* pProcess, int* pResult);
 extern int (*gSFIOValidateTable[30])(int eError, int uProcess, int uResult);
-extern void fn_801715B8(void* pParams, void* pDeviceData, void* pName);
-extern void fn_80171744(u8* pInfo14, u8* pInfo15, void* pDeviceData, void* pName);
-int SFIOStartSelectDevice(int eDevice, int* pProcess);
-int SFIOStartOp18(int* pHandle, int* pProcess);
-int SFIOStartOp19(int* pHandle, int* pProcess);
-int SFIONextDeviceFromMask(u16 uDeviceMask, int uDirection);
 SFIODevice* _SFIO_pDevice = NULL;
 
 enum { SFIO_STATE_BUSY_A = 0xB, SFIO_STATE_BUSY_B = 0xC, SFIO_STATE_BUSY_C = 0xD };
@@ -69,19 +17,11 @@ enum { SFIO_STATE_BUSY_A = 0xB, SFIO_STATE_BUSY_B = 0xC, SFIO_STATE_BUSY_C = 0xD
 extern void  fn_8012C8D0(void* pLock, int unused);
 extern int   TagFile_SetDescriptor(void* pDescriptor);
 extern int   fn_8012C98C(int eError);
-extern void  fn_80172FA4(int);
-extern void  fn_80171308(int eDevice, void* pInfo);
-extern void  fn_80172D7C(void* pDescriptor, void* pA, void* pB);
-extern void  fn_80172F48(void* p);
-extern u32   fn_80173000(void);
-void fn_8017124C(void* pDescriptor, void* pA, void* pB);
-extern int   fn_80173024(void* pDescriptor);
-extern BOOL  fn_80172D54(const char* pFilename);
+void fn_8017124C(SFIODescriptor* pDescriptor, u32* pSize, u32* pEntries);
 u32 SFIOGetHeaderSize(void);
 int SFIONumDevicesInMask(u16 uDeviceMask);
 int SFIOFirstDeviceFromMask(u16 uDeviceMask);
 int SFIOLastDeviceFromMask(u16 uDeviceMask);
-void SFIOSetLastError(int eError);
 extern void* TibExtMemAlloc(void* pAllocator, u32 uSize, u32 uAlign, const char* pFile, int uLine);
 extern void  TibExtMemFree(void* pAllocator, void* p, u32 uSize, u32 uAlign);
 
@@ -427,7 +367,7 @@ int SFIOValidateErrorPassThrough(int eError, void* pArg1, void* pArg2) {
 // Asynchronous probe / mount / select sequence. Called with the result of the previous step.
 // *pProcess: 1 = keep calling, 2 = finished.
 int SFIOContinueSelect(int eError, int* pProcess, int* pResult) {
-    u8 params[0x20];
+    char szSearchName[0x20];
     if (pProcess == NULL) return 0x12;
     if (pResult == NULL) return 0x12;
     if (!(_SFIO_pData->eState == 3 || _SFIO_pData->eState == 6)) return 0x12;
@@ -435,9 +375,9 @@ int SFIOContinueSelect(int eError, int* pProcess, int* pResult) {
     switch (_SFIO_pData->eOperation) {
     case 1:
         if (eError == 0) {
-            fn_801715B8(params, _SFIO_pDevice->uData50, _SFIO_pData->szName35);
+            fn_801715B8(szSearchName, &_SFIO_pDevice->desc, _SFIO_pData->szName35);
             _SFIO_pData->eOperation = 2;
-            _SFIO_pDevice->fn.pfnProbe(params, _SFIO_pData->eDevice);
+            _SFIO_pDevice->fn.pfnProbe(szSearchName, _SFIO_pData->eDevice);
         } else if (eError == 3) {
             if (_SFIO_pData->eState == 3) {
                 _SFIO_pData->eDevice = SFIONextDeviceFromMask(_SFIO_pDevice->uAvailableMask, _SFIO_pData->uSearchDirection);
@@ -457,9 +397,11 @@ int SFIOContinueSelect(int eError, int* pProcess, int* pResult) {
     case 2:
         if (eError == 0) {
             if (*pResult == 1) {
-                fn_80171744(&_SFIO_pData->uInfo14, _SFIO_pData->szInfo15, _SFIO_pDevice->uData50, _SFIO_pData->szName35);
+                fn_80171744(_SFIO_pData->szDirName, _SFIO_pData->szFileName, &_SFIO_pDevice->desc,
+                            _SFIO_pData->szName35);
                 _SFIO_pData->eOperation = 0x16;
-                _SFIO_pDevice->fn.pfnMount(&_SFIO_pData->uInfo14, _SFIO_pData->szInfo15, _SFIO_pData->eDevice, 0x80000004);
+                _SFIO_pDevice->fn.pfnMount(_SFIO_pData->szDirName, _SFIO_pData->szFileName, _SFIO_pData->eDevice,
+                                           0x80000004);
             } else if (*pResult == 0) {
                 SFIOSetLastError(4);
                 _SFIO_pData->eOperation = 0x1A;
@@ -758,7 +700,7 @@ int SFIOBeginLoad(const char* pName, int eDevice, int uSearchDirection) {
         _SFIO_pData->eState = 5;
     }
     SFIOSetLastError(0);
-    strcpy((char*)_SFIO_pData->szName35, pName);
+    strcpy(_SFIO_pData->szName35, pName);
     _SFIO_pData->uSearchDirection = uSearchDirection;
     fn_80172FA4(1);
     _SFIO_pDevice->fn.pfnStartProbe(_SFIO_pData->eDevice);
@@ -796,7 +738,7 @@ int SFIOBeginSave(const char* pName, int eDevice, int uSearchDirection) {
         _SFIO_pData->eState = 4;
     }
     SFIOSetLastError(0);
-    strcpy((char*)_SFIO_pData->szName35, pName);
+    strcpy(_SFIO_pData->szName35, pName);
     _SFIO_pData->uSearchDirection = uSearchDirection;
     fn_80172FA4(1);
     _SFIO_pDevice->fn.pfnStartProbe(_SFIO_pData->eDevice);
@@ -832,7 +774,7 @@ int SFIOBeginDelete(const char* pName, int eDevice, int uSearchDirection) {
         _SFIO_pData->eState = 6;
     }
     SFIOSetLastError(0);
-    strcpy((char*)_SFIO_pData->szName35, pName);
+    strcpy(_SFIO_pData->szName35, pName);
     _SFIO_pData->uSearchDirection = uSearchDirection;
     fn_80172FA4(1);
     _SFIO_pDevice->fn.pfnStartProbe(_SFIO_pData->eDevice);
@@ -940,8 +882,8 @@ int SFIOGetDeviceInfo(int eDevice, void* pInfo) {
 int SFIOSetDescriptor(void* pDescriptor) {
     if (pDescriptor == NULL) return 0xC;
     if (!SFIOIsInitialized()) return 2;
-    memcpy(_SFIO_pDevice->uData50, pDescriptor, 0x10);
-    fn_8017124C(pDescriptor, &_SFIO_pDevice->uData50[0x10], &_SFIO_pDevice->uData50[0x14]);
+    memcpy(&_SFIO_pDevice->desc, pDescriptor, sizeof(SFIODescriptor));
+    fn_8017124C(pDescriptor, &_SFIO_pDevice->uFileSize, &_SFIO_pDevice->uNumFiles);
     return fn_80173024(pDescriptor);
 }
 
@@ -1037,8 +979,8 @@ void SFIOShiftJISToAscii(const u16* pSrc, char* pDst) {
 }
 
 // Thin wrappers over the platform layer (llSharedFileIO.c).
-void fn_8017124C(void* pDescriptor, void* pA, void* pB) {
-    fn_80172D7C(pDescriptor, pA, pB);
+void fn_8017124C(SFIODescriptor* pDescriptor, u32* pSize, u32* pEntries) {
+    fn_80172D7C(pDescriptor, pSize, pEntries);
 }
 
 void SFIOPlatformCall80172F48(void* p) {
