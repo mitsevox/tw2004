@@ -483,13 +483,41 @@ SDK side 58.9% -> 69.5%. Scripts in `C:\dev\scratch\tw\` (outside the repo):
   never renames to another project's own `fn_` placeholder; `rename_fix.py` reverts renames of
   already-named functions and updates our sources.
 - Checked and not useful for code: Need for Speed Underground / Most Wanted (EA Black Box's C++
-  engine, no shared EA code with Tiburon's C engine; NFSMW's SDK is a 2005 revision and its files
+  engine, no shared EA code with this game's engine; NFSMW's SDK is a 2005 revision and its files
   need headers it does not ship), The Sims 2 (C++, mostly raw-byte wrappers), EA Nation server
   (networking; the GameCube version has no online play). BFBB / Incredibles / Sonic Heroes /
   Gauntlet show the cross-platform symbol method (PS2/Xbox builds with symbols or PDBs): worth
   trying if a Tiger Woods 2004 build for another platform with symbols turns up.
 - Not done yet: data sections for these units (Level 3), more flag variants for the files that
   compile but fall a few functions short, and other projects (Pikmin 2, Sunshine, Animal Crossing).
+
+Symbols from related builds
+---------------------------
+
+2026-09-23. Tiger Woods PGA Tour 2004 (GC, PS2, Xbox) was developed by **EA Redwood Shores**
+(the PC version by Headgate). No TW2004 build with symbols is known: none is on RetroReversing's
+PS2/GameCube symbol lists, and the TW2004 demo on OPS2M Demo 40 (SCED-51535) / UPS2M Italia 12/03
+(SCED-52057) is not marked as having debug info (unverified: the demo ELF itself was not checked).
+
+Downloaded from debugging.games to `C:\dev\ext\symbols\` (reference only, never committed):
+
+- **Tiger Woods PGA Tour 06, Xbox beta, 2005-07-12: `default.pdb` + debug `default.exe`.**
+  Same studio, **same engine lineage**: source root `c:\dev\tiger06\tigercode\code\`, with
+  `legacy\specif\ukernel.c`, `golf\hi-rendering\gocamera.c`, `golf\entry\goentry.c`,
+  `golf\hi-rendering\gogreengrid.c`, `golf\sitdev\sitdevfile.c`,
+  `golf\easportsshared\easportsbio.c`, `core\frontend\fe_manager.c`, `legacy\ll\llfont.c`,
+  and types `UStream`, `UMemPool`, `DynChainVars_t`, `PsBallFx_*`, `TSKALib*`, `TMTALib*`.
+  Built as unity files (`Legacy_unity.obj`: 68 source files `u*.c`/`ll*.c`, 1,129 functions;
+  `golf_unity`, `golf2_unity`, `other_unity`, `apt_unity`): 25,211 functions in 830 modules.
+  Parsed with `C:\dev\scratch\tw\pdbread.py` (minimal MSF 7.00 reader: modules, per-module
+  source files, S_GPROC32/S_LPROC32) into `pdb_modules.json`. Parts are C++ by 2005
+  (`DynTex::`, `UMemPoolResizeable::`); much is still C (`UIDList*`, `DynMemPool_*`).
+  x86 code, so no byte matching: names and struct layouts have to be carried over by string
+  references, call graphs and constants.
+- **007 Agent Under Fire (GC, USA) and 007 Everything or Nothing (GC, EU)**: unstripped ELFs
+  (same studio, same console). A masked byte match (`C:\dev\scratch\tw\xmatch.py`) found no
+  shared EA engine code, only 27 SDK / runtime functions (names only). Agent Under Fire runs on a
+  different engine.
 
 CI and decomp.dev
 -----------------
