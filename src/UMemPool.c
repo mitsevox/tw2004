@@ -9,6 +9,27 @@ f32* lbl_80281BD8;                      // the log2 table: 1024 entries over the
 
 void fn_8000AE9C(void);
 
+// ---- sweep code (not yet cleaned up) ----
+
+void Vec_Copy();
+void fn_8000A0E8(u8* p0, u8* p1);
+void fn_8000A144(u8* p0, u8* p1);
+
+void fn_8000A0E8(u8* p0, u8* p1) {
+    Vec_Copy();
+    Vec_Copy((p0 + 0x10), (p1 + 0x10));
+    Vec_Copy((p0 + 0x20), (p1 + 0x20));
+    Vec_Copy((p0 + 0x30), (p1 + 0x30));
+}
+
+void fn_8000A144(u8* p0, u8* p1) {
+    Vec_Copy();
+    Vec_Copy((p0 + 0x10), (p1 + 0x10));
+    Vec_Copy((p0 + 0x20), (p1 + 0x20));
+}
+
+// ---- end of sweep code ----
+
 // Swaps two 4-float vectors.
 void fn_8000AD34(f32* pA, f32* pB) {
     f32 f;
