@@ -45,11 +45,15 @@ u32    strlen(const char* p);
 char*  strcpy(char* pDst, const char* pSrc);
 char*  strncpy(char* pDst, const char* pSrc, u32 uLen);
 int    strcmp(const char* a, const char* b);
+int    strncmp(const char* a, const char* b, u32 uLen);
 char*  strstr(const char* pStr, const char* pFind);
+int    atoi(const char* p);
 int    sprintf(char* pBuf, const char* pFmt, ...);
 int    snprintf(char* pBuf, u32 uLen, const char* pFmt, ...);
 int    atoi(const char* p);
 double atan(double x);
+double sin(double x);
+double cos(double x);
 double fabs(double x);                  // 0x8000AE94
 double floor(double x);
 #else
