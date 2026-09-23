@@ -4,25 +4,53 @@
 
 #include "frontend/uistudio.h"
 
-// Pushes an event on the studio's event stack. From the top down it holds the event type, nA,
-// nB, a free word, the four data words, the argument count and then the arguments, the last one
-// first.
-void fn_80165B90(s16 nA, s16 nB, UIStudio* pStudio, s32 nType, const u32* pData, s32 nArgs,
+// Walks the event stack from the bottom up and, for each type 9 event queued for the given
+// screen, while that screen is still loaded, calls fn_8016B0F8 with the event's first data word
+// and its arguments.
+s32 fn_80165ACC(UIStudio* pStudio, u16 uGroup, u16 uScreen) {
+    s32* p;
+    s32* pData;
+    s32* pArgs;
+    s32 nArgs;
+    s32 nType;
+    u16 uA;
+    u16 uB;
+
+    p = pStudio->pEventBase;
+    while (p > pStudio->pEventTop) {
+        nArgs = p[-8];
+        nType = p[0];
+        uA = p[-1];
+        uB = p[-2];
+        p -= 7;
+        pData = p;
+        p -= 1;
+        p -= nArgs;
+        pArgs = p;
+        p -= 1;
+        if (uA == uGroup && uB == uScreen && nType == 9
+            && fn_8016C6C4(pStudio, uA, uB) < (u32)pStudio->nScreens) {
+            fn_8016B0F8(pStudio, *pData, nArgs, pArgs);
+        }
+    }
+    return 1;
+}
+
+// Pushes an event on the studio's event stack: the event record, with its type on the top word,
+// then its arguments below it, the last one first.
+void fn_80165B90(s16 nA, s16 nB, UIStudio* pStudio, s32 nType, const UISEventData* pData, s32 nArgs,
                  const s32* pArgs) {
-    s32* pTop;
+    UISEvent* pEvent;
     s32* pDst;
     s32 i;
 
-    pTop = pStudio->pEventTop;
-    pTop[0] = nType;
-    pDst = pTop - 9;
-    pTop[-1] = nA;
-    pTop[-2] = nB;
-    pTop[-7] = pData[0];
-    pTop[-6] = pData[1];
-    pTop[-5] = pData[2];
-    pTop[-4] = pData[3];
-    pTop[-8] = nArgs;
+    pEvent = (UISEvent*)(pStudio->pEventTop - 8);
+    pEvent->nType = nType;
+    pDst = (s32*)pEvent - 1;
+    pEvent->nA = nA;
+    pEvent->nB = nB;
+    pEvent->data = *pData;
+    pEvent->nArgs = nArgs;
     if (pArgs != NULL) {
         for (i = nArgs - 1; i >= 0; i--) {
             *pDst-- = pArgs[i];
@@ -133,14 +161,15 @@ void fn_80165E9C(UIStudio* pStudio, UISScreen* pScreen, u32 u18, s32 n30, u32 uI
     pRateFn->pScreen = pScreen;
     pRateFn->uId = uId;
     pRateFn->n4 = n4;
-    pRateFn->u10 = pStudio->u8;
+    pRateFn->u10 = pStudio->uMsPerTick;
     pRateFn->n8 = 0;
     pRateFn->nC = 0;
     pRateFn->uState = 0;
     pRateFn->n20 = n20;
     pRateFn->fTarget = fTarget;
     pRateFn->n2C = n2C;
-    pRateFn->fStep = (fTarget - *fn_8016C1A4(pRateFn->n20, pRateFn->n30)) / ((f32)uTime / (f32)pStudio->u8);
+    pRateFn->fStep =
+        (fTarget - *fn_8016C1A4(pRateFn->n20, pRateFn->n30)) / ((f32)uTime / (f32)pStudio->uMsPerTick);
 }
 
 // Returns the index of a rate function, or the count when there is none.

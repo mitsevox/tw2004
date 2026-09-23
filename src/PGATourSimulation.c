@@ -34,11 +34,9 @@ void CalcScoreRankingsIfDirty(int nPlayer);
 void CalcAllStats(int nPlayer);
 void fn_80117694(UStreamObject* pObject);
 
-int  fn_800D31A4(int nPar);             // the number of the 18 holes with that par
 char* GameModeDriverPGATour_GetInitialChampName(s32 i);               // a tournament's first champion
 s32  GameModeDriverPGATour_GetInitialChampScore(s32 i);                // and the champion's score
 s32  fn_800EF0E0(s32 nPlayer);          // GameModeDriverPGATour.c: the player's bracket
-s32  fn_800D2FB4(s32 nTeeSet);          // the course's par from the tee set
 
 PgaEntrantMC* GetEntrantMCPtr(int nPlayer, int nEntrant) {
     return &gpSaveData[nPlayer].tour.field.aEntrant[nEntrant];
@@ -363,6 +361,14 @@ s32 GM_PgaTourSim_GetGolferIDFromStatRow(int nPlayer, GM_Pga_StatTypes_t nStat, 
 
 s32 GM_PgaTourSim_GetStatView(GM_Pga_StatTypes_t nStat) {
     return lbl_80194074[nStat];
+}
+
+s32 fn_8011903C(int nPlayer, int nGolfer) {
+    return gpSaveData[nPlayer].tour.aStats[nGolfer].nEvents;
+}
+
+s32 fn_80119064(int nPlayer, int nGolfer) {
+    return gpSaveData[nPlayer].tour.aStats[nGolfer].nRounds;
 }
 
 // Entrant 0 is the player's slot; it is the player when it holds the player's golfer.

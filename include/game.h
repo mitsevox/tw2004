@@ -40,6 +40,30 @@ LAYOUT_ASSERT(Replay, 0xF28);
 
 extern Replay gReplayData;              // 0x801D6030
 
+#define NUM_COURSES 30
+extern char* lbl_80191990[NUM_COURSES]; // each course's name ("Pebble Beach", ...)
+
+// The replay recorder's buffer (our name; 0x15260 bytes, made by fn_8006BED4 at the start of a
+// round). Only the flag is read so far.
+typedef struct ReplayBuffer {
+    u8   unk0[0x1525C];
+    u8   b1525C;                // 0x1525C  set by fn_8006C5E0, cleared by fn_8006C608 (not in a replay)
+    u8   unk1525D[3];
+} ReplayBuffer;
+LAYOUT_ASSERT(ReplayBuffer, 0x15260);
+
+extern ReplayBuffer* lbl_80281E48;      // 0x80281E48
+
+// Replay.c
+void fn_8006BED4(void);                 // make the replay buffer
+void fn_8006BF20(void);                 // free it
+void fn_8006BF4C(void);                 // in-flight replays off (gReplayData.bF10)
+void fn_8006C28C(int nPlayer, int nController);
+void fn_8006C2A8(int nPlayer, f32 fForwardSpin, f32 fSideSpin);
+void fn_8006C2C8(int nPlayer, f32* pForwardSpin, f32* pSideSpin);
+void fn_8006C5E0(void);
+void fn_8006C608(void);
+
 int  Game_GetCourse(void);              // 0x80008830
 int  Game_CurHoleIndex(void);           // 0..17 in the round (Golfer.c)
 int  Game_CurrentPinSet(void);          // the current hole's pin position, 0..3 (Golfer.c)
@@ -84,21 +108,102 @@ void fn_80062D0C(int nPlayer);
 void fn_80062D38(int nMsg, int nA, int nB);    // send message nMsg with two values (fn_800E5998)
 void fn_80062D6C(int nMsg, int nValue);        // send message nMsg with one value (fn_800E590C)
 
+// What lbl_802811F0 points to (its code, around 0x8006F650, is not decompiled; fn_8006F608 clears
+// it). GameMode5's fn_800ED6F8 sets f18 and flags it in b1C; SitDevFile.c tests the flags.
+typedef struct Unk802811F0 {
+    u32 uFlags;                 // 0x00  bit 0x2: fn_80035574
+    u32 u04;                    // 0x04  bit 0x2: fn_800BCC38
+    s32 n08;                    // 0x08
+    s32 n0C;                    // 0x0C
+    s32 n10;                    // 0x10
+    u8  b14;                    // 0x14  1 after fn_8006F608
+    u8  unk15[3];
+    f32 f18;                    // 0x18
+    u8  b1C;                    // 0x1C
+} Unk802811F0;
+extern Unk802811F0* lbl_802811F0;       // 0x802811F0
+
+u8   fn_80035574(void);                 // lbl_802811F0's flag 0x2
+
+// ---- the course table (CourseData.c) ---------------------------------------------------------
+
+#define NUM_COURSE_DATA 21      // courses in the 'CRI ' table
+#define NUM_BUILT_ROUNDS 7      // rounds in the 'CMPS' table
+
+// One hole of the course table (0x38 bytes).
+typedef struct HoleData {
+    s32  nPar;                  // 0x00
+    s32  n04;                   // 0x04
+    s32  n08;                   // 0x08  per tee set (fn_800D2B80): tee 3
+    s32  n0C;                   // 0x0C  tee 2
+    s32  n10;                   // 0x10  tee 1
+    s32  n14;                   // 0x14  tee 0
+    s32  nWindDir;              // 0x18  (Hole_WindDir)
+    u8   unk1C[0x2C - 0x1C];
+    f32  fWindSpeed;            // 0x2C  (Hole_WindSpeed)
+    u8   unk30[4];
+    u8   b34;                   // 0x34
+    u8   b35;                   // 0x35
+    u8   unk36;
+    u8   b37;                   // 0x37  checked at the end of a PGA Tour hole
+} HoleData;
+LAYOUT_ASSERT(HoleData, 0x38);
+
+// One course of the table (0x430 bytes), read from the disc's 'CRI ' chunk.
+typedef struct CourseData {
+    HoleData aHoles[18];        // 0x000
+    struct {
+        s32  n0;                // +0x0
+        s32  nPar;              // +0x4  the course's par from this tee set (fn_800D2F00)
+        u8   unk8[8];
+    } aTeeSets[4];              // 0x3F0
+} CourseData;
+LAYOUT_ASSERT(CourseData, 0x430);
+
+// A round built from other courses' holes (0x24 bytes), from the 'CMPS' chunk: for each of its 18
+// holes, the course and the hole's number there (1-based).
+typedef struct BuiltRound {
+    struct {
+        u8   nCourse;
+        u8   nHole;
+    } aHoles[18];
+} BuiltRound;
+LAYOUT_ASSERT(BuiltRound, 0x24);
+
+extern BuiltRound lbl_801FA1F8[NUM_BUILT_ROUNDS];    // 0x801FA1F8
+extern CourseData lbl_801FA2F4[NUM_COURSE_DATA];     // 0x801FA2F4
+
+void fn_800D29E8(void);
+int  Hole_WindDir(void);
+f32  Hole_WindSpeed(void);
+s32  fn_800D2FB4(s32 nTeeSet);          // the course's par (the tee set is not used)
+u8   fn_800D3080(int nHole);
+int  fn_800D3118(int nRound, int nHole);    // a built round's course for a hole
+int  fn_800D315C(int nRound, int nHole);    // and its hole number (1-based)
+int  fn_800D31A4(int nPar);             // the number of the 18 holes with that par
+
 // ---- the game manager ------------------------------------------------------------------------
 
 f32  fn_800D0478(int nPlayer);          // the ball's distance from the pin (yards)
 f32  fn_800D0550(int nPlayer);          // the shot's length
 int  Hole_ScoreAfterTapIn(int nPlayer); // HoleScore.c
 void fn_800D2714(u16* pDate, s32* pMonth, s32* pDay, s32* pYear);
+void fn_800D2678(u16* pDate, s32 nMonth, s32 nDay, s32 nYear);    // make a date
+void fn_800D27CC(u16* pDate, s32 nDays);        // move a date on by nDays
+s32  fn_800D27E0(u16* pDate);                   // its day of the week, 1..7
+s32  fn_800D2814(s32 nMonth, s32 nYear);        // the days in a month
+void fn_800D2884(s32 nMonth, s32 nYear, s32* pMonth, s32* pYear);  // the month before
+void fn_800D28B0(s32 nMonth, s32 nYear, s32* pMonth, s32* pYear);  // the month after
+void fn_800D28DC(u16 nDate, char* szOut);       // a date as text
 u16  fn_800D2994(void);                 // today's date
 int  fn_800D2ABC(int nCourse, int nHole);   // a hole's par on a course
 int  fn_800D2AD8(int nHole);            // a hole's par
 void fn_800D3548(int nPlayer, int nMoney, CourseMoneyTracking* pMoney);   // pMoney may be NULL
-int  GM_Earnings_GetStrokeWinnings(int nWinner, int nLoser, int nMargin, int* pPrize);
-int  GM_Earnings_GetStrokeWinningsTeam(int nWinner, int nLoser, int nMargin, int* pPrize);
-int  GM_Earnings_RateGolfer(int nPlayer);          // the player's earnings rating, 0..25
-s32  GM_Earnings_ComputeBonusModifiers(s32 nPoints, int nPlayer, u8 bCourse, u8 bTee, u8 bHole, CourseMoneyTracking* pMoney);
-int  GM_Earnings_ComputeTOURCardModifiers(int nReward, int nPlayer, CourseMoneyTracking* pMoney);
+int  fn_800D36E0(int nWinner, int nLoser, int nMargin, int* pPrize);
+int  fn_800D37BC(int nWinner, int nLoser, int nMargin, int* pPrize);
+int  fn_800D3C7C(int nPlayer);          // the player's earnings rating, 0..25
+s32  fn_800D6A70(s32 nPoints, int nPlayer, u8 bCourse, u8 bTee, u8 bHole, CourseMoneyTracking* pMoney);
+int  fn_800D7220(int nReward, int nPlayer, CourseMoneyTracking* pMoney);
 s32  fn_800D7660(int nPlayer, Ball* pBall, u8 b);   // one of GameEffects' GameBreaker checks
 
 // GameHoleContests.c: the longest-drive, closest-to-the-pin and hole-in-one contests
@@ -156,6 +261,8 @@ LAYOUT_ASSERT(GameEffects, 0x58);
 
 extern GameEffects lbl_80202898;        // 0x80202898
 
+int  fn_800DB86C(int nPlayer);          // this lie is worth a GameBreaker (GameEffects.c)
+u8   fn_800DC818(Ball* pBall, int nPlayer, u8 bNext);
 GameEffects* fn_800DAF74(void);
 void GameEffects_ResetGameEffectSettings(void);
 int  GameEffects_BallUpdatesThisFrame(int nPlayer);   // preview speed: ghost steps per frame
@@ -228,6 +335,7 @@ void fn_800E2A88(void);
 u8   fn_800E2B40(int nPlayer, Ball* pBall);   // out of bounds
 void fn_800E2BA4(void);                 // a random hole from the selection
 u8   fn_800E2DB4(int nPlayer);
+u8   fn_800E2EAC(int nPlayer);          // placing the ball (state 22), or the mode says so
 u8   fn_800E39F0(void);
 u8   fn_800E3A54(void);                 // modes 6, 7 and 8
 void fn_800E3B04(void);
@@ -418,6 +526,28 @@ u8   fn_800EE470(void);                 // GameModeDriverPGATour.c
 void GameModeDriverRTE_StartEvent(void);                 // GameModeDriverRTE.c
 void fn_800F07C8(void);                 // GameModeDriverRTE.c
 u8   fn_800F0818(void);                 // GameModeDriverRTE.c
+
+// GameModeDriver.c: the career calendar. Its functions come in tables of three, indexed by
+// CareerCalendar.nDriver: no career, the PGA TOUR season (GameModeDriverPGATour.c), the real-time
+// events (GameModeDriverRTE.c). The calendar shows one month as a grid of 35 day cells.
+typedef struct CareerCalendar {
+    u16  nToday;                // 0x00  the career's current day (fn_80117188)
+    u16  nSelected;             // 0x02  the day the cursor is on
+    s32  nMonth;                // 0x04  the month shown, 1..12
+    u32  nYear;                 // 0x08  and its year
+    u32  nFirstCell;            // 0x0C  the cell of the month's first day
+    u32  nEndCell;              // 0x10  the cell after its last day
+    u32  nPrevMonthDays;        // 0x14  the days in the month before
+    s32  nDriver;               // 0x18  0 none, 1 PGA TOUR, 2 real-time events
+    s32  n1C;                   // 0x1C  which panel the day's details show (PGA TOUR 0..3, RTE 4..6)
+    u8   bSeasonOver;           // 0x20  the PGA TOUR season has no event left
+    u8   unk21[0x28 - 0x21];
+} CareerCalendar;
+LAYOUT_ASSERT(CareerCalendar, 0x28);
+
+extern CareerCalendar lbl_80223C48;
+extern char* (*lbl_80193EDC[3])(u16 nDate);    // the name of the event on a day ("" none)
+extern u16 (*lbl_80193EC4[3])(void);           // the career's current day
 
 // GameTargets.c: what the target games (modes 13..17) share
 extern f32 lbl_80211D38[40][4];         // the target list: lbl_80282360 points (w = 1)

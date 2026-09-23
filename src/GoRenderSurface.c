@@ -4,10 +4,7 @@
 // alpha channels are written, through fn_8002F38C.
 
 #include "engine.h"
-
-// The GameCube graphics library (no shared header for it yet).
-void GXSetAlphaUpdate(u8 bUpdate);
-void GXSetColorUpdate(u8 bUpdate);
+#include "gx.h"
 
 void fn_8002F32C(s32 nSurface);
 s32  fn_8002F480(s32 nSurface);

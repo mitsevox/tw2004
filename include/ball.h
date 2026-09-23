@@ -88,6 +88,33 @@ typedef struct TerObject {
     u16  nObjList;              // 0x22  TW06: uiObjectListNum
 } TerObject;
 
+// One of a hole's lights (0x30 bytes).
+typedef struct CourseLight {
+    u8   nType;                 // 0x00  1: directional, 2: a point light (PsMgr.c dims each kind)
+    u8   unk1[0x10 - 0x1];
+    f32  vColor[4];             // 0x10
+    f32  vPos[4];               // 0x20
+} CourseLight;
+
+// A hole's lights, at CourseInfo 0x100. fn_800935CC reads the first five records' kinds; how many
+// the block really holds is not known.
+typedef struct CourseLights {
+    s32  nLights;               // 0x00
+    u8   unk4[0x10 - 0x4];
+    CourseLight aLight[5];      // 0x10
+} CourseLights;
+
+// A block of four light vectors and values (CourseInfo.p38 and p44): fn_80093900 hands them to
+// the current light set (fn_8006F400), and f80 to fn_8006F430.
+typedef struct CourseLightBlock {
+    struct {
+        f32  v0[4];             // 0x00
+        f32  f10;               // 0x10
+        u8   unk14[0x20 - 0x14];
+    } a[4];
+    f32  f80;                   // 0x80
+} CourseLightBlock;
+
 // The current hole's terrain data (fn_8000C594): the ground as collision data. TW06:
 // TGD_TerrainInfo, the same offsets up to 0x2C; TW06 has three more pointers before the polygon
 // list. The ground is triangle strips: each TerPolyRef names a first vertex and a triangle count,
@@ -105,10 +132,10 @@ typedef struct CourseInfo {
                                 //       bit 3 done (fn_80050794); bits 4-5 / 6-7 its highest / lowest corner
     u8*    pLight;              // 0x30  per vertex: the light on the ground there, 0..255 (fn_8004B78C)
     TerCell* pGrid;             // 0x34  nGridWidth x nGridLength cells, row by row. TW06: pTerrainGrid (0x3C)
-    u8*    p38;                 // 0x38  four optional blocks (NULL when absent); TW06 has its fog, sun,
-    u8*    p3C;                 // 0x3C    sky and lighting data in the same place
-    u8*    p40;                 // 0x40
-    u8*    p44;                 // 0x44
+    CourseLightBlock* p38;      // 0x38  four optional blocks (NULL when absent); TW06 has its fog, sun,
+    u8*    p3C;                 // 0x3C    sky and lighting data in the same place. fn_800A27FC uses
+    u8*    p40;                 // 0x40    p38 without a test, p44 only when it is set
+    CourseLightBlock* p44;      // 0x44
     TerObject* pObjects;        // 0x48  the course objects. TW06: pObjectInstanceTable (0x54)
     TerPolyRef* pPolyRefs;      // 0x4C  TW06: pPolygonReferenceList (at 0x58 there)
     u16*   pObjRefs;            // 0x50  per cell, the objects in it (indices). TW06: pObjectReferenceList (0x5C)
@@ -116,6 +143,8 @@ typedef struct CourseInfo {
     f32    fFloor;              // 0x6C  a ball in the air above this with no ground under it is still in play
     PinPos pin[4];              // 0x70  the hole's four pin positions: gpGame->nPinSet[] picks one
     PinPos tee[4];              // 0xB0  the tee of each tee set (gSession.nTeeSet[])
+    u8     unkF0[0x100 - 0xF0];
+    CourseLights lights;        // 0x100 the hole's lights (goballfx.c fn_800935CC, PsMgr.c fn_800A27FC)
 } CourseInfo;
 
 // An object in the world the ball can hit (a tree, a building, the flagstick), as fn_800B1B18
@@ -208,6 +237,14 @@ extern s32       lbl_80281DC4;        // free-drop networks loaded
 extern s32       lbl_80281DC8;        // out-of-bounds networks loaded
 
 CourseInfo* fn_8000C594(void);          // the current hole's terrain data
+u8   Course_RegisterLoader(int nChunk, void (*pfn)(u8*));   // 0x8000C0B4: pfn gets the hole's chunk nChunk
+s32  fn_8000C140(f32* pPos, TNetwork* pNet, s32 nNodes);   // point in outline. TW06: wn_PnPoly
+s32  Ter_iNumOOBNetworksLoaded(void);
+
+// target.c: placing the ball (TW06's PlaceBall_* functions, names not proven here)
+u8   fn_80069218(f32* pPos);            // a ball may be placed here. TW06: PlaceBall_IsValidDropLocation?
+u8   fn_80069428(f32* pPos);            // the point is in bounds. TW06: PlaceBall_CheckInBounds?
+TNetwork* fn_80069498(void);            // the hole's placement outline (lbl_80281E30), if any
 SurfaceType* fn_800CC190(CourseInfo* pCourse, f32* pPos);   // surface type under a point
 f32  Terrain_HeightAt(f32* pPos, SurfaceType** ppSurface);   // 0x800447DC
 

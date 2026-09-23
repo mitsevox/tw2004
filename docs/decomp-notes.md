@@ -130,6 +130,51 @@ The fixes that come up most often. Each points to its full entry below.
 - Every function at 100% but the DOL hash fails: check the unit's data sections, `.sdata2`
   constants and `splits.txt`. See [Data](#data-constants-and-symbols).
 
+### New from the map-first run (2026-09-23)
+
+These were found by the map lanes; each was verified by changing only that and watching the score move.
+They will be sorted into the sections below.
+
+- **[verified] A `u8` result that the caller stores without `clrlwi` means the callee returns `int`/`s32`.**
+  CodeWarrior masks a `u8` return at the call site. The reverse also holds: an `int` local returned from a
+  `u8` function gives `clrlwi r3` at the return (`u8 b` there gives `mr r3`). FE_MessageTable fn_800846D4
+  (91.25 -> 100 with an `s32` callee), GameMode4Menu fn_801218BC (92.5 -> 100 with `int b`),
+  GameModeDriver fn_801174B8 and 5 others.
+- **[verified] Front-end `MsgArg` handlers read every argument into locals before the first store.**
+  GameMode4Menu fn_80121430: `p->fX = pArgs[1].f` -> `f32 fX = pArgs[1].f; ...; p->fX = fX;`, 49.4 -> 100
+  (fn_80121458 79.9 -> 100, fn_80121770 67.1 -> 100).
+- **[verified] Operands that are both calls are evaluated right to left.** `fn(5) + fn(4)` calls `fn(4)`
+  first; for arguments, `f(g(), h())` calls `h()` first. To call in source order, use a temporary.
+  CourseData fn_800D2F00, sweep_800D3208 (99.87 -> 100).
+- **[verified] `x = f(); if (x == NULL) { while (x == NULL) {...} }` gives CodeWarrior's "test the result,
+  then jump to the loop test" shape** (`cmplwi r3,0; bne end; b test`). StaticMemory fn_800097CC 96.15 ->
+  100 (mark it `// fake match` if the outer `if` is redundant in the source).
+- **[verified] A count-down fill `n = count; i = 0; while (n-- > 0) a[i++] = v;` gives
+  `cmpwi n,0; ble; srwi. n,3; mtctr ... andi. 7`.** A `for (i = 0; i < n; i++)` gives `cmpwi n,8; subi`
+  (49%); plain `while (n--)` gives `beq`. GameHoleContests fn_800DA36C.
+- **[verified] A loop over a global table with a dead `li r7,0; cmpwi r7,13; bge` before the unrolled body
+  wants an `s32` counter.** Glows fn_80098740: `int i` 77.4, `s32 i` 100.
+- **[verified] Take a pointer to the array element before the first store when a loop both reads fields
+  and calls with the element.** UIStudio fn_80168B80: `pScreen = &p->pScreens[i]; bOut = 0; ...`,
+  41.5 -> 100. UISScreen fn_8016C5C4 (77 -> 100). The opposite also happens (emotion fn_8006BAA8 wants
+  `gX[n].field` written out), so try both.
+- **[verified] A lone `cmpwi` with no branch at the end of a void function is `if (nErr != 0) return;`.**
+  An empty `if (...) {}` is removed entirely. TibExt fn_80122834 68.8 -> 100.
+- **[verified] `bResult = a && b;` shares the `li rX,0` of an earlier zero store and narrows later;
+  `bResult = 0; if (a && b) bResult = 1;` doesn't.** emotion fn_8006BB5C 98.2 -> 100.
+- **[verified] A range test on a state written as an unsigned byte: `(u8)(n - 2) <= 2`** gives
+  `subi; clrlwi 24; cmplwi 2`. target fn_80067CD4 92.8 -> 98.0.
+- **[verified] Comparing a call's result with a field: the inline form puts the field first (`cmplw r0,r3`);
+  a local for the result puts it first (`cmplw r3,r0`).** MC fn_800A233C 99.69 -> 100.
+- **[verified] Writing a float's bits through a union drops an earlier dead store; a pointer cast
+  (`*(u32*)&f = ...`) keeps it.** urandom Rand_Float 88.2 -> 100. Mark it `// port:` (a port needs
+  `memcpy` or `-fno-strict-aliasing`).
+- **[verified] MWCC treats `s32` (long) and `int` as different types when redeclaring, and an empty `()`
+  prototype clashes with one whose parameters are promoted (u8, s8, u16, s16, f32).** `void f(); void
+  f(int)` compiles; `void f(); void f(u8)` does not. `tools/match/declcheck.py` finds these before a fold.
+- **[verified] Plain `ninja` does not compile NonMatching units.** Build `ninja all_source` (or the unit's
+  `.o`) to see compile errors; merge.py does.
+
 ### Loops and unrolling
 
 - **[verified] Two tests on players n and n + 1 can be a two-pass loop.** When the second

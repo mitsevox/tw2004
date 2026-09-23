@@ -76,6 +76,13 @@ matches, but identically on GC/2.0, 2.5 and 2.6, so it does not separate them. G
 (63 functions, including the 99.67% near-miss `fn_800E30D4`) compiles byte-identically under
 GC/1.3.2, 2.0, 2.0p1, 2.5, 2.6 and 2.7, so its stubborn register shuffle is not a version effect.
 
+**The C library (MSL) was not built with one compiler (2026-09-23).** ansi_fp.c matches only on GC/2.0,
+2.5 or 2.6 (on GC/1.3.2 `__timesdec` is 95.4 and `__minus_dec` 96.7; GC/2.0p1 is worse). printf.c's
+parse_format, long2str, longlong2str, double2hex and float2str all reach 100 on GC/2.5 (82-98 on GC/1.3),
+while s_ldexp in the same group drops from 100 to 99.96 on GC/2.5. So set the compiler per file. The
+earlier "this game's printf revision differs" was a compiler difference. Try GC/2.5 on any other MSL
+near-miss. GameMode4Menu (game code) scored identically on GC/2.0 and GC/2.5.
+
 Things that looked like evidence but were not
 ---------------------------------------------
 

@@ -39,8 +39,8 @@ void fn_80010028(TexBank* pBank) {
 int fn_8001005C(TexBank* pBank, u64 uHash) {
     u32 i;
 
-    for (i = 0; i < pBank->nNumTex; i++) {
-        if (uHash == pBank->p8[i].uHash) return i;
+    for (i = 0; i < pBank->n2; i++) {
+        if (uHash == pBank->p8[i].u0) return i;
     }
     return 0x80000000;
 }
@@ -52,8 +52,8 @@ void fn_800100B0(TexBank* pBank, TexEntry* p8, TexPalette* pC, void* p10, void* 
     pBank->pC = pC;
     pBank->p10 = p10;
     pBank->p14 = p14;
-    pBank->nNumTex = nNumTex;
-    pBank->nNumPalettes = nNumPalettes;
+    pBank->n2 = nNumTex;
+    pBank->n4 = nNumPalettes;
 }
 
 void fn_80010114(int nDst, int nFunc, int nSrc, int nMtx) {

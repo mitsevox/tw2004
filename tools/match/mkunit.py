@@ -1,9 +1,11 @@
 """Create a NonMatching unit over [lo, hi), folding in the sweep units inside it; or widen one.
 
-    python tools/match/mkunit.py GameManager.c 0x800DCA94 0x800DFC18 [after=Gimme.c]
+    python tools/match/mkunit.py GameManager.c 0x800DCA94 0x800DFC18 [after=GameRound.c]
     python tools/match/mkunit.py --extend uiTransform.c 0x80092CE8 0x80093560
 Writes splits.txt / configure.py edits and prints the sweep sources to merge (it does not delete
-their files; that is done after the merged unit is verified, by fold.py).
+their files; that is done after the merged unit is verified, by fold.py). The new unit's
+configure.py line takes the place of the first sweep it absorbs, or goes after `after=`.
+Nothing is written when a check fails.
 
 --extend widens an existing unit's .text range to cover [lo, hi) as well (its other sections and
 its configure.py line stay as they are). Only sweep units may lie in the added range, whole; the
@@ -48,11 +50,12 @@ def extend(name, lo, hi):
                 absorbed.append(m.group(1))
                 continue
         out.append(b)
-    SPLITS.write_text('\n'.join(out), encoding='utf-8', newline='\n')
     cp = (ROOT / 'configure.py').read_text(encoding='utf-8')
     for u in absorbed:
         cp, n = re.subn(r'\n[ \t]*Object\(\w+, "%s"\),' % re.escape(u), '', cp)
-        assert n == 1, u
+        if n != 1:
+            sys.exit('%s is not in configure.py (once): nothing written' % u)
+    SPLITS.write_text('\n'.join(out), encoding='utf-8', newline='\n')
     (ROOT / 'configure.py').write_text(cp, encoding='utf-8', newline='\n')
     print('%s: .text 0x%08X-0x%08X (was 0x%08X-0x%08X)' % (name, new_lo, new_hi, old_lo, old_hi))
     print('absorbed', absorbed)
@@ -81,15 +84,23 @@ def create(name, lo, hi, after):
                 out.append('%s:\n\t.text       start:0x%08X end:0x%08X\n' % (name, lo, hi))
                 inserted = True
         out.append(b)
-    SPLITS.write_text('\n'.join(out), encoding='utf-8', newline='\n')
-
+    # configure.py: the new unit takes the place of its first absorbed sweep (same lib), or goes
+    # after `after`. Everything is checked before either file is written.
     cp = (ROOT / 'configure.py').read_text(encoding='utf-8')
+    line = r'\n([ \t]*)Object\(\w+, "%s"\),'
+    if not after and not absorbed:
+        sys.exit('no sweep unit in %x-%x: say where the unit goes (after=<Unit>.c)' % (lo, hi))
+    anchor = after or absorbed[0]
+    if len(re.findall(line % re.escape(anchor), cp)) != 1:
+        sys.exit('%s is not in configure.py (once): nothing written' % anchor)
     for u in absorbed:
-        cp, n = re.subn(r'\n[ \t]*Object\(\w+, "%s"\),' % re.escape(u), '', cp)
-        assert n == 1, u
-    cp, n = re.subn(r'(\n([ \t]*)Object\(\w+, "%s"\),)' % re.escape(after),
-                    r'\1\n\2Object(NonMatching, "%s"),' % name, cp)
-    assert n == 1
+        if len(re.findall(line % re.escape(u), cp)) != 1:
+            sys.exit('%s is not in configure.py (once): nothing written' % u)
+    cp = re.sub(line % re.escape(anchor),
+                lambda m: m.group(0) + '\n%sObject(NonMatching, "%s"),' % (m.group(1), name), cp)
+    for u in absorbed:
+        cp = re.sub(line % re.escape(u), '', cp)
+    SPLITS.write_text('\n'.join(out), encoding='utf-8', newline='\n')
     (ROOT / 'configure.py').write_text(cp, encoding='utf-8', newline='\n')
     print('absorbed', absorbed)
 
@@ -98,5 +109,5 @@ if __name__ == '__main__':
     if sys.argv[1] == '--extend':
         extend(sys.argv[2], int(sys.argv[3], 16), int(sys.argv[4], 16))
     else:
-        create(sys.argv[1], int(sys.argv[2], 16), int(sys.argv[3], 16),
-               sys.argv[4] if len(sys.argv) > 4 else 'Gimme.c')
+        after = sys.argv[4].removeprefix('after=') if len(sys.argv) > 4 else None
+        create(sys.argv[1], int(sys.argv[2], 16), int(sys.argv[3], 16), after)

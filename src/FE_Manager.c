@@ -4,6 +4,7 @@
 // picks and unlocks.
 
 #include "engine.h"
+#include "ustream.h"
 #include "game.h"
 #include "charstate.h"
 #include "core/easb.h"
@@ -23,10 +24,8 @@ void fn_8008D8F4(void);
 void fn_8008DAEC(void);
 void fn_8008DBE8(void);
 void fn_8008E6D4(int a);
-void fn_80079EA8(void);
 void fn_80092198(void);
 void fn_8009220C(void);
-void fn_800A75B4(void);
 void fn_800A7644(int a);
 void fn_800A4FD8(void);
 void fn_80102AC4(void);
@@ -40,23 +39,24 @@ s8   fn_80103BC0(int nAsset);           // } its kind, fn_80107444's count, and 
 s16  fn_8010742C(int nAsset);           // } choice
 int  fn_80107444(int nAsset);           // }
 void fn_80105FF8(int nAsset, s16* pKind, s32* pPart, s32* pChoice);    // }
-
-void fn_8011E020(s32* pMonth, s32* pDay, s32* pYear, s32* pHour, s32* pMinute, s32* pSecond, s32* pMsec);
 f32  GM_GetGameProgress(SaveProfile* pProfile);         // GameManager.c
 u8   fn_80056480(int a);
 u8   fn_800564AC(int n);
 u8   fn_80058304(SaveProfile* pProfile, int a);
 s32  fn_801258E8(void);                 // EASportsBio.c
-void fn_80076EEC(void);                 // frees lbl_80281EC8
-void fn_80076F20(void);
-u8   fn_80079E44(int nAttr);            // a hidden attribute: ATTR_AGGRESSION, ATTR_IQ, ATTR_SPEED
+void fn_8009170C(void);
 
 // This file, in address order.
+void fn_80076E48(void);
+void fn_80076EEC(void);                 // frees lbl_80281EC8
+void fn_80076F20(void);
+void fn_80076F24(void);
+void fn_80076F54(void);
+void fn_80076F58(void);
 void fn_80076F80(UStreamObject* pObject);
 int  fn_80076FDC(void);
 void fn_8007706C(char* pName, char* pDir, char* pPath);
 void fn_800770D4(char* pName, char* pPath);
-FEMovie* fn_800770FC(void);
 u8   fn_80077148(void);
 void FE_GetBIOMovieName(void);
 void fn_800772E0(void);
@@ -70,11 +70,7 @@ void fn_800773F8(void);
 void fn_80077428(void);
 void fn_8007744C(void);
 void Golfer_LoadCreatedFromSave(void);
-void fn_80077780(void);
-void fn_80077808(int nSlot);
-void fn_80077968(int nSlot);
 void fn_800779BC(int a, int b);
-GolferRecord* fn_80077A80(int nGolfer);
 int  fn_80077BDC(int n);
 void fn_80077C1C(int a, int b);
 u8   fn_80078008(s32 nAsset, SaveProfile* pProfile);
@@ -92,9 +88,9 @@ void fn_80079664(SaveProfile* pProfile);
 void fn_8007975C(SaveProfile* pProfile, s16 nPart, int nChance);
 int  fn_800797E0(SaveProfile* pProfile, s16 nPart, int b, int nChance);
 void fn_80079974(void);
-void fn_80079AD4(void);
 void fn_80079D30(void);
 void fn_80079DAC(void);
+u8   fn_80079E44(int nAttr);            // a hidden attribute: ATTR_AGGRESSION, ATTR_IQ, ATTR_SPEED
 
 // This file's globals (fe.h), each section in reverse address order as the compiler lays it out.
 FEState lbl_801D7148;
@@ -107,6 +103,49 @@ u8* lbl_80281EC8;
 // 1.0f (0x80283AC0), before the 0.0f and 0.05f FE_GetBIOMovieName uses first; its body is unknown.
 static f32 FE_Manager_StrippedFn(f32 x) {
     return x + 1.0f;
+}
+
+// Set the front end's state up: no profiles loaded, no CPU players, no backups, no movies.
+void fn_80076E48(void) {
+    int i;
+    for (i = 0; i < 5; i++) {
+        lbl_801D7148.aLoaded[i] = 0;
+        lbl_801D7148.aCPU[i] = 0;
+        lbl_801D7148.aBackup[i] = -1;
+    }
+    lbl_801D7148.b0F = 1;
+    lbl_801D7148.b10 = 1;
+    lbl_801D7148.nMode = -1;
+    lbl_801D7148.b11 = 0;
+    lbl_801D7148.b18 = 1;
+    lbl_801D7148.n1C = 0;
+    lbl_801D7148.nMovieNext = 0;
+    lbl_801D7148.nMovieFree = 0;
+    lbl_801D7148.p658 = NULL;
+    fn_8009170C();
+    lbl_801D8858.n30 = 0;
+}
+
+// Free the copy of the 'BIO ' stream object's data.
+void fn_80076EEC(void) {
+    if (lbl_80281EC8 != NULL) {
+        fn_80009E70(lbl_80281EC8);
+        lbl_80281EC8 = NULL;
+    }
+}
+
+void fn_80076F20(void) {
+}
+
+void fn_80076F24(void) {
+    UStream_RegisterHandler(TAG('B', 'I', 'O', ' '), fn_80076F80);
+}
+
+void fn_80076F54(void) {
+}
+
+void fn_80076F58(void) {
+    UStream_UnregisterHandler(TAG('B', 'I', 'O', ' '));
 }
 
 // The 'BIO ' stream object's handler: keep a copy of its data.
@@ -1273,4 +1312,13 @@ void fn_80079DAC(void) {
             lbl_80281ED0 = 0;
         }
     }
+}
+
+// Whether an attribute is one of the hidden ones.
+u8 fn_80079E44(int nAttr) {
+    int bHidden = 0;
+    if (nAttr == ATTR_AGGRESSION || nAttr == ATTR_IQ || nAttr == ATTR_SPEED) {
+        bHidden = 1;
+    }
+    return bHidden;
 }

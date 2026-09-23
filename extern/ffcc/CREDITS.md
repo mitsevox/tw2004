@@ -19,5 +19,15 @@ Changed for this game (so the units link into the DOL):
   written for this game: the linker strips them, but their messages share the string pool with
   that `""`, in this order. `include/errno.h` is new for them (its comment says which values
   are proven). These additions are ours, not FFCC's.
+- `src/ax/AXOut.c`: this game's revision has no thread queue (`__AXDSPDoneCallback` only sets
+  its flag, `__AXOutInitDSP` does not set up a queue, and there is no `__AXOutQuit`), and
+  `__AXDSPTask` and `__AXDramImage` are globals, laid out after `__AXLocalProfile`.
+- `src/ax/AXVPB.c`: `__AXServiceVPB` does not copy the current address back to the user's
+  parameter block when only the loop or end address changed.
+- `src/mix/mix.c`: this game's MIX takes 6 dB (not 3 dB) off the rear channel, and in mono and
+  stereo `MIXInitChannel` gives the dry rear level (`vS`) no cut at all.
+- `src/MSL_C/PPCEABI/bare/H/ansi_fp.c`: `__dec2num` steps to the neighbouring double by adding or
+  taking one from its bits (as the Pikmin 2 decompilation's MSL does), not with `nextafter`, and
+  reads the lower-case map inline (`_tolower`). This file is built with GC/2.5 (see configure.py).
 - `src/MSL_C/PPCEABI/bare/H/alloc.c`: the malloc pool's flag is one `unsigned char initialized`
   (FFCC has an `int` read through a byte cast, plus an unused `init` static the game lacks).

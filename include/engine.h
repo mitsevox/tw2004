@@ -18,6 +18,8 @@ int   fn_80005BC8(const void* pA, const void* pB, u32 uLen);   // memcmp
 // Allocates from the static heap (StaticMemory.c); nMode picks where (see there).
 void* fn_80009B34(int nSize, int nMode, int nAlign, const char* pFile, int nLine);
 void  fn_80009E70(void* p);             // free
+void  fn_8000A0AC(s32 v);               // } a value callers pass on as fn_80009B34's uFlags
+s32   fn_8000A0B4(void);                // } (EASportsBio.c sets 0 while the Bio starts, then 2)
 void* fn_800951A0(u32 uSize, int nAlign, int a);
 void  fn_8009527C(void* p);             // frees what fn_800951A0 allocated
 void  fn_800953C8(int a);
@@ -48,6 +50,12 @@ void  fn_8015929C(void* pBase, u32 nCount, u32 nSize, s32 (*pfnCompare)(const vo
 
 #define FRAME_RATE 59.94f               // frames a second (NTSC)
 #define FRAME_TIME (1.0f / FRAME_RATE)  // one frame, in seconds
+
+// llrtclock.c: the real-time clock as a date: month 1-12, day, year, hour 0-23, minute, second,
+// millisecond. Always TRUE.
+int  fn_8011E020(s32* pnMonth, s32* pnDay, s32* pnYear, s32* pnHour, s32* pnMinute, s32* pnSecond,
+                 s32* pnMsec);
+void RTClock_GetDateTimeString(char* szOut);   // "M/D/YYYY H:MM AM"
 
 // ---- math and random numbers -----------------------------------------------------------------
 
@@ -88,7 +96,7 @@ void vec4flt_CrossProduct(f32* pA, f32* pB, f32* pOut);   // cross product
 
 // A texture in a bank (0x50 bytes; the bank's p8 is an array of them). Only what the game code reads.
 typedef struct TexEntry {
-    u64  uHash;                 // 0x00  its name's hash (fn_8000BEE4)
+    u64  u0;                    // 0x00  its name's hash (fn_8000BEE4; fn_8001005C finds a texture by it)
     u32  uPixels;               // 0x08  where its pixels start in the bank's p18
     u8   unkC[0x3C - 0xC];
     s16  nPalette;              // 0x3C  its row in the bank's pC
@@ -106,8 +114,8 @@ LAYOUT_ASSERT(TexPalette, 0xC);
 // A loaded texture bank (0x30 bytes, followed by its tables; up to 200, listed at lbl_801A26DC).
 typedef struct TexBank {
     u8   unk0[2];
-    s16  nNumTex;               // 0x02  entries in p8
-    s16  nNumPalettes;          // 0x04  rows in pC
+    s16  n2;                    // 0x02  how many textures p8 holds
+    s16  n4;                    // 0x04  how many rows pC holds
     u8   unk6[2];
     TexEntry*   p8;             // 0x08  its textures
     TexPalette* pC;             // 0x0C  its palettes
@@ -197,6 +205,25 @@ extern RenderState lbl_801B8980;
 
 void fn_8005CC64(TexBank* pBank, TexEntry* pTex);  // set the texture of the next draw
 
+// One row of lbl_80188E88 (our name; 20 rows of 0x44 bytes): a module's hooks. The main loop
+// (gomainloop.c) calls each row's pfnC..pfn20 at six points of a frame (fn_8006DDA8 and its
+// neighbours), skipping NULL ones; fn_8003519C calls a row's pfn8 with data. Rows 0 and 1 hold
+// functions of 0x8006FED4-0x80070FB0 from +0x24 on.
+typedef struct ModuleHooks {
+    u8    unk0[8];
+    void  (*pfn8)(void* pData);   // 0x08
+    void  (*pfnC)(void);          // 0x0C  fn_8006E068
+    void  (*pfn10)(void);         // 0x10  fn_8006DDE8
+    void  (*pfn14)(void);         // 0x14  fn_8006DFE8
+    void  (*pfn18)(void);         // 0x18  fn_8006DE68
+    void  (*pfn1C)(void);         // 0x1C  fn_8006DF68
+    void  (*pfn20)(void);         // 0x20  fn_8006DEE8
+    u8    unk24[0x44 - 0x24];
+} ModuleHooks;
+LAYOUT_ASSERT(ModuleHooks, 0x44);
+
+extern ModuleHooks lbl_80188E88[20];
+
 // A render surface (GoRenderSurface.c; our name, after the file): one of five 0x2C-byte slots at
 // lbl_801D3950. A slot whose n0 is not 1 owns a buffer of nSize bytes. Only what the code reads.
 typedef struct RenderSurface {
@@ -221,6 +248,9 @@ extern s32 lbl_80281D50;        // the surface fn_8002F38C selected last
 int  fn_8002F260(s32 n0, s32 nWidth, s32 nHeight, s32 nKind, s32 n20, s32 nSurface);   // 0: no memory
 void fn_8002F38C(s32 nSurface, s32 nC, s32 n10, s32 n14, u32 uFlags, s32 n18);
 s32  fn_8002F454(s32 nSurface);     // the surface's buffer size, 0 if the slot is free
+
+// The graphics helpers at 0x80029FC8 (file name unknown)
+void* fn_8002A624(void);            // the screen-copy texture's pixels (lbl_80281100's first word)
 
 // ---- the file streamer (UStream.c) -----------------------------------------------------------
 
@@ -261,10 +291,6 @@ int  fn_8000633C(int hFile);            // file close
 int  fn_80006444(int hFile, void* pDst, u32 uLen, u32 uOffset, void (*pfnDone)(int nBytes, int nError));
 u32  fn_800065B0(int hFile);            // file size
 
-// ---- fonts (UFont.c) -------------------------------------------------------------------------
-
-f32  fn_80012C30(char* sz);             // fn_80012BDC(sz, 4)
-
 // ---- controller input ------------------------------------------------------------------------
 
 void fn_80012EF8(void);
@@ -298,16 +324,18 @@ int  fn_8006AA9C(int nPlayer);          // how the shot turned out (0..4, 8+)
 void fn_8006AAB4(int nPlayer, int a);
 void fn_8006ACF8(int nPlayer, int a);
 void Emotion_UpdatePlayerEmotion(int nPlayer);
-void fn_8006B2C4(int nPlayer, int a);
+void fn_8006B2C4(int nPlayer, u8 bBefore);   // the shot's outcome from the ball (bBefore: ballBefore)
 void fn_8006BAA8(int nPlayer);
 void fn_8006BF60(int nPlayer);          // the replay recorder
 void fn_8006C300(int nPlayer);
-void fn_8006C4A0(void);                 // take the shot back (a mulligan)
+void fn_8006C4A0(void);                 // clears gSession.bReplay: a saved replay's playback ends
 void fn_8006F4B4(void);
 u8   fn_80095430(int a);
 void fn_8009B970(int nView);
 void fn_8009EF98(void);
 void fn_800A6278(void);
+void fn_800A6FE0(void);
+void fn_800A707C(void);
 void fn_800A62A4(void);
 void fn_800A62E0(void);
 void fn_800A6358(void);
