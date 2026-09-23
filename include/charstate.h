@@ -9,9 +9,16 @@
 
 // A skin (Skin.c): a character's body or one of its attachments; only what the code reads.
 typedef struct Skin {
-    u8   unk0[0x10D4];
+    u8   unk0[0x10B4];
+    void* p10B4;                // 0x10B4  } fn_800CCA40's and fn_800CCEA0's number of 8-byte
+    u8   unk10B8[0x10C4 - 0x10B8];
+    void* p10C4;                // 0x10C4  } entries each (the created golfer's are saved)
+    u8   unk10C8[0x10D4 - 0x10C8];
     u32  u10D4;                 // 0x10D4  bit 1 set by fn_80019CEC; bit 2 tested by fn_80037708
 } Skin;
+
+s32  fn_800CCA40(Skin* pSkin);          // SkinPart.c: how many 8-byte entries p10B4 holds
+s32  fn_800CCEA0(Skin* pSkin);          // SkinPart.c: and p10C4
 
 // A pool of seven entries characters take (fn_8001A418) and give back (fn_8001A3B0).
 typedef struct CharPoolEntry {

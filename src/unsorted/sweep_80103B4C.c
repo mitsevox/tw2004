@@ -1,25 +1,19 @@
 // Small functions found by the sweep (sweep.py). Original file and meanings unknown.
 
 #include "game_types.h"
+#include "frontend/fe.h"
 
-extern u8* lbl_80282460;
-void fn_80103B28();
-void fn_80104F68();
-void fn_80104F7C();
+int fn_80104F7C(CrAPAsset* pAsset);
 
-void fn_80103B4C(void);
-void fn_80103B74(u8 v);
-u8 fn_80103B80(void);
-void fn_80103B4C(void) {
-    fn_80104F7C();
-    fn_80103B28();
-    fn_80104F68();
+// The asset an asset takes its attributes from.
+CrAPAsset* fn_80103B4C(CrAPAsset* pAsset) {
+    return fn_80104F68(fn_80103B28(fn_80104F7C(pAsset)));
 }
 
-void fn_80103B74(u8 v) {
-    *(u8*)(lbl_80282460 + 0x14) = v;
+void fn_80103B74(u8 b) {
+    lbl_80282460->b14 = b;
 }
 
 u8 fn_80103B80(void) {
-    return *(u8*)(lbl_80282460 + 0x14);
+    return lbl_80282460->b14;
 }

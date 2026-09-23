@@ -208,7 +208,14 @@ typedef struct SaveProfile {
     char szGolferNames[6][8];   // 0x054C8  -> PlayerProfile.szNames
     u8   nGolferOutfit;         // 0x054F8  -> PlayerProfile.nOutfit
     u8   nGolferBallType;       // 0x054F9  -> PlayerProfile.nBallType
-    u8   unk54FA[0xB054 - 0x54FA];
+    u8   unk54FA[0x5614 - 0x54FA];
+    // The created golfer's skins: copies of their p10B4 and p10C4 entries, 8 bytes each, for the
+    // body (fn_80103D6C) and its six attachments (fn_80103DE0).
+    u8   a5614[0x5754 - 0x5614];    // 0x05614
+    u8   a5754[0x5AF4 - 0x5754];    // 0x05754
+    u8   a5AF4[6][0x50];            // 0x05AF4
+    u8   a5CD4[6][0x50];            // 0x05CD4
+    u8   unk5EB4[0xB054 - 0x5EB4];
     // Four bit arrays with a bit per Create-A-Player asset (0x80057F18's loop over them all, which
     // also clears aB344 and aB4BC; fn_8001E9CC tests a bit).
     u32  aAssetLocked[94];      // 0x0B054  the asset was locked (fn_80078008) when last checked
