@@ -299,6 +299,7 @@ GoAnimalActors.c:
 
 GoDynObjTypes.c:
 	.text       start:0x8004ABBC end:0x8004AFA0
+	.sdata2     start:0x80283280 end:0x80283288
 
 GoTerrainCollision.c:
 	.text       start:0x8004AFA0 end:0x80050C2C

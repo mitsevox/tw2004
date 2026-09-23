@@ -1023,7 +1023,7 @@ config.libs = [
             Object(Matching, "unsorted/sweep_800A7198.c"),
             Object(Matching, "unsorted/sweep_80127D84.c"),
             Object(Matching, "unsorted/sweep_80127E44.c"),
-            Object(NonMatching, "GoDynObjTypes.c"),
+            Object(Matching, "GoDynObjTypes.c"),
             Object(Matching, "unsorted/sweep_800977CC.c"),
             Object(Matching, "unsorted/sweep_800B1AB0.c"),
             Object(Matching, "unsorted/sweep_800B5D08.c"),

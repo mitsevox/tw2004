@@ -21,17 +21,30 @@ typedef struct DynObjDef {
     f32  f1C;                   // 0x1C  type 2: its turning speed, degrees a second
 } DynObjDef;
 
+typedef struct DynObjModelRef {
+    u8   unk0[4];
+    void* p4;                   // 0x04  goes to fn_800486F4
+} DynObjModelRef;
+
 typedef struct DynObjModel {
     u8   unk0[8];
-    void* p8;                   // 0x08  the model, if any (its +4 goes to fn_800486F4)
+    DynObjModelRef* p8;         // 0x08  the model, if any
 } DynObjModel;
+
+// The names an object passes to fn_8000EA1C (DynObjSetup.pC).
+typedef struct DynObjNames {
+    u8   unk0[0x28];
+    const char* p28;            // 0x28  -> DynObj.p15C
+    const char* p2C;            // 0x2C  -> DynObj.p160
+    const char* p30;            // 0x30  -> DynObj.p164
+} DynObjNames;
 
 // What a type's message 2 gets.
 typedef struct DynObjSetup {
     u8   unk0[4];
     DynObjModel* pModel;        // 0x04
     DynObjDef* pDef;            // 0x08
-    u8*  pC;                    // 0x0C  its words at 0x28..0x30 -> DynObj.p15C..p164
+    DynObjNames* pC;            // 0x0C
 } DynObjSetup;
 
 // A dynamic object (0x16C bytes for type 0; a type may add fields after it).
@@ -95,5 +108,9 @@ void fn_80048894(void* pObj);
 // GoDynObjBase.c
 int  fn_80049820(int nMsg, DynObj* pObj, void* pArg);  // type 0's handler, the others' default
 DynObjHandler fn_800499B0(int nType);
+
+// GoDynObjTypes.c: the handlers of types 6 and 9.
+int  fn_8004AD54(int nMsg, DynObj* pObj, void* pArg);
+int  fn_8004AF2C(int nMsg, DynObj* pObj, void* pArg);
 
 #endif
