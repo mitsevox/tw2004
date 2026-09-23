@@ -111,6 +111,52 @@ void fn_80168F5C(UIStudio* pStudio, s16 nGroup, s16 nScreen) {
     }
 }
 
+// Called before a screen is unloaded. If the last p60 record names the screen, it is dropped:
+// the screen it holds becomes current, and its paused script runs on with n on the top of its
+// stack. Returns 0 when an older record names the screen, or holds it: it cannot go yet.
+u8 fn_80169308(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 n) {
+    s32 i;
+    UISRecord60* pRecords;
+    UISRecord60* pRec;
+    UISScreen* pScreen;
+    s32* p1C;
+    UISFrame* pFrame;
+
+    i = pStudio->n5C;
+    if (i > 0) {
+        pRecords = pStudio->p60;
+        pRec = &pRecords[i - 1];
+        if (pRec->u24 == uScreen && pRec->u26 == uGroup) {
+            pStudio->n5C = i - 1;
+            if (pRec->pScreen != NULL) {
+                pStudio->nCurScreen = fn_8016C6C4(pStudio, pRec->pScreen->uGroup, pRec->pScreen->uScreen);
+            } else {
+                pStudio->nCurScreen = -1;
+                return 1;
+            }
+            if ((u32)pStudio->nCurScreen < pStudio->nScreens) {
+                p1C = pRec->p1C;
+                if (p1C != NULL) {
+                    pFrame = pRec->pFrame;
+                    *pFrame = pRec->frame;
+                    pFrame->pC[-1] = n;
+                    if (fn_80166098(pStudio, pRec->p1C, pFrame, pRec->pScreen, pRec->n14) != 3) {
+                        pFrame->pC = p1C;
+                    }
+                }
+            }
+        } else {
+            while (i-- != 0) {
+                pRec = &pRecords[i];
+                if (pRec->u24 == uScreen && pRec->u26 == uGroup) return 0;
+                pScreen = pRec->pScreen;
+                if (pScreen != NULL && pScreen->uScreen == uScreen && pScreen->uGroup == uGroup) return 0;
+            }
+        }
+    }
+    return 1;
+}
+
 // Goes to a screen: queued as event 0 while an event is being sent, at once otherwise.
 s32 fn_801694A0(UIStudio* pStudio, s16 nGroup, s16 nScreen, u8 nArgs, s32* pArgs) {
     UISEventData data;
