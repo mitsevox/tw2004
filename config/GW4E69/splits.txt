@@ -3026,16 +3026,7 @@ unsorted/sweep_8011D858.c:
 	.text       start:0x8011D858 end:0x8011D878
 
 GoGrass.c:
-	.text       start:0x8011E170 end:0x80120194
-
-unsorted/sweep_8012022C.c:
-	.text       start:0x8012022C end:0x80120244
-
-unsorted/sweep_80120244.c:
-	.text       start:0x80120244 end:0x80120268
-
-unsorted/sweep_8012028C.c:
-	.text       start:0x8012028C end:0x80120298
+	.text       start:0x8011E170 end:0x80120298
 
 unsorted/sweep_80120298.c:
 	.text       start:0x80120298 end:0x801202F8
