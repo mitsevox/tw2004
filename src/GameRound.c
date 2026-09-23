@@ -89,7 +89,7 @@ int   Game_CurHoleIndex(void);
 u32   Rand_Next(int nStream);
 void  fn_800E1260(int nPreset);
 void  fn_800E1404(int nHole);
-int   fn_800E39F0(void);
+u8    fn_800E39F0(void);
 int   Game_CurrentHole(void);
 double fn_80009680(double x);               // sqrt
 u8    fn_8004B580(void);
@@ -1016,16 +1016,19 @@ void fn_800E2BA4(void) {
 // already holed, or, when it says no, when the ball is within half a yard of the pin.
 u8 fn_800E2DB4(int nPlayer) {
     CourseInfo* pCourse;
-    PinPos*     pPin;
+    int         nHole;
+    f32         dx;
+    f32         dz;
     f32         fDist;
     u8          b;
     if (fn_800E39F0()) {
         return 0;
     }
     pCourse = fn_8000C594();
-    pPin = &pCourse->pin[Game_CurrentHole()];
-    fDist = fn_80009680((*(f32*)(gPlayers[nPlayer].ball + 0) - pPin->x) * (*(f32*)(gPlayers[nPlayer].ball + 0) - pPin->x) +
-                        (*(f32*)(gPlayers[nPlayer].ball + 8) - pPin->z) * (*(f32*)(gPlayers[nPlayer].ball + 8) - pPin->z));
+    nHole = Game_CurrentHole();
+    dx = *(f32*)(gPlayers[nPlayer].ball + 0) - pCourse->pin[nHole].x;
+    dz = *(f32*)(gPlayers[nPlayer].ball + 8) - pCourse->pin[nHole].z;
+    fDist = fn_80009680(dx * dx + dz * dz);
     b = fn_8004B580();
     if ((b && gPlayers[nPlayer].nLie == LIE_HOLED) || (!b && fDist < 0.5f)) {
         gPlayers[nPlayer].nLie = LIE_HOLED;
@@ -1109,7 +1112,7 @@ void fn_800E292C(void) {
 }
 
 // Modes 13-17.
-int fn_800E39F0(void) {
+u8 fn_800E39F0(void) {
     if (Game_GetMode() == 13 || Game_GetMode() == 14 || Game_GetMode() == 15 || Game_GetMode() == 16 ||
         Game_GetMode() == 17) {
         return 1;
