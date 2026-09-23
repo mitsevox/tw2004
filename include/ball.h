@@ -8,27 +8,40 @@
 
 #include "game_types.h"
 #include "platform.h"
+#include "terrain.h"   // the terrain manager (lbl_801D3CB0)
 
-// A row of gSurfaceTypes (0x44 bytes): how a ball behaves on one kind of ground.
+// A row of gSurfaceTypes (0x44 bytes): how a ball behaves on one kind of ground. TW06:
+// TGD_MaterialInfo, the same size; its field names (after "TW06:") agree with what the code here
+// does with each field.
 typedef struct SurfaceType {
-    f32  f00;                   // 0x00  launch: share of the speed kept; + the ball's f70 (fn_800510EC)
-    f32  f04;                   // 0x04  lie: size of the random lie quality (Ball_SetLie)
-    f32  f08;                   // 0x08  launch: spin factor
-    f32  f0C;                   // 0x0C  bounce restitution; below 0: branches/leaves (randomised, LUCK)
-    f32  f10;                   // 0x10  bounce: friction at the contact
-    f32  f14;                   // 0x14  skid: 1 - this scales the slope pull
-    f32  f18;                   // 0x18  skid: friction building roll spin
-    f32  f1C;                   // 0x1C  0.375 on surfaces a ball may stop on; roll: break strength
-    f32  f20;                   // 0x20  roll: rolling friction
-    f32  f24;                   // 0x24  bounce: how hard a landing it takes to bend the normal (softness)
-    f32  f28;                   // 0x28  bounce: base softness
+    f32  f00;                   // 0x00  launch: share of the speed kept; + the ball's f70 (fn_800510EC).
+                                //       TW06: impactV
+    f32  f04;                   // 0x04  lie: size of the random lie quality (Ball_SetLie).
+                                //       TW06: impactV_Modifier
+    f32  f08;                   // 0x08  launch: spin factor. TW06: impactSpin
+    f32  f0C;                   // 0x0C  bounce restitution; below 0: branches/leaves (randomised, LUCK).
+                                //       TW06: restitution
+    f32  f10;                   // 0x10  bounce: friction at the contact. TW06: grip
+    f32  f14;                   // 0x14  skid: 1 - this scales the slope pull. TW06: kinetic
+    f32  f18;                   // 0x18  skid: friction building roll spin. TW06: transKinetic
+    f32  f1C;                   // 0x1C  0.375 on surfaces a ball may stop on; roll: break strength.
+                                //       TW06: precession
+    f32  f20;                   // 0x20  roll: rolling friction. TW06: rolling
+    f32  f24;                   // 0x24  bounce: how hard a landing it takes to bend the normal (softness).
+                                //       TW06: terminalVy
+    f32  f28;                   // 0x28  bounce: base softness. TW06: surfaceFriction
     u32  nClass;                // 0x2C  surface class (TW06: lieID), not a Lie_t. Ball_SetLie makes the lie
                                 //       from it: 1, 2 fairway; 3 green; 4 fringe; 5, 11 rough; 6, 20 sand;
                                 //       7, 16 water; 8 cart path; 12 the cup; 18 green (holes a ball, as 12).
                                 //       17 = tree; 19 = not playable (Ter_CalcLowestPlayableWorldHeight)
-    u8   unk30[4];
-    u32  u34;                   // 0x34  bit 0x10: event 0x25 on landing
-    u8   unk38[0x44 - 0x38];
+    u32  nSoundId;              // 0x30  TW06: soundID; nothing here reads it yet
+    u32  u34;                   // 0x34  TW06: flags. Bit 0x1: a ball may lie or be dropped here (without
+                                //       it GameManager takes the ball out); 0x2: taking it out sets the
+                                //       player's bLowIQPenalty; 0x10: event 0x25 on landing; 0x80 is read
+                                //       by GoTerrainCollision
+    u32  nCollisionEffectId;    // 0x38  TW06: uiCollisionEffectID
+    u32  nSwingSoundId;         // 0x3C  TW06: uiSwingSoundID
+    u32  nSwingEffectId;        // 0x40  TW06: uiSwingEffectID
 } SurfaceType;
 LAYOUT_ASSERT(SurfaceType, 0x44);
 
@@ -181,19 +194,10 @@ typedef struct TerBox {
 
 #define NUM_CUP_POSITIONS 4     // one set of cup geometry per pin position (CourseInfo.pin)
 
-// The terrain manager (GoTerrain.c, 0x11C8 bytes); only its course is read so far. TW06:
-// Ter_TerrainGameDataMgr, whose GetTGD returns this pointer.
-typedef struct TerrainMgr {
-    u8          unk0[8];
-    CourseInfo* pCourse;        // 0x008
-    u8          unkC[0x11C8 - 0xC];
-} TerrainMgr;
-
 #define MAX_OBJECTS 1000        // course objects a line test can mark
 #define TER_NO_GROUND -65536.125f   // the height the ground lookups return when nothing is under the point
 
-extern TerrainMgr lbl_801D3CB0;
-extern TerBox    lbl_801D53A8[NUM_CUP_POSITIONS];  // the 3D cup geometry of each pin position
+extern TerBox   lbl_801D53A8[NUM_CUP_POSITIONS];  // the 3D cup geometry of each pin position
 extern TNetwork* lbl_801D5428[MAX_FREE_DROP_NETWORKS];
 extern TNetwork* lbl_801D548C[MAX_OOB_NETWORKS];
 extern u8        lbl_801D54A0[MAX_OBJECTS];        // objects near the current line
@@ -211,7 +215,8 @@ f32  Terrain_HeightAt(f32* pPos, SurfaceType** ppSurface);   // 0x800447DC
 u8   Ter_Use3DCupGeometry(void);               // the cup is real geometry the ball drops into
 u8   Ter_PointInFreeDropNetwork(f32* pPos);    // inside a free-drop area
 u8   Ter_PointInOOBNetwork(f32* pPos);         // inside the in-bounds outlines (always, with none loaded)
-u8   Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 a, u8 b, f32 f, u8 c, f32 g);
+u8   Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 bModels, u8 bHazards, f32 fStep, u8 bSlope,
+                                         f32 fMaxSlope);
 u8   Ter_SearchForDropLocation(int nPlayer, u8 bPreferred, u8 bCheck, f32* pOut);   // where to drop the ball
 f32  Ter_CheckForDropLocation(CourseInfo* pCourse, f32* pPos, u8 bOnDropSurface, u8* pbDrop, u8* pbPreferred,
                               SurfaceType** ppSurface);   // whether a ball could be dropped at a point
@@ -235,6 +240,12 @@ s32  fn_80050BEC(SurfaceType* pSurface);   // a surface's row in gSurfaceTypes, 
 
 // ---- the ball (Ball.c) ----------------------------------------------------------------------
 
+// One club's carry for a shot kind, in yards: fDist[0] at power 0.1 up to fDist[10] at 1.1
+// (fDist[9], full power, is the club's reach). Ball.c's gClubRows1..7 hold one per club, 0..24.
+typedef struct ClubRow {
+    f32 fDist[11];
+} ClubRow;
+
 void Ball_SetSimulating(u8 bOn);        // rehearsals and look-aheads: no sounds, effects or tree roll
 void fn_80050D2C(u8 b);
 f32  fn_80050D34(f32 fDist);            // putt power for a distance
@@ -254,6 +265,7 @@ void fn_80055C40(int n);
 void fn_80055CAC(int n);
 void fn_80055CD0(int n);
 void Wind_Set(int nDir, f32 fSpeed);
+f32  Wind_Get(f32* pOut);               // the wind's speed; its vector (direction x speed) into pOut
 void Wind_Generate(void);
 
 void fn_80047B6C(Ball* pBall, int nPlayer);

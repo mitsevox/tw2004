@@ -212,7 +212,7 @@ LAYOUT_ASSERT(SwingData, 0x634);
 // fills it in), and a player's totals (Player.money), which fn_800D3548 adds it to field by field.
 typedef struct CourseMoneyTracking {
     s32  n0;                    // 0x00  the payout
-    u8   unk4[4];
+    s32  n4;                    // 0x04  a PGA TOUR tournament's prize money (GameModeDriverPGATour)
     s32  n8;                    // 0x08  bonuses won (GameMode5 EndGame)
     s32  nC;                    // 0x0C  a ladder event's prize (GameMode4 EndGame)
     s32  n10;                   // 0x10  n24 minus the last match prize (GameModeMatch EndGame)
@@ -308,7 +308,7 @@ typedef struct Player {
     Character* pChar;           // 0xC18  the golfer on screen
     f32  fThinkTime;            // 0xC1C  seconds a CPU has spent in state 2
     f32  fC20;                  // 0xC20
-    u8   unkC24[4];
+    s32  nC24;                  // 0xC24  added to TourStats.n8 at the end of a hole (fn_800EF2B8)
     u8   bMulliganUsed;         // 0xC28  the one mulligan of a one-per-player mode is used (GM_PlayerTakeMulligan)
     u8   bLowIQPenalty;         // 0xC29  quarters the IQ overconfidence term when set
     s8   nLevel;                // 0xC2A  CPU difficulty level: 25 modifier points per level
@@ -334,7 +334,9 @@ typedef struct Player {
     s32  nC6C[18];              // 0xC6C  cleared at the start of a round
     f32  fCB4;                  // 0xCB4  speed golf: raised by a button, falls every frame
     s32  nCB8;                  // 0xCB8  speed golf: cleared by that button
-    u8   unkCBC[0xCD0 - 0xCBC];
+    f32  vCBC[3];               // 0xCBC  a vector (the run's velocity?): the first-person camera's step is
+                                //        three times the length of its x and z
+    u8   unkCC8[0xCD0 - 0xCC8];
     s32  nCD0;                  // 0xCD0  cleared per game (fn_800F2030)
     s32  aCD4[20];              // 0xCD4
     s32  nD24;                  // 0xD24  mode 12: a bonus meter, 0..100
@@ -417,12 +419,13 @@ typedef struct PlayerProfile {
 LAYOUT_ASSERT(PlayerProfile, 0x40);
 
 // A course's records (the 'rcrd' stream block, Session_OnRecordsLoaded; 0x320 bytes per course).
+// Like the all-time records (recA): 8 kinds, the top 5 of each (fn_800D8458 reads them).
+// GameEffects compares kind 0's best with a player's strokes + 1, and kind 2's with three times
+// Player.fA64.
 typedef struct CourseRecord {
-    s32  n0;                    // 0x000  compared with a player's strokes + 1 (GameEffects)
-    u8   unk4[0xC8 - 0x4];
-    s32  nC8;                   // 0x0C8  compared with three times Player.fA64 (GameEffects)
-    u8   unkCC[0x320 - 0xCC];
+    RecordEntry aRecord[8][5];  // 0x000
 } CourseRecord;
+LAYOUT_ASSERT(CourseRecord, 0x320);
 
 #define NUM_COURSE_RECORDS 21   // 0xF00..0x50A0 of the session
 
@@ -530,9 +533,9 @@ typedef struct GameState {
     void (*pfnEndGame)(void);   // 0x1F4  game finished. TW06: EndGame
     u8   (*pfn1F8)(int nPlayer); // 0x1F8  fn_800DCB10 returns its answer
     u8   (*pfn1FC)(int nPlayer); // 0x1FC  asked before the special ball pick-up
-    void (*pfn200)(void);       // 0x200
-    void (*pfn204)(void);       // 0x204
-    void (*pfn208)(void);       // 0x208
+    s32  (*pfn200)(int nPlayer); // 0x200  strokes behind the leader. TW06: GetCurrentLead
+    s32  (*pfn204)(int nPlayer); // 0x204  the same if this putt drops. TW06: GetPotentialLead
+    s32  (*pfn208)(int nPlayer); // 0x208
     void (*pfn20C)(int nPlayer); // 0x20C  called as a swing begins (state 1)
     void (*pfn210)(int nPlayer); // 0x210  the hole is over, the game is not
     void (*pfn214)(void);       // 0x214
@@ -593,6 +596,7 @@ typedef struct GameState {
     s32  n290;                  // 0x290
     s32  n294;                  // 0x294
 } GameState;
+LAYOUT_ASSERT(GameState, 0x298);
 
 // An authored aim point. pDef points at its position and the up-to-ten other points a golfer
 // standing in its zone may aim at; the bytes are filters and requirements (negative = at most).
@@ -639,6 +643,8 @@ int  fn_801006F0(int nPlayer);          // club override, 26 = none
 int  fn_80015464(void);
 u8   fn_80101DF4(void);
 f32  Swing_SpinScale(int nSpin);         // how much spin SPIN allows: 0.15 at 0 .. 1.0 at 110 (Swing.c)
+f32  fn_8005C280(int nPlayer);          // the swing's fNonPowerShotPower (Swing.c)
+void Swing_RumbleOff(int nPlayer);      // stops the pad rumble (Swing.c)
 
 u8   Club_UsableForKind(int nPlayer, int nClub, int nKind);
 int  AI_FirstUsableClub(int nPlayer, int nKind);

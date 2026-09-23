@@ -173,15 +173,30 @@ def ub_check(path, lines):
     import subprocess, tempfile
     cc = ROOT / 'build/compilers/GC/2.5/mwcceppc.exe'
     with tempfile.TemporaryDirectory() as tmp:
-        out = subprocess.run([str(cc)] + CFLAGS + ['-c', str(path.resolve()), '-o', tmp + '/x.o'],
-                             cwd=ROOT, capture_output=True, text=True)
+        out = subprocess.run([str(cc)] + CFLAGS + ['-maxerrors', '1000', '-c', str(path.resolve()),
+                             '-o', tmp + '/x.o'], cwd=ROOT, capture_output=True, text=True)
     hits = []
-    if out.returncode:
+    # With -w all, a call to a function with no declaration in scope (an implicit declaration: the
+    # compiler assumes `int f()`) is an error, not a warning. It is reported as ub-no-prototype at
+    # the call, once per function (later calls see the implicit declaration), and the file is still
+    # read to the end, so the warning checks below keep working.
+    err, implicit = [], set()
+    for l in (out.stdout + out.stderr).splitlines():
+        m = re.match(r'(.*?):(\d+): (?!warning:)(.*)', l)
+        if not m:
+            continue
+        if m.group(3).startswith('function has no prototype') and pathlib.Path(m.group(1)).name == path.name:
+            i = int(m.group(2))
+            src = lines[i - 1] if i <= len(lines) else ''
+            implicit.add(i)
+            if 'fake match' not in src:
+                hits.append((i, 'ub-no-prototype', 'implicit declaration: ' + src.strip()))
+        else:
+            err.append(m)
+    if out.returncode and (err or not implicit):
         # The checks below read compiler warnings; a file that does not compile here gives none,
         # so a failure must be a finding, not a silent pass.
-        err = [l for l in (out.stdout + out.stderr).splitlines()
-               if re.match(r'.*?:\d+: ', l) and ': warning:' not in l]
-        m = re.match(r'(.*?):(\d+): (.*)', err[0]) if err else None
+        m = err[0] if err else None
         hits.append((int(m.group(2)) if m and pathlib.Path(m.group(1)).name == path.name else 1,
                      'compile-error', m.group(3) if m else 'the compiler failed on this file'))
         return hits
@@ -190,7 +205,7 @@ def ub_check(path, lines):
     with tempfile.TemporaryDirectory() as tmp:
         rp = subprocess.run([str(cc)] + CFLAGS + ['-requireprotos', '-maxerrors', '1000', '-c',
                             str(path.resolve()), '-o', tmp + '/x.o'], cwd=ROOT, capture_output=True, text=True)
-    seen = set()
+    seen = set(implicit)
     for l in (rp.stdout + rp.stderr).splitlines():
         m = re.match(r'(.*?):(\d+):(?: warning:)? function has no prototype', l)
         if not m or pathlib.Path(m.group(1)).name != path.name:
@@ -259,7 +274,7 @@ def main():
             continue
         hits = lint(f, protos)
         if changed is not None:     # file-level checks (line 1) count only if line 1 changed too
-            hits = [h for h in hits if h[0] in changed[f.name]]
+            hits = [h for h in hits if h[0] in changed[f.name] or h[1] == 'compile-error']
         total += len(hits)
         if '--summary' in sys.argv:
             if hits:

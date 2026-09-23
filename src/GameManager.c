@@ -18,7 +18,6 @@ void  fn_800D8D38(int nPlayer);
 u8    fn_800E0A90(int nPlayer);
 void  fn_800D439C(int nPlayer, int a);
 void  fn_800D9834(int nPlayer);
-u8    fn_8012591C(void);
 void  fn_8011989C(int nPlayer, int nStrokes);
 void  GM_GolferConcede_Hole(int nPlayer);
 void  GM_EndOfGolferTurn_HoleFinished(int nPlayer);
@@ -37,11 +36,7 @@ void  GM_CheckBallForUIHints(int nPlayer);
 u8    fn_8008AC40(void);
 void  fn_800D9350(int nPlayer);
 void  fn_800BB0A8(void);
-void  fn_800335F8(int a);
 void  fn_8006C4C0(int nPlayer);
-
-f32   fn_800336E4(void);
-f32   fn_800336F4(void);
 
 u8    GM_bIsZoomButtonPressed(int nPlayer);
 u8    GM_bIsElevatorCamButtonPressed(int nPlayer);
@@ -55,8 +50,12 @@ u8    fn_800BB1F8(int nPlayer);
 int   GM_vGetAllTimeRecordsHeld(SaveProfile* pProfile);
 f32   GM_GetBonusProgress(SaveProfile* pProfile);
 
-extern s32 lbl_80189528[14];
-extern s32 lbl_801894D0[6];
+// fake match: stands in for a function the original linker stripped. The file's pool starts with
+// 1.0f (0x802845C0), before every constant the functions below use first (only the progress
+// counters near the end load it); its body is unknown.
+static f32 GameManager_StrippedFn(f32 x) {
+    return x + 1.0f;
+}
 
 void fn_800DCAD8(void) {
     fn_800E58B4(50);
@@ -248,10 +247,10 @@ void GM_EndOfGolferTurn_GameFinished(int nPlayer) {
     int nView;
     EVENT_Trigger(nPlayer, 5, 0, -1);
     gpGame->b28E = 1;
-    fn_80125910(0);
+    EASBio_SetCurrentGameWon(0);
     gpGame->pfnEndGame();
-    if (fn_8012591C() && gSession.a8[0] == 0) {
-        fn_80125854(1);
+    if (EASBio_IsCurrentGameWon() && gSession.a8[0] == 0) {
+        EASBio_IncrementGamesWon(1);
     }
     if (gpGame->b273) {
         for (i = 0; i < gNumPlayersSetUp; i++) {
@@ -298,15 +297,16 @@ u8 GM_CheckForAIConcede(int nPlayer) {
     u8  bConcede = 0;
     int i;
     if (Player_IsCPU(nPlayer)) {
-        Player* p = &gPlayers[nPlayer];
-        if (p->ball.nLie != LIE_INCUP_e) {
-            if (p->nLevel > 2) {
+        if (gPlayers[nPlayer].ball.nLie != LIE_INCUP_e) {
+            if (gPlayers[nPlayer].nLevel > 2) {
                 bConcede = 1;
             } else {
                 for (i = 0; i < gSession.nNumPlayers; i++) {
                     if (i == nPlayer) break;
-                    if (gPlayers[i].ball.nLie == LIE_GREEN_e && p->ball.nLie != LIE_GREEN_e &&
-                        p->nStrokes[gpGame->nCurHole] > gPlayers[i].nStrokes[gpGame->nCurHole] + 3) {
+                    if (gPlayers[(u32)i].ball.nLie == LIE_GREEN_e &&
+                        gPlayers[nPlayer].ball.nLie != LIE_GREEN_e &&
+                        gPlayers[nPlayer].nStrokes[gpGame->nCurHole] >
+                            gPlayers[(u32)i].nStrokes[gpGame->nCurHole] + 3) {
                         bConcede = 1;
                     }
                 }
@@ -347,7 +347,6 @@ u8 GM_CheckForBallOOB(int nPlayer) {
     u8           bOut  = fn_800E2B40(nPlayer, pBall);
     SurfaceType* pSurf = Ter_GetSupportingWorldMaterial(gPlayers[nPlayer].ball.pCourse, pBall->vPos);
     u8           bDrop;
-    Player*      p;
 
     if (pSurf == NULL) {
         bOut  = 1;
@@ -362,19 +361,18 @@ u8 GM_CheckForBallOOB(int nPlayer) {
         gPlayers[nPlayer].ball.nState = 0;
         if (bOut || (bDrop && (pSurf->u34 & 2))) {
             gPlayers[nPlayer].bLowIQPenalty = 1;
-            p = &gPlayers[nPlayer];
-            p->nLevel++;
-            p->nStrokes[gpGame->nCurHole]++;
-            if (p->nClub == CLUB_PUTTER_e) {
-                p->nPutts[gpGame->nCurHole]++;
+            gPlayers[nPlayer].nLevel++;
+            gPlayers[nPlayer].nStrokes[gpGame->nCurHole]++;
+            if (gPlayers[nPlayer].nClub == CLUB_PUTTER_e) {
+                gPlayers[nPlayer].nPutts[gpGame->nCurHole]++;
             }
             if (fn_800EE470()) {
-                fn_8011989C(nPlayer, p->nStrokes[gpGame->nCurHole]);
+                fn_8011989C(nPlayer, gPlayers[nPlayer].nStrokes[gpGame->nCurHole]);
             }
             if (Game_GetMode() == 8 || Game_GetMode() == 7) {
                 return 1;
             }
-            if (gpGame->bStrokeLimit && p->nStrokes[gpGame->nCurHole] >= 10) {
+            if (gpGame->bStrokeLimit && gPlayers[nPlayer].nStrokes[gpGame->nCurHole] >= 10) {
                 if (fn_800EE470()) {
                     fn_8011989C(nPlayer, 10);
                 }
@@ -534,8 +532,7 @@ void GM_PlayerTookShot(int nPlayer) {
 // shot is undone: effects stopped, the mode told, the golfer back in the Swing state, and the views
 // of other players sharing this screen (and still playing the hole) updated.
 u8 GM_PlayerTakeMulligan(int nPlayer) {
-    int     i;
-    Player* q;
+    int i;
     if (fn_800E177C() == 0) {
         return 0;
     }
@@ -568,9 +565,10 @@ u8 GM_PlayerTakeMulligan(int nPlayer) {
     GOLFERSTATE_Switch(GS_SWING, nPlayer);
     fn_800E3D38(nPlayer, 1);
     fn_80016CFC(gPlayers[nPlayer].nView[0])->bFlagOut = 1;
-    for (i = 0, q = gPlayers; i < gSession.nNumPlayers; i++, q++) {
-        if (q->bPlayerCut == 0 && q->nView[0] == gPlayers[nPlayer].nView[0] &&
-            q->ball.nLie != 10 && q->ball.nLie != LIE_GREEN_e && q->ball.nLie != LIE_INCUP_e) {
+    for (i = 0; i < gSession.nNumPlayers; i++) {
+        if (gPlayers[i].bPlayerCut == 0 && gPlayers[i].nView[0] == gPlayers[nPlayer].nView[0] &&
+            gPlayers[i].ball.nLie != 10 && gPlayers[i].ball.nLie != LIE_GREEN_e &&
+            gPlayers[i].ball.nLie != LIE_INCUP_e) {
             fn_80016CFC(gPlayers[nPlayer].nView[0])->bFlagOut = 0;
         }
     }
@@ -664,8 +662,7 @@ int GM_ShowPostShotAnimation(int nPlayer) {
             fHigh = fHighA;
             pSurf = pSurfA;
         } else {
-            fHigh = fabsf(fHighB - gPlayers[nPlayer].vBall[1]);
-            if (fabsf(fHighA - gPlayers[nPlayer].vBall[1]) < fHigh) {
+            if (fabsf(fHighA - gPlayers[nPlayer].vBall[1]) < fabsf(fHighB - gPlayers[nPlayer].vBall[1])) {
                 fHigh = fHighA;
                 pSurf = pSurfA;
             } else {
@@ -869,16 +866,13 @@ void GM_GolferConcede_Hole(int nPlayer) {
 void GM_MovePlayerToBall(int nPlayer) {
     f32         fLow;
     f32         fHigh;
-    Player*     p     = &gPlayers[nPlayer];
-    Ball*       pBall = &p->ball;
-    f32*        pPos  = p->vBall;
     CourseInfo* pCourse;
     f32         f;
-    Vec3Copy(pBall->vPos, pPos);
-    Vec_Copy(pBall->vPos, p->vPreShot);
+    Vec3Copy(gPlayers[nPlayer].ball.vPos, gPlayers[nPlayer].vBall);
+    Vec_Copy(gPlayers[nPlayer].ball.vPos, gPlayers[nPlayer].vPreShot);
     pCourse = fn_8000C594();
     if (pCourse) {
-        Ter_GetEnclosingGroundHeight(pCourse, pPos, &fLow, &fHigh);
+        Ter_GetEnclosingGroundHeight(pCourse, gPlayers[nPlayer].vBall, &fLow, &fHigh);
         f = fHigh;
         if (-65536.125f == f || f > 0.25f + gPlayers[nPlayer].vBall[1]) {
             f = fLow;
@@ -1083,32 +1077,24 @@ int GM_ChooseRemoveBallState(int nPlayer) {
 // miss that came within 0.2 of the hole always does (animation 9). A scripted reaction (uFlags
 // bit 0) plays when the ball passes the saved distance instead.
 void GM_SimulateBallMovement(int nPlayer) {
-    int     nSteps = 0;
-    u64     t0;
-    int     nUpdates;
-    int     i;
-    f32     fBudget;
-    f32     fMs;
-    Player* p;
-    Ball*   pBall;
-    s32*    pState;
-    u64     t1;
-    u8      bReact;
-    u8      bOn;
-    f32     fDist;
-    u32*    pFlags;
-    u8*     pDone;
-    s32*    pLie;
+    int nSteps = 0;
+    u64 t0;
+    int nUpdates;
+    int i;
+    f32 fBudget;
+    f32 fMs;
+    u8  bReact;
+    u8  bOn;
+    f32 fDist;
+    int nResult;
 
     t0 = fn_800954A4(0);
     nUpdates = GameEffects_BallUpdatesThisFrame(nPlayer);
     if (gpGame->n294 != 0 && fn_800C71A4(fn_80017028(gPlayers[nPlayer].nView[0]), nPlayer)) {
         nUpdates = 0;
     }
-    p = &gPlayers[nPlayer];
-    pBall = &p->ball;
     for (i = 0; i < nUpdates; i++) {
-        Physics_Simulate(pBall, 20);
+        Physics_Simulate(&gPlayers[nPlayer].ball, 20);
     }
     fMs = 1000.0f * fn_8006E118(fn_800954A4(0), t0);
     fBudget = 0.83f - fMs;
@@ -1118,12 +1104,11 @@ void GM_SimulateBallMovement(int nPlayer) {
     if (gSession.nSplitScreen == 0 && gSession.fFrameTime > 0.0f) {
         Ball_SetSimulating(1);
         fn_80050D2C(1);
-        pBall = &p->ballBefore;
-        pState = &p->ballBefore.nState;
-        while (*pState != 1 && *pState != 5 && *pState != 0 && fBudget > 0.1f) {
-            t1 = fn_800954A4(0);
-            Physics_Simulate(pBall, 20);
-            fMs = 1000.0f * fn_8006E118(fn_800954A4(0), t1);
+        while (gPlayers[nPlayer].ballBefore.nState != 1 && gPlayers[nPlayer].ballBefore.nState != 5 &&
+               gPlayers[nPlayer].ballBefore.nState != 0 && fBudget > 0.1f) {
+            t0 = fn_800954A4(0);
+            Physics_Simulate(&gPlayers[nPlayer].ballBefore, 20);
+            fMs = 1000.0f * fn_8006E118(fn_800954A4(0), t0);
             nSteps++;
             fBudget -= fMs;
             if (fn_8008AC40()) {
@@ -1133,7 +1118,8 @@ void GM_SimulateBallMovement(int nPlayer) {
                     fBudget = 0.0f;
                 }
             }
-            if (*pState == 1 || *pState == 5 || *pState == 0) {
+            if (gPlayers[nPlayer].ballBefore.nState == 1 || gPlayers[nPlayer].ballBefore.nState == 5 ||
+                gPlayers[nPlayer].ballBefore.nState == 0) {
                 if (!(gPlayers[nPlayer].uFlags & 8)) {
                     EVENT_Trigger(nPlayer, 0x3C, 0, -1);
                     fn_8006B2C4(nPlayer, 1);
@@ -1144,32 +1130,32 @@ void GM_SimulateBallMovement(int nPlayer) {
         fn_80050D2C(0);
         Ball_SetSimulating(0);
         if (fn_800BB1F8(nPlayer)) {
-            bReact = (u32)(fn_8006AA9C(nPlayer) - 8) <= 1;
-            bOn    = fn_800E27A8();
-            fDist  = fn_800D0478(nPlayer);
+            nResult = fn_8006AA9C(nPlayer);
+            bReact  = nResult == 8 || nResult == 9;
+            bOn     = fn_800E27A8();
+            fDist   = fn_800D0478(nPlayer);
             if (bOn) {
-                pFlags = &gPlayers[nPlayer].uFlags;
-                if (*pFlags & 1) {
-                    if ((*pFlags & 4) && fDist < gPlayers[nPlayer].fEEC) {
+                if (gPlayers[nPlayer].uFlags & 1) {
+                    if ((gPlayers[nPlayer].uFlags & 4) && fDist < gPlayers[nPlayer].fEEC) {
                         fn_80095744(gPlayers[nPlayer].pChar, 9);
                     }
                 } else if (bReact) {
-                    pDone = &gPlayers[nPlayer].bRehearsalDone;
-                    if (!*pDone && fDist < 5.5f && fDist > 2.0f &&
+                    if (!gPlayers[nPlayer].bRehearsalDone && fDist < 5.5f && fDist > 2.0f &&
                         fDist - gPlayers[nPlayer].ball.fClosest < 0.3f) {
-                        pLie = &gPlayers[nPlayer].ballBefore.nLie;
-                        if (*pLie == LIE_INCUP_e && Hole_ScoreAfterTapIn(nPlayer) <= 0) {
+                        if (gPlayers[nPlayer].ballBefore.nLie == LIE_INCUP_e &&
+                            Hole_ScoreAfterTapIn(nPlayer) <= 0) {
                             if (Rand_Next(1) % 100 < 50) {
-                                *pFlags |= 4;
+                                gPlayers[nPlayer].uFlags |= 4;
                                 gPlayers[nPlayer].fEEC = fDist;
                                 fn_80095744(gPlayers[nPlayer].pChar, 9);
                             }
-                        } else if (*pLie != LIE_INCUP_e && gPlayers[nPlayer].ballBefore.fClosest < 0.2f) {
-                            *pFlags |= 4;
+                        } else if (gPlayers[nPlayer].ballBefore.nLie != LIE_INCUP_e &&
+                                   gPlayers[nPlayer].ballBefore.fClosest < 0.2f) {
+                            gPlayers[nPlayer].uFlags |= 4;
                             gPlayers[nPlayer].fEEC = fDist;
                             fn_80095744(gPlayers[nPlayer].pChar, 9);
                         }
-                        *pDone = 1;
+                        gPlayers[nPlayer].bRehearsalDone = 1;
                     }
                 }
             }
@@ -1349,7 +1335,7 @@ f32 GM_GetGameProgress(SaveProfile* pProfile) {
         }
     }
     for (i = 0; i < 31; i++) {
-        if (pProfile->aC8[i].b) {
+        if (pProfile->aC8[i].award.bWon) {
             f += 1.0f;
         }
     }

@@ -178,9 +178,8 @@ static int ReverbHIModify(AXFX_REVHI_WORK* rv, f32 coloration, f32 time, f32 mix
 }
 
 const static double i2fMagic = 4503601774854144.0;
-const static f32 value1_0 = 1.0f;
-const static f32 value0_3 = 0.3f;
 const static f32 value0_6 = 0.6f;
+const static f32 value0_3 = 0.3f;
 
 asm static void DoCrossTalk(register s32* l, register s32* r, register f32 cross, register f32 invcross) {
     nofralloc
@@ -195,8 +194,8 @@ asm static void DoCrossTalk(register s32* l, register s32* r, register f32 cross
 	stw r5, 32(r1)
 	ps_merge00 f3, invcross, cross
 	ps_merge00 f4, cross, invcross
-	lis r5, value1_0@ha
-	lfs f5, value1_0@l(r5)
+	lis r5, value0_6@ha
+	lfs f5, value0_6@l(r5)
 	li r5, 79
 	mtctr r5
 	li r10, -8

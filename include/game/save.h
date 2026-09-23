@@ -46,27 +46,87 @@ typedef struct SavedRound {
 
 #define NUM_SAVED_ROUNDS 3      // the setup's loop count
 
+// A PGA TOUR tournament won, in a save profile (8 bytes): filled in when the player finishes first
+// (GameModeDriverPGATour fn_800EEA3C).
+typedef struct TourWin {
+    Award award;                // 0x0  won, and the day (fn_800D7770)
+    u16  nScore;                // 0x4  the player's score (fn_801191D0, as SeasonEvent.nUserScore)
+    s16  n6;                    // 0x6  the tournament's aPrize[bracket][1]
+} TourWin;
+
+// PGA TOUR statistics (0x58 bytes): counted for the current tournament round in lbl_80205ED8
+// (GameModeDriverPGATour.c) and added to the profile's career totals as each round ends (fn_800EED0C).
+typedef struct TourStats {
+    u16  n0;                    // 0x00  tournaments started (the round counted was a first round)
+    u16  n2;                    // 0x02  rounds played
+    u16  n4;                    // 0x04  the career keeps the highest
+    u16  n6;                    // 0x06
+    s32  n8;                    // 0x08
+    u16  nC;                    // 0x0C  the career keeps the highest
+    u16  nE;                    // 0x0E
+    u16  n10;                   // 0x10
+    u16  n12;                   // 0x12
+    u16  n14;                   // 0x14
+    u16  n16;                   // 0x16
+    u16  n18;                   // 0x18
+    u16  n1A;                   // 0x1A
+    u16  n1C;                   // 0x1C
+    u16  n1E;                   // 0x1E
+    u16  n20;                   // 0x20
+    u16  n22;                   // 0x22
+    u16  n24;                   // 0x24
+    u16  n26;                   // 0x26
+    u16  n28;                   // 0x28
+    u16  n2A;                   // 0x2A
+    u16  n2C;                   // 0x2C
+    u16  n2E;                   // 0x2E
+    u16  n30;                   // 0x30
+    u16  n32;                   // 0x32
+    u16  n34;                   // 0x34
+    u16  n36;                   // 0x36
+    u16  n38;                   // 0x38
+    u16  n3A;                   // 0x3A
+    u16  n3C;                   // 0x3C
+    u8   unk3E[2];
+    s32  n40;                   // 0x40
+    s32  n44;                   // 0x44
+    u16  n48;                   // 0x48
+    u8   n4A;                   // 0x4A
+    u8   unk4B[5];
+    s32  n50;                   // 0x50
+    u16  n54;                   // 0x54
+    u8   unk56[2];
+} TourStats;
+LAYOUT_ASSERT(TourStats, 0x58);
+
 // One save profile (0x10600 bytes).
 typedef struct SaveProfile {
     u8   bActive;               // 0x00000  1: the slot holds a profile; payouts are scaled and awards given only then
     char szName[0x1C - 0x1];    // 0x00001  the profile's name, compared with the record holders'
     u8   aGolferUnlocked[30];   // 0x0001C  per golfer (fn_80058278 sets, fn_8005832C tests)
     u8   aCourseUnlocked[23];   // 0x0003A  per course
-    u8   aRewardUnlocked[0x70 - 0x51];  // 0x00051  per reward (fn_80058428 sets); the
+    u8   aRewardUnlocked[0x64 - 0x51];  // 0x00051  per reward (fn_80058428 sets); the
                                 //          "THEKITCHENSINK" code (0x80056568) sets the first 18
+    s32  n64;                   // 0x00064  money: every payout is added (fn_800D3548); a course unlocks
+                                //          when it reaches the course's price (fn_800D3A20)
+    u8   unk68[4];
+    s32  n6C;                   // 0x0006C  money: every payout is added here too (fn_800D3548)
     u8   b70;                   // 0x00070  set when an award is won, a round is counted or a challenge
                                 //          starts; cleared when a round is set up (GameRound.c)
     u8   unk71[3];
     s32  n74;                   // 0x00074  stroke-play rounds counted
     s32  n78;                   // 0x00078  their strokes
     s32  n7C;                   // 0x0007C  full rounds counted
-    u8   unk80[0xA8 - 0x80];
+    u8   unk80[8];
+    s32  n88;                   // 0x00088  drives counted (the tee shot of a par 4 or 5 off class-1
+                                //          ground; fn_800D8FE4)
+    s32  n8C;                   // 0x0008C  their distance together
+    u8   unk90[0xA0 - 0x90];
+    s32  nA0;                   // 0x000A0  the longest of those drives
+    s32  nA4;                   // 0x000A4  the longest putt, in feet (fn_800D8FE4)
     s32  nA8;                   // 0x000A8  the best stroke-play round (0: none yet)
     u8   unkAC[0xC8 - 0xAC];
-    struct {
-        u8 b;                   //          1: the tournament is won (fn_800F02A8)
-        u8 unk1[7];
-    } aC8[31];                  // 0x000C8  one per PGA TOUR tournament
+    TourWin aC8[31];            // 0x000C8  one per PGA TOUR tournament
     struct {
         u8 b;
         u8 unk1[3];
@@ -88,7 +148,9 @@ typedef struct SaveProfile {
     u16  aMedalDate[29];        // 0x051E4  the day each was earned (fn_800D2994)
     u8   unk521E[0x5230 - 0x521E];
     SavedRound aSavedRound[NUM_SAVED_ROUNDS];   // 0x05230
-    u8   unk5380[0x54C2 - 0x5380];
+    GolferRecord createdGolfer; // 0x05380  the created golfer's record (fn_80077A80: golfers
+                                //          from FIRST_CREATED_GOLFER on are read here)
+    u8   unk54C0[0x54C2 - 0x54C0];
     // The created golfer kept in this slot (golfer FIRST_CREATED_GOLFER + the slot), copied into
     // the session's PlayerProfile by Golfer.c.
     u8   n54C2;                 // 0x054C2  -> PlayerProfile.unk2
@@ -96,11 +158,29 @@ typedef struct SaveProfile {
     char szGolferNames[6][8];   // 0x054C8  -> PlayerProfile.szNames
     u8   nGolferOutfit;         // 0x054F8  -> PlayerProfile.nOutfit
     u8   nGolferBallType;       // 0x054F9  -> PlayerProfile.nBallType
-    u8   unk54FA[0xB634 - 0x54FA];
+    u8   unk54FA[0xB054 - 0x54FA];
+    // Four bit arrays with a bit per Create-A-Player asset (0x80057F18's loop over them all, which
+    // also clears aB344 and aB4BC; fn_8001E9CC tests a bit).
+    u32  aAssetLocked[94];      // 0x0B054  the asset was locked (fn_80078008) when last checked
+    u32  aB1CC[94];             // 0x0B1CC  set where fn_80105C0C gives 0; an asset of lock kind 0
+                                //          stays locked until the bit its fn_80105610 names is set
+    u32  aB344[94];             // 0x0B344
+    u32  aB4BC[94];             // 0x0B4BC
     TourSeason tour;            // 0x0B634
-    u8   unkBA9C[0x104C8 - 0xBA9C];
+    u8   unkBA9C[0xF66C - 0xBA9C];
+    TourStats tourStats;        // 0x0F66C  the career totals
+    u8   unkF6C4[0x104C8 - 0xF6C4];
     u16  n104C8;                // 0x104C8  counts the tournaments started
-    u8   unk104CA[0x10578 - 0x104CA];
+    u8   unk104CA[2];
+    u16  n104CC;                // 0x104CC  a run of tour rounds, counted on each 18th hole
+                                //          (fn_800EF2B8); reset to 0 when the run breaks
+    u8   unk104CE[0x1054C - 0x104CE];
+    struct {
+        u8  b;
+        u8  unk1;
+        s16 n;
+    } a1054C[11];               // 0x1054C  cleared by the profile setup; fn_80078008's lock kinds
+                                //          10 and 11 read them
     u8   a10578[4];             // 0x10578  marked holes 71..74: fn_800588F4's kind 0
     s32  a1057C[4];             // 0x1057C  and kind 1
     u8   unk1058C[0x10600 - 0x1058C];
@@ -109,9 +189,16 @@ LAYOUT_ASSERT(SaveProfile, 0x10600);
 
 extern SaveProfile* gpSaveData;
 extern SaveProfile* lbl_80281DF4;       // unlocks that hold for every profile (the cheat codes set them)
+extern u32 lbl_801D5948[8];             // a bit array the code at 0x80056480 keeps; fn_80078008's lock
+                                        // kind 6 tests bits 1..5 of it
+extern s32 lbl_80189528[14];            // the golfers GM_GetGameProgress counts as unlockable
+extern s32 lbl_801894D0[6];             // the courses GM_GetGameProgress counts as unlockable
+
+// GameManager.c: the profile's completion score (fn_800D439C raises the TOUR card level with it)
+f32  GM_GetGameProgress(SaveProfile* pProfile);
 
 // Earnings.c: the awards
-s32  fn_800D7770(int nPlayer, Award* pAward);   // mark an award won today; 1 if it was not won before
+u8   fn_800D7770(int nPlayer, Award* pAward);   // mark an award won today; 1 if it was not won before
 
 // 0x800588F4: marked hole i's kind-0 byte (a5004/a10578) or kind-1 value (a504C/a1057C); -1 for
 // another kind.

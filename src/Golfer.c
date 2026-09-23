@@ -8,6 +8,7 @@
 #include "game.h"
 #include "engine.h"
 #include "game/save.h"
+#include "frontend/fe.h"
 
 // fake match: the (s8) on GOLFERSTATE_GetCurrentState (see game.h).
 
@@ -75,12 +76,13 @@ int Shot_GoverningAttribute(int nPlayer, int nClub, int nLie, int nKind) {
 int Golfer_GetAttribute(Player* pPlayer, int nAttr, int nMode) {
     int nValue = 0;
     if (nMode == ATTR_BASE || nMode == ATTR_TOTAL) {
+        // fake match: the (s8) casts on the s8 record values keep the original's extsb before the add
         if (Controller_IsCPU(pPlayer->nController) && pPlayer->golfer.nIndex < FIRST_CREATED_GOLFER &&
             (Game_GetMode() == 4 || (gSession.uFlags & 2))) {
             nValue =
-                (s8)((s32)pPlayer->golfer.attrAlt[nAttr] + Golfer_TierBonus(pPlayer->golfer.tier[nAttr]));
+                (s8)((s8)pPlayer->golfer.attrAlt[nAttr] + Golfer_TierBonus(pPlayer->golfer.tier[nAttr]));
         } else {
-            nValue = (s8)((s32)pPlayer->golfer.attr[nAttr] + Golfer_TierBonus(pPlayer->golfer.tier[nAttr]));
+            nValue = (s8)((s8)pPlayer->golfer.attr[nAttr] + Golfer_TierBonus(pPlayer->golfer.tier[nAttr]));
         }
     }
     if (nMode == ATTR_MODIFIERS || nMode == ATTR_TOTAL) {
@@ -109,8 +111,9 @@ void Golfer_ClampModifiers(Player* pPlayer) {
 
 // ---- the CPU golfer ---------------------------------------------------------------------------
 
-f32 AI_Pow(f32 fBase, f32 fExp) {
-    return fn_8015F824(fBase, fExp);
+// The binary's only powf: the SDK's reverb effect (reverb_hi.c) calls this same function.
+f32 powf(f32 x, f32 y) {
+    return fn_8015F824(x, y);
 }
 
 // Pick where the CPU aims: the most demanding authored aim point it qualifies for. A human
@@ -179,9 +182,9 @@ void AI_ChooseTarget(int nPlayer) {
             if (Player_IsCPU(nPlayer)) {
                 // Low IQ makes the golfer think it is better than it is.
                 if (p->bLowIQPenalty) {
-                    nSkill += (int)(10.0f * (AI_Pow(fDumb, 2.0f) / 100.0f) / 100.0f);
+                    nSkill += (int)(10.0f * (powf(fDumb, 2.0f) / 100.0f) / 100.0f);
                 } else {
-                    nSkill += (int)(40.0f * (AI_Pow(fDumb, 2.0f) / 100.0f) / 100.0f);
+                    nSkill += (int)(40.0f * (powf(fDumb, 2.0f) / 100.0f) / 100.0f);
                 }
                 if ((s8)nSkill > 100) {
                     nSkill = 100;
@@ -1527,7 +1530,8 @@ u8 Player_IsController8(int nPlayer) {
 
 // Controllers 0..7 are pads; 8 is something else; 9 is the CPU.
 u8 Player_HasPad(int nPlayer) {
-    return gPlayers[nPlayer].nController <= 7;
+    if (gPlayers[nPlayer].nController <= 7) return 1;
+    return 0;
 }
 
 u8 Controller_IsPad(int nController) {
@@ -1535,7 +1539,8 @@ u8 Controller_IsPad(int nController) {
 }
 
 u8 Player_IsNotCPU(int nPlayer) {
-    return gPlayers[nPlayer].nController <= 8;
+    if (gPlayers[nPlayer].nController <= 8) return 1;
+    return 0;
 }
 
 u8 Controller_IsNotCPU(int nController) {
@@ -1791,7 +1796,7 @@ void Players_Reset(void) {
     int i;
     for (i = 0; i < gSession.nNumPlayers; i++) {
         GOLFERSTATE_Kill(i);
-        gPlayers[i].pChar = NULL;
+        PLAYER(i)->pChar = NULL;
     }
     gNumPlayersSetUp = 0;
 }
@@ -1821,7 +1826,6 @@ extern char gszEmpty[];             // 0x802810B8
 extern char lbl_80187650[];         // "cl_bbsd" ... the default name at +0x1A
 
 void fn_800CB700(char* pDst, char* pSrc);       // string copy
-u8   fn_80077B18(void);
 
 // Options_SetDefaults(): the defaults, then the debug "all 105" variant when session flag
 // 0x4000 is set.
@@ -1951,7 +1955,7 @@ void Session_SetupProfiles(void) {
             fn_800CB700(pProf->szNames[0], lbl_80187650 + 0x1A);
             pProf->n2        = 0;
             pProf->nBallType = 0;
-        } else if (fn_80077B18()) {
+        } else if (fn_80077B18(nGolfer)) {
             pProf->n2        = 0;
             pProf->nBallType = 0;
         } else {

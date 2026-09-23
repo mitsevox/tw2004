@@ -405,5 +405,5 @@ void fn_800F5A14(int nPlayer, int nId) {
 }
 
 void fn_800F5A88(void) {
-    fn_80125910(1);
+    EASBio_SetCurrentGameWon(1);
 }

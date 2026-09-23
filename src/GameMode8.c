@@ -7,6 +7,7 @@
 #include "game.h"
 #include "engine.h"
 #include "game/save.h"
+#include "frontend/fe.h"
 
 // fake match: the (s8) on GOLFERSTATE_GetCurrentState and the (u8) on GOLFERSTATE_Set's player (see game.h).
 
@@ -63,7 +64,6 @@ extern SGLog lbl_802120F8[100];
 extern s32 lbl_802823CC;
 extern u8  lbl_802823C8;
 u8    fn_800A7720(void);
-extern u8  lbl_801D7148[];                  // per profile slot: nonzero to show the profile's name
 void  fn_800FE190(f32* pA, f32* pB, f32* pOut);
 // The run's pace (fCB4): a button press adds lbl_802816B0; it falls by lbl_802816B4 a frame, or
 // lbl_802816C0 once the button has not been pressed for lbl_802816C4 seconds; it stays within
@@ -395,7 +395,7 @@ void fn_800FA3AC(void) {
     gPlayers[1].nC6C[Game_CurHoleIndex()] = gPlayers[1].nC44;
 }
 
-// Game finished: in stroke play fn_800FA4B8's totals (thrown away too), then fn_80125910(1).
+// Game finished: in stroke play fn_800FA4B8's totals (thrown away too), then EASBio_SetCurrentGameWon(1).
 void fn_800FA410(void) {
     if (gpGame->n4 == 0) {
         fn_800FA4B8(0);
@@ -404,10 +404,10 @@ void fn_800FA410(void) {
         }
         if (gNumPlayersSetUp == 1) {
             if (gPlayers[0].nC44 > 0) {
-                fn_80125910(1);
+                EASBio_SetCurrentGameWon(1);
             }
         } else {
-            fn_80125910(1);
+            EASBio_SetCurrentGameWon(1);
         }
     }
 }
@@ -1561,14 +1561,14 @@ s32 fn_800FD8D0(char* szName1, s32* pPoints1, char* szName2, s32* pPoints2) {
     int nHole = Game_CurHoleIndex();
     int nProfile;
     nProfile = gPlayers[0].nIndex;
-    if (!lbl_801D7148[nProfile]) {
+    if (!lbl_801D7148.aLoaded[nProfile]) {
         sprintf(sz, "User %d", nProfile + 1);
         strcpy(szName1, sz);
     } else {
         strcpy(szName1, gpSaveData[nProfile].szName);
     }
     nProfile = gPlayers[1].nIndex;
-    if (!lbl_801D7148[nProfile]) {
+    if (!lbl_801D7148.aLoaded[nProfile]) {
         sprintf(sz, "User %d", nProfile + 1);
         strcpy(szName2, sz);
     } else {

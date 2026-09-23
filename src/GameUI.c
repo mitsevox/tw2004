@@ -10,6 +10,64 @@ void  fn_8006A8B0(void);
 
 void  fn_800E3E0C(void);
 
+// GameUI.c's data (declared in game.h), defined last address first: CodeWarrior lays each section
+// out in reverse order of definition.
+UIQueueItem lbl_802030BC[UI_QUEUE_LEN];
+UIQueueItem lbl_80203044[UI_QUEUE_LEN];
+UIQueueItem lbl_80202FCC[UI_QUEUE_LEN];
+UIQueueItem lbl_80202F54[UI_QUEUE_LEN];
+UIQueueItem lbl_80202EDC[UI_QUEUE_LEN];
+UIQueueItem lbl_80202E64[UI_QUEUE_LEN];
+UIQueueItem lbl_80202DEC[UI_QUEUE_LEN];
+UIQueueItem lbl_80202D74[UI_QUEUE_LEN];
+UIQueueItem lbl_80202CFC[UI_QUEUE_LEN];
+UIQueueItem lbl_80202C84[UI_QUEUE_LEN];
+UIQueueItem lbl_80202C0C[UI_QUEUE_LEN];
+UIQueueItem lbl_80202B94[UI_QUEUE_LEN];
+u8          lbl_80202B88[9];    // only GameMessages.c uses it, but it lies in this file's .bss
+
+char lbl_80281640[8] = "";      // an empty string sent with message 0x53
+
+u8  lbl_802822DF;
+u8  lbl_802822DC[3];
+u8  lbl_802822DB;
+u8  lbl_802822DA;
+u8  lbl_802822D9;
+u8  lbl_802822D8;
+u8  lbl_802822D7;
+u8  lbl_802822D6;
+u8  lbl_802822D5;
+u8  lbl_802822D4;
+u32 lbl_802822D0;
+u32 lbl_802822CC;
+u32 lbl_802822C8;
+u8  lbl_802822C4;
+u8  lbl_802822C3;
+u8  lbl_802822C2;
+u8  lbl_802822C1;
+u8  lbl_802822C0;
+u8  lbl_802822BF;
+u8  lbl_802822BE;
+u8  lbl_802822BD;
+u8  lbl_802822BC;
+s32 lbl_802822B8;
+s32 lbl_802822B4;
+s32 lbl_802822B0;
+s32 lbl_802822AC;
+s32 lbl_802822A8;
+s32 lbl_802822A4;
+s32 lbl_802822A0;
+s32 lbl_8028229C;
+s32 lbl_80282298;
+s32 lbl_80282294;
+s32 lbl_80282290;
+s32 lbl_8028228C;
+s32 lbl_80282288;
+s32 lbl_80282284;
+u8  lbl_80282282;
+u8  lbl_80282281;
+u8  lbl_80282280;
+
 // Clears every display flag and timer at the start of a round.
 void fn_800E3B28(void) {
     lbl_802822DF = 0;
@@ -67,10 +125,7 @@ u8    fn_80127004(void);
         (q)[i].n8 = c;       \
     }
 
-extern char lbl_80281640[8];
-
 void  fn_80095444(int a);
-void  fn_80125814(int a);
 void  fn_800A7350(int a);
 
 void fn_800E3BEC(void) {
@@ -167,7 +222,7 @@ void fn_800E3E3C(void) {
         lbl_802822DF = 1;
         gSession.nPaused = 1;
         fn_800DC9D4(1);
-        fn_80125814(0);
+        EASBio_SetGamePlayState(0);
         if (fn_800EC550()) {
             fn_800ECBE4();
         }
@@ -198,7 +253,7 @@ void fn_800E3EE0(void) {
             gSession.nPaused = 0;
             fn_800DC9D4(0);
             fn_800A7350(0);
-            fn_80125814(1);
+            EASBio_SetGamePlayState(1);
         }
         fn_8009EF98();
         if (gSession.bReplay && Game_GetMode() != 11 && Game_GetMode() != 10) {

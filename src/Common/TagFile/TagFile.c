@@ -133,7 +133,7 @@ int  SFIOSetDescriptor(void* pDescriptor);
 void SFIOPlatformCall80172F48(const ChecksumInterface** ppInterface);
 // Host memory functions (CodeWarrior side).
 extern void* TibExtMemAlloc(void* pAllocator, u32 uSize, u32 uAlign, const char* pFile, int uLine);
-extern void  fn_80122128(void* pAllocator, void* p, u32 uSize, u32 uAlign);
+extern void  TibExtMemFree(void* pAllocator, void* p, u32 uSize, u32 uAlign);
 
 int TagFile_AllocBuffer(void** ppBuffer, void* pAllocator, u32 uSize, int eType);
 int TagFile_FreeBuffer(void* pBuffer, void* pAllocator, u32 uSize, int eType);
@@ -614,14 +614,14 @@ int TagFile_Shutdown(void) {
     if (eError != 0) {
         return eError;
     }
-    fn_80122128(_TagFile_pData->pAllocator, _TagFile_pData->Map.pList, _TagFile_pData->Map.uMaxEntries * sizeof(TagMapEntry), 4);
+    TibExtMemFree(_TagFile_pData->pAllocator, _TagFile_pData->Map.pList, _TagFile_pData->Map.uMaxEntries * sizeof(TagMapEntry), 4);
     _TagFile_pData->Map.pList = NULL;
     if (_TagFile_pData->pCipher != NULL) {
         eCipherError = _TagFile_pData->pCipher->pfnShutdown();
         if (eCipherError != 0) {
             return TagFile_CipherError(eCipherError);
         }
-        fn_80122128(_TagFile_pData->pAllocator, _TagFile_pData->pKey, _TagFile_pData->uKeyLen, 4);
+        TibExtMemFree(_TagFile_pData->pAllocator, _TagFile_pData->pKey, _TagFile_pData->uKeyLen, 4);
         _TagFile_pData->pKey = NULL;
     }
     _TagFile_pData->pCipher = NULL;
@@ -634,7 +634,7 @@ int TagFile_Shutdown(void) {
     if (eSFIOError != 0) {
         return TagFile_SFIOError(eSFIOError);
     }
-    fn_80122128(_TagFile_pData->pAllocator, _TagFile_pData, sizeof(TagFileData), 4);
+    TibExtMemFree(_TagFile_pData->pAllocator, _TagFile_pData, sizeof(TagFileData), 4);
     _TagFile_pData = NULL;
     return 0;
 }
@@ -972,7 +972,7 @@ int TagFile_FreeBuffer(void* pBuffer, void* pAllocator, u32 uSize, int eType) {
     // produces.
     if (TRUE) {
         pBuffer = (u8*)pBuffer - TAG_BUFFERSIZE;
-        fn_80122128(pAllocator, pBuffer, uTotal, uAlignAddr);
+        TibExtMemFree(pAllocator, pBuffer, uTotal, uAlignAddr);
         pBuffer = NULL;
         return 0;
     } else {

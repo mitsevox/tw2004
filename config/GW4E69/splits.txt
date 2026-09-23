@@ -591,17 +591,8 @@ GoDynamicCam.c:
 unsorted/sweep_8003DC78.c:
 	.text       start:0x8003DC78 end:0x8003DCAC
 
-unsorted/sweep_80043920.c:
-	.text       start:0x80043920 end:0x800439E4
-
-unsorted/sweep_80044AA8.c:
-	.text       start:0x80044AA8 end:0x80044B0C
-
-unsorted/sweep_80044E2C.c:
-	.text       start:0x80044E2C end:0x80044E74
-
-unsorted/sweep_80044E74.c:
-	.text       start:0x80044E74 end:0x80044EA8
+gocamscripts.c:
+	.text       start:0x8003DCE8 end:0x800453C8
 
 unsorted/sweep_80045470.c:
 	.text       start:0x80045470 end:0x80045494
@@ -1133,6 +1124,12 @@ unsorted/sweep_80076F58.c:
 
 FE_Manager.c:
 	.text       start:0x80076F80 end:0x80079E44
+	.rodata     start:0x80183858 end:0x80183870
+	.data       start:0x80189560 end:0x801896F0
+	.bss        start:0x801D7148 end:0x801D77A8
+	.sdata      start:0x80281208 end:0x802812A0
+	.sbss       start:0x80281EC8 end:0x80281ED8
+	.sdata2     start:0x80283AC0 end:0x80283AD8
 
 unsorted/sweep_80079E44.c:
 	.text       start:0x80079E44 end:0x80079E6C
@@ -1942,10 +1939,11 @@ unsorted/sweep_80092C38.c:
 	.text       start:0x80092C38 end:0x80092CE8
 
 uiTransform.c:
-	.text       start:0x80092F8C end:0x8009349C
-
-unsorted/sweep_800934F8.c:
-	.text       start:0x800934F8 end:0x80093524
+	.text       start:0x80092CE8 end:0x80093524
+	.data       start:0x80189CA0 end:0x80189CB0
+	.bss        start:0x801D91F0 end:0x801D9278
+	.sbss       start:0x80281F38 end:0x80281F40
+	.sdata2     start:0x80283C20 end:0x80283C40
 
 unsorted/sweep_80093824.c:
 	.text       start:0x80093824 end:0x80093854
@@ -1998,20 +1996,8 @@ unsorted/sweep_800957B0.c:
 unsorted/sweep_800957D8.c:
 	.text       start:0x800957D8 end:0x800957FC
 
-unsorted/sweep_800958EC.c:
-	.text       start:0x800958EC end:0x800958F8
-
-unsorted/sweep_800962F8.c:
-	.text       start:0x800962F8 end:0x80096338
-
-unsorted/sweep_8009637C.c:
-	.text       start:0x8009637C end:0x80096398
-
-unsorted/sweep_80096508.c:
-	.text       start:0x80096508 end:0x80096530
-
 CharAnim.c:
-	.text       start:0x800965DC end:0x80096690
+	.text       start:0x800957FC end:0x80097208
 
 GoShaderObjectCommon_MorphAnimManager_Gc.c:
 	.text       start:0x80097208 end:0x800975B0
@@ -2092,19 +2078,10 @@ GoGreenGrid.c:
 	.text       start:0x8009B630 end:0x8009C914
 
 MC_Gc.c:
-	.text       start:0x8009CC00 end:0x8009F6A0
-
-unsorted/sweep_8009F780.c:
-	.text       start:0x8009F780 end:0x8009F7E4
-
-unsorted/sweep_8009F7E4.c:
-	.text       start:0x8009F7E4 end:0x8009F7E8
-
-unsorted/sweep_8009F834.c:
-	.text       start:0x8009F834 end:0x8009F850
+	.text       start:0x8009CB9C end:0x8009F850
 
 MC.c:
-	.text       start:0x8009FAD0 end:0x800A233C
+	.text       start:0x8009F850 end:0x800A233C
 
 unsorted/sweep_800A2604.c:
 	.text       start:0x800A2604 end:0x800A2614
@@ -2450,6 +2427,10 @@ unsorted/sweep_800AF31C.c:
 
 startUp.c:
 	.text       start:0x800AF324 end:0x800B1A40
+	.data       start:0x8018FE98 end:0x8018FF68
+	.sdata      start:0x80281498 end:0x802814A8
+	.sbss       start:0x802820E8 end:0x80282158
+	.sdata2     start:0x80284070 end:0x802840B0
 
 unsorted/sweep_800B1A88.c:
 	.text       start:0x800B1A88 end:0x800B1A9C
@@ -2681,6 +2662,12 @@ unsorted/sweep_800BD83C.c:
 
 GoGolfCam.c:
 	.text       start:0x800BD894 end:0x800C7480
+	.rodata     start:0x80184C78 end:0x80184D20
+	.data       start:0x80191308 end:0x80191440
+	.bss        start:0x801FA1E8 end:0x801FA1F8
+	.sdata      start:0x80281520 end:0x80281528
+	.sbss       start:0x80282220 end:0x80282228
+	.sdata2     start:0x802842C0 end:0x802843B8
 
 GoBreakLine.c:
 	.text       start:0x800C808C end:0x800C9310
@@ -2776,18 +2763,31 @@ GameEffects.c:
 
 GameManager.c:
 	.text       start:0x800DCAD8 end:0x800E0AF0
+	.rodata     start:0x80184D30 end:0x80184D40
+	.data       start:0x80192010 end:0x80192030
+	.sdata2     start:0x802845C0 end:0x80284610
 
 GameRound.c:
 	.text       start:0x800E0AF0 end:0x800E3B28
+	.data       start:0x80192030 end:0x80192558
+	.bss        start:0x802028F0 end:0x80202B88
+	.sdata      start:0x80281588 end:0x80281640
+	.sbss       start:0x80282270 end:0x80282280
+	.sdata2     start:0x80284610 end:0x80284628
 
 GameUI.c:
 	.text       start:0x800E3B28 end:0x800E4FFC
 	.rodata     start:0x80184D90 end:0x80184DA0
 	.data       start:0x80192558 end:0x80192588
+	.bss        start:0x80202B88 end:0x80203138
+	.sdata      start:0x80281640 end:0x80281648
+	.sbss       start:0x80282280 end:0x802822E0
 	.sdata2     start:0x80284628 end:0x80284630
 
 GameMessages.c:
 	.text       start:0x800E4FFC end:0x800E5E54
+	.bss        start:0x80203138 end:0x80203148
+	.sbss       start:0x802822E0 end:0x802822E8
 	.sdata2     start:0x80284630 end:0x80284638
 
 GameAnalysis.c:
@@ -2826,6 +2826,10 @@ GameMode9.c:
 
 GameModeDriverPGATour.c:
 	.text       start:0x800EDD18 end:0x800F0448
+	.data       start:0x801926A8 end:0x80192810
+	.bss        start:0x80205ED8 end:0x8020CF90
+	.sdata      start:0x80281670 end:0x80281680
+	.sbss       start:0x80282338 end:0x80282348
 
 GameModeDriverRTE.c:
 	.text       start:0x800F0448 end:0x800F125C
@@ -3156,98 +3160,8 @@ unsorted/sweep_801174B8.c:
 unsorted/sweep_801174E4.c:
 	.text       start:0x801174E4 end:0x80117510
 
-unsorted/sweep_80117628.c:
-	.text       start:0x80117628 end:0x8011763C
-
-unsorted/sweep_8011766C.c:
-	.text       start:0x8011766C end:0x80117694
-
-unsorted/sweep_80117694.c:
-	.text       start:0x80117694 end:0x801176C0
-
-unsorted/sweep_80117DE0.c:
-	.text       start:0x80117DE0 end:0x80117DE8
-
-unsorted/sweep_80117DE8.c:
-	.text       start:0x80117DE8 end:0x80117DF0
-
-unsorted/sweep_80118A4C.c:
-	.text       start:0x80118A4C end:0x80118A5C
-
-unsorted/sweep_80118F10.c:
-	.text       start:0x80118F10 end:0x80118F60
-
-unsorted/sweep_80119028.c:
-	.text       start:0x80119028 end:0x8011903C
-
-unsorted/sweep_80119118.c:
-	.text       start:0x80119118 end:0x8011913C
-
-unsorted/sweep_8011913C.c:
-	.text       start:0x8011913C end:0x801191D0
-
-unsorted/sweep_801197A4.c:
-	.text       start:0x801197A4 end:0x80119808
-
-unsorted/sweep_801198F8.c:
-	.text       start:0x801198F8 end:0x80119934
-
-unsorted/sweep_80119A04.c:
-	.text       start:0x80119A04 end:0x80119A50
-
-unsorted/sweep_8011A6F4.c:
-	.text       start:0x8011A6F4 end:0x8011A720
-
-unsorted/sweep_8011A85C.c:
-	.text       start:0x8011A85C end:0x8011A890
-
-unsorted/sweep_8011ABF8.c:
-	.text       start:0x8011ABF8 end:0x8011AC40
-
-unsorted/sweep_8011AEC8.c:
-	.text       start:0x8011AEC8 end:0x8011AF14
-
-unsorted/sweep_8011AF14.c:
-	.text       start:0x8011AF14 end:0x8011AF60
-
-unsorted/sweep_8011B00C.c:
-	.text       start:0x8011B00C end:0x8011B048
-
-unsorted/sweep_8011B048.c:
-	.text       start:0x8011B048 end:0x8011B094
-
-unsorted/sweep_8011B100.c:
-	.text       start:0x8011B100 end:0x8011B13C
-
-unsorted/sweep_8011B13C.c:
-	.text       start:0x8011B13C end:0x8011B160
-
-unsorted/sweep_8011B160.c:
-	.text       start:0x8011B160 end:0x8011B1AC
-
-unsorted/sweep_8011B1AC.c:
-	.text       start:0x8011B1AC end:0x8011B1DC
-
-unsorted/sweep_8011B234.c:
-	.text       start:0x8011B234 end:0x8011B264
-
-unsorted/sweep_8011B2C4.c:
-	.text       start:0x8011B2C4 end:0x8011B384
-
-unsorted/sweep_8011B384.c:
-	.text       start:0x8011B384 end:0x8011B3B8
-
-unsorted/sweep_8011B3B8.c:
-	.text       start:0x8011B3B8 end:0x8011B538
-
-unsorted/sweep_8011B538.c:
-	.text       start:0x8011B538 end:0x8011B56C
-
-unsorted/sweep_8011B56C.c:
-	.text       start:0x8011B56C end:0x8011B5FC
-
-unsorted/sweep_8011C054.c:
-	.text       start:0x8011C054 end:0x8011C068
+PGATourSimulation.c:
+	.text       start:0x80117600 end:0x8011C068
 
 SkinMorph.c:
 	.text       start:0x8011C27C end:0x8011CADC
@@ -3483,32 +3397,8 @@ unsorted/sweep_8012CC48.c:
 unsorted/sweep_8012CCC0.c:
 	.text       start:0x8012CCC0 end:0x8012CCD8
 
-unsorted/sweep_8012D0D4.c:
-	.text       start:0x8012D0D4 end:0x8012D1A0
-
-unsorted/sweep_8012D744.c:
-	.text       start:0x8012D744 end:0x8012D794
-
-unsorted/sweep_8012D7F0.c:
-	.text       start:0x8012D7F0 end:0x8012D7F8
-
-unsorted/sweep_8012DD24.c:
-	.text       start:0x8012DD24 end:0x8012DD7C
-
-unsorted/sweep_8012DDE0.c:
-	.text       start:0x8012DDE0 end:0x8012DE38
-
-unsorted/sweep_8012DE38.c:
-	.text       start:0x8012DE38 end:0x8012DE90
-
-unsorted/sweep_8012E818.c:
-	.text       start:0x8012E818 end:0x8012E820
-
-unsorted/sweep_8012E820.c:
-	.text       start:0x8012E820 end:0x8012E8A8
-
-unsorted/sweep_8012E8A8.c:
-	.text       start:0x8012E8A8 end:0x8012E950
+EASB.c:
+	.text       start:0x8012CCD8 end:0x8012E950
 
 src/vi/vi.c:
 	.text       start:0x8012E950 end:0x8013042C
@@ -3544,24 +3434,29 @@ dolphin/ar/ar.c:
 
 libs/dolphin/src/ar/arq.c:
 	.text       start:0x8013538C end:0x80135810
+	.data       start:0x80195DE8 end:0x80195E30
+	.sdata      start:0x802819E0 end:0x802819E8
+	.sbss       start:0x80282660 end:0x80282690
 
 src/ax/AX.c:
 	.text       start:0x80135810 end:0x8013584C
+	.data       start:0x80195E30 end:0x80195E78
+	.sdata      start:0x802819E8 end:0x802819F0
 
 src/ax/AXAlloc.c:
 	.text       start:0x8013584C end:0x80135BE0
+	.bss        start:0x80261460 end:0x80261560
+	.sbss       start:0x80282690 end:0x80282698
 
 src/ax/AXAux.c:
-	.text       start:0x80135BE0 end:0x80136058
-
-unsorted/sweep_80136058.c:
-	.text       start:0x80136058 end:0x80136064
-
-unsorted/sweep_80136064.c:
-	.text       start:0x80136064 end:0x8013606C
+	.text       start:0x80135BE0 end:0x80136064
+	.bss        start:0x80261560 end:0x80264260
+	.sbss       start:0x80282698 end:0x802826D0
 
 src/ax/AXCL.c:
-	.text       start:0x8013606C end:0x80136790
+	.text       start:0x80136064 end:0x80136790
+	.bss        start:0x80264260 end:0x80264860
+	.sbss       start:0x802826D0 end:0x802826E8
 
 unsorted/sweep_80136980.c:
 	.text       start:0x80136980 end:0x8013698C
@@ -3570,10 +3465,12 @@ unsorted/sweep_801369E4.c:
 	.text       start:0x801369E4 end:0x801369F0
 
 unsorted/sweep_80136DF4.c:
-	.text       start:0x80136DF4 end:0x80136E08
+	.text       start:0x80136DF4 end:0x80136DFC
 
 src/ax/AXSPB.c:
-	.text       start:0x80136E08 end:0x801372C0
+	.text       start:0x80136DFC end:0x801372C0
+	.bss        start:0x80269080 end:0x802690C0
+	.sbss       start:0x80282708 end:0x80282730
 
 unsorted/sweep_801372C0.c:
 	.text       start:0x801372C0 end:0x801372C8
@@ -3586,9 +3483,12 @@ src/dolphin/ax/AXVPB.c:
 
 src/ax/AXProf.c:
 	.text       start:0x80138184 end:0x801381CC
+	.sbss       start:0x80282740 end:0x80282750
 
 src/axfx/reverb_hi.c:
 	.text       start:0x801381CC end:0x80138EC8
+	.data       start:0x801998C0 end:0x801998E0
+	.sdata2     start:0x80284B68 end:0x80284BA8
 
 src/axfx/delay.c:
 	.text       start:0x80138EC8 end:0x80139374
@@ -3623,6 +3523,9 @@ dolphin/dvd/dvdlow.c:
 
 dolphin/dvd/dvdfs.c:
 	.text       start:0x8013AF10 end:0x8013B3C4
+	.data       start:0x80199AB8 end:0x80199BB8
+	.sdata      start:0x80281A10 end:0x80281A18
+	.sbss       start:0x802827C0 end:0x802827E0
 
 unsorted/sweep_8013B3C4.c:
 	.text       start:0x8013B3C4 end:0x8013B3C8
@@ -3644,9 +3547,14 @@ dolphin/dvd/dvdidutils.c:
 
 src/dvd/dvdFatal.c:
 	.text       start:0x8013E13C end:0x8013E16C
+	.sbss       start:0x80282830 end:0x80282838
 
 dolphin/dvd/fstload.c:
 	.text       start:0x8013E16C end:0x8013E3AC
+	.data       start:0x80199D80 end:0x80199DF0
+	.bss        start:0x8027A658 end:0x8027A6C8
+	.sdata      start:0x80281A38 end:0x80281A48
+	.sbss       start:0x80282838 end:0x80282848
 
 dolphin/gx/GXInit.c:
 	.text       start:0x8013E3AC end:0x8013F57C
@@ -3664,6 +3572,8 @@ unsorted/sweep_8013FF30.c:
 
 dolphin/gx/GXAttr.c:
 	.text       start:0x8013FF38 end:0x801410A8
+	.data       start:0x80199F20 end:0x8019A080
+	.sdata      start:0x80281A50 end:0x80281A60
 
 dolphin/gx/GXMisc.c:
 	.text       start:0x801410A8 end:0x801415AC
@@ -3681,6 +3591,9 @@ dolphin/gx/GXLight.c:
 
 dolphin/gx/GXTexture.c:
 	.text       start:0x801427D0 end:0x80143768
+	.data       start:0x8019A170 end:0x8019A398
+	.sdata      start:0x80281A60 end:0x80281AA0
+	.sdata2     start:0x80284BD8 end:0x80284C00
 
 dolphin/gx/GXBump.c:
 	.text       start:0x80143768 end:0x80143AE0
@@ -3691,12 +3604,16 @@ dolphin/gx/GXTev.c:
 
 dolphin/gx/GXPixel.c:
 	.text       start:0x801442C4 end:0x80144898
+	.data       start:0x8019A410 end:0x8019A430
+	.sdata2     start:0x80284C00 end:0x80284C30
 
 dolphin/gx/GXStubs.c:
 	.text       start:0x80144898 end:0x8014489C
 
 src/gx/GXDisplayList.c:
 	.text       start:0x8014489C end:0x80144AA8
+	.bss        start:0x8027AC40 end:0x8027B160
+	.sbss       start:0x80282890 end:0x80282898
 
 src/gx/GXTransform.c:
 	.text       start:0x80144AA8 end:0x80145140
@@ -3710,12 +3627,19 @@ unsorted/sweep_80145B1C.c:
 
 dolphin/mtx/mtx.c:
 	.text       start:0x80147B94 end:0x80147DB0
+	.sdata      start:0x80281AA0 end:0x80281AA8
+	.sdata2     start:0x80284C48 end:0x80284C50
 
 dolphin/mtx/mtx44.c:
 	.text       start:0x80147DB0 end:0x80147E48
+	.sdata2     start:0x80284C50 end:0x80284C60
 
-src/dolphin/os/OS.c:
+dolphin/os/OS.c:
 	.text       start:0x80147E48 end:0x80148790
+	.data       start:0x8019B0E0 end:0x8019B2E8
+	.bss        start:0x8027C960 end:0x8027C9B0
+	.sdata      start:0x80281AA8 end:0x80281AB0
+	.sbss       start:0x802828A8 end:0x802828D8
 
 dolphin/os/OSAlarm.c:
 	.text       start:0x80148790 end:0x80148E40
@@ -3723,9 +3647,13 @@ dolphin/os/OSAlarm.c:
 
 src/os/OSAlloc.c:
 	.text       start:0x80148E40 end:0x80149150
+	.sdata      start:0x80281AB0 end:0x80281AB8
+	.sbss       start:0x802828E0 end:0x802828F0
 
 dolphin/os/OSArena.c:
 	.text       start:0x80149150 end:0x80149170
+	.sdata      start:0x80281AB8 end:0x80281AC0
+	.sbss       start:0x802828F0 end:0x802828F8
 
 dolphin/os/OSAudioSystem.c:
 	.text       start:0x80149170 end:0x80149404
@@ -3733,15 +3661,21 @@ dolphin/os/OSAudioSystem.c:
 
 dolphin/os/OSCache.c:
 	.text       start:0x80149404 end:0x8014983C
+	.data       start:0x8019B368 end:0x8019B598
 
 dolphin/os/OSContext.c:
 	.text       start:0x8014983C end:0x8014A0AC
+	.data       start:0x8019B598 end:0x8019B770
 
 dolphin/os/OSError.c:
 	.text       start:0x8014A0AC end:0x8014A758
+	.data       start:0x8019B770 end:0x8019BA90
+	.bss        start:0x8027C9B0 end:0x8027C9F8
+	.sdata      start:0x80281AC0 end:0x80281AC8
 
 src/os/OSFont.c:
 	.text       start:0x8014A758 end:0x8014A7B0
+	.sdata      start:0x80281AC8 end:0x80281AD0
 
 dolphin/os/OSInterrupt.c:
 	.text       start:0x8014A7B0 end:0x8014B01C
@@ -3818,6 +3752,8 @@ runtime/__va_arg.c:
 
 src/Runtime.PPCEABI.H/global_destructor_chain.c:
 	.text       start:0x80151A6C end:0x80151AB4
+	.dtors      start:0x8017DB40 end:0x8017DB44
+	.sbss       start:0x802829D8 end:0x802829E0
 
 runtime/runtime.c:
 	.text       start:0x80151AB4 end:0x801520F8
@@ -3825,15 +3761,23 @@ runtime/runtime.c:
 
 src/Runtime.PPCEABI.H/GCN_mem_alloc.c:
 	.text       start:0x801520F8 end:0x801521B0
+	.rodata     start:0x80184FE8 end:0x80185060
 
 src/MSL_C/PPCEABI/bare/H/abort_exit.c:
 	.text       start:0x801521B0 end:0x801522A0
+	.bss        start:0x8027D4C0 end:0x8027D5C0
+	.sbss       start:0x802829E0 end:0x802829F0
 
 src/MSL_C/PPCEABI/bare/H/alloc.c:
 	.text       start:0x801522A0 end:0x80152754
+	.rodata     start:0x80185060 end:0x80185078
+	.bss        start:0x8027D5C0 end:0x8027D5F8
+	.sbss       start:0x802829F0 end:0x802829F8
 
 src/MSL_C/PPCEABI/bare/H/ansi_files.c:
 	.text       start:0x80152754 end:0x8015286C
+	.data       start:0x8019C3E0 end:0x8019C520
+	.bss        start:0x8027D5F8 end:0x8027D8F8
 
 src/MSL_C/PPCEABI/bare/H/ansi_fp.c:
 	.text       start:0x801538EC end:0x80155BD0
@@ -3864,7 +3808,7 @@ runtime/mem.c:
 	.text       start:0x80156C78 end:0x80156DE8
 
 src/MSL_C/PPCEABI/bare/H/mem_funcs.c:
-	.text       start:0x80156DE8 end:0x80156F54
+	.text       start:0x80156DE8 end:0x801570B8
 
 runtime/misc_io.c:
 	.text       start:0x801570B8 end:0x801570C8
@@ -3878,18 +3822,19 @@ runtime/sscanf.c:
 
 src/MSL_C/PPCEABI/bare/H/string.c:
 	.text       start:0x8015A450 end:0x8015A8D0
+	.rodata     start:0x801851B0 end:0x80185540
+	.sdata      start:0x80281B10 end:0x80281B18
 
 src/MSL_C/strtold.c:
 	.text       start:0x8015A8D0 end:0x8015B8DC
 
 src/MSL_C/strtoul.c:
 	.text       start:0x8015B8DC end:0x8015C120
+	.data       start:0x8019CCC0 end:0x8019CD48
 
-unsorted/sweep_8015C120.c:
-	.text       start:0x8015C120 end:0x8015C128
-
-unsorted/sweep_8015C128.c:
-	.text       start:0x8015C128 end:0x8015C1F8
+runtime/uart_console_io.c:
+	.text       start:0x8015C120 end:0x8015C1F8
+	.sbss       start:0x80282A00 end:0x80282A08
 
 runtime/wchar_io.c:
 	.text       start:0x8015C1F8 end:0x8015C280
@@ -3917,6 +3862,8 @@ runtime/e_log.c:
 
 src/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common_Embedded/Math/Double_precision/e_pow.c:
 	.text       start:0x8015D03C end:0x8015D8F0
+	.rodata     start:0x80185588 end:0x801855B8
+	.sdata2     start:0x80284EB8 end:0x80284FC8
 
 runtime/e_rem_pio2.c:
 	.text       start:0x8015D8F0 end:0x8015DC90
@@ -3943,6 +3890,8 @@ runtime/k_tan.c:
 
 src/MSL_C/PPCEABI/bare/H/s_atan.c:
 	.text       start:0x8015EE8C end:0x8015F0A4
+	.rodata     start:0x801857F8 end:0x80185890
+	.sdata2     start:0x80285118 end:0x80285140
 
 runtime/s_copysign.c:
 	.text       start:0x8015F0A4 end:0x8015F0CC
@@ -3982,24 +3931,34 @@ MetroTRK/mainloop.c:
 
 MetroTRK/nubevent.c:
 	.text       start:0x8015F9C8 end:0x8015FBF0
+	.bss        start:0x8027D8F8 end:0x8027D920
 
 MetroTRK/nubinit.c:
 	.text       start:0x8015FBF0 end:0x8015FD88
+	.rodata     start:0x80185890 end:0x801858C0
+	.bss        start:0x8027D920 end:0x8027D928
 
 MetroTRK/msg.c:
 	.text       start:0x8015FD88 end:0x8015FDCC
+	.rodata     start:0x801858C0 end:0x801858E8
 
 MetroTRK/msgbuf.c:
-	.text       start:0x8015FDCC end:0x80160610
+	.text       start:0x8015FDCC end:0x80160608
+	.rodata     start:0x801858E8 end:0x80185908
+	.bss        start:0x8027D928 end:0x8027F2D8
 
 MetroTRK/serpoll.c:
-	.text       start:0x80160610 end:0x801608C0
+	.text       start:0x80160608 end:0x801608C0
+	.rodata     start:0x80185908 end:0x80185A98
+	.bss        start:0x8027F2D8 end:0x8027F2F0
 
 MetroTRK/usr_put.c:
 	.text       start:0x801608C0 end:0x8016094C
 
 MetroTRK/dispatch.c:
 	.text       start:0x8016094C end:0x80160AC4
+	.rodata     start:0x80185A98 end:0x80185AD8
+	.data       start:0x8019CD48 end:0x8019CDB8
 
 MetroTRK/msghndlr.c:
 	.text       start:0x80160AC4 end:0x80161A94
@@ -4023,11 +3982,11 @@ runtime/__mem.c:
 	.init       start:0x800033A8 end:0x800034E0
 
 MetroTRK/mem_TRK.c:
-	.init       start:0x80003510 end:0x80003534
-	.text       start:0x801622B0 end:0x80162378
+	.init       start:0x800034E0 end:0x80003534
+	.text       start:0x801622B0 end:0x80162368
 
 MetroTRK/targimpl.c:
-	.text       start:0x80162378 end:0x80163DD0
+	.text       start:0x80162368 end:0x80163DB0
 
 MetroTRK/mpc_7xx_603e.c:
 	.text       start:0x80163DD0 end:0x80164140
@@ -4041,6 +4000,8 @@ MetroTRK/dolphin_trk.c:
 
 MetroTRK/main_TRK.c:
 	.text       start:0x801643C8 end:0x80164420
+	.rodata     start:0x80185E00 end:0x80185E10
+	.bss        start:0x8027F880 end:0x8027F888
 
 src/TRK_MINNOW_DOLPHIN/dolphin_trk_glue.c:
 	.text       start:0x80164420 end:0x80164978
@@ -4053,6 +4014,7 @@ MetroTRK/targcont.c:
 
 MetroTRK/target_options.c:
 	.text       start:0x801649AC end:0x801649C8
+	.bss        start:0x8027F890 end:0x8027F898
 
 MetroTRK/mslsupp.c:
 	.text       start:0x801649C8 end:0x80164B40
@@ -4062,12 +4024,18 @@ MetroTRK/UDP_Stubs.c:
 
 MetroTRK/ddh/main.c:
 	.text       start:0x80164B88 end:0x80164ECC
+	.rodata     start:0x80185F18 end:0x80185FF8
+	.bss        start:0x8027F898 end:0x802800B8
+	.sbss       start:0x80282A18 end:0x80282A20
 
 MetroTRK/CircleBuffer.c:
 	.text       start:0x80164ECC end:0x80165134
 
 MetroTRK/gdev/main.c:
 	.text       start:0x80165134 end:0x80165480
+	.rodata     start:0x80185FF8 end:0x801860D8
+	.bss        start:0x802800B8 end:0x802805D8
+	.sbss       start:0x80282A20 end:0x80282A28
 
 MetroTRK/MWTrace.c:
 	.text       start:0x80165480 end:0x801654D0
@@ -4123,6 +4091,7 @@ Common/TagFile/TagFile.c:
 
 src/gba/GBA.c:
 	.text       start:0x80176270 end:0x80176280
+	.sbss       start:0x80282A38 end:0x80282A40
 
 src/card/CARDBios.c:
 	.text       start:0x80176A38 end:0x80177DA4

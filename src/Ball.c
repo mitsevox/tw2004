@@ -1,8 +1,9 @@
 // Ball.c (our name): the ball's flight and roll. No assert names this file (the leaked list's
-// PsBallFx.c is elsewhere). Units are yards and seconds; every constant below is a whole number
-// of inches (1/36 yd). The cup is real geometry (surface classes 12/18, surface type 90): the ball
-// is holed when it has dropped below the pin height. What is written up in docs/gameplay.md is
-// the near-cup pull below.
+// PsBallFx.c is elsewhere). Units are yards and seconds. Many constants are inches or miles per
+// hour converted to yards (INCHES, MPH): the original's float bits are exactly those quotients,
+// not the rounded decimals. The cup is real geometry (surface classes 12/18, surface type 90): the
+// ball is holed when it has dropped below the pin height. What is written up in docs/gameplay.md
+// is the near-cup pull below.
 
 #include "golfer.h"
 #include "physics.h"
@@ -10,46 +11,355 @@
 #include "game.h"
 #include "engine.h"
 
-#define BALL_RADIUS 0.0256667f      // 0.92 in (a real one is 0.84)
-#define CUP_DIAMETER 0.10717f       // 3.86 in (a real cup is 4.25)
+#define INCHES(x) ((x) / 36.0f)                  // inches to yards
+#define MPH(x)    ((x) * (1760.0f / 3600.0f))    // miles per hour to yards per second
+
+#define BALL_RADIUS  INCHES(0.924f)   // 1.1 x a real ball's 0.84 in
+#define CUP_DIAMETER 0.10717f         // 3.86 in (a real cup is 4.25)
 
 void   Ball_Stop(Ball* pBall);                   // 0x80054340
 void   fn_8000AE28(f32* pIn, f32 f, f32* pOut);  // scale a vector
 void   Ball_SetLie(Ball* pBall, SurfaceType* pSurface);
 void   Ball_Tick(Ball* pBall, f32 fTicks);
 void   Physics_FixBallHeight(Ball* pBall, u8 bSettle, f32 fTicks);
-// One club's distances for a shot kind: power 0.1, 0.2 .. 1.1 (fDist[9], full power, is "the
-// reach" AI_PowerScale divides by).
-typedef struct ClubRow {
-    f32  fDist[11];
-} ClubRow;
-
-u8     fn_80050DE4(int nKind, int nClub, int a, ClubRow** ppRow, s32* pSurface);
+u8     fn_80050DE4(int nKind, int nClub, int a, const ClubRow** ppRow, s32* pSurface);
 u8     Physics_GetShotData(Ball* pBall, int nClub, int nKind, f32 fPower, f32 fAim, int nTrajectory, f32* pA,
                            f32* pB, f32* pVel, f32* pSpin);
-extern f32     gPuttDist[23];                    // 0x80181604  putt distance at power 0, 0.05 .. 1.1
-extern f32     gPuttSpeedScale[5];               // 0x80181660  x by the green-speed setting
-extern ClubRow gClubRows1[25];                   // 0x80181674  full swing
-extern ClubRow gClubRows2[25];                   // 0x80181AC0  chip (wedges and putter only)
-extern ClubRow gClubRows3[25];                   // 0x80181F0C
-extern ClubRow gClubRows4[25];                   // 0x80182358
-extern ClubRow gClubRows5[25];                   // 0x801827A4
-extern ClubRow gClubRows6[25];                   // 0x80182BF0
-extern ClubRow gClubRows7[25];                   // 0x8018303C
-extern f32 gKindSpeed[8];                        // 0x80181328  launch speed x, per shot kind
-extern f32 gKindLoft[8];                         // 0x80181348  launch angle +, per shot kind (radians)
-extern f32 gKindSpin[8];                         // 0x80181368  spin x, per shot kind
-extern f32 gTrajLoft[3];                         // 0x80181388  -5, 0, +5 degrees
-extern f32 gClubSpeed[26];                       // 0x80181394  launch speed, per club
-extern f32 gClubLoft[26];                        // 0x801813FC  launch angle, per club (6 .. 60 degrees)
-extern s32 gClubStep[26];                        // 0x80181464  0 for the woods, then 1 .. 15
-extern f32 gChipLoft[26];                        // 0x801814CC  launch angle for a chip
-extern f32 gChipSpeed[26];                       // 0x80181534  launch speed for a chip
-extern f32 gClubSpin[26];                        // 0x8018159C  spin, per club
-extern f32 gTurfSpeedMul[5];                     // 0x80183488  by gTurfSpeed: 0.6 .. 1.4 (classes 2, 3, 4)
-extern f32 gGreenSpeedMul[3];                    // 0x8018349C  by options +0x18: 1.0 1.1 1.2 (class 3)
-extern f32 gFairwaySpeedMul[3];                  // 0x801834A8  by gFairwaySetting: 1.0 1.1 1.2 (class 2)
-extern f32 gRoughMul[3];                         // 0x801834B4  by options +0x1C: 1.3 1.0 0.7 (class 5)
+
+// ---- the club and shot tables (0x80181328 - 0x801834C0, in the original's order) -------------
+// Shot kinds are ShotType_t (0 putt, 1 full swing, 2 chip, 3 pitch, 4 punch, 5 flop; 6 and 7 are
+// unnamed); clubs are Club_t (0..24 the bag, 25 the putter). Speeds are launch speeds before
+// Physics_GetShotData's scaling, angles are in degrees (the values are exact as DEG(x)).
+
+// Per shot kind: launch speed x, launch angle +, spin x.
+const f32 gKindSpeed[8] = {
+    1.0f, 1.148f, 0.5f, 0.58f, 1.15f, 0.4f, 0.85f, 0.4f
+};
+const f32 gKindLoft[8] = {
+    0.0f, 0.0f, DEG(-4.0f), DEG(10.0f), DEG(-6.0f), DEG(17.0f), DEG(4.0f), DEG(26.0f)
+};
+const f32 gKindSpin[8] = {
+    1.0f, 1.0f, 1.0f, 1.0f, 1.5f, 0.01f, 1.0f, 1.0f
+};
+
+// The trajectory setting (low, normal, high) added to the launch angle.
+const f32 gTrajLoft[3] = {
+    DEG(-5.0f), 0.0f, DEG(5.0f)
+};
+
+// Per club: launch speed.
+const f32 gClubSpeed[CLUB_MAX_e] = {
+    0.5049f, 0.4977f, 0.4927f, 0.4902f, 0.4873f, 0.4845f, 0.449f, 0.415f, 0.392f,  // drivers 1-6, 3/5/7 wood
+    0.37f, 0.356f, 0.342f, 0.329f, 0.319f, 0.312f, 0.308f, 0.303f, 0.301f,         // irons 1-9
+    0.311f, 0.3343f, 0.3297f, 0.3284f, 0.324f, 0.3302f, 0.337f,                    // PW AW GW SW LBW LW HLW
+    0.0471f                                                                        // putter
+};
+
+// Per club: launch angle (the loft).
+const f32 gClubLoft[CLUB_MAX_e] = {
+    DEG(6.0f),    // driver 1
+    DEG(7.0f),    // driver 2
+    DEG(8.0f),    // driver 3
+    DEG(9.0f),    // driver 4
+    DEG(9.5f),    // driver 5
+    DEG(10.0f),   // driver 6
+    DEG(9.75f),   // 3 wood
+    DEG(11.5f),   // 5 wood
+    DEG(15.0f),   // 7 wood
+    DEG(16.25f),  // 1 iron
+    DEG(17.84f),  // 2 iron
+    DEG(19.46f),  // 3 iron
+    DEG(21.3f),   // 4 iron
+    DEG(23.3f),   // 5 iron
+    DEG(25.9f),   // 6 iron
+    DEG(28.7f),   // 7 iron
+    DEG(31.75f),  // 8 iron
+    DEG(34.75f),  // 9 iron
+    DEG(39.25f),  // pitching wedge
+    DEG(44.75f),  // approach wedge
+    DEG(48.5f),   // gap wedge
+    DEG(52.0f),   // sand wedge
+    DEG(54.0f),   // low-bounce wedge
+    DEG(57.0f),   // lob wedge
+    DEG(60.0f),   // high lob wedge
+    0.0f          // putter
+};
+
+// Per club: its step down the bag (a punch loses 0.01 speed and 0.8 degrees of loft per step; a
+// lie's lost speed comes back 1.25% per step).
+const s32 gClubStep[CLUB_MAX_e] = {
+    0, 0, 0, 0, 0, 0, 1, 2, 3,     // drivers 1-6, 3/5/7 wood
+    4, 5, 6, 7, 8, 9, 10, 11, 12,  // irons 1-9
+    13, 13, 13, 14, 14, 15, 15,    // PW AW GW SW LBW LW HLW
+    0                              // putter
+};
+
+// Per club: launch angle and speed for a chip (5 iron and up only).
+const f32 gChipLoft[CLUB_MAX_e] = {
+    0.0f,         // driver 1
+    0.0f,         // driver 2
+    0.0f,         // driver 3
+    0.0f,         // driver 4
+    0.0f,         // driver 5
+    0.0f,         // driver 6
+    0.0f,         // 3 wood
+    0.0f,         // 5 wood
+    0.0f,         // 7 wood
+    0.0f,         // 1 iron
+    0.0f,         // 2 iron
+    0.0f,         // 3 iron
+    0.0f,         // 4 iron
+    DEG(28.91f),  // 5 iron
+    DEG(31.83f),  // 6 iron
+    DEG(34.76f),  // 7 iron
+    DEG(38.42f),  // 8 iron
+    DEG(43.18f),  // 9 iron
+    DEG(45.99f),  // pitching wedge
+    DEG(46.16f),  // approach wedge
+    DEG(46.22f),  // gap wedge
+    DEG(50.34f),  // sand wedge
+    DEG(50.34f),  // low-bounce wedge
+    DEG(50.51f),  // lob wedge
+    DEG(50.57f),  // high lob wedge
+    0.0f          // putter
+};
+const f32 gChipSpeed[CLUB_MAX_e] = {
+    0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,            // drivers 1-6, 3/5/7 wood
+    0.0f, 0.0f, 0.0f, 0.0f, 0.169f, 0.175f, 0.182f, 0.193f, 0.211f,  // irons 1-9
+    0.224f, 0.225f, 0.225f, 0.247f, 0.247f, 0.248f, 0.248f,          // PW AW GW SW LBW LW HLW
+    0.0f                                                             // putter
+};
+
+// Per club: spin.
+const f32 gClubSpin[CLUB_MAX_e] = {
+    0.87f, 0.87f, 0.87f, 0.87f, 0.87f, 0.87f, 0.85f, 0.825f, 0.8f,  // drivers 1-6, 3/5/7 wood
+    0.84f, 0.76f, 0.69f, 0.63f, 0.58f, 0.54f, 0.5f, 0.46f, 0.43f,   // irons 1-9
+    0.36f, 0.31f, 0.25f, 0.21f, 0.2f, 0.15f, 0.11f,                 // PW AW GW SW LBW LW HLW
+    0.0f                                                            // putter
+};
+
+// Putt distance (yards, medium green) at power 0, 0.05 .. 1.1, and its scale by gTurfSpeed.
+const f32 gPuttDist[23] = {
+    0.0f, 0.11f, 0.43f, 0.97f, 1.73f, 2.71f, 3.91f, 5.32f, 6.96f, 8.81f, 10.88f, 13.09f,
+    15.59f, 18.3f, 21.24f, 24.39f, 27.77f, 31.35f, 35.16f, 39.19f, 43.43f, 47.75f, 52.42f
+};
+const f32 gPuttSpeedScale[5] = {
+    0.606f, 0.65f, 1.0f, 1.3f, 1.82f
+};
+
+// Carry by power (ClubRow), one table per shot kind 1..7 (fn_80050DE4).
+// Kind 1, the full swing.
+const ClubRow gClubRows1[25] = {
+    {{15.1f, 46.1f, 78.9f, 112.2f, 147.3f, 184.1f, 220.9f, 254.3f, 283.7f, 309.7f, 333.5f}},  // driver 1
+    {{14.8f, 45.6f, 78.7f, 112.7f, 148.6f, 186.0f, 221.8f, 254.6f, 282.7f, 307.8f, 331.4f}},  // driver 2
+    {{14.6f, 45.3f, 78.7f, 113.1f, 149.7f, 187.5f, 222.8f, 254.0f, 281.1f, 305.9f, 329.5f}},  // driver 3
+    {{14.4f, 45.3f, 79.0f, 114.3f, 151.6f, 189.3f, 223.5f, 253.5f, 279.6f, 304.1f, 327.7f}},  // driver 4
+    {{14.3f, 45.0f, 78.7f, 114.3f, 151.6f, 188.8f, 222.7f, 251.9f, 277.9f, 302.1f, 325.8f}},  // driver 5
+    {{14.2f, 44.6f, 78.4f, 114.2f, 151.4f, 188.5f, 221.8f, 250.3f, 276.0f, 299.8f, 324.3f}},  // driver 6
+    {{12.4f, 39.8f, 70.7f, 103.2f, 137.0f, 171.9f, 204.8f, 233.9f, 259.7f, 282.9f, 305.0f}},  // 3 wood
+    {{10.7f, 35.5f, 63.9f, 94.6f, 126.3f, 158.5f, 189.3f, 216.9f, 241.1f, 263.2f, 283.9f}},  // 5 wood
+    {{9.6f, 32.1f, 59.4f, 88.6f, 119.0f, 149.0f, 177.0f, 201.7f, 223.4f, 243.7f, 263.2f}},  // 7 wood
+    {{8.5f, 29.0f, 54.5f, 81.9f, 110.4f, 138.9f, 165.4f, 188.8f, 209.3f, 228.5f, 246.3f}},  // 1 iron
+    {{7.9f, 26.9f, 51.2f, 77.2f, 104.4f, 131.4f, 157.0f, 179.7f, 200.1f, 218.6f, 236.1f}},  // 2 iron
+    {{7.3f, 24.7f, 47.6f, 72.4f, 98.2f, 123.8f, 148.3f, 170.4f, 190.2f, 208.4f, 225.6f}},  // 3 iron
+    {{6.7f, 22.6f, 44.2f, 67.5f, 92.0f, 116.3f, 139.6f, 161.0f, 180.2f, 198.1f, 214.9f}},  // 4 iron
+    {{6.1f, 20.8f, 41.0f, 63.3f, 86.5f, 109.7f, 131.9f, 152.5f, 171.3f, 188.6f, 204.6f}},  // 5 iron
+    {{5.7f, 19.2f, 38.1f, 59.2f, 81.2f, 103.1f, 124.2f, 144.0f, 161.9f, 178.8f, 193.9f}},  // 6 iron
+    {{5.2f, 17.8f, 35.4f, 55.5f, 76.4f, 97.3f, 117.2f, 135.8f, 153.3f, 169.5f, 183.8f}},  // 7 iron
+    {{4.8f, 16.2f, 32.2f, 50.9f, 70.4f, 90.0f, 108.9f, 126.6f, 143.3f, 158.4f, 172.0f}},  // 8 iron
+    {{4.3f, 14.6f, 29.5f, 46.9f, 65.2f, 83.7f, 101.3f, 118.3f, 134.4f, 148.7f, 161.5f}},  // 9 iron
+    {{4.0f, 13.5f, 27.3f, 43.4f, 60.7f, 78.1f, 95.0f, 111.4f, 126.4f, 140.0f, 151.8f}},  // pitching wedge
+    {{3.6f, 12.5f, 25.4f, 40.5f, 56.6f, 72.9f, 89.2f, 104.1f, 117.9f, 130.1f, 139.8f}},  // approach wedge
+    {{2.9f, 10.4f, 21.3f, 34.3f, 48.6f, 63.3f, 78.5f, 92.9f, 106.9f, 120.0f, 131.6f}},  // gap wedge
+    {{2.4f, 8.7f, 17.7f, 29.3f, 41.8f, 55.2f, 69.3f, 83.0f, 96.5f, 109.9f, 122.4f}},  // sand wedge
+    {{2.1f, 7.6f, 15.6f, 25.9f, 37.2f, 49.5f, 62.0f, 75.1f, 87.6f, 100.1f, 111.8f}},  // low-bounce wedge
+    {{1.8f, 6.5f, 13.6f, 22.7f, 32.9f, 43.8f, 55.3f, 67.1f, 78.8f, 90.0f, 100.9f}},  // lob wedge
+    {{1.5f, 5.6f, 11.7f, 19.3f, 28.5f, 38.4f, 48.6f, 59.1f, 69.9f, 80.1f, 90.0f}}    // high lob wedge
+};
+// Kind 2, the chip: 5 iron and up (the rows before are -0.0 in the original).
+const ClubRow gClubRows2[25] = {
+    {{-0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f}},  // driver 1
+    {{-0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f}},  // driver 2
+    {{-0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f}},  // driver 3
+    {{-0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f}},  // driver 4
+    {{-0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f}},  // driver 5
+    {{-0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f}},  // driver 6
+    {{-0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f}},  // 3 wood
+    {{-0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f}},  // 5 wood
+    {{-0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f}},  // 7 wood
+    {{-0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f}},  // 1 iron
+    {{-0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f}},  // 2 iron
+    {{-0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f}},  // 3 iron
+    {{-0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f, -0.0f}},  // 4 iron
+    {{0.8f, 3.1f, 6.2f, 8.5f, 10.9f, 14.2f, 17.3f, 21.1f, 25.3f, 29.7f, 34.3f}},  // 5 iron
+    {{0.8f, 3.0f, 6.0f, 8.4f, 11.1f, 14.1f, 17.6f, 21.3f, 25.4f, 29.7f, 34.4f}},  // 6 iron
+    {{0.8f, 2.9f, 6.3f, 8.7f, 11.0f, 14.3f, 17.3f, 21.5f, 25.5f, 29.8f, 34.3f}},  // 7 iron
+    {{0.7f, 2.8f, 6.0f, 8.7f, 11.1f, 13.9f, 17.6f, 21.3f, 25.7f, 29.8f, 34.2f}},  // 8 iron
+    {{0.7f, 2.7f, 5.7f, 8.4f, 11.1f, 14.1f, 17.6f, 21.7f, 25.6f, 29.8f, 34.3f}},  // 9 iron
+    {{0.7f, 2.6f, 5.5f, 8.6f, 11.3f, 14.2f, 17.7f, 21.4f, 25.8f, 29.7f, 34.5f}},  // pitching wedge
+    {{0.7f, 2.6f, 5.5f, 8.6f, 11.2f, 14.1f, 17.7f, 21.5f, 25.8f, 29.8f, 34.5f}},  // approach wedge
+    {{0.7f, 2.6f, 5.5f, 8.5f, 11.3f, 14.1f, 17.7f, 21.4f, 25.8f, 29.7f, 34.5f}},  // gap wedge
+    {{0.7f, 2.5f, 5.2f, 7.9f, 11.2f, 14.4f, 17.4f, 21.4f, 25.4f, 29.8f, 34.0f}},  // sand wedge
+    {{0.7f, 2.5f, 5.2f, 8.0f, 11.2f, 14.4f, 17.4f, 21.4f, 25.4f, 29.8f, 34.0f}},  // low-bounce wedge
+    {{0.6f, 2.4f, 5.1f, 7.9f, 11.2f, 14.4f, 17.4f, 21.4f, 25.4f, 29.9f, 34.0f}},  // lob wedge
+    {{0.6f, 2.4f, 5.1f, 7.9f, 11.1f, 14.4f, 17.4f, 21.4f, 25.3f, 29.8f, 34.1f}}   // high lob wedge
+};
+// Kind 3, the pitch.
+const ClubRow gClubRows3[25] = {
+    {{4.5f, 15.2f, 30.7f, 48.2f, 66.6f, 85.9f, 105.6f, 125.4f, 144.8f, 163.0f, 179.7f}},  // driver 1
+    {{4.3f, 14.7f, 29.7f, 47.1f, 65.1f, 84.0f, 103.4f, 122.7f, 141.6f, 159.3f, 175.5f}},  // driver 2
+    {{4.3f, 14.4f, 29.0f, 45.9f, 63.9f, 82.5f, 101.6f, 120.6f, 139.0f, 156.2f, 171.9f}},  // driver 3
+    {{4.2f, 14.1f, 28.6f, 45.3f, 63.1f, 81.5f, 100.5f, 119.1f, 137.2f, 153.9f, 169.1f}},  // driver 4
+    {{4.1f, 13.9f, 28.1f, 44.7f, 62.4f, 80.6f, 99.3f, 117.7f, 135.6f, 152.1f, 167.1f}},  // driver 5
+    {{4.0f, 13.5f, 27.7f, 44.1f, 61.6f, 79.7f, 98.2f, 116.5f, 133.9f, 150.2f, 164.9f}},  // driver 6
+    {{3.6f, 11.9f, 24.4f, 39.3f, 55.3f, 71.8f, 88.8f, 106.0f, 122.9f, 138.8f, 153.8f}},  // 3 wood
+    {{3.1f, 10.1f, 20.8f, 34.0f, 48.3f, 63.2f, 78.6f, 94.2f, 109.7f, 124.5f, 138.6f}},  // 5 wood
+    {{2.6f, 8.7f, 17.9f, 29.3f, 42.2f, 55.7f, 69.8f, 83.8f, 97.8f, 111.4f, 124.1f}},  // 7 wood
+    {{2.2f, 7.7f, 15.9f, 26.1f, 37.7f, 50.2f, 63.0f, 76.0f, 89.1f, 101.6f, 113.7f}},  // 1 iron
+    {{2.0f, 7.0f, 14.2f, 23.6f, 34.4f, 46.1f, 58.1f, 70.3f, 82.6f, 94.5f, 106.2f}},  // 2 iron
+    {{1.8f, 6.3f, 12.8f, 21.3f, 31.2f, 41.8f, 53.2f, 64.6f, 76.0f, 87.4f, 98.6f}},  // 3 iron
+    {{1.6f, 5.7f, 11.5f, 19.2f, 28.0f, 37.8f, 48.2f, 58.8f, 69.5f, 80.3f, 90.9f}},  // 4 iron
+    {{1.4f, 5.1f, 10.3f, 17.3f, 25.3f, 34.3f, 43.8f, 53.7f, 63.8f, 73.9f, 83.8f}},  // 5 iron
+    {{1.2f, 4.6f, 9.2f, 15.3f, 22.7f, 30.8f, 39.5f, 48.7f, 58.0f, 67.3f, 76.5f}},  // 6 iron
+    {{1.1f, 4.1f, 8.4f, 13.7f, 20.5f, 27.8f, 35.7f, 44.0f, 52.6f, 61.3f, 69.8f}},  // 7 iron
+    {{0.9f, 3.5f, 7.3f, 12.1f, 17.9f, 24.5f, 31.5f, 39.0f, 46.8f, 54.6f, 62.6f}},  // 8 iron
+    {{0.8f, 3.0f, 6.4f, 10.6f, 15.6f, 21.7f, 28.0f, 34.7f, 41.7f, 48.9f, 56.1f}},  // 9 iron
+    {{1.0f, 3.8f, 8.1f, 13.5f, 20.0f, 27.2f, 34.8f, 42.8f, 51.0f, 59.2f, 67.5f}},  // pitching wedge
+    {{0.7f, 2.6f, 5.6f, 9.5f, 14.2f, 19.3f, 25.4f, 31.5f, 37.9f, 44.4f, 50.9f}},  // approach wedge
+    {{0.5f, 2.1f, 4.4f, 7.5f, 11.3f, 15.5f, 20.2f, 25.7f, 31.2f, 36.9f, 42.6f}},  // gap wedge
+    {{0.4f, 1.6f, 3.4f, 5.8f, 8.8f, 12.3f, 16.1f, 20.2f, 25.1f, 29.9f, 34.9f}},  // sand wedge
+    {{0.2f, 0.9f, 2.0f, 3.4f, 5.1f, 7.2f, 9.5f, 12.1f, 15.0f, 18.0f, 21.2f}},  // low-bounce wedge
+    {{0.2f, 0.7f, 1.5f, 2.6f, 4.0f, 5.7f, 7.6f, 9.6f, 11.9f, 14.3f, 17.1f}},  // lob wedge
+    {{0.1f, 0.5f, 1.2f, 2.1f, 3.1f, 4.4f, 5.9f, 7.5f, 9.3f, 11.3f, 13.3f}}  // high lob wedge
+};
+// Kind 4, the punch.
+const ClubRow gClubRows4[25] = {
+    {{14.4f, 42.7f, 70.3f, 94.6f, 116.7f, 136.8f, 155.7f, 173.8f, 192.0f, 210.1f, 230.4f}},  // driver 1
+    {{14.2f, 42.5f, 70.7f, 96.1f, 120.2f, 144.2f, 169.4f, 197.8f, 228.2f, 258.6f, 286.6f}},  // driver 2
+    {{14.1f, 42.5f, 71.5f, 98.4f, 124.8f, 152.3f, 182.8f, 215.7f, 248.0f, 278.0f, 304.8f}},  // driver 3
+    {{14.1f, 42.8f, 72.5f, 100.9f, 129.9f, 161.2f, 195.4f, 230.3f, 262.5f, 291.6f, 317.2f}},  // driver 4
+    {{14.0f, 42.8f, 72.7f, 101.8f, 131.8f, 164.4f, 199.7f, 235.1f, 266.9f, 295.2f, 320.7f}},  // driver 5
+    {{14.0f, 42.7f, 72.7f, 102.7f, 133.6f, 167.5f, 203.7f, 238.5f, 270.3f, 297.9f, 322.6f}},  // driver 6
+    {{11.6f, 36.7f, 63.1f, 88.9f, 114.3f, 140.7f, 169.2f, 200.0f, 230.8f, 260.0f, 286.4f}},  // 3 wood
+    {{9.6f, 31.7f, 56.0f, 80.5f, 104.5f, 129.2f, 155.9f, 184.5f, 213.5f, 241.4f, 267.2f}},  // 5 wood
+    {{8.4f, 28.2f, 51.3f, 75.6f, 100.2f, 126.2f, 153.5f, 182.0f, 209.7f, 235.0f, 257.6f}},  // 7 wood
+    {{7.1f, 24.3f, 45.4f, 67.4f, 89.9f, 113.3f, 138.2f, 164.3f, 190.5f, 214.9f, 237.2f}},  // 1 iron
+    {{6.3f, 21.4f, 40.9f, 61.4f, 82.4f, 104.0f, 126.8f, 150.8f, 174.9f, 198.5f, 220.4f}},  // 2 iron
+    {{5.5f, 18.6f, 36.3f, 55.0f, 74.6f, 94.8f, 115.6f, 137.1f, 159.3f, 181.4f, 202.4f}},  // 3 iron
+    {{4.7f, 16.0f, 32.0f, 49.2f, 67.0f, 85.8f, 104.7f, 124.5f, 144.7f, 165.1f, 184.8f}},  // 4 iron
+    {{4.1f, 13.9f, 28.1f, 44.0f, 60.4f, 77.7f, 95.4f, 113.5f, 132.1f, 150.8f, 169.2f}},  // 5 iron
+    {{3.6f, 12.0f, 24.7f, 39.5f, 54.9f, 70.7f, 87.3f, 104.2f, 121.5f, 138.8f, 156.0f}},  // 6 iron
+    {{3.2f, 10.6f, 21.9f, 35.5f, 49.9f, 64.8f, 80.3f, 96.0f, 112.2f, 128.4f, 144.5f}},  // 7 iron
+    {{2.8f, 9.2f, 19.0f, 31.0f, 44.2f, 58.0f, 72.1f, 86.7f, 101.5f, 116.5f, 131.1f}},  // 8 iron
+    {{2.4f, 8.0f, 16.6f, 27.4f, 39.5f, 52.2f, 65.2f, 78.6f, 92.3f, 106.2f, 119.8f}},  // 9 iron
+    {{2.3f, 7.7f, 15.9f, 26.2f, 37.9f, 50.4f, 63.2f, 76.3f, 89.6f, 102.9f, 116.0f}},  // pitching wedge
+    {{2.5f, 8.7f, 17.8f, 29.2f, 42.0f, 55.6f, 69.5f, 83.6f, 97.5f, 111.0f, 124.3f}},  // approach wedge
+    {{2.2f, 7.7f, 15.8f, 25.8f, 37.4f, 49.8f, 62.6f, 75.5f, 88.5f, 101.3f, 113.7f}},  // gap wedge
+    {{1.8f, 6.5f, 13.1f, 21.9f, 31.7f, 42.6f, 54.0f, 65.7f, 77.4f, 89.0f, 100.4f}},  // sand wedge
+    {{1.6f, 5.9f, 11.9f, 19.8f, 28.9f, 38.8f, 49.4f, 60.4f, 71.4f, 82.2f, 93.1f}},  // low-bounce wedge
+    {{1.4f, 5.3f, 10.7f, 17.9f, 26.2f, 35.2f, 45.0f, 55.1f, 65.4f, 75.8f, 86.2f}},  // lob wedge
+    {{1.3f, 5.0f, 10.3f, 16.9f, 25.2f, 34.0f, 43.4f, 53.2f, 63.3f, 73.5f, 83.6f}}  // high lob wedge
+};
+// Kind 5, the flop.
+const ClubRow gClubRows5[25] = {
+    {{1.3f, 4.6f, 9.3f, 15.5f, 22.7f, 30.8f, 39.4f, 48.1f, 56.8f, 65.7f, 74.3f}},  // driver 1
+    {{1.3f, 4.6f, 9.3f, 15.6f, 22.8f, 30.9f, 39.5f, 48.3f, 57.1f, 65.9f, 74.7f}},  // driver 2
+    {{1.3f, 4.7f, 9.4f, 15.7f, 22.9f, 31.0f, 39.6f, 48.5f, 57.3f, 66.1f, 74.9f}},  // driver 3
+    {{1.3f, 4.7f, 9.4f, 15.7f, 23.0f, 31.1f, 39.7f, 48.5f, 57.5f, 66.4f, 75.1f}},  // driver 4
+    {{1.3f, 4.7f, 9.4f, 15.8f, 23.0f, 31.2f, 39.7f, 48.5f, 57.6f, 66.4f, 75.2f}},  // driver 5
+    {{1.3f, 4.7f, 9.5f, 15.8f, 23.0f, 31.2f, 39.8f, 48.6f, 57.6f, 66.5f, 75.3f}},  // driver 6
+    {{1.3f, 4.7f, 9.5f, 15.8f, 23.0f, 31.2f, 39.7f, 48.6f, 57.6f, 66.5f, 75.3f}},  // 3 wood
+    {{1.3f, 4.7f, 9.5f, 15.8f, 23.1f, 31.1f, 39.8f, 48.7f, 57.6f, 66.5f, 75.4f}},  // 5 wood
+    {{1.2f, 4.6f, 9.5f, 15.5f, 23.0f, 30.9f, 39.5f, 48.4f, 57.3f, 66.3f, 75.2f}},  // 7 wood
+    {{1.2f, 4.6f, 9.4f, 15.4f, 22.9f, 30.8f, 39.3f, 48.1f, 57.1f, 66.0f, 74.9f}},  // 1 iron
+    {{1.2f, 4.5f, 9.3f, 15.3f, 22.7f, 30.6f, 39.0f, 47.7f, 56.6f, 65.5f, 74.4f}},  // 2 iron
+    {{1.2f, 4.5f, 9.2f, 15.2f, 22.5f, 30.3f, 38.6f, 47.2f, 56.1f, 65.0f, 73.8f}},  // 3 iron
+    {{1.2f, 4.4f, 9.1f, 14.9f, 22.1f, 29.8f, 38.1f, 46.7f, 55.4f, 64.2f, 73.1f}},  // 4 iron
+    {{1.1f, 4.3f, 8.9f, 14.6f, 21.7f, 29.3f, 37.4f, 45.9f, 54.5f, 63.3f, 72.2f}},  // 5 iron
+    {{1.1f, 4.1f, 8.6f, 14.3f, 21.3f, 28.9f, 37.2f, 46.0f, 55.0f, 64.4f, 74.0f}},  // 6 iron
+    {{1.0f, 3.9f, 8.2f, 13.7f, 20.4f, 27.7f, 35.8f, 44.3f, 53.1f, 62.2f, 71.9f}},  // 7 iron
+    {{1.0f, 3.6f, 7.6f, 12.8f, 18.9f, 26.2f, 33.9f, 42.0f, 50.6f, 59.4f, 68.6f}},  // 8 iron
+    {{0.9f, 3.3f, 7.0f, 11.9f, 17.7f, 24.6f, 31.8f, 39.6f, 47.8f, 56.3f, 65.1f}},  // 9 iron
+    {{0.8f, 2.9f, 6.1f, 10.4f, 15.7f, 21.5f, 28.4f, 35.5f, 43.0f, 50.9f, 59.1f}},  // pitching wedge
+    {{0.6f, 2.4f, 5.0f, 8.7f, 13.0f, 18.2f, 23.9f, 30.1f, 36.7f, 43.6f, 50.6f}},  // approach wedge
+    {{0.5f, 2.0f, 4.3f, 7.4f, 11.3f, 15.8f, 20.8f, 26.3f, 32.1f, 38.2f, 44.5f}},  // gap wedge
+    {{0.4f, 1.7f, 3.6f, 6.3f, 9.6f, 13.5f, 17.9f, 22.6f, 27.7f, 33.2f, 38.8f}},  // sand wedge
+    {{0.4f, 1.5f, 3.3f, 5.7f, 8.7f, 12.2f, 16.2f, 20.5f, 25.3f, 30.2f, 35.3f}},  // low-bounce wedge
+    {{0.3f, 1.2f, 2.8f, 4.8f, 7.4f, 10.3f, 13.8f, 17.5f, 21.5f, 25.7f, 30.1f}},  // lob wedge
+    {{0.3f, 1.0f, 2.3f, 3.9f, 6.1f, 8.6f, 11.4f, 14.5f, 17.9f, 21.4f, 25.0f}}  // high lob wedge
+};
+// Kind 6.
+const ClubRow gClubRows6[25] = {
+    {{3.6f, 12.1f, 24.8f, 39.3f, 54.2f, 69.8f, 85.8f, 102.1f, 118.7f, 135.8f, 153.3f}},  // driver 1
+    {{3.7f, 12.1f, 24.8f, 39.3f, 54.5f, 70.1f, 86.5f, 103.1f, 120.1f, 137.4f, 154.5f}},  // driver 2
+    {{3.6f, 12.0f, 24.7f, 39.4f, 54.7f, 70.5f, 86.9f, 103.9f, 121.2f, 138.3f, 155.7f}},  // driver 3
+    {{3.6f, 12.0f, 24.7f, 39.4f, 54.8f, 70.7f, 87.3f, 104.3f, 121.6f, 139.1f, 156.4f}},  // driver 4
+    {{3.6f, 12.0f, 24.6f, 39.4f, 54.8f, 70.8f, 87.4f, 104.5f, 121.9f, 139.3f, 156.5f}},  // driver 5
+    {{3.6f, 12.0f, 24.6f, 39.3f, 54.8f, 70.9f, 87.6f, 104.7f, 122.2f, 139.6f, 156.4f}},  // driver 6
+    {{3.6f, 12.0f, 24.6f, 39.4f, 54.8f, 70.9f, 87.6f, 104.6f, 122.0f, 139.4f, 156.2f}},  // 3 wood
+    {{3.6f, 11.9f, 24.4f, 39.1f, 54.7f, 70.9f, 87.7f, 104.8f, 122.1f, 139.2f, 155.7f}},  // 5 wood
+    {{3.5f, 11.5f, 23.7f, 38.2f, 53.9f, 70.0f, 86.7f, 103.7f, 120.4f, 136.7f, 151.8f}},  // 7 wood
+    {{3.4f, 11.4f, 23.4f, 37.8f, 53.3f, 69.5f, 86.0f, 102.7f, 119.2f, 134.9f, 149.6f}},  // 1 iron
+    {{3.3f, 11.2f, 23.0f, 37.1f, 52.5f, 68.5f, 84.8f, 101.3f, 117.4f, 132.7f, 147.2f}},  // 2 iron
+    {{3.3f, 10.9f, 22.4f, 36.3f, 51.6f, 67.3f, 83.4f, 99.5f, 115.2f, 130.4f, 144.4f}},  // 3 iron
+    {{3.2f, 10.6f, 21.7f, 35.4f, 50.2f, 65.8f, 81.5f, 97.2f, 112.7f, 127.3f, 141.1f}},  // 4 iron
+    {{3.1f, 10.2f, 21.0f, 34.1f, 48.7f, 63.7f, 79.1f, 94.5f, 109.4f, 123.7f, 137.0f}},  // 5 iron
+    {{2.9f, 9.7f, 19.9f, 32.4f, 46.3f, 60.9f, 75.7f, 90.4f, 104.8f, 118.4f, 131.3f}},  // 6 iron
+    {{2.6f, 9.1f, 18.6f, 30.3f, 43.5f, 57.3f, 71.5f, 85.5f, 99.2f, 112.1f, 124.7f}},  // 7 iron
+    {{2.4f, 8.4f, 17.2f, 28.0f, 40.1f, 53.2f, 66.6f, 79.7f, 92.6f, 105.1f, 116.9f}},  // 8 iron
+    {{2.1f, 7.6f, 15.5f, 25.6f, 36.9f, 48.9f, 61.3f, 73.8f, 85.9f, 97.9f, 109.4f}},  // 9 iron
+    {{1.8f, 6.5f, 13.2f, 21.9f, 31.8f, 42.4f, 53.5f, 64.7f, 75.9f, 86.6f, 97.5f}},  // pitching wedge
+    {{1.3f, 5.0f, 10.5f, 17.2f, 25.6f, 34.3f, 43.7f, 53.3f, 62.9f, 72.6f, 81.7f}},  // approach wedge
+    {{1.1f, 4.1f, 8.7f, 14.4f, 21.5f, 29.1f, 37.3f, 45.8f, 54.6f, 63.4f, 72.4f}},  // gap wedge
+    {{0.9f, 3.3f, 7.1f, 11.9f, 17.6f, 24.4f, 31.5f, 39.0f, 46.8f, 54.9f, 62.9f}},  // sand wedge
+    {{0.8f, 2.9f, 6.2f, 10.6f, 15.7f, 21.4f, 28.2f, 35.0f, 42.2f, 49.6f, 56.9f}},  // low-bounce wedge
+    {{0.6f, 2.4f, 5.1f, 8.6f, 12.9f, 17.8f, 23.5f, 29.3f, 35.5f, 41.8f, 48.4f}},  // lob wedge
+    {{0.5f, 1.9f, 4.1f, 7.0f, 10.4f, 14.5f, 18.9f, 23.8f, 29.3f, 34.7f, 40.3f}}  // high lob wedge
+};
+// Kind 7.
+const ClubRow gClubRows7[25] = {
+    {{1.5f, 5.4f, 11.0f, 18.4f, 26.8f, 36.3f, 46.2f, 56.4f, 66.7f, 76.8f, 86.4f}},  // driver 1
+    {{1.4f, 5.3f, 10.7f, 18.0f, 26.2f, 35.3f, 45.1f, 55.1f, 65.1f, 75.0f, 84.4f}},  // driver 2
+    {{1.4f, 5.1f, 10.5f, 17.5f, 25.5f, 34.4f, 44.0f, 53.7f, 63.5f, 73.1f, 82.3f}},  // driver 3
+    {{1.3f, 5.0f, 10.2f, 17.0f, 24.8f, 33.5f, 42.7f, 52.3f, 61.8f, 71.2f, 80.4f}},  // driver 4
+    {{1.3f, 5.0f, 10.0f, 16.7f, 24.5f, 33.0f, 42.2f, 51.5f, 61.0f, 70.3f, 79.2f}},  // driver 5
+    {{1.3f, 4.9f, 9.9f, 16.3f, 24.2f, 32.6f, 41.6f, 50.9f, 60.2f, 69.3f, 78.3f}},  // driver 6
+    {{1.3f, 4.9f, 9.9f, 16.6f, 24.3f, 32.8f, 41.9f, 51.2f, 60.6f, 69.9f, 78.9f}},  // 3 wood
+    {{1.2f, 4.6f, 9.5f, 15.5f, 23.1f, 31.2f, 39.9f, 48.8f, 57.8f, 66.7f, 75.3f}},  // 5 wood
+    {{1.1f, 4.1f, 8.4f, 13.9f, 20.6f, 27.9f, 35.7f, 43.8f, 52.0f, 60.2f, 68.1f}},  // 7 wood
+    {{1.0f, 3.9f, 8.0f, 13.2f, 19.8f, 26.7f, 34.2f, 42.0f, 49.8f, 57.5f, 65.1f}},  // 1 iron
+    {{0.9f, 3.6f, 7.5f, 12.5f, 18.6f, 25.2f, 32.4f, 39.8f, 47.3f, 54.9f, 62.2f}},  // 2 iron
+    {{0.9f, 3.3f, 7.0f, 11.7f, 17.2f, 23.7f, 30.4f, 37.6f, 44.8f, 52.1f, 59.1f}},  // 3 iron
+    {{0.8f, 3.0f, 6.5f, 10.8f, 15.9f, 22.0f, 28.3f, 35.0f, 41.8f, 48.7f, 55.6f}},  // 4 iron
+    {{0.7f, 2.8f, 5.9f, 9.9f, 14.6f, 20.2f, 26.0f, 32.3f, 38.6f, 45.1f, 51.6f}},  // 5 iron
+    {{0.6f, 2.4f, 5.1f, 8.7f, 12.8f, 17.6f, 23.1f, 28.6f, 34.5f, 40.4f, 46.2f}},  // 6 iron
+    {{0.5f, 2.0f, 4.3f, 7.4f, 11.1f, 15.2f, 19.7f, 24.9f, 30.1f, 35.4f, 40.7f}},  // 7 iron
+    {{0.4f, 1.7f, 3.6f, 6.1f, 9.2f, 12.7f, 16.6f, 20.8f, 25.5f, 30.2f, 34.9f}},  // 8 iron
+    {{0.4f, 1.3f, 2.9f, 5.0f, 7.5f, 10.4f, 13.7f, 17.3f, 21.0f, 25.3f, 29.4f}},  // 9 iron
+    {{0.2f, 0.9f, 2.1f, 3.6f, 5.4f, 7.6f, 10.0f, 12.6f, 15.4f, 18.6f, 21.7f}},  // pitching wedge
+    {{0.2f, 0.6f, 1.3f, 2.2f, 3.4f, 4.8f, 6.3f, 8.1f, 10.0f, 12.0f, 14.2f}},  // approach wedge
+    {{0.1f, 0.4f, 0.9f, 1.6f, 2.4f, 3.4f, 4.5f, 5.8f, 7.2f, 8.7f, 10.2f}},  // gap wedge
+    {{0.1f, 0.3f, 0.6f, 1.1f, 1.7f, 2.4f, 3.2f, 4.1f, 5.1f, 6.2f, 7.4f}},  // sand wedge
+    {{0.1f, 0.2f, 0.5f, 0.9f, 1.4f, 1.9f, 2.6f, 3.4f, 4.2f, 5.1f, 6.0f}},  // low-bounce wedge
+    {{0.1f, 0.2f, 0.5f, 0.9f, 1.4f, 1.9f, 2.6f, 3.4f, 4.2f, 5.1f, 6.0f}},  // lob wedge
+    {{0.1f, 0.2f, 0.5f, 0.9f, 1.4f, 1.9f, 2.6f, 3.4f, 4.2f, 5.1f, 6.0f}}   // high lob wedge
+};
+
+// The ground's pace by course setting: x gTurfSpeed's (0.6 .. 1.4, classes 2, 3, 4), then the
+// green speed (options +0x18, class 3), the fairway (gFairwaySetting, class 2) and the rough
+// (options +0x1C, class 5).
+const f32 gTurfSpeedMul[5] = {
+    0.6f, 0.8f, 1.0f, 1.2f, 1.4f
+};
+const f32 gGreenSpeedMul[3] = {
+    1.0f, 1.1f, 1.2f
+};
+const f32 gFairwaySpeedMul[3] = {
+    1.0f, 1.1f, 1.2f
+};
+const f32 gRoughMul[3] = {
+    1.3f, 1.0f, 0.7f
+};
 void   PsBallFx_TriggerTrail(Ball* pBall, int nPlayer);    // rolling sound / effect
 void   Ball_CupPull(Ball* pBall, f32 fDt);
 void   fn_80055E7C(f32* pA, f32* pB, f32* pOut);
@@ -86,7 +396,6 @@ void   fn_80052268(Ball* pBall, f32 fTicks);
 void   Ball_FlightStep(Ball* pBall, f32 fTicks);
 f32    fn_80055324(Ball* pBall);
 u8     fn_80054040(Ball* pBall, f32 fTicks);
-f32    Wind_Get(f32* pOut);
 
 extern u8  gSimulating;                          // 0x80281DD0  a rehearsal: no sounds or effects
 extern u8  gSimFullCup;                          // a sim that still gets the cup pull and near-cup gravity
@@ -157,9 +466,9 @@ static inline f32 Ball_Clamp(f32 x, f32 fLo, f32 fHi) {
 // The ball dropped in: park it in the cup and stop it.
 void Ball_Holed(Ball* pBall) {
     Vec3Copy(PIN(pBall), pBall->vPos);
-    pBall->vPos[0] += 0.0138889f;
-    pBall->vPos[1] -= 0.0833333f;
-    pBall->vPos[2] += 0.0138889f;
+    pBall->vPos[0] += INCHES(0.5f);
+    pBall->vPos[1] -= INCHES(3.0f);
+    pBall->vPos[2] += INCHES(0.5f);
     pBall->bHoled = 1;
     Ball_Stop(pBall);
 }
@@ -207,10 +516,19 @@ f32 fn_80050D34(f32 fDist) {
     return fPower;
 }
 
+// fake match: stands in for a function the original linker stripped. The file's pool has 20.0,
+// 0.5, 2.0, 1.0, 0.0, 0.1 in that order right after fn_80050D34's constants, before the
+// functions below use them (fn_80050F88 would put -60000 and 0.375 before 0.1); its body is
+// unknown, this one only reproduces the order.
+static f32 Ball_StrippedFn(f32 x) {
+    x = (x + 2.0f) * 0.5f + 20.0f;
+    if (x < 0.1f) return 1.0f;
+    return 0.0f;
+}
 
 // A club's distance row for a shot kind (1..7, clubs 0..24): the row, and the surface the
 // table assumes (45; 14 for the chip table). 0 for a putt or a bad club.
-u8 fn_80050DE4(int nKind, int nClub, int a, ClubRow** ppRow, s32* pSurface) {
+u8 fn_80050DE4(int nKind, int nClub, int a, const ClubRow** ppRow, s32* pSurface) {
     if (nClub < 0 || nClub >= 25) return 0;
     switch (nKind) {
     case 1:
@@ -263,7 +581,7 @@ u8 fn_80050DE4(int nKind, int nClub, int a, ClubRow** ppRow, s32* pSurface) {
 
 // A club's reach for a shot kind (the table entry's +0x24), 1 if there is none.
 f32 fn_80050F44(int nKind, int nClub) {
-    ClubRow* pRow;
+    const ClubRow* pRow;
     if (fn_80050DE4(nKind, nClub, 0, &pRow, NULL)) {
         return pRow->fDist[9];
     }
@@ -275,14 +593,14 @@ f32 fn_80050F44(int nKind, int nClub) {
 // is not a stopping surface counts as 14); 1.1 beyond the row.
 // A row's distance at column i (an accessor in the original: reading the array directly gives
 // different registers).
-static inline f32 ClubRow_Dist(ClubRow* pRow, int i) {
+static inline f32 ClubRow_Dist(const ClubRow* pRow, int i) {
     return pRow->fDist[i];
 }
 
 f32 fn_80050F88(f32 fDist, Ball* pBall, int nKind, int nClub) {
     s32          nSurface;
     SurfaceType* pSurface;
-    ClubRow*     pRow;
+    const ClubRow* pRow;
     f32          vNormal[4];
     f32          fBase, fAdj, fFrac, fPower;
     int          i;
@@ -294,6 +612,8 @@ f32 fn_80050F88(f32 fDist, Ball* pBall, int nKind, int nClub) {
         pSurface = &gSurfaceTypes[14];
     }
     fAdj = fBase - pSurface->f00;
+    // EA bug: a row has 11 entries (0..10), but a distance beyond fDist[10] reads fDist[11]: the
+    // next club's first carry (for club 24, the start of whatever follows the table)
     for (i = 1; i < 12; i++) {
         if (fDist <= ClubRow_Dist(pRow, i)) {
             fFrac = (fDist - ClubRow_Dist(pRow, i - 1)) / (ClubRow_Dist(pRow, i) - ClubRow_Dist(pRow, i - 1));
@@ -518,7 +838,7 @@ u8 Physics_GetShotData(Ball* pBall, int nClub, int nKind, f32 fPower, f32 fAim, 
     }
     fn_80055EC4(vDir, vAxis, vAlong);
     fn_80055EA0(vDir, vAlong, vOff);
-    fn_8001EF34(vOff, 0.10000002f, vOffPart);
+    fn_8001EF34(vOff, 1.0f - 0.9f, vOffPart);   // 0x3DCCCCD0, one bit above 0.1f
     nLie = pBall->nLie;
     switch (nLie) {
     case LIE_SAND_HIGH_e:
@@ -1669,21 +1989,21 @@ void fn_80054A6C(Ball* pBall) {
 // The pull toward the cup. Inside 5.5 in of the pin, while the ball is still short of it, a
 // ball heading within 30 degrees of the cup (or within 3.5 in whatever its heading) gets
 // 0.455 x dt x (pin - ball) added to its velocity - but never on an axis where that would speed
-// it up while it already moves faster than 0.293 (about 1.5 ft/s) along that axis. A ball
-// crossing over the cup fast and off line loses up to 67% of its speed instead: the lip.
+// it up while it already moves faster than 0.6 mph along that axis. A ball crossing over the cup
+// faster than 0.75 mph and off line loses up to 67% of its speed instead: the lip.
 void Ball_CupPull(Ball* pBall, f32 fDt) {
     f32 vPin[3];
     f32 fDist;
 
     fDist = Vec_Distance(PIN(pBall), (f32*)pBall);
-    if (fDist >= 0.152778f) return;
+    if (fDist >= INCHES(5.5f)) return;
     Vec_Copy(PIN(pBall), vPin);
     vPin[1] += BALL_RADIUS;
     {
         f32 fStartDist = Vec_Distance(pBall->vStart, vPin);
         f32 fAngle, fK, fPull;
-        if (fStartDist < 0.166667f) return;
-        if (Vec_Distance(pBall->vStart, (f32*)pBall) > fStartDist - 0.0416667f) return;
+        if (fStartDist < INCHES(6.0f)) return;
+        if (Vec_Distance(pBall->vStart, (f32*)pBall) > fStartDist - INCHES(1.5f)) return;
 
         fAngle = fn_8000AD78(pBall->vPos[0] - pBall->vPrev[0], pBall->vPos[2] - pBall->vPrev[2]);
         fAngle = fabsf(fAngle - fn_8000AD78(vPin[0] - pBall->vPos[0], vPin[2] - pBall->vPos[2]));
@@ -1691,25 +2011,25 @@ void Ball_CupPull(Ball* pBall, f32 fDt) {
             fAngle -= 3.14159265f;
         }
         if (fDist < 0.0625f) {
-            if (fAngle > 0.523599f && pBall->fSpeed > 0.366667f) {
+            if (fAngle > DEG(30.0f) && pBall->fSpeed > MPH(0.75f)) {
                 f32 fSlow = 1.0f - 16.0f * (0.67f * fDist);
                 pBall->vVel[0] *= fSlow;
                 pBall->vVel[2] *= fSlow;
             }
             return;
         }
-        if (fAngle < 0.523599f || fDist < 0.0972222f) {
-            fK    = 0.455472f * fDt;
+        if (fAngle < DEG(30.0f) || fDist < INCHES(3.5f)) {
+            fK    = (CUP_DIAMETER * 4.25f) * fDt;   // the bits are exactly this product (0x3EE933B1)
             fPull = fK * (vPin[0] - pBall->vPos[0]);
             if ((pBall->vVel[0] < 0.0f && fPull < 0.0f) || (pBall->vVel[0] > 0.0f && fPull > 0.0f)) {
-                if (fabsf(pBall->vVel[0]) > 0.293333f) {
+                if (fabsf(pBall->vVel[0]) > MPH(0.6f)) {
                     fPull = 0.0f;
                 }
             }
             pBall->vVel[0] += fPull;
             fPull = fK * (vPin[2] - pBall->vPos[2]);
             if ((pBall->vVel[2] < 0.0f && fPull < 0.0f) || (pBall->vVel[2] > 0.0f && fPull > 0.0f)) {
-                if (fabsf(pBall->vVel[2]) > 0.293333f) {
+                if (fabsf(pBall->vVel[2]) > MPH(0.6f)) {
                     fPull = 0.0f;
                 }
             }
@@ -2001,7 +2321,7 @@ u8 Physics_DropBall(Ball* pBall, f32* pPos) {
     SurfaceType* pSurface;
     f32          fGround;
     Vec3Copy(pPos, v);
-    v[1] += 0.0555556f;
+    v[1] += INCHES(2.0f);
     fGround = fn_8004D620(pBall->pCourse, v);
     if (fGround < -60000.0f) {
         fGround = fn_8004D5C0(pBall->pCourse, v);

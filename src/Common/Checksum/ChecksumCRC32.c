@@ -16,7 +16,7 @@ typedef struct {
 
 // Memory functions of the host game (CodeWarrior side). Signatures inferred from the calls.
 extern void* TibExtMemAlloc(void* allocator, unsigned long size, unsigned long align, const char* file, int line);
-extern void  fn_80122128(void* allocator, void* p, unsigned long size, unsigned long align);
+extern void  TibExtMemFree(void* allocator, void* p, unsigned long size, unsigned long align);
 
 CRC32State gCRC = { 0, { 4, 0 }, 0xFFFFFFFF, 0 };   // read directly by SharedFileIO.c, so not static
 static unsigned long gCRCResult;
@@ -71,7 +71,7 @@ int CRC32_Init(void* allocator) {
 
 int CRC32_Shutdown(void) {
     if (gCRC.table == 0) return 6;
-    fn_80122128(gCRC.allocator, gCRC.table, 1024, 4);
+    TibExtMemFree(gCRC.allocator, gCRC.table, 1024, 4);
     gCRC.table = 0;
     return 0;
 }
