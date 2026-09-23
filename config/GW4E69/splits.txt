@@ -117,17 +117,8 @@ unsorted/sweep_8000B058.c:
 unsorted/sweep_8000B078.c:
 	.text       start:0x8000B078 end:0x8000B0D4
 
-unsorted/sweep_8000B244.c:
-	.text       start:0x8000B244 end:0x8000B264
-
-unsorted/sweep_8000B2B8.c:
-	.text       start:0x8000B2B8 end:0x8000B30C
-
-unsorted/sweep_8000B30C.c:
-	.text       start:0x8000B30C end:0x8000B318
-
-unsorted/sweep_8000B3E8.c:
-	.text       start:0x8000B3E8 end:0x8000B428
+urandom.c:
+	.text       start:0x8000B130 end:0x8000B46C
 
 unsorted/sweep_8000B4B0.c:
 	.text       start:0x8000B4B0 end:0x8000B4B8
@@ -492,6 +483,9 @@ unsorted/sweep_8002A624.c:
 Golfer.c:
 	.text       start:0x8002A630 end:0x8002F1D4
 
+GoRenderSurface.c:
+	.text       start:0x8002F1D4 end:0x8002F4FC
+
 LLPict_Gc.c:
 	.text       start:0x8002F4FC end:0x8003001C
 
@@ -517,52 +511,7 @@ unsorted/sweep_8003024C.c:
 	.text       start:0x8003024C end:0x80030254
 
 GoTerrain.c:
-	.text       start:0x80030254 end:0x8003541C
-
-unsorted/sweep_8003541C.c:
-	.text       start:0x8003541C end:0x80035440
-
-unsorted/sweep_80035440.c:
-	.text       start:0x80035440 end:0x8003546C
-
-unsorted/sweep_800354B4.c:
-	.text       start:0x800354B4 end:0x800354C4
-
-unsorted/sweep_800354C4.c:
-	.text       start:0x800354C4 end:0x800354D0
-
-unsorted/sweep_800354E4.c:
-	.text       start:0x800354E4 end:0x80035500
-
-unsorted/sweep_80035500.c:
-	.text       start:0x80035500 end:0x80035508
-
-unsorted/sweep_80035508.c:
-	.text       start:0x80035508 end:0x80035514
-
-unsorted/sweep_80035554.c:
-	.text       start:0x80035554 end:0x8003556C
-
-unsorted/sweep_8003556C.c:
-	.text       start:0x8003556C end:0x80035574
-
-unsorted/sweep_80035574.c:
-	.text       start:0x80035574 end:0x80035584
-
-unsorted/sweep_80035584.c:
-	.text       start:0x80035584 end:0x80035590
-
-unsorted/sweep_80035590.c:
-	.text       start:0x80035590 end:0x800355E0
-
-unsorted/sweep_800355E0.c:
-	.text       start:0x800355E0 end:0x80035600
-
-unsorted/sweep_80035600.c:
-	.text       start:0x80035600 end:0x80035604
-
-unsorted/sweep_80035604.c:
-	.text       start:0x80035604 end:0x80035640
+	.text       start:0x80030254 end:0x80035640
 
 Skin.c:
 	.text       start:0x800358E0 end:0x80037AB8
@@ -807,8 +756,8 @@ unsorted/sweep_8006A89C.c:
 unsorted/sweep_8006A8D4.c:
 	.text       start:0x8006A8D4 end:0x8006A964
 
-unsorted/sweep_8006AA70.c:
-	.text       start:0x8006AA70 end:0x8006AA84
+emotion.c:
+	.text       start:0x8006AA70 end:0x8006BED4
 
 unsorted/sweep_8006BED4.c:
 	.text       start:0x8006BED4 end:0x8006BF4C
@@ -886,10 +835,7 @@ unsorted/sweep_8006E0F8.c:
 	.text       start:0x8006E0F8 end:0x8006E118
 
 GoFrameBuf.c:
-	.text       start:0x8006E150 end:0x8006E26C
-
-unsorted/sweep_8006E26C.c:
-	.text       start:0x8006E26C end:0x8006E2A4
+	.text       start:0x8006E150 end:0x8006E2A4
 
 GoLighting.c:
 	.text       start:0x8006E2A4 end:0x8006EFB8
@@ -1074,35 +1020,14 @@ unsorted/sweep_8007524C.c:
 unsorted/sweep_80075250.c:
 	.text       start:0x80075250 end:0x80075280
 
-unsorted/sweep_80075280.c:
-	.text       start:0x80075280 end:0x800752DC
-
-unsorted/sweep_8007531C.c:
-	.text       start:0x8007531C end:0x8007535C
-
 LLVideo.c:
-	.text       start:0x800754C0 end:0x80076128
-
-unsorted/sweep_80076128.c:
-	.text       start:0x80076128 end:0x80076158
+	.text       start:0x80075280 end:0x80076158
 
 unsorted/sweep_800763B4.c:
 	.text       start:0x800763B4 end:0x800763BC
 
 GoCamera.c:
-	.text       start:0x800763BC end:0x80076948
-
-unsorted/sweep_80076948.c:
-	.text       start:0x80076948 end:0x80076954
-
-unsorted/sweep_80076954.c:
-	.text       start:0x80076954 end:0x800769C0
-
-unsorted/sweep_800769C0.c:
-	.text       start:0x800769C0 end:0x80076A04
-
-unsorted/sweep_80076A04.c:
-	.text       start:0x80076A04 end:0x80076A14
+	.text       start:0x800763BC end:0x80076A54
 
 GoViewport.c:
 	.text       start:0x80076A54 end:0x80076B7C
@@ -2646,19 +2571,7 @@ unsorted/sweep_800BAA4C.c:
 	.text       start:0x800BAA4C end:0x800BAA50
 
 SitDevFile.c:
-	.text       start:0x800BAEB0 end:0x800BCA60
-
-unsorted/sweep_800BCB74.c:
-	.text       start:0x800BCB74 end:0x800BCB88
-
-unsorted/sweep_800BCD50.c:
-	.text       start:0x800BCD50 end:0x800BCD68
-
-unsorted/sweep_800BD7D0.c:
-	.text       start:0x800BD7D0 end:0x800BD7E8
-
-unsorted/sweep_800BD83C.c:
-	.text       start:0x800BD83C end:0x800BD894
+	.text       start:0x800BAEB0 end:0x800BD894
 
 GoGolfCam.c:
 	.text       start:0x800BD894 end:0x800C7480
@@ -2670,7 +2583,7 @@ GoGolfCam.c:
 	.sdata2     start:0x802842C0 end:0x802843B8
 
 GoBreakLine.c:
-	.text       start:0x800C808C end:0x800C9310
+	.text       start:0x800C808C end:0x800C937C
 
 AnimStream.c:
 	.text       start:0x800C937C end:0x800CC1EC
@@ -2741,20 +2654,8 @@ unsorted/sweep_800D3208.c:
 Earnings.c:
 	.text       start:0x800D3244 end:0x800D9E14
 
-unsorted/sweep_800DA174.c:
-	.text       start:0x800DA174 end:0x800DA1D4
-
-unsorted/sweep_800DA1D4.c:
-	.text       start:0x800DA1D4 end:0x800DA234
-
-unsorted/sweep_800DA234.c:
-	.text       start:0x800DA234 end:0x800DA264
-
-unsorted/sweep_800DAD1C.c:
-	.text       start:0x800DAD1C end:0x800DAD44
-
-unsorted/sweep_800DAD44.c:
-	.text       start:0x800DAD44 end:0x800DAD54
+GameHoleContests.c:
+	.text       start:0x800D9E14 end:0x800DAE44
 
 GameEffects.c:
 	.text       start:0x800DAE44 end:0x800DCAD8

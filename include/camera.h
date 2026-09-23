@@ -447,4 +447,31 @@ void   fn_800C7178(View* pView, int nPlayer);
 u8     fn_800C71A4(View* pView, int nPlayer);
 u8     fn_800C7340(View* pView, int nPlayer);
 
+// ---- frame buffers (GoFrameBuf.c) -----------------------------------------------------------
+
+// A frame buffer's size and scale (0x34 bytes; fn_8006E1C8 makes one). The last seven fields are
+// worked out from the first six by fn_8006E150.
+typedef struct GoFrameBuf {
+    f32  f0;                    // 0x00  0 by default
+    f32  f4;                    // 0x04  0 by default
+    f32  fWidth;                // 0x08  512 by default
+    f32  fHeight;               // 0x0C  448 by default
+    f32  f10;                   // 0x10  a horizontal scale, 1 by default
+    f32  f14;                   // 0x14  a vertical scale, 1 by default
+    f32  f18;                   // 0x18  fWidth * f10
+    f32  f1C;                   // 0x1C  fHeight * f14
+    f32  f20;                   // 0x20  fWidth / f10
+    f32  f24;                   // 0x24  fHeight / f14
+    f32  f28;                   // 0x28  1 / f10
+    f32  f2C;                   // 0x2C  1 / f14
+    f32  fAspect;               // 0x30  fHeight / fWidth
+} GoFrameBuf;
+LAYOUT_ASSERT(GoFrameBuf, 0x34);
+
+void        fn_8006E150(GoFrameBuf* pBuf);   // work out the derived fields
+GoFrameBuf* fn_8006E1C8(void);               // a new frame buffer with the default size
+void        fn_8006E214(GoFrameBuf* pBuf);   // free it
+void        fn_8006E234(GoFrameBuf* pBuf);   // the default size: 512 x 448, scale 1
+void        fn_8006E26C(GoFrameBuf* pBuf, f32 f0, f32 f4, f32 fWidth, f32 fHeight, f32 f10, f32 f14);
+
 #endif
