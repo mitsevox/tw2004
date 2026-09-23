@@ -208,7 +208,7 @@ Functions still unnamed or named from TW06:
 | `800C336C` | `fn_800C336C` | `GolfCamera_ProcessInHoleCamera` | medium | PS2 nbr(r4,2) |
 | `800C6D9C` | `fn_800C6D9C` | `GolfCamera_IsFreezeTimeActive` | medium | PS2 nbr2(r7,2) |
 | `800D1530` | `fn_800D1530` | `GameAnalysis_GetSidehillLie` | medium | PS2 anchor(1)+graph |
-| `800DD904` | `fn_800DD904` | `GM_BumpBallForObstructions` | medium | PS2 nbr(r0,2) |
+| `800DD904` | `GM_BumpBallForObstructions` | `GM_BumpBallForObstructions` | medium | PS2 nbr(r0,2) |
 | `800DDFB4` | `fn_800DDFB4` | `GM_DoPreshotAnimation` | medium | PS2 nbr(r1,2) |
 | `800DEA44` | `fn_800DEA44` | `GM_ReplaceOOBBall` | medium | PS2 nbr(r4,2) |
 | `800E53B8` | `fn_800E53B8` | `GUI_IsAwardUIAnimating` | medium | PS2 calls(r0,2) |

@@ -3615,29 +3615,8 @@ unsorted/sweep_800DC45C.c:
 unsorted/sweep_800DC514.c:
 	.text       start:0x800DC514 end:0x800DC524
 
-unsorted/sweep_800DCAD8.c:
-	.text       start:0x800DCAD8 end:0x800DCB10
-
-unsorted/sweep_800DCB74.c:
-	.text       start:0x800DCB74 end:0x800DCB84
-
-unsorted/sweep_800DCBA8.c:
-	.text       start:0x800DCBA8 end:0x800DCBB8
-
-unsorted/sweep_800DCBB8.c:
-	.text       start:0x800DCBB8 end:0x800DCBBC
-
-unsorted/sweep_800DCBBC.c:
-	.text       start:0x800DCBBC end:0x800DCC04
-
-unsorted/sweep_800DCC04.c:
-	.text       start:0x800DCC04 end:0x800DCC30
-
-unsorted/sweep_800DCC30.c:
-	.text       start:0x800DCC30 end:0x800DCC70
-
-unsorted/sweep_800DEA24.c:
-	.text       start:0x800DEA24 end:0x800DEA44
+GameManager.c:
+	.text       start:0x800DCA94 end:0x800DFC18
 
 unsorted/sweep_800E0A84.c:
 	.text       start:0x800E0A84 end:0x800E0A98

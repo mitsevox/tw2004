@@ -3,13 +3,13 @@
 #include "game_types.h"
 
 f32 AI_MaxDistance();
-f32 fn_800DEA24();
+f32 GM_GetGolferDistanceToPin();
 
 void fn_8008642C(u8* p0, u8* p1);
 void fn_80086460(u8* p0, u8* p1);
 void fn_8008642C(u8* p0, u8* p1) {
     f32 t0;
-    t0 = fn_800DEA24(*(s32*)p0);
+    t0 = GM_GetGolferDistanceToPin(*(s32*)p0);
     *(f32*)p1 = t0;
 }
 

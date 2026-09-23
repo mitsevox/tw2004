@@ -214,7 +214,8 @@ typedef struct Player {
     // longestdrive, longestputt, fairways[18], gir[18], roundEventFlag - which fills 0x154..0x354
     // exactly. Only strokes and matchwins are confirmed by our code so far.
     s32  nStrokes[18];          // 0x154  strokes taken per hole
-    u8   unk19C[0x278 - 0x19C]; // 0x19C  TW06: putts[18], modepoints[18] (0x1E4), skinwin[18] (0x22C), skinwins (0x274)
+    s32  nPutts[18];            // 0x19C  putts per hole (GM_PlayerAddStroke). TW06: putts
+    u8   unk1E4[0x278 - 0x1E4]; // 0x1E4  TW06: modepoints[18], skinwin[18] (0x22C), skinwins (0x274)
     s32  nHolesWon;             // 0x278  match play. TW06: matchwins
     u8   unk27C[0x28C - 0x27C]; // 0x27C  TW06: roundscore[4]
     u8   unk28C;                // 0x28C  TW06: playercut
@@ -236,7 +237,8 @@ typedef struct Player {
     f32  fBallY;                // 0x3B8
     f32  fBallZ;                // 0x3BC
     f32  fBallW;                // 0x3C0
-    u8   unk3C4[0x3D4 - 0x3C4]; // 0x3C4  TW06 has PreShotBallPos (a vector) right before the swing data
+    f32  vPreShot[4];           // 0x3C4  where the ball lay before the shot (GM_BumpBallForObstructions drops it
+                                //        back here). TW06: PreShotBallPos
     SwingData swing;            // 0x3D4  the swing meter's state for this player
     s32  nController;           // 0xA08  CONTROLLER_CPU for the AI. TW06: Controller (PlayerCtrl_t, 9 = AI)
     s32  nView0;                // 0xA0C  TW06: viewControllerID[2]
@@ -247,7 +249,7 @@ typedef struct Player {
     f32  fTargetW;              // 0xA20
     f32  vTargetCopy[4];        // 0xA24  copy of the planned target. Probably TW06's originalTargetPos
     f32  vTarget2[4];           // 0xA34  copy of the chosen aim point
-    u8   unkA44[0xA54 - 0xA44];
+    f32  vA44[4];               // 0xA44  compared with the ball position (GM_BumpBallForObstructions)
     f32  fDistance;             // 0xA54  to the target. TW06: targetDistance
     f32  fDistance2;            // 0xA58
     u8   unkA5C[8];
@@ -335,33 +337,76 @@ typedef struct Session {
     u8   unk5B4C[0x5BD0 - 0x5B4C];
 } Session;
 
-// The game state gpGame points at; only what this file reads.
+// The game state gpGame points at: the current game mode's rules (data and callbacks; TW06
+// turned this into the GameModeDriver class). Only what our files use is named.
 typedef struct GameState {
     s32  nMode;                 // 0x000
     u8   unk4[0x14 - 0x4];
     s32  unk14;                 // 0x014
     u8   unk18[0x64 - 0x18];
     s32  nCurHole;              // 0x064  index into holeOrder
-    u8   unk68[0xE4 - 0x68];
+    u8   unk68[0xB0 - 0x68];
+    u8   bHoleSelected[18];     // 0x0B0  holes this round plays (GM_GotoNextSelectedHole)
+    u8   unkC2[0xD4 - 0xC2];
+    u8   bD4;                   // 0x0D4
+    u8   unkD5[0xE4 - 0xD5];
     s32  holeOrder[18];         // 0x0E4
-    u8   unk12C[0x1D8 - 0x12C];
+    s32  n12C;                  // 0x12C
+    u8   unk130[4];
+    u8   b134;                  // 0x134  cleared at the start of a hole
+    u8   unk135[0x144 - 0x135];
+    s32  n144[5];               // 0x144  per player, cleared at the start of a hole
+    s32  n158[5];               // 0x158  per player, cleared at the start of a hole
+    u8   unk16C[0x1CC - 0x16C];
+    void (*pfn1CC)(void);       // 0x1CC
+    u8   unk1D0[4];
+    s32  (*pfn1D4)(int a);      // 0x1D4
     u8   (*pfn1D8)(int nPlayer, int a); // 0x1D8  nonzero blocks a gimme (Gimme_Allowed asks with a = 1)
-    u8   unk1DC[0x20C - 0x1DC];
+    u8   (*pfn1DC)(int a);      // 0x1DC  nonzero: the game is over
+    u8   unk1E0[4];
+    void (*pfn1E4)(void);       // 0x1E4  hole start
+    void (*pfn1E8)(void);       // 0x1E8  hole finished
+    void (*pfn1EC)(void);       // 0x1EC
+    void (*pfn1F0)(void);       // 0x1F0
+    void (*pfn1F4)(void);       // 0x1F4  game finished
+    void (*pfn1F8)(int nPlayer); // 0x1F8
+    void (*pfn1FC)(void);       // 0x1FC
+    u8   unk200[0x20C - 0x200];
     void (*pfn20C)(int nPlayer); // 0x20C  called as a swing begins (state 1)
-    u8   unk210[0x228 - 0x210];
+    void (*pfn210)(int nPlayer); // 0x210  the hole is over, the game is not
+    u8   unk214[4];
+    void (*pfn218)(int nPlayer); // 0x218
+    void (*pfn21C)(int nPlayer); // 0x21C
+    void (*pfn220)(int nPlayer); // 0x220
+    void (*pfn224)(int nPlayer); // 0x224
     void (*pfn228)(int nPlayer); // 0x228  called every frame of the shot setup (state 10)
     void (*pfn22C)(int nPlayer); // 0x22C  called after a re-plan in swing state 9
     u8   unk230[0x238 - 0x230];
     u8   (*pfn238)(int nPlayer); // 0x238  nonzero: skip addressing the ball (swing state 1)
-    u8   unk23C[0x24C - 0x23C];
+    u8   unk23C[0x248 - 0x23C];
+    void (*pfn248)(int nPlayer); // 0x248  end of a golfer's turn
     void (*pfn24C)(int nPlayer); // 0x24C  called when a swing leaves state 20
-    u8   unk250[0x264 - 0x250];
+    void (*pfn250)(int nPlayer); // 0x250  the ball went out of bounds
+    void (*pfn254)(int nPlayer); // 0x254  a mulligan was taken
+    void (*pfn258)(int nPlayer); // 0x258
+    u8   unk25C[0x264 - 0x25C];
     u8   (*pfn264)(int nPlayer); // 0x264  "aim at the pin?" for a re-plan
-    u8   unk268[0x276 - 0x268];
+    u8   unk268[0x270 - 0x268];
+    u8   bShowYardage;          // 0x270  show how far each shot went
+    u8   b271;                  // 0x271
+    u8   bStrokeLimit;          // 0x272  a hole ends at 10 strokes
+    u8   b273;                  // 0x273
+    u8   b274;                  // 0x274
+    u8   b275;                  // 0x275
     u8   b276;                  // 0x276  re-plan the shot as the swing begins
     u8   b277;                  // 0x277
     u8   bGimmesAllowed;        // 0x278  this mode allows gimmes
-    u8   unk279[0x281 - 0x279];
+    u8   b279;                  // 0x279
+    u8   bAIConcedes;           // 0x27A  a CPU may concede the hole (GM_CheckForAIConcede)
+    u8   unk27B[0x27E - 0x27B];
+    u8   b27E;                  // 0x27E
+    u8   b27F;                  // 0x27F
+    u8   unk280;
     u8   b281;                  // 0x281  tutorial tips may show at setup
     u8   b282;                  // 0x282
     u8   b283;                  // 0x283  the special swing cameras may be used
@@ -371,7 +416,10 @@ typedef struct GameState {
     u8   b287;                  // 0x287  in-flight replays are allowed
     u8   unk288[0x28B - 0x288];
     u8   bNoWind;               // 0x28B  wind off
-    u8   unk28C[0x290 - 0x28C];
+    u8   bBumpObstructions;     // 0x28C  move a ball resting against an obstruction
+    u8   b28D;                  // 0x28D
+    u8   b28E;                  // 0x28E  set when the game finishes
+    u8   unk28F;
     s32  n290;                  // 0x290
     s32  n294;                  // 0x294
 } GameState;

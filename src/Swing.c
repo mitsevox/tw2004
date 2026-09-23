@@ -2100,7 +2100,7 @@ void  GM_DoPostShotInHoleUI(int nPlayer);
 void  fn_800E3C0C(int a);
 u8    fn_80063C90(void* pView);              // the camera is still moving
 void  fn_80063BF4(void* pView, f32 f, f32* pVec);
-void  fn_800DD904(void);
+void  GM_BumpBallForObstructions(void);
 extern u8  lbl_80281E10;
 typedef struct Vec4 { f32 x, y, z, w; } Vec4;
 extern Vec4 lbl_80183660;
@@ -2303,7 +2303,7 @@ void STATEFUNC_WaitUpdate(int nPlayer) {
 
 void STATEFUNC_ShowYardageExit(int nPlayer) {
     if (gPlayers[nPlayer].unkC2E == 0 && lbl_80281E10 == 0) {
-        fn_800DD904();
+        GM_BumpBallForObstructions();
     }
     lbl_80281E10 = 0;
 }
@@ -3876,7 +3876,7 @@ u8    fn_800C6D9C(void);
 void  GM_SimulateBallMovement(int nPlayer);
 u8 fn_80062DD4(View* pView);               // the view has faded out
 f32 fn_80062DCC(View* pView);               // and how far
-void  fn_800DDA14(int nPlayer);
+void  GM_PlayerTookShot(int nPlayer);
 void  fn_8006C4A0(void);                      // take the shot back (a mulligan)
 void  fn_800DBDA8(int nPlayer);
 u8 fn_80058F5C(int nPlayer);              // the per-frame swing poll: the ball was struck
@@ -3905,7 +3905,7 @@ void STATEFUNC_SimulateUpdate(int nPlayer) {
     GM_SimulateBallMovement(nPlayer);
     Swing_RumbleTick(nPlayer);
     if (fn_80062DD4(pV) && fn_80062DCC(pV) > 0.5f) {
-        fn_800DDA14(nPlayer);
+        GM_PlayerTookShot(nPlayer);
         fn_8006C4A0();
         fn_800DBDA8(nPlayer);
         if (gPlayers[nPlayer].nLie == LIE_HOLED) {
@@ -3995,7 +3995,7 @@ void  fn_800DB4E8(int nPlayer);
 void fn_80062B68(int nPlayer);
 u8    fn_800E5098(void);
 u8    fn_800E3DDC(int nPlayer);
-void  fn_800DD3A4(int nPlayer);
+void  GM_BallHit(int nPlayer);
 void fn_80062B6C(int nPlayer);
 void  fn_800C6618(View* pView, int nPlayer);
 int   fn_800C7138(View* pView);
@@ -4116,7 +4116,7 @@ void STATEFUNC_SwingUpdate(int nPlayer) {
     gpGame->pfn228(nPlayer);
     if (bSwung) {
         View* pV;
-        fn_800DD3A4(nPlayer);
+        GM_BallHit(nPlayer);
         fn_80062B6C(nPlayer);
         fn_8000B1D4(1, gSession.nSeed);
         pV = (View*)fn_80017028(gPlayers[nPlayer].nView0);
