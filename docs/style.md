@@ -67,13 +67,14 @@ Code that exists only to make the compiler emit the original instructions is mar
 reader knows it is deliberate:
 
 ```c
-    long j;         // fake match: long, not int, for the original register order
+    int n;          // fake match: a copy of nPlayer, for the original register order
 ```
 
 - Use `// fake match: <why>` for anything a person would not naturally write (a redundant copy
   of a variable, an odd type, a useless cast, a strange statement order).
-- Rules that explain *normal* EA style (repeated `gPlayers[n].field`, `while` loops) are not
-  fake matches and need no comment.
+- Rules that explain *normal* EA style are not fake matches and need no comment: repeated
+  `gPlayers[n].field`, `while` loops, the `gPlayers[(u32)i]` index, and choosing `int` or
+  `s32`/`long` for a local (both are natural; the choice changes the code, see decomp-notes).
 - No `goto` unless the control flow cannot be matched without it; mark it as a fake match.
 
 Odd code vs wrong code

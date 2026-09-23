@@ -280,7 +280,11 @@ The fixes that come up most often. Each points to its full entry below.
   `optimize_for_size`, any placement of the add, a separate result variable, a ternary, a cast
   to `int` or `u8` - those are no-ops the front end drops - and every GC/2.x version behaves the
   same. A cast to `u32`/`s32` on one operand of `n = n + x` also blocks the fold, which is how the
-  rule was found: `s32` is `long` in `game_types.h`.)
+  rule was found: `s32` is `long` in `game_types.h`.) The same choice decides loop hoisting: in
+  Stableford's `fn_800FE8A8`, `int nPar` had `nPar + 2` hoisted into its own saved register before
+  the player loop (one saved register more than the original); `s32 nPar` keeps the `addi` in the
+  loop body. All 8 `int`/`s32` combinations of the other locals with `s32 nPar` are exact, all 7
+  with `int nPar` stay at 75.4%. The `long j` counter in GameMode13 `fn_800F6ED4` is the same rule.
 - **[verified] What else forces an in-place `+= const`:** the post-add value flowing into a phi
   with another definition of the same variable - a loop that decrements it, or a redefinition in
   one branch plus a use after the join. Even a *dead* decrement inside a later loop does it (the
@@ -295,8 +299,10 @@ The fixes that come up most often. Each points to its full entry below.
 - **[verified] `u8` returned from an `int` local** gives `clrlwi r3, rX, 24` at the return; a `u8`
   local gives a plain `mr`.
 - **[verified] Array index cast to `u32` moves the hoisting.** In the GameMode2 (Skins) honors
-  loop (`fn_800F8278`), `gPlayers[(u32)i].field[h]` is what gives the original's base + h*4 hoisted out of the
-  loop; the plain `int` index computes it differently.
+  loop (`fn_800F8278`), `gPlayers[(u32)i].field[h]` is what gives the original's base + h*4
+  hoisted out of the loop; the plain `int` index computes it differently. The same `(u32)` index
+  matched in GameModeMatch.c and in Stableford `fn_800FE8A8`: it is EA's habit (likely from a
+  macro of theirs), so it is written without a fake-match comment.
 
 ### Function calls and parameters
 

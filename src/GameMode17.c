@@ -30,13 +30,11 @@ extern s32 lbl_802823A4;                    // the extra balls of the last shot
 extern s32 lbl_802823A8;                    // the points of the last shot
 
 void  fn_800E1480(int nHole);
-u32   Rand_Next(int nStream);
 int   Game_CurHoleIndex(void);
 void  Mem_cpy(void* pDst, void* pSrc, int nBytes);
 void  fn_80055AA8(u8* pBall, f32* pPos, int nPlayer);
 f32   fn_800D0550(int nPlayer);             // the shot's length
 int   GOLFERSTATE_GetCurrentState(int nPlayer);
-void  AI_DefaultTarget(int nPlayer);
 void  fn_800A62A4(void);
 void  fn_800A62E0(void);
 void  fn_800A6358(void);
@@ -71,7 +69,7 @@ void  fn_800F5F58(int nPlayer);
 void  fn_800F66A0(void);
 void  fn_800F673C(void);
 void  fn_800F6760(void);
-u8*   fn_800F6788(void);
+void  fn_800F6788(void);
 void  fn_800F67E0(int nPlayer);
 u8    fn_800F6820(int a);
 void  fn_800F6828(int nPlayer);
@@ -180,7 +178,8 @@ void fn_800F5E9C(int nPlayer) {
         Mem_cpy(gPlayers[nPlayer].ball, gReplayData.player.ball, 0xBC);
     } else {
         fn_80055AA8(gPlayers[nPlayer].ball,
-                    (f32*)((u8*)gPlayers[nPlayer].pBallCourse + gSession.nTeeSet[nPlayer] * 0x10 + 0xB0), nPlayer);
+                    (f32*)((u8*)gPlayers[nPlayer].pBallCourse + gSession.nTeeSet[nPlayer] * 0x10 + 0xB0),
+                    nPlayer);
     }
     gPlayers[nPlayer].nDC0--;
 }
@@ -417,19 +416,13 @@ void fn_800F6760(void) {
 }
 
 // 5 balls each, starting at the first target.
-u8* fn_800F6788(void) {
+void fn_800F6788(void) {
+    int i;
     fn_800F1EE4();
-    *(u8*)((u8*)gPlayers + 0xE9C) = 0;
-    *(s32*)((u8*)gPlayers + 0xDC0) = 5;
-    *(u8*)((u8*)gPlayers + 0x1D94) = 0;
-    *(s32*)((u8*)gPlayers + 0x1CB8) = 5;
-    *(u8*)((u8*)gPlayers + 0x2C8C) = 0;
-    *(s32*)((u8*)gPlayers + 0x2BB0) = 5;
-    *(u8*)((u8*)gPlayers + 0x3B84) = 0;
-    *(s32*)((u8*)gPlayers + 0x3AA8) = 5;
-    *(u8*)((u8*)gPlayers + 0x4A7C) = 0;
-    *(s32*)((u8*)gPlayers + 0x49A0) = 5;
-    return (u8*)gPlayers;
+    for (i = 0; i < 5; i++) {
+        gPlayers[i].nNextTarget = 0;
+        gPlayers[i].nDC0 = 5;
+    }
 }
 
 void fn_800F67E0(int nPlayer) {
