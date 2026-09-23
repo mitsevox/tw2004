@@ -84,19 +84,13 @@ void  GM_FlyByMode_Init(void);
 void  fn_80125854(int a);
 void  fn_800A6EC8(void);
 void  fn_800E5200(int a);
-void  Shot_Prepare(int nPlayer, u8 bNotify);
 void  AI_ChooseTarget(int nPlayer);
-void  BreakLine_Start(int nView);
-void  fn_8009B970(int nView);
 void  fn_80058FA4(int nPlayer);
 void  fn_80047B6C(u8* pBall, int nPlayer);
 void  fn_80047BC0(u8* pBall, int nPlayer);
 void  fn_800E3D38(int nPlayer, int a);
 void  fn_800A6DCC(int nMusic, int a);
-u32   fn_800136DC(int nController);         // buttons: held << 16 | pressed this frame
-u32   fn_800142AC(int nButton, int a);      // a button's mask
 u8    fn_800A7720(void);
-void  fn_80063BF4(void* pView, f32 f, f32* pVec);
 u8    fn_80063C7C(void* pView);
 f32   fn_8005C1EC(int nPlayer);
 extern u8* gpSaveData;
