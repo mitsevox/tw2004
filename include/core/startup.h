@@ -39,6 +39,14 @@ void   AXSetVoiceState(AXVPB* pVpb, u16 uState);   // 0 stopped, 1 running
 void   fn_80145B24(AXVPB* pVpb, u32 uMode, int nInput, int nAuxA, int nAuxB, int nPan, int nSPan,
                    int nFader);
 
+// Keeps a global the code never uses through the linker's dead-stripping (startUp.c's data has
+// three). `#pragma force_active` does not mark uninitialised data; this does.
+#ifdef __MWERKS__
+#define KEEP_UNUSED __declspec(export)
+#else
+#define KEEP_UNUSED
+#endif
+
 // ---- the voice table --------------------------------------------------------------------------
 
 #define NUM_VOICES 50
@@ -186,6 +194,8 @@ typedef struct BootSound {
 LAYOUT_ASSERT(BootSound, 0x48);
 
 extern BootSound lbl_8018FE98[2];
+extern u8    lbl_8018F040[0x600];   // } the two sounds' ADPCM data: game data, so it stays in the
+extern u8    lbl_8018F640[0x858];   // } DOL's own data (split before startUp.c's)
 extern u16   lbl_80282118;      // the next voice fn_800B0858 plays on
 
 // ---- the rest ---------------------------------------------------------------------------------

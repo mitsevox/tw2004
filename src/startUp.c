@@ -90,6 +90,53 @@ s32    fn_8009EE28(s32 nSlot, s32 n);
 void   fn_80084FF0(s32 nKind);          // pick a save kind
 s32    fn_80084FB4(CardPos* pPos);      // the picked save kind's size on that card
 
+// The two built-in sounds: where their data is, its size, its playback rate (16.16 fixed point:
+// 0.5 and 0.25) and its header, with the addresses counted from the data's start (fn_800B07A0
+// rebases them into ARAM).
+BootSound lbl_8018FE98[2] = {
+    {lbl_8018F040, 0x600, 0, 0x8000,
+     {2, 0xBC9, 0x8002, 0,
+      {0x024302E8, 0x0C3BF9E6, 0x0807FE3A, 0x0E9DF887, 0x00420786, 0x0CC7FA46, 0x0A2FFD3B, 0x0E53F921},
+      0x40, 0, 0, 0}},
+    {lbl_8018F640, 0x860, 0, 0x4000,
+     {2, 0x10AA, 0x8002, 0,
+      {0x0E77F80C, 0x0FAEF80D, 0x0F44F808, 0x0FD7F818, 0x0EABF858, 0x0FC7F813, 0x0F7FF80C, 0x0FDDF81B},
+      0x37, 0, 0, 0}},
+};
+
+s32 lbl_80281498 = -1;
+s32 lbl_8028149C = -1;
+u8  lbl_802814A0 = 1;
+
+// Defined last-address-first: the compiler lays an object's uninitialised data out in reverse.
+s32    lbl_80282150[NUM_CARD_SLOTS][1];
+s32    lbl_80282148[NUM_CARD_SLOTS][1];
+s32    lbl_80282140[NUM_CARD_SLOTS][1];
+s32    lbl_80282138[NUM_CARD_SLOTS];
+void*  lbl_80282134;
+void*  lbl_80282130;
+u32    lbl_8028212C;
+u32    lbl_80282128;
+s32    lbl_80282124;
+u8     lbl_80282120;
+// fake match: lbl_8028211C, lbl_80282114 and lbl_802820EC are never used by the game's code, but
+// the original's data has a word at each of these addresses (likely the globals of functions the
+// linker stripped); kept through the dead-stripping so the rest lines up. Types unknown.
+KEEP_UNUSED u32 lbl_8028211C;
+u16    lbl_80282118;
+KEEP_UNUSED u32 lbl_80282114;
+u8     lbl_80282110;
+void*  lbl_8028210C;
+u32    lbl_80282108;
+void*  lbl_80282104;
+u32    lbl_80282100;
+u32    lbl_802820FC;
+void*  lbl_802820F8;
+s32    lbl_802820F4;
+u32    lbl_802820F0;
+KEEP_UNUSED u32 lbl_802820EC;
+Voice* lbl_802820E8;
+
 // The mixer callback, run after every audio frame: for each voice, ask for a lost hardware voice
 // back, pass changed settings on to the hardware, start, release, pause and resume it, and step
 // its volume envelope.
