@@ -6,7 +6,6 @@
 // there on shares one constant pool) and ends where Ball.c begins.
 
 #include "golfer.h"
-#include "physics.h"
 #include "game.h"
 #include "engine.h"
 
@@ -18,7 +17,7 @@ u8    Course_RegisterLoader(int nChunk, void (*pfn)(u8*));   // 0x8000C0B4
 s32   fn_8000C140(f32* pPos, TNetwork* pNet, s32 nNodes);   // point in outline. TW06: wn_PnPoly
 u8    fn_8000C3C8(f32* pFrom, f32* pTo, TNetwork* pNet, s32 nNodes, f32* pHit);   // segment crosses outline
 void  fn_8004B588(TNetwork* pNet);
-u8    Ter_LieIsPreferred(u32 nLie);
+u8    Ter_LieIsPreferred(u32 nClass);
 void  fn_8004B63C(TNetwork* pNet);
 void  vec4flt_CrossProduct(f32* pA, f32* pB, f32* pOut);
 f32   fn_8000C5FC(f32* pA, f32* pB);                      // dot product
@@ -379,9 +378,9 @@ done:
 
 // TW06: f32 Ter_CheckForDropLocation(TGD_TerrainInfo*, f32*, bool, bool*, bool*, TGD_MaterialInfo**).
 // Whether a ball could be dropped at a point: in bounds and outside the free-drop areas, and, unless
-// bOnDropSurface, on ground that allows a drop (surface flag 1, not the fringe) that is no steeper
-// than 30 degrees and clear of objects and hazards. *pbPreferred says the lie there is a
-// preferred one (always, when bOnDropSurface). Returns the ground height (0 when bOnDropSurface).
+// bOnDropSurface, on ground that allows a drop (surface flag 1, not surface class 10) that is no
+// steeper than 30 degrees and clear of objects and hazards. *pbPreferred says the surface there is
+// a preferred one (always, when bOnDropSurface). Returns the ground height (0 when bOnDropSurface).
 f32 Ter_CheckForDropLocation(CourseInfo* pCourse, f32* pPos, u8 bOnDropSurface, u8* pbDrop, u8* pbPreferred,
                              SurfaceType** ppSurface) {
     f32 vPos[4];
@@ -400,7 +399,7 @@ f32 Ter_CheckForDropLocation(CourseInfo* pCourse, f32* pPos, u8 bOnDropSurface, 
             *ppSurface = pSurface;
         }
         bOk = fHeight != TER_NO_GROUND && pSurface != NULL && (pSurface->u34 & 1)
-              && pSurface->nClass != LIE_FRINGE_e && fn_8000AD9C(vNormal[1]) > 0.86603f
+              && pSurface->nClass != 10 && fn_8000AD9C(vNormal[1]) > 0.86603f
               && Ter_PointInOOBNetwork(vPos) && !Ter_PointInFreeDropNetwork(vPos)
               && (bOnDropSurface || !Ter_CheckObjectAndHazardObstruction(vPos, 1.5f, 0, 1, 2.0f, 1, 0.577f));
     } else {
@@ -425,16 +424,19 @@ f32 Ter_CheckForDropLocation(CourseInfo* pCourse, f32* pPos, u8 bOnDropSurface, 
     return fHeight;
 }
 
-// Lies from which a drop may be taken: the fairways and the roughs.
-u8 Ter_LieIsPreferred(u32 nLie) {
-    if (nLie == LIE_FAIRWAY_e || nLie == LIE_FAIRWAY_TIGHT_e || nLie == LIE_ROUGH_HIGH_e
-        || nLie == LIE_ROUGH_e) {
+// TW06: bool Ter_LieIsPreferred(u32). Whether a surface class (SurfaceType.nClass, which TW06 calls
+// the lie ID; not a Lie_t) is a preferred place for a drop: classes 1 to 4, the ones Ball_SetLie
+// turns into the fairway (1, 2), green (3) and fringe (4) lies.
+u8 Ter_LieIsPreferred(u32 nClass) {
+    if (nClass == 1 || nClass == 2 || nClass == 3 || nClass == 4) {
         return 1;
     }
     return 0;
 }
 
-// TW06: bool Ter_IsValidDropSurface(s32). Surfaces of class 3, 12 and 18.
+// TW06: bool Ter_IsValidDropSurface(s32). Whether a surface type (a row of gSurfaceTypes) is of
+// surface class 3 (green), 12 (the cup) or 18 (green by the cup): Physics_Simulate records a ball
+// there as a drop spot without the ground checks.
 u8 Ter_IsValidDropSurface(s32 nSurface) {
     u32 nClass;
 
@@ -1103,7 +1105,7 @@ u8 fn_8004E0D4(f32* pFrom, f32* pDir, f32 fRange, f32* pCentre, f32 fRadius) {
 
 // TW06: bool Ter_CheckForPinCollision(TGD_TerrainInfo*, s32, f32*, f32*, f32[4]*, f32[4]*,
 // TGD_MaterialInfo**, TGD_ObjectInstanceInfo**). Whether the line from pFrom to pTo hits the
-// flagstick of the current hole: a vertical cylinder one inch across and 2 yards tall at the pin.
+// flagstick of the current hole: a vertical cylinder of one inch radius, 2 yards tall, at the pin.
 // Not for nobody's ball, nor when the player's view has the flagstick out (view byte 0x275). On
 // a hit: the point, the stick's outward normal and surface 90 (the cup).
 u8 Ter_CheckForPinCollision(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,

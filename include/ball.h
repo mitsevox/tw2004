@@ -21,7 +21,10 @@ typedef struct SurfaceType {
     f32  f20;                   // 0x20  roll: rolling friction
     f32  f24;                   // 0x24  bounce: how hard a landing it takes to bend the normal (softness)
     f32  f28;                   // 0x28  bounce: base softness
-    u32  nClass;                // 0x2C  2, 3 = green, 4, 5 = rough, 6 = sand, 7/16 = water, 11, 12/18 = the cup, 17 = tree
+    u32  nClass;                // 0x2C  surface class (TW06: lieID), not a Lie_t. Ball_SetLie makes the lie
+                                //       from it: 1, 2 fairway; 3 green; 4 fringe; 5, 11 rough; 6, 20 sand;
+                                //       7, 16 water; 8 cart path; 12 the cup; 18 green (holes a ball, as 12).
+                                //       17 = tree; 19 = not playable (Ter_CalcLowestPlayableWorldHeight)
     u8   unk30[4];
     u32  u34;                   // 0x34  bit 0x10: event 0x25 on landing
     u8   unk38[0x44 - 0x38];
