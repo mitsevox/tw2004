@@ -61,7 +61,6 @@ typedef struct RTEData {
 } RTEData;
 extern RTEData gRTEs;
 
-void  fn_800EC544(RTEChallenge* pList, s32 n);   // Challenge* in GameMode5.c
 void  fn_800D7770(int nPlayer, u8* pFlag);
 void  fn_8011E020(s32* pMonth, s32* pDay, s32* pYear, s32* pHour, s32* pMinute, s32* pSecond, s32* pMsec);
 void  fn_800D2678(u16* pDate, s32 nMonth, s32 nDay, s32 nYear);
@@ -157,7 +156,7 @@ void fn_800F06DC(void) {
         if (gRTEs.aEvent[lbl_80282350].nChallenge != 0) {
             gSession.nNumPlayers = 1;
             fn_800E0B38(5);
-            fn_800EC544(gRTEs.aChallenge, 111);
+            fn_800EC544((Challenge*)gRTEs.aChallenge, 111);
             fn_800EAE38(gRTEs.aEvent[lbl_80282350].nChallenge - 1);
             fn_800EAF7C();
             lbl_8028235C = gpGame->pfn1CC;

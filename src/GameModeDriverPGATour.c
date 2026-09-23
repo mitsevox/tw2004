@@ -105,7 +105,6 @@ s32 fn_800EFE3C(s32 i);
 char* fn_800EFE60(s32 i);
 void fn_800F009C(void);
 u8 fn_8011908C(s32, s32);
-s32 fn_8011937C(s32, s32, u8);
 void fn_800F018C(void);
 
 extern s32 lbl_80281670;
@@ -140,7 +139,6 @@ void fn_80117D80(s32 nPlayer);
 u8   fn_800EF83C(u16 nDate, s32* pId, s32* pRound);
 s32  fn_8011A7C8(s32 nPlayer, s32 nHole);
 s32  fn_80119588(s32 nPlayer, s32 a);
-s32  fn_800E1904(s32 nPlayer, s32 a);
 s32   fn_80118684(s32 a);
 char* fn_80118E30(s32 a, s32 b);
 s32   fn_80119118(s32 a, s32 b);

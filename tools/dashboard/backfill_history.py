@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Backfill build/dashboard_reports.json (objdiff matched code per commit) by rebuilding old commits
+Backfill build/dashboard_reports.json (objdiff's matched and linked bytes per commit) by rebuilding old commits
 in a throwaway worktree, then refresh the dashboard history.
 
     python tools/dashboard/backfill_history.py <oldest-commit> [<newest-commit>]
@@ -52,14 +52,15 @@ for i, c in enumerate(todo):
     rep = os.path.join(WT, 'build', VERSION, 'report.json')
     if ok and os.path.exists(rep):
         try:
-            m = int(json.load(open(rep))['measures']['matched_code'])
+            measures = json.load(open(rep))['measures']
+            m = {k: int(measures.get(k, 0)) for k in ('matched_code', 'complete_code', 'matched_data', 'complete_data')}
         except Exception as e:
             ok = False; m = None
     if ok:
         reports = json.load(open(REPORTS)) if os.path.exists(REPORTS) else {}
         reports[c] = m
         json.dump(reports, open(REPORTS, 'w'), indent=0)
-        log(f'[{i + 1}/{len(todo)}] {c[:7]} {m:,} bytes ({time.time() - t0:.0f}s)')
+        log(f'[{i + 1}/{len(todo)}] {c[:7]} {m["matched_code"]:,} bytes ({time.time() - t0:.0f}s)')
     else:
         log(f'[{i + 1}/{len(todo)}] {c[:7]} BUILD FAILED, skipped ({time.time() - t0:.0f}s)')
     subprocess.run([sys.executable, os.path.join(ROOT, 'tools', 'dashboard', 'refresh_history.py')],
