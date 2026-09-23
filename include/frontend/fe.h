@@ -207,7 +207,10 @@ typedef struct CrAPAsset {
     u64  aVariant[4];           // 0x090  } them) and the id of each one's variant (fn_80106A64)
     u64  aSet[4];               // 0x0B0  the ids of four skin sets; taking the asset off puts
                                 //        them back to "Defaults" (fn_80106DA0)
-    u8   unkD0[0x118 - 0xD0];
+    u8   unkD0[0x112 - 0xD0];
+    s16  n112;                  // 0x112  } offsets of strings in 'CR_S' (fn_801064EC); n114 is
+    s16  n114;                  // 0x114  } passed to fn_8008E724 with the asset's name (fn_80104094)
+    u8   unk116[2];
 } CrAPAsset;
 LAYOUT_ASSERT(CrAPAsset, 0x118);
 
@@ -227,7 +230,11 @@ LAYOUT_ASSERT(CrAPDB, 0x18);
 extern CrAPDB* lbl_80282460;
 extern UStreamObject* lbl_80282464;     // the 'CR_A' object (the assets), kept until freed
 extern UStreamObject* lbl_80282468;     // the 'CR_S' object (their names)
+extern void* lbl_80282470;              // 0x2C-byte records (fn_80107244); freed by fn_80103A64
 extern s32* lbl_80282474;               // per part: the index of its first asset
+extern s32* lbl_80282478;               // per part, 24 entries: the categories fn_80104AF4 found
+extern void* lbl_8028247C;              // freed by fn_80103A64
+extern void* lbl_80282480;              // freed by fn_80103A64
 extern char lbl_801935C8[16][32];      // 16 names (fn_80107294)
 extern char lbl_801932C8[CRAP_NUM_PARTS][32];   // per part: the name of its "All ..." entry that
                                         // lists every category ("All Headwear"), or ""
@@ -305,6 +312,7 @@ void fn_8008E244(void);
 void fn_8008E364(int n);
 int  fn_8008E420(void);
 int  fn_8008E44C(void);
+char* fn_8008E6BC(void);
 void fn_8008E6D4(int n);
 void fn_8008E724(char* szAnim, char* szShot, s8 n, u8 bLoop);
 void fn_8008E824(void);

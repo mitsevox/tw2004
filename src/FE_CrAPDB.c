@@ -31,6 +31,42 @@ int  fn_8010766C(MsgArg* pArg, char* sz);
 // uistudio.h has UIStudio* and const s32*, and game/frontend.h cannot be included with it).
 void fn_8016B09C(void* pHandler, int nMsg, int nArgs, MsgArg* pArgs);
 
+// Free the database: its stream objects, the database and its tables.
+void fn_80103A64(void) {
+    if (lbl_80282464 != NULL) {
+        fn_80009E70(lbl_80282464);
+    }
+    if (lbl_80282468 != NULL) {
+        fn_80009E70(lbl_80282468);
+    }
+    lbl_80282468 = NULL;
+    lbl_80282464 = NULL;
+    if (lbl_80282460 != NULL) {
+        fn_80009E70(lbl_80282460);
+    }
+    if (lbl_80282480 != NULL) {
+        fn_80009E70(lbl_80282480);
+    }
+    if (lbl_8028247C != NULL) {
+        fn_80009E70(lbl_8028247C);
+    }
+    if (lbl_80282478 != NULL) {
+        fn_80009E70(lbl_80282478);
+    }
+    if (lbl_80282474 != NULL) {
+        fn_80009E70(lbl_80282474);
+    }
+    if (lbl_80282470 != NULL) {
+        fn_80009E70(lbl_80282470);
+    }
+    lbl_80282480 = NULL;
+    lbl_8028247C = NULL;
+    lbl_80282478 = NULL;
+    lbl_80282474 = NULL;
+    lbl_80282470 = NULL;
+    lbl_80282460 = NULL;
+}
+
 int fn_80103B28(int nAsset) {
     CrAPAsset* pAsset = &lbl_80282460->pAssets[nAsset];
 
@@ -180,6 +216,24 @@ u8 fn_80104020(int nAsset) {
         return 1;
     }
     return 0;
+}
+
+// Switch the asset's name in the profile's list b: take it out when it is there, otherwise add it
+// and have the menu golfer play it (unless it already does).
+void fn_80104094(CrAPAsset* pAsset, int b) {
+    SaveProfile* pProfile = fn_80077ACC();
+    char szName[24];
+
+    fn_80105B80(pAsset, szName);
+    if (fn_800587A8(pProfile, b, szName)) {
+        fn_80058624(pProfile, b, szName);
+    } else {
+        fn_80058560(pProfile, b, szName);
+        if (fn_8008E6BC() == NULL || strcmp(fn_8008E6BC(), szName) != 0) {
+            fn_8008E724(szName, fn_801064EC(pAsset->n114), 1, 0);
+        }
+    }
+    fn_8008E944(0, 0.0f);
 }
 
 // The parts whose choices are grouped by category, with an "All ..." entry: headwear, shirts,
