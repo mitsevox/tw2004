@@ -570,8 +570,9 @@ void fn_800C0C0C(View* pView, int nPlayer) {
     fn_8003DCE8(nPlayer, pCam, pSub, &pView->script, &pView->shot19C, 0, gSession.fFrameTime);
 }
 
-// Camera 12's process: shots of kind 6, 8, 9 and 10 have no next shot while the script runs; the
-// script runs at 1/59.94 s a frame in slow motion; on the downswing kinds 9 and 10 give way to 0 and 2.
+// Camera 12's process: shots of kind 6, 8, 9 and 10 have no next shot while the script runs; in super
+// slow motion the script steps one fixed frame (FRAME_TIME); on the downswing kinds 9 and 10 give way
+// to 0 and 2.
 void fn_800C1338(View* pView, int nPlayer) {
     f32* pCam;
     f32* pSub;
@@ -583,7 +584,7 @@ void fn_800C1338(View* pView, int nPlayer) {
         pView->p134 = NULL;
     }
     if (fn_800DC514(nPlayer) && gSession.unk14 == 0) {
-        fTime = 0.016683351f;
+        fTime = FRAME_TIME;
     }
     fn_8003DCE8(nPlayer, pCam, pSub, &pView->script, &pView->shot19C, 0, fTime);
     if (pView->n140 == 6 || pView->n140 == 8 || pView->n140 == 9 || pView->n140 == 10) {
@@ -711,8 +712,8 @@ void GolfCamera_InitHeartBeatCamera(View* pView, int nPlayer) {
     pView->f18C = 0.0f;
     lbl_80282220->b5A = 1;
     fn_80063B98(pView, lbl_80281F78->fC4, v);
-    fRate = (59.94f * (fn_800C741C((u8*)gPlayers[nPlayer].nShotHandle, 2) - fStart))
-          / (59.94f * (lbl_80281F78->fC4 * (lbl_80281F78->nBeatFrames * (lbl_80281F78->nBeats + 1))
+    fRate = (FRAME_RATE * (fn_800C741C((u8*)gPlayers[nPlayer].nShotHandle, 2) - fStart))
+          / (FRAME_RATE * (lbl_80281F78->fC4 * (lbl_80281F78->nBeatFrames * (lbl_80281F78->nBeats + 1))
                        + (lbl_80281F78->nBeats * lbl_80281F78->fC8
                           + lbl_80281F78->nBeats * lbl_80281F78->fCC)));
     GameEffects_SetSuperSlowMo(1, nPlayer, fRate);
@@ -720,7 +721,8 @@ void GolfCamera_InitHeartBeatCamera(View* pView, int nPlayer) {
 }
 
 // Camera 21: the heartbeats. While b5A is set, each beat (every nBeatFrames steps of n194, nBeats
-// of them) cuts to a new angle, the last to the saved shot p80. Runs at 1/59.94 s a frame.
+// of them) cuts to a new angle, the last to the saved shot p80. The script steps one fixed frame
+// (FRAME_TIME) at a time.
 void GolfCamera_ProcessHeartBeatCamera(View* pView, int nPlayer) {
     f32* pCam = fn_8001731C(pView);
     f32* pSub = fn_80017314(pView);
@@ -756,11 +758,11 @@ void GolfCamera_ProcessHeartBeatCamera(View* pView, int nPlayer) {
                 pView->n194++;
                 pView->f18C = 0.0f;
             } else if (pView->nCamera == 0 || pView->nCamera == 4 || pView->nCamera == 3) {
-                pView->f18C += 0.016683351f;
+                pView->f18C += FRAME_TIME;
                 fn_80063CBC(pView, v);
             }
         }
-        fn_8003DCE8(nPlayer, pCam, pSub, &pView->script, &pView->shot19C, 0, 0.016683351f);
+        fn_8003DCE8(nPlayer, pCam, pSub, &pView->script, &pView->shot19C, 0, FRAME_TIME);
     }
 }
 
@@ -788,10 +790,10 @@ void GolfCamera_InitShutterCamera(View* pView, int nPlayer) {
     GameEffects_SetSuperSlowMo(1, nPlayer, 1.0f);
 }
 
-// Camera 17: the script runs on at 1/59.94 s a frame.
+// Camera 17: the script steps on one fixed frame (FRAME_TIME) at a time.
 void fn_800C34F8(View* pView, int nPlayer) {
-    fn_8003F2E0(&pView->script, 0.016683351f);
-    pView->f114 += 0.016683351f;
+    fn_8003F2E0(&pView->script, FRAME_TIME);
+    pView->f114 += FRAME_TIME;
 }
 
 // Camera 15, the post-shot camera: the crowd flyby, else shot 0x40 of the plan or shot 5 of the
@@ -1005,7 +1007,7 @@ void fn_800C39A8(View* pView, int nPlayer) {
     }
     // EA bug: with no golfer (pB4 NULL) this reads b18 through the NULL pointer.
     if (lbl_80281EE0->pB4->b18) {
-        fn_8003E624(nPlayer, pCam, pSub, &pView->script, &pView->shot19C, 0, 0.016683351f);
+        fn_8003E624(nPlayer, pCam, pSub, &pView->script, &pView->shot19C, 0, FRAME_TIME);
     }
 }
 
@@ -1062,7 +1064,7 @@ void GolfCamera_SwitchCrAPCamera(View* pView, char* szName, int nShot, u8 bBlend
     pView->n194 = lbl_80281EE0->pB4->nC;
     pView->n198 = lbl_80281EE0->n0;
     if (lbl_80281EE0->pB4->b18) {
-        fn_8003E624(0, pCam, pSub, &pView->script, &pView->shot19C, 0, 0.016683351f);
+        fn_8003E624(0, pCam, pSub, &pView->script, &pView->shot19C, 0, FRAME_TIME);
     }
 }
 
@@ -1278,7 +1280,7 @@ f32 fn_800C54FC(View* pView, f32* pCam, f32* pSub, int nPlayer) {
         EVENT_Trigger(nPlayer, 0x3B, NULL, 1);
         pShot = pView->p130->p44;
         if (pShot != NULL) {
-            Mem_cpy(&pView->shot19C, pShot, 0xC0);
+            Mem_cpy(&pView->shot19C, pShot, sizeof(CamShot));
             pView->shot19C.p44 = pShot;
             pView->p134 = &pView->shot19C;
             pView->fCamTime = 0.0f;
@@ -1299,10 +1301,10 @@ f32 fn_800C54FC(View* pView, f32* pCam, f32* pSub, int nPlayer) {
                 pView->f18C = 0.0f;
             } else {
                 fTime = 0.0f;
-                pView->f18C += 0.016683351f;
+                pView->f18C += FRAME_TIME;
             }
         } else {
-            fTime = 0.016683351f;
+            fTime = FRAME_TIME;
         }
     }
     return fTime;
@@ -1333,7 +1335,7 @@ f32 fn_800C5A70(View* pView, f32* pCam, f32* pSub, int nPlayer) {
         }
         pShot = pView->p130->p44;
         if (pShot != NULL) {
-            Mem_cpy(&pView->shot19C, pShot, 0xC0);
+            Mem_cpy(&pView->shot19C, pShot, sizeof(CamShot));
             pView->shot19C.p44 = pShot;
             pView->p134 = &pView->shot19C;
             pView->fCamTime = 0.0f;
@@ -1361,7 +1363,7 @@ f32 fn_800C5A70(View* pView, f32* pCam, f32* pSub, int nPlayer) {
         lbl_80282220->shot12C.f7C = lbl_80281F78->f80;
     }
     if (gSession.unk14 == 0) {
-        fTime = 0.016683351f;
+        fTime = FRAME_TIME;
     }
     return fTime;
 }

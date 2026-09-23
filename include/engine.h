@@ -21,6 +21,11 @@ char* strcpy(char* pDst, const char* pSrc);
 int  strcmp(const char* a, const char* b);
 int  sprintf(char* pBuf, const char* pFmt, ...);
 
+// ---- time ------------------------------------------------------------------------------------
+
+#define FRAME_RATE 59.94f               // frames a second (NTSC)
+#define FRAME_TIME (1.0f / FRAME_RATE)  // one frame, in seconds
+
 // ---- math and random numbers -----------------------------------------------------------------
 
 void Vec3Copy(f32* pSrc, f32* pDst);    // 0x80008304
