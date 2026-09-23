@@ -257,6 +257,19 @@ extern void* lbl_80281100;          // 0x80281100 (.sdata): &lbl_801D4F68, GoPos
                                     // pointers: the screen copy's pixels, then two gomainloop tests)
 void* fn_8002A624(void);            // the screen-copy texture's pixels (lbl_80281100's first word)
 
+// The screen copy (our name; what lbl_80281100 points at): render surface 1, set up by gomainloop
+// fn_8006DCA8 for each game type and filled by PostFx_CopyScreenToBuffer.
+typedef struct ScreenCopy {
+    void* pPixels;              // 0x00  surface 1's buffer, NULL without a size
+    s32   nWidth;               // 0x04
+    s32   nHeight;              // 0x08
+    s32   nC;                   // 0x0C
+    s32   nSize;                // 0x10  the buffer's size in bytes (fn_8002F454)
+} ScreenCopy;
+
+extern ScreenCopy* lbl_80281100;
+extern s32 lbl_80281B88;        // bit 0: the video field being drawn
+
 // ---- the file streamer (UStream.c) -----------------------------------------------------------
 
 // An object built from SHOC chunks. The header is 0x34 bytes, then the copied chunk header
