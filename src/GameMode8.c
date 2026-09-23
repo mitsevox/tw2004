@@ -59,6 +59,28 @@ extern u8  lbl_802823CA;
 extern s32 lbl_802823D0;
 extern s32 lbl_802823D4;
 extern u8  lbl_80192C00[];
+extern u16 lbl_80192BA8[];                  // per event, a sound (0xFFFF = none)
+
+// The events of the two-player game: flags set on the player and points won from the other player.
+typedef struct SGEvent {
+    u32 uFlags;                 // 0x0  or'd into nC48
+    u32 uFlags2;                // 0x4  or'd into nC4C
+    s32 nPoints;                // 0x8
+    u8  unkC[4];
+} SGEvent;
+extern SGEvent lbl_80192908[];
+// The last 100 events.
+typedef struct SGLog {
+    s32 nEvent;
+    s32 nPlayer;
+} SGLog;
+extern SGLog lbl_802120F8[100];
+extern s32 lbl_802823CC;
+void  Mem_cpy(void* pDst, void* pSrc, int nBytes);
+void  fn_8006ACF8(int nPlayer, int a);
+void  fn_8006BAA8(int nPlayer);
+void  fn_800FE100(s32 p0, s32 p1, s32 p2);
+void  fn_800FA554(int nPlayer);
 
 void  fn_800F9824(void);
 void  fn_800F9844(void);
@@ -529,6 +551,85 @@ void fn_800FA998(int nPlayer) {
     gPlayers[nPlayer].nC54--;
     if (gPlayers[nPlayer].nC54 <= 0 && (gPlayers[nPlayer].nC3C & 4)) {
         gPlayers[nPlayer].nC3C &= ~6;
+    }
+}
+
+// States 12 and 24, enter: the shot starts; the ball is saved and the shot clock set.
+void fn_800FA9E0(int nPlayer) {
+    Mem_cpy(gPlayers[nPlayer].ballBefore, gPlayers[nPlayer].ball, 0xBC);
+    *(s32*)(gPlayers[nPlayer].ballBefore + 0x94) = -1;
+    fn_8006ACF8(nPlayer, 0);
+    fn_8006BAA8(nPlayer);
+    fn_800FA554(nPlayer);
+    gPlayers[nPlayer].nC40 = gPlayers[nPlayer].nLie;
+}
+
+// An event's sound.
+void fn_800FAA70(int nEvent) {
+    if (nEvent < 37) {
+        if (lbl_80192BA8[nEvent] == 0xFFFF) {
+            return;
+        }
+        fn_800FE164(lbl_80192BA8[nEvent], 1);
+    }
+}
+
+// An event for a player: its flags, and its points taken from the other player. A player whose
+// points run out loses the hole; the other gets 6000.
+void fn_800FAAB8(int nPlayer, int nEvent) {
+    int nOther;
+    s32 nPoints;
+    if ((!(gPlayers[nPlayer].nC3C & 0x6000) || nEvent == 0x28 || nEvent == 0x29) && nEvent <= 0x2A) {
+        if (nEvent == 0x25) {
+            lbl_802823CC++;
+        }
+        if (nEvent == 0x27) {
+            fn_80062C80(gPlayers[nPlayer].nC58, 1);
+        }
+        gPlayers[nPlayer].nC4C |= lbl_80192908[nEvent].uFlags2;
+        nOther = nPlayer == 0;
+        nPoints = lbl_80192908[nEvent].nPoints;
+        gPlayers[nPlayer].nC48 |= lbl_80192908[nEvent].uFlags;
+        gPlayers[nPlayer].nC44 += nPoints;
+        if (gPlayers[nPlayer].nC44 <= 0 && !(gPlayers[nPlayer].nC3C & 0x2000) && !(gPlayers[nPlayer].nC3C & 0x8000)) {
+            gPlayers[nPlayer].nC44 = 0;
+            gPlayers[nOther].nC44 = 6000;
+            gPlayers[nPlayer].nC3C |= 0xC000;
+            gPlayers[nOther].nC3C |= 0x10000 | 0x4000;
+            if ((s8)GOLFERSTATE_GetCurrentState(nOther) != 26) {
+                GOLFERSTATE_Set(26, (u8)nOther);
+            }
+            if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) != 26) {
+                GOLFERSTATE_Set(26, (u8)nPlayer);
+            }
+        } else {
+            fn_800FDFC4(gPlayers[nPlayer].nC58, gPlayers[nPlayer].nC44, 0);
+            fn_800FE100(gPlayers[nPlayer].nC58, nEvent, nPoints);
+            lbl_802120F8[lbl_802823D0].nEvent = nEvent;
+            lbl_802120F8[lbl_802823D0].nPlayer = nPlayer;
+            if (++lbl_802823D0 >= 100) {
+                lbl_802823D0 = 0;
+            }
+            fn_800FAA70(nEvent);
+            if (nPoints != 0) {
+                gPlayers[nOther].nC44 -= nPoints;
+                fn_800FDFC4(gPlayers[nOther].nC58, gPlayers[nOther].nC44, 0);
+                if (gPlayers[nOther].nC44 <= 0) {
+                    if (!(gPlayers[nOther].nC3C & 0x6000) && !(gPlayers[nOther].nC3C & 0x8000)) {
+                        gPlayers[nOther].nC44 = 0;
+                        gPlayers[nPlayer].nC44 = 6000;
+                        gPlayers[nOther].nC3C |= 0xC000;
+                        gPlayers[nPlayer].nC3C |= 0x10000 | 0x4000;
+                        if ((s8)GOLFERSTATE_GetCurrentState(nOther) != 26) {
+                            GOLFERSTATE_Set(26, (u8)nOther);
+                        }
+                        if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) != 26) {
+                            GOLFERSTATE_Set(26, (u8)nPlayer);
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
