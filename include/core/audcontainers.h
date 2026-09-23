@@ -43,7 +43,7 @@ typedef struct UPoolNode {
 // itself (&head), not at NULL.
 typedef struct UPool {
     UPoolNode head;             // 0x0    head.pNext: the first free block
-    s32       nFree;            // 0x4    free blocks
+    u32       nFree;            // 0x4    free blocks
 } UPool;
 LAYOUT_ASSERT(UPool, 0x8);
 
@@ -58,5 +58,8 @@ void*      fn_800AE084(UQueue* pQueue);
 void       fn_800AE0DC(UPool* pPool, void* pMem, u32 nBlocks, u32 nBlockSize);
 void*      fn_800AE1AC(UPool* pPool);
 void       fn_800AE1DC(UPool* pPool, void* pBlock);
+
+// UAudMemStack.c
+void*      fn_800B5BD8(u32 uSize);      // the sound engine's allocator
 
 #endif
