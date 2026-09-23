@@ -4,6 +4,8 @@
 
 #include "game_types.h"
 
+// ---- sweep code (not yet cleaned up) ----
+
 extern u8 lbl_8018EB90[];
 extern u8 lbl_801F18B8[];
 void fn_800AE084();
@@ -67,3 +69,5 @@ void fn_800AC310(u8* p0) {
 s32 fn_800AC328(void) {
     return lbl_80281468;
 }
+
+// ---- end of sweep code ----
