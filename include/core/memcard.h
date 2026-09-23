@@ -78,10 +78,13 @@ void fn_8009CD7C(void);
 s32  fn_8009D614(s32 nPort, s32 nSlot, const char* pName);
 s32  fn_8009D74C(s32 nPort, s32 nSlot);     // mount the card; 0, or -22 when it was mounted already
 s32  fn_8009DBAC(s32 nPort, s32 nSlot);     // unmount it
+s32  fn_8009D3DC(s32 nPort, s32 nSlot);
+s32  fn_8009D50C(s32 nPort, s32 nSlot);
 void fn_8009DCEC(s32 nPort, s32 nSlot);
 s32  fn_8009DD44(s32 nPort, s32 nSlot, const char* pName);
 void fn_8009EA98(void);
 void fn_8009EAF0(void);
+s32  fn_8009EE28(s32 nPort, s32 nSlot);
 u32  fn_8009EF90(void);
 s32  fn_8009F5E4(s32 nPort, s32 nSlot, const char* pName);    // delete the save file
 
@@ -91,6 +94,7 @@ s32  fn_8009F5E4(s32 nPort, s32 nSlot, const char* pName);    // delete the save
 // a format in progress or an encoding error clears it), -35 not mounted, else 0.
 s32  fn_8009F734(s32 nPort, s32 nSlot);
 u8   fn_8009F7E8(int nPort);        // lbl_80282008[nPort]
+void fn_8009F7F4(MCCardState* pState, int nPort, int nSlot);   // copy out lbl_801F1510[nPort][nSlot]
 u8   fn_8009F850(void);
 
 // ---- MC.c ---------------------------------------------------------------------------------------
