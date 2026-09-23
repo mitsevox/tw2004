@@ -3951,6 +3951,8 @@ runtime/k_tan.c:
 
 src/MSL_C/PPCEABI/bare/H/s_atan.c:
 	.text       start:0x8015EE8C end:0x8015F0A4
+	.rodata     start:0x801857F8 end:0x80185890
+	.sdata2     start:0x80285118 end:0x80285140
 
 runtime/s_copysign.c:
 	.text       start:0x8015F0A4 end:0x8015F0CC
