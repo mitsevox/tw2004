@@ -2514,16 +2514,7 @@ AnimStream.c:
 	.text       start:0x800C937C end:0x800CC1EC
 
 SkinPart.c:
-	.text       start:0x800CC1EC end:0x800CEA30
-
-unsorted/sweep_800CEDE0.c:
-	.text       start:0x800CEDE0 end:0x800CEE04
-
-unsorted/sweep_800CEE88.c:
-	.text       start:0x800CEE88 end:0x800CEEC8
-
-unsorted/sweep_800CEEF4.c:
-	.text       start:0x800CEEF4 end:0x800CEF04
+	.text       start:0x800CC1EC end:0x800CF158
 
 HoleScore.c:
 	.text       start:0x800CF158 end:0x800D1698

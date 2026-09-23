@@ -79,3 +79,49 @@ void fn_800CE16C(void) {
 }
 
 // ---- end of sweep code ----
+
+// ---- sweep code (not yet cleaned up) ----
+
+void fn_8010AD50();
+void fn_800CEDE0(s32 p0, s32 p1);
+extern u8 lbl_80282238;
+void fn_800CEE88(u8 v);
+u8 fn_800CEE90(void);
+void fn_800CEE98(void);
+void fn_800CEEBC(void);
+u8 fn_800CEEC0(u8* p);
+s32 fn_800CEEF4(u8* p);
+s32 fn_800CEEFC(u8* p);
+
+void fn_800CEDE0(s32 p0, s32 p1) {
+    fn_8010AD50(p1);
+}
+
+void fn_800CEE88(u8 v) {
+    lbl_80282238 = v;
+}
+
+u8 fn_800CEE90(void) {
+    return lbl_80282238;
+}
+
+void fn_800CEE98(void) {
+    fn_800CEE88(1);
+}
+
+void fn_800CEEBC(void) {
+}
+
+u8 fn_800CEEC0(u8* p) {
+    return *(u8*)(p + 0x4);
+}
+
+s32 fn_800CEEF4(u8* p) {
+    return *(s32*)(p + 0x8);
+}
+
+s32 fn_800CEEFC(u8* p) {
+    return *(s32*)(p + 0xC);
+}
+
+// ---- end of sweep code ----
