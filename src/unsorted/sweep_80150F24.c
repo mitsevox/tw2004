@@ -3,10 +3,10 @@
 #include "game_types.h"
 
 
-void fn_80150F24(void);
-void fn_80150F28(void);
-void fn_80150F24(void) {
+void DBClose(void);
+void DBOpen(void);
+void DBClose(void) {
 }
 
-void fn_80150F28(void) {
+void DBOpen(void) {
 }

@@ -4,6 +4,7 @@
 // Most of it talks to the GameCube's audio libraries; see core/startup.h.
 
 #include "core/startup.h"
+#include "game/frontend.h"
 
 void   fn_800AF324(void);
 void   fn_800AF93C(void* pVpb);
@@ -16,12 +17,15 @@ s16    fn_800AFF9C(s16 nVolume);
 void   fn_800B00A4(u16 nVoice, u32 u, int a);
 void   fn_800B0114(u16 nVoice, VoiceEnvelope* pEnv);
 void   fn_800B01B4(u16 nVoice, u8 bA, u8 bB);
-int    fn_800B044C(u32 uAram, void* pSrc, int nLen, void (*pfnDone)(void), int n);
 void   fn_800B04EC(void* p, u32 uLen, int nDir);
 void   fn_800B051C(void* p, u32 uLen, int nDir);
 void   fn_800B055C(void);
 u32    fn_800B0698(u32 uSize);
-int    fn_800B13FC(s32* pnA, s32* pnB);
+s32    fn_800B09C8(int nSlot, int n);
+void   fn_800B10A4(void);
+u8     fn_800B1180(void);
+s32    fn_800B12FC(s32* pnSlot, s32* pn);
+int    fn_800B13FC(s32* pnSlot, s32* pn);
 void   fn_800B166C(UStreamObject* pObject);
 
 // port: the GameCube's audio and ARAM libraries and their set-up.
@@ -43,6 +47,16 @@ void   fn_800B65C0(void* pSrc, u32 uAram, u32 uLen, int a, int b, void (*pfnDone
                    int c);                                            // ARAM DMA
 f32    fn_8000AF7C(f32 x);              // natural logarithm
 void   fn_8009527C(void* p);            // frees what fn_800951A0 allocated
+
+// The memory card code (MC.c, MC_Gc.c).
+void   fn_8009CD10(void);
+void   fn_8009CD7C(void);
+void   fn_8009DCEC(s32 a, s32 b);
+u8     fn_8009F7E8(int nSlot);
+u8     fn_8009F850(void);
+void   fn_8009FAD0(void);
+s32    fn_800A0A7C(s32 a, s32 b);
+s32    fn_800A2100(s32 a, s32 b);
 
 // The hardware dropped a voice (to play one of higher priority): mark ours lost and stop it. The
 // mixer callback asks for it back after 255 passes.
@@ -157,6 +171,18 @@ void fn_800AFCBC(u16 nVoice, u8 bPause) {
         }
     }
     OSRestoreInterrupts(bEnabled);
+}
+
+// Where a voice is in its sound, in bytes of ARAM: from the hardware once it plays.
+u32 fn_800AFD8C(u16 nVoice) {
+    Voice* p = &lbl_802820E8[nVoice];
+    if (p->flags.b.nState <= 2) {
+        return p->u14 >> 1;
+    }
+    // fake match: one 32-bit load across both halves (combining them in C loads each alone).
+    // port: this reads a u32 at a 2-byte boundary and assumes big-endian; a port should use
+    // ((u32)n1B2 << 16 | n1B4).
+    return *(u32*)&p->pVpb->n1B2 >> 1;
 }
 
 // Set a voice up to play a sound.
@@ -439,16 +465,260 @@ void fn_800B0954(void) {
     lbl_802814A0 = 0;
 }
 
-// Start a search from the beginning (fn_800B13FC continues it).
-int fn_800B14E4(s32* pnA, s32* pnB) {
+void fn_800B0960(void) {
+    MsgArg arg;
+    if (!lbl_802814A0) {
+        fn_80005AE8(&arg, 0, sizeof(arg));
+        fn_8016B0F8(lbl_80281F1C->pHandler, 0x86, 1, &arg);
+        return;
+    }
+    fn_8009CD10();
+    fn_8009FAD0();
+    lbl_80282120 = fn_8009F850();
+    fn_8009CD7C();
+}
+
+// The messages below have no values: their one value is cleared and not counted.
+
+void fn_800B0DB8(void) {
+    MsgArg arg;
+    fn_80005AE8(&arg, 0, sizeof(arg));
+    fn_8016B0F8(lbl_80281F1C->pHandler, 0x87, 0, &arg);
+}
+
+void fn_800B0DFC(void) {
+    MsgArg arg;
+    fn_80005AE8(&arg, 0, sizeof(arg));
+    fn_8016B0F8(lbl_80281F1C->pHandler, 0x88, 0, &arg);
+}
+
+void fn_800B0E40(void) {
+    MsgArg arg;
+    fn_80005AE8(&arg, 0, sizeof(arg));
+    fn_8016B0F8(lbl_80281F1C->pHandler, 0x89, 0, &arg);
+}
+
+void fn_800B0E84(void) {
+    MsgArg arg;
+    fn_80005AE8(&arg, 0, sizeof(arg));
+    fn_8016B0F8(lbl_80281F1C->pHandler, 0x8A, 0, &arg);
+}
+
+void fn_800B0EC8(void) {
+    MsgArg arg;
+    fn_80005AE8(&arg, 0, sizeof(arg));
+    fn_8016B0F8(lbl_80281F1C->pHandler, 0x8C, 0, &arg);
+}
+
+void fn_800B0F0C(void) {
+    MsgArg arg;
+    fn_80005AE8(&arg, 0, sizeof(arg));
+    fn_8016B0F8(lbl_80281F1C->pHandler, 0x83, 0, &arg);
+}
+
+void fn_800B0F50(void) {
+    MsgArg arg;
+    fn_80005AE8(&arg, 0, sizeof(arg));
+    fn_8016B0F8(lbl_80281F1C->pHandler, 0x81, 0, &arg);
+}
+
+void fn_800B0F94(void) {
+    MsgArg arg;
+    fn_80005AE8(&arg, 0, sizeof(arg));
+    fn_8016B0F8(lbl_80281F1C->pHandler, 0x8B, 0, &arg);
+}
+
+void fn_800B0FD8(void) {
+    MsgArg arg;
+    fn_80005AE8(&arg, 0, sizeof(arg));
+    fn_8016B0F8(lbl_80281F1C->pHandler, 0x80, 0, &arg);
+}
+
+void fn_800B101C(void) {
+    MsgArg arg;
+    fn_80005AE8(&arg, 0, sizeof(arg));
+    fn_8016B0F8(lbl_80281F1C->pHandler, 0x82, 0, &arg);
+}
+
+void fn_800B1060(void) {
+    MsgArg arg;
+    fn_80005AE8(&arg, 0, sizeof(arg));
+    fn_8016B0F8(lbl_80281F1C->pHandler, 0x8C, 0, &arg);
+}
+
+// Read every card slot's status; a changed status is marked not yet reported. Here and in
+// fn_800B1180 and fn_800B13FC EA tests the slot (fn_8009F7E8) but gives it one entry either way.
+void fn_800B10A4(void) {
+    int j;
+    int i;
+    s32 n;
+    for (i = 0; i < NUM_CARD_SLOTS; i++) {
+        if (fn_8009F7E8(i)) {
+            n = 1;
+        } else {
+            n = 1;
+        }
+        if (lbl_80282138[i] != n) {
+            lbl_80282138[i] = n;
+            lbl_80282150[i][0] = 0;
+            lbl_80282148[i][0] = 0;
+            lbl_80282140[i][0] = 0;
+        }
+        for (j = 0; j < n; j++) {
+            lbl_80282150[i][j] = fn_800B09C8(i, j);
+            if (lbl_80282148[i][j] != lbl_80282150[i][j]) {
+                lbl_80282148[i][j] = lbl_80282150[i][j];
+                lbl_80282140[i][j] = 0;
+            }
+        }
+    }
+}
+
+// Whether every status is 0.
+u8 fn_800B1180(void) {
+    int i;
+    int j;
+    s32 n;
+    for (i = 0; i < NUM_CARD_SLOTS; i++) {
+        if (fn_8009F7E8(i)) {
+            n = 1;
+        } else {
+            n = 1;
+        }
+        for (j = 0; j < n; j++) {
+            if (lbl_80282150[i][j] != 0) return 0;
+        }
+    }
+    return 1;
+}
+
+// Report the entry the reports reached again, re-reading the statuses first; 5 when every status
+// is 0.
+s32 fn_800B120C(s32* pnSlot, s32* pn) {
+    fn_800B10A4();
+    if (fn_800B1180()) return 5;
+    if (lbl_8028149C == -1 || lbl_80281498 == -1) {
+        return fn_800B12FC(pnSlot, pn);
+    }
+    lbl_80282140[lbl_8028149C][lbl_80281498] = 1;
+    lbl_80282148[lbl_8028149C][lbl_80281498] = lbl_80282150[lbl_8028149C][lbl_80281498];
+    *pnSlot = lbl_8028149C;
+    *pn = lbl_80281498;
+    // EA bug: the slot is used for both indexes; for slot 1 this reads past the table (the word
+    // after it, lbl_80282158).
+    if (lbl_80282150[lbl_8028149C][lbl_8028149C] == 0 && fn_800B1180()) return 5;
+    return lbl_80282150[lbl_8028149C][lbl_80281498];
+}
+
+// Report the first status not yet reported (4 when there is none, 5 when every status is 0).
+s32 fn_800B12FC(s32* pnSlot, s32* pn) {
+    s32 n;
+    int i;
+    int j;
+    fn_800B10A4();
+    if (fn_800B1180()) return 5;
+    for (i = 0; i < NUM_CARD_SLOTS; i++) {
+        n = lbl_80282138[i];
+        for (j = 0; j < n; j++) {
+            if (lbl_80282140[i][j] == 0) {
+                lbl_8028149C = i;
+                lbl_80281498 = j;
+                lbl_80282140[i][j] = 1;
+                lbl_80282148[i][j] = lbl_80282150[i][j];
+                *pnSlot = i;
+                *pn = j;
+                if (n > 1) {
+                    (*pn)++;
+                }
+                return lbl_80282150[i][j];
+            }
+        }
+    }
     lbl_80281498 = -1;
     lbl_8028149C = -1;
-    return fn_800B13FC(pnA, pnB);
+    return 4;
+}
+
+// Find the next slot and entry after the last one found that has a status; returns whether there
+// is one.
+int fn_800B13FC(s32* pnSlot, s32* pn) {
+    int i;
+    int j;
+    s32 n;
+    for (i = 0; i < NUM_CARD_SLOTS; i++) {
+        if (fn_8009F7E8(i)) {
+            lbl_80282138[i] = n = 1;
+        } else {
+            lbl_80282138[i] = n = 1;
+        }
+        for (j = 0; j < n; j++) {
+            if (lbl_80282150[i][j] != 0 &&
+                (i > lbl_8028149C || (i == lbl_8028149C && j > lbl_80281498))) {
+                *pnSlot = i;
+                *pn = j;
+                if (n == 1) {
+                    (*pn)++;
+                }
+                lbl_8028149C = i;
+                lbl_80281498 = j;
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
+
+// Start a search from the beginning (fn_800B13FC continues it).
+int fn_800B14E4(s32* pnSlot, s32* pn) {
+    lbl_80281498 = -1;
+    lbl_8028149C = -1;
+    return fn_800B13FC(pnSlot, pn);
+}
+
+void fn_800B1510(s32 a, s32 b) {
+    MsgArg arg;
+    s32 n = fn_800A2100(a, b);
+    fn_8009DCEC(a, b);
+    fn_80005AE8(&arg, 0, sizeof(arg));
+    arg.i = n;
+    fn_8016B0F8(lbl_80281F1C->pHandler, 0x84, 1, &arg);
+}
+
+void fn_800B158C(s32 a, s32 b) {
+    MsgArg arg;
+    s32 n = fn_800A0A7C(a, b);
+    fn_8009DCEC(a, b);
+    fn_80005AE8(&arg, 0, sizeof(arg));
+    arg.i = n;
+    fn_8016B0F8(lbl_80281F1C->pHandler, 0x8D, 1, &arg);
 }
 
 void fn_800B1608(void) {
 }
 
+void fn_800B160C(void) {
+    lbl_80282124 = 0;
+    UStream_RegisterHandler('LEGL', fn_800B166C);
+}
+
 void fn_800B1644(void) {
     UStream_UnregisterHandler('LEGL');
+}
+
+// The 'LEGL' handler: keep a copy of the first two objects, free each. A copy's size is rounded up
+// to 128 bytes (a size already a multiple of 128 gets 128 more).
+void fn_800B166C(UStreamObject* pObject) {
+    s32 nPad = 128 - (s32)pObject->uSize % 128;
+    if (lbl_80282124 == 0) {
+        lbl_8028212C = pObject->uSize + nPad;
+        lbl_80282134 = fn_80009B34(lbl_8028212C, 2, 16, "startUp.c", 882);
+        Mem_cpy(lbl_80282134, pObject->pData, lbl_8028212C);
+        lbl_80282124++;
+    } else if (lbl_80282124 == 1) {
+        lbl_80282128 = pObject->uSize + nPad;
+        lbl_80282130 = fn_80009B34(lbl_80282128, 2, 16, "startUp.c", 891);
+        Mem_cpy(lbl_80282130, pObject->pData, lbl_80282128);
+        lbl_80282124++;
+    }
+    fn_80009E70(pObject);
 }

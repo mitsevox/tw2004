@@ -6,9 +6,11 @@
 #include "game.h"
 #include "frontend/fe.h"
 
+// Outside this file.
 // The movie player (LLVideo.c): plays a movie file until it ends or pfnSkip returns nonzero.
 void fn_80075FB8(char* pPath, int (*pfnSkip)(void), int a, int b);
 void fn_80037FB4(u8 a, f32* pColor);    // a full-screen colour (GoPostFx.c)
+void fn_80010284(void);
 void fn_80013400(void);                 // read the controllers
 void fn_8008B704(void);
 void fn_8008B754(int a);
@@ -17,14 +19,26 @@ void fn_8008D8CC(void);
 void fn_8008D8F4(void);
 void fn_8008DAEC(void);
 void fn_8008DBE8(void);
+void fn_8008E6D4(int a);
+void fn_80079EA8(void);
 void fn_80092198(void);
 void fn_8009220C(void);
 void fn_800A75B4(void);
 void fn_800A7644(int a);
-void fn_80010284(void);
-void fn_80079EA8(void);
-void Golfer_LoadCreatedFromSave(void);
+void fn_80103B74(int a);
+int  fn_80103D14(s16 nSlot);            // the asset worn in an equipment slot, or -1 (FE_CrAPDB.c)
+u8   fn_80104020(void* pChoice);        // } a part's choices (FE_CrAPDB.c): whether one may be
+int  fn_801048EC(s16 nPart, int a);     // } picked, how many there are, one of them and its
+void* fn_80104FA8(s16 nPart, int a, int i);   // } asset
+CrAPAsset* fn_80104F68(void* pChoice);  // }
+int  fn_801049C8(int a);                // how many choices part a has (FE_CrAPDB.c)
+int  fn_80105494(int nAsset);           // } the two attributes an asset raises (-1: none)
+int  fn_80105504(int nAsset);           // }
+int  fn_801054CC(int nAsset);           // } and the tier it raises each to
+int  fn_8010553C(int nAsset);           // }
+u8   fn_80105C30(void);                 // the Create-A-Player database is loaded (FE_CrAPDB.c)
 
+// This file, in address order.
 void fn_80076F80(UStreamObject* pObject);
 int  fn_80076FDC(void);
 void fn_8007706C(char* pName, char* pDir, char* pPath);
@@ -42,25 +56,29 @@ void fn_8007739C(Replay* pReplay);
 void fn_800773F8(void);
 void fn_80077428(void);
 void fn_8007744C(void);
+void Golfer_LoadCreatedFromSave(void);
 void fn_80077780(void);
 void fn_80077968(int nSlot);
+void fn_800779BC(int a, int b);
 GolferRecord* fn_80077A80(int nGolfer);
-u8   fn_80077B18(int n);
 void fn_80077B78(void);
 int  fn_80077BDC(int n);
 void fn_80077C1C(int a, int b);
+int  fn_80078604(int a, int b, int c);
+void fn_80078620(int n, int* pA, int* pB, int* pC);
+void fn_8007873C(SaveProfile* pProfile);
+u8   FE_CrAP_IsAssetUndesirable(s16 nPart, CrAPAsset* pAsset);
+void fn_80078A2C(s16 nPart, int nChance);
+u8   fn_80078B84(CrAPAsset* pAsset);
+u8   FE_CrAP_IsCrazyHat(CrAPAsset* pAsset);
+u8   fn_80078D24(CrAPAsset* pAsset);
 void fn_80078E34(SaveProfile* pProfile);
 void fn_80079664(SaveProfile* pProfile);
 void fn_8007975C(SaveProfile* pProfile, int a, int b);
 void fn_800797E0(SaveProfile* pProfile, int a, int nChoice, int b);
 void fn_80079974(void);
-void fn_8008E6D4(int a);
-void fn_80103B74(int a);
-int  fn_801049C8(int a);                // how many choices part a has (FE_CrAPDB.c)
 void fn_80079D30(void);
 void fn_80079DAC(void);
-int  fn_80078604(int a, int b, int c);
-void fn_80078620(int n, int* pA, int* pB, int* pC);
 
 // The 'BIO ' stream object's handler: keep a copy of its data.
 void fn_80076F80(UStreamObject* pObject) {
@@ -143,8 +161,8 @@ void FE_GetBIOMovieName(void) {
                 fn_800770D4(szName, szPath);
                 fn_80075FB8(szPath, fn_80076FDC, 0, 0);
                 break;
-            case 4:                     // a kind 4 is taken off the queue unplayed
-                break;
+            case 4:                     // fake match: the original never compares with 4; this empty
+                break;                  // case only makes the dispatch test 3 before 1
             }
             fn_8007731C();
             fn_800A7644(0);
@@ -227,6 +245,15 @@ void fn_80077968(int nSlot) {
     Mem_cpy(&lbl_801D7148.p658[lbl_801D7148.aBackup[nSlot]], &gpSaveData[nSlot], sizeof(SaveProfile));
 }
 
+// Swap two backup rows.
+void fn_800779BC(int a, int b) {
+    SaveProfile* pTemp = fn_80009B34(sizeof(SaveProfile), 1, 32, "FE_Manager.c", 1194);
+    Mem_cpy(pTemp, &lbl_801D7148.p658[b], sizeof(SaveProfile));
+    Mem_cpy(&lbl_801D7148.p658[b], &lbl_801D7148.p658[a], sizeof(SaveProfile));
+    Mem_cpy(&lbl_801D7148.p658[a], pTemp, sizeof(SaveProfile));
+    fn_80009E70(pTemp);
+}
+
 // A golfer's record: a table golfer, or the profile's created golfer.
 GolferRecord* fn_80077A80(int nGolfer) {
     SaveProfile* pProfile = fn_80077ACC();
@@ -299,6 +326,135 @@ void fn_80078620(int n, int* pA, int* pB, int* pC) {
 
 // ---- the created golfer's parts -----------------------------------------------------------------
 
+// The created golfer's equipment tiers, from the equipment it wears: each of the 53 equipment
+// slots can raise up to two attributes' tiers.
+void fn_8007873C(SaveProfile* pProfile) {
+    s32 i;
+    int nAsset;
+    s16 nSlot;
+    int nAttrA;
+    int nAttrB;
+    int nTierA;
+    int nTierB;
+    if (fn_80105C30()) {
+        for (i = 0; i < NUM_ATTRS; i++) {
+            pProfile->createdGolfer.tier[i] = 0;
+        }
+        for (nSlot = 0; nSlot < 53; nSlot++) {
+            nAsset = fn_80103D14(nSlot);
+            if (nAsset >= 0) {
+                nAttrA = fn_80105494(nAsset);
+                nAttrB = fn_80105504(nAsset);
+                nTierA = fn_801054CC(nAsset);
+                nTierB = fn_8010553C(nAsset);
+                if (nAttrA >= 0 && pProfile->createdGolfer.tier[nAttrA] < nTierA) {
+                    pProfile->createdGolfer.tier[nAttrA] = nTierA;
+                }
+                if (nAttrB >= 0 && pProfile->createdGolfer.tier[nAttrB] < nTierB) {
+                    pProfile->createdGolfer.tier[nAttrB] = nTierB;
+                }
+            }
+        }
+    }
+}
+
+// Put a random choice on part nPart: an undesirable one (see FE_CrAP_IsAssetUndesirable) with a
+// chance of 100 - nChance percent, else a desirable one; only choices fn_80104020 allows.
+void fn_80078A2C(s16 nPart, int nChance) {
+    int aChoices[250];
+    u32 bDesirable = (int)(Rand_Next(0) % 100) < nChance;
+    int nFound = 0;
+    int nCount = fn_801048EC(nPart, 0);
+    int i;
+    void* pChoice;
+    CrAPAsset* pAsset;
+    for (i = 0; i < nCount; i++) {
+        pChoice = fn_80104FA8(nPart, 0, i);
+        pAsset = fn_80104F68(pChoice);
+        if (bDesirable && !FE_CrAP_IsAssetUndesirable(nPart, pAsset) && fn_80104020(pChoice)) {
+            aChoices[nFound++] = i;
+        } else if (!bDesirable && FE_CrAP_IsAssetUndesirable(nPart, pAsset) && fn_80104020(pChoice)) {
+            aChoices[nFound++] = i;
+        }
+    }
+    if (nFound) {
+        FE_CrAP_TurnOnPart(nPart, 0, aChoices[Rand_Next(0) % nFound]);
+    }
+}
+
+// The asset is one of the eight plain colours.
+u8 fn_80078B84(CrAPAsset* pAsset) {
+    if (pAsset == NULL) {
+        return 0;
+    }
+    if (fn_8015F844(pAsset->szName, "White") == 0) {
+        return 1;
+    }
+    if (fn_8015F844(pAsset->szName, "Bright Red") == 0) {
+        return 1;
+    }
+    if (fn_8015F844(pAsset->szName, "Orange") == 0) {
+        return 1;
+    }
+    if (fn_8015F844(pAsset->szName, "Pink") == 0) {
+        return 1;
+    }
+    if (fn_8015F844(pAsset->szName, "Yellow") == 0) {
+        return 1;
+    }
+    if (fn_8015F844(pAsset->szName, "Green") == 0) {
+        return 1;
+    }
+    if (fn_8015F844(pAsset->szName, "Purple") == 0) {
+        return 1;
+    }
+    return fn_8015F844(pAsset->szName, "Blue") == 0;
+}
+
+// Anything worn on the head but a plain hat (one worn backwards counts) or a visor.
+u8 FE_CrAP_IsCrazyHat(CrAPAsset* pAsset) {
+    if (pAsset == NULL) {
+        return 0;
+    }
+    if (fn_8015F844(fn_801064EC(pAsset->nCategory), "Hats") == 0 &&
+        strstr(pAsset->szName, "backwards") == NULL) {
+        return 0;
+    }
+    if (fn_8015F844(fn_801064EC(pAsset->nCategory), "Visors") == 0) {
+        return 0;
+    }
+    return 1;
+}
+
+// The same test as fn_80078B84.
+u8 fn_80078D24(CrAPAsset* pAsset) {
+    if (pAsset == NULL) {
+        return 0;
+    }
+    if (fn_8015F844(pAsset->szName, "White") == 0) {
+        return 1;
+    }
+    if (fn_8015F844(pAsset->szName, "Bright Red") == 0) {
+        return 1;
+    }
+    if (fn_8015F844(pAsset->szName, "Orange") == 0) {
+        return 1;
+    }
+    if (fn_8015F844(pAsset->szName, "Pink") == 0) {
+        return 1;
+    }
+    if (fn_8015F844(pAsset->szName, "Yellow") == 0) {
+        return 1;
+    }
+    if (fn_8015F844(pAsset->szName, "Green") == 0) {
+        return 1;
+    }
+    if (fn_8015F844(pAsset->szName, "Purple") == 0) {
+        return 1;
+    }
+    return fn_8015F844(pAsset->szName, "Blue") == 0;
+}
+
 void fn_80079664(SaveProfile* pProfile) {
     FE_CrAP_TurnOnPart(0xC, 1, 0);
     FE_CrAP_TurnOnPart(0xC, 2, 0);
@@ -352,5 +508,36 @@ void fn_80079974(void) {
         }
         FE_CrAP_TurnOnPart(0xD, 2, 0);
         fn_80103B74(1);
+    }
+}
+
+// ---- the profile backups in ARAM ---------------------------------------------------------------
+
+// Move the backups out to ARAM, freeing the main memory they used.
+void fn_80079D30(void) {
+    if (lbl_801D7148.p658 != NULL) {
+        lbl_80281ECC = FE_BACKUP_SIZE;
+        if (lbl_80281ED0 == 0) {
+            lbl_80281ED0 = fn_800B6564(FE_BACKUP_SIZE);
+        }
+        fn_800B6844(lbl_801D7148.p658, lbl_80281ED0, lbl_80281ECC);
+        fn_800B67EC();
+        fn_80009E70(lbl_801D7148.p658);
+        lbl_801D7148.p658 = NULL;
+    }
+}
+
+// Bring the backups back from ARAM (empty ones if there were none).
+void fn_80079DAC(void) {
+    if (lbl_801D7148.p658 == NULL) {
+        lbl_80281ECC = FE_BACKUP_SIZE;
+        lbl_801D7148.p658 = fn_80009B34(lbl_80281ECC, 2, 32, "FE_Manager.c", 2778);
+        memset(lbl_801D7148.p658, 0, lbl_80281ECC);
+        if (lbl_80281ED0 != 0) {
+            fn_800B68B4(lbl_801D7148.p658, lbl_80281ED0, lbl_80281ECC);
+            fn_800B67EC();
+            fn_800B6594(lbl_80281ED0);
+            lbl_80281ED0 = 0;
+        }
     }
 }

@@ -8,6 +8,7 @@
 #include "game.h"
 #include "engine.h"
 #include "game/save.h"
+#include "frontend/fe.h"
 
 // fake match: the (s8) on GOLFERSTATE_GetCurrentState (see game.h).
 
@@ -109,8 +110,9 @@ void Golfer_ClampModifiers(Player* pPlayer) {
 
 // ---- the CPU golfer ---------------------------------------------------------------------------
 
-f32 AI_Pow(f32 fBase, f32 fExp) {
-    return fn_8015F824(fBase, fExp);
+// The binary's only powf: the SDK's reverb effect (reverb_hi.c) calls this same function.
+f32 powf(f32 x, f32 y) {
+    return fn_8015F824(x, y);
 }
 
 // Pick where the CPU aims: the most demanding authored aim point it qualifies for. A human
@@ -179,9 +181,9 @@ void AI_ChooseTarget(int nPlayer) {
             if (Player_IsCPU(nPlayer)) {
                 // Low IQ makes the golfer think it is better than it is.
                 if (p->bLowIQPenalty) {
-                    nSkill += (int)(10.0f * (AI_Pow(fDumb, 2.0f) / 100.0f) / 100.0f);
+                    nSkill += (int)(10.0f * (powf(fDumb, 2.0f) / 100.0f) / 100.0f);
                 } else {
-                    nSkill += (int)(40.0f * (AI_Pow(fDumb, 2.0f) / 100.0f) / 100.0f);
+                    nSkill += (int)(40.0f * (powf(fDumb, 2.0f) / 100.0f) / 100.0f);
                 }
                 if ((s8)nSkill > 100) {
                     nSkill = 100;
@@ -1821,7 +1823,6 @@ extern char gszEmpty[];             // 0x802810B8
 extern char lbl_80187650[];         // "cl_bbsd" ... the default name at +0x1A
 
 void fn_800CB700(char* pDst, char* pSrc);       // string copy
-u8   fn_80077B18(void);
 
 // Options_SetDefaults(): the defaults, then the debug "all 105" variant when session flag
 // 0x4000 is set.
@@ -1951,7 +1952,7 @@ void Session_SetupProfiles(void) {
             fn_800CB700(pProf->szNames[0], lbl_80187650 + 0x1A);
             pProf->n2        = 0;
             pProf->nBallType = 0;
-        } else if (fn_80077B18()) {
+        } else if (fn_80077B18(nGolfer)) {
             pProf->n2        = 0;
             pProf->nBallType = 0;
         } else {
