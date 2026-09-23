@@ -28,11 +28,6 @@ void fn_800A4FD8(void);
 void fn_80102AC4(void);
 void fn_80103B74(int a);
 void fn_801073DC(int nPart);            // FE_CrAPDB.c
-void fn_80103B8C(s8 b);                // } FE_CrAPDB.c: set b; an asset's b (2: either),
-s8   fn_80103BC0(int nAsset);           // } its kind, fn_80107444's count, and its part and
-s16  fn_8010742C(int nAsset);           // } choice
-int  fn_80107444(int nAsset);           // }
-void fn_80105FF8(int nAsset, s16* pKind, s32* pPart, s32* pChoice);    // }
 u8   fn_80056480(int a);
 u8   fn_800564AC(int n);
 s32  fn_801258E8(void);                 // EASportsBio.c
@@ -66,7 +61,6 @@ void fn_800779BC(int a, int b);
 int  fn_80077BDC(int n);
 void fn_80077C1C(int a, int b);
 u8   fn_80078008(s32 nAsset, SaveProfile* pProfile);
-int  fn_80078604(int a, int b, int c);
 void fn_80078620(int n, int* pA, int* pB, int* pC);
 void fn_80078680(SaveProfile* pProfile);
 void fn_8007873C(SaveProfile* pProfile);

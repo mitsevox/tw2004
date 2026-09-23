@@ -202,7 +202,16 @@ typedef struct CrAPAsset {
     s16  n46;                   // 0x046
     s16  n48;                   // 0x048
     s8   a4A[0x58 - 0x4A];      // 0x04A  indexed by fn_80105644's last argument
-    u8   unk58[0x118 - 0x58];
+    u8   unk58[0x70 - 0x58];
+    u64  aPart[4];              // 0x070  } the ids of four skin parts it sets (fn_800CDAFC finds
+    u64  aVariant[4];           // 0x090  } them) and the id of each one's variant (fn_80106A64)
+    u64  aSet[4];               // 0x0B0  the ids of four skin sets; taking the asset off puts
+                                //        them back to "Defaults" (fn_80106DA0)
+    u8   unkD0[0x110 - 0xD0];
+    s16  n110;                  // 0x110  the offset in 'CR_S' of its unlock text (-1: none; fn_8010651C)
+    s16  n112;                 // 0x112  } offsets of strings in 'CR_S' (fn_801064EC); n114 is
+    s16  n114;                  // 0x114  } passed to fn_8008E724 with the asset's name (fn_80104094)
+    u8   unk116[2];
 } CrAPAsset;
 LAYOUT_ASSERT(CrAPAsset, 0x118);
 
@@ -222,7 +231,14 @@ LAYOUT_ASSERT(CrAPDB, 0x18);
 extern CrAPDB* lbl_80282460;
 extern UStreamObject* lbl_80282464;     // the 'CR_A' object (the assets), kept until freed
 extern UStreamObject* lbl_80282468;     // the 'CR_S' object (their names)
+extern void* lbl_80282470;              // 0x2C-byte records (fn_80107244); freed by fn_80103A64
 extern s32* lbl_80282474;               // per part: the index of its first asset
+extern s32* lbl_80282478;               // per part, 24 entries: the categories fn_80104AF4 found
+extern void* lbl_8028247C;              // freed by fn_80103A64
+extern void* lbl_80282480;              // freed by fn_80103A64
+extern char lbl_801935C8[16][32];      // 16 names (fn_80107294)
+extern s32 lbl_802816E8;                // } an asset to put on and one to take off when
+extern s32 lbl_802816EC;                // } fn_80104804 runs (-1: none)
 extern char lbl_801932C8[CRAP_NUM_PARTS][32];   // per part: the name of its "All ..." entry that
                                         // lists every category ("All Headwear"), or ""
 
@@ -230,6 +246,8 @@ int  fn_80103B28(int nAsset);           // the asset nAsset takes its attributes
                                         // or for lock kind 28 the asset its nLock names)
 CrAPAsset* fn_80103B4C(CrAPAsset* pAsset);  // the same, by asset
 u8   fn_80103B80(void);                 // the database's b14
+void fn_80103B8C(s8 n);                 // set the database's n4 (which assets are offered)
+s8   fn_80103BC0(int nAsset);           // an asset's n40
 s8   fn_80103BB4(void);                 // the database's n4
 int  fn_80103D14(s16 nSlot);            // the profile's aAF80[nSlot], an asset (-1 past slot 52)
 int  fn_801049C8(s16 nPart);
@@ -237,13 +255,16 @@ void fn_80104804(void);
 u8   fn_80104DB8(s16 nPart, int n, char* pDst); // copy the name of a part's entry n (for 0 its
                                         // "All ..." entry when it has one); 0 if there is none
 int  fn_80105C44(s16 nPart, int b);
+void fn_80105FF8(int nAsset, s16* pKind, s32* pPart, s32* pChoice);
 u8   fn_801061C8(s8 n);                 // an asset with this n40 is offered
-int  fn_80106244(s16 nPart);            // the first slot of aAF80 whose asset is of the part
+int  fn_80106244(s16 nPart);            // the asset in the first slot of aAF80 whose asset is of the part
                                         // (-1: none)
 u8   fn_8010645C(int nOffset, char* pDst);  // copy a 'CR_S' name ("" for "NONE")
 void fn_801072CC(s16 nPart, s32* pLocked, s32* pB1CC, s32* pB344, s32* pAll);  // count a part's
                                         // offered assets: locked, with each bit set, and all
 u8   fn_801074D4(int nAsset);
+s16  fn_8010742C(int nAsset);           // the part an asset is a choice for
+int  fn_80107444(int nAsset);           // an asset's n38
 u8   fn_80104020(int nAsset);           // the asset may be picked: not locked when last checked,
                                         // and its aB1CC bit is set
 int  fn_801048EC(s16 nPart, int b);     // how many choices a part has
@@ -265,6 +286,7 @@ void FE_MakeMoviePath(char* pName, char* pPath);        // "data/movies/<name>.N
 void FE_MakeCameoMoviePath(char* pName, char* pPath);   // "data/movies/cameos/<name>.NGC"
 void FE_CrAP_TurnOnPart(s16 nPart, int b, int c);      // FE_CrAPDB.c
 SaveProfile* fn_80077ACC(void);         // the profile being worked on
+int  fn_80078604(int a, int b, int c);  // a date (month, day, year from fn_8011E020) packed
 int  fn_80077B08(void);                 // its player slot
 u8   fn_80077B18(int nGolfer);          // a yes/no list over golfers 0..28 (Golfer.c asks it)
 void fn_80077B78(void);                 // pick the day's random assets (fn_80077C1C)
@@ -294,10 +316,13 @@ void fn_8008E244(void);
 void fn_8008E364(int n);
 int  fn_8008E420(void);
 int  fn_8008E44C(void);
+char* fn_8008E6BC(void);
 void fn_8008E6D4(int n);
 void fn_8008E724(char* szAnim, char* szShot, s8 n, u8 bLoop);
 void fn_8008E824(void);
 void fn_8008E860(int n);
+u8   fn_8008E944(u8 b, f32 f);
+void fn_8008EB70(void);
 
 // ---- the logo editor (FE_LogoDesign.c) -------------------------------------------------------
 
@@ -349,5 +374,10 @@ int  fn_8010FBCC(int nX, int nY, u32* pR, u32* pG, u32* pB, u32* pA);  // a pixe
                                         // and its colour as fn_8010F7FC gives it
 void fn_8010FC3C(u8* pDst, u8* pSrc, int a, int nWidth, int nHeight);   // copy pixels: a = 0
                                         // from a texture into the logo, 1 from the logo into one
+u8*  fn_8010FF5C(u8* pLogo, int nWidth, int nHeight);   // the logo's pixels as a texture (in
+                                        // lbl_80212B60)
+
+extern u8 lbl_80212B60[64 * 64];        // a logo's pixels laid out as a texture (fn_8010FF5C);
+                                        // 64 x 64 or 128 x 32
 
 #endif

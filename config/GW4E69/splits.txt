@@ -184,28 +184,7 @@ GoRenderSurface.c:
 	.text       start:0x8002F1D4 end:0x8002F4FC
 
 LLPict_Gc.c:
-	.text       start:0x8002F4FC end:0x8003001C
-
-unsorted/sweep_8003001C.c:
-	.text       start:0x8003001C end:0x80030040
-
-unsorted/sweep_8003009C.c:
-	.text       start:0x8003009C end:0x800300A0
-
-unsorted/sweep_800301D0.c:
-	.text       start:0x800301D0 end:0x800301F4
-
-unsorted/sweep_800301F4.c:
-	.text       start:0x800301F4 end:0x8003020C
-
-unsorted/sweep_8003020C.c:
-	.text       start:0x8003020C end:0x80030214
-
-unsorted/sweep_80030214.c:
-	.text       start:0x80030214 end:0x8003024C
-
-unsorted/sweep_8003024C.c:
-	.text       start:0x8003024C end:0x80030254
+	.text       start:0x8002F4FC end:0x80030254
 
 GoTerrain.c:
 	.text       start:0x80030254 end:0x80035640
@@ -219,32 +198,11 @@ GoPostFx.c:
 unsorted/sweep_8003944C.c:
 	.text       start:0x8003944C end:0x80039454
 
-unsorted/sweep_800394AC.c:
-	.text       start:0x800394AC end:0x800394F0
-
-unsorted/sweep_80039520.c:
-	.text       start:0x80039520 end:0x8003954C
-
-unsorted/sweep_8003954C.c:
-	.text       start:0x8003954C end:0x80039554
-
 GoDynamicCam.c:
-	.text       start:0x80039554 end:0x8003DC30
-
-unsorted/sweep_8003DC78.c:
-	.text       start:0x8003DC78 end:0x8003DCAC
+	.text       start:0x80039454 end:0x8003DCE8
 
 gocamscripts.c:
-	.text       start:0x8003DCE8 end:0x800453C8
-
-unsorted/sweep_80045470.c:
-	.text       start:0x80045470 end:0x80045494
-
-unsorted/sweep_8004560C.c:
-	.text       start:0x8004560C end:0x8004562C
-
-unsorted/sweep_8004562C.c:
-	.text       start:0x8004562C end:0x80045660
+	.text       start:0x8003DCE8 end:0x80045660
 
 DepthField.c:
 	.text       start:0x80045660 end:0x80045D18
@@ -277,16 +235,10 @@ unsorted/sweep_80045F6C.c:
 	.text       start:0x80045F6C end:0x80045F74
 
 GoDynObj.c:
-	.text       start:0x80045F74 end:0x80048680
-
-unsorted/sweep_800486EC.c:
-	.text       start:0x800486EC end:0x800486F4
+	.text       start:0x80045F74 end:0x800486F4
 
 UObject.c:
-	.text       start:0x800486F4 end:0x80048A84
-
-unsorted/sweep_80048AC4.c:
-	.text       start:0x80048AC4 end:0x80048AD4
+	.text       start:0x800486F4 end:0x80048AF4
 
 UKernel.c:
 	.text       start:0x80048AF4 end:0x800496E0
@@ -299,12 +251,16 @@ GoAnimalActors.c:
 
 GoDynObjTypes.c:
 	.text       start:0x8004ABBC end:0x8004AFA0
+	.sdata2     start:0x80283280 end:0x80283288
 
 GoTerrainCollision.c:
 	.text       start:0x8004AFA0 end:0x80050C2C
 
 Ball.c:
 	.text       start:0x80050C2C end:0x8005620C
+
+LLPictInt.c:
+	.text       start:0x8005620C end:0x800563C4
 
 user.c:
 	.text       start:0x800563C4 end:0x80056480
@@ -732,22 +688,16 @@ unsorted/sweep_800B59EC.c:
 	.text       start:0x800B59EC end:0x800B5A14
 
 UAudMemStack.c:
-	.text       start:0x800B5A14 end:0x800B5B80
-
-unsorted/sweep_800B5C30.c:
-	.text       start:0x800B5C30 end:0x800B5C40
-
-unsorted/sweep_800B5D08.c:
-	.text       start:0x800B5D08 end:0x800B5D34
-
-unsorted/sweep_800B5F28.c:
-	.text       start:0x800B5F28 end:0x800B5F4C
-
-unsorted/sweep_800B6034.c:
-	.text       start:0x800B6034 end:0x800B6060
+	.text       start:0x800B5A14 end:0x800B5C40
+	.data       start:0x8018FFA8 end:0x8018FFB8
+	.bss        start:0x801F6360 end:0x801F6680
+	.sbss       start:0x80282180 end:0x80282188
 
 GoARAM.c:
-	.text       start:0x800B61B4 end:0x800B6924
+	.text       start:0x800B5C40 end:0x800B6924
+	.data       start:0x8018FFB8 end:0x8018FFC8
+	.bss        start:0x801F6680 end:0x801F66A8
+	.sdata      start:0x802814C8 end:0x802814D0
 
 DiscError.c:
 	.text       start:0x800B6924 end:0x800B769C
@@ -963,7 +913,7 @@ uiArc.c:
 	.text       start:0x80102AC8 end:0x801037F8
 
 FE_CrAPDB.c:
-	.text       start:0x801037F8 end:0x801074D4
+	.text       start:0x801037F8 end:0x801077EC
 
 FE_CrAPMessages.c:
 	.text       start:0x801077EC end:0x8010A448

@@ -4,12 +4,10 @@
 
 #include "frontend/fe.h"
 
-void fn_800CB8F0(u64* pHash, char* szName);        // the name a hash was made from
 int  fn_8010AD10(void* pModel);                     // how many textures the model has
 u64  fn_8010AD18(void* pModel, int nTex);           // a texture's name hash
 void fn_8010B1D4(void* pModel, int nTex, u8* pPixels, int a, int b);
 void fn_8010B2A8(void* pModel, int nTex, s16* pPalette, int a, int b);
-u8*  fn_8010FF5C(u8* pLogo, int nWidth, int nHeight);   // the logo's pixels as a texture
 
 // The user logo a texture stands for (the n of "_usrtextr<n>"), or -1.
 int sGetUserTextureIdx(u64 uHash) {
