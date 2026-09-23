@@ -23,7 +23,8 @@ typedef struct CharModel {
                                 //       position
     u8        unkC[0x38 - 0xC];
     Skeleton* pSkel;            // 0x38
-    u8        unk3C[0xEE - 0x3C];   // 0x3C  bone indices (fn_8001EED8), ...
+    u8        aBone[0x59];      // 0x3C  each bone id's index (fn_8001EED8)
+    u8        aBone2[0x59];     // 0x95  the index fn_8001EEE4 gives while bEE is set, by bone index
     u8        bEE;              // 0xEE  fn_8001EDF4
 } CharModel;
 
@@ -95,7 +96,7 @@ typedef struct ClipBlend {
 // Anim_SetTime and fn_8007326C take the address of its animation player at 0x164, whose fields
 // from 0x168 on are named here directly.
 typedef struct Character {
-    u8    unk0[4];
+    s32   nIndex;               // 0x000  its entry in lbl_801B9624 (fn_8001C21C)
     s32   nPlayer;              // 0x004  the player it belongs to (Player_SetGolfer); 1000 for the
                                 //        characters fn_8001D324 finds by id
     s32   nId;                  // 0x008  (fn_8001D324)
