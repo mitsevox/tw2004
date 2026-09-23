@@ -194,8 +194,6 @@ int fn_800D36E0(int nWinner, int nLoser, int nMargin, int* pPrize) {
 
 // TW06: GM_Earnings_GetStrokeWinningsTeam. The same for a team (0: players 0 and 1, 1: players 2 and
 // 3) beating a CPU team: the average of what the two losers would pay.
-// 99.2%: only the order of the four table loads in the return differs. Tried: all 24 orders of the
-// flat sum, the grouped forms, an inline per-golfer helper; the nBase locals took it from 82% to 98%.
 int fn_800D37BC(int nWinner, int nLoser, int nMargin, int* pPrize) {
     int nFirst;
     int nSecond;
@@ -203,6 +201,7 @@ int fn_800D37BC(int nWinner, int nLoser, int nMargin, int* pPrize) {
     int nRating2;
     int nBase1;
     int nBase2;
+    int nTotal;
 
     if (fn_800E177C() != 0) return 0;
     if (Team_IsAllCPU(nWinner) || !Team_IsAllCPU(nLoser)) return 0;
@@ -223,10 +222,11 @@ int fn_800D37BC(int nWinner, int nLoser, int nMargin, int* pPrize) {
     if (pPrize != NULL) {
         *pPrize = (nBase1 + nBase2) / 2;
     }
-    return (lbl_80200538.aStrokePrize[nRating2].nBase +
-            (lbl_80200538.aStrokePrize[nRating2].nPerStroke * nMargin +
-             (lbl_80200538.aStrokePrize[nRating1].nBase +
-              lbl_80200538.aStrokePrize[nRating1].nPerStroke * nMargin))) / 2;
+    nTotal = lbl_80200538.aStrokePrize[nRating1].nBase +
+             lbl_80200538.aStrokePrize[nRating1].nPerStroke * nMargin;
+    nTotal += lbl_80200538.aStrokePrize[nRating2].nBase +
+              lbl_80200538.aStrokePrize[nRating2].nPerStroke * nMargin;
+    return nTotal / 2;
 }
 
 // Pay a player twice nMoney, booked in the breakdown's n24 and n3C.
