@@ -331,10 +331,7 @@ void fn_800AA1B8(AudTrack* pTrack, int bNow) {
 // Advances a track by one tick; returns 0 once it has ended.
 u8 fn_800AA2A4(AudTrack* pTrack) {
     pTrack->f4C += pTrack->f50;
-    if (pTrack->pTmpl->n0 & 8) {
-        return Stm_Tick(pTrack);
-    }
-    return fn_800AAEFC(pTrack);
+    return !(pTrack->pTmpl->n0 & 8) ? fn_800AAEFC(pTrack) : Stm_Tick(pTrack);
 }
 
 void fn_800AA2EC(AudTrack* pTrack, u8 n, u8 bCheck) {
