@@ -4041,11 +4041,11 @@ runtime/__mem.c:
 	.init       start:0x800033A8 end:0x800034E0
 
 MetroTRK/mem_TRK.c:
-	.init       start:0x80003510 end:0x80003534
-	.text       start:0x801622B0 end:0x80162378
+	.init       start:0x800034E0 end:0x80003534
+	.text       start:0x801622B0 end:0x80162368
 
 MetroTRK/targimpl.c:
-	.text       start:0x80162378 end:0x80163DD0
+	.text       start:0x80162368 end:0x80163DB0
 
 MetroTRK/mpc_7xx_603e.c:
 	.text       start:0x80163DD0 end:0x80164140
