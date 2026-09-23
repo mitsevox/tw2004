@@ -93,6 +93,14 @@ f32   Ter_CheckForDropLocation(CourseInfo* pCourse, f32* pPos, u8 bOnDropSurface
                                SurfaceType** ppSurface);
 void  fn_8004D2E0(CourseInfo* pCourse, f32* pPos, TerPolyRef** ppRefLow, f32* pLow, f32 (**ppTriLow)[3],
                   TerPolyRef** ppRefHigh, f32* pHigh, f32 (**ppTriHigh)[3]);
+u8    fn_8004EB7C(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32* pDir, f32 fMax, f32* pHit,
+                  f32* pNormal, SurfaceType** ppSurface, TerObject** ppObj, u8* pbFlags);
+u8    fn_8004F43C(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32* pDir, f32 fMax, f32* pHit,
+                  f32* pNormal, SurfaceType** ppSurface, TerObject** ppObj);
+u8    fn_8004FCB4(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32* pDir, f32 fMax, f32* pHit,
+                  f32* pNormal, SurfaceType** ppSurface, TerObject** ppObj);
+u8    fn_800504F4(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32* pDir, f32 fMax, f32* pHit,
+                  f32* pNormal, SurfaceType** ppSurface, TerObject** ppObj);
 u8    fn_8004E0D4(f32* pFrom, f32* pDir, f32 fRange, f32* pCentre, f32 fRadius);
 u8    fn_80050A9C(f32* pA, f32* pB, f32* pC, f32 fX, f32 fZ);
 void  fn_800509D8(f32* pTri, f32* pPos, f32* pA, f32* pB, f32* pC);
@@ -907,6 +915,262 @@ u8 fn_8004E0D4(f32* pFrom, f32* pDir, f32 fRange, f32* pCentre, f32 fRadius) {
     return 1;
 }
 
+// TW06: bool Ter_CheckForWorldCollisionOneGrid(TGD_TerrainInfo*, s32, s32, f32*, f32*, f32*, f32,
+// f32[4]*, f32[4]*, TGD_MaterialInfo**, TGD_ObjectInstanceInfo**, u8*). The nearest triangle of
+// grid cell (nX, nZ) that the line from pFrom along pDir meets before fMax (pTo is the line's end,
+// for the cell's height test): the point, normal, surface, the object it belongs to (NULL for the
+// ground) and, when pbFlags is given, the triangle's flag bits. Only the objects marked in
+// lbl_801D54A0 are tested.
+u8 fn_8004EB7C(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32* pDir, f32 fMax, f32* pHit,
+               f32* pNormal, SurfaceType** ppSurface, TerObject** ppObj, u8* pbFlags) {
+    f32 vHit[4];
+    f32 vNormal[4];
+    f32 fT;
+    u8 bHit = 0;
+    u32 uHole = 1 << Game_CurrentHole();
+    TerCell* pCell;
+    TerPolyRef* pRef;
+    f32 (*pVert)[3];
+    u8* pFlags;
+    int i;
+    int j;
+    f32 fLow;
+    f32 fHigh;
+
+    if (nX >= 0 && nX < pCourse->nGridWidth && nZ >= 0 && nZ < pCourse->nGridLength) {
+        fLow = pFrom[1];
+        fHigh = pFrom[1];
+        pCell = &pCourse->pGrid[nX + nZ * pCourse->nGridWidth];
+        if (pTo[1] > pFrom[1]) {
+            fHigh = pTo[1];
+        }
+        if (pTo[1] < fLow) {
+            fLow = pTo[1];
+        }
+        if (fLow > (f32)pCell->nMaxHeight || fHigh < (f32)pCell->nMinHeight) return 0;
+        pRef = &pCourse->pPolyRefs[pCell->uRefs >> 12];
+        for (i = (pCell->uRefs & 0xFFF) - 1; i >= 0; i--) {
+            if (pRef->u4 != 0 && (!(pRef->u4 & uHole) || ((pRef->u4 & 0x10) && gSession.nSplitScreen))) {
+                pRef++;
+            } else if (lbl_801D54A0[pRef->n2] == 0) {
+                pRef++;
+            } else {
+                pVert = &pCourse->pVerts[TER_FIRST_VERTEX(pRef)];
+                pFlags = pCourse->pTriFlags + TER_FIRST_VERTEX(pRef);
+                for (j = pRef->nTris - 1; j >= 0; j--) {
+                    if ((pFlags[2] & 7) && fn_8004AFA0(pFrom, pDir, fMax, pVert, &fT, vHit, vNormal)) {
+                        fMax = fT;
+                        Vec_Copy(vHit, pHit);
+                        Vec_Copy(vNormal, pNormal);
+                        if (pbFlags != NULL) {
+                            *pbFlags = pFlags[2] & 7;
+                        }
+                        *ppSurface = &gSurfaceTypes[pRef->nSurface];
+                        if (pRef->n2 != 0) {
+                            *ppObj = &pCourse->pObjects[pRef->n2];
+                        } else {
+                            *ppObj = NULL;
+                        }
+                        bHit = 1;
+                    }
+                    pVert++;
+                    pFlags++;
+                }
+                pRef++;
+            }
+        }
+        return bHit;
+    }
+    return 0;
+}
+
+// TW06: bool Ter_CheckForSolidWorldCollisionOneGrid(...), the same parameters without the flags.
+// As fn_8004EB7C, but surfaces with a negative bounce (branches and leaves, which a ball passes
+// through) do not count.
+u8 fn_8004F43C(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32* pDir, f32 fMax, f32* pHit,
+               f32* pNormal, SurfaceType** ppSurface, TerObject** ppObj) {
+    f32 vHit[4];
+    f32 vNormal[4];
+    f32 fT;
+    u8 bHit = 0;
+    u32 uHole = 1 << Game_CurrentHole();
+    TerCell* pCell;
+    TerPolyRef* pRef;
+    f32 (*pVert)[3];
+    u8* pFlags;
+    int i;
+    int j;
+    f32 fLow;
+    f32 fHigh;
+
+    if (nX >= 0 && nX < pCourse->nGridWidth && nZ >= 0 && nZ < pCourse->nGridLength) {
+        fLow = pFrom[1];
+        fHigh = pFrom[1];
+        pCell = &pCourse->pGrid[nX + nZ * pCourse->nGridWidth];
+        if (pTo[1] > pFrom[1]) {
+            fHigh = pTo[1];
+        }
+        if (pTo[1] < fLow) {
+            fLow = pTo[1];
+        }
+        if (fLow > (f32)pCell->nMaxHeight || fHigh < (f32)pCell->nMinHeight) return 0;
+        pRef = &pCourse->pPolyRefs[pCell->uRefs >> 12];
+        for (i = (pCell->uRefs & 0xFFF) - 1; i >= 0; i--) {
+            if (pRef->u4 != 0 && (!(pRef->u4 & uHole) || ((pRef->u4 & 0x10) && gSession.nSplitScreen))) {
+                pRef++;
+            } else if (lbl_801D54A0[pRef->n2] == 0) {
+                pRef++;
+            } else if (gSurfaceTypes[pRef->nSurface].f0C < 0.0f) {
+                pRef++;
+            } else {
+                pVert = &pCourse->pVerts[TER_FIRST_VERTEX(pRef)];
+                pFlags = pCourse->pTriFlags + TER_FIRST_VERTEX(pRef);
+                for (j = pRef->nTris - 1; j >= 0; j--) {
+                    if ((pFlags[2] & 7) && fn_8004AFA0(pFrom, pDir, fMax, pVert, &fT, vHit, vNormal)) {
+                        fMax = fT;
+                        Vec_Copy(vHit, pHit);
+                        Vec_Copy(vNormal, pNormal);
+                        *ppSurface = &gSurfaceTypes[pRef->nSurface];
+                        if (pRef->n2 != 0) {
+                            *ppObj = &pCourse->pObjects[pRef->n2];
+                        } else {
+                            *ppObj = NULL;
+                        }
+                        bHit = 1;
+                    }
+                    pVert++;
+                    pFlags++;
+                }
+                pRef++;
+            }
+        }
+        return bHit;
+    }
+    return 0;
+}
+// TW06: bool Ter_CheckForGroundCollisionOneGrid(...). As fn_8004F43C, the ground only (no objects).
+u8 fn_8004FCB4(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32* pDir, f32 fMax, f32* pHit,
+               f32* pNormal, SurfaceType** ppSurface, TerObject** ppObj) {
+    f32 vHit[4];
+    f32 vNormal[4];
+    f32 fT;
+    u8 bHit = 0;
+    u32 uHole = 1 << Game_CurrentHole();
+    TerCell* pCell;
+    TerPolyRef* pRef;
+    f32 (*pVert)[3];
+    u8* pFlags;
+    int i;
+    int j;
+    f32 fLow;
+    f32 fHigh;
+
+    if (nX >= 0 && nX < pCourse->nGridWidth && nZ >= 0 && nZ < pCourse->nGridLength) {
+        fLow = pFrom[1];
+        fHigh = pFrom[1];
+        pCell = &pCourse->pGrid[nX + nZ * pCourse->nGridWidth];
+        if (pTo[1] > pFrom[1]) {
+            fHigh = pTo[1];
+        }
+        if (pTo[1] < fLow) {
+            fLow = pTo[1];
+        }
+        if (fLow > (f32)pCell->nMaxHeight || fHigh < (f32)pCell->nMinHeight) return 0;
+        pRef = &pCourse->pPolyRefs[pCell->uRefs >> 12];
+        for (i = (pCell->uRefs & 0xFFF) - 1; i >= 0; i--) {
+            if (pRef->n2 != 0) {
+                pRef++;
+            } else if (pRef->u4 != 0
+                       && (!(pRef->u4 & uHole) || ((pRef->u4 & 0x10) && gSession.nSplitScreen))) {
+                pRef++;
+            } else {
+                pVert = &pCourse->pVerts[TER_FIRST_VERTEX(pRef)];
+                pFlags = pCourse->pTriFlags + TER_FIRST_VERTEX(pRef);
+                for (j = pRef->nTris - 1; j >= 0; j--) {
+                    if ((pFlags[2] & 7) && fn_8004AFA0(pFrom, pDir, fMax, pVert, &fT, vHit, vNormal)) {
+                        fMax = fT;
+                        Vec_Copy(vHit, pHit);
+                        Vec_Copy(vNormal, pNormal);
+                        *ppSurface = &gSurfaceTypes[pRef->nSurface];
+                        if (pRef->n2 != 0) {
+                            *ppObj = &pCourse->pObjects[pRef->n2];
+                        } else {
+                            *ppObj = NULL;
+                        }
+                        bHit = 1;
+                    }
+                    pVert++;
+                    pFlags++;
+                }
+                pRef++;
+            }
+        }
+        return bHit;
+    }
+    return 0;
+}
+// TW06: bool Ter_CheckForObjectCollisionOneGrid(...). As fn_8004F43C, objects only, plus ground
+// whose surface has flag 0x80.
+u8 fn_800504F4(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32* pDir, f32 fMax, f32* pHit,
+               f32* pNormal, SurfaceType** ppSurface, TerObject** ppObj) {
+    f32 vHit[4];
+    f32 vNormal[4];
+    f32 fT;
+    u8 bHit = 0;
+    u32 uHole = 1 << Game_CurrentHole();
+    TerCell* pCell;
+    TerPolyRef* pRef;
+    f32 (*pVert)[3];
+    u8* pFlags;
+    int i;
+    int j;
+    f32 fLow;
+    f32 fHigh;
+
+    if (nX >= 0 && nX < pCourse->nGridWidth && nZ >= 0 && nZ < pCourse->nGridLength) {
+        fLow = pFrom[1];
+        fHigh = pFrom[1];
+        pCell = &pCourse->pGrid[nX + nZ * pCourse->nGridWidth];
+        if (pTo[1] > pFrom[1]) {
+            fHigh = pTo[1];
+        }
+        if (pTo[1] < fLow) {
+            fLow = pTo[1];
+        }
+        if (fLow > (f32)pCell->nMaxHeight || fHigh < (f32)pCell->nMinHeight) return 0;
+        pRef = &pCourse->pPolyRefs[pCell->uRefs >> 12];
+        for (i = (pCell->uRefs & 0xFFF) - 1; i >= 0; i--) {
+            if (pRef->n2 == 0 && !(gSurfaceTypes[pRef->nSurface].u34 & 0x80)) {
+                pRef++;
+            } else if (pRef->u4 != 0
+                       && (!(pRef->u4 & uHole) || ((pRef->u4 & 0x10) && gSession.nSplitScreen))) {
+                pRef++;
+            } else {
+                pVert = &pCourse->pVerts[TER_FIRST_VERTEX(pRef)];
+                pFlags = pCourse->pTriFlags + TER_FIRST_VERTEX(pRef);
+                for (j = pRef->nTris - 1; j >= 0; j--) {
+                    if ((pFlags[2] & 7) && fn_8004AFA0(pFrom, pDir, fMax, pVert, &fT, vHit, vNormal)) {
+                        fMax = fT;
+                        Vec_Copy(vHit, pHit);
+                        Vec_Copy(vNormal, pNormal);
+                        *ppSurface = &gSurfaceTypes[pRef->nSurface];
+                        if (pRef->n2 != 0) {
+                            *ppObj = &pCourse->pObjects[pRef->n2];
+                        } else {
+                            *ppObj = NULL;
+                        }
+                        bHit = 1;
+                    }
+                    pVert++;
+                    pFlags++;
+                }
+                pRef++;
+            }
+        }
+        return bHit;
+    }
+    return 0;
+}
 // Mark every ground triangle's highest and lowest corner in its flags (bits 4-5 and 6-7), using
 // bit 3 to do each triangle once, then clear bit 3 again. TW06 has the two halves as
 // Ter_ComputeHighestPointInEveryTriangle and Ter_ClearVertexProcessedBit.
