@@ -64,7 +64,7 @@ typedef struct SeasonEvent {
     s32  nChampScore;           // 0x10  TW06: champScore
     u16  nEventPar;             // 0x14  TW06: eventPar
     u16  nUserBracket;          // 0x16  the player's bracket when it was played. TW06: userBracket
-    u8   unk18[0x1C - 0x18];
+    s32  nUserScore;            // 0x18  TW06: userScore
     s32  nUserRank;             // 0x1C  the player's finishing place. TW06: userRank
     s32  nUserRankType;         // 0x20  0 did not play, 1 missed the cut, 2 placed. TW06: eUserRankType
 } SeasonEvent;
@@ -81,7 +81,9 @@ typedef struct TourSeason {
 typedef struct Profile {
     u8         unk0[0xB634];
     TourSeason tour;            // 0xB634
-    u8         unkBA9C[0x10600 - 0xBA9C];
+    u8         unkBA9C[0x104C8 - 0xBA9C];
+    u16        n104C8;          // 0x104C8  counts the tournaments started
+    u8         unk104CA[0x10600 - 0x104CA];
 } Profile;
 extern Profile* gpSaveData;
 
@@ -127,6 +129,9 @@ extern s32 lbl_80282340;
 s32  fn_80119A04(s32 a, s32 b);
 u8   fn_801197A4(s32 nPlayer, s32 b);
 u8   fn_80117DE0(void);
+void fn_80117B58(s32 a);
+s32  fn_801191D0(s32 a, s32 b, s32 c);
+void fn_800EEA3C(s32 nPlayer);
 void fn_80117DF0(s32 nPlayer);
 void fn_80117AF8(s32 nPlayer);
 void fn_800EED0C(s32 nPlayer);
@@ -207,6 +212,26 @@ void fn_800EE064(void) {
 
 u8 fn_800EE470(void) {
     return lbl_8028233C;
+}
+
+// A round of the current tournament is over for profile 0: after the second round of a
+// tournament of four or more the cut is checked, the round's score is kept, and after the last
+// round the tournament ends.
+void fn_800EE478(void) {
+    PlayerNumber_t nPlayer = PLR_1_e;
+    if (gpSaveData[nPlayer].tour.nRound == 0) {
+        gpSaveData[nPlayer].n104C8++;
+    }
+    if (fn_800EFA9C(gpSaveData[nPlayer].tour.nEvent) >= 4 && gpSaveData[nPlayer].tour.nRound == 1) {
+        fn_80117B58(0);
+        if (fn_801197A4(0, 0)) {
+            gpSaveData[nPlayer].tour.aEvent[gpSaveData[nPlayer].tour.nEvent].nUserRankType = 1;
+        }
+    }
+    gpSaveData[nPlayer].tour.aEvent[gpSaveData[nPlayer].tour.nEvent].nUserScore = fn_801191D0(0, 0, 1);
+    if (gpSaveData[nPlayer].tour.nRound + 1 >= fn_800EFA9C(gpSaveData[nPlayer].tour.nEvent)) {
+        fn_800EEA3C(0);
+    }
 }
 
 // Whether the player trails the leader by more than one stroke.
