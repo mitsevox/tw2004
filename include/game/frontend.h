@@ -9,6 +9,8 @@
 typedef struct FrontEnd {
     u8    unk0[4];
     void* pHandler;             // 0x4  where GameMessages.c sends its messages (fn_8016B09C)
+    u8    unk8[4];
+    void* pC;                   // 0xC  a block uiLoadFile.c frees (fn_8008F24C)
 } FrontEnd;
 
 extern FrontEnd* lbl_80281F1C;
