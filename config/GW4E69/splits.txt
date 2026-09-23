@@ -634,10 +634,7 @@ Ball.c:
 	.text       start:0x80050C2C end:0x8005620C
 
 user.c:
-	.text       start:0x800563C4 end:0x80056454
-
-unsorted/sweep_80056454.c:
-	.text       start:0x80056454 end:0x80056480
+	.text       start:0x800563C4 end:0x80056480
 
 unsorted/sweep_80057ED0.c:
 	.text       start:0x80057ED0 end:0x80057F18
