@@ -1407,7 +1407,8 @@ void fn_800C4E80(View* pView, int nPlayer) {
     CamShot* pShot;
     pCam = fn_8001731C(pView);
     pSub = fn_80017314(pView);
-    if (pView->p134 == NULL || pView->n140 == 6 || pView->n140 == 9 || pView->n140 == 8
+    // fake match: the constant first in one compare keeps the 8/9 tests from becoming a range test
+    if (pView->p134 == NULL || 6 == pView->n140 || pView->n140 == 9 || pView->n140 == 8
         || pView->n140 == 10) {
         pView->n264++;
         if (pView->n264 > 5) {
