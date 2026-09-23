@@ -344,3 +344,19 @@ Stack functions: `GetCurrentState` (was `SwingStack_Top`), `GetPreviousState`, `
 `Set` (clear, then push one), `Switch` (replace the top; our old name `SwingStack_Push` was
 wrong), `Kill` (was `SwingStack_Clear`), `OpenONCE` (empty all stacks), `Update` (run every
 player's current update).
+
+## Names by position: game effects, analysis and the game modes (2026-09-23)
+
+These come from TW06's function order (the PS2 map is in source order) and from the modes'
+shared shapes; they are in the source comments ("TW06: ... (by position)"), and the symbols keep
+their `fn_` names until the rest of each file is confirmed.
+
+| File | Mode | TW06 | Notes |
+|---|---|---|---|
+| `GameEffects.c` | - | `GameEffects_*` | Init/Reset/AdjustTimeRate/FieldOfViewChange/SimulateBall/SpinWindowDone/UpdateGameEffects/VibrateControllerForHeartbeat/SkipOtherCommentary/ScriptedGBDidIt/Pause/RenderGameBreakerEffects/RenderPredictedGB/RenderScriptedGB/DrawLetterBoxes/EndGB/StartPredictedGB/CheckScriptedGB/IsGBPossible |
+| `GameAnalysis.c` | - | `GameAnalysis_*` | CountTotalPuttsSoFarThisRound (6170), CountTotalHoleScores (6204), CountBogeysOrWorse (62B4), CountCompletedHoles (6484); the tip picker is ours |
+| `GameModeMatch.c` | 1 | `GameModeMatch::` | Init, GetTeeHonors, GetHonors, HoleFinished, GameFinished, GoToPlayoff, EndHole, EndGame |
+| `GameModeBestBall.c` | 19 | `GameModeBestBall::` | also `GM_BestBallMode_GetTeamHoleScore` (8C24) and `..._GetTeamRelativeScore` (8CA8) |
+| `GameModeFourBall.c` | 20 | `GameModeFourBall::` | TeamDone, TeamConceded, TeamBestPossibleScore, TeamMatchWins, GetPlayerTeam |
+| `GameModeAlternateShot.c` | 21 | `GameModeAlternateShot::` | TeamDone, GetPartner, TeamBestPossibleScore, TeamMatchWins, EndGolferTurn (partner takes the ball) |
+| `GameModeBattle.c` | 25 | `GameModeBattle::` | ClubIsRequired (clubs 13, 21, 25), NumRemovableClubsLeft, RemoveClub, AddClub, Save/RestoreClubSetup, CanAddClub, GetWinner |

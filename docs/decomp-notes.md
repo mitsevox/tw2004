@@ -193,6 +193,30 @@ Reading compiler output
   the same value here (`RECORD_AT_LEAST` in `GameManager.c`).
 - **[verified] GC/2.0, 2.5 and 2.6 compile the game units identically; GC/2.0p1 is worse**
   (Golfer 70 -> 67, Ball 63 -> 46, Swing 139 -> 133). Tested on every game unit, 2026-09-23.
+- **[verified] The right side of a comparison is evaluated first.** `f(0) < f(1)` calls `f(1)`
+  first. So the call order in the original tells you how the comparison was written: m2c's
+  `t = f(1); if (f(0) < t)` is the source `f(0) < f(1)` (GameModeAlternateShot, 2026-09-23).
+  Additions go left to right, so `a = f(x) + f(y)` calls `f(x)` first.
+- **[verified] `bne next; b exit` over an early return** (instead of one `beq exit`) comes from
+  structure the optimiser doesn't collapse: `switch (f()) { case 0: break; default: return; }`
+  (fn_800E7828, GameModeBattle/BestBall/FourBall EndGame, a `Game_GetCourse() != 7` test), or
+  `if (x == 0) { return -1; } else { return y; }` with an explicit `else` (fn_800ECA34). A plain
+  `if (x) return;` always collapses. The `if (!gpGame->b285) return;` in GameEffects
+  (DB30C/DBA50) is still unexplained: a switch gives `cmpwi`, the original has `cmplwi`.
+- **[verified] `x ? 0 : 2` compiles branch-free** (cntlzw/neg/andc); EA's code has
+  `a = 2; if (x == 0) a = 0;`. A flag from `(a || b) ? 1 : 0` adds a `neg/or/srwi` normalising
+  step that a plain `a || b` does not.
+- **[verified] Taking a parameter's address puts it on the stack at the parameter's slot**;
+  copying it to a local first gives a different slot order (fn_800E4164, fn_800E53F0).
+- **[verified] The PLAYER(i) byte-offset form also applies to plain arrays**: EA's loops over
+  `lbl_8020315C[i]` next to `gPlayers[i]` index both by byte offset
+  (`*(u32*)((u8*)arr + i * sizeof(u32))`); `arr[i]` walks a pointer (GameModeBattle 800C).
+- **[verified] GetHonors shape (all four match modes):** one variable for "best" and "other",
+  the pin read as `pCourse->pin[nHole].x` (not through a pointer), and the ball through the
+  Player (`*(f32*)(PLAYER(i)->ball + 8)`), not a Ball* cast. GameModeMatch GetHonors 85 -> 100%.
+- **[verified] Statement order among plain stores matters**: `a[i] = 1; x = 0; y = 0;` and
+  `x = 0; a[i] = 1; y = 0;` give different register use (fn_800E4238). And a call made for an
+  argument that was never used (`fn_800E5DA0(lbl)` vs `fn_800E5DA0()`) changes the code.
 - **[verified] `x / 2.0f` becomes `x * 0.5f`** with the constant loaded first (`lfs f0, 0.5;
   lfs f2, x`). Writing `x * 0.5f` loads them the other way round. (STATEFUNC_ShowYardageUpdate.)
 - **[verified] `!(a >= b || c > d)` vs `a < b && c <= d`.** The original's float compares follow

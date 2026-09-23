@@ -243,6 +243,20 @@ Dated log of what was done and decided, newest last. Facts and lessons belong in
   A checklist for using these references on every new area is in `tw2004-notes.md`,
   "Starting a new area: check the references first".
 - Numbers at the end of the day: **26.06% code, 3,714 of 7,647 functions**; EA 14.4%, SDK 82.6%.
+- **Overnight 2026-09-23: the game manager region and the game modes.** New units (TW06 names
+  by function order and shared code): `GameEffects.c` (GameBreaker slow-motion/letterbox/heartbeat
+  rumble, frame time), `GameManager.c`, `GameRound.c`, `GameUI.c` (31/31), `GameMessages.c`
+  (front-end messages: an id plus up to 8 int-or-float values; 55/55), `GameAnalysis.c` (round
+  stats and the loading-screen tip; 11/11), and the mode files: `GameModeAlternateShot.c` (mode
+  21), `GameModeBattle.c` (mode 25, the winner of a hole takes a club; 17/17),
+  `GameModeBestBall.c` (19), `GameModeFourBall.c` (20), `GameModeMatch.c` (1), `GameMode5.c`
+  (mode 5: 83 challenges of 0x80 bytes with medal targets, probably the Tiger Challenge).
+  60 sweep files folded into them, each deleted only after its functions were checked exact.
+  The mode map from `fn_800E0B38`: 0 FF700, 1 Match, 2 F80FC, 5 challenges, 6 F944C, 7 F9610,
+  8 F986C, 9 ED738, 10 F125C, 11 FFF34, 12 FEAFC, 13 F6A60, 14 F2984, 15 F39F4, 16 F4B40,
+  17 F5AAC, 18 FE1B4, 19 BestBall, 20 FourBall, 21 AlternateShot, 22 80125E68, 23 EDD18,
+  24 F0448, 25 Battle, 26 8010C4A0. Compiler rules found are in `decomp-notes.md` (dated
+  2026-09-23). Numbers: **29.34% code, 3,918 of 7,647 functions**.
 - **Next:**
   1. ~~Golfer and Swing structs from TW06~~ **done 2026-09-23**: `SwingData` is TW06's
      `SW_sSwingData` (50 fields renamed: the ones our code really uses were checked against it, a few it only
