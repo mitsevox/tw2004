@@ -793,13 +793,7 @@ unsorted/sweep_8006F64C.c:
 	.text       start:0x8006F64C end:0x8006F650
 
 GoShaderObjectContainer_OBFData_Gc.c:
-	.text       start:0x8006F650 end:0x8006FDCC
-
-unsorted/sweep_8006FDCC.c:
-	.text       start:0x8006FDCC end:0x8006FDD4
-
-unsorted/sweep_8006FED4.c:
-	.text       start:0x8006FED4 end:0x8006FF2C
+	.text       start:0x8006F650 end:0x8006FF2C
 
 unsorted/sweep_8006FF2C.c:
 	.text       start:0x8006FF2C end:0x8006FF80
