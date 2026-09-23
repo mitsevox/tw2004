@@ -14,18 +14,12 @@ typedef struct SwingStateDef {
 } SwingStateDef;
 extern SwingStateDef sGolferStateEngineTable[];        // 0x801883D8
 
-void  STATEFUNC_SimulateInit(int nPlayer);
-void  STATEFUNC_SimulateUpdate(int nPlayer);
-void  STATEFUNC_SimulateExit(int nPlayer);
-void  GM_MovePlayerToBall(int nPlayer);
 void  Shot_Plan(int nPlayer, int a);
-void  fn_8001D8DC(int nPlayer);
 void  fn_80062CB0(int a, int b);
 void  fn_80062F1C(void);
 s32   fn_800E27C0(void);
 void  fn_800E3C70(int a);
 void  fn_800E3CD4(int a);
-void  fn_800F80D4(s32 p0);
 extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
 extern u8* gpSaveData;
 extern u8  lbl_8028227C;
@@ -57,19 +51,10 @@ typedef struct SGLog {
 extern SGLog lbl_802120F8[100];
 extern s32 lbl_802823CC;
 extern u8  lbl_802823C8;
-void  GM_PlayerAddStroke(int nPlayer);
-u8    GM_CheckForBallOOB(int nPlayer);
-void  GM_ReplaceOOBBall(int nPlayer);
 SurfaceType* Ter_GetSupportingWorldMaterial(CourseInfo* pCourse, u8* pBall);
-void  fn_800DEB5C(int nPlayer);
 u8    fn_800A7720(void);
-u8    fn_80063C90(void* pView);             // the camera is still moving
-int   sprintf(char* pDst, const char* pFmt, ...);
 extern u8  lbl_801D7148[];                  // per profile slot: nonzero to show the profile's name
 void  fn_800FE190(f32* pA, f32* pB, f32* pOut);
-u8*   fn_800136C4(int nController);         // the pad's state: stick bytes at +0..+3
-u32   fn_800136DC(int nController);         // buttons: held << 16 | pressed this frame
-u32   fn_800142AC(int nButton, int a);      // a button's mask
 // The run's pace (fCB4): a button press adds lbl_802816B0; it falls by lbl_802816B4 a frame, or
 // lbl_802816C0 once the button has not been pressed for lbl_802816C4 seconds; it stays within
 // lbl_802816B8..lbl_802816BC.
@@ -82,18 +67,6 @@ f32 lbl_802816C4 = 0.25f;
 // fake match: a one-entry array, so the compiler loads it where fn_800FBD2C compares with it
 // instead of folding in its own 1.0f (the original has this constant first in the file's .sdata2)
 const f32 lbl_80284708[1] = {1.0f};
-f32   fn_8000AD78(f32 y, f32 x);                // atan2f
-void  fn_800BAF04(f32* pSrc, f32* pDst);        // normalise
-int   Golfer_GetAttribute(Player* pPlayer, int nAttr, int nMode);
-void  GM_SimulateBallMovement(int nPlayer);
-u8    fn_80058F5C(int nPlayer);                 // the per-frame swing poll: the ball was struck
-void  fn_800ED710(s32 p0);
-void  Vec_Normalize(f32* pSrc, f32* pDst);
-u8    Ter_PointInOOBNetwork(u8* pBall);
-void  fn_80069330(int nPlayer, f32* pPos);
-void  fn_8006A6C4(int nPlayer);
-void  PlaceBall_UpdateMomentums(int nPlayer, f32 f);
-u8*   fn_80016CFC(int nView);
 u8*   fn_80008370(u8* p);
 extern f32 lbl_801D5888[4][4];                  // per player: where the ball was last on the course
 
@@ -102,30 +75,17 @@ typedef struct HoleTees {
     u8     unk0[0xB0];
     PinPos tee[4];                          // 0xB0  one per tee set
 } HoleTees;
-void  fn_8006ACF8(int nPlayer, int a);
-void  fn_8006BAA8(int nPlayer);
 void  fn_800FE100(s32 p0, s32 p1, s32 p2);
 void  fn_800FA554(int nPlayer);
 
-void  fn_800F9844(void);
-u8    fn_800F9C00(int nPlayer, int a);
-void  fn_800F9C48(void);
-u8    fn_800F9D00(u8 bCheck);
-void  fn_800F9E00(void);
-u8    fn_800F9F04(u8 bCheck);
-u8    fn_800FA148(int a);
 u8    fn_800FA1CC(int nPlayer, int a);
 u8    fn_800FA26C(int a);
-s32   fn_800FA2C8(void);
 void  fn_800FA2D0(void);
-void  fn_800FA3AC(void);
-void  fn_800FA410(void);
 s32   fn_800FA48C(int nPlayer, int nHole);
 s32   fn_800FA4B8(int nPlayer);
 void  fn_800FA608(int nPlayer);
 void  fn_800FA844(int nPlayer);
 void  fn_800FA994(int nPlayer);
-void  fn_800FA998(int nPlayer);
 void  fn_800FA9E0(int nPlayer);
 void  fn_800FB35C(int nPlayer, int nOther);
 f32   fn_800FB41C(f32* pA, f32* pB);
@@ -135,7 +95,6 @@ void  fn_800FCCF0(void);
 void  fn_800FD1C0(int nPlayer);
 void  fn_800FD534(int nPlayer);
 void  fn_800FD6A0(int nPlayer);
-void  fn_800FDF38(void);
 void  fn_800FDFC4(s32 p0, s32 p1, s32 p2);
 void  fn_800FDFFC(s32 p0, s32 p1);
 void  fn_800FE02C(void);
