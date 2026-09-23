@@ -2,12 +2,12 @@
 
 #include "game_types.h"
 
-void fn_8000FBB0();
+void TX_spParseTextureGroupFromStream();
 
 void fn_8000FB88(u8* p);
 void fn_8000FBAC(void);
 void fn_8000FB88(u8* p) {
-    fn_8000FBB0(*(s32*)(p + 0x0));
+    TX_spParseTextureGroupFromStream(*(s32*)(p + 0x0));
 }
 
 void fn_8000FBAC(void) {

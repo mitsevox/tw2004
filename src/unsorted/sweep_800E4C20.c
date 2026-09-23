@@ -4,7 +4,7 @@
 
 s32 Game_GetMode();
 s32 fn_80062D38(s32, s32, s32);
-s32 fn_80067074(s32, s32, s32, s32);
+s32 EVENT_Trigger(s32, s32, s32, s32);
 s32 fn_800A72EC(s32, s32);
 s32 fn_800DAE84();
 extern s8 lbl_80282281;
@@ -41,7 +41,7 @@ void fn_800E4C20(u8 arg0) {
         fn_800DAE84();
         if (arg0 != 0) {
             fn_80062D38(0xE, 1, 1);
-            fn_80067074(0xFF, 0x41, 0, -1);
+            EVENT_Trigger(0xFF, 0x41, 0, -1);
             return;
         }
         fn_80062D38(0xE, 1, 0);

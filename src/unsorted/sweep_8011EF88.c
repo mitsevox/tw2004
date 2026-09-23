@@ -11,7 +11,7 @@ void fn_8001614C();
 void fn_80016B9C();
 void fn_80035138();
 void fn_800352BC();
-void fn_8011EFE4();
+void GrassRender_vBuildAndUploadOneTimeData();
 
 void fn_8011EF88(void);
 void fn_8011EF88(void) {
@@ -24,5 +24,5 @@ void fn_8011EF88(void) {
     fn_80012F34(0);
     fn_80014118(80);
     fn_80012EF8();
-    fn_8011EFE4();
+    GrassRender_vBuildAndUploadOneTimeData();
 }

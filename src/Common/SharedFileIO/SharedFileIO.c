@@ -86,7 +86,7 @@ int SFIONumDevicesInMask(u16 uDeviceMask);
 int SFIOFirstDeviceFromMask(u16 uDeviceMask);
 int SFIOLastDeviceFromMask(u16 uDeviceMask);
 void SFIOSetLastError(int eError);
-extern void* fn_801220D4(void* pAllocator, u32 uSize, u32 uAlign, const char* pFile, int uLine);
+extern void* TibExtMemAlloc(void* pAllocator, u32 uSize, u32 uAlign, const char* pFile, int uLine);
 extern void  fn_80122128(void* pAllocator, void* p, u32 uSize, u32 uAlign);
 
 typedef struct {
@@ -652,10 +652,10 @@ int SFIOInit(int* pDevices, const SFIOFuncTable* pFuncs, void* pAllocator) {
           pFuncs->pfn3C && pFuncs->pfnUpdate && pFuncs->pfn44)) return 0xC;
     if (_SFIO_pDevice != NULL || _SFIO_pData != NULL) return 1;
 #line 2157
-    _SFIO_pDevice = fn_801220D4(pAllocator, sizeof(SFIODevice), 4, __FILE__, __LINE__);
+    _SFIO_pDevice = TibExtMemAlloc(pAllocator, sizeof(SFIODevice), 4, __FILE__, __LINE__);
     if (_SFIO_pDevice == NULL) return 7;
 #line 2162
-    _SFIO_pData = fn_801220D4(pAllocator, sizeof(SFIOData), 4, __FILE__, __LINE__);
+    _SFIO_pData = TibExtMemAlloc(pAllocator, sizeof(SFIOData), 4, __FILE__, __LINE__);
     if (_SFIO_pData == NULL) return 7;
     _SFIO_pDevice->pAllocator = pAllocator;
     _SFIO_pDevice->uAvailableMask = 0;

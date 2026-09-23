@@ -528,7 +528,7 @@ void Ball_Launch(void* pBall, int nClub, int nKind, f32 fPower, f32 fAim, int nT
 void Luck_TakePerfectShot(int nPlayer);      // Golfer.c
 void fn_8000B1D4(int nStream, u32 uSeed);    // seed an RNG stream
 void fn_80095744(int nHandle, int nAnim);    // play an animation
-void fn_80096690(int nHandle);
+void CharacterState_UpdateSKAState(int nHandle);
 void fn_8006BF60(int nPlayer);               // the replay recorder
 void fn_8006C300(int nPlayer);
 void Swing_FaceVector(int nPlayer, f32* pOut);
@@ -1064,7 +1064,7 @@ f32 fn_8005CB78(int nHandle, unsigned long long uEvent);   // an animation event
 void Swing_ResetBoostAndSpin(int nPlayer);
 void fn_8006C5E0(void);
 void Swing_ClearFrameFlag(int nPlayer);
-void fn_80067074(int nPlayer, int nSound, int a, int b);
+void EVENT_Trigger(int nPlayer, int nSound, int a, int b);
 
 // The swing is under way: phase 1, the animation started, its three marks read, the 25-sample
 // stick history filled with the centre, the spin stick centred.
@@ -1222,7 +1222,7 @@ void Swing_Begin(int nPlayer) {
 
     pSw->nPhase = 1;
     fn_80095744(nHandle, 6);
-    fn_80096690(nHandle);
+    CharacterState_UpdateSKAState(nHandle);
     pSw->f10 = 0.0f;
     pSw->f14 = 0.0f;
     pSw->fMark0 = fn_8005CB78(nHandle, 0);
@@ -1274,7 +1274,7 @@ int Swing_WaitForBackswing(int nPlayer) {
             gPlayers[nPlayer].swing.nCentreX      = gPlayers[nPlayer].swing.nRestX;
             gPlayers[nPlayer].swing.bUsingCStick  = 0;
         }
-        fn_80067074(nPlayer, 0x2C, 0, 0);
+        EVENT_Trigger(nPlayer, 0x2C, 0, 0);
         Swing_Begin(nPlayer);
         Swing_ClearFrameFlag(nPlayer);
         fn_8006C5E0();
@@ -1375,7 +1375,7 @@ int Swing_UpdateBackswing(int nPlayer) {
             if (fn_800204A0(*(u8**)(pObj->pClip + 0xD8), pObj->v1638, *(f32*)(*(u8**)(pObj->pClip + 0xD8) + 8) + (pObj->fAnimTime - pSw->fMark0))) {
                 pSw->fMark2 = pObj->fAnimTime + (*(f32*)(*(u8**)(pObj->pClip + 0xD4) + 0x24) - pObj->v1638[1]) + pObj->f1644;
             }
-            fn_80096690((int)pObj);
+            CharacterState_UpdateSKAState((int)pObj);
             pObj->n5CC = 2;
             pSw->fMark1 = pObj->fAnimTime;
             ShotObj_Set1634(pObj, 0.0f);
@@ -1449,14 +1449,14 @@ int Swing_UpdateBackswing(int nPlayer) {
         if (fn_800204A0(*(u8**)(pObj->pClip + 0xD8), pObj->v1638, *(f32*)(*(u8**)(pObj->pClip + 0xD8) + 8) + (pObj->fAnimTime - pSw->fMark0))) {
             pSw->fMark2 = pObj->fAnimTime + (*(f32*)(*(u8**)(pObj->pClip + 0xD4) + 0x24) - pObj->v1638[1]) + pObj->f1644;
         }
-        fn_80096690((int)pObj);
+        CharacterState_UpdateSKAState((int)pObj);
         pObj->n5CC = 2;
         pSw->fMark1 = pObj->fAnimTime;
         ShotObj_Set1634(pObj, 0.0f);
         ShotObj_Set1630(pObj, 0.0f);
         ShotObj_Set162C(pObj, 1.4f * ShotObj_GetBlend(pObj));
         pSw->nPhase = 3;
-        fn_80067074(nPlayer, 0x2F, 0, 0);
+        EVENT_Trigger(nPlayer, 0x2F, 0, 0);
         pSw->nImpactX = nX;
         pSw->nImpactY = nY;
         pSw->nImpactX2 = nX;
@@ -1518,7 +1518,7 @@ int Swing_UpdateAtTop(int nPlayer) {
             pSw->nPhase = 0;
             fn_80095744((int)pObj, 5);
             Anim_SetRate(pObj->anim, 1.0f);
-            fn_80067074(nPlayer, 9, 0, 0);
+            EVENT_Trigger(nPlayer, 9, 0, 0);
         }
     }
     Swing_UpdatePower(nPlayer);
@@ -1569,7 +1569,7 @@ int Swing_UpdateDownswing(int nPlayer) {
             Swing_MisHitRumble(nPlayer);
         }
         if (gPlayers[nPlayer].nShotKind == SHOT_PUTT) {
-            fn_80067074(nPlayer, 0x2B, 0, 0);
+            EVENT_Trigger(nPlayer, 0x2B, 0, 0);
         }
         return 1;
     }
@@ -1635,7 +1635,7 @@ void Swing_SpinInput(int nPlayer) {
     uButtons    = fn_800136DC(gPlayers[nPlayer].nController);
     if (!(uButtons & fn_800142AC(0x20, 0))) return;
     if (gPlayers[nPlayer].swing.bShotTaken == 0) return;
-    fn_80067074(nPlayer, 0x2E, 0, 0);
+    EVENT_Trigger(nPlayer, 0x2E, 0, 0);
     nX = Swing_StickX(nPlayer, Pad_State(nPlayer, gPlayers[nPlayer].nController));
     nY = Swing_StickY(nPlayer, Pad_State(nPlayer, gPlayers[nPlayer].nController));
     if (gPlayers[nPlayer].swing.nSpinAmount == 0) {
@@ -2061,7 +2061,7 @@ void Swing_BoostInput(int nPlayer) {
     if ((uButtons & fn_800142AC(0x1F, 0)) && fMag > 93.0f) {
         if (gPlayers[nPlayer].swing.nBoostLevel < 8) {
             (gPlayers[nPlayer].swing.nBoostLevel)++;
-            fn_80067074(nPlayer, 0x2D, 0, 0);
+            EVENT_Trigger(nPlayer, 0x2D, 0, 0);
         }
     }
     if (gPlayers[nPlayer].swing.fBackDown > 0.0f) {
@@ -2381,9 +2381,9 @@ void SwingState11_Exit(int nPlayer) {
     fn_800DC524(0, nPlayer, 0.0f);
     fn_800C6E14();
     if (gSession.bReplay != 0) {
-        fn_80067074(nPlayer, 0x3B, 0, 0);
+        EVENT_Trigger(nPlayer, 0x3B, 0, 0);
     } else {
-        fn_80067074(nPlayer, 0x3B, 0, 1);
+        EVENT_Trigger(nPlayer, 0x3B, 0, 1);
     }
 }
 
@@ -2557,7 +2557,7 @@ void SwingState04_Enter(int nPlayer) {
 
 void SwingState03_Exit(int nPlayer) {
     int nView;
-    fn_80067074(nPlayer, 0x31, 0, -1);
+    EVENT_Trigger(nPlayer, 0x31, 0, -1);
     if (fn_8005D2A8(nPlayer) == 10) {
         nView = gPlayers[nPlayer].nView0;
         View_SetCamera(fn_80017028(nView), 0xC, nPlayer, nView);
@@ -2705,7 +2705,7 @@ void SwingState21_Enter(int nPlayer) {
     View* pV;
     int   k, j;
     u8    bShared;
-    fn_80067074(nPlayer, 0x4A, 0, -1);
+    EVENT_Trigger(nPlayer, 0x4A, 0, -1);
     pViews = &gPlayers[nPlayer].nView0;
     for (k = 0; k < 2; k++) {
         pV      = (View*)fn_80017028(pViews[k]);
@@ -2971,17 +2971,17 @@ void SwingState08_Update(int nPlayer) {
         fn_8005CFD4(nPlayer);
     } else {
         if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0xB, 1)) {
-            fn_80067074(nPlayer, 0x12, 0, -1);
+            EVENT_Trigger(nPlayer, 0x12, 0, -1);
         } else {
             if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0xC, 1)) {
-                fn_80067074(nPlayer, 0x13, 0, -1);
+                EVENT_Trigger(nPlayer, 0x13, 0, -1);
             }
         }
         if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0xD, 1)) {
-            fn_80067074(nPlayer, 0x14, 0, -1);
+            EVENT_Trigger(nPlayer, 0x14, 0, -1);
         } else {
             if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0xE, 1)) {
-                fn_80067074(nPlayer, 0x15, 0, -1);
+                EVENT_Trigger(nPlayer, 0x15, 0, -1);
             }
         }
     }
@@ -3013,24 +3013,24 @@ void SwingState04_Update(int nPlayer) {
         fn_8005CFD4(nPlayer);
     } else {
         if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(9, 0)) {
-            fn_80067074(nPlayer, 0xD, 0, -1);
+            EVENT_Trigger(nPlayer, 0xD, 0, -1);
         } else {
             if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0xA, 0)) {
-                fn_80067074(nPlayer, 0xE, 0, -1);
+                EVENT_Trigger(nPlayer, 0xE, 0, -1);
             }
         }
         if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0xB, 1)) {
-            fn_80067074(nPlayer, 0x12, 0, -1);
+            EVENT_Trigger(nPlayer, 0x12, 0, -1);
         } else {
             if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0xC, 1)) {
-                fn_80067074(nPlayer, 0x13, 0, -1);
+                EVENT_Trigger(nPlayer, 0x13, 0, -1);
             }
         }
         if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0xD, 1)) {
-            fn_80067074(nPlayer, 0x14, 0, -1);
+            EVENT_Trigger(nPlayer, 0x14, 0, -1);
         } else {
             if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0xE, 1)) {
-                fn_80067074(nPlayer, 0x15, 0, -1);
+                EVENT_Trigger(nPlayer, 0x15, 0, -1);
             }
         }
     }
@@ -3052,7 +3052,7 @@ void SwingState02_Enter(int nPlayer) {
     }
     if (gpGame->n290 != 0) {
         fn_80095744(gPlayers[nPlayer].nShotHandle, 2);
-        fn_80096690(gPlayers[nPlayer].nShotHandle);
+        CharacterState_UpdateSKAState(gPlayers[nPlayer].nShotHandle);
     }
     fn_80062C38();
     pBall = gPlayers[nPlayer].ball;
@@ -3072,7 +3072,7 @@ void SwingState02_Enter(int nPlayer) {
     }
     fn_80054A6C(pBall);
     gPlayers[nPlayer].fA64 = fn_800D04AC(nPlayer);
-    fn_80067074(nPlayer, 6, 0, -1);
+    EVENT_Trigger(nPlayer, 6, 0, -1);
 }
 
 
@@ -3099,7 +3099,7 @@ void SwingState20_Enter(int nPlayer) {
     int   nView;
     int   i, k;
 
-    fn_80067074(nPlayer, 0x4A, 0, -1);
+    EVENT_Trigger(nPlayer, 0x4A, 0, -1);
     pView = &gPlayers[nPlayer].nView0;
     fn_800170C4(*pView, 1);
     nView = *pView;
@@ -3253,17 +3253,17 @@ void SwingState22_Update(int nPlayer) {
     } else {
         fn_800EDAE0(nPlayer);
         if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x1A, 1)) {
-            fn_80067074(nPlayer, 0x16, 0, -1);
+            EVENT_Trigger(nPlayer, 0x16, 0, -1);
         } else {
             if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x1B, 1)) {
-                fn_80067074(nPlayer, 0x17, 0, -1);
+                EVENT_Trigger(nPlayer, 0x17, 0, -1);
             }
         }
         if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x1C, 1)) {
-            fn_80067074(nPlayer, 0x18, 0, -1);
+            EVENT_Trigger(nPlayer, 0x18, 0, -1);
         } else {
             if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x1D, 1)) {
-                fn_80067074(nPlayer, 0x19, 0, -1);
+                EVENT_Trigger(nPlayer, 0x19, 0, -1);
             }
         }
         if ((fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x19, 0)) && gPlayers[nPlayer].nLie != 0 && fn_800DDDC8(nPlayer)) {
@@ -3287,27 +3287,27 @@ void SwingState03_Update(int nPlayer) {
         fn_8005CFD4(nPlayer);
     } else {
         if ((fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(9, 0))) {
-            fn_80067074(nPlayer, 0xD, 0, -1);
+            EVENT_Trigger(nPlayer, 0xD, 0, -1);
         } else {
             if ((fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0xA, 0))) {
-                fn_80067074(nPlayer, 0xE, 0, -1);
+                EVENT_Trigger(nPlayer, 0xE, 0, -1);
             }
         }
         if ((fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x1E, 0))) {
-            fn_80067074(nPlayer, 0xF, 0, -1);
+            EVENT_Trigger(nPlayer, 0xF, 0, -1);
         }
         if ((fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0xB, 1))) {
-            fn_80067074(nPlayer, 0x12, 0, -1);
+            EVENT_Trigger(nPlayer, 0x12, 0, -1);
         } else {
             if ((fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0xC, 1))) {
-                fn_80067074(nPlayer, 0x13, 0, -1);
+                EVENT_Trigger(nPlayer, 0x13, 0, -1);
             }
         }
         if ((fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0xD, 1))) {
-            fn_80067074(nPlayer, 0x14, 0, -1);
+            EVENT_Trigger(nPlayer, 0x14, 0, -1);
         } else {
             if ((fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0xE, 1))) {
-                fn_80067074(nPlayer, 0x15, 0, -1);
+                EVENT_Trigger(nPlayer, 0x15, 0, -1);
             }
         }
     }
@@ -3450,7 +3450,7 @@ u8    fn_800C44CC(View* pView, int nPlayer);
 u8    fn_800C44E0(View* pView, int nPlayer);
 void  CharAnim_StartTapIn(int nHandle);
 u8    fn_800C6D80(void);
-void  fn_80095B4C(int nHandle, int a, int b, void* pfn, int c, int d, f32 f1, f32 f2, f32 f3, f32 f4, f32 f5);
+void  CharacterState_AddSKABlendData(int nHandle, int a, int b, void* pfn, int c, int d, f32 f1, f32 f2, f32 f3, f32 f4, f32 f5);
 void  fn_80072ACC(void);
 void  fn_80027764(u8* p, f32 f);
 void  fn_80047EF0(u8* pBall, int nPlayer, int a);   // tee the ball up
@@ -3489,9 +3489,9 @@ void SwingState11_Enter(int nPlayer) {
         CharAnim_StartTapIn(gPlayers[nPlayer].nShotHandle);
     } else {
         if (fn_800C6D80() || fn_800C44A8(pV, nPlayer) || fn_800C44CC(pV, nPlayer) || fn_800C44E0(pV, nPlayer)) {
-            fn_80095B4C(gPlayers[nPlayer].nShotHandle, 1, 0, fn_80072ACC, 1, 8, -20000.0f, -30000.0f, -10000.0f, 0.0f, -10000.0f);
+            CharacterState_AddSKABlendData(gPlayers[nPlayer].nShotHandle, 1, 0, fn_80072ACC, 1, 8, -20000.0f, -30000.0f, -10000.0f, 0.0f, -10000.0f);
         } else {
-            fn_80095B4C(gPlayers[nPlayer].nShotHandle, 1, 0, fn_80072ACC, 1, 8, -20000.0f, -90000.0f, -10000.0f, 0.0f, -10000.0f);
+            CharacterState_AddSKABlendData(gPlayers[nPlayer].nShotHandle, 1, 0, fn_80072ACC, 1, 8, -20000.0f, -90000.0f, -10000.0f, 0.0f, -10000.0f);
         }
         fn_80027764(*(u8**)(*(u8**)(gPlayers[nPlayer].nShotHandle + 0x38) + 0x38), 1.0f);
     }
@@ -3535,7 +3535,7 @@ void SwingState11_Update(int nPlayer) {
             Swing_Launch(nPlayer);
             SwingStack_Push(0xC, nPlayer);
         } else if (fn_800C4518(pV) >= fn_800C6B38(pV)) {
-            fn_80067074(nPlayer, 0xA, (int)gPlayers[nPlayer].ball, 1);
+            EVENT_Trigger(nPlayer, 0xA, (int)gPlayers[nPlayer].ball, 1);
             fn_800C44A8(pV, nPlayer);
             fn_8002792C(*(u8**)(((ShotObj*)gPlayers[nPlayer].nShotHandle)->pView + 0x38));
             Swing_Launch(nPlayer);
@@ -3547,9 +3547,9 @@ void SwingState11_Update(int nPlayer) {
                 bSpecial = fn_800C5FE4(pV, nPlayer);
             }
             if (bSpecial) {
-                fn_80095B4C(gPlayers[nPlayer].nShotHandle, 1, 0x12, fn_80072ACC, 1, 8, -20000.0f, -30000.0f, -10000.0f, 0.0f, -10000.0f);
+                CharacterState_AddSKABlendData(gPlayers[nPlayer].nShotHandle, 1, 0x12, fn_80072ACC, 1, 8, -20000.0f, -30000.0f, -10000.0f, 0.0f, -10000.0f);
             } else {
-                fn_80095B4C(gPlayers[nPlayer].nShotHandle, 1, 0, fn_80072ACC, 1, 8, -20000.0f, -90000.0f, -10000.0f, 0.0f, -10000.0f);
+                CharacterState_AddSKABlendData(gPlayers[nPlayer].nShotHandle, 1, 0, fn_80072ACC, 1, 8, -20000.0f, -90000.0f, -10000.0f, 0.0f, -10000.0f);
             }
             fn_800957D8(gPlayers[nPlayer].nShotHandle);
             Swing_ClearFrameFlag(nPlayer);
@@ -3602,7 +3602,7 @@ void SwingState01_Enter(int nPlayer) {
     for (k = 0; k < 2; k++) {
         fn_8001704C(pView[k], nPlayer);
     }
-    fn_80067074(nPlayer, 0x2A, 0, -1);
+    EVENT_Trigger(nPlayer, 0x2A, 0, -1);
     fn_8001D8DC(nPlayer);
     fn_8001C804(nPlayer, 1, 1);
     if (gpGame->b277 != 0) {
@@ -3633,7 +3633,7 @@ void SwingState01_Enter(int nPlayer) {
     fn_80054A6C(pBall);
     fn_80005628(gPlayers[nPlayer].ballBefore, pBall, 0xBC);
     gPlayers[nPlayer].fA64 = fn_800D04AC(nPlayer);
-    fn_80067074(nPlayer, 3, 0, -1);
+    EVENT_Trigger(nPlayer, 3, 0, -1);
     if (gSession.nGameType != 8 && Player_IsCPU(nPlayer)) {
         fn_800E3D38(nPlayer, 1);
     }
@@ -3644,7 +3644,7 @@ void SwingState01_Enter(int nPlayer) {
         } else {
             fn_80095744(*pHandle, 1);
         }
-        fn_80096690(*pHandle);
+        CharacterState_UpdateSKAState(*pHandle);
         nView = *pView;
         View_SetCamera(fn_80017028(nView), 0xB, nPlayer, nView);
     }
@@ -3760,7 +3760,7 @@ void SwingState01_Update(int nPlayer) {
     }
     if (fn_80095780(gPlayers[nPlayer].nShotHandle) != 10 && fn_80095780(gPlayers[nPlayer].nShotHandle) != 1 && fn_800C6E88(pV, nPlayer)) {
         fn_80095744(gPlayers[nPlayer].nShotHandle, 5);
-        fn_80096690(gPlayers[nPlayer].nShotHandle);
+        CharacterState_UpdateSKAState(gPlayers[nPlayer].nShotHandle);
         fn_80063CF0(pV, 0x17, nPlayer);
     }
     if (fn_80063C7C(pV) && (fn_800C6F7C(pV, nPlayer, 0.25f) || !fn_800C6E88(pV, nPlayer))) {
@@ -3792,7 +3792,7 @@ int   fn_8001EED8(void* pSkel, int nBone);    // a bone's index
 f32   fn_8004D620(CourseInfo* pCourse, f32* pPos);   // ground height, -60000 and below if none
 void fn_80062DDC(f32* pA, f32* pB, f32* pOut);       // a - b
 double fn_80009744(f32* pVec);                // dot with itself
-void  fn_800BAF04(f32* pSrc, f32* pDst);      // normalise (3)
+void  vec4flt_LengthSquared3(f32* pSrc, f32* pDst);      // normalise (3)
 void  fn_80051A18(u8* pBall, f32* pDir, f32 fSpeed, u8* pFrom);   // Ball.c: launch with a velocity
 extern Vec4 lbl_80183680;
 extern f32  gRealBallRadiusIn;               // 0x80283300  0.84: a real golf ball, in inches
@@ -3845,7 +3845,7 @@ void SwingState18_Update(int nPlayer) {
                     fn_80062DDC((f32*)pB, pPrev, vDir);
                     fSpeed = (f32)fn_80009680(fn_80009744(vDir));
                     if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
-                        fn_800BAF04(vDir, vDir);
+                        vec4flt_LengthSquared3(vDir, vDir);
                     }
                     fSpeed = 60.0f * (60.0f * (59.94f * (fSpeed / 1760.0f))) * 0.5f;
                     fn_80062B98(*pHandle, 4);
@@ -4031,7 +4031,7 @@ void SwingState10_Enter(int nPlayer) {
     fn_80068AA8(nPlayer);
     fn_800A562C((u8)nPlayer);
     fn_8006BAA8(nPlayer);
-    fn_80067074(nPlayer, 0x2A, 0, -1);
+    EVENT_Trigger(nPlayer, 0x2A, 0, -1);
     fn_8006AD68(nPlayer);
     fn_8006ACF8(nPlayer, 5);
     gPlayers[nPlayer].fC20 = 0.0f;
@@ -4078,7 +4078,7 @@ void SwingState10_Enter(int nPlayer) {
     gPlayers[nPlayer].unkC2E = 0;
     gPlayers[nPlayer].bPlanReady = 0;
     gPlayers[nPlayer].uFlags     = 0;
-    fn_80067074(nPlayer, 7, 0, -1);
+    EVENT_Trigger(nPlayer, 7, 0, -1);
     fn_800DB4E8(nPlayer);
     fn_80062B68(nPlayer);
 }
@@ -4123,7 +4123,7 @@ void SwingState10_Update(int nPlayer) {
         fn_800C6618(pV, nPlayer);
         fn_800A5980((u8)nPlayer);
         if (fn_800C7138(pV) == 0) {
-            fn_80067074(nPlayer, 0x3B, 0, 0);
+            EVENT_Trigger(nPlayer, 0x3B, 0, 0);
         }
         if (gpGame->b283 != 0 &&
             (fn_800C441C(pV, nPlayer) || fn_800C44A8(pV, nPlayer) || fn_800C44CC(pV, nPlayer) || fn_800C44E0(pV, nPlayer))) {

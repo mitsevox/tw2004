@@ -4,7 +4,7 @@
 
 int  Hole_ScoreAfterTapIn(int nPlayer);
 void fn_8001C7FC(u8* pChar, int nStyle);   // the character's animation style (+0x16E0)
-void fn_80095B4C(u8* pChar, int a, int nGroup, void* pfn, int c, int d, f32 f1, f32 f2, f32 f3, f32 f4, f32 f5);
+void CharacterState_AddSKABlendData(u8* pChar, int a, int nGroup, void* pfn, int c, int d, f32 f1, f32 f2, f32 f3, f32 f4, f32 f5);
 void fn_80072ACC(void);
 
 // Animation 11, the gimme tap-in: the style is the score the tap-in will give (under par 6, par
@@ -24,5 +24,5 @@ void CharAnim_StartTapIn(u8* pChar) {
     } else {
         fn_8001C7FC(pChar, 2);
     }
-    fn_80095B4C(pChar, 1, 9, fn_80072ACC, 1, 8, -10000.0f, -30000.0f, -10000.0f, 0.0f, -10000.0f);
+    CharacterState_AddSKABlendData(pChar, 1, 9, fn_80072ACC, 1, 8, -10000.0f, -30000.0f, -10000.0f, 0.0f, -10000.0f);
 }

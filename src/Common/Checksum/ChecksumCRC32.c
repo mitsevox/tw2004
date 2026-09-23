@@ -15,7 +15,7 @@ typedef struct {
 } CRC32State;
 
 // Memory functions of the host game (CodeWarrior side). Signatures inferred from the calls.
-extern void* fn_801220D4(void* allocator, unsigned long size, unsigned long align, const char* file, int line);
+extern void* TibExtMemAlloc(void* allocator, unsigned long size, unsigned long align, const char* file, int line);
 extern void  fn_80122128(void* allocator, void* p, unsigned long size, unsigned long align);
 
 CRC32State gCRC = { 0, { 4, 0 }, 0xFFFFFFFF, 0 };   // read directly by SharedFileIO.c, so not static
@@ -59,7 +59,7 @@ void CRC32_BuildTable(unsigned long* table) {
 int CRC32_Init(void* allocator) {
     if (gCRC.table != 0) return 5;
 #line 214 "../../../Source/Common/Checksum/ChecksumCRC32.c"
-    gCRC.table = fn_801220D4(allocator, 1024, 4, __FILE__, __LINE__);
+    gCRC.table = TibExtMemAlloc(allocator, 1024, 4, __FILE__, __LINE__);
     if (gCRC.table == 0) return 1;
     gCRC.allocator = allocator;
     CRC32_BuildTable(gCRC.table);

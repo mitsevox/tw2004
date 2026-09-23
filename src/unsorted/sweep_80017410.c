@@ -8,7 +8,7 @@ s32 fn_80017410(void);
 s32 fn_80017410(void) {
     s32 temp_r3;
 
-    temp_r3 = fn_80017320();
+    temp_r3 = sGetUserTextureIdx();
     if ((temp_r3 < 0) || (temp_r3 >= 5)) {
         return 0;
     }

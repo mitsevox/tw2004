@@ -10,10 +10,10 @@ s32 fn_8006DDA8();
 s32 fn_8006DE28();
 s32 fn_8006DFA8();
 s32 fn_8006E028();
-s32 fn_80077168();
+s32 FE_GetBIOMovieName();
 s32 fn_8008B864();
 s32 fn_8008B9A0();
-s32 fn_8008BAB4();
+s32 sFE_AdjustAndSetGolferPosition();
 s32 fn_8008C844();
 s32 fn_8008C8C4();
 u8 fn_8008EB10();
@@ -37,7 +37,7 @@ void fn_8006D838(void) {
         fn_8006C8EC(0);
         temp_r3 = fn_8008EB10();
         if (temp_r3 != 0) {
-            fn_8008BAB4();
+            sFE_AdjustAndSetGolferPosition();
             fn_8008B9A0();
             fn_8008C844();
         }
@@ -53,7 +53,7 @@ void fn_8006D838(void) {
     fn_8009069C();
     fn_8008FD60(1);
     fn_800382E0();
-    fn_80077168();
+    FE_GetBIOMovieName();
     fn_8006DE28();
     fn_8006DDA8();
     fn_801242D0();

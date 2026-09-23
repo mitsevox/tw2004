@@ -132,7 +132,7 @@ int  SFIOUpdate(int* pProcess, int* pResult);
 int  SFIOSetDescriptor(void* pDescriptor);
 void SFIOPlatformCall80172F48(const ChecksumInterface** ppInterface);
 // Host memory functions (CodeWarrior side).
-extern void* fn_801220D4(void* pAllocator, u32 uSize, u32 uAlign, const char* pFile, int uLine);
+extern void* TibExtMemAlloc(void* pAllocator, u32 uSize, u32 uAlign, const char* pFile, int uLine);
 extern void  fn_80122128(void* pAllocator, void* p, u32 uSize, u32 uAlign);
 extern void* memcpy(void* pDst, const void* pSrc, u32 uLen);
 extern void* memset(void* pDst, int c, u32 uLen);
@@ -561,7 +561,7 @@ int TagFile_Init(const TagFileInitParams* pParams) {
         return TagFile_SFIOError(eSFIOError);
     }
 #line 1644
-    _TagFile_pData = fn_801220D4(pParams->pAllocator, sizeof(TagFileData), 4, __FILE__, __LINE__);
+    _TagFile_pData = TibExtMemAlloc(pParams->pAllocator, sizeof(TagFileData), 4, __FILE__, __LINE__);
     if (_TagFile_pData == NULL) {
         return TAG_ERROR_NO_MEMORY;
     }
@@ -578,7 +578,7 @@ int TagFile_Init(const TagFileInitParams* pParams) {
         }
         _TagFile_pData->uKeyLen = pParams->uKeyLen;
 #line 1687
-        _TagFile_pData->pKey = fn_801220D4(pParams->pAllocator, _TagFile_pData->uKeyLen, 4, __FILE__, __LINE__);
+        _TagFile_pData->pKey = TibExtMemAlloc(pParams->pAllocator, _TagFile_pData->uKeyLen, 4, __FILE__, __LINE__);
         if (_TagFile_pData->pKey == NULL) {
             return TAG_ERROR_NO_MEMORY;
         }
@@ -588,7 +588,7 @@ int TagFile_Init(const TagFileInitParams* pParams) {
     _TagFile_pData->Map.uNumEntries = 0;
     _TagFile_pData->Map.uNextOffset = 0;
 #line 1704
-    _TagFile_pData->Map.pList = fn_801220D4(pParams->pAllocator, pParams->uMaxEntries * sizeof(TagMapEntry), 4, __FILE__, __LINE__);
+    _TagFile_pData->Map.pList = TibExtMemAlloc(pParams->pAllocator, pParams->uMaxEntries * sizeof(TagMapEntry), 4, __FILE__, __LINE__);
     if (_TagFile_pData->Map.pList == NULL) {
         return TAG_ERROR_NO_MEMORY;
     }
@@ -949,7 +949,7 @@ int TagFile_AllocBuffer(void** ppBuffer, void* pAllocator, u32 uSize, int eType)
         return TAG_ERROR_BAD_PARAM;
     }
 #line 2917
-    *ppBuffer = fn_801220D4(pAllocator, uTotal, uAlignAddr, __FILE__, __LINE__);
+    *ppBuffer = TibExtMemAlloc(pAllocator, uTotal, uAlignAddr, __FILE__, __LINE__);
     if (*ppBuffer != NULL) {
         memset(*ppBuffer, 0, uTotal);
         memcpy(*ppBuffer, TAG_SENTINEL, TAG_BUFFERSIZE);
