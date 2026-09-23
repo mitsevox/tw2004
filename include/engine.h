@@ -14,6 +14,7 @@
 void* Mem_cpy(void* pDst, const void* pSrc, u32 uLen);    // returns pDst
 void* fn_80005884(void* pDst, const void* pSrc, u32 uLen); // a copy the ranges may overlap in
 void* fn_80005AE8(void* pDst, int nValue, u32 uLen);      // memset; returns pDst
+int   fn_80005BC8(const void* pA, const void* pB, u32 uLen);   // memcmp
 // Allocates from the static heap (StaticMemory.c); nMode picks where (see there).
 void* fn_80009B34(int nSize, int nMode, int nAlign, const char* pFile, int nLine);
 void  fn_80009E70(void* p);             // free
