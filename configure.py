@@ -721,7 +721,7 @@ config.libs = [
         "progress_category": "sdk",
         "src_dir": "extern/sdk",
         "objects": [
-            Object(NonMatching, "dolphin/gx/GXPixel.c"),
+            Object(Matching, "dolphin/gx/GXPixel.c"),
             Object(NonMatching, "dolphin/gx/GXFifo.c"),
             Object(NonMatching, "dolphin/gx/GXMisc.c"),
             Object(NonMatching, "dolphin/gx/GXAttr.c"),

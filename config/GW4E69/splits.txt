@@ -3696,6 +3696,8 @@ dolphin/gx/GXTev.c:
 
 dolphin/gx/GXPixel.c:
 	.text       start:0x801442C4 end:0x80144898
+	.data       start:0x8019A410 end:0x8019A430
+	.sdata2     start:0x80284C00 end:0x80284C30
 
 dolphin/gx/GXStubs.c:
 	.text       start:0x80144898 end:0x8014489C
