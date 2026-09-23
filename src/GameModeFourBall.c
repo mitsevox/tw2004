@@ -30,8 +30,12 @@ typedef struct GolferPrize {
     s32 nBase;
     s32 nPerStroke;
 } GolferPrize;
-extern u8 lbl_80200538[];
-#define GOLFER_PRIZE(n) ((GolferPrize*)(lbl_80200538 + 0x1D4))[n]
+typedef struct PrizeTable {
+    u8          unk0[0x1D4];
+    GolferPrize prize[1];       // 0x1D4  per golfer
+} PrizeTable;
+extern PrizeTable lbl_80200538;
+#define GOLFER_PRIZE(n) lbl_80200538.prize[n]
 
 // The tee order before anyone has a lower team score (lbl_80184DB0: 0, 1, 2, 3).
 typedef struct TeeOrder {
@@ -300,6 +304,8 @@ void fn_800E8A68(void) {
     int i;
     int nFirst;
     int nOther;
+    int nOther2;
+    int nSum;
     int nOtherTeam;
     int nOurs;
     int nTheirs;
@@ -328,18 +334,21 @@ void fn_800E8A68(void) {
                     nOtherTeam = 0;
                 }
                 if (Team_IsAllCPU(nOtherTeam)) {
-                    nOurs = fn_800E1788(nFirst) + fn_800E1788(nFirst + 1);
-                    nTheirs = fn_800E1788(nOther) + fn_800E1788(nOther + 1);
+                    nOurs = fn_800E1788(nFirst);
+                    nOurs += fn_800E1788(nFirst + 1);
+                    nOther2 = nOther + 1;
+                    nTheirs = fn_800E1788(nOther);
+                    nTheirs += fn_800E1788(nOther2);
                     if (nOurs < nTheirs) {
                         nMargin = nTheirs - nOurs;
                         if (nMargin > 5) {
                             nMargin = 5;
                         }
                         x = fn_800D3C7C(nOther);
-                        y = fn_800D3C7C(nOther + 1);
-                        nBase = (GOLFER_PRIZE(x).nBase + GOLFER_PRIZE(y).nBase) / 2;
-                        nMoney = (GOLFER_PRIZE(x).nBase + GOLFER_PRIZE(y).nBase + GOLFER_PRIZE(x).nPerStroke * nMargin +
-                                  GOLFER_PRIZE(y).nPerStroke * nMargin) / 2;
+                        y = fn_800D3C7C(nOther2);
+                        nSum = GOLFER_PRIZE(x).nBase + GOLFER_PRIZE(y).nBase;
+                        nBase = nSum / 2;
+                        nMoney = (nSum + GOLFER_PRIZE(x).nPerStroke * nMargin + GOLFER_PRIZE(y).nPerStroke * nMargin) / 2;
                         for (i = 0; i < 2; i++) {
                             nProfile = gPlayers[nFirst + i].nIndex;
                             if (gpSaveData[nProfile * 0x10600]) {
