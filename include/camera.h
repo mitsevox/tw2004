@@ -99,7 +99,7 @@ LAYOUT_ASSERT(CamSequence, 0x50);
 typedef struct CamScript {
     f32  v0[4];                 // 0x00  camera 4 puts the ball here
     f32  v10[4];                // 0x10  and the pin here
-    u8   unk20[0x20];
+    f32  a20[8];                // 0x20  cleared with the rest by fn_80062E40
 } CamScript;
 
 // A view's camera controller (View_SetCamera is TW06's CameraController_SetCameraMode): the
@@ -128,7 +128,8 @@ typedef struct View {
     f32      vC4[4];            // 0x0C4
     f32      vD4[4];            // 0x0D4  the ball-flight camera: where the shot should land (the aim, at
                                 //        the club's full distance)
-    u8       unkE4[0x104 - 0xE4];
+    u8       unkE4[0xF4 - 0xE4];
+    f32      vF4[4];            // 0x0F4  (0, 0, 0, 1) when the view is set up (fn_80062E40)
     f32      fCamTime;          // 0x104  time on this camera
     u8       unk108[0x110 - 0x108];
     f32      f110;              // 0x110
@@ -156,7 +157,8 @@ typedef struct View {
     u8       unk160[4];
     s32      n164;              // 0x164  a shot kind for fn_8003A950 (25 = none)
     f32      f168;              // 0x168
-    u8       unk16C[0x174 - 0x16C];
+    u8       b16C;              // 0x16C
+    u8       unk16D[0x174 - 0x16D];
     f32      f174;              // 0x174  } set together by fn_800642A4
     f32      f178;              // 0x178  }
     u8       unk17C[0x18C - 0x17C];
@@ -226,7 +228,8 @@ typedef struct CamTuning {
     f32  f84;                   // 0x084  how long the super zoom's first shot lasts
     f32  f88;                   // 0x088
     f32  f8C;                   // 0x08C
-    u8   unk90[4];
+    f32  f90;                   // 0x090  fn_800638B8 switches to camera 2 while the ball is below this
+                                //        height (and falling, not yet bounced)
     f32  f94;                   // 0x094  the elevator camera's first blend value
     f32  f98;                   // 0x098  camera 8: 1 - this is its height's share of the move a frame
     f32  f9C;                   // 0x09C  the swing camera: the least shot power for one (fn_800C6618)
@@ -340,7 +343,9 @@ void   fn_80013EEC(void* pCamera);
 void   fn_80016B9C(void);
 int    fn_80016D10(void);
 void   fn_800171D8(f32* pRect, f32 x, f32 y, f32 w, f32 h);   // set a screen rectangle (fractions)
-void   fn_8006434C(void* pCamera, f32* pPos, f32* pX, f32* pY, int a);   // a world position on screen (0..1)
+// A world position on screen (0..1 across and down; pZ, if not NULL, gets a third value). Returns
+// 1, or 0 when one of its tests fails (not decompiled yet).
+u8     fn_8006434C(void* pCamera, f32* pPos, f32* pX, f32* pY, f32* pZ);
 void   fn_8006A8D4(void* pCamera, f32* pX, f32* pY);
 
 // ---- camera shots and sequences (0x8003A7C8..) ----------------------------------------------
