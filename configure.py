@@ -205,6 +205,10 @@ cflags_base = [
     "-inline smart",  # EA code shows no automatic inlining; see docs/compiler.md
     '-pragma "cats off"',
     '-pragma "warn_notinlined off"',
+    # EA built with data pooling off: each global is addressed on its own. With pooling on,
+    # GameTargets.c fn_800F266C reaches its three tables through one base (74%); every other
+    # matched function is unaffected.
+    '-pragma "pool_data off"',
     "-maxerrors 1",
     "-nosyspath",
     "-RTTI off",
@@ -817,7 +821,8 @@ config.libs = [
             Object(Matching, "GameMode9.c"),
             Object(NonMatching, "GameMode23.c"),
             Object(NonMatching, "GameMode24.c"),
-            Object(NonMatching, "GameMode10.c"),
+            Object(Matching, "GameMode10.c"),
+            Object(Matching, "GameTargets.c"),
             Object(Matching, "GameMode14.c"),
             Object(Matching, "GameMode15.c"),
             Object(Matching, "GameMode16.c"),

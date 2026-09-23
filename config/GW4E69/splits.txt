@@ -3659,7 +3659,13 @@ GameMode24.c:
 	.text       start:0x800F0448 end:0x800F125C
 
 GameMode10.c:
-	.text       start:0x800F125C end:0x800F2984
+	.text       start:0x800F125C end:0x800F19D4
+	.sdata2     start:0x80284688 end:0x802846A0
+
+GameTargets.c:
+	.text       start:0x800F19D4 end:0x800F2984
+	.data       start:0x80192810 end:0x801928EC
+	.sdata2     start:0x802846A0 end:0x802846B8
 
 GameMode14.c:
 	.text       start:0x800F2984 end:0x800F39F4

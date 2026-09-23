@@ -12,6 +12,7 @@
 //     (UStream_RegisterHandler), e.g. the texture manager for 'txf '.
 
 #include "game_types.h"
+#include "engine.h"
 
 #define USTREAM_BUFFER_SIZE   0x6000
 #define USTREAM_NUM_BUFFERS   18
@@ -129,14 +130,11 @@ int gnNumHandlers = 0;            // lbl_80280DB8 (.sdata)
 
 // ---- externals ---------------------------------------------------------------------------
 
-extern void* Mem_cpy(void* pDst, const void* pSrc, u32 uLen);   // memcpy
 extern int   fn_80005BC8(const void* pA, const void* pB);           // string/name compare
 extern int   fn_800060E0(const char* pName);                        // file open
 extern int   fn_8000633C(int hFile);                                // file close
 extern int   fn_80006444(int hFile, void* pDst, u32 uLen, u32 uOffset, void (*pfnDone)(int, int)); // async read
 extern u32   fn_800065B0(int hFile);                                // file size
-extern void* fn_80009B34(u32 uSize, u32 uFlags, u32 uAlign, const char* pFile, int nLine);  // alloc
-extern void  fn_80009E70(void* p);                                  // free
 extern void* fn_8000AFA0(u32 uNodeSize, u32 uAlign, int a, int b);  // UMemPool create
 extern void  fn_8000B058(void* pPool);                              // UMemPool destroy
 extern void* fn_8000B078(void* pPool);                              // UMemPool take node
@@ -157,7 +155,6 @@ extern void* fn_800A9374(u32 uSize);
 extern void  fn_800A93AC(void);
 extern void  fn_800B044C(void* pDst, const void* pSrc, u32 uLen, void (*pfn)(void), int);
 extern void  fn_800B7490(void);                                     // yield / pump
-extern void* fn_800951A0(u32 uSize, u32 uAlign, int);
 extern void  fn_8009527C(void* p);
 extern void  fn_8000E708(UStreamParams* p);
 extern void  fn_8015A7FC(char* pDst, const char* pSrc);             // strcpy

@@ -3,24 +3,13 @@
 // club that can be taken loses as soon as the other wins a hole.
 
 #include "golfer.h"
+#include "game.h"
+#include "engine.h"
 
-int   Game_CurHoleIndex(void);
-u8    Player_IsHoled(int nPlayer);
 u8    Bag_AddClub(int nPlayer, int nBit);
 u8    Bag_RemoveClub(int nPlayer, int nBit);
 u8    Bag_HasClub(int nPlayer, int nBit);
 int   Bag_CountClubs(int nPlayer);
-u8    fn_800E1BBC(void);
-u8    fn_800EC550(void);
-u8    fn_800EA548(void);
-int   fn_800D36E0(int nWinner, int nLoser, int nMargin, int* pPrize);
-void  fn_800D3548(int nPlayer, int nMoney, int a);
-void  fn_800E4364(u32 nQueue, int a, int b, int c);
-void  fn_80125910(int a);
-void  fn_800E9F14(void);
-s32   fn_800EA084(int a);
-u8    fn_800EA278(int nPlayer, int a);
-s32   fn_800EA758(void);
 extern u8* gpSaveData;
 extern u32 lbl_8020315C[5];                 // the bags at the start of the round
 extern s32 lbl_80203148[5];                 // how many clubs each bag had then
@@ -30,7 +19,7 @@ extern u8  lbl_802822E8;                    // a club is to be taken
 
 void fn_800E7A7C(void);
 void fn_800E7A9C(void);
-u8   fn_800E7ABC(int a);
+u8   fn_800E7ABC(u8 bCheck);
 void fn_800E7B58(void);
 void fn_800E7CBC(void);
 u8   fn_800E7E64(int nClub);
@@ -44,9 +33,9 @@ void fn_800E7980(void) {
     gpGame->pfn1CC = fn_800E7A7C;
     gpGame->pfn1D0 = fn_800E9F14;
     gpGame->pfn1D4 = fn_800EA084;
-    gpGame->pfn1D8 = fn_800EA278;
-    gpGame->pfn1DC = fn_800E7ABC;
-    gpGame->pfn1E0 = fn_800EA758;
+    gpGame->pfn1D8 = (u8 (*)(int, int))fn_800EA278;
+    gpGame->pfn1DC = (u8 (*)(int))fn_800E7ABC;
+    gpGame->pfn1E0 = (s32 (*)(void))fn_800EA758;
     gpGame->pfn1E8 = fn_800E7B58;
     gpGame->pfn1F4 = fn_800E7CBC;
     gpGame->pfn1F0 = fn_800E7A9C;
@@ -71,8 +60,8 @@ void fn_800E7A9C(void) {
 
 // TW06: GameModeBattle::GameFinished. The usual match-play end, or a player with at most one club
 // left to lose who has just lost a hole.
-u8 fn_800E7ABC(int a) {
-    if (fn_800EA548()) {
+u8 fn_800E7ABC(u8 bCheck) {
+    if (fn_800EA548(bCheck)) {
         return 1;
     }
     if ((fn_800E7E88(0) <= 1 && gPlayers[1].nModePoints[Game_CurHoleIndex()] != 0) ||

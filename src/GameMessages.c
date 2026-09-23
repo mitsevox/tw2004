@@ -2,6 +2,8 @@
 // each sends a message id plus up to eight int-or-float values, and the display queues' handlers.
 
 #include "golfer.h"
+#include "game.h"
+#include "engine.h"
 
 // One value of a message: an int or a float (the mask passed with it says which), or a pointer.
 typedef union MsgArg {
@@ -23,19 +25,14 @@ typedef struct FrontEnd {
 } FrontEnd;
 extern FrontEnd* lbl_80281F1C;
 
-void  fn_80005AE8(void* p, int c, int n);   // memset
 void  fn_8016B09C(void* pHandler, int nMsg, int nArgs, MsgArg* pArgs);
 u32   strlen(const char* s);
 void  fn_800E5A4C(int nMsg, u32 uFloats, void* p0, void* p1, void* p2);
 void  fn_800E5B0C(int nMsg, u32 uFloats, void* p0, void* p1, void* p2, void* p3, void* p4);
-void  fn_800E3C0C(int a);
-void  fn_80062C80(int a, int b);
 extern s32 lbl_80282278;
 void  fn_800E3B04(void);
 u8    fn_80095430(int a);
-void  fn_800953C8(int a);
 extern u8 lbl_802822DF;
-void  fn_800DC9D4(int a);
 void  fn_8009EF98(void);
 extern s32 lbl_802822B0;
 extern s32 lbl_8028229C;
@@ -46,11 +43,9 @@ typedef struct UIQueueItem {
     s32 c;
 } UIQueueItem;
 extern UIQueueItem lbl_802030BC[10];
-void  fn_80062D38(int a, int b, int c);
 extern u8 lbl_80203138[14];
 
 extern u8 lbl_802822BE;
-void fn_80062D6C();
 void fn_800E4FFC(int p0);
 void fn_800E502C(int p0);
 void fn_800E505C(int p0);
@@ -58,7 +53,6 @@ void fn_800E508C(void);
 extern u8 lbl_802822BD;
 void fn_800E50FC(void);
 extern u8 lbl_80282282;
-u8 fn_800E5110(void);
 void fn_800E5200(int p0);
 void fn_800E5228(void);
 extern u8 lbl_80202B88[];
@@ -67,15 +61,12 @@ extern u8 lbl_802822BC;
 extern u8 lbl_802822DA;
 void fn_800E53A4(u8 v);
 void fn_800E53AC(void);
-u8 fn_800E53B8(void);
-void fn_800A72EC();
 void fn_800E53C0(void);
 extern u8 lbl_80282280;
 void fn_800E53E8(u8 v);
 void fn_800E542C(void);
 void fn_800E5450(void);
 void fn_800E5474(int p0);
-void fn_800E53F0(int nMsg, int a, int b, int c);
 void fn_800E54A0(int p0, int p1, int p2);
 void fn_800E54D8(int p0, int p1, int p2);
 void fn_800E5510(int p0, int p1, int p2);
@@ -89,11 +80,8 @@ void fn_800E5698(int p0, int p1, int p2);
 void fn_800E56D0(int p0, int p1, int p2);
 extern u8 lbl_802822E4;
 void fn_800E5708(void);
-void fn_800E5714(int p0);
 extern s32 lbl_802822E0;
-void fn_800E5724(int v);
 void fn_800E572C(int p0);
-void fn_800E58B4(int arg0);
 void fn_800E573C(void);
 void fn_800E5908(int nMsg);
 void fn_800E5C84(void);

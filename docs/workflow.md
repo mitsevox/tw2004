@@ -93,6 +93,11 @@ function's first N declaration lines and keeps the best:
 python tools/match/declperm.py <Unit> src/<Unit>.c <fn> <N>
 ```
 
+Prefer an exact order close to the natural one: a reader should not wonder why the declarations
+are shuffled. When full permutations only find scrambled orders, try orders a few adjacent swaps
+from the natural one first (GameMode0 `fn_800FFDB8`: 137 of 633 such orders were exact, one a
+single swap from natural).
+
 **The permuter** searches random rewrites for you. It is slow (minutes to hours) but has solved
 functions nothing else did (`fn_800F6ED4`: the loop counter had to be `long`).
 
