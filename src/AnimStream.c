@@ -212,6 +212,56 @@ void fn_800CA268(int nPlayer, int a, int nGroup, int nClub, int nStyle) {
     }
 }
 
+// With streaming on, adds up the bytes each player's clips need, gives each group, style and club
+// class two buffers as big as the largest player's clips, and the read buffer as big as the
+// largest of all.
+void fn_800CA7E0(void) {
+    int nMax = 0;
+    int i;
+    int nStyle;
+    int nClub;
+    int nPlayer;
+    int nSize;
+    int nClip;
+    int j;
+
+    if (lbl_80282230->bOn == 0) return;
+    for (nPlayer = 0; nPlayer < gSession.nNumPlayers; nPlayer++) {
+        lbl_80282230->aPlayerBytes[nPlayer] = 0;
+    }
+    for (i = 0; i < 2; i++) {
+        for (nStyle = 0; nStyle < 8; nStyle++) {
+            for (nClub = 0; nClub < 6; nClub++) {
+                nSize = 0;
+                for (nPlayer = 0; nPlayer < gSession.nNumPlayers; nPlayer++) {
+                    lbl_80282230->aPlayerBytes[nPlayer] +=
+                        lbl_80282230->players[nPlayer].clips[i][nStyle][nClub].nMaxSize;
+                    nClip = lbl_80282230->players[nPlayer].clips[i][nStyle][nClub].nMaxSize;
+                    if (nClip > nMax) {
+                        nMax = nClip;
+                    }
+                    if (nClip > nSize) {
+                        nSize = nClip;
+                    }
+                }
+                if (nSize > 0) {
+                    for (j = 0; j < 2; j++) {
+                        lbl_80282230->bufs[j][i][nStyle][nClub].pData =
+                            fn_80009B34(nSize, 2, 64, "AnimStream.c", 1005);
+                        lbl_80282230->bufs[j][i][nStyle][nClub].nSize = nSize;
+                        lbl_80282230->nBytes += nSize;
+                    }
+                }
+            }
+        }
+    }
+    if (nMax > 0) {
+        lbl_80282230->pRead = fn_80009B34(nMax, 2, 64, "AnimStream.c", 1018);
+        lbl_80282230->nReadSize = nMax;
+        lbl_80282230->nBytes += nMax;
+    }
+}
+
 // With streaming on, sets up the streamed clips of each player whose character uses this
 // animation slot (-1: every player), from the character's overlay library and its slot's library.
 void fn_800CA9DC(int nSlot) {
