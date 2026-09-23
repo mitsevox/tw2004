@@ -411,3 +411,26 @@ Adding a function: the steps
 6. `python configure.py`, then `ninja`. Success is `build/GW4E69/main.dol: OK`.
 7. If it fails: `ninja build/GW4E69/report.json` for per-function percentages, then
    `objdiff-cli diff` for the instruction-level differences (left = original, right = ours).
+
+The permuter (for register-only near-misses)
+--------------------------------------------
+
+`decomp-permuter` (github.com/simonlindholm/decomp-permuter, cloned to `C:\dev\tools\`, set up
+2026-09-23) rewrites a function's C at random - temporaries, statement order, operand order -
+compiles each version and keeps the ones whose code is closer to the original. It is the tool
+for functions whose logic is right but whose register numbers or instruction order differ.
+
+Windows setup, with the helpers in the scratch folder (`C:\dev\scratch\tw\`):
+
+- `perm_setup.py <Unit> <fn>` makes `perm/<fn>/`: `base.c` is the unit preprocessed by mwcc
+  (`-EP`) with every other function cut to a prototype (inline helpers keep their bodies);
+  `target.o` is the function's asm from `build/GW4E69/asm/` assembled alone; `compile.sh` runs
+  the unit's exact mwcc flags.
+- `perm_objdump.py`: the disassembler the permuter scores with. Smart App Control blocks the
+  downloaded `powerpc-eabi-objdump.exe` (the assembler from the same zip runs), so this uses
+  `objdiff-cli` and prints objdump's layout, with data symbol names blanked.
+- Local patch in the permuter: `src/preprocess.py` reads `base.c` as-is when there is no `cpp`.
+- Run: `python C:\dev\tools\decomp-permuter\permuter.py perm\<fn> [more dirs] -j16 --best-only`.
+  Score 0 is a match (checked: an exact function scores 0). Results land in `perm/<fn>/output-*`
+  with a `diff.txt` against the base; carry the change back into `src/` by hand (macros are
+  expanded in `base.c`) and confirm with `ninja`.
