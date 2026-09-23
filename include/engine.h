@@ -205,7 +205,10 @@ void fn_800BAF04(f32* pSrc, f32* pDst);   // normalise
 f32  Vec_Distance(f32* pA, f32* pB);
 void BreakLine_Start(int nView);
 int  fn_8011937C(int nPlayer, int a, u8 b);
-void fn_80125854(int a);
-void fn_80125910(u8 b);
+// The EA Sports Bio, game side (EASportsBio.c; TW06's names)
+void EASBio_SetGamePlayState(u8 bFlag);
+void EASBio_IncrementGamesWon(u32 uCount);
+void EASBio_SetCurrentGameWon(u8 bWon);
+u8   EASBio_IsCurrentGameWon(void);
 
 #endif

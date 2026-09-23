@@ -3,7 +3,7 @@
 #include "game_types.h"
 
 s32 fn_801252D0();
-s32 fn_801256AC();
+s32 EASBio_GetCurrentRewardMessage();
 
 void fn_80084F40(u8* p0, u8* p1);
 void fn_80084F84(s32 p0, u8* p1);
@@ -15,6 +15,6 @@ void fn_80084F40(u8* p0, u8* p1) {
 
 void fn_80084F84(s32 p0, u8* p1) {
     s32 t0;
-    t0 = fn_801256AC();
+    t0 = EASBio_GetCurrentRewardMessage();
     *(s32*)p1 = t0;
 }

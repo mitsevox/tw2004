@@ -368,7 +368,7 @@ void fn_800FA3AC(void) {
     gPlayers[1].nC6C[Game_CurHoleIndex()] = gPlayers[1].nC44;
 }
 
-// Game finished: in stroke play fn_800FA4B8's totals (thrown away too), then fn_80125910(1).
+// Game finished: in stroke play fn_800FA4B8's totals (thrown away too), then EASBio_SetCurrentGameWon(1).
 void fn_800FA410(void) {
     if (gpGame->n4 == 0) {
         fn_800FA4B8(0);
@@ -377,10 +377,10 @@ void fn_800FA410(void) {
         }
         if (gNumPlayersSetUp == 1) {
             if (gPlayers[0].nC44 > 0) {
-                fn_80125910(1);
+                EASBio_SetCurrentGameWon(1);
             }
         } else {
-            fn_80125910(1);
+            EASBio_SetCurrentGameWon(1);
         }
     }
 }
