@@ -131,7 +131,7 @@ f32 fn_800DAF98(f32 fFrameTime) {
         return 0.0f;
     }
     for (i = 0; i < 5; i++) {
-        d = fabsf(i / 59.94f - fFrameTime);
+        d = fabsf(i / FRAME_RATE - fFrameTime);
         if (d < fBest) {
             fBest = d;
         } else if (i > 0) {
