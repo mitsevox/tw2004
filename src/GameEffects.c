@@ -189,22 +189,20 @@ static inline int GE_CurrentTarget(int nPlayer) {
 // record, reason 15 when the drive beats the longest-drive record (the record is in feet). Only for
 // a human, one view, not in a replay, and only with the game's GameBreaker option on.
 void fn_800DB30C(int nPlayer, int nReason) {
-    if ((!(gSession.uFlags & 0x4000) || !(gSession.uFlags & 0x8000)) && !gSession.bReplay &&
-        !gSession.nSplitScreen && !gSession.a8[0]) {
-        if (!gpGame->b285) {
-            return;
-        }
-        if (lbl_80202898.bGameBreaker != 1 && !Player_IsCPU(nPlayer)) {
-            if (nReason == 12) {
-                if (fn_800E17AC(nPlayer) + 1 >= gSession.aCourseRecord[Game_GetCourse()].n0) {
-                    return;
-                }
-            } else if (nReason == 15 &&
-                       !(3.0f * gPlayers[nPlayer].fA64 > gSession.aCourseRecord[Game_GetCourse()].nC8)) {
+    if (((gSession.uFlags & 0x4000) && (gSession.uFlags & 0x8000)) || gSession.bReplay ||
+        gSession.nSplitScreen || gSession.a8[0] || !gpGame->b285) {
+        return;
+    }
+    if (lbl_80202898.bGameBreaker != 1 && !Player_IsCPU(nPlayer)) {
+        if (nReason == 12) {
+            if (fn_800E17AC(nPlayer) + 1 >= gSession.aCourseRecord[Game_GetCourse()].n0) {
                 return;
             }
-            GB_START(nPlayer, nReason);
+        } else if (nReason == 15 &&
+                   !(3.0f * gPlayers[nPlayer].fA64 > gSession.aCourseRecord[Game_GetCourse()].nC8)) {
+            return;
         }
+        GB_START(nPlayer, nReason);
     }
 }
 
@@ -256,6 +254,31 @@ void fn_800DB4E8(int nPlayer) {
     }
 }
 
+// The GameBreaker camera: none on course 7; otherwise a camera at the shot's full distance.
+void fn_800DB714(int nPlayer) {
+    int nLie;
+    f32 fDist;
+    View* pView;
+    if ((!(gSession.uFlags & 0x4000) || !(gSession.uFlags & 0x8000)) && lbl_80202898.bGameBreaker) {
+        if (Game_GetCourse() == 7) {
+            lbl_80202898.b19 = 1;
+            return;
+        }
+        nLie = gPlayers[nPlayer].ball.nLie;
+        fDist = AI_MaxDistance(nPlayer, gPlayers[nPlayer].nShotKind, gPlayers[nPlayer].nClub);
+        fDist *= fn_800510EC(&gPlayers[nPlayer].ball);
+        fDist *= fn_8005B64C(nPlayer);
+        fn_80045494(0, nPlayer);
+        fn_80045558(0, nPlayer);
+        pView = fn_80017028(gPlayers[nPlayer].nView[0]);
+        pView->p74 = fn_8003BDBC(nPlayer, nLie, 3, 0xC, 1, fDist);
+        lbl_80202898.b19 = 1;
+        if (lbl_80202898.f24 > 0.8f) {
+            lbl_80202898.f24 = 0.8f;
+        }
+    }
+}
+
 // No TW06 name settled (by position it falls among ScriptedGameBreakerBallHitTrigger and
 // IsScriptedGameBreaker). Whether this lie is worth a GameBreaker: on the green putting for two
 // under par or better, or one of the other big-putt checks, or a birdie or eagle putt (by the score
@@ -300,31 +323,6 @@ int fn_800DB86C(int nPlayer) {
     return bPossible;
 }
 
-// The GameBreaker camera: none on course 7; otherwise a camera at the shot's full distance.
-void fn_800DB714(int nPlayer) {
-    int nLie;
-    f32 fDist;
-    View* pView;
-    if ((!(gSession.uFlags & 0x4000) || !(gSession.uFlags & 0x8000)) && lbl_80202898.bGameBreaker) {
-        if (Game_GetCourse() == 7) {
-            lbl_80202898.b19 = 1;
-            return;
-        }
-        nLie = gPlayers[nPlayer].ball.nLie;
-        fDist = AI_MaxDistance(nPlayer, gPlayers[nPlayer].nShotKind, gPlayers[nPlayer].nClub);
-        fDist *= fn_800510EC(&gPlayers[nPlayer].ball);
-        fDist *= fn_8005B64C(nPlayer);
-        fn_80045494(0, nPlayer);
-        fn_80045558(0, nPlayer);
-        pView = fn_80017028(gPlayers[nPlayer].nView[0]);
-        pView->p74 = fn_8003BDBC(nPlayer, nLie, 3, 0xC, 1, fDist);
-        lbl_80202898.b19 = 1;
-        if (lbl_80202898.f24 > 0.8f) {
-            lbl_80202898.f24 = 0.8f;
-        }
-    }
-}
-
 // TW06: GameEffects_InFlightGameBreakerTrigger (by position). The look-ahead ball says the shot
 // drops: a predicted GameBreaker starts, for a human's shot that went far enough (1 with the
 // putter, 10 for a chip, 5 otherwise), with its own camera; a golfer mid-swing may get a reaction
@@ -343,66 +341,64 @@ void fn_800DBA50(int nPlayer) {
     f32 f3;
     f32 v2[4];
     f32 v[4];
-    if ((!(gSession.uFlags & 0x4000) || !(gSession.uFlags & 0x8000)) && !gSession.bReplay &&
-        !gSession.nSplitScreen && !gSession.a8[0]) {
-        if (!gpGame->b285) {
-            return;
-        }
-        if (!(gPlayers[nPlayer].uFlags & 8) && !Player_IsCPU(nPlayer) && lbl_80202898.bGameBreaker != 1) {
-            fn_800DCB84(gPlayers[nPlayer].ball.vPos, gPlayers[nPlayer].ballBefore.vPos, v);
-            v[1] = 0.0f;
-            fDist = fn_80009680(fn_80009744(v));
-            if (gPlayers[nPlayer].nClub == 25) {
-                if (fDist < 1.0f) {
-                    return;
-                }
-            } else if (gPlayers[nPlayer].nShotKind == 1) {
-                if (fDist < 10.0f) {
-                    return;
-                }
-            } else if (fDist < 5.0f) {
+    if (((gSession.uFlags & 0x4000) && (gSession.uFlags & 0x8000)) || gSession.bReplay ||
+        gSession.nSplitScreen || gSession.a8[0] || !gpGame->b285) {
+        return;
+    }
+    if (!(gPlayers[nPlayer].uFlags & 8) && !Player_IsCPU(nPlayer) && lbl_80202898.bGameBreaker != 1) {
+        fn_800DCB84(gPlayers[nPlayer].ball.vPos, gPlayers[nPlayer].ballBefore.vPos, v);
+        v[1] = 0.0f;
+        fDist = fn_80009680(fn_80009744(v));
+        if (gPlayers[nPlayer].nClub == 25) {
+            if (fDist < 1.0f) {
                 return;
             }
-            if (!gPlayers[nPlayer].b30D && fn_8000C594()) {
-                fn_800DCB84(gPlayers[nPlayer].ball.vStart, gPlayers[nPlayer].ballBefore.vPos, v2);
-                v2[1] = 0.0f;
-                fDist = fn_80009680(fn_80009744(v2));
-                nLie = gPlayers[nPlayer].ball.nLie;
-                if (gPlayers[nPlayer].ballBefore.nSurface >= 0) {
-                    nClass = gSurfaceTypes[gPlayers[nPlayer].ballBefore.nSurface].nClass;
-                } else {
-                    nClass = 10;
-                }
-                lbl_80202898.bClosing = 0;
-                lbl_80202898.bGameBreaker = 1;
-                lbl_80202898.fGBTime = 0.0f;
-                lbl_80202898.f24 = 0.0f;
-                lbl_80202898.nGBType = 1;
-                lbl_80202898.nPlayer = nPlayer;
-                lbl_80202898.bPaused = 0;
-                lbl_80202898.nHeartbeats = 0;
-                fn_80045494(0, nPlayer);
-                fn_80045558(0, nPlayer);
-                pView = fn_80017028(gPlayers[nPlayer].nView[0]);
-                pSeq = fn_8003BDBC(nPlayer, nLie, nClass, 0xB, 1, fDist);
-                pShot = fn_8003A950(pSeq, 0, &nKind, &fTime, &f2, &nB, &f3, nPlayer);
-                if (pShot != NULL && pView->p130 != pShot && pView->p134 != pShot &&
-                    !fn_800451A8(&pView->script, pShot, nPlayer)) {
-                    if (nKind == 5 && fn_8003DC78(pShot)) {
-                        if (gPlayers[nPlayer].nShotKind != SHOT_TYPE_PUTT_e &&
-                            fn_80095780(gPlayers[nPlayer].pChar) != 9) {
-                            fn_80095744(gPlayers[nPlayer].pChar, 14);
-                            if (0.0f == fTime) {
-                                fTime = FRAME_TIME;
-                            }
+        } else if (gPlayers[nPlayer].nShotKind == 1) {
+            if (fDist < 10.0f) {
+                return;
+            }
+        } else if (fDist < 5.0f) {
+            return;
+        }
+        if (!gPlayers[nPlayer].b30D && fn_8000C594()) {
+            fn_800DCB84(gPlayers[nPlayer].ball.vStart, gPlayers[nPlayer].ballBefore.vPos, v2);
+            v2[1] = 0.0f;
+            fDist = fn_80009680(fn_80009744(v2));
+            nLie = gPlayers[nPlayer].ball.nLie;
+            if (gPlayers[nPlayer].ballBefore.nSurface >= 0) {
+                nClass = gSurfaceTypes[gPlayers[nPlayer].ballBefore.nSurface].nClass;
+            } else {
+                nClass = 10;
+            }
+            lbl_80202898.bClosing = 0;
+            lbl_80202898.bGameBreaker = 1;
+            lbl_80202898.fGBTime = 0.0f;
+            lbl_80202898.f24 = 0.0f;
+            lbl_80202898.nGBType = 1;
+            lbl_80202898.nPlayer = nPlayer;
+            lbl_80202898.bPaused = 0;
+            lbl_80202898.nHeartbeats = 0;
+            fn_80045494(0, nPlayer);
+            fn_80045558(0, nPlayer);
+            pView = fn_80017028(gPlayers[nPlayer].nView[0]);
+            pSeq = fn_8003BDBC(nPlayer, nLie, nClass, 0xB, 1, fDist);
+            pShot = fn_8003A950(pSeq, 0, &nKind, &fTime, &f2, &nB, &f3, nPlayer);
+            if (pShot != NULL && pView->p130 != pShot && pView->p134 != pShot &&
+                !fn_800451A8(&pView->script, pShot, nPlayer)) {
+                if (nKind == 5 && fn_8003DC78(pShot)) {
+                    if (gPlayers[nPlayer].nShotKind != SHOT_TYPE_PUTT_e &&
+                        fn_80095780(gPlayers[nPlayer].pChar) != 9) {
+                        fn_80095744(gPlayers[nPlayer].pChar, 14);
+                        if (0.0f == fTime) {
+                            fTime = FRAME_TIME;
                         }
                     }
-                    pView->p74 = pSeq;
-                    pView->n148 = 0;
-                    pView->n14C = 25;
                 }
-                EVENT_Trigger(nPlayer, 0x3F, 0, -1);
+                pView->p74 = pSeq;
+                pView->n148 = 0;
+                pView->n14C = 25;
             }
+            EVENT_Trigger(nPlayer, 0x3F, 0, -1);
         }
     }
 }

@@ -498,8 +498,11 @@ The fixes that come up most often. Each points to its full entry below.
   gate exactly; `if`, `||`, `&&` and `goto` spellings all fold to a single `bne end`. A plain
   `if (x) return;` always collapses, and an `if (x == 0)` gives a single `bne`; an empty
   then-block is optimised away. The compare is `cmpwi` for a `u8` switch operand; the
-  original's `cmplwi` is still unexplained. The same goes for the `if (!gpGame->b285) return;`
-  in GameEffects (DB30C/DBA50): a switch gives `cmpwi`, the original has `cmplwi`.
+  original's `cmplwi` is usually the or-chain rule above (a `cmplwi` in a branch-over-a-branch
+  means the test is the last term of an `||` chain of early exits, and that chain can take in an
+  enclosing `if`). GameEffects DB30C/DBA50: `if (A && !b && !c) { if (!gpGame->b285) return; ...}`
+  had `cmplwi; bne body; b end`; `if (!A || b || c || !gpGame->b285) return; ...` matched both
+  (99.49%/99.08% -> 100).
 - **[verified] A one-case `switch`** on a call result gives `cmpwi; beq case; b default` and the
   default path returns the value still in r3; an `if (x != 8) return x;` gives a single `bne`.
 - **[verified] A return through the common exit is a `goto`/single `return`.** An early
