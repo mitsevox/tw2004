@@ -31,6 +31,9 @@ u8   fn_800E22E4(int nSlot, int a, int b);      // GameRound.c
 int  fn_800E234C(int nSlot, int a, int b);      // GameRound.c
 int  fn_800E2520(int nMode);            // GameRound.c
 void fn_800E25E0(void);                 // GameRound.c
+void fn_800E30D4(void);                 // GameRound.c: builds the mixed rounds
+int  fn_80110180(void);
+s32  fn_8011027C(void);                 // DiscCheck.c
 void GM_SetupCustomHoleSelection(void); // GameManager.c
 int  GM_vGetAllTimeRecordsHeld(SaveProfile* pProfile);  // GameManager.c
 void fn_800EAE44(int nId);              // GameMode5.c
@@ -3864,6 +3867,39 @@ void fn_80082F68(MsgArg* pArgs, MsgArg* pResult) {
     fn_800A44A0();
 }
 
+// Whether choice pArgs[0] is available: 1 always, 2 and 3 once a loaded profile or a cheat code
+// has unlocked course 21 or 22.
+void fn_80083068(MsgArg* pArgs, MsgArg* pResult) {
+    s32 nChoice = pArgs[0].i;
+    int b = 0;
+    int i;
+
+    for (i = 0; i < 5; i++) {
+        switch (nChoice) {
+        case 1:
+            b = 1;
+            break;
+        case 2:
+            if (gpSaveData[i].bActive != 0 && gpSaveData[i].aCourseUnlocked[21] != 0) {
+                b = 1;
+            }
+            if (lbl_80281DF4->aCourseUnlocked[21] != 0) {
+                b = 1;
+            }
+            break;
+        case 3:
+            if (gpSaveData[i].bActive != 0 && gpSaveData[i].aCourseUnlocked[22] != 0) {
+                b = 1;
+            }
+            if (lbl_80281DF4->aCourseUnlocked[22] != 0) {
+                b = 1;
+            }
+            break;
+        }
+    }
+    pResult->i = b;
+}
+
 void fn_80083354(MsgArg* pArgs, MsgArg* pResult) {
 }
 
@@ -4298,6 +4334,29 @@ void fn_80084984(MsgArg* pArgs, MsgArg* pResult) {
 // A challenge group's best medal, the group counted from 1.
 void fn_800849C8(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gpSaveData[pArgs[0].i].aMedal[pArgs[1].i - 1];
+}
+
+// Set up course pArgs[0] (10000: the mixed round, built once) and answer fn_80110180, inverted
+// when fn_8011027C says so.
+void fn_800849F8(MsgArg* pArgs, MsgArg* pResult) {
+    if (pArgs[0].i == 10000) {
+        if (gpGame->b137 == 0) {
+            gpGame->b137 = 1;
+            fn_800E30D4();
+        }
+        pResult->i = fn_80110180();
+        if (fn_8011027C() != 0) {
+            pResult->i = pResult->i == 0;
+        }
+    } else {
+        fn_800E14E0(pArgs[0].i);
+        fn_800E1434();
+        pResult->i = fn_80110180();
+        if (fn_8011027C() != 0) {
+            pResult->i = pResult->i == 0;
+        }
+        gpGame->b137 = 0;
+    }
 }
 
 // Passes the message on to one of three handlers, by pArgs[0].
