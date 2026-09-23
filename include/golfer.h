@@ -280,9 +280,10 @@ typedef struct Player {
     f32  fA7C;                  // 0xA7C  pad stick x, -1..1 (GameMode9 fn_800EDAE0)
     f32  fA80;                  // 0xA80
     f32  fA84;                  // 0xA84
-    u8   unkA88[4];
+    f32  fA88;                  // 0xA88  an angle (speed golf: the run's heading)
     f32  fA8C;                  // 0xA8C  pad stick y, -1..1 (GameMode8 fn_800FB460)
-    u8   ball[0x68];            // 0xA90  the player's Ball (0xBC bytes, see Ball.c) - nLie is its +0x68
+    u8   ball[0x64];            // 0xA90  the player's Ball (0xBC bytes, see Ball.c) - nLie is its +0x68
+    s32  nBallState;            // 0xAF4  the ball's nState (Ball + 0x64)
     s32  nLie;                  // 0xAF8
     u8   unkAFC[0xB04 - 0xAFC];
     s32  nBallSurface;          // 0xB04  the ball's nSurface (Ball + 0x74)
@@ -317,9 +318,10 @@ typedef struct Player {
     f32  fC50;                  // 0xC50  speed golf: a distance from the ball to vA44
     s32  nC54;                  // 0xC54  a frame countdown (speed golf's run to the ball)
     s32  nC58;                  // 0xC58
-    u8   unkC5C[4];
-    s32  nC60;                  // 0xC60
-    u8   unkC64[0xC6C - 0xC64];
+    s32  nC5C;                  // 0xC5C
+    s32  nC60;                  // 0xC60  speed golf: strokes when the player holed out
+    s32  nC64;                  // 0xC64  speed golf: strokes when the ball reached the green
+    f32  fC68;                  // 0xC68  speed golf: the ball's distance from gpGame->p130 then
     s32  nC6C[18];              // 0xC6C  cleared at the start of a round
     f32  fCB4;                  // 0xCB4  speed golf: raised by a button, falls every frame
     s32  nCB8;                  // 0xCB8  speed golf: cleared by that button
@@ -466,7 +468,7 @@ typedef struct GameState {
     s32  nE0;                   // 0x0E0
     s32  holeOrder[18];         // 0x0E4
     s32  n12C;                  // 0x12C
-    u8   unk130[4];
+    f32* p130;                  // 0x130  a position: speed golf measures the ball's distance to it
     u8   b134;                  // 0x134  cleared at the start of a hole
     u8   b135;                  // 0x135  set by fn_800E0A84
     u8   b136;                  // 0x136  the holes are not one course's 1..18 (four kinds, 0x136..0x139)
@@ -668,14 +670,32 @@ u8   Team_IsAllHuman(int nTeam);        // team 0 is players 0 and 1, team 1 pla
 void AI_PlanShot(int nPlayer, f32* pTarget);
 u8   AI_GreenTowardPin(int nPlayer, f32 fDist);
 u8   AI_RehearseShot(int nPlayer, f32* pOutDist2, u8 bFast, f32 fTolerance);
+void AI_ApplyError(int nPlayer);
 u8   Lie_AllowsFullSwing(int nPlayer);
 void Shot_FitTargetToClub(int nPlayer);
+void Shot_Prepare(int nPlayer, u8 bNotify);
 int  Shot_Trajectory(int nPlayer);
 void Shot_DefaultSpin(int nPlayer, f32* pOut);
 void Shot_FaceVector(int nPlayer, f32* pOut);
 f32  Shot_AimAngle(int nPlayer);
 void AI_ClubLonger(int nPlayer, s32* pClub, int nStep);
 void AI_ClubShorter(int nPlayer, s32* pClub, int nStep);
+f32  AI_PowerScale(int nPlayer);
+void AI_FaceVector(int nPlayer, f32* pOut);
+void Caddie_Start(int nPlayer);
+void Caddie_Stop(void);
+void Caddie_Update(int nPlayer);
+void Luck_TakePerfectShot(int nPlayer);
+void Caddie_ApplyTip(int nPlayer);
+int  Golfer_GetAttribute(Player* pPlayer, int nAttr, int nMode);
+u8   Player_IsHoledNotState23(int nPlayer);
+u8   Team_IsAllCPU(int nTeam);
+u8   Player_IsNotCPU(int nPlayer);
+u8   Bag_AddClub(int nPlayer, int nBit);
+u8   Bag_RemoveClub(int nPlayer, int nBit);
+u8   Bag_HasClub(int nPlayer, int nBit);
+int  Bag_CountClubs(int nPlayer);
+void Session_SetGolfer(int nGolfer, int nPlayer);
 
 // Game options at gSession + 0xE78 (the wind setting is nWind, at gSession + 0xE88).
 typedef struct GameOptions {

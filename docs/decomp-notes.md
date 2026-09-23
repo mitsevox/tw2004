@@ -233,6 +233,24 @@ The fixes that come up most often. Each points to its full entry below.
 
 ### Structs, arrays and pointers
 
+- **[verified] Other global arrays follow the gPlayers rule.** `gSwingStacks[n].nState[
+  gSwingStacks[n].nTop]` written out each time, not `SwingStack* p` / `s8* pTop` locals (Swing
+  `GOLFERSTATE_Pop` 98.53% -> 100; the permuter found it).
+- **[verified] A load the original does before a store to the same struct was a local.**
+  `n = p->n60; p->f68 = 0.0f; fn(n, p);` keeps the load first; reading `p->n60` in the call
+  moves it after the store (GoGolfCam `fn_800C0880`, 94.6% -> 100).
+- **[verified] A typed struct-pointer global indexes differently from a cast byte pointer.**
+  `extern Profile* gpSaveData; gpSaveData[n].f` gives `addis base; add; lwz off`;
+  `((Profile*)u8ptr)[n].f` gives `addis idx; addi; lwzx` (GameMode23 `fn_800F0428` 83.75% -> 100).
+- **[verified] `a[x - 1]` folds the -1 into the displacement; `n = x - 1; a[n]` keeps a `subi`.**
+  Per function: GameMode23 `fn_800EE064` needs the local, its neighbour `fn_800EFA9C` does not.
+- **[verified] Pointer-to-index with `mulhwu` is a byte difference divided by `sizeof`.**
+  `p - base` divides signed (`mulhw; srawi`); `((u8*)p - (u8*)base) / sizeof(T)` divides
+  unsigned (`mulhwu; srwi.`), because `sizeof` is unsigned (GoTerrainCollision `fn_80050BEC`,
+  82.69% -> 100).
+- **[verified] In a leaf loop, reading a field each time instead of a local copy moves the
+  volatile registers**, though the field is still loaded once (GoTerrainCollision
+  `Ter_CalcLowestPlayableWorldHeight`, 97.21% -> 98.69%, then exact by declaration order).
 - **[verified] `a[k] = x; k++;` and `a[k++] = x;` compile differently.** The split form gives
   walking pointers (`&a[k]` stepped by `addi 4`, and `&a[0]` kept for a later loop); `k++` in the
   index gives `stwx` with a scaled index; a `*p++ = x` walk gives one pointer. GameMode0
@@ -297,6 +315,11 @@ The fixes that come up most often. Each points to its full entry below.
 
 ### Types, casts and sign extension
 
+- **[verified] An enum-typed local holding 0 is not folded into an index multiply.** EA's
+  `PlayerNumber_t nPlayer = PLR_1_e; gpSaveData[nPlayer]` gives `li rX, 0; mullw`; a literal 0,
+  any integer local, a const global, an inline helper and `(Enum)0` all fold the multiply away
+  (GameMode24 `fn_800F0820`, 82.9% -> 100; 12 times in GameMode23). EA style, no fake-match
+  comment; the type is TW06's.
 - **[verified] Two neighbouring words handled with 64-bit operations are one `u64`.** When the
   code ORs, ANDs and tests two adjacent words together (`and`/`xor`/`or.` on both halves, an AND
   with `li -1` for the upper word), declare one `u64` field. Player 0xC48/0xC4C as two `s32`s
@@ -350,6 +373,13 @@ The fixes that come up most often. Each points to its full entry below.
 
 ### Function calls and parameters
 
+- **[verified] A callee that ignores r3, called while r3 still holds the caller's first
+  parameter, takes that parameter.** `Scenario_RequiredShape()` -> `(nPlayer)` (Golfer
+  `AI_FaceVector` 99.72% -> 100). Likewise a callee starting `clrlwi. r0, r3, 24` has a `u8`
+  first parameter, and its callers pass a `u8` without `clrlwi` (Swing `fn_80045494/5558`).
+- **[verified] `fn(15, (u8)a, b)` and `fn(15, a & 0xFF, b)` differ for an int parameter `a`.**
+  The original's `mr r0, r3; clrlwi r4, r0, 24` comes from `a & 0xFF` (or a `u8` parameter passed
+  on); `(u8)a` gives `clrlwi r4, r3, 24` (GameMode11 `fn_80101F40`, 57.9% -> 100).
 - **[verified] A redeclaration with different parameter types is an error.** `void f(int, s32*);
   void f(int, int);` (also int vs s8, int vs long) gives "identifier redeclared", so a file that
   includes the header cannot declare its own variant; cast at the call site instead.
@@ -383,6 +413,9 @@ The fixes that come up most often. Each points to its full entry below.
 
 ### Compares and conditions
 
+- **[verified] A boolean chain assigned to an `int` keeps the original's register order where
+  `if (...) b = 1;` does not**: `bDown = (A || B) && (C || D) && (E || F);` (GameMode8
+  `fn_800FCC38`, 98.9% -> 100).
 - **[verified] `n ? 0 : 1` and `n == 0` give the same instructions, different saved registers.**
   GameMode8 `fn_800FAAB8`: `nOther = nPlayer ? 0 : 1;` put `nOther` in the original's register
   (91.7% -> 93.1); `nOther = nPlayer == 0;` and `!nPlayer` (89.4%) did not.
@@ -414,6 +447,15 @@ The fixes that come up most often. Each points to its full entry below.
 
 ### Returns, early exits and switch
 
+- **[verified] A byte test compiled `cmplwi; beq body; b end` is the last term of an or-chain of
+  early exits**, not a switch: `if (a && b || Player_IsCPU(n) || gSession.nSplitScreen) return;`.
+  A `(u32)` switch gives the branch shape with `cmpwi`; the or-chain gives the original's
+  `cmplwi` (Golfer `Caddie_Update` 99.03% -> 100, `Caddie_Start` 97.86% -> 100).
+- **[verified] An explicit `case 1: break;` leaves a second unconditional branch after the
+  dispatch** (`b end; b end`); `default:` in any position does not (GameMode8 `fn_800FBD2C`).
+- **[verified] Loop early exits: `for (...) { if (a[h] != 1) break; n++; }`** gives the
+  original's test-at-the-bottom layout; `&& a[h] == 1` in the loop condition does not (GameMode8
+  `fn_800FD1C0`, 92.5% -> 99.95%).
 - **[verified] One shared `return` means one combined condition.** Four separate
   `if (...) return 2;` lines each get their own return sequence. If the original has several
   tests all branching to a single shared return, the source was `if (a || b || c || d) return 2;`.
@@ -483,6 +525,9 @@ The fixes that come up most often. Each points to its full entry below.
 
 ### Floating point
 
+- **[verified] A MIN-style ternary whose result lands in a scratch register is its own
+  variable.** `r = a <= b ? a : b;` with `r` separate matched; writing it back into `a` let the
+  compiler merge them (GameMode8 `fn_800FBD2C`).
 - **[verified] A value the compiler CSEs into a callee-saved float register** (e.g. `100 - skill`
   used three times, first computed *after* a call) was a named local in the source, assigned
   right after the call whose result it is combined with: `r = Rand_Float(0); miss = 100 - skill;

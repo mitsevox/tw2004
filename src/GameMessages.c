@@ -27,13 +27,8 @@ extern FrontEnd* lbl_80281F1C;
 
 void  fn_8016B09C(void* pHandler, int nMsg, int nArgs, MsgArg* pArgs);
 u32   strlen(const char* s);
-void  fn_800E5A4C(int nMsg, u32 uFloats, void* p0, void* p1, void* p2);
-void  fn_800E5B0C(int nMsg, u32 uFloats, void* p0, void* p1, void* p2, void* p3, void* p4);
 extern s32 lbl_80282278;
-void  fn_800E3B04(void);
-u8    fn_80095430(int a);
 extern u8 lbl_802822DF;
-void  fn_8009EF98(void);
 extern s32 lbl_802822B0;
 extern s32 lbl_8028229C;
 extern s32 lbl_802822B8;
@@ -48,13 +43,11 @@ extern u8 lbl_80203138[14];
 extern u8 lbl_802822BE;
 void fn_800E4FFC(int p0);
 void fn_800E502C(int p0);
-void fn_800E505C(int p0);
 void fn_800E508C(void);
 extern u8 lbl_802822BD;
 void fn_800E50FC(void);
 extern u8 lbl_80282282;
 void fn_800E5200(int p0);
-void fn_800E5228(void);
 extern u8 lbl_80202B88[];
 void fn_800E522C(int p0);
 extern u8 lbl_802822BC;
@@ -64,32 +57,16 @@ void fn_800E53AC(void);
 void fn_800E53C0(void);
 extern u8 lbl_80282280;
 void fn_800E53E8(u8 v);
-void fn_800E542C(void);
-void fn_800E5450(void);
-void fn_800E5474(int p0);
-void fn_800E54A0(int p0, int p1, int p2);
-void fn_800E54D8(int p0, int p1, int p2);
-void fn_800E5510(int p0, int p1, int p2);
-void fn_800E5548(int p0, int p1, int p2);
-void fn_800E5580(int p0, int p1, int p2);
-void fn_800E55B8(int p0, int p1, int p2);
-void fn_800E55F0(int p0, int p1, int p2);
-void fn_800E5628(int p0, int p1, int p2);
-void fn_800E5660(int p0, int p1, int p2);
-void fn_800E5698(int p0, int p1, int p2);
-void fn_800E56D0(int p0, int p1, int p2);
 extern u8 lbl_802822E4;
 void fn_800E5708(void);
 extern s32 lbl_802822E0;
 void fn_800E572C(int p0);
 void fn_800E573C(void);
 void fn_800E5908(int nMsg);
-void fn_800E5C84(void);
-void fn_800E5C08(int nMsg, char* pStr);
 void fn_800E5D40(int p0);
 void fn_800E5D68(char* p0);
 extern u8 lbl_801D87C0[];
-s32 fn_800E5D90(void);
+u8  fn_800E5D90(void);
 
 void fn_800E4FFC(int p0) {
     fn_80062D6C(48, p0);
@@ -489,8 +466,8 @@ void fn_800E5C08(int nMsg, char* pStr) {
     fn_8016B09C(lbl_80281F1C->pHandler, nMsg, 1, &arg);
 }
 
-void fn_800E5C84(void) {
-    fn_800E5D90();
+u8 fn_800E5C84(void) {
+    return fn_800E5D90();
 }
 
 // Message 0x42: seven ints and a float (the sixth value).
@@ -517,8 +494,8 @@ void fn_800E5D68(char* p0) {
     fn_800E5C08(90, p0);
 }
 
-s32 fn_800E5D90(void) {
-    return *(u8*)lbl_801D87C0;
+u8 fn_800E5D90(void) {
+    return lbl_801D87C0[0];
 }
 
 void fn_800E5DA0(void) {

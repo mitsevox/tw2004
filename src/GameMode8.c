@@ -4,6 +4,8 @@
 // the two-player stroke and match versions.
 
 #include "golfer.h"
+#include "game.h"
+#include "engine.h"
 
 typedef struct SwingStateDef {
     void (*pfnEnter)(int nPlayer);  // 0x00
@@ -15,41 +17,15 @@ extern SwingStateDef sGolferStateEngineTable[];        // 0x801883D8
 void  STATEFUNC_SimulateInit(int nPlayer);
 void  STATEFUNC_SimulateUpdate(int nPlayer);
 void  STATEFUNC_SimulateExit(int nPlayer);
-int   Game_CurHoleIndex(void);
-u8    Player_IsHoled(int nPlayer);
-int   GOLFERSTATE_GetCurrentState(int nPlayer);
-void  GOLFERSTATE_Set(int nState, int nPlayer);
-void  Session_SetNumPlayers(int n);
 void  GM_MovePlayerToBall(int nPlayer);
 void  Shot_Plan(int nPlayer, int a);
-void  Emotion_UpdatePlayerEmotion(int nPlayer);
-void  EVENT_Trigger(int nPlayer, int nEvent, int a, int b);
-void  View_SetCamera(void* pView, int nCamera, int nPlayer, int nView);
-void* fn_80017028(int nView);
-void  fn_8001704C(int nView, int nPlayer);
-void  fn_8001C804(int nPlayer, int a, int b);
 void  fn_8001D8DC(int nPlayer);
-void  fn_80062C80(int a, int b);
 void  fn_80062CB0(int a, int b);
-void  fn_80062D38();
-void  fn_80062D6C();
 void  fn_80062F1C(void);
-void  fn_80095744(int nHandle, int nAnim);
-void  fn_800957D8(int nHandle);
-void  fn_800A7664();
-u8    fn_800E1BBC(void);
-void  fn_800E2BA4();
 s32   fn_800E27C0(void);
 void  fn_800E3C70(int a);
 void  fn_800E3CD4(int a);
-u8    fn_800E4254(int nPlayer);
-void  fn_800E4364(u32 nQueue, int a, int b, int c);
-void  fn_800E45C0();
-void  fn_800E53F0();
-int   fn_800D36E0(int nWinner, int nLoser, int nMargin, int* pPrize);
-void  fn_800D3548(int nPlayer, int nMoney, int a);
 void  fn_800F80D4(s32 p0);
-void  fn_80125910(int a);
 extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
 extern u8* gpSaveData;
 extern u8  lbl_8028227C;
@@ -81,12 +57,12 @@ typedef struct SGLog {
 extern SGLog lbl_802120F8[100];
 extern s32 lbl_802823CC;
 extern u8  lbl_802823C8;
-void  GOLFERSTATE_Switch(int nState, int nPlayer);
 void  GM_PlayerAddStroke(int nPlayer);
 u8    GM_CheckForBallOOB(int nPlayer);
 void  GM_ReplaceOOBBall(int nPlayer);
 SurfaceType* Ter_GetSupportingWorldMaterial(CourseInfo* pCourse, u8* pBall);
 void  fn_800DEB5C(int nPlayer);
+u8    fn_800A7720(void);
 void  fn_800FE190(f32* pA, f32* pB, f32* pOut);
 u8*   fn_800136C4(int nController);         // the pad's state: stick bytes at +0..+3
 u32   fn_800136DC(int nController);         // buttons: held << 16 | pressed this frame
@@ -95,24 +71,39 @@ extern f32 lbl_802816B0;
 extern f32 lbl_802816B4;
 extern f32 lbl_802816C0;
 extern f32 lbl_802816C4;
-void  Mem_cpy(void* pDst, void* pSrc, int nBytes);
+extern f32 lbl_802816B8;
+extern f32 lbl_802816BC;
+f32   fn_8000AD78(f32 y, f32 x);                // atan2f
+void  fn_800BAF04(f32* pSrc, f32* pDst);        // normalise
+int   Golfer_GetAttribute(Player* pPlayer, int nAttr, int nMode);
+void  GM_SimulateBallMovement(int nPlayer);
+u8    fn_80058F5C(int nPlayer);                 // the per-frame swing poll: the ball was struck
+void  fn_800ED710(s32 p0);
+void  Vec_Normalize(f32* pSrc, f32* pDst);
+u8    Ter_PointInOOBNetwork(u8* pBall);
+void  fn_80069330(int nPlayer, f32* pPos);
+void  fn_8006A6C4(int nPlayer);
+void  PlaceBall_UpdateMomentums(int nPlayer, f32 f);
+u8*   fn_80016CFC(int nView);
+u8*   fn_80008370(u8* p);
+extern f32 lbl_801D5888[4][4];                  // per player: where the ball was last on the course
+
+// The tee positions follow the pins in the per-hole data (fn_8000C594).
+typedef struct HoleTees {
+    u8     unk0[0xB0];
+    PinPos tee[4];                          // 0xB0  one per tee set
+} HoleTees;
 void  fn_8006ACF8(int nPlayer, int a);
 void  fn_8006BAA8(int nPlayer);
 void  fn_800FE100(s32 p0, s32 p1, s32 p2);
 void  fn_800FA554(int nPlayer);
 
-void  fn_800F9824(void);
 void  fn_800F9844(void);
-void  fn_800F9A58(void);
-void  fn_800F9AB0(void);
-void  fn_800F9B34(void);
-s32   fn_800F9BF8(int nPlayer);
 u8    fn_800F9C00(int nPlayer, int a);
 void  fn_800F9C48(void);
 u8    fn_800F9D00(u8 bCheck);
 void  fn_800F9E00(void);
 u8    fn_800F9F04(u8 bCheck);
-u8    fn_800FA118(int nPlayer, int a);
 u8    fn_800FA148(int a);
 u8    fn_800FA1CC(int nPlayer, int a);
 u8    fn_800FA26C(int a);
@@ -122,12 +113,12 @@ void  fn_800FA3AC(void);
 void  fn_800FA410(void);
 s32   fn_800FA48C(int nPlayer, int nHole);
 s32   fn_800FA4B8(int nPlayer);
-void  fn_800FA570(void);
 void  fn_800FA608(int nPlayer);
 void  fn_800FA844(int nPlayer);
 void  fn_800FA994(int nPlayer);
 void  fn_800FA998(int nPlayer);
 void  fn_800FA9E0(int nPlayer);
+void  fn_800FB35C(int nPlayer, int nOther);
 f32   fn_800FB41C(f32* pA, f32* pB);
 void  fn_800FBD2C(int nPlayer);
 void  fn_800FCBDC(int nPlayer);
@@ -135,17 +126,15 @@ void  fn_800FCCF0(void);
 void  fn_800FD1C0(int nPlayer);
 void  fn_800FD534(int nPlayer);
 void  fn_800FD6A0(int nPlayer);
-void  fn_800FDA30(int nPlayer, int a);
 void  fn_800FDF38(void);
-u8    fn_800FDF58(int nPlayer);
-u8    fn_800FDF60(void);
 void  fn_800FDFC4(s32 p0, s32 p1, s32 p2);
 void  fn_800FDFFC(s32 p0, s32 p1);
-void  fn_800FE02C();
+void  fn_800FE02C(void);
 void  fn_800FE054(s32 p0, s32 p1);
 void  fn_800FE080(s32 p0, s32 p1);
 void  fn_800FE0AC(s32 p0, s32 p1);
 void  fn_800FE0D8(void);
+void  fn_800FE138(s32 p0, s32 p1);
 void  fn_800FE164(s32 p0, s32 p1);
 
 // Mode 8 starts: solo speed golf.
@@ -318,7 +307,7 @@ void fn_800F9E00(void) {
                 if (nPrize) {
                     fn_800E4364(0, 0x6B, nPrize, nProfile);
                 }
-                fn_800D3548(nWinner, nMoney, 0);
+                fn_800D3548(nWinner, nMoney, NULL);
                 gPlayers[nWinner].n330 += nMoney;
             }
         }
@@ -807,9 +796,10 @@ void fn_800FB204(int nPlayer, int nStrokes) {
     }
 }
 
-// A holed shot's length (from vPreShot to the ball): a putt of 20 feet or more is event 17; any
-// other shot of 10 yards or more is event 18, or 19 from 60 yards.
-void fn_800FB35C(int nPlayer) {
+// A shot's length (from vPreShot to the ball): a putt of 20/3 or more is event 17; any other
+// shot of 10 or more is event 18, or 19 from 60. The unit is not proven (in yards, 20/3 would be
+// 20 feet). fn_800FB41C always returns 0, so none of these fire.
+void fn_800FB35C(int nPlayer, int nOther) {
     f32 fDist = fn_800FB41C(gPlayers[nPlayer].vPreShot, (f32*)gPlayers[nPlayer].ball);
     if (gPlayers[nPlayer].nClub == CLUB_PUTTER) {
         if (fDist >= 20.0f / 3.0f) {
@@ -930,7 +920,646 @@ void fn_800FB774(int nPlayer) {
     }
 }
 
+// A CPU player's sticks for the run: turn from the heading fA88 towards vPlacement (fA80),
+// forward speed from how far off the heading is (fA84), both eased off near the target; fCB4
+// rises until it reaches a level set by the golfer's speed attribute.
+void fn_800FBB30(Player* p) {
+    f32 v[4];
+    f32 fAngle;
+    f32 fDistSq;
+    f32 fOff;
+    f32 fScale;
+    f32 fLow;
+    fn_800FE190((f32*)p->ball, p->vPlacement, v);
+    fDistSq = v[0] * v[0] + v[2] * v[2];
+    fn_800BAF04(v, v);
+    fAngle = p->fA88 - fn_8000AD78(v[2], v[0]) - PI / 2.0f;
+    while (fAngle < -PI) {
+        fAngle += TWOPI;
+    }
+    while (fAngle > PI) {
+        fAngle -= TWOPI;
+    }
+    fOff = fn_8000AD9C(fAngle);
+    if (fOff > DEG(1.0f) && fOff < DEG(15.0f)) {
+        fOff *= 3.0f;
+        fAngle *= 3.0f;
+    }
+    fScale = (PI - fOff) / PI;
+    p->fA84 = fScale;
+    if (fOff >= PI / 4.0f) {
+        p->fA84 *= 0.25f;
+    }
+    p->fA80 = (1.0f / PI) * fAngle;
+    if (fDistSq < 31.25f) {
+        p->fA84 *= fDistSq / 31.25f;
+        p->fA80 *= fDistSq / 31.25f;
+    }
+    if (fOff > DEG(2.0f)) {
+        p->fA84 *= fScale;
+        p->fA80 *= fScale;
+        p->fA7C = (1.0f / PI) * -fAngle;
+    } else {
+        p->fA7C = 0.0f;
+    }
+    fLow = lbl_802816B8;
+    if (p->fCB4 < (lbl_802816BC - fLow) *
+                      (0.5f * (0.01f * (s8)Golfer_GetAttribute(p, ATTR_SPEED, ATTR_TOTAL))) + fLow) {
+        p->fCB4 += lbl_802816B0;
+    }
+}
+
+// States 12 and 24, update: the ball flies, then the golfer runs to it. Once the ball stops,
+// fn_800FAD54 scores the shot; a holed ball (mode 7: its events, and state 26 once both are
+// down) or a ball on the green gets its events, and out of bounds replaces the ball. Then the
+// run: the countdown from fn_800FA518, the sticks (fn_800FB774, or fn_800FBB30 for the CPU), and
+// arriving at the ball (within 5 of it).
+void fn_800FBD2C(int nPlayer) {
+    Player* p = &gPlayers[nPlayer];
+    int nOther = nPlayer ? 0 : 1;
+    f32 vStart[4];
+    f32 vDir[4];
+    f32 v[4];
+    int nStrokes;
+    int nPar;
+    int nDiff;
+    int n;
+    CourseInfo* pHole;
+    f32 fDist;
+    f32 fToPlace;
+    f32 fAngle;
+    f32 fLow;
+    f32 fHigh;
+    u8* pBall;
+    f32* pTarget;
+    if (Game_GetMode() == 7) {
+
+        if (!(gPlayers[nPlayer].uC48 & 1) && !(gPlayers[nOther].uC48 & 1)) {
+            fn_800FAAB8(nPlayer, 0);
+        }
+        if (p->vA44[0] == *(f32*)(p->ball + 0) && p->vA44[2] == *(f32*)(p->ball + 8) && (p->nC3C & 8)) {
+            if (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] == gPlayers[nPlayer].nC60 &&
+                !(gPlayers[nPlayer].uC48 & 0x4000000000LL)) {
+                fn_800FAAB8(nPlayer, 0x26);
+            }
+        }
+    }
+    GM_SimulateBallMovement(nPlayer);
+    if (gPlayers[nPlayer].nBallState == 0) {
+    } else if (gPlayers[nPlayer].nBallState == 1 || gPlayers[nPlayer].nBallState == 5) {
+        if (!fn_800FAD54(nPlayer)) {
+            if (Game_GetMode() == 7 && (s8)GOLFERSTATE_GetCurrentState(nOther) == 26) {
+                GOLFERSTATE_Set(26, (u8)nPlayer);
+            }
+            return;
+        }
+        nStrokes = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
+        if (gPlayers[nPlayer].nLie == LIE_HOLED) {
+            if (Game_GetMode() == 7) {
+                fn_800FB35C(nPlayer, nOther);
+                nStrokes = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
+                if (gPlayers[nPlayer].nC3C & 8) {
+                    gPlayers[nPlayer].nC3C |= 0x10;
+                    if (!(gPlayers[nOther].nC3C & 8)) {
+                        fn_800FAAB8(nPlayer, 0x1D);
+                    }
+                    fn_800FB204(nPlayer, nStrokes - gPlayers[nPlayer].nC60);
+                } else {
+                    gPlayers[nPlayer].nC3C |= 8;
+                    gPlayers[nPlayer].nC5C = 59;
+                    gPlayers[nPlayer].nC3C |= 0x100;
+                    gPlayers[nPlayer].nC60 = nStrokes;
+                    fn_800FB204(nPlayer, nStrokes);
+                    if (gPlayers[nOther].nC3C & 8) {
+                        if (nStrokes < gPlayers[nOther].nC60) {
+                            if (!(gPlayers[nPlayer].uC48 & 0x2000000000LL)) {
+                                fn_800FAAB8(nPlayer, 0x25);
+                            }
+                        } else if (nStrokes > gPlayers[nOther].nC60) {
+                            if (!(gPlayers[nOther].uC48 & 0x2000000000LL)) {
+                                fn_800FAAB8(nOther, 0x25);
+                            }
+                        }
+                    } else if (nStrokes <= gPlayers[nOther].nStrokes[Game_CurHoleIndex()]) {
+                        if (!(gPlayers[nPlayer].uC48 & 0x2000000000LL)) {
+                            fn_800FAAB8(nPlayer, 0x25);
+                        }
+                    }
+                }
+                if ((gPlayers[nOther].nC3C & 8) || (gPlayers[nPlayer].nC3C & 0x10)) {
+                    GOLFERSTATE_Set(26, (u8)nPlayer);
+                    if (gPlayers[nOther].nBallState != 2 && gPlayers[nOther].nBallState != 3 &&
+                        gPlayers[nOther].nBallState != 4) {
+                        GOLFERSTATE_Set(26, (u8)nOther);
+                    }
+                    return;
+                }
+                if (!(gPlayers[nPlayer].uC48 & 4)) {
+                    fn_800FAAB8(nPlayer, 2);
+                }
+                pHole = fn_8000C594();
+                fn_80055AA8((Ball*)p->ball, &((HoleTees*)pHole)->tee[gSession.nTeeSet[nPlayer]].x, nPlayer);
+                Vec_Copy(&((HoleTees*)pHole)->tee[gSession.nTeeSet[nPlayer]].x, &p->fBallX);
+                Vec_Copy(&((HoleTees*)pHole)->tee[gSession.nTeeSet[nPlayer]].x, p->vA44);
+                gPlayers[nPlayer].nC3C &= ~1;
+                if (lbl_802823C8) {
+                    GOLFERSTATE_Switch(1, nPlayer);
+                    lbl_802823C8 = 0;
+                } else {
+                    gPlayers[nPlayer].nC3C |= 0x100000;
+                }
+            } else {
+                fn_800F80D4(0);
+                fn_800ED710(nPlayer);
+                GOLFERSTATE_Switch(13, nPlayer);
+                if (lbl_802823C9) {
+                    lbl_802823C9 = 0;
+                    lbl_802823CA = 1;
+                } else {
+                    lbl_802823CA = 0;
+                }
+            }
+        } else {
+            if (!(gPlayers[nPlayer].nC3C & 8) && (gPlayers[nOther].nC3C & 8)) {
+                if (nStrokes >= gPlayers[nOther].nC60 && !(gPlayers[nOther].uC48 & 0x2000000000LL)) {
+                    fn_800FAAB8(nOther, 0x25);
+                }
+            }
+            pBall = p->ball;
+            if (!Ter_PointInOOBNetwork(pBall)) {
+                gPlayers[nPlayer].nBallState = 5;
+            }
+            if (gPlayers[nPlayer].nBallState == 5) {
+                GM_ReplaceOOBBall(nPlayer);
+                if (lbl_802823C8) {
+                    GOLFERSTATE_Switch(1, nPlayer);
+                    lbl_802823C8 = 0;
+                } else {
+                    gPlayers[nPlayer].nC3C |= 0x100000;
+                }
+            } else {
+                gPlayers[nPlayer].nBallState = 0;
+                Mem_cpy(p->ballBefore, pBall, 0xBC);
+                nPar = fn_800D2B08();
+                if (gPlayers[nPlayer].nLie == LIE_GREEN) {
+                    if (Game_GetMode() == 7) {
+                        fDist = fn_800FB41C(p->vPreShot, (f32*)pBall);
+                        if (fn_800FB41C((f32*)pBall, gpGame->p130) <= 1.0f && fDist >= 20.0f) {
+                            fn_800FAAB8(nPlayer, 0x14);
+                        }
+                        if (!(gPlayers[nPlayer].nC3C & 0x40)) {
+                            gPlayers[nPlayer].nC3C |= 0x40;
+                            gPlayers[nPlayer].nC64 = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
+                            if (!(gPlayers[nOther].nC3C & 0x40)) {
+                                fn_800FAAB8(nPlayer, 3);
+                            }
+                            fn_800FE190((f32*)p->ball, gpGame->p130, v);
+                            p->fC68 = fn_80009680(v[0] * v[0] + v[2] * v[2]);
+                            nDiff = nPar - 2 - gPlayers[nPlayer].nC64;
+                            if (nDiff == 0) {
+                                fn_800FAAB8(nPlayer, 0x15);
+                            } else if (nDiff > 0) {
+                                fn_800FAAB8(nPlayer, 0x16);
+                            }
+                            if ((gPlayers[nOther].uC48 & 0x600000) && nDiff >= 0) {
+                                if (gPlayers[nOther].fC68 > gPlayers[nPlayer].fC68) {
+                                    fn_800FAAB8(nPlayer, 7);
+                                } else if (gPlayers[nOther].fC68 < gPlayers[nPlayer].fC68) {
+                                    fn_800FAAB8(nOther, 7);
+                                }
+                            }
+                        } else if ((gPlayers[nPlayer].nC3C & 8) && !(gPlayers[nPlayer].nC3C & 0x80)) {
+                            gPlayers[nPlayer].nC3C |= 0x80;
+                            fn_800FAAB8(nPlayer, 0x1C);
+                            nDiff = nPar - 2 - (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] -
+                                                gPlayers[nPlayer].nC60);
+                            if (nDiff == 0) {
+                                fn_800FAAB8(nPlayer, 0x15);
+                            } else if (nDiff > 0) {
+                                fn_800FAAB8(nPlayer, 0x16);
+                            }
+                            if ((gPlayers[nOther].uC48 & 0x600000) && nDiff >= 0) {
+                                fn_800FE190((f32*)p->ball, gpGame->p130, v);
+                                fDist = fn_80009680(v[0] * v[0] + v[2] * v[2]);
+                                if (gPlayers[nPlayer].uC48 & 0x0C000080) {
+                                    if (fDist < gPlayers[nPlayer].fC68) {
+                                        fn_800FAAB8(nPlayer, 0x1B);
+                                        gPlayers[nPlayer].fC68 = fDist;
+                                    }
+                                } else if (gPlayers[nOther].uC48 & 0x0C000080) {
+                                    if (fDist < gPlayers[nOther].fC68) {
+                                        fn_800FAAB8(nPlayer, 0x1A);
+                                        gPlayers[nPlayer].fC68 = fDist;
+                                        gPlayers[nOther].uC48 &= ~(u64)0x0C000080;
+                                    }
+                                } else {
+                                    fn_800FAAB8(nPlayer, 7);
+                                    gPlayers[nPlayer].fC68 = fDist;
+                                }
+                            }
+                        }
+                    }
+                } else if (Game_GetMode() == 7 &&
+                           (gPlayers[nPlayer].nLie == 6 || gPlayers[nPlayer].nLie == 7 ||
+                            gPlayers[nPlayer].nLie == 8)) {
+
+                    if (gPlayers[nPlayer].nC3C & 0x10) {
+                        fn_800FAAB8(nPlayer, 0x20);
+                    } else {
+                        fn_800FAAB8(nPlayer, 6);
+                    }
+                    gPlayers[nPlayer].nC3C |= 0x400;
+                }
+            }
+        }
+        if (Game_GetMode() == 7 && (s8)GOLFERSTATE_GetCurrentState(nOther) == 26) {
+            if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) != 26) {
+                GOLFERSTATE_Set(26, (u8)nPlayer);
+            }
+            return;
+        }
+    } else {
+        fn_80058F5C(nPlayer);
+    }
+    switch (fn_800FA518(nPlayer)) {
+    case 1:
+        break;
+    case 0:
+        Vec_Copy(&p->fBallX, vStart);
+        fn_80069330(nPlayer, vStart);
+        fn_8006A6C4(nPlayer);
+        n = gPlayers[nPlayer].nView0;
+        View_SetCamera(fn_80017028(n), 9, nPlayer, n);
+        gPlayers[nPlayer].nC3C |= 1;
+        fn_80062C80(gPlayers[nPlayer].nC58, 0);
+        gPlayers[nPlayer].fCB4 = lbl_802816B8;
+        if (gPlayers[nPlayer].nC3C & 0x200000) {
+            gPlayers[nPlayer].nC54 = 59;
+        } else {
+            gPlayers[nPlayer].nC54 = 179;
+        }
+        fn_800FE190((f32*)p->ball, p->vPlacement, vDir);
+        Vec_Normalize(vDir, vDir);
+        gPlayers[nPlayer].fA88 = PI / 2.0f + fn_8000AD78(vDir[2], vDir[0]);
+        break;
+    case -1:
+        if (Player_IsCPU(nPlayer)) {
+            fn_800FBB30(p);
+        } else {
+            fn_800FB774(nPlayer);
+        }
+        if (gPlayers[nPlayer].fCB4 < lbl_802816B8) {
+            gPlayers[nPlayer].fCB4 = lbl_802816B8;
+        }
+        if (gPlayers[nPlayer].fCB4 > lbl_802816BC) {
+            gPlayers[nPlayer].fCB4 = lbl_802816BC;
+        }
+        fDist = gPlayers[nPlayer].fCB4;
+        fDist *= 0.01f * (s8)Golfer_GetAttribute(p, ATTR_SPEED, ATTR_TOTAL);
+        PlaceBall_UpdateMomentums(nPlayer, fDist);
+        pBall = p->ball;
+        pTarget = p->vPlacement;
+        fn_800FE190((f32*)pBall, pTarget, vDir);
+        Vec_Normalize(vDir, vDir);
+        fAngle = gPlayers[nPlayer].fA88 - fn_8000AD78(vDir[2], vDir[0]) - PI / 2.0f;
+        fAngle *= 180.0f / PI;
+        if (gPlayers[nPlayer].nC58 == 2) {
+            fLow = 40.0f;
+            fHigh = 330.0f;
+        } else {
+            fLow = 30.0f;
+            fHigh = 340.0f;
+        }
+        while (fAngle < 0.0f) {
+            fAngle += 360.0f;
+        }
+        while (fAngle > 360.0f) {
+            fAngle -= 360.0f;
+        }
+        if (fAngle <= fLow || fAngle >= fHigh) {
+            n = 0;
+        } else if (fAngle > fLow && fAngle < 135.0f) {
+            n = 1;
+        } else if (fAngle < fHigh && fAngle > 225.0f) {
+            n = 3;
+        } else {
+            n = 2;
+        }
+        fn_800FE0AC(gPlayers[nPlayer].nC58, n);
+        fn_800FE190((f32*)pBall, pTarget, vDir);
+        fToPlace = fn_80009680(vDir[0] * vDir[0] + vDir[2] * vDir[2]);
+        // the distance to a position in the view's object (+0x34), if that is nearer; the second
+        // square root is written twice, as a MIN() macro would expand
+        fn_800FE190((f32*)pBall, (f32*)(fn_80008370(*(u8**)fn_80016CFC(gPlayers[nPlayer].nView0)) + 0x34),
+                    vDir);
+        fDist = (fToPlace <= (f32)fn_80009680(vDir[0] * vDir[0] + vDir[2] * vDir[2]))
+
+                    ? fToPlace
+                    : (f32)fn_80009680(vDir[0] * vDir[0] + vDir[2] * vDir[2]);
+        if (gPlayers[nPlayer].nBallState == 0) {
+            if (fDist < 5.0f) {
+                Vec_Copy((f32*)pBall, &p->fBallX);
+                gPlayers[nPlayer].nC3C &= ~1;
+                fn_80062C80(gPlayers[nPlayer].nC58, 1);
+                fn_800FE0AC(gPlayers[nPlayer].nC58, 0);
+                fn_800FE080(gPlayers[nPlayer].nC58, 0);
+                fn_800FE054(gPlayers[nPlayer].nC58, 0);
+                if (lbl_802823C8 || Game_GetMode() != 7) {
+                    GOLFERSTATE_Switch(1, nPlayer);
+                    lbl_802823C8 = 0;
+                } else {
+                    gPlayers[nPlayer].nC3C |= 0x100000;
+                }
+            }
+        } else if (fDist < 5.0f) {
+            if (!Player_IsCPU(nPlayer)) {
+                if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x23, 0)) {
+                    if (gPlayers[nPlayer].nBallState != 1) {
+                        Physics_DropBall((Ball*)pBall, lbl_801D5888[nPlayer]);
+                        gPlayers[nPlayer].nBallState = 1;
+                    }
+                } else {
+                    fn_800FE054(gPlayers[nPlayer].nC58, 1);
+                }
+            }
+        } else {
+            fn_800FE054(gPlayers[nPlayer].nC58, 0);
+        }
+        break;
+    }
+}
+
+// States 12 and 24, exit: camera 25.
+void fn_800FCBDC(int nPlayer) {
+    int nView = gPlayers[nPlayer].nView0;
+    View_SetCamera(fn_80017028(nView), 25, nPlayer, nView);
+}
+
+// 1 when the player's pad has buttons 0x1000, 0x400 and 0x800 (Start, X and Y on a GameCube pad)
+// all down, each pressed this frame or held; 0 for the CPU and for any other controller.
+u8 fn_800FCC38(int nPlayer) {
+    int bDown;
+    int nCtrl = gPlayers[nPlayer].nController;  // fake match: only the first read goes through nCtrl
+    if (nCtrl >= 8) {
+        return 0;
+    }
+    bDown = (fn_800136DC(nCtrl) & 0x1000 || fn_800136DC(gPlayers[nPlayer].nController) & 0x10000000) &&
+            (fn_800136DC(gPlayers[nPlayer].nController) & 0x400 ||
+             fn_800136DC(gPlayers[nPlayer].nController) & 0x4000000) &&
+            (fn_800136DC(gPlayers[nPlayer].nController) & 0x800 ||
+             fn_800136DC(gPlayers[nPlayer].nController) & 0x8000000);
+    return bDown;
+}
+
+// Every frame (pfn220 through fn_800FDF38): in the two-player game, a holed player takes 5 points a
+// second from one still playing, which can end the hole; in both games, button 0x25 restarts the
+// hole from the tee (for the cost of event 39 in mode 7). Then speed golf's lbl_802823C8 is set.
+void fn_800FCCF0(void) {
+    int i;
+    int nOther;
+    int k;
+    CourseInfo* pHole;
+    if (gSession.unk14 == 0) {
+        if (Game_GetMode() == 7) {
+            i = 0;
+            nOther = 1;
+            if ((gPlayers[i].nC3C & 0x6000) || (gPlayers[nOther].nC3C & 0x6000)) {
+                return;
+            }
+            for (k = 0; k < 2; k++) {
+                if (gPlayers[i].nC3C & 0x100) {
+                    if (!(gPlayers[nOther].nC3C & 8)) {
+                        gPlayers[i].nC5C--;
+                        if (gPlayers[i].nC5C == 0) {
+                            gPlayers[i].nC44 += 5;
+                            fn_800FDFC4(gPlayers[i].nC58, gPlayers[i].nC44, 0);
+                            fn_800FE138(gPlayers[i].nC58, 5);
+                            gPlayers[nOther].nC44 -= 5;
+                            fn_800FDFC4(gPlayers[nOther].nC58, gPlayers[nOther].nC44, 0);
+                            gPlayers[i].nC5C = 59;
+                            if (gPlayers[nOther].nC44 <= 0 && !(gPlayers[nOther].nC3C & 0x6000) &&
+                                !(gPlayers[nOther].nC3C & 0x8000)) {
+                                gPlayers[nOther].nC44 = 0;
+                                gPlayers[i].nC44 = 6000;
+                                gPlayers[nOther].nC3C |= 0xC000;
+                                gPlayers[i].nC3C |= 0x10000 | 0x4000;
+                                GOLFERSTATE_Set(26, (u8)nOther);
+                                GOLFERSTATE_Set(26, (u8)i);
+                                return;
+                            }
+                        }
+                    }
+                }
+                gPlayers[i].nCB8++;
+                if (!Player_IsCPU(i) && !fn_800FA118(i, 1) &&
+                    lbl_80192908[0x27].nPoints + gPlayers[i].nC44 > 0) {
+                    if ((fn_800136DC(gPlayers[i].nController) & fn_800142AC(0x25, 0)) && !fn_800FCC38(i) &&
+                        ((s8)GOLFERSTATE_GetCurrentState(i) == 24 ||
+                         (gPlayers[i].nLie != 0 && gPlayers[i].nLie != LIE_HOLED && gPlayers[i].nLie != 16 &&
+                          (s8)GOLFERSTATE_GetCurrentState(i) != 2 &&
+                          (s8)GOLFERSTATE_GetCurrentState(i) != 4 &&
+                          (s8)GOLFERSTATE_GetCurrentState(i) != 3 &&
+                          (s8)GOLFERSTATE_GetCurrentState(i) != 8 &&
+                          (s8)GOLFERSTATE_GetCurrentState(i) != 10))) {
+                        fn_800FAAB8(i, 0x27);
+                        pHole = fn_8000C594();
+                        fn_80055AA8((Ball*)gPlayers[i].ball, &((HoleTees*)pHole)->tee[gSession.nTeeSet[i]].x,
+                                    i);
+                        Vec_Copy(&((HoleTees*)pHole)->tee[gSession.nTeeSet[i]].x, &gPlayers[i].fBallX);
+                        Vec_Copy(&((HoleTees*)pHole)->tee[gSession.nTeeSet[i]].x, gPlayers[i].vA44);
+                        gPlayers[i].nC3C &= ~1;
+                        fn_800FE0AC(gPlayers[i].nC58, 0);
+                        fn_800FE080(gPlayers[i].nC58, 0);
+                        fn_800FE054(gPlayers[i].nC58, 0);
+                        GOLFERSTATE_Switch(1, i);
+                        lbl_802823C8 = 0;
+                    }
+                }
+                nOther = 0;
+                i = 1;
+            }
+        } else if (Game_GetMode() == 8) {
+            i = 0;
+            if ((fn_800136DC(gPlayers[i].nController) & fn_800142AC(0x25, 0)) && !fn_800FCC38(i) &&
+                ((s8)GOLFERSTATE_GetCurrentState(i) == 24 ||
+                 (gPlayers[i].nLie != 0 && gPlayers[i].nLie != LIE_HOLED && gPlayers[i].nLie != 16))) {
+                pHole = fn_8000C594();
+                fn_80055AA8((Ball*)gPlayers[i].ball, &((HoleTees*)pHole)->tee[gSession.nTeeSet[i]].x, i);
+                Vec_Copy(&((HoleTees*)pHole)->tee[gSession.nTeeSet[i]].x, &gPlayers[i].fBallX);
+                Vec_Copy(&((HoleTees*)pHole)->tee[gSession.nTeeSet[i]].x, gPlayers[i].vA44);
+                gPlayers[i].nC3C &= ~1;
+                fn_800FE0AC(gPlayers[i].nC58, 0);
+                fn_800FE080(gPlayers[i].nC58, 0);
+                fn_800FE054(gPlayers[i].nC58, 0);
+                GOLFERSTATE_Switch(1, i);
+            }
+        }
+        lbl_802823C8 = 1;
+    }
+}
+
+// State 26, enter: the hole is over for this player. In the two-player game each played hole is
+// scored by who gained more points on it (1 won, 0 halved, 2 lost); a run of wins up to this
+// hole is event 33 (three) or 34 (more), and one win after three or more losses is event 35.
+void fn_800FD1C0(int nPlayer) {
+    int aResult[18];
+    int nHole;
+    s32 nOther;
+    int h;
+    int nMine;
+    int nTheirs;
+    int nWon;
+    int nLost;
+    nHole = Game_CurHoleIndex();
+    nOther = nPlayer ? 0 : 1;
+    if (nPlayer == 0) {
+        if (lbl_802823C9) {
+            lbl_802823C9 = 0;
+            lbl_802823CA = 1;
+        } else {
+            lbl_802823CA = 0;
+        }
+    }
+    gPlayers[nPlayer].nC54 = 134;
+    gPlayers[nPlayer].nC3C &= ~1;
+    fn_800FE0AC(gPlayers[nPlayer].nC58, 0);
+    fn_800FE080(gPlayers[nPlayer].nC58, 0);
+    fn_800FE054(gPlayers[nPlayer].nC58, 0);
+    fn_800FDFC4(gPlayers[nPlayer].nC58, gPlayers[nPlayer].nC44, 1);
+    if (Game_GetMode() == 7) {
+        gPlayers[nPlayer].nC3C |= 0x2000000;
+        gPlayers[nPlayer].nC54 = 239;
+        if (nHole != fn_800F9328()) {
+            for (h = fn_800F9328(); h != -1; h = fn_800F93D8(h)) {
+                if (h == fn_800F9328()) {
+                    nMine = gPlayers[nPlayer].nC6C[h] - 3000;
+                    nTheirs = gPlayers[nOther].nC6C[h] - 3000;
+                } else if (h == nHole) {
+                    nMine = gPlayers[nPlayer].nC44 - gPlayers[nPlayer].nC6C[fn_800F9414(h)];
+                    nTheirs = gPlayers[nOther].nC44 - gPlayers[nOther].nC6C[fn_800F9414(h)];
+                } else {
+                    nMine = gPlayers[nPlayer].nC6C[h] - gPlayers[nPlayer].nC6C[fn_800F9414(h)];
+                    nTheirs = gPlayers[nOther].nC6C[h] - gPlayers[nOther].nC6C[fn_800F9414(h)];
+                }
+                if (nMine > nTheirs) {
+                    aResult[h] = 1;
+                } else if (nMine == nTheirs) {
+                    aResult[h] = 0;
+                } else {
+                    aResult[h] = 2;
+                }
+            }
+            nWon = 0;
+            for (h = nHole; h != -1; h = fn_800F9414(h)) {
+                if (aResult[h] != 1) break;
+                nWon++;
+            }
+            if (nWon > 3) {
+                gPlayers[nPlayer].nC3C |= 0x40000;
+            } else if (nWon == 3) {
+                gPlayers[nPlayer].nC3C |= 0x20000;
+            } else if (nWon == 1) {
+                if (nHole != 0) {
+                    nLost = 0;
+                    for (h = fn_800F9414(nHole); h != -1; h = fn_800F9414(h)) {
+                        if (aResult[h] != 2) break;
+                        nLost++;
+                    }
+                }
+                // EA bug: on the first hole (nHole 0) nLost is never set
+                if (nLost > 2) {
+                    gPlayers[nPlayer].nC3C |= 0x80000;
+                }
+            }
+            if (gPlayers[nPlayer].nC3C & 0x20000) {
+                gPlayers[nPlayer].nC3C &= ~0x20000;
+                fn_800FAAB8(nPlayer, 0x21);
+                gPlayers[nPlayer].nC54 += 119;
+            } else if (gPlayers[nPlayer].nC3C & 0x40000) {
+                gPlayers[nPlayer].nC3C &= ~0x40000;
+                fn_800FAAB8(nPlayer, 0x22);
+                gPlayers[nPlayer].nC54 += 119;
+            } else if (gPlayers[nPlayer].nC3C & 0x80000) {
+                gPlayers[nPlayer].nC3C &= ~0x80000;
+                fn_800FAAB8(nPlayer, 0x23);
+                gPlayers[nPlayer].nC54 += 119;
+            }
+        }
+    }
+}
+
+// State 26, update: a player who lost the hole (bit 15) or won it on the other's points (bit 16)
+// gets event 40 or 41. When the countdown ends (and fn_800A7720 is clear), the player's turn is
+// over, and the other player's too if that one is not in state 26 and the ball is not in play.
+void fn_800FD534(int nPlayer) {
+    int nOther;
+    if (gPlayers[nPlayer].nC3C & 0x8000) {
+        fn_800FAAB8(nPlayer, 0x28);
+        gPlayers[nPlayer].nC3C &= ~0x8000;
+        gPlayers[nPlayer].nC54 += 119;
+    } else if (gPlayers[nPlayer].nC3C & 0x10000) {
+        fn_800FAAB8(nPlayer, 0x29);
+        gPlayers[nPlayer].nC3C &= ~0x10000;
+        gPlayers[nPlayer].nC54 += 119;
+    }
+    if (gPlayers[nPlayer].nC54-- <= 0 && !fn_800A7720()) {
+        if (gPlayers[nPlayer].nC3C & 0x4000) {
+            gPlayers[nPlayer].nC3C ^= 0x6000;
+        }
+        gPlayers[nPlayer].nC3C |= 8;
+        GM_EndOfGolferTurn(nPlayer);
+        nOther = nPlayer ? 0 : 1;
+        if ((s8)GOLFERSTATE_GetCurrentState(nOther) != 26 && gPlayers[nOther].nBallState == 0) {
+            gPlayers[nOther].nC3C |= 8;
+            gPlayers[nPlayer].nC3C |= 8;
+            GM_EndOfGolferTurn(nPlayer);
+        }
+    }
+}
+
 void fn_800FD6A0(int nPlayer) {
+}
+
+// A hole's points (nC6C) for the scorecard; *pWon is 1 when the player gained points on it
+// (two-player game only). The hole being played counts from nC44 until it is finished.
+s32 fn_800FD704(int nPlayer, int nHole, s32* pWon) {
+    int nCur = Game_CurHoleIndex();
+    int nGain;
+    if (Game_GetMode() == 8) {
+        *pWon = 0;
+    } else if (nHole == Game_CurHoleIndex() && !fn_800FA118(nPlayer, 1)) {
+        *pWon = 0;
+        return gPlayers[nPlayer].nC6C[nHole];
+    } else if (gpGame->bHoleSelected[nHole]) {
+        if (nHole == fn_800F9328()) {
+            if (nCur == nHole) {
+                nGain = gPlayers[nPlayer].nC44 - 3000;
+            } else {
+                nGain = gPlayers[nPlayer].nC6C[nHole] - 3000;
+            }
+        } else if (nHole == nCur) {
+            nGain = gPlayers[nPlayer].nC44 - gPlayers[nPlayer].nC6C[fn_800F9414(nHole)];
+        } else {
+            nGain = gPlayers[nPlayer].nC6C[nHole] - gPlayers[nPlayer].nC6C[fn_800F9414(nHole)];
+        }
+        if (nGain > 0) {
+            *pWon = 1;
+        } else {
+            *pWon = 0;
+        }
+    } else {
+        *pWon = 0;
+        return 0;
+    }
+    return gPlayers[nPlayer].nC6C[nHole];
+}
+
+// In speed golf (modes 7 and 8), bit 0 of nC3C: the golfer is running to the ball.
+s32 fn_800FD6A4(int nPlayer) {
+    if (Game_GetMode() == 7 || Game_GetMode() == 8) {
+        return gPlayers[nPlayer].nC3C & 1;
+    }
+    return 0;
 }
 
 void fn_800FDC0C(s32* p0, s32* p1, s32* p2) {
@@ -948,14 +1577,14 @@ u8 fn_800FDF58(int nPlayer) {
 }
 
 void fn_800FDFC4(s32 p0, s32 p1, s32 p2) {
-    fn_800E53F0(21, p0, p1, p2, p0);
+    fn_800E53F0(21, p0, p1, p2);
 }
 
 void fn_800FDFFC(s32 p0, s32 p1) {
     fn_80062D38(19, p0, (p1 & 0xFF));
 }
 
-void fn_800FE02C() {
+void fn_800FE02C(void) {
     fn_80062D6C(16, 1);
 }
 
@@ -976,7 +1605,7 @@ void fn_800FE0D8(void) {
 }
 
 void fn_800FE100(s32 p0, s32 p1, s32 p2) {
-    fn_800E53F0(23, p0, p1, p2, p0);
+    fn_800E53F0(23, p0, p1, p2);
 }
 
 void fn_800FE138(s32 p0, s32 p1) {
