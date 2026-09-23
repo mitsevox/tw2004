@@ -43,6 +43,7 @@ s32  fn_800F9254(void);
 s32  fn_800F9308(void);
 
 #define PLAYER_AT(i) (&gPlayers[i])
+#define PLAYER_U(i) (&gPlayers[(u32)(i)])
 // Clears every player's round (all 18 holes) for a playoff.
 #define CLEAR_ROUNDS(P)                             \
     for (i = 0; i < gNumPlayersSetUp; i++) {        \
@@ -103,7 +104,7 @@ void fn_800F81FC(void) {
 }
 
 // TW06: GameModeSkins::GetHonors. Only players who can still win the hole (fewer strokes than the
-// best holed score) play. On the tee: the last skin winner, then anyone; otherwise the player
+// best holed score) play. On the tee: a player who won a skin (latest hole first), then anyone; otherwise the player
 // farthest from the pin (off the green first).
 s32 fn_800F8278(int nPlayer) {
     int i;
@@ -125,12 +126,11 @@ s32 fn_800F8278(int nPlayer) {
     for (h = Game_CurHoleIndex() - 1; h >= 0; h--) {
         if (gpGame->bHoleSelected[h]) {
             for (i = 0; i < gNumPlayersSetUp; i++) {
-                if (i != nPlayer && Player_OnTee(i) && PLAYER(i)->n22C[h] != 0 &&
+                if (i != nPlayer && Player_OnTee(i) && gPlayers[(u32)i].n22C[h] != 0 &&
                     PLAYER(i)->nStrokes[Game_CurHoleIndex()] < nLow) {
                     return i;
                 }
             }
-            break;
         }
     }
     for (i = 0; i < gNumPlayersSetUp; i++) {
