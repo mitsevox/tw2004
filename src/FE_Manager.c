@@ -1,6 +1,7 @@
 // FE_Manager.c (EA's name, from its asserts; also in EA's 2002 source tree): the front end's
 // manager, which runs the menu screens: the movies played from the menus (the intro, the credits,
-// the golfers' bios), the profile being worked on, and the created golfer. Partly decompiled.
+// the golfers' bios), the profile being worked on, the created golfer and its Create-A-Player
+// picks and unlocks.
 
 #include "engine.h"
 #include "game.h"
@@ -42,7 +43,8 @@ int  fn_80105494(int nAsset);           // } the two attributes an asset raises 
 int  fn_80105504(int nAsset);           // }
 int  fn_801054CC(int nAsset);           // } and the tier it raises each to
 int  fn_8010553C(int nAsset);           // }
-void fn_80103B8C(s8 b);                 // } FE_CrAPDB.c: set b; an asset's b (2: either),
+s8   fn_80103BB4(void);                 // FE_CrAPDB.c: the b fn_80103B8C set
+void fn_80103B8C(s8 b);                // } FE_CrAPDB.c: set b; an asset's b (2: either),
 s8   fn_80103BC0(int nAsset);           // } its kind, fn_80107444's count, and its part and
 s16  fn_8010742C(int nAsset);           // } choice
 int  fn_80107444(int nAsset);           // }
@@ -93,6 +95,7 @@ void fn_80077C1C(int a, int b);
 u8   fn_80078008(s32 nAsset, SaveProfile* pProfile);
 int  fn_80078604(int a, int b, int c);
 void fn_80078620(int n, int* pA, int* pB, int* pC);
+void fn_80078680(SaveProfile* pProfile);
 void fn_8007873C(SaveProfile* pProfile);
 u8   FE_CrAP_IsAssetUndesirable(s16 nPart, CrAPAsset* pAsset);
 void fn_80078A2C(s16 nPart, int nChance);
@@ -728,6 +731,26 @@ void fn_80078620(int n, int* pA, int* pB, int* pC) {
     *pA = n / 10000;
     n -= *pA * 10000;
     *pC = n;
+}
+
+// Note which Create-A-Player assets are locked for the profile (fn_80078008), one bit each.
+void fn_80078680(SaveProfile* pProfile) {
+    int i;
+    int nCount;
+    s8 nSaved;
+    if (fn_80105C30()) {
+        nSaved = fn_80103BB4();
+        nCount = fn_80105C00();
+        for (i = 0; i < nCount; i++) {
+            fn_80103B8C(fn_80103BC0(i));
+            if (fn_80078008(i, pProfile)) {
+                fn_8001EA34(pProfile->aAssetLocked, i);
+            } else {
+                fn_8001EB6C(pProfile->aAssetLocked, i);
+            }
+        }
+        fn_80103B8C(nSaved);
+    }
 }
 
 // ---- the created golfer's parts -----------------------------------------------------------------
