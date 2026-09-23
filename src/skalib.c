@@ -496,14 +496,14 @@ int AnimLib_KeepRandomCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* p
                 for (j = nStart; j < pLeaf->nCount; j++) {
                     pRec = &pLib->pRecords[pIdx[j]];
                     if (SKA_KEEPABLE(pRec, pCtx)) {
-                        // fake match: the search's exit as a jump (not tested without it)
+                        // fake match: skips the other search (breaks and a test: 169 differ, not 0)
                         goto found;
                     }
                 }
                 for (j = nStart; j >= 0; j--) {
                     pRec = &pLib->pRecords[pIdx[j]];
                     if (SKA_KEEPABLE(pRec, pCtx)) {
-                        // fake match: the search's exit as a jump (not tested without it)
+                        // fake match: skips the other search (breaks and a test: 169 differ, not 0)
                         goto found;
                     }
                 }
@@ -527,7 +527,7 @@ int AnimLib_KeepRandomCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* p
                         pRec = (ClipRecord*)pRec->pClip;
                     }
                     if (!(pRec->n12 & 1) && pRec->n10 > 0 && pRec->n10 <= pCtx->nMaxUsers) {
-                        // fake match: the search's exit as a jump (not tested without it)
+                        // fake match: skips the other search (breaks and a test: 169 differ, not 0)
                         goto found2;
                     }
                 }
@@ -537,7 +537,7 @@ int AnimLib_KeepRandomCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* p
                         pRec = (ClipRecord*)pRec->pClip;
                     }
                     if (!(pRec->n12 & 1) && pRec->n10 > 0 && pRec->n10 <= pCtx->nMaxUsers) {
-                        // fake match: the search's exit as a jump (not tested without it)
+                        // fake match: skips the other search (breaks and a test: 169 differ, not 0)
                         goto found2;
                     }
                 }
@@ -1053,30 +1053,27 @@ u32 AnimLib_PlanBank(u32 nSlot) {
                 pOther = pLib;
                 pp     = pOvs - 1;
                 do {
-                    if (pOther == NULL) {
-                        // fake match: the search's exit as a jump (not tested without it)
-                        goto skip;
-                    }
-                    for (m = 0; m < pOther->nRecords; m++) {
-                        pRecO = &pOther->pRecords[m];
-                        if (strcmp(pRec->name, pRecO->name) == 0) {
-                            if (pRecO->n10 != 0) {
-                                nLeft--;
-                                nBytes -= pRec->n14;
+                    if (pOther != NULL) {
+                        for (m = 0; m < pOther->nRecords; m++) {
+                            pRecO = &pOther->pRecords[m];
+                            if (strcmp(pRec->name, pRecO->name) == 0) {
+                                if (pRecO->n10 != 0) {
+                                    nLeft--;
+                                    nBytes -= pRec->n14;
+                                }
+                                pRecO->n10 += pRec->n10;
+                                pRec->n10   = 0;
+                                pRec->pClip = pRecO;
+                                if (k != -1) {
+                                    pRec->n12 |= 0x10;
+                                } else {
+                                    pRec->n12 |= 2;
+                                }
+                                // fake match: leaves both loops (a found flag: 635 differ, not 421)
+                                goto next;
                             }
-                            pRecO->n10 += pRec->n10;
-                            pRec->n10   = 0;
-                            pRec->pClip = pRecO;
-                            if (k != -1) {
-                                pRec->n12 |= 0x10;
-                            } else {
-                                pRec->n12 |= 2;
-                            }
-                            // fake match: the search's exit as a jump (not tested without it)
-                            goto next;
                         }
                     }
-                skip:
                     k++;
                     pOther = (++pp)->pWork;
                 } while (k < i);
@@ -1085,22 +1082,19 @@ u32 AnimLib_PlanBank(u32 nSlot) {
                 pOther = pLib;
                 pp     = pOvs - 1;
                 do {
-                    if (pOther == NULL) {
-                        // fake match: the search's exit as a jump (not tested without it)
-                        goto skip2;
-                    }
-                    for (m = 0; m < pOther->nRecords; m++) {
-                        pRecO = &pOther->pRecords[m];
-                        if (strcmp(pRec->name, pRecO->name) == 0) {
-                            pRecO->n10 += pRec->n10;
-                            nLeft--;
-                            pRec->n10   = 0;
-                            pRec->pClip = pRecO;
-                            // fake match: the search's exit as a jump (not tested without it)
-                            goto next;
+                    if (pOther != NULL) {
+                        for (m = 0; m < pOther->nRecords; m++) {
+                            pRecO = &pOther->pRecords[m];
+                            if (strcmp(pRec->name, pRecO->name) == 0) {
+                                pRecO->n10 += pRec->n10;
+                                nLeft--;
+                                pRec->n10   = 0;
+                                pRec->pClip = pRecO;
+                                // fake match: leaves both search loops, as above
+                                goto next;
+                            }
                         }
                     }
-                skip2:
                     k++;
                     pOther = (++pp)->pWork;
                 } while (k < i);
@@ -1309,7 +1303,7 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
 
     if (nSlot < 3) {
         k        = nSlot;
-        pSlot    = &lbl_801C6068[nSlot];
+        pSlot    = &lbl_801C6068[k];
         pLibFile = pSlot->pLib;
         pSrc     = pLibFile;
     } else {
@@ -1318,9 +1312,9 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
             for (j = 0; j < pSlot->nOverlays; j++) {
                 pOv = &pSlot->overlays[j];
                 if (pOv->n10 == nSlot) {
-                    k       = pOv->pChar->nSlot;
+                    k        = pOv->pChar->nSlot;
                     pOv->n10 = -1;
-                    // fake match: the search's exit as a jump (not tested without it)
+                    // fake match: leaves both loops (two breaks and a test: 84.8%, not 87.1%)
                     goto found;
                 }
             }
@@ -1632,65 +1626,45 @@ void** AnimLib_Find(AnimLib* pLib, int nGroup, int nStyle, int nClub, int nKey, 
         if (nOff < 0) {
             *pFlags |= 1;
             nOff = pLib->nDefault;
-            // fake match: the search's exit as a jump (not tested without it)
-            goto leaf;
+        } else {
+            pNode = (s16*)(pLib->pTree + nOff);
+            nOff  = pNode[1 + nStyle];
+            if (nOff < 0 && nStyle != 0) {
+                nOff = pNode[1];
+            }
+            if (nOff < 0) {
+                *pFlags |= 1;
+                nOff = pNode[0];
+                if (nOff < 0) {
+                    nOff = pLib->nDefault;
+                    if (nOff < 0) return NULL;
+                }
+            } else {
+                nOff = *(s16*)(pLib->pTree + nOff + nClub * 2);
+                if (nOff < 0) {
+                    *pFlags |= 1;
+                    nOff = pNode[0];
+                    if (nOff < 0) {
+                        nOff = pLib->nDefault;
+                        if (nOff < 0) return NULL;
+                    }
+                } else {
+                    pClub = (s16*)(pLib->pTree + nOff);
+                    nOff  = pClub[2 + nKey];
+                    if (nOff < 0) {
+                        *pFlags |= 2;
+                        nOff = pClub[1];
+                        if (nOff < 0) {
+                            nOff = pNode[0];
+                            if (nOff < 0) {
+                                nOff = pLib->nDefault;
+                                if (nOff < 0) return NULL;
+                            }
+                        }
+                    }
+                }
+            }
         }
-        pNode = (s16*)(pLib->pTree + nOff);
-        nOff  = pNode[1 + nStyle];
-        if (nOff < 0 && nStyle != 0) {
-            nOff = pNode[1];
-        }
-        if (nOff < 0) {
-            *pFlags |= 1;
-            nOff = pNode[0];
-            if (nOff >= 0) {
-                // fake match: the search's exit as a jump (not tested without it)
-                goto leaf;
-            }
-            nOff = pLib->nDefault;
-            if (nOff >= 0) {
-                // fake match: the search's exit as a jump (not tested without it)
-                goto leaf;
-            }
-            return NULL;
-        }
-        nOff = *(s16*)(pLib->pTree + nOff + nClub * 2);
-        if (nOff < 0) {
-            *pFlags |= 1;
-            nOff = pNode[0];
-            if (nOff >= 0) {
-                // fake match: the search's exit as a jump (not tested without it)
-                goto leaf;
-            }
-            nOff = pLib->nDefault;
-            if (nOff >= 0) {
-                // fake match: the search's exit as a jump (not tested without it)
-                goto leaf;
-            }
-            return NULL;
-        }
-        pClub = (s16*)(pLib->pTree + nOff);
-        nOff  = pClub[2 + nKey];
-        if (nOff < 0) {
-            *pFlags |= 2;
-            nOff = pClub[1];
-            if (nOff >= 0) {
-                // fake match: the search's exit as a jump (not tested without it)
-                goto leaf;
-            }
-            nOff = pNode[0];
-            if (nOff >= 0) {
-                // fake match: the search's exit as a jump (not tested without it)
-                goto leaf;
-            }
-            nOff = pLib->nDefault;
-            if (nOff >= 0) {
-                // fake match: the search's exit as a jump (not tested without it)
-                goto leaf;
-            }
-            return NULL;
-        }
-leaf:
         pLeaf   = (s16*)(pLib->pTree + nOff);
         *pCount = pLeaf[0];
         if (ppUsed != NULL) {
@@ -1894,7 +1868,6 @@ AnimLib* AnimLib_Load(u8* pData, ClipBank* pBank) {
     void*     pSrc;
     u32       uPad;
     AnimLib*  pLib;
-    u8*       p;
     int       i;
 
     uPad = 16 - ((uptr)pData & 15);
@@ -1903,7 +1876,7 @@ AnimLib* AnimLib_Load(u8* pData, ClipBank* pBank) {
     }
     pLib        = (AnimLib*)(pData + uPad);
     pLib->pFile = pData;
-    p           = (u8*)pLib + sizeof(AnimLib);
+    pData       = (u8*)pLib + sizeof(AnimLib);   // from here on, where the next part of the file is
     pDst = pSrc = pLib;
     // port: an animation library's header ('SAL ', and 'SAC ' overlays), little-endian on disc; a
     //       little-endian port does not swap here.
@@ -1912,10 +1885,10 @@ AnimLib* AnimLib_Load(u8* pData, ClipBank* pBank) {
     if (pLib->pBank != NULL) {
         if (pBank == NULL) return NULL;
         pLib->pClipData = NULL;
-        pLib->ppClips   = (void**)p;
-        p += pLib->nClips * 4;
+        pLib->ppClips   = (void**)pData;
+        pData += pLib->nClips * 4;
         pLib->nClips2   = pLib->nClips;
-        pLib->pTree = p;
+        pLib->pTree = pData;
         pDst = pSrc = pLib->ppClips;
         // port: the library's clip numbers into its bank, little-endian on disc; a little-endian port does
         //       not swap here
@@ -1931,16 +1904,16 @@ AnimLib* AnimLib_Load(u8* pData, ClipBank* pBank) {
         }
         pLib->pBank = pBank;
     } else {
-        pLib->pIndex  = (s16*)p;
-        p += pLib->nClips * 2;
+        pLib->pIndex  = (s16*)pData;
+        pData += pLib->nClips * 2;
         pLib->nClips2 = pLib->nClips;
-        if ((uptr)p & 15) {
-            p = (u8*)((((uptr)p >> 4) + 1) << 4);
+        if ((uptr)pData & 15) {
+            pData = (u8*)((((uptr)pData >> 4) + 1) << 4);
         }
-        pLib->pRecords = (ClipRecord*)p;
-        p += pLib->nRecords * sizeof(ClipRecord);
-        pLib->pTree = p;
-        p += pLib->nTreeSize;
+        pLib->pRecords = (ClipRecord*)pData;
+        pData += pLib->nRecords * sizeof(ClipRecord);
+        pLib->pTree = pData;
+        pData += pLib->nTreeSize;
         pDst = pSrc = pLib->pIndex;
         // port: the library's clip index, little-endian on disc; a little-endian port does not swap here
         fn_80076158(&pSrc, pDst, pLib->nClips * 2, 2);
@@ -1949,10 +1922,10 @@ AnimLib* AnimLib_Load(u8* pData, ClipBank* pBank) {
         //       little-endian port does not swap here
         fn_8001F08C(&pSrc, &pDst, recFmt, 7, pLib->nRecords);
         if (pLib->uFlags & 1) {
-            if ((uptr)p & 15) {
-                p = (u8*)((((uptr)p >> 4) + 1) << 4);
+            if ((uptr)pData & 15) {
+                pData = (u8*)((((uptr)pData >> 4) + 1) << 4);
             }
-            pLib->pClipData = p;
+            pLib->pClipData = pData;
             pLib->ppClips   = fn_80009B34(pLib->nClips * 4, 2, 0x40, "skalib.c", 4164);
             for (i = 0; i < pLib->nRecords; i++) {
                 pLib->pRecords[i].pClip =
