@@ -501,6 +501,25 @@ u8 fn_80105C30(void) {
 void fn_80105EFC(void) {
 }
 
+// How many offered assets of the part that fit its entry n come before the asset in the part's
+// list: the asset's place in that list.
+void fn_801060F0(int nAsset, s16 nPart, int n, s32* pnPlace) {
+    int i;
+    int nCount = 0;
+    int nWanted;
+
+    i = fn_80105140(lbl_80282460->pAssets[nAsset].nPart);
+    nWanted = fn_80104AF4(nPart, n);
+
+    for (; i < nAsset; i++) {
+        if (nPart == lbl_80282460->pAssets[i].nPart && fn_801061C8(lbl_80282460->pAssets[i].n40) &&
+            fn_801061F8(nPart, lbl_80282460->pAssets[i].nCategory, nWanted)) {
+            nCount++;
+        }
+    }
+    *pnPlace = nCount;
+}
+
 // An asset with this n40 is offered: it matches the database's n4, or 2 (any).
 u8 fn_801061C8(s8 n) {
     if (n == lbl_80282460->n4 || n == 2) {
