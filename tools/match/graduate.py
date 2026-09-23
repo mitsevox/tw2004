@@ -25,7 +25,8 @@ r = subprocess.run('ninja', shell=True, cwd=ROOT, capture_output=True, text=True
 ok = 'main.dol: OK' in r.stdout
 print(unit, 'OK' if ok else 'FAILED')
 if not ok:
-    print('\n'.join(l for l in r.stdout.splitlines() if 'WARN' not in l and ('rror' in l or 'FAIL' in l))[:3000])
+    print('\n'.join(l for l in r.stdout.splitlines()
+                    if 'WARN' not in l and ('rror' in l or 'FAIL' in l or l.startswith('#   ')))[:3000])
     open(SP, 'w', encoding='utf-8', newline='').write(sp0)
     open(CF, 'w', encoding='utf-8', newline='').write(cf0)
     subprocess.run('python configure.py', shell=True, cwd=ROOT, capture_output=True)
