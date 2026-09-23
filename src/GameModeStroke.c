@@ -4,19 +4,10 @@
 // and 23 reuse some of these callbacks.
 
 #include "golfer.h"
+#include "game.h"
 
-int   Game_CurHoleIndex(void);
-int   Game_CurrentHole(void);
-u8    Player_IsHoled(int nPlayer);
-u8    Player_OnTee(int nPlayer);
-void  GOLFERSTATE_Set(int nState, int nPlayer);
-void  fn_800E1480(int nHole);
-u8    fn_800E1BBC(void);
-u8    fn_800EC550(void);
 int   fn_800E1788(int nPlayer);             // the player's round total
 int   fn_800D3C7C(int nPlayer);             // the player's golfer
-void  fn_800D3548(int nPlayer, int nMoney, int a);
-void  fn_800E4364(u32 nQueue, int a, int b, int c);
 void  fn_80125854(int a);
 extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
 extern u8* gpSaveData;
@@ -40,7 +31,6 @@ typedef struct TeeOrder {
 } TeeOrder;
 extern TeeOrder lbl_80184DF0;
 
-void fn_800FF7DC(void);
 s32  fn_800FF894(int nPlayer);
 u8   fn_800FFCCC(int nPlayer, int a);
 u8   fn_800FFD54(int a);
@@ -264,7 +254,7 @@ void fn_800FFDB8(void) {
                         if (nBase) {
                             fn_800E4364(0, 0x6A, nBase, nProfile);
                         }
-                        fn_800D3548(i, nMoney, 0);
+                        fn_800D3548(i, nMoney, NULL);
                     }
                 }
             }

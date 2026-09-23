@@ -4,6 +4,8 @@
 // starts and puts them back when it ends. Golfer.c, Swing.c and skalib.c ask it what the lesson allows.
 
 #include "golfer.h"
+#include "game.h"
+#include "engine.h"
 
 // One lesson: where the ball is placed and what the shot must be (lessons 1..11; 12 is the end).
 typedef struct Lesson {
@@ -34,29 +36,19 @@ extern s32 lbl_80282420;
 extern s32 lbl_80282424;
 extern s32 lbl_80282428;                    // the lesson's step
 
-int   Game_CurHoleIndex(void);
 int   strcmp(const char* a, const char* b);
-void  fn_800E1260(int nPreset);
-void  fn_800E1434(void);
 void  fn_800E14E0(int nCourse);
-void  Session_SetNumPlayers(int n);
 void  Session_SetGolfer(int nGolfer, int nPlayer);
 void  fn_80055C1C(u8 b);
-void  fn_8000B1D4(int nStream, u32 nSeed);
 void  GM_FlyByMode_Init(void);
 void  fn_80125854(int a);
 void  fn_800A6EC8(void);
-void  fn_80062D6C(int a, int nPlayer);
-void  fn_80062D38(int a, int b, int c);
-void  fn_800E58B4(int a);
-void  fn_800A7664(int a, int b, int c);
 
 void fn_801000E8(void);
 void fn_80100108(void);
 void fn_80100128(void);
 void fn_80100160(void);
 void fn_80100230(void);
-u8   fn_80100294(void);
 void fn_80100308(void);
 void fn_80100A3C(int nPlayer);
 void fn_80100C08(void);
