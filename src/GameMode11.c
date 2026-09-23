@@ -203,13 +203,16 @@ void fn_80100160(void) {
 
 // The mode ends: the saved options go back.
 void fn_80100230(void) {
+    Session* pSession;
     SESSION_OPTIONS->unkC = lbl_802816D8;
     SESSION_OPTIONS->nWind = lbl_802823EC;
     fn_80055C1C(0);
-    SESSION_OPTIONS->unk0[4] = lbl_8028240B;
-    SESSION_OPTIONS->unk84 = lbl_8028240A;
-    SESSION_OPTIONS->bBoostEnabled = lbl_80282409;
-    SESSION_OPTIONS->bSpinEnabled = lbl_80282408;
+    // fake match: &gSession re-taken inside the first store after the call, as the original
+    // recomputes it
+    SESSION_OPTIONS_OF(pSession = &gSession)->unk0[4] = lbl_8028240B;
+    SESSION_OPTIONS_OF(pSession)->unk84 = lbl_8028240A;
+    SESSION_OPTIONS_OF(pSession)->bBoostEnabled = lbl_80282409;
+    SESSION_OPTIONS_OF(pSession)->bSpinEnabled = lbl_80282408;
 }
 
 // Is a lesson running (mode 11)?
