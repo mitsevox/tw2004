@@ -38,7 +38,7 @@ Last updated 2026-09-23.
   animation library (`skalib.c`), the asset stream decompressor (`UStream.c`), and about 2,370
   small functions (accessors, setters, call wrappers and short functions decompiled with m2c) in
   `unsorted/sweep_*` files, pending their real file names.
-- Named: about 1,350 functions, 47 of them carried over from a Tiger Woods PGA Tour 06 symbol file
+- Named: about 1,350 functions, 46 of them carried over from a Tiger Woods PGA Tour 06 symbol file
   (`docs/tw06-names.md`). About 6,290 are still `fn_ADDRESS`.
 - Compiler: CodeWarrior GC/2.5, `-O4,p`. See `docs/compiler.md`.
 - Asset formats: the CTRL container (`.hog`/`.gcb`/`.ngc`, with an extractor), course textures

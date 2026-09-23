@@ -3792,7 +3792,7 @@ int   fn_8001EED8(void* pSkel, int nBone);    // a bone's index
 f32   fn_8004D620(CourseInfo* pCourse, f32* pPos);   // ground height, -60000 and below if none
 void fn_80062DDC(f32* pA, f32* pB, f32* pOut);       // a - b
 double fn_80009744(f32* pVec);                // dot with itself
-void  vec4flt_LengthSquared3(f32* pSrc, f32* pDst);      // normalise (3)
+void  fn_800BAF04(f32* pSrc, f32* pDst);      // normalise (3)
 void  fn_80051A18(u8* pBall, f32* pDir, f32 fSpeed, u8* pFrom);   // Ball.c: launch with a velocity
 extern Vec4 lbl_80183680;
 extern f32  gRealBallRadiusIn;               // 0x80283300  0.84: a real golf ball, in inches
@@ -3845,7 +3845,7 @@ void SwingState18_Update(int nPlayer) {
                     fn_80062DDC((f32*)pB, pPrev, vDir);
                     fSpeed = (f32)fn_80009680(fn_80009744(vDir));
                     if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
-                        vec4flt_LengthSquared3(vDir, vDir);
+                        fn_800BAF04(vDir, vDir);
                     }
                     fSpeed = 60.0f * (60.0f * (59.94f * (fSpeed / 1760.0f))) * 0.5f;
                     fn_80062B98(*pHandle, 4);

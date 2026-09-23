@@ -104,7 +104,7 @@ extern f32 gFairwaySpeedMul[3];                  // 0x801834A8  by gFairwaySetti
 extern f32 gRoughMul[3];                         // 0x801834B4  by options +0x1C: 1.3 1.0 0.7 (class 5)
 void   PsBallFx_TriggerTrail(Ball* pBall, int nPlayer);    // rolling sound / effect
 void   Ball_CupPull(Ball* pBall, f32 fDt);
-void   vec4flt_LengthSquared3(f32* pSrc, f32* pDst);        // normalise
+void   fn_800BAF04(f32* pSrc, f32* pDst);        // normalise
 f32    fn_8000C5FC(f32* pA, f32* pB);            // dot product
 void   fn_8000C5D4(f32* pA, f32* pB, f32 f, f32* pOut);   // a + f x b
 void   vec4flt_CrossProduct(f32* pA, f32* pB, f32* pOut); // cross product
@@ -513,7 +513,7 @@ u8 Physics_GetShotData(Ball* pBall, int nClub, int nKind, f32 fPower, f32 fAim, 
         fSpeed *= 7.2f;
         fn_8001EF34(pB, fSpeed, vDir);
         fn_80055D70(&vDir[0], &vDir[2], fSinAim, fCosAim);
-        vec4flt_LengthSquared3(vNormal, vNormal);
+        fn_800BAF04(vNormal, vNormal);
         fn_8000C5D4(vDir, vNormal, -fn_8000C5FC(vDir, vNormal), pVel);
         fn_8001EF34(pVel, 1.8f, pVel);
         pSpin[0] = 0.0f;
@@ -830,7 +830,7 @@ void fn_80052268(Ball* pBall, f32 fTicks) {
     f32          fPull, fDot, fFric;
     if (!Physics_GetSurfaceInfo(pBall, &pSurface, vNormal)) return;
     pBall->nSurface = fn_80050BEC(pSurface);
-    vec4flt_LengthSquared3(vNormal, vNormal);
+    fn_800BAF04(vNormal, vNormal);
     fPull = 1.0f - pSurface->f14;
     if (pSurface->nClass == 3) fPull *= 2.0f - gGreenSpeedMul[gGreenSpeedSetting];
     if (pSurface->nClass == 2) fPull *= 2.0f - gFairwaySpeedMul[gFairwaySetting];
@@ -843,7 +843,7 @@ void fn_80052268(Ball* pBall, f32 fTicks) {
     vAccel[1] = fPull * (-0.107170001f - vNormal[1] * fDot);
     vAccel[2] = -(fPull * (vNormal[2] * fDot));
     fn_8000C5D4(pBall->vVel, vNormal, -fn_8000C5FC(pBall->vVel, vNormal), vTmp);
-    vec4flt_LengthSquared3(vTmp, vDir);
+    fn_800BAF04(vTmp, vDir);
     fn_8001EF34(vDir, fn_80009680(fn_80009744(pBall->vVel)), pBall->vVel);
     fFric = 1.5f * (pSurface->f18 * (-0.107170001f * vNormal[1]));
     if (pSurface->nClass == 3) fFric *= 2.0f - gGreenSpeedMul[gGreenSpeedSetting];
@@ -953,13 +953,13 @@ f32 Physics_HandleCollision(Ball* pBall, f32* pNormal, SurfaceType* pSurface) {
     } else if (fLen != 0.0f) {
         fn_8000C5D4(pNormal, vBent, fA / fLen, pNormal);
     }
-    vec4flt_LengthSquared3(pNormal, pNormal);
+    fn_800BAF04(pNormal, pNormal);
     fn_8001EF34(pNormal, -0.839999974f, vDown);
     vec4flt_CrossProduct(pBall->vSpin, vDown, vCon);
     fn_80055E7C(vCon, pBall->vVel, vCon);
     fn_8000C5D4(vCon, pNormal, -fn_8000C5FC(vCon, pNormal), vSlide);
     if (fn_80009744(vSlide) != 0.0f) {
-        vec4flt_LengthSquared3(vSlide, vDir);
+        fn_800BAF04(vSlide, vDir);
     } else {
         Vec3Copy(pNormal, vDir);
     }
@@ -1136,7 +1136,7 @@ u8 fn_80053240(Ball* pBall, f32 fTicks) {
     if (0.375f != pSurface->f1C) {
         pSurface = &gSurfaceTypes[14];
     }
-    vec4flt_LengthSquared3(vNormal, vNormal);
+    fn_800BAF04(vNormal, vNormal);
     if (pSurface->f0C >= 0.0f) {
         Vec3Copy(vHit, pBall->vPos);
         pBall->vPos[1] += 0.027055556f;
@@ -1333,13 +1333,13 @@ u8 Physics_ProcessCollision(Ball* pBall, f32* pHit, f32* pNormal, SurfaceType* p
         r >>= 8;
         nB = (r & 7) + 12;
         if (r & 31) nB = -nB;
-        vec4flt_LengthSquared3(pNormal, pNormal);
+        fn_800BAF04(pNormal, pNormal);
         fn_80055E28(0.017453292f * nA, &fSin, &fCos);
         fn_80055D70(&pNormal[0], &pNormal[1], fSin, fCos);
         fn_80055E28(0.017453292f * nB, &fSin, &fCos);
         fn_80055D70(&pNormal[2], &pNormal[1], fSin, fCos);
     }
-    vec4flt_LengthSquared3(pNormal, pNormal);
+    fn_800BAF04(pNormal, pNormal);
     pHit[1] += BALL_RADIUS;
     if (pNormal[1] > 0.0f) {
         pHit[1] += 0.0013888889f;
@@ -1725,9 +1725,9 @@ void Ball_GroundContact(Ball* pBall, f32 fTicks) {
             return;
         }
     }
-    vec4flt_LengthSquared3(vNormal, vNormal);
+    fn_800BAF04(vNormal, vNormal);
     fn_8000C5D4(pBall->vVel, vNormal, -fn_8000C5FC(pBall->vVel, vNormal), vTmp);
-    vec4flt_LengthSquared3(vTmp, vDir);
+    fn_800BAF04(vTmp, vDir);
     fn_8001EF34(vDir, fn_80009680(fn_80009744(pBall->vVel)), pBall->vVel);
     fn_8001EF34(vNormal, -0.839999974f, vDown);
     fZ   = -0.173615396f * vDown[2];

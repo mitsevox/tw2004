@@ -61,7 +61,7 @@ functions under 48 bytes are never named from call-graph evidence.
 | `800A8934` | `fn_800A8934` | `Mov_Exit` | strong | anchor(1) | 180 / 138 |
 | `800B251C` | `fn_800B251C` | `SH_vSetShadowIntensity` | strong | anchor(1) | 448 / 103 |
 | `800B4E28` | `fn_800B4E28` | `SD_vShaderObject_Rain_Dynamic_Init` | strong | anchor(1) | 252 / 1279 |
-| `800BAF04` | `fn_800BAF04` | `vec4flt_LengthSquared3` | strong | nbr(r7,11) | 84 / 89 |
+| `800BAF04` | `fn_800BAF04` | ~~`vec4flt_LengthSquared3`~~ | **rejected** | nbr(r7,11); our code shows it normalises a vector (src, dst), which a squared-length function cannot | 84 / 89 |
 | `800BB42C` | `fn_800BB42C` | `SitDev_LoadScripts` | strong | anchor(1) | 132 / 298 |
 | `800BEEB0` | `fn_800BEEB0` | `GolfCamera_InitSteepSlopeCamera` | strong | anchor(1) | 120 / 78 |
 | `800BEFAC` | `fn_800BEFAC` | `GolfCamera_InitElevatorCamera` | strong | anchor(1) | 232 / 146 |

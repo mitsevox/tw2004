@@ -514,7 +514,7 @@ Downloaded from debugging.games to `C:\dev\ext\symbols\` (reference only, never 
   (`DynTex::`, `UMemPoolResizeable::`); much is still C (`UIDList*`, `DynMemPool_*`).
   x86 code, so no byte matching: names and struct layouts have to be carried over by string
   references, call graphs and constants.
-- **Name transfer, first pass (2026-09-23): 85 functions paired, 47 applied** (list and evidence:
+- **Name transfer, first pass (2026-09-23): 85 functions paired, 46 applied** (one strong pairing rejected because our own code contradicts it: small vector helpers are the weak spot) (list and evidence:
   [`tw06-names.md`](tw06-names.md)). Tools in `C:\dev\scratch\tw\`: `anchors.py` (strings and
   float constants per function; Xbox side exact from the debug exe's base relocations, GameCube
   side by following lis/addi/ori and r2/r13 arithmetic per register) and `callgraph.py`
