@@ -259,6 +259,9 @@ GoTerrainCollision.c:
 Ball.c:
 	.text       start:0x80050C2C end:0x8005620C
 
+LLPictInt.c:
+	.text       start:0x8005620C end:0x800563C4
+
 user.c:
 	.text       start:0x800563C4 end:0x80056480
 

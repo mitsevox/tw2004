@@ -1,7 +1,7 @@
 // LLPict_Gc.c (EA's name, from its asserts; also in EA's 2002 source tree): not yet decompiled; the
 // sweep code below is the matched small functions.
 
-#include "engine.h"
+#include "llpict.h"
 
 // ---- sweep code (not yet cleaned up) ----
 
@@ -74,9 +74,6 @@ void fn_8002FF94(void) {
 void fn_800B9930();
 void fn_8003001C(s32 p0, u8* p1);
 void fn_8003009C(void);
-s32 fn_800301D0(void* arg0);
-s32 fn_800301F4(u8* p0);
-s32 fn_8003020C(u8* p);
 s32 fn_80030214(u8* p0);
 s32 fn_80030234(u8* p0);
 s32 fn_8003024C(u8* p);
@@ -88,17 +85,21 @@ void fn_8003001C(s32 p0, u8* p1) {
 void fn_8003009C(void) {
 }
 
-s32 fn_800301D0(void* arg0) {
-    return (*(s32*)((u8*)(arg0) + 0x60)) + ((s32) ((*(s32*)((u8*)(arg0) + 0x64)) * (*(s32*)((u8*)(arg0) + 0x68)) * 5) / 4);
+// ---- end of sweep code ----
+
+u8* fn_800301D0(LLPict* pPict) {
+    return pPict->pPixels + pPict->nWidth * pPict->nHeight * 5 / 4;
 }
 
-s32 fn_800301F4(u8* p0) {
-    return (*(s32*)(p0 + 0x60) + (*(s32*)(p0 + 0x64) * *(s32*)(p0 + 0x68)));
+u8* fn_800301F4(LLPict* pPict) {
+    return pPict->pPixels + pPict->nWidth * pPict->nHeight;
 }
 
-s32 fn_8003020C(u8* p) {
-    return *(s32*)(p + 0x60);
+u8* fn_8003020C(LLPict* pPict) {
+    return pPict->pPixels;
 }
+
+// ---- sweep code (not yet cleaned up) ----
 
 s32 fn_80030214(u8* p0) {
     return (*(s32*)(p0 + 0x8) + ((u32)((*(s32*)p0 * *(s32*)(p0 + 0x4)) * 5) >> 2));
