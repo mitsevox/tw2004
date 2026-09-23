@@ -1,5 +1,3 @@
-// Small functions found by the sweep (sweep.py). Original file and meanings unknown.
-
 #include "game_types.h"
 
 void GXCopyTex();
@@ -8,9 +6,9 @@ void GXSetTexCopyDst();
 void GXSetTexCopySrc();
 s32 fn_8002A624();
 void DF_vDrawBufferToScreen();
-
 void fn_80045880(s32 p0);
 void fn_800458B4(void);
+
 void fn_80045880(s32 p0) {
     fn_800458B4();
     DF_vDrawBufferToScreen(p0);
