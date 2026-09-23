@@ -58,12 +58,7 @@ s16 lbl_80192F2C[12 * 16] = {
     60, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 };
 
-typedef struct Vec4 {
-    f32 x, y, z, w;
-} Vec4;
-extern Vec4 lbl_80184E00;                   // 0, 0, 0, 0.5
-
-extern s32 lbl_802816D8;                    // the options' unkC, saved while the mode runs
+extern s32 lbl_802816D8;                    // the options' nC, saved while the mode runs
 extern u8  lbl_802823E0;
 extern u8  lbl_802823E1;
 extern u8  lbl_802823E2;
@@ -519,9 +514,8 @@ static inline int Hint(void) {
 // 7 the player's tries with their hints, 8..11 a failed try, 12 a passed one, 13..19 the screens
 // between lessons.
 void fn_80100C08(void) {
-    Vec4 v;
+    f32 v[4] = {0.0f, 0.0f, 0.0f, 0.5f};
     int nView;
-    v = lbl_80184E00;
     if (lbl_802823F8) {
         fn_800E58B4(39);
         lbl_802823F8 = 0;
@@ -540,7 +534,7 @@ void fn_80100C08(void) {
             if (lbl_80282424 == 13) {
                 lbl_80282428 = 18;
                 lbl_80282424 = 13;
-                fn_80063BF4(fn_80017028(gPlayers[0].nView0), 0.25f, &v.x);
+                fn_80063BF4(fn_80017028(gPlayers[0].nView0), 0.25f, v);
             }
         }
         break;
