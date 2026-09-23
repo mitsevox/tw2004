@@ -1274,7 +1274,7 @@ void fn_800FCCF0(void) {
     int nPlayer;
     int k;
     CourseInfo* pHole;
-    if (gSession.n14 == 0) {
+    if (gSession.nPaused == 0) {
         if (Game_GetMode() == 7) {
             i = PLR_1_e;
             nOther = PLR_2_e;

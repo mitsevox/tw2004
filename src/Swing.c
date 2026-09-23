@@ -1815,7 +1815,7 @@ void fn_8005A7A0(int nPlayer) {
     if ((gPlayers[nPlayer].swing.nPowerBoost > 0 || gPlayers[nPlayer].swing.nSpinBoost > 0) &&
         gPlayers[nPlayer].nShotKind != 0 && gPlayers[nPlayer].swing.bDrawBoostUI != 0 &&
         gSession.bReplay == 0 &&
-        gSession.n14 == 0 && !fn_800C6CB0()) {
+        gSession.nPaused == 0 && !fn_800C6CB0()) {
         fn_800AE3F8(gPlayers[nPlayer].nView[0]);
     }
 }

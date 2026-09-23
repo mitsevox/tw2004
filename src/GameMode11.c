@@ -475,7 +475,7 @@ void fn_80100B38(void) {
     if (!fn_80100294() || lbl_802823FC == 12) {
         return;
     }
-    if (gSession.n14 == 0 && lbl_80282428 != 17) {
+    if (gSession.nPaused == 0 && lbl_80282428 != 17) {
         fn_800A76E4();
         if (lbl_802823FC == 0) {
             lbl_802823FC = 1;

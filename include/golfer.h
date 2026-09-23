@@ -432,7 +432,8 @@ typedef struct Session {
     u8   b12;                   // 0x012  set by the pause menu, a replay and the lessons; GameManager
                                 //        tests it
     u8   bReplay;               // 0x013  a saved replay is playing: no luck swap, no spin, instant launch
-    s32  n14;                   // 0x014  nonzero while the game is paused (GameUI.c; GameMessages.c sets 2)
+    s32  nPaused;               // 0x014  0 running, 1 paused (GameUI fn_800E3E3C), 2 paused until the last
+                                //        menu screen closes (fn_800E5240 then unpauses)
     f32  fFrameTime;            // 0x018  seconds per frame
     f32  f1C;                   // 0x01C
     s32  n20;                   // 0x020

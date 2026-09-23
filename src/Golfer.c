@@ -1820,7 +1820,7 @@ void Session_Init(void) {
     pSession->b11         = 0;
     pSession->b12         = 0;
     pSession->bReplay     = 0;
-    pSession->n14       = 0;
+    pSession->nPaused   = 0;
     pSession->uFlags     &= ~0x60;
     pSession->fFrameTime  = 0.0f;
     pSession->f1C         = 0.0f;

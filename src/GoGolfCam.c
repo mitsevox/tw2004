@@ -497,7 +497,7 @@ void fn_800C1338(View* pView, int nPlayer) {
     if (pView->n140 == 6 || pView->n140 == 8 || pView->n140 == 9 || pView->n140 == 10) {
         pView->p134 = NULL;
     }
-    if (fn_800DC514(nPlayer) && gSession.n14 == 0) {
+    if (fn_800DC514(nPlayer) && gSession.nPaused == 0) {
         fTime = FRAME_TIME;
     }
     fn_8003DCE8(nPlayer, pCam, pSub, &pView->script, &pView->shot19C, 0, fTime);
@@ -642,7 +642,7 @@ void GolfCamera_ProcessHeartBeatCamera(View* pView, int nPlayer) {
     f32* pSub = fn_80017314(pView);
     CamShot* pShot = NULL;
     f32 v[4] = {0.0f, 0.0f, 0.0f, 0.5f};
-    if (gSession.n14 == 0) {
+    if (gSession.nPaused == 0) {
         if (lbl_80282220->b5A) {
             if (pView->nCamera == 5) {
                 if (pView->n194 >= lbl_80281F78->nBeats * lbl_80281F78->nBeatFrames) {
@@ -1188,7 +1188,7 @@ void fn_800C4E80(View* pView, int nPlayer) {
 f32 fn_800C54FC(View* pView, f32* pCam, f32* pSub, int nPlayer) {
     f32 fTime = 0.0f;
     CamShot* pShot;
-    if (gSession.n14 == 0) {
+    if (gSession.nPaused == 0) {
         fn_80038054(1, fn_80016D10(), 0.0f, lbl_80281F78->f64);
     }
     if (pView->p134 == NULL) {
@@ -1212,7 +1212,7 @@ f32 fn_800C54FC(View* pView, f32* pCam, f32* pSub, int nPlayer) {
             pView->p134->p44 = pShot;
         }
     }
-    if (gSession.n14 == 0) {
+    if (gSession.nPaused == 0) {
         if (lbl_80281F78->f60) {
             if (pView->f18C > lbl_80281F78->f60) {
                 fTime = lbl_80281F78->f60;
@@ -1237,7 +1237,7 @@ f32 fn_800C5A70(View* pView, f32* pCam, f32* pSub, int nPlayer) {
     CamTuning* pTune;
     f32 t;
     f32 f;
-    if (gSession.n14 == 0) {
+    if (gSession.nPaused == 0) {
         pTune = lbl_80281F78;
         fn_80038054(1, fn_80016D10(), pTune->f8C, pTune->f88);
     }
@@ -1282,7 +1282,7 @@ f32 fn_800C5A70(View* pView, f32* pCam, f32* pSub, int nPlayer) {
         lbl_80282220->shot12C.f78 = lbl_80281F78->f80;
         lbl_80282220->shot12C.f7C = lbl_80281F78->f80;
     }
-    if (gSession.n14 == 0) {
+    if (gSession.nPaused == 0) {
         fTime = FRAME_TIME;
     }
     return fTime;

@@ -445,7 +445,7 @@ void fn_800DBDA8(int nPlayer) {
 
 // TW06: GameEffects_RenderGameBreakerEffects (by position).
 void fn_800DBF34(void) {
-    if (lbl_80202898.bGameBreaker && gSession.n14 == 0 && !lbl_80202898.bPaused) {
+    if (lbl_80202898.bGameBreaker && gSession.nPaused == 0 && !lbl_80202898.bPaused) {
         switch (lbl_80202898.nGBType) {
         case 1:
             fn_800DBFAC();
@@ -562,7 +562,7 @@ f32 fn_800DC3A4(void) {
     if (!lbl_80202898.bGameBreaker) {
         return 0.0f;
     }
-    if (gSession.n14 != 0) {
+    if (gSession.nPaused != 0) {
         return 0.0f;
     }
     if (lbl_80202898.bPaused) {
