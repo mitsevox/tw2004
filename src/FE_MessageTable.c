@@ -20,6 +20,7 @@ void fn_8008E354(void);                 // FEgolferanim.c
 void fn_8008F80C(s32 p0, s32 p1);       // uiProcessInterface.c
 void fn_8008E358(s32 p0);               // FEgolferanim.c
 s32  fn_800A0C6C(MCCardPosStr* pPos);   // MC.c
+s32  fn_800A0230(MCCardPos* pPos);      // MC.c: load a replay from the card
 void fn_800A78F0(f32 f);
 void fn_8009CD80(s32 nPort, s32 nSlot); // MC_Gc.c
 s32  fn_8009D390(s32 nPort, s32 nSlot); // MC_Gc.c
@@ -2397,6 +2398,19 @@ void fn_8007E3D4(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
+// Record nKind, place pArgs[1]: its value, and its holder's name into pArgs[2]. pArgs[0] is the
+// course; past the last course it is the all-time records.
+void fn_8007E458(int nKind, MsgArg* pArgs, MsgArg* pResult) {
+    if (pArgs[0].i < NUM_COURSE_RECORDS) {
+        pResult->i = gSession.aCourseRecord[pArgs[0].i].aRecord[nKind][pArgs[1].i].nValue;
+        strcpy(((MsgString*)pArgs[2].p)->pStr,
+               gSession.aCourseRecord[pArgs[0].i].aRecord[nKind][pArgs[1].i].szName);
+        return;
+    }
+    pResult->i = gSession.recA[nKind][pArgs[1].i].nValue;
+    strcpy(((MsgString*)pArgs[2].p)->pStr, gSession.recA[nKind][pArgs[1].i].szName);
+}
+
 void fn_8007E51C(MsgArg* pArgs, MsgArg* pResult) {
     fn_8007E458(0, pArgs, pResult);
 }
@@ -2429,7 +2443,43 @@ void fn_8007E650(MsgArg* pArgs, MsgArg* pResult) {
     fn_8007E458(7, pArgs, pResult);
 }
 
+// Load the replay at card position pArgs[0..2]: 1 when it loaded. Its golfer (a created golfer is
+// replaced by golfer 0) and course are set up for the session.
+void fn_8007E67C(MsgArg* pArgs, MsgArg* pResult) {
+    MCCardPos pos;
+
+    pos.nPort = pArgs[0].i;
+    pos.nSlot = pArgs[1].i;
+    pos.n8 = pArgs[2].i;
+    pResult->i = fn_800A0230(&pos) == 0;
+    if (pResult->i != 0) {
+        if (lbl_801D7148.aLoaded[0] == 1) {
+            Session_SetGolfer(FIRST_CREATED_GOLFER, 0);
+        } else if (gReplayData.player.golfer.nIndex >= FIRST_CREATED_GOLFER) {
+            Session_SetGolfer(0, 0);
+        } else {
+            Session_SetGolfer(gReplayData.player.golfer.nIndex, 0);
+        }
+        fn_800E14E0(gReplayData.nCourse);
+        lbl_80281ED4->b0 = 0;
+    }
+}
+
 void fn_8007E744(MsgArg* pArgs, MsgArg* pResult) {
+}
+
+// Whether one of the four names on the card at pArgs[0], pArgs[1] is pArgs[2].
+void fn_8007E79C(MsgArg* pArgs, MsgArg* pResult) {
+    MCCardState state;
+    int i;
+
+    fn_8009F7F4(&state, pArgs[0].i, pArgs[1].i);
+    pResult->i = 0;
+    for (i = 0; i < 4; i++) {
+        if (strcmp(state.aszName[i], ((MsgString*)pArgs[2].p)->pStr) == 0) {
+            pResult->i = 1;
+        }
+    }
 }
 
 void fn_8007E748(MsgArg* pArgs, MsgArg* pResult) {
