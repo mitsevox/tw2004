@@ -36,6 +36,9 @@ void fn_800E25E0(void);                 // GameRound.c
 void fn_800E30D4(void);                 // GameRound.c: builds the mixed rounds
 int  fn_80110180(void);
 s32  fn_8011027C(void);                 // DiscCheck.c
+int  fn_80110450(void);                 // DiscCheck.c (defined there as u8; callers here see int)
+u8*  fn_801104A0(void);                 // DiscCheck.c: the disc read's command block
+s32  DVDGetCommandBlockStatus(u8* pBlock);
 void fn_80126F84(s32 n);                // GameMode22.c: sets lbl_80195498.n4
 void fn_80126F94(s32 n);                // GameMode22.c: sets lbl_80195498.n0
 void GM_SetupCustomHoleSelection(void); // GameManager.c
@@ -4252,6 +4255,36 @@ void fn_80083BC8(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
     if (pResult->i == 0) {
         fn_801102AC();
+    }
+}
+
+// The disc read's state for the menus (100: fn_80110450 says so), like GameUICommands.c's
+// fn_8008A010 for the drive.
+void fn_80083D88(MsgArg* pArgs, MsgArg* pResult) {
+    switch (DVDGetCommandBlockStatus(fn_801104A0())) {
+    case 7:
+        if (fn_8011027C() != 0) {
+            pResult->i = 0;
+        } else {
+            pResult->i = 1;
+        }
+        break;
+    case 6:
+        if (fn_8011027C() != 0) {
+            pResult->i = 2;
+        } else {
+            pResult->i = 3;
+        }
+        break;
+    case 1:
+        pResult->i = 4;
+        break;
+    default:
+        pResult->i = 5;
+        break;
+    }
+    if (fn_80110450() != 0) {
+        pResult->i = 100;
     }
 }
 
