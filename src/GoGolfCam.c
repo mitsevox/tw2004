@@ -90,6 +90,24 @@ typedef struct ShotObj {
     f32  fAnimTime;             // 0x17C
 } ShotObj;
 
+// The create-a-player (CrAP) screen's state at lbl_80281EE0; only what the CrAP camera reads.
+typedef struct CrAPModel {
+    u8   unk0[0x34];
+    s32  n34;                   // 0x34  1: the shot names get an 'f' in front
+} CrAPModel;
+typedef struct CrAPGolfer {
+    u8   unk0[8];
+    CrAPModel* p8;              // 0x08
+    s32  nC;                    // 0x0C
+    u8   unk10[8];
+    u8   b18;                   // 0x18  the camera script runs
+} CrAPGolfer;
+typedef struct CrAPState {
+    s32  nView;                 // 0x00  which part of the golfer is being edited (0..4)
+    u8   unk4[0xB4 - 0x4];
+    CrAPGolfer* pB4;            // 0xB4
+} CrAPState;
+
 // The camera tuning values.
 typedef struct CamTuning {
     u8   unk0[0x4C];
@@ -104,7 +122,8 @@ typedef struct CamTuning {
     f32  f78;                   // 0x78  ... over this many seconds
     u8   unk7C[0x94 - 0x7C];
     f32  f94;                   // 0x94  the elevator camera's first blend value
-    u8   unk98[0xBC - 0x98];
+    u8   unk98[0xB8 - 0x98];
+    f32  fB8;                   // 0xB8  camera 15 waits this long on a ball near the green
     s32  nBeats;                // 0xBC  the heartbeat camera's beats
     s32  nBeatFrames;           // 0xC0
     f32  fC4;                   // 0xC4
@@ -157,7 +176,8 @@ typedef struct View {
     u8       unk12C[4];
     CamShot* p130;              // 0x130  the current shot
     CamShot* p134;              // 0x134  the next one
-    u8       unk138[0x140 - 0x138];
+    CamShot* p138;              // 0x138  where SwitchCrAPCamera records the current camera
+    u8       unk13C[4];
     s32      n140;              // 0x140
     s32      nCamera;           // 0x144
     s32      n148;              // 0x148  the shot kind asked for
@@ -193,6 +213,7 @@ typedef struct GameEffects {
 extern GameEffects   lbl_80202898;
 extern GolfCamState* lbl_80282220;
 extern CamTuning*    lbl_80281F78;
+extern CrAPState*    lbl_80281EE0;
 
 void*    fn_80017004(int nView);
 void*    fn_80008370(void* pCamera);
@@ -226,6 +247,12 @@ void     fn_80063CF0(void* pView, int nCamera, int nPlayer);
 u8       fn_800C7160(View* pView);
 void     fn_800C6110(View* pView, int nPlayer, int a);
 void     fn_80063CBC(View* pView, f32* pVec);          // nCamera 3, the vector into vC4
+void     fn_8003E624(int nPlayer, void* pCam, void* pSub, void* pScript, CamShot* pShot, int a,
+                     f32 fFrameTime);
+u8       fn_8001EDF4(CrAPModel* pModel);
+CamShot* fn_8003A8C4(char* szName);
+// GameManager.c defines it as int; the test here is on a byte.
+u8       GM_ShowPostShotCrowdFlyby(void);
 CamSequence* fn_8003BDBC(int nPlayer, int nLie, int nClass, int nKind, int a, f32 fDist);
 void     GolfCamera_CutToGolferDoneAnimatingCam(View* pView, int nPlayer);
 int      fn_80062C10(int nHandle);
@@ -929,6 +956,62 @@ void fn_800C34F8(View* pView, int nPlayer) {
     pView->f114 += 0.016683351f;
 }
 
+// Camera 15, the post-shot camera: the crowd flyby, else shot 0x40 of the plan or shot 5 of the
+// sequence. For a ball that ended near the green (lies 6..8, or kind 10 asked for) only after fB8.
+void GolfCamera_InitPostShotCamera(View* pView, int nPlayer) {
+    CamShot* pShot = NULL;
+    f32* pCam = fn_8001731C(pView);
+    f32* pSub = fn_80017314(pView);
+    int nA = 5;
+    f32 f1 = 0.0f;
+    f32 f2 = 0.0f;
+    int nB = 0x19;
+    f32 f3 = 0.0f;
+    pView->n194 = 0;
+    pView->p78 = pView->p74;
+    if (pView->n148 != 6 && pView->n148 != 8 && pView->n148 != 10) {
+        fn_80063CF0(pView, 5, nPlayer);
+    }
+    pView->n198 = 0;
+    if ((pView->n148 != 10 && gPlayers[nPlayer].nLie != 6 && gPlayers[nPlayer].nLie != 7
+         && gPlayers[nPlayer].nLie != 8)
+        || pView->fCamTime >= lbl_80281F78->fB8) {
+        if (fn_800C7160(pView)) {
+            fn_800C6110(pView, nPlayer, 0x40);
+        } else {
+            if (GM_ShowPostShotCrowdFlyby()) {
+                pShot = fn_8006509C(9);
+            }
+            if (pShot != NULL) {
+                pView->p130 = pShot;
+                pView->p134 = pShot->p40;
+                pView->f110 = pView->p130->f48;
+                pView->n140 = pView->p130->bAB;
+                pView->fCamTime = 0.0f;
+                pView->f124 = 0.0f;
+                pView->f128 = 0.0f;
+            } else {
+                pShot = fn_80064F7C(nPlayer, 0x40, 1, pView->p130);
+                if (pShot != NULL && fn_80062C28(gPlayers[nPlayer].nShotHandle) < 1.0f) {
+                    pView->n198 = 1;
+                }
+                if (pShot == NULL || pShot->bAC == 5) {
+                    pShot = fn_8003A950(pView->p74, 5, &nA, &f1, &f2, &nB, &f3, nPlayer);
+                    if (pShot != NULL && pShot->bAA == 0) {
+                        pView->n198 = 1;
+                    }
+                }
+                if (pShot != NULL) {
+                    CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, nA, f1, f2, nB,
+                                                   f3);
+                    pView->b153 = 0;
+                }
+            }
+        }
+        pView->n194 = 1;
+    }
+}
+
 // Camera 16, the in-the-hole camera.
 void GolfCamera_InitInHoleCamera(View* pView, int nPlayer) {
     fn_8001731C(pView);
@@ -1020,6 +1103,128 @@ void fn_800C38BC(View* pView, int nPlayer) {
         pView->p80 = pShot;
         pView->n194 = -1;
         pView->n198 = 0x23;
+    }
+}
+
+// Camera 23's process: on the create-a-player screen, a new shot for the part being edited
+// when it changes (the saved shot p80 if there is one).
+void fn_800C39A8(View* pView, int nPlayer) {
+    f32* pCam;
+    f32* pSub;
+    CamShot* pShot;
+    pCam = fn_8001731C(pView);
+    pSub = fn_80017314(pView);
+    pShot = NULL;
+    if (lbl_80281EE0->pB4 != NULL && lbl_80281EE0->pB4->b18
+        && (pView->n194 != lbl_80281EE0->pB4->nC || (f32)pView->n198 != lbl_80281EE0->nView)) {
+        switch (lbl_80281EE0->nView) {
+        case 0:
+            pShot = fn_8003A7C8(0, 0x23, pView->p80);
+            if (pShot == NULL) {
+                pShot = fn_8003A7C8(0, 0x23, NULL);
+            }
+            break;
+        case 1:
+            if (fn_8001EDF4(lbl_80281EE0->pB4->p8)) {
+                pShot = fn_8003A7C8(0, 0x38, pView->p80);
+                if (pShot == NULL) {
+                    pShot = fn_8003A7C8(0, 0x38, NULL);
+                }
+            } else {
+                pShot = fn_8003A7C8(0, 0x24, pView->p80);
+                if (pShot == NULL) {
+                    pShot = fn_8003A7C8(0, 0x24, NULL);
+                }
+            }
+            break;
+        case 2:
+            pShot = fn_8003A7C8(0, 0x25, pView->p80);
+            if (pShot == NULL) {
+                pShot = fn_8003A7C8(0, 0x25, NULL);
+            }
+            break;
+        case 3:
+            pShot = fn_8003A7C8(0, 0x2F, pView->p80);
+            if (pShot == NULL) {
+                pShot = fn_8003A7C8(0, 0x2F, NULL);
+            }
+            break;
+        case 4:
+            pShot = fn_8003A7C8(0, 0x3D, pView->p80);
+            if (pShot == NULL) {
+                pShot = fn_8003A7C8(0, 0x3D, NULL);
+            }
+            break;
+        }
+        pView->n198 = lbl_80281EE0->nView;
+        if (pShot == NULL) {
+            return;
+        }
+        CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, 5, 0.0f, 100.0f, 0x19,
+                                       0.0f);
+        pView->p80 = pShot;
+        pView->n194 = lbl_80281EE0->pB4->nC;
+    }
+    // EA bug: with no golfer (pB4 NULL) this reads b18 through the NULL pointer.
+    if (lbl_80281EE0->pB4->b18) {
+        fn_8003E624(nPlayer, pCam, pSub, &pView->script, &pView->shot19C, 0, 0.016683351f);
+    }
+}
+
+// Switch the CrAP camera to a named shot (with an 'f' in front for some models), else to shot
+// 0x2F/0x37/0x39/0x3B/0x3C by nShot; bBlend records the current camera and blends from it.
+void GolfCamera_SwitchCrAPCamera(View* pView, char* szName, int nShot, u8 bBlend, u8 bForce) {
+    f32* pCam;
+    f32* pSub;
+    CamShot* pShot;
+    char c;
+    pCam = fn_8001731C(pView);
+    pSub = fn_80017314(pView);
+    if (bForce && (nShot == 0 || nShot == 2)) {
+        nShot = 1;
+    }
+    pShot = NULL;
+    if (szName != NULL) {
+        pShot = fn_8003A8C4(szName);
+        if (pShot == NULL && lbl_80281EE0->pB4 != NULL && lbl_80281EE0->pB4->p8 != NULL
+            && lbl_80281EE0->pB4->p8->n34 == 1) {
+            c = szName[0];
+            szName[0] = 'f';
+            pShot = fn_8003A8C4(szName);
+            szName[0] = c;
+        }
+    }
+    if (pShot == NULL) {
+        if (nShot == 0) {
+            pShot = fn_8003A7C8(0, 0x2F, NULL);
+        } else if (nShot == 1) {
+            pShot = fn_8003A7C8(0, 0x37, NULL);
+        } else if (nShot == 2) {
+            pShot = fn_8003A7C8(0, 0x39, NULL);
+        } else if (nShot == 3) {
+            pShot = fn_8003A7C8(0, 0x3B, NULL);
+        } else if (nShot == 4) {
+            pShot = fn_8003A7C8(0, 0x3C, NULL);
+        } else {
+            pShot = NULL;
+        }
+    }
+    if (pShot != NULL && pShot != pView->p130 && pShot != pView->p134) {
+        if (bBlend) {
+            CameraScript_RecordCurrentCam(pView->p138, pCam, pSub, 0, &pView->script, 0);
+            pView->p130 = pView->p138;
+            pView->p134 = NULL;
+            CameraScript_InterpToNewScript(&pView->script, pShot, 0, pCam, pSub, 0, pShot->f48, 1000.0f, 0x19,
+                                           0.0f);
+        } else {
+            CameraScript_InterpToNewScript(&pView->script, pShot, 0, pCam, pSub, 5, 0.0f, 1000.0f, 0x19,
+                                           0.0f);
+        }
+    }
+    pView->n194 = lbl_80281EE0->pB4->nC;
+    pView->n198 = lbl_80281EE0->nView;
+    if (lbl_80281EE0->pB4->b18) {
+        fn_8003E624(0, pCam, pSub, &pView->script, &pView->shot19C, 0, 0.016683351f);
     }
 }
 
