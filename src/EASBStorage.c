@@ -694,7 +694,7 @@ void fn_801298FC(EASBProduct* pProduct, u8* pBuffer, u32 uSize) {
     fn_80129290(pBuffer, &nOffset, 1, pProduct->bValid, 0, 1);
     for (i = 0; i < EASB_MAX_ACCOMPLISHMENTS; i++) {
         pAccomplishment = &pProduct->aAccomplishments[i];
-        fn_80129290(pBuffer, &nOffset, 2, pProduct->aAccomplishments[i].uLanguage, 0, 0xFFFF);
+        fn_80129290(pBuffer, &nOffset, 2, pAccomplishment->uLanguage, 0, 0xFFFF);
         fn_80129644(pBuffer, &nOffset, (EASB_ACCOMPLISHMENT_NAME_SIZE - 1) * sizeof(u16), pAccomplishment->szName,
                     pAccomplishment->uLanguage);
         fn_80129290(pBuffer, &nOffset, 4, pAccomplishment->uTime, EASB_TIME_FIRST, EASB_TIME_LAST);
@@ -702,6 +702,45 @@ void fn_801298FC(EASBProduct* pProduct, u8* pBuffer, u32 uSize) {
             fn_80129290(pBuffer, &nOffset, 1, pAccomplishment->u86, 1, 250);
         } else {
             fn_80129290(pBuffer, &nOffset, 1, 0, 0, 0);
+        }
+    }
+}
+
+// Unpacks a product record from pBuffer (fn_801298FC's layout), ending the names; an
+// accomplishment is in use when its u86 is not 0.
+void fn_80129B30(EASBProduct* pProduct, u8* pBuffer) {
+    s32 nOffset;
+    u32 i;
+    EASBAccomplishment* pAccomplishment;
+
+    nOffset = 0;
+    memset(pProduct, 0, sizeof(EASBProduct));
+    fn_801295D8(pBuffer, &nOffset, EASB_PRODUCT_NAME_SIZE - 1, pProduct->szName);
+    pProduct->szName[EASB_PRODUCT_NAME_SIZE - 1] = '\0';
+    pProduct->uGamesPlayedTypeLanguage = fn_801293F8(pBuffer, &nOffset, 2, 0, 0xFFFF);
+    fn_801296CC(pBuffer, &nOffset, (EASB_GAMES_PLAYED_TYPE_SIZE - 1) * sizeof(u16), pProduct->szGamesPlayedType,
+                pProduct->uGamesPlayedTypeLanguage);
+    pProduct->szGamesPlayedType[EASB_GAMES_PLAYED_TYPE_SIZE - 1] = 0;
+    pProduct->uTime = fn_801293F8(pBuffer, &nOffset, 4, EASB_TIME_FIRST, EASB_TIME_LAST);
+    pProduct->u50 = fn_801293F8(pBuffer, &nOffset, 4, 0, 0xFFFFFFFF);
+    pProduct->u54 = fn_801293F8(pBuffer, &nOffset, 4, 0, 0xFFFFFFFF);
+    pProduct->u58 = fn_801293F8(pBuffer, &nOffset, 4, 0, 0xFFFFFFFF);
+    pProduct->u5C = fn_801293F8(pBuffer, &nOffset, 4, 0, pProduct->u58);
+    pProduct->u1160 = fn_801293F8(pBuffer, &nOffset, 2, 0, EASB_MAX_LEVEL);
+    pProduct->uLevel = fn_801293F8(pBuffer, &nOffset, 2, 0, EASB_MAX_LEVEL + 1);
+    pProduct->bValid = fn_801293F8(pBuffer, &nOffset, 1, 0, 1);
+    for (i = 0; i < EASB_MAX_ACCOMPLISHMENTS; i++) {
+        pAccomplishment = &pProduct->aAccomplishments[i];
+        pAccomplishment->uLanguage = fn_801293F8(pBuffer, &nOffset, 2, 0, 0xFFFF);
+        fn_801296CC(pBuffer, &nOffset, (EASB_ACCOMPLISHMENT_NAME_SIZE - 1) * sizeof(u16), pAccomplishment->szName,
+                    pAccomplishment->uLanguage);
+        pProduct->aAccomplishments[i].szName[EASB_ACCOMPLISHMENT_NAME_SIZE - 1] = 0;
+        pAccomplishment->uTime = fn_801293F8(pBuffer, &nOffset, 4, EASB_TIME_FIRST, EASB_TIME_LAST);
+        pAccomplishment->u86 = fn_801293F8(pBuffer, &nOffset, 1, 0, 250);
+        if (pAccomplishment->u86 == 0) {
+            pAccomplishment->bValid = 0;
+        } else {
+            pAccomplishment->bValid = 1;
         }
     }
 }
