@@ -57,11 +57,9 @@ void fn_800773F8(void);
 void fn_80077428(void);
 void fn_8007744C(void);
 void Golfer_LoadCreatedFromSave(void);
-void fn_800779BC(int a, int b);
 int  fn_80077BDC(int n);
 void fn_80077C1C(int a, int b);
 u8   fn_80078008(s32 nAsset, SaveProfile* pProfile);
-void fn_80078620(int n, int* pA, int* pB, int* pC);
 void fn_80078680(SaveProfile* pProfile);
 void fn_8007873C(SaveProfile* pProfile);
 u8   FE_CrAP_IsAssetUndesirable(s16 nPart, CrAPAsset* pAsset);
@@ -83,7 +81,7 @@ FEState lbl_801D7148;
 FEProfile* lbl_80281ED4;
 u32 lbl_80281ED0;
 u32 lbl_80281ECC;
-u8* lbl_80281EC8;
+FEBio* lbl_80281EC8;
 
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
 // 1.0f (0x80283AC0), before the 0.0f and 0.05f FE_GetBIOMovieName uses first; its body is unknown.

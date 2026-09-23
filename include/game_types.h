@@ -60,6 +60,15 @@ static inline double __fabs(double x) {
     v.u &= ~((u64)1 << 63);
     return v.d;
 }
+
+// __stwbrx stores the word x byte-reversed at p + n.
+static inline void __stwbrx(u32 x, void* p, int n) {
+    u8* pOut = (u8*)p + n;
+    pOut[0] = (u8)x;
+    pOut[1] = (u8)(x >> 8);
+    pOut[2] = (u8)(x >> 16);
+    pOut[3] = (u8)(x >> 24);
+}
 #endif
 typedef float              f32;
 typedef double             f64;

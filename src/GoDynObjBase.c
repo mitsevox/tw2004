@@ -12,8 +12,6 @@ void fn_800BADF8(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
 void fn_8000C5A4(f32 (*pMtx)[4]);
 int  fn_8000EA1C(const char* pName, int a, int b, void* pObj);
 int  fn_80049ACC(int nMsg, DynObj* pObj, void* pArg);
-int  fn_8004AD54(int nMsg, DynObj* pObj, void* pArg);
-int  fn_8004AF2C(int nMsg, DynObj* pObj, void* pArg);
 int  fn_8004AAEC(int nMsg, DynObj* pObj, void* pArg);
 
 // Set flag 0x04000000 once; the first time, with bNotify, also run fn_800491C4. 1: it was set now.
