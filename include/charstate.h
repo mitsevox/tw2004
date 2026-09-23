@@ -7,8 +7,29 @@
 
 #include "character.h"
 
+// A skin (Skin.c): a character's body or one of its attachments; only what the code reads.
+typedef struct Skin {
+    u8   unk0[0x10D4];
+    u32  u10D4;                 // 0x10D4  bit 1 set by fn_80019CEC; bit 2 tested by fn_80037708
+} Skin;
+
+// A pool of seven entries characters take (fn_8001A418) and give back (fn_8001A3B0).
+typedef struct CharPoolEntry {
+    void* p;                    // 0x0
+    u8    bUsed;                // 0x4
+    u8    pad5[3];
+} CharPoolEntry;
+
+typedef struct CharPool {
+    CharPoolEntry a[7];         // 0x00
+    s32   nEntries;             // 0x38
+} CharPool;
+LAYOUT_ASSERT(CharPool, 0x3C);
+
+extern CharPool   lbl_801B95E8;
 extern Character* lbl_801B9624[5];     // the characters made so far (fn_8001C21C)
 extern s32        lbl_80281CA8;         // how many
+extern s32        lbl_80281CAC;         // the player fn_8001D8DC last marked (-1 at start)
 extern s32        lbl_80187164[8];      // the clip key for each shot kind (fn_8001C724)
 extern s32        lbl_80280E20;         // set to 6 (4 in split screen) by fn_8001C254, 3 by fn_8001C304
 extern void*      lbl_80280E24[2];      // what fn_8001B208 makes of the 'CLB ' object: one, or one per view
