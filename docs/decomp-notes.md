@@ -150,7 +150,7 @@ Reading compiler output
   itself and folds the first read into `lwzu rD, off(rP)`; later reads are `lwz rD, 0(rP)`. An
   explicit `s32* p = &gPlayers[n].field; ... *p` local blocks that shape (`addi rP; lwz` from the
   base). Write the field access out each time. Applied to 33 functions of `Swing.c` in one sweep
-  (`C:\dev\scratch	w\ptr_sweep.py`), 10 became exact. Exception: pointers that are indexed
+  (`C:\dev\scratch\tw\ptr_sweep.py`), 10 became exact. Exception: pointers that are indexed
   (`pViews[k]`) or passed as pointers stay pointers.
 - **[verified] 64-bit arguments skip r4.** `fn(handle, 0, k)` sites where the original sets r5 and
   r6 but never r4 are `fn(handle, (unsigned long long)k)`: a 64-bit integer goes in an aligned

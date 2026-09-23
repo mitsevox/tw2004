@@ -193,7 +193,7 @@ Dated log of what was done and decided, newest last. Facts and lessons belong in
      `Ball_SetLie` 99.2, `fn_800539F8` 99.7, `fn_80053E98` 99.7, `fn_80053240` 99.9,
      `Ball_Collide` 99.9. All register/schedule issues; notes on what was tried are in the
      checkpoint entries above.
-  Scratch tools added this round (`C:\dev\scratch	w\`): `dolread.py` (read main.dol by
+  Scratch tools added this round (`C:\dev\scratch\tw\`): `dolread.py` (read main.dol by
   address), `grepfn.py` (asm grep with enclosing function), `unitfns.py <unit>` (non-exact
   functions of a unit), `insert_fns.py <module.py> <File.c>` (insert CODE dict at address
   positions; now takes the target file), `ball_cp*.py` (the checkpoint code modules). optional register polish in `skalib.c`
