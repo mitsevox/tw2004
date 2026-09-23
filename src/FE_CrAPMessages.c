@@ -793,6 +793,29 @@ void fn_80109EAC(MsgArg* pArgs, MsgArg* pResult) {
     fn_801072CC(pArgs[0].i, pArgs[3].p, pArgs[2].p, pArgs[4].p, pArgs[1].p);
 }
 
+// ---- end of sweep code ----
+
+// How many of the five random assets of category pArgs[0] have been bought (aB1CC).
+void fn_80109EE8(MsgArg* pArgs, MsgArg* pResult) {
+    SaveProfile* pProfile = fn_80077ACC();
+    int i;
+    s32* pnBought = pArgs[1].p;
+    int nCategory = fn_80077BDC(pArgs[0].i);
+    s8 b = fn_80103BB4();
+    int nAsset;
+
+    *pnBought = 0;
+    for (i = 0; i < 5; i++) {
+        nAsset = fn_80104FA8(lbl_80281ED4->aKind[b][nCategory], lbl_80281ED4->aPart[b][nCategory][i],
+                             lbl_80281ED4->aChoice[b][nCategory][i]);
+        if (fn_8001E9CC(pProfile->aB1CC, nAsset)) {
+            (*pnBought)++;
+        }
+    }
+}
+
+// ---- sweep code (not yet cleaned up) ----
+
 void fn_8010A208(MsgArg* pArgs, MsgArg* pResult) {
     fn_8008E724(NULL, NULL, 0, 0);
 }
@@ -816,6 +839,24 @@ void fn_8010A238(MsgArg* pArgs, MsgArg* pResult) {
         nResult = nPlace;
     }
     pResult->i = nResult;
+}
+
+// Part 13's choice i has its animation in the shown golfer's library (always 1 for other parts,
+// or with no golfer shown).
+void fn_8010A2C8(MsgArg* pArgs, MsgArg* pResult) {
+    char szName[64];                    // the size is unknown (the frame allows up to 0x40)
+    u8 bFound = 1;
+    s16 nPart = pArgs[0].i;
+    int b = pArgs[1].i;
+    int i = pArgs[2].i;
+
+    if (lbl_80281EE0->pB4 != NULL && nPart == 13) {
+        fn_80105B4C(nPart, b, i, szName);
+        if (AnimLib_FindByName(lbl_80281EE0->pB4->pChar->pLib, szName) == NULL) {
+            bFound = 0;
+        }
+    }
+    pResult->i = bFound;
 }
 
 // ---- sweep code (not yet cleaned up) ----
