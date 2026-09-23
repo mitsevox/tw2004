@@ -3020,40 +3020,34 @@ extern Vec4 lbl_801836A0;
 // detached, this player attached to both of its views, Shot_Plan with the HUD told, animation 1.
 void STATEFUNC_InitialFlyByInit(int nPlayer) {
     Vec4  vOffset = lbl_801836A0;
-    s32*  pView;
-    s32*  pHandle;
-    int   nView;
     int   i, k;
 
     EVENT_Trigger(nPlayer, 0x4A, 0, -1);
-    pView = &gPlayers[nPlayer].nView0;
-    fn_800170C4(*pView, 1);
-    nView = *pView;
-    View_SetCamera(fn_80017028(nView), 10, nPlayer, nView);
-    fn_80063B98(fn_80017028(*pView), 0.5f, (f32*)&vOffset);
+    fn_800170C4(gPlayers[nPlayer].nView0, 1);
+    View_SetCamera(fn_80017028(gPlayers[nPlayer].nView0), 10, nPlayer, gPlayers[nPlayer].nView0);
+    fn_80063B98(fn_80017028(gPlayers[nPlayer].nView0), 0.5f, (f32*)&vOffset);
     fn_800C7140(0);
-    fn_800170F4(*pView);
-    fn_80017004(*pView);
+    fn_800170F4(gPlayers[nPlayer].nView0);
+    fn_80017004(gPlayers[nPlayer].nView0);
     fn_80012EF0();
     fn_800171D8(0.0f, 0.0f, 1.0f, 1.0f);
     for (i = 0; i < gNumPlayersSetUp; i++) {
         for (k = 0; k < 2; k++) {
-            if ((&gPlayers[i].nView0)[k] != *pView) {
+            if ((&gPlayers[i].nView0)[k] != gPlayers[nPlayer].nView0) {
                 fn_800170C4((&gPlayers[i].nView0)[k], 0);
             }
         }
     }
     for (k = 0; k < 2; k++) {
-        fn_8001704C(pView[k], nPlayer);
+        fn_8001704C((&gPlayers[nPlayer].nView0)[k], nPlayer);
     }
     fn_80045824(nPlayer);
     GM_MovePlayerToBall(nPlayer);
     Shot_Plan(nPlayer, 1);
     fn_8001D8DC(nPlayer);
     fn_8001C804(nPlayer, 1, 1);
-    pHandle = &gPlayers[nPlayer].nShotHandle;
-    fn_800957D8(*pHandle);
-    fn_80095744(*pHandle, 1);
+    fn_800957D8(gPlayers[nPlayer].nShotHandle);
+    fn_80095744(gPlayers[nPlayer].nShotHandle, 1);
     fn_8003349C(1.0f, 12.0f, 0.1f);
     GameEffects_ResetGameEffectSettings();
     for (i = 0; i < gNumPlayersSetUp; i++) {
