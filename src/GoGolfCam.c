@@ -488,7 +488,7 @@ void fn_800C0914(View* pView, int nPlayer) {
     }
 }
 
-// Camera 11, the pre-shot camera: shot 0x20 of the plan, or half the time (or without one) shot 13
+// Camera 11, the pre-shot camera: shot 0x20 of the plan, or 49 times in 100 (or without one) shot 13
 // of fn_8003C9D0's sequence or a new pre-flight sequence.
 void GolfCamera_InitPreShotCamera(View* pView, int nPlayer) {
     int nLie;
@@ -786,7 +786,7 @@ void GolfCamera_InitShutterCamera(View* pView, int nPlayer) {
     pView->f18C = 0.0f;
     pView->f190 = 0.0f;
     lbl_80282220->b5B = 1;
-    pView->f190 = 0.0f;
+    pView->f190 = 0.0f;     // stored twice, as in the original
     GameEffects_SetSuperSlowMo(1, nPlayer, 1.0f);
 }
 
@@ -856,9 +856,9 @@ void GolfCamera_InitPostShotCamera(View* pView, int nPlayer) {
 void GolfCamera_InitInHoleCamera(View* pView, int nPlayer) {
     fn_8001731C(pView);
     fn_80017314(pView);
-    GOLFERSTATE_GetCurrentState(nPlayer);
+    GOLFERSTATE_GetCurrentState(nPlayer);  // the result is unused, as in the original
     pView->p78 = pView->p74;
-    pView->n194 = 0;
+    pView->n194 = 0;        // 0 and then 1, as in the original
     pView->n194 = 1;
     fn_80063CF0(pView, 8, nPlayer);
     if (gPlayers[nPlayer].bPlanReady == 1) {
@@ -871,6 +871,7 @@ void GolfCamera_InitInHoleCamera(View* pView, int nPlayer) {
             pView->n194 = 0;
         }
     } else {
+        // The state is compared as a signed byte (extsb), as if GOLFERSTATE_GetCurrentState returned s8.
         if (fn_800C7160(pView) || (s8)GOLFERSTATE_GetCurrentState(nPlayer) == GS_REMOVE_BALL) {
             fn_800C6110(pView, nPlayer, 1);
         }
@@ -955,6 +956,7 @@ void fn_800C39A8(View* pView, int nPlayer) {
     pCam = fn_8001731C(pView);
     pSub = fn_80017314(pView);
     pShot = NULL;
+    // The original compares n198 and n0, both ints, as floats.
     if (lbl_80281EE0->pB4 != NULL && lbl_80281EE0->pB4->b18
         && (pView->n194 != lbl_80281EE0->pB4->nC || (f32)pView->n198 != lbl_80281EE0->n0)) {
         switch (lbl_80281EE0->n0) {
@@ -1061,6 +1063,7 @@ void GolfCamera_SwitchCrAPCamera(View* pView, char* szName, int nShot, u8 bBlend
                                            0.0f);
         }
     }
+    // EA bug: pB4 may be NULL (tested above for the 'f' names), but it is read here without a test.
     pView->n194 = lbl_80281EE0->pB4->nC;
     pView->n198 = lbl_80281EE0->n0;
     if (lbl_80281EE0->pB4->b18) {
@@ -1265,8 +1268,9 @@ void fn_800C4E80(View* pView, int nPlayer) {
     }
 }
 
-// Camera 13's tick: with no next shot, end the game breaker's effect and replay the current shot's
-// p44 as a hand-made shot. Returns the frame time to run the script at (0 while held).
+// Camera 13's tick: with no next shot, clear b54 (a freeze-time flag: fn_800C6D9C tests it) and
+// replay the current shot's p44 as a hand-made shot. Returns the frame time to run the script at (0
+// while held).
 f32 fn_800C54FC(View* pView, f32* pCam, f32* pSub, int nPlayer) {
     f32 fTime = 0.0f;
     CamShot* pShot;
@@ -1310,8 +1314,9 @@ f32 fn_800C54FC(View* pView, f32* pCam, f32* pSub, int nPlayer) {
     return fTime;
 }
 
-// Camera 13's tick for kinds 15 and 16: after 0.05 s with no next shot, end the effect and replay
-// the current shot's p44; while a shot runs, ease the fallback shots' f78/f7C from f7C to f80.
+// Camera 13's tick for kinds 15 and 16: after 0.05 s with no next shot, clear b58 (a freeze-time
+// flag: fn_800C6D9C tests it) and replay the current shot's p44; while a shot runs, ease the fallback
+// shots' f78/f7C from f7C to f80.
 f32 fn_800C5A70(View* pView, f32* pCam, f32* pSub, int nPlayer) {
     f32 fTime = 0.0f;
     CamShot* pShot;
@@ -1333,6 +1338,7 @@ f32 fn_800C5A70(View* pView, f32* pCam, f32* pSub, int nPlayer) {
             lbl_80282220->shot12C.f78 = lbl_80281F78->f80;
             lbl_80282220->shot12C.f7C = lbl_80281F78->f80;
         }
+        // EA bug: p130 was tested for NULL just above, but is read here without a test.
         pShot = pView->p130->p44;
         if (pShot != NULL) {
             Mem_cpy(&pView->shot19C, pShot, sizeof(CamShot));
@@ -1488,6 +1494,7 @@ void fn_800C6110(View* pView, int nPlayer, int a) {
     int nLie = gPlayers[nPlayer].ball.nLie;
     int nClass;
     f32 fDist;
+    // The original tests the ball's surface but looks up the one the ball lay on before the shot.
     if (gPlayers[nPlayer].ball.nSurface >= 0) {
         nClass = gSurfaceTypes[gPlayers[nPlayer].ballBefore.nSurface].nClass;
     } else {
@@ -1530,8 +1537,8 @@ int fn_800C6B38(View* pView) {
         return 2;
     case 5:
         return 1;
-    case 3:
-    case 4:
+    case 3:     // these return the default, but the original lists them: its jump table sends
+    case 4:     // them to their own return
     case 7:
     case 9:
     case 15:
@@ -1579,7 +1586,7 @@ f32 fn_800C6B7C(View* pView) {
             return lbl_80282220->f64;
         }
         return 1.0f;
-    case 3:
+    case 3:     // the default, but listed in the original (its own entry in the jump table)
         return 1.0f;
     }
     return 1.0f;
@@ -1708,7 +1715,7 @@ void fn_800C70F8(View* pView, int a) {
     pView->b268 = a;
 }
 
-// The camera has settled: no shot, or more than 5 seconds on this one.
+// No current shot, no next one, or more than 5 seconds on this one.
 u8 fn_800C7100(View* pView) {
     if (pView->p130 == NULL || pView->p134 == NULL || pView->fCamTime > 5.0f) {
         return 1;
@@ -1751,8 +1758,8 @@ void fn_800C7178(View* pView, int nPlayer) {
     fn_800C6E2C();
 }
 
-// Is the ball behind the camera (on the far side from where it looks)? Only once the shot has
-// settled, and not for shot kind 3.
+// Is the ball behind the camera (on the far side from where it looks)? Never without a current
+// shot, for shot kind 3 (bAD), or once f11C passes 5.
 u8 fn_800C71A4(View* pView, int nPlayer) {
     f32 vLook[4];
     f32 vBall[4];
