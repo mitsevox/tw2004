@@ -11,9 +11,6 @@ void fn_8000E830(DynObj* pObj);
 void fn_8000ADC0(f32 (*pMtx)[4]);                   // identity
 void fn_8000C5A4(f32 (*pMtx)[4]);
 
-void* fn_8000B748(u8* pData, u32 uSize, u32 uTag, u32 uId);
-DynObjChunk* fn_8000B7B0(u8* pData, u32 uSize, u32 uTag, u32 uId);
-UStreamObject* fn_8000B70C(u32 uType, u32 uId);
 void fn_800646D0(UStreamObject* pObject);
 void fn_80064A0C(UStreamObject* pObject);
 void fn_8009943C(u8* pData, u32 uSize);
@@ -51,7 +48,7 @@ void fn_80048B70(void* p) {
 // objects looked up and become a dynamic object, whose id is kept in the stream object.
 void fn_80048BDC(UStreamObject* pObject) {
     DynObjSetup setup;
-    DynObjChunk* pChunk;
+    TagRecord* pChunk;
     int i;
 
     setup.pDef = (DynObjDef*)((u8*)fn_8000B748(pObject->pData, pObject->uSize, 'tACT', pObject->uId) -
@@ -87,7 +84,7 @@ void fn_80048BDC(UStreamObject* pObject) {
     pChunk = fn_8000B7B0(pObject->pData, pObject->uSize, 'aRSL', pObject->uId);
     if (pChunk != NULL) {
         setup.pModel = (DynObjModel*)&pChunk->uId;
-        setup.pModel->nEntries = (pChunk->uSize - sizeof(DynObjChunk)) / sizeof(DynObjModelEntry);
+        setup.pModel->nEntries = (pChunk->uSize - sizeof(TagRecord)) / sizeof(DynObjModelEntry);
         for (i = 0; i < setup.pModel->nEntries; i++) {
             if (setup.pModel->aEntries[i].u.nId != 0) {
                 setup.pModel->aEntries[i].u.pRef = (DynObjModelRef*)fn_8000B70C(
@@ -100,7 +97,7 @@ void fn_80048BDC(UStreamObject* pObject) {
     setup.pfnHandler = fn_800499B0(setup.pDef->n4);
     setup.pC = (DynObjNames*)pObject;
     pObject->pData = (u8*)setup.pModel;
-    pObject->uUnk8 = 0;
+    pObject->pfn8 = NULL;
     pObject->uUnk4 = fn_800490B8(&setup);
     fn_80009E70(pObject);
 }

@@ -91,11 +91,10 @@ extern SwapField lbl_801911B0[7];
 extern SwapField lbl_801911E8[5];
 extern SwapField lbl_80191210[4];
 
-// A situation zone, from chunk 5 of the hole's data (fn_800BB6DC): an outline, its nNumNodes
-// nodes of 0x30 bytes, and then the zone's bits (a u32 right after the last node).
+// A situation zone, from chunk 5 of the hole's data (fn_800BB6DC): an outline (with its
+// net.nNumNodes nodes), and then the zone's bits (a u32 right after the last node).
 typedef struct SitDevZone {
     TNetwork net;               // 0x0
-    u8       aNodes[1][0x30];   // 0x4  net.nNumNodes of them
 } SitDevZone;
 
 extern SitDevZone* lbl_801FA1C0[10];    // the hole's zones

@@ -58,10 +58,6 @@ int gnNumHandlers = -1;           // 0x80280DB8 (.sdata): -1 until UStream_Init
 
 // ---- other files' functions -----------------------------------------------------------
 
-void  fn_8000B4B8(UStreamObject* p);
-u8    fn_8000B508(UStreamObject* p);
-void  fn_8000B588(UStreamObject* p);
-UStreamObject* fn_8000B70C(u32 uType, u32 uId);
 int   fn_8000EA1C(const char* pName, int a, int b, int c);
 void  fn_8007593C(void* pChunk);                             // MPG2
 void  fn_800A4BDC(void);
@@ -222,19 +218,20 @@ static int UStream_BeginObject(UStreamObject** ppObject, UStreamChunk* pChunk) {
         if (pChunk->uType == TAG('t', 'x', 'f', '2')) {
             pChunk->uFlags = 1;
         }
-        uPad = (uExtra + 0x34) & 0x7F;
+        uPad = (uExtra + sizeof(UStreamObject)) & 0x7F;
         uPad = uPad ? 0x80 - uPad : 0;
         {
             u32 uDataSize = pChunk->uSize;
-            pObject = fn_80009B34((uExtra + uPad) + uDataSize + 0x34, pChunk->uFlags, 0x80, "UStream.c", 732);
+            pObject = fn_80009B34((uExtra + uPad) + uDataSize + sizeof(UStreamObject), pChunk->uFlags,
+                                  0x80, "UStream.c", 732);
         }
         *ppObject = pObject;
         pObject->nUnk14 = 0;
         ppObject[1] = NULL;
         Mem_cpy(&pObject->uFlags, &pChunk->uFlags, uExtra + 0x1C);
-        pObject->pData = (u8*)pObject + uExtra + uPad + 0x34;
+        pObject->pData = (u8*)pObject + uExtra + uPad + sizeof(UStreamObject);
         pObject->uUnk4 = 0;
-        pObject->uUnk8 = 0;
+        pObject->pfn8 = NULL;
         pObject->pPrev = NULL;
         pObject->pNext = NULL;
     }

@@ -5,8 +5,6 @@
 #include "engine.h"
 #include "frontend/fe.h"
 
-u8   fn_8000BD80(char* pName, u8** ppPixels);   // a texture's pixels by name; 0 if none
-int  fn_8000BDF8(char* pName, TexBank** ppBank, TexEntry** ppTex);  // find a texture by name
 
 void fn_8010F6C8(void);
 void fn_8010F718(void);
