@@ -3113,6 +3113,38 @@ void fn_800810F4(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
+// Option n18: menu choices 1-3 are the values 0-2, applied at once.
+void fn_80081158(MsgArg* pArgs, MsgArg* pResult) {
+    switch (pArgs[0].i) {
+    case 1:
+        gSession.options.n18 = 0;
+        break;
+    case 2:
+        gSession.options.n18 = 1;
+        break;
+    case 3:
+        gSession.options.n18 = 2;
+        break;
+    }
+    fn_80055C40(gSession.options.n18);
+}
+
+// Option n20, the same way.
+void fn_800811E4(MsgArg* pArgs, MsgArg* pResult) {
+    switch (pArgs[0].i) {
+    case 1:
+        gSession.options.n20 = 0;
+        break;
+    case 2:
+        gSession.options.n20 = 1;
+        break;
+    case 3:
+        gSession.options.n20 = 2;
+        break;
+    }
+    fn_80055CAC(gSession.options.n20);
+}
+
 void fn_80081270(MsgArg* pArgs, MsgArg* pResult) {
     switch (pArgs[0].i) {
     case 1:
@@ -4080,6 +4112,22 @@ void fn_80084B88(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_80084BE4(MsgArg* pArgs, MsgArg* pResult) {
+}
+
+// A name typed as nothing but spaces becomes "User <n>" for the working slot.
+void fn_80084C88(MsgArg* pArgs, MsgArg* pResult) {
+    char* szName = ((MsgString*)pArgs[0].p)->pStr;
+    int n = 0;
+    int i;
+
+    for (i = 0; szName[i] != '\0'; i++) {
+        if (szName[i] != ' ') {
+            n++;
+        }
+    }
+    if (n == 0) {
+        sprintf(szName, "User %d", lbl_80281ED4->nSlot + 1);
+    }
 }
 
 // Copy a string, cut to eight characters and "..." when it is longer than 12.
