@@ -24,7 +24,6 @@ int   fn_800D8750(int a, int b, int c, char* szName, int nPlayer);   // szName: 
 u8    fn_800BCD24(int nPlayer);
 int   fn_800D0620(int nPlayer, int a, int b);
 int   fn_800D089C(int nPlayer, int a);
-void  fn_800BD83C(int nSound, int a);
 void  fn_800A6DCC(int nMusic, int a);
 u8    fn_800451A8(CamScript* pScript, CamShot* pShot, int nPlayer);
 
