@@ -18,7 +18,6 @@ s32 fn_801253F0(s32 arg0, s32 arg1);
 s32 fn_80125520(u8 b);
 s32 fn_801258E8(void);
 u8 fn_801257A0(void);
-void fn_8000A0AC(s32 v);
 void fn_80124B10(UStreamObject* pObject);
 
 // Starts the Bio library once, under this game's name, with the memory-card glue from TibExt.c.

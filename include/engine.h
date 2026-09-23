@@ -15,6 +15,8 @@ void* Mem_cpy(void* pDst, const void* pSrc, u32 uLen);    // returns pDst
 void* fn_80005AE8(void* pDst, int nValue, u32 uLen);      // memset; returns pDst
 void* fn_80009B34(u32 uSize, u32 uFlags, u32 uAlign, const char* pFile, int nLine);  // alloc
 void  fn_80009E70(void* p);             // free
+void  fn_8000A0AC(s32 v);               // } a value callers pass on as fn_80009B34's uFlags
+s32   fn_8000A0B4(void);                // } (EASportsBio.c sets 0 while the Bio starts, then 2)
 void* fn_800951A0(u32 uSize, int nAlign, int a);
 void  fn_800953C8(int a);
 // Sorts nCount items of nSize bytes with pfnCompare (the C library's qsort, by its arguments).

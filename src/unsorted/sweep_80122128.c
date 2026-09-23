@@ -1,10 +1,8 @@
 // Small functions found by the sweep (sweep.py). Original file and meanings unknown.
 
-#include "game_types.h"
+#include "engine.h"
+#include "core/easb.h"
 
-void fn_80009E70();
-
-void TibExtMemFree(s32 p0, s32 p1);
-void TibExtMemFree(s32 p0, s32 p1) {
-    fn_80009E70(p1);
+void TibExtMemFree(u32 uHeapID, void* p, u32 uSize, u32 uAlign) {
+    fn_80009E70(p);
 }

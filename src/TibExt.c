@@ -1,19 +1,10 @@
-// TibExt.c (EA's name, from its asserts; TW06): not yet decompiled; the sweep code below is the
-// matched small functions.
+// TibExt.c (EA's name, from its asserts; TW06): the glue between EA's Tiburon SDK libraries (the
+// EA Sports Bio's EASB.c, the shared file library) and the game: memory, the real-time clock, and
+// the memory-card callbacks (lbl_80281970) the shared file library calls.
 
-#include "game_types.h"
+#include "engine.h"
+#include "core/easb.h"
 
-// ---- sweep code (not yet cleaned up) ----
-
-extern u8 lbl_80194748[];
-void fn_80009B34();
-s32 fn_8000A0B4();
-void TibExtMemAlloc(s32 p0, s32 p1, s32 p2);
-
-void TibExtMemAlloc(s32 p0, s32 p1, s32 p2) {
-    s32 t0;
-    t0 = fn_8000A0B4();
-    fn_80009B34(p1, t0, p2, lbl_80194748, 42);
+void* TibExtMemAlloc(u32 uHeapID, u32 uSize, u32 uAlign) {
+    return fn_80009B34(uSize, fn_8000A0B4(), uAlign, "TibExt.c", 42);
 }
-
-// ---- end of sweep code ----

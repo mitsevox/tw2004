@@ -85,7 +85,7 @@ typedef struct EASBProduct {
 
 // The library's state, allocated when it starts (lbl_802825B8).
 typedef struct EASBState {
-    void* pAllocator;               // 0x0000: what the library allocates from (TibExt.c)
+    u32 uHeapID;                    // 0x0000: EASBInitParams.uHeapID, passed to TibExt.c's allocator
     u8 unk4[0x50];
     u32 u54;                        // 0x0054: the Bio's totals, raised with the product's
     u32 u58;                        // 0x0058
@@ -117,9 +117,23 @@ typedef struct EASBInitParams {
 extern EASBState* lbl_802825B8;
 
 // TibExt.c: the library's memory and clock glue.
-void TibExtMemFree(void* pAllocator, void* p, u32 uSize, u32 uAlign);
+// The library's allocator (TW06's signatures). The heap id is not used: the game's current heap
+// (fn_8000A0B4) is.
+void* TibExtMemAlloc(u32 uHeapID, u32 uSize, u32 uAlign);
+void TibExtMemFree(u32 uHeapID, void* p, u32 uSize, u32 uAlign);
 u32 TibExtCurrentTimeGet(void);     // the real-time clock, in seconds since 1970
 struct SFIOCallbacks* fn_801221F0(void);    // fills in and returns the memory-card callbacks
+
+// TibExt.c's memory-card glue (lbl_80260D88): the callbacks it hands the shared file library,
+// then the result of the last card call.
+typedef struct TibExtCard {
+    void (*apfnCallback[17])(void); // 0x00: fn_801221F0 fills these in
+    s32 nError;                     // 0x44: the last card call's error, as the file library's code
+    s32 n48;                        // 0x48
+} TibExtCard;
+
+extern TibExtCard* lbl_80281970;
+extern s32 lbl_80194758[46];        // the file library's code for each card error (by -error)
 
 // The code before EASB.c (still sweep code).
 u32 fn_80128468(u32 uA, u32 uB);    // uA + uB, saturating at 0xFFFFFFFF
