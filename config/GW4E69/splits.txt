@@ -3467,10 +3467,12 @@ unsorted/sweep_801369E4.c:
 	.text       start:0x801369E4 end:0x801369F0
 
 unsorted/sweep_80136DF4.c:
-	.text       start:0x80136DF4 end:0x80136E08
+	.text       start:0x80136DF4 end:0x80136DFC
 
 src/ax/AXSPB.c:
-	.text       start:0x80136E08 end:0x801372C0
+	.text       start:0x80136DFC end:0x801372C0
+	.bss        start:0x80269080 end:0x802690C0
+	.sbss       start:0x80282708 end:0x80282730
 
 unsorted/sweep_801372C0.c:
 	.text       start:0x801372C0 end:0x801372C8

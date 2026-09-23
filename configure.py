@@ -467,7 +467,7 @@ config.libs = [
             Object(Matching, "src/ax/AX.c"),
             Object(Matching, "src/ax/AXAux.c"),
             Object(Matching, "src/ax/AXCL.c"),
-            Object(NonMatching, "src/ax/AXSPB.c"),
+            Object(Matching, "src/ax/AXSPB.c"),
             Object(Matching, "src/ax/AXProf.c"),
             Object(NonMatching, "src/axfx/reverb_hi.c"),
             Object(Matching, "src/axfx/delay.c"),
