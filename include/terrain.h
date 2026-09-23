@@ -193,6 +193,8 @@ LAYOUT_ASSERT(TerSettings, 0x54);
 extern Ter_TerrainRendererMgr lbl_801D3CB0;
 extern TerSettings* lbl_802811E0;    // Code8006F154.c: points at lbl_801D70A8
 extern TerSettings lbl_801D70A8;
+
+void fn_8006F334(TerSettings* pSettings);   // Code8006F154.c: the default colours
 extern f32 lbl_801876D8[21][3];     // rows fn_80034648 copies into fDefaultObjectMipmapBias
 extern f32 lbl_802810C8;
 extern s8  lbl_802810CC;
