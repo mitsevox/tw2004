@@ -20,17 +20,15 @@ void  fn_800E3050(int nCourse);
 int   fn_8011937C(int nPlayer, int a, u8 b);
 
 int   fn_800E8C24(int nPlayer, int nHole);
-int   sprintf(char* pBuf, const char* pFmt, ...);
 
-extern u8   gNumPlayersSetUp;               // 0x80281D48 (Golfer.c)
 extern char lbl_80282270[8];                // the hole name
 
 void  fn_800E3AF4(void);
 s32   fn_800E3AEC(int a);
-u8    fn_800E3AE4(int nPlayer, int a);
-u8    fn_800E3ADC(int a);
-s32   fn_800E3AD4(void);
-void  fn_800CF158(int nPlayer);
+u8    fn_800E3AE4(int nPlayer, u8 bCheck);
+u8    fn_800E3ADC(u8 bCheck);
+u8    fn_800E3AD4(u8 bCheck);
+u8    fn_800CF158(int nPlayer);
 u8    fn_800CF450(int nPlayer);
 void  fn_800CFE74(void);
 void  fn_800D0098(void);
@@ -39,14 +37,13 @@ void  fn_800E3AD0(int nPlayer);
 u8    fn_800E3AC8(int nPlayer);
 u8    fn_800E3AC0(void);
 u8    fn_800E3AB8(int nPlayer);
-s32   fn_800E3AB0(void);
+s32   fn_800E3AB0(int nPlayer);
 void  fn_800E3AAC(int nPlayer, int nTime);
 void  fn_800E3AA8(int nPlayer, int nId);
 s32   fn_800E3AA0(int a, int nTarget);
 void  fn_800FF700(void);
 void  fn_800E9E40(void);
 void  fn_800F80FC(void);
-void  fn_80101FEC(void);
 void  fn_800F944C(void);
 void  fn_800F9610(void);
 void  fn_800F986C(void);
@@ -69,7 +66,6 @@ void  fn_800F0448(void);
 void  fn_800E7980(void);
 void  fn_8010C4A0(void);
 void  fn_80125E68(void);
-extern s32 lbl_80282278;
 
 u8    fn_800E3AF8(void);
 void  fn_800E0A84(u8 v);
@@ -77,8 +73,6 @@ void  fn_800E1404(int nHole);
 void  fn_80057364(int a);
 int   fn_800D3118(int nRound, int nHole);    // a built round's course for a hole
 int   fn_800D315C(int nRound, int nHole);    // and its hole number (1-based)
-
-extern u8  lbl_8028227C;
 
 // out = a - b (four floats)
 asm void fn_800E0AF0(register f32* pA, register f32* pB, register f32* pOut) {
@@ -105,7 +99,6 @@ extern CourseList lbl_80184D40;
 
 // A course counts as unlocked when any of the five profiles (or the second block) has its flag.
 #define COURSE_UNLOCKED(c, k) (gpSaveData[k].aCourseUnlocked[c] || lbl_80281DF4->aCourseUnlocked[c])
-
 
 // out = a - b (three floats)
 asm void fn_800E0B14(register f32* pA, register f32* pB, register f32* pOut) {
@@ -167,18 +160,18 @@ void fn_800E0B38(int nMode) {
     gpGame->n290 = 2;
     gpGame->n294 = 1;
     gpGame->b28E = 0;
-    gpGame->pfn1C8 = fn_800E3AF4;
-    gpGame->pfn1CC = fn_800E3AF4;
-    gpGame->pfn1D0 = fn_800E3AF4;
-    gpGame->pfn1D4 = fn_800E3AEC;
-    gpGame->pfn1D8 = fn_800E3AE4;
-    gpGame->pfn1DC = fn_800E3ADC;
-    gpGame->pfn1E0 = fn_800E3AD4;
+    gpGame->pfnInit = fn_800E3AF4;
+    gpGame->pfnShutdown = fn_800E3AF4;
+    gpGame->pfnSetupNextGolfer = fn_800E3AF4;
+    gpGame->pfnGetHonors = fn_800E3AEC;
+    gpGame->pfnHoleFinished = fn_800E3AE4;
+    gpGame->pfnGameFinished = fn_800E3ADC;
+    gpGame->pfnGoToPlayoff = fn_800E3AD4;
     gpGame->pfn1E4 = fn_800E3AF4;
-    gpGame->pfn1E8 = fn_800E3AF4;
+    gpGame->pfnEndHole = fn_800E3AF4;
     gpGame->pfn1EC = fn_800E3AF4;
     gpGame->pfn1F0 = fn_800E3AF4;
-    gpGame->pfn1F4 = fn_800E3AF4;
+    gpGame->pfnEndGame = fn_800E3AF4;
     gpGame->pfn1F8 = fn_800CF158;
     gpGame->pfn1FC = fn_800CF450;
     gpGame->pfn200 = fn_800CFE74;
@@ -198,7 +191,7 @@ void fn_800E0B38(int nMode) {
     gpGame->pfn23C = fn_800E3AD0;
     gpGame->pfn240 = fn_800E3AB0;
     gpGame->pfn244 = fn_800E3AD0;
-    gpGame->pfn248 = fn_800E3AD0;
+    gpGame->pfnEndGolferTurn = fn_800E3AD0;
     gpGame->pfn24C = fn_800E3AD0;
     gpGame->pfn250 = fn_800E3AD0;
     gpGame->pfn254 = fn_800E3AD0;
@@ -541,8 +534,8 @@ u8 fn_800E1BBC(void) {
 }
 
 // Whether the current hole is the round's last.
-int fn_800E1CA8(void) {
-    int b = 1;
+u8 fn_800E1CA8(void) {
+    u8 b = 1;
     int i;
     for (i = gpGame->nCurHole + 1; i < 18; i++) {
         if (gpGame->bHoleSelected[i]) {
@@ -781,7 +774,7 @@ int fn_800E234C(int nSlot, int a, int b) {
 // The hole's stroke limit: with the session's limit option (0x5B39) on and the mode using it,
 // 10 strokes ends the hole (GM_PlayerTookShot picks the ball up).
 u8 fn_800E23B0(int nPlayer, int nStrokes) {
-    if (gSession.unk5B39 && gpGame->bStrokeLimit && nStrokes >= 10) {
+    if (gSession.bStrokeLimit && gpGame->bStrokeLimit && nStrokes >= 10) {
         return 1;
     }
     return 0;
@@ -796,7 +789,7 @@ u8 fn_800E23EC(int nPlayer) {
     if (fn_800E177C() == 0) {
         return 0;
     }
-    if (fn_800E177C() == 2 && gPlayers[nPlayer].unkC28) {
+    if (fn_800E177C() == 2 && gPlayers[nPlayer].bMulliganUsed) {
         return 0;
     }
     return 1;
@@ -806,7 +799,7 @@ u8 fn_800E23EC(int nPlayer) {
 void fn_800E2470(void) {
     int i;
     for (i = 0; i < gNumPlayersSetUp; i++) {
-        PLAYER(i)->unkC28 = 0;
+        PLAYER(i)->bMulliganUsed = 0;
     }
 }
 
@@ -923,7 +916,7 @@ int fn_800E27C0(void) {
 
 // Runs the mode's player choice twice (fn_800E292C runs it once).
 void fn_800E295C(void) {
-    gpGame->pfn1D4(gpGame->pfn1D4(5));
+    gpGame->pfnGetHonors(gpGame->pfnGetHonors(5));
 }
 
 // The start of a hole: every player's ball on their tee, the look-ahead copy and the saved
@@ -956,7 +949,7 @@ void fn_800E2A88(void) {
         }
     }
     if (!bBusy) {
-        gpGame->pfn1D0();
+        gpGame->pfnSetupNextGolfer();
     }
 }
 
@@ -1042,7 +1035,7 @@ void fn_800E2F14(void) {
     int i;
     u8  bDead = 0;
     u8  bAny;
-    if (gSession.unk5B34 == 0) {
+    if (gSession.n5B34 == 0) {
         // Dead code in the original: a loop over the holes testing a flag that is always 0 here.
         // Only the empty counting loop survives compilation, so the body is unknown.
         for (i = 0; i < 18; i++) {
@@ -1286,19 +1279,19 @@ void fn_800E30D4(void) {
 // (18 inches) of the pin - on the putter, or in any shot of a one-player game. Called from swing
 // state 14; yes leads to state 15 (the tap-in is planned) and 16 (played for the player).
 u8 Gimme_Allowed(int nPlayer) {
-    if (!SESSION_OPTIONS->bGimmes) return 0;
+    if (!gSession.options.bGimmes) return 0;
     if (gSession.nSplitScreen) return 0;
     if (gSession.bReplay) return 0;
     if ((gSession.uFlags & 0x4000) && (gSession.uFlags & 0x8000)) return 0;
     if (!gpGame->bGimmesAllowed) return 0;
-    if (gpGame->pfn1D8(nPlayer, 1)) return 0;
+    if (gpGame->pfnHoleFinished(nPlayer, 1)) return 0;
     if (fn_800D0478(nPlayer) > 0.5f) return 0;
     if (gPlayers[nPlayer].nClub != CLUB_PUTTER && gSession.nNumPlayers > 1) return 0;
     return 1;
 }
 
 void fn_800E292C(void) {
-    gpGame->pfn1D4(5);
+    gpGame->pfnGetHonors(5);
 }
 
 // Modes 13-17.
@@ -1329,7 +1322,7 @@ void fn_800E3AA8(int nPlayer, int nId) {
 void fn_800E3AAC(int nPlayer, int nTime) {
 }
 
-s32 fn_800E3AB0(void) {
+s32 fn_800E3AB0(int nPlayer) {
     return 0;
 }
 
@@ -1348,15 +1341,15 @@ u8 fn_800E3AC8(int nPlayer) {
 void fn_800E3AD0(int nPlayer) {
 }
 
-s32 fn_800E3AD4(void) {
+u8 fn_800E3AD4(u8 bCheck) {
     return 0;
 }
 
-u8 fn_800E3ADC(int a) {
+u8 fn_800E3ADC(u8 bCheck) {
     return 0;
 }
 
-u8 fn_800E3AE4(int nPlayer, int a) {
+u8 fn_800E3AE4(int nPlayer, u8 bCheck) {
     return 0;
 }
 

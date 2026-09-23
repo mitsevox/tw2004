@@ -45,7 +45,6 @@ void fn_8011A5F8(s32 a);
 u8   fn_800EF720(s32 nPlayer);
 s32  fn_8011A684(s32 a);
 u8   fn_8011A6F4(s32 a, s32 b);
-extern u8  gNumPlayersSetUp;
 extern s32 lbl_80282340;
 s32  fn_80119A04(s32 a, s32 b);
 u8   fn_801197A4(s32 nPlayer, s32 b);
@@ -119,8 +118,8 @@ void fn_800EDFC0(UStreamObject* pObject) {
 void fn_800EE02C(void) {
     gpGame->nC = 1;
     gpGame->n10 = 1;
-    SESSION_OPTIONS->unkC = lbl_80281670;
-    SESSION_OPTIONS->nWind = lbl_80282338;
+    gSession.options.nC = lbl_80281670;
+    gSession.options.nWind = lbl_80282338;
     lbl_8028233C = 0;
 }
 

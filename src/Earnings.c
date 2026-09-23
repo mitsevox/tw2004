@@ -36,16 +36,12 @@ extern s32 lbl_802003F8[10];
 extern s32 lbl_80200420[10];
 extern u8  lbl_801FFAE8[0x280];
 extern u8  lbl_801FFD90[0x280];
-extern Replay gReplayData;
-extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
 extern s32 lbl_80282248;
 extern s32 lbl_8028224C;
 extern s32 lbl_80282250;
 extern s32 lbl_80282254;
 extern s32 lbl_80191A08[39];
 extern f32 lbl_80191AA4[70];
-
-void* memcpy(void* pDst, const void* pSrc, u32 uLen);
 
 u8    fn_800CF450(int nPlayer);
 

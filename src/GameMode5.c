@@ -29,12 +29,11 @@ void  fn_800EBD28(void);
 void  fn_800EC1E0(void);
 void  fn_800ED604(int nPlayer);
 void  fn_800EAF18(UStreamObject* pObject);
-extern u8  (*lbl_80282320)(void);
+extern u8  (*lbl_80282320)(u8 bCheck);        // the mode's own GameFinished
 extern s32 lbl_80282300;
 extern s32 lbl_80282304;
 extern s32 lbl_80282308;
 extern s32 lbl_8028230C;
-extern u8 gNumPlayersSetUp;                 // 0x80281D48 (Golfer.c)
 extern void (*lbl_80282328)(void);
 int   fn_800ECF9C(int i);
 void  fn_800EC170(int n);
@@ -45,8 +44,8 @@ extern u8 lbl_802822FC;
 u8 fn_800ECA08(void);
 extern u8 lbl_80282314;
 extern u8 lbl_802822FE;
-extern u8 (*lbl_8028231C)(int nPlayer, int bCheck);
-u8 fn_800ED5C8(int nPlayer, int bCheck);
+extern u8 (*lbl_8028231C)(int nPlayer, u8 bCheck);   // and HoleFinished
+u8 fn_800ED5C8(int nPlayer, u8 bCheck);
 extern u8 lbl_802822FD;
 void fn_800ED6E8(u8 v);
 u8 fn_800ED6F0(void);
@@ -62,11 +61,11 @@ extern Unk802811F0* lbl_802811F0;
 
 // Game mode 5 starts: its callbacks, one player, the challenge list.
 void fn_800EACD8(void) {
-    gpGame->pfn1C8 = fn_800EACD8;
-    gpGame->pfn1CC = fn_800EAD6C;
+    gpGame->pfnInit = fn_800EACD8;
+    gpGame->pfnShutdown = fn_800EAD6C;
     gpGame->pfn1E4 = fn_800EBD28;
-    gpGame->pfn1F4 = fn_800EC1E0;
-    gpGame->pfn1D8 = (u8 (*)(int, int))fn_800ED5C8;
+    gpGame->pfnEndGame = fn_800EC1E0;
+    gpGame->pfnHoleFinished = fn_800ED5C8;
     gpGame->pfn210 = fn_800ED604;
     gpGame->nC = 1;
     gpGame->n10 = 1;
@@ -83,8 +82,8 @@ void fn_800EAD6C(void) {
     }
     gpGame->nC = 1;
     gpGame->n10 = 1;
-    SESSION_OPTIONS->unkC = lbl_80281660;
-    SESSION_OPTIONS->nWind = lbl_802822F0;
+    gSession.options.nC = lbl_80281660;
+    gSession.options.nWind = lbl_802822F0;
     lbl_802822FC = 0;
 }
 
@@ -157,8 +156,8 @@ void fn_800EAF7C(void) {
     int nPar;
     int nHoles;
     u8 bFound;
-    lbl_80281660 = SESSION_OPTIONS->unkC;
-    lbl_802822F0 = SESSION_OPTIONS->nWind;
+    lbl_80281660 = gSession.options.nC;
+    lbl_802822F0 = gSession.options.nWind;
     fn_800E1074();
     if (gpSaveData[gPlayers[0].nIndex].bActive) {
         gpSaveData[gPlayers[0].nIndex].b70 = 1;
@@ -197,10 +196,10 @@ void fn_800EAF7C(void) {
         gSession.nTeeSet[1] = lbl_80281664[lbl_802822F4].nTeeSet;
         gNumPlayersSetUp = 2;
         if (gSession.nGolfer[0] == gSession.nGolfer[1] &&
-            SESSION_PROFILE(0)->n0 == SESSION_PROFILE(1)->n0) {
-            SESSION_PROFILE(1)->n0++;
-            if (SESSION_PROFILE(1)->n0 >= 4) {
-                SESSION_PROFILE(1)->n0 = 0;
+            gSession.aProfile[0].n0 == gSession.aProfile[1].n0) {
+            gSession.aProfile[1].n0++;
+            if (gSession.aProfile[1].n0 >= 4) {
+                gSession.aProfile[1].n0 = 0;
             }
         }
     }
@@ -210,10 +209,10 @@ void fn_800EAF7C(void) {
         gSession.nTeeSet[2] = lbl_80281664[lbl_802822F4].nTeeSet;
         gNumPlayersSetUp = 3;
         if (gSession.nGolfer[0] == gSession.nGolfer[2] &&
-            SESSION_PROFILE(0)->n0 == SESSION_PROFILE(2)->n0) {
-            SESSION_PROFILE(2)->n0++;
-            if (SESSION_PROFILE(2)->n0 >= 4) {
-                SESSION_PROFILE(2)->n0 = 0;
+            gSession.aProfile[0].n0 == gSession.aProfile[2].n0) {
+            gSession.aProfile[2].n0++;
+            if (gSession.aProfile[2].n0 >= 4) {
+                gSession.aProfile[2].n0 = 0;
             }
         }
     }
@@ -223,10 +222,10 @@ void fn_800EAF7C(void) {
         gSession.nTeeSet[3] = lbl_80281664[lbl_802822F4].nTeeSet;
         gNumPlayersSetUp = 4;
         if (gSession.nGolfer[0] == gSession.nGolfer[3] &&
-            SESSION_PROFILE(0)->n0 == SESSION_PROFILE(3)->n0) {
-            SESSION_PROFILE(3)->n0++;
-            if (SESSION_PROFILE(3)->n0 >= 4) {
-                SESSION_PROFILE(3)->n0 = 0;
+            gSession.aProfile[0].n0 == gSession.aProfile[3].n0) {
+            gSession.aProfile[3].n0++;
+            if (gSession.aProfile[3].n0 >= 4) {
+                gSession.aProfile[3].n0 = 0;
             }
         }
     }
@@ -385,12 +384,12 @@ void fn_800EAF7C(void) {
         break;
     }
     if (lbl_80281664[lbl_802822F4].b4D) {
-        SESSION_OPTIONS->unkC = 3;
+        gSession.options.nC = 3;
     } else {
-        SESSION_OPTIONS->unkC = 0;
+        gSession.options.nC = 0;
     }
     gpGame->nMulligans = 0;
-    SESSION_OPTIONS->nWind = lbl_80281664[lbl_802822F4].nWind;
+    gSession.options.nWind = lbl_80281664[lbl_802822F4].nWind;
     bFound = 0;
     for (i = lbl_802822F4 - 1; i >= 0; i--) {
         if (lbl_80281664[i].nGroup == lbl_80281664[lbl_802822F4].nGroup) {
@@ -408,17 +407,17 @@ void fn_800EAF7C(void) {
         lbl_80282308 += nPar;
         lbl_80282304 += nHoles;
     }
-    lbl_8028232C = gpGame->pfn1CC;
-    lbl_80282328 = gpGame->pfn1F4;
+    lbl_8028232C = gpGame->pfnShutdown;
+    lbl_80282328 = gpGame->pfnEndGame;
     lbl_80282324 = gpGame->pfn1E4;
-    lbl_80282320 = (u8 (*)(void))gpGame->pfn1DC;
-    lbl_8028231C = gpGame->pfn1D8;
+    lbl_80282320 = gpGame->pfnGameFinished;
+    lbl_8028231C = gpGame->pfnHoleFinished;
     lbl_80282318 = gpGame->pfn210;
-    gpGame->pfn1CC = fn_800EAD6C;
-    gpGame->pfn1F4 = fn_800EC1E0;
+    gpGame->pfnShutdown = fn_800EAD6C;
+    gpGame->pfnEndGame = fn_800EC1E0;
     gpGame->pfn1E4 = fn_800EBD28;
-    gpGame->pfn1DC = (u8 (*)(int))fn_800EBD60;
-    gpGame->pfn1D8 = fn_800ED5C8;
+    gpGame->pfnGameFinished = fn_800EBD60;
+    gpGame->pfnHoleFinished = fn_800ED5C8;
     gpGame->pfn210 = fn_800ED604;
 }
 
@@ -438,7 +437,7 @@ u8 fn_800EBD60(u8 bCheck) {
     if (lbl_802822FE) {
         return 0;
     }
-    if (lbl_80282320()) {
+    if (lbl_80282320(bCheck)) {
         nStrokes = 0;
         for (h = 0; h < 18; h++) {
             if (gpGame->bHoleSelected[h]) {
@@ -606,12 +605,12 @@ void fn_800EC1E0(void) {
                 if (fn_800ED6F0() && fn_800D9998(0, 0x1C) && fn_800D750C(0, 0x1C)) {
                     fn_800E4364(6, 0x1C, lbl_80200538.nA24, nProfile);
                     fn_800D3548(0, lbl_80200538.nA24, 0);
-                    gPlayers[0].n31C += lbl_80200538.nA24;
+                    gPlayers[0].money.n8 += lbl_80200538.nA24;
                 }
                 if (fn_800EC4F0(nProfile) && fn_800D750C(0, 0xC)) {
                     fn_800E4364(2, 0xC, lbl_80200538.n9E4, nProfile);
                     fn_800D3548(0, lbl_80200538.n9E4, 0);
-                    gPlayers[0].n31C += lbl_80200538.n9E4;
+                    gPlayers[0].money.n8 += lbl_80200538.n9E4;
                 }
             }
         }
@@ -1138,7 +1137,7 @@ void fn_800ED554(void) {
 }
 
 // Hole finished: always after a restart; otherwise the challenge's own test.
-u8 fn_800ED5C8(int nPlayer, int bCheck) {
+u8 fn_800ED5C8(int nPlayer, u8 bCheck) {
     if (lbl_802822FE) {
         return 1;
     }

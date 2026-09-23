@@ -8,10 +8,6 @@
 #include "engine.h"
 #include "game/earnings.h"
 
-extern Replay gReplayData;
-extern u8  gNumPlayersSetUp;
-extern s32 lbl_80282278;                    // the player whose turn it is
-extern s8  lbl_80282360;                    // the number of targets (GameModeReplay.c)
 extern s32 lbl_802816A0;                    // the options saved while the game runs
 extern s32 lbl_802823A0;
 extern s32 lbl_802823A4;                    // the extra balls of the last shot
@@ -19,7 +15,7 @@ extern s32 lbl_802823A8;                    // the points of the last shot
 
 void  fn_800F5CC8(void);
 void  fn_800F5CE4(void);
-s32   fn_800F5D10(void);
+u8    fn_800F5D10(u8 bCheck);
 s32   fn_800F5D18(int nPlayer);
 void  fn_800F5E9C(int nPlayer);
 void  fn_800F5F58(int nPlayer);
@@ -28,9 +24,9 @@ void  fn_800F673C(void);
 void  fn_800F6760(void);
 void  fn_800F6788(void);
 void  fn_800F67E0(int nPlayer);
-u8    fn_800F6820(int a);
+u8    fn_800F6820(u8 bCheck);
 void  fn_800F6828(int nPlayer);
-u8    fn_800F6848(int nPlayer, int a);
+u8    fn_800F6848(int nPlayer, u8 bCheck);
 void  fn_800F68C4(s32 nSurface, s32* pPoints, s32* pBalls);
 u8    fn_800F6990(int nPlayer);
 u8    fn_800F69C8(int nPlayer);
@@ -39,14 +35,14 @@ void  fn_800F6A3C(void);
 
 // Mode 17 starts: one player at a time, no wind, no gimmes, no mulligans.
 void fn_800F5AAC(void) {
-    gpGame->pfn1C8 = fn_800F5AAC;
-    gpGame->pfn1CC = fn_800F5CC8;
-    gpGame->pfn1D0 = fn_800F66A0;
-    gpGame->pfn1D4 = fn_800F5D18;
-    gpGame->pfn1D8 = fn_800F6848;
-    gpGame->pfn1DC = fn_800F6820;
-    gpGame->pfn1E0 = fn_800F5D10;
-    gpGame->pfn248 = fn_800F5E9C;
+    gpGame->pfnInit = fn_800F5AAC;
+    gpGame->pfnShutdown = fn_800F5CC8;
+    gpGame->pfnSetupNextGolfer = fn_800F66A0;
+    gpGame->pfnGetHonors = fn_800F5D18;
+    gpGame->pfnHoleFinished = fn_800F6848;
+    gpGame->pfnGameFinished = fn_800F6820;
+    gpGame->pfnGoToPlayoff = fn_800F5D10;
+    gpGame->pfnEndGolferTurn = fn_800F5E9C;
     gpGame->pfn244 = fn_800F5F58;
     gpGame->pfn1E4 = fn_800F673C;
     gpGame->pfn228 = fn_800F67E0;
@@ -56,7 +52,7 @@ void fn_800F5AAC(void) {
     gpGame->pfn264 = fn_800F6990;
     gpGame->pfn258 = fn_800F69C8;
     gpGame->pfn26C = fn_800F6A08;
-    gpGame->pfn1F4 = fn_800F6A3C;
+    gpGame->pfnEndGame = fn_800F6A3C;
     gpGame->b276 = 0;
     gpGame->bGimmesAllowed = 0;
     gpGame->b280 = 0;
@@ -86,18 +82,18 @@ void fn_800F5AAC(void) {
 }
 
 void fn_800F5CC8(void) {
-    SESSION_OPTIONS->unkC = lbl_802816A0;
-    SESSION_OPTIONS->nWind = lbl_802823A0;
+    gSession.options.nC = lbl_802816A0;
+    gSession.options.nWind = lbl_802823A0;
 }
 
 void fn_800F5CE4(void) {
-    lbl_802816A0 = SESSION_OPTIONS->unkC;
-    lbl_802823A0 = SESSION_OPTIONS->nWind;
-    SESSION_OPTIONS->unkC = 4;
-    SESSION_OPTIONS->nWind = 0;
+    lbl_802816A0 = gSession.options.nC;
+    lbl_802823A0 = gSession.options.nWind;
+    gSession.options.nC = 4;
+    gSession.options.nWind = 0;
 }
 
-s32 fn_800F5D10(void) {
+u8 fn_800F5D10(u8 bCheck) {
     return 0;
 }
 
@@ -385,7 +381,7 @@ void fn_800F67E0(int nPlayer) {
     }
 }
 
-u8 fn_800F6820(int a) {
+u8 fn_800F6820(u8 bCheck) {
     return 1;
 }
 
@@ -394,7 +390,7 @@ void fn_800F6828(int nPlayer) {
 }
 
 // The game is over when player 0 has hit every target, or nobody has a ball left.
-u8 fn_800F6848(int nPlayer, int a) {
+u8 fn_800F6848(int nPlayer, u8 bCheck) {
     int i;
     if (lbl_80282360 == fn_800F20C0(0)) {
         return 1;

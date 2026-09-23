@@ -4,21 +4,17 @@
 #include "golfer.h"
 #include "game.h"
 
-extern u8  lbl_8028227C;
-extern s32 lbl_802823D0;
-extern s32 lbl_802823D4;
-
 void fn_800F944C(void) {
-    gpGame->pfn1C8 = fn_800F944C;
-    gpGame->pfn1CC = fn_800F9A58;
+    gpGame->pfnInit = fn_800F944C;
+    gpGame->pfnShutdown = fn_800F9A58;
     gpGame->pfn1EC = fn_800F9AB0;
-    gpGame->pfn1D0 = fn_800F9B34;
-    gpGame->pfn1D4 = fn_800F9BF8;
-    gpGame->pfn1D8 = fn_800F9C00;
-    gpGame->pfn1DC = (u8 (*)(int))fn_800F9D00;
-    gpGame->pfn1E0 = (s32 (*)(void))fn_800F9F04;
-    gpGame->pfn1E8 = fn_800F9C48;
-    gpGame->pfn1F4 = fn_800F9E00;
+    gpGame->pfnSetupNextGolfer = fn_800F9B34;
+    gpGame->pfnGetHonors = fn_800F9BF8;
+    gpGame->pfnHoleFinished = fn_800F9C00;
+    gpGame->pfnGameFinished = fn_800F9D00;
+    gpGame->pfnGoToPlayoff = fn_800F9F04;
+    gpGame->pfnEndHole = fn_800F9C48;
+    gpGame->pfnEndGame = fn_800F9E00;
     gpGame->pfn1E4 = fn_800F9824;
     gpGame->pfn230 = fn_800FDF58;
     gpGame->pfn234 = fn_800FDF60;

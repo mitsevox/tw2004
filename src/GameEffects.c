@@ -35,17 +35,12 @@ int   fn_800E17AC(int nPlayer);           // the player's total strokes
 int   fn_800F354C(int nPlayer);
 int   fn_800F1D34(int nPlayer);
 int   fn_800D8750(int a, int b, int c, char* szName, int nPlayer);   // szName: a profile's name
-u8    fn_800DCB10(int nPlayer);
 u8    fn_800BCD24(int nPlayer);
 int   fn_800D0620(int nPlayer, int a, int b);
 int   fn_800D089C(int nPlayer, int a);
 void  fn_800BD83C(int nSound, int a);
 void  fn_800A6DCC(int nMusic, int a);
 u8    fn_800451A8(CamScript* pScript, CamShot* pShot, int nPlayer);
-extern u8 gNumPlayersSetUp;                 // 0x80281D48 (Golfer.c)
-
-// A course's records (the 'rcrd' block at gSession + 0xF00, 0x320 bytes per course).
-#define COURSE_RECORD(off) (*(s32*)((u8*)&gSession + 0xF00 + Game_GetCourse() * 0x320 + (off)))
 
 // Starts a scripted GameBreaker for nPlayer, for reason nReason (a bit in uFlags).
 #define GB_START(nPlayer, nReason)                                                                     if (!lbl_80202898.bGameBreaker || lbl_80202898.bClosing || lbl_80202898.nGBType != 0) {                lbl_80202898.bClosing = 0;                                                                         lbl_80202898.bGameBreaker = 1;                                                                     lbl_80202898.fGBTime = 0.0f;                                                                       lbl_80202898.f24 = 0.0f;                                                                           lbl_80202898.b19 = 0;                                                                              lbl_80202898.nGBType = 0;                                                                          lbl_80202898.nPlayer = nPlayer;                                                                    lbl_80202898.bPaused = 0;                                                                          lbl_80202898.uFlags = 1 << (nReason);                                                              lbl_80202898.nHeartbeats = 0;                                                                      EVENT_Trigger(nPlayer, 0x3D, 0, -1);                                                           }
@@ -201,10 +196,11 @@ void fn_800DB30C(int nPlayer, int nReason) {
         }
         if (lbl_80202898.bGameBreaker != 1 && !Player_IsCPU(nPlayer)) {
             if (nReason == 12) {
-                if (fn_800E17AC(nPlayer) + 1 >= COURSE_RECORD(0)) {
+                if (fn_800E17AC(nPlayer) + 1 >= gSession.aCourseRecord[Game_GetCourse()].n0) {
                     return;
                 }
-            } else if (nReason == 15 && !(3.0f * gPlayers[nPlayer].fA64 > COURSE_RECORD(0xC8))) {
+            } else if (nReason == 15 &&
+                       !(3.0f * gPlayers[nPlayer].fA64 > gSession.aCourseRecord[Game_GetCourse()].nC8)) {
                 return;
             }
             GB_START(nPlayer, nReason);
@@ -365,7 +361,7 @@ void fn_800DBA50(int nPlayer) {
             } else if (fDist < 5.0f) {
                 return;
             }
-            if (!gPlayers[nPlayer].unk30C[1] && fn_8000C594()) {
+            if (!gPlayers[nPlayer].b30D && fn_8000C594()) {
                 fn_800DCB84(gPlayers[nPlayer].ball.vStart, gPlayers[nPlayer].ballBefore.vPos, v2);
                 v2[1] = 0.0f;
                 fDist = fn_80009680(fn_80009744(v2));

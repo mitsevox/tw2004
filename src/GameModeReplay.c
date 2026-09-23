@@ -8,12 +8,6 @@
 #include "game.h"
 #include "engine.h"
 
-extern Replay gReplayData;
-
-// The target list of the target games: up to lbl_80282360 points (w = 1).
-extern f32 lbl_80211D38[][4];
-extern s8  lbl_80282360;
-
 void  fn_800E14E0(int nCourse);
 void  fn_800E1404(int nHole);
 void  fn_800ED6F8(f32 x0);
@@ -24,18 +18,18 @@ void fn_800F1404(void);
 void fn_800F1424(void);
 void fn_800F15AC(void);
 void fn_800F18C8(void);
-u8   fn_800F193C(int nPlayer, int a);
-u8   fn_800F1944(int a);
+u8   fn_800F193C(int nPlayer, u8 bCheck);
+u8   fn_800F1944(u8 bCheck);
 void fn_800F194C(void);
 
 // TW06: GameModeReplay::Init. Mode 10 starts: one player, no mulligans, the saved shot's hole.
 void fn_800F125C(void) {
-    gpGame->pfn1C8 = fn_800F125C;
-    gpGame->pfn1D0 = fn_800F15AC;
-    gpGame->pfn1D8 = fn_800F193C;
-    gpGame->pfn1DC = fn_800F1944;
+    gpGame->pfnInit = fn_800F125C;
+    gpGame->pfnSetupNextGolfer = fn_800F15AC;
+    gpGame->pfnHoleFinished = fn_800F193C;
+    gpGame->pfnGameFinished = fn_800F1944;
     gpGame->pfn1EC = fn_800F1424;
-    gpGame->pfn1F4 = fn_800F194C;
+    gpGame->pfnEndGame = fn_800F194C;
     gpGame->pfn1E4 = fn_800F1388;
     gpGame->pfn224 = fn_800F1404;
     gpGame->b273 = 0;
@@ -85,7 +79,9 @@ void fn_800F1424(void) {
     fn_800E1404(gReplayData.nHole);
     Session_SetNumPlayers(1);
     gSession.bReplay = 1;
-    SESSION_OPTIONS->unkC = gReplayData.nF12;
+    // fake match: a no-op cast of &gSession; written plainly the address is scheduled
+    // differently (96.9%)
+    ((Session*)&gSession)->options.nC = gReplayData.nF12;
     if (gReplayData.nF12 == 3) {
         fn_800ED6F8(gReplayData.nF14 / 100.0f);
     }
@@ -108,7 +104,9 @@ void fn_800F15AC(void) {
     Mem_cpy(&gPlayers[0].golfer, &gReplayData.player.golfer, 0x140);
     Mem_cpy(gPlayers[0].attrMod, gReplayData.player.attrMod, 0xC);
     Mem_cpy(gPlayers[0].nStrokes, gReplayData.player.nStrokes, 0x1B8);
-    Mem_cpy(gPlayers[0].unk30C, gReplayData.player.unk30C, 0x48);
+    // b30C up to the shot block at 0x354: the flags and the round's money. Sized as the distance
+    // port: between the two fields the copy scores 96.4%
+    Mem_cpy(&gPlayers[0].b30C, &gReplayData.player.b30C, 0x48);
     Mem_cpy(&gPlayers[0].nClub, &gReplayData.player.nClub, 0x5C);
     Mem_cpy(&gPlayers[0].nShotKind2, &gReplayData.player.nShotKind2, 4);
     Mem_cpy(&gPlayers[0].swing, &gReplayData.player.swing, 0x630);
@@ -159,12 +157,12 @@ void fn_800F18C8(void) {
 }
 
 // TW06: GameModeReplay::HoleFinished.
-u8 fn_800F193C(int nPlayer, int a) {
+u8 fn_800F193C(int nPlayer, u8 bCheck) {
     return 1;
 }
 
 // TW06: GameModeReplay::GameFinished.
-u8 fn_800F1944(int a) {
+u8 fn_800F1944(u8 bCheck) {
     return 1;
 }
 

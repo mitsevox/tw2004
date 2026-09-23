@@ -113,8 +113,8 @@ void fn_80101F40(u8 a, int b);
 void fn_80101FC0(int a, int b);
 void fn_80100A3C(int nPlayer);
 void fn_80100C08(void);
-u8   fn_80101C9C(int nPlayer, int a);
-u8   fn_80101CC4(int a);
+u8   fn_80101C9C(int nPlayer, u8 bCheck);
+u8   fn_80101CC4(u8 bCheck);
 void fn_80101CD8(void);
 void fn_8010179C(void);
 void fn_801008F8(void);
@@ -124,16 +124,16 @@ void fn_80101F94(int a, int b);
 // Mode 11 starts: one player, most of the round's rules off, a fixed random seed. The player's
 // options that the lessons override are saved first.
 void fn_800FFF34(void) {
-    gpGame->pfn1C8 = fn_800FFF34;
-    gpGame->pfn1CC = fn_80100230;
-    gpGame->pfn1D8 = fn_80101C9C;
-    gpGame->pfn1DC = fn_80101CC4;
+    gpGame->pfnInit = fn_800FFF34;
+    gpGame->pfnShutdown = fn_80100230;
+    gpGame->pfnHoleFinished = fn_80101C9C;
+    gpGame->pfnGameFinished = fn_80101CC4;
     gpGame->pfn1E4 = fn_801000E8;
     gpGame->pfn220 = fn_80100C08;
     gpGame->pfn224 = fn_80100108;
     gpGame->pfn22C = fn_80100A3C;
     gpGame->pfn1EC = fn_80100160;
-    gpGame->pfn1F4 = fn_80101CD8;
+    gpGame->pfnEndGame = fn_80101CD8;
     gpGame->bShowYardage = 0;
     gpGame->bStrokeLimit = 0;
     gpGame->b275 = 0;
@@ -154,14 +154,14 @@ void fn_800FFF34(void) {
     gpGame->n10 = 1;
     gpGame->b276 = 1;
     fn_80055C1C(1);
-    lbl_8028240B = SESSION_OPTIONS->unk0[4];
-    lbl_8028240A = SESSION_OPTIONS->unk84;
-    lbl_80282409 = SESSION_OPTIONS->bBoostEnabled;
-    lbl_80282408 = SESSION_OPTIONS->bSpinEnabled;
-    SESSION_OPTIONS->unk0[4] = 4;
-    SESSION_OPTIONS->unk84 = 0;
-    SESSION_OPTIONS->bBoostEnabled = 1;
-    SESSION_OPTIONS->bSpinEnabled = 1;
+    lbl_8028240B = gSession.options.unk0[4];
+    lbl_8028240A = gSession.options.b84;
+    lbl_80282409 = gSession.options.bBoostEnabled;
+    lbl_80282408 = gSession.options.bSpinEnabled;
+    gSession.options.unk0[4] = 4;
+    gSession.options.b84 = 0;
+    gSession.options.bBoostEnabled = 1;
+    gSession.options.bSpinEnabled = 1;
     fn_8000B1D4(0, 69);
 }
 
@@ -194,10 +194,10 @@ void fn_80100160(void) {
     gSession.nTeeSet[1] = 0;
     gSession.nPinSet = 0;
     gpGame->nPinSet[Game_CurHoleIndex()] = 0;
-    lbl_802816D8 = SESSION_OPTIONS->unkC;
-    lbl_802823EC = SESSION_OPTIONS->nWind;
-    SESSION_OPTIONS->unkC = 4;
-    SESSION_OPTIONS->nWind = 0;
+    lbl_802816D8 = gSession.options.nC;
+    lbl_802823EC = gSession.options.nWind;
+    gSession.options.nC = 4;
+    gSession.options.nWind = 0;
     Session_SetNumPlayers(1);
     Session_SetGolfer(1, 0);
     gPlayers[0].nController = CONTROLLER_CPU;
@@ -209,15 +209,15 @@ void fn_80100160(void) {
 // The mode ends: the saved options go back.
 void fn_80100230(void) {
     Session* pSession;
-    SESSION_OPTIONS->unkC = lbl_802816D8;
-    SESSION_OPTIONS->nWind = lbl_802823EC;
+    gSession.options.nC = lbl_802816D8;
+    gSession.options.nWind = lbl_802823EC;
     fn_80055C1C(0);
     // fake match: &gSession re-taken inside the first store after the call, as the original
     // recomputes it
-    SESSION_OPTIONS_OF(pSession = &gSession)->unk0[4] = lbl_8028240B;
-    SESSION_OPTIONS_OF(pSession)->unk84 = lbl_8028240A;
-    SESSION_OPTIONS_OF(pSession)->bBoostEnabled = lbl_80282409;
-    SESSION_OPTIONS_OF(pSession)->bSpinEnabled = lbl_80282408;
+    (pSession = &gSession)->options.unk0[4] = lbl_8028240B;
+    (pSession)->options.b84 = lbl_8028240A;
+    (pSession)->options.bBoostEnabled = lbl_80282409;
+    (pSession)->options.bSpinEnabled = lbl_80282408;
 }
 
 // Is a lesson running (mode 11)?
@@ -286,13 +286,13 @@ void fn_80100328(void) {
         lbl_80282418 = 2;
         break;
     case 7:
-        SESSION_OPTIONS->unk84 = 1;
+        gSession.options.b84 = 1;
         lbl_80282420 = 0x80;
         lbl_8028241C = 5;
         lbl_80282418 = 2;
         break;
     case 10:
-        SESSION_OPTIONS->unk84 = 0;
+        gSession.options.b84 = 0;
         lbl_80282420 = 0x90;
         lbl_8028241C = 5;
         lbl_80282418 = 2;
@@ -1016,7 +1016,7 @@ u8 fn_80101AA8(int nPlayer, int nEvent) {
 }
 
 // HoleFinished: lesson 12 is over unless its step is 19.
-u8 fn_80101C9C(int nPlayer, int a) {
+u8 fn_80101C9C(int nPlayer, u8 bCheck) {
     if (lbl_802823FC == 12 && lbl_80282428 != 19) {
         return 1;
     }
@@ -1024,7 +1024,7 @@ u8 fn_80101C9C(int nPlayer, int a) {
 }
 
 // GameFinished: after lesson 12.
-u8 fn_80101CC4(int a) {
+u8 fn_80101CC4(u8 bCheck) {
     return lbl_802823FC == 12;
 }
 
