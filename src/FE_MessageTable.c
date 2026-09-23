@@ -3143,6 +3143,21 @@ void fn_80080828(MsgArg* pArgs, MsgArg* pResult) {
     strcpy(((MsgString*)pArgs[2].p)->pStr, gpSaveData[pArgs[0].i].aSavedRound[pArgs[1].i].szName);
 }
 
+// Name slot pArgs[0]'s custom round pArgs[1]: blank it, then copy the first pArgs[3] characters
+// of pArgs[2] (each place is blanked again first).
+void fn_80080878(MsgArg* pArgs, MsgArg* pResult) {
+    int i;
+
+    for (i = 0; i < 20; i++) {
+        gpSaveData[pArgs[0].i].aSavedRound[pArgs[1].i].szName[i] = ' ';
+    }
+    for (i = 0; i < pArgs[3].i; i++) {
+        gpSaveData[pArgs[0].i].aSavedRound[pArgs[1].i].szName[i] = ' ';
+        gpSaveData[pArgs[0].i].aSavedRound[pArgs[1].i].szName[i] = ((MsgString*)pArgs[2].p)->pStr[i];
+    }
+    gpSaveData[pArgs[0].i].aSavedRound[pArgs[1].i].szName[i] = '\0';
+}
+
 // Set hole pArgs[2] of slot pArgs[0]'s custom round pArgs[1]: course pArgs[3] (-1 empties the
 // round instead) and hole number pArgs[4].
 void fn_800809F8(MsgArg* pArgs, MsgArg* pResult) {
