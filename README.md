@@ -18,16 +18,24 @@ The discs differ only in which course data they carry.
 Status
 ======
 
-Early days. Last updated 2026-09-21.
+Last updated 2026-09-23.
 
 - Builds byte-identical to the retail `main.dol`.
-- Matched: 28 of 7,646 functions (2,016 of 1,542,732 code bytes) - the camera visibility code
-  at `0x80007BC4` - `0x800083A4`.
-- Named: about 860 functions, mostly SDK and runtime. About 6,940 are still `fn_ADDRESS`.
-- Compiler: CodeWarrior GC/2.5 baseline, `-O4`. GC/2.0 not ruled out. See `docs/compiler.md`.
-- Asset formats: inventoried, none reverse-engineered yet.
-- First practical result: a two-instruction Gecko code that fixes object pop-in under Dolphin's
-  widescreen hack, found by decompiling the frustum cull test. See `docs/tw2004-notes.md`.
+- Matched code: **17.5%** (271,656 of 1,550,720 bytes), **1,814 of 7,647 functions** (23.7%).
+  Counting partial matches: 21.1%.
+- Game code in C so far: the swing and its state machine (`Swing.c`), golfer attributes and the
+  CPU's shot planning (`Golfer.c`), ball physics (`Ball.c`, 63 of 68 functions exact), the
+  animation library (`skalib.c`), the asset stream decompressor (`UStream.c`), and about 180
+  small `unsorted/` files of accessors and wrappers.
+- SDK and runtime: 764 of 841 configured functions matched.
+- Named: about 1,300 functions. About 6,340 are still `fn_ADDRESS`.
+- Compiler: CodeWarrior GC/2.5, `-O4,p`. See `docs/compiler.md`.
+- Asset formats: animation libraries decoded; the rest inventoried. See `docs/formats`.
+- Gameplay: nine gameplay hypotheses tested against the code (`docs/hypotheses.md`), with the
+  mechanics written up in plain English in `docs/gameplay.md` (swing error, CPU putting, the
+  cup pull, lucky shots, lies, wind, bounces).
+- Gecko codes (`tools/codes/`): a widescreen pop-in fix, an always-pool-cue gimme (confirmed in
+  game), and a no-lucky-shots code (untested).
 
 Roadmap
 =======
