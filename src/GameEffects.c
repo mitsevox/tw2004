@@ -82,13 +82,26 @@ int   Game_GetCourse(void);
 f32   AI_MaxDistance(int nPlayer, int nKind, int nClub);
 f32   fn_800510EC(u8* pBall);
 f32   fn_8005B64C(int nPlayer);
-void  fn_80045494(int a, int nPlayer);
+void  fn_80045494();                      // (bOn, nPlayer); EA calls it with one argument too
 void  fn_80045558(int a, int nPlayer);
 void* fn_80017028(int nView);
 int   fn_8003BDBC(int nPlayer, int nLie, int a, int b, int c, f32 fDist);
 void  fn_800DBFAC(void);
 void  fn_800DC18C(void);
 void  fn_800DC290(f32 fHeight);
+int   fn_800E17AC(int nPlayer);           // the player's total strokes
+f32   fn_80009744(f32* pVec);               // dot with itself
+void  fn_800DCB84(u8* pA, u8* pB, f32* pOut);
+int   fn_800F354C(int nPlayer);
+int   fn_800F20C0(int nPlayer);
+int   fn_800F1D34(int nPlayer);
+extern u8 gNumPlayersSetUp;                 // 0x80281D48 (Golfer.c)
+
+// A course's records (the 'rcrd' block at gSession + 0xF00, 0x320 bytes per course).
+#define COURSE_RECORD(off) (*(s32*)((u8*)&gSession + 0xF00 + Game_GetCourse() * 0x320 + (off)))
+
+// Starts a scripted GameBreaker for nPlayer, for reason nReason (a bit in uFlags).
+#define GB_START(nPlayer, nReason)                                                                     if (!lbl_80202898.bGameBreaker || lbl_80202898.bClosing || lbl_80202898.nGBType != 0) {                lbl_80202898.bClosing = 0;                                                                         lbl_80202898.bGameBreaker = 1;                                                                     lbl_80202898.fGBTime = 0.0f;                                                                       lbl_80202898.f24 = 0.0f;                                                                           lbl_80202898.b19 = 0;                                                                              lbl_80202898.nGBType = 0;                                                                          lbl_80202898.nPlayer = nPlayer;                                                                    lbl_80202898.bPaused = 0;                                                                          lbl_80202898.uFlags = 1 << (nReason);                                                              lbl_80202898.nHeartbeats = 0;                                                                      EVENT_Trigger(nPlayer, 0x3D, 0, -1);                                                           }
 
 // TW06: GameEffects_InitGameEffectSettings (by position and size).
 void fn_800DAE44(void) {
@@ -224,6 +237,74 @@ int GameEffects_BallUpdatesThisFrame(int nPlayer) {
     return 0.5f + gSession.fFrameTime / (1.0f / 59.94f);
 }
 
+// TW06: GameEffects_CheckScriptedGB (by position). A scripted GameBreaker for a record chance:
+// reason 12 while the round can still beat the course record, reason 15 when the drive beats the
+// longest-drive record (the record is in feet). Only for a human, one view, not in a replay, and
+// only with the game's GameBreaker option on.
+void fn_800DB30C(int nPlayer, int nReason) {
+    if ((!(gSession.uFlags & 0x4000) || !(gSession.uFlags & 0x8000)) && !gSession.bReplay &&
+        !gSession.nSplitScreen && !gSession.unk8[0]) {
+        if (!gpGame->b285) {
+            return;
+        }
+        if (lbl_80202898.bGameBreaker != 1 && !Player_IsCPU(nPlayer)) {
+            if (nReason == 12) {
+                if (fn_800E17AC(nPlayer) + 1 >= COURSE_RECORD(0)) {
+                    return;
+                }
+            } else if (nReason == 15 && !(3.0f * gPlayers[nPlayer].fA64 > COURSE_RECORD(0xC8))) {
+                return;
+            }
+            GB_START(nPlayer, nReason);
+        }
+    }
+}
+
+// The same for the challenge modes on course 7: mode 14 (reason 17), mode 15 when every other
+// player is out (22), modes 16 and 17 on the last target (23).
+void fn_800DB4E8(int nPlayer) {
+    u8 bStart = 0;
+    int nReason;
+    int i;
+    int n;
+    if (!gSession.bReplay && !gSession.nSplitScreen && !gSession.unk8[0]) {
+        if (Game_GetCourse() != 7) {
+            return;
+        }
+        if (lbl_80202898.bGameBreaker != 1) {
+            if (Game_GetMode() == 14) {
+                if (fn_800F354C(nPlayer) == 4) {
+                    bStart = 1;
+                    nReason = 17;
+                }
+            } else if (Game_GetMode() == 15) {
+                n = 0;
+                for (i = 0; i < gNumPlayersSetUp; i++) {
+                    if (i != nPlayer && gPlayers[i].nE88 < 5) {
+                        n++;
+                    }
+                }
+                if (n == 0) {
+                    bStart = 1;
+                    nReason = 22;
+                }
+            } else if (Game_GetMode() == 17) {
+                if (fn_800F20C0(nPlayer) == 39) {
+                    bStart = 1;
+                    nReason = 23;
+                }
+            } else if ((Game_GetMode() == 16 || Game_GetMode() == 16) && fn_800F20C0(nPlayer) == 39 &&
+                       gPlayers[nPlayer].nDE4[fn_800F1D34(nPlayer)] == 0) {
+                bStart = 1;
+                nReason = 23;
+            }
+            if (bStart) {
+                GB_START(nPlayer, nReason);
+            }
+        }
+    }
+}
+
 // The GameBreaker camera: none on course 7; otherwise a camera at the shot's full distance.
 void fn_800DB714(int nPlayer) {
     int nLie;
@@ -260,6 +341,48 @@ void fn_800DBF34(void) {
             fn_800DC18C();
             break;
         }
+    }
+}
+
+// TW06: GameEffects_RenderPredictedGB (by position). While the look-ahead ball says the shot
+// will drop: the letterbox, and the slow-down near the hole (within 2 of it for a putt, 4 otherwise)
+// for a human.
+void fn_800DBFAC(void) {
+    f32 fHeight;
+    f32 fDist;
+    f32 v[3];
+    if (lbl_80202898.fGBTime < 0.8f) {
+        fHeight = 0.15f * (lbl_80202898.fGBTime / 0.8f);
+    } else {
+        fHeight = 0.15f;
+    }
+    fn_800DCB84(gPlayers[lbl_80202898.nPlayer].ball, gPlayers[lbl_80202898.nPlayer].ballBefore, v);
+    v[1] = 0.0f;
+    fDist = fn_80009680(fn_80009744(v));
+    if (!Player_IsCPU(lbl_80202898.nPlayer)) {
+        if (gPlayers[lbl_80202898.nPlayer].nShotKind == SHOT_PUTT) {
+            if (fDist < 2.0f && !lbl_80202898.bClosing) {
+                fn_80045494(1, lbl_80202898.nPlayer);
+            } else {
+                fn_80045494(0, lbl_80202898.nPlayer);
+            }
+        } else if (fDist < 4.0f && !lbl_80202898.bClosing) {
+            fn_80045494(1, lbl_80202898.nPlayer);
+        } else {
+            fn_80045494(0, lbl_80202898.nPlayer);
+        }
+    } else {
+        fn_80045494(0, lbl_80202898.nPlayer);
+    }
+    fn_800DC290(fHeight);
+    if (lbl_80202898.bClosing) {
+        lbl_80202898.fGBTime -= gSession.fFrameTime;
+        if (lbl_80202898.fGBTime < 0.0f) {
+            lbl_80202898.bGameBreaker = 0;
+            fn_80045494(0, lbl_80202898.nPlayer);
+        }
+    } else {
+        lbl_80202898.fGBTime += gSession.fFrameTime;
     }
 }
 

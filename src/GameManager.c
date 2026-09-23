@@ -347,10 +347,13 @@ void GM_InitForHole(void) {
     lbl_80282278 = gpGame->pfn1D4(5);
     EVENT_Trigger(0xFF, 0, 0, -1);
     for (i = 0; i < 5; i++) {
+        int j;              // j only steers the register choice (found by the permuter)
         gpGame->n144[i] = 0;
-        gpGame->n158[i] = 0;
+        j = i;
+        gpGame->n158[j] = 0;
+        i = j;
         gPlayers[i].unkC2F = 0;
-        gPlayers[i].unkC2D = 0;
+        gPlayers[j].unkC2D = 0;
     }
 }
 
