@@ -311,6 +311,56 @@ EASBErrorE fn_8012881C(u32 uTime, u16* pnDays, u8* pnHours, u8* pnMinutes, u8* p
     return EASB_ERROR_NONE;
 }
 
+// Converts a time in seconds since 1970 to a calendar date and time of day.
+EASBErrorE fn_801288DC(u32 uTime, u16* pnYear, u8* pnMonth, u8* pnDay, u8* pnHours, u8* pnMinutes,
+                       u8* pnSeconds) {
+    s32 aDaysBefore[12] = { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
+    s32 aDaysBeforeLeap[12] = { 0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335 };
+    u16 nDays;
+    u32 uDay;
+    s32 nDayOfYear;
+    EASBErrorE eError;
+
+    if (pnYear == NULL || pnMonth == NULL || pnDay == NULL || pnHours == NULL || pnMinutes == NULL ||
+        pnSeconds == NULL) {
+        return EASB_ERROR_NULL_PARAMETERS;
+    }
+    eError = fn_8012881C(uTime, &nDays, pnHours, pnMinutes, pnSeconds);
+    if (eError != EASB_ERROR_NONE) return eError;
+    // Days since the year 0, with the ten days the Gregorian calendar dropped.
+    uDay = nDays + 719165;
+    if (uDay > 577737) {
+        uDay += 10;
+    }
+    *pnYear = uDay / 365;
+    nDayOfYear = uDay % 365 - *pnYear / 4 + *pnYear / 100 - *pnYear / 400 - 12;
+    while (nDayOfYear <= 0) {
+        if (fn_80127F40(*pnYear) == 1) {
+            nDayOfYear += 366;
+        } else {
+            nDayOfYear += 365;
+        }
+        (*pnYear)--;
+    }
+    (*pnYear)++;
+    if (fn_80127F40(*pnYear) == 1) {
+        for (*pnMonth = 12; *pnMonth != 0; (*pnMonth)--) {
+            if (nDayOfYear > aDaysBeforeLeap[*pnMonth - 1]) {
+                *pnDay = nDayOfYear - aDaysBeforeLeap[*pnMonth - 1];
+                break;
+            }
+        }
+    } else {
+        for (*pnMonth = 12; *pnMonth != 0; (*pnMonth)--) {
+            if (nDayOfYear > aDaysBefore[*pnMonth - 1]) {
+                *pnDay = nDayOfYear - aDaysBefore[*pnMonth - 1];
+                break;
+            }
+        }
+    }
+    return EASB_ERROR_NONE;
+}
+
 // Clamps a time to 2003-01-01..2023-01-01.
 u32 fn_80128BC4(u32 uTime) {
     u32 uClamped;
@@ -682,8 +732,8 @@ void fn_801298FC(EASBProduct* pProduct, u8* pBuffer, u32 uSize) {
     memset(pBuffer, 0, uSize);
     fn_8012956C(pBuffer, &nOffset, EASB_PRODUCT_NAME_SIZE - 1, pProduct->szName);
     fn_80129290(pBuffer, &nOffset, 2, pProduct->uGamesPlayedTypeLanguage, 0, 0xFFFF);
-    fn_80129644(pBuffer, &nOffset, (EASB_GAMES_PLAYED_TYPE_SIZE - 1) * sizeof(u16), pProduct->szGamesPlayedType,
-                pProduct->uGamesPlayedTypeLanguage);
+    fn_80129644(pBuffer, &nOffset, (EASB_GAMES_PLAYED_TYPE_SIZE - 1) * sizeof(u16),
+                pProduct->szGamesPlayedType, pProduct->uGamesPlayedTypeLanguage);
     fn_80129290(pBuffer, &nOffset, 4, pProduct->uTime, EASB_TIME_FIRST, EASB_TIME_LAST);
     fn_80129290(pBuffer, &nOffset, 4, pProduct->u50, 0, 0xFFFFFFFF);
     fn_80129290(pBuffer, &nOffset, 4, pProduct->u54, 0, 0xFFFFFFFF);
@@ -695,8 +745,8 @@ void fn_801298FC(EASBProduct* pProduct, u8* pBuffer, u32 uSize) {
     for (i = 0; i < EASB_MAX_ACCOMPLISHMENTS; i++) {
         pAccomplishment = &pProduct->aAccomplishments[i];
         fn_80129290(pBuffer, &nOffset, 2, pAccomplishment->uLanguage, 0, 0xFFFF);
-        fn_80129644(pBuffer, &nOffset, (EASB_ACCOMPLISHMENT_NAME_SIZE - 1) * sizeof(u16), pAccomplishment->szName,
-                    pAccomplishment->uLanguage);
+        fn_80129644(pBuffer, &nOffset, (EASB_ACCOMPLISHMENT_NAME_SIZE - 1) * sizeof(u16),
+                    pAccomplishment->szName, pAccomplishment->uLanguage);
         fn_80129290(pBuffer, &nOffset, 4, pAccomplishment->uTime, EASB_TIME_FIRST, EASB_TIME_LAST);
         if (pAccomplishment->bValid == 1) {
             fn_80129290(pBuffer, &nOffset, 1, pAccomplishment->u86, 1, 250);
@@ -718,8 +768,8 @@ void fn_80129B30(EASBProduct* pProduct, u8* pBuffer) {
     fn_801295D8(pBuffer, &nOffset, EASB_PRODUCT_NAME_SIZE - 1, pProduct->szName);
     pProduct->szName[EASB_PRODUCT_NAME_SIZE - 1] = '\0';
     pProduct->uGamesPlayedTypeLanguage = fn_801293F8(pBuffer, &nOffset, 2, 0, 0xFFFF);
-    fn_801296CC(pBuffer, &nOffset, (EASB_GAMES_PLAYED_TYPE_SIZE - 1) * sizeof(u16), pProduct->szGamesPlayedType,
-                pProduct->uGamesPlayedTypeLanguage);
+    fn_801296CC(pBuffer, &nOffset, (EASB_GAMES_PLAYED_TYPE_SIZE - 1) * sizeof(u16),
+                pProduct->szGamesPlayedType, pProduct->uGamesPlayedTypeLanguage);
     pProduct->szGamesPlayedType[EASB_GAMES_PLAYED_TYPE_SIZE - 1] = 0;
     pProduct->uTime = fn_801293F8(pBuffer, &nOffset, 4, EASB_TIME_FIRST, EASB_TIME_LAST);
     pProduct->u50 = fn_801293F8(pBuffer, &nOffset, 4, 0, 0xFFFFFFFF);
@@ -732,8 +782,8 @@ void fn_80129B30(EASBProduct* pProduct, u8* pBuffer) {
     for (i = 0; i < EASB_MAX_ACCOMPLISHMENTS; i++) {
         pAccomplishment = &pProduct->aAccomplishments[i];
         pAccomplishment->uLanguage = fn_801293F8(pBuffer, &nOffset, 2, 0, 0xFFFF);
-        fn_801296CC(pBuffer, &nOffset, (EASB_ACCOMPLISHMENT_NAME_SIZE - 1) * sizeof(u16), pAccomplishment->szName,
-                    pAccomplishment->uLanguage);
+        fn_801296CC(pBuffer, &nOffset, (EASB_ACCOMPLISHMENT_NAME_SIZE - 1) * sizeof(u16),
+                    pAccomplishment->szName, pAccomplishment->uLanguage);
         pProduct->aAccomplishments[i].szName[EASB_ACCOMPLISHMENT_NAME_SIZE - 1] = 0;
         pAccomplishment->uTime = fn_801293F8(pBuffer, &nOffset, 4, EASB_TIME_FIRST, EASB_TIME_LAST);
         pAccomplishment->u86 = fn_801293F8(pBuffer, &nOffset, 1, 0, 250);
@@ -797,6 +847,32 @@ void fn_80129F98(EASBTotals* pTotals, EASBTotals* pAdd, s32 nMode) {
     pTotals->nProducts = pAdd->nProducts;
     if (nMode != 3 && pTotals->nProducts < 250) {
         pTotals->nProducts++;
+    }
+}
+
+// Adds pFrom's record into pInto when both are in use: the counters, every valid
+// accomplishment (through fn_8012DB30), b1167, u1160 and the higher level.
+void fn_8012A050(EASBProduct* pInto, EASBProduct* pFrom) {
+    u32 i;
+
+    if (!pInto->bValid || !pFrom->bValid) return;
+    pInto->u50 = fn_80128468(pInto->u50, pFrom->u50);
+    pInto->u54 = fn_80128468(pInto->u54, pFrom->u54);
+    pInto->u58 = fn_80128468(pInto->u58, pFrom->u58);
+    pInto->u5C = fn_80128468(pInto->u5C, pFrom->u5C);
+    if (pInto->u5C > pInto->u58) {
+        pInto->u58 = pInto->u5C;
+    }
+    for (i = 0; i < EASB_MAX_ACCOMPLISHMENTS; i++) {
+        if (fn_80128054(&pFrom->aAccomplishments[i]) == EASB_ERROR_NONE) {
+            fn_8012DB30(pFrom->aAccomplishments[i].szName, pFrom->aAccomplishments[i].u86,
+                        pFrom->aAccomplishments[i].uLanguage, pFrom->aAccomplishments[i].uTime);
+        }
+    }
+    pInto->b1167 = pFrom->b1167;
+    pInto->u1160 = pFrom->u1160;
+    if (pInto->uLevel < pFrom->uLevel) {
+        pInto->uLevel = pFrom->uLevel;
     }
 }
 

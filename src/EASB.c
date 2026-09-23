@@ -554,13 +554,16 @@ EASBErrorE fn_8012E820(u32 uTime, u16* pnDays, u8* pnHours, u8* pnMinutes, u8* p
     return fn_8012881C(uTime, pnDays, pnHours, pnMinutes, pnSeconds);
 }
 
-EASBErrorE fn_8012E8A8(s32 arg0, s32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5, u32 arg6) {
+// Converts a time in seconds since 1970 to a calendar date and time of day.
+EASBErrorE fn_8012E8A8(u32 uTime, u16* pnYear, u8* pnMonth, u8* pnDay, u8* pnHours, u8* pnMinutes,
+                       u8* pnSeconds) {
     EASBErrorE eError;
 
-    if (arg1 == 0 || arg2 == 0 || arg3 == 0 || arg4 == 0 || arg5 == 0 || arg6 == 0) {
+    if (pnYear == NULL || pnMonth == NULL || pnDay == NULL || pnHours == NULL || pnMinutes == NULL ||
+        pnSeconds == NULL) {
         return EASB_ERROR_NULL_PARAMETERS;
     }
     eError = fn_8012CCD8(EASB_NEED_ANY);
     if (eError != EASB_ERROR_NONE) return eError;
-    return fn_801288DC(arg0, arg1, arg2, arg3, arg4, arg5, arg6);
+    return fn_801288DC(uTime, pnYear, pnMonth, pnDay, pnHours, pnMinutes, pnSeconds);
 }
