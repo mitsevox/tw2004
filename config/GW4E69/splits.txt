@@ -3455,11 +3455,10 @@ src/ax/AXAux.c:
 	.bss        start:0x80261560 end:0x80264260
 	.sbss       start:0x80282698 end:0x802826D0
 
-unsorted/sweep_80136064.c:
-	.text       start:0x80136064 end:0x8013606C
-
 src/ax/AXCL.c:
-	.text       start:0x8013606C end:0x80136790
+	.text       start:0x80136064 end:0x80136790
+	.bss        start:0x80264260 end:0x80264860
+	.sbss       start:0x802826D0 end:0x802826E8
 
 unsorted/sweep_80136980.c:
 	.text       start:0x80136980 end:0x8013698C
