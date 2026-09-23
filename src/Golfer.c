@@ -1170,14 +1170,15 @@ f32 Shot_AimAngle(int nPlayer) {
 // The trajectory the shot shape asks for: 3 and 4 are the two alternatives, anything else normal.
 int Shot_Trajectory(int nPlayer) {
     Player* p = &gPlayers[nPlayer];
+    int     nTrajectory;
     if (p->nShotShape == SHAPE_HIGH) {
-        return 2;
-    }
-    if (p->nShotShape == SHAPE_LOW) {
-        return 0;
+        nTrajectory = 2;
+    } else if (p->nShotShape == SHAPE_LOW) {
+        nTrajectory = 0;
     } else {
-        return 1;
+        nTrajectory = 1;
     }
+    return nTrajectory;
 }
 
 // The first launch block: no spin offset.
