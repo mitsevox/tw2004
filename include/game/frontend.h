@@ -38,6 +38,13 @@ LAYOUT_ASSERT(UILoaded, 0x18);
 
 extern UILoaded lbl_801D87A8;
 
+// One font in the 'FONS' object (uiLoadFile.c fn_8008EFFC): the font's data starts at 0x20; once
+// it is loaded into a font slot, its first word holds the slot.
+typedef struct UIFont {
+    u8  unk0[0x20];
+    s32 nSlot;                  // 0x20
+} UIFont;
+
 // Print nValue into szOut with a comma between every three digits ("1,234,567").
 void fn_800907AC(int nValue, char* szOut);
 
@@ -82,6 +89,7 @@ void fn_800834A8(MsgArg* pArgs, MsgArg* pResult);
 void fn_800834E8(MsgArg* pArgs, MsgArg* pResult);
 
 extern u8 lbl_80281F18;         // set by the pause handler (GameUICommands.c fn_8008633C)
+extern u8 lbl_80281F19;         // (uiProcessInterface.c) FEgolferanim.c's fn_8008EB10 tests it
 
 // Four words a UI element passes down its transform stack, copied as one struct (what they hold is
 // not known yet).

@@ -217,7 +217,10 @@ typedef struct SaveProfile {
     char szGolferNames[6][8];   // 0x054C8  -> PlayerProfile.szNames
     u8   nGolferOutfit;         // 0x054F8  -> PlayerProfile.nOutfit
     u8   nGolferBallType;       // 0x054F9  -> PlayerProfile.nBallType
-    u8   unk54FA[0xB054 - 0x54FA];
+    u8   unk54FA[0x5613 - 0x54FA];
+    s8   n5613;                 // 0x05613  set by fn_8008DD34; FEgolferanim.c passes it to the
+                                //          character (fn_8008EA44)
+    u8   unk5614[0xB054 - 0x5614];
     // Four bit arrays with a bit per Create-A-Player asset (0x80057F18's loop over them all, which
     // also clears aB344 and aB4BC; fn_8001E9CC tests a bit).
     u32  aAssetLocked[94];      // 0x0B054  the asset was locked (fn_80078008) when last checked
