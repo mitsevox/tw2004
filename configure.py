@@ -568,9 +568,10 @@ config.libs = [
             Object(Matching, "MetroTRK/target_options.c"),
             Object(Matching, "MetroTRK/mslsupp.c"),
             Object(Matching, "MetroTRK/UDP_Stubs.c"),
-            Object(NonMatching, "MetroTRK/ddh/main.c"),
+            # the ddh and gdev drivers use small data (gIsInitialized is in .sbss); the rest of TRK does not
+            Object(Matching, "MetroTRK/ddh/main.c", extra_cflags=["-sdata 8", "-sdata2 8"]),
             Object(Matching, "MetroTRK/CircleBuffer.c"),
-            Object(NonMatching, "MetroTRK/gdev/main.c"),
+            Object(Matching, "MetroTRK/gdev/main.c", extra_cflags=["-sdata 8", "-sdata2 8"]),
             Object(Matching, "MetroTRK/MWTrace.c"),
         ],
     },

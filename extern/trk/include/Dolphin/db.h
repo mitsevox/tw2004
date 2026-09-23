@@ -15,8 +15,8 @@ struct DBInterface {
 	u32 unk4;
 };
 
-static struct DBInterface* __DBInterface;
-static int DBVerbose;
+extern struct DBInterface* __DBInterface;
+extern int DBVerbose;
 
 void DBInit(void);
 void DBInitComm(vu8**, AmcEXICallback); // possibly not this type, but some similar construction

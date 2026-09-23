@@ -4037,12 +4037,18 @@ MetroTRK/UDP_Stubs.c:
 
 MetroTRK/ddh/main.c:
 	.text       start:0x80164B88 end:0x80164ECC
+	.rodata     start:0x80185F18 end:0x80185FF8
+	.bss        start:0x8027F898 end:0x802800B8
+	.sbss       start:0x80282A18 end:0x80282A20
 
 MetroTRK/CircleBuffer.c:
 	.text       start:0x80164ECC end:0x80165134
 
 MetroTRK/gdev/main.c:
 	.text       start:0x80165134 end:0x80165480
+	.rodata     start:0x80185FF8 end:0x801860D8
+	.bss        start:0x802800B8 end:0x802805D8
+	.sbss       start:0x80282A20 end:0x80282A28
 
 MetroTRK/MWTrace.c:
 	.text       start:0x80165480 end:0x801654D0
