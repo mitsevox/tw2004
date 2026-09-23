@@ -40,10 +40,32 @@ print(m.stdout.strip())
 if m.returncode:
     fail('merge failed: ' + (m.stderr.strip() or m.stdout.strip())[-500:])
 print(run(f'python "{HERE / "dedupe_decls.py"}" src/{name}.c').stdout.strip())
-run('rm -f build/GW4E69/ok')
+
+
+def compile_errors(out):
+    """The compiler's messages in ninja's output (from each FAILED: line to the next [n/m] line)."""
+    keep, on = [], False
+    for ln in out.splitlines():
+        if ln.startswith('FAILED:'):
+            on = True
+        elif re.match(r'^\[\d+/\d+\]', ln) or ln.startswith('ninja:'):
+            on = False
+        if on and not ln.startswith('FAILED:') and len(ln) < 400:
+            keep.append(ln)
+    return '\n'.join(keep).strip()
+
+
+# A NonMatching unit is not linked, so main.dol can be OK while the unit does not even compile:
+# build its object first, on its own, and stop on a compile error.
+obj = ROOT / 'build/GW4E69/src' / f'{name}.o'
+c = run(f'ninja build/GW4E69/src/{name}.o')
+if c.returncode or not obj.exists() or obj.stat().st_mtime < path.stat().st_mtime:
+    print(compile_errors(c.stdout) or c.stdout[-2000:] or c.stderr[-2000:])
+    fail(f'src/{name}.c DOES NOT COMPILE (ninja exit {c.returncode})')
+(ROOT / 'build/GW4E69/ok').unlink(missing_ok=True)
 b = run('ninja')
-if 'main.dol: OK' not in b.stdout:
-    print(b.stdout[-2000:])
+if b.returncode or 'main.dol: OK' not in b.stdout:
+    print(compile_errors(b.stdout) or b.stdout[-2000:])
     fail('BUILD NOT OK')
 run('ninja build/GW4E69/report.json')
 r = json.load(open(ROOT / 'build/GW4E69/report.json'))
