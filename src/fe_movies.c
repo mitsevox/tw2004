@@ -1,0 +1,77 @@
+// fe_movies.c (TW06's file name, a guess from the filemap): the front end's movies. Not yet
+// decompiled; the sweep code below is the matched small functions.
+
+#include "game_types.h"
+
+// ---- sweep code (not yet cleaned up) ----
+
+extern u8 lbl_80281370;
+void fn_80091454(void);
+void fn_80091708(void);
+void fn_80006EDC();
+void fn_80006FE8();
+void fn_80007254();
+void fn_800083A0();
+void fn_80091BDC();
+void fn_800A4BDC();
+void fn_80091B98(s32 p0);
+extern u8 lbl_801A25F0[];
+extern s32 lbl_80281C04;
+void fn_80012EF8();
+void fn_8005CC64();
+void fn_80091DB8();
+void fn_80091D84(void);
+void fn_80091EE4(void);
+void fn_8009220C(void);
+extern void* lbl_80281F1C;
+extern f32 lbl_80283BA4;
+f32 fn_80092210(void);
+extern s32 lbl_80280DF0;
+void fn_80013E30();
+void fn_80092274(s32 p0);
+s32 fn_800922A0(u8* p);
+
+void fn_80091454(void) {
+    lbl_80281370 = 0;
+}
+
+void fn_80091708(void) {
+}
+
+void fn_80091B98(s32 p0) {
+    fn_80006EDC();
+    fn_80091BDC(p0);
+    fn_80006FE8();
+    fn_80007254();
+    fn_800083A0();
+    fn_800A4BDC();
+}
+
+void fn_80091D84(void) {
+    fn_80091DB8(30);
+    fn_8005CC64(0, 0);
+    fn_80012EF8();
+}
+
+void fn_80091EE4(void) {
+}
+
+void fn_8009220C(void) {
+}
+
+f32 fn_80092210(void) {
+    if ((void* ) lbl_80281F1C != NULL) {
+        return (*(f32*)((u8*)(lbl_80281F1C) + 0x18));
+    }
+    return lbl_80283BA4;
+}
+
+void fn_80092274(s32 p0) {
+    fn_80013E30(*(s32*)((u8*)lbl_80280DF0), p0, lbl_80280DF0);
+}
+
+s32 fn_800922A0(u8* p) {
+    return *(s32*)(p + 0x8);
+}
+
+// ---- end of sweep code ----
