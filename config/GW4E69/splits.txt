@@ -1546,17 +1546,8 @@ unsorted/sweep_8010FBC4.c:
 unsorted/sweep_8010FF5C.c:
 	.text       start:0x8010FF5C end:0x8010FF9C
 
-unsorted/sweep_80110178.c:
-	.text       start:0x80110178 end:0x80110180
-
-unsorted/sweep_8011027C.c:
-	.text       start:0x8011027C end:0x801102AC
-
-unsorted/sweep_80110450.c:
-	.text       start:0x80110450 end:0x80110468
-
-unsorted/sweep_801104A0.c:
-	.text       start:0x801104A0 end:0x801104AC
+DiscCheck.c:
+	.text       start:0x8010FF9C end:0x801104AC
 
 hwsBurn.c:
 	.text       start:0x801104AC end:0x80111F58
