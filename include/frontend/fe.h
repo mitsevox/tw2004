@@ -207,6 +207,8 @@ s8   fn_80103BB4(void);                 // the database's n4
 int  fn_80103D14(s16 nSlot);            // the profile's aAF80[nSlot], an asset (-1 past slot 52)
 int  fn_801049C8(s16 nPart);
 void fn_80104804(void);
+u8   fn_80104DB8(s16 nPart, int n, char* pDst); // copy the name of a part's entry n (for 0 its
+                                        // "All ..." entry when it has one); 0 if there is none
 int  fn_80105C44(s16 nPart, int b);
 u8   fn_801061C8(s8 n);                 // an asset with this n40 is offered
 int  fn_80106244(s16 nPart);            // the first slot of aAF80 whose asset is of the part
@@ -285,6 +287,16 @@ typedef struct LogoEdit {
 LAYOUT_ASSERT(LogoEdit, 0xC);
 
 extern LogoEdit* lbl_802824B8;
+
+// A logo as it is kept (0x1022 bytes): the profile holds them from 0x5ED0 and fn_8010FB70 picks
+// the one LogoEdit.n0 names.
+typedef struct LogoRecord {
+    u8   aPixels[0x1000];       // 0x0000  64 x 64 or 128 x 32 colour indexes
+    char szName[0x20];          // 0x1000
+    u8   b1020;                 // 0x1020
+    u8   nShape;                // 0x1021  LOGO_SQUARE or LOGO_RECT
+} LogoRecord;
+LAYOUT_ASSERT(LogoRecord, 0x1022);
 extern s16* lbl_802824BC;               // the palette: 256 colours, 1-bit alpha (the sign bit)
                                         // and 5-5-5 RGB; read signed (lha)
 extern u8 lbl_802824C0;                 // the palette has been copied from "__LogoSquare"
@@ -296,7 +308,7 @@ void fn_8010F7FC(int nColor, u32* pR, u32* pG, u32* pB, u32* pA);  // a palette 
 void fn_8010F880(void);                 // mark the logo changed
 void fn_8010F890(char* pName);          // load the logo from a texture
 void fn_8010F90C(int nX, int nY, int nColor);   // set a pixel
-u8*  fn_8010FB70(void);                 // the logo's pixels
+LogoRecord* fn_8010FB70(void);          // the logo being edited
 s16* fn_8010FBC4(void);                 // the palette
 int  fn_8010FBCC(int nX, int nY, u32* pR, u32* pG, u32* pB, u32* pA);  // a pixel's colour index,
                                         // and its colour as fn_8010F7FC gives it

@@ -316,7 +316,8 @@ typedef struct CrAPGolfer {
 } CrAPGolfer;
 typedef struct CrAPState {
     s32  n0;                    // 0x00  0..4: picks the shot the CrAP camera frames (fn_800C39A8)
-    u8   unk4[0x83 - 0x4];
+    s32  n4;                    // 0x04  the CrAP camera's nShot (GolfCamera_SwitchCrAPCamera)
+    u8   unk8[0x83 - 0x8];
     u8   b83;                   // 0x83  set by a menu message (FE_MessageTable.c)
     u8   unk84[2];
     u8   b86;                   // 0x86  set by a menu message; a change while n0 is 3 calls
@@ -434,6 +435,8 @@ u8     fn_800C5FE4(View* pView, int nPlayer);
 void   fn_800C6010(View* pView, int nPlayer);
 void   fn_800C60E8(View* pView, int nPlayer);
 void   GolfCamera_CutToGolferDoneAnimatingCam(View* pView, int nPlayer);
+// Every caller passes a sixth argument (0) that the camera does not read.
+void   GolfCamera_SwitchCrAPCamera(View* pView, char* szName, int nShot, u8 bBlend, u8 bForce, int n6);
 u8     fn_800C6604(View* pView);
 void   fn_800C6618(View* pView, int nPlayer);
 int    fn_800C6B38(View* pView);
