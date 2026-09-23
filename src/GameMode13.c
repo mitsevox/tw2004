@@ -7,22 +7,7 @@
 #include "ball.h"
 #include "game.h"
 #include "engine.h"
-
-// The prize rows at lbl_80200538 + 0x710 (see GameTargets.c).
-typedef struct MiniPrize {
-    s32 nId;                    // 0x00  a surface id (0x85..0x90 are the target rings), 999 the prize row
-    s32 nMode13;                // 0x04  mode 13's points for the surface
-    s32 nMode16;                // 0x08
-    s32 nMode17;                // 0x0C
-    s32 nMode15;                // 0x10
-    s32 nMode13Time;            // 0x14  mode 13's seconds added for the surface
-    s32 nMode17Balls;           // 0x18
-} MiniPrize;
-typedef struct PrizeTable {
-    u8        unk0[0x710];
-    MiniPrize mini[20];         // 0x710
-} PrizeTable;
-extern PrizeTable lbl_80200538;
+#include "game/earnings.h"
 
 extern Replay gReplayData;
 extern u8  gNumPlayersSetUp;
@@ -432,10 +417,10 @@ void fn_800F7A4C(s32 nSurface, s32* pPoints, s32* pTime, s32* pBalls) {
     *pTime = 0;
     *pBalls = 0;
     for (i = 0; i < 20; i++) {
-        if (nSurface == lbl_80200538.mini[i].nId) {
-            *pPoints = lbl_80200538.mini[i].nMode13;
-            *pTime = lbl_80200538.mini[i].nMode13Time;
-            *pBalls = lbl_80200538.mini[i].nMode17Balls;
+        if (nSurface == lbl_80200538.aMini[i].nId) {
+            *pPoints = lbl_80200538.aMini[i].n4;
+            *pTime = lbl_80200538.aMini[i].n14;
+            *pBalls = lbl_80200538.aMini[i].n18;
         }
     }
 }

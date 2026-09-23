@@ -8,26 +8,10 @@
 #include "game.h"
 #include "engine.h"
 #include "game/save.h"
+#include "game/earnings.h"
 
 extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
 extern s32 lbl_802823DC;                    // the surface the ball stopped on (-1: none)
-
-// The prize rows at lbl_80200538 + 0x710 (see GameMode10.c). Mode 12 reads a surface's points
-// (nMode13), its bonus-meter points (nMode13Time) and its shot multiplier (nMode17Balls).
-typedef struct MiniPrize {
-    s32 nId;                    // 0x00  a surface id (0x85..0x90 are the target rings), 999 the prize row
-    s32 nMode13;                // 0x04
-    s32 nMode16;                // 0x08
-    s32 nMode17;                // 0x0C
-    s32 nMode15;                // 0x10
-    s32 nMode13Time;            // 0x14
-    s32 nMode17Balls;           // 0x18
-} MiniPrize;
-typedef struct PrizeTable {
-    u8        unk0[0x710];
-    MiniPrize mini[20];         // 0x710
-} PrizeTable;
-extern PrizeTable lbl_80200538;
 
 // The surfaces a player has scored on, for the HUD (fn_800FF634): lbl_802823D8 entries.
 extern s32 lbl_802823D8;
@@ -153,10 +137,10 @@ void fn_800FEF00(s32 nSurface, s32* pPoints, s32* pMeter, s32* pMult) {
     *pMeter = 0;
     *pMult = 0;
     for (i = 0; i < 20; i++) {
-        if (nSurface == lbl_80200538.mini[i].nId) {
-            *pPoints = lbl_80200538.mini[i].nMode13;
-            *pMeter = lbl_80200538.mini[i].nMode13Time;
-            *pMult = lbl_80200538.mini[i].nMode17Balls;
+        if (nSurface == lbl_80200538.aMini[i].nId) {
+            *pPoints = lbl_80200538.aMini[i].n4;
+            *pMeter = lbl_80200538.aMini[i].n14;
+            *pMult = lbl_80200538.aMini[i].n18;
         }
     }
 }
@@ -328,9 +312,9 @@ void fn_800FF634(int nPlayer) {
     s32 n;
     lbl_802823D8 = 0;
     for (i = 0; i < 20; i++) {
-        n = fn_800FEFF8(nPlayer, lbl_80200538.mini[i].nId);
+        n = fn_800FEFF8(nPlayer, lbl_80200538.aMini[i].nId);
         if (n != 0) {
-            lbl_80212468[lbl_802823D8] = lbl_80200538.mini[i].nId;
+            lbl_80212468[lbl_802823D8] = lbl_80200538.aMini[i].nId;
             lbl_80212418[lbl_802823D8] = n;
             lbl_802823D8++;
         }
