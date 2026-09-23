@@ -3630,14 +3630,8 @@ GameModeAlternateShot.c:
 GameModeBattle.c:
 	.text       start:0x800E7980 end:0x800E81C4
 
-unsorted/sweep_800E83A8.c:
-	.text       start:0x800E83A8 end:0x800E83F8
-
-unsorted/sweep_800E8858.c:
-	.text       start:0x800E8858 end:0x800E88A8
-
-unsorted/sweep_800E8904.c:
-	.text       start:0x800E8904 end:0x800E890C
+GameModeFourBall.c:
+	.text       start:0x800E81C4 end:0x800E8D58
 
 unsorted/sweep_800EADD8.c:
 	.text       start:0x800EADD8 end:0x800EADDC
