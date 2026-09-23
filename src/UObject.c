@@ -24,3 +24,13 @@ void fn_80048894(void) {
 }
 
 // ---- end of sweep code ----
+
+// ---- sweep code (not yet cleaned up) ----
+
+s32 fn_80048AC4(u8* p0, s32 p1);
+
+s32 fn_80048AC4(u8* p0, s32 p1) {
+    return *(s32*)(((u8*)*(s32*)(p0 + 0x8)) + (p1 << 2));
+}
+
+// ---- end of sweep code ----
