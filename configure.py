@@ -983,7 +983,12 @@ config.libs = [
             Object(NonMatching, "UISEvent.c"),
             Object(NonMatching, "UIStudio.c"),
             Object(NonMatching, "UISApi.c"),
-            Object(NonMatching, "UISScreen.c"),
+            # Built with automatic inlining: fn_8016A830 and fn_8016B188 have their own recursion
+            # inlined three deep (-inline smart 55.8%, -inline auto 64.7%, nothing worse). Not
+            # deferred: -inline auto,deferred emits the functions in reverse order and pastes
+            # fn_8016C614/fn_8016C674 and the fn_8016C15C accessors into fn_8016A2D4/fn_8016A510,
+            # which the original calls (87 -> 62%, 93 -> 69%).
+            Object(NonMatching, "UISScreen.c", extra_cflags=["-inline auto"]),
             Object(Matching, "unsorted/sweep_80013070.c"),
             Object(Matching, "unsorted/sweep_800A75F4.c"),
             Object(Matching, "unsorted/sweep_8010BF3C.c"),

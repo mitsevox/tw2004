@@ -2,36 +2,13 @@
 // a loaded screen's nodes to draw them with a scale and offset, finds and runs the handlers
 // nodes have for an event, formats text for them (a printf of its own) and finds the variable a
 // rate function drives. Called by UIStudio.c and by the game's menus. The original was built with
-// automatic inlining: fn_8016A830 and fn_8016B188 have their own recursion inlined three deep.
+// automatic inlining (-inline auto in configure.py): fn_8016A830 and fn_8016B188 have their own
+// recursion inlined three deep.
 
 #include "frontend/uistudio.h"
 
 void fn_8016B188(UIStudio* pStudio, UISScreen* pScreen, UISWordStack* pStack, u32 nNode, u32 uEvent,
                  s32 nArgs, const s32* pArgs);
-
-// fn_8016C5C4 and fn_8016C6C4 sit at the end of the file in the original, but fn_8016B188 and
-// fn_8016B4D4 have them inlined, so their bodies were visible before those two.
-
-// The node's handler of the kind marked 0x4000 for an event.
-u8* fn_8016C5C4(UISNode* pNode, u16 uEvent) {
-    u32 i;
-    for (i = 0; i < pNode->nHandlers; i++) {
-        UISHandler* pHandler = &pNode->pHandlers[i];
-        if ((pHandler->uFlags & 0x4000) && pHandler->uEvent == uEvent) {
-            return pHandler->u4.pScript;
-        }
-    }
-    return NULL;
-}
-
-// The index of a loaded screen, or the number of screens when it is not loaded.
-u16 fn_8016C6C4(UIStudio* pStudio, u16 uGroup, u16 uScreen) {
-    u16 i;
-    for (i = 0; i < pStudio->nScreens; i++) {
-        if (pStudio->pScreens[i].uGroup == uGroup && pStudio->pScreens[i].uScreen == uScreen) break;
-    }
-    return i;
-}
 
 // Sends event uEvent to node nNode and, first, to the nodes it links to. A node takes events only
 // while its info has u4 and u60 set, except the studio's own events (n5 -2 to -5 and -8 to -11).
@@ -333,6 +310,18 @@ void fn_8016B188(UIStudio* pStudio, UISScreen* pScreen, UISWordStack* pStack, u3
     }
 }
 
+// The index of a loaded screen, or the number of screens when it is not loaded.
+// fake match: fn_8016C6C4's body, kept here so fn_8016B4D4 can inline it. The original has
+// fn_8016C6C4 pasted into fn_8016B4D4 although it sits at the end of the file; -inline auto only
+// pastes functions defined earlier, and -inline deferred pastes too much (see configure.py).
+static inline u16 UIS_FindScreen(UIStudio* pStudio, u16 uGroup, u16 uScreen) {
+    u16 i;
+    for (i = 0; i < pStudio->nScreens; i++) {
+        if (pStudio->pScreens[i].uGroup == uGroup && pStudio->pScreens[i].uScreen == uScreen) break;
+    }
+    return i;
+}
+
 // Moves a loaded screen nMove places up or down the screen table, one swap at a time, keeping
 // the current screen, the rate functions and the p60 records on the screens they named.
 void fn_8016B4D4(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 nMove) {
@@ -346,7 +335,7 @@ void fn_8016B4D4(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 nMove) {
     UISScreen tmp;
 
     nScreens = pStudio->nScreens;
-    nIndex = fn_8016C6C4(pStudio, uGroup, uScreen);
+    nIndex = UIS_FindScreen(pStudio, uGroup, uScreen);
     if (nIndex < nScreens) {
         if (nMove >= 0) {
             nCount = nMove;
@@ -555,6 +544,18 @@ s8 fn_8016C270(UIStudio* pStudio, UISScreen* pScreen, UISNodeInfo* pInfo, UISWor
     return nResult;
 }
 
+// The node's handler of the kind marked 0x4000 for an event.
+u8* fn_8016C5C4(UISNode* pNode, u16 uEvent) {
+    u32 i;
+    for (i = 0; i < pNode->nHandlers; i++) {
+        UISHandler* pHandler = &pNode->pHandlers[i];
+        if ((pHandler->uFlags & 0x4000) && pHandler->uEvent == uEvent) {
+            return pHandler->u4.pScript;
+        }
+    }
+    return NULL;
+}
+
 // A node's plain handler (neither kind bit) with the given ID for an event.
 u8* fn_8016C614(UISNode* pNode, u16 uId, u16 uEvent) {
     u32 i;
@@ -578,4 +579,9 @@ u8* fn_8016C674(UISNode* pNode, u16 uEvent) {
         }
     }
     return NULL;
+}
+
+// The index of a loaded screen, or the number of screens when it is not loaded.
+u16 fn_8016C6C4(UIStudio* pStudio, u16 uGroup, u16 uScreen) {
+    return UIS_FindScreen(pStudio, uGroup, uScreen);
 }
