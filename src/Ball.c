@@ -517,6 +517,15 @@ f32 fn_80050D34(f32 fDist) {
     return fPower;
 }
 
+// fake match: stands in for a function the original linker stripped. The file's pool has 20.0,
+// 0.5, 2.0, 1.0, 0.0, 0.1 in that order right after fn_80050D34's constants, before the
+// functions below use them (fn_80050F88 would put -60000 and 0.375 before 0.1); its body is
+// unknown, this one only reproduces the order.
+static f32 Ball_StrippedFn(f32 x) {
+    x = (x + 2.0f) * 0.5f + 20.0f;
+    if (x < 0.1f) return 1.0f;
+    return 0.0f;
+}
 
 // A club's distance row for a shot kind (1..7, clubs 0..24): the row, and the surface the
 // table assumes (45; 14 for the chip table). 0 for a putt or a bad club.
