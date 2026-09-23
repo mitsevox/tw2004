@@ -6,11 +6,11 @@
 #include "physics.h"
 #include "game.h"
 #include "engine.h"
+#include "game/save.h"
 
 int  fn_800E19A4(int nPlayer, int nHoles);
 void fn_800E25CC(u8 b);
 int  fn_800E1CE8(int a, int b);
-u8   fn_800588F4(u8* pProfile, int a, int i);
 
 void  fn_800D8D5C(int nPlayer, int a);
 void  fn_800E2470(void);
@@ -78,7 +78,6 @@ void  fn_80057364(int a);
 int   fn_800D3118(int nRound, int nHole);    // a built round's course for a hole
 int   fn_800D315C(int nRound, int nHole);    // and its hole number (1-based)
 
-extern u8* gpSaveData;
 extern u8  lbl_8028227C;
 
 // out = a - b (four floats)
@@ -97,7 +96,6 @@ asm void fn_800E0AF0(register f32* pA, register f32* pB, register f32* pOut) {
 
 int   fn_80110180(void);                    // the current hole can be played (inferred)
 int   fn_800D2ABC(int nCourse, int nHole);  // a hole's par
-extern u8* lbl_80281DF4;                    // unlock flags (a second save block)
 
 // The 20 course ids the mixed rounds pick from (lbl_80184D40).
 typedef struct CourseList {
@@ -106,7 +104,7 @@ typedef struct CourseList {
 extern CourseList lbl_80184D40;
 
 // A course counts as unlocked when any of the five profiles (or the second block) has its flag.
-#define COURSE_UNLOCKED(c, k) (gpSaveData[(k) * 0x10600 + (c) + 0x3A] || lbl_80281DF4[(c) + 0x3A])
+#define COURSE_UNLOCKED(c, k) (gpSaveData[k].aCourseUnlocked[c] || lbl_80281DF4->aCourseUnlocked[c])
 
 
 // out = a - b (three floats)
@@ -339,8 +337,8 @@ void fn_800E1074(void) {
             p->nC6C[j] = 0;
         }
         fn_800D8D5C(i, 0);
-        if (gpSaveData[p->nIndex * 0x10600] != 0) {
-            gpSaveData[p->nIndex * 0x10600 + 0x70] = 0;
+        if (gpSaveData[p->nIndex].bActive != 0) {
+            gpSaveData[p->nIndex].b70 = 0;
         }
     }
     for (i = 0; i < 18; i++) {
@@ -761,18 +759,20 @@ int fn_800E1CE8(int nCourse, int nHole) {
     return -1;
 }
 
-int fn_800E22E4(int nSlot, int a, int b) {
+// Marked hole (course a, hole b)'s kind-0 byte in save slot nSlot (0 for an unmarked hole).
+u8 fn_800E22E4(int nSlot, int a, int b) {
     int i = fn_800E1CE8(a, b);
     if (i != -1) {
-        return fn_800588F4(gpSaveData + nSlot * 0x10600, 0, i);
+        return fn_800588F4(&gpSaveData[nSlot], 0, i);
     }
     return 0;
 }
 
-u8 fn_800E234C(int nSlot, int a, int b) {
+// And its kind-1 value.
+int fn_800E234C(int nSlot, int a, int b) {
     int i = fn_800E1CE8(a, b);
     if (i != -1) {
-        return fn_800588F4(gpSaveData + nSlot * 0x10600, 1, i);
+        return fn_800588F4(&gpSaveData[nSlot], 1, i);
     }
     return 0;
 }
@@ -1052,7 +1052,7 @@ void fn_800E2F14(void) {
     }
     bAny = 0;
     for (i = 0; i < 5; i++) {
-        if (gpSaveData[i * 0x10600] == 1) {
+        if (gpSaveData[i].bActive == 1) {
             bAny = 1;
         }
     }
