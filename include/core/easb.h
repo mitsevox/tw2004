@@ -6,6 +6,7 @@
 // Error codes and the image layout are TW06's (its PDB keeps the EASB types).
 
 #include "game_types.h"
+#include "Common/SharedFileIO.h"
 
 // Every library call returns one of these (TW06's EASBErrorE).
 typedef enum EASBErrorE {
@@ -109,7 +110,7 @@ typedef struct EASBState {
 typedef struct EASBInitParams {
     char* szProductName;            // 0x00: this game's name in the Bio
     u16* szGamesPlayedType;         // 0x04: what the Bio counts this game's games in (wide text)
-    struct SFIOCallbacks* pCallbacks;   // 0x08: the memory-card glue (TibExt.c)
+    SFIOFuncTable* pCallbacks;      // 0x08: the memory-card glue (TibExt.c)
     u32 uHeapID;                    // 0x0C
     u16 uGamesPlayedTypeLanguage;   // 0x10: the language of szGamesPlayedType, two letters
 } EASBInitParams;
@@ -122,15 +123,17 @@ extern EASBState* lbl_802825B8;
 void* TibExtMemAlloc(u32 uHeapID, u32 uSize, u32 uAlign);
 void TibExtMemFree(u32 uHeapID, void* p, u32 uSize, u32 uAlign);
 u32 TibExtCurrentTimeGet(void);     // the real-time clock, in seconds since 1970
-struct SFIOCallbacks* fn_801221F0(void);    // fills in and returns the memory-card callbacks
+SFIOFuncTable* fn_801221F0(void);   // fills in and returns the memory-card callbacks
 
 // TibExt.c's memory-card glue (lbl_80260D88): the callbacks it hands the shared file library,
 // then the result of the last card call.
 typedef struct TibExtCard {
-    void (*apfnCallback[17])(void); // 0x00: fn_801221F0 fills these in
+    SFIOFuncTable fn;               // 0x00: fn_801221F0 fills these in
     s32 nError;                     // 0x44: the last card call's error, as the file library's code
-    s32 n48;                        // 0x48
+    s32 n48;                        // 0x48: the last call's result (a size, a count, a file)
+    char szFileName[0x44];          // 0x4C: the save file the probe found
 } TibExtCard;
+LAYOUT_ASSERT(TibExtCard, 0x90);
 
 extern TibExtCard* lbl_80281970;
 extern s32 lbl_80194758[46];        // the file library's code for each card error (by -error)

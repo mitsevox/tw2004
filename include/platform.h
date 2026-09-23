@@ -47,6 +47,7 @@ char*  strncpy(char* pDst, const char* pSrc, u32 uLen);
 int    strcmp(const char* a, const char* b);
 char*  strstr(const char* pStr, const char* pFind);
 int    sprintf(char* pBuf, const char* pFmt, ...);
+int    snprintf(char* pBuf, u32 uLen, const char* pFmt, ...);
 int    atoi(const char* p);
 double atan(double x);
 double fabs(double x);                  // 0x8000AE94

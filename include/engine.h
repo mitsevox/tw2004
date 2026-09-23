@@ -56,6 +56,9 @@ int  fn_8011E020(s32* pnMonth, s32* pnDay, s32* pnYear, s32* pnHour, s32* pnMinu
                  s32* pnMsec);
 void RTClock_GetDateTimeString(char* szOut);   // "M/D/YYYY H:MM AM"
 
+// Calendar.c: the day number of a date (month 1-12, day, year) into *pDate.
+void fn_800D2678(u16* pDate, s32 nMonth, s32 nDay, s32 nYear);
+
 // ---- math and random numbers -----------------------------------------------------------------
 
 void Vec3Copy(const f32* pSrc, f32* pDst);   // 0x80008304 (const: see code_800082F8.c)
