@@ -547,6 +547,43 @@ Downloaded from debugging.games to `C:\dev\ext\symbols\` (reference only, never 
   shared EA engine code, only 27 SDK / runtime functions (names only). Agent Under Fire runs on a
   different engine.
 
+EA's source tree (from the TW2003 Xbox prototypes)
+--------------------------------------------------
+
+2026-09-23. Hidden Palace has two Tiger Woods PGA Tour 2003 Xbox builds: Sep 3 2002 (PAL,
+`Golf_Pal_Final_Xbox`, full disc) and Sep 12 2002 (`Golf_Demo_Final_Xbox`, the demo). Both are
+**release builds with no symbols** (no PDB or map on the disc; the XBE only records the PDB's path).
+Their strings and source paths were kept as text in `C:\dev\ext\tw2003\` and the game files deleted.
+Only 57 of their strings also occur in this game (course names, camera and movie debug labels), too
+few to pair functions.
+
+What they do give is **the real layout of EA's source tree**, root `C:\Dev\TigerCode\Code\`, with
+64 file paths. The files this game names in its own asserts sit here:
+
+| Folder | Files seen (2002) |
+|---|---|
+| `Golf\AI\` | `Swing.c` (so our `Swing.c` has the right name) |
+| `Golf\Animation\` | `Skeleton.c`, `Skin.c`, `char_skin.c`, `MTA.c`, `mtalib.c` |
+| `Golf\Audio\Engine\Utils\` | `UAudMemStack.c` |
+| `Golf\Cameras\` | `GoDynamicCam.c`, `GoComicCam.c`, `GoStaticCam.c` |
+| `Golf\Entry\` | `GoEntry.c`, `startUp.c` |
+| `Golf\FrontEnd\` | `FE_Manager.c` |
+| `Golf\GameMode\` | `CareerMode.c`, `CourseInfo.c`, `TournamentMode.c` |
+| `Golf\Hi-Rendering\` | `GoCamera.c`, `GoFrameBuf.c`, `GoViewport.c`, `GoDynObj.c`, `GoLighting.c`, `GoTerrain.c` (+ platform `Xbox\GoRenderCtx_Xbox.c`) |
+| `Golf\Lo-Rendering\Shader\` | `ShaderObject\...\GoShaderObject_{Glows,Particle,Rain}_Xbox.c`, `ShaderObjectContainer\...\GoShaderObjectContainer_OBFData_Xbox.c` |
+| `Golf\Memory Card\` | `MC.c` (+ `Xbox\MC_Xbox.c`) |
+| `Golf\RCMP\` | `rcmp_mad_codec.c` |
+| `Golf\SFX\` | `PsBallFx.c`, `PsMgr.c`, `UFstPart.c`, `shadow.c` |
+| `Golf\SitDev\` | `SitDev.c` |
+| `Golf\UI runtime\` | `FETextureMgr.c`, `FEgolferanim.c`, `uiEATrax.c`, `uiLoadFile.c`, `uiProcessInterface.c`, `uiTransform.c` |
+| `Legacy\LL\` | `LLFont.c`, `LLPictInt.c`, `LLTex.c`, `LLTexGrp.c`, `LLVideo.c` (+ `Xbox\LLDisSt/LLGraph/LLPict/LLObj_Xbox.c`) |
+| `Legacy\Lib\` | `UMath.c`, `UDynMemPool.c`, `UHeap.c`, `UMemPool.c`, `UObject.c`, `UObject3D.c` |
+| `Legacy\SPECIF\` | `UFont.c`, `UKernel.c`, `UStream.c` |
+
+Platform files end in `_Xbox`; this game's own asserts use the `_Gc` versions of the same names
+(`LLObj_Gc.c`, `MC_Gc.c`, `GoRenderCtx_Gc.c`, ...). This is the natural layout for `src/` once
+files are identified.
+
 CI and decomp.dev
 -----------------
 
