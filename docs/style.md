@@ -76,7 +76,7 @@ Prototypes
 - **Headers:** `game.h` (game manager, rounds, modes, golfer states, sessions), `engine.h`
   (memory, math, streams, views, events, sound, animation), `golfer.h` (players and golfers),
   `ball.h` (the ball, surfaces and the hole's terrain; `golfer.h` includes it), `camera.h` (the
-  golf cameras' types), `game/save.h` (the save profile), `game/modes/*.h` (data a family of game
+  golf cameras' types), `game/save.h` (the save profile), `game/earnings.h` (the prize table), `game/modes/*.h` (data a family of game
   modes shares: `challenge.h`, `pgatour.h`, `rte.h`). A header includes only the headers below it
   (`game_types.h` < `engine.h` < `camera.h`, `ball.h` < `golfer.h` < `game.h`).
 - **No per-file re-declaration with other types.** CodeWarrior rejects a second prototype whose

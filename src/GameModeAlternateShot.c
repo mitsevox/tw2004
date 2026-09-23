@@ -5,10 +5,9 @@
 #include "ball.h"
 #include "game.h"
 #include "engine.h"
+#include "game/save.h"
 
-int   fn_800D37BC(int nWinner, int nLoser, int nMargin, int* pPrize);
 extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
-extern u8* gpSaveData;
 extern s32 lbl_80282278;                    // the player whose turn it is
 extern u8  lbl_80282240;
 extern u8  lbl_80281648[2];                 // per team: 1 when the second partner (1 or 3) hits next
@@ -429,7 +428,7 @@ void fn_800E7828(void) {
             for (k = 0, i = nFirst; k < 2; k++, i++) {
                 p = PLAYER(i);
                 nProfile = p->nIndex;
-                if (gpSaveData[nProfile * 0x10600]) {
+                if (gpSaveData[nProfile].bActive) {
                     fn_80125910(1);
                     if (nMoney) {
                         fn_800E4364(0, 0x6B, nPrize, nProfile);

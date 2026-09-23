@@ -5,25 +5,11 @@
 
 #include "golfer.h"
 #include "game.h"
+#include "game/save.h"
+#include "game/earnings.h"
 
-int   fn_800E1788(int nPlayer);             // the player's round total
-int   fn_800D3C7C(int nPlayer);             // the player's golfer
-void  fn_80125854(int a);
 extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
-extern u8* gpSaveData;
 extern s32 lbl_80282278;                    // the player whose turn it is
-
-// Per golfer: the prize for beating them (lbl_80200538 + 0x1D4, 8 bytes each).
-typedef struct GolferPrize {
-    s32 nBase;
-    s32 nPerStroke;
-} GolferPrize;
-typedef struct PrizeTable {
-    u8          unk0[0x1D4];
-    GolferPrize prize[1];       // 0x1D4  per golfer
-} PrizeTable;
-extern PrizeTable lbl_80200538;
-#define GOLFER_PRIZE(n) lbl_80200538.prize[n]
 
 // The tee order before any hole is played (lbl_80184DF0: 0, 1, 2, 3).
 typedef struct TeeOrder {
@@ -31,7 +17,6 @@ typedef struct TeeOrder {
 } TeeOrder;
 extern TeeOrder lbl_80184DF0;
 
-s32  fn_800FFDB0(void);
 void fn_800FFDB8(void);
 
 // TW06: GameModeStroke::Init. Up to four players, one mulligan each.
@@ -196,14 +181,15 @@ s32 fn_800FFDB0(void) {
     return 0;
 }
 
-// TW06: GameModeStroke::EndGame. Each human with a profile who beat CPU golfers wins the prize of
-// the best of them: its base prize plus its per-stroke prize for up to 5 strokes of margin.
+// TW06: GameModeStroke::EndGame. Each human with a profile who beat CPU golfers wins the prize for
+// the best earnings rating among them: its base prize plus its per-stroke prize for up to 5 strokes
+// of margin.
 void fn_800FFDB8(void) {
     int i;
     int j;
     int nScore;
     int nOther;
-    int nGolfer;
+    int nRating;
     int nBest;
     int nMargin;
     int nMoney;
@@ -226,9 +212,9 @@ void fn_800FFDB8(void) {
                     if (i != j && Player_IsCPU(j)) {
                         nOther = fn_800E1788(j);
                         if (nScore < nOther) {
-                            nGolfer = fn_800D3C7C(j);
-                            if (nGolfer > nBest) {
-                                nBest = nGolfer;
+                            nRating = fn_800D3C7C(j);
+                            if (nRating > nBest) {
+                                nBest = nRating;
                                 nMargin = nOther - nScore;
                             }
                         }
@@ -238,10 +224,10 @@ void fn_800FFDB8(void) {
                     if (nMargin > 5) {
                         nMargin = 5;
                     }
-                    nBase = GOLFER_PRIZE(nBest).nBase;
-                    nMoney = nBase + GOLFER_PRIZE(nBest).nPerStroke * nMargin;
+                    nBase = lbl_80200538.aStrokePrize[nBest].nBase;
+                    nMoney = nBase + lbl_80200538.aStrokePrize[nBest].nPerStroke * nMargin;
                     nProfile = PLAYER(i)->nIndex;
-                    if (gpSaveData[nProfile * 0x10600]) {
+                    if (gpSaveData[nProfile].bActive) {
                         if (bFirst) {
                             fn_80125854(1);
                             bFirst = 0;

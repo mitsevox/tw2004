@@ -4,11 +4,9 @@
 #include "golfer.h"
 #include "ball.h"
 #include "game.h"
+#include "game/save.h"
 
-u8    Player_IsHoledNotState23(int nPlayer);
-int   fn_800D37BC(int nWinner, int nLoser, int nMargin, int* pPrize);
 extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
-extern u8* gpSaveData;
 extern s32 lbl_80282278;                    // the player whose turn it is
 extern u8  lbl_80282240;
 
@@ -432,7 +430,7 @@ void fn_800E9CF4(void) {
             }
             for (k = 0, i = nFirst; k < 2; k++, i++) {
                 p = PLAYER(i);
-                if (gpSaveData[p->nIndex * 0x10600] && nMoney) {
+                if (gpSaveData[p->nIndex].bActive && nMoney) {
                     fn_800E4364(0, 0x6B, nPrize, p->nIndex);
                     fn_800D3548(i, nMoney, 0);
                     p->n328 += nMoney;
