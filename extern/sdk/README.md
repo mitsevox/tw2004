@@ -14,3 +14,5 @@ Changed for this game:
 - `runtime/extras.c` (new, ours): `stricmp`, the only function of MSL's extras the linker kept.
 - `dolphin/gx/GXMisc.c`: `GXResetWriteGatherPipe` (ours), which Prime's copy lacks.
 - `dolphin/card/CARDRead.c`: `CARDRead` (ours), the synchronous wrapper Prime's copy lacks.
+- `dolphin/gx/GXFifo.c`: `GXSaveCPUFifo`, `__GXSaveCPUFifoAux` (global: `GXEndDisplayList` calls
+  it) and `GXGetFifoStatus` (ours), which Prime's copy lacks.

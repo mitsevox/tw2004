@@ -727,7 +727,7 @@ config.libs = [
         "src_dir": "extern/sdk",
         "objects": [
             Object(Matching, "dolphin/gx/GXPixel.c"),
-            Object(NonMatching, "dolphin/gx/GXFifo.c"),
+            Object(Matching, "dolphin/gx/GXFifo.c"),
             Object(Matching, "dolphin/gx/GXMisc.c"),
             Object(Matching, "dolphin/gx/GXAttr.c"),
             Object(Matching, "dolphin/gx/GXBump.c"),
@@ -1197,7 +1197,6 @@ config.libs = [
             Object(Matching, "unsorted/sweep_8010FBC4.c"),
             Object(Matching, "unsorted/sweep_80124814.c"),
             Object(Matching, "unsorted/sweep_8013B3C4.c"),
-            Object(Matching, "unsorted/sweep_8013FF30.c"),
             Object(Matching, "unsorted/sweep_8014CA80.c"),
             Object(Matching, "unsorted/sweep_801654D0.c"),
             Object(Matching, "unsorted/sweep_80165524.c"),
