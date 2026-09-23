@@ -2483,8 +2483,11 @@ unsorted/rcmp_mad_codec/sweep_800B9B48.c:
 Trax.c:
 	.text       start:0x800B9FF0 end:0x800BA74C
 
-unsorted/sweep_800BAA4C.c:
-	.text       start:0x800BAA4C end:0x800BAA50
+ScreenClear.c:
+	.text       start:0x800BA74C end:0x800BA940
+
+Code800BA940.c:
+	.text       start:0x800BA940 end:0x800BAD60
 
 VecMath.c:
 	.text       start:0x800BAD60 end:0x800BB0A8
@@ -2500,6 +2503,9 @@ GoGolfCam.c:
 	.sdata      start:0x80281520 end:0x80281528
 	.sbss       start:0x80282220 end:0x80282228
 	.sdata2     start:0x802842C0 end:0x802843B8
+
+CamSpline.c:
+	.text       start:0x800C7480 end:0x800C808C
 
 GoBreakLine.c:
 	.text       start:0x800C808C end:0x800C937C
