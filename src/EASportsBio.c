@@ -7,14 +7,10 @@
 #include "core/memcard.h"
 #include "core/easb.h"
 
-s32 fn_8009D1D8(s32 nPort, s32 nSlot, s32 arg2, s32 arg3);
-void fn_800A27BC(const char* szSrc, u16* szDst, s32 nMax);
 s32 fn_80106ED8(s32 arg0, s32 nLevel);
 s32 fn_80107084(s32 arg0, s32 nLevel);
 s32 EASBio_ConvertError(EASBErrorE eError);
 s32 EASBio_WaitForAsyncProcessToComplete(void);
-s32 fn_80125354(s32 arg0, s32 arg1);
-s32 fn_801253F0(s32 arg0, s32 arg1);
 s32 fn_80125520(u8 b);
 s32 fn_801258E8(void);
 u8 fn_801257A0(void);

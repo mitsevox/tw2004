@@ -1294,7 +1294,6 @@ void Shot_Plan(int nPlayer, u8 bNotify) {
 
 extern u8 gAITargetsLoaded;             // 0x80281D40
 
-u8   Course_RegisterLoader(int nChunk, void (*pfn)(u8*));   // 0x8000C0B4
 
 void AI_TargetsClear(void) {
     int i;
