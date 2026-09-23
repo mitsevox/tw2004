@@ -1022,7 +1022,6 @@ void STATEFUNC_ShotSetupUpdate(int nPlayer) {
 // ---- starting the swing ---------------------------------------------------------------------------
 
 u8*  fn_80058EB8(int nPlayer, int nController);   // the pad's state: [1] main stick y, [3] C-stick y
-f32 fn_8005CB78(int nHandle, unsigned long long uEvent);   // an animation event's time (64-bit id: r5:r6)
 void Swing_ResetBoostAndSpin(int nPlayer);
 void fn_8006C5E0(void);
 void Swing_ClearFrameFlag(int nPlayer);
@@ -3265,8 +3264,6 @@ u8    fn_800C7170(View* pView);
 void  fn_800C7158(View* pView, int a);
 u8    fn_800C7160(View* pView);
 u8    fn_800734A0(void* pAnim);
-int fn_80062C1C(int nHandle);
-int fn_80062C10(int nHandle);
 u8    fn_800C6604(View* pView);
 void  GolfCamera_CutToGolferDoneAnimatingCam(View* pView, int nPlayer);
 
@@ -4000,7 +3997,6 @@ void STATEFUNC_SwingUpdate(int nPlayer) {
 }
 
 
-f32 fn_80062C28(int nHandle);
 extern Vec4 lbl_80183620;
 
 // State 14: the ball has come to rest, not holed. First frame: the result to the view and the
