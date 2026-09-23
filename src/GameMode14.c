@@ -5,6 +5,8 @@
 
 #include "golfer.h"
 #include "ball.h"
+#include "game.h"
+#include "engine.h"
 
 // One target's claim: how close the claiming shot was (0 best .. 4, 5 = unclaimed) and who holds it
 // (5 = nobody).
@@ -26,42 +28,9 @@ extern u8  lbl_80282370;                    // the round was ended
 extern s32 lbl_80282374;                    // the points of the last claim
 extern s32 lbl_801928F0[];                  // points per rank
 
-void  fn_800E1480(int nHole);
-u32   Rand_Next(int nStream);
-int   Game_CurHoleIndex(void);
-void  Mem_cpy(void* pDst, void* pSrc, int nBytes);
-void  fn_80055AA8(u8* pBall, f32* pPos, int nPlayer);
-f32   fn_800D0550(int nPlayer);          // the shot's length
-int   GOLFERSTATE_GetCurrentState(int nPlayer);
-void  GOLFERSTATE_Switch(int nState, int nPlayer);
-void  AI_DefaultTarget(int nPlayer);
-void  fn_800A6278(void);
-void  fn_800A62E0(void);
-void  fn_800A6358(void);
-void  fn_800A63D0(void);
-void  fn_800A30E4(int nKind, u8* pBall, int nPlayer, int a, f32 f);
-s32   fn_800D6A70(s32 nPoints, int nPlayer, int a, int b, int c, int d);
-int   fn_800D7220(int nReward, int a, s32* pOut);
-void  fn_800D3548(int nPlayer, int nMoney, s32* p);
-void  fn_800E3D90(void);
-void  fn_800E58B4(int a);
 void  fn_800E5B0C(int nMsg, u32 uFloats, void* p0, void* p1, void* p2, void* p3, void* p4);
-void  fn_80062D6C(int a, int nPlayer);
-void  fn_800FF7DC(void);
-void  fn_80125910(int a);
-void  fn_800F19D4(void);
-void  fn_800F1B60(int nPlayer, int n);
-u8    fn_800F1BD8(int nPlayer);
-u8    fn_800F1C34(int nPlayer);
-s8    fn_800F1C74(int nPlayer);
 int   fn_800F1D34(int nPlayer);
-s32   fn_800F1E58(s32 n);
-void  fn_800F1EE4(void);
-void  fn_800F2030(void);
-void  fn_800F263C(s32 p0);
 s32   fn_800F266C(s32 n, int i);
-u8    fn_800F2788(int nPlayer, f32 f);
-void  fn_800F2958(s32 p0, s32 p1);
 
 void  fn_800F2BBC(void);
 void  fn_800F2BD8(void);
@@ -83,7 +52,6 @@ void  fn_800F36A4(void);
 void  fn_800F3800(int nPlayer);
 void  fn_800F3860(void);
 s32   fn_800F392C(int a, int i);
-void  fn_800F3980(int nMsg, s32 a, s32 b, s32 c, s32 d, s32 e);
 void  fn_800F39CC(s32 p0);
 
 // Mode 14 starts: two players, no wind, no gimmes, no mulligans.
@@ -186,7 +154,7 @@ void fn_800F2D4C(int nPlayer) {
     if (gReplayData.bF10) {
         Mem_cpy(gPlayers[nPlayer].ball, gReplayData.player.ball, 0xBC);
     } else {
-        fn_80055AA8(gPlayers[nPlayer].ball,
+        fn_80055AA8((Ball*)gPlayers[nPlayer].ball,
                     (f32*)((u8*)gPlayers[nPlayer].pBallCourse + gSession.nTeeSet[nPlayer] * 0x10 + 0xB0), nPlayer);
     }
     gPlayers[nPlayer].nDC0++;

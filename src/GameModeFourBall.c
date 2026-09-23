@@ -3,22 +3,10 @@
 
 #include "golfer.h"
 #include "ball.h"
+#include "game.h"
 
-int   Game_CurHoleIndex(void);
-int   Game_CurrentHole(void);
-u8    Player_IsHoled(int nPlayer);
 u8    Player_IsHoledNotState23(int nPlayer);
-u8    Player_OnTee(int nPlayer);
-u8    Team_IsAllHuman(int nTeam);
-void  GOLFERSTATE_Set(int nState, int nPlayer);
-CourseInfo* fn_8000C594(void);
-u8    fn_800E1BBC(void);
-u8    fn_800EC550(void);
-void  fn_800E2BA4();
-void  fn_800E45C0();
 int   fn_800D37BC(int nWinner, int nLoser, int nMargin, int* pPrize);
-void  fn_800D3548(int nPlayer, int nMoney, int a);
-void  fn_800E4364(u32 nQueue, int a, int b, int c);
 extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
 extern u8* gpSaveData;
 extern s32 lbl_80282278;                    // the player whose turn it is
@@ -328,7 +316,8 @@ u8 fn_800E96B8(u8 bCheck) {
             return 1;
         }
         if (!bCheck) {
-            fn_800E2BA4(gpGame->nD8++);
+            gpGame->nD8++;
+            fn_800E2BA4();
             CLEAR_ROUNDS(PLAYER_AT);
             fn_800E45C0();
         }
@@ -372,7 +361,8 @@ u8 fn_800E98F0(u8 bCheck) {
         fn_800E2BA4();
         CLEAR_ROUNDS(PLAYER);
         gpGame->bD4 = 1;
-        fn_800E45C0(gpGame->nD8++);
+        gpGame->nD8++;
+        fn_800E45C0();
         return 1;
     }
     return 0;

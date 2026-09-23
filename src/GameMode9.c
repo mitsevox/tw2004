@@ -3,20 +3,11 @@
 // (fn_800FF894, fn_800FFDB0).
 
 #include "golfer.h"
+#include "game.h"
+#include "engine.h"
 
-int   Game_CurHoleIndex(void);
-u8    Player_IsHoled(int nPlayer);
-void  GOLFERSTATE_Set(int nState, int nPlayer);
-void  GM_EndOfGolferTurn(int nPlayer);
-void  fn_800E1480(int nHole);
-void  fn_800E3C0C(int a);
-void  fn_800E4D94(u8 bHuman);
 void  fn_800E4D88(void);
 void  fn_800E3EE0(void);
-void  fn_800E4C20(u8 bHuman);
-void  fn_80125910(int a);
-void* fn_80017028(int nView);
-void  fn_80063B98(void* pView, f32* pVec, f32 f);
 u8*   fn_800136C4(int nController);         // the pad's state: stick bytes at +0, +2, +3
 s32   fn_800FF894(int nPlayer);
 s32   fn_800FFDB0(void);
@@ -147,7 +138,7 @@ void fn_800EDA34(int nPlayer) {
 void fn_800EDA74(void) {
     Vec4 v = lbl_80184DD0;
     GOLFERSTATE_Set(GS_PLACE_BALL, 0);
-    fn_80063B98(fn_80017028(gPlayers[0].nView0), (f32*)&v, 0.5f);
+    fn_80063B98(fn_80017028(gPlayers[0].nView0), 0.5f, (f32*)&v);
 }
 
 // The pad's sticks (beyond the 96..160 dead zone) scaled to -1..1 into the player's fA7C..fA84.
