@@ -13,7 +13,7 @@
 #define PIN_RADIUS_SQ 0.00077160494f   // the flagstick's radius squared: (1 inch)^2 in square yards
 // port: the course file keeps each list's offset from its start in the pointer field itself, and
 // loading turns it into the pointer in place; with 64-bit pointers the file needs its own layout.
-#define TER_RELOCATE(pCourse, field) ((pCourse)->field = (void*)((u8*)(pCourse) + (u32)(pCourse)->field))
+#define TER_RELOCATE(pCourse, field) ((pCourse)->field = (void*)((u8*)(pCourse) + (uptr)(pCourse)->field))
 
 u8    Course_RegisterLoader(int nChunk, void (*pfn)(u8*));   // 0x8000C0B4
 s32   fn_8000C140(f32* pPos, TNetwork* pNet, s32 nNodes);   // point in outline. TW06: wn_PnPoly

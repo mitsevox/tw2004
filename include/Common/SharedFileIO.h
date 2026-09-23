@@ -4,14 +4,11 @@
 // EA shared file library (memory-card save system). Names with the SFIO prefix and Hungarian
 // notation come from assert strings in the binary; everything else is ours.
 
-typedef unsigned char  u8;
-typedef unsigned short u16;
-typedef short          s16;
-typedef unsigned long  u32;
+#include "game_types.h"
+
 typedef u8             BOOL;   // byte-sized: SFIOIsInitialized() is truncated to 8 bits after use
 #define TRUE  1
 #define FALSE 0
-#define NULL  0
 
 enum {
     SFIO_DEVICE_FIRST = 0,
