@@ -3709,62 +3709,11 @@ unsorted/sweep_800FF604.c:
 unsorted/sweep_800FF60C.c:
 	.text       start:0x800FF60C end:0x800FF634
 
-unsorted/sweep_800FFDB0.c:
-	.text       start:0x800FFDB0 end:0x800FFDB8
+GameModeStroke.c:
+	.text       start:0x800FF700 end:0x800FFF34
 
-unsorted/sweep_801000E8.c:
-	.text       start:0x801000E8 end:0x80100128
-
-unsorted/sweep_80100294.c:
-	.text       start:0x80100294 end:0x801002C0
-
-unsorted/sweep_801002C0.c:
-	.text       start:0x801002C0 end:0x80100308
-
-unsorted/sweep_80100308.c:
-	.text       start:0x80100308 end:0x80100328
-
-unsorted/sweep_80100AF8.c:
-	.text       start:0x80100AF8 end:0x80100B38
-
-unsorted/sweep_80100C00.c:
-	.text       start:0x80100C00 end:0x80100C08
-
-unsorted/sweep_80101738.c:
-	.text       start:0x80101738 end:0x8010179C
-
-unsorted/sweep_80101C9C.c:
-	.text       start:0x80101C9C end:0x80101CC4
-
-unsorted/sweep_80101CC4.c:
-	.text       start:0x80101CC4 end:0x80101CD8
-
-unsorted/sweep_80101CD8.c:
-	.text       start:0x80101CD8 end:0x80101CFC
-
-unsorted/sweep_80101CFC.c:
-	.text       start:0x80101CFC end:0x80101D4C
-
-unsorted/sweep_80101DF4.c:
-	.text       start:0x80101DF4 end:0x80101E34
-
-unsorted/sweep_80101EDC.c:
-	.text       start:0x80101EDC end:0x80101EE8
-
-unsorted/sweep_80101EE8.c:
-	.text       start:0x80101EE8 end:0x80101F18
-
-unsorted/sweep_80101F18.c:
-	.text       start:0x80101F18 end:0x80101F40
-
-unsorted/sweep_80101F40.c:
-	.text       start:0x80101F40 end:0x80101F70
-
-unsorted/sweep_80101F70.c:
-	.text       start:0x80101F70 end:0x80101F94
-
-unsorted/sweep_80101F94.c:
-	.text       start:0x80101F94 end:0x80101FEC
+GameMode11.c:
+	.text       start:0x800FFF34 end:0x80101FEC
 
 unsorted/sweep_801020BC.c:
 	.text       start:0x801020BC end:0x801020C0
