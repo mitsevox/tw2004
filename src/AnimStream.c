@@ -6,6 +6,7 @@
 #include "endian.h"
 
 void fn_8006C63C(void);                 // called while waiting for a read
+void fn_800C9EFC(int nBytes, int nError);
 void fn_800C9F14(u8 bForce);
 void fn_800CB550(int nBytes, int nError);
 void fn_800CA2E4(int nPlayer, AnimLib* pOverlay, AnimLib* pLib);
@@ -97,6 +98,52 @@ void fn_800C9CA0(void) {
     if (lbl_80282230->nState == 2) {
         fn_800C9F14(1);
     }
+}
+
+// Starts reading a player's next clip for a group (by index), style and club class, when the set
+// has two or more: the clips take turns. Returns 1 when the read started. The caller has set the
+// buffer and the clip set (p0, p4); nSlot is not used.
+u8 fn_800C9D14(int nSlot, int nPlayer, int nIndex, int nStyle, int nClub) {
+    Character* pChar;
+    AnimLib* pLib;
+    ClipRecord* pRec;
+    u32 uOffset;
+    u32 uFileSize;
+    u32 uLen;
+    s32 nCount;
+    u32 uFlags;
+    s32 nFirst;
+    char szPath[256];
+
+    uFlags = 0;
+    pLib = gPlayers[nPlayer].pChar->pLib;
+    AnimLib_Find(pLib, fn_800C9928(nIndex), nStyle, nClub, 0, &nCount, &uFlags, NULL, &nFirst);
+    if (nCount < 2) return 0;
+    lbl_80282230->players[nPlayer].clips[nIndex][nStyle][nClub].nNext++;
+    if (lbl_80282230->players[nPlayer].clips[nIndex][nStyle][nClub].nNext >= nCount) {
+        lbl_80282230->players[nPlayer].clips[nIndex][nStyle][nClub].nNext = 0;
+    }
+    pChar = gPlayers[nPlayer].pChar;
+    nFirst += lbl_80282230->players[nPlayer].clips[nIndex][nStyle][nClub].nNext;
+    pRec = &pChar->pRecords[nFirst];
+    fn_800CB668((pRec->n12 >> 1) & 1, pChar->nSlot, nPlayer, szPath);
+    uOffset = pRec->n20;
+    lbl_80282230->hFile = fn_800060E0(szPath);
+    lbl_80282230->nState = 1;
+    lbl_80282230->n1CC8 = nPlayer;
+    uFileSize = fn_800065B0(lbl_80282230->hFile);
+    if (uFileSize < uOffset + lbl_80282230->p0->nSize) {
+        uLen = uFileSize - uOffset;
+        uLen -= uLen & 0x7FF;
+    } else {
+        uLen = lbl_80282230->p0->nSize;
+    }
+    if (fn_80006444(lbl_80282230->hFile, lbl_80282230->pRead, uLen, uOffset, fn_800C9EFC) < 0) {
+        fn_8000633C(lbl_80282230->hFile);
+        lbl_80282230->hFile = -1;
+        return 0;
+    }
+    return 1;
 }
 
 // The read's completion callback: the read is done.
