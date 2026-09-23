@@ -24,10 +24,8 @@ void fn_8008D8F4(void);
 void fn_8008DAEC(void);
 void fn_8008DBE8(void);
 void fn_8008E6D4(int a);
-void fn_80079EA8(void);
 void fn_80092198(void);
 void fn_8009220C(void);
-void fn_800A75B4(void);
 void fn_800A7644(int a);
 void fn_800A4FD8(void);
 void fn_80102AC4(void);
@@ -41,9 +39,6 @@ s8   fn_80103BC0(int nAsset);           // } its kind, fn_80107444's count, and 
 s16  fn_8010742C(int nAsset);           // } choice
 int  fn_80107444(int nAsset);           // }
 void fn_80105FF8(int nAsset, s16* pKind, s32* pPart, s32* pChoice);    // }
-
-void fn_8011E020(s32* pMonth, s32* pDay, s32* pYear, s32* pHour, s32* pMinute, s32* pSecond, s32* pMsec);
-f32  GM_GetGameProgress(SaveProfile* pProfile);         // GameManager.c
 u8   fn_80056480(int a);
 u8   fn_800564AC(int n);
 u8   fn_80058304(SaveProfile* pProfile, int a);
@@ -61,7 +56,6 @@ void fn_80076F80(UStreamObject* pObject);
 int  fn_80076FDC(void);
 void fn_8007706C(char* pName, char* pDir, char* pPath);
 void fn_800770D4(char* pName, char* pPath);
-FEMovie* fn_800770FC(void);
 u8   fn_80077148(void);
 void FE_GetBIOMovieName(void);
 void fn_800772E0(void);
@@ -75,11 +69,7 @@ void fn_800773F8(void);
 void fn_80077428(void);
 void fn_8007744C(void);
 void Golfer_LoadCreatedFromSave(void);
-void fn_80077780(void);
-void fn_80077808(int nSlot);
-void fn_80077968(int nSlot);
 void fn_800779BC(int a, int b);
-GolferRecord* fn_80077A80(int nGolfer);
 int  fn_80077BDC(int n);
 void fn_80077C1C(int a, int b);
 u8   fn_80078008(s32 nAsset, SaveProfile* pProfile);
@@ -97,7 +87,6 @@ void fn_80079664(SaveProfile* pProfile);
 void fn_8007975C(SaveProfile* pProfile, s16 nPart, int nChance);
 int  fn_800797E0(SaveProfile* pProfile, s16 nPart, int b, int nChance);
 void fn_80079974(void);
-void fn_80079AD4(void);
 void fn_80079D30(void);
 void fn_80079DAC(void);
 u8   fn_80079E44(int nAttr);            // a hidden attribute: ATTR_AGGRESSION, ATTR_IQ, ATTR_SPEED

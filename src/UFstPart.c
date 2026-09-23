@@ -36,3 +36,15 @@ void fn_80099B74(u8* p0) {
 }
 
 // ---- end of sweep code ----
+
+// ---- sweep code (not yet cleaned up) ----
+
+extern void* lbl_80281F88;
+void fn_80099EA4(void* arg0);
+
+void fn_80099EA4(void* arg0) {
+    (*(void**)((u8*)(arg0) + 0x40)) = (void* ) lbl_80281F88;
+    lbl_80281F88 = arg0;
+}
+
+// ---- end of sweep code ----

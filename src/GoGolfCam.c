@@ -40,8 +40,6 @@ void     fn_800B5918(f32* pSrc, f32* pDst);             // copy three floats
 void     fn_800636B4(int nPlayer);
 void     fn_800C4AB0(f32* pFrom, f32* pTo, f32* pOut);
 int      fn_800C4D2C(f32* pFrom, f32* pTo, f32* pOut, f32 fMax);
-u8       fn_80069428(f32* pPos);                        // the point is in bounds
-TNetwork* fn_80069498(void);                            // the course's boundary outline, if any
 // The segment crosses the outline (at pHit).
 u8       fn_8000C3C8(f32* pFrom, f32* pTo, TNetwork* pNet, s32 nNodes, f32* pHit);
 u8       fn_8004B6F8(f32* pFrom, f32* pTo, f32* pHit);

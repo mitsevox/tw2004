@@ -26,7 +26,6 @@ s32 lbl_80282338;               // the options' nWind from before the tour (fn_8
 // Not in a C unit yet
 s32  fn_8008AC00(void);
 void fn_800907AC(s32 nMoney, char* pDst);               // money as text
-void fn_800D27CC(u16* pDate, s32 nDays);                // moves a date on by nDays
 
 void GameModeDriverPGATour_LoadPGAcFromStream(UStreamObject* pObject);
 void GameModeDriverPGATour_LoadPGAtFromStream(UStreamObject* pObject);
@@ -47,8 +46,6 @@ void fn_800EF294(void);
 void GameModeDriverPGATour_EndHole(void);
 u8   GameModeDriverPGATour_GameFinished(u8 bCheck);
 u8   GameModeDriverPGATour_GoToPlayoff(u8 bCheck);
-Tournament* fn_800EFA70(s32 i);
-s32  GameModeDriverPGATour_GetRounds(s32 i);
 s32  GameModeDriverPGATour_GetEventOnOrAfter(s32 i);
 s32  fn_800F02A8(void);
 
@@ -885,9 +882,10 @@ void GameModeDriverPGATour_GetCurrentEventLeader(char* pDst) {
     }
 }
 
-void fn_800F009C(void) {
+// The leader's score in the current tournament.
+int fn_800F009C(void) {
     s32 nLeader = fn_801197CC(0, 0);
-    fn_8011937C(0, nLeader, fn_8011908C(0, nLeader) == 0);
+    return fn_8011937C(0, nLeader, fn_8011908C(0, nLeader) == 0);
 }
 
 // The same for the purse.
@@ -903,8 +901,9 @@ void GameModeDriverPGATour_GetPurseString(s32 i, char* pDst) {
     fn_800907AC(GameModeDriverPGATour_ComputePurseForBracket(i, nBracket), pDst);
 }
 
-void fn_800F018C(void) {
-    fn_8011937C(0, 0, fn_8011908C(0, 0) == 0);
+// The player's own score in the current tournament.
+int fn_800F018C(void) {
+    return fn_8011937C(0, 0, fn_8011908C(0, 0) == 0);
 }
 
 // A tournament's result for the season screen:
