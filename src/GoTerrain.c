@@ -1,21 +1,33 @@
-// GoTerrain.c (EA's name, from its asserts; also in EA's 2002 source tree): the terrain manager
-// (TerrainMgr, TW06's Ter_TerrainGameDataMgr): loads the hole's ground from the 'ter ', 'tgd ' and
-// 'tLOD' chunks, keeps its patches and the lists they are drawn from, and draws them. The file ends
-// with small setters of the renderer's state (RenderState), which share its constant pool.
+// GoTerrain.c (EA's name, from its asserts; also in EA's 2002 source tree): the terrain renderer
+// (Ter_TerrainRendererMgr, terrain.h): loads the hole's ground and objects from the 'ter ', 'tgd '
+// and 'tLOD' chunks, sorts its patches and objects into draw lists by distance and level of
+// detail, animates the objects (trees, the crowd, the flag) and draws them. The file ends with
+// small setters of the renderer's state (RenderState), which share its constant pool.
 
 #include "golfer.h"
 #include "ball.h"
+#include "game.h"
 #include "engine.h"
 
 void* fn_800073B4(u8* pData, int n);
 void  fn_800075CC(void* p);         // frees what fn_800073B4 made
 void  fn_80019358(Character* pChar, f32* pDir, f32 f);
 void  fn_8001BE88(Character* pChar, void* pClip, int n, f32 f);
+void  fn_800F199C(f32 x, f32 y, f32 z);
 void  fn_80030894(void);
 void  fn_80030A40(void* p, int n);
+f32   fn_800351D8(u32 n, f32 fPeriod);
+void  fn_8003519C(int nRow, void* pData);   // calls row nRow's function of lbl_80188E88 with pData
+void  fn_80035240(s32 p0);
+void  fn_800352E4(void);
+void  fn_80035308(void);
+void  fn_80035338(s32 p0);
 s32   fn_800318AC(const void* pA, const void* pB);
-void  fn_80031938(f32* pOut, f32 f, s32 a, s32 b, s32 c, s32 d);
-void  fn_80032F88(void* pList, s32 nCount, s32 n3, s32 n4);
+void  fn_8003272C(int n);
+void  fn_80031938(Ter_LODPlane* pPlanes, f32 fStep, s32 a, s32 b, s32 c, s32 d);
+void  fn_80032B7C(void* pGround, s32 eClipMethod, s32 nPass, s32 n1C, s32 n18, s32 n20, u8* pbFirst, u8 b1,
+                  u8 b2, f32 fNear, f32 fFar);
+void  fn_80032F88(Ter_ObjectDrawData* pList, s32 nCount, s32 eFilterMin, s32 eFilterMag);
 void  fn_800341A4(UStreamObject* pObject);
 void  fn_800342B4(UStreamObject* pObject);
 void  fn_800342F0(UStreamObject* pObject);
@@ -51,19 +63,19 @@ void fn_80031084(s32 arg0, s32 arg1, s32 arg2, void* arg3, f32 farg0) {
 // ---- end of sweep code ----
 
 void fn_800306B8(void) {
-    fn_80009E70(lbl_801D3CB0.p10);
-    fn_80009E70(lbl_801D3CB0.p14);
-    fn_80009E70(lbl_801D3CB0.p18);
-    fn_80009E70(lbl_801D3CB0.p1C);
-    fn_80009E70(lbl_801D3CB0.p20);
-    fn_80009E70(lbl_801D3CB0.p24);
-    fn_80009E70(lbl_801D3CB0.p28);
-    fn_80009E70(lbl_801D3CB0.p2C);
-    fn_80009E70(lbl_801D3CB0.p30);
-    fn_80009E70(lbl_801D3CB0.p34);
-    if (lbl_801D3CB0.p0 != NULL) {
-        fn_800075CC(lbl_801D3CB0.p0);
-        lbl_801D3CB0.p0 = NULL;
+    fn_80009E70(lbl_801D3CB0.pPatchList);
+    fn_80009E70(lbl_801D3CB0.pPostDrawTerrainList);
+    fn_80009E70(lbl_801D3CB0.pObjectSortList);
+    fn_80009E70(lbl_801D3CB0.pOpaqueObjectList);
+    fn_80009E70(lbl_801D3CB0.pTranslucentObjectList);
+    fn_80009E70(lbl_801D3CB0.pNearbyObjectList);
+    fn_80009E70(lbl_801D3CB0.pDeferredItemsList);
+    fn_80009E70(lbl_801D3CB0.pPanoramaItemsList);
+    fn_80009E70(lbl_801D3CB0.pPostDrawItemsList);
+    fn_80009E70(lbl_801D3CB0.pObjectStateList);
+    if (lbl_801D3CB0.pCurrentHoleData != NULL) {
+        fn_800075CC(lbl_801D3CB0.pCurrentHoleData);
+        lbl_801D3CB0.pCurrentHoleData = NULL;
     }
     if (lbl_801D3CB0.pCourse != NULL) {
         fn_80009E70(lbl_801D3CB0.pCourse);
@@ -91,17 +103,52 @@ void fn_8003084C(void) {
     fn_80012EF8();
 }
 
-// Sorts p18 by f10, except when gSession.b11 is set.
+// Sets the renderer up for the terrain, then hands rows 4 and 5 of lbl_80188E88 the frame count,
+// row 4 with four waves between 0 and 1 whose cycles are 1591.2 x (5.5 + i) / 1000 seconds.
+void fn_80030894(void) {
+    TerWaveData wave;
+    u32 nFrame;
+    int i;
+
+    fn_80035240(0);
+    fn_80016B9C();
+    fn_80016B9C();
+    fn_80016B9C();
+    fn_80035118(4, 5);
+    fn_80012F50(1, 6, 1);
+    fn_80012F18(3);
+    fn_80035338(2);
+    fn_80035308();
+    fn_800352E4();
+    fn_80014118(0x70);
+    fn_80013EEC(fn_8001614C());
+    fn_80012EF8();
+    for (i = 0; i < 4; i++) {
+        // fake match: the original's 1591.2 is one bit above the literal 1591.2f, as a folded float
+        // product gives it; 26.52 x 60 is one such product (3 x 530.4 and 12 x 132.6 are others)
+        f32 fPeriod = 26.52f * 60.0f * (5.5f + (f32)i) / 1000.0f;
+
+        wave.aWave[i] = 0.5f * fn_800095F0(6.2831855f * fn_800351D8(gSession.nFrameCount, fPeriod) / fPeriod)
+                        + 0.5f;
+    }
+    wave.nFrame = gSession.nFrameCount;
+    fn_8003519C(4, &wave);
+    nFrame = gSession.nFrameCount;
+    fn_8003519C(5, &nFrame);
+}
+
+// Sorts pObjectSortList by distance, except when gSession.b11 is set.
 void fn_8003185C(void) {
     if (gSession.b11 == 0) {
-        fn_8015929C(lbl_801D3CB0.p18, lbl_801D3CB0.n10D0, sizeof(TerSortItem), fn_800318AC);
+        fn_8015929C(lbl_801D3CB0.pObjectSortList, lbl_801D3CB0.iTotalSortObjects, sizeof(Ter_ObjectReference),
+                    fn_800318AC);
     }
 }
 
-// fn_8003185C's comparison: by f10, smallest first.
+// fn_8003185C's comparison: nearest first.
 s32 fn_800318AC(const void* pA, const void* pB) {
-    f32 fA = ((const TerSortItem*)pA)->f10;
-    f32 fB = ((const TerSortItem*)pB)->f10;
+    f32 fA = ((const Ter_ObjectReference*)pA)->fDistanceSquared;
+    f32 fB = ((const Ter_ObjectReference*)pB)->fDistanceSquared;
 
     if (fA > fB) return 1;
     if (fA < fB) return -1;
@@ -109,20 +156,25 @@ s32 fn_800318AC(const void* pA, const void* pB) {
 }
 
 void fn_800318D8(void) {
-    fn_80031938(lbl_801D3CB0.a1110, lbl_802810D8, lbl_802810D0, lbl_802810D4, lbl_802810DC, lbl_802810E0);
-    lbl_801D3CB0.f11A8 = lbl_801D3CB0.f11A0 * lbl_801D3CB0.f11A4;
-    lbl_801D3CB0.f11A8 = lbl_801D3CB0.f11A8 * lbl_801D3CB0.f11A8;
+    fn_80031938(lbl_801D3CB0.LODPlanes, lbl_802810D8, lbl_802810D0, lbl_802810D4, lbl_802810DC,
+                lbl_802810E0);
+    lbl_801D3CB0.fDistanceCullFrameYardsSquared =
+        lbl_801D3CB0.fFOVScale * lbl_801D3CB0.fDistanceCullYardsBase;
+    lbl_801D3CB0.fDistanceCullFrameYardsSquared =
+        lbl_801D3CB0.fDistanceCullFrameYardsSquared * lbl_801D3CB0.fDistanceCullFrameYardsSquared;
 }
 
-void fn_80031938(f32* pOut, f32 f, s32 a, s32 b, s32 c, s32 d) {
-    s32 n = (f32)a * lbl_801D3CB0.f11A0;
+// The three levels of detail's ranges, in steps of fStep: LOD 0 from 0 to (a x fFOVScale + 1)
+// steps, LOD 1 from c steps before that end to b steps after, LOD 2 from d steps before that on.
+void fn_80031938(Ter_LODPlane* pPlanes, f32 fStep, s32 a, s32 b, s32 c, s32 d) {
+    s32 n = (f32)a * lbl_801D3CB0.fFOVScale;
 
-    pOut[0] = 0.0f;
-    pOut[5] = 0.0f;
-    pOut[1] = (f32)(n + 1) * f;
-    pOut[2] = pOut[1] - (f32)c * f;
-    pOut[3] = pOut[2] + (f32)b * f;
-    pOut[4] = pOut[3] - (f32)d * f;
+    pPlanes[0].fBegin = 0.0f;
+    pPlanes[2].fEnd = 0.0f;
+    pPlanes[0].fEnd = (f32)(n + 1) * fStep;
+    pPlanes[1].fBegin = pPlanes[0].fEnd - (f32)c * fStep;
+    pPlanes[1].fEnd = pPlanes[1].fBegin + (f32)b * fStep;
+    pPlanes[2].fBegin = pPlanes[1].fEnd - (f32)d * fStep;
 }
 
 void fn_80031A08(s32* pA, s32* pB, s32 a, s32 b) {
@@ -130,7 +182,7 @@ void fn_80031A08(s32* pA, s32* pB, s32 a, s32 b) {
     // stores the one fctiwz result twice); the same cast everywhere shares one.
     s32 n = a + lbl_802810DC * (s32)lbl_802810D8;
 
-    *pA = (f32)(n / (int)lbl_802810D8 - 1) / lbl_801D3CB0.f11A0;
+    *pA = (f32)(n / (int)lbl_802810D8 - 1) / lbl_801D3CB0.fFOVScale;
     *pB = lbl_802810DC + (b + lbl_802810E0 * (s32)lbl_802810D8 - n) / (int)lbl_802810D8;
 }
 
@@ -139,27 +191,135 @@ u8 fn_80031E40(void) {
     return lbl_802810E4 != -1;
 }
 
+// Draws render pass nRenderPass's sorted patches, if it has any: each list (the pass a patch is
+// drawn in, 0..2) one clip method at a time, then the deferred items with the terrain's filters.
+void fn_80032518(int nRenderPass) {
+    u8 bFirst = 1;
+    u8 bAny;
+    int nList;
+    int nClip;
+    Ter_PatchReference* pPatch;
+
+    bAny = 0;
+    for (nList = 0; nList < 3; nList++) {
+        for (nClip = 0; nClip < 3; nClip++) {
+            if (lbl_801D3CB0.pSortedPatchList[nRenderPass][nList][nClip] != NULL) {
+                bAny = 1;
+                break;
+            }
+        }
+    }
+    if (bAny) {
+        if (nRenderPass == 2) {
+            fn_8003272C(0);
+        }
+        fn_80012EF8();
+        fn_80014118(0x70);
+        fn_80012F50(0, 6, 1);
+        for (nList = 0; nList <= 2; nList++) {
+            if (nRenderPass != 2) {
+                if (nList == 0) {
+                    fn_8003272C(1);
+                } else {
+                    fn_8003272C(0);
+                }
+            }
+            for (nClip = 0; nClip <= 2; nClip++) {
+                if (lbl_801D3CB0.pSortedPatchList[nRenderPass][nList][nClip] != NULL) {
+                    switch (nClip) {
+                    case 2:
+                        fn_80035138(1);
+                        break;
+                    case 1:
+                        fn_80035138(1);
+                        break;
+                    default:
+                        fn_80035138(0);
+                        break;
+                    }
+                    fn_80012EF8();
+                    for (pPatch = lbl_801D3CB0.pSortedPatchList[nRenderPass][nList][nClip]; pPatch != NULL;
+                         pPatch = pPatch->pNext[nList]) {
+                        fn_80032B7C(pPatch->pGround, nClip, nList, pPatch->n1C, pPatch->n18, pPatch->n20,
+                                    &bFirst, 0, 0, pPatch->fDistance,
+                                    pPatch->fDistance + 2.0f * pPatch->fBoundingRadius);
+                    }
+                }
+            }
+        }
+        fn_80032F88(lbl_801D3CB0.pDeferredItemsList, lbl_801D3CB0.iDeferredItems,
+                    lbl_801D3CB0.eTerrainFilterMin, lbl_801D3CB0.eTerrainFilterMag);
+        lbl_801D3CB0.iDeferredItems = 0;
+        fn_80012F50(1, 6, 1);
+        fn_80012EF8();
+        fn_8003272C(1);
+        fn_80012EF8();
+    }
+}
+
 void fn_8003272C(int n) {
-    if (lbl_801D3CB0.b11AC) {
+    if (lbl_801D3CB0.boManageZUpdate) {
         fn_80012F34(n);
         lbl_802810CC = n;
     }
 }
 
 void fn_80032954(void) {
-    fn_80032F88(lbl_801D3CB0.p1C, lbl_801D3CB0.n10D4, lbl_801D3CB0.n11B8, lbl_801D3CB0.n11BC);
-    if (lbl_801D3CB0.n10D8 != 0) {
-        fn_80032F88(lbl_801D3CB0.p20, lbl_801D3CB0.n10D8, lbl_801D3CB0.n11B8, lbl_801D3CB0.n11BC);
+    fn_80032F88(lbl_801D3CB0.pOpaqueObjectList, lbl_801D3CB0.iOpaqueObjects, lbl_801D3CB0.eObjectFilterMin,
+                lbl_801D3CB0.eObjectFilterMag);
+    if (lbl_801D3CB0.iTranslucentObjects != 0) {
+        fn_80032F88(lbl_801D3CB0.pTranslucentObjectList, lbl_801D3CB0.iTranslucentObjects,
+                    lbl_801D3CB0.eObjectFilterMin, lbl_801D3CB0.eObjectFilterMag);
     }
     fn_80012F50(1, 6, 128);
     fn_80012EF8();
 }
 
+// Draws the post-draw terrain patches, each in every pass (bits 0..2 of n1C) it takes part in.
+void fn_800329CC(void) {
+    u8 bFirst = 1;
+    int i;
+    int nPass;
+    int nPassBit;
+
+    fn_80030894();
+    fn_80014118(0x70);
+    for (i = 0; i < lbl_801D3CB0.iTotalPostDrawTerrainPatches; i++) {
+        switch (lbl_801D3CB0.pPostDrawTerrainList[i].eClipMethod) {
+        case 2:
+            fn_80035138(1);
+            break;
+        case 1:
+            fn_80035138(1);
+            break;
+        default:
+            fn_80035138(0);
+            break;
+        }
+        fn_80012EF8();
+        for (nPass = 0, nPassBit = 1; nPass <= 2; nPass++, nPassBit <<= 1) {
+            if (nPassBit & lbl_801D3CB0.pPostDrawTerrainList[i].n1C) {
+                fn_80032B7C(lbl_801D3CB0.pPostDrawTerrainList[i].pGround,
+                            lbl_801D3CB0.pPostDrawTerrainList[i].eClipMethod, nPass,
+                            lbl_801D3CB0.pPostDrawTerrainList[i].n1C,
+                            lbl_801D3CB0.pPostDrawTerrainList[i].n18,
+                            lbl_801D3CB0.pPostDrawTerrainList[i].n20, &bFirst, 1, 0,
+                            lbl_801D3CB0.pPostDrawTerrainList[i].fDistance,
+                            lbl_801D3CB0.pPostDrawTerrainList[i].fDistance
+                                + 2.0f * lbl_801D3CB0.pPostDrawTerrainList[i].fBoundingRadius);
+            }
+        }
+    }
+    fn_8003084C();
+}
+
 void fn_80032AEC(void) {
     fn_80030894();
-    fn_80032F88(lbl_801D3CB0.p30, lbl_801D3CB0.n10E4, lbl_801D3CB0.n11B8, lbl_801D3CB0.n11BC);
+    fn_80032F88(lbl_801D3CB0.pPostDrawItemsList, lbl_801D3CB0.iPostDrawItems, lbl_801D3CB0.eObjectFilterMin,
+                lbl_801D3CB0.eObjectFilterMag);
     fn_8003272C(0);
-    fn_80032F88(lbl_801D3CB0.p24, lbl_801D3CB0.n10DC, lbl_801D3CB0.n11B8, lbl_801D3CB0.n11BC);
+    fn_80032F88(lbl_801D3CB0.pNearbyObjectList, lbl_801D3CB0.iNearbyObjects, lbl_801D3CB0.eObjectFilterMin,
+                lbl_801D3CB0.eObjectFilterMag);
     fn_8003272C(1);
     fn_80035098(0);
     fn_8003084C();
@@ -172,33 +332,75 @@ void fn_800332F4(void) {
     lbl_802810C8 = -1.0f;
 }
 
-// Puts every patch with bits 0 and 1 of a20[0] back: n1C to 0, and f14 to f10, or with bReset
-// f14 and n18 to 0.
-void fn_800335F8(u8 bReset) {
+// Starts the crowd's animation: after fDelay seconds when that is above 0 (fn_80033744 counts it
+// down, then calls here again), otherwise now, for fDuration, each crowd object from a
+// pseudo-random point of its cycle. EA passes the share of the crowd that starts, but sets it to 1.
+void fn_8003349C(f32 fPercentage, f32 fDuration, f32 fDelay) {
+    f32 fRand = 0.0f;
     int i;
 
-    lbl_801D3CB0.f116C = -1.0f;
-    lbl_801D3CB0.f1178 = 0.0f;
-    for (i = 0; i < TER_NUM_PATCHES; i++) {
-        s32 nFlags = lbl_801D3CB0.p34[i].a20[0];
-        s32 nFlags3 = lbl_801D3CB0.p34[i].a20[3];
+    fPercentage = 1.0f;
+    if (fDelay > fRand) {
+        lbl_801D3CB0.fCrowdAnimationDelayedStartTimer = fDelay;
+        lbl_801D3CB0.fCrowdAnimationDelayedStartPercentage = fPercentage;
+        lbl_801D3CB0.fCrowdAnimationDelayedStartDuration = fDuration;
+        return;
+    }
+    lbl_801D3CB0.fCrowdAnimationCountdown = fDuration;
+    lbl_801D3CB0.fCrowdAnimationDelayedStartPercentage = fPercentage;
+    for (i = 0; i < TER_NUM_OBJECTS; i++) {
+        s32 nFlags = lbl_801D3CB0.pObjectStateList[i].a20[0];
+        s32 nFlags3 = lbl_801D3CB0.pObjectStateList[i].a20[3];
 
         if (nFlags & 1) {
             if ((nFlags & 2) && !(nFlags3 & 0x40)) {
-                lbl_801D3CB0.p34[i].n1C = 0;
+                if (fPercentage >= fRand) {
+                    lbl_801D3CB0.pObjectStateList[i].n1C = 3;
+                    lbl_801D3CB0.pObjectStateList[i].f14 = lbl_801D3CB0.pObjectStateList[i].f10;
+                }
+                fRand *= 131.2934f;
+                fRand += 82.459f;
+                fRand -= fn_80035074(fRand);
+            } else if ((nFlags & 2) && (nFlags3 & 0x40)) {
+                if (fPercentage >= fRand) {
+                    lbl_801D3CB0.pObjectStateList[i].n1C = 1;
+                    lbl_801D3CB0.pObjectStateList[i].f14 = lbl_801D3CB0.pObjectStateList[i].f10;
+                }
+                fRand *= 131.2934f;
+                fRand += 82.459f;
+                fRand -= fn_80035074(fRand);
+            }
+        }
+    }
+}
+
+// Stops the crowd's animation and puts every object with bits 0 and 1 of a20[0] back: n1C to 0,
+// and f14 to f10, or with bReset f14 and n18 to 0.
+void fn_800335F8(u8 bReset) {
+    int i;
+
+    lbl_801D3CB0.fCrowdAnimationDelayedStartTimer = -1.0f;
+    lbl_801D3CB0.fCrowdAnimationCountdown = 0.0f;
+    for (i = 0; i < TER_NUM_OBJECTS; i++) {
+        s32 nFlags = lbl_801D3CB0.pObjectStateList[i].a20[0];
+        s32 nFlags3 = lbl_801D3CB0.pObjectStateList[i].a20[3];
+
+        if (nFlags & 1) {
+            if ((nFlags & 2) && !(nFlags3 & 0x40)) {
+                lbl_801D3CB0.pObjectStateList[i].n1C = 0;
                 if (bReset) {
-                    lbl_801D3CB0.p34[i].f14 = 0.0f;
-                    lbl_801D3CB0.p34[i].n18 = 0;
+                    lbl_801D3CB0.pObjectStateList[i].f14 = 0.0f;
+                    lbl_801D3CB0.pObjectStateList[i].n18 = 0;
                 } else {
-                    lbl_801D3CB0.p34[i].f14 = lbl_801D3CB0.p34[i].f10;
+                    lbl_801D3CB0.pObjectStateList[i].f14 = lbl_801D3CB0.pObjectStateList[i].f10;
                 }
             } else if ((nFlags & 2) && (nFlags3 & 0x40)) {
-                lbl_801D3CB0.p34[i].n1C = 0;
+                lbl_801D3CB0.pObjectStateList[i].n1C = 0;
                 if (bReset) {
-                    lbl_801D3CB0.p34[i].f14 = 0.0f;
-                    lbl_801D3CB0.p34[i].n18 = 0;
+                    lbl_801D3CB0.pObjectStateList[i].f14 = 0.0f;
+                    lbl_801D3CB0.pObjectStateList[i].n18 = 0;
                 } else {
-                    lbl_801D3CB0.p34[i].f14 = lbl_801D3CB0.p34[i].f10;
+                    lbl_801D3CB0.pObjectStateList[i].f14 = lbl_801D3CB0.pObjectStateList[i].f10;
                 }
             }
         }
@@ -206,19 +408,20 @@ void fn_800335F8(u8 bReset) {
 }
 
 f32 fn_800336E4(void) {
-    return lbl_801D3CB0.f1178;
+    return lbl_801D3CB0.fCrowdAnimationCountdown;
 }
 
 f32 fn_800336F4(void) {
-    return lbl_801D3CB0.f1170;
+    return lbl_801D3CB0.fCrowdAnimationDelayedStartPercentage;
 }
 
-// Sets the patch's n1C to 1 when bit 0 of its a20[3] is set.
-void fn_80033704(u16 nRow, u16 nCol) {
-    TerPatch* pPatch = &lbl_801D3CB0.p34[lbl_801D3CB0.aRowStart[nRow] + nCol];
+// Sets object nObject of patch nPatch's n1C to 1 when bit 0 of its a20[3] is set.
+void fn_80033704(u16 nPatch, u16 nObject) {
+    Ter_ObjectState* pState =
+        &lbl_801D3CB0.pObjectStateList[lbl_801D3CB0.iPatchFirstObjectInstanceIndex[nPatch] + nObject];
 
-    if (pPatch->a20[3] & 1) {
-        pPatch->n1C = 1;
+    if (pState->a20[3] & 1) {
+        pState->n1C = 1;
     }
 }
 
@@ -253,29 +456,29 @@ void fn_800341A4(UStreamObject* pObject) {
 
 // The 'ter ' chunk arrived.
 void fn_800342B4(UStreamObject* pObject) {
-    lbl_801D3CB0.p4 = pObject;
-    lbl_801D3CB0.p0 = fn_800073B4(pObject->pData, 0);
+    lbl_801D3CB0.pCurrentHoleDataStreamData = pObject;
+    lbl_801D3CB0.pCurrentHoleData = fn_800073B4(pObject->pData, 0);
 }
 
 void fn_80034648(int n) {
-    lbl_801D3CB0.v1140[0] = lbl_801876D8[n][0];
-    lbl_801D3CB0.v1140[1] = lbl_801876D8[n][1];
-    lbl_801D3CB0.v1140[2] = lbl_801876D8[n][2];
+    lbl_801D3CB0.fDefaultObjectMipmapBias[0] = lbl_801876D8[n][0];
+    lbl_801D3CB0.fDefaultObjectMipmapBias[1] = lbl_801876D8[n][1];
+    lbl_801D3CB0.fDefaultObjectMipmapBias[2] = lbl_801876D8[n][2];
 }
 
 // Unloads the terrain.
 void fn_8003467C(void) {
     fn_800335F8(1);
-    if (lbl_801D3CB0.p0 != NULL) {
-        fn_800075CC(lbl_801D3CB0.p0);
-        lbl_801D3CB0.p0 = NULL;
-        fn_80009E70(lbl_801D3CB0.p4);
+    if (lbl_801D3CB0.pCurrentHoleData != NULL) {
+        fn_800075CC(lbl_801D3CB0.pCurrentHoleData);
+        lbl_801D3CB0.pCurrentHoleData = NULL;
+        fn_80009E70(lbl_801D3CB0.pCurrentHoleDataStreamData);
     }
     if (lbl_801D3CB0.pCourse != NULL) {
-        fn_80009E70(lbl_801D3CB0.pC);
+        fn_80009E70(lbl_801D3CB0.pCourseStreamData);
         lbl_801D3CB0.pCourse = NULL;
     }
-    lbl_801D3CB0.n1154 = -1;
+    lbl_801D3CB0.iLowLODListOffset = -1;
     lbl_802810E4 = -1;
     lbl_802810E8 = -1;
     lbl_802810D0 = 26;
@@ -284,15 +487,39 @@ void fn_8003467C(void) {
 
 // A tee's position arrived: into its row of the course's tees, if the course is loaded.
 void fn_80034720(UStreamObject* pObject) {
-    TerTeeData* pTee = (TerTeeData*)pObject->pData;
+    TerPosData* pTee = (TerPosData*)pObject->pData;
 
     if (lbl_801D3CB0.pCourse != NULL) {
-        lbl_801D3CB0.pCourse->tee[pTee->nTeeSet].x = pTee->vPos[0];
-        lbl_801D3CB0.pCourse->tee[pTee->nTeeSet].y = pTee->vPos[1];
-        lbl_801D3CB0.pCourse->tee[pTee->nTeeSet].z = pTee->vPos[2];
-        lbl_801D3CB0.pCourse->tee[pTee->nTeeSet].w = 1.0f;
+        lbl_801D3CB0.pCourse->tee[pTee->nIndex].x = pTee->vPos[0];
+        lbl_801D3CB0.pCourse->tee[pTee->nIndex].y = pTee->vPos[1];
+        lbl_801D3CB0.pCourse->tee[pTee->nIndex].z = pTee->vPos[2];
+        lbl_801D3CB0.pCourse->tee[pTee->nIndex].w = 1.0f;
     }
     fn_80009E70(pObject);
+}
+
+// A pin position arrived (UKernel.c hands it on). With fn_800E39F0 set it goes to fn_800F199C;
+// otherwise a pin the course already has (w not 0) is copied into the chunk, and a missing one is
+// taken from it.
+int fn_800347B4(UStreamObject* pObject) {
+    TerPosData* pPin = (TerPosData*)pObject->pData;
+
+    if (lbl_801D3CB0.pCourse != NULL) {
+        if (fn_800E39F0()) {
+            fn_800F199C(pPin->vPos[0], pPin->vPos[1], pPin->vPos[2]);
+        } else if (0.0f != lbl_801D3CB0.pCourse->pin[pPin->nIndex].w) {
+            pPin->vPos[0] = lbl_801D3CB0.pCourse->pin[pPin->nIndex].x;
+            pPin->vPos[1] = lbl_801D3CB0.pCourse->pin[pPin->nIndex].y;
+            pPin->vPos[2] = lbl_801D3CB0.pCourse->pin[pPin->nIndex].z;
+        } else {
+            lbl_801D3CB0.pCourse->pin[pPin->nIndex].x = pPin->vPos[0];
+            lbl_801D3CB0.pCourse->pin[pPin->nIndex].y = pPin->vPos[1];
+            lbl_801D3CB0.pCourse->pin[pPin->nIndex].z = pPin->vPos[2];
+            lbl_801D3CB0.pCourse->pin[pPin->nIndex].w = 1.0f;
+        }
+    }
+    fn_80009E70(pObject);
+    return 0;
 }
 
 // The flag follows the wind: it turns to face it and plays "flagcalm" below 5, "flagbrzy" below
@@ -325,18 +552,101 @@ void fn_800348DC(void) {
 }
 
 void fn_800349CC(int n) {
-    if (lbl_801D3CB0.p0 != NULL) {
+    if (lbl_801D3CB0.pCurrentHoleData != NULL) {
         fn_80030894();
-        fn_80030A40(lbl_801D3CB0.p0, n);
+        fn_80030A40(lbl_801D3CB0.pCurrentHoleData, n);
         fn_8003084C();
     }
 }
 
-// Sets b11AC and returns what it was.
-u8 fn_8003505C(u8 b) {
-    u8 bOld = lbl_801D3CB0.b11AC;
+// Draws the grass patches of render pass nRenderPass that take part in the first pass (bit 0 of
+// n1C), farthest first, one clip method at a time.
+// Not exact (97.1%): the original tests bit 0 with `and.` against a register holding 1 (one more
+// saved register); every spelling tried folds the 1 into `clrlwi.` (a local, s32/int counters).
+void fn_80034CAC(int nRenderPass) {
+    u8 bFirst = 1;
+    int i;
+    s32 nClip;
 
-    lbl_801D3CB0.b11AC = b;
+    fn_80012EF8();
+    fn_80014118(0x70);
+    for (nClip = 0; nClip <= 2; nClip++) {
+        switch (nClip) {
+        case 2:
+            fn_80035138(1);
+            break;
+        case 1:
+            fn_80035138(1);
+            break;
+        default:
+            fn_80035138(0);
+            break;
+        }
+        fn_80012EF8();
+        for (i = lbl_801D3CB0.iNumGrassPatches - 1; i >= 0; i--) {
+            if (lbl_801D3CB0.xpGrassPatchList[i].eClipMethod == nClip
+                && lbl_801D3CB0.xpGrassPatchList[i].iRenderPass == nRenderPass
+                && (lbl_801D3CB0.xpGrassPatchList[i].n1C & 1)) {
+                fn_80032B7C(lbl_801D3CB0.xpGrassPatchList[i].pGround, nClip, 0,
+                            lbl_801D3CB0.xpGrassPatchList[i].n1C, lbl_801D3CB0.xpGrassPatchList[i].n18,
+                            lbl_801D3CB0.xpGrassPatchList[i].n20, &bFirst, 0, 1,
+                            lbl_801D3CB0.xpGrassPatchList[i].fDistance,
+                            lbl_801D3CB0.xpGrassPatchList[i].fDistance
+                                + 2.0f * lbl_801D3CB0.xpGrassPatchList[i].fBoundingRadius);
+            }
+        }
+    }
+    fn_80012F50(1, 6, 1);
+    fn_80012EF8();
+    fn_8003272C(1);
+    fn_80012EF8();
+}
+
+// Draws the grass patches in list 0x80 of n1C (pass 3), farthest first, one clip method at a time.
+void fn_80034DE4(void) {
+    u8 bFirst = 1;
+    int i;
+    s32 nClip;
+
+    fn_8003272C(0);
+    fn_80012EF8();
+    fn_80014118(0x70);
+    for (nClip = 0; nClip <= 2; nClip++) {
+        switch (nClip) {
+        case 2:
+            fn_80035138(1);
+            break;
+        case 1:
+            fn_80035138(1);
+            break;
+        default:
+            fn_80035138(0);
+            break;
+        }
+        fn_80012EF8();
+        for (i = lbl_801D3CB0.iNumGrassPatches - 1; i >= 0; i--) {
+            if (nClip == lbl_801D3CB0.xpGrassPatchList[i].eClipMethod
+                && (lbl_801D3CB0.xpGrassPatchList[i].n1C & 0x80)) {
+                fn_80032B7C(lbl_801D3CB0.xpGrassPatchList[i].pGround, nClip, 3,
+                            lbl_801D3CB0.xpGrassPatchList[i].n1C, lbl_801D3CB0.xpGrassPatchList[i].n18,
+                            lbl_801D3CB0.xpGrassPatchList[i].n20, &bFirst, 0, 1,
+                            lbl_801D3CB0.xpGrassPatchList[i].fDistance,
+                            lbl_801D3CB0.xpGrassPatchList[i].fDistance
+                                + 2.0f * lbl_801D3CB0.xpGrassPatchList[i].fBoundingRadius);
+            }
+        }
+    }
+    fn_80012F50(1, 6, 1);
+    fn_80012EF8();
+    fn_8003272C(1);
+    fn_80012EF8();
+}
+
+// Sets boManageZUpdate and returns what it was.
+u8 fn_8003505C(u8 b) {
+    u8 bOld = lbl_801D3CB0.boManageZUpdate;
+
+    lbl_801D3CB0.boManageZUpdate = b;
     return bOld;
 }
 
