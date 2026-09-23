@@ -221,7 +221,26 @@ typedef struct Character {
     s32   nSlot;                // 0x034  the animation slot it uses (skalib); the CrAP camera's shot names
                                 //        get an 'f' in front when it is 1
     CharModel* pModel;          // 0x038
-    u8    unk3C[0x164 - 0x3C];
+    struct Skin* pSkin;         // 0x03C  its body's skin (Skin.c), the first of apSkins
+    u8    unk40[0x54 - 0x40];
+    s32   hFile;                // 0x054  a file closed with it (fn_8001971C), -1 none
+    u8    unk58[0x64 - 0x58];
+    void* a64[2];               // 0x064  } entries taken from lbl_801B95E8 (fn_8001A418), and their
+    s8    a6C[2];               // 0x06C  } indices there (-1 once given back)
+    u8    unk6E[2];
+    s32   n70;                  // 0x070  how many of a64 it takes
+    s32   n74;                  // 0x074  the one of a64 fn_80019E80 uses
+    u8    unk78[0xA8 - 0x78];
+    void* pA8;                  // 0x0A8  } freed by fn_8001971C
+    u8    unkAC[4];
+    void* pB0;                  // 0x0B0  }
+    u8    unkB4[4];
+    void* pB8;                  // 0x0B8  }
+    void* pBC;                  // 0x0BC  }
+    struct Skin* apSkins[7];    // 0x0C0  its skins: the body's, then its attachments' (fn_8001CE5C)
+    s32   nSkins;               // 0x0DC
+    u8    bE0;                  // 0x0E0  cleared by fn_8001A3B0, set by fn_8001A20C
+    u8    unkE1[0x164 - 0xE1];
     u8    anim[4];              // 0x164  the animation player (+0x14 is its playback rate)
     s32   uFlags;               // 0x168  bit 0x40: the backswing is being backed down; 0x200 / 0x400: the
                                 //        clip lookup fell back (Char_SetClip). Signed: the original tests
