@@ -148,8 +148,8 @@ void fn_800F0678(void) {
 // TW06: GameModeDriverRTE::StartEvent. Starts today's event: the options are saved (wind off), and
 // its challenge runs in mode 5 with this file's start and end wrapped around it.
 void fn_800F06DC(void) {
-    lbl_8028234C = 1;
     lbl_80281680 = SESSION_OPTIONS->unkC;
+    lbl_8028234C = 1;
     lbl_80282348 = SESSION_OPTIONS->nWind;
     SESSION_OPTIONS->unkC = 4;
     SESSION_OPTIONS->nWind = 0;
