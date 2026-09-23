@@ -125,7 +125,9 @@ typedef struct View {
     u8       unk151[2];
     u8       b153;              // 0x153
     s32      n154;              // 0x154
-    u8       unk158[0x164 - 0x158];
+    u8       unk158[4];
+    f32      f15C;              // 0x15C  camera 8: the ground height it follows
+    u8       unk160[4];
     s32      n164;              // 0x164  a shot kind for fn_8003A950 (25 = none)
     f32      f168;              // 0x168
     u8       unk16C[0x18C - 0x16C];
@@ -185,7 +187,8 @@ typedef struct CamTuning {
     f32  f8C;                   // 0x08C
     u8   unk90[4];
     f32  f94;                   // 0x094  the elevator camera's first blend value
-    u8   unk98[0xB8 - 0x98];
+    f32  f98;                   // 0x098  camera 8: 1 - this is its height's share of the move a frame
+    u8   unk9C[0xB8 - 0x9C];
     f32  fB8;                   // 0x0B8  camera 15 waits this long on a ball near the green
     s32  nBeats;                // 0x0BC  the heartbeat camera's beats
     s32  nBeatFrames;           // 0x0C0

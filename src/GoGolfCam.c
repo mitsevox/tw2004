@@ -60,7 +60,9 @@ u8       fn_8000C3C8(f32* pFrom, f32* pTo, TNetwork* pNet, s32 nNodes, f32* pHit
 u8       fn_8004B6F8(f32* pFrom, f32* pTo, f32* pHit);
 f32      fn_8001EFFC(u8* pLens);                        // the lens's fB0 (char.c: its parameter is u8*)
 void     fn_80038054(u8 a, int n, f32 f1, f32 f2);
-u8       CamScript_KeepAboveGround(int nPlayer, f32* pNew, f32* pOld, int a, void* p1, void* p2, void* p3,
+// Keep pNew above the ground (by fClearance); the out values are optional (NULL): two flags and a
+// float.
+u8       CamScript_KeepAboveGround(int nPlayer, f32* pNew, f32* pOld, int a, u8* pb1, f32* pf, u8* pb2,
                                    f32 fClearance);
 CamShot* fn_80064F7C(int nPlayer, int nKind, int a, CamShot* pShot);
 u8       fn_8003C9D0(int nPlayer, int a, CamSequence** ppSeq, CamShot** ppShot);
@@ -357,6 +359,136 @@ void fn_800BF110(View* pView, int nPlayer) {
     pView->n194 = 0;
     pView->p74 = NULL;
     pView->p130 = NULL;
+}
+
+// Camera 8: 10 back and up at 20 degrees from the ball's placement spot along its heading (fA88),
+// over the ground there, which it follows smoothly; it looks at the placement spot.
+void fn_800BF184(View* pView, int nPlayer) {
+    f32 vOld[4];
+    f32 v[4];
+    f32 vHit[4];
+    f32 vNormal[4];
+    SurfaceType* pSurfaceAt;
+    f32 fAbove;
+    SurfaceType* pSurface;
+    TerObject* pObj;
+    f32* pCam;
+    f32* pSub;
+    CourseInfo* pCourse;
+    int nPinSet;
+    f32 fGround;
+    f32 fUp;
+    f32 fBack;
+    f32 fSin;
+    f32 fCos;
+    f32 fX;
+    f32 fZ;
+    pCam = fn_8001731C(pView);
+    pSub = fn_80017314(pView);
+    pCourse = fn_8000C594();
+    if (pCourse != NULL) {
+        Vec3Copy(pCam, vOld);
+        nPinSet = Game_CurrentPinSet();
+        if (gSession.nPaused == 0) {
+            fn_8003F2E0(&pView->script, gSession.fFrameTime);
+            pView->f114 += gSession.fFrameTime;
+        }
+        if (gSession.fFrameTime != 0.0f) {
+            fUp = fn_800095F0(DEG(20.0f));
+            fBack = fn_80009638(DEG(20.0f));
+            fUp *= 10.0f;
+            fBack *= 10.0f;
+            fSin = fn_800095F0(gPlayers[nPlayer].fA88);
+            fCos = fn_80009638(gPlayers[nPlayer].fA88);
+            fX = fBack * -fSin;
+            fZ = fBack * fCos;
+            pCam[0] = fX + gPlayers[nPlayer].vPlacement[0];
+            pCam[2] = fZ + gPlayers[nPlayer].vPlacement[2];
+            fGround = Terrain_HeightAt(pCam, &pSurfaceAt);
+            if (fGround < -60000.0f) {
+                fGround = gPlayers[nPlayer].vPlacement[1];
+            }
+            if (pView->n194 == 0) {
+                pView->f15C = fGround;
+            } else if (gPlayers[nPlayer].uFlagsEF0 & 1) {
+                if (pView->f15C > gPlayers[nPlayer].vPlacement[1]) {
+                    if (gPlayers[nPlayer].vPlacement[1] > fGround) {
+                        pView->f15C = gPlayers[nPlayer].vPlacement[1];
+                    } else {
+                        pView->f15C = fGround;
+                    }
+                } else if (pView->f15C < gPlayers[nPlayer].vPlacement[1]) {
+                    if (gPlayers[nPlayer].vPlacement[1] > fGround) {
+                        pView->f15C = gPlayers[nPlayer].vPlacement[1];
+                    } else {
+                        pView->f15C = fGround;
+                    }
+                }
+                fGround = pView->f15C;
+            } else {
+                if (pView->f15C < gPlayers[nPlayer].vPlacement[1]) {
+                    if (pView->f15C < pCourse->tee[gSession.nTeeSet[nPlayer]].y + 0.1f
+                        || pView->f15C < pCourse->pin[nPinSet].y + 0.1f) {
+                        if (pView->f15C > fGround) {
+                            fGround = 0.1f + pView->f15C;
+                        }
+                        pView->f15C = fGround;
+                    }
+                } else {
+                    if (pView->f15C > pCourse->tee[gSession.nTeeSet[nPlayer]].y - 0.1f
+                        || pView->f15C > pCourse->pin[nPinSet].y - 0.1f) {
+                        if (pView->f15C > fGround) {
+                            fGround = pView->f15C - 0.1f;
+                        }
+                        pView->f15C = fGround;
+                    }
+                }
+                fGround = pView->f15C;
+            }
+            if (fGround < -60000.0f) {
+                fGround = 0.0f;
+            }
+            if (pView->n194 != 0) {
+                fUp += fGround;
+                v[0] = pCam[0];
+                v[2] = pCam[2];
+                v[1] = fUp;
+                if (fUp > pCam[1]) {
+                    if (Ter_CheckForGroundCollision(pCourse, v, pCam, vHit, vNormal, &pSurface, &pObj)) {
+                        pCam[1] = fUp;
+                        pView->f15C = fGround;
+                    } else {
+                        pCam[1] += (1.0f - lbl_80281F78->f98) * (fUp - pCam[1]);
+                    }
+                } else {
+                    pCam[1] += (1.0f - lbl_80281F78->f98) * (fUp - pCam[1]);
+                }
+            } else {
+                pCam[1] = fUp + fGround;
+            }
+            if (pView->n194 != 0) {
+                CamScript_KeepAboveGround(nPlayer, pCam, vOld, 1, NULL, &fAbove, NULL,
+                                          0.2f + lbl_80281F78->f168);
+            }
+            pSub[0] = gPlayers[nPlayer].vPlacement[0];
+            pSub[2] = gPlayers[nPlayer].vPlacement[2];
+            fGround = gPlayers[nPlayer].vPlacement[1];
+            if (fGround < -60000.0f) {
+                fGround = 0.0f;
+            }
+            if (pView->n194 != 0) {
+                pSub[1] += (1.0f - lbl_80281F78->f98) * (fGround - pSub[1]);
+                if (pCam[1] - pSub[1] > 5.0f) {
+                    pSub[1] = pCam[1] - 5.0f;
+                }
+            } else {
+                pSub[1] = fGround;
+            }
+            if (pView->n194 == 0) {
+                pView->n194 = 1;
+            }
+        }
+    }
 }
 
 // Camera 9: the same as camera 8.
