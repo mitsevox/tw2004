@@ -17,6 +17,8 @@ void* fn_80009B34(u32 uSize, u32 uFlags, u32 uAlign, const char* pFile, int nLin
 void  fn_80009E70(void* p);             // free
 void* fn_800951A0(u32 uSize, int nAlign, int a);
 void  fn_800953C8(int a);
+// qsort (the C library's heap sort; the comparisons in PGATourSimulation.c return s32)
+void  fn_8015929C(void* pBase, u32 nCount, u32 nSize, s32 (*pfnCompare)(const void* pA, const void* pB));
 
 // ---- time ------------------------------------------------------------------------------------
 
@@ -34,6 +36,8 @@ void Vec_Copy(f32* pSrc, f32* pDst);    // 0x8000AD10
 f32  fn_8000AD78(f32 y, f32 x);         // atan2f
 f32  fabsf(f32 x);                      // 0x8000AD9C: fabs (0x8000AE94, platform.h) rounded to a float
 u32  Rand_Next(int nStream);            // 0x8000B130  EA's lagged-Fibonacci generator
+f32  fn_8000B318(int nStream);          // a normally distributed random number (mean 0, deviation 1):
+                                        // Box-Muller on two Rand_Floats, the second value kept
 void fn_8000B1D4(int nStream, u32 uSeed);   // seed a random stream
 f32  Rand_Float(int nStream);           // 0x8000B428  [0, 1)
 void fn_8000C5D4(f32* pA, f32* pB, f32 f, f32* pOut);   // out = a + f x b

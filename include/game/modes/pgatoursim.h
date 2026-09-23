@@ -78,6 +78,8 @@ LAYOUT_ASSERT(PgaEntrant, 0x50);
 extern PgaEntrant lbl_80224070[PGA_MAX_ENTRANTS];
 
 // The entrants in score order (0x400 bytes), rebuilt when the scores change.
+#define PGA_SCORE_CUT       0x7FFFFFFF          // a cut entrant's score in the sorts: the worst
+#define PGA_SCORE_WINNER    (-0x7FFFFFFF - 1)   // the winner's: the best
 typedef struct PgaScoreRanking {
     s32  aEntrant[PGA_MAX_ENTRANTS];    // 0x000  the entrant in each row
     s32  aRank[PGA_MAX_ENTRANTS];       // 0x200  each entrant's place
