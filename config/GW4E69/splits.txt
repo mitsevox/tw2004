@@ -2303,6 +2303,9 @@ src/MSL_C/PPCEABI/bare/H/ansi_files.c:
 
 src/MSL_C/PPCEABI/bare/H/ansi_fp.c:
 	.text       start:0x8015286C end:0x80155E48
+	.rodata     start:0x80185078 end:0x80185158
+	.data       start:0x8019C520 end:0x8019C688
+	.sdata2     start:0x80284C60 end:0x80284C90
 
 runtime/buffer_io.c:
 	.text       start:0x80155E48 end:0x80155F40
@@ -2445,8 +2448,23 @@ runtime/s_tan.c:
 	.text       start:0x8015F70C end:0x8015F784
 	.sdata2     start:0x80285190 end:0x80285198
 
-unsorted/sweep_8015F784.c:
-	.text       start:0x8015F784 end:0x8015F844
+runtime/w_acos.c:
+	.text       start:0x8015F784 end:0x8015F7A4
+
+runtime/w_asin.c:
+	.text       start:0x8015F7A4 end:0x8015F7C4
+
+runtime/w_atan2.c:
+	.text       start:0x8015F7C4 end:0x8015F7E4
+
+runtime/w_fmod.c:
+	.text       start:0x8015F7E4 end:0x8015F804
+
+runtime/w_log.c:
+	.text       start:0x8015F804 end:0x8015F824
+
+runtime/w_pow.c:
+	.text       start:0x8015F824 end:0x8015F844
 
 MetroTRK/mainloop.c:
 	.text       start:0x8015F8D0 end:0x8015F9C8

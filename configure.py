@@ -432,7 +432,7 @@ config.libs = [
         "progress_category": "sdk",
         "src_dir": "extern/ffcc",
         "objects": [
-            Object(NonMatching, "src/MSL_C/PPCEABI/bare/H/ansi_fp.c"),
+            Object(Matching, "src/MSL_C/PPCEABI/bare/H/ansi_fp.c"),
         ],
     },
     {
@@ -795,6 +795,12 @@ config.libs = [
             Object(Matching, "runtime/s_ldexp.c"),
             Object(Matching, "runtime/s_sin.c"),
             Object(Matching, "runtime/s_tan.c"),
+            Object(Matching, "runtime/w_acos.c"),
+            Object(Matching, "runtime/w_asin.c"),
+            Object(Matching, "runtime/w_atan2.c"),
+            Object(Matching, "runtime/w_fmod.c"),
+            Object(Matching, "runtime/w_log.c"),
+            Object(Matching, "runtime/w_pow.c"),
             Object(Matching, "runtime/__mem.c"),
             Object(Matching, "runtime/__va_arg.c"),
             Object(Matching, "runtime/buffer_io.c"),
@@ -1437,7 +1443,6 @@ config.libs = [
             Object(Matching, "unsorted/sweep_801338E0.c"),
             Object(Matching, "unsorted/sweep_80150F24.c"),
             Object(Matching, "unsorted/sweep_80155F40.c"),
-            Object(Matching, "unsorted/sweep_8015F784.c"),
         ],
     },
     {

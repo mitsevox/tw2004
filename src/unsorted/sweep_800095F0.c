@@ -3,8 +3,8 @@
 #include "game_types.h"
 
 double cos();
-double fn_8015F784();
-double fn_8015F7A4();
+double acos();
+double asin();
 double sin();
 
 f32 fn_800095F0(f32 x0);
@@ -19,7 +19,7 @@ f32 fn_800095F0(f32 x0) {
 
 f32 fn_80009614(f32 x0) {
     f32 t0;
-    t0 = fn_8015F784(x0);
+    t0 = acos(x0);
     return t0;
 }
 
@@ -31,6 +31,6 @@ f32 fn_80009638(f32 x0) {
 
 f32 fn_8000965C(f32 x0) {
     f32 t0;
-    t0 = fn_8015F7A4(x0);
+    t0 = asin(x0);
     return t0;
 }
