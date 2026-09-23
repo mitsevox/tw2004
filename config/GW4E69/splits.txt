@@ -198,32 +198,11 @@ GoPostFx.c:
 unsorted/sweep_8003944C.c:
 	.text       start:0x8003944C end:0x80039454
 
-unsorted/sweep_800394AC.c:
-	.text       start:0x800394AC end:0x800394F0
-
-unsorted/sweep_80039520.c:
-	.text       start:0x80039520 end:0x8003954C
-
-unsorted/sweep_8003954C.c:
-	.text       start:0x8003954C end:0x80039554
-
 GoDynamicCam.c:
-	.text       start:0x80039554 end:0x8003DC30
-
-unsorted/sweep_8003DC78.c:
-	.text       start:0x8003DC78 end:0x8003DCAC
+	.text       start:0x80039454 end:0x8003DCE8
 
 gocamscripts.c:
-	.text       start:0x8003DCE8 end:0x800453C8
-
-unsorted/sweep_80045470.c:
-	.text       start:0x80045470 end:0x80045494
-
-unsorted/sweep_8004560C.c:
-	.text       start:0x8004560C end:0x8004562C
-
-unsorted/sweep_8004562C.c:
-	.text       start:0x8004562C end:0x80045660
+	.text       start:0x8003DCE8 end:0x80045660
 
 DepthField.c:
 	.text       start:0x80045660 end:0x80045D18

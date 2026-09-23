@@ -19,6 +19,33 @@ u8   fn_8003D0EC(CamSequence* pSequence, int nKind);
 u8   fn_8003D240(CamShot* pShot, int nKind);
 u8   fn_8003D294(CamShot* pShot);
 
+// ---- sweep code (not yet cleaned up) ----
+
+void fn_8003954C(void);
+void fn_800394AC(void);
+void fn_80039550(void);
+void fn_80039520(void);
+
+void fn_800394AC(void) {
+    UStream_UnregisterHandler('CAMS');
+    UStream_UnregisterHandler('CAMV');
+    UStream_UnregisterHandler('CAMA');
+    fn_8003954C();
+}
+
+void fn_80039520(void) {
+    UStream_UnregisterHandler('CAMV');
+    fn_80039550();
+}
+
+void fn_8003954C(void) {
+}
+
+void fn_80039550(void) {
+}
+
+// ---- end of sweep code ----
+
 // The stream handler for the shot file: takes the shots unless some are loaded already.
 void fn_80039690(UStreamObject* pObject) {
     lbl_80281D88->n1C++;
@@ -561,3 +588,16 @@ f32 fn_8003DBA8(f32 f) {
     }
     return f;
 }
+
+// ---- sweep code (not yet cleaned up) ----
+
+u8 fn_8003DC78(CamShot* pShot) {
+    u8 nKind = pShot->bAC;
+
+    if (nKind == 1 || (u8)(nKind - 2) <= 4U || nKind == 7) {
+        return 1;
+    }
+    return 0;
+}
+
+// ---- end of sweep code ----
