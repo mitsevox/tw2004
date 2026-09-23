@@ -3665,12 +3665,14 @@ GameMode16.c:
 
 GameMode17.c:
 	.text       start:0x800F5AAC end:0x800F6A60
+	.sdata2     start:0x802846E0 end:0x802846E8
 
 GameMode13.c:
 	.text       start:0x800F6A60 end:0x800F80FC
 
 GameMode2.c:
 	.text       start:0x800F80FC end:0x800F944C
+	.sdata2     start:0x80284700 end:0x80284708
 
 GameMode6.c:
 	.text       start:0x800F944C end:0x800F9610
