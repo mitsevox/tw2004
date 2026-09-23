@@ -1,18 +1,18 @@
 // Small functions found by the sweep (sweep.py). Original file and meanings unknown.
 
-#include "game_types.h"
+#include "grassshader.h"
 
-extern s32 lbl_80281908;
-void fn_8000B0D4();
+void GrassPacket_vSetBuffer(GrassWord* pBuffer, int nVerts);
+void SD_vShaderObject_Grass_Static_Close(SD_SShaderObject_Static* pObject);
 
-void fn_80120DD0(s32 p0, s32 p1);
-void fn_80120DF8(u8* p0);
-void fn_80120DD0(s32 p0, s32 p1) {
-    *(s32*)(((u8*)lbl_80281908) + 0x354) = p0;
-    *(s32*)(((u8*)lbl_80281908) + 0x350) = p0;
-    *(s32*)(((u8*)lbl_80281908) + 0x358) = (*(s32*)(((u8*)lbl_80281908) + 0x350) + (p1 << 4));
+// The packets are built into pBuffer, which holds nVerts vertices.
+void GrassPacket_vSetBuffer(GrassWord* pBuffer, int nVerts) {
+    SD_gpGrassTypeData->pCur = pBuffer;
+    SD_gpGrassTypeData->pBase = pBuffer;
+    SD_gpGrassTypeData->pEnd = SD_gpGrassTypeData->pBase + nVerts * 4;
 }
 
-void fn_80120DF8(u8* p0) {
-    fn_8000B0D4(*(s32*)(((u8*)lbl_80281908) + 0x368), *(s32*)(p0 + 0x4), lbl_80281908);
+// A grass object goes: its render record back to the pool.
+void SD_vShaderObject_Grass_Static_Close(SD_SShaderObject_Static* pObject) {
+    fn_8000B0D4(SD_gpGrassTypeData->pPool, pObject->pData);
 }

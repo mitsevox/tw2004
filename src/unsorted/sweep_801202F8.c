@@ -1,10 +1,9 @@
 // Small functions found by the sweep (sweep.py). Original file and meanings unknown.
 
-#include "game_types.h"
+#include "grassshader.h"
 
-extern u8* lbl_80281908;
+void SD_vShaderObject_Grass_Type_SetParameters(void* pParams);
 
-void fn_801202F8(s32 v);
-void fn_801202F8(s32 v) {
-    *(s32*)(lbl_80281908 + 0x36C) = v;
+void SD_vShaderObject_Grass_Type_SetParameters(void* pParams) {
+    SD_gpGrassTypeData->pParams = pParams;
 }

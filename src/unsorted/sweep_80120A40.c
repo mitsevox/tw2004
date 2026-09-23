@@ -1,12 +1,11 @@
 // Small functions found by the sweep (sweep.py). Original file and meanings unknown.
 
-#include "game_types.h"
+#include "grassshader.h"
 
-extern s32 lbl_80281908;
-void Mem_cpy();
+void GrassPacket_vAddVerts(GrassWord* pVerts, int nVerts);
 
-void fn_80120A40(s32 p0, s32 p1);
-void fn_80120A40(s32 p0, s32 p1) {
-    Mem_cpy(*(s32*)(((u8*)lbl_80281908) + 0x354), p0, (p1 << 4));
-    *(s32*)(((u8*)lbl_80281908) + 0x354) = (*(s32*)(((u8*)lbl_80281908) + 0x354) + (p1 << 4));
+// Copies nVerts ready-made vertices into the packet.
+void GrassPacket_vAddVerts(GrassWord* pVerts, int nVerts) {
+    Mem_cpy(SD_gpGrassTypeData->pCur, pVerts, nVerts * 16);
+    SD_gpGrassTypeData->pCur += nVerts * 4;
 }

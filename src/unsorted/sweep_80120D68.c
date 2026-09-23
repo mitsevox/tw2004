@@ -1,10 +1,9 @@
 // Small functions found by the sweep (sweep.py). Original file and meanings unknown.
 
-#include "game_types.h"
+#include "grassshader.h"
 
-extern u8* lbl_80281908;
+GrassWord* GrassPacket_pGetNextAvailableVertSlot(void);
 
-s32 fn_80120D68(void);
-s32 fn_80120D68(void) {
-    return *(s32*)(lbl_80281908 + 0x354);
+GrassWord* GrassPacket_pGetNextAvailableVertSlot(void) {
+    return SD_gpGrassTypeData->pCur;
 }
