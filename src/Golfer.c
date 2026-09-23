@@ -1049,13 +1049,13 @@ u8 AI_RehearseShot(int nPlayer, f32* pOutDist2, u8 bFast, f32 fTolerance) {
             BUMP_MODIFIERS(p, 5);
             Golfer_ClampModifiers(p);
             switch (p->nShotShape) {
-            case SHAPE_STRAIGHT:    break;
-            case SHAPE_CURVE_A:     AI_NudgeAim(nPlayer, DEG(-1.0f)); break;
-            case SHAPE_CURVE_B:     AI_NudgeAim(nPlayer, DEG(1.0f)); break;
-            case SHAPE_LOW:         AI_NudgeDistance(nPlayer, -5.0f); break;
-            case SHAPE_HIGH:        AI_NudgeDistance(nPlayer, 5.0f); break;
-            case SHAPE_BIG_CURVE_A: AI_NudgeAim(nPlayer, DEG(-2.0f)); break;
-            case SHAPE_BIG_CURVE_B: AI_NudgeAim(nPlayer, DEG(2.0f)); break;
+            case SHAPE_NORMAL:   break;
+            case SHAPE_FADE:     AI_NudgeAim(nPlayer, DEG(-1.0f)); break;
+            case SHAPE_DRAW:     AI_NudgeAim(nPlayer, DEG(1.0f)); break;
+            case SHAPE_HIGH:     AI_NudgeDistance(nPlayer, -5.0f); break;
+            case SHAPE_LOW:      AI_NudgeDistance(nPlayer, 5.0f); break;
+            case SHAPE_SLICE:    AI_NudgeAim(nPlayer, DEG(-2.0f)); break;
+            case SHAPE_HOOK:     AI_NudgeAim(nPlayer, DEG(2.0f)); break;
             }
             Shot_Prepare(nPlayer, 0);
             p->nRehearseState = 0;
@@ -1148,10 +1148,10 @@ f32 Shot_AimAngle(int nPlayer) {
 // The trajectory the shot shape asks for: 3 and 4 are the two alternatives, anything else normal.
 int Shot_Trajectory(int nPlayer) {
     Player* p = &gPlayers[nPlayer];
-    if (p->nShotShape == SHAPE_LOW) {
+    if (p->nShotShape == SHAPE_HIGH) {
         return 2;
     }
-    if (p->nShotShape == SHAPE_HIGH) {
+    if (p->nShotShape == SHAPE_LOW) {
         return 0;
     } else {
         return 1;
@@ -1176,27 +1176,27 @@ void AI_FaceVector(int nPlayer, f32* pOut) {
     pOut[1] = 0.0f;
     pOut[2] = 1.0f;
     pOut[3] = 0.0f;
-    if (p->nShotShape == SHAPE_STRAIGHT) {
+    if (p->nShotShape == SHAPE_NORMAL) {
         pOut[0] = 0.0f;
         pOut[1] = 0.0f;
         pOut[2] = 1.0f;
         pOut[3] = 0.0f;
-    } else if (p->nShotShape == SHAPE_CURVE_A) {
+    } else if (p->nShotShape == SHAPE_FADE) {
         pOut[0] = 0.02f;
         pOut[1] = 0.0f;
         pOut[2] = 0.98f;
         pOut[3] = 0.0f;
-    } else if (p->nShotShape == SHAPE_CURVE_B) {
+    } else if (p->nShotShape == SHAPE_DRAW) {
         pOut[0] = -0.02f;
         pOut[1] = 0.0f;
         pOut[2] = 0.98f;
         pOut[3] = 0.0f;
-    } else if (p->nShotShape == SHAPE_BIG_CURVE_A) {
+    } else if (p->nShotShape == SHAPE_SLICE) {
         pOut[0] = 0.04f;
         pOut[1] = 0.0f;
         pOut[2] = 0.96f;
         pOut[3] = 0.0f;
-    } else if (p->nShotShape == SHAPE_BIG_CURVE_B) {
+    } else if (p->nShotShape == SHAPE_HOOK) {
         pOut[0] = -0.04f;
         pOut[1] = 0.0f;
         pOut[2] = 0.96f;
@@ -1551,7 +1551,7 @@ int Bag_CountClubs(int nPlayer) {
 int Golfer_FindById(int nId) {
     int i;
     for (i = 0; i < NUM_GOLFERS; i++) {
-        if (nId == gGolferTable[i].unk1) return i;
+        if (nId == gGolferTable[i].nModelID) return i;
     }
     return -1;
 }
@@ -1929,7 +1929,7 @@ void Session_SetupProfiles(void) {
 void Golfer_TableSetup(void) {
     int i, k;
     gNumPlayersSetUp = 0;
-    if ((s8)gCurGolferRecord.unk8E != 0) {
+    if ((s8)gCurGolferRecord.bAvailable != 0) {
         Mem_cpy(&gGolferTable[FIRST_CREATED_GOLFER], &gCurGolferRecord, sizeof(GolferRecord));
     }
     if (gSession.uFlags & 0x4000) {

@@ -35,16 +35,17 @@ enum {
 #define NUM_CLUBS            26   // clubs 0..24 are the bag, 25 the putter
 #define CLUB_PUTTER          25
 #define CLUB_SAND_WEDGE      21
-// A CPU shot's shape, from the authored aim point. The rehearsal compensates each one when it
-// fails: the curves by turning the aim 1 or 2 degrees, the trajectories by 5 yards of distance.
+// A CPU shot's shape (TW06: ShotShape_t), from the authored aim point. The rehearsal compensates
+// each one when it fails: the curves by turning the aim 1 or 2 degrees, the trajectories by 5
+// yards of distance. High/low pick gTrajLoft's +5 / -5 degrees (Shot_Trajectory).
 enum {
-    SHAPE_STRAIGHT    = 0,
-    SHAPE_CURVE_A     = 1,      // clubface x +0.02
-    SHAPE_CURVE_B     = 2,      // clubface x -0.02
-    SHAPE_LOW         = 3,      // trajectory 2 (which of 3/4 is the punch is unverified)
-    SHAPE_HIGH        = 4,      // trajectory 0
-    SHAPE_BIG_CURVE_A = 5,      // clubface x +0.04
-    SHAPE_BIG_CURVE_B = 6       // clubface x -0.04
+    SHAPE_NORMAL = 0,
+    SHAPE_FADE   = 1,       // clubface x +0.02
+    SHAPE_DRAW   = 2,       // clubface x -0.02
+    SHAPE_HIGH   = 3,       // trajectory 2: +5 degrees of loft
+    SHAPE_LOW    = 4,       // trajectory 0: -5 degrees
+    SHAPE_SLICE  = 5,       // clubface x +0.04
+    SHAPE_HOOK   = 6        // clubface x -0.04
 };
 
 #define SHOT_PUTT            0    // shot kinds (Player.nShotKind)
@@ -64,20 +65,23 @@ enum {
 
 // One 320-byte row of STATS_GC.BIN as it sits in gGolferTable. The file has a 2-byte header,
 // so every field is 2 bytes later than in the file; the game reuses the first byte as the
-// golfer index once a row is copied into a player.
+// golfer index once a row is copied into a player. TW06: GolferData_t (0x1F0), the same up to
+// 0x62, then 4 bytes later from the stats on (it added fields in 0x62..0x6C).
 typedef struct GolferRecord {
     u8   nIndex;                // 0x000
-    u8   unk1;                  // 0x001
+    u8   nModelID;              // 0x001  Golfer_FindById searches on it. TW06: modelID
     char szFirst[32];           // 0x002
     char szLast[32];            // 0x022
     char szNick[32];            // 0x042
-    u8   unk62[6];              // 0x062
-    s8   attr[NUM_ATTRS];       // 0x068  block A
-    s8   attrAlt[NUM_ATTRS];    // 0x074  block B: used for CPU pros in game mode 4
-    s8   tier[14];              // 0x080  equipment tiers 0..4, one per attribute
-    u8   unk8E;                 // 0x08E  non-zero in gCurGolferRecord when there is one
+    u8   unk62[6];              // 0x062  [0] = the outfit. TW06 has ballID, earningsRating,
+                                //        trajectory[3], characteristic, severity, chance here
+    s8   attr[NUM_ATTRS];       // 0x068  block A. TW06: baseStats
+    s8   attrAlt[NUM_ATTRS];    // 0x074  block B: used for CPU pros in game mode 4. TW06: crapStats
+    s8   tier[NUM_ATTRS];       // 0x080  equipment tiers 0..4, one per attribute. TW06: modLevel
+    u8   stance[2];             // 0x08C  TW06's name; unused here
+    u8   bAvailable;            // 0x08E  non-zero in gCurGolferRecord when there is one. TW06: available
     u8   unk8F;                 // 0x08F
-    u32  uBagMask;              // 0x090  bit n set = club n is in the bag
+    u32  uBagMask;              // 0x090  bit n set = club n is in the bag. TW06: clubAvailable
     u8   unk94[0x140 - 0x94];
 } GolferRecord;
 
@@ -166,56 +170,64 @@ typedef struct SwingData {
 } SwingData;
 
 // A player in the current round (human or CPU). 0xEF8 bytes; only the fields read so far.
+// TW06: GamePlayer (0xFE0). EA later grouped these fields into sub-structs in a different
+// order, so only blocks are matched: the score block is the first 0x200 bytes of TW06's
+// GolferScore_t and the shot block at 0x354 is its AIshot_t (see docs/tw06-names.md).
 typedef struct Player {
     s32  nIndex;                // 0x000
     s32  unk4;                  // 0x004
     GolferRecord golfer;        // 0x008
-    s8   attrMod[NUM_ATTRS];    // 0x148  modifiers on top of the record
+    s8   attrMod[NUM_ATTRS];    // 0x148  modifiers on top of the record. TW06: modStats
+    // Score block, TW06 GolferScore_t: strokes, putts, modepoints, skinwin (18 each), skinwins,
+    // matchwins, roundscore[4], playercut, timetaken[18], puttDistances[18], playoffrelscore,
+    // longestdrive, longestputt, fairways[18], gir[18], roundEventFlag - which fills 0x154..0x354
+    // exactly. Only strokes and matchwins are confirmed by our code so far.
     s32  nStrokes[18];          // 0x154  strokes taken per hole
-    u8   unk19C[0x278 - 0x19C];
-    s32  nHolesWon;             // 0x278  match play
-    u8   unk27C[0x28C - 0x27C];
-    u8   unk28C;                // 0x28C
+    u8   unk19C[0x278 - 0x19C]; // 0x19C  TW06: putts[18], modepoints[18] (0x1E4), skinwin[18] (0x22C), skinwins (0x274)
+    s32  nHolesWon;             // 0x278  match play. TW06: matchwins
+    u8   unk27C[0x28C - 0x27C]; // 0x27C  TW06: roundscore[4]
+    u8   unk28C;                // 0x28C  TW06: playercut
     u8   unk28D[0x354 - 0x28D];
-    s32  nClub;                 // 0x354
-    s32  nClubPerKind[8];       // 0x358  the club Shot_Prepare would pick for each shot kind
-    f32  fAim;                  // 0x378  aim angle, radians
-    f32  fPower;                // 0x37C  0..1 (up to 1.5)
-    s32  nShotKind;             // 0x380  0 putt, 2/3 approach, 5..7 recovery
-    s32  nTrajectory;           // 0x384  from Shot_Trajectory
-    f32  vLaunchA[4];           // 0x388  launch parameter blocks handed to Ball_Launch
-    f32  vLaunchB[4];           // 0x398
-    s32  nShotShape;            // 0x3A8  SHAPE_*: what the aim point (or a lesson) asks the CPU to play
-    u8   bPerfect;              // 0x3AC  no error / no forgiveness when set
+    // Shot block, TW06 AIshot_t (which has 6 preferred clubs where we have 8).
+    s32  nClub;                 // 0x354  TW06: club
+    s32  nClubPerKind[8];       // 0x358  the club Shot_Prepare would pick for each shot kind. TW06: preferredClub
+    f32  fAim;                  // 0x378  aim angle, radians. TW06: direction
+    f32  fPower;                // 0x37C  0..1 (up to 1.5). TW06: strength
+    s32  nShotKind;             // 0x380  0 putt, 2/3 approach, 5..7 recovery. TW06: type (ShotType_t)
+    s32  nTrajectory;           // 0x384  from Shot_Trajectory: 0 low, 1 normal, 2 high. TW06 has a float stance here
+    f32  vLaunchA[4];           // 0x388  launch parameter blocks handed to Ball_Launch. TW06: clubDirection (the face)
+    f32  vLaunchB[4];           // 0x398  TW06: strokeDirection (the swing path, which carries the shape)
+    s32  nShotShape;            // 0x3A8  SHAPE_*: what the aim point (or a lesson) asks the CPU to play. TW06: shape
+    u8   bPerfect;              // 0x3AC  no error / no forgiveness when set. TW06: perfect
     u8   unk3AD[3];
     s32  nShotKind2;            // 0x3B0
     f32  fBallX;                // 0x3B4
     f32  fBallY;                // 0x3B8
     f32  fBallZ;                // 0x3BC
     f32  fBallW;                // 0x3C0
-    u8   unk3C4[0x3D4 - 0x3C4];
+    u8   unk3C4[0x3D4 - 0x3C4]; // 0x3C4  TW06 has PreShotBallPos (a vector) right before the swing data
     SwingData swing;            // 0x3D4  the swing meter's state for this player
-    s32  nController;           // 0xA08  CONTROLLER_CPU for the AI
-    s32  nView0;                // 0xA0C
+    s32  nController;           // 0xA08  CONTROLLER_CPU for the AI. TW06: Controller (PlayerCtrl_t, 9 = AI)
+    s32  nView0;                // 0xA0C  TW06: viewControllerID[2]
     s32  nView1;                // 0xA10
     f32  fTargetX;              // 0xA14
     f32  fTargetY;              // 0xA18
     f32  fTargetZ;              // 0xA1C
     f32  fTargetW;              // 0xA20
-    f32  vTargetCopy[4];        // 0xA24  copy of the planned target
+    f32  vTargetCopy[4];        // 0xA24  copy of the planned target. Probably TW06's originalTargetPos
     f32  vTarget2[4];           // 0xA34  copy of the chosen aim point
     u8   unkA44[0xA54 - 0xA44];
-    f32  fDistance;             // 0xA54  to the target
+    f32  fDistance;             // 0xA54  to the target. TW06: targetDistance
     f32  fDistance2;            // 0xA58
     u8   unkA5C[8];
     f32  fA64;                  // 0xA64  a distance, set when a swing state 16 begins
-    s32  nSurface;              // 0xA68  surface type under the target, -1 none, 16 water
+    s32  nSurface;              // 0xA68  surface type under the target, -1 none, 16 water. TW06: targetedSurfaceID
     f32  vPlacement[4];         // 0xA6C  where the ball may be placed (swing state 22)
     u8   unkA7C[0xA90 - 0xA7C];
     u8   ball[0x68];            // 0xA90  the player's Ball (0xBC bytes, see Ball.c) - nLie is its +0x68
     s32  nLie;                  // 0xAF8
     u8   unkAFC[0xB4C - 0xAFC];
-    f32  vOrient[4];            // 0xB4C  a quaternion, identity at setup
+    f32  vOrient[4];            // 0xB4C  a quaternion, identity at setup. TW06: ballRot
     u8   ballBefore[0xBC];      // 0xB5C  copy of the Ball as it lay before the shot
     s32  nShotHandle;           // 0xC18
     f32  fThinkTime;            // 0xC1C  seconds a CPU has spent in state 2

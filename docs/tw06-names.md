@@ -282,11 +282,13 @@ EA added later) names ours. Only fields our code confirms are renamed; the rest 
 | `Ball` (`src/Ball.c`) | `PhysicsBall_t` | TW06 inserted `terrainHeight` at 0x58. |
 | `SwingData` (`include/golfer.h`) | `SW_sSwingData` (0x648; ours 0x634) | TW06 added 4 bytes after 0x14, the second stick's fields after 0x2C (12 bytes) and two calibration fields after 0x37C, 0x18 in all. The swing-boost list at 0x49C has exactly TW06's size. |
 | swing states | `SW_eSwingState` | idle 0, back 1, fidget at the top 2, down 3, follow 4, post 5, cancel 6. Our code sets 2 when the backswing settles, goes back to 1 when the stick moves and to 0 after 0.1 s near centre. |
-| CPU shot shapes | `ShotShape_t` | normal 0, fade 1, draw 2, high 3, low 4, slice 5, hook 6: fade/slice share a sign in our code (+0.02/+0.04), draw/hook the other. |
+| CPU shot shapes | `ShotShape_t` | normal 0, fade 1, draw 2, high 3, low 4, slice 5, hook 6: fade/slice share a sign in our code (+0.02/+0.04), draw/hook the other. We had 3 and 4 swapped: shape 3 picks `gTrajLoft[2]` = +5 degrees of launch angle, a high shot. |
+| `GolferRecord` | `GolferData_t` (0x1F0; ours 0x140) | Same to 0x62, then TW06 is 4 bytes later (fields added in 0x62..0x6C). Renamed: `nModelID` (0x01, `Golfer_FindById` searches on it), `bAvailable` (0x8E; TW06 declares it `char`, and our code reads it with a signed cast), and `tier` shrinks to 12 with TW06's `stance[2]` after it. The outfit byte at 0x62 does not fit TW06's `ballID`, so 0x62..0x67 stay unnamed. |
+| `Player` | `GamePlayer` (0xFE0; ours 0xEF8) | EA regrouped the player into sub-structs (`CoreShotInfo_t`, `GolferScore_t`, `GolferBonus_t`) in a different order, so only blocks match. Score: our strokes at 0x154 and holes won at 0x278 sit at `strokes` (+0) and `matchwins` (+0x124), and the first 0x200 bytes of `GolferScore_t` fill 0x154..0x354 exactly. Shot: 0x354..0x3B0 is `AIshot_t` (club, preferred clubs (8 here, 6 in TW06), direction, strength, type, face and path vectors, shape, perfect). TW06 names are in comments; our names are kept. |
 
 SwingData checks that decided it:
 - `nNumInBlurQueue` (was `n370`) counts the trail points drawn, capped at 25.
-- The trail colour fields are blue, red, green in TW06. Our code packs them into the vertex colour as bytes G, B, R order of the fields, i.e. R = field 2, G = field 3, B = field 1, so TW06 is right and our earlier local names `r`/`g`/`b` were wrong. The trail is blue with the stick left of centre, yellow right.
+- The trail colour fields are blue, red, green in TW06 (0x484, 0x488, 0x48C). Our code writes the second into the vertex colour's red byte, the third into green and the first into blue, so TW06 is right and our earlier local names `r`/`g`/`b` were wrong. The trail is blue with the stick left of centre, yellow (red + green) right.
 - `fPowerBoostDieTime` (was `fBackDown`): when it runs out, the power boost level is cleared.
 - `bCanSpin` (was `bShotTaken`) gates the spin input.
 - `fForwardSpin` / `fSideSpin`: the CPU sets the first from its distance error and the second from its aim error.
