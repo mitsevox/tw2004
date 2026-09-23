@@ -86,6 +86,10 @@ LAYOUT_ASSERT(EarningsTable, 0x22F0);
 
 extern EarningsTable lbl_80200538;
 extern s32 lbl_801FFD68[10];    // the courses fn_800D3A20 unlocked, for their messages
+extern s32 lbl_80200448[10];    // a working table: fn_800D439C messages the entries of kind 2 or 4
+extern s32 lbl_802004C0[10];    // with these ids
+extern s32 lbl_802004E8[10];    // the putt record ids (2)
+extern s32 lbl_80200470[10];    // the putt record results (fn_800D7B1C)
 extern s32 lbl_80200498[10];    // a working table: fn_800D3DDC messages the entries of kind 2 or 4
 extern s32 lbl_80200510[10];    // with these ids
 extern s32 lbl_80282258;        // their count

@@ -188,6 +188,9 @@ extern u32 lbl_801D5948[8];             // a bit array the code at 0x80056480 ke
 extern s32 lbl_80189528[14];            // the golfers GM_GetGameProgress counts as unlockable
 extern s32 lbl_801894D0[6];             // the courses GM_GetGameProgress counts as unlockable
 
+// GameManager.c: the profile's completion score (fn_800D439C raises the TOUR card level with it)
+f32  GM_GetGameProgress(SaveProfile* pProfile);
+
 // Earnings.c: the awards
 u8   fn_800D7770(int nPlayer, Award* pAward);   // mark an award won today; 1 if it was not won before
 
