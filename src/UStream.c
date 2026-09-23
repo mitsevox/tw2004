@@ -74,7 +74,6 @@ void  fn_800A929C(u32 uType);
 void* fn_800A9374(u32 uSize);
 void  fn_800A93AC(void);
 void  fn_800B7490(void);                                     // yield / pump
-void  fn_8009527C(void* p);
 void  fn_8000E708(UStreamParams* p);
 void  fn_8015A7FC(char* pDst, const char* pSrc);             // strcpy
 
