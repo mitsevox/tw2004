@@ -865,7 +865,6 @@ extern f32 gSimBestAim[3];          // 0x801C64D8  the aim that produced it
 extern Ball gSimBall;               // 0x801C64E4  the rehearsal's own ball
 extern s32 gSimClub[6];             // 0x801C65A0  per player: club the rehearsal started with
 
-
 // +n on every modifier the rehearsal cares about (not LUCK), aggression the other way.
 #define BUMP_MODIFIERS(p, n)                                                                       \
     (p)->attrMod[ATTR_POWER]         += (n);                                                       \
@@ -1238,7 +1237,6 @@ void Shot_FitTargetToClub(int nPlayer) {
 
 // ---- planning a shot ------------------------------------------------------------------------------
 
-
 // Plan the next shot: a CPU sets its modifiers, everyone picks a target, Shot_Prepare fills in
 // the rest, the rehearsal is reset, and the luck roll decides whether this shot is perfect.
 void Shot_Plan(int nPlayer, u8 bNotify) {
@@ -1348,7 +1346,6 @@ u8 Lie_AllowsFullSwing(int nPlayer) {
 }
 
 // ---- ground probes ------------------------------------------------------------------------------
-
 
 // Is the ground fDist yards from the ball toward the pin of class 3 (the green)? True when the
 // ball is on the pin. The CPU putts from the fringe when the green starts within 1.5 yards and
@@ -1548,9 +1545,9 @@ int Golfer_FindById(int nId) {
     return -1;
 }
 
-// The 'rcrd' handler: 0xF00 into the session.
+// The 'rcrd' handler: the courses' records into the session.
 void Session_OnRecordsLoaded(UStreamObject* pObject) {
-    Mem_cpy((u8*)&gSession + 0xF00, *(u8**)pObject, *(u32*)((u8*)pObject + 0x24));
+    Mem_cpy(gSession.aCourseRecord, pObject->pData, pObject->uSize);
     fn_80009E70(pObject);
 }
 
@@ -1618,7 +1615,6 @@ void Luck_TakePerfectShot(int nPlayer) {
 #define BAG_ALL      0x03FFFFFF     // every club
 #define BAG_DEFAULT  0x01FFFC7F     // a bag with no clubs 7, 8, 9 (the 3-, 4-, 5-woods?) or 25
 
-extern u8 gNumPlayersSetUp;         // 0x80281D48
 
 u8    fn_800170A0(int nView);                                   // the view exists
 void  fn_80016D18(int nView, f32 x, f32 y, f32 w, f32 h);       // open it (screen fractions)
@@ -1658,7 +1654,7 @@ void Player_SetGolfer(int nPlayer, int nGolfer, int nController, u32 uBag, int b
     p->vTarget[3]    = 0.0f;
     fn_80009710(p->vOrient);
     p->nController = nController;
-    p->unkC28      = 0;
+    p->bMulliganUsed = 0;
     if (gSession.nSplitScreen) {
         if (bRightSide == 0) {
             if (!fn_800170A0(0)) fn_80016D18(0, 0.0f, 0.0f, 0.5f, 1.0f);
@@ -1700,7 +1696,7 @@ void Player_SetGolfer(int nPlayer, int nGolfer, int nController, u32 uBag, int b
     p->bLowIQPenalty = 0;
     p->nLevel       = 0;
     p->fC20         = 0.0f;
-    p->unkC2D       = 0;
+    p->bC2D         = 0;
     p->bPlanReady       = 0;
     p->bRehearsalDone       = 0;
     p->uFlags       = 0;
@@ -1742,8 +1738,6 @@ void fn_8002F180(void) {
     fn_800953C8(0);
 }
 
-
-
 void fn_8002E258(void) {
 }
 
@@ -1751,7 +1745,6 @@ void fn_8002E25C(void) {
 }
 
 // ---- the session and its options ---------------------------------------------------------------
-
 
 extern char gszEmpty[];             // 0x802810B8
 extern char lbl_80187650[];         // "cl_bbsd" ... the default name at +0x1A
@@ -1768,32 +1761,32 @@ void Options_SetDefaults(GameOptions* pOpt) {
     pOpt->unk0[2]  = 5;
     pOpt->unk0[3]  = 1;
     pOpt->unk0[4]  = 4;
-    pOpt->unk7[1]  = 1;
-    pOpt->unk7[2]  = 1;
+    pOpt->a7[1]    = 1;
+    pOpt->a7[2]    = 1;
     pOpt->bGimmes  = 1;
     pOpt->bSkipCameras = 0;
-    pOpt->unkC     = 2;
+    pOpt->nC       = 2;
     pOpt->nWind    = 0;
-    pOpt->unk14    = 0;
-    pOpt->unk18    = 1;
-    pOpt->unk1C    = 1;
+    pOpt->n14      = 0;
+    pOpt->n18      = 1;
+    pOpt->n1C      = 1;
     for (i = 0; i < 8; i++) {
-        pOpt->unk24[i] = 1;
+        pOpt->a24[i] = 1;
     }
     pOpt->bBoostEnabled = 1;
     pOpt->bSpinEnabled  = 1;
-    pOpt->unk7E = 0;
-    pOpt->unk80 = 1;
+    pOpt->b7E = 0;
+    pOpt->n80 = 1;
     for (i = 0; i < 4; i++) {
         for (j = 0; j < 19; j++) {
             pOpt->rows[i][j] = 1;
         }
     }
-    pOpt->unk7A = 1;
-    pOpt->unk7B = 0;
-    pOpt->unk7C = 1;
-    pOpt->unk7D = 0;
-    pOpt->unk84 = 0;
+    pOpt->b7A = 1;
+    pOpt->b7B = 0;
+    pOpt->b7C = 1;
+    pOpt->b7D = 0;
+    pOpt->b84 = 0;
     fn_8002EBA4((u8*)pOpt, 1);
     if (gSession.uFlags & 0x4000) {
         for (i = 0; i < 4; i++) {
@@ -1801,15 +1794,15 @@ void Options_SetDefaults(GameOptions* pOpt) {
                 pOpt->rows[i][j] = 0;
             }
         }
-        pOpt->unk7A      = 1;
+        pOpt->b7A      = 1;
         pOpt->rows[0][13] = 1;
         pOpt->rows[0][15] = 1;
         pOpt->rows[0][17] = 1;
         pOpt->rows[1][0]  = 1;
         fn_8002EBA4((u8*)pOpt, 0);
     }
-    fn_80055C40(pOpt->unk18);
-    fn_80055CD0(pOpt->unk1C);
+    fn_80055C40(pOpt->n18);
+    fn_80055CD0(pOpt->n1C);
 }
 
 // A fresh session: one player, every slot a CPU on tee set 2 with an empty profile.
@@ -1819,35 +1812,35 @@ void Session_Init(void) {
 
     pSession->uFlags      = 0;
     pSession->nGameType   = 0;
-    pSession->unk8[0]     = 0;
-    pSession->unkC        = 0;
+    pSession->a8[0]     = 0;
+    pSession->nC          = 0;
     pSession->nSplitScreen = 0;
     pSession->unk11[0]    = 0;
     pSession->unk11[1]    = 0;
     pSession->bReplay     = 0;
-    pSession->unk14       = 0;
+    pSession->n14       = 0;
     pSession->uFlags     &= ~0x60;
     pSession->fFrameTime  = 0.0f;
     pSession->f1C         = 0.0f;
-    pSession->unk20       = 0;
+    pSession->n20         = 0;
     pSession->unk24       = 0;
-    pSession->unk28       = 0;
-    Options_SetDefaults(SESSION_OPTIONS);
+    pSession->n28         = 0;
+    Options_SetDefaults(&gSession.options);
     gSession.nSeed = Rand_Next(0);
     fn_8000B1D4(0, gSession.nSeed);
     gSession.nNumPlayers = 1;
     gSession.nPinSet     = -1;
-    gSession.unk5B39     = 1;
+    gSession.bStrokeLimit = 1;
     for (i = 0; i < 5; i++) {
         gSession.nController[i] = CONTROLLER_CPU;
         gSession.nGolfer[i]     = 0;
         gSession.nTeeSet[i]     = 2;
         gSession.uBag[i]        = 0;
-        SESSION_PROFILE(i)->n0 = 0;
-        SESSION_PROFILE(i)->unk1 = 0;
-        SESSION_PROFILE(i)->unk2 = 0;
+        gSession.aProfile[i].n0 = 0;
+        gSession.aProfile[i].n1 = 0;
+        gSession.aProfile[i].n2 = 0;
         for (j = 0; j < 6; j++) {
-            fn_800CB700(SESSION_PROFILE(i)->szNames[j], gszEmpty);
+            fn_800CB700(gSession.aProfile[i].szNames[j], gszEmpty);
         }
     }
     gSession.f5B3C = 0.0f;
@@ -1864,14 +1857,15 @@ void Session_SetupProfiles(void) {
     s8       nSpin;
 
     for (i = 0; i < pSession->nNumPlayers; i++) {
-        PlayerProfile* pProf = SESSION_PROFILE(i);
+        // fake match: the cast keeps this near-miss at 70.9% (&gSession.aProfile[i]: 70.1%)
+        PlayerProfile* pProf = (PlayerProfile*)gSession.aProfile + i;
         int            nGolfer;
-        pProf->unk1 = 0;
+        pProf->n1 = 0;
         nSpin = gGolferTable[pSession->nGolfer[i]].attr[ATTR_SPIN];
         for (j = 0; j < 6; j++) {
             fn_800CB700(pProf->szNames[j], gszEmpty);
         }
-        pProf->nOutfit = gGolferTable[pSession->nGolfer[i]].unk62[0];
+        pProf->nOutfit = gGolferTable[pSession->nGolfer[i]].nOutfit;
         nGolfer = pSession->nGolfer[i];
         if (nGolfer >= FIRST_CREATED_GOLFER) {
             SaveProfile* pSave = &gpSaveData[nGolfer - FIRST_CREATED_GOLFER];
@@ -1879,18 +1873,18 @@ void Session_SetupProfiles(void) {
                 ((u32*)pProf->szNames[j])[0] = ((u32*)pSave->szGolferNames[j])[0];
                 ((u32*)pProf->szNames[j])[1] = ((u32*)pSave->szGolferNames[j])[1];
             }
-            pProf->unk2      = pSave->n54C2;
+            pProf->n2        = pSave->n54C2;
             pProf->nBallType = pSave->nGolferBallType;
             pProf->nOutfit   = pSave->nGolferOutfit;
         } else if (nGolfer == 0 || nGolfer == 1) {
             fn_800CB700(pProf->szNames[0], lbl_80187650 + 0x1A);
-            pProf->unk2      = 0;
+            pProf->n2        = 0;
             pProf->nBallType = 0;
         } else if (fn_80077B18()) {
-            pProf->unk2      = 0;
+            pProf->n2        = 0;
             pProf->nBallType = 0;
         } else {
-            pProf->unk2 = 0;
+            pProf->n2 = 0;
             if (nSpin >= 100) {
                 pProf->nBallType = 3;
             } else if (nSpin >= 75) {

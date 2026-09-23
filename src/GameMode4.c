@@ -48,7 +48,6 @@ void  fn_800D39B4(int nPlayer, int nMoney);
 void  fn_80058278(int nProfile, int nGolfer);
 u8    fn_8005832C(int nProfile, int nGolfer);  // the golfer is unlocked for the profile
 void  fn_80058428(int nProfile, int nReward);
-void* memcpy(void* pDst, const void* pSrc, u32 uLen);
 
 void fn_80102404(void);
 u8   fn_80102204(int nProfile, int nEvent);
@@ -64,15 +63,15 @@ void fn_80102874(void);
 
 // Mode 4 starts: a match against the event's pro, with GameModeMatch's rules.
 void fn_80101FEC(void) {
-    gpGame->pfn1C8 = fn_80101FEC;
-    gpGame->pfn1CC = fn_80102404;
-    gpGame->pfn1D0 = fn_800E9F14;
-    gpGame->pfn1D4 = fn_800EA084;
-    gpGame->pfn1D8 = (u8 (*)(int, int))fn_800EA278;
-    gpGame->pfn1DC = (u8 (*)(int))fn_800EA548;
-    gpGame->pfn1E0 = (s32 (*)(void))fn_800EA758;
-    gpGame->pfn1E8 = fn_800EAA40;
-    gpGame->pfn1F4 = fn_801025FC;
+    gpGame->pfnInit = fn_80101FEC;
+    gpGame->pfnShutdown = fn_80102404;
+    gpGame->pfnSetupNextGolfer = fn_800E9F14;
+    gpGame->pfnGetHonors = fn_800EA084;
+    gpGame->pfnHoleFinished = fn_800EA278;
+    gpGame->pfnGameFinished = fn_800EA548;
+    gpGame->pfnGoToPlayoff = fn_800EA758;
+    gpGame->pfnEndHole = fn_800EAA40;
+    gpGame->pfnEndGame = fn_801025FC;
     gpGame->n4 = 1;
     gpGame->nMulligans = 0;
     gpGame->nC = 1;
@@ -190,8 +189,8 @@ void fn_80102404(void) {
     }
     gpGame->nC = 1;
     gpGame->n10 = 1;
-    SESSION_OPTIONS->unkC = lbl_802816E0;
-    SESSION_OPTIONS->nWind = lbl_80282430;
+    gSession.options.nC = lbl_802816E0;
+    gSession.options.nWind = lbl_80282430;
     lbl_80282434 = 0;
 }
 
@@ -199,10 +198,10 @@ void fn_80102404(void) {
 void fn_80102468(void) {
     int nEvent;
     int nPins;
-    lbl_802816E0 = SESSION_OPTIONS->unkC;
-    lbl_80282430 = SESSION_OPTIONS->nWind;
-    SESSION_OPTIONS->unkC = 4;
-    SESSION_OPTIONS->nWind = 0;
+    lbl_802816E0 = gSession.options.nC;
+    lbl_80282430 = gSession.options.nWind;
+    gSession.options.nC = 4;
+    gSession.options.nWind = 0;
     lbl_80282434 = 1;
     nEvent = fn_801021FC();
     lbl_80282448 = lbl_802124B8[nEvent].nGolfer;
@@ -213,8 +212,8 @@ void fn_80102468(void) {
             fn_800E0B38(5);
             fn_800EAE38(lbl_802124B8[nEvent].nChallenge - 1);
             fn_800EAF7C();
-            lbl_80282450 = gpGame->pfn1CC;
-            gpGame->pfn1CC = fn_80102404;
+            lbl_80282450 = gpGame->pfnShutdown;
+            gpGame->pfnShutdown = fn_80102404;
         } else {
             lbl_80282450 = NULL;
             gpGame->nC = 2;
@@ -258,8 +257,8 @@ void fn_801025FC(void) {
             fn_800E4364(0, 0x6E, nPrize, nProfile);
             fn_800D3548(0, nMoney, NULL);
             nEvent = fn_801021FC();
-            gPlayers[0].n320 += lbl_80200538.aLadderPrize[nEvent].nBase;
-            gPlayers[0].n324 += lbl_80200538.aLadderPrize[nEvent].nPerHole * nMargin;
+            gPlayers[0].money.nC += lbl_80200538.aLadderPrize[nEvent].nBase;
+            gPlayers[0].money.n10 += lbl_80200538.aLadderPrize[nEvent].nPerHole * nMargin;
             fn_80102874();
         }
     }
@@ -272,7 +271,7 @@ void fn_80102704(void) {
     if (nMoney != 0 && gpSaveData[gPlayers[0].nIndex].bActive) {
         fn_800E4364(0, 0x6E, nPrize, gPlayers[0].nIndex);
         fn_800D3548(0, nMoney, NULL);
-        gPlayers[0].n320 += nMoney;
+        gPlayers[0].money.nC += nMoney;
     }
     fn_80102874();
 }
@@ -334,7 +333,7 @@ void fn_80102874(void) {
                 if (fn_800D750C(0, 15)) {
                     fn_800E4364(2, 15, lbl_80200538.nLadderDone, nProfile);
                     fn_800D3548(0, lbl_80200538.nLadderDone, NULL);
-                    gPlayers[0].n31C += lbl_80200538.nLadderDone;
+                    gPlayers[0].money.n8 += lbl_80200538.nLadderDone;
                 }
             } else if ((nEvent + 1) % 4 == 0) {
                 fn_800E4364(5, nEvent / 4 + 20, 0, nProfile);

@@ -8,10 +8,6 @@
 #include "engine.h"
 #include "game/earnings.h"
 
-extern Replay gReplayData;
-extern u8  gNumPlayersSetUp;
-extern s32 lbl_80282278;                    // the player whose turn it is
-extern s8  lbl_80282360;                    // the number of targets (GameModeReplay.c)
 extern s32 lbl_80281690;                    // the options saved while the game runs
 extern s32 lbl_80282378;
 extern u8  lbl_8028237C;                    // a new leader was just set
@@ -26,7 +22,7 @@ void  fn_800A640C(void);
 
 void  fn_800F3C2C(void);
 void  fn_800F3C48(void);
-s32   fn_800F3C74(void);
+u8    fn_800F3C74(u8 bCheck);
 s32   fn_800F3C7C(int nPlayer);
 void  fn_800F3E00(int nPlayer);
 void  fn_800F3EBC(int nPlayer);
@@ -35,9 +31,9 @@ void  fn_800F4698(void);
 void  fn_800F46BC(void);
 void  fn_800F46E4(void);
 void  fn_800F471C(int nPlayer);
-u8    fn_800F475C(int a);
+u8    fn_800F475C(u8 bCheck);
 void  fn_800F4764(int nPlayer);
-s32   fn_800F4784(int nPlayer, int a);
+s32   fn_800F4784(int nPlayer, u8 bCheck);
 u8    fn_800F47D8(int nPlayer);
 u8    fn_800F4828(int nPlayer);
 s8    fn_800F4878(void);
@@ -49,14 +45,16 @@ s32   fn_800F4B14(int a, int i);
 
 // Mode 15 starts: the same setup as mode 14.
 void fn_800F39F4(void) {
-    gpGame->pfn1C8 = fn_800F39F4;
-    gpGame->pfn1CC = fn_800F3C2C;
-    gpGame->pfn1D0 = fn_800F4584;
-    gpGame->pfn1D4 = fn_800F3C7C;
-    gpGame->pfn1D8 = (u8 (*)(int, int))fn_800F4784;
-    gpGame->pfn1DC = fn_800F475C;
-    gpGame->pfn1E0 = fn_800F3C74;
-    gpGame->pfn248 = fn_800F3E00;
+    gpGame->pfnInit = fn_800F39F4;
+    gpGame->pfnShutdown = fn_800F3C2C;
+    gpGame->pfnSetupNextGolfer = fn_800F4584;
+    gpGame->pfnGetHonors = fn_800F3C7C;
+    // The original's fn_800F4784 returns an s32 (0 or 1; a u8 return adds a clrlwi: 95%), so it
+    // goes in the u8 slot through a cast.
+    gpGame->pfnHoleFinished = (u8 (*)(int, u8))fn_800F4784;
+    gpGame->pfnGameFinished = fn_800F475C;
+    gpGame->pfnGoToPlayoff = fn_800F3C74;
+    gpGame->pfnEndGolferTurn = fn_800F3E00;
     gpGame->pfn244 = fn_800F3EBC;
     gpGame->pfn1E4 = fn_800F4698;
     gpGame->pfn228 = fn_800F471C;
@@ -66,7 +64,7 @@ void fn_800F39F4(void) {
     gpGame->pfn264 = fn_800F47D8;
     gpGame->pfn258 = fn_800F4828;
     gpGame->pfn260 = fn_800F4894;
-    gpGame->pfn1F4 = fn_800F4950;
+    gpGame->pfnEndGame = fn_800F4950;
     gpGame->pfn26C = fn_800F4B14;
     gpGame->b276 = 0;
     gpGame->bGimmesAllowed = 0;
@@ -98,18 +96,18 @@ void fn_800F39F4(void) {
 }
 
 void fn_800F3C2C(void) {
-    SESSION_OPTIONS->unkC = lbl_80281690;
-    SESSION_OPTIONS->nWind = lbl_80282378;
+    gSession.options.nC = lbl_80281690;
+    gSession.options.nWind = lbl_80282378;
 }
 
 void fn_800F3C48(void) {
-    lbl_80281690 = SESSION_OPTIONS->unkC;
-    lbl_80282378 = SESSION_OPTIONS->nWind;
-    SESSION_OPTIONS->unkC = 4;
-    SESSION_OPTIONS->nWind = 0;
+    lbl_80281690 = gSession.options.nC;
+    lbl_80282378 = gSession.options.nWind;
+    gSession.options.nC = 4;
+    gSession.options.nWind = 0;
 }
 
-s32 fn_800F3C74(void) {
+u8 fn_800F3C74(u8 bCheck) {
     return 0;
 }
 
@@ -384,7 +382,7 @@ void fn_800F471C(int nPlayer) {
     }
 }
 
-u8 fn_800F475C(int a) {
+u8 fn_800F475C(u8 bCheck) {
     return 1;
 }
 
@@ -393,7 +391,7 @@ void fn_800F4764(int nPlayer) {
 }
 
 // The game is over when at most one player is still in.
-s32 fn_800F4784(int nPlayer, int a) {
+s32 fn_800F4784(int nPlayer, u8 bCheck) {
     int i;
     s32 n = 0;
     for (i = 0; i < gNumPlayersSetUp; i++) {

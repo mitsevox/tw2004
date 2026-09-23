@@ -145,17 +145,17 @@ void fn_800E5240(int i) {
             }
         }
         fn_800E3B04();
-        if (gSession.unk14 == 2) {
+        if (gSession.n14 == 2) {
             if (!fn_80095430(1)) {
                 fn_800953C8(1);
             }
             lbl_802822DF = 0;
             fn_800DC9D4(0);
             fn_8009EF98();
-            gSession.unk14 = 0;
+            gSession.n14 = 0;
             return;
         }
-        gSession.unk14 = 1;
+        gSession.n14 = 1;
     }
 }
 

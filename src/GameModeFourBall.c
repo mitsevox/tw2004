@@ -6,16 +6,6 @@
 #include "game.h"
 #include "game/save.h"
 
-extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
-extern s32 lbl_80282278;                    // the player whose turn it is
-extern u8  lbl_80282240;
-
-// The tee order before anyone has won a hole (lbl_80184DC0: 0, 1, 2, 3).
-typedef struct TeeOrder {
-    s32 a[4];
-} TeeOrder;
-extern TeeOrder lbl_80184DC0;
-
 u8   fn_800E8E24(int nTeam);
 u8   fn_800E8F20(int nTeam);
 int  fn_800E8FC8(int nTeam);
@@ -23,7 +13,7 @@ int  fn_800E90AC(int nTeam);
 void fn_800E90FC(void);
 s32  fn_800E9178(int nPlayer);
 int  fn_800E947C(int nPlayer);
-u8   fn_800E948C(u32 nPlayer, int a);
+u8   fn_800E948C(int nPlayer, u8 bCheck);
 u8   fn_800E96B8(u8 bCheck);
 u8   fn_800E98F0(u8 bCheck);
 void fn_800E9BBC(void);
@@ -31,14 +21,14 @@ void fn_800E9CF4(void);
 
 // TW06: GameModeFourBall::Init. Four players; the CPU may concede.
 void fn_800E8D58(void) {
-    gpGame->pfn1C8 = fn_800E8D58;
-    gpGame->pfn1D0 = fn_800E90FC;
-    gpGame->pfn1D4 = fn_800E9178;
-    gpGame->pfn1D8 = (u8 (*)(int, int))fn_800E948C;
-    gpGame->pfn1DC = (u8 (*)(int))fn_800E96B8;
-    gpGame->pfn1E0 = (s32 (*)(void))fn_800E98F0;
-    gpGame->pfn1E8 = fn_800E9BBC;
-    gpGame->pfn1F4 = fn_800E9CF4;
+    gpGame->pfnInit = fn_800E8D58;
+    gpGame->pfnSetupNextGolfer = fn_800E90FC;
+    gpGame->pfnGetHonors = fn_800E9178;
+    gpGame->pfnHoleFinished = fn_800E948C;
+    gpGame->pfnGameFinished = fn_800E96B8;
+    gpGame->pfnGoToPlayoff = fn_800E98F0;
+    gpGame->pfnEndHole = fn_800E9BBC;
+    gpGame->pfnEndGame = fn_800E9CF4;
     gpGame->bAIConcedes = 1;
     gpGame->n4 = 1;
     gpGame->nMulligans = 0;
@@ -137,7 +127,7 @@ int fn_800E90AC(int nTeam) {
 // The hole starts: the first golfer to play gets ready, the others wait.
 void fn_800E90FC(void) {
     int i;
-    lbl_80282278 = gpGame->pfn1D4(5);
+    lbl_80282278 = gpGame->pfnGetHonors(5);
     for (i = 0; i < gNumPlayersSetUp; i++) {
         if (i == lbl_80282278) {
             GOLFERSTATE_Set(GS_PRE_SHOT, i);
@@ -151,8 +141,8 @@ void fn_800E90FC(void) {
 // team 0 only) the better score of the pair; otherwise the player farthest from the pin (off the
 // green first) whose team is still playing.
 s32 fn_800E9178(int nPlayer) {
-    TeeOrder order;
-    s32* pOrder;        // fake match: the within-team compare reads order.a through a pointer
+    s32 aOrder[4] = {0, 1, 2, 3};  // the tee order before anyone has won a hole
+    s32* pOrder;        // fake match: the within-team compare reads aOrder through a pointer
     int w;
     int t;
     int i;
@@ -167,8 +157,7 @@ s32 fn_800E9178(int nPlayer) {
     f32 dz;
     f32 d;
     nLead = 0;
-    order = lbl_80184DC0;
-    pOrder = order.a;
+    pOrder = aOrder;
     for (h = 0; h < Game_CurHoleIndex(); h++) {
         if (gpGame->bHoleSelected[h]) {
             if (gPlayers[0].nModePoints[h] != 0) {
@@ -180,23 +169,23 @@ s32 fn_800E9178(int nPlayer) {
             }
             if (w != nLead) {
                 nLead = w;
-                t = order.a[0];
-                order.a[0] = order.a[2];
-                order.a[2] = t;
-                t = order.a[1];
-                order.a[1] = order.a[3];
-                order.a[3] = t;
+                t = aOrder[0];
+                aOrder[0] = aOrder[2];
+                aOrder[2] = t;
+                t = aOrder[1];
+                aOrder[1] = aOrder[3];
+                aOrder[3] = t;
             }
-            if (gPlayers[order.a[1]].nStrokes[h] < gPlayers[pOrder[0]].nStrokes[h]) {
-                t = order.a[0];
-                order.a[0] = order.a[1];
-                order.a[1] = t;
+            if (gPlayers[aOrder[1]].nStrokes[h] < gPlayers[pOrder[0]].nStrokes[h]) {
+                t = aOrder[0];
+                aOrder[0] = aOrder[1];
+                aOrder[1] = t;
             }
         }
     }
     for (j = 0; j < gNumPlayersSetUp; j++) {
-        if (nPlayer != order.a[j] && Player_OnTee(order.a[j]) && !fn_800E8E24(fn_800E947C(order.a[j]))) {
-            return order.a[j];
+        if (nPlayer != aOrder[j] && Player_OnTee(aOrder[j]) && !fn_800E8E24(fn_800E947C(aOrder[j]))) {
+            return aOrder[j];
         }
     }
     pCourse = fn_8000C594();
@@ -243,7 +232,7 @@ int fn_800E947C(int nPlayer) {
 
 // TW06: GameModeFourBall::HoleFinished. Both teams done or one conceded; or one team done and the
 // other can no longer beat it (or only tie, when dormie).
-u8 fn_800E948C(u32 nPlayer, int a) {
+u8 fn_800E948C(int nPlayer, u8 bCheck) {
     int nLeft;
     int h;
     if (fn_800E8E24(0) && fn_800E8E24(1)) {
@@ -252,12 +241,12 @@ u8 fn_800E948C(u32 nPlayer, int a) {
     if (fn_800E8F20(0) || fn_800E8F20(1)) {
         return 1;
     }
-    if (fn_800E8E24(0) && (!lbl_80282240 || nPlayer > 1)) {
+    if (fn_800E8E24(0) && (!lbl_80282240 || (u32)nPlayer > 1)) {
         if (fn_800E8FC8(0) < fn_800E8FC8(1)) {
             return 1;
         }
     }
-    if (fn_800E8E24(1) && (!lbl_80282240 || nPlayer - 2 > 1)) {
+    if (fn_800E8E24(1) && (!lbl_80282240 || (u32)(nPlayer - 2) > 1)) {
         if (fn_800E8FC8(1) < fn_800E8FC8(0)) {
             return 1;
         }
@@ -268,14 +257,14 @@ u8 fn_800E948C(u32 nPlayer, int a) {
             nLeft++;
         }
     }
-    if (fn_800E8E24(0) && (!lbl_80282240 || nPlayer > 1)) {
+    if (fn_800E8E24(0) && (!lbl_80282240 || (u32)nPlayer > 1)) {
         if (nLeft + fn_800E90AC(1) == fn_800E90AC(0)) {
             if (fn_800E8FC8(0) <= fn_800E8FC8(1)) {
                 return 1;
             }
         }
     }
-    if (fn_800E8E24(1) && (!lbl_80282240 || nPlayer - 2 > 1)) {
+    if (fn_800E8E24(1) && (!lbl_80282240 || (u32)(nPlayer - 2) > 1)) {
         if (nLeft + fn_800E90AC(0) == fn_800E90AC(1)) {
             if (fn_800E8FC8(1) <= fn_800E8FC8(0)) {
                 return 1;
@@ -433,7 +422,7 @@ void fn_800E9CF4(void) {
                 if (gpSaveData[p->nIndex].bActive && nMoney) {
                     fn_800E4364(0, 0x6B, nPrize, p->nIndex);
                     fn_800D3548(i, nMoney, 0);
-                    p->n328 += nMoney;
+                    p->money.n14 += nMoney;
                 }
             }
         }

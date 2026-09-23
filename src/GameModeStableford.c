@@ -8,8 +8,6 @@
 #include "game/save.h"
 #include "game/earnings.h"
 
-extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
-extern s32 lbl_80282278;                    // the player whose turn it is
 // The points for 3 under par .. 2 or more over. TW06: GameModeStableford::stablefordPointTable.
 extern s8  lbl_802816D0[6];
 
@@ -24,14 +22,14 @@ void fn_800FE980(void);
 
 // TW06: GameModeStableford::Init. One mulligan per player per round; the CPU may concede.
 void fn_800FE1B4(void) {
-    gpGame->pfn1C8 = fn_800FE1B4;
-    gpGame->pfn1D0 = fn_800FE344;
-    gpGame->pfn1D4 = fn_800FE3FC;
-    gpGame->pfn1D8 = (u8 (*)(int, int))fn_800FE7EC;
-    gpGame->pfn1DC = (u8 (*)(int))fn_800FE844;
-    gpGame->pfn1E0 = (s32 (*)(void))fn_800FE8A0;
-    gpGame->pfn1E8 = fn_800FE8A8;
-    gpGame->pfn1F4 = fn_800FE980;
+    gpGame->pfnInit = fn_800FE1B4;
+    gpGame->pfnSetupNextGolfer = fn_800FE344;
+    gpGame->pfnGetHonors = fn_800FE3FC;
+    gpGame->pfnHoleFinished = fn_800FE7EC;
+    gpGame->pfnGameFinished = fn_800FE844;
+    gpGame->pfnGoToPlayoff = fn_800FE8A0;
+    gpGame->pfnEndHole = fn_800FE8A8;
+    gpGame->pfnEndGame = fn_800FE980;
     gpGame->bAIConcedes = 1;
     gpGame->n4 = 3;
     gpGame->nMulligans = 2;
@@ -61,7 +59,7 @@ void fn_800FE344(void) {
             GOLFERSTATE_Set(GS_PRE_SHOT, i);
         }
     } else {
-        lbl_80282278 = gpGame->pfn1D4(5);
+        lbl_80282278 = gpGame->pfnGetHonors(5);
         for (i = 0; i < gNumPlayersSetUp; i++) {
             if (i == lbl_80282278) {
                 GOLFERSTATE_Set(GS_PRE_SHOT, i);

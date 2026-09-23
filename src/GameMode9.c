@@ -6,7 +6,6 @@
 #include "game.h"
 #include "engine.h"
 
-extern u8 gNumPlayersSetUp;                 // 0x80281D48 (Golfer.c)
 extern u8 lbl_80282330;                     // the hole is being restarted
 
 typedef struct Vec4 {
@@ -18,8 +17,8 @@ void fn_800ED890(void);
 void fn_800ED8B8(void);
 void fn_800ED8E0(void);
 u8   fn_800ED900(void);
-u8   fn_800ED908(int nPlayer, int a);
-u8   fn_800ED9AC(int a);
+u8   fn_800ED908(int nPlayer, u8 bCheck);
+u8   fn_800ED9AC(u8 bCheck);
 void fn_800ED9A0(void);
 void fn_800EDA08(void);
 void fn_800EDA34(int nPlayer);
@@ -27,13 +26,13 @@ void fn_800EDA74(void);
 
 // Mode 9 starts: one player, one mulligan, no gimmes, no GameBreakers.
 void fn_800ED738(void) {
-    gpGame->pfn1C8 = fn_800ED738;
-    gpGame->pfn1D0 = fn_800ED8E0;
-    gpGame->pfn1D4 = fn_800FF894;
-    gpGame->pfn1D8 = fn_800ED908;
-    gpGame->pfn1DC = fn_800ED9AC;
-    gpGame->pfn1E0 = fn_800FFDB0;
-    gpGame->pfn1F4 = fn_800EDA08;
+    gpGame->pfnInit = fn_800ED738;
+    gpGame->pfnSetupNextGolfer = fn_800ED8E0;
+    gpGame->pfnGetHonors = fn_800FF894;
+    gpGame->pfnHoleFinished = fn_800ED908;
+    gpGame->pfnGameFinished = fn_800ED9AC;
+    gpGame->pfnGoToPlayoff = fn_800FFDB0;
+    gpGame->pfnEndGame = fn_800EDA08;
     gpGame->pfn1E4 = fn_800ED890;
     gpGame->pfn224 = fn_800ED8B8;
     gpGame->pfn210 = fn_800EDA34;
@@ -78,7 +77,7 @@ u8 fn_800ED900(void) {
 }
 
 // Hole finished: on a restart, or once every player has holed out.
-u8 fn_800ED908(int nPlayer, int a) {
+u8 fn_800ED908(int nPlayer, u8 bCheck) {
     int i;
     if (fn_800ED900()) {
         return 1;
@@ -102,7 +101,7 @@ void fn_800ED9A0(void) {
 }
 
 // Game finished: no selected hole is left.
-u8 fn_800ED9AC(int a) {
+u8 fn_800ED9AC(u8 bCheck) {
     int h;
     for (h = Game_CurHoleIndex() + 1; h < 18; h++) {
         if (gpGame->bHoleSelected[h]) {

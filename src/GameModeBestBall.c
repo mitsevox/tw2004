@@ -8,36 +8,27 @@
 #include "game/save.h"
 #include "game/earnings.h"
 
-extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
-extern s32 lbl_80282278;                    // the player whose turn it is
-
-// The tee order before anyone has a lower team score (lbl_80184DB0: 0, 1, 2, 3).
-typedef struct TeeOrder {
-    s32 a[4];
-} TeeOrder;
-extern TeeOrder lbl_80184DB0;
-
 u8   fn_800E82AC(int nTeam);
 int  fn_800E83A8(int nPlayer);
 void fn_800E83F8(void);
 s32  fn_800E84B0(int nPlayer);
 int  fn_800E8848(int nPlayer);
-int  fn_800E8858(void);
-u8   fn_800E88A8(int a);
-s32  fn_800E8904(void);
+u8   fn_800E8858(int nPlayer, u8 bCheck);
+u8   fn_800E88A8(u8 bCheck);
+u8   fn_800E8904(u8 bCheck);
 void fn_800E890C(void);
 void fn_800E8A68(void);
 
 // TW06: GameModeBestBall::Init. Four players, stroke play, one mulligan each.
 void fn_800E81C4(void) {
-    gpGame->pfn1C8 = fn_800E81C4;
-    gpGame->pfn1D0 = fn_800E83F8;
-    gpGame->pfn1D4 = fn_800E84B0;
-    gpGame->pfn1D8 = (u8 (*)(int, int))fn_800E8858;
-    gpGame->pfn1DC = fn_800E88A8;
-    gpGame->pfn1E0 = fn_800E8904;
-    gpGame->pfn1E8 = fn_800E890C;
-    gpGame->pfn1F4 = fn_800E8A68;
+    gpGame->pfnInit = fn_800E81C4;
+    gpGame->pfnSetupNextGolfer = fn_800E83F8;
+    gpGame->pfnGetHonors = fn_800E84B0;
+    gpGame->pfnHoleFinished = fn_800E8858;
+    gpGame->pfnGameFinished = fn_800E88A8;
+    gpGame->pfnGoToPlayoff = fn_800E8904;
+    gpGame->pfnEndHole = fn_800E890C;
+    gpGame->pfnEndGame = fn_800E8A68;
     gpGame->n4 = 0;
     gpGame->nMulligans = 2;
     gpGame->nC = 4;
@@ -96,7 +87,7 @@ void fn_800E83F8(void) {
         }
         return;
     }
-    lbl_80282278 = gpGame->pfn1D4(5);
+    lbl_80282278 = gpGame->pfnGetHonors(5);
     for (i = 0; i < gNumPlayersSetUp; i++) {
         if (i == lbl_80282278) {
             GOLFERSTATE_Set(GS_PRE_SHOT, i);
@@ -110,8 +101,8 @@ void fn_800E83F8(void) {
 // with the better score on the last decided hole, and within a team the better score; otherwise the
 // player farthest from the pin (off the green first) whose team is still playing.
 s32 fn_800E84B0(int nPlayer) {
-    TeeOrder order;
-    s32* pOrder;        // fake match: the within-team compares read order.a through a pointer
+    s32 aOrder[4] = {0, 1, 2, 3};  // the tee order before anyone has a lower team score
+    s32* pOrder;        // fake match: the within-team compares read aOrder through a pointer
     int a;
     int b;
     int w;
@@ -127,8 +118,7 @@ s32 fn_800E84B0(int nPlayer) {
     f32 dz;
     f32 d;
     nLead = 0;
-    order = lbl_80184DB0;
-    pOrder = order.a;
+    pOrder = aOrder;
     for (h = 0; h < Game_CurHoleIndex(); h++) {
         if (gpGame->bHoleSelected[h]) {
             a = gPlayers[1].nStrokes[h];
@@ -148,31 +138,31 @@ s32 fn_800E84B0(int nPlayer) {
             }
             if (w != nLead) {
                 nLead = w;
-                t = order.a[0];
-                order.a[0] = order.a[2];
-                order.a[2] = t;
-                t = order.a[1];
-                order.a[1] = order.a[3];
-                order.a[3] = t;
+                t = aOrder[0];
+                aOrder[0] = aOrder[2];
+                aOrder[2] = t;
+                t = aOrder[1];
+                aOrder[1] = aOrder[3];
+                aOrder[3] = t;
             }
-            t = order.a[0];
+            t = aOrder[0];
             if (gPlayers[t].nStrokes[h] > gPlayers[pOrder[1]].nStrokes[h]) {
-                order.a[0] = order.a[1];
-                order.a[1] = t;
+                aOrder[0] = aOrder[1];
+                aOrder[1] = t;
             }
-            t = order.a[2];
+            t = aOrder[2];
             if (gPlayers[t].nStrokes[h] > gPlayers[pOrder[3]].nStrokes[h]) {
-                order.a[2] = order.a[3];
-                order.a[3] = t;
+                aOrder[2] = aOrder[3];
+                aOrder[3] = t;
             }
         }
     }
     // fake match: the tee-order loop reuses the hole counter h; a counter of its own gets another
     // register (h, t or w all match)
     for (h = 0; h < gNumPlayersSetUp; h++) {
-        if (nPlayer != order.a[h] && Player_OnTee(order.a[h]) && !gPlayers[order.a[h]].bPlayerCut &&
-            !fn_800E82AC(fn_800E8848(order.a[h]))) {
-            return order.a[h];
+        if (nPlayer != aOrder[h] && Player_OnTee(aOrder[h]) && !gPlayers[aOrder[h]].bPlayerCut &&
+            !fn_800E82AC(fn_800E8848(aOrder[h]))) {
+            return aOrder[h];
         }
     }
     pCourse = fn_8000C594();
@@ -219,8 +209,8 @@ int fn_800E8848(int nPlayer) {
 }
 
 // TW06: GameModeBestBall::HoleFinished. Both teams are done.
-int fn_800E8858(void) {
-    u8 bDone = 0;
+u8 fn_800E8858(int nPlayer, u8 bCheck) {
+    int bDone = 0;
     if (fn_800E82AC(0) && fn_800E82AC(1)) {
         bDone = 1;
     }
@@ -228,7 +218,7 @@ int fn_800E8858(void) {
 }
 
 // TW06: GameModeBestBall::GameFinished. No selected hole is left.
-u8 fn_800E88A8(int a) {
+u8 fn_800E88A8(u8 bCheck) {
     int h;
     for (h = Game_CurHoleIndex() + 1; h < 18; h++) {
         if (gpGame->bHoleSelected[h]) {
@@ -239,7 +229,7 @@ u8 fn_800E88A8(int a) {
 }
 
 // TW06: GameModeBestBall::GoToPlayoff (never).
-s32 fn_800E8904(void) {
+u8 fn_800E8904(u8 bCheck) {
     return 0;
 }
 

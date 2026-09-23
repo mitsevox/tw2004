@@ -11,15 +11,13 @@
 
 void  fn_80102704(void);
 void  fn_80102874(void);
-extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
-extern s32 lbl_80282278;                    // the player whose turn it is
 extern s32 lbl_802823C0;                    // skins carried over
 extern s32 lbl_802823C4;                    // the money carried over
 
 void fn_800F81EC(void);
 void fn_800F81FC(void);
 s32  fn_800F8278(int nPlayer);
-u8   fn_800F8624(int nPlayer, int a);
+u8   fn_800F8624(int nPlayer, u8 bCheck);
 u8   fn_800F8880(u8 bCheck);
 u8   fn_800F8B08(u8 bCheck);
 void fn_800F8EDC(void);
@@ -29,15 +27,15 @@ s32  fn_800F9308(void);
 
 // Mode 2 starts: up to four players, CPUs may concede.
 void fn_800F80FC(void) {
-    gpGame->pfn1C8 = fn_800F80FC;
-    gpGame->pfn1D0 = fn_800F81FC;
-    gpGame->pfn1D4 = fn_800F8278;
-    gpGame->pfn1D8 = fn_800F8624;
-    gpGame->pfn1DC = (u8 (*)(int))fn_800F8880;
-    gpGame->pfn1E0 = (s32 (*)(void))fn_800F8B08;
-    gpGame->pfn1E8 = fn_800F8EDC;
+    gpGame->pfnInit = fn_800F80FC;
+    gpGame->pfnSetupNextGolfer = fn_800F81FC;
+    gpGame->pfnGetHonors = fn_800F8278;
+    gpGame->pfnHoleFinished = fn_800F8624;
+    gpGame->pfnGameFinished = fn_800F8880;
+    gpGame->pfnGoToPlayoff = fn_800F8B08;
+    gpGame->pfnEndHole = fn_800F8EDC;
     gpGame->pfn1EC = fn_800F81EC;
-    gpGame->pfn1F4 = fn_800F9100;
+    gpGame->pfnEndGame = fn_800F9100;
     gpGame->b274 = 0;
     gpGame->bAIConcedes = 1;
     gpGame->n4 = 2;
@@ -58,7 +56,7 @@ void fn_800F81EC(void) {
 // Hole start: the honor plays first, everyone else waits.
 void fn_800F81FC(void) {
     int i;
-    lbl_80282278 = gpGame->pfn1D4(5);
+    lbl_80282278 = gpGame->pfnGetHonors(5);
     for (i = 0; i < gNumPlayersSetUp; i++) {
         if (i == lbl_80282278) {
             GOLFERSTATE_Set(1, i);
@@ -152,7 +150,7 @@ s32 fn_800F8278(int nPlayer) {
 
 // The hole is over when nobody still playing can beat (or, with a tie for the lead, tie) the best
 // holed score.
-u8 fn_800F8624(int nPlayer, int a) {
+u8 fn_800F8624(int nPlayer, u8 bCheck) {
     int i;
     int nBest = 5;
     int nSecond = 5;
@@ -351,7 +349,7 @@ void fn_800F9100(void) {
                         fn_800E4364(0, 0x6C, PLAYER(i)->n274, nProfile);
                     }
                     fn_800D3548(i, PLAYER(i)->n274, 0);
-                    PLAYER(i)->n32C += PLAYER(i)->n274;
+                    PLAYER(i)->money.n18 += PLAYER(i)->n274;
                 }
             }
         }

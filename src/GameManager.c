@@ -22,7 +22,6 @@ void  GM_FlyByMode_Init(void);
 void  fn_800D8D38(int nPlayer);
 void  Caddie_Stop(void);
 u8    fn_800E0A90(int nPlayer);
-u8    fn_800E1CA8(void);                  // int in GameRound.c; the callers here test the byte
 void  fn_800D439C(int nPlayer, int a);
 void  fn_800D9834(int nPlayer);
 u8    fn_8012591C(void);
@@ -58,8 +57,6 @@ void  fn_8006C4C0(int nPlayer);
 void  fn_8006C4A0(void);
 void  fn_800E0AF0(f32* pFrom, f32* pTo, f32* pOut);
 
-extern u8  gReplayData[];                   // 0x801D6030
-
 f32   fn_800336E4(void);
 f32   fn_800336F4(void);
 void  GOLFERSTATE_Push(int nState, int nPlayer);
@@ -73,7 +70,6 @@ void  fn_800E41C8(void);
 int   fn_8006AA9C(int nPlayer);             // how the shot turned out (0..4, 8+)
 void  fn_8006AAB4(int nPlayer, int a);
 
-typedef struct Vec4 { f32 x, y, z, w; } Vec4;
 u32   fn_800136DC(int nController);         // buttons: held << 16 | pressed this frame
 u32   fn_800142AC(int nButton, int a);      // a button's mask
 u8    fn_80014300(u32 uMask);               // any pad pressed these buttons
@@ -84,8 +80,6 @@ void  fn_80062B70(void);
 u8    Player_IsNotCPU(int nPlayer);
 void  fn_800E41D4(int nPlayer);
 void  fn_8006C300(int nPlayer);
-
-extern Vec4 lbl_80184D30;
 
 void  Shot_Prepare(int nPlayer, u8 bNotify);
 void  BreakLine_Start(int nView);            // GoBreakLine.c
@@ -113,12 +107,6 @@ f32   GM_GetBonusProgress(SaveProfile* pProfile);
 extern s32 lbl_80189528[14];
 extern s32 lbl_801894D0[6];
 
-int   strcmp(const char* a, const char* b);
-
-extern s32 lbl_80282278;
-extern u8  lbl_8028227C;
-extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
-
 void fn_800DCAD8(void) {
     fn_800E58B4(50);
 }
@@ -134,8 +122,8 @@ u8 fn_800DCB08(void) {
     return 0;
 }
 
-void fn_800DCB10(int nPlayer) {
-    gpGame->pfn1F8(nPlayer);
+u8 fn_800DCB10(int nPlayer) {
+    return gpGame->pfn1F8(nPlayer);
 }
 
 u8 fn_800DCB3C(void) {
@@ -228,7 +216,7 @@ void GM_InitForHole(void) {
         fn_800D8D38(i);
     }
     gpGame->b134 = 0;
-    lbl_80282278 = gpGame->pfn1D4(5);
+    lbl_80282278 = gpGame->pfnGetHonors(5);
     EVENT_Trigger(0xFF, 0, 0, -1);
     for (i = 0; i < 5; i++) {
         int j;              // j only steers the register choice (found by the permuter)
@@ -236,8 +224,8 @@ void GM_InitForHole(void) {
         j = i;
         gpGame->n158[j] = 0;
         i = j;
-        gPlayers[i].unkC2F = 0;
-        gPlayers[j].unkC2D = 0;
+        gPlayers[i].bC2F = 0;
+        gPlayers[j].bC2D = 0;
     }
 }
 
@@ -247,11 +235,11 @@ void GM_InitForHole(void) {
 void GM_EndOfGolferTurn(int nPlayer) {
     u8 bWait;
     Caddie_Stop();
-    gpGame->pfn248(nPlayer);
+    gpGame->pfnEndGolferTurn(nPlayer);
     fn_8001D7A4(gPlayers[nPlayer].pChar);
     EVENT_Trigger(nPlayer, 4, 0, -1);
     fn_800E4204();
-    if (gpGame->pfn1D8(nPlayer, 0) || fn_800E0A90(nPlayer)) {
+    if (gpGame->pfnHoleFinished(nPlayer, 0) || fn_800E0A90(nPlayer)) {
         GM_EndOfGolferTurn_HoleFinished(nPlayer);
         return;
     }
@@ -280,14 +268,14 @@ void GM_EndOfGolferTurn(int nPlayer) {
 void GM_EndOfGolferTurn_HoleFinished(int nPlayer) {
     int i;
     EVENT_Trigger(nPlayer, 1, 0, -1);
-    gpGame->pfn1E8();
+    gpGame->pfnEndHole();
     if (fn_800E1CA8() && !gpGame->bD4 && !fn_800E0A90(nPlayer)) {
         for (i = 0; i < gNumPlayersSetUp; i++) {
             fn_800D439C(i, 0);
             fn_800D9834(i);
         }
     }
-    if (gpGame->pfn1DC(0) || fn_800E0A90(nPlayer)) {
+    if (gpGame->pfnGameFinished(0) || fn_800E0A90(nPlayer)) {
         GM_EndOfGolferTurn_GameFinished(nPlayer);
         return;
     }
@@ -301,8 +289,8 @@ void GM_EndOfGolferTurn_GameFinished(int nPlayer) {
     EVENT_Trigger(nPlayer, 5, 0, -1);
     gpGame->b28E = 1;
     fn_80125910(0);
-    gpGame->pfn1F4();
-    if (fn_8012591C() && gSession.unk8[0] == 0) {
+    gpGame->pfnEndGame();
+    if (fn_8012591C() && gSession.a8[0] == 0) {
         fn_80125854(1);
     }
     if (gpGame->b273) {
@@ -310,7 +298,7 @@ void GM_EndOfGolferTurn_GameFinished(int nPlayer) {
             fn_800D439C(i, 1);
         }
     }
-    if (gSession.unk11[1] == 0 && gSession.unk8[0] == 0) {
+    if (gSession.unk11[1] == 0 && gSession.a8[0] == 0) {
         if (gpGame->b275) {
             if (!gpGame->b274 || fn_800EC550()) {
                 fn_800E4D94(1);
@@ -516,7 +504,7 @@ void GM_PlayerTookShot(int nPlayer) {
     if (fn_800E23EC(nPlayer) && !(gPlayers[nPlayer].uFlags & 8)) {
         fn_800E0AC4(1);
     }
-    if (!Player_IsCPU(nPlayer) && gSession.nSplitScreen == 0 && gpGame->b287 && gReplayData[0xF10]) {
+    if (!Player_IsCPU(nPlayer) && gSession.nSplitScreen == 0 && gpGame->b287 && gReplayData.bF10) {
         fn_800E0A98(1);
     }
     GM_PlayerAddStroke(nPlayer);
@@ -544,7 +532,7 @@ void GM_PlayerTookShot(int nPlayer) {
         } else {
             if (fn_800E23B0(nPlayer, gPlayers[nPlayer].nStrokes[gpGame->nCurHole])) {
                 gPlayers[nPlayer].ball.nLie = LIE_INCUP_e;
-                gPlayers[nPlayer].unkC2D = 1;
+                gPlayers[nPlayer].bC2D = 1;
                 if (fn_800EE470()) {
                     gPlayers[nPlayer].nStrokes[gpGame->nCurHole] = 10;
                 } else {
@@ -598,18 +586,18 @@ u8 GM_PlayerTakeMulligan(int nPlayer) {
         return 0;
     }
     if (fn_800E177C() == 2) {
-        if (gPlayers[nPlayer].unkC28) {
+        if (gPlayers[nPlayer].bMulliganUsed) {
             return 0;
         }
-        gPlayers[nPlayer].unkC28 = 1;
+        gPlayers[nPlayer].bMulliganUsed = 1;
     }
     fn_800BB0A8();
     fn_800E4204();
     fn_800335F8(1);
     fn_800A76E4();
     fn_8006C4C0(nPlayer);
-    gPlayers[nPlayer].unkC2E = 1;
-    gPlayers[nPlayer].unkC2F = 1;
+    gPlayers[nPlayer].bC2E = 1;
+    gPlayers[nPlayer].bC2F = 1;
     gpGame->pfn254(nPlayer);
     if (gSession.bReplay) {
         fn_8006C4A0();
@@ -790,7 +778,7 @@ u8 GM_ShowPostShotCrowdFlyby(void) {
 
 // TW06: GM_FlyByMode_Init. The player the mode picks starts the hole flyover.
 void GM_FlyByMode_Init(void) {
-    int n = gpGame->pfn1D4(5);
+    int n = gpGame->pfnGetHonors(5);
     GOLFERSTATE_Push(GS_INITIAL_FLY_BY, n);
     fn_8001704C(gPlayers[n].nView[0], n);
 }
@@ -989,7 +977,7 @@ void GM_CheckForShotChanges(int nPlayer) {
         } else if (!gpGame->b28D && fn_800E012C(nPlayer)) {
             fn_800C4E80(fn_80017028(gPlayers[nPlayer].nView[0]), nPlayer);
         } else if (fn_800DFF0C(nPlayer)) {
-            if (SESSION_OPTIONS->bSkipCameras) return;
+            if (gSession.options.bSkipCameras) return;
             if (fn_8008AC40()) return;
             GOLFERSTATE_Push(GS_MID_HOLE_FLY_BY, nPlayer);
         }
@@ -1023,7 +1011,7 @@ void GM_CheckForShotChanges(int nPlayer) {
 // continues on any pad's button 0.
 void GM_DoPostShotInHoleUI(int nPlayer) {
     View* pView = fn_80017028(gPlayers[nPlayer].nView[0]);
-    Vec4  vOffset = lbl_80184D30;
+    f32   vOffset[4] = {0.0f, 0.0f, 0.0f, 0.5f};
     if ((gPlayers[nPlayer].uFlags & 8) && fn_80063C7C(pView)) {
         GM_EndOfGolferTurn(nPlayer);
         fn_80062D0C(nPlayer);
@@ -1043,7 +1031,7 @@ void GM_DoPostShotInHoleUI(int nPlayer) {
         fn_80062B78(nPlayer);
         fn_80062B74(nPlayer);
         fn_80062B70();
-        fn_80063BF4(pView, lbl_80281F78->f170, (f32*)&vOffset);
+        fn_80063BF4(pView, lbl_80281F78->f170, vOffset);
         return;
     }
     if (Player_IsNotCPU(nPlayer) && gSession.nSplitScreen == 0) {
@@ -1054,7 +1042,7 @@ void GM_DoPostShotInHoleUI(int nPlayer) {
             }
             return;
         }
-        if (gReplayData[0xF10] && (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x18, 0)) &&
+        if (gReplayData.bF10 && (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x18, 0)) &&
             gpGame->b287 && (s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_CONCEDED && !fn_800E53B8() &&
             !(gPlayers[nPlayer].pChar->u10 & 0x40)) {
             fn_80062D0C(nPlayer);
@@ -1086,7 +1074,7 @@ int GM_ChooseRemoveBallState(int nPlayer) {
     if (!fn_800E27A8()) {
         return 0;
     }
-    if (gPlayers[nPlayer].unkC2D) {
+    if (gPlayers[nPlayer].bC2D) {
         return 0;
     }
     if (fn_8006AA9C(nPlayer) == 2) {

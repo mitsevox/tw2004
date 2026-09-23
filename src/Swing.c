@@ -124,7 +124,6 @@ extern SwingState*   gpSwing;                    // 0x80281188
 extern f32           gForgivenessTable[3][27];  // 0x80188168  rows: value at attribute 0 / 100 / 110
 extern s32           gBoostSteps[8];             // 0x80188148  power boost per level: 1 2 4 6 9 12 16 20
 extern f32           lbl_80281B40[];             // FLT_MAX
-extern Replay        gReplayData;                // 0x801D6030
 extern f32           gPuttXScale[8];             // 0x801882AC  per shot kind: 0.03 for a putt, 0.2 otherwise
 extern f32           gSwingXScale[8];            // 0x801882CC  the same values again
 extern s32           gClubCurve[CLUB_MAX_e];      // 0x80183578  per club, 0..26: how much it can shape
@@ -140,7 +139,6 @@ extern u8            lbl_80281E10;
 extern u8            lbl_80281E13;
 extern u8            lbl_80281E11;
 extern u8            lbl_80281E12;
-extern u8            gNumPlayersSetUp;           // 0x80281D48 (Golfer.c)
 extern Vec4          lbl_80183690;          // 0, 0, 0, 0.5 (assigned, not an initialiser: as one,
                                                 //   STATEFUNC_RemoveBallExit drops to 42.5%)
 extern u8*           lbl_80281DA0;               // per player, 0x104 bytes each
@@ -1618,7 +1616,7 @@ void Swing_SpinInput(int nPlayer) {
     u32     uButtons;
     int     nX, nY;
     if (Player_IsCPU(nPlayer)) return;
-    if (SESSION_OPTIONS->bSpinEnabled == 0) return;
+    if (gSession.options.bSpinEnabled == 0) return;
     uButtons    = fn_800136DC(gPlayers[nPlayer].nController);
     if (!(uButtons & fn_800142AC(0x20, 0))) return;
     if (gPlayers[nPlayer].swing.bCanSpin == 0) return;
@@ -1817,7 +1815,7 @@ void fn_8005A7A0(int nPlayer) {
     if ((gPlayers[nPlayer].swing.nPowerBoost > 0 || gPlayers[nPlayer].swing.nSpinBoost > 0) &&
         gPlayers[nPlayer].nShotKind != 0 && gPlayers[nPlayer].swing.bDrawBoostUI != 0 &&
         gSession.bReplay == 0 &&
-        gSession.unk14 == 0 && !fn_800C6CB0()) {
+        gSession.n14 == 0 && !fn_800C6CB0()) {
         fn_800AE3F8(gPlayers[nPlayer].nView[0]);
     }
 }
@@ -1856,7 +1854,7 @@ void fn_8005A850(int nPlayer) {
     }
     {
         if ((pObj->nAnim == 6 || pObj->nAnim == 7) && fn_8001EE90(pObj) != 2 && pSw->nNumInBlurQueue >= 2 &&
-            SESSION_OPTIONS->unk24[7] != 0) {
+            gSession.options.a24[7] != 0) {
             Vec_Copy(pObj->pModel->pMatrices[nGrip][3], vGrip);
             nBlue = 255.0f * pSw->fBlueColor;
             nRed = 255.0f * pSw->fRedColor;
@@ -2008,7 +2006,7 @@ void Swing_BoostInput(int nPlayer) {
     f32  fMag;
 
     if (Player_IsCPU(nPlayer)) return;
-    if (SESSION_OPTIONS->bBoostEnabled == 0) return;
+    if (gSession.options.bBoostEnabled == 0) return;
     uButtons    = fn_800136DC(gPlayers[nPlayer].nController);
     nY   = Swing_StickY(nPlayer, Pad_State(nPlayer, gPlayers[nPlayer].nController));
     nX   = Swing_StickX(nPlayer, Pad_State(nPlayer, gPlayers[nPlayer].nController));
@@ -2223,7 +2221,7 @@ void STATEFUNC_WaitUpdate(int nPlayer) {
 }
 
 void STATEFUNC_ShowYardageExit(int nPlayer) {
-    if (gPlayers[nPlayer].unkC2E == 0 && lbl_80281E10 == 0) {
+    if (gPlayers[nPlayer].bC2E == 0 && lbl_80281E10 == 0) {
         GM_BumpBallForObstructions(nPlayer);
     }
     lbl_80281E10 = 0;
@@ -2646,7 +2644,7 @@ void STATEFUNC_GreenWatchRollInit(int nPlayer) {
 void STATEFUNC_MidHoleFlyByUpdate(int nPlayer) {
     u8  bDone = 0;
     u32 uMask;
-    if (SESSION_OPTIONS->bSkipCameras) {
+    if (gSession.options.bSkipCameras) {
         bDone = 1;
     } else if (fn_80100294()) {
         return;
@@ -2672,8 +2670,8 @@ void STATEFUNC_MidHoleFlyByUpdate(int nPlayer) {
 // State 20 (another camera state), the same idea with a confirm step.
 void STATEFUNC_InitialFlyByUpdate(int nPlayer) {
     u8 bDone = 0;
-    if (gSession.unk8[0] == 0 || !fn_80014300(0)) {
-        if (SESSION_OPTIONS->bSkipCameras) {
+    if (gSession.a8[0] == 0 || !fn_80014300(0)) {
+        if (gSession.options.bSkipCameras) {
             bDone = 1;
         } else if (fn_800172C4(fn_80017028(gPlayers[nPlayer].nView[0]))) {
             bDone = 1;
@@ -3715,7 +3713,7 @@ void STATEFUNC_SwingInit(int nPlayer) {
     Emotion_UpdatePlayerEmotion(nPlayer);
     fn_8006ACF8(nPlayer, 5);
     gPlayers[nPlayer].fC20 = 0.0f;
-    if (gPlayers[nPlayer].unkC2E == 0 && gpGame->b281 != 0 && !Player_IsCPU(nPlayer)) {
+    if (gPlayers[nPlayer].bC2E == 0 && gpGame->b281 != 0 && !Player_IsCPU(nPlayer)) {
         if (fn_800DA264() && fn_800DA174()) {
             fn_800E505C(0);
             fn_800E3D38(nPlayer, 0);
@@ -3732,7 +3730,7 @@ void STATEFUNC_SwingInit(int nPlayer) {
             fn_800D1DAC(nPlayer);
         }
     }
-    if (gPlayers[nPlayer].unkC2E == 0 && !Player_IsCPU(nPlayer) && fn_800EC550() && fn_800ED540()) {
+    if (gPlayers[nPlayer].bC2E == 0 && !Player_IsCPU(nPlayer) && fn_800EC550() && fn_800ED540()) {
         if (fn_800F0818()) {
             fn_800E502C(fn_800EAC7C());
         } else {
@@ -3755,7 +3753,7 @@ void STATEFUNC_SwingInit(int nPlayer) {
     pBall = &gPlayers[nPlayer].ball;
     fn_80047B6C(pBall, nPlayer);
     fn_80047BC0(pBall, nPlayer);
-    gPlayers[nPlayer].unkC2E = 0;
+    gPlayers[nPlayer].bC2E = 0;
     gPlayers[nPlayer].bPlanReady = 0;
     gPlayers[nPlayer].uFlags     = 0;
     EVENT_Trigger(nPlayer, 7, 0, -1);

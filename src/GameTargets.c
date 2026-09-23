@@ -11,12 +11,6 @@
 #include "engine.h"
 #include "game/earnings.h"
 
-// The target list (see GameModeReplay.c): up to lbl_80282360 points (w = 1).
-extern f32 lbl_80211D38[][4];
-extern s8  lbl_80282360;
-
-extern u8 gNumPlayersSetUp;
-
 // Score multipliers for fn_800F266C, one table per value of fn_80015464.
 f32 lbl_80192810[13] = {
     1.0f, 1.0f, 1.3f, 1.1f, 1.0f, 1.1f, 1.2f, 1.3f, 1.3f, 1.4f, 1.4f, 1.3f, 1.0f,
