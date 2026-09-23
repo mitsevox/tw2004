@@ -69,9 +69,6 @@ void  fn_800509A0(f32* pSrc, f32* pDst);                  // negate (paired-sing
 f32   fn_800CBEE0(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** ppRef, f32 (**ppTri)[3],
                   s32* pTri);
 f32   fn_80035074(f32 x);                                 // floor
-f32   fn_8004CB30(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** ppRef, f32 (**ppTri)[3],
-                  s32* pTri);
-f32   fn_8004CD94(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** ppRef, f32 (**ppTri)[3]);
 u8    fn_80050A9C(f32* pA, f32* pB, f32* pC, f32 fX, f32 fZ);
 void  fn_800509D8(f32* pTri, f32* pPos, f32* pA, f32* pB, f32* pC);
 
@@ -342,6 +339,240 @@ f32 fn_8004C8E0(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** p
     return TER_NO_GROUND;
 }
 
+// The lowest ground triangle under a point (x, z), with the same outputs and strip rules as
+// fn_8004C8E0; TER_NO_GROUND when there is none.
+f32 fn_8004CB30(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** ppRef, f32 (**ppTri)[3],
+                s32* pTri) {
+    u32 uHole = 1 << Game_CurrentHole();
+    f32 fBest = 50000.0f;
+    int nX = (int)fn_80035074((pPos[0] - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
+    int nZ = (int)fn_80035074((pPos[2] - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
+    TerCell* pCell;
+    TerPolyRef* pRef;
+    f32 (*pVert)[3];
+    u8* pFlags;
+    int i;
+    int j;
+    f32 fA;
+    f32 fB;
+    f32 fC;
+    f32 fHeight;
+
+    if (nX >= 0 && nX < pCourse->nGridWidth && nZ >= 0 && nZ < pCourse->nGridLength) {
+        pCell = &pCourse->pGrid[nX + nZ * pCourse->nGridWidth];
+        pRef = &pCourse->pPolyRefs[pCell->uRefs >> 12];
+        for (i = (pCell->uRefs & 0xFFF) - 1; i >= 0; i--) {
+            if (pRef->n2 != 0) {
+                pRef++;
+            } else if (pRef->u4 != 0
+                       && (!(pRef->u4 & uHole) || ((pRef->u4 & 0x10) && gSession.nSplitScreen))) {
+                pRef++;
+            } else {
+                pVert = &pCourse->pVerts[TER_FIRST_VERTEX(pRef)];
+                pFlags = pCourse->pTriFlags + TER_FIRST_VERTEX(pRef);
+                for (j = pRef->nTris - 1; j >= 0; j--) {
+                    if ((pFlags[2] & 7) && fBest > pVert[(pFlags[2] >> 6) & 3][1]
+                        && fn_80050A9C(pVert[0], pVert[1], pVert[2], pPos[0], pPos[2])) {
+                        fn_800509D8(pVert[0], pPos, &fA, &fB, &fC);
+                        fHeight = fA * pVert[0][1] + fB * pVert[1][1] + fC * pVert[2][1];
+                        if (fHeight < fBest) {
+                            *ppCell = pCell;
+                            fBest = fHeight;
+                            *ppRef = pRef;
+                            *ppTri = pVert;
+                            *pTri = pRef->nTris - j - 1;
+                        }
+                    }
+                    pVert++;
+                    pFlags++;
+                }
+                pRef++;
+            }
+        }
+        if (fBest == 50000.0f) return TER_NO_GROUND;
+        return fBest;
+    }
+    return TER_NO_GROUND;
+}
+
+// The highest triangle under a point at or below its height, objects included (so a ball on a
+// bridge is on the bridge); TER_NO_GROUND when there is none. Probably TW06's
+// Ter_GetSupportingWorldTriangle.
+f32 fn_8004CD94(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** ppRef, f32 (**ppTri)[3]) {
+    u32 uHole = 1 << Game_CurrentHole();
+    f32 fBest = TER_NO_GROUND;
+    int nX = (int)fn_80035074((pPos[0] - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
+    int nZ = (int)fn_80035074((pPos[2] - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
+    TerCell* pCell;
+    TerPolyRef* pRef;
+    f32 (*pVert)[3];
+    u8* pFlags;
+    int i;
+    int j;
+    f32 fA;
+    f32 fB;
+    f32 fC;
+    f32 fHeight;
+
+    if (nX >= 0 && nX < pCourse->nGridWidth && nZ >= 0 && nZ < pCourse->nGridLength) {
+        pCell = &pCourse->pGrid[nX + nZ * pCourse->nGridWidth];
+        if ((f32)pCell->nMinHeight > pPos[1]) return TER_NO_GROUND;
+        pRef = &pCourse->pPolyRefs[pCell->uRefs >> 12];
+        for (i = (pCell->uRefs & 0xFFF) - 1; i >= 0; i--) {
+            if (pRef->u4 != 0 && (!(pRef->u4 & uHole) || ((pRef->u4 & 0x10) && gSession.nSplitScreen))) {
+                pRef++;
+            } else {
+                pVert = &pCourse->pVerts[TER_FIRST_VERTEX(pRef)];
+                pFlags = pCourse->pTriFlags + TER_FIRST_VERTEX(pRef);
+                for (j = pRef->nTris - 1; j >= 0; j--) {
+                    if ((pFlags[2] & 7)
+                        && (pPos[1] > pVert[(pFlags[2] >> 6) & 3][1]
+                            || fBest < pVert[(pFlags[2] >> 4) & 3][1])
+                        && fn_80050A9C(pVert[0], pVert[1], pVert[2], pPos[0], pPos[2])) {
+                        fn_800509D8(pVert[0], pPos, &fA, &fB, &fC);
+                        fHeight = fA * pVert[0][1] + fB * pVert[1][1] + fC * pVert[2][1];
+                        if (fHeight > fBest && fHeight <= pPos[1]) {
+                            *ppCell = pCell;
+                            fBest = fHeight;
+                            *ppRef = pRef;
+                            *ppTri = pVert;
+                        }
+                    }
+                    pVert++;
+                    pFlags++;
+                }
+                pRef++;
+            }
+        }
+        return fBest;
+    }
+    return TER_NO_GROUND;
+}
+
+// The lowest ground triangle under a point at or above its height (the ground covering it);
+// TER_NO_GROUND when there is none. Probably TW06's Ter_GetCoveringGroundTriangle.
+f32 fn_8004D01C(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** ppRef, f32 (**ppTri)[3],
+                s32* pTri) {
+    u32 uHole = 1 << Game_CurrentHole();
+    f32 fBest = 65536.0f;
+    int nX = (int)fn_80035074((pPos[0] - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
+    int nZ = (int)fn_80035074((pPos[2] - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
+    TerCell* pCell;
+    TerPolyRef* pRef;
+    f32 (*pVert)[3];
+    u8* pFlags;
+    int i;
+    int j;
+    f32 fA;
+    f32 fB;
+    f32 fC;
+    f32 fHeight;
+
+    if (nX >= 0 && nX < pCourse->nGridWidth && nZ >= 0 && nZ < pCourse->nGridLength) {
+        pCell = &pCourse->pGrid[nX + nZ * pCourse->nGridWidth];
+        if ((f32)pCell->nMaxHeight < pPos[1]) return TER_NO_GROUND;
+        pRef = &pCourse->pPolyRefs[pCell->uRefs >> 12];
+        for (i = (pCell->uRefs & 0xFFF) - 1; i >= 0; i--) {
+            if (pRef->n2 != 0) {
+                pRef++;
+            } else if (pRef->u4 != 0
+                       && (!(pRef->u4 & uHole) || ((pRef->u4 & 0x10) && gSession.nSplitScreen))) {
+                pRef++;
+            } else {
+                pVert = &pCourse->pVerts[TER_FIRST_VERTEX(pRef)];
+                pFlags = pCourse->pTriFlags + TER_FIRST_VERTEX(pRef);
+                for (j = pRef->nTris - 1; j >= 0; j--) {
+                    if ((pFlags[2] & 7)
+                        && (fBest > pVert[(pFlags[2] >> 6) & 3][1]
+                            || pPos[1] < pVert[(pFlags[2] >> 4) & 3][1])
+                        && fn_80050A9C(pVert[0], pVert[1], pVert[2], pPos[0], pPos[2])) {
+                        fn_800509D8(pVert[0], pPos, &fA, &fB, &fC);
+                        fHeight = fA * pVert[0][1] + fB * pVert[1][1] + fC * pVert[2][1];
+                        if (fHeight < fBest && fHeight >= pPos[1]) {
+                            *ppCell = pCell;
+                            fBest = fHeight;
+                            *ppRef = pRef;
+                            *ppTri = pVert;
+                            *pTri = pRef->nTris - j - 1;
+                        }
+                    }
+                    pVert++;
+                    pFlags++;
+                }
+                pRef++;
+            }
+        }
+        if (fBest == 65536.0f) return TER_NO_GROUND;
+        return fBest;
+    }
+    return TER_NO_GROUND;
+}
+
+// The ground triangles just below (supporting) and just above (covering) a point, in one pass:
+// their heights (TER_NO_GROUND for none), strips and vertices. TW06:
+// void Ter_GetSupportingAndCoveringGroundTriangles(TGD_TerrainInfo*, f32*, TGD_PolygonReference**, f32*,
+// f32***, TGD_PolygonReference**, f32*, f32***), the same parameters.
+void fn_8004D2E0(CourseInfo* pCourse, f32* pPos, TerPolyRef** ppRefLow, f32* pLow, f32 (**ppTriLow)[3],
+                 TerPolyRef** ppRefHigh, f32* pHigh, f32 (**ppTriHigh)[3]) {
+    u32 uHole = 1 << Game_CurrentHole();
+    f32 fHigh = 65536.0f;
+    f32 fLow = -65536.0f;
+    int nX = (int)fn_80035074((pPos[0] - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
+    int nZ = (int)fn_80035074((pPos[2] - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
+    TerCell* pCell;
+    TerPolyRef* pRef;
+    f32 (*pVert)[3];
+    u8* pFlags;
+    int i;
+    int j;
+    f32 fA;
+    f32 fB;
+    f32 fC;
+    f32 fHeight;
+
+    if (nX >= 0 && nX < pCourse->nGridWidth && nZ >= 0 && nZ < pCourse->nGridLength) {
+        pCell = &pCourse->pGrid[nX + nZ * pCourse->nGridWidth];
+        pRef = &pCourse->pPolyRefs[pCell->uRefs >> 12];
+        for (i = (pCell->uRefs & 0xFFF) - 1; i >= 0; i--) {
+            if (pRef->n2 != 0) {
+                pRef++;
+            } else if (pRef->u4 != 0
+                       && (!(pRef->u4 & uHole) || ((pRef->u4 & 0x10) && gSession.nSplitScreen))) {
+                pRef++;
+            } else {
+                pVert = &pCourse->pVerts[TER_FIRST_VERTEX(pRef)];
+                pFlags = pCourse->pTriFlags + TER_FIRST_VERTEX(pRef);
+                for (j = pRef->nTris - 1; j >= 0; j--) {
+                    if ((pFlags[2] & 7)
+                        && (fHigh > pVert[(pFlags[2] >> 6) & 3][1] || fLow < pVert[(pFlags[2] >> 4) & 3][1])
+                        && fn_80050A9C(pVert[0], pVert[1], pVert[2], pPos[0], pPos[2])) {
+                        fn_800509D8(pVert[0], pPos, &fA, &fB, &fC);
+                        fHeight = fA * pVert[0][1] + fB * pVert[1][1] + fC * pVert[2][1];
+                        if (fHeight < fHigh && fHeight >= pPos[1]) {
+                            *ppRefHigh = pRef;
+                            fHigh = fHeight;
+                            *ppTriHigh = pVert;
+                        }
+                        if (fHeight > fLow && fHeight <= pPos[1]) {
+                            *ppRefLow = pRef;
+                            fLow = fHeight;
+                            *ppTriLow = pVert;
+                        }
+                    }
+                    pVert++;
+                    pFlags++;
+                }
+                pRef++;
+            }
+        }
+        *pHigh = fHigh == 65536.0f ? TER_NO_GROUND : fHigh;
+        *pLow = fLow == -65536.0f ? TER_NO_GROUND : fLow;
+        return;
+    }
+    *pLow = TER_NO_GROUND;
+    *pHigh = TER_NO_GROUND;
+}
+
 // The height of the highest ground under a point. Probably TW06's Ter_GetHighestGroundHeight.
 f32 fn_8004D5C0(CourseInfo* pCourse, f32* pPos) {
     TerCell* pCell;
@@ -372,6 +603,37 @@ f32 fn_8004D620(CourseInfo* pCourse, f32* pPos) {
     return fn_800CBEE0(pCourse, pPos, &pCell, &pRef, &pTri, &nTri);
 }
 
+// The height of the ground covering a point, with that triangle's upward normal. Probably TW06's
+// Ter_GetCoveringGroundHeightAndNormal.
+f32 fn_8004D650(CourseInfo* pCourse, f32* pPos, f32* pNormal) {
+    f32 vA[4];
+    f32 vB[4];
+    f32 vC[4];
+    f32 vAB[4];
+    f32 vBC[4];
+    TerCell* pCell;
+    TerPolyRef* pRef;
+    f32 (*pTri)[3];
+    s32 nTri;
+    f32 fHeight;
+
+    fHeight = fn_8004D01C(pCourse, pPos, &pCell, &pRef, &pTri, &nTri);
+    if (fHeight != TER_NO_GROUND) {
+        Vec3Copy(pTri[0], vA);
+        Vec3Copy(pTri[1], vB);
+        Vec3Copy(pTri[2], vC);
+        fn_8005097C(vA, vB, vAB);
+        fn_8005097C(vB, vC, vBC);
+        vec4flt_CrossProduct(vAB, vBC, pNormal);
+        fn_800BAF04(pNormal, pNormal);
+        if (pNormal[1] < 0.0f) {
+            fn_800509A0(pNormal, pNormal);
+        }
+        return fHeight;     // fake match: a return of its own, so the other path skips the final fmr
+    }
+    return fHeight;
+}
+
 // TW06: bool Ter_GetSupportingGroundNormal(TGD_TerrainInfo*, f32*, f32*). The upward normal of the
 // ground under a point; 0 when there is none.
 u8 Ter_GetSupportingGroundNormal(CourseInfo* pCourse, f32* pPos, f32* pNormal) {
@@ -399,6 +661,16 @@ u8 Ter_GetSupportingGroundNormal(CourseInfo* pCourse, f32* pPos, f32* pNormal) {
         return 1;
     }
     return 0;
+}
+
+// The height of whatever supports a point, objects included. Probably TW06's
+// Ter_GetSupportingWorldHeight.
+f32 fn_8004D80C(CourseInfo* pCourse, f32* pPos) {
+    TerCell* pCell;
+    TerPolyRef* pRef;
+    f32 (*pTri)[3];
+
+    return fn_8004CD94(pCourse, pPos, &pCell, &pRef, &pTri);
 }
 
 // TW06: TGD_MaterialInfo* Ter_GetSupportingWorldMaterial(TGD_TerrainInfo*, f32*). The surface
@@ -446,6 +718,67 @@ f32 Ter_GetSupportingGroundData(CourseInfo* pCourse, f32* pPos, SurfaceType** pp
         *ppSurface = NULL;
     }
     return fHeight;
+}
+
+// TW06: void Ter_GetEnclosingGroundHeight(TGD_TerrainInfo*, f32*, f32*, f32*). The heights of the
+// ground just below and just above a point (TER_NO_GROUND for none).
+void Ter_GetEnclosingGroundHeight(CourseInfo* pCourse, f32* pPos, f32* pLow, f32* pHigh) {
+    TerPolyRef* pRefLow;
+    TerPolyRef* pRefHigh;
+    f32 (*pTriLow)[3];
+    f32 (*pTriHigh)[3];
+
+    fn_8004D2E0(pCourse, pPos, &pRefLow, pLow, &pTriLow, &pRefHigh, pHigh, &pTriHigh);
+}
+
+// TW06: void Ter_GetEnclosingGroundData(TGD_TerrainInfo*, f32*, f32*, TGD_MaterialInfo**, f32*, f32*,
+// TGD_MaterialInfo**, f32*). The ground just below and just above a point: heights,
+// surfaces and upward normals (TER_NO_GROUND and NULL for none).
+void Ter_GetEnclosingGroundData(CourseInfo* pCourse, f32* pPos, f32* pLow, SurfaceType** ppSurfaceLow,
+                                f32* pNormalLow, f32* pHigh, SurfaceType** ppSurfaceHigh, f32* pNormalHigh) {
+    f32 vA[4];
+    f32 vB[4];
+    f32 vC[4];
+    f32 vAB[4];
+    f32 vBC[4];
+    f32 vAB2[4];
+    f32 vBC2[4];
+    TerPolyRef* pRefLow;
+    TerPolyRef* pRefHigh;
+    f32 (*pTriLow)[3];
+    f32 (*pTriHigh)[3];
+
+    fn_8004D2E0(pCourse, pPos, &pRefLow, pLow, &pTriLow, &pRefHigh, pHigh, &pTriHigh);
+    if (*pLow != TER_NO_GROUND) {
+        Vec3Copy(pTriLow[0], vA);
+        Vec3Copy(pTriLow[1], vB);
+        Vec3Copy(pTriLow[2], vC);
+        fn_8005097C(vA, vB, vAB);
+        fn_8005097C(vB, vC, vBC);
+        vec4flt_CrossProduct(vAB, vBC, pNormalLow);
+        fn_800BAF04(pNormalLow, pNormalLow);
+        if (pNormalLow[1] < 0.0f) {
+            fn_800509A0(pNormalLow, pNormalLow);
+        }
+        *ppSurfaceLow = &gSurfaceTypes[pRefLow->nSurface];
+    } else {
+        *ppSurfaceLow = NULL;
+    }
+    if (*pHigh != TER_NO_GROUND) {
+        Vec3Copy(pTriHigh[0], vA);
+        Vec3Copy(pTriHigh[1], vB);
+        Vec3Copy(pTriHigh[2], vC);
+        fn_8005097C(vA, vB, vAB2);
+        fn_8005097C(vB, vC, vBC2);
+        vec4flt_CrossProduct(vAB2, vBC2, pNormalHigh);
+        fn_800BAF04(pNormalHigh, pNormalHigh);
+        if (pNormalHigh[1] < 0.0f) {
+            fn_800509A0(pNormalHigh, pNormalHigh);
+        }
+        *ppSurfaceHigh = &gSurfaceTypes[pRefHigh->nSurface];
+    } else {
+        *ppSurfaceHigh = NULL;
+    }
 }
 
 // Mark every ground triangle's highest and lowest corner in its flags (bits 4-5 and 6-7), using
