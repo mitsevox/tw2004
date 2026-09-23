@@ -59,7 +59,9 @@ typedef struct FEScreen {
     s32 n38;                    // 0x38  a menu message reads it (fn_8007DAD4)
     u8  unk3C[0x44 - 0x3C];
     f32 fFade;                  // 0x44  the fade to black before a movie, 0 to 1
-    u8  unk48[0x4C - 0x48];
+    u8  unk48;
+    u8  b49;                    // 0x49  FEgolferanim.c's fn_8008EB10 tests it
+    u8  unk4A[0x4C - 0x4A];
 } FEScreen;
 LAYOUT_ASSERT(FEScreen, 0x4C);
 
@@ -145,6 +147,31 @@ void fn_800B6844(void* pSrc, u32 uAram, u32 uSize);   // copy to ARAM
 void fn_800B68B4(void* pDst, u32 uAram, u32 uSize);   // copy from ARAM
 void fn_800B67EC(void);                               // wait for the ARAM copy
 
+// ---- the golfers animated on menu screens (FEgolferanim.c) -----------------------------------
+
+// A state of the golfer loader (lbl_80189AA0): run by fn_8008B864.
+typedef struct FEGolferState {
+    void (*pfnEnter)(void);     // 0x00
+    void (*pfnUpdate)(void);    // 0x04  every frame
+    void (*pfnExit)(void);      // 0x08
+    void (*pfnAbort)(void);     // 0x0C  fn_8008B704
+    s32  nNext;                 // 0x10  the state that follows it
+} FEGolferState;
+LAYOUT_ASSERT(FEGolferState, 0x14);
+
+#define FE_NUM_GOLFER_STATES 5  // state 0 is empty
+
+// The golfer loader's state machine (lbl_801D8708).
+typedef struct FEGolferMachine {
+    s32 nNext;                  // 0x0  the state after this one
+    s32 nState;                 // 0x4  the running state (0: stopped)
+    u8  bDone;                  // 0x8  the state is finished: go to nNext
+    u8  bEnter;                 // 0x9  the state's pfnEnter is still to run
+    u8  bAbort;                 // 0xA  set by fn_8008B704
+    u8  bPaused;                // 0xB
+} FEGolferMachine;
+LAYOUT_ASSERT(FEGolferMachine, 0xC);
+
 // ---- the Create-A-Player database (FE_CrAPDB.c) ----------------------------------------------
 
 // A created golfer is put together from CRAP_NUM_PARTS parts (headwear, shirts, shoes...), and
@@ -160,7 +187,7 @@ typedef struct CrAPAsset {
     s16  nCategory;             // 0x02A  its category: where the category's name ("Hats",
                                 //        "Visors") starts in the 'CR_S' strings (fn_801064EC)
     s16  n2C;                   // 0x02C
-    u8   unk2E[2];
+    s16  n2E;                   // 0x02E  0..15; fn_801074D4 tests it
     s32  n30;                   // 0x030
     s32  n34;                   // 0x034
     s32  n38;                   // 0x038
@@ -201,6 +228,22 @@ extern char lbl_801932C8[CRAP_NUM_PARTS][32];   // per part: the name of its "Al
 
 int  fn_80103B28(int nAsset);           // the asset nAsset takes its attributes from (itself,
                                         // or for lock kind 28 the asset its nLock names)
+CrAPAsset* fn_80103B4C(CrAPAsset* pAsset);  // the same, by asset
+u8   fn_80103B80(void);                 // the database's b14
+s8   fn_80103BB4(void);                 // the database's n4
+int  fn_80103D14(s16 nSlot);            // the profile's aAF80[nSlot], an asset (-1 past slot 52)
+int  fn_801049C8(s16 nPart);
+void fn_80104804(void);
+u8   fn_80104DB8(s16 nPart, int n, char* pDst); // copy the name of a part's entry n (for 0 its
+                                        // "All ..." entry when it has one); 0 if there is none
+int  fn_80105C44(s16 nPart, int b);
+u8   fn_801061C8(s8 n);                 // an asset with this n40 is offered
+int  fn_80106244(s16 nPart);            // the first slot of aAF80 whose asset is of the part
+                                        // (-1: none)
+u8   fn_8010645C(int nOffset, char* pDst);  // copy a 'CR_S' name ("" for "NONE")
+void fn_801072CC(s16 nPart, s32* pLocked, s32* pB1CC, s32* pB344, s32* pAll);  // count a part's
+                                        // offered assets: locked, with each bit set, and all
+u8   fn_801074D4(int nAsset);
 u8   fn_80104020(int nAsset);           // the asset may be picked: not locked when last checked,
                                         // and its aB1CC bit is set
 int  fn_801048EC(s16 nPart, int b);     // how many choices a part has
@@ -243,6 +286,19 @@ extern char* lbl_80191990[30];          // per course: a string the menus show (
 extern s32 lbl_80281FFC;                // set by fn_80084FF0: the lbl_8018C7D8 set (memcard.h) the
                                         // menus' memory-card messages use
 
+// ---- the golfers animated on menu screens (FEgolferanim.c) ------------------------------------
+
+int  fn_8008B990(void);
+void fn_8008DAEC(void);
+void fn_8008E244(void);
+void fn_8008E364(int n);
+int  fn_8008E420(void);
+int  fn_8008E44C(void);
+void fn_8008E6D4(int n);
+void fn_8008E724(char* szAnim, char* szShot, s8 n, u8 bLoop);
+void fn_8008E824(void);
+void fn_8008E860(int n);
+
 // ---- the logo editor (FE_LogoDesign.c) -------------------------------------------------------
 
 // A logo is 8-bit colour indexes into a 256-colour palette, either 64 x 64 (shape 0, drawn into
@@ -258,11 +314,13 @@ typedef struct LogoEdit {
 } LogoEdit;
 LAYOUT_ASSERT(LogoEdit, 0xC);
 
-// A saved logo (0x1022 bytes).
+// A saved logo (0x1022 bytes): the profile holds five (ProfileLogos) and fn_8010FB70 picks the
+// one LogoEdit.n0 names.
 typedef struct LogoRecord {
-    u8  aPixels[0x1000];        // 0x0000  64 x 64 or 128 x 32 colour indexes
-    u8  unk1000[0x1021 - 0x1000];
-    u8  nShape;                 // 0x1021  LOGO_SQUARE or LOGO_RECT
+    u8   aPixels[0x1000];       // 0x0000  64 x 64 or 128 x 32 colour indexes
+    char szName[0x20];          // 0x1000
+    u8   b1020;                 // 0x1020
+    u8   nShape;                // 0x1021  LOGO_SQUARE or LOGO_RECT
 } LogoRecord;
 LAYOUT_ASSERT(LogoRecord, 0x1022);
 
@@ -278,8 +336,17 @@ extern s16* lbl_802824BC;               // the palette: 256 colours, 1-bit alpha
                                         // and 5-5-5 RGB; read signed (lha)
 extern u8 lbl_802824C0;                 // the palette has been copied from "__LogoSquare"
 
-u8*  fn_8010FB70(void);                 // the logo's pixels
+void fn_8010F7C0(s32 n);                // pick the logo to edit (LogoEdit.n0)
+s32  fn_8010F7D8(void);                 // which logo is edited
+void fn_8010F7E4(s32 nShape);           // set its shape
+void fn_8010F7FC(int nColor, u32* pR, u32* pG, u32* pB, u32* pA);  // a palette colour, 0-255 each
+void fn_8010F880(void);                 // mark the logo changed
+void fn_8010F890(char* pName);          // load the logo from a texture
+void fn_8010F90C(int nX, int nY, int nColor);   // set a pixel
+LogoRecord* fn_8010FB70(void);          // the logo being edited
 s16* fn_8010FBC4(void);                 // the palette
+int  fn_8010FBCC(int nX, int nY, u32* pR, u32* pG, u32* pB, u32* pA);  // a pixel's colour index,
+                                        // and its colour as fn_8010F7FC gives it
 void fn_8010FC3C(u8* pDst, u8* pSrc, int a, int nWidth, int nHeight);   // copy pixels: a = 0
                                         // from a texture into the logo, 1 from the logo into one
 

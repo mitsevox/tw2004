@@ -36,7 +36,7 @@ void fn_80058208(SaveProfile* pProfile) {
 }
 
 u8 fn_80058304(SaveProfile* pProfile, int nBit) {
-    return fn_8001E9CC(&pProfile->u10548, nBit);
+    return fn_8001E9CC(pProfile->a10548, nBit);
 }
 
 void fn_800588D4(s16 n) {

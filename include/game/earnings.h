@@ -61,6 +61,14 @@ typedef struct CoursePrice {
 
 #define NUM_COURSE_PRICES 24    // the 'ERN ' data has 24 rows (0x114..0x1D4): fn_800D3A20 reads 0..20, 21 and 23
 
+// The payout multipliers are one table of 29 (EarningsTable.aMult; GameUICommands.c's fn_80088CF0
+// indexes it across the groups). Where each group starts:
+#define EARN_MULT_COURSE 0      // 16: the course multiplier (x1..x4) per course, in fn_800D6EEC's order
+#define EARN_MULT_TEE    16     // 3: the tee percentage, as [2 - nTeeSet] (tee set 3 pays as 1)
+#define EARN_MULT_PINSET 19     // 4: the percentage for the hole's pin set (gpGame->nPinSet) 0..3
+#define EARN_MULT_TOUR   23     // 6: the TOUR card percentage per level 1..6 (level 0 pays as 1)
+#define EARN_NUM_MULTS   29
+
 // A row of the first table (12 bytes): a range of values and what it maps to. A menu message
 // (fn_8007D708) looks a value up: the first row with n0 - 1 <= value <= n4 gives n8.
 typedef struct EarningsRange {
@@ -79,10 +87,7 @@ typedef struct EarningsTable {
     u8   unk4AC[0x5E4 - 0x4AC];
     MatchPrize aLadderPrize[25];    // 0x5E4  per ladder event
     MiniPrize aMini[20];            // 0x710
-    s32  aCourseMult[16];       // 0x940  the course multiplier (x1..x4) per course, in fn_800D6EEC's order
-    s32  aTeePct[3];            // 0x980  the tee multiplier, as [2 - nTeeSet] (tee set 3 pays as 1)
-    s32  aPinSetPct[4];         // 0x98C  the multiplier for the hole's pin set (gpGame->nPinSet) 0..3
-    s32  aTourPct[6];           // 0x99C  the TOUR card multiplier per level 1..6 (level 0 pays as 1)
+    s32  aMult[EARN_NUM_MULTS]; // 0x940  the payout multipliers, one table (EARN_MULT_...)
     s32  a9B4[12];              // 0x9B4  read by index by a menu message (fn_8007E174)
     s32  n9E4;                  // 0x9E4  paid with award 0xC, once every challenge has a medal (GameMode5)
     u8   unk9E8[0x9F0 - 0x9E8];

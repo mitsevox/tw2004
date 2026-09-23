@@ -307,13 +307,70 @@ int  fn_8000633C(int hFile);            // file close
 int  fn_80006444(int hFile, void* pDst, u32 uLen, u32 uOffset, void (*pfnDone)(int nBytes, int nError));
 u32  fn_800065B0(int hFile);            // file size
 
+// ---- fonts -----------------------------------------------------------------------------------
+
+f32  fn_80012C30(char* sz);             // UFont.c: a string's width
+
 // ---- controller input ------------------------------------------------------------------------
 
+// One controller as the pad library reads it (12 bytes a pad, filled by PADRead).
+typedef struct PadStatus {
+    u16 uButtons;                 // 0x00
+    s8  nStickX;                  // 0x02
+    s8  nStickY;                  // 0x03
+    s8  nSubStickX;               // 0x04  the C stick
+    s8  nSubStickY;               // 0x05
+    u8  nTriggerL;                // 0x06
+    u8  nTriggerR;                // 0x07
+    u8  nAnalogA;                 // 0x08
+    u8  nAnalogB;                 // 0x09
+    s8  nError;                   // 0x0A  0: read, -1: no controller
+    u8  unkB;                     // 0x0B
+} PadStatus;
+
+// A pad's sticks and triggers rescaled to 0-255 with a dead zone; 0x80 is the centre. Y grows
+// downwards.
+typedef struct PadAnalog {
+    u8  nSubStickX;               // 0x00
+    u8  nSubStickY;               // 0x01
+    u8  nStickX;                  // 0x02
+    u8  nStickY;                  // 0x03
+    u8  nTriggerL;                // 0x04
+    u8  nTriggerR;                // 0x05
+} PadAnalog;
+
+typedef struct PadRumble {
+    u8  bOn;                      // 0x00  cleared while rumble is switched off (fn_80013200)
+    u8  bAllowed;                 // 0x01
+    s16 nFrames;                  // 0x02  frames the motor has run; it stops after 60
+} PadRumble;
+
+// Controller_Gc.c's state: the four pads.
+typedef struct Controllers {
+    u8  bStickAsDpad;             // 0x00  the main stick also presses the D-pad
+    u32 uConnected;               // 0x04  one bit a pad, 0x80000000 >> n
+    PadStatus aStatus[4];         // 0x08
+    PadAnalog aAnalog[4];         // 0x38
+    u32 auButtons[4];             // 0x50  held << 16 | pressed this frame
+    u32 auHeld[4];                // 0x60  last frame's held buttons
+    PadRumble aRumble[4];         // 0x70
+    s8  nRead;                    // 0x80  one bit a pad (1 << n): it answered this frame
+} Controllers;
+LAYOUT_ASSERT(Controllers, 0x84);
+
+int  fn_80012FA4(void);                 // controller init
 void fn_80012EF8(void);
 void fn_80012F18(int a);
 void fn_80012F34(int a);
 void fn_80012F50(int a, int b, int c);
+void fn_80013030(void);
+u32  fn_80013050(int nChan);            // the pad's device type (SIProbe)
+s32  fn_80013070(int nChan);            // a controller the game takes is plugged in
+void fn_800130EC(u8 bOn);               // the main stick also presses the D-pad
+void fn_800130F8(int nController, int bOn);         // rumble on or off
 void fn_80013130(int nController, int nStrength);   // rumble strength
+void fn_800131C4(int nController);      // rumble off
+void fn_80013400(void);                 // read the controllers
 u8*  fn_800136C4(int nController);      // the pad's state: stick bytes at +0, +2, +3
 u32  fn_800136DC(int nController);      // buttons: held << 16 | pressed this frame
 void fn_80014118(int a);
@@ -345,6 +402,7 @@ void PlaceBall_UpdateMomentums(int nPlayer, f32 f);
 void fn_8006A6C4(int nPlayer);
 int  fn_8006AA9C(int nPlayer);          // how the shot turned out (0..4, 8+)
 void fn_8006AAB4(int nPlayer, int a);
+void fn_8006ACE0(int nPlayer, int nResult);
 void fn_8006ACF8(int nPlayer, int a);
 void Emotion_UpdatePlayerEmotion(int nPlayer);
 void fn_8006B2C4(int nPlayer, u8 bBefore);   // the shot's outcome from the ball (bBefore: ballBefore)
@@ -363,6 +421,7 @@ void fn_800A62A4(void);
 void fn_800A62E0(void);
 void fn_800A6358(void);
 void fn_800A63D0(void);
+void fn_800A6DCC(int nMusic, int a);
 void fn_800A72EC(u8 a, u8 b);
 void fn_800A7664(int nKind, int nMsg, int a);
 void fn_800A76E4(void);

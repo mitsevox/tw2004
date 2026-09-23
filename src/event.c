@@ -763,7 +763,7 @@ int fn_80067560(void) {
 
 void fn_80067608(void) {
     fn_80005AE8(lbl_802811B8, 0, sizeof(SitDevData));
-    lbl_802811B8->nE8 = 0;
+    lbl_802811B8->pE8 = NULL;
     lbl_802811B8->n13C = 0;
     Course_RegisterLoader(5, fn_800BB6DC);
     fn_800BB0C8();
@@ -783,7 +783,9 @@ void fn_800676AC(void) {
 }
 
 void fn_800676B8(void) {
-    UStream_RegisterHandler('sscr', SitDev_LoadScripts);
+    // port: SitDevFile.c defines the handler with the object's first word (the scripts) as its
+    // parameter; UStream calls it with the object. Same address on the GameCube.
+    UStream_RegisterHandler('sscr', (void (*)(UStreamObject*))SitDev_LoadScripts);
 }
 
 void fn_800676E8(void) {

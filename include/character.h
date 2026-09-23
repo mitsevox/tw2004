@@ -134,7 +134,8 @@ typedef struct Clip {
     u8     unk90[0x10];
     char   name[0x30];          // 0xA0
     u8*    pD0;                 // 0xD0
-    u8     unkD4[8];
+    u8     unkD4[4];
+    u32    uD8;                 // 0xD8  nonzero: FEgolferanim.c turns the golfer round for it
     u32    uAram;               // 0xDC
     u8     unkE0[4];
     u8*    pE4;                 // 0xE4
@@ -146,12 +147,40 @@ typedef struct Clip {
     u8*    pFC;                 // 0xFC
 } Clip;
 
-// A node of a character's SKA blend tree (the root is at Character + 0x40C): its kind at +4 and two
-// children at +0x24 / +0x28 (fn_80072CB8 walks them); only what the game code reads.
-typedef struct SKABlendNode {
-    u8   unk0[0x2C];
-    s32  nGroup;                // 0x2C  the clip group CharacterState_AddSKABlendData last added
-} SKABlendNode;
+typedef struct SKABlendNode SKABlendNode;
+
+// The blend callback CharacterState_AddSKABlendData attaches (fn_80072ACC is one).
+typedef void (*SKABlendFn)(SKABlendNode* pNode, int* pn, f32 fTime);
+
+// A node of a character's SKA blend tree (animblender.c; the root is at Character + 0x40C). A node
+// of type 1 blends its two children into its pose with pfnBlend; a node of type 0 plays one source
+// from fFrom to fTo. fn_80071C28 takes nodes from three pools by type (0x34, 0x2C and 0x20 bytes),
+// so the blend fields end at 0x2C; nGroup follows the root in Character.
+struct SKABlendNode {
+    s32  bPooled;               // 0x00  taken from a pool, so fn_80071F58 gives it back
+    s32  nType;                 // 0x04  0: plays a source, 1: blends apChild
+    s32  nFormat;               // 0x08  its pose buffer's format, 0 (0x1040 bytes) or 1 (0x114C bytes)
+    u8   bC;                    // 0x0C
+    u8   padD[3];
+    f32  fStart;                // 0x10  a blend's is its children's earliest (fn_800728D8)
+    f32  fEnd;                  // 0x14  a blend's is its children's latest (fn_80072938)
+    f32  fWeight;               // 0x18  its share of its parent's blend (fn_80072ACC)
+    void* pPose;                // 0x1C  its pose buffer, taken from the pool for nFormat
+    union {
+        struct {
+            SKABlendFn pfnBlend;            // 0x20
+            SKABlendNode* apChild[2];       // 0x24
+        } blend;                            // nType 1
+        struct {
+            void* pSrc;                     // 0x20  a ClipBlend for nFormat 0 (fn_8001F02C)
+            f32   fFrom;                    // 0x24
+            f32   fTo;                      // 0x28
+        } src;                              // nType 0
+    } u;
+    s32  nGroup;                // 0x2C  the clip group CharacterState_AddSKABlendData last added (the
+                                //       root only: past the end of a pooled blend node)
+};
+LAYOUT_ASSERT(SKABlendNode, 0x30);
 
 // A clip as the swing reads it through a ClipBlend; only what the swing reads.
 typedef struct BlendClip {
@@ -189,11 +218,15 @@ LAYOUT_ASSERT(CharBuffer, 0x1C);
 // An animation player; only what is read. Character has two: the one at 0x164, whose fields are
 // named in Character directly, and anim29C.
 typedef struct AnimPlayer {
-    u8    unk0[0xC];
+    u8    unk0[4];
+    s32   uFlags;               // 0x04  fn_8007325C sets bit 2, fn_8007326C clears bits 1 and 2
+    u8    unk8[4];
     s32   nC;                   // 0x0C  } set together by fn_800958EC
     f32   f10;                  // 0x10  }
     u8    unk14[4];
     f32   fTime;                // 0x18
+    f32   fStart;               // 0x1C  } Anim_SetTime's -30000 and -10000 stand for these
+    f32   fEnd;                 // 0x20  }
 } AnimPlayer;
 
 // The golfer's character object (0x1798 bytes or more); only the fields read so far. Anim_SetRate,
@@ -205,8 +238,8 @@ typedef struct Character {
                                 //        characters fn_8001D324 finds by id
     u32   uId;                  // 0x008  the id of the 'SKLO' object it was built from (fn_8001D3EC);
                                 //        fn_8001D324 finds it by this
-    u8    unkC[0x10 - 0xC];
-    u32   u10;                  // 0x010  bit 0x40 tested by the game manager and the swing; bit 0x8000
+    s32   nC;                   // 0x00C  the golfer's id (FEgolferanim.c: 7 and 29 are special)
+    u32   u10;                 // 0x010  bit 0x40 tested by the game manager and the swing; bit 0x8000
                                 //        cleared by CharacterState_AddSKABlendData
     u8    unk14[0x1C - 0x14];
     s32   nAnim;                // 0x01C  the playing animation (6 backswing, 7 downswing)
@@ -251,7 +284,7 @@ typedef struct Character {
     f32   fAnimEnd;             // 0x184  the animation's end time
     u8    unk188[0x29C - 0x188];
     AnimPlayer anim29C;         // 0x29C  a second animation player
-    u8    unk2B8[0x3D8 - 0x2B8];
+    u8    unk2C0[0x3D8 - 0x2C0];
     AnimLib* pLib;              // 0x3D8  its animation library
     struct ClipRecord* pRecords;    // 0x3DC  records for its merged library (skalib)
     u8    node3E0[0x40C - 0x3E0];   // 0x3E0  a blend node for anim29C (fn_800732F4 takes it as it takes blend)
@@ -259,7 +292,8 @@ typedef struct Character {
     CharBuffer buffers[4];      // 0x43C
     struct { u32 bSet; f32 fTime; u8 unk8[8]; } events[18];   // 0x4AC  animation events, by 64-bit id
     s32   n5CC;                 // 0x5CC
-    u8    unk5D0[0x1624 - 0x5D0];
+    u8    unk5D0[0x1614 - 0x5D0];
+    char  sz1614[16];           // 0x1614  a name the situation scripts test (fn_800BB7AC)
     ClipBlend* pBlend;          // 0x1624
     f32   fBackswing;           // 0x1628  how far along the backswing is, 0..1 (pBlend's fCC, copied every
                                 //         frame of the backswing; the swing's power is its square root)
@@ -366,9 +400,6 @@ extern AnimStream* lbl_80282230;
 
 u8    fn_800C9828(int nGroup, int nStyle, int nClub, int nKey);   // the clips are streamed
 void  fn_800CA9DC(int nSlot);
-
-// The blend callback CharacterState_AddSKABlendData attaches (fn_80072ACC is one).
-typedef void (*SKABlendFn)(SKABlendNode* pNode, int* pn, f32 fTime);
 
 void  Character_SetPosition(Character* pChar, f32* pPos, int a);
 void  fn_8001C724(Character* pChar, int nKind);
@@ -478,13 +509,6 @@ typedef struct ClipBank {
     u32    n1C;                 // 0x1C
 } ClipBank;
 LAYOUT_ASSERT(ClipBank, 0x20);
-
-// One field of a byte-swap description: nBytes bytes made of nSize-byte values (negative: not
-// swapped).
-typedef struct SwapField {
-    s32 nBytes;                 // 0x0
-    s32 nSize;                  // 0x4
-} SwapField;
 
 // A library that can be layered over a slot's own.
 typedef struct LibOverlay {
