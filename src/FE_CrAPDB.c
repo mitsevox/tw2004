@@ -8,6 +8,7 @@
 #include "frontend/fe.h"
 
 // This file, in address order.
+int  fn_80104F7C(CrAPAsset* pAsset);
 void fn_80105188(UStreamObject* pObject);
 void fn_801051F4(UStreamObject* pObject);
 void fn_80105240(void);
@@ -17,10 +18,7 @@ void fn_80105EFC(void);
 u8   fn_801061C8(s8 n);
 u8   fn_801061F8(s16 nPart, int nCategory, int nWanted);
 
-// ---- sweep code (not yet cleaned up) ----
-
-int fn_80104F7C(CrAPAsset* pAsset);
-
+// The asset an asset takes its attributes from.
 CrAPAsset* fn_80103B4C(CrAPAsset* pAsset) {
     return fn_80104F68(fn_80103B28(fn_80104F7C(pAsset)));
 }
@@ -37,6 +35,7 @@ s8 fn_80103BB4(void) {
     return lbl_80282460->n4;
 }
 
+// Save the created golfer's body skin entries in the profile.
 void fn_80103D6C(void) {
     SaveProfile* pProfile = fn_80077ACC();
     Skin* pSkin = lbl_80281EE0->pB4->pChar->pSkin;
@@ -44,8 +43,6 @@ void fn_80103D6C(void) {
     Mem_cpy(pProfile->a5614, pSkin->p10B4, fn_800CCA40(pSkin) * 8);
     Mem_cpy(pProfile->a5754, pSkin->p10C4, fn_800CCEA0(pSkin) * 8);
 }
-
-// ---- end of sweep code ----
 
 // The asset may be picked: it was not locked when last checked, and its aB1CC bit is set.
 u8 fn_80104020(int nAsset) {
