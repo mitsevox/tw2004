@@ -400,6 +400,40 @@ The server launches no programs (see decomp-notes.md); commit history comes from
 `python tools/dashboard/install_hook.py` once. To stop or restart: kill `pythonw3.13.exe`
 (not `pythonw`), then `schtasks /run /tn tw2004-dashboard`.
 
+Starting a new area: check the references first
+-----------------------------------------------
+
+Do this every time work starts on a new file or system of this game (a struct, a group of
+`fn_` functions, a subsystem), before writing C. The external search is finished (see "Symbols
+from related builds" and "EA's source tree" below); what keeps paying off is looking up each new
+area in the TW06 material. Tools are in `C:\dev\scratch\tw\`; the reference files are in
+`C:\dev\ext\symbols\` (never committed).
+
+1. **Names already found.** Search [`tw06-names.md`](tw06-names.md) for the addresses in the area.
+   Strong names are already in `symbols.txt`; a *medium* suggestion there is confirmed or
+   rejected now, by what the code does (update its row either way).
+2. **TW06 functions and signatures.** For a named function, `python tpiread.py func <TW06 name>`
+   gives its Xbox parameter types; `MAPFILE.TXT` in the PS2 folder gives the full C++ signature
+   (`grep <name> MAPFILE.TXT`). Neighbouring TW06 functions in the same module are likely
+   neighbours here too (`pdb_modules.json`).
+3. **Structs and enums.** `python tpiread.py find <word>` then `python tpiread.py struct <name>`.
+   Line the offsets up with ours: plain C structs lay out identically on Xbox and GameCube, so
+   matching offsets confirm the struct; TW06 may have inserted fields (the ball struct gained
+   `terrainHeight` at 0x58). Rename fields only where the offsets and our code agree; note TW06
+   names in comments; put enums in a header (as `include/physics.h`). Field renames change no
+   code, so `main.dol: OK` must still hold.
+4. **Where the file lives.** Check the 2002 source tree (below) for the real file name and folder.
+5. **Treat TW06 as 2005 evidence, not truth.** Our code wins every disagreement
+   (`vec4flt_LengthSquared3` was rejected because our code showed a normalise). Record
+   rejections in `tw06-names.md`.
+6. **After the area is decompiled and named, re-run the matcher** so its neighbours get names:
+   `python anchors.py gc && python anchors.py match && python anchors.py match ps2`, then
+   `python callgraph.py` and `python callgraph.py ps2`, then merge and apply as in
+   "Symbols from related builds" (strong only; `rename_fix.py` afterwards; check `main.dol: OK`).
+7. **SDK code** (anything past `0x8012E950` except UI Studio and the GCC file library): run
+   `harvest.py` / `harvest2.py` / `integrate.py plan` again instead; other projects' source may
+   already match.
+
 Adding a function: the steps
 ----------------------------
 
@@ -557,18 +591,18 @@ Their strings and source paths were kept as text in `C:\dev\ext\tw2003\` and the
 Only 57 of their strings also occur in this game (course names, camera and movie debug labels), too
 few to pair functions.
 
-What they do give is **the real layout of EA's source tree**, root `C:\Dev\TigerCode\Code\`, with
-64 file paths. The files this game names in its own asserts sit here:
+What they do give is **the real layout of EA's source tree**, root `C:\Dev\TigerCode\Code\` (the
+Sep 3 build: `C:\TigerCode\Code\`), with 64 file paths, the same set in both builds. The files this game names in its own asserts sit here:
 
 | Folder | Files seen (2002) |
 |---|---|
 | `Golf\AI\` | `Swing.c` (so our `Swing.c` has the right name) |
-| `Golf\Animation\` | `Skeleton.c`, `Skin.c`, `char_skin.c`, `MTA.c`, `mtalib.c` |
+| `Golf\Animation\` | `Skeleton.c`, `Skin.c`, `char.c`, `char_skin.c`, `MTA.c`, `mtalib.c`, `skalib.c` (our `skalib.c` has the right name) |
 | `Golf\Audio\Engine\Utils\` | `UAudMemStack.c` |
 | `Golf\Cameras\` | `GoDynamicCam.c`, `GoComicCam.c`, `GoStaticCam.c` |
 | `Golf\Entry\` | `GoEntry.c`, `startUp.c` |
 | `Golf\FrontEnd\` | `FE_Manager.c` |
-| `Golf\GameMode\` | `CareerMode.c`, `CourseInfo.c`, `TournamentMode.c` |
+| `Golf\GameMode\` | `CareerMode.c`, `CourseInfo.c`, `Earnings.c`, `PlayNowMode.c`, `TournamentMode.c` |
 | `Golf\Hi-Rendering\` | `GoCamera.c`, `GoFrameBuf.c`, `GoViewport.c`, `GoDynObj.c`, `GoLighting.c`, `GoTerrain.c` (+ platform `Xbox\GoRenderCtx_Xbox.c`) |
 | `Golf\Lo-Rendering\Shader\` | `ShaderObject\...\GoShaderObject_{Glows,Particle,Rain}_Xbox.c`, `ShaderObjectContainer\...\GoShaderObjectContainer_OBFData_Xbox.c` |
 | `Golf\Memory Card\` | `MC.c` (+ `Xbox\MC_Xbox.c`) |
