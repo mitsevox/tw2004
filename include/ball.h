@@ -200,7 +200,7 @@ u8   Ter_Use3DCupGeometry(void);               // the cup is real geometry the b
 u8   Ter_PointInFreeDropNetwork(f32* pPos);    // inside a free-drop area
 u8   Ter_PointInOOBNetwork(f32* pPos);         // inside the in-bounds outlines (always, with none loaded)
 u8   Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 a, u8 b, f32 f, u8 c, f32 g);
-u8   Ter_SearchAreaForDropLocation(int nPlayer, u8 bPreferred, u8 bCheck, f32* pOut);   // where to drop the ball
+u8   Ter_SearchForDropLocation(int nPlayer, u8 bPreferred, u8 bCheck, f32* pOut);   // where to drop the ball
 f32  Ter_CheckForDropLocation(CourseInfo* pCourse, f32* pPos, u8 bOnDropSurface, u8* pbDrop, u8* pbPreferred,
                               SurfaceType** ppSurface);   // whether a ball could be dropped at a point
 u8   Ter_IsValidDropSurface(s32 nSurface);

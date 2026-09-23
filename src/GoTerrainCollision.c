@@ -288,7 +288,8 @@ f32 fn_8004B78C(CourseInfo* pCourse, f32* pPos) {
 // 0x8004B89C: Ter_CheckObjectAndHazardObstruction (TW06's name; 0x898 bytes) goes here. Not written
 // yet; its prototype is in ball.h (Ter_CheckForDropLocation calls it).
 
-// TW06: Ter_SearchAreaForDropLocation (its parameters differ here). Where a player's ball is to be
+// TW06: bool Ter_SearchForDropLocation(s32, bool, bool, f32*), with the ring search that TW06 split
+// out as Ter_SearchAreaForDropLocation written inline. Where a player's ball is to be
 // dropped (pOut): the last good drop spot (lbl_801D5888), or with bPreferred the last spot with a
 // preferred lie (lbl_801D58C8) when that is not the shot's own start and is less than 10 yards
 // further away. If the spot is over 3 yards off, or (not preferred) on another class of surface
@@ -297,7 +298,7 @@ f32 fn_8004B78C(CourseInfo* pCourse, f32* pPos) {
 // shot started, or (with bCheck) within 50 yards of vA44.
 // Not exact yet (98.9%): the frame is 0x10 bigger and the saved registers differ; unfinished
 // when work was frozen.
-u8 Ter_SearchAreaForDropLocation(int nPlayer, u8 bPreferred, u8 bCheck, f32* pOut) {
+u8 Ter_SearchForDropLocation(int nPlayer, u8 bPreferred, u8 bCheck, f32* pOut) {
     f32 vPos[4];
     f32 vDir[4];
     SurfaceType* pSurface;
