@@ -3572,6 +3572,8 @@ unsorted/sweep_8013FF30.c:
 
 dolphin/gx/GXAttr.c:
 	.text       start:0x8013FF38 end:0x801410A8
+	.data       start:0x80199F20 end:0x8019A080
+	.sdata      start:0x80281A50 end:0x80281A60
 
 dolphin/gx/GXMisc.c:
 	.text       start:0x801410A8 end:0x801415AC
