@@ -219,6 +219,71 @@ void fn_800E4C20(u8 bHuman);            // the end-of-round screen
 void fn_800E4D88(void);
 void fn_800E4D94(u8 bHuman);            // the end-of-hole screen
 
+// The display state (GameUI.c's data; GameMessages.c and GameAnalysis.c use some of it). Twelve
+// queues of display items, each with its count; the pump shows the newest item of the first
+// non-empty queue.
+typedef struct UIQueueItem {
+    s32  n0;                    // 0x0  three values whose meaning depends on the queue
+    s32  n4;                    // 0x4
+    s32  n8;                    // 0x8
+} UIQueueItem;
+
+#define UI_QUEUE_LEN 10         // items a display queue holds
+
+extern UIQueueItem lbl_80203044[UI_QUEUE_LEN];  // queue 0 (count lbl_802822B4)
+extern UIQueueItem lbl_802030BC[UI_QUEUE_LEN];  // queue 1 (lbl_802822B8)
+extern UIQueueItem lbl_80202FCC[UI_QUEUE_LEN];  // queue 2 (lbl_802822B0)
+extern UIQueueItem lbl_80202F54[UI_QUEUE_LEN];  // queue 3 (lbl_802822AC)
+extern UIQueueItem lbl_80202EDC[UI_QUEUE_LEN];  // queue 4 (lbl_802822A8)
+extern UIQueueItem lbl_80202E64[UI_QUEUE_LEN];  // queue 5 (lbl_802822A0), no duplicates
+extern UIQueueItem lbl_80202DEC[UI_QUEUE_LEN];  // queue 6 (lbl_8028229C)
+extern UIQueueItem lbl_80202D74[UI_QUEUE_LEN];  // queue 7 (lbl_80282298)
+extern UIQueueItem lbl_80202CFC[UI_QUEUE_LEN];  // queue 8 (lbl_80282294)
+extern UIQueueItem lbl_80202C84[UI_QUEUE_LEN];  // queue 9 (lbl_80282290)
+extern UIQueueItem lbl_80202C0C[UI_QUEUE_LEN];  // queue 10 (lbl_8028228C)
+extern UIQueueItem lbl_80202B94[UI_QUEUE_LEN];  // queue 11 (lbl_80282288)
+extern u8          lbl_80203138[14];            // the tips already shown (GameMessages.c, GameAnalysis.c)
+
+extern u8  lbl_80282280;
+extern u8  lbl_80282281;                    // the end-of-round screen is up
+extern u8  lbl_80282282;                    // the end-of-hole screen is up
+extern s32 lbl_80282284;
+extern s32 lbl_80282288;
+extern s32 lbl_8028228C;
+extern s32 lbl_80282290;
+extern s32 lbl_80282294;
+extern s32 lbl_80282298;
+extern s32 lbl_8028229C;
+extern s32 lbl_802822A0;
+extern s32 lbl_802822A4;
+extern s32 lbl_802822A8;
+extern s32 lbl_802822AC;
+extern s32 lbl_802822B0;
+extern s32 lbl_802822B4;
+extern s32 lbl_802822B8;
+extern u8  lbl_802822BC;
+extern u8  lbl_802822BD;
+extern u8  lbl_802822BE;
+extern u8  lbl_802822BF;
+extern u8  lbl_802822C0;
+extern u8  lbl_802822C1;
+extern u8  lbl_802822C2;
+extern u8  lbl_802822C3;
+extern u8  lbl_802822C4;
+extern u32 lbl_802822C8;                    // frame counts when the HUDs last changed
+extern u32 lbl_802822CC;
+extern u32 lbl_802822D0;
+extern u8  lbl_802822D4;
+extern u8  lbl_802822D5;
+extern u8  lbl_802822D6;
+extern u8  lbl_802822D7;                    // the HUD on screen 3 (split screen, player 2)
+extern u8  lbl_802822D8;                    // the HUD on screen 2 (split screen, player 1)
+extern u8  lbl_802822D9;                    // the HUD on the single screen
+extern u8  lbl_802822DA;
+extern u8  lbl_802822DB;
+extern u8  lbl_802822DC[3];
+extern u8  lbl_802822DF;
+
 // GameMessages.c
 void fn_800E4FFC(int a);
 void fn_800E502C(int a);
