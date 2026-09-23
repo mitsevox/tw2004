@@ -12,6 +12,7 @@
 #include "core/memcard.h"
 #include "core/easb.h"
 #include "game/earnings.h"
+#include "game/modes/ladder.h"
 
 // Outside this file.
 void fn_800142A4(s8 n);                 // sets lbl_80281C98
@@ -29,6 +30,7 @@ s32  fn_8009EB44(s32 nPort, s32 nSlot); // MC_Gc.c
 s32  fn_800A1164(s32 nPort, s32 nSlot, char* pName, s32 n);     // MC.c
 u8   fn_800E22E4(int nSlot, int a, int b);      // GameRound.c
 int  fn_800E234C(int nSlot, int a, int b);      // GameRound.c
+int  fn_800D3D10(int nGolfer);          // Earnings.c: the golfer's rating
 int  fn_800E2520(int nMode);            // GameRound.c
 void fn_800E25E0(void);                 // GameRound.c
 void fn_800E30D4(void);                 // GameRound.c: builds the mixed rounds
@@ -2950,7 +2952,7 @@ void fn_8007FF8C(MsgArg* pArgs, MsgArg* pResult) {
 // Hole pArgs[1]'s par on course pArgs[0]. Below 0 it is the custom round being edited (slot n3,
 // round n4); 22 and 24..29 are built rounds, whose holes come from other courses.
 void fn_80080054(MsgArg* pArgs, MsgArg* pResult) {
-    int nHole;
+    int nCourse;
 
     if (pArgs[0].i <= -1) {
         pResult->i = fn_800D2ABC(
@@ -2959,13 +2961,13 @@ void fn_80080054(MsgArg* pArgs, MsgArg* pResult) {
         return;
     }
     if (pArgs[0].i == 22) {
-        nHole = fn_800D3118(22, pArgs[1].i);
-        pResult->i = fn_800D2ABC(nHole, fn_800D315C(22, pArgs[1].i) - 1);
+        nCourse = fn_800D3118(22, pArgs[1].i);
+        pResult->i = fn_800D2ABC(nCourse, fn_800D315C(22, pArgs[1].i) - 1);
         return;
     }
     if (pArgs[0].i >= 24 && pArgs[0].i < 30) {
-        nHole = fn_800D3118(pArgs[0].i, pArgs[1].i);
-        pResult->i = fn_800D2ABC(nHole, fn_800D315C(pArgs[0].i, pArgs[1].i) - 1);
+        nCourse = fn_800D3118(pArgs[0].i, pArgs[1].i);
+        pResult->i = fn_800D2ABC(nCourse, fn_800D315C(pArgs[0].i, pArgs[1].i) - 1);
         return;
     }
     pResult->i = fn_800D2ABC(pArgs[0].i, pArgs[1].i);
@@ -2982,6 +2984,32 @@ void fn_800801C0(MsgArg* pArgs, MsgArg* pResult) {
 
 void fn_800801D4(MsgArg* pArgs, MsgArg* pResult) {
     strcpy(((MsgString*)pArgs[0].p)->pStr, gReplayData.player.golfer.szLast);
+}
+
+// The prize for beating golfer pArgs[0] in the current game mode: the stroke prize in modes 0 and
+// 1, the skins value in mode 2, the ladder event's in mode 4 (the last event's past event 24);
+// the golfer's rating picks the row. Other modes leave pResult alone.
+void fn_80080208(MsgArg* pArgs, MsgArg* pResult) {
+    int nEvent = fn_801020C0();
+
+    switch (Game_GetMode()) {
+    case 4:
+        if (nEvent >= 25) {
+            pResult->i = lbl_80200538.aLadderPrize[24].nBase;
+            return;
+        }
+        pResult->i = lbl_80200538.aLadderPrize[lbl_80260CB8.nEvent].nBase;
+        return;
+    case 0:
+    case 1:
+        pResult->i = lbl_80200538.aStrokePrize[fn_800D3D10(pArgs[0].i)].nBase;
+        return;
+    case 2:
+        pResult->i = lbl_80200538.aSkins[fn_800D3D10(pArgs[0].i)].n10;
+        return;
+    case 3:
+        return;
+    }
 }
 
 void fn_80080300(MsgArg* pArgs, MsgArg* pResult) {
