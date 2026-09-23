@@ -40,8 +40,8 @@ UMemPool* fn_8000AFA0(int nNodes, u32 uNodeSize, u32 uFlags, u32 uAlign);   // c
 void  fn_8000B058(UMemPool* pPool);                     // destroy
 void* fn_8000B078(UMemPool* pPool);                     // take a node (NULL when none is free)
 void  fn_8000B0D4(UMemPool* pPool, void* pNode);        // give a node back
-// Sorts nCount items of nSize bytes with pfnCompare (the C library's qsort, by its arguments).
-void  fn_8015929C(void* pBase, u32 nCount, u32 nSize, s32 (*pfnCompare)(const void* pA, const void* pB));
+// Sorts nCount items of nSize bytes with pfnCompare (MSL, 0x8015929C).
+void  qsort(void* pBase, u32 nCount, u32 nSize, s32 (*pfnCompare)(const void* pA, const void* pB));
 
 // ---- time ------------------------------------------------------------------------------------
 

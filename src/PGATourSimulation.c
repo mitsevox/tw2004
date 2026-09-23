@@ -728,7 +728,7 @@ void fn_8011A890(int nPlayer) {
         lbl_80223C70.aEntrant[i] = -1;
     }
     lbl_80281848 = nPlayer;
-    fn_8015929C(lbl_80223C70.aEntrant, nEntrants, sizeof(lbl_80223C70.aEntrant[0]), fn_8011BDF8);
+    qsort(lbl_80223C70.aEntrant, nEntrants, sizeof(lbl_80223C70.aEntrant[0]), fn_8011BDF8);
     lbl_80281848 = 0;
     nPrevScore = 0;
     nRank = 0;
@@ -764,8 +764,8 @@ void fn_8011AAC0(int nPlayer) {
     lbl_80281848 = nPlayer;
     nCutRow = fn_80119AE0(nPlayer);
     if (nCutRow != -1) {
-        fn_8015929C(&lbl_80223C70.aEntrant[nCutRow], nEntrants - nCutRow, sizeof(lbl_80223C70.aEntrant[0]),
-                    fn_8011BF74);
+        qsort(&lbl_80223C70.aEntrant[nCutRow], nEntrants - nCutRow, sizeof(lbl_80223C70.aEntrant[0]),
+              fn_8011BF74);
     }
     lbl_80281848 = 0;
     nPrevScore = 0;
@@ -811,7 +811,7 @@ void fn_8011AC40(int nPlayer, GM_Pga_StatTypes_t nStat) {
     }
     lbl_80281840.nPlayer = nPlayer;
     lbl_80281840.nStat = nStat;
-    fn_8015929C(pRanking->aGolfer, PGA_NUM_GOLFERS, sizeof(pRanking->aGolfer[0]), lbl_80193FF8[nStat]);
+    qsort(pRanking->aGolfer, PGA_NUM_GOLFERS, sizeof(pRanking->aGolfer[0]), lbl_80193FF8[nStat]);
     lbl_80281840.nStat = -1;
     lbl_80281840.nPlayer = 0;
     sprintf(szPrev, "");

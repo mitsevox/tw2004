@@ -808,6 +808,7 @@ config.libs = [
             Object(Matching, "runtime/misc_io.c"),
             Object(Matching, "runtime/s_copysign.c"),
             Object(Matching, "runtime/s_modf.c"),
+            Object(Matching, "runtime/qsort.c", mw_version="GC/2.5"),
             Object(Matching, "runtime/sscanf.c"),
             Object(Matching, "runtime/wchar_io.c"),
             Object(Matching, "runtime/uart_console_io.c"),
