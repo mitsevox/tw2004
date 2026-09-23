@@ -365,11 +365,11 @@ s32 GM_PgaTourSim_GetStatView(GM_Pga_StatTypes_t nStat) {
     return lbl_80194074[nStat];
 }
 
-u16 fn_8011903C(int nPlayer, int nGolfer) {
+s32 fn_8011903C(int nPlayer, int nGolfer) {
     return gpSaveData[nPlayer].tour.aStats[nGolfer].nEvents;
 }
 
-u16 fn_80119064(int nPlayer, int nGolfer) {
+s32 fn_80119064(int nPlayer, int nGolfer) {
     return gpSaveData[nPlayer].tour.aStats[nGolfer].nRounds;
 }
 

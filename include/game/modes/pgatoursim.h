@@ -160,8 +160,8 @@ s32   GM_PgaTourSim_GetStatRankFromGolferID(int nPlayer, int nGolfer, GM_Pga_Sta
 f32   GM_PgaTourSim_GetStatValueFromGolferID(int nPlayer, int nGolfer, GM_Pga_StatTypes_t nStat);
 s32   GM_PgaTourSim_GetGolferIDFromStatRow(int nPlayer, GM_Pga_StatTypes_t nStat, int nRow);
 s32   GM_PgaTourSim_GetStatView(GM_Pga_StatTypes_t nStat);
-u16   fn_8011903C(int nPlayer, int nGolfer);    // the golfer's tournaments this season
-u16   fn_80119064(int nPlayer, int nGolfer);    // the golfer's rounds this season
+s32   fn_8011903C(int nPlayer, int nGolfer);    // the golfer's tournaments this season
+s32   fn_80119064(int nPlayer, int nGolfer);    // the golfer's rounds this season
 
 // ---- fe_stats.c: the tour statistics screen ----
 
