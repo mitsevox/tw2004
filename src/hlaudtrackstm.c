@@ -18,9 +18,7 @@ int  fn_80006478(s32 hFile, u8* pDst, u32 uLen, u32 uOffset,
                  AudTrack* pTrack, u8 nId, int n19);                 // read from disc, not waiting
 u8*  fn_800A942C(u32 uSize, u8 nPlayList);                          // the stream buffer
 void fn_800A9434(u8* pBuffer, u32 uSize, u8 nPlayList);             // give it back
-AudStream* fn_800A9438(AudPlayList* pList, u16 nStream, u32* puLength);
 u32  fn_800A955C(u8 nPlayList);                                      // the buffer size it needs
-AudPlayList* fn_800A9564(u8 nPlayList);
 s32  DVDGetDriveStatus(void);
 
 void Stm_SetPlayList(AudTrack* pTrack, u8 nPlayList);
@@ -43,7 +41,7 @@ u8 fn_800AB3A4(AudTrack* pTrack) {
         pTrack->u.stm.nNextPlayList = 0xFF;
     }
     if (pTrack->u.stm.nNextStream != 0xFFFF) {
-        if (pTrack->pTmpl->pPlayList != NULL) {
+        if (pTrack->pTmpl->data.pPlayList != NULL) {
             Stm_SetStream(pTrack, pTrack->u.stm.nNextStream, 0);
             bChanged = 1;
         }
@@ -58,7 +56,7 @@ void fn_800AB428(AudTrack* pTrack) {
     u8 i;
     int bLoud;
 
-    pList = pTrack->pTmpl->pPlayList;
+    pList = pTrack->pTmpl->data.pPlayList;
     fn_800A85FC(pTrack->f44, fn_800AA44C(pList->n3));
     bLoud = pList->n3 == 15;
     for (i = 0; i < pList->nChannels; i++) {
@@ -155,7 +153,7 @@ void fn_800AB72C(AudTrack* pTrack, void (*pfnDone)(u32 bLast), u32 uStep, u8 bSk
 
     i = 0;
     pSrc = pTrack->u.stm.pBuffer;
-    pList = pTrack->pTmpl->pPlayList;
+    pList = pTrack->pTmpl->data.pPlayList;
     lbl_802820AC = pTrack;
     while (i < (nChannels = pList->nChannels)) {
         pVoice = pTrack->apVoices[i];
@@ -226,7 +224,7 @@ void fn_800AB958(AudTrack* pTrack, u32 uLen) {
 
 // A disc read is done: DMA it to the voices, unless the track moved on meanwhile.
 void fn_800AB99C(int nBytes, int nError, AudTrack* pTrack, u8 nId) {
-    if (pTrack->u.stm.nReadId != nId || pTrack->pTmpl == NULL || pTrack->pTmpl->pPlayList == NULL ||
+    if (pTrack->u.stm.nReadId != nId || pTrack->pTmpl == NULL || pTrack->pTmpl->data.pPlayList == NULL ||
         pTrack->u.stm.pStream == NULL) {
         RemoveFromAudStreamQueue(pTrack);
         return;
@@ -243,7 +241,7 @@ void fn_800ABA28(AudTrack* pTrack) {
     u8 i;
     AudVoice* pVoice;
 
-    pList = pTrack->pTmpl->pPlayList;
+    pList = pTrack->pTmpl->data.pPlayList;
     hFile = fn_800AC328();
     if (pList == NULL) return;
     if (pTrack->nState == 5) return;
@@ -312,14 +310,14 @@ void Stm_Exit(AudTrack* pTrack) {
     fn_800B596C("Stm_Exit");
     fn_800B04CC(pTrack);
     if (pTrack->u.stm.pBuffer != NULL) {
-        fn_800A9434(pTrack->u.stm.pBuffer, pTrack->u.stm.uBufferSize, pTrack->pTmpl->pPlayList->nId);
+        fn_800A9434(pTrack->u.stm.pBuffer, pTrack->u.stm.uBufferSize, pTrack->pTmpl->data.pPlayList->nId);
     }
     fn_800ABC54(pTrack);
     fn_800B5994("Stm_Exit");
 }
 
 void Stm_Start(AudTrack* pTrack) {
-    if (pTrack->pTmpl->pPlayList == NULL) return;
+    if (pTrack->pTmpl->data.pPlayList == NULL) return;
     fn_800B596C("Stm_Start");
     if (pTrack->nState != 5) {
         fn_800ABA28(pTrack);
@@ -350,7 +348,7 @@ u8 Stm_Tick(AudTrack* pTrack) {
 
     bFed = 0;
     fn_800B596C("Stm_Tick");
-    pList = pTrack->pTmpl->pPlayList;
+    pList = pTrack->pTmpl->data.pPlayList;
     if (DVDGetDriveStatus() == 0) {
         ppVoice = pTrack->apVoices;
         for (i = 0; i < pList->nChannels; i++, ppVoice++) {
@@ -456,7 +454,7 @@ void Stm_SetPlayList(AudTrack* pTrack, u8 nPlayList) {
     } else {
         pList = fn_800A9564(nPlayList);
         if (pTrack->nState == 2) {
-            pOld = pTmpl->pPlayList;
+            pOld = pTmpl->data.pPlayList;
             nOld = pOld->nId;
         } else {
             pOld = NULL;
@@ -466,7 +464,7 @@ void Stm_SetPlayList(AudTrack* pTrack, u8 nPlayList) {
             if (pTrack->u.stm.pBuffer != NULL) {
                 fn_800A9434(pTrack->u.stm.pBuffer, pTrack->u.stm.uBufferSize, nOld);
             }
-            pTmpl->pPlayList = pList;
+            pTmpl->data.pPlayList = pList;
             pTrack->u.stm.pBuffer = fn_800A942C(uSize, pList->nId);
             pTrack->u.stm.uBufferSize = uSize;
             pTmpl->n2 = pList->nChannels;
@@ -494,7 +492,7 @@ void Stm_SetStream(AudTrack* pTrack, u16 nStream, int nMode) {
             pTrack->u.stm.nNextPlayList = 0xFF;
         }
     } else {
-        pList = pTmpl->pPlayList;
+        pList = pTmpl->data.pPlayList;
         if (pList != NULL) {
             if (nStream == 0xFFFE) {
                 nStream = fn_800AB32C(pList->nStreams);

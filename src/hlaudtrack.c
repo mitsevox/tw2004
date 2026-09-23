@@ -100,7 +100,7 @@ void fn_800A9AC8(void) {
                     pTrack->bits.b.bTicked = 1;
                 }
             } else if (!(lbl_8028207C & 0x40) ||
-                       (pTmpl->pPlayList->n3 == 0 && pTrack->pSource->n40 != 8)) {
+                       (pTmpl->data.pPlayList->n3 == 0 && pTrack->pSource->n40 != 8)) {
                 if (fn_800AA2A4(pTrack)) {
                     fn_800AA34C(pTrack);
                 } else {
@@ -156,7 +156,7 @@ AudTrack* fn_800A9BC8(AudSource* pSource, AudTrackTmpl* pTmpl, u8 nChannel, f32 
     pTrack->bits.n = 0;
     pTrack->bits.b.bSorted = bSorted;
     pTrack->bits.b.b5 = pSource->n40 >= 0;
-    pTrack->n3E = 0;
+    pTrack->params.flags.n = 0;
     fn_80005AE8(pTrack->apVoices, 0, sizeof(pTrack->apVoices));
     if (bSorted == 0) {
         fn_800ADEC8(pList, &pTrack->link);
@@ -266,7 +266,7 @@ void fn_800A9E7C(AudSource* pSource, AudTrack* pTrack, AudTrackTmpl* pTmpl, u8 n
 
 // Starts a track.
 void fn_800AA0D8(AudTrack* pTrack) {
-    pTrack->n3E = 0;
+    pTrack->params.flags.n = 0;
     if (!(pTrack->pTmpl->n0 & 8)) {
         fn_800AAE90(pTrack);
         return;
@@ -353,7 +353,7 @@ void fn_800AA34C(AudTrack* pTrack) {
     f32 fCurve;
 
     pSource = pTrack->pSource;
-    pList = pTrack->pTmpl->pPlayList;
+    pList = pTrack->pTmpl->data.pPlayList;
     if (pList == NULL) return;
     fCurve = fn_800AA44C(pList->n3);
     fn_800A85FC(pTrack->f44, fCurve);
@@ -371,7 +371,7 @@ void fn_800AA3D4(AudTrackTmpl* pTmpl) {
 }
 
 // A voice's end callback: it leaves its track, and a stopping track with no voices left is stopped.
-void fn_800AA400(AudVoice* pVoice) {
+void fn_800AA400(AudVoice* pVoice, int nReason) {
     AudTrack* pTrack;
 
     pTrack = pVoice->pUser;
