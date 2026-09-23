@@ -360,7 +360,19 @@ typedef struct Player {
     s8   nNextTarget;           // 0xE9C  the next target to hit, in order (GameMode17)
     s8   bE9D;                  // 0xE9D
     u8   bE9E;                  // 0xE9E
-    u8   unkE9F[0xEE0 - 0xE9F];
+    u8   unkE9F;
+    s32  nEA0;                  // 0xEA0  } values of the modes' own the menus ask for
+    u8   unkEA4[4];             //        } (GameUICommands.c fn_80089DB0)
+    s32  nEA8;                  // 0xEA8  }
+    u8   unkEAC[0xEBC - 0xEAC];
+    s32  nEBC;                  // 0xEBC  }
+    s32  nEC0;                  // 0xEC0  }
+    u8   unkEC4[0xECC - 0xEC4];
+    s32  nECC;                  // 0xECC  }
+    u8   unkED0[4];
+    s32  nED4;                  // 0xED4  }
+    s32  nED8;                  // 0xED8  }
+    s32  nEDC;                  // 0xEDC  }
     u8   bEE0;                  // 0xEE0
     u8   unkEE1[3];
     s32  nEE4;                  // 0xEE4  2 or 3 picks a message after a shot (GM_PlayerTookShot)
