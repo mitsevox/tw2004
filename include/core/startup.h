@@ -12,7 +12,12 @@
 
 // ---- the GameCube libraries (port: GameCube only) ---------------------------------------------
 
-typedef struct AXVPB AXVPB;             // a hardware voice (AX); only its address is used here
+// A hardware voice (AX): only the fields this code touches.
+typedef struct AXVPB {
+    u8   unk0[0x1B2];
+    u16  n1B2;                  // 0x1B2  } where the voice is playing, in 4-bit units, as two
+    u16  n1B4;                  // 0x1B4  } halves (Voice.u14 is copied here when it starts)
+} AXVPB;
 
 int    OSDisableInterrupts(void);       // returns whether interrupts were on
 int    OSRestoreInterrupts(int bEnabled);
@@ -159,5 +164,10 @@ extern s32   lbl_80281498;      // } where fn_800B13FC's search stopped; -1 to s
 extern s32   lbl_8028149C;      // }
 extern u8    lbl_802814A0;
 extern u8    lbl_80282120;      // fn_800B0960 keeps a memory-card result here
+extern s32   lbl_80282124;      // how many 'LEGL' objects fn_800B166C has kept (it keeps two)
+extern u32   lbl_80282128;      // the second one's size
+extern u32   lbl_8028212C;      // the first one's size
+extern void* lbl_80282130;      // the second one's copy
+extern void* lbl_80282134;      // the first one's copy
 
 #endif

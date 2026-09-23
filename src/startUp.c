@@ -168,6 +168,18 @@ void fn_800AFCBC(u16 nVoice, u8 bPause) {
     OSRestoreInterrupts(bEnabled);
 }
 
+// Where a voice is in its sound, in bytes of ARAM: from the hardware once it plays.
+u32 fn_800AFD8C(u16 nVoice) {
+    Voice* p = &lbl_802820E8[nVoice];
+    if (p->flags.b.nState <= 2) {
+        return p->u14 >> 1;
+    }
+    // fake match: one 32-bit load across both halves (combining them in C loads each alone).
+    // port: this reads a u32 at a 2-byte boundary and assumes big-endian; a port should use
+    // ((u32)n1B2 << 16 | n1B4).
+    return *(u32*)&p->pVpb->n1B2 >> 1;
+}
+
 // Set a voice up to play a sound.
 void fn_800AFDC8(u16 nVoice, SoundHeader* pHdr) {
     Voice* p = &lbl_802820E8[nVoice];
@@ -557,6 +569,29 @@ void fn_800B158C(s32 a, s32 b) {
 void fn_800B1608(void) {
 }
 
+void fn_800B160C(void) {
+    lbl_80282124 = 0;
+    UStream_RegisterHandler('LEGL', fn_800B166C);
+}
+
 void fn_800B1644(void) {
     UStream_UnregisterHandler('LEGL');
+}
+
+// The 'LEGL' handler: keep a copy of the first two objects, free each. A copy's size is rounded up
+// to 128 bytes (a size already a multiple of 128 gets 128 more).
+void fn_800B166C(UStreamObject* pObject) {
+    s32 nPad = 128 - (s32)pObject->uSize % 128;
+    if (lbl_80282124 == 0) {
+        lbl_8028212C = pObject->uSize + nPad;
+        lbl_80282134 = fn_80009B34(lbl_8028212C, 2, 16, "startUp.c", 882);
+        Mem_cpy(lbl_80282134, pObject->pData, lbl_8028212C);
+        lbl_80282124++;
+    } else if (lbl_80282124 == 1) {
+        lbl_80282128 = pObject->uSize + nPad;
+        lbl_80282130 = fn_80009B34(lbl_80282128, 2, 16, "startUp.c", 891);
+        Mem_cpy(lbl_80282130, pObject->pData, lbl_80282128);
+        lbl_80282124++;
+    }
+    fn_80009E70(pObject);
 }
