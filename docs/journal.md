@@ -220,14 +220,36 @@ Dated log of what was done and decided, newest last. Facts and lessons belong in
   (below `0x8012E950`, 79% of the executable) **11.43%**, 2,570 of 6,433 functions; Nintendo SDK
   and runtime (the rest, 21%) **62.71%**, 913 of 1,213. Most of the headline number is SDK;
   the EA figure is the one to watch.
+- **m2c at 256/512 bytes and a repair pass.** Batch 11 (m2c up to 256 bytes): 43 exact; 512
+  bytes: 3 (m2c's limit). `retry.py` compiles each non-exact m2c function alone and scores it
+  against `main.elf`, then tries single edits (add a missing call argument first or last, drop
+  prototypes, `void*` -> `u8*`, integer widths): 80 more exact. m2c's commonest miss is a call
+  argument already sitting in `r3`/`r4`.
+- **SDK from other decompilations** (`harvest.py`, `harvest2.py`, `integrate.py`): matching
+  CC0 source from Final Fantasy Crystal Chronicles (same Sep 5 2002 SDK), Wind Waker, Twilight
+  Princess, then Sonic Heroes (MIT) and Gauntlet: Dark Legacy; Melee's `__exception.s` for the
+  TRK vector table (8 KB). Jump tables/reset records assigned to their units fixed the
+  `name_ADDRESS` glitch for 5 functions. The 29 KB "unknown SDK" chunk was **EA's UI Studio**
+  (`UIStudio.c`/`UISEvent.c`), now counted as EA. SDK 58.9% -> **82.6%**.
+- **Symbols from related builds.** No TW2004 symbols exist publicly. From debugging.games:
+  Tiger Woods PGA Tour 06 Xbox beta PDB and PS2 `MAPFILE.TXT` + release ELF (same studio, EA
+  Redwood Shores, same engine lineage), 007 AUF/EON GameCube ELFs (different engine: no shared
+  code). Name transfer by strings, float constants and call graphs (`anchors.py`,
+  `callgraph.py`, `ps2side.py`): **123 functions named** (`docs/tw06-names.md`). Types
+  (`tpiread.py`): TW06's `PhysicsBall_t` is our `Ball`; field names and the lie/state/club/shot/
+  mishit enums applied (`include/physics.h`); lie 16 / state 5 are "out of bounds" in TW06.
+  TW2003 Xbox prototypes (Sep 3 / Sep 12 2002): release builds, every file scanned, no symbols;
+  they gave EA's 2002 source tree (`Golf\AI\Swing.c`, `Legacy\SPECIF\UStream.c`, ...).
+  A checklist for using these references on every new area is in `tw2004-notes.md`,
+  "Starting a new area: check the references first".
+- Numbers at the end of the day: **26.06% code, 3,714 of 7,647 functions**; EA 14.4%, SDK 82.6%.
 - **Next:**
-  1. More m2c sweep: larger sizes (256, 512 bytes), and a second pass over the 1,060 m2c units
-     that compiled but were not exact (common fixes: signed/unsigned compares, `u8` vs `s32`
-     returns, argument counts of pass-through calls).
-  2. Literal-pool functions (float constants, strings) are still excluded; they need the unit to
-     own its `.sdata2`/`.rodata` range, which means proper file boundaries.
-  3. `Ball.c` last five (see the checkpoint entries above); caveat for sweep units: pass-through
-     wrappers may take parameters the C does not show (the code is the same either way).
+  1. **Golfer and Swing structs from TW06** (next up): follow the checklist; TW06 types for the
+     golfer, swing states and shot data should name most of `Golfer.c`/`Swing.c`'s `nXX`/`fXX`
+     fields. Then re-run the name matcher.
+  2. More m2c/repair passes as new seeds and names arrive; literal-pool functions still need
+     units that own their `.sdata2`/`.rodata`.
+  3. `Ball.c` last five; the 57 medium TW06 names as their areas come up.
   Scratch tools added this round (`C:\dev\scratch\tw\`): `dolread.py` (read main.dol by
   address), `grepfn.py` (asm grep with enclosing function), `unitfns.py <unit>` (non-exact
   functions of a unit), `insert_fns.py <module.py> <File.c>` (insert CODE dict at address
