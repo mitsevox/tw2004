@@ -51,9 +51,6 @@ u8    fn_800BB1F8(int nPlayer);
 int   GM_vGetAllTimeRecordsHeld(SaveProfile* pProfile);
 f32   GM_GetBonusProgress(SaveProfile* pProfile);
 
-extern s32 lbl_80189528[14];
-extern s32 lbl_801894D0[6];
-
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
 // 1.0f (0x802845C0), before every constant the functions below use first (only the progress
 // counters near the end load it); its body is unknown.

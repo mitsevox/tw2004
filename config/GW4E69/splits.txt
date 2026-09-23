@@ -1942,11 +1942,11 @@ unsorted/sweep_80092C38.c:
 	.text       start:0x80092C38 end:0x80092CE8
 
 uiTransform.c:
-	.text       start:0x80092F8C end:0x8009349C
+	.text       start:0x80092CE8 end:0x80093524
+	.data       start:0x80189CA0 end:0x80189CB0
+	.bss        start:0x801D91F0 end:0x801D9278
+	.sbss       start:0x80281F38 end:0x80281F40
 	.sdata2     start:0x80283C20 end:0x80283C40
-
-unsorted/sweep_800934F8.c:
-	.text       start:0x800934F8 end:0x80093524
 
 unsorted/sweep_80093824.c:
 	.text       start:0x80093824 end:0x80093854
