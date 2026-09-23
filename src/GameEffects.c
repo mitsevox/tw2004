@@ -184,10 +184,10 @@ inline int GE_CurrentTarget(int nPlayer) {
     return fn_800F1D34(nPlayer);
 }
 
-// TW06: GameEffects_CheckScriptedGB (by position). A scripted GameBreaker for a record chance:
-// reason 12 while the round can still beat the course record, reason 15 when the drive beats the
-// longest-drive record (the record is in feet). Only for a human, one view, not in a replay, and
-// only with the game's GameBreaker option on.
+// TW06: GameEffects_ScriptedGameBreakerTrigger (by position; the same player and reason arguments).
+// A scripted GameBreaker for a record chance: reason 12 while the round can still beat the course
+// record, reason 15 when the drive beats the longest-drive record (the record is in feet). Only for
+// a human, one view, not in a replay, and only with the game's GameBreaker option on.
 void fn_800DB30C(int nPlayer, int nReason) {
     if ((!(gSession.uFlags & 0x4000) || !(gSession.uFlags & 0x8000)) && !gSession.bReplay &&
         !gSession.nSplitScreen && !gSession.a8[0]) {
@@ -256,9 +256,10 @@ void fn_800DB4E8(int nPlayer) {
     }
 }
 
-// TW06: GameEffects_IsGBPossible (by position). Whether this lie is worth a GameBreaker: on the
-// green putting for two under par or better, or one of the other big-putt checks, or a birdie or
-// eagle putt (by the score after a tap-in).
+// No TW06 name settled (by position it falls among ScriptedGameBreakerBallHitTrigger and
+// IsScriptedGameBreaker). Whether this lie is worth a GameBreaker: on the green putting for two
+// under par or better, or one of the other big-putt checks, or a birdie or eagle putt (by the score
+// after a tap-in).
 int fn_800DB86C(int nPlayer) {
     int bPossible = 0;
     int nPar;
@@ -324,9 +325,10 @@ void fn_800DB714(int nPlayer) {
     }
 }
 
-// TW06: GameEffects_StartPredictedGB (by position). The look-ahead ball says the shot drops: a
-// predicted GameBreaker starts, for a human's shot that went far enough (1 with the putter, 10 for
-// a chip, 5 otherwise), with its own camera; a golfer mid-swing may get a reaction animation.
+// TW06: GameEffects_InFlightGameBreakerTrigger (by position). The look-ahead ball says the shot
+// drops: a predicted GameBreaker starts, for a human's shot that went far enough (1 with the
+// putter, 10 for a chip, 5 otherwise), with its own camera; a golfer mid-swing may get a reaction
+// animation.
 void fn_800DBA50(int nPlayer) {
     int nClass;
     int nLie;
@@ -405,8 +407,8 @@ void fn_800DBA50(int nPlayer) {
     }
 }
 
-// TW06: GameEffects_EndGB (by position). The letterbox starts closing, with the end event; the
-// GameBreaker music stops, or (a scripted one that failed) the old music comes back.
+// TW06: GameEffects_EndGameBreaker (by position). The letterbox starts closing, with the end event;
+// the GameBreaker music stops, or (a scripted one that failed) the old music comes back.
 void fn_800DBDA8(int nPlayer) {
     if (lbl_80202898.bGameBreaker) {
         lbl_80202898.bClosing = 1;

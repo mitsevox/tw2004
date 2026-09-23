@@ -203,7 +203,7 @@ s32 fn_800E84B0(int nPlayer) {
     return nBest;
 }
 
-// TW06: GameModeBestBall::GetPlayerTeam.
+// A player's team (TW06 has this as GameModeFourBall::GetPlayerTeam; its best ball mode has none).
 int fn_800E8848(int nPlayer) {
     return nPlayer / 2;
 }
@@ -228,7 +228,7 @@ u8 fn_800E88A8(u8 bCheck) {
     return 1;
 }
 
-// TW06: GameModeBestBall::GoToPlayoff (never).
+// GoToPlayoff: never (TW06's GameModeBestBall does not override GameModeBase::GoToPlayoff).
 u8 fn_800E8904(u8 bCheck) {
     return 0;
 }
