@@ -221,7 +221,7 @@ void AI_ChooseTarget(int nPlayer) {
     // Already closer to the pin than the chosen point: aim normally instead.
     fDZ = p->fBallZ - pCourse->pin[nHole].z;
     fDX = p->fBallX - pCourse->pin[nHole].x;
-    if (fDX * fDX + fDZ * fDZ < fBestDist2 && !(gpGame->unk14 == 3 && fn_80015464() == 17)) {
+    if (fDX * fDX + fDZ * fDZ < fBestDist2 && !(gpGame->nCurCourse == 3 && fn_80015464() == 17)) {
         AI_DefaultTarget(nPlayer);
         return;
     }

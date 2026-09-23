@@ -4,11 +4,193 @@
 #include "golfer.h"
 
 void fn_800E19A4(int nPlayer, int nHoles);
+void fn_800E1434(void);
+void fn_800E1480(int nHole);
 int  fn_800E1CE8(int a, int b);
 u8   fn_800588F4(u8* pProfile, int a, int i);
 
+void  fn_800D8D5C(int nPlayer, int a);
+void  fn_800E2470(void);
+void  fn_800E30D4(void);
+void  fn_800E2FD8(void);
+void  fn_800E3050(void);
+int   fn_800D2AD8(int nHole);               // a hole's par
+u8    fn_800EE470(void);
+int   fn_8011937C(int nPlayer, int a, u8 b);
+
 extern u8* gpSaveData;
 extern u8  lbl_8028227C;
+
+// out = a - b (four floats)
+asm void fn_800E0AF0(register f32* pA, register f32* pB, register f32* pOut) {
+    nofralloc
+    psq_l  f0, 0(pA), 0, 0
+    psq_l  f1, 8(pA), 0, 0
+    psq_l  f2, 0(pB), 0, 0
+    psq_l  f3, 8(pB), 0, 0
+    ps_sub f2, f0, f2
+    ps_sub f3, f1, f3
+    psq_st f2, 0(pOut), 0, 0
+    psq_st f3, 8(pOut), 0, 0
+    blr
+}
+
+// out = a - b (three floats)
+asm void fn_800E0B14(register f32* pA, register f32* pB, register f32* pOut) {
+    nofralloc
+    psq_l  f0, 0(pA), 0, 0
+    psq_l  f1, 8(pA), 1, 0
+    psq_l  f2, 0(pB), 0, 0
+    psq_l  f3, 8(pB), 1, 0
+    ps_sub f2, f0, f2
+    ps_sub f3, f1, f3
+    psq_st f2, 0(pOut), 0, 0
+    psq_st f3, 8(pOut), 1, 0
+    blr
+}
+
+// Clears one player's record of one hole: strokes, putts, points and the rest.
+void fn_800E1018(int nPlayer, int nHole) {
+    gPlayers[nPlayer].nStrokes[nHole] = 0;
+    gPlayers[nPlayer].nPutts[nHole] = 0;
+    gPlayers[nPlayer].nModePoints[nHole] = 0;
+    gPlayers[nPlayer].n22C[nHole] = 0;
+    gPlayers[nPlayer].n290[nHole] = 0;
+    gPlayers[nPlayer].b2F6[nHole] = 0;
+    gPlayers[nPlayer].b2E4[nHole] = 0;
+    gpGame->b16C[nPlayer][nHole] = 0;
+    gPlayers[nPlayer].nD28[nHole] = 0;
+    gPlayers[nPlayer].nD70[nHole] = 0;
+}
+
+// A new round: every player's holes and round totals cleared, the pin for every hole set from
+// the session's pin option (-1 = the first pin), and the first hole chosen.
+void fn_800E1074(void) {
+    int     j;
+    int     i;
+    Player* p;
+    for (i = 0; i < 5; i++) {
+        for (j = 0; j < 18; j++) {
+            fn_800E1018(i, j);
+        }
+        p = (Player*)((u8*)gPlayers + i * sizeof(Player));
+        for (j = 0; j < 4; j++) {
+            p->nRoundScore[j] = 0;
+        }
+        p->unk28C = 0;
+        p->nHolesWon = 0;
+        p->n274 = 0;
+        p->n2D8 = 0;
+        p->n2DC = 0;
+        p->n2E0 = 0;
+        p->n308 = 0;
+        p->nC44 = 3000;
+        p->nC3C = 0;
+        p->nC4C = 0;
+        p->nC48 = 0;
+        for (j = 0; j < 18; j++) {
+            p->nC6C[j] = 0;
+        }
+        fn_800D8D5C(i, 0);
+        if (gpSaveData[p->nIndex * 0x10600] != 0) {
+            gpSaveData[p->nIndex * 0x10600 + 0x70] = 0;
+        }
+    }
+    for (i = 0; i < 18; i++) {
+        if (gSession.unk5B38 == -1) {
+            gpGame->holeOrder[i] = 0;
+        } else {
+            gpGame->holeOrder[i] = gSession.unk5B38;
+        }
+    }
+    fn_800E2470();
+    gpGame->nE0 = 1;
+    gpGame->bD5 = 0;
+}
+
+// Adds a hole to the round and moves to the round's first hole.
+void fn_800E1404(int nHole) {
+    gpGame->bHoleSelected[nHole] = 1;
+    fn_800E1434();
+}
+
+// Moves to the round's first hole.
+void fn_800E1434(void) {
+    int i;
+    for (i = 0; i < 18; i++) {
+        if (gpGame->bHoleSelected[i]) {
+            fn_800E1480(i);
+            return;
+        }
+    }
+}
+
+// Makes a hole of the round the current one: its number, and its course when the round mixes
+// courses.
+void fn_800E1480(int nHole) {
+    gpGame->nCurHole = nHole;
+    gpGame->nCurHoleNum = gpGame->nHoleNum[nHole];
+    if (gpGame->b136 || gpGame->b137 || gpGame->b139 || gpGame->b138) {
+        gpGame->nCurCourse = gpGame->nHoleCourse[nHole];
+    }
+}
+
+// Sets the round's course. 23, 22 and 24..29 are the mixed rounds (built by fn_800E30D4,
+// fn_800E2FD8 and fn_800E3050); any other value is one course's holes 1..18.
+void fn_800E14E0(int nCourse) {
+    int i;
+    if (nCourse == 23) {
+        fn_800E30D4();
+        gpGame->b137 = 1;
+        return;
+    }
+    gpGame->b137 = 0;
+    if (nCourse == 22) {
+        gpGame->b138 = 1;
+        fn_800E2FD8();
+        gpGame->nCurCourse = gpGame->nHoleCourse[gpGame->nCurHole];
+        return;
+    }
+    gpGame->b138 = 0;
+    if (nCourse >= 24 && nCourse < 30) {
+        gpGame->b139 = nCourse - 23;
+        fn_800E3050();
+        gpGame->nCurCourse = gpGame->nHoleCourse[gpGame->nCurHole];
+    } else {
+        gpGame->b139 = 0;
+        gpGame->nCurCourse = nCourse;
+    }
+    if (!gpGame->b136 && !gpGame->b137 && !gpGame->b138 && !gpGame->b139) {
+        for (i = 0; i < 18; i++) {
+            gpGame->nHoleCourse[i] = nCourse;
+        }
+        for (i = 0; i < 18; i++) {
+            gpGame->nHoleNum[i] = i;
+        }
+    }
+}
+
+// The round's next hole after the current one, or -1.
+int fn_800E16F4(void) {
+    int i;
+    for (i = gpGame->nCurHole + 1; i < 18; i++) {
+        if (gpGame->bHoleSelected[i]) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+// Whether the current hole is the round's first.
+u8 fn_800E1734(void) {
+    int i;
+    for (i = 0; i < 18; i++) {
+        if (gpGame->bHoleSelected[i]) {
+            return i == gpGame->nCurHole;
+        }
+    }
+    return 0;
+}
 
 // The mode's mulligan rule: 0 none, 2 one per player per round.
 int fn_800E177C(void) {
@@ -17,6 +199,49 @@ int fn_800E177C(void) {
 
 void fn_800E1788(int nPlayer) {
     fn_800E19A4(nPlayer, 18);
+}
+
+// A player's total strokes for the round.
+int fn_800E17AC(int nPlayer) {
+    int i;
+    int n = 0;
+    for (i = 0; i < 18; i++) {
+        n += gPlayers[nPlayer].nStrokes[i];
+    }
+    return n;
+}
+
+// Strokes against par over the holes played so far (and the current one, when asked and the
+// ball is in the hole).
+int fn_800E184C(int nPlayer, u8 bCurrent) {
+    int nPar = 0;
+    int nStrokes = 0;
+    int i;
+    int nEnd = gpGame->nCurHole;
+    if (bCurrent && gPlayers[nPlayer].nLie == LIE_HOLED && nEnd < 18) {
+        nEnd++;
+    }
+    for (i = 0; i < nEnd; i++) {
+        if (gpGame->bHoleSelected[i]) {
+            nPar += fn_800D2AD8(i);
+            nStrokes += gPlayers[nPlayer].nStrokes[i];
+        }
+    }
+    return nStrokes - nPar;
+}
+
+// The score shown for a player: the online game's, the mode's own total, or strokes against par.
+int fn_800E1904(int nPlayer, u8 bCurrent) {
+    if (fn_800EE470()) {
+        return fn_8011937C(nPlayer, 0, bCurrent);
+    }
+    if (gpGame->bD4) {
+        return gPlayers[nPlayer].n2D8;
+    }
+    if (gpGame->nDC < gpGame->nE0) {
+        return fn_800E184C(nPlayer, bCurrent);
+    }
+    return 0;
 }
 
 int fn_800E22E4(int nSlot, int a, int b) {

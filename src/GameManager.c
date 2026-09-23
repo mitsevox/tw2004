@@ -1359,27 +1359,27 @@ void GM_CheckControllerPulled(void) {
     }
 }
 
-// A course record in the save data (0x70 bytes; the rest unknown).
-typedef struct SavedCourse {
+// A saved custom round (0x70 bytes): 18 holes, each a hole number and the course it is from.
+typedef struct SavedRound {
     u8   unk0[2];
-    u8   nPar[18];              // 0x02  signed values
-    s32  nYards[18];            // 0x14
+    s8   nHoleNum[18];          // 0x02
+    s32  nCourse[18];           // 0x14
     u8   unk5C[0x70 - 0x5C];
-} SavedCourse;
+} SavedRound;
 
 typedef struct SaveSlot {
-    u8          unk0[0x5244];
-    SavedCourse course[1];      // 0x5244
-    u8          unk52B4[0x10600 - 0x52B4];
+    u8         unk0[0x5244];
+    SavedRound round[1];        // 0x5244
+    u8         unk52B4[0x10600 - 0x52B4];
 } SaveSlot;
 
-// Copies a course's pars and yardages from the save data into the game state (a created or
-// saved course: slot nSaveSlot, record nSaveCourse).
-void fn_800DFC6C(void) {
+// TW06: GM_SetupCustomHoleSelection. Loads a saved custom round (slot nSaveSlot, record
+// nSaveCourse) into the round's hole list.
+void GM_SetupCustomHoleSelection(void) {
     int i;
     for (i = 0; i < 18; i++) {
-        gpGame->nHolePar[i] = (s8)((SaveSlot*)gpSaveData)[gpGame->nSaveSlot].course[gpGame->nSaveCourse].nPar[i];
-        gpGame->nHoleYards[i] = ((SaveSlot*)gpSaveData)[gpGame->nSaveSlot].course[gpGame->nSaveCourse].nYards[i];
+        gpGame->nHoleNum[i] = ((SaveSlot*)gpSaveData)[gpGame->nSaveSlot].round[gpGame->nSaveCourse].nHoleNum[i];
+        gpGame->nHoleCourse[i] = ((SaveSlot*)gpSaveData)[gpGame->nSaveSlot].round[gpGame->nSaveCourse].nCourse[i];
     }
 }
 

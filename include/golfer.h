@@ -216,11 +216,20 @@ typedef struct Player {
     s32  nStrokes[18];          // 0x154  strokes taken per hole
     s32  nPutts[18];            // 0x19C  putts per hole (GM_PlayerAddStroke). TW06: putts
     s32  nModePoints[18];       // 0x1E4  per hole, the mode's points (match play: 1 = hole won). TW06: modepoints
-    u8   unk22C[0x278 - 0x22C]; // 0x22C  TW06: skinwin[18], skinwins (0x274)
+    s32  n22C[18];              // 0x22C  per hole. TW06: skinwin
+    s32  n274;                  // 0x274  TW06: skinwins
     s32  nHolesWon;             // 0x278  match play. TW06: matchwins
-    u8   unk27C[0x28C - 0x27C]; // 0x27C  TW06: roundscore[4]
+    s32  nRoundScore[4];        // 0x27C  TW06: roundscore
     u8   unk28C;                // 0x28C  TW06: playercut
-    u8   unk28D[0x30E - 0x28D];
+    u8   unk28D[3];
+    s32  n290[18];              // 0x290  per hole
+    s32  n2D8;                  // 0x2D8
+    s32  n2DC;                  // 0x2DC
+    s32  n2E0;                  // 0x2E0
+    u8   b2E4[18];              // 0x2E4  per hole
+    u8   b2F6[18];              // 0x2F6  per hole
+    s32  n308;                  // 0x308
+    u8   unk30C[2];
     u8   b30E;                  // 0x30E  a replaced ball must be dropped (GM_ReplaceOOBBall)
     u8   unk30F[0x354 - 0x30F];
     // Shot block, TW06 AIshot_t (which has 6 preferred clubs where we have 8).
@@ -278,9 +287,20 @@ typedef struct Player {
     u8   unkC2E;                // 0xC2E
     u8   unkC2F;
     s32  nRehearseState;        // 0xC30  AI_RehearseShot state machine
-    u8   unkC34[0xC58 - 0xC34];
+    u8   unkC34[0xC3C - 0xC34];
+    s32  nC3C;                  // 0xC3C
+    s32  nC40;                  // 0xC40
+    s32  nC44;                  // 0xC44  3000 at the start of a round
+    s32  nC48;                  // 0xC48
+    s32  nC4C;                  // 0xC4C
+    u8   unkC50[0xC58 - 0xC50];
     s32  nC58;                  // 0xC58
-    u8   unkC5C[0xEE0 - 0xC5C];
+    u8   unkC5C[0xC6C - 0xC5C];
+    s32  nC6C[18];              // 0xC6C  cleared at the start of a round
+    u8   unkCB4[0xD28 - 0xCB4];
+    s32  nD28[18];              // 0xD28  per hole
+    s32  nD70[18];              // 0xD70  per hole
+    u8   unkDB8[0xEE0 - 0xDB8];
     u8   bEE0;                  // 0xEE0
     u8   unkEE1[3];
     s32  nEE4;                  // 0xEE4  2 or 3 picks a message after a shot (GM_PlayerTookShot)
@@ -359,26 +379,35 @@ typedef struct GameState {
     u8   unk4[4];
     s32  nMulligans;            // 0x008  0 none, 2 one per player per round (GM_PlayerTakeMulligan)
     u8   unkC[0x14 - 0xC];
-    s32  unk14;                 // 0x014
-    s32  nHoleYards[18];        // 0x018  from the save data's course (fn_800DFC6C)
-    s32  n60;                   // 0x060
-    s32  nCurHole;              // 0x064  index into holeOrder
-    s32  nHolePar[18];          // 0x068
+    s32  nCurCourse;            // 0x014  the course of the current hole
+    s32  nHoleCourse[18];       // 0x018  the round's 18 holes: which course each comes from
+    s32  nCurHoleNum;           // 0x060  the current hole's number on its course
+    s32  nCurHole;              // 0x064  0..17 in the round
+    s32  nHoleNum[18];          // 0x068  and which hole of that course (a custom round mixes courses)
     u8   bHoleSelected[18];     // 0x0B0  holes this round plays (GM_GotoNextSelectedHole)
     u8   unkC2[0xD4 - 0xC2];
     u8   bD4;                   // 0x0D4
-    u8   unkD5[0xE4 - 0xD5];
+    u8   bD5;                   // 0x0D5
+    u8   unkD6[2];
+    s32  nD8;                   // 0x0D8
+    s32  nDC;                   // 0x0DC
+    s32  nE0;                   // 0x0E0
     s32  holeOrder[18];         // 0x0E4
     s32  n12C;                  // 0x12C
     u8   unk130[4];
     u8   b134;                  // 0x134  cleared at the start of a hole
     u8   b135;                  // 0x135  set by fn_800E0A84
-    u8   unk136[0x13C - 0x136];
-    s32  nSaveSlot;             // 0x13C  the save slot (0x10600 bytes each) the course comes from
-    s32  nSaveCourse;           // 0x140  the course record in it (0x70 bytes each)
+    u8   b136;                  // 0x136  the holes are not one course's 1..18 (four kinds, 0x136..0x139)
+    u8   b137;                  // 0x137
+    u8   b138;                  // 0x138
+    u8   b139;                  // 0x139  1..6
+    u8   unk13A[2];
+    s32  nSaveSlot;             // 0x13C  the save slot (0x10600 bytes each) of a custom round
+    s32  nSaveCourse;           // 0x140  the custom round in it (0x70 bytes each)
     s32  n144[5];               // 0x144  per player, cleared at the start of a hole
     s32  n158[5];               // 0x158  per player, cleared at the start of a hole
-    u8   unk16C[0x1CC - 0x16C];
+    u8   b16C[5][18];           // 0x16C  per player and hole, cleared with the hole's score
+    u8   unk1C6[0x1CC - 0x1C6];
     void (*pfn1CC)(void);       // 0x1CC
     u8   unk1D0[4];
     s32  (*pfn1D4)(int a);      // 0x1D4
