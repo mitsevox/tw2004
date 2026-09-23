@@ -3597,7 +3597,6 @@ void STATEFUNC_PreShotInit(int nPlayer) {
 }
 
 void  Character_GetBallOnFingerPosition(int nHandle, f32* pPos);
-u8    fn_80063C7C(View* pView);
 void  fn_800A3CB0(f32* pPos, int nPlayer);
 void  fn_800A3D6C(f32* pPos, int nPlayer);
 void  fn_800A3DF4(int nPlayer);
