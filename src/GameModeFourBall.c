@@ -166,6 +166,7 @@ void fn_800E90FC(void) {
 // green first) whose team is still playing.
 s32 fn_800E9178(int nPlayer) {
     TeeOrder order;
+    s32* pOrder;        // fake match: the within-team compare reads order.a through a pointer
     int w;
     int t;
     int i;
@@ -180,6 +181,7 @@ s32 fn_800E9178(int nPlayer) {
     f32 d;
     nLead = 0;
     order = lbl_80184DC0;
+    pOrder = order.a;
     for (h = 0; h < Game_CurHoleIndex(); h++) {
         if (gpGame->bHoleSelected[h]) {
             if (gPlayers[0].nModePoints[h] != 0) {
@@ -198,7 +200,7 @@ s32 fn_800E9178(int nPlayer) {
                 order.a[1] = order.a[3];
                 order.a[3] = t;
             }
-            if (gPlayers[order.a[1]].nStrokes[h] < gPlayers[order.a[0]].nStrokes[h]) {
+            if (gPlayers[order.a[1]].nStrokes[h] < gPlayers[pOrder[0]].nStrokes[h]) {
                 t = order.a[0];
                 order.a[0] = order.a[1];
                 order.a[1] = t;
