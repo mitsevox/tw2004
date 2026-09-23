@@ -29,6 +29,7 @@ typedef struct AXVPB {
 
 int    OSDisableInterrupts(void);       // returns whether interrupts were on
 int    OSRestoreInterrupts(int bEnabled);
+void   DCFlushRange(void* p, u32 uLen);         // write the CPU cache back and drop it
 void   DCStoreRange(void* p, u32 uLen);         // write the CPU cache back to memory
 void   DCInvalidateRange(void* p, u32 uLen);    // drop the CPU cache over a range
 AXVPB* AXAcquireVoice(u32 uPriority, void (*pfnDropped)(void* pVpb), u32 uUser);
