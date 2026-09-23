@@ -76,7 +76,7 @@ void     fn_8000923C(f32* pRot, f32* pQuat);            // a rotation vector (ax
 void     fn_800090E4(f32* pQuat, f32* pIn, f32* pOut);  // rotate a vector by a quaternion
 f32      fn_8005C280(int nPlayer);                      // Swing.c: the swing's fNonPowerShotPower
 void     Swing_RumbleOff(int nPlayer);                  // Swing.c
-u8       fn_8006BEA4(void);                             // the GameBreaker letterbox is up, scripted (nGBType 0)
+u8       fn_8006BEA4(void);                             // the GameBreaker letterbox is up, scripted
 void     fn_800A68C0(u8 nPlayer);
 u8       CameraScript_IsDefaultSwingCam(CamShot* pShot, int nPlayer, f32* pCam);
 u8       fn_8003D7A0(CamSequence* pSequence, int nPlayer);
@@ -2074,7 +2074,8 @@ void fn_800C4FF0(View* pView, f32* pFrom, f32* pTo, int nPlayer) {
     lbl_80282220->shot6C.f68 = 0.2f;
     lbl_80282220->shot6C.f6C = 20.0f;
     fChange = fn_800DC3A4();
-    lbl_80282220->shot6C.f78 = fn_80014278(fn_80008370(fn_80016CFC(gPlayers[nPlayer].nView[0])->pCamera)) - fChange;
+    lbl_80282220->shot6C.f78 =
+        fn_80014278(fn_80008370(fn_80016CFC(gPlayers[nPlayer].nView[0])->pCamera)) - fChange;
     lbl_80282220->shot6C.f7C = lbl_80282220->shot6C.f78;
     lbl_80282220->shot6C.f80 = 0.0f;
     lbl_80282220->shot6C.f4C = 1.0f;
