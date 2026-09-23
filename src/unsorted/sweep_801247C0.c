@@ -1,0 +1,14 @@
+// Small functions found by the sweep (sweep.py). Original file and meanings unknown.
+
+#include "game_types.h"
+
+s32 fn_8007018C(s32, s32);
+
+void fn_801247C0(void* arg0, void* arg1);
+void fn_801247C0(void* arg0, void* arg1) {
+    if (arg1 != NULL) {
+        (*(s32*)((u8*)(arg0) + 4)) = fn_8007018C((*(s32*)((u8*)(arg1) + 0)), (*(s32*)((u8*)(arg1) + 4)));
+        return;
+    }
+    (*(s32*)((u8*)(arg0) + 4)) = fn_8007018C(0x32, 1);
+}
