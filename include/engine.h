@@ -42,18 +42,55 @@ double fn_8015F824(double x, double y); // pow
 f32  fn_800BB028(f32* pA, f32* pB);     // squared distance
 void vec4flt_CrossProduct(f32* pA, f32* pB, f32* pOut);   // cross product
 
+// ---- textures --------------------------------------------------------------------------------
+
+// A texture in a bank (0x50 bytes; the bank's p8 is an array of them). Only what the game code reads.
+typedef struct TexEntry {
+    u8   unk0[8];
+    u32  uPixels;               // 0x08  where its pixels start in the bank's p18
+    u8   unkC[0x3C - 0xC];
+    s16  nPalette;              // 0x3C  its row in the bank's pC
+    u8   unk3E[0x50 - 0x3E];
+} TexEntry;
+LAYOUT_ASSERT(TexEntry, 0x50);
+
+// A row of a bank's palette table (12 bytes).
+typedef struct TexPalette {
+    u32  uColors;               // 0x0  where its colours start in the bank's p20
+    u8   unk4[0xC - 0x4];
+} TexPalette;
+LAYOUT_ASSERT(TexPalette, 0xC);
+
+// A loaded texture bank (up to 200, listed at lbl_801A26DC). Only what the game code reads.
+typedef struct TexBank {
+    u8   unk0[8];
+    TexEntry*   p8;             // 0x08  its textures
+    TexPalette* pC;             // 0x0C  its palettes
+    u8   unk10[0x18 - 0x10];
+    u8*  p18;                   // 0x18  the pixel data
+    u8   unk1C[0x20 - 0x1C];
+    u8*  p20;                   // 0x20  the palette data
+    u32  u24;                   // 0x24  the size of one palette (FE_LogoDesign copies this much)
+} TexBank;
+
+u64  fn_8000BEE4(char* pName);          // a name's 64-bit hash
+// Find a loaded texture by its name's hash: its bank and entry (both NULL if none).
+int  fn_800102DC(u64 uHash, TexBank** ppBank, TexEntry** ppTex);
+
 // ---- the renderer ----------------------------------------------------------------------------
 
 // The renderer's state (lbl_801B8980, 0x118 bytes); only what the game code writes.
 typedef struct RenderState {
     u8   unk0[0x100];
-    s32  n100;                  // 0x100  } the two textures of the next draw (fn_8005CC64: the swing
-    s32  n104;                  // 0x104  } trail's)
+    TexBank*  p100;             // 0x100  } the texture of the next draw (fn_8005CC64: the swing
+    TexEntry* p104;             // 0x104  } trail's, the logo editor's)
     u8   unk108[0x114 - 0x108];
-    u32  uFlags;                // 0x114  bit 1: n100/n104 are set
+    u32  uFlags;                // 0x114  bit 1: p100/p104 are set
 } RenderState;
 
 extern RenderState lbl_801B8980;
+
+void fn_8005CC64(TexBank* pBank, TexEntry* pTex);  // set the texture of the next draw
 
 // ---- the file streamer (UStream.c) -----------------------------------------------------------
 
