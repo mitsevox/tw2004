@@ -40,7 +40,6 @@ void  fn_800BB0A8(void);
 void  fn_800335F8(int a);
 void  fn_8006C4C0(int nPlayer);
 
-
 u8    GM_bIsZoomButtonPressed(int nPlayer);
 u8    GM_bIsElevatorCamButtonPressed(int nPlayer);
 u8    fn_800E012C(int nPlayer);
