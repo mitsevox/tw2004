@@ -1,7 +1,8 @@
-// Earnings.c (TW06's earnings.c): the money and goals kept in the save profiles. It loads the
-// prize table (stream 'ERN '), rounds payouts to $25, pays the tournament and match prizes, scales
-// a payout by the bonus, course, tee, pin and TOUR card multipliers, checks the goals that unlock
-// things, and keeps the saved replays. The GM_Earnings_ functions of TW06 come in the same order.
+// Earnings.c (EA's name, from the TW2003 source tree: Golf/GameMode/Earnings.c): the money and
+// goals kept in the save profiles. It loads the prize table (stream 'ERN '), rounds payouts to $25,
+// pays the tournament and match prizes, scales a payout by the bonus, course, tee, pin and TOUR
+// card multipliers, checks the goals that unlock things, and keeps the saved replays. The
+// GM_Earnings_ functions of TW06 come in the same order.
 
 #include "golfer.h"
 #include "game.h"
@@ -84,12 +85,13 @@ s32 fn_800D33A8(s32 nMoney) {
 void fn_800D33F0(void) {
 }
 
-// TW06: GM_Earnings_RegisterStreamClients. The prize table comes from the stream.
+// TW06: EarningsInfo::RegisterStreamClients (TW06 made it a class method). The prize table comes
+// from the stream.
 void fn_800D33F4(void) {
     UStream_RegisterHandler('ERN ', fn_800D344C);
 }
 
-// TW06: GM_Earnings_UnRegisterStreamClients.
+// TW06: EarningsInfo::UnRegisterStreamClients.
 void fn_800D3424(void) {
     UStream_UnregisterHandler('ERN ');
 }
@@ -340,8 +342,8 @@ u8 fn_800D69B8(int nPlayer, u8 bCheck) {
 // course, the tees played and the hole's gpGame->nPinSet value (each flag switches one on).
 // Each part is rounded to $25 by itself; the total is at least 0.
 s32 fn_800D6A70(s32 nPoints, int nPlayer, u8 bCourse, u8 bTee, u8 bHole, CourseMoneyTracking* pMoney) {
-    f32 fCourseBonus;
-    f32 fTeeBonus;
+    f32 fCourseBonus;           // fake match: whole dollars kept as floats and added as floats, as
+    f32 fTeeBonus;              // the original does (s32 locals with float casts: 87%)
     f32 fHoleBonus;
     f32 fCourse;
     f32 fTee;
