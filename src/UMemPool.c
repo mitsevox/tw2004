@@ -7,28 +7,220 @@
 
 f32* lbl_80281BD8;                      // the log2 table: 1024 entries over the mantissa of [1, 2)
 
+int  fn_8000A818(f32 (*pA)[4], f32 (*pB)[4]);
+void fn_8000AD34(f32* pA, f32* pB);
+void fn_8000ADC0(f32 (*pDst)[4]);
+void fn_8000AE0C(f32* pSrc, f32* pDst);
+void fn_8000AE28(f32* pIn, f32 fScale, f32* pOut);
+void fn_8000AE6C(f32* pA, f32* pB, f32 fScale, f32* pOut);
 void fn_8000AE9C(void);
+void fn_800BADB4(f32 (*pMtx)[4], f32* pIn, f32* pOut);     // a vector through a matrix
 
-// ---- sweep code (not yet cleaned up) ----
-
-void Vec_Copy();
-void fn_8000A0E8(u8* p0, u8* p1);
-void fn_8000A144(u8* p0, u8* p1);
-
-void fn_8000A0E8(u8* p0, u8* p1) {
-    Vec_Copy();
-    Vec_Copy((p0 + 0x10), (p1 + 0x10));
-    Vec_Copy((p0 + 0x20), (p1 + 0x20));
-    Vec_Copy((p0 + 0x30), (p1 + 0x30));
+// Copies a 4x4 matrix, one row at a time.
+void fn_8000A0E8(f32 (*pSrc)[4], f32 (*pDst)[4]) {
+    Vec_Copy(pSrc[0], pDst[0]);
+    Vec_Copy(pSrc[1], pDst[1]);
+    Vec_Copy(pSrc[2], pDst[2]);
+    Vec_Copy(pSrc[3], pDst[3]);
 }
 
-void fn_8000A144(u8* p0, u8* p1) {
-    Vec_Copy();
-    Vec_Copy((p0 + 0x10), (p1 + 0x10));
-    Vec_Copy((p0 + 0x20), (p1 + 0x20));
+// Copies the first three rows of a 4x4 matrix.
+void fn_8000A144(f32 (*pSrc)[4], f32 (*pDst)[4]) {
+    Vec_Copy(pSrc[0], pDst[0]);
+    Vec_Copy(pSrc[1], pDst[1]);
+    Vec_Copy(pSrc[2], pDst[2]);
 }
 
-// ---- end of sweep code ----
+// Transposes the 3x3 part of a 4x4 matrix (pSrc and pDst may be the same matrix).
+void fn_8000A6C8(f32 (*pSrc)[4], f32 (*pDst)[4]) {
+    f32 f;
+
+    pDst[0][0] = pSrc[0][0];
+    pDst[1][1] = pSrc[1][1];
+    pDst[2][2] = pSrc[2][2];
+    f = pSrc[1][0];
+    pDst[1][0] = pSrc[0][1];
+    pDst[0][1] = f;
+    f = pSrc[2][0];
+    pDst[2][0] = pSrc[0][2];
+    pDst[0][2] = f;
+    f = pSrc[1][2];
+    pDst[1][2] = pSrc[2][1];
+    pDst[2][1] = f;
+}
+
+// Transposes a 4x4 matrix (pSrc and pDst may be the same matrix).
+void fn_8000A714(f32 (*pSrc)[4], f32 (*pDst)[4]) {
+    f32 f;
+
+    pDst[0][0] = pSrc[0][0];
+    pDst[1][1] = pSrc[1][1];
+    pDst[2][2] = pSrc[2][2];
+    pDst[3][3] = pSrc[3][3];
+    f = pSrc[1][0];
+    pDst[1][0] = pSrc[0][1];
+    pDst[0][1] = f;
+    f = pSrc[2][0];
+    pDst[2][0] = pSrc[0][2];
+    pDst[0][2] = f;
+    f = pSrc[3][0];
+    pDst[3][0] = pSrc[0][3];
+    pDst[0][3] = f;
+    f = pSrc[1][2];
+    pDst[1][2] = pSrc[2][1];
+    pDst[2][1] = f;
+    f = pSrc[1][3];
+    pDst[1][3] = pSrc[3][1];
+    pDst[3][1] = f;
+    f = pSrc[2][3];
+    pDst[2][3] = pSrc[3][2];
+    pDst[3][2] = f;
+}
+
+// Inverts a rotation-and-translation matrix: the rotation transposed, and the translation
+// turned back through it and negated.
+void fn_8000A798(f32 (*pSrc)[4], f32 (*pDst)[4]) {
+    f32 aTurned[4];
+    f32 aPos[4];
+
+    Vec_Copy(pSrc[3], aPos);
+    pDst[0][3] = 0.0f;
+    pDst[1][3] = 0.0f;
+    pDst[2][3] = 0.0f;
+    pDst[3][3] = 1.0f;
+    fn_8000A6C8(pSrc, pDst);
+    fn_800BADB4(pDst, aPos, aTurned);
+    fn_8000AE0C(aTurned, pDst[3]);
+}
+
+// Gauss-Jordan elimination with full pivoting: pA is replaced by its inverse, and pB goes
+// through the same row steps (so an identity pB also comes out as the inverse). Returns 0, or
+// -1 / -2 when pA is singular.
+int fn_8000A818(f32 (*pA)[4], f32 (*pB)[4]) {
+    int anCol[4];
+    int anRow[4];
+    int anPivot[4];
+    int i;
+    int j;
+    int k;
+    int nCol;
+    int nRow;
+    f32 fBig;
+    f32 fPivInv;
+    f32 fDum;
+
+    for (j = 0; j < 4; j++) {
+        anPivot[j] = 0;
+    }
+    for (i = 0; i < 4; i++) {
+        fBig = 0.0f;
+        for (j = 0; j < 4; j++) {
+            if (anPivot[j] != 1) {
+                for (k = 0; k < 4; k++) {
+                    if (anPivot[k] == 0) {
+                        if (fabsf(pA[j][k]) >= fBig) {
+                            fBig = fabsf(pA[j][k]);
+                            nRow = j;
+                            nCol = k;
+                        }
+                    } else if (anPivot[k] > 1) {
+                        return -1;
+                    }
+                }
+            }
+        }
+        anPivot[nCol]++;
+        if (nRow != nCol) {
+            fn_8000AD34(pA[nRow], pA[nCol]);
+            fn_8000AD34(pB[nRow], pB[nCol]);
+        }
+        anRow[i] = nRow;
+        anCol[i] = nCol;
+        if (pA[nCol][nCol] == 0.0f) {
+            return -2;
+        }
+        fPivInv = 1.0f / pA[nCol][nCol];
+        pA[nCol][nCol] = 1.0f;
+        fn_8000AE28(pA[nCol], fPivInv, pA[nCol]);
+        fn_8000AE28(pB[nCol], fPivInv, pB[nCol]);
+        for (j = 0; j < 4; j++) {
+            if (j != nCol) {
+                fDum = -pA[j][nCol];
+                pA[j][nCol] = 0.0f;
+                fn_8000AE6C(pA[j], pA[nCol], fDum, pA[j]);
+                fn_8000AE6C(pB[j], pB[nCol], fDum, pB[j]);
+            }
+        }
+    }
+    // undo the column swaps, last first
+    for (j = 3; j >= 0; j--) {
+        if (anRow[j] != anCol[j]) {
+            for (k = 0; k < 4; k++) {
+                fDum = pA[k][anRow[j]];
+                pA[k][anRow[j]] = pA[k][anCol[j]];
+                pA[k][anCol[j]] = fDum;
+            }
+        }
+    }
+    return 0;
+}
+
+// Inverts a 4x4 matrix into pDst.
+void fn_8000AB40(f32 (*pSrc)[4], f32 (*pDst)[4]) {
+    f32 aIdentity[4][4];
+
+    fn_8000A0E8(pSrc, pDst);
+    fn_8000ADC0(aIdentity);
+    fn_8000A818(pDst, aIdentity);
+}
+
+// A 2D projection: the identity, scaled so fWidth by fHeight spans 2 units (-1 to 1).
+void fn_8000AB80(f32 (*pDst)[4], f32 fWidth, f32 fHeight) {
+    fn_8000ADC0(pDst);
+    pDst[0][0] = 2.0f / fWidth;
+    pDst[1][1] = 2.0f / fHeight;
+}
+
+// A perspective projection in the GameCube's layout (the rows are the columns of GX's
+// matrix): depth from fNear to fFar maps to -1..0, w = -z.
+void fn_8000ABE8(f32 (*pDst)[4], f32 fScale, f32 fScaleX, f32 fScaleY, f32 fNear, f32 fFar) {
+    pDst[0][0] = fScale * fScaleX;
+    pDst[1][0] = 0.0f;
+    pDst[2][0] = 0.0f;
+    pDst[3][0] = 0.0f;
+    pDst[0][1] = 0.0f;
+    pDst[1][1] = fScale * fScaleY;
+    pDst[2][1] = 0.0f;
+    pDst[3][1] = 0.0f;
+    pDst[0][2] = 0.0f;
+    pDst[1][2] = 0.0f;
+    pDst[2][2] = -fNear * (1.0f / (fFar - fNear));
+    pDst[3][2] = (1.0f / (fFar - fNear)) * -(fFar * fNear);
+    pDst[0][3] = 0.0f;
+    pDst[1][3] = 0.0f;
+    pDst[2][3] = -1.0f;
+    pDst[3][3] = 0.0f;
+}
+
+// A perspective projection with its x and y scales given: depth from fNear to fFar maps to
+// -1..0, w = -z.
+void fn_8000AC5C(f32 (*pDst)[4], f32 fScaleX, f32 fScaleY, f32 fNear, f32 fFar) {
+    fn_8000ADC0(pDst);
+    pDst[0][0] = fScaleX;
+    pDst[1][1] = fScaleY;
+    pDst[2][2] = -1.0f / (fFar - fNear);
+    pDst[3][2] = -(1.0f + fNear / (fFar - fNear));
+    pDst[2][3] = -1.0f;
+    pDst[3][3] = 0.0f;
+}
+
+// Copies a 4-float vector.
+void Vec_Copy(const f32* pSrc, f32* pDst) {
+    pDst[0] = pSrc[0];
+    pDst[1] = pSrc[1];
+    pDst[2] = pSrc[2];
+    pDst[3] = pSrc[3];
+}
 
 // Swaps two 4-float vectors.
 void fn_8000AD34(f32* pA, f32* pB) {
@@ -55,6 +247,119 @@ f32 fn_8000AD78(f32 y, f32 x) {
 f32 fabsf(f32 x) {
     return fabs(x);
 }
+
+// Sets a 4x4 matrix to the identity.
+void fn_8000ADC0(f32 (*pDst)[4]) {
+    pDst[0][0] = 1.0f;
+    pDst[0][1] = 0.0f;
+    pDst[0][2] = 0.0f;
+    pDst[0][3] = 0.0f;
+    pDst[1][0] = 0.0f;
+    pDst[1][1] = 1.0f;
+    pDst[1][2] = 0.0f;
+    pDst[1][3] = 0.0f;
+    pDst[2][0] = 0.0f;
+    pDst[2][1] = 0.0f;
+    pDst[2][2] = 1.0f;
+    pDst[2][3] = 0.0f;
+    pDst[3][0] = 0.0f;
+    pDst[3][1] = 0.0f;
+    pDst[3][2] = 0.0f;
+    pDst[3][3] = 1.0f;
+}
+
+// Negates a 3-float vector into pDst.
+#ifdef __MWERKS__
+asm void fn_8000AE0C(register f32* pSrc, register f32* pDst) {
+    nofralloc
+    psq_l  f0, 0(pSrc), 0, 0
+    psq_l  f1, 8(pSrc), 1, 0
+    ps_neg f0, f0
+    ps_neg f1, f1
+    psq_st f0, 0(pDst), 0, 0
+    psq_st f1, 8(pDst), 1, 0
+    blr
+}
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void fn_8000AE0C(f32* pSrc, f32* pDst) {
+    pDst[0] = -pSrc[0];
+    pDst[1] = -pSrc[1];
+    pDst[2] = -pSrc[2];
+}
+#endif
+
+// Scales a 4-float vector into pOut.
+#ifdef __MWERKS__
+asm void fn_8000AE28(register f32* pIn, register f32 fScale, register f32* pOut) {
+    nofralloc
+    fmr      f2, fScale
+    psq_l    f0, 0(pIn), 0, 0
+    psq_l    f1, 8(pIn), 0, 0
+    ps_muls0 f0, f0, f2
+    ps_muls0 f1, f1, f2
+    psq_st   f0, 0(pOut), 0, 0
+    psq_st   f1, 8(pOut), 0, 0
+    blr
+}
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void fn_8000AE28(f32* pIn, f32 fScale, f32* pOut) {
+    pOut[0] = pIn[0] * fScale;
+    pOut[1] = pIn[1] * fScale;
+    pOut[2] = pIn[2] * fScale;
+    pOut[3] = pIn[3] * fScale;
+}
+#endif
+
+// Multiplies two 4-float vectors component by component into pOut.
+#ifdef __MWERKS__
+asm void fn_8000AE48(register f32* pA, register f32* pB, register f32* pOut) {
+    nofralloc
+    psq_l  f0, 0(pA), 0, 0
+    psq_l  f1, 8(pA), 0, 0
+    psq_l  f2, 0(pB), 0, 0
+    psq_l  f3, 8(pB), 0, 0
+    ps_mul f0, f0, f2
+    ps_mul f1, f1, f3
+    psq_st f0, 0(pOut), 0, 0
+    psq_st f1, 8(pOut), 0, 0
+    blr
+}
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void fn_8000AE48(f32* pA, f32* pB, f32* pOut) {
+    pOut[0] = pA[0] * pB[0];
+    pOut[1] = pA[1] * pB[1];
+    pOut[2] = pA[2] * pB[2];
+    pOut[3] = pA[3] * pB[3];
+}
+#endif
+
+// pA + pB * fScale into pOut (four floats).
+#ifdef __MWERKS__
+asm void fn_8000AE6C(register f32* pA, register f32* pB, register f32 fScale, register f32* pOut) {
+    nofralloc
+    fmr       f4, fScale
+    psq_l     f0, 0(pA), 0, 0
+    psq_l     f1, 8(pA), 0, 0
+    psq_l     f2, 0(pB), 0, 0
+    psq_l     f3, 8(pB), 0, 0
+    ps_madds0 f2, f2, f4, f0
+    ps_madds0 f3, f3, f4, f1
+    psq_st    f2, 0(pOut), 0, 0
+    psq_st    f3, 8(pOut), 0, 0
+    blr
+}
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void fn_8000AE6C(f32* pA, f32* pB, f32 fScale, f32* pOut) {
+    pOut[0] = pB[0] * fScale + pA[0];
+    pOut[1] = pB[1] * fScale + pA[1];
+    pOut[2] = pB[2] * fScale + pA[2];
+    pOut[3] = pB[3] * fScale + pA[3];
+}
+#endif
 
 // 0x8000AE94: the absolute value of a double (fabsf, which rounds its result to a float, is
 // the float version).

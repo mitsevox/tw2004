@@ -67,7 +67,7 @@ f32  fn_80009638(f32 fAngle);           // cos
 double fn_80009680(double x);           // sqrt
 f32  fn_80009744(f32* pVec);            // dot with itself (at most FLT_MAX)
 extern f32 lbl_80281B40[];              // FLT_MAX (MSL's)
-void Vec_Copy(f32* pSrc, f32* pDst);    // 0x8000AD10
+void Vec_Copy(const f32* pSrc, f32* pDst);   // 0x8000AD10 (const: see Vec3Copy)
 f32  fn_8000AD78(f32 y, f32 x);         // atan2f
 f32  fabsf(f32 x);                      // 0x8000AD9C: fabs (0x8000AE94, platform.h) rounded to a float
 f32  fn_8000AF7C(f32 x);                // natural logarithm
