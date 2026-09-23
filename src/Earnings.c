@@ -9,6 +9,7 @@
 #include "engine.h"
 #include "game/save.h"
 #include "game/earnings.h"
+#include "frontend/fe.h"
 
 // The working tables and their saved copies, ten entries each.
 extern s32 lbl_80200010[10];
@@ -45,6 +46,7 @@ extern s32 lbl_80191A08[39];
 extern f32 lbl_80191AA4[70];
 
 u8    fn_800CF450(int nPlayer);
+int   fn_8008AB40(void);
 
 void  fn_800D344C(UStreamObject* pObject);
 int   fn_800584DC(int nProfile);
@@ -63,9 +65,14 @@ int   fn_800D3CF8(int nRating);
 u8    fn_800D4010(int nId);
 s32   fn_800D477C(int nPlayer, Ball* pBall, u8 b);
 void  fn_800D4F14(int nPlayer, u8 b);
+void  fn_800D588C(int nPlayer, u8 a, u8 bRoundOver);
 f32   fn_800D6EEC(void);
 u8    fn_800D76AC(int nPlayer, int nAward);
-int   fn_800D782C(int nPlayer, Ball* pBall, int a, u8 b, int c);
+int   fn_800D782C(int nPlayer, Ball* pBall, int a, u8 bCountStroke, u8 bAll);
+int   fn_800D7B1C(int nPlayer, Ball* pBall, int a, u8 bCountStroke, u8 bAll);
+int   fn_800D7DA0(int nPlayer, u8 a, u8 b, u8 c);
+int   fn_800D8750(int nKind, int nValue, int a, const char* szName, int nPlayer);
+u8    fn_800D8DB4(int nKind);
 s32   fn_800D9954(void);
 s32   fn_800D9E00(s32 i);
 
@@ -415,6 +422,134 @@ u8 fn_800D4010(int nId) {
     return b;
 }
 
+// After a putt, for a human player with a profile: the putt record check (fn_800D7B1C) with its
+// messages, then two rounds of payouts from the working tables as fn_800D3DDC pays them: the
+// putt's (fn_800D4F14), then the hole's (fn_800D588C; none in a playoff).
+void fn_800D4030(int nPlayer) {
+    int nProfile;
+    int nKind;
+    int i;
+
+    if (Game_GetMode() == 10) return;
+    if (fn_800E177C() != 0) return;
+    nProfile = gPlayers[nPlayer].nIndex;
+    if (gpSaveData[nProfile].bActive == 0) return;
+    if (Player_IsCPU(nPlayer)) return;
+    fn_800D7B1C(nPlayer, &gPlayers[nPlayer].ball, 1, 0, 0);
+    for (i = 0; i < lbl_80282258; i++) {
+        nKind = lbl_80200470[i];
+        if (nKind == 2 || nKind == 4) {
+            fn_800E4364(1, lbl_802004E8[i], nKind, nProfile);
+        }
+    }
+    fn_800D4F14(nPlayer, 0);
+    fn_800D3244();
+    for (i = 0; i < lbl_8028224C; i++) {
+        if (lbl_80200128[i] != 0) {
+            fn_800E4364(0, lbl_802001A0[i], lbl_80200128[i], nProfile);
+            fn_800D3548(nPlayer, lbl_80200128[i], &lbl_801FFD90[i]);
+        }
+    }
+    for (i = 0; i < lbl_80282248; i++) {
+        if (fn_800D750C(nPlayer, lbl_802000B0[i])) {
+            if (fn_800D4010(lbl_802000B0[i])) {
+                fn_800E4364(6, fn_800D9E00(lbl_802000B0[i]), 0, nProfile);
+            } else {
+                fn_800E4364(2, fn_800D9E00(lbl_802000B0[i]), lbl_80200038[i], nProfile);
+            }
+            fn_800D3548(nPlayer, lbl_80200038[i], NULL);
+            gPlayers[nPlayer].money.n8 += lbl_80200038[i];
+        }
+    }
+    if (!gpGame->bD4) {
+        fn_800D588C(nPlayer, 0, 0);
+    } else {
+        lbl_80282254 = 0;
+        lbl_80282250 = 0;
+    }
+    fn_800D3244();
+    for (i = 0; i < lbl_8028224C; i++) {
+        if (lbl_80200100[i] != 0) {
+            fn_800E4364(0, lbl_80200178[i], lbl_80200100[i], nProfile);
+            fn_800D3548(nPlayer, lbl_80200100[i], &lbl_801FFD90[i]);
+        }
+    }
+    for (i = 0; i < lbl_80282248; i++) {
+        if (fn_800D750C(nPlayer, lbl_80200268[i])) {
+            if (fn_800D4010(lbl_80200088[i])) {
+                fn_800E4364(6, fn_800D9E00(lbl_80200088[i]), 0, nProfile);
+            } else {
+                fn_800E4364(2, fn_800D9E00(lbl_80200088[i]), lbl_80200010[i], nProfile);
+            }
+            fn_800D3548(nPlayer, lbl_80200010[i], NULL);
+            gPlayers[nPlayer].money.n8 += lbl_80200010[i];
+        }
+    }
+}
+
+// At the end of a hole, for a human player with a profile: what the hole earned is paid out from
+// the working tables, with its messages (as fn_800D3DDC does after a shot), and the TOUR card
+// level rises with the profile's completion score: level 2 from 7.5, 3 from 15, 4 from 30, 5 from
+// 60, 6 at 100. bRoundOver skips the hole check (fn_800D7DA0) and its messages.
+void fn_800D439C(int nPlayer, u8 bRoundOver) {
+    int nProfile;
+    int nLevel;
+    int nKind;
+    int i;
+    f32 fProgress;
+
+    nLevel = 0;
+    if (fn_800E3A54()) return;
+    if (fn_800E177C() != 0) return;
+    nProfile = gPlayers[nPlayer].nIndex;
+    if (gpSaveData[nProfile].bActive == 0) return;
+    if (Player_IsCPU(nPlayer)) return;
+    if (!bRoundOver) {
+        fn_800D7DA0(nPlayer, 1, 0, 0);
+        for (i = 0; i < lbl_80282258; i++) {
+            nKind = lbl_80200448[i];
+            if (nKind == 2 || nKind == 4) {
+                fn_800E4364(1, lbl_802004C0[i], nKind, nProfile);
+            }
+        }
+    }
+    fn_800D588C(nPlayer, 0, bRoundOver);
+    fn_800D3244();
+    for (i = 0; i < lbl_8028224C; i++) {
+        if (lbl_80200358[i] != 0) {
+            fn_800E4364(0, lbl_802003D0[i], lbl_80200358[i], nProfile);
+            fn_800D3548(nPlayer, lbl_80200358[i], &lbl_801FFD90[i]);
+        }
+    }
+    for (i = 0; i < lbl_80282248; i++) {
+        if (fn_800D750C(nPlayer, lbl_80200268[i])) {
+            if (fn_800D4010(lbl_80200088[i])) {
+                fn_800E4364(6, fn_800D9E00(lbl_80200088[i]), 0, nProfile);
+            } else {
+                fn_800E4364(2, fn_800D9E00(lbl_80200088[i]), lbl_80200010[i], nProfile);
+            }
+            fn_800D3548(nPlayer, lbl_802001F0[i], NULL);
+            gPlayers[nPlayer].money.n8 += lbl_802001F0[i];
+        }
+    }
+    fProgress = GM_GetGameProgress(&gpSaveData[nProfile]);
+    if (fProgress >= 100.0f) {
+        nLevel = 6;
+    } else if (fProgress >= 60.0f) {
+        nLevel = 5;
+    } else if (fProgress >= 30.0f) {
+        nLevel = 4;
+    } else if (fProgress >= 15.0f) {
+        nLevel = 3;
+    } else if (fProgress >= 7.5f) {
+        nLevel = 2;
+    }
+    if (gpSaveData[nProfile].nTourCardLevel < nLevel) {
+        gpSaveData[nProfile].nTourCardLevel = nLevel;
+        fn_800E4364(0, gpSaveData[nProfile].nTourCardLevel + 99, 0, nProfile);
+    }
+}
+
 s32 fn_800D4694(u32 n) {
     if (n == 1) return 0;
     if (n == 2) return 1;
@@ -575,6 +710,67 @@ s32 fn_800D6A70(s32 nPoints, int nPlayer, u8 bCourse, u8 bTee, u8 bHole, CourseM
     return nTotal;
 }
 
+// The current course's payout multiplier (1 for a course the table does not list); course 7 has
+// three, one per fn_80015464 value.
+f32 fn_800D6EEC(void) {
+    f32 fMult;
+
+    fMult = 1.0f;
+    switch (gpGame->nCurCourse) {
+    case 0:
+        fMult = lbl_80200538.aCourseMult[0];
+        break;
+    case 2:
+        fMult = lbl_80200538.aCourseMult[1];
+        break;
+    case 1:
+        fMult = lbl_80200538.aCourseMult[2];
+        break;
+    case 6:
+        fMult = lbl_80200538.aCourseMult[3];
+        break;
+    case 10:
+        fMult = lbl_80200538.aCourseMult[4];
+        break;
+    case 11:
+        fMult = lbl_80200538.aCourseMult[5];
+        break;
+    case 13:
+        fMult = lbl_80200538.aCourseMult[6];
+        break;
+    case 15:
+        fMult = lbl_80200538.aCourseMult[7];
+        break;
+    case 14:
+        fMult = lbl_80200538.aCourseMult[8];
+        break;
+    case 3:
+        fMult = lbl_80200538.aCourseMult[9];
+        break;
+    case 12:
+        fMult = lbl_80200538.aCourseMult[10];
+        break;
+    case 9:
+        fMult = lbl_80200538.aCourseMult[11];
+        break;
+    case 22:
+        fMult = lbl_80200538.aCourseMult[12];
+        break;
+    case 7:
+        if (fn_80015464() == 0) {
+            fMult = lbl_80200538.aCourseMult[13];
+        }
+        if (fn_80015464() == 1) {
+            fMult = lbl_80200538.aCourseMult[14];
+        }
+        if (fn_80015464() == 2) {
+            fMult = lbl_80200538.aCourseMult[15];
+        }
+        break;
+    }
+    return fMult;
+}
+
 // TW06: GM_Earnings_ComputeTOURCardModifiers. The TOUR card level raises the payout; the extra
 // goes in the breakdown. Nothing is paid when fn_800E177C says so.
 int fn_800D7220(int nReward, int nPlayer, CourseMoneyTracking* pMoney) {
@@ -616,12 +812,12 @@ int fn_800D7220(int nReward, int nPlayer, CourseMoneyTracking* pMoney) {
     return nTotal;
 }
 
-// Whether a human player's profile can earn awards. It returns an int (the compare is not cut to 8
-// bits); its callers keep the answer in a u8 (a clrlwi after each call).
-int fn_800D748C(int nPlayer) {
+// Whether a human player's profile can earn awards.
+u8 fn_800D748C(int nPlayer) {
     if (Player_IsCPU(nPlayer)) return 0;
     if (fn_800E177C() != 0) return 0;
-    return gpSaveData[gPlayers[nPlayer].nIndex].bActive == 1;
+    if (gpSaveData[gPlayers[nPlayer].nIndex].bActive != 1) return 0;
+    return 1;
 }
 
 // Give a player award nAward if they do not have it yet. Five awards also keep the shot's replay.
@@ -683,6 +879,108 @@ u8 fn_800D7770(int nPlayer, Award* pAward) {
     pAward->bWon = 1;
     pAward->nDate = fn_800D2994();
     return 1;
+}
+
+// The record checks after a shot share this start: nothing in some modes and states, or for a
+// CPU player or one without a profile; the record holder's name is the profile's, or "User <n>"
+// when the front end has no profile loaded in that slot.
+
+// Whether a drive (from the tee of a par 4 or 5, off the fairway class 1 surface, in bounds) sets a
+// record (kind 1) of its distance. With bAll only a new best (fn_800D8750 gives 2 or 4) counts,
+// else any place; a hit goes into lbl_80200498/lbl_80200510. bCountStroke counts the shot on the
+// hole while it is checked. Returns how many hit.
+int fn_800D782C(int nPlayer, Ball* pBall, int a, u8 bCountStroke, u8 bAll) {
+    char szName[32];
+    int nProfile;
+    f32 fDist;
+    f32 fDx;
+    f32 fDz;
+    int nPar;
+    u32 nClass;
+    int nResult;
+
+    lbl_80282258 = 0;
+    if (gSession.uFlags & 0x4000) return 0;
+    if (Player_IsCPU(nPlayer)) return 0;
+    if (Game_GetMode() == 12 || fn_800E39F0() || Game_GetMode() == 22 || Game_GetMode() == 26) return 0;
+    if (gpGame->b137) return 0;
+    if (fn_800E177C() != 0) return 0;
+    nProfile = gPlayers[nPlayer].nIndex;
+    if (gpSaveData[nProfile].bActive == 0) return 0;
+    if (lbl_801D7148.aLoaded[nProfile] == 0) {
+        sprintf(szName, "User %d", nProfile + 1);
+    } else {
+        strcpy(szName, gpSaveData[nProfile].szName);
+    }
+    if (bCountStroke) {
+        gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()]++;
+    }
+    fDx = pBall->vPos[0] - gPlayers[nPlayer].vBall[0];
+    fDz = pBall->vPos[2] - gPlayers[nPlayer].vBall[2];
+    fDist = fn_80009680(fDx * fDx + fDz * fDz);
+    if (pBall->pCourse == NULL) {
+        if (bCountStroke) {
+            gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()]--;
+        }
+        return 0;
+    }
+    nPar = fn_800D2B08();
+    nClass = gSurfaceTypes[pBall->nStartSurface].nClass;
+    if (fn_800D8DB4(1) && (nPar == 4 || nPar == 5) && nClass == 1 && !fn_800E2B40(nPlayer, pBall)) {
+        nResult = fn_800D8750(1, (s32)fDist, a, szName, nPlayer);
+        if ((bAll && (nResult == 2 || nResult == 4)) || (!bAll && nResult != 0)) {
+            lbl_80200498[lbl_80282258] = nResult;
+            lbl_80200510[lbl_80282258] = 1;
+            lbl_80282258++;
+        }
+    }
+    if (bCountStroke) {
+        gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()]--;
+    }
+    return lbl_80282258;
+}
+
+// The same for a putt (the putter, club 25): record kind 2, its distance in feet; a hit goes into
+// lbl_80200470/lbl_802004E8.
+int fn_800D7B1C(int nPlayer, Ball* pBall, int a, u8 bCountStroke, u8 bAll) {
+    char szName[32];
+    int nProfile;
+    f32 fDist;
+    f32 fDx;
+    f32 fDz;
+    int nResult;
+
+    lbl_80282258 = 0;
+    if (gSession.uFlags & 0x4000) return 0;
+    if (Player_IsCPU(nPlayer)) return 0;
+    if (Game_GetMode() == 12 || fn_800E39F0() || Game_GetMode() == 22 || Game_GetMode() == 26) return 0;
+    if (gpGame->b137) return 0;
+    if (fn_800E177C() != 0) return 0;
+    nProfile = gPlayers[nPlayer].nIndex;
+    if (gpSaveData[nProfile].bActive == 0) return 0;
+    if (lbl_801D7148.aLoaded[nProfile] == 0) {
+        sprintf(szName, "User %d", nProfile + 1);
+    } else {
+        strcpy(szName, gpSaveData[nProfile].szName);
+    }
+    if (bCountStroke) {
+        gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()]++;
+    }
+    fDx = pBall->vPos[0] - gPlayers[nPlayer].vBall[0];
+    fDz = pBall->vPos[2] - gPlayers[nPlayer].vBall[2];
+    fDist = fn_80009680(fDx * fDx + fDz * fDz);
+    if (fn_800D8DB4(2) && gPlayers[nPlayer].nClub == 25) {
+        nResult = fn_800D8750(2, (s32)(3.0f * fDist), a, szName, nPlayer);
+        if ((bAll && (nResult == 2 || nResult == 4)) || (!bAll && nResult != 0)) {
+            lbl_80200470[lbl_80282258] = nResult;
+            lbl_802004E8[lbl_80282258] = 2;
+            lbl_80282258++;
+        }
+    }
+    if (bCountStroke) {
+        gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()]--;
+    }
+    return lbl_80282258;
 }
 
 // Whether nValue and szName are among the top five of course k's record i. Never on a round whose
@@ -812,6 +1110,114 @@ void fn_800D8D5C(int nPlayer) {
     gPlayers[nPlayer].money.n38 = 0;
     gPlayers[nPlayer].money.n3C = 0;
     gPlayers[nPlayer].money.n24 = 0;
+}
+
+// Whether goals of kind nKind count now: never in modes 9 and 11 or when fn_800E177C says so;
+// kinds 0 and 3..7 need fn_800EC550 off, a round of every hole and fn_8008AB40 off, kinds 1 and 2
+// only fn_800EC550 off, kind 8 fn_800E39F0, kind 9 game mode 22.
+u8 fn_800D8DB4(int nKind) {
+    if (Game_GetMode() == 9 || Game_GetMode() == 11) return 0;
+    if (fn_800E177C() != 0) return 0;
+    switch (nKind) {
+    case 0:
+        if (fn_800EC550() || !fn_800E1BBC() || fn_8008AB40()) return 0;
+        return 1;
+    case 1:
+        if (fn_800EC550()) return 0;
+        return 1;
+    case 2:
+        if (fn_800EC550()) return 0;
+        return 1;
+    case 3:
+        if (fn_800EC550() || !fn_800E1BBC() || fn_8008AB40()) return 0;
+        return 1;
+    case 4:
+        if (fn_800EC550() || !fn_800E1BBC() || fn_8008AB40()) return 0;
+        return 1;
+    case 5:
+        if (fn_800EC550() || !fn_800E1BBC() || fn_8008AB40()) return 0;
+        return 1;
+    case 6:
+        if (fn_800EC550() || !fn_800E1BBC() || fn_8008AB40()) return 0;
+        return 1;
+    case 7:
+        if (fn_800EC550() || !fn_800E1BBC() || fn_8008AB40()) return 0;
+        return 1;
+    case 8:
+        if (fn_800EC550() || !fn_800E39F0()) return 0;
+        return 1;
+    case 9:
+        if (fn_800EC550() || Game_GetMode() != 22) return 0;
+        return 1;
+    }
+    return 1;
+}
+
+// After a shot that stayed in bounds (GM_PlayerTookShot), when gpGame->b27B allows it: the shot's
+// statistics. A drive (the first stroke of a par 4 or 5, off class-1 ground) can be the round's
+// and the profile's longest and is counted in the profile; the first stroke's distance goes in
+// nC24; b2E4 marks a first stroke on a par 4 or 5 that finished on the fairway, the green or in the
+// hole, b2F6 a ball on the green or in the hole in par - 2 strokes or fewer. A putt (club 25) that
+// fn_800E2DB4 accepts can be the longest, in feet.
+void fn_800D8FE4(int nPlayer) {
+    Ball* pBall;
+    int nPar;
+    u32 nClass;
+    f32 fDist;
+    f32 fDx;
+    f32 fDz;
+    int nLie;
+    int nStrokes;
+    int nProfile;
+    SurfaceType* pSurface;
+    int nPutt;
+
+    if (!gpGame->b27B) return;
+    if (fn_800E177C() != 0) return;
+    pBall = &gPlayers[nPlayer].ball;
+    nPar = fn_800D2B08();
+    nClass = gSurfaceTypes[pBall->nStartSurface].nClass;
+    fDx = pBall->vPos[0] - gPlayers[nPlayer].vBall[0];
+    fDz = pBall->vPos[2] - gPlayers[nPlayer].vBall[2];
+    fDist = fn_80009680(fDx * fDx + fDz * fDz);
+    nLie = pBall->nLie;
+    nStrokes = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
+    pSurface = Ter_GetSupportingWorldMaterial(pBall->pCourse, gPlayers[nPlayer].vBall);
+    nProfile = gPlayers[nPlayer].nIndex;
+    if ((nPar == 4 || nPar == 5) && nStrokes == 1 && nClass == 1) {
+        if (fDist > gPlayers[nPlayer].n2DC) {
+            gPlayers[nPlayer].n2DC = fDist;
+        }
+        if (gpSaveData[nProfile].bActive && fDist > gpSaveData[nProfile].nA0) {
+            gpSaveData[nProfile].nA0 = fDist;
+            gpSaveData[nProfile].b70 = 1;
+        }
+    }
+    if (nStrokes == 1) {
+        gPlayers[nPlayer].nC24 = fDist;
+    }
+    if ((nPar == 4 || nPar == 5) && nStrokes == 1 &&
+        (nLie == LIE_FAIRWAY_e || nLie == LIE_GREEN_e || nLie == LIE_INCUP_e)) {
+        gPlayers[nPlayer].b2E4[Game_CurHoleIndex()] = 1;
+    }
+    if (pSurface != NULL && pSurface->nClass != 3 && (nLie == LIE_GREEN_e || nLie == LIE_INCUP_e) &&
+        nStrokes <= nPar - 2) {
+        gPlayers[nPlayer].b2F6[Game_CurHoleIndex()] = 1;
+    }
+    if (gpSaveData[nProfile].bActive && (nPar == 4 || nPar == 5) && nStrokes == 1 && nClass == 1) {
+        gpSaveData[nProfile].n88++;
+        gpSaveData[nProfile].n8C += (s32)fDist;
+        gpSaveData[nProfile].b70 = 1;
+    }
+    if (fn_800E2DB4(nPlayer) && gPlayers[nPlayer].nClub == 25) {
+        nPutt = 3.0f * gPlayers[nPlayer].fA64;
+        if (nPutt > gPlayers[nPlayer].n2E0) {
+            gPlayers[nPlayer].n2E0 = nPutt;
+        }
+        if (gpSaveData[nProfile].bActive && nPutt > gpSaveData[nProfile].nA4) {
+            gpSaveData[nProfile].nA4 = nPutt;
+        }
+    }
 }
 
 // After every shot (GM_PlayerTookShot calls it last), when the mode allows no mulligans: carry the

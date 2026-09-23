@@ -1,6 +1,7 @@
 // FE_Manager.c (EA's name, from its asserts; also in EA's 2002 source tree): the front end's
 // manager, which runs the menu screens: the movies played from the menus (the intro, the credits,
-// the golfers' bios), the profile being worked on, and the created golfer. Partly decompiled.
+// the golfers' bios), the profile being worked on, the created golfer and its Create-A-Player
+// picks and unlocks.
 
 #include "engine.h"
 #include "game.h"
@@ -31,24 +32,14 @@ void fn_800A4FD8(void);
 void fn_80102AC4(void);
 void fn_80103B74(int a);
 int  fn_80103D14(s16 nSlot);            // the asset worn in an equipment slot, or -1 (FE_CrAPDB.c)
-u8   fn_80104020(void* pChoice);        // } a part's choices (FE_CrAPDB.c): whether one may be
-int  fn_801048EC(s16 nPart, int a);     // } picked, how many there are, one of them and its
-void* fn_80104FA8(s16 nPart, int a, int i);   // } asset
-CrAPAsset* fn_80104F68(void* pChoice);  // }
-CrAPAsset* fn_80104E84(s16 nPart, int a, int i);   // a part's choice's asset (FE_CrAPDB.c)
 void fn_801073DC(int nPart);            // FE_CrAPDB.c
 int  fn_801049C8(s16 nPart);            // how many b a part has, for fn_800797E0 (FE_CrAPDB.c)
-int  fn_80105494(int nAsset);           // } the two attributes an asset raises (-1: none)
-int  fn_80105504(int nAsset);           // }
-int  fn_801054CC(int nAsset);           // } and the tier it raises each to
-int  fn_8010553C(int nAsset);           // }
-void fn_80103B8C(s8 b);                 // } FE_CrAPDB.c: set b; an asset's b (2: either),
+s8   fn_80103BB4(void);                 // FE_CrAPDB.c: the b fn_80103B8C set
+void fn_80103B8C(s8 b);                // } FE_CrAPDB.c: set b; an asset's b (2: either),
 s8   fn_80103BC0(int nAsset);           // } its kind, fn_80107444's count, and its part and
 s16  fn_8010742C(int nAsset);           // } choice
 int  fn_80107444(int nAsset);           // }
 void fn_80105FF8(int nAsset, s16* pKind, s32* pPart, s32* pChoice);    // }
-s32  fn_80105C00(void);                 // FE_CrAPDB.c: how many assets there are
-u8   fn_80105C30(void);                 // the Create-A-Player database is loaded (FE_CrAPDB.c)
 
 void fn_8011E020(s32* pMonth, s32* pDay, s32* pYear, s32* pHour, s32* pMinute, s32* pSecond, s32* pMsec);
 u32  fn_8000B244(void);                 // a random seed from the clock
@@ -57,8 +48,6 @@ u8   fn_80056480(int a);
 u8   fn_800564AC(int n);
 u8   fn_80058304(SaveProfile* pProfile, int a);
 s32  fn_801258E8(void);                 // EASportsBio.c
-s8   fn_801055DC(int nAsset);           // } FE_CrAPDB.c: an asset's lock kind and number
-s16  fn_80105610(int nAsset);           // } (fn_80078008)
 void fn_80076EEC(void);                 // frees lbl_80281EC8
 void fn_80076F20(void);
 u8   fn_80079E44(int nAttr);            // a hidden attribute: ATTR_AGGRESSION, ATTR_IQ, ATTR_SPEED
@@ -87,12 +76,12 @@ void fn_80077808(int nSlot);
 void fn_80077968(int nSlot);
 void fn_800779BC(int a, int b);
 GolferRecord* fn_80077A80(int nGolfer);
-void fn_80077B78(void);
 int  fn_80077BDC(int n);
 void fn_80077C1C(int a, int b);
 u8   fn_80078008(s32 nAsset, SaveProfile* pProfile);
 int  fn_80078604(int a, int b, int c);
 void fn_80078620(int n, int* pA, int* pB, int* pC);
+void fn_80078680(SaveProfile* pProfile);
 void fn_8007873C(SaveProfile* pProfile);
 u8   FE_CrAP_IsAssetUndesirable(s16 nPart, CrAPAsset* pAsset);
 void fn_80078A2C(s16 nPart, int nChance);
@@ -730,6 +719,26 @@ void fn_80078620(int n, int* pA, int* pB, int* pC) {
     *pC = n;
 }
 
+// Note which Create-A-Player assets are locked for the profile (fn_80078008), one bit each.
+void fn_80078680(SaveProfile* pProfile) {
+    int i;
+    int nCount;
+    s8 nSaved;
+    if (fn_80105C30()) {
+        nSaved = fn_80103BB4();
+        nCount = fn_80105C00();
+        for (i = 0; i < nCount; i++) {
+            fn_80103B8C(fn_80103BC0(i));
+            if (fn_80078008(i, pProfile)) {
+                fn_8001EA34(pProfile->aAssetLocked, i);
+            } else {
+                fn_8001EB6C(pProfile->aAssetLocked, i);
+            }
+        }
+        fn_80103B8C(nSaved);
+    }
+}
+
 // ---- the created golfer's parts -----------------------------------------------------------------
 
 // The created golfer's equipment tiers, from the equipment it wears: each of the 53 equipment
@@ -823,14 +832,14 @@ void fn_80078A2C(s16 nPart, int nChance) {
     int nFound = 0;
     int nCount = fn_801048EC(nPart, 0);
     int i;
-    void* pChoice;
+    int nAsset;
     CrAPAsset* pAsset;
     for (i = 0; i < nCount; i++) {
-        pChoice = fn_80104FA8(nPart, 0, i);
-        pAsset = fn_80104F68(pChoice);
-        if (bDesirable && !FE_CrAP_IsAssetUndesirable(nPart, pAsset) && fn_80104020(pChoice)) {
+        nAsset = fn_80104FA8(nPart, 0, i);
+        pAsset = fn_80104F68(nAsset);
+        if (bDesirable && !FE_CrAP_IsAssetUndesirable(nPart, pAsset) && fn_80104020(nAsset)) {
             aChoices[nFound++] = i;
-        } else if (!bDesirable && FE_CrAP_IsAssetUndesirable(nPart, pAsset) && fn_80104020(pChoice)) {
+        } else if (!bDesirable && FE_CrAP_IsAssetUndesirable(nPart, pAsset) && fn_80104020(nAsset)) {
             aChoices[nFound++] = i;
         }
     }
@@ -926,7 +935,7 @@ void fn_80078E34(SaveProfile* pProfile) {
     char szDebug[256];
     u8 bPicking;
     u8 bChance;
-    void* pChoice;
+    int nAsset;
     int nCount;
     int nPick;
     int nPrev;
@@ -1044,9 +1053,8 @@ void fn_80078E34(SaveProfile* pProfile) {
                 bPicking = 0;
             }
         }
-        pChoice = fn_80104FA8(0, 0, nPick);
-        sprintf(szDebug, "I hate everone: %d", pChoice);    // EA bug: a pointer printed with %d
-                                                            // (a leftover debug line; never shown)
+        nAsset = fn_80104FA8(0, 0, nPick);
+        sprintf(szDebug, "I hate everone: %d", nAsset);     // a leftover debug line; never shown
     } else {
         FE_CrAP_TurnOnPart(0, 0, 0);
     }

@@ -16,7 +16,7 @@ s32 lbl_80281674 = 1;           // the options' n18 from before a tour round (fn
 
 PgaData gPgaData;
 Pga80205F30 lbl_80205F30;
-TourStats lbl_80205ED8;
+PgaStatCounts lbl_80205ED8;
 
 s32 lbl_80282340;               // the playoff hole index: set to 16, each playoff moves it on
                                 //   (17, 15, 16, 17, ...; fn_800EF720)
@@ -184,7 +184,7 @@ void fn_800EE0A0(s32 i) {
 void fn_800EE2C8(void) {
     PlayerNumber_t nPlayer = PLR_1_e;
     s32 nEvent = gpSaveData[nPlayer].tour.nEvent;
-    TourStats* pRec = &lbl_80205ED8;
+    PgaStatCounts* pRec = &lbl_80205ED8;
     s32 nFormat;
     lbl_80281670 = gSession.options.nC;
     lbl_80282338 = gSession.options.nWind;
@@ -203,9 +203,9 @@ void fn_800EE2C8(void) {
         fn_801178C8(0, &gpSaveData[nPlayer].tour.aEvent[gpSaveData[nPlayer].tour.nEvent],
                     gpSaveData[nPlayer].tour.nRound, gPgaData.aTourEvent[nFormat].a40[fn_800EF0E0(0)], 5);
         fn_80005AE8(pRec, 0, sizeof(*pRec));
-        pRec->n2++;
+        pRec->nRounds++;
         if (gpSaveData[nPlayer].tour.nRound == 0) {
-            pRec->n0++;
+            pRec->nEvents++;
         }
         fn_800E1260(1);
     }
@@ -232,7 +232,7 @@ static inline SeasonEvent* Tour_CurrentEvent(PlayerNumber_t nPlayer) {
 void fn_800EE478(void) {
     PlayerNumber_t nPlayer = PLR_1_e;
     if (gpSaveData[nPlayer].tour.nRound == 0) {
-        Tour_Profile(nPlayer)->n104C8++;
+        Tour_Profile(nPlayer)->tour.n4E94++;
     }
     if (fn_800EFA9C(gpSaveData[nPlayer].tour.nEvent) >= 4 && gpSaveData[nPlayer].tour.nRound == 1) {
         fn_80117B58(0);
@@ -379,47 +379,49 @@ void fn_800EEB94(int nPlayer) {
     gpSaveData[nPlayer].tour.nEvent = fn_800EFBD0(gpSaveData[nPlayer].tour.nEvent + 1);
 }
 
-// The round's statistics go into the player's career totals: most are added, n4 and nC keep the
-// higher value.
+// The round's statistics go into the player's own season counts (golfer PGA_USER_GOLFER): most
+// are added, the longest drive and putt keep the higher value.
 void fn_800EED0C(s32 nPlayer) {
-    TourStats* pRound = &lbl_80205ED8;
-    TourStats* pTotal = &gpSaveData[nPlayer].tourStats;
-    pTotal->n0 += pRound->n0;
-    pTotal->n2 += pRound->n2;
-    pTotal->n4 = pTotal->n4 <= pRound->n4 ? pRound->n4 : pTotal->n4;
-    pTotal->n6 += pRound->n6;
-    pTotal->n8 += pRound->n8;
-    pTotal->nC = pTotal->nC <= pRound->nC ? pRound->nC : pTotal->nC;
-    pTotal->nE += pRound->nE;
-    pTotal->n10 += pRound->n10;
-    pTotal->n12 += pRound->n12;
-    pTotal->n14 += pRound->n14;
-    pTotal->n16 += pRound->n16;
-    pTotal->n18 += pRound->n18;
-    pTotal->n1A += pRound->n1A;
-    pTotal->n1C += pRound->n1C;
-    pTotal->n1E += pRound->n1E;
-    pTotal->n20 += pRound->n20;
-    pTotal->n22 += pRound->n22;
-    pTotal->n24 += pRound->n24;
-    pTotal->n26 += pRound->n26;
-    pTotal->n28 += pRound->n28;
-    pTotal->n2A += pRound->n2A;
-    pTotal->n2C += pRound->n2C;
-    pTotal->n2E += pRound->n2E;
-    pTotal->n30 += pRound->n30;
-    pTotal->n32 += pRound->n32;
-    pTotal->n34 += pRound->n34;
-    pTotal->n36 += pRound->n36;
-    pTotal->n38 += pRound->n38;
-    pTotal->n3A += pRound->n3A;
-    pTotal->n3C += pRound->n3C;
-    pTotal->n40 += pRound->n40;
+    PgaStatCounts* pRound = &lbl_80205ED8;
+    PgaStatCounts* pTotal = &gpSaveData[nPlayer].tour.aStats[PGA_USER_GOLFER];
+    pTotal->nEvents += pRound->nEvents;
+    pTotal->nRounds += pRound->nRounds;
+    pTotal->nLongestDrive = pTotal->nLongestDrive <= pRound->nLongestDrive
+                  ? pRound->nLongestDrive : pTotal->nLongestDrive;
+    pTotal->nDrives += pRound->nDrives;
+    pTotal->nDriveDistance += pRound->nDriveDistance;
+    pTotal->nLongestPutt = pTotal->nLongestPutt <= pRound->nLongestPutt
+                  ? pRound->nLongestPutt : pTotal->nLongestPutt;
+    pTotal->nFairwaysHit += pRound->nFairwaysHit;
+    pTotal->nFairways += pRound->nFairways;
+    pTotal->nGreensHit += pRound->nGreensHit;
+    pTotal->nHoles += pRound->nHoles;
+    pTotal->nPutts += pRound->nPutts;
+    pTotal->nGIRPutts += pRound->nGIRPutts;
+    pTotal->nBunkerSaves += pRound->nBunkerSaves;
+    pTotal->nBunkers += pRound->nBunkers;
+    pTotal->nNonGIRPars += pRound->nNonGIRPars;
+    pTotal->nBirdiesAfterBogey += pRound->nBirdiesAfterBogey;
+    pTotal->nBogeys += pRound->nBogeys;
+    pTotal->nEagles += pRound->nEagles;
+    pTotal->nBirdies += pRound->nBirdies;
+    pTotal->nPar3Birdies += pRound->nPar3Birdies;
+    pTotal->nPar3Holes += pRound->nPar3Holes;
+    pTotal->nPar4Birdies += pRound->nPar4Birdies;
+    pTotal->nPar4Holes += pRound->nPar4Holes;
+    pTotal->nPar5Birdies += pRound->nPar5Birdies;
+    pTotal->nPar5Holes += pRound->nPar5Holes;
+    pTotal->nGIRBirdies += pRound->nGIRBirdies;
+    pTotal->nStrokes += pRound->nStrokes;
+    pTotal->nPar3Strokes += pRound->nPar3Strokes;
+    pTotal->nPar4Strokes += pRound->nPar4Strokes;
+    pTotal->nPar5Strokes += pRound->nPar5Strokes;
+    pTotal->nSeasonWinnings += pRound->nSeasonWinnings;
     pTotal->n44 += pRound->n44;
-    pTotal->n48 += pRound->n48;
-    pTotal->n4A += pRound->n4A;
-    pTotal->n50 += pRound->n50;
-    pTotal->n54 += pRound->n54;
+    pTotal->nSeasonWins += pRound->nSeasonWins;
+    pTotal->nPlayerOfYearPoints += pRound->nPlayerOfYearPoints;
+    pTotal->nCareerWinnings += pRound->nCareerWinnings;
+    pTotal->nCareerWins += pRound->nCareerWins;
 }
 
 // A round is over. The round count goes up and a player who missed the cut is out; after the last
@@ -489,12 +491,12 @@ void fn_800EF294(void) {
 
 // TW06: GameModeDriverPGATour::EndHole (by its slot). Outside a playoff, the hole just finished goes
 // into the round's statistics (lbl_80205ED8): strokes and putts, the hole's result against par,
-// counts per par 3, 4 and 5, and the longest values; after the 18th hole the profile's n104CC run
+// counts per par 3, 4 and 5, and the longest values; after the 18th hole the profile's tour.n4E98 run
 // goes on or ends. Then the tour simulation (fn_801198F8) is given the next hole. The u16 casts on
 // the sums are in the original (a clrlwi before each add).
 void fn_800EF2B8(void) {
     PlayerNumber_t nPlayer;
-    TourStats* pRound;
+    PgaStatCounts* pRound;
     Player* p;
     int nHole;
     int nPar;
@@ -517,79 +519,79 @@ void fn_800EF2B8(void) {
     if (nPutts > 10) {
         nPutts = 0;
     }
-    pRound->n14++;
-    pRound->n36 += (u16)nStrokes;
+    pRound->nHoles++;
+    pRound->nStrokes += (u16)nStrokes;
     if (p->b310) {
-        pRound->n1C++;
+        pRound->nBunkers++;
         if (nStrokes <= nPar) {
-            pRound->n1A++;
+            pRound->nBunkerSaves++;
         }
     }
     if (nPar >= 4) {
-        pRound->n10++;
+        pRound->nFairways++;
         if (p->b2E4[nHole]) {
-            pRound->nE++;
+            pRound->nFairwaysHit++;
         }
     }
     if (p->b2F6[nHole]) {
-        pRound->n12++;
-        pRound->n18 += (u16)nPutts;
+        pRound->nGreensHit++;
+        pRound->nGIRPutts += (u16)nPutts;
         if (bUnder) {
-            pRound->n34++;
+            pRound->nGIRBirdies++;
         }
     } else if (nStrokes <= nPar) {
-        pRound->n1E++;
+        pRound->nNonGIRPars++;
     }
-    pRound->n16 += (u16)nPutts;
+    pRound->nPutts += (u16)nPutts;
     if (bUnder) {
         if (nStrokes < nPar - 1) {
-            pRound->n24++;
+            pRound->nEagles++;
         }
-        pRound->n26++;
+        pRound->nBirdies++;
     } else if (nStrokes > nPar) {
-        pRound->n22++;
+        pRound->nBogeys++;
     }
     switch (nPar) {
     case 3:
-        pRound->n2A++;
-        pRound->n38 += (u16)nStrokes;
+        pRound->nPar3Holes++;
+        pRound->nPar3Strokes += (u16)nStrokes;
         if (bUnder) {
-            pRound->n28++;
+            pRound->nPar3Birdies++;
         }
         break;
     case 4:
-        pRound->n2E++;
-        pRound->n3A += (u16)nStrokes;
+        pRound->nPar4Holes++;
+        pRound->nPar4Strokes += (u16)nStrokes;
         if (bUnder) {
-            pRound->n2C++;
+            pRound->nPar4Birdies++;
         }
         break;
     case 5:
-        pRound->n32++;
-        pRound->n3C += (u16)nStrokes;
+        pRound->nPar5Holes++;
+        pRound->nPar5Strokes += (u16)nStrokes;
         if (bUnder) {
-            pRound->n30++;
+            pRound->nPar5Birdies++;
         }
         break;
     }
     if (nHole >= 1 && bUnder) {
         nPrev = nHole - 1;
         if (p->nStrokes[nPrev] > fn_800D2AD8(nPrev)) {
-            pRound->n20++;
+            pRound->nBirdiesAfterBogey++;
         }
     }
     if (fn_800D3080(nHole)) {
-        pRound->n6++;
-        pRound->n8 += p->nC24;
+        pRound->nDrives++;
+        pRound->nDriveDistance += p->nC24;
     }
-    pRound->n4 = pRound->n4 <= (u16)p->n2DC ? (u16)p->n2DC : pRound->n4;
-    pRound->nC = pRound->nC <= (u16)p->n2E0 ? (u16)p->n2E0 : pRound->nC;
+    pRound->nLongestDrive = pRound->nLongestDrive <= (u16)p->n2DC ? (u16)p->n2DC : pRound->nLongestDrive;
+    pRound->nLongestPutt = pRound->nLongestPutt <= (u16)p->n2E0 ? (u16)p->n2E0 : pRound->nLongestPutt;
     if (nHole == 17) {
         n = fn_80119638(0, 0, gpSaveData[nPlayer].tour.nRound);
         if (n <= fn_800D2FB4(gSession.nTeeSet[0])) {
-            gpSaveData[nPlayer].n104CC++;
+            gpSaveData[nPlayer].tour.n4E98++;
         } else {
-            gpSaveData[nPlayer].n104CC = 0;
+            gpSaveData[nPlayer].tour.n4E98 = 0;
         }
     }
     fn_801198F8(0, nHole + 1);

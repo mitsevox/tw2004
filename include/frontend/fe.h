@@ -124,14 +124,74 @@ void fn_800B67EC(void);                               // wait for the ARAM copy
 
 // ---- the Create-A-Player database (FE_CrAPDB.c) ----------------------------------------------
 
-// A Create-A-Player asset (a hat, a shirt, a colour...). Only what the cleaned code reads.
+// A created golfer is put together from CRAP_NUM_PARTS parts (headwear, shirts, shoes...), and
+// each part offers a list of assets to choose from.
+#define CRAP_NUM_PARTS 24
+
+// A Create-A-Player asset (0x118 bytes): a hat, a shirt, a colour... The 'CR_A' stream object is
+// the array of them all (fn_80105188). Only what the cleaned code reads.
 typedef struct CrAPAsset {
     u8   unk0[4];
-    char szName[0x28 - 0x4];    // 0x04  "White", "Bright Red", "... backwards" ...
-    u8   unk28[2];
-    s16  nCategory;             // 0x2A  fn_801064EC gives the category's name ("Hats", "Visors")
+    char szName[0x28 - 0x4];    // 0x004  "White", "Bright Red", "... backwards" ...
+    s16  nPart;                 // 0x028  the part it is a choice for
+    s16  nCategory;             // 0x02A  its category: where the category's name ("Hats",
+                                //        "Visors") starts in the 'CR_S' strings (fn_801064EC)
+    s16  n2C;                   // 0x02C
+    u8   unk2E[2];
+    s32  n30;                   // 0x030
+    s32  n34;                   // 0x034
+    s32  n38;                   // 0x038
+    s8   nAttrA;                // 0x03C  } the two attributes it raises (-1: none) and the tier
+    s8   nTierA;                // 0x03D  } it raises each to
+    s8   nAttrB;                // 0x03E  }
+    s8   nTierB;                // 0x03F  }
+    s8   n40;                   // 0x040  the database's n4 it is offered with (2: any; fn_801061C8)
+    s8   nLockKind;             // 0x041  } how it is unlocked and the number that goes with it
+    s16  nLock;                 // 0x042  } (fn_80078008)
+    s16  n44;                   // 0x044
+    s16  n46;                   // 0x046
+    s16  n48;                   // 0x048
+    s8   a4A[0x58 - 0x4A];      // 0x04A  indexed by fn_80105644's last argument
+    u8   unk58[0x118 - 0x58];
 } CrAPAsset;
+LAYOUT_ASSERT(CrAPAsset, 0x118);
 
+// The Create-A-Player database (0x18 bytes, allocated by fn_801037F8).
+typedef struct CrAPDB {
+    s32  nAssets;               // 0x00  how many assets pAssets holds
+    s8   n4;                    // 0x04  which assets are offered (fn_801061C8): fn_80103B8C sets it
+    u8   unk5[3];
+    CrAPAsset* pAssets;         // 0x08  the 'CR_A' object's data: every asset
+    char* pStrings;             // 0x0C  } the 'CR_S' object's data (the names the assets use)
+    u32  uStringsSize;          // 0x10  } and its size
+    u8   b14;                   // 0x14  1 when allocated; fn_80103B74 sets it
+    u8   unk15[3];
+} CrAPDB;
+LAYOUT_ASSERT(CrAPDB, 0x18);
+
+extern CrAPDB* lbl_80282460;
+extern UStreamObject* lbl_80282464;     // the 'CR_A' object (the assets), kept until freed
+extern UStreamObject* lbl_80282468;     // the 'CR_S' object (their names)
+extern s32* lbl_80282474;               // per part: the index of its first asset
+extern char lbl_801932C8[CRAP_NUM_PARTS][32];   // per part: the name of its "All ..." entry that
+                                        // lists every category ("All Headwear"), or ""
+
+int  fn_80103B28(int nAsset);           // the asset nAsset takes its attributes from (itself,
+                                        // or for lock kind 28 the asset its nLock names)
+u8   fn_80104020(int nAsset);           // the asset may be picked: not locked when last checked,
+                                        // and its aB1CC bit is set
+int  fn_801048EC(s16 nPart, int b);     // how many choices a part has
+int  fn_80104FA8(s16 nPart, int b, int i);          // a part's choice i: the asset's index
+CrAPAsset* fn_80104E84(s16 nPart, int b, int i);    // a part's choice i: the asset
+CrAPAsset* fn_80104F68(int nAsset);     // an asset by index
+int  fn_80105494(int nAsset);           // } the two attributes an asset raises (-1: none)
+int  fn_80105504(int nAsset);           // }
+int  fn_801054CC(int nAsset);           // } and the tier it raises each to
+int  fn_8010553C(int nAsset);           // }
+s8   fn_801055DC(int nAsset);           // } an asset's lock kind and number (-1: no such
+s16  fn_80105610(int nAsset);           // } asset)
+s32  fn_80105C00(void);                 // how many assets there are
+u8   fn_80105C30(void);                 // the Create-A-Player database is allocated
 char* fn_801064EC(int nCategory);       // a category's name
 int  fn_8015F844(const char* a, const char* b);       // strcmp ignoring case (MSL's __lower_map)
 
@@ -141,6 +201,7 @@ void FE_CrAP_TurnOnPart(s16 nPart, int b, int c);      // FE_CrAPDB.c
 SaveProfile* fn_80077ACC(void);         // the profile being worked on
 int  fn_80077B08(void);                 // its player slot
 u8   fn_80077B18(int nGolfer);          // a yes/no list over golfers 0..28 (Golfer.c asks it)
+void fn_80077B78(void);                 // pick the day's random assets (fn_80077C1C)
 
 // ---- the logo editor (FE_LogoDesign.c) -------------------------------------------------------
 

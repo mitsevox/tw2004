@@ -17,8 +17,16 @@ void fn_8009EB38(UStreamObject* pObject);
 s32  fn_8009ED34(s32 nPort, s32 nSlot, const char* pName, const char* pBackupName);
 s32  fn_8009EECC(s32 nPort, s32 nSlot, const char* pName);
 s32  fn_80125194(s32 a, s32 b);         // EA Sports Bio (0x80125194)
+void GXSetVtxAttrFmt(int nFmt, int nAttr, int nCnt, int nType, u8 uFrac);   // port: GameCube only
 u8*  Skalib_ScratchToAram(int n);       // skalib.c
 void Skalib_ScratchFromAram(int n);     // skalib.c
+
+// Every operation starts here: note its size and how far the CARD library's transfer count has
+// got, from which its progress is measured.
+void fn_8009CB9C(s32 nPort, s32 nSlot, s32 nSize) {
+    lbl_801F1510[nPort][nSlot].nXferStart = CARDGetXferredBytes(nPort);
+    lbl_80281FB4 = nSize;
+}
 
 // Park the save file images: take the ARAM for them once, allocate both, then let fn_8009EF98 copy
 // them to ARAM and free them.
@@ -422,4 +430,52 @@ s32 fn_8009F488(s32 nFile) {
     CARDClose(&lbl_801E3180[nFile]);
     lbl_802813D8 = -1;
     return 0;
+}
+
+s32 fn_8009F6A0(s32 nPort, s32 nSlot) {
+    CARDStat stat;
+    int i;
+    for (i = 0; i < 127; i++) {
+        if (CARDGetStatus(nPort, i, &stat) == CARD_RESULT_READY &&
+            strstr(stat.fileName, "BASLUS-20572") != NULL) {
+            return 0;
+        }
+    }
+    return MC_ERR_NOFILE;
+}
+
+// Whether the card in this port had an I/O error.
+u8 fn_8009F728(int nPort) {
+    return lbl_80281FD0[nPort];
+}
+
+s32 fn_8009F734(s32 nPort, s32 nSlot) {
+    u32 uFlags = lbl_801F1510[nPort][nSlot].uFlags;
+    if (!(uFlags & MC_CARD_PRESENT)) return -4;
+    if (!(uFlags & 0x08)) return -1;
+    if (!(uFlags & MC_CARD_MOUNTED)) return MC_ERR_NOTMOUNTED;
+    return 0;
+}
+
+// Vertex format 2: position (x, y, z floats), colour (RGBA8) and a texture coordinate (s, t floats).
+// port: GameCube only.
+void fn_8009F780(void) {
+    GXSetVtxAttrFmt(2, 9, 1, 4, 0);
+    GXSetVtxAttrFmt(2, 11, 1, 5, 0);
+    GXSetVtxAttrFmt(2, 13, 1, 4, 0);
+}
+
+void fn_8009F7E4(void) {
+}
+
+u8 fn_8009F7E8(int nPort) {
+    return lbl_80282008[nPort];
+}
+
+void fn_8009F7F4(MCCardState* pState, int nPort, int nSlot) {
+    *pState = lbl_801F1510[nPort][nSlot];
+}
+
+MCCardState* fn_8009F834(s32 nPort, s32 nSlot) {
+    return &lbl_801F1510[nPort][nSlot];
 }

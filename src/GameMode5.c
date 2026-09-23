@@ -153,10 +153,10 @@ void fn_800EAF18(UStreamObject* pObject) {
 // the mode's own ones kept for fn_800EAD6C and the rest to call.
 void fn_800EAF7C(void) {
     int h;
-    int i;
     int nSum;
     int nSum0;
     int nDiff;
+    int i;
     int nStrokes;
     int nPar;
     int nHoles;
@@ -344,10 +344,10 @@ void fn_800EAF7C(void) {
             nSum0 = 0;
             for (h = 0; h < Game_CurHoleIndex(); h++) {
                 gPlayers[0].nStrokes[h] = fn_800D2AD8(h);
-                for (i = 1; i < gNumPlayersSetUp; i++) {
-                    PLAYER(i)->nStrokes[h] = fn_800D2AD8(h);
-                }
                 nSum0 += gPlayers[0].nStrokes[h];
+                for (i = 1; i < gNumPlayersSetUp; i++) {
+                    gPlayers[(u32)i].nStrokes[h] = fn_800D2AD8(h);
+                }
             }
             nDiff = lbl_80281664[lbl_802822F4].nTargetBase;
             while (nDiff != 0) {

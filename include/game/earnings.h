@@ -68,7 +68,7 @@ typedef struct EarningsTable {
     u8   unk4AC[0x5E4 - 0x4AC];
     MatchPrize aLadderPrize[25];    // 0x5E4  per ladder event
     MiniPrize aMini[20];            // 0x710
-    u8   unk940[0x980 - 0x940];
+    s32  aCourseMult[16];       // 0x940  the course multiplier (x1..x4) per course, in fn_800D6EEC's order
     s32  aTeePct[3];            // 0x980  the tee multiplier, as [2 - nTeeSet] (tee set 3 pays as 1)
     s32  aPinSetPct[4];         // 0x98C  the multiplier for the hole's pin set (gpGame->nPinSet) 0..3
     s32  aTourPct[6];           // 0x99C  the TOUR card multiplier per level 1..6 (level 0 pays as 1)
@@ -86,6 +86,10 @@ LAYOUT_ASSERT(EarningsTable, 0x22F0);
 
 extern EarningsTable lbl_80200538;
 extern s32 lbl_801FFD68[10];    // the courses fn_800D3A20 unlocked, for their messages
+extern s32 lbl_80200448[10];    // a working table: fn_800D439C messages the entries of kind 2 or 4
+extern s32 lbl_802004C0[10];    // with these ids
+extern s32 lbl_802004E8[10];    // the putt record ids (2)
+extern s32 lbl_80200470[10];    // the putt record results (fn_800D7B1C)
 extern s32 lbl_80200498[10];    // a working table: fn_800D3DDC messages the entries of kind 2 or 4
 extern s32 lbl_80200510[10];    // with these ids
 extern s32 lbl_80282258;        // their count

@@ -5,18 +5,23 @@
 
 #include "golfer.h"
 #include "charstate.h"
+#include "unsorted/cull.h"
 
 void  fn_80014BB4(void);
 void  fn_80014C9C(void);
 void  fn_80014DC0(void);
+void  fn_8001A024(Character* pChar);
 void  fn_8001A288(void);
 void  fn_8001A33C(void);
+void  fn_8001A3B0(Character* pChar);
 void  fn_8001A4BC(void);
+void  fn_8001A58C(int nPlayer);
 void  fn_8001A75C(UStreamObject* pObject);
 void  fn_8001A798(void);
 void  fn_8001A7C8(void);
 Character* fn_8001A9F4(u8* pData, int a, int nPlayer, u32 uId, u8 b, void* p);
 void* fn_8001B208(u8* pData);
+void  fn_8001B878(Character* pChar, int n);
 void  fn_8001C0E0(Character* pChar);
 Character* fn_8001C21C(Character* pChar);
 void  fn_8001CCF8(UStreamObject* pObject);
@@ -29,6 +34,8 @@ void  fn_8001EBD8(Character* pChar, int nBone, f32* pPos);
 u8    fn_8001EC48(Character* pChar);
 f32 (*fn_8001EC6C(Character* pChar, int nBone))[4];
 f32 (*fn_8001ECA8(Character* pChar, int nBone))[4];
+f32   fn_8001EFFC(CamLens* pLens);
+CamLens* fn_8001F004(void);
 void  fn_80027738(u8 bOn);
 void  fn_80035C58(void);
 void  fn_80035CC0(void);
@@ -38,12 +45,19 @@ void  fn_80095554(void);
 void  fn_8009555C(void);
 void  fn_80095560(void);
 void  fn_80095564(void);
+void  fn_800955F0(int nPlayer);
+void  fn_8008E918(s32 v);
+u8    fn_8008E938(void);
+void  fn_8008EAC8(u8 v);
 void  fn_800C937C(void);
 void  fn_800C9764(void);
 void  fn_800C9FE0(void);
 void  fn_800CCA1C(void);
 void  fn_800CCA3C(void);
+void  fn_800CEE04(Skin* pSkin, int a, int b);
 void  fn_800CEE88(u8 b);
+u8    fn_800FCC38(int nPlayer);
+void  fn_8010A668(void* p);
 void  fn_8010BF68(void);
 void  fn_8010BFE0(void);
 void  fn_80112C64(int n);
@@ -53,20 +67,9 @@ void  fn_80112CEC(void);
 s32 fn_8001E8A4(s32, s32);
 s32 fn_8001E938(s32, s32);
 void fn_80017864(void* arg0, s32 arg1);
-void fn_80019C84(void);
-s32 fn_8008E918(s32);
-u8 fn_8008E938();
-s32 fn_8008EAC8(s32);
-s32 fn_8001A024(s32);
-void fn_8001A0FC(s32 arg0);
 void fn_8001B1DC(s32 p0, u8* p1, s32 p2);
 void fn_8001B1E8(void* p);
 void fn_8001C650(void* arg0, s32 arg1);
-f32 fn_8001EFFC(u8* p);
-void* fn_8001F004(void);
-extern f32 lbl_80282BC0;
-extern f32 lbl_80282BF8;
-void* fn_80008370();
 
 void fn_80017864(void* arg0, s32 arg1) {
     if ((u32) (*(u32*)((u8*)(arg0) + 0x3C)) != 0U) {
@@ -74,15 +77,6 @@ void fn_80017864(void* arg0, s32 arg1) {
         fn_8001E8A4(arg1 + 0x30, 0x80);
         fn_8001E938(arg1, 0x80);
         fn_8001E938(arg1 + 0x10, 0x80);
-    }
-}
-
-void fn_8001A0FC(s32 arg0) {
-    fn_80019C84();
-    fn_8008E918(2);
-    fn_8008EAC8(1);
-    if (fn_8008E938() == 0) {
-        fn_8001A024(arg0);
     }
 }
 
@@ -103,14 +97,6 @@ void fn_8001C650(void* arg0, s32 arg1) {
         (*(s32*)((u8*)(arg0) + 0x16D4)) = 4;
     }
     (*(s32*)((u8*)(arg0) + 0x16D4)) = arg1;
-}
-
-f32 fn_8001EFFC(u8* p) {
-    return *(f32*)(p + 0xB0);
-}
-
-void* fn_8001F004(void) {
-    return fn_80008370(*(s32*)((u8*)lbl_80280DF0));
 }
 
 // ---- end of sweep code ----
@@ -156,7 +142,98 @@ void fn_80019648(void) {
     fn_8001A4BC();
 }
 
-void fn_8001A484(void) {
+// Give back the character's pool entries and free what it holds.
+void fn_8001971C(Character* pChar) {
+    fn_8001A3B0(pChar);
+    if (pChar->pA8 != NULL) {
+        fn_80009E70(pChar->pA8);
+    }
+    if (pChar->pB0 != NULL) {
+        fn_80009E70(pChar->pB0);
+    }
+    if (pChar->pB8 != NULL) {
+        fn_80009E70(pChar->pB8);
+    }
+    if (pChar->pBC != NULL) {
+        fn_80009E70(pChar->pBC);
+    }
+    if (pChar->hFile >= 0) {
+        fn_8000633C(pChar->hFile);
+    }
+}
+
+void fn_80019C1C(Character* pChar) {
+    int i;
+    for (i = 0; i < pChar->nSkins; i++) {
+        fn_800CEE04(pChar->apSkins[i], 3, 2);
+    }
+}
+
+void fn_80019C84(Character* pChar) {
+    int i;
+    for (i = 0; i < pChar->nSkins; i++) {
+        fn_800CEE04(pChar->apSkins[i], 2, 1);
+    }
+}
+
+void fn_80019CEC(Character* pChar) {
+    int i;
+    for (i = 0; i < pChar->nSkins; i++) {
+        fn_800CEE04(pChar->apSkins[i], 1, 0);
+        pChar->apSkins[i]->u10D4 |= 1;
+    }
+}
+
+void fn_8001A0FC(Character* pChar) {
+    fn_80019C84(pChar);
+    fn_8008E918(2);
+    fn_8008EAC8(1);
+    if (fn_8008E938() == 0) {
+        fn_8001A024(pChar);
+    }
+}
+
+// Reset every pool entry and mark it free.
+void fn_8001A33C(void) {
+    int i;
+    for (i = 0; i < lbl_801B95E8.nEntries; i++) {
+        fn_8010A668(lbl_801B95E8.a[i].p);
+        lbl_801B95E8.a[i].bUsed = 0;
+    }
+}
+
+// Give the character's pool entries back.
+void fn_8001A3B0(Character* pChar) {
+    int i;
+    for (i = 0; i < pChar->n70; i++) {
+        if (pChar->a64[i] != NULL) {
+            lbl_801B95E8.a[pChar->a6C[i]].bUsed = 0;
+            pChar->a6C[i] = -1;
+            pChar->a64[i] = NULL;
+        }
+    }
+    pChar->bE0 = 0;
+}
+
+// Take n70 free pool entries for the character.
+void fn_8001A418(Character* pChar) {
+    int i;
+    int n = 0;
+    for (i = 0; i < lbl_801B95E8.nEntries; i++) {
+        if (lbl_801B95E8.a[i].bUsed == 0) {
+            pChar->a6C[n] = i;
+            pChar->a64[n] = lbl_801B95E8.a[i].p;
+            n++;
+            lbl_801B95E8.a[i].bUsed = 1;
+            if (n == pChar->n70) {
+                return;
+            }
+        }
+    }
+}
+
+// Empty; fn_8001A4BC calls it with a player's character.
+void fn_8001A484(Character* pChar) {
 }
 
 void fn_8001A488(void) {
@@ -369,6 +446,16 @@ Character* fn_8001D324(int nId) {
     return NULL;
 }
 
+// Run fn_8001B878 on every character with no player (the 'SKLO' ones).
+void fn_8001D384(void) {
+    int i;
+    for (i = 0; i < lbl_80281CA8; i++) {
+        if (lbl_801B9624[i]->nPlayer == 1000) {
+            fn_8001B878(lbl_801B9624[i], 1000);
+        }
+    }
+}
+
 // The 'SKLO' handler: a character built from the object with no player (1000), keyed by the
 // object's id.
 // port: the skeleton is little-endian on disc and fn_8001A9F4 swaps it (fn_80076158): a
@@ -402,6 +489,16 @@ void fn_8001D7A4(Character* pChar) {
     pChar->u10 = pChar->u10 | 0x40;
 }
 
+void fn_8001D8DC(int nPlayer) {
+    gPlayers[nPlayer].pChar->u10 &= ~0x40;
+    fn_800955F0(nPlayer);
+    fn_8001A58C(nPlayer);
+    if (!gSession.nSplitScreen && lbl_80281CAC != nPlayer) {
+        fn_8001D6D8(nPlayer);
+        lbl_80281CAC = nPlayer;
+    }
+}
+
 // Empty the character's four data buffers (their memory is kept).
 void fn_8001DB98(Character* pChar) {
     int i;
@@ -422,6 +519,16 @@ u8 fn_8001DBF4(Character* pChar) {
         return 1;
     }
     return 0;
+}
+
+// Every player for whom fn_800FCC38 says so has its animation played at normal speed.
+void fn_8001E7DC(void) {
+    int i;
+    for (i = 0; i < gSession.nNumPlayers; i++) {
+        if (fn_800FCC38(i)) {
+            Anim_SetRate(gPlayers[i].pChar->anim, 1.0f);
+        }
+    }
 }
 
 // Copy a quaternion (Skeleton.c's use).
@@ -507,9 +614,9 @@ f32 (*fn_8001ED08(Character* pChar, int nBone))[4] {
 
 f32 fn_8001ED44(Character* pChar, int b) {
     if (b != 0) {
-        return pChar->f1660 * (lbl_80282BF8 / fn_8001EFFC(fn_8001F004()));
+        return pChar->f1660 * (0.5f / fn_8001EFFC(fn_8001F004()));
     }
-    return pChar->f1660 * (lbl_80282BC0 / fn_8001EFFC(fn_8001F004()));
+    return pChar->f1660 * (1.0f / fn_8001EFFC(fn_8001F004()));
 }
 
 // A bone's position, by bone id through fn_8001EEE4.
@@ -523,9 +630,9 @@ u8 fn_8001EDF4(Character* pChar) {
 
 f32 fn_8001EE00(Character* pChar, int b) {
     if (b != 0) {
-        return pChar->f165C * (lbl_80282BF8 / fn_8001EFFC(fn_8001F004()));
+        return pChar->f165C * (0.5f / fn_8001EFFC(fn_8001F004()));
     }
-    return pChar->f165C * (lbl_80282BC0 / fn_8001EFFC(fn_8001F004()));
+    return pChar->f165C * (1.0f / fn_8001EFFC(fn_8001F004()));
 }
 
 void fn_8001EE64(Character* pChar) {
@@ -547,6 +654,15 @@ void fn_8001EE98(Character* pChar, u8 b) {
 // The dot product of two 4-vectors.
 f32 fn_8001EEA4(f32* pA, f32* pB) {
     return pA[0] * pB[0] + pA[1] * pB[1] + pA[2] * pB[2] + pA[3] * pB[3];
+}
+
+f32 fn_8001EFFC(CamLens* pLens) {
+    return pLens->fB0;
+}
+
+// The current render camera's lens.
+CamLens* fn_8001F004(void) {
+    return fn_80008370(*lbl_80280DF0);
 }
 
 int fn_8001EED8(CharModel* pModel, int nBone) {

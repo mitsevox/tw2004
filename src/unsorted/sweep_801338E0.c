@@ -7,7 +7,7 @@ void EXI2_Init(void);
 void EXI2_EnableInterrupts(void);
 s32 EXI2_Poll(void);
 s32 EXI2_ReadN(void);
-s32 fn_801338F8(void);
+s32 EXI2_WriteN(void);
 void EXI2_Reserve(void);
 void EXI2_Unreserve(void);
 s32 AMC_IsStub(void);
@@ -26,7 +26,7 @@ s32 EXI2_ReadN(void) {
     return 0;
 }
 
-s32 fn_801338F8(void) {
+s32 EXI2_WriteN(void) {
     return 0;
 }
 
