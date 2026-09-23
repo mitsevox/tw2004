@@ -972,10 +972,12 @@ void GOLFERSTATE_Update(void) {
 
 // Pop every player's states.
 void fn_8005CD94(void) {
-    int i;
+    s8*         pTop;
+    SwingStack* pStack;
+    int         i;
     for (i = 0; i < 5; i++) {
-        SwingStack* pStack = &gSwingStacks[i];
-        s8*         pTop   = &pStack->nTop;
+        pStack = &gSwingStacks[(u32)i];
+        pTop   = &pStack->nTop;
         while (*pTop > -1) {
             if (sGolferStateEngineTable[(s8)pStack->nState[*pTop]].pfnExit != NULL) {
                 gInSwingExit = 1;
