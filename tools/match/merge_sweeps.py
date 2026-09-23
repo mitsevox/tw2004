@@ -154,8 +154,14 @@ def append(path, includes, decls, bodies):
             chunk = [sweepblock.BEGIN, ''] + code + ['', sweepblock.END, '']
         lines = lines[:at] + chunk + lines[at:]
     if missing:
-        last = max((i for i, l in enumerate(lines) if l.startswith('#include')), default=0)
-        lines = lines[:last + 1] + missing + lines[last + 1:]
+        last = max((i for i, l in enumerate(lines) if l.startswith('#include')), default=None)
+        if last is None:                             # no includes yet: after the header comment
+            at = 0
+            while at < len(lines) and lines[at].startswith('//'):
+                at += 1
+            lines = lines[:at] + [''] + missing + lines[at:]
+        else:
+            lines = lines[:last + 1] + missing + lines[last + 1:]
     out = '\n'.join(lines) + '\n'
     for b in bodies:                                 # every body verbatim, every old line kept
         assert b in out
