@@ -1996,20 +1996,8 @@ unsorted/sweep_800957B0.c:
 unsorted/sweep_800957D8.c:
 	.text       start:0x800957D8 end:0x800957FC
 
-unsorted/sweep_800958EC.c:
-	.text       start:0x800958EC end:0x800958F8
-
-unsorted/sweep_800962F8.c:
-	.text       start:0x800962F8 end:0x80096338
-
-unsorted/sweep_8009637C.c:
-	.text       start:0x8009637C end:0x80096398
-
-unsorted/sweep_80096508.c:
-	.text       start:0x80096508 end:0x80096530
-
 CharAnim.c:
-	.text       start:0x800965DC end:0x80096690
+	.text       start:0x800957FC end:0x80097208
 
 GoShaderObjectCommon_MorphAnimManager_Gc.c:
 	.text       start:0x80097208 end:0x800975B0
@@ -2090,19 +2078,10 @@ GoGreenGrid.c:
 	.text       start:0x8009B630 end:0x8009C914
 
 MC_Gc.c:
-	.text       start:0x8009CC00 end:0x8009F6A0
-
-unsorted/sweep_8009F780.c:
-	.text       start:0x8009F780 end:0x8009F7E4
-
-unsorted/sweep_8009F7E4.c:
-	.text       start:0x8009F7E4 end:0x8009F7E8
-
-unsorted/sweep_8009F834.c:
-	.text       start:0x8009F834 end:0x8009F850
+	.text       start:0x8009CB9C end:0x8009F850
 
 MC.c:
-	.text       start:0x8009FAD0 end:0x800A233C
+	.text       start:0x8009F850 end:0x800A233C
 
 unsorted/sweep_800A2604.c:
 	.text       start:0x800A2604 end:0x800A2614
@@ -2683,6 +2662,12 @@ unsorted/sweep_800BD83C.c:
 
 GoGolfCam.c:
 	.text       start:0x800BD894 end:0x800C7480
+	.rodata     start:0x80184C78 end:0x80184D20
+	.data       start:0x80191308 end:0x80191440
+	.bss        start:0x801FA1E8 end:0x801FA1F8
+	.sdata      start:0x80281520 end:0x80281528
+	.sbss       start:0x80282220 end:0x80282228
+	.sdata2     start:0x802842C0 end:0x802843B8
 
 GoBreakLine.c:
 	.text       start:0x800C808C end:0x800C9310
@@ -3645,8 +3630,12 @@ dolphin/mtx/mtx44.c:
 	.text       start:0x80147DB0 end:0x80147E48
 	.sdata2     start:0x80284C50 end:0x80284C60
 
-src/dolphin/os/OS.c:
+dolphin/os/OS.c:
 	.text       start:0x80147E48 end:0x80148790
+	.data       start:0x8019B0E0 end:0x8019B2E8
+	.bss        start:0x8027C960 end:0x8027C9B0
+	.sdata      start:0x80281AA8 end:0x80281AB0
+	.sbss       start:0x802828A8 end:0x802828D8
 
 dolphin/os/OSAlarm.c:
 	.text       start:0x80148790 end:0x80148E40
@@ -3839,11 +3828,9 @@ src/MSL_C/strtoul.c:
 	.text       start:0x8015B8DC end:0x8015C120
 	.data       start:0x8019CCC0 end:0x8019CD48
 
-unsorted/sweep_8015C120.c:
-	.text       start:0x8015C120 end:0x8015C128
-
-unsorted/sweep_8015C128.c:
-	.text       start:0x8015C128 end:0x8015C1F8
+runtime/uart_console_io.c:
+	.text       start:0x8015C120 end:0x8015C1F8
+	.sbss       start:0x80282A00 end:0x80282A08
 
 runtime/wchar_io.c:
 	.text       start:0x8015C1F8 end:0x8015C280
@@ -4033,12 +4020,18 @@ MetroTRK/UDP_Stubs.c:
 
 MetroTRK/ddh/main.c:
 	.text       start:0x80164B88 end:0x80164ECC
+	.rodata     start:0x80185F18 end:0x80185FF8
+	.bss        start:0x8027F898 end:0x802800B8
+	.sbss       start:0x80282A18 end:0x80282A20
 
 MetroTRK/CircleBuffer.c:
 	.text       start:0x80164ECC end:0x80165134
 
 MetroTRK/gdev/main.c:
 	.text       start:0x80165134 end:0x80165480
+	.rodata     start:0x80185FF8 end:0x801860D8
+	.bss        start:0x802800B8 end:0x802805D8
+	.sbss       start:0x80282A20 end:0x80282A28
 
 MetroTRK/MWTrace.c:
 	.text       start:0x80165480 end:0x801654D0

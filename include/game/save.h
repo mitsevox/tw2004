@@ -157,7 +157,13 @@ typedef struct SaveProfile {
     s32  n74;                   // 0x00074  stroke-play rounds counted
     s32  n78;                   // 0x00078  their strokes
     s32  n7C;                   // 0x0007C  full rounds counted
-    u8   unk80[0xA8 - 0x80];
+    u8   unk80[8];
+    s32  n88;                   // 0x00088  drives counted (the tee shot of a par 4 or 5 off class-1
+                                //          ground; fn_800D8FE4)
+    s32  n8C;                   // 0x0008C  their distance together
+    u8   unk90[0xA0 - 0x90];
+    s32  nA0;                   // 0x000A0  the longest of those drives
+    s32  nA4;                   // 0x000A4  the longest putt, in feet (fn_800D8FE4)
     s32  nA8;                   // 0x000A8  the best stroke-play round (0: none yet)
     u8   unkAC[0xC8 - 0xAC];
     TourWin aC8[31];            // 0x000C8  one per PGA TOUR tournament
@@ -220,6 +226,9 @@ extern u32 lbl_801D5948[8];             // a bit array the code at 0x80056480 ke
                                         // kind 6 tests bits 1..5 of it
 extern s32 lbl_80189528[14];            // the golfers GM_GetGameProgress counts as unlockable
 extern s32 lbl_801894D0[6];             // the courses GM_GetGameProgress counts as unlockable
+
+// GameManager.c: the profile's completion score (fn_800D439C raises the TOUR card level with it)
+f32  GM_GetGameProgress(SaveProfile* pProfile);
 
 // Earnings.c: the awards
 u8   fn_800D7770(int nPlayer, Award* pAward);   // mark an award won today; 1 if it was not won before

@@ -157,7 +157,8 @@ typedef struct SKABlendNode {
 typedef struct BlendClip {
     u8   unk0[8];
     f32  f08;                   // 0x08  added to the time fn_800204A0 samples the clip at
-    u8   unkC[0x24 - 0xC];
+    f32  f0C;                   // 0x0C
+    u8   unk10[0x24 - 0x10];
     f32  f24;                   // 0x24  the swing measures the ball-hit time from it
 } BlendClip;
 
@@ -185,6 +186,16 @@ typedef struct CharBuffer {
 } CharBuffer;
 LAYOUT_ASSERT(CharBuffer, 0x1C);
 
+// An animation player; only what is read. Character has two: the one at 0x164, whose fields are
+// named in Character directly, and anim29C.
+typedef struct AnimPlayer {
+    u8    unk0[0xC];
+    s32   nC;                   // 0x0C  } set together by fn_800958EC
+    f32   f10;                  // 0x10  }
+    u8    unk14[4];
+    f32   fTime;                // 0x18
+} AnimPlayer;
+
 // The golfer's character object (0x1798 bytes or more); only the fields read so far. Anim_SetRate,
 // Anim_SetTime and fn_8007326C take the address of its animation player at 0x164, whose fields
 // from 0x168 on are named here directly.
@@ -200,13 +211,36 @@ typedef struct Character {
     u8    unk14[0x1C - 0x14];
     s32   nAnim;                // 0x01C  the playing animation (6 backswing, 7 downswing)
     s32   n20;                  // 0x020
-    u8    unk24[0x2C - 0x24];
+    s8    n24;                  // 0x024  } counters CharacterState's idle update (fn_80096398) runs down
+    s8    n25;                  // 0x025  }
+    s8    n26;                  // 0x026  set while that update's clip plays
+    u8    unk27;
+    s32   u28;                  // 0x028  bit 0: a state change is waiting (fn_80096F0C)
     s32   n2C;                  // 0x02C  tested for 0 (PreShotInit) and for 4 or 5 (ShotSetupInit)
-    u8    unk30[0x34 - 0x30];
+    s32   n30;                  // 0x030
     s32   nSlot;                // 0x034  the animation slot it uses (skalib); the CrAP camera's shot names
                                 //        get an 'f' in front when it is 1
     CharModel* pModel;          // 0x038
-    u8    unk3C[0x164 - 0x3C];
+    struct Skin* pSkin;         // 0x03C  its body's skin (Skin.c), the first of apSkins
+    u8    unk40[0x54 - 0x40];
+    s32   hFile;                // 0x054  a file closed with it (fn_8001971C), -1 none
+    u8    unk58[0x64 - 0x58];
+    void* a64[2];               // 0x064  } entries taken from lbl_801B95E8 (fn_8001A418), and their
+    s8    a6C[2];               // 0x06C  } indices there (-1 once given back)
+    u8    unk6E[2];
+    s32   n70;                  // 0x070  how many of a64 it takes
+    s32   n74;                  // 0x074  the one of a64 fn_80019E80 uses
+    u8    unk78[0xA8 - 0x78];
+    void* pA8;                  // 0x0A8  } freed by fn_8001971C
+    u8    unkAC[4];
+    void* pB0;                  // 0x0B0  }
+    u8    unkB4[4];
+    void* pB8;                  // 0x0B8  }
+    void* pBC;                  // 0x0BC  }
+    struct Skin* apSkins[7];    // 0x0C0  its skins: the body's, then its attachments' (fn_8001CE5C)
+    s32   nSkins;               // 0x0DC
+    u8    bE0;                  // 0x0E0  cleared by fn_8001A3B0, set by fn_8001A20C
+    u8    unkE1[0x164 - 0xE1];
     u8    anim[4];              // 0x164  the animation player (+0x14 is its playback rate)
     s32   uFlags;               // 0x168  bit 0x40: the backswing is being backed down; 0x200 / 0x400: the
                                 //        clip lookup fell back (Char_SetClip). Signed: the original tests
@@ -215,10 +249,12 @@ typedef struct Character {
     f32   fAnimTime;            // 0x17C
     u8    unk180[0x184 - 0x180];
     f32   fAnimEnd;             // 0x184  the animation's end time
-    u8    unk188[0x3D8 - 0x188];
+    u8    unk188[0x29C - 0x188];
+    AnimPlayer anim29C;         // 0x29C  a second animation player
+    u8    unk2B8[0x3D8 - 0x2B8];
     AnimLib* pLib;              // 0x3D8  its animation library
     struct ClipRecord* pRecords;    // 0x3DC  records for its merged library (skalib)
-    u8    unk3E0[0x40C - 0x3E0];
+    u8    node3E0[0x40C - 0x3E0];   // 0x3E0  a blend node for anim29C (fn_800732F4 takes it as it takes blend)
     SKABlendNode blend;         // 0x40C  the root of its blend tree
     CharBuffer buffers[4];      // 0x43C
     struct { u32 bSet; f32 fTime; u8 unk8[8]; } events[18];   // 0x4AC  animation events, by 64-bit id
