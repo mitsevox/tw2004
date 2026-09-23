@@ -4016,6 +4016,8 @@ MetroTRK/msgbuf.c:
 
 MetroTRK/serpoll.c:
 	.text       start:0x80160608 end:0x801608C0
+	.rodata     start:0x80185908 end:0x80185A98
+	.bss        start:0x8027F2D8 end:0x8027F2F0
 
 MetroTRK/usr_put.c:
 	.text       start:0x801608C0 end:0x8016094C

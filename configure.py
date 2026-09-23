@@ -551,7 +551,8 @@ config.libs = [
             Object(Matching, "MetroTRK/nubinit.c"),
             Object(Matching, "MetroTRK/msg.c"),
             Object(Matching, "MetroTRK/msgbuf.c"),
-            Object(NonMatching, "MetroTRK/serpoll.c"),
+            # gTRKInputPendingPtr is a common symbol: the linker puts it in .sbss (0x80282A10)
+            Object(Matching, "MetroTRK/serpoll.c", extra_cflags=["-common on"]),
             Object(Matching, "MetroTRK/usr_put.c"),
             Object(Matching, "MetroTRK/dispatch.c"),
             Object(NonMatching, "MetroTRK/msghndlr.c"),
