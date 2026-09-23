@@ -25,7 +25,7 @@ extern PrizeTable lbl_80200538;
 extern Replay gReplayData;
 extern u8  gNumPlayersSetUp;
 extern s32 lbl_80282278;                    // the player whose turn it is
-extern s8  lbl_80282360;                    // the number of targets (GameMode10.c)
+extern s8  lbl_80282360;                    // the number of targets (GameModeReplay.c)
 extern s32 lbl_80281690;                    // the options saved while the game runs
 extern s32 lbl_80282378;
 extern u8  lbl_8028237C;                    // a new leader was just set
@@ -40,7 +40,6 @@ void  fn_800A640C(void);
 void* fn_80017004(int nView);
 void  fn_8006434C(void* pView, f32* pPos, f32* pX, f32* pY, int a);
 void  fn_8006A8D4(void* pView, f32* pX, f32* pY);
-void  fn_800F39CC(s32 p0);
 
 void  fn_800F3C2C(void);
 void  fn_800F3C48(void);
