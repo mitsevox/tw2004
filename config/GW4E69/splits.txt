@@ -628,122 +628,8 @@ PsMgr.c:
 PsBallFx.c:
 	.text       start:0x800A2C3C end:0x800A3E3C
 
-unsorted/sweep_800A3E3C.c:
-	.text       start:0x800A3E3C end:0x800A3F38
-
-unsorted/sweep_800A3F38.c:
-	.text       start:0x800A3F38 end:0x800A3F58
-
-unsorted/sweep_800A3F94.c:
-	.text       start:0x800A3F94 end:0x800A3FF4
-
-unsorted/sweep_800A3FF4.c:
-	.text       start:0x800A3FF4 end:0x800A402C
-
-unsorted/sweep_800A402C.c:
-	.text       start:0x800A402C end:0x800A4038
-
-unsorted/sweep_800A4038.c:
-	.text       start:0x800A4038 end:0x800A4044
-
-unsorted/sweep_800A4080.c:
-	.text       start:0x800A4080 end:0x800A4084
-
-unsorted/sweep_800A4374.c:
-	.text       start:0x800A4374 end:0x800A43DC
-
-unsorted/sweep_800A49A4.c:
-	.text       start:0x800A49A4 end:0x800A4A24
-
-unsorted/sweep_800A4BAC.c:
-	.text       start:0x800A4BAC end:0x800A4BDC
-
-unsorted/sweep_800A4BDC.c:
-	.text       start:0x800A4BDC end:0x800A4C54
-
-unsorted/sweep_800A4C54.c:
-	.text       start:0x800A4C54 end:0x800A4CB8
-
-unsorted/sweep_800A4FD8.c:
-	.text       start:0x800A4FD8 end:0x800A500C
-
-unsorted/sweep_800A5620.c:
-	.text       start:0x800A5620 end:0x800A562C
-
-unsorted/sweep_800A5E94.c:
-	.text       start:0x800A5E94 end:0x800A5EC0
-
-unsorted/sweep_800A624C.c:
-	.text       start:0x800A624C end:0x800A62A4
-
-unsorted/sweep_800A62A4.c:
-	.text       start:0x800A62A4 end:0x800A6448
-
-unsorted/sweep_800A6448.c:
-	.text       start:0x800A6448 end:0x800A6450
-
-unsorted/sweep_800A6EC8.c:
-	.text       start:0x800A6EC8 end:0x800A6F38
-
-unsorted/sweep_800A6F38.c:
-	.text       start:0x800A6F38 end:0x800A6FE0
-
-unsorted/sweep_800A707C.c:
-	.text       start:0x800A707C end:0x800A70E4
-
-unsorted/sweep_800A70E4.c:
-	.text       start:0x800A70E4 end:0x800A714C
-
-unsorted/sweep_800A714C.c:
-	.text       start:0x800A714C end:0x800A7198
-
-unsorted/sweep_800A7198.c:
-	.text       start:0x800A7198 end:0x800A71E4
-
-unsorted/sweep_800A71E4.c:
-	.text       start:0x800A71E4 end:0x800A7220
-
-unsorted/sweep_800A7294.c:
-	.text       start:0x800A7294 end:0x800A72EC
-
-unsorted/sweep_800A72EC.c:
-	.text       start:0x800A72EC end:0x800A7350
-
-unsorted/sweep_800A73C0.c:
-	.text       start:0x800A73C0 end:0x800A73F0
-
-unsorted/sweep_800A73F0.c:
-	.text       start:0x800A73F0 end:0x800A746C
-
-unsorted/sweep_800A7528.c:
-	.text       start:0x800A7528 end:0x800A754C
-
-unsorted/sweep_800A75B4.c:
-	.text       start:0x800A75B4 end:0x800A75F4
-
-unsorted/sweep_800A75F4.c:
-	.text       start:0x800A75F4 end:0x800A7644
-
-unsorted/sweep_800A7644.c:
-	.text       start:0x800A7644 end:0x800A7664
-
-unsorted/sweep_800A76E4.c:
-	.text       start:0x800A76E4 end:0x800A7720
-
-unsorted/sweep_800A7720.c:
-	.text       start:0x800A7720 end:0x800A7770
-
-unsorted/sweep_800A7924.c:
-	.text       start:0x800A7924 end:0x800A7968
-
-unsorted/sweep_800A7994.c:
-	.text       start:0x800A7994 end:0x800A7A34
-
-unsorted/sweep_800A7A34.c:
-	.text       start:0x800A7A34 end:0x800A7AD0
-
-unsorted/sweep_800A7AD0.c:
-	.text       start:0x800A7AD0 end:0x800A7AF0
+GameAudio.c:
+	.text       start:0x800A3E3C end:0x800A7AF0
 
 AudTable.c:
 	.text       start:0x800A7AF0 end:0x800A85CC
@@ -846,22 +732,16 @@ unsorted/sweep_800B59EC.c:
 	.text       start:0x800B59EC end:0x800B5A14
 
 UAudMemStack.c:
-	.text       start:0x800B5A14 end:0x800B5B80
-
-unsorted/sweep_800B5C30.c:
-	.text       start:0x800B5C30 end:0x800B5C40
-
-unsorted/sweep_800B5D08.c:
-	.text       start:0x800B5D08 end:0x800B5D34
-
-unsorted/sweep_800B5F28.c:
-	.text       start:0x800B5F28 end:0x800B5F4C
-
-unsorted/sweep_800B6034.c:
-	.text       start:0x800B6034 end:0x800B6060
+	.text       start:0x800B5A14 end:0x800B5C40
+	.data       start:0x8018FFA8 end:0x8018FFB8
+	.bss        start:0x801F6360 end:0x801F6680
+	.sbss       start:0x80282180 end:0x80282188
 
 GoARAM.c:
-	.text       start:0x800B61B4 end:0x800B6924
+	.text       start:0x800B5C40 end:0x800B6924
+	.data       start:0x8018FFB8 end:0x8018FFC8
+	.bss        start:0x801F6680 end:0x801F66A8
+	.sdata      start:0x802814C8 end:0x802814D0
 
 DiscError.c:
 	.text       start:0x800B6924 end:0x800B769C

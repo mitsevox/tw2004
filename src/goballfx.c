@@ -9,10 +9,10 @@
 
 void fn_80035FFC(void);
 CamLens* fn_8001F004(void);
-void fn_8000AE28(f32* pIn, f32 f, f32* pOut);   // scale a vector (four floats)
 void fn_80093990(LightSet* pSet);
 void fn_800939CC(LightSet* pSet);
-void fn_80093A04(s32 nLight, CamLens* pLens);
+f32  fn_80093A04(s32 nLight, CamLens* pLens);
+f32  fn_80093A50(GoLight* pLight, CamLens* pLens);
 
 // GoLighting.c
 void fn_8006E5A8(GoLight** apLight, s32 nLights);
@@ -192,6 +192,15 @@ void fn_80093990(LightSet* pSet) {
 void fn_800939CC(LightSet* pSet) {
     fn_8006E62C(pSet->apLight);
     fn_8006F148(pSet);
+}
+
+// The angle between the camera's direction and light nLight of the current set.
+f32 fn_80093A04(s32 nLight, CamLens* pLens) {
+    return fn_80093A50(fn_8003532C()->apLight[nLight], pLens);
+}
+
+f32 fn_80093A50(GoLight* pLight, CamLens* pLens) {
+    return fn_80009614(fn_8000C5FC(pLens->v24, pLight->u.point.vPos));
 }
 
 void BFX_vInit(void) {
