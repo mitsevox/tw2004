@@ -19,8 +19,8 @@ void  fn_800E4364(u32 nQueue, int a, int b, int c);
 u8    fn_800E4BF8(void);
 u8    fn_800EC550(void);
 void  fn_800D3548(int nPlayer, int nMoney, int a);
-void  fn_800D3C1C(void);
-s32   fn_800D3D64(int nHole);               // a hole's skin value
+void* fn_800D3C1C(void);
+s32   fn_800D3D64(void* p, int nHole);      // a hole's skin value
 u8    fn_801025F4(void);
 void  fn_80102704(void);
 void  fn_80102874(void);
@@ -193,10 +193,10 @@ u8 fn_800F8624(int nPlayer, int a) {
     int nSecond = 5;
     for (i = 0; i < gNumPlayersSetUp; i++) {
         if (Player_IsHoled(i)) {
-            if (nBest == 5 || PLAYER(i)->nStrokes[Game_CurHoleIndex()] < gPlayers[nBest].nStrokes[Game_CurHoleIndex()]) {
+            if (nBest == 5 || nBest != 5 && PLAYER(i)->nStrokes[Game_CurHoleIndex()] < gPlayers[nBest].nStrokes[Game_CurHoleIndex()]) {
                 nBest = i;
             }
-            if (nBest != i && (nSecond == 5 || PLAYER(i)->nStrokes[Game_CurHoleIndex()] <
+            if (nBest != i && (nSecond == 5 || nSecond != 5 && PLAYER(i)->nStrokes[Game_CurHoleIndex()] <
                                                    gPlayers[nSecond].nStrokes[Game_CurHoleIndex()])) {
                 nSecond = i;
             }
@@ -310,10 +310,10 @@ void fn_800F8EDC(void) {
     s32 n;
     for (i = 0; i < gNumPlayersSetUp; i++) {
         if (Player_IsHoled(i)) {
-            if (nBest == 5 || PLAYER(i)->nStrokes[Game_CurHoleIndex()] < gPlayers[nBest].nStrokes[Game_CurHoleIndex()]) {
+            if (nBest == 5 || nBest != 5 && PLAYER(i)->nStrokes[Game_CurHoleIndex()] < gPlayers[nBest].nStrokes[Game_CurHoleIndex()]) {
                 nBest = i;
             }
-            if (nBest != i && (nSecond == 5 || PLAYER(i)->nStrokes[Game_CurHoleIndex()] <
+            if (nBest != i && (nSecond == 5 || nSecond != 5 && PLAYER(i)->nStrokes[Game_CurHoleIndex()] <
                                                    gPlayers[nSecond].nStrokes[Game_CurHoleIndex()])) {
                 nSecond = i;
             }
@@ -322,8 +322,7 @@ void fn_800F8EDC(void) {
     if (nSecond != 5 && gPlayers[nBest].nStrokes[Game_CurHoleIndex()] == gPlayers[nSecond].nStrokes[Game_CurHoleIndex()]) {
         if (!gpGame->bD4) {
             nHole = Game_CurHoleIndex();
-            fn_800D3C1C();
-            lbl_802823C4 += fn_800D3D64(nHole);
+            lbl_802823C4 += fn_800D3D64(fn_800D3C1C(), nHole);
             lbl_802823C0++;
         }
     } else {
@@ -343,7 +342,7 @@ void fn_800F9100(void) {
     int i;
     int nProfile;
     u8 bFirst = 1;
-    u8 bWon;
+    s32 bWon;
     if (!fn_800EC550() || fn_801025F4()) {
         for (i = 0; i < gNumPlayersSetUp; i++) {
             if (!Player_IsCPU(i)) {
@@ -387,14 +386,12 @@ s32 fn_800F9254(void) {
     if (fn_800E4BF8()) {
         for (h = Game_CurHoleIndex() + 1; h < 18; h++) {
             if (gpGame->bHoleSelected[h]) {
-                fn_800D3C1C();
-                return lbl_802823C4 + fn_800D3D64(h);
+                return lbl_802823C4 + fn_800D3D64(fn_800D3C1C(), h);
             }
         }
     }
     h = Game_CurHoleIndex();
-    fn_800D3C1C();
-    return lbl_802823C4 + fn_800D3D64(h);
+    return lbl_802823C4 + fn_800D3D64(fn_800D3C1C(), h);
 }
 
 // Skins won on this hole: one plus those carried over (only one in the playoff... as the count).
