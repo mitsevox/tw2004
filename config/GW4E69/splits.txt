@@ -1047,6 +1047,9 @@ unsorted/sweep_8004B65C.c:
 unsorted/sweep_8004C774.c:
 	.text       start:0x8004C774 end:0x8004C798
 
+GoTerrainCollision.c:
+	.text       start:0x8004C798 end:0x80050C2C
+
 Ball.c:
 	.text       start:0x80050C2C end:0x8005620C
 

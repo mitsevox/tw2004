@@ -586,8 +586,19 @@ typedef struct PinPos {
     f32  x, y, z, w;
 } PinPos;
 
+// The terrain's collision data (TW06: TGD_TerrainInfo, same offsets up to 0x2C; TW06 has three
+// more pointers before the polygon list). The ground is triangle strips: each TerPolyRef names a
+// first vertex and a triangle count, and triangle k of a strip is vertices k, k+1, k+2.
 typedef struct CourseInfo {
-    u8     unk0[0x6C];
+    u8     unk0[0x20];
+    u32    nPolyRefs;           // 0x20  TW06: uiPolygonReferencesListSize
+    u8     unk24[4];
+    f32  (*pVerts)[3];          // 0x28  TW06: pVertexList
+    u8*    pTriFlags;           // 0x2C  per vertex, for the triangle that ends there: bits 0-2 = 0 skip it;
+                                //       bit 3 done (fn_80050794); bits 4-5 / 6-7 its highest / lowest corner
+    u8     unk30[0x4C - 0x30];
+    struct TerPolyRef* pPolyRefs;   // 0x4C  TW06: pPolygonReferenceList (at 0x58 there)
+    u8     unk50[0x6C - 0x50];
     f32    fFloor;              // 0x6C  a ball in the air above this with no ground under it is still in play
 
     PinPos pin[18];             // 0x70
@@ -609,6 +620,7 @@ extern u8           gClubKindTable[8][NUM_CLUBS];   // 0x801874B0  which clubs e
 extern f32          gClubDistAtPower0[NUM_CLUBS];   // 0x80187580  reach at POWER 0 (245 for the woods)
 extern f32          gClubPowerStep[NUM_CLUBS];      // 0x801875E8  reach gained per POWER point over 100
 extern SurfaceType  gSurfaceTypes[];    // 0x8017E9B8
+#define NUM_SURFACE_TYPES 156           // rows in gSurfaceTypes
 
 int  Game_GetMode(void);                // 0x8000BED8
 int  fn_800D2B08(void);
