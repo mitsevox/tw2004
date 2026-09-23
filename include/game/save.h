@@ -152,7 +152,14 @@ typedef struct SaveProfile {
     char szGolferNames[6][8];   // 0x054C8  -> PlayerProfile.szNames
     u8   nGolferOutfit;         // 0x054F8  -> PlayerProfile.nOutfit
     u8   nGolferBallType;       // 0x054F9  -> PlayerProfile.nBallType
-    u8   unk54FA[0xB634 - 0x54FA];
+    u8   unk54FA[0xB054 - 0x54FA];
+    // Four bit arrays with a bit per Create-A-Player asset (0x80057F18's loop over them all, which
+    // also clears aB344 and aB4BC; fn_8001E9CC tests a bit).
+    u32  aAssetLocked[94];      // 0x0B054  the asset was locked (fn_80078008) when last checked
+    u32  aB1CC[94];             // 0x0B1CC  set where fn_80105C0C gives 0; an asset of lock kind 0
+                                //          stays locked until the bit its fn_80105610 names is set
+    u32  aB344[94];             // 0x0B344
+    u32  aB4BC[94];             // 0x0B4BC
     TourSeason tour;            // 0x0B634
     u8   unkBA9C[0xF66C - 0xBA9C];
     TourStats tourStats;        // 0x0F66C  the career totals
@@ -161,7 +168,13 @@ typedef struct SaveProfile {
     u8   unk104CA[2];
     u16  n104CC;                // 0x104CC  a run of tour rounds, counted on each 18th hole
                                 //          (fn_800EF2B8); reset to 0 when the run breaks
-    u8   unk104CE[0x10578 - 0x104CE];
+    u8   unk104CE[0x1054C - 0x104CE];
+    struct {
+        u8  b;
+        u8  unk1;
+        s16 n;
+    } a1054C[11];               // 0x1054C  cleared by the profile setup; fn_80078008's lock kinds
+                                //          10 and 11 read them
     u8   a10578[4];             // 0x10578  marked holes 71..74: fn_800588F4's kind 0
     s32  a1057C[4];             // 0x1057C  and kind 1
     u8   unk1058C[0x10600 - 0x1058C];
@@ -170,6 +183,8 @@ LAYOUT_ASSERT(SaveProfile, 0x10600);
 
 extern SaveProfile* gpSaveData;
 extern SaveProfile* lbl_80281DF4;       // unlocks that hold for every profile (the cheat codes set them)
+extern u32 lbl_801D5948[8];             // a bit array the code at 0x80056480 keeps; fn_80078008's lock
+                                        // kind 6 tests bits 1..5 of it
 extern s32 lbl_80189528[14];            // the golfers GM_GetGameProgress counts as unlockable
 extern s32 lbl_801894D0[6];             // the courses GM_GetGameProgress counts as unlockable
 

@@ -1124,6 +1124,12 @@ unsorted/sweep_80076F58.c:
 
 FE_Manager.c:
 	.text       start:0x80076F80 end:0x80079E44
+	.rodata     start:0x80183858 end:0x80183870
+	.data       start:0x80189560 end:0x801896F0
+	.bss        start:0x801D7148 end:0x801D77A8
+	.sdata      start:0x80281208 end:0x802812A0
+	.sbss       start:0x80281EC8 end:0x80281ED8
+	.sdata2     start:0x80283AC0 end:0x80283AD8
 
 unsorted/sweep_80079E44.c:
 	.text       start:0x80079E44 end:0x80079E6C
