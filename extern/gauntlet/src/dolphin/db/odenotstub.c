@@ -265,8 +265,8 @@ int DBQueryData(void)
     if (RecvDataLeng == 0) {
         enable = OSDisableInterrupts();
         CheckMailBox();
+        OSRestoreInterrupts(enable);
     }
-    OSRestoreInterrupts(enable);
     return RecvDataLeng;
 }
 

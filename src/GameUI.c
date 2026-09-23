@@ -125,7 +125,6 @@ u8    fn_80127004(void);
         (q)[i].n8 = c;       \
     }
 
-void  fn_80095444(int a);
 void  fn_800A7350(int a);
 
 void fn_800E3BEC(void) {

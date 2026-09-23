@@ -22,6 +22,37 @@ void fn_8004255C(f32* pPos, f32* pTarget, f32 fUp, f32 fSide) {
     pPos[2] += fSide * vDir[0];
 }
 
+// ---- sweep code (not yet cleaned up) ----
+
+s32 fn_80043920(void* arg0, s32 arg1);
+
+s32 fn_80043920(void* arg0, s32 arg1) {
+    u8 temp_r0;
+    u8 temp_r0_2;
+    void* temp_r3;
+    void* temp_r3_2;
+
+    temp_r3 = (*(void**)((u8*)(arg0) + 0xAC));
+    if (temp_r3 == NULL) {
+        return 0;
+    }
+    temp_r0 = (*(u8*)((u8*)(temp_r3) + 0xAC));
+    if (((temp_r0 == 0) || (temp_r0 == 0xD)) && (GameEffects_BallUpdatesThisFrame(arg1) < 1)) {
+        return 1;
+    }
+    temp_r3_2 = (*(void**)((u8*)(arg0) + 0xB0));
+    if ((temp_r3_2 == NULL) || ((s32) (*(s32*)((u8*)(arg0) + 0xBC)) == 5)) {
+        return 0;
+    }
+    temp_r0_2 = (*(u8*)((u8*)(temp_r3_2) + 0xAC));
+    if (((temp_r0_2 == 0) || (temp_r0_2 == 0xD)) && (GameEffects_BallUpdatesThisFrame(arg1) < 1)) {
+        return 1;
+    }
+    return 0;
+}
+
+// ---- end of sweep code ----
+
 // The pin, when pPos is near no AI target: pOut gets the nearest target, or the current pin
 // position of the hole.
 void fn_80044768(f32* pPos, f32* pOut) {
@@ -33,6 +64,34 @@ void fn_80044768(f32* pPos, f32* pOut) {
         Vec3Copy(&pCourse->pin[nPin].x, pOut);
     }
 }
+
+// ---- sweep code (not yet cleaned up) ----
+
+s32 fn_80044AA8(void* arg0);
+
+s32 fn_80044AA8(void* arg0) {
+    u32 temp_r0;
+
+    if (arg0 == NULL) {
+        return 0;
+    }
+    temp_r0 = (*(u32*)((u8*)(arg0) + 0x2C));
+    if (temp_r0 == 0xAU) {
+        return 0;
+    }
+    if (temp_r0 == 9U) {
+        return 0;
+    }
+    if ((temp_r0 >= 1U) && (temp_r0 <= 0xCU)) {
+        return 1;
+    }
+    if (temp_r0 == 0x12U) {
+        return 1;
+    }
+    return 0;
+}
+
+// ---- end of sweep code ----
 
 // The highest of the nCount heights that is not above fMax, or TER_NO_GROUND.
 f32 fn_80044B0C(f32* pHeights, u32 nCount, f32 fMax) {
@@ -109,53 +168,109 @@ f32 fn_80044F58(int nPlayer) {
     return 1.0f;
 }
 
-// ---- sweep code (not yet cleaned up) ----
-
-s32 fn_80043920(void* arg0, s32 arg1);
-s32 fn_80044AA8(void* arg0);
-
-s32 fn_80043920(void* arg0, s32 arg1) {
-    u8 temp_r0;
-    u8 temp_r0_2;
-    void* temp_r3;
-    void* temp_r3_2;
-
-    temp_r3 = (*(void**)((u8*)(arg0) + 0xAC));
-    if (temp_r3 == NULL) {
+u8 fn_800453C8(int nPlayer, CamShot* pShot) {
+    if (gSession.nGameType == 3) {
         return 0;
     }
-    temp_r0 = (*(u8*)((u8*)(temp_r3) + 0xAC));
-    if (((temp_r0 == 0) || (temp_r0 == 0xD)) && (GameEffects_BallUpdatesThisFrame(arg1) < 1)) {
-        return 1;
-    }
-    temp_r3_2 = (*(void**)((u8*)(arg0) + 0xB0));
-    if ((temp_r3_2 == NULL) || ((s32) (*(s32*)((u8*)(arg0) + 0xBC)) == 5)) {
-        return 0;
-    }
-    temp_r0_2 = (*(u8*)((u8*)(temp_r3_2) + 0xAC));
-    if (((temp_r0_2 == 0) || (temp_r0_2 == 0xD)) && (GameEffects_BallUpdatesThisFrame(arg1) < 1)) {
-        return 1;
-    }
-    return 0;
+    return fn_8001EDF4(gPlayers[nPlayer].pChar) != 0;
 }
 
-s32 fn_80044AA8(void* arg0) {
-    u32 temp_r0;
+// a - b into out (three floats)
+#ifdef __MWERKS__
+asm void fn_80045428(register f32* pA, register f32* pB, register f32* pOut) {
+    nofralloc
+    psq_l  f0, 0(pA), 0, 0
+    psq_l  f1, 8(pA), 1, 0
+    psq_l  f2, 0(pB), 0, 0
+    psq_l  f3, 8(pB), 1, 0
+    ps_sub f2, f0, f2
+    ps_sub f3, f1, f3
+    psq_st f2, 0(pOut), 0, 0
+    psq_st f3, 8(pOut), 1, 0
+    blr
+}
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void fn_80045428(f32* pA, f32* pB, f32* pOut) {
+    pOut[0] = pA[0] - pB[0];
+    pOut[1] = pA[1] - pB[1];
+    pOut[2] = pA[2] - pB[2];
+}
+#endif
 
-    if (arg0 == NULL) {
-        return 0;
+// a + b into out (three floats)
+#ifdef __MWERKS__
+asm void fn_8004544C(register f32* pA, register f32* pB, register f32* pOut) {
+    nofralloc
+    psq_l  f0, 0(pA), 0, 0
+    psq_l  f1, 8(pA), 1, 0
+    psq_l  f2, 0(pB), 0, 0
+    psq_l  f3, 8(pB), 1, 0
+    ps_add f2, f2, f0
+    ps_add f3, f3, f1
+    psq_st f2, 0(pOut), 0, 0
+    psq_st f3, 8(pOut), 1, 0
+    blr
+}
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void fn_8004544C(f32* pA, f32* pB, f32* pOut) {
+    pOut[0] = pB[0] + pA[0];
+    pOut[1] = pB[1] + pA[1];
+    pOut[2] = pB[2] + pA[2];
+}
+#endif
+
+void fn_80045470(CamLens* pLens, f32 fFov) {
+    pLens->fFov = fFov;
+    fn_800763BC(pLens);
+}
+
+// The quarter-speed slow motion (GameEffects.b11) on or off, with its sound events (0x35 on,
+// 0x36 off); every second of its frames moves the ball.
+void fn_80045494(u8 bOn, int nPlayer) {
+    lbl_80202898.n2C = 2;
+    if (bOn) {
+        if (!lbl_80202898.b11) {
+            EVENT_Trigger(nPlayer, 0x35, gPlayers[nPlayer].vBall, -1);
+            lbl_80202898.b11 = bOn;
+            lbl_80202898.n28 = 0;
+        }
+    } else if (lbl_80202898.b11) {
+        EVENT_Trigger(nPlayer, 0x36, gPlayers[nPlayer].vBall, -1);
+        lbl_80202898.b11 = bOn;
     }
-    temp_r0 = (*(u32*)((u8*)(arg0) + 0x2C));
-    if (temp_r0 == 0xAU) {
-        return 0;
+}
+
+// The half-speed slow motion (GameEffects.b10) on or off, with its sound events (0x37 on, 0x38 off).
+void fn_80045558(u8 bOn, int nPlayer) {
+    if (bOn) {
+        if (!lbl_80202898.b10) {
+            EVENT_Trigger(nPlayer, 0x37, gPlayers[nPlayer].vBall, -1);
+            lbl_80202898.b10 = bOn;
+        }
+    } else if (lbl_80202898.b10) {
+        EVENT_Trigger(nPlayer, 0x38, gPlayers[nPlayer].vBall, -1);
+        lbl_80202898.b10 = bOn;
     }
-    if (temp_r0 == 9U) {
-        return 0;
-    }
-    if ((temp_r0 >= 1U) && (temp_r0 <= 0xCU)) {
-        return 1;
-    }
-    if (temp_r0 == 0x12U) {
+}
+
+// ---- sweep code (not yet cleaned up) ----
+
+u8 fn_8004561C(void);
+
+u8 fn_8004560C(void) {
+    return lbl_80202898.bGameBreaker;
+}
+
+u8 fn_8004561C(void) {
+    return lbl_80202898.b10;
+}
+
+u8 fn_8004562C(CamShot* pShot) {
+    u8 nKind = pShot->bAC;
+
+    if (nKind == 0 || (u8)(nKind - 13) <= 2U || nKind == 23) {
         return 1;
     }
     return 0;

@@ -13,6 +13,13 @@ Changed for this game:
   (0x8015C120, returns 0), which `__files` points at; a second definition here would clash with it.
 - `include/Dolphin/db.h`: `__DBInterface` and `DBVerbose` are declared `extern` (they are the SDK
   db.c's globals); Pikmin 2's header defines them `static`, which gave gdev/main.c its own copies.
+- `MetroTRK/support.c`: when `TRKSuppAccessFile` gets a shorter reply than asked for and no error,
+  it reports an I/O error (unless it was a short read), as this game's TRK does.
+- `MetroTRK/targimpl.c`: this game's `TRKPPCAccessFPRegister` does not call `ReadFPSCR` or
+  `WriteFPSCR` for the FPSCR (register 0x20); it only masks the value to 32 bits.
+- `MetroTRK/msghndlr.c`: this game's `TRKDoReadMemory` and `TRKDoWriteMemory` have no ARAM path
+  (`TRKTargetAccessARAM`) and use a plain 0x800-byte stack buffer, not a 32-byte aligned one.
+- `MetroTRK/targsupp.s`: aligned to 16 bytes (`.balign 16`), not 32, as in this game.
 
 `include/` holds just the headers these files need, copied from the same project.
 

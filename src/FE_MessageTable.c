@@ -12,22 +12,45 @@
 #include "core/memcard.h"
 #include "core/easb.h"
 #include "game/earnings.h"
+#include "game/modes/ladder.h"
 
 // Outside this file.
 void fn_800142A4(s8 n);                 // sets lbl_80281C98
 void fn_80057438(SaveProfile* pProfile);
+void fn_80057ED0(SaveProfile* pProfile, const char* pName);     // PasswordManager.c
+void fn_800A44A0(void);
 void fn_8008E354(void);                 // FEgolferanim.c
 void fn_8008F80C(s32 p0, s32 p1);       // uiProcessInterface.c
 void fn_8008E358(s32 p0);               // FEgolferanim.c
 s32  fn_800A0C6C(MCCardPosStr* pPos);   // MC.c
-void fn_800A78F0(f32 f);
+s32  fn_800A0230(MCCardPos* pPos);      // MC.c: load a replay from the card
 void fn_8009CD80(s32 nPort, s32 nSlot); // MC_Gc.c
 s32  fn_8009D390(s32 nPort, s32 nSlot); // MC_Gc.c
 s32  fn_8009EB44(s32 nPort, s32 nSlot); // MC_Gc.c
 s32  fn_800A1164(s32 nPort, s32 nSlot, char* pName, s32 n);     // MC.c
 u8   fn_800E22E4(int nSlot, int a, int b);      // GameRound.c
+int  fn_800E234C(int nSlot, int a, int b);      // GameRound.c
+int  fn_800D3D10(int nGolfer);          // Earnings.c: the golfer's rating
 int  fn_800E2520(int nMode);            // GameRound.c
 void fn_800E25E0(void);                 // GameRound.c
+void fn_800E30D4(void);                 // GameRound.c: builds the mixed rounds
+int  fn_80110180(void);
+s32  fn_8011027C(void);                 // DiscCheck.c
+int  fn_80110450(void);                 // DiscCheck.c (defined there as u8; callers here see int)
+u8*  fn_801104A0(void);                 // DiscCheck.c: the disc read's command block
+s32  DVDGetCommandBlockStatus(u8* pBlock);
+void fn_80110178(u8 v);                 // DiscCheck.c
+void fn_80101EE8(void);                 // GameMode11.c
+void fn_800EE2C8(void);                 // GameModeDriverPGATour.c
+u8*  fn_8010C718(void);                 // CharSliders.c
+void fn_801260C0(void);                 // GameMode22.c
+s32  fn_80124094(void);                 // gbacable.c
+void fn_8012409C(void);                 // gbacable.c
+void fn_801240A8(void);                 // gbacable.c
+void fn_800582C4(SaveProfile* pProfile, int nBit, u8 bSet);    // set or clear bit nBit of a10548
+s32  fn_801255C4(s32* pPos);            // EASportsBio.c
+void fn_80126F84(s32 n);                // GameMode22.c: sets lbl_80195498.n4
+void fn_80126F94(s32 n);                // GameMode22.c: sets lbl_80195498.n0
 void GM_SetupCustomHoleSelection(void); // GameManager.c
 int  GM_vGetAllTimeRecordsHeld(SaveProfile* pProfile);  // GameManager.c
 void fn_800EAE44(int nId);              // GameMode5.c
@@ -676,6 +699,10 @@ void fn_80084F84(MsgArg* pArgs, MsgArg* pResult);
 // The handlers, by message number (fn_80079EA8 fills it).
 #define FE_NUM_MESSAGES 770
 MsgHandler lbl_801D77A8[FE_NUM_MESSAGES];
+
+// fn_8007D428 and fn_80080388 set it to 0 for a golfer that can be picked and 0.2 for a locked
+// one.
+f32 lbl_80281374 = 0.25f;
 
 // Run message nMsg's handler.
 void fn_80079E6C(int nMsg, MsgArg* pArgs, MsgArg* pResult) {
@@ -1884,6 +1911,73 @@ void fn_8007CE58(MsgArg* pArgs, MsgArg* pResult) {
     fn_80102308(pArgs[0].i);
 }
 
+// Find golfer pArgs[0]'s bio (golfer 1 has golfer 0's) and hand back its index and its numbers.
+void fn_8007CE7C(MsgArg* pArgs, MsgArg* pResult) {
+    int i;
+    s32 nId;
+
+    nId = pArgs[0].i;
+    if (nId == 1) {
+        nId = 0;
+    }
+    for (i = 0; i < FE_NUM_BIOS; i++) {
+        if (nId == lbl_80281EC8[i].nId) break;
+    }
+    pResult->i = i;
+    *(s32*)pArgs[1].p = lbl_80281EC8[i].a34[0];
+    *(s32*)pArgs[2].p = lbl_80281EC8[i].a34[1];
+    *(s32*)pArgs[3].p = lbl_80281EC8[i].a34[2];
+    *(s32*)pArgs[4].p = lbl_80281EC8[i].a34[3];
+    *(s32*)pArgs[5].p = lbl_80281EC8[i].a34[4];
+    *(s32*)pArgs[6].p = lbl_80281EC8[i].a34[5];
+    *(s32*)pArgs[7].p = lbl_80281EC8[i].n68;
+}
+
+// Bio pArgs[0]'s texts, and its course's name.
+void fn_8007CF4C(MsgArg* pArgs, MsgArg* pResult) {
+    s32 nBio = pArgs[0].i;
+
+    strcpy(((MsgString*)pArgs[1].p)->pStr, lbl_80281EC8[nBio].sz4);
+    strcpy(((MsgString*)pArgs[2].p)->pStr, lbl_80281EC8[nBio].sz24);
+    strcpy(((MsgString*)pArgs[3].p)->pStr, lbl_80281EC8[nBio].sz4C);
+    strcpy(((MsgString*)pArgs[4].p)->pStr, lbl_80281EC8[nBio].sz70);
+    if (lbl_80281EC8[nBio].nCourse == -1) {
+        strcpy(((MsgString*)pArgs[5].p)->pStr, "N/A");
+        return;
+    }
+    strcpy(((MsgString*)pArgs[5].p)->pStr, lbl_80191990[lbl_80281EC8[nBio].nCourse]);
+}
+
+// Bio pArgs[0]'s five lines of text; missing lines are blank.
+void fn_8007D028(MsgArg* pArgs, MsgArg* pResult) {
+    char szText[sizeof(lbl_80281EC8->sz98)];
+    int i;
+    char* pLine;
+
+    strcpy(szText, lbl_80281EC8[pArgs[0].i].sz98);
+    pLine = strtok(szText, "\n");
+    for (i = 1; i <= 5; i++) {
+        if (pLine != NULL) {
+            strcpy(((MsgString*)pArgs[i].p)->pStr, pLine);
+            pLine = strtok(NULL, "\n");
+        } else {
+            strcpy(((MsgString*)pArgs[i].p)->pStr, "  ");
+        }
+    }
+}
+
+// Give the created golfer being edited model pArgs[1], in the profile and in its golfer record
+// (golfers 30 on are the slots' created golfers).
+void fn_8007D0E0(MsgArg* pArgs, MsgArg* pResult) {
+    SaveProfile* pProfile = fn_80077ACC();
+    int nSlot = lbl_80281ED4->nSlot;
+
+    pProfile->createdGolfer.nModelID = pArgs[1].i;
+    // fake match: reads nSlot again rather than using the local
+    gSession.nGolfer[nSlot] = (u8)(lbl_80281ED4->nSlot + FIRST_CREATED_GOLFER);
+    gGolferTable[gSession.nGolfer[nSlot]].nModelID = pProfile->createdGolfer.nModelID;
+}
+
 void fn_8007D25C(MsgArg* pArgs, MsgArg* pResult) {
 }
 
@@ -1952,6 +2046,55 @@ void fn_8007D420(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_8007D424(MsgArg* pArgs, MsgArg* pResult) {
+}
+
+// Whether golfer pArgs[1] can be picked: 1 when it is unlocked (by any profile or a cheat code, or
+// it is a created golfer), 0 when it is locked, -1 when it is not available at all.
+void fn_8007D428(MsgArg* pArgs, MsgArg* pResult) {
+    int i;
+
+    if (lbl_80281ED4->b11702 != 0) {
+        pResult->i = 1;
+    } else if ((s8)gGolferTable[pArgs[1].i].bAvailable != -1) {
+        pResult->i = 0;
+        if (pArgs[1].i >= FIRST_CREATED_GOLFER) {
+            pResult->i = 1;
+        }
+        for (i = 0; i < 5; i++) {
+            if (gpSaveData[i].aGolferUnlocked[pArgs[1].i] != 0) {
+                pResult->i = 1;
+            }
+        }
+        if (lbl_80281DF4->aGolferUnlocked[pArgs[1].i] != 0) {
+            pResult->i = 1;
+        }
+    } else {
+        pResult->i = -1;
+    }
+    if (pResult->i != 0) {
+        lbl_80281374 = 0.0f;
+    } else {
+        lbl_80281374 = 0.2f;
+    }
+}
+
+// Whether course pArgs[1] can be picked: 1 when a loaded profile or a cheat code has unlocked it
+// (course 23 always), else 0.
+void fn_8007D598(MsgArg* pArgs, MsgArg* pResult) {
+    int i;
+
+    pResult->i = 0;
+    if (pArgs[1].i == 23) {
+        pResult->i = 1;
+    }
+    for (i = 0; i < 5; i++) {
+        if (gpSaveData[i].aCourseUnlocked[pArgs[1].i] != 0 && gpSaveData[i].bActive != 0) {
+            pResult->i = 1;
+        }
+    }
+    if (lbl_80281DF4->aCourseUnlocked[pArgs[1].i] != 0) {
+        pResult->i = 1;
+    }
 }
 
 void fn_8007D6D8(MsgArg* pArgs, MsgArg* pResult) {
@@ -2025,6 +2168,24 @@ void fn_8007D9D0(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = lbl_80281ED4->nSlot;
 }
 
+// Move on to the next slot with a loaded profile: its number, or -1 past the last player.
+void fn_8007D9E4(MsgArg* pArgs, MsgArg* pResult) {
+    lbl_80281ED4->nSlot++;
+    while (lbl_80281ED4->nSlot < 4 && gpSaveData[lbl_80281ED4->nSlot].bActive == 0) {
+        lbl_80281ED4->nSlot++;
+    }
+    if (lbl_80281ED4->nSlot >= 4 || lbl_80281ED4->nSlot + 1 > gSession.nNumPlayers) {
+        pResult->i = -1;
+        return;
+    }
+    pResult->i = lbl_80281ED4->nSlot;
+}
+
+// Slot pArgs[0]'s profile name.
+void fn_8007DA6C(MsgArg* pArgs, MsgArg* pResult) {
+    strcpy(((MsgString*)pArgs[1].p)->pStr, gpSaveData[pArgs[0].i].szName);
+}
+
 void fn_8007DAB0(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gpSaveData[pArgs[0].i].bActive;
 }
@@ -2067,6 +2228,58 @@ void fn_8007DB38(MsgArg* pArgs, MsgArg* pResult) {
 // A slot's profile's numbers.
 void fn_8007DB3C(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gpSaveData[pArgs[0].i].n7C;
+}
+
+// Slot pArgs[0]'s strokes per stroke-play round.
+void fn_8007DB60(MsgArg* pArgs, MsgArg* pResult) {
+    SaveProfile* pProfile = &gpSaveData[pArgs[0].i];
+
+    if (pProfile->n74 != 0) {
+        pResult->f = (f32)pProfile->n78 / (f32)pProfile->n74;
+        return;
+    }
+    pResult->f = 0.0f;
+}
+
+void fn_8007DBD8(MsgArg* pArgs, MsgArg* pResult) {
+    SaveProfile* pProfile = &gpSaveData[pArgs[0].i];
+
+    if (pProfile->n80 != 0) {
+        pResult->f = (f32)pProfile->n84 / (f32)pProfile->n80;
+        return;
+    }
+    pResult->f = 0.0f;
+}
+
+// Slot pArgs[0]'s average drive.
+void fn_8007DC50(MsgArg* pArgs, MsgArg* pResult) {
+    SaveProfile* pProfile = &gpSaveData[pArgs[0].i];
+
+    if (pProfile->n88 != 0) {
+        pResult->i = (f32)pProfile->n8C / (f32)pProfile->n88;
+        return;
+    }
+    pResult->i = 0;
+}
+
+void fn_8007DCD4(MsgArg* pArgs, MsgArg* pResult) {
+    SaveProfile* pProfile = &gpSaveData[pArgs[0].i];
+
+    if (pProfile->n90 != 0) {
+        pResult->i = 100.0f * (f32)pProfile->n94 / (f32)pProfile->n90;
+        return;
+    }
+    pResult->i = 0;
+}
+
+void fn_8007DD60(MsgArg* pArgs, MsgArg* pResult) {
+    SaveProfile* pProfile = &gpSaveData[pArgs[0].i];
+
+    if (pProfile->n98 != 0) {
+        pResult->i = 100.0f * ((f32)pProfile->n9C / (f32)pProfile->n98);
+        return;
+    }
+    pResult->i = 0;
 }
 
 void fn_8007DDEC(MsgArg* pArgs, MsgArg* pResult) {
@@ -2144,10 +2357,81 @@ void fn_8007E194(MsgArg* pArgs, MsgArg* pResult) {
 void fn_8007E200(MsgArg* pArgs, MsgArg* pResult) {
 }
 
+// Whether club pArgs[1] is in player pArgs[0]'s golfer's bag; the player's bag starts as the
+// golfer's.
+void fn_8007E204(MsgArg* pArgs, MsgArg* pResult) {
+    GolferRecord* pRecord = fn_80077A80(gSession.nGolfer[pArgs[0].i]);
+
+    pResult->i = pRecord->uBagMask & (1 << pArgs[1].i);
+    gSession.uBag[pArgs[0].i] = pRecord->uBagMask;
+}
+
 void fn_8007E288(MsgArg* pArgs, MsgArg* pResult) {
 }
 
+// Put club pArgs[1] into player pArgs[0]'s bag or take it out (not with session flag 0x4000). A
+// created golfer, or any golfer in game mode 4, keeps the new bag in its record.
+void fn_8007E28C(MsgArg* pArgs, MsgArg* pResult) {
+    GolferRecord* pRecord;
+    s32 nClub;
+
+    pRecord = fn_80077A80(gSession.nGolfer[pArgs[0].i]);
+    nClub = pArgs[1].i;
+    if (!(gSession.uFlags & 0x4000)) {
+        gSession.uBag[pArgs[0].i] ^= 1 << nClub;
+        if (gSession.nGolfer[pArgs[0].i] >= FIRST_CREATED_GOLFER || Game_GetMode() == 4) {
+            Game_GetMode();     // the original calls it again and ignores the result
+            pRecord->uBagMask = gSession.uBag[pArgs[0].i];
+        }
+    }
+}
+
 void fn_8007E354(MsgArg* pArgs, MsgArg* pResult) {
+}
+
+// The wind option: menu choices 1-4 are wind settings 0-3 (calm to gusty).
+void fn_8007E358(MsgArg* pArgs, MsgArg* pResult) {
+    switch (pArgs[0].i) {
+    case 1:
+        gSession.options.nWind = 0;
+        return;
+    case 2:
+        gSession.options.nWind = 1;
+        return;
+    case 3:
+        gSession.options.nWind = 2;
+        return;
+    case 4:
+        gSession.options.nWind = 3;
+        return;
+    }
+}
+
+// Option a7[0]: menu choice 1 turns it on, 2 off.
+void fn_8007E3D4(MsgArg* pArgs, MsgArg* pResult) {
+    switch (pArgs[0].i) {
+    case 1:
+        fn_8002EBA4((u8*)&gSession.options, 1);
+        gSession.options.a7[0] = 1;
+        return;
+    case 2:
+        fn_8002EBA4((u8*)&gSession.options, 0);
+        gSession.options.a7[0] = 0;
+        return;
+    }
+}
+
+// Record nKind, place pArgs[1]: its value, and its holder's name into pArgs[2]. pArgs[0] is the
+// course; past the last course it is the all-time records.
+void fn_8007E458(int nKind, MsgArg* pArgs, MsgArg* pResult) {
+    if (pArgs[0].i < NUM_COURSE_RECORDS) {
+        pResult->i = gSession.aCourseRecord[pArgs[0].i].aRecord[nKind][pArgs[1].i].nValue;
+        strcpy(((MsgString*)pArgs[2].p)->pStr,
+               gSession.aCourseRecord[pArgs[0].i].aRecord[nKind][pArgs[1].i].szName);
+        return;
+    }
+    pResult->i = gSession.recA[nKind][pArgs[1].i].nValue;
+    strcpy(((MsgString*)pArgs[2].p)->pStr, gSession.recA[nKind][pArgs[1].i].szName);
 }
 
 void fn_8007E51C(MsgArg* pArgs, MsgArg* pResult) {
@@ -2182,6 +2466,28 @@ void fn_8007E650(MsgArg* pArgs, MsgArg* pResult) {
     fn_8007E458(7, pArgs, pResult);
 }
 
+// Load the replay at card position pArgs[0..2]: 1 when it loaded. Its golfer (a created golfer is
+// replaced by golfer 0) and course are set up for the session.
+void fn_8007E67C(MsgArg* pArgs, MsgArg* pResult) {
+    MCCardPos pos;
+
+    pos.nPort = pArgs[0].i;
+    pos.nSlot = pArgs[1].i;
+    pos.n8 = pArgs[2].i;
+    pResult->i = fn_800A0230(&pos) == 0;
+    if (pResult->i != 0) {
+        if (lbl_801D7148.aLoaded[0] == 1) {
+            Session_SetGolfer(FIRST_CREATED_GOLFER, 0);
+        } else if (gReplayData.player.golfer.nIndex >= FIRST_CREATED_GOLFER) {
+            Session_SetGolfer(0, 0);
+        } else {
+            Session_SetGolfer(gReplayData.player.golfer.nIndex, 0);
+        }
+        fn_800E14E0(gReplayData.nCourse);
+        lbl_80281ED4->b0 = 0;
+    }
+}
+
 void fn_8007E744(MsgArg* pArgs, MsgArg* pResult) {
 }
 
@@ -2201,6 +2507,20 @@ void fn_8007E74C(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_8007E798(MsgArg* pArgs, MsgArg* pResult) {
+}
+
+// Whether one of the four names on the card at pArgs[0], pArgs[1] is pArgs[2].
+void fn_8007E79C(MsgArg* pArgs, MsgArg* pResult) {
+    MCCardState state;
+    int i;
+
+    fn_8009F7F4(&state, pArgs[0].i, pArgs[1].i);
+    pResult->i = 0;
+    for (i = 0; i < 4; i++) {
+        if (strcmp(state.aszName[i], ((MsgString*)pArgs[2].p)->pStr) == 0) {
+            pResult->i = 1;
+        }
+    }
 }
 
 void fn_8007E818(MsgArg* pArgs, MsgArg* pResult) {
@@ -2278,6 +2598,104 @@ void fn_8007E9BC(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
+// Option a0[1]: the menus' choices 1..6 are the values 5, 0, 1, 2, 3, 4; it is passed on times 0.2.
+void fn_8007EA70(MsgArg* pArgs, MsgArg* pResult) {
+    switch (pArgs[0].i) {
+    case 1:
+        gSession.options.a0[1] = 5;
+        break;
+    case 2:
+        gSession.options.a0[1] = 0;
+        break;
+    case 3:
+        gSession.options.a0[1] = 1;
+        break;
+    case 4:
+        gSession.options.a0[1] = 2;
+        break;
+    case 5:
+        gSession.options.a0[1] = 3;
+        break;
+    case 6:
+        gSession.options.a0[1] = 4;
+        break;
+    }
+    fn_800A7924(0.2f * (s8)gSession.options.a0[1]);
+}
+
+// Option a0[0], the same way.
+void fn_8007EB70(MsgArg* pArgs, MsgArg* pResult) {
+    switch (pArgs[0].i) {
+    case 1:
+        gSession.options.a0[0] = 5;
+        break;
+    case 2:
+        gSession.options.a0[0] = 0;
+        break;
+    case 3:
+        gSession.options.a0[0] = 1;
+        break;
+    case 4:
+        gSession.options.a0[0] = 2;
+        break;
+    case 5:
+        gSession.options.a0[0] = 3;
+        break;
+    case 6:
+        gSession.options.a0[0] = 4;
+        break;
+    }
+    fn_800A77E0(0.2f * (s8)gSession.options.a0[0]);
+}
+
+// Option a0[1] as the menus' choice (1..6).
+void fn_8007EC70(MsgArg* pArgs, MsgArg* pResult) {
+    switch ((s8)gSession.options.a0[1]) {
+    case 5:
+        pResult->i = 1;
+        return;
+    case 0:
+        pResult->i = 2;
+        return;
+    case 1:
+        pResult->i = 3;
+        return;
+    case 2:
+        pResult->i = 4;
+        return;
+    case 3:
+        pResult->i = 5;
+        return;
+    case 4:
+        pResult->i = 6;
+        return;
+    }
+}
+
+// Option a0[0] as the menus' choice (1..6).
+void fn_8007ECFC(MsgArg* pArgs, MsgArg* pResult) {
+    switch ((s8)gSession.options.a0[0]) {
+    case 5:
+        pResult->i = 1;
+        return;
+    case 0:
+        pResult->i = 2;
+        return;
+    case 1:
+        pResult->i = 3;
+        return;
+    case 2:
+        pResult->i = 4;
+        return;
+    case 3:
+        pResult->i = 5;
+        return;
+    case 4:
+        pResult->i = 6;
+        return;
+    }
+}
+
 void fn_8007ED88(MsgArg* pArgs, MsgArg* pResult) {
     switch (gSession.options.nC) {
     case 2:
@@ -2328,6 +2746,28 @@ void fn_8007EE80(MsgArg* pArgs, MsgArg* pResult) {
     lbl_80281ED4->profile.createdGolfer.nModelID = pArgs[1].i;
 }
 
+// Save the profile being worked on into slot pArgs[0] and mark the slot loaded (with session flag
+// 0x4000, only into a slot that has none). A profile without a TOUR card level gets level 1.
+void fn_8007EE90(MsgArg* pArgs, MsgArg* pResult) {
+    s32 nSlot = pArgs[0].i;
+
+    if (!(gSession.uFlags & 0x4000) || lbl_801D7148.aLoaded[nSlot] == 0) {
+        Mem_cpy(&gpSaveData[nSlot], &lbl_80281ED4->profile, sizeof(SaveProfile));
+        gpSaveData[nSlot].bActive = 1;
+        if (gpSaveData[nSlot].nTourCardLevel == 0 && lbl_801D7148.b18 == 0) {
+            gpSaveData[nSlot].nTourCardLevel = 1;
+        }
+        lbl_801D7148.aLoaded[nSlot] = 1;
+        fn_80077808(nSlot);
+    }
+}
+
+// Slot pArgs[0]'s money, and its golfer's TOUR career winnings.
+void fn_8007EF54(MsgArg* pArgs, MsgArg* pResult) {
+    *(s32*)pArgs[1].p = gpSaveData[pArgs[0].i].n64;
+    *(u32*)pArgs[2].p = gpSaveData[pArgs[0].i].tour.aStats[PGA_USER_GOLFER].nCareerWinnings;
+}
+
 void fn_8007EF9C(MsgArg* pArgs, MsgArg* pResult) {
 }
 
@@ -2345,8 +2785,52 @@ void fn_8007EFA0(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = n;
 }
 
+// How many of the awards after the first 23 the slot's profile has won.
+void fn_8007EFEC(MsgArg* pArgs, MsgArg* pResult) {
+    int n;
+    int i;
+
+    n = 0;
+    // EA bug: counts 39 awards from award 23, so aAward[39..61] read the first saved replay's
+    // bytes (aReplay[0]); the 16 real ones end at aAward[38].
+    for (i = 23; i < 62; i++) {
+        if (gpSaveData[pArgs[0].i].aAward[i].bWon == 1) {
+            n++;
+        }
+    }
+    pResult->i = n;
+}
+
 void fn_8007F088(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = GM_vGetAllTimeRecordsHeld(&gpSaveData[pArgs[0].i]);
+}
+
+// How many of the 71 marked holes the slot's profile has (fn_800588F4's kind 0).
+void fn_8007F5CC(MsgArg* pArgs, MsgArg* pResult) {
+    int n;
+    int i;
+
+    n = 0;
+    for (i = 0; i < 71; i++) {
+        if (fn_800588F4(&gpSaveData[pArgs[0].i], 0, i) == 1) {
+            n++;
+        }
+    }
+    pResult->i = n;
+}
+
+// How many ladder events the slot's profile has won.
+void fn_8007F640(MsgArg* pArgs, MsgArg* pResult) {
+    int n;
+    int i;
+
+    n = 0;
+    for (i = 0; i < 25; i++) {
+        if (gpSaveData[pArgs[0].i].aLadderAward[i].bWon != 0) {
+            n++;
+        }
+    }
+    pResult->i = n;
 }
 
 // One for a TOUR card, plus one per challenge group with a medal.
@@ -2360,6 +2844,51 @@ void fn_8007F724(MsgArg* pArgs, MsgArg* pResult) {
     }
     for (i = 0; i < 29; i++) {
         if (gpSaveData[pArgs[0].i].aMedal[i] != 3) {
+            n++;
+        }
+    }
+    pResult->i = n;
+}
+
+// How many challenge groups have medal 2.
+void fn_8007F784(MsgArg* pArgs, MsgArg* pResult) {
+    int n;
+    int i;
+
+    n = 0;
+    for (i = 0; i < 29; i++) {
+        if (gpSaveData[pArgs[0].i].aMedal[i] == 2) {
+            n++;
+        }
+    }
+    pResult->i = n;
+}
+
+// How many challenge groups have medal 1.
+void fn_8007F7D0(MsgArg* pArgs, MsgArg* pResult) {
+    int n;
+    int i;
+
+    n = 0;
+    for (i = 0; i < 29; i++) {
+        if (gpSaveData[pArgs[0].i].aMedal[i] == 1) {
+            n++;
+        }
+    }
+    pResult->i = n;
+}
+
+// One for a TOUR card, plus one per challenge group with the best medal (0).
+void fn_8007F81C(MsgArg* pArgs, MsgArg* pResult) {
+    int n;
+    int i;
+
+    n = 0;
+    if (gpSaveData[pArgs[0].i].nTourCardLevel >= 1) {
+        n = 1;
+    }
+    for (i = 0; i < 29; i++) {
+        if (gpSaveData[pArgs[0].i].aMedal[i] == 0) {
             n++;
         }
     }
@@ -2390,6 +2919,17 @@ void fn_8007FED8(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = lbl_801D7148.b18;
 }
 
+// Set b18; clearing it gives slot 0's profile (and its backup) TOUR card level 1 if it has none.
+void fn_8007FEEC(MsgArg* pArgs, MsgArg* pResult) {
+    lbl_801D7148.b18 = pArgs[0].i;
+    if (lbl_801D7148.b18 == 0 && gpSaveData[0].nTourCardLevel == 0) {
+        if (lbl_801D7148.p658[0].nTourCardLevel < 1) {
+            lbl_801D7148.p658[0].nTourCardLevel = 1;
+        }
+        gpSaveData[0].nTourCardLevel = 1;
+    }
+}
+
 void fn_8007FF3C(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = lbl_80281EE0->b86;
 }
@@ -2403,6 +2943,50 @@ void fn_8007FF6C(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = lbl_80200538.aCoursePrice[pArgs[0].i].nPrice;
 }
 
+// Make the profile being worked on a new one named "USER<n>" and save it into slot pArgs[0]. A
+// slot that had no profile gets 25000 more money, plus n1C.
+void fn_8007FF8C(MsgArg* pArgs, MsgArg* pResult) {
+    s32 nSlot = pArgs[0].i;
+    char szName[16];
+
+    sprintf(szName, "USER%d", nSlot + 1);
+    fn_80057ED0(&lbl_80281ED4->profile, szName);
+    if (lbl_801D7148.aLoaded[nSlot] == 0) {
+        lbl_80281ED4->profile.n6C += lbl_801D7148.n1C + 25000;
+    }
+    lbl_80281ED4->profile.bActive = 1;
+    if (lbl_80281ED4->profile.nTourCardLevel == 0) {
+        lbl_80281ED4->profile.nTourCardLevel = 1;
+    }
+    lbl_801D7148.aLoaded[nSlot] = 1;
+    Mem_cpy(&gpSaveData[nSlot], &lbl_80281ED4->profile, sizeof(SaveProfile));
+    fn_80077808(nSlot);
+}
+
+// Hole pArgs[1]'s par on course pArgs[0]. Below 0 it is the custom round being edited (slot n3,
+// round n4); 22 and 24..29 are built rounds, whose holes come from other courses.
+void fn_80080054(MsgArg* pArgs, MsgArg* pResult) {
+    int nCourse;
+
+    if (pArgs[0].i <= -1) {
+        pResult->i = fn_800D2ABC(
+            gpSaveData[lbl_80281ED4->n3].aSavedRound[lbl_80281ED4->n4].nCourse[pArgs[1].i],
+            gpSaveData[lbl_80281ED4->n3].aSavedRound[lbl_80281ED4->n4].nHoleNum[pArgs[1].i]);
+        return;
+    }
+    if (pArgs[0].i == 22) {
+        nCourse = fn_800D3118(22, pArgs[1].i);
+        pResult->i = fn_800D2ABC(nCourse, fn_800D315C(22, pArgs[1].i) - 1);
+        return;
+    }
+    if (pArgs[0].i >= 24 && pArgs[0].i < 30) {
+        nCourse = fn_800D3118(pArgs[0].i, pArgs[1].i);
+        pResult->i = fn_800D2ABC(nCourse, fn_800D315C(pArgs[0].i, pArgs[1].i) - 1);
+        return;
+    }
+    pResult->i = fn_800D2ABC(pArgs[0].i, pArgs[1].i);
+}
+
 // The saved replay's course, hole and golfer.
 void fn_8008017C(MsgArg* pArgs, MsgArg* pResult) {
     strcpy(((MsgString*)pArgs[0].p)->pStr, lbl_80191990[gReplayData.nCourse]);
@@ -2414,6 +2998,32 @@ void fn_800801C0(MsgArg* pArgs, MsgArg* pResult) {
 
 void fn_800801D4(MsgArg* pArgs, MsgArg* pResult) {
     strcpy(((MsgString*)pArgs[0].p)->pStr, gReplayData.player.golfer.szLast);
+}
+
+// The prize for beating golfer pArgs[0] in the current game mode: the stroke prize in modes 0 and
+// 1, the skins value in mode 2, the ladder event's in mode 4 (the last event's past event 24);
+// the golfer's rating picks the row. Other modes leave pResult alone.
+void fn_80080208(MsgArg* pArgs, MsgArg* pResult) {
+    int nEvent = fn_801020C0();
+
+    switch (Game_GetMode()) {
+    case 4:
+        if (nEvent >= 25) {
+            pResult->i = lbl_80200538.aLadderPrize[24].nBase;
+            return;
+        }
+        pResult->i = lbl_80200538.aLadderPrize[lbl_80260CB8.nEvent].nBase;
+        return;
+    case 0:
+    case 1:
+        pResult->i = lbl_80200538.aStrokePrize[fn_800D3D10(pArgs[0].i)].nBase;
+        return;
+    case 2:
+        pResult->i = lbl_80200538.aSkins[fn_800D3D10(pArgs[0].i)].n10;
+        return;
+    case 3:
+        return;
+    }
 }
 
 void fn_80080300(MsgArg* pArgs, MsgArg* pResult) {
@@ -2433,12 +3043,57 @@ void fn_80080358(MsgArg* pArgs, MsgArg* pResult) {
     fn_8009CD7C();
 }
 
+// Like fn_8007D428, with the golfers of lbl_801894E8 unlocked instead of the profiles' unlocks.
+void fn_80080388(MsgArg* pArgs, MsgArg* pResult) {
+    int i;
+
+    if ((s8)gGolferTable[pArgs[1].i].bAvailable != -1) {
+        pResult->i = 0;
+        if (pArgs[1].i >= FIRST_CREATED_GOLFER) {
+            pResult->i = 1;
+        }
+        for (i = 0; i < 16; i++) {
+            if (pArgs[1].i == lbl_801894E8[i]) {
+                pResult->i = 1;
+            }
+        }
+        if (lbl_80281DF4->aGolferUnlocked[pArgs[1].i] != 0) {
+            pResult->i = 1;
+        }
+    } else {
+        pResult->i = -1;
+    }
+    if (pResult->i != 0) {
+        lbl_80281374 = 0.0f;
+    } else {
+        lbl_80281374 = 0.2f;
+    }
+}
+
 void fn_800804D8(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
 void fn_800804E4(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = fn_800E22E4(pArgs[0].i, pArgs[1].i, pArgs[2].i - 1);
+}
+
+// For the working slot's marked hole pArgs[0], pArgs[1] (from 1): its value unpacked into
+// pArgs[2..4] (a date packed by fn_80078604), or zeros when the hole is not marked.
+void fn_8008052C(MsgArg* pArgs, MsgArg* pResult) {
+    s32 nA = pArgs[0].i;
+    s32 nB = pArgs[1].i - 1;
+    int* pA = pArgs[2].p;
+    int* pB = pArgs[3].p;
+    int* pC = pArgs[4].p;
+
+    if (fn_800E22E4(lbl_80281ED4->nSlot, nA, nB)) {
+        fn_80078620(fn_800E234C(lbl_80281ED4->nSlot, nA, nB), pA, pB, pC);
+        return;
+    }
+    *pA = 0;
+    *pB = 0;
+    *pC = 0;
 }
 
 void fn_800805C4(MsgArg* pArgs, MsgArg* pResult) {
@@ -2452,8 +3107,79 @@ void fn_800805C4(MsgArg* pArgs, MsgArg* pResult) {
 void fn_800805F0(MsgArg* pArgs, MsgArg* pResult) {
 }
 
+// Whether slot pArgs[0]'s profile or a cheat code has unlocked course pArgs[1].
+void fn_800805F4(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = 0;
+    if (gpSaveData[pArgs[0].i].aCourseUnlocked[pArgs[1].i] != 0) {
+        pResult->i = 1;
+    }
+    if (lbl_80281DF4->aCourseUnlocked[pArgs[1].i] != 0) {
+        pResult->i = 1;
+    }
+}
+
+// How far the rewards go for slot pArgs[0]: the number of the last one its profile or a cheat
+// code has unlocked (0: none).
+void fn_80080654(MsgArg* pArgs, MsgArg* pResult) {
+    int i;
+    int n = 0;
+
+    for (i = 0; i < 18; i++) {
+        if (gpSaveData[pArgs[0].i].aRewardUnlocked[i] != 0 && i + 1 > n) {
+            n = i + 1;
+        }
+    }
+    for (i = 0; i < 18; i++) {
+        if (lbl_80281DF4->aRewardUnlocked[i] != 0 && i + 1 > n) {
+            n = i + 1;
+        }
+    }
+    pResult->i = n;
+}
+
 void fn_800807D0(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
+}
+
+// Whether slot pArgs[0] has a loaded profile with custom round pArgs[1] in use.
+void fn_800807DC(MsgArg* pArgs, MsgArg* pResult) {
+    int b = 0;
+
+    if (gpSaveData[pArgs[0].i].aSavedRound[pArgs[1].i].n0 != 0 && gpSaveData[pArgs[0].i].bActive != 0) {
+        b = 1;
+    }
+    pResult->i = b;
+}
+
+// The name of slot pArgs[0]'s custom round pArgs[1].
+void fn_80080828(MsgArg* pArgs, MsgArg* pResult) {
+    strcpy(((MsgString*)pArgs[2].p)->pStr, gpSaveData[pArgs[0].i].aSavedRound[pArgs[1].i].szName);
+}
+
+// Name slot pArgs[0]'s custom round pArgs[1]: blank it, then copy the first pArgs[3] characters
+// of pArgs[2] (each place is blanked again first).
+void fn_80080878(MsgArg* pArgs, MsgArg* pResult) {
+    int i;
+
+    for (i = 0; i < 20; i++) {
+        gpSaveData[pArgs[0].i].aSavedRound[pArgs[1].i].szName[i] = ' ';
+    }
+    for (i = 0; i < pArgs[3].i; i++) {
+        gpSaveData[pArgs[0].i].aSavedRound[pArgs[1].i].szName[i] = ' ';
+        gpSaveData[pArgs[0].i].aSavedRound[pArgs[1].i].szName[i] = ((MsgString*)pArgs[2].p)->pStr[i];
+    }
+    gpSaveData[pArgs[0].i].aSavedRound[pArgs[1].i].szName[i] = '\0';
+}
+
+// Set hole pArgs[2] of slot pArgs[0]'s custom round pArgs[1]: course pArgs[3] (-1 empties the
+// round instead) and hole number pArgs[4].
+void fn_800809F8(MsgArg* pArgs, MsgArg* pResult) {
+    if (pArgs[3].i != -1) {
+        gpSaveData[pArgs[0].i].aSavedRound[pArgs[1].i].nCourse[pArgs[2].i] = pArgs[3].i;
+    } else {
+        gpSaveData[pArgs[0].i].aSavedRound[pArgs[1].i].n0 = 0;
+    }
+    gpSaveData[pArgs[0].i].aSavedRound[pArgs[1].i].nHoleNum[pArgs[2].i] = pArgs[4].i;
 }
 
 void fn_80080AA0(MsgArg* pArgs, MsgArg* pResult) {
@@ -2463,6 +3189,12 @@ void fn_80080AA0(MsgArg* pArgs, MsgArg* pResult) {
 // A string's first character.
 void fn_80080AD0(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = ((MsgString*)pArgs[0].p)->pStr[0];
+}
+
+// Hole pArgs[2] of slot pArgs[0]'s custom round pArgs[1]: its course and hole number.
+void fn_80080BB8(MsgArg* pArgs, MsgArg* pResult) {
+    *(s32*)pArgs[3].p = gpSaveData[pArgs[0].i].aSavedRound[pArgs[1].i].nCourse[pArgs[2].i];
+    *(s32*)pArgs[4].p = gpSaveData[pArgs[0].i].aSavedRound[pArgs[1].i].nHoleNum[pArgs[2].i];
 }
 
 void fn_80080C2C(MsgArg* pArgs, MsgArg* pResult) {
@@ -2497,6 +3229,53 @@ void fn_800810BC(MsgArg* pArgs, MsgArg* pResult) {
 
 void fn_800810D8(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = lbl_801D7148.aCPU[pArgs[0].i];
+}
+
+// Option n14: menu choices 1-3 are the values 0-2.
+void fn_800810F4(MsgArg* pArgs, MsgArg* pResult) {
+    switch (pArgs[0].i) {
+    case 1:
+        gSession.options.n14 = 0;
+        return;
+    case 2:
+        gSession.options.n14 = 1;
+        return;
+    case 3:
+        gSession.options.n14 = 2;
+        return;
+    }
+}
+
+// Option n18: menu choices 1-3 are the values 0-2, applied at once.
+void fn_80081158(MsgArg* pArgs, MsgArg* pResult) {
+    switch (pArgs[0].i) {
+    case 1:
+        gSession.options.n18 = 0;
+        break;
+    case 2:
+        gSession.options.n18 = 1;
+        break;
+    case 3:
+        gSession.options.n18 = 2;
+        break;
+    }
+    fn_80055C40(gSession.options.n18);
+}
+
+// Option n20, the same way.
+void fn_800811E4(MsgArg* pArgs, MsgArg* pResult) {
+    switch (pArgs[0].i) {
+    case 1:
+        gSession.options.n20 = 0;
+        break;
+    case 2:
+        gSession.options.n20 = 1;
+        break;
+    case 3:
+        gSession.options.n20 = 2;
+        break;
+    }
+    fn_80055CAC(gSession.options.n20);
 }
 
 void fn_80081270(MsgArg* pArgs, MsgArg* pResult) {
@@ -2616,6 +3395,75 @@ void fn_800814F0(MsgArg* pArgs, MsgArg* pResult) {
         return;
     case 2:
         gSession.options.bSpinEnabled = 0;
+        return;
+    }
+}
+
+// Option a0[2]: the menus' choices 1..6 are the values 5, 0, 1, 2, 3, 4.
+void fn_80081530(MsgArg* pArgs, MsgArg* pResult) {
+    switch (pArgs[0].i) {
+    case 1:
+        gSession.options.a0[2] = 5;
+        return;
+    case 2:
+        gSession.options.a0[2] = 0;
+        return;
+    case 3:
+        gSession.options.a0[2] = 1;
+        return;
+    case 4:
+        gSession.options.a0[2] = 2;
+        return;
+    case 5:
+        gSession.options.a0[2] = 3;
+        return;
+    case 6:
+        gSession.options.a0[2] = 4;
+        return;
+    }
+}
+
+// Option n14 as the menus' choice (1..3).
+void fn_800815E0(MsgArg* pArgs, MsgArg* pResult) {
+    switch (gSession.options.n14) {
+    case 0:
+        pResult->i = 1;
+        return;
+    case 1:
+        pResult->i = 2;
+        return;
+    case 2:
+        pResult->i = 3;
+        return;
+    }
+}
+
+// Option n18 as the menus' choice (1..3).
+void fn_80081634(MsgArg* pArgs, MsgArg* pResult) {
+    switch (gSession.options.n18) {
+    case 0:
+        pResult->i = 1;
+        return;
+    case 1:
+        pResult->i = 2;
+        return;
+    case 2:
+        pResult->i = 3;
+        return;
+    }
+}
+
+// Option n20 as the menus' choice (1..3).
+void fn_80081688(MsgArg* pArgs, MsgArg* pResult) {
+    switch (gSession.options.n20) {
+    case 0:
+        pResult->i = 1;
+        return;
+    case 1:
+        pResult->i = 2;
+        return;
+    case 2:
+        pResult->i = 3;
         return;
     }
 }
@@ -2741,6 +3589,30 @@ void fn_80081934(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
+// Option a0[2] as the menus' choice (1..6).
+void fn_80081970(MsgArg* pArgs, MsgArg* pResult) {
+    switch ((s8)gSession.options.a0[2]) {
+    case 5:
+        pResult->i = 1;
+        return;
+    case 0:
+        pResult->i = 2;
+        return;
+    case 1:
+        pResult->i = 3;
+        return;
+    case 2:
+        pResult->i = 4;
+        return;
+    case 3:
+        pResult->i = 5;
+        return;
+    case 4:
+        pResult->i = 6;
+        return;
+    }
+}
+
 // Pick the saved custom round the holes come from.
 void fn_800819FC(MsgArg* pArgs, MsgArg* pResult) {
     gpGame->b136 = pArgs[0].i;
@@ -2752,6 +3624,42 @@ void fn_800819FC(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
+// Whether backup row pArgs[0] holds a profile no player slot is using.
+void fn_80081A54(MsgArg* pArgs, MsgArg* pResult) {
+    u8 bUsed = 0;
+    int i;
+
+    for (i = 0; i < 4; i++) {
+        if (lbl_801D7148.aBackup[i] == pArgs[0].i) {
+            bUsed = 1;
+        }
+    }
+    if (bUsed) {
+        pResult->i = 0;
+        return;
+    }
+    pResult->i = lbl_801D7148.p658[pArgs[0].i].bActive;
+}
+
+// The name in slot pArgs[0]'s profile backup.
+void fn_80081B04(MsgArg* pArgs, MsgArg* pResult) {
+    strcpy(((MsgString*)pArgs[1].p)->pStr, lbl_801D7148.p658[pArgs[0].i].szName);
+}
+
+// Load slot pArgs[1] from backup row pArgs[0] (the rows are swapped first when they differ), and
+// mark the slot loaded.
+void fn_80081B50(MsgArg* pArgs, MsgArg* pResult) {
+    s32 nRow = pArgs[0].i;
+    s32 nSlot = pArgs[1].i;
+
+    lbl_801D7148.aLoaded[nSlot] = 1;
+    if (nSlot != nRow) {
+        fn_800779BC(nSlot, nRow);
+    }
+    Mem_cpy(&gpSaveData[nSlot], &lbl_801D7148.p658[nSlot], sizeof(SaveProfile));
+    lbl_801D7148.aBackup[nSlot] = nSlot;
+}
+
 void fn_80081BD4(MsgArg* pArgs, MsgArg* pResult) {
     fn_80077780();
 }
@@ -2760,7 +3668,57 @@ void fn_80081BF4(MsgArg* pArgs, MsgArg* pResult) {
     fn_80077808(pArgs[0].i);
 }
 
+// Option n1C: menu choices 1-3 are the values 0-2, applied at once.
+void fn_80081C18(MsgArg* pArgs, MsgArg* pResult) {
+    switch (pArgs[0].i) {
+    case 1:
+        gSession.options.n1C = 0;
+        break;
+    case 2:
+        gSession.options.n1C = 1;
+        break;
+    case 3:
+        gSession.options.n1C = 2;
+        break;
+    }
+    fn_80055CD0(gSession.options.n1C);
+}
+
+// Option n1C as the menus' choice (1..3).
+void fn_80081CA4(MsgArg* pArgs, MsgArg* pResult) {
+    switch (gSession.options.n1C) {
+    case 0:
+        pResult->i = 1;
+        return;
+    case 1:
+        pResult->i = 2;
+        return;
+    case 2:
+        pResult->i = 3;
+        return;
+    }
+}
+
 void fn_80081CF8(MsgArg* pArgs, MsgArg* pResult) {
+}
+
+// Slot pArgs[0]'s created golfer: set its ball type (pArgs[4]) and n54C2 (pArgs[5]); -1 keeps one.
+void fn_80081CFC(MsgArg* pArgs, MsgArg* pResult) {
+    if (pArgs[4].i >= 0) {
+        gpSaveData[pArgs[0].i].nGolferBallType = pArgs[4].i;
+    }
+    if (pArgs[5].i >= 0) {
+        gpSaveData[pArgs[0].i].n54C2 = pArgs[5].i;
+    }
+}
+
+// The same two, read back (read signed); pArgs[1..3] are cleared.
+void fn_80081D50(MsgArg* pArgs, MsgArg* pResult) {
+    *(s32*)pArgs[1].p = 0;
+    *(s32*)pArgs[2].p = 0;
+    *(s32*)pArgs[3].p = 0;
+    *(s32*)pArgs[4].p = (s8)gpSaveData[pArgs[0].i].nGolferBallType;
+    *(s32*)pArgs[5].p = (s8)gpSaveData[pArgs[0].i].n54C2;
 }
 
 void fn_80081F98(MsgArg* pArgs, MsgArg* pResult) {
@@ -2820,6 +3778,39 @@ void fn_8008281C(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 7;
 }
 
+// The card in slot pArgs[0], pArgs[1]: whether its sectors are not 8 KB, and its error flags
+// (bad encoding, not a memory card, I/O error, broken).
+void fn_80082828(MsgArg* pArgs, MsgArg* pResult) {
+    MCCardState state;
+
+    fn_8009F7F4(&state, pArgs[0].i, pArgs[1].i);
+    if (state.nSectorSize != 0x2000) {
+        *(s32*)pArgs[2].p = 1;
+    } else {
+        *(s32*)pArgs[2].p = 0;
+    }
+    if (state.uFlags & MC_CARD_ENCODING) {
+        *(s32*)pArgs[3].p = 1;
+    } else {
+        *(s32*)pArgs[3].p = 0;
+    }
+    if (state.uFlags & MC_CARD_WRONGDEVICE) {
+        *(s32*)pArgs[4].p = 1;
+    } else {
+        *(s32*)pArgs[4].p = 0;
+    }
+    if (state.uFlags & MC_CARD_IOERROR) {
+        *(s32*)pArgs[5].p = 1;
+    } else {
+        *(s32*)pArgs[5].p = 0;
+    }
+    if (state.uFlags & MC_CARD_BROKEN) {
+        *(s32*)pArgs[6].p = 1;
+        return;
+    }
+    *(s32*)pArgs[6].p = 0;
+}
+
 void fn_80082928(MsgArg* pArgs, MsgArg* pResult) {
     gSession.nC = 2;
 }
@@ -2870,6 +3861,14 @@ void fn_80082A48(MsgArg* pArgs, MsgArg* pResult) {
 void fn_80082A4C(MsgArg* pArgs, MsgArg* pResult) {
 }
 
+// The free directory entries on the card in slot pArgs[0], pArgs[1].
+void fn_80082A50(MsgArg* pArgs, MsgArg* pResult) {
+    MCCardState state;
+
+    fn_8009F7F4(&state, pArgs[0].i, pArgs[1].i);
+    pResult->i = state.nFreeFiles;
+}
+
 // Empty a player slot: no profile in it, none loaded.
 void fn_80082C74(MsgArg* pArgs, MsgArg* pResult) {
     gpSaveData[pArgs[0].i].bActive = 0;
@@ -2918,6 +3917,116 @@ void fn_80082E10(MsgArg* pArgs, MsgArg* pResult) {
         n = nError;
     }
     pResult->i = n;
+}
+
+// Options b7A..b7E as the menus' choices (1 on, 2 off), and n80.
+void fn_80082E5C(MsgArg* pArgs, MsgArg* pResult) {
+    switch (gSession.options.b7A) {
+    case 1:
+        *(s32*)pArgs[0].p = 1;
+        break;
+    case 0:
+        *(s32*)pArgs[0].p = 2;
+        break;
+    }
+    switch (gSession.options.b7B) {
+    case 1:
+        *(s32*)pArgs[1].p = 1;
+        break;
+    case 0:
+        *(s32*)pArgs[1].p = 2;
+        break;
+    }
+    switch (gSession.options.b7C) {
+    case 1:
+        *(s32*)pArgs[2].p = 1;
+        break;
+    case 0:
+        *(s32*)pArgs[2].p = 2;
+        break;
+    }
+    switch (gSession.options.b7D) {
+    case 1:
+        *(s32*)pArgs[3].p = 1;
+        break;
+    case 0:
+        *(s32*)pArgs[3].p = 2;
+        break;
+    }
+    *(s32*)pArgs[4].p = gSession.options.b7E ? 1 : 2;
+    *(s32*)pArgs[5].p = gSession.options.n80;
+}
+
+// Set options b7A..b7E from the menus' choices (1 on, 2 off) and n80, then apply them.
+void fn_80082F68(MsgArg* pArgs, MsgArg* pResult) {
+    switch (pArgs[0].i) {
+    case 1:
+        gSession.options.b7A = 1;
+        break;
+    case 2:
+        gSession.options.b7A = 0;
+        break;
+    }
+    switch (pArgs[1].i) {
+    case 1:
+        gSession.options.b7B = 1;
+        break;
+    case 2:
+        gSession.options.b7B = 0;
+        break;
+    }
+    switch (pArgs[2].i) {
+    case 1:
+        gSession.options.b7C = 1;
+        break;
+    case 2:
+        gSession.options.b7C = 0;
+        break;
+    }
+    switch (pArgs[3].i) {
+    case 1:
+        gSession.options.b7D = 1;
+        break;
+    case 2:
+        gSession.options.b7D = 0;
+        break;
+    }
+    gSession.options.b7E = pArgs[4].i == 1;
+    gSession.options.n80 = pArgs[5].i;
+    fn_800A44A0();
+}
+
+// Whether choice pArgs[0] is available: 1 always, 2 and 3 once a loaded profile or a cheat code
+// has unlocked course 21 or 22.
+void fn_80083068(MsgArg* pArgs, MsgArg* pResult) {
+    s32 nChoice = pArgs[0].i;
+    int b = 0;
+    int i;
+
+    for (i = 0; i < 5; i++) {
+        switch (nChoice) {
+        case 1:
+            b = 1;
+            break;
+        case 2:
+            if (gpSaveData[i].bActive != 0 && gpSaveData[i].aCourseUnlocked[21] != 0) {
+                b = 1;
+            }
+            if (lbl_80281DF4->aCourseUnlocked[21] != 0) {
+                b = 1;
+            }
+            break;
+        case 3:
+            if (gpSaveData[i].bActive != 0 && gpSaveData[i].aCourseUnlocked[22] != 0) {
+                b = 1;
+            }
+            if (lbl_80281DF4->aCourseUnlocked[22] != 0) {
+                b = 1;
+            }
+            break;
+        }
+    }
+    pResult->i = b;
 }
 
 void fn_80083354(MsgArg* pArgs, MsgArg* pResult) {
@@ -2987,6 +4096,22 @@ void fn_800834DC(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
+// For the card in slot pArgs[0], pArgs[1]: fn_8009D3DC's answer, and fn_8009D1D8's with kind 0.
+void fn_800834E8(MsgArg* pArgs, MsgArg* pResult) {
+    fn_8009CD80(pArgs[0].i, pArgs[1].i);
+    *(s32*)pArgs[2].p = fn_8009D3DC(pArgs[0].i, pArgs[1].i);
+    *(s32*)pArgs[3].p = fn_8009D1D8(pArgs[0].i, pArgs[1].i, 0, 0);
+    fn_8009CD7C();
+}
+
+// The same for an EA Sports Bio save: the new files it needs, and fn_8009D1D8's with kind 3.
+void fn_80083550(MsgArg* pArgs, MsgArg* pResult) {
+    fn_8009CD80(pArgs[0].i, pArgs[1].i);
+    *(s32*)pArgs[2].p = fn_8009D50C(pArgs[0].i, pArgs[1].i);
+    *(s32*)pArgs[3].p = fn_8009D1D8(pArgs[0].i, pArgs[1].i, 0, 3);
+    fn_8009CD7C();
+}
+
 void fn_800835B8(MsgArg* pArgs, MsgArg* pResult) {
 }
 
@@ -2996,6 +4121,18 @@ void fn_800835BC(MsgArg* pArgs, MsgArg* pResult) {
 
 void fn_800835C8(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
+}
+
+// Give player pArgs[0] their golfer's bag: a created golfer's own, else the default bag.
+void fn_800835D4(MsgArg* pArgs, MsgArg* pResult) {
+    s32 nPlayer = pArgs[0].i;
+    GolferRecord* pRecord = fn_80077A80(gSession.nGolfer[nPlayer]);
+
+    if (gSession.nGolfer[nPlayer] < FIRST_CREATED_GOLFER) {
+        gSession.uBag[nPlayer] = 0x02A7FC44;
+        return;
+    }
+    gSession.uBag[nPlayer] = pRecord->uBagMask;
 }
 
 void fn_80083860(MsgArg* pArgs, MsgArg* pResult) {
@@ -3131,6 +4268,78 @@ void fn_80083BC8(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
+// Start the current game mode's event (modes 11, 5, 23, 26, 22, 24) and answer fn_80110180. In
+// modes 5 and 11 player 0 gets the created golfer (a loaded profile) or golfer 0 first.
+void fn_80083BFC(MsgArg* pArgs, MsgArg* pResult) {
+    if (Game_GetMode() == 11) {
+        if (Game_GetMode() == 5 || Game_GetMode() == 11) {
+            if (gpSaveData[0].bActive) {
+                lbl_801D7148.aBackup[0] = 0;
+                if (lbl_80281ED4->b11703 == 0) {
+                    Session_SetGolfer(FIRST_CREATED_GOLFER, 0);
+                }
+            } else {
+                Session_SetGolfer(0, 0);
+            }
+        }
+        fn_80101EE8();
+        fn_80110178(1);
+    } else if (Game_GetMode() == 5) {
+        if (Game_GetMode() == 5 || Game_GetMode() == 11) {
+            if (gpSaveData[0].bActive) {
+                lbl_801D7148.aBackup[0] = 0;
+                if (lbl_80281ED4->b11703 == 0) {
+                    Session_SetGolfer(FIRST_CREATED_GOLFER, 0);
+                }
+            } else {
+                Session_SetGolfer(0, 0);
+            }
+        }
+        fn_800EAF7C();
+        fn_80110178(1);
+    } else if (Game_GetMode() == 23) {
+        fn_800EE2C8();
+    } else if (Game_GetMode() == 26) {
+        fn_8010C718();
+    } else if (Game_GetMode() == 22) {
+        fn_801260C0();
+    } else if (Game_GetMode() == 24) {
+        GameModeDriverRTE_StartEvent();
+    }
+    pResult->i = fn_80110180();
+    fn_80110178(0);
+}
+
+// The disc read's state for the menus (100: fn_80110450 says so), like GameUICommands.c's
+// fn_8008A010 for the drive.
+void fn_80083D88(MsgArg* pArgs, MsgArg* pResult) {
+    switch (DVDGetCommandBlockStatus(fn_801104A0())) {
+    case 7:
+        if (fn_8011027C() != 0) {
+            pResult->i = 0;
+        } else {
+            pResult->i = 1;
+        }
+        break;
+    case 6:
+        if (fn_8011027C() != 0) {
+            pResult->i = 2;
+        } else {
+            pResult->i = 3;
+        }
+        break;
+    case 1:
+        pResult->i = 4;
+        break;
+    default:
+        pResult->i = 5;
+        break;
+    }
+    if (fn_80110450() != 0) {
+        pResult->i = 100;
+    }
+}
+
 void fn_80083E48(MsgArg* pArgs, MsgArg* pResult) {
     fn_80123FF8();
     fn_8012408C(0);
@@ -3149,6 +4358,21 @@ void fn_80083EB8(MsgArg* pArgs, MsgArg* pResult) {
 
 void fn_80083EBC(MsgArg* pArgs, MsgArg* pResult) {
     fn_8012408C(18);
+}
+
+// The first time only (bit 1 of the working profile's a10548 not yet set): run fn_801240A8 and
+// fn_8012409C, set the bit and answer 1; else 0.
+void fn_80083EE0(MsgArg* pArgs, MsgArg* pResult) {
+    SaveProfile* pProfile = fn_80077ACC();
+
+    if (!fn_80058304(pProfile, 1)) {
+        fn_801240A8();
+        fn_8012409C();
+        fn_800582C4(pProfile, 1, 1);
+        pResult->i = 1;
+        return;
+    }
+    pResult->i = 0;
 }
 
 void fn_80083F54(MsgArg* pArgs, MsgArg* pResult) {
@@ -3175,6 +4399,15 @@ void fn_80084160(MsgArg* pArgs, MsgArg* pResult) {
 
 void fn_80084190(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = fn_80124174();
+}
+
+// Whether gbacable.c's fn_80124094 answers 18.
+void fn_800841C0(MsgArg* pArgs, MsgArg* pResult) {
+    if (fn_80124094() == 18) {
+        pResult->i = 1;
+        return;
+    }
+    pResult->i = 0;
 }
 
 void fn_80084208(MsgArg* pArgs, MsgArg* pResult) {
@@ -3213,6 +4446,15 @@ void fn_800842D0(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = nError == 0;
 }
 
+// For the card in slot pArgs[0], pArgs[1]: fn_801255C4's answer.
+void fn_8008449C(MsgArg* pArgs, MsgArg* pResult) {
+    s32 aPos[2];
+
+    aPos[0] = pArgs[0].i;
+    aPos[1] = pArgs[1].i;
+    pResult->i = fn_801255C4(aPos);
+}
+
 void fn_800844E0(MsgArg* pArgs, MsgArg* pResult) {
     s32 nError;
 
@@ -3229,8 +4471,32 @@ void fn_80084544(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = EASBio_IsBioLoaded();
 }
 
+// 0 when card slot 0, 0 answers fn_80125354 with error -43 (then fn_801253F0 runs anyway), else 1.
+void fn_80084578(MsgArg* pArgs, MsgArg* pResult) {
+    if (fn_80125354(0, 0) == -43) {
+        pResult->i = 0;
+    } else {
+        pResult->i = 1;
+    }
+    fn_801253F0(0, 0);
+}
+
 void fn_800845D4(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = fn_80125528(pArgs[0].i, pArgs[1].i);
+}
+
+// 1 when fn_80125354 answers error -18 for card slot 0, 0; fn_801253F0 follows when it succeeds.
+void fn_80084614(MsgArg* pArgs, MsgArg* pResult) {
+    s32 nError = fn_80125354(0, 0);
+
+    if (nError == -18) {
+        pResult->i = 1;
+    } else {
+        pResult->i = 0;
+    }
+    if (nError == 0) {
+        fn_801253F0(0, 0);
+    }
 }
 
 void fn_80084678(MsgArg* pArgs, MsgArg* pResult) {
@@ -3250,6 +4516,18 @@ void fn_800846D4(MsgArg* pArgs, MsgArg* pResult) {
 
     pN = pArgs[0].p;
     *pN = fn_80125928();
+}
+
+// Whether an EA Sports Bio reward is waiting (fn_801256B8); its message is set up either way.
+void fn_80084704(MsgArg* pArgs, MsgArg* pResult) {
+    EASBio_eReward eReward = fn_801256B8();
+
+    if (eReward != -1) {
+        pResult->i = 1;
+    } else {
+        pResult->i = 0;
+    }
+    EASBio_SetCurrentRewardMessage(eReward);
 }
 
 void fn_80084750(MsgArg* pArgs, MsgArg* pResult) {
@@ -3292,6 +4570,74 @@ void fn_800849C8(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gpSaveData[pArgs[0].i].aMedal[pArgs[1].i - 1];
 }
 
+// Set up course pArgs[0] (10000: the mixed round, built once) and answer fn_80110180, inverted
+// when fn_8011027C says so.
+void fn_800849F8(MsgArg* pArgs, MsgArg* pResult) {
+    if (pArgs[0].i == 10000) {
+        if (gpGame->b137 == 0) {
+            gpGame->b137 = 1;
+            fn_800E30D4();
+        }
+        pResult->i = fn_80110180();
+        if (fn_8011027C() != 0) {
+            pResult->i = pResult->i == 0;
+        }
+    } else {
+        fn_800E14E0(pArgs[0].i);
+        fn_800E1434();
+        pResult->i = fn_80110180();
+        if (fn_8011027C() != 0) {
+            pResult->i = pResult->i == 0;
+        }
+        gpGame->b137 = 0;
+    }
+}
+
+// pArgs[0] 0: set up game mode 26, or mode 22 in variant 0 or 1 (pArgs[1] 1, 2). 1: game mode
+// 22's n4 is 5, 10 or 15 (pArgs[1] 0, 1, 2).
+void fn_80084AA8(MsgArg* pArgs, MsgArg* pResult) {
+    s32 nMode;
+    s32 n;
+
+    switch (pArgs[0].i) {
+    case 0:
+        switch (pArgs[1].i) {
+        case 1:
+            nMode = 22;
+            n = 0;
+            break;
+        case 2:
+            nMode = 22;
+            n = 1;
+            break;
+        default:
+            nMode = 26;
+            n = 0;
+            break;
+        }
+        fn_800E0B38(nMode);
+        fn_800E25E0();
+        if (nMode == 22) {
+            fn_80126F94(n);
+        }
+        return;
+    case 1:
+        switch (pArgs[1].i) {
+        case 1:
+            n = 10;
+            break;
+        case 2:
+            n = 15;
+            break;
+        default:
+            n = 5;
+            break;
+        }
+        fn_80126F84(n);
+        break;
+    }
+}
+
 // Passes the message on to one of three handlers, by pArgs[0].
 void fn_80084B88(MsgArg* pArgs, MsgArg* pResult) {
     switch (pArgs[0].i) {
@@ -3310,6 +4656,22 @@ void fn_80084B88(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_80084BE4(MsgArg* pArgs, MsgArg* pResult) {
+}
+
+// A name typed as nothing but spaces becomes "User <n>" for the working slot.
+void fn_80084C88(MsgArg* pArgs, MsgArg* pResult) {
+    char* szName = ((MsgString*)pArgs[0].p)->pStr;
+    int n = 0;
+    int i;
+
+    for (i = 0; szName[i] != '\0'; i++) {
+        if (szName[i] != ' ') {
+            n++;
+        }
+    }
+    if (n == 0) {
+        sprintf(szName, "User %d", lbl_80281ED4->nSlot + 1);
+    }
 }
 
 // Copy a string, cut to eight characters and "..." when it is longer than 12.

@@ -7,17 +7,89 @@
 #include "game.h"
 #include "dyncam.h"
 #include "frontend/fe.h"
+#include "endian.h"
 
 u8   fn_8001E9CC(u32* pBits, int nBit);         // the bit is set
+void fn_80039884(u8* pSrc, u8* pDst, int nCount);
 void fn_800399E0(u8* pSrc, CamShot* pDst, u32 nCount);
 void fn_80039A48(u8* pSrc, DynCamSet* pDst, u32 nCount);
 void fn_80039B14(int nSize);
 void fn_80039C5C(int nSize);
 void fn_80039D0C(int nSequences);
+void fn_80039E58(void);
+u8   fn_8003C800(char* szName, CamSequence** ppSeq, CamShot** ppShot);
+void fn_8003DC54(f32* pA, f32* pB, f32* pOut);
+void fn_800090E4(f32* pTurn, f32* pVec, f32* pOut);     // the vector turned by it
 void fn_80039EB8(int nSize);
 u8   fn_8003D0EC(CamSequence* pSequence, int nKind);
 u8   fn_8003D240(CamShot* pShot, int nKind);
 u8   fn_8003D294(CamShot* pShot);
+void fn_8003954C(void);
+void fn_80039550(void);
+void fn_80039554(UStreamObject* pObject);
+void fn_80039690(UStreamObject* pObject);
+void fn_80039754(UStreamObject* pObject);
+void fn_800397EC(UStreamObject* pObject);
+
+// Registers the handlers of the camera files ('CAMS', 'CAMV', 'CAMA').
+void fn_80039454(void) {
+    UStream_RegisterHandler('CAMS', fn_80039554);
+    UStream_RegisterHandler('CAMV', fn_80039690);
+    UStream_RegisterHandler('CAMA', fn_800397EC);
+}
+
+void fn_800394AC(void) {
+    UStream_UnregisterHandler('CAMS');
+    UStream_UnregisterHandler('CAMV');
+    UStream_UnregisterHandler('CAMA');
+    fn_8003954C();
+}
+
+// The same for the other 'CAMV' handler alone.
+void fn_800394F0(void) {
+    UStream_RegisterHandler('CAMV', fn_80039754);
+}
+
+void fn_80039520(void) {
+    UStream_UnregisterHandler('CAMV');
+    fn_80039550();
+}
+
+void fn_8003954C(void) {
+}
+
+void fn_80039550(void) {
+}
+
+// The stream handler for the sequence file: two counts (sequences, then choices), then the
+// sequences; takes them unless some are loaded already, and makes room for the choices.
+void fn_80039554(UStreamObject* pObject) {
+    s32 nSequences;
+    s32 nChoices;
+    u8* pSrc;
+
+    lbl_80281D88->n1C++;
+    if (lbl_80281D88->n1C > 2) {
+        lbl_80281D88->n1C = 1;
+    }
+    if (lbl_80281D88->pSequences != NULL) {
+        fn_80009E70(pObject);
+        return;
+    }
+    pSrc = pObject->pData;
+    fn_80076158(&pSrc, (u8*)&nSequences, sizeof(nSequences), 4);
+    pSrc = pObject->pData + 4;
+    fn_80076158(&pSrc, (u8*)&nChoices, sizeof(nChoices), 4);
+    lbl_80281D88->pSequences = fn_80009B34(nSequences * sizeof(CamSequence), 2, 0, "GoDynamicCam.c", 403);
+    lbl_80281D88->pChoices = fn_80009B34(nChoices * sizeof(CamChoice), 2, 0, "GoDynamicCam.c", 404);
+    lbl_80281D88->nSequences = 0;
+    lbl_80281D88->nChoicesUsed = 0;
+    pSrc = pObject->pData + 8;
+    fn_80039884(pSrc, (u8*)lbl_80281D88->pSequences, nSequences);
+    fn_80039D0C(nSequences);
+    fn_80039E58();
+    fn_80009E70(pObject);
+}
 
 // The stream handler for the shot file: takes the shots unless some are loaded already.
 void fn_80039690(UStreamObject* pObject) {
@@ -58,6 +130,65 @@ void fn_800397EC(UStreamObject* pObject) {
     fn_80039A48(pObject->pData, lbl_80281D88->pSets, pObject->uSize / sizeof(DynCamSet));
     fn_80039EB8(pObject->uSize);
     fn_80009E70(pObject);
+}
+
+// Copies nCount sequences from the file (little-endian) into pDst, swapping each value's bytes.
+// Each is followed in the file by its shot choices, which go into the choice block in turn; the
+// sequence's p4C gets the first of them. The file keeps a word where p4C goes.
+void fn_80039884(u8* pSrc, u8* pDst, int nCount) {
+    SwapField aSequence[] = {
+        { 32, 1 },                                          // szName
+        { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 },
+        { 1, 1 }, { 1, 1 }, { 1, 1 }, { 1, 1 }, { 1, 1 }, { 1, 1 }, { 1, 1 }, { 1, 1 },
+    };
+    SwapField aChoice[] = {
+        { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 },
+        { 1, 1 }, { 1, 1 }, { 1, 1 }, { 1, 1 },
+        { 48, 4 },                                          // aNoHoles
+    };
+    CamChoice* pChoice;
+    int i;
+
+    for (i = 0; i < nCount; i++) {
+        fn_8001F08C((void**)&pSrc, (void**)&pDst, aSequence, sizeof(aSequence) / sizeof(aSequence[0]), 1);
+        // pDst is now at the sequence's p4C
+        *(CamChoice**)pDst = &lbl_80281D88->pChoices[lbl_80281D88->nChoicesUsed];
+        pSrc += sizeof(CamChoice*);
+        pDst += sizeof(CamChoice*);
+        pChoice = &lbl_80281D88->pChoices[lbl_80281D88->nChoicesUsed];
+        fn_8001F08C((void**)&pSrc, (void**)&pChoice, aChoice, sizeof(aChoice) / sizeof(aChoice[0]),
+                    lbl_80281D88->pSequences[i].nChoices);
+        lbl_80281D88->nChoicesUsed += lbl_80281D88->pSequences[i].nChoices;
+    }
+    lbl_80281D88->nSequences = nCount;
+}
+
+// Copies nCount shots from the file (little-endian) into pDst, swapping each value's bytes.
+void fn_800399E0(u8* pSrc, CamShot* pDst, u32 nCount) {
+    SwapField aFormat[] = {
+        { 32, 1 },                                          // szName
+        { 16, 4 }, { 16, 4 },                               // v20, v30
+        { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 },
+        { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 },
+        { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 },
+        { 1, 1 }, { 1, 1 }, { 1, 1 }, { 1, 1 }, { 1, 1 }, { 1, 1 }, { 1, 1 }, { 1, 1 }, { 1, 1 },
+        { 1, 1 }, { 1, 1 },
+        { 13, 1 },
+    };
+
+    fn_8001F08C((void**)&pSrc, (void**)&pDst, aFormat, sizeof(aFormat) / sizeof(aFormat[0]), nCount);
+}
+
+// The same for nCount shot sets.
+void fn_80039A48(u8* pSrc, DynCamSet* pDst, u32 nCount) {
+    SwapField aFormat[] = {
+        { 16, 1 },
+        { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 },
+        { 1, 1 },
+        { 3, 1 },
+    };
+
+    fn_8001F08C((void**)&pSrc, (void**)&pDst, aFormat, sizeof(aFormat) / sizeof(aFormat[0]), nCount);
 }
 
 // Sets up nSize bytes of freshly loaded shots, as fn_80039C5C does, and first keeps f68 at least
@@ -109,6 +240,42 @@ void fn_80039C5C(int nSize) {
         }
         lbl_80281D88->pShots[i].f6C = lbl_80281D88->pShots[i].f68;
         lbl_80281D88->pShots[i].f7C = lbl_80281D88->pShots[i].f78;
+    }
+}
+
+// Once both camera files are in (n1C is 2): turns each shot choice's shot index into a pointer, and
+// sets its b16 to 25 unless it is 13..22 and some choice of the same sequence is for that shot kind.
+void fn_80039D0C(int nSequences) {
+    int i;
+    int j;
+    int k;
+    u8 bFound;
+
+    lbl_80281D88->nSequences = nSequences;
+    if (lbl_80281D88->n1C != 2) {
+        return;
+    }
+    for (i = 0; i < lbl_80281D88->nSequences; i++) {
+        for (j = 0; j < lbl_80281D88->pSequences[i].nChoices; j++) {
+            // port: the file keeps an index in the pointer field
+            lbl_80281D88->pSequences[i].p4C[j].p10 =
+                &lbl_80281D88->pShots[(s32)lbl_80281D88->pSequences[i].p4C[j].p10];
+            if (lbl_80281D88->pSequences[i].p4C[j].b16 < 13 || lbl_80281D88->pSequences[i].p4C[j].b16 > 22) {
+                lbl_80281D88->pSequences[i].p4C[j].b16 = 25;
+            }
+            if (lbl_80281D88->pSequences[i].p4C[j].b16 >= 13 &&
+                lbl_80281D88->pSequences[i].p4C[j].b16 <= 22) {
+                bFound = 0;
+                for (k = 0; k < lbl_80281D88->pSequences[i].nChoices; k++) {
+                    if (lbl_80281D88->pSequences[i].p4C[j].b16 == lbl_80281D88->pSequences[i].p4C[k].b14) {
+                        bFound = 1;
+                    }
+                }
+                if (!bFound) {
+                    lbl_80281D88->pSequences[i].p4C[j].b16 = 25;
+                }
+            }
+        }
     }
 }
 
@@ -266,6 +433,76 @@ u8 fn_8003ABEC(CamChoice* pChoice, int nPlayer) {
         return 0;
     }
     return 1;
+}
+
+// The set named szName (case ignored) gives a sequence (*ppSeq) or a shot (*ppShot): its p20
+// 39 times in 100 when that has shot choices, else by its kind: 14 one of p14, p18 and p1C at
+// random (the next one when the pick is missing), 13 its shot. 0: no set gave one.
+u8 fn_8003C800(char* szName, CamSequence** ppSeq, CamShot** ppShot) {
+    int i;
+    u32 nPick;
+
+    for (i = 0; i < lbl_80281D88->nSets; i++) {
+        if (stricmp(lbl_80281D88->pSets[i].szName, szName) != 0) {
+            continue;
+        }
+        if (lbl_80281D88->pSets[i].p20 != NULL && lbl_80281D88->pSets[i].p20->nChoices > 0 &&
+            Rand_Next(1) % 100 > 60) {
+            *ppSeq = lbl_80281D88->pSets[i].p20;
+            return 1;
+        }
+        if (lbl_80281D88->pSets[i].nKind == 14) {
+            nPick = Rand_Next(1) % 3;
+            if (nPick == 0 && lbl_80281D88->pSets[i].p14 != NULL) {
+                *ppSeq = lbl_80281D88->pSets[i].p14;
+                return 1;
+            }
+            if (nPick == 1 && lbl_80281D88->pSets[i].p18 != NULL) {
+                *ppSeq = lbl_80281D88->pSets[i].p18;
+                return 1;
+            }
+            if (lbl_80281D88->pSets[i].p1C != NULL) {
+                *ppSeq = lbl_80281D88->pSets[i].p1C;
+                return 1;
+            }
+        } else if (lbl_80281D88->pSets[i].nKind == 13) {
+            *ppShot = lbl_80281D88->pSets[i].pShot;
+            return 1;
+        }
+    }
+    return 0;
+}
+
+// The sequence and shot named after the golfer's clip: with b, the clip in Character.p1790 when
+// there is one, else the clip it is playing. While the GameBreaker letterbox is up (fn_8003DCAC)
+// the "LB" version of the name is tried first.
+u8 fn_8003C9D0(int nPlayer, u8 b, CamSequence** ppSeq, CamShot** ppShot) {
+    char szName[0x18];          // the frame allows 12 to 24 bytes; the true size is unknown
+    char* pName = NULL;
+
+    if (ppSeq == NULL || ppShot == NULL) {
+        return 0;
+    }
+    *ppSeq = NULL;
+    *ppShot = NULL;
+    if (b && gPlayers[nPlayer].pChar->p1790 != NULL) {
+        pName = gPlayers[nPlayer].pChar->p1790->name;
+    }
+    if (pName == NULL && gPlayers[nPlayer].pChar->pCurClip != NULL) {
+        pName = gPlayers[nPlayer].pChar->pCurClip->name;
+    }
+    if (pName != NULL) {
+        if (fn_8003DCAC()) {
+            sprintf(szName, "LB%s", pName);
+            if (fn_8003C800(szName, ppSeq, ppShot) == 1) {
+                return 1;
+            }
+        }
+        if (fn_8003C800(pName, ppSeq, ppShot) == 1) {
+            return 1;
+        }
+    }
+    return 0;
 }
 
 // A default sequence of the kind: one whose name starts with "DEF".
@@ -520,6 +757,41 @@ u8 fn_8003D7A0(CamSequence* pSequence, int nPlayer) {
     return 0;
 }
 
+// Keeps the direction pDir within the tuning's f19C (an angle) of level: with no level part at
+// all it becomes the direction from pA to pB; tilted further than f19C, it is turned back to that
+// tilt. The result is normalised.
+void fn_8003D810(f32* pDir, f32* pA, f32* pB) {
+    f32 vLevel[4];
+    f32 vAxis[4];
+    f32 qTurn[4];
+
+    if (0.0f == pDir[0] && 0.0f == pDir[2]) {
+        fn_8003DC54(pB, pA, pDir);
+        if (0.0f != pDir[0] || 0.0f != pDir[1] || 0.0f != pDir[2]) {
+            fn_800BAF04(pDir, pDir);
+        }
+        return;
+    }
+    Vec3Copy(pDir, vLevel);
+    vLevel[1] = 0.0f;
+    if (0.0f != vLevel[0] || 0.0f != vLevel[1] || 0.0f != vLevel[2]) {
+        fn_800BAF04(vLevel, vLevel);
+    }
+    if (fabsf(fn_80009614(fn_8000C5FC(vLevel, pDir))) > lbl_80281F78->f19C) {
+        vec4flt_CrossProduct(pDir, vLevel, vAxis);
+        if (0.0f != vAxis[0] || 0.0f != vAxis[1] || 0.0f != vAxis[2]) {
+            fn_800BAF04(vAxis, vAxis);
+        }
+        fn_8001EF34(vAxis, lbl_80281F78->f19C, vAxis);
+        fn_8000923C(vAxis, qTurn);
+        vLevel[3] = 0.0f;
+        fn_800090E4(qTurn, vLevel, pDir);
+        if (0.0f != pDir[0] || 0.0f != pDir[1] || 0.0f != pDir[2]) {
+            fn_800BAF04(pDir, pDir);
+        }
+    }
+}
+
 // The shot's f64 and f60 into *pA and *pB; when fn_800453C8 holds for the player they are
 // turned a quarter: (-f64, f60), or (f64, -f60) for a shot with bAF or bB0 set to 21.
 void fn_8003DAC8(CamShot* pShot, int nPlayer, f32* pA, f32* pB) {
@@ -560,4 +832,69 @@ f32 fn_8003DBA8(f32 f) {
         return 10.0f * f;
     }
     return f;
+}
+
+// a + b into out (three floats)
+#ifdef __MWERKS__
+asm void fn_8003DC30(register f32* pA, register f32* pB, register f32* pOut) {
+    nofralloc
+    psq_l  f0, 0(pA), 0, 0
+    psq_l  f1, 8(pA), 1, 0
+    psq_l  f2, 0(pB), 0, 0
+    psq_l  f3, 8(pB), 1, 0
+    ps_add f2, f2, f0
+    ps_add f3, f3, f1
+    psq_st f2, 0(pOut), 0, 0
+    psq_st f3, 8(pOut), 1, 0
+    blr
+}
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void fn_8003DC30(f32* pA, f32* pB, f32* pOut) {
+    pOut[0] = pB[0] + pA[0];
+    pOut[1] = pB[1] + pA[1];
+    pOut[2] = pB[2] + pA[2];
+}
+#endif
+
+// a - b into out (three floats)
+#ifdef __MWERKS__
+asm void fn_8003DC54(register f32* pA, register f32* pB, register f32* pOut) {
+    nofralloc
+    psq_l  f0, 0(pA), 0, 0
+    psq_l  f1, 8(pA), 1, 0
+    psq_l  f2, 0(pB), 0, 0
+    psq_l  f3, 8(pB), 1, 0
+    ps_sub f2, f0, f2
+    ps_sub f3, f1, f3
+    psq_st f2, 0(pOut), 0, 0
+    psq_st f3, 8(pOut), 1, 0
+    blr
+}
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void fn_8003DC54(f32* pA, f32* pB, f32* pOut) {
+    pOut[0] = pA[0] - pB[0];
+    pOut[1] = pA[1] - pB[1];
+    pOut[2] = pA[2] - pB[2];
+}
+#endif
+
+u8 fn_8003DC78(CamShot* pShot) {
+    u8 nKind = pShot->bAC;
+
+    if (nKind == 1 || (u8)(nKind - 2) <= 4U || nKind == 7) {
+        return 1;
+    }
+    return 0;
+}
+
+// The GameBreaker letterbox is up, for a predicted GameBreaker or while b19 is set.
+u8 fn_8003DCAC(void) {
+    int bResult = 0;
+
+    if (lbl_80202898.bGameBreaker && (lbl_80202898.nGBType != 0 || lbl_80202898.b19 == 1)) {
+        bResult = 1;
+    }
+    return bResult;
 }

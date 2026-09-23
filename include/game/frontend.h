@@ -16,12 +16,24 @@ typedef struct UIFile {
     u32* p8;                    // 0x8  a count, then that many tables (each a count and its words)
 } UIFile;
 
+// An entry of the front end's colour table: p8 points at four bytes, alpha first (uiText.c).
+typedef struct UIColorEntry {
+    u8   unk0[0x8];
+    u8*  p8;                    // 0x8
+} UIColorEntry;
+
+typedef struct UIColorTable {
+    s32  nCount;                // 0x0  read as an s16
+    UIColorEntry* apEntries[1]; // 0x4  nCount of them
+} UIColorTable;
+
 typedef struct FrontEnd {
     UIFile* pFile;              // 0x0
     void* pHandler;             // 0x4  where GameMessages.c sends its messages (fn_8016B09C)
     u8    unk8[4];
     void* pC;                   // 0xC  a block uiLoadFile.c frees (fn_8008F24C)
-    u8    unk10[8];
+    u8    unk10[4];
+    UIColorTable* p14;          // 0x14  the colours UIText.n8 picks from (uiText.c), NULL: none
     f32   f18;                  // 0x18  set to 1 when a round starts (gomainloop fn_8006DC20)
 } FrontEnd;
 
@@ -88,6 +100,27 @@ typedef struct UIArc {
     f32  fEnd;                  // 0x34  message 4: degrees
 } UIArc;
 
+// A menu UI text element (uiText.c): a string drawn in a font, in a colour of its own or of the
+// front end's colour table, optionally with a shadow. Only what the code reads so far.
+typedef struct UIText {
+    s32  nText;                 // 0x00  messages 3 and 4: its string (a MsgString), as an offset
+                                //       from the element
+    s16  n4;                    // 0x04  its font (fn_80012868)
+    u8   unk6[2];
+    s16  n8;                    // 0x08  message 8, low half: an entry of the colour table, -1: aColor
+    s16  nA;                    // 0x0A  message 8, high half
+    s16  nFlags;                // 0x0C  bits 0/1: message 5; 0x10: a shadow; 0x100/0x200: f30/f34
+    s16  nE;                    // 0x0E  messages 16 and 17
+    u8   aColor[4];             // 0x10  message 0: red, green, blue, alpha
+    u8   aShadowColor[4];       // 0x14  message 1
+    f32  v18[3];                // 0x18  message 6
+    f32  f24;                   // 0x24  } passed to fn_80092C38 when it has a shadow
+    f32  f28;                   // 0x28  }
+    u8   unk2C[4];
+    f32  f30;                   // 0x30  messages 18 and 20, as an int
+    f32  f34;                   // 0x34  messages 19 and 21, as an int
+} UIText;
+
 // The menu UI's commands go to one of these, by the session's game type (uiProcessInterface.c's
 // fn_8008F568): each runs the handler for message nMsg of its table.
 void fn_80079E6C(int nMsg, MsgArg* pArgs, MsgArg* pResult);    // the menus (FE_MessageTable.c)
@@ -151,5 +184,7 @@ typedef struct UITransformDesc {
     UIWords4 w34;               // 0x34
     f32      f44[4];            // 0x44  divided by 511 when pushed
 } UITransformDesc;
+
+UITransform* fn_80093274(void);         // the current level (uiTransform.c)
 
 #endif

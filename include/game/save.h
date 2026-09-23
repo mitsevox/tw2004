@@ -123,7 +123,8 @@ LAYOUT_ASSERT(TourSeason, 0x4E9C);
 // A saved custom round (0x70 bytes): 18 holes, each a hole number and the course it is from.
 // A new profile has three, emptied by the profile setup at 0x80057C88.
 typedef struct SavedRound {
-    s8   n0;                    // 0x00  cleared by the setup; set by a menu message (fn_80083860)
+    u8   n0;                    // 0x00  cleared by the setup; set by a menu message (fn_80083860);
+                                //       read unsigned (FE_MessageTable.c fn_800807DC)
     char szName[0x14];          // 0x01  the round's name, shown as its course (GameUICommands.c)
     s8   n15;                   // 0x15  set to 1 by the setup; menu messages set and read it
                                 //       (read signed: fn_80080C2C)
@@ -169,11 +170,15 @@ typedef struct SaveProfile {
     s32  n74;                   // 0x00074  stroke-play rounds counted
     s32  n78;                   // 0x00078  their strokes
     s32  n7C;                   // 0x0007C  full rounds counted
-    u8   unk80[8];
-    s32  n88;                   // 0x00088  drives counted (the tee shot of a par 4 or 5 off class-1
+    s32  n80;                  // 0x00080  holes whose putts are counted (fewer than 10; fn_800D9458)
+    s32  n84;                   // 0x00084  their putts
+    s32  n88;                  // 0x00088  drives counted (the tee shot of a par 4 or 5 off class-1
                                 //          ground; fn_800D8FE4)
     s32  n8C;                   // 0x0008C  their distance together
-    u8   unk90[0xA0 - 0x90];
+    s32  n90;                   // 0x00090  } par 4 and 5 holes counted (fn_800D9458), and those where
+    s32  n94;                   // 0x00094  } the player's b2E4 was set
+    s32  n98;                   // 0x00098  } every hole counted, and those where the player's b2F6
+    s32  n9C;                   // 0x0009C  } was set
     s32  nA0;                   // 0x000A0  the longest of those drives
     s32  nA4;                   // 0x000A4  the longest putt, in feet (fn_800D8FE4)
     s32  nA8;                   // 0x000A8  the best stroke-play round (0: none yet)
@@ -228,7 +233,9 @@ typedef struct SaveProfile {
     u8   a5CD4[6][0x50];            // 0x05CD4
     u8   a5EB4[26];             // 0x05EB4  set to 50 each when FE_CrAP_InitCrAPInfo clears
                                 //          0x5500..0xB634 (fn_80058208)
-    u8   unk5ECE[0xB054 - 0x5ECE];
+    u8   unk5ECE[0xAF80 - 0x5ECE];
+    s32  aAF80[53];             // 0x0AF80  per slot: a Create-A-Player asset (FE_CrAPDB.c
+                                //          fn_80103D14), -1 for none; an asset's n2E is its slot
     // Four bit arrays with a bit per Create-A-Player asset (0x80057F18's loop over them all, which
     // also clears aB344 and aB4BC; fn_8001E9CC tests a bit).
     u32  aAssetLocked[94];      // 0x0B054  the asset was locked (fn_80078008) when last checked
@@ -268,11 +275,15 @@ u8   fn_800D7770(int nPlayer, Award* pAward);   // mark an award won today; 1 if
 
 // fe_craputils.c (TW06's FE_CrAP_ utilities)
 u8   fn_80058304(SaveProfile* pProfile, int nBit);  // bit nBit of pProfile->u10548
+void fn_80058560(SaveProfile* pProfile, int nKind, char* pName);  // add pName to list nKind
+void fn_80058624(SaveProfile* pProfile, int nKind, char* pName);  // take pName out of list nKind
+u8   fn_800587A8(SaveProfile* pProfile, int nKind, char* pName);  // pName is in list nKind (0..2)
 void fn_800588D4(s16 n);            // set lbl_80281DF0 (switched on, value n)
 s16  fn_800588E8(void);             // lbl_80281DF0's value
 
 // 0x800588F4: marked hole i's kind-0 byte (a5004/a10578) or kind-1 value (a504C/a1057C); -1 for
 // another kind.
 int  fn_800588F4(SaveProfile* pProfile, int nKind, int i);
+void fn_8005897C(SaveProfile* pProfile, int nKind, int i, int nValue);  // and set it
 
 #endif

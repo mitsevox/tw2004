@@ -3,10 +3,11 @@
 // matrices, and small setters; the sweep code in the marked block is the other matched small
 // functions, not yet cleaned up.
 
-#include "golfer.h"
+#include "game.h"
 #include "charstate.h"
 #include "unsorted/cull.h"
 #include "game_types.h"
+#include "endian.h"
 
 void  fn_80014BB4(void);
 void  fn_80014C9C(void);
@@ -25,6 +26,15 @@ void* fn_8001B208(u8* pData);
 void  fn_8001B878(Character* pChar, int n);
 void  fn_8001C0E0(Character* pChar);
 Character* fn_8001C21C(Character* pChar);
+void  Character_UpdateAnimation(Character* pChar, int a, f32 f);
+void  Character_UpdateTestPoints(Character* pChar);
+void  Character_UpdateFeetTerrainInfo(Character* pChar, int a);
+void  Character_PlaceFeetOnGround(Character* pChar);
+void  SKEL_TransformBones(CharModel* pModel, u32* auBits);
+void  fn_800B28D4(Character* pChar, int a, int b);
+void  fn_800B2FB0(Character* pChar, int a, int b);
+void  fn_800BAD60(f32 mtx[4][4], Vec4* src, Vec4* dst);    // VecMath.c: a point through a matrix
+void  fn_8001EB8C(Character* pChar, int nBone, f32* pPos);
 void  fn_8001CCF8(UStreamObject* pObject);
 void  fn_8001CD80(UStreamObject* pObject);
 void  fn_8001CE5C(UStreamObject* pObject);
@@ -65,19 +75,19 @@ void  fn_80112C64(int n);
 void  fn_80112CEC(void);
 
 // ---- sweep code (not yet cleaned up) ----
-s32 fn_8001E8A4(s32, s32);
-s32 fn_8001E938(s32, s32);
-void fn_80017864(void* arg0, s32 arg1);
+void fn_8001E8A4(u32* aBits, u32 nBits);
+void fn_8001E938(u32* aBits, u32 nBits);
+void fn_80017864(void* arg0, u32 (*arg1)[4]);
 void fn_8001B1DC(s32 p0, u8* p1, s32 p2);
 void fn_8001B1E8(void* p);
 void fn_8001C650(void* arg0, s32 arg1);
 
-void fn_80017864(void* arg0, s32 arg1) {
+void fn_80017864(void* arg0, u32 (*arg1)[4]) {
     if ((u32) (*(u32*)((u8*)(arg0) + 0x3C)) != 0U) {
-        fn_8001E8A4(arg1 + 0x20, 0x80);
-        fn_8001E8A4(arg1 + 0x30, 0x80);
-        fn_8001E938(arg1, 0x80);
-        fn_8001E938(arg1 + 0x10, 0x80);
+        fn_8001E8A4(arg1[2], 0x80);
+        fn_8001E8A4(arg1[3], 0x80);
+        fn_8001E938(arg1[0], 0x80);
+        fn_8001E938(arg1[1], 0x80);
     }
 }
 
@@ -135,6 +145,35 @@ void fn_80018484(Character* pChar, CharModel* pModel) {
         pChar->nClubHeadBone = fn_8001EED8(pChar->pModel, 0x53);
         pChar->nGripBone     = fn_8001EED8(pChar->pModel, 0x52);
         pChar->n16A8         = fn_8001EEE4(pChar->pModel, 0x15);
+    }
+}
+
+// Moves the character to pPos (its root bone's position); with bPlace, the bones are transformed
+// again and the feet put back on the ground.
+void Character_SetPosition(Character* pChar, f32* pPos, u8 bPlace) {
+    u32 auBits[4];
+
+    fn_8001E8A4(auBits, 0x80);
+    if (pChar != NULL) {
+        Vec_Copy(pPos, pChar->pModel->pBones->v1C);
+        if (bPlace) {
+            SKEL_TransformBones(pChar->pModel, auBits);
+            Character_UpdateTestPoints(pChar);
+            pChar->n1784 = -1;
+            Character_UpdateFeetTerrainInfo(pChar, 1);
+            Character_PlaceFeetOnGround(pChar);
+        }
+    }
+}
+
+// Turns the character's root bone to fAngle about y (half a turn more in game type 3 while the
+// model's bEE is set).
+void fn_800192D4(Character* pChar, f32 fAngle) {
+    if (pChar != NULL) {
+        if (gSession.nGameType == 3 && fn_8001EDF4(pChar)) {
+            fAngle += PI;
+        }
+        fn_80008BB8(pChar->pModel->pBones->q0C, 0.0f, fAngle, 0.0f);
     }
 }
 
@@ -284,6 +323,17 @@ void fn_8001A81C(void) {
         AnimLib_FreeWorkCopies();
     }
     fn_800C9FE0();
+}
+
+// Advances every character's animation by fTime, except in game type 6 while fn_800E415C holds.
+void fn_8001BC8C(f32 fTime) {
+    int i;
+
+    if (gSession.nGameType != 6 || !fn_800E415C()) {
+        for (i = 0; i < lbl_80281CA8; i++) {
+            Character_UpdateAnimation(lbl_801B9624[i], 0, fTime);
+        }
+    }
 }
 
 // Add a character to the table of characters (up to five); NULL when it is full.
@@ -436,6 +486,20 @@ void fn_8001D268(void) {
     UStream_UnregisterHandler('CHR ');
 }
 
+// Runs fn_800B28D4 and fn_800B2FB0 on each character found by id (nPlayer 1000) whose n1658 is not
+// 2 and that has neither bit 0x01 nor 0x40 of u10 set.
+void fn_8001D290(void) {
+    int i;
+
+    for (i = 0; i < lbl_80281CA8; i++) {
+        if (lbl_801B9624[i]->nPlayer == 1000 && lbl_801B9624[i]->n1658 != 2 &&
+            !(lbl_801B9624[i]->u10 & 0x41)) {
+            fn_800B28D4(lbl_801B9624[i], 1, 0);
+            fn_800B2FB0(lbl_801B9624[i], 1, 0);
+        }
+    }
+}
+
 // The character built from the 'SKLO' object with this id (fn_8001D3EC), or NULL.
 Character* fn_8001D324(int nId) {
     int i;
@@ -501,6 +565,23 @@ void fn_8001D8DC(int nPlayer) {
 }
 
 // Empty the character's four data buffers (their memory is kept).
+// The clip's point v80 through bone 0's matrix (fn_8001ED08) into pOut; without a clip, bone 0's
+// position (fn_8001EB8C).
+void fn_8001DB04(Character* pChar, f32* pOut) {
+    Vec4 vPos;
+    f32 (*pMtx)[4];
+
+    if (pChar->pCurClip != NULL) {
+        fn_8001EED8(pChar->pModel, 1);  // the result is not used
+        pMtx = fn_8001ED08(pChar, 0);
+        Vec3Copy(pChar->pCurClip->v80, &vPos.x);
+        vPos.w = 1.0f;
+        fn_800BAD60(pMtx, &vPos, (Vec4*)pOut);
+        return;
+    }
+    fn_8001EB8C(pChar, 0, pOut);
+}
+
 void fn_8001DB98(Character* pChar) {
     int i;
     for (i = 0; i < 4; i++) {
@@ -545,6 +626,24 @@ void fn_8001E880(f32* pSrc, f32* pDst) {
     pDst[1] = pSrc[1];
     pDst[2] = pSrc[2];
     pDst[3] = 1.0f;
+}
+
+// Sets every bit of a bit array of nBits bits.
+void fn_8001E8A4(u32* aBits, u32 nBits) {
+    u32 i;
+
+    for (i = 0; i < (nBits + 31) >> 5; i++) {
+        aBits[i] = 0xFFFFFFFF;
+    }
+}
+
+// Clears every bit of a bit array of nBits bits.
+void fn_8001E938(u32* aBits, u32 nBits) {
+    u32 i;
+
+    for (i = 0; i < (nBits + 31) >> 5; i++) {
+        aBits[i] = 0;
+    }
 }
 
 u8 fn_8001E9CC(u32* aBits, u32 n) {
@@ -657,15 +756,6 @@ f32 fn_8001EEA4(f32* pA, f32* pB) {
     return pA[0] * pB[0] + pA[1] * pB[1] + pA[2] * pB[2] + pA[3] * pB[3];
 }
 
-f32 fn_8001EFFC(CamLens* pLens) {
-    return pLens->fB0;
-}
-
-// The current render camera's lens.
-CamLens* fn_8001F004(void) {
-    return fn_80008370(*lbl_80280DF0);
-}
-
 int fn_8001EED8(CharModel* pModel, int nBone) {
     return pModel->aBone[nBone];
 }
@@ -678,6 +768,165 @@ int fn_8001EEE4(CharModel* pModel, int nBone) {
     return pModel->aBone[nBone];
 }
 
+// a - b into out (three floats)
+#ifdef __MWERKS__
+asm void fn_8001EF10(register f32* pA, register f32* pB, register f32* pOut) {
+    nofralloc
+    psq_l  f0, 0(pA), 0, 0
+    psq_l  f1, 8(pA), 1, 0
+    psq_l  f2, 0(pB), 0, 0
+    psq_l  f3, 8(pB), 1, 0
+    ps_sub f2, f0, f2
+    ps_sub f3, f1, f3
+    psq_st f2, 0(pOut), 0, 0
+    psq_st f3, 8(pOut), 1, 0
+    blr
+}
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void fn_8001EF10(f32* pA, f32* pB, f32* pOut) {
+    pOut[0] = pA[0] - pB[0];
+    pOut[1] = pA[1] - pB[1];
+    pOut[2] = pA[2] - pB[2];
+}
+#endif
+
+// in scaled by f into out (three floats)
+#ifdef __MWERKS__
+asm void fn_8001EF34(register f32* pIn, register f32 f, register f32* pOut) {
+    nofralloc
+    fmr      f2, f
+    psq_l    f0, 0(pIn), 0, 0
+    psq_l    f1, 8(pIn), 1, 0
+    ps_muls0 f0, f0, f2
+    ps_muls0 f1, f1, f2
+    psq_st   f0, 0(pOut), 0, 0
+    psq_st   f1, 8(pOut), 1, 0
+    blr
+}
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void fn_8001EF34(f32* pIn, f32 f, f32* pOut) {
+    pOut[0] = pIn[0] * f;
+    pOut[1] = pIn[1] * f;
+    pOut[2] = pIn[2] * f;
+}
+#endif
+
+// b + a into out (three floats)
+#ifdef __MWERKS__
+asm void fn_8001EF54(register f32* pA, register f32* pB, register f32* pOut) {
+    nofralloc
+    psq_l  f0, 0(pA), 0, 0
+    psq_l  f1, 8(pA), 1, 0
+    psq_l  f2, 0(pB), 0, 0
+    psq_l  f3, 8(pB), 1, 0
+    ps_add f2, f2, f0
+    ps_add f3, f3, f1
+    psq_st f2, 0(pOut), 0, 0
+    psq_st f3, 8(pOut), 1, 0
+    blr
+}
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void fn_8001EF54(f32* pA, f32* pB, f32* pOut) {
+    pOut[0] = pB[0] + pA[0];
+    pOut[1] = pB[1] + pA[1];
+    pOut[2] = pB[2] + pA[2];
+}
+#endif
+
+// a x b into out; out's fourth float is set to 0.
+#ifdef __MWERKS__
+asm void vec4flt_CrossProduct(register f32* pA, register f32* pB, register f32* pOut) {
+    nofralloc
+    psq_l      f0, 0(pA), 0, 0
+    psq_l      f1, 4(pA), 0, 0
+    psq_l      f3, 0(pB), 0, 0
+    psq_l      f5, 4(pB), 0, 0
+    ps_merge10 f2, f1, f0
+    ps_merge10 f4, f3, f3
+    ps_merge10 f3, f5, f3
+    ps_mul     f4, f0, f4
+    ps_mul     f0, f2, f5
+    ps_merge11 f2, f4, f4
+    ps_msub    f0, f1, f3, f0
+    ps_sub     f4, f4, f2
+    psq_st     f0, 0(pOut), 0, 0
+    psq_st     f4, 8(pOut), 0, 0
+    blr
+}
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void vec4flt_CrossProduct(f32* pA, f32* pB, f32* pOut) {
+    f32 fX = pA[1] * pB[2] - pA[2] * pB[1];
+    f32 fY = pA[2] * pB[0] - pA[0] * pB[2];
+    f32 fZ = pA[0] * pB[1] - pA[1] * pB[0];
+
+    pOut[0] = fX;
+    pOut[1] = fY;
+    pOut[2] = fZ;
+    pOut[3] = 0.0f;
+}
+#endif
+
+// a - b into out (four floats)
+#ifdef __MWERKS__
+asm void fn_8001EFB4(register f32* pA, register f32* pB, register f32* pOut) {
+    nofralloc
+    psq_l  f0, 0(pA), 0, 0
+    psq_l  f1, 8(pA), 0, 0
+    psq_l  f2, 0(pB), 0, 0
+    psq_l  f3, 8(pB), 0, 0
+    ps_sub f2, f0, f2
+    ps_sub f3, f1, f3
+    psq_st f2, 0(pOut), 0, 0
+    psq_st f3, 8(pOut), 0, 0
+    blr
+}
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void fn_8001EFB4(f32* pA, f32* pB, f32* pOut) {
+    pOut[0] = pA[0] - pB[0];
+    pOut[1] = pA[1] - pB[1];
+    pOut[2] = pA[2] - pB[2];
+    pOut[3] = pA[3] - pB[3];
+}
+#endif
+
+// b + a into out (four floats)
+#ifdef __MWERKS__
+asm void fn_8001EFD8(register f32* pA, register f32* pB, register f32* pOut) {
+    nofralloc
+    psq_l  f0, 0(pA), 0, 0
+    psq_l  f1, 8(pA), 0, 0
+    psq_l  f2, 0(pB), 0, 0
+    psq_l  f3, 8(pB), 0, 0
+    ps_add f2, f2, f0
+    ps_add f3, f3, f1
+    psq_st f2, 0(pOut), 0, 0
+    psq_st f3, 8(pOut), 0, 0
+    blr
+}
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void fn_8001EFD8(f32* pA, f32* pB, f32* pOut) {
+    pOut[0] = pB[0] + pA[0];
+    pOut[1] = pB[1] + pA[1];
+    pOut[2] = pB[2] + pA[2];
+    pOut[3] = pB[3] + pA[3];
+}
+#endif
+
+f32 fn_8001EFFC(CamLens* pLens) {
+    return pLens->fB0;
+}
+
+// The current render camera's lens.
+CamLens* fn_8001F004(void) {
+    return fn_80008370(*lbl_80280DF0);
+}
+
 // ---- sweep code (not yet cleaned up) ----
 
 void Anim_SetRate(u8* p, f32 v);
@@ -687,3 +936,22 @@ void Anim_SetRate(u8* p, f32 v) {
 }
 
 // ---- end of sweep code ----
+
+// Byte-swaps nCount records laid out as pFormat's nFields fields from *ppSrc to *ppDst; both
+// pointers are left after the last record.
+void fn_8001F08C(void** ppSrc, void** ppDst, SwapField* pFormat, int nFields, int nCount) {
+    SwapField* pField;
+    int i;
+
+    if (nCount > 0) {
+        do {
+            pField = pFormat;
+            for (i = 0; i < nFields; i++) {
+                // port: *ppSrc is read and advanced as a u8* (fn_80076158's parameter)
+                fn_80076158((u8**)ppSrc, *ppDst, pField->nBytes, pField->nSize);
+                *ppDst = (u8*)*ppDst + pField->nBytes;
+                pField++;
+            }
+        } while (--nCount > 0);
+    }
+}
