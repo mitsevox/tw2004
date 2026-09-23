@@ -92,6 +92,8 @@ void fn_800EADD8(void) {
 
 // A course object of type 10 (from the course loader at 0x80048BDC): one challenge's ball spot.
 void fn_800EADDC(void* pObj) {
+    // port: the course object is big-endian and read in place through ChallengeSpotRecord; a
+    // little-endian port converts v[] (three floats) here
     ChallengeSpotRecord* d = *(ChallengeSpotRecord**)pObj;
     int i = d->nChallenge - 1;
     if (i < 83) {
@@ -128,6 +130,9 @@ void fn_800EAEB8(void) {
 }
 
 void fn_800EAEEC(UStreamObject* pObject) {
+    // port: the 'PLY ' object is copied straight into the challenges (Challenge[83]); it is
+    // big-endian on disc, so a little-endian port converts it field by field here
+    // (docs/format-byteorder.md)
     fn_8000E790(pObject, sizeof(lbl_80203554), lbl_80203554);
 }
 

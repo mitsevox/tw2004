@@ -59,7 +59,7 @@ Objects delivered by UStream
 | `CAMA` | fn_800397EC | GoDynamicCam.c | swapped: fn_80039A48 > fn_8001F08C | little-endian on disc |
 | `TEO ` | fn_80045F74 | sweep | none seen | asm |
 | `BALL` | fn_80045FC8 | asm | none seen | asm |
-| `Cact` | fn_80048BDC | UKernel.c | none seen | asm |
+| `Cact` | fn_80048BDC | UKernel.c | none seen | asm; its type-10 objects go to fn_800EADDC (GameMode5.c), which reads a challenge's ball spot in place through `ChallengeSpotRecord` (`port:` note there) |
 | `CAMC` | fn_800644F4 | GoStaticCam.c | swapped: fn_8001F08C | little-endian on disc |
 | `sscr` | SitDev_LoadScripts | SitDevFile.c | swapped: fn_800BB52C > fn_8001F08C | little-endian on disc |
 | `BIO ` | fn_80076F80 | FE_Manager.c | none seen | asm |
@@ -73,14 +73,14 @@ Objects delivered by UStream
 | `BALF` | fn_800B99BC | sweep | none seen | asm |
 | `TRAX`, `TRXT` | fn_800BA118, fn_800BA15C | sweep | none seen | asm |
 | `CRI `, `CMPS` | fn_800D2A64, fn_800D2A90 | sweep | none seen | asm |
-| `ERN ` | fn_800D344C | Earnings.c | none seen | yes: copied over the prize table `lbl_80200538` (`EarningsTable`) |
-| `PLY ` | fn_800EAEEC | GameMode5.c | none seen | yes: copied over `lbl_80203554` |
+| `ERN ` | fn_800D344C | Earnings.c | none seen | yes: copied over the prize table `lbl_80200538` (`EarningsTable`, include/game/earnings.h); a `port:` note in the handler marks where a port converts it |
+| `PLY ` | fn_800EAEEC | GameMode5.c | none seen | yes: copied over `lbl_80203554` (`Challenge[83]`, include/game/modes/challenge.h); `port:` note in the handler |
 | `PLYs` | fn_800EAF18 | GameMode5.c | none seen | bytes: a string block, copied |
-| `PGAc`, `PGAt`, `PGAp` | fn_800EDF34, fn_800EDF60, fn_800EDF90 | GameModeDriverPGATour.c | none seen | yes: copied over `gPgaData.aTournament`, `.aTourEvent`, `.aTriple` |
+| `PGAc`, `PGAt`, `PGAp` | fn_800EDF34, fn_800EDF60, fn_800EDF90 | GameModeDriverPGATour.c | none seen | yes: copied over `gPgaData.aTournament`, `.aTourEvent`, `.aTriple` (`Tournament`, `TourEvent`, `PgaTriple`, include/game/modes/pgatour.h); a `port:` note in each handler |
 | `PGAn` | fn_800EDFC0 | GameModeDriverPGATour.c | none seen | bytes: names, copied |
-| `RTEc`, `RTEs` | fn_800F05B0, fn_800F05DC | GameModeDriverRTE.c | none seen | yes: copied over `gRTEs.aEvent`, `.aChallenge` |
+| `RTEc`, `RTEs` | fn_800F05B0, fn_800F05DC | GameModeDriverRTE.c | none seen | yes: copied over `gRTEs.aEvent`, `.aChallenge` (`RTEvent`, `Challenge`, include/game/modes/rte.h); a `port:` note in each handler |
 | `RTEn` | fn_800F060C | GameModeDriverRTE.c | none seen | bytes: names, copied |
-| `TCM ` | fn_8010237C | GameMode4.c | none seen | yes: copied over `lbl_802124B8` |
+| `TCM ` | fn_8010237C | GameMode4.c | none seen | yes: copied over `lbl_802124B8` (`LadderEvent[25]`, GameMode4.c); `port:` note in the handler |
 | `TCMS` | fn_801023A8 | GameMode4.c | none seen | bytes: text, copied |
 | `CR_A` | fn_80105188 | FE_CrAPDB.c | swapped: fn_80105DAC > fn_8001F08C | little-endian on disc |
 | `CR_S` | fn_801051F4 | FE_CrAPDB.c | none seen | asm |
@@ -105,7 +105,7 @@ The memory card
 
 | Data | Code | Swap | Overlay |
 |---|---|---|---|
-| the save profile (`SaveProfile`, include/game/save.h, 0x10600 bytes, with raw replays) | MC_Gc.c: `CARDReadAsync` (fn_8009DD94), `CARDWriteAsync` (fn_8009E130), `CARDRead` (fn_8009F208) | none seen: nothing in MC_Gc.c or MC.c calls a swap routine | yes: read and written as the struct's bytes (`gpSaveData`) |
+| the save profile (`SaveProfile`, include/game/save.h, 0x10600 bytes, with raw replays) | MC_Gc.c: `CARDReadAsync` (fn_8009DD94), `CARDWriteAsync` (fn_8009E130), `CARDRead` (fn_8009F208) | none seen: nothing in MC_Gc.c or MC.c calls a swap routine | yes: read and written as the struct's bytes (`gpSaveData`). The load and store are in MC_Gc.c (asm, lane C); `include/game/save.h` says a port reads and writes the profile field by field |
 
 Other byte-order facts
 ----------------------
