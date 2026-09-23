@@ -4534,6 +4534,10 @@ dolphin/exi/EXIUart.c:
 
 dolphin/si/SIBios.c:
 	.text       start:0x80131F78 end:0x801337D8
+	.data       start:0x80195BF0 end:0x80195D08
+	.bss        start:0x80261260 end:0x80261460
+	.sdata      start:0x802819D0 end:0x802819D8
+	.sbss       start:0x80282628 end:0x80282638
 
 dolphin/si/SISamplingRate.c:
 	.text       start:0x801337D8 end:0x801338E0
