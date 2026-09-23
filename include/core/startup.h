@@ -172,6 +172,9 @@ int fn_800B044C(u32 uAram, void* pSrc, int nLen, void (*pfnDone)(u32 n), int n);
 void fn_800B0268(u16 nVoice, StreamChunk* pChunk, u32 uSize, int nBuffer);
 // Cancel the ARAM transfers queued for pOwner.
 void fn_800B04CC(void* pOwner);
+// The CPU cache work around a DMA of uLen bytes at p (nDir as ARQRequest.type); GoARAM.c uses them too.
+void fn_800B04EC(void* p, u32 uLen, int nDir);
+void fn_800B051C(void* p, u32 uLen, int nDir);
 
 // ---- the built-in sounds ----------------------------------------------------------------------
 

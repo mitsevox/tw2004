@@ -1,13 +1,11 @@
 // GoARAM.c (EA's name, from its asserts): the audio RAM (ARAM): its set-up (fn_800B62DC), its heap
-// and the queue of DMA transfers between main memory and ARAM (the state at lbl_802814C8). The
-// heap (fn_800B5C40-fn_800B6188) is written out; the rest is still the sweep's code.
+// and the queue of DMA transfers between main memory and ARAM (the state at lbl_801F6680). The
+// front end, the memory card and the animation code keep data here while it is not needed.
 
 #include "core/goaram.h"
+#include "core/startup.h"
 
-ARAMHeap*  fn_800B5C40(u32 uSize, u32 uBase, u32 nBlocks, ARAMHeap* pHeap);
 void       fn_800B5D08(ARAMHeap* pHeap);
-u32        fn_800B5D34(ARAMHeap* pHeap, u32 uSize, u32 uAlign);
-void       fn_800B5E88(ARAMHeap* pHeap, u32 uAram);
 void       fn_800B5F28(ARAMHeap* pHeap, ARAMBlock* pBlock);
 ARAMBlock* fn_800B5F4C(ARAMHeap* pHeap);
 ARAMBlock* fn_800B5F8C(ARAMHeap* pHeap, ARAMBlock* pHead, ARAMBlock* pBlock);
@@ -17,6 +15,18 @@ void       fn_800B608C(ARAMBlock* pBlock);
 ARAMBlock* fn_800B60B0(ARAMBlock* pHead, ARAMBlock* pBlock);
 ARAMBlock* fn_800B60F0(ARAMBlock* pHead, ARAMBlock* pBlock);
 void       fn_800B6188(ARAMHeap* pHeap);
+void       fn_800B61B4(ARQRequest* pRequest);
+void       fn_800B6214(ARAMTransfer* pTransfer);
+void       fn_800B62DC(void);
+void       fn_800B64D8(void);
+void       fn_800B655C(void);
+void       fn_800B6560(void);
+s32        fn_800B67B4(ARAMTransfer* pTransfer);
+void       fn_80007328(void);
+void       fn_80007368(void);
+
+ARAMState lbl_801F6680;
+ARAMState* lbl_802814C8 = &lbl_801F6680;
 
 // Sets up a heap of uSize bytes at ARAM address uBase, with nBlocks block records after pHeap:
 // one record holds the whole heap as free, the others go to the spare list.
@@ -228,70 +238,87 @@ void fn_800B6188(ARAMHeap* pHeap) {
     } while (pBlock != pHead);
 }
 
-// ---- sweep code (not yet cleaned up) ----
+// The ARQ library calls this when a transfer's DMA is done.
+void fn_800B61B4(ARQRequest* pRequest) {
+    ARAMTransfer* pTransfer = (ARAMTransfer*)pRequest;
 
-void fn_800B6214(void* arg0);
-s32 fn_80007328();
-s32 fn_80007368();
-s32 fn_800B04EC(s32, s32, s32);
-void fn_800B051C();
-void fn_800B65C0();
-void fn_800B61B4(void* arg0);
-void fn_800B64D8(void);
-void fn_800B655C(void);
-void fn_800B6560(void);
-u32 fn_800B6564(u32 uSize);
-void fn_800B6594(u32 uAram);
-s32 fn_800B67B4(void* arg0);
-void fn_800B67EC(void* arg0);
-void fn_800B6844(s32 p0, s32 p1, s32 p2);
-void fn_800B68B4(s32 p0, s32 p1, s32 p2);
-
-void fn_800B61B4(void* arg0) {
-    s32 (*temp_r12)(s32);
-
-    temp_r12 = (*(s32 (**)(s32))((u8*)(arg0) + 0x20));
-    if (temp_r12 != NULL) {
-        temp_r12((*(s32*)((u8*)(arg0) + 0x24)));
+    if (pTransfer->pfnDone != NULL) {
+        pTransfer->pfnDone(pTransfer->uOwner);
     }
-    if ((*(u8*)((u8*)(arg0) + 0x38)) & 1) {
-        fn_800B6214(arg0);
+    if (pTransfer->uFlags & 1) {
+        fn_800B6214(pTransfer);
         return;
     }
-    (*(s32*)((u8*)(arg0) + 0x28)) = 2;
+    pTransfer->nState = 2;
 }
 
-void fn_800B6214(void* arg0) {
-    void* temp_r0;
-    void* temp_r4;
-    void* temp_r5;
-
-    (*(s32*)((u8*)(arg0) + 0x28)) = 0;
-    temp_r5 = (*(void**)((u8*)(arg0) + 0x3C));
-    if (arg0 == temp_r5) {
-        (*(void**)((u8*)(lbl_802814C8) + 0x10)) = NULL;
+// Moves a transfer from the queued list back to the unused list.
+void fn_800B6214(ARAMTransfer* pTransfer) {
+    pTransfer->nState = 0;
+    if (pTransfer == pTransfer->pNext) {
+        lbl_802814C8->pQueued = NULL;
     } else {
-        if (arg0 == (void* ) (*(void**)((u8*)(lbl_802814C8) + 0x10))) {
-            (*(void**)((u8*)(lbl_802814C8) + 0x10)) = temp_r5;
+        if (pTransfer == lbl_802814C8->pQueued) {
+            lbl_802814C8->pQueued = pTransfer->pNext;
         }
-        (*(void**)((u8*)((*(void**)((u8*)(arg0) + 0x40))) + 0x3C)) = (void* ) (*(void**)((u8*)(arg0) + 0x3C));
-        (*(void**)((u8*)((*(void**)((u8*)(arg0) + 0x3C))) + 0x40)) = (void* ) (*(void**)((u8*)(arg0) + 0x40));
-        (*(void**)((u8*)(arg0) + 0x40)) = arg0;
-        (*(void**)((u8*)(arg0) + 0x3C)) = arg0;
+        pTransfer->pPrev->pNext = pTransfer->pNext;
+        pTransfer->pNext->pPrev = pTransfer->pPrev;
+        pTransfer->pPrev = pTransfer;
+        pTransfer->pNext = pTransfer;
     }
-    (*(s32*)((u8*)(lbl_802814C8) + 0x20)) = (s32) ((*(s32*)((u8*)(lbl_802814C8) + 0x20)) - 1);
-    temp_r0 = (*(void**)((u8*)(lbl_802814C8) + 0x14));
-    if (temp_r0 != NULL) {
-        (*(void**)((u8*)(arg0) + 0x3C)) = temp_r0;
-        (*(void**)((u8*)(arg0) + 0x40)) = (void* ) (*(void**)((u8*)((*(void**)((u8*)(lbl_802814C8) + 0x14))) + 0x40));
-        temp_r4 = (*(void**)((u8*)((*(void**)((u8*)(lbl_802814C8) + 0x14))) + 0x40));
-        if (temp_r4 != NULL) {
-            (*(void**)((u8*)(temp_r4) + 0x3C)) = arg0;
+    lbl_802814C8->nQueued--;
+    if (lbl_802814C8->pUnused != NULL) {
+        pTransfer->pNext = lbl_802814C8->pUnused;
+        pTransfer->pPrev = lbl_802814C8->pUnused->pPrev;
+        if (lbl_802814C8->pUnused->pPrev != NULL) {
+            lbl_802814C8->pUnused->pPrev->pNext = pTransfer;
         }
-        (*(void**)((u8*)((*(void**)((u8*)(lbl_802814C8) + 0x14))) + 0x40)) = arg0;
+        lbl_802814C8->pUnused->pPrev = pTransfer;
     }
-    (*(void**)((u8*)(lbl_802814C8) + 0x14)) = arg0;
-    (*(s32*)((u8*)(lbl_802814C8) + 0x24)) = (s32) ((*(s32*)((u8*)(lbl_802814C8) + 0x24)) + 1);
+    lbl_802814C8->pUnused = pTransfer;
+    lbl_802814C8->nUnused++;
+}
+
+// Sets up the ARAM: the heap over all of it and ARAM_NUM_TRANSFERS unused transfers.
+void fn_800B62DC(void) {
+    ARAMTransfer* pTransfer;
+    u32 uBase;
+    u32 uEnd;
+    int i;
+
+    ARInit(NULL, 0);
+    uBase = ARGetBaseAddress();
+    uEnd = fn_80133B18();
+    lbl_802814C8->pHeapMem = fn_800951A0(sizeof(ARAMHeap) + ARAM_NUM_BLOCKS * sizeof(ARAMBlock), 16, 1);
+    lbl_802814C8->pHeap = fn_800B5C40(uEnd - uBase, uBase, ARAM_NUM_BLOCKS, lbl_802814C8->pHeapMem);
+    lbl_802814C8->p8 = fn_800951A0(ARAM_NUM_TRANSFERS * sizeof(ARAMTransfer), 16, 1);
+    lbl_802814C8->nTransfers = ARAM_NUM_TRANSFERS;
+    if (lbl_802814C8->p8 == NULL) {
+        lbl_802814C8->p18 = fn_80009B34(ARAM_NUM_TRANSFERS * sizeof(ARAMTransfer), 2, 16, "GoARAM.c", 192);
+        lbl_802814C8->pTransfers = lbl_802814C8->p18;
+    } else {
+        lbl_802814C8->p18 = NULL;
+        lbl_802814C8->pTransfers = lbl_802814C8->p8;
+    }
+    lbl_802814C8->pQueued = NULL;
+    lbl_802814C8->pUnused = NULL;
+    pTransfer = lbl_802814C8->pTransfers;
+    for (i = 0; i < ARAM_NUM_TRANSFERS; i++) {
+        pTransfer->pNext = pTransfer;
+        pTransfer->pPrev = pTransfer;
+        if (lbl_802814C8->pUnused != NULL) {
+            pTransfer->pNext = lbl_802814C8->pUnused;
+            pTransfer->pPrev = lbl_802814C8->pUnused->pPrev;
+            if (lbl_802814C8->pUnused->pPrev != NULL) {
+                lbl_802814C8->pUnused->pPrev->pNext = pTransfer;
+            }
+            lbl_802814C8->pUnused->pPrev = pTransfer;
+        }
+        lbl_802814C8->pUnused = pTransfer;
+        pTransfer++;
+    }
+    lbl_802814C8->nUnused = ARAM_NUM_TRANSFERS;
+    lbl_802814C8->nQueued = 0;
 }
 
 void fn_800B64D8(void) {
@@ -303,8 +330,8 @@ void fn_800B64D8(void) {
     lbl_802814C8->p8 = NULL;
     fn_800B5D08(lbl_802814C8->pHeap);
     lbl_802814C8->pHeap = NULL;
-    fn_8009527C(lbl_802814C8->p4);
-    lbl_802814C8->p4 = NULL;
+    fn_8009527C(lbl_802814C8->pHeapMem);
+    lbl_802814C8->pHeapMem = NULL;
 }
 
 void fn_800B655C(void) {
@@ -322,32 +349,101 @@ void fn_800B6594(u32 uAram) {
     fn_800B5E88(lbl_802814C8->pHeap, uAram);
 }
 
-s32 fn_800B67B4(void* arg0) {
-    s32 temp_r31;
+// Queues a DMA of uLength bytes from uSource to uDest (nType as ARQRequest.type) and returns its
+// transfer. pfnDone(uOwner) is called when it is done.
+ARAMTransfer* fn_800B65C0(u32 uSource, u32 uDest, u32 uLength, int nType, u32 uPriority,
+                          void (*pfnDone)(u32 uOwner), u32 uOwner, u8 uFlags) {
+    ARAMTransfer* pTransfer;
 
     fn_80007368();
-    temp_r31 = (*(s32*)((u8*)(arg0) + 0x28));
+    pTransfer = lbl_802814C8->pUnused;
+    if (pTransfer == pTransfer->pNext) {
+        lbl_802814C8->pUnused = NULL;
+    } else {
+        if (pTransfer == lbl_802814C8->pUnused) {
+            lbl_802814C8->pUnused = pTransfer->pNext;
+        }
+        pTransfer->pPrev->pNext = pTransfer->pNext;
+        pTransfer->pNext->pPrev = pTransfer->pPrev;
+        pTransfer->pPrev = pTransfer;
+        pTransfer->pNext = pTransfer;
+    }
+    lbl_802814C8->nUnused--;
+    if (lbl_802814C8->pQueued != NULL) {
+        pTransfer->pNext = lbl_802814C8->pQueued;
+        pTransfer->pPrev = lbl_802814C8->pQueued->pPrev;
+        if (lbl_802814C8->pQueued->pPrev != NULL) {
+            lbl_802814C8->pQueued->pPrev->pNext = pTransfer;
+        }
+        lbl_802814C8->pQueued->pPrev = pTransfer;
+    }
+    lbl_802814C8->pQueued = pTransfer;
+    lbl_802814C8->nQueued++;
     fn_80007328();
-    return temp_r31;
+    pTransfer->pfnDone = pfnDone;
+    pTransfer->uOwner = uOwner;
+    pTransfer->uFlags = uFlags;
+    pTransfer->nType = nType;
+    pTransfer->uMain = (nType == 0) ? uSource : uDest;
+    pTransfer->uLength = uLength;
+    pTransfer->nState = 1;
+    ARQPostRequest(&pTransfer->request, uOwner, nType, uPriority, uSource, uDest, uLength, fn_800B61B4);
+    return pTransfer;
 }
 
-void fn_800B67EC(void* arg0) {
+// Cancels the queued transfers of uOwner that allow it (flag 2) and returns how many.
+int fn_800B6728(u32 uOwner) {
+    ARAMTransfer* pTransfer;
+    ARAMTransfer* pNext;
+    int nQueued;
+    int i;
+    int nCancelled = 0;
+
+    fn_80007368();
+    i = 0;
+    pTransfer = lbl_802814C8->pQueued;
+    nQueued = lbl_802814C8->nQueued;
+    for (; i < nQueued; i++) {
+        pNext = pTransfer->pNext;
+        if ((pTransfer->uFlags & 2) && pTransfer->uOwner == uOwner) {
+            ARQRemoveRequest(&pTransfer->request);
+            fn_800B6214(pTransfer);
+            nCancelled++;
+        }
+        pTransfer = pNext;
+    }
+    fn_80007328();
+    return nCancelled;
+}
+
+s32 fn_800B67B4(ARAMTransfer* pTransfer) {
+    s32 nState;
+
+    fn_80007368();
+    nState = pTransfer->nState;
+    fn_80007328();
+    return nState;
+}
+
+// Waits for a transfer to finish, then gives it back.
+void fn_800B67EC(ARAMTransfer* pTransfer) {
     do {
-    } while (fn_800B67B4(arg0) != 2);
-    fn_800B04EC((*(s32*)((u8*)(arg0) + 0x30)), (*(s32*)((u8*)(arg0) + 0x34)), (*(s32*)((u8*)(arg0) + 0x2C)));
+    } while (fn_800B67B4(pTransfer) != 2);
+    // port: the main-memory address is kept as a u32, as the ARQ library takes it
+    fn_800B04EC((void*)pTransfer->uMain, pTransfer->uLength, pTransfer->nType);
     fn_80007368();
-    fn_800B6214(arg0);
+    fn_800B6214(pTransfer);
     fn_80007328();
 }
 
-void fn_800B6844(s32 p0, s32 p1, s32 p2) {
-    fn_800B051C(p0, p2, 0);
-    fn_800B65C0(p0, p1, p2, 0, 1, 0, 0, 0);
+// Copies uSize bytes from pSrc to ARAM address uAram.
+void fn_800B6844(void* pSrc, u32 uAram, u32 uSize) {
+    fn_800B051C(pSrc, uSize, 0);
+    fn_800B65C0((u32)pSrc, uAram, uSize, 0, 1, NULL, 0, 0);    // port: the ARQ library takes addresses as u32
 }
 
-void fn_800B68B4(s32 p0, s32 p1, s32 p2) {
-    fn_800B051C(p0, p2, 1);
-    fn_800B65C0(p1, p0, p2, 1, 1, 0, 0, 0);
+// Copies uSize bytes from ARAM address uAram to pDst.
+void fn_800B68B4(void* pDst, u32 uAram, u32 uSize) {
+    fn_800B051C(pDst, uSize, 1);
+    fn_800B65C0(uAram, (u32)pDst, uSize, 1, 1, NULL, 0, 0);    // port: the ARQ library takes addresses as u32
 }
-
-// ---- end of sweep code ----
