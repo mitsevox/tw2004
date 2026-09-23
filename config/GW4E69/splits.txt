@@ -3295,17 +3295,8 @@ unsorted/sweep_801247C0.c:
 unsorted/sweep_80124814.c:
 	.text       start:0x80124814 end:0x80124838
 
-unsorted/sweep_80124A70.c:
-	.text       start:0x80124A70 end:0x80124A98
-
-unsorted/sweep_80124A98.c:
-	.text       start:0x80124A98 end:0x80124AAC
-
-unsorted/sweep_80124B10.c:
-	.text       start:0x80124B10 end:0x80124B54
-
 EASportsBio.c:
-	.text       start:0x80124B54 end:0x8012597C
+	.text       start:0x801249A8 end:0x8012597C
 
 unsorted/sweep_801260B8.c:
 	.text       start:0x801260B8 end:0x801260C0

@@ -19,6 +19,24 @@ s32 fn_80125520(u8 b);
 s32 fn_801258E8(void);
 u8 fn_801257A0(void);
 
+// ---- sweep code (not yet cleaned up) ----
+
+
+void fn_80124A70(void) {
+    UStream_UnregisterHandler('EASI');
+}
+
+s32 fn_80124A98(EASBErrorE eError) {
+    return lbl_80195340[eError];
+}
+
+void fn_80124B10(UStreamObject* pObject) {
+    Mem_cpy(lbl_80281988->pIcon, pObject->pData, pObject->uSize);
+    fn_80009E70(pObject);
+}
+
+// ---- end of sweep code ----
+
 // Sets up the manager for the front end: no pictures yet, room for the icon, nothing pending.
 void fn_80124B54(void) {
     lbl_80281988->pCurrentGameImage = NULL;
