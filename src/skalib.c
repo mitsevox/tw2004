@@ -37,8 +37,8 @@ typedef struct AnimLib {
 
 typedef struct ClipRecord {
     char   name[16];            // 0x00
-    s16    n10;                 // 0x10
-    s16    n12;                 // 0x12
+    s16    n10;                 // 0x10  leaves using the clip, while merging
+    s16    n12;                 // 0x12  merge flags: 1 keep, 2 / 0x10 moved (pClip then points to the record it went to)
     s32    n14;                 // 0x14
     s32    n18;                 // 0x18
     void*  pClip;               // 0x1C  offset into the clip data on disc, pointer once loaded
@@ -147,7 +147,10 @@ extern s32         lbl_80281CF0;
 extern s32         lbl_80281CF4;
 extern s32         lbl_80281074;      // clips a leaf may keep this round
 extern u32         lbl_80281CDC;      // bytes of clips a slot may keep
-extern f32         lbl_80281D1C;      // slot 0's share of the memory when double buffering
+extern f32         lbl_80281D1C;
+extern s32         lbl_80281070;      // leaves this short are left alone by the drop pass
+u8                 fn_80100294(void);
+u8                 fn_80101E34(struct ClipRecord* pRec);      // slot 0's share of the memory when double buffering
 extern u8*         lbl_80281CC4;      // staging buffers (32-aligned), see Skalib_Init
 extern u8*         lbl_80281CC8;
 extern u8*         lbl_80281CCC;
@@ -357,8 +360,11 @@ typedef struct AnimLeaf {
 // What the merge adds up as it walks.
 typedef struct MergeCtx {
     u32  n0;
-    s32* pCount;                // 0x4  clips still in use
-    s32  nBytes;                // 0x8  bytes of clip data still in use
+    s32* pCount;                // 0x04  clips still in use
+    s32  nBytes;                // 0x08  bytes of clip data still in use
+    s32  nTarget;               // 0x0C  bytes to get down to
+    s32  nKeep;                 // 0x10  clips a leaf keeps
+    s32  nMaxUsers;             // 0x14  clips shared by more leaves than this are not picked
 } MergeCtx;
 
 // Merge walk, sizing pass: counts the tree bytes the merged library needs (a leaf, then the
@@ -569,6 +575,214 @@ int AnimLib_TrimCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB,
 
 f32 Skalib_Random(void) {
     return Rand_Float(1);
+}
+
+// A clip that can still be kept: not moved (2, 0x10), not kept already (1), and used by
+// between 1 and nMaxUsers leaves.
+#define SKA_KEEPABLE(pRec, pCtx) \
+    (!((pRec)->n12 & 2) && !((pRec)->n12 & 0x10) && !((pRec)->n12 & 1) && (pRec)->n10 > 0 && (pRec)->n10 <= (pCtx)->nMaxUsers)
+
+// Merge walk, keep pass: marks nCount - nKeep more clips of each leaf to keep, picked at random
+// (the next keepable one from a random start, looking forward, then back).
+int AnimLib_KeepRandomCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB, MergeCtx* pCtx, int nLevel, int nIndex) {
+    AnimLeaf*   pLeaf;
+    AnimLib*    pLib;
+    ClipRecord* pRec;
+    int         nMarked;
+    s16*        pIdx;
+    int         i;
+    int         nStart;
+    int         j;
+    int         nExtra;
+
+    if (pLeafA != NULL) {
+        pLeaf = pLeafA;
+        pLib  = pA;
+    } else {
+        pLeaf = pLeafB;
+        pLib  = pB;
+    }
+    if (pLeaf != NULL && pLib != NULL) {
+        if (pLeaf->uMask & 2) return 0;
+        if (pLeaf->nCount > pCtx->nKeep) {
+            nExtra  = pLeaf->nCount - pCtx->nKeep;
+            nMarked = 0;
+            pIdx    = pLib->pIndex + pLeaf->nFirst;
+            for (i = 0; i < nExtra; i++) {
+                nStart = Rand_Next(1) % pLeaf->nCount;
+                for (j = nStart; j < pLeaf->nCount; j++) {
+                    pRec = &pLib->pRecords[pIdx[j]];
+                    if (SKA_KEEPABLE(pRec, pCtx)) goto found;
+                }
+                for (j = nStart; j >= 0; j--) {
+                    pRec = &pLib->pRecords[pIdx[j]];
+                    if (SKA_KEEPABLE(pRec, pCtx)) goto found;
+                }
+                continue;
+            found:
+                if (fn_80100294()) {
+                    if (!fn_80101E34(pRec)) pRec->n12 |= 1;
+                    nMarked++;
+                } else {
+                    pRec->n12 |= 1;
+                    nMarked++;
+                }
+            }
+            for (i = nMarked; i < nExtra; i++) {
+                nStart = Rand_Next(1) % pLeaf->nCount;
+                for (j = nStart; j < pLeaf->nCount; j++) {
+                    pRec = &pLib->pRecords[pIdx[j]];
+                    while ((pRec->n12 & 2) || (pRec->n12 & 0x10)) pRec = (ClipRecord*)pRec->pClip;
+                    if (!(pRec->n12 & 1) && pRec->n10 > 0 && pRec->n10 <= pCtx->nMaxUsers) goto found2;
+                }
+                for (j = nStart; j >= 0; j--) {
+                    pRec = &pLib->pRecords[pIdx[j]];
+                    while ((pRec->n12 & 2) || (pRec->n12 & 0x10)) pRec = (ClipRecord*)pRec->pClip;
+                    if (!(pRec->n12 & 1) && pRec->n10 > 0 && pRec->n10 <= pCtx->nMaxUsers) goto found2;
+                }
+                continue;
+            found2:
+                if (fn_80100294()) {
+                    if (!fn_80101E34(pRec)) pRec->n12 |= 1;
+                } else {
+                    pRec->n12 |= 1;
+                }
+            }
+        }
+    }
+    return 0;
+}
+
+// Merge walk, keep pass: marks nCount - nKeep more clips of each leaf to keep, highest n18 first.
+int AnimLib_KeepBestCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB, MergeCtx* pCtx, int nLevel, int nIndex) {
+    AnimLeaf*   pLeaf;
+    AnimLib*    pLib;
+    int         nExtra;
+    int         nMarked;
+    int         i;
+    int         j;
+    ClipRecord* pRec;
+    ClipRecord* pBest;
+    s16*        pIdx;
+
+    if (pLeafA != NULL) {
+        pLeaf = pLeafA;
+        pLib  = pA;
+    } else {
+        pLeaf = pLeafB;
+        pLib  = pB;
+    }
+    if (pLeaf != NULL && pLib != NULL) {
+        if (pLeaf->uMask & 2) return 0;
+        if (pLeaf->nCount > pCtx->nKeep) {
+            nExtra  = pLeaf->nCount - pCtx->nKeep;
+            nMarked = 0;
+            pIdx    = pLib->pIndex + pLeaf->nFirst;
+            for (i = 0; i < nExtra; i++) {
+                pBest = NULL;
+                for (j = 0; j < pLeaf->nCount; j++) {
+                    pRec = &pLib->pRecords[pIdx[j]];
+                    if (SKA_KEEPABLE(pRec, pCtx)) {
+                        if (pBest == NULL || pRec->n18 > pBest->n18) pBest = pRec;
+                    }
+                }
+                if (pBest != NULL) {
+                    if (fn_80100294()) {
+                        if (!fn_80101E34(pBest)) pBest->n12 |= 1;
+                        nMarked++;
+                    } else {
+                        pBest->n12 |= 1;
+                        nMarked++;
+                    }
+                }
+            }
+            for (; nMarked < nExtra; nMarked++) {
+                pBest = NULL;
+                for (j = 0; j < pLeaf->nCount; j++) {
+                    pRec = &pLib->pRecords[pIdx[j]];
+                    while ((pRec->n12 & 2) || (pRec->n12 & 0x10)) pRec = (ClipRecord*)pRec->pClip;
+                    if (!(pRec->n12 & 1) && pRec->n10 > 0 && pRec->n10 <= pCtx->nMaxUsers) {
+                        if (pBest == NULL || pRec->n18 > pBest->n18) pBest = pRec;
+                    }
+                }
+                if (pBest != NULL) {
+                    if (fn_80100294()) {
+                        if (!fn_80101E34(pBest)) pBest->n12 |= 1;
+                    } else {
+                        pBest->n12 |= 1;
+                    }
+                }
+            }
+        }
+    }
+    return 0;
+}
+
+// Merge walk: the largest clip count of any leaf still in play goes into lbl_80281074.
+int AnimLib_MaxCountCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB, MergeCtx* pCtx, int nLevel, int nIndex) {
+    AnimLeaf* pLeaf;
+    AnimLib*  pLib;
+
+    if (pLeafA != NULL) {
+        pLeaf = pLeafA;
+        pLib  = pA;
+    } else {
+        pLeaf = pLeafB;
+        pLib  = pB;
+    }
+    if (pLeaf != NULL && pLib != NULL) {
+        if (pLeaf->uMask & 2) return 0;
+        if (pLeaf->nCount > lbl_80281074) lbl_80281074 = pLeaf->nCount;
+    }
+    return 0;
+}
+
+// Merge walk, drop pass: takes the clips marked 1 out of leaves longer than lbl_80281070, freeing
+// the ones nobody uses any more; stops (returning 1) once the bytes in use fall under the target.
+int AnimLib_DropCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB, MergeCtx* pCtx, int nLevel, int nIndex) {
+    int         bDone = 0;
+    AnimLeaf*   pLeaf;
+    AnimLib*    pLib;
+    s16*        p;
+    int         i;
+    s16*        pIdx;
+    ClipRecord* pRec;
+    int         j;
+
+    if (pLeafA != NULL) {
+        pLeaf = pLeafA;
+        pLib  = pA;
+    } else {
+        pLeaf = pLeafB;
+        pLib  = pB;
+    }
+    if (pLeaf != NULL && pLib != NULL) {
+        if (pLeaf->uMask & 2) return 0;
+        pIdx = pLib->pIndex + pLeaf->nFirst;
+        for (i = 0; i < pLeaf->nCount; i++) {
+            if (pLeaf->nCount <= lbl_80281070) return 0;
+            p    = &pIdx[i];
+            pRec = &pLib->pRecords[*p];
+            if (pLeaf == pLeafB) {
+                while ((pRec->n12 & 2) || (pRec->n12 & 0x10)) pRec = (ClipRecord*)pRec->pClip;
+            }
+            if (pRec->n12 & 1) {
+                pRec->n10--;
+                if (pRec->n10 == 0) {
+                    pRec->pClip = NULL;
+                    pRec->n10--;
+                    pCtx->nBytes -= pRec->n14;
+                    (*pCtx->pCount)--;
+                    if (pCtx->nBytes < pCtx->nTarget) bDone = 1;
+                }
+                for (j = i; j < pLeaf->nCount - 1; j++, p++) *p = p[1];
+                pLeaf->nCount = pLeaf->nCount - 1;
+                i--;
+                if (bDone) return bDone;
+            }
+        }
+    }
+    return 0;
 }
 
 // The scratch area for slot n, uSize bytes: while only one of the first two slots has a bank,
