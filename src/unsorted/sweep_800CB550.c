@@ -1,0 +1,11 @@
+// Small functions found by the sweep (sweep.py). Original file and meanings unknown.
+
+#include "game_types.h"
+
+extern s32 lbl_80282230;
+
+void fn_800CB550(s32 p0);
+void fn_800CB550(s32 p0) {
+    *(u8*)(((u8*)lbl_80282230) + 0x1CCC) = 1;
+    *(s32*)(((u8*)lbl_80282230) + 0x1CC4) = p0;
+}
