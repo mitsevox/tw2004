@@ -319,7 +319,52 @@ void fn_80046B8C(int nView) {
     }
 }
 
-// ---- 0x80046C34..0x80046E1C: not yet decompiled ----
+// A ball moving at 10 or more just above ground of class 3 leaves a 'TEO ' 10005 object at pPos:
+// ten are used in turn.
+void fn_80046C34(f32* pPos, int nPlayer) {
+    DynObjDef def;
+    DynObjSetup setup;
+    DynObjModel model;
+    f32 vPos[4];
+    f32 vNormal[4];
+    SurfaceType* pSurface;
+    f32 fGround;
+    s32 nId;
+
+    vPos[0] = pPos[0];
+    vPos[1] = pPos[1];
+    vPos[2] = pPos[2];
+    vPos[3] = 1.0f;
+    fGround = Ter_GetSupportingGroundData(fn_8000C594(), vPos, &pSurface, vNormal);
+    if (TER_NO_GROUND != fGround && pSurface->nClass == 3 && fGround - pPos[1] < 0.02f &&
+        (f32)fn_80009680(fn_80009744(gPlayers[nPlayer].ball.vVel)) >= 10.0f) {
+        if (lbl_80281DA0->apRing[lbl_80281DA0->nRing] == NULL) {
+            // EA bug: def.n1A is never set, and type 0's setup copies it to DynObj.n14E
+            def.n0 = 0;
+            def.n4 = 0;
+            def.aPos[0] = pPos[0];
+            def.aPos[1] = pPos[1];
+            def.aPos[2] = pPos[2];
+            def.u14 = 0x200;
+            def.n18 = 0;
+            setup.pDef = &def;
+            setup.pModel = &model;
+            model.aEntries[0].uType = 'TEO ';
+            setup.pModel->aEntries[0].u.pRef = (DynObjModelRef*)fn_8000B70C('TEO ', 10005);
+            setup.pfnHandler = fn_800499B0(setup.pDef->n4);
+            setup.pC = NULL;
+            nId = fn_800490B8(&setup);
+            if (nId != -2) {
+                lbl_80281DA0->apRing[lbl_80281DA0->nRing] = fn_80048E4C(nId);
+            }
+        } else {
+            Vec_Copy(vPos, lbl_80281DA0->apRing[lbl_80281DA0->nRing]->obj.m80[3]);
+            fn_8000C5A4(lbl_80281DA0->apRing[lbl_80281DA0->nRing]->obj.m0);
+        }
+        lbl_80281DA0->nRing = lbl_80281DA0->nRing + 1;
+        lbl_80281DA0->nRing = lbl_80281DA0->nRing % 10;
+    }
+}
 
 // Puts the player's 'TEO ' 10001 object on the ground at pPos, turned to the player's aim; the
 // first time it is made (a type 0 object, flags 0xC00).
