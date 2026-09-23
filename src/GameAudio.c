@@ -51,6 +51,7 @@ void fn_800A3F58(u8 bLow, u8 bHigh);
 void fn_800A4170(u8 nId, u8 nTrack, s32 n);
 void fn_800A5980(u8 nPlayer);
 void fn_800A6C98(u8 nPlayer, u8 n);
+void fn_800A6660(u8 nPlayer);
 void fn_800AD950(u8 nId, u8 nTrack, u8 n);
 u8   fn_800A4A24(s32 nCourse, int n);
 u8   fn_800A4A88(void);
@@ -190,7 +191,6 @@ void fn_800A6448(void);
 void fn_800A644C(void);
 void fn_800A6EC8(void);
 void fn_800A6F38(void);
-s32 fn_800A6660(s32);
 extern u8 lbl_8028202E;
 void fn_800A72EC(u8 arg0, u8 arg1);
 void fn_800ADA28(u8 nId, u8 nTrack, u8 n, int bCheck);
@@ -810,6 +810,44 @@ u8 fn_800A4A88(void) {
     return 1;
 }
 
+void fn_800A4E34(void) {
+    f32 vPos[3];
+
+    lbl_80281419 = 0xFF;
+    lbl_8028203C = 0;
+    lbl_8028141A = 0xFF;
+    lbl_80281418 = 0xFF;
+    if (lbl_80282028 == 0) {
+        // the options' volumes, 0.2 per step
+        fn_800A77E0(0.2f * (s8)gSession.options.a0[0]);
+        fn_800A78F0(0.2f * (s8)gSession.options.a0[4]);
+        fn_800A3FB4(15, 0.2f * (s8)gSession.options.a0[1] * lbl_8018E988[15]);
+        fn_800A3F94(2);
+        lbl_80282028 = 1;
+    }
+    vPos[0] = 0.0f;
+    vPos[1] = 0.0f;
+    vPos[2] = 0.0f;
+    lbl_8028141B = fn_800AD280(1, -1, 1, 1, NULL);
+    fn_800AD800(lbl_8028141B, vPos, 0, 0);
+    fn_800AD698(lbl_8028141B, 0, 1);
+    lbl_8028202B = 0;
+    lbl_8028202C = 0;
+    lbl_8028202E = 0;
+    lbl_8028202D = 0;
+    lbl_8028202F = 0;
+    lbl_80282032 = 0;
+    lbl_80281424 = -1;
+    lbl_80281428 = -1;
+    lbl_80282030 = 0;
+    lbl_80282031 = 0;
+    lbl_80282033 = 0;
+    lbl_80282034 = 0;
+    lbl_8028202A = 1;
+    lbl_80282041 = 0;
+    lbl_80282040 = 0;
+}
+
 void fn_800A5EC0(u8 nPlayer) {
     Player* pPlayer;
     u8 nId;
@@ -922,6 +960,36 @@ void fn_800A64A8(u8 nPlayer, u8 b) {
         fn_800A6C98(nPlayer, 0);
     }
     lbl_8028202F = 1;
+}
+
+void fn_800A6660(u8 nPlayer) {
+    GameAudioView* pView;
+
+    pView = &lbl_801F1790[gPlayers[nPlayer].nView[0]];
+    if (lbl_8028202B == 0) {
+        fn_800AD698(pView->n2, 2, 0);
+        fn_800AD698(pView->n3, 2, 0);
+        fn_800A3F58(0, 0);
+        fn_800ADA94(lbl_80281420, 0, 1.0f);
+        fn_800ADA94(lbl_8028141C, 0, lbl_80281430);
+        fn_800ADA94(lbl_8028141C, 1, lbl_80281430);
+        fn_800ADA94(lbl_8028141C, 2, lbl_80281430);
+        fn_800ADA94(lbl_8028141C, 3, lbl_80281430);
+        fn_800ADA94(lbl_8028141C, 4, lbl_80281430);
+        fn_800ADA94(lbl_8028141C, 5, lbl_80281430);
+        fn_800ADA94(lbl_8028141D, 0, lbl_80281430);
+        fn_800ADA94(lbl_8028141D, 1, lbl_80281430);
+        fn_800ADA94(lbl_8028141D, 2, lbl_80281430);
+        fn_800ADA94(lbl_8028141D, 3, lbl_80281430);
+        fn_800ADA94(lbl_8028141D, 4, lbl_80281430);
+        fn_800ADA94(lbl_8028141D, 5, lbl_80281430);
+        fn_800ADA94(lbl_8028141A, 0, 1.0f);
+        lbl_8028202F = 0;
+        if (lbl_80281428 != -1) {
+            fn_800A6DCC(lbl_80281428, 1);
+            lbl_80281428 = -1;
+        }
+    }
 }
 
 void fn_800A67E8(u8 nPlayer) {
