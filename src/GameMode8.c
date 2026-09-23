@@ -1320,6 +1320,7 @@ u8 fn_800FCC38(int nPlayer) {
 void fn_800FCCF0(void) {
     PlayerNumber_t i;
     PlayerNumber_t nOther;
+    int nPlayer;
     int k;
     CourseInfo* pHole;
     if (gSession.unk14 == 0) {
@@ -1330,51 +1331,56 @@ void fn_800FCCF0(void) {
                 return;
             }
             for (k = 0; k < 2; k++) {
-                if (gPlayers[i].nC3C & 0x100) {
+                nPlayer = i;    // fake match: the loop body indexes through an int copy
+                if (gPlayers[nPlayer].nC3C & 0x100) {
                     if (!(gPlayers[nOther].nC3C & 8)) {
-                        gPlayers[i].nC5C--;
-                        if (gPlayers[i].nC5C == 0) {
-                            gPlayers[i].nC44 += 5;
-                            fn_800FDFC4(gPlayers[i].nC58, gPlayers[i].nC44, 0);
-                            fn_800FE138(gPlayers[i].nC58, 5);
+                        gPlayers[nPlayer].nC5C--;
+                        if (gPlayers[nPlayer].nC5C == 0) {
+                            gPlayers[nPlayer].nC44 += 5;
+                            fn_800FDFC4(gPlayers[nPlayer].nC58, gPlayers[nPlayer].nC44, 0);
+                            fn_800FE138(gPlayers[nPlayer].nC58, 5);
                             gPlayers[nOther].nC44 -= 5;
                             fn_800FDFC4(gPlayers[nOther].nC58, gPlayers[nOther].nC44, 0);
-                            gPlayers[i].nC5C = 59;
+                            gPlayers[nPlayer].nC5C = 59;
                             if (gPlayers[nOther].nC44 <= 0 && !(gPlayers[nOther].nC3C & 0x6000) &&
                                 !(gPlayers[nOther].nC3C & 0x8000)) {
                                 gPlayers[nOther].nC44 = 0;
-                                gPlayers[i].nC44 = 6000;
+                                gPlayers[nPlayer].nC44 = 6000;
                                 gPlayers[nOther].nC3C |= 0xC000;
-                                gPlayers[i].nC3C |= 0x10000 | 0x4000;
+                                gPlayers[nPlayer].nC3C |= 0x10000 | 0x4000;
                                 GOLFERSTATE_Set(26, (u8)nOther);
-                                GOLFERSTATE_Set(26, (u8)i);
+                                GOLFERSTATE_Set(26, (u8)nPlayer);
                                 return;
                             }
                         }
                     }
                 }
-                gPlayers[i].nCB8++;
-                if (!Player_IsCPU(i) && !fn_800FA118(i, 1) &&
-                    lbl_80192908[0x27].nPoints + gPlayers[i].nC44 > 0) {
-                    if ((fn_800136DC(gPlayers[i].nController) & fn_800142AC(0x25, 0)) && !fn_800FCC38(i) &&
-                        ((s8)GOLFERSTATE_GetCurrentState(i) == 24 ||
-                         (gPlayers[i].nLie != 0 && gPlayers[i].nLie != LIE_HOLED && gPlayers[i].nLie != 16 &&
-                          (s8)GOLFERSTATE_GetCurrentState(i) != 2 &&
-                          (s8)GOLFERSTATE_GetCurrentState(i) != 4 &&
-                          (s8)GOLFERSTATE_GetCurrentState(i) != 3 &&
-                          (s8)GOLFERSTATE_GetCurrentState(i) != 8 &&
-                          (s8)GOLFERSTATE_GetCurrentState(i) != 10))) {
-                        fn_800FAAB8(i, 0x27);
+                gPlayers[nPlayer].nCB8++;
+                if (!Player_IsCPU(nPlayer) && !fn_800FA118(nPlayer, 1) &&
+                    lbl_80192908[0x27].nPoints + gPlayers[nPlayer].nC44 > 0) {
+                    if ((fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x25, 0)) &&
+                        !fn_800FCC38(nPlayer) &&
+                        ((s8)GOLFERSTATE_GetCurrentState(nPlayer) == 24 ||
+                         (gPlayers[nPlayer].nLie != 0 && gPlayers[nPlayer].nLie != LIE_HOLED &&
+                          gPlayers[nPlayer].nLie != 16 &&
+                          (s8)GOLFERSTATE_GetCurrentState(nPlayer) != 2 &&
+                          (s8)GOLFERSTATE_GetCurrentState(nPlayer) != 4 &&
+                          (s8)GOLFERSTATE_GetCurrentState(nPlayer) != 3 &&
+                          (s8)GOLFERSTATE_GetCurrentState(nPlayer) != 8 &&
+                          (s8)GOLFERSTATE_GetCurrentState(nPlayer) != 10))) {
+                        fn_800FAAB8(nPlayer, 0x27);
                         pHole = fn_8000C594();
-                        fn_80055AA8((Ball*)gPlayers[i].ball, &((HoleTees*)pHole)->tee[gSession.nTeeSet[i]].x,
-                                    i);
-                        Vec_Copy(&((HoleTees*)pHole)->tee[gSession.nTeeSet[i]].x, &gPlayers[i].fBallX);
-                        Vec_Copy(&((HoleTees*)pHole)->tee[gSession.nTeeSet[i]].x, gPlayers[i].vA44);
-                        gPlayers[i].nC3C &= ~1;
-                        fn_800FE0AC(gPlayers[i].nC58, 0);
-                        fn_800FE080(gPlayers[i].nC58, 0);
-                        fn_800FE054(gPlayers[i].nC58, 0);
-                        GOLFERSTATE_Switch(1, i);
+                        fn_80055AA8((Ball*)gPlayers[nPlayer].ball,
+                                    &((HoleTees*)pHole)->tee[gSession.nTeeSet[nPlayer]].x, nPlayer);
+                        Vec_Copy(&((HoleTees*)pHole)->tee[gSession.nTeeSet[nPlayer]].x,
+                                 &gPlayers[nPlayer].fBallX);
+                        Vec_Copy(&((HoleTees*)pHole)->tee[gSession.nTeeSet[nPlayer]].x,
+                                 gPlayers[nPlayer].vA44);
+                        gPlayers[nPlayer].nC3C &= ~1;
+                        fn_800FE0AC(gPlayers[nPlayer].nC58, 0);
+                        fn_800FE080(gPlayers[nPlayer].nC58, 0);
+                        fn_800FE054(gPlayers[nPlayer].nC58, 0);
+                        GOLFERSTATE_Switch(1, nPlayer);
                         lbl_802823C8 = 0;
                     }
                 }
