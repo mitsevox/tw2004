@@ -154,20 +154,21 @@ void fn_800EE478(void) {
     }
 }
 
-// Whether the player trails the leader by more than one stroke.
+// TW06: GameModeDriverPGATour::IsPuttForLead. Whether holing this putt puts the player in the lead:
+// in a playoff, beating the best score on this hole; otherwise, not ahead now and ahead with it.
 u8 fn_800EE5B4(s32 nPlayer) {
-    int bBehind;
+    int bLead;
     if (gpGame->bD4) {
         return gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1 <
                fn_8011A7C8(nPlayer, Game_CurHoleIndex());
     }
-    bBehind = 0;
+    bLead = 0;
     if (fn_800E1904(nPlayer, 0) >= fn_80119588(nPlayer, 1)) {
         if (fn_800E1904(nPlayer, 1) + 1 < fn_80119588(nPlayer, 1)) {
-            bBehind = 1;
+            bLead = 1;
         }
     }
-    return bBehind;
+    return bLead;
 }
 
 // TW06: GameModeDriverPGATour::IsPuttForWin. In a playoff, a putt for the lead; otherwise on the

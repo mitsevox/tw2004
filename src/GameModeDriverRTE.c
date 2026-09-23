@@ -150,14 +150,14 @@ s32 fn_800F0820(void) {
     return n;
 }
 
-// The message after an event: every event done (0), or one for the event, else one of four at
-// random.
+// The message after an event (before its award is marked won): the first win (0), or one for the
+// event, else one of four at random.
 void fn_800F08A8(void) {
-    u8 bAll = 0;
+    u8 bFirst = 0;
     u8 bSaid;
     if (!fn_800F0820()) {
         fn_800E4364(10, 0, 0, 0);
-        bAll = 1;
+        bFirst = 1;
     }
     bSaid = 1;
     switch (lbl_80282350) {
@@ -211,7 +211,7 @@ void fn_800F08A8(void) {
         bSaid = 0;
         break;
     }
-    if (!bAll && !bSaid) {
+    if (!bFirst && !bSaid) {
         switch (Rand_Next(0) & 3) {
         case 0:
             fn_800E4364(10, 2, 0, 0);

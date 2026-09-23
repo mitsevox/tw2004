@@ -94,7 +94,7 @@ void fn_800EAD6C(void) {
 void fn_800EADD8(void) {
 }
 
-// The 'PLYs' records: three values per challenge.
+// A course object of type 10 (from the course loader at 0x80048BDC): one challenge's ball spot.
 void fn_800EADDC(void* pObj) {
     ChallengeSpotRecord* d = *(ChallengeSpotRecord**)pObj;
     int i = d->nChallenge - 1;
@@ -743,6 +743,8 @@ int fn_800EC558(void) {
                             }
                         }
                     }
+                    // EA bug: with one player nSum is never set, so this compares whatever the
+                    // register holds.
                     if (nSum - nStrokes <= nMark) {
                         return m;
                     }
@@ -796,6 +798,8 @@ int fn_800EC558(void) {
                 }
                 break;
             case 6:
+                // EA bug: nPen is only set when the round's totals are scored (nScoring 0), so
+                // this compares whatever the register holds.
                 if (nPen < nMark) {
                     return m;
                 }
