@@ -54,13 +54,16 @@ void Vec3Copy(const f32* pSrc, f32* pDst);   // 0x80008304 (const: see code_8000
 f32  fn_800095F0(f32 fAngle);           // sin
 f32  fn_80009638(f32 fAngle);           // cos
 double fn_80009680(double x);           // sqrt
-f32  fn_80009744(f32* pVec);            // dot with itself
+f32  fn_80009744(f32* pVec);            // dot with itself (at most FLT_MAX)
+extern f32 lbl_80281B40[];              // FLT_MAX (MSL's)
 void Vec_Copy(f32* pSrc, f32* pDst);    // 0x8000AD10
 f32  fn_8000AD78(f32 y, f32 x);         // atan2f
 f32  fabsf(f32 x);                      // 0x8000AD9C: fabs (0x8000AE94, platform.h) rounded to a float
 f32  fn_8000AF7C(f32 x);                // natural logarithm
 void fn_8000AF20(void);                 // make the log2 table (lbl_80281BD8)
 void fn_8000AF58(void);                 // free the log2 table
+double fn_8015F784(double x);           // acos
+double fn_8015F7A4(double x);           // asin
 double fn_8015F7C4(double y, double x); // atan2
 double fn_8015F804(double x);           // log
 u32  Rand_Next(int nStream);            // 0x8000B130  EA's lagged-Fibonacci generator

@@ -66,23 +66,8 @@ unsorted/code_800082F8.c:
 GoEntry.c:
 	.text       start:0x800083A4 end:0x8000883C
 
-unsorted/sweep_80008EF0.c:
-	.text       start:0x80008EF0 end:0x80008F20
-
-unsorted/sweep_80008F20.c:
-	.text       start:0x80008F20 end:0x80008F9C
-
-unsorted/sweep_80008F9C.c:
-	.text       start:0x80008F9C end:0x80008FCC
-
-unsorted/sweep_80008FCC.c:
-	.text       start:0x80008FCC end:0x800090A0
-
-unsorted/sweep_800090A0.c:
-	.text       start:0x800090A0 end:0x800090E4
-
-unsorted/sweep_800095F0.c:
-	.text       start:0x800095F0 end:0x80009680
+Quaternion.c:
+	.text       start:0x8000883C end:0x8000977C
 
 StaticMemory.c:
 	.text       start:0x8000977C end:0x8000A0E8
