@@ -367,10 +367,7 @@ unsorted/sweep_80017410.c:
 	.text       start:0x80017410 end:0x8001744C
 
 char.c:
-	.text       start:0x80017508 end:0x8001F084
-
-unsorted/sweep_8001F084.c:
-	.text       start:0x8001F084 end:0x8001F08C
+	.text       start:0x80017508 end:0x8001F32C
 
 mtalib.c:
 	.text       start:0x8001F32C end:0x8001F42C
