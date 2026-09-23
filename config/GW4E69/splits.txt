@@ -139,19 +139,7 @@ UStream.c:
 	.text       start:0x8000C624 end:0x8000E830
 
 LLTex.c:
-	.text       start:0x8000E830 end:0x8000FFAC
-
-unsorted/sweep_8000FFAC.c:
-	.text       start:0x8000FFAC end:0x80010028
-
-unsorted/sweep_80010028.c:
-	.text       start:0x80010028 end:0x8001005C
-
-unsorted/sweep_800100B0.c:
-	.text       start:0x800100B0 end:0x80010114
-
-unsorted/sweep_80010114.c:
-	.text       start:0x80010114 end:0x8001013C
+	.text       start:0x8000E830 end:0x8001013C
 
 LLTexGrp.c:
 	.text       start:0x8001013C end:0x800107F4

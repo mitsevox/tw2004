@@ -84,7 +84,7 @@ void vec4flt_CrossProduct(f32* pA, f32* pB, f32* pOut);   // cross product
 
 // A texture in a bank (0x50 bytes; the bank's p8 is an array of them). Only what the game code reads.
 typedef struct TexEntry {
-    u8   unk0[8];
+    u64  uHash;                 // 0x00  its name's hash (fn_8000BEE4)
     u32  uPixels;               // 0x08  where its pixels start in the bank's p18
     u8   unkC[0x3C - 0xC];
     s16  nPalette;              // 0x3C  its row in the bank's pC
@@ -99,17 +99,25 @@ typedef struct TexPalette {
 } TexPalette;
 LAYOUT_ASSERT(TexPalette, 0xC);
 
-// A loaded texture bank (up to 200, listed at lbl_801A26DC). Only what the game code reads.
+// A loaded texture bank (0x30 bytes, followed by its tables; up to 200, listed at lbl_801A26DC).
 typedef struct TexBank {
-    u8   unk0[8];
+    u8   unk0[2];
+    s16  nNumTex;               // 0x02  entries in p8
+    s16  nNumPalettes;          // 0x04  rows in pC
+    u8   unk6[2];
     TexEntry*   p8;             // 0x08  its textures
     TexPalette* pC;             // 0x0C  its palettes
-    u8   unk10[0x18 - 0x10];
+    void* p10;                  // 0x10
+    void* p14;                  // 0x14
     u8*  p18;                   // 0x18  the pixel data
     u8   unk1C[0x20 - 0x1C];
     u8*  p20;                   // 0x20  the palette data
     u32  u24;                   // 0x24  the size of one palette (FE_LogoDesign copies this much)
+    u8   unk28[0x2D - 0x28];
+    u8   b2D;                   // 0x2D  1: p18 and p20 are not the bank's own (never freed)
+    u8   unk2E[2];
 } TexBank;
+LAYOUT_ASSERT(TexBank, 0x30);
 
 u64  fn_8000BEE4(char* pName);          // a name's 64-bit hash
 // Find a loaded texture by its name's hash: its bank and entry (both NULL if none).
