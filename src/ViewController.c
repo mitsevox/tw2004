@@ -27,7 +27,6 @@ void  fn_80013D68(void* pCamera);
 void  fn_80076A54(f32* pRect);
 
 ViewController* fn_80016E28(int nView);
-int  fn_8001707C(int nView);
 s32  fn_800171B0(void);
 f32* fn_800172B4(View* pView);
 f32* fn_800172BC(View* pView);

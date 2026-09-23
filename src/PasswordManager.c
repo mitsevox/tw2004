@@ -121,7 +121,7 @@ int PasswordManager_TestPassword(char* szCode) {
         lbl_80281DF4->aGolferUnlocked[29] = 1;
         return 1;
     }
-    if (fn_8015F844(szCode, "SHERWOOD TARGET") == 0) {
+    if (stricmp(szCode, "SHERWOOD TARGET") == 0) {
         fn_8001EA34(lbl_801D5948, 6);
         return 1;
     }

@@ -141,8 +141,8 @@ void fn_80030894(void) {
 // Sorts pObjectSortList by distance, except when gSession.b11 is set.
 void fn_8003185C(void) {
     if (gSession.b11 == 0) {
-        fn_8015929C(lbl_801D3CB0.pObjectSortList, lbl_801D3CB0.iTotalSortObjects, sizeof(Ter_ObjectReference),
-                    fn_800318AC);
+        qsort(lbl_801D3CB0.pObjectSortList, lbl_801D3CB0.iTotalSortObjects, sizeof(Ter_ObjectReference),
+              fn_800318AC);
     }
 }
 

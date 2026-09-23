@@ -1,12 +1,416 @@
 // EventInfo.c (our name): the front end's panel of details about a calendar day's event: for a
 // PGA TOUR event the purse, round, course, leader, score and the defending champion, for a
-// real-time event its rewards, status and dates. Each function fills one line's label and value.
+// real-time event its rewards, status and dates. Each function fills one line's label and value
+// (lines 3 to 8 of the panel).
 // TW06 keeps the like in fe_calendarpopups.c, but nothing here proves the pairing.
 
-#include "game_types.h"
+#include "golfer.h"
+#include "game.h"
+#include "game/save.h"
+#include "game/frontend.h"
+#include "frontend/fe.h"
+#include "game/modes/pgatour.h"
+#include "game/modes/rte.h"
 
+// Up to three reward names for a real-time event (nKind 0x11); how many there are.
+int  fn_80106F68(int nKind, s32 nId, char* szFirst, char* szSecond, char* szThird);
+void fn_800A73F0(s32 n);
 void fn_8011D658(int nLine, char* szLabel, char* szValue);
+
+// A PGA TOUR event under way: purse, round, course, leader, the leader's score, the player's score.
+void fn_8011D280(int nLine, char* szLabel, char* szValue) {
+    char sz[128];
+    s32 aCourses[4];
+    s32 nId;
+    s32 nRound;
+    int nScore;
+    s32 nRounds;
+
+    GameModeDriverPGATour_GetEventByDate(lbl_80223C48.nSelected, &nId, &nRound);
+    switch (nLine) {
+    case 3:
+        strcpy(szLabel, "Purse:");
+        GameModeDriverPGATour_GetWinnerEarningsString(nId, sz);
+        sprintf(szValue, "$%s", sz);
+        break;
+    case 4:
+        strcpy(szLabel, "Round:");
+        sprintf(szValue, "%d", nRound + 1);
+        break;
+    case 5:
+        strcpy(szLabel, "Course:");
+        GameModeDriverPGATour_GetCourses(fn_800EFA70(nId), aCourses);
+        nRounds = GameModeDriverPGATour_GetRounds(nId);
+        if (nRound >= 0 && nRound < nRounds) {
+            strcpy(szValue, lbl_80191990[aCourses[nRound]]);
+        } else {
+            strcpy(szValue, lbl_80191990[aCourses[0]]);
+        }
+        break;
+    case 6:
+        strcpy(szLabel, "Leader:");
+        GameModeDriverPGATour_GetCurrentEventLeader(sz);
+        strcpy(szValue, sz);
+        break;
+    case 7:
+        nScore = fn_800F009C();
+        strcpy(szLabel, "Score:");
+        if (nScore == 0) {
+            sprintf(szValue, "E");
+        } else if (nScore > 0) {
+            sprintf(szValue, "+%d", nScore);
+        } else {
+            sprintf(szValue, "%d", nScore);
+        }
+        break;
+    case 8:
+        nScore = fn_800F018C();
+        strcpy(szLabel, "Your Score:");
+        if (nScore == 0) {
+            sprintf(szValue, "E");
+        } else if (nScore > 0) {
+            sprintf(szValue, "+%d", nScore);
+        } else {
+            sprintf(szValue, "%d", nScore);
+        }
+        break;
+    }
+}
+
+// A PGA TOUR event played: the winner, the winning score, the player's earnings and finish.
+void fn_8011D4DC(int nLine, char* szLabel, char* szValue) {
+    char sz[128];
+    s32 nId;
+    s32 nRound;
+    s32 nScore;
+
+    GameModeDriverPGATour_GetEventByDate(lbl_80223C48.nSelected, &nId, &nRound);
+    switch (nLine) {
+    case 3:
+        strcpy(szLabel, "");
+        strcpy(szValue, "");
+        break;
+    case 4:
+        strcpy(szLabel, "Winner:");
+        GameModeDriverPGATour_GetChamp(nId, sz);
+        strcpy(szValue, sz);
+        break;
+    case 5:
+        nScore = GameModeDriverPGATour_GetChampScore(nId);
+        strcpy(szLabel, "Score:");
+        sprintf(szValue, "%d", nScore);
+        break;
+    case 6:
+        strcpy(szLabel, "Earnings:");
+        GameModeDriverPGATour_GetPurseString(nId, sz);
+        sprintf(szValue, "$%s", sz);
+        break;
+    case 7:
+        strcpy(szLabel, "Your Finish:");
+        GameModeDriverPGATour_GetUserFinishString(nId, sz);
+        strcpy(szValue, sz);
+        break;
+    case 8:
+        strcpy(szLabel, "");
+        strcpy(szValue, "");
+        break;
+    }
+}
+
+// A PGA TOUR event to come: the defending champion and winning score, the purse, the course.
+void fn_8011D658(int nLine, char* szLabel, char* szValue) {
+    char sz[128];
+    s32 aCourses[4];
+    s32 nId;
+    s32 nRound;
+    Tournament* pTournament;
+    s32 nRounds;
+
+    GameModeDriverPGATour_GetEventByDate(lbl_80223C48.nSelected, &nId, &nRound);
+    switch (nLine) {
+    case 3:
+        strcpy(szLabel, "Defending ");
+        strcpy(szValue, "");
+        break;
+    case 4:
+        strcpy(szLabel, "Champion:");
+        GameModeDriverPGATour_GetChamp(nId, sz);
+        strcpy(szValue, sz);
+        break;
+    case 5:
+        strcpy(szLabel, "Winning ");
+        strcpy(szValue, "");
+        break;
+    case 6:
+        strcpy(szLabel, "Score:");
+        if (GameModeDriverPGATour_GetChampScore(nId) > 0) {
+            sprintf(szValue, "%d", GameModeDriverPGATour_GetChampScore(nId));
+        } else {
+            strcpy(szValue, "N/A");
+        }
+        break;
+    case 7:
+        strcpy(szLabel, "Purse:");
+        GameModeDriverPGATour_GetWinnerEarningsString(nId, sz);
+        sprintf(szValue, "$%s", sz);
+        break;
+    case 8:
+        strcpy(szLabel, "Course:");
+        pTournament = fn_800EFA70(nId);
+        nRounds = GameModeDriverPGATour_GetRounds(nId);
+        GameModeDriverPGATour_GetCourses(pTournament, aCourses);
+        if (nRound >= 0 && nRound < nRounds) {
+            strcpy(szValue, lbl_80191990[aCourses[nRound]]);
+        } else {
+            strcpy(szValue, lbl_80191990[aCourses[0]]);
+        }
+        break;
+    }
+}
 
 void fn_8011D858(int nLine, char* szLabel, char* szValue) {
     fn_8011D658(nLine, szLabel, szValue);
+}
+
+// A real-time event to come: the purse and up to three rewards.
+void fn_8011D878(int nLine, char* szLabel, char* szValue) {
+    char szReward1[36];
+    char szReward2[36];
+    char szReward3[36];
+    char szMoney[32];
+    char szPurse[32];
+    s32 nId;
+    s32 nRound;
+    int nRewards;
+
+    GameModeDriverRTE_GetEventByDate(lbl_80223C48.nSelected, &nId, &nRound);
+    nRewards = fn_80106F68(0x11, fn_800F120C(nId), szReward1, szReward2, szReward3);
+    fn_800907AC(fn_800F0F30(nId), szMoney);
+    sprintf(szPurse, "$%s", szMoney);
+    switch (nLine) {
+    case 3:
+        strcpy(szLabel, "Purse:");
+        strcpy(szValue, szPurse);
+        break;
+    case 4:
+        strcpy(szLabel, "Rewards:");
+        if (nRewards >= 1) {
+            strcpy(szValue, szReward1);
+        } else {
+            strcpy(szValue, "N/A");
+        }
+        break;
+    case 5:
+        strcpy(szLabel, "");
+        if (nRewards >= 2) {
+            strcpy(szValue, szReward2);
+        } else {
+            strcpy(szValue, "");
+        }
+        break;
+    case 6:
+        strcpy(szLabel, "");
+        if (nRewards >= 3) {
+            strcpy(szValue, szReward3);
+        } else {
+            strcpy(szValue, "");
+        }
+        break;
+    case 7:
+        strcpy(szLabel, "");
+        strcpy(szValue, "");
+        break;
+    case 8:
+        strcpy(szLabel, "");
+        strcpy(szValue, "");
+        break;
+    }
+}
+
+// A real-time event played: whether the player completed it, then the purse and rewards.
+void fn_8011DA44(int nLine, char* szLabel, char* szValue) {
+    char szReward1[36];
+    char szReward2[36];
+    char szReward3[36];
+    char szMoney[32];
+    char szPurse[32];
+    s32 nId;
+    s32 nRound;
+    int nRewards;
+    u8 bComplete;
+
+    GameModeDriverRTE_GetEventByDate(lbl_80223C48.nSelected, &nId, &nRound);
+    bComplete = GameModeDriverRTE_IsEventComplete(lbl_80281ED4->nSlot, nId);
+    nRewards = fn_80106F68(0x11, fn_800F120C(nId), szReward1, szReward2, szReward3);
+    fn_800907AC(fn_800F0F30(nId), szMoney);
+    sprintf(szPurse, "$%s", szMoney);
+    switch (nLine) {
+    case 3:
+        strcpy(szLabel, "Status:");
+        if (bComplete) {
+            strcpy(szValue, "COMPLETE");
+        } else {
+            strcpy(szValue, "INCOMPLETE");
+        }
+        break;
+    case 4:
+        strcpy(szLabel, "Purse:");
+        strcpy(szValue, szPurse);
+        break;
+    case 5:
+        strcpy(szLabel, "Rewards:");
+        if (nRewards >= 1) {
+            strcpy(szValue, szReward1);
+        } else {
+            strcpy(szValue, "N/A");
+        }
+        break;
+    case 6:
+        strcpy(szLabel, "");
+        if (nRewards >= 2) {
+            strcpy(szValue, szReward2);
+        } else {
+            strcpy(szValue, "");
+        }
+        break;
+    case 7:
+        strcpy(szLabel, "");
+        if (nRewards >= 3) {
+            strcpy(szValue, szReward3);
+        } else {
+            strcpy(szValue, "");
+        }
+        break;
+    case 8:
+        strcpy(szLabel, "");
+        strcpy(szValue, "");
+        break;
+    }
+}
+
+// The same for a real-time event on another day.
+void fn_8011DC30(int nLine, char* szLabel, char* szValue) {
+    char szReward1[36];
+    char szReward2[36];
+    char szReward3[36];
+    char szMoney[32];
+    char szPurse[32];
+    s32 nId;
+    s32 nRound;
+    int nRewards;
+
+    GameModeDriverRTE_GetEventByDate(lbl_80223C48.nSelected, &nId, &nRound);
+    nRewards = fn_80106F68(0x11, fn_800F120C(nId), szReward1, szReward2, szReward3);
+    fn_800907AC(fn_800F0F30(nId), szMoney);
+    sprintf(szPurse, "$%s", szMoney);
+    switch (nLine) {
+    case 3:
+        strcpy(szLabel, "Purse:");
+        strcpy(szValue, szPurse);
+        break;
+    case 4:
+        strcpy(szLabel, "Rewards:");
+        if (nRewards >= 1) {
+            strcpy(szValue, szReward1);
+        } else {
+            strcpy(szValue, "N/A");
+        }
+        break;
+    case 5:
+        strcpy(szLabel, "");
+        if (nRewards >= 2) {
+            strcpy(szValue, szReward2);
+        } else {
+            strcpy(szValue, "");
+        }
+        break;
+    case 6:
+        strcpy(szLabel, "");
+        if (nRewards >= 3) {
+            strcpy(szValue, szReward3);
+        } else {
+            strcpy(szValue, "");
+        }
+        break;
+    case 7:
+        strcpy(szLabel, "");
+        strcpy(szValue, "");
+        break;
+    case 8:
+        strcpy(szLabel, "");
+        strcpy(szValue, "");
+        break;
+    }
+}
+
+// The next real-time event: name, "Status (?)", its start date; flashes (sound 0x19) when it is
+// a day or less away and a profile is loaded. Gives whether it flashed.
+void fn_8011DDFC(MsgArg* pArgs, MsgArg* pResult) {
+    char* szName = ((MsgString*)pArgs[0].p)->pStr;
+    char* szStatus = ((MsgString*)pArgs[1].p)->pStr;
+    char* szDate = ((MsgString*)pArgs[2].p)->pStr;
+    s32 nEvent = GameModeDriverRTE_GetNextEvent();
+    u16 nDate;
+    u8 bSoon;
+
+    if (nEvent == -1) {
+        pResult->i = 0;
+        return;
+    }
+    GameModeDriverRTE_GetCalData(nEvent);
+    nDate = fn_800F0FBC(nEvent);
+    strcpy(szName, GameModeDriverRTE_GetName(nEvent));
+    strcpy(szStatus, "Status (?)");
+    strcpy(szDate, "Start Date");
+    fn_800D28DC(nDate, szDate);
+    bSoon = 0;
+    if (nDate - fn_800D2994() < 2 && lbl_801D7148.aLoaded[0]) {
+        bSoon = 1;
+    }
+    if (bSoon) {
+        fn_800A73F0(0x19);
+    }
+    pResult->i = bSoon;
+}
+
+// The clock's date and time as text, while the clock reads before October 2003 (not set yet).
+void fn_8011DEF0(MsgArg* pArgs, MsgArg* pResult) {
+    s32 nMonth;
+    s32 nYear;
+    s32 nUnused;
+    char* szOut = ((MsgString*)pArgs[0].p)->pStr;
+    int bShow;
+
+    fn_8011E020(&nMonth, &nUnused, &nYear, &nUnused, &nUnused, &nUnused, &nUnused);
+    bShow = 0;
+    if (nYear < 2003 && nMonth < 10) {
+        bShow = 1;
+    }
+    if (bShow) {
+        RTClock_GetDateTimeString(szOut);
+        pResult->i = 1;
+    } else {
+        szOut[0] = '\0';
+        pResult->i = 0;
+    }
+}
+
+// A real-time event's award: its name and prize (fn_800F11A0, fn_800F1154) and the day the player
+// won it. Gives whether it is won.
+void fn_8011DF90(MsgArg* pArgs, MsgArg* pResult) {
+    SaveProfile* pProfile = fn_80077ACC();
+    s32 nId = pArgs[2].i;
+    char* szDate = ((MsgString*)pArgs[3].p)->pStr;
+    s32* pPrize = (s32*)pArgs[5].p;
+    u8 bWon;
+
+    fn_800F11A0(nId, ((MsgString*)pArgs[4].p)->pStr);
+    *pPrize = fn_800F1154(nId);
+    bWon = pProfile->aRTEAward[nId].bWon;
+    if (bWon) {
+        fn_800D28DC(pProfile->aRTEAward[nId].nDate, szDate);
+    } else {
+        szDate[0] = '\0';
+    }
+    pResult->i = bWon;
 }
