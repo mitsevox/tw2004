@@ -3,7 +3,7 @@
 #include "game_types.h"
 
 s32 fn_800AAEFC();
-s32 fn_800ABDB0();
+s32 Stm_Tick();
 
 void fn_800AA2A4(void* arg0);
 void fn_800AA2A4(void* arg0) {
@@ -12,5 +12,5 @@ void fn_800AA2A4(void* arg0) {
         fn_800AAEFC(arg0);
         return;
     }
-    fn_800ABDB0();
+    Stm_Tick();
 }

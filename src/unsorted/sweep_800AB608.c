@@ -8,8 +8,8 @@ void fn_800AE084();
 void fn_800B59BC();
 void fn_800B59EC();
 
-void fn_800AB608(void);
-void fn_800AB608(void) {
+void RemoveFromAudStreamQueue(void);
+void RemoveFromAudStreamQueue(void) {
     fn_800B59BC(lbl_8018EB90);
     fn_800AE084(lbl_801F18B8);
     *(u8*)(lbl_801F18B8 + 0x18) = 0;
