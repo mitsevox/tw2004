@@ -851,7 +851,7 @@ config.libs = [
             Object(NonMatching, "FEgolferanim.c"),
             Object(NonMatching, "uiLoadFile.c"),
             Object(NonMatching, "uiProcessInterface.c"),
-            Object(NonMatching, "uiTransform.c"),
+            Object(Matching, "uiTransform.c"),
             Object(NonMatching, "GoShaderObject_Particle_Gc.c"),
             Object(NonMatching, "CharAnim.c"),
             Object(NonMatching, "GoShaderObjectCommon_MorphAnimManager_Gc.c"),
