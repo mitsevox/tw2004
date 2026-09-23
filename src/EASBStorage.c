@@ -323,45 +323,60 @@ u32 fn_80128BC4(u32 uTime) {
     return uClamped;
 }
 
-// Copies szSrc into szDest, at most uSize - 1 characters, always ending the text.
-void fn_80128BF8(char* szDest, char* szSrc, u32 uSize) {
+// Copies szSrc into szDest, at most uSize - 1 characters, always ending the text. Returns szDest.
+char* fn_80128BF8(char* szDest, char* szSrc, u32 uSize) {
+    char* pDest;
+    u8 c;
+
     if (szSrc != NULL && szDest != NULL && uSize != 0 && szSrc != szDest) {
-        while (--uSize != 0) {
-            if ((*szDest++ = *szSrc++) == '\0') return;
+        pDest = szDest;
+        for (;;) {
+            if (--uSize == 0) {
+                *pDest = '\0';
+                return szDest;
+            }
+            c = *szSrc++;
+            *pDest++ = c;
+            if (c == '\0') return szDest;
         }
-        *szDest = '\0';
     }
+    return szDest;
 }
 
 // The same for wide text.
-void fn_80128C4C(u16* szDest, u16* szSrc, u32 uLength) {
+u16* fn_80128C4C(u16* szDest, u16* szSrc, u32 uLength) {
+    u16* pDest;
+    u16 c;
+
     if (szSrc != NULL && szDest != NULL && uLength != 0 && szSrc != szDest) {
-        while (--uLength != 0) {
-            if ((*szDest++ = *szSrc++) == 0) return;
+        pDest = szDest;
+        for (;;) {
+            if (--uLength == 0) {
+                *pDest = 0;
+                return szDest;
+            }
+            c = *szSrc++;
+            *pDest++ = c;
+            if (c == 0) return szDest;
         }
-        *szDest = 0;
     }
+    return szDest;
 }
 
 // Compares two texts like strcmp; bCase 0 ignores the case of a-z.
 s32 fn_80128CA0(char* szA, char* szB, u8 bCase) {
-    u8 cA;
-    u8 cB;
-
     if (szA == szB || szA == NULL || szB == NULL) return 0;
     if (bCase) {
-        while (*szA == *szB++) {
-            if (*szA++ == '\0') return 0;
+        while ((u8)*szA == (u8)*szB++) {
+            if ((u8)*szA++ == '\0') return 0;
         }
         return (u8)*szA - (u8)szB[-1];
     }
     for (;;) {
-        cB = *szB;
-        cA = *szA;
-        if (EASB_TO_UPPER(cA) != EASB_TO_UPPER(cB)) {
-            return EASB_TO_UPPER(cA) - EASB_TO_UPPER(cB);
+        if (EASB_TO_UPPER((u8)*szA) != EASB_TO_UPPER((u8)*szB)) {
+            return EASB_TO_UPPER((u8)*szA) - EASB_TO_UPPER((u8)*szB);
         }
-        if (cA == '\0') return 0;
+        if ((u8)*szA == '\0') return 0;
         szA++;
         szB++;
     }
