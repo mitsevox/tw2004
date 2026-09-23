@@ -12,7 +12,7 @@
 
 GolferRecord* fn_80077A80(int nGolfer);
 int fn_80121A38(int nNode);
-u8 fn_80121B8C(int nNode);
+int fn_80121B8C(int nNode);
 int fn_80121C08(int nNode);
 int fn_80121C44(int nEvent);
 void fn_80121C80(int nDir, u8* abCandidate);
@@ -22,25 +22,29 @@ void fn_80122070(u8* abCandidate);
 
 // Places a node: node, x, y.
 void fn_80121430(MsgArg* pArgs, MsgArg* pResult) {
-    LadderMapNode* pNode = &lbl_80260CB8.aNode[pArgs[0].i];
+    int nNode = pArgs[0].i;
+    f32 fX = pArgs[1].f;
+    f32 fY = pArgs[2].f;
 
-    pNode->fX = pArgs[1].f;
-    pNode->fY = pArgs[2].f;
+    lbl_80260CB8.aNode[nNode].fX = fX;
+    lbl_80260CB8.aNode[nNode].fY = fY;
 }
 
 // Where a node is.
 void fn_80121458(MsgArg* pArgs, MsgArg* pResult) {
-    LadderMapNode* pNode = &lbl_80260CB8.aNode[pArgs[0].i];
+    int nNode = pArgs[0].i;
+    f32* pX = (f32*)pArgs[1].p;
+    f32* pY = (f32*)pArgs[2].p;
 
-    *(f32*)pArgs[1].p = pNode->fX;
-    *(f32*)pArgs[2].p = pNode->fY;
+    *pX = lbl_80260CB8.aNode[nNode].fX;
+    *pY = lbl_80260CB8.aNode[nNode].fY;
 }
 
 // The opponent's nickname in quotes, or the last name when there is none (golfer 18 always
 // goes by the last name).
 void fn_80121488(int nGolfer, char* szOut) {
     GolferRecord* pRecord = fn_80077A80(nGolfer);
-    u8 bNick = 0;
+    int bNick = 0;
 
     if (strcmp(pRecord->szNick, "NA") != 0 && strlen(pRecord->szNick) > 1 && nGolfer != 18) {
         bNick = 1;
@@ -62,24 +66,25 @@ void fn_8012153C(MsgArg* pArgs, MsgArg* pResult) {
     char* szEmpty = ((MsgString*)pArgs[5].p)->pStr;
     char* szHoles = ((MsgString*)pArgs[6].p)->pStr;
     int nStop = fn_80102AAC(lbl_80260CB8.nEvent);
+    int nRegion = fn_80121C08(lbl_80260CB8.nNode);
     int nGolfer;
     int nCourse;
     int nHoles;
 
-    sprintf(szStop, "%s / Tour Stop %d", lbl_80194694[fn_80121C08(lbl_80260CB8.nNode)], nStop);
+    sprintf(szStop, "%s / Tour Stop %d", lbl_80194694[nRegion], nStop);
     nGolfer = fn_801020EC(lbl_80260CB8.nEvent);
-    if (nGolfer < NUM_COURSES) {
+    if (nGolfer <= 29) {
         fn_80121488(nGolfer, szOpponent);
     }
     nCourse = fn_80102104(lbl_80260CB8.nEvent);
-    if (nCourse < NUM_COURSES) {
+    if (nCourse <= NUM_COURSES - 1) {
         strcpy(szCourse, lbl_80191990[nCourse]);
     }
     fn_80102A58(lbl_80260CB8.nEvent, szName);
     strcpy(szPart, lbl_80194730[fn_80121C44(lbl_80260CB8.nEvent)]);
     strcpy(szEmpty, "");
     nHoles = fn_8010211C(lbl_80260CB8.nEvent);
-    if (nHoles < 4) {
+    if (nHoles <= 3) {
         strcpy(szHoles, lbl_80194714[nHoles]);
     }
 }
@@ -112,10 +117,15 @@ void fn_8012172C(MsgArg* pArgs, MsgArg* pResult) {
 
 // Where the first node and the cursor's node are.
 void fn_80121770(MsgArg* pArgs, MsgArg* pResult) {
-    *(f32*)pArgs[0].p = lbl_80260CB8.aNode[0].fX;
-    *(f32*)pArgs[1].p = lbl_80260CB8.aNode[0].fY;
-    *(f32*)pArgs[2].p = lbl_80260CB8.aNode[lbl_80260CB8.nNode].fX;
-    *(f32*)pArgs[3].p = lbl_80260CB8.aNode[lbl_80260CB8.nNode].fY;
+    f32* pFirstX = (f32*)pArgs[0].p;
+    f32* pFirstY = (f32*)pArgs[1].p;
+    f32* pX = (f32*)pArgs[2].p;
+    f32* pY = (f32*)pArgs[3].p;
+
+    *pFirstX = lbl_80260CB8.aNode[0].fX;
+    *pFirstY = lbl_80260CB8.aNode[0].fY;
+    *pX = lbl_80260CB8.aNode[lbl_80260CB8.nNode].fX;
+    *pY = lbl_80260CB8.aNode[lbl_80260CB8.nNode].fY;
 }
 
 // Starts the event under the cursor, with the player on the created golfer.
@@ -140,7 +150,7 @@ void fn_80121890(MsgArg* pArgs, MsgArg* pResult) {
 
 // Nodes 18 to 23 stand alone.
 u8 fn_801218BC(int nNode) {
-    u8 b = 0;
+    int b = 0;
 
     if (nNode >= 18 && nNode < 24) {
         b = 1;
@@ -159,8 +169,8 @@ u8 fn_801218EC(int nRegion) {
 
 // Has the player won every event of the region?
 u8 fn_801218FC(int nRegion) {
+    int bWon;
     int nProfile = fn_80077B08();
-    u8 bWon;
 
     if (fn_801218EC(nRegion)) {
         return fn_80102204(nProfile, 24);
@@ -176,24 +186,25 @@ u8 fn_801218FC(int nRegion) {
 
 // Has the player won every event but the final?
 u8 fn_801219CC(void) {
+    int nProfile;
+    int i;
     u8 bWon = 1;
-    int i = 0;
-    int nProfile = fn_80077B08();
 
-    do {
+    nProfile = fn_80077B08();
+    for (i = 0; i < 24; i++) {
         if (!fn_80102204(nProfile, i)) {
             bWon = 0;
         }
-        i++;
-    } while (i < 24);
+    }
     return bWon;
 }
 
 // A node's state: -1 not shown, 0 open, 1 won, 2 locked.
 int fn_80121A38(int nNode) {
+    int nProfile;
     int nEvent = lbl_801946B0[nNode];
-    int nProfile = fn_80077B08();
 
+    nProfile = fn_80077B08();
     if (!fn_80121B8C(nNode)) return -1;
     if (fn_801218DC(nNode)) {
         if (fn_80102204(nProfile, nEvent)) return 1;
@@ -209,7 +220,7 @@ int fn_80121A38(int nNode) {
 
 // Is the node shown? The final once every other event is won, the single nodes once their region
 // is won, the regions' own nodes until it is.
-u8 fn_80121B8C(int nNode) {
+int fn_80121B8C(int nNode) {
     u8 bRegionWon = fn_801218FC(fn_80121C08(nNode));
 
     if (fn_801218DC(nNode)) {
@@ -238,10 +249,10 @@ int fn_80121C44(int nEvent) {
 
 // Marks the nodes that lie in the direction from the cursor's node.
 void fn_80121C80(int nDir, u8* abCandidate) {
-    f32 fX = lbl_80260CB8.aNode[lbl_80260CB8.nNode].fX;
-    f32 fY = lbl_80260CB8.aNode[lbl_80260CB8.nNode].fY;
     f32 fDX;
     f32 fDY;
+    f32 fX = lbl_80260CB8.aNode[lbl_80260CB8.nNode].fX;
+    f32 fY = lbl_80260CB8.aNode[lbl_80260CB8.nNode].fY;
     int i;
     u8 b;
 
@@ -291,14 +302,16 @@ int fn_80121E1C(u8* abCandidate) {
     f32 fDX;
     f32 fDY;
     f32 fDist;
-    int nBest = -1;
     int i;
+    int nBest = -1;
 
     for (i = 0; i < NUM_LADDER_EVENTS; i++) {
         if (abCandidate[i]) {
             fDX = fX - lbl_80260CB8.aNode[i].fX;
             fDY = fY - lbl_80260CB8.aNode[i].fY;
-            fDist = fn_80009680(fDX * fDX + fDY * fDY);
+            fDX *= fDX;
+            fDY *= fDY;
+            fDist = fn_80009680(fDX + fDY);
             if (fDist < fBest) {
                 nBest = i;
                 fBest = fDist;
@@ -310,9 +323,10 @@ int fn_80121E1C(u8* abCandidate) {
 
 // The event is open to the player and not won yet.
 u8 fn_80121F0C(int nEvent) {
+    int b;
     int nProfile = fn_80077B08();
-    u8 b = 0;
 
+    b = 0;
     if (!fn_80102204(nProfile, nEvent) && fn_80102228(nProfile, nEvent)) {
         b = 1;
     }
