@@ -63,11 +63,37 @@ typedef struct FEProfile {
 extern FEProfile* lbl_80281ED4;
 extern u8* lbl_80281EC8;                // a copy of the 'BIO ' stream object's data (fn_80076F80)
 
+// The profile backups (FEState.p658) can be moved out to ARAM (fn_80079D30) and back (fn_80079DAC).
+#define FE_BACKUP_SIZE 0x41820          // the four slots' backups (4 x 0x10600) and 0x20 more
+extern u32 lbl_80281ECC;                // their size
+extern u32 lbl_80281ED0;                // their ARAM address while they are there (0: not there)
+
+// ARAM (the audio memory, used as spare storage). skalib.c declares its own copies of these.
+u32  fn_800B6564(u32 uSize);                          // ARAM alloc
+void fn_800B6594(u32 uAram);                          // ARAM free
+void fn_800B6844(void* pSrc, u32 uAram, u32 uSize);   // copy to ARAM
+void fn_800B68B4(void* pDst, u32 uAram, u32 uSize);   // copy from ARAM
+void fn_800B67EC(void);                               // wait for the ARAM copy
+
+// ---- the Create-A-Player database (FE_CrAPDB.c) ----------------------------------------------
+
+// A Create-A-Player asset (a hat, a shirt, a colour...). Only what the cleaned code reads.
+typedef struct CrAPAsset {
+    u8   unk0[4];
+    char szName[0x28 - 0x4];    // 0x04  "White", "Bright Red", "... backwards" ...
+    u8   unk28[2];
+    s16  nCategory;             // 0x2A  fn_801064EC gives the category's name ("Hats", "Visors")
+} CrAPAsset;
+
+char* fn_801064EC(int nCategory);       // a category's name
+int  fn_8015F844(const char* a, const char* b);       // strcmp ignoring case (MSL's __lower_map)
+
 void FE_MakeMoviePath(char* pName, char* pPath);        // "data/movies/<name>.NGC"
 void FE_MakeCameoMoviePath(char* pName, char* pPath);   // "data/movies/cameos/<name>.NGC"
-void FE_CrAP_TurnOnPart(int a, int b, int c);          // FE_CrAPDB.c
+void FE_CrAP_TurnOnPart(s16 nPart, int b, int c);      // FE_CrAPDB.c
 SaveProfile* fn_80077ACC(void);         // the profile being worked on
 int  fn_80077B08(void);                 // its player slot
+u8   fn_80077B18(int nGolfer);          // a yes/no list over golfers 0..28 (Golfer.c asks it)
 
 // ---- the logo editor (FE_LogoDesign.c) -------------------------------------------------------
 
