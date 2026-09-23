@@ -2522,17 +2522,8 @@ HoleScore.c:
 SwingTips.c:
 	.text       start:0x800D1698 end:0x800D256C
 
-unsorted/sweep_800D27CC.c:
-	.text       start:0x800D27CC end:0x800D27E0
-
-unsorted/sweep_800D27E0.c:
-	.text       start:0x800D27E0 end:0x800D2814
-
-unsorted/sweep_800D2884.c:
-	.text       start:0x800D2884 end:0x800D28B0
-
-unsorted/sweep_800D28B0.c:
-	.text       start:0x800D28B0 end:0x800D28DC
+Calendar.c:
+	.text       start:0x800D256C end:0x800D29E8
 
 CourseData.c:
 	.text       start:0x800D29E8 end:0x800D3244
