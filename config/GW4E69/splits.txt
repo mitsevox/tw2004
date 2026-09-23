@@ -3778,6 +3778,8 @@ src/MSL_C/PPCEABI/bare/H/alloc.c:
 
 src/MSL_C/PPCEABI/bare/H/ansi_files.c:
 	.text       start:0x80152754 end:0x8015286C
+	.data       start:0x8019C3E0 end:0x8019C520
+	.bss        start:0x8027D5F8 end:0x8027D8F8
 
 src/MSL_C/PPCEABI/bare/H/ansi_fp.c:
 	.text       start:0x801538EC end:0x80155BD0

@@ -448,7 +448,7 @@ config.libs = [
             Object(Matching, "src/Runtime.PPCEABI.H/GCN_mem_alloc.c"),
             Object(Matching, "src/MSL_C/PPCEABI/bare/H/abort_exit.c"),
             Object(Matching, "src/MSL_C/PPCEABI/bare/H/alloc.c"),
-            Object(NonMatching, "src/MSL_C/PPCEABI/bare/H/ansi_files.c"),
+            Object(Matching, "src/MSL_C/PPCEABI/bare/H/ansi_files.c"),
             Object(Matching, "src/MSL_C/PPCEABI/bare/H/direct_io.c"),
             Object(Matching, "src/MSL_C/PPCEABI/bare/H/file_io.c"),
             Object(NonMatching, "src/MSL_C/PPCEABI/bare/H/mem_funcs.c"),
