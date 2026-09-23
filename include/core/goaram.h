@@ -47,7 +47,7 @@ LAYOUT_ASSERT(ARQRequest, 0x20);
 
 u32  ARInit(u32* pStack, u32 nEntries);
 u32  ARGetBaseAddress(void);
-u32  fn_80133B18(void);         // the end of the ARAM GoARAM.c manages
+u32  ARGetSize(void);           // the ARAM's size, so the end of the ARAM GoARAM.c manages
 void ARQPostRequest(ARQRequest* pRequest, u32 uOwner, u32 uType, u32 uPriority, u32 uSource, u32 uDest,
                     u32 uLength, void (*pfnCallback)(ARQRequest* pRequest));
 void ARQRemoveRequest(ARQRequest* pRequest);
@@ -102,7 +102,7 @@ ARAMTransfer* fn_800B65C0(u32 uSource, u32 uDest, u32 uLength, int nType, u32 uP
                           void (*pfnDone)(u32 uOwner), u32 uOwner, u8 uFlags);
 int           fn_800B6728(u32 uOwner);                 // cancel uOwner's transfers
 void          fn_800B67EC(ARAMTransfer* pTransfer);    // wait for a transfer, then free it
-void          fn_800B6844(void* pSrc, u32 uAram, u32 uSize);
-void          fn_800B68B4(void* pDst, u32 uAram, u32 uSize);
+ARAMTransfer* fn_800B6844(void* pSrc, u32 uAram, u32 uSize);   // copy to ARAM
+ARAMTransfer* fn_800B68B4(void* pDst, u32 uAram, u32 uSize);   // copy from ARAM
 
 #endif

@@ -15,7 +15,6 @@ u8  lbl_80281BE0;               // lbl_80281BE4 holds a value not yet handed out
 
 u32 fn_8000B194(void);
 u32 fn_8000B264(void);
-u32 fn_8000B3E8(void);
 u32 fn_8000B408(void);
 
 // The next number of a stream: the table entry 3 places on is added into the current one.

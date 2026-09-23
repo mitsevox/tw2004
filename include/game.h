@@ -345,6 +345,8 @@ void fn_800E2470(void);
 u8   fn_800E27A8(void);
 int  fn_800E27C0(void);
 u8   Gimme_Allowed(int nPlayer);
+s32  fn_800E292C(void);                 // the first player to play (the mode's choice after nobody)
+s32  fn_800E295C(void);                 // the player after that one
 void fn_800E299C(void);
 void fn_800E2A88(void);
 u8   fn_800E2B40(int nPlayer, Ball* pBall);   // out of bounds

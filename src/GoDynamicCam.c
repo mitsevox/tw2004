@@ -19,7 +19,6 @@ void fn_80039D0C(int nSequences);
 void fn_80039E58(void);
 u8   fn_8003C800(char* szName, CamSequence** ppSeq, CamShot** ppShot);
 void fn_8003DC54(f32* pA, f32* pB, f32* pOut);
-void fn_8000923C(f32* pAxis, f32* pOut);                // a turn about the axis (its length the angle)
 void fn_800090E4(f32* pTurn, f32* pVec, f32* pOut);     // the vector turned by it
 void fn_80039EB8(int nSize);
 u8   fn_8003D0EC(CamSequence* pSequence, int nKind);

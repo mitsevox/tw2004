@@ -6,7 +6,7 @@
 const char* __CARDVersion = "<< Dolphin SDK - CARD\tdebug build: Apr  5 2004 03:56:53 (0x2301) >>";
 u32 __CARDFreq = 0;
 #else
-char gCARDVersionString[] = "<< Dolphin SDK - CARD\trelease build: Sep  5 2002 05:35:20 (0x2301) >>";
+char gCARDVersionString[] = "<< Dolphin SDK - CARD\trelease build: Apr  2 2003 15:27:49 (0x2301) >>";
 const char* __CARDVersion = gCARDVersionString;
 CARDFreqData __CARDFreq = { 0 };
 #endif
@@ -608,6 +608,22 @@ s32 CARDFreeBlocks(s32 chan, s32* byteNotUsed, s32* filesNotUsed) {
         }
     }
 
+    return __CARDPutControlBlock(card, CARD_RESULT_READY);
+}
+
+s32 CARDGetEncoding(s32 chan, u16* encode) {
+    CARDControl* card;
+    CARDID* id;
+    s32 result;
+
+    result = __CARDGetControlBlock(chan, &card);
+    if (result < 0) {
+        return result;
+    }
+
+    // the card's character encoding, from its ID block
+    id = card->workArea;
+    *encode = id->encode;
     return __CARDPutControlBlock(card, CARD_RESULT_READY);
 }
 

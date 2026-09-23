@@ -849,12 +849,7 @@ DSError TRKPPCAccessFPRegister(void* srcDestPtr, u32 fpr, BOOL read)
 
 		error = TRKPPCAccessSpecialReg(srcDestPtr, instructionData1, read);
 	} else if (fpr == 0x20) {
-		if (read) {
-			ReadFPSCR(srcDestPtr);
-		} else {
-			WriteFPSCR(srcDestPtr);
-		}
-
+		// this game's TRK neither reads nor writes the FPSCR here (no ReadFPSCR/WriteFPSCR)
 		*(u64*)srcDestPtr &= 0xFFFFFFFF;
 	} else if (fpr == 0x21) {
 		if (!read) {

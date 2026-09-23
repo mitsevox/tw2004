@@ -50,6 +50,7 @@ int    stricmp(const char* a, const char* b);       // 0x8015F844 (MSL): strcmp 
 int    strncmp(const char* a, const char* b, u32 uLen);
 char*  strstr(const char* pStr, const char* pFind);
 char*  strchr(const char* pStr, int c);
+char*  strtok(char* pStr, const char* pDelim);
 int    atoi(const char* p);
 int    sprintf(char* pBuf, const char* pFmt, ...);
 int    snprintf(char* pBuf, u32 uLen, const char* pFmt, ...);
@@ -60,11 +61,19 @@ double cos(double x);
 double fabs(double x);                  // 0x8000AE94
 double floor(double x);
 double fmod(double x, double m);
+// MSL's NaN and infinity (0x80281B18, 0x80281B1C: one float each). fake match: declared unsized,
+// as MSL does, so they are reached with lis/lfs although they live in .sdata.
+extern f32 __float_nan[];
+extern f32 __float_huge[];
+#define TW_NAN      (__float_nan[0])
+#define TW_INFINITY (__float_huge[0])
 #else
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#define TW_NAN      NAN
+#define TW_INFINITY INFINITY
 #endif
 
 // ---- the GameCube OS library ------------------------------------------------------------------
@@ -88,5 +97,16 @@ s64  OSGetTime(void);           // the time base, in ticks
 void OSTicksToCalendarTime(s64 nTicks, OSCalendarTime* pTime);
 u32  OSGetTick(void);           // the low 32 bits of the time base
 void OSReport(const char* pFmt, ...);   // debug print (nothing in the retail build)
+
+// The OS arena and heaps.
+void* OSGetArenaLo(void);
+void* OSGetArenaHi(void);
+void  OSSetArenaLo(void* pLo);
+void* OSInitAlloc(void* pStart, void* pEnd, int nMaxHeaps);    // returns the arena's new start
+int   OSCreateHeap(void* pStart, void* pEnd);
+int   OSSetCurrentHeap(int hHeap);
+void* OSAllocFromHeap(int hHeap, u32 uSize);
+void  OSFreeToHeap(int hHeap, void* p);
+extern volatile int __OSCurrHeap;
 
 #endif

@@ -1,7 +1,7 @@
 .include "macros.inc"
 
 .text
-.balign 32
+.balign 16
 
 .fn TRKAccessFile, global
 	twi 31, r0, 0

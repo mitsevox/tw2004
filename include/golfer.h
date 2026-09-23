@@ -62,10 +62,6 @@ typedef enum PlayerNumber_t {
     PLR_MAX_e
 } PlayerNumber_t;
 
-#define PI    3.14159265f
-#define TWOPI 6.28318531f
-#define DEG(x) ((x) * (PI / 180.0f))
-
 #define IABS(v) (((v) ^ ((v) >> 31)) - ((v) >> 31))   // what the compiler emits for abs()
 
 // One 320-byte row of STATS_GC.BIN as it sits in gGolferTable. The file has a 2-byte header,
@@ -403,8 +399,8 @@ typedef struct GameOptions {
     s32  n14;                   // 0x14
     s32  n18;                   // 0x18  -> fn_80055C40
     s32  n1C;                   // 0x1C  -> fn_80055CD0
-    u8   unk20[4];
-    u8   a24[8];                // 0x24  eight on/off options, default on; [7] (0xEA3) the swing trail
+    s32  n20;                   // 0x20  0..2 -> fn_80055CAC (FE_MessageTable.c fn_800811E4)
+    u8   a24[8];               // 0x24  eight on/off options, default on; [7] (0xEA3) the swing trail
     u8   bBoostEnabled;         // 0x2C  (gSession + 0xEA4)
     u8   bSpinEnabled;          // 0x2D  (gSession + 0xEA5)
     u8   rows[4][19];           // 0x2E  four rows of 19 flags
@@ -698,6 +694,7 @@ extern f32          gClubPowerStep[CLUB_MAX_e];      // 0x801875E8  reach gained
 int  Game_GetMode(void);                // 0x8000BED8
 void fn_8002EBA4(u8* pObj, u8 nValue);  // set byte 7 of the options (a7[0]) and apply it (Golfer.c)
 int  fn_800D2B08(void);
+s32  fn_800D2C68(int nTee);             // CourseData.c: the current hole's value for tee set nTee
 int  fn_80100744(void);                 // shot kind override, 8 = none
 int  fn_801006F0(int nPlayer);          // club override, 26 = none
 int  fn_80015464(void);

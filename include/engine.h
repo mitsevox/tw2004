@@ -20,9 +20,60 @@ void* fn_80009B34(int nSize, int nMode, int nAlign, const char* pFile, int nLine
 void  fn_80009E70(void* p);             // free
 void  fn_8000A0AC(s32 v);               // } a value callers pass on as fn_80009B34's uFlags
 s32   fn_8000A0B4(void);                // } (EASportsBio.c sets 0 while the Bio starts, then 2)
-void* fn_800951A0(u32 uSize, int nAlign, int a);
+// The main-memory heap (GoShaderObject_Particle_Gc.c): fn_80095108 makes it from the arena.
+// fn_800951A0 returns a block aligned to nAlign (0: 16) that remembers the heap block and its
+// own padding just before and after it (every caller passes 1 as n, which it does not read).
+typedef struct HeapBlockHead {
+    void* pBlock;               // 0x0  the heap block it is in
+    u32   uSize;                // 0x4  what was asked for
+} HeapBlockHead;
+
+void  fn_80095108(void);
+void* fn_800951A0(u32 uSize, u16 nAlign, int n);
 void  fn_8009527C(void* p);             // frees what fn_800951A0 allocated
-void  fn_800953C8(int a);
+
+// The stopwatches (GoShaderObject_Particle_Gc.c, lbl_802813B0): a 64-bit clock made from the
+// 32-bit tick (fn_8000B3E8), and five watches read against it.
+typedef union ProfTime {
+    u64 u;
+    struct {
+        u32 nHi;                // port: the halves in the GameCube's (big-endian) order
+        u32 nLo;
+    } w;
+} ProfTime;
+
+typedef struct ProfWatch {
+    ProfTime tBase;             // 0x00  a running watch reads the clock minus this
+    ProfTime tStop;             // 0x08  when it was stopped
+    u8   bRunning;              // 0x10
+} ProfWatch;
+LAYOUT_ASSERT(ProfWatch, 0x18);
+
+typedef struct ProfClock {
+    ProfTime tStart;            // 0x00  when fn_800952D8 set it up
+    ProfTime tNow;              // 0x08  the last reading
+    ProfWatch aWatches[5];      // 0x10
+} ProfClock;
+
+extern ProfClock* lbl_802813B0;
+
+// The particles' buffers (GoShaderObject_Particle_Gc.c, lbl_802813A8).
+typedef struct ParticleBuffers {
+    void* apBuffers[4];         // 0x00  two of 90000 bytes, two of 10000 (fn_8009414C)
+    u8    b10;                  // 0x10  flipped by fn_80094278
+    s32   n14;                  // 0x14
+} ParticleBuffers;
+
+extern ParticleBuffers* lbl_802813A8;
+
+u32  fn_8000B3E8(void);                 // the tick (urandom.c)
+void fn_800952D8(void);                 // set up, every watch reset and stopped
+u64  fn_80095368(void);                 // the clock, since the set-up
+void fn_800953C8(int nWatch);           // start
+u8   fn_80095430(int nWatch);           // running?
+u64  fn_80095444(int nWatch);           // stop; returns the reading
+u64  fn_800954A4(int nWatch);           // the reading
+void fn_80095504(int nWatch);           // reset to 0
 // Pack up to 12 characters of pName into a 64-bit code (base 40, table lbl_80191520).
 int   fn_800CB700(u64* pId, const char* pName);
 // And back: the 12 characters a code was made from (table lbl_80191720); szName takes 13 bytes.
@@ -66,13 +117,18 @@ void RTClock_GetDateTimeString(char* szOut);   // "M/D/YYYY H:MM AM"
 
 // ---- math and random numbers -----------------------------------------------------------------
 
+#define PI    3.14159265f
+#define TWOPI 6.28318531f
+#define DEG(x) ((x) * (PI / 180.0f))
+
 void Vec3Copy(const f32* pSrc, f32* pDst);   // 0x80008304 (const: see code_800082F8.c)
 f32  fn_800095F0(f32 fAngle);           // sin
 f32  fn_80009638(f32 fAngle);           // cos
+f32  fn_8000965C(f32 x);                // asin
 double fn_80009680(double x);           // sqrt
 f32  fn_80009744(f32* pVec);            // dot with itself (at most FLT_MAX)
 extern f32 lbl_80281B40[];              // FLT_MAX (MSL's)
-void Vec_Copy(f32* pSrc, f32* pDst);    // 0x8000AD10
+void Vec_Copy(const f32* pSrc, f32* pDst);   // 0x8000AD10 (const: see Vec3Copy)
 f32  fn_8000AD78(f32 y, f32 x);         // atan2f
 f32  fabsf(f32 x);                      // 0x8000AD9C: fabs (0x8000AE94, platform.h) rounded to a float
 f32  fn_8000AF7C(f32 x);                // natural logarithm
@@ -91,6 +147,9 @@ void fn_8000B2B8(u32 uSeed);            // seed all three random streams
 void fn_8000B30C(void);                 // drop the kept normal value (fn_8000B318)
 f32  Rand_Float(int nStream);           // 0x8000B428  [0, 1)
 void fn_8000883C(f32* pA, f32* pB, f32 fT);   // quaternion slerp from a to b by fT, into b
+void fn_80008BB8(f32* pOut, f32 fA, f32 fB, f32 fC);   // the quaternion of three (negated) angles
+void fn_8000923C(f32* pRot, f32* pOut); // a rotation vector (axis * angle) as a quaternion
+void fn_80009710(f32* pQ);              // the identity quaternion (0, 0, 0, 1)
 f32  fn_80029B64(f32 x);                // square root (Skeleton.c); x itself when x <= 0
 void fn_8000C5D4(f32* pA, f32* pB, f32 f, f32* pOut);   // out = a + f x b
 f32  fn_8000C5FC(f32* pA, f32* pB);     // dot product
@@ -387,10 +446,34 @@ void fn_80014194(f32* pColour);
 void fn_800141F8(f32* pXY, f32* pUV, f32 x0, f32 y0, f32 x1, f32 y1);
 void fn_8001425C(int a);
 void fn_8001644C(int a, f32* pXY, int b, f32* pUV, int c);
+void fn_800BA74C(u8 bFade);             // ScreenClear.c: a black screen for 1, 2 or 30 frames
 u32  fn_800142AC(int nButton, int a);   // a button's mask
 u8   fn_80014300(u32 uMask);            // any pad pressed these buttons
 
 // ---- events, sound, effects ------------------------------------------------------------------
+
+// A node of Code8009B340.c's list (lbl_80281FA0): glows queued by fn_8009B260 that fade out
+// (fAlpha falls by fAlphaSpeed a second) and is freed once it has faded.
+typedef struct FadeAnchor {
+    u8   unk0[0x30];
+    f32  a30[4];                // 0x30  drawn at, when a node has one
+} FadeAnchor;
+
+typedef struct FadeNode {
+    struct FadeNode* pNext;     // 0x00
+    f32  a4[4];                 // 0x04  drawn at, when p34 is NULL
+    u32  uFlags;                // 0x14  1, 2: how it is drawn; 0x80000000: faded, to be freed
+    f32  f18;                   // 0x18  grows by f30 a second
+    f32  f1C;                   // 0x1C  f18 + f20, at least 0
+    f32  f20;                   // 0x20
+    u32  uColor;                // 0x24  its top byte is fAlpha * 255
+    f32  fAlpha;                // 0x28
+    f32  fAlphaSpeed;           // 0x2C
+    f32  f30;                   // 0x30
+    FadeAnchor* p34;            // 0x34
+} FadeNode;
+
+extern FadeNode* lbl_80281FA0;
 
 void fn_8001C804(int nPlayer, u8 a, u8 b);  // char.c: sets bits of the player's character's u10
 void fn_8001D8DC(int nPlayer);
@@ -418,7 +501,6 @@ void fn_8006BF60(int nPlayer);          // the replay recorder
 void fn_8006C300(int nPlayer);
 void fn_8006C4A0(void);                 // clears gSession.bReplay: a saved replay's playback ends
 void fn_8006F4B4(void);
-u8   fn_80095430(int a);
 void fn_8009B970(int nView);
 void fn_8009EF98(void);
 void fn_800A6278(void);
@@ -432,6 +514,9 @@ void fn_800A6DCC(int nMusic, int a);
 void fn_800A72EC(u8 a, u8 b);
 void fn_800A7664(int nKind, int nMsg, int a);
 void fn_800A76E4(void);
+void fn_800A77E0(f32 f);                // } the options menu passes them 0.2 x options.a0[0], a0[4]
+void fn_800A78F0(f32 f);                // } and a0[1] (FE_MessageTable.c, GameUICommands.c)
+void fn_800A7924(f32 f);                // }
 void Vec_Normalize(f32* pSrc, f32* pDst);
 void fn_800BAF04(f32* pSrc, f32* pDst);   // normalise
 f32  Vec_Distance(f32* pA, f32* pB);

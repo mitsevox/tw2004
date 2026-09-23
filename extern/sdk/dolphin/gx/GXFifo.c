@@ -178,6 +178,73 @@ void GXSetGPFifo(GXFifoObj *fifo) {
   OSRestoreInterrupts(interrupts);
 }
 
+void __GXSaveCPUFifoAux(__GXFifoObj *realFifo);
+
+void GXSaveCPUFifo(GXFifoObj *fifo) {
+  __GXFifoObj *realFifo = (__GXFifoObj *)fifo;
+  __GXSaveCPUFifoAux(realFifo);
+}
+
+// Reads the CPU FIFO's current state back from the hardware into the FIFO object (also used by
+// GXEndDisplayList).
+void __GXSaveCPUFifoAux(__GXFifoObj *realFifo) {
+  BOOL enabled = OSDisableInterrupts();
+
+  GXFlush();
+  realFifo->base = OSPhysicalToCached(GX_GET_PI_REG(3));
+  realFifo->top = OSPhysicalToCached(GX_GET_PI_REG(4));
+  realFifo->wrPtr = OSPhysicalToCached(GX_GET_PI_REG(5) & 0xFBFFFFFF);
+  if (CPGPLinked) {
+    {
+      u32 temp = GX_GET_CP_REG(29) << 16;
+      temp |= GX_GET_CP_REG(28);
+      realFifo->rdPtr = OSPhysicalToCached(temp);
+    }
+    {
+      u32 temp = GX_GET_CP_REG(25) << 16;
+      temp |= GX_GET_CP_REG(24);
+      realFifo->count = temp;
+    }
+  } else {
+    realFifo->count = (u8 *)realFifo->wrPtr - (u8 *)realFifo->rdPtr;
+    if (realFifo->count < 0) {
+      realFifo->count += realFifo->size;
+    }
+  }
+  OSRestoreInterrupts(enabled);
+}
+
+void GXGetFifoStatus(GXFifoObj *fifo, GXBool *overhi, GXBool *underlow, u32 *fifoCount,
+                     GXBool *cpu_write, GXBool *gp_read, GXBool *fifowrap) {
+  __GXFifoObj *realFifo = (__GXFifoObj *)fifo;
+
+  *underlow = GX_FALSE;
+  *overhi = GX_FALSE;
+  *fifoCount = 0;
+  *fifowrap = GX_FALSE;
+  if (realFifo == GPFifo) {
+    {
+      u32 temp = GX_GET_CP_REG(29) << 16;
+      temp |= GX_GET_CP_REG(28);
+      realFifo->rdPtr = OSPhysicalToCached(temp);
+    }
+    {
+      u32 temp = GX_GET_CP_REG(25) << 16;
+      temp |= GX_GET_CP_REG(24);
+      realFifo->count = temp;
+    }
+  }
+  if (realFifo == CPUFifo) {
+    __GXSaveCPUFifoAux(realFifo);
+    *fifowrap = (GXBool)GET_REG_FIELD(GX_GET_PI_REG(5), 1, 26);
+  }
+  *overhi = (u32)realFifo->count > realFifo->hiWatermark;
+  *underlow = (u32)realFifo->count < realFifo->loWatermark;
+  *fifoCount = realFifo->count;
+  *cpu_write = CPUFifo == realFifo;
+  *gp_read = GPFifo == realFifo;
+}
+
 void GXGetFifoPtrs(GXFifoObj *fifo, void **readPtr, void **writePtr) {
   struct __GXFifoObj *realFifo = (struct __GXFifoObj *)fifo;
 

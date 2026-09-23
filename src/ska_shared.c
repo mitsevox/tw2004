@@ -3,25 +3,25 @@
 // clip banks. Not yet decompiled; the code below is the matched small functions.
 
 #include "game_types.h"
+#include "core/goaram.h"
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_800B68B4();
-void fn_8001FCA8(s32 p0, s32 p1);
-void fn_800B67EC();
-void fn_8001FCD4(void);
+ARAMTransfer* fn_8001FCA8(u32 uAram, void* pDst, u32 uSize);
+void fn_8001FCD4(ARAMTransfer* pTransfer);
 extern u8 lbl_80281CC0;
 void fn_80021978(u8 v);
 f32 fn_800205F8();
 extern f32 lbl_80282CC0;
 f32 fn_80021A98(void* arg0);
 
-void fn_8001FCA8(s32 p0, s32 p1) {
-    fn_800B68B4(p1, p0);
+// Starts copying uSize bytes from ARAM address uAram to pDst; fn_8001FCD4 waits for it.
+ARAMTransfer* fn_8001FCA8(u32 uAram, void* pDst, u32 uSize) {
+    return fn_800B68B4(pDst, uAram, uSize);
 }
 
-void fn_8001FCD4(void) {
-    fn_800B67EC();
+void fn_8001FCD4(ARAMTransfer* pTransfer) {
+    fn_800B67EC(pTransfer);
 }
 
 void fn_80021978(u8 v) {

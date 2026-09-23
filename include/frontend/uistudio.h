@@ -8,22 +8,13 @@
 
 #include "game_types.h"
 #include "platform.h"
+#include "frontend/uisvec.h"
 
 // Where the library reports problems: a level (0 warning, 1 error, as the calls use it), the
 // source file, the line and the message. Set by fn_80165C6C.
 typedef void (*UISReportFn)(s32 nLevel, const char* szFile, s32 nLine, const char* szMsg);
 
 extern UISReportFn lbl_80282A28;
-
-// Four floats, copied as one (UISScreen.c).
-typedef struct UISVec4 {
-    f32 a[4];
-} UISVec4;
-
-// The values screen nodes are drawn with (UISScreen.c): each node adds its UISNodeInfo.afAdd to
-// the first and multiplies its afMul into the second for its children.
-extern UISVec4 lbl_80280628;
-extern UISVec4 lbl_80280638;
 
 // A text buffer the studio formats into and reads from (fn_8016B808, fn_8016B844).
 typedef struct UISText {
@@ -338,8 +329,6 @@ void fn_8016B808(u32 u0, UISText* pOut, UISText* pFormat, s32 nArgs, const UISWo
 s32 fn_8016B844(char* pOut, s32 nSize, const char* szFormat, s32 nArgs, const UISWord* pArgs);
 void fn_8016C15C(f32 f1, f32 f2, f32 f3, f32 f4);
 void fn_8016C174(f32 f1, f32 f2, f32 f3, f32 f4);
-UISVec4* fn_8016C18C(void);
-UISVec4* fn_8016C198(void);
 // Returns a pointer to the float of pInfo that a rate function's n20 names.
 f32* fn_8016C1A4(s32 n20, UISNodeInfo* pInfo);
 // Runs pScript for node info pInfo with a call frame pushed on pStack.

@@ -12,3 +12,7 @@ Changed for this game:
   lock (critical region 2) around their work; `libc/critical_regions.h` (new) declares it.
   `printf.c` is built with GC/2.5 (see configure.py), and so is `runtime/qsort.c` (unchanged).
 - `runtime/extras.c` (new, ours): `stricmp`, the only function of MSL's extras the linker kept.
+- `dolphin/gx/GXMisc.c`: `GXResetWriteGatherPipe` (ours), which Prime's copy lacks.
+- `dolphin/card/CARDRead.c`: `CARDRead` (ours), the synchronous wrapper Prime's copy lacks.
+- `dolphin/gx/GXFifo.c`: `GXSaveCPUFifo`, `__GXSaveCPUFifoAux` (global: `GXEndDisplayList` calls
+  it) and `GXGetFifoStatus` (ours), which Prime's copy lacks.

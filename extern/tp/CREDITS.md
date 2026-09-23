@@ -12,3 +12,7 @@ Changed for this game (so the units link into the DOL):
 - `libs/dolphin/src/ar/arq.c`: the release build string is this game's ARQ build
   (Sep  5 2002 05:34:29). The Metroid Prime copy in `extern/sdk` has the right string but lacks
   `ARQRemoveRequest`, which this game has.
+- `libs/dolphin/src/card/CARDStatEx.c`: `CARDGetAttributes`, `CARDSetAttributesAsync` and
+  `CARDSetAttributes` (ours), which TP's copy lacks; this game's build calls `__CARDGetStatusEx`
+  in them instead of inlining it. The file also holds `__CARDVendorID`, `__CARDPermMask` and
+  `__CARDEnableGlobal` (ours), as this game's copy of the SDK's CARDNet.c does.

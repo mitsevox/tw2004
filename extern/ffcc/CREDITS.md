@@ -31,3 +31,9 @@ Changed for this game (so the units link into the DOL):
   reads the lower-case map inline (`_tolower`). This file is built with GC/2.5 (see configure.py).
 - `src/MSL_C/PPCEABI/bare/H/alloc.c`: the malloc pool's flag is one `unsigned char initialized`
   (FFCC has an `int` read through a byte cast, plus an unused `init` static the game lacks).
+- `src/gx/GXTransform.c`: `GXLoadTexMtxIndx` (ours), which FFCC's copy lacks.
+- `src/card/CARDBios.c`: `CARDGetEncoding` (ours), which FFCC's copy lacks, and this game's CARD
+  library is the Apr 2 2003 build (its version string).
+- `src/card/CARDWrite.c`: the callbacks are the static `WriteCallback` and `EraseCallback`, as in
+  this game's symbols, and `CARDWriteAsync` checks the file with `__CARDIsWritable`, not
+  `__CARDAccess`.
