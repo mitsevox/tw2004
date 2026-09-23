@@ -1,14 +1,12 @@
 // Small functions found by the sweep (sweep.py). Original file and meanings unknown.
 
-#include "game_types.h"
+#include "engine.h"
+#include "lldyntex.h"
 
-s32 fn_80009E70();
-extern u32* lbl_80282488;
-
-void fn_8010A4E8(void);
+// Free the state and the block allocated with it.
 void fn_8010A4E8(void) {
-    if ((u32) *lbl_80282488 != 0U) {
-        fn_80009E70(*lbl_80282488);
+    if (lbl_80282488->p0 != NULL) {
+        fn_80009E70(lbl_80282488->p0);
     }
     fn_80009E70(lbl_80282488);
 }
