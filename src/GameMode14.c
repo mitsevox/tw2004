@@ -31,7 +31,7 @@ u32   Rand_Next(int nStream);
 int   Game_CurHoleIndex(void);
 void  Mem_cpy(void* pDst, void* pSrc, int nBytes);
 void  fn_80055AA8(u8* pBall, f32* pPos, int nPlayer);
-f32   fn_800D0550(Player* p);            // the shot's length
+f32   fn_800D0550(int nPlayer);          // the shot's length
 int   GOLFERSTATE_GetCurrentState(int nPlayer);
 void  GOLFERSTATE_Switch(int nState, int nPlayer);
 void  AI_DefaultTarget(int nPlayer);
@@ -195,18 +195,19 @@ void fn_800F2D4C(int nPlayer) {
 // The ball stopped: on a target, maybe claim it.
 void fn_800F2E08(int nPlayer) {
     s32 nSurface;
-    s8 nTarget;
+    int nTarget;
     s32 nRank;
     s32 nMsg = -1;
-    s32 nKind = 0;
     s32 nText;
+    s32 nKind = 0;
     f32 fLength;
+    s32 nMult;
     if (lbl_80282370) {
         fn_800F3980(0x33, 0, 0, 0, 0xD1, 1);
         nMsg = 0x14;
     } else {
-        nSurface = ((Ball*)gPlayers[nPlayer].ball)->nSurface;
-        fLength = fn_800D0550(&gPlayers[nPlayer]);
+        nSurface = gPlayers[nPlayer].nBallSurface;
+        fLength = fn_800D0550(nPlayer);
         if (nSurface >= 0x85 && nSurface <= 0x90 && !fn_800F2788(nPlayer, fLength)) {
             nTarget = fn_800F1C74(nPlayer);
             nRank = fn_800F1E58(nSurface);
@@ -279,13 +280,15 @@ void fn_800F2E08(int nPlayer) {
                         fn_800A62E0();
                         pBall = gPlayers[nPlayer].ball;
                         fn_800A30E4(8, pBall, nPlayer, 0, 0.0f);
-                        if (gPlayers[nPlayer].nDBC > 1) {
-                            fn_800A30E4(gPlayers[nPlayer].nDBC + 7, pBall, nPlayer, 0, 0.0f);
+                        nMult = gPlayers[nPlayer].nDBC;
+                        if (nMult > 1) {
+                            fn_800A30E4(nMult + 7, pBall, nPlayer, 0, 0.0f);
                         }
                     } else {
                         fn_800A6358();
-                        if (gPlayers[nPlayer].nDBC > 1) {
-                            fn_800A30E4(gPlayers[nPlayer].nDBC + 7, gPlayers[nPlayer].ball, nPlayer, 0, 0.0f);
+                        nMult = gPlayers[nPlayer].nDBC;
+                        if (nMult > 1) {
+                            fn_800A30E4(nMult + 7, gPlayers[nPlayer].ball, nPlayer, 0, 0.0f);
                         }
                     }
                 }

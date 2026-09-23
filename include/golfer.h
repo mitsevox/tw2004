@@ -281,7 +281,9 @@ typedef struct Player {
     u8   unkA88[0xA90 - 0xA88];
     u8   ball[0x68];            // 0xA90  the player's Ball (0xBC bytes, see Ball.c) - nLie is its +0x68
     s32  nLie;                  // 0xAF8
-    u8   unkAFC[0xB0C - 0xAFC];
+    u8   unkAFC[0xB04 - 0xAFC];
+    s32  nBallSurface;          // 0xB04  the ball's nSurface (Ball + 0x74)
+    u8   unkB08[4];
     void* pBallCourse;          // 0xB0C  the ball's pCourse (Ball + 0x7C)
     u8   unkB10[0xB24 - 0xB10];
     s32  nBallOwner;            // 0xB24  the ball's nPlayer (Ball + 0x94)
