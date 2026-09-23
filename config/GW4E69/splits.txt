@@ -2779,6 +2779,11 @@ GameManager.c:
 
 GameRound.c:
 	.text       start:0x800E0AF0 end:0x800E3B28
+	.data       start:0x80192030 end:0x80192558
+	.bss        start:0x802028F0 end:0x80202B88
+	.sdata      start:0x80281588 end:0x80281640
+	.sbss       start:0x80282270 end:0x80282280
+	.sdata2     start:0x80284610 end:0x80284628
 
 GameUI.c:
 	.text       start:0x800E3B28 end:0x800E4FFC
