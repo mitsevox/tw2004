@@ -114,6 +114,45 @@ typedef struct TexBank {
 u64  fn_8000BEE4(char* pName);          // a name's 64-bit hash
 // Find a loaded texture by its name's hash: its bank and entry (both NULL if none).
 int  fn_800102DC(u64 uHash, TexBank** ppBank, TexEntry** ppTex);
+// Makes a texture bank from a 'txf ' stream object's data (LLTex.c), in pBank or, when it is NULL,
+// a new allocation.
+TexBank* fn_8000FB88(struct UStreamObject* pObject, TexBank* pBank, int n);
+
+// The texture bank list (LLTexGrp.c): the banks loaded from 'txf ' stream objects, searched by
+// fn_800102DC.
+typedef struct TexGrpSlot {
+    TexBank* pBank;             // 0x0  NULL: a free slot
+    int  n4;                    // 0x4  the list's n8 when the bank came in (fn_80010608 frees by it)
+    int  n8;                    // 0x8  -1, or the list's n10 when the bank came in
+} TexGrpSlot;
+LAYOUT_ASSERT(TexGrpSlot, 0xC);
+
+// How to load a 'txf ' object whose id (modulo 100000) is 20000 or more (0x18 bytes).
+typedef struct TexGrpRec {
+    u8   b0;                    // 0x00  set: the object's bank is not loaded
+    u8   unk1[3];
+    u32  uId;                   // 0x04  the object id (modulo 100000) it is for
+    int  n8;                    // 0x08  goes to the slot's n8
+    int  nC;                    // 0x0C  passed on to fn_8000FB88
+    int  nSlot;                 // 0x10  the slot the bank went into
+    u8   bUsed;                 // 0x14  set once an object took it
+    u8   unk15[3];
+} TexGrpRec;
+LAYOUT_ASSERT(TexGrpRec, 0x18);
+
+typedef struct TexGrpList {
+    TexGrpSlot* pSlots;         // 0x00
+    int  nNumSlots;             // 0x04  100
+    int  n8;                    // 0x08
+    u8   bUseRecs;              // 0x0C  set: objects are loaded as pRecs says
+    u8   unkD[3];
+    int  n10;                   // 0x10
+    u8   b14;                   // 0x14  set: fn_800102DC only looks in slots whose n8 is n10
+    u8   unk15[3];
+    int  nNumRecs;              // 0x18
+    TexGrpRec* pRecs;           // 0x1C
+} TexGrpList;
+LAYOUT_ASSERT(TexGrpList, 0x20);
 
 // ---- the renderer ----------------------------------------------------------------------------
 

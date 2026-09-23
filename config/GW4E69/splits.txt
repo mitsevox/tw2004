@@ -153,32 +153,8 @@ unsorted/sweep_800100B0.c:
 unsorted/sweep_80010114.c:
 	.text       start:0x80010114 end:0x8001013C
 
-unsorted/sweep_800102B4.c:
-	.text       start:0x800102B4 end:0x800102DC
-
 LLTexGrp.c:
-	.text       start:0x800103C0 end:0x8001049C
-
-unsorted/sweep_8001052C.c:
-	.text       start:0x8001052C end:0x80010544
-
-unsorted/sweep_80010544.c:
-	.text       start:0x80010544 end:0x8001058C
-
-unsorted/sweep_800106A0.c:
-	.text       start:0x800106A0 end:0x800106C4
-
-unsorted/sweep_800106C4.c:
-	.text       start:0x800106C4 end:0x800106D8
-
-unsorted/sweep_80010754.c:
-	.text       start:0x80010754 end:0x80010760
-
-unsorted/sweep_800107C0.c:
-	.text       start:0x800107C0 end:0x800107E4
-
-unsorted/sweep_800107E4.c:
-	.text       start:0x800107E4 end:0x800107F4
+	.text       start:0x8001013C end:0x800107F4
 
 LLFont.c:
 	.text       start:0x800107F4 end:0x80012438
