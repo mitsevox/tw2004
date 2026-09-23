@@ -21,12 +21,13 @@ Status
 Last updated 2026-09-23.
 
 - Builds byte-identical to the retail `main.dol`.
-- Matched code: **17.5%** (271,656 of 1,550,720 bytes), **1,814 of 7,647 functions** (23.7%).
-  Counting partial matches: 21.1%.
+- Matched code: **18.3%** (284,176 of 1,550,720 bytes), **2,374 of 7,647 functions** (31.0%).
+  Counting partial matches: 21.9%.
 - Game code in C so far: the swing and its state machine (`Swing.c`), golfer attributes and the
   CPU's shot planning (`Golfer.c`), ball physics (`Ball.c`, 63 of 68 functions exact), the
-  animation library (`skalib.c`), the asset stream decompressor (`UStream.c`), and about 180
-  small `unsorted/` files of accessors and wrappers.
+  animation library (`skalib.c`), the asset stream decompressor (`UStream.c`), and about 1,140
+  small functions (accessors, setters and call wrappers) in `unsorted/sweep_*` files, pending their
+  real file names.
 - SDK and runtime: 764 of 841 configured functions matched.
 - Named: about 1,300 functions. About 6,340 are still `fn_ADDRESS`.
 - Compiler: CodeWarrior GC/2.5, `-O4,p`. See `docs/compiler.md`.
