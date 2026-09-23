@@ -2699,23 +2699,8 @@ unsorted/sweep_800D2884.c:
 unsorted/sweep_800D28B0.c:
 	.text       start:0x800D28B0 end:0x800D28DC
 
-unsorted/sweep_800D29E8.c:
-	.text       start:0x800D29E8 end:0x800D29EC
-
-unsorted/sweep_800D2A30.c:
-	.text       start:0x800D2A30 end:0x800D2ABC
-
-unsorted/sweep_800D2ABC.c:
-	.text       start:0x800D2ABC end:0x800D2B08
-
-unsorted/sweep_800D2C30.c:
-	.text       start:0x800D2C30 end:0x800D2CB0
-
-unsorted/sweep_800D3118.c:
-	.text       start:0x800D3118 end:0x800D315C
-
-unsorted/sweep_800D3208.c:
-	.text       start:0x800D3208 end:0x800D3244
+CourseData.c:
+	.text       start:0x800D29E8 end:0x800D3244
 
 Earnings.c:
 	.text       start:0x800D3244 end:0x800D9E14
