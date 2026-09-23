@@ -220,8 +220,7 @@ void fn_800B06CC(u32 uAddr) {
     fn_800B5E88(lbl_802820F8, uAddr);
 }
 
-// Take the first free 0xFE00-byte ARAM block; returns its address (the end of the blocks if all
-// eight are taken).
+// Take the first free 0xFE00-byte ARAM block; returns its address.
 u32 fn_800B06F4(void) {
     u32 uAddr;
     u32 uBit = 1;
@@ -233,6 +232,8 @@ u32 fn_800B06F4(void) {
         }
         uBit <<= 1;
     }
+    // EA bug: the original has no return here, so when all eight blocks are taken the caller
+    // (which tests for 0) gets the loop's address, the end of the blocks. This keeps that value.
     return uAddr;
 }
 

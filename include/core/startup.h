@@ -31,8 +31,8 @@ void   fn_80145B24(AXVPB* pVpb, u32 uMode, int nInput, int nAuxA, int nAuxB, int
 #define NUM_VOICES 50
 #define VOLUME_MIN (-904)               // -90.4 dB: silent
 
-// A voice's state flags (the word at 0x4). The b...: flags ask the mixer callback
-// (fn_800AF324) to pass a changed setting on to the hardware on its next pass.
+// A voice's state flags (the word at 0x4). The bSet... flags ask the mixer callback (fn_800AF324)
+// to pass a changed setting on to the hardware on its next pass.
 typedef struct VoiceFlags {
     u32  n4_E0      : 3;        // 0x4
     u32  n4_18      : 2;
