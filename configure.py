@@ -587,7 +587,7 @@ config.libs = [
         "progress_category": "sdk",
         "src_dir": "extern/sdk",
         "objects": [
-            Object(NonMatching, "dolphin/mtx/mtx.c"),
+            Object(Matching, "dolphin/mtx/mtx.c"),
             Object(NonMatching, "dolphin/mtx/mtx44.c"),
         ],
     },
