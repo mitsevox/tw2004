@@ -33,6 +33,8 @@ void  Character_PlaceFeetOnGround(Character* pChar);
 void  SKEL_TransformBones(CharModel* pModel, u32* auBits);
 void  fn_800B28D4(Character* pChar, int a, int b);
 void  fn_800B2FB0(Character* pChar, int a, int b);
+void  fn_800BAD60(f32 mtx[4][4], Vec4* src, Vec4* dst);    // VecMath.c: a point through a matrix
+void  fn_8001EB8C(Character* pChar, int nBone, f32* pPos);
 void  fn_8001CCF8(UStreamObject* pObject);
 void  fn_8001CD80(UStreamObject* pObject);
 void  fn_8001CE5C(UStreamObject* pObject);
@@ -563,6 +565,23 @@ void fn_8001D8DC(int nPlayer) {
 }
 
 // Empty the character's four data buffers (their memory is kept).
+// The clip's point v80 through the root bone's matrix into pOut; without a clip, bone 0's
+// position (fn_8001EB8C).
+void fn_8001DB04(Character* pChar, f32* pOut) {
+    Vec4 vPos;
+    f32 (*pMtx)[4];
+
+    if (pChar->pCurClip != NULL) {
+        fn_8001EED8(pChar->pModel, 1);  // the result is not used
+        pMtx = fn_8001ED08(pChar, 0);
+        Vec3Copy(pChar->pCurClip->v80, &vPos.x);
+        vPos.w = 1.0f;
+        fn_800BAD60(pMtx, &vPos, (Vec4*)pOut);
+        return;
+    }
+    fn_8001EB8C(pChar, 0, pOut);
+}
+
 void fn_8001DB98(Character* pChar) {
     int i;
     for (i = 0; i < 4; i++) {
