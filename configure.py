@@ -744,7 +744,7 @@ config.libs = [
         "src_dir": "extern/sdk",
         "objects": [
             Object(NonMatching, "dolphin/os/OSError.c"),
-            Object(NonMatching, "dolphin/os/OSContext.c"),
+            Object(Matching, "dolphin/os/OSContext.c"),
             Object(NonMatching, "dolphin/os/OSReboot.c"),
             Object(Matching, "dolphin/os/OSAlarm.c"),
             Object(Matching, "dolphin/os/OSArena.c"),

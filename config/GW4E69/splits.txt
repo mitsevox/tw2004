@@ -3659,6 +3659,7 @@ dolphin/os/OSCache.c:
 
 dolphin/os/OSContext.c:
 	.text       start:0x8014983C end:0x8014A0AC
+	.data       start:0x8019B598 end:0x8019B770
 
 dolphin/os/OSError.c:
 	.text       start:0x8014A0AC end:0x8014A758
