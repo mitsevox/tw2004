@@ -12,6 +12,8 @@ u8    lbl_80282200;     // 0x80282200  the watched ball has reached surface 105
 Ball* lbl_802821FC;     // 0x802821FC  the watched ball, NULL for none
 u32   lbl_802821F8;     // 0x802821F8  gSession.nFrameCount when it started
 
+void fn_80067710(int nPlayer, int a, int b);   // also declared in Swing.c; belongs in a header
+
 // ---- vector helpers ------------------------------------------------------------------------
 // Hand-written paired-single assembly. The square roots are one Newton step on the hardware
 // estimate: r = frsqrte(s); r = 0.5 * r * (3 - s * r * r).

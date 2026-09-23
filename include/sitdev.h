@@ -23,7 +23,6 @@ extern SitDevData* lbl_802811B8;    // 0x802811B8 (.sdata): &lbl_801D5AB0
 extern s32 lbl_801FA198[5];         // per player; cleared by fn_800BB1C0
 extern s32 lbl_801FA1AC[5];         // per player; 1: fn_800BB1F8 is true
 
-void fn_80067710(int nPlayer, int a, int b);
 // Store uValue in pValues[nIndex] and set bit nIndex of pSetBits.
 void fn_80067B1C(u16* pValues, int nIndex, u16 uValue, u32* pSetBits);
 
