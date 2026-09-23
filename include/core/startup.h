@@ -199,4 +199,9 @@ typedef struct CardPos {
 } CardPos;
 LAYOUT_ASSERT(CardPos, 0xC);
 
+// ---- the hardware voices, as the sound engine (hlaudvoice.c) uses them -----------------------------
+
+void fn_800AFCBC(u16 nVoice, u8 bPause);
+void fn_800B0748(u32 uAddr);            // give an ARAM buffer back
+
 #endif
