@@ -2,10 +2,10 @@
 // matched small functions.
 
 #include "game_types.h"
+#include "charstate.h"
 
 // ---- sweep code (not yet cleaned up) ----
 
-u8 fn_8001E9CC(s32, s32);
 s32 fn_80077ACC();
 s32 fn_80104020(s32 arg0);
 s32 fn_801048B0(u32 arg0);
@@ -14,7 +14,6 @@ s32 fn_80104F68(s32 p0);
 u32 fn_80104F7C(s32 arg0);
 extern s32 lbl_80282474;
 s32 fn_80105140(s32 p0);
-void UStream_UnregisterHandler();
 void fn_80105154(void);
 void fn_80077B78();
 void fn_801050D0();
@@ -46,7 +45,6 @@ s32 fn_80105C30(void);
 void fn_80105EFC(void);
 s32 fn_801061C8(s8 arg0);
 s32 fn_8015F844(s8*, s32*);
-s32 strcpy(s8*, s32);
 extern s32 lbl_80281748;
 s32 fn_8010645C(s32 arg0, s8* arg1);
 
@@ -54,7 +52,8 @@ s32 fn_80104020(s32 arg0) {
     s32 temp_r3;
 
     temp_r3 = fn_80077ACC();
-    if ((fn_8001E9CC(temp_r3 + 0xB054, arg0) == 0) && (fn_8001E9CC(temp_r3 + 0xB1CC, arg0) != 0)) {
+    if ((fn_8001E9CC((u32*)(temp_r3 + 0xB054), arg0) == 0) &&
+        (fn_8001E9CC((u32*)(temp_r3 + 0xB1CC), arg0) != 0)) {
         return 1;
     }
     return 0;
@@ -246,7 +245,7 @@ s32 fn_8010645C(s32 arg0, s8* arg1) {
     if (arg0 == -1) {
         return 0;
     }
-    strcpy(arg1, temp_r0 + arg0);
+    strcpy((char*)arg1, (char*)(temp_r0 + arg0));
     if (fn_8015F844(arg1, &lbl_80281748) == 0) {
         *arg1 = 0;
     }
