@@ -300,7 +300,7 @@ void fn_8011E974(void);
 void fn_8012402C(void);
 s32  fn_80124094(void);
 void fn_801242D0(void);
-void fn_801249A8(void);
+void EASBio_InitOnce(void);
 void fn_80124B54(void);
 void fn_801250C0(void);
 void fn_80124C10(void);
@@ -425,7 +425,7 @@ void fn_8006C720(void) {
     fn_800DCBA8();
     fn_800A2064();
     fn_8010F6C8();
-    fn_801249A8();
+    EASBio_InitOnce();
     fn_80009918();
 }
 

@@ -6,6 +6,7 @@
 // Error codes and the image layout are TW06's (its PDB keeps the EASB types).
 
 #include "game_types.h"
+#include "Common/SharedFileIO.h"
 
 // Every library call returns one of these (TW06's EASBErrorE).
 typedef enum EASBErrorE {
@@ -46,6 +47,13 @@ typedef enum EASBErrorE {
     EASB_ERROR_UNKNOWN = 34
 } EASBErrorE;
 
+// Where a memory-card operation the library runs in steps has got to (TW06's EASBProcessE).
+typedef enum EASBProcessE {
+    EASB_PROCESS_NONE = 0,
+    EASB_PROCESS_CONTINUE = 1,
+    EASB_PROCESS_COMPLETE = 2
+} EASBProcessE;
+
 // What a call needs from the memory-card session (the argument of fn_8012CCD8).
 #define EASB_NEED_FILE 0        // the Bio file must be open
 #define EASB_NEED_NO_FILE 1     // no file may be open
@@ -78,7 +86,7 @@ typedef struct EASBProduct {
 
 // The library's state, allocated when it starts (lbl_802825B8).
 typedef struct EASBState {
-    void* pAllocator;               // 0x0000: what the library allocates from (TibExt.c)
+    u32 uHeapID;                    // 0x0000: EASBInitParams.uHeapID, passed to TibExt.c's allocator
     u8 unk4[0x50];
     u32 u54;                        // 0x0054: the Bio's totals, raised with the product's
     u32 u58;                        // 0x0058
@@ -98,11 +106,37 @@ typedef struct EASBState {
 
 #define EASB_PRODUCT_BUFFER_SIZE 0x1B328
 
+// What the game passes to fn_8012D394 to start the library (TW06's EASBInitParams_t).
+typedef struct EASBInitParams {
+    char* szProductName;            // 0x00: this game's name in the Bio
+    u16* szGamesPlayedType;         // 0x04: what the Bio counts this game's games in (wide text)
+    SFIOFuncTable* pCallbacks;      // 0x08: the memory-card glue (TibExt.c)
+    u32 uHeapID;                    // 0x0C
+    u16 uGamesPlayedTypeLanguage;   // 0x10: the language of szGamesPlayedType, two letters
+} EASBInitParams;
+
 extern EASBState* lbl_802825B8;
 
 // TibExt.c: the library's memory and clock glue.
-void TibExtMemFree(void* pAllocator, void* p, u32 uSize, u32 uAlign);
+// The library's allocator (TW06's signatures). The heap id is not used: the game's current heap
+// (fn_8000A0B4) is.
+void* TibExtMemAlloc(u32 uHeapID, u32 uSize, u32 uAlign);
+void TibExtMemFree(u32 uHeapID, void* p, u32 uSize, u32 uAlign);
 u32 TibExtCurrentTimeGet(void);     // the real-time clock, in seconds since 1970
+SFIOFuncTable* fn_801221F0(void);   // fills in and returns the memory-card callbacks
+
+// TibExt.c's memory-card glue (lbl_80260D88): the callbacks it hands the shared file library,
+// then the result of the last card call.
+typedef struct TibExtCard {
+    SFIOFuncTable fn;               // 0x00: fn_801221F0 fills these in
+    s32 nError;                     // 0x44: the last card call's error, as the file library's code
+    s32 n48;                        // 0x48: the last call's result (a size, a count, a file)
+    char szFileName[0x44];          // 0x4C: the save file the probe found
+} TibExtCard;
+LAYOUT_ASSERT(TibExtCard, 0x90);
+
+extern TibExtCard* lbl_80281970;
+extern s32 lbl_80194758[46];        // the file library's code for each card error (by -error)
 
 // The code before EASB.c (still sweep code).
 u32 fn_80128468(u32 uA, u32 uB);    // uA + uB, saturating at 0xFFFFFFFF
@@ -124,6 +158,7 @@ EASBErrorE fn_8012CD8C(void);
 EASBErrorE fn_8012CF00(void);
 EASBErrorE fn_8012D0D4(void);
 EASBErrorE fn_8012D1A0(void);
+EASBErrorE fn_8012D394(EASBInitParams* pParams);
 EASBErrorE fn_8012D560(void);
 EASBErrorE fn_8012D5B0(void);
 EASBErrorE fn_8012D5E4(void* p0, void* p1);
@@ -133,6 +168,7 @@ EASBErrorE fn_8012D710(void);
 EASBErrorE fn_8012D744(u32* pOut);
 EASBErrorE fn_8012D794(void* pImage);
 EASBErrorE fn_8012D7F0(void);
+EASBErrorE fn_8012D7F8(EASBProcessE* peProcess);  // runs the next step of the operation
 EASBErrorE fn_8012D8C4(u32 uCount);
 EASBErrorE fn_8012D93C(u32 uCount);
 EASBErrorE fn_8012D9B4(u16* puLevel);
@@ -199,6 +235,10 @@ void fn_80125680(s32 p0);
 s32  fn_80125928(void);             // the Bio's level (0: none loaded)
 
 extern EASBioMgr* lbl_80281988;
+extern EASBInitParams lbl_80261040;
+extern char lbl_80195308[28];       // "Tiger Woods PGA TOUR(R) 2004"
+extern u16 lbl_80195324[14];        // "Rounds Played", 16-bit characters
+extern s32 EASB_gErrorMap[35];      // the memory-card error code for each EASBErrorE
 extern u8 lbl_80282568;
 extern u8 lbl_80282569;
 extern u8 lbl_8028256A;
