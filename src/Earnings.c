@@ -462,8 +462,9 @@ int fn_800D7220(int nReward, int nPlayer, CourseMoneyTracking* pMoney) {
     return nTotal;
 }
 
-// Whether a human player's profile can earn awards.
-u8 fn_800D748C(int nPlayer) {
+// Whether a human player's profile can earn awards. It returns an int (the compare is not cut to 8
+// bits); its callers keep the answer in a u8 (a clrlwi after each call).
+int fn_800D748C(int nPlayer) {
     if (Player_IsCPU(nPlayer)) return 0;
     if (fn_800E177C() != 0) return 0;
     return gpSaveData[gPlayers[nPlayer].nIndex].bActive == 1;
@@ -601,11 +602,39 @@ s32 fn_800D8720(s32 n) {
     }
 }
 
+// Clear the player's flags b30C..b30F (Swing.c calls it).
+void fn_800D8D10(int nPlayer) {
+    gPlayers[nPlayer].b30C = 0;
+    gPlayers[nPlayer].b30D = 0;
+    gPlayers[nPlayer].b30F = 0;
+    gPlayers[nPlayer].b30E = 0;
+}
+
 // Clear the flags fn_800D9350 sets.
 void fn_800D8D38(int nPlayer) {
     gPlayers[nPlayer].b310 = 0;
     gPlayers[nPlayer].b311 = 0;
     gPlayers[nPlayer].b312 = 0;
+}
+
+// Clear the player's money breakdown for the round (GameRound.c, as a round is set up).
+void fn_800D8D5C(int nPlayer) {
+    gPlayers[nPlayer].money.n0 = 0;
+    gPlayers[nPlayer].money.n4 = 0;
+    gPlayers[nPlayer].money.n8 = 0;
+    gPlayers[nPlayer].money.nC = 0;
+    gPlayers[nPlayer].money.n10 = 0;
+    gPlayers[nPlayer].money.n14 = 0;
+    gPlayers[nPlayer].money.n18 = 0;
+    gPlayers[nPlayer].money.n1C = 0;
+    gPlayers[nPlayer].money.nBase = 0;
+    gPlayers[nPlayer].money.nCourse = 0;
+    gPlayers[nPlayer].money.n2C = 0;
+    gPlayers[nPlayer].money.nTee = 0;
+    gPlayers[nPlayer].money.nTourCard = 0;
+    gPlayers[nPlayer].money.n38 = 0;
+    gPlayers[nPlayer].money.n3C = 0;
+    gPlayers[nPlayer].money.n24 = 0;
 }
 
 // After every shot (GM_PlayerTookShot calls it last), when the mode allows no mulligans: carry the
