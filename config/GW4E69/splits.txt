@@ -3038,6 +3038,8 @@ unsorted/sweep_8010F574.c:
 
 FE_LogoDesign.c:
 	.text       start:0x8010F6C8 end:0x8010FB70
+	.data       start:0x80193D28 end:0x80193D58
+	.sbss       start:0x802824B8 end:0x802824C8
 
 unsorted/sweep_8010FBC4.c:
 	.text       start:0x8010FBC4 end:0x8010FBCC

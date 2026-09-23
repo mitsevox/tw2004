@@ -911,7 +911,7 @@ config.libs = [
             Object(NonMatching, "LLDynTex.c"),
             Object(NonMatching, "CharSliders.c"),
             Object(NonMatching, "FE_PGATourMessages.c"),
-            Object(NonMatching, "FE_LogoDesign.c"),
+            Object(Matching, "FE_LogoDesign.c"),
             Object(NonMatching, "hwsBurn.c"),
             Object(NonMatching, "hwsMaterial_Gc.c"),
             Object(NonMatching, "hwsOverride_Gc.c"),
