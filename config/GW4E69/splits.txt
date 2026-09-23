@@ -1551,6 +1551,9 @@ unsorted/sweep_80077BDC.c:
 unsorted/sweep_80079664.c:
 	.text       start:0x80079664 end:0x8007975C
 
+unsorted/sweep_80079974.c:
+	.text       start:0x80079974 end:0x80079AD4
+
 unsorted/sweep_80079E44.c:
 	.text       start:0x80079E44 end:0x80079E6C
 
@@ -3702,6 +3705,9 @@ unsorted/sweep_800E45CC.c:
 unsorted/sweep_800E4BF8.c:
 	.text       start:0x800E4BF8 end:0x800E4C20
 
+unsorted/sweep_800E4C20.c:
+	.text       start:0x800E4C20 end:0x800E4D88
+
 unsorted/sweep_800E4D88.c:
 	.text       start:0x800E4D88 end:0x800E4D94
 
@@ -4391,6 +4397,9 @@ unsorted/sweep_801097FC.c:
 
 unsorted/sweep_8010988C.c:
 	.text       start:0x8010988C end:0x801098B0
+
+unsorted/sweep_80109BA4.c:
+	.text       start:0x80109BA4 end:0x80109CBC
 
 unsorted/sweep_80109CBC.c:
 	.text       start:0x80109CBC end:0x80109D5C
