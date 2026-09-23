@@ -1,3 +1,7 @@
+// target.c (TW06's target.c, golf/ai/target.c): where the CPU aims and where a ball may be
+// placed or dropped (TW06's PlaceBall_* functions). Mostly not yet decompiled; the machine-style
+// code below is the sweep's.
+
 #include "game_types.h"
 
 s32 fn_8000C140();

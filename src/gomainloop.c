@@ -1,3 +1,7 @@
+// gomainloop.c (TW06's gomainloop.c, golf/mainloop/gomainloop.c; GO_vInitIG): the game's main
+// loop: starting up and shutting down every system, the frame update and the render passes.
+// Mostly not yet decompiled; the machine-style code below is the sweep's.
+
 #include "game_types.h"
 
 extern s32 lbl_802811F0;
