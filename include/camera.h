@@ -7,6 +7,19 @@
 
 #include "engine.h"
 
+// A render camera's lens (our name; unsorted/cull.h called it CameraSub): what fn_80008370 returns,
+// the pointer at the render camera's +0x10. Only the fields read so far; its size is unknown.
+typedef struct CamLens {
+    s32  nType;                 // 0x00  0: a perspective camera, else flat (LLObj_Gc.c)
+    f32  v4[3];                 // 0x04  a position: the green zoom-to-aim camera copies it to View.v20
+    u8   unk10[0x34 - 0x10];
+    f32  v34[3];                // 0x34  a position: GameMode8 measures the ball's distance to it
+    u8   unk40[0xB0 - 0x40];
+    f32  fB0;                   // 0xB0  fn_8001EFFC; the zoom-to-aim camera divides its distance by it
+    f32  fB4;                  // 0xB4  a flat camera's view width (guess)
+    f32  fB8;                   // 0xB8  its view height (guess)
+} CamLens;
+
 // A camera shot (0xC0 bytes): a named script position the camera script moves to. The shots of a
 // sequence are chained through p40.
 typedef struct CamShot {
@@ -29,7 +42,9 @@ typedef struct CamShot {
     f32  f7C;                   // 0x7C
     f32  f80;                   // 0x80
     f32  f84;                   // 0x84
-    u8   unk88[0x94 - 0x88];
+    u8   unk88[4];
+    f32  f8C;                   // 0x8C
+    u8   unk90[4];
     f32  f94;                   // 0x94
     f32  f98;                   // 0x98
     f32  f9C;                   // 0x9C
@@ -58,6 +73,8 @@ typedef struct CamSequence {
     f32  f38;                   // 0x38  its length
     u8   unk3C[0x44 - 0x3C];
     u8   b44;                   // 0x44  its kind
+    u8   unk45;
+    u8   b46;                   // 0x46  6: the ball-flight camera keeps one for shot kind 5
 } CamSequence;
 
 // A view's camera script (0x40 bytes at View + 0x84).
@@ -89,7 +106,9 @@ typedef struct View {
     CamShot* p80;               // 0x080
     CamScript script;           // 0x084  the camera script the camera functions drive
     f32      vC4[4];            // 0x0C4
-    u8       unkD4[0x104 - 0xD4];
+    f32      vD4[4];            // 0x0D4  the ball-flight camera: where the shot should land (the aim, at
+                                //        the club's full distance)
+    u8       unkE4[0x104 - 0xE4];
     f32      fCamTime;          // 0x104  time on this camera
     u8       unk108[0x110 - 0x108];
     f32      f110;              // 0x110
@@ -112,7 +131,9 @@ typedef struct View {
     u8       unk151[2];
     u8       b153;              // 0x153
     s32      n154;              // 0x154
-    u8       unk158[0x164 - 0x158];
+    u8       unk158[4];
+    f32      f15C;              // 0x15C  camera 8: the ground height it follows
+    u8       unk160[4];
     s32      n164;              // 0x164  a shot kind for fn_8003A950 (25 = none)
     f32      f168;              // 0x168
     u8       unk16C[0x18C - 0x16C];
@@ -159,7 +180,8 @@ typedef struct CamTuning {
     f32  f50;                   // 0x050  camera 5: the ball-to-pin distance of a full swing out
     f32  f54;                   // 0x054  camera 5: how long the swing out lasts
     f32  f58;                   // 0x058  how long camera 13's closing shot lasts
-    u8   unk5C[4];
+    f32  f5C;                   // 0x05C  how long the matrix camera's first shot lasts (twice as long for
+                                //        swing camera kinds other than 1 and 6)
     f32  f60;                   // 0x060  camera 13's slow-motion step length (0: every frame)
     f32  f64;                   // 0x064
     f32  v68[4];                // 0x068  camera 13's fn_80038010 vector; [3] shrinks as the camera's time
@@ -172,7 +194,14 @@ typedef struct CamTuning {
     f32  f8C;                   // 0x08C
     u8   unk90[4];
     f32  f94;                   // 0x094  the elevator camera's first blend value
-    u8   unk98[0xB8 - 0x98];
+    f32  f98;                   // 0x098  camera 8: 1 - this is its height's share of the move a frame
+    f32  f9C;                   // 0x09C  the swing camera: the least shot power for one (fn_800C6618)
+    f32  fA0;                   // 0x0A0  ... above this power, the chance (percent) is fAC
+    f32  fA4;                   // 0x0A4  ... above this one, fB0 (else fA8)
+    f32  fA8;                   // 0x0A8
+    f32  fAC;                   // 0x0AC
+    f32  fB0;                   // 0x0B0
+    f32  fB4;                   // 0x0B4  ... above this power with a short club, always kind 11
     f32  fB8;                   // 0x0B8  camera 15 waits this long on a ball near the green
     s32  nBeats;                // 0x0BC  the heartbeat camera's beats
     s32  nBeatFrames;           // 0x0C0
@@ -225,7 +254,7 @@ typedef struct GolfCamState {
     f32     f68;                // 0x068
     CamShot shot6C;             // 0x06C  the tutorial wait's two hand-made shots (camera 18)
     CamShot shot12C;            // 0x12C
-    s32     n1EC[5];            // 0x1EC
+    s32     n1EC[5];            // 0x1EC  per player: the next swing camera kind (View.n260) to use, 1..11 in turn
 } GolfCamState;
 
 extern GolfCamState* lbl_80282220;
@@ -278,6 +307,9 @@ CamShot* fn_8003A950(CamSequence* pSequence, int nKind, int* pA, f32* pF1, f32* 
                      int nPlayer);
 CamSequence* fn_8003BDBC(int nPlayer, int nLie, int nClass, int nKind, int a, f32 fDist);
 u8     fn_8003DC78(CamShot* pShot);     // the shot's bAC is 1..6 or 7
+// 0 when gSession.nGameType is 3, else fn_8001EDF4 of the player's golfer (Player.pChar) as a flag;
+// the shot is not read.
+u8     fn_800453C8(int nPlayer, CamShot* pShot);
 
 // ---- the camera controller (0x80062F38..) ---------------------------------------------------
 

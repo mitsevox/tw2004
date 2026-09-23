@@ -64,6 +64,8 @@ CodeWarrior versions (GameCube)
   separates "1.2.5 or older" from "1.3.2 or newer" without writing any C.
 - **[verified] Float copies.** Copying three floats: GC/1.3.2 loads and stores one at a time;
   GC/2.0 - 2.7 interleave (load, load, store, load, store, store); GC/3.0 loads all then stores all.
+  The interleave needs a `const` source: `Vec3Copy(f32* pSrc, f32* pDst)` gave load/store in turns
+  and the linked DOL failed; `(const f32* pSrc, f32* pDst)` matched (code_800082F8 `Vec3Copy`).
 - **[verified] Null pointer compare.** GC/2.x and older use an unsigned compare (`cmplwi`), GC/3.0 a signed one (`cmpwi`).
 - **[verified] GC/2.0 vs 2.5+.** Differ when a byte-sized value is masked and then used as an
   index, and in bit-field packing. GC/2.5, 2.6 and 2.7 never differed from each other in our tests.
@@ -203,6 +205,18 @@ The fixes that come up most often. Each points to its full entry below.
 
 ### Evaluation and statement order
 
+- **[verified] A three-term sum is reordered by the compiler.** `return c + a*10000 + b*1000000;` adds
+  the products first in every term order; `int n = c; n += a * 10000; n += b * 1000000; return n;`
+  matched (FE_Manager `fn_80078604`).
+- **[verified] Call results as arguments.** `f(g(), p->x, p->y)` loads the other arguments first and
+  keeps them in saved registers; `t = g(); f(t, p->x, p->y);` calls first (FE_LogoDesign
+  `fn_8010FAF4`, 76.2 -> 100).
+- **[verified] Shift the parameter once.** `(s16)(n >> 1)` written at three uses scored 90.7;
+  `n >>= 1;` then plain uses gave the original's `extsh` then `srawi`/`extsh.` (startUp `fn_800AFF9C`).
+- **[verified] A pointer local to a global struct**, `T* p = &gX; p->a++; ...`, can be what the
+  original did even though the address could be reused anyway (PGATour `fn_800EE2C8`, 80.5 -> 100
+  with its other locals).
+
 - **[verified] The right side of a comparison is evaluated first.** `f(0) < f(1)` calls `f(1)`
   first. So the call order in the original tells you how the comparison was written: m2c's
   `t = f(1); if (f(0) < t)` is the source `f(0) < f(1)` (GameModeAlternateShot, 2026-09-23).
@@ -335,6 +349,14 @@ The fixes that come up most often. Each points to its full entry below.
 
 ### Types, casts and sign extension
 
+- **[verified] `u32` bit-fields compile to EA's byte and halfword accesses** (`lbz`/`extrwi`/
+  `rlwimi`/`stb`, and `lhz`/`sth` for a field that crosses a byte). A single `stw 0` over the whole
+  word needs a union with a `u32` member (startUp voice flags). A test written on the shifted value,
+  `if (p->nAttack * 16 == 0)`, gives an in-place `rlwinm.` mask test where `== 0` gives `extrwi.`
+  (startUp `fn_800B0114`).
+- **[verified] A `u8` return changes the epilogue order.** `return p != NULL;` as `int` restores r31
+  after the `srwi`; as `u8` before it, like the original (startUp `fn_800AF9BC`).
+
 - **[verified] `int` vs `s32` matters for parameters too.** PGATour `fn_800EE6A0(s32 nPlayer)` is
   exact; as `(int nPlayer)` it gives `addis r3, r4, 1; add r3, r3, r29` instead of the original's
   `addis r0, r4, 1; add r3, r0, r29` (99.81). Its neighbours were unaffected either way.
@@ -396,6 +418,14 @@ The fixes that come up most often. Each points to its full entry below.
   macro of theirs), so it is written without a fake-match comment.
 
 ### Function calls and parameters
+
+- **[verified] A parameter's type moves saved registers, in the callee and in callers.** startUp
+  `fn_800B044C`: `u32 uLen` -> `int nLen` (98.75 -> 100). PGATour `fn_800EF130`: the callee's
+  prototype `fn_800EF0E0(PlayerNumber_t)` -> `(s32)` fixed the CALLER (98.65 -> 100; `int` did not).
+- **[verified] A leftover argument can be an old value still in r4.** GameRound `fn_800E1074`:
+  `fn_800D8D5C(i, 0)` was really `fn_800D8D5C(i)`; the callee sets r4 itself, and the original's r4 = 0
+  was the zero shared by earlier stores (97.85 -> 100). Sign: a `li rX, 0` for an argument the
+  original lacks, and the callee overwriting that register before reading it.
 
 - **[verified] Pass the expression, not the variable just stored.** `p = x + n; f(p);` gives
   `add r30; mr r3, r30`; `p = x + n` used later with the call written `f(x + n)` gives the
@@ -494,6 +524,11 @@ The fixes that come up most often. Each points to its full entry below.
 
 ### Returns, early exits and switch
 
+- **[verified] A dispatch that tests the top case first can mean one more (empty) case.** With cases
+  1 and 3 the compiler splits on a compare with 2; adding `case 4: break;` made it test 3 first,
+  then 1, as the original does (FE_Manager `FE_GetBIOMovieName`, 97.6 -> 100). Check the asm for a
+  compare with the extra value before calling it real; otherwise label it a fake match.
+
 - **[verified] A byte test compiled `cmplwi; beq body; b end` is the last term of an or-chain of
   early exits**, not a switch: `if (a && b || Player_IsCPU(n) || gSession.nSplitScreen) return;`.
   A `(u32)` switch gives the branch shape with `cmpwi`; the or-chain gives the original's
@@ -587,6 +622,10 @@ The fixes that come up most often. Each points to its full entry below.
   in the helper, keeps the wrong registers.
 
 ### Floating point
+
+- **[verified] `x += c` vs `x = x + c` swap the `fadds` operands**, and which one matches differs
+  from function to function (GoGolfCam `GolfCamera_InitGreenZoomToAimCamera` needed `+=`; its
+  `fn_800C1D3C` needed `x = x * c` rather than `*=`). Try both.
 
 - **[verified] `x *= c` vs `x = x * c` on an address-taken array element.** `v[3] *= 2.0f` loads the
   element first; `v[3] = v[3] * 2.0f` loads the constant first, as the original did (GoGolfCam

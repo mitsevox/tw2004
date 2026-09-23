@@ -212,7 +212,7 @@ LAYOUT_ASSERT(SwingData, 0x634);
 // fills it in), and a player's totals (Player.money), which fn_800D3548 adds it to field by field.
 typedef struct CourseMoneyTracking {
     s32  n0;                    // 0x00  the payout
-    u8   unk4[4];
+    s32  n4;                    // 0x04  a PGA TOUR tournament's prize money (GameModeDriverPGATour)
     s32  n8;                    // 0x08  bonuses won (GameMode5 EndGame)
     s32  nC;                    // 0x0C  a ladder event's prize (GameMode4 EndGame)
     s32  n10;                   // 0x10  n24 minus the last match prize (GameModeMatch EndGame)
@@ -593,6 +593,7 @@ typedef struct GameState {
     s32  n290;                  // 0x290
     s32  n294;                  // 0x294
 } GameState;
+LAYOUT_ASSERT(GameState, 0x298);
 
 // An authored aim point. pDef points at its position and the up-to-ten other points a golfer
 // standing in its zone may aim at; the bytes are filters and requirements (negative = at most).

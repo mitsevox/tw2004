@@ -9,8 +9,8 @@
 #include "engine.h"
 #include "camera.h"
 
-void*    fn_80008370(void* pCamera);
-void     fn_80045470(void* pLens, f32 fFov);
+CamLens* fn_80008370(void* pCamera);                    // the render camera's lens
+void     fn_80045470(CamLens* pLens, f32 fFov);
 void     fn_800352BC(void);
 void     fn_80035240(int a);
 void     CameraScript_RecordCurrentCam(CamShot* pShot, void* pCam, void* pSub, int nPlayer, void* pScript,
@@ -48,7 +48,7 @@ u8       fn_8004562C(CamShot* pShot);                   // the shot's bAC is 0, 
 int      fn_800636EC(void);
 void     fn_8000A194(f32 (*m)[4], f32 a, f32 b, f32 c);  // a rotation matrix from three angles
 void     fn_800BADB4(f32 (*m)[4], f32* pIn, f32* pOut);  // a vector through a matrix
-f32      fn_80014278(void* pLens);                      // the lens's field of view
+f32      fn_80014278(CamLens* pLens);                   // the lens's field of view
 void     fn_800B5918(f32* pSrc, f32* pDst);             // copy three floats
 void     fn_800636B4(int nPlayer);
 void     fn_800C4AB0(f32* pFrom, f32* pTo, f32* pOut);
@@ -58,9 +58,11 @@ TNetwork* fn_80069498(void);                            // the course's boundary
 // The segment crosses the outline (at pHit).
 u8       fn_8000C3C8(f32* pFrom, f32* pTo, TNetwork* pNet, s32 nNodes, f32* pHit);
 u8       fn_8004B6F8(f32* pFrom, f32* pTo, f32* pHit);
-f32      fn_8001EFFC(u8* pLens);
+f32      fn_8001EFFC(u8* pLens);                        // the lens's fB0 (char.c: its parameter is u8*)
 void     fn_80038054(u8 a, int n, f32 f1, f32 f2);
-u8       CamScript_KeepAboveGround(int nPlayer, f32* pNew, f32* pOld, int a, void* p1, void* p2, void* p3,
+// Keep pNew above the ground (by fClearance); the out values are optional (NULL): two flags and a
+// float.
+u8       CamScript_KeepAboveGround(int nPlayer, f32* pNew, f32* pOld, int a, u8* pb1, f32* pf, u8* pb2,
                                    f32 fClearance);
 CamShot* fn_80064F7C(int nPlayer, int nKind, int a, CamShot* pShot);
 u8       fn_8003C9D0(int nPlayer, int a, CamSequence** ppSeq, CamShot** ppShot);
@@ -72,6 +74,18 @@ f32      fn_80009614(f32 x);                            // arc cosine
 void     fn_8000AE28(f32* pIn, f32 f, f32* pOut);       // scale a vector
 void     fn_8000923C(f32* pRot, f32* pQuat);            // a rotation vector (axis * angle) as a quaternion
 void     fn_800090E4(f32* pQuat, f32* pIn, f32* pOut);  // rotate a vector by a quaternion
+f32      fn_8005C280(int nPlayer);                      // Swing.c: the swing's fNonPowerShotPower
+void     Swing_RumbleOff(int nPlayer);                  // Swing.c
+u8       fn_8006BEA4(void);                             // the GameBreaker letterbox is up, scripted
+void     fn_800A68C0(u8 nPlayer);
+u8       CameraScript_IsDefaultSwingCam(CamShot* pShot, int nPlayer, f32* pCam);
+u8       fn_8003D7A0(CamSequence* pSequence, int nPlayer);
+void     fn_8001966C(Character* pChar);                 // char.c
+void     fn_8007325C(u8* pAnim);                        // set bit 2 of the animation player's flags
+u8       fn_800C43C0(View* pView, int nPlayer);
+u8       fn_800C44F4(View* pView, int nPlayer);
+void     fn_800C4FF0(View* pView, f32* pFrom, f32* pTo, int nPlayer);
+void     fn_800C56B4(View* pView, f32* pFrom, f32* pTo, int nPlayer);
 u8       Ter_CheckForGroundCollision(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
                                      SurfaceType** ppSurface, TerObject** ppObj);
 
@@ -214,6 +228,98 @@ void GolfCamera_InitZoomToAimCamera(View* pView, int nPlayer) {
     EVENT_Trigger(nPlayer, 0x30, NULL, -1);
 }
 
+// The zoom-to-aim camera on the green: as GolfCamera_InitZoomToAimCamera, but the height is the
+// tuning's f168 over the pin or the ground under the camera, whichever is higher (0.5 more over
+// anything but green, fringe or cup, at most 1 under the camera when it is more than 5 over), and
+// the view's v20 is set from the lens.
+void GolfCamera_InitGreenZoomToAimCamera(View* pView, int nPlayer) {
+    f32 vAim[4];
+    f32 vDir[4];
+    f32 v[4];
+    f32 vNormalHigh[4];
+    f32 vNormalLow[4];
+    SurfaceType* pSurfaceLow;
+    SurfaceType* pSurfaceHigh;
+    f32 fLow;
+    f32 fHigh;
+    CamShot* pShot;
+    f32 fGround;
+    f32 fTop;
+    CourseInfo* pCourse;
+    f32* pCam;
+    f32* pSub;
+    pCam = fn_8001731C(pView);
+    pSub = fn_80017314(pView);
+    pCourse = fn_8000C594();
+    if (pCourse != NULL) {
+        Vec_Copy(gPlayers[nPlayer].vTargetCopy, vAim);
+        Ter_GetEnclosingGroundData(fn_8000C594(), pCam, &fLow, &pSurfaceLow, vNormalLow, &fHigh,
+                                   &pSurfaceHigh, vNormalHigh);
+        if (fLow < -60000.0f) {
+            if (!(fHigh < -60000.0f)) {
+                fGround = fHigh;
+                if (pSurfaceHigh != NULL && pSurfaceHigh->nClass != 3 && pSurfaceHigh->nClass != 4
+                    && pSurfaceHigh->nClass != 12 && pSurfaceHigh->nClass != 18) {
+                    fGround += 0.5f;
+                }
+            } else {
+                fGround = 0.0f;
+            }
+        } else {
+            fGround = fLow;
+            if (pSurfaceLow != NULL && pSurfaceLow->nClass != 3 && pSurfaceLow->nClass != 4
+                && pSurfaceLow->nClass != 12 && pSurfaceLow->nClass != 18) {
+                fGround += 0.5f;
+            }
+        }
+        if (pCam[1] - fGround > 5.0f) {
+            fGround = pCam[1] - 1.0f;
+        }
+        if (pView->p130 != NULL) {
+            for (pShot = pView->p130; pShot->p40 != NULL; pShot = pShot->p40) {
+                if (pShot->p40->bAB == 6 || pShot->p40->bAB == 8 || pShot->p40->bAB == 9
+                    || pShot->p40->bAB == 10) {
+                    break;
+                }
+            }
+            pView->shot19C.f74 = pShot->f74;
+            pView->shot19C.f70 = 0.0f;
+            if (pShot->bAF == 0x15 || pShot->bB0 == 0x15) {
+                pView->shot19C.f64 = pShot->f60;
+                pView->shot19C.f60 = -pShot->f64;
+            } else {
+                pView->shot19C.f60 = pShot->f60;
+                pView->shot19C.f64 = pShot->f64;
+            }
+        } else {
+            pView->shot19C.f74 = 0.0f;
+            pView->shot19C.f70 = 0.0f;
+            pView->shot19C.f60 = 0.0f;
+            pView->shot19C.f64 = 0.0f;
+        }
+        fTop = pCourse->pin[Game_CurrentPinSet()].y;
+        if (fTop <= fGround) {
+            fTop = fGround;
+        }
+        pView->shot19C.f68 = lbl_80281F78->f168 + fTop;
+        Vec3Copy(pCam, pView->shot19C.v30);
+        pView->p130 = NULL;
+        pView->f18C = -1.0f;
+        pView->f190 = 100000000.0f;
+        if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_SHOT_SETUP) {
+            fn_800C73DC(pSub, pCam, vDir);
+            if (vDir[0] != 0.0f || vDir[1] != 0.0f || vDir[2] != 0.0f) {
+                fn_800BAF04(vDir, vDir);
+            }
+            fn_800C73DC(vAim, pCam, v);
+            fn_8001EF34(vDir, fn_80009680(fn_80009744(v)), vDir);
+            fn_800C73B8(pCam, vDir, pSub);
+        }
+        EVENT_Trigger(nPlayer, 0x30, NULL, -1);
+        Vec3Copy(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[0]))->v4, pView->v20);
+    }
+}
+
 void GolfCamera_InitSteepSlopeCamera(View* pView, int nPlayer) {
     if (pView->p130 != NULL) {
         GolfCamera_ComputeSteepSlopeCamVectors(pView, nPlayer);
@@ -265,6 +371,136 @@ void fn_800BF110(View* pView, int nPlayer) {
     pView->n194 = 0;
     pView->p74 = NULL;
     pView->p130 = NULL;
+}
+
+// Camera 8: 10 back and up at 20 degrees from the ball's placement spot along its heading (fA88),
+// over the ground there, which it follows smoothly; it looks at the placement spot.
+void fn_800BF184(View* pView, int nPlayer) {
+    f32 vOld[4];
+    f32 v[4];
+    f32 vHit[4];
+    f32 vNormal[4];
+    SurfaceType* pSurfaceAt;
+    f32 fAbove;
+    SurfaceType* pSurface;
+    TerObject* pObj;
+    f32* pCam;
+    f32* pSub;
+    CourseInfo* pCourse;
+    int nPinSet;
+    f32 fGround;
+    f32 fUp;
+    f32 fBack;
+    f32 fSin;
+    f32 fCos;
+    f32 fX;
+    f32 fZ;
+    pCam = fn_8001731C(pView);
+    pSub = fn_80017314(pView);
+    pCourse = fn_8000C594();
+    if (pCourse != NULL) {
+        Vec3Copy(pCam, vOld);
+        nPinSet = Game_CurrentPinSet();
+        if (gSession.nPaused == 0) {
+            fn_8003F2E0(&pView->script, gSession.fFrameTime);
+            pView->f114 += gSession.fFrameTime;
+        }
+        if (gSession.fFrameTime != 0.0f) {
+            fUp = fn_800095F0(DEG(20.0f));
+            fBack = fn_80009638(DEG(20.0f));
+            fUp *= 10.0f;
+            fBack *= 10.0f;
+            fSin = fn_800095F0(gPlayers[nPlayer].fA88);
+            fCos = fn_80009638(gPlayers[nPlayer].fA88);
+            fX = fBack * -fSin;
+            fZ = fBack * fCos;
+            pCam[0] = fX + gPlayers[nPlayer].vPlacement[0];
+            pCam[2] = fZ + gPlayers[nPlayer].vPlacement[2];
+            fGround = Terrain_HeightAt(pCam, &pSurfaceAt);
+            if (fGround < -60000.0f) {
+                fGround = gPlayers[nPlayer].vPlacement[1];
+            }
+            if (pView->n194 == 0) {
+                pView->f15C = fGround;
+            } else if (gPlayers[nPlayer].uFlagsEF0 & 1) {
+                if (pView->f15C > gPlayers[nPlayer].vPlacement[1]) {
+                    if (gPlayers[nPlayer].vPlacement[1] > fGround) {
+                        pView->f15C = gPlayers[nPlayer].vPlacement[1];
+                    } else {
+                        pView->f15C = fGround;
+                    }
+                } else if (pView->f15C < gPlayers[nPlayer].vPlacement[1]) {
+                    if (gPlayers[nPlayer].vPlacement[1] > fGround) {
+                        pView->f15C = gPlayers[nPlayer].vPlacement[1];
+                    } else {
+                        pView->f15C = fGround;
+                    }
+                }
+                fGround = pView->f15C;
+            } else {
+                if (pView->f15C < gPlayers[nPlayer].vPlacement[1]) {
+                    if (pView->f15C < pCourse->tee[gSession.nTeeSet[nPlayer]].y + 0.1f
+                        || pView->f15C < pCourse->pin[nPinSet].y + 0.1f) {
+                        if (pView->f15C > fGround) {
+                            fGround = 0.1f + pView->f15C;
+                        }
+                        pView->f15C = fGround;
+                    }
+                } else {
+                    if (pView->f15C > pCourse->tee[gSession.nTeeSet[nPlayer]].y - 0.1f
+                        || pView->f15C > pCourse->pin[nPinSet].y - 0.1f) {
+                        if (pView->f15C > fGround) {
+                            fGround = pView->f15C - 0.1f;
+                        }
+                        pView->f15C = fGround;
+                    }
+                }
+                fGround = pView->f15C;
+            }
+            if (fGround < -60000.0f) {
+                fGround = 0.0f;
+            }
+            if (pView->n194 != 0) {
+                fUp += fGround;
+                v[0] = pCam[0];
+                v[2] = pCam[2];
+                v[1] = fUp;
+                if (fUp > pCam[1]) {
+                    if (Ter_CheckForGroundCollision(pCourse, v, pCam, vHit, vNormal, &pSurface, &pObj)) {
+                        pCam[1] = fUp;
+                        pView->f15C = fGround;
+                    } else {
+                        pCam[1] += (1.0f - lbl_80281F78->f98) * (fUp - pCam[1]);
+                    }
+                } else {
+                    pCam[1] += (1.0f - lbl_80281F78->f98) * (fUp - pCam[1]);
+                }
+            } else {
+                pCam[1] = fUp + fGround;
+            }
+            if (pView->n194 != 0) {
+                CamScript_KeepAboveGround(nPlayer, pCam, vOld, 1, NULL, &fAbove, NULL,
+                                          0.2f + lbl_80281F78->f168);
+            }
+            pSub[0] = gPlayers[nPlayer].vPlacement[0];
+            pSub[2] = gPlayers[nPlayer].vPlacement[2];
+            fGround = gPlayers[nPlayer].vPlacement[1];
+            if (fGround < -60000.0f) {
+                fGround = 0.0f;
+            }
+            if (pView->n194 != 0) {
+                pSub[1] += (1.0f - lbl_80281F78->f98) * (fGround - pSub[1]);
+                if (pCam[1] - pSub[1] > 5.0f) {
+                    pSub[1] = pCam[1] - 5.0f;
+                }
+            } else {
+                pSub[1] = fGround;
+            }
+            if (pView->n194 == 0) {
+                pView->n194 = 1;
+            }
+        }
+    }
 }
 
 // Camera 9: the same as camera 8.
@@ -841,6 +1077,112 @@ void fn_800C1D3C(View* pView, int nPlayer) {
     }
 }
 
+// The ball-flight camera: pick the flight sequence (the pre-flight sequence's follow-on if it has
+// one, else one for the shot's lie, surface class and distance), fall back on the current camera as
+// a hand-made shot, and start the matrix camera or the super zoom when the swing camera asks.
+void GolfCamera_InitBallFlightCamera(View* pView, int nPlayer) {
+    f32 vAim[4];
+    f32 vDiff[4];
+    f32* pCam;
+    f32* pSub;
+    int nClass;
+    int nLie;
+    f32 fDist;
+    CamSequence* pSeq;
+    pCam = fn_8001731C(pView);
+    pSub = fn_80017314(pView);
+    pView->b153 = 0;
+    nLie = gPlayers[nPlayer].ball.nLie;
+    if (gSession.bReplay && gPlayers[nPlayer].ballBefore.nState == 0) {
+        // a replay whose look-ahead ball has stopped: the distance that ball went
+        if (gPlayers[nPlayer].ballBefore.nSurface >= 0) {
+            nClass = gSurfaceTypes[gPlayers[nPlayer].ballBefore.nSurface].nClass;
+        } else {
+            nClass = 10;
+        }
+        fn_800C73DC(gPlayers[nPlayer].ballBefore.vPos, gPlayers[nPlayer].ball.vStart, vDiff);
+        fDist = fn_80009680(fn_80009744(vDiff));
+    } else {
+        fDist = AI_MaxDistance(nPlayer, gPlayers[nPlayer].nShotKind, gPlayers[nPlayer].nClub);
+        fDist *= fn_800510EC(&gPlayers[nPlayer].ball);
+        fDist *= fn_8005B64C(nPlayer);
+        nClass = 2;
+        fn_800C73DC(gPlayers[nPlayer].vTarget, gPlayers[nPlayer].vBall, vAim);
+        fn_800BAF04(vAim, vAim);
+        fn_8001EF34(vAim, fDist, vAim);
+        fn_800C73B8(vAim, gPlayers[nPlayer].vBall, pView->vD4);
+    }
+    if (pView->p74 != NULL && pView->p74->b44 == 3 && pView->p74->p20 != pView->p74 && pView->p74->p20 != NULL
+        && pView->p74->p20->b44 == 4 && fn_8003D7A0(pView->p74->p20, nPlayer)) {
+        pView->p74 = pView->p74->p20;
+    } else {
+        pView->p74 = fn_8003BDBC(nPlayer, nLie, nClass, 4, 1, fDist);
+    }
+    if (gPlayers[nPlayer].nShotKind == 5 && (pView->p74 == NULL || pView->p74->b46 != 6)) {
+        pSeq = fn_8003BDBC(nPlayer, nLie, nClass, 4, 0, fDist);
+        if (pSeq != NULL && pSeq->b46 == 6) {
+            pView->p74 = pSeq;
+        }
+    }
+    if (pView->p74 == NULL) {
+        CameraScript_RecordCurrentCam(&pView->shot19C, pCam, pSub, nPlayer, &pView->script, 0);
+        pView->p130 = &pView->shot19C;
+        pView->p134 = NULL;
+        pView->fCamTime = 0.0f;
+        pView->p130->f98 = 0.0f;
+    }
+    if (pView->p130 != NULL && pView->p134 != NULL && pView->n140 == 6) {
+        pView->n140 = 0;
+        pView->fCamTime = 0.0f;
+        pView->b150 = 1;
+    } else if (pView->p130 != NULL && pView->p134 != NULL && pView->n140 == 8) {
+        pView->n140 = 2;
+        pView->fCamTime = 0.0f;
+        pView->b150 = 1;
+    } else if (pView->p134 == NULL) {
+        if (fn_800C44A8(pView, nPlayer)) {
+            CameraScript_RecordCurrentCam(&pView->shot19C, pCam, pSub, nPlayer, &pView->script, 0);
+            pView->shot19C.p44 = pView->p130;
+            pView->p130 = &pView->shot19C;
+            pView->fCamTime = 0.0f;
+            pView->p130->f4C = -1.0f;
+            pView->p134 = NULL;
+        } else {
+            CameraScript_RecordCurrentCam(&pView->shot19C, pCam, pSub, nPlayer, &pView->script, 0);
+            pView->shot19C.p44 = pView->p130;
+            pView->p130 = &pView->shot19C;
+            pView->fCamTime = 0.0f;
+            if (pView->p74 != NULL) {
+                pView->p130->f4C = pView->p74->f38;
+            } else {
+                pView->p130->f4C = 1.0f;
+            }
+            pView->p134 = NULL;
+        }
+    }
+    pView->p13C = NULL;
+    if (fn_800C43C0(pView, nPlayer)) {
+        lbl_80282220->b54 = 1;
+        fn_8001966C(gPlayers[nPlayer].pChar);
+        fn_8007325C(gPlayers[nPlayer].pChar->anim);
+        fn_800C4FF0(pView, pCam, pSub, nPlayer);
+        pView->f18C = 0.0f;
+        EVENT_Trigger(nPlayer, 0x32, NULL, -1);
+    } else if (fn_800C44F4(pView, nPlayer)) {
+        lbl_80282220->b58 = 1;
+        fn_8007325C(gPlayers[nPlayer].pChar->anim);
+        fn_800C56B4(pView, pCam, pSub, nPlayer);
+        EVENT_Trigger(nPlayer, 0x39, NULL, -1);
+    } else if (pView->n260 == 15 || pView->n260 == 16) {
+        pView->p130->f4C = 1.0f;
+    }
+    pView->n148 = 0;
+    pView->n14C = 9;
+    if (pView->nCamera != 0 && pView->nCamera != 2) {
+        pView->nCamera = 0;
+    }
+}
+
 // Camera 15, the post-shot camera: the crowd flyby, else shot 0x40 of the plan or shot 5 of the
 // sequence. For a ball that ended near the green (lies 6..8, or kind 10 asked for) only after fB8.
 void GolfCamera_InitPostShotCamera(View* pView, int nPlayer) {
@@ -1320,7 +1662,7 @@ u8 fn_800C3FC0(View* pView, int nPlayer, f32* pSub, f32* pAim, f32* pCam) {
     } else {
         fBack = lbl_80281F78->f38;
     }
-    fBack *= 1.0f / fn_8001EFFC(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[0])));
+    fBack *= 1.0f / fn_8001EFFC((u8*)fn_80008370(fn_80017004(gPlayers[nPlayer].nView[0])));
     if (fBack + lbl_80281F78->fC > fDist && gPlayers[nPlayer].nShotKind != 0) {
         if (fBack > fDist) {
             fBack = lbl_80281F78->f10 * fDist;
@@ -1701,6 +2043,136 @@ void fn_800C4E80(View* pView, int nPlayer) {
             }
         }
     }
+}
+
+// The matrix camera: two hand-made "MATRIX CAM" shots in the shared state, both looking at pTo, one
+// from pFrom and one from the far side of pTo at pFrom's height (shot 0x22 of the player's camera
+// plan instead, if it has one). The lens zooms to the view's field of view less the letterbox's
+// change. Swing camera kind 6 starts on the far side; kinds other than 1 and 6 hold the first shot
+// twice as long, with blend mode 7.
+void fn_800C4FF0(View* pView, f32* pFrom, f32* pTo, int nPlayer) {
+    f32 v[4];
+    f32 vFrom[4];
+    char szName[] = "MATRIX CAM";
+    f32 fChange;
+    CamShot* pShot;
+    int nOrder;
+    Vec_Copy(pFrom, vFrom);
+    fn_800C73DC(pTo, vFrom, v);
+    v[1] = 0.0f;
+    fn_800C73B8(pTo, v, v);
+    v[1] = vFrom[1];
+    fn_80005AE8(&lbl_80282220->shot6C, 0, sizeof(CamShot) * 2);
+    strcpy(lbl_80282220->shot6C.szName, szName);
+    Vec3Copy(vFrom, lbl_80282220->shot6C.v20);
+    Vec3Copy(pTo, lbl_80282220->shot6C.v30);
+    lbl_80282220->shot6C.p40 = NULL;
+    lbl_80282220->shot6C.f60 = 0.0f;
+    lbl_80282220->shot6C.f64 = 0.0f;
+    lbl_80282220->shot6C.f70 = 0.0f;
+    lbl_80282220->shot6C.f74 = 0.0f;
+    lbl_80282220->shot6C.f68 = 0.2f;
+    lbl_80282220->shot6C.f6C = 20.0f;
+    fChange = fn_800DC3A4();
+    lbl_80282220->shot6C.f78 =
+        fn_80014278(fn_80008370(fn_80016CFC(gPlayers[nPlayer].nView[0])->pCamera)) - fChange;
+    lbl_80282220->shot6C.f7C = lbl_80282220->shot6C.f78;
+    lbl_80282220->shot6C.f80 = 0.0f;
+    lbl_80282220->shot6C.f4C = 1.0f;
+    lbl_80282220->shot6C.f9C = 0.0f;
+    lbl_80282220->shot6C.f84 = 0.0f;
+    lbl_80282220->shot6C.bA8 = 0;
+    lbl_80282220->shot6C.bAA = 1;
+    lbl_80282220->shot6C.bAC = 0x18;
+    lbl_80282220->shot6C.bB1 = 9;
+    lbl_80282220->shot6C.bB2 = 0;
+    lbl_80282220->shot6C.bAD = 3;
+    lbl_80282220->shot6C.p44 = pView->p130;
+    lbl_80282220->shot6C.f8C = 0.0f;
+    pShot = fn_8003A7C8(nPlayer, 0x22, NULL);
+    if (pShot != NULL) {
+        Mem_cpy(&lbl_80282220->shot12C, pShot, sizeof(CamShot));
+        lbl_80282220->shot12C.p40 = NULL;
+        lbl_80282220->shot12C.p44 = pView->p130;
+        lbl_80282220->shot12C.bAD = 3;
+        lbl_80282220->shot12C.f8C = 0.0f;
+        lbl_80282220->shot12C.f4C = 1.0f;
+    } else {
+        strcpy(lbl_80282220->shot12C.szName, szName);
+        Vec3Copy(v, lbl_80282220->shot12C.v20);
+        Vec3Copy(pTo, lbl_80282220->shot12C.v30);
+        lbl_80282220->shot12C.p40 = NULL;
+        lbl_80282220->shot12C.f60 = 0.0f;
+        lbl_80282220->shot12C.f64 = 0.0f;
+        lbl_80282220->shot12C.f70 = 0.0f;
+        lbl_80282220->shot12C.f74 = 0.0f;
+        lbl_80282220->shot12C.f68 = 0.2f;
+        lbl_80282220->shot12C.f6C = 20.0f;
+        lbl_80282220->shot12C.f78 = lbl_80282220->shot6C.f78;
+        lbl_80282220->shot12C.f7C = lbl_80282220->shot12C.f78;
+        lbl_80282220->shot12C.f80 = 0.0f;
+        lbl_80282220->shot12C.f4C = 1.0f;
+        lbl_80282220->shot12C.f9C = 0.0f;
+        lbl_80282220->shot12C.f84 = 0.0f;
+        lbl_80282220->shot12C.bA8 = 0;
+        lbl_80282220->shot12C.bAA = 1;
+        lbl_80282220->shot12C.bAC = 0x18;
+        lbl_80282220->shot12C.bB1 = 9;
+        lbl_80282220->shot12C.bB2 = 0;
+        lbl_80282220->shot12C.bAD = 3;
+        lbl_80282220->shot12C.p44 = pView->p130;
+        lbl_80282220->shot12C.f8C = 0.0f;
+    }
+    switch (pView->n260) {
+    case 1:
+        nOrder = 0;
+        break;
+    case 6:
+        nOrder = 1;
+        break;
+    case 10:
+    default:
+        nOrder = 2;
+        break;
+    }
+    if (nOrder == 0) {
+        pView->p130 = &lbl_80282220->shot6C;
+        pView->p134 = &lbl_80282220->shot12C;
+        pView->f110 = lbl_80281F78->f5C;
+        pView->n140 = 2;
+        if (fn_800453C8(nPlayer, NULL)) {
+            pView->n154 = 2;
+        } else {
+            pView->n154 = 1;
+        }
+    } else if (nOrder == 1) {
+        pView->p130 = &lbl_80282220->shot12C;
+        pView->p134 = &lbl_80282220->shot6C;
+        pView->f110 = lbl_80281F78->f5C;
+        pView->n140 = 2;
+        if (fn_800453C8(nPlayer, NULL)) {
+            pView->n154 = 1;
+        } else {
+            pView->n154 = 1;
+        }
+    } else {
+        pView->p130 = &lbl_80282220->shot6C;
+        pView->p134 = &lbl_80282220->shot12C;
+        pView->n140 = 7;
+        pView->f110 = 2.0f * lbl_80281F78->f5C;
+        if (fn_800453C8(nPlayer, NULL)) {
+            pView->n154 = 2;
+        } else {
+            pView->n154 = 1;
+        }
+    }
+    pView->fCamTime = 0.00001f;
+    if (pView->p74 != NULL) {
+        pView->p134->f4C = pView->p74->f38;
+    } else {
+        pView->p134->f4C = 0.5f;
+    }
+    pView->p134->f4C = 1.0f;    // f4C is set just above; the original overwrites it
 }
 
 // Camera 13's tick: with no next shot, clear b54 (a freeze-time flag: fn_800C6D9C tests it) and
@@ -2104,6 +2576,105 @@ void GolfCamera_CutToGolferDoneAnimatingCam(View* pView, int nPlayer) {
 
 u8 fn_800C6604(View* pView) {
     return pView->n198 > 0;
+}
+
+// Pick the swing camera kind (View.n260; 0 is none) for the shot about to be hit. Two-player
+// sessions with both flags 0x4000 and 0x8000 set use kind 2 for player 0 and kind 11 for player 1
+// on the tee. Otherwise only a shot of kind 1, not from the lies 6..8, with a short club (8 or
+// under) unless on the tee, and powered at least the tuning's f9C gets one: kind 11 above fB4 with
+// a short club, else, by chance, the player's next kind in turn (1..11), more likely the harder
+// the shot; kind 11 falls back to 1 off the tee or with a long club. A scripted GameBreaker makes
+// it kind 7 half the time.
+void fn_800C6618(View* pView, int nPlayer) {
+    u8 bSwingCam = 0;
+    int bShortClub;     // fake match: int, tested as (u8); a u8 local truncates it where it is set
+    f32* pCam;
+    f32 fPower;
+    pCam = fn_8001731C(pView);
+    if ((gSession.uFlags & 0x4000) && (gSession.uFlags & 0x8000)) {
+        if (nPlayer == 0 && gPlayers[nPlayer].ball.nLie == 0) {
+            pView->n260 = 2;
+            Swing_RumbleOff(nPlayer);
+            fn_800A68C0(nPlayer);
+            return;
+        }
+        if (nPlayer == 1 && gPlayers[nPlayer].ball.nLie == 0) {
+            pView->n260 = 11;
+            Swing_RumbleOff(nPlayer);
+            fn_800A68C0(nPlayer);
+            return;
+        }
+        pView->n260 = 0;
+        return;
+    }
+    fPower = fn_8005C280(nPlayer);
+    bShortClub = gPlayers[nPlayer].nClub <= 8;
+    if (gSession.nSplitScreen) {
+        bSwingCam = 0;
+    } else if (gSession.bReplay) {
+        bSwingCam = 0;
+    } else if (!gpGame->b28A) {
+        bSwingCam = 0;
+    } else if (gPlayers[nPlayer].ball.nLie != 0 && gPlayers[nPlayer].nClub > 8) {
+        bSwingCam = 0;
+    } else if (gPlayers[nPlayer].ball.nLie == 6 || gPlayers[nPlayer].ball.nLie == 7
+               || gPlayers[nPlayer].ball.nLie == 8) {
+        bSwingCam = 0;
+    } else if (gPlayers[nPlayer].nShotKind != 1) {
+        bSwingCam = 0;
+    } else if (!CameraScript_IsDefaultSwingCam(pView->p130, nPlayer, pCam) && Player_IsCPU(nPlayer)
+               && (lbl_80282220->n1EC[nPlayer] == 1 || lbl_80282220->n1EC[nPlayer] == 6
+                   || lbl_80282220->n1EC[nPlayer] == 10 || lbl_80282220->n1EC[nPlayer] == 11)) {
+        bSwingCam = 0;
+    } else if (fPower >= lbl_80281F78->f9C) {
+        bSwingCam = 1;
+    }
+    if (bSwingCam) {
+        if (fPower > lbl_80281F78->fB4 && (u8)bShortClub) {
+            pView->n260 = 11;
+        } else if (fPower > lbl_80281F78->fA4) {
+            if ((f32)(s32)(Rand_Next(1) % 100) < lbl_80281F78->fB0) {
+                pView->n260 = lbl_80282220->n1EC[nPlayer];
+                lbl_80282220->n1EC[nPlayer]++;
+                if (lbl_80282220->n1EC[nPlayer] >= 12) {
+                    lbl_80282220->n1EC[nPlayer] = 1;
+                }
+            }
+        } else if (fPower > lbl_80281F78->fA0) {
+            if ((f32)(s32)(Rand_Next(1) % 100) < lbl_80281F78->fAC) {
+                pView->n260 = lbl_80282220->n1EC[nPlayer];
+                lbl_80282220->n1EC[nPlayer]++;
+                if (lbl_80282220->n1EC[nPlayer] >= 12) {
+                    lbl_80282220->n1EC[nPlayer] = 1;
+                }
+            }
+        } else if (fPower > lbl_80281F78->f9C) {
+            if ((f32)(s32)(Rand_Next(1) % 100) < lbl_80281F78->fA8) {
+                pView->n260 = lbl_80282220->n1EC[nPlayer];
+                lbl_80282220->n1EC[nPlayer]++;
+                if (lbl_80282220->n1EC[nPlayer] >= 12) {
+                    lbl_80282220->n1EC[nPlayer] = 1;
+                }
+            }
+        }
+        if (pView->n260 == 11 && (gPlayers[nPlayer].ball.nLie != 0 || !(u8)bShortClub)) {
+            pView->n260 = 1;
+            lbl_80282220->n1EC[nPlayer] = 2;
+        }
+        if (fn_8006BEA4() && Rand_Next(1) % 100 > 50) {
+            pView->n260 = 7;
+            lbl_80282220->n1EC[nPlayer] = 8;
+            if (lbl_80282220->n1EC[nPlayer] >= 12) {
+                lbl_80282220->n1EC[nPlayer] = 1;
+            }
+        }
+        if (pView->n260 != 0) {
+            Swing_RumbleOff(nPlayer);
+            fn_800A68C0(nPlayer);
+        }
+    } else {
+        pView->n260 = 0;
+    }
 }
 
 int fn_800C6B38(View* pView) {

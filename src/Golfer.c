@@ -8,6 +8,7 @@
 #include "game.h"
 #include "engine.h"
 #include "game/save.h"
+#include "frontend/fe.h"
 
 // fake match: the (s8) on GOLFERSTATE_GetCurrentState (see game.h).
 
@@ -1822,7 +1823,6 @@ extern char gszEmpty[];             // 0x802810B8
 extern char lbl_80187650[];         // "cl_bbsd" ... the default name at +0x1A
 
 void fn_800CB700(char* pDst, char* pSrc);       // string copy
-u8   fn_80077B18(void);
 
 // Options_SetDefaults(): the defaults, then the debug "all 105" variant when session flag
 // 0x4000 is set.
@@ -1952,7 +1952,7 @@ void Session_SetupProfiles(void) {
             fn_800CB700(pProf->szNames[0], lbl_80187650 + 0x1A);
             pProf->n2        = 0;
             pProf->nBallType = 0;
-        } else if (fn_80077B18()) {
+        } else if (fn_80077B18(nGolfer)) {
             pProf->n2        = 0;
             pProf->nBallType = 0;
         } else {
