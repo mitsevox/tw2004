@@ -207,11 +207,24 @@ LAYOUT_ASSERT(Ball, 0xBC);
 
 // ---- the terrain ----------------------------------------------------------------------------
 
-// A closed outline on the course (TW06: TNetwork, 0x14 bytes): the free-drop areas and the
-// in-bounds outlines. Only the header is read so far.
+// A node of a TNetwork outline (0x30 bytes). Each names its two neighbours; the outline is
+// walked from node 0 by taking the neighbour it did not come from.
+typedef struct TNetNode {
+    f32  vPos[3];               // 0x00
+    u8   unkC[4];
+    s16  nLink10;               // 0x10  } the two neighbouring nodes
+    s16  nLink12;               // 0x12  }
+    u8   unk14[0x30 - 0x14];
+} TNetNode;
+LAYOUT_ASSERT(TNetNode, 0x30);
+
+// A closed outline on the course (TW06: TNetwork, 0x14 bytes there): the free-drop areas and the
+// in-bounds outlines, from the hole's 'Cnet' stream objects (TerrainData.c). The nodes follow
+// the header (TerrainData.c's walks index them from the network's address).
 typedef struct TNetwork {
     s16  nExportType;           // 0x0  TW06: ExportType
     s16  nNumNodes;             // 0x2  TW06: NumNodes
+    TNetNode aNodes[1];         // 0x4  nNumNodes of them
 } TNetwork;
 
 #define MAX_FREE_DROP_NETWORKS 25
@@ -237,19 +250,6 @@ extern f32       lbl_801D58C8[4][4];  // per player: the last such spot with a p
 extern u8        lbl_80281DC0;        // the cup is real geometry
 extern s32       lbl_80281DC4;        // free-drop networks loaded
 extern s32       lbl_80281DC8;        // out-of-bounds networks loaded
-
-// A node of a TNetwork outline (0x30 bytes). The nodes follow the 4-byte TNetwork header; each
-// names its two neighbours, and the outline is walked from node 0 by taking the neighbour it did
-// not come from.
-typedef struct TNetNode {
-    f32  vPos[3];               // 0x00
-    u8   unkC[4];
-    s16  nLink10;               // 0x10  } the two neighbouring nodes
-    s16  nLink12;               // 0x12  }
-    u8   unk14[0x30 - 0x14];
-} TNetNode;
-LAYOUT_ASSERT(TNetNode, 0x30);
-#define TNET_NODES(pNet) ((TNetNode*)((TNetwork*)(pNet) + 1))
 
 // A handler for the hole's networks ('Cnet' stream objects, TerrainData.c): pfn gets each
 // network whose nExportType is nChunk.

@@ -27,10 +27,13 @@ f32 fn_8000BF20(f32* pPos) {
     f32 v[4];
     CourseInfo* pCourse;
     f32 fHeight;
+    f32 fX = pPos[0];
+    f32 fY = 1.0f / 3.0f + pPos[1];
+    f32 fZ = pPos[2];
 
-    v[0] = pPos[0];
-    v[1] = pPos[1] + 1.0f / 3.0f;
-    v[2] = pPos[2];
+    v[0] = fX;
+    v[1] = fY;
+    v[2] = fZ;
     v[3] = 1.0f;
     pCourse = fn_8000C594();
     if (pCourse != NULL) {
@@ -50,10 +53,9 @@ void fn_8000BF8C(UStreamObject* pObject) {
 // The 'Cnet' handler: keep the object (unless it is already kept), put its nodes on the ground
 // where their height is 0, and hand the network to the loaders of its kind.
 void fn_8000BF9C(UStreamObject* pObject) {
-    u8* pData;
     TNetwork* pNet;
-    TNetNode* pNode;
     int i;
+    TNetNode* pNode;
 
     if (fn_8000B508(pObject)) {
         fn_8000B830(pObject);
@@ -61,18 +63,17 @@ void fn_8000BF9C(UStreamObject* pObject) {
     }
     pObject->pfn8 = fn_8000BF8C;
     fn_8000B4B8(pObject);
-    pData = pObject->pData;
-    pNet = (TNetwork*)(pData + 0xC);
+    pNet = (TNetwork*)(pObject->pData + 0xC);   // after a 12-byte header
     lbl_801A2A40[lbl_80281C10++] = pNet;
-    pNode = TNET_NODES(pNet);
+    pNode = pNet->aNodes;
     for (i = 0; i < pNet->nNumNodes; i++) {
-        if (pNode->vPos[1] == 0.0f) {
+        if (0.0f == pNode->vPos[1]) {
             pNode->vPos[1] = fn_8000BF20(pNode->vPos);
         }
         pNode++;
     }
     for (i = 0; i < lbl_80280DB0; i++) {
-        if (((TNetwork*)(pData + 0xC))->nExportType == lbl_801A2A00[i].nChunk) {
+        if (pNet->nExportType == lbl_801A2A00[i].nChunk) {
             lbl_801A2A00[i].pfn((u8*)pNet);
         }
     }
@@ -100,28 +101,29 @@ void fn_8000C104(void) {
 
 // The winding number of the outline around pPos, in x and z: nonzero when pPos is inside.
 s32 fn_8000C140(f32* pPos, TNetwork* pNet, s32 nNodes) {
-    s32 nWinding = 0;
-    s16 nCur = 0;
-    s16 nPrev = -1;
-    s16 nNext;
     s32 i;
-    TNetNode* pNode;
-    TNetNode* pNext;
+    s32 nWinding = 0;
+    int nCur = 0;
+    int nPrev = -1;
+    int nNext;
+    f32* pA;
+    f32* pB;
 
     for (i = 0; i < nNodes; i++) {
-        pNode = &TNET_NODES(pNet)[nCur];
-        if (nPrev != pNode->nLink10) {
-            nNext = pNode->nLink10;
+        pA = pNet->aNodes[nCur].vPos;
+        if (nPrev != pNet->aNodes[nCur].nLink10) {
+            nNext = pNet->aNodes[nCur].nLink10;
+            pB = pNet->aNodes[nNext].vPos;
         } else {
-            nNext = pNode->nLink12;
+            nNext = pNet->aNodes[nCur].nLink12;
+            pB = pNet->aNodes[nNext].vPos;
         }
-        pNext = &TNET_NODES(pNet)[nNext];
-        if (pNode->vPos[2] <= pPos[2]) {
-            if (pNext->vPos[2] > pPos[2] && fn_8000C244(pNode->vPos, pNext->vPos, pPos) > 0.0f) {
+        if (pA[2] <= pPos[2]) {
+            if (pB[2] > pPos[2] && fn_8000C244(pA, pB, pPos) > 0.0f) {
                 nWinding++;
             }
         } else {
-            if (pNext->vPos[2] <= pPos[2] && fn_8000C244(pNode->vPos, pNext->vPos, pPos) < 0.0f) {
+            if (pB[2] <= pPos[2] && fn_8000C244(pA, pB, pPos) < 0.0f) {
                 nWinding--;
             }
         }
@@ -188,31 +190,34 @@ u8 fn_8000C328(f32* pA, f32* pB, f32* pC, f32* pD) {
 }
 
 u8 fn_8000C3C8(f32* pFrom, f32* pTo, TNetwork* pNet, s32 nNodes, f32* pHit) {
-    f32 fBest = 100000000.0f;
-    s16 nCur = 0;
-    s16 nPrev = -1;
-    s16 nNext;
-    u8 bHit = 0;
     s32 i;
-    TNetNode* pNode;
-    TNetNode* pNext;
+    f32 fBest = 100000000.0f;
+    int nCur = 0;
+    int nPrev = -1;
+    int nNext;
+    u8 bHit = 0;
+    f32* pA;
+    f32* pB;
     f32 v[3];
     f32 fDx;
     f32 fDz;
     f32 fDist;
 
     for (i = 0; i < nNodes; i++) {
-        pNode = &TNET_NODES(pNet)[nCur];
-        if (nPrev != pNode->nLink10) {
-            nNext = pNode->nLink10;
+        pA = pNet->aNodes[nCur].vPos;
+        if (nPrev != pNet->aNodes[nCur].nLink10) {
+            nNext = pNet->aNodes[nCur].nLink10;
+            pB = pNet->aNodes[nNext].vPos;
         } else {
-            nNext = pNode->nLink12;
+            nNext = pNet->aNodes[nCur].nLink12;
+            pB = pNet->aNodes[nNext].vPos;
         }
-        pNext = &TNET_NODES(pNet)[nNext];
-        if (fn_8000C278(pFrom, pTo, pNode->vPos, pNext->vPos, v)) {
+        if (fn_8000C278(pFrom, pTo, pA, pB, v)) {
             fDx = v[0] - pFrom[0];
             fDz = v[2] - pFrom[2];
-            fDist = fn_80009680(fDx * fDx + fDz * fDz);
+            fDist = fDx * fDx;      // fake match: the squares as statements, so they do not fuse
+            fDz = fDz * fDz;
+            fDist = fn_80009680(fDist + fDz);
             bHit = 1;
             if (fDist < fBest) {
                 fBest = fDist;
@@ -227,22 +232,23 @@ u8 fn_8000C3C8(f32* pFrom, f32* pTo, TNetwork* pNet, s32 nNodes, f32* pHit) {
 }
 
 u8 fn_8000C4E0(f32* pFrom, f32* pTo, TNetwork* pNet, s32 nNodes) {
-    s16 nCur = 0;
-    s16 nPrev = -1;
-    s16 nNext;
     s32 i;
-    TNetNode* pNode;
-    TNetNode* pNext;
+    int nCur = 0;
+    int nPrev = -1;
+    int nNext;
+    f32* pA;
+    f32* pB;
 
     for (i = 0; i < nNodes; i++) {
-        pNode = &TNET_NODES(pNet)[nCur];
-        if (nPrev != pNode->nLink10) {
-            nNext = pNode->nLink10;
+        pA = pNet->aNodes[nCur].vPos;
+        if (nPrev != pNet->aNodes[nCur].nLink10) {
+            nNext = pNet->aNodes[nCur].nLink10;
+            pB = pNet->aNodes[nNext].vPos;
         } else {
-            nNext = pNode->nLink12;
+            nNext = pNet->aNodes[nCur].nLink12;
+            pB = pNet->aNodes[nNext].vPos;
         }
-        pNext = &TNET_NODES(pNet)[nNext];
-        if (fn_8000C328(pFrom, pTo, pNode->vPos, pNext->vPos)) {
+        if (fn_8000C328(pFrom, pTo, pA, pB)) {
             return 1;
         }
         nPrev = nCur;
