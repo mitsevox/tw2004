@@ -1840,7 +1840,7 @@ void Session_Init(void) {
         gSession.nGolfer[i]     = 0;
         gSession.nTeeSet[i]     = 2;
         gSession.uBag[i]        = 0;
-        SESSION_PROFILE(i)->unk0 = 0;
+        SESSION_PROFILE(i)->n0 = 0;
         SESSION_PROFILE(i)->unk1 = 0;
         SESSION_PROFILE(i)->unk2 = 0;
         for (j = 0; j < 6; j++) {
