@@ -223,8 +223,9 @@ f32 Swing_TeeSweetSpot(int nPlayer, f32 fPower) {
         fT = -p->swing.fControllerSliceAngle / 1.5707964f;
         if (fT > gpSwing->fKnot1X && fT < gpSwing->fKnot2X) {
             f32 fBonus;
-            fHalf  = 0.5f * (gpSwing->fKnot2X - gpSwing->fKnot1X);
-            fBonus = (1.0f - (f32)fabsf(fHalf - (fT - gpSwing->fKnot1X)) / fHalf) * gpSwing->fTeeBonus;
+            fHalf  = (gpSwing->fKnot2X - gpSwing->fKnot1X) / 2.0f;
+            fBonus = 1.0f - (f32)fabsf(fHalf - (fT - gpSwing->fKnot1X)) / fHalf;
+            fBonus *= gpSwing->fTeeBonus;
             return fPower + fBonus;
         }
     }
@@ -654,7 +655,7 @@ f32 Swing_MeterError(int nPlayer) {
     }
     Vec_Sub(vThrough, vBack, vDiff);
     Vec_Add(vDir, vDiff, vDir);
-    if (0.0f != vDir[2]) {
+    if (vDir[2]) {
         fAngle = fn_8005CC84(vDir[0] / vDir[2]);
     } else {
         fAngle = (PI / 2) * (vDir[0] >= 0.0f ? 1.0f : -1.0f);
@@ -2340,7 +2341,7 @@ void STATEFUNC_FadeToRemoveBallInit(int nPlayer) {
 int   fn_8001707C(int nView);                 // the player a view belongs to
 void GOLFERSTATE_Pop(int nPlayer);
 void  fn_80067710(int nPlayer, int a, int b);
-void  fn_80045494(int a, int nPlayer);
+void  fn_80045494(u8 bOn, int nPlayer);
 void  GameEffects_SetSuperSlowMo(int a, int nPlayer, f32 f);
 void  fn_800C6E14(void);
 extern u8 lbl_80281E13;
@@ -2391,7 +2392,7 @@ void STATEFUNC_ReplaySwingExit(int nPlayer) {
 s8 GOLFERSTATE_GetPreviousState(int nPlayer);               // the state below the top of the stack
 u8    fn_80063C50(void* pView);
 void  fn_80063CBC(void* pView, f32* pVec);
-void  fn_80045558(int a, int nPlayer);
+void  fn_80045558(u8 bOn, int nPlayer);
 void  fn_8006C608(void);
 void fn_80062CE0(u8 a);
 void  fn_800C1790(void* pView, int nPlayer);
@@ -2928,17 +2929,19 @@ extern Vec4 lbl_80183650;
 // set, the launch is made with the controller set to the CPU for the call (so no meter, no
 // error, no luck swap), then it is state 12 with the ball away.
 void STATEFUNC_TapInUpdate(int nPlayer) {
+    int   nController;
     Vec4  vOffset = lbl_80183650;
     View* pV      = (View*)fn_80017028(gPlayers[nPlayer].nView0);
     int   nHandle = gPlayers[nPlayer].nShotHandle;
-    int   nController;
 
     if (fn_80095780(nHandle) != 11) return;
     if (pV->nCurCamera != 0xC) {
         View_SetCamera(pV, 0xC, nPlayer, gPlayers[nPlayer].nView0);
         fn_80063B98(pV, 0.75f, (f32*)&vOffset);
     }
-    if (pV->nCamera == 1 || pV->nCamera == 4 || pV->nCamera == 3) return;
+    if (pV->nCamera == 1) return;
+    if (pV->nCamera == 4) return;
+    if (pV->nCamera == 3) return;
     if (fn_80048574(nHandle, 2)) {
         if (!fn_80062BB0(nHandle, 2)) return;
         fn_80062B98(nHandle, 2);
