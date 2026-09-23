@@ -153,3 +153,55 @@ f32 fn_8001418C(u8* p) {
 }
 
 // ---- end of sweep code ----
+
+// ---- sweep code (not yet cleaned up) ----
+
+extern u8* lbl_80280E08;
+void fn_8001425C(s32 v);
+f32 fn_80014268(u8* p);
+f32 fn_80014270(u8* p);
+f32 fn_80014278(u8* p);
+double tan();
+f32 fn_80014280(f32 x0);
+extern u8 lbl_80281C98;
+void fn_800142A4(u8 v);
+s32 fn_800131C4(s32);
+void fn_8001437C(void);
+
+void fn_8001425C(s32 v) {
+    *(s32*)(lbl_80280E08 + 0xD0) = v;
+}
+
+f32 fn_80014268(u8* p) {
+    return *(f32*)(p + 0xAC);
+}
+
+f32 fn_80014270(u8* p) {
+    return *(f32*)(p + 0xA8);
+}
+
+f32 fn_80014278(u8* p) {
+    return *(f32*)(p + 0xA4);
+}
+
+f32 fn_80014280(f32 x0) {
+    f32 t0;
+    t0 = tan(x0);
+    return t0;
+}
+
+void fn_800142A4(u8 v) {
+    lbl_80281C98 = v;
+}
+
+void fn_8001437C(void) {
+    s32 var_r31;
+
+    var_r31 = 0;
+    do {
+        fn_800131C4(var_r31);
+        var_r31 += 1;
+    } while (var_r31 < 4);
+}
+
+// ---- end of sweep code ----
