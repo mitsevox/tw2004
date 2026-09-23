@@ -56,6 +56,7 @@ typedef struct TNetwork {
 #define MAX_OOB_NETWORKS       5
 
 #define AXIS3(n) ((n) == 0 ? 0 : 2)    // grid axis 0 (x) or 1 (z) as an index into a 3D vector
+#define PIN_RADIUS_SQ 0.00077160494f   // the flagstick's radius squared: (1 inch)^2 in square yards
 #define TER_NO_GROUND -65536.125f   // the height the lookups return when nothing is under the point
 
 extern u8        lbl_80281DC0;                          // the cup is real geometry
@@ -884,6 +885,55 @@ f32 fn_8004DBB0(CourseInfo* pCourse, f32* pPos, SurfaceType** ppSurface, f32* pN
     return fHeight;
 }
 
+// TW06: u32 Ter_GetTerrainLayers(TGD_TerrainInfo*, f32*, TGD_MaterialInfo**, f32*, u32). Every
+// ground triangle over or under a point (x, z), up to nMax: their heights and surfaces, in the
+// order found. Returns how many.
+u32 fn_8004DCC4(CourseInfo* pCourse, f32* pPos, SurfaceType** ppSurfaces, f32* pHeights, u32 nMax) {
+    u32 uHole = 1 << Game_CurrentHole();
+    u32 nFound = 0;
+    int nX = (int)fn_80035074((pPos[0] - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
+    int nZ = (int)fn_80035074((pPos[2] - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
+    TerCell* pCell;
+    TerPolyRef* pRef;
+    f32 (*pVert)[3];
+    u8* pFlags;
+    int i;
+    int j;
+    f32 fA;
+    f32 fB;
+    f32 fC;
+
+    if (nX >= 0 && nX < pCourse->nGridWidth && nZ >= 0 && nZ < pCourse->nGridLength) {
+        pCell = &pCourse->pGrid[nX + nZ * pCourse->nGridWidth];
+        pRef = &pCourse->pPolyRefs[pCell->uRefs >> 12];
+        for (i = (pCell->uRefs & 0xFFF) - 1; i >= 0; i--) {
+            if (pRef->n2 != 0) {
+                pRef++;
+            } else if (pRef->u4 != 0
+                       && (!(pRef->u4 & uHole) || ((pRef->u4 & 0x10) && gSession.nSplitScreen))) {
+                pRef++;
+            } else {
+                pVert = &pCourse->pVerts[TER_FIRST_VERTEX(pRef)];
+                pFlags = pCourse->pTriFlags + TER_FIRST_VERTEX(pRef);
+                for (j = pRef->nTris - 1; j >= 0; j--) {
+                    if ((pFlags[2] & 7) && fn_80050A9C(pVert[0], pVert[1], pVert[2], pPos[0], pPos[2])) {
+                        fn_800509D8(pVert[0], pPos, &fA, &fB, &fC);
+                        pHeights[nFound] = fA * pVert[0][1] + fB * pVert[1][1] + fC * pVert[2][1];
+                        ppSurfaces[nFound] = &gSurfaceTypes[pRef->nSurface];
+                        nFound++;
+                        if (nFound == nMax) return nFound;
+                    }
+                    pVert++;
+                    pFlags++;
+                }
+                pRef++;
+            }
+        }
+        return nFound;
+    }
+    return 0;
+}
+
 // Mark in lbl_801D54A0 the objects of grid cell (nX, nZ) that the line from pFrom along pDir
 // passes within fRange of (entry 0 is always marked).
 void fn_8004DF10(CourseInfo* pCourse, f32* pFrom, f32* pDir, int nX, int nZ, f32 fRange) {
@@ -925,6 +975,79 @@ u8 fn_8004E0D4(f32* pFrom, f32* pDir, f32 fRange, f32* pCentre, f32 fRadius) {
     if (fDist > fRange) return 0;
     if (fDist < 0.0f) return 1;
     if (fn_8000C5FC(vTo, pDir) < 0.0f) return 0;
+    return 1;
+}
+
+// TW06: bool Ter_CheckForPinCollision(TGD_TerrainInfo*, s32, f32*, f32*, f32[4]*, f32[4]*,
+// TGD_MaterialInfo**, TGD_ObjectInstanceInfo**). Whether the line from pFrom to pTo hits the
+// flagstick of the current hole: a vertical cylinder one inch across and 2 yards tall at the pin.
+// Not for nobody's ball, nor when the player's view has the flagstick out (view byte 0x275). On
+// a hit: the point, the stick's outward normal and surface 90 (the cup).
+u8 Ter_CheckForPinCollision(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
+                            SurfaceType** ppSurface, TerObject** ppObj) {
+    f32 vDelta[4];
+    f32 vFlat[4];
+    f32 vFrom[4];
+    f32 vTo[4];
+    f32 vIn[4];
+    f32 fA;
+    f32 fB;
+    f32 fC;
+    f32 fDisc;
+    f32 fRoot;
+    f32 fT1;
+    f32 fT2;
+    f32 fT;
+
+    if (nPlayer < 0) return 0;
+    if (fn_80016CFC(gPlayers[nPlayer].nView0)[0x275]) return 0;
+    // the line relative to the pin
+    vFrom[0] = pFrom[0] - pCourse->pin[Game_CurrentHole()].x;
+    vFrom[1] = pFrom[1] - pCourse->pin[Game_CurrentHole()].y;
+    vFrom[2] = pFrom[2] - pCourse->pin[Game_CurrentHole()].z;
+    vFrom[3] = 1.0f;
+    vTo[0] = pTo[0] - pCourse->pin[Game_CurrentHole()].x;
+    vTo[1] = pTo[1] - pCourse->pin[Game_CurrentHole()].y;
+    vTo[2] = pTo[2] - pCourse->pin[Game_CurrentHole()].z;
+    vTo[3] = 1.0f;
+    fn_8005097C(vTo, vFrom, vDelta);
+    Vec3Copy(vDelta, vFlat);
+    vFlat[1] = 0.0f;
+    vIn[0] = -vFrom[0];
+    vIn[1] = 0.0f;
+    vIn[2] = -vFrom[2];
+    vIn[3] = 1.0f;
+    if (fn_8000C5FC(vIn, vFlat) < 0.0f) return 0;      // moving away from the stick
+    fC = vFrom[0] * vFrom[0] + vFrom[2] * vFrom[2];
+    if (fC < PIN_RADIUS_SQ) return 0;                   // already inside it
+    // where the line meets the cylinder: a t^2 + b t + c = 0
+    fA = vDelta[0] * vDelta[0] + vDelta[2] * vDelta[2];
+    fB = 2.0f * vDelta[0] * vFrom[0] + 2.0f * vDelta[2] * vFrom[2];
+    fDisc = fB * fB - 4.0f * fA * (fC - PIN_RADIUS_SQ);
+    if (fDisc <= 0.0f) return 0;
+    fRoot = (f32)fn_80009680(fDisc);
+    fT1 = (-fB + fRoot) / (2.0f * fA);
+    fT2 = (-fB - fRoot) / (2.0f * fA);
+    fT = fT1 <= fT2 ? fT1 : fT2;
+    if (fT <= 0.0f) {
+        fT = fT1 <= fT2 ? fT2 : fT1;
+    }
+    if (fT <= 0.0f || fT >= 1.0f) return 0;
+    pHit[0] = vDelta[0] * fT + vFrom[0];
+    pHit[1] = vDelta[1] * fT + vFrom[1];
+    pHit[2] = vDelta[2] * fT + vFrom[2];
+    pHit[3] = 1.0f;
+    if (pHit[1] >= 2.0f) return 0;                      // over the top of the stick
+    pNormal[0] = pHit[0];
+    pNormal[1] = 0.0f;
+    pNormal[2] = pHit[2];
+    pNormal[3] = 1.0f;
+    fn_800BAF04(pNormal, pNormal);
+    pHit[0] += pCourse->pin[Game_CurrentHole()].x;
+    pHit[1] += pCourse->pin[Game_CurrentHole()].y;
+    pHit[2] += pCourse->pin[Game_CurrentHole()].z;
+    *ppSurface = &gSurfaceTypes[90];
+    *ppObj = NULL;
     return 1;
 }
 
