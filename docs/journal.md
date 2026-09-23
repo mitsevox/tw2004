@@ -151,8 +151,15 @@ Dated log of what was done and decided, newest last. Facts and lessons belong in
   `gKindSpeed`, `gKindLoft`, `gKindSpin`, `gTrajLoft`). Mechanics in `gameplay.md` ("The
   strike"): putts laid onto the green plane with no spin; uphill lies cost speed; sidehill lies
   tilt the spin axis (not for a perfect shot); rough and sand speed/spin table.
-- **Next:** `Ball.c` checkpoint 4 = flight and tick (`Ball_FlightStep`, `Ball_Tick`,
-  `fn_80051C84`.., `fn_80052088`); then ground contact, collision, lie; then `fn_80052598`; optional register polish in `skalib.c`
+- **`Ball.c` checkpoint 4: flight and tick (55 of 68 exact).** `Ball_Tick`, `fn_8005418C`,
+  `fn_80054040`, `fn_80055324` exact; `Ball_FlightStep` 98.3% (two `addi` schedules),
+  `fn_80052088` 99.1% (a branch-over-branch). Findings in `gameplay.md` ("The ball in flight"):
+  wind scaled down near the ground, quadratic drag/lift with spin terms, gravity x3 within
+  2.25 in above the cup for the real ball but not the CPU rehearsal, 4-second stall check, a
+  probable `n < 156` typo in the coasting surface.
+- **Next:** `Ball.c` checkpoint 5 = rolling and ground contact (`fn_80052268`,
+  `Ball_GroundContact`, `fn_80053240`, `Ball_Collide`, `Ball_SetLie`, the tree hit
+  `fn_800539F8` / `fn_80053E98`); then `fn_80052598` (bounce); optional register polish in `skalib.c`
   (`AnimLib_MergeOverlay`, `AnimLib_PlanBank`, `AnimLib_WalkPair`). Scratch tools in `C:\dev\scratch\tw\`:
   `sbs2.py` (normalised diff), `fnsrc.py`, `regress.py` (who lost 100%), `insert_fns.py` (add
   functions at address positions), `unwritten.py`, `find_fn.py` (search asm by regexes),

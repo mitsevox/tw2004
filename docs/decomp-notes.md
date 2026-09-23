@@ -134,6 +134,16 @@ Reading compiler output
   halves of a function got different registers until they were two variables declared in the
   right place; the product `a *= t; b = p * (k * a)` in place of `p * (k * (a * t))` fixed the
   register numbers of a multiply chain.
+- **[verified] `a + b*c` where the original fuses the *other* product.** CodeWarrior evaluates
+  the heavier operand first and fuses the last product into `fmadds`; swapping the operands in
+  the source changes nothing. To fuse `spin * (...)` and keep `k * speed` as the addend, compute
+  the addend into a local first: `t = k * speed; x = spin * (...) + t;` (`Ball_FlightStep`).
+- **[verified] `x >= c` in an `&&` chain gives `cror; bne`; the original's plain `blt` is
+  `!(x < c)`.** Same for `if (!(h2 < -60000.0f) && ...)`. (`fn_8005418C`, `fn_80055324`.)
+- **[verified] Two early returns that became one `bne; b`** are one `||` test:
+  `if (pBall->bHoled || pBall->nState == 2) return;`.
+- **[verified] A local reused as a temporary** can be the reason for a register mismatch: the
+  original stored a sqrt into the distance local before scaling it (`Ball_Tick`).
 - **[verified] `abs()` on an int** is emitted inline as `srawi t,v,31; xor; subf` (no call).
 - **[verified] The `lwzu`/`lfsu` idiom is a repeated field access, not a pointer local.** When the
   same `gPlayers[n].field` is read again after a call, CodeWarrior makes a pointer to the field

@@ -616,6 +616,42 @@ spin. Every number here is from the code.
   (`gClubSpin`: 0.87 for the woods down to 0.11 for club 24) x kind spin (`gKindSpin`: kind 4
   x 1.5, kind 5 x 0.01 - a flop has no spin) x 0.85 x the lie's spin / 0.84.
 
+The ball in flight (`Ball_Tick`, `Ball_FlightStep` and helpers, in C)
+-------------------------------------------------------------------------
+
+**Each tick** (`Ball_Tick`; a tick is one 20 ms step of the real ball, the same step the
+rehearsals use): the state's own step runs - in the air (`Ball_FlightStep`), rolling
+(`fn_80052268`) or bouncing (`Ball_GroundContact`) - then the ball moves by velocity / 36. A
+ball still in play is kept on the ground (`fn_8005418C`) or collided with the ground
+(`Ball_Collide`), then swept against trees and objects (`fn_80054040`: event 0x27, and a bounce
+off it as surface 13). **Stall check:** every 4 seconds' worth of ticks the ball must have moved
+at least 4 inches since the last check, or it is stopped where it is. Then its speed, its
+height above the ground and its closest approach to the pin are updated.
+
+**In the air** (`Ball_FlightStep`):
+
+- **Wind is weaker near the ground**: below 25 ft it is scaled by 0.25 + 0.75 x height / 25 ft -
+  a quarter of the wind at ground level. A CPU's wind is clamped to +-15 per axis (as before).
+- **Air speed** is the velocity less 0.19 x the wind. **Drag** opposes it and grows with its
+  square; the coefficient rises with speed and with spin. **Lift** acts along spin x air
+  velocity, also quadratic, with its own speed/spin terms (the exact polynomials are in the C).
+- **Gravity**, and a near-cup extra: **within 2.25 inches of a point one ball radius above the
+  pin position, gravity is tripled** - the cup pulls a ball in the air down into it. This runs
+  for the real ball, the look-ahead ball and the state-15 rehearsal (your suggested shot and the
+  gimme tap-in, which set `lbl_80281DD1`), **but not for the CPU's own shot rehearsal or the
+  caddie**. It only acts in the air (a putt rolls in state 3), so it matters for chip-ins and
+  hops over the hole.
+- Event 0x1C fires once, at the top of the flight.
+- **Spin decays** 0.3% a tick, faster when flying into the wind (0.3 x the headwind part of the
+  velocity change is added).
+
+**Ground safety nets:** a rolling ball with no ground under it coasts for up to two ticks as if
+on flat ground, then it is a hazard (`fn_80052088`). The surface it coasts on is 109 whenever its
+own surface index is below 156 - i.e. always; the test reads `n < 0 || n < 156`, which looks like
+a typo for `n >= 156`. A ball in the air with no ground under it within 8 ft of the pin is set
+down on the other ground height (`fn_80055324`); elsewhere it stays in play while above the
+course floor (`CourseInfo +0x6C`) and is a hazard below it.
+
 CPU putts are hit 5% firm (`Swing_ComputePower`)
 -----------------------------------------------
 

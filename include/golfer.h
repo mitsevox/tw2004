@@ -338,7 +338,9 @@ typedef struct PinPos {
 } PinPos;
 
 typedef struct CourseInfo {
-    u8     unk0[0x70];
+    u8     unk0[0x6C];
+    f32    fFloor;              // 0x6C  a ball in the air above this with no ground under it is still in play
+
     PinPos pin[18];             // 0x70
 } CourseInfo;
 

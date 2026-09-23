@@ -34,7 +34,8 @@ typedef struct Ball {
     CourseInfo* pCourse;        // 0x7C
     s32  n80;                   // 0x80
     s32  n84;                   // 0x84
-    u8   unk88[0x94 - 0x88];
+    u8   unk88[0x90 - 0x88];
+    s32  n90;                   // 0x90  what the ball last hit (fn_80054040)
     s32  nPlayer;               // 0x94  -1 when nobody's
     u8   bHoled;                // 0x98
     u8   b99;                   // 0x99
@@ -42,10 +43,10 @@ typedef struct Ball {
     u8   b9B;                   // 0x9B
     u8   unk9C;                 // 0x9C
     u8   unk9D[0xAC - 0x9D];
-    f32  fAC;                   // 0xAC
+    f32  fAC;                   // 0xAC  ticks spent with no ground under a rolling ball
     u8   unkB0[4];
-    f32  fB4;                   // 0xB4
-    f32  fB8;                   // 0xB8
+    f32  fB4;                   // 0xB4  distance from the start at the last stall check
+    f32  fB8;                   // 0xB8  time since the last stall check
 } Ball;
 
 void   Vec3Copy(f32* pSrc, f32* pDst);           // 0x80008304
@@ -60,7 +61,7 @@ void   fn_8000AE28(f32* pIn, f32 f, f32* pOut);  // scale a vector
 void   fn_80067074(int nPlayer, int nEvent, int a, int b);   // the game-event table
 void   Ball_SetLie(Ball* pBall, SurfaceType* pSurface);
 void   Ball_Tick(Ball* pBall, f32 fTicks);
-void   fn_8005418C(Ball* pBall, int a, f32 f);
+void   fn_8005418C(Ball* pBall, u8 bSettle, f32 fTicks);
 SurfaceType* fn_8004D838(CourseInfo* pCourse, Ball* pBall);   // the surface under a point
 f32    fn_8004D620(CourseInfo* pCourse, f32* pPos);   // ground height, -60000 and below if none
 f32    fn_8004D5C0(CourseInfo* pCourse, f32* pPos);   // the same from another source
@@ -119,6 +120,26 @@ f32    Ball_DistanceToPin(f32* pPos);
 void   Ball_Holed(Ball* pBall);
 void   Ball_SimSeconds(Ball* pBall, f32 fSeconds, f32 fTick);
 
+f32    fn_80009744(f32* pVec);                   // dot with itself
+double fn_80009680(double x);                    // sqrt
+void   fn_8004D9E0(CourseInfo* pCourse, Ball* pBall, f32* pHeight, SurfaceType** ppSurface, f32* pNormal,
+                   f32* pHeight2, SurfaceType** ppSurface2, f32* pNormal2);
+void   fn_8004D9A8(CourseInfo* pCourse, Ball* pBall, f32* pHeight, f32* pHeight2);
+int    fn_80050BEC(SurfaceType* pSurface);       // a surface's index
+u8     fn_800E2B40(int nPlayer, Ball* pBall);
+u8     fn_800B1B18(int nPlayer, f32* pTo, f32* pFrom, f32* pHit, f32* pNormal, s32* pWhat);
+u8     fn_80053E98(Ball* pBall, s32 nWhat, f32* pHit, f32* pNormal);
+u8     fn_800539F8(Ball* pBall, f32* pHit, f32* pNormal, SurfaceType* pSurface, int a, u8* pOut, f32 fTicks);
+u8     fn_80053240(Ball* pBall, f32 fTicks);
+void   fn_80052598(Ball* pBall, f32* pNormal, SurfaceType* pSurface);
+void   Ball_Collide(Ball* pBall, f32 fTicks);
+void   Ball_GroundContact(Ball* pBall, f32 fTicks);
+void   fn_80052268(Ball* pBall, f32 fTicks);
+void   Ball_FlightStep(Ball* pBall, f32 fTicks);
+f32    fn_80055324(Ball* pBall);
+u8     fn_80054040(Ball* pBall, f32 fTicks);
+f32    Wind_Get(f32* pOut);
+
 extern u8  gSimulating;                          // 0x80281DD0  a rehearsal: no sounds or effects
 extern u8  lbl_80281DD1;
 extern u8  lbl_80281DD2;
@@ -126,12 +147,24 @@ extern s32 lbl_80281DD4;                         // course setting (options +0x1
 extern s32 lbl_80281DD8;                         // course setting, 0..2
 extern s32 lbl_80281130;                         // green speed, 0..4, default 2 (gPuttSpeedScale)
 extern s32 lbl_80281134;                         // course setting (options +0x1C), 0..2, default 1
-extern u8  lbl_80281DE4;
+extern u8  lbl_80281DE4;                          // the two ground heights below are current
+extern f32 lbl_80281DE0;                         // ground height under the ball
+extern f32 lbl_80281DDC;                         // the other ground height (fn_8004D9E0)
 extern f32 gWindSpeed;                           // 0x80281DE8
 extern s32 gWindDir;                             // 0x80281DEC  0..7
 extern f32 gWindDirs[8][4];                      // 0x80187EF8  unit vectors, 45 degrees apart
 extern f32 lbl_801D5888[4][4];                   // per player: where the ball was last on ...
 extern f32 lbl_801D58C8[4][4];                   // ... two kinds of surface (fn_8004C590)
+
+static inline u8 Ball_NoGround(f32 fHeight) {
+    return fHeight < -60000.0f;
+}
+
+static inline f32 Ball_Clamp(f32 x, f32 fLo, f32 fHi) {
+    if (x < fLo) return fLo;
+    if (x > fHi) return fHi;
+    return x;
+}
 
 #define PIN(pBall) ((f32*)&(pBall)->pCourse->pin[Game_CurrentHole()])
 
@@ -315,12 +348,6 @@ f32 fn_800511F0(Ball* pBall, f32 fAim, f32* pNormal) {
     if (fAngle < -0.76794487f) return -0.76794487f;
     if (fAngle > 0.76794487f) return 0.76794487f;
     return fAngle;
-}
-
-static inline f32 Ball_Clamp(f32 x, f32 fLo, f32 fHi) {
-    if (x < fLo) return fLo;
-    if (x > fHi) return fHi;
-    return x;
 }
 
 // The strike: club, shot kind, power, aim, trajectory and the two launch blocks become the
@@ -598,6 +625,190 @@ void fn_80051C84(Ball* pBall, f32 fX, f32 fY) {
     pBall->fSpinY = 15.0f * fY;
 }
 
+// One tick in the air. The wind (a CPU's clamped to +-15 on each axis) is weaker near the
+// ground: x (0.25 + 0.75 x height / 25 ft) below 25 ft. Air speed is the velocity less 0.19 x
+// the wind. Drag and lift are quadratic in air speed with coefficients that depend on speed and
+// spin; lift is along spin x air velocity. Gravity 0.10717 - and, for a real ball (or a sim
+// with lbl_80281DD1 set), three times that within 2.25 in of the top of the cup. Event 0x1C
+// at the top of the flight. Spin decays 0.3% a tick, faster flying into the wind.
+void Ball_FlightStep(Ball* pBall, f32 fTicks) {
+    f32 vWind[4];
+    f32 vRel[4];
+    f32 vDrag[4];
+    f32 vLift[4];
+    f32 vAccel[4];
+    f32 vPin[4];
+    f32 fDrag, fSpeed2, fSpin, fSpeed, fLift, fLen, fInto, fExtra, fHeight, fK, fX, fZ;
+
+    Wind_Get(vWind);
+    if (Player_IsCPU(pBall->nPlayer)) {
+        vWind[0] = Ball_Clamp(vWind[0], -15.0f, 15.0f);
+        vWind[1] = Ball_Clamp(vWind[1], -15.0f, 15.0f);
+        vWind[2] = Ball_Clamp(vWind[2], -15.0f, 15.0f);
+    }
+    if (pBall->fHeight < 8.333333f) {
+        fHeight = pBall->fHeight;
+        if (fHeight < 0.0f) fHeight = 0.0f;
+        fn_8001EF34(vWind, 0.75f * (fHeight / 8.333333f) + 0.25f, vWind);
+    }
+    fn_8000C5D4(pBall->vVel, vWind, -0.190666676f, vRel);
+    fSpeed2 = fn_80009744(vRel);
+    fSpeed  = fn_80009680(fSpeed2);
+    fSpin   = fn_80009680(fn_80009744(pBall->vSpin));
+    if (fSpeed != 0.0f) {
+        fDrag = 0.000780952396f * fSpeed;
+        fDrag = -(fSpeed2 * (0.000474568689f * (0.225790471f + (fSpin * (-0.000348685688f * fSpeed + 0.0168940704f) + fDrag))) / fSpeed);
+    } else {
+        fDrag = 0.0f;
+    }
+    fn_8001EF34(vRel, fDrag, vDrag);
+    fLift = -0.000201047602f * fSpeed;
+    fLift = fSpeed2 * (0.000474568689f * (0.0847342834f + (fSpin * (-0.000628289126f * fSpeed + 0.0407094695f) + fLift)));
+    fn_8001EF78(pBall->vSpin, vRel, vLift);
+    fLen = fn_80009680(fn_80009744(vLift));
+    fn_8001EF34(vLift, fLen != 0.0f ? fLift / fLen : 0.0f, vAccel);
+    fn_80055E7C(vDrag, vAccel, vAccel);
+    vAccel[1] -= 0.107170001f;
+    if (!gSimulating || lbl_80281DD1) {
+        Vec_Copy(PIN(pBall), vPin);
+        vPin[1] += BALL_RADIUS;
+        if (Vec_Distance(vPin, pBall->vPos) < 0.0625f) {
+            vAccel[1] -= 0.214340001f;
+        }
+    }
+    fn_8000C5D4(pBall->vVel, vAccel, fTicks, pBall->vVel);
+    if (!pBall->b9A && pBall->nPlayer >= 0 && pBall->vVel[1] < 0.0f && pBall->vVel[1] - fTicks * vAccel[1] >= 0.0f) {
+        pBall->b9A = 1;
+        fn_80067074(pBall->nPlayer, 0x1C, (int)pBall, !gSimulating);
+    }
+    fInto  = vWind[0] * pBall->vVel[0] + vWind[2] * pBall->vVel[2];
+    if (fInto < 0.0f) {
+        fK = fTicks * fInto / fn_80009744(pBall->vVel);
+        fX = fK * pBall->vVel[0];
+        fZ = fK * pBall->vVel[2];
+        fExtra = 0.3f * (f32)fn_80009680(fX * fX + fZ * fZ);
+    } else {
+        fExtra = 0.0f;
+    }
+    fn_8001EF34(pBall->vSpin, 1.0f - fTicks * (0.003f * (1.0f + fExtra)), pBall->vSpin);
+}
+
+// The ground under a rolling ball: its surface and normal. No ground: if there is none under
+// the other source either (or it is more than 1 in above the ball), the ball may coast on for
+// up to two ticks on surface 109 (or its own) as if on flat ground - unless fn_800E2B40 says
+// otherwise - and is a hazard after that. Returns 0 for a hazard.
+u8 fn_80052088(Ball* pBall, SurfaceType** ppSurface, f32* pNormal) {
+    SurfaceType* pSurface;
+    SurfaceType* pSurface2;
+    f32          vNormal[4];
+    f32          vNormal2[4];
+    f32          fDrop;
+    int          nPlayer;
+    fn_8004D9E0(pBall->pCourse, pBall, &lbl_80281DE0, &pSurface, vNormal, &lbl_80281DDC, &pSurface2, vNormal2);
+    lbl_80281DE4 = 1;
+    if (lbl_80281DE0 < -60000.0f) {
+        if (!Ball_NoGround(lbl_80281DDC)) {
+            fDrop = lbl_80281DDC - pBall->vPos[1];
+        }
+        if (lbl_80281DDC < -60000.0f || fDrop > 0.028f) {
+            nPlayer = pBall->nPlayer;
+            if (nPlayer < 0) nPlayer = 4;
+            if (lbl_80281DDC < -60000.0f && pBall->fAC < 2.0f && !fn_800E2B40(nPlayer, pBall)) {
+                if (pBall->nSurface < 0 || pBall->nSurface < 156) {
+                    pBall->nSurface = 109;
+                }
+                pSurface = &gSurfaceTypes[pBall->nSurface];
+                lbl_80281DE0 = pBall->vPrev[1] - BALL_RADIUS - 0.0013888889f;
+                pBall->fAC += 1.0f;
+                vNormal[0] = 0.0f;
+                vNormal[1] = 1.0f;
+                vNormal[2] = 0.0f;
+                vNormal[3] = 0.0f;
+                goto check;
+            }
+            fn_80050CAC(pBall, 1);
+            return 0;
+        }
+        pSurface = pSurface2;
+        Vec3Copy(vNormal2, vNormal);
+    }
+    pBall->fAC = 0.0f;
+check:
+    if (0.375f != pSurface->f1C) {
+        pSurface = &gSurfaceTypes[14];
+    }
+    *ppSurface = pSurface;
+    Vec3Copy(vNormal, pNormal);
+    return 1;
+}
+
+// Did the ball hit something (a tree, an object) between last tick and this one? fn_800B1B18
+// sweeps the path, fn_80053E98 and fn_800539F8 decide; then event 0x27 and the bounce off it
+// as surface 13. Returns 1 on a hit.
+u8 fn_80054040(Ball* pBall, f32 fTicks) {
+    f32          vHit[4];
+    f32          vNormal[4];
+    f32          vFrom[4];
+    f32          vTo[4];
+    s32          nWhat;
+    u8           bOut;
+    SurfaceType* pSurface;
+    Vec3Copy(pBall->vPrev, vFrom);
+    vFrom[1] -= BALL_RADIUS;
+    Vec3Copy(pBall->vPos, vTo);
+    vTo[1] -= BALL_RADIUS;
+    if (!fn_800B1B18(pBall->nPlayer, vTo, vFrom, vHit, vNormal, &nWhat)) return 0;
+    if (!fn_80053E98(pBall, nWhat, vHit, vNormal)) return 0;
+    pSurface = &gSurfaceTypes[13];
+    if (!fn_800539F8(pBall, vHit, vNormal, pSurface, 0, &bOut, fTicks)) return 0;
+    if (pBall->nPlayer >= 0) {
+        pBall->n90 = nWhat;
+        fn_80067074(pBall->nPlayer, 0x27, (int)pBall, !gSimulating);
+    }
+    fn_80052598(pBall, vNormal, pSurface);
+    return 1;
+}
+
+// Keep a ball that is on the ground on the ground: find the ground under it (no ground at all:
+// hazard). Unless settling, fn_80053240 may throw it back into the air. More than 1.68 in above
+// the ground: take the other ground height if it is within 2.5 in, else look again once, else
+// (unless settling) it is in the air. Then sit it on the ground.
+void fn_8005418C(Ball* pBall, u8 bSettle, f32 fTicks) {
+    u8  bRetried;
+    f32 fGround;
+    if (pBall->bHoled || pBall->nState == 2) return;
+    bRetried = 0;
+retry:
+    if (!lbl_80281DE4) {
+        fn_8004D9A8(pBall->pCourse, pBall, &lbl_80281DE0, &lbl_80281DDC);
+    }
+    fGround = lbl_80281DE0;
+    if (fGround < -60000.0f) {
+        fGround = lbl_80281DDC;
+        if (fGround < -60000.0f) {
+            fn_80050CAC(pBall, 1);
+            return;
+        }
+    }
+    if (!bSettle && fn_80053240(pBall, fTicks)) {
+        pBall->nState = 2;
+        return;
+    }
+    if (pBall->vPos[1] - fGround > 0.0466666669f) {
+        if (pBall->nSurface != 98 && !(lbl_80281DDC < -60000.0f) && lbl_80281DDC - pBall->vPos[1] <= 0.07f) {
+            fGround = lbl_80281DDC;
+        } else if (!bRetried) {
+            bRetried     = 1;
+            lbl_80281DE4 = 0;
+            goto retry;
+        } else if (!bSettle) {
+            pBall->nState = 2;
+            return;
+        }
+    }
+    pBall->vPos[1] = 0.0013888889f + (BALL_RADIUS + fGround);
+}
+
 // The ball has stopped. Holed: state 1, lie 12, events 0x21 and 0x20. Otherwise it is settled
 // (fn_8005418C) and given the lie of the surface under it - a surface whose +0x1C is not 0.375
 // counts as surface 14 - or, with no surface at all, it is a hazard.
@@ -691,6 +902,102 @@ void Ball_CupPull(Ball* pBall, f32 fDt) {
             if (fn_8000AD9C(fAngle) > 0.293333f) fPull = 0.0f;
         }
         pBall->vVel[2] += fPull;
+    }
+}
+
+// The height of a ball in the air above the ground (0 when not in the air). With no ground
+// under it: within 8 ft of the pin it is set on the other ground height; if that is less than
+// 1.68 in above it, that is the ground; else above the course floor it is still in play
+// (surface -1), and below it a hazard.
+f32 fn_80055324(Ball* pBall) {
+    f32          vNormal[4];
+    f32          vNormal2[4];
+    f32          vPin[4];
+    f32          fHeight;
+    f32          fHeight2;
+    SurfaceType* pSurface;
+    SurfaceType* pSurface2;
+    if (pBall->nState != 2) return 0.0f;
+    fn_8004D9E0(pBall->pCourse, pBall, &fHeight, &pSurface, vNormal, &fHeight2, &pSurface2, vNormal2);
+    if (fHeight < -60000.0f) {
+        Vec_Copy(PIN(pBall), vPin);
+        vPin[1] += BALL_RADIUS;
+        if (Vec_Distance(vPin, pBall->vPos) < 2.66666675f) {
+            pBall->vPos[1]  = 0.0013888889f + (BALL_RADIUS + fHeight2);
+            pBall->nSurface = -1;
+            return 0.0f;
+        }
+        if (!(fHeight2 < -60000.0f) && fHeight2 - pBall->vPos[1] < 0.0466666669f) {
+            pBall->vPos[1] = 0.0013888889f + (BALL_RADIUS + fHeight2);
+            fHeight  = fHeight2;
+            pSurface = pSurface2;
+        } else {
+            if (pBall->vPos[1] > fn_8000C594()->fFloor) {
+                pBall->nSurface = -1;
+                return pBall->vPos[1] - fn_8000C594()->fFloor;
+            }
+            fn_80050CAC(pBall, 1);
+            return 0.0f;
+        }
+    }
+    pBall->nSurface = fn_80050BEC(pSurface);
+    return pBall->vPos[1] - fHeight;
+}
+
+// One tick: the state's step (air, rolling, bouncing), then move by velocity / 36. A ball
+// still in play is kept on the ground or collided, checked against objects, and every 4 s
+// (0.0167 a tick) it must have moved 4 in, or it stops. Then its speed (x 60 / 36), its height
+// and its closest approach to the pin.
+void Ball_Tick(Ball* pBall, f32 fTicks) {
+    f32 fDist;
+    lbl_80281DE4 = 0;
+    switch (pBall->nState) {
+    case 2:
+        Ball_FlightStep(pBall, fTicks);
+        break;
+    case 3:
+        fn_80052268(pBall, fTicks);
+        break;
+    case 4:
+        Ball_GroundContact(pBall, fTicks);
+        break;
+    default:
+        goto done;
+    }
+    Vec3Copy(pBall->vPos, pBall->vPrev);
+    fn_8000C5D4(pBall->vPos, pBall->vVel, fTicks / 36.0f, pBall->vPos);
+    if (pBall->nState != 1 && pBall->nState != 5) {
+        if (!pBall->bHoled) {
+            if (pBall->nState != 2) {
+                fn_8005418C(pBall, 0, fTicks);
+            } else {
+                Ball_Collide(pBall, fTicks);
+            }
+            fn_80054040(pBall, fTicks);
+        }
+        pBall->fB8 += 0.0166666675f * fTicks;
+        if (pBall->fB8 > 4.0f) {
+            fDist = Vec_Distance(pBall->vStart, pBall->vPos);
+            if (fn_8000AD9C(fDist - pBall->fB4) < 0.111111112f) {
+                Ball_Stop(pBall);
+            } else {
+                pBall->fB4 = fDist;
+                pBall->fB8 = 0.0f;
+            }
+        }
+    }
+done:
+    lbl_80281DE4 = 0;
+    if (pBall->bHoled || pBall->nState == 1 || pBall->nState == 5) {
+        pBall->fSpeed = 0.0f;
+    } else {
+        fDist = fn_80009680(fn_80009744(pBall->vVel));
+        pBall->fSpeed  = 60.0f * (fDist / 36.0f);
+        pBall->fHeight = fn_80055324(pBall);
+        fDist = Ball_DistanceToPin(pBall->vPos);
+        if (fDist < pBall->fClosest) {
+            pBall->fClosest = fDist;
+        }
     }
 }
 
