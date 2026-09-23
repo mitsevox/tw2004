@@ -1812,7 +1812,8 @@ void Ball_GroundContact(Ball* pBall, f32 fTicks) {
         return;
     }
     fB = pBall->vVel[1];
-    fn_8000C5D4(pBall->vVel, vDir, -fTurn, pBall->vVel);
+    fTurn = -fTurn;
+    fn_8000C5D4(pBall->vVel, vDir, fTurn, pBall->vVel);
     if (pBall->nSurface == 98) {
         pBall->vVel[1] = 0.9f * fB;
     }
