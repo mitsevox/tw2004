@@ -74,6 +74,7 @@ typedef struct TerrainMgr {
 #define NUM_CUP_POSITIONS 4
 #define TER_RELOCATE(pCourse, field) ((pCourse)->field = (void*)((u8*)(pCourse) + (u32)(pCourse)->field))
 
+#define BALL(p) ((Ball*)(p)->ball)
 #define TER_NO_GROUND -65536.125f   // the height the lookups return when nothing is under the point
 
 extern u8        lbl_80281DC0;                          // the cup is real geometry
@@ -84,6 +85,8 @@ extern TNetwork* lbl_801D548C[MAX_OOB_NETWORKS];
 extern u8        lbl_801D54A0[MAX_OBJECTS];        // objects near the current line
 extern TerBox    lbl_801D53A8[NUM_CUP_POSITIONS];  // the 3D cup geometry of each pin position
 extern TerrainMgr lbl_801D3CB0;
+extern f32       lbl_801D5888[4][4];                // per player: the last spot a ball could be dropped
+extern f32       lbl_801D58C8[4][4];                // per player: the last such spot with a preferred lie
 
 u8    Course_RegisterLoader(int nChunk, void (*pfn)(u8*));   // 0x8000C0B4
 s32   fn_8000C140(f32* pPos, TNetwork* pNet, s32 nNodes);   // point in outline. TW06: wn_PnPoly
@@ -143,6 +146,7 @@ u8    fn_8004FCB4(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32
                   f32* pNormal, SurfaceType** ppSurface, TerObject** ppObj);
 u8    fn_800504F4(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32* pDir, f32 fMax, f32* pHit,
                   f32* pNormal, SurfaceType** ppSurface, TerObject** ppObj);
+SurfaceType* fn_800CC190(CourseInfo* pCourse, f32* pPos);   // the playable ground under a point
 u8    fn_8004E0D4(f32* pFrom, f32* pDir, f32 fRange, f32* pCentre, f32 fRadius);
 u8    fn_80050A9C(f32* pA, f32* pB, f32* pC, f32 fX, f32 fZ);
 void  fn_800509D8(f32* pTri, f32* pPos, f32* pA, f32* pB, f32* pC);
@@ -369,6 +373,97 @@ f32 fn_8004B78C(CourseInfo* pCourse, f32* pPos) {
         return (pCourse->pLight + TER_FIRST_VERTEX(pRef))[nTri] / 255.0f;
     }
     return 1.0f;
+}
+
+// TW06: Ter_SearchAreaForDropLocation (its parameters differ here). Where a player's ball is to be
+// dropped (pOut): the last good drop spot (lbl_801D5888), or with bPreferred the last spot with a
+// preferred lie (lbl_801D58C8) when that is not the shot's own start and is less than 10 yards
+// further away. If the spot is over 3 yards off, or (not preferred) on another class of surface
+// than the ball, search rings of 1 to 4 yards around the ball, every 45 degrees starting towards
+// the pin, for a drop on the same class, else the nearest. Returns 0 when the spot is where the
+// shot started, or (with bCheck) within 50 yards of vA44.
+// Not exact yet (96.6%): the frame is 0x10 bigger and the saved registers differ; unfinished
+// when work was frozen.
+u8 Ter_SearchAreaForDropLocation(int nPlayer, u8 bPreferred, u8 bCheck, f32* pOut) {
+    f32 vPos[4];
+    f32 vDir[4];
+    SurfaceType* pSurface;
+    u8 bDrop;
+    u8 bPreferredLie;
+    Player* p = &gPlayers[nPlayer];
+    CourseInfo* pCourse = fn_8000C594();
+    f32 fDist;
+    f32 fDropDist;
+    f32 fAngle;
+    f32 fTurn;
+    f32 fRadius;
+    f32 fLift;
+    f32 fSin;
+    f32 fHeading;
+    int nRing;
+    SurfaceType* pGround;
+
+    fDist = fn_800BB028(&pCourse->pin[Game_CurrentHole()].x, BALL(p)->vStart);
+    if (fn_800BB028(BALL(p)->vPos, BALL(p)->vStart) > fDist) {
+        bPreferred = 0;                 // past the pin
+    }
+    if (bPreferred) {
+        fDist = Vec_Distance(lbl_801D58C8[nPlayer], BALL(p)->vPos);
+        fDropDist = Vec_Distance(lbl_801D5888[nPlayer], BALL(p)->vPos);
+        if ((BALL(p)->vStart[0] != lbl_801D58C8[nPlayer][0] || BALL(p)->vStart[1] != lbl_801D58C8[nPlayer][1]
+             || BALL(p)->vStart[2] != lbl_801D58C8[nPlayer][2])
+            && fDist - fDropDist < 10.0f) {
+            Vec_Copy(lbl_801D58C8[nPlayer], pOut);
+        } else {
+            Vec_Copy(lbl_801D5888[nPlayer], pOut);
+        }
+    } else {
+        Vec_Copy(lbl_801D5888[nPlayer], pOut);
+    }
+    vPos[0] = pOut[0];
+    vPos[1] = 1000000.0f;
+    vPos[2] = pOut[2];
+    vPos[3] = 1.0f;
+    pGround = fn_800CC190(pCourse, vPos);
+    fDist = fn_800BB028(pOut, BALL(p)->vPos);
+    if (fDist > 9.0f
+        || (!bPreferred && pGround->nClass != gSurfaceTypes[p->nBallSurface].nClass)) {
+        fn_8005097C(&pCourse->pin[Game_CurrentHole()].x, BALL(p)->vPos, vDir);
+        fn_800BAF04(vDir, vDir);
+        fHeading = fn_8000AD78(vDir[0], vDir[2]);
+        fRadius = 1.0f;
+        for (nRing = 0; nRing < 4; nRing++) {
+            fLift = 2.0f * fRadius;
+            for (fTurn = 0.0f; fTurn <= 6.265732f; fTurn += 0.7853982f) {
+                fAngle = fHeading + fTurn;
+                fSin = fn_800095F0(fAngle);
+                vPos[0] = fn_80009638(fAngle) * fRadius + BALL(p)->vPos[0];
+                vPos[2] = fSin * fRadius + BALL(p)->vPos[2];
+                // from water, only straight towards the pin
+                if (gSurfaceTypes[p->nBallSurface].nClass == 7 && fTurn > 0.0f) continue;
+                vPos[1] = BALL(p)->vPos[1] + fLift;
+                vPos[1] = Ter_CheckForDropLocation(pCourse, vPos, 0, &bDrop, &bPreferredLie, &pSurface);
+                if ((bPreferred && bPreferredLie) || (!bPreferred && bDrop)) {
+                    if (pSurface->nClass == gSurfaceTypes[p->nBallSurface].nClass) {
+                        Vec_Copy(vPos, pOut);
+                        goto done;      // leaves both loops (a goto, as the original jumps straight past them)
+                    }
+                    if (fRadius < fDist) {      // EA bug: a distance against a squared one
+                        Vec_Copy(vPos, pOut);
+                        fDist = fRadius;
+                    }
+                }
+            }
+            fRadius += 1.0f;
+        }
+    }
+done:
+    if (BALL(p)->vStart[0] == pOut[0] && BALL(p)->vStart[2] == pOut[2]) return 0;
+    if (bCheck && p->vA44[0] == p->fBallX && p->vA44[2] == p->fBallZ
+        && fn_800BB028(pOut, p->vA44) < 2500.0f) {
+        return 0;
+    }
+    return 1;
 }
 
 // TW06: f32 Ter_CheckForDropLocation(TGD_TerrainInfo*, f32*, bool, bool*, bool*, TGD_MaterialInfo**).
