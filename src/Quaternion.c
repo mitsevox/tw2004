@@ -95,7 +95,7 @@ f32 fn_800095F0(f32 fAngle) {
 }
 
 f32 fn_80009614(f32 x) {
-    return fn_8015F784(x);
+    return acos(x);
 }
 
 f32 fn_80009638(f32 fAngle) {
@@ -103,7 +103,7 @@ f32 fn_80009638(f32 fAngle) {
 }
 
 f32 fn_8000965C(f32 x) {
-    return fn_8015F7A4(x);
+    return asin(x);
 }
 
 // The identity rotation.

@@ -297,7 +297,7 @@ u8 fn_8010645C(int nOffset, char* pDst) {
         return 0;
     }
     strcpy(pDst, pStrings + nOffset);
-    if (fn_8015F844(pDst, "NONE") == 0) {
+    if (stricmp(pDst, "NONE") == 0) {
         *pDst = '\0';
     }
     return 1;

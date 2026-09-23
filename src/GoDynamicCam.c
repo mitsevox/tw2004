@@ -240,7 +240,7 @@ CamShot* fn_8003A8C4(char* szName) {
     int i;
 
     for (i = 0; i < lbl_80281D88->nShots; i++) {
-        if (fn_8015F844(szName, lbl_80281D88->pShots[i].szName) == 0) {
+        if (stricmp(szName, lbl_80281D88->pShots[i].szName) == 0) {
             return &lbl_80281D88->pShots[i];
         }
     }
