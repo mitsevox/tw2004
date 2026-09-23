@@ -76,12 +76,13 @@ int Shot_GoverningAttribute(int nPlayer, int nClub, int nLie, int nKind) {
 int Golfer_GetAttribute(Player* pPlayer, int nAttr, int nMode) {
     int nValue = 0;
     if (nMode == ATTR_BASE || nMode == ATTR_TOTAL) {
+        // fake match: the (s8) casts on the s8 record values keep the original's extsb before the add
         if (Controller_IsCPU(pPlayer->nController) && pPlayer->golfer.nIndex < FIRST_CREATED_GOLFER &&
             (Game_GetMode() == 4 || (gSession.uFlags & 2))) {
             nValue =
-                (s8)((s32)pPlayer->golfer.attrAlt[nAttr] + Golfer_TierBonus(pPlayer->golfer.tier[nAttr]));
+                (s8)((s8)pPlayer->golfer.attrAlt[nAttr] + Golfer_TierBonus(pPlayer->golfer.tier[nAttr]));
         } else {
-            nValue = (s8)((s32)pPlayer->golfer.attr[nAttr] + Golfer_TierBonus(pPlayer->golfer.tier[nAttr]));
+            nValue = (s8)((s8)pPlayer->golfer.attr[nAttr] + Golfer_TierBonus(pPlayer->golfer.tier[nAttr]));
         }
     }
     if (nMode == ATTR_MODIFIERS || nMode == ATTR_TOTAL) {
@@ -1528,7 +1529,8 @@ u8 Player_IsController8(int nPlayer) {
 
 // Controllers 0..7 are pads; 8 is something else; 9 is the CPU.
 u8 Player_HasPad(int nPlayer) {
-    return gPlayers[nPlayer].nController <= 7;
+    if (gPlayers[nPlayer].nController <= 7) return 1;
+    return 0;
 }
 
 u8 Controller_IsPad(int nController) {
@@ -1536,7 +1538,8 @@ u8 Controller_IsPad(int nController) {
 }
 
 u8 Player_IsNotCPU(int nPlayer) {
-    return gPlayers[nPlayer].nController <= 8;
+    if (gPlayers[nPlayer].nController <= 8) return 1;
+    return 0;
 }
 
 u8 Controller_IsNotCPU(int nController) {
@@ -1792,7 +1795,7 @@ void Players_Reset(void) {
     int i;
     for (i = 0; i < gSession.nNumPlayers; i++) {
         GOLFERSTATE_Kill(i);
-        gPlayers[i].pChar = NULL;
+        PLAYER(i)->pChar = NULL;
     }
     gNumPlayersSetUp = 0;
 }
