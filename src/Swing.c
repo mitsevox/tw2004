@@ -1591,13 +1591,11 @@ void Swing_RumbleOff(int nPlayer) {
 // Count the mis-hit rumble down and stop it when it runs out.
 void Swing_RumbleTick(int nPlayer) {
     if (Player_HasPad(nPlayer)) {
-        Player* p = &gPlayers[nPlayer];
-        if (p->swing.bVibrating) {
-            s32* pFrames = &p->swing.nVibrateCount;
-            if (*pFrames <= 0) {
+        if (gPlayers[nPlayer].swing.bVibrating) {
+            if (gPlayers[nPlayer].swing.nVibrateCount <= 0) {
                 Swing_RumbleOff(nPlayer);
             } else {
-                (*pFrames)--;
+                gPlayers[nPlayer].swing.nVibrateCount--;
             }
         }
     }
