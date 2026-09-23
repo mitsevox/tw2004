@@ -120,6 +120,20 @@ asm void fn_800E0AF0(register f32* pA, register f32* pB, register f32* pOut) {
     blr
 }
 
+int   fn_80110180(void);                    // the current hole can be played (inferred)
+int   fn_800D2ABC(int nCourse, int nHole);  // a hole's par
+extern u8* lbl_80281DF4;                    // unlock flags (a second save block)
+
+// The 20 course ids the mixed rounds pick from (lbl_80184D40).
+typedef struct CourseList {
+    u32 a[20];
+} CourseList;
+extern CourseList lbl_80184D40;
+
+// A course counts as unlocked when any of the five profiles (or the second block) has its flag.
+#define COURSE_UNLOCKED(c, k) (gpSaveData[(k) * 0x10600 + (c) + 0x3A] || lbl_80281DF4[(c) + 0x3A])
+
+
 // out = a - b (three floats)
 asm void fn_800E0B14(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
@@ -1089,6 +1103,206 @@ void fn_800E3050(int nCourse) {
         gpGame->nHoleCourse[i] = fn_800D3118(nCourse, i);
         gpGame->nHoleNum[i] = fn_800D315C(nCourse, i) - 1;
     }
+}
+
+// Builds a random mixed round from the unlocked courses: two par 3s on the front nine and two on
+// the back (never on neighbouring holes), then four par 5s the same way, then par 4s everywhere
+// else. Each hole comes from a random course, no hole twice, and every course is used once
+// before any is used again.
+void fn_800E30D4(void) {
+    CourseList courses;
+    s8  holes[18];
+    u8  bUsed[20];
+    u32 slots[4];
+    int nAvail = 0;
+    int i;
+    int k;
+    int n;
+    u32 nPick;
+    u32 nCourse;
+    u32 nHole;
+    s8  nHoles;
+    int h;
+    s8* p;
+
+    courses = lbl_80184D40;
+    for (i = 0; i < 20; i++) {
+        bUsed[i] = 0;
+    }
+    for (i = 0; i < 20; i++) {
+        for (k = 0; k < 5; k++) {
+            if (COURSE_UNLOCKED(courses.a[i], k)) {
+                nAvail++;
+                break;
+            }
+        }
+    }
+    for (i = 0; i < 18; i++) {
+        gpGame->nHoleCourse[i] = 0;
+        gpGame->nHoleNum[i] = -1;
+    }
+
+    // Par 3s.
+    for (n = 0; n < 4; n++) {
+    slot3:
+        if (n < 2) {
+            slots[n] = Rand_Next(1) % 9;
+        } else {
+            slots[n] = Rand_Next(1) % 9 + 9;
+        }
+        for (k = 0; k < n; k++) {
+            if (slots[n] == slots[k] || slots[n] == slots[k] + 1 || slots[n] == slots[k] - 1) {
+                goto slot3;
+            }
+        }
+    pick3:
+        nPick = Rand_Next(1) % nAvail;
+        gpGame->nCurCourse = courses.a[nPick];
+        gpGame->nCurHoleNum = 0;
+        while (!fn_80110180()) {
+            nPick = Rand_Next(1) % nAvail;
+            gpGame->nCurCourse = courses.a[nPick];
+            gpGame->nCurHoleNum = 0;
+            if (!fn_80110180()) {
+                bUsed[nPick] = 1;
+            }
+        }
+        nCourse = courses.a[nPick];
+        for (k = 0; k < 20; k++) {
+            for (i = 0; i < 5; i++) {
+                if (COURSE_UNLOCKED(k, i)) {
+                    break;
+                }
+            }
+            if (k == nPick) {
+                nCourse = courses.a[nPick];
+                break;
+            }
+        }
+        p = holes;
+        nHoles = 0;
+        for (h = 0; h < 18; h++) {
+            if (fn_800D2ABC(nCourse, h) == 3) {
+                *p++ = h;
+                nHoles++;
+            }
+        }
+        nHole = holes[Rand_Next(1) % nHoles];
+        for (k = 0; k < n; k++) {
+            if (nCourse == gpGame->nHoleCourse[slots[k]] && nHole == gpGame->nHoleNum[slots[k]]) {
+                goto pick3;
+            }
+        }
+        if (bUsed[nPick] == 1) {
+            for (k = 0; k < nAvail; k++) {
+                if (!bUsed[k]) {
+                    goto pick3;
+                }
+            }
+        }
+        bUsed[nPick] = 1;
+        gpGame->nHoleCourse[slots[n]] = nCourse;
+        gpGame->nHoleNum[slots[n]] = nHole;
+    }
+
+    // Par 5s.
+    for (n = 0; n < 4; n++) {
+    slot5:
+        if (n < 2) {
+            slots[n] = Rand_Next(1) % 9;
+        } else {
+            slots[n] = Rand_Next(1) % 9 + 9;
+        }
+        if (gpGame->nHoleNum[slots[n]] != -1) {
+            goto slot5;
+        }
+        for (k = 0; k < n; k++) {
+            if (slots[n] == slots[k] || slots[n] == slots[k] + 1 || slots[n] == slots[k] - 1) {
+                goto slot5;
+            }
+        }
+    pick5:
+        nPick = Rand_Next(1) % nAvail;
+        gpGame->nCurCourse = courses.a[nPick];
+        gpGame->nCurHoleNum = 0;
+        while (!fn_80110180()) {
+            nPick = Rand_Next(1) % nAvail;
+            gpGame->nCurCourse = courses.a[nPick];
+            gpGame->nCurHoleNum = 0;
+            if (!fn_80110180()) {
+                bUsed[nPick] = 1;
+            }
+        }
+        nCourse = courses.a[nPick];
+        p = holes;
+        nHoles = 0;
+        for (h = 0; h < 18; h++) {
+            if (fn_800D2ABC(nCourse, h) == 5) {
+                *p++ = h;
+                nHoles++;
+            }
+        }
+        nHole = holes[Rand_Next(1) % nHoles];
+        for (k = 0; k < n; k++) {
+            if (nCourse == gpGame->nHoleCourse[slots[k]] && nHole == gpGame->nHoleNum[slots[k]]) {
+                goto pick5;
+            }
+        }
+        if (bUsed[nPick] == 1) {
+            for (k = 0; k < nAvail; k++) {
+                if (!bUsed[k]) {
+                    goto pick5;
+                }
+            }
+        }
+        bUsed[nPick] = 1;
+        gpGame->nHoleCourse[slots[n]] = nCourse;
+        gpGame->nHoleNum[slots[n]] = nHole;
+    }
+
+    // Par 4s for the rest.
+    for (i = 0; i < 18; i++) {
+        if (gpGame->nHoleNum[i] == -1) {
+        pick4:
+            nPick = Rand_Next(1) % nAvail;
+            gpGame->nCurCourse = courses.a[nPick];
+            gpGame->nCurHoleNum = 0;
+            while (!fn_80110180()) {
+                nPick = Rand_Next(1) % nAvail;
+                gpGame->nCurCourse = courses.a[nPick];
+                gpGame->nCurHoleNum = 0;
+                if (!fn_80110180()) {
+                    bUsed[nPick] = 1;
+                }
+            }
+            nHoles = 0;
+            nCourse = courses.a[nPick];
+            p = holes;
+            for (h = 0; h < 18; h++) {
+                if (fn_800D2ABC(nCourse, h) == 4) {
+                    *p++ = h;
+                nHoles++;
+                }
+            }
+            nHole = holes[Rand_Next(1) % nHoles];
+            for (k = 0; k < i; k++) {
+                if (nCourse == gpGame->nHoleCourse[k] && nHole == gpGame->nHoleNum[k]) {
+                    goto pick4;
+                }
+            }
+            if (bUsed[nPick] == 1) {
+                for (k = 0; k < nAvail; k++) {
+                    if (!bUsed[k]) {
+                        goto pick4;
+                    }
+                }
+            }
+            gpGame->nHoleCourse[i] = nCourse;
+            bUsed[nPick] = 1;
+            gpGame->nHoleNum[i] = nHole;
+        }
+    }
+    fn_800E1434();
 }
 
 // A gimme (formerly its own unit, Gimme.c): the Gimmes option is on, it is not split screen or a
