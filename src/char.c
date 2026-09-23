@@ -62,7 +62,6 @@ void fn_8001A0FC(s32 arg0);
 void fn_8001B1DC(s32 p0, u8* p1, s32 p2);
 void fn_8001B1E8(void* p);
 void fn_8001C650(void* arg0, s32 arg1);
-void fn_8001DB98(u8* p0);
 f32 fn_8001EFFC(u8* p);
 void* fn_8001F004(void);
 extern f32 lbl_80282BC0;
@@ -105,29 +104,6 @@ void fn_8001C650(void* arg0, s32 arg1) {
         (*(s32*)((u8*)(arg0) + 0x16D4)) = 4;
     }
     (*(s32*)((u8*)(arg0) + 0x16D4)) = arg1;
-}
-
-void fn_8001DB98(u8* p0) {
-    *(s32*)(p0 + 0x43C) = -1;
-    *(s32*)(p0 + 0x440) = 0;
-    *(s32*)(p0 + 0x448) = 0;
-    *(s32*)(p0 + 0x44C) = 0;
-    *(s32*)(p0 + 0x450) = 0;
-    *(s32*)(p0 + 0x458) = -1;
-    *(s32*)(p0 + 0x45C) = 0;
-    *(s32*)(p0 + 0x464) = 0;
-    *(s32*)(p0 + 0x468) = 0;
-    *(s32*)(p0 + 0x46C) = 0;
-    *(s32*)(p0 + 0x474) = -1;
-    *(s32*)(p0 + 0x478) = 0;
-    *(s32*)(p0 + 0x480) = 0;
-    *(s32*)(p0 + 0x484) = 0;
-    *(s32*)(p0 + 0x488) = 0;
-    *(s32*)(p0 + 0x490) = -1;
-    *(s32*)(p0 + 0x494) = 0;
-    *(s32*)(p0 + 0x49C) = 0;
-    *(s32*)(p0 + 0x4A0) = 0;
-    *(s32*)(p0 + 0x4A4) = 0;
 }
 
 f32 fn_8001EFFC(u8* p) {
@@ -425,6 +401,18 @@ void fn_8001D7A4(Character* pChar) {
     fn_8001D7EC();
     pChar->u10 = pChar->u10 & ~0x20C;
     pChar->u10 = pChar->u10 | 0x40;
+}
+
+// Empty the character's four data buffers (their memory is kept).
+void fn_8001DB98(Character* pChar) {
+    int i;
+    for (i = 0; i < 4; i++) {
+        pChar->buffers[i].n00 = -1;
+        pChar->buffers[i].p04 = NULL;
+        pChar->buffers[i].p0C = NULL;
+        pChar->buffers[i].p10 = NULL;
+        pChar->buffers[i].p14 = NULL;
+    }
 }
 
 // The ball is in the golfer's hand: the current clip has more than bone 0x54's index of something

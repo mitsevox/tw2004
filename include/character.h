@@ -122,6 +122,20 @@ typedef struct ClipBlend {
     BlendClip* pD8;             // 0xD8  fn_800204A0 samples it
 } ClipBlend;
 
+// One of a character's four data buffers (Character.buffers): pBuf holds three runs of 16-byte
+// entries, p0C..p18 mark where they start and end, their counts read from p04's +0x60, +0x58 and
+// +0x5C (the code at 0x8001FE50 fills them; fn_8001DB98 empties them, fn_8001C0E0 frees pBuf).
+typedef struct CharBuffer {
+    s32   n00;                  // 0x00  -1 when empty
+    void* p04;                  // 0x04  what the buffer was filled for
+    u8*   pBuf;                 // 0x08
+    u8*   p0C;                  // 0x0C
+    u8*   p10;                  // 0x10
+    u8*   p14;                  // 0x14
+    u8*   p18;                  // 0x18
+} CharBuffer;
+LAYOUT_ASSERT(CharBuffer, 0x1C);
+
 // The golfer's character object (0x1798 bytes or more); only the fields read so far. Anim_SetRate,
 // Anim_SetTime and fn_8007326C take the address of its animation player at 0x164, whose fields
 // from 0x168 on are named here directly.
@@ -157,7 +171,7 @@ typedef struct Character {
     struct ClipRecord* pRecords;    // 0x3DC  records for its merged library (skalib)
     u8    unk3E0[0x40C - 0x3E0];
     SKABlendNode blend;         // 0x40C  the root of its blend tree
-    u8    unk43C[0x4AC - 0x43C];
+    CharBuffer buffers[4];      // 0x43C
     struct { u32 bSet; f32 fTime; u8 unk8[8]; } events[18];   // 0x4AC  animation events, by 64-bit id
     s32   n5CC;                 // 0x5CC
     u8    unk5D0[0x1624 - 0x5D0];
