@@ -80,7 +80,7 @@ typedef struct {
 } UStream;
 
 typedef struct {
-    u32   uType;
+    int   nType;             // a 4-character tag; compared signed (cmpw) in the register calls
     void  (*pfnHandler)(UStreamObject* pObject);
     int   nRefs;
 } UStreamHandler;

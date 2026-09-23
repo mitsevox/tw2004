@@ -7,10 +7,10 @@
 
 extern OSTime __OSGetSystemTime();
 #if VERSION < VERSION_GM8P_00
-static const char* __OSVersion =
+const char* __OSVersion =
     "<< Dolphin SDK - OS\trelease build: Sep  5 2002 05:32:39 (0x2301) >>";
 #else
-static const char* __OSVersion =
+const char* __OSVersion =
     "<< Dolphin SDK - OS\trelease build: Nov  5 2002 12:52:29 (0x2301) >>";
 #endif
 extern char _db_stack_end[];
@@ -161,7 +161,7 @@ void* __OSSavedRegionEnd;
 extern u32 BOOT_REGION_START : 0x812FDFF0; //(*(u32 *)0x812fdff0)
 extern u32 BOOT_REGION_END : 0x812FDFEC;   //(*(u32 *)0x812fdfec)
 
-void ClearArena(void) {
+static void ClearArena(void) {
   if ((u32)(OSGetResetCode() + 0x80000000) != 0U) {
     __OSSavedRegionStart = 0U;
     __OSSavedRegionEnd = 0U;

@@ -83,7 +83,7 @@ int SFIOFirstDeviceFromMask(u16 uDeviceMask);
 int SFIOLastDeviceFromMask(u16 uDeviceMask);
 void SFIOSetLastError(int eError);
 extern void* TibExtMemAlloc(void* pAllocator, u32 uSize, u32 uAlign, const char* pFile, int uLine);
-extern void  fn_80122128(void* pAllocator, void* p, u32 uSize, u32 uAlign);
+extern void  TibExtMemFree(void* pAllocator, void* p, u32 uSize, u32 uAlign);
 
 typedef struct {
     void* pAllocator;
@@ -716,9 +716,9 @@ int SFIOShutdown(void) {
     _SFIO_pDevice->fn.pfn44 = NULL;
     _SFIO_pData->eState = 0;
     _SFIO_pData->eOperation = 0;
-    fn_80122128(_SFIO_pDevice->pAllocator, _SFIO_pData, sizeof(SFIOData), 4);
+    TibExtMemFree(_SFIO_pDevice->pAllocator, _SFIO_pData, sizeof(SFIOData), 4);
     _SFIO_pData = NULL;
-    fn_80122128(_SFIO_pDevice->pAllocator, _SFIO_pDevice, sizeof(SFIODevice), 4);
+    TibExtMemFree(_SFIO_pDevice->pAllocator, _SFIO_pDevice, sizeof(SFIODevice), 4);
     _SFIO_pDevice = NULL;
     return 0;
 }

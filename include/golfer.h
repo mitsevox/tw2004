@@ -334,7 +334,9 @@ typedef struct Player {
     s32  nC6C[18];              // 0xC6C  cleared at the start of a round
     f32  fCB4;                  // 0xCB4  speed golf: raised by a button, falls every frame
     s32  nCB8;                  // 0xCB8  speed golf: cleared by that button
-    u8   unkCBC[0xCD0 - 0xCBC];
+    f32  vCBC[3];               // 0xCBC  a vector (the run's velocity?): the first-person camera's step is
+                                //        three times the length of its x and z
+    u8   unkCC8[0xCD0 - 0xCC8];
     s32  nCD0;                  // 0xCD0  cleared per game (fn_800F2030)
     s32  aCD4[20];              // 0xCD4
     s32  nD24;                  // 0xD24  mode 12: a bonus meter, 0..100
@@ -417,12 +419,13 @@ typedef struct PlayerProfile {
 LAYOUT_ASSERT(PlayerProfile, 0x40);
 
 // A course's records (the 'rcrd' stream block, Session_OnRecordsLoaded; 0x320 bytes per course).
+// Like the all-time records (recA): 8 kinds, the top 5 of each (fn_800D8458 reads them).
+// GameEffects compares kind 0's best with a player's strokes + 1, and kind 2's with three times
+// Player.fA64.
 typedef struct CourseRecord {
-    s32  n0;                    // 0x000  compared with a player's strokes + 1 (GameEffects)
-    u8   unk4[0xC8 - 0x4];
-    s32  nC8;                   // 0x0C8  compared with three times Player.fA64 (GameEffects)
-    u8   unkCC[0x320 - 0xCC];
+    RecordEntry aRecord[8][5];  // 0x000
 } CourseRecord;
+LAYOUT_ASSERT(CourseRecord, 0x320);
 
 #define NUM_COURSE_RECORDS 21   // 0xF00..0x50A0 of the session
 

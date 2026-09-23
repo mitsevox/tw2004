@@ -1,9 +1,12 @@
 // FE_Manager.c (EA's name, from its asserts; also in EA's 2002 source tree): the front end's
 // manager, which runs the menu screens: the movies played from the menus (the intro, the credits,
-// the golfers' bios), the profile being worked on, and the created golfer. Partly decompiled.
+// the golfers' bios), the profile being worked on, the created golfer and its Create-A-Player
+// picks and unlocks.
 
 #include "engine.h"
 #include "game.h"
+#include "charstate.h"
+#include "core/easb.h"
 #include "frontend/fe.h"
 
 // Outside this file.
@@ -29,25 +32,22 @@ void fn_800A4FD8(void);
 void fn_80102AC4(void);
 void fn_80103B74(int a);
 int  fn_80103D14(s16 nSlot);            // the asset worn in an equipment slot, or -1 (FE_CrAPDB.c)
-u8   fn_80104020(void* pChoice);        // } a part's choices (FE_CrAPDB.c): whether one may be
-int  fn_801048EC(s16 nPart, int a);     // } picked, how many there are, one of them and its
-void* fn_80104FA8(s16 nPart, int a, int i);   // } asset
-CrAPAsset* fn_80104F68(void* pChoice);  // }
+void fn_801073DC(int nPart);            // FE_CrAPDB.c
 int  fn_801049C8(s16 nPart);            // how many b a part has, for fn_800797E0 (FE_CrAPDB.c)
-int  fn_80105494(int nAsset);           // } the two attributes an asset raises (-1: none)
-int  fn_80105504(int nAsset);           // }
-int  fn_801054CC(int nAsset);           // } and the tier it raises each to
-int  fn_8010553C(int nAsset);           // }
-void fn_80103B8C(s8 b);                 // } FE_CrAPDB.c: set b; an asset's b (2: either),
+s8   fn_80103BB4(void);                 // FE_CrAPDB.c: the b fn_80103B8C set
+void fn_80103B8C(s8 b);                // } FE_CrAPDB.c: set b; an asset's b (2: either),
 s8   fn_80103BC0(int nAsset);           // } its kind, fn_80107444's count, and its part and
 s16  fn_8010742C(int nAsset);           // } choice
 int  fn_80107444(int nAsset);           // }
 void fn_80105FF8(int nAsset, s16* pKind, s32* pPart, s32* pChoice);    // }
-s32  fn_80105C00(void);                 // FE_CrAPDB.c: how many assets there are
-u8   fn_80105C30(void);                 // the Create-A-Player database is loaded (FE_CrAPDB.c)
 
 void fn_8011E020(s32* pMonth, s32* pDay, s32* pYear, s32* pHour, s32* pMinute, s32* pSecond, s32* pMsec);
 u32  fn_8000B244(void);                 // a random seed from the clock
+f32  GM_GetGameProgress(SaveProfile* pProfile);         // GameManager.c
+u8   fn_80056480(int a);
+u8   fn_800564AC(int n);
+u8   fn_80058304(SaveProfile* pProfile, int a);
+s32  fn_801258E8(void);                 // EASportsBio.c
 void fn_80076EEC(void);                 // frees lbl_80281EC8
 void fn_80076F20(void);
 u8   fn_80079E44(int nAttr);            // a hidden attribute: ATTR_AGGRESSION, ATTR_IQ, ATTR_SPEED
@@ -76,12 +76,12 @@ void fn_80077808(int nSlot);
 void fn_80077968(int nSlot);
 void fn_800779BC(int a, int b);
 GolferRecord* fn_80077A80(int nGolfer);
-void fn_80077B78(void);
 int  fn_80077BDC(int n);
 void fn_80077C1C(int a, int b);
-u8   fn_80078008(int nAsset, SaveProfile* pProfile);
+u8   fn_80078008(s32 nAsset, SaveProfile* pProfile);
 int  fn_80078604(int a, int b, int c);
 void fn_80078620(int n, int* pA, int* pB, int* pC);
+void fn_80078680(SaveProfile* pProfile);
 void fn_8007873C(SaveProfile* pProfile);
 u8   FE_CrAP_IsAssetUndesirable(s16 nPart, CrAPAsset* pAsset);
 void fn_80078A2C(s16 nPart, int nChance);
@@ -96,6 +96,19 @@ void fn_80079974(void);
 void fn_80079AD4(void);
 void fn_80079D30(void);
 void fn_80079DAC(void);
+
+// This file's globals (fe.h), each section in reverse address order as the compiler lays it out.
+FEState lbl_801D7148;
+FEProfile* lbl_80281ED4;
+u32 lbl_80281ED0;
+u32 lbl_80281ECC;
+u8* lbl_80281EC8;
+
+// fake match: stands in for a function the original linker stripped. The file's pool starts with
+// 1.0f (0x80283AC0), before the 0.0f and 0.05f FE_GetBIOMovieName uses first; its body is unknown.
+static f32 FE_Manager_StrippedFn(f32 x) {
+    return x + 1.0f;
+}
 
 // The 'BIO ' stream object's handler: keep a copy of its data.
 void fn_80076F80(UStreamObject* pObject) {
@@ -500,6 +513,196 @@ void fn_80077C1C(int a, int b) {
     fn_8000B1D4(0, gSession.nSeed);
 }
 
+// Whether a Create-A-Player asset is still locked for the profile (never in the session's 0x4000
+// mode, nor while fn_80056480(0) holds). The asset names a lock kind (fn_801055DC) and a number
+// for it (fn_80105610): a bit, an award, a tournament won, a count of them to reach, a season...
+u8 fn_80078008(s32 nAsset, SaveProfile* pProfile) {
+    int aBits[5] = {1, 2, 3, 4, 5};
+    int nCount = 0;
+    s8 nKind;
+    s16 n;
+    u8 bLocked;
+    int i;
+    if (gSession.uFlags & 0x4000) {
+        return 0;
+    }
+    nKind = fn_801055DC(nAsset);
+    n = fn_80105610(nAsset);
+    if (fn_80056480(0)) {
+        return 0;
+    }
+    switch (nKind) {
+    case 0:
+        bLocked = fn_8001E9CC(pProfile->aB1CC, n) == 0;
+        break;
+    case 2:
+        bLocked = !fn_80058304(pProfile, 1);
+        break;
+    case 3:
+        bLocked = 1;
+        break;
+    case 4:
+        bLocked = 0;
+        break;
+    case 6:
+        bLocked = fn_8001E9CC(lbl_801D5948, aBits[n]) == 0;
+        break;
+    case 7:
+        bLocked = !pProfile->aC8[n].award.bWon;
+        break;
+    case 8:
+        bLocked = 1;
+        for (i = 0; i < 31; i++) {
+            if (pProfile->aC8[i].award.bWon) {
+                nCount++;
+            }
+        }
+        if (nCount >= n) {
+            bLocked = 0;
+        }
+        break;
+    case 9:
+        bLocked = pProfile->tour.nSeason < n;
+        break;
+    case 10:
+        bLocked = 1;
+        if (fn_800564AC(n)) {
+            bLocked = 0;
+        }
+        for (i = 0; i < 11; i++) {
+            if (pProfile->a1054C[i].b && pProfile->a1054C[i].n == n) {
+                bLocked = 0;
+            }
+        }
+        break;
+    case 11:
+        bLocked = 1;
+        for (i = 0; i < 11; i++) {
+            if (pProfile->a1054C[i].b) {
+                nCount++;
+            }
+        }
+        if (nCount >= n) {
+            bLocked = 0;
+        }
+        break;
+    case 12:
+        if (EASBio_IsBioLoaded() && n <= fn_801258E8()) {
+            bLocked = 0;
+        } else {
+            bLocked = 1;
+        }
+        break;
+    case 13:
+        bLocked = 1;
+        break;
+    case 14:
+        bLocked = !pProfile->aLadderAward[n].bWon;
+        break;
+    case 15:
+        bLocked = 1;
+        for (i = 0; i < 25; i++) {
+            if (pProfile->aLadderAward[i].bWon) {
+                nCount++;
+            }
+        }
+        if (nCount >= n) {
+            bLocked = 0;
+        }
+        break;
+    case 16:
+        bLocked = n > GM_GetGameProgress(pProfile);
+        break;
+    case 17:
+        bLocked = !pProfile->aRTEAward[n].bWon;
+        break;
+    case 18:
+        bLocked = 1;
+        for (i = 0; i < 75; i++) {
+            if (pProfile->aRTEAward[i].bWon) {
+                nCount++;
+            }
+        }
+        if (nCount >= n) {
+            bLocked = 0;
+        }
+        break;
+    case 19:
+        bLocked = pProfile->aMedal[n] != 0;
+        break;
+    case 20:
+        bLocked = 1;
+        if (pProfile->nTourCardLevel >= 1) {
+            nCount = 1;
+        }
+        for (i = 0; i < 29; i++) {
+            if (pProfile->aMedal[i]) {
+                nCount++;
+            }
+        }
+        if (nCount >= n) {
+            bLocked = 0;
+        }
+        break;
+    case 21:
+        bLocked = !pProfile->aAward[n].bWon;
+        break;
+    case 22:
+        bLocked = 1;
+        for (i = 0; i < 23; i++) {
+            if (pProfile->aAward[i].bWon) {
+                nCount++;
+            }
+        }
+        if (nCount >= n) {
+            bLocked = 0;
+        }
+        break;
+    case 23:
+        n += 23;
+        bLocked = !pProfile->aAward[n].bWon;
+        break;
+    case 24:
+        bLocked = 1;
+        for (i = 23; i < 16; i++) {         // EA bug: never runs (awards 23..38 were meant?)
+            if (pProfile->aAward[i].bWon) {
+                nCount++;
+            }
+        }
+        if (nCount >= n) {
+            bLocked = 0;
+        }
+        break;
+    case 25:
+        bLocked = !pProfile->a1C0[n + 12].b;
+        break;
+    case 26:
+        bLocked = 1;
+        for (i = 12; i < 16; i++) {
+            if (pProfile->a1C0[i].b) {
+                nCount++;
+            }
+        }
+        if (nCount >= n) {
+            bLocked = 0;
+        }
+        break;
+    case 27:
+        bLocked = pProfile->nTourCardLevel < n;
+        break;
+    case -1:
+        bLocked = 0;
+        break;
+    case 28:
+        bLocked = 0;
+        break;
+    default:
+        bLocked = 0;
+        break;
+    }
+    return bLocked;
+}
+
 // Pack three numbers into one, b * 1000000 + a * 10000 + c; fn_80078620 unpacks it.
 int fn_80078604(int a, int b, int c) {
     int n = c;
@@ -514,6 +717,26 @@ void fn_80078620(int n, int* pA, int* pB, int* pC) {
     *pA = n / 10000;
     n -= *pA * 10000;
     *pC = n;
+}
+
+// Note which Create-A-Player assets are locked for the profile (fn_80078008), one bit each.
+void fn_80078680(SaveProfile* pProfile) {
+    int i;
+    int nCount;
+    s8 nSaved;
+    if (fn_80105C30()) {
+        nSaved = fn_80103BB4();
+        nCount = fn_80105C00();
+        for (i = 0; i < nCount; i++) {
+            fn_80103B8C(fn_80103BC0(i));
+            if (fn_80078008(i, pProfile)) {
+                fn_8001EA34(pProfile->aAssetLocked, i);
+            } else {
+                fn_8001EB6C(pProfile->aAssetLocked, i);
+            }
+        }
+        fn_80103B8C(nSaved);
+    }
 }
 
 // ---- the created golfer's parts -----------------------------------------------------------------
@@ -609,14 +832,14 @@ void fn_80078A2C(s16 nPart, int nChance) {
     int nFound = 0;
     int nCount = fn_801048EC(nPart, 0);
     int i;
-    void* pChoice;
+    int nAsset;
     CrAPAsset* pAsset;
     for (i = 0; i < nCount; i++) {
-        pChoice = fn_80104FA8(nPart, 0, i);
-        pAsset = fn_80104F68(pChoice);
-        if (bDesirable && !FE_CrAP_IsAssetUndesirable(nPart, pAsset) && fn_80104020(pChoice)) {
+        nAsset = fn_80104FA8(nPart, 0, i);
+        pAsset = fn_80104F68(nAsset);
+        if (bDesirable && !FE_CrAP_IsAssetUndesirable(nPart, pAsset) && fn_80104020(nAsset)) {
             aChoices[nFound++] = i;
-        } else if (!bDesirable && FE_CrAP_IsAssetUndesirable(nPart, pAsset) && fn_80104020(pChoice)) {
+        } else if (!bDesirable && FE_CrAP_IsAssetUndesirable(nPart, pAsset) && fn_80104020(nAsset)) {
             aChoices[nFound++] = i;
         }
     }
@@ -651,7 +874,10 @@ u8 fn_80078B84(CrAPAsset* pAsset) {
     if (fn_8015F844(pAsset->szName, "Purple") == 0) {
         return 1;
     }
-    return fn_8015F844(pAsset->szName, "Blue") == 0;
+    if (fn_8015F844(pAsset->szName, "Blue") == 0) {
+        return 1;
+    }
+    return 0;
 }
 
 // Anything worn on the head but a plain hat (one worn backwards counts) or a visor.
@@ -695,7 +921,172 @@ u8 fn_80078D24(CrAPAsset* pAsset) {
     if (fn_8015F844(pAsset->szName, "Purple") == 0) {
         return 1;
     }
-    return fn_8015F844(pAsset->szName, "Blue") == 0;
+    if (fn_8015F844(pAsset->szName, "Blue") == 0) {
+        return 1;
+    }
+    return 0;
+}
+
+// A random created golfer: random parts 10, 9 and 16; hair (part 3) with a 10% chance of corn
+// rows, an afro or a mohawk; parts 4 to 6 on a random choice now and then; part 14 a plain colour
+// one time in five, and part 15 usually the same choice; a hat (part 0) 40% of the time, a crazy
+// one one time in five; and a few more parts by chance.
+void fn_80078E34(SaveProfile* pProfile) {
+    char szDebug[256];
+    u8 bPicking;
+    u8 bChance;
+    int nAsset;
+    int nCount;
+    int nPick;
+    int nPrev;
+    CrAPAsset* pAsset;
+    fn_8007975C(pProfile, 10, 0);
+    fn_8007975C(pProfile, 9, 0);
+    fn_8007975C(pProfile, 16, 0);
+
+    bChance = Rand_Next(0) % 100 < 10;
+    bPicking = 1;
+    nCount = fn_801048EC(3, 0);
+    while (bPicking) {
+        nPick = Rand_Next(0) % nCount;
+        pAsset = fn_80104E84(3, 0, nPick);
+        if (bChance && pAsset &&
+            (fn_8015F844(pAsset->szName, "Corn Rows") == 0 || fn_8015F844(pAsset->szName, "Afro") == 0 ||
+             fn_8015F844(pAsset->szName, "Mohawk") == 0)) {
+            FE_CrAP_TurnOnPart(3, 0, nPick);
+            bPicking = 0;
+        }
+        if (!bChance &&
+            (pAsset == NULL || (fn_8015F844(pAsset->szName, "Corn Rows") != 0 &&
+                                fn_8015F844(pAsset->szName, "Afro") != 0 &&
+                                fn_8015F844(pAsset->szName, "Mohawk") != 0))) {
+            FE_CrAP_TurnOnPart(3, 0, nPick);
+            bPicking = 0;
+        }
+    }
+
+    bChance = Rand_Next(0) % 100 < 20;
+    if (bChance) {
+        nCount = fn_801048EC(4, 0);
+        nPick = Rand_Next(0) % (nCount - 1);
+        nPick++;
+        FE_CrAP_TurnOnPart(4, 0, nPick);
+    } else {
+        FE_CrAP_TurnOnPart(4, 0, 0);
+    }
+    bChance = Rand_Next(0) % 100 < 10;
+    if (bChance) {
+        nCount = fn_801048EC(5, 0);
+        nPick = Rand_Next(0) % (nCount - 1);
+        nPick++;
+        FE_CrAP_TurnOnPart(5, 0, nPick);
+    } else {
+        FE_CrAP_TurnOnPart(5, 0, 0);
+    }
+    bChance = Rand_Next(0) % 100 < 10;
+    if (bChance) {
+        nCount = fn_801048EC(6, 0);
+        if (nCount != -1) {
+            if (nCount > 1) {
+                nPick = Rand_Next(0) % (nCount - 1);
+            } else {
+                nPick = Rand_Next(0) % (nCount - 1);   // EA bug: divides by zero for one choice
+                nPick++;
+            }
+            FE_CrAP_TurnOnPart(6, 0, nPick);
+        }
+    } else {
+        FE_CrAP_TurnOnPart(6, 0, 0);
+    }
+
+    bChance = Rand_Next(0) % 100 < 80;
+    bPicking = 1;
+    nCount = fn_801048EC(14, 0);
+    while (bPicking) {
+        nPick = Rand_Next(0) % nCount;
+        pAsset = fn_80104E84(14, 0, nPick);
+        if (bChance && !fn_80078B84(pAsset)) {
+            FE_CrAP_TurnOnPart(14, 0, nPick);
+            bPicking = 0;
+        }
+        if (!bChance && fn_80078B84(pAsset)) {
+            FE_CrAP_TurnOnPart(14, 0, nPick);
+            bPicking = 0;
+        }
+        nPrev = nPick;
+    }
+    bChance = Rand_Next(0) % 100 < 90;
+    if (bChance) {
+        FE_CrAP_TurnOnPart(15, 0, nPrev);
+    } else {
+        bChance = Rand_Next(0) % 100 < 80;
+        bPicking = 1;
+        nCount = fn_801048EC(15, 0);
+        while (bPicking) {
+            nPick = Rand_Next(0) % nCount;
+            pAsset = fn_80104E84(15, 0, nPick);
+            if (bChance && !fn_80078D24(pAsset)) {
+                FE_CrAP_TurnOnPart(15, 0, nPick);
+                bPicking = 0;
+            }
+            if (!bChance && fn_80078D24(pAsset)) {
+                FE_CrAP_TurnOnPart(15, 0, nPick);
+                bPicking = 0;
+            }
+        }
+    }
+
+    bChance = Rand_Next(0) % 100 < 40;
+    if (bChance) {
+        bChance = Rand_Next(0) % 100 < 80;
+        bPicking = 1;
+        nCount = fn_801048EC(0, 0);
+        while (bPicking) {
+            nPick = Rand_Next(0) % nCount;
+            pAsset = fn_80104E84(0, 0, nPick);
+            if (bChance && !FE_CrAP_IsCrazyHat(pAsset)) {
+                FE_CrAP_TurnOnPart(0, 0, nPick);
+                bPicking = 0;
+            }
+            if (!bChance && FE_CrAP_IsCrazyHat(pAsset)) {
+                FE_CrAP_TurnOnPart(0, 0, nPick);
+                bPicking = 0;
+            }
+        }
+        nAsset = fn_80104FA8(0, 0, nPick);
+        sprintf(szDebug, "I hate everone: %d", nAsset);     // a leftover debug line; never shown
+    } else {
+        FE_CrAP_TurnOnPart(0, 0, 0);
+    }
+
+    fn_801073DC(5);
+    fn_801073DC(6);
+    fn_801073DC(7);
+    fn_801073DC(8);
+    fn_801073DC(11);
+    fn_801073DC(12);
+    fn_801073DC(13);
+    fn_801073DC(14);
+    if (Rand_Next(0) % 100 < 30) {
+        fn_8007975C(pProfile, 19, 0);
+    }
+    if (Rand_Next(0) % 100 < 30) {
+        fn_8007975C(pProfile, 20, 0);
+    }
+    bChance = Rand_Next(0) % 100 < 20;
+    if (bChance) {
+        nCount = fn_801048EC(19, 3);
+        nPick = Rand_Next(0) % nCount;
+        fn_80104E84(19, 3, nPick);
+        FE_CrAP_TurnOnPart(19, 0, nPick);
+    }
+    bChance = Rand_Next(0) % 100 < 5;
+    if (bChance) {
+        nCount = fn_801048EC(8, 0);
+        FE_CrAP_TurnOnPart(8, 0, Rand_Next(0) % nCount);
+    } else {
+        fn_801073DC(13);
+    }
 }
 
 void fn_80079664(SaveProfile* pProfile) {

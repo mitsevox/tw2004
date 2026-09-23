@@ -434,7 +434,7 @@ void fn_800F3860(void) {
                 nMsg = 0x48;
             }
         } else {
-            fn_80125910(1);
+            EASBio_SetCurrentGameWon(1);
             fn_800D3548(i, PLAYER(i)->nDD8, 0);
         }
     }

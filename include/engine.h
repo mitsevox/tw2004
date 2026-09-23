@@ -17,6 +17,8 @@ void* fn_80009B34(u32 uSize, u32 uFlags, u32 uAlign, const char* pFile, int nLin
 void  fn_80009E70(void* p);             // free
 void* fn_800951A0(u32 uSize, int nAlign, int a);
 void  fn_800953C8(int a);
+// Sorts nCount items of nSize bytes with pfnCompare (the C library's qsort, by its arguments).
+void  fn_8015929C(void* pBase, u32 nCount, u32 nSize, s32 (*pfnCompare)(const void* pA, const void* pB));
 
 // ---- time ------------------------------------------------------------------------------------
 
@@ -137,10 +139,18 @@ typedef struct UStreamObject {
     char  szName[4];              // 0x40  chunk+0x3C
 } UStreamObject;
 
-int  UStream_RegisterHandler(u32 uType, void (*pfnHandler)(UStreamObject*));
-int  UStream_UnregisterHandler(u32 uType);
+int  UStream_RegisterHandler(int nType, void (*pfnHandler)(UStreamObject*));
+int  UStream_UnregisterHandler(int nType);
 u32  fn_8000E790(UStreamObject* pObject, u32 uMax, void* pDst);   // copy the data out, free the object
 u32  fn_8000E81C(UStreamObject* pObject, void** ppData);          // the data and its size
+
+// Files on disc: a handle from open, -1 for none.
+int  fn_800060E0(const char* pName);    // file open
+int  fn_8000633C(int hFile);            // file close
+// Reads uLen bytes at uOffset into pDst without waiting; pfnDone is called when it is done. Below
+// 0: the read could not be queued.
+int  fn_80006444(int hFile, void* pDst, u32 uLen, u32 uOffset, void (*pfnDone)(int nBytes, int nError));
+u32  fn_800065B0(int hFile);            // file size
 
 // ---- controller input ------------------------------------------------------------------------
 
@@ -157,7 +167,7 @@ u8   fn_80014300(u32 uMask);            // any pad pressed these buttons
 
 // ---- events, sound, effects ------------------------------------------------------------------
 
-void fn_8001C804(int nPlayer, int a, int b);
+void fn_8001C804(int nPlayer, u8 a, u8 b);  // char.c: sets bits of the player's character's u10
 void fn_8001D8DC(int nPlayer);
 void fn_8001EF34(f32* pIn, f32 f, f32* pOut);   // scale a vector (paired singles)
 
@@ -197,7 +207,10 @@ void fn_800BAF04(f32* pSrc, f32* pDst);   // normalise
 f32  Vec_Distance(f32* pA, f32* pB);
 void BreakLine_Start(int nView);
 int  fn_8011937C(int nPlayer, int a, u8 b);
-void fn_80125854(int a);
-void fn_80125910(u8 b);
+// The EA Sports Bio, game side (EASportsBio.c; TW06's names)
+void EASBio_SetGamePlayState(u8 bFlag);
+void EASBio_IncrementGamesWon(u32 uCount);
+void EASBio_SetCurrentGameWon(u8 bWon);
+u8   EASBio_IsCurrentGameWon(void);
 
 #endif

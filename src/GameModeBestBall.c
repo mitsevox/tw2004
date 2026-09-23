@@ -331,7 +331,7 @@ void fn_800E8A68(void) {
                         for (i = 0; i < 2; i++) {
                             nProfile = gPlayers[nFirst + i].nIndex;
                             if (gpSaveData[nProfile].bActive) {
-                                fn_80125910(1);
+                                EASBio_SetCurrentGameWon(1);
                                 if (nBase) {
                                     fn_800E4364(0, 0x76, nBase, nProfile);
                                 }
