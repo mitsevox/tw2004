@@ -1520,6 +1520,40 @@ void fn_800FD534(int nPlayer) {
 void fn_800FD6A0(int nPlayer) {
 }
 
+// A hole's points (nC6C) for the scorecard; *pWon is 1 when the player gained points on it
+// (two-player game only). The hole being played counts from nC44 until it is finished.
+s32 fn_800FD704(int nPlayer, int nHole, s32* pWon) {
+    int nCur = Game_CurHoleIndex();
+    int nGain;
+    if (Game_GetMode() == 8) {
+        *pWon = 0;
+    } else if (nHole == Game_CurHoleIndex() && !fn_800FA118(nPlayer, 1)) {
+        *pWon = 0;
+        return gPlayers[nPlayer].nC6C[nHole];
+    } else if (gpGame->bHoleSelected[nHole]) {
+        if (nHole == fn_800F9328()) {
+            if (nCur == nHole) {
+                nGain = gPlayers[nPlayer].nC44 - 3000;
+            } else {
+                nGain = gPlayers[nPlayer].nC6C[nHole] - 3000;
+            }
+        } else if (nHole == nCur) {
+            nGain = gPlayers[nPlayer].nC44 - gPlayers[nPlayer].nC6C[fn_800F9414(nHole)];
+        } else {
+            nGain = gPlayers[nPlayer].nC6C[nHole] - gPlayers[nPlayer].nC6C[fn_800F9414(nHole)];
+        }
+        if (nGain > 0) {
+            *pWon = 1;
+        } else {
+            *pWon = 0;
+        }
+    } else {
+        *pWon = 0;
+        return 0;
+    }
+    return gPlayers[nPlayer].nC6C[nHole];
+}
+
 // In speed golf (modes 7 and 8), bit 0 of nC3C: the golfer is running to the ball.
 s32 fn_800FD6A4(int nPlayer) {
     if (Game_GetMode() == 7 || Game_GetMode() == 8) {
