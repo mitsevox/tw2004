@@ -34,6 +34,8 @@ void fn_800E25E0(void);                 // GameRound.c
 void fn_800E30D4(void);                 // GameRound.c: builds the mixed rounds
 int  fn_80110180(void);
 s32  fn_8011027C(void);                 // DiscCheck.c
+void fn_80126F84(s32 n);                // GameMode22.c: sets lbl_80195498.n4
+void fn_80126F94(s32 n);                // GameMode22.c: sets lbl_80195498.n0
 void GM_SetupCustomHoleSelection(void); // GameManager.c
 int  GM_vGetAllTimeRecordsHeld(SaveProfile* pProfile);  // GameManager.c
 void fn_800EAE44(int nId);              // GameMode5.c
@@ -2473,20 +2475,6 @@ void fn_8007E67C(MsgArg* pArgs, MsgArg* pResult) {
 void fn_8007E744(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-// Whether one of the four names on the card at pArgs[0], pArgs[1] is pArgs[2].
-void fn_8007E79C(MsgArg* pArgs, MsgArg* pResult) {
-    MCCardState state;
-    int i;
-
-    fn_8009F7F4(&state, pArgs[0].i, pArgs[1].i);
-    pResult->i = 0;
-    for (i = 0; i < 4; i++) {
-        if (strcmp(state.aszName[i], ((MsgString*)pArgs[2].p)->pStr) == 0) {
-            pResult->i = 1;
-        }
-    }
-}
-
 void fn_8007E748(MsgArg* pArgs, MsgArg* pResult) {
 }
 
@@ -2503,6 +2491,20 @@ void fn_8007E74C(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_8007E798(MsgArg* pArgs, MsgArg* pResult) {
+}
+
+// Whether one of the four names on the card at pArgs[0], pArgs[1] is pArgs[2].
+void fn_8007E79C(MsgArg* pArgs, MsgArg* pResult) {
+    MCCardState state;
+    int i;
+
+    fn_8009F7F4(&state, pArgs[0].i, pArgs[1].i);
+    pResult->i = 0;
+    for (i = 0; i < 4; i++) {
+        if (strcmp(state.aszName[i], ((MsgString*)pArgs[2].p)->pStr) == 0) {
+            pResult->i = 1;
+        }
+    }
 }
 
 void fn_8007E818(MsgArg* pArgs, MsgArg* pResult) {
@@ -4356,6 +4358,51 @@ void fn_800849F8(MsgArg* pArgs, MsgArg* pResult) {
             pResult->i = pResult->i == 0;
         }
         gpGame->b137 = 0;
+    }
+}
+
+// pArgs[0] 0: set up game mode 26, or mode 22 in variant 0 or 1 (pArgs[1] 1, 2). 1: game mode
+// 22's n4 is 5, 10 or 15 (pArgs[1] 0, 1, 2).
+void fn_80084AA8(MsgArg* pArgs, MsgArg* pResult) {
+    s32 nMode;
+    s32 n;
+
+    switch (pArgs[0].i) {
+    case 0:
+        switch (pArgs[1].i) {
+        case 1:
+            nMode = 22;
+            n = 0;
+            break;
+        case 2:
+            nMode = 22;
+            n = 1;
+            break;
+        default:
+            nMode = 26;
+            n = 0;
+            break;
+        }
+        fn_800E0B38(nMode);
+        fn_800E25E0();
+        if (nMode == 22) {
+            fn_80126F94(n);
+        }
+        return;
+    case 1:
+        switch (pArgs[1].i) {
+        case 1:
+            n = 10;
+            break;
+        case 2:
+            n = 15;
+            break;
+        default:
+            n = 5;
+            break;
+        }
+        fn_80126F84(n);
+        break;
     }
 }
 
