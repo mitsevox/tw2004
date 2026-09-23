@@ -98,6 +98,111 @@ if dirty:
     sys.exit('Commit the sweep files first (or undo their edits), then run fold.py again. '
              'Nothing was changed.')
 
+
+# mkunit.py takes every sweep in the unit's range out of splits.txt and configure.py. When only
+# some of them are folded here, the others would be left behind as orphans: files that nothing
+# builds, whose functions the unit covers without their code. So each sweep file left out is put
+# back as its own unit (its splits.txt block and configure.py line as at HEAD), and the unit's
+# .text range is cut back to end before it; that works for sweeps at either end of the range
+# only. A left-out sweep between folded code, or one with no block at HEAD, stops the fold
+# before anything is changed.
+TEXT = re.compile(r'\.text\s+start:0x([0-9A-Fa-f]+) end:0x([0-9A-Fa-f]+)')
+SPLITS = ROOT / 'config/GW4E69/splits.txt'
+
+
+def split_blocks(text):
+    return {m.group(1): b for b in re.split(r'\n(?=\S[^\n]*:\n)', text)
+            for m in [re.match(r'(\S[^\n]*):\n', b)] if m}
+
+
+def text_range(block):
+    t = TEXT.search(block or '')
+    return (int(t.group(1), 16), int(t.group(2), 16)) if t else None
+
+
+def restore_left_out():
+    head_splits = run('git show HEAD:config/GW4E69/splits.txt').stdout
+    head_cfg = run('git show HEAD:configure.py').stdout
+    now = split_blocks(SPLITS.read_text(encoding='utf-8'))
+    old = split_blocks(head_splits)
+    unit = f'{name}.c'
+    rng = text_range(now.get(unit))
+    if not rng:
+        return
+    lo, hi = rng
+    cfg = (ROOT / 'configure.py').read_text(encoding='utf-8')
+    passed = set(sweeps)
+    left, stuck = [], []
+    for f in sorted((ROOT / 'src/unsorted').glob('sweep_*.c')):
+        s = f'unsorted/{f.name}'
+        if s in passed or s in now or f'"{s}"' in cfg:
+            continue                                 # folded now, or still its own unit
+        r = text_range(old.get(s))
+        if r is None:
+            a = int(f.stem.split('_')[1], 16)
+            if lo <= a < hi:
+                stuck.append(f'{s}: in {name}.c\'s range, no block in splits.txt at HEAD either '
+                             '(an orphan already: fold it too)')
+            continue
+        if r[0] < hi and r[1] > lo:
+            left.append((s, r))
+    # what the unit keeps: the folded sweeps, and its own range at HEAD when it is being widened
+    keep = [text_range(old.get(s)) for s in sweeps] + [text_range(old.get(unit))]
+    keep = [r for r in keep if r]
+    k_lo = min((r[0] for r in keep), default=hi)
+    k_hi = max((r[1] for r in keep), default=lo)
+    below = [(s, r) for s, r in left if r[1] <= k_lo]
+    above = [(s, r) for s, r in left if r[0] >= k_hi]
+    for s, r in left:
+        if (s, r) not in below and (s, r) not in above:
+            stuck.append(f'{s} (0x{r[0]:08X}-0x{r[1]:08X}): left out, but it lies between '
+                         'code that is folded; fold it too, or narrow the range with mkunit.py')
+        elif not re.search(r'\n[ \t]*Object\(\w+, "%s"\),[^\n]*' % re.escape(s), head_cfg):
+            stuck.append(f'{s}: left out, but configure.py has no line for it at HEAD')
+    if stuck:
+        print('\n'.join(stuck))
+        sys.exit('Nothing was changed.')
+    if not left:
+        return
+    new_lo = max([lo] + [r[1] for _, r in below])
+    new_hi = min([hi] + [r[0] for _, r in above])
+    text = SPLITS.read_text(encoding='utf-8')
+    parts = re.split(r'\n(?=\S[^\n]*:\n)', text)
+    out = []
+    for b in parts:
+        if b.startswith(unit + ':\n'):
+            out += [old[s].rstrip('\n') + '\n' for s, _ in sorted(below, key=lambda x: x[1])]
+            out.append(TEXT.sub('.text       start:0x%08X end:0x%08X' % (new_lo, new_hi), b,
+                                count=1))
+            out += [old[s].rstrip('\n') + '\n' for s, _ in sorted(above, key=lambda x: x[1])]
+        else:
+            out.append(b)
+    for s, r in below + above[::-1]:
+        # where it was at HEAD: after the line that came before it, or before the line that came
+        # after it; failing both, just before / after the unit's own line
+        h = head_cfg.split('\n')
+        i = next(j for j, ln in enumerate(h) if re.match(r'[ \t]*Object\(\w+, "%s"\),' % re.escape(s), ln))
+        now_lines = cfg.split('\n')
+        obj = re.compile(r'[ \t]*Object\(')             # only a unit's line is unique
+        if obj.match(h[i - 1]) and h[i - 1] in now_lines:
+            now_lines.insert(now_lines.index(h[i - 1]) + 1, h[i])
+        elif i + 1 < len(h) and obj.match(h[i + 1]) and h[i + 1] in now_lines:
+            now_lines.insert(now_lines.index(h[i + 1]), h[i])
+        else:
+            j = next((j for j, ln in enumerate(now_lines) if re.match(
+                r'[ \t]*Object\(\w+, "%s"' % re.escape(unit), ln)), None)
+            if j is None:
+                sys.exit(f'{unit} has no line in configure.py: nothing was changed')
+            now_lines.insert(j if (s, r) in below else j + 1, h[i])
+        cfg = '\n'.join(now_lines)
+    SPLITS.write_text('\n'.join(out), encoding='utf-8', newline='\n')
+    (ROOT / 'configure.py').write_text(cfg, encoding='utf-8', newline='\n')
+    print(f'left out, put back as their own units: {", ".join(s for s, _ in below + above)}; '
+          f'{unit} .text cut to 0x{new_lo:08X}-0x{new_hi:08X} (was 0x{lo:08X}-0x{hi:08X})')
+
+
+restore_left_out()
+
 folded = [n for s in sweeps for _, n in defined((ROOT / 'src' / s).read_text(encoding='utf-8'))]
 run('python configure.py')
 # Sweeps that declare one name with two types (with each other, or with the unit and its headers)
