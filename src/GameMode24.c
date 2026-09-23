@@ -73,7 +73,7 @@ void  fn_800F05DC(s32 p0);
 void  fn_800F060C(void* pObj);
 void  fn_800F0678(void);
 void  fn_800F0BBC(void);
-u8    fn_800F0820(void);
+s32   fn_800F0820(void);
 u8    fn_800F0CEC(u16 nDate, s32* pId, s32* pRound);
 u8    fn_800F0DB8(s32 nYear, s32 nMonth, s32 nDay, s32* pId, s32* pRound);
 s32   fn_800F0F54(void);
@@ -214,15 +214,17 @@ void fn_800F07C8(void) {
     gpGame->pfn1F4 = fn_800F0BBC;
 }
 
-// Every event done: all 75 flags at +0x20C of profile 0 (EA's loop checks them and forgets the
-// answer).
-u8 fn_800F0820(void) {
-    u8* p = gpSaveData;
-    int i;
+// How many events profile 0 has done (flags at +0x20C, 4 bytes apart; 75 of them).
+s32 fn_800F0820(void) {
+    u8* p = gpSaveData + 0 * 0x10600;
+    s32 n = 0;
+    s32 i;
     for (i = 0; i < 75; i++) {
         if (p[0x20C + i * 4] == 1) {
+            n++;
         }
     }
+    return n;
 }
 
 // The message after an event: every event done (0), or one for the event, else one of four at
