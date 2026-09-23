@@ -3645,44 +3645,8 @@ GameMode5.c:
 GameMode9.c:
 	.text       start:0x800ED738 end:0x800EDD18
 
-unsorted/sweep_800EDE78.c:
-	.text       start:0x800EDE78 end:0x800EDE7C
-
-unsorted/sweep_800EDEE8.c:
-	.text       start:0x800EDEE8 end:0x800EDFC0
-
-unsorted/sweep_800EE064.c:
-	.text       start:0x800EE064 end:0x800EE0A0
-
-unsorted/sweep_800EE470.c:
-	.text       start:0x800EE470 end:0x800EE478
-
-unsorted/sweep_800EE8B0.c:
-	.text       start:0x800EE8B0 end:0x800EE8C4
-
-unsorted/sweep_800EF294.c:
-	.text       start:0x800EF294 end:0x800EF2B8
-
-unsorted/sweep_800EF834.c:
-	.text       start:0x800EF834 end:0x800EF83C
-
-unsorted/sweep_800EFBAC.c:
-	.text       start:0x800EFBAC end:0x800EFBD0
-
-unsorted/sweep_800EFDFC.c:
-	.text       start:0x800EFDFC end:0x800EFE18
-
-unsorted/sweep_800EFE3C.c:
-	.text       start:0x800EFE3C end:0x800EFE60
-
-unsorted/sweep_800EFE60.c:
-	.text       start:0x800EFE60 end:0x800EFE78
-
-unsorted/sweep_800F009C.c:
-	.text       start:0x800F009C end:0x800F00F8
-
-unsorted/sweep_800F018C.c:
-	.text       start:0x800F018C end:0x800F01CC
+GameMode23.c:
+	.text       start:0x800EDD18 end:0x800F0448
 
 unsorted/sweep_800F0570.c:
 	.text       start:0x800F0570 end:0x800F060C
