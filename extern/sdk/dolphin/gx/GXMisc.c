@@ -46,6 +46,13 @@ void GXFlush(void) {
   PPCSync();
 }
 
+void GXResetWriteGatherPipe(void) {
+  // wait until the gather pipe holds no data, then point it back at the GP FIFO
+  while (PPCMfwpar() & 1) {
+  }
+  PPCMtwpar((u32)OSUncachedToPhysical((void *)GX_FIFO_ADDR));
+}
+
 static void __GXAbortWait(u32 clocks) {
   OSTime time0, time1;
   time0 = OSGetTime();

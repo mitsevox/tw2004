@@ -1403,6 +1403,7 @@ dolphin/gx/GXAttr.c:
 
 dolphin/gx/GXMisc.c:
 	.text       start:0x801410A8 end:0x801415AC
+	.sbss       start:0x80282878 end:0x80282890
 
 dolphin/gx/GXGeometry.c:
 	.text       start:0x801415AC end:0x8014195C
