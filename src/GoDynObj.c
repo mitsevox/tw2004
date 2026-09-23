@@ -26,6 +26,11 @@ void fn_8000C5A4(f32 (*pMtx)[4]);
 void fn_8000A194(f32 (*pMtx)[4], f32 a, f32 b, f32 c);  // a rotation matrix from three angles
 void fn_8000A0E8(f32 (*pSrc)[4], f32 (*pDst)[4]);
 void fn_800BADF8(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
+void fn_8000A144(f32 (*pSrc)[4], f32 (*pDst)[4]);        // copies three rows
+f32  fn_8004D5F0(CourseInfo* pCourse, f32* pPos);          // GoTerrainCollision.c: the ground height
+void fn_80048680(f32* pA, f32* pB, f32* pOut);
+void fn_800486A4(f32* pA, f32* pB, f32* pOut);
+void fn_800486C8(f32* pA, f32* pB, f32* pOut);
 void fn_80047290(void);
 void fn_8004731C(u8* pState);
 void fn_80047C24(int nPlayer);
@@ -552,6 +557,67 @@ void fn_80047BC0(Ball* pBall, int nPlayer) {
         lbl_80281DA0->aB[nPlayer].bF4 = 0;
     }
 }
+
+// Flies the player's 'TEO ' 10002 object (fn_80047A24) off its spot: launched once with a random
+// speed and spin, then carried by its velocity, the wind and gravity until it lands.
+void fn_80047C24(int nPlayer) {
+    f32 mTmp[4][4];
+    f32 vMove[4];
+    f32 vWind[4];
+    GoDynObjPlayerB* pB = &lbl_80281DA0->aB[nPlayer];
+    f32 fRange;
+    f32 fGround;
+
+    if (!pB->b0) return;
+    if (0.0f == gSession.fFrameTime) return;
+    if (!pB->bF4) return;
+    pB->b0 = 0;
+    if (pB->bF5) {
+        fn_8000ADC0(pB->mB0);
+        fn_8000A194(pB->mB0, pB->fC, 0.0f, 0.0f);
+        fn_800BADF8(pB->pF0->obj.m0, pB->mB0, mTmp, 4);
+        fn_8000A0E8(mTmp, pB->pF0->obj.m0);
+        fn_8000C5A4(pB->pF0->obj.m0);
+        Vec_Copy(pB->v20, pB->v30);
+        fn_8004858C(pB->v40, pB->fC, lbl_80281DA0->fAA0);
+        fn_8000AE28(pB->v40, lbl_80281DA0->fA98 * (0.5f * Rand_Float(1) + 0.5f), pB->v40);
+        pB->v40[3] = pB->v40[1];
+        pB->bF5 = 0;
+        pB->b0 = 1;
+        pB->f10 = 0.0f;
+        fRange = lbl_80281DA0->fAA8;
+        pB->v60[0] = fRange * Rand_Float(1) - 0.5f * fRange;
+        fRange = lbl_80281DA0->fAA8;
+        pB->v60[1] = fRange * Rand_Float(1) - 0.5f * fRange;
+        fRange = lbl_80281DA0->fAA8;
+        pB->v60[2] = fRange * Rand_Float(1) - 0.5f * fRange;
+        pB->v50[0] = 0.0f;
+        pB->v50[1] = 0.0f;
+        pB->v50[2] = 0.0f;
+        return;
+    }
+    pB->f10 += gSession.fFrameTime;
+    Wind_Get(vWind);
+    fn_8000AE28(vWind, 0.14666401f, vWind);
+    fn_800486C8(vWind, pB->v40, vMove);
+    fn_8001EF34(vMove, pB->f10, vMove);
+    vMove[1] = vMove[1] + -4.9f * pB->f10 * pB->f10;
+    fn_800486C8(vMove, pB->v20, pB->v30);
+    pB->b0 = 1;
+    fGround = fn_8004D5F0(fn_8000C594(), pB->v30);
+    if (pB->v30[1] < fGround) {
+        pB->v30[1] = 0.01f + fGround;
+        pB->b0 = 0;
+    }
+    fn_800486A4(pB->v60, pB->v50, pB->v50);
+    fn_8000ADC0(pB->mB0);
+    fn_8000A194(pB->mB0, pB->fC + pB->v50[0], pB->v50[1], pB->v50[2]);
+    fn_8000A144(pB->mB0, pB->pF0->obj.m0);
+    fn_8000C5A4(pB->pF0->obj.m0);
+    Vec_Copy(pB->v30, pB->pF0->obj.m80[3]);
+    pB->pF0->obj.m80[3][3] = 1.0f;
+}
+
 
 void fn_8004816C(int nPlayer) {
     lbl_80281DA0->aA[nPlayer].b70 = 1;

@@ -216,12 +216,18 @@ typedef struct GoDynObjPlayerA {
 LAYOUT_ASSERT(GoDynObjPlayerA, 0x104);
 
 typedef struct GoDynObjPlayerB {
-    u8   b0;                    // 0x00  set by fn_80047A24
+    u8   b0;                    // 0x00  set by fn_80047A24; fn_80047C24 moves pF0 while it is set
     u8   unk1[0xC - 0x1];
     f32  fC;                    // 0x0C  minus the player's aim when placed
-    u8   unk10[0x20 - 0x10];
+    f32  f10;                   // 0x10  time in flight
+    u8   unk14[0x20 - 0x14];
     f32  v20[4];                // 0x20  where fn_80047A24 put pF0 (x, y, z, 1)
-    u8   unk30[0xF0 - 0x30];
+    f32  v30[4];                // 0x30  where it is now
+    f32  v40[4];                // 0x40  its launch velocity
+    f32  v50[4];                // 0x50  its turn angles so far ...
+    f32  v60[4];                // 0x60  ... and how fast they grow
+    u8   unk70[0xB0 - 0x70];
+    f32  mB0[4][4];             // 0xB0  its rotation
     DynObj* pF0;                // 0xF0  a 'TEO ' 10002 object (fn_80047A24), given up by fn_80047BC0
     u8   bF4;                   // 0xF4  pF0 is in use
     u8   bF5;                   // 0xF5  set by fn_80047A24
