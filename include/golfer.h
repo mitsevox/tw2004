@@ -309,16 +309,31 @@ typedef struct Player {
     s32  nC58;                  // 0xC58
     u8   unkC5C[0xC6C - 0xC5C];
     s32  nC6C[18];              // 0xC6C  cleared at the start of a round
-    u8   unkCB4[0xD28 - 0xCB4];
+    u8   unkCB4[0xCD0 - 0xCB4];
+    s32  nCD0;                  // 0xCD0  cleared per game (fn_800F2030)
+    s32  aCD4[20];              // 0xCD4
+    u8   unkD24[4];
     s32  nD28[18];              // 0xD28  per hole
     s32  nD70[18];              // 0xD70  per hole
-    u8   unkDB8[0xDD8 - 0xDB8];
+    s32  nDB8;                  // 0xDB8
+    s32  nDBC;                  // 0xDBC  the shot's multiplier in the target games (1, 2, 3 or 5)
+    s32  nDC0;                  // 0xDC0
+    s32  aDC4[5];               // 0xDC4
     s32  nDD8;                  // 0xDD8  a count a challenge medal can ask for (GameMode5)
-    u8   unkDDC[0xDE4 - 0xDDC];
-    s32  nDE4[18];              // 0xDE4  per target (fn_800F1D34), 0 = not yet hit
-    u8   unkE2C[0xE88 - 0xE2C];
+    s32  nDDC;                  // 0xDDC
+    s32  nDE0;                  // 0xDE0
+    s32  nDE4[40];              // 0xDE4  per target (fn_800F1D34), 0 = not yet hit
+    s8   nTarget;               // 0xE84  the current target (GameMode10.c)
+    u8   unkE85[3];
     s32  nE88;                  // 0xE88  below 5: still in (mode 15)
-    u8   unkE8C[0xEE0 - 0xE8C];
+    s32  nE8C;                  // 0xE8C
+    s32  nE90;                  // 0xE90
+    s32  nE94;                  // 0xE94
+    s32  nE98;                  // 0xE98  shots in a row without a multiplier
+    u8   unkE9C;
+    u8   bE9D;                  // 0xE9D
+    u8   bE9E;                  // 0xE9E
+    u8   unkE9F[0xEE0 - 0xE9F];
     u8   bEE0;                  // 0xEE0
     u8   unkEE1[3];
     s32  nEE4;                  // 0xEE4  2 or 3 picks a message after a shot (GM_PlayerTookShot)
