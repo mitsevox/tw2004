@@ -49,7 +49,16 @@ u8    fn_800CF450(int nPlayer);
 void  fn_800D344C(UStreamObject* pObject);
 int   fn_800584DC(int nProfile);
 int   fn_801020C0(void);
+int   fn_801021FC(void);                                // GameMode4: the current ladder event
+void  fn_80125874(const char* szName, s32 arg1);        // EASportsBio.c: post an accomplishment
+void  fn_800583B0(int nProfile, int nCourse);           // unlock a course (aCourseUnlocked)
+u8    fn_800583FC(int nProfile, int nCourse);           // whether a course is unlocked
+void  fn_8005844C(int nProfile);                        // the same for aCourseUnlocked[21]
+u8    fn_8005846C(int nProfile);
+void  fn_80058494(int nProfile);                        // and for aCourseUnlocked[22]
+u8    fn_800584B4(int nProfile);
 
+int   fn_800D3A20(int nProfile, u8 bMessage);
 int   fn_800D3CF8(int nRating);
 s32   fn_800D477C(int nPlayer, Ball* pBall, u8 b);
 void  fn_800D4F14(int nPlayer, u8 b);
@@ -125,6 +134,36 @@ s32 fn_800D3478(int nTotal, int n, int nRow) {
     return nRet;
 }
 
+// Pay a human player: the money goes into the round's breakdown (field by field from pMoney, or
+// all as the payout) and into the profile's money, and the courses it now buys are unlocked.
+void fn_800D3548(int nPlayer, int nMoney, CourseMoneyTracking* pMoney) {
+    int nProfile;
+
+    if (nPlayer >= 5 || nPlayer == 4) return;
+    if (Player_IsCPU(nPlayer)) return;
+    if (fn_800E177C() != 0) return;
+    nProfile = gPlayers[nPlayer].nIndex;
+    if (nProfile >= 5 || nProfile == 4) return;
+    if (gpSaveData[nProfile].bActive != 1) return;
+    if (pMoney != NULL) {
+        gPlayers[nPlayer].money.nBase += pMoney->nBase;
+        gPlayers[nPlayer].money.n24 += pMoney->n24;
+        gPlayers[nPlayer].money.n0 += pMoney->n0;
+        gPlayers[nPlayer].money.nCourse += pMoney->nCourse;
+        gPlayers[nPlayer].money.n2C += pMoney->n2C;
+        gPlayers[nPlayer].money.nTee += pMoney->nTee;
+        gPlayers[nPlayer].money.nTourCard += pMoney->nTourCard;
+        gPlayers[nPlayer].money.n3C += pMoney->n3C;
+        gPlayers[nPlayer].money.n38 += pMoney->n38;
+    } else {
+        gPlayers[nPlayer].money.n24 += nMoney;
+    }
+    gpSaveData[nProfile].n64 += nMoney;
+    gpSaveData[nProfile].n6C += nMoney;
+    gpSaveData[nProfile].b70 = 1;
+    fn_800D3A20(nProfile, 1);
+}
+
 // TW06: GM_Earnings_GetStrokeWinnings. Beating a CPU golfer pays by their earnings rating: a base
 // prize and so much a stroke of the margin (at most 5). *pPrize gets the base.
 int fn_800D36E0(int nWinner, int nLoser, int nMargin, int* pPrize) {
@@ -179,6 +218,28 @@ int fn_800D37BC(int nWinner, int nLoser, int nMargin, int* pPrize) {
     return nTotal / 2;
 }
 
+// A ladder event won (GameMode4): the event's prize and so much a hole of the margin (at most 5),
+// and its EA Sports Bio accomplishment is posted. *pPrize gets the prize.
+int fn_800D38F0(int nWinner, int nLoser, int nMargin, s32* pPrize) {
+    int nEvent;
+    int nMoney;
+
+    if (fn_800E177C() != 0) return 0;
+    nEvent = fn_801021FC();
+    if (nMargin > 5) {
+        nMargin = 5;
+    }
+    if (pPrize != NULL) {
+        *pPrize = lbl_80200538.aLadderPrize[nEvent].nBase;
+    }
+    nMoney = lbl_80200538.aLadderPrize[nEvent].nBase + lbl_80200538.aLadderPrize[nEvent].nPerHole * nMargin;
+    if (lbl_80200538.aLadderPrize[nEvent].nBio != -1) {
+        fn_80125874(lbl_80200538.aBio[lbl_80200538.aLadderPrize[nEvent].nBio].szName,
+                    lbl_80200538.aBio[lbl_80200538.aLadderPrize[nEvent].nBio].nValue);
+    }
+    return nMoney;
+}
+
 // Pay a player twice nMoney, booked in the breakdown's n24 and n3C.
 void fn_800D39B4(int nPlayer, int nMoney) {
     CourseMoneyTracking money;
@@ -191,6 +252,53 @@ void fn_800D39B4(int nPlayer, int nMoney) {
         money.n3C = nPaid;
         fn_800D3548(nPlayer, nPaid, &money);
     }
+}
+
+// The courses a profile's money has bought: each course whose price the money has reached is
+// unlocked, with its EA Sports Bio accomplishment; courses 21 and 22 get a message of their own.
+// With bMessage, a message for each other course unlocked. Returns how many those were.
+int fn_800D3A20(int nProfile, u8 bMessage) {
+    int i;
+    int n;
+
+    n = 0;
+    for (i = 0; i < 21; i++) {
+        if (gpSaveData[nProfile].n64 >= lbl_80200538.aCoursePrice[i].nPrice && !fn_800583FC(nProfile, i)) {
+            fn_800583B0(nProfile, i);
+            if (i != 4) {
+                // EA bug: the list holds 10, and up to 20 courses could be bought at once
+                lbl_801FFD68[n] = i;
+                n++;
+                if (lbl_80200538.aCoursePrice[i].nBio != -1) {
+                    fn_80125874(lbl_80200538.aBio[lbl_80200538.aCoursePrice[i].nBio].szName,
+                                lbl_80200538.aBio[lbl_80200538.aCoursePrice[i].nBio].nValue);
+                }
+            }
+        }
+    }
+    if (gpSaveData[nProfile].n64 >= lbl_80200538.aCoursePrice[21].nPrice && !fn_800584B4(nProfile)) {
+        fn_80058494(nProfile);
+        fn_800E4364(3, 7, 2, nProfile);
+        if (lbl_80200538.aCoursePrice[21].nBio != -1) {
+            fn_80125874(lbl_80200538.aBio[lbl_80200538.aCoursePrice[21].nBio].szName,
+                        lbl_80200538.aBio[lbl_80200538.aCoursePrice[21].nBio].nValue);
+        }
+    }
+    if (gpSaveData[nProfile].n64 >= lbl_80200538.aCoursePrice[23].nPrice && !fn_8005846C(nProfile)) {
+        fn_8005844C(nProfile);
+        fn_800E4364(3, 7, 3, nProfile);
+        if (lbl_80200538.aCoursePrice[23].nBio != -1) {
+            fn_80125874(lbl_80200538.aBio[lbl_80200538.aCoursePrice[23].nBio].szName,
+                        lbl_80200538.aBio[lbl_80200538.aCoursePrice[23].nBio].nValue);
+        }
+    }
+    if (bMessage) {
+        for (i = 0; i < n; i++) {
+            // fake match: the cast gives the original's copy of nProfile for this loop
+            fn_800E4364(3, lbl_801FFD68[i], 0, (u32)nProfile);
+        }
+    }
+    return n;
 }
 
 // TW06: GM_GetHighestRatedGolfer. The best earnings rating among the players.
