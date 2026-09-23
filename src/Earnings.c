@@ -7,27 +7,7 @@
 #include "game.h"
 #include "engine.h"
 #include "game/save.h"
-
-// The prize table (stream 'ERN ', 0x22F0 bytes); multipliers are percentages (100 = x1).
-typedef struct StrokePrize {
-    s32  nBase;                 // the prize for a win
-    s32  nPerStroke;            // and for each stroke of the margin, up to 5
-} StrokePrize;
-typedef struct SkinsValue {
-    s32  aValue[4];             // holes 1..6, 7..12, 13..17, 18
-    s32  n10;
-} SkinsValue;
-typedef struct EarningsTable {
-    u8   unk0[0x1D4];
-    StrokePrize aStrokePrize[26];   // 0x1D4  per earnings rating of the beaten golfer
-    SkinsValue aSkins[26];      // 0x2A4  a skin's value, per the best earnings rating in the game
-    u8   unk4AC[0x980 - 0x4AC];
-    s32  aTeePct[3];            // 0x980  the tee multiplier, as [2 - nTeeSet] (tee set 3 pays as 1)
-    s32  a98C[4];               // 0x98C  the multiplier for the hole's gpGame->nPinSet value 0..3
-    s32  aTourPct[6];           // 0x99C  the TOUR card multiplier per level 1..6 (level 0 pays as 1)
-    u8   unk9B4[0x22F0 - 0x9B4];
-} EarningsTable;
-extern EarningsTable lbl_80200538;
+#include "game/earnings.h"
 
 // The working tables and their saved copies, ten entries each.
 extern s32 lbl_80200010[10];
@@ -393,16 +373,16 @@ s32 fn_800D6A70(s32 nPoints, int nPlayer, u8 bCourse, u8 bTee, u8 bHole, CourseM
     }
     switch (gpGame->nPinSet[Game_CurHoleIndex()]) {
     case 0:
-        fHole = (f32)lbl_80200538.a98C[0] / 100.0f;
+        fHole = (f32)lbl_80200538.aPinSetPct[0] / 100.0f;
         break;
     case 1:
-        fHole = (f32)lbl_80200538.a98C[1] / 100.0f;
+        fHole = (f32)lbl_80200538.aPinSetPct[1] / 100.0f;
         break;
     case 2:
-        fHole = (f32)lbl_80200538.a98C[2] / 100.0f;
+        fHole = (f32)lbl_80200538.aPinSetPct[2] / 100.0f;
         break;
     case 3:
-        fHole = (f32)lbl_80200538.a98C[3] / 100.0f;
+        fHole = (f32)lbl_80200538.aPinSetPct[3] / 100.0f;
         break;
     }
     nBase = fn_800D33A8(nPoints);
