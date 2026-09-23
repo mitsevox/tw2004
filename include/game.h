@@ -156,7 +156,8 @@ void fn_800DB4E8(int nPlayer);
 void fn_800DB714(int nPlayer);
 void fn_800DBDA8(int nPlayer);
 void GameEffects_SetSuperSlowMo(u8 bOn, int nPlayer, f32 fRate);
-u8   fn_800DC514(int nPlayer);          // super slow motion is on (nPlayer unused)
+f32  fn_800DC3A4(void);                 // the letterbox's field-of-view change
+u8   fn_800DC514(int nPlayer);         // super slow motion is on (nPlayer unused)
 void fn_800DC9D4(int a);                // pause or resume a GameBreaker
 
 // GameManager.c
@@ -272,6 +273,7 @@ extern UIQueueItem lbl_80202CFC[UI_QUEUE_LEN];  // queue 8 (lbl_80282294)
 extern UIQueueItem lbl_80202C84[UI_QUEUE_LEN];  // queue 9 (lbl_80282290)
 extern UIQueueItem lbl_80202C0C[UI_QUEUE_LEN];  // queue 10 (lbl_8028228C)
 extern UIQueueItem lbl_80202B94[UI_QUEUE_LEN];  // queue 11 (lbl_80282288)
+extern u8          lbl_80202B88[9];             // the menu screens still open (GameMessages.c)
 extern u8          lbl_80203138[14];            // the tips already shown (GameMessages.c, GameAnalysis.c)
 
 extern u8  lbl_80282280;

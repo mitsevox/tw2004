@@ -14,7 +14,6 @@ void fn_800EDF34(UStreamObject* pObject);
 void fn_800EDF60(UStreamObject* pObject);
 void fn_800EDF90(UStreamObject* pObject);
 void fn_800EE064(void);
-extern u8 lbl_8028233C;
 s32 fn_800EE8B0(void);
 void fn_80119934(int a);
 void fn_800EF294(void);
@@ -29,23 +28,22 @@ void fn_800F009C(void);
 u8 fn_8011908C(s32, s32);
 void fn_800F018C(void);
 
-extern s32 lbl_80281670;
-extern s32 lbl_80282338;
+void fn_800EE0A0(s32 i);
+void fn_80117DE8(s32 a, s32 b);
 s32  fn_801190D8(s32 a, s32 n);
 s32  fn_800EFBD0(s32 i);
 void fn_800D27CC(u16* pDate, s32 nDays);
 void fn_800907AC(s32 nMoney, char* pDst);
 void fn_80117C50(s32 a, s32 b);
-void fn_800EF130(s32 a, u32 b);
+void fn_800EF130(s32 nPlayer, u8 bQuick);
 void fn_800EEB94(s32 a);
 void fn_80117860(TourSeason* pTour);
 s32  fn_8008AC00(void);
 void fn_8011A720(s32 a, s32 nHole);
 void fn_8011A5F8(s32 a);
-u8   fn_800EF720(s32 nPlayer);
+u8   fn_800EF720(u8 bCheck);
 s32  fn_8011A684(s32 a);
 u8   fn_8011A6F4(s32 a, s32 b);
-extern s32 lbl_80282340;
 s32  fn_80119A04(s32 a, s32 b);
 u8   fn_801197A4(s32 nPlayer, s32 b);
 u8   fn_80117DE0(void);
@@ -67,6 +65,51 @@ s32   fn_801197CC(s32 a, s32 b);
 void  fn_800EDFC0(UStreamObject* pObject);
 s32  fn_800F02A8(void);
 s32  fn_800EFA9C(s32 i);
+void fn_800EE02C(void);
+u8   fn_800EF64C(u8 bCheck);
+void fn_800EF2B8(void);
+void fn_800EE478(void);
+u8   fn_800EE5B4(int nPlayer);
+u8   fn_800EE6A0(s32 nPlayer);
+s32  fn_800EE778(int nPlayer);
+s32  fn_800EE810(int nPlayer);
+void fn_800EE8C4(void);
+s32  fn_800EF0E0(s32 nPlayer);
+void fn_80117E98(s32 nPlayer);
+s32  fn_80119A2C(s32 nPlayer, s32 a);
+void fn_801178C8(s32 nPlayer, SeasonEvent* pEvent, s32 nRound, s32 n, s32 k);
+
+// TW06: GameModeDriverPGATour::Init. Stroke play's hole and honors rules, the tour's own round and
+// playoff handling; no mulligans, one player.
+void fn_800EDD18(void) {
+    gpGame->pfnInit = fn_800EDD18;
+    gpGame->pfnShutdown = fn_800EE02C;
+    gpGame->pfn1E4 = fn_800EF294;
+    gpGame->pfnSetupNextGolfer = fn_800FF7DC;
+    gpGame->pfnGetHonors = fn_800FF894;
+    gpGame->pfnHoleFinished = fn_800FFCCC;
+    gpGame->pfnGameFinished = fn_800EF64C;
+    gpGame->pfnGoToPlayoff = fn_800EF720;
+    gpGame->pfn1EC = fn_800EE064;
+    gpGame->pfnEndHole = fn_800EF2B8;
+    gpGame->pfnEndGame = fn_800EE478;
+    gpGame->pfn1F8 = fn_800EE5B4;
+    // IsPuttForWin's player is an s32 (long): as an int its profile index compiles differently
+    gpGame->pfn1FC = (u8 (*)(int))fn_800EE6A0;
+    // port: these three slots are still typed void (*)(void) (GameRound.c's defaults are not
+    // decompiled yet); the functions return the lead, so the slots want s32 (*)(int) / s32 (*)(void)
+    gpGame->pfn200 = (void (*)(void))fn_800EE778;
+    gpGame->pfn204 = (void (*)(void))fn_800EE810;
+    gpGame->pfn208 = (void (*)(void))fn_800EE8B0;
+    gpGame->b274 = 0;
+    gpGame->n4 = 0;
+    gpGame->nMulligans = 0;
+    gpGame->nC = 1;
+    gpGame->n10 = 1;
+    gpGame->nDC = 0;
+    gpGame->nE0 = 1;
+    gSession.nSplitScreen = 0;
+}
 
 void fn_800EDE78(void) {
 }
@@ -138,8 +181,75 @@ void fn_800EE064(void) {
     gpGame->nE0 = gPgaData.aTourEvent[nTourEvent].nRounds;
 }
 
+// The course of the tournament format i's current round: everyone plays its tee set, every hole its
+// pin position, and its GameOptions.n18 replaces the player's (kept in lbl_80281674).
+// Not exact yet (only gPgaData's and gSession's address loads come out in the other order); the
+// tee set's store back to the tournament is in the original.
+void fn_800EE0A0(s32 i) {
+    PlayerNumber_t nPlayer = PLR_1_e;
+    TourEvent* pEvent = &gPgaData.aTourEvent[i];
+    int k;
+    int h;
+    for (k = 0; k < 5; k++) {
+        gSession.nTeeSet[k] = pEvent->nTeeSet;
+    }
+    pEvent->nTeeSet = gSession.nTeeSet[4];
+    fn_800E14E0(gPgaData.aTourEvent[i].aRound[gpGame->nDC].nCourse);
+    gSession.nPinSet = gPgaData.aTourEvent[i].aRound[gpSaveData[nPlayer].tour.nRound].nPinSet - 1;
+    for (h = 0; h < 18; h++) {
+        gpGame->nPinSet[h] = gPgaData.aTourEvent[i].aRound[gpSaveData[nPlayer].tour.nRound].nPinSet - 1;
+    }
+    lbl_80281674 = gSession.options.n18;
+    gSession.options.n18 = (u8)gPgaData.aTourEvent[i].aRound[gpSaveData[nPlayer].tour.nRound].n8;
+    fn_80055C40(gSession.options.n18);
+}
+
+// A round of the current tournament starts: the options nC and nWind are kept (fn_800EE02C puts
+// them back) and set to 4 and calm, one player plays the round's course, and the round's field is
+// set up.
+void fn_800EE2C8(void) {
+    PlayerNumber_t nPlayer = PLR_1_e;
+    s32 nEvent = gpSaveData[nPlayer].tour.nEvent;
+    Pga80205ED8* pRec = &lbl_80205ED8;
+    s32 nFormat;
+    lbl_80281670 = gSession.options.nC;
+    lbl_80282338 = gSession.options.nWind;
+    gSession.options.nC = 4;
+    gSession.options.nWind = 0;
+    lbl_8028233C = 1;
+    lbl_80282340 = 16;
+    lbl_80205F30.b0 = 0;
+    if (gPgaData.aTournament[nEvent].nTourEvent) {
+        gSession.nNumPlayers = 1;
+        gpGame->nDC = gpSaveData[nPlayer].tour.nRound;
+        nFormat = gPgaData.aTournament[nEvent].nTourEvent - 1;
+        gpGame->nE0 = gPgaData.aTourEvent[nFormat].nRounds;
+        fn_800EE0A0(gPgaData.aTournament[nEvent].nTourEvent - 1);
+        fn_80117DE8(0, 0);
+        fn_801178C8(0, &gpSaveData[nPlayer].tour.aEvent[gpSaveData[nPlayer].tour.nEvent],
+                    gpSaveData[nPlayer].tour.nRound, gPgaData.aTourEvent[nFormat].a40[fn_800EF0E0(0)], 5);
+        fn_80005AE8(pRec, 0, sizeof(*pRec));
+        pRec->n2++;
+        if (gpSaveData[nPlayer].tour.nRound == 0) {
+            pRec->n0++;
+        }
+        fn_800E1260(1);
+    }
+}
+
 u8 fn_800EE470(void) {
     return lbl_8028233C;
+}
+
+// A profile, and its current tournament. fake match: fn_800EE478 reaches the profile through these
+// in two statements, where the original adds the profile's offset to gpSaveData last (indexed
+// load/store); gpSaveData[nPlayer] written out adds it first.
+static inline SaveProfile* Tour_Profile(PlayerNumber_t nPlayer) {
+    return &gpSaveData[nPlayer];
+}
+
+static inline SeasonEvent* Tour_CurrentEvent(PlayerNumber_t nPlayer) {
+    return &gpSaveData[nPlayer].tour.aEvent[gpSaveData[nPlayer].tour.nEvent];
 }
 
 // A round of the current tournament is over for profile 0: after the second round of a
@@ -148,12 +258,12 @@ u8 fn_800EE470(void) {
 void fn_800EE478(void) {
     PlayerNumber_t nPlayer = PLR_1_e;
     if (gpSaveData[nPlayer].tour.nRound == 0) {
-        gpSaveData[nPlayer].n104C8++;
+        Tour_Profile(nPlayer)->n104C8++;
     }
     if (fn_800EFA9C(gpSaveData[nPlayer].tour.nEvent) >= 4 && gpSaveData[nPlayer].tour.nRound == 1) {
         fn_80117B58(0);
         if (fn_801197A4(0, 0)) {
-            gpSaveData[nPlayer].tour.aEvent[gpSaveData[nPlayer].tour.nEvent].nUserRankType = 1;
+            Tour_CurrentEvent(nPlayer)->nUserRankType = 1;
         }
     }
     gpSaveData[nPlayer].tour.aEvent[gpSaveData[nPlayer].tour.nEvent].nUserScore = fn_801191D0(0, 0, 1);
@@ -164,17 +274,16 @@ void fn_800EE478(void) {
 
 // TW06: GameModeDriverPGATour::IsPuttForLead. Whether holing this putt puts the player in the lead:
 // in a playoff, beating the best score on this hole; otherwise, not ahead now and ahead with it.
-u8 fn_800EE5B4(s32 nPlayer) {
+u8 fn_800EE5B4(int nPlayer) {
     int bLead;
     if (gpGame->bD4) {
         return gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1 <
                fn_8011A7C8(nPlayer, Game_CurHoleIndex());
     }
     bLead = 0;
-    if (fn_800E1904(nPlayer, 0) >= fn_80119588(nPlayer, 1)) {
-        if (fn_800E1904(nPlayer, 1) + 1 < fn_80119588(nPlayer, 1)) {
-            bLead = 1;
-        }
+    if (fn_800E1904(nPlayer, 0) >= fn_80119588(nPlayer, 1) &&
+        fn_800E1904(nPlayer, 1) + 1 < fn_80119588(nPlayer, 1)) {
+        bLead = 1;
     }
     return bLead;
 }
@@ -183,22 +292,16 @@ u8 fn_800EE5B4(s32 nPlayer) {
 // last round, a putt that would put the player ahead.
 u8 fn_800EE6A0(s32 nPlayer) {
     s32 nRounds;
-    int bWin;
     if (gpGame->bD4) {
         return fn_800EE5B4(nPlayer);
     }
     nRounds = fn_800EFA9C(gpSaveData[nPlayer].tour.nEvent);
-    bWin = 0;
-    if (fn_8008AC00() == 1 && gpSaveData[nPlayer].tour.nRound + 1 >= nRounds) {
-        if (fn_800E1904(nPlayer, 1) + 1 < fn_80119588(nPlayer, 1)) {
-            bWin = 1;
-        }
-    }
-    return bWin;
+    return fn_8008AC00() == 1 && gpSaveData[nPlayer].tour.nRound + 1 >= nRounds &&
+           fn_800E1904(nPlayer, 1) + 1 < fn_80119588(nPlayer, 1);
 }
 
 // TW06: GameModeDriverPGATour::GetCurrentLead. Strokes behind the leader (in a playoff, on this hole).
-s32 fn_800EE778(s32 nPlayer) {
+s32 fn_800EE778(int nPlayer) {
     if (gpGame->bD4) {
         return fn_8011A7C8(nPlayer, Game_CurHoleIndex()) - gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
     }
@@ -206,7 +309,7 @@ s32 fn_800EE778(s32 nPlayer) {
 }
 
 // TW06: GameModeDriverPGATour::GetPotentialLead.
-s32 fn_800EE810(s32 nPlayer) {
+s32 fn_800EE810(int nPlayer) {
     if (gpGame->bD4) {
         return fn_8011A7C8(nPlayer, Game_CurHoleIndex()) -
                (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1);
@@ -220,6 +323,85 @@ s32 fn_800EE8B0(void) {
 
 Pga80205F30* fn_800EE8B8(void) {
     return &lbl_80205F30;
+}
+
+// The message after a tournament the player won: the first win, then either three wins of the
+// tournaments marked nC, one of four random ones, or for tournaments 9 and 8 their own.
+void fn_800EE8C4(void) {
+    PlayerNumber_t nPlayer = PLR_1_e;
+    Tournament* p = fn_800EFA70(gpSaveData[nPlayer].tour.nEvent);
+    int i;
+    int nWins;
+    if (lbl_80205F30.b0 == 1) {
+        if (fn_800F02A8() == 0) {
+            fn_800E4364(5, 31, 0, 0);
+        }
+        if (p->nC) {
+            nWins = 0;
+            for (i = 0; i <= gpSaveData[nPlayer].tour.nEvent; i++) {
+                if (gPgaData.aTournament[i].nC && gpSaveData[nPlayer].tour.aEvent[i].nUserRank == 1) {
+                    nWins++;
+                }
+            }
+            if (nWins >= 3) {
+                fn_800E4364(5, 8, 0, 0);
+            } else {
+                fn_800E4364(5, (Rand_Next(1) & 3) + 27, 0, 0);
+            }
+        } else if (gpSaveData[nPlayer].tour.nEvent == 9) {
+            fn_800E4364(5, 9, 0, 0);
+        } else if (gpSaveData[nPlayer].tour.nEvent == 8) {
+            fn_800E4364(5, 10, 0, 0);
+        }
+    }
+}
+
+// The last round is over: a win is recorded in the profile (with its score and the tournament's
+// aPrize[bracket][1]) and its message queued, and the prize money is paid.
+void fn_800EEA3C(s32 nPlayer) {
+    s32 nBracket = fn_800EF0E0(nPlayer);
+    Tournament* p = fn_800EFA70(gpSaveData[nPlayer].tour.nEvent);
+    s32 nMoney;
+    fn_80117E98(nPlayer);
+    if (fn_801190D8(nPlayer, 0) == 1) {
+        fn_800EE8C4();
+        if (fn_800D7770(nPlayer, &gpSaveData[nPlayer].aC8[gpSaveData[nPlayer].tour.nEvent].award)) {
+            gpSaveData[nPlayer].aC8[gpSaveData[nPlayer].tour.nEvent].nScore = fn_801191D0(nPlayer, 0, 1);
+            gpSaveData[nPlayer].aC8[gpSaveData[nPlayer].tour.nEvent].n6 = p->aPrize[nBracket][1];
+        }
+    }
+    nMoney = fn_80119A2C(nPlayer, 0);
+    if (nMoney) {
+        fn_800D3548(0, nMoney, NULL);
+        gPlayers[nPlayer].money.n4 += nMoney;
+    }
+}
+
+// The tournament is over for the player: its champion and winning score are kept with the
+// player's result (cut, a place, or did not play), and the season moves on to the next tournament.
+void fn_800EEB94(s32 nPlayer) {
+    SeasonEvent* p = &gpSaveData[nPlayer].tour.aEvent[gpSaveData[nPlayer].tour.nEvent];
+    s32 nLeader = fn_801197CC(nPlayer, 0);
+    s32 nGolfer = fn_80119118(nPlayer, nLeader);
+    strcpy(p->szChampName, fn_80118E30(nPlayer, nGolfer));
+    p->nChampScore = fn_8011937C(nPlayer, nLeader, 1);
+    if (fn_8011908C(nPlayer, 0)) {
+        if (fn_801197A4(nPlayer, 0)) {
+            p->nUserRank = 0;
+            p->nUserScore = 0;
+            p->nUserRankType = 1;
+        } else {
+            p->nUserRank = fn_801190D8(nPlayer, 0);
+            p->nUserScore = fn_8011937C(nPlayer, 0, 1);
+            p->nUserRankType = 2;
+        }
+    } else {
+        p->nUserRank = 0;
+        p->nUserScore = 0;
+        p->nUserRankType = 0;
+    }
+    gpSaveData[nPlayer].tour.nRound = 0;
+    gpSaveData[nPlayer].tour.nEvent = fn_800EFBD0(gpSaveData[nPlayer].tour.nEvent + 1);
 }
 
 // A round is over. The round count goes up and a player who missed the cut is out; after the last
@@ -252,22 +434,48 @@ void fn_800EF094(s32 a, s32 n) {
 }
 
 // The player's bracket, 0..9: tournaments won x 10 / 31 (profile 0's awards; nPlayer is not read).
-s32 fn_800EF0E0(PlayerNumber_t nPlayer) {
+s32 fn_800EF0E0(s32 nPlayer) {
     s32 n = fn_800F02A8() * 10 / 31;
     return n > 9 ? 9 : n;
+}
+
+// The rounds of the current tournament not played yet are played out for the player: each round's
+// course is loaded and the round simulated (k 3 when bQuick is set). fn_800EF9D0 skips ahead with it.
+void fn_800EF130(s32 nPlayer, u8 bQuick) {
+    s32 nRounds = fn_800EFA9C(gpSaveData[nPlayer].tour.nEvent);
+    Tournament* p = fn_800EFA70(gpSaveData[nPlayer].tour.nEvent);
+    s32 k;
+    s32 nTourEvent;
+    while (gpSaveData[nPlayer].tour.nRound < nRounds) {
+        if (p->nTourEvent) {
+            fn_800E14E0(
+                gPgaData.aTourEvent[p->nTourEvent - 1].aRound[gpSaveData[nPlayer].tour.nRound].nCourse);
+            k = 0;
+            nTourEvent = gPgaData.aTournament[gpSaveData[nPlayer].tour.nEvent].nTourEvent - 1;
+            if (bQuick) {
+                k = 3;
+            }
+            fn_801178C8(nPlayer, &gpSaveData[nPlayer].tour.aEvent[gpSaveData[nPlayer].tour.nEvent],
+                        gpSaveData[nPlayer].tour.nRound,
+                        gPgaData.aTourEvent[nTourEvent].a40[fn_800EF0E0(nPlayer)], k);
+        }
+        gpSaveData[nPlayer].tour.nRound++;
+    }
+    fn_8011A5F8(nPlayer);
+    fn_80117E98(nPlayer);
 }
 
 void fn_800EF294(void) {
     fn_80119934(0);
 }
 
-// Whether the round is over for the player: no selected hole is left and it was the last round (in
-// a playoff, after every hole).
-u8 fn_800EF64C(s32 nPlayer) {
+// TW06: GameModeDriverPGATour::GameFinished (by its slot). Whether the round is over: no selected
+// hole is left and it was the last round, and no playoff follows (in a playoff, after every hole).
+u8 fn_800EF64C(u8 bCheck) {
     s32 i;
     if (gpGame->bD4) {
         fn_8011A720(0, Game_CurHoleIndex());
-        return fn_800EF720(nPlayer) == 0;
+        return fn_800EF720(bCheck) == 0;
     }
     for (i = Game_CurHoleIndex() + 1; i < 18; i++) {
         if (gpGame->bHoleSelected[i]) {
@@ -276,14 +484,15 @@ u8 fn_800EF64C(s32 nPlayer) {
     }
     if (gpGame->nDC + 1 >= gpGame->nE0) {
         fn_8011A5F8(0);
-        return fn_800EF720(nPlayer) == 0;
+        return fn_800EF720(bCheck) == 0;
     }
     return 1;
 }
 
-// A tie for the lead after the last round goes to a playoff: the scores are cleared and the playoff
-// holes (16..18 of the course, looping) are set up. nPlayer is not read.
-u8 fn_800EF720(s32 nPlayer) {
+// TW06: GameModeDriverPGATour::GoToPlayoff (by its slot). A tie for the lead after the last round
+// goes to a playoff: the scores are cleared and the playoff holes (16..18 of the course, looping)
+// are set up. bCheck is not read.
+u8 fn_800EF720(u8 bCheck) {
     u8 bPlayoff = 0;
     s32 i;
     int h;
@@ -610,7 +819,7 @@ s32 fn_800F02A8(void) {
     s32 n = 0;
     s32 i;
     for (i = 0; i < 31; i++) {
-        if (gpSaveData->aC8[i].b == 1) {
+        if (gpSaveData->aC8[i].award.bWon == 1) {
             n++;
         }
     }

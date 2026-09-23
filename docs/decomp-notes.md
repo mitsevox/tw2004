@@ -64,6 +64,8 @@ CodeWarrior versions (GameCube)
   separates "1.2.5 or older" from "1.3.2 or newer" without writing any C.
 - **[verified] Float copies.** Copying three floats: GC/1.3.2 loads and stores one at a time;
   GC/2.0 - 2.7 interleave (load, load, store, load, store, store); GC/3.0 loads all then stores all.
+  The interleave needs a `const` source: `Vec3Copy(f32* pSrc, f32* pDst)` gave load/store in turns
+  and the linked DOL failed; `(const f32* pSrc, f32* pDst)` matched (code_800082F8 `Vec3Copy`).
 - **[verified] Null pointer compare.** GC/2.x and older use an unsigned compare (`cmplwi`), GC/3.0 a signed one (`cmpwi`).
 - **[verified] GC/2.0 vs 2.5+.** Differ when a byte-sized value is masked and then used as an
   index, and in bit-field packing. GC/2.5, 2.6 and 2.7 never differed from each other in our tests.
@@ -203,6 +205,18 @@ The fixes that come up most often. Each points to its full entry below.
 
 ### Evaluation and statement order
 
+- **[verified] A three-term sum is reordered by the compiler.** `return c + a*10000 + b*1000000;` adds
+  the products first in every term order; `int n = c; n += a * 10000; n += b * 1000000; return n;`
+  matched (FE_Manager `fn_80078604`).
+- **[verified] Call results as arguments.** `f(g(), p->x, p->y)` loads the other arguments first and
+  keeps them in saved registers; `t = g(); f(t, p->x, p->y);` calls first (FE_LogoDesign
+  `fn_8010FAF4`, 76.2 -> 100).
+- **[verified] Shift the parameter once.** `(s16)(n >> 1)` written at three uses scored 90.7;
+  `n >>= 1;` then plain uses gave the original's `extsh` then `srawi`/`extsh.` (startUp `fn_800AFF9C`).
+- **[verified] A pointer local to a global struct**, `T* p = &gX; p->a++; ...`, can be what the
+  original did even though the address could be reused anyway (PGATour `fn_800EE2C8`, 80.5 -> 100
+  with its other locals).
+
 - **[verified] The right side of a comparison is evaluated first.** `f(0) < f(1)` calls `f(1)`
   first. So the call order in the original tells you how the comparison was written: m2c's
   `t = f(1); if (f(0) < t)` is the source `f(0) < f(1)` (GameModeAlternateShot, 2026-09-23).
@@ -299,12 +313,22 @@ The fixes that come up most often. Each points to its full entry below.
   `if (gPlayers[n].nLie == 6 || ... == 7 || ... == 8)` became `subi; cmplwi 1; ble` (a 6..7 range)
   plus one compare; the same chain through `Player* p` (`p->nLie == 6 || ...`) gave the original's
   three plain `cmpwi/beq` (`Lie_AllowsFullSwing`, exact). A `switch` with the three cases was
-  wrong both ways.
+  wrong both ways. The other direction: `pShot->p40->bAB == 6 || == 8 || == 9 || == 10` on a
+  field read through a pointer gave the original's one `subi 8; clrlwi; cmplwi 2; ble` (8..10);
+  copied into a `u8` local first, the same chain gave an 8..9 range plus a compare with 10
+  (GoGolfCam `GolfCamera_InitZoomToAimCamera`). Which spelling makes the range depends on how the
+  value is read, so try the field, the local and the pointer form.
+- **[verified] An address used twice: keep the index, not a pointer.** `f32* pPin =
+  &pCourse->pin[Game_CurrentPinSet()].x;` used twice swapped two registers in every declaration
+  order; `nPinSet = Game_CurrentPinSet();` with `&pCourse->pin[nPinSet].x` written at each use
+  matched (GoGolfCam `fn_800C0414`, 98.52% -> 100).
 - **[verified] A loop over a global array: index it, don't walk a pointer.** `T* p = gTable;
   for (...; p++)` gives `addi r0, r3, gTable@l; mr r31, r0` for the pointer; `gTable[i].x` in the
   loop body (CW strength-reduces it to the same walking pointer) gives the original's direct
   `addi r31, r3, gTable@l`. Two functions went 93/95 -> 100 (`AI_TargetsClear`,
-  `Golfer_TableByteSwap`).
+  `Golfer_TableByteSwap`). A local set at the top of each iteration, `pSlot = &gTable[i];`, is
+  as good as indexing and gives the same direct `addi` (skalib `AnimLib_FreeCopies`, 96.0 -> 100;
+  fully indexed was worse there).
 - **[verified] A loop over the players with a separate base and offset register** (`addi rB,
   gPlayers@l` before the loop, `add rP, rB, rOff` inside, `addi rOff, rOff, 0xEF8`) comes from
   byte arithmetic: `(Player*)((u8*)gPlayers + i * sizeof(Player))` (the `PLAYER(i)` macro in
@@ -324,6 +348,18 @@ The fixes that come up most often. Each points to its full entry below.
   Player (`*(f32*)(PLAYER(i)->ball + 8)`), not a Ball* cast. GameModeMatch GetHonors 85 -> 100%.
 
 ### Types, casts and sign extension
+
+- **[verified] `u32` bit-fields compile to EA's byte and halfword accesses** (`lbz`/`extrwi`/
+  `rlwimi`/`stb`, and `lhz`/`sth` for a field that crosses a byte). A single `stw 0` over the whole
+  word needs a union with a `u32` member (startUp voice flags). A test written on the shifted value,
+  `if (p->nAttack * 16 == 0)`, gives an in-place `rlwinm.` mask test where `== 0` gives `extrwi.`
+  (startUp `fn_800B0114`).
+- **[verified] A `u8` return changes the epilogue order.** `return p != NULL;` as `int` restores r31
+  after the `srwi`; as `u8` before it, like the original (startUp `fn_800AF9BC`).
+
+- **[verified] `int` vs `s32` matters for parameters too.** PGATour `fn_800EE6A0(s32 nPlayer)` is
+  exact; as `(int nPlayer)` it gives `addis r3, r4, 1; add r3, r3, r29` instead of the original's
+  `addis r0, r4, 1; add r3, r0, r29` (99.81). Its neighbours were unaffected either way.
 
 - **[verified] An enum-typed local holding 0 is not folded into an index multiply.** EA's
   `PlayerNumber_t nPlayer = PLR_1_e; gpSaveData[nPlayer]` gives `li rX, 0; mullw`; a literal 0,
@@ -383,6 +419,20 @@ The fixes that come up most often. Each points to its full entry below.
 
 ### Function calls and parameters
 
+- **[verified] A parameter's type moves saved registers, in the callee and in callers.** startUp
+  `fn_800B044C`: `u32 uLen` -> `int nLen` (98.75 -> 100). PGATour `fn_800EF130`: the callee's
+  prototype `fn_800EF0E0(PlayerNumber_t)` -> `(s32)` fixed the CALLER (98.65 -> 100; `int` did not).
+- **[verified] A leftover argument can be an old value still in r4.** GameRound `fn_800E1074`:
+  `fn_800D8D5C(i, 0)` was really `fn_800D8D5C(i)`; the callee sets r4 itself, and the original's r4 = 0
+  was the zero shared by earlier stores (97.85 -> 100). Sign: a `li rX, 0` for an argument the
+  original lacks, and the callee overwriting that register before reading it.
+
+- **[verified] Pass the expression, not the variable just stored.** `p = x + n; f(p);` gives
+  `add r30; mr r3, r30`; `p = x + n` used later with the call written `f(x + n)` gives the
+  original's `add r3; mr r30, r3` (skalib `ClipBank_Load`, 99.76 -> 100).
+- **[verified] Assign-then-fix each global in turn.** `a = x; a = align(a); b = y; b = align(b);`
+  and `a = x; b = y; a = align(a); b = align(b);` schedule the same, but only the first gives the
+  original's temporary registers (skalib `Skalib_Init`, 98.54 -> 100).
 - **[verified] A wrong prototype can hide the real call shape and still score in the 80s-90s.**
   Check each prototype against the real definition, then check r3/r4 are set or kept live
   before each `bl`: `fn_80039344(View*, f32)` was really `(int nView, f32)` (Swing
@@ -431,6 +481,11 @@ The fixes that come up most often. Each points to its full entry below.
 
 ### Compares and conditions
 
+- **[verified] Nested `if`s vs one `&&`, and a flag vs a direct return.** `if (A) { if (B) x = 1; }`
+  and `if (A && B) x = 1;` get different saved registers (PGATour `fn_800EE5B4`, 99.75 -> 100). A u8
+  function's `bWin = 0; if (A && B) { if (C) bWin = 1; } return bWin;` was really
+  `return A && B && C;` (`fn_800EE6A0`, 99.44 -> 100; no order of the flag form matched).
+
 - **[verified] `return !(x == -1);` and `return x != -1;` end in a different instruction order**
   (GameMode11 `fn_80100798`, 93.9% -> 100).
 - **[verified] A two-value choice `h = (n == 2) ? 6 : 7` compiles branch-free (`subi/nor/srawi`);**
@@ -469,6 +524,11 @@ The fixes that come up most often. Each points to its full entry below.
 
 ### Returns, early exits and switch
 
+- **[verified] A dispatch that tests the top case first can mean one more (empty) case.** With cases
+  1 and 3 the compiler splits on a compare with 2; adding `case 4: break;` made it test 3 first,
+  then 1, as the original does (FE_Manager `FE_GetBIOMovieName`, 97.6 -> 100). Check the asm for a
+  compare with the extra value before calling it real; otherwise label it a fake match.
+
 - **[verified] A byte test compiled `cmplwi; beq body; b end` is the last term of an or-chain of
   early exits**, not a switch: `if (a && b || Player_IsCPU(n) || gSession.nSplitScreen) return;`.
   A `(u32)` switch gives the branch shape with `cmpwi`; the or-chain gives the original's
@@ -498,8 +558,11 @@ The fixes that come up most often. Each points to its full entry below.
   gate exactly; `if`, `||`, `&&` and `goto` spellings all fold to a single `bne end`. A plain
   `if (x) return;` always collapses, and an `if (x == 0)` gives a single `bne`; an empty
   then-block is optimised away. The compare is `cmpwi` for a `u8` switch operand; the
-  original's `cmplwi` is still unexplained. The same goes for the `if (!gpGame->b285) return;`
-  in GameEffects (DB30C/DBA50): a switch gives `cmpwi`, the original has `cmplwi`.
+  original's `cmplwi` is usually the or-chain rule above (a `cmplwi` in a branch-over-a-branch
+  means the test is the last term of an `||` chain of early exits, and that chain can take in an
+  enclosing `if`). GameEffects DB30C/DBA50: `if (A && !b && !c) { if (!gpGame->b285) return; ...}`
+  had `cmplwi; bne body; b end`; `if (!A || b || c || !gpGame->b285) return; ...` matched both
+  (99.49%/99.08% -> 100).
 - **[verified] A one-case `switch`** on a call result gives `cmpwi; beq case; b default` and the
   default path returns the value still in r3; an `if (x != 8) return x;` gives a single `bne`.
 - **[verified] A return through the common exit is a `goto`/single `return`.** An early
@@ -519,6 +582,12 @@ The fixes that come up most often. Each points to its full entry below.
   out is undefined behaviour; `lint.py` reports it (`ub-missing-return`), and no unit has one.
 
 ### Inlining and inline helpers
+
+- **[verified] A `const` on an inline helper's return type moves the caller's first loads.**
+  FourBall `fn_800E8FC8`: `static inline int FourBall_TeamSecond(int)` -> `static inline const int`,
+  94.39 -> 100 (`volatile` works the same; `s32`/`u32`/`long`/`short` go far worse). Label it a fake
+  match. Getting repeated "pick the team's player" code through small helpers fixed the register
+  numbers there (10 -> 4 differing) but made two neighbouring functions worse: decide per function.
 
 - **[verified] An inline helper that reads a global itself, rather than being passed it,
   changes register choice** (GameMode11 `fn_80100C08`'s hint helper).
@@ -554,6 +623,17 @@ The fixes that come up most often. Each points to its full entry below.
 
 ### Floating point
 
+- **[verified] `x += c` vs `x = x + c` swap the `fadds` operands**, and which one matches differs
+  from function to function (GoGolfCam `GolfCamera_InitGreenZoomToAimCamera` needed `+=`; its
+  `fn_800C1D3C` needed `x = x * c` rather than `*=`). Try both.
+
+- **[verified] `x *= c` vs `x = x * c` on an address-taken array element.** `v[3] *= 2.0f` loads the
+  element first; `v[3] = v[3] * 2.0f` loads the constant first, as the original did (GoGolfCam
+  `fn_800C1D3C`, 4 differing -> 0).
+- **[verified] An unwanted fused multiply-add goes away when one local holds the step.**
+  `f74 += 0.01f * (fDist - f74)` fused; `fDist = 0.01f * (fDist - f74); f74 += fDist;` kept the
+  original's separate `fmuls`/`fadds` (GoGolfCam `GolfCamera_ProcessPostShotCamera`, 99.07 -> 100).
+
 - **[verified] A MIN-style ternary whose result lands in a scratch register is its own
   variable.** `r = a <= b ? a : b;` with `r` separate matched; writing it back into `a` let the
   compiler merge them (GameMode8 `fn_800FBD2C`).
@@ -564,7 +644,8 @@ The fixes that come up most often. Each points to its full entry below.
 - **[verified] Float locals coalesce by live range, not by name.** Two slopes computed in two
   halves of a function got different registers until they were two variables declared in the
   right place; the product `a *= t; b = p * (k * a)` in place of `p * (k * (a * t))` fixed the
-  register numbers of a multiply chain.
+  register numbers of a multiply chain. Integers too: one `s32 nCount` reused for two leaves
+  became `nCountA`/`nCountB`, declared in that order (skalib `AnimLib_TrimCb`, 99.93 -> 100).
 - **[verified] A float parameter reused as the running value.** When the original's product
   lands in a different callee-saved register than ours and the operands of `fmuls` are swapped
   (`f1, f0` vs `f0, f1`), the source overwrote the parameter: `fSeconds *= 60.0f; do { ...
@@ -594,6 +675,22 @@ The fixes that come up most often. Each points to its full entry below.
   into the "wrong" FPR number: the original declared `f32 fInv = 1.0f / 128.0f;` at the top.
 
 ### Data, constants and symbols
+
+- **[verified] Where EA's globals live: ordinary `.bss`, in link order, so game code builds with
+  `-common off`.** The game's `.bss` (0x8019D540 to about 0x80261000) comes before the SDK's
+  (0x802611A0 on) and follows the link order of the code that uses it; COMMON symbols would link
+  after every `.bss`. With `pool_data off`, `-common` changes no function (all 7,647 scored the
+  same both ways). So a shared uninitialised global is defined, non-static, in its owner file, with
+  a plain `.bss` split (GameEffects `lbl_80202898`, DOL OK). Inside one object `.bss` is laid out in
+  REVERSE definition order: define the file's globals last-address-first. `= {0}` moves a global to
+  `.data`; don't. dtk's `common` split attribute is not for this (it turns every later `.bss` split
+  into commons).
+
+- **[observed] An all-zero small array in `.sdata` (not `.sbss`) was written with an initializer.**
+  `u8 lbl_80281648[2] = {0, 0};` lands in `.sdata` and links (AlternateShot).
+- **[verified] Base-last indexing of a big-struct global.** `gpSaveData[n].f` adds the base first;
+  `((SaveProfile*)gpSaveData)[n].f`, an inline accessor returning `&gpSaveData[n]`, or a pointer local
+  all give the original's `addis idx; addi; lhzx/stwx base` (PGATour `fn_800EE478`, 92.08 -> 100).
 
 - **[verified] objdiff scores a switch 100% even when its jump table points at the wrong case
   bodies**: it masks relocations. GameMode11 `fn_80100328` had case labels off by one and read
@@ -830,9 +927,9 @@ are for code built with GCC 2.95 at -O0 (SN ProDG), kept for reference.
   end of the chain. `TagFile_FreeBuffer` and the last branch of `TagFile_Update` have it.
 - **[verified] Unused `static` variables are still emitted at -O0**, in declaration order, into
   `.sbss`/`.sdata` like any other. If a file's `.sbss` is bigger than its referenced globals,
-  add a dummy static of the missing size; the DOL will not hash otherwise. Uninitialised
-  non-static globals become COMMON symbols instead and land elsewhere, so use `static` (or an
-  explicit `= 0` for `.sdata`) to control the section.
+  add a dummy static of the missing size; the DOL will not hash otherwise. Under `-common on`
+  uninitialised non-static globals become COMMON symbols and land after all `.bss`; game code
+  builds with `-common off` (see "Where EA's globals live" in Data, constants and symbols).
 - **[verified] Comparison operand order.** `a == p->x` loads `p` first, then `a` into `r0`, then
   `p->x` into `r9`, and compares `r0, r9`. `p->x == a` gives `lwz r0, 0(r9)` then `lwz r9, a`.
   For two stack variables the left one is always `r0`. So the register order of a `cmpw`

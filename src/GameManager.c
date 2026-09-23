@@ -1349,7 +1349,7 @@ f32 GM_GetGameProgress(SaveProfile* pProfile) {
         }
     }
     for (i = 0; i < 31; i++) {
-        if (pProfile->aC8[i].b) {
+        if (pProfile->aC8[i].award.bWon) {
             f += 1.0f;
         }
     }

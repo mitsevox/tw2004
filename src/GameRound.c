@@ -14,12 +14,18 @@ int  fn_800E19A4(int nPlayer, int nHoles);
 void fn_800E25CC(u8 b);
 int  fn_800E1CE8(int a, int b);
 
-void  fn_800D8D5C(int nPlayer, int a);
+void  fn_800D8D5C(int nPlayer);   // clears the player's words at 0x314-0x350
 void  fn_800E30D4(void);
 void  fn_800E2FD8(void);
 void  fn_800E3050(int nCourse);
 
-extern char lbl_80282270[8];                // the hole name
+// GameRound.c's data. The uninitialised globals are defined last address first (CodeWarrior lays
+// each section out in reverse order of definition).
+GameState  lbl_802028F0;                    // the game state (reached through gpGame)
+GameState* gpGame = &lbl_802028F0;          // golfer.h
+u8   lbl_8028227C;                          // game.h
+s32  lbl_80282278;                          // game.h
+char lbl_80282270[8];                       // the hole name
 
 void  fn_800E3AF4(void);
 s32   fn_800E3AEC(int a);
@@ -304,7 +310,7 @@ void fn_800E1074(void) {
         for (j = 0; j < 18; j++) {
             fn_800E1018(i, j);
         }
-        p = (Player*)((u8*)gPlayers + i * sizeof(Player));
+        p = PLAYER(i);
         for (j = 0; j < 4; j++) {
             p->nRoundScore[j] = 0;
         }
@@ -321,7 +327,7 @@ void fn_800E1074(void) {
         for (j = 0; j < 18; j++) {
             p->nC6C[j] = 0;
         }
-        fn_800D8D5C(i, 0);
+        fn_800D8D5C(i);
         if (gpSaveData[p->nIndex].bActive != 0) {
             gpSaveData[p->nIndex].b70 = 0;
         }
@@ -487,6 +493,50 @@ int fn_800E1788(int nPlayer) {
     return fn_800E19A4(nPlayer, 18);
 }
 
+// A player's total strokes for the round.
+int fn_800E17AC(int nPlayer) {
+    int i;
+    int n = 0;
+    for (i = 0; i < 18; i++) {
+        n += gPlayers[nPlayer].nStrokes[i];
+    }
+    return n;
+}
+
+// Strokes against par over the holes played so far (and the current one, when asked and the
+// ball is in the hole).
+int fn_800E184C(int nPlayer, u8 bCurrent) {
+    int nPar;
+    int nStrokes = 0;
+    int i;
+    int nEnd = gpGame->nCurHole;
+    nPar = 0;
+    if (bCurrent && gPlayers[nPlayer].ball.nLie == LIE_INCUP_e && nEnd < 18) {
+        nEnd++;
+    }
+    for (i = 0; i < nEnd; i++) {
+        if (gpGame->bHoleSelected[i]) {
+            nPar += fn_800D2AD8(i);
+            nStrokes += gPlayers[nPlayer].nStrokes[i];
+        }
+    }
+    return nStrokes - nPar;
+}
+
+// The score shown for a player: the online game's, the mode's own total, or strokes against par.
+int fn_800E1904(int nPlayer, u8 bCurrent) {
+    if (fn_800EE470()) {
+        return fn_8011937C(nPlayer, 0, bCurrent);
+    }
+    if (gpGame->bD4) {
+        return gPlayers[nPlayer].n2D8;
+    }
+    if (gpGame->nDC < gpGame->nE0) {
+        return fn_800E184C(nPlayer, bCurrent);
+    }
+    return 0;
+}
+
 // A player's total for the first nHoles holes: the mode's points in mode 18 (match play),
 // fn_800E8C24's count in mode 19, strokes otherwise.
 int fn_800E19A4(int nPlayer, int nHoles) {
@@ -535,50 +585,6 @@ u8 fn_800E1CA8(void) {
         }
     }
     return b;
-}
-
-// A player's total strokes for the round.
-int fn_800E17AC(int nPlayer) {
-    int i;
-    int n = 0;
-    for (i = 0; i < 18; i++) {
-        n += gPlayers[nPlayer].nStrokes[i];
-    }
-    return n;
-}
-
-// Strokes against par over the holes played so far (and the current one, when asked and the
-// ball is in the hole).
-int fn_800E184C(int nPlayer, u8 bCurrent) {
-    int nPar;
-    int nStrokes = 0;
-    int i;
-    int nEnd = gpGame->nCurHole;
-    nPar = 0;
-    if (bCurrent && gPlayers[nPlayer].ball.nLie == LIE_INCUP_e && nEnd < 18) {
-        nEnd++;
-    }
-    for (i = 0; i < nEnd; i++) {
-        if (gpGame->bHoleSelected[i]) {
-            nPar += fn_800D2AD8(i);
-            nStrokes += gPlayers[nPlayer].nStrokes[i];
-        }
-    }
-    return nStrokes - nPar;
-}
-
-// The score shown for a player: the online game's, the mode's own total, or strokes against par.
-int fn_800E1904(int nPlayer, u8 bCurrent) {
-    if (fn_800EE470()) {
-        return fn_8011937C(nPlayer, 0, bCurrent);
-    }
-    if (gpGame->bD4) {
-        return gPlayers[nPlayer].n2D8;
-    }
-    if (gpGame->nDC < gpGame->nE0) {
-        return fn_800E184C(nPlayer, bCurrent);
-    }
-    return 0;
 }
 
 // The 75 marked holes (three to five per course; the items GM_GetGameProgress counts with
@@ -862,10 +868,6 @@ void fn_800E25E0(void) {
     }
 }
 
-u8 fn_800E27A8(void) {
-    return gpGame->n294 != 0;
-}
-
 // The course's folder name ("01_Peb" = Pebble Beach ...). Course 5's is "22_Ant".
 char* fn_800E2680(void) {
     switch (Game_GetCourse()) {
@@ -900,10 +902,35 @@ char* GameManager_GetHoleName(int nHole) {
     return lbl_80282270;
 }
 
+u8 fn_800E27A8(void) {
+    return gpGame->n294 != 0;
+}
+
 // Seconds since the round's clock was last reset (gpGame->n12C holds the session's frame count
 // then).
 int fn_800E27C0(void) {
     return (1.0f / FRAME_RATE) * (f32)(u32)(gSession.nFrameCount - gpGame->n12C);
+}
+
+// A gimme (formerly its own unit, Gimme.c): the Gimmes option is on, it is not split screen or a
+// replay, the session is not in the mode with both flag bits 0x4000 and 0x8000, the game mode
+// allows gimmes and its rules callback does not object, and the ball is within half a yard
+// (18 inches) of the pin - on the putter, or in any shot of a one-player game. Called from swing
+// state 14; yes leads to state 15 (the tap-in is planned) and 16 (played for the player).
+u8 Gimme_Allowed(int nPlayer) {
+    if (!gSession.options.bGimmes) return 0;
+    if (gSession.nSplitScreen) return 0;
+    if (gSession.bReplay) return 0;
+    if ((gSession.uFlags & 0x4000) && (gSession.uFlags & 0x8000)) return 0;
+    if (!gpGame->bGimmesAllowed) return 0;
+    if (gpGame->pfnHoleFinished(nPlayer, 1)) return 0;
+    if (fn_800D0478(nPlayer) > 0.5f) return 0;
+    if (gPlayers[nPlayer].nClub != CLUB_PUTTER_e && gSession.nNumPlayers > 1) return 0;
+    return 1;
+}
+
+void fn_800E292C(void) {
+    gpGame->pfnGetHonors(5);
 }
 
 // Runs the mode's player choice twice (fn_800E292C runs it once).
@@ -1272,27 +1299,6 @@ void fn_800E30D4(void) {
         }
     }
     fn_800E1434();
-}
-
-// A gimme (formerly its own unit, Gimme.c): the Gimmes option is on, it is not split screen or a
-// replay, the session is not in the mode with both flag bits 0x4000 and 0x8000, the game mode
-// allows gimmes and its rules callback does not object, and the ball is within half a yard
-// (18 inches) of the pin - on the putter, or in any shot of a one-player game. Called from swing
-// state 14; yes leads to state 15 (the tap-in is planned) and 16 (played for the player).
-u8 Gimme_Allowed(int nPlayer) {
-    if (!gSession.options.bGimmes) return 0;
-    if (gSession.nSplitScreen) return 0;
-    if (gSession.bReplay) return 0;
-    if ((gSession.uFlags & 0x4000) && (gSession.uFlags & 0x8000)) return 0;
-    if (!gpGame->bGimmesAllowed) return 0;
-    if (gpGame->pfnHoleFinished(nPlayer, 1)) return 0;
-    if (fn_800D0478(nPlayer) > 0.5f) return 0;
-    if (gPlayers[nPlayer].nClub != CLUB_PUTTER_e && gSession.nNumPlayers > 1) return 0;
-    return 1;
-}
-
-void fn_800E292C(void) {
-    gpGame->pfnGetHonors(5);
 }
 
 // Modes 13-17.
