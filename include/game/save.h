@@ -105,8 +105,12 @@ typedef struct SaveProfile {
     char szName[0x1C - 0x1];    // 0x00001  the profile's name, compared with the record holders'
     u8   aGolferUnlocked[30];   // 0x0001C  per golfer (fn_80058278 sets, fn_8005832C tests)
     u8   aCourseUnlocked[23];   // 0x0003A  per course
-    u8   aRewardUnlocked[0x70 - 0x51];  // 0x00051  per reward (fn_80058428 sets); the
+    u8   aRewardUnlocked[0x64 - 0x51];  // 0x00051  per reward (fn_80058428 sets); the
                                 //          "THEKITCHENSINK" code (0x80056568) sets the first 18
+    s32  n64;                   // 0x00064  money: every payout is added (fn_800D3548); a course unlocks
+                                //          when it reaches the course's price (fn_800D3A20)
+    u8   unk68[4];
+    s32  n6C;                   // 0x0006C  money: every payout is added here too (fn_800D3548)
     u8   b70;                   // 0x00070  set when an award is won, a round is counted or a challenge
                                 //          starts; cleared when a round is set up (GameRound.c)
     u8   unk71[3];
