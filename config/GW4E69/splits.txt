@@ -1709,32 +1709,20 @@ unsorted/rcmp_mad_codec/sweep_800B9A88.c:
 unsorted/rcmp_mad_codec/sweep_800B9B48.c:
 	.text       start:0x800B9B48 end:0x800B9BF4
 
-unsorted/sweep_800BA080.c:
-	.text       start:0x800BA080 end:0x800BA0A0
+Trax.c:
+	.text       start:0x800B9FF0 end:0x800BA74C
 
-unsorted/sweep_800BA0E4.c:
-	.text       start:0x800BA0E4 end:0x800BA1A4
+ScreenClear.c:
+	.text       start:0x800BA74C end:0x800BA940
 
-unsorted/sweep_800BA3A4.c:
-	.text       start:0x800BA3A4 end:0x800BA3D8
+Code800BA940.c:
+	.text       start:0x800BA940 end:0x800BAD60
 
-unsorted/sweep_800BA3D8.c:
-	.text       start:0x800BA3D8 end:0x800BA40C
-
-unsorted/sweep_800BA40C.c:
-	.text       start:0x800BA40C end:0x800BA440
-
-unsorted/sweep_800BA6CC.c:
-	.text       start:0x800BA6CC end:0x800BA700
-
-unsorted/sweep_800BA700.c:
-	.text       start:0x800BA700 end:0x800BA734
-
-unsorted/sweep_800BAA4C.c:
-	.text       start:0x800BAA4C end:0x800BAA50
+VecMath.c:
+	.text       start:0x800BAD60 end:0x800BB0A8
 
 SitDevFile.c:
-	.text       start:0x800BAEB0 end:0x800BD894
+	.text       start:0x800BB0A8 end:0x800BD894
 
 GoGolfCam.c:
 	.text       start:0x800BD894 end:0x800C7480
@@ -1745,74 +1733,29 @@ GoGolfCam.c:
 	.sbss       start:0x80282220 end:0x80282228
 	.sdata2     start:0x802842C0 end:0x802843B8
 
+CamSpline.c:
+	.text       start:0x800C7480 end:0x800C808C
+
 GoBreakLine.c:
 	.text       start:0x800C808C end:0x800C937C
 
 AnimStream.c:
 	.text       start:0x800C937C end:0x800CC1EC
 
-unsorted/sweep_800CCA1C.c:
-	.text       start:0x800CCA1C end:0x800CCA40
-
-unsorted/sweep_800CCA40.c:
-	.text       start:0x800CCA40 end:0x800CCA70
-
-unsorted/sweep_800CCEA0.c:
-	.text       start:0x800CCEA0 end:0x800CCED0
-
 SkinPart.c:
-	.text       start:0x800CD404 end:0x800CEA30
-
-unsorted/sweep_800CEDE0.c:
-	.text       start:0x800CEDE0 end:0x800CEE04
-
-unsorted/sweep_800CEE88.c:
-	.text       start:0x800CEE88 end:0x800CEEC8
-
-unsorted/sweep_800CEEF4.c:
-	.text       start:0x800CEEF4 end:0x800CEF04
-
-unsorted/sweep_800D0478.c:
-	.text       start:0x800D0478 end:0x800D0514
+	.text       start:0x800CC1EC end:0x800CF158
 
 HoleScore.c:
-	.text       start:0x800D0AA0 end:0x800D0AF4
+	.text       start:0x800CF158 end:0x800D1698
 
-unsorted/sweep_800D1AE0.c:
-	.text       start:0x800D1AE0 end:0x800D1B10
+SwingTips.c:
+	.text       start:0x800D1698 end:0x800D256C
 
-unsorted/sweep_800D1D30.c:
-	.text       start:0x800D1D30 end:0x800D1D38
+Calendar.c:
+	.text       start:0x800D256C end:0x800D29E8
 
-unsorted/sweep_800D27CC.c:
-	.text       start:0x800D27CC end:0x800D27E0
-
-unsorted/sweep_800D27E0.c:
-	.text       start:0x800D27E0 end:0x800D2814
-
-unsorted/sweep_800D2884.c:
-	.text       start:0x800D2884 end:0x800D28B0
-
-unsorted/sweep_800D28B0.c:
-	.text       start:0x800D28B0 end:0x800D28DC
-
-unsorted/sweep_800D29E8.c:
-	.text       start:0x800D29E8 end:0x800D29EC
-
-unsorted/sweep_800D2A30.c:
-	.text       start:0x800D2A30 end:0x800D2ABC
-
-unsorted/sweep_800D2ABC.c:
-	.text       start:0x800D2ABC end:0x800D2B08
-
-unsorted/sweep_800D2C30.c:
-	.text       start:0x800D2C30 end:0x800D2CB0
-
-unsorted/sweep_800D3118.c:
-	.text       start:0x800D3118 end:0x800D315C
-
-unsorted/sweep_800D3208.c:
-	.text       start:0x800D3208 end:0x800D3244
+CourseData.c:
+	.text       start:0x800D29E8 end:0x800D3244
 
 Earnings.c:
 	.text       start:0x800D3244 end:0x800D9E14

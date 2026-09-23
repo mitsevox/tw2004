@@ -1,6 +1,6 @@
-// SitDevFile.c (EA's name, from its asserts; TW06): the paired-single vector helpers, a watcher
-// that follows the ball after a shot (an event 48 frames in, a call when it reaches surface 105),
-// and the loading of the situation scripts into the block lbl_802811B8 points at (sitdev.h).
+// SitDevFile.c (EA's name, from its asserts; TW06): a watcher that follows the ball after a shot
+// (an event 48 frames in, a call when it reaches surface 105), the loading of the situation
+// scripts into the block lbl_802811B8 points at (sitdev.h), and the values the scripts test.
 
 #include "game_types.h"
 #include "engine.h"
@@ -14,255 +14,6 @@ Ball* lbl_802821FC;     // 0x802821FC  the watched ball, NULL for none
 u32   lbl_802821F8;     // 0x802821F8  gSession.nFrameCount when it started
 
 void fn_80067710(int nPlayer, int a, int b);   // also declared in Swing.c; belongs in a header
-
-// ---- vector helpers ------------------------------------------------------------------------
-// Hand-written paired-single assembly. The square roots are one Newton step on the hardware
-// estimate: r = frsqrte(s); r = 0.5 * r * (3 - s * r * r).
-
-#ifdef __MWERKS__
-static const f32 kVecEpsilon = 1.0f / 1073741824.0f;   // 2^-30: shorter than this is not scaled
-static const f32 kHalf = 0.5f;
-static const f32 kThree = 3.0f;
-static const f32 kZero = 0.0f;
-
-// Normalise a four-float vector (a quaternion) from pSrc into pDst; a near-zero one is copied.
-asm void Vec_Normalize(register f32* pSrc, register f32* pDst) {
-    nofralloc
-    psq_l    f3, 0(pSrc), 0, 0
-    psq_l    f4, 8(pSrc), 0, 0
-    ps_mul   f5, f3, f3
-    ps_madd  f5, f4, f4, f5
-    ps_sum0  f5, f5, f5, f5
-    lfs      f0, kVecEpsilon
-    fcmpo    cr0, f5, f0
-    ble      store
-    frsqrte  f6, f5
-    lfs      f2, kHalf
-    lfs      f0, kThree
-    frsp     f6, f6
-    fmuls    f1, f6, f6
-    fmuls    f2, f2, f6
-    fnmsubs  f0, f5, f1, f0
-    fmuls    f6, f2, f0
-    ps_muls0 f3, f3, f6
-    ps_muls0 f4, f4, f6
-store:
-    psq_st   f3, 0(pDst), 0, 0
-    psq_st   f4, 8(pDst), 0, 0
-    blr
-}
-
-// Normalise a three-float vector from pSrc into pDst; a near-zero one is copied.
-asm void fn_800BAF04(register f32* pSrc, register f32* pDst) {
-    nofralloc
-    psq_l    f3, 0(pSrc), 0, 0
-    psq_l    f4, 8(pSrc), 1, 0
-    ps_mul   f5, f3, f3
-    ps_madd  f0, f4, f4, f5
-    ps_sum0  f5, f0, f5, f5
-    lfs      f0, kVecEpsilon
-    fcmpo    cr0, f5, f0
-    ble      store
-    frsqrte  f6, f5
-    lfs      f2, kHalf
-    lfs      f0, kThree
-    frsp     f6, f6
-    fmuls    f1, f6, f6
-    fmuls    f2, f2, f6
-    fnmsubs  f0, f5, f1, f0
-    fmuls    f6, f2, f0
-    ps_muls0 f3, f3, f6
-    ps_muls0 f4, f4, f6
-store:
-    psq_st   f3, 0(pDst), 0, 0
-    psq_st   f4, 8(pDst), 1, 0
-    blr
-}
-
-// Vec_Normalize that also returns the length (0 for a near-zero vector).
-asm f32 fn_800BAF58(register f32* pSrc, register f32* pDst) {
-    nofralloc
-    psq_l    f3, 0(pSrc), 0, 0
-    psq_l    f4, 8(pSrc), 0, 0
-    ps_mul   f5, f3, f3
-    ps_madd  f5, f4, f4, f5
-    ps_sum0  f5, f5, f5, f5
-    lfs      f0, kVecEpsilon
-    fcmpo    cr0, f5, f0
-    ble      zero
-    frsqrte  f6, f5
-    lfs      f2, kHalf
-    lfs      f0, kThree
-    frsp     f6, f6
-    fmuls    f1, f6, f6
-    fmuls    f2, f2, f6
-    fnmsubs  f0, f5, f1, f0
-    fmuls    f6, f2, f0
-    ps_muls0 f3, f3, f6
-    ps_muls0 f4, f4, f6
-    psq_st   f3, 0(pDst), 0, 0
-    psq_st   f4, 8(pDst), 0, 0
-    fmuls    f1, f6, f5
-    blr
-zero:
-    psq_st   f3, 0(pDst), 0, 0
-    psq_st   f4, 8(pDst), 0, 0
-    lfs      f1, kZero
-    blr
-}
-
-// fn_800BAF04 that also returns the length (0 for a near-zero vector).
-asm f32 fn_800BAFC0(register f32* pSrc, register f32* pDst) {
-    nofralloc
-    psq_l    f3, 0(pSrc), 0, 0
-    psq_l    f4, 8(pSrc), 1, 0
-    ps_mul   f5, f3, f3
-    ps_madd  f0, f4, f4, f5
-    ps_sum0  f5, f0, f5, f5
-    lfs      f0, kVecEpsilon
-    fcmpo    cr0, f5, f0
-    ble      zero
-    frsqrte  f6, f5
-    lfs      f2, kHalf
-    lfs      f0, kThree
-    frsp     f6, f6
-    fmuls    f1, f6, f6
-    fmuls    f2, f2, f6
-    fnmsubs  f0, f5, f1, f0
-    fmuls    f6, f2, f0
-    ps_muls0 f3, f3, f6
-    ps_muls0 f4, f4, f6
-    psq_st   f3, 0(pDst), 0, 0
-    psq_st   f4, 8(pDst), 1, 0
-    fmuls    f1, f6, f5
-    blr
-zero:
-    psq_st   f3, 0(pDst), 0, 0
-    psq_st   f4, 8(pDst), 1, 0
-    lfs      f1, kZero
-    blr
-}
-
-// The squared distance between two three-float points.
-asm f32 fn_800BB028(register f32* pA, register f32* pB) {
-    nofralloc
-    psq_l    f0, 0(pA), 0, 0
-    psq_l    f1, 8(pA), 1, 0
-    psq_l    f2, 0(pB), 0, 0
-    psq_l    f3, 8(pB), 1, 0
-    ps_sub   f0, f0, f2
-    ps_sub   f1, f1, f3
-    ps_mul   f0, f0, f0
-    ps_madd  f1, f1, f1, f0
-    ps_sum0  f1, f1, f0, f0
-    blr
-}
-
-// The distance between two three-float points.
-asm f32 Vec_Distance(register f32* pA, register f32* pB) {
-    nofralloc
-    psq_l    f0, 0(pA), 0, 0
-    psq_l    f1, 8(pA), 1, 0
-    psq_l    f2, 0(pB), 0, 0
-    psq_l    f3, 8(pB), 1, 0
-    ps_sub   f0, f0, f2
-    ps_sub   f1, f1, f3
-    ps_mul   f0, f0, f0
-    ps_madd  f3, f1, f1, f0
-    ps_sum0  f3, f3, f0, f0
-    lfs      f1, kZero
-    fcmpo    cr0, f3, f1
-    blelr
-    frsqrte  f4, f3
-    lfs      f2, kHalf
-    lfs      f0, kThree
-    frsp     f4, f4
-    fmuls    f1, f4, f4
-    fmuls    f2, f2, f4
-    fnmsubs  f0, f3, f1, f0
-    fmuls    f0, f2, f0
-    fmuls    f1, f3, f0
-    blr
-}
-#else
-// port: untested, the plain-C versions for compilers without paired singles. The originals use
-// the hardware square-root estimate plus one refinement step, so results differ in the last bits.
-static f32 Vec3_LengthSq(const f32* p) {
-    return p[0] * p[0] + p[1] * p[1] + p[2] * p[2];
-}
-
-void Vec_Normalize(f32* pSrc, f32* pDst) {
-    f32 s = pSrc[0] * pSrc[0] + pSrc[1] * pSrc[1] + pSrc[2] * pSrc[2] + pSrc[3] * pSrc[3];
-    f32 k = 1.0f;
-    int i;
-    if (s > 1.0f / 1073741824.0f) {
-        k = 1.0f / (f32)sqrt(s);
-    }
-    for (i = 0; i < 4; i++) {
-        pDst[i] = pSrc[i] * k;
-    }
-}
-
-void fn_800BAF04(f32* pSrc, f32* pDst) {
-    f32 s = Vec3_LengthSq(pSrc);
-    f32 k = 1.0f;
-    int i;
-    if (s > 1.0f / 1073741824.0f) {
-        k = 1.0f / (f32)sqrt(s);
-    }
-    for (i = 0; i < 3; i++) {
-        pDst[i] = pSrc[i] * k;
-    }
-}
-
-f32 fn_800BAF58(f32* pSrc, f32* pDst) {
-    f32 s = pSrc[0] * pSrc[0] + pSrc[1] * pSrc[1] + pSrc[2] * pSrc[2] + pSrc[3] * pSrc[3];
-    f32 fLen;
-    int i;
-    if (!(s > 1.0f / 1073741824.0f)) {
-        for (i = 0; i < 4; i++) {
-            pDst[i] = pSrc[i];
-        }
-        return 0.0f;
-    }
-    fLen = (f32)sqrt(s);
-    for (i = 0; i < 4; i++) {
-        pDst[i] = pSrc[i] / fLen;
-    }
-    return fLen;
-}
-
-f32 fn_800BAFC0(f32* pSrc, f32* pDst) {
-    f32 s = Vec3_LengthSq(pSrc);
-    f32 fLen;
-    int i;
-    if (!(s > 1.0f / 1073741824.0f)) {
-        for (i = 0; i < 3; i++) {
-            pDst[i] = pSrc[i];
-        }
-        return 0.0f;
-    }
-    fLen = (f32)sqrt(s);
-    for (i = 0; i < 3; i++) {
-        pDst[i] = pSrc[i] / fLen;
-    }
-    return fLen;
-}
-
-f32 fn_800BB028(f32* pA, f32* pB) {
-    f32 d[3];
-    d[0] = pA[0] - pB[0];
-    d[1] = pA[1] - pB[1];
-    d[2] = pA[2] - pB[2];
-    return Vec3_LengthSq(d);
-}
-
-f32 Vec_Distance(f32* pA, f32* pB) {
-    f32 s = fn_800BB028(pA, pB);
-    if (!(s > 0.0f)) return 0.0f;
-    return (f32)sqrt(s);
-}
-#endif
 
 // ---- the watched ball ----------------------------------------------------------------------
 
@@ -338,6 +89,10 @@ void fn_800BBADC(int nValue) {
 
 void fn_800BCA60(s32* pClass, int nSurface, Ball* pBall, Player* pPlayer);
 void fn_800BCB74(s32* pClass, int nSurface);
+int  fn_800BCB88(void);
+u8   fn_800BCBE0(void);
+u8   fn_800BCC38(void);
+u8   fn_800BCC48(void);
 s32  fn_800BCCA0(int nPlayer);
 s32  fn_800BCCCC(int nPlayer);
 s32  fn_800BCCF8(int nPlayer);
@@ -380,6 +135,44 @@ void fn_800BCB74(s32* pClass, int nSurface) {
     }
 }
 
+// 1, 3 or 2 by which of lbl_802811F0's flags are set (fn_800BCC48, fn_800BCBE0, flag 0x2 alone),
+// otherwise 0.
+int fn_800BCB88(void) {
+    int nResult;
+    if (fn_800BCC48()) {
+        nResult = 1;
+    } else if (fn_800BCBE0()) {
+        nResult = 3;
+    } else if (fn_80035574()) {
+        nResult = 2;
+    } else {
+        nResult = 0;
+    }
+    return nResult;
+}
+
+// Neither flag 0x2 nor b14 is set, and u04's flag 0x2 is.
+u8 fn_800BCBE0(void) {
+    int bResult = 0;
+    if (!fn_80035574() && !lbl_802811F0->b14 && fn_800BCC38()) {
+        bResult = 1;
+    }
+    return bResult;
+}
+
+u8 fn_800BCC38(void) {
+    return lbl_802811F0->u04 & 2;
+}
+
+// Flag 0x2 is set, and u04's flag 0x2 is clear or b14 is set.
+u8 fn_800BCC48(void) {
+    int bResult = 0;
+    if (fn_80035574() && (!fn_800BCC38() || lbl_802811F0->b14)) {
+        bResult = 1;
+    }
+    return bResult;
+}
+
 // The game mode's answers for the scripts (GameState's callbacks).
 s32 fn_800BCCA0(int nPlayer) {
     return gpGame->pfn204(nPlayer);
@@ -403,6 +196,14 @@ u8 fn_800BCD50(void) {
 
 s32 fn_800BCD5C(void) {
     return gpGame->nDC;
+}
+
+// Clear the scripts' per-entry bytes.
+void fn_800BD74C(void) {
+    u32 i;
+    for (i = 0; i < lbl_80282208->n10; i++) {
+        lbl_802811B8->pD4[i] = 0;
+    }
 }
 
 // ---- sounds and music ----------------------------------------------------------------------
