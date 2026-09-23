@@ -72,13 +72,15 @@ u8 fn_800E7ABC(u8 bCheck) {
 void fn_800E7B58(void) {
     lbl_802822E8 = 0;
     lbl_80281650 = 5;
-    if (Player_IsHoled(0) && gPlayers[0].nStrokes[Game_CurHoleIndex()] < gPlayers[1].nStrokes[Game_CurHoleIndex()]) {
+    if (Player_IsHoled(0) &&
+        gPlayers[0].nStrokes[Game_CurHoleIndex()] < gPlayers[1].nStrokes[Game_CurHoleIndex()]) {
         gPlayers[0].nModePoints[Game_CurHoleIndex()] = 1;
         lbl_802822E8 = 1;
         lbl_80281650 = 0;
         gPlayers[0].nHolesWon++;
     }
-    if (Player_IsHoled(1) && gPlayers[1].nStrokes[Game_CurHoleIndex()] < gPlayers[0].nStrokes[Game_CurHoleIndex()]) {
+    if (Player_IsHoled(1) &&
+        gPlayers[1].nStrokes[Game_CurHoleIndex()] < gPlayers[0].nStrokes[Game_CurHoleIndex()]) {
         gPlayers[1].nModePoints[Game_CurHoleIndex()] = 1;
         lbl_802822E8 = 1;
         lbl_80281650 = 1;

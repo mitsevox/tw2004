@@ -8,6 +8,8 @@
 #include "engine.h"
 #include "game/save.h"
 
+// fake match: the (s8) on GOLFERSTATE_GetCurrentState and the (u8) on GOLFERSTATE_Set's player (see game.h).
+
 int  fn_800E19A4(int nPlayer, int nHoles);
 void fn_800E25CC(u8 b);
 int  fn_800E1CE8(int a, int b);
@@ -46,7 +48,7 @@ void  fn_80057364(int a);
 int   fn_800D3118(int nRound, int nHole);    // a built round's course for a hole
 int   fn_800D315C(int nRound, int nHole);    // and its hole number (1-based)
 
-// out = a - b (four floats)
+// Four floats: pOut gets pA minus pB.
 asm void fn_800E0AF0(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
@@ -71,7 +73,7 @@ extern CourseList lbl_80184D40;
 // A course counts as unlocked when any of the five profiles (or the second block) has its flag.
 #define COURSE_UNLOCKED(c, k) (gpSaveData[k].aCourseUnlocked[c] || lbl_80281DF4->aCourseUnlocked[c])
 
-// out = a - b (three floats)
+// Three floats: pOut gets pA minus pB.
 asm void fn_800E0B14(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
@@ -1091,6 +1093,7 @@ void fn_800E30D4(void) {
         }
         for (k = 0; k < n; k++) {
             if (slots[n] == slots[k] || slots[n] == slots[k] + 1 || slots[n] == slots[k] - 1) {
+                // fake match: a retry jump, as the binary branches; structured retries untried
                 goto slot3;
             }
         }
@@ -1129,12 +1132,14 @@ void fn_800E30D4(void) {
         nHole = holes[Rand_Next(1) % nHoles];
         for (k = 0; k < n; k++) {
             if (nCourse == gpGame->nHoleCourse[slots[k]] && nHole == gpGame->nHoleNum[slots[k]]) {
+                // fake match: a retry jump, as the binary branches; structured retries untried
                 goto pick3;
             }
         }
         if (bUsed[nPick] == 1) {
             for (k = 0; k < nAvail; k++) {
                 if (!bUsed[k]) {
+                    // fake match: a retry jump, as the binary branches; structured retries untried
                     goto pick3;
                 }
             }
@@ -1153,10 +1158,12 @@ void fn_800E30D4(void) {
             slots[n] = Rand_Next(1) % 9 + 9;
         }
         if (gpGame->nHoleNum[slots[n]] != -1) {
+            // fake match: a retry jump, as the binary branches; structured retries untried
             goto slot5;
         }
         for (k = 0; k < n; k++) {
             if (slots[n] == slots[k] || slots[n] == slots[k] + 1 || slots[n] == slots[k] - 1) {
+                // fake match: a retry jump, as the binary branches; structured retries untried
                 goto slot5;
             }
         }
@@ -1184,12 +1191,14 @@ void fn_800E30D4(void) {
         nHole = holes[Rand_Next(1) % nHoles];
         for (k = 0; k < n; k++) {
             if (nCourse == gpGame->nHoleCourse[slots[k]] && nHole == gpGame->nHoleNum[slots[k]]) {
+                // fake match: a retry jump, as the binary branches; structured retries untried
                 goto pick5;
             }
         }
         if (bUsed[nPick] == 1) {
             for (k = 0; k < nAvail; k++) {
                 if (!bUsed[k]) {
+                    // fake match: a retry jump, as the binary branches; structured retries untried
                     goto pick5;
                 }
             }
@@ -1226,12 +1235,14 @@ void fn_800E30D4(void) {
             nHole = holes[Rand_Next(1) % nHoles];
             for (k = 0; k < i; k++) {
                 if (nCourse == gpGame->nHoleCourse[k] && nHole == gpGame->nHoleNum[k]) {
+                    // fake match: a retry jump, as the binary branches; structured retries untried
                     goto pick4;
                 }
             }
             if (bUsed[nPick] == 1) {
                 for (k = 0; k < nAvail; k++) {
                     if (!bUsed[k]) {
+                        // fake match: a retry jump, as the binary branches; structured retries untried
                         goto pick4;
                     }
                 }

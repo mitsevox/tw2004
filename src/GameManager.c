@@ -9,6 +9,8 @@
 #include "engine.h"
 #include "game/save.h"
 
+// fake match: the (s8) on GOLFERSTATE_GetCurrentState (see game.h).
+
 void  fn_800D29E8(void);
 void  fn_800D33F0(void);
 void  fn_800DA36C(void);
@@ -420,7 +422,7 @@ void GM_ShowYardage(int nPlayer) {
 // TW06: GM_BumpBallForObstructions. A ball at rest against an obstruction or hazard is moved to
 // a drop point nearby, or else back where it was before the shot.
 void GM_BumpBallForObstructions(int nPlayer) {
-    int n;                      // a copy of nPlayer: register order only (a "fake match", found by the permuter)
+    int n;                      // fake match: a copy of nPlayer for the register order (permuter)
     f32 vDrop[4];
     if (gpGame->bBumpObstructions) {
         Player* p;
@@ -1209,14 +1211,14 @@ u8 fn_800DFF0C(int nPlayer) {
     return 0;
 }
 
-// TW06: GM_bIsZoomButtonPressed. Button 8 held: counts frames (at 59.94 a second) and says yes
+// TW06: GM_bIsZoomButtonPressed. Button 8 held: counts frames (FRAME_RATE a second) and says yes
 // once it has been held for 6.
 u8 GM_bIsZoomButtonPressed(int nPlayer) {
     if ((fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(8, 0)) && gpGame->n144[nPlayer] == 0) {
         gpGame->n144[nPlayer]++;
     } else if (gpGame->n144[nPlayer] > 0) {
         if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(8, 1)) {
-            gpGame->n144[nPlayer] += (int)(59.94f * gSession.fFrameTime + 0.5f);
+            gpGame->n144[nPlayer] += (int)(FRAME_RATE * gSession.fFrameTime + 0.5f);
             if (gpGame->n144[nPlayer] >= 6) {
                 gpGame->n144[nPlayer] = 0;
                 return 1;
@@ -1251,7 +1253,7 @@ u8 GM_bIsElevatorCamButtonPressed(int nPlayer) {
         gpGame->n158[nPlayer]++;
     } else if (gpGame->n158[nPlayer] > 0) {
         if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x2F, 1)) {
-            gpGame->n158[nPlayer] += (int)(59.94f * gSession.fFrameTime + 0.5f);
+            gpGame->n158[nPlayer] += (int)(FRAME_RATE * gSession.fFrameTime + 0.5f);
             if (gpGame->n158[nPlayer] >= 20) {
                 gpGame->n158[nPlayer] = 0;
                 return 1;
@@ -1289,6 +1291,7 @@ int GM_vGetAllTimeRecordsHeld(SaveProfile* pProfile) {
                     for (b = 0; b < 3; b++) {
                         if (RECORD_AT_LEAST(gSession.recB[k][i][j].nValue, gSession.recB[b][i][0].nValue)) {
                             n++;
+                            // fake match: leaves all three loops (ending them by setting their counters: 83%)
                             goto nextB;
                         }
                     }
@@ -1304,6 +1307,7 @@ int GM_vGetAllTimeRecordsHeld(SaveProfile* pProfile) {
                     for (b = 0; b < 3; b++) {
                         if (RECORD_AT_LEAST(gSession.recC[k][i][j].nValue, gSession.recC[b][i][0].nValue)) {
                             n++;
+                            // fake match: as above
                             goto nextC;
                         }
                     }

@@ -9,6 +9,8 @@
 #include "engine.h"
 #include "game/save.h"
 
+// fake match: the (s8) on GOLFERSTATE_GetCurrentState (see game.h).
+
 // One lesson: where the ball is placed and what the shot must be (lessons 1..11; 12 is the end).
 typedef struct Lesson {
     f32 vPos[4];                // 0x00  (-1, -1, -1): the ball stays on the tee

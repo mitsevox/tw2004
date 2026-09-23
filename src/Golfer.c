@@ -8,6 +8,8 @@
 #include "engine.h"
 #include "game/save.h"
 
+// fake match: the (s8) on GOLFERSTATE_GetCurrentState (see game.h).
+
 // ---- small accessors ------------------------------------------------------------------------
 
 u8 Player_IsCPU(int nPlayer) {

@@ -8,6 +8,8 @@
 #include "engine.h"
 #include "game/save.h"
 
+// fake match: the (s8) on GOLFERSTATE_GetCurrentState and the (u8) on GOLFERSTATE_Set's player (see game.h).
+
 extern u8  lbl_802823CA;
 extern u16 lbl_80192BA8[];                  // per event, a sound (0xFFFF = none)
 // Three values per course, largest first (750, 675 and 600 for the first course).
@@ -851,11 +853,11 @@ void fn_800FB774(int nPlayer) {
                 fn_800FE080(gPlayers[nPlayer].nC58, 1);
             }
         }
-        fStep = 59.94f / 60.0f * (59.94f * gSession.fFrameTime);
+        fStep = FRAME_RATE / 60.0f * (FRAME_RATE * gSession.fFrameTime);
         if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x24, 0)) {
             gPlayers[nPlayer].fCB4 += lbl_802816B0;
             gPlayers[nPlayer].nCB8 = 0;
-        } else if (gPlayers[nPlayer].nCB8 > (s32)(59.94f * lbl_802816C4)) {
+        } else if (gPlayers[nPlayer].nCB8 > (s32)(FRAME_RATE * lbl_802816C4)) {
             gPlayers[nPlayer].fCB4 -= lbl_802816C0 * fStep;
         } else {
             gPlayers[nPlayer].fCB4 -= lbl_802816B4 * fStep;

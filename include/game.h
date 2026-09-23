@@ -61,7 +61,12 @@ f32  fn_8005B64C(int nPlayer);          // the swing's shot power
 void GOLFERSTATE_Push(int nState, int nPlayer);     // push a state and run its enter callback
 void GOLFERSTATE_Set(int nState, int nPlayer);      // pop everything and start again from one state
 void GOLFERSTATE_Switch(int nState, int nPlayer);   // replace the current state
-int  GOLFERSTATE_GetCurrentState(int nPlayer);      // GS_*, or -1
+// GS_*, or -1. The definition returns the state byte zero-extended (lbzx, Swing.c) and -1 as a full
+// int, so its return type is int. Many callers sign-extend the result, as if their own prototype
+// said s8; they write (s8)GOLFERSTATE_GetCurrentState(n), a fake match (without it GameMode8 falls
+// to 61/66). The same holds for the (u8) some callers put on GOLFERSTATE_Set's player (GameMode8,
+// GameRound). Both casts are harmless for the values these take (-1..0x30, 0..4).
+int  GOLFERSTATE_GetCurrentState(int nPlayer);
 u8   fn_8005D2DC(void);
 void STATEFUNC_SimulateInit(int nPlayer);
 void STATEFUNC_SimulateUpdate(int nPlayer);

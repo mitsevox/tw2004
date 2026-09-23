@@ -345,7 +345,8 @@ int fn_800E8C24(int nPlayer, int nHole) {
     return gPlayers[fn_800E83A8(nPlayer)].nStrokes[nHole];
 }
 
-// TW06: GM_BestBallMode_GetTeamRelativeScore. The team's score against par so far (and on the current hole once holed, when asked).
+// TW06: GM_BestBallMode_GetTeamRelativeScore. The team's score against par so far (and on the
+// current hole once holed, when asked).
 int fn_800E8CA8(int nPlayer, u8 bCurrent) {
     int nPar;
     int nScore;

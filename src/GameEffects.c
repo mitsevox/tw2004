@@ -7,6 +7,8 @@
 #include "engine.h"
 #include "game/save.h"
 
+// fake match: the (s8) on GOLFERSTATE_GetCurrentState (see game.h).
+
 void  fn_800131C4(int nController);
 void  fn_8001425C(int a);
 void  fn_80012F18(int a);
@@ -101,14 +103,14 @@ f32 fn_800DAF98(f32 fFrameTime) {
     int i;
     f32 d;
     if (fn_800DCB08() && 0.0f != fFrameTime) {
-        fFrameTime = 1.0f / 59.94f;
+        fFrameTime = FRAME_TIME;
     }
     if (fn_8005D2DC()) {
         fFrameTime = 0.0f;
     }
     if (fn_800DCB00()) {
         if (0.0f != fFrameTime) {
-            fFrameTime = 1.0f / 59.94f;
+            fFrameTime = FRAME_TIME;
         }
         GM_vCloseModuleONCE();
     }
@@ -116,7 +118,7 @@ f32 fn_800DAF98(f32 fFrameTime) {
         return 0.0f;
     }
     for (i = 0; i < 5; i++) {
-        d = fn_8000AD9C(i / 59.94f - fFrameTime);
+        d = fn_8000AD9C(i / FRAME_RATE - fFrameTime);
         if (d < fBest) {
             fBest = d;
         } else if (i > 0) {
@@ -144,12 +146,12 @@ f32 fn_800DAF98(f32 fFrameTime) {
         }
     }
     if (lbl_80202898.bSlowMo) {
-        return 1.0f / 59.94f * fTicks * lbl_80202898.fSlowMo;
+        return FRAME_TIME * fTicks * lbl_80202898.fSlowMo;
     }
-    return 1.0f / 59.94f * fTicks;
+    return FRAME_TIME * fTicks;
 }
 
-// How many physics steps the ball takes this frame: one per 1/59.94 s of frame time (rounded;
+// How many physics steps the ball takes this frame: one per FRAME_TIME of frame time (rounded;
 // twice that in mode 26), none while paused (no frame time), one outside the ball's flight.
 // With the slow-down on, it moves only on every n2C-th frame.
 int GameEffects_BallUpdatesThisFrame(int nPlayer) {
@@ -162,19 +164,19 @@ int GameEffects_BallUpdatesThisFrame(int nPlayer) {
     if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_SIMULATE) {
         return 1;
     }
-    if (fn_800DCB74() && gSession.fFrameTime < 1.0f / 59.94f) {
+    if (fn_800DCB74() && gSession.fFrameTime < FRAME_TIME) {
         return fn_800DCB3C() != 0;
     }
     if (Game_GetMode() == 26) {
-        if (gSession.fFrameTime <= 1.0f / 59.94f) {
+        if (gSession.fFrameTime <= FRAME_TIME) {
             return 2;
         }
-        return 0.5f + 2.0f * gSession.fFrameTime / (1.0f / 59.94f);
+        return 0.5f + 2.0f * gSession.fFrameTime / FRAME_TIME;
     }
-    if (gSession.fFrameTime <= 1.0f / 59.94f) {
+    if (gSession.fFrameTime <= FRAME_TIME) {
         return 1;
     }
-    return 0.5f + gSession.fFrameTime / (1.0f / 59.94f);
+    return 0.5f + gSession.fFrameTime / FRAME_TIME;
 }
 
 // The player's current target (an inline in EA's source; calling fn_800F1D34 directly does not match).
@@ -389,7 +391,7 @@ void fn_800DBA50(int nPlayer) {
                             fn_80095780(gPlayers[nPlayer].pChar) != 9) {
                             fn_80095744(gPlayers[nPlayer].pChar, 14);
                             if (0.0f == fTime) {
-                                fTime = 1.0f / 59.94f;
+                                fTime = FRAME_TIME;
                             }
                         }
                     }
