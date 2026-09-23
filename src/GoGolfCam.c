@@ -81,6 +81,7 @@ void     fn_800A68C0(u8 nPlayer);
 u8       CameraScript_IsDefaultSwingCam(CamShot* pShot, int nPlayer, f32* pCam);
 u8       fn_8003D7A0(CamSequence* pSequence, int nPlayer);
 void     fn_80039344(int nView, f32 f);                 // a per-view float (Swing.c's declaration)
+u8       fn_8012022C(void);                             // (sweep code) lbl_80281900's +0x370 is nonzero
 void     fn_8001966C(Character* pChar);                 // char.c
 void     fn_8007325C(u8* pAnim);                        // set bit 2 of the animation player's flags
 u8       fn_800C43C0(View* pView, int nPlayer);
@@ -911,6 +912,176 @@ void fn_800C0C0C(View* pView, int nPlayer) {
         }
     }
     fn_8003DCE8(nPlayer, pCam, pSub, &pView->script, &pView->shot19C, 0, gSession.fFrameTime);
+}
+
+// Camera 12, the swing camera: pick the pre-flight sequence (the saved one, the follow-on of a kind 1
+// or 2 sequence, or a new one for the lie) and its shot of kind 9. Outside a replay the choice is
+// saved, and a big height difference to the target (over 10 up or down) or a ball on lies 3..5 can
+// swap in one of the plan's own shots. A shot that would hide the golfer is swapped for one from
+// sequence 0x1C.
+void GolfCamera_InitSwingCamera(View* pView, int nPlayer) {
+    int nA;
+    f32 f1;
+    f32 f2;
+    int nB;
+    f32 f3;
+    CamSequence* pAltSeq;
+    CamShot* pAltShot;
+    CamShot* pShot = NULL;
+    CamShot* pClear = NULL;
+    f32* pCam;
+    f32* pSub;
+    int nLie;
+    CamSequence* pOldSeq;
+    CamSequence* pSeq;
+    pCam = fn_8001731C(pView);
+    pSub = fn_80017314(pView);
+    pOldSeq = pView->p74;
+    pView->b153 = 0;
+    lbl_80282220->f68 = 0.0f;
+    lbl_80282220->b5D = 0;
+    fn_800C1790(pView, nPlayer);
+    pView->n260 = 0;
+    lbl_80282220->b5A = 0;
+    lbl_80282220->b5B = 0;
+    nLie = gPlayers[nPlayer].ball.nLie;
+    if (pView->p7C != NULL && !gSession.bReplay) {
+        pView->p74 = pView->p7C;
+    } else if (pView->p74 != NULL && (pView->p74->b44 == 2 || pView->p74->b44 == 1)
+               && pView->p74->p20 != pView->p74 && pView->p74->p20 != NULL && pView->p74->p20->b44 == 3) {
+        pView->p74 = pView->p74->p20;
+        if (!gSession.bReplay) {
+            pView->p7C = pView->p74;
+        }
+    } else {
+        pView->p74 = DynamicCam_ChoosePreFlightSequence(nPlayer, nLie, 3);
+        if (!gSession.bReplay) {
+            pView->p7C = pView->p74;
+        }
+    }
+    if (!gSession.bReplay) {
+        pView->p7C = pView->p74;
+        pView->p78 = pView->p74;
+    }
+    if (pView->p80 != NULL && !gSession.bReplay) {
+        if (pView->n264 > 0 && pView->n264 != 3) {
+            pShot = fn_800C4DF8(pView->n264, nPlayer);
+        }
+        if (pShot == NULL) {
+            pShot = pView->p80;
+        }
+        f3 = 0.0f;
+        nB = 0x19;
+        nA = 5;
+        f2 = 100.0f;
+        f1 = 0.0f;
+    } else {
+        pShot = fn_8003A950(pView->p74, 9, &nA, &f1, &f2, &nB, &f3, nPlayer);
+        if (!gSession.bReplay) {
+            pView->n264 = 0;
+            pView->p80 = pShot;
+        }
+        if (!Player_IsCPU(nPlayer)) {
+            f32 fRise = gPlayers[nPlayer].vTarget[1] - gPlayers[nPlayer].vBall[1];
+            if (fRise > 10.0f) {
+                pShot = fn_800C4DF8(4, nPlayer);
+                if (pShot == NULL) {
+                    pShot = pView->p80;
+                } else {
+                    pView->n264 = 4;
+                    f3 = 0.0f;
+                    nB = 0x19;
+                    nA = 5;
+                    f2 = 100.0f;
+                    f1 = 0.0f;
+                }
+            } else if (fRise < -10.0f) {
+                pShot = fn_800C4DF8(2, nPlayer);
+                if (pShot == NULL) {
+                    pShot = pView->p80;
+                } else {
+                    pView->n264 = 2;
+                    f3 = 0.0f;
+                    nB = 0x19;
+                    nA = 5;
+                    f2 = 100.0f;
+                    f1 = 0.0f;
+                }
+            }
+        }
+        if (fn_8012022C() && (nLie == 3 || nLie == 4 || nLie == 5) && gPlayers[nPlayer].nClub != 2) {
+            pShot = fn_800C4DF8(5, nPlayer);
+            if (pShot == NULL) {
+                pShot = pView->p80;
+            } else {
+                pView->n264 = 5;
+                f3 = 0.0f;
+                nB = 0x19;
+                nA = 5;
+                f2 = 100.0f;
+                f1 = 0.0f;
+            }
+        }
+    }
+    if (pShot != NULL) {
+        if (CameraScript_WillGolferBeOccludedInThisView(nPlayer, pShot, &pView->script)) {
+            pSeq = DynamicCam_ChoosePreFlightSequence(nPlayer, nLie, 0x1C);
+            if (pSeq != NULL) {
+                pClear = fn_8003A950(pSeq, 9, &nA, &f1, &f2, &nB, &f3, nPlayer);
+            }
+            if (pClear != NULL) {
+                pView->p74 = pSeq;
+                pShot = pClear;
+                pView->n264 = 0;
+            }
+        }
+        if (pView->p80 != NULL) {
+            // the saved shot moves on to the last shot of its chain, stopping before kinds 6 and 8..10
+            while (pView->p80->p40 != NULL) {
+                if (pView->p80->p40->bAB == 6 || pView->p80->p40->bAB == 8 || pView->p80->p40->bAB == 9
+                    || pView->p80->p40->bAB == 10) {
+                    break;
+                }
+                pView->p80 = pView->p80->p40;
+            }
+        }
+        if (gSession.nSplitScreen || pView->b268) {
+            while (pShot->p40 != NULL) {
+                if (pShot->p40->bAB == 6 || pShot->p40->bAB == 8 || pShot->p40->bAB == 9
+                    || pShot->p40->bAB == 10) {
+                    break;
+                }
+                pShot = pShot->p40;
+            }
+            nA = 5;
+        }
+        if (pView->nCurCamera != 0 || pOldSeq == NULL || pOldSeq->b47) {
+            nA = 5;
+            f1 = 0.0f;
+        }
+        if (fn_80095780(gPlayers[nPlayer].pChar) == 11 && fn_8003C9D0(nPlayer, 0, &pAltSeq, &pAltShot)) {
+            if (pAltSeq != NULL) {
+                pView->p74 = pAltSeq;
+                pShot = fn_8003A950(pAltSeq, 9, &nA, &f1, &f2, &nB, &f3, nPlayer);
+            } else if (pAltShot != NULL) {
+                nA = 5;
+                pShot = pAltShot;
+                f1 = 0.0f;
+                f2 = 100.0f;
+                nB = 0x19;
+                f3 = 0.0f;
+            }
+        }
+        CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, nA, f1, f2, nB, f3);
+        if (gSession.nSplitScreen) {
+            pView->p134 = NULL;
+        }
+        pView->n194 = 0;
+        if (pView->nCamera == 4) {
+            pView->nCamera = 2;
+            pView->f114 = 0.0f;
+        }
+    }
 }
 
 // Camera 12's process: shots of kind 6, 8, 9 and 10 have no next shot while the script runs; in super

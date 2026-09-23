@@ -75,6 +75,7 @@ typedef struct CamSequence {
     u8   b44;                   // 0x44  its kind
     u8   unk45;
     u8   b46;                   // 0x46  6: the ball-flight camera keeps one for shot kind 5
+    u8   b47;                   // 0x47  nonzero: the swing camera starts its shot with blend 5, time 0
 } CamSequence;
 
 // A view's camera script (0x40 bytes at View + 0x84).
@@ -104,7 +105,7 @@ typedef struct View {
     s32      nCurCamera;        // 0x070
     CamSequence* p74;           // 0x074  the camera sequence the shots are picked from
     CamSequence* p78;           // 0x078  the sequence before the post-shot cameras (p74 saved)
-    u8       unk7C[4];
+    CamSequence* p7C;           // 0x07C  the swing camera's sequence, kept for the replay
     CamShot* p80;               // 0x080
     CamScript script;           // 0x084  the camera script the camera functions drive
     f32      vC4[4];            // 0x0C4
@@ -259,7 +260,8 @@ typedef struct GolfCamState {
     u8      b5A;                // 0x05A
     u8      b5B;                // 0x05B  set by the shutter camera
     u8      b5C;                // 0x05C
-    u8      unk5D[3];
+    u8      b5D;                // 0x05D  cleared by the swing camera
+    u8      unk5E[2];
     s32     n60;                // 0x060  passed to fn_8006509C
     f32     f64;                // 0x064  camera 7's slow-motion rate while b5A is set
     f32     f68;                // 0x068
