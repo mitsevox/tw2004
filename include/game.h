@@ -40,6 +40,9 @@ LAYOUT_ASSERT(Replay, 0xF28);
 
 extern Replay gReplayData;              // 0x801D6030
 
+#define NUM_COURSES 30
+extern char* lbl_80191990[NUM_COURSES]; // each course's name ("Pebble Beach", ...)
+
 int  Game_GetCourse(void);              // 0x80008830
 int  Game_CurHoleIndex(void);           // 0..17 in the round (Golfer.c)
 int  Game_CurrentPinSet(void);          // the current hole's pin position, 0..3 (Golfer.c)
