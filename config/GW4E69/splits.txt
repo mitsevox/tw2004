@@ -3843,6 +3843,7 @@ runtime/runtime.c:
 
 src/Runtime.PPCEABI.H/GCN_mem_alloc.c:
 	.text       start:0x801520F8 end:0x801521B0
+	.rodata     start:0x80184FE8 end:0x80185060
 
 src/MSL_C/PPCEABI/bare/H/abort_exit.c:
 	.text       start:0x801521B0 end:0x801522A0

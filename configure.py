@@ -445,7 +445,7 @@ config.libs = [
         "src_dir": "extern/ffcc",
         "objects": [
             Object(Matching, "src/Runtime.PPCEABI.H/global_destructor_chain.c"),
-            Object(NonMatching, "src/Runtime.PPCEABI.H/GCN_mem_alloc.c"),
+            Object(Matching, "src/Runtime.PPCEABI.H/GCN_mem_alloc.c"),
             Object(NonMatching, "src/MSL_C/PPCEABI/bare/H/abort_exit.c"),
             Object(NonMatching, "src/MSL_C/PPCEABI/bare/H/alloc.c"),
             Object(NonMatching, "src/MSL_C/PPCEABI/bare/H/ansi_files.c"),
