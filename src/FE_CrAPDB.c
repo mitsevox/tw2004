@@ -7,6 +7,7 @@
 #include "charstate.h"
 #include "endian.h"
 #include "dynobj.h"
+#include "game/modes/pgatour.h"
 #include "frontend/fe.h"
 #include "game/frontend.h"
 
@@ -1299,6 +1300,31 @@ s32 fn_80106ED8(s32 nKind, s32 nLock) {
     return nCount;
 }
 
+// Copy the names of the first three of those assets; how many there are, up to 3.
+s32 fn_80106F68(s32 nKind, s32 nLock, char* szFirst, char* szSecond, char* szThird) {
+    int i;
+    int nCount = 0;
+
+    for (i = 0; i < lbl_80282460->nAssets; i++) {
+        if (nKind == lbl_80282460->pAssets[i].nLockKind && nLock == lbl_80282460->pAssets[i].nLock &&
+            fn_801061C8(lbl_80282460->pAssets[i].n40)) {
+            nCount++;
+            switch (nCount) {
+            case 1:
+                strcpy(szFirst, lbl_80282460->pAssets[i].szName);
+                break;
+            case 2:
+                strcpy(szSecond, lbl_80282460->pAssets[i].szName);
+                break;
+            case 3:
+                strcpy(szThird, lbl_80282460->pAssets[i].szName);
+                return nCount;
+            }
+        }
+    }
+    return nCount;
+}
+
 // The lowest nLock above nAfter among the assets of lock kind nKind (-1: none).
 s32 fn_80107084(s32 nKind, s32 nAfter) {
     int i;
@@ -1315,6 +1341,45 @@ s32 fn_80107084(s32 nKind, s32 nAfter) {
         return -1;
     }
     return nBest;
+}
+
+// Fill lbl_80282470: a record for each of the profile's set a1054C entries and each asset in the
+// profile's slots whose n2C is that entry's n (with fn_800F0304 of the entry and the asset's name).
+// How many records there are.
+s32 fn_801070F4(void) {
+    SaveProfile* pProfile = fn_80077ACC();
+    s32 aAssets[64];
+    int nAssets = 0;
+    s16 nSlot;
+    int nAsset;
+    s32* p;
+    int i;
+    int j;
+
+    p = aAssets;
+    for (nSlot = 0; nSlot < 53; nSlot++) {
+        nAsset = fn_80103D14(nSlot);
+        if (nAsset >= 0 && nAssets < 64) {
+            *p++ = nAsset;
+            nAssets++;
+        }
+    }
+    lbl_8028246C = 0;
+    for (i = 0; i < 11; i++) {
+        if (pProfile->a1054C[i].b) {
+            p = aAssets;
+            for (j = 0; j < nAssets; j++) {
+                if (pProfile->a1054C[i].n == lbl_80282460->pAssets[*p].n2C) {
+                    lbl_80282470[lbl_8028246C].n0 = pProfile->a1054C[i].n;
+                    lbl_80282470[lbl_8028246C].n4 = fn_800F0304(i);
+                    strcpy(lbl_80282470[lbl_8028246C].sz8, lbl_80282460->pAssets[*p].szName);
+                    lbl_8028246C++;
+                }
+                p++;
+            }
+        }
+    }
+    return lbl_8028246C;
 }
 
 // Copy record n out of lbl_80282470.

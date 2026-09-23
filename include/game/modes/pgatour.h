@@ -90,4 +90,7 @@ void GameModeDriverPGATour_GetChamp(s32 i, char* pDst);
 s32  GameModeDriverPGATour_GetChampScore(s32 i);
 s32  fn_800F0428(s32 nPlayer);
 
+// GameModeDriverPGATour.c, as FE_CrAPDB.c uses it
+s32  fn_800F0304(s32 i);                // aTriple[i].n8
+
 #endif
