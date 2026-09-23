@@ -29,11 +29,8 @@ unsorted/sweep_800055D8.c:
 unsorted/sweep_80005BC8.c:
 	.text       start:0x80005BC8 end:0x80005BE8
 
-unsorted/sweep_800060DC.c:
-	.text       start:0x800060DC end:0x800060E0
-
 LLFileIO_Gc.c:
-	.text       start:0x800065C8 end:0x800066E4
+	.text       start:0x80005BE8 end:0x800066E4
 
 LLDisp_Gc.c:
 	.text       start:0x800067E4 end:0x800072E0
