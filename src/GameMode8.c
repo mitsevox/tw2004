@@ -68,8 +68,7 @@ extern SGCourse lbl_80192C00[];
 
 // The events of the two-player game: flags set on the player and points won from the other player.
 typedef struct SGEvent {
-    u32 uFlags;                 // 0x0  or'd into nC48
-    u32 uFlags2;                // 0x4  or'd into nC4C
+    u64 uFlags;                 // 0x0  or'd into the player's uC48
     s32 nPoints;                // 0x8
     u8  unkC[4];
 } SGEvent;
@@ -465,8 +464,7 @@ void fn_800FA570(void) {
     int i;
     for (i = 0; i < gNumPlayersSetUp; i++) {
         PLAYER(i)->nC3C = 0;
-        PLAYER(i)->nC4C = 0;
-        PLAYER(i)->nC48 = 0;
+        PLAYER(i)->uC48 = 0;
         fn_8001C804(i, 1, 1);
         fn_80095744(PLAYER(i)->nShotHandle, 1);
         Emotion_UpdatePlayerEmotion(i);
@@ -586,7 +584,6 @@ void fn_800FAA70(int nEvent) {
 void fn_800FAAB8(int nPlayer, int nEvent) {
     int nOther;
     s32 nPoints;
-    SGEvent* pEvent;
     if ((!(gPlayers[nPlayer].nC3C & 0x6000) || nEvent == 0x28 || nEvent == 0x29) && nEvent <= 0x2A) {
         if (nEvent == 0x25) {
             lbl_802823CC++;
@@ -594,11 +591,9 @@ void fn_800FAAB8(int nPlayer, int nEvent) {
         if (nEvent == 0x27) {
             fn_80062C80(gPlayers[nPlayer].nC58, 1);
         }
-        pEvent = &lbl_80192908[nEvent];
-        gPlayers[nPlayer].nC4C |= pEvent->uFlags2;
         nOther = nPlayer ? 0 : 1;
-        nPoints = pEvent->nPoints;
-        gPlayers[nPlayer].nC48 |= pEvent->uFlags;
+        nPoints = lbl_80192908[nEvent].nPoints;
+        gPlayers[nPlayer].uC48 |= lbl_80192908[nEvent].uFlags;
         gPlayers[nPlayer].nC44 += nPoints;
         if (gPlayers[nPlayer].nC44 <= 0 && !(gPlayers[nPlayer].nC3C & 0x2000) &&
             !(gPlayers[nPlayer].nC3C & 0x8000)) {
