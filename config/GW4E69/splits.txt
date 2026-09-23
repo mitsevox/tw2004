@@ -3110,10 +3110,7 @@ unsorted/sweep_80127098.c:
 	.text       start:0x80127098 end:0x801270F0
 
 SkinBurn.c:
-	.text       start:0x801270F0 end:0x80127B10
-
-unsorted/sweep_80127B10.c:
-	.text       start:0x80127B10 end:0x80127B4C
+	.text       start:0x801270F0 end:0x80127D84
 
 unsorted/sweep_80127D84.c:
 	.text       start:0x80127D84 end:0x80127E44
