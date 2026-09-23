@@ -9,6 +9,7 @@ import pathlib, re, sys
 ROOT = pathlib.Path(__file__).resolve().parents[2]   # the checkout this script lives in
 sys.path.insert(0, str(ROOT / 'tools/match'))
 import sweepblock                                    # noqa: E402
+import includes                                      # noqa: E402
 
 SWEEP_DEBT = {}                                      # file name -> lines of uncleaned sweep code
 
@@ -83,12 +84,13 @@ EARLY_EXIT = re.compile(r'\)\s*(return\b[^;]*|break|continue);\s*(//.*)?$')
 
 
 def header_protos():
-    """name -> normalized signature, from the top-level headers."""
+    """name -> [(normalized signature, header path)], from every header under include/. lint()
+    compares a file only with the headers it includes, directly or not (includes.py)."""
     out = {}
-    for h in (ROOT / 'include').glob('*.h'):
+    for h in sorted((ROOT / 'include').rglob('*.h')):
         for m in re.finditer(r'^(?!typedef|#|\s)([\w \*]+?)\b(\w+)\s*\(([^;{}]*)\)\s*;',
                              h.read_text(encoding='utf-8', errors='replace'), re.M):
-            out[m.group(2)] = (norm(m.group(1), m.group(3)), h.name)
+            out.setdefault(m.group(2), []).append((norm(m.group(1), m.group(3)), h.resolve()))
     return out
 
 
@@ -115,6 +117,7 @@ def lint(path, protos):
     if not re.match(r'// \w+\.c\b', lines[0]):
         hits.append((1, 'header-comment', 'first line should be "// <File>.c (our name): ..."'))
     raw_sweep = sweepblock.lines_in_blocks(lines)      # style rules wait until the code is cleaned
+    seen = includes.seen_headers(path)
     SWEEP_DEBT[path.name] = len(raw_sweep)
     for i, l in enumerate(lines, 1):
         l = l.rstrip('\r')
@@ -133,13 +136,16 @@ def lint(path, protos):
         if re.search(r'\bgoto\b', l) and 'fake match' not in l and 'fake match' not in lines[i - 2]:
             hits.append((i, 'goto-unmarked', l.strip()))
         m = re.match(r'^(?!typedef|return|#|static)([A-Za-z_][\w \*]*?[\s\*])(\w+)\s*\(([^;{}]*)\)\s*;(.*)$', l)
-        if m and m.group(2) in protos:
-            sig, hname = protos[m.group(2)]
-            if norm(m.group(1), m.group(3)) == sig:
-                hits.append((i, 'dup-prototype', '%s is already declared in %s' % (m.group(2), hname)))
+        # only the headers this file includes count: one it does not see declares nothing here
+        decl = [(sig, h) for sig, h in protos.get(m.group(2), []) if h in seen] if m else []
+        if decl:
+            same = [h for sig, h in decl if sig == norm(m.group(1), m.group(3))]
+            if same:
+                hits.append((i, 'dup-prototype', '%s is already declared in %s'
+                             % (m.group(2), includes.label(same[0]))))
             elif '//' not in m.group(4):
                 hits.append((i, 'proto-mismatch', '%s differs from %s with no comment saying why'
-                             % (m.group(2), hname)))
+                             % (m.group(2), includes.label(decl[0][1]))))
     hits += [h for h in asm_fallback_hits(lines) if h[0] not in raw_sweep]
     return hits + ub_check(path, lines)
 
