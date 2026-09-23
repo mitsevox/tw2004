@@ -62,6 +62,7 @@ u8    GM_CheckForBallOOB(int nPlayer);
 void  GM_ReplaceOOBBall(int nPlayer);
 SurfaceType* Ter_GetSupportingWorldMaterial(CourseInfo* pCourse, u8* pBall);
 void  fn_800DEB5C(int nPlayer);
+u8    fn_800A7720(void);
 void  fn_800FE190(f32* pA, f32* pB, f32* pOut);
 u8*   fn_800136C4(int nController);         // the pad's state: stick bytes at +0..+3
 u32   fn_800136DC(int nController);         // buttons: held << 16 | pressed this frame
@@ -1487,7 +1488,44 @@ void fn_800FD1C0(int nPlayer) {
     }
 }
 
+// State 26, update: a player who lost the hole (bit 15) or won it on the other's points (bit 16)
+// gets event 40 or 41. When the countdown ends (and fn_800A7720 is clear), the player's turn is
+// over, and the other player's too if that one is not in state 26 and the ball is not in play.
+void fn_800FD534(int nPlayer) {
+    int nOther;
+    if (gPlayers[nPlayer].nC3C & 0x8000) {
+        fn_800FAAB8(nPlayer, 0x28);
+        gPlayers[nPlayer].nC3C &= ~0x8000;
+        gPlayers[nPlayer].nC54 += 119;
+    } else if (gPlayers[nPlayer].nC3C & 0x10000) {
+        fn_800FAAB8(nPlayer, 0x29);
+        gPlayers[nPlayer].nC3C &= ~0x10000;
+        gPlayers[nPlayer].nC54 += 119;
+    }
+    if (gPlayers[nPlayer].nC54-- <= 0 && !fn_800A7720()) {
+        if (gPlayers[nPlayer].nC3C & 0x4000) {
+            gPlayers[nPlayer].nC3C ^= 0x6000;
+        }
+        gPlayers[nPlayer].nC3C |= 8;
+        GM_EndOfGolferTurn(nPlayer);
+        nOther = nPlayer ? 0 : 1;
+        if ((s8)GOLFERSTATE_GetCurrentState(nOther) != 26 && gPlayers[nOther].nBallState == 0) {
+            gPlayers[nOther].nC3C |= 8;
+            gPlayers[nPlayer].nC3C |= 8;
+            GM_EndOfGolferTurn(nPlayer);
+        }
+    }
+}
+
 void fn_800FD6A0(int nPlayer) {
+}
+
+// In speed golf (modes 7 and 8), bit 0 of nC3C: the golfer is running to the ball.
+s32 fn_800FD6A4(int nPlayer) {
+    if (Game_GetMode() == 7 || Game_GetMode() == 8) {
+        return gPlayers[nPlayer].nC3C & 1;
+    }
+    return 0;
 }
 
 void fn_800FDC0C(s32* p0, s32* p1, s32* p2) {
