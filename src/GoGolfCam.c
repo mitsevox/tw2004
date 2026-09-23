@@ -120,7 +120,12 @@ typedef struct CamTuning {
     f32  f64;                   // 0x64
     f32  v68[4];                // 0x68  camera 13's fn_80038010 vector; [3] shrinks as the camera's time runs
     f32  f78;                   // 0x78  ... over this many seconds
-    u8   unk7C[0x94 - 0x7C];
+    f32  f7C;                   // 0x7C  camera 13's fallback shots' f78/f7C: from this value ...
+    f32  f80;                   // 0x80  ... to this one
+    u8   unk84[4];
+    f32  f88;                   // 0x88
+    f32  f8C;                   // 0x8C
+    u8   unk90[4];
     f32  f94;                   // 0x94  the elevator camera's first blend value
     u8   unk98[0xB8 - 0x98];
     f32  fB8;                   // 0xB8  camera 15 waits this long on a ball near the green
@@ -1465,6 +1470,64 @@ f32 fn_800C54FC(View* pView, f32* pCam, f32* pSub, int nPlayer) {
         } else {
             fTime = 0.016683351f;
         }
+    }
+    return fTime;
+}
+
+// Camera 13's tick for kinds 15 and 16: after 0.05 s with no next shot, end the effect and replay
+// the current shot's p44; while a shot runs, ease the fallback shots' f78/f7C from f7C to f80.
+f32 fn_800C5A70(View* pView, f32* pCam, f32* pSub, int nPlayer) {
+    f32 fTime = 0.0f;
+    CamShot* pShot;
+    CamTuning* pTune;
+    f32 t;
+    f32 f;
+    if (gSession.unk14 == 0) {
+        pTune = lbl_80281F78;
+        fn_80038054(1, fn_80016D10(), pTune->f8C, pTune->f88);
+    }
+    if (pView->p134 == NULL && pView->fCamTime > 0.05f) {
+        lbl_80282220->b58 = 0;
+        fn_8007326C(((ShotObj*)gPlayers[nPlayer].nShotHandle)->a164);
+        EVENT_Trigger(nPlayer, 0x3A, 0, -1);
+        EVENT_Trigger(nPlayer, 0x3B, 0, 1);
+        if (pView->p130 != NULL) {
+            lbl_80282220->shot6C.f78 = lbl_80281F78->f80;
+            lbl_80282220->shot6C.f7C = lbl_80281F78->f80;
+            lbl_80282220->shot12C.f78 = lbl_80281F78->f80;
+            lbl_80282220->shot12C.f7C = lbl_80281F78->f80;
+        }
+        pShot = pView->p130->p44;
+        if (pShot != NULL) {
+            Mem_cpy(&pView->shot19C, pShot, 0xC0);
+            pView->shot19C.p44 = pShot;
+            pView->p134 = &pView->shot19C;
+            pView->fCamTime = 0.0f;
+            pView->f110 = lbl_80281F78->f58;
+            pView->n140 = 5;
+            if (pView->p74 != NULL) {
+                pView->p134->f4C = pView->p74->f38 - lbl_80281F78->f58;
+            } else {
+                pView->p134->f4C = lbl_80281F78->f58;
+            }
+            pView->p134->p44 = pShot;
+        }
+    } else if (pView->p134 != NULL) {
+        t = pView->fCamTime / pView->f110;
+        t *= t;
+        f = t * (lbl_80281F78->f80 - lbl_80281F78->f7C) + lbl_80281F78->f7C;
+        lbl_80282220->shot6C.f78 = f;
+        lbl_80282220->shot6C.f7C = f;
+        lbl_80282220->shot12C.f78 = f;
+        lbl_80282220->shot12C.f7C = f;
+    } else if (pView->p130 != NULL) {
+        lbl_80282220->shot6C.f78 = lbl_80281F78->f80;
+        lbl_80282220->shot6C.f7C = lbl_80281F78->f80;
+        lbl_80282220->shot12C.f78 = lbl_80281F78->f80;
+        lbl_80282220->shot12C.f7C = lbl_80281F78->f80;
+    }
+    if (gSession.unk14 == 0) {
+        fTime = 0.016683351f;
     }
     return fTime;
 }
