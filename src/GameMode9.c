@@ -6,8 +6,6 @@
 #include "game.h"
 #include "engine.h"
 
-s32   fn_800FF894(int nPlayer);
-s32   fn_800FFDB0(void);
 extern u8 gNumPlayersSetUp;                 // 0x80281D48 (Golfer.c)
 extern u8 lbl_80282330;                     // the hole is being restarted
 

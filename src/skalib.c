@@ -194,7 +194,6 @@ extern s32         lbl_80281070;
 extern s16*        lbl_80281CF8;      // the group, style and club node being built
 extern s16*        lbl_80281CFC;
 extern s16*        lbl_80281D00;      // leaves this short are left alone by the drop pass
-u8                 fn_80101E34(struct ClipRecord* pRec);      // slot 0's share of the memory when double buffering
 extern u8*         lbl_80281CC4;      // staging buffers (32-aligned), see Skalib_Init
 extern u8*         lbl_80281CC8;
 extern u8*         lbl_80281CCC;
@@ -663,7 +662,9 @@ int AnimLib_KeepRandomCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* p
                 continue;
             found:
                 if (fn_80100294()) {
-                    if (!fn_80101E34(pRec)) pRec->n12 |= 1;
+                    if (!fn_80101E34(pRec->name)) {
+                        pRec->n12 |= 1;
+                    }
                     nMarked++;
                 } else {
                     pRec->n12 |= 1;
@@ -685,7 +686,9 @@ int AnimLib_KeepRandomCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* p
                 continue;
             found2:
                 if (fn_80100294()) {
-                    if (!fn_80101E34(pRec)) pRec->n12 |= 1;
+                    if (!fn_80101E34(pRec->name)) {
+                        pRec->n12 |= 1;
+                    }
                 } else {
                     pRec->n12 |= 1;
                 }
@@ -730,7 +733,9 @@ int AnimLib_KeepBestCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLe
                 }
                 if (pBest != NULL) {
                     if (fn_80100294()) {
-                        if (!fn_80101E34(pBest)) pBest->n12 |= 1;
+                        if (!fn_80101E34(pBest->name)) {
+                            pBest->n12 |= 1;
+                        }
                         nMarked++;
                     } else {
                         pBest->n12 |= 1;
@@ -749,7 +754,9 @@ int AnimLib_KeepBestCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLe
                 }
                 if (pBest != NULL) {
                     if (fn_80100294()) {
-                        if (!fn_80101E34(pBest)) pBest->n12 |= 1;
+                        if (!fn_80101E34(pBest->name)) {
+                            pBest->n12 |= 1;
+                        }
                     } else {
                         pBest->n12 |= 1;
                     }

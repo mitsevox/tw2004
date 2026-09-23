@@ -22,6 +22,7 @@ int  sprintf(char* pBuf, const char* pFmt, ...);
 // ---- math and random numbers -----------------------------------------------------------------
 
 f32  fn_80009744(f32* pVec);            // dot with itself
+f32  fn_8000AD78(f32 y, f32 x);         // atan2f
 f32  fn_8000AD9C(f32 x);                // fabsf
 void fn_8000B1D4(int nStream, u32 uSeed);   // seed a random stream
 
@@ -71,6 +72,9 @@ void fn_80063BF4(void* pView, f32 f, f32* pVec);
 u8   fn_80063C90(void* pView);          // the camera is still moving
 void EVENT_Trigger(int nPlayer, int nEvent, int a, int b);    // through the event table at lbl_80188628
 void fn_800689D4(int nPlayer);
+void fn_80069330(int nPlayer, f32* pPos);
+void PlaceBall_UpdateMomentums(int nPlayer, f32 f);
+void fn_8006A6C4(int nPlayer);
 int  fn_8006AA9C(int nPlayer);          // how the shot turned out (0..4, 8+)
 void fn_8006AAB4(int nPlayer, int a);
 void fn_8006ACF8(int nPlayer, int a);
@@ -99,6 +103,7 @@ void fn_800A63D0(void);
 void fn_800A72EC(u8 a, u8 b);
 void fn_800A7664(int nKind, int nMsg, int a);
 void fn_800A76E4(void);
+void Vec_Normalize(f32* pSrc, f32* pDst);
 void fn_800BAF04(f32* pSrc, f32* pDst);   // normalise
 f32  Vec_Distance(f32* pA, f32* pB);
 u8   fn_800C6CB0(void);

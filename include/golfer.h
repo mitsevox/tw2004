@@ -677,6 +677,7 @@ u8   Bag_AddClub(int nPlayer, int nBit);
 u8   Bag_RemoveClub(int nPlayer, int nBit);
 u8   Bag_HasClub(int nPlayer, int nBit);
 int  Bag_CountClubs(int nPlayer);
+void Session_SetGolfer(int nGolfer, int nPlayer);
 
 // Game options at gSession + 0xE78 (the wind setting is nWind, at gSession + 0xE88).
 typedef struct GameOptions {

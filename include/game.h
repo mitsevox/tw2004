@@ -16,6 +16,7 @@ void Session_SetNumPlayers(int n);      // Golfer.c
 
 // ---- golfer states (Swing.c) -----------------------------------------------------------------
 
+u8   fn_80058F5C(int nPlayer);          // the per-frame swing poll: the ball was struck
 f32  fn_8005B64C(int nPlayer);          // the swing's shot power
 void GOLFERSTATE_Push(int nState, int nPlayer);     // push a state and run its enter callback
 void GOLFERSTATE_Set(int nState, int nPlayer);      // pop everything and start again from one state
@@ -47,6 +48,7 @@ int  fn_800D2AD8(int nHole);            // a hole's par
 void fn_800D3548(int nPlayer, int nMoney, s32* pTotals);   // pTotals may be NULL
 int  fn_800D36E0(int nWinner, int nLoser, int nMargin, int* pPrize);
 int  fn_800D37BC(int nWinner, int nLoser, int nMargin, int* pPrize);
+int  fn_800D3C7C(int nPlayer);          // the player's golfer
 s32  fn_800D6A70(s32 nPoints, int nPlayer, int a, int b, int c, int d);
 int  fn_800D7220(int nReward, int a, s32* pOut);
 u8   fn_800DA174(void);
@@ -73,6 +75,7 @@ void GM_PlayerTookShot(int nPlayer);
 u8   GM_PlayerTakeMulligan(int nPlayer);
 int  fn_800DDFB4(int nPlayer);
 int  GM_ShowPostShotAnimation(int nPlayer);
+void GM_FlyByMode_Init(void);
 void GM_ReplaceOOBBall(int nPlayer);
 void fn_800DEB5C(int nPlayer);
 void GM_MovePlayerToBall(int nPlayer);
@@ -185,6 +188,9 @@ void fn_800F944C(void);                 // mode 6
 void fn_800F9610(void);                 // mode 7
 void fn_800F986C(void);                 // mode 8
 void fn_800FE1B4(void);                 // mode 18 (GameModeStableford.c)
+void fn_800FEAFC(void);                 // mode 12 (GameMode12.c)
+void fn_800FF700(void);                 // mode 0 (GameModeStroke.c)
+void fn_800FFF34(void);                 // mode 11 (GameMode11.c)
 
 int  fn_800E8C24(int nPlayer, int nHole);   // GameModeBestBall.c
 
@@ -285,9 +291,21 @@ void fn_800FDF38(void);
 u8   fn_800FDF58(int nPlayer);
 u8   fn_800FDF60(void);
 
-// after the Stableford code (0x800FF634..)
+// GameModeStroke.c: stroke play (mode 0)
 void fn_800FF7DC(void);
+s32  fn_800FF894(int nPlayer);          // TW06 GetHonors: who plays next (5: nobody)
+s32  fn_800FFDB0(void);                 // TW06 GoToPlayoff: stroke play has none
+
+// GameMode11.c: the lessons
 u8   fn_80100294(void);                 // in a lesson (mode 11)
+int  Scenario_RequiredShape(void);      // the lesson's shape in mode 11, else 7 (none)
+u8   fn_80100AF8(void);                 // lesson 5 of mode 11
+u8   fn_80100C00(void);
+u8   fn_80101738(void);
+u8   fn_80101D4C(int nPlayer);          // a CPU in game mode 11 is always lucky
+u8   fn_80101E34(char* szName);         // one of the lessons' demonstration animations
+void fn_80101EDC(void);
+
 u8   fn_801025F4(void);
 
 #endif

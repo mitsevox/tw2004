@@ -14,7 +14,6 @@
 #define CUP_DIAMETER 0.10717f       // 3.86 in (a real cup is 4.25)
 
 void   Vec3Copy(f32* pSrc, f32* pDst);           // 0x80008304
-f32    fn_8000AD78(f32 y, f32 x);                // atan2f
 void   Ball_Stop(Ball* pBall);                   // 0x80054340
 void   fn_8000AE28(f32* pIn, f32 f, f32* pOut);  // scale a vector
 void   Ball_SetLie(Ball* pBall, SurfaceType* pSurface);

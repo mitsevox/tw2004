@@ -133,7 +133,6 @@ extern char lbl_80281640[8];
 
 void  fn_80095444(int a);
 void  fn_80125814(int a);
-void  fn_80101EDC(void);
 void  fn_800A7350(int a);
 extern u8 gNumPlayersSetUp;                 // 0x80281D48 (Golfer.c)
 
