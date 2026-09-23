@@ -35,10 +35,14 @@ f32  fn_80009744(f32* pVec);            // dot with itself
 void Vec_Copy(f32* pSrc, f32* pDst);    // 0x8000AD10
 f32  fn_8000AD78(f32 y, f32 x);         // atan2f
 f32  fabsf(f32 x);                      // 0x8000AD9C: fabs (0x8000AE94, platform.h) rounded to a float
+f32  fn_8000AF7C(f32 x);                // natural logarithm
 u32  Rand_Next(int nStream);            // 0x8000B130  EA's lagged-Fibonacci generator
 f32  fn_8000B318(int nStream);          // a normally distributed random number (mean 0, deviation 1):
                                         // Box-Muller on two Rand_Floats, the second value kept
 void fn_8000B1D4(int nStream, u32 uSeed);   // seed a random stream
+u32  fn_8000B244(void);                 // a random seed from the clock
+void fn_8000B2B8(u32 uSeed);            // seed all three random streams
+void fn_8000B30C(void);                 // drop the kept normal value (fn_8000B318)
 f32  Rand_Float(int nStream);           // 0x8000B428  [0, 1)
 void fn_8000883C(f32* pA, f32* pB, f32 fT);   // quaternion slerp from a to b by fT, into b
 f32  fn_80029B64(f32 x);                // square root (Skeleton.c); x itself when x <= 0
@@ -232,6 +236,7 @@ void fn_800A76E4(void);
 void Vec_Normalize(f32* pSrc, f32* pDst);
 void fn_800BAF04(f32* pSrc, f32* pDst);   // normalise
 f32  Vec_Distance(f32* pA, f32* pB);
+void fn_800BD83C(int nSound, int a);      // SitDevFile.c: fn_800A7664(0, nSound, a)
 void BreakLine_Start(int nView);
 int  fn_8011937C(int nPlayer, int a, u8 b);
 // The EA Sports Bio, game side (EASportsBio.c; TW06's names)
