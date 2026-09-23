@@ -73,7 +73,7 @@ typedef struct EarningsTable {
     s32  aTeePct[3];            // 0x980  the tee multiplier, as [2 - nTeeSet] (tee set 3 pays as 1)
     s32  aPinSetPct[4];         // 0x98C  the multiplier for the hole's pin set (gpGame->nPinSet) 0..3
     s32  aTourPct[6];           // 0x99C  the TOUR card multiplier per level 1..6 (level 0 pays as 1)
-    u8   unk9B4[0x9E4 - 0x9B4];
+    s32  a9B4[12];              // 0x9B4  read by index by a menu message (fn_8007E174)
     s32  n9E4;                  // 0x9E4  paid with award 0xC, once every challenge has a medal (GameMode5)
     u8   unk9E8[0x9F0 - 0x9E8];
     s32  nLadderDone;           // 0x9F0  paid when the last ladder event is won

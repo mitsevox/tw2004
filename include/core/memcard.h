@@ -78,6 +78,17 @@ typedef struct MCCardPos {
 } MCCardPos;
 LAYOUT_ASSERT(MCCardPos, 0xC);
 
+// The memory-card screens' operations (lbl_8018C7D8): four sets of five, one set per kind of data
+// (the menus pick one with fn_80084FF0; set 0 starts with fn_8009FE90 and fn_8009FCFC, set 3 is the
+// EA Sports Bio's). The menus' messages call them with the card they picked.
+typedef s32 (*MCOp)(MCCardPos* pPos);
+typedef struct MCOpSet {
+    MCOp apfn[5];               // 0x00
+} MCOpSet;
+LAYOUT_ASSERT(MCOpSet, 0x14);
+
+extern MCOpSet lbl_8018C7D8[4];
+
 // The save file's names on the card: EA kept the PlayStation 2 names (SLUS-20757 is the PS2
 // release), the second a backup copy.
 #define MC_FILE_NAME    "BASLUS-20757"
