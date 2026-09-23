@@ -15,8 +15,8 @@ extern u8 lbl_8028234C;
 s32 fn_800F0E18(s32 i);
 extern s32 lbl_80282350;
 extern s32 lbl_80282354;
-s32 fn_800F0E20(u8* p0);
-void fn_800F0E30(s32 p0, s32 p1);
+s32 fn_800F0E20(s32* pRound);
+void fn_800F0E30(s32 nId, s32 nRound);
 s32 fn_800F1008(s32 i);
 s32 fn_800F102C(void);
 
@@ -269,6 +269,8 @@ u8 fn_800F0CEC(u16 nDate, s32* pId, s32* pRound) {
     fn_800D2714(&nDate, &nMonth, &nDay, &nYear);
     bFound = 0;
     nSeason = nYear - 2003;
+    // EA bug: nSeason is not checked against the ten seasons (fn_800F1034 checks it), so a date
+    // outside 2003..2012 reads past aDate.
     for (i = 0; i < 118; i++) {
         if (gRTEs.aEvent[i].aDate[nSeason] != 0) {
             d = nDate - gRTEs.aEvent[i].aDate[nSeason];
@@ -298,14 +300,16 @@ s32 fn_800F0E18(s32 i) {
     return 1;
 }
 
-s32 fn_800F0E20(u8* p0) {
-    *(s32*)p0 = lbl_80282354;
+// The current event, and its day.
+s32 fn_800F0E20(s32* pRound) {
+    *pRound = lbl_80282354;
     return lbl_80282350;
 }
 
-void fn_800F0E30(s32 p0, s32 p1) {
-    lbl_80282354 = p1;
-    lbl_80282350 = p0;
+// Event nId, on its day nRound, becomes the current one.
+void fn_800F0E30(s32 nId, s32 nRound) {
+    lbl_80282354 = nRound;
+    lbl_80282350 = nId;
 }
 
 // Today's event becomes the current one.
