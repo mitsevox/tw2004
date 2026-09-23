@@ -56,8 +56,8 @@ unsorted/sweep_80007368.c:
 unsorted/sweep_800073A8.c:
 	.text       start:0x800073A8 end:0x800073B4
 
-unsorted/code_80007BC4.c:
-	.text       start:0x80007BC4 end:0x800080D0
+LLObj_Gc.c:
+	.text       start:0x800073B4 end:0x800080D0
 	.sdata2     start:0x80282A80 end:0x80282A88
 
 unsorted/code_800080D0.c:

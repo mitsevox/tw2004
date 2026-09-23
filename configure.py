@@ -804,7 +804,7 @@ config.libs = [
         "objects": [
             Object(NonMatching, "LLFileIO_Gc.c"),
             Object(NonMatching, "LLDisp_Gc.c"),
-            Object(Matching, "unsorted/code_80007BC4.c"),
+            Object(NonMatching, "LLObj_Gc.c"),
             Object(Matching, "unsorted/code_800080D0.c"),
             Object(Matching, "unsorted/code_800082F8.c"),
             Object(NonMatching, "GoEntry.c"),
