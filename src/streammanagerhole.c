@@ -1,4 +1,10 @@
-#include "game_types.h"
+// streammanagerhole.c (our name, after TW06's golf/streaming/streammanagerhole.cpp; the 2003 game
+// is C): loads a hole's stream files, registering and unregistering every system's stream handlers
+// around each load. Not yet decompiled; the code below is the matched small functions.
+
+#include "ustream.h"
+
+// ---- sweep code (not yet cleaned up) ----
 
 void fn_800143B8();
 void fn_80014524(void);
@@ -29,7 +35,6 @@ void fn_800A295C();
 void fn_800A298C();
 void fn_80014594(void);
 void fn_800145E0(void);
-u8 UStream_Update();
 s32 fn_800918A4();
 s32 fn_8009198C(s32);
 void fn_8001462C(void);
@@ -178,7 +183,7 @@ void fn_8001462C(void) {
     fn_800150E0();
     do {
         fn_8009198C(0);
-    } while (UStream_Update() != 0);
+    } while ((u8)UStream_Update() != 0);   // fake match: this file tests the result as a byte
     fn_800150B8();
 }
 
@@ -222,7 +227,7 @@ void fn_800147A4(void) {
     fn_8001518C();
     do {
 
-    } while (UStream_Update() != 0);
+    } while ((u8)UStream_Update() != 0);   // fake match: this file tests the result as a byte
     fn_80015164();
 }
 
@@ -246,7 +251,7 @@ void fn_80014834(void) {
     fn_800151E4();
     do {
 
-    } while (UStream_Update() != 0);
+    } while ((u8)UStream_Update() != 0);   // fake match: this file tests the result as a byte
     fn_800151BC();
 }
 
@@ -280,7 +285,7 @@ void fn_800148EC(void) {
     fn_80015214();
     do {
 
-    } while (UStream_Update() != 0);
+    } while ((u8)UStream_Update() != 0);   // fake match: this file tests the result as a byte
     fn_8001510C();
 }
 
@@ -307,7 +312,7 @@ void fn_80014DC0(void) {
     fn_800150E0();
     do {
         fn_8009198C(0);
-    } while (UStream_Update() != 0);
+    } while ((u8)UStream_Update() != 0);   // fake match: this file tests the result as a byte
     fn_800150B8();
 }
 
@@ -463,3 +468,5 @@ void fn_80016CA8(f32 farg0, f32 farg1) {
     *(f32* )0xCC008000 = farg0;
     *(f32* )0xCC008000 = farg1;
 }
+
+// ---- end of sweep code ----
