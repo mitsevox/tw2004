@@ -575,15 +575,13 @@ s8 AI_NearestTarget(f32* pPos, f32* pOut) {
 // Fill in everything that follows from a target: the landing surface, the target height, the
 // distance, and (for a human) a snap to the club's reach when it is just under.
 void AI_PlanShot(int nPlayer, f32* pTarget) {
-    f32*         pDst;
     SurfaceType* pSurface = NULL;
     f32          fHeight;
     f32          fDX, fDZ;
     int          nType;
 
-    pDst = &gPlayers[nPlayer].fTargetX;
-    Vec_Copy(pTarget, pDst);
-    fHeight = Terrain_HeightAt(pDst, &pSurface);
+    Vec_Copy(pTarget, &gPlayers[nPlayer].fTargetX);
+    fHeight = Terrain_HeightAt(&gPlayers[nPlayer].fTargetX, &pSurface);
     gPlayers[nPlayer].uFlagsEF0 &= ~2;
     if (pSurface != NULL) {
         nType = pSurface - gSurfaceTypes;
@@ -617,7 +615,7 @@ void AI_PlanShot(int nPlayer, f32* pTarget) {
         }
     }
     gPlayers[nPlayer].fDistance2 = gPlayers[nPlayer].fDistance;
-    Vec_Copy(pDst, gPlayers[nPlayer].vTargetCopy);
+    Vec_Copy(&gPlayers[nPlayer].fTargetX, gPlayers[nPlayer].vTargetCopy);
 }
 
 // Aim at the pin.
@@ -788,38 +786,38 @@ extern s32 gCaddieFrames;           // 0x80281D4C
 u8 AI_RehearseShot(int nPlayer, f32* pOutDist2, u8 bFast, f32 fTolerance);   // 0x8002B030
 
 void Caddie_Start(int nPlayer) {
-    if (!gPlayers[nPlayer].bPerfect && gPlayers[nPlayer].nShotKind != SHOT_PUTT) return;
-    if (Player_IsCPU(nPlayer)) return;
-    switch ((u32)gSession.nSplitScreen) {   // a switch, not an if: the original branches over a branch
-    case 0:
-        Mem_cpy(&gPlayers[CADDIE_SLOT], &gPlayers[nPlayer], sizeof(Player));
-        gPlayers[CADDIE_SLOT].nController = CONTROLLER_CPU;
-        AI_DefaultTarget(CADDIE_SLOT);
-        gCaddieDone   = 0;
-        gPlayers[CADDIE_SLOT].nRehearseState = 2;
-        gCaddieActive = 1;
-        gCaddieFrames = 0;
-        break;
+    if ((!gPlayers[nPlayer].bPerfect && gPlayers[nPlayer].nShotKind != SHOT_PUTT) || Player_IsCPU(nPlayer) ||
+        gSession.nSplitScreen) {
+        return;
     }
+    Mem_cpy(&gPlayers[CADDIE_SLOT], &gPlayers[nPlayer], sizeof(Player));
+    gPlayers[CADDIE_SLOT].nController = CONTROLLER_CPU;
+    AI_DefaultTarget(CADDIE_SLOT);
+    gPlayers[CADDIE_SLOT].nRehearseState = 2;
+    gCaddieDone   = 0;
+    gCaddieActive = 1;
+    gCaddieFrames = 0;
 }
 
 void Caddie_Update(int nPlayer) {
-    if (!gPlayers[nPlayer].bPerfect && gPlayers[nPlayer].nShotKind != SHOT_PUTT) return;
-    if (Player_IsCPU(nPlayer)) return;
-    switch ((u32)gSession.nSplitScreen) {   // a switch, not an if: the original branches over a branch
-    case 0:
-        if (!gCaddieActive) return;
-        if (gPlayers[nPlayer].bPerfect) {
-            f32 fDist2;
-            AI_RehearseShot(CADDIE_SLOT, &fDist2, 0, CADDIE_TOLERANCE);
-            if (fDist2 < 0.0625f) gCaddieDone = 1;
-        } else {
-            if (gCaddieDone) return;
-            if (AI_RehearseShot(CADDIE_SLOT, NULL, 0, CADDIE_TOLERANCE)) gCaddieDone = 1;
-        }
-        gCaddieFrames++;
-        break;
+    f32 fDist2;
+    if ((!gPlayers[nPlayer].bPerfect && gPlayers[nPlayer].nShotKind != SHOT_PUTT) || Player_IsCPU(nPlayer) ||
+        gSession.nSplitScreen) {
+        return;
     }
+    if (!gCaddieActive) return;
+    if (gPlayers[nPlayer].bPerfect) {
+        AI_RehearseShot(CADDIE_SLOT, &fDist2, 0, CADDIE_TOLERANCE);
+        if (fDist2 < 0.0625f) {
+            gCaddieDone = 1;
+        }
+    } else {
+        if (gCaddieDone) return;
+        if (AI_RehearseShot(CADDIE_SLOT, NULL, 0, CADDIE_TOLERANCE)) {
+            gCaddieDone = 1;
+        }
+    }
+    gCaddieFrames++;
 }
 
 // 0 = no tip for this shot, 1 = tip ready (the aim point in pOut), 2 = gave up.
@@ -1130,7 +1128,7 @@ u8 AI_RehearseShot(int nPlayer, f32* pOutDist2, u8 bFast, f32 fTolerance) {
 
 double fn_8015F7C4(double y, double x);   // atan2
 void Vec_Normalize(f32* pSrc, f32* pDst);   // 0x800BAEB0
-int  Scenario_RequiredShape(void);      // 0x8010069C  the lesson's shape in mode 11, else 7 (none)
+int  Scenario_RequiredShape(int nPlayer); // 0x8010069C  a lesson's shape in mode 11, else 7; nPlayer unused
 
 // The aim angle from the ball to the target, wrapped to -pi..pi. 0 is +z; positive turns left.
 f32 Shot_AimAngle(int nPlayer) {
@@ -1170,8 +1168,10 @@ void Shot_DefaultSpin(int nPlayer, f32* pOut) {
 // x = +-0.02 for a slight curve, +-0.04 for a big one, normalised.
 void AI_FaceVector(int nPlayer, f32* pOut) {
     Player* p = &gPlayers[nPlayer];
-    int     nShape = Scenario_RequiredShape();
-    if (nShape != 7) p->nShotShape = nShape;
+    int     nShape = Scenario_RequiredShape(nPlayer);
+    if (nShape != 7) {
+        p->nShotShape = nShape;
+    }
     pOut[0] = 0.0f;
     pOut[1] = 0.0f;
     pOut[2] = 1.0f;
