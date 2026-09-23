@@ -15,6 +15,11 @@ u8   fn_800D0D54(int nPlayer);
 int  fn_800D0DC8(int nPlayer, int nToPar);
 int  fn_800D0E74(int nPlayer);
 int  fn_800D0F04(int nPlayer, int nToPar);
+int  fn_800D0FBC(int nPlayer);
+int  fn_800D10B0(int nPlayer);
+int  fn_800D1170(int nPlayer, u8 bOnlyFlagged);
+int  fn_800D1250(int nPlayer);
+int  fn_800D1330(int nPlayer);
 void fn_800D1674(f32* pA, f32* pB, f32* pOut);
 
 // The ball's distance from the pin: where it lies, where the shot started, and where it lay before
@@ -135,6 +140,90 @@ int fn_800D0F04(int nPlayer, int nToPar) {
         nBest = nRun;
     }
     return nBest;
+}
+
+// The round's holes with b2E4 set (by position in the score block, TW06's fairways[]).
+int fn_800D0FBC(int nPlayer) {
+    int nCount = 0;
+    int i;
+    for (i = 0; i < 18; i++) {
+        if (gpGame->bHoleSelected[i] && gPlayers[nPlayer].b2E4[i]) {
+            nCount++;
+        }
+    }
+    return nCount;
+}
+
+// The longest run of the round's holes with b2E4 set; a par 3 does not break it.
+int fn_800D10B0(int nPlayer) {
+    int nRun;
+    int nBest;
+    int i;
+    nBest = 0;
+    nRun = 0;
+    for (i = 0; i < 18; i++) {
+        if (gpGame->bHoleSelected[i] && gPlayers[nPlayer].b2E4[i]) {
+            nRun++;
+        } else if (fn_800D2AD8(i) != 3) {
+            if (nRun > nBest) {
+                nBest = nRun;
+            }
+            nRun = 0;
+        }
+    }
+    if (nRun > nBest) {
+        nBest = nRun;
+    }
+    return nBest;
+}
+
+// The round's holes with b2F6 set (TW06's gir[]); with bOnlyFlagged, only those whose
+// gpGame->b16C entry is 1.
+int fn_800D1170(int nPlayer, u8 bOnlyFlagged) {
+    int nCount = 0;
+    int i;
+    for (i = 0; i < 18; i++) {
+        if (gpGame->bHoleSelected[i] && gPlayers[nPlayer].b2F6[i] &&
+            (gpGame->b16C[nPlayer][i] == 1 || !bOnlyFlagged)) {
+            nCount++;
+        }
+    }
+    return nCount;
+}
+
+// The longest run of the round's holes with b2F6 set.
+int fn_800D1250(int nPlayer) {
+    int nRun;
+    int nBest;
+    int i;
+    nBest = 0;
+    nRun = 0;
+    for (i = 0; i < 18; i++) {
+        if (gpGame->bHoleSelected[i] && gPlayers[nPlayer].b2F6[i]) {
+            nRun++;
+        } else {
+            if (nRun > nBest) {
+                nBest = nRun;
+            }
+            nRun = 0;
+        }
+    }
+    if (nRun > nBest) {
+        nBest = nRun;
+    }
+    return nBest;
+}
+
+// The player's putts over the round's holes.
+int fn_800D1330(int nPlayer) {
+    int nPutts = 0;
+    int i;
+    for (i = 0; i < 18; i++) {
+        if (gpGame->bHoleSelected[i]) {
+            nPutts += gPlayers[nPlayer].nPutts[i];
+        }
+    }
+    return nPutts;
 }
 
 // a - b into out (three floats)
