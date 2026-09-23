@@ -418,7 +418,7 @@ s32 fn_800F0F54(void) {
 
 u16 fn_800F0FBC(s32 i) {
     RTEvent* p = fn_800F0EA0(i);
-    if (!p) {
+    if (p == NULL) {
         return 0xFFFF;
     }
     return p->aDate[fn_800F0F54()];

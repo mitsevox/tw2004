@@ -42,6 +42,15 @@ typedef struct PgaData {
 } PgaData;
 extern PgaData gPgaData;
 
+typedef struct Pga80205F30 {
+    u8   b0;                    // 0x0
+    u8   unk1[3];
+    s32  n4;                    // 0x4
+    s32  n8;                    // 0x8
+} Pga80205F30;
+extern Pga80205F30 lbl_80205F30;
+Pga80205F30* fn_800EE8B8(void);
+
 // A tournament of the season in a save profile (TW06: PGATourSeason_EventData, the same layout).
 typedef struct SeasonEvent {
     char szChampName[0x10];     // 0x00  the tournament's champion. TW06: champName
@@ -73,9 +82,7 @@ void fn_800EDF60(UStreamObject* pObject);
 void fn_800EDF90(UStreamObject* pObject);
 void fn_800EE064(void);
 extern u8 lbl_8028233C;
-extern u8 lbl_80205F30[];
 s32 fn_800EE8B0(void);
-u8* fn_800EE8B8(void);
 void fn_80119934(int a);
 void fn_800EF294(void);
 s32 fn_800EF834(void);
@@ -92,7 +99,7 @@ void fn_800F018C(void);
 
 extern s32 lbl_80281670;
 extern s32 lbl_80282338;
-s32  fn_801190D8(s32 a);
+s32  fn_801190D8(s32 a, s32 n);
 s32  fn_800EFBD0(s32 i);
 u8   fn_800EF83C(u16 nDate, s32* pId, s32* pRound);
 void fn_800D2714(u16* pDate, s32* pDay, s32* pMonth, s32* pYear);
@@ -210,14 +217,14 @@ s32 fn_800EE8B0(void) {
     return 3;
 }
 
-u8* fn_800EE8B8(void) {
-    return lbl_80205F30;
+Pga80205F30* fn_800EE8B8(void) {
+    return &lbl_80205F30;
 }
 
-void fn_800EF094(s32 n) {
-    *(s32*)(lbl_80205F30 + 0) = 1;
-    *(s32*)(lbl_80205F30 + 4) = fn_801190D8(0);
-    *(s32*)(lbl_80205F30 + 8) = n;
+void fn_800EF094(s32 a, s32 n) {
+    lbl_80205F30.b0 = 1;
+    lbl_80205F30.n4 = fn_801190D8(a, 0);
+    lbl_80205F30.n8 = n;
 }
 
 // A progress bar out of 10: tournaments won x 10 / 31, at most 9.
@@ -334,16 +341,18 @@ Tournament* fn_800EFC80(u16 nDate) {
 
 // Two times of tournament i's round k, in milliseconds.
 s32 fn_800EFCC0(s32 i, s32 k) {
-    return fn_800EFA70(i)->aTimes[k][0] * 1000;
+    Tournament* p = fn_800EFA70(i);
+    return p->aTimes[k][0] * 1000;
 }
 
 s32 fn_800EFCFC(s32 i, s32 k) {
-    return fn_800EFA70(i)->aTimes[k][1] * 1000;
+    Tournament* p = fn_800EFA70(i);
+    return p->aTimes[k][1] * 1000;
 }
 
 u16 fn_800EFD38(s32 i) {
     Tournament* p = fn_800EFA70(i);
-    if (!p) {
+    if (p == NULL) {
         return 0xFFFF;
     }
     return p->aStartDate[fn_800EFB88()];
