@@ -80,6 +80,13 @@ typedef struct SGLog {
 } SGLog;
 extern SGLog lbl_802120F8[100];
 extern s32 lbl_802823CC;
+extern u8  lbl_802823C8;
+void  GOLFERSTATE_Switch(int nState, int nPlayer);
+void  GM_PlayerAddStroke(int nPlayer);
+u8    GM_CheckForBallOOB(int nPlayer);
+void  GM_ReplaceOOBBall(int nPlayer);
+SurfaceType* Ter_GetSupportingWorldMaterial(CourseInfo* pCourse, u8* pBall);
+void  fn_800DEB5C(int nPlayer);
 void  Mem_cpy(void* pDst, void* pSrc, int nBytes);
 void  fn_8006ACF8(int nPlayer, int a);
 void  fn_8006BAA8(int nPlayer);
@@ -636,6 +643,118 @@ void fn_800FAAB8(int nPlayer, int nEvent) {
             }
         }
     }
+}
+
+// A shot has come to rest (from state 12's update): count the stroke, and after out of bounds
+// drop the ball (water) or replace it. Returns 0 when the golfer goes back to state 1. In the
+// two-player stroke game (mode 7) it also scores events: the penalties (4/5, or 0x1E/0x1F with
+// nC3C bit 4), and the distance from fBallX/fBallZ against the other player's (events 1, 0x18
+// and 0x19).
+u8 fn_800FAD54(int nPlayer) {
+    int nOther;
+    f32 fDist;
+    SurfaceType* pSurf;
+    int nStrokes;               // read and never used
+    int nOtherStrokes;          // read and never used
+    f32 fX;
+    f32 fZ;
+    f32 dx;
+    f32 dz;
+    if (lbl_802823C8 && (gPlayers[nPlayer].nC3C & 0x100000)) {
+        lbl_802823C8 = 0;
+        gPlayers[nPlayer].nC3C &= ~0x100000;
+        GOLFERSTATE_Switch(1, nPlayer);
+        return 0;
+    }
+    if (Game_GetMode() != 7) {
+        GM_PlayerAddStroke(nPlayer);
+        if (GM_CheckForBallOOB(nPlayer)) {
+            pSurf = Ter_GetSupportingWorldMaterial(gPlayers[nPlayer].pBallCourse, gPlayers[nPlayer].ball);
+            if (pSurf != NULL && pSurf->nClass == 7) {
+                fn_800DEB5C(nPlayer);
+                gPlayers[nPlayer].nC3C &= ~1;
+            } else {
+                gPlayers[nPlayer].nC3C &= ~1;
+                GM_ReplaceOOBBall(nPlayer);
+            }
+            fn_800FE0AC(gPlayers[nPlayer].nC58, 0);
+            fn_800FE080(gPlayers[nPlayer].nC58, 0);
+            fn_800FE054(gPlayers[nPlayer].nC58, 0);
+            GOLFERSTATE_Switch(1, nPlayer);
+            return 0;
+        }
+        return 1;
+    }
+    nOther = nPlayer ? 0 : 1;
+    GM_PlayerAddStroke(nPlayer);
+    nStrokes = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
+    nOtherStrokes = gPlayers[nOther].nStrokes[Game_CurHoleIndex()];
+    if (GM_CheckForBallOOB(nPlayer)) {
+        pSurf = Ter_GetSupportingWorldMaterial(gPlayers[nPlayer].pBallCourse, gPlayers[nPlayer].ball);
+        if (pSurf != NULL && pSurf->nClass == 7) {
+            if (gPlayers[nPlayer].nC3C & 0x10) {
+                fn_800FAAB8(nPlayer, 0x1F);
+            } else {
+                fn_800FAAB8(nPlayer, 5);
+            }
+            fn_800DEB5C(nPlayer);
+            gPlayers[nPlayer].nC3C &= ~1;
+            gPlayers[nPlayer].nC3C |= 0x800;
+        } else {
+            if (gPlayers[nPlayer].nC3C & 0x10) {
+                fn_800FAAB8(nPlayer, 0x1E);
+            } else {
+                fn_800FAAB8(nPlayer, 4);
+            }
+            gPlayers[nPlayer].nC3C &= ~1;
+            GM_ReplaceOOBBall(nPlayer);
+        }
+        fn_800FE0AC(gPlayers[nPlayer].nC58, 0);
+        fn_800FE080(gPlayers[nPlayer].nC58, 0);
+        fn_800FE054(gPlayers[nPlayer].nC58, 0);
+        if (lbl_802823C8) {
+            GOLFERSTATE_Switch(1, nPlayer);
+            lbl_802823C8 = 0;
+        } else {
+            gPlayers[nPlayer].nC3C |= 0x100000;
+        }
+        return 0;
+    }
+    fX = gPlayers[nPlayer].fBallX;
+    fZ = gPlayers[nPlayer].fBallZ;
+    if (fX == gPlayers[nPlayer].vA44[0] && fZ == gPlayers[nPlayer].vA44[2]) {
+        dx = *(f32*)(gPlayers[nPlayer].ball + 0) - fX;
+        dz = *(f32*)(gPlayers[nPlayer].ball + 8) - fZ;
+        fDist = fn_80009680(dx * dx + dz * dz);
+        if (!(gPlayers[nPlayer].nC3C & 0x20)) {
+            gPlayers[nPlayer].fC50 = fDist;
+            gPlayers[nPlayer].nC3C |= 0x20;
+            if (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] == 1) {
+                if ((gPlayers[nOther].nC3C & 0x20) && fn_800D2B08() > 3) {
+                    if (gPlayers[nPlayer].fC50 > gPlayers[nOther].fC50) {
+                        fn_800FAAB8(nPlayer, 1);
+                    } else if (gPlayers[nPlayer].fC50 < gPlayers[nOther].fC50) {
+                        fn_800FAAB8(nOther, 1);
+                    }
+                }
+            }
+        } else if (gPlayers[nPlayer].nC3C & 8) {
+            if (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] == gPlayers[nPlayer].nC60 + 1 &&
+                fn_800D2B08() > 3) {
+                if (gPlayers[nOther].uC48 & 0x03000002) {
+                    if (fDist > gPlayers[nOther].fC50) {
+                        gPlayers[nOther].uC48 &= ~(u64)0x03000002;
+                        fn_800FAAB8(nPlayer, 0x18);
+                        gPlayers[nPlayer].fC50 = fDist;
+                    }
+                } else if (fDist > gPlayers[nPlayer].fC50) {
+                    fn_800FAAB8(nPlayer, 0x19);
+                    gPlayers[nPlayer].fC50 = fDist;
+                }
+            }
+        }
+    }
+    return 1;
 }
 
 void fn_800FD6A0(int nPlayer) {

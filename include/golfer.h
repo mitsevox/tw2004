@@ -313,10 +313,12 @@ typedef struct Player {
     s32  nC40;                  // 0xC40
     s32  nC44;                  // 0xC44  3000 at the start of a round
     u64  uC48;                  // 0xC48  speed golf: the events' flags (SGEvent), 64 bits
-    u8   unkC50[4];
+    f32  fC50;                  // 0xC50  speed golf: a distance from the ball to vA44
     s32  nC54;                  // 0xC54  a frame countdown (speed golf's run to the ball)
     s32  nC58;                  // 0xC58
-    u8   unkC5C[0xC6C - 0xC5C];
+    u8   unkC5C[4];
+    s32  nC60;                  // 0xC60
+    u8   unkC64[0xC6C - 0xC64];
     s32  nC6C[18];              // 0xC6C  cleared at the start of a round
     u8   unkCB4[0xCD0 - 0xCB4];
     s32  nCD0;                  // 0xCD0  cleared per game (fn_800F2030)
