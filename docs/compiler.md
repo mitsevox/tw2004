@@ -72,7 +72,9 @@ candidate and compared function by function:
 
 **If a function with byte masking or bit packing sticks one or two instructions short,
 try GC/2.0 before rewriting the C.** `fn_800AACBC` (bit-fields) was tried as a tie-breaker: it
-matches, but identically on GC/2.0, 2.5 and 2.6, so it does not separate them.
+matches, but identically on GC/2.0, 2.5 and 2.6, so it does not separate them. GameRound
+(63 functions, including the 99.67% near-miss `fn_800E30D4`) compiles byte-identically under
+GC/1.3.2, 2.0, 2.0p1, 2.5, 2.6 and 2.7, so its stubborn register shuffle is not a version effect.
 
 Things that looked like evidence but were not
 ---------------------------------------------
