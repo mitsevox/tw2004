@@ -946,9 +946,9 @@ void fn_8005CCA8(int nPlayer) {
 
 // Empty every player's swing stack.
 void GOLFERSTATE_OpenONCE(void) {
-    int i;
-    for (i = 0; i < 5; i++) {
-        gSwingStacks[i].nTop = -1;
+    int i = 0;
+    while (i < 5) {
+        gSwingStacks[i++].nTop = -1;
     }
     gInSwingExit = 0;
 }
