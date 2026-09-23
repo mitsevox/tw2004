@@ -1182,8 +1182,8 @@ void fn_800D8FE4(int nPlayer) {
     fDist = fn_80009680(fDx * fDx + fDz * fDz);
     nLie = pBall->nLie;
     nStrokes = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
-    nProfile = gPlayers[nPlayer].nIndex;
     pSurface = Ter_GetSupportingWorldMaterial(pBall->pCourse, gPlayers[nPlayer].vBall);
+    nProfile = gPlayers[nPlayer].nIndex;
     if ((nPar == 4 || nPar == 5) && nStrokes == 1 && nClass == 1) {
         if (fDist > gPlayers[nPlayer].n2DC) {
             gPlayers[nPlayer].n2DC = fDist;
