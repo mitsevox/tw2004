@@ -1309,6 +1309,12 @@ void Ball_SetLie(Ball* pBall, SurfaceType* pSurface) {
 // given back for the part of the tick not flown. First bounce of a shot in flight: event 0x1D,
 // and the spin stick's input becomes the ball's spin (backspin x (1.9 - green setting), side x
 // (1.95 - green setting)), turned to the direction of travel; event 0x1F.
+// The stick spin's weight, 1 - n84 (an inline in the original: written out twice, the registers
+// come out differently).
+static inline f32 Ball_SpinKeep(Ball* pBall) {
+    return (f32)(1 - pBall->n84);
+}
+
 u8 fn_800539F8(Ball* pBall, f32* pHit, f32* pNormal, SurfaceType* pSurface, s32 nWhat, f32* pFrac, f32 fTicks) {
     f32 vSpin[4];
     f32 fSin, fCos;
@@ -1374,9 +1380,11 @@ u8 fn_800539F8(Ball* pBall, f32* pHit, f32* pNormal, SurfaceType* pSurface, s32 
             if (fBack < 0.0f) {
                 fBack *= 1.9f - gGreenSpeedMul[gGreenSpeedSetting];
             }
-            vSpin[0] = fBack * (f32)(1 - pBall->n84);
+            vSpin[0] = fBack * Ball_SpinKeep(pBall);
             vSpin[1] = 0.0f;
-            vSpin[2] = pBall->fSpinX * (1.95f - gGreenSpeedMul[gGreenSpeedSetting]) * (f32)(1 - pBall->n84);
+            fPrev = pBall->fSpinX;
+            fPrev *= 1.95f - gGreenSpeedMul[gGreenSpeedSetting];
+            vSpin[2] = fPrev * Ball_SpinKeep(pBall);
             fAngle = -fn_8000AD78(pBall->vVel[0], pBall->vVel[2]);
             fS = fn_800095F0(fAngle);
             fC = fn_80009638(fAngle);
@@ -1397,14 +1405,10 @@ u8 fn_80053E98(Ball* pBall, void* pv, f32* pHit, f32* pNormal) {
     u8* pObj = (u8*)pv;
     f32 vPole[4];
     f32 fRadius;
-    f32 fDX, fDZ, fDist2;
+    f32 fDZ, fDist2;
     if (pObj[0x146] != 11) return 1;
     if (0.0f != *(f32*)(pObj + 0x19C)) return 0;
-    fDist2 = pHit[0] - pBall->vPos[0];
-    fDZ = pHit[2] - pBall->vPos[2];
-    fDX = fDist2 * fDist2;
-    fDZ = fDZ * fDZ;
-    fDist2 = fDX + fDZ;
+    fDist2 = (pHit[0] - pBall->vPos[0]) * (pHit[0] - pBall->vPos[0]) + (pHit[2] - pBall->vPos[2]) * (pHit[2] - pBall->vPos[2]);
     fn_800B1AB0(pObj, vPole, &fRadius);
     if (fRadius < 0.027777778f || fDist2 >= fRadius * fRadius + 0.444444478f) return 0;
     fDZ = vPole[2] - pBall->vPos[2];

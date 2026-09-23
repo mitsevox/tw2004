@@ -145,6 +145,11 @@ Reading compiler output
   directly swapped two integer registers; the same reads through a one-line
   `static inline f32 ClubRow_Dist(ClubRow*, int)` matched (`fn_80050F88`, found by the permuter).
   When only integer registers around an array read are off, try an accessor.
+- **[verified] A squared distance written inline.** `(a[0] - b[0]) * (a[0] - b[0]) + ...` matched
+  where every spelling with a named difference was one register off (`fn_80053E98`).
+- **[verified] Repeated small expressions can be inline helpers.** `(f32)(1 - pBall->n84)`, used
+  twice, matched as a one-line `static inline` (`Ball_SpinKeep`, `fn_800539F8`); a value scaled
+  in place (`x = pBall->fSpinX; x *= k;`) matched where `pBall->fSpinX * k` did not.
 - **Permuter results need a human.** Most of its "wins" are nonsense (`if (!x && !x) {}`,
   `vPin[(long long)1]`, dummy variables) that happen to nudge the allocator. Use them as hints
   for what to change and look for a plausible spelling that gives the same code; never commit
