@@ -86,8 +86,9 @@ s32 fn_800FEC78(void) {
 }
 
 // A surface is used up once it has scored 5 times (1 time for one that costs points).
-static inline u8 SurfaceUsedUp(s32 nPoints, s32 nHits) {
+static inline u8 SurfaceUsedUp(s32* pPoints, s32 nHits) {
     u8 bUsed = 1;
+    s32 nPoints = *pPoints;
     if (nPoints < 0 && nHits < 1) {
         bUsed = 0;
     }
@@ -111,7 +112,7 @@ void fn_800FEC80(int nPlayer) {
     if (lbl_802823DC >= 0) {
         fn_800FEF00(lbl_802823DC, &nPoints, &nMeter, &nMult);
         nHits = fn_800FEFF8(nPlayer, lbl_802823DC);
-        if (!SurfaceUsedUp(nPoints, nHits)) {
+        if (!SurfaceUsedUp(&nPoints, nHits)) {
             fn_8006434C(fn_80017004(gPlayers[nPlayer].nView0), (f32*)(gPlayers[nPlayer].ball + 0x10),
                         &x, &y, 0);
             fn_8006A8D4(fn_80017004(gPlayers[nPlayer].nView0), &x, &y);
@@ -182,7 +183,7 @@ s32 fn_800FF038(int nPlayer) {
         lbl_802823DC = pSurface - gSurfaceTypes;
         nHits = fn_800FEFF8(nPlayer, lbl_802823DC);
         fn_800FEF00(lbl_802823DC, &nPoints, &nMeter, &nMult);
-        if (!SurfaceUsedUp(nPoints, nHits) && nPoints != 0) {
+        if (!SurfaceUsedUp(&nPoints, nHits) && nPoints != 0) {
             return 0;
         }
     }
