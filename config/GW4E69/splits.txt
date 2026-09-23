@@ -228,62 +228,11 @@ GoRenderCtx_Gc.c:
 streammanagerhole.c:
 	.text       start:0x800143B8 end:0x80016CB8
 
-unsorted/sweep_80016CB8.c:
-	.text       start:0x80016CB8 end:0x80016CD8
+ViewController.c:
+	.text       start:0x80016CB8 end:0x80017320
 
-unsorted/sweep_80016CF4.c:
-	.text       start:0x80016CF4 end:0x80016CFC
-
-unsorted/sweep_80016CFC.c:
-	.text       start:0x80016CFC end:0x80016D10
-
-unsorted/sweep_80016D10.c:
-	.text       start:0x80016D10 end:0x80016D18
-
-unsorted/sweep_80016E28.c:
-	.text       start:0x80016E28 end:0x80016E3C
-
-unsorted/sweep_80016E3C.c:
-	.text       start:0x80016E3C end:0x80016E90
-
-unsorted/sweep_80017004.c:
-	.text       start:0x80017004 end:0x80017028
-
-unsorted/sweep_80017028.c:
-	.text       start:0x80017028 end:0x8001707C
-
-unsorted/sweep_8001707C.c:
-	.text       start:0x8001707C end:0x800170A0
-
-unsorted/sweep_800170A0.c:
-	.text       start:0x800170A0 end:0x800170C4
-
-unsorted/sweep_800170C4.c:
-	.text       start:0x800170C4 end:0x800170F4
-
-unsorted/sweep_800170F4.c:
-	.text       start:0x800170F4 end:0x80017158
-
-unsorted/sweep_80017158.c:
-	.text       start:0x80017158 end:0x800171B0
-
-unsorted/sweep_800171B0.c:
-	.text       start:0x800171B0 end:0x80017208
-
-unsorted/sweep_800172B4.c:
-	.text       start:0x800172B4 end:0x800172C4
-
-unsorted/sweep_800172C4.c:
-	.text       start:0x800172C4 end:0x80017314
-
-unsorted/sweep_80017314.c:
-	.text       start:0x80017314 end:0x8001731C
-
-unsorted/sweep_8001731C.c:
-	.text       start:0x8001731C end:0x80017320
-
-unsorted/sweep_80017410.c:
-	.text       start:0x80017410 end:0x8001744C
+char_tex_manager.c:
+	.text       start:0x80017320 end:0x80017508
 
 char.c:
 	.text       start:0x80017508 end:0x8001F32C

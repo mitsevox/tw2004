@@ -218,6 +218,21 @@ typedef struct LogoEdit {
 } LogoEdit;
 LAYOUT_ASSERT(LogoEdit, 0xC);
 
+// A saved logo (0x1022 bytes).
+typedef struct LogoRecord {
+    u8  aPixels[0x1000];        // 0x0000  64 x 64 or 128 x 32 colour indexes
+    u8  unk1000[0x1021 - 0x1000];
+    u8  nShape;                 // 0x1021  LOGO_SQUARE or LOGO_RECT
+} LogoRecord;
+LAYOUT_ASSERT(LogoRecord, 0x1022);
+
+// The part of the save profile from 0x5500 that char_tex_manager.c is given (fn_80077ACC() +
+// 0x5500); only the logos are known.
+typedef struct ProfileLogos {
+    u8  unk0[0x9D0];
+    LogoRecord aLogo[5];        // 0x09D0  the user logos ("_usrtextr0".."_usrtextr4")
+} ProfileLogos;
+
 extern LogoEdit* lbl_802824B8;
 extern s16* lbl_802824BC;               // the palette: 256 colours, 1-bit alpha (the sign bit)
                                         // and 5-5-5 RGB; read signed (lha)
