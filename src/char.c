@@ -6,10 +6,14 @@
 #include "golfer.h"
 #include "charstate.h"
 
+void  fn_80014C9C(void);
+void  fn_80014DC0(void);
+void  fn_8001A288(void);
 void  fn_8001A75C(UStreamObject* pObject);
 void  fn_8001A798(void);
 void  fn_8001A7C8(void);
 Character* fn_8001A9F4(u8* pData, int a, int nPlayer, u32 uId, u8 b, void* p);
+void* fn_8001B208(u8* pData);
 void  fn_8001C0E0(Character* pChar);
 Character* fn_8001C21C(Character* pChar);
 void  fn_8001CCF8(UStreamObject* pObject);
@@ -18,10 +22,18 @@ void  fn_8001CE5C(UStreamObject* pObject);
 void  fn_8001D020(UStreamObject* pObject);
 void  fn_8001D3EC(UStreamObject* pObject);
 void  fn_8001D7EC(void);
-void  fn_8010BFE0(void);
-u8    fn_8001EC48(void);
+void  fn_8001EBD8(Character* pChar, int nBone, f32* pPos);
+u8    fn_8001EC48(Character* pChar);
 f32 (*fn_8001EC6C(Character* pChar, int nBone))[4];
 f32 (*fn_8001ECA8(Character* pChar, int nBone))[4];
+void  fn_80027738(u8 bOn);
+void  fn_80035C58(void);
+void  fn_8009555C(void);
+void  fn_800C937C(void);
+void  fn_800C9FE0(void);
+void  fn_800CCA1C(void);
+void  fn_800CEE88(u8 b);
+void  fn_8010BFE0(void);
 
 // ---- sweep code (not yet cleaned up) ----
 s32 fn_8001E8A4(s32, s32);
@@ -40,7 +52,6 @@ void fn_8001A484(void);
 void fn_8010BF68();
 void fn_8001A73C(void);
 void fn_80014BB4();
-void fn_80014DC0();
 void fn_8001A7F0(void);
 void fn_8001B1DC(s32 p0, u8* p1, s32 p2);
 void fn_8001B1E8(void* p);
@@ -52,13 +63,8 @@ void fn_800CCA3C();
 void fn_8001C2B4(void);
 void fn_80095564();
 void fn_8001C2E4(void);
-extern s32 lbl_80280E20;
-void fn_8001A288();
-void fn_80027738();
 void fn_80036460();
 void fn_80036464();
-void fn_800CCA1C();
-void fn_800CEE88();
 void fn_80112C64();
 void fn_80112CEC();
 void fn_8001C304(void);
@@ -248,6 +254,21 @@ void fn_8001A7C8(void) {
     UStream_UnregisterHandler('SAC ');
 }
 
+// With more than one player: reload the animation slot with 'SAC ' overlays handled, then free the
+// work copies.
+void fn_8001A81C(void) {
+    if (gSession.nNumPlayers > 1) {
+        lbl_80281CE4 = 1;
+        AnimLib_ReloadSlot();
+        fn_8001A798();
+        fn_80014C9C();
+        fn_80014DC0();
+        fn_8001A7C8();
+        AnimLib_FreeWorkCopies();
+    }
+    fn_800C9FE0();
+}
+
 // Add a character to the table of characters (up to five); NULL when it is full.
 Character* fn_8001C21C(Character* pChar) {
     if (lbl_80281CA8 >= 5) {
@@ -257,6 +278,22 @@ Character* fn_8001C21C(Character* pChar) {
     pChar->nIndex = lbl_80281CA8;
     lbl_80281CA8++;
     return pChar;
+}
+
+void fn_8001C254(void) {
+    int n;
+    fn_8009555C();
+    fn_8001A288();
+    fn_80027738(1);
+    n = 6;
+    if (gSession.nSplitScreen) {
+        n = 4;
+    }
+    lbl_80280E20 = n;
+    fn_800C937C();
+    fn_800CCA1C();
+    fn_800CEE88(1);
+    fn_80035C58();
 }
 
 void fn_8001C518(void) {
@@ -278,8 +315,53 @@ u8 fn_8001C584(int nPlayer) {
     return b;
 }
 
+// Set the character's shot kind and the clip key that goes with it.
+void fn_8001C724(Character* pChar, int nKind) {
+    if (pChar != NULL) {
+        fn_8001C650(pChar, lbl_80187164[nKind]);
+        pChar->nShotKind = nKind;
+    }
+}
+
 void fn_8001C7FC(Character* pChar, int nStyle) {
     pChar->nStyle = nStyle;
+}
+
+// Flags on the player's character: bit 4 always, bit 8 set or cleared by b, bit 0x200 set by a.
+void fn_8001C804(int nPlayer, u8 a, u8 b) {
+    Character* pChar = gPlayers[nPlayer].pChar;
+    pChar->u10 |= 4;
+    if (b) {
+        pChar->u10 |= 8;
+    } else {
+        pChar->u10 &= ~8;
+    }
+    if (a) {
+        pChar->u10 |= 0x200;
+    }
+}
+
+// The 'CLB ' handlers: what fn_8001B208 makes of the object is kept unless there already is one;
+// the first handler makes a second one for split screen.
+void fn_8001CCF8(UStreamObject* pObject) {
+    if (lbl_80280E24[0] == NULL) {
+        if (gSession.nSplitScreen) {
+            lbl_80280E24[0] = fn_8001B208(pObject->pData);
+            lbl_80280E24[1] = fn_8001B208(pObject->pData);
+        } else {
+            lbl_80280E24[0] = fn_8001B208(pObject->pData);
+            lbl_80280E24[1] = NULL;
+        }
+    }
+    fn_80009E70(pObject);
+}
+
+void fn_8001CD80(UStreamObject* pObject) {
+    if (lbl_80280E24[0] == NULL) {
+        lbl_80280E24[0] = fn_8001B208(pObject->pData);
+        lbl_80280E24[1] = NULL;
+    }
+    fn_80009E70(pObject);
 }
 
 // The 'CLB ' stream objects: two handlers for the same type.
@@ -308,6 +390,17 @@ void fn_8001D268(void) {
     UStream_UnregisterHandler('CHR ');
 }
 
+// The character built from the 'SKLO' object with this id (fn_8001D3EC), or NULL.
+Character* fn_8001D324(int nId) {
+    int i;
+    for (i = 0; i < lbl_80281CA8; i++) {
+        if (lbl_801B9624[i]->nPlayer == 1000 && lbl_801B9624[i]->uId == nId) {
+            return lbl_801B9624[i];
+        }
+    }
+    return NULL;
+}
+
 // The 'SKLO' handler: a character built from the object with no player (1000), keyed by the
 // object's id.
 // port: the skeleton is little-endian on disc and fn_8001A9F4 swaps it (fn_80076158): a
@@ -315,7 +408,7 @@ void fn_8001D268(void) {
 void fn_8001D3EC(UStreamObject* pObject) {
     Character* pChar = fn_8001C21C(fn_8001A9F4(pObject->pData, 0, 0, pObject->uId, 0, NULL));
     pChar->nPlayer = 1000;
-    pChar->nId     = pObject->uId;
+    pChar->uId     = pObject->uId;
     fn_80009E70(pObject);
 }
 
@@ -370,6 +463,16 @@ u8 fn_8001E9CC(u32* aBits, u32 n) {
     return (aBits[n >> 5] & (1 << (n & 31))) != 0;
 }
 
+u8 fn_8001E9F4(u32* aA, u32* aB, u32 nBits) {
+    u32 i;
+    for (i = 0; i < (nBits + 31) >> 5; i++) {
+        if (aA[i] & aB[i]) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
 void fn_8001EA34(u32* aBits, u32 n) {
     aBits[n >> 5] |= 1 << (n & 31);
 }
@@ -378,17 +481,40 @@ void fn_8001EB6C(u32* aBits, u32 n) {
     aBits[n >> 5] &= ~(1 << (n & 31));
 }
 
+// A bone's position, by bone id.
+void fn_8001EB8C(Character* pChar, int nBone, f32* pPos) {
+    fn_8001EBD8(pChar, fn_8001EED8(pChar->pModel, nBone), pPos);
+}
+
+// Bone n's position (bone 1's without an animation slot); nothing without a character.
+void fn_8001EBD8(Character* pChar, int nBone, f32* pPos) {
+    if (pChar != NULL) {
+        if (fn_8001EC48(pChar) == 0) {
+            nBone = 1;
+        }
+        Vec_Copy(pChar->pModel->pMatrices[nBone][3], pPos);
+    }
+}
+
+// The character plays from animation slot 0 or 1.
+u8 fn_8001EC48(Character* pChar) {
+    if (pChar->nSlot >= 0 && pChar->nSlot < 2) {
+        return 1;
+    }
+    return 0;
+}
+
 f32 (*fn_8001EC6C(Character* pChar, int nBone))[4] {
     return fn_8001ECA8(pChar, fn_8001EEE4(pChar->pModel, nBone));
 }
 
-// Bone n's matrix (bone 1's while fn_8001EC48 says no); NULL without a character.
+// Bone n's matrix (bone 1's without an animation slot); NULL without a character.
 f32 (*fn_8001ECA8(Character* pChar, int nBone))[4] {
     int n = nBone;
     if (pChar == NULL) {
         return NULL;
     }
-    if (fn_8001EC48() == 0) {
+    if (fn_8001EC48(pChar) == 0) {
         n = 1;
     }
     return pChar->pModel->pMatrices[n];
@@ -404,6 +530,11 @@ f32 fn_8001ED44(Character* pChar, int b) {
         return pChar->f1660 * (lbl_80282BF8 / fn_8001EFFC(fn_8001F004()));
     }
     return pChar->f1660 * (lbl_80282BC0 / fn_8001EFFC(fn_8001F004()));
+}
+
+// A bone's position, by bone id through fn_8001EEE4.
+void fn_8001EDA8(Character* pChar, int nBone, f32* pPos) {
+    fn_8001EBD8(pChar, fn_8001EEE4(pChar->pModel, nBone), pPos);
 }
 
 u8 fn_8001EDF4(Character* pChar) {

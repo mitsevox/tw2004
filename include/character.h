@@ -129,7 +129,8 @@ typedef struct Character {
     s32   nIndex;               // 0x000  its entry in lbl_801B9624 (fn_8001C21C)
     s32   nPlayer;              // 0x004  the player it belongs to (Player_SetGolfer); 1000 for the
                                 //        characters fn_8001D324 finds by id
-    s32   nId;                  // 0x008  (fn_8001D324)
+    u32   uId;                  // 0x008  the id of the 'SKLO' object it was built from (fn_8001D3EC);
+                                //        fn_8001D324 finds it by this
     u8    unkC[0x10 - 0xC];
     u32   u10;                  // 0x010  bit 0x40 tested by the game manager and the swing; bit 0x8000
                                 //        cleared by CharacterState_AddSKABlendData
@@ -179,8 +180,9 @@ typedef struct Character {
     s32   nClubHeadBone;        // 0x16A0  bone 0x53's index: the club head (the swing trail's end)
     s32   nGripBone;            // 0x16A4  bone 0x52's index: the grip (the trail's other end)
     s32   n16A8;                // 0x16A8  fn_8001EEE4's answer for bone 0x15
-    u8    unk16AC[0x16D4 - 0x16AC];
-    s32   n16D4;                // 0x16D4  the key for clip lookups (Char_SetClip)
+    u8    unk16AC[0x16D0 - 0x16AC];
+    s32   nShotKind;            // 0x16D0  the player's shot kind (fn_8001C724)
+    s32   n16D4;              // 0x16D4  the key for clip lookups (Char_SetClip)
     u8    unk16D8[0x16DC - 0x16D8];
     s32   n16DC;                // 0x16DC  twice the players set up so far, in split screen 2
                                 //         (Player_SetGolfer)
@@ -431,6 +433,8 @@ void* AnimLib_Pick(int nPlayer, AnimLib* pLib, int nGroup, int nStyle, int nClub
                    const char* pName);
 void* Char_SetClip(Character* pChar, int nGroup, int nStyle, const char* pName);
 s32   AnimLib_MergeOverlay(u8* pData, int nSlot);   // skalib.c; char.c's 'SAC ' handler
+void  AnimLib_FreeWorkCopies(void);
+void  AnimLib_ReloadSlot(void);
 
 // Swing.c
 f32   fn_8005CB78(Character* pChar, u64 uEvent);    // the time of an animation event
