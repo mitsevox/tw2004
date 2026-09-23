@@ -27,7 +27,7 @@ extern PrizeTable lbl_80200538;
 extern Replay gReplayData;
 extern u8  gNumPlayersSetUp;
 extern s32 lbl_80282278;                    // the player whose turn it is
-extern s8  lbl_80282360;                    // the number of targets (GameMode10.c)
+extern s8  lbl_80282360;                    // the number of targets (GameModeReplay.c)
 extern s32 lbl_802816A8;                    // the options saved while the game runs
 extern s32 lbl_802823B0;
 extern s32 lbl_802823B4;                    // the points multiplier from bonuses
@@ -35,10 +35,6 @@ extern s32 lbl_802823B8;                    // the seconds added by the last sho
 extern s32 lbl_802823BC;                    // the points of the last shot
 
 void  fn_800A624C(void);
-void  fn_800ED710(s32 p0);
-void  fn_800F21B4(int nPlayer);
-s32   fn_800F266C(s32 n, int i);
-s32   fn_800F2810(s32 n);
 
 void  fn_800F6CC4(void);
 void  fn_800F6CE0(void);
@@ -54,8 +50,6 @@ void  fn_800F7CA0(void);
 void  fn_800F7CD4(void);
 void  fn_800F7D4C(int nPlayer);
 u8    fn_800F7D8C(int a);
-s32   fn_800F7D94(void);
-s32   fn_800F7D9C(void);
 void  fn_800F7DA4(void);
 void  fn_800F7ED8(int nPlayer);
 void  fn_800F7EF8(int nPlayer);
@@ -63,9 +57,7 @@ void  fn_800F7F1C(int nPlayer, int nTime);
 u8    fn_800F7F70(int nPlayer, int a);
 void  fn_800F7FF4(int nPlayer, int nId);
 s32   fn_800F8068(int nPlayer, int i);
-s32   fn_800F80A0(void);
 void  fn_800F80A8(void);
-void  fn_800F80D4(s32 p0);
 
 // Mode 13 starts: one player at a time, no wind, no gimmes, one mulligan.
 void fn_800F6A60(void) {
@@ -505,11 +497,11 @@ u8 fn_800F7D8C(int a) {
     return 1;
 }
 
-s32 fn_800F7D94(void) {
+s32 fn_800F7D94(s32 a) {
     return lbl_802823BC;
 }
 
-s32 fn_800F7D9C(void) {
+s32 fn_800F7D9C(s32 a) {
     return lbl_802823B8;
 }
 
@@ -579,7 +571,7 @@ s32 fn_800F8068(int nPlayer, int i) {
     return 0;
 }
 
-s32 fn_800F80A0(void) {
+s32 fn_800F80A0(s32 a) {
     return lbl_802823B4;
 }
 

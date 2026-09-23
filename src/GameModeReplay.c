@@ -1,6 +1,7 @@
-// GameMode10.c (our name): game mode 10, playing back a saved shot (gReplayData): the saved
-// course, hole, wind and player are put back and the shot starts again. Also the target games'
-// target list (lbl_80211D38, lbl_80282360 points); the rest of their shared code is GameTargets.c.
+// GameModeReplay.c (TW06's GameModeReplay): game mode 10, playing back a saved shot (gReplayData):
+// the saved course, hole, wind and player are put back and the shot starts again. Also the target
+// games' target list (lbl_80211D38, lbl_80282360 points); the rest of their shared code is
+// GameTargets.c.
 
 #include "golfer.h"
 #include "ball.h"
@@ -33,7 +34,7 @@ u8   fn_800F193C(int nPlayer, int a);
 u8   fn_800F1944(int a);
 void fn_800F194C(void);
 
-// Mode 10 starts: one player, no mulligans, the saved shot's hole.
+// TW06: GameModeReplay::Init. Mode 10 starts: one player, no mulligans, the saved shot's hole.
 void fn_800F125C(void) {
     gpGame->pfn1C8 = fn_800F125C;
     gpGame->pfn1D0 = fn_800F15AC;
@@ -61,7 +62,7 @@ void fn_800F125C(void) {
     gSession.nNumPlayers = 1;
 }
 
-// Hole start: the saved wind and conditions.
+// TW06: GameModeReplay::LoadHole. The saved wind and conditions.
 void fn_800F1388(void) {
     Wind_Set(gReplayData.nWindDir, gReplayData.nWindSpeed);
     fn_80055C40(gReplayData.nF1A);
@@ -69,6 +70,7 @@ void fn_800F1388(void) {
     fn_80055CD0(gReplayData.nF1E);
 }
 
+// TW06: GameModeReplay::RestartHole.
 void fn_800F1404(void) {
     fn_800F18C8();
 }
@@ -78,7 +80,7 @@ static inline s8 Replay_SetF07(void) {
     return gSession.unk5B38 = gReplayData.nF07;
 }
 
-// Round setup: the saved course, hole and tees.
+// TW06: GameModeReplay::StartGamePreData. The saved course, hole and tees.
 void fn_800F1424(void) {
     int i;
     for (i = 0; i < 18; i++) {
@@ -97,7 +99,8 @@ void fn_800F1424(void) {
     Replay_SetF07();
 }
 
-// Put player 0 back as they were before the shot, then start it.
+// TW06: GameModeReplay::SetupNextGolfer. Put player 0 back as they were before the shot, then
+// start it.
 void fn_800F15AC(void) {
     Ball ball;
     f32 fF08;
@@ -161,14 +164,17 @@ void fn_800F18C8(void) {
     }
 }
 
+// TW06: GameModeReplay::HoleFinished.
 u8 fn_800F193C(int nPlayer, int a) {
     return 1;
 }
 
+// TW06: GameModeReplay::GameFinished.
 u8 fn_800F1944(int a) {
     return 1;
 }
 
+// TW06: GameModeReplay::EndGame.
 void fn_800F194C(void) {
     gSession.unk11[1] = 1;
 }

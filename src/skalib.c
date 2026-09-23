@@ -5,8 +5,6 @@
 #include "game.h"
 #include "engine.h"
 
-int   strcmp(const char* pA, const char* pB);
-
 // An animation library (a SAL object: glbchar.gcb holds the shared male/female ones, and each
 // character's CHR object embeds its own). On disc it is little-endian; the loader swaps it and
 // fills in the pointers. Clips are found through a tree of s16 byte offsets into pTree:
@@ -96,7 +94,6 @@ int   Skalib_HasOverlays(int nSlot);
 u8    fn_800C9828(int nGroup, int nStyle, int nClub, int nKey);
 void  AnimLib_FreeCopies(void);
 void  ClipBank_FreeAram(void);
-int   strcmp(const char* pA, const char* pB);
 
 // A library that can be layered over a slot's own (0x20 bytes).
 typedef struct LibOverlay {
@@ -197,7 +194,6 @@ extern s32         lbl_80281070;
 extern s16*        lbl_80281CF8;      // the group, style and club node being built
 extern s16*        lbl_80281CFC;
 extern s16*        lbl_80281D00;      // leaves this short are left alone by the drop pass
-u8                 fn_80101E34(struct ClipRecord* pRec);      // slot 0's share of the memory when double buffering
 extern u8*         lbl_80281CC4;      // staging buffers (32-aligned), see Skalib_Init
 extern u8*         lbl_80281CC8;
 extern u8*         lbl_80281CCC;
@@ -666,7 +662,9 @@ int AnimLib_KeepRandomCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* p
                 continue;
             found:
                 if (fn_80100294()) {
-                    if (!fn_80101E34(pRec)) pRec->n12 |= 1;
+                    if (!fn_80101E34(pRec->name)) {
+                        pRec->n12 |= 1;
+                    }
                     nMarked++;
                 } else {
                     pRec->n12 |= 1;
@@ -688,7 +686,9 @@ int AnimLib_KeepRandomCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* p
                 continue;
             found2:
                 if (fn_80100294()) {
-                    if (!fn_80101E34(pRec)) pRec->n12 |= 1;
+                    if (!fn_80101E34(pRec->name)) {
+                        pRec->n12 |= 1;
+                    }
                 } else {
                     pRec->n12 |= 1;
                 }
@@ -733,7 +733,9 @@ int AnimLib_KeepBestCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLe
                 }
                 if (pBest != NULL) {
                     if (fn_80100294()) {
-                        if (!fn_80101E34(pBest)) pBest->n12 |= 1;
+                        if (!fn_80101E34(pBest->name)) {
+                            pBest->n12 |= 1;
+                        }
                         nMarked++;
                     } else {
                         pBest->n12 |= 1;
@@ -752,7 +754,9 @@ int AnimLib_KeepBestCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLe
                 }
                 if (pBest != NULL) {
                     if (fn_80100294()) {
-                        if (!fn_80101E34(pBest)) pBest->n12 |= 1;
+                        if (!fn_80101E34(pBest->name)) {
+                            pBest->n12 |= 1;
+                        }
                     } else {
                         pBest->n12 |= 1;
                     }

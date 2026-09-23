@@ -25,7 +25,6 @@ extern s32        lbl_80281668;
 extern s32        lbl_802822F4;
 
 int  fn_800E9F90(int nPlayer);
-void fn_800EAA40(void);
 void fn_800EAB44(void);
 
 // TW06: GameModeMatch::Init. Two players; the CPU may concede.

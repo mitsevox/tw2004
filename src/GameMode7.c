@@ -9,14 +9,6 @@ extern u8  lbl_802823C9;
 extern s32 lbl_802823D0;
 extern s32 lbl_802823D4;
 
-void  fn_800F9844(void);
-u8    fn_800FA148(int a);
-s32   fn_800FA2C8(void);
-void  fn_800FA3AC(void);
-void  fn_800FA410(void);
-void  fn_800FDF38(void);
-void  fn_800FA998(int nPlayer);
-
 void fn_800F9610(void) {
     gpGame->pfn1C8 = fn_800F9610;
     gpGame->pfn1CC = fn_800F9A58;

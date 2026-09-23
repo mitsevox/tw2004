@@ -43,7 +43,6 @@ typedef struct Challenge {
 
 extern s32 lbl_802822F4;
 extern s32 lbl_802822F8;
-void fn_800EAE38(s32 p0);
 void fn_800EAE44(int nId);
 s32 fn_800EAE6C(void);
 extern Challenge lbl_80203554[83];
@@ -68,10 +67,7 @@ extern void (*lbl_80282324)(void);
 extern void (*lbl_80282318)(int nPlayer);
 extern u8* gpSaveData;
 int   fn_800ED028(int i);
-void  fn_800F06DC(void);
-void  fn_800EAF7C(void);
 void  fn_80019648(void);
-void  fn_800E4D88(void);
 void  fn_800EBEF0(void);
 void  fn_800EAD6C(void);
 void  fn_800EBD28(void);
@@ -83,13 +79,8 @@ extern s32 lbl_80282300;
 extern s32 lbl_80282304;
 extern s32 lbl_80282308;
 extern s32 lbl_8028230C;
-int   fn_800D2ABC(int nCourse, int nHole);  // a hole's par on a course
-void  fn_800E0B38(int nMode);
-void  fn_800F07C8(void);
 extern u8 gNumPlayersSetUp;                 // 0x80281D48 (Golfer.c)
 extern void (*lbl_80282328)(void);
-int   fn_800EC558(void);
-u8    fn_801025F4(void);
 s16   fn_800D2994(void);
 u8    fn_800D9998(int nPlayer, int nAward);
 u8    fn_800D750C(int nPlayer, int nAward);
@@ -108,10 +99,7 @@ int   fn_800ECF9C(int i);
 void fn_800EC544(Challenge* p0, s32 p1);
 extern u8 lbl_802822FC;
 s32 fn_800ECA08(void);
-void fn_800ECBE4(void);
 extern u8 lbl_80282314;
-u8 fn_800ED540(void);
-void fn_800ED548(void);
 extern u8 lbl_802822FE;
 extern u8 (*lbl_8028231C)(int nPlayer, int bCheck);
 u8 fn_800ED5C8(int nPlayer, int bCheck);
@@ -119,8 +107,6 @@ extern u8 lbl_802822FD;
 void fn_800ED6E8(u8 v);
 u8 fn_800ED6F0(void);
 extern s32 lbl_802811F0;
-void fn_800ED6F8(f32 x0);
-void fn_800ED710(s32 p0);
 
 // Game mode 5 starts: its callbacks, one player, the challenge list.
 void fn_800EACD8(void) {
