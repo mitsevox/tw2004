@@ -21,6 +21,8 @@ void fn_800AD698(u8 nId, u8 nTrack, u8 bOn);
 u8   fn_800AD618(u8 nId, u8 nTrack);
 void fn_800AD790(u8 nId, u8 nTrack, u32 uParams);
 void fn_800AD9AC(u8 nId, u8 nTrack, u8 n);
+void fn_800AD800(u8 nId, f32* pPos, int a, u8 b);
+void fn_800ADA94(u8 nId, u8 nTrack, f32 fVolume);
 void fn_800ADB4C(s16 nKind, u8 nTrack, u8 bOn);
 void fn_800ADC44(s16 nKind, u8 nTrack, u8 n);
 void fn_800ADCD0(s16 nKind, u8 nTrack, u8 n, u8 b);
@@ -617,6 +619,63 @@ u8 fn_800A4A24(s32 nCourse, int n) {
     return nSound;
 }
 
+void fn_800A5EC0(u8 nPlayer) {
+    Player* pPlayer;
+    u8 nId;
+
+    pPlayer = &gPlayers[nPlayer];
+    nId = lbl_801F1790[pPlayer->nView[0]].n1;
+    fn_800AD800(nId, pPlayer->ball.vPos, 0, 0);
+    fn_800ADA94(nId, 0, 2.0f);
+    fn_800ADA28(nId, 0, !(Rand_Next(2) & 1) ? 0x1A : 0x1C, 0);
+}
+
+void fn_800A5F60(u8 nPlayer) {
+    Player* pPlayer;
+    u8 nId;
+
+    pPlayer = &gPlayers[nPlayer];
+    nId = lbl_801F1790[pPlayer->nView[0]].n1;
+    fn_800AD800(nId, pPlayer->ball.vPos, 0, 0);
+    fn_800ADA94(nId, 0, 1.0f);
+    fn_800ADA28(nId, 0, 0x17, 0);
+}
+
+void fn_800A5FE8(u8 nPlayer) {
+    Player* pPlayer;
+    u8 nId;
+
+    pPlayer = &gPlayers[nPlayer];
+    nId = lbl_801F1790[pPlayer->nView[0]].n1;
+    fn_800AD800(nId, pPlayer->ball.vPos, 0, 0);
+    fn_800ADA94(nId, 0, 1.0f);
+    fn_800ADA28(nId, 0, 0x17, 0);
+}
+
+void fn_800A6148(void) {
+    u8 nIdA;
+    u8 nIdB;
+
+    nIdA = lbl_801F1790[0].n2;
+    nIdB = lbl_801F1790[0].n3;
+    fn_800AD9AC(nIdA, 1, 3);
+    fn_800AD9AC(nIdB, 1, 3);
+    fn_800AD698(nIdA, 1, 1);
+    fn_800AD698(nIdB, 1, 1);
+}
+
+void fn_800A61C4(int n) {
+    u8 nIdA;
+    u8 nIdB;
+
+    nIdA = lbl_801F1790[0].n2;
+    nIdB = lbl_801F1790[0].n3;
+    fn_800AD9AC(nIdA, 7, n);
+    fn_800AD9AC(nIdB, 7, n);
+    fn_800AD698(nIdA, 7, 1);
+    fn_800AD698(nIdB, 7, 1);
+}
+
 void fn_800A6450(u8 nPlayer) {
     u8 nId;
 
@@ -627,6 +686,45 @@ void fn_800A6450(u8 nPlayer) {
 }
 
 // The calls below only sound when gpGame->b288 is set.
+void fn_800A67E8(u8 nPlayer) {
+    GameAudioView* pView;
+
+    pView = &lbl_801F1790[gPlayers[nPlayer].nView[0]];
+    fn_800AD698(pView->n2, 0, 1);
+    fn_800AD698(pView->n3, 0, 1);
+}
+
+void fn_800A6854(u8 nPlayer) {
+    GameAudioView* pView;
+
+    pView = &lbl_801F1790[gPlayers[nPlayer].nView[0]];
+    fn_800AD698(pView->n2, 0, 0);
+    fn_800AD698(pView->n3, 0, 0);
+}
+
+void fn_800A6D48(u8 nPlayer) {
+    GameAudioView* pView;
+
+    pView = &lbl_801F1790[gPlayers[nPlayer].nView[0]];
+    if (Game_GetMode() < 6 || Game_GetMode() > 8) {
+        fn_800AD698(pView->n2, 3, 0);
+        fn_800AD698(pView->n3, 3, 0);
+    }
+}
+
+void fn_800A6FE0(void) {
+    if (lbl_8028202F == 0) {
+        if (lbl_80282040 == 0) return;
+        if (gPlayers[lbl_80282278].ball.b99 == 0) {
+            fn_800A6EC8();
+        }
+        fn_800AD698(lbl_8028141C, 4, 1);
+        fn_800AD698(lbl_8028141D, 4, 1);
+        fn_800AD698(lbl_8028141C, 5, 1);
+        fn_800AD698(lbl_8028141D, 5, 1);
+    }
+}
+
 void fn_800A70E4(int n) {
     if (gpGame->b288) {
         fn_800ADB4C(0, 0, 1);
