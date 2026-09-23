@@ -16,12 +16,24 @@ typedef struct UIFile {
     u32* p8;                    // 0x8  a count, then that many tables (each a count and its words)
 } UIFile;
 
+// An entry of the front end's colour table: p8 points at four bytes, alpha first (uiText.c).
+typedef struct UIColorEntry {
+    u8   unk0[0x8];
+    u8*  p8;                    // 0x8
+} UIColorEntry;
+
+typedef struct UIColorTable {
+    s32  nCount;                // 0x0  read as an s16
+    UIColorEntry* apEntries[1]; // 0x4  nCount of them
+} UIColorTable;
+
 typedef struct FrontEnd {
     UIFile* pFile;              // 0x0
     void* pHandler;             // 0x4  where GameMessages.c sends its messages (fn_8016B09C)
     u8    unk8[4];
     void* pC;                   // 0xC  a block uiLoadFile.c frees (fn_8008F24C)
-    u8    unk10[8];
+    u8    unk10[4];
+    UIColorTable* p14;          // 0x14  the colours UIText.n8 picks from (uiText.c), NULL: none
     f32   f18;                  // 0x18  set to 1 when a round starts (gomainloop fn_8006DC20)
 } FrontEnd;
 
@@ -93,7 +105,8 @@ typedef struct UIArc {
 typedef struct UIText {
     s32  nText;                 // 0x00  messages 3 and 4: its string (a MsgString), as an offset
                                 //       from the element
-    s32  n4;                    // 0x04  its font (fn_80012868)
+    s16  n4;                    // 0x04  its font (fn_80012868)
+    u8   unk6[2];
     s16  n8;                    // 0x08  message 8, low half: an entry of the colour table, -1: aColor
     s16  nA;                    // 0x0A  message 8, high half
     s16  nFlags;                // 0x0C  bits 0/1: message 5; 0x10: a shadow; 0x100/0x200: f30/f34
@@ -171,5 +184,7 @@ typedef struct UITransformDesc {
     UIWords4 w34;               // 0x34
     f32      f44[4];            // 0x44  divided by 511 when pushed
 } UITransformDesc;
+
+UITransform* fn_80093274(void);         // the current level (uiTransform.c)
 
 #endif
