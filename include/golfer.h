@@ -57,6 +57,15 @@ enum {
 #define NUM_AI_LINKS         10   // candidate aim points per zone
 #define NUM_AI_TARGETS       25   // aim points per hole (gAITargets)
 
+// A player slot, TW06's PlayerNumber_t. The save profiles (gpSaveData) are indexed by it.
+typedef enum PlayerNumber_t {
+    PLR_1_e,
+    PLR_2_e,
+    PLR_3_e,
+    PLR_4_e,
+    PLR_MAX_e
+} PlayerNumber_t;
+
 #define PI    3.14159265f
 #define TWOPI 6.28318531f
 #define DEG(x) ((x) * (PI / 180.0f))
