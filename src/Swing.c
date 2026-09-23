@@ -3445,7 +3445,7 @@ void STATEFUNC_PreShotUpdate(int nPlayer) {
             fn_80047EF0(&gPlayers[nPlayer].ball, nPlayer, 0);
         } else {
             Character_GetBallOnFingerPosition(gPlayers[nPlayer].pChar, gPlayers[nPlayer].ball.vPos);
-            fn_8001DA04(gPlayers[nPlayer].pChar, pSlot->a30, pSlot->a50);
+            fn_8001DA04(gPlayers[nPlayer].pChar, pSlot->v30, pSlot->v50);
             bInHand = 1;
         }
     } else if (gPlayers[nPlayer].ball.nLie == 0) {

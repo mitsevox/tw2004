@@ -568,8 +568,7 @@ void fn_80047C24(int nPlayer) {
     f32 fRange;
     f32 fGround;
 
-    if (!pB->b0) return;
-    if (0.0f == gSession.fFrameTime) return;
+    if (!pB->b0 || 0.0f == gSession.fFrameTime) return;
     if (!pB->bF4) return;
     pB->b0 = 0;
     if (pB->bF5) {
@@ -598,7 +597,7 @@ void fn_80047C24(int nPlayer) {
     }
     pB->f10 += gSession.fFrameTime;
     Wind_Get(vWind);
-    fn_8000AE28(vWind, 0.14666401f, vWind);
+    fn_8000AE28(vWind, 0.48888f * 0.3f, vWind);
     fn_800486C8(vWind, pB->v40, vMove);
     fn_8001EF34(vMove, pB->f10, vMove);
     vMove[1] = vMove[1] + -4.9f * pB->f10 * pB->f10;
@@ -619,8 +618,152 @@ void fn_80047C24(int nPlayer) {
 }
 
 
+// Puts the player's 'TEO ' 10004 object at pPos (raised by fAAC), the first time making it (a type
+// 0 object with no flags); after that its turn angles wind back to 0 (at once with bReset).
+void fn_80047EF0(f32* pPos, int nPlayer, u8 bReset) {
+    DynObjDef def;
+    DynObjSetup setup;
+    DynObjModel model;
+    GoDynObjPlayerA* pA = &lbl_80281DA0->aA[nPlayer];
+    s32 nId;
+    int i;
+
+    pA->v20[0] = pPos[0];
+    pA->v20[1] = pPos[1] + lbl_80281DA0->fAAC;
+    pA->v20[2] = pPos[2];
+    pA->v20[3] = 1.0f;
+    pA->bF9 = 1;
+    pA->b0 = 1;
+    pA->b70 = 0;
+    if (!pA->bF8) {
+        // EA bug: def.n1A is never set, and type 0's setup copies it to DynObj.n14E
+        def.n0 = 0;
+        def.n4 = 0;
+        def.aPos[0] = pA->v20[0];
+        def.aPos[1] = pA->v20[1];
+        def.aPos[2] = pA->v20[2];
+        def.u14 = 0;
+        def.n18 = 0;
+        setup.pDef = &def;
+        setup.pModel = &model;
+        model.aEntries[0].uType = 'TEO ';
+        setup.pModel->aEntries[0].u.pRef = (DynObjModelRef*)fn_8000B70C('TEO ', 10004);
+        setup.pfnHandler = fn_800499B0(setup.pDef->n4);
+        setup.pC = NULL;
+        nId = fn_800490B8(&setup);
+        if (nId != -2) {
+            pA->pF4 = fn_80048E4C(nId);
+        }
+        pA->bF8 = 1;
+        fn_8000ADC0(pA->mB4);
+        Vec_Copy(pA->v20, pA->v30);
+        Vec_Copy(pA->v20, pA->pF4->obj.m80[3]);
+        fn_8000C5A4(pA->pF4->obj.m0);
+        return;
+    }
+    if (bReset) {
+        pA->v50[0] = 0.0f;
+        pA->v50[1] = 0.0f;
+        pA->v50[2] = 0.0f;
+    } else {
+        for (i = 0; i < 3; i++) {
+            if (fabs(pA->v50[i]) > PI / 4.0f) {
+                pA->v50[i] = 0.0f;
+            }
+            if (pA->v50[i] > 0.0f) {
+                pA->v50[i] -= PI / 2.0f * gSession.fFrameTime;
+                if (pA->v50[i] < 0.0f) {
+                    pA->v50[i] = 0.0f;
+                }
+            }
+            if (pA->v50[i] < 0.0f) {
+                pA->v50[i] += PI / 2.0f * gSession.fFrameTime;
+                if (pA->v50[i] > 0.0f) {
+                    pA->v50[i] = 0.0f;
+                }
+            }
+        }
+    }
+    fn_8000ADC0(pA->mB4);
+    fn_8000A194(pA->mB4, pA->v50[0], pA->v50[1], pA->v50[2]);
+    fn_8000A144(pA->mB4, pA->pF4->obj.m0);
+    Vec_Copy(pA->v20, pA->v30);
+    Vec_Copy(pA->v20, pA->pF4->obj.m80[3]);
+    fn_8000C5A4(pA->pF4->obj.m0);
+}
+
 void fn_8004816C(int nPlayer) {
     lbl_80281DA0->aA[nPlayer].b70 = 1;
+}
+
+// Flies the player's 'TEO ' 10004 object (fn_80047EF0) once fn_8004816C launched it: a random
+// heading, speed and spin, then its velocity, the wind and gravity until it lands. Until then it
+// stays where it was put.
+void fn_80048184(int nPlayer) {
+    f32 mTmp[4][4];
+    f32 vMove[4];
+    f32 vWind[4];
+    GoDynObjPlayerA* pA = &lbl_80281DA0->aA[nPlayer];
+    f32 fRange;
+    f32 fGround;
+
+    if (0.0f == gSession.fFrameTime) return;
+    if (!pA->bF8) return;
+    if (pA->b70 && pA->b0) {
+        pA->b0 = 0;
+        if (pA->bF9) {
+            pA->fC = -gPlayers[nPlayer].fAim + Rand_Float(1) - 0.5f;
+            fn_8000ADC0(pA->mB4);
+            fn_8000A194(pA->mB4, pA->fC, 0.0f, 0.0f);
+            fn_800BADF8(pA->pF4->obj.m0, pA->mB4, mTmp, 4);
+            fn_8000A0E8(mTmp, pA->pF4->obj.m0);
+            fn_8000C5A4(pA->pF4->obj.m0);
+            Vec_Copy(pA->v20, pA->v30);
+            fn_8004858C(pA->v40, pA->fC, lbl_80281DA0->fA9C);
+            fn_8000AE28(pA->v40, lbl_80281DA0->fA94 * Rand_Float(1), pA->v40);
+            pA->v40[3] = pA->v40[1];
+            pA->bF9 = 0;
+            pA->b0 = 1;
+            pA->f10 = 0.0f;
+            fRange = lbl_80281DA0->fAA4;
+            pA->v60[0] = fRange * Rand_Float(1) - 0.5f * fRange;
+            fRange = lbl_80281DA0->fAA4;
+            pA->v60[1] = fRange * Rand_Float(1) - 0.5f * fRange;
+            fRange = lbl_80281DA0->fAA4;
+            pA->v60[2] = fRange * Rand_Float(1) - 0.5f * fRange;
+            pA->v50[0] = 0.0f;
+            pA->v50[1] = 0.0f;
+            pA->v50[2] = 0.0f;
+            return;
+        }
+        pA->f10 += gSession.fFrameTime;
+        Wind_Get(vWind);
+        fn_8000AE28(vWind, 0.48888f, vWind);
+        fn_800486C8(vWind, pA->v40, vMove);
+        fn_8001EF34(vMove, pA->f10, vMove);
+        vMove[1] = vMove[1] + -4.9f * pA->f10 * pA->f10;
+        fn_800486C8(vMove, pA->v20, pA->v30);
+        pA->b0 = 1;
+        fGround = fn_8004D5F0(fn_8000C594(), pA->v30);
+        if (pA->v30[1] < fGround) {
+            pA->v30[1] = 0.01f + fGround;
+            pA->b0 = 0;
+        }
+        fn_800486A4(pA->v60, pA->v50, pA->v50);
+        fn_8000ADC0(pA->mB4);
+        fn_8000A194(pA->mB4, pA->fC + pA->v50[0], pA->v50[1], pA->v50[2]);
+        fn_8000A144(pA->mB4, pA->pF4->obj.m0);
+        fn_8000C5A4(pA->pF4->obj.m0);
+        Vec_Copy(pA->v30, pA->pF4->obj.m80[3]);
+        pA->pF4->obj.m80[3][3] = 1.0f;
+    } else {
+        fn_8000ADC0(pA->mB4);
+        fn_8000A194(pA->mB4, pA->v50[0], pA->v50[1], pA->v50[2]);
+        fn_8000A144(pA->mB4, pA->pF4->obj.m0);
+        fn_8000C5A4(pA->pF4->obj.m0);
+        Vec_Copy(pA->v30, pA->pF4->obj.m80[3]);
+        pA->pF4->obj.m80[3][3] = 1.0f;
+    }
 }
 
 char* fn_800484E0(int i) {
