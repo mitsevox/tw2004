@@ -587,7 +587,11 @@ EA's source tree (from the TW2003 Xbox prototypes)
 2026-09-23. Hidden Palace has two Tiger Woods PGA Tour 2003 Xbox builds: Sep 3 2002 (PAL,
 `Golf_Pal_Final_Xbox`, full disc) and Sep 12 2002 (`Golf_Demo_Final_Xbox`, the demo). Both are
 **release builds with no symbols** (no PDB or map on the disc; the XBE only records the PDB's path).
-Their strings and source paths were kept as text in `C:\dev\ext\tw2003\` and the game files deleted.
+Every file of both was scanned (29 files / 205 MB and 489 files / 2.06 GB, with
+`C:\dev\scratch\tw\scanfiles.py`) for paths, file names, asserts and error texts: only the program
+(`default.xbe`) carries debug leftovers (the source paths); the data files hold in-game text only
+(memory-card messages, some still saying "for PlayStation"). The scans, strings and source paths are
+kept as text in `C:\dev\ext\tw2003\`; the game files were deleted after that was verified.
 Only 57 of their strings also occur in this game (course names, camera and movie debug labels), too
 few to pair functions.
 
