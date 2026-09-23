@@ -232,7 +232,9 @@ typedef struct SaveProfile {
     u8   a5CD4[6][0x50];            // 0x05CD4
     u8   a5EB4[26];             // 0x05EB4  set to 50 each when FE_CrAP_InitCrAPInfo clears
                                 //          0x5500..0xB634 (fn_80058208)
-    u8   unk5ECE[0xB054 - 0x5ECE];
+    u8   unk5ECE[0xAF80 - 0x5ECE];
+    s32  aAF80[53];             // 0x0AF80  per slot: a Create-A-Player asset (FE_CrAPDB.c
+                                //          fn_80103D14), -1 for none; an asset's n2E is its slot
     // Four bit arrays with a bit per Create-A-Player asset (0x80057F18's loop over them all, which
     // also clears aB344 and aB4BC; fn_8001E9CC tests a bit).
     u32  aAssetLocked[94];      // 0x0B054  the asset was locked (fn_80078008) when last checked

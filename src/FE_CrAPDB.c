@@ -12,6 +12,7 @@ s32  fn_800CCA40(Skin* pSkin);          // SkinPart.c: how many choices aParts[3
 s32  fn_800CCEA0(Skin* pSkin);          // SkinPart.c: and aSets[3]
 
 // This file, in address order.
+void fn_80103920(void);
 int  fn_80104F7C(CrAPAsset* pAsset);
 void fn_80105188(UStreamObject* pObject);
 void fn_801051F4(UStreamObject* pObject);
@@ -26,6 +27,15 @@ int  fn_8010766C(MsgArg* pArg, char* sz);
 // uistudio.h has UIStudio* and const s32*, and game/frontend.h cannot be included with it).
 void fn_8016B09C(void* pHandler, int nMsg, int nArgs, MsgArg* pArgs);
 
+int fn_80103B28(int nAsset) {
+    CrAPAsset* pAsset = &lbl_80282460->pAssets[nAsset];
+
+    if (pAsset->nLockKind == 28) {
+        return pAsset->nLock;
+    }
+    return nAsset;
+}
+
 // The asset an asset takes its attributes from.
 CrAPAsset* fn_80103B4C(CrAPAsset* pAsset) {
     return fn_80104F68(fn_80103B28(fn_80104F7C(pAsset)));
@@ -39,8 +49,58 @@ u8 fn_80103B80(void) {
     return lbl_80282460->b14;
 }
 
+void fn_80103B8C(s8 n) {
+    lbl_80282460->n4 = n;
+    fn_80103920();
+}
+
 s8 fn_80103BB4(void) {
     return lbl_80282460->n4;
+}
+
+s8 fn_80103BC0(int nAsset) {
+    return lbl_80282460->pAssets[nAsset].n40;
+}
+
+// Empty the profile's slot of the asset.
+void fn_80103BD8(CrAPAsset* pAsset) {
+    SaveProfile* pProfile = fn_80077ACC();
+    s16 nSlot = pAsset->n2E;
+
+    if (nSlot >= 0 && nSlot < 53) {
+        pProfile->aAF80[nSlot] = -1;
+    }
+}
+
+// Put the asset in its slot of the profile.
+void fn_80103C2C(CrAPAsset* pAsset) {
+    SaveProfile* pProfile = fn_80077ACC();
+    s16 nSlot = pAsset->n2E;
+
+    if (nSlot >= 0 && nSlot < 53) {
+        pProfile->aAF80[nSlot] = fn_80104F7C(pAsset);
+    }
+}
+
+// The asset (the one it takes its attributes from) is the one in its slot of the profile.
+u8 fn_80103C98(CrAPAsset* pAsset) {
+    SaveProfile* pProfile = fn_80077ACC();
+    CrAPAsset* pBase = fn_80103B4C(pAsset);
+    s16 nSlot = pBase->n2E;
+
+    if (nSlot >= 0 && nSlot < 53) {
+        return pProfile->aAF80[nSlot] == fn_80104F7C(pBase);
+    }
+    return 0;
+}
+
+int fn_80103D14(s16 nSlot) {
+    SaveProfile* pProfile = fn_80077ACC();
+
+    if (nSlot >= 0 && nSlot < 53) {
+        return pProfile->aAF80[nSlot];
+    }
+    return -1;
 }
 
 // Save the created golfer's body skin entries in the profile.

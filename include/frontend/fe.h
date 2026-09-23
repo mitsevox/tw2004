@@ -230,6 +230,8 @@ int  fn_80103B28(int nAsset);           // the asset nAsset takes its attributes
                                         // or for lock kind 28 the asset its nLock names)
 CrAPAsset* fn_80103B4C(CrAPAsset* pAsset);  // the same, by asset
 u8   fn_80103B80(void);                 // the database's b14
+void fn_80103B8C(s8 n);                 // set the database's n4 (which assets are offered)
+s8   fn_80103BC0(int nAsset);           // an asset's n40
 s8   fn_80103BB4(void);                 // the database's n4
 int  fn_80103D14(s16 nSlot);            // the profile's aAF80[nSlot], an asset (-1 past slot 52)
 int  fn_801049C8(s16 nPart);
