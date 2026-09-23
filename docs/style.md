@@ -16,8 +16,10 @@ Files
   lines in plain English: which game mode or system, the main data it works on. "(our name)"
   marks names we chose; EA's file names are unknown. A unit named after its TW06 class says so
   instead: `// GameModeStableford.c (TW06's GameModeStableford): game mode 18, ...`.
-- **File names:** the TW06 class name when the code proves the match (`GameModeMatch.c`,
-  `GameModeStableford.c`), otherwise our own (`GameMode8.c`).
+- **File names**, strongest evidence first: EA's own name from an assert string in the binary
+  (`GoGolfCam.c`, header "(EA's name, from its asserts)"); a TW06 source file or class name when
+  the code proves the match (`GoTerrainCollision.c`, `GameModeStableford.c`); otherwise our own
+  (`GameMode8.c`, "(our name)").
 - **Order inside a file:** includes, then types local to the file, then `extern` data, then
   prototypes, then functions in address order (the order is fixed by the binary).
 - **Includes:** `golfer.h` (players, sessions, shared game types), `ball.h`, `physics.h` as needed.
@@ -59,9 +61,12 @@ Prototypes
 - **A function used by more than one file** is declared once, in the header of the system it
   belongs to (`golfer.h` for game and player functions for now).
 - **A prototype local to a file** is for functions only that file calls.
-- **An intentional mismatch** (a file must see a different parameter type to match, see
-  "Function calls and parameters" in `decomp-notes.md`) gets a comment on the prototype:
-  `// s8 here, int in golfer.h: the callers in this file sign-extend`.
+- **Headers:** `game.h` (game manager, rounds, modes, golfer states, sessions), `engine.h`
+  (memory, math, streams, views, events, sound, animation), `golfer.h` (players and golfers),
+  `ball.h` (ball and terrain).
+- **No per-file re-declaration with other types.** CodeWarrior rejects a second prototype whose
+  parameter types differ (even `int` vs `s32`) as "identifier redeclared". When one file's calls
+  need a different argument type to match, cast at the call site (`fn((u16)x)`) and say why.
 
 Matching tricks
 ---------------

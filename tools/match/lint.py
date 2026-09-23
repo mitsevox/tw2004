@@ -14,9 +14,12 @@ CHECKS = [
     ('alias-macro', re.compile(r'^#define\s+\w+\s+\(?(lbl|fn)_[0-9A-F]{8}\b')),
     ('tab', re.compile(r'\t')),
     ('trailing-space', re.compile(r'[ \t]+$')),
-    ('no-braces', re.compile(r'^\s*(if|for|while)\s*\(.*\)\s*(?!return\b|break;|continue;)[^{\s;][^{]*;\s*(//.*)?$')),
+    ('no-braces', re.compile(r'^\s*(if|for|while)\s*\(.*\)\s*[^{\s;][^{]*;\s*(//.*)?$')),
     ('commented-code', re.compile(r'^\s*//\s*([\w\[\]\.>-]+\s*[-+*/|&]?=[^=][^;]*|\w+\([^)]*\)|return\b[^;]*|(if|for|while)\s*\(.*\)\s*\{?)\s*;?\s*$')),
 ]
+# The statement after the condition is return/break/continue. Checked separately: a regex
+# lookahead after `\(.*\)` can backtrack to an inner parenthesis of the condition.
+EARLY_EXIT = re.compile(r'\)\s*(return\b[^;]*|break|continue);\s*(//.*)?$')
 
 
 def header_protos():
@@ -54,6 +57,8 @@ def lint(path, protos):
     for i, l in enumerate(lines, 1):
         l = l.rstrip('\r')
         for name, rx in CHECKS:
+            if name == 'no-braces' and EARLY_EXIT.search(l):
+                continue            # a one-line early exit is allowed (style.md, Formatting)
             if rx.search(l):
                 hits.append((i, name, l.strip()))
         if len(l) > 110:

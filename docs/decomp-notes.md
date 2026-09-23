@@ -120,6 +120,10 @@ The fixes that come up most often. Each points to its full entry below.
 
 ### Loops and unrolling
 
+- **[verified] Two tests on players n and n + 1 can be a two-pass loop.** When the second
+  address is `off + 0xEF8` added to the first, the source was `for (i = 0; i < 2; i++)` with an
+  `s32 i` (unrolled); `int i` recomputes `(n + 1) * 0xEF8` (91.5%). Golfer `Team_IsAllCPU`,
+  `Team_IsAllHuman`: 78.95% -> 100.
 - **[verified] CodeWarrior -O4,p loop shapes.** A byte/halfword copy loop written as
   `while (n > 7) { eight explicit copies through temporaries; p += 8; n -= 8; }` followed by
   `while (n--) *d++ = *s++;` comes out as: count = n >> 3 into `mtctr`, the block unrolled 2x with
@@ -229,6 +233,24 @@ The fixes that come up most often. Each points to its full entry below.
 
 ### Structs, arrays and pointers
 
+- **[verified] A global pointer written through, then used again, was copied to a local.**
+  `g->f68 = 0.0f; fn(..., g);` reloads `g` after the store; `p = g; p->f68 = 0.0f; fn(..., p);`
+  loads it once, like the original (GoGolfCam `fn_800C14B0`, 96.9% -> 100).
+- **[verified] A load the original does before a store to the same struct was a local.**
+  `n = p->n60; p->f68 = 0.0f; fn(n, p);` keeps the load first; reading `p->n60` in the call
+  moves it after the store (GoGolfCam `fn_800C0880`, 94.6% -> 100).
+- **[verified] A typed struct-pointer global indexes differently from a cast byte pointer.**
+  `extern Profile* gpSaveData; gpSaveData[n].f` gives `addis base; add; lwz off`;
+  `((Profile*)u8ptr)[n].f` gives `addis idx; addi; lwzx` (GameMode23 `fn_800F0428` 83.75% -> 100).
+- **[verified] `a[x - 1]` folds the -1 into the displacement; `n = x - 1; a[n]` keeps a `subi`.**
+  Per function: GameMode23 `fn_800EE064` needs the local, its neighbour `fn_800EFA9C` does not.
+- **[verified] Pointer-to-index with `mulhwu` is a byte difference divided by `sizeof`.**
+  `p - base` divides signed (`mulhw; srawi`); `((u8*)p - (u8*)base) / sizeof(T)` divides
+  unsigned (`mulhwu; srwi.`), because `sizeof` is unsigned (GoTerrainCollision `fn_80050BEC`,
+  82.69% -> 100).
+- **[verified] In a leaf loop, reading a field each time instead of a local copy moves the
+  volatile registers**, though the field is still loaded once (GoTerrainCollision
+  `Ter_CalcLowestPlayableWorldHeight`, 97.21% -> 98.69%, then exact by declaration order).
 - **[verified] `a[k] = x; k++;` and `a[k++] = x;` compile differently.** The split form gives
   walking pointers (`&a[k]` stepped by `addi 4`, and `&a[0]` kept for a later loop); `k++` in the
   index gives `stwx` with a scaled index; a `*p++ = x` walk gives one pointer. GameMode0
@@ -293,11 +315,19 @@ The fixes that come up most often. Each points to its full entry below.
 
 ### Types, casts and sign extension
 
+- **[verified] An enum-typed local holding 0 is not folded into an index multiply.** EA's
+  `PlayerNumber_t nPlayer = PLR_1_e; gpSaveData[nPlayer]` gives `li rX, 0; mullw`; a literal 0,
+  any integer local, a const global, an inline helper and `(Enum)0` all fold the multiply away
+  (GameMode24 `fn_800F0820`, 82.9% -> 100; 12 times in GameMode23). EA style, no fake-match
+  comment; the type is TW06's.
 - **[verified] Two neighbouring words handled with 64-bit operations are one `u64`.** When the
   code ORs, ANDs and tests two adjacent words together (`and`/`xor`/`or.` on both halves, an AND
   with `li -1` for the upper word), declare one `u64` field. Player 0xC48/0xC4C as two `s32`s
   could not match in any statement order; as `u64 uC48` GameMode8 `fn_800FAAB8` went 93.3% ->
   99.2%, then exact with statement order.
+- **[verified] Taking a field's address on a cast pointer reuses the base register.**
+  `((Ball*)gPlayers[n].ball)->vPrev` gives `addi r4, r3, 0x10` where the original computes it
+  afresh from `(f32*)(gPlayers[n].ball + 0x10)` (Swing `STATEFUNC_PreShotUpdate`, 96.14 -> 96.01).
 - **[verified] The ball position is read as bytes of the Player, not through a `Ball*`.**
   `*(f32*)(gPlayers[n].ball + 0)` / `+ 8` matches; `((Ball*)gPlayers[n].ball)->vPos[0]` and
   `((f32*)gPlayers[n].ball)[0]` add an `addi r3, r3, 0xa90` pointer temp (GameMode8
@@ -343,6 +373,19 @@ The fixes that come up most often. Each points to its full entry below.
 
 ### Function calls and parameters
 
+- **[verified] A redeclaration with different parameter types is an error.** `void f(int, s32*);
+  void f(int, int);` (also int vs s8, int vs long) gives "identifier redeclared", so a file that
+  includes the header cannot declare its own variant; cast at the call site instead.
+- **[verified] A function that leaves r3 alone before a call passes its own first parameter on**,
+  and a `clrlwi` before the call gives that parameter's type. GameModeBattle `fn_800E7ABC`:
+  `u8 fn(int a) { fn_800EA548(a); }` adds a `clrlwi`; `u8 fn(u8 bCheck)` is exact.
+- **[verified] A `u16` return stored into an `s16` costs an `extsh` at the caller; `s16` does not**
+  (GameMode5 `fn_800EC1E0`: `fn_800D2994` as `u16` drops 93.93 -> 92.96).
+- **[verified] m2c turns a register holding half of a constant into an extra argument.** When the
+  next call's argument register already holds `lis rN, 'PG'` for a later constant, m2c passes it
+  on. `UStream_RegisterHandler('PGAc', fn, 'PG  ')` was really two arguments: GameMode23
+  `fn_800EDE7C`, GameMode24 `fn_800F0518`, GameMode5 `fn_800EAE74` all went exact once it was
+  dropped. Check each extra argument m2c shows against the callee's definition.
 - **[verified] An unexplained `mr r3, r4` before the first call** means an unused first
   parameter: the function takes something in r3 it never reads (`fn_80051124(Ball*, f32, f32*)`).
 - **[verified] 64-bit arguments skip r4.** `fn(handle, 0, k)` sites where the original sets r5 and

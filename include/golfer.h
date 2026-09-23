@@ -644,6 +644,9 @@ u8   Controller_IsCPU(int nController);
 u8   Player_HasPad(int nPlayer);
 u8   Controller_IsPad(int nController);
 u8   Player_IsController8(int nPlayer);
+u8   Player_OnTee(int nPlayer);
+u8   Player_IsHoled(int nPlayer);
+u8   Team_IsAllHuman(int nTeam);        // team 0 is players 0 and 1, team 1 players 2 and 3
 void AI_PlanShot(int nPlayer, f32* pTarget);
 u8   AI_GreenTowardPin(int nPlayer, f32 fDist);
 u8   AI_RehearseShot(int nPlayer, f32* pOutDist2, u8 bFast, f32 fTolerance);

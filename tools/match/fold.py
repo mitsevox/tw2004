@@ -33,7 +33,10 @@ miss = [d for d in defs if d not in ex]
 print(len(defs), 'defined, not exact:', miss, 'total fns', len(u['functions']))
 if miss or not defs:
     print('NOT deleting sweeps'); sys.exit(1)
-print(run('git rm -q ' + ' '.join('src/' + s for s in sweeps)).stderr.strip())
+rm = run('git rm -q ' + ' '.join('src/' + s for s in sweeps))
+if rm.returncode != 0:
+    # e.g. a sweep file has local changes: someone edited it, so it is not deleted unchecked
+    print('git rm failed, nothing committed:', rm.stderr.strip()); sys.exit(1)
 print(run(f'git add src/{name}.c config/GW4E69/splits.txt configure.py').stderr.strip())
 lo = re.search(r'start:(0x\w+) end:(0x\w+)',
                (ROOT / 'config/GW4E69/splits.txt').read_text().split(name + '.c:')[1])

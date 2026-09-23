@@ -7,6 +7,8 @@
 
 #include "golfer.h"
 #include "ball.h"
+#include "game.h"
+#include "engine.h"
 
 // The target list (see GameMode10.c): up to lbl_80282360 points (w = 1).
 extern f32 lbl_80211D38[][4];
@@ -43,15 +45,7 @@ f32   Vec_Distance(f32* pA, f32* pB);
 int   fn_8001D324(int n);
 void  Character_SetPosition(int nHandle, f32* pPos, int a);
 void  Shot_Prepare(int nPlayer, u8 bNotify);
-void  fn_8001C804(int nPlayer, int a, int b);
-void  fn_800957D8(int nHandle);
-void  fn_80095744(int nHandle, int nAnim);
-void  fn_80062C38(void);
 void  fn_800A631C(void);
-void  fn_800A7664();
-s32   fn_800F7DE8();
-s32   fn_800F3828();
-s32   fn_800F48C4();
 s32   fn_800F37F8(s32);
 s32   fn_800F59CC(s32);
 s32   fn_800F6A00(s32);
@@ -61,10 +55,7 @@ s32   fn_800F59D4(s32);
 s32   fn_800F80A0(s32);
 s32   fn_800F6A34(s32);
 
-void fn_800F1ABC(int nPlayer, s8 n);
-void fn_800F2030(void);
 u8   fn_800F2358(int nPlayer);
-void fn_800F2958(s32 p0, s32 p1);
 
 // Sort the targets by distance from the tee, nearest first.
 void fn_800F19D4(void) {
@@ -358,14 +349,14 @@ s32 fn_800F2578(void) {
     return 0;
 }
 
-void fn_800F263C(s32 p0) {
-    fn_800F2958((p0 & 0xFFFF), 1);
+void fn_800F263C(s32 nMsg) {
+    fn_800F2958((nMsg & 0xFFFF), 1);
 }
 
-void fn_800F2664(void) {
+void fn_800F2664(int nPlayer) {
 }
 
-void fn_800F2668(void) {
+void fn_800F2668(int nPlayer) {
 }
 
 // Scale n by table entry i; which table depends on fn_80015464 (0..2).
@@ -434,6 +425,6 @@ s32 fn_800F2810(s32 n) {
     return 4;
 }
 
-void fn_800F2958(s32 p0, s32 p1) {
-    fn_800A7664(7, p0, p1);
+void fn_800F2958(s32 nMsg, s32 a) {
+    fn_800A7664(7, nMsg, a);
 }

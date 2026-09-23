@@ -2,24 +2,21 @@
 // each, loaded from the 'PGAc' stream object), with the player's results kept in the save profile
 // (+0xB634..): "Did Not Play", "Cut", a finishing place, "Tied (%d players)".
 
-#include "game_types.h"
+#include "golfer.h"
+#include "game.h"
+#include "engine.h"
 
-void fn_800EDE78(void);
-void UStream_UnregisterHandler();
-void fn_8000E790();
 void fn_800EDEE8(void);
-void fn_800EDF34(s32 p0);
-void fn_800EDF60(s32 p0);
-void fn_800EDF90(s32 p0);
-extern s32 gpGame;
+void fn_800EDF34(UStreamObject* pObject);
+void fn_800EDF60(UStreamObject* pObject);
+void fn_800EDF90(UStreamObject* pObject);
 extern s32 gpSaveData;
 void fn_800EE064(void);
 extern u8 lbl_8028233C;
-u8 fn_800EE470(void);
 extern u8 lbl_80205F30[];
 s32 fn_800EE8B0(void);
 u8* fn_800EE8B8(void);
-void fn_80119934();
+void fn_80119934(int a);
 void fn_800EF294(void);
 s32 fn_800EF834(void);
 s32 fn_800EFB88(void);
@@ -28,7 +25,6 @@ s32 fn_800EFDFC(s32 p0);
 u8* fn_800EFA70(s32 i);
 s32 fn_800EFE3C(s32 i);
 u8* fn_800EFE60(s32 p0);
-s32 fn_801197CC();
 void fn_800F009C(void);
 u8 fn_8011908C(s32, s32);
 s32 fn_8011937C(s32, s32, u8);
@@ -74,30 +70,20 @@ typedef struct Profile {
 #define SEASON ((LessonSave*)((u8*)gpSaveData + 0xB640))   // profile 0's results
 
 extern u8  lbl_80281670[];
-extern u8  gSession[];
 extern s32 lbl_80282338;
 s32  fn_801190D8(s32 a);
-void fn_800E4364(u32 nQueue, s32 a, s32 b, s32 c);
 s32  fn_800EFBD0(s32 i);
 u8   fn_800EF83C(u16 nDate, s32* pId, s32* pRound);
 void fn_800D2714(u16* pDate, s32* pDay, s32* pMonth, s32* pYear);
 s32  fn_8011A7C8(s32 nPlayer, s32 nHole);
 s32  fn_80119588(s32 a);
 s32  fn_800E1904(s32 nPlayer, s32 a);
-s32  Game_CurHoleIndex(void);
-extern u8 gPlayers[];
-char* strcpy(char* pDst, const char* pSrc);
 int   sprintf(char* pDst, const char* pFmt, ...);
-int   UStream_RegisterHandler();
-u32   fn_8000E81C(void* pObj, void** ppData);
-void* fn_800951A0(u32 nSize, int nAlign, int a);
-void  Mem_cpy(void* pDst, void* pSrc, int nBytes);   // memcpy
-void  fn_80009E70(void* p);                 // free
 s32   fn_80118684(s32 a);
 char* fn_80118E30(s32 a, s32 b);
 s32   fn_80119118(s32 a, s32 b);
 s32   fn_801197CC(s32 a, s32 b);
-void  fn_800EDFC0(void* pObj);
+void  fn_800EDFC0(UStreamObject* pObject);
 s32  fn_800F02A8(void);
 s32  fn_800EFA9C(s32 i);
 
@@ -105,22 +91,22 @@ void fn_800EDE78(void) {
 }
 
 void fn_800EDEE8(void) {
-    UStream_UnregisterHandler(1346847075);
-    UStream_UnregisterHandler(1346847092);
-    UStream_UnregisterHandler(1346847088);
-    UStream_UnregisterHandler(1346847086);
+    UStream_UnregisterHandler('PGAc');
+    UStream_UnregisterHandler('PGAt');
+    UStream_UnregisterHandler('PGAp');
+    UStream_UnregisterHandler('PGAn');
 }
 
-void fn_800EDF34(s32 p0) {
-    fn_8000E790(p0, 3100, LESSON_BYTES);
+void fn_800EDF34(UStreamObject* pObject) {
+    fn_8000E790(pObject, 3100, LESSON_BYTES);
 }
 
-void fn_800EDF60(s32 p0) {
-    fn_8000E790(p0, 2604, (LESSON_BYTES + 0xC1C));
+void fn_800EDF60(UStreamObject* pObject) {
+    fn_8000E790(pObject, 2604, (LESSON_BYTES + 0xC1C));
 }
 
-void fn_800EDF90(s32 p0) {
-    fn_8000E790(p0, 132, (LESSON_BYTES + 0x6FC8));
+void fn_800EDF90(UStreamObject* pObject) {
+    fn_8000E790(pObject, 132, (LESSON_BYTES + 0x6FC8));
 }
 
 void fn_800EE064(void) {
@@ -179,10 +165,10 @@ void fn_800F018C(void) {
 
 // The mode ends: one player back, and the options it changed come back.
 void fn_800EE02C(void) {
-    ((s32*)gpGame)[0xC / 4] = 1;
-    ((s32*)gpGame)[0x10 / 4] = 1;
-    *(s32*)(gSession + 0xE84) = *(s32*)lbl_80281670;
-    *(s32*)(gSession + 0xE88) = lbl_80282338;
+    gpGame->nC = 1;
+    gpGame->n10 = 1;
+    SESSION_OPTIONS->unkC = *(s32*)lbl_80281670;
+    SESSION_OPTIONS->nWind = lbl_80282338;
     lbl_8028233C = 0;
 }
 
@@ -315,20 +301,20 @@ s32 fn_800F0428(s32 n) {
 }
 
 void fn_800EDE7C(void) {
-    UStream_RegisterHandler('PGAc', fn_800EDF34, 'PG\0\0');
-    UStream_RegisterHandler('PGAt', fn_800EDF60, 'PG\0\0');
-    UStream_RegisterHandler('PGAp', fn_800EDF90, 'PG\0\0');
-    UStream_RegisterHandler('PGAn', fn_800EDFC0, 'PG\0\0');
+    UStream_RegisterHandler('PGAc', fn_800EDF34);
+    UStream_RegisterHandler('PGAt', fn_800EDF60);
+    UStream_RegisterHandler('PGAp', fn_800EDF90);
+    UStream_RegisterHandler('PGAn', fn_800EDFC0);
 }
 
 // The 'PGAn' object: the names block is copied out.
-void fn_800EDFC0(void* pObj) {
+void fn_800EDFC0(UStreamObject* pObject) {
     void* pData;
-    u32 nSize = fn_8000E81C(pObj, &pData);
+    u32 nSize = fn_8000E81C(pObject, &pData);
     if (nSize) {
         *(void**)(LESSON_BYTES + 0x704C) = fn_800951A0(nSize, 0x10, 1);
         Mem_cpy(*(void**)(LESSON_BYTES + 0x704C), pData, nSize);
-        fn_80009E70(pObj);
+        fn_80009E70(pObject);
     }
 }
 
@@ -357,19 +343,18 @@ void fn_800F01CC(s32 i, char* pDst) {
     }
 }
 
-#define STROKES(n, h) (*(s32*)(gPlayers + (n) * 0xEF8 + (h) * 4 + 0x154))
-
 // Strokes behind the leader (in a playoff, on this hole).
 s32 fn_800EE778(s32 nPlayer) {
-    if (((u8*)gpGame)[0xD4]) {
-        return fn_8011A7C8(nPlayer, Game_CurHoleIndex()) - STROKES(nPlayer, Game_CurHoleIndex());
+    if (gpGame->bD4) {
+        return fn_8011A7C8(nPlayer, Game_CurHoleIndex()) - gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
     }
     return fn_80119588(1) - fn_800E1904(nPlayer, 0);
 }
 
 s32 fn_800EE810(s32 nPlayer) {
-    if (((u8*)gpGame)[0xD4]) {
-        return fn_8011A7C8(nPlayer, Game_CurHoleIndex()) - (STROKES(nPlayer, Game_CurHoleIndex()) + 1);
+    if (gpGame->bD4) {
+        return fn_8011A7C8(nPlayer, Game_CurHoleIndex()) -
+               (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1);
     }
     return fn_80119588(1) - (fn_800E1904(nPlayer, 1) + 1);
 }
@@ -377,8 +362,9 @@ s32 fn_800EE810(s32 nPlayer) {
 // Whether the player trails the leader by more than one stroke.
 u8 fn_800EE5B4(s32 nPlayer) {
     u8 bBehind;
-    if (((u8*)gpGame)[0xD4]) {
-        return STROKES(nPlayer, Game_CurHoleIndex()) + 1 < fn_8011A7C8(nPlayer, Game_CurHoleIndex());
+    if (gpGame->bD4) {
+        return gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1 <
+               fn_8011A7C8(nPlayer, Game_CurHoleIndex());
     }
     bBehind = 0;
     if (fn_800E1904(nPlayer, 0) >= fn_80119588(1)) {
