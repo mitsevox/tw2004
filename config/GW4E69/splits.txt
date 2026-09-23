@@ -90,32 +90,14 @@ unsorted/sweep_800090A0.c:
 unsorted/sweep_800095F0.c:
 	.text       start:0x800095F0 end:0x80009680
 
-unsorted/sweep_8000977C.c:
-	.text       start:0x8000977C end:0x800097C4
-
-unsorted/sweep_800097C4.c:
-	.text       start:0x800097C4 end:0x800097CC
-
-unsorted/sweep_8000989C.c:
-	.text       start:0x8000989C end:0x80009918
-
-unsorted/sweep_80009918.c:
-	.text       start:0x80009918 end:0x8000991C
-
-unsorted/sweep_8000A0AC.c:
-	.text       start:0x8000A0AC end:0x8000A0E8
+StaticMemory.c:
+	.text       start:0x8000977C end:0x8000A0E8
 
 unsorted/sweep_8000A0E8.c:
 	.text       start:0x8000A0E8 end:0x8000A194
 
 UMemPool.c:
-	.text       start:0x8000A194 end:0x8000B058
-
-unsorted/sweep_8000B058.c:
-	.text       start:0x8000B058 end:0x8000B078
-
-unsorted/sweep_8000B078.c:
-	.text       start:0x8000B078 end:0x8000B0D4
+	.text       start:0x8000A194 end:0x8000B130
 
 urandom.c:
 	.text       start:0x8000B130 end:0x8000B46C
@@ -744,104 +726,23 @@ unsorted/sweep_800676AC.c:
 unsorted/sweep_800676E8.c:
 	.text       start:0x800676E8 end:0x80067710
 
-unsorted/sweep_80069428.c:
-	.text       start:0x80069428 end:0x80069498
-
-unsorted/sweep_80069498.c:
-	.text       start:0x80069498 end:0x800694A0
-
-unsorted/sweep_8006A89C.c:
-	.text       start:0x8006A89C end:0x8006A8D4
-
-unsorted/sweep_8006A8D4.c:
-	.text       start:0x8006A8D4 end:0x8006A964
+target.c:
+	.text       start:0x80067B80 end:0x8006AA70
 
 emotion.c:
 	.text       start:0x8006AA70 end:0x8006BED4
 
-unsorted/sweep_8006BED4.c:
-	.text       start:0x8006BED4 end:0x8006BF4C
-
-unsorted/sweep_8006BF4C.c:
-	.text       start:0x8006BF4C end:0x8006BF60
-
 Replay.c:
-	.text       start:0x8006BF60 end:0x8006C300
+	.text       start:0x8006BED4 end:0x8006C630
 
-unsorted/sweep_8006C630.c:
-	.text       start:0x8006C630 end:0x8006C63C
-
-unsorted/sweep_8006C63C.c:
-	.text       start:0x8006C63C end:0x8006C69C
-
-unsorted/sweep_8006C6F0.c:
-	.text       start:0x8006C6F0 end:0x8006C7A8
-
-unsorted/sweep_8006C7A8.c:
-	.text       start:0x8006C7A8 end:0x8006C8EC
-
-unsorted/sweep_8006CB2C.c:
-	.text       start:0x8006CB2C end:0x8006CBDC
-
-unsorted/sweep_8006CFC8.c:
-	.text       start:0x8006CFC8 end:0x8006D01C
-
-unsorted/sweep_8006D7E8.c:
-	.text       start:0x8006D7E8 end:0x8006D838
-
-unsorted/sweep_8006D838.c:
-	.text       start:0x8006D838 end:0x8006D8E8
-
-unsorted/sweep_8006DC20.c:
-	.text       start:0x8006DC20 end:0x8006DC34
-
-unsorted/sweep_8006DC34.c:
-	.text       start:0x8006DC34 end:0x8006DC4C
-
-unsorted/sweep_8006DC4C.c:
-	.text       start:0x8006DC4C end:0x8006DCA0
-
-unsorted/sweep_8006DCA0.c:
-	.text       start:0x8006DCA0 end:0x8006DCA8
-
-unsorted/sweep_8006DD44.c:
-	.text       start:0x8006DD44 end:0x8006DD84
-
-unsorted/sweep_8006DD84.c:
-	.text       start:0x8006DD84 end:0x8006DDA8
-
-unsorted/sweep_8006DDA8.c:
-	.text       start:0x8006DDA8 end:0x8006DDE8
-
-unsorted/sweep_8006DE28.c:
-	.text       start:0x8006DE28 end:0x8006DE68
-
-unsorted/sweep_8006DEA8.c:
-	.text       start:0x8006DEA8 end:0x8006DEE8
-
-unsorted/sweep_8006DF28.c:
-	.text       start:0x8006DF28 end:0x8006DF68
-
-unsorted/sweep_8006DFA8.c:
-	.text       start:0x8006DFA8 end:0x8006DFE8
-
-unsorted/sweep_8006E028.c:
-	.text       start:0x8006E028 end:0x8006E068
-
-unsorted/sweep_8006E0A8.c:
-	.text       start:0x8006E0A8 end:0x8006E0C0
-
-unsorted/sweep_8006E0F8.c:
-	.text       start:0x8006E0F8 end:0x8006E118
+gomainloop.c:
+	.text       start:0x8006C630 end:0x8006E150
 
 GoFrameBuf.c:
 	.text       start:0x8006E150 end:0x8006E2A4
 
 GoLighting.c:
-	.text       start:0x8006E2A4 end:0x8006EFB8
-
-unsorted/sweep_8006F144.c:
-	.text       start:0x8006F144 end:0x8006F154
+	.text       start:0x8006E2A4 end:0x8006F154
 
 unsorted/sweep_8006F400.c:
 	.text       start:0x8006F400 end:0x8006F430
@@ -874,13 +775,7 @@ unsorted/sweep_8006F64C.c:
 	.text       start:0x8006F64C end:0x8006F650
 
 GoShaderObjectContainer_OBFData_Gc.c:
-	.text       start:0x8006F650 end:0x8006FDCC
-
-unsorted/sweep_8006FDCC.c:
-	.text       start:0x8006FDCC end:0x8006FDD4
-
-unsorted/sweep_8006FED4.c:
-	.text       start:0x8006FED4 end:0x8006FF2C
+	.text       start:0x8006F650 end:0x8006FF2C
 
 unsorted/sweep_8006FF2C.c:
 	.text       start:0x8006FF2C end:0x8006FF80
@@ -949,82 +844,19 @@ unsorted/sweep_80070FF0.c:
 	.text       start:0x80070FF0 end:0x80071028
 
 GoShaderObject_PrelitUVAnimation_Gc.c:
-	.text       start:0x8007110C end:0x80071574
+	.text       start:0x8007110C end:0x80071AD0
 
-unsorted/sweep_80071574.c:
-	.text       start:0x80071574 end:0x80071578
-
-unsorted/sweep_80071578.c:
-	.text       start:0x80071578 end:0x800715D0
-
-unsorted/sweep_800715D0.c:
-	.text       start:0x800715D0 end:0x80071624
-
-unsorted/sweep_80071624.c:
-	.text       start:0x80071624 end:0x80071628
-
-unsorted/sweep_80071628.c:
-	.text       start:0x80071628 end:0x80071680
-
-unsorted/sweep_80071680.c:
-	.text       start:0x80071680 end:0x800716D4
-
-unsorted/sweep_800716D4.c:
-	.text       start:0x800716D4 end:0x800717AC
-
-unsorted/sweep_80071828.c:
-	.text       start:0x80071828 end:0x80071850
-
-unsorted/sweep_80071850.c:
-	.text       start:0x80071850 end:0x8007185C
-
-unsorted/sweep_8007185C.c:
-	.text       start:0x8007185C end:0x800718C4
-
-unsorted/sweep_800718C4.c:
-	.text       start:0x800718C4 end:0x800718E4
-
-unsorted/sweep_800718E4.c:
-	.text       start:0x800718E4 end:0x8007190C
-
-unsorted/sweep_8007190C.c:
-	.text       start:0x8007190C end:0x80071914
-
-unsorted/sweep_80071A14.c:
-	.text       start:0x80071A14 end:0x80071A54
-
-unsorted/sweep_800725BC.c:
-	.text       start:0x800725BC end:0x8007260C
-
-unsorted/sweep_8007325C.c:
-	.text       start:0x8007325C end:0x8007326C
-
-unsorted/sweep_8007326C.c:
-	.text       start:0x8007326C end:0x8007327C
-
-unsorted/sweep_8007327C.c:
-	.text       start:0x8007327C end:0x800732B8
-
-unsorted/sweep_800732B8.c:
-	.text       start:0x800732B8 end:0x800732F4
-
-unsorted/sweep_800734A0.c:
-	.text       start:0x800734A0 end:0x800734D0
+animblender.c:
+	.text       start:0x80071AD0 end:0x80073878
 
 GoShaderObjectCommon_ShaderObjectsData_Gc.c:
-	.text       start:0x80074BE0 end:0x8007524C
-
-unsorted/sweep_8007524C.c:
-	.text       start:0x8007524C end:0x80075250
-
-unsorted/sweep_80075250.c:
-	.text       start:0x80075250 end:0x80075280
+	.text       start:0x80073878 end:0x80075280
 
 LLVideo.c:
 	.text       start:0x80075280 end:0x80076158
 
-unsorted/sweep_800763B4.c:
-	.text       start:0x800763B4 end:0x800763BC
+ByteSwap.c:
+	.text       start:0x80076158 end:0x800763BC
 
 GoCamera.c:
 	.text       start:0x800763BC end:0x80076A54
@@ -1035,20 +867,8 @@ GoViewport.c:
 GoShaderObjectCommon_TexAnimManager_Gc.c:
 	.text       start:0x80076B7C end:0x80076E48
 
-unsorted/sweep_80076EEC.c:
-	.text       start:0x80076EEC end:0x80076F20
-
-unsorted/sweep_80076F20.c:
-	.text       start:0x80076F20 end:0x80076F24
-
-unsorted/sweep_80076F54.c:
-	.text       start:0x80076F54 end:0x80076F58
-
-unsorted/sweep_80076F58.c:
-	.text       start:0x80076F58 end:0x80076F80
-
 FE_Manager.c:
-	.text       start:0x80076F80 end:0x80079E44
+	.text       start:0x80076E48 end:0x80079E6C
 	.rodata     start:0x80183858 end:0x80183870
 	.data       start:0x80189560 end:0x801896F0
 	.bss        start:0x801D7148 end:0x801D77A8
@@ -1056,743 +876,14 @@ FE_Manager.c:
 	.sbss       start:0x80281EC8 end:0x80281ED8
 	.sdata2     start:0x80283AC0 end:0x80283AD8
 
-unsorted/sweep_80079E44.c:
-	.text       start:0x80079E44 end:0x80079E6C
-
-unsorted/sweep_8007BBA0.c:
-	.text       start:0x8007BBA0 end:0x8007BCA0
-
-unsorted/sweep_8007BCA0.c:
-	.text       start:0x8007BCA0 end:0x8007BCC4
-
-unsorted/sweep_8007BD18.c:
-	.text       start:0x8007BD18 end:0x8007BD1C
-
-unsorted/sweep_8007BD1C.c:
-	.text       start:0x8007BD1C end:0x8007BDAC
-
-unsorted/sweep_8007BDFC.c:
-	.text       start:0x8007BDFC end:0x8007BE28
-
-unsorted/sweep_8007BEEC.c:
-	.text       start:0x8007BEEC end:0x8007BEF0
-
-unsorted/sweep_8007C12C.c:
-	.text       start:0x8007C12C end:0x8007C17C
-
-unsorted/sweep_8007C17C.c:
-	.text       start:0x8007C17C end:0x8007C190
-
-unsorted/sweep_8007C218.c:
-	.text       start:0x8007C218 end:0x8007C248
-
-unsorted/sweep_8007C248.c:
-	.text       start:0x8007C248 end:0x8007C254
-
-unsorted/sweep_8007C254.c:
-	.text       start:0x8007C254 end:0x8007C2A0
-
-unsorted/sweep_8007C330.c:
-	.text       start:0x8007C330 end:0x8007C370
-
-unsorted/sweep_8007C488.c:
-	.text       start:0x8007C488 end:0x8007C48C
-
-unsorted/sweep_8007C48C.c:
-	.text       start:0x8007C48C end:0x8007C4B8
-
-unsorted/sweep_8007C4B8.c:
-	.text       start:0x8007C4B8 end:0x8007C4F8
-
-unsorted/sweep_8007C698.c:
-	.text       start:0x8007C698 end:0x8007C6E4
-
-unsorted/sweep_8007C784.c:
-	.text       start:0x8007C784 end:0x8007C79C
-
-unsorted/sweep_8007C79C.c:
-	.text       start:0x8007C79C end:0x8007C7AC
-
-unsorted/sweep_8007C7AC.c:
-	.text       start:0x8007C7AC end:0x8007C7B0
-
-unsorted/sweep_8007C7B0.c:
-	.text       start:0x8007C7B0 end:0x8007C7EC
-
-unsorted/sweep_8007C94C.c:
-	.text       start:0x8007C94C end:0x8007C950
-
-unsorted/sweep_8007C950.c:
-	.text       start:0x8007C950 end:0x8007C988
-
-unsorted/sweep_8007C988.c:
-	.text       start:0x8007C988 end:0x8007C9A4
-
-unsorted/sweep_8007CD58.c:
-	.text       start:0x8007CD58 end:0x8007CD98
-
-unsorted/sweep_8007CDF0.c:
-	.text       start:0x8007CDF0 end:0x8007CDF4
-
-unsorted/sweep_8007CDF4.c:
-	.text       start:0x8007CDF4 end:0x8007CE1C
-
-unsorted/sweep_8007CE1C.c:
-	.text       start:0x8007CE1C end:0x8007CE20
-
-unsorted/sweep_8007CE20.c:
-	.text       start:0x8007CE20 end:0x8007CE58
-
-unsorted/sweep_8007CE58.c:
-	.text       start:0x8007CE58 end:0x8007CE7C
-
-unsorted/sweep_8007D25C.c:
-	.text       start:0x8007D25C end:0x8007D270
-
-unsorted/sweep_8007D270.c:
-	.text       start:0x8007D270 end:0x8007D2A4
-
-unsorted/sweep_8007D2D0.c:
-	.text       start:0x8007D2D0 end:0x8007D2D4
-
-unsorted/sweep_8007D380.c:
-	.text       start:0x8007D380 end:0x8007D3B4
-
-unsorted/sweep_8007D3B4.c:
-	.text       start:0x8007D3B4 end:0x8007D3D8
-
-unsorted/sweep_8007D3D8.c:
-	.text       start:0x8007D3D8 end:0x8007D408
-
-unsorted/sweep_8007D408.c:
-	.text       start:0x8007D408 end:0x8007D428
-
-unsorted/sweep_8007D6D8.c:
-	.text       start:0x8007D6D8 end:0x8007D6E0
-
-unsorted/sweep_8007D6E0.c:
-	.text       start:0x8007D6E0 end:0x8007D708
-
-unsorted/sweep_8007D76C.c:
-	.text       start:0x8007D76C end:0x8007D7A0
-
-unsorted/sweep_8007D7E4.c:
-	.text       start:0x8007D7E4 end:0x8007D810
-
-unsorted/sweep_8007D924.c:
-	.text       start:0x8007D924 end:0x8007D938
-
-unsorted/sweep_8007D938.c:
-	.text       start:0x8007D938 end:0x8007D964
-
-unsorted/sweep_8007D964.c:
-	.text       start:0x8007D964 end:0x8007D968
-
-unsorted/sweep_8007D9D0.c:
-	.text       start:0x8007D9D0 end:0x8007D9E4
-
-unsorted/sweep_8007DAB0.c:
-	.text       start:0x8007DAB0 end:0x8007DAD0
-
-unsorted/sweep_8007DAD0.c:
-	.text       start:0x8007DAD0 end:0x8007DAD4
-
-unsorted/sweep_8007DAD4.c:
-	.text       start:0x8007DAD4 end:0x8007DAE8
-
-unsorted/sweep_8007DB28.c:
-	.text       start:0x8007DB28 end:0x8007DB3C
-
-unsorted/sweep_8007E0BC.c:
-	.text       start:0x8007E0BC end:0x8007E0D0
-
-unsorted/sweep_8007E0D0.c:
-	.text       start:0x8007E0D0 end:0x8007E0F8
-
-unsorted/sweep_8007E194.c:
-	.text       start:0x8007E194 end:0x8007E200
-
-unsorted/sweep_8007E200.c:
-	.text       start:0x8007E200 end:0x8007E204
-
-unsorted/sweep_8007E288.c:
-	.text       start:0x8007E288 end:0x8007E28C
-
-unsorted/sweep_8007E354.c:
-	.text       start:0x8007E354 end:0x8007E358
-
-unsorted/sweep_8007E51C.c:
-	.text       start:0x8007E51C end:0x8007E67C
-
-unsorted/sweep_8007E744.c:
-	.text       start:0x8007E744 end:0x8007E74C
-
-unsorted/sweep_8007E798.c:
-	.text       start:0x8007E798 end:0x8007E79C
-
-unsorted/sweep_8007E85C.c:
-	.text       start:0x8007E85C end:0x8007E8B4
-
-unsorted/sweep_8007E8B4.c:
-	.text       start:0x8007E8B4 end:0x8007E8C4
-
-unsorted/sweep_8007E8C4.c:
-	.text       start:0x8007E8C4 end:0x8007E904
-
-unsorted/sweep_8007E92C.c:
-	.text       start:0x8007E92C end:0x8007E93C
-
-unsorted/sweep_8007E9A0.c:
-	.text       start:0x8007E9A0 end:0x8007E9A8
-
-unsorted/sweep_8007E9A8.c:
-	.text       start:0x8007E9A8 end:0x8007E9BC
-
-unsorted/sweep_8007EE7C.c:
-	.text       start:0x8007EE7C end:0x8007EE80
-
-unsorted/sweep_8007EE80.c:
-	.text       start:0x8007EE80 end:0x8007EE90
-
-unsorted/sweep_8007EF9C.c:
-	.text       start:0x8007EF9C end:0x8007EFA0
-
-unsorted/sweep_8007F088.c:
-	.text       start:0x8007F088 end:0x8007F0D0
-
-unsorted/sweep_8007FCC0.c:
-	.text       start:0x8007FCC0 end:0x8007FCE8
-
-unsorted/sweep_8007FEAC.c:
-	.text       start:0x8007FEAC end:0x8007FED8
-
-unsorted/sweep_8007FED8.c:
-	.text       start:0x8007FED8 end:0x8007FEEC
-
-unsorted/sweep_8007FF3C.c:
-	.text       start:0x8007FF3C end:0x8007FF4C
-
-unsorted/sweep_8008017C.c:
-	.text       start:0x8008017C end:0x800801C0
-
-unsorted/sweep_800801C0.c:
-	.text       start:0x800801C0 end:0x800801D4
-
-unsorted/sweep_800801D4.c:
-	.text       start:0x800801D4 end:0x80080208
-
-unsorted/sweep_80080300.c:
-	.text       start:0x80080300 end:0x80080304
-
-unsorted/sweep_80080358.c:
-	.text       start:0x80080358 end:0x80080388
-
-unsorted/sweep_800804D8.c:
-	.text       start:0x800804D8 end:0x800804E4
-
-unsorted/sweep_800804E4.c:
-	.text       start:0x800804E4 end:0x8008052C
-
-unsorted/sweep_800805C4.c:
-	.text       start:0x800805C4 end:0x800805F0
-
-unsorted/sweep_800805F0.c:
-	.text       start:0x800805F0 end:0x800805F4
-
-unsorted/sweep_800807D0.c:
-	.text       start:0x800807D0 end:0x800807DC
-
-unsorted/sweep_80080AD0.c:
-	.text       start:0x80080AD0 end:0x80080AE8
-
-unsorted/sweep_80080C60.c:
-	.text       start:0x80080C60 end:0x80080CA8
-
-unsorted/sweep_80080CA8.c:
-	.text       start:0x80080CA8 end:0x80080CC8
-
-unsorted/sweep_800819FC.c:
-	.text       start:0x800819FC end:0x80081A54
-
-unsorted/sweep_80081BD4.c:
-	.text       start:0x80081BD4 end:0x80081C18
-
-unsorted/sweep_80081CF8.c:
-	.text       start:0x80081CF8 end:0x80081CFC
-
-unsorted/sweep_80081F98.c:
-	.text       start:0x80081F98 end:0x80081FBC
-
-unsorted/sweep_80082608.c:
-	.text       start:0x80082608 end:0x80082620
-
-unsorted/sweep_8008266C.c:
-	.text       start:0x8008266C end:0x80082680
-
-unsorted/sweep_80082680.c:
-	.text       start:0x80082680 end:0x800827D0
-
-unsorted/sweep_80082800.c:
-	.text       start:0x80082800 end:0x8008281C
-
-unsorted/sweep_8008281C.c:
-	.text       start:0x8008281C end:0x80082828
-
-unsorted/sweep_80082928.c:
-	.text       start:0x80082928 end:0x8008293C
-
-unsorted/sweep_8008293C.c:
-	.text       start:0x8008293C end:0x80082978
-
-unsorted/sweep_80082978.c:
-	.text       start:0x80082978 end:0x80082980
-
-unsorted/sweep_80082980.c:
-	.text       start:0x80082980 end:0x8008299C
-
-unsorted/sweep_800829D4.c:
-	.text       start:0x800829D4 end:0x800829EC
-
-unsorted/sweep_800829EC.c:
-	.text       start:0x800829EC end:0x80082A10
-
-unsorted/sweep_80082A10.c:
-	.text       start:0x80082A10 end:0x80082A44
-
-unsorted/sweep_80082A44.c:
-	.text       start:0x80082A44 end:0x80082A50
-
-unsorted/sweep_80082C74.c:
-	.text       start:0x80082C74 end:0x80082CA4
-
-unsorted/sweep_80082CA4.c:
-	.text       start:0x80082CA4 end:0x80082CA8
-
-unsorted/sweep_80082CA8.c:
-	.text       start:0x80082CA8 end:0x80082CDC
-
-unsorted/sweep_80082CDC.c:
-	.text       start:0x80082CDC end:0x80082D14
-
-unsorted/sweep_80082D98.c:
-	.text       start:0x80082D98 end:0x80082DA8
-
-unsorted/sweep_80082DBC.c:
-	.text       start:0x80082DBC end:0x80082E10
-
-unsorted/sweep_80082E10.c:
-	.text       start:0x80082E10 end:0x80082E5C
-
-unsorted/sweep_80083354.c:
-	.text       start:0x80083354 end:0x80083358
-
-unsorted/sweep_80083358.c:
-	.text       start:0x80083358 end:0x800833A4
-
-unsorted/sweep_800833A4.c:
-	.text       start:0x800833A4 end:0x800833D0
-
-unsorted/sweep_80083430.c:
-	.text       start:0x80083430 end:0x80083480
-
-unsorted/sweep_80083480.c:
-	.text       start:0x80083480 end:0x800834A8
-
-unsorted/sweep_800834A8.c:
-	.text       start:0x800834A8 end:0x800834DC
-
-unsorted/sweep_800834DC.c:
-	.text       start:0x800834DC end:0x800834E8
-
-unsorted/sweep_800835B8.c:
-	.text       start:0x800835B8 end:0x800835D4
-
-unsorted/sweep_80083890.c:
-	.text       start:0x80083890 end:0x800838C4
-
-unsorted/sweep_800838C4.c:
-	.text       start:0x800838C4 end:0x80083904
-
-unsorted/sweep_80083904.c:
-	.text       start:0x80083904 end:0x80083934
-
-unsorted/sweep_80083970.c:
-	.text       start:0x80083970 end:0x80083974
-
-unsorted/sweep_80083974.c:
-	.text       start:0x80083974 end:0x80083A44
-
-unsorted/sweep_80083A44.c:
-	.text       start:0x80083A44 end:0x80083A4C
-
-unsorted/sweep_80083BA4.c:
-	.text       start:0x80083BA4 end:0x80083BC8
-
-unsorted/sweep_80083E48.c:
-	.text       start:0x80083E48 end:0x80083E70
-
-unsorted/sweep_80083E70.c:
-	.text       start:0x80083E70 end:0x80083EE0
-
-unsorted/sweep_80083F54.c:
-	.text       start:0x80083F54 end:0x80083F60
-
-unsorted/sweep_8008410C.c:
-	.text       start:0x8008410C end:0x80084158
-
-unsorted/sweep_80084158.c:
-	.text       start:0x80084158 end:0x80084160
-
-unsorted/sweep_80084160.c:
-	.text       start:0x80084160 end:0x800841C0
-
-unsorted/sweep_80084208.c:
-	.text       start:0x80084208 end:0x8008422C
-
-unsorted/sweep_8008422C.c:
-	.text       start:0x8008422C end:0x80084288
-
-unsorted/sweep_80084288.c:
-	.text       start:0x80084288 end:0x800842D0
-
-unsorted/sweep_800842D0.c:
-	.text       start:0x800842D0 end:0x80084354
-
-unsorted/sweep_800844E0.c:
-	.text       start:0x800844E0 end:0x80084544
-
-unsorted/sweep_80084544.c:
-	.text       start:0x80084544 end:0x80084578
-
-unsorted/sweep_800845D4.c:
-	.text       start:0x800845D4 end:0x80084614
-
-unsorted/sweep_80084678.c:
-	.text       start:0x80084678 end:0x800846C8
-
-unsorted/sweep_800846C8.c:
-	.text       start:0x800846C8 end:0x800846D4
-
-unsorted/sweep_800846D4.c:
-	.text       start:0x800846D4 end:0x80084704
-
-unsorted/sweep_80084750.c:
-	.text       start:0x80084750 end:0x80084754
-
-unsorted/sweep_80084754.c:
-	.text       start:0x80084754 end:0x800847BC
-
-unsorted/sweep_800847BC.c:
-	.text       start:0x800847BC end:0x800847E0
-
-unsorted/sweep_800848E4.c:
-	.text       start:0x800848E4 end:0x800848E8
-
-unsorted/sweep_800848E8.c:
-	.text       start:0x800848E8 end:0x800849C8
-
-unsorted/sweep_80084B88.c:
-	.text       start:0x80084B88 end:0x80084BE4
-
-unsorted/sweep_80084BE4.c:
-	.text       start:0x80084BE4 end:0x80084BE8
-
-unsorted/sweep_80084D6C.c:
-	.text       start:0x80084D6C end:0x80084DF4
-
-unsorted/sweep_80084DF4.c:
-	.text       start:0x80084DF4 end:0x80084E7C
-
-unsorted/sweep_80084E7C.c:
-	.text       start:0x80084E7C end:0x80084E90
-
-unsorted/sweep_80084E90.c:
-	.text       start:0x80084E90 end:0x80084F04
-
-unsorted/sweep_80084F04.c:
-	.text       start:0x80084F04 end:0x80084F0C
-
-unsorted/sweep_80084F0C.c:
-	.text       start:0x80084F0C end:0x80084F3C
-
-unsorted/sweep_80084F3C.c:
-	.text       start:0x80084F3C end:0x80084F40
-
-unsorted/sweep_80084F40.c:
-	.text       start:0x80084F40 end:0x80084FB4
-
-unsorted/sweep_80084FF0.c:
-	.text       start:0x80084FF0 end:0x80084FF8
-
-unsorted/sweep_80086208.c:
-	.text       start:0x80086208 end:0x80086238
-
-unsorted/sweep_8008633C.c:
-	.text       start:0x8008633C end:0x80086378
-
-unsorted/sweep_80086378.c:
-	.text       start:0x80086378 end:0x80086384
-
-unsorted/sweep_80086384.c:
-	.text       start:0x80086384 end:0x800863CC
-
-unsorted/sweep_8008642C.c:
-	.text       start:0x8008642C end:0x800864A0
-
-unsorted/sweep_800865E0.c:
-	.text       start:0x800865E0 end:0x80086640
-
-unsorted/sweep_800866E8.c:
-	.text       start:0x800866E8 end:0x800866EC
-
-unsorted/sweep_80086940.c:
-	.text       start:0x80086940 end:0x800869A4
-
-unsorted/sweep_80086D24.c:
-	.text       start:0x80086D24 end:0x80086D58
-
-unsorted/sweep_80086DFC.c:
-	.text       start:0x80086DFC end:0x80086E5C
-
-unsorted/sweep_80086F0C.c:
-	.text       start:0x80086F0C end:0x80086FB4
-
-unsorted/sweep_80087038.c:
-	.text       start:0x80087038 end:0x800872AC
-
-unsorted/sweep_800872F8.c:
-	.text       start:0x800872F8 end:0x80087338
-
-unsorted/sweep_800873D4.c:
-	.text       start:0x800873D4 end:0x80087420
-
-unsorted/sweep_80087420.c:
-	.text       start:0x80087420 end:0x80087460
-
-unsorted/sweep_800874F0.c:
-	.text       start:0x800874F0 end:0x80087510
-
-unsorted/sweep_80087510.c:
-	.text       start:0x80087510 end:0x80087548
-
-unsorted/sweep_80087574.c:
-	.text       start:0x80087574 end:0x8008759C
-
-unsorted/sweep_80087628.c:
-	.text       start:0x80087628 end:0x80087658
-
-unsorted/sweep_800876CC.c:
-	.text       start:0x800876CC end:0x80087764
-
-unsorted/sweep_80087764.c:
-	.text       start:0x80087764 end:0x80087790
-
-unsorted/sweep_80087790.c:
-	.text       start:0x80087790 end:0x800877CC
-
-unsorted/sweep_80087D14.c:
-	.text       start:0x80087D14 end:0x80087D54
-
-unsorted/sweep_80087D54.c:
-	.text       start:0x80087D54 end:0x80087D8C
-
-unsorted/sweep_80087E60.c:
-	.text       start:0x80087E60 end:0x80087E80
-
-unsorted/sweep_80087E80.c:
-	.text       start:0x80087E80 end:0x80087E9C
-
-unsorted/sweep_80087E9C.c:
-	.text       start:0x80087E9C end:0x80087ED8
-
-unsorted/sweep_8008802C.c:
-	.text       start:0x8008802C end:0x8008805C
-
-unsorted/sweep_8008805C.c:
-	.text       start:0x8008805C end:0x800880AC
-
-unsorted/sweep_800880AC.c:
-	.text       start:0x800880AC end:0x800880D0
-
-unsorted/sweep_800881A8.c:
-	.text       start:0x800881A8 end:0x800881E8
-
-unsorted/sweep_80088208.c:
-	.text       start:0x80088208 end:0x8008823C
-
-unsorted/sweep_8008823C.c:
-	.text       start:0x8008823C end:0x8008828C
-
-unsorted/sweep_8008828C.c:
-	.text       start:0x8008828C end:0x800882F4
-
-unsorted/sweep_800882F4.c:
-	.text       start:0x800882F4 end:0x80088324
-
-unsorted/sweep_80088324.c:
-	.text       start:0x80088324 end:0x80088354
-
-unsorted/sweep_80088354.c:
-	.text       start:0x80088354 end:0x8008835C
-
-unsorted/sweep_800883FC.c:
-	.text       start:0x800883FC end:0x80088474
-
-unsorted/sweep_800884F0.c:
-	.text       start:0x800884F0 end:0x800885A0
-
-unsorted/sweep_80088634.c:
-	.text       start:0x80088634 end:0x80088660
-
-unsorted/sweep_80088804.c:
-	.text       start:0x80088804 end:0x80088830
-
-unsorted/sweep_80088830.c:
-	.text       start:0x80088830 end:0x80088834
-
-unsorted/sweep_80088834.c:
-	.text       start:0x80088834 end:0x8008886C
-
-unsorted/sweep_80088CC4.c:
-	.text       start:0x80088CC4 end:0x80088CF0
-
-unsorted/sweep_800894B4.c:
-	.text       start:0x800894B4 end:0x800894E8
-
-unsorted/sweep_80089584.c:
-	.text       start:0x80089584 end:0x80089590
-
-unsorted/sweep_80089590.c:
-	.text       start:0x80089590 end:0x80089600
-
-unsorted/sweep_80089648.c:
-	.text       start:0x80089648 end:0x8008967C
-
-unsorted/sweep_8008967C.c:
-	.text       start:0x8008967C end:0x8008968C
-
-unsorted/sweep_8008968C.c:
-	.text       start:0x8008968C end:0x800896A8
-
-unsorted/sweep_800896A8.c:
-	.text       start:0x800896A8 end:0x800896B4
-
-unsorted/sweep_800896B4.c:
-	.text       start:0x800896B4 end:0x800896D0
-
-unsorted/sweep_800896D0.c:
-	.text       start:0x800896D0 end:0x800896F0
-
-unsorted/sweep_80089A50.c:
-	.text       start:0x80089A50 end:0x80089A8C
-
-unsorted/sweep_80089AD0.c:
-	.text       start:0x80089AD0 end:0x80089AD4
-
-unsorted/sweep_80089B78.c:
-	.text       start:0x80089B78 end:0x80089B8C
-
-unsorted/sweep_80089B8C.c:
-	.text       start:0x80089B8C end:0x80089BBC
-
-unsorted/sweep_80089BD0.c:
-	.text       start:0x80089BD0 end:0x80089C20
-
-unsorted/sweep_80089C4C.c:
-	.text       start:0x80089C4C end:0x80089C84
-
-unsorted/sweep_80089CAC.c:
-	.text       start:0x80089CAC end:0x80089CCC
-
-unsorted/sweep_80089D04.c:
-	.text       start:0x80089D04 end:0x80089D68
-
-unsorted/sweep_80089D68.c:
-	.text       start:0x80089D68 end:0x80089D98
-
-unsorted/sweep_80089D98.c:
-	.text       start:0x80089D98 end:0x80089DB0
-
-unsorted/sweep_80089E5C.c:
-	.text       start:0x80089E5C end:0x80089E64
-
-unsorted/sweep_80089E98.c:
-	.text       start:0x80089E98 end:0x80089E9C
-
-unsorted/sweep_80089E9C.c:
-	.text       start:0x80089E9C end:0x80089ED0
-
-unsorted/sweep_80089ED0.c:
-	.text       start:0x80089ED0 end:0x80089F24
-
-unsorted/sweep_80089F24.c:
-	.text       start:0x80089F24 end:0x80089F6C
-
-unsorted/sweep_8008A184.c:
-	.text       start:0x8008A184 end:0x8008A188
-
-unsorted/sweep_8008A188.c:
-	.text       start:0x8008A188 end:0x8008A208
-
-unsorted/sweep_8008A208.c:
-	.text       start:0x8008A208 end:0x8008A20C
-
-unsorted/sweep_8008A20C.c:
-	.text       start:0x8008A20C end:0x8008A240
-
-unsorted/sweep_8008A240.c:
-	.text       start:0x8008A240 end:0x8008A294
-
-unsorted/sweep_8008A468.c:
-	.text       start:0x8008A468 end:0x8008A4A8
-
-unsorted/sweep_8008A758.c:
-	.text       start:0x8008A758 end:0x8008A788
-
-unsorted/sweep_8008A788.c:
-	.text       start:0x8008A788 end:0x8008A7C8
-
-unsorted/sweep_8008A7C8.c:
-	.text       start:0x8008A7C8 end:0x8008A7D4
-
-unsorted/sweep_8008A800.c:
-	.text       start:0x8008A800 end:0x8008A804
-
-unsorted/sweep_8008A804.c:
-	.text       start:0x8008A804 end:0x8008A86C
-
-unsorted/sweep_8008A86C.c:
-	.text       start:0x8008A86C end:0x8008A870
-
-unsorted/sweep_8008A8B8.c:
-	.text       start:0x8008A8B8 end:0x8008A8E8
-
-unsorted/sweep_8008A914.c:
-	.text       start:0x8008A914 end:0x8008A964
-
-unsorted/sweep_8008A964.c:
-	.text       start:0x8008A964 end:0x8008A9A0
-
-unsorted/sweep_8008AAAC.c:
-	.text       start:0x8008AAAC end:0x8008AAB8
-
-unsorted/sweep_8008AAB8.c:
-	.text       start:0x8008AAB8 end:0x8008AB40
-
-unsorted/sweep_8008AB40.c:
-	.text       start:0x8008AB40 end:0x8008AB4C
-
-unsorted/sweep_8008AC3C.c:
-	.text       start:0x8008AC3C end:0x8008AC4C
-
-unsorted/sweep_8008AC4C.c:
-	.text       start:0x8008AC4C end:0x8008AD80
+FE_MessageTable.c:
+	.text       start:0x80079E6C end:0x800850E4
+
+GameUICommands.c:
+	.text       start:0x800850E4 end:0x8008AD80
 
 FEgolferanim.c:
-	.text       start:0x8008AD80 end:0x8008EBB4
-
-unsorted/sweep_8008EBB4.c:
-	.text       start:0x8008EBB4 end:0x8008EC0C
+	.text       start:0x8008AD80 end:0x8008EC30
 
 uiLoadFile.c:
 	.text       start:0x8008EC30 end:0x8008F39C
@@ -1800,32 +891,8 @@ uiLoadFile.c:
 uiProcessInterface.c:
 	.text       start:0x8008F39C end:0x80090940
 
-unsorted/sweep_80091454.c:
-	.text       start:0x80091454 end:0x80091460
-
-unsorted/sweep_80091708.c:
-	.text       start:0x80091708 end:0x8009170C
-
-unsorted/sweep_80091B98.c:
-	.text       start:0x80091B98 end:0x80091BDC
-
-unsorted/sweep_80091D84.c:
-	.text       start:0x80091D84 end:0x80091DB8
-
-unsorted/sweep_80091EE4.c:
-	.text       start:0x80091EE4 end:0x80091EE8
-
-unsorted/sweep_8009220C.c:
-	.text       start:0x8009220C end:0x80092210
-
-unsorted/sweep_80092210.c:
-	.text       start:0x80092210 end:0x8009222C
-
-unsorted/sweep_80092274.c:
-	.text       start:0x80092274 end:0x800922A0
-
-unsorted/sweep_800922A0.c:
-	.text       start:0x800922A0 end:0x800922A8
+fe_movies.c:
+	.text       start:0x80090B80 end:0x800922A8
 
 unsorted/sweep_800929E0.c:
 	.text       start:0x800929E0 end:0x800929E4
@@ -2498,32 +1565,20 @@ unsorted/rcmp_mad_codec/sweep_800B9A88.c:
 unsorted/rcmp_mad_codec/sweep_800B9B48.c:
 	.text       start:0x800B9B48 end:0x800B9BF4
 
-unsorted/sweep_800BA080.c:
-	.text       start:0x800BA080 end:0x800BA0A0
+Trax.c:
+	.text       start:0x800B9FF0 end:0x800BA74C
 
-unsorted/sweep_800BA0E4.c:
-	.text       start:0x800BA0E4 end:0x800BA1A4
+ScreenClear.c:
+	.text       start:0x800BA74C end:0x800BA940
 
-unsorted/sweep_800BA3A4.c:
-	.text       start:0x800BA3A4 end:0x800BA3D8
+Code800BA940.c:
+	.text       start:0x800BA940 end:0x800BAD60
 
-unsorted/sweep_800BA3D8.c:
-	.text       start:0x800BA3D8 end:0x800BA40C
-
-unsorted/sweep_800BA40C.c:
-	.text       start:0x800BA40C end:0x800BA440
-
-unsorted/sweep_800BA6CC.c:
-	.text       start:0x800BA6CC end:0x800BA700
-
-unsorted/sweep_800BA700.c:
-	.text       start:0x800BA700 end:0x800BA734
-
-unsorted/sweep_800BAA4C.c:
-	.text       start:0x800BAA4C end:0x800BAA50
+VecMath.c:
+	.text       start:0x800BAD60 end:0x800BB0A8
 
 SitDevFile.c:
-	.text       start:0x800BAEB0 end:0x800BD894
+	.text       start:0x800BB0A8 end:0x800BD894
 
 GoGolfCam.c:
 	.text       start:0x800BD894 end:0x800C7480
@@ -2534,74 +1589,29 @@ GoGolfCam.c:
 	.sbss       start:0x80282220 end:0x80282228
 	.sdata2     start:0x802842C0 end:0x802843B8
 
+CamSpline.c:
+	.text       start:0x800C7480 end:0x800C808C
+
 GoBreakLine.c:
 	.text       start:0x800C808C end:0x800C937C
 
 AnimStream.c:
 	.text       start:0x800C937C end:0x800CC1EC
 
-unsorted/sweep_800CCA1C.c:
-	.text       start:0x800CCA1C end:0x800CCA40
-
-unsorted/sweep_800CCA40.c:
-	.text       start:0x800CCA40 end:0x800CCA70
-
-unsorted/sweep_800CCEA0.c:
-	.text       start:0x800CCEA0 end:0x800CCED0
-
 SkinPart.c:
-	.text       start:0x800CD404 end:0x800CEA30
-
-unsorted/sweep_800CEDE0.c:
-	.text       start:0x800CEDE0 end:0x800CEE04
-
-unsorted/sweep_800CEE88.c:
-	.text       start:0x800CEE88 end:0x800CEEC8
-
-unsorted/sweep_800CEEF4.c:
-	.text       start:0x800CEEF4 end:0x800CEF04
-
-unsorted/sweep_800D0478.c:
-	.text       start:0x800D0478 end:0x800D0514
+	.text       start:0x800CC1EC end:0x800CF158
 
 HoleScore.c:
-	.text       start:0x800D0AA0 end:0x800D0AF4
+	.text       start:0x800CF158 end:0x800D1698
 
-unsorted/sweep_800D1AE0.c:
-	.text       start:0x800D1AE0 end:0x800D1B10
+SwingTips.c:
+	.text       start:0x800D1698 end:0x800D256C
 
-unsorted/sweep_800D1D30.c:
-	.text       start:0x800D1D30 end:0x800D1D38
+Calendar.c:
+	.text       start:0x800D256C end:0x800D29E8
 
-unsorted/sweep_800D27CC.c:
-	.text       start:0x800D27CC end:0x800D27E0
-
-unsorted/sweep_800D27E0.c:
-	.text       start:0x800D27E0 end:0x800D2814
-
-unsorted/sweep_800D2884.c:
-	.text       start:0x800D2884 end:0x800D28B0
-
-unsorted/sweep_800D28B0.c:
-	.text       start:0x800D28B0 end:0x800D28DC
-
-unsorted/sweep_800D29E8.c:
-	.text       start:0x800D29E8 end:0x800D29EC
-
-unsorted/sweep_800D2A30.c:
-	.text       start:0x800D2A30 end:0x800D2ABC
-
-unsorted/sweep_800D2ABC.c:
-	.text       start:0x800D2ABC end:0x800D2B08
-
-unsorted/sweep_800D2C30.c:
-	.text       start:0x800D2C30 end:0x800D2CB0
-
-unsorted/sweep_800D3118.c:
-	.text       start:0x800D3118 end:0x800D315C
-
-unsorted/sweep_800D3208.c:
-	.text       start:0x800D3208 end:0x800D3244
+CourseData.c:
+	.text       start:0x800D29E8 end:0x800D3244
 
 Earnings.c:
 	.text       start:0x800D3244 end:0x800D9E14
@@ -3812,20 +2822,14 @@ unsorted/sweep_80165524.c:
 UISEvent.c:
 	.text       start:0x80165528 end:0x80166098
 
-unsorted/sweep_80169B0C.c:
-	.text       start:0x80169B0C end:0x80169B28
+UIStudio.c:
+	.text       start:0x80166098 end:0x80168C24
 
-unsorted/sweep_80169B28.c:
-	.text       start:0x80169B28 end:0x80169B30
+UISApi.c:
+	.text       start:0x80168C24 end:0x8016A2D4
 
-unsorted/sweep_80169B30.c:
-	.text       start:0x80169B30 end:0x80169B3C
-
-unsorted/sweep_80169B3C.c:
-	.text       start:0x80169B3C end:0x80169B4C
-
-unsorted/sweep_8016C18C.c:
-	.text       start:0x8016C18C end:0x8016C1A4
+UISScreen.c:
+	.text       start:0x8016A2D4 end:0x8016C718
 
 Common/Checksum/ChecksumCRC32.c:
 	.text       start:0x8016C718 end:0x8016CC20
@@ -3846,6 +2850,7 @@ Common/SharedFileIO/SharedFileIO.c:
 
 NGC/SharedFileIO/llSharedFileIO.c:
 	.text       start:0x80171308 end:0x801730C8
+	.rodata     start:0x801863D4 end:0x8018655C
 
 Common/TagFile/TagFile.c:
 	.text       start:0x801730C8 end:0x80175F54

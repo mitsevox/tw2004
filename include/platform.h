@@ -56,4 +56,25 @@ double floor(double x);
 #include <string.h>
 #endif
 
+// ---- the GameCube OS library ------------------------------------------------------------------
+// A port supplies these: the clock and its conversion to a calendar date.
+
+typedef struct OSCalendarTime {
+    s32 nSec;                  // 0x00  0-59
+    s32 nMin;                   // 0x04  0-59
+    s32 nHour;                  // 0x08  0-23
+    s32 nMday;                  // 0x0C
+    s32 nMon;                   // 0x10
+    s32 nYear;                  // 0x14
+    s32 nWday;                  // 0x18
+    s32 nYday;                  // 0x1C
+    s32 nMsec;                  // 0x20
+    s32 nUsec;                  // 0x24
+} OSCalendarTime;
+LAYOUT_ASSERT(OSCalendarTime, 0x28);
+
+s64  OSGetTime(void);           // the time base, in ticks
+void OSTicksToCalendarTime(s64 nTicks, OSCalendarTime* pTime);
+u32  OSGetTick(void);           // the low 32 bits of the time base
+
 #endif
