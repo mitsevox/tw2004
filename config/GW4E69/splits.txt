@@ -3639,44 +3639,8 @@ GameModeFourBall.c:
 GameModeMatch.c:
 	.text       start:0x800E9E40 end:0x800EACD8
 
-unsorted/sweep_800EADD8.c:
-	.text       start:0x800EADD8 end:0x800EADDC
-
-unsorted/sweep_800EAE38.c:
-	.text       start:0x800EAE38 end:0x800EAE6C
-
-unsorted/sweep_800EAE6C.c:
-	.text       start:0x800EAE6C end:0x800EAE74
-
-unsorted/sweep_800EAEB8.c:
-	.text       start:0x800EAEB8 end:0x800EAF18
-
-unsorted/sweep_800EC544.c:
-	.text       start:0x800EC544 end:0x800EC550
-
-unsorted/sweep_800EC550.c:
-	.text       start:0x800EC550 end:0x800EC558
-
-unsorted/sweep_800ECA08.c:
-	.text       start:0x800ECA08 end:0x800ECA34
-
-unsorted/sweep_800ECBE4.c:
-	.text       start:0x800ECBE4 end:0x800ECC14
-
-unsorted/sweep_800ED540.c:
-	.text       start:0x800ED540 end:0x800ED554
-
-unsorted/sweep_800ED5C8.c:
-	.text       start:0x800ED5C8 end:0x800ED604
-
-unsorted/sweep_800ED6E8.c:
-	.text       start:0x800ED6E8 end:0x800ED6F8
-
-unsorted/sweep_800ED6F8.c:
-	.text       start:0x800ED6F8 end:0x800ED710
-
-unsorted/sweep_800ED710.c:
-	.text       start:0x800ED710 end:0x800ED738
+GameMode5.c:
+	.text       start:0x800EACD8 end:0x800ED738
 
 unsorted/sweep_800ED890.c:
 	.text       start:0x800ED890 end:0x800ED8E0
