@@ -34,9 +34,13 @@ typedef struct GameEffects {
     u8   bRumble;               // 0x44
     u8   nHeartbeats;           // 0x45
     u8   bPaused;               // 0x46
-    u8   unk47[3];
-    u8   b4A;                   // 0x4A
-    u8   unk4B[5];
+    u8   b47;                   // 0x47  u48 holds a sound to stop
+    u16  u48;                   // 0x48
+    u8   b4A;                   // 0x4A  u4C holds a sound to stop
+    u8   unk4B;
+    u16  u4C;                   // 0x4C
+    u8   b4E;                   // 0x4E
+    u8   n4F;                   // 0x4F  the music to go back to
     u32  uFlags;                // 0x50  bit 0x4000: an eagle on a par 5 counts
     f32  f54;                   // 0x54
 } GameEffects;
@@ -95,6 +99,18 @@ void  fn_800DCB84(u8* pA, u8* pB, f32* pOut);
 int   fn_800F354C(int nPlayer);
 int   fn_800F20C0(int nPlayer);
 int   fn_800F1D34(int nPlayer);
+CourseInfo* fn_8000C594(void);
+void* fn_800CC190(CourseInfo* pCourse, f32* pPos);   // surface type under a point
+f32   fn_800D0478(int nPlayer);             // the ball's distance from the pin (yards)
+extern u8* gpSaveData;
+int   fn_800D8750(int a, int b, int c, u8* pProfile, int nPlayer);
+u8    fn_800DCB10(int nPlayer);
+u8    fn_800BCD24(int nPlayer);
+int   fn_800D0620(int nPlayer, int a, int b);
+int   fn_800D089C(int nPlayer, int a);
+int   Hole_ScoreAfterTapIn(int nPlayer);
+void  fn_800BD83C(int nSound, int a);
+void  fn_800A6DCC(int nMusic, int a);
 extern u8 gNumPlayersSetUp;                 // 0x80281D48 (Golfer.c)
 
 // A course's records (the 'rcrd' block at gSession + 0xF00, 0x320 bytes per course).
@@ -305,6 +321,49 @@ void fn_800DB4E8(int nPlayer) {
     }
 }
 
+// TW06: GameEffects_IsGBPossible (by position). Whether this lie is worth a GameBreaker: on the
+// green putting for two under par or better, or one of the other big-putt checks, or a birdie or
+// eagle putt (by the score after a tap-in).
+int fn_800DB86C(int nPlayer) {
+    int bPossible = 0;
+    int nPar;
+    int nStrokes;
+    CourseInfo* pCourse;
+    void* pSurface;
+    f32 fDist;
+    pCourse = fn_8000C594();
+    if (!pCourse) {
+        return 0;
+    }
+    if (!gpGame->b285) {
+        return 0;
+    }
+    nPar = fn_800D2B08();
+    nStrokes = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1;
+    pSurface = fn_800CC190(pCourse, gPlayers[nPlayer].vTarget2);
+    fDist = fn_800D0478(nPlayer);
+    if (!pSurface) {
+        return 0;
+    }
+    if (gPlayers[nPlayer].nLie == LIE_GREEN && nPar - nStrokes >= 2) {
+        bPossible = 1;
+    } else if (gPlayers[nPlayer].nLie == LIE_GREEN &&
+               fn_800D8750(2, fDist, 0, gpSaveData + nPlayer * 0x10600 + 1, nPlayer)) {
+        bPossible = 1;
+    } else if (gPlayers[nPlayer].nLie == LIE_GREEN && fn_800DCB10(nPlayer)) {
+        bPossible = 1;
+    } else if (gPlayers[nPlayer].nLie == LIE_GREEN && fn_800BCD24(nPlayer)) {
+        bPossible = 1;
+    } else if (gPlayers[nPlayer].nLie == LIE_GREEN && fn_800D0620(nPlayer, 0, 0) == 11 &&
+               Hole_ScoreAfterTapIn(nPlayer) < 0) {
+        bPossible = 1;
+    } else if (gPlayers[nPlayer].nLie == LIE_GREEN && fn_800D089C(nPlayer, 0) == 1 &&
+               Hole_ScoreAfterTapIn(nPlayer) < -1) {
+        bPossible = 1;
+    }
+    return bPossible;
+}
+
 // The GameBreaker camera: none on course 7; otherwise a camera at the shot's full distance.
 void fn_800DB714(int nPlayer) {
     int nLie;
@@ -326,6 +385,44 @@ void fn_800DB714(int nPlayer) {
         lbl_80202898.b19 = 1;
         if (lbl_80202898.f24 > 0.8f) {
             lbl_80202898.f24 = 0.8f;
+        }
+    }
+}
+
+// TW06: GameEffects_EndGB (by position). The letterbox starts closing, with the end event; the
+// GameBreaker music stops, or (a scripted one that failed) the old music comes back.
+void fn_800DBDA8(void) {
+    if (lbl_80202898.bGameBreaker) {
+        lbl_80202898.bClosing = 1;
+        if (lbl_80202898.fGBTime > 0.8f) {
+            lbl_80202898.fGBTime = 0.8f;
+        }
+        switch (lbl_80202898.nGBType) {
+        case 1:
+            EVENT_Trigger(lbl_80202898.nPlayer, 0x40, 0, -1);
+            if (lbl_80202898.b4A) {
+                fn_800BD83C(lbl_80202898.u4C, 0);
+                lbl_80202898.b4A = 0;
+            }
+            fn_800A6DCC(3, 1);
+            return;
+        case 0:
+            EVENT_Trigger(lbl_80202898.nPlayer, 0x3E, 0, -1);
+            if (fn_800DC818(gPlayers[lbl_80202898.nPlayer].ball, lbl_80202898.nPlayer, 0)) {
+                if (lbl_80202898.b4A) {
+                    fn_800BD83C(lbl_80202898.u4C, 0);
+                    lbl_80202898.b4A = 0;
+                }
+                fn_800A6DCC(3, 1);
+            } else {
+                if (lbl_80202898.b47) {
+                    fn_800BD83C(lbl_80202898.u48, 0);
+                }
+                fn_800A6DCC(lbl_80202898.n4F, 1);
+                lbl_80202898.b4E = 0;
+            }
+            lbl_80202898.b47 = 0;
+            break;
         }
     }
 }
