@@ -1,6 +1,7 @@
 // engine.h (our name): the services under the game code that more than one file calls: memory
-// and strings, math, the random streams, the file streamer (UStream.c), views and cameras,
-// events, sound and effects, and character animation. The game itself is in game.h.
+// and strings, math, the random streams, the file streamer (UStream.c), controller input, events,
+// sound and effects. Views and cameras are in camera.h, the golfer's character in character.h, the
+// game itself in game.h.
 
 #ifndef ENGINE_H
 #define ENGINE_H
@@ -53,7 +54,9 @@ typedef struct UStreamObject {
     int   nUnk14;                 // 0x14
     u32   uFlags;                 // 0x18  chunk+0x14; set to 1 for txf / Cpyr / Cact / txf2
     u32   uType;                  // 0x1C  chunk+0x18, e.g. 'ter '
-    u32   uHash;                  // 0x20  chunk+0x1C
+    u32   uId;                    // 0x20  chunk+0x1C: the object's id within its type (fn_8000B70C
+                                  //       finds objects by type and id); for skalib's SAL and BNK
+                                  //       objects, the animation slot
     u32   uSize;                  // 0x24  chunk+0x20 decompressed size
     u32   uRef28;                 // 0x28  chunk+0x24 } rebased by the RPNS value when the
     u32   uRef2C;                 // 0x2C  chunk+0x28 } object is delivered
@@ -81,50 +84,11 @@ void fn_80014118(int a);
 u32  fn_800142AC(int nButton, int a);   // a button's mask
 u8   fn_80014300(u32 uMask);            // any pad pressed these buttons
 
-// ---- views, events, sound, animation ---------------------------------------------------------
+// ---- events, sound, effects ------------------------------------------------------------------
 
-// The golfer's character object at Player.nShotHandle; only the fields read so far.
-typedef struct ShotObj {
-    u8    unk0[0x1C];
-    s32   nAnim;                // 0x01C  the playing animation (6 backswing, 7 downswing)
-    u8    unk20[0x2C - 0x20];
-    s32   n2C;                  // 0x02C  tested for 0 (PreShotInit) and for 4 or 5 (ShotSetupInit)
-    u8    unk30[0x38 - 0x30];
-    u8*   pView;                // 0x038  -> +0x38 -> a struct with +0x10E4
-    u8    unk3C[0x164 - 0x3C];
-    u8    anim[4];              // 0x164  the animation: +0x14 is its playback rate
-    s32   uFlags;               // 0x168  bit 0x40: the backswing is being backed down (signed: the original tests it with cmpwi)
-    u8    unk16C[0x17C - 0x16C];
-    f32   fAnimTime;            // 0x17C
-    u8    unk180[0x184 - 0x180];
-    f32   fAnimEnd;             // 0x184  the animation's end time
-    u8    unk188[0x438 - 0x188];
-    s32   n438;                 // 0x438  compared with 11 (GM_ShowPostShotAnimation)
-    u8    unk43C[0x4AC - 0x43C];
-    struct { u32 bSet; f32 fTime; u8 unk8[8]; } events[18];   // 0x4AC  animation events, by 64-bit id
-    s32   n5CC;                 // 0x5CC
-    u8    unk5D0[0x1624 - 0x5D0];
-    u8*   pClip;                // 0x1624 -> +0xCC blend, +0xD4/+0xD8 clips
-    f32   f1628;
-    f32   f162C;
-    f32   f1630;
-    f32   f1634;
-    f32   v1638[3];             // 0x1638
-    f32   f1644;
-    u8    unk1648[0x1698 - 0x1648];
-    s32   n1698;                // 0x1698
-} ShotObj;
-
-void Character_SetPosition(int nHandle, f32* pPos, int a);
-void fn_8001C724(int nHandle, int nKind);
-void fn_8001C774(int nHandle, int nClub);
 void fn_8001C804(int nPlayer, int a, int b);
 void fn_8001D8DC(int nPlayer);
 void fn_8001EF34(f32* pIn, f32 f, f32* pOut);   // scale a vector (paired singles)
-
-typedef struct AnimLib AnimLib;        // skalib.c
-void* AnimLib_Pick(int nPlayer, AnimLib* pLib, int nGroup, int nStyle, int nClub, int nKey, u32* pFlags,
-                   const char* pName);
 
 void fn_80045494(u8 bOn, int nPlayer);
 void fn_80045558(u8 bOn, int nPlayer);
@@ -146,16 +110,7 @@ void fn_8006BF60(int nPlayer);          // the replay recorder
 void fn_8006C300(int nPlayer);
 void fn_8006C4A0(void);                 // take the shot back (a mulligan)
 void fn_8006F4B4(void);
-void fn_80072ACC(void);
 u8   fn_80095430(int a);
-void fn_80095744(int nHandle, int nAnim);   // play an animation
-int  fn_80095780(int nHandle);          // the animation playing
-int  fn_80095798(int nHandle);
-void fn_800957D8(int nHandle);
-void fn_800957FC(int nHandle, int a);
-void CharacterState_AddSKABlendData(u8* pChar, int a, int nGroup, void* pfn, int c, int d, f32 f1, f32 f2,
-                                    f32 f3, f32 f4, f32 f5);
-void CharAnim_StartTapIn(u8* pChar);
 void fn_8009B970(int nView);
 void fn_8009EF98(void);
 void fn_800A6278(void);

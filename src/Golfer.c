@@ -915,8 +915,8 @@ void Shot_Prepare(int nPlayer, u8 bNotify) {
     Shot_DefaultSpin(nPlayer, p->vLaunchA);
     Shot_FaceVector(nPlayer, p->vLaunchB);
     if (bNotify) {
-        fn_8001C774(gPlayers[nPlayer].nShotHandle, gPlayers[nPlayer].nClub);
-        fn_8001C724(gPlayers[nPlayer].nShotHandle, gPlayers[nPlayer].nShotKind);
+        fn_8001C774(gPlayers[nPlayer].pChar, gPlayers[nPlayer].nClub);
+        fn_8001C724(gPlayers[nPlayer].pChar, gPlayers[nPlayer].nShotKind);
     }
 }
 
@@ -1613,9 +1613,6 @@ void Luck_TakePerfectShot(int nPlayer) {
 
 extern u8 gNumPlayersSetUp;         // 0x80281D48
 
-typedef struct ViewSlot { void* pUnk; void* pShot; } ViewSlot;
-extern ViewSlot gViewSlots[];       // 0x80187124  per player
-
 u8    fn_800170A0(int nView);                                   // the view exists
 void  fn_80016D18(int nView, f32 x, f32 y, f32 w, f32 h);       // open it (screen fractions)
 void  fn_80009710(f32* pQuat);                                  // identity (0, 0, 0, 1)
@@ -1685,11 +1682,11 @@ void Player_SetGolfer(int nPlayer, int nGolfer, int nController, u32 uBag, int b
             fn_8001704C(p->nView1, nPlayer);
         }
     }
-    p->nShotHandle = (s32)gViewSlots[nPlayer].pShot;
-    if (p->nShotHandle != 0) {
-        *(s32*)(p->nShotHandle + 4) = nPlayer;
+    p->pChar = gViewSlots[nPlayer].pChar;
+    if (p->pChar != NULL) {
+        p->pChar->nPlayer = nPlayer;
         if (gSession.nSplitScreen == 2) {
-            *(s32*)(p->nShotHandle + 0x16DC) = gNumPlayersSetUp * 2;
+            p->pChar->n16DC = gNumPlayersSetUp * 2;
         }
     }
     p->swing.unk630 = 0;
@@ -1720,7 +1717,7 @@ void Players_Reset(void) {
     int i;
     for (i = 0; i < gSession.nNumPlayers; i++) {
         GOLFERSTATE_Kill(i);
-        gPlayers[i].nShotHandle = 0;
+        gPlayers[i].pChar = NULL;
     }
     gNumPlayersSetUp = 0;
 }

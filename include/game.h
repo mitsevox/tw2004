@@ -19,7 +19,6 @@ void Session_SetNumPlayers(int n);      // Golfer.c
 
 u8   fn_80058F5C(int nPlayer);          // the per-frame swing poll: the ball was struck
 f32  fn_8005B64C(int nPlayer);          // the swing's shot power
-f32  fn_8005CB78(int nHandle, unsigned long long uEvent);   // the time of the character's animation event
 void GOLFERSTATE_Push(int nState, int nPlayer);     // push a state and run its enter callback
 void GOLFERSTATE_Set(int nState, int nPlayer);      // pop everything and start again from one state
 void GOLFERSTATE_Switch(int nState, int nPlayer);   // replace the current state
@@ -31,9 +30,6 @@ void STATEFUNC_SimulateExit(int nPlayer);
 void fn_80062B70(void);
 void fn_80062B74(int nPlayer);
 void fn_80062B78(int nPlayer);
-int  fn_80062C10(int nHandle);          // the character's flag 4
-int  fn_80062C1C(int nHandle);          // the character's flag 1
-f32  fn_80062C28(int nHandle);          // how far the character's animation still has to run
 void fn_80062C38(void);
 void fn_80062C5C(void);
 void fn_80062C80(int a, u8 b);

@@ -391,8 +391,9 @@ void fn_800DBA50(int nPlayer) {
                 if (pShot != NULL && pView->p130 != pShot && pView->p134 != pShot &&
                     !fn_800451A8(&pView->script, pShot, nPlayer)) {
                     if (nKind == 5 && fn_8003DC78(pShot)) {
-                        if (gPlayers[nPlayer].nShotKind != SHOT_PUTT && fn_80095780(gPlayers[nPlayer].nShotHandle) != 9) {
-                            fn_80095744(gPlayers[nPlayer].nShotHandle, 14);
+                        if (gPlayers[nPlayer].nShotKind != SHOT_PUTT &&
+                            fn_80095780(gPlayers[nPlayer].pChar) != 9) {
+                            fn_80095744(gPlayers[nPlayer].pChar, 14);
                             if (0.0f == fTime) {
                                 fTime = 1.0f / 59.94f;
                             }

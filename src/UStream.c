@@ -120,7 +120,7 @@ extern void  fn_8000B0D4(void* pPool, void* pNode);                 // UMemPool 
 extern void  fn_8000B4B8(UStreamObject* p);
 extern u8    fn_8000B508(UStreamObject* p);
 extern void  fn_8000B588(UStreamObject* p);
-extern UStreamObject* fn_8000B70C(u32 uType, u32 uHash);
+extern UStreamObject* fn_8000B70C(u32 uType, u32 uId);
 extern int   fn_8000EA1C(const char* pName, int a, int b, int c);
 extern void  fn_8007593C(void* pChunk);                             // MPG2
 extern void  fn_800A4BDC(void);
@@ -739,7 +739,7 @@ int UStream_Update(void) {
         pObject->uRef30 += gRPNSBase;
         if (pObject->uType == TAG('R', 'P', 'N', 'S')) {
             if (fn_8000B508(pObject)) {
-                UStreamObject* pOld = fn_8000B70C(pObject->uType, pObject->uHash);
+                UStreamObject* pOld = fn_8000B70C(pObject->uType, pObject->uId);
                 if (pOld != NULL) {
                     if (pOld->uSize == pObject->uSize && fn_80005BC8(pObject->pData, pOld->pData) == 0) {
                         fn_80009E70(pObject);

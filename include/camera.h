@@ -146,7 +146,8 @@ typedef struct CamTuning {
     u8   unk5C[4];
     f32  f60;                   // 0x060  camera 13's slow-motion step length (0: every frame)
     f32  f64;                   // 0x064
-    f32  v68[4];                // 0x068  camera 13's fn_80038010 vector; [3] shrinks as the camera's time runs
+    f32  v68[4];                // 0x068  camera 13's fn_80038010 vector; [3] shrinks as the camera's time
+                                //        runs
     f32  f78;                   // 0x078  ... over this many seconds
     f32  f7C;                   // 0x07C  camera 13's fallback shots' f78/f7C: from this value ...
     f32  f80;                   // 0x080  ... to this one
@@ -205,13 +206,9 @@ typedef struct GolfCamState {
 extern GolfCamState* lbl_80282220;
 
 // The create-a-player (CrAP) screen's state at lbl_80281EE0; only what the CrAP camera reads.
-typedef struct CrAPModel {
-    u8   unk0[0x34];
-    s32  n34;                   // 0x34  1: the shot names get an 'f' in front
-} CrAPModel;
 typedef struct CrAPGolfer {
     u8   unk0[8];
-    CrAPModel* p8;              // 0x08
+    struct Character* pChar;    // 0x08  the golfer being edited (character.h)
     s32  nC;                    // 0x0C
     u8   unk10[8];
     u8   b18;                   // 0x18  the camera script runs

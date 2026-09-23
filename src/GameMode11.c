@@ -57,12 +57,6 @@ s16 lbl_80192F2C[12 * 16] = {
     60, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 };
 
-// A shot animation object (Player.nShotHandle); only its progress is read here.
-typedef struct ShotAnim {
-    u8  unk0[0x1628];
-    f32 fProgress;                          // 0x1628  compared with 0.45 and 0.75
-} ShotAnim;
-
 // The save data's lessons field (gpSaveData + 0x5000).
 typedef struct LessonSave {
     u8  unk0[0x5000];
@@ -438,7 +432,7 @@ void fn_801008F8(void) {
     gPlayers[0].nController = lbl_80282404;
     GOLFERSTATE_Switch(GS_PRE_SHOT, 0);
     if (lbl_80282428 == 8 || lbl_80282428 == 9 || lbl_80282428 == 10 || lbl_80282428 == 11) {
-        fn_800957D8(gPlayers[0].nShotHandle);
+        fn_800957D8(gPlayers[0].pChar);
     }
     if (lbl_802823FC == 7) {
         AI_DefaultTarget(0);
@@ -446,10 +440,10 @@ void fn_801008F8(void) {
         BreakLine_Start(gPlayers[0].nView0);
         fn_8009B970(gPlayers[0].nView0);
         fn_8001C804(0, 1, 1);
-        fn_800957D8(gPlayers[0].nShotHandle);
+        fn_800957D8(gPlayers[0].pChar);
         fn_80058FA4(0);
         if (lbl_80282428 != 8 && lbl_80282428 != 9 && lbl_80282428 != 10 && lbl_80282428 != 11) {
-            fn_80095744(gPlayers[0].nShotHandle, 1);
+            fn_80095744(gPlayers[0].pChar, 1);
         }
     }
     lbl_802823E0 = 0;
@@ -474,8 +468,8 @@ void fn_80100A3C(int nPlayer) {
     BreakLine_Start(gPlayers[0].nView0);
     fn_8009B970(gPlayers[0].nView0);
     fn_8001C804(0, 1, 1);
-    fn_800957D8(gPlayers[0].nShotHandle);
-    fn_80095744(gPlayers[0].nShotHandle, 5);
+    fn_800957D8(gPlayers[0].pChar);
+    fn_80095744(gPlayers[0].pChar, 5);
     fn_80062C38();
 }
 
@@ -705,8 +699,8 @@ void fn_80100C08(void) {
             fn_80101F94(8, 0);
             if (gPlayers[0].swing.nState == 2 || gPlayers[0].swing.nState == 3 ||
                 (gPlayers[0].swing.nState == 1 &&
-                 ((lbl_802823FC == 5 && ((ShotAnim*)gPlayers[0].nShotHandle)->fProgress > 0.45f) ||
-                  (lbl_802823FC != 5 && ((ShotAnim*)gPlayers[0].nShotHandle)->fProgress > 0.75f)))) {
+                 ((lbl_802823FC == 5 && gPlayers[0].pChar->fBackswing > 0.45f) ||
+                  (lbl_802823FC != 5 && gPlayers[0].pChar->fBackswing > 0.75f)))) {
                 fn_80101F40(1, lbl_80282418);
                 fn_800E5200(lbl_802823F4);
                 fn_80101F18(2);

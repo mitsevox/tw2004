@@ -41,7 +41,7 @@ f32 lbl_80192880[15] = {
     1.1f, 1.1f, 1.0f, 1.0f, 1.0f, 1.1f, 1.2f, 1.3f, 1.0f, 1.3f, 1.4f, 1.4f, 1.3f, 1.0f, 1.0f,
 };
 
-int   fn_8001D324(int n);
+Character* fn_8001D324(int nId);   // the character with this id (nPlayer 1000), or NULL
 void  fn_800A631C(void);
 
 u8   fn_800F2358(int nPlayer);
@@ -65,12 +65,12 @@ void fn_800F19D4(void) {
 
 // Aim the player at target n (wrapping round): the pin moves there.
 void fn_800F1ABC(int nPlayer, s8 n) {
-    u32 h;
+    Character* pChar;
     gPlayers[nPlayer].nTarget = n % lbl_80282360;
     Vec_Copy(lbl_80211D38[gPlayers[nPlayer].nTarget], (f32*)fn_8000C594()->pin);
-    h = fn_8001D324(100);
-    if (h) {
-        Character_SetPosition(h, lbl_80211D38[gPlayers[nPlayer].nTarget], 1);
+    pChar = fn_8001D324(100);
+    if (pChar != NULL) {
+        Character_SetPosition(pChar, lbl_80211D38[gPlayers[nPlayer].nTarget], 1);
     }
 }
 
@@ -79,8 +79,8 @@ void fn_800F1B60(int nPlayer, s8 n) {
     AI_DefaultTarget(nPlayer);
     Shot_Prepare(nPlayer, 1);
     fn_8001C804(nPlayer, 1, 1);
-    fn_800957D8(gPlayers[nPlayer].nShotHandle);
-    fn_80095744(gPlayers[nPlayer].nShotHandle, 5);
+    fn_800957D8(gPlayers[nPlayer].pChar);
+    fn_80095744(gPlayers[nPlayer].pChar, 5);
     fn_80062C38();
 }
 

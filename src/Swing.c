@@ -115,11 +115,10 @@ void fn_8005C15C(int nPlayer, f32* pSpinY, f32* pSpinX) {
     *pSpinY = gPlayers[nPlayer].swing.fSideSpin;
 }
 
-u8 fn_8001EDF4(int nHandle);
 
 // The backswing's sideways angle as a fraction of a quarter turn, mirrored by fn_8001EDF4.
 f32 fn_8005C1EC(int nPlayer) {
-    if (fn_8001EDF4(gPlayers[nPlayer].nShotHandle)) {
+    if (fn_8001EDF4(gPlayers[nPlayer].pChar)) {
         return gPlayers[nPlayer].swing.fControllerSliceAngle / 1.5707964f;
     }
     return -(gPlayers[nPlayer].swing.fControllerSliceAngle / 1.5707964f);
@@ -292,31 +291,30 @@ int fn_8005CB60(int nPlayer) {
 }
 
 // An animation event's time.
-f32 fn_8005CB78(int nHandle, unsigned long long uEvent) {
-    ShotObj* pObj = (ShotObj*)nHandle;
-    return pObj->events[(int)uEvent].fTime;
+f32 fn_8005CB78(Character* pChar, u64 uEvent) {
+    return pChar->events[(int)uEvent].fTime;
 }
 
-void ShotObj_Set162C(ShotObj* pObj, f32 f) {
+void ShotObj_Set162C(Character* pObj, f32 f) {
     if (pObj != NULL) {
         pObj->f162C = f;
     }
 }
 
-f32 ShotObj_GetBlend(ShotObj* pObj) {
+f32 ShotObj_GetBlend(Character* pObj) {
     if (pObj == NULL) {
         return 0.0f;
     }
-    return pObj->f1628;
+    return pObj->fBackswing;
 }
 
-void ShotObj_Set1630(ShotObj* pObj, f32 f) {
+void ShotObj_Set1630(Character* pObj, f32 f) {
     if (pObj != NULL) {
         pObj->f1630 = f;
     }
 }
 
-void ShotObj_Set1634(ShotObj* pObj, f32 f) {
+void ShotObj_Set1634(Character* pObj, f32 f) {
     if (pObj != NULL) {
         pObj->f1634 = f;
     }
@@ -475,7 +473,6 @@ f32 fn_8005B64C(int nPlayer) {
 
 extern Replay gReplayData;                   // 0x801D6030
 
-void CharacterState_UpdateSKAState(int nHandle);
 void Swing_FaceVector(int nPlayer, f32* pOut);
 f32  Swing_MeterError(int nPlayer);
 void Swing_ShapeVector(int nPlayer, f32* pOut);
@@ -1135,7 +1132,7 @@ void fn_80058FA4(int nPlayer) {
     gPlayers[nPlayer].swing.nState = 0;
     gPlayers[nPlayer].swing.nRestCX = gPlayers[nPlayer].swing.nRestCY = 0x80;
     gPlayers[nPlayer].swing.nRestX = gPlayers[nPlayer].swing.nRestY = 0x80;
-    fn_80095744(gPlayers[nPlayer].nShotHandle, 5);
+    fn_80095744(gPlayers[nPlayer].pChar, 5);
     Swing_RumbleOff(nPlayer);
     Swing_ResetBoostAndSpin(nPlayer);
     gPlayers[nPlayer].swing.nSpinCtrlX = 0x80;
@@ -1149,18 +1146,18 @@ void fn_80058FA4(int nPlayer) {
 
 void Swing_Begin(int nPlayer) {
     Player*    p      = &gPlayers[nPlayer];
-    int        nHandle = p->nShotHandle;
+    Character* pChar  = p->pChar;
     SwingData* pSw    = &p->swing;
     int        i;
 
     pSw->nState = 1;
-    fn_80095744(nHandle, 6);
-    CharacterState_UpdateSKAState(nHandle);
+    fn_80095744(pChar, 6);
+    CharacterState_UpdateSKAState(pChar);
     pSw->f10 = 0.0f;
     pSw->f14 = 0.0f;
-    pSw->fTimeSwingStart = fn_8005CB78(nHandle, 0);
-    pSw->fTimeSwingTop = fn_8005CB78(nHandle, 1);
-    pSw->fTimeBallHit = fn_8005CB78(nHandle, 2);
+    pSw->fTimeSwingStart = fn_8005CB78(pChar, 0);
+    pSw->fTimeSwingTop = fn_8005CB78(pChar, 1);
+    pSw->fTimeBallHit = fn_8005CB78(pChar, 2);
     for (i = 0; i < 25; i++) {
         pSw->nCtrlListX[i] = pSw->nCalibrateX;
         pSw->nCtrlListY[i] = pSw->nCalibrateY;
@@ -1183,14 +1180,14 @@ void Swing_Begin(int nPlayer) {
 int Swing_WaitForBackswing(int nPlayer) {
     Player* p          = &gPlayers[nPlayer];
     int     nController = p->nController;
-    int     nHandle    = p->nShotHandle;
+    Character* pChar   = p->pChar;
     u8*     pPad;
     u8      bMain, bCStick;
 
     if (Controller_IsCPU(nController) || Game_GetMode() == 10) {
         gPlayers[nPlayer].swing.nState = 1;
         Swing_Begin(nPlayer);
-        *(u32*)(nHandle + 0x168) &= ~1;
+        pChar->uFlags &= ~1;
         Swing_ClearFrameFlag(nPlayer);
         return 0;
     }
@@ -1230,14 +1227,8 @@ int Swing_StickX(int nPlayer, u8* pPad);              // 0x80058F04  main or C-s
 int Swing_StickY(int nPlayer, u8* pPad);              // 0x80058F30
 f32 Swing_TopTime(SwingData* pSw);                    // 0x80058E98  fTimeSwingTop - 0.0076
 f32 Swing_StartTime(SwingData* pSw);                  // 0x80058EA8  fTimeSwingStart + 0.0076
-f32 ShotObj_GetBlend(ShotObj* pObj);                  // 0x8005CB98  f1628
-void ShotObj_Set162C(ShotObj* pObj, f32 f);            // 0x8005CB88
-void ShotObj_Set1630(ShotObj* pObj, f32 f);            // 0x8005CBB0
-void ShotObj_Set1634(ShotObj* pObj, f32 f);            // 0x8005CBC0
-void Anim_SetRate(u8* pAnim, f32 fRate);               // 0x8001F084
-void Anim_SetTime(u8* pAnim, f32 fTime);               // 0x8007327C
-int  fn_800204A0(u8* pClip, f32* pOut, f32 fTime);
-void Character_UpdateAnimation(ShotObj* pObj, int a, f32 f);
+int  fn_800204A0(BlendClip* pClip, f32* pOut, f32 fTime);
+void Character_UpdateAnimation(Character* pObj, int a, f32 f);
 void Swing_UpdatePower(int nPlayer);
 void Swing_BoostInput(int nPlayer);
 
@@ -1245,7 +1236,7 @@ void Swing_BoostInput(int nPlayer);
 void Swing_HoldAtTop(int nPlayer) {
     Player*    p    = &gPlayers[nPlayer];
     SwingData* pSw  = &p->swing;
-    ShotObj*   pObj = (ShotObj*)p->nShotHandle;
+    Character*   pObj = p->pChar;
     pSw->fFidgetTargetTime = pSw->fFidgetPauseTime;
     Anim_SetTime(pObj->anim, pSw->fFidgetTargetTime);
     Character_UpdateAnimation(pObj, 0, 0.0f);
@@ -1273,7 +1264,7 @@ static inline int Swing_DeadZone(int v) {
 // animation starts, and it is phase 3 with the impact sample seeded from this frame.
 int Swing_UpdateBackswing(int nPlayer) {
     Player*    p;
-    ShotObj*   pObj;
+    Character*   pObj;
     SwingData* pSw;
     int        nController;
     int        nX, nY;
@@ -1281,16 +1272,16 @@ int Swing_UpdateBackswing(int nPlayer) {
     f32        fAnimTime, fTop, fStart, fMag, fTarget, fDelta, fRate, fRange;
 
     p           = &gPlayers[nPlayer];
-    pObj        = (ShotObj*)p->nShotHandle;
+    pObj        = p->pChar;
     pSw         = &p->swing;
     nController = p->nController;
-    if (*(u8**)(pObj->pView + 0x38) != NULL) {
-        *(s32*)(*(u8**)(pObj->pView + 0x38) + 0x10E4) = 4;
+    if (pObj->pModel->pSkel != NULL) {
+        pObj->pModel->pSkel->n10E4 = 4;
     }
-    if (pObj->pClip != NULL) {
-        pObj->f1628 = *(f32*)(pObj->pClip + 0xCC);
+    if (pObj->pBlend != NULL) {
+        pObj->fBackswing = pObj->pBlend->fCC;
     } else {
-        pObj->f1628 = 0.0f;
+        pObj->fBackswing = 0.0f;
     }
     fAnimTime = pObj->fAnimTime;
     if (Controller_IsCPU(nController) || Game_GetMode() == 10) {
@@ -1303,11 +1294,12 @@ int Swing_UpdateBackswing(int nPlayer) {
         }
         if (fAnimTime >= pSw->fTimeSwingStart + fFrac * (pSw->fTimeSwingTop - pSw->fTimeSwingStart)) {
             Anim_SetRate(pObj->anim, 1.0f);
-            fn_80095744((int)pObj, 7);
-            if (fn_800204A0(*(u8**)(pObj->pClip + 0xD8), pObj->v1638, *(f32*)(*(u8**)(pObj->pClip + 0xD8) + 8) + (pObj->fAnimTime - pSw->fTimeSwingStart))) {
-                pSw->fTimeBallHit = pObj->fAnimTime + (*(f32*)(*(u8**)(pObj->pClip + 0xD4) + 0x24) - pObj->v1638[1]) + pObj->f1644;
+            fn_80095744(pObj, 7);
+            if (fn_800204A0(pObj->pBlend->pD8, pObj->v1638,
+                            pObj->pBlend->pD8->f08 + (pObj->fAnimTime - pSw->fTimeSwingStart))) {
+                pSw->fTimeBallHit = pObj->fAnimTime + (pObj->pBlend->pD4->f24 - pObj->v1638[1]) + pObj->f1644;
             }
-            CharacterState_UpdateSKAState((int)pObj);
+            CharacterState_UpdateSKAState(pObj);
             pObj->n5CC = 2;
             pSw->fTimeSwingTop = pObj->fAnimTime;
             ShotObj_Set1634(pObj, 0.0f);
@@ -1377,11 +1369,12 @@ int Swing_UpdateBackswing(int nPlayer) {
         }
         Swing_UpdatePower(nPlayer);
         Anim_SetRate(pObj->anim, 1.0f);
-        fn_80095744((int)pObj, 7);
-        if (fn_800204A0(*(u8**)(pObj->pClip + 0xD8), pObj->v1638, *(f32*)(*(u8**)(pObj->pClip + 0xD8) + 8) + (pObj->fAnimTime - pSw->fTimeSwingStart))) {
-            pSw->fTimeBallHit = pObj->fAnimTime + (*(f32*)(*(u8**)(pObj->pClip + 0xD4) + 0x24) - pObj->v1638[1]) + pObj->f1644;
+        fn_80095744(pObj, 7);
+        if (fn_800204A0(pObj->pBlend->pD8, pObj->v1638,
+                        pObj->pBlend->pD8->f08 + (pObj->fAnimTime - pSw->fTimeSwingStart))) {
+            pSw->fTimeBallHit = pObj->fAnimTime + (pObj->pBlend->pD4->f24 - pObj->v1638[1]) + pObj->f1644;
         }
-        CharacterState_UpdateSKAState((int)pObj);
+        CharacterState_UpdateSKAState(pObj);
         pObj->n5CC = 2;
         pSw->fTimeSwingTop = pObj->fAnimTime;
         ShotObj_Set1634(pObj, 0.0f);
@@ -1401,7 +1394,6 @@ int Swing_UpdateBackswing(int nPlayer) {
 
 // ---- at the top, and the downswing ----------------------------------------------------------------
 
-void fn_8002792C(u8* p);
 
 // Phase 2, holding at the top. Any stick movement drops back to phase 1 (backing down if it
 // came forward). While it is steady the animation waggles +-0.0076 around the top. If the
@@ -1409,7 +1401,7 @@ void fn_8002792C(u8* p);
 // abandoned: phase 0, the address animation, sound 9.
 int Swing_UpdateAtTop(int nPlayer) {
     Player*    p;
-    ShotObj*   pObj;
+    Character*   pObj;
     SwingData* pSw;
     int        nController;
     int        nX, nY;
@@ -1417,11 +1409,11 @@ int Swing_UpdateAtTop(int nPlayer) {
     f32        fTop, fStart, fAnimTime;
 
     p           = &gPlayers[nPlayer];
-    pObj        = (ShotObj*)p->nShotHandle;
+    pObj        = p->pChar;
     pSw         = &p->swing;
     nController = p->nController;
-    if (*(u8**)(pObj->pView + 0x38) != NULL) {
-        *(s32*)(*(u8**)(pObj->pView + 0x38) + 0x10E4) = 4;
+    if (pObj->pModel->pSkel != NULL) {
+        pObj->pModel->pSkel->n10E4 = 4;
     }
     pPad   = Pad_State(nPlayer, nController);
     nX     = Swing_StickX(nPlayer, pPad);
@@ -1448,7 +1440,7 @@ int Swing_UpdateAtTop(int nPlayer) {
         pSw->fFidgetWaitToIdle += gSession.fFrameTime;
         if (pSw->fFidgetWaitToIdle > 0.1f) {
             pSw->nState = 0;
-            fn_80095744((int)pObj, 5);
+            fn_80095744(pObj, 5);
             Anim_SetRate(pObj->anim, 1.0f);
             EVENT_Trigger(nPlayer, 9, 0, 0);
         }
@@ -1463,7 +1455,7 @@ int Swing_UpdateAtTop(int nPlayer) {
 // impact (n5CC < 0): phase 5, Swing_Launch, the mis-hit rumble, the putt sound.
 int Swing_UpdateDownswing(int nPlayer) {
     Player*    p;
-    ShotObj*   pObj;
+    Character*   pObj;
     SwingData* pSw;
     int        nController;
     int        nX, nY;
@@ -1471,10 +1463,10 @@ int Swing_UpdateDownswing(int nPlayer) {
 
     p           = &gPlayers[nPlayer];
     pSw         = &p->swing;
-    pObj        = (ShotObj*)p->nShotHandle;
+    pObj        = p->pChar;
     nController = p->nController;
-    if (*(u8**)(pObj->pView + 0x38) != NULL) {
-        *(s32*)(*(u8**)(pObj->pView + 0x38) + 0x10E4) = 4;
+    if (pObj->pModel->pSkel != NULL) {
+        pObj->pModel->pSkel->n10E4 = 4;
     }
     if (!Controller_IsCPU(nController) && Game_GetMode() != 10) {
         int nDX, nDY;
@@ -1491,7 +1483,7 @@ int Swing_UpdateDownswing(int nPlayer) {
         }
     }
     if (pObj->n5CC < 0) {
-        fn_8002792C(*(u8**)(pObj->pView + 0x38));
+        fn_8002792C(pObj->pModel->pSkel);
         gPlayers[nPlayer].swing.nState = 5;
         Swing_Launch(nPlayer);
         if (!Controller_IsCPU(nController) && gSession.bReplay == 0) {
@@ -1511,8 +1503,8 @@ int Swing_UpdateDownswing(int nPlayer) {
 
 // ---- after impact ---------------------------------------------------------------------------------
 
-unsigned long long fn_8000BEE4(char* pName);   // a tuning name's 64-bit hash
-void fn_800102DC(unsigned long long uHash, void* pOwner, u32* pOut);   // bind a named resource
+u64 fn_8000BEE4(char* pName);   // a tuning name's 64-bit hash
+void fn_800102DC(u64 uHash, void* pOwner, u32* pOut);   // bind a named resource
 
 int Swing_PhaseIdle4(int nPlayer) {
     return 0;
@@ -1599,7 +1591,6 @@ void Swing_ClearFrameFlag(int nPlayer) {
     gPlayers[nPlayer].swing.nNumInBlurQueue = 0;
 }
 
-int  fn_8001EED8(void* pSkel, int nBone);             // a bone's index
 
 // Record the club for its trail: the head (bone 0x53) and grip (0x52) go on the front of the
 // 25-entry history. When the head has moved more than 0.3 since the last entry, five in-between
@@ -1618,24 +1609,24 @@ void fn_8005A0FC(int nPlayer) {
     f32        v28[4];
     f32        v18[4];
     f32        v8[4];
-    ShotObj*   pObj = (ShotObj*)gPlayers[nPlayer].nShotHandle;
+    Character*   pObj = gPlayers[nPlayer].pChar;
     SwingData* pSw  = &gPlayers[nPlayer].swing;
-    int        nHead = fn_8001EED8(pObj->pView, 0x53);
-    int        nGrip = fn_8001EED8(pObj->pView, 0x52);
+    int        nHead = fn_8001EED8(pObj->pModel, 0x53);
+    int        nGrip = fn_8001EED8(pObj->pModel, 0x52);
     f32        f;                  // the head's move, then the blend step
     f32        fLen;
     int        k;
     int        i;
 
-    Vec_Copy((*(f32 (**)[4][4])(pObj->pView + 8))[nHead][3], v98);
+    Vec_Copy(pObj->pModel->pMatrices[nHead][3], v98);
     Vec_Sub(v98, pSw->prevClub[0].vClubPos, vB8);
     f = fn_80009680(fn_8005CC18(vB8));
     Vec_Copy(v98, vA8);
     if (f > 0.3f && pSw->nNumInBlurQueue != 0) {
         v18[3] = 0.0f;
         v28[3] = 0.0f;
-        Vec_Copy((*(f32 (**)[4][4])(pObj->pView + 8))[nHead][3], v88);
-        Vec_Copy((*(f32 (**)[4][4])(pObj->pView + 8))[nGrip][3], v68);
+        Vec_Copy(pObj->pModel->pMatrices[nHead][3], v88);
+        Vec_Copy(pObj->pModel->pMatrices[nGrip][3], v68);
         Vec_Copy(pSw->prevClub[0].vClubPos, v78);
         Vec_Copy(pSw->prevClub[0].vHandPos, v58);
         Vec_Sub(v68, v58, v48);
@@ -1671,23 +1662,22 @@ void fn_8005A0FC(int nPlayer) {
         }
         Vec_Copy(vA8, pSw->prevClub[0].vClubPos);
         pSw->prevClub[0].vClubPos[3] = 1.0f;
-        Vec_Copy((*(f32 (**)[4][4])(pObj->pView + 8))[nGrip][3], pSw->prevClub[0].vHandPos);
+        Vec_Copy(pObj->pModel->pMatrices[nGrip][3], pSw->prevClub[0].vHandPos);
         if (pSw->nNumInBlurQueue < 25) {
             pSw->nNumInBlurQueue++;
         }
     }
 }
 
-int fn_8001EE90(ShotObj* pObj);
-void fn_8005AD20(ShotObj* pObj, SwingData* pSw, int nStickX);
+void fn_8005AD20(Character* pObj, SwingData* pSw, int nStickX);
 int  fn_8005CC5C(void);
 
 // Pose the golfer from the stick each frame of the backswing (animation 6) and downswing (7): the
 // blend weights at 0x484..0x490 and the twist. A human's stick is read; a CPU only does this in
 // mode 11 (when fn_8005CC5C() is 8 or 9), with the stick hard to one side.
 void fn_8005A478(int nPlayer) {
-    ShotObj*   pObj  = (ShotObj*)gPlayers[nPlayer].nShotHandle;
-    int        nBone = fn_8001EED8(pObj->pView, 0x53);
+    Character*   pObj  = gPlayers[nPlayer].pChar;
+    int        nBone = fn_8001EED8(pObj->pModel, 0x53);
     SwingData* pSw;
     int        nStickX;
     u8*        pPad;
@@ -1721,7 +1711,7 @@ void fn_8005A478(int nPlayer) {
                     nStickX = Swing_StickX(nPlayer, pPad);
                     Swing_StickY(nPlayer, pPad);
                 }
-                Vec_Copy((*(f32 (**)[4][4])(pObj->pView + 8))[nBone][3], vPos);
+                Vec_Copy(pObj->pModel->pMatrices[nBone][3], vPos);
                 if (pObj->nAnim == 6) {
                     if (nStickX < pSw->nCalibrateX) {
                         pSw->fRedColor = 0.0f;
@@ -1797,7 +1787,7 @@ void fn_8005A850(int nPlayer) {
     TrailMeshDesc mesh;
     f32           vGrip[4];
     TrailDraw     draw;
-    ShotObj*      pObj;
+    Character*      pObj;
     u8            nBlue;
     s8            nRed;
     u8            nGreen;
@@ -1807,9 +1797,9 @@ void fn_8005A850(int nPlayer) {
     int           i;
 
     pSw   = &gPlayers[nPlayer].swing;
-    pObj  = (ShotObj*)gPlayers[nPlayer].nShotHandle;
+    pObj  = gPlayers[nPlayer].pChar;
     nView = gPlayers[nPlayer].nView0;
-    nGrip = fn_8001EED8(pObj->pView, 0x52);
+    nGrip = fn_8001EED8(pObj->pModel, 0x52);
     if (Player_IsCPU(nPlayer)) {
         if (Game_GetMode() != 11) return;
         if (fn_8005CC5C() != 8) {
@@ -1824,7 +1814,7 @@ void fn_8005A850(int nPlayer) {
     {
         if ((pObj->nAnim == 6 || pObj->nAnim == 7) && fn_8001EE90(pObj) != 2 && pSw->nNumInBlurQueue >= 2 &&
             SESSION_OPTIONS->unk24[7] != 0) {
-            Vec_Copy((*(f32 (**)[4][4])(pObj->pView + 8))[nGrip][3], vGrip);
+            Vec_Copy(pObj->pModel->pMatrices[nGrip][3], vGrip);
             nBlue = 255.0f * pSw->fBlueColor;
             nRed = 255.0f * pSw->fRedColor;
             nGreen = 255.0f * pSw->fGreenColor;
@@ -1883,21 +1873,19 @@ void fn_8005A850(int nPlayer) {
     }
 }
 
-void fn_8001EEE4(u8* pSkel, int nBone);
 void fn_80008BB8(f32* pOut, f32 x, f32 y, f32 z);
-void fn_80027808(u8* pSkel, f32* pRot);
 
 // Twist the golfer with the stick: how far through the backswing (animation 6, eased in) or the
 // downswing (7, eased out) the animation is, times a smoothed copy of the stick's X, becomes a
 // rotation on the skeleton (mirrored for a left-hander).
-void fn_8005AD20(ShotObj* pObj, SwingData* pSw, int nStickX) {
+void fn_8005AD20(Character* pObj, SwingData* pSw, int nStickX) {
     f32 fAmount = 0.0f;
     f32 fDelta;
     f32 fRate;
     f32 vRot[3];
-    fn_8001EEE4(pObj->pView, 0x24);
-    fn_8001EEE4(pObj->pView, 0x11);
-    fn_8001EED8(pObj->pView, 0x52);
+    fn_8001EEE4(pObj->pModel, 0x24);
+    fn_8001EEE4(pObj->pModel, 0x11);
+    fn_8001EED8(pObj->pModel, 0x52);
     if (pObj->nAnim == 6) {
         fAmount = (pObj->fAnimTime - pSw->fTimeSwingStart) / (pSw->fTimeSwingTop - pSw->fTimeSwingStart);
         fAmount *= fAmount;
@@ -1914,16 +1902,16 @@ void fn_8005AD20(ShotObj* pObj, SwingData* pSw, int nStickX) {
     fRate = (fRate < 0.5f) ? 0.5f : ((fRate > 1.0f) ? 1.0f : fRate);
     pSw->f10 = 0.33333334f * (fDelta * fRate) + pSw->f10;
     fAmount = 0.75f * fAmount * pSw->f10;
-    if (fn_8001EDF4((int)pObj)) {
+    if (fn_8001EDF4(pObj)) {
         fAmount = -fAmount;
     }
     fn_80008BB8(vRot, 0.0f, 0.0f, fAmount);
-    fn_80027808(pObj->pView, vRot);
+    fn_80027808(pObj->pModel, vRot);
 }
 
 // Bind the swing module's tuning values by name.
 void Swing_LoadTuning(int nPlayer) {
-    unsigned long long uHash;
+    u64 uHash;
     uHash = fn_8000BEE4("clubback");
     fn_800102DC(uHash, gpSwing, &gpSwing->uClubBack);
     uHash = fn_8000BEE4("clubdown");
@@ -1939,7 +1927,7 @@ void Swing_LoadTuning(int nPlayer) {
 // (a CPU takes it straight), snapping to 1 within 3% of the top. Holding at the top of a full
 // backswing on anything but a putt costs (hold - 0.05)^2, at most 0.3.
 void Swing_UpdatePower(int nPlayer) {
-    f32  fPower = ((ShotObj*)gPlayers[nPlayer].nShotHandle)->f1628;
+    f32  fPower = gPlayers[nPlayer].pChar->fBackswing;
     f32  fPenalty;
     if (!Player_IsCPU(nPlayer)) {
         fPower = (f32)fn_80009680(fPower);
@@ -2071,44 +2059,42 @@ u8 fn_80062B90(void) {
 }
 
 // Clear an animation event's "reached" flag.
-int fn_80062B98(int nHandle, unsigned long long uEvent) {
-    ShotObj* pObj = (ShotObj*)nHandle;
-    pObj->events[(int)uEvent].bSet = 0;
+int fn_80062B98(Character* pChar, u64 uEvent) {
+    pChar->events[(int)uEvent].bSet = 0;
     return 0;
 }
 
 // An animation event has been reached: it is set and the animation time is past it.
-int fn_80062BB0(int nHandle, unsigned long long uEvent) {
-    u8* pEvent = (u8*)nHandle + (int)uEvent * 0x10;
-    if (*(u32*)(pEvent + 0x4AC) != 0 && *(f32*)(nHandle + 0x17C) >= *(f32*)(pEvent + 0x4B0)) {
+int fn_80062BB0(Character* pChar, u64 uEvent) {
+    if (pChar->events[(int)uEvent].bSet != 0 && pChar->fAnimTime >= pChar->events[(int)uEvent].fTime) {
         return 1;
     }
     return 0;
 }
 
-void fn_80062BE8(int nHandle) {
-    if ((u8*)nHandle != NULL) {
-        *(u32*)(nHandle + 0x1794) = 0;
+void fn_80062BE8(Character* pChar) {
+    if (pChar != NULL) {
+        pChar->p1794 = NULL;
     }
 }
 
-void fn_80062BFC(int nHandle) {
-    if ((u8*)nHandle != NULL) {
-        *(u32*)(nHandle + 0x1790) = 0;
+void fn_80062BFC(Character* pChar) {
+    if (pChar != NULL) {
+        pChar->p1790 = NULL;
     }
 }
 
-int fn_80062C10(int nHandle) {
-    return *(u32*)(nHandle + 0x168) & 4;
+int fn_80062C10(Character* pChar) {
+    return pChar->uFlags & 4;
 }
 
-int fn_80062C1C(int nHandle) {
-    return *(u32*)(nHandle + 0x168) & 1;
+int fn_80062C1C(Character* pChar) {
+    return pChar->uFlags & 1;
 }
 
 // How far the animation still has to run.
-f32 fn_80062C28(int nHandle) {
-    return *(f32*)(nHandle + 0x184) - *(f32*)(nHandle + 0x17C);
+f32 fn_80062C28(Character* pChar) {
+    return pChar->fAnimEnd - pChar->fAnimTime;
 }
 
 void fn_80062C38(void) {
@@ -2569,12 +2555,12 @@ void STATEFUNC_RemoveBallInit(int nPlayer) {
     nPinSet = Game_CurrentPinSet();
     pCourse = fn_8000C594();
     if (pCourse != NULL) {
-        Character_SetPosition(gPlayers[nPlayer].nShotHandle, &pCourse->pin[nPinSet].x, 1);
+        Character_SetPosition(gPlayers[nPlayer].pChar, &pCourse->pin[nPinSet].x, 1);
         Physics_DropBall(pBall, &pCourse->pin[nPinSet].x);
         gPlayers[nPlayer].ball.nLie = LIE_HOLED;
         Vec3Copy(pBall->vPos, pBallBefore->vPos);
     }
-    fn_80095744(gPlayers[nPlayer].nShotHandle, 12);
+    fn_80095744(gPlayers[nPlayer].pChar, 12);
 }
 
 // State 21: each of the player's views saves its camera and takes camera 10.
@@ -2605,16 +2591,14 @@ void STATEFUNC_MidHoleFlyByInit(int nPlayer) {
 }
 
 
-void fn_80062BFC(int nHandle);
-void fn_80062BE8(int nHandle);
 
 void STATEFUNC_TapInInit(int nPlayer) {
     GM_MovePlayerToBall(nPlayer);
-    fn_80095744(gPlayers[nPlayer].nShotHandle, 11);
-    fn_80062BFC(gPlayers[nPlayer].nShotHandle);
-    fn_80062BE8(gPlayers[nPlayer].nShotHandle);
-    fn_8001C774(gPlayers[nPlayer].nShotHandle, gPlayers[nPlayer].nClub);
-    fn_8001C724(gPlayers[nPlayer].nShotHandle, gPlayers[nPlayer].nShotKind);
+    fn_80095744(gPlayers[nPlayer].pChar, 11);
+    fn_80062BFC(gPlayers[nPlayer].pChar);
+    fn_80062BE8(gPlayers[nPlayer].pChar);
+    fn_8001C774(gPlayers[nPlayer].pChar, gPlayers[nPlayer].nClub);
+    fn_8001C724(gPlayers[nPlayer].pChar, gPlayers[nPlayer].nShotKind);
     fn_8001C804(nPlayer, 1, 1);
     gPlayers[nPlayer].uFlags |= 8;
     gPlayers[nPlayer].fA64 = fn_800D0478(nPlayer);
@@ -2726,7 +2710,7 @@ void STATEFUNC_SimulateInit(int nPlayer) {
         Mem_cpy(pBallBefore, &gPlayers[nPlayer].ball, sizeof(Ball));
     }
     pBallBefore->nPlayer = -1;
-    if (fn_80095780(gPlayers[nPlayer].nShotHandle) != 11 && fn_80101738() && !fn_800C6CB0()) {
+    if (fn_80095780(gPlayers[nPlayer].pChar) != 11 && fn_80101738() && !fn_800C6CB0()) {
         int nView = gPlayers[nPlayer].nView0;
         View_SetCamera(fn_80017028(nView), 0xE, nPlayer, nView);
     }
@@ -2772,9 +2756,6 @@ void STATEFUNC_FadeToTapInUpdate(int nPlayer) {
 }
 
 
-int   fn_80048574(int nHandle, unsigned long long uEvent);
-int fn_80062BB0(int nHandle, unsigned long long uEvent);
-int fn_80062B98(int nHandle, unsigned long long uEvent);
 void  fn_800A5980(u8 nPlayer);
 void  fn_8006C28C(int nPlayer, int nController);
 extern Vec4 lbl_80183650;
@@ -2783,12 +2764,12 @@ extern Vec4 lbl_80183650;
 // set, the launch is made with the controller set to the CPU for the call (so no meter, no
 // error, no luck swap), then it is state 12 with the ball away.
 void STATEFUNC_TapInUpdate(int nPlayer) {
-    int   nController;
-    Vec4  vOffset = lbl_80183650;
-    View* pV      = fn_80017028(gPlayers[nPlayer].nView0);
-    int   nHandle = gPlayers[nPlayer].nShotHandle;
+    int        nController;
+    Vec4       vOffset = lbl_80183650;
+    View*      pV      = fn_80017028(gPlayers[nPlayer].nView0);
+    Character* pChar   = gPlayers[nPlayer].pChar;
 
-    if (fn_80095780(nHandle) != 11) return;
+    if (fn_80095780(pChar) != 11) return;
     if (pV->nCurCamera != 0xC) {
         View_SetCamera(pV, 0xC, nPlayer, gPlayers[nPlayer].nView0);
         fn_80063B98(pV, 0.75f, (f32*)&vOffset);
@@ -2796,9 +2777,9 @@ void STATEFUNC_TapInUpdate(int nPlayer) {
     if (pV->nCamera == 1) return;
     if (pV->nCamera == 4) return;
     if (pV->nCamera == 3) return;
-    if (fn_80048574(nHandle, 2)) {
-        if (!fn_80062BB0(nHandle, 2)) return;
-        fn_80062B98(nHandle, 2);
+    if (fn_80048574(pChar, 2)) {
+        if (!fn_80062BB0(pChar, 2)) return;
+        fn_80062B98(pChar, 2);
         nController  = gPlayers[nPlayer].nController;
         gPlayers[nPlayer].nController = CONTROLLER_CPU;
         Swing_Launch(nPlayer);
@@ -2851,7 +2832,6 @@ void STATEFUNC_KneeCamUpdate(int nPlayer) {
 
 void fn_80058FA4(int nPlayer);
 void  fn_80068AA8(int nPlayer);
-void  fn_800957B0(int nHandle, int a);
 f32   fn_800D04AC(int nPlayer);
 
 // State 4: an aiming camera held while button 7 is down (the caddie keeps updating). Buttons
@@ -2900,8 +2880,8 @@ void STATEFUNC_ShotSetupInit(int nPlayer) {
         View_SetCamera(fn_80017028(nView), 0xC, nPlayer, nView);
     }
     if (gpGame->n290 != 0) {
-        fn_80095744(gPlayers[nPlayer].nShotHandle, 2);
-        CharacterState_UpdateSKAState(gPlayers[nPlayer].nShotHandle);
+        fn_80095744(gPlayers[nPlayer].pChar, 2);
+        CharacterState_UpdateSKAState(gPlayers[nPlayer].pChar);
     }
     fn_80062C38();
     pBall = &gPlayers[nPlayer].ball;
@@ -2915,10 +2895,10 @@ void STATEFUNC_ShotSetupInit(int nPlayer) {
     if (gpGame->b276 != 0) {
         fn_800689D4(nPlayer);
     }
-    if (((ShotObj*)gPlayers[nPlayer].nShotHandle)->n2C == 4 ||
-        ((ShotObj*)gPlayers[nPlayer].nShotHandle)->n2C == 5) {
-        fn_800957FC(gPlayers[nPlayer].nShotHandle, 1);
-        fn_800957B0(gPlayers[nPlayer].nShotHandle, 1);
+    if (gPlayers[nPlayer].pChar->n2C == 4 ||
+        gPlayers[nPlayer].pChar->n2C == 5) {
+        fn_800957FC(gPlayers[nPlayer].pChar, 1);
+        fn_800957B0(gPlayers[nPlayer].pChar, 1);
     }
     fn_80054A6C(pBall);
     gPlayers[nPlayer].fA64 = fn_800D04AC(nPlayer);
@@ -2960,8 +2940,8 @@ void STATEFUNC_InitialFlyByInit(int nPlayer) {
     Shot_Plan(nPlayer, 1);
     fn_8001D8DC(nPlayer);
     fn_8001C804(nPlayer, 1, 1);
-    fn_800957D8(gPlayers[nPlayer].nShotHandle);
-    fn_80095744(gPlayers[nPlayer].nShotHandle, 1);
+    fn_800957D8(gPlayers[nPlayer].pChar);
+    fn_80095744(gPlayers[nPlayer].pChar, 1);
     fn_8003349C(1.0f, 12.0f, 0.1f);
     GameEffects_ResetGameEffectSettings();
     for (i = 0; i < gNumPlayersSetUp; i++) {
@@ -2997,7 +2977,7 @@ void STATEFUNC_PlaceBallInit(int nPlayer) {
     Shot_Plan(nPlayer, 1);
     gPlayers[nPlayer].fThinkTime = 0.0f;
     fn_8001C804(nPlayer, 1, 1);
-    fn_800957D8(gPlayers[nPlayer].nShotHandle);
+    fn_800957D8(gPlayers[nPlayer].pChar);
     GameEffects_ResetGameEffectSettings();
     fn_800D8D10(nPlayer);
     fn_800693A4(nPlayer);
@@ -3049,8 +3029,8 @@ void STATEFUNC_GreenMorphUpdate(int nPlayer) {
             Shot_Prepare(nPlayer, 1);
             BreakLine_Start(gPlayers[nPlayer].nView0);
             fn_8001C804(nPlayer, 1, 1);
-            fn_800957D8(gPlayers[nPlayer].nShotHandle);
-            fn_80095744(gPlayers[nPlayer].nShotHandle, 5);
+            fn_800957D8(gPlayers[nPlayer].pChar);
+            fn_80095744(gPlayers[nPlayer].pChar, 5);
             fn_80062C38();
             if (gSession.nSplitScreen != 0) {
                 fn_80062CB0(gPlayers[nPlayer].nC58, 1);
@@ -3213,7 +3193,6 @@ void STATEFUNC_GreenWatchRollUpdate(int nPlayer) {
 }
 
 
-u8    fn_800734A0(void* pAnim);
 
 // State 13: the ball has come to rest and the golfer reacts. On the first frame the result is
 // handed to the view; a good result (gpGame+0x294, not on cameras 1/4) plays the reaction
@@ -3233,8 +3212,9 @@ void STATEFUNC_InTheHoleUpdate(int nPlayer) {
         fn_800C7158(pV, GM_ShowPostShotAnimation(nPlayer));
         if (gpGame->n294 != 0 && pV->nCamera != 1 && pV->nCamera != 4) {
             if (!(gPlayers[nPlayer].uFlags & 8) || fn_8006AA9C(nPlayer) == 2) {
-                if (fn_80095780(gPlayers[nPlayer].nShotHandle) != 9 && fn_80095798(gPlayers[nPlayer].nShotHandle) != 9 && fn_800C7160(pV)) {
-                    fn_80095744(gPlayers[nPlayer].nShotHandle, 9);
+                if (fn_80095780(gPlayers[nPlayer].pChar) != 9 && fn_80095798(gPlayers[nPlayer].pChar) != 9 &&
+                    fn_800C7160(pV)) {
+                    fn_80095744(gPlayers[nPlayer].pChar, 9);
                 } else {
                     View_SetCamera(pV, 0x10, nPlayer, gPlayers[nPlayer].nView0);
                 }
@@ -3246,12 +3226,13 @@ void STATEFUNC_InTheHoleUpdate(int nPlayer) {
         GOLFERSTATE_Switch(GS_FADE_TO_REMOVE_BALL, nPlayer);
         return;
     }
-    if (fn_80095780(gPlayers[nPlayer].nShotHandle) == 9 && pV->nCurCamera != 0x10 && Game_GetMode() != 11 &&
-        !fn_800734A0((u8*)gPlayers[nPlayer].nShotHandle + 0x40C)) {
+    if (fn_80095780(gPlayers[nPlayer].pChar) == 9 && pV->nCurCamera != 0x10 && Game_GetMode() != 11 &&
+        !fn_800734A0(&gPlayers[nPlayer].pChar->blend)) {
         View_SetCamera(pV, 0x10, nPlayer, gPlayers[nPlayer].nView0);
     }
-    if (fn_80095780(gPlayers[nPlayer].nShotHandle) == 9) {
-        if ((fn_80062C1C(gPlayers[nPlayer].nShotHandle) != 0 || fn_80062C10(gPlayers[nPlayer].nShotHandle) != 0) && !fn_800C6604(pV)) {
+    if (fn_80095780(gPlayers[nPlayer].pChar) == 9) {
+        if ((fn_80062C1C(gPlayers[nPlayer].pChar) != 0 || fn_80062C10(gPlayers[nPlayer].pChar) != 0) &&
+            !fn_800C6604(pV)) {
             GolfCamera_CutToGolferDoneAnimatingCam(pV, nPlayer);
         }
     }
@@ -3260,7 +3241,6 @@ void STATEFUNC_InTheHoleUpdate(int nPlayer) {
 
 
 void fn_80062D98(void);
-void  SKEL_SetIKSolutionWeight(u8* p, f32 f);
 void  fn_80047EF0(Ball* pBall, int nPlayer, int a);   // tee the ball up
 
 // State 11 begins: the swing animation. The camera is 12 in a replay, else one of the three
@@ -3286,20 +3266,20 @@ void STATEFUNC_ReplaySwingInit(int nPlayer) {
         }
     }
     fn_8001C804(nPlayer, 1, 1);
-    fn_800957D8(gPlayers[nPlayer].nShotHandle);
-    *(s32*)(gPlayers[nPlayer].nShotHandle + 0x20) = 7;
-    *(s32*)(gPlayers[nPlayer].nShotHandle + 0x1C) = 7;
+    fn_800957D8(gPlayers[nPlayer].pChar);
+    gPlayers[nPlayer].pChar->n20 = 7;
+    gPlayers[nPlayer].pChar->nAnim = 7;
     if (gPlayers[nPlayer].uFlags & 8) {
-        CharAnim_StartTapIn((u8*)gPlayers[nPlayer].nShotHandle);
+        CharAnim_StartTapIn(gPlayers[nPlayer].pChar);
     } else {
         if (fn_800C6D80() || fn_800C44A8(pV, nPlayer) || fn_800C44CC(pV, nPlayer) || fn_800C44E0(pV, nPlayer)) {
-            CharacterState_AddSKABlendData((u8*)gPlayers[nPlayer].nShotHandle, 1, 0, fn_80072ACC, 1, 8,
+            CharacterState_AddSKABlendData(gPlayers[nPlayer].pChar, 1, 0, fn_80072ACC, 1, 8,
                                            -20000.0f, -30000.0f, -10000.0f, 0.0f, -10000.0f);
         } else {
-            CharacterState_AddSKABlendData((u8*)gPlayers[nPlayer].nShotHandle, 1, 0, fn_80072ACC, 1, 8,
+            CharacterState_AddSKABlendData(gPlayers[nPlayer].pChar, 1, 0, fn_80072ACC, 1, 8,
                                            -20000.0f, -90000.0f, -10000.0f, 0.0f, -10000.0f);
         }
-        SKEL_SetIKSolutionWeight(*(u8**)(*(u8**)(gPlayers[nPlayer].nShotHandle + 0x38) + 0x38), 1.0f);
+        SKEL_SetIKSolutionWeight(gPlayers[nPlayer].pChar->pModel->pSkel, 1.0f);
     }
     Swing_ClearFrameFlag(nPlayer);
     if (gPlayers[nPlayer].ball.nLie == 0) {
@@ -3330,16 +3310,16 @@ void STATEFUNC_ReplaySwingUpdate(int nPlayer) {
     View* pV    = fn_80017028(gPlayers[nPlayer].nView0);
     u8    bSpecial = 0;
     GameEffects_SetSuperSlowMo(1, nPlayer, fn_800C6B7C(fn_80017028(gPlayers[nPlayer].nView0)));
-    if (!fn_80048574(gPlayers[nPlayer].nShotHandle, 2) ||
-        fn_8005CB78(gPlayers[nPlayer].nShotHandle, 2) < ((ShotObj*)gPlayers[nPlayer].nShotHandle)->fAnimTime) {
+    if (!fn_80048574(gPlayers[nPlayer].pChar, 2) ||
+        fn_8005CB78(gPlayers[nPlayer].pChar, 2) < gPlayers[nPlayer].pChar->fAnimTime) {
         if (gSession.bReplay) {
-            fn_8002792C(*(u8**)(((ShotObj*)gPlayers[nPlayer].nShotHandle)->pView + 0x38));
+            fn_8002792C(gPlayers[nPlayer].pChar->pModel->pSkel);
             Swing_Launch(nPlayer);
             GOLFERSTATE_Switch(GS_SIMULATE, nPlayer);
         } else if (fn_800C4518(pV) >= fn_800C6B38(pV)) {
             EVENT_Trigger(nPlayer, 0xA, &gPlayers[nPlayer].ball, 1);
             fn_800C44A8(pV, nPlayer);
-            fn_8002792C(*(u8**)(((ShotObj*)gPlayers[nPlayer].nShotHandle)->pView + 0x38));
+            fn_8002792C(gPlayers[nPlayer].pChar->pModel->pSkel);
             Swing_Launch(nPlayer);
             GOLFERSTATE_Switch(GS_SIMULATE, nPlayer);
         } else {
@@ -3349,13 +3329,13 @@ void STATEFUNC_ReplaySwingUpdate(int nPlayer) {
                 bSpecial = fn_800C5FE4(pV, nPlayer);
             }
             if (bSpecial) {
-                CharacterState_AddSKABlendData((u8*)gPlayers[nPlayer].nShotHandle, 1, 0x12, fn_80072ACC, 1, 8,
+                CharacterState_AddSKABlendData(gPlayers[nPlayer].pChar, 1, 0x12, fn_80072ACC, 1, 8,
                                                -20000.0f, -30000.0f, -10000.0f, 0.0f, -10000.0f);
             } else {
-                CharacterState_AddSKABlendData((u8*)gPlayers[nPlayer].nShotHandle, 1, 0, fn_80072ACC, 1, 8,
+                CharacterState_AddSKABlendData(gPlayers[nPlayer].pChar, 1, 0, fn_80072ACC, 1, 8,
                                                -20000.0f, -90000.0f, -10000.0f, 0.0f, -10000.0f);
             }
-            fn_800957D8(gPlayers[nPlayer].nShotHandle);
+            fn_800957D8(gPlayers[nPlayer].pChar);
             Swing_ClearFrameFlag(nPlayer);
             fn_80062D98();
         }
@@ -3367,8 +3347,6 @@ void STATEFUNC_ReplaySwingUpdate(int nPlayer) {
 }
 
 
-void  fn_800CC5C0(int nHandle, char* pA, char* pB);   // an attachment (the glove) on / off
-void  fn_8007326C(u8* pAnim);
 
 // State 1 begins: addressing the ball. Camera 25 and the game's 0x20C hook; a fresh Shot_Plan
 // when the game asks (gpGame+0x276, and it ends any replay); the glove comes off for a putt;
@@ -3392,9 +3370,9 @@ void STATEFUNC_PreShotInit(int nPlayer) {
         Shot_Plan(nPlayer, 1);
     }
     if (gPlayers[nPlayer].nClub == CLUB_PUTTER) {
-        fn_800CC5C0(gPlayers[nPlayer].nShotHandle, "Glove", "GloveOff");
+        fn_800CC5C0(gPlayers[nPlayer].pChar, "Glove", "GloveOff");
     } else {
-        fn_800CC5C0(gPlayers[nPlayer].nShotHandle, "Glove", "GloveOn");
+        fn_800CC5C0(gPlayers[nPlayer].pChar, "Glove", "GloveOn");
     }
     gPlayers[nPlayer].fThinkTime = 0.0f;
     for (k = 0; k < 2; k++) {
@@ -3404,15 +3382,15 @@ void STATEFUNC_PreShotInit(int nPlayer) {
     fn_8001D8DC(nPlayer);
     fn_8001C804(nPlayer, 1, 1);
     if (gpGame->b277 != 0) {
-        fn_800957D8(gPlayers[nPlayer].nShotHandle);
+        fn_800957D8(gPlayers[nPlayer].pChar);
     }
     GameEffects_ResetGameEffectSettings();
     fn_800D8D10(nPlayer);
     fn_80068AA8(nPlayer);
-    fn_800957FC(gPlayers[nPlayer].nShotHandle, 1);
+    fn_800957FC(gPlayers[nPlayer].pChar, 1);
     Emotion_UpdatePlayerEmotion(nPlayer);
-    if (((ShotObj*)gPlayers[nPlayer].nShotHandle)->n2C == 0) {
-        fn_800957B0(gPlayers[nPlayer].nShotHandle, 1);
+    if (gPlayers[nPlayer].pChar->n2C == 0) {
+        fn_800957B0(gPlayers[nPlayer].pChar, 1);
     }
     fn_80045824(nPlayer);
     Swing_ResetBoostAndSpin(nPlayer);
@@ -3435,23 +3413,21 @@ void STATEFUNC_PreShotInit(int nPlayer) {
         fn_800E3D38(nPlayer, 1);
     }
     if (fn_800DDFB4(nPlayer) != 0) {
-        fn_8007326C(((ShotObj*)gPlayers[nPlayer].nShotHandle)->anim);
+        fn_8007326C(gPlayers[nPlayer].pChar->anim);
         if (gPlayers[nPlayer].bLowIQPenalty != 0 && gPlayers[nPlayer].ball.nLie != 0 && !fn_80100294()) {
-            fn_80095744(gPlayers[nPlayer].nShotHandle, 10);
+            fn_80095744(gPlayers[nPlayer].pChar, 10);
         } else {
-            fn_80095744(gPlayers[nPlayer].nShotHandle, 1);
+            fn_80095744(gPlayers[nPlayer].pChar, 1);
         }
-        CharacterState_UpdateSKAState(gPlayers[nPlayer].nShotHandle);
+        CharacterState_UpdateSKAState(gPlayers[nPlayer].pChar);
         nView = gPlayers[nPlayer].nView0;
         View_SetCamera(fn_80017028(nView), 0xB, nPlayer, nView);
     }
 }
 
-void  Character_GetBallOnFingerPosition(int nHandle, f32* pPos);
 void  fn_800A3CB0(f32* pPos, int nPlayer);
 void  fn_800A3D6C(f32* pPos, int nPlayer);
 void  fn_800A3DF4(int nPlayer);
-void  fn_8001DA04(int nHandle, u8* pA, u8* pB);
 extern u8*  lbl_80281DA0;                    // per player, 0x104 bytes each
 extern Vec4 lbl_801835E0;
 
@@ -3476,42 +3452,42 @@ void STATEFUNC_PreShotUpdate(int nPlayer) {
         GOLFERSTATE_Switch(GS_SHOT_SETUP, nPlayer);
         return;
     }
-    if (fn_80095780(gPlayers[nPlayer].nShotHandle) == 10) {
-        if (fn_80048574(gPlayers[nPlayer].nShotHandle, 3)) {
-            if (fn_80062BB0(gPlayers[nPlayer].nShotHandle, 3)) {
-                fn_80062B98(gPlayers[nPlayer].nShotHandle, 3);
+    if (fn_80095780(gPlayers[nPlayer].pChar) == 10) {
+        if (fn_80048574(gPlayers[nPlayer].pChar, 3)) {
+            if (fn_80062BB0(gPlayers[nPlayer].pChar, 3)) {
+                fn_80062B98(gPlayers[nPlayer].pChar, 3);
                 if (!fn_800559BC(&gPlayers[nPlayer].ball, gPlayers[nPlayer].ball.vPos)) {
                     Physics_DropBall(&gPlayers[nPlayer].ball, gPlayers[nPlayer].ball.vPos);
                 }
             } else {
-                Character_GetBallOnFingerPosition(gPlayers[nPlayer].nShotHandle, gPlayers[nPlayer].ball.vPos);
+                Character_GetBallOnFingerPosition(gPlayers[nPlayer].pChar, gPlayers[nPlayer].ball.vPos);
                 bInHand = 1;
             }
         }
-    } else if (fn_80048574(gPlayers[nPlayer].nShotHandle, 0x10)) {
-        if (fn_80062BB0(gPlayers[nPlayer].nShotHandle, 0x10)) {
-            Character_GetBallOnFingerPosition(gPlayers[nPlayer].nShotHandle, vHand);
-            fn_80062B98(gPlayers[nPlayer].nShotHandle, 0x10);
+    } else if (fn_80048574(gPlayers[nPlayer].pChar, 0x10)) {
+        if (fn_80062BB0(gPlayers[nPlayer].pChar, 0x10)) {
+            Character_GetBallOnFingerPosition(gPlayers[nPlayer].pChar, vHand);
+            fn_80062B98(gPlayers[nPlayer].pChar, 0x10);
             fn_800A3CB0(vHand, nPlayer);
         }
-    } else if (fn_80048574(gPlayers[nPlayer].nShotHandle, 0x11)) {
-        if (fn_80062BB0(gPlayers[nPlayer].nShotHandle, 0x11)) {
-            fn_80062B98(gPlayers[nPlayer].nShotHandle, 0x11);
+    } else if (fn_80048574(gPlayers[nPlayer].pChar, 0x11)) {
+        if (fn_80062BB0(gPlayers[nPlayer].pChar, 0x11)) {
+            fn_80062B98(gPlayers[nPlayer].pChar, 0x11);
             fn_800A3DF4(nPlayer);
         } else {
-            Character_GetBallOnFingerPosition(gPlayers[nPlayer].nShotHandle, vHand);
+            Character_GetBallOnFingerPosition(gPlayers[nPlayer].pChar, vHand);
             fn_800A3D6C(vHand, nPlayer);
         }
     }
-    if (gPlayers[nPlayer].ball.nLie == 0 && fn_80048574(gPlayers[nPlayer].nShotHandle, 3)) {
-        if (fn_80062BB0(gPlayers[nPlayer].nShotHandle, 3)) {
-            fn_80062B98(gPlayers[nPlayer].nShotHandle, 3);
+    if (gPlayers[nPlayer].ball.nLie == 0 && fn_80048574(gPlayers[nPlayer].pChar, 3)) {
+        if (fn_80062BB0(gPlayers[nPlayer].pChar, 3)) {
+            fn_80062B98(gPlayers[nPlayer].pChar, 3);
             gPlayers[nPlayer].ball.vPos[1] += 2.0f;
             fn_80055AA8(&gPlayers[nPlayer].ball, gPlayers[nPlayer].ball.vPos, nPlayer);
             fn_80047EF0(&gPlayers[nPlayer].ball, nPlayer, 0);
         } else {
-            Character_GetBallOnFingerPosition(gPlayers[nPlayer].nShotHandle, gPlayers[nPlayer].ball.vPos);
-            fn_8001DA04(gPlayers[nPlayer].nShotHandle, pSlot + 0x30, pSlot + 0x50);
+            Character_GetBallOnFingerPosition(gPlayers[nPlayer].pChar, gPlayers[nPlayer].ball.vPos);
+            fn_8001DA04(gPlayers[nPlayer].pChar, pSlot + 0x30, pSlot + 0x50);
             bInHand = 1;
         }
     } else if (gPlayers[nPlayer].ball.nLie == 0) {
@@ -3548,14 +3524,15 @@ void STATEFUNC_PreShotUpdate(int nPlayer) {
             }
         }
     }
-    if (fn_80095780(gPlayers[nPlayer].nShotHandle) != 10 && fn_80095780(gPlayers[nPlayer].nShotHandle) != 1 && fn_800C6E88(pV, nPlayer)) {
-        fn_80095744(gPlayers[nPlayer].nShotHandle, 5);
-        CharacterState_UpdateSKAState(gPlayers[nPlayer].nShotHandle);
+    if (fn_80095780(gPlayers[nPlayer].pChar) != 10 && fn_80095780(gPlayers[nPlayer].pChar) != 1 &&
+        fn_800C6E88(pV, nPlayer)) {
+        fn_80095744(gPlayers[nPlayer].pChar, 5);
+        CharacterState_UpdateSKAState(gPlayers[nPlayer].pChar);
         fn_80063CF0(pV, 0x17, nPlayer);
     }
     if (fn_80063C7C(pV) && (fn_800C6F7C(pV, nPlayer, 0.25f) || !fn_800C6E88(pV, nPlayer))) {
         if (bInHand) {
-            if (fn_80095780(gPlayers[nPlayer].nShotHandle) == 10) {
+            if (fn_80095780(gPlayers[nPlayer].pChar) == 10) {
                 Physics_DropBall(&gPlayers[nPlayer].ball, &gPlayers[nPlayer].fBallX);
             } else {
                 fn_80055AA8(&gPlayers[nPlayer].ball, gPlayers[nPlayer].ball.vPrev, nPlayer);
@@ -3567,17 +3544,17 @@ void STATEFUNC_PreShotUpdate(int nPlayer) {
     if (pV->fCamTime > 10.0f) {
         GOLFERSTATE_Switch(GS_SHOT_SETUP, nPlayer);
     }
-    if (fn_80095780(gPlayers[nPlayer].nShotHandle) != 10 && fn_80095780(gPlayers[nPlayer].nShotHandle) != 1 && fn_800C6F7C(pV, nPlayer, 0.25f) &&
-        !fn_80063C90(pV)) {
+    if (fn_80095780(gPlayers[nPlayer].pChar) != 10 && fn_80095780(gPlayers[nPlayer].pChar) != 1 &&
+        fn_800C6F7C(pV, nPlayer, 0.25f) && !fn_80063C90(pV)) {
         fn_80063BF4(pV, 0.25f, (f32*)&vOffset);
-    } else if ((fn_80095780(gPlayers[nPlayer].nShotHandle) == 10 || fn_80095780(gPlayers[nPlayer].nShotHandle) == 1) &&
-               ((ShotObj*)gPlayers[nPlayer].nShotHandle)->fAnimTime > ((ShotObj*)gPlayers[nPlayer].nShotHandle)->fAnimEnd - 0.25f && !fn_80063C90(pV)) {
+    } else if ((fn_80095780(gPlayers[nPlayer].pChar) == 10 || fn_80095780(gPlayers[nPlayer].pChar) == 1) &&
+               gPlayers[nPlayer].pChar->fAnimTime > gPlayers[nPlayer].pChar->fAnimEnd - 0.25f &&
+               !fn_80063C90(pV)) {
         fn_80063BF4(pV, 0.25f, (f32*)&vOffset);
     }
 }
 
 
-u8    fn_8001DBF4(int nHandle);               // the ball is in the golfer's hand
 void fn_80062DDC(f32* pA, f32* pB, f32* pOut);       // a - b
 extern Vec4 lbl_80183680;
 extern f32  gRealBallRadiusIn;               // 0x80283300  0.84: a real golf ball, in inches
@@ -3592,22 +3569,22 @@ void STATEFUNC_RemoveBallUpdate(int nPlayer) {
     Vec4  vOffset = lbl_80183680;
     s32*  pnView  = &gPlayers[nPlayer].nView0;
     View* pV      = fn_80017028(*pnView);
-    s32*  pHandle = &gPlayers[nPlayer].nShotHandle;
+    Character** ppChar = &gPlayers[nPlayer].pChar;
     Ball* pBall;
     f32   vDir[4];
     f32   vPos[4];
     f32   fGround, fSpeed;
 
-    if (fn_80095780(*pHandle) == 12 && pV->nCurCamera != 0x10) {
+    if (fn_80095780(*ppChar) == 12 && pV->nCurCamera != 0x10) {
         int nView = *pnView;
         View_SetCamera(fn_80017028(nView), 0x10, nPlayer, nView);
         fn_80063B98(fn_80017028(*pnView), 0.75f, (f32*)&vOffset);
     }
-    if (fn_8001DBF4(*pHandle)) {
-        int   nBone = fn_8001EED8(*(u8**)(*pHandle + 0x38), 0x54);
+    if (fn_8001DBF4(*ppChar)) {
+        int   nBone = fn_8001EED8((*ppChar)->pModel, 0x54);
         f32*  pBallY;
         pBall = &gPlayers[nPlayer].ball;
-        Vec3Copy((f32*)(*(u8**)(*(u8**)(*pHandle + 0x38) + 8) + nBone * 0x40 + 0x30), pBall->vPos);
+        Vec3Copy((*ppChar)->pModel->pMatrices[nBone][3], pBall->vPos);
         Vec3Copy(pBall->vPos, vPos);
         vPos[1] += 30.0f;
         fGround = fn_8004D620(fn_8000C594(), vPos);
@@ -3618,30 +3595,30 @@ void STATEFUNC_RemoveBallUpdate(int nPlayer) {
             }
         }
     } else if (gSession.fFrameTime > 0.0f) {
-        if (fn_80048574(*pHandle, 4) && fn_80062BB0(*pHandle, 4)) {
+        if (fn_80048574(*ppChar, 4) && fn_80062BB0(*ppChar, 4)) {
             Player* p     = &gPlayers[nPlayer];
             Ball*   pB    = &p->ball;
             f32*    pPrev = p->ball.vPrev;
             Vec3Copy(pB->vPos, pPrev);
-            Character_GetBallOnFingerPosition(*pHandle, pB->vPos);
-            if (fn_80062BB0(*pHandle, 3)) {
-                f32 fT4 = fn_8005CB78(*pHandle, 4);
-                if (fn_8005CB78(*pHandle, 3) > fT4) {
+            Character_GetBallOnFingerPosition(*ppChar, pB->vPos);
+            if (fn_80062BB0(*ppChar, 3)) {
+                f32 fT4 = fn_8005CB78(*ppChar, 4);
+                if (fn_8005CB78(*ppChar, 3) > fT4) {
                     fn_80062DDC(pB->vPos, pPrev, vDir);
                     fSpeed = (f32)fn_80009680(fn_80009744(vDir));
                     if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
                         fn_800BAF04(vDir, vDir);
                     }
                     fSpeed = 60.0f * (60.0f * (59.94f * (fSpeed / 1760.0f))) * 0.5f;
-                    fn_80062B98(*pHandle, 4);
+                    fn_80062B98(*ppChar, 4);
                     gPlayers[nPlayer].ballBefore.bHoled = 0;
                     fn_80051A18(&p->ballBefore, vDir, fSpeed, pB->vPos);
                 }
             }
         }
-        if (fn_80048574(*pHandle, 3) && fn_80062BB0(*pHandle, 3)) {
-            f32 fT4 = fn_8005CB78(*pHandle, 4);
-            if (fn_8005CB78(*pHandle, 3) > fT4) {
+        if (fn_80048574(*ppChar, 3) && fn_80062BB0(*ppChar, 3)) {
+            f32 fT4 = fn_8005CB78(*ppChar, 4);
+            if (fn_8005CB78(*ppChar, 3) > fT4) {
                 s32 nState = gPlayers[nPlayer].ballBefore.nState;
                 if (nState != 1 && nState != 5 && nState != 0) {
                     Player* p = &gPlayers[nPlayer];
@@ -3725,7 +3702,7 @@ void STATEFUNC_SimulateUpdate(int nPlayer) {
     if (gReplayData.bF10 != 0 && gpGame->b287 != 0) {
         if ((fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x18, 0)) && !(gPlayers[nPlayer].uFlags & 8) &&
             (s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_CONCEDED && !fn_800E53B8() &&
-            !(*(u32*)(gPlayers[nPlayer].nShotHandle + 0x10) & 0x40)) {
+            !(gPlayers[nPlayer].pChar->u10 & 0x40)) {
             s32* pKeptState = &gPlayers[nPlayer].ballBefore.nState;
             if (*pKeptState != 0) *pKeptState = 1;
             if (fn_800C6D28()) fn_800C6DE4();
@@ -3760,14 +3737,14 @@ void STATEFUNC_SwingInit(int nPlayer) {
     int   i;
 
     if (pV->nCurCamera == 0 && Player_IsCPU(nPlayer) && Game_GetMode() != 11) {
-        fn_800957D8(gPlayers[nPlayer].nShotHandle);
+        fn_800957D8(gPlayers[nPlayer].pChar);
     }
-    fn_80095744(gPlayers[nPlayer].nShotHandle, 5);
-    fn_8001C774(gPlayers[nPlayer].nShotHandle, gPlayers[nPlayer].nClub);
-    fn_8001C724(gPlayers[nPlayer].nShotHandle, gPlayers[nPlayer].nShotKind);
-    fn_80062BFC(gPlayers[nPlayer].nShotHandle);
-    fn_80062BE8(gPlayers[nPlayer].nShotHandle);
-    fn_8007326C(((ShotObj*)gPlayers[nPlayer].nShotHandle)->anim);
+    fn_80095744(gPlayers[nPlayer].pChar, 5);
+    fn_8001C774(gPlayers[nPlayer].pChar, gPlayers[nPlayer].nClub);
+    fn_8001C724(gPlayers[nPlayer].pChar, gPlayers[nPlayer].nShotKind);
+    fn_80062BFC(gPlayers[nPlayer].pChar);
+    fn_80062BE8(gPlayers[nPlayer].pChar);
+    fn_8007326C(gPlayers[nPlayer].pChar->anim);
     if (gPlayers[nPlayer].swing.unk630 == 0) {
         fn_80058FA4(nPlayer);
         gPlayers[nPlayer].swing.unk630 = 1;
@@ -3898,8 +3875,8 @@ void STATEFUNC_SwingUpdate(int nPlayer) {
             BreakLine_Start(gPlayers[nPlayer].nView0);
             fn_8009B970(gPlayers[nPlayer].nView0);
             fn_8001C804(nPlayer, 1, 1);
-            fn_800957D8(gPlayers[nPlayer].nShotHandle);
-            fn_80095744(gPlayers[nPlayer].nShotHandle, 5);
+            fn_800957D8(gPlayers[nPlayer].pChar);
+            fn_80095744(gPlayers[nPlayer].pChar, 5);
             fn_800689D4(nPlayer);
             fn_80062C38();
             if (gSession.nSplitScreen != 0) {
@@ -3937,8 +3914,9 @@ void STATEFUNC_ShowYardageUpdate(int nPlayer) {
 
     if (lbl_80281E13 != 0) {
         fn_800C7158(pV, GM_ShowPostShotAnimation(nPlayer));
-        if (fn_80095780(gPlayers[nPlayer].nShotHandle) != 9 && fn_80095798(gPlayers[nPlayer].nShotHandle) != 9 && fn_800C7160(pV)) {
-            fn_80095744(gPlayers[nPlayer].nShotHandle, 9);
+        if (fn_80095780(gPlayers[nPlayer].pChar) != 9 && fn_80095798(gPlayers[nPlayer].pChar) != 9 &&
+            fn_800C7160(pV)) {
+            fn_80095744(gPlayers[nPlayer].pChar, 9);
         } else {
             View_SetCamera(pV, 0xF, nPlayer, gPlayers[nPlayer].nView0);
         }
@@ -3946,11 +3924,12 @@ void STATEFUNC_ShowYardageUpdate(int nPlayer) {
         lbl_80281E13 = 0;
     }
     vOffset = lbl_80183620;
-    if (fn_80095780(gPlayers[nPlayer].nShotHandle) == 9 && pV->nCurCamera != 0xF && Game_GetMode() != 11 &&
-        !fn_800734A0((u8*)gPlayers[nPlayer].nShotHandle + 0x40C)) {
+    if (fn_80095780(gPlayers[nPlayer].pChar) == 9 && pV->nCurCamera != 0xF && Game_GetMode() != 11 &&
+        !fn_800734A0(&gPlayers[nPlayer].pChar->blend)) {
         View_SetCamera(pV, 0xF, nPlayer, gPlayers[nPlayer].nView0);
     }
-    if ((fn_80062C1C(gPlayers[nPlayer].nShotHandle) != 0 || fn_80062C10(gPlayers[nPlayer].nShotHandle) != 0) && fn_80095780(gPlayers[nPlayer].nShotHandle) == 9 && !fn_800C6604(pV)) {
+    if ((fn_80062C1C(gPlayers[nPlayer].pChar) != 0 || fn_80062C10(gPlayers[nPlayer].pChar) != 0) &&
+        fn_80095780(gPlayers[nPlayer].pChar) == 9 && !fn_800C6604(pV)) {
         GolfCamera_CutToGolferDoneAnimatingCam(pV, nPlayer);
     }
     if (fn_800E46B4()) return;
@@ -3963,8 +3942,8 @@ void STATEFUNC_ShowYardageUpdate(int nPlayer) {
             return;
         }
         if (fn_80063C90(pV)) return;
-        if (!fn_800C6604(pV) && fn_80095780(gPlayers[nPlayer].nShotHandle) == 9) {
-            if (!(fn_80062C28(gPlayers[nPlayer].nShotHandle) >= lbl_80281F78->f170 / 2.0f ||
+        if (!fn_800C6604(pV) && fn_80095780(gPlayers[nPlayer].pChar) == 9) {
+            if (!(fn_80062C28(gPlayers[nPlayer].pChar) >= lbl_80281F78->f170 / 2.0f ||
                   pV->f11C > 1.0f)) {
                 return;
             }
@@ -3990,7 +3969,7 @@ void STATEFUNC_ShowYardageUpdate(int nPlayer) {
         if (gReplayData.bF10 != 0) {
             if ((fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x18, 0)) && gpGame->b287 != 0 &&
                 !(gPlayers[nPlayer].uFlags & 8) && (s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_CONCEDED && !fn_800E53B8() &&
-                !(*(u32*)(gPlayers[nPlayer].nShotHandle + 0x10) & 0x40)) {
+                !(gPlayers[nPlayer].pChar->u10 & 0x40)) {
                 lbl_80281E10 = 1;
                 fn_80062D0C(nPlayer);
                 fn_8006C300(nPlayer);
