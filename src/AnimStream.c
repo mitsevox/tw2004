@@ -3,6 +3,7 @@
 // partly decompiled. The types are in character.h.
 
 #include "golfer.h"
+#include "endian.h"
 
 void fn_8006C63C(void);                 // called while waiting for a read
 void fn_800C9F14(u8 bForce);
@@ -167,4 +168,25 @@ int fn_800CB568(int nId) {
         }
     }
     return -1;
+}
+
+// Unpacks a name code (fn_800CB700) into its 12 characters.
+void fn_800CB868(u64* pId, char* szName) {
+    int i;
+    u64 uId = *pId;
+
+    szName[12] = '\0';
+    for (i = 11; i >= 0; i--) {
+        szName[i] = lbl_80191720[uId % 40];
+        uId /= 40;
+    }
+}
+
+// The same for a code stored with its bytes reversed.
+void fn_800CB8F0(u64* pId, char* szName) {
+    u64 uId = *pId;
+    u8* p = (u8*)&uId;
+
+    fn_80076158(&p, (u8*)&uId, sizeof(u64), sizeof(u64));
+    fn_800CB868(&uId, szName);
 }
