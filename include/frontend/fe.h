@@ -243,7 +243,7 @@ s16  fn_80105610(int nAsset);           // } asset)
 s32  fn_80105C00(void);                 // how many assets there are
 u8   fn_80105C30(void);                 // the Create-A-Player database is allocated
 char* fn_801064EC(int nCategory);       // a category's name
-int  fn_8015F844(const char* a, const char* b);       // strcmp ignoring case (MSL's __lower_map)
+int  stricmp(const char* a, const char* b);           // 0x8015F844 (MSL): strcmp ignoring case
 
 void FE_MakeMoviePath(char* pName, char* pPath);        // "data/movies/<name>.NGC"
 void FE_MakeCameoMoviePath(char* pName, char* pPath);   // "data/movies/cameos/<name>.NGC"
@@ -267,7 +267,8 @@ void fn_80084FF0(int n);                // sets lbl_80281FFC
 
 extern char* lbl_80191990[30];          // per course: a string the menus show (a replay's course
                                         // picks it)
-extern s32 lbl_80281FFC;                // set by fn_80084FF0
+extern s32 lbl_80281FFC;                // set by fn_80084FF0: the lbl_8018C7D8 set (memcard.h) the
+                                        // menus' memory-card messages use
 
 // ---- the logo editor (FE_LogoDesign.c) -------------------------------------------------------
 

@@ -389,7 +389,7 @@ config.libs = [
         "progress_category": "sdk",
         "src_dir": "extern/sonicheroes",
         "objects": [
-            Object(NonMatching, "src/MSL_C/strtold.c"),
+            Object(Matching, "src/MSL_C/strtold.c"),
             Object(Matching, "src/MSL_C/strtoul.c"),
         ],
     },
@@ -432,7 +432,7 @@ config.libs = [
         "progress_category": "sdk",
         "src_dir": "extern/ffcc",
         "objects": [
-            Object(NonMatching, "src/MSL_C/PPCEABI/bare/H/ansi_fp.c"),
+            Object(Matching, "src/MSL_C/PPCEABI/bare/H/ansi_fp.c"),
         ],
     },
     {
@@ -449,7 +449,7 @@ config.libs = [
             Object(Matching, "src/MSL_C/PPCEABI/bare/H/ansi_files.c"),
             Object(Matching, "src/MSL_C/PPCEABI/bare/H/direct_io.c"),
             Object(Matching, "src/MSL_C/PPCEABI/bare/H/file_io.c"),
-            Object(NonMatching, "src/MSL_C/PPCEABI/bare/H/mem_funcs.c"),
+            Object(Matching, "src/MSL_C/PPCEABI/bare/H/mem_funcs.c", mw_version="GC/2.5"),
             Object(Matching, "src/MSL_C/PPCEABI/bare/H/string.c"),
             Object(Matching, "src/MSL_C/PPCEABI/bare/H/s_atan.c"),
         ],
@@ -505,7 +505,7 @@ config.libs = [
         "progress_category": "sdk",
         "src_dir": "extern/tww",
         "objects": [
-            Object(NonMatching, "src/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common/Src/mbstring.c"),
+            Object(Matching, "src/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common/Src/mbstring.c", mw_version="GC/1.3"),
             Object(Matching, "src/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common_Embedded/Math/Double_precision/e_pow.c"),
         ],
     },
@@ -775,9 +775,9 @@ config.libs = [
         "src_dir": "extern/sdk",
         "objects": [
             # built with the game's compiler, like ansi_fp.c: GC/1.3 misses long2str, float2str and three more
-            Object(NonMatching, "runtime/printf.c", mw_version="GC/2.5"),
+            Object(Matching, "runtime/printf.c", mw_version="GC/2.5"),
             Object(Matching, "runtime/runtime.c"),
-            Object(NonMatching, "runtime/FILE_POS.c"),
+            Object(Matching, "runtime/FILE_POS.c"),
             Object(Matching, "runtime/ctype.c"),
             Object(Matching, "runtime/e_acos.c"),
             Object(Matching, "runtime/e_asin.c"),
@@ -795,6 +795,13 @@ config.libs = [
             Object(Matching, "runtime/s_ldexp.c"),
             Object(Matching, "runtime/s_sin.c"),
             Object(Matching, "runtime/s_tan.c"),
+            Object(Matching, "runtime/w_acos.c"),
+            Object(Matching, "runtime/w_asin.c"),
+            Object(Matching, "runtime/w_atan2.c"),
+            Object(Matching, "runtime/w_fmod.c"),
+            Object(Matching, "runtime/w_log.c"),
+            Object(Matching, "runtime/w_pow.c"),
+            Object(Matching, "runtime/extras.c"),
             Object(Matching, "runtime/__mem.c"),
             Object(Matching, "runtime/__va_arg.c"),
             Object(Matching, "runtime/buffer_io.c"),
@@ -802,6 +809,7 @@ config.libs = [
             Object(Matching, "runtime/misc_io.c"),
             Object(Matching, "runtime/s_copysign.c"),
             Object(Matching, "runtime/s_modf.c"),
+            Object(Matching, "runtime/qsort.c", mw_version="GC/2.5"),
             Object(Matching, "runtime/sscanf.c"),
             Object(Matching, "runtime/wchar_io.c"),
             Object(Matching, "runtime/uart_console_io.c"),
@@ -1333,7 +1341,6 @@ config.libs = [
             Object(Matching, "unsorted/sweep_801338E0.c"),
             Object(Matching, "unsorted/sweep_80150F24.c"),
             Object(Matching, "unsorted/sweep_80155F40.c"),
-            Object(Matching, "unsorted/sweep_8015F784.c"),
         ],
     },
     {

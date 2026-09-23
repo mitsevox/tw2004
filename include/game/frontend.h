@@ -21,6 +21,8 @@ typedef struct FrontEnd {
     void* pHandler;             // 0x4  where GameMessages.c sends its messages (fn_8016B09C)
     u8    unk8[4];
     void* pC;                   // 0xC  a block uiLoadFile.c frees (fn_8008F24C)
+    u8    unk10[8];
+    f32   f18;                  // 0x18  set to 1 when a round starts (gomainloop fn_8006DC20)
 } FrontEnd;
 
 extern FrontEnd* lbl_80281F1C;
