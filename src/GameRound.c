@@ -13,13 +13,9 @@ void fn_800E25CC(u8 b);
 int  fn_800E1CE8(int a, int b);
 
 void  fn_800D8D5C(int nPlayer, int a);
-void  fn_800E2470(void);
 void  fn_800E30D4(void);
 void  fn_800E2FD8(void);
 void  fn_800E3050(int nCourse);
-int   fn_8011937C(int nPlayer, int a, u8 b);
-
-int   fn_800E8C24(int nPlayer, int nHole);
 
 extern char lbl_80282270[8];                // the hole name
 
@@ -41,35 +37,11 @@ s32   fn_800E3AB0(int nPlayer);
 void  fn_800E3AAC(int nPlayer, int nTime);
 void  fn_800E3AA8(int nPlayer, int nId);
 s32   fn_800E3AA0(int a, int nTarget);
-void  fn_800FF700(void);
-void  fn_800E9E40(void);
-void  fn_800F80FC(void);
-void  fn_800F944C(void);
-void  fn_800F9610(void);
-void  fn_800F986C(void);
-void  fn_800ED738(void);
-void  fn_800EACD8(void);
-void  fn_800F125C(void);
-void  fn_800FFF34(void);
-void  fn_800FEAFC(void);
-void  fn_800F6A60(void);
-void  fn_800F2984(void);
-void  fn_800F39F4(void);
-void  fn_800F4B40(void);
-void  fn_800F5AAC(void);
-void  fn_800FE1B4(void);
-void  fn_800E81C4(void);
-void  fn_800E8D58(void);
-void  fn_800E68F0(void);
 void  fn_800EDD18(void);
-void  fn_800F0448(void);
-void  fn_800E7980(void);
 void  fn_8010C4A0(void);
 void  fn_80125E68(void);
 
 u8    fn_800E3AF8(void);
-void  fn_800E0A84(u8 v);
-void  fn_800E1404(int nHole);
 void  fn_80057364(int a);
 int   fn_800D3118(int nRound, int nHole);    // a built round's course for a hole
 int   fn_800D315C(int nRound, int nHole);    // and its hole number (1-based)
@@ -89,7 +61,6 @@ asm void fn_800E0AF0(register f32* pA, register f32* pB, register f32* pOut) {
 }
 
 int   fn_80110180(void);                    // the current hole can be played (inferred)
-int   fn_800D2ABC(int nCourse, int nHole);  // a hole's par
 
 // The 20 course ids the mixed rounds pick from (lbl_80184D40).
 typedef struct CourseList {

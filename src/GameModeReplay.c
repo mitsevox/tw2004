@@ -8,11 +8,6 @@
 #include "game.h"
 #include "engine.h"
 
-void  fn_800E14E0(int nCourse);
-void  fn_800E1404(int nHole);
-void  fn_800ED6F8(f32 x0);
-void  fn_8006BF60(int nPlayer);
-
 void fn_800F1388(void);
 void fn_800F1404(void);
 void fn_800F1424(void);

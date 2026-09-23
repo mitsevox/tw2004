@@ -9,23 +9,14 @@
 #include "engine.h"
 #include "game/save.h"
 
-void  fn_800E0A84(u8 v);
 void  fn_800D29E8(void);
 void  fn_800D33F0(void);
-int   fn_800E177C(void);
-void  fn_800E2470(void);
-void  fn_8006F4B4(void);
-void  fn_800E299C(void);
-void  fn_800E3B28(void);
 void  fn_800DA36C(void);
-void  GM_FlyByMode_Init(void);
 void  fn_800D8D38(int nPlayer);
-void  Caddie_Stop(void);
 u8    fn_800E0A90(int nPlayer);
 void  fn_800D439C(int nPlayer, int a);
 void  fn_800D9834(int nPlayer);
 u8    fn_8012591C(void);
-void  fn_80125854(int a);
 void  fn_8011989C(int nPlayer, int nStrokes);
 void  GM_GolferConcede_Hole(int nPlayer);
 void  GM_EndOfGolferTurn_HoleFinished(int nPlayer);
@@ -33,58 +24,23 @@ void  GM_EndOfGolferTurn_GameFinished(int nPlayer);
 void  GM_HoleFinished_GameNotFinished(int nPlayer);
 u8    GM_CheckForAIConcede(int nPlayer);
 
-void  fn_800E4164(int nMessage, int nPlayer, f32 f);
-
-void  fn_800E0AC4(int a);
-void  fn_800E0A98(int a);
 void  fn_800D8FE4(int nPlayer);
 void  fn_800D3DDC(int nPlayer);
 void  fn_800DA48C(int nPlayer);
 u8    fn_800DA2AC(void);
 void  fn_800DAD54(void);
-u8    fn_800DA174(void);
-u8    fn_800DA1D4(void);
-u8    fn_800E2DB4(int nPlayer);
 void  fn_800D9458(int nPlayer);
 void  fn_800D4030(int nPlayer);
 void  GM_CheckBallForUIHints(int nPlayer);
-u8    fn_800E23B0(int nPlayer, int nStrokes);
 u8    fn_8008AC40(void);
 void  fn_800D9350(int nPlayer);
 void  fn_800BB0A8(void);
 void  fn_800335F8(int a);
 void  fn_8006C4C0(int nPlayer);
-void  fn_8006C4A0(void);
-void  fn_800E0AF0(f32* pFrom, f32* pTo, f32* pOut);
 
 f32   fn_800336E4(void);
 f32   fn_800336F4(void);
-void  GOLFERSTATE_Push(int nState, int nPlayer);
-u8    fn_800E415C(void);
-u8    fn_800E45CC(void);
-u8    fn_800E46B4(void);
-void  fn_800E2A88(void);
-void  fn_800E1018(int nPlayer, int nHole);
-void  fn_800E41C8(void);
 
-int   fn_8006AA9C(int nPlayer);             // how the shot turned out (0..4, 8+)
-void  fn_8006AAB4(int nPlayer, int a);
-
-u32   fn_800136DC(int nController);         // buttons: held << 16 | pressed this frame
-u32   fn_800142AC(int nButton, int a);      // a button's mask
-u8    fn_80014300(u32 uMask);               // any pad pressed these buttons
-void  fn_80062D0C(int nPlayer);
-void  fn_80062B78(int nPlayer);
-void  fn_80062B74(int nPlayer);
-void  fn_80062B70(void);
-u8    Player_IsNotCPU(int nPlayer);
-void  fn_800E41D4(int nPlayer);
-void  fn_8006C300(int nPlayer);
-
-void  Shot_Prepare(int nPlayer, u8 bNotify);
-void  BreakLine_Start(int nView);            // GoBreakLine.c
-void  fn_8009B970(int nView);
-void  fn_800689D4(int nPlayer);
 u8    GM_bIsZoomButtonPressed(int nPlayer);
 u8    GM_bIsElevatorCamButtonPressed(int nPlayer);
 u8    fn_800E012C(int nPlayer);
@@ -92,14 +48,7 @@ u8    fn_800DFF0C(int nPlayer);
 
 u64   fn_800954A4(int a);                   // a time stamp
 f32   fn_8006E118(u64 tEnd, u64 tStart);    // seconds between two time stamps
-int   GameEffects_BallUpdatesThisFrame(int nPlayer);
-void  fn_8006B2C4(int nPlayer, int a);
 u8    fn_800BB1F8(int nPlayer);
-
-void  fn_800E0B14(f32* pA, f32* pB, f32* pOut);
-u8    fn_8004560C(void);
-
-void  fn_800E5228(void);
 
 int   GM_vGetAllTimeRecordsHeld(SaveProfile* pProfile);
 f32   GM_GetBonusProgress(SaveProfile* pProfile);
