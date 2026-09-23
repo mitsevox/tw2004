@@ -3,7 +3,8 @@
 
 #include "golfer.h"
 
-void fn_800E19A4(int nPlayer, int nHoles);
+int  fn_800E19A4(int nPlayer, int nHoles);
+void fn_800E25CC(u8 b);
 void fn_800E1434(void);
 void fn_800E1480(int nHole);
 int  fn_800E1CE8(int a, int b);
@@ -17,6 +18,13 @@ void  fn_800E3050(void);
 int   fn_800D2AD8(int nHole);               // a hole's par
 u8    fn_800EE470(void);
 int   fn_8011937C(int nPlayer, int a, u8 b);
+
+int   fn_800E8C24(int nPlayer, int nHole);
+u8    Player_IsCPU(int nPlayer);
+int   sprintf(char* pBuf, const char* pFmt, ...);
+
+extern u8   gNumPlayersSetUp;               // 0x80281D48 (Golfer.c)
+extern char lbl_80282270[8];                // the hole name
 
 extern u8* gpSaveData;
 extern u8  lbl_8028227C;
@@ -201,6 +209,56 @@ void fn_800E1788(int nPlayer) {
     fn_800E19A4(nPlayer, 18);
 }
 
+// A player's total for the first nHoles holes: the mode's points in mode 18 (match play),
+// fn_800E8C24's count in mode 19, strokes otherwise.
+int fn_800E19A4(int nPlayer, int nHoles) {
+    int n;
+    int i;
+    if (Game_GetMode() == 19) {
+        n = 0;
+        for (i = 0; i < nHoles; i++) {
+            n += fn_800E8C24(nPlayer, i);
+        }
+    } else if (Game_GetMode() == 18) {
+        n = 0;
+        for (i = 0; i < nHoles; i++) {
+            n += gPlayers[nPlayer].nModePoints[i];
+        }
+    } else {
+        n = 0;
+        for (i = 0; i < nHoles; i++) {
+            n += gPlayers[nPlayer].nStrokes[i];
+        }
+    }
+    return n;
+}
+
+// Whether the round plays every hole (or the mode's own answer, 0xD5, when it keeps one).
+u8 fn_800E1BBC(void) {
+    int i;
+    if (gpGame->bD4) {
+        return gpGame->bD5;
+    }
+    for (i = 0; i < 18; i++) {
+        if (!gpGame->bHoleSelected[i]) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+// Whether the current hole is the round's last.
+int fn_800E1CA8(void) {
+    int b = 1;
+    int i;
+    for (i = gpGame->nCurHole + 1; i < 18; i++) {
+        if (gpGame->bHoleSelected[i]) {
+            b = 0;
+        }
+    }
+    return b;
+}
+
 // A player's total strokes for the round.
 int fn_800E17AC(int nPlayer) {
     int i;
@@ -260,11 +318,80 @@ u8 fn_800E234C(int nSlot, int a, int b) {
     return 0;
 }
 
+// The hole's stroke limit: with the session's limit option (0x5B39) on and the mode using it,
+// 10 strokes ends the hole (GM_PlayerTookShot picks the ball up).
+u8 fn_800E23B0(int nPlayer, int nStrokes) {
+    if (gSession.unk5B39 && gpGame->bStrokeLimit && nStrokes >= 10) {
+        return 1;
+    }
+    return 0;
+}
+
+// Whether a player may take a mulligan: humans only, the mode allows them, and in the
+// one-per-round rule not already used.
+u8 fn_800E23EC(int nPlayer) {
+    if (Player_IsCPU(nPlayer)) {
+        return 0;
+    }
+    if (fn_800E177C() == 0) {
+        return 0;
+    }
+    if (fn_800E177C() == 2 && gPlayers[nPlayer].unkC28) {
+        return 0;
+    }
+    return 1;
+}
+
+// Gives every player their mulligan back.
+void fn_800E2470(void) {
+    int i;
+    for (i = 0; i < gNumPlayersSetUp; i++) {
+        PLAYER(i)->unkC28 = 0;
+    }
+}
+
 void fn_800E25CC(u8 b) {
     lbl_8028227C = b;
     gSession.nSplitScreen = b;
 }
 
+// Split screen for the mode: modes 0-2 as the session has it, 6, 7 and 26 always, others never.
+void fn_800E25E0(void) {
+    switch (Game_GetMode()) {
+    case 6:
+    case 7:
+        fn_800E25CC(1);
+        return;
+    case 26:
+        fn_800E25CC(1);
+        return;
+    case 0:
+    case 1:
+    case 2:
+        if (gSession.nSplitScreen == 1) {
+            fn_800E25CC(1);
+            return;
+        }
+        fn_800E25CC(0);
+        return;
+    default:
+        fn_800E25CC(0);
+        return;
+    }
+}
+
 int fn_800E27A8(void) {
     return gpGame->n294 != 0;
+}
+
+// TW06: GameManager::GetHoleName. "HOLE_01" .. "HOLE_18".
+char* GameManager_GetHoleName(int nHole) {
+    sprintf(lbl_80282270, "HOLE_%02d", nHole + 1);
+    return lbl_80282270;
+}
+
+// Seconds since the round's clock was last reset (gpGame->n12C holds the session's frame count
+// then).
+int fn_800E27C0(void) {
+    return (1.0f / 59.94f) * (f32)(u32)(gSession.unk24 - gpGame->n12C);
 }
