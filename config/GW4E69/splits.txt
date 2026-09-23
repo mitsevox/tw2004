@@ -3693,8 +3693,8 @@ unsorted/sweep_800FF604.c:
 unsorted/sweep_800FF60C.c:
 	.text       start:0x800FF60C end:0x800FF634
 
-unsorted/sweep_800FFDB0.c:
-	.text       start:0x800FFDB0 end:0x800FFDB8
+GameMode0.c:
+	.text       start:0x800FF700 end:0x800FFF34
 
 unsorted/sweep_801000E8.c:
 	.text       start:0x801000E8 end:0x80100128
