@@ -17,6 +17,8 @@ void* fn_80009B34(u32 uSize, u32 uFlags, u32 uAlign, const char* pFile, int nLin
 void  fn_80009E70(void* p);             // free
 void* fn_800951A0(u32 uSize, int nAlign, int a);
 void  fn_800953C8(int a);
+// Sorts nCount items of nSize bytes with pfnCompare (the C library's qsort, by its arguments).
+void  fn_8015929C(void* pBase, u32 nCount, u32 nSize, s32 (*pfnCompare)(const void* pA, const void* pB));
 
 // ---- time ------------------------------------------------------------------------------------
 

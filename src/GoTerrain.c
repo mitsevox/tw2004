@@ -8,11 +8,9 @@
 #include "engine.h"
 
 void* fn_800073B4(u8* pData, int n);
-// Sorts nCount items of nSize bytes with pfnCompare (the C library's qsort, by its arguments).
-void  fn_8015929C(void* pBase, u32 nCount, u32 nSize, int (*pfnCompare)(const void*, const void*));
 void  fn_80030894(void);
 void  fn_80030A40(void* p, int n);
-int   fn_800318AC(const void* pA, const void* pB);
+s32   fn_800318AC(const void* pA, const void* pB);
 void  fn_80031938(f32* pOut, f32 f, s32 a, s32 b, s32 c, s32 d);
 void  fn_80032F88(void* pList, s32 nCount, s32 n3, s32 n4);
 void  fn_800341A4(UStreamObject* pObject);
@@ -77,7 +75,7 @@ void fn_8003185C(void) {
 }
 
 // fn_8003185C's comparison: by f10, smallest first.
-int fn_800318AC(const void* pA, const void* pB) {
+s32 fn_800318AC(const void* pA, const void* pB) {
     f32 fA = ((const TerSortItem*)pA)->f10;
     f32 fB = ((const TerSortItem*)pB)->f10;
 
