@@ -3287,6 +3287,7 @@ void STATEFUNC_ZoomUpdate(int nPlayer) {
 
 int   GameEffects_BallUpdatesThisFrame(int nPlayer);               // preview speed: ghost steps per frame
 void  Physics_Simulate(u8* pBall, int nTicks);     // Ball.c: step a ball
+f32   Vec_Distance(f32* pA, f32* pB);
 extern Vec4 lbl_80183600;
 
 // State 6, the putt preview playing. Any button ends it (any pad for a CPU). Otherwise the
