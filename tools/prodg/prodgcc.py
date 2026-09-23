@@ -9,6 +9,9 @@ stages itself: cpp.exe -> cc1.exe -> NgcAs.exe. The object lands at <out_dir>/<s
 """
 import os, subprocess, sys
 args = sys.argv[1:]
+wrapper = []
+if args and args[0] == '--wrapper':     # e.g. wibo or wine: the ProDG tools are Windows programs
+    wrapper = [args[1]]; args = args[2:]
 compilers, version = args[0], args[1]; rest = args[2:]
 src = rest[rest.index('-c') + 1]; out_dir = rest[rest.index('-o') + 1]
 flags = []
@@ -65,6 +68,7 @@ def strip_empty_sections(path):
 
 
 def run(cmd):
+    cmd = wrapper + cmd
     r = subprocess.run(cmd, capture_output=True, text=True)
     if r.returncode:
         sys.stderr.write(' '.join(cmd) + '\n' + r.stdout + r.stderr); sys.exit(r.returncode)
