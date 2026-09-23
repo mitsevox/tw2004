@@ -3621,6 +3621,9 @@ GameUI.c:
 GameMessages.c:
 	.text       start:0x800E4FFC end:0x800E5E54
 
+GameAnalysis.c:
+	.text       start:0x800E5E54 end:0x800E68F0
+
 unsorted/sweep_800E6A48.c:
 	.text       start:0x800E6A48 end:0x800E6A98
 

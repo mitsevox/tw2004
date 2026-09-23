@@ -807,6 +807,7 @@ config.libs = [
             Object(NonMatching, "GameRound.c"),
             Object(NonMatching, "GameUI.c"),
             Object(NonMatching, "GameMessages.c"),
+            Object(NonMatching, "GameAnalysis.c"),
             Object(Matching, "unsorted/sweep_80079974.c"),
             Object(Matching, "unsorted/sweep_80109BA4.c"),
             Object(Matching, "unsorted/sweep_80013070.c"),
