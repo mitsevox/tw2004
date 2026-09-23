@@ -22,36 +22,25 @@ void fn_8004255C(f32* pPos, f32* pTarget, f32 fUp, f32 fSide) {
     pPos[2] += fSide * vDir[0];
 }
 
-// ---- sweep code (not yet cleaned up) ----
-
-s32 fn_80043920(void* arg0, s32 arg1);
-
-s32 fn_80043920(void* arg0, s32 arg1) {
-    u8 temp_r0;
-    u8 temp_r0_2;
-    void* temp_r3;
-    void* temp_r3_2;
-
-    temp_r3 = (*(void**)((u8*)(arg0) + 0xAC));
-    if (temp_r3 == NULL) {
+// The script's shot, or else its next one (unless the next kind is 5), has bAC 0 or 13 while the
+// ball makes no update this frame.
+u8 fn_80043920(CamScript* pScript, int nPlayer) {
+    if (pScript->pShot == NULL) {
         return 0;
     }
-    temp_r0 = (*(u8*)((u8*)(temp_r3) + 0xAC));
-    if (((temp_r0 == 0) || (temp_r0 == 0xD)) && (GameEffects_BallUpdatesThisFrame(arg1) < 1)) {
+    if ((pScript->pShot->bAC == 0 || pScript->pShot->bAC == 13)
+        && GameEffects_BallUpdatesThisFrame(nPlayer) < 1) {
         return 1;
     }
-    temp_r3_2 = (*(void**)((u8*)(arg0) + 0xB0));
-    if ((temp_r3_2 == NULL) || ((s32) (*(s32*)((u8*)(arg0) + 0xBC)) == 5)) {
+    if (pScript->pNextShot == NULL || pScript->nBC == 5) {
         return 0;
     }
-    temp_r0_2 = (*(u8*)((u8*)(temp_r3_2) + 0xAC));
-    if (((temp_r0_2 == 0) || (temp_r0_2 == 0xD)) && (GameEffects_BallUpdatesThisFrame(arg1) < 1)) {
+    if ((pScript->pNextShot->bAC == 0 || pScript->pNextShot->bAC == 13)
+        && GameEffects_BallUpdatesThisFrame(nPlayer) < 1) {
         return 1;
     }
     return 0;
 }
-
-// ---- end of sweep code ----
 
 // The pin, when pPos is near no AI target: pOut gets the nearest target, or the current pin
 // position of the hole.

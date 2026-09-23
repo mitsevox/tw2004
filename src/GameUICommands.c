@@ -2403,7 +2403,7 @@ void fn_80089F6C(MsgArg* pArgs, MsgArg* pResult) {
         fn_801102AC();
         fn_8001A870();
         fn_8006F4B4();
-        pView->nCamera = 0;
+        pView->script.nCamera = 0;
     }
 }
 
