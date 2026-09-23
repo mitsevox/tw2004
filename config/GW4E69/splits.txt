@@ -3606,17 +3606,11 @@ unsorted/sweep_800DAD1C.c:
 unsorted/sweep_800DAD44.c:
 	.text       start:0x800DAD44 end:0x800DAD54
 
-unsorted/sweep_800DAF74.c:
-	.text       start:0x800DAF74 end:0x800DAF98
-
-unsorted/sweep_800DC45C.c:
-	.text       start:0x800DC45C end:0x800DC464
-
-unsorted/sweep_800DC514.c:
-	.text       start:0x800DC514 end:0x800DC524
+GameEffects.c:
+	.text       start:0x800DAE44 end:0x800DCAD8
 
 GameManager.c:
-	.text       start:0x800DCA94 end:0x800E0AF0
+	.text       start:0x800DCAD8 end:0x800E0AF0
 
 GameRound.c:
 	.text       start:0x800E0AF0 end:0x800E3B28

@@ -235,16 +235,6 @@ extern s32 lbl_80282278;
 extern u8  lbl_8028227C;
 extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
 
-f32 GameEffects_GetLetterboxHeight(void) {
-    if (lbl_80202898[0x12] != 0) {
-        if (*(f32*)(lbl_80202898 + 0x1C) < 0.8f) {
-            return 0.15f * (*(f32*)(lbl_80202898 + 0x1C) / 0.8f);
-        }
-        return 0.15f;
-    }
-    return 0.0f;
-}
-
 void fn_800DCAD8(void) {
     fn_800E58B4(50);
 }
