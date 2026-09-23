@@ -7,6 +7,7 @@
 
 #include "game_types.h"
 #include "platform.h"
+#include "endian.h"
 #include "game/save.h"
 
 // ---- the menu screens (FE_Manager.c) ---------------------------------------------------------
@@ -221,8 +222,10 @@ typedef struct CrAPAsset {
     s16  n46;                   // 0x046
     s16  n48;                   // 0x048
     s8   a4A[0x58 - 0x4A];      // 0x04A  indexed by fn_80105644's last argument
-    u8   unk58[0x70 - 0x58];
-    u64  aPart[4];              // 0x070  } the ids of four skin parts it sets (fn_800CDAFC finds
+    u8   a58[4];                // 0x058  assets of a category that differ here are different
+                                //        choices (fn_80105C44)
+    u8   unk5C[0x70 - 0x5C];
+    u64  aPart[4];            // 0x070  } the ids of four skin parts it sets (fn_800CDAFC finds
     u64  aVariant[4];           // 0x090  } them) and the id of each one's variant (fn_80106A64)
     u64  aSet[4];               // 0x0B0  the ids of four skin sets; taking the asset off puts
                                 //        them back to "Defaults" (fn_80106DA0)
@@ -230,7 +233,7 @@ typedef struct CrAPAsset {
     s16  n110;                  // 0x110  the offset in 'CR_S' of its unlock text (-1: none; fn_8010651C)
     s16  n112;                 // 0x112  } offsets of strings in 'CR_S' (fn_801064EC); n114 is
     s16  n114;                  // 0x114  } passed to fn_8008E724 with the asset's name (fn_80104094)
-    u8   unk116[2];
+    s16  n116;                  // 0x116  (swapped by fn_80105DAC)
 } CrAPAsset;
 LAYOUT_ASSERT(CrAPAsset, 0x118);
 
@@ -267,6 +270,7 @@ extern s32* lbl_80282478;               // per part, 24 entries: the categories 
 extern s32* lbl_8028247C;               // 0x600 entries, rows 24 apart (fn_80103920 clears 64 from
                                         // each row's start); fn_801048EC stores a part's choice count
 extern s32* lbl_80282480;               // 24 entries (fn_80103920 sets them to -1)
+extern SwapField lbl_80193228[20];      // an asset's byte-swap layout (fn_80105DAC)
 extern char lbl_801935C8[16][32];      // 16 names (fn_80107294)
 extern s32 lbl_802816E8;                // } an asset to put on and one to take off when
 extern s32 lbl_802816EC;                // } fn_80104804 runs (-1: none)
@@ -285,8 +289,9 @@ int  fn_801049C8(s16 nPart);
 void fn_80104804(void);
 u8   fn_80104DB8(s16 nPart, int n, char* pDst); // copy the name of a part's entry n (for 0 its
                                         // "All ..." entry when it has one); 0 if there is none
-int  fn_80105C44(s16 nPart, int b);
-void fn_80105FF8(int nAsset, s16* pKind, s32* pPart, s32* pChoice);
+int  fn_80105C44(s16 nPart, int b);     // how many different choices fit a part's entry b
+void fn_80105FF8(int nAsset, s16* pnPart, s32* pnEntry, s32* pnPlace); // where an asset is listed:
+                                        // its part, the entry of its category, its place there
 u8   fn_801061C8(s8 n);                 // an asset with this n40 is offered
 int  fn_80106244(s16 nPart);            // the asset in the first slot of aAF80 whose asset is of the part
                                         // (-1: none)

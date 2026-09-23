@@ -755,8 +755,85 @@ u8 fn_80105C30(void) {
     return lbl_80282460 != NULL;
 }
 
+// How many different choices fit a part's entry b: assets of the same category and the same a58
+// bytes count once.
+int fn_80105C44(s16 nPart, int b) {
+    int nCount = 0;
+    int i;
+    int j;
+    int nWanted;
+    u8 bEarlier;
+
+    nWanted = fn_80104AF4(nPart, b);
+    for (i = 0; i < lbl_80282460->nAssets; i++) {
+        if (nPart == lbl_80282460->pAssets[i].nPart && fn_801061C8(lbl_80282460->pAssets[i].n40) &&
+            fn_801061F8(nPart, lbl_80282460->pAssets[i].nCategory, nWanted)) {
+            bEarlier = 0;
+            for (j = i - 1; j >= 0; j--) {
+                if (nPart == lbl_80282460->pAssets[j].nPart && fn_801061C8(lbl_80282460->pAssets[j].n40) &&
+                    lbl_80282460->pAssets[j].nCategory == lbl_80282460->pAssets[i].nCategory &&
+                    lbl_80282460->pAssets[j].a58[0] == lbl_80282460->pAssets[i].a58[0] &&
+                    lbl_80282460->pAssets[j].a58[1] == lbl_80282460->pAssets[i].a58[1] &&
+                    lbl_80282460->pAssets[j].a58[2] == lbl_80282460->pAssets[i].a58[2] &&
+                    lbl_80282460->pAssets[j].a58[3] == lbl_80282460->pAssets[i].a58[3]) {
+                    bEarlier = 1;
+                    break;
+                }
+            }
+            if (!bEarlier) {
+                nCount++;
+            }
+        }
+    }
+    return nCount;
+}
+
+// Swap every asset from the disc's byte order.
+void fn_80105DAC(void) {
+    u8* pSrc;
+    u8* pDst;
+    u32 i;
+
+    for (i = 0; i < lbl_80282460->nAssets; i++) {
+        pSrc = (u8*)&lbl_80282460->pAssets[i];
+        pDst = (u8*)&lbl_80282460->pAssets[i];
+        fn_8001F08C((void**)&pSrc, (void**)&pDst, lbl_80193228, 20, 1);
+        pSrc = (u8*)&lbl_80282460->pAssets[i].n110;
+        pDst = (u8*)&lbl_80282460->pAssets[i].n110;
+        fn_80076158(&pSrc, pDst, sizeof(s16), sizeof(s16));
+        pSrc = (u8*)&lbl_80282460->pAssets[i].n112;
+        pDst = (u8*)&lbl_80282460->pAssets[i].n112;
+        fn_80076158(&pSrc, pDst, sizeof(s16), sizeof(s16));
+        pSrc = (u8*)&lbl_80282460->pAssets[i].n114;
+        pDst = (u8*)&lbl_80282460->pAssets[i].n114;
+        fn_80076158(&pSrc, pDst, sizeof(s16), sizeof(s16));
+        pSrc = (u8*)&lbl_80282460->pAssets[i].n116;
+        pDst = (u8*)&lbl_80282460->pAssets[i].n116;
+        fn_80076158(&pSrc, pDst, sizeof(s16), sizeof(s16));
+    }
+}
+
 // Called when the names arrive; empty in this build.
 void fn_80105EFC(void) {
+}
+
+void fn_80105FF8(int nAsset, s16* pnPart, s32* pnEntry, s32* pnPlace) {
+    int i;
+    int nCount = 0;
+    int nFirst;
+
+    nFirst = fn_80105140(lbl_80282460->pAssets[nAsset].nPart);
+    *pnPart = lbl_80282460->pAssets[nAsset].nPart;
+    *pnEntry = fn_80104C58(*pnPart, lbl_80282460->pAssets[nAsset].nCategory);
+    for (i = nFirst; i < nAsset; i++) {
+        if (*pnPart == lbl_80282460->pAssets[i].nPart && fn_801061C8(lbl_80282460->pAssets[i].n40)) {
+            if (fn_801061F8(*pnPart, lbl_80282460->pAssets[i].nCategory,
+                            lbl_80282460->pAssets[nAsset].nCategory)) {
+                nCount++;
+            }
+        }
+    }
+    *pnPlace = nCount;
 }
 
 // How many offered assets of the part that fit its entry n come before the asset in the part's
@@ -764,12 +841,13 @@ void fn_80105EFC(void) {
 void fn_801060F0(int nAsset, s16 nPart, int n, s32* pnPlace) {
     int i;
     int nCount = 0;
+    int nFirst;
     int nWanted;
 
-    i = fn_80105140(lbl_80282460->pAssets[nAsset].nPart);
+    nFirst = fn_80105140(lbl_80282460->pAssets[nAsset].nPart);
     nWanted = fn_80104AF4(nPart, n);
 
-    for (; i < nAsset; i++) {
+    for (i = nFirst; i < nAsset; i++) {
         if (nPart == lbl_80282460->pAssets[i].nPart && fn_801061C8(lbl_80282460->pAssets[i].n40) &&
             fn_801061F8(nPart, lbl_80282460->pAssets[i].nCategory, nWanted)) {
             nCount++;
