@@ -427,7 +427,7 @@ config.libs = [
     },
     {
         "lib": "ffcc_sdk_4",
-        "mw_version": "GC/1.3.2",
+        "mw_version": "GC/2.5",
         "cflags": ["-nodefaults", "-proc gekko", "-align powerpc", "-enum int", "-fp hardware", "-Cpp_exceptions off", "-O4,p", "-inline auto", "-pragma \"cats off\"", "-pragma \"warn_notinlined off\"", "-maxerrors 1", "-nosyspath", "-RTTI off", "-str reuse", "-DNDEBUG=1", "-D__GEKKO__", "-fp_contract on", "-use_lmw_stmw on", "-str reuse,pool,readonly", "-common off", "-inline deferred,auto", "-char signed", "-i extern/ffcc/include", "-i extern/ffcc/include/dolphin", "-i extern/ffcc/src", "-i extern/ffcc/include/TRK_MINNOW_DOLPHIN", "-ir extern/ffcc/src", "-i extern/ffcc/Include", "-DBUILD_VERSION=0", "-DVERSION_GCCE6W"],
         "progress_category": "sdk",
         "src_dir": "extern/ffcc",

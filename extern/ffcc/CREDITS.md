@@ -26,5 +26,8 @@ Changed for this game (so the units link into the DOL):
   parameter block when only the loop or end address changed.
 - `src/mix/mix.c`: this game's MIX takes 6 dB (not 3 dB) off the rear channel, and in mono and
   stereo `MIXInitChannel` gives the dry rear level (`vS`) no cut at all.
+- `src/MSL_C/PPCEABI/bare/H/ansi_fp.c`: `__dec2num` steps to the neighbouring double by adding or
+  taking one from its bits (as the Pikmin 2 decompilation's MSL does), not with `nextafter`, and
+  reads the lower-case map inline (`_tolower`). This file is built with GC/2.5 (see configure.py).
 - `src/MSL_C/PPCEABI/bare/H/alloc.c`: the malloc pool's flag is one `unsigned char initialized`
   (FFCC has an `int` read through a byte cast, plus an unused `init` static the game lacks).

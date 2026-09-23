@@ -3634,7 +3634,7 @@ src/MSL_C/PPCEABI/bare/H/ansi_files.c:
 	.bss        start:0x8027D5F8 end:0x8027D8F8
 
 src/MSL_C/PPCEABI/bare/H/ansi_fp.c:
-	.text       start:0x801538EC end:0x80155BD0
+	.text       start:0x8015286C end:0x80155E48
 
 runtime/buffer_io.c:
 	.text       start:0x80155E48 end:0x80155F40
