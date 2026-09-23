@@ -90,20 +90,8 @@ unsorted/sweep_800090A0.c:
 unsorted/sweep_800095F0.c:
 	.text       start:0x800095F0 end:0x80009680
 
-unsorted/sweep_8000977C.c:
-	.text       start:0x8000977C end:0x800097C4
-
-unsorted/sweep_800097C4.c:
-	.text       start:0x800097C4 end:0x800097CC
-
-unsorted/sweep_8000989C.c:
-	.text       start:0x8000989C end:0x80009918
-
-unsorted/sweep_80009918.c:
-	.text       start:0x80009918 end:0x8000991C
-
-unsorted/sweep_8000A0AC.c:
-	.text       start:0x8000A0AC end:0x8000A0E8
+StaticMemory.c:
+	.text       start:0x8000977C end:0x8000A0E8
 
 unsorted/sweep_8000A0E8.c:
 	.text       start:0x8000A0E8 end:0x8000A194

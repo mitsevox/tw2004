@@ -12,8 +12,10 @@
 // ---- memory and strings ----------------------------------------------------------------------
 
 void* Mem_cpy(void* pDst, const void* pSrc, u32 uLen);    // returns pDst
+void* fn_80005884(void* pDst, const void* pSrc, u32 uLen); // a copy the ranges may overlap in
 void* fn_80005AE8(void* pDst, int nValue, u32 uLen);      // memset; returns pDst
-void* fn_80009B34(u32 uSize, u32 uFlags, u32 uAlign, const char* pFile, int nLine);  // alloc
+// Allocates from the static heap (StaticMemory.c); nMode picks where (see there).
+void* fn_80009B34(int nSize, int nMode, int nAlign, const char* pFile, int nLine);
 void  fn_80009E70(void* p);             // free
 void* fn_800951A0(u32 uSize, int nAlign, int a);
 void  fn_8009527C(void* p);             // frees what fn_800951A0 allocated
