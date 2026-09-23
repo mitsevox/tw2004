@@ -572,6 +572,8 @@ void fn_800FA9E0(int nPlayer) {
 
 // An event's sound, if it has one: only the first 37 events play one.
 void fn_800FAA70(int nEvent) {
+    // Read before the range check, but in bounds: the table has 44 entries and the callers pass
+    // at most event 42.
     u16 nSound = lbl_80192BA8[nEvent];
     if (nEvent >= 37 || nSound == 0xFFFF) {
         return;
