@@ -48,15 +48,6 @@ extern u8 (*lbl_8028231C)(int nPlayer, u8 bCheck);   // and HoleFinished
 u8 fn_800ED5C8(int nPlayer, u8 bCheck);
 extern u8 lbl_802822FD;
 void fn_800ED6E8(u8 v);
-// What lbl_802811F0 points to (its code, around 0x8006F650, is not decompiled): fn_800ED6F8 sets
-// f18 and flags it in b1C.
-typedef struct Unk802811F0 {
-    u32 uFlags;                 // 0x00
-    u8  unk4[0x18 - 0x4];
-    f32 f18;                    // 0x18
-    u8  b1C;                    // 0x1C
-} Unk802811F0;
-extern Unk802811F0* lbl_802811F0;
 
 // Game mode 5 starts: its callbacks, one player, the challenge list.
 void fn_800EACD8(void) {
@@ -591,7 +582,7 @@ void fn_800EC1E0(void) {
             fn_800EC170(nMedal);
             nProfile = gPlayers[0].nIndex;
             if (gpSaveData[nProfile].bActive) {
-                nMoney = GM_Earnings_ComputeTOURCardModifiers(nReward, 0, (CourseMoneyTracking*)aOut);
+                nMoney = fn_800D7220(nReward, 0, (CourseMoneyTracking*)aOut);
                 if (nMoney) {
                     switch (nMedal) {
                     case 0:

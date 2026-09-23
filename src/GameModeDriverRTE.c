@@ -25,10 +25,8 @@ s32 fn_800F0E18(s32 i);
 s32 fn_800F0E20(s32* pRound);
 void fn_800F0E30(s32 nId, s32 nRound);
 s32 fn_800F1008(s32 i);
-s32 fn_800F102C(void);
 
 void  fn_8011E020(s32* pMonth, s32* pDay, s32* pYear, s32* pHour, s32* pMinute, s32* pSecond, s32* pMsec);
-void  fn_800D2678(u16* pDate, s32 nMonth, s32 nDay, s32 nYear);
 void  GameModeDriverRTE_Locale_LoadRTEnFromStream(UStreamObject* pObject);
 void  fn_800F0678(void);
 void  fn_800F0BBC(void);
@@ -384,7 +382,7 @@ s32 fn_800F1008(s32 i) {
     return GameModeDriverRTE_GetCalData(i)->n14;
 }
 
-s32 fn_800F102C(void) {
+u8 fn_800F102C(void) {
     return 0;
 }
 

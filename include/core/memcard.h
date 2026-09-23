@@ -16,6 +16,7 @@
 
 #include "game.h"
 #include "game/save.h"
+#include "core/card.h"
 
 #define MC_NUM_PORTS 2              // GameCube card slots A and B
 #define MC_NUM_SLOTS 1              // multitap slots per port
@@ -149,7 +150,21 @@ extern SaveImage* lbl_80281FE4; // } the first image
 extern SaveImage* lbl_80281FE8; // }
 extern SaveImage* lbl_80281FEC; // }
 extern s32   lbl_80281FF8;      // SaveImage.n4D0C0 of the save loaded (0 when it has none)
-extern u32   lbl_80281FC0;      // the size parked in ARAM (MC_BUFFER_SIZE + 0x20)
+
+// One entry of the list the 'eagm' stream object carries (fn_800A1D4C builds it, 0x4C bytes).
+typedef struct MCEagmEntry {
+    u8    b0;                   // 0x00  cleared when the list is loaded
+    u8    unk1[3];
+    char* p4;                   // 0x04  n8 names of 16 characters each
+    s32   n8;                   // 0x08
+    char  szName[0x40];         // 0x0C
+} MCEagmEntry;
+LAYOUT_ASSERT(MCEagmEntry, 0x4C);
+
+extern u32   lbl_801F1110[256]; // the save checksum's CRC table (fn_800A253C)
+extern MCEagmEntry* lbl_80281FF0;   // the 'eagm' list (fn_800A1BE0 frees it)
+extern s32   lbl_80281FF4;      // its number of entries
+extern u32   lbl_80281FC0;     // the size parked in ARAM (MC_BUFFER_SIZE + 0x20)
 extern u32   lbl_80281FC4;      // the ARAM address they are parked at (0: none yet)
 extern UStreamObject* lbl_80281FB8;     // the 'MCI ' object (fn_8009EB30)
 extern UStreamObject* lbl_80281FBC;     // the 'MCB ' object (fn_8009EB38)
@@ -212,63 +227,22 @@ s32  fn_800A2194(s32 nPort, s32 nSlot);
 
 // Whether the data from pData up to pTrailer is a good save: the mark, then the checksum.
 u8   fn_800A233C(void* pData, SaveTrailer* pTrailer);
-// The checksum of pData up to the end of pTrailer (a CRC-32), its uChecksum read as 0.
+// The checksum (a CRC-32) of pData up to pTrailer's uChecksum, the mark included. uChecksum is
+// set to 0 while it runs and put back after, though the sum stops short of it.
 u32  fn_800A23BC(void* pData, SaveTrailer* pTrailer);
 
-// ---- the CARD library (port: GameCube only) ------------------------------------------------------
+// ---- the 'eagm' list and string helpers (MC.c) ----------------------------------------------------
 
-// The CARD library's results that MC_Gc.c handles.
-#define CARD_RESULT_READY           0
-#define CARD_RESULT_BUSY            -1
-#define CARD_RESULT_WRONGDEVICE     -2
-#define CARD_RESULT_NOCARD          -3
-#define CARD_RESULT_NOFILE          -4
-#define CARD_RESULT_IOERROR         -5
-#define CARD_RESULT_BROKEN          -6
-#define CARD_RESULT_EXIST           -7
-#define CARD_RESULT_NOENT           -8
-#define CARD_RESULT_INSSPACE        -9
-#define CARD_RESULT_NOPERM          -10
-#define CARD_RESULT_LIMIT           -11
-#define CARD_RESULT_NAMETOOLONG     -12
-#define CARD_RESULT_ENCODING        -13
-#define CARD_RESULT_CANCELED        -14
-#define CARD_RESULT_FATAL_ERROR     -128
+u8    fn_800A2604(s32 nEntry);      // lbl_80281FF0[nEntry].b0
+char* fn_800A2614(s32 nEntry);      // lbl_80281FF0[nEntry].szName
+s32   fn_800A2628(void);            // lbl_80281FF4
+s32   fn_800A27F4(void);            // lbl_80281FF8
+// Copy a string of 16-bit characters into 8-bit ones (and back), nMax characters at most, the
+// terminator included. A character above 0xFF becomes 0xAC.
+void  fn_800A2774(const u16* szSrc, char* szDst, s32 nMax);
+void  fn_800A27BC(const char* szSrc, u16* szDst, s32 nMax);
 
-// An open file on a card.
-typedef struct CARDFileInfo {
-    s32  chan;                  // 0x00
-    s32  fileNo;                // 0x04
-    s32  offset;                // 0x08
-    s32  length;                // 0x0C
-    u16  iBlock;                // 0x10
-    u16  unk12;
-} CARDFileInfo;
-LAYOUT_ASSERT(CARDFileInfo, 0x14);
-
-// A file's directory entry (0x6C bytes); only the fields the game uses.
-typedef struct CARDStat {
-    char fileName[32];          // 0x00
-    u8   unk20[0x2E - 0x20];
-    u8   bannerFormat;          // 0x2E  bits 0-1 the banner's format, bit 2 set: the icon ping-pongs
-    u8   unk2F;
-    u32  iconAddr;              // 0x30  where the banner and icon images start in the file
-    u16  iconFormat;            // 0x34  2 bits per icon frame
-    u16  iconSpeed;             // 0x36  2 bits per icon frame; 0 ends the animation
-    u32  commentAddr;           // 0x38  where the two comment lines are in the file
-    u8   unk3C[0x6C - 0x3C];
-} CARDStat;
-LAYOUT_ASSERT(CARDStat, 0x6C);
-
-s32  CARDClose(CARDFileInfo* pFile);
-s32  CARDGetStatus(s32 nChan, s32 nFileNo, CARDStat* pStat);
-s32  CARDGetXferredBytes(s32 nChan);
-s32  CARDOpen(s32 nChan, const char* pName, CARDFileInfo* pFile);
-s32  CARDProbeEx(s32 nChan, s32* pnMemSize, s32* pnSectorSize);
-s32  CARDRead(CARDFileInfo* pFile, void* pBuf, s32 nLen, s32 nOffset);
-s32  CARDSetStatus(s32 nChan, s32 nFileNo, CARDStat* pStat);
-s32  CARDUnmount(s32 nChan);
-s32  __CARDEnableGlobal(s32 bEnable);   // CARD_PATCH_2003; returns the previous setting
+// ---- MC_Gc.c's CARD state (the CARD library itself is in core/card.h) ----------------------------
 
 extern CARDFileInfo lbl_801E3180[127];  // the open files, by file number
 extern s32   lbl_802813D8;      // the file open through fn_8009F3D4 (-1: none)
