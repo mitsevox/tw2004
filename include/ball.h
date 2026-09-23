@@ -8,6 +8,7 @@
 
 #include "game_types.h"
 #include "platform.h"
+#include "terrain.h"   // the terrain manager (lbl_801D3CB0)
 
 // A row of gSurfaceTypes (0x44 bytes): how a ball behaves on one kind of ground.
 typedef struct SurfaceType {
@@ -181,19 +182,10 @@ typedef struct TerBox {
 
 #define NUM_CUP_POSITIONS 4     // one set of cup geometry per pin position (CourseInfo.pin)
 
-// The terrain manager (GoTerrain.c, 0x11C8 bytes); only its course is read so far. TW06:
-// Ter_TerrainGameDataMgr, whose GetTGD returns this pointer.
-typedef struct TerrainMgr {
-    u8          unk0[8];
-    CourseInfo* pCourse;        // 0x008
-    u8          unkC[0x11C8 - 0xC];
-} TerrainMgr;
-
 #define MAX_OBJECTS 1000        // course objects a line test can mark
 #define TER_NO_GROUND -65536.125f   // the height the ground lookups return when nothing is under the point
 
-extern TerrainMgr lbl_801D3CB0;
-extern TerBox    lbl_801D53A8[NUM_CUP_POSITIONS];  // the 3D cup geometry of each pin position
+extern TerBox   lbl_801D53A8[NUM_CUP_POSITIONS];  // the 3D cup geometry of each pin position
 extern TNetwork* lbl_801D5428[MAX_FREE_DROP_NETWORKS];
 extern TNetwork* lbl_801D548C[MAX_OOB_NETWORKS];
 extern u8        lbl_801D54A0[MAX_OBJECTS];        // objects near the current line
