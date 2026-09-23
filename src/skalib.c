@@ -85,11 +85,12 @@ void  fn_800B67EC(void);                               // wait for the ARAM copy
 void  AnimLib_Free(AnimLib* pLib);
 void  fn_800269E4(struct LibOverlay* pOv, int nSlot, s32 n);
 void  fn_800CA9DC(int nSlot);
-u32   fn_800227BC(void);                               // the current slot
+u32   Skalib_NextSlot(void);
 void  fn_80022828(void);
 int   fn_80023F7C(int nSlot);
 AnimLib* AnimLib_Load(u8* pData, ClipBank* pBank);
 u32   fn_8009EF90(void);
+u8    fn_800C9828(int nGroup, int nStyle, int nClub, int nKey);
 void  AnimLib_FreeCopies(void);
 void  ClipBank_FreeAram(void);
 int   strcmp(const char* pA, const char* pB);
@@ -138,6 +139,11 @@ extern u32         lbl_80281D04[2];   // ARAM copy of each scratch area
 extern u32         lbl_80281D0C[2];   // its size
 extern u8          lbl_801D9908[0xC8];
 extern u32         lbl_80281D18;
+extern u8          lbl_80281CD8;      // double buffering: libraries alternate between slots 0 and 1
+extern s32         lbl_80281CE8;      // group, style, club and key being merged
+extern s32         lbl_80281CEC;
+extern s32         lbl_80281CF0;
+extern s32         lbl_80281CF4;
 extern u8*         lbl_80281CC4;      // staging buffers (32-aligned), see Skalib_Init
 extern u8*         lbl_80281CC8;
 extern u8*         lbl_80281CCC;
@@ -260,6 +266,123 @@ ClipBank* ClipBank_Get(u32 nSlot) {
     return lbl_801C6050[nSlot];
 }
 
+// A leaf of the clip tree (see AnimLib); while two trees are merged its mask holds flags
+// instead: 1 keep this one, 2 replace it.
+typedef struct AnimLeaf {
+    s16 nCount;                 // 0x0
+    s16 nFirst;                 // 0x2
+    u32 uMask;                  // 0x4
+} AnimLeaf;
+
+// What the merge adds up as it walks.
+typedef struct MergeCtx {
+    u32  n0;
+    s32* pCount;                // 0x4  clips still in use
+    s32  nBytes;                // 0x8  bytes of clip data still in use
+} MergeCtx;
+
+// Merge walk, sizing pass: counts the tree bytes the merged library needs (a leaf, then the
+// node for this level) and decides for each leaf pair which side wins.
+int AnimLib_MergeSizeCb(AnimLib* pLibA, AnimLib* pLib, AnimLeaf* pLeaf, AnimLeaf* pOver, MergeCtx* pCtx, int nLevel) {
+    int bAny = 0;
+
+    if (pLeaf != NULL || pOver != NULL) bAny = 1;
+    if (bAny) pLib->nTreeSize += 8;
+    switch (nLevel) {
+    case 0:
+        break;
+    case 1:
+        pLib->nTreeSize += 0x14;
+        break;
+    case 2:
+        pLib->nTreeSize += 0xC;
+        break;
+    case 3:
+        pLib->nTreeSize += 0x20;
+        break;
+    case 4:
+        break;
+    }
+    if (pLeaf != NULL) {
+        if (pOver != NULL) {
+            if (fn_800C9828(lbl_80281CE8, lbl_80281CEC, lbl_80281CF0, lbl_80281CF4)) {
+                pOver->uMask |= 2;
+                pLeaf->uMask |= 2;
+            } else if (lbl_80281CE8 == 20) {
+                pOver->uMask |= 2;
+            } else {
+                if (!(pOver->uMask & 1)) pLib->nClips -= pLeaf->nCount;
+                if (!(pOver->uMask & 1) && !(pLeaf->uMask & 1)) {
+                    pLeaf->uMask |= 2;
+                } else {
+                    pLeaf->uMask &= ~2;
+                    pLeaf->uMask |= 1;
+                }
+            }
+        } else if (fn_800C9828(lbl_80281CE8, lbl_80281CEC, lbl_80281CF0, lbl_80281CF4)) {
+            pLeaf->uMask |= 2;
+        } else {
+            pLeaf->uMask &= ~2;
+            pLeaf->uMask |= 1;
+        }
+    }
+    return 0;
+}
+
+// Merge walk, release pass: every clip of a replaced leaf loses a user; the ones nobody uses any
+// more come off the totals.
+int AnimLib_MergeReleaseCb(AnimLib* pLibA, AnimLib* pLibB, AnimLeaf* pLeafA, AnimLeaf* pLeafB, MergeCtx* pCtx, int nLevel) {
+    ClipRecord* pRec;
+    int         i;
+    s16*        pIdx;
+
+    if (pLeafA != NULL && (pLeafA->uMask & 2) && pLeafA->nCount != 0) {
+        pIdx = pLibA->pIndex + pLeafA->nFirst;
+        for (i = 0; i < pLeafA->nCount; pIdx++, i++) {
+            pRec = &pLibA->pRecords[*pIdx];
+            pRec->n10--;
+            if (pRec->n10 == 0) {
+                (*pCtx->pCount)--;
+                pCtx->nBytes -= pRec->n14;
+            }
+        }
+    }
+    if (pLeafB != NULL && (pLeafB->uMask & 2) && pLeafB->nCount != 0) {
+        pIdx = pLibB->pIndex + pLeafB->nFirst;
+        for (i = 0; i < pLeafB->nCount; pIdx++, i++) {
+            pRec = &pLibB->pRecords[*pIdx];
+            pRec->n10--;
+            if (pRec->n10 == 0) {
+                (*pCtx->pCount)--;
+                pCtx->nBytes -= pRec->n14;
+            }
+        }
+    }
+    return 0;
+}
+
+u8 Skalib_IsDoubleBuffered(void) {
+    return lbl_80281CD8;
+}
+
+int fn_80023CE8(int n);
+
+// The slot the next library loads into: with double buffering it flips between 0 and 1.
+u32 Skalib_NextSlot(void) {
+    if (Skalib_IsDoubleBuffered()) {
+        lbl_80281078 = (lbl_80281078 == 0);
+    } else if (fn_80023CE8(0)) {
+        lbl_80281078 = 0;
+    } else {
+        lbl_80281078 = 1;
+    }
+    return lbl_80281078;
+}
+
+u32 Skalib_CurSlot(void) {
+    return lbl_80281078;
+}
+
 // The scratch area for slot n, uSize bytes: while only one of the first two slots has a bank,
 // it is carved out of that bank; otherwise it is the slot's own bank.
 static inline u8* Skalib_Scratch(int n, u32 uSize) {
@@ -372,7 +495,7 @@ void fn_80025478(void) {
 // Rebuilds the current slot's libraries from their pristine copies (they are swapped in place
 // when loaded, so a reload starts from the copy), first freeing the bank clips kept in ARAM.
 void AnimLib_ReloadSlot(void) {
-    u32         nSlot = fn_800227BC();
+    u32         nSlot = Skalib_NextSlot();
     u32         i;
     LibSlot*    pSlot;
     int         j;
@@ -486,7 +609,6 @@ u8 AnimLib_WasLastPlayed(int nPlayer, const char* pName, char** ppSlot, int nGro
 }
 
 int   AnimLib_RandomIndex(u32 uUsed, int nCount);
-u8    fn_800C9828(int nGroup, int nStyle, int nClub, int nKey);
 void* fn_800CAA7C(int nPlayer, int nGroup, int nStyle, int nClub);
 
 // The clip a player plays for a group and style. A named clip (lessons) is looked up by name.
