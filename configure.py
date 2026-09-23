@@ -464,7 +464,7 @@ config.libs = [
         "src_dir": "extern/ffcc",
         "objects": [
             Object(NonMatching, "src/vi/vi.c"),
-            Object(NonMatching, "src/ax/AX.c"),
+            Object(Matching, "src/ax/AX.c"),
             Object(NonMatching, "src/ax/AXAux.c"),
             Object(NonMatching, "src/ax/AXCL.c"),
             Object(NonMatching, "src/ax/AXSPB.c"),
