@@ -28,6 +28,10 @@ void fn_800ADC44(s16 nKind, u8 nTrack, u8 n);
 void fn_800ADCD0(s16 nKind, u8 nTrack, u8 n, u8 b);
 
 void fn_800DC6E8(int nPlayer);
+u8   fn_8006BAD8(int nPlayer, s32* pOut);
+f32  fn_8006C630(void);
+u8   fn_800AD280(s16 nSound, s32 n, int a, int b, void* p);    // hlaudemitter.c; types unproven
+void fn_800ADA08(s16 nSound, u8 nTrack, u8 n);
 void fn_800BA734(int n, s8 nTrack);
 
 void fn_800A3F38(u8 b, u8 b2);
@@ -40,6 +44,9 @@ void fn_800A44A0(void);
 void fn_800A47A0(void);
 void fn_800A484C(void);
 void fn_800A4928(void);
+void fn_800A42B0(u8 n);
+void fn_800A7220(f32 fAmount);
+void fn_800A754C(u8 a, u16 b);
 u8   fn_800A4A24(s32 nCourse, int n);
 u8   fn_800A4A88(void);
 void fn_800A7968(u8 nId, u8 nTrack, u8 a, u16 b, s32 c);
@@ -71,13 +78,43 @@ GameAudioCourseSound lbl_8018EA08[9] = {
 
 GameAudioView lbl_801F1790[2];
 
+u8 lbl_80281418 = 0xFF;
+u8 lbl_80281419 = 0xFF;
+u8 lbl_8028141A = 0xFF;
+u8 lbl_8028141B = 0xFF;
+u8 lbl_8028141C = 0xFF;
+u8 lbl_8028141D = 0xFF;
+u8 lbl_8028141E = 0xFF;
+u8 lbl_8028141F = 0xFF;
+u8 lbl_80281420 = 0xFF;
+s32 lbl_80281424 = -1;
+s32 lbl_80281428 = -1;
+u8 lbl_8028142C = 0xFF;
+u8 lbl_8028142D = 0xFF;
+f32 lbl_80281430 = 1.0f;
+f32 lbl_80281434 = 0.6f;
+f32 lbl_80281438 = 4.0f;
+f32 lbl_8028143C = 4.0f;
+f32 lbl_80281440 = 0.8f;
+f32 lbl_80281444 = 0.75f;
+f32 lbl_80281448 = 1.5f;
+f32 lbl_8028144C = 0.03f;
+f32 lbl_80281450 = 25.0f;
+f32 lbl_80281454 = 2.0f;
+f32 lbl_80281458 = 21.0f;
+
+s32 lbl_80282048;
+f32 lbl_80282044;
+u8 lbl_80282042;
 u8 lbl_80282041;
+s32 lbl_80282034;
 u8 lbl_80282033;
 u8 lbl_80282032;
 u8 lbl_80282031;
 u8 lbl_80282030;
 u8 lbl_8028202F;
 u8 lbl_8028202B;
+u8 lbl_80282028;
 u8 lbl_80282024[2];
 u8 lbl_80282020;
 
@@ -617,6 +654,133 @@ u8 fn_800A4A24(s32 nCourse, int n) {
         }
     }
     return nSound;
+}
+
+// Starts the course's sounds (not in modes 0, 1 and 3): the wind and the pin's emitter.
+void fn_800A4084(void) {
+    u8 nWind;
+
+    if (gSession.nGameType != 3 && gSession.nGameType != 1 && gSession.nGameType != 0) {
+        fn_80015464();
+        nWind = gSession.options.nWind;
+        fn_800A6DCC(0, 0);
+        fn_800A70E4(nWind);
+        fn_800A7198(nWind);
+        if (fn_80035574()) {
+            fn_800A7220(fn_8006C630());
+        }
+        lbl_80281420 = fn_800AD280(9, -1, 1, 0, NULL);
+        fn_800AD800(lbl_80281420, &gPlayers[0].ball.pCourse->pin[Game_CurrentPinSet()].x, 0, 0);
+        fn_800ADA08(9, 0, nWind);
+    }
+    lbl_80282029 = 1;
+}
+
+void fn_800A41A4(void) {
+    if (fn_800A7720()) {
+        if (lbl_80282031 == 0) {
+            if (lbl_8028203C == 1) {
+                fn_800A3FB4(15, lbl_8018E988[15] * (0.2f * (s8)gSession.options.a0[1] * lbl_80281434));
+            }
+            lbl_80282031 = 1;
+        }
+    } else if (lbl_80282031 != 0) {
+        if (lbl_8028203C == 1) {
+            fn_800A3FB4(15, 0.2f * (s8)gSession.options.a0[1] * lbl_8018E988[15]);
+        }
+        lbl_80282031 = 0;
+    }
+}
+
+void fn_800A43DC(void) {
+    s32 n;
+
+    if (lbl_80282040 && lbl_80282033 && !lbl_80282030 && !lbl_8028202F && !lbl_80282032
+        && lbl_80281428 == -1) {
+        if (fn_8006BAD8(lbl_80282278, &n)) {
+            fn_800A6DCC((u8)(n + 4), 1);
+            lbl_80282030 = 1;
+        } else if (n >= 0) {
+            if (--n < 0) {
+                n = 0;
+            }
+            fn_800A42B0(n);
+        }
+    }
+}
+
+// Steps to the next track switched on in the options' row lbl_8028142C (19 tracks) and plays it.
+void fn_800A47A0(void) {
+    u8 i;
+    int nCount = 0;
+
+    if (lbl_8028203C == 1) {
+        // fake match: the original keeps an empty 19-step loop here; a count nothing reads
+        // reproduces it (what EA's loop did is lost)
+        for (i = 0; i < 19; i++) {
+            if (gSession.options.rows[lbl_8028142C][i]) {
+                nCount++;
+            }
+        }
+        for (i = 0; i < 19; i++) {
+            if (++lbl_8028142D >= 19) {
+                lbl_8028142D = 0;
+            }
+            if (gSession.options.rows[lbl_8028142C][lbl_8028142D]) {
+                fn_800A754C(13, lbl_8028142D);
+                return;
+            }
+        }
+    }
+}
+
+u8 fn_800A4A88(void) {
+    int i;
+
+    for (i = 0; i < 2; i++) {
+        lbl_801F1790[i].n0 = 0xFF;
+        lbl_801F1790[i].n1 = 0xFF;
+        lbl_801F1790[i].n2 = 0xFF;
+        lbl_801F1790[i].n3 = 0xFF;
+        lbl_801F1790[i].n4 = 0;
+        lbl_801F1790[i].n5 = 0;
+        lbl_801F1790[i].f8 = 0.0f;
+        lbl_801F1790[i].fC = 0.0f;
+        lbl_801F1790[i].n14 = 0;
+        lbl_801F1790[i].n10 = 0;
+    }
+    lbl_80281418 = 0xFF;
+    lbl_80281419 = 0xFF;
+    lbl_8028141A = 0xFF;
+    lbl_8028141B = 0xFF;
+    lbl_8028141C = 0xFF;
+    lbl_8028141D = 0xFF;
+    lbl_8028141E = 0xFF;
+    lbl_8028141F = 0xFF;
+    lbl_80281420 = 0xFF;
+    lbl_80282028 = 0;
+    lbl_8028202A = 1;
+    lbl_8028202B = 0;
+    lbl_8028202C = 0;
+    lbl_8028202D = 0;
+    lbl_8028202E = 0;
+    lbl_8028202F = 0;
+    lbl_80282032 = 0;
+    lbl_80281424 = -1;
+    lbl_80281428 = -1;
+    lbl_80282030 = 0;
+    lbl_80282031 = 0;
+    lbl_80282033 = 0;
+    lbl_80282034 = 0;
+    lbl_8028203C = 0;
+    lbl_80282040 = 0;
+    lbl_80282041 = 0;
+    lbl_80281430 = 1.0f;
+    lbl_80281434 = 0.6f;
+    lbl_80281458 = 21.0f;
+    fn_800A3E3C(60);
+    fn_800A3FD4(32, lbl_8018E988);
+    return 1;
 }
 
 void fn_800A5EC0(u8 nPlayer) {
