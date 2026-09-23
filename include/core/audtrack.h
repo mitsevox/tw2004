@@ -12,12 +12,17 @@ typedef struct AudVoice {
     u8   unk0[0x8];
     u16  nHwVoice;              // 0x8    the startUp.c voice it plays on
     u8   bHalf : 1;             // 0xA    which half of its ARAM buffer the next stream block fills
-    u8   unkA : 7;
+    u8   unkA_6 : 2;
+    u8   bA_4 : 1;              //        it owns uAram, given back when it stops (fn_800ACB28)
+    u8   unkA : 4;
     u8   unkB_7 : 1;            // 0xB
     u8   bB_6 : 1;              //        paused; Stm_Tick resumes it once the drive is fine
     u8   unkB : 6;
-    u8   unkC[0x28 - 0xC];
-    u32  uAram;                 // 0x28   its ARAM buffer (two halves of 0x7F00 bytes)
+    u8   unkC[0x1C - 0xC];
+    void (*pfnCallback)(struct AudVoice* pVoice);  // 0x1C   the request's, called when it ends
+    void* pUser;                // 0x20   the request's (the track)
+    s32  nIndex;                // 0x24   the request's (the track's channel)
+    u32  uAram;                // 0x28   its ARAM buffer (two halves of 0x7F00 bytes)
     u32  uPlayPos;              // 0x2C   where it is playing in that buffer, in bytes
 } AudVoice;
 
@@ -36,7 +41,7 @@ typedef struct AudVoiceRequest {
         } b;
         u16 n;                  //        cleared as a whole first
     } flags;                    // 0x8
-    void (*pfnCallback)(void);  // 0xC
+    void (*pfnCallback)(struct AudVoice* pVoice);  // 0xC   called when the voice ends
     void* pUser;                // 0x10   the track
     s32  nIndex;                // 0x14   the track's channel
 } AudVoiceRequest;
@@ -73,24 +78,18 @@ typedef union AudTrackStmFlags {
 typedef struct AudTrackTmpl {
     u8   n0;                    // 0x0    bit 0x08: a streamed track
     u8   unk1;
-    u8   n2;                    // 0x2    its play list's channel count
-    u8   unk3[0x14 - 0x3];
-    AudPlayList* pPlayList;     // 0x14   streamed tracks only
+    u8   n2;                    // 0x2    its channel count (one voice each)
+    u8   n3;                    // 0x3
+    u8   unk4[0x6 - 0x4];
+    u8   n6;                   // 0x6    passed to fn_800A8584 when the track is freed (n0 & 0x40)
+    u8   unk7[0xC - 0x7];
+    f32  fC;                    // 0xC    copied to the track's f40
+    u8   unk10[0x14 - 0x10];
+    AudPlayList* pPlayList;     // 0x14   its n3 is the track's volume curve
 } AudTrackTmpl;
 
-// A playing track. The stream fields (0x64-0x8A) are cleared by fn_800ABC54.
-typedef struct AudTrack {
-    u8   unk0[0x8];
-    AudTrackTmpl* pTmpl;        // 0x8
-    AudVoice* apVoices[12];     // 0xC    one per channel; 12 is a guess (0x3E is the next field in use)
-    u8   unk3C[0x44 - 0x3C];
-    f32  f44;                   // 0x44   its volume
-    u8   unk48[0x58 - 0x48];
-    s32  nState;                // 0x58   2 starting, 3 and 6 playing, 4 filling, 5 filled
-    u8   b5C : 1;               // 0x5C
-    u8   unk5C : 7;
-    u8   n5D;                   // 0x5D
-    u8   unk5E[0x64 - 0x5E];
+// A streamed track's own fields (AudTrack 0x64), cleared by fn_800ABC54.
+typedef struct AudTrackStm {
     AudStream* pStream;         // 0x64   the stream playing
     u8*  pBuffer;               // 0x68   the read buffer (0x8000 bytes per channel and half)
     u32  uBufferSize;           // 0x6C
@@ -104,7 +103,99 @@ typedef struct AudTrack {
     u8   nNextPlayList;         // 0x88   0xFF: none waiting
     AudTrackStmFlags flags;     // 0x89
     u8   nReadId;               // 0x8A   tells this track's reads from an older start's
+} AudTrackStm;
+
+// A track's flags (AudTrack 0x5C), cleared as a byte when it is allocated.
+typedef union AudTrackFlags {
+    struct {
+        u8 b7 : 1;
+        u8 bSorted : 1;         // in the second list, the one sorted on f48
+        u8 b5 : 1;              // its source's n40 was not negative
+        u8 bDetached : 1;       // taken out of its source's apTracks
+        u8 bTicked : 1;         // an allocated track (state 1) is freed on its second tick
+        u8 unk0 : 3;
+    } b;
+    u8 n;
+} AudTrackFlags;
+
+// A sequenced track's own fields (AudTrack 0x64); only the ones fn_800A9E7C keeps when it
+// restarts the track.
+typedef struct AudTrackSeq {
+    u8   n64;                   // 0x64   its variation (set by fn_800AA444)
+    u8   unk65;
+    u8   n66;                   // 0x66   from its template's n3 (fn_800AAEEC)
+    u8   unk67;
+    u8   n68;                   // 0x68
+    u8   unk69[0x8C - 0x69];
+} AudTrackSeq;
+
+// A playing track (0x8C bytes, from a pool of 32 made by fn_800A98B4).
+typedef struct AudTrack {
+    UListNode link;             // 0x0    in one of the two track lists (lbl_801F1868)
+    AudTrackTmpl* pTmpl;        // 0x8
+    AudVoice* apVoices[8];      // 0xC    one per channel (fn_800A9BC8 clears 0x20 bytes)
+    struct AudSource* pSource;  // 0x2C   the sound source the track plays for
+    u8   unk30[0x3E - 0x30];
+    u8   n3E;                   // 0x3E   cleared when the track starts
+    u8   unk3F;
+    f32  f40;                   // 0x40   from its template
+    f32  f44;                   // 0x44   its volume
+    f32  f48;                   // 0x48   the second list is sorted on it, highest first
+    f32  f4C;                   // 0x4C   advanced by f50 every tick
+    f32  f50;                   // 0x50
+    u8   nIndex;                // 0x54   its slot in the pool
+    u8   nChannel;              // 0x55   its slot in its source's apTracks
+    u8   unk56[2];
+    s32  nState;                // 0x58   1 allocated, 2 stopped, 3 stopping, 4 filling, 5 filled,
+                                //        6 playing (streamed tracks)
+    AudTrackFlags bits;         // 0x5C
+    u8   n5D;                   // 0x5D   its voices still playing
+    u8   unk5E[0x64 - 0x5E];
+    union {
+        AudTrackStm stm;        // 0x64   streamed tracks (pTmpl->n0 & 8)
+        AudTrackSeq seq;        // 0x64   sequenced tracks
+    } u;
 } AudTrack;
+LAYOUT_ASSERT(AudTrack, 0x8C);
+
+// A sound source: one track per channel. Only the fields the tracks read are known.
+typedef struct AudSourceTmpl {
+    u8   unk0[0x3];
+    u8   n3;                    // 0x3    bit 0: its tracks go in the sorted list
+} AudSourceTmpl;
+
+typedef struct AudSource {
+    u8   u0;                    // 0x0    bits set by the sequencer's event fn_800AAB48
+    u8   u1;                    // 0x1    the same, for events whose n4 is 0
+    u8   unk2[0x3C - 0x2];
+    AudSourceTmpl* pTmpl;       // 0x3C
+    s16  n40;                   // 0x40
+    u8   unk42[0x44 - 0x42];
+    AudTrack* apTracks[1];      // 0x44   one per channel; the count is not known
+} AudSource;
+
+// A sequencer event (8 bytes; fn_800AB1B8 walks them). Only the fields read so far are named.
+typedef struct AudSeqEvent {
+    u16  n0;                    // 0x0
+    u8   nType;                 // 0x2    picks its handler in the sequencer's table (lbl_801F1880)
+    u8   n3;                    // 0x3
+    s32  n4;                    // 0x4
+} AudSeqEvent;
+LAYOUT_ASSERT(AudSeqEvent, 0x8);
+
+// One of hlaudemitter.c's 256 emitter instances (lbl_801F2740); only the fields read so far.
+typedef struct AudInstance {
+    u8   unk0[0x22];
+    u8   u22;                   // 0x22   bits cleared by fn_800ADDC8
+    u8   unk23[0x30 - 0x23];
+    void (*pfnCallback)(u8 nId, u8 nBit, s32 n);  // 0x30
+} AudInstance;
+LAYOUT_ASSERT(AudInstance, 0x34);
+
+// The two track lists: [0] in start order, [1] sorted on f48, highest first.
+extern UList lbl_801F1868[2];
+extern UPool lbl_80282098;              // the free tracks
+extern AudTrack* lbl_802820A0;          // the pool's memory
 
 // A disc read waiting in the stream read queue (lbl_801F18B8). bRestart marks a request to refill
 // the whole buffer (fn_800AB860) instead of a read.
@@ -133,5 +224,63 @@ extern AudStreamQueue lbl_801F18B8;
 extern s32 lbl_80281468;                // the stream file (hlaudmovie.c opens "/AudioStm_GC.sab")
 extern u8 lbl_802820A8;                 // the last read id handed out (hlaudtrackstm.c)
 extern AudTrack* lbl_802820AC;          // the track whose block is being DMA'd (hlaudtrackstm.c)
+
+// hlaudmovie.c's, used by the tracks.
+extern f32 lbl_801F17D0[32];            // the volume curves
+extern s32 lbl_80282060;                // one bit per curve: 1 = flat (fn_800AA498)
+extern f32 lbl_80281460;                // returned by fn_800AB39C
+extern s32 lbl_80282080;                // fn_800AB374 says whether it is 0
+extern u32 lbl_8028207C;            // 0xD: the tracks tick; 0x40: only some do
+void fn_800A8584(AudSource* pSource, u8 n, int n2);
+f32  fn_800A85FC(f32 fVolume, f32 fCurve);
+void fn_800A9590(AudSource* pSource, AudTrack* pTrack);   // pan and volume, sorted tracks
+void fn_800A96DC(AudSource* pSource, AudTrack* pTrack);   // the same for the others
+
+// hlaudtrack.c
+void fn_800A9808(AudTrack* pTrack);
+u8   fn_800A98B4(void);
+s32  fn_800A9A50(void);
+void fn_800A9AC8(void);
+AudTrack* fn_800A9BC8(AudSource* pSource, AudTrackTmpl* pTmpl, u8 nChannel, f32 fPriority);
+s32  fn_800A9D7C(AudTrack* pTrack);
+void fn_800AA0D8(AudTrack* pTrack);
+void fn_800AA118(AudTrack* pTrack);
+void fn_800AA1B8(AudTrack* pTrack, int bNow);
+u8   fn_800AA2A4(AudTrack* pTrack);
+void fn_800AA34C(AudTrack* pTrack);
+void fn_800AA400(AudVoice* pVoice);
+void fn_800AA444(AudTrack* pTrack, u8 n);
+f32  fn_800AA44C(u8 nCurve);
+u8   fn_800AA498(u8 nCurve);
+
+// hlaudtrackseq.c
+u8   fn_800AAD18(void);
+void fn_800AADE8(AudTrack* pTrack);
+void fn_800AAE70(AudTrack* pTrack);
+void fn_800AAE90(AudTrack* pTrack);
+void fn_800AAEEC(AudTrack* pTrack);
+u8   fn_800AAEFC(AudTrack* pTrack);
+void fn_800AB118(AudTrack* pTrack, u8 n, u8 bCheck);
+void fn_800AB14C(AudTrack* pTrack, u8 n);
+void fn_800AB1B8(AudTrackTmpl* pTmpl);
+u32  fn_800AB32C(u32 nRange);           // a random number below nRange
+u8   fn_800AB374(void);
+f32  fn_800AB39C(void);
+
+// hlaudtrackstm.c
+u8   fn_800ABBC8(void);
+void fn_800ABC34(AudTrack* pTrack);
+void Stm_Exit(AudTrack* pTrack);
+void Stm_Start(AudTrack* pTrack);
+void fn_800ABD7C(AudTrack* pTrack);
+u8   Stm_Tick(AudTrack* pTrack);
+
+// hlaudvoice.c
+AudVoice* fn_800AC4A0(AudVoiceRequest* pRequest);
+void fn_800AC7DC(AudVoice* pVoice, u32 uLen, u16 n4, int bLoud);
+void fn_800ACA5C(AudVoice* pVoice, u8 bPause);
+void fn_800ACA94(AudVoice* pVoice);     // let it end
+void fn_800ACB28(AudVoice* pVoice);     // stop it now
+u8   fn_800ACE38(AudVoice* pVoice, u32* puPos);
 
 #endif

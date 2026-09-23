@@ -1,17 +1,15 @@
-#include "game_types.h"
+// hlaudvoice.c (TW06's name, by structure: golf/audio/engine/hl/hlaudvoice.c, the file after
+// hlaudtrackstm.c): the sound engine's voices. Each wraps one of startUp.c's hardware voices; a
+// track takes one per channel (fn_800AC4A0) and is called back when it ends. Its extent is its
+// data: it is the first to use the .bss at 0x801F19B8 and the .sdata2 block 0x80283FF8-0x80284008.
+// Not yet decompiled: the functions below are the sweep's.
 
-void fn_800AC330();
-s32 fn_800AC470(void);
-s32 fn_800AC494(void);
-void fn_800AC49C(void);
-s32 fn_800AFCBC(u16, u8);
-void fn_800ACA5C(void* arg0, u8 arg1);
-s32 fn_800B0748();
-s32 fn_800ACA94();
-void fn_800ACB28(void* arg0);
-f32 fn_800ACEC4(f32 x0, f32 x1);
+#include "core/audtrack.h"
+#include "core/startup.h"
 
-s32 fn_800AC470(void) {
+void fn_800AC330(void);
+
+u8 fn_800AC470(void) {
     fn_800AC330();
     return 1;
 }
@@ -23,27 +21,29 @@ s32 fn_800AC494(void) {
 void fn_800AC49C(void) {
 }
 
-void fn_800ACA5C(void* arg0, u8 arg1) {
-    if ((arg0 != NULL) && !(((u8) (*(u8*)((u8*)(arg0) + 0xB)) >> 6U) & 1)) {
-        fn_800AFCBC((*(u16*)((u8*)(arg0) + 8)), arg1);
+// Pauses or resumes a voice's hardware voice.
+void fn_800ACA5C(AudVoice* pVoice, u8 bPause) {
+    if (pVoice != NULL && !pVoice->bB_6) {
+        fn_800AFCBC(pVoice->nHwVoice, bPause);
     }
 }
 
-void fn_800ACB28(void* arg0) {
-    fn_800ACA94();
-    (*(s32*)((u8*)(arg0) + 0x1C)) = 0;
-    (*(s32*)((u8*)(arg0) + 0x20)) = 0;
-    (*(s32*)((u8*)(arg0) + 0x24)) = 0;
-    if (((u8) (*(u8*)((u8*)(arg0) + 0xA)) >> 4U) & 1) {
-        fn_800ACA5C(arg0, 1);
-        if ((u32) (*(u32*)((u8*)(arg0) + 0x28)) != 0U) {
-            fn_800B0748((*(u32*)((u8*)(arg0) + 0x28)));
-            (*(u32*)((u8*)(arg0) + 0x28)) = 0U;
-            (*(s32*)((u8*)(arg0) + 0x2C)) = 0;
+// Stops a voice at once: it forgets its track and gives back its ARAM buffer.
+void fn_800ACB28(AudVoice* pVoice) {
+    fn_800ACA94(pVoice);
+    pVoice->pfnCallback = NULL;
+    pVoice->pUser = NULL;
+    pVoice->nIndex = 0;
+    if (pVoice->bA_4) {
+        fn_800ACA5C(pVoice, 1);
+        if (pVoice->uAram != 0) {
+            fn_800B0748(pVoice->uAram);
+            pVoice->uAram = 0;
+            pVoice->uPlayPos = 0;
         }
     }
 }
 
-f32 fn_800ACEC4(f32 x0, f32 x1) {
-    return (x0 * x1);
+f32 fn_800ACEC4(f32 fA, f32 fB) {
+    return fA * fB;
 }
