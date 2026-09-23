@@ -40,6 +40,9 @@ LAYOUT_ASSERT(Replay, 0xF28);
 
 extern Replay gReplayData;              // 0x801D6030
 
+#define NUM_COURSES 30
+extern char* lbl_80191990[NUM_COURSES]; // each course's name ("Pebble Beach", ...)
+
 // The replay recorder's buffer (our name; 0x15260 bytes, made by fn_8006BED4 at the start of a
 // round). Only the flag is read so far.
 typedef struct ReplayBuffer {

@@ -17,6 +17,8 @@ void* fn_80005AE8(void* pDst, int nValue, u32 uLen);      // memset; returns pDs
 // Allocates from the static heap (StaticMemory.c); nMode picks where (see there).
 void* fn_80009B34(int nSize, int nMode, int nAlign, const char* pFile, int nLine);
 void  fn_80009E70(void* p);             // free
+void  fn_8000A0AC(s32 v);               // } a value callers pass on as fn_80009B34's uFlags
+s32   fn_8000A0B4(void);                // } (EASportsBio.c sets 0 while the Bio starts, then 2)
 void* fn_800951A0(u32 uSize, int nAlign, int a);
 void  fn_8009527C(void* p);             // frees what fn_800951A0 allocated
 void  fn_800953C8(int a);
@@ -47,6 +49,12 @@ void  fn_8015929C(void* pBase, u32 nCount, u32 nSize, s32 (*pfnCompare)(const vo
 
 #define FRAME_RATE 59.94f               // frames a second (NTSC)
 #define FRAME_TIME (1.0f / FRAME_RATE)  // one frame, in seconds
+
+// llrtclock.c: the real-time clock as a date: month 1-12, day, year, hour 0-23, minute, second,
+// millisecond. Always TRUE.
+int  fn_8011E020(s32* pnMonth, s32* pnDay, s32* pnYear, s32* pnHour, s32* pnMinute, s32* pnSecond,
+                 s32* pnMsec);
+void RTClock_GetDateTimeString(char* szOut);   // "M/D/YYYY H:MM AM"
 
 // ---- math and random numbers -----------------------------------------------------------------
 
