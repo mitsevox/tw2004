@@ -11,8 +11,12 @@ u8 fn_800D1A34(int nPlayer);
 u8 fn_800D1A70(int nPlayer);
 u8 fn_800D1AA8(int nPlayer);
 u8 fn_800D1AE0(void);
+u8 fn_800D1B10(int nPlayer);
+u8 fn_800D1BA4(int nPlayer);
 u8 fn_800D1C38(int nPlayer);
+u8 fn_800D1C9C(int nPlayer);
 u8 fn_800D1D30(void);
+u8 fn_800D1D38(int nPlayer);
 
 // A tip test: a shot other than a putt, with the wind's speed over 6.
 u8 fn_800D1698(int nPlayer) {
@@ -53,6 +57,28 @@ u8 fn_800D1AE0(void) {
     return fn_80035574() != 0;
 }
 
+// A tip test: the player's first shot on a par 5 of 500 or more (the hole's value for the tee).
+u8 fn_800D1B10(int nPlayer) {
+    s32 nStrokes = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
+    int nPar = fn_800D2B08();
+    s32 nLength = fn_800D2C68(gSession.nTeeSet[nPlayer]);
+    if (nPar == 5 && nStrokes == 0 && nLength >= 500) {
+        return 1;
+    }
+    return 0;
+}
+
+// A tip test: the player's first shot on a par 4 of 325 or less.
+u8 fn_800D1BA4(int nPlayer) {
+    s32 nStrokes = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
+    int nPar = fn_800D2B08();
+    s32 nLength = fn_800D2C68(gSession.nTeeSet[nPlayer]);
+    if (nPar == 4 && nStrokes == 0 && nLength <= 325) {
+        return 1;
+    }
+    return 0;
+}
+
 // A tip test: the club reaches past the pin (the longest the player can hit it is more than the
 // ball's distance from the pin).
 u8 fn_800D1C38(int nPlayer) {
@@ -60,7 +86,28 @@ u8 fn_800D1C38(int nPlayer) {
     return fMax > fn_800D0478(nPlayer);
 }
 
+// A tip test: the player's first shot on a par 4 of 425 or more.
+u8 fn_800D1C9C(int nPlayer) {
+    s32 nStrokes = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
+    int nPar = fn_800D2B08();
+    s32 nLength = fn_800D2C68(gSession.nTeeSet[nPlayer]);
+    if (nPar == 4 && nStrokes == 0 && nLength >= 425) {
+        return 1;
+    }
+    return 0;
+}
+
 // A tip test that never fires.
 u8 fn_800D1D30(void) {
+    return 0;
+}
+
+// A tip test: a target 25 to 33 away, no more than 3 feet above or below the ball.
+u8 fn_800D1D38(int nPlayer) {
+    f32 fRise = 3.0f * (gPlayers[nPlayer].vTarget[1] - gPlayers[nPlayer].vBall[1]);
+    if (gPlayers[nPlayer].fDistance >= 25.0f && gPlayers[nPlayer].fDistance <= 33.0f && fRise >= -3.0f &&
+        fRise <= 3.0f) {
+        return 1;
+    }
     return 0;
 }

@@ -694,6 +694,7 @@ extern f32          gClubPowerStep[CLUB_MAX_e];      // 0x801875E8  reach gained
 int  Game_GetMode(void);                // 0x8000BED8
 void fn_8002EBA4(u8* pObj, u8 nValue);  // set byte 7 of the options (a7[0]) and apply it (Golfer.c)
 int  fn_800D2B08(void);
+s32  fn_800D2C68(int nTee);             // CourseData.c: the current hole's value for tee set nTee
 int  fn_80100744(void);                 // shot kind override, 8 = none
 int  fn_801006F0(int nPlayer);          // club override, 26 = none
 int  fn_80015464(void);
