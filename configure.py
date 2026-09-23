@@ -877,7 +877,7 @@ config.libs = [
             Object(NonMatching, "SkinPart.c"),
             Object(Matching, "HoleScore.c"),
             Object(NonMatching, "Earnings.c"),
-            Object(NonMatching, "GameManager.c"),
+            Object(Matching, "GameManager.c"),
             Object(Matching, "GameEffects.c"),
             Object(NonMatching, "GameRound.c"),
             Object(Matching, "GameUI.c"),
