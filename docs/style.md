@@ -74,11 +74,14 @@ Prototypes
   belongs to.
 - **A prototype local to a file** is for functions only that file calls.
 - **Headers:** `game.h` (game manager, rounds, modes, golfer states, sessions), `engine.h`
-  (memory, math, streams, views, events, sound, animation), `golfer.h` (players and golfers),
-  `ball.h` (the ball, surfaces and the hole's terrain; `golfer.h` includes it), `camera.h` (the
-  golf cameras' types), `game/save.h` (the save profile), `game/earnings.h` (the prize table), `game/modes/*.h` (data a family of game
-  modes shares: `challenge.h`, `pgatour.h`, `rte.h`). A header includes only the headers below it
-  (`game_types.h` < `engine.h` < `camera.h`, `ball.h` < `golfer.h` < `game.h`).
+  (memory, math, streams, events, sound), `golfer.h` (players and golfers), `ball.h` (the ball,
+  surfaces and the hole's terrain; `golfer.h` includes it), `camera.h` (views and cameras),
+  `character.h` (the golfer's character object and animation), `physics.h` (TW06's lie, shot-kind
+  and club enums), `platform.h` (the C library and layout checks; see Portability),
+  `game/save.h` (the save profile), `game/earnings.h` (the prize table), `game/modes/*.h` (data a
+  family of game modes shares: `challenge.h`, `pgatour.h`, `rte.h`). A header includes only the
+  headers below it (`game_types.h` < `platform.h` < `engine.h` < `camera.h`, `character.h`;
+  `physics.h`, `ball.h` < `golfer.h` < `game.h`).
 - **No per-file re-declaration with other types.** CodeWarrior rejects a second prototype whose
   parameter types differ (even `int` vs `s32`) as "identifier redeclared". When one file's calls
   need a different argument type to match, cast at the call site (`fn((u16)x)`) and say why.
@@ -145,6 +148,25 @@ the patterns that break there:
   `sizeof(Ball)`: the size of a struct holding pointers changes on a 64-bit machine.
 - `port-frame-rate`: the frame rate as a bare number (`59.94f`). Use `FRAME_RATE` or `FRAME_TIME`
   (engine.h); CodeWarrior folds `1.0f / FRAME_RATE` to the same constant as `0.016683351f`.
+- `port-asm-no-fallback`: CodeWarrior-only code with no plain-C version. An `asm` function sits
+  under `#ifdef __MWERKS__` with an `#else` that computes the same result in C (marked untested
+  until a port runs it; the asm body stays as it is). A compiler intrinsic (`__cntlzw`) needs a C
+  fallback in game_types.h or platform.h, in the `TW_PORT` branch.
+
+The base types and the platform layer:
+
+- `game_types.h`: for the GameCube build `s32`/`u32` stay `long` (CodeWarrior treats `int` and
+  `long` differently, and some functions only match with `long`); a port defines `TW_PORT` and gets
+  `<stdint.h>` types. `uptr` is an integer as wide as a pointer: use it, not `u32`, for address
+  arithmetic (alignment, an offset stored in a pointer field), e.g. `(uptr)p & 15`.
+- `platform.h` (included by engine.h): the C library prototypes, declared once (a port gets the
+  standard headers instead), and `LAYOUT_ASSERT(Type, size)`, a zero-code size check. Every shared
+  struct with a proven size gets one after its definition. The sizes are the GameCube's 32-bit
+  layouts, checked only when `TW_GC_LAYOUT` is defined (the GameCube build), so a 64-bit port knows
+  which structs its layout must not rely on.
+- Test `__MWERKS__` only for CodeWarrior syntax (`asm`, intrinsics). For what differs between the
+  GameCube build and a port, test `TW_PORT`: the Common library is built with ProDG, which defines
+  no `__MWERKS__`.
 
 When the original's code can only be matched with one of these, keep it and say why with
 `// port: <why>` on the line or the line before, so a porter knows to look there. Data read from

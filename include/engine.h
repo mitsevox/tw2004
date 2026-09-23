@@ -7,6 +7,7 @@
 #define ENGINE_H
 
 #include "game_types.h"
+#include "platform.h"
 
 // ---- memory and strings ----------------------------------------------------------------------
 
@@ -16,13 +17,6 @@ void* fn_80009B34(u32 uSize, u32 uFlags, u32 uAlign, const char* pFile, int nLin
 void  fn_80009E70(void* p);             // free
 void* fn_800951A0(u32 uSize, int nAlign, int a);
 void  fn_800953C8(int a);
-// The C library's (MSL) functions the game calls directly.
-void* memcpy(void* pDst, const void* pSrc, u32 uLen);
-void* memset(void* pDst, int nValue, u32 uLen);
-u32   strlen(const char* s);
-char* strcpy(char* pDst, const char* pSrc);
-int  strcmp(const char* a, const char* b);
-int  sprintf(char* pBuf, const char* pFmt, ...);
 
 // ---- time ------------------------------------------------------------------------------------
 
@@ -38,8 +32,7 @@ double fn_80009680(double x);           // sqrt
 f32  fn_80009744(f32* pVec);            // dot with itself
 void Vec_Copy(f32* pSrc, f32* pDst);    // 0x8000AD10
 f32  fn_8000AD78(f32 y, f32 x);         // atan2f
-f32  fn_8000AD9C(f32 x);                // fabsf
-double fabs(double x);                  // 0x8000AE94; fn_8000AD9C is the float version
+f32  fn_8000AD9C(f32 x);                // fabsf (fabs, 0x8000AE94, is in platform.h)
 u32  Rand_Next(int nStream);            // 0x8000B130  EA's lagged-Fibonacci generator
 void fn_8000B1D4(int nStream, u32 uSeed);   // seed a random stream
 f32  Rand_Float(int nStream);           // 0x8000B428  [0, 1)

@@ -147,7 +147,6 @@ extern Vec4          lbl_80183620;          // 0, 0, 0, 0.5 (assigned)
 
 void  fn_800130F8(int nPad, int n);              // rumble on
 void  fn_8006C2C8(int nPlayer, f32* pX, f32* pY);
-double atan(double x);
 void  Swing_FaceVector(int nPlayer, f32* pOut);
 f32   Swing_MeterError(int nPlayer);
 void  Swing_ShapeVector(int nPlayer, f32* pOut);
@@ -464,6 +463,7 @@ void ShotObj_Set1634(Character* pObj, f32 f) {
 }
 
 // Paired-single vector add over four floats (the fourth is carried along).
+#ifdef __MWERKS__
 asm void Vec_Add(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
@@ -476,7 +476,17 @@ asm void Vec_Add(register f32* pA, register f32* pB, register f32* pOut) {
     psq_st f3, 8(pOut), 0, 0
     blr
 }
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void Vec_Add(f32* pA, f32* pB, f32* pOut) {
+    pOut[0] = pB[0] + pA[0];
+    pOut[1] = pB[1] + pA[1];
+    pOut[2] = pB[2] + pA[2];
+    pOut[3] = pB[3] + pA[3];
+}
+#endif
 
+#ifdef __MWERKS__
 asm void Vec_Sub(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
@@ -489,6 +499,15 @@ asm void Vec_Sub(register f32* pA, register f32* pB, register f32* pOut) {
     psq_st f3, 8(pOut), 0, 0
     blr
 }
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void Vec_Sub(f32* pA, f32* pB, f32* pOut) {
+    pOut[0] = pA[0] - pB[0];
+    pOut[1] = pA[1] - pB[1];
+    pOut[2] = pA[2] - pB[2];
+    pOut[3] = pA[3] - pB[3];
+}
+#endif
 
 // A 4-vector's squared length, capped.
 f32 fn_8005CC18(f32* pV) {
@@ -2189,6 +2208,7 @@ u8 fn_80062DD4(View* pView) {
 }
 
 // a - b over three floats (paired singles; the third is a single).
+#ifdef __MWERKS__
 asm void fn_80062DDC(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
@@ -2201,6 +2221,14 @@ asm void fn_80062DDC(register f32* pA, register f32* pB, register f32* pOut) {
     psq_st f3, 8(pOut), 1, 0
     blr
 }
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void fn_80062DDC(f32* pA, f32* pB, f32* pOut) {
+    pOut[0] = pA[0] - pB[0];
+    pOut[1] = pA[1] - pB[1];
+    pOut[2] = pA[2] - pB[2];
+}
+#endif
 
 void fn_80062E00(void) {
     fn_800BD894();

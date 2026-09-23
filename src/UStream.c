@@ -371,13 +371,11 @@ u8* UStream_Fill(u8* pDst, u32 value, u32 uCount) {
 // The eight-at-a-time blocks read into temporaries first: that is what lets the compiler
 // hoist the loads above the stores.
 u8* UStream_Copy(u8* pDst, const u8* pSrc, u32 uCount) {
-    // port: alignment tests on the addresses; a 64-bit port needs an integer as wide as a pointer
-    if (((u32)pDst & (u32)pSrc) & 1) {
+    if (((uptr)pDst & (uptr)pSrc) & 1) {
         *pDst++ = *pSrc++;
         uCount--;
     }
-    // port: as above
-    if ((((u32)pDst | (u32)pSrc) & 1) == 0) {
+    if ((((uptr)pDst | (uptr)pSrc) & 1) == 0) {
         s16* d = (s16*)pDst;
         const s16* s = (const s16*)pSrc;
         u32 uOdd = uCount & 1;

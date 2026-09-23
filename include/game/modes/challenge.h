@@ -6,6 +6,7 @@
 #define GAME_MODES_CHALLENGE_H
 
 #include "game_types.h"
+#include "platform.h"
 
 // A medal of a challenge: the rule it is judged by (0 none; see fn_800EC558), the mark the rule
 // compares with, and the reward.
@@ -43,6 +44,7 @@ typedef struct Challenge {
     s32 nScoring;               // 0x58  0 the round's totals, 1 this hole
     ChallengeMedal aMedal[3];   // 0x5C  0 the best
 } Challenge;
+LAYOUT_ASSERT(Challenge, 0x80);
 
 // Where a challenge places the ball (12 bytes), when its bPlaceBall is set.
 typedef struct ChallengeSpot {

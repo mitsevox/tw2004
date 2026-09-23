@@ -7,6 +7,7 @@
 #define GAME_EARNINGS_H
 
 #include "game_types.h"
+#include "platform.h"
 
 #define NUM_EARNINGS_RATINGS 26  // fn_800D3CF8 caps a rating at 25
 
@@ -60,6 +61,7 @@ typedef struct EarningsTable {
     s32  nA24;                  // 0xA24  paid with award 0x1C after a challenge (GameMode5)
     u8   unkA28[0x22F0 - 0xA28];
 } EarningsTable;
+LAYOUT_ASSERT(EarningsTable, 0x22F0);
 
 extern EarningsTable lbl_80200538;
 
