@@ -29,13 +29,15 @@ typedef struct FEState {
     u8  aCPU[5];                // 0x005  per player slot: a CPU player (fn_80079AD4 gives it
                                 //        CONTROLLER_CPU and no profile)
     s8  aBackup[5];             // 0x00A  per player slot: its row in p658 (-1: none)
-    u8  unkF[0x11 - 0xF];
+    u8  b0F;                    // 0x00F  set by fn_80076E48
+    u8  b10;                    // 0x010  set by fn_80076E48
     u8  b11;                    // 0x011  cleared by fn_80079AD4
     u8  unk12[2];
     s32 nMode;                  // 0x014  the game mode the menus start in (fn_80079AD4): the
                                 //        session's, or 4, 23, 27 or 28
-    u8  b18;                    // 0x018  cleared by the "THEKITCHENSINK" cheat code
-    u8  unk19[0x20 - 0x19];
+    u8  b18;                    // 0x018  set by fn_80076E48; cleared by the "THEKITCHENSINK" cheat code
+    u8  unk19[3];
+    s32 n1C;                    // 0x01C  cleared by fn_80076E48
     s32 nMovieNext;             // 0x020  } the movie queue: the next to play, and where the next
     s32 nMovieFree;             // 0x024  } one is added (equal when it is empty)
     FEMovie aMovies[FE_NUM_MOVIES];     // 0x028

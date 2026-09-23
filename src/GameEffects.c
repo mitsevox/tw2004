@@ -15,7 +15,6 @@ void  fn_800141F8(f32* pA, f32* pB, f32 x0, f32 y0, f32 x1, f32 y1);
 void  fn_80014194(f32* pColour);
 void  fn_8001644C(int a, f32* pA, int b, f32* pB, int c);
 int   fn_800D782C(int nPlayer, Ball* pBall, int a, u8 b, int c);
-u8    fn_800DC818(Ball* pBall, int nPlayer, u8 bNext);
 u8    fn_800B4AE0(void);
 void  fn_800DBFAC(void);
 void  fn_800DC18C(void);
