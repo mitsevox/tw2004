@@ -299,7 +299,8 @@ void fn_800329CC(void) {
             if (nPassBit & lbl_801D3CB0.pPostDrawTerrainList[i].n1C) {
                 fn_80032B7C(lbl_801D3CB0.pPostDrawTerrainList[i].pGround,
                             lbl_801D3CB0.pPostDrawTerrainList[i].eClipMethod, nPass,
-                            lbl_801D3CB0.pPostDrawTerrainList[i].n1C, lbl_801D3CB0.pPostDrawTerrainList[i].n18,
+                            lbl_801D3CB0.pPostDrawTerrainList[i].n1C,
+                            lbl_801D3CB0.pPostDrawTerrainList[i].n18,
                             lbl_801D3CB0.pPostDrawTerrainList[i].n20, &bFirst, 1, 0,
                             lbl_801D3CB0.pPostDrawTerrainList[i].fDistance,
                             lbl_801D3CB0.pPostDrawTerrainList[i].fDistance
