@@ -59,6 +59,10 @@ void  fn_8009555C(void);
 void  fn_80095560(void);
 void  fn_80095564(void);
 void  fn_800955F0(int nPlayer);
+void  fn_8008B704(void);               // FEgolferanim.c
+void  fn_8008B754(int nNext);           // FEgolferanim.c
+int   fn_8008B990(void);
+u8    fn_8008E924(void);                // FEgolferanim.c
 void  fn_8008E918(s32 v);
 u8    fn_8008E938(void);
 void  fn_8008EAC8(u8 v);
@@ -588,6 +592,21 @@ void fn_8001D47C(void) {
 
 void fn_8001D624(int n) {
     gSession.aD2D[n] = 1;
+}
+
+// Each index set by fn_8001D624 is taken once the CrAP camera's golfer runs its script, the front
+// end is not in state 4 and fn_8008E924 agrees: the front end is aborted into state 4.
+void fn_8001D63C(void) {
+    int i;
+
+    for (i = 0; i < 5; i++) {
+        if (gSession.aD2D[i] && lbl_80281EE0->pB4 != NULL && lbl_80281EE0->pB4->b18 &&
+            fn_8008B990() != 4 && fn_8008E924()) {
+            gSession.aD2D[i] = 0;
+            fn_8008B704();
+            fn_8008B754(4);
+        }
+    }
 }
 
 void fn_8001D6D8(int n) {
