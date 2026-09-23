@@ -3905,17 +3905,11 @@ unsorted/sweep_80165524.c:
 UISEvent.c:
 	.text       start:0x80165528 end:0x80166098
 
-unsorted/sweep_80169B0C.c:
-	.text       start:0x80169B0C end:0x80169B28
+UIStudio.c:
+	.text       start:0x80166098 end:0x80168C24
 
-unsorted/sweep_80169B28.c:
-	.text       start:0x80169B28 end:0x80169B30
-
-unsorted/sweep_80169B30.c:
-	.text       start:0x80169B30 end:0x80169B3C
-
-unsorted/sweep_80169B3C.c:
-	.text       start:0x80169B3C end:0x80169B4C
+UISApi.c:
+	.text       start:0x80168C24 end:0x8016A2D4
 
 unsorted/sweep_8016C18C.c:
 	.text       start:0x8016C18C end:0x8016C1A4
