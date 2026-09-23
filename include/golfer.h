@@ -244,7 +244,7 @@ typedef struct Player {
     u8   b30E;                  // 0x30E  a replaced ball must be dropped (GM_ReplaceOOBBall)
     u8   unk30F[0x31C - 0x30F];
     s32  n31C;                  // 0x31C  bonuses won (GameMode5 EndGame)
-    u8   unk320[0x324 - 0x320];
+    s32  n320;                  // 0x320  a ladder event's prize is added (GameMode4 EndGame)
     s32  n324;                  // 0x324  n338 minus the last match prize (GameModeMatch EndGame)
     s32  n328;                  // 0x328  a total the match modes add their prize (or money) to
     s32  n32C;                  // 0x32C  skins money won (GameMode2 EndGame)
