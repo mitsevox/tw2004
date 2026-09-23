@@ -1,4 +1,9 @@
-#include "game_types.h"
+// GameMode22.c (our name): game mode 22 (GameRound.c starts it with fn_80125E68), and before it the
+// trophy case's text (Rookie of the Year, Player of the Year, the money and scoring leaders; "Earned
+// on %s"). One file: both halves share its .data, .sdata and .sbss blocks. Not yet decompiled; the
+// sweep code below is the matched small functions.
+
+#include "game/modes/mode22.h"
 
 void fn_801260B8(void);
 void fn_801260BC(void);
@@ -11,8 +16,7 @@ void fn_80126418(void);
 void fn_8012643C(void);
 void fn_80126EC0();
 void fn_80126E68(void);
-extern u8 lbl_80195498[];
-u8* fn_80126E88(void);
+void fn_80126E88(void);
 void fn_80126F7C(void);
 void fn_80126F80(void);
 void fn_80126F84(s32 p0);
@@ -47,11 +51,10 @@ void fn_80126E68(void) {
     fn_80126EC0();
 }
 
-u8* fn_80126E88(void) {
+void fn_80126E88(void) {
     fn_80126EC0();
-    *(s32*)(lbl_80195498 + 0x8) = 5;
-    *(u8*)(lbl_80195498 + 0xC) = 0;
-    return lbl_80195498;
+    lbl_80195498.n8 = 5;
+    lbl_80195498.bC = 0;
 }
 
 void fn_80126F7C(void) {
@@ -61,11 +64,11 @@ void fn_80126F80(void) {
 }
 
 void fn_80126F84(s32 p0) {
-    *(s32*)(lbl_80195498 + 0x4) = p0;
+    lbl_80195498.n4 = p0;
 }
 
 s32 fn_80126FA0(void) {
-    return *(s32*)lbl_80195498;
+    return lbl_80195498.n0;
 }
 
 s32 fn_80126FD8(void) {
