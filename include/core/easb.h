@@ -69,20 +69,37 @@ typedef struct EASBImage {
 // This game's product record, as stored in the Bio file. Times are seconds since 1970
 // (TibExt.c's clock).
 typedef struct EASBProduct {
-    u8 unk0[0x4C];
+    char szName[0x24];              // 0x0000: EASBInitParams.szProductName
+    u16 szGamesPlayedType[0x14];    // 0x0024: EASBInitParams.szGamesPlayedType
     u32 uTime;                      // 0x004C: last update, kept within 2003-2023 by fn_80128BC4
     u32 u50;                        // 0x0050: play time while b11E0 is set
     u32 u54;                        // 0x0054: play time while b11E0 is clear
     u32 u58;                        // 0x0058: counter raised by fn_8012D8C4
     u32 u5C;                        // 0x005C: counter raised by fn_8012D93C
-    u8 unk60[0x1102];
+    u8 unk60[0x1100];               // 0x0060: 32 entries of 0x88 bytes (cleared by fn_8012CD8C)
+    u16 u1160;                      // 0x1160
     u16 uLevel;                     // 0x1162: only rises, up to EASB_MAX_LEVEL
-    u8 unk1164[2];
+    u16 uGamesPlayedTypeLanguage;   // 0x1164: EASBInitParams.uGamesPlayedTypeLanguage
     u8 bValid;                      // 0x1166
     u8 b1167;                       // 0x1167
 } EASBProduct;                      // size 0x1168
+LAYOUT_ASSERT(EASBProduct, 0x1168);
 
 #define EASB_MAX_LEVEL 1250         // fn_8012DAB8 also takes 1251
+
+// Which product record a call means (the u8 the per-game calls take): the Bio file holds
+// EASB_MAX_PRODUCTS games' records, loaded into EASBState.pProductBuffer.
+#define EASB_MAX_PRODUCTS 25
+#define EASB_PRODUCT_OURS 26        // this game's own record (EASBState.product)
+#define EASB_PRODUCT_NONE 27        // no record (EASBState.b11D0 when this game has no slot)
+
+// A game's picture as the Bio file keeps it (EASBState.pImageBuffer; EASBProduct.b1167 picks one).
+typedef struct EASBImageSlot {
+    u8 aColorTable[0x400];          // 0x0000: EASBImage.aColorTable
+    u8 aData[0x4000];               // 0x0400: EASBImage.aData
+    u8 bLoaded;                     // 0x4400
+} EASBImageSlot;                    // size 0x4401
+LAYOUT_ASSERT(EASBImageSlot, 0x4401);
 
 // The library's state, allocated when it starts (lbl_802825B8).
 typedef struct EASBState {
@@ -94,17 +111,17 @@ typedef struct EASBState {
     u32 u60;                        // 0x0060
     u8 unk64[4];
     EASBProduct product;            // 0x0068: this game's record
-    u8 b11D0;                       // 0x11D0
+    u8 b11D0;                       // 0x11D0: this game's slot in pProductBuffer, or EASB_PRODUCT_NONE
     u8 unk11D1[3];
-    u8* pProductBuffer;             // 0x11D4: EASB_PRODUCT_BUFFER_SIZE bytes, from the heap
-    u8* pImageBuffer;               // 0x11D8: color table, pixels, then a "loaded" flag at 0x4400
+    EASBProduct* pProductBuffer;    // 0x11D4: EASB_MAX_PRODUCTS records, from the heap
+    EASBImageSlot* pImageBuffer;    // 0x11D8: one picture per product record
     u32 uLastTime;                  // 0x11DC: when fn_8012D1A0 last added up play time
     u8 b11E0;                       // 0x11E0: which play-time counter runs (fn_8012DD7C)
     u8 unk11E1[3];
     EASBImage* pImage;              // 0x11E4: the game's own picture
 } EASBState;
 
-#define EASB_PRODUCT_BUFFER_SIZE 0x1B328
+#define EASB_PRODUCT_BUFFER_SIZE (EASB_MAX_PRODUCTS * sizeof(EASBProduct))     // 0x1B328
 
 // What the game passes to fn_8012D394 to start the library (TW06's EASBInitParams_t).
 typedef struct EASBInitParams {
@@ -139,25 +156,38 @@ extern TibExtCard* lbl_80281970;
 extern s32 lbl_80194758[46];        // the file library's code for each card error (by -error)
 
 // The code before EASB.c (still sweep code).
+EASBErrorE fn_80127F88(EASBProduct* pProduct);  // EASB_ERROR_INVALID_PRODUCT if the record is bad
+u8 fn_801281B4(u16 uLanguage, u16* aLanguages, u8 nLanguages);  // is uLanguage in the list
 u32 fn_80128468(u32 uA, u32 uB);    // uA + uB, saturating at 0xFFFFFFFF
+void fn_80128624(EASBProduct* aProducts, u32 nCount);          // a shell sort of the records
+s32 fn_80128CA0(EASBProduct* pA, EASBProduct* pB, u8 bFlag);    // compares two records (0: same)
+void fn_80128BF8(char* szDest, char* szSrc, u32 uSize);         // bounded string copy
+void fn_80128C4C(u16* szDest, u16* szSrc, u32 uLength);         // the same for wide text
+EASBErrorE fn_80128FD4(u32* pTotals, u16* puLevel, f32* pfProgress);
+EASBErrorE fn_801291A8(u16 uLevel, u16 u1160, u16* puLevel);
+EASBErrorE fn_80129218(u16 uLevel, u16 u1160, u16* puLevel);
 u32 fn_80128BC4(u32 uTime);         // clamps a time to 2003-01-01..2023-01-01
 s32 fn_8012881C(s32 arg0, s32 arg1, u32 arg2, u32 arg3, u32 arg4);
 s32 fn_801288DC(s32 arg0, s32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5, u32 arg6);
 EASBErrorE fn_8012C5F8(u32* p0, EASBProduct* pProduct, u8* p2);
 EASBErrorE fn_8012C69C(void);
 EASBErrorE fn_8012C73C(void);
-EASBErrorE fn_8012C774(u8* pBuffer);
+EASBErrorE fn_8012C774(EASBProduct* pProducts);
 EASBErrorE fn_8012C7BC(u32* p0, EASBProduct* pProduct, void* pImage);
 u8 fn_8012C83C(void);
 u8 fn_8012C848(void);
+EASBErrorE fn_8012C854(u8* pnSlot);  // the storage code's slot number (EASB_PRODUCT_NONE: none)
 EASBErrorE fn_8012C888(u32* pOut);
 
 // EASB.c
 EASBErrorE fn_8012CCD8(s32 nNeed);
 EASBErrorE fn_8012CD8C(void);
 EASBErrorE fn_8012CF00(void);
+EASBErrorE fn_8012CF64(void);
+EASBErrorE fn_8012D030(void);
 EASBErrorE fn_8012D0D4(void);
 EASBErrorE fn_8012D1A0(void);
+EASBErrorE fn_8012D290(u8 nProduct, EASBProduct** ppProduct);
 EASBErrorE fn_8012D394(EASBInitParams* pParams);
 EASBErrorE fn_8012D560(void);
 EASBErrorE fn_8012D5B0(void);
@@ -179,7 +209,17 @@ EASBErrorE fn_8012DD24(u16* szName, s32 arg1, s32 nLanguage);
 EASBErrorE fn_8012DD7C(u8 bFlag);
 EASBErrorE fn_8012DDE0(u32* pOut);
 EASBErrorE fn_8012DE38(u32* pOut);
+EASBErrorE fn_8012DE90(u8* pnProducts);
 EASBErrorE fn_8012DF4C(u16* puLevel, f32* pfProgress);
+EASBErrorE fn_8012DFDC(u8 nProduct, char* szName, u32 uSize);
+EASBErrorE fn_8012E084(u8 nProduct, u16* szGamesPlayedType, u32 uLength, u16* aLanguages, u8 nLanguages,
+                       u16* puLanguage);
+EASBErrorE fn_8012E16C(u8 nProduct, u32* puTime);
+EASBErrorE fn_8012E1E0(u8 nProduct, u16* puLevel);
+EASBErrorE fn_8012E25C(u8 nProduct, u32* pOut);
+EASBErrorE fn_8012E2D4(u8 nProduct, u32* pOut);
+EASBErrorE fn_8012E34C(u8 nProduct, u32* pOut);
+EASBErrorE fn_8012E3C0(u8 nProduct, u32* pOut);
 EASBErrorE fn_8012E818(u8 n, void* pImage);
 EASBErrorE fn_8012E820(s32 arg0, s32 arg1, u32 arg2, u32 arg3, u32 arg4);
 EASBErrorE fn_8012E8A8(s32 arg0, s32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5, u32 arg6);
