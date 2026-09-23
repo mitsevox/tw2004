@@ -309,6 +309,12 @@ typedef struct SurfaceType {
     u8   unk38[0x44 - 0x38];
 } SurfaceType;
 
+// An all-time record: the value and who holds it (gSession.recA/B/C).
+typedef struct RecordEntry {
+    s32  nValue;                // 0x00
+    char szName[16];            // 0x04
+} RecordEntry;
+
 // The round / session state at gSession (0x5BD0 bytes); only what this file reads.
 typedef struct Session {
     u32  uFlags;                // 0x000  bit 1: use the alternate attribute block everywhere;
@@ -330,7 +336,10 @@ typedef struct Session {
     s32  nGolfer[5];            // 0x044  golfer index per player
     s32  nTeeSet[5];            // 0x058
     u32  uBag[5];               // 0x06C  per player, 0 = the record's own
-    u8   unk80[0x5B2C - 0x80];  // profiles at 0xD38 (PlayerProfile x 5), options at 0xE78
+    u8   unk80[0x50A0 - 0x80];  // profiles at 0xD38 (PlayerProfile x 5), options at 0xE78
+    RecordEntry recA[8][5];     // 0x50A0  all-time records: 8 kinds, top 5 each
+    RecordEntry recB[3][3][5];  // 0x53C0  3 x 3 kinds, top 5 each
+    RecordEntry recC[5][2][5];  // 0x5744  5 x 2 kinds, top 5 each
     u32  nSeed;                 // 0x5B2C
     u8   unk5B30[8];
     s8   unk5B38;               // 0x5B38
@@ -349,9 +358,10 @@ typedef struct GameState {
     s32  nMode;                 // 0x000
     u8   unk4[0x14 - 0x4];
     s32  unk14;                 // 0x014
-    u8   unk18[0x64 - 0x18];
+    s32  nHoleYards[18];        // 0x018  from the save data's course (fn_800DFC6C)
+    s32  n60;                   // 0x060
     s32  nCurHole;              // 0x064  index into holeOrder
-    u8   unk68[0xB0 - 0x68];
+    s32  nHolePar[18];          // 0x068
     u8   bHoleSelected[18];     // 0x0B0  holes this round plays (GM_GotoNextSelectedHole)
     u8   unkC2[0xD4 - 0xC2];
     u8   bD4;                   // 0x0D4
@@ -361,7 +371,9 @@ typedef struct GameState {
     u8   unk130[4];
     u8   b134;                  // 0x134  cleared at the start of a hole
     u8   b135;                  // 0x135  set by fn_800E0A84
-    u8   unk136[0x144 - 0x136];
+    u8   unk136[0x13C - 0x136];
+    s32  nSaveSlot;             // 0x13C  the save slot (0x10600 bytes each) the course comes from
+    s32  nSaveCourse;           // 0x140  the course record in it (0x70 bytes each)
     s32  n144[5];               // 0x144  per player, cleared at the start of a hole
     s32  n158[5];               // 0x158  per player, cleared at the start of a hole
     u8   unk16C[0x1CC - 0x16C];

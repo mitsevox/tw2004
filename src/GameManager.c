@@ -195,6 +195,41 @@ int   fn_80095798(int nHandle);
 
 void  fn_800E5228(void);
 
+typedef struct SaveProfile SaveProfile;
+int   GM_vGetAllTimeRecordsHeld(SaveProfile* pProfile);
+f32   GM_GetBonusProgress(SaveProfile* pProfile);
+int   fn_800588F4(SaveProfile* pProfile, int a, int i);
+
+extern s32 lbl_80189528[14];
+extern s32 lbl_801894D0[6];
+
+// A completion flag in the save profile: the first byte of a 4-byte entry.
+typedef struct Flag4 {
+    u8 b;
+    u8 pad[3];
+} Flag4;
+
+// The parts of a save profile the progress counters read (offsets from the reads).
+struct SaveProfile {
+    u8    unk0;
+    char  szName[0x1C - 0x1];   // 0x001  compared against the record holders' names
+    u8    b1C[0x3A - 0x1C];     // 0x01C  indexed by lbl_80189528
+    u8    b3A[0xC8 - 0x3A];     // 0x03A  indexed by lbl_801894D0
+    struct { u8 b; u8 pad[7]; } aC8[31];   // 0x0C8
+    Flag4 a1C0[16];             // 0x1C0
+    u8    unk200[0x20C - 0x200];
+    Flag4 a20C[75];             // 0x20C
+    Flag4 a338[25];             // 0x338
+    Flag4 a39C[39];             // 0x39C
+    u8    unk438[0x5000 - 0x438];
+    s32   n5000;                // 0x5000
+    u8    unk5004[0x516C - 0x5004];
+    s32   a516C[29];            // 0x516C
+};
+
+int   strcmp(const char* a, const char* b);
+
+extern u8* gpSaveData;
 extern u8  lbl_80202898[];
 extern s32 lbl_80282278;
 extern u8  lbl_8028227C;
@@ -1324,6 +1359,16 @@ void GM_CheckControllerPulled(void) {
     }
 }
 
+// Copies a course's pars and yardages from the save data into the game state (a created or
+// saved course: slot nSaveSlot, record nSaveCourse).
+void fn_800DFC6C(void) {
+    int i;
+    for (i = 0; i < 18; i++) {
+        gpGame->nHolePar[i] = (s8)gpSaveData[gpGame->nSaveSlot * 0x10600 + gpGame->nSaveCourse * 0x70 + i + 0x5246];
+        gpGame->nHoleYards[i] = *(s32*)(gpSaveData + (gpGame->nSaveSlot * 0x10600 + gpGame->nSaveCourse * 0x70 + i * 4 + 0x5258));
+    }
+}
+
 // Button 8 tapped: released after 2 to 5 frames of holding (the count is kept by GM_bIsZoomButtonPressed).
 // A tap asks for the mid-hole flyover (when the mode has one, 0x280); a hold is the zoom camera.
 u8 fn_800DFF0C(int nPlayer) {
@@ -1397,6 +1442,136 @@ u8 GM_bIsElevatorCamButtonPressed(int nPlayer) {
         return 0;
     }
     return 0;
+}
+
+// TW06: GM_vGetAllTimeRecordsHeld (by position). How many all-time records the profile's golfer
+// holds: in the first table a top-5 entry with the same value as the record; in the other two,
+// an entry that is at least the record of any of the first three blocks of that kind.
+// The original compares a record three times over (the three branches are in the binary): most
+// likely a macro written for a record of several fields, all of which are the one value here.
+#define RECORD_AT_LEAST(a, b) ((a) >= (b) && (a) >= (b) && (a) >= (b))
+
+int GM_vGetAllTimeRecordsHeld(SaveProfile* pProfile) {
+    int n = 0;
+    int j, i, k, b;
+    for (i = 0; i < 8; i++) {
+        for (j = 0; j < 5; j++) {
+            if (strcmp(gSession.recA[i][j].szName, pProfile->szName) == 0 &&
+                gSession.recA[i][j].nValue == gSession.recA[i][0].nValue) {
+                n++;
+                break;
+            }
+        }
+    }
+    for (i = 0; i < 3; i++) {
+        for (k = 0; k < 3; k++) {
+            for (j = 0; j < 5; j++) {
+                if (strcmp(gSession.recB[k][i][j].szName, pProfile->szName) == 0) {
+                    for (b = 0; b < 3; b++) {
+                        if (RECORD_AT_LEAST(gSession.recB[k][i][j].nValue, gSession.recB[b][i][0].nValue)) {
+                            n++;
+                            goto nextB;
+                        }
+                    }
+                }
+            }
+        }
+    nextB:;
+    }
+    for (i = 0; i < 2; i++) {
+        for (k = 0; k < 5; k++) {
+            for (j = 0; j < 5; j++) {
+                if (strcmp(gSession.recC[k][i][j].szName, pProfile->szName) == 0) {
+                    for (b = 0; b < 3; b++) {
+                        if (RECORD_AT_LEAST(gSession.recC[k][i][j].nValue, gSession.recC[b][i][0].nValue)) {
+                            n++;
+                            goto nextC;
+                        }
+                    }
+                }
+            }
+        }
+    nextC:;
+    }
+    return n;
+}
+
+// TW06: GM_GetGameProgress (by position). The profile's completion score: one point for each of
+// the 25 entries at 0x338, and half a point for each other finished thing (0x5000,
+// the 29 entries at 0x516C not in state 3, the 31 flags at 0xC8, the first 23 entries at 0x39C
+// equal to 1, the 75 items fn_800588F4 reports, and the two indexed flag tables), plus the bonus
+// progress below.
+f32 GM_GetGameProgress(SaveProfile* pProfile) {
+    f32 f = 0.0f;
+    int i;
+    for (i = 0; i < 25; i++) {
+        if (pProfile->a338[i].b) {
+            f += 1.0f;
+        }
+    }
+    if (pProfile->n5000 >= 1) {
+        f += 0.5f;
+    }
+    for (i = 0; i < 29; i++) {
+        if (pProfile->a516C[i] != 3) {
+            f += 0.5f;
+        }
+    }
+    for (i = 0; i < 31; i++) {
+        if (pProfile->aC8[i].b) {
+            f += 1.0f;
+        }
+    }
+    for (i = 0; i < 23; i++) {
+        if (pProfile->a39C[i].b == 1) {
+            f += 0.5f;
+        }
+    }
+    for (i = 0; i < 75; i++) {
+        if (fn_800588F4(pProfile, 0, i)) {
+            f += 0.5f;
+        }
+    }
+    for (i = 0; i < 14; i++) {
+        if (pProfile->b1C[lbl_80189528[i]]) {
+            f += 0.5f;
+        }
+    }
+    for (i = 0; i < 6; i++) {
+        if (pProfile->b3A[lbl_801894D0[i]]) {
+            f += 0.5f;
+        }
+    }
+    return f + GM_GetBonusProgress(pProfile);
+}
+
+// TW06: GM_GetBonusProgress (by position). One point for each of the 75 entries at 0x20C, half a point for entries 23-38 at 0x39C and 0-15 at 0x1C0, and half a point for each
+// all-time record held.
+f32 GM_GetBonusProgress(SaveProfile* pProfile) {
+    f32 f = 0.0f;
+    int i;
+    for (i = 0; i < 75; i++) {
+        if (pProfile->a20C[i].b) {
+            f += 1.0f;
+        }
+    }
+    for (i = 23; i < 39; i++) {
+        if (pProfile->a39C[i].b) {
+            f += 0.5f;
+        }
+    }
+    for (i = 0; i < 12; i++) {
+        if (pProfile->a1C0[i].b) {
+            f += 0.5f;
+        }
+    }
+    for (i = 12; i < 16; i++) {
+        if (pProfile->a1C0[i].b) {
+            f += 0.5f;
+        }
+    }
+    f += 0.5f * GM_vGetAllTimeRecordsHeld(pProfile);
+    return f;
 }
 
 void fn_800E0A84(u8 v) {
