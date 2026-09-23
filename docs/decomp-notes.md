@@ -233,6 +233,24 @@ The fixes that come up most often. Each points to its full entry below.
 
 ### Structs, arrays and pointers
 
+- **[verified] A global pointer written through, then used again, was copied to a local.**
+  `g->f68 = 0.0f; fn(..., g);` reloads `g` after the store; `p = g; p->f68 = 0.0f; fn(..., p);`
+  loads it once, like the original (GoGolfCam `fn_800C14B0`, 96.9% -> 100).
+- **[verified] A load the original does before a store to the same struct was a local.**
+  `n = p->n60; p->f68 = 0.0f; fn(n, p);` keeps the load first; reading `p->n60` in the call
+  moves it after the store (GoGolfCam `fn_800C0880`, 94.6% -> 100).
+- **[verified] A typed struct-pointer global indexes differently from a cast byte pointer.**
+  `extern Profile* gpSaveData; gpSaveData[n].f` gives `addis base; add; lwz off`;
+  `((Profile*)u8ptr)[n].f` gives `addis idx; addi; lwzx` (GameMode23 `fn_800F0428` 83.75% -> 100).
+- **[verified] `a[x - 1]` folds the -1 into the displacement; `n = x - 1; a[n]` keeps a `subi`.**
+  Per function: GameMode23 `fn_800EE064` needs the local, its neighbour `fn_800EFA9C` does not.
+- **[verified] Pointer-to-index with `mulhwu` is a byte difference divided by `sizeof`.**
+  `p - base` divides signed (`mulhw; srawi`); `((u8*)p - (u8*)base) / sizeof(T)` divides
+  unsigned (`mulhwu; srwi.`), because `sizeof` is unsigned (GoTerrainCollision `fn_80050BEC`,
+  82.69% -> 100).
+- **[verified] In a leaf loop, reading a field each time instead of a local copy moves the
+  volatile registers**, though the field is still loaded once (GoTerrainCollision
+  `Ter_CalcLowestPlayableWorldHeight`, 97.21% -> 98.69%, then exact by declaration order).
 - **[verified] `a[k] = x; k++;` and `a[k++] = x;` compile differently.** The split form gives
   walking pointers (`&a[k]` stepped by `addi 4`, and `&a[0]` kept for a later loop); `k++` in the
   index gives `stwx` with a scaled index; a `*p++ = x` walk gives one pointer. GameMode0
@@ -297,6 +315,11 @@ The fixes that come up most often. Each points to its full entry below.
 
 ### Types, casts and sign extension
 
+- **[verified] An enum-typed local holding 0 is not folded into an index multiply.** EA's
+  `PlayerNumber_t nPlayer = PLR_1_e; gpSaveData[nPlayer]` gives `li rX, 0; mullw`; a literal 0,
+  any integer local, a const global, an inline helper and `(Enum)0` all fold the multiply away
+  (GameMode24 `fn_800F0820`, 82.9% -> 100; 12 times in GameMode23). EA style, no fake-match
+  comment; the type is TW06's.
 - **[verified] Two neighbouring words handled with 64-bit operations are one `u64`.** When the
   code ORs, ANDs and tests two adjacent words together (`and`/`xor`/`or.` on both halves, an AND
   with `li -1` for the upper word), declare one `u64` field. Player 0xC48/0xC4C as two `s32`s
