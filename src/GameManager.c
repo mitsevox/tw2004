@@ -737,8 +737,8 @@ int GM_ShowPostShotAnimation(int nPlayer) {
     SurfaceType* pSurf;
     f32          fHigh;
     f32          fLen;
-    f32          fRise;
     f32          fSlope;
+    f32          fRise;
 
     nResult = fn_8006AA9C(nPlayer);
     if (!fn_800E27A8()) {
@@ -792,7 +792,7 @@ int GM_ShowPostShotAnimation(int nPlayer) {
         }
     }
     if ((gSession.uFlags & 0x4000) && (gSession.uFlags & 0x8000)) {
-        if (gPlayers[nPlayer].nLie == LIE_HOLED || *(s32*)(gPlayers[nPlayer].ball + 0x78) == 16 ||
+        if (gPlayers[nPlayer].nLie == LIE_HOLED || gPlayers[nPlayer].nBallStartSurface == 16 ||
             nResult == 2 || nResult == 1) {
             return 1;
         }
@@ -1162,8 +1162,8 @@ int GM_ChooseRemoveBallState(int nPlayer) {
     if (gPlayers[nPlayer].fA64 > 5.0f) {
         return 0;
     }
-    if (*(s32*)(gPlayers[nPlayer].ball + 0x78) < 0 || *(s32*)(gPlayers[nPlayer].ball + 0x78) >= 156 ||
-        gSurfaceTypes[*(s32*)(gPlayers[nPlayer].ball + 0x78)].nClass != 3) {
+    if (gPlayers[nPlayer].nBallStartSurface < 0 || gPlayers[nPlayer].nBallStartSurface >= 156 ||
+        gSurfaceTypes[gPlayers[nPlayer].nBallStartSurface].nClass != 3) {
         return 0;
     }
     if (gPlayers[nPlayer].uFlags & 1) {

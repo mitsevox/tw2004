@@ -106,6 +106,13 @@ function's first N declaration lines and keeps the best:
 python tools/match/declperm.py <Unit> src/<Unit>.c <fn> <N>
 ```
 
+With more than about eight declarations, `declclimb.py` moves one line at a time and keeps each
+move that raises the score, until no single move helps (minutes, not hours; a local best):
+
+```
+python tools/match/declclimb.py <Unit> <fn> <N>
+```
+
 Prefer an exact order close to the natural one: a reader should not wonder why the declarations
 are shuffled. When full permutations only find scrambled orders, try orders a few adjacent swaps
 from the natural one first (GameMode0 `fn_800FFDB8`: 137 of 633 such orders were exact, one a

@@ -302,7 +302,7 @@ typedef struct Player {
     s32  nLie;                  // 0xAF8
     u8   unkAFC[0xB04 - 0xAFC];
     s32  nBallSurface;          // 0xB04  the ball's nSurface (Ball + 0x74)
-    u8   unkB08[4];
+    s32  nBallStartSurface;     // 0xB08  the ball's nStartSurface (Ball + 0x78)
     void* pBallCourse;          // 0xB0C  the ball's pCourse (Ball + 0x7C)
     u8   unkB10[0xB18 - 0xB10];
     struct SurfaceType* pBallHitSurface;   // 0xB18  the ball's pHitSurface (Ball + 0x88)
@@ -356,7 +356,7 @@ typedef struct Player {
     s32  nDDC;                  // 0xDDC
     s32  nDE0;                  // 0xDE0
     s32  nDE4[40];              // 0xDE4  per target (fn_800F1D34), 0 = not yet hit
-    s8   nTarget;               // 0xE84  the current target (GameMode10.c)
+    s8   nTarget;               // 0xE84  the current target (set in GameTargets.c)
     u8   unkE85[3];
     s32  nE88;                  // 0xE88  below 5: still in (mode 15)
     s32  nE8C;                  // 0xE8C
