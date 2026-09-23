@@ -171,6 +171,7 @@ void fn_800E1434(void);
 void fn_800E1480(int nHole);            // make a hole of the round the current one
 void fn_800E14E0(int nCourse);
 int  fn_800E177C(void);
+int  fn_800E1788(int nPlayer);          // the player's total for the round
 int  fn_800E17AC(int nPlayer);          // the player's total strokes
 int  fn_800E1904(int nPlayer, u8 bCurrent);
 u8   fn_800E1BBC(void);                 // whether the round plays every hole

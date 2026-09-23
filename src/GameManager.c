@@ -7,6 +7,7 @@
 #include "ball.h"
 #include "game.h"
 #include "engine.h"
+#include "game/save.h"
 
 void  fn_800E0A84(u8 v);
 void  fn_800D29E8(void);
@@ -106,41 +107,14 @@ u8    fn_8004560C(void);
 
 void  fn_800E5228(void);
 
-typedef struct SaveProfile SaveProfile;
 int   GM_vGetAllTimeRecordsHeld(SaveProfile* pProfile);
 f32   GM_GetBonusProgress(SaveProfile* pProfile);
-int   fn_800588F4(SaveProfile* pProfile, int a, int i);
 
 extern s32 lbl_80189528[14];
 extern s32 lbl_801894D0[6];
 
-// A completion flag in the save profile: the first byte of a 4-byte entry.
-typedef struct Flag4 {
-    u8 b;
-    u8 pad[3];
-} Flag4;
-
-// The parts of a save profile the progress counters read (offsets from the reads).
-struct SaveProfile {
-    u8    unk0;
-    char  szName[0x1C - 0x1];   // 0x001  compared against the record holders' names
-    u8    b1C[0x3A - 0x1C];     // 0x01C  indexed by lbl_80189528
-    u8    b3A[0xC8 - 0x3A];     // 0x03A  indexed by lbl_801894D0
-    struct { u8 b; u8 pad[7]; } aC8[31];   // 0x0C8
-    Flag4 a1C0[16];             // 0x1C0
-    u8    unk200[0x20C - 0x200];
-    Flag4 a20C[75];             // 0x20C
-    Flag4 a338[25];             // 0x338
-    Flag4 a39C[39];             // 0x39C
-    u8    unk438[0x5000 - 0x438];
-    s32   n5000;                // 0x5000
-    u8    unk5004[0x516C - 0x5004];
-    s32   a516C[29];            // 0x516C
-};
-
 int   strcmp(const char* a, const char* b);
 
-extern u8* gpSaveData;
 extern s32 lbl_80282278;
 extern u8  lbl_8028227C;
 extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
@@ -1264,29 +1238,15 @@ void GM_CheckControllerPulled(void) {
     }
 }
 
-// A saved custom round (0x70 bytes): 18 holes, each a hole number and the course it is from.
-typedef struct SavedRound {
-    u8   unk0[2];
-    s8   nHoleNum[18];          // 0x02
-    s32  nCourse[18];           // 0x14
-    u8   unk5C[0x70 - 0x5C];
-} SavedRound;
-
-typedef struct SaveSlot {
-    u8         unk0[0x5244];
-    SavedRound round[1];        // 0x5244
-    u8         unk52B4[0x10600 - 0x52B4];
-} SaveSlot;
-
 // TW06: GM_SetupCustomHoleSelection. Loads a saved custom round (slot nSaveSlot, record
 // nSaveCourse) into the round's hole list.
 void GM_SetupCustomHoleSelection(void) {
     int       i;
-    SaveSlot* pSave;
+    SaveProfile* pSave;
     for (i = 0; i < 18; i++) {
-        pSave = (SaveSlot*)gpSaveData;
-        gpGame->nHoleNum[i] = pSave[gpGame->nSaveSlot].round[gpGame->nSaveCourse].nHoleNum[i];
-        gpGame->nHoleCourse[i] = ((SaveSlot*)gpSaveData)[gpGame->nSaveSlot].round[gpGame->nSaveCourse].nCourse[i];
+        pSave = gpSaveData;
+        gpGame->nHoleNum[i] = pSave[gpGame->nSaveSlot].aSavedRound[gpGame->nSaveCourse].nHoleNum[i];
+        gpGame->nHoleCourse[i] = gpSaveData[gpGame->nSaveSlot].aSavedRound[gpGame->nSaveCourse].nCourse[i];
     }
 }
 
@@ -1417,24 +1377,23 @@ int GM_vGetAllTimeRecordsHeld(SaveProfile* pProfile) {
     return n;
 }
 
-// TW06: GM_GetGameProgress (by position). The profile's completion score: one point for each of
-// the 25 entries at 0x338, and half a point for each other finished thing (0x5000,
-// the 29 entries at 0x516C not in state 3, the 31 flags at 0xC8, the first 23 entries at 0x39C
-// equal to 1, the 75 items fn_800588F4 reports, and the two indexed flag tables), plus the bonus
-// progress below.
+// TW06: GM_GetGameProgress (by position). The profile's completion score: a point for each ladder
+// event and each PGA TOUR tournament won; half a point for a TOUR card, for each challenge group
+// with a medal, each of the first 23 awards, each marked hole fn_800588F4 reports, and 14 golfers
+// and 6 courses unlocked (the lists lbl_80189528, lbl_801894D0); plus the bonus progress below.
 f32 GM_GetGameProgress(SaveProfile* pProfile) {
     f32 f = 0.0f;
     int i;
     for (i = 0; i < 25; i++) {
-        if (pProfile->a338[i].b) {
+        if (pProfile->aLadderAward[i].bWon) {
             f += 1.0f;
         }
     }
-    if (pProfile->n5000 >= 1) {
+    if (pProfile->nTourCardLevel >= 1) {
         f += 0.5f;
     }
     for (i = 0; i < 29; i++) {
-        if (pProfile->a516C[i] != 3) {
+        if (pProfile->aMedal[i] != 3) {
             f += 0.5f;
         }
     }
@@ -1444,7 +1403,7 @@ f32 GM_GetGameProgress(SaveProfile* pProfile) {
         }
     }
     for (i = 0; i < 23; i++) {
-        if (pProfile->a39C[i].b == 1) {
+        if (pProfile->aAward[i].bWon == 1) {
             f += 0.5f;
         }
     }
@@ -1454,30 +1413,30 @@ f32 GM_GetGameProgress(SaveProfile* pProfile) {
         }
     }
     for (i = 0; i < 14; i++) {
-        if (pProfile->b1C[lbl_80189528[i]]) {
+        if (pProfile->aGolferUnlocked[lbl_80189528[i]]) {
             f += 0.5f;
         }
     }
     for (i = 0; i < 6; i++) {
-        if (pProfile->b3A[lbl_801894D0[i]]) {
+        if (pProfile->aCourseUnlocked[lbl_801894D0[i]]) {
             f += 0.5f;
         }
     }
     return f + GM_GetBonusProgress(pProfile);
 }
 
-// TW06: GM_GetBonusProgress (by position). One point for each of the 75 entries at 0x20C, half a point for entries 23-38 at 0x39C and 0-15 at 0x1C0, and half a point for each
-// all-time record held.
+// TW06: GM_GetBonusProgress (by position). A point for each real-time event won; half a point for
+// awards 23..38, each of the 16 a1C0 flags and each all-time record held.
 f32 GM_GetBonusProgress(SaveProfile* pProfile) {
     f32 f = 0.0f;
     int i;
     for (i = 0; i < 75; i++) {
-        if (pProfile->a20C[i].b) {
+        if (pProfile->aRTEAward[i].bWon) {
             f += 1.0f;
         }
     }
     for (i = 23; i < 39; i++) {
-        if (pProfile->a39C[i].b) {
+        if (pProfile->aAward[i].bWon) {
             f += 0.5f;
         }
     }

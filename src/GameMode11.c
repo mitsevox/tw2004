@@ -7,6 +7,7 @@
 #include "golfer.h"
 #include "game.h"
 #include "engine.h"
+#include "game/save.h"
 
 // One lesson: where the ball is placed and what the shot must be (lessons 1..11; 12 is the end).
 typedef struct Lesson {
@@ -57,12 +58,6 @@ s16 lbl_80192F2C[12 * 16] = {
     60, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 };
 
-// The save data's lessons field (gpSaveData + 0x5000).
-typedef struct LessonSave {
-    u8  unk0[0x5000];
-    s32 n5000;                              // 0x5000  at least 1 once a lesson has been finished
-} LessonSave;
-
 typedef struct Vec4 {
     f32 x, y, z, w;
 } Vec4;
@@ -100,12 +95,10 @@ extern s32 lbl_80282428;                    // the lesson's step
 
 void  fn_800A6EC8(void);
 void  fn_800E5200(int a);
-void  AI_ChooseTarget(int nPlayer);
 void  fn_80058FA4(int nPlayer);
 void  fn_800A6DCC(int nMusic, int a);
 u8    fn_800A7720(void);
 f32   fn_8005C1EC(int nPlayer);
-extern u8* gpSaveData;
 
 void fn_801000E8(void);
 void fn_80100108(void);
@@ -835,8 +828,9 @@ void fn_80100C08(void) {
                 lbl_802823E2 = 1;
                 break;
             }
-            if (((LessonSave*)gpSaveData)->n5000 < 1) {
-                ((LessonSave*)gpSaveData)->n5000 = 1;
+            // Profile 0 gets its first TOUR card level (lesson 12, the end, has left above).
+            if (gpSaveData->nTourCardLevel < 1) {
+                gpSaveData->nTourCardLevel = 1;
             }
             lbl_80282424 = 14;
             fn_80101F70();

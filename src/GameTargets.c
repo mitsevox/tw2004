@@ -9,25 +9,12 @@
 #include "ball.h"
 #include "game.h"
 #include "engine.h"
+#include "game/earnings.h"
 
 // The target list (see GameModeReplay.c): up to lbl_80282360 points (w = 1).
 extern f32 lbl_80211D38[][4];
 extern s8  lbl_80282360;
 
-// Prize rows (0x1C bytes) at lbl_80200538 + 0x710; the row with id 999 holds the target games'
-// prizes.
-typedef struct MiniPrize {
-    s32 nId;                    // 0x00
-    s32 nMode13;                // 0x04
-    s32 nMode16;                // 0x08
-    s32 nMode17;                // 0x0C
-    u8  unk10[0xC];
-} MiniPrize;
-typedef struct PrizeTable {
-    u8        unk0[0x710];
-    MiniPrize mini[20];         // 0x710
-} PrizeTable;
-extern PrizeTable lbl_80200538;
 extern u8 gNumPlayersSetUp;
 
 // Score multipliers for fn_800F266C, one table per value of fn_80015464.
@@ -323,15 +310,15 @@ s32 fn_800F2534(s32 arg0) {
 s32 fn_800F2578(void) {
     int i;
     for (i = 0; i < 20; i++) {
-        if (lbl_80200538.mini[i].nId == 999) {
+        if (lbl_80200538.aMini[i].nId == 999) {
             if (Game_GetMode() == 0xD) {
-                return lbl_80200538.mini[i].nMode13;
+                return lbl_80200538.aMini[i].n4;
             }
             if (Game_GetMode() == 0x10) {
-                return lbl_80200538.mini[i].nMode16;
+                return lbl_80200538.aMini[i].n8;
             }
             if (Game_GetMode() == 0x11) {
-                return lbl_80200538.mini[i].nMode17;
+                return lbl_80200538.aMini[i].nC;
             }
         }
     }

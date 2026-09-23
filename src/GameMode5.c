@@ -7,6 +7,7 @@
 #include "engine.h"
 #include "game/save.h"
 #include "game/modes/challenge.h"
+#include "game/earnings.h"
 
 extern s32 lbl_802822F8;
 void fn_800EAE44(int nId);
@@ -35,10 +36,6 @@ extern s32 lbl_80282308;
 extern s32 lbl_8028230C;
 extern u8 gNumPlayersSetUp;                 // 0x80281D48 (Golfer.c)
 extern void (*lbl_80282328)(void);
-u8    fn_800D9998(int nPlayer, int nAward);
-u8    fn_800D750C(int nPlayer, int nAward);
-extern u8 lbl_80200538[];                   // prize data: bonuses at +0x9E4 and +0xA24
-#define PRIZE_AT(off) (*(s32*)(lbl_80200538 + (off)))
 int   fn_800ECF9C(int i);
 void  fn_800EC170(int n);
 u8    fn_800EC4F0(int n);
@@ -163,7 +160,7 @@ void fn_800EAF7C(void) {
     lbl_80281660 = SESSION_OPTIONS->unkC;
     lbl_802822F0 = SESSION_OPTIONS->nWind;
     fn_800E1074();
-    if (gpSaveData[gPlayers[0].nIndex].b0) {
+    if (gpSaveData[gPlayers[0].nIndex].bActive) {
         gpSaveData[gPlayers[0].nIndex].b70 = 1;
     }
     fn_800E0B38(lbl_80281664[lbl_802822F4].nMode);
@@ -590,7 +587,7 @@ void fn_800EC1E0(void) {
             }
             fn_800EC170(nMedal);
             nProfile = gPlayers[0].nIndex;
-            if (gpSaveData[nProfile].b0) {
+            if (gpSaveData[nProfile].bActive) {
                 nMoney = fn_800D7220(nReward, 0, (CourseMoneyTracking*)aOut);
                 if (nMoney) {
                     switch (nMedal) {
@@ -607,26 +604,26 @@ void fn_800EC1E0(void) {
                 }
                 fn_800D3548(0, nMoney, (CourseMoneyTracking*)aOut);
                 if (fn_800ED6F0() && fn_800D9998(0, 0x1C) && fn_800D750C(0, 0x1C)) {
-                    fn_800E4364(6, 0x1C, PRIZE_AT(0xA24), nProfile);
-                    fn_800D3548(0, PRIZE_AT(0xA24), 0);
-                    gPlayers[0].n31C += PRIZE_AT(0xA24);
+                    fn_800E4364(6, 0x1C, lbl_80200538.nA24, nProfile);
+                    fn_800D3548(0, lbl_80200538.nA24, 0);
+                    gPlayers[0].n31C += lbl_80200538.nA24;
                 }
                 if (fn_800EC4F0(nProfile) && fn_800D750C(0, 0xC)) {
-                    fn_800E4364(2, 0xC, PRIZE_AT(0x9E4), nProfile);
-                    fn_800D3548(0, PRIZE_AT(0x9E4), 0);
-                    gPlayers[0].n31C += PRIZE_AT(0x9E4);
+                    fn_800E4364(2, 0xC, lbl_80200538.n9E4, nProfile);
+                    fn_800D3548(0, lbl_80200538.n9E4, 0);
+                    gPlayers[0].n31C += lbl_80200538.n9E4;
                 }
             }
         }
     }
 }
 
-// Whether profile n has done every challenge: its n5000 is set and none of the 29 best medals is
-// 3 (none).
+// Whether profile n has done every challenge: it has a TOUR card (level 1 or more) and none of the
+// 29 best medals is 3 (none).
 u8 fn_800EC4F0(int n) {
     SaveProfile* p = &gpSaveData[n];
     int i;
-    if (p->n5000 < 1) {
+    if (p->nTourCardLevel < 1) {
         return 0;
     }
     for (i = 0; i < 29; i++) {
@@ -1020,6 +1017,8 @@ int fn_800ED028(int i) {
 // Challenge text lines (offsets into the text block).
 char* fn_800ED280(int nId) {
     int i = fn_800EAC94(nId);
+    // EA bug: fn_800EAC94 returns 0, never -1, for a group it does not find, so this test never
+    // passes and an unknown id gets challenge 0's line.
     if (i == -1) {
         return 0;
     }
@@ -1028,6 +1027,7 @@ char* fn_800ED280(int nId) {
 
 char* fn_800ED2C8(int nId) {
     int i = fn_800EAC94(nId);
+    // EA bug: never -1, as above.
     if (i == -1) {
         return 0;
     }
@@ -1092,6 +1092,8 @@ int fn_800ED314(void) {
     if (fn_800E5110()) {
         return 0;
     }
+    // fake match: the binary calls fn_800E4BF8 and branches on its result, but both paths return
+    // n (a bare call without the test loses the compare: 99.2%).
     if (fn_800E4BF8()) {
         return n;
     }
@@ -1137,7 +1139,7 @@ void fn_800ED554(void) {
 
 // Hole finished: always after a restart; otherwise the challenge's own test.
 u8 fn_800ED5C8(int nPlayer, int bCheck) {
-    if ((u8) lbl_802822FE != 0) {
+    if (lbl_802822FE) {
         return 1;
     }
     return lbl_8028231C(nPlayer, bCheck);
