@@ -3716,6 +3716,8 @@ src/os/OSAlloc.c:
 
 dolphin/os/OSArena.c:
 	.text       start:0x80149150 end:0x80149170
+	.sdata      start:0x80281AB8 end:0x80281AC0
+	.sbss       start:0x802828F0 end:0x802828F8
 
 dolphin/os/OSAudioSystem.c:
 	.text       start:0x80149170 end:0x80149404
