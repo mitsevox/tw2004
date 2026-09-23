@@ -1005,7 +1005,9 @@ config.libs = [
             Object(NonMatching, "EASB.c"),
             Object(NonMatching, "UISEvent.c"),
             Object(NonMatching, "UIStudio.c"),
-            Object(NonMatching, "UISApi.c"),
+            # Built with automatic inlining like UISScreen.c below: fn_80168DB0 88.9 -> 98.7%, no
+            # function worse.
+            Object(NonMatching, "UISApi.c", extra_cflags=["-inline auto"]),
             # Built with automatic inlining: fn_8016A830 and fn_8016B188 have their own recursion
             # inlined three deep (-inline smart 55.8%, -inline auto 64.7%, nothing worse). Not
             # deferred: -inline auto,deferred emits the functions in reverse order and pastes
