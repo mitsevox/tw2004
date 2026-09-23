@@ -52,25 +52,26 @@ typedef struct {
     int   uExpected54;       // 0x54  compared with the close result
 } SFIOData;
 
-// The 17 platform functions the host passes to SFIOInit (llSharedFileIO.c on GameCube).
+// The 17 platform functions the host passes to SFIOInit (TibExt.c's on GameCube). Each one starts
+// an operation and returns nothing; pfnUpdate then gives the operation's error and result.
 typedef struct {
-    int (*pfnProbe)(char* pSearchName, int eDevice);                    // 0x04 in SFIODevice
-    int (*pfn08)(int eDevice);                                          // 0x08  result: free space
-    int (*pfn0C)(int eDevice);                                          // 0x0C  result: free entries
-    int (*pfnStartProbe)(int eDevice);                                  // 0x10
-    int (*pfnSelectDevice)(int eDevice);                                // 0x14
-    int (*pfnMount)(const char* pDirName, char* pFileName, int eDevice, u32 uFlags); // 0x18
-    int (*pfnOp19)(int uHandle);                                        // 0x1C
-    int (*pfn20)(char* pFileName, u32 uSize, int eDevice);              // 0x20
-    int (*pfn24)(char* pDirName, char* pFileName, int eDevice);         // 0x24
-    int (*pfn28)(char* pDirName, int eDevice);                          // 0x28
-    int (*pfnRead)(int uHandle, void* pBuffer, u32 uSize);              // 0x2C
-    int (*pfnWrite)(int uHandle, void* pBuffer, u32 uSize);             // 0x30
-    int (*pfnSeek)(int uHandle, u32 uOffset, u32 uWhence);              // 0x34
-    int (*pfnOp18)(int uHandle);                                        // 0x38
-    int (*pfn3C)(int uHandle, u32 uValue);                              // 0x3C
-    int (*pfnUpdate)(int* pProcess, int* pResult);                      // 0x40
-    int (*pfn44)(char* pFileName);                                      // 0x44
+    void (*pfnProbe)(char* pSearchName, int eDevice);                   // 0x04 in SFIODevice
+    void (*pfn08)(int eDevice);                                         // 0x08  result: free space
+    void (*pfn0C)(int eDevice);                                         // 0x0C  result: free entries
+    void (*pfnStartProbe)(int eDevice);                                 // 0x10
+    void (*pfnSelectDevice)(int eDevice);                               // 0x14
+    void (*pfnMount)(const char* pDirName, char* pFileName, int eDevice, u32 uFlags); // 0x18
+    void (*pfnOp19)(int uHandle);                                       // 0x1C
+    void (*pfn20)(char* pFileName, u32 uSize, int eDevice);             // 0x20
+    void (*pfn24)(char* pDirName, char* pFileName, int eDevice);        // 0x24
+    void (*pfn28)(char* pDirName, int eDevice);                         // 0x28
+    void (*pfnRead)(int uHandle, void* pBuffer, u32 uSize);             // 0x2C
+    void (*pfnWrite)(int uHandle, void* pBuffer, u32 uSize);            // 0x30
+    void (*pfnSeek)(int uHandle, u32 uOffset, u32 uWhence);             // 0x34
+    void (*pfnOp18)(int uHandle);                                       // 0x38
+    void (*pfn3C)(int uHandle, u32 uValue);                             // 0x3C
+    int  (*pfnUpdate)(int* pProcess, int* pResult);                     // 0x40
+    void (*pfn44)(char* pFileName);                                     // 0x44
 } SFIOFuncTable;
 
 // Platform-layer state, 0x6C bytes, allocated by SFIOInit.
@@ -110,6 +111,7 @@ void SFIOPlatformCall80172F48(void* const** ppInterface);
 BOOL SFIOIsInitialized(void);
 int  SFIOGetLastError(void);
 void SFIOSetLastError(int eError);
+BOOL SFIOValidateFilename(const char* pFilename);
 int  SFIONextDeviceFromMask(u16 uDeviceMask, int uDirection);
 int  SFIOStartSelectDevice(int eDevice, int* pProcess);
 int  SFIOStartOp18(int* pHandle, int* pProcess);
