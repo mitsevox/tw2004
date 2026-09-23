@@ -253,7 +253,8 @@ void fn_8002F38C(s32 nSurface, s32 nC, s32 n10, s32 n14, u32 uFlags, s32 n18);
 s32  fn_8002F454(s32 nSurface);     // the surface's buffer size, 0 if the slot is free
 
 // The graphics helpers (GxUtil.c, 0x80029FC8; the rest are in gx.h)
-extern void** lbl_80281100;         // 0x80281100 (.sdata): &lbl_801D4F68, GoPostFx's buffers
+extern void* lbl_80281100;          // 0x80281100 (.sdata): &lbl_801D4F68, GoPostFx's buffers (three
+                                    // pointers: the screen copy's pixels, then two gomainloop tests)
 void* fn_8002A624(void);            // the screen-copy texture's pixels (lbl_80281100's first word)
 
 // ---- the file streamer (UStream.c) -----------------------------------------------------------
