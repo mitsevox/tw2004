@@ -231,7 +231,9 @@ typedef struct Player {
     s32  n308;                  // 0x308
     u8   unk30C[2];
     u8   b30E;                  // 0x30E  a replaced ball must be dropped (GM_ReplaceOOBBall)
-    u8   unk30F[0x324 - 0x30F];
+    u8   unk30F[0x31C - 0x30F];
+    s32  n31C;                  // 0x31C  bonuses won (GameMode5 EndGame)
+    u8   unk320[0x324 - 0x320];
     s32  n324;                  // 0x324  n338 minus the last match prize (GameModeMatch EndGame)
     s32  n328;                  // 0x328  a total the match modes add their prize (or money) to
     u8   unk32C[0x338 - 0x32C];

@@ -101,6 +101,25 @@ void  fn_800E0B38(int nMode);
 void  fn_800F07C8(void);
 u8    fn_800E4BF8(void);
 int   Game_CurHoleIndex(void);
+extern void (*lbl_80282328)(void);
+int   fn_800EC558(void);
+u8    fn_801025F4(void);
+s16   fn_800D2994();
+int   fn_800D7220(int nReward, int a, s32* pOut);
+void  fn_800D3548(int nPlayer, int nMoney, s32* p);
+u8    fn_800D9998(int nPlayer, int nAward);
+u8    fn_800D750C(int nPlayer, int nAward);
+extern u8 lbl_80200538[];                   // prize data: bonuses at +0x9E4 and +0xA24
+#define PRIZE_AT(off) (*(s32*)(lbl_80200538 + (off)))
+// A profile's best medal per challenge (3 = none) and a date stamp for it, in the save.
+typedef struct ChallengeSave {
+    u8  unk0[0x516C];
+    s32 aMedal[29];             // 0x516C
+    u8  unk51E0[4];
+    s16 aStamp[29];             // 0x51E4
+} ChallengeSave;
+#define PROFILE_MEDAL(n, i) ((ChallengeSave*)(gpSaveData + (n) * 0x10600))->aMedal[i]
+#define PROFILE_STAMP(n, i) ((ChallengeSave*)(gpSaveData + (n) * 0x10600))->aStamp[i]
 int   fn_800ECF9C(int i);
 u8    fn_800E5110(void);
 void  fn_80055AA8(u8* pBall, f32* pPos, int nPlayer);
@@ -663,5 +682,66 @@ void fn_800EBEF0(void) {
     }
     if (lbl_80281664[lbl_802822F4].b4D) {
         fn_800ED6F8(lbl_80281664[lbl_802822F4].f54);
+    }
+}
+
+// The challenge is over: a better medal than the profile's best is saved (with a stamp); the medal's
+// message; for a profile, the medal's reward, then two bonuses (0x1C, and 0xC once every challenge
+// has a medal).
+void fn_800EC1E0(void) {
+    s32 aOut[18];
+    int nMedal;
+    int nReward;
+    int nProfile;
+    int nMoney;
+    lbl_80282328();
+    if (!fn_800F0818()) {
+        nMedal = fn_800EC558();
+        if (!fn_801025F4() && nMedal != 3) {
+            if (nMedal < PROFILE_MEDAL(gPlayers[0].nIndex, fn_800EAC7C())) {
+                PROFILE_MEDAL(gPlayers[0].nIndex, fn_800EAC7C()) = nMedal;
+                PROFILE_STAMP(gPlayers[0].nIndex, fn_800EAC7C()) = fn_800D2994();
+            }
+            switch (nMedal) {
+            case 0:
+                nReward = lbl_80281664[lbl_802822F4].n64;
+                break;
+            case 1:
+                nReward = lbl_80281664[lbl_802822F4].n70;
+                break;
+            case 2:
+                nReward = lbl_80281664[lbl_802822F4].n7C;
+                break;
+            }
+            fn_800EC170(nMedal);
+            nProfile = gPlayers[0].nIndex;
+            if (gpSaveData[nProfile * 0x10600]) {
+                nMoney = fn_800D7220(nReward, 0, aOut);
+                if (nMoney) {
+                    switch (nMedal) {
+                    case 0:
+                        fn_800E4364(0, 0x6F, nMoney, nProfile);
+                        break;
+                    case 1:
+                        fn_800E4364(0, 0x70, nMoney, nProfile);
+                        break;
+                    case 2:
+                        fn_800E4364(0, 0x71, nMoney, nProfile);
+                        break;
+                    }
+                }
+                fn_800D3548(0, nMoney, aOut);
+                if (fn_800ED6F0() && fn_800D9998(0, 0x1C) && fn_800D750C(0, 0x1C)) {
+                    fn_800E4364(6, 0x1C, PRIZE_AT(0xA24), nProfile);
+                    fn_800D3548(0, PRIZE_AT(0xA24), 0);
+                    gPlayers[0].n31C += PRIZE_AT(0xA24);
+                }
+                if (fn_800EC4F0(nProfile) && fn_800D750C(0, 0xC)) {
+                    fn_800E4364(2, 0xC, PRIZE_AT(0x9E4), nProfile);
+                    fn_800D3548(0, PRIZE_AT(0x9E4), 0);
+                    gPlayers[0].n31C += PRIZE_AT(0x9E4);
+                }
+            }
+        }
     }
 }
