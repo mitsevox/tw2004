@@ -53,6 +53,8 @@ typedef struct ClipBank {
     s32    n0C;                 // 0x0C
     void** ppClips;             // 0x10
     void*  pFile;               // 0x14  the loaded file, while the bank owns it
+    u8*    pRecords;            // 0x18  a planned bank: where its records go
+    u32    n1C;                 // 0x1C
 } ClipBank;
 
 // A loaded file as the streaming code hands it over: the data, which of the three slots it is
@@ -87,7 +89,7 @@ void  fn_800269E4(struct LibOverlay* pOv, int nSlot, s32 n);
 void  fn_800CA9DC(int nSlot);
 u32   Skalib_NextSlot(void);
 void  Skalib_SetBudgets(void);
-int   fn_80023F7C(int nSlot);
+u32   AnimLib_PlanBank(u32 nSlot);
 AnimLib* AnimLib_Load(u8* pData, ClipBank* pBank);
 u32   fn_8009EF90(void);
 int   Skalib_HasOverlays(int nSlot);
@@ -105,7 +107,8 @@ typedef struct LibOverlay {
     s32    n10;                 // 0x10
     s32    n14;                 // 0x14
     u8     bActive;             // 0x18
-    u8     pad19[7];
+    u8     pad19[3];
+    s32    nTree;               // 0x1C  the tree size before a merge
 } LibOverlay;
 
 // One of the three animation slots (0x158 bytes).
@@ -116,7 +119,7 @@ typedef struct LibSlot {
     LibOverlay overlays[10];    // 0x00C
     s32        nOverlays;       // 0x14C
     s32        n150;            // 0x150
-    u8         unk154[4];
+    u8*        pEnd;            // 0x154  the end of the slot's clip bank records
 } LibSlot;
 
 // The start of a clip (only the fields read here).
@@ -163,7 +166,6 @@ extern u8          lbl_801C5C50[0x1DC];
 extern u8          lbl_801BF9C0[0x6290];
 extern u8          lbl_801B9730[0x6290];
 void               fn_80005AE8(void* p, int c, int n);   // memset
-
 
 extern char (*lbl_80281D14)[2][8][6][16];   // the last clip name played: [player][reaction kind][style][club]
 
@@ -788,6 +790,7 @@ int AnimLib_DropCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB,
     return 0;
 }
 
+
 void* AnimLib_ResolveRecord(AnimLib* pLib, int nRec, ClipRecord* pOut, u8 bLink);
 
 // The library a merge writes, and the records it copies clips into.
@@ -997,6 +1000,260 @@ done:
     return nRet == 1;
 }
 
+// What was spent on each slot's clip bank, kept for reference.
+typedef struct SlotStats {
+    s32 nBudget;                // 0x00  bytes the bank may use
+    s32 n04;                    // 0x04
+    s32 nBytes;                 // 0x08  clip bytes wanted before trimming
+    s32 nTrimmed;               // 0x0C  bytes the trim took off
+    s32 nKeep;                  // 0x10  clips per leaf it settled on
+    s32 nMaxUsers;              // 0x14
+} SlotStats;
+
+extern SlotStats lbl_801C6008[3];
+
+// Plans the clip bank for a slot: merges the slot's library with its overlays (clips with the
+// same name are shared, later copies pointing at the first), and, unless it is slot 2, trims
+// the result to the slot's share of the 920 KB clip budget (random picks first; if that cannot
+// fit, the best-ranked picks from a fresh copy). Allocates the bank and returns its size.
+u32 AnimLib_PlanBank(u32 nSlot) {
+    LibSlot*    pSlot = &lbl_801C6068[nSlot];
+    u32         nRet  = 0;
+    u8          bBoth = 0;
+    s32         nRecSize;
+    u8*         apTree[10];
+    s16*        apIndex[10];
+    MergeCtx    ctx;
+    MergeCtx    ctxOv;
+    s32         nClips;
+    s32         nLibClips;
+    s32         nOvClips;
+    s32         nClipsAll;
+    s16*        pIndexCopy;
+    u8*         pTreeCopy;
+    ClipRecord* pRecordsCopy;
+    s32         nBytesBefore;
+    ClipRecord* apRecords[10];
+    s32         nIndexSize;
+    s32         nHdr;
+    AnimLib*    pLib;
+    s32         nBytes;
+    LibOverlay* pOvs;
+    int         nOvs;
+    int         i;
+    int         j;
+    int         k;
+    int         m;
+    AnimLib*    pOvLib;
+    AnimLib*    pOther;
+    LibOverlay* pp;
+    ClipRecord* pRec;
+    ClipRecord* pRecO;
+    s32         nLeft;
+    s32         nTotal;
+    s32         nBudget;
+    ClipBank*   pBank;
+
+    if (lbl_801C6068[0].nOverlays != 0 && lbl_801C6068[1].nOverlays != 0) bBoth = 1;
+    if (pSlot->nOverlays == 0) goto done;
+    nOvs   = pSlot->nOverlays;
+    pLib   = pSlot->pLib;
+    nClips = 0;
+    pOvs   = pSlot->overlays;
+    if (pLib != NULL) {
+        nLibClips = pLib->nRecords;
+        nBytes    = pLib->n140;
+    } else {
+        nLibClips = 0;
+        nBytes    = 0;
+    }
+    ctx.nBytes = nBytes;
+    ctx.pCount = &nLibClips;
+    for (i = 0; i < nOvs; i++) {
+        pOvLib = pOvs[i].pWork;
+        if (pOvLib != NULL) {
+            pOvs[i].nTree     = pOvLib->nTreeSize;
+            pOvLib->nTreeSize = 0;
+            if (pLib != NULL) pOvLib->nClips += pLib->nClips;
+            AnimLib_WalkPair(pLib, pOvLib, (AnimLibWalkFn)AnimLib_MergeSizeCb, NULL);
+            if (pOvLib->nTreeSize & 15) pOvLib->nTreeSize = ((pOvLib->nTreeSize >> 4) + 1) << 4;
+            pOvs[i].n14 = pOvs[i].n10 - 3;
+        }
+    }
+    if (pLib != NULL && nSlot != 2) {
+        AnimLib_WalkPair(pLib, NULL, (AnimLibWalkFn)AnimLib_TrimCb, &ctx);
+        nBytes = ctx.nBytes;
+    }
+    for (i = 0; i < nOvs; i++) {
+        if (pOvs[i].pWork != NULL && nSlot != 2) {
+            AnimLib_WalkPair(NULL, pOvs[i].pWork, (AnimLibWalkFn)AnimLib_TrimCb, NULL);
+        }
+    }
+    for (i = 0; i < nOvs; i++) {
+        pOvLib       = pOvs[i].pWork;
+        nOvClips     = pOvLib->nRecords;
+        ctxOv.pCount = &nOvClips;
+        AnimLib_WalkPair(NULL, pOvLib, (AnimLibWalkFn)AnimLib_MergeReleaseCb, &ctxOv);
+        nLeft = pOvLib->nRecords;
+        for (j = 0; j < pOvLib->nRecords; j++) {
+            pRec = &pOvLib->pRecords[j];
+            if (pRec->n10 != 0) {
+                nBytes += pRec->n14;
+                k      = -1;
+                pOther = pLib;
+                pp     = pOvs - 1;
+                do {
+                    if (pOther == NULL) goto skip;
+                    for (m = 0; m < pOther->nRecords; m++) {
+                        pRecO = &pOther->pRecords[m];
+                        if (strcmp(pRec->name, pRecO->name) == 0) {
+                            if (pRecO->n10 != 0) {
+                                nLeft--;
+                                nBytes -= pRec->n14;
+                            }
+                            pRecO->n10 += pRec->n10;
+                            pRec->n10   = 0;
+                            pRec->pClip = pRecO;
+                            if (k != -1) {
+                                pRec->n12 |= 0x10;
+                            } else {
+                                pRec->n12 |= 2;
+                            }
+                            goto next;
+                        }
+                    }
+                skip:
+                    k++;
+                    pOther = (++pp)->pWork;
+                } while (k < i);
+            } else if (pRec->n12 & 4) {
+                k      = -1;
+                pOther = pLib;
+                pp     = pOvs - 1;
+                do {
+                    if (pOther == NULL) goto skip2;
+                    for (m = 0; m < pOther->nRecords; m++) {
+                        pRecO = &pOther->pRecords[m];
+                        if (strcmp(pRec->name, pRecO->name) == 0) {
+                            pRecO->n10 += pRec->n10;
+                            nLeft--;
+                            pRec->n10   = 0;
+                            pRec->pClip = pRecO;
+                            goto next;
+                        }
+                    }
+                skip2:
+                    k++;
+                    pOther = (++pp)->pWork;
+                } while (k < i);
+            } else {
+                nLeft--;
+            }
+        next:;
+        }
+        nClips += nLeft;
+    }
+    ctx.nBytes = nBytes;
+    ctx.pCount = &nLibClips;
+    if (pLib != NULL && nClips != 0) AnimLib_WalkPair(pLib, NULL, (AnimLibWalkFn)AnimLib_MergeReleaseCb, &ctx);
+    for (i = 0; i < nOvs; i++) {
+    }
+    nClipsAll = nClips + nLibClips;
+    nClips    = nClipsAll;
+    if (nClipsAll == 0) goto done;
+    nIndexSize = ((nClipsAll * 4 >> 4) + 1) << 4;
+    nRecSize   = ((nClipsAll >> 4) + 1) << 4;
+    nTotal     = ctx.nBytes + nIndexSize + nRecSize + 0x20;
+    if (nSlot != 2) {
+        nBudget = lbl_80281CDC;
+        if (lbl_80281CD8) {
+            if (nSlot == 0) {
+                nBudget = 942080.0f * lbl_80281D1C;
+            } else {
+                nBudget = 942080.0f * (1.0f - lbl_80281D1C);
+            }
+        }
+        lbl_801C6008[nSlot].nKeep     = lbl_80281074;
+        lbl_801C6008[nSlot].nTrimmed  = 0;
+        lbl_801C6008[nSlot].nBytes    = ctx.nBytes;
+        if (nTotal > nBudget) {
+            ctx.pCount   = &nClips;
+            nHdr         = nIndexSize + nRecSize + 0x20;
+            ctx.nTarget  = nBudget;
+            ctx.nBytes  += nHdr;
+            nBytesBefore = ctx.nBytes;
+            pRecordsCopy = fn_80009B34(pLib->nRecords * sizeof(ClipRecord), 1, 0, "skalib.c", 2078);
+            fn_80005628(pRecordsCopy, pLib->pRecords, pLib->nRecords * sizeof(ClipRecord));
+            pIndexCopy = fn_80009B34(pLib->nClips2 * 2, 1, 0, "skalib.c", 2080);
+            fn_80005628(pIndexCopy, pLib->pIndex, pLib->nClips2 * 2);
+            pTreeCopy = fn_80009B34(pLib->nTreeSize, 1, 0, "skalib.c", 2082);
+            fn_80005628(pTreeCopy, pLib->pTree, pLib->nTreeSize);
+            for (i = 0; i < nOvs; i++) {
+                apRecords[i] = fn_80009B34(pOvs[i].pWork->nRecords * sizeof(ClipRecord), 1, 0, "skalib.c", 2086);
+                fn_80005628(apRecords[i], pOvs[i].pWork->pRecords, pOvs[i].pWork->nRecords * sizeof(ClipRecord));
+                apIndex[i] = fn_80009B34(pOvs[i].pWork->nClips2 * 2, 1, 0, "skalib.c", 2088);
+                fn_80005628(apIndex[i], pOvs[i].pWork->pIndex, pOvs[i].pWork->nClips2 * 2);
+                apTree[i] = fn_80009B34(pOvs[i].nTree, 1, 0, "skalib.c", 2090);
+                fn_80005628(apTree[i], pOvs[i].pWork->pTree, pOvs[i].nTree);
+            }
+            if (!AnimLib_TrimToFit(&ctx, pLib, pOvs, nOvs, 0)) {
+                lbl_801C6008[nSlot].nKeep    = lbl_80281074;
+                lbl_801C6008[nSlot].nTrimmed = 0;
+                ctx.nTarget      = nBudget;
+                lbl_801C6008[nSlot].nBytes   = ctx.nBytes;
+                nClips           = nClipsAll;
+                ctx.nBytes       = nBytesBefore;
+                fn_80005628(pLib->pRecords, pRecordsCopy, pLib->nRecords * sizeof(ClipRecord));
+                fn_80005628(pLib->pIndex, pIndexCopy, pLib->nClips2 * 2);
+                fn_80005628(pLib->pTree, pTreeCopy, pLib->nTreeSize);
+                for (i = 0; i < nOvs; i++) {
+                    fn_80005628(pOvs[i].pWork->pRecords, apRecords[i], pOvs[i].pWork->nRecords * sizeof(ClipRecord));
+                    fn_80005628(pOvs[i].pWork->pIndex, apIndex[i], pOvs[i].pWork->nClips2 * 2);
+                    fn_80005628(pOvs[i].pWork->pTree, apTree[i], pOvs[i].nTree);
+                }
+                if (!AnimLib_TrimToFit(&ctx, pLib, pOvs, nOvs, 1)) {
+                    if (nSlot == 1 || !bBoth) {
+                        nBudget = ctx.nBytes;
+                    } else {
+                        nBudget      = ctx.nBytes;
+                        lbl_80281D1C = nBudget / 942080.0f;
+                    }
+                }
+            }
+            fn_80009E70(pRecordsCopy);
+            fn_80009E70(pIndexCopy);
+            fn_80009E70(pTreeCopy);
+            for (i = 0; i < nOvs; i++) {
+                fn_80009E70(apRecords[i]);
+                fn_80009E70(apIndex[i]);
+                fn_80009E70(apTree[i]);
+            }
+            lbl_801C6008[nSlot].nBytes    = ctx.nBytes - nHdr;
+            lbl_801C6008[nSlot].nKeep     = ctx.nKeep;
+            lbl_801C6008[nSlot].nTrimmed  = nBytesBefore - ctx.nBytes;
+            lbl_801C6008[nSlot].nMaxUsers = ctx.nMaxUsers;
+        }
+        lbl_801C6008[nSlot].nBudget = nBudget;
+        lbl_801C6008[nSlot].n04     = 0;
+        pBank = lbl_801C6050[nSlot];
+        if (pBank == NULL) pBank = fn_80009B34(nBudget, 2, 0x40, "skalib.c", 2159);
+        nRet = nBudget;
+    } else {
+        pBank = fn_80009B34(nTotal, 2, 0x40, "skalib.c", 2175);
+        nRet  = nTotal;
+    }
+    pBank->nClips  = nClips;
+    pBank->uId     = 0;
+    pBank->pFile   = NULL;
+    pBank->ppClips = (void**)((u8*)pBank + 0x20);
+    for (i = 0; i < nClips; i++) pBank->ppClips[i] = NULL;
+    pBank->pRecords      = (u8*)pBank->ppClips + nIndexSize;
+    lbl_801C6050[nSlot]  = pBank;
+    pSlot->pEnd          = pBank->pRecords + nRecSize;
+done:
+    return nRet;
+}
+
 // The scratch area for slot n, uSize bytes: while only one of the first two slots has a bank,
 // it is carved out of that bank; otherwise it is the slot's own bank.
 static inline u8* Skalib_Scratch(int n, u32 uSize) {
@@ -1103,7 +1360,7 @@ void fn_80025478(void) {
     u32 i;
     int nTotal = 0;
     Skalib_SetBudgets();
-    for (i = 0; i < 3; i++) nTotal += fn_80023F7C(i);
+    for (i = 0; i < 3; i++) nTotal += AnimLib_PlanBank(i);
 }
 
 // Rebuilds the current slot's libraries from their pristine copies (they are swapped in place
@@ -1137,7 +1394,7 @@ void AnimLib_ReloadSlot(void) {
     }
     AnimLib_ApplyOverlays(nSlot);
     fn_800CA9DC(nSlot);
-    fn_80023F7C(nSlot);
+    AnimLib_PlanBank(nSlot);
 }
 
 // The clips for an animation group, style, club class and key: each level falls back to its
@@ -1361,7 +1618,6 @@ void AnimLib_SwapTree(AnimLib* pLib, u8* pSrc, u8* pDst) {
 // the clip bank pBank, or (flag 1) from the library itself; a library whose id does not match the
 // bank's plays the bank's first clip for everything. NULL when it needs a bank and there is none.
 AnimLib* AnimLib_Load(u8* pData, ClipBank* pBank) {
-
 
     SwapField hdrFmt[19] = {{0x100, 4}, {8, -8}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, -4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {2, 2}, {2, 2}};
     SwapField recFmt[7]  = {{0x10, -1}, {2, 2}, {2, 2}, {4, 4}, {4, 4}, {4, 4}, {4, 4}};
