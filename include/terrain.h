@@ -180,7 +180,9 @@ LAYOUT_ASSERT(Ter_TerrainRendererMgr, 0x11C8);
 // The settings fn_80035440 copies in (0x54 bytes); fn_80035398 makes the renderer's colour
 // (RenderState.a30) and its distances f28 and f2C from them.
 typedef struct TerSettings {
-    u8   unk0[0x44];
+    f32  aColours[4][4];        // 0x00  Code8006F154.c: four colours, blended round the compass by
+                                //       the camera's heading
+    f32  f40;                   // 0x40  Code8006F154.c: an angle added to the heading (radians)
     f32  f44;                   // 0x44  } the colour, 0..255 each
     f32  f48;                   // 0x48  }
     f32  f4C;                   // 0x4C  }
@@ -189,7 +191,8 @@ typedef struct TerSettings {
 LAYOUT_ASSERT(TerSettings, 0x54);
 
 extern Ter_TerrainRendererMgr lbl_801D3CB0;
-extern TerSettings* lbl_802811E0;
+extern TerSettings* lbl_802811E0;    // Code8006F154.c: points at lbl_801D70A8
+extern TerSettings lbl_801D70A8;
 extern f32 lbl_801876D8[21][3];     // rows fn_80034648 copies into fDefaultObjectMipmapBias
 extern f32 lbl_802810C8;
 extern s8  lbl_802810CC;

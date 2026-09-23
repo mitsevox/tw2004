@@ -1534,7 +1534,7 @@ void fn_8007C440(MsgArg* pArgs, MsgArg* pResult) {
     MCCardState state;
 
     fn_8009F7F4(&state, pArgs[0].i, pArgs[1].i);
-    pResult->i = (state.uFlags >> 1) & 1;
+    pResult->i = (state.uFlags & MC_CARD_PRESENT) >> 1;
 }
 
 void fn_8007C488(MsgArg* pArgs, MsgArg* pResult) {
@@ -1690,14 +1690,14 @@ void fn_8007C81C(MsgArg* pArgs, MsgArg* pResult) {
     MCCardState state;
 
     fn_8009F7F4(&state, pArgs[0].i, pArgs[1].i);
-    pResult->i = (state.uFlags >> 3) & 1;
+    pResult->i = (state.uFlags & 8) >> 3;
 }
 
 void fn_8007C864(MsgArg* pArgs, MsgArg* pResult) {
     MCCardState state;
 
     fn_8009F7F4(&state, pArgs[0].i, pArgs[1].i);
-    pResult->i = (state.uFlags >> 4) & 1;
+    pResult->i = (state.uFlags & MC_CARD_WRONGDEVICE) >> 4;
 }
 
 void fn_8007C8AC(MsgArg* pArgs, MsgArg* pResult) {
