@@ -896,7 +896,7 @@ void Shot_Prepare(int nPlayer, u8 bNotify) {
     p->fAim = Shot_AimAngle(nPlayer);
     for (i = 0; i < 8; i++) {
         p->nShotKind      = i;
-        p->nClubPerKind[i] = AI_ClubForShot(nPlayer, p->nShotKind, 0, p->fDistance);
+        p->nClubPerKind[(u32)i] = AI_ClubForShot(nPlayer, p->nShotKind, 0, p->fDistance);
     }
     p->nShotKind  = AI_ShotKindForDistance(nPlayer, p->fDistance);
     p->nShotKind2 = p->nShotKind;
