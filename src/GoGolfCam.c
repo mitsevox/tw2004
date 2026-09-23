@@ -44,6 +44,23 @@ typedef struct CamShot {
     u8   unkB3[0xC0 - 0xB3];
 } CamShot;
 
+// A camera sequence (DynamicCam's): the shots a camera plan steps through.
+typedef struct CamSequence {
+    u8   unk0[0x20];
+    struct CamSequence* p20;    // 0x20  the sequence that follows
+    u8   unk24[0x38 - 0x24];
+    f32  f38;                   // 0x38  its length
+    u8   unk3C[0x44 - 0x3C];
+    u8   b44;                   // 0x44  its kind
+} CamSequence;
+
+// A view's camera script (0x40 bytes at View + 0x84).
+typedef struct CamScript {
+    f32  v0[4];                 // 0x00  camera 4 puts the ball here
+    f32  v10[4];                // 0x10  and the pin here
+    u8   unk20[0x20];
+} CamScript;
+
 // The golf cameras' shared state (0x200 bytes, allocated by fn_800BD894).
 typedef struct GolfCamState {
     f32     fElevatorHeight[21];    // 0x000  per course, added to the elevator shot's height
@@ -67,13 +84,18 @@ typedef struct GolfCamState {
 
 // The golfer's animation object (gPlayers[].nShotHandle); Swing.c has more of it.
 typedef struct ShotObj {
-    u8   unk0[0x17C];
+    u8   unk0[0x164];
+    u8   a164[0x17C - 0x164];   // 0x164
     f32  fAnimTime;             // 0x17C
 } ShotObj;
 
 // The camera tuning values.
 typedef struct CamTuning {
-    u8   unk0[0x68];
+    u8   unk0[0x58];
+    f32  f58;                   // 0x58  how long camera 13's closing shot lasts
+    u8   unk5C[4];
+    f32  f60;                   // 0x60  camera 13's slow-motion step length (0: every frame)
+    f32  f64;                   // 0x64
     f32  v68[4];                // 0x68  camera 13's fn_80038010 vector; [3] shrinks as the camera's time runs
     f32  f78;                   // 0x78  ... over this many seconds
     u8   unk7C[0x94 - 0x7C];
@@ -97,13 +119,18 @@ typedef struct View {
     f32      v0[4];             // 0x000  what fn_8001731C returns: the camera's position (inferred)
     f32      v10[4];            // 0x010  what fn_80017314 returns: where it looks (the pin, for camera 5)
     f32      v20[4];            // 0x020
-    u8       unk30[0x70 - 0x30];
+    f32      v30[4];            // 0x030
+    f32      v40[4];            // 0x040
+    f32      f50;               // 0x050
+    f32      f54;               // 0x054
+    f32      f58;               // 0x058
+    u8       unk5C[0x70 - 0x5C];
     s32      nCurCamera;        // 0x070
-    void*    p74;               // 0x074  the camera sequence the shots are picked from
+    CamSequence* p74;           // 0x074  the camera sequence the shots are picked from
     void*    p78;               // 0x078
     u8       unk7C[4];
     CamShot* p80;               // 0x080
-    u8       a84[0x40];         // 0x084  the camera script the camera functions drive
+    CamScript script;           // 0x084  the camera script the camera functions drive
     f32      vC4[4];            // 0x0C4
     u8       unkD4[0x104 - 0xD4];
     f32      fCamTime;          // 0x104  time on this camera
@@ -123,7 +150,8 @@ typedef struct View {
     s32      nCamera;           // 0x144
     s32      n148;              // 0x148  the shot kind asked for
     s32      n14C;              // 0x14C  the shot kind last started
-    u8       unk150[0x153 - 0x150];
+    u8       b150;              // 0x150
+    u8       unk151[2];
     u8       b153;              // 0x153
     s32      n154;              // 0x154
     u8       unk158[0x164 - 0x158];
@@ -192,7 +220,7 @@ void     fn_8003DCE8(int nPlayer, void* pCam, void* pSub, void* pScript, CamShot
 void     fn_8003EA50(int nPlayer, void* pCam, void* pSub, void* pScript, CamShot* pShot, int a,
                      f32 fFrameTime);
 CamShot* fn_8003A7C8(int nPlayer, int nKind, CamShot* pShot);
-CamShot* fn_8003A950(void* pSequence, int nKind, int* pA, f32* pF1, f32* pF2, int* pB, f32* pF3, int nPlayer);
+CamShot* fn_8003A950(CamSequence* pSequence, int nKind, int* pA, f32* pF1, f32* pF2, int* pB, f32* pF3, int nPlayer);
 u8       fn_8003DC78(CamShot* pShot);
 void     CameraScript_InterpToNewScript(void* pScript, CamShot* pShot, int nPlayer, void* pCam, void* pSub,
                                         int nA, f32 f1, f32 f2, int nB, f32 f3);
@@ -216,9 +244,17 @@ u8       fn_800C708C(View* pView);
 f32      fn_80062C28(int nHandle);            // the animation time left
 int      fn_80016D10(void);
 void     fn_80038010(u8 a, int n, f32* pVec);
+void     fn_80038054(u8 a, int n, f32 f1, f32 f2);
+void     fn_8007326C(void* p);
+CamShot* fn_80064F7C(int nPlayer, int nKind, int a, CamShot* pShot);
+u8       fn_8003C9D0(int nPlayer, int a, CamSequence** ppSeq, CamShot** ppShot);
+u32      fn_800136DC(int nController);         // buttons: held << 16 | pressed this frame
+u32      fn_800142AC(int nButton, int a);      // a button's mask
 CamShot* fn_800C4DF8(int nFirst, int nPlayer);
 void     fn_800C5EC0(View* pView, f32* pCam, f32* pSub, int nPlayer);
 u8       fn_800C6D80(void);
+CamSequence* DynamicCam_ChoosePreFlightSequence(int nPlayer, int nLie, int nKind);
+u8       fn_800DC514(int nPlayer);   // GameEffects.c: s32 (void); this file passes the player and tests a byte
 u8       Ter_CheckForGroundCollision(void* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal, void* pA,
                                      void* pB);
 
@@ -250,20 +286,56 @@ void fn_800BDA04(void) {
     lbl_80282220 = NULL;
 }
 
+// Camera 0: the pre-flight sequence (the one after the current one when that is kind 1 -> 2), shot 2.
+void fn_800BDA30(View* pView, int nPlayer) {
+    f32* pCam;
+    f32* pSub;
+    CamShot* pShot;
+    CamSequence* pSeq;
+    int nA;
+    f32 f1;
+    f32 f2;
+    int nB;
+    f32 f3;
+    int nLie;
+    pCam = fn_8001731C(pView);
+    pSub = fn_80017314(pView);
+    pView->b153 = 0;
+    lbl_80282220->f68 = 0.0f;
+    nLie = gPlayers[nPlayer].nLie;
+    pSeq = pView->p74;
+    if (pSeq != NULL && pSeq->b44 == 1 && pSeq->p20 != pSeq && pSeq->p20 != NULL && pSeq->p20->b44 == 2) {
+        pView->p74 = pSeq->p20;
+    } else {
+        pView->p74 = DynamicCam_ChoosePreFlightSequence(nPlayer, nLie, 2);
+    }
+    pShot = fn_8003A950(pView->p74, 2, &nA, &f1, &f2, &nB, &f3, nPlayer);
+    if (pShot != NULL) {
+        if (pView->p130 == NULL || pView->p130->bAD != 1 || pView->p134 != NULL) {
+            nA = 5;
+        }
+        CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, nA, f1, f2, nB, f3);
+        if (pView->nCamera != 0) {
+            pView->f114 = 0.0f;
+            pView->nCamera = 2;
+        }
+    }
+}
+
 // Camera 0: only the script's per-frame update.
 void fn_800BDBA4(View* pView, int nPlayer) {
     void* pCam;
     void* pSub;
     pCam = fn_8001731C(pView);
     pSub = fn_80017314(pView);
-    fn_8003DCE8(nPlayer, pCam, pSub, pView->a84, &pView->shot19C, 0, gSession.fFrameTime);
+    fn_8003DCE8(nPlayer, pCam, pSub, &pView->script, &pView->shot19C, 0, gSession.fFrameTime);
 }
 
 void GolfCamera_InitSteepSlopeCamera(View* pView, int nPlayer) {
     if (pView->p130 != NULL) {
         GolfCamera_ComputeSteepSlopeCamVectors(pView, nPlayer);
         pView->p130 = NULL;
-        CameraScript_RecordCurrentCam(&pView->shot19C, pView->v0, pView->v10, nPlayer, pView->a84, 0);
+        CameraScript_RecordCurrentCam(&pView->shot19C, pView->v0, pView->v10, nPlayer, &pView->script, 0);
         strcpy(pView->shot19C.szName, "STEEPSLOPE CAM");
     }
 }
@@ -274,7 +346,7 @@ void GolfCamera_ProcessSteepSlopeCamera(View* pView, int nPlayer) {
     GolfCamera_ComputeSteepSlopeCamVectors(pView, nPlayer);
     pCam = fn_8001731C(pView);
     pSub = fn_80017314(pView);
-    fn_8003DCE8(nPlayer, pCam, pSub, pView->a84, &pView->shot19C, 0, gSession.fFrameTime);
+    fn_8003DCE8(nPlayer, pCam, pSub, &pView->script, &pView->shot19C, 0, gSession.fFrameTime);
 }
 
 // Camera 3, the elevator camera: the current view raised by the course's elevator height.
@@ -284,11 +356,11 @@ void GolfCamera_InitElevatorCamera(View* pView, int nPlayer) {
     pCam = fn_8001731C(pView);
     pSub = fn_80017314(pView);
     if (pView->p130 != NULL) {
-        CameraScript_RecordCurrentCam(&pView->shot19C, pCam, pSub, nPlayer, pView->a84, 0);
+        CameraScript_RecordCurrentCam(&pView->shot19C, pCam, pSub, nPlayer, &pView->script, 0);
         strcpy(pView->shot19C.szName, "ELEVATOR CAM");
         pView->shot19C.f24 += lbl_80282220->fElevatorHeight[Game_GetCourse()];
         pView->shot19C.bAC = 9;
-        CameraScript_InterpToNewScript(pView->a84, &pView->shot19C, nPlayer, pCam, pSub, 1, lbl_80281F78->f94,
+        CameraScript_InterpToNewScript(&pView->script, &pView->shot19C, nPlayer, pCam, pSub, 1, lbl_80281F78->f94,
                                        100.0f, 0x19, 0.0f);
     }
 }
@@ -299,7 +371,7 @@ void fn_800BF094(View* pView, int nPlayer) {
     void* pSub;
     pCam = fn_8001731C(pView);
     pSub = fn_80017314(pView);
-    fn_8003DCE8(nPlayer, pCam, pSub, pView->a84, &pView->shot19C, 0, gSession.fFrameTime);
+    fn_8003DCE8(nPlayer, pCam, pSub, &pView->script, &pView->shot19C, 0, gSession.fFrameTime);
 }
 
 // Camera 8: a 60-degree lens, no script.
@@ -320,6 +392,44 @@ void fn_800BF5E4(View* pView, int nPlayer) {
     pView->n194 = 0;
     pView->p130 = NULL;
     pView->p74 = NULL;
+}
+
+// Camera 4 (holding button 0x30 starts it 2 s in): the ball and the pin into the script, a
+// 30-degree lens.
+void fn_800BFC80(View* pView, int nPlayer) {
+    f32 v[4];
+    f32* pCam;
+    f32* pSub;
+    CourseInfo* pCourse;
+    int nHole;
+    pCam = fn_8001731C(pView);
+    pSub = fn_80017314(pView);
+    pCourse = fn_8000C594();
+    if (pCourse != NULL) {
+        pView->f50 = 1.0f;
+        pView->f54 = 1.0f;
+        pView->f58 = 1.0f;
+        if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x30, 1)) {
+            pView->fCamTime = 2.0f;
+        } else {
+            pView->fCamTime = 0.0f;
+        }
+        nHole = Game_CurrentHole();
+        Vec_Copy(pCam, pView->v30);
+        fn_800C73DC(pSub, pCam, v);
+        if (v[0] != 0.0f || v[1] != 0.0f || v[2] != 0.0f) {
+            fn_800BAF04(v, v);
+        }
+        fn_800C73B8(pCam, v, v);
+        Vec_Copy(v, pView->v40);
+        Vec_Copy((f32*)gPlayers[nPlayer].ball, pView->script.v0);
+        Vec_Copy(&pCourse->pin[nHole].x, pView->script.v10);
+        pView->shot19C.f6C = 1.0f;
+        pView->shot19C.f68 = *(f32*)(gPlayers[nPlayer].ball + 4);
+        pView->p130 = NULL;
+        pView->p134 = NULL;
+        fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView0)), DEG(30.0f));
+    }
 }
 
 // Camera 5: look at the pin through a 30-degree lens.
@@ -348,7 +458,7 @@ void fn_800C0624(View* pView, int nPlayer) {
     pSub = fn_80017314(pView);
     pShot = fn_8003A7C8(nPlayer, 0x3A, NULL);
     if (pShot != NULL) {
-        CameraScript_InterpToNewScript(pView->a84, pShot, nPlayer, pCam, pSub, 5, 0.0f, 100.0f, 0x19, 0.0f);
+        CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, 5, 0.0f, 100.0f, 0x19, 0.0f);
     }
 }
 
@@ -358,7 +468,7 @@ void fn_800C06C8(View* pView, int nPlayer) {
     void* pSub;
     pCam = fn_8001731C(pView);
     pSub = fn_80017314(pView);
-    fn_8003DCE8(nPlayer, pCam, pSub, pView->a84, &pView->shot19C, 0, gSession.fFrameTime);
+    fn_8003DCE8(nPlayer, pCam, pSub, &pView->script, &pView->shot19C, 0, gSession.fFrameTime);
 }
 
 // Camera 7 (the knee cam): a shot built by hand from the current one, lasting 0.55 s.
@@ -395,7 +505,7 @@ void fn_800C0804(View* pView, int nPlayer) {
     void* pSub;
     pCam = fn_8001731C(pView);
     pSub = fn_80017314(pView);
-    fn_8003DCE8(nPlayer, pCam, pSub, pView->a84, &pView->shot19C, 0, gSession.fFrameTime);
+    fn_8003DCE8(nPlayer, pCam, pSub, &pView->script, &pView->shot19C, 0, gSession.fFrameTime);
 }
 
 // Camera 10: start on the first shot fn_8006509C gives.
@@ -432,13 +542,52 @@ void fn_800C0914(View* pView, int nPlayer) {
     pSub = fn_80017314(pView);
     fLead = lbl_80281F78->f178;
     Vec_Copy(lbl_80281F78->v17C, v);
-    fn_8003EA50(nPlayer, pCam, pSub, pView->a84, &pView->shot19C, 0, gSession.fFrameTime);
+    fn_8003EA50(nPlayer, pCam, pSub, &pView->script, &pView->shot19C, 0, gSession.fFrameTime);
     if (pView->p134 != NULL && (pView->p134->p40 == NULL || pView->p134->nA4 != pView->p134->p40->nA4)
         && pView->nCamera == 0 && pView->f110 - pView->fCamTime < fLead) {
         pView->nCamera = 1;
         Vec_Copy(v, pView->vC4);
         pView->f114 = 0.0f;
         pView->f118 = pView->f110 - pView->fCamTime;
+    }
+}
+
+// Camera 11, the pre-shot camera: shot 0x20 of the plan, or half the time (or without one) shot 13
+// of fn_8003C9D0's sequence or a new pre-flight sequence.
+void GolfCamera_InitPreShotCamera(View* pView, int nPlayer) {
+    int nLie;
+    CamShot* pShot = NULL;
+    int nA = 5;
+    f32 f1 = 0.0f;
+    f32 f2 = 0.0f;
+    f32* pCam = fn_8001731C(pView);
+    f32* pSub = fn_80017314(pView);
+    int nB = 0x19;
+    f32 f3 = 0.0f;
+    lbl_80282220->f68 = 0.0f;
+    pView->b153 = 0;
+    nLie = gPlayers[nPlayer].nLie;
+    pView->p74 = NULL;
+    pShot = fn_80064F7C(nPlayer, 0x20, 0, pView->p130);
+    if (pShot == NULL || Rand_Next(1) % 100 > 50) {
+        if (fn_8003C9D0(nPlayer, 0, &pView->p74, &pShot) && pView->p74 != NULL) {
+            pShot = fn_8003A950(pView->p74, 13, &nA, &f1, &f2, &nB, &f3, nPlayer);
+        }
+        if (pShot == NULL) {
+            pView->p74 = DynamicCam_ChoosePreFlightSequence(nPlayer, nLie, 1);
+            pShot = fn_8003A950(pView->p74, 13, &nA, &f1, &f2, &nB, &f3, nPlayer);
+        }
+        pView->n14C = 13;
+        pView->n148 = 13;
+    }
+    if (pShot != NULL) {
+        CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, nA, f1, f2, nB, f3);
+        if (pView->nCamera != 0) {
+            pView->f114 = 0.0f;
+            pView->nCamera = 2;
+        }
+        pView->n194 = 0;
+        pView->n198 = 0;
     }
 }
 
@@ -477,11 +626,43 @@ void fn_800C0C0C(View* pView, int nPlayer) {
         if (bStart) {
             pShot = fn_8003A950(pView->p74, pView->n148, &nA, &f1, &f2, &nB, &f3, nPlayer);
             if (pShot != NULL) {
-                CameraScript_InterpToNewScript(pView->a84, pShot, nPlayer, pCam, pSub, nA, f1, f2, nB, f3);
+                CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, nA, f1, f2, nB, f3);
             }
         }
     }
-    fn_8003DCE8(nPlayer, pCam, pSub, pView->a84, &pView->shot19C, 0, gSession.fFrameTime);
+    fn_8003DCE8(nPlayer, pCam, pSub, &pView->script, &pView->shot19C, 0, gSession.fFrameTime);
+}
+
+// Camera 12's process: shots of kind 6, 8, 9 and 10 have no next shot while the script runs; the
+// script runs at 1/59.94 s a frame in slow motion; on the downswing kinds 9 and 10 give way to 0 and 2.
+void fn_800C1338(View* pView, int nPlayer) {
+    f32* pCam;
+    f32* pSub;
+    f32 fTime;
+    pCam = fn_8001731C(pView);
+    pSub = fn_80017314(pView);
+    fTime = gSession.fFrameTime;
+    if (pView->n140 == 6 || pView->n140 == 8 || pView->n140 == 9 || pView->n140 == 10) {
+        pView->p134 = NULL;
+    }
+    if (fn_800DC514(nPlayer) && gSession.unk14 == 0) {
+        fTime = 0.016683351f;
+    }
+    fn_8003DCE8(nPlayer, pCam, pSub, &pView->script, &pView->shot19C, 0, fTime);
+    if (pView->n140 == 6 || pView->n140 == 8 || pView->n140 == 9 || pView->n140 == 10) {
+        pView->p134 = pView->p130->p40;
+    }
+    if (gPlayers[nPlayer].swing.nState == SW_DOWN_SWING) {
+        if (pView->n140 == 9) {
+            pView->n140 = 0;
+            pView->fCamTime = 0.0f;
+            pView->b150 = 1;
+        } else if (pView->n140 == 10) {
+            pView->n140 = 2;
+            pView->fCamTime = 0.0f;
+            pView->b150 = 1;
+        }
+    }
 }
 
 // Camera 13.
@@ -516,7 +697,7 @@ void fn_800C1530(View* pView, int nPlayer) {
     }
     pShot = pView->p130;
     n140 = pView->n140;
-    fn_8003DCE8(nPlayer, pCam, pSub, pView->a84, &pView->shot19C, 0, gSession.fFrameTime);
+    fn_8003DCE8(nPlayer, pCam, pSub, &pView->script, &pView->shot19C, 0, gSession.fFrameTime);
     if (fn_800C6D80() && pShot != pView->p130) {
         if (pShot != NULL && pShot->p40 == NULL) {
             pView->n140 = 5;
@@ -568,7 +749,7 @@ void fn_800C16C4(View* pView, int nPlayer) {
         View_SetCamera(fn_80017028(nView), 14, nPlayer, nView);
         GolfCamera_ProcessBallFlightCamera(pView, nPlayer);
     } else {
-        fn_8003DCE8(nPlayer, pCam, pSub, pView->a84, &pView->shot19C, 0, gSession.fFrameTime);
+        fn_8003DCE8(nPlayer, pCam, pSub, &pView->script, &pView->shot19C, 0, gSession.fFrameTime);
     }
 }
 
@@ -585,7 +766,7 @@ void GolfCamera_InitShutterCamera(View* pView, int nPlayer) {
         pShot = fn_8003A7C8(nPlayer, 0xD, pView->p130);
     }
     if (pShot != NULL) {
-        CameraScript_InterpToNewScript(pView->a84, pShot, nPlayer, pCam, pSub, 5, 0.0f, 100.0f, 0x19, 0.0f);
+        CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, 5, 0.0f, 100.0f, 0x19, 0.0f);
     }
     pView->n194 = 0;
     pView->f18C = 0.0f;
@@ -597,7 +778,7 @@ void GolfCamera_InitShutterCamera(View* pView, int nPlayer) {
 
 // Camera 17: the script runs on at 1/59.94 s a frame.
 void fn_800C34F8(View* pView, int nPlayer) {
-    fn_8003F2E0(pView->a84, 0.016683351f);
+    fn_8003F2E0(&pView->script, 0.016683351f);
     pView->f114 += 0.016683351f;
 }
 
@@ -643,7 +824,7 @@ void GolfCamera_ProcessInHoleCamera(View* pView, int nPlayer) {
         GolfCamera_CutToGolferDoneAnimatingCam(pView, nPlayer);
         pView->n198 = 1;
     }
-    fn_8003DCE8(nPlayer, pCam, pSub, pView->a84, &pView->shot19C, 0, gSession.fFrameTime);
+    fn_8003DCE8(nPlayer, pCam, pSub, &pView->script, &pView->shot19C, 0, gSession.fFrameTime);
 }
 
 // Camera 17: move to a fixed spot unless the camera is already moving there.
@@ -660,7 +841,7 @@ void fn_800C37FC(View* pView, int nPlayer) {
     void* pSub;
     pCam = fn_8001731C(pView);
     pSub = fn_80017314(pView);
-    fn_8003DCE8(nPlayer, pCam, pSub, pView->a84, &pView->shot19C, 0, gSession.fFrameTime);
+    fn_8003DCE8(nPlayer, pCam, pSub, &pView->script, &pView->shot19C, 0, gSession.fFrameTime);
     if (pView->p134 == NULL) {
         pView->p130 = &lbl_80282220->shot6C;
         pView->p134 = &lbl_80282220->shot12C;
@@ -687,7 +868,7 @@ void fn_800C38BC(View* pView, int nPlayer) {
     pSub[2] = pCam[2];
     pShot = fn_8003A7C8(0, 0x23, NULL);
     if (pShot != NULL) {
-        CameraScript_InterpToNewScript(pView->a84, pShot, nPlayer, pCam, pSub, 5, 0.0f, 100.0f, 0x19, 0.0f);
+        CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, 5, 0.0f, 100.0f, 0x19, 0.0f);
         pView->p80 = pShot;
         pView->n194 = -1;
         pView->n198 = 0x23;
@@ -876,18 +1057,63 @@ void fn_800C4E80(View* pView, int nPlayer) {
         }
         pShot = fn_800C4DF8(pView->n264, nPlayer);
         if (pShot != NULL && pView->n264 != 3) {
-            CameraScript_InterpToNewScript(pView->a84, pShot, nPlayer, pCam, pSub, pShot->bAB, pShot->f48,
+            CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, pShot->bAB, pShot->f48,
                                            1000.0f, 0x19, 0.0f);
         } else if (pView->p80 != NULL && pView->p80 != pView->p130) {
             if (pView->p130 != NULL) {
-                CameraScript_InterpToNewScript(pView->a84, pView->p80, nPlayer, pCam, pSub, pView->p130->bAB,
+                CameraScript_InterpToNewScript(&pView->script, pView->p80, nPlayer, pCam, pSub, pView->p130->bAB,
                                                pView->p130->f48, 1000.0f, 0x19, 0.0f);
             } else {
-                CameraScript_InterpToNewScript(pView->a84, pView->p80, nPlayer, pCam, pSub, 5, 0.0f, 1000.0f,
+                CameraScript_InterpToNewScript(&pView->script, pView->p80, nPlayer, pCam, pSub, 5, 0.0f, 1000.0f,
                                                0x19, 0.0f);
             }
         }
     }
+}
+
+// Camera 13's tick: with no next shot, end the game breaker's effect and replay the current shot's
+// p44 as a hand-made shot. Returns the frame time to run the script at (0 while held).
+f32 fn_800C54FC(View* pView, f32* pCam, f32* pSub, int nPlayer) {
+    f32 fTime = 0.0f;
+    CamShot* pShot;
+    if (gSession.unk14 == 0) {
+        fn_80038054(1, fn_80016D10(), 0.0f, lbl_80281F78->f64);
+    }
+    if (pView->p134 == NULL) {
+        lbl_80282220->b54 = 0;
+        fn_8007326C(((ShotObj*)gPlayers[nPlayer].nShotHandle)->a164);
+        EVENT_Trigger(nPlayer, 0x33, 0, -1);
+        EVENT_Trigger(nPlayer, 0x3B, 0, 1);
+        pShot = pView->p130->p44;
+        if (pShot != NULL) {
+            Mem_cpy(&pView->shot19C, pShot, 0xC0);
+            pView->shot19C.p44 = pShot;
+            pView->p134 = &pView->shot19C;
+            pView->fCamTime = 0.0f;
+            pView->f110 = lbl_80281F78->f58;
+            pView->n140 = 5;
+            if (pView->p74 != NULL) {
+                pView->p134->f4C = pView->p74->f38 - lbl_80281F78->f58;
+            } else {
+                pView->p134->f4C = lbl_80281F78->f58;
+            }
+            pView->p134->p44 = pShot;
+        }
+    }
+    if (gSession.unk14 == 0) {
+        if (lbl_80281F78->f60) {
+            if (pView->f18C > lbl_80281F78->f60) {
+                fTime = lbl_80281F78->f60;
+                pView->f18C = 0.0f;
+            } else {
+                fTime = 0.0f;
+                pView->f18C += 0.016683351f;
+            }
+        } else {
+            fTime = 0.016683351f;
+        }
+    }
+    return fTime;
 }
 
 void fn_800C5CEC(View* pView, int nPlayer) {
@@ -923,7 +1149,7 @@ void fn_800C5D64(View* pView, f32* pViewCam, f32* pViewSub, int nPlayer) {
     if (pView->n260 == 15 || pView->n260 == 16) {
         pShot = fn_8003A7C8(nPlayer, 0x22, NULL);
         if (pShot != NULL) {
-            CameraScript_InterpToNewScript(pView->a84, pShot, nPlayer, pCam, pSub, 5, 0.0f, 100.0f, 0x19,
+            CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, 5, 0.0f, 100.0f, 0x19,
                                            0.0f);
             pView->f110 = 1.0f;
         }
@@ -939,8 +1165,8 @@ void fn_800C5D64(View* pView, f32* pViewCam, f32* pViewSub, int nPlayer) {
             pView->fCamTime = 0.0f;
         } else {
             pShot = fn_8003A7C8(nPlayer, 0xD, pView->p130);
-            if (pShot != NULL && !CameraScript_WillGolferBeOccludedInThisView(nPlayer, pShot, pView->a84)) {
-                CameraScript_InterpToNewScript(pView->a84, pShot, nPlayer, pCam, pSub, 5, 0.0f, 100.0f, 0x19,
+            if (pShot != NULL && !CameraScript_WillGolferBeOccludedInThisView(nPlayer, pShot, &pView->script)) {
+                CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, 5, 0.0f, 100.0f, 0x19,
                                                0.0f);
             }
         }
