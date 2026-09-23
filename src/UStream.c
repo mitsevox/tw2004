@@ -13,60 +13,7 @@
 
 #include "game_types.h"
 #include "engine.h"
-
-#define USTREAM_BUFFER_SIZE   0x6000
-#define USTREAM_NUM_BUFFERS   18
-#define USTREAM_MAX_STREAMS   2
-#define USTREAM_MAX_HANDLERS  64
-#define USTREAM_MAX_FILES     8
-
-#define TAG(a, b, c, d) (((u32)(a) << 24) | ((u32)(b) << 16) | ((u32)(c) << 8) | (u32)(d))
-
-// One read buffer: 0x40 bytes of bookkeeping followed by 0x6000 bytes of file data.
-typedef struct UStreamBuffer {
-    struct UStreamBuffer* pNext;   // 0x00  list link
-    int  nFileOffset;              // 0x04  where in the file this buffer came from
-    u32  uPos;                     // 0x08  parse position inside data[]
-    int  nRefs;                    // 0x0C  objects still reading from data[]
-    u8   pad[0x30];
-    u8   data[USTREAM_BUFFER_SIZE];
-} UStreamBuffer;
-
-// What the caller passes to UStream_Open (0x284 bytes) - the file list and per-file callbacks.
-typedef struct {
-    int   nNumFiles;                                 // 0x000
-    char  aszName[USTREAM_MAX_FILES][0x40];          // 0x004
-    void  (*apfnOpened[USTREAM_MAX_FILES])(void*);   // 0x204
-    void  (*apfnClosed[USTREAM_MAX_FILES])(void*);   // 0x224
-    void* apOpenedArg[USTREAM_MAX_FILES];            // 0x244
-    void* apClosedArg[USTREAM_MAX_FILES];            // 0x264
-} UStreamParams;
-
-// A stream (0x2E0 bytes).
-typedef struct {
-    int   hFile;             // 0x00  -1 when nothing is open
-    int   nFileSize;         // 0x04
-    int   nFilePos;          // 0x08  next read offset
-    int   nUnkC;             // 0x0C  -2 at open
-    u8    bEOF;              // 0x10
-    u8    bWaitingForSWVR;   // 0x11
-    u8    pad12[2];
-    int   nChunkBudget;      // 0x14  -1 = unlimited; counts reads down to EOF
-    int   nFileIndex;        // 0x18
-    UStreamParams params;    // 0x1C
-    u8    pad2A0[0x40];
-} UStream;
-
-typedef struct {
-    u32   uType;
-    void  (*pfnHandler)(UStreamObject* pObject);
-    int   nRefs;
-} UStreamHandler;
-
-typedef struct UStreamNode {
-    struct UStreamNode* pNext;
-    UStreamObject* pObject;
-} UStreamNode;
+#include "ustream.h"
 
 // ---- state -------------------------------------------------------------------------------
 // Everything here is private to the file. CodeWarrior lays out a file's static data in the
@@ -80,7 +27,7 @@ static UStreamHandler   gHandlers[USTREAM_MAX_HANDLERS];        // 0x801A3124
 static UStreamBuffer*   gReadyRing[USTREAM_NUM_BUFFERS];        // 0x801A30DC
 static UStreamBuffer*   gFreeRing[USTREAM_NUM_BUFFERS];         // 0x801A3094
 static UStream          gStreams[USTREAM_MAX_STREAMS];          // 0x801A2AD4
-static u32              gSoundHeader[5];                        // 0x801A2AC0 (SONO state)
+static UStreamSound     gSoundHeader;                           // 0x801A2AC0 (SONO state)
 
 static u32  gRPNSBase;            // 0x80281C5C  value of the last RPNS object
 static UStreamBuffer* volatile gpReadBuffer;  // 0x80281C58  buffer of the read in flight
@@ -107,37 +54,38 @@ static s8   gbPaused;             // 0x80281C18
 
 int gnNumHandlers = -1;           // 0x80280DB8 (.sdata): -1 until UStream_Init
 
-// ---- externals ---------------------------------------------------------------------------
+// ---- other files' functions -----------------------------------------------------------
 
-extern int   fn_80005BC8(const void* pA, const void* pB);           // string/name compare
-extern int   fn_800060E0(const char* pName);                        // file open
-extern int   fn_8000633C(int hFile);                                // file close
-extern int   fn_80006444(int hFile, void* pDst, u32 uLen, u32 uOffset, void (*pfnDone)(int, int)); // async read
-extern u32   fn_800065B0(int hFile);                                // file size
-extern void* fn_8000AFA0(u32 uNodeSize, u32 uAlign, int a, int b);  // UMemPool create
-extern void  fn_8000B058(void* pPool);                              // UMemPool destroy
-extern void* fn_8000B078(void* pPool);                              // UMemPool take node
-extern void  fn_8000B0D4(void* pPool, void* pNode);                 // UMemPool return node
-extern void  fn_8000B4B8(UStreamObject* p);
-extern u8    fn_8000B508(UStreamObject* p);
-extern void  fn_8000B588(UStreamObject* p);
-extern UStreamObject* fn_8000B70C(u32 uType, u32 uHash);
-extern int   fn_8000EA1C(const char* pName, int a, int b, int c);
-extern void  fn_8007593C(void* pChunk);                             // MPG2
-extern void  fn_800A4BDC(void);
-extern void  fn_800A8AD4(void* pChunk);                             // DSPM / VAGM / XADP
-extern void* fn_800A8FB4(u32 uSize);
-extern void  fn_800A8FFC(void);
-extern void* fn_800A925C(u32 uSize, u32 uType);
-extern void  fn_800A929C(u32 uType);
-extern void* fn_800A9374(u32 uSize);
-extern void  fn_800A93AC(void);
-extern void  fn_800B044C(void* pDst, const void* pSrc, u32 uLen, void (*pfn)(void), int);
-extern void  fn_800B7490(void);                                     // yield / pump
-extern void  fn_8009527C(void* p);
-extern void  fn_8000E708(UStreamParams* p);
-extern void  fn_8015A7FC(char* pDst, const char* pSrc);             // strcpy
-extern void* memset(void* p, int c, u32 n);
+int   fn_80005BC8(const void* pA, const void* pB);           // string/name compare
+int   fn_800060E0(const char* pName);                        // file open
+int   fn_8000633C(int hFile);                                // file close
+// async read
+int   fn_80006444(int hFile, void* pDst, u32 uLen, u32 uOffset, void (*pfnDone)(int, int));
+u32   fn_800065B0(int hFile);                                // file size
+void* fn_8000AFA0(u32 uNodeSize, u32 uAlign, int a, int b);  // UMemPool create
+void  fn_8000B058(void* pPool);                              // UMemPool destroy
+void* fn_8000B078(void* pPool);                              // UMemPool take node
+void  fn_8000B0D4(void* pPool, void* pNode);                 // UMemPool return node
+void  fn_8000B4B8(UStreamObject* p);
+u8    fn_8000B508(UStreamObject* p);
+void  fn_8000B588(UStreamObject* p);
+UStreamObject* fn_8000B70C(u32 uType, u32 uHash);
+int   fn_8000EA1C(const char* pName, int a, int b, int c);
+void  fn_8007593C(void* pChunk);                             // MPG2
+void  fn_800A4BDC(void);
+void  fn_800A8AD4(void* pChunk);                             // DSPM / VAGM / XADP
+void* fn_800A8FB4(u32 uSize);
+void  fn_800A8FFC(void);
+void* fn_800A925C(u32 uSize, u32 uType);
+void  fn_800A929C(u32 uType);
+void* fn_800A9374(u32 uSize);
+void  fn_800A93AC(void);
+void  fn_800B044C(void* pDst, const void* pSrc, u32 uLen, void (*pfn)(void), int);
+void  fn_800B7490(void);                                     // yield / pump
+void  fn_8009527C(void* p);
+void  fn_8000E708(UStreamParams* p);
+void  fn_8015A7FC(char* pDst, const char* pSrc);             // strcpy
+void* memset(void* p, int c, u32 n);
 
 static void UStream_ReadDone(int nBytes, int nError);
 static void UStream_StartRead(void);
@@ -173,11 +121,14 @@ static void UStream_StartRead(void) {
     if (pStream->bEOF) return;
     if (pStream->hFile < 0) return;
     gFreeRing[gFreeRingTail] = NULL;
-    if (++gFreeRingTail == USTREAM_NUM_BUFFERS) gFreeRingTail = 0;
+    if (++gFreeRingTail == USTREAM_NUM_BUFFERS) {
+        gFreeRingTail = 0;
+    }
     gpReadBuffer = pBuffer;
     gpReadBuffer->nFileOffset = pStream->nFilePos;
     gbReadPending = 1;
-    if (fn_80006444(pStream->hFile, pBuffer->data, USTREAM_BUFFER_SIZE, pStream->nFilePos, UStream_ReadDone) < 0) {
+    if (fn_80006444(pStream->hFile, pBuffer->data, USTREAM_BUFFER_SIZE, pStream->nFilePos,
+                    UStream_ReadDone) < 0) {
         gbReadPending = 0;
         gnReadErrors++;
         UStream_ReleaseBuffer(gpReadBuffer);
@@ -231,7 +182,9 @@ static void UStream_ReadDone(int nBytes, int nError) {
         }
         if (!bDropped) {
             gReadyRing[gReadyRingHead] = gpReadBuffer;
-            if (++gReadyRingHead == USTREAM_NUM_BUFFERS) gReadyRingHead = 0;
+            if (++gReadyRingHead == USTREAM_NUM_BUFFERS) {
+                gReadyRingHead = 0;
+            }
         }
         gnReadErrors = 0;
     } else {
@@ -250,16 +203,16 @@ void UStream_SetAutoRead(u8 bAuto) {
 }
 
 // Object allocation from an SHDR chunk: header + name + 0x80-aligned data.
-static int UStream_BeginObject(UStreamObject** ppObject, u8* pChunk) {
+static int UStream_BeginObject(UStreamObject** ppObject, UStreamChunk* pChunk) {
     u32 uExtra;
     int nWanted;
     u32 uPad;
     UStreamObject* pObject;
-    if (*(u32*)(pChunk + 0x18) == TAG('C', 's', 'a', 'c')) {
+    if (pChunk->uType == TAG('C', 's', 'a', 'c')) {
         nWanted = 1;
-        uExtra = ((*(int*)(pChunk + 0x38) + 3 + *(int*)(pChunk + 0x34)) & ~3) + 8;
+        uExtra = ((pChunk->n38 + 3 + pChunk->nNameLen) & ~3) + 8;
     } else {
-        const char* pName = (const char*)(pChunk + 0x3C) + *(int*)(pChunk + 0x34);
+        const char* pName = (const char*)pChunk->szName + pChunk->nNameLen;
         uExtra = 0;
         nWanted = fn_8000EA1C(pName, 0, -1, 0);
         if (nWanted) {
@@ -267,20 +220,28 @@ static int UStream_BeginObject(UStreamObject** ppObject, u8* pChunk) {
         }
     }
     if (nWanted) {
-        if (*(u32*)(pChunk + 0x18) == TAG('t', 'x', 'f', ' ')) *(u32*)(pChunk + 0x14) = 1;
-        if (*(u32*)(pChunk + 0x18) == TAG('C', 'p', 'y', 'r')) *(u32*)(pChunk + 0x14) = 1;
-        if (*(u32*)(pChunk + 0x18) == TAG('C', 'a', 'c', 't')) *(u32*)(pChunk + 0x14) = 1;
-        if (*(u32*)(pChunk + 0x18) == TAG('t', 'x', 'f', '2')) *(u32*)(pChunk + 0x14) = 1;
+        if (pChunk->uType == TAG('t', 'x', 'f', ' ')) {
+            pChunk->uFlags = 1;
+        }
+        if (pChunk->uType == TAG('C', 'p', 'y', 'r')) {
+            pChunk->uFlags = 1;
+        }
+        if (pChunk->uType == TAG('C', 'a', 'c', 't')) {
+            pChunk->uFlags = 1;
+        }
+        if (pChunk->uType == TAG('t', 'x', 'f', '2')) {
+            pChunk->uFlags = 1;
+        }
         uPad = (uExtra + 0x34) & 0x7F;
         uPad = uPad ? 0x80 - uPad : 0;
         {
-            u32 uDataSize = *(u32*)(pChunk + 0x20);
-            pObject = fn_80009B34((uExtra + uPad) + uDataSize + 0x34, *(u32*)(pChunk + 0x14), 0x80, "UStream.c", 732);
+            u32 uDataSize = pChunk->uSize;
+            pObject = fn_80009B34((uExtra + uPad) + uDataSize + 0x34, pChunk->uFlags, 0x80, "UStream.c", 732);
         }
         *ppObject = pObject;
         pObject->nUnk14 = 0;
         ppObject[1] = NULL;
-        Mem_cpy(&pObject->uFlags, pChunk + 0x14, uExtra + 0x1C);
+        Mem_cpy(&pObject->uFlags, &pChunk->uFlags, uExtra + 0x1C);
         pObject->pData = (u8*)pObject + uExtra + uPad + 0x34;
         pObject->uUnk4 = 0;
         pObject->uUnk8 = 0;
@@ -340,7 +301,9 @@ static UStreamBuffer* UStream_PumpBuffers(u8 bTakeReady) {
             gpFreeList = p->pNext;
             p->pNext = NULL;
             gFreeRing[gFreeRingHead] = p;
-            if (++gFreeRingHead == USTREAM_NUM_BUFFERS) gFreeRingHead = 0;
+            if (++gFreeRingHead == USTREAM_NUM_BUFFERS) {
+                gFreeRingHead = 0;
+            }
         }
         if (gFreeRing[gFreeRingTail] != NULL && !gbReadPending) {
             UStream_StartRead();
@@ -351,7 +314,9 @@ static UStreamBuffer* UStream_PumpBuffers(u8 bTakeReady) {
         while ((p = gReadyRing[gReadyRingTail]) != NULL) {
             UStreamBuffer* q;
             gReadyRing[gReadyRingTail] = NULL;
-            if (++gReadyRingTail == USTREAM_NUM_BUFFERS) gReadyRingTail = 0;
+            if (++gReadyRingTail == USTREAM_NUM_BUFFERS) {
+                gReadyRingTail = 0;
+            }
             p->pNext = NULL;
             if (gpCurList == NULL) {
                 gpCurList = p;
@@ -371,9 +336,13 @@ static void UStream_StripStreamExt(char* pName) {
     const char* pMatch = pPattern;
     char c;
     while ((c = *pName) != 0) {
-        if (c >= 'A' && c <= 'Z') c += 0x20;
+        if (c >= 'A' && c <= 'Z') {
+            c += 0x20;
+        }
         if (c == *pMatch) {
-            if (pStart == NULL) pStart = pName;
+            if (pStart == NULL) {
+                pStart = pName;
+            }
             if (*++pMatch == 0) {
                 *pStart = 0;
                 return;
@@ -384,7 +353,9 @@ static void UStream_StripStreamExt(char* pName) {
         }
         pName++;
     }
-    if (pStart != NULL) *pStart = 0;
+    if (pStart != NULL) {
+        *pStart = 0;
+    }
 }
 
 u8* UStream_Fill(u8* pDst, u32 value, u32 uCount) {
@@ -401,10 +372,12 @@ u8* UStream_Fill(u8* pDst, u32 value, u32 uCount) {
 // The eight-at-a-time blocks read into temporaries first: that is what lets the compiler
 // hoist the loads above the stores.
 u8* UStream_Copy(u8* pDst, const u8* pSrc, u32 uCount) {
+    // port: alignment tests on the addresses; a 64-bit port needs an integer as wide as a pointer
     if (((u32)pDst & (u32)pSrc) & 1) {
         *pDst++ = *pSrc++;
         uCount--;
     }
+    // port: as above
     if ((((u32)pDst | (u32)pSrc) & 1) == 0) {
         s16* d = (s16*)pDst;
         const s16* s = (const s16*)pSrc;
@@ -428,7 +401,8 @@ u8* UStream_Copy(u8* pDst, const u8* pSrc, u32 uCount) {
         u8* d = pDst;
         while (uCount > 7) {
             {
-                u8 t0 = pSrc[0], t1 = pSrc[1], t2 = pSrc[2], t3 = pSrc[3], t4 = pSrc[4], t5 = pSrc[5], t6 = pSrc[6], t7 = pSrc[7];
+                u8 t0 = pSrc[0], t1 = pSrc[1], t2 = pSrc[2], t3 = pSrc[3];
+                u8 t4 = pSrc[4], t5 = pSrc[5], t6 = pSrc[6], t7 = pSrc[7];
                 d[0] = t0; d[1] = t1; d[2] = t2; d[3] = t3; d[4] = t4; d[5] = t5; d[6] = t6; d[7] = t7;
                 d += 8; pSrc += 8;
             }
@@ -445,7 +419,7 @@ u8* UStream_Copy(u8* pDst, const u8* pSrc, u32 uCount) {
 //   1nnn1ooo cccccccc  nnn != 0: fill (c + 3) bytes with the byte at dst - (ooo<<3 | nnn)
 //   10001lll llllllll  literal run of l bytes (l = low 11 bits)
 //   mlll dddd dddddddd  back-reference: length lll (+ next byte if 7) + 3, distance d;
-//                       m = 0 forward copy, m = 1 mirrored copy (bytes read backwards)
+//                       m clear: forward copy; m set: mirrored copy (bytes read backwards)
 void UStream_Decompress(const void* pSrc, void* pDst, u32 uSize) {
     u8* pEnd;
     u8* d = (u8*)pDst;
@@ -519,7 +493,7 @@ static void UStream_NullCallback(void) {
 // objects (through the audio module), the stream / movie tags go to their players.
 static void UStream_ParseChunks(void) {
     UStreamBuffer* pBuffer;
-    u8* pChunk;
+    UStreamChunk* pChunk;
     u32 uLen;
     u32 uTag;
     if (UStream_PumpBuffers(1) == NULL) return;
@@ -527,40 +501,44 @@ static void UStream_ParseChunks(void) {
     pBuffer = gpCurList;
     while (pBuffer != NULL) {
         while (pBuffer->uPos < USTREAM_BUFFER_SIZE) {
-            pChunk = pBuffer->data + pBuffer->uPos;
-            uTag = *(u32*)pChunk;
-            uLen = *(u32*)(pChunk + 4);
+            pChunk = (UStreamChunk*)(pBuffer->data + pBuffer->uPos);
+            uTag = pChunk->uTag;
+            uLen = pChunk->uLength;
             switch (uTag) {
             case TAG('S', 'W', 'V', 'R'):
-                *(u32*)&gSWVRName[0] = *(u32*)pChunk;
-                *(u32*)&gSWVRName[4] = *(u32*)(pChunk + 4);
-                *(u32*)&gSWVRName[8] = *(u32*)(pChunk + 8);
-                *(u32*)&gSWVRName[12] = *(u32*)(pChunk + 12);
+                *(u32*)&gSWVRName[0] = ((u32*)pChunk)[0];
+                *(u32*)&gSWVRName[4] = ((u32*)pChunk)[1];
+                *(u32*)&gSWVRName[8] = ((u32*)pChunk)[2];
+                *(u32*)&gSWVRName[12] = ((u32*)pChunk)[3];
                 *(u32*)&gSWVRName[16] = 0;
                 UStream_StripStreamExt(gSWVRName);
                 break;
             case TAG('S', 'H', 'O', 'C'):
-                if (*(u32*)(pChunk + 0x10) == TAG('S', 'H', 'D', 'R')) {
+                if (pChunk->uSubTag == TAG('S', 'H', 'D', 'R')) {
                     if (UStream_BeginObject(&gpCurObject, pChunk) != 0) return;
-                } else if (*(u32*)(pChunk + 0x10) == TAG('S', 'D', 'A', 'T')) {
+                } else if (pChunk->uSubTag == TAG('S', 'D', 'A', 'T')) {
                     pBuffer->uPos += 0x40;
                     uLen -= 0x40;
                     if (gpCurObject != NULL) {
                         u32 uCopy = uLen;
-                        if (gCurObjectPos + uLen > gpCurObject->uSize) uCopy = gpCurObject->uSize - gCurObjectPos;
-                        Mem_cpy(gpCurObject->pData + gCurObjectPos, pChunk + 0x40, uCopy);
+                        if (gCurObjectPos + uLen > gpCurObject->uSize) {
+                            uCopy = gpCurObject->uSize - gCurObjectPos;
+                        }
+                        Mem_cpy(gpCurObject->pData + gCurObjectPos, (u8*)(pChunk + 1), uCopy);
                         gCurObjectPos += uCopy;
                         if (gCurObjectPos == gpCurObject->uSize) {
                             UStream_FinishObject(gpCurObject);
                             gpCurObject = NULL;
                         }
                     }
-                } else if (*(u32*)(pChunk + 0x10) == TAG('R', 'd', 'a', 't')) {
+                } else if (pChunk->uSubTag == TAG('R', 'd', 'a', 't')) {
                     pBuffer->uPos += 0x40;
                     uLen -= 0x40;
                     if (gpCurObject != NULL) {
-                        u32 uUnpacked = *(u32*)(pChunk + 0x40);
-                        UStream_Decompress(pChunk + 0x44, gpCurObject->pData + gCurObjectPos, uUnpacked);
+                        // the piece's unpacked size, then the packed bytes
+                        u32 uUnpacked = *(u32*)(pChunk + 1);
+                        UStream_Decompress((u32*)(pChunk + 1) + 1, gpCurObject->pData + gCurObjectPos,
+                                           uUnpacked);
                         gCurObjectPos += uUnpacked;
                         if (gCurObjectPos == gpCurObject->uSize) {
                             UStream_FinishObject(gpCurObject);
@@ -578,48 +556,57 @@ static void UStream_ParseChunks(void) {
                 fn_800A8AD4(pChunk);
                 break;
             case TAG('S', 'O', 'N', 'O'):
-                if (*(u32*)(pChunk + 0x10) == TAG('S', 'H', 'D', 'R')) {
-                    u32 uKind = *(u32*)(pChunk + 0x18);
+                if (pChunk->uSubTag == TAG('S', 'H', 'D', 'R')) {
+                    u32 uKind = pChunk->uType;
                     if (uKind == TAG('s', 'h', 'd', 'r')) {
-                        if (*(u32*)(pChunk + 0x1C) == 2) gSoundHeader[0] = (u32)fn_800A9374(*(u32*)(pChunk + 0x20));
-                        else gSoundHeader[0] = (u32)fn_800A8FB4(*(u32*)(pChunk + 0x20));
+                        if (pChunk->uHash == 2) {
+                            gSoundHeader.pDst = fn_800A9374(pChunk->uSize);
+                        } else {
+                            gSoundHeader.pDst = fn_800A8FB4(pChunk->uSize);
+                        }
                     } else if (uKind == TAG('s', 'a', 'm', 'p')) {
-                        gSoundHeader[0] = (u32)fn_800A925C(*(u32*)(pChunk + 0x20), *(u32*)(pChunk + 0x1C));
+                        gSoundHeader.pDst = fn_800A925C(pChunk->uSize, pChunk->uHash);
                     } else {
-                        gSoundHeader[0] = 0;
+                        gSoundHeader.pDst = NULL;
                     }
-                    gSoundHeader[1] = *(u32*)(pChunk + 0x20);
-                    gSoundHeader[2] = 0;
-                    gSoundHeader[3] = *(u32*)(pChunk + 0x18);
-                    gSoundHeader[4] = *(u32*)(pChunk + 0x1C);
-                } else if (*(u32*)(pChunk + 0x10) == TAG('S', 'D', 'A', 'T')) {
+                    gSoundHeader.uSize = pChunk->uSize;
+                    gSoundHeader.uPos = 0;
+                    gSoundHeader.uKind = pChunk->uType;
+                    gSoundHeader.uMemory = pChunk->uHash;
+                } else if (pChunk->uSubTag == TAG('S', 'D', 'A', 'T')) {
                     u32 uCopy = uLen - 0x40;
-                    if (gSoundHeader[0] != 0) {
-                        u8* pDst = (u8*)gSoundHeader[0] + gSoundHeader[2];
-                        if (gSoundHeader[2] + uCopy > gSoundHeader[1]) uCopy = gSoundHeader[1] - gSoundHeader[2];
-                        if (gSoundHeader[3] == TAG('s', 'h', 'd', 'r')) {
-                            Mem_cpy(pDst, pChunk + 0x40, uCopy);
-                        } else if (gSoundHeader[3] == TAG('s', 'a', 'm', 'p')) {
-                            fn_800B044C(pDst, pChunk + 0x40, uCopy, UStream_NullCallback, 0);
+                    if (gSoundHeader.pDst != NULL) {
+                        u8* pDst = gSoundHeader.pDst + gSoundHeader.uPos;
+                        if (gSoundHeader.uPos + uCopy > gSoundHeader.uSize) {
+                            uCopy = gSoundHeader.uSize - gSoundHeader.uPos;
+                        }
+                        if (gSoundHeader.uKind == TAG('s', 'h', 'd', 'r')) {
+                            Mem_cpy(pDst, (u8*)(pChunk + 1), uCopy);
+                        } else if (gSoundHeader.uKind == TAG('s', 'a', 'm', 'p')) {
+                            fn_800B044C(pDst, (u8*)(pChunk + 1), uCopy, UStream_NullCallback, 0);
                         }
                     }
-                    gSoundHeader[2] += uCopy;
-                    if (gSoundHeader[2] >= gSoundHeader[1]) {
-                        if (gSoundHeader[3] == TAG('s', 'h', 'd', 'r')) {
-                            if (gSoundHeader[4] == 2) fn_800A93AC();
-                            else fn_800A8FFC();
-                        } else if (gSoundHeader[3] == TAG('s', 'a', 'm', 'p')) {
-                            fn_800A929C(gSoundHeader[4]);
+                    gSoundHeader.uPos += uCopy;
+                    if (gSoundHeader.uPos >= gSoundHeader.uSize) {
+                        if (gSoundHeader.uKind == TAG('s', 'h', 'd', 'r')) {
+                            if (gSoundHeader.uMemory == 2) {
+                                fn_800A93AC();
+                            } else {
+                                fn_800A8FFC();
+                            }
+                        } else if (gSoundHeader.uKind == TAG('s', 'a', 'm', 'p')) {
+                            fn_800A929C(gSoundHeader.uMemory);
                         }
-                        gSoundHeader[1] = 0;
-                        gSoundHeader[2] = 0;
-                        gSoundHeader[3] = 0;
-                        gSoundHeader[0] = 0;
+                        gSoundHeader.uSize = 0;
+                        gSoundHeader.uPos = 0;
+                        gSoundHeader.uKind = 0;
+                        gSoundHeader.pDst = NULL;
                     }
                 }
                 break;
             case TAG('M', 'P', 'G', '2'):
                 pBuffer->nRefs++;
+                // port: the movie player gets its buffer through the chunk's first word (a 32-bit pointer)
                 *(UStreamBuffer**)pChunk = pBuffer;
                 fn_8007593C(pChunk);
                 break;
@@ -672,10 +659,14 @@ static UStreamObject* UStream_NextObject(u8 bParse) {
     UStream* pStream;
     UStreamNode* pNode;
     UStreamObject* pObject;
-    if (bParse) UStream_ParseChunks();
+    if (bParse) {
+        UStream_ParseChunks();
+    }
     if (gnCurStream == -1) return NULL;
     pStream = &gStreams[gnCurStream];
-    if (gpCurList == NULL && bParse) UStream_ParseChunks();
+    if (gpCurList == NULL && bParse) {
+        UStream_ParseChunks();
+    }
     if (gpCurList == NULL) {
         if (UStream_PumpBuffers(1) == NULL && pStream->bEOF) {
             if (pStream->nFileIndex + 1 < pStream->params.nNumFiles) {
@@ -716,7 +707,8 @@ int UStream_Update(void) {
         if (gnCurStream == -1) return 0;
         pStream = &gStreams[gnCurStream];
         fn_800A4BDC();
-        if (pStream->bEOF && !gbReadPending && gReadyRing[gReadyRingTail] == NULL && gpCurList == NULL && gpUsedList == NULL) {
+        if (pStream->bEOF && !gbReadPending && gReadyRing[gReadyRingTail] == NULL && gpCurList == NULL
+            && gpUsedList == NULL) {
             return 0;
         }
         return 1;
@@ -727,13 +719,17 @@ int UStream_Update(void) {
             pObject->pNext->pPrev = pObject->pPrev;
         } else {
             gpQueueHead = pObject->pPrev;
-            if (gpQueueHead != NULL) gpQueueHead->pNext = NULL;
+            if (gpQueueHead != NULL) {
+                gpQueueHead->pNext = NULL;
+            }
         }
         if (pObject->pPrev != NULL) {
             pObject->pPrev->pNext = pObject->pNext;
         } else {
             gpQueueTail = pObject->pNext;
-            if (gpQueueTail != NULL) gpQueueTail->pPrev = NULL;
+            if (gpQueueTail != NULL) {
+                gpQueueTail->pPrev = NULL;
+            }
         }
         pObject->uRef28 += gRPNSBase;
         pObject->uRef2C += gRPNSBase;
@@ -744,7 +740,8 @@ int UStream_Update(void) {
                 if (pOld != NULL) {
                     if (pOld->uSize == pObject->uSize && fn_80005BC8(pObject->pData, pOld->pData) == 0) {
                         fn_80009E70(pObject);
-                        goto next;
+                        goto next;  // fake match: the original branches straight to the loop's step;
+                                    // advancing and continuing here scores 85.3% against 87.1%
                     }
                     fn_8000B588(pOld);
                 }
@@ -797,7 +794,9 @@ void UStream_ReleaseObjectBuffer(UStreamBuffer** ppBuffer) {
 // Stop the current stream at the end of what has been read. Returns whether a read is pending.
 int UStream_Stop(void) {
     s32 nStream = gnCurStream;
-    if (nStream < 0) nStream = 0;
+    if (nStream < 0) {
+        nStream = 0;
+    }
     gStreams[nStream].bEOF = 1;
     return gbReadPending != 0;
 }
