@@ -343,11 +343,8 @@ unsorted/sweep_8006FFD4.c:
 unsorted/sweep_80070168.c:
 	.text       start:0x80070168 end:0x8007018C
 
-unsorted/sweep_80070348.c:
-	.text       start:0x80070348 end:0x800703B8
-
-unsorted/sweep_80070B50.c:
-	.text       start:0x80070B50 end:0x80070B74
+DynamicRenderingBuffer.c:
+	.text       start:0x8007018C end:0x80070B74
 
 unsorted/sweep_80070B74.c:
 	.text       start:0x80070B74 end:0x80070B78
