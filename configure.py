@@ -618,7 +618,7 @@ config.libs = [
         "progress_category": "sdk",
         "src_dir": "extern/sdk",
         "objects": [
-            Object(NonMatching, "dolphin/ai.c"),
+            Object(Matching, "dolphin/ai.c"),
         ],
     },
     {

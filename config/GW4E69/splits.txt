@@ -4814,6 +4814,9 @@ src/dolphin/pad/Pad.c:
 
 dolphin/ai.c:
 	.text       start:0x80150658 end:0x80150F24
+	.data       start:0x8019C398 end:0x8019C3E0
+	.sdata      start:0x80281AF8 end:0x80281B00
+	.sbss       start:0x80282980 end:0x802829C0
 
 unsorted/sweep_80150F24.c:
 	.text       start:0x80150F24 end:0x80150F2C
