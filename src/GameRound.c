@@ -578,10 +578,11 @@ int fn_800E17AC(int nPlayer) {
 // Strokes against par over the holes played so far (and the current one, when asked and the
 // ball is in the hole).
 int fn_800E184C(int nPlayer, u8 bCurrent) {
-    int nPar = 0;
+    int nPar;
     int nStrokes = 0;
     int i;
     int nEnd = gpGame->nCurHole;
+    nPar = 0;
     if (bCurrent && gPlayers[nPlayer].nLie == LIE_HOLED && nEnd < 18) {
         nEnd++;
     }

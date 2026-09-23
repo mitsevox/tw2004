@@ -1008,10 +1008,10 @@ void GM_GolferConcede_Hole(int nPlayer) {
     int     n;
     fn_800E3D38(nPlayer, 0);
     p = &gPlayers[nPlayer];
-    p->nLie = LIE_HOLED;
-    p->nStrokes[gpGame->nCurHole] = 999;
+    gPlayers[nPlayer].nLie = LIE_HOLED;
+    gPlayers[nPlayer].nStrokes[gpGame->nCurHole] = 999;
     p->nPutts[gpGame->nCurHole] = 999;
-    *(s32*)(p->ball + 0x64) = 0;
+    *(s32*)(gPlayers[nPlayer].ball + 0x64) = 0;
     if (Game_GetMode() != 0x12) {
         nPlayers = gNumPlayersSetUp;
         n = 0;
@@ -1376,9 +1376,11 @@ typedef struct SaveSlot {
 // TW06: GM_SetupCustomHoleSelection. Loads a saved custom round (slot nSaveSlot, record
 // nSaveCourse) into the round's hole list.
 void GM_SetupCustomHoleSelection(void) {
-    int i;
+    int       i;
+    SaveSlot* pSave;
     for (i = 0; i < 18; i++) {
-        gpGame->nHoleNum[i] = ((SaveSlot*)gpSaveData)[gpGame->nSaveSlot].round[gpGame->nSaveCourse].nHoleNum[i];
+        pSave = (SaveSlot*)gpSaveData;
+        gpGame->nHoleNum[i] = pSave[gpGame->nSaveSlot].round[gpGame->nSaveCourse].nHoleNum[i];
         gpGame->nHoleCourse[i] = ((SaveSlot*)gpSaveData)[gpGame->nSaveSlot].round[gpGame->nSaveCourse].nCourse[i];
     }
 }
