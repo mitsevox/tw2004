@@ -127,6 +127,9 @@ LAYOUT_ASSERT(UISCurrent, 0x14);
 typedef union UISEventData {
     u32 au[4];
     u16 aw[8];
+    s16 as[8];                      // events 5 and 6: an ID in as[0], a done flag in as[1]
+    void* ap[4];                    // events 5 and 6 carry pointers in words 1 and 2
+                                    // port: the event stack holds pointers in 32-bit words
 } UISEventData;
 
 // An event on the studio's event stack (0x24 bytes). Its type is the stack's top word; its
@@ -238,6 +241,7 @@ LAYOUT_ASSERT(UIStudio, 0xBC);
 
 // UISEvent.c
 void fn_80165528(UIStudio* pStudio, u8 b);
+s32* fn_80165670(UIStudio* pStudio, s32* pTop, s32** ppKeep);
 s32 fn_80165ACC(UIStudio* pStudio, u16 uGroup, u16 uScreen);
 void fn_80165B90(s16 nA, s16 nB, UIStudio* pStudio, s32 nType, const UISEventData* pData, s32 nArgs,
                  const s32* pArgs);
@@ -252,6 +256,8 @@ u32 fn_8016604C(UIStudio* pStudio, u32 u18, u32 uId);
 // UIStudio.c
 // Runs a screen's script from pFrame (a bytecode interpreter).
 s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, UISNodeDesc* pDesc);
+void fn_801686F8(UIStudio* pStudio, u8 bOn, u16 uGroup, u16 uScreen);
+void fn_80168918(UIStudio* pStudio, u8 bOn, s16 nId, UISNodeDesc* pDesc, s32* p, u16 uScreen, u16 uGroup);
 void fn_80168B80(UIStudio* pStudio, u32 uEvent);
 
 // UISApi.c
@@ -288,6 +294,7 @@ void fn_8016A830(UIStudio* pStudio, s32 nOp, UISScreen* pScreen, s32 nNode);
 void fn_8016AEEC(UIStudio* pStudio, UISScreen* pScreen, s32 nNode, s32 n);
 void fn_8016B09C(UIStudio* pStudio, u32 uEvent, s32 nArgs, const s32* pArgs);
 void fn_8016B0F8(UIStudio* pStudio, u32 uEvent, s32 nArgs, const s32* pArgs);
+void fn_8016B4D4(UIStudio* pStudio, u16 uGroup, u16 uScreen, u32 u);
 void fn_8016C15C(f32 f1, f32 f2, f32 f3, f32 f4);
 void fn_8016C174(f32 f1, f32 f2, f32 f3, f32 f4);
 f32* fn_8016C18C(void);
