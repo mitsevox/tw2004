@@ -44,20 +44,15 @@ f32 lbl_80192880[15] = {
     1.1f, 1.1f, 1.0f, 1.0f, 1.0f, 1.1f, 1.2f, 1.3f, 1.0f, 1.3f, 1.4f, 1.4f, 1.3f, 1.0f, 1.0f,
 };
 
-void  Vec_Copy(f32* pSrc, f32* pDst);
 f32   Vec_Distance(f32* pA, f32* pB);
-CourseInfo* fn_8000C594(void);
 int   fn_8001D324(int n);
 void  Character_SetPosition(int nHandle, f32* pPos, int a);
-void  AI_DefaultTarget(int nPlayer);
 void  Shot_Prepare(int nPlayer, u8 bNotify);
 void  fn_8001C804(int nPlayer, int a, int b);
 void  fn_800957D8(int nHandle);
 void  fn_80095744(int nHandle, int nAnim);
 void  fn_80062C38(void);
-u32   Rand_Next(int nStream);
 void  fn_800A631C(void);
-int   fn_80015464(void);
 void  fn_800A7664();
 s32   fn_800F7DE8();
 s32   fn_800F3828();
