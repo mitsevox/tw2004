@@ -5,7 +5,6 @@
 #include "golfer.h"
 #include "camera.h"
 
-int  fn_8001707C(int nView);           // the player a view belongs to
 u8   fn_800C72DC(View* pView);
 u8   fn_80063608(int nPlayer, f32* pPos, f32 fMargin);
 u8   fn_800637C4(int nPlayer, int nView);
@@ -219,8 +218,8 @@ void fn_800642A4(View* pView, f32 f174, f32 f178) {
     pView->f178 = f178;
 }
 
-void fn_800642B0(void) {
-    fn_800C6CB0();
+u8 fn_800642B0(void) {
+    return fn_800C6CB0();
 }
 
 // Blends the view's script into its current shot.

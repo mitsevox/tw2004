@@ -1,4 +1,5 @@
 #include <ansi_files.h>
+#include <critical_regions.h>
 #include <errno.h>
 
 inline fpos_t _ftell(FILE* file) {
@@ -27,7 +28,9 @@ inline fpos_t _ftell(FILE* file) {
 long ftell(FILE* file) {
   long retval;
 
+  __begin_critical_region(files_access);
   retval = (long)_ftell(file);
+  __end_critical_region(files_access);
 
   return retval;
 }
@@ -95,8 +98,9 @@ int fseek(FILE * file, long offset, int mode)
 		int retval;		
 		
 		
+		__begin_critical_region(files_access);
 		retval = _fseek(file, real_offset, mode);
-
+		__end_critical_region(files_access);
 
 		return(retval);
 }

@@ -446,7 +446,7 @@ s32 fn_8009F6A0(s32 nPort, s32 nSlot) {
 }
 
 // Whether the card in this port had an I/O error.
-u8 fn_8009F728(int nPort) {
+s32 fn_8009F728(int nPort) {
     return lbl_80281FD0[nPort];
 }
 

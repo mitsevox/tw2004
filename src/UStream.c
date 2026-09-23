@@ -58,7 +58,6 @@ int gnNumHandlers = -1;           // 0x80280DB8 (.sdata): -1 until UStream_Init
 
 // ---- other files' functions -----------------------------------------------------------
 
-int   fn_80005BC8(const void* pA, const void* pB);           // string/name compare
 void  fn_8000B4B8(UStreamObject* p);
 u8    fn_8000B508(UStreamObject* p);
 void  fn_8000B588(UStreamObject* p);
@@ -738,7 +737,8 @@ int UStream_Update(void) {
             if (fn_8000B508(pObject)) {
                 UStreamObject* pOld = fn_8000B70C(pObject->uType, pObject->uId);
                 if (pOld != NULL) {
-                    if (pObject->uSize == pOld->uSize && fn_80005BC8(pObject->pData, pOld->pData) == 0) {
+                    if (pObject->uSize == pOld->uSize
+                        && fn_80005BC8(pObject->pData, pOld->pData, pObject->uSize) == 0) {
                         fn_80009E70(pObject);
                         break;
                     }
@@ -976,5 +976,17 @@ void UStream_Init(void) {
     gnNumHandlers = 0;
     for (i = 0; i < USTREAM_MAX_HANDLERS; i++) {
         gHandlers[i].nRefs = 0;
+    }
+}
+
+// Clears the per-file callbacks of a stream's open parameters.
+void fn_8000E708(UStreamParams* p) {
+    int i;
+
+    for (i = 0; i < USTREAM_MAX_FILES; i++) {
+        p->apfnOpened[i] = NULL;
+        p->apfnClosed[i] = NULL;
+        p->apOpenedArg[i] = NULL;
+        p->apOpenedArg[i] = NULL;   // EA bug: clears apOpenedArg twice; apClosedArg is never cleared
     }
 }

@@ -50,7 +50,6 @@ void  fn_8010C4A0(void);
 void  fn_80125E68(void);
 
 u8    fn_800E3AF8(void);
-void  fn_80057364(int a);
 
 // Four floats: pOut gets pA minus pB.
 #ifdef __MWERKS__

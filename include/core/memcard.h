@@ -78,6 +78,18 @@ typedef struct MCCardPos {
 } MCCardPos;
 LAYOUT_ASSERT(MCCardPos, 0xC);
 
+// The memory-card screens' operations (lbl_8018C7D8): four sets of five, one set per kind of save
+// (fn_80084FF0 picks one; set 0 is the game's save, starting with fn_8009FE90 and fn_8009FCFC; set 3
+// is the EA Sports Bio's). apfn[4] gives the save's size on the card (startUp.c). The menus'
+// messages call them through fn_80084FB4 and its neighbours with the card they picked.
+typedef s32 (*MCOp)(MCCardPos* pPos);
+typedef struct MCOpSet {
+    MCOp apfn[5];               // 0x00
+} MCOpSet;
+LAYOUT_ASSERT(MCOpSet, 0x14);
+
+extern MCOpSet lbl_8018C7D8[4];
+
 // The save file's names on the card: EA kept the PlayStation 2 names (SLUS-20757 is the PS2
 // release), the second a backup copy.
 #define MC_FILE_NAME    "BASLUS-20757"
@@ -190,13 +202,27 @@ void fn_8009E544(char* pGameName, char* pComment, u8* pIcon, u8* pBanner);
 // Write a file. pBackupName (the PS2's backup copy) is not used here.
 s32  fn_8009E604(s32 nPort, s32 nSlot, const char* pName, void* pBuf, s32 nLen,
                  const char* pBackupName);
+s32  fn_8009E758(s32 nPort, s32 nSlot, const char* pName);
 s32  fn_8009E918(s32 nPort, s32 nSlot);     // format the card
 void fn_8009EA98(void);
 void fn_8009EAF0(void);
 s32  fn_8009EE28(s32 nPort, s32 nSlot);
 u32  fn_8009EF90(void);
 void fn_8009F02C(void);             // bring the images back from ARAM (fn_8009EF98 parks them)
-s32  fn_8009F208(s32 nFile, void* pBuf, s32 nLen, s32 arg3);  // read on from the last read
+// Up to nMax names of the card's files whose name holds pPattern, into apName; how many in pnFound.
+s32  fn_8009F0F0(s32 nPort, s32 nSlot, const char* pPattern, char** apName, s32 nMax, s32* pnFound);
+// Read from open file nFile, on from the last read. arg3 is not used (TibExt passes 0).
+s32  fn_8009F208(s32 nFile, void* pBuf, s32 nLen, s32 arg3);
+s32  fn_8009F258(s32 nFile, void* pBuf, s32 nLen);          // write to open file nFile
+s32  fn_8009F2D8(s32 nFile, s32 nOffset, u8 bFromStart);    // move open file nFile's position
+s32  fn_8009F35C(void);             // always 0
+s32  fn_8009F364(void);             // always 0
+s32  fn_8009F36C(s32 nPort, s32 nSlot, s32* pnFreeBytes);   // the card's free space
+// The card's free directory entries. pName is not used.
+s32  fn_8009F3A0(s32 nPort, s32 nSlot, const char* pName, s32* pnFreeFiles);
+// Open pName, its file number into pnFile.
+s32  fn_8009F3D4(s32 nPort, s32 nSlot, const char* pName, u32 uFlags, s32* pnFile);
+s32  fn_8009F488(s32 nFile);        // close open file nFile
 // Create pName with nLen bytes, but only when it is the save directory's name (the PS2's mkdir).
 s32  fn_8009F514(s32 nPort, s32 nSlot, const char* pName, s32 nLen);
 s32  fn_8009F5E4(s32 nPort, s32 nSlot, const char* pName);    // delete the save file
@@ -207,6 +233,7 @@ s32  fn_8009F6A0(s32 nPort, s32 nSlot);
 // The card's state as an error code: -4 no card, -1 when uFlags bit 0x08 is clear (a mount sets it,
 // a format in progress or an encoding error clears it), -35 not mounted, else 0.
 s32  fn_8009F734(s32 nPort, s32 nSlot);
+s32  fn_8009F728(int nPort);        // lbl_80281FD0[nPort] (the menus read it as a whole word)
 u8   fn_8009F7E8(int nPort);        // lbl_80282008[nPort]
 void fn_8009F7F4(MCCardState* pState, int nPort, int nSlot);   // copy out lbl_801F1510[nPort][nSlot]
 MCCardState* fn_8009F834(s32 nPort, s32 nSlot);                 // &lbl_801F1510[nPort][nSlot]
@@ -220,6 +247,8 @@ s32  fn_800A0A7C(s32 nPort, s32 nSlot);
 void fn_800A1BE0(void);
 void fn_800A1D4C(UStreamObject* pObject);  // the 'eagm' handler
 s32  fn_800A2100(s32 nPort, s32 nSlot);
+s32  fn_800A218C(s32 nPort, s32 nSlot);    // always MC_ERR_NOFILE
+s32  fn_800A2194(s32 nPort, s32 nSlot);
 
 // ---- the save file's checksum (0x800A233C) -------------------------------------------------------
 

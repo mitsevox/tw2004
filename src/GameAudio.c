@@ -1,4 +1,14 @@
+// GameAudio.c (our name): the game's side of the sound engine. fn_800A3E3C starts the engine
+// (memory stack, ARAM, sound table, movie sound, banks) one step after another; the rest drives
+// the sound emitters (hlaudemitter.c's fn_800AD*) from the game: the course, the game mode and the
+// pin set. Its extent is proven by its data: every section starts and ends on 8-byte boundaries
+// shared with no other file (.rodata 0x80183AD8-0x80183B08, .data 0x8018E988-0x8018EB30,
+// .bss 0x801F1708-0x801F17D0, .sdata 0x80281418-0x80281460, .sbss 0x80282010-0x80282058,
+// .sdata2 0x80283F48-0x80283F88), and all its functions share those globals.
+
 #include "game_types.h"
+
+// ---- sweep code (not yet cleaned up) ----
 
 u8 fn_800A3FF4(void);
 u8 fn_800A7AF0();
@@ -536,3 +546,5 @@ void fn_800A7A98(s32 p0) {
 void fn_800A7AD0(void) {
     fn_800A94F4();
 }
+
+// ---- end of sweep code ----
