@@ -4,7 +4,7 @@
 
 extern u8 lbl_802690C0[];
 
-u8* fn_80137C2C(void);
-u8* fn_80137C2C(void) {
+u8* __AXGetPBs(void);
+u8* __AXGetPBs(void) {
     return lbl_802690C0;
 }

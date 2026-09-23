@@ -987,7 +987,6 @@ u32 AnimLib_PlanBank(u32 nSlot) {
     int         m;
     AnimLib*    pOvLib;
     AnimLib*    pOther;
-    LibOverlay* pp;
     ClipRecord* pRec;
     ClipRecord* pRecO;
     s32         nLeft;
@@ -1051,7 +1050,6 @@ u32 AnimLib_PlanBank(u32 nSlot) {
                 nBytes += pRec->n14;
                 k      = -1;
                 pOther = pLib;
-                pp     = pOvs - 1;
                 do {
                     if (pOther != NULL) {
                         for (m = 0; m < pOther->nRecords; m++) {
@@ -1075,12 +1073,11 @@ u32 AnimLib_PlanBank(u32 nSlot) {
                         }
                     }
                     k++;
-                    pOther = (++pp)->pWork;
+                    pOther = pOvs[k].pWork;
                 } while (k < i);
             } else if (pRec->n12 & 4) {
                 k      = -1;
                 pOther = pLib;
-                pp     = pOvs - 1;
                 do {
                     if (pOther != NULL) {
                         for (m = 0; m < pOther->nRecords; m++) {
@@ -1096,7 +1093,7 @@ u32 AnimLib_PlanBank(u32 nSlot) {
                         }
                     }
                     k++;
-                    pOther = (++pp)->pWork;
+                    pOther = pOvs[k].pWork;
                 } while (k < i);
             } else {
                 nLeft--;
