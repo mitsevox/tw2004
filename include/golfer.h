@@ -394,7 +394,7 @@ typedef struct GameState {
     void (*pfn24C)(int nPlayer); // 0x24C  called when a swing leaves state 20
     void (*pfn250)(int nPlayer); // 0x250  the ball went out of bounds
     void (*pfn254)(int nPlayer); // 0x254  a mulligan was taken
-    void (*pfn258)(int nPlayer); // 0x258
+    u8   (*pfn258)(int nPlayer); // 0x258  the re-plan button is allowed
     u8   unk25C[0x264 - 0x25C];
     u8   (*pfn264)(int nPlayer); // 0x264  "aim at the pin?" for a re-plan
     u8   unk268[0x270 - 0x268];

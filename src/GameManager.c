@@ -159,6 +159,21 @@ void  fn_8006C300(int nPlayer);
 
 extern Vec4 lbl_80184D30;
 
+void  Shot_Prepare(int nPlayer, u8 bNotify);
+void  BreakLine_Start(int nView);            // GoBreakLine.c
+void  fn_8009B970(int nView);
+void  fn_8001C804(int nPlayer, int a, int b);
+void  fn_80095744(int nHandle, int nAnim);   // play an animation
+void  fn_800689D4(int nPlayer);
+void  fn_80062C38(void);
+void  fn_800C4E80(void* pView, int nPlayer);
+u8    fn_800DFFF8(int nPlayer);
+u8    fn_800E0200(int nPlayer);
+u8    fn_800E012C(int nPlayer);
+u8    fn_800DFF0C(int nPlayer);
+u8    fn_80068AC8(int nPlayer);
+void  Emotion_UpdatePlayerEmotion(int nPlayer);
+
 extern u8  lbl_80202898[];
 extern s32 lbl_80282278;
 extern u8  lbl_8028227C;
@@ -860,6 +875,80 @@ void GM_MovePlayerToBall(int nPlayer) {
             }
         }
         gPlayers[nPlayer].fBallY = f;
+    }
+}
+
+// TW06: GM_CheckForShotChanges. A human's buttons while setting up: three camera/aim buttons
+// (9, 10, 30; not in modes 22 and 26), then the aiming cameras - zoom, elevator - or the mode's
+// re-plan button 47 (a fresh default target and shot), the green camera, or the mid-hole flyover
+// (unless cameras are skipped). Buttons 11-14 are taunts/reactions (events 0x12-0x15); any of it
+// updates the golfer's emotion.
+void GM_CheckForShotChanges(int nPlayer) {
+    u8 bChanged = 0;
+    if (Player_IsCPU(nPlayer)) {
+        return;
+    }
+    if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_GREEN_MORPH) {
+        if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(9, 0)) {
+            if (Game_GetMode() == 0x1A || Game_GetMode() == 0x16) return;
+            EVENT_Trigger(nPlayer, 0xD, 0, -1);
+            fn_800E3D38(nPlayer, 1);
+            bChanged = 1;
+        } else if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(10, 0)) {
+            if (Game_GetMode() == 0x1A || Game_GetMode() == 0x16) return;
+            EVENT_Trigger(nPlayer, 0xE, 0, -1);
+            fn_800E3D38(nPlayer, 1);
+            bChanged = 1;
+        } else if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x1E, 0)) {
+            if (Game_GetMode() == 0x1A || Game_GetMode() == 0x16) return;
+            EVENT_Trigger(nPlayer, 0xF, 0, -1);
+            fn_800E3D38(nPlayer, 1);
+            bChanged = 1;
+        }
+        if (fn_800DFFF8(nPlayer)) {
+            GOLFERSTATE_Push(GS_ZOOM, nPlayer);
+        } else if (!gpGame->b28D && fn_800E0200(nPlayer)) {
+            GOLFERSTATE_Push(GS_ELEVATOR, nPlayer);
+        } else if (gpGame->b28D && (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x2F, 0))) {
+            if (gpGame->pfn258(nPlayer)) {
+                AI_DefaultTarget(nPlayer);
+                Shot_Prepare(nPlayer, 1);
+                BreakLine_Start(gPlayers[nPlayer].nView0);
+                fn_8009B970(gPlayers[nPlayer].nView0);
+                fn_8001C804(nPlayer, 1, 1);
+                fn_800957D8(gPlayers[nPlayer].nShotHandle);
+                fn_80095744(gPlayers[nPlayer].nShotHandle, 5);
+                fn_800689D4(nPlayer);
+                fn_80062C38();
+                fn_800E3D38(nPlayer, 1);
+            }
+        } else if (!gpGame->b28D && fn_800E012C(nPlayer)) {
+            fn_800C4E80(fn_80017028(gPlayers[nPlayer].nView0), nPlayer);
+        } else if (fn_800DFF0C(nPlayer)) {
+            if (SESSION_OPTIONS->bSkipCameras) return;
+            if (fn_8008AC40()) return;
+            GOLFERSTATE_Push(GS_MID_HOLE_FLY_BY, nPlayer);
+        }
+    }
+    if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0xB, 1)) {
+        EVENT_Trigger(nPlayer, 0x12, 0, -1);
+        bChanged = 1;
+    } else if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0xC, 1)) {
+        EVENT_Trigger(nPlayer, 0x13, 0, -1);
+        bChanged = 1;
+    }
+    if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0xD, 1)) {
+        EVENT_Trigger(nPlayer, 0x14, 0, -1);
+        bChanged = 1;
+    } else if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0xE, 1)) {
+        EVENT_Trigger(nPlayer, 0x15, 0, -1);
+        bChanged = 1;
+    }
+    if (fn_80068AC8(nPlayer)) {
+        bChanged = 1;
+    }
+    if (bChanged) {
+        Emotion_UpdatePlayerEmotion(nPlayer);
     }
 }
 
