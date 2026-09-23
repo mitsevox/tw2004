@@ -362,12 +362,10 @@ int fn_8005CC5C(void) {
     return lbl_802823FC;
 }
 
-extern u8 lbl_801B8980[0x118];
-
 void fn_8005CC64(int a, int b) {
-    *(int*)(lbl_801B8980 + 0x100) = a;
-    *(int*)(lbl_801B8980 + 0x104) = b;
-    *(u32*)(lbl_801B8980 + 0x114) |= 1;
+    lbl_801B8980.n100 = a;
+    lbl_801B8980.n104 = b;
+    lbl_801B8980.uFlags |= 1;
 }
 
 double atan(double x);
@@ -394,7 +392,7 @@ f32 Swing_ComputePower(int nPlayer) {
             fPower *= 1.05f;
             if (fPower < 0.1f) fPower = 0.1f;
         }
-        goto clamp;
+        goto clamp;         // fake match: the shared clamp as a jump (without the gotos: 83.9%, not 84.9%)
     }
     p      = &gPlayers[nPlayer];
     fPower = p->fPower;
@@ -408,7 +406,7 @@ f32 Swing_ComputePower(int nPlayer) {
         fPower = *pPower * fn_80050D34(fDist);
         Golfer_GetAttribute(p, ATTR_PUTTING, ATTR_TOTAL);
         if (fPower < 0.1f) fPower = 0.1f;
-        goto clamp;
+        goto clamp;         // fake match: the shared clamp as a jump (without the gotos: 83.9%, not 84.9%)
     }
     case SHOT_CHIP:
     case SHOT_PITCH: {
@@ -419,7 +417,7 @@ f32 Swing_ComputePower(int nPlayer) {
         fPower = Swing_ApplyPowerBoost(nPlayer, f);
         Golfer_GetAttribute(p, ATTR_APPROACH, ATTR_TOTAL);
         if (fPower < 0.1f) fPower = 0.1f;
-        goto clamp;
+        goto clamp;         // fake match: the shared clamp as a jump (without the gotos: 83.9%, not 84.9%)
     }
     case 5:
     case 6:
@@ -492,6 +490,7 @@ void Swing_Launch(int nPlayer) {
     p = &gPlayers[nPlayer];
     if (Game_GetMode() == 10) {
         fn_8000B1D4(0, gReplayData.nSeed);
+        // port: 0x630 of the swing data's 0x634 bytes (it holds no pointers)
         Mem_cpy(&gPlayers[0].swing, &gReplayData.player.swing, 0x630);
     } else if (gSession.bReplay == 0) {
         Luck_TakePerfectShot(nPlayer);
@@ -1638,7 +1637,7 @@ void fn_8005A0FC(int nPlayer) {
             fn_8001EF34(v8, fLen, v8);
             Vec_Add(v8, v28, v8);
             for (k = 24; k > 0; k--) {
-                Mem_cpy(&pSw->prevClub[k], &pSw->prevClub[k - 1], 0x20);
+                Mem_cpy(&pSw->prevClub[k], &pSw->prevClub[k - 1], sizeof(pSw->prevClub[k]));
             }
             Vec_Copy(v8, pSw->prevClub[0].vClubPos);
             pSw->prevClub[0].vClubPos[3] = 1.0f;
@@ -1649,7 +1648,7 @@ void fn_8005A0FC(int nPlayer) {
         }
     } else {
         for (k = 24; k > 0; k--) {
-            Mem_cpy(&pSw->prevClub[k], &pSw->prevClub[k - 1], 0x20);
+            Mem_cpy(&pSw->prevClub[k], &pSw->prevClub[k - 1], sizeof(pSw->prevClub[k]));
         }
         Vec_Copy(vA8, pSw->prevClub[0].vClubPos);
         pSw->prevClub[0].vClubPos[3] = 1.0f;
@@ -2612,7 +2611,7 @@ void STATEFUNC_GreenWatchRollInit(int nPlayer) {
     nView = gPlayers[nPlayer].nView[0];
     View_SetCamera(fn_80017028(nView), 5, nPlayer, nView);
     pShot = (u8*)&gPlayers[nPlayer].nClub;
-    Mem_cpy(shotSaved, pShot, 0x5C);
+    Mem_cpy(shotSaved, pShot, 0x5C);   // port: the shot block, nClub..unk3AD (no pointers)
     Caddie_ApplyTip(nPlayer);
     pBall = &gPlayers[nPlayer].ball;
     Mem_cpy(&ballSaved, pBall, sizeof(Ball));
@@ -2623,7 +2622,7 @@ void STATEFUNC_GreenWatchRollInit(int nPlayer) {
     Mem_cpy(&gPlayers[nPlayer].ballBefore, pBall, sizeof(Ball));
     gPlayers[nPlayer].ballBefore.nPlayer = -1;
     Mem_cpy(pBall, &ballSaved, sizeof(Ball));
-    Mem_cpy(pShot, shotSaved, 0x5C);
+    Mem_cpy(pShot, shotSaved, 0x5C);   // port: as above
     fn_8006BF60(nPlayer);
     fn_800E3D38(nPlayer, 0);
 }
@@ -3553,7 +3552,7 @@ extern f32  gRealBallRadiusIn;               // 0x80283300  0.84: a real golf ba
 // State 18, holed out: animation 12, the golfer picks the ball out of the cup and tosses it.
 // While the ball is in the hand it follows the hand bone (kept at least a real ball's radius,
 // 0.84 in, above the ground). At the animation's event 4 the ball is thrown: a real launch of
-// the kept ball along the hand's motion, at 0.5 x 60 x 60 x 59.94 x (yards moved / 1760) - the
+// the kept ball along the hand's motion, at 0.5 x 60 x 60 x FRAME_RATE x (yards moved / 1760) - the
 // hand's speed in miles per hour, halved. Then, until event 3, the thrown ball is stepped 20
 // ticks a frame and the live ball follows it. Camera 16 over the whole thing.
 void STATEFUNC_RemoveBallUpdate(int nPlayer) {
@@ -3600,7 +3599,7 @@ void STATEFUNC_RemoveBallUpdate(int nPlayer) {
                     if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
                         fn_800BAF04(vDir, vDir);
                     }
-                    fSpeed = 60.0f * (60.0f * (59.94f * (fSpeed / 1760.0f))) * 0.5f;
+                    fSpeed = 60.0f * (60.0f * (FRAME_RATE * (fSpeed / 1760.0f))) * 0.5f;
                     fn_80062B98(*ppChar, 4);
                     gPlayers[nPlayer].ballBefore.bHoled = 0;
                     fn_80051A18(&p->ballBefore, vDir, fSpeed, pB->vPos);

@@ -45,6 +45,19 @@ double fn_8015F824(double x, double y); // pow
 f32  fn_800BB028(f32* pA, f32* pB);     // squared distance
 void vec4flt_CrossProduct(f32* pA, f32* pB, f32* pOut);   // cross product
 
+// ---- the renderer ----------------------------------------------------------------------------
+
+// The renderer's state (lbl_801B8980, 0x118 bytes); only what the game code writes.
+typedef struct RenderState {
+    u8   unk0[0x100];
+    s32  n100;                  // 0x100  } the two textures of the next draw (fn_8005CC64: the swing
+    s32  n104;                  // 0x104  } trail's)
+    u8   unk108[0x114 - 0x108];
+    u32  uFlags;                // 0x114  bit 1: n100/n104 are set
+} RenderState;
+
+extern RenderState lbl_801B8980;
+
 // ---- the file streamer (UStream.c) -----------------------------------------------------------
 
 // An object built from SHOC chunks. The header is 0x34 bytes, then the copied chunk header
