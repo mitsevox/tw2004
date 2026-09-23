@@ -26,9 +26,6 @@ void fn_80046828(s32 arg0);
 extern u8 lbl_80187B98[];
 u8* fn_800484E0(s32 p0);
 void fn_80048584(u8* p, u8 v);
-
-// ---- sweep code (not yet cleaned up) ----
-
 s32 UStream_RegisterHandler(s32, void (*)(void*), s32);
 s32 fn_8000B4B8(void*);
 u8 fn_8000B508();
@@ -59,8 +56,6 @@ void fn_80046174(void) {
     UStream_UnregisterHandler(1413828384);
     UStream_UnregisterHandler(1111575628);
 }
-
-// ---- end of sweep code ----
 
 void fn_800461A8(void) {
     s32 t0;
