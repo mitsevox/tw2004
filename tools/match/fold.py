@@ -81,6 +81,23 @@ def fail(msg):
     sys.exit(1)
 
 
+# The sweeps are deleted with `git rm` at the end, which refuses a file with uncommitted edits:
+# check that up front, before anything is merged or built.
+dirty = []
+for s in sweeps:
+    f = f'src/{s}'
+    if not (ROOT / f).exists():
+        dirty.append(f'{f}: no such file')
+    elif subprocess.run(['git', 'ls-files', '--error-unmatch', f], cwd=ROOT,
+                        capture_output=True).returncode:
+        dirty.append(f'{f}: not committed (untracked)')
+    elif subprocess.run(['git', 'diff', '--quiet', 'HEAD', '--', f], cwd=ROOT).returncode:
+        dirty.append(f'{f}: has uncommitted changes')
+if dirty:
+    print('\n'.join(dirty))
+    sys.exit('Commit the sweep files first (or undo their edits), then run fold.py again. '
+             'Nothing was changed.')
+
 folded = [n for s in sweeps for _, n in defined((ROOT / 'src' / s).read_text(encoding='utf-8'))]
 run('python configure.py')
 # Sweeps that declare one name with two types (with each other, or with the unit and its headers)
