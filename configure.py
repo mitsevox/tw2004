@@ -309,6 +309,7 @@ cflags_trk = [
     "-inline deferred",
     "-sdata 0",
     "-sdata2 0",
+    "-rostr",  # string literals go to .rodata, as in this game's TRK
 ]
 
 cflags_runtime = [
