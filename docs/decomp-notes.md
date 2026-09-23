@@ -208,6 +208,10 @@ Reading compiler output
   step that a plain `a || b` does not.
 - **[verified] Taking a parameter's address puts it on the stack at the parameter's slot**;
   copying it to a local first gives a different slot order (fn_800E4164, fn_800E53F0).
+- **[verified] `addi r0, rOff, 0x1E4; lwzx r0, rBase, r0`** (the field offset added to the player
+  offset, then an indexed load from a base that already holds `gPlayers + h*4`) comes from an
+  unsigned player index: `gPlayers[(u32)i].nModePoints[h]` (GameModeMatch `fn_800E9F90`, found by
+  the permuter as `i & 0xFFFFFFFFu`).
 - **[verified] The PLAYER(i) byte-offset form also applies to plain arrays**: EA's loops over
   `lbl_8020315C[i]` next to `gPlayers[i]` index both by byte offset
   (`*(u32*)((u8*)arr + i * sizeof(u32))`); `arr[i]` walks a pointer (GameModeBattle 800C).
