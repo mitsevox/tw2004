@@ -7,6 +7,7 @@
 
 #include "core/memcard.h"
 #include "frontend/fe.h"
+#include "core/goaram.h"
 
 void fn_8006C63C(void);         // } called around every CARD library call (not yet known)
 void fn_800A4BDC(void);         // }
@@ -373,8 +374,7 @@ u32 fn_8009EF90(void) {
 void fn_8009EF98(void) {
     if (lbl_80281FE8 != NULL) {
         lbl_80281FC0 = MC_BUFFER_SIZE + 0x20;
-        fn_800B6844(lbl_80281FE8, lbl_80281FC4, lbl_80281FC0);
-        fn_800B67EC();
+        fn_800B67EC(fn_800B6844(lbl_80281FE8, lbl_80281FC4, lbl_80281FC0));
         if (gSession.nGameType == 6) {
             Skalib_ScratchFromAram(0);
             Skalib_ScratchFromAram(1);
@@ -404,8 +404,7 @@ void fn_8009F02C(void) {
             lbl_80281FDC = lbl_80281FE0 = lbl_80281FD8 =
                 fn_80009B34(lbl_80281FC0, 1, 0x20, "MC_Gc.c", 2810);
         }
-        fn_800B68B4(lbl_80281FE8, lbl_80281FC4, lbl_80281FC0);
-        fn_800B67EC();
+        fn_800B67EC(fn_800B68B4(lbl_80281FE8, lbl_80281FC4, lbl_80281FC0));
     }
 }
 

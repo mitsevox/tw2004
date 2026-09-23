@@ -436,14 +436,16 @@ void fn_800B67EC(ARAMTransfer* pTransfer) {
     fn_80007328();
 }
 
-// Copies uSize bytes from pSrc to ARAM address uAram.
-void fn_800B6844(void* pSrc, u32 uAram, u32 uSize) {
+// Starts copying uSize bytes from pSrc to ARAM address uAram; fn_800B67EC waits for it.
+ARAMTransfer* fn_800B6844(void* pSrc, u32 uAram, u32 uSize) {
     fn_800B051C(pSrc, uSize, 0);
-    fn_800B65C0((u32)pSrc, uAram, uSize, 0, 1, NULL, 0, 0);    // port: the ARQ library takes addresses as u32
+    // port: the ARQ library takes addresses as u32
+    return fn_800B65C0((u32)pSrc, uAram, uSize, 0, 1, NULL, 0, 0);
 }
 
-// Copies uSize bytes from ARAM address uAram to pDst.
-void fn_800B68B4(void* pDst, u32 uAram, u32 uSize) {
+// Starts copying uSize bytes from ARAM address uAram to pDst; fn_800B67EC waits for it.
+ARAMTransfer* fn_800B68B4(void* pDst, u32 uAram, u32 uSize) {
     fn_800B051C(pDst, uSize, 1);
-    fn_800B65C0(uAram, (u32)pDst, uSize, 1, 1, NULL, 0, 0);    // port: the ARQ library takes addresses as u32
+    // port: the ARQ library takes addresses as u32
+    return fn_800B65C0(uAram, (u32)pDst, uSize, 1, 1, NULL, 0, 0);
 }
