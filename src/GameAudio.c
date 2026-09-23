@@ -21,7 +21,8 @@ void fn_800AD698(u8 nId, u8 nTrack, u8 bOn);
 u8   fn_800AD618(u8 nId, u8 nTrack);
 void fn_800AD790(u8 nId, u8 nTrack, u32 uParams);
 void fn_800AD9AC(u8 nId, u8 nTrack, u8 n);
-void fn_800AD800(u8 nId, f32* pPos, int a, u8 b);
+void fn_800AD800(u8 nId, f32* pPos, f32* pLast, u8 b);
+void fn_800ADAF0(u8 nId, u8 nTrack, f32 fPitch);
 void fn_800ADA94(u8 nId, u8 nTrack, f32 fVolume);
 void fn_800ADB4C(s16 nKind, u8 nTrack, u8 bOn);
 void fn_800ADC44(s16 nKind, u8 nTrack, u8 n);
@@ -683,7 +684,7 @@ void fn_800A4084(void) {
             fn_800A7220(fn_8006C630());
         }
         lbl_80281420 = fn_800AD280(9, -1, 1, 0, NULL);
-        fn_800AD800(lbl_80281420, &gPlayers[0].ball.pCourse->pin[Game_CurrentPinSet()].x, 0, 0);
+        fn_800AD800(lbl_80281420, &gPlayers[0].ball.pCourse->pin[Game_CurrentPinSet()].x, NULL, 0);
         fn_800ADA08(9, 0, nWind);
     }
     lbl_80282029 = 1;
@@ -838,7 +839,7 @@ void fn_800A4E34(void) {
     vPos[1] = 0.0f;
     vPos[2] = 0.0f;
     lbl_8028141B = fn_800AD280(1, -1, 1, 1, NULL);
-    fn_800AD800(lbl_8028141B, vPos, 0, 0);
+    fn_800AD800(lbl_8028141B, vPos, NULL, 0);
     fn_800AD698(lbl_8028141B, 0, 1);
     lbl_8028202B = 0;
     lbl_8028202C = 0;
@@ -929,11 +930,66 @@ void fn_800A562C(u8 nPlayer) {
         lbl_80281420 = 0xFF;
     }
     fn_8001EB8C(pPlayer->pChar, 0x53, vPos);
-    fn_800AD800(nId, vPos, 0, 0);
+    fn_800AD800(nId, vPos, NULL, 0);
     fn_800ADA28(nId, 0, 1, 1);
     pView->f8 = 0.0f;
     pView->fC = 1.0f / 59.94f;
     pView->n18 = 0;
+}
+
+// The swish of the club while the swing meter runs (swing states 1 and 3): its pitch and volume
+// follow how fast the club head (bone 0x53) moves.
+void fn_800A573C(u8 nPlayer) {
+    Player* pPlayer;
+    GameAudioView* pView;
+    u8 nId;
+    s32 nState;
+    f32 fSpeed;
+    f32 fPitch;
+    f32 fVolume;
+    f32 vPos[4];
+    f32 vLast[4];
+
+    pPlayer = &gPlayers[nPlayer];
+    pView = &lbl_801F1790[pPlayer->nView[0]];
+    nId = pView->n0;
+    if (nId != 0xFF) {
+        fn_8001EB8C(pPlayer->pChar, 0x53, vPos);
+        fn_800AD800(nId, vPos, vLast, 0);
+        nState = pPlayer->swing.nState;
+        if (nState == 1 || nState == 3) {
+            if (pView->fC > 0.0f) {
+                if (pView->n18 == 1 && pView->n18 != nState) {
+                    fn_800ADA28(nId, 0, 1, 1);
+                } else {
+                    fSpeed = Vec_Distance(vPos, vLast) / (59.94f * pView->fC);
+                    fPitch = fSpeed * lbl_80281438;
+                    fVolume = fSpeed * lbl_8028143C;
+                    fPitch = (fPitch <= lbl_80281444) ? lbl_80281444 : fPitch;
+                    fPitch = (fPitch <= lbl_80281448) ? fPitch : lbl_80281448;
+                    fVolume = (fVolume <= lbl_80282044) ? lbl_80282044 : fVolume;
+                    fVolume = (fVolume <= lbl_80281440) ? fVolume : lbl_80281440;
+                    if (pPlayer->nClub > 17) {
+                        fVolume *= 0.35f;
+                    }
+                    if (pPlayer->swing.nState == 1) {
+                        fVolume *= 0.35f;
+                    }
+                    fn_800ADA28(nId, 0, 0, 1);
+                    fn_800ADA94(nId, 0, fVolume);
+                    fn_800ADAF0(nId, 0, fPitch);
+                }
+                pView->n18 = pPlayer->swing.nState;
+            }
+        } else {
+            fn_800ADA28(nId, 0, 1, 1);
+        }
+        if (lbl_80202898.bSlowMo) {
+            pView->fC = gSession.fFrameTime / lbl_80202898.fSlowMo;
+        } else {
+            pView->fC = gSession.fFrameTime;
+        }
+    }
 }
 
 void fn_800A5EC0(u8 nPlayer) {
@@ -942,7 +998,7 @@ void fn_800A5EC0(u8 nPlayer) {
 
     pPlayer = &gPlayers[nPlayer];
     nId = lbl_801F1790[pPlayer->nView[0]].n1;
-    fn_800AD800(nId, pPlayer->ball.vPos, 0, 0);
+    fn_800AD800(nId, pPlayer->ball.vPos, NULL, 0);
     fn_800ADA94(nId, 0, 2.0f);
     fn_800ADA28(nId, 0, !(Rand_Next(2) & 1) ? 0x1A : 0x1C, 0);
 }
@@ -953,7 +1009,7 @@ void fn_800A5F60(u8 nPlayer) {
 
     pPlayer = &gPlayers[nPlayer];
     nId = lbl_801F1790[pPlayer->nView[0]].n1;
-    fn_800AD800(nId, pPlayer->ball.vPos, 0, 0);
+    fn_800AD800(nId, pPlayer->ball.vPos, NULL, 0);
     fn_800ADA94(nId, 0, 1.0f);
     fn_800ADA28(nId, 0, 0x17, 0);
 }
@@ -964,7 +1020,7 @@ void fn_800A5FE8(u8 nPlayer) {
 
     pPlayer = &gPlayers[nPlayer];
     nId = lbl_801F1790[pPlayer->nView[0]].n1;
-    fn_800AD800(nId, pPlayer->ball.vPos, 0, 0);
+    fn_800AD800(nId, pPlayer->ball.vPos, NULL, 0);
     fn_800ADA94(nId, 0, 1.0f);
     fn_800ADA28(nId, 0, 0x17, 0);
 }
