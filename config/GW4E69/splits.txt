@@ -583,16 +583,7 @@ unsorted/sweep_80049A14.c:
 	.text       start:0x80049A14 end:0x80049A54
 
 GoAnimalActors.c:
-	.text       start:0x80049B40 end:0x8004AAEC
-
-unsorted/sweep_8004AAEC.c:
-	.text       start:0x8004AAEC end:0x8004AB90
-
-unsorted/sweep_8004ABA4.c:
-	.text       start:0x8004ABA4 end:0x8004ABB4
-
-unsorted/sweep_8004ABB4.c:
-	.text       start:0x8004ABB4 end:0x8004ABBC
+	.text       start:0x80049B40 end:0x8004ABBC
 
 unsorted/sweep_8004AD54.c:
 	.text       start:0x8004AD54 end:0x8004ADDC
