@@ -11,8 +11,8 @@ s32 fn_8009D1D8(s32 nPort, s32 nSlot, s32 arg2, s32 arg3);
 void fn_800A27BC(const char* szSrc, u16* szDst, s32 nMax);
 s32 fn_80106ED8(s32 arg0, s32 nLevel);
 s32 fn_80107084(s32 arg0, s32 nLevel);
-s32 fn_80124A98(EASBErrorE eError);
-s32 fn_80124AAC(void);
+s32 EASBio_ConvertError(EASBErrorE eError);
+s32 EASBio_WaitForAsyncProcessToComplete(void);
 s32 fn_80125354(s32 arg0, s32 arg1);
 s32 fn_801253F0(s32 arg0, s32 arg1);
 s32 fn_80125520(u8 b);
@@ -22,7 +22,7 @@ void fn_8000A0AC(s32 v);
 void fn_80124B10(UStreamObject* pObject);
 
 // Starts the Bio library once, under this game's name, with the memory-card glue from TibExt.c.
-void fn_801249A8(void) {
+void EASBio_InitOnce(void) {
     lbl_80261040.szProductName = lbl_80195308;
     lbl_80261040.szGamesPlayedType = lbl_80195324;
     lbl_80261040.pCallbacks = fn_801221F0();
@@ -47,19 +47,19 @@ void fn_80124A70(void) {
 }
 
 // The memory-card screens' error code for a library error.
-s32 fn_80124A98(EASBErrorE eError) {
-    return lbl_80195340[eError];
+s32 EASBio_ConvertError(EASBErrorE eError) {
+    return EASB_gErrorMap[eError];
 }
 
 // Runs the library's memory-card operation step by step until it is complete.
-s32 fn_80124AAC(void) {
+s32 EASBio_WaitForAsyncProcessToComplete(void) {
     EASBProcessE eProcess;
     EASBErrorE eError;
 
     eProcess = EASB_PROCESS_NONE;
     while (eProcess != EASB_PROCESS_COMPLETE) {
         eError = fn_8012D7F8(&eProcess);
-        if (eError != EASB_ERROR_NONE) return fn_80124A98(eError);
+        if (eError != EASB_ERROR_NONE) return EASBio_ConvertError(eError);
         if (eProcess == EASB_PROCESS_NONE) return 0;
     }
     return 0;
@@ -151,8 +151,8 @@ s32 fn_801251EC(s32* pArgs) {
     nError = fn_80125354(nPort, nSlot);
     if (nError != 0) return nError;
     eError = fn_8012D794(lbl_80281988->pOurGameImage);
-    if (eError != EASB_ERROR_NONE) return fn_80124A98(eError);
-    nError = fn_80124AAC();
+    if (eError != EASB_ERROR_NONE) return EASBio_ConvertError(eError);
+    nError = EASBio_WaitForAsyncProcessToComplete();
     fn_801253F0(nPort, nSlot);
     return nError & ((-nError | nError) >> 31);
 }
@@ -162,8 +162,8 @@ s32 fn_80125280(void) {
     EASBErrorE eError;
 
     eError = fn_8012D694();
-    if (eError != EASB_ERROR_NONE) return fn_80124A98(eError);
-    nError = fn_80124AAC();
+    if (eError != EASB_ERROR_NONE) return EASBio_ConvertError(eError);
+    nError = EASBio_WaitForAsyncProcessToComplete();
     if (nError != 0) return nError;
     lbl_80281988->bBioLoaded = 0;
     return 0;
@@ -178,8 +178,8 @@ s32 fn_801252D0(void) {
     fn_8009DBAC(0, 0);
     if (nMount == -25) return -25;
     eError = fn_8012D5E4(lbl_80281988->pIcon, lbl_80281988->pOurGameImage);
-    if (eError != EASB_ERROR_NONE) return fn_80124A98(eError);
-    nError = fn_80124AAC();
+    if (eError != EASB_ERROR_NONE) return EASBio_ConvertError(eError);
+    nError = EASBio_WaitForAsyncProcessToComplete();
     return nError & ((-nError | nError) >> 31);
 }
 
@@ -193,8 +193,8 @@ s32 fn_80125354(s32 arg0, s32 arg1) {
     fn_8009DBAC(0, 0);
     if (nMount == -25) return -25;
     eError = fn_8012D560();
-    if (eError != EASB_ERROR_NONE) return fn_80124A98(eError);
-    nError = fn_80124AAC();
+    if (eError != EASB_ERROR_NONE) return EASBio_ConvertError(eError);
+    nError = EASBio_WaitForAsyncProcessToComplete();
     if (nError != 0) return nError;
     if (!lbl_80281988->bBioLoaded) {
         fn_8012D9B4(&lbl_80281988->uCurLevel);
@@ -208,8 +208,8 @@ s32 fn_801253F0(s32 arg0, s32 arg1) {
     EASBErrorE eError;
 
     eError = fn_8012D5B0();
-    if (eError != EASB_ERROR_NONE) return fn_80124A98(eError);
-    nError = fn_80124AAC();
+    if (eError != EASB_ERROR_NONE) return EASBio_ConvertError(eError);
+    nError = EASBio_WaitForAsyncProcessToComplete();
     return nError & ((-nError | nError) >> 31);
 }
 
@@ -221,8 +221,8 @@ s32 fn_80125434(s32 arg0, s32 arg1) {
     nError = fn_80125354(arg0, arg1);
     if (nError != 0) return nError;
     eError = fn_8012D6C8();
-    if (eError != EASB_ERROR_NONE) return fn_80124A98(eError);
-    nWait = fn_80124AAC();
+    if (eError != EASB_ERROR_NONE) return EASBio_ConvertError(eError);
+    nWait = EASBio_WaitForAsyncProcessToComplete();
     fn_801253F0(arg0, arg1);
     return nWait & ((-nWait | nWait) >> 31);
 }
@@ -231,7 +231,7 @@ s32 fn_801254B8(void) {
     EASBErrorE eError;
 
     eError = fn_8012D7F0();
-    if (eError != EASB_ERROR_NONE) return fn_80124A98(eError);
+    if (eError != EASB_ERROR_NONE) return EASBio_ConvertError(eError);
     return 0;
 }
 
@@ -239,7 +239,7 @@ s32 fn_801254EC(void) {
     EASBErrorE eError;
 
     eError = fn_8012D710();
-    if (eError != EASB_ERROR_NONE) return fn_80124A98(eError);
+    if (eError != EASB_ERROR_NONE) return EASBio_ConvertError(eError);
     return 0;
 }
 

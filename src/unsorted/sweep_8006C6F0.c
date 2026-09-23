@@ -26,7 +26,7 @@ void fn_800DCBA8();
 void fn_800DCBB8();
 void fn_8010F6C8();
 void fn_8010F718();
-void fn_801249A8();
+void EASBio_InitOnce();
 
 void fn_8006C6F0(void);
 void fn_8006C720(void);
@@ -51,7 +51,7 @@ void fn_8006C720(void) {
     fn_800DCBA8();
     fn_800A2064();
     fn_8010F6C8();
-    fn_801249A8();
+    EASBio_InitOnce();
     fn_80009918();
 }
 
