@@ -237,17 +237,14 @@ void     CameraScript_RecordCurrentCam(CamShot* pShot, void* pCam, void* pSub, i
                                        int a);
 void     fn_8003F2E0(void* pScript, f32 fTime);
 f32      (*fn_8001ED08(int nHandle, int nBone))[4];
-void     fn_8001EF34(f32* pIn, f32 f, f32* pOut);           // scale a vector
 void     fn_8000C5D4(f32* pA, f32* pB, f32 f, f32* pOut);   // a + f x b
 u8       fn_800635D0(int nPlayer);
 u8       fn_800B36F4(View* pView, int nPlayer, f32 fFrameTime);
-double   fabsf(double x);
 void     fn_800C73B8(f32* pA, f32* pB, f32* pOut);
 void     fn_800C73DC(f32* pA, f32* pB, f32* pOut);
 void     fn_800C7400(f32* pA, f32* pOut);
 void     GolfCamera_ProcessBallFlightCamera(View* pView, int nPlayer);
 f32      fn_800C741C(u8* p, unsigned long long uEvent);
-void     fn_80063CF0(void* pView, int nCamera, int nPlayer);
 u8       fn_800C7160(View* pView);
 void     fn_800C6110(View* pView, int nPlayer, int a);
 void     fn_80063CBC(View* pView, f32* pVec);          // nCamera 3, the vector into vC4
@@ -283,7 +280,6 @@ void     fn_800C6DFC(void);
 void     fn_800C6E14(void);
 void     fn_800C6E2C(void);
 void     GameEffects_SetSuperSlowMo(u8 bOn, int nPlayer, f32 fRate);
-u8       fn_80063C7C(void* pView);
 f32      fn_8005CB78(int nHandle, unsigned long long uEvent);   // an animation event's time
 u8       CameraScript_WillGolferBeOccludedInThisView(int nPlayer, CamShot* pShot, void* pScript);
 f32      fn_8000C5FC(f32* pA, f32* pB);                         // dot product
@@ -298,6 +294,7 @@ u8       CamScript_KeepAboveGround(int nPlayer, f32* pNew, f32* pOld, int a, voi
 CamShot* fn_80064F7C(int nPlayer, int nKind, int a, CamShot* pShot);
 u8       fn_8003C9D0(int nPlayer, int a, CamSequence** ppSeq, CamShot** ppShot);
 CamShot* fn_800C4DF8(int nFirst, int nPlayer);
+int      fn_800C6B38(View* pView);
 void     fn_800C5EC0(View* pView, f32* pCam, f32* pSub, int nPlayer);
 u8       fn_800C6D80(void);
 CamSequence* DynamicCam_ChoosePreFlightSequence(int nPlayer, int nLie, int nKind);
