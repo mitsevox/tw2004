@@ -212,8 +212,8 @@ The physics-side question (a pull toward the cup, capture radius) is still open.
 **Result (2026-09-22, `Ball_CupPull` in C):** **yes, there is a pull.** Inside 5.5 in of the pin
 (the physics is in yards; we first misread it as metres), while the ball is still short of the
 hole, a ball heading within 30 degrees of the cup (or within 3.5 in regardless) gets `0.455 x dt x (pin - ball)` added to its velocity each frame - an
-acceleration toward the cup - limited so it never speeds the ball up while it is more than
-16.8 degrees off line. A ball crossing the cup fast and off line loses up to 67% of its speed
+acceleration toward the cup - limited so it never speeds the ball up along an axis on which it
+already moves faster than about 1.5 ft/s (corrected 2026-09-23; first read as an angle test). A ball crossing the cup fast and off line loses up to 67% of its speed
 instead (the lip). The hole itself is geometry: holed means "dropped more than 2 in below the
 pin height" on a cup surface, no capture radius. The pull applies to every ball, human or CPU,
 with no attribute involved. Full numbers in [`gameplay.md`](gameplay.md).
@@ -289,14 +289,15 @@ game's.
 
 A perfect CPU (no skill error at all), side-hill putts, green setting 2. The rehearsal's aim
 always holes out at the rehearsed pace; the real putt at +5% passes the cup this far on the high
-side (inches; the cup is ~2.1 in in radius):
+side (inches; the cup is ~2.1 in in radius). Rerun 2026-09-23 after the cup pull was
+corrected (see hypothesis 5); a 2.25 in cup gives the same makes and misses:
 
     length    1% slope   2%      3%      4%
-     6 ft     -0.6      -0.1    +0.6    +0.9     all holed
-    10 ft     -0.2      +0.6    +1.9    +2.6     4%: misses, stops 11 in past
-    15 ft     -0.3      +1.9    +2.8    +5.0     3% and up miss, ~17 in past
-    20 ft     +0.5      +2.4    +4.8    +6.7     2% and up miss, ~23 in past
-    30 ft     +1.8      +4.8    +8.3   +11.6     1% and up miss (1% drops with a 2.25 in cup)
+     6 ft     -0.5      -0.2    +0.4    +0.6     all holed
+    10 ft     -0.2      +0.4    +1.5    +2.6     4%: misses, stops 11 in past
+    15 ft     -0.4      +1.6    +2.8    +5.0     3% and up miss, ~17 in past
+    20 ft     +0.5      +1.9    +4.8    +6.7     3% and up miss, ~23 in past
+    30 ft     +1.6      +4.8    +8.3   +11.6     2% and up miss, ~37 in past
     45 ft     +2.8      +7.3   +12.6   +18.6     all miss, ~56 in past
 
 Straight putts (0%) are holed at every length. So for a *perfect* CPU the miss depends on
@@ -307,13 +308,13 @@ With the skill error on (300 putts a cell, `--mc 300`), make % at +5% pace (as t
 at x1.00 for comparison:
 
     PUTTING 98   0%         1%         2%         3%         4%
-     10 ft     100/100    100/100    100/100     50/100     32/100
-     20 ft     100/100     74/68      52/75       0/96       0/85
-     30 ft      30/77      53/49       0/61       0/79       0/74
+     10 ft     100/100    100/100    100/100     94/100     48/100
+     20 ft     100/100    100/87      52/89       0/99       0/92
+     30 ft      48/100     53/57       0/66       0/85       0/80
     PUTTING 80
-     10 ft     100/73     100/81      92/78      61/70      38/55
-     20 ft      26/18      25/20      35/20      25/20      16/22
-     30 ft       9/8       20/9       18/11      14/14       4/11
+     10 ft     100/73     100/81      99/78      69/72      51/60
+     20 ft      30/20      33/22      40/22      28/22      19/24
+     30 ft      12/11      21/12      21/12      15/15       5/13
 
 What that says:
 

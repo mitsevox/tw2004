@@ -1655,8 +1655,8 @@ void fn_80054A6C(Ball* pBall) {
 // The pull toward the cup. Inside 5.5 in of the pin, while the ball is still short of it, a
 // ball heading within 30 degrees of the cup (or within 3.5 in whatever its heading) gets
 // 0.455 x dt x (pin - ball) added to its velocity - but never on an axis where that would speed
-// it up while it is more than 16.8 degrees off line. A ball crossing over the cup fast and
-// off line loses up to 67% of its speed instead: the lip.
+// it up while it already moves faster than 0.293 (about 1.5 ft/s) along that axis. A ball
+// crossing over the cup fast and off line loses up to 67% of its speed instead: the lip.
 void Ball_CupPull(Ball* pBall, f32 fDt) {
     f32 vPin[3];
     f32 fDist;
@@ -1684,19 +1684,19 @@ void Ball_CupPull(Ball* pBall, f32 fDt) {
             }
             return;
         }
-        if (fAngle >= 0.523599f && fDist >= 0.0972222f) return;
-
-        fK    = 0.455472f * fDt;
-        fPull = fK * (vPin[0] - pBall->vPos[0]);
-        if ((pBall->vVel[0] < 0.0f && fPull < 0.0f) || (pBall->vVel[0] > 0.0f && fPull > 0.0f)) {
-            if (fn_8000AD9C(fAngle) > 0.293333f) fPull = 0.0f;
+        if (fAngle < 0.523599f || fDist < 0.0972222f) {
+            fK    = 0.455472f * fDt;
+            fPull = fK * (vPin[0] - pBall->vPos[0]);
+            if ((pBall->vVel[0] < 0.0f && fPull < 0.0f) || (pBall->vVel[0] > 0.0f && fPull > 0.0f)) {
+                if (fn_8000AD9C(pBall->vVel[0]) > 0.293333f) fPull = 0.0f;
+            }
+            pBall->vVel[0] += fPull;
+            fPull = fK * (vPin[2] - pBall->vPos[2]);
+            if ((pBall->vVel[2] < 0.0f && fPull < 0.0f) || (pBall->vVel[2] > 0.0f && fPull > 0.0f)) {
+                if (fn_8000AD9C(pBall->vVel[2]) > 0.293333f) fPull = 0.0f;
+            }
+            pBall->vVel[2] += fPull;
         }
-        pBall->vVel[0] += fPull;
-        fPull = fK * (vPin[2] - pBall->vPos[2]);
-        if ((pBall->vVel[2] < 0.0f && fPull < 0.0f) || (pBall->vVel[2] > 0.0f && fPull > 0.0f)) {
-            if (fn_8000AD9C(fAngle) > 0.293333f) fPull = 0.0f;
-        }
-        pBall->vVel[2] += fPull;
     }
 }
 

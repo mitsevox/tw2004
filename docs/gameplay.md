@@ -376,7 +376,9 @@ rehearsal (your suggested shot, the gimme) and the look-ahead ball get it (corre
 - otherwise, if heading **within 30 degrees** of the cup, or **within 3.5 in** regardless:
   `velocity += 0.455 x dt x (pin - ball)` on x and z - an acceleration toward the cup
   proportional to the offset - except on any axis where that would speed the ball up while it
-  is more than 16.8 degrees off line.
+  already moves faster than about 1.5 ft/s along that axis. (Corrected 2026-09-23: first read
+  as "more than 16.8 degrees off line"; matching the function exactly showed the test is on the
+  axis speed.) So the pull can always slow a ball toward the cup, but only nudges a slow one.
 
 How much is it? At 4 in off the line and rolling at a foot per second the ball spends about
 half a second in the zone and picks up under an inch per second sideways: a few degrees of

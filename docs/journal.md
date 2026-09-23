@@ -183,7 +183,7 @@ Dated log of what was done and decided, newest last. Facts and lessons belong in
   a tilted plane. Validation: level-green roll matches `gPuttDist` within 0.6% at green setting
   2 (so the putt table was built for the fastest greens). Result: a perfect CPU holes every
   straight putt, but the +5% pace misses high once break x length is big enough (15 ft at 3%,
-  20 ft at 2%, 30 ft at 1%); with skill error, PUTTING 98 makes are decided by break, PUTTING
+  20 ft at 3%, 30 ft at 2%, 45 ft at 1%; rerun after the cup-pull fix); with skill error, PUTTING 98 makes are decided by break, PUTTING
   80 by length. The +5% is "never up, never in" for average putters. The rim is modelled, not
   the game's (cup geometry not decoded); `--cup 2.25` shows the same pattern. Side find:
   surfaces 98/105 are the cup (the "water" comment in `AI_PlanShot` was wrong).

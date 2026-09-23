@@ -223,7 +223,7 @@ class Ball:
         for i in (0, 2):
             pull = k * (pin[i] - p[i])
             if (self.vel[i] < 0 and pull < 0) or (self.vel[i] > 0 and pull > 0):
-                if abs(a) > 0.293333:
+                if abs(self.vel[i]) > 0.293333:
                     pull = 0.0
             self.vel[i] += pull
 
