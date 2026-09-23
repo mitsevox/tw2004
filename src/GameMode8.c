@@ -88,6 +88,13 @@ void  GM_ReplaceOOBBall(int nPlayer);
 SurfaceType* Ter_GetSupportingWorldMaterial(CourseInfo* pCourse, u8* pBall);
 void  fn_800DEB5C(int nPlayer);
 void  fn_800FE190(f32* pA, f32* pB, f32* pOut);
+u8*   fn_800136C4(int nController);         // the pad's state: stick bytes at +0..+3
+u32   fn_800136DC(int nController);         // buttons: held << 16 | pressed this frame
+u32   fn_800142AC(int nButton, int a);      // a button's mask
+extern f32 lbl_802816B0;
+extern f32 lbl_802816B4;
+extern f32 lbl_802816C0;
+extern f32 lbl_802816C4;
 void  Mem_cpy(void* pDst, void* pSrc, int nBytes);
 void  fn_8006ACF8(int nPlayer, int a);
 void  fn_8006BAA8(int nPlayer);
@@ -822,6 +829,105 @@ f32 fn_800FB41C(f32* pA, f32* pB) {
     f32 v[4];
     fn_800FE190(pB, pB, v);     // EA bug: pB less itself, so the distance is always 0
     return fn_80009680(v[0] * v[0] + v[2] * v[2]);
+}
+
+// The pad's sticks (beyond the 96..160 dead zone) scaled to -1..1 into the player's fA7C..fA8C;
+// 0 inside the dead zone.
+void fn_800FB460(int nPlayer) {
+    u8* pPad = fn_800136C4(gPlayers[nPlayer].nController);
+    if (pPad) {
+        if (pPad[3] < 96.0f) {
+            gPlayers[nPlayer].fA84 = (96.0f - pPad[3]) / 96.0f;
+        } else if (pPad[3] > 160.0f) {
+            gPlayers[nPlayer].fA84 = (160.0f - pPad[3]) / 96.0f;
+        } else {
+            gPlayers[nPlayer].fA84 = 0.0f;
+        }
+        if (pPad[2] < 96.0f) {
+            gPlayers[nPlayer].fA80 = (96.0f - pPad[2]) / 96.0f;
+        } else if (pPad[2] > 160.0f) {
+            gPlayers[nPlayer].fA80 = (160.0f - pPad[2]) / 96.0f;
+        } else {
+            gPlayers[nPlayer].fA80 = 0.0f;
+        }
+        if (pPad[0] < 96.0f) {
+            gPlayers[nPlayer].fA7C = -((96.0f - pPad[0]) / 96.0f);
+        } else if (pPad[0] > 160.0f) {
+            gPlayers[nPlayer].fA7C = -((160.0f - pPad[0]) / 96.0f);
+        } else {
+            gPlayers[nPlayer].fA7C = 0.0f;
+        }
+        if (pPad[1] < 96.0f) {
+            gPlayers[nPlayer].fA8C = -(96.0f - pPad[1]) / 96.0f;
+        } else if (pPad[1] > 160.0f) {
+            gPlayers[nPlayer].fA8C = -(160.0f - pPad[1]) / 96.0f;
+        } else {
+            gPlayers[nPlayer].fA8C = 0.0f;
+        }
+    }
+}
+
+// Every frame of the run to the ball: the sticks, four buttons that trigger events 22 to 25,
+// the stick-driven countdowns in nC54 (bits 21 to 24 of nC3C), and fCB4, which a button raises
+// and which otherwise falls at a rate scaled by the frame time.
+void fn_800FB774(int nPlayer) {
+    f32 fStep;
+    if (!fn_800FA118(nPlayer, 1)) {
+        fn_800FB460(nPlayer);
+        if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x1A, 1)) {
+            EVENT_Trigger(nPlayer, 0x16, 0, -1);
+        } else if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x1B, 1)) {
+            EVENT_Trigger(nPlayer, 0x17, 0, -1);
+        }
+        if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x1C, 1)) {
+            EVENT_Trigger(nPlayer, 0x18, 0, -1);
+        } else if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x1D, 1)) {
+            EVENT_Trigger(nPlayer, 0x19, 0, -1);
+        }
+        if (gPlayers[nPlayer].nC3C & 0x200000) {
+            gPlayers[nPlayer].nC3C &= ~0x200000;
+            if (gPlayers[nPlayer].fA80 != 0.0f || gPlayers[nPlayer].fA84 != 0.0f) {
+                gPlayers[nPlayer].nC54 = 179;
+            } else {
+                fn_800FE080(gPlayers[nPlayer].nC58, 1);
+            }
+        } else if (gPlayers[nPlayer].nC3C & 0xC00000) {
+            if (gPlayers[nPlayer].fA80 != 0.0f || gPlayers[nPlayer].fA84 != 0.0f) {
+                if (gPlayers[nPlayer].nC3C & 0x400000) {
+                    fn_800FE080(gPlayers[nPlayer].nC58, 2);
+                    gPlayers[nPlayer].nC3C &= ~0x400000;
+                } else {
+                    fn_800FE080(gPlayers[nPlayer].nC58, 3);
+                    gPlayers[nPlayer].nC3C &= ~0x800000;
+                }
+                gPlayers[nPlayer].nC3C |= 0x1000000;
+                gPlayers[nPlayer].nC54 = 239;
+            }
+        } else if (gPlayers[nPlayer].nC3C & 0x1000000) {
+            gPlayers[nPlayer].nC54--;
+            if (gPlayers[nPlayer].nC54 == 0) {
+                fn_800FE080(gPlayers[nPlayer].nC58, 0);
+                gPlayers[nPlayer].nC3C &= ~0x1000000;
+            }
+        } else if (gPlayers[nPlayer].fA80 != 0.0f || gPlayers[nPlayer].fA84 != 0.0f) {
+            gPlayers[nPlayer].nC54 = 179;
+            fn_800FE080(gPlayers[nPlayer].nC58, 0);
+        } else {
+            gPlayers[nPlayer].nC54--;
+            if (gPlayers[nPlayer].nC54 == 0) {
+                fn_800FE080(gPlayers[nPlayer].nC58, 1);
+            }
+        }
+        fStep = 0.999f * (59.94f * gSession.fFrameTime);
+        if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x24, 0)) {
+            gPlayers[nPlayer].fCB4 += lbl_802816B0;
+            gPlayers[nPlayer].nCB8 = 0;
+        } else if (gPlayers[nPlayer].nCB8 > (s32)(59.94f * lbl_802816C4)) {
+            gPlayers[nPlayer].fCB4 -= lbl_802816C0 * fStep;
+        } else {
+            gPlayers[nPlayer].fCB4 -= lbl_802816B4 * fStep;
+        }
+    }
 }
 
 void fn_800FD6A0(int nPlayer) {

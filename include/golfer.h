@@ -280,7 +280,8 @@ typedef struct Player {
     f32  fA7C;                  // 0xA7C  pad stick x, -1..1 (GameMode9 fn_800EDAE0)
     f32  fA80;                  // 0xA80
     f32  fA84;                  // 0xA84
-    u8   unkA88[0xA90 - 0xA88];
+    u8   unkA88[4];
+    f32  fA8C;                  // 0xA8C  pad stick y, -1..1 (GameMode8 fn_800FB460)
     u8   ball[0x68];            // 0xA90  the player's Ball (0xBC bytes, see Ball.c) - nLie is its +0x68
     s32  nLie;                  // 0xAF8
     u8   unkAFC[0xB04 - 0xAFC];
@@ -320,7 +321,9 @@ typedef struct Player {
     s32  nC60;                  // 0xC60
     u8   unkC64[0xC6C - 0xC64];
     s32  nC6C[18];              // 0xC6C  cleared at the start of a round
-    u8   unkCB4[0xCD0 - 0xCB4];
+    f32  fCB4;                  // 0xCB4  speed golf: raised by a button, falls every frame
+    s32  nCB8;                  // 0xCB8  speed golf: cleared by that button
+    u8   unkCBC[0xCD0 - 0xCBC];
     s32  nCD0;                  // 0xCD0  cleared per game (fn_800F2030)
     s32  aCD4[20];              // 0xCD4
     u8   unkD24[4];
