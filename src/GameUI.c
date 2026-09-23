@@ -45,8 +45,142 @@ extern u8  lbl_802822DB;
 extern u8  lbl_802822DC[3];
 extern u8  lbl_802822DF;
 
+extern u8  lbl_80282280;
+extern s32 lbl_80282284;
+extern s32 lbl_802822A0;
+extern u8  lbl_802822BC;
+extern u8  lbl_802822BD;
+extern u32 lbl_802822C8;                    // frame counts when the HUDs last changed
+extern u32 lbl_802822CC;
+extern u32 lbl_802822D0;
+extern u8  lbl_802822D4;
+extern u8  lbl_802822D5;
+extern u8  lbl_802822D6;
+extern u8  lbl_802822D7;                    // the HUD on screen 3 (split screen, player 2)
+extern u8  lbl_802822D8;                    // the HUD on screen 2 (split screen, player 1)
+extern u8  lbl_802822D9;                    // the HUD on the single screen
+extern u8  lbl_802822DA;
+void  fn_800E5DA0(u8* p);
+void  fn_800E3B04(void);
+void  fn_800E3E0C(void);
+void  fn_800E5A4C(int a, int b, int* pA, f32* pF, int* pB);
+
+// Clears every display flag and timer at the start of a round.
+void fn_800E3B28(void) {
+    lbl_802822DF = 0;
+    lbl_802822DC[0] = 0;
+    lbl_802822DC[1] = 0;
+    lbl_802822DC[2] = 0;
+    lbl_802822DB = 0;
+    lbl_802822DA = 0;
+    lbl_802822D9 = 0;
+    lbl_802822D8 = 0;
+    lbl_802822D7 = 0;
+    lbl_802822D6 = 0;
+    lbl_802822D5 = 0;
+    lbl_802822D4 = 0;
+    lbl_802822B8 = 0;
+    lbl_802822B4 = 0;
+    lbl_802822B0 = 0;
+    lbl_802822AC = 0;
+    lbl_802822A8 = 0;
+    lbl_802822A4 = 0;
+    lbl_802822A0 = 0;
+    lbl_8028229C = 0;
+    lbl_80282298 = 0;
+    lbl_80282294 = 0;
+    lbl_80282290 = 0;
+    lbl_8028228C = 0;
+    lbl_80282288 = 0;
+    lbl_80282284 = 0;
+    lbl_80282282 = 0;
+    lbl_80282281 = 0;
+    lbl_802822C4 = 0;
+    lbl_802822C3 = 0;
+    lbl_802822C2 = 0;
+    lbl_802822C1 = 0;
+    lbl_802822C0 = 0;
+    lbl_802822BF = 0;
+    lbl_802822BE = 0;
+    lbl_802822BD = 0;
+    lbl_802822BC = 0;
+    lbl_80282280 = 0;
+    fn_800E5DA0(lbl_802822DC);
+    fn_800E3B04();
+}
+
 void fn_800E3BEC(void) {
     fn_8001437C();
+}
+
+// Show (b = 1) or hide the HUD on the single screen, and when.
+void fn_800E3C0C(u8 b) {
+    if (b) {
+        fn_800E3E0C();
+        fn_80062D6C(2, 1);
+    } else {
+        fn_80062D6C(1, 1);
+    }
+    lbl_802822D9 = b;
+    lbl_802822D0 = gSession.unk24;
+}
+
+// The same for split screen's first view.
+void fn_800E3C70(u8 b) {
+    if (b) {
+        fn_800E3E0C();
+        fn_80062D6C(2, 2);
+    } else {
+        fn_80062D6C(1, 2);
+    }
+    lbl_802822D8 = b;
+    lbl_802822CC = gSession.unk24;
+}
+
+// And its second view.
+void fn_800E3CD4(u8 b) {
+    if (b) {
+        fn_800E3E0C();
+        fn_80062D6C(2, 3);
+    } else {
+        fn_80062D6C(1, 3);
+    }
+    lbl_802822D7 = b;
+    lbl_802822C8 = gSession.unk24;
+}
+
+// Shows or hides a player's HUD.
+void fn_800E3D38(int nPlayer, u8 b) {
+    if (gSession.nSplitScreen) {
+        if (nPlayer == 0) {
+            fn_800E3C70(b);
+            return;
+        }
+        fn_800E3CD4(b);
+        return;
+    }
+    fn_800E3C0C(b);
+}
+
+// Hides every HUD.
+void fn_800E3D90(void) {
+    if (gSession.nSplitScreen) {
+        fn_800E3C70(0);
+        fn_800E3CD4(0);
+        return;
+    }
+    fn_800E3C0C(0);
+}
+
+// Whether a player's HUD is up.
+u8 fn_800E3DDC(int nPlayer) {
+    if (gSession.nSplitScreen) {
+        if (nPlayer == 0) {
+            return lbl_802822D8;
+        }
+        return lbl_802822D7;
+    }
+    return lbl_802822D9;
 }
 
 void fn_800E3E0C(void) {
@@ -66,6 +200,19 @@ u8 fn_800E415C(void) {
     return lbl_802822DF;
 }
 
+// A HUD message: message nMsg for a player, with a number (a distance, strokes over par); not
+// in mode 11.
+void fn_800E4164(int nMsg, int nPlayer, f32 f) {
+    int nWho;
+    int nId = nMsg;
+    f32 fVal = f;
+    if (Game_GetMode() != 11) {
+        nWho = nPlayer + 1;
+        fn_800E5A4C(5, 2, &nId, &fVal, &nWho);
+        lbl_802822DB = 1;
+    }
+}
+
 void fn_800E41C8(void) {
     lbl_802822DB = 1;
 }
@@ -79,6 +226,12 @@ void fn_800E4204(void) {
     fn_800E0AC4(0);
     fn_800E0A98(0);
     fn_800E5474(0);
+}
+
+void fn_800E4238(int i) {
+    lbl_802822DA = 0;
+    lbl_802822DC[i] = 1;
+    lbl_802822DB = 0;
 }
 
 int fn_800E430C(int nPlayer) {
