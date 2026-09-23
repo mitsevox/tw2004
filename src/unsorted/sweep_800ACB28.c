@@ -4,6 +4,7 @@
 
 s32 fn_800B0748();
 s32 fn_800ACA94();
+void fn_800ACA5C(void* arg0, u8 arg1);
 
 void fn_800ACB28(void* arg0);
 void fn_800ACB28(void* arg0) {
