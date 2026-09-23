@@ -74,7 +74,6 @@ extern s32 lbl_80282278;
 u8    fn_800E3AF8(void);
 void  fn_800E0A84(u8 v);
 void  fn_800E1404(int nHole);
-u8    fn_8004B580(void);
 void  fn_80057364(int a);
 int   fn_800D3118(int nRound, int nHole);    // a built round's course for a hole
 int   fn_800D315C(int nRound, int nHole);    // and its hole number (1-based)
@@ -1002,7 +1001,7 @@ void fn_800E2BA4(void) {
     fn_800E1404(nCur);
 }
 
-// Whether the ball is in the hole: it is (lie "holed") when fn_8004B580 says so and the lie is
+// Whether the ball is in the hole: it is (lie "holed") when Ter_Use3DCupGeometry says so and the lie is
 // already holed, or, when it says no, when the ball is within half a yard of the pin.
 u8 fn_800E2DB4(int nPlayer) {
     CourseInfo* pCourse;
@@ -1019,7 +1018,7 @@ u8 fn_800E2DB4(int nPlayer) {
     dx = gPlayers[nPlayer].ball.vPos[0] - pCourse->pin[nPinSet].x;
     dz = gPlayers[nPlayer].ball.vPos[2] - pCourse->pin[nPinSet].z;
     fDist = fn_80009680(dx * dx + dz * dz);
-    b = fn_8004B580();
+    b = Ter_Use3DCupGeometry();
     if ((b && gPlayers[nPlayer].ball.nLie == LIE_HOLED) || (!b && fDist < 0.5f)) {
         gPlayers[nPlayer].ball.nLie = LIE_HOLED;
         return 1;
