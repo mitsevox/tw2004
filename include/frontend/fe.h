@@ -273,6 +273,8 @@ extern s32* lbl_8028247C;               // 0x600 entries, rows 24 apart (fn_8010
 extern s32* lbl_80282480;               // 24 entries (fn_80103920 sets them to -1)
 extern SwapField lbl_80193228[20];      // an asset's byte-swap layout (fn_80105DAC)
 extern char lbl_801935C8[16][32];      // 16 names (fn_80107294)
+extern char lbl_801937C8[11][32];      // the skin sets a logo can go on ("ushirtlogof",
+                                        // "uhatlogof", "uarmtattool"...; sTurnOnLogo)
 extern s32 lbl_802816E8;                // } an asset to put on and one to take off when
 extern s32 lbl_802816EC;                // } fn_80104804 runs (-1: none)
 extern char lbl_801932C8[CRAP_NUM_PARTS][32];   // per part: the name of its "All ..." entry that
@@ -380,10 +382,7 @@ void fn_8008EB70(void);
 
 // ---- the logo editor (FE_LogoDesign.c) -------------------------------------------------------
 
-// A logo is 8-bit colour indexes into a 256-colour palette, either 64 x 64 (shape 0, drawn into
-// the texture "__LogoSquare") or 128 x 32 (shape 1, "__LogoRect").
-#define LOGO_SQUARE 0
-#define LOGO_RECT   1
+// A logo (LogoRecord, game/save.h) is 8-bit colour indexes into a 256-colour palette.
 
 // The logo being edited (12 bytes, allocated by fn_8010F748).
 typedef struct LogoEdit {
@@ -392,16 +391,6 @@ typedef struct LogoEdit {
     u8  bDirty;                 // 0x8  changed since it was last copied into its texture
 } LogoEdit;
 LAYOUT_ASSERT(LogoEdit, 0xC);
-
-// A saved logo (0x1022 bytes): the profile holds five (ProfileLogos) and fn_8010FB70 picks the
-// one LogoEdit.n0 names.
-typedef struct LogoRecord {
-    u8   aPixels[0x1000];       // 0x0000  64 x 64 or 128 x 32 colour indexes
-    char szName[0x20];          // 0x1000
-    u8   b1020;                 // 0x1020
-    u8   nShape;                // 0x1021  LOGO_SQUARE or LOGO_RECT
-} LogoRecord;
-LAYOUT_ASSERT(LogoRecord, 0x1022);
 
 // The part of the save profile from 0x5500 that char_tex_manager.c is given (fn_80077ACC() +
 // 0x5500); only the logos are known.

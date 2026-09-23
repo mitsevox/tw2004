@@ -286,6 +286,42 @@ void fn_80104094(CrAPAsset* pAsset, int b) {
     fn_8008E944(0, 0.0f);
 }
 
+// Part 17: set the logo place b (a set of lbl_801937C8) to variant i; for 1..5 that is the
+// profile's user logo i - 1, whose set gets the variant for its shape.
+void sTurnOnLogo(s16 nPart, int b, int i) {
+    char szLogo[32];
+    char szShape[32];
+    u64 uSetId;
+    u64 uVariantId;
+    SaveProfile* pProfile = fn_80077ACC();
+    Skin* pSkin;
+    int nLogo = i - 1;
+    s32 nSet;
+    s32 nVariant;
+
+    fn_8008EA38(1);
+    pSkin = lbl_80281EE0->pB4->pChar->pSkin;
+    fn_8008E944(0, 0.0f);
+    fn_800CB700(&uSetId, lbl_801937C8[b]);
+    nSet = fn_800CDC2C(pSkin, uSetId);
+    fn_800CCF90(pSkin, nSet, i, 0);
+    if (i > 0 && i <= 5) {
+        sprintf(szLogo, "%s%d", "userlogo", nLogo);
+        if (pProfile->aLogos[nLogo].nShape == LOGO_SQUARE) {
+            strcpy(szShape, "square");
+        } else {
+            strcpy(szShape, "wide");
+        }
+        fn_800CB700(&uSetId, szLogo);
+        fn_800CB700(&uVariantId, szShape);
+        nSet = fn_800CDC2C(pSkin, uSetId);
+        nVariant = fn_800CDCE0(pSkin, nSet, uVariantId);
+        fn_800CCF90(pSkin, nSet, nVariant, 0);
+    }
+    fn_8001D624(lbl_80281EE0->pB4->n10);
+    fn_80103D6C();
+}
+
 // A part 18 asset: set the menu golfer's n0 from it and have the golfer play its animation (unless
 // it already does).
 void fn_801042D0(CrAPAsset* pAsset) {
