@@ -52,8 +52,6 @@ extern f32 gFairwaySpeedMul[3];                  // 0x801834A8  by gFairwaySetti
 extern f32 gRoughMul[3];                         // 0x801834B4  by options +0x1C: 1.3 1.0 0.7 (class 5)
 void   PsBallFx_TriggerTrail(Ball* pBall, int nPlayer);    // rolling sound / effect
 void   Ball_CupPull(Ball* pBall, f32 fDt);
-f32    fn_8000C5FC(f32* pA, f32* pB);            // dot product
-void   fn_8000C5D4(f32* pA, f32* pB, f32 f, f32* pOut);   // a + f x b
 void   fn_80055E7C(f32* pA, f32* pB, f32* pOut);
 void   fn_80055EA0(f32* pA, f32* pB, f32* pOut);
 void   fn_80055EC4(f32* pA, f32* pB, f32* pOut);
@@ -458,7 +456,7 @@ u8 Physics_GetShotData(Ball* pBall, int nClub, int nKind, f32 fPower, f32 fAim, 
     fSpeed *= gKindSpeed[nKind];
     fSpeed = fPower * (8.333333f * fSpeed);
     fn_80055E28(fAim, &fSinAim, &fCosAim);
-    if (nKind == SHOT_PUTT || nClub == CLUB_PUTTER) {
+    if (nKind == SHOT_TYPE_PUTT_e || nClub == CLUB_PUTTER_e) {
         fSpeed *= 7.2f;
         fn_8001EF34(pB, fSpeed, vDir);
         fn_80055D70(&vDir[0], &vDir[2], fSinAim, fCosAim);
@@ -614,7 +612,7 @@ void Ball_Launch(Ball* pBall, int nClub, int nKind, f32 fPower, f32 fAim, int nT
         Physics_OutOfBounds(pBall, 1);
         return;
     }
-    if (nKind == SHOT_PUTT || nClub == CLUB_PUTTER) {
+    if (nKind == SHOT_TYPE_PUTT_e || nClub == CLUB_PUTTER_e) {
         pBall->b99    = 1;
         pBall->b9B    = 1;
         pBall->bHitTopArc    = 1;

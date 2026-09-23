@@ -482,7 +482,7 @@ void fn_800EBEF0(void) {
         v[3] = 1.0f;
         fn_80055AA8(&gPlayers[0].ball, v, 0);
         Physics_DropBall(&gPlayers[0].ball, v);
-        Vec_Copy(v, &gPlayers[0].fBallX);
+        Vec_Copy(v, gPlayers[0].vBall);
     }
     if (lbl_80281664[lbl_802822F4].nClubBits) {
         gPlayers[0].golfer.uBagMask = 0x2000000;

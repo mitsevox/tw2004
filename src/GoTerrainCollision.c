@@ -21,7 +21,6 @@ u8    fn_8000C3C8(f32* pFrom, f32* pTo, TNetwork* pNet, s32 nNodes, f32* pHit); 
 void  fn_8004B588(TNetwork* pNet);
 u8    Ter_LieIsPreferred(u32 nClass);
 void  fn_8004B63C(TNetwork* pNet);
-f32   fn_8000C5FC(f32* pA, f32* pB);                      // dot product
 void  fn_8005097C(f32* pA, f32* pB, f32* pOut);           // a - b (paired-single assembly)
 void  fn_800509A0(f32* pSrc, f32* pDst);                  // negate (paired-single assembly)
 void  fn_800509BC(f32* pSrc, f32* pDst);                  // negate, four floats (paired-single assembly)
@@ -374,7 +373,7 @@ u8 Ter_SearchForDropLocation(int nPlayer, u8 bPreferred, u8 bCheck, f32* pOut) {
     }
 done:
     if (p->ball.vStart[0] == pOut[0] && p->ball.vStart[2] == pOut[2]) return 0;
-    if (bCheck && p->vA44[0] == p->fBallX && p->vA44[2] == p->fBallZ
+    if (bCheck && p->vA44[0] == p->vBall[0] && p->vA44[2] == p->vBall[2]
         && fn_800BB028(pOut, p->vA44) < 2500.0f) {
         return 0;
     }
@@ -1132,7 +1131,7 @@ u8 Ter_CheckForPinCollision(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* p
     f32 fT;
 
     if (nPlayer < 0) return 0;
-    if (fn_80016CFC(gPlayers[nPlayer].nView0)->bFlagOut) return 0;
+    if (fn_80016CFC(gPlayers[nPlayer].nView[0])->bFlagOut) return 0;
     // the line relative to the pin
     vFrom[0] = pFrom[0] - pCourse->pin[Game_CurrentPinSet()].x;
     vFrom[1] = pFrom[1] - pCourse->pin[Game_CurrentPinSet()].y;

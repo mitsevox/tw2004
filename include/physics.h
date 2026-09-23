@@ -39,6 +39,7 @@ typedef enum physicsBallState_t {
     PHYSICS_BALLSTATE_BallScripted_e = 6
 } physicsBallState_t;
 
+// Player.nClub: 0..24 the bag, 25 the putter (CLUB_MAX_e clubs in all).
 typedef enum Club_t {
     CLUB_DRIVER1_e = 0, CLUB_DRIVER2_e, CLUB_DRIVER3_e, CLUB_DRIVER4_e, CLUB_DRIVER5_e, CLUB_DRIVER6_e,
     CLUB_3WOOD_e, CLUB_5WOOD_e, CLUB_7WOOD_e,
@@ -50,6 +51,8 @@ typedef enum Club_t {
     CLUB_MAX_e = 26
 } Club_t;
 
+// Player.nShotKind. This game uses 0..3 as named (1 is every full swing, not only the driver) and
+// 5..7 for recovery shots, where TW06 has FLOP at 5.
 typedef enum ShotType_t {
     SHOT_TYPE_PUTT_e = 0,
     SHOT_TYPE_DRIVE_e = 1,

@@ -171,7 +171,7 @@ s32 fn_800E84B0(int nPlayer) {
     nBest = 5;
     for (i = 0; i < gNumPlayersSetUp; i++) {
         if (i != nPlayer && !Player_IsHoled(i) && !PLAYER(i)->bPlayerCut && !fn_800E82AC(fn_800E8848(i)) &&
-            PLAYER(i)->ball.nLie != LIE_GREEN) {
+            PLAYER(i)->ball.nLie != LIE_GREEN_e) {
             dx = PLAYER(i)->ball.vPos[0] - pCourse->pin[nPinSet].x;
             dz = PLAYER(i)->ball.vPos[2] - pCourse->pin[nPinSet].z;
             d = fn_80009680(dx * dx + dz * dz);
@@ -354,7 +354,7 @@ int fn_800E8CA8(int nPlayer, u8 bCurrent) {
     nScore = 0;
     nPar = 0;
     n = gpGame->nCurHole;
-    if (bCurrent && gPlayers[nPlayer].ball.nLie == LIE_HOLED && n < 18) {
+    if (bCurrent && gPlayers[nPlayer].ball.nLie == LIE_INCUP_e && n < 18) {
         n++;
     }
     for (h = 0; h < n; h++) {

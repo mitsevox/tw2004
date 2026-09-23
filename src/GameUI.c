@@ -158,9 +158,9 @@ void fn_800E3E0C(void) {
     fn_8006A8B0();
 }
 
-// Pauses the game (gSession.unk14): the pause menu, sounds held, the HUD's pause flag.
+// Pauses the game (gSession.n14): the pause menu, sounds held, the HUD's pause flag.
 void fn_800E3E3C(void) {
-    if (gSession.unk14 == 0) {
+    if (gSession.n14 == 0) {
         fn_800E5714(4);
         fn_8001437C();
         fn_80062CE0(0);
@@ -168,7 +168,7 @@ void fn_800E3E3C(void) {
             fn_80095444(1);
         }
         lbl_802822DF = 1;
-        gSession.unk14 = 1;
+        gSession.n14 = 1;
         fn_800DC9D4(1);
         fn_80125814(0);
         if (fn_800EC550()) {
@@ -188,7 +188,7 @@ void fn_800E3ECC(void) {
 void fn_800E3EE0(void) {
     int i;
     int j;
-    if (gSession.unk14 != 0) {
+    if (gSession.n14 != 0) {
         fn_800E5714(8);
         if (fn_80100294()) {
             fn_80101EDC();
@@ -198,7 +198,7 @@ void fn_800E3EE0(void) {
                 fn_800953C8(1);
             }
             lbl_802822DF = 0;
-            gSession.unk14 = 0;
+            gSession.n14 = 0;
             fn_800DC9D4(0);
             fn_800A7350(0);
             fn_80125814(1);
@@ -559,8 +559,8 @@ void fn_800E4D94(u8 bHuman) {
         GameEffects_ResetGameEffectSettings();
         if ((Game_GetMode() == 26 || Game_GetMode() == 22) && gSession.nSplitScreen) {
             v = lbl_80184D90;
-            fn_80063B98(fn_80017028(gPlayers[0].nView0), 0.0f, (f32*)&v);
-            fn_80063B98(fn_80017028(gPlayers[1].nView0), 0.0f, (f32*)&v);
+            fn_80063B98(fn_80017028(gPlayers[0].nView[0]), 0.0f, (f32*)&v);
+            fn_80063B98(fn_80017028(gPlayers[1].nView[0]), 0.0f, (f32*)&v);
         }
         if (bHuman) {
             fn_80062D38(0xE, 2, 1);
