@@ -10,11 +10,13 @@
 #include "endian.h"
 
 u8   fn_8001E9CC(u32* pBits, int nBit);         // the bit is set
+void fn_80039884(u8* pSrc, u8* pDst, int nCount);
 void fn_800399E0(u8* pSrc, CamShot* pDst, u32 nCount);
 void fn_80039A48(u8* pSrc, DynCamSet* pDst, u32 nCount);
 void fn_80039B14(int nSize);
 void fn_80039C5C(int nSize);
 void fn_80039D0C(int nSequences);
+void fn_80039E58(void);
 void fn_80039EB8(int nSize);
 u8   fn_8003D0EC(CamSequence* pSequence, int nKind);
 u8   fn_8003D240(CamShot* pShot, int nKind);
@@ -56,6 +58,36 @@ void fn_8003954C(void) {
 void fn_80039550(void) {
 }
 
+// The stream handler for the sequence file: two counts (sequences, then choices), then the
+// sequences; takes them unless some are loaded already, and makes room for the choices.
+void fn_80039554(UStreamObject* pObject) {
+    s32 nSequences;
+    s32 nChoices;
+    u8* pSrc;
+
+    lbl_80281D88->n1C++;
+    if (lbl_80281D88->n1C > 2) {
+        lbl_80281D88->n1C = 1;
+    }
+    if (lbl_80281D88->pSequences != NULL) {
+        fn_80009E70(pObject);
+        return;
+    }
+    pSrc = pObject->pData;
+    fn_80076158(&pSrc, (u8*)&nSequences, sizeof(nSequences), 4);
+    pSrc = pObject->pData + 4;
+    fn_80076158(&pSrc, (u8*)&nChoices, sizeof(nChoices), 4);
+    lbl_80281D88->pSequences = fn_80009B34(nSequences * sizeof(CamSequence), 2, 0, "GoDynamicCam.c", 403);
+    lbl_80281D88->pChoices = fn_80009B34(nChoices * sizeof(CamChoice), 2, 0, "GoDynamicCam.c", 404);
+    lbl_80281D88->nSequences = 0;
+    lbl_80281D88->nChoicesUsed = 0;
+    pSrc = pObject->pData + 8;
+    fn_80039884(pSrc, (u8*)lbl_80281D88->pSequences, nSequences);
+    fn_80039D0C(nSequences);
+    fn_80039E58();
+    fn_80009E70(pObject);
+}
+
 // The stream handler for the shot file: takes the shots unless some are loaded already.
 void fn_80039690(UStreamObject* pObject) {
     lbl_80281D88->n1C++;
@@ -95,6 +127,37 @@ void fn_800397EC(UStreamObject* pObject) {
     fn_80039A48(pObject->pData, lbl_80281D88->pSets, pObject->uSize / sizeof(DynCamSet));
     fn_80039EB8(pObject->uSize);
     fn_80009E70(pObject);
+}
+
+// Copies nCount sequences from the file (little-endian) into pDst, swapping each value's bytes.
+// Each is followed in the file by its shot choices, which go into the choice block in turn; the
+// sequence's p4C gets the first of them. The file keeps a word where p4C goes.
+void fn_80039884(u8* pSrc, u8* pDst, int nCount) {
+    SwapField aSequence[] = {
+        { 32, 1 },                                          // szName
+        { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 },
+        { 1, 1 }, { 1, 1 }, { 1, 1 }, { 1, 1 }, { 1, 1 }, { 1, 1 }, { 1, 1 }, { 1, 1 },
+    };
+    SwapField aChoice[] = {
+        { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 },
+        { 1, 1 }, { 1, 1 }, { 1, 1 }, { 1, 1 },
+        { 48, 4 },                                          // aNoHoles
+    };
+    CamChoice* pChoice;
+    int i;
+
+    for (i = 0; i < nCount; i++) {
+        fn_8001F08C((void**)&pSrc, (void**)&pDst, aSequence, sizeof(aSequence) / sizeof(aSequence[0]), 1);
+        // pDst is now at the sequence's p4C
+        *(CamChoice**)pDst = &lbl_80281D88->pChoices[lbl_80281D88->nChoicesUsed];
+        pSrc += sizeof(CamChoice*);
+        pDst += sizeof(CamChoice*);
+        pChoice = &lbl_80281D88->pChoices[lbl_80281D88->nChoicesUsed];
+        fn_8001F08C((void**)&pSrc, (void**)&pChoice, aChoice, sizeof(aChoice) / sizeof(aChoice[0]),
+                    lbl_80281D88->pSequences[i].nChoices);
+        lbl_80281D88->nChoicesUsed += lbl_80281D88->pSequences[i].nChoices;
+    }
+    lbl_80281D88->nSequences = nCount;
 }
 
 // Copies nCount shots from the file (little-endian) into pDst, swapping each value's bytes.
