@@ -9,22 +9,52 @@
 
 typedef struct AnimLib AnimLib;         // skalib.c
 
-// A character's skeleton data (CharModel.pSkel; the SKEL_ functions take it); only what the game
-// code reads.
+// An IK chain of a skeleton (Skeleton.pChains).
+typedef struct IKChain {
+    s8   nLinks;                // 0x00
+    u8   unk1[3];
+    struct IKLink* pLinks;      // 0x04  0x78 bytes each; the bone's index at +1
+    u8   unk8[0x20 - 0x8];
+} IKChain;
+LAYOUT_ASSERT(IKChain, 0x20);
+
+// A character's skeleton data (CharModel.pSkel; the SKEL_ functions take it): its IK chains and
+// how strongly their solution is applied (the IK weight, 0..1); only what the code reads.
 typedef struct Skeleton {
-    u8   unk0[0x10E4];
+    u8   unk0[4];
+    s32  nChains;               // 0x0004
+    u8   unk8[4];
+    IKChain* pChains;           // 0x000C
+    u8   unk10[0x20 - 0x10];
+    f32  (*p20)[4];             // 0x0020  a quaternion per bone
+    f32  (*p24)[4];             // 0x0024  a quaternion per bone
+    f32  (*p28)[4];             // 0x0028  p20 at an IK weight of 0 or 1, otherwise p24
+    u8   unk2C[0x1070 - 0x2C];
+    f32  fIKWeight;             // 0x1070  SKEL_SetIKSolutionWeight
+    f32  f1074;                 // 0x1074  } set by fn_8002792C and SKEL_TransitionIK
+    f32  f1078;                 // 0x1078  }
+    u8   unk107C[0x10A4 - 0x107C];
+    f32  v10A4[4];              // 0x10A4
+    f32  v10B4[4];              // 0x10B4  v10A4 scaled by the IK weight
+    f32  f10C4;                 // 0x10C4  the IK weight
+    u8   unk10C8[0x10D4 - 0x10C8];
+    f32  q10D4[4];              // 0x10D4  a rotation (quaternion) given by fn_80027808
     s32  n10E4;                 // 0x10E4  set to 4 as a swing starts
 } Skeleton;
 
 // A character's model: its bones; only what the game code reads.
 typedef struct CharModel {
-    u8        unk0[8];
-    f32     (*pMatrices)[4][4]; // 0x08  one per bone (fn_8001EED8 gives a bone's index); row 3 is its
-                                //       position
+    s32       nBones;           // 0x000
+    u8        unk4[4];
+    f32     (*pMatrices)[4][4]; // 0x008  one per bone (fn_8001EED8 gives a bone's index); row 3 is its
+                                //        position
     u8        unkC[0x38 - 0xC];
-    Skeleton* pSkel;            // 0x38
-    u8        unk3C[0xEE - 0x3C];   // 0x3C  bone indices (fn_8001EED8), ...
-    u8        bEE;              // 0xEE  fn_8001EDF4
+    Skeleton* pSkel;            // 0x038
+    u8        unk3C[0xEE - 0x3C];   // 0x03C  bone indices (fn_8001EED8), ...
+    u8        bEE;              // 0x0EE  fn_8001EDF4
+    u8        unkEF[0x140 - 0xEF];
+    f32       a140[128][3];     // 0x140  per bone, a factor for each axis: reset to 1 by fn_80028A3C,
+                                //        multiplied by fn_80028A70 (the next field is at 0x740)
 } CharModel;
 
 // A clip's header (the fields used here). In a file, pD0 marks the end of the header and
@@ -171,6 +201,20 @@ typedef struct ViewSlot {
 
 extern ViewSlot gViewSlots[5];          // 0x80187124  per player
 
+// Skeleton.c
+extern f32 lbl_801C6498[4];             // the identity rotation (quaternion), set by fn_80029530
+extern u8  lbl_802810A6;                // IK on (fn_80027738); off, the IK functions do nothing
+
+// AnimStream.c: the animation groups it streams clips for (groups 1 and 5, the reactions), and the
+// index each has in its tables.
+typedef struct AnimStreamGroup {
+    u8   nGroup;                // 0x0
+    s32  nIndex;                // 0x4
+} AnimStreamGroup;
+LAYOUT_ASSERT(AnimStreamGroup, 8);
+
+extern AnimStreamGroup lbl_80191490[2];
+
 // The blend callback CharacterState_AddSKABlendData attaches (fn_80072ACC is one).
 typedef void (*SKABlendFn)(SKABlendNode* pNode, int* pn, f32 fTime);
 
@@ -192,6 +236,9 @@ void  Anim_SetRate(u8* pAnim, f32 fRate);           // 0x8001F084
 void  SKEL_SetIKSolutionWeight(Skeleton* pSkel, f32 f);
 void  fn_80027808(CharModel* pModel, f32* pRot);
 void  fn_8002792C(Skeleton* pSkel);
+void  SKEL_TransitionIK(Skeleton* pSkel, u8 b, f32 f);
+void  fn_80028A3C(CharModel* pModel);
+void  fn_80028A70(CharModel* pModel, int nBone, u32 uAxes, f32 f);
 int   fn_80048574(Character* pChar, u64 uEvent);    // the character's animation has event uEvent
 void  fn_80072ACC(SKABlendNode* pNode, int* pn, f32 fTime);
 f32   fn_80072CB8(SKABlendNode* pNode, u64 uEvent); // an event's time in a blend tree
