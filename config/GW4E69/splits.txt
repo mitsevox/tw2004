@@ -2771,6 +2771,7 @@ unsorted/sweep_800DAD44.c:
 
 GameEffects.c:
 	.text       start:0x800DAE44 end:0x800DCAD8
+	.bss        start:0x80202898 end:0x802028F0
 	.sdata2     start:0x80284578 end:0x802845C0
 
 GameManager.c:
@@ -2797,6 +2798,7 @@ GameAnalysis.c:
 GameModeAlternateShot.c:
 	.text       start:0x800E68F0 end:0x800E7980
 	.rodata     start:0x80184DA0 end:0x80184DB0
+	.sdata      start:0x80281648 end:0x80281650
 	.sdata2     start:0x80284648 end:0x80284650
 
 GameModeBattle.c:
@@ -2807,6 +2809,8 @@ GameModeBestBall.c:
 
 GameModeFourBall.c:
 	.text       start:0x800E8D58 end:0x800E9E40
+	.rodata     start:0x80184DC0 end:0x80184DD0
+	.sdata2     start:0x80284658 end:0x80284660
 
 GameModeMatch.c:
 	.text       start:0x800E9E40 end:0x800EACD8
@@ -3034,6 +3038,8 @@ unsorted/sweep_8010F574.c:
 
 FE_LogoDesign.c:
 	.text       start:0x8010F6C8 end:0x8010FB70
+	.data       start:0x80193D28 end:0x80193D58
+	.sbss       start:0x802824B8 end:0x802824C8
 
 unsorted/sweep_8010FBC4.c:
 	.text       start:0x8010FBC4 end:0x8010FBCC

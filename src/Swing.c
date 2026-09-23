@@ -9,10 +9,10 @@
 
 // The swing module's state; only the tuning values read here. Set up in Swing_Init.
 typedef struct SwingState {
-    u32  uTexture0;             // 0x000  passed with the trail texture to fn_8005CC64
-    u32  uClubBack;             // 0x004  resource "clubback": the backswing trail's texture
-    u32  uClubDown;             // 0x008  resource "clubdown": the downswing trail's texture
-    u32  uTBall;                // 0x00C  resource "tball"
+    TexBank*  pBank;            // 0x000  the bank of the three textures below
+    TexEntry* pClubBack;        // 0x004  texture "clubback": the backswing trail's
+    TexEntry* pClubDown;        // 0x008  texture "clubdown": the downswing trail's
+    TexEntry* pTBall;           // 0x00C  texture "tball"
     u8   unk10[0x44 - 0x10];
     u8   mesh[2][0x28];         // 0x044  the trail mesh, per view
     f32* p94[2];               // 0x094  the trail's vertex positions, per view
@@ -172,8 +172,6 @@ int   fn_800204A0(BlendClip* pClip, f32* pOut, f32 fTime);
 void  Character_UpdateAnimation(Character* pObj, int a, f32 f);
 void  Swing_UpdatePower(int nPlayer);
 void  Swing_BoostInput(int nPlayer);
-u64   fn_8000BEE4(char* pName);                  // a tuning name's 64-bit hash
-void  fn_800102DC(u64 uHash, void* pOwner, u32* pOut);  // bind a named resource
 void  fn_8005AD20(Character* pObj, SwingData* pSw, int nStickX);
 int   fn_8005CC5C(void);
 void  fn_800AE3F8(int nView);
@@ -522,9 +520,9 @@ int fn_8005CC5C(void) {
     return lbl_802823FC;
 }
 
-void fn_8005CC64(int a, int b) {
-    lbl_801B8980.n100 = a;
-    lbl_801B8980.n104 = b;
+void fn_8005CC64(TexBank* pBank, TexEntry* pTex) {
+    lbl_801B8980.p100 = pBank;
+    lbl_801B8980.p104 = pTex;
     lbl_801B8980.uFlags |= 1;
 }
 
@@ -1910,9 +1908,9 @@ void fn_8005A850(int nPlayer) {
             fn_80012F50(0, 6, 0x80);
             fn_80012F34(0);
             if (pObj->nAnim == 6) {
-                fn_8005CC64(gpSwing->uTexture0, gpSwing->uClubBack);
+                fn_8005CC64(gpSwing->pBank, gpSwing->pClubBack);
             } else if (pObj->nAnim == 7) {
-                fn_8005CC64(gpSwing->uTexture0, gpSwing->uClubDown);
+                fn_8005CC64(gpSwing->pBank, gpSwing->pClubDown);
             }
             fn_80012EF8();
             draw.nPrims   = 1;
@@ -1972,15 +1970,15 @@ void fn_8005AD20(Character* pObj, SwingData* pSw, int nStickX) {
     fn_80027808(pObj->pModel, vRot);
 }
 
-// Bind the swing module's tuning values by name.
+// Find the swing's textures by name (all three are in one bank).
 void Swing_LoadTuning(int nPlayer) {
     u64 uHash;
     uHash = fn_8000BEE4("clubback");
-    fn_800102DC(uHash, gpSwing, &gpSwing->uClubBack);
+    fn_800102DC(uHash, &gpSwing->pBank, &gpSwing->pClubBack);
     uHash = fn_8000BEE4("clubdown");
-    fn_800102DC(uHash, gpSwing, &gpSwing->uClubDown);
+    fn_800102DC(uHash, &gpSwing->pBank, &gpSwing->pClubDown);
     uHash = fn_8000BEE4("tball");
-    fn_800102DC(uHash, gpSwing, &gpSwing->uTBall);
+    fn_800102DC(uHash, &gpSwing->pBank, &gpSwing->pTBall);
 }
 
 // ---- the power meter -----------------------------------------------------------------------------

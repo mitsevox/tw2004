@@ -312,7 +312,9 @@ The fixes that come up most often. Each points to its full entry below.
   for (...; p++)` gives `addi r0, r3, gTable@l; mr r31, r0` for the pointer; `gTable[i].x` in the
   loop body (CW strength-reduces it to the same walking pointer) gives the original's direct
   `addi r31, r3, gTable@l`. Two functions went 93/95 -> 100 (`AI_TargetsClear`,
-  `Golfer_TableByteSwap`).
+  `Golfer_TableByteSwap`). A local set at the top of each iteration, `pSlot = &gTable[i];`, is
+  as good as indexing and gives the same direct `addi` (skalib `AnimLib_FreeCopies`, 96.0 -> 100;
+  fully indexed was worse there).
 - **[verified] A loop over the players with a separate base and offset register** (`addi rB,
   gPlayers@l` before the loop, `add rP, rB, rOff` inside, `addi rOff, rOff, 0xEF8`) comes from
   byte arithmetic: `(Player*)((u8*)gPlayers + i * sizeof(Player))` (the `PLAYER(i)` macro in
@@ -332,6 +334,10 @@ The fixes that come up most often. Each points to its full entry below.
   Player (`*(f32*)(PLAYER(i)->ball + 8)`), not a Ball* cast. GameModeMatch GetHonors 85 -> 100%.
 
 ### Types, casts and sign extension
+
+- **[verified] `int` vs `s32` matters for parameters too.** PGATour `fn_800EE6A0(s32 nPlayer)` is
+  exact; as `(int nPlayer)` it gives `addis r3, r4, 1; add r3, r3, r29` instead of the original's
+  `addis r0, r4, 1; add r3, r0, r29` (99.81). Its neighbours were unaffected either way.
 
 - **[verified] An enum-typed local holding 0 is not folded into an index multiply.** EA's
   `PlayerNumber_t nPlayer = PLR_1_e; gpSaveData[nPlayer]` gives `li rX, 0; mullw`; a literal 0,
@@ -391,6 +397,12 @@ The fixes that come up most often. Each points to its full entry below.
 
 ### Function calls and parameters
 
+- **[verified] Pass the expression, not the variable just stored.** `p = x + n; f(p);` gives
+  `add r30; mr r3, r30`; `p = x + n` used later with the call written `f(x + n)` gives the
+  original's `add r3; mr r30, r3` (skalib `ClipBank_Load`, 99.76 -> 100).
+- **[verified] Assign-then-fix each global in turn.** `a = x; a = align(a); b = y; b = align(b);`
+  and `a = x; b = y; a = align(a); b = align(b);` schedule the same, but only the first gives the
+  original's temporary registers (skalib `Skalib_Init`, 98.54 -> 100).
 - **[verified] A wrong prototype can hide the real call shape and still score in the 80s-90s.**
   Check each prototype against the real definition, then check r3/r4 are set or kept live
   before each `bl`: `fn_80039344(View*, f32)` was really `(int nView, f32)` (Swing
@@ -438,6 +450,11 @@ The fixes that come up most often. Each points to its full entry below.
   the function's own return type to fit the slot changes its code and loses the match.
 
 ### Compares and conditions
+
+- **[verified] Nested `if`s vs one `&&`, and a flag vs a direct return.** `if (A) { if (B) x = 1; }`
+  and `if (A && B) x = 1;` get different saved registers (PGATour `fn_800EE5B4`, 99.75 -> 100). A u8
+  function's `bWin = 0; if (A && B) { if (C) bWin = 1; } return bWin;` was really
+  `return A && B && C;` (`fn_800EE6A0`, 99.44 -> 100; no order of the flag form matched).
 
 - **[verified] `return !(x == -1);` and `return x != -1;` end in a different instruction order**
   (GameMode11 `fn_80100798`, 93.9% -> 100).
@@ -531,6 +548,12 @@ The fixes that come up most often. Each points to its full entry below.
 
 ### Inlining and inline helpers
 
+- **[verified] A `const` on an inline helper's return type moves the caller's first loads.**
+  FourBall `fn_800E8FC8`: `static inline int FourBall_TeamSecond(int)` -> `static inline const int`,
+  94.39 -> 100 (`volatile` works the same; `s32`/`u32`/`long`/`short` go far worse). Label it a fake
+  match. Getting repeated "pick the team's player" code through small helpers fixed the register
+  numbers there (10 -> 4 differing) but made two neighbouring functions worse: decide per function.
+
 - **[verified] An inline helper that reads a global itself, rather than being passed it,
   changes register choice** (GameMode11 `fn_80100C08`'s hint helper).
 - **[verified] An inline helper that takes a value by pointer changes register choice.** The
@@ -565,6 +588,13 @@ The fixes that come up most often. Each points to its full entry below.
 
 ### Floating point
 
+- **[verified] `x *= c` vs `x = x * c` on an address-taken array element.** `v[3] *= 2.0f` loads the
+  element first; `v[3] = v[3] * 2.0f` loads the constant first, as the original did (GoGolfCam
+  `fn_800C1D3C`, 4 differing -> 0).
+- **[verified] An unwanted fused multiply-add goes away when one local holds the step.**
+  `f74 += 0.01f * (fDist - f74)` fused; `fDist = 0.01f * (fDist - f74); f74 += fDist;` kept the
+  original's separate `fmuls`/`fadds` (GoGolfCam `GolfCamera_ProcessPostShotCamera`, 99.07 -> 100).
+
 - **[verified] A MIN-style ternary whose result lands in a scratch register is its own
   variable.** `r = a <= b ? a : b;` with `r` separate matched; writing it back into `a` let the
   compiler merge them (GameMode8 `fn_800FBD2C`).
@@ -575,7 +605,8 @@ The fixes that come up most often. Each points to its full entry below.
 - **[verified] Float locals coalesce by live range, not by name.** Two slopes computed in two
   halves of a function got different registers until they were two variables declared in the
   right place; the product `a *= t; b = p * (k * a)` in place of `p * (k * (a * t))` fixed the
-  register numbers of a multiply chain.
+  register numbers of a multiply chain. Integers too: one `s32 nCount` reused for two leaves
+  became `nCountA`/`nCountB`, declared in that order (skalib `AnimLib_TrimCb`, 99.93 -> 100).
 - **[verified] A float parameter reused as the running value.** When the original's product
   lands in a different callee-saved register than ours and the operands of `fmuls` are swapped
   (`f1, f0` vs `f0, f1`), the source overwrote the parameter: `fSeconds *= 60.0f; do { ...
@@ -605,6 +636,22 @@ The fixes that come up most often. Each points to its full entry below.
   into the "wrong" FPR number: the original declared `f32 fInv = 1.0f / 128.0f;` at the top.
 
 ### Data, constants and symbols
+
+- **[verified] Where EA's globals live: ordinary `.bss`, in link order, so game code builds with
+  `-common off`.** The game's `.bss` (0x8019D540 to about 0x80261000) comes before the SDK's
+  (0x802611A0 on) and follows the link order of the code that uses it; COMMON symbols would link
+  after every `.bss`. With `pool_data off`, `-common` changes no function (all 7,647 scored the
+  same both ways). So a shared uninitialised global is defined, non-static, in its owner file, with
+  a plain `.bss` split (GameEffects `lbl_80202898`, DOL OK). Inside one object `.bss` is laid out in
+  REVERSE definition order: define the file's globals last-address-first. `= {0}` moves a global to
+  `.data`; don't. dtk's `common` split attribute is not for this (it turns every later `.bss` split
+  into commons).
+
+- **[observed] An all-zero small array in `.sdata` (not `.sbss`) was written with an initializer.**
+  `u8 lbl_80281648[2] = {0, 0};` lands in `.sdata` and links (AlternateShot).
+- **[verified] Base-last indexing of a big-struct global.** `gpSaveData[n].f` adds the base first;
+  `((SaveProfile*)gpSaveData)[n].f`, an inline accessor returning `&gpSaveData[n]`, or a pointer local
+  all give the original's `addis idx; addi; lhzx/stwx base` (PGATour `fn_800EE478`, 92.08 -> 100).
 
 - **[verified] objdiff scores a switch 100% even when its jump table points at the wrong case
   bodies**: it masks relocations. GameMode11 `fn_80100328` had case labels off by one and read
@@ -841,9 +888,9 @@ are for code built with GCC 2.95 at -O0 (SN ProDG), kept for reference.
   end of the chain. `TagFile_FreeBuffer` and the last branch of `TagFile_Update` have it.
 - **[verified] Unused `static` variables are still emitted at -O0**, in declaration order, into
   `.sbss`/`.sdata` like any other. If a file's `.sbss` is bigger than its referenced globals,
-  add a dummy static of the missing size; the DOL will not hash otherwise. Uninitialised
-  non-static globals become COMMON symbols instead and land elsewhere, so use `static` (or an
-  explicit `= 0` for `.sdata`) to control the section.
+  add a dummy static of the missing size; the DOL will not hash otherwise. Under `-common on`
+  uninitialised non-static globals become COMMON symbols and land after all `.bss`; game code
+  builds with `-common off` (see "Where EA's globals live" in Data, constants and symbols).
 - **[verified] Comparison operand order.** `a == p->x` loads `p` first, then `a` into `r0`, then
   `p->x` into `r9`, and compares `r0, r9`. `p->x == a` gives `lwz r0, 0(r9)` then `lwz r9, a`.
   For two stack variables the left one is always `r0`. So the register order of a `cmpw`
