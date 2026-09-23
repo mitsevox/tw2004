@@ -413,6 +413,7 @@ u8    fn_800C9828(int nGroup, int nStyle, int nClub, int nKey);   // the clips a
 void  fn_800CA9DC(int nSlot);
 
 void  Character_SetPosition(Character* pChar, f32* pPos, int a);
+int   fn_8001C558(int nPlayer);          // the model id of the player's golfer
 void  fn_8001C724(Character* pChar, int nKind);
 void  fn_8001C774(Character* pChar, int nClub);
 void  fn_8001C7FC(Character* pChar, int nStyle);   // the animation style (nStyle)
