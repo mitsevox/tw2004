@@ -4,6 +4,7 @@
 
 #include "engine.h"
 #include "game.h"
+#include "charstate.h"
 #include "frontend/fe.h"
 
 // Outside this file.
@@ -48,6 +49,14 @@ u8   fn_80105C30(void);                 // the Create-A-Player database is loade
 
 void fn_8011E020(s32* pMonth, s32* pDay, s32* pYear, s32* pHour, s32* pMinute, s32* pSecond, s32* pMsec);
 u32  fn_8000B244(void);                 // a random seed from the clock
+f32  GM_GetGameProgress(SaveProfile* pProfile);         // GameManager.c
+u8   fn_80056480(int a);
+u8   fn_800564AC(int n);
+u8   fn_80058304(SaveProfile* pProfile, int a);
+u8   fn_80125694(void);                 // } EASportsBio.c
+s32  fn_801258E8(void);                 // }
+s8   fn_801055DC(int nAsset);           // } FE_CrAPDB.c: an asset's lock kind and number
+s16  fn_80105610(int nAsset);           // } (fn_80078008)
 void fn_80076EEC(void);                 // frees lbl_80281EC8
 void fn_80076F20(void);
 u8   fn_80079E44(int nAttr);            // a hidden attribute: ATTR_AGGRESSION, ATTR_IQ, ATTR_SPEED
@@ -79,7 +88,7 @@ GolferRecord* fn_80077A80(int nGolfer);
 void fn_80077B78(void);
 int  fn_80077BDC(int n);
 void fn_80077C1C(int a, int b);
-u8   fn_80078008(int nAsset, SaveProfile* pProfile);
+u8   fn_80078008(s32 nAsset, SaveProfile* pProfile);
 int  fn_80078604(int a, int b, int c);
 void fn_80078620(int n, int* pA, int* pB, int* pC);
 void fn_8007873C(SaveProfile* pProfile);
@@ -498,6 +507,196 @@ void fn_80077C1C(int a, int b) {
     }
     gSession.nSeed = fn_8000B244();
     fn_8000B1D4(0, gSession.nSeed);
+}
+
+// Whether a Create-A-Player asset is still locked for the profile (never in the session's 0x4000
+// mode, nor while fn_80056480(0) holds). The asset names a lock kind (fn_801055DC) and a number
+// for it (fn_80105610): a bit, an award, a tournament won, a count of them to reach, a season...
+u8 fn_80078008(s32 nAsset, SaveProfile* pProfile) {
+    int aBits[5] = {1, 2, 3, 4, 5};
+    int nCount = 0;
+    s8 nKind;
+    s16 n;
+    u8 bLocked;
+    int i;
+    if (gSession.uFlags & 0x4000) {
+        return 0;
+    }
+    nKind = fn_801055DC(nAsset);
+    n = fn_80105610(nAsset);
+    if (fn_80056480(0)) {
+        return 0;
+    }
+    switch (nKind) {
+    case 0:
+        bLocked = fn_8001E9CC(pProfile->aB1CC, n) == 0;
+        break;
+    case 2:
+        bLocked = !fn_80058304(pProfile, 1);
+        break;
+    case 3:
+        bLocked = 1;
+        break;
+    case 4:
+        bLocked = 0;
+        break;
+    case 6:
+        bLocked = fn_8001E9CC(lbl_801D5948, aBits[n]) == 0;
+        break;
+    case 7:
+        bLocked = !pProfile->aC8[n].award.bWon;
+        break;
+    case 8:
+        bLocked = 1;
+        for (i = 0; i < 31; i++) {
+            if (pProfile->aC8[i].award.bWon) {
+                nCount++;
+            }
+        }
+        if (nCount >= n) {
+            bLocked = 0;
+        }
+        break;
+    case 9:
+        bLocked = pProfile->tour.nSeason < n;
+        break;
+    case 10:
+        bLocked = 1;
+        if (fn_800564AC(n)) {
+            bLocked = 0;
+        }
+        for (i = 0; i < 11; i++) {
+            if (pProfile->a1054C[i].b && pProfile->a1054C[i].n == n) {
+                bLocked = 0;
+            }
+        }
+        break;
+    case 11:
+        bLocked = 1;
+        for (i = 0; i < 11; i++) {
+            if (pProfile->a1054C[i].b) {
+                nCount++;
+            }
+        }
+        if (nCount >= n) {
+            bLocked = 0;
+        }
+        break;
+    case 12:
+        if (fn_80125694() && n <= fn_801258E8()) {
+            bLocked = 0;
+        } else {
+            bLocked = 1;
+        }
+        break;
+    case 13:
+        bLocked = 1;
+        break;
+    case 14:
+        bLocked = !pProfile->aLadderAward[n].bWon;
+        break;
+    case 15:
+        bLocked = 1;
+        for (i = 0; i < 25; i++) {
+            if (pProfile->aLadderAward[i].bWon) {
+                nCount++;
+            }
+        }
+        if (nCount >= n) {
+            bLocked = 0;
+        }
+        break;
+    case 16:
+        bLocked = n > GM_GetGameProgress(pProfile);
+        break;
+    case 17:
+        bLocked = !pProfile->aRTEAward[n].bWon;
+        break;
+    case 18:
+        bLocked = 1;
+        for (i = 0; i < 75; i++) {
+            if (pProfile->aRTEAward[i].bWon) {
+                nCount++;
+            }
+        }
+        if (nCount >= n) {
+            bLocked = 0;
+        }
+        break;
+    case 19:
+        bLocked = pProfile->aMedal[n] != 0;
+        break;
+    case 20:
+        bLocked = 1;
+        if (pProfile->nTourCardLevel >= 1) {
+            nCount = 1;
+        }
+        for (i = 0; i < 29; i++) {
+            if (pProfile->aMedal[i]) {
+                nCount++;
+            }
+        }
+        if (nCount >= n) {
+            bLocked = 0;
+        }
+        break;
+    case 21:
+        bLocked = !pProfile->aAward[n].bWon;
+        break;
+    case 22:
+        bLocked = 1;
+        for (i = 0; i < 23; i++) {
+            if (pProfile->aAward[i].bWon) {
+                nCount++;
+            }
+        }
+        if (nCount >= n) {
+            bLocked = 0;
+        }
+        break;
+    case 23:
+        n += 23;
+        bLocked = !pProfile->aAward[n].bWon;
+        break;
+    case 24:
+        bLocked = 1;
+        for (i = 23; i < 16; i++) {         // EA bug: never runs (awards 23..38 were meant?)
+            if (pProfile->aAward[i].bWon) {
+                nCount++;
+            }
+        }
+        if (nCount >= n) {
+            bLocked = 0;
+        }
+        break;
+    case 25:
+        bLocked = !pProfile->a1C0[n + 12].b;
+        break;
+    case 26:
+        bLocked = 1;
+        for (i = 12; i < 16; i++) {
+            if (pProfile->a1C0[i].b) {
+                nCount++;
+            }
+        }
+        if (nCount >= n) {
+            bLocked = 0;
+        }
+        break;
+    case 27:
+        bLocked = pProfile->nTourCardLevel < n;
+        break;
+    case -1:
+        bLocked = 0;
+        break;
+    case 28:
+        bLocked = 0;
+        break;
+    default:
+        bLocked = 0;
+        break;
+    }
+    return bLocked;
 }
 
 // Pack three numbers into one, b * 1000000 + a * 10000 + c; fn_80078620 unpacks it.
