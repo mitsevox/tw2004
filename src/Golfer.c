@@ -636,8 +636,6 @@ void AI_DefaultTarget(int nPlayer) {
 }
 
 extern s8 gLuckOdds[8];                 // 0x802810B0  "1 in n" per player: 12 12 12 12
-u8   fn_80101D4C(int nPlayer);          // a CPU in game mode 11 is always lucky
-u8   fn_800DA234(void);                 // the current hole is the flagged one
 
 // ---- luck -------------------------------------------------------------------------------------
 
@@ -863,8 +861,6 @@ extern s32 gSimClub[6];             // 0x801C65A0  per player: club the rehearsa
 
 void Ball_Launch(void* pBall, int nClub, int nKind, f32 fPower, f32 fAim, int nTrajectory, f32* pA, f32* pB);
 void Ball_SimStep(void* pBall, f32 fDt, f32 fScale);              // 0x8005585C
-void fn_8001C774(int nHandle, int nClub);
-void fn_8001C724(int nHandle, int nKind);
 
 // +n on every modifier the rehearsal cares about (not LUCK), aggression the other way.
 #define BUMP_MODIFIERS(p, n)                                                                       \
@@ -1117,8 +1113,6 @@ u8 AI_RehearseShot(int nPlayer, f32* pOutDist2, u8 bFast, f32 fTolerance) {
 // ---- shot setup helpers -------------------------------------------------------------------------
 
 double fn_8015F7C4(double y, double x);   // atan2
-void Vec_Normalize(f32* pSrc, f32* pDst);   // 0x800BAEB0
-int  Scenario_RequiredShape(int nPlayer); // 0x8010069C  a lesson's shape in mode 11, else 7; nPlayer unused
 
 // The aim angle from the ball to the target, wrapped to -pi..pi. 0 is +z; positive turns left.
 f32 Shot_AimAngle(int nPlayer) {
@@ -1158,7 +1152,7 @@ void Shot_DefaultSpin(int nPlayer, f32* pOut) {
 // x = +-0.02 for a slight curve, +-0.04 for a big one, normalised.
 void AI_FaceVector(int nPlayer, f32* pOut) {
     Player* p = &gPlayers[nPlayer];
-    int     nShape = Scenario_RequiredShape(nPlayer);
+    int     nShape = Scenario_RequiredShape();
     if (nShape != 7) {
         p->nShotShape = nShape;
     }
@@ -1350,7 +1344,6 @@ u8 Lie_AllowsFullSwing(int nPlayer) {
 
 // ---- ground probes ------------------------------------------------------------------------------
 
-f32          fn_8004D5C0(CourseInfo* pCourse, f32* pPos);          // ground height, -65536.1 if none
 SurfaceType* fn_800CC190(CourseInfo* pCourse, f32* pPos);          // surface type under a point
 
 // Is the ground fDist yards from the ball toward the pin of class 3 (the green)? True when the
@@ -1766,8 +1759,6 @@ extern u8*  gpSaveData;             // 0x80281DF8  created-golfer profiles at +0
 extern char lbl_80187650[];         // "cl_bbsd" ... the default name at +0x1A
 
 void fn_800CB700(char* pDst, char* pSrc);       // string copy
-void fn_80055C40(int n);
-void fn_80055CD0(int n);
 u8   fn_80077B18(void);
 
 // Options_SetDefaults(): the defaults, then the debug "all 105" variant when session flag

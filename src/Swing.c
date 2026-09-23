@@ -104,9 +104,7 @@ extern s32         gBoostSteps[8];           // 0x80188148  power boost per leve
 
 double fabsf(double x);                // fabs
 void   fn_800130F8(int nPad, int n);         // rumble on
-void   fn_80013130(int nPad, int n);         // rumble strength
 
-f32 AI_PowerScale(int nPlayer);              // Golfer.c
 
 // Rows of gForgivenessTable, in pairs (threshold, scale) unless noted.
 enum {
@@ -527,10 +525,7 @@ f32 fn_8005B64C(int nPlayer) {
 extern Replay gReplayData;                   // 0x801D6030
 
 void Ball_Launch(void* pBall, int nClub, int nKind, f32 fPower, f32 fAim, int nTrajectory, f32* pA, f32* pB);
-void Luck_TakePerfectShot(int nPlayer);      // Golfer.c
 void CharacterState_UpdateSKAState(int nHandle);
-void fn_8006BF60(int nPlayer);               // the replay recorder
-void fn_8006C300(int nPlayer);
 void Swing_FaceVector(int nPlayer, f32* pOut);
 f32  Swing_MeterError(int nPlayer);
 void Swing_ShapeVector(int nPlayer, f32* pOut);
@@ -675,7 +670,6 @@ f32 Swing_MeterError(int nPlayer) {
 
 extern s32 gClubCurve[NUM_CLUBS];            // 0x80183578  per club, 0..26: how much it can shape
 
-void AI_FaceVector(int nPlayer, f32* pOut);  // Golfer.c
 
 // How far the face turns for a backswing angled fBackAngle off vertical: the angle as a fraction
 // of a quarter turn goes through a three-piece curve (knots at gpSwing 0xB8..0xC4), scaled by
@@ -953,9 +947,7 @@ void GOLFERSTATE_OpenONCE(void) {
     gInSwingExit = 0;
 }
 
-u8 fn_800E415C(void);
 
-u8   fn_8005D2DC(void);
 
 // Run the current state's update for every player (not while the game is held).
 void GOLFERSTATE_Update(void) {
@@ -999,7 +991,6 @@ void fn_8005CD94(void) {
 // ---- state 2: thinking ----------------------------------------------------------------------------
 
 u8    fn_800C7100(void* pView);              // its camera has settled
-void  AI_ApplyError(int nPlayer);            // Golfer.c
 
 #define CPU_TOLERANCE 0.0025f               // 0.05 yd squared: land within 1.8 in of the target
 
@@ -1151,8 +1142,6 @@ f32 Swing_StartTime(SwingData* pSw) {
     return 0.0076f + pSw->fTimeSwingStart;
 }
 
-u8*  fn_800136C4(int nController);
-u8   fn_80100C00(void);
 extern u8 lbl_80281194[4];                   // a neutral pad: both sticks centred (0x80)
 
 // A controller's pad state; the neutral pad when there is none or input is locked.
@@ -1300,7 +1289,6 @@ int  fn_800204A0(u8* pClip, f32* pOut, f32 fTime);
 void Character_UpdateAnimation(ShotObj* pObj, int a, f32 f);
 void Swing_UpdatePower(int nPlayer);
 void Swing_BoostInput(int nPlayer);
-u8   fn_80100AF8(void);                                // lesson 5 of mode 11
 
 // Freeze the backswing at the top: the animation stops (rate 0.008) where it is.
 void Swing_HoldAtTop(int nPlayer) {
@@ -1572,8 +1560,6 @@ int Swing_UpdateDownswing(int nPlayer) {
 
 // ---- after impact ---------------------------------------------------------------------------------
 
-u32  fn_800136DC(int nController);           // buttons: held << 16 | pressed this frame
-u32  fn_800142AC(int nButton, int a);        // a button's mask
 unsigned long long fn_8000BEE4(char* pName);   // a tuning name's 64-bit hash
 void fn_800102DC(unsigned long long uHash, void* pOwner, u32* pOut);   // bind a named resource
 
@@ -1823,7 +1809,6 @@ void fn_8005A788(int nPlayer, int a) {
     gPlayers[nPlayer].swing.bDrawBoostUI = a;
 }
 
-u8   fn_800C6CB0(void);
 void fn_800AE3F8(int nView);
 
 void fn_8005A7A0(int nPlayer) {
@@ -1838,11 +1823,7 @@ void fn_80035138(int a);
 void fn_80016B9C(void);
 void fn_8001614C(void);
 void fn_80013EEC(void);
-void fn_80014118(int a);
 void fn_80035118(int a, int b);
-void fn_80012F50(int a, int b, int c);
-void fn_80012F34(int a);
-void fn_80012EF8(void);
 void fn_80036100(u8* pMesh, void* pDesc, int n);
 void fn_800360D4(u8* pMesh);
 
@@ -2085,9 +2066,6 @@ void Swing_ResetBoostAndSpin(int nPlayer) {
 // the player's SwingStack. Most of these drive the camera, HUD and sounds around the swing.
 
 void  fn_800E3D38(int nPlayer, int a);
-void  GM_DoPostShotInHoleUI(int nPlayer);
-u8    fn_80063C90(void* pView);              // the camera is still moving
-void  fn_80063BF4(void* pView, f32 f, f32* pVec);
 void  GM_BumpBallForObstructions(void);
 extern u8  lbl_80281E10;
 typedef struct Vec4 { f32 x, y, z, w; } Vec4;
@@ -2373,9 +2351,7 @@ void STATEFUNC_ReplaySwingExit(int nPlayer) {
 s8 GOLFERSTATE_GetPreviousState(int nPlayer);               // the state below the top of the stack
 u8    fn_80063C50(void* pView);
 void  fn_80063CBC(void* pView, f32* pVec);
-void  fn_80045558(u8 bOn, int nPlayer);
 void  fn_8006C608(void);
-void fn_80062CE0(u8 a);
 void  fn_800C1790(void* pView, int nPlayer);
 void fn_80062DB8(void* pView, int a);
 extern Vec4 lbl_80183670;
@@ -2434,7 +2410,6 @@ void STATEFUNC_ZoomInit(int nPlayer) {
 }
 
 
-void  fn_8006AAB4(int nPlayer, int a);
 extern Vec4 lbl_801835F0;
 extern u8   lbl_80281E12;
 
@@ -2504,7 +2479,6 @@ extern u8*  lbl_80281F78;                    // a game object: +0x1C0 non-zero e
 extern u8   gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
 u8    fn_800C4650(View* pView, int nPlayer);
 void  fn_80017158(int nView);
-void  fn_800170C4(int nView, int a);
 void  fn_800C7178(View* pView, int nPlayer);
 extern Vec4 lbl_80183690;
 extern Vec4 lbl_80183610;
@@ -2636,7 +2610,6 @@ void STATEFUNC_MidHoleFlyByExit(int nPlayer) {
 
 void fn_80062B64(int nPlayer);
 void fn_80062B60(int nPlayer);
-void  Character_SetPosition(int nHandle, f32* pPos, int a);
 void  fn_800C7140(int a);
 void  fn_80045824(int nPlayer);
 extern Vec4 lbl_80183630;
@@ -2706,11 +2679,8 @@ void STATEFUNC_MidHoleFlyByInit(int nPlayer) {
 }
 
 
-void  GM_MovePlayerToBall(int nPlayer);
 void fn_80062BFC(int nHandle);
 void fn_80062BE8(int nHandle);
-u8*   fn_80016CFC(int nView);
-void  Caddie_ApplyTip(int nPlayer);           // Golfer.c
 
 void STATEFUNC_TapInInit(int nPlayer) {
     GM_MovePlayerToBall(nPlayer);
@@ -2759,7 +2729,6 @@ void STATEFUNC_GreenWatchRollInit(int nPlayer) {
 
 
 u8    fn_800172C4(void* pView);               // the camera move has finished
-u8    fn_80014300(u32 uMask);                 // any pad pressed these buttons
 u8 fn_80062B90(void);
 u8 fn_80062B88(int nPlayer);
 void fn_80062B84(int a);
@@ -2819,11 +2788,6 @@ void STATEFUNC_InitialFlyByUpdate(int nPlayer) {
 }
 
 
-void  fn_8006B2C4(int nPlayer, int a);
-u8    fn_80101738(void);
-u8    fn_800C6CB0(void);
-void  fn_8006ACF8(int nPlayer, int a);
-void  fn_800DB714(int nPlayer);
 void fn_80062DC0(void* pView);
 void  fn_80050D2C(u8 bOn);                    // Ball.c: the second sim flag
 extern Vec4 lbl_80183640;
@@ -2965,11 +2929,8 @@ void STATEFUNC_KneeCamUpdate(int nPlayer) {
 }
 
 
-void  Caddie_Update(int nPlayer);             // Golfer.c
 void fn_80058FA4(int nPlayer);
 void  fn_80068AA8(int nPlayer);
-void  fn_800689D4(int nPlayer);
-void  fn_800957FC(int nHandle, int a);
 void  fn_800957B0(int nHandle, int a);
 void  fn_80054A6C(u8* pBall);
 f32   fn_800D04AC(int nPlayer);
@@ -3049,12 +3010,9 @@ void  fn_800170F4(int nView);
 void  fn_80017004(int nView);
 void  fn_80012EF0(void);
 void  fn_800171D8(f32 x, f32 y, f32 w, f32 h);
-void  fn_8001D8DC(int nPlayer);
 void  fn_8003349C(f32 a, f32 b, f32 c);
 void  fn_800D8D10(int nPlayer);
 void  fn_800693A4(int nPlayer);
-void  fn_80069330(int nPlayer, f32* pPos);
-void  fn_8006A6C4(int nPlayer);
 extern Vec4 lbl_801836A0;
 
 // State 20: the walk to the tee. Camera 10 on this player's view, every other player's views
@@ -3151,12 +3109,7 @@ void STATEFUNC_PlaceBallInit(int nPlayer) {
 }
 
 
-void  BreakLine_Start(int nView);            // GoBreakLine.c
 void fn_80062CB0(int a, u8 b);
-void  GM_CheckForShotChanges(int nPlayer);
-void  fn_800EDAE0(int nPlayer);
-u8    GM_PlayerTakeMulligan(int nPlayer);
-void  PlaceBall_UpdateMomentums(int nPlayer, f32 f);
 
 // State 9: the putt-line view. Pops when neither button 46 nor 48 is held and the view's fade
 // is complete. For a human outside a replay, before the swing starts, the caddie updates and
@@ -3288,9 +3241,7 @@ void STATEFUNC_ZoomUpdate(int nPlayer) {
 }
 
 
-int   GameEffects_BallUpdatesThisFrame(int nPlayer);               // preview speed: ghost steps per frame
 void  Physics_Simulate(u8* pBall, int nTicks);     // Ball.c: step a ball
-f32   Vec_Distance(f32* pA, f32* pB);
 extern Vec4 lbl_80183600;
 
 // State 6, the putt preview playing. Any button ends it (any pad for a CPU). Otherwise the
@@ -3354,13 +3305,9 @@ void STATEFUNC_GreenWatchRollUpdate(int nPlayer) {
 }
 
 
-int   GM_ChooseRemoveBallState(int nPlayer);
 void  fn_800C7168(View* pView, int a);
 u8    fn_800C7170(View* pView);
 void  fn_800C7158(View* pView, int a);
-int   GM_ShowPostShotAnimation(int nPlayer);
-int   fn_8006AA9C(int nPlayer);
-int   fn_80095798(int nHandle);
 u8    fn_800C7160(View* pView);
 u8    fn_800734A0(void* pAnim);
 int fn_80062C1C(int nHandle);
@@ -3419,7 +3366,6 @@ u8    fn_800C44E0(View* pView, int nPlayer);
 void  CharAnim_StartTapIn(int nHandle);
 u8    fn_800C6D80(void);
 void  CharacterState_AddSKABlendData(int nHandle, int a, int b, void* pfn, int c, int d, f32 f1, f32 f2, f32 f3, f32 f4, f32 f5);
-void  fn_80072ACC(void);
 void  SKEL_SetIKSolutionWeight(u8* p, f32 f);
 void  fn_80047EF0(u8* pBall, int nPlayer, int a);   // tee the ball up
 void  fn_80047B6C(u8* pBall, int nPlayer);
@@ -3533,8 +3479,6 @@ void STATEFUNC_ReplaySwingUpdate(int nPlayer) {
 
 void  fn_80062F1C(void* pView);
 void  fn_800CC5C0(int nHandle, char* pA, char* pB);   // an attachment (the glove) on / off
-void  fn_8009B970(int nView);
-int   fn_800DDFB4(int nPlayer);
 void  fn_8007326C(u8* pAnim);
 
 // State 1 begins: addressing the ball. Camera 25 and the game's 0x20C hook; a fresh Shot_Plan
@@ -3757,9 +3701,7 @@ void STATEFUNC_PreShotUpdate(int nPlayer) {
 
 u8    fn_8001DBF4(int nHandle);               // the ball is in the golfer's hand
 int   fn_8001EED8(void* pSkel, int nBone);    // a bone's index
-f32   fn_8004D620(CourseInfo* pCourse, f32* pPos);   // ground height, -60000 and below if none
 void fn_80062DDC(f32* pA, f32* pB, f32* pOut);       // a - b
-void  fn_800BAF04(f32* pSrc, f32* pDst);      // normalise (3)
 void  fn_80051A18(u8* pBall, f32* pDir, f32 fSpeed, u8* pFrom);   // Ball.c: launch with a velocity
 extern Vec4 lbl_80183680;
 extern f32  gRealBallRadiusIn;               // 0x80283300  0.84: a real golf ball, in inches
@@ -3840,16 +3782,10 @@ void STATEFUNC_RemoveBallUpdate(int nPlayer) {
 
 
 u8    fn_800C6D9C(void);
-void  GM_SimulateBallMovement(int nPlayer);
 u8 fn_80062DD4(View* pView);               // the view has faded out
 f32 fn_80062DCC(View* pView);               // and how far
-void  GM_PlayerTookShot(int nPlayer);
-void  fn_8006C4A0(void);                      // take the shot back (a mulligan)
 void  fn_800DBDA8(int nPlayer);
-u8 fn_80058F5C(int nPlayer);              // the per-frame swing poll: the ball was struck
 void  fn_8006BB5C(int nPlayer);
-u8    fn_8004560C(void);
-u8    fn_800E430C(int nPlayer);
 u8    fn_800C6D28(void);
 void  fn_800C6DE4(void);
 u8    fn_800C6D64(void);
@@ -3940,31 +3876,17 @@ void STATEFUNC_SimulateUpdate(int nPlayer) {
 
 
 void  fn_800A562C(u8 nPlayer);
-void  fn_8006BAA8(int nPlayer);
 u8    fn_800DA264(void);                      // tips are on
-u8    fn_800DA174(void);
-u8    fn_800DA1D4(void);
-u8    fn_800DA234(void);
-void  fn_800E505C(int nTip);
 void  fn_800D1DAC(int nPlayer);
-u8    fn_800ED540(void);
 void  fn_800EAC7C(void);
 void  fn_800E502C(void);
 void  fn_800E4FFC(void);
-void  fn_800ED548(void);
-void  Caddie_Start(int nPlayer);              // Golfer.c
-void fn_80062C5C(void);
-void  fn_800DB4E8(int nPlayer);
 void fn_80062B68(int nPlayer);
-u8    fn_800E5098(void);
-u8    fn_800E3DDC(int nPlayer);
-void  GM_BallHit(int nPlayer);
 void fn_80062B6C(int nPlayer);
 void  fn_800C6618(View* pView, int nPlayer);
 int   fn_800C7138(View* pView);
 u8    fn_800C441C(View* pView, int nPlayer);
 void  fn_800642D0(View* pView, int nPlayer);
-void GOLFERSTATE_Push(int nState, int nPlayer);   // another stack operation
 
 // State 10 begins: setting up the shot. The address animation and the HUD's club and shot
 // kind; camera 12; the tutorial tips (first tee, first approach, first putt) for a human when
@@ -4141,15 +4063,7 @@ void STATEFUNC_SwingUpdate(int nPlayer) {
 }
 
 
-u8    fn_800E46B4(void);
-void  GM_ReplaceOOBBall(int nPlayer);
 f32 fn_80062C28(int nHandle);
-void fn_80062B78(int nPlayer);
-void fn_80062B74(int nPlayer);
-void fn_80062B70(void);
-u8    Gimme_Allowed(int nPlayer);
-void fn_80062D0C(int nPlayer);
-void  fn_800E41D4(int nPlayer);
 extern Vec4 lbl_80183620;
 
 // State 14: the ball has come to rest, not holed. First frame: the result to the view and the
