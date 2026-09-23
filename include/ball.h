@@ -103,6 +103,15 @@ typedef struct CourseInfo {
     PinPos tee[4];              // 0xB0  the tee of each tee set (gSession.nTeeSet[])
 } CourseInfo;
 
+// An object in the world the ball can hit (a tree, a building, the flagstick), as fn_800B1B18
+// reports it. Only the fields Ball.c reads are known; its size is not.
+typedef struct HitObject {
+    u8   unk0[0x146];
+    u8   nKind;                 // 0x146  11 = the flagstick
+    u8   unk147[0x19C - 0x147];
+    f32  fSway;                 // 0x19C  the flag's sway; not 0 while it still moves
+} HitObject;
+
 // A golf ball in flight or at rest (0xBC bytes): Player.ball and Player.ballBefore hold one each.
 typedef struct Ball {
     // Field names in the comments after "TW06:" are from Tiger Woods PGA Tour 06's PhysicsBall_t
@@ -134,7 +143,7 @@ typedef struct Ball {
     s32  nSolidCollideCount;    // 0x84  TW06: solidCollideCount
     SurfaceType* pHitSurface;   // 0x88  what it last hit. TW06: pLastCollisionSurface
     TerObject* pHitObject;      // 0x8C  the object it last hit. TW06: pLastCollisionObject
-    s32  n90;                   // 0x90  what the ball last hit (fn_80054040). TW06: pLastCollisionActor
+    HitObject* pHitActor;       // 0x90  the world object it last hit (fn_80054040). TW06: pLastCollisionActor
     s32  nPlayer;               // 0x94  -1 when nobody's. TW06: playerID
     u8   bHoled;                // 0x98  TW06: PBF_InHole
     u8   b99;                   // 0x99

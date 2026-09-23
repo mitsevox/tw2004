@@ -5,7 +5,6 @@
 #include "game.h"
 
 extern u8 gNumPlayersSetUp;                 // 0x80281D48 (Golfer.c)
-extern u8 lbl_80203138[14];                 // the tips already shown (GameMessages.c)
 
 u8  fn_800E6020(int nMode, int nTip);
 u8  fn_800E60E4(u32 nTip);

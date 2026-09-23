@@ -40,6 +40,8 @@ u32  Rand_Next(int nStream);            // 0x8000B130  EA's lagged-Fibonacci gen
 void fn_8000B1D4(int nStream, u32 uSeed);   // seed a random stream
 f32  Rand_Float(int nStream);           // 0x8000B428  [0, 1)
 double fn_8015F824(double x, double y); // pow
+f32  fn_800BB028(f32* pA, f32* pB);     // squared distance
+void vec4flt_CrossProduct(f32* pA, f32* pB, f32* pOut);   // cross product
 
 // ---- the file streamer (UStream.c) -----------------------------------------------------------
 

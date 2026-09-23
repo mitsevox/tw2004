@@ -8,46 +8,6 @@
 void  fn_8001437C(void);
 void  fn_8006A8B0(void);
 
-extern u8  lbl_80282281;                    // the end-of-round screen is up
-extern u8  lbl_80282282;                    // the end-of-hole screen is up
-extern s32 lbl_80282288;
-extern s32 lbl_8028228C;
-extern s32 lbl_80282290;
-extern s32 lbl_80282294;
-extern s32 lbl_80282298;
-extern s32 lbl_8028229C;
-extern s32 lbl_802822A4;
-extern s32 lbl_802822A8;
-extern s32 lbl_802822AC;
-extern s32 lbl_802822B0;
-extern s32 lbl_802822B4;
-extern s32 lbl_802822B8;
-extern u8  lbl_802822BE;
-extern u8  lbl_802822BF;
-extern u8  lbl_802822C0;
-extern u8  lbl_802822C1;
-extern u8  lbl_802822C2;
-extern u8  lbl_802822C3;
-extern u8  lbl_802822C4;
-extern u8  lbl_802822DB;
-extern u8  lbl_802822DC[3];
-extern u8  lbl_802822DF;
-
-extern u8  lbl_80282280;
-extern s32 lbl_80282284;
-extern s32 lbl_802822A0;
-extern u8  lbl_802822BC;
-extern u8  lbl_802822BD;
-extern u32 lbl_802822C8;                    // frame counts when the HUDs last changed
-extern u32 lbl_802822CC;
-extern u32 lbl_802822D0;
-extern u8  lbl_802822D4;
-extern u8  lbl_802822D5;
-extern u8  lbl_802822D6;
-extern u8  lbl_802822D7;                    // the HUD on screen 3 (split screen, player 2)
-extern u8  lbl_802822D8;                    // the HUD on screen 2 (split screen, player 1)
-extern u8  lbl_802822D9;                    // the HUD on the single screen
-extern u8  lbl_802822DA;
 void  fn_800E3E0C(void);
 
 // Clears every display flag and timer at the start of a round.
@@ -99,32 +59,12 @@ u8    fn_8010D390(void);
 u8    fn_80126FD8(void);
 u8    fn_80127004(void);
 
-// A queued display item: three values whose meaning depends on the queue.
-typedef struct UIQueueItem {
-    s32 a;
-    s32 b;
-    s32 c;
-} UIQueueItem;
-
-extern UIQueueItem lbl_80203044[10];        // queue 0 (count lbl_802822B4)
-extern UIQueueItem lbl_802030BC[10];        // queue 1 (lbl_802822B8)
-extern UIQueueItem lbl_80202FCC[10];        // queue 2 (lbl_802822B0)
-extern UIQueueItem lbl_80202F54[10];        // queue 3 (lbl_802822AC)
-extern UIQueueItem lbl_80202EDC[10];        // queue 4 (lbl_802822A8)
-extern UIQueueItem lbl_80202E64[10];        // queue 5 (lbl_802822A0), no duplicates
-extern UIQueueItem lbl_80202DEC[10];        // queue 6 (lbl_8028229C)
-extern UIQueueItem lbl_80202D74[10];        // queue 7 (lbl_80282298)
-extern UIQueueItem lbl_80202CFC[10];        // queue 8 (lbl_80282294)
-extern UIQueueItem lbl_80202C84[10];        // queue 9 (lbl_80282290)
-extern UIQueueItem lbl_80202C0C[10];        // queue 10 (lbl_8028228C)
-extern UIQueueItem lbl_80202B94[10];        // queue 11 (lbl_80282288)
-
 #define UI_PUSH(q, n)       \
     {                       \
         int i = (n)++;      \
-        (q)[i].a = a;       \
-        (q)[i].b = b;       \
-        (q)[i].c = c;       \
+        (q)[i].n0 = a;       \
+        (q)[i].n4 = b;       \
+        (q)[i].n8 = c;       \
     }
 
 typedef struct Vec4 { f32 x, y, z, w; } Vec4;
@@ -409,13 +349,13 @@ void fn_800E4364(u32 nQueue, int a, int b, int c) {
         return;
     case 5:
         for (i = 0; i < lbl_802822A0; i++) {
-            if (a == lbl_80202E64[i].a) {
+            if (a == lbl_80202E64[i].n0) {
                 return;
             }
         }
-        lbl_80202E64[lbl_802822A0].a = a;
-        lbl_80202E64[lbl_802822A0].b = b;
-        lbl_80202E64[lbl_802822A0].c = c;
+        lbl_80202E64[lbl_802822A0].n0 = a;
+        lbl_80202E64[lbl_802822A0].n4 = b;
+        lbl_80202E64[lbl_802822A0].n8 = c;
         lbl_802822A0++;
         return;
     }
@@ -427,10 +367,11 @@ void fn_800E45C0(void) {
 
 // Whether any of the display timers or flags is still running.
 u8 fn_800E45CC(void) {
-    if (lbl_802822B8 != 0 || lbl_802822B4 != 0 || lbl_802822B0 != 0 || lbl_802822AC != 0 || lbl_802822A8 != 0 ||
-        lbl_802822A4 != 0 || lbl_802822C3 != 0 || lbl_802822C4 != 0 || lbl_802822C1 != 0 || lbl_802822C2 != 0 ||
-        lbl_8028229C != 0 || lbl_80282298 != 0 || lbl_80282294 != 0 || lbl_80282290 != 0 || lbl_8028228C != 0 ||
-        lbl_80282288 != 0 || lbl_802822C0 != 0 || lbl_802822BF != 0) {
+    if (lbl_802822B8 != 0 || lbl_802822B4 != 0 || lbl_802822B0 != 0 || lbl_802822AC != 0 ||
+        lbl_802822A8 != 0 || lbl_802822A4 != 0 || lbl_802822C3 != 0 || lbl_802822C4 != 0 ||
+        lbl_802822C1 != 0 || lbl_802822C2 != 0 || lbl_8028229C != 0 || lbl_80282298 != 0 ||
+        lbl_80282294 != 0 || lbl_80282290 != 0 || lbl_8028228C != 0 || lbl_80282288 != 0 ||
+        lbl_802822C0 != 0 || lbl_802822BF != 0) {
         return 1;
     }
     return 0;
@@ -494,47 +435,60 @@ u8 fn_800E46B4(void) {
         }
     }
     if (lbl_802822B4 != 0) {
-        fn_800E56D0(lbl_80203044[lbl_802822B4 - 1].a, lbl_80203044[lbl_802822B4 - 1].b, lbl_80203044[lbl_802822B4 - 1].c);
+        fn_800E56D0(lbl_80203044[lbl_802822B4 - 1].n0, lbl_80203044[lbl_802822B4 - 1].n4,
+                    lbl_80203044[lbl_802822B4 - 1].n8);
         bBusy = 1;
         lbl_802822B4--;
     } else if (lbl_802822B0 != 0) {
-        fn_800E5698(lbl_80202FCC[lbl_802822B0 - 1].a, lbl_80202FCC[lbl_802822B0 - 1].b, lbl_80202FCC[lbl_802822B0 - 1].c);
+        fn_800E5698(lbl_80202FCC[lbl_802822B0 - 1].n0, lbl_80202FCC[lbl_802822B0 - 1].n4,
+                    lbl_80202FCC[lbl_802822B0 - 1].n8);
         bBusy = 1;
         lbl_802822B0--;
     } else if (lbl_802822B8 != 0) {
-        fn_800E5660(lbl_802030BC[lbl_802822B8 - 1].a, lbl_802030BC[lbl_802822B8 - 1].b, lbl_802030BC[lbl_802822B8 - 1].c);
+        fn_800E5660(lbl_802030BC[lbl_802822B8 - 1].n0, lbl_802030BC[lbl_802822B8 - 1].n4,
+                    lbl_802030BC[lbl_802822B8 - 1].n8);
         bBusy = 1;
         lbl_802822B8--;
     } else if (lbl_802822AC != 0) {
-        fn_800E5628(lbl_80202F54[lbl_802822AC - 1].a, lbl_80202F54[lbl_802822AC - 1].b, lbl_80202F54[lbl_802822AC - 1].c);
+        fn_800E5628(lbl_80202F54[lbl_802822AC - 1].n0, lbl_80202F54[lbl_802822AC - 1].n4,
+                    lbl_80202F54[lbl_802822AC - 1].n8);
         bBusy = 1;
         lbl_802822AC--;
     } else if (lbl_802822A8 != 0) {
-        fn_800E55F0(lbl_80202EDC[lbl_802822A8 - 1].a, lbl_80202EDC[lbl_802822AC - 1].b, lbl_80202EDC[lbl_802822AC - 1].c);
+        // EA bug: n4 and n8 are taken at queue 3's count (lbl_802822AC), not this queue's
+        fn_800E55F0(lbl_80202EDC[lbl_802822A8 - 1].n0, lbl_80202EDC[lbl_802822AC - 1].n4,
+                    lbl_80202EDC[lbl_802822AC - 1].n8);
         bBusy = 1;
         lbl_802822A8--;
     } else if (lbl_8028229C != 0) {
-        fn_800E55B8(lbl_80202DEC[lbl_8028229C - 1].a, lbl_80202DEC[lbl_8028229C - 1].b, lbl_80202DEC[lbl_8028229C - 1].c);
+        fn_800E55B8(lbl_80202DEC[lbl_8028229C - 1].n0, lbl_80202DEC[lbl_8028229C - 1].n4,
+                    lbl_80202DEC[lbl_8028229C - 1].n8);
         bBusy = 1;
         lbl_8028229C--;
     } else if (lbl_80282298 != 0) {
-        fn_800E5580(lbl_80202D74[lbl_80282298 - 1].a, lbl_80202D74[lbl_80282298 - 1].b, lbl_80202D74[lbl_80282298 - 1].c);
+        fn_800E5580(lbl_80202D74[lbl_80282298 - 1].n0, lbl_80202D74[lbl_80282298 - 1].n4,
+                    lbl_80202D74[lbl_80282298 - 1].n8);
         bBusy = 1;
         lbl_80282298--;
     } else if (lbl_80282294 != 0) {
-        fn_800E5548(lbl_80202CFC[lbl_80282294 - 1].a, lbl_80202CFC[lbl_80282294 - 1].b, lbl_80202CFC[lbl_80282294].c);
+        // EA bug: n8 is taken one item past the newest (no - 1)
+        fn_800E5548(lbl_80202CFC[lbl_80282294 - 1].n0, lbl_80202CFC[lbl_80282294 - 1].n4,
+                    lbl_80202CFC[lbl_80282294].n8);
         bBusy = 1;
         lbl_80282294--;
     } else if (lbl_80282290 != 0) {
-        fn_800E5510(lbl_80202C84[lbl_80282290 - 1].a, lbl_80202C84[lbl_80282290 - 1].b, lbl_80202C84[lbl_80282290 - 1].c);
+        fn_800E5510(lbl_80202C84[lbl_80282290 - 1].n0, lbl_80202C84[lbl_80282290 - 1].n4,
+                    lbl_80202C84[lbl_80282290 - 1].n8);
         bBusy = 1;
         lbl_80282290--;
     } else if (lbl_8028228C != 0) {
-        fn_800E54D8(lbl_80202C0C[lbl_8028228C - 1].a, lbl_80202C0C[lbl_8028228C - 1].b, lbl_80202C0C[lbl_8028228C - 1].c);
+        fn_800E54D8(lbl_80202C0C[lbl_8028228C - 1].n0, lbl_80202C0C[lbl_8028228C - 1].n4,
+                    lbl_80202C0C[lbl_8028228C - 1].n8);
         bBusy = 1;
         lbl_8028228C--;
     } else if (lbl_80282288 != 0) {
-        fn_800E54A0(lbl_80202B94[lbl_80282288 - 1].a, lbl_80202B94[lbl_80282288 - 1].b, lbl_80202B94[lbl_80282288 - 1].c);
+        fn_800E54A0(lbl_80202B94[lbl_80282288 - 1].n0, lbl_80202B94[lbl_80282288 - 1].n4,
+                    lbl_80202B94[lbl_80282288 - 1].n8);
         bBusy = 1;
         lbl_80282288--;
     } else if (lbl_80282282 || lbl_80282281) {
@@ -555,8 +509,9 @@ u8 fn_800E4BF8(void) {
 // CPU side); otherwise it opens, with effects reset and event 0x41 for a human.
 void fn_800E4C20(u8 bHuman) {
     if (lbl_802822DC[0] || lbl_802822DC[1] || lbl_802822DC[2] || lbl_802822B8 != 0 || lbl_802822B4 != 0 ||
-        lbl_802822B0 != 0 || lbl_802822AC != 0 || lbl_802822A8 != 0 || lbl_802822A4 != 0 || lbl_8028229C != 0 ||
-        lbl_80282298 != 0 || lbl_80282294 != 0 || lbl_80282290 != 0 || lbl_8028228C != 0 || lbl_80282288 != 0) {
+        lbl_802822B0 != 0 || lbl_802822AC != 0 || lbl_802822A8 != 0 || lbl_802822A4 != 0 ||
+        lbl_8028229C != 0 || lbl_80282298 != 0 || lbl_80282294 != 0 || lbl_80282290 != 0 ||
+        lbl_8028228C != 0 || lbl_80282288 != 0) {
         if (bHuman) {
             lbl_802822C3 = 1;
         }
@@ -587,8 +542,9 @@ void fn_800E4D88(void) {
 void fn_800E4D94(u8 bHuman) {
     Vec4 v;
     if (lbl_802822DC[0] || lbl_802822DC[1] || lbl_802822DC[2] || lbl_802822B8 != 0 || lbl_802822B4 != 0 ||
-        lbl_802822B0 != 0 || lbl_802822AC != 0 || lbl_802822A8 != 0 || lbl_802822A4 != 0 || lbl_8028229C != 0 ||
-        lbl_80282298 != 0 || lbl_80282294 != 0 || lbl_80282290 != 0 || lbl_8028228C != 0 || lbl_80282288 != 0) {
+        lbl_802822B0 != 0 || lbl_802822AC != 0 || lbl_802822A8 != 0 || lbl_802822A4 != 0 ||
+        lbl_8028229C != 0 || lbl_80282298 != 0 || lbl_80282294 != 0 || lbl_80282290 != 0 ||
+        lbl_8028228C != 0 || lbl_80282288 != 0) {
         if (bHuman) {
             lbl_802822C1 = 1;
         }
