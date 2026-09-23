@@ -8,8 +8,8 @@ s32 WriteUARTN(s32, s32);
 s32 __TRK_write_console(s32, s32, s32*, s32);
 extern s32 lbl_80282A00;
 
-s32 fn_8015C128(s32 arg0, s32 arg1, s32* arg2, s32 arg3);
-s32 fn_8015C128(s32 arg0, s32 arg1, s32* arg2, s32 arg3) {
+s32 __write_console(s32 arg0, s32 arg1, s32* arg2, s32 arg3);
+s32 __write_console(s32 arg0, s32 arg1, s32* arg2, s32 arg3) {
     s32 var_r3;
 
     if (!(OSGetConsoleType() & 0x20000000)) {

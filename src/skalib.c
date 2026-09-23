@@ -21,14 +21,12 @@ void  fn_80020BC8(void* pClip);                        // swaps a clip in place
 void  fn_80020F60(struct Clip* pClip, u32 uAram);
 void  AnimLib_Free(AnimLib* pLib);
 void  fn_800269E4(struct LibOverlay* pOv, int nSlot, s32 n);
-void  fn_800CA9DC(int nSlot);
 u32   Skalib_NextSlot(void);
 void  Skalib_SetBudgets(void);
 u32   AnimLib_PlanBank(u32 nSlot);
 AnimLib* AnimLib_Load(u8* pData, ClipBank* pBank);
 u32   fn_8009EF90(void);
 int   Skalib_HasOverlays(int nSlot);
-u8    fn_800C9828(int nGroup, int nStyle, int nClub, int nKey);
 void  AnimLib_FreeCopies(void);
 void  ClipBank_FreeAram(void);
 

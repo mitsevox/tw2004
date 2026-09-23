@@ -160,6 +160,7 @@ rm -f build/GW4E69/ok; ninja                          # main.dol: OK
 python tools/match/lint.py --diff main                # style check on the lines you changed
 python tools/match/typeaudit.py --count               # no number higher than on main
 python tools/match/symaudit.py --count                # no number higher than on main
+python tools/match/constcheck.py --unit <Unit>        # 0 mismatches in the units you touched
 ```
 
 Lint must report 0 findings on your lines (see [`style.md`](style.md) for each rule). If a file
@@ -174,6 +175,24 @@ and section in `symbols.txt`: a global of 8 bytes or less lives in small data an
 through r13/r2, so declaring it larger, or unsized (`extern u8 x[];`), makes every use compile to
 lis/addi instead. It also checks `static` against the symbol's scope where symbols.txt knows it.
 `symaudit.py --all` lists partial views too (a declaration smaller than the object).
+
+**Constant values.** objdiff masks relocations, so a function scores 100% whatever value its
+constants hold: `lfs f1, @24@sda21(r2)` matches whether `@24` is 1/72 or `0.0138889f`, a few bits
+off. The DOL check only catches it once the unit is linked, and a port inherits the wrong value
+meanwhile.
+`constcheck.py` reads the bytes each 100% function loads, in our object and in the original's, and
+lists every difference (floats, then strings, then other data), suggesting the expression that
+reproduces the original exactly:
+
+```
+python tools/match/constcheck.py --unit Ball          # one unit
+python tools/match/constcheck.py                      # every unit, summary first
+python tools/match/constcheck.py --count              # one number (merge ratchet)
+Ball.c Ball_Holed +0x38: ours 0x3C638E45 (0.0138889002) orig 0x3C638E39 (0.013888889 = 1/72?)
+```
+
+A mismatch usually means a literal typed out to a few digits: write it the way EA did,
+`1.0f / 72.0f` or `DEG(30.0f)`, and rerun until the unit shows 0.
 
 Finishing a unit
 ----------------
@@ -210,7 +229,8 @@ second copy. The steps:
 
 Leave the unit `NonMatching` until the DOL passes. Linking is also the only real check of
 `switch` statements: objdiff masks relocations, so a jump table pointing at the wrong case bodies
-still scores 100% until the DOL comparison catches it.
+still scores 100% until the DOL comparison catches it. Until then, `constcheck.py --unit <Unit>`
+(see "Before you commit") is the check for the constants' values.
 
 When stuck
 ----------

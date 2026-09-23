@@ -19,7 +19,7 @@ EASBErrorE fn_8012CCD8(s32 nNeed) {
 // Frees the product buffer.
 EASBErrorE fn_8012CF00(void) {
     if (lbl_802825B8->pProductBuffer == NULL) return EASB_ERROR_PRODUCT_NOT_LOADED;
-    fn_80122128(lbl_802825B8->pAllocator, lbl_802825B8->pProductBuffer, EASB_PRODUCT_BUFFER_SIZE, 4);
+    TibExtMemFree(lbl_802825B8->pAllocator, lbl_802825B8->pProductBuffer, EASB_PRODUCT_BUFFER_SIZE, 4);
     lbl_802825B8->pProductBuffer = NULL;
     lbl_802825B8->b11D0 = 27;
     return EASB_ERROR_NONE;
@@ -57,7 +57,7 @@ EASBErrorE fn_8012D1A0(void) {
     if (eError != EASB_ERROR_NONE) {
         return eError;
     } else {
-        uNow = fn_80122150();
+        uNow = TibExtCurrentTimeGet();
         uStamp = fn_80128BC4(uNow);
         if (lbl_802825B8->uLastTime <= uNow) {
             uElapsed = uNow - lbl_802825B8->uLastTime;
@@ -149,7 +149,7 @@ EASBErrorE fn_8012D744(u32* pOut) {
     return fn_8012C888(pOut);
 }
 
-EASBErrorE fn_8012D794(s32 arg0) {
+EASBErrorE fn_8012D794(void* pImage) {
     EASBErrorE eError;
 
     eError = fn_8012CCD8(EASB_NEED_FILE);
@@ -158,7 +158,7 @@ EASBErrorE fn_8012D794(s32 arg0) {
     } else {
         eError = fn_8012D1A0();
         if (eError == EASB_ERROR_NONE) {
-            eError = fn_8012C7BC(&lbl_802825B8->u54, &lbl_802825B8->product, arg0);
+            eError = fn_8012C7BC(&lbl_802825B8->u54, &lbl_802825B8->product, pImage);
         }
         return eError;
     }
@@ -217,7 +217,7 @@ EASBErrorE fn_8012DAB8(u16 uLevel) {
 }
 
 EASBErrorE fn_8012DD24(u16* szName, s32 arg1, s32 nLanguage) {
-    return fn_8012DB30(szName, arg1, nLanguage, fn_80122150());
+    return fn_8012DB30(szName, arg1, nLanguage, TibExtCurrentTimeGet());
 }
 
 // Switches which play-time counter runs, adding up the time so far first.
