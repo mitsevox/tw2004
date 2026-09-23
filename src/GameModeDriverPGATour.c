@@ -125,7 +125,13 @@ u8   fn_8011A6F4(s32 a, s32 b);
 extern u8  gNumPlayersSetUp;
 extern s32 lbl_80282340;
 s32  fn_80119A04(s32 a, s32 b);
-u8   fn_801197A4(s32 a, s32 b);
+u8   fn_801197A4(s32 nPlayer, s32 b);
+u8   fn_80117DE0(void);
+void fn_80117DF0(s32 nPlayer);
+void fn_80117AF8(s32 nPlayer);
+void fn_800EED0C(s32 nPlayer);
+void fn_8011A538(s32 nPlayer);
+void fn_80117D80(s32 nPlayer);
 u8   fn_800EF83C(u16 nDate, s32* pId, s32* pRound);
 s32  fn_8011A7C8(s32 nPlayer, s32 nHole);
 s32  fn_80119588(s32 nPlayer, s32 a);
@@ -260,6 +266,29 @@ s32 fn_800EE8B0(void) {
 
 Pga80205F30* fn_800EE8B8(void) {
     return &lbl_80205F30;
+}
+
+// A round is over. The round count goes up and a player who missed the cut is out; after the last
+// round the tournament ends.
+void fn_800EEF88(s32 nPlayer) {
+    if (fn_80117DE0()) {
+        fn_80117DF0(nPlayer);
+        if (gpSaveData[nPlayer].tour.nRound == 0) {
+            fn_80117AF8(nPlayer);
+        }
+    } else {
+        fn_800EED0C(nPlayer);
+        fn_8011A538(nPlayer);
+        fn_80117D80(nPlayer);
+        fn_80117DF0(nPlayer);
+        gpSaveData[nPlayer].tour.nRound++;
+        if (fn_801197A4(nPlayer, 0)) {
+            fn_800EF130(nPlayer, 0);
+        }
+        if (gpSaveData[nPlayer].tour.nRound >= fn_800EFA9C(gpSaveData[nPlayer].tour.nEvent)) {
+            fn_800EEB94(nPlayer);
+        }
+    }
 }
 
 void fn_800EF094(s32 a, s32 n) {
