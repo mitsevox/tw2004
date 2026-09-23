@@ -6,6 +6,9 @@
 #include "golfer.h"
 #include "charstate.h"
 
+void  fn_8001A75C(UStreamObject* pObject);
+void  fn_8001A798(void);
+void  fn_8001A7C8(void);
 Character* fn_8001A9F4(u8* pData, int a, int nPlayer, u32 uId, u8 b, void* p);
 void  fn_8001C0E0(Character* pChar);
 Character* fn_8001C21C(Character* pChar);
@@ -36,12 +39,8 @@ void fn_8001A0FC(s32 arg0);
 void fn_8001A484(void);
 void fn_8010BF68();
 void fn_8001A73C(void);
-void AnimLib_MergeOverlay();
-void fn_8001A75C(u8* p0);
-void fn_8001A7C8(void);
 void fn_80014BB4();
 void fn_80014DC0();
-void fn_8001A798();
 void fn_8001A7F0(void);
 void fn_8001B1DC(s32 p0, u8* p1, s32 p2);
 void fn_8001B1E8(void* p);
@@ -66,14 +65,10 @@ void fn_8001C304(void);
 void fn_8001C350(void);
 void fn_8001C650(void* arg0, s32 arg1);
 void fn_8001DB98(u8* p0);
-void fn_8001E85C(u8* p0, u8* p1);
 f32 fn_8001EFFC(u8* p);
 void* fn_8001F004(void);
 extern f32 lbl_80282BC0;
 extern f32 lbl_80282BF8;
-s32 fn_8001EE88(u8* p);
-void fn_8001EE98(u8* p0, s32 p1);
-f32 fn_8001EEA4(u8* p0, u8* p1);
 extern s32 lbl_80280DF0;
 void* fn_80008370();
 
@@ -105,17 +100,6 @@ void fn_8001A484(void) {
 
 void fn_8001A73C(void) {
     fn_8010BF68();
-}
-
-// port: the 'SAC ' handler; the overlay library is little-endian on disc and AnimLib_MergeOverlay
-//       swaps it (fn_80020BC8 > fn_80076158): a little-endian port does not swap there.
-void fn_8001A75C(u8* p0) {
-    AnimLib_MergeOverlay(*(s32*)p0, *(s32*)(p0 + 0x20));
-    fn_80009E70(p0);
-}
-
-void fn_8001A7C8(void) {
-    UStream_UnregisterHandler(1396785952);
 }
 
 void fn_8001A7F0(void) {
@@ -196,25 +180,6 @@ void fn_8001DB98(u8* p0) {
     *(s32*)(p0 + 0x4A4) = 0;
 }
 
-void fn_8001E85C(u8* p0, u8* p1) {
-    *(f32*)(p1 + 0xC) = *(f32*)(p0 + 0xC);
-    *(f32*)p1 = *(f32*)p0;
-    *(f32*)(p1 + 0x4) = *(f32*)(p0 + 0x4);
-    *(f32*)(p1 + 0x8) = *(f32*)(p0 + 0x8);
-}
-
-s32 fn_8001EE88(u8* p) {
-    return *(s32*)(p + 0x1658);
-}
-
-void fn_8001EE98(u8* p0, s32 p1) {
-    *(u8*)(((u8*)*(s32*)(p0 + 0x38)) + 0xEE) = p1;
-}
-
-f32 fn_8001EEA4(u8* p0, u8* p1) {
-    return (*(f32*)(p0 + 0xC) * *(f32*)(p1 + 0xC) + (*(f32*)(p0 + 0x8) * *(f32*)(p1 + 0x8) + (*(f32*)p0 * *(f32*)p1 + (*(f32*)(p0 + 0x4) * *(f32*)(p1 + 0x4)))));
-}
-
 f32 fn_8001EFFC(u8* p) {
     return *(f32*)(p + 0xB0);
 }
@@ -265,6 +230,22 @@ void fn_8001A488(void) {
     if (gSession.nNumPlayers > 2) {
         fn_8010BFE0();
     }
+}
+
+// The 'SAC ' handler: an animation library merged over the one of the slot the object's id names.
+// port: the overlay library is little-endian on disc and AnimLib_MergeOverlay swaps it
+//       (fn_80020BC8 > fn_80076158): a little-endian port does not swap there.
+void fn_8001A75C(UStreamObject* pObject) {
+    AnimLib_MergeOverlay(pObject->pData, pObject->uId);
+    fn_80009E70(pObject);
+}
+
+void fn_8001A798(void) {
+    UStream_RegisterHandler('SAC ', fn_8001A75C);
+}
+
+void fn_8001A7C8(void) {
+    UStream_UnregisterHandler('SAC ');
 }
 
 // Add a character to the table of characters (up to five); NULL when it is full.
@@ -370,6 +351,14 @@ u8 fn_8001DBF4(Character* pChar) {
     return 0;
 }
 
+// Copy a 4-vector.
+void fn_8001E85C(f32* pSrc, f32* pDst) {
+    pDst[3] = pSrc[3];
+    pDst[0] = pSrc[0];
+    pDst[1] = pSrc[1];
+    pDst[2] = pSrc[2];
+}
+
 void fn_8001E880(f32* pSrc, f32* pDst) {
     pDst[0] = pSrc[0];
     pDst[1] = pSrc[1];
@@ -432,8 +421,21 @@ void fn_8001EE64(Character* pChar) {
     fn_8001ED08(pChar, 1);
 }
 
+int fn_8001EE88(Character* pChar) {
+    return pChar->n1658;
+}
+
 int fn_8001EE90(Character* pChar) {
     return pChar->n1654;
+}
+
+void fn_8001EE98(Character* pChar, u8 b) {
+    pChar->pModel->bEE = b;
+}
+
+// The dot product of two 4-vectors.
+f32 fn_8001EEA4(f32* pA, f32* pB) {
+    return pA[0] * pB[0] + pA[1] * pB[1] + pA[2] * pB[2] + pA[3] * pB[3];
 }
 
 int fn_8001EED8(CharModel* pModel, int nBone) {

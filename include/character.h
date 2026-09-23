@@ -383,6 +383,7 @@ extern f32         lbl_80281D1C;
 void* AnimLib_Pick(int nPlayer, AnimLib* pLib, int nGroup, int nStyle, int nClub, int nKey, u32* pFlags,
                    const char* pName);
 void* Char_SetClip(Character* pChar, int nGroup, int nStyle, const char* pName);
+s32   AnimLib_MergeOverlay(u8* pData, int nSlot);   // skalib.c; char.c's 'SAC ' handler
 
 // Swing.c
 f32   fn_8005CB78(Character* pChar, u64 uEvent);    // the time of an animation event
