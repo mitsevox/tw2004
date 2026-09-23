@@ -437,26 +437,26 @@ f32 fn_8005CB78(Character* pChar, u64 uEvent) {
     return pChar->events[(int)uEvent].fTime;
 }
 
-void ShotObj_Set162C(Character* pObj, f32 f) {
+void fn_8005CB88(Character* pObj, f32 f) {
     if (pObj != NULL) {
         pObj->f162C = f;
     }
 }
 
-f32 ShotObj_GetBlend(Character* pObj) {
+f32 Char_GetBackswing(Character* pObj) {
     if (pObj == NULL) {
         return 0.0f;
     }
     return pObj->fBackswing;
 }
 
-void ShotObj_Set1630(Character* pObj, f32 f) {
+void fn_8005CBB0(Character* pObj, f32 f) {
     if (pObj != NULL) {
         pObj->f1630 = f;
     }
 }
 
-void ShotObj_Set1634(Character* pObj, f32 f) {
+void fn_8005CBC0(Character* pObj, f32 f) {
     if (pObj != NULL) {
         pObj->f1634 = f;
     }
@@ -1385,9 +1385,9 @@ int Swing_UpdateBackswing(int nPlayer) {
             CharacterState_UpdateSKAState(pObj);
             pObj->n5CC = 2;
             pSw->fTimeSwingTop = pObj->fAnimTime;
-            ShotObj_Set1634(pObj, 0.0f);
-            ShotObj_Set1630(pObj, 0.0f);
-            ShotObj_Set162C(pObj, 1.4f * ShotObj_GetBlend(pObj));
+            fn_8005CBC0(pObj, 0.0f);
+            fn_8005CBB0(pObj, 0.0f);
+            fn_8005CB88(pObj, 1.4f * Char_GetBackswing(pObj));
             pSw->nState = 3;
         }
         return 0;
@@ -1397,7 +1397,7 @@ int Swing_UpdateBackswing(int nPlayer) {
     nY     = Swing_StickY(nPlayer, pPad);
     fTop   = Swing_TopTime(pSw);
     fStart = Swing_StartTime(pSw);
-    if ((nY <= 255 && nY > 96) || (ShotObj_GetBlend(pObj) < 0.1f && nY < 96)) {
+    if ((nY <= 255 && nY > 96) || (Char_GetBackswing(pObj) < 0.1f && nY < 96)) {
         if (nY < 96) {
             fMag = 0.0f;
         } else {
@@ -1467,9 +1467,9 @@ int Swing_UpdateBackswing(int nPlayer) {
         CharacterState_UpdateSKAState(pObj);
         pObj->n5CC = 2;
         pSw->fTimeSwingTop = pObj->fAnimTime;
-        ShotObj_Set1634(pObj, 0.0f);
-        ShotObj_Set1630(pObj, 0.0f);
-        ShotObj_Set162C(pObj, 1.4f * ShotObj_GetBlend(pObj));
+        fn_8005CBC0(pObj, 0.0f);
+        fn_8005CBB0(pObj, 0.0f);
+        fn_8005CB88(pObj, 1.4f * Char_GetBackswing(pObj));
         pSw->nState = 3;
         EVENT_Trigger(nPlayer, 0x2F, 0, 0);
         pSw->nFollowThroughX = nX;
