@@ -4625,6 +4625,9 @@ dolphin/dsp/dsp_task.c:
 
 dolphin/dvd/dvdlow.c:
 	.text       start:0x8013A0D0 end:0x8013AF10
+	.bss        start:0x8027A4C0 end:0x8027A590
+	.sdata      start:0x80281A08 end:0x80281A10
+	.sbss       start:0x80282778 end:0x802827C0
 
 dolphin/dvd/dvdfs.c:
 	.text       start:0x8013AF10 end:0x8013B3C4

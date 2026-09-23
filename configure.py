@@ -713,7 +713,7 @@ config.libs = [
         "src_dir": "extern/sdk",
         "objects": [
             Object(NonMatching, "dolphin/dvd/fstload.c"),
-            Object(NonMatching, "dolphin/dvd/dvdlow.c"),
+            Object(Matching, "dolphin/dvd/dvdlow.c"),
             Object(NonMatching, "dolphin/dvd/dvdfs.c"),
             Object(Matching, "dolphin/dvd/dvderror.c"),
             Object(Matching, "dolphin/dvd/dvdqueue.c"),
