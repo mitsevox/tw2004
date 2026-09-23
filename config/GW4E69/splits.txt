@@ -3730,6 +3730,7 @@ dolphin/os/OSAudioSystem.c:
 
 dolphin/os/OSCache.c:
 	.text       start:0x80149404 end:0x8014983C
+	.data       start:0x8019B368 end:0x8019B598
 
 dolphin/os/OSContext.c:
 	.text       start:0x8014983C end:0x8014A0AC
