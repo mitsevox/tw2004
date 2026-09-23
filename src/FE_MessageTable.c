@@ -44,6 +44,8 @@ void fn_80101EE8(void);                 // GameMode11.c
 void fn_800EE2C8(void);                 // GameModeDriverPGATour.c
 u8*  fn_8010C718(void);                 // CharSliders.c
 void fn_801260C0(void);                 // GameMode22.c
+s32  fn_80124094(void);                 // gbacable.c
+s32  fn_801255C4(s32* pPos);            // EASportsBio.c
 void fn_80126F84(s32 n);                // GameMode22.c: sets lbl_80195498.n4
 void fn_80126F94(s32 n);                // GameMode22.c: sets lbl_80195498.n0
 void GM_SetupCustomHoleSelection(void); // GameManager.c
@@ -4381,6 +4383,15 @@ void fn_80084190(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = fn_80124174();
 }
 
+// Whether gbacable.c's fn_80124094 answers 18.
+void fn_800841C0(MsgArg* pArgs, MsgArg* pResult) {
+    if (fn_80124094() == 18) {
+        pResult->i = 1;
+        return;
+    }
+    pResult->i = 0;
+}
+
 void fn_80084208(MsgArg* pArgs, MsgArg* pResult) {
     fn_8012408C(5);
 }
@@ -4415,6 +4426,15 @@ void fn_800842D0(MsgArg* pArgs, MsgArg* pResult) {
     nError = fn_801253F0(pArgs[0].i, pArgs[1].i);
     lbl_80281ED4->n11704 = nError;
     pResult->i = nError == 0;
+}
+
+// For the card in slot pArgs[0], pArgs[1]: fn_801255C4's answer.
+void fn_8008449C(MsgArg* pArgs, MsgArg* pResult) {
+    s32 aPos[2];
+
+    aPos[0] = pArgs[0].i;
+    aPos[1] = pArgs[1].i;
+    pResult->i = fn_801255C4(aPos);
 }
 
 void fn_800844E0(MsgArg* pArgs, MsgArg* pResult) {
