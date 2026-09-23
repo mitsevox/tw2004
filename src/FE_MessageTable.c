@@ -38,6 +38,13 @@ void fn_80102308(s32 n);                // GameMode4.c
 void fn_8010D334(s32 v);                // CharSliders.c
 void fn_8008DD34(int nSlot, int n);
 void fn_801102AC(void);
+s32  fn_8009FCFC(MCCardPos* pPos);      // MC.c: load the save from the card
+s32  fn_8009FE90(MCCardPos* pPos);      // } MC.c, in lbl_8018C7D8's set 0
+s32  fn_800A09EC(MCCardPos* pPos);      // }
+s32  fn_800A0E6C(MCCardPos* pPos);      // }
+s32  fn_800A1964(MCCardPos* pPos);      // }
+void fn_800A4FD8(void);
+void fn_800A73F0(int n);
 void fn_8010F2FC(MsgArg* pArgs, MsgArg* pResult);
 void fn_8010F3A4(MsgArg* pArgs, MsgArg* pResult);
 void fn_8011DF90(MsgArg* pArgs, MsgArg* pResult);
@@ -213,6 +220,7 @@ void fn_80125DE0(MsgArg* pArgs, MsgArg* pResult);
 // This file.
 void GetGolferName(int nGolfer, char* szName);
 void fn_8007E458(int n, MsgArg* pArgs, MsgArg* pResult);
+s32  fn_80084FB4(MCCardPos* pPos);
 
 // This file's message handlers, in address order.
 void fn_8007BBA0(MsgArg* pArgs, MsgArg* pResult);
@@ -1326,6 +1334,15 @@ void fn_8007BCA4(MsgArg* pArgs, MsgArg* pResult) {
     fn_80079AD4();
 }
 
+// Set up a game mode from the menus.
+void fn_8007BCC4(MsgArg* pArgs, MsgArg* pResult) {
+    lbl_801D7148.b11 = 1;
+    fn_800E0B38((u8)pArgs[0].i);
+    lbl_801D87C0.b0 = 1;
+    gSession.a8[0] = 1;
+    fn_800A4FD8();
+}
+
 void fn_8007BD18(MsgArg* pArgs, MsgArg* pResult) {
 }
 
@@ -1340,6 +1357,11 @@ void fn_8007BD44(MsgArg* pArgs, MsgArg* pResult) {
 
 void fn_8007BD84(MsgArg* pArgs, MsgArg* pResult) {
     fn_800E1260((u8)pArgs[0].i);
+}
+
+// A golfer's attribute.
+void fn_8007BDAC(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = fn_80077A80(pArgs[0].i)->attr[pArgs[1].i];
 }
 
 void fn_8007BDFC(MsgArg* pArgs, MsgArg* pResult) {
@@ -1390,6 +1412,14 @@ void fn_8007C330(MsgArg* pArgs, MsgArg* pResult) {
     strcpy(((MsgString*)pResult->p)->pStr, fn_80077A80(pArgs[0].i)->szLast);
 }
 
+// The card's state: a flag of it, or its free space.
+void fn_8007C440(MsgArg* pArgs, MsgArg* pResult) {
+    MCCardState state;
+
+    fn_8009F7F4(&state, pArgs[0].i, pArgs[1].i);
+    pResult->i = (state.uFlags >> 1) & 1;
+}
+
 void fn_8007C488(MsgArg* pArgs, MsgArg* pResult) {
 }
 
@@ -1405,6 +1435,47 @@ void fn_8007C4D8(MsgArg* pArgs, MsgArg* pResult) {
     fn_8009CD7C();
 }
 
+void fn_8007C594(MsgArg* pArgs, MsgArg* pResult) {
+    MCCardPos pos;
+    s32 nError;
+    s32 n;
+
+    pos.nPort = pArgs[0].i;
+    pos.nSlot = pArgs[1].i;
+    pos.n8 = pArgs[2].i;
+    nError = fn_800A0E6C(&pos);
+    n = 1;
+    if (nError != 0) {
+        n = nError;
+    }
+    pResult->i = n;
+}
+
+void fn_8007C5F0(MsgArg* pArgs, MsgArg* pResult) {
+    int n;
+
+    n = pArgs[0].i;
+    if (n == 11) {
+        fn_800A73F0((Rand_Next(0) & 7) + 11);
+    } else {
+        fn_800A73F0(n);
+    }
+}
+
+void fn_8007C634(MsgArg* pArgs, MsgArg* pResult) {
+    switch (pArgs[0].i) {
+    case 1:
+        gSession.options.nC = 2;
+        return;
+    case 2:
+        gSession.options.nC = 3;
+        return;
+    case 3:
+        gSession.options.nC = 0;
+        return;
+    }
+}
+
 void fn_8007C698(MsgArg* pArgs, MsgArg* pResult) {
     s32 nError;
     s32 n;
@@ -1418,6 +1489,25 @@ void fn_8007C698(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // The slot's profile has a created golfer.
+// Every player's tee set: 1, 2 or 3 picks tee set 2, 1 or 0.
+void fn_8007C6E4(MsgArg* pArgs, MsgArg* pResult) {
+    int i;
+
+    for (i = 0; i < 5; i++) {
+        switch (pArgs[1].i) {
+        case 1:
+            gSession.nTeeSet[i] = 2;
+            break;
+        case 2:
+            gSession.nTeeSet[i] = 1;
+            break;
+        case 3:
+            gSession.nTeeSet[i] = 0;
+            break;
+        }
+    }
+}
+
 void fn_8007C748(MsgArg* pArgs, MsgArg* pResult) {
     if ((s8)gpSaveData[pArgs[0].i].createdGolfer.bAvailable != 0) {
         pResult->i = 1;
@@ -1456,6 +1546,39 @@ void fn_8007C7EC(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = lbl_801D87C0.a1[n];
 }
 
+void fn_8007C81C(MsgArg* pArgs, MsgArg* pResult) {
+    MCCardState state;
+
+    fn_8009F7F4(&state, pArgs[0].i, pArgs[1].i);
+    pResult->i = (state.uFlags >> 3) & 1;
+}
+
+void fn_8007C864(MsgArg* pArgs, MsgArg* pResult) {
+    MCCardState state;
+
+    fn_8009F7F4(&state, pArgs[0].i, pArgs[1].i);
+    pResult->i = (state.uFlags >> 4) & 1;
+}
+
+void fn_8007C8AC(MsgArg* pArgs, MsgArg* pResult) {
+    MCCardState state;
+
+    fn_8009F7F4(&state, pArgs[0].i, pArgs[1].i);
+    pResult->i = state.nFreeBlocks;
+}
+
+// The game save's size on the card.
+void fn_8007C8F0(MsgArg* pArgs, MsgArg* pResult) {
+    MCCardPos pos;
+
+    pos.nPort = pArgs[0].i;
+    pos.nSlot = pArgs[1].i;
+    fn_80084FF0(0);
+    fn_8009CD80(pos.nPort, pos.nSlot);
+    pResult->i = fn_80084FB4(&pos);
+    fn_8009CD7C();
+}
+
 void fn_8007C94C(MsgArg* pArgs, MsgArg* pResult) {
 }
 
@@ -1466,6 +1589,36 @@ void fn_8007C950(MsgArg* pArgs, MsgArg* pResult) {
 void fn_8007C988(MsgArg* pArgs, MsgArg* pResult) {
     lbl_801D880C.n4 = pArgs[0].i;
     lbl_801D880C.n0 = 0;
+}
+
+void fn_8007C9A4(MsgArg* pArgs, MsgArg* pResult) {
+    MCCardPos pos;
+    s32 nError;
+    s32 n;
+
+    pos.nPort = pArgs[0].i;
+    pos.nSlot = pArgs[1].i;
+    nError = fn_8009FE90(&pos);
+    n = 1;
+    if (nError != 0) {
+        n = nError;
+    }
+    pResult->i = n;
+}
+
+void fn_8007C9F8(MsgArg* pArgs, MsgArg* pResult) {
+    MCCardPos pos;
+    s32 nError;
+    s32 n;
+
+    pos.nPort = pArgs[0].i;
+    pos.nSlot = pArgs[1].i;
+    nError = fn_8009FCFC(&pos);
+    n = 1;
+    if (nError != 0) {
+        n = nError;
+    }
+    pResult->i = n;
 }
 
 // The on/off options: the menus send and read 1 for on and 2 for off.
@@ -1494,6 +1647,18 @@ void fn_8007CD1C(MsgArg* pArgs, MsgArg* pResult) {
 // A string's width, scaled.
 void fn_8007CD58(MsgArg* pArgs, MsgArg* pResult) {
     pResult->f = 512.0f * fn_80012C30(((MsgString*)pArgs[0].p)->pStr);
+}
+
+// Save kind 1's size on the card.
+void fn_8007CD98(MsgArg* pArgs, MsgArg* pResult) {
+    MCCardPos pos;
+
+    pos.nPort = pArgs[0].i;
+    pos.nSlot = pArgs[1].i;
+    fn_8009CD80(pos.nPort, pos.nSlot);
+    fn_80084FF0(1);
+    pResult->i = fn_80084FB4(&pos);
+    fn_8009CD7C();
 }
 
 void fn_8007CDF0(MsgArg* pArgs, MsgArg* pResult) {
@@ -1598,11 +1763,38 @@ void fn_8007D6E0(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
+// Look a value up in the prize table's ranges (-1: in none).
+void fn_8007D708(MsgArg* pArgs, MsgArg* pResult) {
+    int i;
+    int n;
+    int nValue;
+
+    nValue = pArgs[0].i;
+    n = -1;
+    for (i = 0; i < NUM_EARNINGS_RANGES; i++) {
+        if (nValue >= lbl_80200538.aRange[i].n0 - 1 && nValue <= lbl_80200538.aRange[i].n4) {
+            n = lbl_80200538.aRange[i].n8;
+            break;
+        }
+    }
+    pResult->i = n;
+}
+
 void fn_8007D76C(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile;
 
     pProfile = fn_80077ACC();
     pProfile->n6C = pArgs[1].i;
+}
+
+// Set an attribute of the created golfer being worked on.
+void fn_8007D7A0(MsgArg* pArgs, MsgArg* pResult) {
+    SaveProfile* pProfile;
+    int nAttr;
+
+    nAttr = pArgs[1].i;
+    pProfile = fn_80077ACC();
+    pProfile->createdGolfer.attr[nAttr] = pArgs[2].i;
 }
 
 void fn_8007D7E4(MsgArg* pArgs, MsgArg* pResult) {
@@ -1720,6 +1912,13 @@ void fn_8007E0F8(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gpSaveData[pArgs[0].i].aAward[pArgs[1].i].bWon;
 }
 
+void fn_8007E128(MsgArg* pArgs, MsgArg* pResult) {
+    Award* pAward;
+
+    pAward = &fn_80077ACC()->aAward[pArgs[0].i];
+    pResult->i = pAward[23].bWon;
+}
+
 void fn_8007E174(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = lbl_80200538.a9B4[pArgs[0].i];
 }
@@ -1784,7 +1983,27 @@ void fn_8007E744(MsgArg* pArgs, MsgArg* pResult) {
 void fn_8007E748(MsgArg* pArgs, MsgArg* pResult) {
 }
 
+// How many challenge groups in a row, from the first, have a medal.
+void fn_8007E74C(MsgArg* pArgs, MsgArg* pResult) {
+    int n;
+    int i;
+
+    n = 0;
+    for (i = 0; i < 29; i++, n++) {
+        if (gpSaveData[pArgs[0].i].aMedal[i] == 3) break;
+    }
+    pResult->i = n;
+}
+
 void fn_8007E798(MsgArg* pArgs, MsgArg* pResult) {
+}
+
+void fn_8007E818(MsgArg* pArgs, MsgArg* pResult) {
+    MCCardPos pos;
+
+    pos.nPort = pArgs[0].i;
+    pos.nSlot = pArgs[1].i;
+    pResult->i = fn_800A1964(&pos);
 }
 
 void fn_8007E85C(MsgArg* pArgs, MsgArg* pResult) {
@@ -1840,6 +2059,52 @@ void fn_8007E9A8(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = lbl_801D7148.b11;
 }
 
+void fn_8007E9BC(MsgArg* pArgs, MsgArg* pResult) {
+    MCCardPos pos;
+    s32 n;
+
+    pos.nPort = pArgs[0].i;
+    pos.nSlot = pArgs[1].i;
+    n = fn_800A09EC(&pos);
+    if (n >= 0) {
+        pResult->i = n;
+        return;
+    }
+    pResult->i = 0;
+}
+
+void fn_8007ED88(MsgArg* pArgs, MsgArg* pResult) {
+    switch (gSession.options.nC) {
+    case 2:
+        pResult->i = 1;
+        return;
+    case 3:
+        pResult->i = 2;
+        return;
+    case 0:
+        pResult->i = 3;
+        return;
+    }
+}
+
+// The wind option: calm (0) to gusty (3), shown as 1 to 4.
+void fn_8007EDDC(MsgArg* pArgs, MsgArg* pResult) {
+    switch (gSession.options.nWind) {
+    case 0:
+        pResult->i = 1;
+        return;
+    case 1:
+        pResult->i = 2;
+        return;
+    case 2:
+        pResult->i = 3;
+        return;
+    case 3:
+        pResult->i = 4;
+        return;
+    }
+}
+
 void fn_8007EE40(MsgArg* pArgs, MsgArg* pResult) {
     switch (gSession.options.a7[0]) {
     case 1:
@@ -1861,8 +2126,39 @@ void fn_8007EE80(MsgArg* pArgs, MsgArg* pResult) {
 void fn_8007EF9C(MsgArg* pArgs, MsgArg* pResult) {
 }
 
+// How many of the first 23 awards the slot's profile has won.
+void fn_8007EFA0(MsgArg* pArgs, MsgArg* pResult) {
+    int n;
+    int i;
+
+    n = 0;
+    for (i = 0; i < 23; i++) {
+        if (gpSaveData[pArgs[0].i].aAward[i].bWon == 1) {
+            n++;
+        }
+    }
+    pResult->i = n;
+}
+
 void fn_8007F088(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = GM_vGetAllTimeRecordsHeld(&gpSaveData[pArgs[0].i]);
+}
+
+// One for a TOUR card, plus one per challenge group with a medal.
+void fn_8007F724(MsgArg* pArgs, MsgArg* pResult) {
+    int n;
+    int i;
+
+    n = 0;
+    if (gpSaveData[pArgs[0].i].nTourCardLevel >= 1) {
+        n = 1;
+    }
+    for (i = 0; i < 29; i++) {
+        if (gpSaveData[pArgs[0].i].aMedal[i] != 3) {
+            n++;
+        }
+    }
+    pResult->i = n;
 }
 
 void fn_8007F87C(MsgArg* pArgs, MsgArg* pResult) {
@@ -2866,29 +3162,27 @@ void fn_80084F84(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = EASBio_GetCurrentRewardMessage();
 }
 
-// The memory-card operations of the set picked (lbl_80281FFC), run on the card in pArgs[0..1].
-// port: pArgs is handed on as an MCCardPos (two words: nPort, nSlot); MsgArg is pointer-sized, so a
-// 64-bit build must copy the two values into an MCCardPos instead.
-void fn_80084FB4(MsgArg* pArgs, MsgArg* pResult) {
-    lbl_8018C7D8[lbl_80281FFC].apfn[4]((MCCardPos*)pArgs);
+// The memory-card operations of the set picked (lbl_80281FFC), run on the card at pPos.
+s32 fn_80084FB4(MCCardPos* pPos) {
+    return lbl_8018C7D8[lbl_80281FFC].apfn[4](pPos);
 }
 
 void fn_80084FF0(int n) {
     lbl_80281FFC = n;
 }
 
-void fn_80084FF8(MsgArg* pArgs, MsgArg* pResult) {
-    lbl_8018C7D8[lbl_80281FFC].apfn[2]((MCCardPos*)pArgs);
+s32 fn_80084FF8(MCCardPos* pPos) {
+    return lbl_8018C7D8[lbl_80281FFC].apfn[2](pPos);
 }
 
-void fn_80085034(MsgArg* pArgs, MsgArg* pResult) {
-    lbl_8018C7D8[lbl_80281FFC].apfn[3]((MCCardPos*)pArgs);
+s32 fn_80085034(MCCardPos* pPos) {
+    return lbl_8018C7D8[lbl_80281FFC].apfn[3](pPos);
 }
 
-void fn_80085070(MsgArg* pArgs, MsgArg* pResult) {
-    lbl_8018C7D8[lbl_80281FFC].apfn[1]((MCCardPos*)pArgs);
+s32 fn_80085070(MCCardPos* pPos) {
+    return lbl_8018C7D8[lbl_80281FFC].apfn[1](pPos);
 }
 
-void fn_800850AC(MsgArg* pArgs, MsgArg* pResult) {
-    lbl_8018C7D8[lbl_80281FFC].apfn[0]((MCCardPos*)pArgs);
+s32 fn_800850AC(MCCardPos* pPos) {
+    return lbl_8018C7D8[lbl_80281FFC].apfn[0](pPos);
 }

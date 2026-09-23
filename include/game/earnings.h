@@ -61,8 +61,18 @@ typedef struct CoursePrice {
 
 #define NUM_COURSE_PRICES 24    // the 'ERN ' data has 24 rows (0x114..0x1D4): fn_800D3A20 reads 0..20, 21 and 23
 
+// A row of the first table (12 bytes): a range of values and what it maps to. A menu message
+// (fn_8007D708) looks a value up: the first row with n0 - 1 <= value <= n4 gives n8.
+typedef struct EarningsRange {
+    s32  n0;                    // 0x0
+    s32  n4;                    // 0x4
+    s32  n8;                    // 0x8
+} EarningsRange;
+
+#define NUM_EARNINGS_RANGES 23
+
 typedef struct EarningsTable {
-    u8   unk0[0x114];
+    EarningsRange aRange[NUM_EARNINGS_RANGES];      // 0x000
     CoursePrice aCoursePrice[NUM_COURSE_PRICES];     // 0x114  per course (SaveProfile.aCourseUnlocked)
     StrokePrize aStrokePrize[NUM_EARNINGS_RATINGS];  // 0x1D4  per rating of the beaten golfer
     SkinsValue aSkins[NUM_EARNINGS_RATINGS];         // 0x2A4  per best rating in the game

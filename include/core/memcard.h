@@ -78,9 +78,10 @@ typedef struct MCCardPos {
 } MCCardPos;
 LAYOUT_ASSERT(MCCardPos, 0xC);
 
-// The memory-card screens' operations (lbl_8018C7D8): four sets of five, one set per kind of data
-// (the menus pick one with fn_80084FF0; set 0 starts with fn_8009FE90 and fn_8009FCFC, set 3 is the
-// EA Sports Bio's). The menus' messages call them with the card they picked.
+// The memory-card screens' operations (lbl_8018C7D8): four sets of five, one set per kind of save
+// (fn_80084FF0 picks one; set 0 is the game's save, starting with fn_8009FE90 and fn_8009FCFC; set 3
+// is the EA Sports Bio's). apfn[4] gives the save's size on the card (startUp.c). The menus'
+// messages call them through fn_80084FB4 and its neighbours with the card they picked.
 typedef s32 (*MCOp)(MCCardPos* pPos);
 typedef struct MCOpSet {
     MCOp apfn[5];               // 0x00
