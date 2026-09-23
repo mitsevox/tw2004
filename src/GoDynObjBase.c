@@ -39,7 +39,9 @@ int fn_80049728(int nMsg, DynObj* pObj, void* pArg) {
         nId = (uptr)pArg;
         if (nMsg != 10) {
             pOther = pArg;
-            if (pOther != NULL) {
+            // fake match: EA tests the argument as a signed number, not the pointer (port: a
+            // 64-bit pointer must be tested whole)
+            if ((s32)nId != 0) {
                 nAmount = pOther->n142;
                 nId = pOther->n140;
             } else {
@@ -49,7 +51,7 @@ int fn_80049728(int nMsg, DynObj* pObj, void* pArg) {
         }
         if (nAmount > 0) {
             pObj->uFlags |= 0x08000000;
-            pObj->n144 -= nAmount;
+            pObj->n144 -= (s16)nAmount;
             if (pObj->p15C != NULL) {
                 fn_8000EA1C(pObj->p15C, (u32)pObj->n144 >> 31, nId & 0x7FFF, pObj);
             }

@@ -1027,7 +1027,7 @@ config.libs = [
             Object(Matching, "unsorted/sweep_80007328.c"),
             Object(Matching, "unsorted/sweep_80007368.c"),
             Object(Matching, "unsorted/sweep_80045F38.c"),
-            Object(NonMatching, "GoDynObjBase.c"),
+            Object(Matching, "GoDynObjBase.c"),
             Object(Matching, "unsorted/sweep_8006FF2C.c"),
             Object(Matching, "unsorted/sweep_8006FF80.c"),
             Object(Matching, "unsorted/sweep_80070BD0.c"),
