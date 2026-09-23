@@ -209,7 +209,6 @@ void  fn_800A3DF4(int nPlayer);
 void  fn_80062DDC(f32* pA, f32* pB, f32* pOut);  // a - b
 void  fn_8006BB5C(int nPlayer);
 void  fn_800A562C(u8 nPlayer);
-u8    fn_800DA264(void);                         // tips are on
 void  fn_800D1DAC(int nPlayer);
 void  fn_80062B68(int nPlayer);
 void  fn_80062B6C(int nPlayer);
