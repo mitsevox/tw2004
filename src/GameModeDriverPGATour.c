@@ -682,7 +682,7 @@ s32 fn_800F02A8(void) {
     s32 n = 0;
     s32 i;
     for (i = 0; i < 31; i++) {
-        if (gpSaveData->aC8[i].b == 1) {
+        if (gpSaveData->aC8[i].award.bWon == 1) {
             n++;
         }
     }
