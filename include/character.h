@@ -147,7 +147,14 @@ typedef struct Clip {
     u8*    pFC;                 // 0xFC
 } Clip;
 
+// char.c: run on a clip just read from disc (skalib.c, AnimStream.c).
+void* fn_80020DD4(void* pClip, void* pOut, int nAlign);
+
 typedef struct SKABlendNode SKABlendNode;
+
+// animblender.c: whether a source under pNode plays pSrc (format 0, format 1).
+u8 fn_80073554(SKABlendNode* pNode, void* pSrc);
+u8 fn_80073610(SKABlendNode* pNode, void* pSrc);
 
 // The blend callback CharacterState_AddSKABlendData attaches (fn_80072ACC is one).
 typedef void (*SKABlendFn)(SKABlendNode* pNode, int* pn, f32 fTime);
@@ -377,8 +384,8 @@ LAYOUT_ASSERT(AnimStreamPlayer, 0x484);
 
 // The stream's state (lbl_80282230, allocated by fn_800C937C).
 typedef struct AnimStream {
-    void* p0;                   // 0x0000  the current request
-    void* p4;                   // 0x0004
+    AnimStreamBuf*   p0;        // 0x0000  the buffer the current read fills (a clip, fn_800C9F14)
+    AnimStreamClips* p4;        // 0x0004  the clips it is for
     AnimStreamBuf bufs[2][2][8][6];     // 0x0008  [double buffer][group index][style][club class]
     AnimStreamPlayer players[5];        // 0x0608
     void* pRead;                // 0x1C9C  the read buffer

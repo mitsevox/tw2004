@@ -2,7 +2,7 @@
 // (1 and 5) per player, style and club class, reading them from disc into double buffers. Only
 // partly decompiled. The types are in character.h.
 
-#include "golfer.h"
+#include "game.h"
 #include "endian.h"
 
 void fn_8006C63C(void);                 // called while waiting for a read
@@ -13,6 +13,7 @@ AnimLib* fn_80026AC0(Character* pChar);  // the overlay library loaded for the c
 AnimLib* fn_80026B34(Character* pChar);  // the library of the character's animation slot
 u8 fn_8001C558(int nPlayer);            // the model id of the player's golfer
 void fn_800CB668(u8 bGlobal, int bFemale, int nPlayer, char* szPath);
+u8 fn_800CB5B0(int nPlayer, Clip* pClip);
 
 char lbl_80281530[8] = "";              // the folder the stream files' paths start from
 
@@ -102,6 +103,25 @@ void fn_800C9EFC(int nBytes, int nError) {
     lbl_80282230->nResult = nBytes;
 }
 
+// Ends the current read: closes the file and, when bForce is set or the clip is free to replace,
+// copies what was read into the clip's buffer and marks the request done.
+void fn_800C9F14(u8 bForce) {
+    if (lbl_80282230->hFile >= 0) {
+        fn_8000633C(lbl_80282230->hFile);
+        lbl_80282230->hFile = -1;
+    }
+    if (bForce || fn_800CB5B0(lbl_80282230->n1CC8, lbl_80282230->p0->pData)) {
+        if (lbl_80282230->nResult > 0) {
+            Mem_cpy(lbl_80282230->p0->pData, lbl_80282230->pRead, lbl_80282230->nResult);
+            fn_80020DD4(lbl_80282230->p0->pData, NULL, 16);
+        }
+        lbl_80282230->p4->b8 = 0;
+        lbl_80282230->p4 = NULL;
+        lbl_80282230->nState = 0;
+        lbl_80282230->p0 = NULL;
+    }
+}
+
 // Sets b8 of each of a player's streamed clip sets that has a buffer.
 void fn_800CA194(int nPlayer, u8 b) {
     int i;
@@ -172,6 +192,17 @@ int fn_800CB568(int nId) {
         }
     }
     return -1;
+}
+
+// Whether a streamed clip may be replaced: always for players other than the one whose turn it
+// is; for that player, only while the golfer is not playing it.
+u8 fn_800CB5B0(int nPlayer, Clip* pClip) {
+    if (lbl_80282278 != nPlayer) return 1;
+    if (fn_80073554(&gPlayers[nPlayer].pChar->blend, pClip)) return 0;
+    // node3E0 is still bytes in Character (its type is not known yet); it holds a blend node
+    if (fn_80073610((SKABlendNode*)gPlayers[nPlayer].pChar->node3E0, pClip->pF4)) return 0;
+    if (gPlayers[nPlayer].pChar->p1790 == pClip || gPlayers[nPlayer].pChar->p1794 == pClip) return 0;
+    return 1;
 }
 
 // The path of a stream file: the male or female animations every golfer shares, or the ones of
