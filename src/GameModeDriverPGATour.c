@@ -124,6 +124,8 @@ s32  fn_8011A684(s32 a);
 u8   fn_8011A6F4(s32 a, s32 b);
 extern u8  gNumPlayersSetUp;
 extern s32 lbl_80282340;
+s32  fn_80119A04(s32 a, s32 b);
+u8   fn_801197A4(s32 a, s32 b);
 u8   fn_800EF83C(u16 nDate, s32* pId, s32* pRound);
 s32  fn_8011A7C8(s32 nPlayer, s32 nHole);
 s32  fn_80119588(s32 nPlayer, s32 a);
@@ -642,6 +644,29 @@ s32 fn_800F02EC(s32 i) {
 
 s32 fn_800F0304(s32 i) {
     return gPgaData.aTriple[i].n8;
+}
+
+// The message after a round, if there is one: after the second round whether the player made the
+// cut, and in a playoff the score to beat.
+s32 fn_800F031C(char* pDst) {
+    PlayerNumber_t nPlayer = PLR_1_e;
+    if (gpSaveData[nPlayer].tour.nRound == 1 && fn_80119A04(0, 0) == 18) {
+        if (fn_801197A4(0, 0)) {
+            strcpy(pDst, "TOURNAMENT CUT\n\nYou did not place in the top 70 after two\n"
+                         "rounds. You have been cut from the tournament.");
+            return 1;
+        }
+        strcpy(pDst, "TOURNAMENT CUT\n\nCongratulations! You placed in the top 70\n"
+                     "after two rounds. You made the cut!");
+        return 1;
+    }
+    if (gpGame->bD4 && fn_8011A6F4(0, 0) && fn_8011A684(0) > 1) {
+        sprintf(pDst, "TOURNAMENT PLAYOFF\n\nYou're tied for first place. You must beat\n"
+                      "your opponent's score of %d on the playoff\nhole to win.",
+                fn_8011A7C8(0, lbl_80282340));
+        return 1;
+    }
+    return 0;
 }
 
 s32 fn_800F0428(s32 nPlayer) {
