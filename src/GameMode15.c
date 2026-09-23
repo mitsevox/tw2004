@@ -59,7 +59,7 @@ void  fn_8006A8D4(void* pView, f32* pX, f32* pY);
 void  fn_800FF7DC(void);
 void  fn_80125910(int a);
 void  fn_800F19D4(void);
-void  fn_800F1ABC(int nPlayer, s8 n);
+void  fn_800F1ABC(int nPlayer, int n);
 void  fn_800F1B60(int nPlayer, int n);
 u8    fn_800F1BD8(int nPlayer);
 u8    fn_800F1C34(int nPlayer);
@@ -86,7 +86,7 @@ void  fn_800F46E4(void);
 void  fn_800F471C(int nPlayer);
 u8    fn_800F475C(int a);
 void  fn_800F4764(int nPlayer);
-u8    fn_800F4784(int nPlayer, int a);
+s32   fn_800F4784(int nPlayer, int a);
 u8    fn_800F47D8(int nPlayer);
 u8    fn_800F4828(int nPlayer);
 s8    fn_800F4878(void);
@@ -102,7 +102,7 @@ void fn_800F39F4(void) {
     gpGame->pfn1CC = fn_800F3C2C;
     gpGame->pfn1D0 = fn_800F4584;
     gpGame->pfn1D4 = fn_800F3C7C;
-    gpGame->pfn1D8 = fn_800F4784;
+    gpGame->pfn1D8 = (u8 (*)(int, int))fn_800F4784;
     gpGame->pfn1DC = fn_800F475C;
     gpGame->pfn1E0 = fn_800F3C74;
     gpGame->pfn248 = fn_800F3E00;
@@ -202,7 +202,7 @@ void fn_800F3E00(int nPlayer) {
 // The ball stopped: match the leader, beat them, or take a letter.
 void fn_800F3EBC(int nPlayer) {
     s32 nSurface;
-    int nTarget;
+    s8 nTarget;
     s32 nRank;
     s32 nMsg;
     f32 fLength;
@@ -402,7 +402,7 @@ void fn_800F4584(void) {
                 if (lbl_8028238C != 5) {
                     PLAYER(i)->nTarget = lbl_80282384;
                 }
-                fn_800F1B60(i, PLAYER(i)->nTarget);
+                fn_800F1B60(i, (s8)PLAYER(i)->nTarget);
             }
         }
     }
@@ -441,7 +441,7 @@ void fn_800F4764(int nPlayer) {
 }
 
 // The game is over when at most one player is still in.
-u8 fn_800F4784(int nPlayer, int a) {
+s32 fn_800F4784(int nPlayer, int a) {
     int i;
     s32 n = 0;
     for (i = 0; i < gNumPlayersSetUp; i++) {
@@ -457,7 +457,7 @@ u8 fn_800F47D8(int nPlayer) {
     if (lbl_8028238C == 5) {
         fn_800F1BD8(nPlayer);
     } else {
-        fn_800F1ABC(nPlayer, gPlayers[nPlayer].nTarget);
+        fn_800F1ABC(nPlayer, (s8)gPlayers[nPlayer].nTarget);
     }
     return 1;
 }
@@ -466,7 +466,7 @@ u8 fn_800F4828(int nPlayer) {
     if (lbl_8028238C == 5) {
         fn_800F1C34(nPlayer);
     } else {
-        fn_800F1ABC(nPlayer, gPlayers[nPlayer].nTarget);
+        fn_800F1ABC(nPlayer, (s8)gPlayers[nPlayer].nTarget);
     }
     return 1;
 }
