@@ -132,7 +132,7 @@ void fn_800EAEB8(void) {
 }
 
 void fn_800EAEEC(UStreamObject* pObject) {
-    fn_8000E790(pObject, 10624, lbl_80203554);
+    fn_8000E790(pObject, sizeof(lbl_80203554), lbl_80203554);
 }
 
 // The 'PLYs' object: the challenge text block is copied out.
