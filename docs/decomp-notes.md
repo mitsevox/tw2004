@@ -637,6 +637,16 @@ The fixes that come up most often. Each points to its full entry below.
 
 ### Data, constants and symbols
 
+- **[verified] Where EA's globals live: ordinary `.bss`, in link order, so game code builds with
+  `-common off`.** The game's `.bss` (0x8019D540 to about 0x80261000) comes before the SDK's
+  (0x802611A0 on) and follows the link order of the code that uses it; COMMON symbols would link
+  after every `.bss`. With `pool_data off`, `-common` changes no function (all 7,647 scored the
+  same both ways). So a shared uninitialised global is defined, non-static, in its owner file, with
+  a plain `.bss` split (GameEffects `lbl_80202898`, DOL OK). Inside one object `.bss` is laid out in
+  REVERSE definition order: define the file's globals last-address-first. `= {0}` moves a global to
+  `.data`; don't. dtk's `common` split attribute is not for this (it turns every later `.bss` split
+  into commons).
+
 - **[observed] An all-zero small array in `.sdata` (not `.sbss`) was written with an initializer.**
   `u8 lbl_80281648[2] = {0, 0};` lands in `.sdata` and links (AlternateShot).
 - **[verified] Base-last indexing of a big-struct global.** `gpSaveData[n].f` adds the base first;
@@ -878,9 +888,9 @@ are for code built with GCC 2.95 at -O0 (SN ProDG), kept for reference.
   end of the chain. `TagFile_FreeBuffer` and the last branch of `TagFile_Update` have it.
 - **[verified] Unused `static` variables are still emitted at -O0**, in declaration order, into
   `.sbss`/`.sdata` like any other. If a file's `.sbss` is bigger than its referenced globals,
-  add a dummy static of the missing size; the DOL will not hash otherwise. Uninitialised
-  non-static globals become COMMON symbols instead and land elsewhere, so use `static` (or an
-  explicit `= 0` for `.sdata`) to control the section.
+  add a dummy static of the missing size; the DOL will not hash otherwise. Under `-common on`
+  uninitialised non-static globals become COMMON symbols and land after all `.bss`; game code
+  builds with `-common off` (see "Where EA's globals live" in Data, constants and symbols).
 - **[verified] Comparison operand order.** `a == p->x` loads `p` first, then `a` into `r0`, then
   `p->x` into `r9`, and compares `r0, r9`. `p->x == a` gives `lwz r0, 0(r9)` then `lwz r9, a`.
   For two stack variables the left one is always `r0`. So the register order of a `cmpw`
