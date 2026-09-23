@@ -172,6 +172,7 @@ void  fn_800FE054(s32 p0, s32 p1);
 void  fn_800FE080(s32 p0, s32 p1);
 void  fn_800FE0AC(s32 p0, s32 p1);
 void  fn_800FE0D8(void);
+void  fn_800FE138(s32 p0, s32 p1);
 void  fn_800FE164(s32 p0, s32 p1);
 
 // Mode 8 starts: solo speed golf.
@@ -1346,6 +1347,92 @@ u8 fn_800FCC38(int nPlayer) {
             (fn_800136DC(gPlayers[nPlayer].nController) & 0x800 ||
              fn_800136DC(gPlayers[nPlayer].nController) & 0x8000000);
     return bDown;
+}
+
+// Every frame (pfn220 through fn_800FDF38): in the two-player game, a holed player takes 5 points a
+// second from one still playing, which can end the hole; in both games, button 0x25 restarts the
+// hole from the tee (for the cost of event 39 in mode 7). Then speed golf's lbl_802823C8 is set.
+void fn_800FCCF0(void) {
+    int i;
+    int nOther;
+    int k;
+    CourseInfo* pHole;
+    if (gSession.unk14 == 0) {
+        if (Game_GetMode() == 7) {
+            i = 0;
+            nOther = 1;
+            if ((gPlayers[i].nC3C & 0x6000) || (gPlayers[nOther].nC3C & 0x6000)) {
+                return;
+            }
+            for (k = 0; k < 2; k++) {
+                if (gPlayers[i].nC3C & 0x100) {
+                    if (!(gPlayers[nOther].nC3C & 8)) {
+                        gPlayers[i].nC5C--;
+                        if (gPlayers[i].nC5C == 0) {
+                            gPlayers[i].nC44 += 5;
+                            fn_800FDFC4(gPlayers[i].nC58, gPlayers[i].nC44, 0);
+                            fn_800FE138(gPlayers[i].nC58, 5);
+                            gPlayers[nOther].nC44 -= 5;
+                            fn_800FDFC4(gPlayers[nOther].nC58, gPlayers[nOther].nC44, 0);
+                            gPlayers[i].nC5C = 59;
+                            if (gPlayers[nOther].nC44 <= 0 && !(gPlayers[nOther].nC3C & 0x6000) &&
+                                !(gPlayers[nOther].nC3C & 0x8000)) {
+                                gPlayers[nOther].nC44 = 0;
+                                gPlayers[i].nC44 = 6000;
+                                gPlayers[nOther].nC3C |= 0xC000;
+                                gPlayers[i].nC3C |= 0x10000 | 0x4000;
+                                GOLFERSTATE_Set(26, (u8)nOther);
+                                GOLFERSTATE_Set(26, (u8)i);
+                                return;
+                            }
+                        }
+                    }
+                }
+                gPlayers[i].nCB8++;
+                if (!Player_IsCPU(i) && !fn_800FA118(i, 1) &&
+                    lbl_80192908[0x27].nPoints + gPlayers[i].nC44 > 0) {
+                    if ((fn_800136DC(gPlayers[i].nController) & fn_800142AC(0x25, 0)) && !fn_800FCC38(i) &&
+                        ((s8)GOLFERSTATE_GetCurrentState(i) == 24 ||
+                         (gPlayers[i].nLie != 0 && gPlayers[i].nLie != LIE_HOLED && gPlayers[i].nLie != 16 &&
+                          (s8)GOLFERSTATE_GetCurrentState(i) != 2 &&
+                          (s8)GOLFERSTATE_GetCurrentState(i) != 4 &&
+                          (s8)GOLFERSTATE_GetCurrentState(i) != 3 &&
+                          (s8)GOLFERSTATE_GetCurrentState(i) != 8 &&
+                          (s8)GOLFERSTATE_GetCurrentState(i) != 10))) {
+                        fn_800FAAB8(i, 0x27);
+                        pHole = fn_8000C594();
+                        fn_80055AA8(gPlayers[i].ball, &((HoleTees*)pHole)->tee[gSession.nTeeSet[i]].x, i);
+                        Vec_Copy(&((HoleTees*)pHole)->tee[gSession.nTeeSet[i]].x, &gPlayers[i].fBallX);
+                        Vec_Copy(&((HoleTees*)pHole)->tee[gSession.nTeeSet[i]].x, gPlayers[i].vA44);
+                        gPlayers[i].nC3C &= ~1;
+                        fn_800FE0AC(gPlayers[i].nC58, 0);
+                        fn_800FE080(gPlayers[i].nC58, 0);
+                        fn_800FE054(gPlayers[i].nC58, 0);
+                        GOLFERSTATE_Switch(1, i);
+                        lbl_802823C8 = 0;
+                    }
+                }
+                nOther = 0;
+                i = 1;
+            }
+        } else if (Game_GetMode() == 8) {
+            i = 0;
+            if ((fn_800136DC(gPlayers[i].nController) & fn_800142AC(0x25, 0)) && !fn_800FCC38(i) &&
+                ((s8)GOLFERSTATE_GetCurrentState(i) == 24 ||
+                 (gPlayers[i].nLie != 0 && gPlayers[i].nLie != LIE_HOLED && gPlayers[i].nLie != 16))) {
+                pHole = fn_8000C594();
+                fn_80055AA8(gPlayers[i].ball, &((HoleTees*)pHole)->tee[gSession.nTeeSet[i]].x, i);
+                Vec_Copy(&((HoleTees*)pHole)->tee[gSession.nTeeSet[i]].x, &gPlayers[i].fBallX);
+                Vec_Copy(&((HoleTees*)pHole)->tee[gSession.nTeeSet[i]].x, gPlayers[i].vA44);
+                gPlayers[i].nC3C &= ~1;
+                fn_800FE0AC(gPlayers[i].nC58, 0);
+                fn_800FE080(gPlayers[i].nC58, 0);
+                fn_800FE054(gPlayers[i].nC58, 0);
+                GOLFERSTATE_Switch(1, i);
+            }
+        }
+        lbl_802823C8 = 1;
+    }
 }
 
 void fn_800FD6A0(int nPlayer) {
