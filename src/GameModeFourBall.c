@@ -6,12 +6,6 @@
 #include "game.h"
 #include "game/save.h"
 
-// The tee order before anyone has won a hole (lbl_80184DC0: 0, 1, 2, 3).
-typedef struct TeeOrder {
-    s32 a[4];
-} TeeOrder;
-extern TeeOrder lbl_80184DC0;
-
 u8   fn_800E8E24(int nTeam);
 u8   fn_800E8F20(int nTeam);
 int  fn_800E8FC8(int nTeam);
@@ -147,8 +141,8 @@ void fn_800E90FC(void) {
 // team 0 only) the better score of the pair; otherwise the player farthest from the pin (off the
 // green first) whose team is still playing.
 s32 fn_800E9178(int nPlayer) {
-    TeeOrder order;
-    s32* pOrder;        // fake match: the within-team compare reads order.a through a pointer
+    s32 aOrder[4] = {0, 1, 2, 3};  // the tee order before anyone has won a hole
+    s32* pOrder;        // fake match: the within-team compare reads aOrder through a pointer
     int w;
     int t;
     int i;
@@ -163,8 +157,7 @@ s32 fn_800E9178(int nPlayer) {
     f32 dz;
     f32 d;
     nLead = 0;
-    order = lbl_80184DC0;
-    pOrder = order.a;
+    pOrder = aOrder;
     for (h = 0; h < Game_CurHoleIndex(); h++) {
         if (gpGame->bHoleSelected[h]) {
             if (gPlayers[0].nModePoints[h] != 0) {
@@ -176,23 +169,23 @@ s32 fn_800E9178(int nPlayer) {
             }
             if (w != nLead) {
                 nLead = w;
-                t = order.a[0];
-                order.a[0] = order.a[2];
-                order.a[2] = t;
-                t = order.a[1];
-                order.a[1] = order.a[3];
-                order.a[3] = t;
+                t = aOrder[0];
+                aOrder[0] = aOrder[2];
+                aOrder[2] = t;
+                t = aOrder[1];
+                aOrder[1] = aOrder[3];
+                aOrder[3] = t;
             }
-            if (gPlayers[order.a[1]].nStrokes[h] < gPlayers[pOrder[0]].nStrokes[h]) {
-                t = order.a[0];
-                order.a[0] = order.a[1];
-                order.a[1] = t;
+            if (gPlayers[aOrder[1]].nStrokes[h] < gPlayers[pOrder[0]].nStrokes[h]) {
+                t = aOrder[0];
+                aOrder[0] = aOrder[1];
+                aOrder[1] = t;
             }
         }
     }
     for (j = 0; j < gNumPlayersSetUp; j++) {
-        if (nPlayer != order.a[j] && Player_OnTee(order.a[j]) && !fn_800E8E24(fn_800E947C(order.a[j]))) {
-            return order.a[j];
+        if (nPlayer != aOrder[j] && Player_OnTee(aOrder[j]) && !fn_800E8E24(fn_800E947C(aOrder[j]))) {
+            return aOrder[j];
         }
     }
     pCourse = fn_8000C594();

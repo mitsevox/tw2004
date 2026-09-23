@@ -77,7 +77,6 @@ void  fn_800E41C8(void);
 int   fn_8006AA9C(int nPlayer);             // how the shot turned out (0..4, 8+)
 void  fn_8006AAB4(int nPlayer, int a);
 
-typedef struct Vec4 { f32 x, y, z, w; } Vec4;
 u32   fn_800136DC(int nController);         // buttons: held << 16 | pressed this frame
 u32   fn_800142AC(int nButton, int a);      // a button's mask
 u8    fn_80014300(u32 uMask);               // any pad pressed these buttons
@@ -90,8 +89,6 @@ void  fn_80062B70(void);
 u8    Player_IsNotCPU(int nPlayer);
 void  fn_800E41D4(int nPlayer);
 void  fn_8006C300(int nPlayer);
-
-extern Vec4 lbl_80184D30;
 
 void  Shot_Prepare(int nPlayer, u8 bNotify);
 void  BreakLine_Start(int nView);            // GoBreakLine.c
@@ -1026,7 +1023,7 @@ void GM_CheckForShotChanges(int nPlayer) {
 // continues on any pad's button 0.
 void GM_DoPostShotInHoleUI(int nPlayer) {
     void* pView = fn_80017028(gPlayers[nPlayer].nView0);
-    Vec4  vOffset = lbl_80184D30;
+    f32   vOffset[4] = {0.0f, 0.0f, 0.0f, 0.5f};
     if ((gPlayers[nPlayer].uFlags & 8) && fn_80063C7C(pView)) {
         GM_EndOfGolferTurn(nPlayer);
         fn_80062D0C(nPlayer);
@@ -1046,7 +1043,7 @@ void GM_DoPostShotInHoleUI(int nPlayer) {
         fn_80062B78(nPlayer);
         fn_80062B74(nPlayer);
         fn_80062B70();
-        fn_80063BF4(pView, lbl_80281F78->f170, (f32*)&vOffset);
+        fn_80063BF4(pView, lbl_80281F78->f170, vOffset);
         return;
     }
     if (Player_IsNotCPU(nPlayer) && gSession.nSplitScreen == 0) {

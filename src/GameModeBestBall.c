@@ -8,12 +8,6 @@
 #include "game/save.h"
 #include "game/earnings.h"
 
-// The tee order before anyone has a lower team score (lbl_80184DB0: 0, 1, 2, 3).
-typedef struct TeeOrder {
-    s32 a[4];
-} TeeOrder;
-extern TeeOrder lbl_80184DB0;
-
 u8   fn_800E82AC(int nTeam);
 int  fn_800E83A8(int nPlayer);
 void fn_800E83F8(void);
@@ -107,8 +101,8 @@ void fn_800E83F8(void) {
 // with the better score on the last decided hole, and within a team the better score; otherwise the
 // player farthest from the pin (off the green first) whose team is still playing.
 s32 fn_800E84B0(int nPlayer) {
-    TeeOrder order;
-    s32* pOrder;        // fake match: the within-team compares read order.a through a pointer
+    s32 aOrder[4] = {0, 1, 2, 3};  // the tee order before anyone has a lower team score
+    s32* pOrder;        // fake match: the within-team compares read aOrder through a pointer
     int a;
     int b;
     int w;
@@ -124,8 +118,7 @@ s32 fn_800E84B0(int nPlayer) {
     f32 dz;
     f32 d;
     nLead = 0;
-    order = lbl_80184DB0;
-    pOrder = order.a;
+    pOrder = aOrder;
     for (h = 0; h < Game_CurHoleIndex(); h++) {
         if (gpGame->bHoleSelected[h]) {
             a = gPlayers[1].nStrokes[h];
@@ -145,31 +138,31 @@ s32 fn_800E84B0(int nPlayer) {
             }
             if (w != nLead) {
                 nLead = w;
-                t = order.a[0];
-                order.a[0] = order.a[2];
-                order.a[2] = t;
-                t = order.a[1];
-                order.a[1] = order.a[3];
-                order.a[3] = t;
+                t = aOrder[0];
+                aOrder[0] = aOrder[2];
+                aOrder[2] = t;
+                t = aOrder[1];
+                aOrder[1] = aOrder[3];
+                aOrder[3] = t;
             }
-            t = order.a[0];
+            t = aOrder[0];
             if (gPlayers[t].nStrokes[h] > gPlayers[pOrder[1]].nStrokes[h]) {
-                order.a[0] = order.a[1];
-                order.a[1] = t;
+                aOrder[0] = aOrder[1];
+                aOrder[1] = t;
             }
-            t = order.a[2];
+            t = aOrder[2];
             if (gPlayers[t].nStrokes[h] > gPlayers[pOrder[3]].nStrokes[h]) {
-                order.a[2] = order.a[3];
-                order.a[3] = t;
+                aOrder[2] = aOrder[3];
+                aOrder[3] = t;
             }
         }
     }
     // fake match: the tee-order loop reuses the hole counter h; a counter of its own gets another
     // register (h, t or w all match)
     for (h = 0; h < gNumPlayersSetUp; h++) {
-        if (nPlayer != order.a[h] && Player_OnTee(order.a[h]) && !gPlayers[order.a[h]].bPlayerCut &&
-            !fn_800E82AC(fn_800E8848(order.a[h]))) {
-            return order.a[h];
+        if (nPlayer != aOrder[h] && Player_OnTee(aOrder[h]) && !gPlayers[aOrder[h]].bPlayerCut &&
+            !fn_800E82AC(fn_800E8848(aOrder[h]))) {
+            return aOrder[h];
         }
     }
     pCourse = fn_8000C594();
