@@ -5,7 +5,7 @@
 
 int fn_8011E020(s32* pnMonth, s32* pnDay, s32* pnYear, s32* pnHour, s32* pnMinute, s32* pnSecond,
                 s32* pnMsec) {
-    struct OSCalendarTime time;
+    OSCalendarTime time;
 
     OSTicksToCalendarTime(OSGetTime(), &time);
     *pnMonth = time.nMon + 1;

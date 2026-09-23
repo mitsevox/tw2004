@@ -50,24 +50,6 @@ void  fn_8015929C(void* pBase, u32 nCount, u32 nSize, s32 (*pfnCompare)(const vo
 #define FRAME_RATE 59.94f               // frames a second (NTSC)
 #define FRAME_TIME (1.0f / FRAME_RATE)  // one frame, in seconds
 
-// port: the GameCube OS library: the clock and its conversion to a calendar date.
-struct OSCalendarTime {
-    s32 nSec;                   // 0x00  0-59
-    s32 nMin;                   // 0x04  0-59
-    s32 nHour;                  // 0x08  0-23
-    s32 nMday;                  // 0x0C
-    s32 nMon;                   // 0x10  0-11
-    s32 nYear;                  // 0x14
-    s32 nWday;                  // 0x18
-    s32 nYday;                  // 0x1C
-    s32 nMsec;                  // 0x20
-    s32 nUsec;                  // 0x24
-};
-
-s64  OSGetTime(void);
-void OSTicksToCalendarTime(s64 nTicks, struct OSCalendarTime* pTime);
-u32  OSGetTick(void);
-
 // llrtclock.c: the real-time clock as a date: month 1-12, day, year, hour 0-23, minute, second,
 // millisecond. Always TRUE.
 int  fn_8011E020(s32* pnMonth, s32* pnDay, s32* pnYear, s32* pnHour, s32* pnMinute, s32* pnSecond,
