@@ -958,11 +958,13 @@ void GOLFERSTATE_Update(void) {
     switch (fn_8005D2DC()) {
     case 0:
         for (i = 0; i < 5; i++) {
-            SwingStack* pStack = &gSwingStacks[i];
+            SwingStack* pStack = &gSwingStacks[(u32)i];
             void (*pfn)(int);
             if (pStack->nTop > -1) {
                 pfn = sGolferStateEngineTable[pStack->nState[pStack->nTop]].pfnUpdate;
-                if (pfn != NULL) pfn(i);
+                if (pfn != NULL) {
+                    pfn(i);
+                }
             }
         }
         break;
