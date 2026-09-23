@@ -5,6 +5,7 @@
 #include "engine.h"
 
 f32 fn_80008EF0(f32* pQ);
+void fn_8000972C(f32* pQ);
 
 // The quaternion's squared length.
 f32 fn_80008EF0(f32* pQ) {
@@ -44,6 +45,16 @@ void fn_800090A0(f32* pA, f32* pB, f32* pOut) {
     pOut[0] = pA[0] + pB[0];
     pOut[1] = pA[1] + pB[1];
     pOut[2] = pA[2] + pB[2];
+}
+
+// b turned by the inverse of the unit quaternion a (conj(a) x b x a), into pOut.
+void fn_800090E4(f32* pA, f32* pB, f32* pOut) {
+    f32 aTmp[4];
+    f32 aConj[4];
+
+    fn_80008F9C(pA, aConj);
+    fn_80008FCC(aConj, pB, aTmp);
+    fn_80008FCC(aTmp, pA, pOut);
 }
 
 // The rotation matrix (3 rows of 4, no translation) of a unit quaternion.
@@ -90,6 +101,69 @@ void fn_8000914C(f32* pQ, f32 (*m)[4]) {
     m[0][3] = 0.0f;
 }
 
+// A rotation vector (axis * angle) as a quaternion, into pOut; the identity when the angle is
+// below 0.001.
+void fn_8000923C(f32* pRot, f32* pOut) {
+    f32 fAngle;
+    f32 fScale;
+
+    fAngle = fn_80009680(fn_80009744(pRot));
+    if (fAngle < 0.001f) {
+        fn_80009710(pOut);
+        return;
+    }
+    pOut[3] = fn_80009638(fAngle / 2.0f);
+    fScale = -(f32)fn_80009680(1.0f - pOut[3] * pOut[3]) / fAngle;
+    pOut[0] = pRot[0] * fScale;
+    pOut[1] = pRot[1] * fScale;
+    pOut[2] = pRot[2] * fScale;
+}
+
+// A rotation by fAngle about the unit axis pAxis as a quaternion, into pOut; the identity when
+// the angle is below 0.001.
+void fn_800092F8(f32* pAxis, f32* pOut, f32 fAngle) {
+    if (fAngle < 0.001f) {
+        fn_80009710(pOut);
+        return;
+    }
+    pOut[3] = fn_80009638(fAngle / 2.0f);
+    // fake match: fAngle is reused for the axis scale (the original keeps both in one register)
+    fAngle = -(f32)fn_80009680(1.0f - pOut[3] * pOut[3]) / fAngle;
+    pOut[0] = pAxis[0] * fAngle;
+    pOut[1] = pAxis[1] * fAngle;
+    pOut[2] = pAxis[2] * fAngle;
+}
+
+// A rotation by -fAngle about z, as a quaternion into pOut.
+void fn_800093AC(f32 fAngle, f32* pOut) {
+    f32 fHalf;
+
+    fn_8000972C(pOut);
+    fHalf = 0.5f * -fAngle;
+    pOut[2] = fn_800095F0(fHalf);
+    pOut[3] = fn_80009638(fHalf);
+}
+
+// A rotation by -fAngle about y, as a quaternion into pOut.
+void fn_80009410(f32 fAngle, f32* pOut) {
+    f32 fHalf;
+
+    fn_8000972C(pOut);
+    fHalf = 0.5f * -fAngle;
+    pOut[1] = fn_800095F0(fHalf);
+    pOut[3] = fn_80009638(fHalf);
+}
+
+// A rotation by -fAngle about x, as a quaternion into pOut.
+void fn_80009474(f32 fAngle, f32* pOut) {
+    f32 fHalf;
+
+    fn_8000972C(pOut);
+    fHalf = 0.5f * -fAngle;
+    pOut[0] = fn_800095F0(fHalf);
+    pOut[3] = fn_80009638(fHalf);
+}
+
 f32 fn_800095F0(f32 fAngle) {
     return sin(fAngle);
 }
@@ -104,6 +178,26 @@ f32 fn_80009638(f32 fAngle) {
 
 f32 fn_8000965C(f32 x) {
     return asin(x);
+}
+
+// Square root: four Newton steps from the reciprocal-root estimate; 0 for 0, NaN for a negative
+// x or a NaN (the infinity at the end is never reached).
+double fn_80009680(double x) {
+    double g;
+
+    if (x > 0.0) {
+        g = __frsqrte(x);
+        g = 0.5 * g * (3.0 - g * g * x);
+        g = 0.5 * g * (3.0 - g * g * x);
+        g = 0.5 * g * (3.0 - g * g * x);
+        g = 0.5 * g * (3.0 - g * g * x);
+        return x * g;
+    } else if (x == 0.0) {
+        return 0.0;
+    } else if (x) {
+        return TW_NAN;
+    }
+    return TW_INFINITY;
 }
 
 // The identity rotation.

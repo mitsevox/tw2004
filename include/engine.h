@@ -91,6 +91,8 @@ void fn_8000B2B8(u32 uSeed);            // seed all three random streams
 void fn_8000B30C(void);                 // drop the kept normal value (fn_8000B318)
 f32  Rand_Float(int nStream);           // 0x8000B428  [0, 1)
 void fn_8000883C(f32* pA, f32* pB, f32 fT);   // quaternion slerp from a to b by fT, into b
+void fn_8000923C(f32* pRot, f32* pOut); // a rotation vector (axis * angle) as a quaternion
+void fn_80009710(f32* pQ);              // the identity quaternion (0, 0, 0, 1)
 f32  fn_80029B64(f32 x);                // square root (Skeleton.c); x itself when x <= 0
 void fn_8000C5D4(f32* pA, f32* pB, f32 f, f32* pOut);   // out = a + f x b
 f32  fn_8000C5FC(f32* pA, f32* pB);     // dot product
