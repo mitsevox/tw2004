@@ -36,8 +36,8 @@ void   AXSetVoiceSrcType(AXVPB* pVpb, u32 uType);
 void   AXSetVoiceState(AXVPB* pVpb, u16 uState);   // 0 stopped, 1 running
 
 // MIX: set a new voice's input, aux A and aux B levels (dB x 10), pan, surround pan and fader.
-void   fn_80145B24(AXVPB* pVpb, u32 uMode, int nInput, int nAuxA, int nAuxB, int nPan, int nSPan,
-                   int nFader);
+void   MIXInitChannel(AXVPB* pVpb, u32 uMode, int nInput, int nAuxA, int nAuxB, int nPan, int nSPan,
+                      int nFader);
 
 // Keeps a global the code never uses through the linker's dead-stripping (startUp.c's data has
 // three). `#pragma force_active` does not mark uninitialised data; this does.

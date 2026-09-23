@@ -47,8 +47,8 @@ void   AXInit(void);
 void   MIXInit(void);
 void   AXSetMode(u32 uMode);
 u32    OSGetSoundMode(void);
-void   fn_80145B1C(u32 uMode);          // MIX: the output mode (mono, stereo, surround)
-void   fn_80136DF4(void (*pfn)(void));  // AX: the callback run after each audio frame
+void   MIXSetSoundMode(u32 uMode);      // the output mode (mono, stereo, surround)
+void   AXRegisterCallback(void (*pfn)(void));  // the callback run after each audio frame
 void*  fn_800B5BD8(u32 uSize);
 u32    fn_800B5D34(void* pHeap, u32 uSize, u32 uAlign);   // ARAM heap: allocate, returns the address
 void   fn_800B5E88(void* pHeap, u32 uAddr);               // ARAM heap: free
@@ -57,7 +57,7 @@ u32    fn_800B6564(u32 uSize);          // take ARAM, returns its address
 void*  fn_800B5C40(u32 uSize, u32 uAram, u32 uAlign, void* pInfo);   // ARAM heap: create
 void   fn_800B65C0(void* pSrc, u32 uAram, u32 uLen, int a, int b, void (*pfnDone)(u32 n), int n,
                    int c);                                            // ARAM DMA
-void   AXSetVoiceSrc(AXVPB* pVpb, f32 fRatio);          // the playback rate
+void   AXSetVoiceSrcRatio(AXVPB* pVpb, f32 fRatio);     // the playback rate
 void   AXSetVoiceAdpcm(AXVPB* pVpb, u32* pCoefs);
 void   AXSetVoiceAdpcmLoop(AXVPB* pVpb, u16* pLoop);
 void   AXSetVoiceType(AXVPB* pVpb, u32 uType);
@@ -67,7 +67,7 @@ void   MIXSetPan(AXVPB* pVpb, int nPan);
 void   MIXSetSPan(AXVPB* pVpb, int nSPan);
 void   MIXMute(AXVPB* pVpb);
 void   MIXUnMute(AXVPB* pVpb);
-void   fn_80146B18(void);               // MIX: pass the settings to the hardware
+void   MIXUpdateSettings(void);         // MIX: pass the settings to the hardware
 void   fn_800B1A88(f32* pA, f32* pB);   // swap two floats
 void   fn_800B1A9C(f32* v, f32 x, f32 y);
 void   fn_80110458(u8 b);
@@ -177,7 +177,7 @@ void fn_800AF324(void) {
         }
         if (p->flags.b.bSetSrc) {
             p->flags.b.bSetSrc = 0;
-            AXSetVoiceSrc(p->pVpb, (1.0f / 65536.0f) * p->u40);
+            AXSetVoiceSrcRatio(p->pVpb, (1.0f / 65536.0f) * p->u40);
         }
         if (p->flags.b.bSetAuxA) {
             p->flags.b.bSetAuxA = 0;
@@ -309,7 +309,7 @@ void fn_800AF324(void) {
             }
         }
     }
-    fn_80146B18();
+    MIXUpdateSettings();
 }
 
 // The hardware dropped a voice (to play one of higher priority): mark ours lost and stop it. The
@@ -349,7 +349,7 @@ void fn_800AFA2C(s16 nVoice) {
     p->u40 = 0;
     p->nPan = 64;
     p->nSPan = 127;
-    fn_80145B24(p->pVpb, 0, VOLUME_MIN, VOLUME_MIN, VOLUME_MIN, 64, 127, 0);
+    MIXInitChannel(p->pVpb, 0, VOLUME_MIN, VOLUME_MIN, VOLUME_MIN, 64, 127, 0);
 }
 
 // Start the audio hardware and the voice table.
@@ -360,14 +360,14 @@ int fn_800AFAB0(void) {
     AXInit();
     MIXInit();
     AXSetMode(0);
-    fn_80145B1C(OSGetSoundMode());
+    MIXSetSoundMode(OSGetSoundMode());
     lbl_802820E8 = fn_800B5BD8(NUM_VOICES * sizeof(Voice));
     fn_80005AE8(lbl_802820E8, 0, NUM_VOICES * sizeof(Voice));
     for (i = 0; i < NUM_VOICES; i++) {
         fn_800AF9BC(i);
         fn_800AFA2C(i);
     }
-    fn_80136DF4(fn_800AF324);
+    AXRegisterCallback(fn_800AF324);
     return 1;
 }
 

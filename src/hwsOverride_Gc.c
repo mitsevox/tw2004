@@ -31,3 +31,26 @@ s32 fn_80112964(u8* p) {
 }
 
 // ---- end of sweep code ----
+
+// ---- sweep code (not yet cleaned up) ----
+
+void fn_8011296C();
+void fn_80112A10(s32 p0, s32 p1);
+void fn_80112A34(s32 p0, s32 p1);
+void fn_80112A58(u32 arg0);
+
+void fn_80112A10(s32 p0, s32 p1) {
+    fn_8011296C(p0, p1, 2);
+}
+
+void fn_80112A34(s32 p0, s32 p1) {
+    fn_8011296C(p0, p1, 1);
+}
+
+void fn_80112A58(u32 arg0) {
+    if (arg0 != 0U) {
+        fn_80009E70();
+    }
+}
+
+// ---- end of sweep code ----
