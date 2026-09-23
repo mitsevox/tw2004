@@ -106,38 +106,36 @@ int fn_800E9F90(int nPlayer) {
 // TW06: GameModeMatch::GetHonors. On the tee the honor; otherwise the player farthest from the pin
 // (off the green first).
 s32 fn_800EA084(int nPlayer) {
-    int nHonor;
-    int nOther;
     int i;
     CourseInfo* pCourse;
-    f32* pPin;
+    int nHole;
     f32 fBest;
     int nBest;
     f32 dx;
     f32 dz;
     f32 d;
-    nHonor = fn_800E9F90(nPlayer);
-    if (nHonor != 5 && Player_OnTee(nHonor)) {
-        return nHonor;
+    nBest = fn_800E9F90(nPlayer);
+    if (nBest != 5 && Player_OnTee(nBest)) {
+        return nBest;
     }
-    nOther = 5;
+    nBest = 5;
     for (i = 0; i < gNumPlayersSetUp; i++) {
         if (i != nPlayer && !Player_IsHoled(i)) {
-            nOther = i;
+            nBest = i;
             break;
         }
     }
-    if (nPlayer == 5 && nOther == 5) {
+    if (nPlayer == 5 && nBest == 5) {
         return 5;
     }
     pCourse = fn_8000C594();
+    nHole = Game_CurrentHole();
     fBest = 0.0f;
-    pPin = (f32*)&pCourse->pin[Game_CurrentHole()];
     nBest = 5;
     for (i = 0; i < gNumPlayersSetUp; i++) {
-        if (i != nPlayer && !Player_IsHoled(i) && gPlayers[i].nLie != LIE_GREEN) {
-            dx = ((Ball*)gPlayers[i].ball)->vPos[0] - pPin[0];
-            dz = ((Ball*)gPlayers[i].ball)->vPos[2] - pPin[2];
+        if (i != nPlayer && !Player_IsHoled(i) && PLAYER(i)->nLie != LIE_GREEN) {
+            dx = *(f32*)(PLAYER(i)->ball + 0) - pCourse->pin[nHole].x;
+            dz = *(f32*)(PLAYER(i)->ball + 8) - pCourse->pin[nHole].z;
             d = fn_80009680(dx * dx + dz * dz);
             if (d > fBest) {
                 fBest = d;
@@ -150,8 +148,8 @@ s32 fn_800EA084(int nPlayer) {
         nBest = 5;
         for (i = 0; i < gNumPlayersSetUp; i++) {
             if (i != nPlayer && !Player_IsHoled(i)) {
-                dx = ((Ball*)gPlayers[i].ball)->vPos[0] - pPin[0];
-                dz = ((Ball*)gPlayers[i].ball)->vPos[2] - pPin[2];
+                dx = *(f32*)(PLAYER(i)->ball + 0) - pCourse->pin[nHole].x;
+                dz = *(f32*)(PLAYER(i)->ball + 8) - pCourse->pin[nHole].z;
                 d = fn_80009680(dx * dx + dz * dz);
                 if (d > fBest) {
                     fBest = d;
