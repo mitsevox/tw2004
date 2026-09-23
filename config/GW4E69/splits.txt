@@ -2272,11 +2272,8 @@ unsorted/sweep_800ADDC8.c:
 UAudContainers.c:
 	.text       start:0x800ADE70 end:0x800AE1F8
 
-unsorted/sweep_800AE380.c:
-	.text       start:0x800AE380 end:0x800AE3C4
-
-unsorted/sweep_800AF0A8.c:
-	.text       start:0x800AF0A8 end:0x800AF0D4
+uiobject.c:
+	.text       start:0x800AE1F8 end:0x800AF114
 
 unsorted/sweep_800AF140.c:
 	.text       start:0x800AF140 end:0x800AF144
@@ -2369,59 +2366,11 @@ unsorted/sweep_800B6034.c:
 GoARAM.c:
 	.text       start:0x800B61B4 end:0x800B6924
 
-unsorted/sweep_800B6924.c:
-	.text       start:0x800B6924 end:0x800B694C
+DiscError.c:
+	.text       start:0x800B6924 end:0x800B769C
 
-unsorted/sweep_800B6C0C.c:
-	.text       start:0x800B6C0C end:0x800B6C14
-
-unsorted/sweep_800B6CD0.c:
-	.text       start:0x800B6CD0 end:0x800B6CD8
-
-unsorted/sweep_800B7684.c:
-	.text       start:0x800B7684 end:0x800B769C
-
-unsorted/sweep_800B90F4.c:
-	.text       start:0x800B90F4 end:0x800B9178
-
-unsorted/rcmp_mad_codec/sweep_800B9178.c:
-	.text       start:0x800B9178 end:0x800B91B8
-
-unsorted/rcmp_mad_codec/sweep_800B91B8.c:
-	.text       start:0x800B91B8 end:0x800B920C
-
-unsorted/rcmp_mad_codec/sweep_800B94B0.c:
-	.text       start:0x800B94B0 end:0x800B94CC
-
-unsorted/rcmp_mad_codec/sweep_800B95FC.c:
-	.text       start:0x800B95FC end:0x800B9624
-
-unsorted/rcmp_mad_codec/sweep_800B9700.c:
-	.text       start:0x800B9700 end:0x800B9760
-
-unsorted/rcmp_mad_codec/sweep_800B97A8.c:
-	.text       start:0x800B97A8 end:0x800B9808
-
-unsorted/rcmp_mad_codec/sweep_800B9808.c:
-	.text       start:0x800B9808 end:0x800B9864
-
-unsorted/rcmp_mad_codec/sweep_800B9930.c:
-	.text       start:0x800B9930 end:0x800B9944
-
-unsorted/rcmp_mad_codec/sweep_800B9988.c:
-	.text       start:0x800B9988 end:0x800B99FC
-
-unsorted/rcmp_mad_codec/sweep_800B99FC.c:
-	.text       start:0x800B99FC end:0x800B9A50
-
-unsorted/rcmp_mad_codec/sweep_800B9A50.c:
-	.text       start:0x800B9A50 end:0x800B9A88
-
-unsorted/rcmp_mad_codec/sweep_800B9A88.c:
-	.text       start:0x800B9A88 end:0x800B9AAC
-
-unsorted/rcmp_mad_codec/sweep_800B9B48.c:
-	.text       start:0x800B9B48 end:0x800B9BF4
+rcmp_mad_codec.c:
+	.text       start:0x800B769C end:0x800B9FF0
 
 unsorted/sweep_800BA080.c:
 	.text       start:0x800BA080 end:0x800BA0A0
