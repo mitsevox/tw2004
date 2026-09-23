@@ -80,8 +80,8 @@ void fn_80062C80(int a, u8 b);
 void fn_80062CB0(int a, u8 b);
 void fn_80062CE0(u8 a);
 void fn_80062D0C(int nPlayer);
-void fn_80062D38(int a, int b, int nPlayer);
-void fn_80062D6C(int a, int nPlayer);
+void fn_80062D38(int nMsg, int nA, int nB);    // send message nMsg with two values (fn_800E5998)
+void fn_80062D6C(int nMsg, int nValue);        // send message nMsg with one value (fn_800E590C)
 
 // ---- the game manager ------------------------------------------------------------------------
 
@@ -415,7 +415,7 @@ void fn_800F1B60(int nPlayer, s8 n);
 u8   fn_800F1BD8(int nPlayer);          // previous target
 u8   fn_800F1C34(int nPlayer);          // next target
 s8   fn_800F1C74(int nPlayer);          // the target nearest the ball
-int  fn_800F1D34(int nPlayer);          // the player's current target
+int  fn_800F1D34(int nPlayer);          // the target nearest the player's aim point
 s32  fn_800F1E58(s32 n);
 void fn_800F1EE4(void);                 // every player's target-game state cleared
 void fn_800F2030(void);

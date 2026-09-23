@@ -26,7 +26,7 @@ typedef struct SGEvent {
     s32 nPoints;                // 0x8
     u8  unkC[4];
 } SGEvent;
-extern SGEvent lbl_80192908[];
+extern SGEvent lbl_80192908[42];
 // The last 100 events.
 typedef struct SGLog {
     s32 nEvent;
@@ -525,8 +525,8 @@ void fn_800FA9E0(int nPlayer) {
 
 // An event's sound, if it has one: only the first 37 events play one.
 void fn_800FAA70(int nEvent) {
-    // Read before the range check, but in bounds: the table has 44 entries and the callers pass
-    // at most event 42.
+    // Read before the range check, but in bounds: the table has 44 entries and no caller passes an
+    // event above 41 (0x29).
     u16 nSound = lbl_80192BA8[nEvent];
     if (nEvent >= 37 || nSound == 0xFFFF) {
         return;
@@ -539,6 +539,8 @@ void fn_800FAA70(int nEvent) {
 void fn_800FAAB8(int nPlayer, int nEvent) {
     int nOther;
     s32 nPoints;
+    // lbl_80192908 has 42 rows, so the bound 0x2A lets one past the end through; no caller passes
+    // more than 0x29.
     if ((!(gPlayers[nPlayer].nC3C & 0x6000) || nEvent == 0x28 || nEvent == 0x29) && nEvent <= 0x2A) {
         if (nEvent == 0x25) {
             lbl_802823CC++;
@@ -706,9 +708,10 @@ u8 fn_800FAD54(int nPlayer) {
     return 1;
 }
 
-// The hole is finished in nStrokes: its events. fn_800D2B08's value (above 3 for the
-// drive-distance events) less the strokes picks events 8 to 11 (0 to 3 under it); a hole in one
-// is event 12 or 13, and 14 when bit 9 of nC3C is already set.
+// The hole is finished in nStrokes: its events. Event 23 at or under par when nC3C bits 10-11
+// are set (then cleared); a hole in one is event 12 on a par 3, 13 otherwise, plus 14 when nC3C
+// bit 9 is already set (a second one; the first sets it); otherwise par (fn_800D2B08) less the
+// strokes picks events 8 to 11 (par to 3 under).
 void fn_800FB204(int nPlayer, int nStrokes) {
     int nPar;
     int nUnder;

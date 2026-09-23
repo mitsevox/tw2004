@@ -470,7 +470,7 @@ void fn_800DBFAC(void) {
     } else {
         fHeight = 0.15f;
     }
-    pGE = &lbl_80202898;       // steers the register choice (found by the permuter)
+    pGE = &lbl_80202898;       // fake match: steers the register choice (found by the permuter)
     fn_800DCB84(gPlayers[pGE->nPlayer].ball.vPos, gPlayers[pGE->nPlayer].ballBefore.vPos, v);
     v[1] = 0.0f;
     fDist = fn_80009680(fn_80009744(v));

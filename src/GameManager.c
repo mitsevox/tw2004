@@ -170,7 +170,7 @@ void GM_InitForHole(void) {
     lbl_80282278 = gpGame->pfnGetHonors(5);
     EVENT_Trigger(0xFF, 0, 0, -1);
     for (i = 0; i < 5; i++) {
-        int j;              // j only steers the register choice (found by the permuter)
+        int j;              // fake match: j only steers the register choice (found by the permuter)
         gpGame->n144[i] = 0;
         j = i;
         gpGame->n158[j] = 0;
