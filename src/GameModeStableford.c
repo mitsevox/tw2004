@@ -6,13 +6,35 @@
 #include "golfer.h"
 
 int   Game_CurHoleIndex(void);
+int   Game_CurrentHole(void);
+u8    Player_OnTee(int nPlayer);
 u8    Player_IsHoled(int nPlayer);
 void  GOLFERSTATE_Set(int nState, int nPlayer);
 void  fn_800E1480(int nHole);
+u8    fn_800E1BBC(void);
+u8    fn_800EC550(void);
+int   fn_800E1788(int nPlayer);             // the player's round total
+int   fn_800D3C7C(int nPlayer);             // the player's golfer
+void  fn_800D3548(int nPlayer, int nMoney, int a);
+void  fn_800E4364(u32 nQueue, int a, int b, int c);
+void  fn_80125854(int a);
 extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
 extern s32 lbl_80282278;                    // the player whose turn it is
 // The points for 3 under par .. 2 or more over. TW06: GameModeStableford::stablefordPointTable.
 extern s8  lbl_802816D0[6];
+extern u8* gpSaveData;
+
+// Per golfer (gGolferTable's 34): the prize for beating them (lbl_80200538 + 0x1D4, 8 bytes each).
+typedef struct GolferPrize {
+    s32 nBase;
+    s32 nPerStroke;
+} GolferPrize;
+typedef struct PrizeTable {
+    u8          unk0[0x1D4];
+    GolferPrize prize[34];      // 0x1D4
+} PrizeTable;
+extern PrizeTable lbl_80200538;
+#define GOLFER_PRIZE(n) lbl_80200538.prize[n]
 
 u8   fn_800FE2B4(int nPlayer);
 void fn_800FE344(void);
@@ -73,6 +95,103 @@ void fn_800FE344(void) {
     }
 }
 
+// TW06: GameModeStableford::GetHonors. Who plays next after nPlayer (5 = nobody). On the tee the
+// honor goes by the scores on the holes played so far (the latest hole first, ties by the hole
+// before); otherwise to the player farthest from the pin, off the green first.
+s32 fn_800FE3FC(int nPlayer) {
+    s32 aOrder[4] = {0, 1, 2, 3};
+    s32 aSorted[4];
+    int n;
+    int h;
+    int i;
+    int k;
+    s32 nLow;
+    s32 nScore;
+    s32 nHigh;
+    CourseInfo* pCourse;
+    int nHole;
+    f32 fBest;
+    int nBest;
+    f32 dx;
+    f32 dz;
+    f32 d;
+    for (h = 0; h < Game_CurHoleIndex(); h++) {
+        if (gpGame->bHoleSelected[h]) {
+            nLow = gPlayers[0].nStrokes[h];
+            nHigh = nLow;
+            for (i = 0; i < gNumPlayersSetUp; i++) {
+                if (gPlayers[(u32)i].nStrokes[h] < nLow) {
+                    nLow = gPlayers[(u32)i].nStrokes[h];
+                }
+                if (gPlayers[(u32)i].nStrokes[h] > nHigh) {
+                    nHigh = gPlayers[(u32)i].nStrokes[h];
+                }
+            }
+            n = 0;
+            for (nScore = nLow; nScore <= nHigh; nScore++) {
+                for (k = 0; k < gNumPlayersSetUp; k++) {
+                    if (nScore == gPlayers[(u32)aOrder[k]].nStrokes[h]) {
+                        aSorted[n] = aOrder[k];
+                        n++;
+                    }
+                }
+            }
+            for (i = 0; i < gNumPlayersSetUp; i++) {
+                aOrder[i] = aSorted[i];
+            }
+        }
+    }
+    for (h = 0; h < gNumPlayersSetUp; h++) {
+        if (nPlayer != aOrder[h] && Player_OnTee(aOrder[h]) && !fn_800FE2B4(aOrder[h])) {
+            return aOrder[h];
+        }
+    }
+    nBest = 5;
+    for (i = 0; i < gNumPlayersSetUp; i++) {
+        if (i != nPlayer && !fn_800FE2B4(i)) {
+            nBest = i;
+            break;
+        }
+    }
+    if (nPlayer == 5 && nBest == 5) {
+        return 5;
+    }
+    pCourse = fn_8000C594();
+    nHole = Game_CurrentHole();
+    fBest = 0.0f;
+    nBest = 5;
+    for (i = 0; i < gNumPlayersSetUp; i++) {
+        if (i != nPlayer && PLAYER(i)->nLie != LIE_GREEN && !fn_800FE2B4(i)) {
+            dx = *(f32*)(PLAYER(i)->ball + 0) - pCourse->pin[nHole].x;
+            dz = *(f32*)(PLAYER(i)->ball + 8) - pCourse->pin[nHole].z;
+            d = fn_80009680(dx * dx + dz * dz);
+            if (d > fBest) {
+                fBest = d;
+                nBest = i;
+            }
+        }
+    }
+    if (nBest == 5) {
+        fBest = 0.0f;
+        nBest = 5;
+        for (i = 0; i < gNumPlayersSetUp; i++) {
+            if (i != nPlayer && !fn_800FE2B4(i)) {
+                dx = *(f32*)(PLAYER(i)->ball + 0) - pCourse->pin[nHole].x;
+                dz = *(f32*)(PLAYER(i)->ball + 8) - pCourse->pin[nHole].z;
+                d = fn_80009680(dx * dx + dz * dz);
+                if (d > fBest) {
+                    fBest = d;
+                    nBest = i;
+                }
+            }
+        }
+    }
+    if (nBest == nPlayer) {
+        return 5;
+    }
+    return nBest;
+}
+
 // TW06: GameModeStableford::HoleFinished. The hole is over when every player is done with it.
 u8 fn_800FE7EC(int nPlayer, u8 bCheck) {
     int i;
@@ -116,5 +235,66 @@ void fn_800FE8A8(void) {
         nDiff = gPlayers[(u32)i].nStrokes[nHole] - nPar;
         nDiff = (nDiff < -3) ? -3 : ((nDiff > 2) ? 2 : nDiff);
         gPlayers[(u32)i].nModePoints[nHole] = lbl_802816D0[nDiff + 3];
+    }
+}
+
+// TW06: GameModeStableford::EndGame (empty there). Each human with a profile who finished the round
+// in fewer strokes than a CPU player wins money: the prize of the best such CPU golfer, its base
+// plus its per-stroke prize for up to 5 strokes of margin.
+void fn_800FE980(void) {
+    int i;
+    int j;
+    int nBest;
+    int nOurs;
+    int nTheirs;
+    int nGolfer;
+    int nMoney;
+    int nMargin;
+    int nBase;
+    int nProfile;
+    u8 bFirst = 1;
+    if (fn_800E1BBC()) {
+        switch (fn_800EC550()) {
+        case 0:
+            break;
+        default:
+            return;
+        }
+        for (i = 0; i < gNumPlayersSetUp; i++) {
+            if (!Player_IsCPU(i)) {
+                nBest = -1;
+                nOurs = fn_800E1788(i);
+                for (j = 0; j < gNumPlayersSetUp; j++) {
+                    if (i != j && Player_IsCPU(j)) {
+                        nTheirs = fn_800E1788(j);
+                        if (nOurs < nTheirs) {
+                            nGolfer = fn_800D3C7C(j);
+                            if (nGolfer > nBest) {
+                                nBest = nGolfer;
+                                nMargin = nTheirs - nOurs;
+                            }
+                        }
+                    }
+                }
+                if (nBest > -1) {
+                    if (nMargin > 5) {
+                        nMargin = 5;
+                    }
+                    nBase = GOLFER_PRIZE(nBest).nBase;
+                    nProfile = PLAYER(i)->nIndex;
+                    nMoney = nBase + GOLFER_PRIZE(nBest).nPerStroke * nMargin;
+                    if (gpSaveData[nProfile * 0x10600]) {
+                        if (bFirst) {
+                            fn_80125854(1);
+                            bFirst = 0;
+                        }
+                        if (nBase) {
+                            fn_800E4364(0, 0x75, nBase, nProfile);
+                        }
+                        fn_800D3548(i, nMoney, 0);
+                    }
+                }
+            }
+        }
     }
 }
