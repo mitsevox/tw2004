@@ -3451,10 +3451,9 @@ src/ax/AXAlloc.c:
 	.sbss       start:0x80282690 end:0x80282698
 
 src/ax/AXAux.c:
-	.text       start:0x80135BE0 end:0x80136058
-
-unsorted/sweep_80136058.c:
-	.text       start:0x80136058 end:0x80136064
+	.text       start:0x80135BE0 end:0x80136064
+	.bss        start:0x80261560 end:0x80264260
+	.sbss       start:0x80282698 end:0x802826D0
 
 unsorted/sweep_80136064.c:
 	.text       start:0x80136064 end:0x8013606C

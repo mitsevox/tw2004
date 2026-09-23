@@ -465,7 +465,7 @@ config.libs = [
         "objects": [
             Object(NonMatching, "src/vi/vi.c"),
             Object(Matching, "src/ax/AX.c"),
-            Object(NonMatching, "src/ax/AXAux.c"),
+            Object(Matching, "src/ax/AXAux.c"),
             Object(NonMatching, "src/ax/AXCL.c"),
             Object(NonMatching, "src/ax/AXSPB.c"),
             Object(Matching, "src/ax/AXProf.c"),
@@ -1430,7 +1430,6 @@ config.libs = [
             Object(Matching, "unsorted/sweep_80126E88.c"),
             Object(Matching, "unsorted/sweep_80126FD8.c"),
             Object(Matching, "unsorted/sweep_80127B10.c"),
-            Object(Matching, "unsorted/sweep_80136058.c"),
             Object(Matching, "unsorted/sweep_801393C4.c"),
             Object(Matching, "unsorted/sweep_801654F4.c"),
             Object(Matching, "unsorted/sweep_80169B0C.c"),
