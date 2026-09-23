@@ -88,9 +88,9 @@ u8 fn_800E8E24(int nTeam) {
 // TW06: GameModeFourBall::TeamConceded. Both partners picked up.
 u8 fn_800E8F20(int nTeam) {
     int nHole = Game_CurHoleIndex();
-    int a;
-    int b;
     int bConceded;
+    int b;
+    int a;
     a = 2;
     if (nTeam == 0) {
         a = 0;
@@ -111,8 +111,8 @@ u8 fn_800E8F20(int nTeam) {
 int fn_800E8FC8(int nTeam) {
     int nHole = Game_CurHoleIndex();
     int a;
-    int b;
     int n;
+    int b;
     int nBest;
     a = 2;
     if (nTeam == 0) {
@@ -127,7 +127,9 @@ int fn_800E8FC8(int nTeam) {
         n = gPlayers[a].nStrokes[nHole] + 1;
     }
     nBest = gPlayers[b].nStrokes[nHole] + 1;
-    nBest = n <= nBest ? n : nBest;
+    if (n <= nBest) {
+        nBest = n;
+    }
     if (Player_IsHoled(a)) {
         nBest = nBest <= gPlayers[a].nStrokes[nHole] ? nBest : gPlayers[a].nStrokes[nHole];
     }
@@ -406,14 +408,14 @@ void fn_800E9BBC(void) {
 // money (by the margin).
 void fn_800E9CF4(void) {
     int nPrize;
-    int nWinner;
+    Player* p;
     int nLoser;
     int nMargin;
     int nMoney;
     int nFirst;
-    int k;
+    int nWinner;
     int i;
-    Player* p;
+    int k;
     if (fn_800E1BBC()) {
         switch (fn_800EC550()) {
         case 0:
