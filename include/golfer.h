@@ -509,7 +509,7 @@ typedef struct GameState {
     void (*pfn250)(int nPlayer); // 0x250  the ball went out of bounds
     void (*pfn254)(int nPlayer); // 0x254  a mulligan was taken
     u8   (*pfn258)(int nPlayer); // 0x258  the re-plan button is allowed
-    void (*pfn25C)(void);       // 0x25C
+    void (*pfn25C)(int nPlayer, int nTime); // 0x25C  set the time left (GameMode13)
     void (*pfn260)(int nPlayer); // 0x260
     u8   (*pfn264)(int nPlayer); // 0x264  "aim at the pin?" for a re-plan
     void (*pfn268)(int nPlayer, int nId); // 0x268  a bonus was collected (GameMode16)

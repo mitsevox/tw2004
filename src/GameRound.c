@@ -42,7 +42,7 @@ u8    fn_800E3AC8(int nPlayer);
 u8    fn_800E3AC0(void);
 u8    fn_800E3AB8(int nPlayer);
 s32   fn_800E3AB0(void);
-void  fn_800E3AAC(void);
+void  fn_800E3AAC(int nPlayer, int nTime);
 void  fn_800E3AA8(int nPlayer, int nId);
 s32   fn_800E3AA0(int a, int nTarget);
 void  fn_800FF700(void);
@@ -1351,7 +1351,7 @@ s32 fn_800E3AA0(int a, int nTarget) {
 void fn_800E3AA8(int nPlayer, int nId) {
 }
 
-void fn_800E3AAC(void) {
+void fn_800E3AAC(int nPlayer, int nTime) {
 }
 
 s32 fn_800E3AB0(void) {
