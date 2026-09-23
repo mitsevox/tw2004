@@ -108,26 +108,8 @@ unsorted/sweep_8000A0AC.c:
 unsorted/sweep_8000A0E8.c:
 	.text       start:0x8000A0E8 end:0x8000A194
 
-unsorted/sweep_8000AD34.c:
-	.text       start:0x8000AD34 end:0x8000AD78
-
-unsorted/sweep_8000AD78.c:
-	.text       start:0x8000AD78 end:0x8000ADC0
-
-src/MSL/atanf.c:
-	.text       start:0x8000AE94 end:0x8000AE9C
-
-unsorted/sweep_8000AF1C.c:
-	.text       start:0x8000AF1C end:0x8000AF20
-
-unsorted/sweep_8000AF20.c:
-	.text       start:0x8000AF20 end:0x8000AF58
-
-unsorted/sweep_8000AF58.c:
-	.text       start:0x8000AF58 end:0x8000AF7C
-
-unsorted/sweep_8000AF7C.c:
-	.text       start:0x8000AF7C end:0x8000AFA0
+UMemPool.c:
+	.text       start:0x8000A194 end:0x8000B058
 
 unsorted/sweep_8000B058.c:
 	.text       start:0x8000B058 end:0x8000B078

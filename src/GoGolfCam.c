@@ -1069,10 +1069,10 @@ u8 fn_800C4520(View* pView, int nPlayer, f32 fUp, f32 fDown) {
     f32 dx = gPlayers[nPlayer].vTarget[0] - gPlayers[nPlayer].ball.vPos[0];
     f32 dy = gPlayers[nPlayer].vTarget[1] - gPlayers[nPlayer].ball.vPos[1];
     f32 fSlope;
-    if (fabsf(dx) < 1e-6f) {
+    if (fabs(dx) < 1e-6f) {
         return 0;
     }
-    fSlope = fabsf(dy / dx);
+    fSlope = fabs(dy / dx);
     if (dy > 0.0f) {
         if (fSlope < fUp) {
             return 0;
