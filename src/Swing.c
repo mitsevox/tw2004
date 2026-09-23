@@ -2067,7 +2067,7 @@ void Swing_ResetBoostAndSpin(int nPlayer) {
 // the player's SwingStack. Most of these drive the camera, HUD and sounds around the swing.
 
 void  fn_800E3D38(int nPlayer, int a);
-void  GM_BumpBallForObstructions(void);
+void  GM_BumpBallForObstructions(int nPlayer);
 extern u8  lbl_80281E10;
 typedef struct Vec4 { f32 x, y, z, w; } Vec4;
 extern Vec4 lbl_80183660;
@@ -2265,7 +2265,7 @@ void STATEFUNC_WaitUpdate(int nPlayer) {
 
 void STATEFUNC_ShowYardageExit(int nPlayer) {
     if (gPlayers[nPlayer].unkC2E == 0 && lbl_80281E10 == 0) {
-        GM_BumpBallForObstructions();
+        GM_BumpBallForObstructions(nPlayer);
     }
     lbl_80281E10 = 0;
 }
@@ -3868,9 +3868,9 @@ void STATEFUNC_SimulateUpdate(int nPlayer) {
 void  fn_800A562C(u8 nPlayer);
 u8    fn_800DA264(void);                      // tips are on
 void  fn_800D1DAC(int nPlayer);
-void  fn_800EAC7C(void);
-void  fn_800E502C(void);
-void  fn_800E4FFC(void);
+s32   fn_800EAC7C(void);                      // GameModeMatch.c
+void  fn_800E502C(int n);                     // GameMessages.c: message 97
+void  fn_800E4FFC(int n);                     // GameMessages.c: message 48
 void fn_80062B68(int nPlayer);
 void fn_80062B6C(int nPlayer);
 void  fn_800C6618(View* pView, int nPlayer);
@@ -3931,11 +3931,9 @@ void STATEFUNC_SwingInit(int nPlayer) {
     }
     if (gPlayers[nPlayer].unkC2E == 0 && !Player_IsCPU(nPlayer) && fn_800EC550() && fn_800ED540()) {
         if (fn_800F0818()) {
-            fn_800EAC7C();
-            fn_800E502C();
+            fn_800E502C(fn_800EAC7C());
         } else {
-            fn_800EAC7C();
-            fn_800E4FFC();
+            fn_800E4FFC(fn_800EAC7C());
         }
         fn_800E3D38(nPlayer, 0);
         fn_80062C80(gPlayers[nPlayer].nC58, 0);
