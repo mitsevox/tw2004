@@ -1941,32 +1941,31 @@ void fn_80088CF0(MsgArg* pArgs, MsgArg* pResult) {
             pResult->i = 0;
             return;
         }
-        // EA bug: a level outside 0..6 leaves nMult unset (here and in case 104). EA indexes the
-        // multipliers as one table (0x940 + 4 * (23..28)), not aTourPct: 99.9% until earnings.h
-        // has that table.
+        // EA bug: a level outside 0..6 leaves nMult unset (here and in case 104). nMult is the
+        // index into the whole multiplier table (23..28: the TOUR card group).
         switch (gpSaveData[gPlayers[pArgs[0].i].nIndex].nTourCardLevel) {
         case 0:
         case 1:
-            nMult = 0;
+            nMult = EARN_MULT_TOUR;
             break;
         case 2:
-            nMult = 1;
+            nMult = EARN_MULT_TOUR + 1;
             break;
         case 3:
-            nMult = 2;
+            nMult = EARN_MULT_TOUR + 2;
             break;
         case 4:
-            nMult = 3;
+            nMult = EARN_MULT_TOUR + 3;
             break;
         case 5:
-            nMult = 4;
+            nMult = EARN_MULT_TOUR + 4;
             break;
         case 6:
-            nMult = 5;
+            nMult = EARN_MULT_TOUR + 5;
             break;
         }
         fn_801025F4();
-        pResult->i = lbl_80200538.aMult[EARN_MULT_TOUR + nMult];
+        pResult->i = lbl_80200538.aMult[nMult];
         return;
     case 104:
         if (gpSaveData[gPlayers[pArgs[0].i].nIndex].bActive != 1) {
