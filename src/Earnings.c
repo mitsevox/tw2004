@@ -8,8 +8,19 @@
 #include "engine.h"
 
 // The prize table (stream 'ERN ', 0x22F0 bytes); multipliers are percentages (100 = x1).
+typedef struct StrokePrize {
+    s32  nBase;                 // the prize for a win
+    s32  nPerStroke;            // and for each stroke of the margin, up to 5
+} StrokePrize;
+typedef struct SkinsValue {
+    s32  aValue[4];             // holes 1..6, 7..12, 13..17, 18
+    s32  n10;
+} SkinsValue;
 typedef struct EarningsTable {
-    u8   unk0[0x980];
+    u8   unk0[0x1D4];
+    StrokePrize aStrokePrize[26];   // 0x1D4  per earnings rating of the beaten golfer
+    SkinsValue aSkins[26];      // 0x2A4  a skin's value, per the best earnings rating in the game
+    u8   unk4AC[0x980 - 0x4AC];
     s32  aTeePct[3];            // 0x980  the tee multiplier, as [2 - nTeeSet] (tee set 3 pays as 1)
     s32  a98C[4];               // 0x98C  the multiplier for the hole's gpGame->holeOrder value 0..3
     s32  aTourPct[6];           // 0x99C  the TOUR card multiplier per level 1..6 (level 0 pays as 1)
@@ -53,6 +64,7 @@ extern s32 lbl_802003F8[10];
 extern s32 lbl_80200420[10];
 extern u8  lbl_801FFAE8[0x280];
 extern u8  lbl_801FFD90[0x280];
+extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
 extern s32 lbl_80282248;
 extern s32 lbl_8028224C;
 extern s32 lbl_80282250;
@@ -62,6 +74,10 @@ extern s32 lbl_80191A08[39];
 void* memcpy(void* pDst, const void* pSrc, u32 uLen);
 
 void  fn_800D344C(UStreamObject* pObject);
+int   fn_800584DC(int nProfile);
+int   fn_801020C0(void);
+
+int   fn_800D3CF8(int nRating);
 s32   fn_800D477C(int nPlayer, u8* pBall, u8 b);
 void  fn_800D4F14(int nPlayer, u8 b);
 f32   fn_800D6EEC(void);
@@ -107,6 +123,131 @@ void fn_800D3424(void) {
 
 void fn_800D344C(UStreamObject* pObject) {
     fn_8000E790(pObject, sizeof(lbl_80200538), &lbl_80200538);
+}
+
+// TW06: GM_Earnings_GetStrokeWinnings. Beating a CPU golfer pays by their earnings rating: a base
+// prize and so much a stroke of the margin (at most 5). *pPrize gets the base.
+int fn_800D36E0(int nWinner, int nLoser, int nMargin, int* pPrize) {
+    int nRating;
+
+    if (fn_800E177C() != 0) return 0;
+    if (Player_IsCPU(nWinner) || !Player_IsCPU(nLoser)) return 0;
+    nRating = fn_800D3C7C(nLoser);
+    if (nMargin > 5) {
+        nMargin = 5;
+    }
+    if (pPrize != NULL) {
+        *pPrize = lbl_80200538.aStrokePrize[nRating].nBase;
+    }
+    return lbl_80200538.aStrokePrize[nRating].nBase + lbl_80200538.aStrokePrize[nRating].nPerStroke * nMargin;
+}
+
+// TW06: GM_Earnings_GetStrokeWinningsTeam. The same for a team (0: players 0 and 1, 1: players 2 and
+// 3) beating a CPU team: the average of what the two losers would pay.
+// 99.2%: only the order of the four table loads in the return differs. Tried: all 24 orders of the
+// flat sum, the grouped forms, an inline per-golfer helper; the nBase locals took it from 82% to 98%.
+int fn_800D37BC(int nWinner, int nLoser, int nMargin, int* pPrize) {
+    int nFirst;
+    int nSecond;
+    int nRating1;
+    int nRating2;
+    int nBase1;
+    int nBase2;
+
+    if (fn_800E177C() != 0) return 0;
+    if (Team_IsAllCPU(nWinner) || !Team_IsAllCPU(nLoser)) return 0;
+    if (nLoser == 0) {
+        nFirst = 0;
+        nSecond = 1;
+    } else {
+        nFirst = 2;
+        nSecond = 3;
+    }
+    nRating1 = fn_800D3C7C(nFirst);
+    nRating2 = fn_800D3C7C(nSecond);
+    if (nMargin > 5) {
+        nMargin = 5;
+    }
+    nBase1 = lbl_80200538.aStrokePrize[nRating1].nBase;
+    nBase2 = lbl_80200538.aStrokePrize[nRating2].nBase;
+    if (pPrize != NULL) {
+        *pPrize = (nBase1 + nBase2) / 2;
+    }
+    return (lbl_80200538.aStrokePrize[nRating2].nBase +
+            (lbl_80200538.aStrokePrize[nRating2].nPerStroke * nMargin +
+             (lbl_80200538.aStrokePrize[nRating1].nBase +
+              lbl_80200538.aStrokePrize[nRating1].nPerStroke * nMargin))) / 2;
+}
+
+// Pay a player twice nMoney, booked in the breakdown's n24 and n3C.
+void fn_800D39B4(int nPlayer, int nMoney) {
+    CourseMoneyTracking money;
+    s32 nPaid;
+
+    if (fn_800E177C() == 0) {
+        nPaid = nMoney * 2;
+        fn_80005AE8(&money, 0, sizeof(money));
+        money.n24 = nPaid;
+        money.n3C = nPaid;
+        fn_800D3548(nPlayer, nPaid, &money);
+    }
+}
+
+// TW06: GM_GetHighestRatedGolfer. The best earnings rating among the players.
+int fn_800D3C1C(void) {
+    int i;
+    int nBest;
+    int nRating;
+
+    nBest = 0;
+    for (i = 0; i < gNumPlayersSetUp; i++) {
+        nRating = fn_800D3C7C(i);
+        if (nRating > nBest) {
+            nBest = nRating;
+        }
+    }
+    return nBest;
+}
+
+// TW06: GM_Earnings_RateGolfer. A CPU plays at its golfer's rating; a human's comes from the profile.
+int fn_800D3C7C(int nPlayer) {
+    int nRating;
+
+    nRating = fn_800584DC(gPlayers[nPlayer].nIndex);
+    if (Player_IsCPU(nPlayer)) {
+        return gPlayers[nPlayer].golfer.nEarningsRating;
+    }
+    return fn_800D3CF8(nRating);
+}
+
+// Ratings stop at 25.
+int fn_800D3CF8(int nRating) {
+    int n;
+
+    n = 25;
+    if (nRating <= 25) {
+        n = nRating;
+    }
+    return n;
+}
+
+// The earnings rating of golfer nGolfer of gGolferTable; the created golfers share one.
+int fn_800D3D10(int nGolfer) {
+    int nRating;
+
+    nRating = fn_801020C0();
+    if (nGolfer >= FIRST_CREATED_GOLFER) {
+        return fn_800D3CF8(nRating);
+    }
+    return gGolferTable[nGolfer].nEarningsRating;
+}
+
+// TW06: GM_Earnings_GetSkinsHoleValue. What a skin on hole nHole (0..17) is worth.
+s32 fn_800D3D64(int nRating, int nHole) {
+    if (nHole < 6) return lbl_80200538.aSkins[nRating].aValue[0];
+    if (nHole < 12) return lbl_80200538.aSkins[nRating].aValue[1];
+    if (nHole < 17) return lbl_80200538.aSkins[nRating].aValue[2];
+    return lbl_80200538.aSkins[nRating].aValue[3];
 }
 
 // Whether an id is one of 23..38.

@@ -63,7 +63,7 @@ int  fn_800D2AD8(int nHole);            // a hole's par
 void fn_800D3548(int nPlayer, int nMoney, CourseMoneyTracking* pMoney);   // pMoney may be NULL
 int  fn_800D36E0(int nWinner, int nLoser, int nMargin, int* pPrize);
 int  fn_800D37BC(int nWinner, int nLoser, int nMargin, int* pPrize);
-int  fn_800D3C7C(int nPlayer);          // the player's golfer
+int  fn_800D3C7C(int nPlayer);          // the player's earnings rating, 0..25
 s32  fn_800D6A70(s32 nPoints, int nPlayer, u8 bCourse, u8 bTee, u8 bHole, CourseMoneyTracking* pMoney);
 int  fn_800D7220(int nReward, int nPlayer, CourseMoneyTracking* pMoney);
 u8   fn_800DA174(void);
