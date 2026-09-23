@@ -119,8 +119,8 @@ void fn_80101F40(u8 a, int b);
 void fn_80101FC0(int a, int b);
 void fn_80100A3C(int nPlayer);
 void fn_80100C08(void);
-u8   fn_80101C9C(int nPlayer, int a);
-u8   fn_80101CC4(int a);
+u8   fn_80101C9C(int nPlayer, u8 bCheck);
+u8   fn_80101CC4(u8 bCheck);
 void fn_80101CD8(void);
 void fn_8010179C(void);
 void fn_801008F8(void);
@@ -130,16 +130,16 @@ void fn_80101F94(int a, int b);
 // Mode 11 starts: one player, most of the round's rules off, a fixed random seed. The player's
 // options that the lessons override are saved first.
 void fn_800FFF34(void) {
-    gpGame->pfn1C8 = fn_800FFF34;
-    gpGame->pfn1CC = fn_80100230;
-    gpGame->pfn1D8 = fn_80101C9C;
-    gpGame->pfn1DC = fn_80101CC4;
+    gpGame->pfnInit = fn_800FFF34;
+    gpGame->pfnShutdown = fn_80100230;
+    gpGame->pfnHoleFinished = fn_80101C9C;
+    gpGame->pfnGameFinished = fn_80101CC4;
     gpGame->pfn1E4 = fn_801000E8;
     gpGame->pfn220 = fn_80100C08;
     gpGame->pfn224 = fn_80100108;
     gpGame->pfn22C = fn_80100A3C;
     gpGame->pfn1EC = fn_80100160;
-    gpGame->pfn1F4 = fn_80101CD8;
+    gpGame->pfnEndGame = fn_80101CD8;
     gpGame->bShowYardage = 0;
     gpGame->bStrokeLimit = 0;
     gpGame->b275 = 0;
@@ -1022,7 +1022,7 @@ u8 fn_80101AA8(int nPlayer, int nEvent) {
 }
 
 // HoleFinished: lesson 12 is over unless its step is 19.
-u8 fn_80101C9C(int nPlayer, int a) {
+u8 fn_80101C9C(int nPlayer, u8 bCheck) {
     if (lbl_802823FC == 12 && lbl_80282428 != 19) {
         return 1;
     }
@@ -1030,7 +1030,7 @@ u8 fn_80101C9C(int nPlayer, int a) {
 }
 
 // GameFinished: after lesson 12.
-u8 fn_80101CC4(int a) {
+u8 fn_80101CC4(u8 bCheck) {
     return lbl_802823FC == 12;
 }
 

@@ -241,7 +241,7 @@ void GM_InitForHole(void) {
         fn_800D8D38(i);
     }
     gpGame->b134 = 0;
-    lbl_80282278 = gpGame->pfn1D4(5);
+    lbl_80282278 = gpGame->pfnGetHonors(5);
     EVENT_Trigger(0xFF, 0, 0, -1);
     for (i = 0; i < 5; i++) {
         int j;              // j only steers the register choice (found by the permuter)
@@ -260,11 +260,11 @@ void GM_InitForHole(void) {
 void GM_EndOfGolferTurn(int nPlayer) {
     u8 bWait;
     Caddie_Stop();
-    gpGame->pfn248(nPlayer);
+    gpGame->pfnEndGolferTurn(nPlayer);
     fn_8001D7A4(gPlayers[nPlayer].nShotHandle);
     EVENT_Trigger(nPlayer, 4, 0, -1);
     fn_800E4204();
-    if (gpGame->pfn1D8(nPlayer, 0) || fn_800E0A90(nPlayer)) {
+    if (gpGame->pfnHoleFinished(nPlayer, 0) || fn_800E0A90(nPlayer)) {
         GM_EndOfGolferTurn_HoleFinished(nPlayer);
         return;
     }
@@ -293,14 +293,14 @@ void GM_EndOfGolferTurn(int nPlayer) {
 void GM_EndOfGolferTurn_HoleFinished(int nPlayer) {
     int i;
     EVENT_Trigger(nPlayer, 1, 0, -1);
-    gpGame->pfn1E8();
+    gpGame->pfnEndHole();
     if (fn_800E1CA8() && !gpGame->bD4 && !fn_800E0A90(nPlayer)) {
         for (i = 0; i < gNumPlayersSetUp; i++) {
             fn_800D439C(i, 0);
             fn_800D9834(i);
         }
     }
-    if (gpGame->pfn1DC(0) || fn_800E0A90(nPlayer)) {
+    if (gpGame->pfnGameFinished(0) || fn_800E0A90(nPlayer)) {
         GM_EndOfGolferTurn_GameFinished(nPlayer);
         return;
     }
@@ -314,7 +314,7 @@ void GM_EndOfGolferTurn_GameFinished(int nPlayer) {
     EVENT_Trigger(nPlayer, 5, 0, -1);
     gpGame->b28E = 1;
     fn_80125910(0);
-    gpGame->pfn1F4();
+    gpGame->pfnEndGame();
     if (fn_8012591C() && gSession.unk8[0] == 0) {
         fn_80125854(1);
     }
@@ -802,7 +802,7 @@ u8 GM_ShowPostShotCrowdFlyby(void) {
 
 // TW06: GM_FlyByMode_Init. The player the mode picks starts the hole flyover.
 void GM_FlyByMode_Init(void) {
-    int n = gpGame->pfn1D4(5);
+    int n = gpGame->pfnGetHonors(5);
     GOLFERSTATE_Push(GS_INITIAL_FLY_BY, n);
     fn_8001704C(gPlayers[n].nView0, n);
 }

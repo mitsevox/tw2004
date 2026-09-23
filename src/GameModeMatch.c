@@ -19,14 +19,14 @@ void fn_800EAB44(void);
 
 // TW06: GameModeMatch::Init. Two players; the CPU may concede.
 void fn_800E9E40(void) {
-    gpGame->pfn1C8 = fn_800E9E40;
-    gpGame->pfn1D0 = fn_800E9F14;
-    gpGame->pfn1D4 = fn_800EA084;
-    gpGame->pfn1D8 = (u8 (*)(int, int))fn_800EA278;
-    gpGame->pfn1DC = (u8 (*)(int))fn_800EA548;
-    gpGame->pfn1E0 = (s32 (*)(void))fn_800EA758;
-    gpGame->pfn1E8 = fn_800EAA40;
-    gpGame->pfn1F4 = fn_800EAB44;
+    gpGame->pfnInit = fn_800E9E40;
+    gpGame->pfnSetupNextGolfer = fn_800E9F14;
+    gpGame->pfnGetHonors = fn_800EA084;
+    gpGame->pfnHoleFinished = fn_800EA278;
+    gpGame->pfnGameFinished = fn_800EA548;
+    gpGame->pfnGoToPlayoff = fn_800EA758;
+    gpGame->pfnEndHole = fn_800EAA40;
+    gpGame->pfnEndGame = fn_800EAB44;
     gpGame->bAIConcedes = 1;
     gpGame->n4 = 1;
     gpGame->nMulligans = 0;
@@ -40,7 +40,7 @@ void fn_800E9E40(void) {
 // The hole starts: the first golfer to play gets ready, the other waits.
 void fn_800E9F14(void) {
     int i;
-    lbl_80282278 = gpGame->pfn1D4(5);
+    lbl_80282278 = gpGame->pfnGetHonors(5);
     for (i = 0; i < gNumPlayersSetUp; i++) {
         if (i == lbl_80282278) {
             GOLFERSTATE_Set(GS_PRE_SHOT, i);

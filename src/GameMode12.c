@@ -18,7 +18,7 @@ extern s32 lbl_802823D8;
 extern s32 lbl_80212468[20];                // the surface
 extern s32 lbl_80212418[20];                // how many times
 
-s32  fn_800FEC78(void);
+u8   fn_800FEC78(u8 bCheck);
 void fn_800FEF00(s32 nSurface, s32* pPoints, s32* pMeter, s32* pMult);
 s32  fn_800FEFF8(int nPlayer, s32 nSurface);
 void fn_800FEC80(int nPlayer);
@@ -32,17 +32,17 @@ void fn_800FF6C0(int nPlayer);
 
 // Mode 12 starts: stroke play with mode 0's turn order, one mulligan per player per round.
 void fn_800FEAFC(void) {
-    gpGame->pfn1C8 = fn_800FEAFC;
-    gpGame->pfn1D4 = fn_800FF894;
-    gpGame->pfn1D8 = fn_800FFCCC;
-    gpGame->pfn1DC = fn_800FFD54;
-    gpGame->pfn1E0 = fn_800FEC78;
-    gpGame->pfn1F4 = fn_800FF288;
+    gpGame->pfnInit = fn_800FEAFC;
+    gpGame->pfnGetHonors = fn_800FF894;
+    gpGame->pfnHoleFinished = fn_800FFCCC;
+    gpGame->pfnGameFinished = fn_800FFD54;
+    gpGame->pfnGoToPlayoff = fn_800FEC78;
+    gpGame->pfnEndGame = fn_800FF288;
     gpGame->pfn23C = fn_800FEC80;
-    gpGame->pfn240 = (s32 (*)(void))fn_800FF038;
-    gpGame->pfn1E8 = fn_800FF114;
+    gpGame->pfn240 = fn_800FF038;
+    gpGame->pfnEndHole = fn_800FF114;
     gpGame->pfn1E4 = fn_800FF3D4;
-    gpGame->pfn1D0 = fn_800FF3F8;
+    gpGame->pfnSetupNextGolfer = fn_800FF3F8;
     gpGame->pfn244 = fn_800FF5B4;
     gpGame->pfn228 = fn_800FF6C0;
     gpGame->b271 = 0;
@@ -60,7 +60,7 @@ void fn_800FEAFC(void) {
     SESSION_OPTIONS->unkC = 0;
 }
 
-s32 fn_800FEC78(void) {
+u8 fn_800FEC78(u8 bCheck) {
     return 0;
 }
 

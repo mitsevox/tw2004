@@ -65,8 +65,8 @@ u8*   fn_80008370(u8* p);
 void  fn_800FE100(s32 p0, s32 p1, s32 p2);
 void  fn_800FA554(int nPlayer);
 
-u8    fn_800FA1CC(int nPlayer, int a);
-u8    fn_800FA26C(int a);
+u8    fn_800FA1CC(int nPlayer, u8 bCheck);
+u8    fn_800FA26C(u8 bCheck);
 void  fn_800FA2D0(void);
 s32   fn_800FA48C(int nPlayer, int nHole);
 s32   fn_800FA4B8(int nPlayer);
@@ -94,16 +94,16 @@ void  fn_800FE164(s32 p0, s32 p1);
 
 // Mode 8 starts: solo speed golf.
 void fn_800F986C(void) {
-    gpGame->pfn1C8 = fn_800F986C;
-    gpGame->pfn1CC = fn_800F9A58;
+    gpGame->pfnInit = fn_800F986C;
+    gpGame->pfnShutdown = fn_800F9A58;
     gpGame->pfn1EC = fn_800F9844;
-    gpGame->pfn1D0 = fn_800F9B34;
-    gpGame->pfn1D4 = fn_800F9BF8;
-    gpGame->pfn1D8 = fn_800FA1CC;
-    gpGame->pfn1DC = fn_800FA26C;
-    gpGame->pfn1E0 = fn_800FA2C8;
-    gpGame->pfn1E8 = fn_800FA2D0;
-    gpGame->pfn1F4 = fn_800FA410;
+    gpGame->pfnSetupNextGolfer = fn_800F9B34;
+    gpGame->pfnGetHonors = fn_800F9BF8;
+    gpGame->pfnHoleFinished = fn_800FA1CC;
+    gpGame->pfnGameFinished = fn_800FA26C;
+    gpGame->pfnGoToPlayoff = fn_800FA2C8;
+    gpGame->pfnEndHole = fn_800FA2D0;
+    gpGame->pfnEndGame = fn_800FA410;
     gpGame->pfn1E4 = fn_800F9824;
     gpGame->pfn220 = fn_800FDF38;
     gpGame->pfn230 = fn_800FDF58;
@@ -186,7 +186,7 @@ s32 fn_800F9BF8(int nPlayer) {
     return 5;
 }
 
-u8 fn_800F9C00(int nPlayer, int a) {
+u8 fn_800F9C00(int nPlayer, u8 bCheck) {
     if (Player_IsHoled(0) || Player_IsHoled(1)) {
         return 1;
     }
@@ -303,7 +303,7 @@ u8 fn_800F9F04(u8 bCheck) {
 }
 
 // Stroke version: the hole is over when both have finished (bit 3).
-u8 fn_800FA118(int nPlayer, int a) {
+u8 fn_800FA118(int nPlayer, u8 bCheck) {
     if ((gPlayers[0].nC3C & 8) && (gPlayers[1].nC3C & 8)) {
         return 1;
     }
@@ -311,7 +311,7 @@ u8 fn_800FA118(int nPlayer, int a) {
 }
 
 // Stroke version: the game is over when a player quit (bit 13) or no hole is left.
-u8 fn_800FA148(int a) {
+u8 fn_800FA148(u8 bCheck) {
     int h;
     if ((gPlayers[0].nC3C & 0x2000) || (gPlayers[1].nC3C & 0x2000)) {
         return 1;
@@ -325,7 +325,7 @@ u8 fn_800FA148(int a) {
 }
 
 // Solo: once holed, the hole's time is taken; the hole is over when holed (or given up).
-u8 fn_800FA1CC(int nPlayer, int a) {
+u8 fn_800FA1CC(int nPlayer, u8 bCheck) {
     if (gPlayers[0].n290[Game_CurHoleIndex()] == 0 && Player_IsHoled(0)) {
         gPlayers[0].n290[Game_CurHoleIndex()] = fn_800E27C0();
     }
@@ -335,7 +335,7 @@ u8 fn_800FA1CC(int nPlayer, int a) {
     return 0;
 }
 
-u8 fn_800FA26C(int a) {
+u8 fn_800FA26C(u8 bCheck) {
     int h;
     for (h = Game_CurHoleIndex() + 1; h < 18; h++) {
         if (gpGame->bHoleSelected[h]) {
@@ -345,7 +345,7 @@ u8 fn_800FA26C(int a) {
     return 1;
 }
 
-s32 fn_800FA2C8(void) {
+u8 fn_800FA2C8(u8 bCheck) {
     return 0;
 }
 

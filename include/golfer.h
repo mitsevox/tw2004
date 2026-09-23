@@ -471,20 +471,23 @@ typedef struct GameState {
     u8   b16C[5][18];           // 0x16C  per player and hole, cleared with the hole's score
     u8   unk1C6[0x1C8 - 0x1C6];
     // The mode's callbacks (0x1C8..0x26C). fn_800E0B38 sets them all to defaults (mostly empty
-    // stubs), then the mode's own setup replaces the ones it needs.
-    void (*pfn1C8)(void);       // 0x1C8
-    void (*pfn1CC)(void);       // 0x1CC
-    void (*pfn1D0)(void);       // 0x1D0
-    s32  (*pfn1D4)(int a);      // 0x1D4
-    u8   (*pfn1D8)(int nPlayer, int a); // 0x1D8  nonzero blocks a gimme (Gimme_Allowed asks with a = 1)
-    u8   (*pfn1DC)(int a);      // 0x1DC  nonzero: the game is over
-    s32  (*pfn1E0)(void);       // 0x1E0
+    // stubs), then the mode's own setup replaces the ones it needs. The names are TW06's
+    // GameModeBase methods, from the modes' implementations (GameModeStroke, GameModeMatch, ...).
+    void (*pfnInit)(void);      // 0x1C8  the mode's setup. TW06: Init
+    void (*pfnShutdown)(void);  // 0x1CC  the mode ends. TW06: Shutdown (GameModeBattle)
+    void (*pfnSetupNextGolfer)(void);   // 0x1D0  the hole starts. TW06: SetupNextGolfer
+    s32  (*pfnGetHonors)(int nPlayer);  // 0x1D4  who plays after nPlayer (5 = nobody). TW06: GetHonors
+    u8   (*pfnHoleFinished)(int nPlayer, u8 bCheck);   // 0x1D8  the hole is over; bCheck 1 only asks
+                                //        (Gimme_Allowed). TW06: HoleFinished(PlayerNumber_t, u8)
+    u8   (*pfnGameFinished)(u8 bCheck);     // 0x1DC  the game is over. TW06: GameFinished(u8)
+    u8   (*pfnGoToPlayoff)(u8 bCheck);      // 0x1E0  TW06: GoToPlayoff(u8). Nothing in the binary
+                                //        calls it (0x800CFB88 only adds the slots up)
     void (*pfn1E4)(void);       // 0x1E4  hole start
-    void (*pfn1E8)(void);       // 0x1E8  hole finished
+    void (*pfnEndHole)(void);   // 0x1E8  hole finished. TW06: EndHole
     void (*pfn1EC)(void);       // 0x1EC
     void (*pfn1F0)(void);       // 0x1F0
-    void (*pfn1F4)(void);       // 0x1F4  game finished
-    void (*pfn1F8)(int nPlayer); // 0x1F8
+    void (*pfnEndGame)(void);   // 0x1F4  game finished. TW06: EndGame
+    u8   (*pfn1F8)(int nPlayer); // 0x1F8  fn_800DCB10 returns its answer
     u8   (*pfn1FC)(int nPlayer); // 0x1FC  asked before the special ball pick-up
     void (*pfn200)(void);       // 0x200
     void (*pfn204)(void);       // 0x204
@@ -502,9 +505,9 @@ typedef struct GameState {
     u8   (*pfn234)(void);       // 0x234  a controller was pulled
     u8   (*pfn238)(int nPlayer); // 0x238  nonzero: skip addressing the ball (swing state 1)
     void (*pfn23C)(int nPlayer); // 0x23C
-    s32  (*pfn240)(void);       // 0x240
+    s32  (*pfn240)(int nPlayer); // 0x240  called from 0x800A3460 with the player
     void (*pfn244)(int nPlayer); // 0x244
-    void (*pfn248)(int nPlayer); // 0x248  end of a golfer's turn
+    void (*pfnEndGolferTurn)(int nPlayer); // 0x248  end of a golfer's turn. TW06: EndGolferTurn
     void (*pfn24C)(int nPlayer); // 0x24C  called when a swing leaves state 20
     void (*pfn250)(int nPlayer); // 0x250  the ball went out of bounds
     void (*pfn254)(int nPlayer); // 0x254  a mulligan was taken

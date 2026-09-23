@@ -36,15 +36,15 @@ s32   fn_800F0F54(void);
 
 // Mode 24 starts: match-play callbacks (GameModeMatch) around the event's own start and end.
 void fn_800F0448(void) {
-    gpGame->pfn1C8 = fn_800F0448;
-    gpGame->pfn1CC = fn_800F0678;
-    gpGame->pfn1D0 = fn_800E9F14;
-    gpGame->pfn1D4 = fn_800EA084;
-    gpGame->pfn1D8 = (u8 (*)(int, int))fn_800EA278;
-    gpGame->pfn1DC = (u8 (*)(int))fn_800EA548;
-    gpGame->pfn1E0 = (s32 (*)(void))fn_800EA758;
-    gpGame->pfn1E8 = fn_800EAA40;
-    gpGame->pfn1F4 = fn_800F0BBC;
+    gpGame->pfnInit = fn_800F0448;
+    gpGame->pfnShutdown = fn_800F0678;
+    gpGame->pfnSetupNextGolfer = fn_800E9F14;
+    gpGame->pfnGetHonors = fn_800EA084;
+    gpGame->pfnHoleFinished = fn_800EA278;
+    gpGame->pfnGameFinished = fn_800EA548;
+    gpGame->pfnGoToPlayoff = fn_800EA758;
+    gpGame->pfnEndHole = fn_800EAA40;
+    gpGame->pfnEndGame = fn_800F0BBC;
     gpGame->n4 = 1;
     gpGame->nMulligans = 0;
     gpGame->nC = 1;
@@ -115,10 +115,10 @@ void fn_800F06DC(void) {
             fn_800EC544(gRTEs.aChallenge, 111);
             fn_800EAE38(gRTEs.aEvent[lbl_80282350].nChallenge - 1);
             fn_800EAF7C();
-            lbl_8028235C = gpGame->pfn1CC;
-            lbl_80282358 = gpGame->pfn1F4;
-            gpGame->pfn1CC = fn_800F0678;
-            gpGame->pfn1F4 = fn_800F0BBC;
+            lbl_8028235C = gpGame->pfnShutdown;
+            lbl_80282358 = gpGame->pfnEndGame;
+            gpGame->pfnShutdown = fn_800F0678;
+            gpGame->pfnEndGame = fn_800F0BBC;
         }
     }
 }
@@ -126,10 +126,10 @@ void fn_800F06DC(void) {
 // The next challenge of the event starts.
 void fn_800F07C8(void) {
     fn_800EAF7C();
-    lbl_8028235C = gpGame->pfn1CC;
-    lbl_80282358 = gpGame->pfn1F4;
-    gpGame->pfn1CC = fn_800F0678;
-    gpGame->pfn1F4 = fn_800F0BBC;
+    lbl_8028235C = gpGame->pfnShutdown;
+    lbl_80282358 = gpGame->pfnEndGame;
+    gpGame->pfnShutdown = fn_800F0678;
+    gpGame->pfnEndGame = fn_800F0BBC;
 }
 
 u8 fn_800F0818(void) {

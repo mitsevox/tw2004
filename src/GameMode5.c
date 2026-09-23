@@ -29,7 +29,7 @@ void  fn_800EBD28(void);
 void  fn_800EC1E0(void);
 void  fn_800ED604(int nPlayer);
 void  fn_800EAF18(UStreamObject* pObject);
-extern u8  (*lbl_80282320)(void);
+extern u8  (*lbl_80282320)(u8 bCheck);        // the mode's own GameFinished
 extern s32 lbl_80282300;
 extern s32 lbl_80282304;
 extern s32 lbl_80282308;
@@ -45,8 +45,8 @@ extern u8 lbl_802822FC;
 u8 fn_800ECA08(void);
 extern u8 lbl_80282314;
 extern u8 lbl_802822FE;
-extern u8 (*lbl_8028231C)(int nPlayer, int bCheck);
-u8 fn_800ED5C8(int nPlayer, int bCheck);
+extern u8 (*lbl_8028231C)(int nPlayer, u8 bCheck);   // and HoleFinished
+u8 fn_800ED5C8(int nPlayer, u8 bCheck);
 extern u8 lbl_802822FD;
 void fn_800ED6E8(u8 v);
 u8 fn_800ED6F0(void);
@@ -62,11 +62,11 @@ extern Unk802811F0* lbl_802811F0;
 
 // Game mode 5 starts: its callbacks, one player, the challenge list.
 void fn_800EACD8(void) {
-    gpGame->pfn1C8 = fn_800EACD8;
-    gpGame->pfn1CC = fn_800EAD6C;
+    gpGame->pfnInit = fn_800EACD8;
+    gpGame->pfnShutdown = fn_800EAD6C;
     gpGame->pfn1E4 = fn_800EBD28;
-    gpGame->pfn1F4 = fn_800EC1E0;
-    gpGame->pfn1D8 = (u8 (*)(int, int))fn_800ED5C8;
+    gpGame->pfnEndGame = fn_800EC1E0;
+    gpGame->pfnHoleFinished = fn_800ED5C8;
     gpGame->pfn210 = fn_800ED604;
     gpGame->nC = 1;
     gpGame->n10 = 1;
@@ -408,17 +408,17 @@ void fn_800EAF7C(void) {
         lbl_80282308 += nPar;
         lbl_80282304 += nHoles;
     }
-    lbl_8028232C = gpGame->pfn1CC;
-    lbl_80282328 = gpGame->pfn1F4;
+    lbl_8028232C = gpGame->pfnShutdown;
+    lbl_80282328 = gpGame->pfnEndGame;
     lbl_80282324 = gpGame->pfn1E4;
-    lbl_80282320 = (u8 (*)(void))gpGame->pfn1DC;
-    lbl_8028231C = gpGame->pfn1D8;
+    lbl_80282320 = gpGame->pfnGameFinished;
+    lbl_8028231C = gpGame->pfnHoleFinished;
     lbl_80282318 = gpGame->pfn210;
-    gpGame->pfn1CC = fn_800EAD6C;
-    gpGame->pfn1F4 = fn_800EC1E0;
+    gpGame->pfnShutdown = fn_800EAD6C;
+    gpGame->pfnEndGame = fn_800EC1E0;
     gpGame->pfn1E4 = fn_800EBD28;
-    gpGame->pfn1DC = (u8 (*)(int))fn_800EBD60;
-    gpGame->pfn1D8 = fn_800ED5C8;
+    gpGame->pfnGameFinished = fn_800EBD60;
+    gpGame->pfnHoleFinished = fn_800ED5C8;
     gpGame->pfn210 = fn_800ED604;
 }
 
@@ -438,7 +438,7 @@ u8 fn_800EBD60(u8 bCheck) {
     if (lbl_802822FE) {
         return 0;
     }
-    if (lbl_80282320()) {
+    if (lbl_80282320(bCheck)) {
         nStrokes = 0;
         for (h = 0; h < 18; h++) {
             if (gpGame->bHoleSelected[h]) {
@@ -1138,7 +1138,7 @@ void fn_800ED554(void) {
 }
 
 // Hole finished: always after a restart; otherwise the challenge's own test.
-u8 fn_800ED5C8(int nPlayer, int bCheck) {
+u8 fn_800ED5C8(int nPlayer, u8 bCheck) {
     if (lbl_802822FE) {
         return 1;
     }

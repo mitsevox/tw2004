@@ -64,15 +64,15 @@ void fn_80102874(void);
 
 // Mode 4 starts: a match against the event's pro, with GameModeMatch's rules.
 void fn_80101FEC(void) {
-    gpGame->pfn1C8 = fn_80101FEC;
-    gpGame->pfn1CC = fn_80102404;
-    gpGame->pfn1D0 = fn_800E9F14;
-    gpGame->pfn1D4 = fn_800EA084;
-    gpGame->pfn1D8 = (u8 (*)(int, int))fn_800EA278;
-    gpGame->pfn1DC = (u8 (*)(int))fn_800EA548;
-    gpGame->pfn1E0 = (s32 (*)(void))fn_800EA758;
-    gpGame->pfn1E8 = fn_800EAA40;
-    gpGame->pfn1F4 = fn_801025FC;
+    gpGame->pfnInit = fn_80101FEC;
+    gpGame->pfnShutdown = fn_80102404;
+    gpGame->pfnSetupNextGolfer = fn_800E9F14;
+    gpGame->pfnGetHonors = fn_800EA084;
+    gpGame->pfnHoleFinished = fn_800EA278;
+    gpGame->pfnGameFinished = fn_800EA548;
+    gpGame->pfnGoToPlayoff = fn_800EA758;
+    gpGame->pfnEndHole = fn_800EAA40;
+    gpGame->pfnEndGame = fn_801025FC;
     gpGame->n4 = 1;
     gpGame->nMulligans = 0;
     gpGame->nC = 1;
@@ -213,8 +213,8 @@ void fn_80102468(void) {
             fn_800E0B38(5);
             fn_800EAE38(lbl_802124B8[nEvent].nChallenge - 1);
             fn_800EAF7C();
-            lbl_80282450 = gpGame->pfn1CC;
-            gpGame->pfn1CC = fn_80102404;
+            lbl_80282450 = gpGame->pfnShutdown;
+            gpGame->pfnShutdown = fn_80102404;
         } else {
             lbl_80282450 = NULL;
             gpGame->nC = 2;

@@ -27,7 +27,7 @@ int fn_800E6BA4(int nTeam);
 void fn_800E6C10(void);
 s32  fn_800E6C8C(int nPlayer);
 void fn_800E6F88(int nPlayer);
-u8   fn_800E7038(u32 nPlayer, int a);
+u8   fn_800E7038(int nPlayer, u8 bCheck);
 u8   fn_800E723C(u8 bCheck);
 u8   fn_800E7474(u8 bCheck);
 void fn_800E7740(void);
@@ -35,15 +35,15 @@ void fn_800E7828(void);
 
 // TW06: GameModeAlternateShot::Init. Four players, no mulligans, no gimmes, one view.
 void fn_800E68F0(void) {
-    gpGame->pfn1C8 = fn_800E68F0;
-    gpGame->pfn1D0 = fn_800E6C10;
-    gpGame->pfn1D4 = fn_800E6C8C;
-    gpGame->pfn248 = fn_800E6F88;
-    gpGame->pfn1D8 = (u8 (*)(int, int))fn_800E7038;
-    gpGame->pfn1DC = (u8 (*)(int))fn_800E723C;
-    gpGame->pfn1E0 = (s32 (*)(void))fn_800E7474;
-    gpGame->pfn1E8 = fn_800E7740;
-    gpGame->pfn1F4 = fn_800E7828;
+    gpGame->pfnInit = fn_800E68F0;
+    gpGame->pfnSetupNextGolfer = fn_800E6C10;
+    gpGame->pfnGetHonors = fn_800E6C8C;
+    gpGame->pfnEndGolferTurn = fn_800E6F88;
+    gpGame->pfnHoleFinished = fn_800E7038;
+    gpGame->pfnGameFinished = fn_800E723C;
+    gpGame->pfnGoToPlayoff = fn_800E7474;
+    gpGame->pfnEndHole = fn_800E7740;
+    gpGame->pfnEndGame = fn_800E7828;
     gpGame->bGimmesAllowed = 0;
     gpGame->n4 = 1;
     gpGame->nMulligans = 0;
@@ -141,7 +141,7 @@ int fn_800E6BA4(int nTeam) {
 // The hole starts: the first golfer to play gets ready, the others wait.
 void fn_800E6C10(void) {
     int i;
-    lbl_80282278 = gpGame->pfn1D4(5);
+    lbl_80282278 = gpGame->pfnGetHonors(5);
     for (i = 0; i < gNumPlayersSetUp; i++) {
         if (i == lbl_80282278) {
             GOLFERSTATE_Set(GS_PRE_SHOT, i);
@@ -253,18 +253,18 @@ void fn_800E6F88(int nPlayer) {
 // TW06: GameModeAlternateShot::HoleFinished. Both teams holed; or one team holed and the other can
 // no longer beat it (can only tie, when the holed team is dormie); lbl_80282240 excuses the
 // holed team's own players.
-u8 fn_800E7038(u32 nPlayer, int a) {
+u8 fn_800E7038(int nPlayer, u8 bCheck) {
     int nLeft;
     int h;
     if (fn_800E69CC(0) && fn_800E69CC(1)) {
         return 1;
     }
-    if (fn_800E69CC(0) && (!lbl_80282240 || nPlayer > 1)) {
+    if (fn_800E69CC(0) && (!lbl_80282240 || (u32)nPlayer > 1)) {
         if (fn_800E6B08(0) < fn_800E6B08(1)) {
             return 1;
         }
     }
-    if (fn_800E69CC(1) && (!lbl_80282240 || nPlayer - 2 > 1)) {
+    if (fn_800E69CC(1) && (!lbl_80282240 || (u32)(nPlayer - 2) > 1)) {
         if (fn_800E6B08(1) < fn_800E6B08(0)) {
             return 1;
         }
@@ -275,14 +275,14 @@ u8 fn_800E7038(u32 nPlayer, int a) {
             nLeft++;
         }
     }
-    if (fn_800E69CC(0) && (!lbl_80282240 || nPlayer > 1)) {
+    if (fn_800E69CC(0) && (!lbl_80282240 || (u32)nPlayer > 1)) {
         if (nLeft + fn_800E6BA4(1) == fn_800E6BA4(0)) {
             if (fn_800E6B08(0) <= fn_800E6B08(1)) {
                 return 1;
             }
         }
     }
-    if (fn_800E69CC(1) && (!lbl_80282240 || nPlayer - 2 > 1)) {
+    if (fn_800E69CC(1) && (!lbl_80282240 || (u32)(nPlayer - 2) > 1)) {
         if (nLeft + fn_800E6BA4(0) == fn_800E6BA4(1)) {
             if (fn_800E6B08(1) <= fn_800E6B08(0)) {
                 return 1;

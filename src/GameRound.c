@@ -27,10 +27,10 @@ extern char lbl_80282270[8];                // the hole name
 
 void  fn_800E3AF4(void);
 s32   fn_800E3AEC(int a);
-u8    fn_800E3AE4(int nPlayer, int a);
-u8    fn_800E3ADC(int a);
-s32   fn_800E3AD4(void);
-void  fn_800CF158(int nPlayer);
+u8    fn_800E3AE4(int nPlayer, u8 bCheck);
+u8    fn_800E3ADC(u8 bCheck);
+u8    fn_800E3AD4(u8 bCheck);
+u8    fn_800CF158(int nPlayer);
 u8    fn_800CF450(int nPlayer);
 void  fn_800CFE74(void);
 void  fn_800D0098(void);
@@ -39,7 +39,7 @@ void  fn_800E3AD0(int nPlayer);
 u8    fn_800E3AC8(int nPlayer);
 u8    fn_800E3AC0(void);
 u8    fn_800E3AB8(int nPlayer);
-s32   fn_800E3AB0(void);
+s32   fn_800E3AB0(int nPlayer);
 void  fn_800E3AAC(int nPlayer, int nTime);
 void  fn_800E3AA8(int nPlayer, int nId);
 s32   fn_800E3AA0(int a, int nTarget);
@@ -167,18 +167,18 @@ void fn_800E0B38(int nMode) {
     gpGame->n290 = 2;
     gpGame->n294 = 1;
     gpGame->b28E = 0;
-    gpGame->pfn1C8 = fn_800E3AF4;
-    gpGame->pfn1CC = fn_800E3AF4;
-    gpGame->pfn1D0 = fn_800E3AF4;
-    gpGame->pfn1D4 = fn_800E3AEC;
-    gpGame->pfn1D8 = fn_800E3AE4;
-    gpGame->pfn1DC = fn_800E3ADC;
-    gpGame->pfn1E0 = fn_800E3AD4;
+    gpGame->pfnInit = fn_800E3AF4;
+    gpGame->pfnShutdown = fn_800E3AF4;
+    gpGame->pfnSetupNextGolfer = fn_800E3AF4;
+    gpGame->pfnGetHonors = fn_800E3AEC;
+    gpGame->pfnHoleFinished = fn_800E3AE4;
+    gpGame->pfnGameFinished = fn_800E3ADC;
+    gpGame->pfnGoToPlayoff = fn_800E3AD4;
     gpGame->pfn1E4 = fn_800E3AF4;
-    gpGame->pfn1E8 = fn_800E3AF4;
+    gpGame->pfnEndHole = fn_800E3AF4;
     gpGame->pfn1EC = fn_800E3AF4;
     gpGame->pfn1F0 = fn_800E3AF4;
-    gpGame->pfn1F4 = fn_800E3AF4;
+    gpGame->pfnEndGame = fn_800E3AF4;
     gpGame->pfn1F8 = fn_800CF158;
     gpGame->pfn1FC = fn_800CF450;
     gpGame->pfn200 = fn_800CFE74;
@@ -198,7 +198,7 @@ void fn_800E0B38(int nMode) {
     gpGame->pfn23C = fn_800E3AD0;
     gpGame->pfn240 = fn_800E3AB0;
     gpGame->pfn244 = fn_800E3AD0;
-    gpGame->pfn248 = fn_800E3AD0;
+    gpGame->pfnEndGolferTurn = fn_800E3AD0;
     gpGame->pfn24C = fn_800E3AD0;
     gpGame->pfn250 = fn_800E3AD0;
     gpGame->pfn254 = fn_800E3AD0;
@@ -923,7 +923,7 @@ int fn_800E27C0(void) {
 
 // Runs the mode's player choice twice (fn_800E292C runs it once).
 void fn_800E295C(void) {
-    gpGame->pfn1D4(gpGame->pfn1D4(5));
+    gpGame->pfnGetHonors(gpGame->pfnGetHonors(5));
 }
 
 // The start of a hole: every player's ball on their tee, the look-ahead copy and the saved
@@ -956,7 +956,7 @@ void fn_800E2A88(void) {
         }
     }
     if (!bBusy) {
-        gpGame->pfn1D0();
+        gpGame->pfnSetupNextGolfer();
     }
 }
 
@@ -1291,14 +1291,14 @@ u8 Gimme_Allowed(int nPlayer) {
     if (gSession.bReplay) return 0;
     if ((gSession.uFlags & 0x4000) && (gSession.uFlags & 0x8000)) return 0;
     if (!gpGame->bGimmesAllowed) return 0;
-    if (gpGame->pfn1D8(nPlayer, 1)) return 0;
+    if (gpGame->pfnHoleFinished(nPlayer, 1)) return 0;
     if (fn_800D0478(nPlayer) > 0.5f) return 0;
     if (gPlayers[nPlayer].nClub != CLUB_PUTTER && gSession.nNumPlayers > 1) return 0;
     return 1;
 }
 
 void fn_800E292C(void) {
-    gpGame->pfn1D4(5);
+    gpGame->pfnGetHonors(5);
 }
 
 // Modes 13-17.
@@ -1329,7 +1329,7 @@ void fn_800E3AA8(int nPlayer, int nId) {
 void fn_800E3AAC(int nPlayer, int nTime) {
 }
 
-s32 fn_800E3AB0(void) {
+s32 fn_800E3AB0(int nPlayer) {
     return 0;
 }
 
@@ -1348,15 +1348,15 @@ u8 fn_800E3AC8(int nPlayer) {
 void fn_800E3AD0(int nPlayer) {
 }
 
-s32 fn_800E3AD4(void) {
+u8 fn_800E3AD4(u8 bCheck) {
     return 0;
 }
 
-u8 fn_800E3ADC(int a) {
+u8 fn_800E3ADC(u8 bCheck) {
     return 0;
 }
 
-u8 fn_800E3AE4(int nPlayer, int a) {
+u8 fn_800E3AE4(int nPlayer, u8 bCheck) {
     return 0;
 }
 

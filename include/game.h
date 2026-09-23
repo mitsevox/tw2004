@@ -364,14 +364,14 @@ void fn_800F9A58(void);
 void fn_800F9AB0(void);
 void fn_800F9B34(void);
 s32  fn_800F9BF8(int nPlayer);
-u8   fn_800F9C00(int nPlayer, int a);
+u8   fn_800F9C00(int nPlayer, u8 bCheck);
 void fn_800F9C48(void);
 u8   fn_800F9D00(u8 bCheck);
 void fn_800F9E00(void);
 u8   fn_800F9F04(u8 bCheck);
-u8   fn_800FA118(int nPlayer, int a);
-u8   fn_800FA148(int a);
-s32  fn_800FA2C8(void);
+u8   fn_800FA118(int nPlayer, u8 bCheck);
+u8   fn_800FA148(u8 bCheck);
+u8   fn_800FA2C8(u8 bCheck);
 void fn_800FA3AC(void);
 void fn_800FA410(void);
 void fn_800FA570(void);
@@ -383,12 +383,12 @@ u8   fn_800FDF60(void);
 
 // GameModeStroke.c: stroke play (mode 0)
 void fn_800FF7DC(void);
-u8   fn_800FFCCC(int nPlayer, int a);
-u8   fn_800FFD54(int a);
+u8   fn_800FFCCC(int nPlayer, u8 bCheck);
+u8   fn_800FFD54(u8 bCheck);
 s32  fn_800FF894(int nPlayer);          // TW06 GetHonors: who plays next (5: nobody)
-u8   fn_800FFCCC(int nPlayer, int a);   // TW06 HoleFinished
-u8   fn_800FFD54(int a);                // TW06 GameFinished
-s32  fn_800FFDB0(void);                 // TW06 GoToPlayoff: stroke play has none
+u8   fn_800FFCCC(int nPlayer, u8 bCheck);   // TW06 HoleFinished
+u8   fn_800FFD54(u8 bCheck);                // TW06 GameFinished
+u8   fn_800FFDB0(u8 bCheck);                 // TW06 GoToPlayoff: stroke play has none
 
 // GetHonors' tee-order sort (GameModeStroke.c, GameModeStableford.c): appends nPlayer to aList
 // (*pnCount entries) if their score on hole nHole is nScore.

@@ -22,22 +22,22 @@ int  fn_800E83A8(int nPlayer);
 void fn_800E83F8(void);
 s32  fn_800E84B0(int nPlayer);
 int  fn_800E8848(int nPlayer);
-int  fn_800E8858(void);
-u8   fn_800E88A8(int a);
-s32  fn_800E8904(void);
+u8   fn_800E8858(int nPlayer, u8 bCheck);
+u8   fn_800E88A8(u8 bCheck);
+u8   fn_800E8904(u8 bCheck);
 void fn_800E890C(void);
 void fn_800E8A68(void);
 
 // TW06: GameModeBestBall::Init. Four players, stroke play, one mulligan each.
 void fn_800E81C4(void) {
-    gpGame->pfn1C8 = fn_800E81C4;
-    gpGame->pfn1D0 = fn_800E83F8;
-    gpGame->pfn1D4 = fn_800E84B0;
-    gpGame->pfn1D8 = (u8 (*)(int, int))fn_800E8858;
-    gpGame->pfn1DC = fn_800E88A8;
-    gpGame->pfn1E0 = fn_800E8904;
-    gpGame->pfn1E8 = fn_800E890C;
-    gpGame->pfn1F4 = fn_800E8A68;
+    gpGame->pfnInit = fn_800E81C4;
+    gpGame->pfnSetupNextGolfer = fn_800E83F8;
+    gpGame->pfnGetHonors = fn_800E84B0;
+    gpGame->pfnHoleFinished = fn_800E8858;
+    gpGame->pfnGameFinished = fn_800E88A8;
+    gpGame->pfnGoToPlayoff = fn_800E8904;
+    gpGame->pfnEndHole = fn_800E890C;
+    gpGame->pfnEndGame = fn_800E8A68;
     gpGame->n4 = 0;
     gpGame->nMulligans = 2;
     gpGame->nC = 4;
@@ -96,7 +96,7 @@ void fn_800E83F8(void) {
         }
         return;
     }
-    lbl_80282278 = gpGame->pfn1D4(5);
+    lbl_80282278 = gpGame->pfnGetHonors(5);
     for (i = 0; i < gNumPlayersSetUp; i++) {
         if (i == lbl_80282278) {
             GOLFERSTATE_Set(GS_PRE_SHOT, i);
@@ -219,8 +219,8 @@ int fn_800E8848(int nPlayer) {
 }
 
 // TW06: GameModeBestBall::HoleFinished. Both teams are done.
-int fn_800E8858(void) {
-    u8 bDone = 0;
+u8 fn_800E8858(int nPlayer, u8 bCheck) {
+    int bDone = 0;
     if (fn_800E82AC(0) && fn_800E82AC(1)) {
         bDone = 1;
     }
@@ -228,7 +228,7 @@ int fn_800E8858(void) {
 }
 
 // TW06: GameModeBestBall::GameFinished. No selected hole is left.
-u8 fn_800E88A8(int a) {
+u8 fn_800E88A8(u8 bCheck) {
     int h;
     for (h = Game_CurHoleIndex() + 1; h < 18; h++) {
         if (gpGame->bHoleSelected[h]) {
@@ -239,7 +239,7 @@ u8 fn_800E88A8(int a) {
 }
 
 // TW06: GameModeBestBall::GoToPlayoff (never).
-s32 fn_800E8904(void) {
+u8 fn_800E8904(u8 bCheck) {
     return 0;
 }
 

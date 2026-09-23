@@ -26,18 +26,18 @@ void fn_800F1404(void);
 void fn_800F1424(void);
 void fn_800F15AC(void);
 void fn_800F18C8(void);
-u8   fn_800F193C(int nPlayer, int a);
-u8   fn_800F1944(int a);
+u8   fn_800F193C(int nPlayer, u8 bCheck);
+u8   fn_800F1944(u8 bCheck);
 void fn_800F194C(void);
 
 // TW06: GameModeReplay::Init. Mode 10 starts: one player, no mulligans, the saved shot's hole.
 void fn_800F125C(void) {
-    gpGame->pfn1C8 = fn_800F125C;
-    gpGame->pfn1D0 = fn_800F15AC;
-    gpGame->pfn1D8 = fn_800F193C;
-    gpGame->pfn1DC = fn_800F1944;
+    gpGame->pfnInit = fn_800F125C;
+    gpGame->pfnSetupNextGolfer = fn_800F15AC;
+    gpGame->pfnHoleFinished = fn_800F193C;
+    gpGame->pfnGameFinished = fn_800F1944;
     gpGame->pfn1EC = fn_800F1424;
-    gpGame->pfn1F4 = fn_800F194C;
+    gpGame->pfnEndGame = fn_800F194C;
     gpGame->pfn1E4 = fn_800F1388;
     gpGame->pfn224 = fn_800F1404;
     gpGame->b273 = 0;
@@ -161,12 +161,12 @@ void fn_800F18C8(void) {
 }
 
 // TW06: GameModeReplay::HoleFinished.
-u8 fn_800F193C(int nPlayer, int a) {
+u8 fn_800F193C(int nPlayer, u8 bCheck) {
     return 1;
 }
 
 // TW06: GameModeReplay::GameFinished.
-u8 fn_800F1944(int a) {
+u8 fn_800F1944(u8 bCheck) {
     return 1;
 }
 

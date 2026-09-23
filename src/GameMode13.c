@@ -23,7 +23,7 @@ void  fn_800A624C(void);
 
 void  fn_800F6CC4(void);
 void  fn_800F6CE0(void);
-s32   fn_800F6D0C(void);
+u8    fn_800F6D0C(u8 bCheck);
 s32   fn_800F6D14(int nPlayer);
 void  fn_800F6DFC(int nPlayer);
 void  fn_800F6ED4(int nPlayer);
@@ -34,26 +34,26 @@ void  fn_800F7C24(int nPlayer);
 void  fn_800F7CA0(void);
 void  fn_800F7CD4(void);
 void  fn_800F7D4C(int nPlayer);
-u8    fn_800F7D8C(int a);
+u8    fn_800F7D8C(u8 bCheck);
 void  fn_800F7DA4(void);
 void  fn_800F7ED8(int nPlayer);
 void  fn_800F7EF8(int nPlayer);
 void  fn_800F7F1C(int nPlayer, int nTime);
-u8    fn_800F7F70(int nPlayer, int a);
+u8    fn_800F7F70(int nPlayer, u8 bCheck);
 void  fn_800F7FF4(int nPlayer, int nId);
 s32   fn_800F8068(int nPlayer, int i);
 void  fn_800F80A8(void);
 
 // Mode 13 starts: one player at a time, no wind, no gimmes, one mulligan.
 void fn_800F6A60(void) {
-    gpGame->pfn1C8 = fn_800F6A60;
-    gpGame->pfn1CC = fn_800F6CC4;
-    gpGame->pfn1D0 = fn_800F7B44;
-    gpGame->pfn1D4 = fn_800F6D14;
-    gpGame->pfn1D8 = fn_800F7F70;
-    gpGame->pfn1DC = fn_800F7D8C;
-    gpGame->pfn1E0 = fn_800F6D0C;
-    gpGame->pfn248 = fn_800F6DFC;
+    gpGame->pfnInit = fn_800F6A60;
+    gpGame->pfnShutdown = fn_800F6CC4;
+    gpGame->pfnSetupNextGolfer = fn_800F7B44;
+    gpGame->pfnGetHonors = fn_800F6D14;
+    gpGame->pfnHoleFinished = fn_800F7F70;
+    gpGame->pfnGameFinished = fn_800F7D8C;
+    gpGame->pfnGoToPlayoff = fn_800F6D0C;
+    gpGame->pfnEndGolferTurn = fn_800F6DFC;
     gpGame->pfn244 = fn_800F6ED4;
     gpGame->pfn1E4 = fn_800F7C00;
     gpGame->pfn228 = fn_800F7D4C;
@@ -67,7 +67,7 @@ void fn_800F6A60(void) {
     gpGame->pfn25C = fn_800F7F1C;
     gpGame->pfn268 = fn_800F7FF4;
     gpGame->pfn26C = fn_800F8068;
-    gpGame->pfn1F4 = fn_800F80A8;
+    gpGame->pfnEndGame = fn_800F80A8;
     gpGame->b276 = 0;
     gpGame->bGimmesAllowed = 0;
     gpGame->b280 = 0;
@@ -109,7 +109,7 @@ void fn_800F6CE0(void) {
     SESSION_OPTIONS->nWind = 0;
 }
 
-s32 fn_800F6D0C(void) {
+u8 fn_800F6D0C(u8 bCheck) {
     return 0;
 }
 
@@ -478,7 +478,7 @@ void fn_800F7D4C(int nPlayer) {
     }
 }
 
-u8 fn_800F7D8C(int a) {
+u8 fn_800F7D8C(u8 bCheck) {
     return 1;
 }
 
@@ -531,7 +531,7 @@ void fn_800F7F1C(int nPlayer, int nTime) {
 }
 
 // The game is over when everyone's time is up.
-u8 fn_800F7F70(int nPlayer, int a) {
+u8 fn_800F7F70(int nPlayer, u8 bCheck) {
     int i;
     for (i = 0; i < gNumPlayersSetUp; i++) {
         if (PLAYER(i)->n290[Game_CurHoleIndex()] != 0) {

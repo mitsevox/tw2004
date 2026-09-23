@@ -30,7 +30,7 @@ extern s32 lbl_801928F0[];                  // points per rank
 
 void  fn_800F2BBC(void);
 void  fn_800F2BD8(void);
-s32   fn_800F2C2C(void);
+u8    fn_800F2C2C(u8 bCheck);
 s32   fn_800F2C34(int nPlayer);
 void  fn_800F2D4C(int nPlayer);
 void  fn_800F2E08(int nPlayer);
@@ -39,9 +39,9 @@ void  fn_800F330C(void);
 void  fn_800F3330(void);
 void  fn_800F3358(void);
 void  fn_800F33D0(int nPlayer);
-u8    fn_800F3410(int a);
+u8    fn_800F3410(u8 bCheck);
 void  fn_800F3418(int nPlayer);
-u8    fn_800F3438(int nPlayer, int a);
+u8    fn_800F3438(int nPlayer, u8 bCheck);
 s32   fn_800F3668(int n);
 void  fn_800F36A4(void);
 void  fn_800F3800(int nPlayer);
@@ -50,14 +50,14 @@ s32   fn_800F392C(int a, int i);
 
 // Mode 14 starts: two players, no wind, no gimmes, no mulligans.
 void fn_800F2984(void) {
-    gpGame->pfn1C8 = fn_800F2984;
-    gpGame->pfn1CC = fn_800F2BBC;
-    gpGame->pfn1D0 = fn_800F31E0;
-    gpGame->pfn1D4 = fn_800F2C34;
-    gpGame->pfn1D8 = fn_800F3438;
-    gpGame->pfn1DC = fn_800F3410;
-    gpGame->pfn1E0 = fn_800F2C2C;
-    gpGame->pfn248 = fn_800F2D4C;
+    gpGame->pfnInit = fn_800F2984;
+    gpGame->pfnShutdown = fn_800F2BBC;
+    gpGame->pfnSetupNextGolfer = fn_800F31E0;
+    gpGame->pfnGetHonors = fn_800F2C34;
+    gpGame->pfnHoleFinished = fn_800F3438;
+    gpGame->pfnGameFinished = fn_800F3410;
+    gpGame->pfnGoToPlayoff = fn_800F2C2C;
+    gpGame->pfnEndGolferTurn = fn_800F2D4C;
     gpGame->pfn244 = fn_800F2E08;
     gpGame->pfn1E4 = fn_800F330C;
     gpGame->pfn228 = fn_800F33D0;
@@ -67,7 +67,7 @@ void fn_800F2984(void) {
     gpGame->pfn264 = fn_800F1BD8;
     gpGame->pfn258 = fn_800F1C34;
     gpGame->pfn260 = fn_800F3800;
-    gpGame->pfn1F4 = fn_800F3860;
+    gpGame->pfnEndGame = fn_800F3860;
     gpGame->pfn26C = fn_800F392C;
     gpGame->b276 = 0;
     gpGame->bGimmesAllowed = 0;
@@ -113,7 +113,7 @@ void fn_800F2BD8(void) {
     lbl_8028236C = Rand_Next(0) & 1;
 }
 
-s32 fn_800F2C2C(void) {
+u8 fn_800F2C2C(u8 bCheck) {
     return 0;
 }
 
@@ -325,7 +325,7 @@ void fn_800F33D0(int nPlayer) {
     }
 }
 
-u8 fn_800F3410(int a) {
+u8 fn_800F3410(u8 bCheck) {
     return 1;
 }
 
@@ -334,7 +334,7 @@ void fn_800F3418(int nPlayer) {
 }
 
 // The game is over when someone holds 5 targets.
-u8 fn_800F3438(int nPlayer, int a) {
+u8 fn_800F3438(int nPlayer, u8 bCheck) {
     int i;
     for (i = 0; i < gNumPlayersSetUp; i++) {
         if (fn_800F354C(i) >= 5) {
