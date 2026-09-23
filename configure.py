@@ -552,7 +552,7 @@ config.libs = [
             Object(Matching, "MetroTRK/msg.c"),
             Object(Matching, "MetroTRK/msgbuf.c"),
             Object(NonMatching, "MetroTRK/serpoll.c"),
-            Object(NonMatching, "MetroTRK/usr_put.c"),
+            Object(Matching, "MetroTRK/usr_put.c"),
             Object(Matching, "MetroTRK/dispatch.c"),
             Object(NonMatching, "MetroTRK/msghndlr.c"),
             Object(NonMatching, "MetroTRK/support.c"),
