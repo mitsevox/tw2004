@@ -39,7 +39,6 @@ int   fn_800E17AC(int nPlayer);           // the player's total strokes
 int   fn_800F354C(int nPlayer);
 int   fn_800F1D34(int nPlayer);
 int   fn_800D8750(int a, int b, int c, char* szName, int nPlayer);   // szName: a profile's name
-u8    fn_800DCB10(int nPlayer);
 u8    fn_800BCD24(int nPlayer);
 int   fn_800D0620(int nPlayer, int a, int b);
 int   fn_800D089C(int nPlayer, int a);

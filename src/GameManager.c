@@ -26,7 +26,6 @@ void  fn_800D8D38(int nPlayer);
 void  Caddie_Stop(void);
 void  fn_8001D7A4(int nHandle);
 u8    fn_800E0A90(int nPlayer);
-u8    fn_800E1CA8(void);                  // int in GameRound.c; the callers here test the byte
 void  fn_800D439C(int nPlayer, int a);
 void  fn_800D9834(int nPlayer);
 u8    fn_8012591C(void);
@@ -147,8 +146,8 @@ u8 fn_800DCB08(void) {
     return 0;
 }
 
-void fn_800DCB10(int nPlayer) {
-    gpGame->pfn1F8(nPlayer);
+u8 fn_800DCB10(int nPlayer) {
+    return gpGame->pfn1F8(nPlayer);
 }
 
 u8 fn_800DCB3C(void) {

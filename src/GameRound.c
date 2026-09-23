@@ -541,8 +541,8 @@ u8 fn_800E1BBC(void) {
 }
 
 // Whether the current hole is the round's last.
-int fn_800E1CA8(void) {
-    int b = 1;
+u8 fn_800E1CA8(void) {
+    u8 b = 1;
     int i;
     for (i = gpGame->nCurHole + 1; i < 18; i++) {
         if (gpGame->bHoleSelected[i]) {

@@ -137,6 +137,7 @@ void fn_800DCAD8(void);
 void GM_vCloseModuleONCE(void);
 u8   fn_800DCB00(void);
 u8   fn_800DCB08(void);
+u8   fn_800DCB10(int nPlayer);          // the mode's pfn1F8 answer for the player
 u8   fn_800DCB3C(void);
 u8   fn_800DCB74(void);
 void fn_800DCB84(f32* pA, f32* pB, f32* pOut);   // out = a - b
@@ -179,6 +180,7 @@ int  fn_800E1788(int nPlayer);          // the player's total for the round
 int  fn_800E17AC(int nPlayer);          // the player's total strokes
 int  fn_800E1904(int nPlayer, u8 bCurrent);
 u8   fn_800E1BBC(void);                 // whether the round plays every hole
+u8   fn_800E1CA8(void);                 // no selected hole is left after the current one
 u8   fn_800E23B0(int nPlayer, int nStrokes);
 u8   fn_800E23EC(int nPlayer);
 void fn_800E2470(void);
