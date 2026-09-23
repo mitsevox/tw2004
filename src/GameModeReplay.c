@@ -8,11 +8,6 @@
 #include "game.h"
 #include "engine.h"
 
-void  fn_800E14E0(int nCourse);
-void  fn_800E1404(int nHole);
-void  fn_800ED6F8(f32 x0);
-void  fn_8006BF60(int nPlayer);
-
 void fn_800F1388(void);
 void fn_800F1404(void);
 void fn_800F1424(void);
@@ -101,14 +96,17 @@ void fn_800F15AC(void) {
     s16 nF12;
     s16 nF14;
 
-    Mem_cpy(&gPlayers[0].golfer, &gReplayData.player.golfer, 0x140);
+    Mem_cpy(&gPlayers[0].golfer, &gReplayData.player.golfer, sizeof(gPlayers[0].golfer));
     Mem_cpy(gPlayers[0].attrMod, gReplayData.player.attrMod, 0xC);
+    // port: the score block from nStrokes to b30C (0x154..0x30C), copied whole
     Mem_cpy(gPlayers[0].nStrokes, gReplayData.player.nStrokes, 0x1B8);
     // b30C up to the shot block at 0x354: the flags and the round's money. Sized as the distance
     // port: between the two fields the copy scores 96.4%
     Mem_cpy(&gPlayers[0].b30C, &gReplayData.player.b30C, 0x48);
+    // port: the shot block from nClub to nShotKind2 (0x354..0x3B0), copied whole
     Mem_cpy(&gPlayers[0].nClub, &gReplayData.player.nClub, 0x5C);
     Mem_cpy(&gPlayers[0].nShotKind2, &gReplayData.player.nShotKind2, 4);
+    // port: the swing data up to (not including) its byte 0x630
     Mem_cpy(&gPlayers[0].swing, &gReplayData.player.swing, 0x630);
     gPlayers[0].uFlags = gReplayData.player.uFlags;
     Vec_Copy(gReplayData.player.vBall, gPlayers[0].vBall);

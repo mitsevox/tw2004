@@ -9,6 +9,8 @@
 #include "engine.h"
 #include "game/earnings.h"
 
+// fake match: the (s8) on GOLFERSTATE_GetCurrentState (see game.h).
+
 extern s32 lbl_802816A8;                    // the options saved while the game runs
 extern s32 lbl_802823B0;
 extern s32 lbl_802823B4;                    // the points multiplier from bonuses
@@ -40,7 +42,7 @@ void  fn_800F7FF4(int nPlayer, int nId);
 s32   fn_800F8068(int nPlayer, int i);
 void  fn_800F80A8(void);
 
-// Mode 13 starts: one player at a time, no wind, no gimmes, one mulligan.
+// Mode 13 starts: one player at a time, no wind, no gimmes, any number of mulligans.
 void fn_800F6A60(void) {
     gpGame->pfnInit = fn_800F6A60;
     gpGame->pfnShutdown = fn_800F6CC4;
@@ -498,8 +500,10 @@ void fn_800F7DA4(void) {
 // The time ran out: a shot not yet taken ends the player's game; one in flight finishes first.
 void fn_800F7DE8(void) {
     fn_800A6278();
-    if ((s8)GOLFERSTATE_GetCurrentState(lbl_80282278) == 1 || (s8)GOLFERSTATE_GetCurrentState(lbl_80282278) == 2 ||
-        (s8)GOLFERSTATE_GetCurrentState(lbl_80282278) == 3 || (s8)GOLFERSTATE_GetCurrentState(lbl_80282278) == 4 ||
+    if ((s8)GOLFERSTATE_GetCurrentState(lbl_80282278) == 1 ||
+        (s8)GOLFERSTATE_GetCurrentState(lbl_80282278) == 2 ||
+        (s8)GOLFERSTATE_GetCurrentState(lbl_80282278) == 3 ||
+        (s8)GOLFERSTATE_GetCurrentState(lbl_80282278) == 4 ||
         (s8)GOLFERSTATE_GetCurrentState(lbl_80282278) == 10) {
         gPlayers[lbl_80282278].ball.nLie = 12;
         gPlayers[lbl_80282278].nC3C |= 0x04000000;

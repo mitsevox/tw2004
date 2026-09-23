@@ -9,6 +9,8 @@
 #include "engine.h"
 #include "game/earnings.h"
 
+// fake match: the (s8) on GOLFERSTATE_GetCurrentState (see game.h).
+
 extern s32 lbl_80281698;                    // the options saved while the game runs
 extern s32 lbl_80282390;
 extern s32 lbl_80282394;                    // the points multiplier from bonuses

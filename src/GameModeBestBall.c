@@ -203,7 +203,7 @@ s32 fn_800E84B0(int nPlayer) {
     return nBest;
 }
 
-// TW06: GameModeBestBall::GetPlayerTeam.
+// A player's team (TW06 has this as GameModeFourBall::GetPlayerTeam; its best ball mode has none).
 int fn_800E8848(int nPlayer) {
     return nPlayer / 2;
 }
@@ -228,7 +228,7 @@ u8 fn_800E88A8(u8 bCheck) {
     return 1;
 }
 
-// TW06: GameModeBestBall::GoToPlayoff (never).
+// GoToPlayoff: never (TW06's GameModeBestBall does not override GameModeBase::GoToPlayoff).
 u8 fn_800E8904(u8 bCheck) {
     return 0;
 }
@@ -345,7 +345,8 @@ int fn_800E8C24(int nPlayer, int nHole) {
     return gPlayers[fn_800E83A8(nPlayer)].nStrokes[nHole];
 }
 
-// TW06: GM_BestBallMode_GetTeamRelativeScore. The team's score against par so far (and on the current hole once holed, when asked).
+// TW06: GM_BestBallMode_GetTeamRelativeScore. The team's score against par so far (and on the
+// current hole once holed, when asked).
 int fn_800E8CA8(int nPlayer, u8 bCurrent) {
     int nPar;
     int nScore;

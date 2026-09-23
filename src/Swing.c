@@ -1834,7 +1834,7 @@ void fn_8005A7A0(int nPlayer) {
     if ((gPlayers[nPlayer].swing.nPowerBoost > 0 || gPlayers[nPlayer].swing.nSpinBoost > 0) &&
         gPlayers[nPlayer].nShotKind != 0 && gPlayers[nPlayer].swing.bDrawBoostUI != 0 &&
         gSession.bReplay == 0 &&
-        gSession.n14 == 0 && !fn_800C6CB0()) {
+        gSession.nPaused == 0 && !fn_800C6CB0()) {
         fn_800AE3F8(gPlayers[nPlayer].nView[0]);
     }
 }
@@ -2179,12 +2179,12 @@ void fn_80062D0C(int nPlayer) {
     fn_80062D6C(9, nPlayer + 1);
 }
 
-void fn_80062D38(int a, int b, int nPlayer) {
-    fn_800E5998(a, 0, &b, &nPlayer);
+void fn_80062D38(int nMsg, int nA, int nB) {
+    fn_800E5998(nMsg, 0, &nA, &nB);
 }
 
-void fn_80062D6C(int a, int nPlayer) {
-    fn_800E590C(a, 0, &nPlayer);
+void fn_80062D6C(int nMsg, int nValue) {
+    fn_800E590C(nMsg, 0, &nValue);
 }
 
 void fn_80062D98(void) {

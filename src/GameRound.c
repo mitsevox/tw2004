@@ -8,18 +8,16 @@
 #include "engine.h"
 #include "game/save.h"
 
+// fake match: the (s8) on GOLFERSTATE_GetCurrentState and the (u8) on GOLFERSTATE_Set's player (see game.h).
+
 int  fn_800E19A4(int nPlayer, int nHoles);
 void fn_800E25CC(u8 b);
 int  fn_800E1CE8(int a, int b);
 
 void  fn_800D8D5C(int nPlayer, int a);
-void  fn_800E2470(void);
 void  fn_800E30D4(void);
 void  fn_800E2FD8(void);
 void  fn_800E3050(int nCourse);
-int   fn_8011937C(int nPlayer, int a, u8 b);
-
-int   fn_800E8C24(int nPlayer, int nHole);
 
 extern char lbl_80282270[8];                // the hole name
 
@@ -41,40 +39,16 @@ s32   fn_800E3AB0(int nPlayer);
 void  fn_800E3AAC(int nPlayer, int nTime);
 void  fn_800E3AA8(int nPlayer, int nId);
 s32   fn_800E3AA0(int a, int nTarget);
-void  fn_800FF700(void);
-void  fn_800E9E40(void);
-void  fn_800F80FC(void);
-void  fn_800F944C(void);
-void  fn_800F9610(void);
-void  fn_800F986C(void);
-void  fn_800ED738(void);
-void  fn_800EACD8(void);
-void  fn_800F125C(void);
-void  fn_800FFF34(void);
-void  fn_800FEAFC(void);
-void  fn_800F6A60(void);
-void  fn_800F2984(void);
-void  fn_800F39F4(void);
-void  fn_800F4B40(void);
-void  fn_800F5AAC(void);
-void  fn_800FE1B4(void);
-void  fn_800E81C4(void);
-void  fn_800E8D58(void);
-void  fn_800E68F0(void);
 void  fn_800EDD18(void);
-void  fn_800F0448(void);
-void  fn_800E7980(void);
 void  fn_8010C4A0(void);
 void  fn_80125E68(void);
 
 u8    fn_800E3AF8(void);
-void  fn_800E0A84(u8 v);
-void  fn_800E1404(int nHole);
 void  fn_80057364(int a);
 int   fn_800D3118(int nRound, int nHole);    // a built round's course for a hole
 int   fn_800D315C(int nRound, int nHole);    // and its hole number (1-based)
 
-// out = a - b (four floats)
+// Four floats: pOut gets pA minus pB.
 #ifdef __MWERKS__
 asm void fn_800E0AF0(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
@@ -99,7 +73,6 @@ void fn_800E0AF0(f32* pA, f32* pB, f32* pOut) {
 #endif
 
 int   fn_80110180(void);                    // the current hole can be played (inferred)
-int   fn_800D2ABC(int nCourse, int nHole);  // a hole's par
 
 // The 20 course ids the mixed rounds pick from (lbl_80184D40).
 typedef struct CourseList {
@@ -110,7 +83,7 @@ extern CourseList lbl_80184D40;
 // A course counts as unlocked when any of the five profiles (or the second block) has its flag.
 #define COURSE_UNLOCKED(c, k) (gpSaveData[k].aCourseUnlocked[c] || lbl_80281DF4->aCourseUnlocked[c])
 
-// out = a - b (three floats)
+// Three floats: pOut gets pA minus pB.
 #ifdef __MWERKS__
 asm void fn_800E0B14(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
@@ -504,7 +477,7 @@ u8 fn_800E1734(void) {
     return 0;
 }
 
-// The mode's mulligan rule: 0 none, 2 one per player per round.
+// The mode's mulligan rule: 0 none, 1 any number, 2 one per player per round.
 int fn_800E177C(void) {
     return gpGame->nMulligans;
 }
@@ -1139,6 +1112,7 @@ void fn_800E30D4(void) {
         }
         for (k = 0; k < n; k++) {
             if (slots[n] == slots[k] || slots[n] == slots[k] + 1 || slots[n] == slots[k] - 1) {
+                // fake match: a retry jump, as the binary branches; structured retries untried
                 goto slot3;
             }
         }
@@ -1177,12 +1151,14 @@ void fn_800E30D4(void) {
         nHole = holes[Rand_Next(1) % nHoles];
         for (k = 0; k < n; k++) {
             if (nCourse == gpGame->nHoleCourse[slots[k]] && nHole == gpGame->nHoleNum[slots[k]]) {
+                // fake match: a retry jump, as the binary branches; structured retries untried
                 goto pick3;
             }
         }
         if (bUsed[nPick] == 1) {
             for (k = 0; k < nAvail; k++) {
                 if (!bUsed[k]) {
+                    // fake match: a retry jump, as the binary branches; structured retries untried
                     goto pick3;
                 }
             }
@@ -1201,10 +1177,12 @@ void fn_800E30D4(void) {
             slots[n] = Rand_Next(1) % 9 + 9;
         }
         if (gpGame->nHoleNum[slots[n]] != -1) {
+            // fake match: a retry jump, as the binary branches; structured retries untried
             goto slot5;
         }
         for (k = 0; k < n; k++) {
             if (slots[n] == slots[k] || slots[n] == slots[k] + 1 || slots[n] == slots[k] - 1) {
+                // fake match: a retry jump, as the binary branches; structured retries untried
                 goto slot5;
             }
         }
@@ -1232,12 +1210,14 @@ void fn_800E30D4(void) {
         nHole = holes[Rand_Next(1) % nHoles];
         for (k = 0; k < n; k++) {
             if (nCourse == gpGame->nHoleCourse[slots[k]] && nHole == gpGame->nHoleNum[slots[k]]) {
+                // fake match: a retry jump, as the binary branches; structured retries untried
                 goto pick5;
             }
         }
         if (bUsed[nPick] == 1) {
             for (k = 0; k < nAvail; k++) {
                 if (!bUsed[k]) {
+                    // fake match: a retry jump, as the binary branches; structured retries untried
                     goto pick5;
                 }
             }
@@ -1274,12 +1254,14 @@ void fn_800E30D4(void) {
             nHole = holes[Rand_Next(1) % nHoles];
             for (k = 0; k < i; k++) {
                 if (nCourse == gpGame->nHoleCourse[k] && nHole == gpGame->nHoleNum[k]) {
+                    // fake match: a retry jump, as the binary branches; structured retries untried
                     goto pick4;
                 }
             }
             if (bUsed[nPick] == 1) {
                 for (k = 0; k < nAvail; k++) {
                     if (!bUsed[k]) {
+                        // fake match: a retry jump, as the binary branches; structured retries untried
                         goto pick4;
                     }
                 }

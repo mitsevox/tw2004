@@ -155,9 +155,9 @@ void fn_800E3E0C(void) {
     fn_8006A8B0();
 }
 
-// Pauses the game (gSession.n14): the pause menu, sounds held, the HUD's pause flag.
+// Pauses the game (gSession.nPaused): the pause menu, sounds held, the HUD's pause flag.
 void fn_800E3E3C(void) {
-    if (gSession.n14 == 0) {
+    if (gSession.nPaused == 0) {
         fn_800E5714(4);
         fn_8001437C();
         fn_80062CE0(0);
@@ -165,7 +165,7 @@ void fn_800E3E3C(void) {
             fn_80095444(1);
         }
         lbl_802822DF = 1;
-        gSession.n14 = 1;
+        gSession.nPaused = 1;
         fn_800DC9D4(1);
         fn_80125814(0);
         if (fn_800EC550()) {
@@ -185,7 +185,7 @@ void fn_800E3ECC(void) {
 void fn_800E3EE0(void) {
     int i;
     int j;
-    if (gSession.n14 != 0) {
+    if (gSession.nPaused != 0) {
         fn_800E5714(8);
         if (fn_80100294()) {
             fn_80101EDC();
@@ -195,7 +195,7 @@ void fn_800E3EE0(void) {
                 fn_800953C8(1);
             }
             lbl_802822DF = 0;
-            gSession.n14 = 0;
+            gSession.nPaused = 0;
             fn_800DC9D4(0);
             fn_800A7350(0);
             fn_80125814(1);
