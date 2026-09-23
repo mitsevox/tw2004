@@ -8,13 +8,20 @@
 #include "game/save.h"
 #include "game/modes/rte.h"
 
+// This file's globals, defined last address first (an object's .bss is laid out in reverse).
+s32 lbl_80281680 = 4;                       // gSession.options.nC saved while an event runs
+void (*lbl_8028235C)(void);                 // mode 5's pfnShutdown, called from ours (fn_800F0678)
+void (*lbl_80282358)(void);                 // mode 5's pfnEndGame, called from ours (fn_800F0BBC)
+s32 lbl_80282354;                           // the event's round
+s32 lbl_80282350;                           // the event (gRTEs.aEvent index)
+u8  lbl_8028234C;                           // 1 while an event runs
+s32 lbl_80282348;                           // gSession.options.nWind saved while an event runs
+RTEData gRTEs;
+
 void fn_800F0570(void);
 void fn_800F05B0(UStreamObject* pObject);
 void fn_800F05DC(UStreamObject* pObject);
-extern u8 lbl_8028234C;
 s32 fn_800F0E18(s32 i);
-extern s32 lbl_80282350;
-extern s32 lbl_80282354;
 s32 fn_800F0E20(s32* pRound);
 void fn_800F0E30(s32 nId, s32 nRound);
 s32 fn_800F1008(s32 i);
@@ -22,10 +29,6 @@ s32 fn_800F102C(void);
 
 void  fn_8011E020(s32* pMonth, s32* pDay, s32* pYear, s32* pHour, s32* pMinute, s32* pSecond, s32* pMsec);
 void  fn_800D2678(u16* pDate, s32 nMonth, s32 nDay, s32 nYear);
-extern void (*lbl_8028235C)(void);
-extern void (*lbl_80282358)(void);
-extern s32 lbl_80281680;
-extern s32 lbl_80282348;
 void  fn_800F060C(UStreamObject* pObject);
 void  fn_800F0678(void);
 void  fn_800F0BBC(void);

@@ -2829,6 +2829,9 @@ GameModeDriverPGATour.c:
 
 GameModeDriverRTE.c:
 	.text       start:0x800F0448 end:0x800F125C
+	.bss        start:0x8020CF90 end:0x80211D38
+	.sdata      start:0x80281680 end:0x80281688
+	.sbss       start:0x80282348 end:0x80282360
 
 GameModeReplay.c:
 	.text       start:0x800F125C end:0x800F19D4
