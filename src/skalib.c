@@ -86,10 +86,11 @@ void  AnimLib_Free(AnimLib* pLib);
 void  fn_800269E4(struct LibOverlay* pOv, int nSlot, s32 n);
 void  fn_800CA9DC(int nSlot);
 u32   Skalib_NextSlot(void);
-void  fn_80022828(void);
+void  Skalib_SetBudgets(void);
 int   fn_80023F7C(int nSlot);
 AnimLib* AnimLib_Load(u8* pData, ClipBank* pBank);
 u32   fn_8009EF90(void);
+int   fn_80023CE8(int n);
 u8    fn_800C9828(int nGroup, int nStyle, int nClub, int nKey);
 void  AnimLib_FreeCopies(void);
 void  ClipBank_FreeAram(void);
@@ -144,6 +145,9 @@ extern s32         lbl_80281CE8;      // group, style, club and key being merged
 extern s32         lbl_80281CEC;
 extern s32         lbl_80281CF0;
 extern s32         lbl_80281CF4;
+extern s32         lbl_80281074;      // clips a leaf may keep this round
+extern u32         lbl_80281CDC;      // bytes of clips a slot may keep
+extern f32         lbl_80281D1C;      // slot 0's share of the memory when double buffering
 extern u8*         lbl_80281CC4;      // staging buffers (32-aligned), see Skalib_Init
 extern u8*         lbl_80281CC8;
 extern u8*         lbl_80281CCC;
@@ -441,8 +445,6 @@ u8 Skalib_IsDoubleBuffered(void) {
     return lbl_80281CD8;
 }
 
-int fn_80023CE8(int n);
-
 // The slot the next library loads into: with double buffering it flips between 0 and 1.
 u32 Skalib_NextSlot(void) {
     if (Skalib_IsDoubleBuffered()) {
@@ -457,6 +459,116 @@ u32 Skalib_NextSlot(void) {
 
 u32 Skalib_CurSlot(void) {
     return lbl_80281078;
+}
+
+// Sets the per-round limits: how many clips each leaf may keep (every clip with one player, at
+// most 10 with more) and the memory for them; with two players' libraries loaded (double
+// buffering), how the memory is split between the two slots, from their sizes, kept to 44-56%.
+void Skalib_SetBudgets(void) {
+    s32      aKeepSingle[4] = {100000, 10, 10, 10};
+    s32      aKeepDouble[4] = {100000, 10, 10, 10};
+    s32      aBytes[4];
+    u32      nSize0;
+    LibSlot* pSlot1;
+    int      i;
+    int      n;
+    LibSlot* pSlot0;
+    u32      nSize1;
+
+    aBytes[0] = 0xE6000;
+    aBytes[1] = 0xE6000;
+    aBytes[2] = 0xE6000;
+    aBytes[3] = 0xE6000;
+    lbl_80281CD8 = 0;
+    if (!fn_80023CE8(0) || !fn_80023CE8(1)) {
+        lbl_80281074 = aKeepSingle[gSession.nNumPlayers - 1];
+        lbl_80281CDC = aBytes[0];
+    } else {
+        n = gSession.nNumPlayers;
+        if (n > 1) lbl_80281CD8 = 1;
+        lbl_80281074 = aKeepDouble[n - 1];
+        lbl_80281CDC = aBytes[n - 1];
+    }
+    lbl_80281078 = (Rand_Next(1) & 1) ^ 1;
+    if (lbl_80281CD8) {
+        pSlot0 = &lbl_801C6068[0];
+        pSlot1 = &lbl_801C6068[1];
+        nSize0 = pSlot0->pLib->n140;
+        nSize1 = pSlot1->pLib->n140;
+        for (i = 0; pSlot0->nOverlays > i; i++) nSize0 += pSlot0->overlays[i].pWork->n140;
+        for (i = 0; pSlot1->nOverlays > i; i++) nSize1 += pSlot1->overlays[i].pWork->n140;
+        lbl_80281D1C = (f32)nSize0 / (f32)(nSize0 + nSize1);
+        lbl_80281D1C = (lbl_80281D1C < 0.44f) ? 0.44f : ((lbl_80281D1C > 0.56f) ? 0.56f : lbl_80281D1C);
+    }
+}
+
+f32 Skalib_Random(void);
+
+// Merge walk, trim pass: cuts each leaf down to the clip limit (none for a leaf being replaced,
+// all of them for the ones fn_800C9828 protects), keeping a run of clips at a random start.
+int AnimLib_TrimCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB, MergeCtx* pCtx, int nLevel, int nIndex) {
+    s32         nKeep;
+    s32         nCount;
+    int         nStart;
+    int         i;
+    ClipRecord* pRec;
+
+    if (fn_800C9828(lbl_80281CE8, lbl_80281CEC, lbl_80281CF0, lbl_80281CF4)) {
+        nKeep = 10000;
+    } else if (pLeafA != NULL && (pLeafA->uMask & 2)) {
+        nKeep = 0;
+    } else {
+        nKeep = lbl_80281074;
+    }
+    if (pLeafA != NULL && (nCount = pLeafA->nCount) > nKeep) {
+        nStart = (nCount - nKeep) * Skalib_Random();
+        for (i = 0; i < nStart; i++) {
+            pRec = &pA->pRecords[pA->pIndex[pLeafA->nFirst + i]];
+            pRec->n10--;
+            if (pRec->n10 == 0 && pCtx != NULL) {
+                (*pCtx->pCount)--;
+                pCtx->nBytes -= pRec->n14;
+            }
+        }
+        for (i = nStart + nKeep; i < pLeafA->nCount; i++) {
+            pRec = &pA->pRecords[pA->pIndex[pLeafA->nFirst + i]];
+            pRec->n10--;
+            if (pRec->n10 == 0 && pCtx != NULL) {
+                (*pCtx->pCount)--;
+                pCtx->nBytes -= pRec->n14;
+            }
+        }
+        pLeafA->nFirst += (s16)nStart;
+        pLeafA->nCount = nKeep;
+    }
+    if (pLeafB != NULL && (nCount = pLeafB->nCount) > nKeep) {
+        nStart = (nCount - nKeep) * Skalib_Random();
+        for (i = 0; i < nStart; i++) {
+            pRec = &pB->pRecords[pB->pIndex[pLeafB->nFirst + i]];
+            pRec->n10--;
+            pB->nClips--;
+            if (pRec->n10 == 0 && pCtx != NULL) {
+                (*pCtx->pCount)--;
+                pCtx->nBytes -= pRec->n14;
+            }
+        }
+        for (i = nStart + nKeep; i < pLeafB->nCount; i++) {
+            pRec = &pB->pRecords[pB->pIndex[pLeafB->nFirst + i]];
+            pRec->n10--;
+            pB->nClips--;
+            if (pRec->n10 == 0 && pCtx != NULL) {
+                (*pCtx->pCount)--;
+                pCtx->nBytes -= pRec->n14;
+            }
+        }
+        pLeafB->nFirst += (s16)nStart;
+        pLeafB->nCount = nKeep;
+    }
+    return 0;
+}
+
+f32 Skalib_Random(void) {
+    return Rand_Float(1);
 }
 
 // The scratch area for slot n, uSize bytes: while only one of the first two slots has a bank,
@@ -509,7 +621,7 @@ void AnimLib_FreeWorkCopies(void) {
     for (i = 0; i < 3; i++, pSlot++) {
         if (lbl_80281CE4 != 0 && i != lbl_80281078) continue;
         if (pSlot->nOverlays != 0) {
-            for (k = 0; k < pSlot->nOverlays; k++) {
+            for (k = 0; pSlot->nOverlays > k; k++) {
             }
             for (j = 0; j < pSlot->nOverlays; j++) {
                 pOv = &pSlot->overlays[j];
@@ -564,7 +676,7 @@ void AnimLib_ApplyOverlays(int nSlot) {
 void fn_80025478(void) {
     u32 i;
     int nTotal = 0;
-    fn_80022828();
+    Skalib_SetBudgets();
     for (i = 0; i < 3; i++) nTotal += fn_80023F7C(i);
 }
 
