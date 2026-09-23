@@ -4,11 +4,9 @@
 
 #include "golfer.h"
 
-int  fn_80006444(int hFile, void* pDst, u32 uLen, u32 uOffset, void (*pfnDone)(int, int));   // UStream.c:
-                                                                                               // async read
 void fn_8006C63C(void);                 // called while waiting for a read
 void fn_800C9F14(u8 bForce);
-void fn_800CB550(int nResult, int n);
+void fn_800CB550(int nBytes, int nError);
 
 AnimStreamGroup lbl_80191490[2] = {
     { 1, 0 },
@@ -49,9 +47,9 @@ void fn_800C9CA0(void) {
 }
 
 // The read's completion callback: the read is done.
-void fn_800C9EFC(int nResult, int n) {
+void fn_800C9EFC(int nBytes, int nError) {
     lbl_80282230->nState  = 2;
-    lbl_80282230->nResult = nResult;
+    lbl_80282230->nResult = nBytes;
 }
 
 // Marks a player's clips for a group, style and club class.
@@ -77,9 +75,9 @@ void fn_800CB4E0(int hFile, u32 uFileSize, void* pDst, u32 uLen, u32 uOffset) {
 }
 
 // fn_800CB4E0's completion callback.
-void fn_800CB550(int nResult, int n) {
+void fn_800CB550(int nBytes, int nError) {
     lbl_80282230->bReadDone = 1;
-    lbl_80282230->nResult   = nResult;
+    lbl_80282230->nResult   = nBytes;
 }
 
 // The player whose part of the stream has this id, -1 for none.

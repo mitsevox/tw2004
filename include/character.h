@@ -276,7 +276,7 @@ typedef struct AnimStream {
     s32   nBytes;               // 0x1CB8  bytes the stream uses in all
     s32   hFile;                // 0x1CBC  the open file, -1 none
     s32   nState;               // 0x1CC0  0 idle, 1 reading, 2 read (fn_800C9EFC)
-    s32   nResult;              // 0x1CC4  what the last read returned
+    s32   nResult;              // 0x1CC4  the bytes the last read got (its callback's nBytes)
     s32   n1CC8;                // 0x1CC8
     u8    bReadDone;            // 0x1CCC  set when a waited-for read finishes (fn_800CB550)
     u8    bOn;                  // 0x1CCD  streaming is on (off in split screen, multiplayer and some
