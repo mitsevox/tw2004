@@ -2636,8 +2636,11 @@ unsorted/sweep_800BA700.c:
 unsorted/sweep_800BAA4C.c:
 	.text       start:0x800BAA4C end:0x800BAA50
 
+VecMath.c:
+	.text       start:0x800BAD60 end:0x800BB0A8
+
 SitDevFile.c:
-	.text       start:0x800BAEB0 end:0x800BD894
+	.text       start:0x800BB0A8 end:0x800BD894
 
 GoGolfCam.c:
 	.text       start:0x800BD894 end:0x800C7480

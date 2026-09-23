@@ -875,6 +875,7 @@ config.libs = [
             Object(NonMatching, "GoShaderObject_Rain_Gc.c"),
             Object(NonMatching, "UAudMemStack.c"),
             Object(NonMatching, "GoARAM.c"),
+            Object(NonMatching, "VecMath.c"),
             Object(NonMatching, "SitDevFile.c"),
             Object(NonMatching, "GoGolfCam.c"),
             Object(NonMatching, "GoBreakLine.c"),
