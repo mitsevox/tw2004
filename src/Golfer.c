@@ -312,7 +312,7 @@ void AI_ApplyError(int nPlayer) {
         if (p->fDistance > 100.0f) {
             fMaxAngle = DEG(3.75f); fDist1 = 7.5f; fDist2 = 5.25f;
         } else if (p->fDistance > 50.0f) {
-            fMaxAngle = DEG(4.25f); fDist1 = 8.5f; fDist2 = 5.95f;
+            fMaxAngle = DEG(4.25f); fDist1 = 8.5f; fDist2 = 7.0f * 0.85f;
         } else {
             fMaxAngle = DEG(5.0f);  fDist1 = 10.0f; fDist2 = 7.0f;
         }
@@ -629,7 +629,7 @@ void AI_PlanShot(int nPlayer, f32* pTarget) {
     } else {
         gPlayers[nPlayer].nSurface = -1;
     }
-    if (fHeight != -65536.1f) {
+    if (fHeight != TER_NO_GROUND) {
         gPlayers[nPlayer].vTarget[1] = fHeight + 0.001f;
     }
     fDX = gPlayers[nPlayer].vTarget[0] - gPlayers[nPlayer].vBall[0];
@@ -808,7 +808,7 @@ void AI_SetShotModifiers(int nPlayer) {
 // simulated ball stops within 0.05 of the target. 600 frames and it gives up.
 
 #define CADDIE_SLOT       4
-#define CADDIE_TOLERANCE  0.0025f   // 0.05 squared
+#define CADDIE_TOLERANCE  (0.05f * 0.05f)   // 0.05 squared
 #define CADDIE_MAX_FRAMES 599
 
 extern u8  gCaddieDone;             // 0x80281D49
@@ -1170,14 +1170,15 @@ f32 Shot_AimAngle(int nPlayer) {
 // The trajectory the shot shape asks for: 3 and 4 are the two alternatives, anything else normal.
 int Shot_Trajectory(int nPlayer) {
     Player* p = &gPlayers[nPlayer];
+    int     nTrajectory;
     if (p->nShotShape == SHAPE_HIGH) {
-        return 2;
-    }
-    if (p->nShotShape == SHAPE_LOW) {
-        return 0;
+        nTrajectory = 2;
+    } else if (p->nShotShape == SHAPE_LOW) {
+        nTrajectory = 0;
     } else {
-        return 1;
+        nTrajectory = 1;
     }
+    return nTrajectory;
 }
 
 // The first launch block: no spin offset.
@@ -1310,7 +1311,7 @@ void AI_TargetsClear(void) {
 void AI_TargetsLoad(u8* pChunk) {
     int          i, k;
     AITargetDef* pDef;
-    s8*          pReq;
+    u8*          pReq;
 
     gNumAITargets = 0;
     // port: the course's AI targets are big-endian and read in place: AITargetDef is laid over the
@@ -1327,9 +1328,8 @@ void AI_TargetsLoad(u8* pChunk) {
         }
         gNumAITargets++;
     }
-    pReq = (s8*)pDef;
+    pReq = (u8*)pDef;
     for (i = 0; i < BES16(pChunk + 2); i++, pReq += 8) {
-        gAITargets[i].bEnabled  = 1;
         gAITargets[i].nTeeSet   = pReq[0];
         gAITargets[i].nPinSet   = pReq[1];
         gAITargets[i].nSkillReq = pReq[2];
@@ -1337,6 +1337,7 @@ void AI_TargetsLoad(u8* pChunk) {
         gAITargets[i].bPriority = pReq[4];
         gAITargets[i].nType     = pReq[5];
         gAITargets[i].nPowerReq = pReq[6];
+        gAITargets[i].bEnabled  = 1;
     }
     gAITargetsLoaded = 1;
 }
@@ -1401,25 +1402,22 @@ u8 AI_GreenTowardPin(int nPlayer, f32 fDist) {
     u8          bGreen  = 0;
     int         nPinSet = Game_CurrentPinSet();
     CourseInfo* pCourse = fn_8000C594();
-    Player*     p       = &gPlayers[nPlayer];
-    f32*        pBall   = p->ball.vPos;
-    f32*        pBallZ  = &p->ball.vPos[2];
     f32         vDir[4];
     f32         fHeight;
     SurfaceType* pSurface;
 
+    vDir[0] = pCourse->pin[nPinSet].x - gPlayers[nPlayer].ball.vPos[0];
     vDir[1] = 0.0f;
-    vDir[0] = pCourse->pin[nPinSet].x - *pBall;
+    vDir[2] = pCourse->pin[nPinSet].z - gPlayers[nPlayer].ball.vPos[2];
     vDir[3] = 0.0f;
-    vDir[2] = pCourse->pin[nPinSet].z - *pBallZ;
     if (0.0f == vDir[0] && 0.0f == vDir[2]) {
         return 1;
     }
     Vec_Normalize(vDir, vDir);
-    vDir[0] = *pBall + vDir[0] * fDist;
-    vDir[2] = *pBallZ + vDir[2] * fDist;
+    vDir[0] = gPlayers[nPlayer].ball.vPos[0] + vDir[0] * fDist;
+    vDir[2] = gPlayers[nPlayer].ball.vPos[2] + vDir[2] * fDist;
     fHeight = fn_8004D5C0(pCourse, vDir);
-    if (fHeight != -65536.1f) {
+    if (fHeight != TER_NO_GROUND) {
         vDir[1]  = 10.0f + fHeight;
         pSurface = fn_800CC190(pCourse, vDir);
         if (pSurface->nClass == 3) {
@@ -1656,7 +1654,7 @@ void Luck_TakePerfectShot(int nPlayer) {
         while (fDiff > PI) {
             fDiff -= 2 * PI;
         }
-        if (fabs(fDiff) > 0.0872665) {
+        if (fabs(fDiff) > DEG(5.0f)) {
             gPlayers[nPlayer].bPerfect = 0;
             return;
         }
@@ -1689,7 +1687,7 @@ void  fn_80095504(int n);
 // In split screen, bRightSide picks the half; otherwise view 0, plus view 2 in game type 4.
 void Player_SetGolfer(int nPlayer, int nGolfer, int nController, u32 uBag, int bRightSide) {
     Player* p = &gPlayers[nPlayer];
-    int     i;
+    s32     i;
 
     p->nIndex = nPlayer;
     Mem_cpy(&p->golfer, &gGolferTable[nGolfer], sizeof(GolferRecord));
@@ -1822,7 +1820,7 @@ void fn_8002E25C(void) {
 
 // ---- the session and its options ---------------------------------------------------------------
 
-extern char gszEmpty[];             // 0x802810B8
+extern char gszEmpty[8];            // 0x802810B8  "" (small data)
 extern char lbl_80187650[];         // "cl_bbsd" ... the default name at +0x1A
 
 void fn_800CB700(char* pDst, char* pSrc);       // string copy
@@ -1894,7 +1892,7 @@ void Session_Init(void) {
     pSession->b12         = 0;
     pSession->bReplay     = 0;
     pSession->nPaused   = 0;
-    pSession->uFlags     &= ~0x60;
+    pSession->uFlags     &= ~0x40;
     pSession->fFrameTime  = 0.0f;
     pSession->f1C         = 0.0f;
     pSession->n20         = 0;
