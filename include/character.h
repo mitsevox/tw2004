@@ -50,7 +50,8 @@ typedef struct CharModel {
                                 //        position
     u8        unkC[0x38 - 0xC];
     Skeleton* pSkel;            // 0x038
-    u8        unk3C[0xEE - 0x3C];   // 0x03C  bone indices (fn_8001EED8), ...
+    u8        aBone[0x59];      // 0x03C  each bone id's index (fn_8001EED8)
+    u8        aBone2[0x59];     // 0x095  the index fn_8001EEE4 gives while bEE is set, by bone index
     u8        bEE;              // 0x0EE  fn_8001EDF4
     u8        unkEF[0x140 - 0xEF];
     f32       a140[128][3];     // 0x140  per bone, a factor for each axis: reset to 1 by fn_80028A3C,
@@ -125,7 +126,7 @@ typedef struct ClipBlend {
 // Anim_SetTime and fn_8007326C take the address of its animation player at 0x164, whose fields
 // from 0x168 on are named here directly.
 typedef struct Character {
-    u8    unk0[4];
+    s32   nIndex;               // 0x000  its entry in lbl_801B9624 (fn_8001C21C)
     s32   nPlayer;              // 0x004  the player it belongs to (Player_SetGolfer); 1000 for the
                                 //        characters fn_8001D324 finds by id
     s32   nId;                  // 0x008  (fn_8001D324)
@@ -429,6 +430,7 @@ extern f32         lbl_80281D1C;
 void* AnimLib_Pick(int nPlayer, AnimLib* pLib, int nGroup, int nStyle, int nClub, int nKey, u32* pFlags,
                    const char* pName);
 void* Char_SetClip(Character* pChar, int nGroup, int nStyle, const char* pName);
+s32   AnimLib_MergeOverlay(u8* pData, int nSlot);   // skalib.c; char.c's 'SAC ' handler
 
 // Swing.c
 f32   fn_8005CB78(Character* pChar, u64 uEvent);    // the time of an animation event

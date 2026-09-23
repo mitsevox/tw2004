@@ -25,18 +25,32 @@ void fn_80092198(void);
 void fn_8009220C(void);
 void fn_800A75B4(void);
 void fn_800A7644(int a);
+void fn_800A4FD8(void);
+void fn_80102AC4(void);
 void fn_80103B74(int a);
 int  fn_80103D14(s16 nSlot);            // the asset worn in an equipment slot, or -1 (FE_CrAPDB.c)
 u8   fn_80104020(void* pChoice);        // } a part's choices (FE_CrAPDB.c): whether one may be
 int  fn_801048EC(s16 nPart, int a);     // } picked, how many there are, one of them and its
 void* fn_80104FA8(s16 nPart, int a, int i);   // } asset
 CrAPAsset* fn_80104F68(void* pChoice);  // }
-int  fn_801049C8(int a);                // how many choices part a has (FE_CrAPDB.c)
+int  fn_801049C8(s16 nPart);            // how many b a part has, for fn_800797E0 (FE_CrAPDB.c)
 int  fn_80105494(int nAsset);           // } the two attributes an asset raises (-1: none)
 int  fn_80105504(int nAsset);           // }
 int  fn_801054CC(int nAsset);           // } and the tier it raises each to
 int  fn_8010553C(int nAsset);           // }
+void fn_80103B8C(s8 b);                 // } FE_CrAPDB.c: set b; an asset's b (2: either),
+s8   fn_80103BC0(int nAsset);           // } its kind, fn_80107444's count, and its part and
+s16  fn_8010742C(int nAsset);           // } choice
+int  fn_80107444(int nAsset);           // }
+void fn_80105FF8(int nAsset, s16* pKind, s32* pPart, s32* pChoice);    // }
+s32  fn_80105C00(void);                 // FE_CrAPDB.c: how many assets there are
 u8   fn_80105C30(void);                 // the Create-A-Player database is loaded (FE_CrAPDB.c)
+
+void fn_8011E020(s32* pMonth, s32* pDay, s32* pYear, s32* pHour, s32* pMinute, s32* pSecond, s32* pMsec);
+u32  fn_8000B244(void);                 // a random seed from the clock
+void fn_80076EEC(void);                 // frees lbl_80281EC8
+void fn_80076F20(void);
+u8   fn_80079E44(int nAttr);            // a hidden attribute: ATTR_AGGRESSION, ATTR_IQ, ATTR_SPEED
 
 // This file, in address order.
 void fn_80076F80(UStreamObject* pObject);
@@ -58,12 +72,14 @@ void fn_80077428(void);
 void fn_8007744C(void);
 void Golfer_LoadCreatedFromSave(void);
 void fn_80077780(void);
+void fn_80077808(int nSlot);
 void fn_80077968(int nSlot);
 void fn_800779BC(int a, int b);
 GolferRecord* fn_80077A80(int nGolfer);
 void fn_80077B78(void);
 int  fn_80077BDC(int n);
 void fn_80077C1C(int a, int b);
+u8   fn_80078008(int nAsset, SaveProfile* pProfile);
 int  fn_80078604(int a, int b, int c);
 void fn_80078620(int n, int* pA, int* pB, int* pC);
 void fn_8007873C(SaveProfile* pProfile);
@@ -74,9 +90,10 @@ u8   FE_CrAP_IsCrazyHat(CrAPAsset* pAsset);
 u8   fn_80078D24(CrAPAsset* pAsset);
 void fn_80078E34(SaveProfile* pProfile);
 void fn_80079664(SaveProfile* pProfile);
-void fn_8007975C(SaveProfile* pProfile, int a, int b);
-void fn_800797E0(SaveProfile* pProfile, int a, int nChoice, int b);
+void fn_8007975C(SaveProfile* pProfile, s16 nPart, int nChance);
+int  fn_800797E0(SaveProfile* pProfile, s16 nPart, int b, int nChance);
 void fn_80079974(void);
+void fn_80079AD4(void);
 void fn_80079D30(void);
 void fn_80079DAC(void);
 
@@ -230,6 +247,59 @@ void fn_80077428(void) {
     fn_80079D30();
 }
 
+// Set up the profile being worked on, cleared, and the logo textures' hashes.
+void fn_8007744C(void) {
+    int i;
+    lbl_80281ED4 = fn_80009B34(sizeof(FEProfile), 2, 16, "FE_Manager.c", 1035);
+    fn_80005AE8(lbl_80281ED4, 0, sizeof(FEProfile));
+    lbl_80281ED4->bCopy = 0;
+    lbl_80281ED4->b10640 = 0;
+    lbl_80281ED4->nSlot = 0;
+    lbl_80281ED4->n1 = -1;
+    for (i = 0; i < FE_NUM_801D8890; i++) {
+        lbl_801D8890[i].b0 = 0;
+        lbl_801D8890[i].n4 = 0;
+        lbl_801D8890[i].b1 = 0;
+    }
+    lbl_801D8858.b18 = 0;
+    lbl_801D8858.n30 = 0;
+    lbl_80281ED4->uSquareHash = fn_8000BEE4("__LogoSquare");
+    lbl_80281ED4->uRectHash = fn_8000BEE4("__LogoRect");
+    lbl_80281ED4->b11702 = 0;
+    lbl_80281ED4->b11703 = 0;
+    lbl_80281ED4->n11704 = 0;
+}
+
+// Every player on a created golfer gets its slot's saved record in the golfer table, but keeps
+// the table's hidden attributes (fn_80079E44). Then the front end's data is freed.
+void Golfer_LoadCreatedFromSave(void) {
+    int i;
+    int j;
+    int nGolfer;
+    s8 aAttr[NUM_ATTRS];
+    s8 aAttrAlt[NUM_ATTRS];
+    for (i = 0; i < gSession.nNumPlayers; i++) {
+        nGolfer = gSession.nGolfer[i];
+        if (nGolfer >= FIRST_CREATED_GOLFER) {
+            gSession.nGolfer[i] = nGolfer;      // the original stores it back unchanged
+            for (j = 0; j < NUM_ATTRS; j++) {
+                aAttr[j] = gGolferTable[nGolfer].attr[j];
+                aAttrAlt[j] = gGolferTable[nGolfer].attrAlt[j];
+            }
+            Mem_cpy(&gGolferTable[gSession.nGolfer[i]], &gpSaveData[i].createdGolfer, sizeof(GolferRecord));
+            for (j = 0; j < NUM_ATTRS; j++) {
+                if (fn_80079E44(j)) {
+                    gGolferTable[gSession.nGolfer[i]].attr[j] = aAttr[j];
+                    gGolferTable[gSession.nGolfer[i]].attrAlt[j] = aAttrAlt[j];
+                }
+            }
+        }
+    }
+    fn_80076EEC();
+    fn_80076F20();
+    fn_80009E70(lbl_80281ED4);
+}
+
 // Back up every slot's profile, where one is loaded.
 void fn_80077780(void) {
     int i;
@@ -237,6 +307,34 @@ void fn_80077780(void) {
         if (gpSaveData[i].bActive) {
             Mem_cpy(&lbl_801D7148.p658[i], &gpSaveData[i], sizeof(SaveProfile));
         }
+    }
+}
+
+// Back up one slot's profile. A slot without a backup row takes its own row, first swapping in
+// the backup that sits in the first free row.
+void fn_80077808(int nSlot) {
+    int nFree = -1;
+    int i;
+    if (lbl_801D7148.aBackup[nSlot] == -1) {
+        for (i = 0; i < 4; i++) {
+            if (!lbl_801D7148.p658[i].bActive) {
+                nFree = i;
+                break;
+            }
+        }
+        if (nFree == -1) {
+            Mem_cpy(&lbl_801D7148.p658[nSlot], &gpSaveData[nSlot], sizeof(SaveProfile));
+            lbl_801D7148.aBackup[nSlot] = nSlot;
+        } else if (nSlot == nFree) {
+            Mem_cpy(&lbl_801D7148.p658[nSlot], &gpSaveData[nSlot], sizeof(SaveProfile));
+            lbl_801D7148.aBackup[nSlot] = nSlot;
+        } else {
+            fn_800779BC(nFree, nSlot);
+            Mem_cpy(&lbl_801D7148.p658[nSlot], &gpSaveData[nSlot], sizeof(SaveProfile));
+            lbl_801D7148.aBackup[nSlot] = nSlot;
+        }
+    } else {
+        Mem_cpy(&lbl_801D7148.p658[lbl_801D7148.aBackup[nSlot]], &gpSaveData[nSlot], sizeof(SaveProfile));
     }
 }
 
@@ -308,6 +406,100 @@ int fn_80077BDC(int n) {
     }
 }
 
+// For b and category a (-1, -2 or -3), seeded by today's date: one of the category's asset kinds
+// at random, then up to five different random assets of that kind that fit b (fn_80103BC0 gives
+// b or 2) and pass fn_80078008. Then the random stream is seeded from the clock again.
+void fn_80077C1C(int a, int b) {
+    int aFound[3000];
+    int aKinds[88];         // fake match: 4 are used; 88 gives the original's stack frame
+    s32 nMonth;
+    s32 nDay;
+    s32 nYear;
+    s32 nHour;
+    s32 nMinute;
+    s32 nSecond;
+    s32 nMsec;
+    s32 nPart;
+    s32 nChoice;
+    s16 nKind;
+    int j;
+    SaveProfile* pProfile;
+    int nCount;
+    int nCategory;
+    int nSeed;
+    int i;
+    int nFound;
+    int nKinds;
+    s8 nB;                  // b as fn_80103B8C and fn_80103BC0 take it
+    pProfile = fn_80077ACC();
+    nFound = 0;
+    nCount = fn_80105C00();
+    nKind = 0;
+    nPart = 0;
+    nChoice = 0;
+    nCategory = fn_80077BDC(a);
+    switch (a) {
+    case -1:
+        aKinds[0] = 0;
+        aKinds[1] = 1;
+        aKinds[2] = 2;
+        aKinds[3] = 7;
+        nKinds = 4;
+        break;
+    case -2:
+        aKinds[0] = 8;
+        aKinds[1] = 19;
+        aKinds[2] = 20;
+        nKinds = 3;
+        break;
+    case -3:
+        aKinds[0] = 12;
+        nKinds = 1;
+        break;
+    default:
+        return;
+    }
+    fn_8011E020(&nMonth, &nDay, &nYear, &nHour, &nMinute, &nSecond, &nMsec);
+    nSeed = fn_80078604(nMonth, nDay, nYear);
+    for (j = 0; j < 5; j++) {
+        lbl_80281ED4->aPart[b][nCategory][j] = -1;
+        lbl_80281ED4->aChoice[b][nCategory][j] = -1;
+    }
+    lbl_80281ED4->nDateSeed = nSeed;
+    if (lbl_80281ED4->nDateSeed == 0) {
+        lbl_80281ED4->nDateSeed = 3081979;          // 8/3/1979, packed as fn_80078604 does
+    }
+    fn_8000B1D4(0, lbl_80281ED4->nDateSeed);
+    lbl_80281ED4->aKind[b][nCategory] = aKinds[Rand_Next(0) % nKinds];
+    nB = b;
+    for (i = 0; i < nCount; i++) {
+        fn_80103B8C(fn_80103BC0(i));
+        nKind = fn_8010742C(i);
+        if (nKind == lbl_80281ED4->aKind[b][nCategory] &&
+            (fn_80103BC0(i) == nB || fn_80103BC0(i) == 2) &&
+            !fn_80078008(i, pProfile) && fn_80107444(i) > 0) {
+            aFound[nFound] = i;
+            nFound++;
+        }
+    }
+    fn_80103B8C(nB);
+    for (j = 0; j < 5; j++) {
+        if (j >= nFound) break;
+    retry:
+        fn_80105FF8(aFound[Rand_Next(0) % nFound], &nKind, &nPart, &nChoice);
+        lbl_80281ED4->aPart[b][nCategory][j] = nPart;
+        lbl_80281ED4->aChoice[b][nCategory][j] = nChoice;
+        for (i = 0; i < j; i++) {
+            if (lbl_80281ED4->aPart[b][nCategory][j] == lbl_80281ED4->aPart[b][nCategory][i] &&
+                lbl_80281ED4->aChoice[b][nCategory][j] == lbl_80281ED4->aChoice[b][nCategory][i]) {
+                goto retry;                         // fake match: a do-while scores 98.3
+            }
+        }
+    }
+    gSession.nSeed = fn_8000B244();
+    fn_8000B1D4(0, gSession.nSeed);
+}
+
 // Pack three numbers into one, b * 1000000 + a * 10000 + c; fn_80078620 unpacks it.
 int fn_80078604(int a, int b, int c) {
     int n = c;
@@ -356,6 +548,57 @@ void fn_8007873C(SaveProfile* pProfile) {
             }
         }
     }
+}
+
+// Only part 10 (the face) has undesirable choices: scars, tattoos, acne, old age and make-up.
+u8 FE_CrAP_IsAssetUndesirable(s16 nPart, CrAPAsset* pAsset) {
+    switch (nPart) {
+    case 10:
+        if (fn_8015F844(pAsset->szName, "Cheek Scar & Tat") == 0) {
+            return 1;
+        }
+        if (fn_8015F844(pAsset->szName, "Facial Tattoo") == 0) {
+            return 1;
+        }
+        if (fn_8015F844(pAsset->szName, "Acne") == 0) {
+            return 1;
+        }
+        if (fn_8015F844(pAsset->szName, "Weathered") == 0) {
+            return 1;
+        }
+        if (fn_8015F844(pAsset->szName, "Old") == 0) {
+            return 1;
+        }
+        if (fn_8015F844(pAsset->szName, "Gold Makeup") == 0) {
+            return 1;
+        }
+        if (fn_8015F844(pAsset->szName, "Beauty 4") == 0) {
+            return 1;
+        }
+        if (fn_8015F844(pAsset->szName, "Punk") == 0) {
+            return 1;
+        }
+        if (fn_8015F844(pAsset->szName, "Punk Makeup") == 0) {
+            return 1;
+        }
+        if (fn_8015F844(pAsset->szName, "Alt Punk") == 0) {
+            return 1;
+        }
+        if (fn_8015F844(pAsset->szName, "Alt Punk Makeup") == 0) {
+            return 1;
+        }
+        if (fn_8015F844(pAsset->szName, "Pink Makeup") == 0) {
+            return 1;
+        }
+        if (fn_8015F844(pAsset->szName, "Old Makeup") == 0) {
+            return 1;
+        }
+        if (fn_8015F844(pAsset->szName, "Old") == 0) {      // EA's list tests "Old" twice
+            return 1;
+        }
+        break;
+    }
+    return 0;
 }
 
 // Put a random choice on part nPart: an undesirable one (see FE_CrAP_IsAssetUndesirable) with a
@@ -471,16 +714,60 @@ void fn_80079664(SaveProfile* pProfile) {
     fn_80078E34(pProfile);
 }
 
-// Part a at a random one of its choices.
-void fn_8007975C(SaveProfile* pProfile, int a, int b) {
-    int nCount = fn_801049C8(a);
+// Part nPart at a random b (fn_801049C8 counts them), then at a random choice (fn_800797E0).
+void fn_8007975C(SaveProfile* pProfile, s16 nPart, int nChance) {
+    int nCount = fn_801049C8(nPart);
     int nPick;
     if (nCount > 0) {
         nPick = Rand_Next(0) % nCount;
     } else {
         nPick = 0;
     }
-    fn_800797E0(pProfile, a, nPick, b);
+    fn_800797E0(pProfile, nPart, nPick, nChance);
+}
+
+// Part nPart, b at a random choice, which is returned; with a chance of nChance percent, its first
+// choice instead. Outside the session's 0x4000 mode (which also skips the intro movie) only
+// choices fn_80104020 allows are drawn. -1: nothing was picked.
+int fn_800797E0(SaveProfile* pProfile, s16 nPart, int b, int nChance) {
+    int aChoices[250];
+    int nFound = 0;
+    int nCount;
+    int i;
+    int nPick;
+    fn_80105C00();
+    if ((int)(Rand_Next(0) % 100) + 1 <= nChance) {
+        if (gSession.uFlags & 0x4000) {
+            FE_CrAP_TurnOnPart(nPart, b, 0);
+            return 0;
+        }
+        return -1;
+    }
+    if (gSession.uFlags & 0x4000) {
+        nCount = fn_801048EC(nPart, b);
+        if (nCount != 0) {
+            nPick = Rand_Next(0) % nCount;
+            FE_CrAP_TurnOnPart(nPart, b, nPick);
+            return nPick;
+        }
+    } else {
+        nCount = fn_801048EC(nPart, b);
+        for (i = 0; i < nCount; i++) {
+            if (fn_80104020(fn_80104FA8(nPart, b, i))) {
+                aChoices[nFound] = i;
+                nFound++;
+            }
+            if (nFound == 250) break;
+        }
+        if (nFound == 0) {
+            FE_CrAP_TurnOnPart(nPart, b, 0);
+            return 0;
+        }
+        nPick = Rand_Next(0) % nFound;
+        FE_CrAP_TurnOnPart(nPart, b, aChoices[nPick]);
+        return aChoices[nPick];
+    }
+    return -1;
 }
 
 // With a working copy of the profile: a random part 9, and a fixed set of parts turned on.
@@ -509,6 +796,62 @@ void fn_80079974(void) {
         FE_CrAP_TurnOnPart(0xD, 2, 0);
         fn_80103B74(1);
     }
+}
+
+// Set up the session for the menus. In game modes 5 and 11 player 1 plays the created golfer when
+// slot 1 holds a profile, else golfer 0. Each player slot is a CPU player, a loaded profile (a
+// created golfer brings its own bag) or a table golfer with its bag; slots past the players have
+// no profile. Then the mode the menus start in.
+void fn_80079AD4(void) {
+    int i;
+    if (Game_GetMode() == 5 || Game_GetMode() == 11) {
+        if (gpSaveData[0].bActive) {
+            lbl_801D7148.aBackup[0] = 0;
+            if (!lbl_80281ED4->b11703) {
+                Session_SetGolfer(FIRST_CREATED_GOLFER, 0);
+            }
+        } else {
+            Session_SetGolfer(0, 0);
+        }
+    }
+    for (i = 0; i < 5; i++) {
+        if (lbl_801D7148.aCPU[i]) {
+            gSession.nController[i] = CONTROLLER_CPU;
+            gSession.uBag[i] = 0;
+            gpSaveData[i].bActive = 0;
+        } else if (lbl_801D7148.aLoaded[i]) {
+            gpSaveData[i].bActive = 1;
+            if (gSession.nGolfer[i] >= FIRST_CREATED_GOLFER) {
+                gSession.uBag[i] = gpSaveData[i].createdGolfer.uBagMask;
+            }
+        } else if (gSession.nController[i] == CONTROLLER_CPU) {
+            gpSaveData[i].bActive = 0;
+        } else if (!lbl_801D7148.aLoaded[i]) {
+            gpSaveData[i].bActive = 1;
+            gSession.uBag[i] = gGolferTable[gSession.nGolfer[i]].uBagMask;
+        }
+        if (i > gSession.nNumPlayers - 1) {
+            gpSaveData[i].bActive = 0;
+        }
+    }
+    lbl_801D7148.nMode = Game_GetMode();
+    if (fn_801025F4()) {
+        lbl_801D7148.nMode = 4;
+    }
+    if (fn_800EE470()) {
+        lbl_801D7148.nMode = 23;
+    }
+    if (lbl_80281ED4->b0 && Game_GetMode() == 10) {
+        lbl_801D7148.nMode = 27;
+    }
+    if (lbl_801D7148.nMode == 11 && gpSaveData[lbl_80281ED4->nSlot].nTourCardLevel > 0) {
+        lbl_801D7148.nMode = 28;
+    }
+    lbl_801D7148.b11 = 0;
+    lbl_801D87C0.b0 = 1;
+    gSession.a8[0] = 0;
+    fn_800A4FD8();
+    fn_80102AC4();
 }
 
 // ---- the profile backups in ARAM ---------------------------------------------------------------

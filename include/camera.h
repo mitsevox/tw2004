@@ -65,17 +65,27 @@ typedef struct CamShot {
 } CamShot;
 LAYOUT_ASSERT(CamShot, 0xC0);
 
-// A camera sequence (DynamicCam's): the shots a camera plan steps through.
+// A camera sequence (DynamicCam's, 0x50 bytes): the shots a camera plan steps through, and the
+// conditions it is picked on. Its shot choices (CamChoice) are in dyncam.h.
 typedef struct CamSequence {
-    u8   unk0[0x20];
-    struct CamSequence* p20;    // 0x20  the sequence that follows
-    u8   unk24[0x38 - 0x24];
+    char szName[0x20];          // 0x00  "DEF..." for a default sequence (fn_8003CAFC)
+    struct CamSequence* p20;   // 0x20  the sequence that follows (an index in the file)
+    f32  f24;                   // 0x24  fn_8003D0BC: picked for values from this ...
+    f32  f28;                   // 0x28  ... to this
+    f32  f2C;                   // 0x2C  fn_8003CD6C: picked for values from this ...
+    f32  f30;                   // 0x30  ... to this
+    u8   unk34[0x38 - 0x34];
     f32  f38;                   // 0x38  its length
-    u8   unk3C[0x44 - 0x3C];
+    s32  nChoices;              // 0x3C  how many shot choices p4C holds
+    u32  uCourses;              // 0x40  one bit per course it is used on
     u8   b44;                   // 0x44  its kind
     u8   unk45;
     u8   b46;                   // 0x46  6: the ball-flight camera keeps one for shot kind 5
+    u8   unk47[0x4B - 0x47];
+    s8   n4B;                   // 0x4B  one bit per value of fn_800D2B08
+    struct CamChoice* p4C;      // 0x4C  its shot choices (dyncam.h)
 } CamSequence;
+LAYOUT_ASSERT(CamSequence, 0x50);
 
 // A view's camera script (0x40 bytes at View + 0x84).
 typedef struct CamScript {
