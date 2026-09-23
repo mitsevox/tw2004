@@ -412,7 +412,7 @@ config.libs = [
         "objects": [
             Object(Matching, "src/ax/AXAlloc.c"),
             Object(Matching, "src/os/OSAlloc.c"),
-            Object(NonMatching, "src/card/CARDWrite.c"),
+            Object(Matching, "src/card/CARDWrite.c"),
         ],
     },
     {

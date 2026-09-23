@@ -13,3 +13,4 @@ Changed for this game:
   `printf.c` is built with GC/2.5 (see configure.py), and so is `runtime/qsort.c` (unchanged).
 - `runtime/extras.c` (new, ours): `stricmp`, the only function of MSL's extras the linker kept.
 - `dolphin/gx/GXMisc.c`: `GXResetWriteGatherPipe` (ours), which Prime's copy lacks.
+- `dolphin/card/CARDRead.c`: `CARDRead` (ours), the synchronous wrapper Prime's copy lacks.

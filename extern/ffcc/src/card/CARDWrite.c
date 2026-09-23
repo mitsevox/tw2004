@@ -3,10 +3,10 @@
 #include "dolphin/card/__card.h"
 
 // prototypes
-void WriteCallback3(s32 chan, s32 result);
-void EraseCallback3(s32 chan, s32 result);
+static void WriteCallback(s32 chan, s32 result);
+static void EraseCallback(s32 chan, s32 result);
 
-void WriteCallback3(s32 chan, s32 result) {
+static void WriteCallback(s32 chan, s32 result) {
     CARDControl* card;
     CARDCallback callback;
     u16* fat;
@@ -38,7 +38,7 @@ void WriteCallback3(s32 chan, s32 result) {
                 result = CARD_RESULT_BROKEN;
                 goto after;
             }
-            result = __CARDEraseSector(chan, card->sectorSize * fileInfo->iBlock, EraseCallback3);
+            result = __CARDEraseSector(chan, card->sectorSize * fileInfo->iBlock, EraseCallback);
 check:;
             if (result < 0) {
                 goto after;
@@ -54,7 +54,7 @@ after:;
     }
 }
 
-void EraseCallback3(s32 chan, s32 result) {
+static void EraseCallback(s32 chan, s32 result) {
     CARDControl* card;
     CARDCallback callback;
     CARDFileInfo* fileInfo;
@@ -63,7 +63,7 @@ void EraseCallback3(s32 chan, s32 result) {
     if (result >= 0) {
         fileInfo = card->fileInfo;
         ASSERTLINE(161, OFFSET(fileInfo->offset, card->sectorSize) == 0);
-        result = __CARDWrite(chan, card->sectorSize * fileInfo->iBlock, card->sectorSize, card->buffer, WriteCallback3);
+        result = __CARDWrite(chan, card->sectorSize * fileInfo->iBlock, card->sectorSize, card->buffer, WriteCallback);
         if (result < 0) {
             goto after;
         }
@@ -99,7 +99,7 @@ s32 CARDWriteAsync(CARDFileInfo* fileInfo, void* buf, s32 length, s32 offset, CA
 
     dir = __CARDGetDirBlock(card);
     ent = &dir[fileInfo->fileNo];
-    result = __CARDAccess(card, ent);
+    result = __CARDIsWritable(card, ent);
     if (result < 0)
         return __CARDPutControlBlock(card, result);
 
@@ -107,7 +107,7 @@ s32 CARDWriteAsync(CARDFileInfo* fileInfo, void* buf, s32 length, s32 offset, CA
     card->apiCallback = callback ? callback : __CARDDefaultApiCallback;
     card->buffer = (void*)buf;
 
-    result = __CARDEraseSector(fileInfo->chan, card->sectorSize * (u32)fileInfo->iBlock, EraseCallback3);
+    result = __CARDEraseSector(fileInfo->chan, card->sectorSize * (u32)fileInfo->iBlock, EraseCallback);
     if (result < 0)
         __CARDPutControlBlock(card, result);
     return result;

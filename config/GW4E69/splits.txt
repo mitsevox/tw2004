@@ -1997,10 +1997,10 @@ dolphin/card/CARDCreate.c:
 	.text       start:0x8017C18C end:0x8017C4DC
 
 dolphin/card/CARDRead.c:
-	.text       start:0x8017C4DC end:0x8017C908
+	.text       start:0x8017C4DC end:0x8017C950
 
 src/card/CARDWrite.c:
-	.text       start:0x8017C908 end:0x8017CC84
+	.text       start:0x8017C950 end:0x8017CC84
 
 dolphin/card/CARDDelete.c:
 	.text       start:0x8017CC84 end:0x8017CF64

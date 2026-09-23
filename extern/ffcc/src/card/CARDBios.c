@@ -611,6 +611,22 @@ s32 CARDFreeBlocks(s32 chan, s32* byteNotUsed, s32* filesNotUsed) {
     return __CARDPutControlBlock(card, CARD_RESULT_READY);
 }
 
+s32 CARDGetEncoding(s32 chan, u16* encode) {
+    CARDControl* card;
+    CARDID* id;
+    s32 result;
+
+    result = __CARDGetControlBlock(chan, &card);
+    if (result < 0) {
+        return result;
+    }
+
+    // the card's character encoding, from its ID block
+    id = card->workArea;
+    *encode = id->encode;
+    return __CARDPutControlBlock(card, CARD_RESULT_READY);
+}
+
 s32 CARDGetSectorSize(s32 chan, u32* size) {
     CARDControl* card;
     s32 result;
