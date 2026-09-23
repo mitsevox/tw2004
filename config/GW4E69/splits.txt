@@ -636,8 +636,8 @@ Ball.c:
 user.c:
 	.text       start:0x800563C4 end:0x80056480
 
-unsorted/sweep_80057ED0.c:
-	.text       start:0x80057ED0 end:0x80057F18
+PasswordManager.c:
+	.text       start:0x80056480 end:0x80057F18
 
 unsorted/sweep_80058208.c:
 	.text       start:0x80058208 end:0x80058278
