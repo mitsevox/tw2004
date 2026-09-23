@@ -1,4 +1,8 @@
-#include "game_types.h"
+// GameMode24.c (our name): game mode 24, events on the calendar ('RTEc'/'RTEs'/'RTEn' stream
+// objects; probably "real-time events"): 118 dated entries, each starting one of 111 challenges
+// (the mode 5 code in GameMode5.c runs them) on its date, by the console's clock.
+
+#include "golfer.h"
 
 extern u8 lbl_8020CF90[];
 void UStream_UnregisterHandler();
@@ -19,6 +23,59 @@ s32 fn_800F0F10(s32 p0);
 s32 fn_800F0F30(s32 p0);
 s32 fn_800F1008(s32 i);
 s32 fn_800F102C(void);
+
+// One calendar event (0x30 bytes).
+typedef struct RTEvent {
+    s32 nName;                  // 0x00  offset into the names block
+    s32 n4;
+    s32 bOff;                   // 0x08  nonzero: not playable
+    s32 nChallenge;             // 0x0C  1-based, in aChallenge
+    s32 nId;                    // 0x10  the event's id (its flag in the save profile)
+    s32 n14;                    // 0x14
+    u8  unk18[4];
+    u16 aDate[10];              // 0x1C  the start date per season (from 2003; 0 = not held)
+} RTEvent;
+#define EVENTS ((RTEvent*)lbl_8020CF90)
+#define EVENT_NAMES (*(char**)(lbl_8020CF90 + 0x4DA0))
+
+void  GM_vCloseModuleONCE(void);
+int   UStream_RegisterHandler();
+u32   fn_8000E81C(void* pObj, void** ppData);
+void* fn_800951A0(u32 nSize, int nAlign, int a);
+void  Mem_cpy(void* pDst, void* pSrc, int nBytes);   // memcpy
+void  fn_80009E70(void* p);                 // free
+void  fn_800E9F14(void);
+s32   fn_800EA084(int nPlayer);
+u8    fn_800EA278(int nPlayer, u8 bCheck);
+u8    fn_800EA548(u8 bCheck);
+u8    fn_800EA758(u8 bCheck);
+void  fn_800EAA40(void);
+void  fn_800E0B38(int nMode);
+void  fn_800EC544(void* pList, s32 n);
+void  fn_800EAE38(s32 i);
+void  fn_800EAF7C(void);
+int   fn_800EC558(void);
+void  fn_800D3548(int nPlayer, int nMoney, s32* p);
+void  fn_800E4364(u32 nQueue, int a, int b, int c);
+void  fn_800D7770(int nPlayer, u8* pFlag);
+u32   Rand_Next(int nStream);
+void  fn_8011E020(s32* pYear, s32* pMonth, s32* pDay, s32* a, s32* b, s32* c, s32* d);
+void  fn_800D2714(u16* pDate, s32* pDay, s32* pMonth, s32* pYear);
+void  fn_800D2678(u16* pDate, s32 nYear, s32 nMonth, s32 nDay);
+char* strcpy(char* pDst, const char* pSrc);
+extern void (*lbl_8028235C)(void);
+extern void (*lbl_80282358)(void);
+extern s32 lbl_80281680;
+extern s32 lbl_80282348;
+extern u8* gpSaveData;
+void  fn_800F05DC(s32 p0);
+void  fn_800F060C(void* pObj);
+void  fn_800F0678(void);
+void  fn_800F0BBC(void);
+u8    fn_800F0820(void);
+u8    fn_800F0CEC(u16 nDate, s32* pId, s32* pRound);
+u8    fn_800F0DB8(s32 nYear, s32 nMonth, s32 nDay, s32* pId, s32* pRound);
+s32   fn_800F0F54(void);
 
 void fn_800F0570(void) {
     UStream_UnregisterHandler(1381254499);
@@ -74,4 +131,348 @@ s32 fn_800F1008(s32 i) {
 
 s32 fn_800F102C(void) {
     return 0;
+}
+
+// Mode 24 starts: match-play callbacks (GameModeMatch) around the event's own start and end.
+void fn_800F0448(void) {
+    gpGame->pfn1C8 = fn_800F0448;
+    gpGame->pfn1CC = fn_800F0678;
+    gpGame->pfn1D0 = fn_800E9F14;
+    gpGame->pfn1D4 = fn_800EA084;
+    gpGame->pfn1D8 = (u8 (*)(int, int))fn_800EA278;
+    gpGame->pfn1DC = (u8 (*)(int))fn_800EA548;
+    gpGame->pfn1E0 = (s32 (*)(void))fn_800EA758;
+    gpGame->pfn1E8 = fn_800EAA40;
+    gpGame->pfn1F4 = fn_800F0BBC;
+    gpGame->n4 = 1;
+    gpGame->nMulligans = 0;
+    gpGame->nC = 1;
+    gpGame->n10 = 1;
+    gpGame->nDC = 0;
+    gSession.nSplitScreen = 0;
+}
+
+void fn_800F0518(void) {
+    UStream_RegisterHandler('RTEc', fn_800F05B0, 'RT\0\0');
+    UStream_RegisterHandler('RTEs', fn_800F05DC, 'RT\0\0');
+    UStream_RegisterHandler('RTEn', fn_800F060C, 'RT\0\0');
+}
+
+// The 'RTEn' object: the names block is copied out.
+void fn_800F060C(void* pObj) {
+    void* pData;
+    u32 nSize = fn_8000E81C(pObj, &pData);
+    if (nSize) {
+        EVENT_NAMES = fn_800951A0(nSize, 0x10, 1);
+        Mem_cpy(EVENT_NAMES, pData, nSize);
+        fn_80009E70(pObj);
+    }
+}
+
+// The mode ends: the challenge's cleanup, and the options it changed come back.
+void fn_800F0678(void) {
+    if (lbl_8028235C) {
+        lbl_8028235C();
+    }
+    gpGame->nC = 1;
+    gpGame->n10 = 1;
+    SESSION_OPTIONS->unkC = lbl_80281680;
+    SESSION_OPTIONS->nWind = lbl_80282348;
+    lbl_8028234C = 0;
+}
+
+// Starts today's event: the options are saved (wind off), and its challenge runs in mode 5 with
+// this file's start and end wrapped around it.
+void fn_800F06DC(void) {
+    lbl_8028234C = 1;
+    lbl_80281680 = SESSION_OPTIONS->unkC;
+    lbl_80282348 = SESSION_OPTIONS->nWind;
+    SESSION_OPTIONS->unkC = 4;
+    SESSION_OPTIONS->nWind = 0;
+    if (EVENTS[lbl_80282350].bOff == 0) {
+        if (EVENTS[lbl_80282350].nChallenge != 0) {
+            gSession.nNumPlayers = 1;
+            fn_800E0B38(5);
+            fn_800EC544(lbl_8020CF90 + 0x1620, 111);
+            fn_800EAE38(EVENTS[lbl_80282350].nChallenge - 1);
+            fn_800EAF7C();
+            lbl_8028235C = gpGame->pfn1CC;
+            lbl_80282358 = gpGame->pfn1F4;
+            gpGame->pfn1CC = fn_800F0678;
+            gpGame->pfn1F4 = fn_800F0BBC;
+        }
+    }
+}
+
+// The next challenge of the event starts.
+void fn_800F07C8(void) {
+    fn_800EAF7C();
+    lbl_8028235C = gpGame->pfn1CC;
+    lbl_80282358 = gpGame->pfn1F4;
+    gpGame->pfn1CC = fn_800F0678;
+    gpGame->pfn1F4 = fn_800F0BBC;
+}
+
+// Every event done: all 75 flags at +0x20C of profile 0 (EA's loop checks them and forgets the
+// answer).
+u8 fn_800F0820(void) {
+    u8* p = gpSaveData;
+    int i;
+    for (i = 0; i < 75; i++) {
+        if (p[0x20C + i * 4] == 1) {
+        }
+    }
+}
+
+// The message after an event: every event done (0), or one for the event, else one of four at
+// random.
+void fn_800F08A8(void) {
+    u8 bAll = 0;
+    u8 bSaid;
+    if (!fn_800F0820()) {
+        fn_800E4364(10, 0, 0, 0);
+        bAll = 1;
+    }
+    bSaid = 1;
+    switch (lbl_80282350) {
+    case 0x0:
+        fn_800E4364(10, 0xD, 0, 0);
+        break;
+    case 0x2:
+    case 0x6:
+        fn_800E4364(10, 0xE, 0, 0);
+        break;
+    case 0x7:
+        fn_800E4364(10, 0xF, 0, 0);
+        break;
+    case 0x12:
+    case 0xE:
+        fn_800E4364(10, 0x10, 0, 0);
+        break;
+    case 0x16:
+        fn_800E4364(10, 0x11, 0, 0);
+        break;
+    case 0x1F:
+        fn_800E4364(10, 0x12, 0, 0);
+        break;
+    case 0x41:
+        fn_800E4364(10, 0x13, 0, 0);
+        break;
+    case 0x55:
+        fn_800E4364(10, 0x14, 0, 0);
+        break;
+    case 0x5D:
+        fn_800E4364(10, 0x15, 0, 0);
+        break;
+    case 0x6D:
+        fn_800E4364(10, 0x16, 0, 0);
+        break;
+    case 0x6E:
+        fn_800E4364(10, 0x17, 0, 0);
+        break;
+    case 0x6F:
+        fn_800E4364(10, 0x18, 0, 0);
+        break;
+    case 0x56:
+    case 0x17:
+        fn_800E4364(10, 0x19, 0, 0);
+        break;
+    case 0x18:
+    case 0x1E:
+        fn_800E4364(10, 5, 0, 0);
+        break;
+    default:
+        bSaid = 0;
+        break;
+    }
+    if (!bAll && !bSaid) {
+        switch (Rand_Next(0) & 3) {
+        case 0:
+            fn_800E4364(10, 2, 0, 0);
+            return;
+        case 1:
+            fn_800E4364(10, 3, 0, 0);
+            return;
+        case 2:
+            fn_800E4364(10, 4, 0, 0);
+            return;
+        default:
+            fn_800E4364(10, 7, 0, 0);
+            break;
+        }
+    }
+}
+
+// The event is over: with a medal, its reward, the messages, and the event's flag in the profile.
+void fn_800F0BBC(void) {
+    s32 nReward;
+    lbl_80282358();
+    if (fn_800EC558() != 3) {
+        nReward = *(s32*)(lbl_8020CF90 + (EVENTS[lbl_80282350].nChallenge << 7) + 0x1604);
+        fn_800D3548(0, nReward, 0);
+        fn_800E4364(0, 0x6F, nReward, 0);
+        fn_800F08A8();
+        fn_800D7770(0, gpSaveData + EVENTS[lbl_80282350].nId * 4 + 0x20C);
+    }
+}
+
+// Today's date from the clock.
+void fn_800F0C74(s32* pYear, s32* pMonth, s32* pDay) {
+    s32 nYear;
+    s32 nMonth;
+    s32 nDay;
+    s32 a;
+    s32 b;
+    s32 c;
+    s32 d;
+    fn_8011E020(&nYear, &nMonth, &nDay, &a, &b, &c, &d);
+    *pYear = nYear;
+    *pMonth = nMonth;
+    *pDay = nDay;
+}
+
+// The event held on a date (and which of its days).
+u8 fn_800F0CEC(u16 nDate, s32* pId, s32* pRound) {
+    s32 nDay;
+    s32 nMonth;
+    s32 nYear;
+    u8 bFound;
+    s32 i;
+    s32 d;
+    fn_800D2714(&nDate, &nDay, &nMonth, &nYear);
+    bFound = 0;
+    for (i = 0; i < 118; i++) {
+        if (EVENTS[i].aDate[nYear - 2003] != 0) {
+            d = nDate - EVENTS[i].aDate[nYear - 2003];
+            if (d >= 0 && d < fn_800F0E18()) {
+                *pId = i;
+                bFound = 1;
+                *pRound = d + 1;
+                break;
+            }
+        }
+    }
+    if (!bFound) {
+        *pId = -1;
+        *pRound = 0;
+    }
+    return bFound;
+}
+
+u8 fn_800F0DB8(s32 nYear, s32 nMonth, s32 nDay, s32* pId, s32* pRound) {
+    u16 nDate;
+    fn_800D2678(&nDate, nYear, nMonth, nDay);
+    return fn_800F0CEC(nDate, pId, pRound);
+}
+
+// Today's event becomes the current one.
+s32 fn_800F0E3C(void) {
+    s32 nYear;
+    s32 nMonth;
+    s32 nDay;
+    s32 nId;
+    s32 nRound;
+    fn_800F0C74(&nYear, &nMonth, &nDay);
+    if (fn_800F0DB8(nYear, nMonth, nDay, &nId, &nRound)) {
+        fn_800F0E30(nId, nRound);
+        return 1;
+    }
+    return 0;
+}
+
+u8* fn_800F0EB4(u16 nDate) {
+    s32 nId;
+    s32 nRound;
+    if (fn_800F0CEC(nDate, &nId, &nRound)) {
+        return fn_800F0EA0(nId);
+    }
+    return 0;
+}
+
+// This year's season (0..9 from 2003), or 0.
+s32 fn_800F0F54(void) {
+    s32 n;
+    s32 nYear;
+    s32 bOk;
+    fn_8011E020(&n, &n, &nYear, &n, &n, &n, &n);
+    bOk = 0;
+    nYear -= 2003;
+    if (nYear >= 0 && nYear < 10) {
+        bOk = 1;
+    }
+    return bOk ? nYear : 0;
+}
+
+u16 fn_800F0FBC(s32 i) {
+    u8* p = fn_800F0EA0(i);
+    if (!p) {
+        return 0xFFFF;
+    }
+    return ((RTEvent*)p)->aDate[fn_800F0F54()];
+}
+
+// The next event from today (-1 if none this season).
+s32 fn_800F1034(void) {
+    s32 nBest = -1;
+    s32 nYear;
+    s32 nMonth;
+    s32 nDay;
+    u16 nToday;
+    s32 nSeason;
+    s32 nNext;
+    u8 bFound;
+    s32 i;
+    s32 d;
+    fn_800F0C74(&nYear, &nMonth, &nDay);
+    nSeason = nDay - 2003;
+    fn_800D2678(&nToday, nYear, nMonth, nDay);
+    if (nSeason >= 0 && nSeason < 10) {
+        bFound = 0;
+        for (i = 0; i < 118; i++) {
+            if (EVENTS[i].aDate[nSeason] != 0) {
+                d = EVENTS[i].aDate[nSeason] - nToday;
+                if (d >= 0 && (nBest == -1 || d < nBest)) {
+                    nNext = i;
+                    nBest = d;
+                    bFound = 1;
+                }
+            }
+        }
+        if (!bFound) {
+            nNext = -1;
+        }
+    } else {
+        nNext = -1;
+    }
+    return nNext;
+}
+
+// An event's n14, by its id (0 if none).
+s32 fn_800F1154(s32 nId) {
+    s32 i;
+    for (i = 0; i < 118; i++) {
+        if (nId == EVENTS[i].nId) {
+            return EVENTS[i].n14;
+        }
+    }
+    return 0;
+}
+
+// An event's name, by its id.
+void fn_800F11A0(s32 nId, char* pDst) {
+    s32 i;
+    for (i = 0; i < 118; i++) {
+        if (nId == EVENTS[i].nId) {
+            strcpy(pDst, EVENT_NAMES + EVENTS[i].nName);
+        }
+    }
+}
+
+s32 fn_800F120C(s32 i) {
+    return EVENTS[i].nId;
+}
+
+// Whether a profile has done event i.
+u8 fn_800F1224(s32 nProfile, s32 i) {
+    return gpSaveData[nProfile * 0x10600 + 0x20C + EVENTS[i].nId * 4];
 }
