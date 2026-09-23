@@ -1520,17 +1520,8 @@ GameMode11.c:
 GameMode4.c:
 	.text       start:0x80101FEC end:0x80102AC8
 
-unsorted/sweep_80103B4C.c:
-	.text       start:0x80103B4C end:0x80103B8C
-
-unsorted/sweep_80103BB4.c:
-	.text       start:0x80103BB4 end:0x80103BC0
-
-unsorted/sweep_80103D6C.c:
-	.text       start:0x80103D6C end:0x80103DE0
-
 FE_CrAPDB.c:
-	.text       start:0x80103EFC end:0x801069AC
+	.text       start:0x801037F8 end:0x801074D4
 
 unsorted/sweep_801077EC.c:
 	.text       start:0x801077EC end:0x80107828

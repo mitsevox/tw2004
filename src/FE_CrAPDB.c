@@ -17,6 +17,36 @@ void fn_80105EFC(void);
 u8   fn_801061C8(s8 n);
 u8   fn_801061F8(s16 nPart, int nCategory, int nWanted);
 
+// ---- sweep code (not yet cleaned up) ----
+
+int fn_80104F7C(CrAPAsset* pAsset);
+
+CrAPAsset* fn_80103B4C(CrAPAsset* pAsset) {
+    return fn_80104F68(fn_80103B28(fn_80104F7C(pAsset)));
+}
+
+void fn_80103B74(u8 b) {
+    lbl_80282460->b14 = b;
+}
+
+u8 fn_80103B80(void) {
+    return lbl_80282460->b14;
+}
+
+s8 fn_80103BB4(void) {
+    return lbl_80282460->n4;
+}
+
+void fn_80103D6C(void) {
+    SaveProfile* pProfile = fn_80077ACC();
+    Skin* pSkin = lbl_80281EE0->pB4->pChar->pSkin;
+
+    Mem_cpy(pProfile->a5614, pSkin->p10B4, fn_800CCA40(pSkin) * 8);
+    Mem_cpy(pProfile->a5754, pSkin->p10C4, fn_800CCEA0(pSkin) * 8);
+}
+
+// ---- end of sweep code ----
+
 // The asset may be picked: it was not locked when last checked, and its aB1CC bit is set.
 u8 fn_80104020(int nAsset) {
     SaveProfile* pProfile = fn_80077ACC();
