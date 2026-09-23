@@ -443,6 +443,88 @@ void fn_800CABA0(void) {
     }
 }
 
+// With streaming on, reads the current clip of each of a player's marked clip sets (b8) into the
+// buffers of the player's slot: first the clips from the golfer's own stream file, then those from
+// the shared file of the character's animation slot.
+void fn_800CACD4(int nPlayer) {
+    Character* pChar;
+    AnimLib* pLib;
+    ClipRecord* pRecords;
+    int nSlot;
+    int nAnimSlot;
+    u32 uFileSize;
+    int i;
+    int nStyle;
+    int nClub;
+    s32 nCount;
+    u32 uFlags;
+    s32 nFirst;
+    char szPath[256];
+
+    uFlags = 0;
+    if (lbl_80282230->bOn == 0) return;
+    pChar = gPlayers[nPlayer].pChar;
+    nAnimSlot = pChar->nSlot;
+    pRecords = pChar->pRecords;
+    nSlot = lbl_80282230->players[nPlayer].nId;
+    pLib = pChar->pLib;
+    fn_800CB668(0, nAnimSlot, nPlayer, szPath);
+    lbl_80282230->hFile = fn_800060E0(szPath);
+    uFileSize = fn_800065B0(lbl_80282230->hFile);
+    for (i = 0; i < 2; i++) {
+        for (nStyle = 0; nStyle < 8; nStyle++) {
+            for (nClub = 0; nClub < 6; nClub++) {
+                if (lbl_80282230->players[nPlayer].clips[i][nStyle][nClub].nMaxSize > 0 &&
+                    lbl_80282230->players[nPlayer].clips[i][nStyle][nClub].b8 != 0) {
+                    AnimLib_Find(pLib, fn_800C9928(i), nStyle, nClub, 0, &nCount, &uFlags, NULL, &nFirst);
+                    if (nCount > 0) {
+                        nFirst += lbl_80282230->players[nPlayer].clips[i][nStyle][nClub].nNext;
+                        if (!(pRecords[nFirst].n12 & 2)) {
+                            fn_800CB4E0(lbl_80282230->hFile, uFileSize,
+                                        lbl_80282230->bufs[nSlot][i][nStyle][nClub].pData,
+                                        lbl_80282230->bufs[nSlot][i][nStyle][nClub].nSize,
+                                        pRecords[nFirst].n20);
+                            lbl_80282230->bufs[nSlot][i][nStyle][nClub].pData =
+                                fn_80020DD4(lbl_80282230->bufs[nSlot][i][nStyle][nClub].pData, NULL, 16);
+                            lbl_80282230->players[nPlayer].clips[i][nStyle][nClub].b8 = 0;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    fn_8000633C(lbl_80282230->hFile);
+    lbl_80282230->hFile = -1;
+
+    fn_800CB668(1, nAnimSlot, 0, szPath);
+    lbl_80282230->hFile = fn_800060E0(szPath);
+    uFileSize = fn_800065B0(lbl_80282230->hFile);
+    for (i = 0; i < 2; i++) {
+        for (nStyle = 0; nStyle < 8; nStyle++) {
+            for (nClub = 0; nClub < 6; nClub++) {
+                if (lbl_80282230->players[nPlayer].clips[i][nStyle][nClub].nMaxSize > 0 &&
+                    lbl_80282230->players[nPlayer].clips[i][nStyle][nClub].b8 != 0) {
+                    AnimLib_Find(pLib, fn_800C9928(i), nStyle, nClub, 0, &nCount, &uFlags, NULL, &nFirst);
+                    if (nCount > 0) {
+                        nFirst += lbl_80282230->players[nPlayer].clips[i][nStyle][nClub].nNext;
+                        if (pRecords[nFirst].n12 & 2) {
+                            fn_800CB4E0(lbl_80282230->hFile, uFileSize,
+                                        lbl_80282230->bufs[nSlot][i][nStyle][nClub].pData,
+                                        lbl_80282230->bufs[nSlot][i][nStyle][nClub].nSize,
+                                        pRecords[nFirst].n20);
+                            lbl_80282230->bufs[nSlot][i][nStyle][nClub].pData =
+                                fn_80020DD4(lbl_80282230->bufs[nSlot][i][nStyle][nClub].pData, NULL, 16);
+                            lbl_80282230->players[nPlayer].clips[i][nStyle][nClub].b8 = 0;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    fn_8000633C(lbl_80282230->hFile);
+    lbl_80282230->hFile = -1;
+}
+
 // With streaming on, gives the first two players a slot each and reads the current clip of each
 // of their streamed clip sets from their golfer's own stream file (the clips not in the shared
 // files), then from the two shared files.
