@@ -168,7 +168,7 @@ u8 fn_800F1944(u8 bCheck) {
 
 // TW06: GameModeReplay::EndGame.
 void fn_800F194C(void) {
-    gSession.unk11[1] = 1;
+    gSession.b12 = 1;
 }
 
 // fake match: the original's .sdata2 has a 0.0f here (0x80284694, after 100.0f and before 1.0f)

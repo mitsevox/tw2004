@@ -154,11 +154,11 @@ void fn_800FFF34(void) {
     gpGame->n10 = 1;
     gpGame->b276 = 1;
     fn_80055C1C(1);
-    lbl_8028240B = gSession.options.unk0[4];
+    lbl_8028240B = gSession.options.a0[4];
     lbl_8028240A = gSession.options.b84;
     lbl_80282409 = gSession.options.bBoostEnabled;
     lbl_80282408 = gSession.options.bSpinEnabled;
-    gSession.options.unk0[4] = 4;
+    gSession.options.a0[4] = 4;
     gSession.options.b84 = 0;
     gSession.options.bBoostEnabled = 1;
     gSession.options.bSpinEnabled = 1;
@@ -214,7 +214,7 @@ void fn_80100230(void) {
     fn_80055C1C(0);
     // fake match: &gSession re-taken inside the first store after the call, as the original
     // recomputes it
-    (pSession = &gSession)->options.unk0[4] = lbl_8028240B;
+    (pSession = &gSession)->options.a0[4] = lbl_8028240B;
     (pSession)->options.b84 = lbl_8028240A;
     (pSession)->options.bBoostEnabled = lbl_80282409;
     (pSession)->options.bSpinEnabled = lbl_80282408;
@@ -808,7 +808,7 @@ void fn_80100C08(void) {
         lbl_80282428 = 1;
         break;
     case 13:
-        gSession.unk11[1] = 1;
+        gSession.b12 = 1;
         EVENT_Trigger(0, 5, 0, -1);
         break;
     case 17:

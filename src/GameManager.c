@@ -298,7 +298,7 @@ void GM_EndOfGolferTurn_GameFinished(int nPlayer) {
             fn_800D439C(i, 1);
         }
     }
-    if (gSession.unk11[1] == 0 && gSession.unk8[0] == 0) {
+    if (gSession.b12 == 0 && gSession.unk8[0] == 0) {
         if (gpGame->b275) {
             if (!gpGame->b274 || fn_800EC550()) {
                 fn_800E4D94(1);
@@ -311,7 +311,7 @@ void GM_EndOfGolferTurn_GameFinished(int nPlayer) {
         View_SetCamera(fn_80017028(nView), 0x11, nPlayer, nView);
         return;
     }
-    gSession.unk11[1] = 1;
+    gSession.b12 = 1;
 }
 
 // TW06: GM_HoleFinished_GameNotFinished.
@@ -791,7 +791,7 @@ void GM_Update(void) {
         } else if (gpGame->b27E && !fn_800E4BF8()) {
             fn_800E2A88();
         }
-        gpGame->n12C = gSession.unk24;
+        gpGame->n12C = gSession.nFrameCount;
     }
 }
 
@@ -808,7 +808,7 @@ void GM_RestartHole(void) {
         if (gpGame->b27F) {
             GM_FlyByMode_Init();
         }
-        gpGame->n12C = gSession.unk24;
+        gpGame->n12C = gSession.nFrameCount;
         fn_800E3D90();
         fn_800E3B28();
         GameEffects_ResetGameEffectSettings();

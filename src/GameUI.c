@@ -74,7 +74,6 @@ extern char lbl_80281640[8];
 void  fn_80095444(int a);
 void  fn_80125814(int a);
 void  fn_800A7350(int a);
-extern u8 gNumPlayersSetUp;                 // 0x80281D48 (Golfer.c)
 
 void fn_800E3BEC(void) {
     fn_8001437C();
@@ -89,7 +88,7 @@ void fn_800E3C0C(u8 b) {
         fn_80062D6C(1, 1);
     }
     lbl_802822D9 = b;
-    lbl_802822D0 = gSession.unk24;
+    lbl_802822D0 = gSession.nFrameCount;
 }
 
 // The same for split screen's first view.
@@ -101,7 +100,7 @@ void fn_800E3C70(u8 b) {
         fn_80062D6C(1, 2);
     }
     lbl_802822D8 = b;
-    lbl_802822CC = gSession.unk24;
+    lbl_802822CC = gSession.nFrameCount;
 }
 
 // And its second view.
@@ -113,7 +112,7 @@ void fn_800E3CD4(u8 b) {
         fn_80062D6C(1, 3);
     }
     lbl_802822D7 = b;
-    lbl_802822C8 = gSession.unk24;
+    lbl_802822C8 = gSession.nFrameCount;
 }
 
 // Shows or hides a player's HUD.
@@ -212,7 +211,7 @@ void fn_800E3EE0(void) {
         }
         if (lbl_80282282) {
             fn_800A72EC(0, 0);
-            gSession.unk11[1] = 1;
+            gSession.b12 = 1;
             lbl_80282282 = 0;
             fn_800A76E4();
         }
@@ -236,7 +235,7 @@ void fn_800E3EE0(void) {
             }
             fn_800A76E4();
         }
-        if ((s8)SESSION_OPTIONS->unk0[4] == 0) {
+        if ((s8)gSession.options.a0[4] == 0) {
             fn_800A76E4();
         }
     }
