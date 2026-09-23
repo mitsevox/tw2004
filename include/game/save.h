@@ -105,6 +105,7 @@ typedef struct SaveProfile {
     s32  a1057C[4];             // 0x1057C  and kind 1
     u8   unk1058C[0x10600 - 0x1058C];
 } SaveProfile;
+LAYOUT_ASSERT(SaveProfile, 0x10600);
 
 extern SaveProfile* gpSaveData;
 extern SaveProfile* lbl_80281DF4;       // unlocks that hold for every profile (the cheat codes set them)

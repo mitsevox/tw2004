@@ -894,7 +894,7 @@ void fn_800FBB30(Player* p) {
     while (fAngle > PI) {
         fAngle -= TWOPI;
     }
-    fOff = fn_8000AD9C(fAngle);
+    fOff = fabsf(fAngle);
     if (fOff > DEG(1.0f) && fOff < DEG(15.0f)) {
         fOff *= 3.0f;
         fAngle *= 3.0f;
@@ -1741,6 +1741,7 @@ void fn_800FE164(s32 p0, s32 p1) {
 }
 
 // Four floats of pA less pB into pOut.
+#ifdef __MWERKS__
 asm void fn_800FE190(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
@@ -1753,3 +1754,12 @@ asm void fn_800FE190(register f32* pA, register f32* pB, register f32* pOut) {
     psq_st f3, 8(pOut), 0, 0
     blr
 }
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void fn_800FE190(f32* pA, f32* pB, f32* pOut) {
+    pOut[0] = pA[0] - pB[0];
+    pOut[1] = pA[1] - pB[1];
+    pOut[2] = pA[2] - pB[2];
+    pOut[3] = pA[3] - pB[3];
+}
+#endif

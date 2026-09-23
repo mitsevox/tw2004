@@ -43,6 +43,7 @@ typedef struct CamShot {
     u8   bB2;                   // 0xB2
     u8   unkB3[0xC0 - 0xB3];
 } CamShot;
+LAYOUT_ASSERT(CamShot, 0xC0);
 
 // A camera sequence (DynamicCam's): the shots a camera plan steps through.
 typedef struct CamSequence {
@@ -122,6 +123,7 @@ typedef struct View {
     u8       b26A;              // 0x26A
     u8       unk26B;
 } View;
+LAYOUT_ASSERT(View, 0x26C);
 
 // One of the four views on screen (lbl_801B8BA8, 0x288 bytes each; Player.nView[], TW06's
 // viewControllerID, index them): the render camera, the view's camera controller, the player it
@@ -135,6 +137,7 @@ typedef struct ViewController {
                                 //        green, the fringe or holed): no pin collisions
     u8       unk276[0x288 - 0x276];
 } ViewController;
+LAYOUT_ASSERT(ViewController, 0x288);
 
 // The camera tuning values (GoGolfCam.c); only the fields read so far.
 typedef struct CamTuning {

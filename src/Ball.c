@@ -473,9 +473,9 @@ u8 Physics_GetShotData(Ball* pBall, int nClub, int nKind, f32 fPower, f32 fAim, 
     fSlope = fn_800511F0(pBall, fAim, vNormal);
     if (fSlope > 0.0f) {
         if (nKind == 3) {
-            fMax = 40.0f * fn_8000AD9C(fSlope) + (75.0f - 1.8f * gClubStep[nClub]);
+            fMax = 40.0f * fabsf(fSlope) + (75.0f - 1.8f * gClubStep[nClub]);
         } else {
-            fMax = 40.0f * fn_8000AD9C(fSlope) + (125.0f - 1.8f * gClubStep[nClub]);
+            fMax = 40.0f * fabsf(fSlope) + (125.0f - 1.8f * gClubStep[nClub]);
         }
         fMax = 0.017453292f * fMax;
         fSpeed *= (1.0f / fMax) * (fMax - fSlope);
@@ -907,7 +907,7 @@ f32 Physics_HandleCollision(Ball* pBall, f32* pNormal, SurfaceType* pSurface) {
               + (pNormal[2] * fD) * (pNormal[2] * fD);
     fn_8000C5D4(pNormal, pBall->vVel, 1.0f / fSpeed, vBent);
     fn_80055EF8(vBent, vBent);
-    fA = fn_8000AD9C(fD) / pSurface->f24;
+    fA = fabsf(fD) / pSurface->f24;
     if (pSurface->nClass == 3) {
         fA *= 2.0f - gGreenSpeedMul[gGreenSpeedSetting];
     }
@@ -1012,7 +1012,7 @@ f32 Physics_HandleCollision(Ball* pBall, f32* pNormal, SurfaceType* pSurface) {
     fT = vSlip[0] * vSlip[0];
     fS = vSlip[2] * vSlip[2];
     fD = fn_80009680(fT + fS);
-    fGrip = pSurface->f10 * fn_8000AD9C(vSlip[1]) * 0.3f;
+    fGrip = pSurface->f10 * fabsf(vSlip[1]) * 0.3f;
     if (pSurface->nClass == 4 || pSurface->nClass == 3 || pSurface->nClass == 2) {
         fGrip *= gTurfSpeedMul[gTurfSpeed];
     }
@@ -1021,7 +1021,7 @@ f32 Physics_HandleCollision(Ball* pBall, f32* pNormal, SurfaceType* pSurface) {
         if (pSurface->nClass == 3 || pSurface->nClass == 4 || pSurface->nClass == 2) {
             fGrip *= gTurfSpeedMul[gTurfSpeed];
         }
-        fScale = fn_8000AD9C(fGrip * vSlip[1] / fD);
+        fScale = fabsf(fGrip * vSlip[1] / fD);
         vSlip[0] *= fScale;
         vSlip[2] *= fScale;
     }
@@ -1227,9 +1227,9 @@ void Ball_SetLie(Ball* pBall, SurfaceType* pSurface) {
             r = Rand_Next(0);
         }
         if (!pBall->bGotFirstSandPos
-            || fn_8000AD9C(pBall->vPos[0] - pBall->vFirstSandPos[0]) >= 0.16666667f ||
-            fn_8000AD9C(pBall->vPos[1] - pBall->vFirstSandPos[1]) >= 0.16666667f ||
-            fn_8000AD9C(pBall->vPos[2] - pBall->vFirstSandPos[2]) >= 0.16666667f
+            || fabsf(pBall->vPos[0] - pBall->vFirstSandPos[0]) >= 0.16666667f ||
+            fabsf(pBall->vPos[1] - pBall->vFirstSandPos[1]) >= 0.16666667f ||
+            fabsf(pBall->vPos[2] - pBall->vFirstSandPos[2]) >= 0.16666667f
             || pBall->fFirstSandVMag < 5.0f) {
             if ((r & 127) < 16 - uLuck / 16) {
                 r >>= 8;
@@ -1429,7 +1429,7 @@ u8 fn_80053E98(Ball* pBall, void* pv, f32* pHit, f32* pNormal) {
     fn_800B1AB0(pObj, vPole, &fRadius);
     if (fRadius < 0.027777778f || fDist2 >= fRadius * fRadius + 0.444444478f) return 0;
     fDZ = vPole[2] - pBall->vPos[2];
-    if (fn_8000AD9C(fDZ) > 0.222222224f) return 0;
+    if (fabsf(fDZ) > 0.222222224f) return 0;
     pNormal[1] = 0.0f;
     pNormal[0] = 0.0f;
     if (fDZ <= 0.0f) {
@@ -1686,7 +1686,7 @@ void Ball_CupPull(Ball* pBall, f32 fDt) {
         if (Vec_Distance(pBall->vStart, (f32*)pBall) > fStartDist - 0.0416667f) return;
 
         fAngle = fn_8000AD78(pBall->vPos[0] - pBall->vPrev[0], pBall->vPos[2] - pBall->vPrev[2]);
-        fAngle = fn_8000AD9C(fAngle - fn_8000AD78(vPin[0] - pBall->vPos[0], vPin[2] - pBall->vPos[2]));
+        fAngle = fabsf(fAngle - fn_8000AD78(vPin[0] - pBall->vPos[0], vPin[2] - pBall->vPos[2]));
         while (fAngle > 3.14159265f) {
             fAngle -= 3.14159265f;
         }
@@ -1702,14 +1702,14 @@ void Ball_CupPull(Ball* pBall, f32 fDt) {
             fK    = 0.455472f * fDt;
             fPull = fK * (vPin[0] - pBall->vPos[0]);
             if ((pBall->vVel[0] < 0.0f && fPull < 0.0f) || (pBall->vVel[0] > 0.0f && fPull > 0.0f)) {
-                if (fn_8000AD9C(pBall->vVel[0]) > 0.293333f) {
+                if (fabsf(pBall->vVel[0]) > 0.293333f) {
                     fPull = 0.0f;
                 }
             }
             pBall->vVel[0] += fPull;
             fPull = fK * (vPin[2] - pBall->vPos[2]);
             if ((pBall->vVel[2] < 0.0f && fPull < 0.0f) || (pBall->vVel[2] > 0.0f && fPull > 0.0f)) {
-                if (fn_8000AD9C(pBall->vVel[2]) > 0.293333f) {
+                if (fabsf(pBall->vVel[2]) > 0.293333f) {
                     fPull = 0.0f;
                 }
             }
@@ -1760,7 +1760,7 @@ void Ball_GroundContact(Ball* pBall, f32 fTicks) {
     fX   = 0.173615396f * vDown[0];
     fLen = fn_80009680(fZ * fZ + fX * fX);
     if (fLen != 0.0f) {
-        fK = fn_8000AD9C(fZ * vDir[0] + fX * vDir[2]) / fLen;
+        fK = fabsf(fZ * vDir[0] + fX * vDir[2]) / fLen;
         fX *= fK;
         fZ *= fK;
         fLen = pSurface->f1C * (f32)fn_80009680(fZ * fZ + fX * fX);
@@ -1932,7 +1932,7 @@ void Ball_Tick(Ball* pBall, f32 fTicks) {
         pBall->fTimeSinceLastCheck += 0.0166666675f * fTicks;
         if (pBall->fTimeSinceLastCheck > 4.0f) {
             fDist = Vec_Distance(pBall->vStart, pBall->vPos);
-            if (fn_8000AD9C(fDist - pBall->fLastDistFromInitShotPos) < 0.111111112f) {
+            if (fabsf(fDist - pBall->fLastDistFromInitShotPos) < 0.111111112f) {
                 Ball_Stop(pBall);
             } else {
                 pBall->fLastDistFromInitShotPos = fDist;
@@ -2205,6 +2205,7 @@ void fn_80055E28(f32 fAngle, f32* pSin, f32* pCos) {
 }
 
 // b + a into out (three floats)
+#ifdef __MWERKS__
 asm void fn_80055E7C(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
@@ -2217,8 +2218,17 @@ asm void fn_80055E7C(register f32* pA, register f32* pB, register f32* pOut) {
     psq_st f3, 8(pOut), 1, 0
     blr
 }
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void fn_80055E7C(f32* pA, f32* pB, f32* pOut) {
+    pOut[0] = pB[0] + pA[0];
+    pOut[1] = pB[1] + pA[1];
+    pOut[2] = pB[2] + pA[2];
+}
+#endif
 
 // a - b into out (three floats)
+#ifdef __MWERKS__
 asm void fn_80055EA0(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
@@ -2231,8 +2241,17 @@ asm void fn_80055EA0(register f32* pA, register f32* pB, register f32* pOut) {
     psq_st f3, 8(pOut), 1, 0
     blr
 }
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void fn_80055EA0(f32* pA, f32* pB, f32* pOut) {
+    pOut[0] = pA[0] - pB[0];
+    pOut[1] = pA[1] - pB[1];
+    pOut[2] = pA[2] - pB[2];
+}
+#endif
 
 // b scaled by a . b into out (b's fourth float included)
+#ifdef __MWERKS__
 asm void fn_80055EC4(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
     psq_l    f0, 0(pA), 0, 0
@@ -2249,8 +2268,19 @@ asm void fn_80055EC4(register f32* pA, register f32* pB, register f32* pOut) {
     psq_st   f3, 8(pOut), 0, 0
     blr
 }
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void fn_80055EC4(f32* pA, f32* pB, f32* pOut) {
+    f32 fDot = pA[2] * pB[2] + (pA[0] * pB[0] + pA[1] * pB[1]);
+    pOut[0] = pB[0] * fDot;
+    pOut[1] = pB[1] * fDot;
+    pOut[2] = pB[2] * fDot;
+    pOut[3] = pB[3] * fDot;
+}
+#endif
 
 // -a into out (three floats)
+#ifdef __MWERKS__
 asm void fn_80055EF8(register f32* pA, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
@@ -2261,6 +2291,14 @@ asm void fn_80055EF8(register f32* pA, register f32* pOut) {
     psq_st f1, 8(pOut), 1, 0
     blr
 }
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void fn_80055EF8(f32* pA, f32* pOut) {
+    pOut[0] = -pA[0];
+    pOut[1] = -pA[1];
+    pOut[2] = -pA[2];
+}
+#endif
 
 void fn_80055F14(void) {
 }

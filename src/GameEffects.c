@@ -118,7 +118,7 @@ f32 fn_800DAF98(f32 fFrameTime) {
         return 0.0f;
     }
     for (i = 0; i < 5; i++) {
-        d = fn_8000AD9C(i / FRAME_RATE - fFrameTime);
+        d = fabsf(i / FRAME_RATE - fFrameTime);
         if (d < fBest) {
             fBest = d;
         } else if (i > 0) {
@@ -180,7 +180,7 @@ int GameEffects_BallUpdatesThisFrame(int nPlayer) {
 }
 
 // The player's current target (an inline in EA's source; calling fn_800F1D34 directly does not match).
-inline int GE_CurrentTarget(int nPlayer) {
+static inline int GE_CurrentTarget(int nPlayer) {
     return fn_800F1D34(nPlayer);
 }
 

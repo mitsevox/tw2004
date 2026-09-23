@@ -89,6 +89,7 @@ u8 fn_800DCB74(void) {
 }
 
 // out = a - b (three floats); the same helper as Ball.c's fn_80055EA0.
+#ifdef __MWERKS__
 asm void fn_800DCB84(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
@@ -101,6 +102,14 @@ asm void fn_800DCB84(register f32* pA, register f32* pB, register f32* pOut) {
     psq_st f3, 8(pOut), 1, 0
     blr
 }
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void fn_800DCB84(f32* pA, f32* pB, f32* pOut) {
+    pOut[0] = pA[0] - pB[0];
+    pOut[1] = pA[1] - pB[1];
+    pOut[2] = pA[2] - pB[2];
+}
+#endif
 
 void fn_800DCBA8(void) {
     lbl_8028227C = 0;
@@ -655,8 +664,8 @@ int GM_ShowPostShotAnimation(int nPlayer) {
             fHigh = fHighA;
             pSurf = pSurfA;
         } else {
-            fHigh = fn_8000AD9C(fHighB - gPlayers[nPlayer].vBall[1]);
-            if (fn_8000AD9C(fHighA - gPlayers[nPlayer].vBall[1]) < fHigh) {
+            fHigh = fabsf(fHighB - gPlayers[nPlayer].vBall[1]);
+            if (fabsf(fHighA - gPlayers[nPlayer].vBall[1]) < fHigh) {
                 fHigh = fHighA;
                 pSurf = pSurfA;
             } else {
@@ -674,7 +683,7 @@ int GM_ShowPostShotAnimation(int nPlayer) {
             fSlope = 0.0f;
         }
         if (!Ter_PointInOOBNetwork(vPos) || (pSurf != NULL && !(pSurf->u34 & 1)) || pSurf->nClass == 7 ||
-            pSurf->nClass == 16 || (fn_8000AD9C(fSlope) > 0.1f && fRise > 0.2f)) {
+            pSurf->nClass == 16 || (fabsf(fSlope) > 0.1f && fRise > 0.2f)) {
             return 0;
         }
     }

@@ -387,8 +387,10 @@ The fixes that come up most often. Each points to its full entry below.
   Check each prototype against the real definition, then check r3/r4 are set or kept live
   before each `bl`: `fn_80039344(View*, f32)` was really `(int nView, f32)` (Swing
   `STATEFUNC_GreenMorphExit` 94.8% -> 100); `GM_BumpBallForObstructions(void)` really takes
-  `nPlayer` (`STATEFUNC_ShowYardageExit` 88.8% -> 100). `fabsf` is `double fabsf(double)`: an
-  `f32` declaration changes Swing's calls (`Swing_MisHitRumble` 99.5% -> 100 with `double`).
+  `nPlayer` (`STATEFUNC_ShowYardageExit` 88.8% -> 100). The routine at 0x8000AE94 is
+  `double fabs(double)` (it was first taken for `fabsf`): an `f32` declaration changes Swing's
+  calls (`Swing_MisHitRumble` 99.5% -> 100 with `double`). The real `fabsf` is 0x8000AD9C, which
+  calls it and rounds with `frsp`.
 - **[verified] A callee that ignores r3, called while r3 still holds the caller's first
   parameter, takes that parameter.** `Scenario_RequiredShape()` -> `(nPlayer)` (Golfer
   `AI_FaceVector` 99.72% -> 100). Likewise a callee starting `clrlwi. r0, r3, 24` has a `u8`

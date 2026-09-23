@@ -147,7 +147,6 @@ extern Vec4          lbl_80183620;          // 0, 0, 0, 0.5 (assigned)
 
 void  fn_800130F8(int nPad, int n);              // rumble on
 void  fn_8006C2C8(int nPlayer, f32* pX, f32* pY);
-double atan(double x);
 void  Swing_FaceVector(int nPlayer, f32* pOut);
 f32   Swing_MeterError(int nPlayer);
 void  Swing_ShapeVector(int nPlayer, f32* pOut);
@@ -304,7 +303,7 @@ f32 Swing_TeeSweetSpot(int nPlayer, f32 fPower) {
         if (fT > gpSwing->fKnot1X && fT < gpSwing->fKnot2X) {
             f32 fBonus;
             fHalf  = (gpSwing->fKnot2X - gpSwing->fKnot1X) / 2.0f;
-            fBonus = 1.0f - (f32)fabsf(fHalf - (fT - gpSwing->fKnot1X)) / fHalf;
+            fBonus = 1.0f - (f32)fabs(fHalf - (fT - gpSwing->fKnot1X)) / fHalf;
             fBonus *= gpSwing->fTeeBonus;
             return fPower + fBonus;
         }
@@ -384,7 +383,7 @@ void Swing_ApplyForgiveness(int nPlayer) {
         }
     }
     TABLE_PAIR(nRowThresh, nRowScale, nAttr, fThresh, fScale);
-    if (fabsf(fError) < fThresh) {
+    if (fabs(fError) < fThresh) {
         fError *= fScale;
     }
     gPlayers[nPlayer].swing.fMishitAngle = fError;
@@ -414,7 +413,7 @@ void Swing_MisHitRumble(int nPlayer) {
         break;
     }
     fScale = TABLE_AT(ROW_RUMBLE, nAttr);
-    gPlayers[nPlayer].swing.nVibrateCount = (int)(fScale * fabsf(gPlayers[nPlayer].swing.fMishitAngle));
+    gPlayers[nPlayer].swing.nVibrateCount = (int)(fScale * fabs(gPlayers[nPlayer].swing.fMishitAngle));
     if (gPlayers[nPlayer].swing.nVibrateCount > 30) {
         gPlayers[nPlayer].swing.nVibrateCount = 30;
     }
@@ -464,6 +463,7 @@ void ShotObj_Set1634(Character* pObj, f32 f) {
 }
 
 // Paired-single vector add over four floats (the fourth is carried along).
+#ifdef __MWERKS__
 asm void Vec_Add(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
@@ -476,7 +476,17 @@ asm void Vec_Add(register f32* pA, register f32* pB, register f32* pOut) {
     psq_st f3, 8(pOut), 0, 0
     blr
 }
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void Vec_Add(f32* pA, f32* pB, f32* pOut) {
+    pOut[0] = pB[0] + pA[0];
+    pOut[1] = pB[1] + pA[1];
+    pOut[2] = pB[2] + pA[2];
+    pOut[3] = pB[3] + pA[3];
+}
+#endif
 
+#ifdef __MWERKS__
 asm void Vec_Sub(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
@@ -489,6 +499,15 @@ asm void Vec_Sub(register f32* pA, register f32* pB, register f32* pOut) {
     psq_st f3, 8(pOut), 0, 0
     blr
 }
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void Vec_Sub(f32* pA, f32* pB, f32* pOut) {
+    pOut[0] = pA[0] - pB[0];
+    pOut[1] = pA[1] - pB[1];
+    pOut[2] = pA[2] - pB[2];
+    pOut[3] = pA[3] - pB[3];
+}
+#endif
 
 // A 4-vector's squared length, capped.
 f32 fn_8005CC18(f32* pV) {
@@ -538,7 +557,7 @@ f32 Swing_ComputePower(int nPlayer) {
     p      = &gPlayers[nPlayer];
     fPower = p->fPower;
     pPower = &p->fPower;
-    fError = fabsf(p->swing.fMishitAngle);
+    fError = fabs(p->swing.fMishitAngle);
     p->swing.fNonPowerShotPower = Swing_ApplyPowerBoost(nPlayer, fPower) - fError;
     switch (p->nShotKind) {
     case SHOT_TYPE_PUTT_e: {
@@ -751,7 +770,7 @@ f32 Swing_CurveAngle(s32* pClub, f32 fBackAngle) {
     f32 fRange = gpSwing->fCurveMin +
                  ((f32)gClubCurve[*pClub] / 26.0f) * (gpSwing->fCurveMax - gpSwing->fCurveMin);
 
-    fT = (f32)fabsf(fT);
+    fT = (f32)fabs(fT);
     if (fT < gpSwing->fKnot1X) {
         fOut = gpSwing->fKnot1Y * fT / gpSwing->fKnot1X;
     } else {
@@ -1392,7 +1411,7 @@ int Swing_UpdateBackswing(int nPlayer) {
         fRange  = fTop - fStart;
         fTarget = fStart + (fMag / 100.0f) * fRange;
         fDelta  = fTarget - fAnimTime;
-        fRate   = 1.0f + (f32)fabsf(fDelta) / fRange;
+        fRate   = 1.0f + (f32)fabs(fDelta) / fRange;
         fRate   = fRate * fRate - 1.0f;
         if (fRate >= 1.0f) {
             fRate = 1.0f;
@@ -1942,7 +1961,7 @@ void fn_8005AD20(Character* pObj, SwingData* pSw, int nStickX) {
     }
     pSw->f14 = (f32)nStickX / 255.0f - 0.5f;
     fDelta = pSw->f14 - pSw->f10;
-    fRate = fn_8000AD9C(fDelta);
+    fRate = fabsf(fDelta);
     fRate = (fRate < 0.5f) ? 0.5f : ((fRate > 1.0f) ? 1.0f : fRate);
     pSw->f10 = 0.33333334f * (fDelta * fRate) + pSw->f10;
     fAmount = 0.75f * fAmount * pSw->f10;
@@ -2189,6 +2208,7 @@ u8 fn_80062DD4(View* pView) {
 }
 
 // a - b over three floats (paired singles; the third is a single).
+#ifdef __MWERKS__
 asm void fn_80062DDC(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
@@ -2201,6 +2221,14 @@ asm void fn_80062DDC(register f32* pA, register f32* pB, register f32* pOut) {
     psq_st f3, 8(pOut), 1, 0
     blr
 }
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void fn_80062DDC(f32* pA, f32* pB, f32* pOut) {
+    pOut[0] = pA[0] - pB[0];
+    pOut[1] = pA[1] - pB[1];
+    pOut[2] = pA[2] - pB[2];
+}
+#endif
 
 void fn_80062E00(void) {
     fn_800BD894();

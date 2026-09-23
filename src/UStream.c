@@ -14,6 +14,7 @@
 #include "game_types.h"
 #include "engine.h"
 #include "ustream.h"
+#include "endian.h"
 
 // ---- state -------------------------------------------------------------------------------
 // Everything here is private to the file. CodeWarrior lays out a file's static data in the
@@ -170,7 +171,7 @@ static void UStream_ReadDone(int nBytes, int nError) {
             }
         }
         bDropped = 0;
-        if (*(u32*)gpReadBuffer->data == TAG('S', 'W', 'V', 'R')) {
+        if (BE32(gpReadBuffer->data) == TAG('S', 'W', 'V', 'R')) {
             if (pStream->bWaitingForSWVR) {
                 pStream->bEOF = 1;
                 bDropped = 1;
@@ -371,13 +372,11 @@ u8* UStream_Fill(u8* pDst, u32 value, u32 uCount) {
 // The eight-at-a-time blocks read into temporaries first: that is what lets the compiler
 // hoist the loads above the stores.
 u8* UStream_Copy(u8* pDst, const u8* pSrc, u32 uCount) {
-    // port: alignment tests on the addresses; a 64-bit port needs an integer as wide as a pointer
-    if (((u32)pDst & (u32)pSrc) & 1) {
+    if (((uptr)pDst & (uptr)pSrc) & 1) {
         *pDst++ = *pSrc++;
         uCount--;
     }
-    // port: as above
-    if ((((u32)pDst | (u32)pSrc) & 1) == 0) {
+    if ((((uptr)pDst | (uptr)pSrc) & 1) == 0) {
         s16* d = (s16*)pDst;
         const s16* s = (const s16*)pSrc;
         u32 uOdd = uCount & 1;
@@ -501,6 +500,8 @@ static void UStream_ParseChunks(void) {
     while (pBuffer != NULL) {
         while (pBuffer->uPos < USTREAM_BUFFER_SIZE) {
             pChunk = (UStreamChunk*)(pBuffer->data + pBuffer->uPos);
+            // port: the chunk header is big-endian and read through UStreamChunk (and copied into the
+            // object by UStream_BeginObject): a little-endian port converts its 0x40 bytes here
             uTag = pChunk->uTag;
             uLen = pChunk->uLength;
             switch (uTag) {
@@ -535,7 +536,7 @@ static void UStream_ParseChunks(void) {
                     uLen -= 0x40;
                     if (gpCurObject != NULL) {
                         // the piece's unpacked size, then the packed bytes
-                        u32 uUnpacked = *(u32*)(pChunk + 1);
+                        u32 uUnpacked = BE32(pChunk + 1);
                         UStream_Decompress((u32*)(pChunk + 1) + 1, gpCurObject->pData + gCurObjectPos,
                                            uUnpacked);
                         gCurObjectPos += uUnpacked;
@@ -746,7 +747,7 @@ int UStream_Update(void) {
                 }
             }
             fn_8000B4B8(pObject);
-            gRPNSBase = *(u32*)pObject->pData;
+            gRPNSBase = BE32(pObject->pData);
         } else if (pObject->uType == TAG('C', 'c', 't', 'r')) {
             fn_80009E70(pObject);
         } else {

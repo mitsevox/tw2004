@@ -551,7 +551,8 @@ SDK side 58.9% -> 69.5%. Scripts in `C:\dev\scratch\tw\` (outside the repo):
 - **Second round (2026-09-23), from projects the user suggested.** `extern/sonicheroes` (MIT,
   licence text kept in the folder): MSL `strtold.c` (4 KB, `__strtold`) and `strtoul.c`
   (`__strtoull`). `extern/gauntlet` (no licence stated): the `db` debugger-comms library
-  (`odenotstub.c`, 12 functions), two `AXVPB` functions, `fabsf`. Also re-picked flag variants for
+  (`odenotstub.c`, 12 functions), two `AXVPB` functions, and `fabsf` from `MSL/atanf.c` (removed
+  later: the function it matched, at 0x8000AE94, is EA's own `fabs`, in UMemPool.c). Also re-picked flag variants for
   a few files already in (`CARDWrite`, `Pad`, `OSAlloc`, `ansi_fp`). +4 KB, SDK 81.0% -> 82.6%.
   `integrate.py` now keeps a replaced unit's data ranges when the new file has the same name, and
   never renames to another project's own `fn_` placeholder; `rename_fix.py` reverts renames of

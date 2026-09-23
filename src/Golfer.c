@@ -1596,7 +1596,7 @@ void Luck_TakePerfectShot(int nPlayer) {
         fDiff = gPlayers[nPlayer].fAim - gPlayers[CADDIE_SLOT].fAim;
         while (fDiff < -PI) fDiff += 2 * PI;
         while (fDiff > PI) fDiff -= 2 * PI;
-        if (fabsf(fDiff) > 0.0872665) {
+        if (fabs(fDiff) > 0.0872665) {
             gPlayers[nPlayer].bPerfect = 0;
             return;
         }
