@@ -1773,7 +1773,6 @@ config.libs = [
             Object(Matching, "unsorted/sweep_80066D54.c"),
             Object(Matching, "unsorted/sweep_80066FA8.c"),
             Object(Matching, "unsorted/sweep_8006752C.c"),
-            Object(Matching, "unsorted/sweep_8006F144.c"),
             Object(Matching, "unsorted/sweep_8006F5F8.c"),
             Object(Matching, "unsorted/sweep_8006FDCC.c"),
             Object(Matching, "unsorted/sweep_800716D4.c"),

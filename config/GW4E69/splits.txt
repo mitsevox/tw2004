@@ -760,10 +760,7 @@ GoFrameBuf.c:
 	.text       start:0x8006E150 end:0x8006E2A4
 
 GoLighting.c:
-	.text       start:0x8006E2A4 end:0x8006EFB8
-
-unsorted/sweep_8006F144.c:
-	.text       start:0x8006F144 end:0x8006F154
+	.text       start:0x8006E2A4 end:0x8006F154
 
 unsorted/sweep_8006F400.c:
 	.text       start:0x8006F400 end:0x8006F430
