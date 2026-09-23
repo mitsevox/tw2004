@@ -9,22 +9,13 @@
 
 // The prize table (stream 'ERN ', 0x22F0 bytes); multipliers are percentages (100 = x1).
 typedef struct EarningsTable {
-    u8   unk0[0x99C];
+    u8   unk0[0x980];
+    s32  aTeePct[3];            // 0x980  the tee multiplier, as [2 - nTeeSet] (tee set 3 pays as 1)
+    s32  a98C[4];               // 0x98C  the multiplier for the hole's gpGame->holeOrder value 0..3
     s32  aTourPct[6];           // 0x99C  the TOUR card multiplier per level 1..6 (level 0 pays as 1)
     u8   unk9B4[0x22F0 - 0x9B4];
 } EarningsTable;
 extern EarningsTable lbl_80200538;
-
-// How a payout was made up (TW06: CourseMoneyTracking_t, at least 0x48 bytes); only the fields
-// this file writes. game.h still types it as an s32 array, which is what GameMode5.c passes.
-typedef struct CourseMoneyTracking {
-    s32  n0;                    // 0x00  the payout
-    u8   unk4[0x24 - 0x4];
-    s32  n24;                   // 0x24  the payout
-    u8   unk28[0x34 - 0x28];
-    s32  n34;                   // 0x34  what the TOUR card level added
-    u8   unk38[0x48 - 0x38];
-} CourseMoneyTracking;
 
 // A save profile (0x10600 bytes each); only what this file reads.
 typedef struct Profile {
@@ -69,11 +60,11 @@ extern s32 lbl_80282254;
 extern s32 lbl_80191A08[39];
 
 void* memcpy(void* pDst, const void* pSrc, u32 uLen);
-int   fn_800E177C(void);
 
 void  fn_800D344C(UStreamObject* pObject);
 s32   fn_800D477C(int nPlayer, u8* pBall, u8 b);
 void  fn_800D4F14(int nPlayer, u8 b);
+f32   fn_800D6EEC(void);
 s32   fn_800D9954(void);
 
 // Put the working tables back to their saved copies.
@@ -134,10 +125,89 @@ u8 fn_800D4EF8(u32 uMask, int nBit) {
     return (uMask & (1 << nBit)) != 0;
 }
 
+// TW06: GM_Earnings_ComputeBonusModifiers. The points, rounded to $25, earn a bonus on top for the
+// course, the tees played and the hole's gpGame->holeOrder value (each flag switches one on).
+// Each part is rounded to $25 by itself; the total is at least 0.
+s32 fn_800D6A70(s32 nPoints, int nPlayer, u8 bCourse, u8 bTee, u8 bHole, CourseMoneyTracking* pMoney) {
+    f32 fCourseBonus;
+    f32 fTeeBonus;
+    f32 fHoleBonus;
+    f32 fCourse;
+    f32 fTee;
+    f32 fHole;
+    s32 nBase;
+    s32 nTotal;
+
+    if (fn_800E177C() != 0) return 0;
+    fTee = 1.0f;
+    fHole = fTee;
+    fCourse = fn_800D6EEC();
+    switch (gSession.nTeeSet[nPlayer]) {
+    case 0:
+        fTee = (f32)lbl_80200538.aTeePct[2] / 100.0f;
+        break;
+    case 1:
+        fTee = (f32)lbl_80200538.aTeePct[1] / 100.0f;
+        break;
+    case 2:
+        fTee = (f32)lbl_80200538.aTeePct[0] / 100.0f;
+        break;
+    case 3:
+        fTee = 1.0f;
+        break;
+    }
+    switch (gpGame->holeOrder[Game_CurHoleIndex()]) {
+    case 0:
+        fHole = (f32)lbl_80200538.a98C[0] / 100.0f;
+        break;
+    case 1:
+        fHole = (f32)lbl_80200538.a98C[1] / 100.0f;
+        break;
+    case 2:
+        fHole = (f32)lbl_80200538.a98C[2] / 100.0f;
+        break;
+    case 3:
+        fHole = (f32)lbl_80200538.a98C[3] / 100.0f;
+        break;
+    }
+    nBase = fn_800D33A8(nPoints);
+    if (bCourse) {
+        fCourse = (f32)nBase * fCourse - (f32)nBase;
+    } else {
+        fCourse = 0.0f;
+    }
+    if (bTee) {
+        fTee = (f32)nBase * fTee - (f32)nBase;
+    } else {
+        fTee = 0.0f;
+    }
+    if (bHole) {
+        fHole = (f32)nBase * fHole - (f32)nBase;
+    } else {
+        fHole = 0.0f;
+    }
+    fCourseBonus = fn_800D33A8((s32)fCourse);
+    fTeeBonus = fn_800D33A8((s32)fTee);
+    fHoleBonus = fn_800D33A8((s32)fHole);
+    nTotal = (s32)((f32)nBase + (fHoleBonus + (fCourseBonus + fTeeBonus)));
+    if (nTotal < 0) {
+        nTotal = 0;
+    }
+    nTotal = (s32)((12.5f + (f32)nTotal) / 25.0f) * 25;
+    if (pMoney != NULL) {
+        pMoney->n24 = nTotal;
+        pMoney->nBase = nBase;
+        pMoney->n0 = nTotal;
+        pMoney->nCourse = (s32)fCourseBonus;
+        pMoney->n2C = (s32)fHoleBonus;
+        pMoney->nTee = (s32)fTeeBonus;
+    }
+    return nTotal;
+}
+
 // TW06: GM_Earnings_ComputeTOURCardModifiers. The TOUR card level raises the payout; the extra
 // goes in the breakdown. Nothing is paid when fn_800E177C says so.
-int fn_800D7220(int nReward, int nPlayer, s32* pOut) {
-    CourseMoneyTracking* pMoney;
+int fn_800D7220(int nReward, int nPlayer, CourseMoneyTracking* pMoney) {
     f32 fMult;
     s32 nTotal;
 
@@ -168,11 +238,10 @@ int fn_800D7220(int nReward, int nPlayer, s32* pOut) {
     }
     nTotal = (s32)((f32)nReward * fMult);
     nTotal = (s32)((12.5f + (f32)nTotal) / 25.0f) * 25;
-    pMoney = (CourseMoneyTracking*)pOut;
     if (pMoney != NULL) {
         pMoney->n24 = nTotal;
         pMoney->n0 = nTotal;
-        pMoney->n34 = nTotal - nReward;
+        pMoney->nTourCard = nTotal - nReward;
     }
     return nTotal;
 }
