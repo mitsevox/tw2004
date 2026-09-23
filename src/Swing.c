@@ -3734,7 +3734,7 @@ void STATEFUNC_PreShotUpdate(int nPlayer) {
             if (fn_80095780(gPlayers[nPlayer].nShotHandle) == 10) {
                 Physics_DropBall((Ball*)gPlayers[nPlayer].ball, &gPlayers[nPlayer].fBallX);
             } else {
-                fn_80055AA8((Ball*)gPlayers[nPlayer].ball, ((Ball*)gPlayers[nPlayer].ball)->vPrev, nPlayer);
+                fn_80055AA8((Ball*)gPlayers[nPlayer].ball, (f32*)(gPlayers[nPlayer].ball + 0x10), nPlayer);
             }
         }
         GOLFERSTATE_Switch(GS_SHOT_SETUP, nPlayer);
