@@ -256,7 +256,6 @@ void fn_800B9A88(void);
 void fn_800B9AAC(void);
 void fn_800B9B48(void);
 void fn_800BA1A4(void);
-void fn_800BA74C(int n);
 void fn_800BA940(void);
 void fn_800BAA4C(void);
 void fn_800BAA50(int nPlayer);
