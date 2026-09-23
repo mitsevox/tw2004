@@ -68,6 +68,7 @@ void FE_MakeCameoMoviePath(char* pName, char* pPath);   // "data/movies/cameos/<
 void FE_CrAP_TurnOnPart(int a, int b, int c);          // FE_CrAPDB.c
 SaveProfile* fn_80077ACC(void);         // the profile being worked on
 int  fn_80077B08(void);                 // its player slot
+u8   fn_80077B18(int nGolfer);          // a yes/no list over golfers 0..28 (Golfer.c asks it)
 
 // ---- the logo editor (FE_LogoDesign.c) -------------------------------------------------------
 

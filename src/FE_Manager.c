@@ -45,7 +45,6 @@ void fn_8007744C(void);
 void fn_80077780(void);
 void fn_80077968(int nSlot);
 GolferRecord* fn_80077A80(int nGolfer);
-u8   fn_80077B18(int n);
 void fn_80077B78(void);
 int  fn_80077BDC(int n);
 void fn_80077C1C(int a, int b);
@@ -143,8 +142,8 @@ void FE_GetBIOMovieName(void) {
                 fn_800770D4(szName, szPath);
                 fn_80075FB8(szPath, fn_80076FDC, 0, 0);
                 break;
-            case 4:                     // a kind 4 is taken off the queue unplayed
-                break;
+            case 4:                     // fake match: the original never compares with 4; this empty
+                break;                  // case only makes the dispatch test 3 before 1
             }
             fn_8007731C();
             fn_800A7644(0);
