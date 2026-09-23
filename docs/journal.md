@@ -112,7 +112,11 @@ Dated log of what was done and decided, newest last. Facts and lessons belong in
   after early exits is an inner block, and `table[n].x` rather than a pointer produces the
   original's spilled address temps. Also: GC/2.0-2.7 all compile these identically, so it is
   not a compiler-version question (`try_compilers.py`).
-- **Next:** `SwingState01_Update`; then `Ball.c`; optional register polish in `skalib.c`
+- **Three new hypotheses from the user** (`hypotheses.md` 6-8): CPU putt misses come from
+  break, not distance; the power boost's full meter needs a non-linear number of Z presses;
+  the heartbeat comes from a look-ahead sim right after the strike. Leads are written in each entry.
+- **Next:** explore hypotheses 6-8 (in that order is fine; 7 is probably quickest: find the Z
+  press -> boost level code in `Swing.c`). Then `SwingState01_Update`; then `Ball.c`; optional register polish in `skalib.c`
   (`AnimLib_MergeOverlay`, `AnimLib_PlanBank`, `AnimLib_WalkPair`). Scratch tools in `C:\dev\scratch\tw\`:
   `sbs2.py` (normalised diff), `fnsrc.py`, `regress.py` (who lost 100%), `insert_fns.py` (add
   functions at address positions), `unwritten.py`, `find_fn.py` (search asm by regexes),

@@ -220,6 +220,79 @@ with no attribute involved. Full numbers in [`gameplay.md`](gameplay.md).
 
 **Status:** answered.
 
+6. The CPU's putt misses come from break, not distance
+-------------------------------------------------------
+
+**Prediction (2026-09-22):** how likely a CPU golfer is to make a putt has nothing to do with the
+distance to the cup. The break decides it: more break, more misses; distance is not factored in
+at all. Probably not coded that way on purpose. It could fall out of how the AI "pulls back"
+from its perfect rehearsed putt: a breaking putt leaves more room for the error to push the
+ball off line.
+
+**What would settle it:** the CPU putt pipeline end to end. What the error is applied to (the aim
+angle, the strike power, or the target point), whether any term reads the distance or the slope,
+and how that error becomes a miss once the ball rolls over a sloped green. A test harness could
+then measure it: the same error on a flat 10-footer and on a flat 30-footer, then on breaking
+putts of the same length, run through the real rehearsal and ball code.
+
+**Leads already known:** `AI_ApplyError` (in C) does read the distance for putts: no error at all
+under 1.5 units, the angle error halved under 5, above that up to 8 degrees of aim and 20% / 10%
+of distance, scaled by `(100 - PUTTING)`. The shot itself comes from `AI_RehearseShot`, which
+solves for the ball *stopping* within 1.8 in of the pin, and `Ball_CupPull` pulls in any ball
+within 5.5 in of the pin that is heading within 30 degrees of the cup. So the question is how
+those combine on a real green: does the pull swallow the error on straight putts, and does an
+aim or pace error on a breaking putt move the ball's line more than the same error does on a
+straight one?
+
+**Where to look:** `AI_ApplyError` (`Golfer.c`), `AI_RehearseShot`, `Ball_CupPull`, the green slope
+code (`GoGreenGrid.c`, `0x8009B68C`) and the putt part of the ball physics.
+
+**Status:** open.
+
+7. Power boost's full meter needs a non-linear number of Z presses
+-------------------------------------------------------------------
+
+**Prediction (2026-09-22):** a full power boost (the whole ball on the meter filled red) is very
+hard to reach because the number of Z presses needed grows faster than linearly: exponential, or
+some other curve that is not a straight line.
+
+**What would settle it:** the code that turns Z presses into a boost level: whether each press adds
+a fixed amount, adds less as the level rises, decays over time, or needs faster presses at higher
+levels. Also the timing window (is there one?) and how the level shown on the ball maps to the
+level used.
+
+**Leads already known:** `Swing_ApplyPowerBoost` (in C) applies the *result*: levels 1..8 add
+steps 1 2 4 6 9 12 16 20, times 0.005 to 0.011 by the POWER BOOST attribute. So the *effect* of
+the levels already grows faster than linearly. The open part is the *input* side, which turns
+presses into a level.
+
+**Where to look:** `Swing.c` (the swing phases and state machine; search for the Z button mask and
+for writes of the boost level), and the meter drawing code that fills the ball.
+
+**Status:** open.
+
+8. The heartbeat comes from a quick look-ahead simulation after the strike
+-----------------------------------------------------------------------------
+
+**Prediction (2026-09-22):** the heartbeat effect (the tense "this could go in" moment) is decided
+by a separate, sped-up physics simulation run right after the ball is struck. If the simulated
+ball finishes close enough to the pin, the heartbeat starts shortly after the ball takes off.
+
+**What would settle it:** what starts the heartbeat sound or effect, and what that code checks.
+Look for a call into the ball physics on a copy of the ball (like the rehearsal's `gSimBall`)
+made at launch, and a distance-to-pin threshold. The alternative is a check on the *live*
+ball during flight or roll (its predicted landing point, or its distance each frame).
+
+**Leads already known:** the game already has a look-ahead sim, the CPU rehearsal
+(`AI_RehearseShot`, on `gSimBall` with sounds and effects off). Whether the heartbeat reuses it,
+runs another, or just watches the real ball is the question.
+
+**Where to look:** the sound or effect trigger for the heartbeat (find the sample name in the audio
+banks or a string in `main.dol`), then its callers. Also check the swing states after launch
+(`Swing.c`) and `Ball.c`.
+
+**Status:** open.
+
 Facts already established that bear on these
 ---------------------------------------------
 
