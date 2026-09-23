@@ -101,8 +101,8 @@ typedef struct EASBState {
 extern EASBState* lbl_802825B8;
 
 // TibExt.c: the library's memory and clock glue.
-void fn_80122128(void* pAllocator, void* p, u32 uSize, u32 uAlign);
-u32 fn_80122150(void);              // the real-time clock, in seconds since 1970
+void TibExtMemFree(void* pAllocator, void* p, u32 uSize, u32 uAlign);
+u32 TibExtCurrentTimeGet(void);     // the real-time clock, in seconds since 1970
 
 // The code before EASB.c (still sweep code).
 u32 fn_80128468(u32 uA, u32 uB);    // uA + uB, saturating at 0xFFFFFFFF
@@ -113,7 +113,7 @@ EASBErrorE fn_8012C5F8(u32* p0, EASBProduct* pProduct, u8* p2);
 EASBErrorE fn_8012C69C(void);
 EASBErrorE fn_8012C73C(void);
 EASBErrorE fn_8012C774(u8* pBuffer);
-EASBErrorE fn_8012C7BC(u32* p0, EASBProduct* pProduct, s32 arg2);
+EASBErrorE fn_8012C7BC(u32* p0, EASBProduct* pProduct, void* pImage);
 u8 fn_8012C83C(void);
 u8 fn_8012C848(void);
 EASBErrorE fn_8012C888(u32* pOut);
@@ -131,11 +131,12 @@ EASBErrorE fn_8012D694(void);
 EASBErrorE fn_8012D6C8(void);
 EASBErrorE fn_8012D710(void);
 EASBErrorE fn_8012D744(u32* pOut);
-EASBErrorE fn_8012D794(s32 arg0);
+EASBErrorE fn_8012D794(void* pImage);
 EASBErrorE fn_8012D7F0(void);
 EASBErrorE fn_8012D8C4(u32 uCount);
 EASBErrorE fn_8012D93C(u32 uCount);
 EASBErrorE fn_8012D9B4(u16* puLevel);
+EASBErrorE fn_8012DA38(u16* puNextLevel);
 EASBErrorE fn_8012DAB8(u16 uLevel);
 EASBErrorE fn_8012DB30(u16* szName, s32 arg1, s32 nLanguage, u32 uTime);
 EASBErrorE fn_8012DD24(u16* szName, s32 arg1, s32 nLanguage);
@@ -161,6 +162,23 @@ typedef struct EASBioMgr {
     u8 unk11[3];
     s32 eCurrentRewardMessage;      // 0x14
 } EASBioMgr;
+
+// What the front end tells the player after a round (TW06's EASBio_eReward).
+typedef enum EASBio_eReward {
+    EASBio_eReward_None = -1,
+    EASBio_eReward_LeveledUpAndUnlocked = 0,
+    EASBio_eReward_LeveledUp = 1,
+    EASBio_eReward_NewAccomplishment = 2
+} EASBio_eReward;
+
+// Declared in engine.h: EASBio_SetGamePlayState, EASBio_IncrementGamesWon,
+// EASBio_SetCurrentGameWon, EASBio_IsCurrentGameWon.
+u8 EASBio_IsBioLoaded(void);
+void EASBio_SetCurrentRewardMessage(s32 eReward);
+s32 EASBio_GetCurrentRewardMessage(void);
+EASBio_eReward fn_801256B8(void);
+void EASBio_IncrementGamesPlayed(u32 uCount);
+void EASBio_SetAccomplishment(const char* szName, s32 arg1);
 
 extern EASBioMgr* lbl_80281988;
 extern u8 lbl_80282568;

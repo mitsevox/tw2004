@@ -108,7 +108,7 @@ u8 fn_800ED9AC(u8 bCheck) {
 
 // Game over: the end-of-hole screen.
 void fn_800EDA08(void) {
-    fn_80125910(1);
+    EASBio_SetCurrentGameWon(1);
     fn_800E4D94(0);
 }
 

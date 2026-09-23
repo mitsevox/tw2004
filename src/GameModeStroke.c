@@ -219,7 +219,7 @@ void fn_800FFDB8(void) {
                     nProfile = PLAYER(i)->nIndex;
                     if (gpSaveData[nProfile].bActive) {
                         if (bFirst) {
-                            fn_80125854(1);
+                            EASBio_IncrementGamesWon(1);
                             bFirst = 0;
                         }
                         if (nBase) {

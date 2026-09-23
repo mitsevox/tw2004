@@ -7,81 +7,52 @@
 #include "engine.h"
 #include "game/save.h"
 #include "game/modes/pgatour.h"
+#include "game/modes/pgatoursim.h"
 
-Pga80205F30* fn_800EE8B8(void);
-void fn_800EDEE8(void);
+// PGA TOUR driver state; only this file uses it. The uninitialised ones are defined last address
+// first: the compiler lays out a file's .bss and .sbss last definition first.
+s32 lbl_80281670 = 4;           // the options' nC from before the tour (fn_800EE02C puts it back)
+s32 lbl_80281674 = 1;           // the options' n18 from before a tour round (fn_800EE0A0 keeps it)
+
+PgaData gPgaData;
+Pga80205F30 lbl_80205F30;
+TourStats lbl_80205ED8;
+
+s32 lbl_80282340;               // the playoff hole index: set to 16, each playoff moves it on
+                                //   (17, 15, 16, 17, ...; fn_800EF720)
+u8  lbl_8028233C;               // 1 while the tour runs
+s32 lbl_80282338;               // the options' nWind from before the tour (fn_800EE02C puts it back)
+
+// Not in a C unit yet
+s32  fn_8008AC00(void);
+void fn_800907AC(s32 nMoney, char* pDst);               // money as text
+void fn_800D27CC(u16* pDate, s32 nDays);                // moves a date on by nDays
+s32  fn_800D2FB4(s32 nTeeSet);
+u8   fn_800D3080(int nHole);
+
 void fn_800EDF34(UStreamObject* pObject);
 void fn_800EDF60(UStreamObject* pObject);
 void fn_800EDF90(UStreamObject* pObject);
-void fn_800EE064(void);
-s32 fn_800EE8B0(int nPlayer);
-void fn_80119934(int a);
-void fn_800EF294(void);
-s32 fn_800EF834(void);
-s32 fn_800EFB88(void);
-s32 fn_800EFBAC(void);
-char* fn_800EFDFC(s32 i);
-Tournament* fn_800EFA70(s32 i);
-s32 fn_800EFE3C(s32 i);
-char* fn_800EFE60(s32 i);
-void fn_800F009C(void);
-u8 fn_8011908C(s32, s32);
-void fn_800F018C(void);
-
-void fn_800EE0A0(s32 i);
-void fn_80117DE8(s32 a, s32 b);
-s32  fn_801190D8(s32 a, s32 n);
-s32  fn_800EFBD0(s32 i);
-void fn_800D27CC(u16* pDate, s32 nDays);
-void fn_800907AC(s32 nMoney, char* pDst);
-void fn_80117C50(s32 a, s32 b);
-void fn_800EF130(s32 nPlayer, u8 bQuick);
-void fn_800EEB94(s32 a);
-void fn_80117860(TourSeason* pTour);
-s32  fn_8008AC00(void);
-void fn_8011A720(s32 a, s32 nHole);
-void fn_8011A5F8(s32 a);
-u8   fn_800EF720(u8 bCheck);
-s32  fn_8011A684(s32 a);
-u8   fn_8011A6F4(s32 a, s32 b);
-s32  fn_80119A04(s32 a, s32 b);
-u8   fn_801197A4(s32 nPlayer, s32 b);
-u8   fn_80117DE0(void);
-void fn_80117B58(s32 a);
-s32  fn_801191D0(s32 a, s32 b, s32 c);
-void fn_800EEA3C(s32 nPlayer);
-void fn_80117DF0(s32 nPlayer);
-void fn_80117AF8(s32 nPlayer);
-void fn_800EED0C(s32 nPlayer);
-void fn_8011A538(s32 nPlayer);
-void fn_80117D80(s32 nPlayer);
-u8   fn_800EF83C(u16 nDate, s32* pId, s32* pRound);
-s32  fn_8011A7C8(s32 nPlayer, s32 nHole);
-s32  fn_80119588(s32 nPlayer, s32 a);
-s32   fn_80118684(s32 a);
-char* fn_80118E30(s32 a, s32 b);
-s32   fn_80119118(s32 a, s32 b);
-s32   fn_801197CC(s32 a, s32 b);
-void  fn_800EDFC0(UStreamObject* pObject);
-s32  fn_800F02A8(void);
-s32  fn_800EFA9C(s32 i);
+void fn_800EDFC0(UStreamObject* pObject);
 void fn_800EE02C(void);
-u8   fn_800EF64C(u8 bCheck);
-void fn_800EF2B8(void);
+void fn_800EE064(void);
 void fn_800EE478(void);
 u8   fn_800EE5B4(int nPlayer);
 u8   fn_800EE6A0(s32 nPlayer);
 s32  fn_800EE778(int nPlayer);
 s32  fn_800EE810(int nPlayer);
-void fn_800EE8C4(void);
+s32  fn_800EE8B0(int nPlayer);
+void fn_800EEA3C(int nPlayer);
 s32  fn_800EF0E0(s32 nPlayer);
-void fn_80117E98(s32 nPlayer);
-s32  fn_80119A2C(s32 nPlayer, s32 a);
-void fn_801178C8(s32 nPlayer, SeasonEvent* pEvent, s32 nRound, s32 n, s32 k);
-u8   fn_800D3080(int nHole);
-s32  fn_800D2FB4(s32 nTeeSet);
-s32  fn_80119638(s32 a, s32 b, s32 nRound);
-void fn_801198F8(s32 a, s32 nHole);
+void fn_800EF130(s32 nPlayer, u8 bQuick);
+void fn_800EF294(void);
+void fn_800EF2B8(void);
+u8   fn_800EF64C(u8 bCheck);
+u8   fn_800EF720(u8 bCheck);
+Tournament* fn_800EFA70(s32 i);
+s32  fn_800EFA9C(s32 i);
+s32  fn_800EFBD0(s32 i);
+s32  fn_800F02A8(void);
 
 // TW06: GameModeDriverPGATour::Init. Stroke play's hole and honors rules, the tour's own round and
 // playoff handling; no mulligans, one player.
@@ -185,17 +156,18 @@ void fn_800EE064(void) {
 
 // The course of the tournament format i's current round: everyone plays its tee set, every hole its
 // pin position, and its GameOptions.n18 replaces the player's (kept in lbl_80281674).
-// Not exact yet (only gPgaData's and gSession's address loads come out in the other order); the
-// tee set's store back to the tournament is in the original.
+// The tee set is written back to the tournament unchanged; the original has that store.
 void fn_800EE0A0(s32 i) {
     PlayerNumber_t nPlayer = PLR_1_e;
     TourEvent* pEvent = &gPgaData.aTourEvent[i];
-    int k;
+    PlayerNumber_t k;
     int h;
+    s32 nTee;
+    nTee = pEvent->nTeeSet;
     for (k = 0; k < 5; k++) {
-        gSession.nTeeSet[k] = pEvent->nTeeSet;
+        gSession.nTeeSet[k] = nTee;
     }
-    pEvent->nTeeSet = gSession.nTeeSet[4];
+    pEvent->nTeeSet = nTee;
     fn_800E14E0(gPgaData.aTourEvent[i].aRound[gpGame->nDC].nCourse);
     gSession.nPinSet = gPgaData.aTourEvent[i].aRound[gpSaveData[nPlayer].tour.nRound].nPinSet - 1;
     for (h = 0; h < 18; h++) {
@@ -361,7 +333,7 @@ void fn_800EE8C4(void) {
 
 // The last round is over: a win is recorded in the profile (with its score and the tournament's
 // aPrize[bracket][1]) and its message queued, and the prize money is paid.
-void fn_800EEA3C(s32 nPlayer) {
+void fn_800EEA3C(int nPlayer) {
     s32 nBracket = fn_800EF0E0(nPlayer);
     Tournament* p = fn_800EFA70(gpSaveData[nPlayer].tour.nEvent);
     s32 nMoney;
@@ -382,7 +354,7 @@ void fn_800EEA3C(s32 nPlayer) {
 
 // The tournament is over for the player: its champion and winning score are kept with the
 // player's result (cut, a place, or did not play), and the season moves on to the next tournament.
-void fn_800EEB94(s32 nPlayer) {
+void fn_800EEB94(int nPlayer) {
     SeasonEvent* p = &gpSaveData[nPlayer].tour.aEvent[gpSaveData[nPlayer].tour.nEvent];
     s32 nLeader = fn_801197CC(nPlayer, 0);
     s32 nGolfer = fn_80119118(nPlayer, nLeader);
