@@ -75,7 +75,7 @@ Prototypes
 - **A prototype local to a file** is for functions only that file calls.
 - **Headers:** `game.h` (game manager, rounds, modes, golfer states, sessions), `engine.h`
   (memory, math, streams, views, events, sound, animation), `golfer.h` (players and golfers),
-  `ball.h` (ball and terrain).
+  `ball.h` (the ball, surfaces and the hole's terrain; `golfer.h` includes it).
 - **No per-file re-declaration with other types.** CodeWarrior rejects a second prototype whose
   parameter types differ (even `int` vs `s32`) as "identifier redeclared". When one file's calls
   need a different argument type to match, cast at the call site (`fn((u16)x)`) and say why.

@@ -671,7 +671,7 @@ on flat ground, then it is a hazard (`fn_80052088`). The surface it coasts on is
 own surface index is below 156 - i.e. always; the test reads `n < 0 || n < 156`, which looks like
 a typo for `n >= 156`. A ball in the air with no ground under it within 8 ft of the pin is set
 down on the other ground height (`fn_80055324`); elsewhere it stays in play while above the
-course floor (`CourseInfo +0x6C`) and is a hazard below it.
+course floor (`CourseInfo.fFloor`) and is a hazard below it.
 
 Skidding and rolling: how a putt breaks (`fn_80052268`, `Ball_GroundContact`)
 ----------------------------------------------------------------------------

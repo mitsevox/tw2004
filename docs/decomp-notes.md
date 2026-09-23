@@ -406,7 +406,7 @@ The fixes that come up most often. Each points to its full entry below.
   (GameMode5 `fn_800EC1E0`: `fn_800D2994` as `u16` drops 93.93 -> 92.96).
 - **[verified] m2c turns a register holding half of a constant into an extra argument.** When the
   next call's argument register already holds `lis rN, 'PG'` for a later constant, m2c passes it
-  on. `UStream_RegisterHandler('PGAc', fn, 'PG  ')` was really two arguments: GameMode23
+  on. `UStream_RegisterHandler('PGAc', fn, 'PG\0\0')` was really two arguments: GameMode23
   `fn_800EDE7C`, GameMode24 `fn_800F0518`, GameMode5 `fn_800EAE74` all went exact once it was
   dropped. Check each extra argument m2c shows against the callee's definition.
 - **[verified] An unexplained `mr r3, r4` before the first call** means an unused first
@@ -545,7 +545,7 @@ The fixes that come up most often. Each points to its full entry below.
   before its home register) is the mark of an inlined helper's return value. Seen in fn_8005A478 with
   the unexplained `beq L; b L` pairs there; a bool or void inline helper did not reproduce them.
 - **[verified] A store whose value is forwarded, done twice, can be an inline `return a = b;`.**
-  GameMode10 fn_800F1424 stores `gReplayData.nF07` into the session in a loop and once more at
+  GameMode10 fn_800F1424 stores `gReplayData.nPinSet` into the session in a loop and once more at
   the end. It only matched as `static inline s8 f(void) { return gSession.x = gReplayData.y; }`,
   called in the loop and once as a statement. The same code written inline, or as two statements
   in the helper, keeps the wrong registers.
