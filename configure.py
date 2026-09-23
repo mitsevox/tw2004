@@ -937,6 +937,7 @@ config.libs = [
             Object(NonMatching, "SkinBurn.c"),
             Object(NonMatching, "EASB.c"),
             Object(NonMatching, "UISEvent.c"),
+            Object(NonMatching, "UISScreen.c"),
             Object(Matching, "unsorted/sweep_80013070.c"),
             Object(Matching, "unsorted/sweep_80069428.c"),
             Object(Matching, "unsorted/sweep_80079E44.c"),
@@ -1885,7 +1886,6 @@ config.libs = [
             Object(Matching, "unsorted/sweep_80155F40.c"),
             Object(Matching, "unsorted/sweep_8015F784.c"),
             Object(Matching, "unsorted/sweep_80169B3C.c"),
-            Object(Matching, "unsorted/sweep_8016C18C.c"),
         ],
     },
     {

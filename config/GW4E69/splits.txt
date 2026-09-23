@@ -3917,8 +3917,8 @@ unsorted/sweep_80169B30.c:
 unsorted/sweep_80169B3C.c:
 	.text       start:0x80169B3C end:0x80169B4C
 
-unsorted/sweep_8016C18C.c:
-	.text       start:0x8016C18C end:0x8016C1A4
+UISScreen.c:
+	.text       start:0x8016A2D4 end:0x8016C718
 
 Common/Checksum/ChecksumCRC32.c:
 	.text       start:0x8016C718 end:0x8016CC20
