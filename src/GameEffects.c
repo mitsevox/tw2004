@@ -11,7 +11,6 @@
 
 void  fn_800131C4(int nController);
 void  fn_8001425C(int a);
-void  fn_80012F18(int a);
 void  fn_800141F8(f32* pA, f32* pB, f32 x0, f32 y0, f32 x1, f32 y1);
 void  fn_80014194(f32* pColour);
 void  fn_8001644C(int a, f32* pA, int b, f32* pB, int c);
