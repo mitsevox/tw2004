@@ -867,6 +867,32 @@ void fn_80105DAC(void) {
 void fn_80105EFC(void) {
 }
 
+// After putting on a part 9 or part 1 asset, switch the body skin's set "wire" (part 9) or "hands"
+// (part 1) to its "nowire" variant.
+void FE_CheckSpecialCaseConnections(CrAPAsset* pAsset) {
+    s16 nPart = pAsset->nPart;
+    s32 nSet;
+    Skin* pSkin;
+    s32 nVariant;
+
+    if (lbl_80281EE0->pB4->pChar != NULL) {
+        pSkin = lbl_80281EE0->pB4->pChar->pSkin;
+        if (nPart == 9) {
+            nSet = fn_800CDCA0(pSkin, "wire");
+            nVariant = fn_800CDD5C(pSkin, nSet, "nowire");
+            if (nSet >= 0 && nVariant >= 0) {
+                fn_800CC9D8(lbl_80281EE0->pB4->pChar, nSet, nVariant, 0);
+            }
+        } else if (nPart == 1) {
+            nSet = fn_800CDCA0(pSkin, "hands");
+            nVariant = fn_800CDD5C(pSkin, nSet, "nowire");
+            if (nSet >= 0 && nVariant >= 0) {
+                fn_800CC9D8(lbl_80281EE0->pB4->pChar, nSet, nVariant, 0);
+            }
+        }
+    }
+}
+
 void fn_80105FF8(int nAsset, s16* pnPart, s32* pnEntry, s32* pnPlace) {
     int i;
     int nCount = 0;
@@ -1156,6 +1182,30 @@ void fn_80107244(int n, s16* pN0, s32* pN4, char* pDst) {
 
 void fn_80107294(s16 n, char* pDst) {
     strcpy(pDst, lbl_801935C8[n]);
+}
+
+void fn_801072CC(s16 nPart, s32* pLocked, s32* pB1CC, s32* pB344, s32* pAll) {
+    int i;
+    SaveProfile* pProfile = fn_80077ACC();
+
+    *pLocked = 0;
+    *pB1CC = 0;
+    *pB344 = 0;
+    *pAll = 0;
+    for (i = 0; i < lbl_80282460->nAssets; i++) {
+        if (nPart == lbl_80282460->pAssets[i].nPart && fn_801061C8(lbl_80282460->pAssets[i].n40)) {
+            if (fn_8001E9CC(pProfile->aB1CC, i)) {
+                *pB1CC += 1;
+            }
+            if (fn_8001E9CC(pProfile->aB344, i)) {
+                *pB344 += 1;
+            }
+            if (fn_80078008(i, pProfile)) {
+                *pLocked += 1;
+            }
+            *pAll += 1;
+        }
+    }
 }
 
 // Take the asset in the profile's slot nSlot off the golfer being edited.
