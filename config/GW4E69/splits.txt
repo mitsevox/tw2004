@@ -3700,14 +3700,8 @@ GameMode8.c:
 GameModeStableford.c:
 	.text       start:0x800FE1B4 end:0x800FEAFC
 
-unsorted/sweep_800FEC78.c:
-	.text       start:0x800FEC78 end:0x800FEC80
-
-unsorted/sweep_800FF604.c:
-	.text       start:0x800FF604 end:0x800FF60C
-
-unsorted/sweep_800FF60C.c:
-	.text       start:0x800FF60C end:0x800FF634
+GameMode12.c:
+	.text       start:0x800FEAFC end:0x800FF700
 
 GameModeStroke.c:
 	.text       start:0x800FF700 end:0x800FFF34
