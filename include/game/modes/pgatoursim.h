@@ -5,7 +5,6 @@
 #define GAME_MODES_PGATOURSIM_H
 
 #include "platform.h"
-#include "game/save.h"
 
 // The tour golfers: 174 pros (the table the 'PGST' stream object fills) and the player.
 #define PGA_NUM_PROS        174
