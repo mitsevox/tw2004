@@ -144,17 +144,19 @@ LAYOUT_ASSERT(UISEvent, 0x24);
 // A rate function: moves one variable of a screen towards a target, a step every tick.
 typedef struct UISRateFn {
     u32 uId;                        // 0x00: the rate function's ID
-    s32 n4;                         // 0x04
-    s32 n8;                         // 0x08
-    s32 nC;                         // 0x0C
-    u32 u10;                        // 0x10: the studio's uMsPerTick when the function was loaded
+    u32 uStepHandler;               // 0x04: a screen handler run each step (fn_8016A030); it can
+                                    //       scale the step. 0 for none
+    s32 n8;                         // 0x08: ms run so far
+    s32 nC;                         // 0x0C: ms stepped so far
+    u32 u10;                        // 0x10: ms per step (the studio's uMsPerTick when loaded; 0: never steps)
     u32 uState;                     // 0x14: 0 new, 1 finished (removed by fn_80165C74), 2 running
     u32 u18;                        // 0x18: with uId, what a rate function is looked up by
     UISScreen* pScreen;             // 0x1C: the screen it belongs to
-    s32 n20;                        // 0x20: with n30, names the variable (fn_8016C1A4)
+    u32 u20;                        // 0x20: with n30, names the variable (fn_8016C1A4); 0 for none
     f32 fTarget;                    // 0x24: the value it moves towards
     f32 fStep;                      // 0x28: the change per tick
-    s32 n2C;                        // 0x2C
+    u32 uDoneHandler;               // 0x2C: a screen handler run when the target is reached (0: the
+                                    //       first node's event -14 handler)
     s32 n30;                        // 0x30
 } UISRateFn;
 LAYOUT_ASSERT(UISRateFn, 0x34);
@@ -242,9 +244,9 @@ void fn_80165B90(s16 nA, s16 nB, UIStudio* pStudio, s32 nType, const UISEventDat
 void fn_80165C6C(UISReportFn pfnReport);
 void fn_80165C74(UIStudio* pStudio);
 void fn_80165D2C(UIStudio* pStudio, u32 u18, u32 uId);
-void fn_80165D90(UIStudio* pStudio, UISScreen* pScreen, u32 u18, u32 uId, s32 n4, u32 u10);
-void fn_80165E9C(UIStudio* pStudio, UISScreen* pScreen, u32 u18, s32 n30, u32 uId, s32 n2C, s32 n4,
-                 u32 uTime, f32 fTarget, s32 n20);
+void fn_80165D90(UIStudio* pStudio, UISScreen* pScreen, u32 u18, u32 uId, u32 uStepHandler, u32 u10);
+void fn_80165E9C(UIStudio* pStudio, UISScreen* pScreen, u32 u18, s32 n30, u32 uId, u32 uDoneHandler,
+                 u32 uStepHandler, u32 uTime, f32 fTarget, u32 u20);
 u32 fn_8016604C(UIStudio* pStudio, u32 u18, u32 uId);
 
 // UIStudio.c
@@ -274,7 +276,7 @@ void fn_80169B4C(UIStudio* pStudio);
 void fn_80169C0C(UIStudio* pStudio, u32 nScreens, u32 nHandlers, u32 nRateFns, u32 n60, u32 nEventWords,
                  u32 nWords2, u32 uMsPerTick);
 u32 fn_80169D90(u32 nScreens, u32 nHandlers, u32 nRateFns, u32 n60, u32 nEventWords, u32 nWords2);
-u8 fn_80169DC4(UISFile* pFile);
+s32 fn_80169DC4(UISFile* pFile);
 void fn_8016A030(UIStudio* pStudio, u32 uMs);
 
 // UISScreen.c (0x8016A2D4-0x8016C718)
@@ -292,6 +294,9 @@ f32* fn_8016C18C(void);
 f32* fn_8016C198(void);
 // Returns a pointer to the variable a rate function drives.
 f32* fn_8016C1A4(s32 n20, s32 n30);
+// Runs a handler of a screen with nArgs arguments on pStack; *pf (0 without pf) is pushed first.
+void fn_8016C270(UIStudio* pStudio, UISScreen* pScreen, u32 u18, UISWordStack* pStack, u32 uHandler, s32 nArgs,
+                 s32* pArgs, s32 n8, s32 n9, u8 b10, s32 n11, f32* pf);
 u32 fn_8016C5C4(UISNode* pNode, u16 uEvent);
 u32 fn_8016C614(UISNode* pNode, u16 uId, u16 uEvent);
 u32 fn_8016C674(UISNode* pNode, u16 uEvent);
