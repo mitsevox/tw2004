@@ -7,7 +7,6 @@
 
 u8    Team_IsAllCPU(int nTeam);
 CourseInfo* fn_8000C594(void);
-u8    fn_800EC550(void);
 int   fn_800E1788(int nPlayer);             // the player's round total
 int   fn_800D3C7C(int nPlayer);             // the player's golfer
 void  fn_80125910(int a);

@@ -6,7 +6,6 @@
 #include "ball.h"
 #include "game.h"
 
-u8    fn_800EC550(void);
 void* fn_800D3C1C(void);
 s32   fn_800D3D64(void* p, int nHole);      // a hole's skin value
 u8    fn_801025F4(void);

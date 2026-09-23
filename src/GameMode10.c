@@ -80,10 +80,7 @@ void fn_800F18C8(void);
 u8   fn_800F193C(int nPlayer, int a);
 u8   fn_800F1944(int a);
 void fn_800F194C(void);
-void fn_800F1ABC(int nPlayer, s8 n);
-void fn_800F2030(void);
 u8   fn_800F2358(int nPlayer);
-void fn_800F2958(s32 p0, s32 p1);
 
 // Mode 10 starts: one player, no mulligans, the saved shot's hole.
 void fn_800F125C(void) {
@@ -534,14 +531,14 @@ s32 fn_800F2578(void) {
     return 0;
 }
 
-void fn_800F263C(s32 p0) {
-    fn_800F2958((p0 & 0xFFFF), 1);
+void fn_800F263C(s32 nMsg) {
+    fn_800F2958((nMsg & 0xFFFF), 1);
 }
 
-void fn_800F2664(void) {
+void fn_800F2664(int nPlayer) {
 }
 
-void fn_800F2668(void) {
+void fn_800F2668(int nPlayer) {
 }
 
 // Scale n by table entry i; which table depends on fn_80015464 (0..2).
@@ -610,6 +607,6 @@ s32 fn_800F2810(s32 n) {
     return 4;
 }
 
-void fn_800F2958(s32 p0, s32 p1) {
-    fn_800A7664(7, p0, p1);
+void fn_800F2958(s32 nMsg, s32 a) {
+    fn_800A7664(7, nMsg, a);
 }

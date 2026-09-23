@@ -95,7 +95,6 @@ int   fn_800E17AC(int nPlayer);           // the player's total strokes
 f32   fn_80009744(f32* pVec);               // dot with itself
 void  fn_800DCB84(u8* pA, u8* pB, f32* pOut);
 int   fn_800F354C(int nPlayer);
-int   fn_800F20C0(int nPlayer);
 int   fn_800F1D34(int nPlayer);
 CourseInfo* fn_8000C594(void);
 void* fn_800CC190(CourseInfo* pCourse, f32* pPos);   // surface type under a point

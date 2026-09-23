@@ -17,7 +17,6 @@ void  fn_800E2470(void);
 void  fn_800E30D4(void);
 void  fn_800E2FD8(void);
 void  fn_800E3050(int nCourse);
-u8    fn_800EE470(void);
 int   fn_8011937C(int nPlayer, int a, u8 b);
 
 int   fn_800E8C24(int nPlayer, int nHole);

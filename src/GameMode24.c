@@ -11,7 +11,6 @@ void fn_800F0570(void);
 void fn_800F05B0(s32 p0);
 void fn_800F05DC(s32 p0);
 extern u8 lbl_8028234C;
-u8 fn_800F0818(void);
 s32 fn_800F0E18(void);
 extern s32 lbl_80282350;
 extern s32 lbl_80282354;
@@ -46,11 +45,6 @@ u32   fn_8000E81C(void* pObj, void** ppData);
 void* fn_800951A0(u32 nSize, int nAlign, int a);
 void  Mem_cpy(void* pDst, void* pSrc, int nBytes);   // memcpy
 void  fn_80009E70(void* p);                 // free
-void  fn_800E9F14(void);
-s32   fn_800EA084(int nPlayer);
-u8    fn_800EA278(int nPlayer, u8 bCheck);
-u8    fn_800EA548(u8 bCheck);
-u8    fn_800EA758(u8 bCheck);
 void  fn_800EAA40(void);
 void  fn_800E0B38(int nMode);
 void  fn_800EC544(void* pList, s32 n);

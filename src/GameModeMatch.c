@@ -7,7 +7,6 @@
 #include "game.h"
 
 CourseInfo* fn_8000C594(void);
-u8    fn_800EC550(void);
 void  fn_80125910(int a);
 extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
 extern u8* gpSaveData;
@@ -26,12 +25,7 @@ extern ListEntry* lbl_80281664;
 extern s32        lbl_80281668;
 extern s32        lbl_802822F4;
 
-void fn_800E9F14(void);
 int  fn_800E9F90(int nPlayer);
-s32  fn_800EA084(int nPlayer);
-u8   fn_800EA278(int nPlayer, u8 bCheck);
-u8   fn_800EA548(u8 bCheck);
-u8   fn_800EA758(u8 bCheck);
 void fn_800EAA40(void);
 void fn_800EAB44(void);
 

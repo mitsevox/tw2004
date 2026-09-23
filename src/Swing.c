@@ -1003,7 +1003,6 @@ void fn_8005CD94(void) {
 
 void* fn_80017028(int nView);                // the view
 u8    fn_800C7100(void* pView);              // its camera has settled
-u8    fn_800FA118(int a, int b);
 void  AI_ApplyError(int nPlayer);            // Golfer.c
 
 #define CPU_TOLERANCE 0.0025f               // 0.05 yd squared: land within 1.8 in of the target
@@ -2770,7 +2769,6 @@ void STATEFUNC_GreenWatchRollInit(int nPlayer) {
 }
 
 
-u8    fn_80100294(void);                      // in a lesson (mode 11)
 u8    fn_800172C4(void* pView);               // the camera move has finished
 u8    fn_80014300(u32 uMask);                 // any pad pressed these buttons
 void  fn_800A76E4(void);
@@ -3962,9 +3960,7 @@ u8    fn_800DA1D4(void);
 u8    fn_800DA234(void);
 void  fn_800E505C(int nTip);
 void  fn_800D1DAC(int nPlayer);
-u8    fn_800EC550(void);
 u8    fn_800ED540(void);
-u8    fn_800F0818(void);
 void  fn_800EAC7C(void);
 void  fn_800E502C(void);
 void  fn_800E4FFC(void);

@@ -65,4 +65,52 @@ void fn_800E5714(int a);
 void fn_800E5724(int a);
 void fn_800E58B4(int nMsg);             // send a message with no values
 
+// ---- the game modes --------------------------------------------------------------------------
+
+// GameModeMatch.c: match play, which the other two-player modes build on
+void fn_800E9F14(void);
+s32  fn_800EA084(int nPlayer);
+u8   fn_800EA278(int nPlayer, u8 bCheck);
+u8   fn_800EA548(u8 bCheck);            // the game is over
+u8   fn_800EA758(u8 bCheck);
+
+u8   fn_800EC550(void);                 // GameMode5.c
+u8   fn_800EE470(void);                 // GameMode23.c
+u8   fn_800F0818(void);                 // GameMode24.c
+
+// GameMode10.c: what the target games (modes 13..17) share
+void fn_800F19D4(void);                 // sort the targets by distance from the tee
+void fn_800F1ABC(int nPlayer, s8 n);
+void fn_800F1B60(int nPlayer, s8 n);
+u8   fn_800F1BD8(int nPlayer);          // previous target
+u8   fn_800F1C34(int nPlayer);          // next target
+s8   fn_800F1C74(int nPlayer);          // the target nearest the ball
+s32  fn_800F1E58(s32 n);
+void fn_800F1EE4(void);                 // every player's target-game state cleared
+void fn_800F2030(void);
+s32  fn_800F20C0(int nPlayer);          // how many targets the player has hit
+s32  fn_800F2578(void);                 // the target game's prize
+void fn_800F263C(s32 nMsg);
+void fn_800F2664(int nPlayer);
+void fn_800F2668(int nPlayer);
+u8   fn_800F2788(int nPlayer, f32 f);   // whether f is far enough for the player's tees
+void fn_800F2958(s32 nMsg, s32 a);
+void fn_800F3980(int nMsg, s32 a, s32 b, s32 c, s32 d, s32 e);    // GameMode14.c
+
+void fn_800F9824(void);                 // GameMode7.c
+
+// GameMode8.c
+void fn_800F9A58(void);
+void fn_800F9AB0(void);
+void fn_800F9B34(void);
+s32  fn_800F9BF8(int nPlayer);
+u8   fn_800FA118(int nPlayer, int a);
+void fn_800FDA30(int nPlayer, int a);
+u8   fn_800FDF58(int nPlayer);
+u8   fn_800FDF60(void);
+
+// after the Stableford code (0x800FF634..)
+void fn_800FF7DC(void);
+u8   fn_80100294(void);                 // in a lesson (mode 11)
+
 #endif

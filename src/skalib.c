@@ -2,6 +2,7 @@
 // lookup and pick, the part that chooses which clip a golfer plays.
 
 #include "golfer.h"
+#include "game.h"
 
 char* strcpy(char* pDst, const char* pSrc);
 int   strcmp(const char* pA, const char* pB);
@@ -199,7 +200,6 @@ extern s32         lbl_80281070;
 extern s16*        lbl_80281CF8;      // the group, style and club node being built
 extern s16*        lbl_80281CFC;
 extern s16*        lbl_80281D00;      // leaves this short are left alone by the drop pass
-u8                 fn_80100294(void);
 u8                 fn_80101E34(struct ClipRecord* pRec);      // slot 0's share of the memory when double buffering
 extern u8*         lbl_80281CC4;      // staging buffers (32-aligned), see Skalib_Init
 extern u8*         lbl_80281CC8;

@@ -36,21 +36,9 @@ void  fn_800A6358(void);
 void  fn_800A63D0(void);
 void  fn_800A30E4(int nKind, u8* pBall, int nPlayer, int a, f32 f);
 void  fn_800E5B0C(int nMsg, u32 uFloats, void* p0, void* p1, void* p2, void* p3, void* p4);
-void  fn_800FF7DC(void);
 void  fn_80125910(int a);
-void  fn_800F19D4(void);
-void  fn_800F1B60(int nPlayer, int n);
-u8    fn_800F1BD8(int nPlayer);
-u8    fn_800F1C34(int nPlayer);
-s8    fn_800F1C74(int nPlayer);
 int   fn_800F1D34(int nPlayer);
-s32   fn_800F1E58(s32 n);
-void  fn_800F1EE4(void);
-void  fn_800F2030(void);
-void  fn_800F263C(s32 p0);
 s32   fn_800F266C(s32 n, int i);
-u8    fn_800F2788(int nPlayer, f32 f);
-void  fn_800F2958(s32 p0, s32 p1);
 
 void  fn_800F2BBC(void);
 void  fn_800F2BD8(void);
@@ -72,7 +60,6 @@ void  fn_800F36A4(void);
 void  fn_800F3800(int nPlayer);
 void  fn_800F3860(void);
 s32   fn_800F392C(int a, int i);
-void  fn_800F3980(int nMsg, s32 a, s32 b, s32 c, s32 d, s32 e);
 void  fn_800F39CC(s32 p0);
 
 // Mode 14 starts: two players, no wind, no gimmes, no mulligans.

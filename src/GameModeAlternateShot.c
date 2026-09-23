@@ -7,7 +7,6 @@
 
 void  Mem_cpy(void* pDst, void* pSrc, int nBytes);   // memcpy
 CourseInfo* fn_8000C594(void);
-u8    fn_800EC550(void);
 int   fn_800D37BC(int nWinner, int nLoser, int nMargin, int* pPrize);
 void  fn_80125910(int a);
 extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)

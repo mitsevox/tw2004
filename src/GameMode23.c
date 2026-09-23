@@ -15,7 +15,6 @@ void fn_800EDF90(s32 p0);
 extern s32 gpSaveData;
 void fn_800EE064(void);
 extern u8 lbl_8028233C;
-u8 fn_800EE470(void);
 extern u8 lbl_80205F30[];
 s32 fn_800EE8B0(void);
 u8* fn_800EE8B8(void);
