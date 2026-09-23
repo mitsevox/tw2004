@@ -2480,26 +2480,8 @@ unsorted/rcmp_mad_codec/sweep_800B9A88.c:
 unsorted/rcmp_mad_codec/sweep_800B9B48.c:
 	.text       start:0x800B9B48 end:0x800B9BF4
 
-unsorted/sweep_800BA080.c:
-	.text       start:0x800BA080 end:0x800BA0A0
-
-unsorted/sweep_800BA0E4.c:
-	.text       start:0x800BA0E4 end:0x800BA1A4
-
-unsorted/sweep_800BA3A4.c:
-	.text       start:0x800BA3A4 end:0x800BA3D8
-
-unsorted/sweep_800BA3D8.c:
-	.text       start:0x800BA3D8 end:0x800BA40C
-
-unsorted/sweep_800BA40C.c:
-	.text       start:0x800BA40C end:0x800BA440
-
-unsorted/sweep_800BA6CC.c:
-	.text       start:0x800BA6CC end:0x800BA700
-
-unsorted/sweep_800BA700.c:
-	.text       start:0x800BA700 end:0x800BA734
+Trax.c:
+	.text       start:0x800B9FF0 end:0x800BA74C
 
 unsorted/sweep_800BAA4C.c:
 	.text       start:0x800BAA4C end:0x800BAA50
