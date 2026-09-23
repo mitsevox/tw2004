@@ -211,6 +211,7 @@ void fn_800A76E4(void);
 void Vec_Normalize(f32* pSrc, f32* pDst);
 void fn_800BAF04(f32* pSrc, f32* pDst);   // normalise
 f32  Vec_Distance(f32* pA, f32* pB);
+void fn_800BD83C(int nSound, int a);      // SitDevFile.c: fn_800A7664(0, nSound, a)
 void BreakLine_Start(int nView);
 int  fn_8011937C(int nPlayer, int a, u8 b);
 // The EA Sports Bio, game side (EASportsBio.c; TW06's names)
