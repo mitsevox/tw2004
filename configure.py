@@ -884,7 +884,7 @@ config.libs = [
             Object(NonMatching, "gomainloop.c"),
             Object(NonMatching, "GoFrameBuf.c"),
             Object(NonMatching, "GoLighting.c"),
-            Object(NonMatching, "Code8006F154.c"),
+            Object(Matching, "Code8006F154.c"),
             Object(NonMatching, "GoShaderObjectContainer_OBFData_Gc.c"),
             Object(NonMatching, "GoShaderObject_PrelitUVAnimation_Gc.c"),
             Object(NonMatching, "animblender.c"),

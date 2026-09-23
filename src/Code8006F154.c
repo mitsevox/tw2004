@@ -13,6 +13,8 @@ void fn_8006F3D0(f32* pA, f32* pB, f32* pOut, f32 t);
 f32* fn_8006F400(TerSettings* pSettings, int nColour, f32* pColour, f32 fW);
 void fn_8006F430(TerSettings* pSettings, f32 fAngle);
 
+TerSettings* lbl_802811E0 = &lbl_801D70A8;
+
 // Blend the colour for the camera's current heading.
 void fn_8006F154(void) {
     TerSettings* pSettings = lbl_802811E0;
