@@ -248,8 +248,8 @@ void GM_InitForHole(void) {
         j = i;
         gpGame->n158[j] = 0;
         i = j;
-        gPlayers[i].unkC2F = 0;
-        gPlayers[j].unkC2D = 0;
+        gPlayers[i].bC2F = 0;
+        gPlayers[j].bC2D = 0;
     }
 }
 
@@ -555,7 +555,7 @@ void GM_PlayerTookShot(int nPlayer) {
         } else {
             if (fn_800E23B0(nPlayer, gPlayers[nPlayer].nStrokes[gpGame->nCurHole])) {
                 gPlayers[nPlayer].ball.nLie = LIE_HOLED;
-                gPlayers[nPlayer].unkC2D = 1;
+                gPlayers[nPlayer].bC2D = 1;
                 if (fn_800EE470()) {
                     gPlayers[nPlayer].nStrokes[gpGame->nCurHole] = 10;
                 } else {
@@ -609,10 +609,10 @@ u8 GM_PlayerTakeMulligan(int nPlayer) {
         return 0;
     }
     if (fn_800E177C() == 2) {
-        if (gPlayers[nPlayer].unkC28) {
+        if (gPlayers[nPlayer].bMulliganUsed) {
             return 0;
         }
-        gPlayers[nPlayer].unkC28 = 1;
+        gPlayers[nPlayer].bMulliganUsed = 1;
     }
     fn_800BB0A8();
     fn_800E4204();
@@ -620,7 +620,7 @@ u8 GM_PlayerTakeMulligan(int nPlayer) {
     fn_800A76E4();
     fn_8006C4C0(nPlayer);
     gPlayers[nPlayer].unkC2E = 1;
-    gPlayers[nPlayer].unkC2F = 1;
+    gPlayers[nPlayer].bC2F = 1;
     gpGame->pfn254(nPlayer);
     if (gSession.bReplay) {
         fn_8006C4A0();
@@ -1097,7 +1097,7 @@ int GM_ChooseRemoveBallState(int nPlayer) {
     if (!fn_800E27A8()) {
         return 0;
     }
-    if (gPlayers[nPlayer].unkC2D) {
+    if (gPlayers[nPlayer].bC2D) {
         return 0;
     }
     if (fn_8006AA9C(nPlayer) == 2) {

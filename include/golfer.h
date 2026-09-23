@@ -319,14 +319,14 @@ typedef struct Player {
     f32  fThinkTime;            // 0xC1C  seconds a CPU has spent in state 2
     f32  fC20;                  // 0xC20
     u8   unkC24[4];
-    u8   unkC28;                // 0xC28
+    u8   bMulliganUsed;         // 0xC28  the one mulligan of a one-per-player mode is used (GM_PlayerTakeMulligan)
     u8   bLowIQPenalty;         // 0xC29  quarters the IQ overconfidence term when set
     s8   nLevel;                // 0xC2A  CPU difficulty level: 25 modifier points per level
     u8   bPlanReady;            // 0xC2B  the gimme's tap-in was solved when the camera arrived
     u8   bRehearsalDone;        // 0xC2C  the gimme's tap-in rehearsal (GS_FADE_TO_TAP_IN) has settled
-    u8   unkC2D;                // 0xC2D
+    u8   bC2D;                  // 0xC2D  set when the stroke limit holes the ball; no mulligan then
     u8   unkC2E;                // 0xC2E
-    u8   unkC2F;
+    u8   bC2F;                  // 0xC2F  set with unkC2E when a mulligan is taken
     s32  nRehearseState;        // 0xC30  AI_RehearseShot state machine
     u8   unkC34[4];
     s32  nC38;                  // 0xC38  a frame countdown (speed golf)

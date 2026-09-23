@@ -1655,7 +1655,7 @@ void Player_SetGolfer(int nPlayer, int nGolfer, int nController, u32 uBag, int b
     p->fTargetW    = 0.0f;
     fn_80009710(p->vOrient);
     p->nController = nController;
-    p->unkC28      = 0;
+    p->bMulliganUsed = 0;
     if (gSession.nSplitScreen) {
         if (bRightSide == 0) {
             if (!fn_800170A0(0)) fn_80016D18(0, 0.0f, 0.0f, 0.5f, 1.0f);
@@ -1697,7 +1697,7 @@ void Player_SetGolfer(int nPlayer, int nGolfer, int nController, u32 uBag, int b
     p->bLowIQPenalty = 0;
     p->nLevel       = 0;
     p->fC20         = 0.0f;
-    p->unkC2D       = 0;
+    p->bC2D         = 0;
     p->bPlanReady       = 0;
     p->bRehearsalDone       = 0;
     p->uFlags       = 0;

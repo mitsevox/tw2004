@@ -796,7 +796,7 @@ u8 fn_800E23EC(int nPlayer) {
     if (fn_800E177C() == 0) {
         return 0;
     }
-    if (fn_800E177C() == 2 && gPlayers[nPlayer].unkC28) {
+    if (fn_800E177C() == 2 && gPlayers[nPlayer].bMulliganUsed) {
         return 0;
     }
     return 1;
@@ -806,7 +806,7 @@ u8 fn_800E23EC(int nPlayer) {
 void fn_800E2470(void) {
     int i;
     for (i = 0; i < gNumPlayersSetUp; i++) {
-        PLAYER(i)->unkC28 = 0;
+        PLAYER(i)->bMulliganUsed = 0;
     }
 }
 
