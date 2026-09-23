@@ -3455,16 +3455,14 @@ src/ax/AXAlloc.c:
 	.sbss       start:0x80282690 end:0x80282698
 
 src/ax/AXAux.c:
-	.text       start:0x80135BE0 end:0x80136058
-
-unsorted/sweep_80136058.c:
-	.text       start:0x80136058 end:0x80136064
-
-unsorted/sweep_80136064.c:
-	.text       start:0x80136064 end:0x8013606C
+	.text       start:0x80135BE0 end:0x80136064
+	.bss        start:0x80261560 end:0x80264260
+	.sbss       start:0x80282698 end:0x802826D0
 
 src/ax/AXCL.c:
-	.text       start:0x8013606C end:0x80136790
+	.text       start:0x80136064 end:0x80136790
+	.bss        start:0x80264260 end:0x80264860
+	.sbss       start:0x802826D0 end:0x802826E8
 
 unsorted/sweep_80136980.c:
 	.text       start:0x80136980 end:0x8013698C
@@ -3473,10 +3471,12 @@ unsorted/sweep_801369E4.c:
 	.text       start:0x801369E4 end:0x801369F0
 
 unsorted/sweep_80136DF4.c:
-	.text       start:0x80136DF4 end:0x80136E08
+	.text       start:0x80136DF4 end:0x80136DFC
 
 src/ax/AXSPB.c:
-	.text       start:0x80136E08 end:0x801372C0
+	.text       start:0x80136DFC end:0x801372C0
+	.bss        start:0x80269080 end:0x802690C0
+	.sbss       start:0x80282708 end:0x80282730
 
 unsorted/sweep_801372C0.c:
 	.text       start:0x801372C0 end:0x801372C8
@@ -3493,6 +3493,8 @@ src/ax/AXProf.c:
 
 src/axfx/reverb_hi.c:
 	.text       start:0x801381CC end:0x80138EC8
+	.data       start:0x801998C0 end:0x801998E0
+	.sdata2     start:0x80284B68 end:0x80284BA8
 
 src/axfx/delay.c:
 	.text       start:0x80138EC8 end:0x80139374
@@ -3527,6 +3529,9 @@ dolphin/dvd/dvdlow.c:
 
 dolphin/dvd/dvdfs.c:
 	.text       start:0x8013AF10 end:0x8013B3C4
+	.data       start:0x80199AB8 end:0x80199BB8
+	.sdata      start:0x80281A10 end:0x80281A18
+	.sbss       start:0x802827C0 end:0x802827E0
 
 unsorted/sweep_8013B3C4.c:
 	.text       start:0x8013B3C4 end:0x8013B3C8
@@ -3573,6 +3578,8 @@ unsorted/sweep_8013FF30.c:
 
 dolphin/gx/GXAttr.c:
 	.text       start:0x8013FF38 end:0x801410A8
+	.data       start:0x80199F20 end:0x8019A080
+	.sdata      start:0x80281A50 end:0x80281A60
 
 dolphin/gx/GXMisc.c:
 	.text       start:0x801410A8 end:0x801415AC
@@ -3658,9 +3665,13 @@ dolphin/os/OSCache.c:
 
 dolphin/os/OSContext.c:
 	.text       start:0x8014983C end:0x8014A0AC
+	.data       start:0x8019B598 end:0x8019B770
 
 dolphin/os/OSError.c:
 	.text       start:0x8014A0AC end:0x8014A758
+	.data       start:0x8019B770 end:0x8019BA90
+	.bss        start:0x8027C9B0 end:0x8027C9F8
+	.sdata      start:0x80281AC0 end:0x80281AC8
 
 src/os/OSFont.c:
 	.text       start:0x8014A758 end:0x8014A7B0
