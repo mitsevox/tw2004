@@ -17,6 +17,16 @@
 // the files that are little-endian on disc.
 void fn_80076158(u8** ppSrc, u8* pDst, int nBytes, int nWidth);
 
+// One field of a byte-swap description: nBytes bytes made of nSize-byte values (negative: not
+// swapped).
+typedef struct SwapField {
+    s32 nBytes;                 // 0x0
+    s32 nSize;                  // 0x4
+} SwapField;
+
+// Byte-swap nCount records laid out as pFormat's nFields fields from *ppSrc to *ppDst.
+void fn_8001F08C(void** ppSrc, void** ppDst, SwapField* pFormat, int nFields, int nCount);
+
 #ifdef __MWERKS__
 
 #define BE16(p)  (*(u16*)(p))

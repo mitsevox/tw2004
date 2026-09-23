@@ -260,7 +260,8 @@ typedef struct Character {
     CharBuffer buffers[4];      // 0x43C
     struct { u32 bSet; f32 fTime; u8 unk8[8]; } events[18];   // 0x4AC  animation events, by 64-bit id
     s32   n5CC;                 // 0x5CC
-    u8    unk5D0[0x1624 - 0x5D0];
+    u8    unk5D0[0x1614 - 0x5D0];
+    char  sz1614[16];           // 0x1614  a name the situation scripts test (fn_800BB7AC)
     ClipBlend* pBlend;          // 0x1624
     f32   fBackswing;           // 0x1628  how far along the backswing is, 0..1 (pBlend's fCC, copied every
                                 //         frame of the backswing; the swing's power is its square root)
@@ -479,13 +480,6 @@ typedef struct ClipBank {
     u32    n1C;                 // 0x1C
 } ClipBank;
 LAYOUT_ASSERT(ClipBank, 0x20);
-
-// One field of a byte-swap description: nBytes bytes made of nSize-byte values (negative: not
-// swapped).
-typedef struct SwapField {
-    s32 nBytes;                 // 0x0
-    s32 nSize;                  // 0x4
-} SwapField;
 
 // A library that can be layered over a slot's own.
 typedef struct LibOverlay {
