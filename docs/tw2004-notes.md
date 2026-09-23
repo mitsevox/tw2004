@@ -388,7 +388,12 @@ Progress dashboard
 ------------------
 
 `tools/dashboard/server.py` serves a read-only progress page on the LAN (port 8420). It reads
-`build/GW4E69/report.json`, `symbols.txt` and git history; refreshes every 20 s. It runs as the
+`build/GW4E69/report.json`, `symbols.txt` and `build/dashboard_history.json`; refreshes every
+20 s. It shows code and data as linked (files marked `Matching`) inside matched, per-file status
+(linked, ready to link = 100% matched but not linked, in progress), matched and linked code per
+commit, and an "in flight" panel: for each worktree in `C:\dev\tw2004-agents` (`--agents` to
+change), the code its last `ninja` report matches or links that main's report does not, compared
+function by function. It runs as the
 Windows scheduled task `tw2004-dashboard` (created with `schtasks`, no admin needed) so it outlives
 the Claude session. It does not survive a reboot; restart it with:
 
@@ -396,9 +401,13 @@ the Claude session. It does not survive a reboot; restart it with:
 
 Inbound port 8420 needs a Windows firewall allow rule (the PC's network is on the Public profile).
 The server launches no programs (see decomp-notes.md); commit history comes from
-`build/dashboard_history.json`, written by the post-commit hook. After cloning, run
-`python tools/dashboard/install_hook.py` once. To stop or restart: kill `pythonw3.13.exe`
-(not `pythonw`), then `schtasks /run /tn tw2004-dashboard`.
+`build/dashboard_history.json`, written by the post-commit hook (`refresh_history.py`). Linked
+bytes per commit are summed from `configure.py` and `splits.txt` at that commit, so they are exact
+for every commit; matched bytes need a build report of that commit (cached in
+`build/dashboard_reports.json`), otherwise the previous value is repeated. The hook caches each
+commit's git reads in the history file, so after the first run it takes well under a second.
+After cloning, run `python tools/dashboard/install_hook.py` once. To stop or restart: kill
+`pythonw3.13.exe` (not `pythonw`), then `schtasks /run /tn tw2004-dashboard`.
 
 Starting a new area: check the references first
 -----------------------------------------------
