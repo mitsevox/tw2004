@@ -1,4 +1,4 @@
-// GameMode18.c (our name): game mode 18, modified Stableford (TW06's GameModeStableford). Each hole
+// GameModeStableford.c (TW06's GameModeStableford): game mode 18, modified Stableford. Each hole
 // scores points by strokes against par from lbl_802816D0 (albatross 8, eagle 5, birdie 2, par 0,
 // bogey -1, double bogey or worse -3; the points go in nModePoints). A player who can no longer
 // beat double bogey is done with the hole.
@@ -109,7 +109,6 @@ void fn_800FE8A8(void) {
     int nDiff;
     nHole = Game_CurHoleIndex();
     nPar = fn_800D2B08();
-    // fake match: the (u32) index gives the original's base + offset addressing
     for (i = 0; i < gNumPlayersSetUp; i++) {
         if (!Player_IsHoled(i)) {
             gPlayers[(u32)i].nStrokes[nHole] = nPar + 2;
