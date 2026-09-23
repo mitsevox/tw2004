@@ -9,6 +9,10 @@
 
 typedef struct AnimLib AnimLib;         // skalib.c
 
+// skalib.c: the clips for an animation group, style, club class and key (AnimStream.c calls it too).
+void** AnimLib_Find(AnimLib* pLib, int nGroup, int nStyle, int nClub, int nKey, s32* pCount,
+                    u32* pFlags, u32** ppUsed, s32* pFirst);
+
 // A link of an IK chain: one bone.
 typedef struct IKLink {
     u8   b0;                    // 0x00  cleared by fn_80028208

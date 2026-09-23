@@ -163,6 +163,37 @@ void fn_800CA9DC(int nSlot) {
     }
 }
 
+// With streaming on, starts each of every player's streamed clip sets at a random clip.
+void fn_800CABA0(void) {
+    int i;
+    int nIndex;
+    int nStyle;
+    int nClub;
+    Character* pChar;
+    s32 nCount;
+    u32 uFlags;
+
+    if (lbl_80282230->bOn != 0) {
+        for (i = 0; i < gSession.nNumPlayers; i++) {
+            pChar = gPlayers[i].pChar;
+            for (nIndex = 0; nIndex < 2; nIndex++) {
+                for (nStyle = 0; nStyle < 8; nStyle++) {
+                    for (nClub = 0; nClub < 6; nClub++) {
+                        if (lbl_80282230->players[i].clips[nIndex][nStyle][nClub].nMaxSize > 0) {
+                            AnimLib_Find(pChar->pLib, fn_800C9928(nIndex), nStyle, nClub, 0, &nCount, &uFlags,
+                                         NULL, NULL);
+                            if (nCount > 0) {
+                                lbl_80282230->players[i].clips[nIndex][nStyle][nClub].nNext =
+                                    Rand_Next(1) % nCount;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 // Reads from a file and waits for it. A read past the end of the file is cut to what is left,
 // rounded down to 2 KB.
 void fn_800CB4E0(int hFile, u32 uFileSize, void* pDst, u32 uLen, u32 uOffset) {
