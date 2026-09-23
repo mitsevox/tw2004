@@ -140,6 +140,17 @@ void fn_80018484(Character* pChar, CharModel* pModel) {
     }
 }
 
+// Turns the character's root bone to fAngle about y (half a turn more in game type 3 while the
+// model's bEE is set).
+void fn_800192D4(Character* pChar, f32 fAngle) {
+    if (pChar != NULL) {
+        if (gSession.nGameType == 3 && fn_8001EDF4(pChar)) {
+            fAngle += PI;
+        }
+        fn_80008BB8(pChar->pModel->pBones->q0C, 0.0f, fAngle, 0.0f);
+    }
+}
+
 void fn_80019648(void) {
     fn_80095554();
     fn_8001A4BC();
