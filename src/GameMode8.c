@@ -25,7 +25,7 @@ void  GM_MovePlayerToBall(int nPlayer);
 void  Shot_Plan(int nPlayer, int a);
 void  Emotion_UpdatePlayerEmotion(int nPlayer);
 void  EVENT_Trigger(int nPlayer, int nEvent, int a, int b);
-void  View_SetCamera(int nCamera, int nPlayer, int nView);
+void  View_SetCamera(void* pView, int nCamera, int nPlayer, int nView);
 void* fn_80017028(int nView);
 void  fn_8001704C(int nView, int nPlayer);
 void  fn_8001C804(int nPlayer, int a, int b);
@@ -158,6 +158,9 @@ void fn_800F9A58(void) {
     sGolferStateEngineTable[25].pfnEnter = NULL;
     sGolferStateEngineTable[25].pfnUpdate = NULL;
     sGolferStateEngineTable[25].pfnExit = NULL;
+    sGolferStateEngineTable[26].pfnEnter = NULL;
+    sGolferStateEngineTable[26].pfnUpdate = NULL;
+    sGolferStateEngineTable[26].pfnExit = NULL;
 }
 
 // Round setup: speed golf's golfer states.
@@ -255,6 +258,7 @@ void fn_800F9E00(void) {
     int nLoser;
     int nMargin;
     int nMoney;
+    int nProfile;
     if (fn_800E1BBC()) {
         if (gPlayers[0].nHolesWon > gPlayers[1].nHolesWon) {
             nMargin = gPlayers[0].nHolesWon - gPlayers[1].nHolesWon;
@@ -267,9 +271,10 @@ void fn_800F9E00(void) {
         }
         nMoney = fn_800D36E0(nWinner, nLoser, nMargin, &nPrize);
         if (!Player_IsCPU(nWinner)) {
-            if (gpSaveData[gPlayers[nWinner].nIndex * 0x10600]) {
+            nProfile = gPlayers[nWinner].nIndex;
+            if (gpSaveData[nProfile * 0x10600]) {
                 if (nPrize) {
-                    fn_800E4364(0, 0x6B, nPrize, gPlayers[nWinner].nIndex);
+                    fn_800E4364(0, 0x6B, nPrize, nProfile);
                 }
                 fn_800D3548(nWinner, nMoney, 0);
                 gPlayers[nWinner].n330 += nMoney;
@@ -360,14 +365,12 @@ s32 fn_800FA2C8(void) {
 
 // End of hole: the time scores, or (match version) the hole winner.
 void fn_800FA2D0(void) {
-    switch (gpGame->n4) {
-    case 0:
+    if (gpGame->n4 == 0) {
         fn_800FA48C(0, Game_CurHoleIndex());
         if (gNumPlayersSetUp > 1) {
             fn_800FA48C(1, Game_CurHoleIndex());
         }
-        break;
-    case 1:
+    } else if (gpGame->n4 == 1) {
         if (Player_IsHoled(0)) {
             gPlayers[0].nModePoints[Game_CurHoleIndex()] = 1;
             gPlayers[0].nHolesWon++;
@@ -376,7 +379,6 @@ void fn_800FA2D0(void) {
             gPlayers[1].nModePoints[Game_CurHoleIndex()] = 1;
             gPlayers[1].nHolesWon++;
         }
-        break;
     }
 }
 
@@ -416,14 +418,15 @@ s32 fn_800FA4B8(int nPlayer) {
     return n;
 }
 
-u8 fn_800FA518(int nPlayer) {
+// EA's code falls off the end when the count is out (it returns the count, 0 or -1).
+s32 fn_800FA518(int nPlayer) {
     if (gPlayers[nPlayer].nC38 != -1) {
         gPlayers[nPlayer].nC38--;
     }
-    if (gPlayers[nPlayer].nC38 > 0) {
-        return 1;
+    if (gPlayers[nPlayer].nC38 <= 0) {
+        return gPlayers[nPlayer].nC38;
     }
-    return 0;
+    return 1;
 }
 
 void fn_800FA554(int nPlayer) {
@@ -473,8 +476,8 @@ void fn_800FA608(int nPlayer) {
     Emotion_UpdatePlayerEmotion(nPlayer);
     fn_80017028(gPlayers[nPlayer].nView0);
     fn_80062F1C();
-    fn_80017028(gPlayers[nPlayer].nView0);
-    View_SetCamera(12, nPlayer, gPlayers[nPlayer].nView0);
+    i = gPlayers[nPlayer].nView0;
+    View_SetCamera(fn_80017028(i), 12, nPlayer, i);
     gPlayers[nPlayer].nC54 = 74;
     gPlayers[nPlayer].nC3C |= 2;
     fn_800FE02C();
