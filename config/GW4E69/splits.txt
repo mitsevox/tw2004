@@ -1764,25 +1764,7 @@ CharSliders.c:
 	.text       start:0x8010C4A0 end:0x8010DC94
 
 FE_PGATourMessages.c:
-	.text       start:0x8010DCE8 end:0x8010EEA8
-
-unsorted/sweep_8010EEA8.c:
-	.text       start:0x8010EEA8 end:0x8010EEE4
-
-unsorted/sweep_8010EF80.c:
-	.text       start:0x8010EF80 end:0x8010EF8C
-
-unsorted/sweep_8010F248.c:
-	.text       start:0x8010F248 end:0x8010F278
-
-unsorted/sweep_8010F2CC.c:
-	.text       start:0x8010F2CC end:0x8010F2FC
-
-unsorted/sweep_8010F52C.c:
-	.text       start:0x8010F52C end:0x8010F574
-
-unsorted/sweep_8010F574.c:
-	.text       start:0x8010F574 end:0x8010F5AC
+	.text       start:0x8010DC94 end:0x8010F6C8
 
 FE_LogoDesign.c:
 	.text       start:0x8010F6C8 end:0x8010FB70
@@ -1808,97 +1790,22 @@ unsorted/sweep_801104A0.c:
 	.text       start:0x801104A0 end:0x801104AC
 
 hwsBurn.c:
-	.text       start:0x801104AC end:0x80111EB0
+	.text       start:0x801104AC end:0x80111F58
 
 hwsMaterial_Gc.c:
-	.text       start:0x8011206C end:0x801127A0
-
-unsorted/sweep_801127A0.c:
-	.text       start:0x801127A0 end:0x801127C4
-
-unsorted/sweep_801127C4.c:
-	.text       start:0x801127C4 end:0x80112804
+	.text       start:0x8011206C end:0x80112804
 
 hwsOverride_Gc.c:
-	.text       start:0x80112848 end:0x80112A10
-
-unsorted/sweep_80112A10.c:
-	.text       start:0x80112A10 end:0x80112A58
-
-unsorted/sweep_80112A58.c:
-	.text       start:0x80112A58 end:0x80112A80
+	.text       start:0x80112804 end:0x80112B80
 
 hwsRender_Gc.c:
-	.text       start:0x80112C64 end:0x8011368C
-
-unsorted/sweep_8011368C.c:
-	.text       start:0x8011368C end:0x801136C4
-
-unsorted/sweep_80113764.c:
-	.text       start:0x80113764 end:0x80113774
-
-unsorted/sweep_80113840.c:
-	.text       start:0x80113840 end:0x80113844
-
-unsorted/sweep_8011387C.c:
-	.text       start:0x8011387C end:0x8011389C
-
-unsorted/sweep_8011389C.c:
-	.text       start:0x8011389C end:0x801138CC
-
-unsorted/sweep_801138D8.c:
-	.text       start:0x801138D8 end:0x801138E8
-
-unsorted/sweep_801138E8.c:
-	.text       start:0x801138E8 end:0x801138EC
-
-unsorted/sweep_801138EC.c:
-	.text       start:0x801138EC end:0x80113910
-
-unsorted/sweep_80113A7C.c:
-	.text       start:0x80113A7C end:0x80113A9C
-
-unsorted/sweep_80113B14.c:
-	.text       start:0x80113B14 end:0x80113B34
-
-unsorted/sweep_80113BAC.c:
-	.text       start:0x80113BAC end:0x80113BCC
-
-unsorted/sweep_80113E54.c:
-	.text       start:0x80113E54 end:0x80113E60
+	.text       start:0x80112B80 end:0x80113E60
 
 DynChain.c:
-	.text       start:0x80113E60 end:0x801164D4
+	.text       start:0x80113E60 end:0x80116540
 
-unsorted/sweep_80116540.c:
-	.text       start:0x80116540 end:0x80116598
-
-unsorted/sweep_80116598.c:
-	.text       start:0x80116598 end:0x801165A0
-
-unsorted/sweep_801165A0.c:
-	.text       start:0x801165A0 end:0x801165B0
-
-unsorted/sweep_80116DD4.c:
-	.text       start:0x80116DD4 end:0x80116DD8
-
-unsorted/sweep_80116F80.c:
-	.text       start:0x80116F80 end:0x80116FA4
-
-unsorted/sweep_801170EC.c:
-	.text       start:0x801170EC end:0x8011710C
-
-unsorted/sweep_8011714C.c:
-	.text       start:0x8011714C end:0x80117180
-
-unsorted/sweep_80117180.c:
-	.text       start:0x80117180 end:0x80117188
-
-unsorted/sweep_801174B8.c:
-	.text       start:0x801174B8 end:0x801174E4
-
-unsorted/sweep_801174E4.c:
-	.text       start:0x801174E4 end:0x80117510
+GameModeDriver.c:
+	.text       start:0x80116540 end:0x80117600
 
 PGATourSimulation.c:
 	.text       start:0x80117600 end:0x8011C068

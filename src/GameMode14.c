@@ -223,8 +223,8 @@ void fn_800F2E08(int nPlayer) {
                 gPlayers[nPlayer].nD70[Game_CurHoleIndex()]++;
                 lbl_80282374 = fn_800F3668(nTarget);
                 lbl_80282374 = fn_800F266C(lbl_80282374, nTarget);
-                lbl_80282374 = GM_Earnings_ComputeBonusModifiers(lbl_80282374, nPlayer, 1, 1, 1, 0);
-                lbl_80282374 = GM_Earnings_ComputeTOURCardModifiers(lbl_80282374, nPlayer, 0);
+                lbl_80282374 = fn_800D6A70(lbl_80282374, nPlayer, 1, 1, 1, 0);
+                lbl_80282374 = fn_800D7220(lbl_80282374, nPlayer, 0);
                 fn_800F36A4();
                 if (nText != 0) {
                     fn_800F3980(0x33, lbl_80282374, 0, 0, nText, 1);
@@ -399,8 +399,8 @@ void fn_800F36A4(void) {
         if (lbl_80211FB8[i].nOwner != 5) {
             n = fn_800F3668(i);
             n = fn_800F266C(n, i);
-            n = GM_Earnings_ComputeBonusModifiers(n, lbl_80211FB8[i].nOwner, 1, 1, 1, 0);
-            n = GM_Earnings_ComputeTOURCardModifiers(n, lbl_80211FB8[i].nOwner, 0);
+            n = fn_800D6A70(n, lbl_80211FB8[i].nOwner, 1, 1, 1, 0);
+            n = fn_800D7220(n, lbl_80211FB8[i].nOwner, 0);
             gPlayers[lbl_80211FB8[i].nOwner].nDD8 += n;
         }
     }
