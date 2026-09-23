@@ -8,6 +8,7 @@
 u8 fn_800D1698(int nPlayer);
 u8 fn_800D16F0(int nPlayer);
 u8 fn_800D17E4(int nPlayer);
+u8 fn_800D18D8(int nPlayer);
 u8 fn_800D19F8(int nPlayer);
 u8 fn_800D1A34(int nPlayer);
 u8 fn_800D1A70(int nPlayer);
@@ -76,6 +77,21 @@ u8 fn_800D17E4(int nPlayer) {
         return 0;
     }
     return 0;
+}
+
+// A tip test: a poor lie. The lie's quality comes from the surface under the ball, the ball's
+// f70 and the golfer's recovery; under 75 fires.
+u8 fn_800D18D8(int nPlayer) {
+    f32 fQuality;
+    f32 fSpread;
+
+    fQuality = 100.0f * (gSurfaceTypes[gPlayers[nPlayer].ball.nSurface].f00 +
+                         0.01f * (gPlayers[nPlayer].ball.f70 *
+                                  (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_RECOVERY, ATTR_TOTAL)));
+    // the surface's random lie range (f04), narrowed by recovery
+    fSpread = gSurfaceTypes[gPlayers[nPlayer].ball.nSurface].f04 *
+              (100.0f - (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_RECOVERY, ATTR_TOTAL));
+    return fQuality + fSpread < 75.0f;
 }
 
 // A tip test: the ball lies in lie 3, 4 or 5.
