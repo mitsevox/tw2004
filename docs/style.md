@@ -14,7 +14,10 @@ Files
 
 - **Header comment.** Every unit starts with `// <File>.c (our name): <what it does>`, two to four
   lines in plain English: which game mode or system, the main data it works on. "(our name)"
-  marks names we chose; EA's file names are unknown.
+  marks names we chose; EA's file names are unknown. A unit named after its TW06 class says so
+  instead: `// GameModeStableford.c (TW06's GameModeStableford): game mode 18, ...`.
+- **File names:** the TW06 class name when the code proves the match (`GameModeMatch.c`,
+  `GameModeStableford.c`), otherwise our own (`GameMode8.c`).
 - **Order inside a file:** includes, then types local to the file, then `extern` data, then
   prototypes, then functions in address order (the order is fixed by the binary).
 - **Includes:** `golfer.h` (players, sessions, shared game types), `ball.h`, `physics.h` as needed.

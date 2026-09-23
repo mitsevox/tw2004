@@ -3169,7 +3169,7 @@ void STATEFUNC_PlaceBallInit(int nPlayer) {
     Emotion_UpdatePlayerEmotion(nPlayer);
     fn_80016CFC(gPlayers[nPlayer].nView0)[0x275] = 1;
     for (i = 0; i < gSession.nNumPlayers; i++) {
-        if (gPlayers[i].unk28C == 0 && gPlayers[i].nView0 == gPlayers[nPlayer].nView0 &&
+        if (gPlayers[i].bPlayerCut == 0 && gPlayers[i].nView0 == gPlayers[nPlayer].nView0 &&
             gPlayers[i].nLie != 10 && gPlayers[i].nLie != LIE_GREEN && gPlayers[i].nLie != LIE_HOLED) {
             fn_80016CFC(gPlayers[nPlayer].nView0)[0x275] = 0;
         }

@@ -736,7 +736,7 @@ u8 GM_PlayerTakeMulligan(int nPlayer) {
     fn_800E3D38(nPlayer, 1);
     fn_80016CFC(gPlayers[nPlayer].nView0)[0x275] = 1;
     for (i = 0, q = gPlayers; i < gSession.nNumPlayers; i++, q++) {
-        if (q->unk28C == 0 && q->nView0 == gPlayers[nPlayer].nView0 &&
+        if (q->bPlayerCut == 0 && q->nView0 == gPlayers[nPlayer].nView0 &&
             q->nLie != 10 && q->nLie != LIE_GREEN && q->nLie != LIE_HOLED) {
             fn_80016CFC(gPlayers[nPlayer].nView0)[0x275] = 0;
         }

@@ -220,7 +220,7 @@ typedef struct Player {
     s32  n274;                  // 0x274  TW06: skinwins
     s32  nHolesWon;             // 0x278  match play. TW06: matchwins
     s32  nRoundScore[4];        // 0x27C  TW06: roundscore
-    u8   unk28C;                // 0x28C  TW06: playercut
+    u8   bPlayerCut;            // 0x28C  TW06: playercut
     u8   unk28D[3];
     s32  n290[18];              // 0x290  per hole
     s32  n2D8;                  // 0x2D8

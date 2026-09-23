@@ -46,7 +46,7 @@ void fn_800FE1B4(void) {
 // TW06: GameModeStableford::PlayerDoneHole. Holed, cut, or already at par + 1 strokes: the best
 // left is double bogey, which scores no better than giving up.
 u8 fn_800FE2B4(int nPlayer) {
-    if (!Player_IsHoled(nPlayer) && !gPlayers[nPlayer].unk28C &&
+    if (!Player_IsHoled(nPlayer) && !gPlayers[nPlayer].bPlayerCut &&
         gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] < fn_800D2B08() + 1) {
         return 0;
     }
