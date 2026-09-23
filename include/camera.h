@@ -184,10 +184,14 @@ typedef struct ViewController {
     void*    pCamera;           // 0x000  the render camera (fn_80017004)
     View     view;              // 0x004  (fn_80017028)
     s32      nPlayer;           // 0x270  set by fn_8001704C
-    u8       unk274;
+    u8       b274;              // 0x274  the view is set up (fn_80016D18) and not yet shut down
     u8       bFlagOut;          // 0x275  the flagstick is out (set while every player on this view is on the
                                 //        green, the fringe or holed): no pin collisions
-    u8       unk276[0x288 - 0x276];
+    u8       unk276[2];
+    f32      f278;              // 0x278  } the render camera's screen rectangle, saved by fn_800170F4 in
+    f32      f27C;              // 0x27C  } reverse order (f284 is its first value) and put back by
+    f32      f280;              // 0x280  } fn_80017158
+    f32      f284;              // 0x284  }
 } ViewController;
 LAYOUT_ASSERT(ViewController, 0x288);
 
@@ -316,7 +320,12 @@ typedef struct CrAPGolfer {
 } CrAPGolfer;
 typedef struct CrAPState {
     s32  n0;                    // 0x00  0..4: picks the shot the CrAP camera frames (fn_800C39A8)
-    u8   unk4[0xB4 - 0x4];
+    u8   unk4[0x83 - 0x4];
+    u8   b83;                   // 0x83  set by a menu message (FE_MessageTable.c)
+    u8   unk84[2];
+    u8   b86;                   // 0x86  set by a menu message; a change while n0 is 3 calls
+                                //       fn_8008E354
+    u8   unk87[0xB4 - 0x87];
     CrAPGolfer* pB4;            // 0xB4
 } CrAPState;
 
@@ -332,11 +341,15 @@ ViewController* fn_80016CFC(int nView);
 void*  fn_80017004(int nView);          // the view's render camera
 View*  fn_80017028(int nView);
 void   fn_8001704C(int nView, int nPlayer);   // the player the view follows
-void   fn_800170C4(int nView, int a);
+void   fn_800170C4(int nView, u8 b);    // sets ViewController.b274
 f32*   fn_8001731C(View* pView);        // the camera's position (v0)
 f32*   fn_80017314(View* pView);        // where it looks (v10)
 u8     fn_800172C4(View* pView);        // the camera move has finished
 f32*   fn_80012EF0(void* pCamera);      // a render camera's screen rectangle
+f32    fn_80012ED0(f32* pRect);         // the rectangle's [3]: its height
+f32    fn_80012ED8(f32* pRect);         // [2]: its width
+f32    fn_80012EE0(f32* pRect);         // [1]: its top
+f32    fn_80012EE8(f32* pRect);         // [0]: its left
 void*  fn_8001614C(void);               // the current render camera
 void   fn_80013CCC(void* pCamera);
 void   fn_80013EEC(void* pCamera);

@@ -26,17 +26,14 @@ unsorted/sweep_800055D4.c:
 unsorted/sweep_800055D8.c:
 	.text       start:0x800055D8 end:0x80005628
 
-unsorted/sweep_80005BC8.c:
-	.text       start:0x80005BC8 end:0x80005BE8
-
-unsorted/sweep_800060DC.c:
-	.text       start:0x800060DC end:0x800060E0
+LLMem_Gc.c:
+	.text       start:0x80005628 end:0x80005BE8
 
 LLFileIO_Gc.c:
-	.text       start:0x800065C8 end:0x800066E4
+	.text       start:0x80005BE8 end:0x800066E4
 
 LLDisp_Gc.c:
-	.text       start:0x800067E4 end:0x800072E0
+	.text       start:0x800066E4 end:0x800072E0
 
 unsorted/sweep_800072E0.c:
 	.text       start:0x800072E0 end:0x800072E8
@@ -67,28 +64,10 @@ unsorted/code_800082F8.c:
 	.text       start:0x800082F8 end:0x800083A4
 
 GoEntry.c:
-	.text       start:0x800083A4 end:0x80008820
+	.text       start:0x800083A4 end:0x8000883C
 
-unsorted/sweep_80008820.c:
-	.text       start:0x80008820 end:0x8000883C
-
-unsorted/sweep_80008EF0.c:
-	.text       start:0x80008EF0 end:0x80008F20
-
-unsorted/sweep_80008F20.c:
-	.text       start:0x80008F20 end:0x80008F9C
-
-unsorted/sweep_80008F9C.c:
-	.text       start:0x80008F9C end:0x80008FCC
-
-unsorted/sweep_80008FCC.c:
-	.text       start:0x80008FCC end:0x800090A0
-
-unsorted/sweep_800090A0.c:
-	.text       start:0x800090A0 end:0x800090E4
-
-unsorted/sweep_800095F0.c:
-	.text       start:0x800095F0 end:0x80009680
+Quaternion.c:
+	.text       start:0x8000883C end:0x8000977C
 
 StaticMemory.c:
 	.text       start:0x8000977C end:0x8000A0E8
@@ -139,52 +118,13 @@ unsorted/sweep_8000C5FC.c:
 	.text       start:0x8000C5FC end:0x8000C624
 
 UStream.c:
-	.text       start:0x8000C624 end:0x8000E708
-
-unsorted/sweep_8000E708.c:
-	.text       start:0x8000E708 end:0x8000E790
+	.text       start:0x8000C624 end:0x8000E830
 
 LLTex.c:
-	.text       start:0x8000EA1C end:0x8000FFAC
-
-unsorted/sweep_8000FFAC.c:
-	.text       start:0x8000FFAC end:0x80010028
-
-unsorted/sweep_80010028.c:
-	.text       start:0x80010028 end:0x8001005C
-
-unsorted/sweep_800100B0.c:
-	.text       start:0x800100B0 end:0x80010114
-
-unsorted/sweep_80010114.c:
-	.text       start:0x80010114 end:0x8001013C
-
-unsorted/sweep_800102B4.c:
-	.text       start:0x800102B4 end:0x800102DC
+	.text       start:0x8000E830 end:0x8001013C
 
 LLTexGrp.c:
-	.text       start:0x800103C0 end:0x8001049C
-
-unsorted/sweep_8001052C.c:
-	.text       start:0x8001052C end:0x80010544
-
-unsorted/sweep_80010544.c:
-	.text       start:0x80010544 end:0x8001058C
-
-unsorted/sweep_800106A0.c:
-	.text       start:0x800106A0 end:0x800106C4
-
-unsorted/sweep_800106C4.c:
-	.text       start:0x800106C4 end:0x800106D8
-
-unsorted/sweep_80010754.c:
-	.text       start:0x80010754 end:0x80010760
-
-unsorted/sweep_800107C0.c:
-	.text       start:0x800107C0 end:0x800107E4
-
-unsorted/sweep_800107E4.c:
-	.text       start:0x800107E4 end:0x800107F4
+	.text       start:0x8001013C end:0x800107F4
 
 LLFont.c:
 	.text       start:0x800107F4 end:0x80012438
@@ -253,193 +193,25 @@ unsorted/sweep_800136F4.c:
 	.text       start:0x800136F4 end:0x8001371C
 
 GoRenderCtx_Gc.c:
-	.text       start:0x8001371C end:0x8001425C
+	.text       start:0x8001371C end:0x800143B8
 
-unsorted/sweep_8001425C.c:
-	.text       start:0x8001425C end:0x80014280
+streammanagerhole.c:
+	.text       start:0x800143B8 end:0x80016CB8
 
-unsorted/sweep_80014280.c:
-	.text       start:0x80014280 end:0x800142A4
+ViewController.c:
+	.text       start:0x80016CB8 end:0x80017320
 
-unsorted/sweep_800142A4.c:
-	.text       start:0x800142A4 end:0x800142AC
-
-unsorted/sweep_8001437C.c:
-	.text       start:0x8001437C end:0x800143B8
-
-unsorted/sweep_80014524.c:
-	.text       start:0x80014524 end:0x80014544
-
-unsorted/sweep_80014590.c:
-	.text       start:0x80014590 end:0x80014594
-
-unsorted/sweep_80014594.c:
-	.text       start:0x80014594 end:0x8001462C
-
-unsorted/sweep_8001462C.c:
-	.text       start:0x8001462C end:0x80014668
-
-unsorted/sweep_80014668.c:
-	.text       start:0x80014668 end:0x80014718
-
-unsorted/sweep_800147A4.c:
-	.text       start:0x800147A4 end:0x800147D4
-
-unsorted/sweep_800147D4.c:
-	.text       start:0x800147D4 end:0x80014834
-
-unsorted/sweep_80014834.c:
-	.text       start:0x80014834 end:0x80014864
-
-unsorted/sweep_80014864.c:
-	.text       start:0x80014864 end:0x800148EC
-
-unsorted/sweep_800148EC.c:
-	.text       start:0x800148EC end:0x8001491C
-
-unsorted/sweep_8001491C.c:
-	.text       start:0x8001491C end:0x8001497C
-
-unsorted/sweep_80014A60.c:
-	.text       start:0x80014A60 end:0x80014A64
-
-unsorted/sweep_80014DC0.c:
-	.text       start:0x80014DC0 end:0x80014DF8
-
-unsorted/sweep_80014DF8.c:
-	.text       start:0x80014DF8 end:0x80014DFC
-
-unsorted/sweep_80014E68.c:
-	.text       start:0x80014E68 end:0x80014E98
-
-unsorted/sweep_800150B8.c:
-	.text       start:0x800150B8 end:0x8001529C
-
-unsorted/sweep_80015324.c:
-	.text       start:0x80015324 end:0x80015334
-
-unsorted/sweep_800153BC.c:
-	.text       start:0x800153BC end:0x800153CC
-
-unsorted/sweep_80015454.c:
-	.text       start:0x80015454 end:0x80015464
-
-unsorted/sweep_80015464.c:
-	.text       start:0x80015464 end:0x80015470
-
-unsorted/sweep_80015620.c:
-	.text       start:0x80015620 end:0x80015624
-
-unsorted/sweep_80016124.c:
-	.text       start:0x80016124 end:0x8001614C
-
-unsorted/sweep_8001614C.c:
-	.text       start:0x8001614C end:0x80016158
-
-unsorted/sweep_8001618C.c:
-	.text       start:0x8001618C end:0x80016198
-
-unsorted/sweep_800162A0.c:
-	.text       start:0x800162A0 end:0x800162AC
-
-unsorted/sweep_80016C7C.c:
-	.text       start:0x80016C7C end:0x80016C94
-
-unsorted/sweep_80016C94.c:
-	.text       start:0x80016C94 end:0x80016CA8
-
-unsorted/sweep_80016CA8.c:
-	.text       start:0x80016CA8 end:0x80016CB8
-
-unsorted/sweep_80016CB8.c:
-	.text       start:0x80016CB8 end:0x80016CD8
-
-unsorted/sweep_80016CF4.c:
-	.text       start:0x80016CF4 end:0x80016CFC
-
-unsorted/sweep_80016CFC.c:
-	.text       start:0x80016CFC end:0x80016D10
-
-unsorted/sweep_80016D10.c:
-	.text       start:0x80016D10 end:0x80016D18
-
-unsorted/sweep_80016E28.c:
-	.text       start:0x80016E28 end:0x80016E3C
-
-unsorted/sweep_80016E3C.c:
-	.text       start:0x80016E3C end:0x80016E90
-
-unsorted/sweep_80017004.c:
-	.text       start:0x80017004 end:0x80017028
-
-unsorted/sweep_80017028.c:
-	.text       start:0x80017028 end:0x8001707C
-
-unsorted/sweep_8001707C.c:
-	.text       start:0x8001707C end:0x800170A0
-
-unsorted/sweep_800170A0.c:
-	.text       start:0x800170A0 end:0x800170C4
-
-unsorted/sweep_800170C4.c:
-	.text       start:0x800170C4 end:0x800170F4
-
-unsorted/sweep_800170F4.c:
-	.text       start:0x800170F4 end:0x80017158
-
-unsorted/sweep_80017158.c:
-	.text       start:0x80017158 end:0x800171B0
-
-unsorted/sweep_800171B0.c:
-	.text       start:0x800171B0 end:0x80017208
-
-unsorted/sweep_800172B4.c:
-	.text       start:0x800172B4 end:0x800172C4
-
-unsorted/sweep_800172C4.c:
-	.text       start:0x800172C4 end:0x80017314
-
-unsorted/sweep_80017314.c:
-	.text       start:0x80017314 end:0x8001731C
-
-unsorted/sweep_8001731C.c:
-	.text       start:0x8001731C end:0x80017320
-
-unsorted/sweep_80017410.c:
-	.text       start:0x80017410 end:0x8001744C
+char_tex_manager.c:
+	.text       start:0x80017320 end:0x80017508
 
 char.c:
-	.text       start:0x80017508 end:0x8001F084
-
-unsorted/sweep_8001F084.c:
-	.text       start:0x8001F084 end:0x8001F08C
+	.text       start:0x80017508 end:0x8001F32C
 
 mtalib.c:
-	.text       start:0x8001F32C end:0x8001F42C
+	.text       start:0x8001F32C end:0x8001FB00
 
-unsorted/sweep_8001F558.c:
-	.text       start:0x8001F558 end:0x8001F578
-
-unsorted/sweep_8001F760.c:
-	.text       start:0x8001F760 end:0x8001F780
-
-unsorted/sweep_8001FA3C.c:
-	.text       start:0x8001FA3C end:0x8001FAA8
-
-unsorted/sweep_8001FAD8.c:
-	.text       start:0x8001FAD8 end:0x8001FB00
-
-unsorted/sweep_8001FCA8.c:
-	.text       start:0x8001FCA8 end:0x8001FCD4
-
-unsorted/sweep_8001FCD4.c:
-	.text       start:0x8001FCD4 end:0x8001FCF4
-
-unsorted/sweep_80021978.c:
-	.text       start:0x80021978 end:0x80021980
-
-unsorted/sweep_80021A98.c:
-	.text       start:0x80021A98 end:0x80021ADC
+ska_shared.c:
+	.text       start:0x8001FB00 end:0x80021ADC
 
 skalib.c:
 	.text       start:0x80021ADC end:0x80026B34
@@ -1607,34 +1379,19 @@ PGATourSimulation.c:
 	.text       start:0x80117600 end:0x8011C068
 
 SkinMorph.c:
-	.text       start:0x8011C27C end:0x8011CADC
+	.text       start:0x8011C068 end:0x8011CEB0
 
-unsorted/sweep_8011CD84.c:
-	.text       start:0x8011CD84 end:0x8011CDE8
+fe_stats.c:
+	.text       start:0x8011CEB0 end:0x8011D280
 
-unsorted/sweep_8011D05C.c:
-	.text       start:0x8011D05C end:0x8011D09C
+EventInfo.c:
+	.text       start:0x8011D280 end:0x8011E020
 
-unsorted/sweep_8011D09C.c:
-	.text       start:0x8011D09C end:0x8011D0A8
-
-unsorted/sweep_8011D268.c:
-	.text       start:0x8011D268 end:0x8011D280
-
-unsorted/sweep_8011D858.c:
-	.text       start:0x8011D858 end:0x8011D878
+llrtclock.c:
+	.text       start:0x8011E020 end:0x8011E170
 
 GoGrass.c:
-	.text       start:0x8011E170 end:0x80120194
-
-unsorted/sweep_8012022C.c:
-	.text       start:0x8012022C end:0x80120244
-
-unsorted/sweep_80120244.c:
-	.text       start:0x80120244 end:0x80120268
-
-unsorted/sweep_8012028C.c:
-	.text       start:0x8012028C end:0x80120298
+	.text       start:0x8011E170 end:0x80120298
 
 unsorted/sweep_80120298.c:
 	.text       start:0x80120298 end:0x801202F8
@@ -1666,71 +1423,14 @@ unsorted/sweep_80121404.c:
 unsorted/sweep_8012141C.c:
 	.text       start:0x8012141C end:0x80121430
 
-unsorted/sweep_8012172C.c:
-	.text       start:0x8012172C end:0x80121770
-
-unsorted/sweep_801217C4.c:
-	.text       start:0x801217C4 end:0x80121808
-
-unsorted/sweep_80121808.c:
-	.text       start:0x80121808 end:0x8012185C
-
-unsorted/sweep_8012185C.c:
-	.text       start:0x8012185C end:0x801218BC
-
-unsorted/sweep_801218BC.c:
-	.text       start:0x801218BC end:0x801218DC
-
-unsorted/sweep_801218DC.c:
-	.text       start:0x801218DC end:0x801218FC
+GameMode4Menu.c:
+	.text       start:0x80121430 end:0x801220D4
 
 TibExt.c:
-	.text       start:0x80121C80 end:0x80122128
-
-unsorted/sweep_80122128.c:
-	.text       start:0x80122128 end:0x8012214C
-
-unsorted/sweep_8012214C.c:
-	.text       start:0x8012214C end:0x80122150
-
-unsorted/sweep_80122468.c:
-	.text       start:0x80122468 end:0x80122488
-
-unsorted/sweep_80122488.c:
-	.text       start:0x80122488 end:0x80122494
-
-unsorted/sweep_80122630.c:
-	.text       start:0x80122630 end:0x80122654
-
-unsorted/sweep_80122868.c:
-	.text       start:0x80122868 end:0x8012288C
-
-unsorted/sweep_8012288C.c:
-	.text       start:0x8012288C end:0x801228AC
+	.text       start:0x801220D4 end:0x801228E0
 
 gbacable.c:
-	.text       start:0x80122CFC end:0x80123E34
-
-unsorted/sweep_80123FF8.c:
-	.text       start:0x80123FF8 end:0x8012402C
-
-unsorted/sweep_8012402C.c:
-	.text       start:0x8012402C end:0x8012408C
-
-unsorted/sweep_8012408C.c:
-	.text       start:0x8012408C end:0x801240A8
-
-unsorted/sweep_801240A8.c:
-	.text       start:0x801240A8 end:0x8012411C
-
-unsorted/sweep_801241AC.c:
-	.text       start:0x801241AC end:0x80124238
-
-unsorted/sweep_80124238.c:
-	.text       start:0x80124238 end:0x80124280
-
-unsorted/sweep_80124280.c:
-	.text       start:0x80124280 end:0x801242D0
+	.text       start:0x801228E0 end:0x801247C0
 
 unsorted/sweep_801247C0.c:
 	.text       start:0x801247C0 end:0x80124814
@@ -1738,17 +1438,8 @@ unsorted/sweep_801247C0.c:
 unsorted/sweep_80124814.c:
 	.text       start:0x80124814 end:0x80124838
 
-unsorted/sweep_80124A70.c:
-	.text       start:0x80124A70 end:0x80124A98
-
-unsorted/sweep_80124A98.c:
-	.text       start:0x80124A98 end:0x80124AAC
-
-unsorted/sweep_80124B10.c:
-	.text       start:0x80124B10 end:0x80124B54
-
 EASportsBio.c:
-	.text       start:0x80124B54 end:0x8012597C
+	.text       start:0x801249A8 end:0x8012597C
 
 unsorted/sweep_801260B8.c:
 	.text       start:0x801260B8 end:0x801260C0
@@ -1784,10 +1475,7 @@ unsorted/sweep_80127098.c:
 	.text       start:0x80127098 end:0x801270F0
 
 SkinBurn.c:
-	.text       start:0x801270F0 end:0x80127B10
-
-unsorted/sweep_80127B10.c:
-	.text       start:0x80127B10 end:0x80127B4C
+	.text       start:0x801270F0 end:0x80127D84
 
 unsorted/sweep_80127D84.c:
 	.text       start:0x80127D84 end:0x80127E44
