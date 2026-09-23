@@ -76,13 +76,13 @@ void* fn_80020DD4(void* pClip, void* pOut, int nAlign);
 void* fn_80009B34(u32 uSize, u32 uFlags, u32 uAlign, const char* pFile, int nLine);  // alloc
 void  fn_80009E70(void* p);                                                           // free
 void  fn_80005628(void* pDst, void* pSrc, int nBytes);                                // memcpy
-ClipBank* fn_80021F2C(u32 nSlot);
+ClipBank* ClipBank_Get(u32 nSlot);
 u32   fn_800B6564(u32 uSize);                          // ARAM alloc
 void  fn_800B6594(u32 uAram);                          // ARAM free
 void  fn_800B6844(void* pSrc, u32 uAram, u32 uSize);   // copy to ARAM
 void  fn_800B68B4(void* pDst, u32 uAram, u32 uSize);   // copy from ARAM
 void  fn_800B67EC(void);                               // wait for the ARAM copy
-void  fn_80021DF8(void* pLib);
+void  AnimLib_Free(AnimLib* pLib);
 void  fn_800269E4(struct LibOverlay* pOv, int nSlot, s32 n);
 void  fn_800CA9DC(int nSlot);
 u32   fn_800227BC(void);                               // the current slot
@@ -90,11 +90,13 @@ void  fn_80022828(void);
 int   fn_80023F7C(int nSlot);
 AnimLib* AnimLib_Load(u8* pData, ClipBank* pBank);
 u32   fn_8009EF90(void);
+void  AnimLib_FreeCopies(void);
+void  ClipBank_FreeAram(void);
 int   strcmp(const char* pA, const char* pB);
 
 // A library that can be layered over a slot's own (0x20 bytes).
 typedef struct LibOverlay {
-    u8*    pWork;               // 0x00  the loaded (swapped) copy
+    AnimLib* pWork;             // 0x00  the loaded (swapped) copy
     void*  pCopy;               // 0x04  the file as it came off the disc
     u32    nSize;               // 0x08
     struct { s32 n0; s32 n4; }* p0C;  // 0x0C
@@ -134,6 +136,17 @@ extern u8          lbl_80281CE4;
 extern u32         lbl_80281078;      // the current slot
 extern u32         lbl_80281D04[2];   // ARAM copy of each scratch area
 extern u32         lbl_80281D0C[2];   // its size
+extern u8          lbl_801D9908[0xC8];
+extern u32         lbl_80281D18;
+extern u8*         lbl_80281CC4;      // staging buffers (32-aligned), see Skalib_Init
+extern u8*         lbl_80281CC8;
+extern u8*         lbl_80281CCC;
+extern u8*         lbl_80281CD0;
+extern u8          lbl_801C5E2C[0x1DC];
+extern u8          lbl_801C5C50[0x1DC];
+extern u8          lbl_801BF9C0[0x6290];
+extern u8          lbl_801B9730[0x6290];
+void               fn_80005AE8(void* p, int c, int n);   // memset
 
 
 extern char (*lbl_80281D14)[2][8][6][16];   // the last clip name played: [player][reaction kind][style][club]
@@ -145,6 +158,106 @@ void* AnimLib_FindByName(AnimLib* pLib, const char* pName) {
         if (pLib->ppClips[i] != NULL && strcmp((char*)pLib->ppClips[i] + 0xA0, pName) == 0) return pLib->ppClips[i];
     }
     return NULL;
+}
+
+// Sets everything up: no libraries or banks, the last-played table allocated and cleared, and the
+// four 32-aligned staging buffers used when overlay clips are merged in.
+void Skalib_Init(void) {
+    int i;
+    int j;
+
+    lbl_801C605C[0] = NULL;
+    lbl_801C6050[0] = NULL;
+    lbl_801C605C[1] = NULL;
+    lbl_801C6050[1] = NULL;
+    lbl_801C605C[2] = NULL;
+    lbl_801C6050[2] = NULL;
+    lbl_801D9908[0] = 0;
+    for (i = 0; i < 3; i++) {
+        lbl_801C6068[i].n150      = 0;
+        lbl_801C6068[i].nOverlays = 0;
+        lbl_801C6068[i].pLib      = NULL;
+        lbl_801C6068[i].pCopy     = NULL;
+        for (j = 0; j < 10; j++) {
+            lbl_801C6068[i].overlays[j].bActive = 0;
+            lbl_801C6068[i].overlays[j].n10     = -1;
+            lbl_801C6068[i].overlays[j].n14     = -1;
+            lbl_801C6068[i].overlays[j].pCopy   = NULL;
+            lbl_801C6068[i].overlays[j].pWork   = NULL;
+        }
+    }
+    if (gSession.nGameType == 3 || gSession.nGameType == 10) lbl_80281D18 = 0;
+    lbl_80281D14 = fn_80009B34(0x1800, 2, 0, "skalib.c", 508);
+    fn_80005AE8(lbl_80281D14, 0, 0x1800);
+    lbl_80281CC4 = lbl_801C5E2C;
+    lbl_80281CC8 = lbl_801C5C50;
+    lbl_80281CCC = lbl_801BF9C0;
+    lbl_80281CD0 = lbl_801B9730;
+    lbl_80281CC4 = (u8*)((((u32)lbl_80281CC4 >> 5) + 1) << 5);
+    lbl_80281CC8 = (u8*)((((u32)lbl_80281CC8 >> 5) + 1) << 5);
+    lbl_80281CCC = (u8*)((((u32)lbl_80281CCC >> 5) + 1) << 5);
+    lbl_80281CD0 = (u8*)((((u32)lbl_80281CD0 >> 5) + 1) << 5);
+}
+
+void AnimLib_Free(AnimLib* pLib);
+void ClipBank_Free(ClipBank* pBank);
+
+// Frees every library and bank.
+void Skalib_Shutdown(void) {
+    int i;
+
+    AnimLib_FreeCopies();
+    fn_80009E70(lbl_80281D14);
+    lbl_80281D14 = NULL;
+    for (i = 0; i < 3; i++) {
+        if (lbl_801C605C[i] != NULL) {
+            AnimLib_Free(lbl_801C605C[i]);
+            lbl_801C605C[i] = NULL;
+        }
+        if (lbl_801C6050[i] != NULL) {
+            if (lbl_801C6050[i]->pFile == lbl_80281CE0) lbl_80281CE0 = NULL;
+            ClipBank_Free(lbl_801C6050[i]);
+            lbl_801C6050[i] = NULL;
+        }
+    }
+    ClipBank_FreeAram();
+}
+
+// Frees a library: just its file when it was loaded from one (plus the clip table it allocated
+// for its own clips), otherwise each part it was built from.
+void AnimLib_Free(AnimLib* pLib) {
+    if (pLib->pFile != NULL) {
+        if (pLib->pClipData != NULL) fn_80009E70(pLib->ppClips);
+        fn_80009E70(pLib->pFile);
+    } else {
+        if (pLib->ppClips != NULL) fn_80009E70(pLib->ppClips);
+        if (pLib->pIndex != NULL) fn_80009E70(pLib->pIndex);
+        if (pLib->pTree != NULL) fn_80009E70(pLib->pTree);
+        if (pLib->pRecords != NULL) fn_80009E70(pLib->pRecords);
+        fn_80009E70(pLib);
+    }
+}
+
+// Frees a bank, and the ARAM of any of its clips that live there.
+void ClipBank_Free(ClipBank* pBank) {
+    u32   i;
+    Clip* pClip;
+
+    for (i = 0; i < pBank->nClips; i++) {
+        pClip = pBank->ppClips[i];
+        if (pClip != NULL && (pClip->uFlags & 4)) fn_800B6594(pClip->uAram);
+    }
+    if (pBank->pFile != NULL) {
+        fn_80009E70(pBank->pFile);
+    } else {
+        fn_80009E70(pBank);
+    }
+}
+
+// A slot's clip bank (NULL past the three slots).
+ClipBank* ClipBank_Get(u32 nSlot) {
+    if (nSlot >= 3) return NULL;
+    return lbl_801C6050[nSlot];
 }
 
 // The scratch area for slot n, uSize bytes: while only one of the first two slots has a bank,
@@ -201,13 +314,13 @@ void AnimLib_FreeWorkCopies(void) {
             }
             for (j = 0; j < pSlot->nOverlays; j++) {
                 pOv = &pSlot->overlays[j];
-                fn_80021DF8(pOv->pWork);
+                AnimLib_Free(pOv->pWork);
                 pOv->pWork = NULL;
                 pOv->n10   = -1;
             }
             pSlot->n150 = 0;
         }
-        if (pSlot->pLib != NULL) fn_80021DF8(pSlot->pLib);
+        if (pSlot->pLib != NULL) AnimLib_Free(pSlot->pLib);
         pSlot->pLib = NULL;
     }
 }
@@ -275,13 +388,13 @@ void AnimLib_ReloadSlot(void) {
     if (pSlot->nOverlays != 0) {
         pSlot->pLib = fn_80009B34(pSlot->nSize, 1, 0x40, "skalib.c", 3193);
         fn_80005628(pSlot->pLib, pSlot->pCopy, pSlot->nSize);
-        pLib = AnimLib_Load((u8*)pSlot->pLib, fn_80021F2C(nSlot));
+        pLib = AnimLib_Load((u8*)pSlot->pLib, ClipBank_Get(nSlot));
         pLib->pFile = pSlot->pLib;
         for (j = 0; j < pSlot->nOverlays; j++) {
             pOv        = &pSlot->overlays[j];
             pOv->pWork = fn_80009B34(pOv->nSize, 1, 0x40, "skalib.c", 3207);
             fn_80005628(pOv->pWork, pOv->pCopy, pOv->nSize);
-            AnimLib_Load(pOv->pWork, fn_80021F2C(nSlot));
+            AnimLib_Load((u8*)pOv->pWork, ClipBank_Get(nSlot));
             pOv->n10 = pOv->n14 + 3;
         }
     }
@@ -616,7 +729,7 @@ void AnimLib_OnLoaded(LoadedFile* pFile) {
         lbl_801C6068[nSlot].pCopy = fn_80009B34(pFile->nSize, 2, 0x40, "skalib.c", 4520);
         fn_80005628(lbl_801C6068[nSlot].pCopy, pFile->pData, pFile->nSize);
         lbl_801C6068[nSlot].nSize = pFile->nSize;
-        pLib = AnimLib_Load(pFile->pData, fn_80021F2C(nSlot));
+        pLib = AnimLib_Load(pFile->pData, ClipBank_Get(nSlot));
         pLib->pFile = pFile;
         if (pLib->pBank != NULL) {
             lbl_801C605C[nSlot] = pLib;
