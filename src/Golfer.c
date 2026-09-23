@@ -312,7 +312,7 @@ void AI_ApplyError(int nPlayer) {
         if (p->fDistance > 100.0f) {
             fMaxAngle = DEG(3.75f); fDist1 = 7.5f; fDist2 = 5.25f;
         } else if (p->fDistance > 50.0f) {
-            fMaxAngle = DEG(4.25f); fDist1 = 8.5f; fDist2 = 5.95f;
+            fMaxAngle = DEG(4.25f); fDist1 = 8.5f; fDist2 = 7.0f * 0.85f;
         } else {
             fMaxAngle = DEG(5.0f);  fDist1 = 10.0f; fDist2 = 7.0f;
         }
@@ -629,7 +629,7 @@ void AI_PlanShot(int nPlayer, f32* pTarget) {
     } else {
         gPlayers[nPlayer].nSurface = -1;
     }
-    if (fHeight != -65536.1f) {
+    if (fHeight != TER_NO_GROUND) {
         gPlayers[nPlayer].vTarget[1] = fHeight + 0.001f;
     }
     fDX = gPlayers[nPlayer].vTarget[0] - gPlayers[nPlayer].vBall[0];
@@ -808,7 +808,7 @@ void AI_SetShotModifiers(int nPlayer) {
 // simulated ball stops within 0.05 of the target. 600 frames and it gives up.
 
 #define CADDIE_SLOT       4
-#define CADDIE_TOLERANCE  0.0025f   // 0.05 squared
+#define CADDIE_TOLERANCE  (0.05f * 0.05f)   // 0.05 squared
 #define CADDIE_MAX_FRAMES 599
 
 extern u8  gCaddieDone;             // 0x80281D49
@@ -1417,7 +1417,7 @@ u8 AI_GreenTowardPin(int nPlayer, f32 fDist) {
     vDir[0] = gPlayers[nPlayer].ball.vPos[0] + vDir[0] * fDist;
     vDir[2] = gPlayers[nPlayer].ball.vPos[2] + vDir[2] * fDist;
     fHeight = fn_8004D5C0(pCourse, vDir);
-    if (fHeight != -65536.1f) {
+    if (fHeight != TER_NO_GROUND) {
         vDir[1]  = 10.0f + fHeight;
         pSurface = fn_800CC190(pCourse, vDir);
         if (pSurface->nClass == 3) {
@@ -1654,7 +1654,7 @@ void Luck_TakePerfectShot(int nPlayer) {
         while (fDiff > PI) {
             fDiff -= 2 * PI;
         }
-        if (fabs(fDiff) > 0.0872665) {
+        if (fabs(fDiff) > DEG(5.0f)) {
             gPlayers[nPlayer].bPerfect = 0;
             return;
         }

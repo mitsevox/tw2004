@@ -1048,7 +1048,7 @@ void fn_8005CD94(void) {
 
 // ---- state 2: thinking ----------------------------------------------------------------------------
 
-#define CPU_TOLERANCE 0.0025f               // 0.05 yd squared: land within 1.8 in of the target
+#define CPU_TOLERANCE (0.05f * 0.05f)       // 0.05 yd squared: land within 1.8 in of the target
 
 // A human goes straight on to state 10 (setting up). A CPU rehearses its shot here, one frame
 // at a time, and moves on once the rehearsal has settled, at least a second has passed and the
@@ -2954,9 +2954,9 @@ void STATEFUNC_PlaceBallInit(int nPlayer) {
         f32 fY;
         Ter_GetEnclosingGroundHeight(pCourse, gPlayers[nPlayer].vBall, &fLow, &fHigh);
         fY = fHigh;
-        if (-65536.1f == fHigh || fHigh > 0.25f + gPlayers[nPlayer].vBall[1]) {
+        if (TER_NO_GROUND == fHigh || fHigh > 0.25f + gPlayers[nPlayer].vBall[1]) {
             fY = fLow;
-            if (-65536.1f == fLow) {
+            if (TER_NO_GROUND == fLow) {
                 fY = gPlayers[nPlayer].vBall[1];
             }
         }
