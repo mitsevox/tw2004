@@ -63,6 +63,8 @@ void  GM_ReplaceOOBBall(int nPlayer);
 SurfaceType* Ter_GetSupportingWorldMaterial(CourseInfo* pCourse, u8* pBall);
 void  fn_800DEB5C(int nPlayer);
 u8    fn_800A7720(void);
+int   sprintf(char* pDst, const char* pFmt, ...);
+extern u8  lbl_801D7148[];                  // per profile slot: nonzero to show the profile's name
 void  fn_800FE190(f32* pA, f32* pB, f32* pOut);
 u8*   fn_800136C4(int nController);         // the pad's state: stick bytes at +0..+3
 u32   fn_800136DC(int nController);         // buttons: held << 16 | pressed this frame
@@ -1315,14 +1317,14 @@ u8 fn_800FCC38(int nPlayer) {
 // second from one still playing, which can end the hole; in both games, button 0x25 restarts the
 // hole from the tee (for the cost of event 39 in mode 7). Then speed golf's lbl_802823C8 is set.
 void fn_800FCCF0(void) {
-    int i;
-    int nOther;
+    PlayerNumber_t i;
+    PlayerNumber_t nOther;
     int k;
     CourseInfo* pHole;
     if (gSession.unk14 == 0) {
         if (Game_GetMode() == 7) {
-            i = 0;
-            nOther = 1;
+            i = PLR_1_e;
+            nOther = PLR_2_e;
             if ((gPlayers[i].nC3C & 0x6000) || (gPlayers[nOther].nC3C & 0x6000)) {
                 return;
             }
@@ -1375,11 +1377,11 @@ void fn_800FCCF0(void) {
                         lbl_802823C8 = 0;
                     }
                 }
-                nOther = 0;
-                i = 1;
+                nOther = PLR_1_e;
+                i = PLR_2_e;
             }
         } else if (Game_GetMode() == 8) {
-            i = 0;
+            i = PLR_1_e;
             if ((fn_800136DC(gPlayers[i].nController) & fn_800142AC(0x25, 0)) && !fn_800FCC38(i) &&
                 ((s8)GOLFERSTATE_GetCurrentState(i) == 24 ||
                  (gPlayers[i].nLie != 0 && gPlayers[i].nLie != LIE_HOLED && gPlayers[i].nLie != 16))) {
@@ -1520,6 +1522,14 @@ void fn_800FD534(int nPlayer) {
 void fn_800FD6A0(int nPlayer) {
 }
 
+// In speed golf (modes 7 and 8), bit 0 of nC3C: the golfer is running to the ball.
+s32 fn_800FD6A4(int nPlayer) {
+    if (Game_GetMode() == 7 || Game_GetMode() == 8) {
+        return gPlayers[nPlayer].nC3C & 1;
+    }
+    return 0;
+}
+
 // A hole's points (nC6C) for the scorecard; *pWon is 1 when the player gained points on it
 // (two-player game only). The hole being played counts from nC44 until it is finished.
 s32 fn_800FD704(int nPlayer, int nHole, s32* pWon) {
@@ -1554,12 +1564,61 @@ s32 fn_800FD704(int nPlayer, int nHole, s32* pWon) {
     return gPlayers[nPlayer].nC6C[nHole];
 }
 
-// In speed golf (modes 7 and 8), bit 0 of nC3C: the golfer is running to the ball.
-s32 fn_800FD6A4(int nPlayer) {
-    if (Game_GetMode() == 7 || Game_GetMode() == 8) {
-        return gPlayers[nPlayer].nC3C & 1;
+// The two players' names ("User n" without a profile) and points for the results screen. Returns
+// which player gained points on the current hole: 0, 1, or -1 for neither.
+s32 fn_800FD8D0(char* szName1, s32* pPoints1, char* szName2, s32* pPoints2) {
+    s32 bWon;
+    char sz[32];
+    int nHole = Game_CurHoleIndex();
+    int nProfile;
+    nProfile = gPlayers[0].nIndex;
+    if (!lbl_801D7148[nProfile]) {
+        sprintf(sz, "User %d", nProfile + 1);
+        strcpy(szName1, sz);
+    } else {
+        strcpy(szName1, (char*)&gpSaveData[nProfile * 0x10600] + 1);
     }
-    return 0;
+    nProfile = gPlayers[1].nIndex;
+    if (!lbl_801D7148[nProfile]) {
+        sprintf(sz, "User %d", nProfile + 1);
+        strcpy(szName2, sz);
+    } else {
+        strcpy(szName2, (char*)&gpSaveData[nProfile * 0x10600] + 1);
+    }
+    *pPoints1 = gPlayers[0].nC44;
+    *pPoints2 = gPlayers[1].nC44;
+    fn_800FD704(0, nHole, &bWon);
+    if (bWon) {
+        return 0;
+    }
+    fn_800FD704(1, nHole, &bWon);
+    return bWon ? 1 : -1;
+}
+
+// The hole's time for a player from nFrames (at 60 a second), and its points with 3 per stroke.
+void fn_800FDA30(int nPlayer, int nFrames) {
+    int n = nFrames / 60;
+    gPlayers[nPlayer].n290[Game_CurHoleIndex()] = n;
+    n += gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] * 3;
+    gPlayers[nPlayer].nC6C[Game_CurHoleIndex()] = n;
+}
+
+// When both golfers are in states 1 to 4 or 10, the first player's (PLR_1_e) hole is ended: lie
+// "holed", nC3C bit 26, and state 13.
+void fn_800FDADC(void) {
+    PlayerNumber_t nPlayer = PLR_1_e;
+    if (((s8)GOLFERSTATE_GetCurrentState(nPlayer) == 1 || (s8)GOLFERSTATE_GetCurrentState(nPlayer) == 2 ||
+         (s8)GOLFERSTATE_GetCurrentState(nPlayer) == 3 || (s8)GOLFERSTATE_GetCurrentState(nPlayer) == 4 ||
+         (s8)GOLFERSTATE_GetCurrentState(nPlayer) == 10) &&
+        ((s8)GOLFERSTATE_GetCurrentState(PLR_2_e) == 1 || (s8)GOLFERSTATE_GetCurrentState(PLR_2_e) == 2 ||
+         (s8)GOLFERSTATE_GetCurrentState(PLR_2_e) == 3 || (s8)GOLFERSTATE_GetCurrentState(PLR_2_e) == 4 ||
+         (s8)GOLFERSTATE_GetCurrentState(PLR_2_e) == 10)) {
+        gPlayers[nPlayer].nLie = LIE_HOLED;
+        gPlayers[nPlayer].nC3C |= 0x4000000;
+        fn_800F80D4(0);
+        fn_800ED710(nPlayer);
+        GOLFERSTATE_Switch(13, nPlayer);
+    }
 }
 
 void fn_800FDC0C(s32* p0, s32* p1, s32* p2) {
