@@ -29,7 +29,6 @@ typedef struct ChallengeSpotRecord {
     f32 v[3];                   // 0x10
     u8  nChallenge;             // 0x1C
 } ChallengeSpotRecord;
-extern s32 lbl_801925F0[][3];               // per message kind: three message ids to pick from
 extern char* lbl_80282310;                  // the challenge text block
 extern s32 lbl_80281660;
 extern s32 lbl_802822F0;
@@ -579,6 +578,13 @@ void fn_800EBEF0(void) {
     }
 }
 
+// Per medal (0..2): three messages to pick from.
+s32 lbl_801925F0[3][3] = {
+    {0, 1, 2},
+    {3, 4, 5},
+    {6, 7, 8},
+};
+
 // A message of kind n: one of three at random.
 void fn_800EC170(int n) {
     s32 nMsg = lbl_801925F0[n][Rand_Next(0) % 3];
@@ -1066,7 +1072,7 @@ int fn_800ED314(void) {
             n++;
         }
     }
-    i = fn_800ED5C8(0, 1) == 0;
+    i = !fn_800ED5C8(0, 1);
     if (fn_800ED508(lbl_80281664[lbl_802822F4].nGroup) > 1) {
         for (i = lbl_802822F4 + i; i < lbl_80281668; i++) {
             if (lbl_80281664[i].nGroup == lbl_80281664[lbl_802822F4].nGroup) {
