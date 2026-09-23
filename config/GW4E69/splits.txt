@@ -4154,6 +4154,7 @@ Common/TagFile/TagFile.c:
 
 src/gba/GBA.c:
 	.text       start:0x80176270 end:0x80176280
+	.sbss       start:0x80282A38 end:0x80282A40
 
 src/card/CARDBios.c:
 	.text       start:0x80176A38 end:0x80177DA4
