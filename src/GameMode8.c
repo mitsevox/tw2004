@@ -101,6 +101,25 @@ f32   fn_8000AD78(f32 y, f32 x);                // atan2f
 f32   fn_8000AD9C(f32 x);                       // fabsf
 void  fn_800BAF04(f32* pSrc, f32* pDst);        // normalise
 int   Golfer_GetAttribute(Player* pPlayer, int nAttr, int nMode);
+void  GM_SimulateBallMovement(int nPlayer);
+u8    fn_80058F5C(int nPlayer);                 // the per-frame swing poll: the ball was struck
+void  fn_800ED710(s32 p0);
+void  fn_80055AA8(u8* pBall, f32* pPos, int nPlayer);
+void  Vec_Normalize(f32* pSrc, f32* pDst);
+u8    Ter_PointInOOBNetwork(u8* pBall);
+void  fn_80069330(int nPlayer, f32* pPos);
+void  fn_8006A6C4(int nPlayer);
+void  PlaceBall_UpdateMomentums(int nPlayer, f32 f);
+u8*   fn_80016CFC(int nView);
+u8*   fn_80008370(u8* p);
+u8    Physics_DropBall(u8* pBall, f32* pPos);
+extern f32 lbl_801D5888[4][4];                  // per player: where the ball was last on the course
+
+// The tee positions follow the pins in the per-hole data (fn_8000C594).
+typedef struct HoleTees {
+    u8     unk0[0xB0];
+    PinPos tee[4];                          // 0xB0  one per tee set
+} HoleTees;
 void  Mem_cpy(void* pDst, void* pSrc, int nBytes);
 void  fn_8006ACF8(int nPlayer, int a);
 void  fn_8006BAA8(int nPlayer);
@@ -134,6 +153,7 @@ void  fn_800FA844(int nPlayer);
 void  fn_800FA994(int nPlayer);
 void  fn_800FA998(int nPlayer);
 void  fn_800FA9E0(int nPlayer);
+void  fn_800FB35C(int nPlayer, int nOther);
 f32   fn_800FB41C(f32* pA, f32* pB);
 void  fn_800FBD2C(int nPlayer);
 void  fn_800FCBDC(int nPlayer);
@@ -816,7 +836,7 @@ void fn_800FB204(int nPlayer, int nStrokes) {
 // A shot's length (from vPreShot to the ball): a putt of 20/3 or more is event 17; any other
 // shot of 10 or more is event 18, or 19 from 60. The unit is not proven (in yards, 20/3 would be
 // 20 feet). fn_800FB41C always returns 0, so none of these fire.
-void fn_800FB35C(int nPlayer) {
+void fn_800FB35C(int nPlayer, int nOther) {
     f32 fDist = fn_800FB41C(gPlayers[nPlayer].vPreShot, (f32*)gPlayers[nPlayer].ball);
     if (gPlayers[nPlayer].nClub == CLUB_PUTTER) {
         if (fDist >= 20.0f / 3.0f) {
@@ -983,6 +1003,327 @@ void fn_800FBB30(Player* p) {
     if (p->fCB4 < (lbl_802816BC - fLow) *
                       (0.5f * (0.01f * (s8)Golfer_GetAttribute(p, ATTR_SPEED, ATTR_TOTAL))) + fLow) {
         p->fCB4 += lbl_802816B0;
+    }
+}
+
+// States 12 and 24, update: the ball flies, then the golfer runs to it. Once the ball stops,
+// fn_800FAD54 scores the shot; a holed ball (mode 7: its events, and state 26 once both are
+// down) or a ball on the green gets its events, and out of bounds replaces the ball. Then the
+// run: the countdown from fn_800FA518, the sticks (fn_800FB774, or fn_800FBB30 for the CPU), and
+// arriving at the ball (within 5 of it).
+void fn_800FBD2C(int nPlayer) {
+    Player* p = &gPlayers[nPlayer];
+    int nOther = nPlayer ? 0 : 1;
+    f32 vStart[4];
+    f32 vDir[4];
+    f32 v[4];
+    int nStrokes;
+    int nPar;
+    int nDiff;
+    int n;
+    CourseInfo* pHole;
+    f32 fDist;
+    f32 fToPlace;
+    f32 fAngle;
+    f32 fLow;
+    f32 fHigh;
+    u8* pBall;
+    f32* pTarget;
+    if (Game_GetMode() == 7) {
+
+        if (!(gPlayers[nPlayer].uC48 & 1) && !(gPlayers[nOther].uC48 & 1)) {
+            fn_800FAAB8(nPlayer, 0);
+        }
+        if (p->vA44[0] == *(f32*)(p->ball + 0) && p->vA44[2] == *(f32*)(p->ball + 8) && (p->nC3C & 8)) {
+            if (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] == gPlayers[nPlayer].nC60 &&
+                !(gPlayers[nPlayer].uC48 & 0x4000000000LL)) {
+                fn_800FAAB8(nPlayer, 0x26);
+            }
+        }
+    }
+    GM_SimulateBallMovement(nPlayer);
+    if (gPlayers[nPlayer].nBallState == 0) {
+    } else if (gPlayers[nPlayer].nBallState == 1 || gPlayers[nPlayer].nBallState == 5) {
+        if (!fn_800FAD54(nPlayer)) {
+            if (Game_GetMode() == 7 && (s8)GOLFERSTATE_GetCurrentState(nOther) == 26) {
+                GOLFERSTATE_Set(26, (u8)nPlayer);
+            }
+            return;
+        }
+        nStrokes = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
+        if (gPlayers[nPlayer].nLie == LIE_HOLED) {
+            if (Game_GetMode() == 7) {
+                fn_800FB35C(nPlayer, nOther);
+                nStrokes = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
+                if (gPlayers[nPlayer].nC3C & 8) {
+                    gPlayers[nPlayer].nC3C |= 0x10;
+                    if (!(gPlayers[nOther].nC3C & 8)) {
+                        fn_800FAAB8(nPlayer, 0x1D);
+                    }
+                    fn_800FB204(nPlayer, nStrokes - gPlayers[nPlayer].nC60);
+                } else {
+                    gPlayers[nPlayer].nC3C |= 8;
+                    gPlayers[nPlayer].nC5C = 59;
+                    gPlayers[nPlayer].nC3C |= 0x100;
+                    gPlayers[nPlayer].nC60 = nStrokes;
+                    fn_800FB204(nPlayer, nStrokes);
+                    if (gPlayers[nOther].nC3C & 8) {
+                        if (nStrokes < gPlayers[nOther].nC60) {
+                            if (!(gPlayers[nPlayer].uC48 & 0x2000000000LL)) {
+                                fn_800FAAB8(nPlayer, 0x25);
+                            }
+                        } else if (nStrokes > gPlayers[nOther].nC60) {
+                            if (!(gPlayers[nOther].uC48 & 0x2000000000LL)) {
+                                fn_800FAAB8(nOther, 0x25);
+                            }
+                        }
+                    } else if (nStrokes <= gPlayers[nOther].nStrokes[Game_CurHoleIndex()]) {
+                        if (!(gPlayers[nPlayer].uC48 & 0x2000000000LL)) {
+                            fn_800FAAB8(nPlayer, 0x25);
+                        }
+                    }
+                }
+                if ((gPlayers[nOther].nC3C & 8) || (gPlayers[nPlayer].nC3C & 0x10)) {
+                    GOLFERSTATE_Set(26, (u8)nPlayer);
+                    if (gPlayers[nOther].nBallState != 2 && gPlayers[nOther].nBallState != 3 &&
+                        gPlayers[nOther].nBallState != 4) {
+                        GOLFERSTATE_Set(26, (u8)nOther);
+                    }
+                    return;
+                }
+                if (!(gPlayers[nPlayer].uC48 & 4)) {
+                    fn_800FAAB8(nPlayer, 2);
+                }
+                pHole = fn_8000C594();
+                fn_80055AA8(p->ball, &((HoleTees*)pHole)->tee[gSession.nTeeSet[nPlayer]].x, nPlayer);
+                Vec_Copy(&((HoleTees*)pHole)->tee[gSession.nTeeSet[nPlayer]].x, &p->fBallX);
+                Vec_Copy(&((HoleTees*)pHole)->tee[gSession.nTeeSet[nPlayer]].x, p->vA44);
+                gPlayers[nPlayer].nC3C &= ~1;
+                if (lbl_802823C8) {
+                    GOLFERSTATE_Switch(1, nPlayer);
+                    lbl_802823C8 = 0;
+                } else {
+                    gPlayers[nPlayer].nC3C |= 0x100000;
+                }
+            } else {
+                fn_800F80D4(0);
+                fn_800ED710(nPlayer);
+                GOLFERSTATE_Switch(13, nPlayer);
+                if (lbl_802823C9) {
+                    lbl_802823C9 = 0;
+                    lbl_802823CA = 1;
+                } else {
+                    lbl_802823CA = 0;
+                }
+            }
+        } else {
+            if (!(gPlayers[nPlayer].nC3C & 8) && (gPlayers[nOther].nC3C & 8)) {
+                if (nStrokes >= gPlayers[nOther].nC60 && !(gPlayers[nOther].uC48 & 0x2000000000LL)) {
+                    fn_800FAAB8(nOther, 0x25);
+                }
+            }
+            pBall = p->ball;
+            if (!Ter_PointInOOBNetwork(pBall)) {
+                gPlayers[nPlayer].nBallState = 5;
+            }
+            if (gPlayers[nPlayer].nBallState == 5) {
+                GM_ReplaceOOBBall(nPlayer);
+                if (lbl_802823C8) {
+                    GOLFERSTATE_Switch(1, nPlayer);
+                    lbl_802823C8 = 0;
+                } else {
+                    gPlayers[nPlayer].nC3C |= 0x100000;
+                }
+            } else {
+                gPlayers[nPlayer].nBallState = 0;
+                Mem_cpy(p->ballBefore, pBall, 0xBC);
+                nPar = fn_800D2B08();
+                if (gPlayers[nPlayer].nLie == LIE_GREEN) {
+                    if (Game_GetMode() == 7) {
+                        fDist = fn_800FB41C(p->vPreShot, (f32*)pBall);
+                        if (fn_800FB41C((f32*)pBall, gpGame->p130) <= 1.0f && fDist >= 20.0f) {
+                            fn_800FAAB8(nPlayer, 0x14);
+                        }
+                        if (!(gPlayers[nPlayer].nC3C & 0x40)) {
+                            gPlayers[nPlayer].nC3C |= 0x40;
+                            gPlayers[nPlayer].nC64 = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
+                            if (!(gPlayers[nOther].nC3C & 0x40)) {
+                                fn_800FAAB8(nPlayer, 3);
+                            }
+                            fn_800FE190((f32*)p->ball, gpGame->p130, v);
+                            p->fC68 = fn_80009680(v[0] * v[0] + v[2] * v[2]);
+                            nDiff = nPar - 2 - gPlayers[nPlayer].nC64;
+                            if (nDiff == 0) {
+                                fn_800FAAB8(nPlayer, 0x15);
+                            } else if (nDiff > 0) {
+                                fn_800FAAB8(nPlayer, 0x16);
+                            }
+                            if ((gPlayers[nOther].uC48 & 0x600000) && nDiff >= 0) {
+                                if (gPlayers[nOther].fC68 > gPlayers[nPlayer].fC68) {
+                                    fn_800FAAB8(nPlayer, 7);
+                                } else if (gPlayers[nOther].fC68 < gPlayers[nPlayer].fC68) {
+                                    fn_800FAAB8(nOther, 7);
+                                }
+                            }
+                        } else if ((gPlayers[nPlayer].nC3C & 8) && !(gPlayers[nPlayer].nC3C & 0x80)) {
+                            gPlayers[nPlayer].nC3C |= 0x80;
+                            fn_800FAAB8(nPlayer, 0x1C);
+                            nDiff = nPar - 2 - (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] -
+                                                gPlayers[nPlayer].nC60);
+                            if (nDiff == 0) {
+                                fn_800FAAB8(nPlayer, 0x15);
+                            } else if (nDiff > 0) {
+                                fn_800FAAB8(nPlayer, 0x16);
+                            }
+                            if ((gPlayers[nOther].uC48 & 0x600000) && nDiff >= 0) {
+                                fn_800FE190((f32*)p->ball, gpGame->p130, v);
+                                fDist = fn_80009680(v[0] * v[0] + v[2] * v[2]);
+                                if (gPlayers[nPlayer].uC48 & 0x0C000080) {
+                                    if (fDist < gPlayers[nPlayer].fC68) {
+                                        fn_800FAAB8(nPlayer, 0x1B);
+                                        gPlayers[nPlayer].fC68 = fDist;
+                                    }
+                                } else if (gPlayers[nOther].uC48 & 0x0C000080) {
+                                    if (fDist < gPlayers[nOther].fC68) {
+                                        fn_800FAAB8(nPlayer, 0x1A);
+                                        gPlayers[nPlayer].fC68 = fDist;
+                                        gPlayers[nOther].uC48 &= ~(u64)0x0C000080;
+                                    }
+                                } else {
+                                    fn_800FAAB8(nPlayer, 7);
+                                    gPlayers[nPlayer].fC68 = fDist;
+                                }
+                            }
+                        }
+                    }
+                } else if (Game_GetMode() == 7 &&
+                           (gPlayers[nPlayer].nLie == 6 || gPlayers[nPlayer].nLie == 7 ||
+                            gPlayers[nPlayer].nLie == 8)) {
+
+                    if (gPlayers[nPlayer].nC3C & 0x10) {
+                        fn_800FAAB8(nPlayer, 0x20);
+                    } else {
+                        fn_800FAAB8(nPlayer, 6);
+                    }
+                    gPlayers[nPlayer].nC3C |= 0x400;
+                }
+            }
+        }
+        if (Game_GetMode() == 7 && (s8)GOLFERSTATE_GetCurrentState(nOther) == 26) {
+            if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) != 26) {
+                GOLFERSTATE_Set(26, (u8)nPlayer);
+            }
+            return;
+        }
+    } else {
+        fn_80058F5C(nPlayer);
+    }
+    switch (fn_800FA518(nPlayer)) {
+    case 1:
+        break;
+    case 0:
+
+        Vec_Copy(&p->fBallX, vStart);
+        fn_80069330(nPlayer, vStart);
+        fn_8006A6C4(nPlayer);
+        n = gPlayers[nPlayer].nView0;
+        View_SetCamera(fn_80017028(n), 9, nPlayer, n);
+        gPlayers[nPlayer].nC3C |= 1;
+        fn_80062C80(gPlayers[nPlayer].nC58, 0);
+        gPlayers[nPlayer].fCB4 = lbl_802816B8;
+        if (gPlayers[nPlayer].nC3C & 0x200000) {
+            gPlayers[nPlayer].nC54 = 59;
+        } else {
+            gPlayers[nPlayer].nC54 = 179;
+        }
+        fn_800FE190((f32*)p->ball, p->vPlacement, vDir);
+        Vec_Normalize(vDir, vDir);
+        gPlayers[nPlayer].fA88 = PI / 2.0f + fn_8000AD78(vDir[2], vDir[0]);
+        break;
+    case -1:
+        if (Player_IsCPU(nPlayer)) {
+            fn_800FBB30(p);
+        } else {
+            fn_800FB774(nPlayer);
+        }
+        if (gPlayers[nPlayer].fCB4 < lbl_802816B8) {
+            gPlayers[nPlayer].fCB4 = lbl_802816B8;
+        }
+        if (gPlayers[nPlayer].fCB4 > lbl_802816BC) {
+            gPlayers[nPlayer].fCB4 = lbl_802816BC;
+        }
+        fDist = gPlayers[nPlayer].fCB4;
+        fDist *= 0.01f * (s8)Golfer_GetAttribute(p, ATTR_SPEED, ATTR_TOTAL);
+        PlaceBall_UpdateMomentums(nPlayer, fDist);
+        pBall = p->ball;
+        pTarget = p->vPlacement;
+        fn_800FE190((f32*)pBall, pTarget, vDir);
+        Vec_Normalize(vDir, vDir);
+        fAngle = gPlayers[nPlayer].fA88 - fn_8000AD78(vDir[2], vDir[0]) - PI / 2.0f;
+        fAngle *= 180.0f / PI;
+        if (gPlayers[nPlayer].nC58 == 2) {
+            fLow = 40.0f;
+            fHigh = 330.0f;
+        } else {
+            fLow = 30.0f;
+            fHigh = 340.0f;
+        }
+        while (fAngle < 0.0f) {
+            fAngle += 360.0f;
+        }
+        while (fAngle > 360.0f) {
+            fAngle -= 360.0f;
+        }
+        if (fAngle <= fLow || fAngle >= fHigh) {
+            n = 0;
+        } else if (fAngle > fLow && fAngle < 135.0f) {
+            n = 1;
+        } else if (fAngle < fHigh && fAngle > 225.0f) {
+            n = 3;
+        } else {
+            n = 2;
+        }
+        fn_800FE0AC(gPlayers[nPlayer].nC58, n);
+        fn_800FE190((f32*)pBall, pTarget, vDir);
+        fToPlace = fn_80009680(vDir[0] * vDir[0] + vDir[2] * vDir[2]);
+        // the distance to a position in the view's object (+0x34), if that is nearer; the second
+        // square root is written twice, as a MIN() macro would expand
+        fn_800FE190((f32*)pBall, (f32*)(fn_80008370(*(u8**)fn_80016CFC(gPlayers[nPlayer].nView0)) + 0x34),
+                    vDir);
+        fDist = (fToPlace <= (f32)fn_80009680(vDir[0] * vDir[0] + vDir[2] * vDir[2]))
+
+                    ? fToPlace
+                    : (f32)fn_80009680(vDir[0] * vDir[0] + vDir[2] * vDir[2]);
+        if (gPlayers[nPlayer].nBallState == 0) {
+            if (fDist < 5.0f) {
+                Vec_Copy((f32*)pBall, &p->fBallX);
+                gPlayers[nPlayer].nC3C &= ~1;
+                fn_80062C80(gPlayers[nPlayer].nC58, 1);
+                fn_800FE0AC(gPlayers[nPlayer].nC58, 0);
+                fn_800FE080(gPlayers[nPlayer].nC58, 0);
+                fn_800FE054(gPlayers[nPlayer].nC58, 0);
+                if (lbl_802823C8 || Game_GetMode() != 7) {
+                    GOLFERSTATE_Switch(1, nPlayer);
+                    lbl_802823C8 = 0;
+                } else {
+                    gPlayers[nPlayer].nC3C |= 0x100000;
+                }
+            }
+        } else if (fDist < 5.0f) {
+            if (!Player_IsCPU(nPlayer)) {
+                if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x23, 0)) {
+                    if (gPlayers[nPlayer].nBallState != 1) {
+                        Physics_DropBall(pBall, lbl_801D5888[nPlayer]);
+                        gPlayers[nPlayer].nBallState = 1;
+                    }
+                } else {
+                    fn_800FE054(gPlayers[nPlayer].nC58, 1);
+                }
+            }
+        } else {
+            fn_800FE054(gPlayers[nPlayer].nC58, 0);
+        }
+        break;
     }
 }
 
