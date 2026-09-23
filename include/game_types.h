@@ -47,6 +47,19 @@ static inline u32 __cntlzw(u32 x) {
 static inline double __frsqrte(double x) {
     return 1.0 / sqrt(x);
 }
+
+// __fabs is the absolute value of a double: the sign bit cleared, as the fabs instruction does
+// (so -0.0 gives +0.0).
+static inline double __fabs(double x) {
+    union {
+        double d;
+        u64 u;
+    } v;
+
+    v.d = x;
+    v.u &= ~((u64)1 << 63);
+    return v.d;
+}
 #endif
 typedef float              f32;
 typedef double             f64;
