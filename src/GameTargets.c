@@ -1,14 +1,14 @@
 // GameTargets.c (our name): the code the target games (modes 13..17) share: the target list sorted
 // and aimed at, each player's targets hit and shot multiplier, the prize, the per-tee distance
-// check, and dispatchers into each mode's own file. Split from GameMode10.c because the two halves
-// each have their own copy of the int-to-float constant; the bytes cannot prove the exact split
-// point, which is somewhere from fn_800F19D4 to fn_800F266C (the functions between use no float
-// constants). fn_800F19D4 is the first function the target modes call.
+// check, and dispatchers into each mode's own file. Split from GameModeReplay.c (mode 10) because
+// the two halves each have their own copy of the int-to-float constant; the bytes cannot prove the
+// exact split point, which is somewhere from fn_800F19D4 to fn_800F266C (the functions between use
+// no float constants). fn_800F19D4 is the first function the target modes call.
 
 #include "golfer.h"
 #include "ball.h"
 
-// The target list (see GameMode10.c): up to lbl_80282360 points (w = 1).
+// The target list (see GameModeReplay.c): up to lbl_80282360 points (w = 1).
 extern f32 lbl_80211D38[][4];
 extern s8  lbl_80282360;
 

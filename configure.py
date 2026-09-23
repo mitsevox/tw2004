@@ -821,7 +821,7 @@ config.libs = [
             Object(Matching, "GameMode9.c"),
             Object(NonMatching, "GameMode23.c"),
             Object(NonMatching, "GameMode24.c"),
-            Object(Matching, "GameMode10.c"),
+            Object(Matching, "GameModeReplay.c"),
             Object(Matching, "GameTargets.c"),
             Object(Matching, "GameMode14.c"),
             Object(Matching, "GameMode15.c"),

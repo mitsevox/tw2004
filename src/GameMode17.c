@@ -23,7 +23,7 @@ extern PrizeTable lbl_80200538;
 extern Replay gReplayData;
 extern u8  gNumPlayersSetUp;
 extern s32 lbl_80282278;                    // the player whose turn it is
-extern s8  lbl_80282360;                    // the number of targets (GameMode10.c)
+extern s8  lbl_80282360;                    // the number of targets (GameModeReplay.c)
 extern s32 lbl_802816A0;                    // the options saved while the game runs
 extern s32 lbl_802823A0;
 extern s32 lbl_802823A4;                    // the extra balls of the last shot
