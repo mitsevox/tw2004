@@ -47,6 +47,11 @@ void fn_800A4928(void);
 void fn_800A42B0(u8 n);
 void fn_800A7220(f32 fAmount);
 void fn_800A754C(u8 a, u16 b);
+void fn_800A3F58(u8 bLow, u8 bHigh);
+void fn_800A4170(u8 nId, u8 nTrack, s32 n);
+void fn_800A5980(u8 nPlayer);
+void fn_800A6C98(u8 nPlayer, u8 n);
+void fn_800AD950(u8 nId, u8 nTrack, u8 n);
 u8   fn_800A4A24(s32 nCourse, int n);
 u8   fn_800A4A88(void);
 void fn_800A7968(u8 nId, u8 nTrack, u8 a, u16 b, s32 c);
@@ -605,24 +610,23 @@ void fn_800A4044(u8 nIndex, u8 nValue) {
     }
 }
 
-void fn_800A4170(s32 n, u8 nState) {
-    if (nState == 2) {
+// An emitter callback (hlaudemitter.c's pfnCallback shape): when track 2 stops, tells GameEffects.c.
+void fn_800A4170(u8 nId, u8 nTrack, s32 n) {
+    if (nTrack == 2) {
         fn_800DC6E8(fn_8001707C(0));
     }
 }
 
 void fn_800A42B0(u8 n) {
-    if (lbl_8028202F == 0) {
-        if (lbl_80282040 == 0) return;
-        fn_800AD9AC(lbl_8028141C, 2, n);
-        fn_800AD9AC(lbl_8028141D, 2, n);
-        fn_800AD9AC(lbl_8028141C, 3, n);
-        fn_800AD9AC(lbl_8028141D, 3, n);
-        fn_800AD698(lbl_8028141C, 2, 1);
-        fn_800AD698(lbl_8028141D, 2, 1);
-        fn_800AD698(lbl_8028141C, 3, 1);
-        fn_800AD698(lbl_8028141D, 3, 1);
-    }
+    if (lbl_8028202F || !lbl_80282040) return;
+    fn_800AD9AC(lbl_8028141C, 2, n);
+    fn_800AD9AC(lbl_8028141D, 2, n);
+    fn_800AD9AC(lbl_8028141C, 3, n);
+    fn_800AD9AC(lbl_8028141D, 3, n);
+    fn_800AD698(lbl_8028141C, 2, 1);
+    fn_800AD698(lbl_8028141D, 2, 1);
+    fn_800AD698(lbl_8028141C, 3, 1);
+    fn_800AD698(lbl_8028141D, 3, 1);
 }
 
 void fn_800A4928(void) {
@@ -705,6 +709,29 @@ void fn_800A43DC(void) {
                 n = 0;
             }
             fn_800A42B0(n);
+        }
+    }
+}
+
+void fn_800A484C(void) {
+    int nCourse;
+    u8 n;
+    u8 nSound;
+
+    if (lbl_8028203C == 2) {
+        nCourse = Game_GetCourse();
+        n = fn_80015464();
+        fn_800ADA94(lbl_8028141A, 0, 1.0f);
+        fn_800AD698(lbl_8028141A, 1, 1);
+        if (fn_80035574()) {
+            fn_800AD698(lbl_8028141A, 2, 1);
+        }
+        fn_800AD9AC(lbl_8028141A, 3, nCourse);
+        fn_800AD698(lbl_8028141A, 3, 1);
+        nSound = fn_800A4A24(nCourse, n);
+        if (nSound != 0xFF) {
+            fn_800AD9AC(lbl_8028141A, 4, nSound);
+            fn_800AD698(lbl_8028141A, 4, 1);
         }
     }
 }
@@ -850,6 +877,35 @@ void fn_800A6450(u8 nPlayer) {
 }
 
 // The calls below only sound when gpGame->b288 is set.
+void fn_800A64A8(u8 nPlayer, u8 b) {
+    GameAudioView* pView;
+
+    pView = &lbl_801F1790[gPlayers[nPlayer].nView[0]];
+    if (lbl_8028202B || lbl_8028202F) return;
+    fn_800A4170(pView->n2, 2, 1);
+    fn_800AD698(pView->n2, 2, 1);
+    fn_800AD698(pView->n3, 2, 1);
+    fn_800A3F58(0, 1);
+    fn_800ADA94(lbl_80281420, 0, 0.0f);
+    fn_800ADA94(lbl_8028141C, 0, 0.0f);
+    fn_800ADA94(lbl_8028141C, 1, 0.0f);
+    fn_800ADA94(lbl_8028141C, 2, 0.0f);
+    fn_800ADA94(lbl_8028141C, 3, 0.0f);
+    fn_800ADA94(lbl_8028141C, 4, 0.0f);
+    fn_800ADA94(lbl_8028141C, 5, 0.0f);
+    fn_800ADA94(lbl_8028141D, 0, 0.0f);
+    fn_800ADA94(lbl_8028141D, 1, 0.0f);
+    fn_800ADA94(lbl_8028141D, 2, 0.0f);
+    fn_800ADA94(lbl_8028141D, 3, 0.0f);
+    fn_800ADA94(lbl_8028141D, 4, 0.0f);
+    fn_800ADA94(lbl_8028141D, 5, 0.0f);
+    fn_800ADA94(lbl_8028141A, 0, 0.0f);
+    if (b) {
+        fn_800A6C98(nPlayer, 0);
+    }
+    lbl_8028202F = 1;
+}
+
 void fn_800A67E8(u8 nPlayer) {
     GameAudioView* pView;
 
@@ -866,6 +922,57 @@ void fn_800A6854(u8 nPlayer) {
     fn_800AD698(pView->n3, 0, 0);
 }
 
+void fn_800A6AC8(u8 nPlayer, u8 n) {
+    GameAudioView* pView;
+
+    pView = &lbl_801F1790[gPlayers[nPlayer].nView[0]];
+    switch (fn_800C7138(fn_80017028(0))) {
+    case 4:
+        n += 4;
+        // fall through
+    case 9:
+        fn_800AD9AC(pView->n2, 6, n);
+        fn_800AD9AC(pView->n3, 6, n);
+        fn_800AD950(pView->n2, 6, 0);
+        fn_800AD950(pView->n3, 6, 1);
+        fn_800AD698(pView->n2, 6, 1);
+        fn_800AD698(pView->n3, 6, 1);
+        break;
+    }
+}
+
+void fn_800A6BA8(u8 nPlayer) {
+    GameAudioView* pView;
+    int nKind;
+
+    pView = &lbl_801F1790[gPlayers[nPlayer].nView[0]];
+    nKind = fn_800C7138(fn_80017028(0));
+    if (Game_GetMode() < 6 || Game_GetMode() > 8) {
+        fn_800A3F58(0, 0);
+        fn_800AD698(pView->n2, 1, 0);
+        fn_800AD698(pView->n3, 1, 0);
+        if (nKind == 7) {
+            fn_800AD698(pView->n2, 2, 0);
+            fn_800AD698(pView->n3, 2, 0);
+        }
+        if (lbl_80282032) {
+            fn_800A5980(nPlayer);
+        }
+    }
+}
+
+void fn_800A6C98(u8 nPlayer, u8 n) {
+    GameAudioView* pView;
+
+    pView = &lbl_801F1790[gPlayers[nPlayer].nView[0]];
+    if (Game_GetMode() < 6 || Game_GetMode() > 8) {
+        fn_800AD9AC(pView->n2, 3, n);
+        fn_800AD9AC(pView->n3, 3, n);
+        fn_800AD698(pView->n2, 3, 1);
+        fn_800AD698(pView->n3, 3, 1);
+    }
+}
+
 void fn_800A6D48(u8 nPlayer) {
     GameAudioView* pView;
 
@@ -877,16 +984,14 @@ void fn_800A6D48(u8 nPlayer) {
 }
 
 void fn_800A6FE0(void) {
-    if (lbl_8028202F == 0) {
-        if (lbl_80282040 == 0) return;
-        if (gPlayers[lbl_80282278].ball.b99 == 0) {
-            fn_800A6EC8();
-        }
-        fn_800AD698(lbl_8028141C, 4, 1);
-        fn_800AD698(lbl_8028141D, 4, 1);
-        fn_800AD698(lbl_8028141C, 5, 1);
-        fn_800AD698(lbl_8028141D, 5, 1);
+    if (lbl_8028202F || !lbl_80282040) return;
+    if (gPlayers[lbl_80282278].ball.b99 == 0) {
+        fn_800A6EC8();
     }
+    fn_800AD698(lbl_8028141C, 4, 1);
+    fn_800AD698(lbl_8028141D, 4, 1);
+    fn_800AD698(lbl_8028141C, 5, 1);
+    fn_800AD698(lbl_8028141D, 5, 1);
 }
 
 void fn_800A70E4(int n) {
