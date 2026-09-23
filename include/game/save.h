@@ -152,6 +152,20 @@ typedef struct SaveLockEntry {
 } SaveLockEntry;
 LAYOUT_ASSERT(SaveLockEntry, 4);
 
+// A logo's shape: 64 x 64 (drawn into the texture "__LogoSquare") or 128 x 32 ("__LogoRect").
+#define LOGO_SQUARE 0
+#define LOGO_RECT   1
+
+// A saved user logo (0x1022 bytes): the profile holds five and the logo editor (FE_LogoDesign.c,
+// fn_8010FB70) edits the one its LogoEdit.n0 names.
+typedef struct LogoRecord {
+    u8   aPixels[0x1000];       // 0x0000  64 x 64 or 128 x 32 colour indexes
+    char szName[0x20];          // 0x1000
+    u8   b1020;                 // 0x1020
+    u8   nShape;                // 0x1021  LOGO_SQUARE or LOGO_RECT
+} LogoRecord;
+LAYOUT_ASSERT(LogoRecord, 0x1022);
+
 // One save profile (0x10600 bytes).
 typedef struct SaveProfile {
     u8   bActive;               // 0x00000  1: the slot holds a profile; payouts are scaled and awards given only then
@@ -220,7 +234,8 @@ typedef struct SaveProfile {
     u8   n54C2;                 // 0x054C2  -> PlayerProfile.unk2
     u8   unk54C3[5];
     u64  aGolferNames[6];       // 0x054C8  -> PlayerProfile.aNames
-    u8   nGolferOutfit;         // 0x054F8  -> PlayerProfile.nOutfit
+    s8   nGolferOutfit;         // 0x054F8  -> PlayerProfile.nOutfit; fn_801069AC stores a ball's
+                                //          index there (fn_800484F4, -1: none)
     u8   nGolferBallType;       // 0x054F9  -> PlayerProfile.nBallType
     u8   unk54FA[0x5613 - 0x54FA];
     s8   n5613;                 // 0x05613  set by fn_8008DD34; FEgolferanim.c passes it to the
@@ -233,7 +248,10 @@ typedef struct SaveProfile {
     u8   a5CD4[6][0x50];            // 0x05CD4
     u8   a5EB4[26];             // 0x05EB4  set to 50 each when FE_CrAP_InitCrAPInfo clears
                                 //          0x5500..0xB634 (fn_80058208)
-    u8   unk5ECE[0xAF80 - 0x5ECE];
+    u8   unk5ECE[0x5ED0 - 0x5ECE];
+    LogoRecord aLogos[5];       // 0x05ED0  the user logos ("_usrtextr0".."_usrtextr4"; fe.h's
+                                //          ProfileLogos reaches them from 0x5500)
+    u8   unkAF7A[0xAF80 - 0xAF7A];
     s32  aAF80[53];             // 0x0AF80  per slot: a Create-A-Player asset (FE_CrAPDB.c
                                 //          fn_80103D14), -1 for none; an asset's n2E is its slot
     // Four bit arrays with a bit per Create-A-Player asset (0x80057F18's loop over them all, which

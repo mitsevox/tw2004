@@ -301,6 +301,9 @@ extern u32 lbl_80281DB0;
 extern UMemPool* lbl_80281DAC;
 extern UMemPool* lbl_80281DA8;
 
+// GoDynObj.c
+int  fn_800484F4(const char* szName);   // the index of the name among lbl_80187B98's 27 (-1: none)
+
 // UKernel.c, UObject.c. The UObject functions take the object part (&DynObj.obj).
 DynObj* fn_80048E44(void);                                  // the first object
 DynObj* fn_80048E4C(int nId);                               // the object with this id, or NULL

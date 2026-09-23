@@ -100,7 +100,6 @@ void fn_80123C2C(s32 nChan) {
 
 extern s32 lbl_8028255C;
 extern s32 lbl_80282560;
-s32 DVDGetCurrentDiskID();
 void fn_801229F8();
 void fn_80175FB8();
 void fn_80123FF8(void);
@@ -153,7 +152,7 @@ s32 fn_80124280(s32 arg0);
 void fn_80123FF8(void) {
     s32 t0;
     s32 t1;
-    t0 = DVDGetCurrentDiskID();
+    t0 = (s32)DVDGetCurrentDiskID();
     lbl_8028255C = t0;
     t1 = OSGetTick();
     lbl_80282560 = t1;
