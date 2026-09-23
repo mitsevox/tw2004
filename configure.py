@@ -503,7 +503,7 @@ config.libs = [
         "src_dir": "extern/tww",
         "objects": [
             Object(NonMatching, "src/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common/Src/mbstring.c"),
-            Object(NonMatching, "src/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common_Embedded/Math/Double_precision/e_pow.c"),
+            Object(Matching, "src/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common_Embedded/Math/Double_precision/e_pow.c"),
         ],
     },
     {

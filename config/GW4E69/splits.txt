@@ -3939,6 +3939,8 @@ runtime/e_log.c:
 
 src/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common_Embedded/Math/Double_precision/e_pow.c:
 	.text       start:0x8015D03C end:0x8015D8F0
+	.rodata     start:0x80185588 end:0x801855B8
+	.sdata2     start:0x80284EB8 end:0x80284FC8
 
 runtime/e_rem_pio2.c:
 	.text       start:0x8015D8F0 end:0x8015DC90
