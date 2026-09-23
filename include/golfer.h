@@ -309,7 +309,9 @@ typedef struct Player {
     u8   unkCB4[0xD28 - 0xCB4];
     s32  nD28[18];              // 0xD28  per hole
     s32  nD70[18];              // 0xD70  per hole
-    u8   unkDB8[0xDE4 - 0xDB8];
+    u8   unkDB8[0xDD8 - 0xDB8];
+    s32  nDD8;                  // 0xDD8  a count a challenge medal can ask for (GameMode5)
+    u8   unkDDC[0xDE4 - 0xDDC];
     s32  nDE4[18];              // 0xDE4  per target (fn_800F1D34), 0 = not yet hit
     u8   unkE2C[0xE88 - 0xE2C];
     s32  nE88;                  // 0xE88  below 5: still in (mode 15)

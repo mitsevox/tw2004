@@ -25,16 +25,17 @@ typedef struct Challenge {
     u8  b4D;                    // 0x4D  f54 goes to fn_800ED6F8
     u8  unk4E[0x54 - 0x4E];
     f32 f54;                    // 0x54
-    u8  unk58[0x5C - 0x58];
-    s32 bMedal2;                // 0x5C  medal 2: given, and its score (n60)
-    s32 n60;
-    s32 n64;                    // 0x64
-    s32 bMedal1;                // 0x68  medal 1: given, and its score (n6C)
+    s32 nScoring;               // 0x58  0 the round's totals, 1 this hole
+    // Three medals (0 the best): the rule (0 none, see fn_800EC558), its mark, the reward.
+    s32 bMedal2;                // 0x5C  medal 0's rule (named by fn_800ECA34's index: 2)
+    s32 n60;                    //       its mark
+    s32 n64;                    //       its reward
+    s32 bMedal1;                // 0x68  medal 1
     s32 n6C;
-    s32 n70;                    // 0x70
-    s32 bMedal0;                // 0x74  medal 0: given, and its score (n78)
+    s32 n70;
+    s32 bMedal0;                // 0x74  medal 2
     s32 n78;
-    s32 n7C;                    // 0x7C
+    s32 n7C;
 } Challenge;
 
 void fn_800EADD8(void);
@@ -101,6 +102,9 @@ void  fn_800E0B38(int nMode);
 void  fn_800F07C8(void);
 u8    fn_800E4BF8(void);
 int   Game_CurHoleIndex(void);
+int   fn_800D2B08(void);                    // the hole's par
+u8    fn_800E39F0(void);
+extern u8 gNumPlayersSetUp;                 // 0x80281D48 (Golfer.c)
 extern void (*lbl_80282328)(void);
 int   fn_800EC558(void);
 u8    fn_801025F4(void);
@@ -744,4 +748,173 @@ void fn_800EC1E0(void) {
             }
         }
     }
+}
+
+// The medal earned (0 best, 3 none): for each medal its rule against the round's totals (strokes
+// plus a number, against par, birdie or par or bogey golf, penalties below a mark, a match margin,
+// the best of the n274 counts, n DD8) or against this hole.
+int fn_800EC558(void) {
+    int nRule;
+    int nMark;
+    int nStrokes;
+    int nPen;
+    int nSum;
+    int nPar;
+    int m;
+    int bBest;
+    int i;
+    for (m = 0; m < 3; m++) {
+        switch (m) {
+        case 0:
+            nRule = lbl_80281664[lbl_802822F4].bMedal2;
+            nMark = lbl_80281664[lbl_802822F4].n60;
+            break;
+        case 1:
+            nRule = lbl_80281664[lbl_802822F4].bMedal1;
+            nMark = lbl_80281664[lbl_802822F4].n6C;
+            break;
+        case 2:
+            nRule = lbl_80281664[lbl_802822F4].bMedal0;
+            nMark = lbl_80281664[lbl_802822F4].n78;
+            break;
+        }
+        switch (lbl_80281664[lbl_802822F4].nScoring) {
+        case 0:
+            nStrokes = lbl_8028230C;
+            nPen = lbl_80282300;
+            switch (nRule) {
+            case 1:
+                if (nStrokes + lbl_80281664[lbl_802822F4].nTargetBase <= nMark) {
+                    return m;
+                }
+                break;
+            case 2:
+                if (nStrokes - lbl_80282308 <= nMark) {
+                    return m;
+                }
+                break;
+            case 3:
+                if (nStrokes <= lbl_80282308 - lbl_80282304) {
+                    return m;
+                }
+                break;
+            case 4:
+                if (nStrokes <= lbl_80282308) {
+                    return m;
+                }
+                break;
+            case 5:
+                if (nStrokes <= lbl_80282308 + lbl_80282304) {
+                    return m;
+                }
+                break;
+            case 6:
+                if (nPen < nMark) {
+                    return m;
+                }
+                break;
+            case 7:
+                if (gpGame->n4 == 1) {
+                    if (fn_800ED6F0()) {
+                        if (gpGame->bD4) {
+                            if (gPlayers[0].nHolesWon > gPlayers[1].nHolesWon) {
+                                return 1;
+                            }
+                            return 2;
+                        }
+                        if (gPlayers[0].nHolesWon - gPlayers[1].nHolesWon >= nMark) {
+                            return m;
+                        }
+                    } else if (gpGame->bD4) {
+                        if (nMark == 0 && gPlayers[0].nHolesWon > gPlayers[1].nHolesWon) {
+                            return m;
+                        }
+                    } else if (gPlayers[0].nHolesWon - gPlayers[1].nHolesWon >= nMark) {
+                        return m;
+                    }
+                }
+                if (gpGame->n4 == 0) {
+                    if (gSession.nNumPlayers > 1) {
+                        nSum = 0;
+                        for (i = 0; i < 18; i++) {
+                            if (gpGame->bHoleSelected[i]) {
+                                nSum += gPlayers[1].nStrokes[i];
+                            }
+                        }
+                    }
+                    if (nSum - nStrokes <= nMark) {
+                        return m;
+                    }
+                }
+                break;
+            case 8:
+                bBest = 1;
+                for (i = 1; i < gNumPlayersSetUp; i++) {
+                    if (gPlayers[0].n274 <= gPlayers[i].n274) {
+                        bBest = 0;
+                    }
+                }
+                if (bBest && gpGame->nD8 <= nMark) {
+                    return m;
+                }
+                break;
+            case 9:
+                if (fn_800E39F0() && gPlayers[0].nDD8 >= nMark) {
+                    return m;
+                }
+                break;
+            }
+            break;
+        case 1:
+            nStrokes = gPlayers[0].nStrokes[Game_CurHoleIndex()];
+            nPar = fn_800D2B08();
+            switch (nRule) {
+            case 1:
+                if (nStrokes <= nMark) {
+                    return m;
+                }
+                break;
+            case 2:
+                if (nStrokes - nPar <= nMark) {
+                    return m;
+                }
+                break;
+            case 3:
+                if (nStrokes <= nPar - 1) {
+                    return m;
+                }
+                break;
+            case 4:
+                if (nStrokes <= nPar) {
+                    return m;
+                }
+                break;
+            case 5:
+                if (nStrokes <= nPar + 1) {
+                    return m;
+                }
+                break;
+            case 6:
+                if (nPen < nMark) {
+                    return m;
+                }
+                break;
+            case 7:
+                if (gpGame->bD4 && gPlayers[0].nHolesWon > gPlayers[1].nHolesWon) {
+                    return 2;
+                }
+                if (gPlayers[0].nHolesWon - gPlayers[1].nHolesWon >= nMark) {
+                    return m;
+                }
+                break;
+            case 9:
+                if (fn_800E39F0() && gPlayers[0].nDD8 >= nMark) {
+                    return m;
+                }
+                break;
+            }
+            break;
+        }
+    }
+    return 3;
 }
