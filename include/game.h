@@ -84,6 +84,63 @@ void fn_80062D0C(int nPlayer);
 void fn_80062D38(int nMsg, int nA, int nB);    // send message nMsg with two values (fn_800E5998)
 void fn_80062D6C(int nMsg, int nValue);        // send message nMsg with one value (fn_800E590C)
 
+// ---- the course table (CourseData.c) ---------------------------------------------------------
+
+#define NUM_COURSE_DATA 21      // courses in the 'CRI ' table
+#define NUM_BUILT_ROUNDS 7      // rounds in the 'CMPS' table
+
+// One hole of the course table (0x38 bytes).
+typedef struct HoleData {
+    s32  nPar;                  // 0x00
+    s32  n04;                   // 0x04
+    s32  n08;                   // 0x08  per tee set (fn_800D2B80): tee 3
+    s32  n0C;                   // 0x0C  tee 2
+    s32  n10;                   // 0x10  tee 1
+    s32  n14;                   // 0x14  tee 0
+    s32  nWindDir;              // 0x18  (Hole_WindDir)
+    u8   unk1C[0x2C - 0x1C];
+    f32  fWindSpeed;            // 0x2C  (Hole_WindSpeed)
+    u8   unk30[4];
+    u8   b34;                   // 0x34
+    u8   b35;                   // 0x35
+    u8   unk36;
+    u8   b37;                   // 0x37  checked at the end of a PGA Tour hole
+} HoleData;
+LAYOUT_ASSERT(HoleData, 0x38);
+
+// One course of the table (0x430 bytes), read from the disc's 'CRI ' chunk.
+typedef struct CourseData {
+    HoleData aHoles[18];        // 0x000
+    struct {
+        s32  n0;                // +0x0
+        s32  nPar;              // +0x4  the course's par from this tee set (fn_800D2F00)
+        u8   unk8[8];
+    } aTeeSets[4];              // 0x3F0
+} CourseData;
+LAYOUT_ASSERT(CourseData, 0x430);
+
+// A round built from other courses' holes (0x24 bytes), from the 'CMPS' chunk: for each of its 18
+// holes, the course and the hole's number there (1-based).
+typedef struct BuiltRound {
+    struct {
+        u8   nCourse;
+        u8   nHole;
+    } aHoles[18];
+} BuiltRound;
+LAYOUT_ASSERT(BuiltRound, 0x24);
+
+extern BuiltRound lbl_801FA1F8[NUM_BUILT_ROUNDS];    // 0x801FA1F8
+extern CourseData lbl_801FA2F4[NUM_COURSE_DATA];     // 0x801FA2F4
+
+void fn_800D29E8(void);
+int  Hole_WindDir(void);
+f32  Hole_WindSpeed(void);
+s32  fn_800D2FB4(s32 nTeeSet);          // the course's par (the tee set is not used)
+u8   fn_800D3080(int nHole);
+int  fn_800D3118(int nRound, int nHole);    // a built round's course for a hole
+int  fn_800D315C(int nRound, int nHole);    // and its hole number (1-based)
+int  fn_800D31A4(int nPar);             // the number of the 18 holes with that par
+
 // ---- the game manager ------------------------------------------------------------------------
 
 f32  fn_800D0478(int nPlayer);          // the ball's distance from the pin (yards)
