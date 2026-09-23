@@ -16,6 +16,7 @@
 // Outside this file.
 void fn_800142A4(s8 n);                 // sets lbl_80281C98
 void fn_80057438(SaveProfile* pProfile);
+void fn_80057ED0(SaveProfile* pProfile, const char* pName);     // PasswordManager.c
 void fn_8008E354(void);                 // FEgolferanim.c
 void fn_8008F80C(s32 p0, s32 p1);       // uiProcessInterface.c
 void fn_8008E358(s32 p0);               // FEgolferanim.c
@@ -2826,6 +2827,51 @@ void fn_8007F724(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = n;
 }
 
+// How many challenge groups have medal 2.
+void fn_8007F784(MsgArg* pArgs, MsgArg* pResult) {
+    int n;
+    int i;
+
+    n = 0;
+    for (i = 0; i < 29; i++) {
+        if (gpSaveData[pArgs[0].i].aMedal[i] == 2) {
+            n++;
+        }
+    }
+    pResult->i = n;
+}
+
+// How many challenge groups have medal 1.
+void fn_8007F7D0(MsgArg* pArgs, MsgArg* pResult) {
+    int n;
+    int i;
+
+    n = 0;
+    for (i = 0; i < 29; i++) {
+        if (gpSaveData[pArgs[0].i].aMedal[i] == 1) {
+            n++;
+        }
+    }
+    pResult->i = n;
+}
+
+// One for a TOUR card, plus one per challenge group with the best medal (0).
+void fn_8007F81C(MsgArg* pArgs, MsgArg* pResult) {
+    int n;
+    int i;
+
+    n = 0;
+    if (gpSaveData[pArgs[0].i].nTourCardLevel >= 1) {
+        n = 1;
+    }
+    for (i = 0; i < 29; i++) {
+        if (gpSaveData[pArgs[0].i].aMedal[i] == 0) {
+            n++;
+        }
+    }
+    pResult->i = n;
+}
+
 void fn_8007F87C(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gpSaveData[pArgs[0].i].nTourCardLevel;
 }
@@ -2850,6 +2896,17 @@ void fn_8007FED8(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = lbl_801D7148.b18;
 }
 
+// Set b18; clearing it gives slot 0's profile (and its backup) TOUR card level 1 if it has none.
+void fn_8007FEEC(MsgArg* pArgs, MsgArg* pResult) {
+    lbl_801D7148.b18 = pArgs[0].i;
+    if (lbl_801D7148.b18 == 0 && gpSaveData[0].nTourCardLevel == 0) {
+        if (lbl_801D7148.p658[0].nTourCardLevel < 1) {
+            lbl_801D7148.p658[0].nTourCardLevel = 1;
+        }
+        gpSaveData[0].nTourCardLevel = 1;
+    }
+}
+
 void fn_8007FF3C(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = lbl_80281EE0->b86;
 }
@@ -2861,6 +2918,26 @@ void fn_8007FF4C(MsgArg* pArgs, MsgArg* pResult) {
 // What unlocks a course.
 void fn_8007FF6C(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = lbl_80200538.aCoursePrice[pArgs[0].i].nPrice;
+}
+
+// Make the profile being worked on a new one named "USER<n>" and save it into slot pArgs[0]. A
+// slot that had no profile gets 25000 more money, plus n1C.
+void fn_8007FF8C(MsgArg* pArgs, MsgArg* pResult) {
+    s32 nSlot = pArgs[0].i;
+    char szName[16];
+
+    sprintf(szName, "USER%d", nSlot + 1);
+    fn_80057ED0(&lbl_80281ED4->profile, szName);
+    if (lbl_801D7148.aLoaded[nSlot] == 0) {
+        lbl_80281ED4->profile.n6C += lbl_801D7148.n1C + 25000;
+    }
+    lbl_80281ED4->profile.bActive = 1;
+    if (lbl_80281ED4->profile.nTourCardLevel == 0) {
+        lbl_80281ED4->profile.nTourCardLevel = 1;
+    }
+    lbl_801D7148.aLoaded[nSlot] = 1;
+    Mem_cpy(&gpSaveData[nSlot], &lbl_80281ED4->profile, sizeof(SaveProfile));
+    fn_80077808(nSlot);
 }
 
 // The saved replay's course, hole and golfer.
