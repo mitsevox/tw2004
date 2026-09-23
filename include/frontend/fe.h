@@ -247,14 +247,26 @@ typedef struct CrAPDB {
 } CrAPDB;
 LAYOUT_ASSERT(CrAPDB, 0x18);
 
+// A 0x2C-byte record of the Create-A-Player database's table lbl_80282470 (64 of them,
+// fn_801037F8); fn_80107244 copies one out.
+typedef struct CrAPRecord {
+    s16  n0;                    // 0x00
+    u8   unk2[2];
+    s32  n4;                    // 0x04
+    char sz8[0x2C - 0x8];       // 0x08
+} CrAPRecord;
+LAYOUT_ASSERT(CrAPRecord, 0x2C);
+
 extern CrAPDB* lbl_80282460;
 extern UStreamObject* lbl_80282464;     // the 'CR_A' object (the assets), kept until freed
 extern UStreamObject* lbl_80282468;     // the 'CR_S' object (their names)
-extern void* lbl_80282470;              // 0x2C-byte records (fn_80107244); freed by fn_80103A64
+extern s32 lbl_8028246C;                // cleared by fn_801037F8
+extern CrAPRecord* lbl_80282470;        // 64 records (fn_80107244); freed by fn_80103A64
 extern s32* lbl_80282474;               // per part: the index of its first asset
 extern s32* lbl_80282478;               // per part, 24 entries: the categories fn_80104AF4 found
-extern void* lbl_8028247C;              // freed by fn_80103A64
-extern void* lbl_80282480;              // freed by fn_80103A64
+extern s32* lbl_8028247C;               // 0x600 entries, rows 24 apart (fn_80103920 clears 64 from
+                                        // each row's start); fn_801048EC stores a part's choice count
+extern s32* lbl_80282480;               // 24 entries (fn_80103920 sets them to -1)
 extern char lbl_801935C8[16][32];      // 16 names (fn_80107294)
 extern s32 lbl_802816E8;                // } an asset to put on and one to take off when
 extern s32 lbl_802816EC;                // } fn_80104804 runs (-1: none)

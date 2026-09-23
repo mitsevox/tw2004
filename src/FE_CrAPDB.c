@@ -5,6 +5,7 @@
 
 #include "game_types.h"
 #include "charstate.h"
+#include "endian.h"
 #include "frontend/fe.h"
 #include "game/frontend.h"
 
@@ -32,6 +33,42 @@ int  fn_8010766C(MsgArg* pArg, char* sz);
 // UISScreen.c's sender, with the front end's view of its arguments (as GameMessages.c declares it;
 // uistudio.h has UIStudio* and const s32*, and game/frontend.h cannot be included with it).
 void fn_8016B09C(void* pHandler, int nMsg, int nArgs, MsgArg* pArgs);
+
+// Allocate the database, empty, and its tables.
+void fn_801037F8(void) {
+    lbl_80282460 = fn_80009B34(sizeof(CrAPDB), 2, 0, "FE_CrAPDB.c", 211);
+    lbl_80282460->pAssets = NULL;
+    lbl_80282460->pStrings = NULL;
+    lbl_80282460->nAssets = 0;
+    lbl_80282460->uStringsSize = 0;
+    lbl_80282460->n4 = 0;
+    lbl_80282460->b14 = 1;
+    lbl_80282480 = fn_80009B34(CRAP_NUM_PARTS * sizeof(s32), 2, 0, "FE_CrAPDB.c", 219);
+    lbl_8028247C = fn_80009B34(CRAP_NUM_PARTS * 64 * sizeof(s32), 2, 0, "FE_CrAPDB.c", 220);
+    lbl_80282478 = fn_80009B34(CRAP_NUM_PARTS * 64 * sizeof(s32), 2, 0, "FE_CrAPDB.c", 221);
+    lbl_80282474 = fn_80009B34(CRAP_NUM_PARTS * sizeof(s32), 2, 0, "FE_CrAPDB.c", 222);
+    lbl_80282470 = fn_80009B34(64 * sizeof(CrAPRecord), 2, 0, "FE_CrAPDB.c", 224);
+    lbl_8028246C = 0;
+    fn_80103920();
+    lbl_80282464 = NULL;
+    lbl_80282468 = NULL;
+}
+
+// Set every part's entries in the tables to -1 (none).
+void fn_80103920(void) {
+    int nPart;
+    s32 i;
+
+    for (nPart = 0; nPart < CRAP_NUM_PARTS; nPart++) {
+        lbl_80282480[nPart] = -1;
+        // EA bug: a part's row is 24 entries long but 64 are cleared, into the next rows (the
+        // tables hold 64 per part, so nothing past the end is touched)
+        for (i = 0; i < 64; i++) {
+            lbl_8028247C[nPart * CRAP_NUM_PARTS + i] = -1;
+            lbl_80282478[nPart * CRAP_NUM_PARTS + i] = -1;
+        }
+    }
+}
 
 // Free the database: its stream objects, the database and its tables.
 void fn_80103A64(void) {
@@ -272,6 +309,137 @@ u8 fn_801048B0(int nPart) {
         return 1;
     }
     return 0;
+}
+
+// How many offered assets of the part fit its entry b (kept in lbl_8028247C).
+int fn_801048EC(s16 nPart, int b) {
+    int nAsset;
+    int nCount;
+    int nWanted;
+    int nFirst;
+
+    nFirst = fn_80105140(nPart);
+    nCount = 0;
+    nWanted = fn_80104AF4(nPart, b);
+    for (nAsset = nFirst; nAsset < lbl_80282460->nAssets; nAsset++) {
+        if (nPart == lbl_80282460->pAssets[nAsset].nPart && fn_801061C8(lbl_80282460->pAssets[nAsset].n40) &&
+            fn_801061F8(nPart, lbl_80282460->pAssets[nAsset].nCategory, nWanted)) {
+            nCount++;
+        }
+    }
+    lbl_8028247C[b + nPart * CRAP_NUM_PARTS] = nCount;
+    return nCount;
+}
+
+// How many entries a part's list has: one per category among its offered assets, plus its "All ..."
+// entry when it has one (kept in lbl_80282480).
+int fn_801049C8(s16 nPart) {
+    int nCount = 0;
+    int i;
+    int j;
+    u8 bLater;
+
+    for (i = 0; i < lbl_80282460->nAssets; i++) {
+        if (nPart == lbl_80282460->pAssets[i].nPart && fn_801061C8(lbl_80282460->pAssets[i].n40)) {
+            // a category is counted at its last asset
+            bLater = 0;
+            for (j = i + 1; j < lbl_80282460->nAssets; j++) {
+                if (nPart == lbl_80282460->pAssets[j].nPart && fn_801061C8(lbl_80282460->pAssets[j].n40) &&
+                    lbl_80282460->pAssets[j].nCategory == lbl_80282460->pAssets[i].nCategory) {
+                    bLater = 1;
+                    break;
+                }
+            }
+            if (!bLater) {
+                nCount++;
+            }
+        }
+    }
+    if (lbl_801932C8[nPart][0] != '\0') {
+        nCount++;
+    }
+    lbl_80282480[nPart] = nCount;
+    return nCount;
+}
+
+// The category of a part's entry n: its categories in the order its offered assets list them,
+// after the "All ..." entry when the part has one (-1 for that entry, 0x40: none). Kept in
+// lbl_80282478.
+int fn_80104AF4(s16 nPart, int n) {
+    s32 aCategories[64];
+    int i;
+    int nFound = 0;
+    int j;
+    int bKnown;
+    int nFirst;
+
+    nFirst = fn_80105140(nPart);
+    if (lbl_801932C8[nPart][0] != '\0') {
+        if (n == 0) {
+            return -1;
+        }
+        n--;
+    }
+    for (i = nFirst; i < lbl_80282460->nAssets; i++) {
+        if (nPart == lbl_80282460->pAssets[i].nPart && fn_801061C8(lbl_80282460->pAssets[i].n40)) {
+            bKnown = 0;
+            for (j = 0; j < nFound; j++) {
+                if (aCategories[j] == lbl_80282460->pAssets[i].nCategory) {
+                    bKnown = 1;
+                    break;
+                }
+            }
+            if (!bKnown) {
+                aCategories[nFound++] = lbl_80282460->pAssets[i].nCategory;
+            }
+            if (nFound == 64) {
+                return 0x40;
+            }
+        }
+    }
+    if (n >= 0 && n < nFound) {
+        lbl_80282478[n + nPart * CRAP_NUM_PARTS] = aCategories[n];
+        return aCategories[n];
+    }
+    return 0x40;
+}
+
+// The entry of a part's list that shows a category (-1: none); see fn_80104AF4.
+int fn_80104C58(s16 nPart, int nCategory) {
+    s32 aCategories[64];
+    int i;
+    int nFound = 0;
+    int j;
+    int bKnown;
+    int nFirst;
+
+    nFirst = fn_80105140(nPart);
+    for (i = nFirst; i < lbl_80282460->nAssets; i++) {
+        if (nPart == lbl_80282460->pAssets[i].nPart && fn_801061C8(lbl_80282460->pAssets[i].n40)) {
+            bKnown = 0;
+            for (j = 0; j < nFound; j++) {
+                if (aCategories[j] == lbl_80282460->pAssets[i].nCategory) {
+                    bKnown = 1;
+                    break;
+                }
+            }
+            if (!bKnown) {
+                aCategories[nFound++] = lbl_80282460->pAssets[i].nCategory;
+            }
+            if (nFound == 64) {
+                return -1;
+            }
+        }
+    }
+    for (j = 0; j < nFound; j++) {
+        if (nCategory == aCategories[j]) {
+            if (lbl_801932C8[nPart][0] != '\0') {
+                return (j > 0) ? j + 1 : 0;
+            }
+            return j;
+        }
+    }
+    return -1;
 }
 
 u8 fn_80104DB8(s16 nPart, int n, char* pDst) {
@@ -557,6 +725,20 @@ void fn_80105B4C(s16 nPart, int b, int i, char* pName) {
     fn_80105B80(fn_80104E84(nPart, b, i), pName);
 }
 
+// Copy the name of the asset's first variant id. The ids are byte-swapped for the lookup and swapped
+// back after.
+void fn_80105B80(CrAPAsset* pAsset, char* pName) {
+    u64 nId;
+    u8* pSrc;
+
+    pSrc = (u8*)pAsset->aVariant;
+    fn_80076158(&pSrc, (u8*)pAsset->aVariant, sizeof(pAsset->aVariant), sizeof(u64));
+    nId = pAsset->aVariant[0];
+    fn_800CB868(&nId, pName);
+    pSrc = (u8*)pAsset->aVariant;
+    fn_80076158(&pSrc, (u8*)pAsset->aVariant, sizeof(pAsset->aVariant), sizeof(u64));
+}
+
 s32 fn_80105C00(void) {
     return lbl_80282460->nAssets;
 }
@@ -835,6 +1017,13 @@ s32 fn_80107084(s32 nKind, s32 nAfter) {
         return -1;
     }
     return nBest;
+}
+
+// Copy record n out of lbl_80282470.
+void fn_80107244(int n, s16* pN0, s32* pN4, char* pDst) {
+    *pN0 = lbl_80282470[n].n0;
+    *pN4 = lbl_80282470[n].n4;
+    strcpy(pDst, lbl_80282470[n].sz8);
 }
 
 void fn_80107294(s16 n, char* pDst) {
