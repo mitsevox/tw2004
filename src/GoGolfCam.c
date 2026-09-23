@@ -74,6 +74,11 @@ f32      fn_80009614(f32 x);                            // arc cosine
 void     fn_8000AE28(f32* pIn, f32 f, f32* pOut);       // scale a vector
 void     fn_8000923C(f32* pRot, f32* pQuat);            // a rotation vector (axis * angle) as a quaternion
 void     fn_800090E4(f32* pQuat, f32* pIn, f32* pOut);  // rotate a vector by a quaternion
+f32      fn_8005C280(int nPlayer);                      // Swing.c: the swing's fNonPowerShotPower
+void     Swing_RumbleOff(int nPlayer);                  // Swing.c
+u8       fn_8006BEA4(void);                             // the GameBreaker letterbox is up, scripted (nGBType 0)
+void     fn_800A68C0(u8 nPlayer);
+u8       CameraScript_IsDefaultSwingCam(CamShot* pShot, int nPlayer, f32* pCam);
 u8       Ter_CheckForGroundCollision(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
                                      SurfaceType** ppSurface, TerObject** ppObj);
 
@@ -1927,6 +1932,135 @@ void fn_800C4E80(View* pView, int nPlayer) {
     }
 }
 
+// The matrix camera: two hand-made "MATRIX CAM" shots in the shared state, both looking at pTo, one
+// from pFrom and one from the far side of pTo at pFrom's height (shot 0x22 of the player's camera
+// plan instead, if it has one). The lens zooms to the view's field of view less the letterbox's
+// change. Swing camera kind 6 starts on the far side; kinds other than 1 and 6 hold the first shot
+// twice as long, with blend mode 7.
+void fn_800C4FF0(View* pView, f32* pFrom, f32* pTo, int nPlayer) {
+    f32 v[4];
+    f32 vFrom[4];
+    char szName[] = "MATRIX CAM";
+    f32 fChange;
+    CamShot* pShot;
+    int nOrder;
+    Vec_Copy(pFrom, vFrom);
+    fn_800C73DC(pTo, vFrom, v);
+    v[1] = 0.0f;
+    fn_800C73B8(pTo, v, v);
+    v[1] = vFrom[1];
+    fn_80005AE8(&lbl_80282220->shot6C, 0, sizeof(CamShot) * 2);
+    strcpy(lbl_80282220->shot6C.szName, szName);
+    Vec3Copy(vFrom, lbl_80282220->shot6C.v20);
+    Vec3Copy(pTo, lbl_80282220->shot6C.v30);
+    lbl_80282220->shot6C.p40 = NULL;
+    lbl_80282220->shot6C.f60 = 0.0f;
+    lbl_80282220->shot6C.f64 = 0.0f;
+    lbl_80282220->shot6C.f70 = 0.0f;
+    lbl_80282220->shot6C.f74 = 0.0f;
+    lbl_80282220->shot6C.f68 = 0.2f;
+    lbl_80282220->shot6C.f6C = 20.0f;
+    fChange = fn_800DC3A4();
+    lbl_80282220->shot6C.f78 = fn_80014278(fn_80008370(fn_80016CFC(gPlayers[nPlayer].nView[0])->pCamera)) - fChange;
+    lbl_80282220->shot6C.f7C = lbl_80282220->shot6C.f78;
+    lbl_80282220->shot6C.f80 = 0.0f;
+    lbl_80282220->shot6C.f4C = 1.0f;
+    lbl_80282220->shot6C.f9C = 0.0f;
+    lbl_80282220->shot6C.f84 = 0.0f;
+    lbl_80282220->shot6C.bA8 = 0;
+    lbl_80282220->shot6C.bAA = 1;
+    lbl_80282220->shot6C.bAC = 0x18;
+    lbl_80282220->shot6C.bB1 = 9;
+    lbl_80282220->shot6C.bB2 = 0;
+    lbl_80282220->shot6C.bAD = 3;
+    lbl_80282220->shot6C.p44 = pView->p130;
+    lbl_80282220->shot6C.f8C = 0.0f;
+    pShot = fn_8003A7C8(nPlayer, 0x22, NULL);
+    if (pShot != NULL) {
+        Mem_cpy(&lbl_80282220->shot12C, pShot, sizeof(CamShot));
+        lbl_80282220->shot12C.p40 = NULL;
+        lbl_80282220->shot12C.p44 = pView->p130;
+        lbl_80282220->shot12C.bAD = 3;
+        lbl_80282220->shot12C.f8C = 0.0f;
+        lbl_80282220->shot12C.f4C = 1.0f;
+    } else {
+        strcpy(lbl_80282220->shot12C.szName, szName);
+        Vec3Copy(v, lbl_80282220->shot12C.v20);
+        Vec3Copy(pTo, lbl_80282220->shot12C.v30);
+        lbl_80282220->shot12C.p40 = NULL;
+        lbl_80282220->shot12C.f60 = 0.0f;
+        lbl_80282220->shot12C.f64 = 0.0f;
+        lbl_80282220->shot12C.f70 = 0.0f;
+        lbl_80282220->shot12C.f74 = 0.0f;
+        lbl_80282220->shot12C.f68 = 0.2f;
+        lbl_80282220->shot12C.f6C = 20.0f;
+        lbl_80282220->shot12C.f78 = lbl_80282220->shot6C.f78;
+        lbl_80282220->shot12C.f7C = lbl_80282220->shot12C.f78;
+        lbl_80282220->shot12C.f80 = 0.0f;
+        lbl_80282220->shot12C.f4C = 1.0f;
+        lbl_80282220->shot12C.f9C = 0.0f;
+        lbl_80282220->shot12C.f84 = 0.0f;
+        lbl_80282220->shot12C.bA8 = 0;
+        lbl_80282220->shot12C.bAA = 1;
+        lbl_80282220->shot12C.bAC = 0x18;
+        lbl_80282220->shot12C.bB1 = 9;
+        lbl_80282220->shot12C.bB2 = 0;
+        lbl_80282220->shot12C.bAD = 3;
+        lbl_80282220->shot12C.p44 = pView->p130;
+        lbl_80282220->shot12C.f8C = 0.0f;
+    }
+    switch (pView->n260) {
+    case 1:
+        nOrder = 0;
+        break;
+    case 6:
+        nOrder = 1;
+        break;
+    case 10:
+    default:
+        nOrder = 2;
+        break;
+    }
+    if (nOrder == 0) {
+        pView->p130 = &lbl_80282220->shot6C;
+        pView->p134 = &lbl_80282220->shot12C;
+        pView->f110 = lbl_80281F78->f5C;
+        pView->n140 = 2;
+        if (fn_800453C8(nPlayer, NULL)) {
+            pView->n154 = 2;
+        } else {
+            pView->n154 = 1;
+        }
+    } else if (nOrder == 1) {
+        pView->p130 = &lbl_80282220->shot12C;
+        pView->p134 = &lbl_80282220->shot6C;
+        pView->f110 = lbl_80281F78->f5C;
+        pView->n140 = 2;
+        if (fn_800453C8(nPlayer, NULL)) {
+            pView->n154 = 1;
+        } else {
+            pView->n154 = 1;
+        }
+    } else {
+        pView->p130 = &lbl_80282220->shot6C;
+        pView->p134 = &lbl_80282220->shot12C;
+        pView->n140 = 7;
+        pView->f110 = 2.0f * lbl_80281F78->f5C;
+        if (fn_800453C8(nPlayer, NULL)) {
+            pView->n154 = 2;
+        } else {
+            pView->n154 = 1;
+        }
+    }
+    pView->fCamTime = 0.00001f;
+    if (pView->p74 != NULL) {
+        pView->p134->f4C = pView->p74->f38;
+    } else {
+        pView->p134->f4C = 0.5f;
+    }
+    pView->p134->f4C = 1.0f;    // f4C is set just above; the original overwrites it
+}
+
 // Camera 13's tick: with no next shot, clear b54 (a freeze-time flag: fn_800C6D9C tests it) and
 // replay the current shot's p44 as a hand-made shot. Returns the frame time to run the script at (0
 // while held).
@@ -2328,6 +2462,105 @@ void GolfCamera_CutToGolferDoneAnimatingCam(View* pView, int nPlayer) {
 
 u8 fn_800C6604(View* pView) {
     return pView->n198 > 0;
+}
+
+// Pick the swing camera kind (View.n260; 0 is none) for the shot about to be hit. Two-player
+// sessions with both flags 0x4000 and 0x8000 set use kind 2 for player 0 and kind 11 for player 1
+// on the tee. Otherwise only a shot of kind 1, not from the lies 6..8, with a short club (8 or
+// under) unless on the tee, and powered at least the tuning's f9C gets one: kind 11 above fB4 with
+// a short club, else, by chance, the player's next kind in turn (1..11), more likely the harder
+// the shot; kind 11 falls back to 1 off the tee or with a long club. A scripted GameBreaker makes
+// it kind 7 half the time.
+void fn_800C6618(View* pView, int nPlayer) {
+    u8 bSwingCam = 0;
+    int bShortClub;     // fake match: int, tested as (u8); a u8 local truncates it where it is set
+    f32* pCam;
+    f32 fPower;
+    pCam = fn_8001731C(pView);
+    if ((gSession.uFlags & 0x4000) && (gSession.uFlags & 0x8000)) {
+        if (nPlayer == 0 && gPlayers[nPlayer].ball.nLie == 0) {
+            pView->n260 = 2;
+            Swing_RumbleOff(nPlayer);
+            fn_800A68C0(nPlayer);
+            return;
+        }
+        if (nPlayer == 1 && gPlayers[nPlayer].ball.nLie == 0) {
+            pView->n260 = 11;
+            Swing_RumbleOff(nPlayer);
+            fn_800A68C0(nPlayer);
+            return;
+        }
+        pView->n260 = 0;
+        return;
+    }
+    fPower = fn_8005C280(nPlayer);
+    bShortClub = gPlayers[nPlayer].nClub <= 8;
+    if (gSession.nSplitScreen) {
+        bSwingCam = 0;
+    } else if (gSession.bReplay) {
+        bSwingCam = 0;
+    } else if (!gpGame->b28A) {
+        bSwingCam = 0;
+    } else if (gPlayers[nPlayer].ball.nLie != 0 && gPlayers[nPlayer].nClub > 8) {
+        bSwingCam = 0;
+    } else if (gPlayers[nPlayer].ball.nLie == 6 || gPlayers[nPlayer].ball.nLie == 7
+               || gPlayers[nPlayer].ball.nLie == 8) {
+        bSwingCam = 0;
+    } else if (gPlayers[nPlayer].nShotKind != 1) {
+        bSwingCam = 0;
+    } else if (!CameraScript_IsDefaultSwingCam(pView->p130, nPlayer, pCam) && Player_IsCPU(nPlayer)
+               && (lbl_80282220->n1EC[nPlayer] == 1 || lbl_80282220->n1EC[nPlayer] == 6
+                   || lbl_80282220->n1EC[nPlayer] == 10 || lbl_80282220->n1EC[nPlayer] == 11)) {
+        bSwingCam = 0;
+    } else if (fPower >= lbl_80281F78->f9C) {
+        bSwingCam = 1;
+    }
+    if (bSwingCam) {
+        if (fPower > lbl_80281F78->fB4 && (u8)bShortClub) {
+            pView->n260 = 11;
+        } else if (fPower > lbl_80281F78->fA4) {
+            if ((f32)(s32)(Rand_Next(1) % 100) < lbl_80281F78->fB0) {
+                pView->n260 = lbl_80282220->n1EC[nPlayer];
+                lbl_80282220->n1EC[nPlayer]++;
+                if (lbl_80282220->n1EC[nPlayer] >= 12) {
+                    lbl_80282220->n1EC[nPlayer] = 1;
+                }
+            }
+        } else if (fPower > lbl_80281F78->fA0) {
+            if ((f32)(s32)(Rand_Next(1) % 100) < lbl_80281F78->fAC) {
+                pView->n260 = lbl_80282220->n1EC[nPlayer];
+                lbl_80282220->n1EC[nPlayer]++;
+                if (lbl_80282220->n1EC[nPlayer] >= 12) {
+                    lbl_80282220->n1EC[nPlayer] = 1;
+                }
+            }
+        } else if (fPower > lbl_80281F78->f9C) {
+            if ((f32)(s32)(Rand_Next(1) % 100) < lbl_80281F78->fA8) {
+                pView->n260 = lbl_80282220->n1EC[nPlayer];
+                lbl_80282220->n1EC[nPlayer]++;
+                if (lbl_80282220->n1EC[nPlayer] >= 12) {
+                    lbl_80282220->n1EC[nPlayer] = 1;
+                }
+            }
+        }
+        if (pView->n260 == 11 && (gPlayers[nPlayer].ball.nLie != 0 || !(u8)bShortClub)) {
+            pView->n260 = 1;
+            lbl_80282220->n1EC[nPlayer] = 2;
+        }
+        if (fn_8006BEA4() && Rand_Next(1) % 100 > 50) {
+            pView->n260 = 7;
+            lbl_80282220->n1EC[nPlayer] = 8;
+            if (lbl_80282220->n1EC[nPlayer] >= 12) {
+                lbl_80282220->n1EC[nPlayer] = 1;
+            }
+        }
+        if (pView->n260 != 0) {
+            Swing_RumbleOff(nPlayer);
+            fn_800A68C0(nPlayer);
+        }
+    } else {
+        pView->n260 = 0;
+    }
 }
 
 int fn_800C6B38(View* pView) {
