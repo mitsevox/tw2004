@@ -217,10 +217,10 @@ void* Char_SetClip(Character* pChar, int nGroup, int nStyle, const char* pName);
 
 // Swing.c
 f32   fn_8005CB78(Character* pChar, u64 uEvent);    // the time of an animation event
-void  ShotObj_Set162C(Character* pChar, f32 f);
-f32   ShotObj_GetBlend(Character* pChar);           // fBackswing
-void  ShotObj_Set1630(Character* pChar, f32 f);
-void  ShotObj_Set1634(Character* pChar, f32 f);
+void  fn_8005CB88(Character* pChar, f32 f);       // sets f162C (none without a character)
+f32   Char_GetBackswing(Character* pChar);       // fBackswing (0 without a character)
+void  fn_8005CBB0(Character* pChar, f32 f);       // sets f1630
+void  fn_8005CBC0(Character* pChar, f32 f);       // sets f1634
 int   fn_80062B98(Character* pChar, u64 uEvent);
 int   fn_80062BB0(Character* pChar, u64 uEvent);   // event uEvent is set and its time has come
 void  fn_80062BE8(Character* pChar);
