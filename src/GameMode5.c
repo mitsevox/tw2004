@@ -7,6 +7,7 @@
 #include "engine.h"
 #include "game/save.h"
 #include "game/modes/challenge.h"
+#include "game/earnings.h"
 
 extern s32 lbl_802822F8;
 void fn_800EAE44(int nId);
@@ -35,10 +36,6 @@ extern s32 lbl_80282308;
 extern s32 lbl_8028230C;
 extern u8 gNumPlayersSetUp;                 // 0x80281D48 (Golfer.c)
 extern void (*lbl_80282328)(void);
-u8    fn_800D9998(int nPlayer, int nAward);
-u8    fn_800D750C(int nPlayer, int nAward);
-extern u8 lbl_80200538[];                   // prize data: bonuses at +0x9E4 and +0xA24
-#define PRIZE_AT(off) (*(s32*)(lbl_80200538 + (off)))
 int   fn_800ECF9C(int i);
 void  fn_800EC170(int n);
 u8    fn_800EC4F0(int n);
@@ -607,14 +604,14 @@ void fn_800EC1E0(void) {
                 }
                 fn_800D3548(0, nMoney, (CourseMoneyTracking*)aOut);
                 if (fn_800ED6F0() && fn_800D9998(0, 0x1C) && fn_800D750C(0, 0x1C)) {
-                    fn_800E4364(6, 0x1C, PRIZE_AT(0xA24), nProfile);
-                    fn_800D3548(0, PRIZE_AT(0xA24), 0);
-                    gPlayers[0].n31C += PRIZE_AT(0xA24);
+                    fn_800E4364(6, 0x1C, lbl_80200538.nA24, nProfile);
+                    fn_800D3548(0, lbl_80200538.nA24, 0);
+                    gPlayers[0].n31C += lbl_80200538.nA24;
                 }
                 if (fn_800EC4F0(nProfile) && fn_800D750C(0, 0xC)) {
-                    fn_800E4364(2, 0xC, PRIZE_AT(0x9E4), nProfile);
-                    fn_800D3548(0, PRIZE_AT(0x9E4), 0);
-                    gPlayers[0].n31C += PRIZE_AT(0x9E4);
+                    fn_800E4364(2, 0xC, lbl_80200538.n9E4, nProfile);
+                    fn_800D3548(0, lbl_80200538.n9E4, 0);
+                    gPlayers[0].n31C += lbl_80200538.n9E4;
                 }
             }
         }
