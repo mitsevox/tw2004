@@ -7,6 +7,8 @@
 
 #include "game_types.h"
 #include "engine.h"
+#include "camera.h"
+#include "character.h"
 #include "ball.h"
 
 // ---- attributes -----------------------------------------------------------------------------
@@ -302,7 +304,7 @@ typedef struct Player {
     f32  vOrient[4];            // 0xB4C  a quaternion, identity at setup. TW06: ballRot
     Ball ballBefore;            // 0xB5C  a copy of the ball: as it lay before the shot, then the look-ahead
                                 //        copy launched with it (STATEFUNC_SimulateInit)
-    s32  nShotHandle;           // 0xC18
+    Character* pChar;           // 0xC18  the golfer on screen
     f32  fThinkTime;            // 0xC1C  seconds a CPU has spent in state 2
     f32  fC20;                  // 0xC20
     u8   unkC24[4];

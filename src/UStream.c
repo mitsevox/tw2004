@@ -69,7 +69,7 @@ void  fn_8000B0D4(void* pPool, void* pNode);                 // UMemPool return 
 void  fn_8000B4B8(UStreamObject* p);
 u8    fn_8000B508(UStreamObject* p);
 void  fn_8000B588(UStreamObject* p);
-UStreamObject* fn_8000B70C(u32 uType, u32 uHash);
+UStreamObject* fn_8000B70C(u32 uType, u32 uId);
 int   fn_8000EA1C(const char* pName, int a, int b, int c);
 void  fn_8007593C(void* pChunk);                             // MPG2
 void  fn_800A4BDC(void);
@@ -559,20 +559,20 @@ static void UStream_ParseChunks(void) {
                 if (pChunk->uSubTag == TAG('S', 'H', 'D', 'R')) {
                     u32 uKind = pChunk->uType;
                     if (uKind == TAG('s', 'h', 'd', 'r')) {
-                        if (pChunk->uHash == 2) {
+                        if (pChunk->uId == 2) {
                             gSoundHeader.pDst = fn_800A9374(pChunk->uSize);
                         } else {
                             gSoundHeader.pDst = fn_800A8FB4(pChunk->uSize);
                         }
                     } else if (uKind == TAG('s', 'a', 'm', 'p')) {
-                        gSoundHeader.pDst = fn_800A925C(pChunk->uSize, pChunk->uHash);
+                        gSoundHeader.pDst = fn_800A925C(pChunk->uSize, pChunk->uId);
                     } else {
                         gSoundHeader.pDst = NULL;
                     }
                     gSoundHeader.uSize = pChunk->uSize;
                     gSoundHeader.uPos = 0;
                     gSoundHeader.uKind = pChunk->uType;
-                    gSoundHeader.uMemory = pChunk->uHash;
+                    gSoundHeader.uMemory = pChunk->uId;
                 } else if (pChunk->uSubTag == TAG('S', 'D', 'A', 'T')) {
                     u32 uCopy = uLen - 0x40;
                     if (gSoundHeader.pDst != NULL) {
@@ -736,7 +736,7 @@ int UStream_Update(void) {
         pObject->uRef30 += gRPNSBase;
         if (pObject->uType == TAG('R', 'P', 'N', 'S')) {
             if (fn_8000B508(pObject)) {
-                UStreamObject* pOld = fn_8000B70C(pObject->uType, pObject->uHash);
+                UStreamObject* pOld = fn_8000B70C(pObject->uType, pObject->uId);
                 if (pOld != NULL) {
                     if (pOld->uSize == pObject->uSize && fn_80005BC8(pObject->pData, pOld->pData) == 0) {
                         fn_80009E70(pObject);

@@ -26,7 +26,8 @@ typedef struct UStreamChunk {
     u32  uSubTag;               // 0x10  'SHDR', 'SDAT', 'Rdat'
     u32  uFlags;                // 0x14  SHDR: the object's allocation flags (UStreamObject.uFlags)
     u32  uType;                 // 0x18  SHDR: the object's type ('ter ', 'txf ', ...); SONO: 'shdr' / 'samp'
-    u32  uHash;                 // 0x1C  SHDR: UStreamObject.uHash; SONO: which sound memory (2: fn_800A9374)
+    u32  uId;                   // 0x1C  SHDR: the object's id (UStreamObject.uId); SONO: which sound memory
+                                //       (2: fn_800A9374)
     u32  uSize;                 // 0x20  SHDR: the object's (unpacked) size
     u8   unk24[0x34 - 0x24];
     int  nNameLen;              // 0x34  SHDR: the name's length
@@ -40,7 +41,7 @@ typedef struct UStreamSound {
     u32  uSize;                 // 0x04
     u32  uPos;                  // 0x08  bytes so far
     u32  uKind;                 // 0x0C  'shdr' or 'samp' (UStreamChunk.uType)
-    u32  uMemory;               // 0x10  UStreamChunk.uHash: which sound memory
+    u32  uMemory;               // 0x10  UStreamChunk.uId: which sound memory
 } UStreamSound;
 
 // One read buffer: 0x40 bytes of bookkeeping followed by 0x6000 bytes of file data.

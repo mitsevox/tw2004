@@ -12,7 +12,7 @@
 //   style node:  [club] club node (6 club classes)
 //   club node:   [1] default leaf, [2 + key] leaf (11 keys)
 //   leaf:        [0] clip count, [1] first entry in ppClips, then a u32 "played" mask
-typedef struct AnimLib {
+struct AnimLib {
     s32    groups[64];          // 0x000  byte offset of each group's node, -1 none (21 used)
     u64    uId;                 // 0x100  must match the clip bank's when the clips live there
     s32    n108;                // 0x108
@@ -32,7 +32,7 @@ typedef struct AnimLib {
     s32    n140;                // 0x140
     s16    n144;                // 0x144
     s16    nClips2;             // 0x146
-} AnimLib;
+};
 
 typedef struct ClipRecord {
     char   name[16];            // 0x00
@@ -55,15 +55,6 @@ typedef struct ClipBank {
     u8*    pRecords;            // 0x18  a planned bank: where its records go
     u32    n1C;                 // 0x1C
 } ClipBank;
-
-// A loaded file as the streaming code hands it over: the data, which of the three slots it is
-// for (0x20) and its size (0x24).
-typedef struct LoadedFile {
-    u8*    pData;               // 0x00
-    u8     unk04[0x1C];
-    u32    nSlot;               // 0x20
-    u32    nSize;               // 0x24
-} LoadedFile;
 
 // One field of a byte-swap description: nBytes bytes made of nSize-byte values (negative: not swapped).
 typedef struct SwapField {
@@ -100,7 +91,7 @@ typedef struct LibOverlay {
     AnimLib* pWork;             // 0x00  the loaded (swapped) copy
     void*  pCopy;               // 0x04  the file as it came off the disc
     u32    nSize;               // 0x08
-    struct CharObj* pChar;      // 0x0C  the golfer it was loaded for
+    Character* pChar;           // 0x0C  the golfer it was loaded for
     s32    n10;                 // 0x10
     s32    n14;                 // 0x14
     u8     bActive;             // 0x18
@@ -158,24 +149,13 @@ typedef struct Clip {
     u8*    pFC;                 // 0xFC
 } Clip;
 
-// A golfer's character object (the fields used here).
-typedef struct CharObj {
-    u8                 unk00[4];
-    s32                n4;          // 0x004
-    u8                 unk08[0x2C];
-    u32                nSlot;       // 0x034  the animation slot it uses
-    u8                 unk38[0x3A0];
-    struct AnimLib*    pLib;        // 0x3D8  its animation library
-    struct ClipRecord* pRecords;    // 0x3DC  records for its merged library
-} CharObj;
-
 extern ClipBank*   lbl_801C6050[3];   // the clip bank of each slot
 extern AnimLib*    lbl_801C605C[3];   // the library of each slot, when its clips are in the bank
 extern LibSlot     lbl_801C6068[3];
 extern u32         lbl_801C6470[3];   // ARAM copy of each slot's bank file
 extern u32         lbl_801C647C[3];   // its size
-extern LoadedFile* lbl_801C6488[3];   // each slot's bank file, while it is in main memory
-extern LoadedFile* lbl_80281CE0;      // the buffer banks are brought back from ARAM into
+extern UStreamObject* lbl_801C6488[3];   // each slot's bank file, while it is in main memory
+extern UStreamObject* lbl_80281CE0;      // the buffer banks are brought back from ARAM into
 extern u8          lbl_80281CE4;
 extern u32         lbl_80281078;      // the current slot
 extern u32         lbl_80281D04[2];   // ARAM copy of each scratch area
@@ -1361,7 +1341,7 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
     u8*         pOut;
     s32         n50Al;
     AnimLib*    pNew;
-    CharObj*    pChar;
+    Character*  pChar;
     s32         nSize;
     Clip*       pHdr;
     ClipRecord* pRec;
@@ -1539,7 +1519,7 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
                 for (s = 0; s < 3; s++) {
                     if (bFound) break;
                     for (o = 0; o < lbl_801C6068[k].nOverlays; o++) {
-                        if ((u32)lbl_801C6068[k].overlays[o].pChar == (u32)gPlayers[p].nShotHandle) {
+                        if (lbl_801C6068[k].overlays[o].pChar == gPlayers[p].pChar) {
                             bFound = 1;
                             break;
                         }
@@ -1612,7 +1592,9 @@ void AnimLib_ApplyOverlays(int nSlot) {
     if (n != 0) {
         pOv = pSlot->overlays;
         for (i = 0; i < n; pOv++, i++) {
-            if (pOv->bActive) fn_800269E4(pOv, nSlot, pOv->pChar->n4);
+            if (pOv->bActive) {
+                fn_800269E4(pOv, nSlot, pOv->pChar->nPlayer);
+            }
         }
     }
 }
@@ -1973,15 +1955,15 @@ ClipBank* ClipBank_Load(u8* pFile, u32 uAlign) {
 }
 
 // A slot's animation library has loaded: keep a copy and set it up against the slot's bank.
-void AnimLib_OnLoaded(LoadedFile* pFile) {
+void AnimLib_OnLoaded(UStreamObject* pFile) {
     u8       bFree = 1;
-    u32      nSlot = pFile->nSlot;
+    u32      nSlot = pFile->uId;
     AnimLib* pLib;
 
     if (nSlot < 3 && lbl_801C605C[nSlot] == NULL) {
-        lbl_801C6068[nSlot].pCopy = fn_80009B34(pFile->nSize, 2, 0x40, "skalib.c", 4520);
-        Mem_cpy(lbl_801C6068[nSlot].pCopy, pFile->pData, pFile->nSize);
-        lbl_801C6068[nSlot].nSize = pFile->nSize;
+        lbl_801C6068[nSlot].pCopy = fn_80009B34(pFile->uSize, 2, 0x40, "skalib.c", 4520);
+        Mem_cpy(lbl_801C6068[nSlot].pCopy, pFile->pData, pFile->uSize);
+        lbl_801C6068[nSlot].nSize = pFile->uSize;
         pLib = AnimLib_Load(pFile->pData, ClipBank_Get(nSlot));
         pLib->pFile = pFile;
         if (pLib->pBank != NULL) {
@@ -1997,16 +1979,16 @@ void AnimLib_OnLoaded(LoadedFile* pFile) {
 void ClipBank_Stash(int nSlot);
 
 // A slot's clip bank file has loaded: park it in ARAM.
-void ClipBank_OnLoaded(LoadedFile* pFile) {
-    u32 nSlot = pFile->nSlot;
+void ClipBank_OnLoaded(UStreamObject* pFile) {
+    u32 nSlot = pFile->uId;
     lbl_801C6488[nSlot] = pFile;
     ClipBank_Stash(nSlot);
 }
 
 // Makes a loaded clip bank file the slot's bank.
-void ClipBank_Install(LoadedFile* pFile) {
+void ClipBank_Install(UStreamObject* pFile) {
     u8  bFree = 1;
-    u32 nSlot = pFile->nSlot;
+    u32 nSlot = pFile->uId;
 
     if (nSlot < 3 && lbl_801C6050[nSlot] == NULL) {
         lbl_801C6050[nSlot]        = ClipBank_Load(pFile->pData, 16);
@@ -2034,7 +2016,7 @@ void ClipBank_Release(int nSlot) {
 // brought back into.
 void ClipBank_Stash(int nSlot) {
     if (lbl_801C6488[nSlot] != NULL) {
-        lbl_801C647C[nSlot] = ((lbl_801C6488[nSlot]->nSize + 0x80) / 32 + 1) * 32;
+        lbl_801C647C[nSlot] = ((lbl_801C6488[nSlot]->uSize + 0x80) / 32 + 1) * 32;
         if (lbl_801C6470[nSlot] == 0) lbl_801C6470[nSlot] = fn_800B6564(lbl_801C647C[nSlot]);
         fn_800B6844(lbl_801C6488[nSlot], lbl_801C6470[nSlot], lbl_801C647C[nSlot]);
         fn_800B67EC();
@@ -2073,10 +2055,10 @@ void ClipBank_FreeAram(void) {
 }
 
 // Hooks the loaders up to the file streamer: 'SAL ' animation libraries and 'BNK ' clip banks.
-// The loaders read the stream object through this file's LoadedFile view of it.
+// A stream object's uId says which of the three animation slots it is for.
 void Skalib_Register(void) {
-    UStream_RegisterHandler('SAL ', (void (*)(UStreamObject*))AnimLib_OnLoaded);
-    UStream_RegisterHandler('BNK ', (void (*)(UStreamObject*))ClipBank_OnLoaded);
+    UStream_RegisterHandler('SAL ', AnimLib_OnLoaded);
+    UStream_RegisterHandler('BNK ', ClipBank_OnLoaded);
 }
 
 void Skalib_Unregister(void) {
