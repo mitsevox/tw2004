@@ -3639,6 +3639,10 @@ src/dvd/dvdFatal.c:
 
 dolphin/dvd/fstload.c:
 	.text       start:0x8013E16C end:0x8013E3AC
+	.data       start:0x80199D80 end:0x80199DF0
+	.bss        start:0x8027A658 end:0x8027A6C8
+	.sdata      start:0x80281A38 end:0x80281A48
+	.sbss       start:0x80282838 end:0x80282848
 
 dolphin/gx/GXInit.c:
 	.text       start:0x8013E3AC end:0x8013F57C
