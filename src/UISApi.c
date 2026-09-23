@@ -24,26 +24,7 @@ void fn_80168C24(UIStudio* pStudio, s32 nTicks) {
 // Sends event uEvent to the current screen, or to every screen when bAll is set. Event -8 skips
 // a screen that is being unloaded.
 void fn_80168CD8(UIStudio* pStudio, UISWordStack* pStack, u32 uEvent, s32 n, u8 b, void* p, u8 bAll) {
-    u32 i;
-    u32 nEnd;
-    UISScreen* pScreen;
-    u8 bOut;
-
-    if (bAll) {
-        nEnd = pStudio->nScreens;
-        i = 0;
-    } else {
-        i = pStudio->nCurScreen;
-        nEnd = i + 1;
-        if (i == -1) return;
-    }
-    for (; i < nEnd; i++) {
-        pScreen = &pStudio->pScreens[i];
-        if ((u32)n != -8 || pScreen->bUnloading != 1) {  // fake match: the original compares unsigned
-            bOut = 0;
-            fn_8016A2D4(pStudio, pScreen, pStack, 0, uEvent, n, b, p, &bOut);
-        }
-    }
+    UIStudio_Send(pStudio, pStack, uEvent, n, b, p, bAll);
 }
 
 // Runs the queued events, makes the screen named by the last p60 record current, then sends

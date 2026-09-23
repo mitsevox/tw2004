@@ -309,4 +309,31 @@ u32 fn_8016C614(UISNode* pNode, u16 uId, u16 uEvent);
 u32 fn_8016C674(UISNode* pNode, u16 uEvent);
 u16 fn_8016C6C4(UIStudio* pStudio, u16 uGroup, u16 uScreen);
 
+// Sends event uEvent to the current screen, or to every screen when bAll is set; n -8 skips a
+// screen being unloaded. fn_80168CD8's body, which UIStudio.c has pasted in twice (the pasted
+// copies keep this block layout, with the loop set-up after the loop).
+static inline void UIStudio_Send(UIStudio* pStudio, UISWordStack* pStack, u32 uEvent, s32 n, u8 b, void* p,
+                                 u8 bAll) {
+    u32 i;
+    u32 nEnd;
+    UISScreen* pScreen;
+    u8 bOut;
+
+    if (bAll) {
+        nEnd = pStudio->nScreens;
+        i = 0;
+    } else {
+        i = pStudio->nCurScreen;
+        nEnd = i + 1;
+        if (i == -1) return;
+    }
+    for (; i < nEnd; i++) {
+        pScreen = &pStudio->pScreens[i];
+        if ((u32)n != -8 || pScreen->bUnloading != 1) {  // fake match: the original compares unsigned
+            bOut = 0;
+            fn_8016A2D4(pStudio, pScreen, pStack, 0, uEvent, n, b, p, &bOut);
+        }
+    }
+}
+
 #endif
