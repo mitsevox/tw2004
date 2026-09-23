@@ -135,7 +135,7 @@ typedef struct Clip {
     u8     unk54[0x10];
     s32    n64;                 // 0x64
     u8     unk68[0x80 - 0x68];
-    f32    v80[3];              // 0x80  a point in the root bone's frame (fn_8001DB04)
+    f32    v80[3];              // 0x80  a point fn_8001DB04 puts through bone 0's matrix
     s16    n8C;                 // 0x8C  halfwords per frame, first stream
     s16    n8E;                 // 0x8E  bytes per frame, second stream
     u8     unk90[0x10];

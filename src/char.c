@@ -565,7 +565,7 @@ void fn_8001D8DC(int nPlayer) {
 }
 
 // Empty the character's four data buffers (their memory is kept).
-// The clip's point v80 through the root bone's matrix into pOut; without a clip, bone 0's
+// The clip's point v80 through bone 0's matrix (fn_8001ED08) into pOut; without a clip, bone 0's
 // position (fn_8001EB8C).
 void fn_8001DB04(Character* pChar, f32* pOut) {
     Vec4 vPos;
