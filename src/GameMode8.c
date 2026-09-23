@@ -95,6 +95,12 @@ extern f32 lbl_802816B0;
 extern f32 lbl_802816B4;
 extern f32 lbl_802816C0;
 extern f32 lbl_802816C4;
+extern f32 lbl_802816B8;
+extern f32 lbl_802816BC;
+f32   fn_8000AD78(f32 y, f32 x);                // atan2f
+f32   fn_8000AD9C(f32 x);                       // fabsf
+void  fn_800BAF04(f32* pSrc, f32* pDst);        // normalise
+int   Golfer_GetAttribute(Player* pPlayer, int nAttr, int nMode);
 void  Mem_cpy(void* pDst, void* pSrc, int nBytes);
 void  fn_8006ACF8(int nPlayer, int a);
 void  fn_8006BAA8(int nPlayer);
@@ -928,6 +934,55 @@ void fn_800FB774(int nPlayer) {
         } else {
             gPlayers[nPlayer].fCB4 -= lbl_802816B4 * fStep;
         }
+    }
+}
+
+// A CPU player's sticks for the run: turn from the heading fA88 towards vPlacement (fA80),
+// forward speed from how far off the heading is (fA84), both eased off near the target; fCB4
+// rises until it reaches a level set by the golfer's speed attribute.
+void fn_800FBB30(Player* p) {
+    f32 v[4];
+    f32 fAngle;
+    f32 fDistSq;
+    f32 fOff;
+    f32 fScale;
+    f32 fLow;
+    fn_800FE190((f32*)p->ball, p->vPlacement, v);
+    fDistSq = v[0] * v[0] + v[2] * v[2];
+    fn_800BAF04(v, v);
+    fAngle = p->fA88 - fn_8000AD78(v[2], v[0]) - PI / 2.0f;
+    while (fAngle < -PI) {
+        fAngle += TWOPI;
+    }
+    while (fAngle > PI) {
+        fAngle -= TWOPI;
+    }
+    fOff = fn_8000AD9C(fAngle);
+    if (fOff > DEG(1.0f) && fOff < DEG(15.0f)) {
+        fOff *= 3.0f;
+        fAngle *= 3.0f;
+    }
+    fScale = (PI - fOff) / PI;
+    p->fA84 = fScale;
+    if (fOff >= PI / 4.0f) {
+        p->fA84 *= 0.25f;
+    }
+    p->fA80 = (1.0f / PI) * fAngle;
+    if (fDistSq < 31.25f) {
+        p->fA84 *= fDistSq / 31.25f;
+        p->fA80 *= fDistSq / 31.25f;
+    }
+    if (fOff > DEG(2.0f)) {
+        p->fA84 *= fScale;
+        p->fA80 *= fScale;
+        p->fA7C = (1.0f / PI) * -fAngle;
+    } else {
+        p->fA7C = 0.0f;
+    }
+    fLow = lbl_802816B8;
+    if (p->fCB4 < (lbl_802816BC - fLow) *
+                      (0.5f * (0.01f * (s8)Golfer_GetAttribute(p, ATTR_SPEED, ATTR_TOTAL))) + fLow) {
+        p->fCB4 += lbl_802816B0;
     }
 }
 

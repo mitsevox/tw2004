@@ -280,7 +280,7 @@ typedef struct Player {
     f32  fA7C;                  // 0xA7C  pad stick x, -1..1 (GameMode9 fn_800EDAE0)
     f32  fA80;                  // 0xA80
     f32  fA84;                  // 0xA84
-    u8   unkA88[4];
+    f32  fA88;                  // 0xA88  an angle (speed golf: the run's heading)
     f32  fA8C;                  // 0xA8C  pad stick y, -1..1 (GameMode8 fn_800FB460)
     u8   ball[0x68];            // 0xA90  the player's Ball (0xBC bytes, see Ball.c) - nLie is its +0x68
     s32  nLie;                  // 0xAF8
