@@ -178,8 +178,17 @@ Dated log of what was done and decided, newest last. Facts and lessons belong in
   backspin "check" for shots from over 63 yd on dry short grass, cut to a tenth when the spin
   stick was used. The original reuses nine float variables for many jobs; the C now mirrors
   that reuse.
+- **Putt test harness: hypothesis 6 measured.** `tools/research/putt_sim.py` (Python) ports
+  skid, roll, cup pull, air and the launch from `Ball.c` and the rehearsal from `Golfer.c` onto
+  a tilted plane. Validation: level-green roll matches `gPuttDist` within 0.6% at green setting
+  2 (so the putt table was built for the fastest greens). Result: a perfect CPU holes every
+  straight putt, but the +5% pace misses high once break x length is big enough (15 ft at 3%,
+  20 ft at 2%, 30 ft at 1%); with skill error, PUTTING 98 makes are decided by break, PUTTING
+  80 by length. The +5% is "never up, never in" for average putters. The rim is modelled, not
+  the game's (cup geometry not decoded); `--cup 2.25` shows the same pattern. Side find:
+  surfaces 98/105 are the cup (the "water" comment in `AI_PlanShot` was wrong).
 - **Next (agreed with the user, in this order):**
-  1. **Putt test harness for hypothesis 6.** Build a host-side (PC) C or Python model of the roll
+  1. ~~Putt test harness for hypothesis 6~~ (done, entry above). Build a host-side (PC) C or Python model of the roll
      physics now in C (`fn_80052268` skid, `Ball_GroundContact` roll incl. break = slope / (0.457
      x spin), 5/7 g along the line, rolling friction x 0.575 on greens, `Ball_CupPull`, the cup
      test) on a planar green of chosen slope. Solve a putt to die at the hole (like the CPU

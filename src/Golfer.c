@@ -588,7 +588,8 @@ void AI_PlanShot(int nPlayer, f32* pTarget) {
     if (pSurface != NULL) {
         nType = pSurface - gSurfaceTypes;
         if (nType == 98 || nType == 105) {
-            // Water: aim at the pin's height instead and flag it.
+            // The cup (surfaces 98 and 105 hole the ball, see Ball.c): aim at the pin's height
+            // instead and flag it.
             fHeight = fn_8000C594()->pin[Game_CurrentHole()].y;
             gPlayers[nPlayer].nSurface = 16;
             gPlayers[nPlayer].uFlagsEF0 |= 2;

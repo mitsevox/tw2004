@@ -557,6 +557,13 @@ a full-power putt rolls 43 yd (130 ft); the maximum, 1.1, rolls 52 yd. Your putt
 meter fraction times this function's answer for the distance to your aim marker, so 100% on the
 meter rolls exactly to the marker (over 75% on the meter counts as 100%).
 
+**The table fits only the fastest green-speed setting.** The putt harness
+(`tools/research/putt_sim.py`, ported from the rolling code) reproduces it to within 0.6% on a
+level green at `gGreenSpeedSetting` 2 (green friction x 0.8). At settings 0 and 1 the same power
+rolls 20% and 11% less, so there 100% on the meter stops short of the marker. The CPU is not
+affected: its rehearsal finds the right aim point whatever the setting. (Verified by the
+harness; which setting the options menu starts on is not checked yet.)
+
 Because roll grows with the *square* of power, **the CPU's +5% putt pace (above) is +10% of
 distance**: a putt planned to die at the hole would finish about 10% of its length past it.
 

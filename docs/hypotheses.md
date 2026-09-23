@@ -280,6 +280,57 @@ less break - the +5% pace is a line error on every breaking putt. (2) The CPU's 
 **without the cup pull** (`Ball_CupPull` is skipped when simulating), so the real putt has help
 at the hole that the rehearsal never counted; that only rescues putts that arrive close.
 
+**Update (2026-09-23, measured):** `tools/research/putt_sim.py` ports the skid, roll, break, cup
+pull and air physics from `Ball.c` and the CPU's rehearsal from `Golfer.c`, on a flat tilted
+green. It checks out: on a level green its roll distances match the game's own putt power
+table to within 0.6% (at green-speed setting 2; see gameplay.md). The only invented part is the
+cup's rim (the real cup is course geometry we have not decoded); the line the ball takes is the
+game's.
+
+A perfect CPU (no skill error at all), side-hill putts, green setting 2. The rehearsal's aim
+always holes out at the rehearsed pace; the real putt at +5% passes the cup this far on the high
+side (inches; the cup is ~2.1 in in radius):
+
+    length    1% slope   2%      3%      4%
+     6 ft     -0.6      -0.1    +0.6    +0.9     all holed
+    10 ft     -0.2      +0.6    +1.9    +2.6     4%: misses, stops 11 in past
+    15 ft     -0.3      +1.9    +2.8    +5.0     3% and up miss, ~17 in past
+    20 ft     +0.5      +2.4    +4.8    +6.7     2% and up miss, ~23 in past
+    30 ft     +1.8      +4.8    +8.3   +11.6     1% and up miss (1% drops with a 2.25 in cup)
+    45 ft     +2.8      +7.3   +12.6   +18.6     all miss, ~56 in past
+
+Straight putts (0%) are holed at every length. So for a *perfect* CPU the miss depends on
+**break x length**: the high-side miss grows with both, and whether it drops is a clean line
+through the table. The +5% is the whole cause: at x1.00 every one of these is holed.
+
+With the skill error on (300 putts a cell, `--mc 300`), make % at +5% pace (as the game does) /
+at x1.00 for comparison:
+
+    PUTTING 98   0%         1%         2%         3%         4%
+     10 ft     100/100    100/100    100/100     50/100     32/100
+     20 ft     100/100     74/68      52/75       0/96       0/85
+     30 ft      30/77      53/49       0/61       0/79       0/74
+    PUTTING 80
+     10 ft     100/73     100/81      92/78      61/70      38/55
+     20 ft      26/18      25/20      35/20      25/20      16/22
+     30 ft       9/8       20/9       18/11      14/14       4/11
+
+What that says:
+
+- **For a strong putter, break decides it.** At PUTTING 98 the aim error is tiny (0.25..0.41
+  degree), so a straight 20-footer always drops and a 3% one never does: the prediction,
+  almost exactly.
+- **For an average putter, distance decides it.** At PUTTING 80 the aim error (up to 1.6
+  degrees) swamps the break, and make % falls with length whatever the slope.
+- **Why EA added the +5%:** it is "never up, never in". Without it, a putt with a short
+  distance error stops on the lip; with it, the average putter holes more of its straight and
+  gently breaking putts (10 ft flat: 100% vs 73%). The price is the high-side miss on bigger
+  breaks - a sensible trade for the average CPU that turns into a blind spot for the best ones.
+
+**Final verdict:** right for the best CPU putters (break, not distance, decides their makes);
+wrong for average ones (distance dominates). Both come from the same two pieces of code: the
+skill-scaled aim error and the fixed +5% pace.
+
 7. Power boost's full meter needs a non-linear number of Z presses
 -------------------------------------------------------------------
 
