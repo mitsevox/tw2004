@@ -332,7 +332,11 @@ EASBErrorE fn_801288DC(u32 uTime, u16* pnYear, u8* pnMonth, u8* pnDay, u8* pnHou
         uDay += 10;
     }
     *pnYear = uDay / 365;
-    nDayOfYear = uDay % 365 - *pnYear / 4 + *pnYear / 100 - *pnYear / 400 - 12;
+    nDayOfYear = uDay % 365;
+    nDayOfYear -= *pnYear / 4;
+    nDayOfYear += *pnYear / 100;
+    nDayOfYear -= *pnYear / 400;
+    nDayOfYear -= 12;
     while (nDayOfYear <= 0) {
         if (fn_80127F40(*pnYear) == 1) {
             nDayOfYear += 366;
