@@ -11,6 +11,8 @@ void fn_800C9F14(u8 bForce);
 void fn_800CB550(int nBytes, int nError);
 void fn_800CA2E4(int nPlayer, AnimLib* pOverlay, AnimLib* pLib);
 void fn_800CA194(int nPlayer, u8 b);
+void fn_800CA610(int nPlayer, AnimLib* pLib, int nFirst, int nLast, int nStyleFirst, int nStyleLast,
+                 int nClubFirst, int nClubLast);
 void fn_800CACD4(int nPlayer);
 void fn_800CB2B0(int nSlot);
 void fn_800CB4E0(int hFile, u32 uFileSize, void* pDst, u32 uLen, u32 uOffset);
@@ -261,53 +263,123 @@ void fn_800CA268(int nPlayer, int a, int nGroup, int nClub, int nStyle) {
     }
 }
 
+// With streaming on, works out a player's streamed clip sets: the overlay library's clips where it
+// has them, and the base library's (fn_800CA610) for every group, style or club class it lacks or
+// whose club node asks for them (flag 1).
+void fn_800CA2E4(int nPlayer, AnimLib* pOverlay, AnimLib* pLib) {
+    int i;
+    int nGroup;
+    int nStyle;
+    int nClub;
+    int nNode;
+    s16* pGroup;
+    s16* pStyle;
+    s16* pIndex;
+    int k;
+    AnimLeaf* pLeaf;
+    int nSize;
+    AnimClubNode* pClub;
+    ClipRecord* pRec;
+
+    if (lbl_80282230->bOn == 0) return;
+    for (i = 0; i < 2; i++) {
+        for (nStyle = 0; nStyle < 8; nStyle++) {
+            for (nClub = 0; nClub < 6; nClub++) {
+                lbl_80282230->players[nPlayer].clips[i][nStyle][nClub].nMaxSize = 0;
+            }
+        }
+    }
+    for (i = 0; i < 2; i++) {
+        nGroup = lbl_80191490[i].nGroup;
+        nNode = pOverlay->groups[nGroup];
+        if (nNode < 0) {
+            fn_800CA610(nPlayer, pLib, i, i, 0, 7, 0, 5);
+            continue;
+        }
+        pGroup = (s16*)(pOverlay->pTree + nNode);
+        for (nStyle = 0; nStyle < 8; nStyle++) {
+            if (pGroup[1 + nStyle] < 0) {
+                fn_800CA610(nPlayer, pLib, i, i, nStyle, nStyle, 0, 5);
+                continue;
+            }
+            pStyle = (s16*)(pOverlay->pTree + pGroup[1 + nStyle]);
+            for (nClub = 0; nClub < 6; nClub++) {
+                if (!fn_800C9828(nGroup, nStyle, nClub, -1)) continue;
+                if (pStyle[nClub] < 0) {
+                    fn_800CA610(nPlayer, pLib, i, i, nStyle, nStyle, nClub, nClub);
+                    continue;
+                }
+                pClub = (AnimClubNode*)(pOverlay->pTree + pStyle[nClub]);
+                if (pClub->uFlags & 1) {
+                    fn_800CA610(nPlayer, pLib, i, i, nStyle, nStyle, nClub, nClub);
+                }
+                if (pClub->nDefault >= 0) {
+                    pLeaf = (AnimLeaf*)(pOverlay->pTree + pClub->nDefault);
+                    pIndex = &pOverlay->pIndex[pLeaf->nFirst];
+                    for (k = 0; k < pLeaf->nCount; k++) {
+                        pRec = &pOverlay->pRecords[*pIndex];
+                        pRec->n12 |= 4;
+                        nSize = pRec->n18;
+                        if (nSize > lbl_80282230->players[nPlayer].clips[i][nStyle][nClub].nMaxSize) {
+                            if (nSize % 0x800 != 0) {
+                                nSize += 0x800 - nSize % 0x800;
+                            }
+                            lbl_80282230->players[nPlayer].clips[i][nStyle][nClub].nMaxSize = nSize;
+                        }
+                        pIndex++;
+                    }
+                }
+            }
+        }
+    }
+}
+
 // With streaming on, goes through a player's library over a range of the stream's groups (by
 // index), styles and club classes: marks the records of each streamed clip set's default clips
 // (flag 4) and keeps the set's largest clip size, rounded up to 0x800 bytes.
 void fn_800CA610(int nPlayer, AnimLib* pLib, int nFirst, int nLast, int nStyleFirst, int nStyleLast,
                  int nClubFirst, int nClubLast) {
-    int i;
     int nGroup;
+    int i;
     int nStyle;
     int nClub;
-    int nOff;
-    int k;
-    int nSize;
+    int nNode;
+    s16* pGroup;
     s16* pStyle;
-    s16* pLeaf;
     s16* pIndex;
+    int k;
+    AnimLeaf* pLeaf;
+    int nSize;
+    AnimClubNode* pClub;
     ClipRecord* pRec;
 
     if (lbl_80282230->bOn == 0) return;
     for (i = nFirst; i <= nLast; i++) {
         nGroup = lbl_80191490[i].nGroup;
-        if (pLib->groups[nGroup] < 0) continue;
+        nNode = pLib->groups[nGroup];
+        if (nNode < 0) continue;
+        pGroup = (s16*)(pLib->pTree + nNode);
         for (nStyle = nStyleFirst; nStyle <= nStyleLast; nStyle++) {
-            nOff = ((s16*)(pLib->pTree + pLib->groups[nGroup]))[1 + nStyle];
-            if (nOff < 0) continue;
-            pStyle = (s16*)(pLib->pTree + nOff);
+            if (pGroup[1 + nStyle] < 0) continue;
+            pStyle = (s16*)(pLib->pTree + pGroup[1 + nStyle]);
             for (nClub = nClubFirst; nClub <= nClubLast; nClub++) {
-                if (fn_800C9828(nGroup, nStyle, nClub, -1)) {
-                    nOff = pStyle[nClub];
-                    if (nOff >= 0) {
-                        nOff = ((s16*)(pLib->pTree + nOff))[1];
-                        if (nOff >= 0) {
-                            pLeaf = (s16*)(pLib->pTree + nOff);
-                            pIndex = &pLib->pIndex[pLeaf[1]];
-                            for (k = 0; k < pLeaf[0]; k++) {
-                                pRec = &pLib->pRecords[*pIndex];
-                                pRec->n12 |= 4;
-                                nSize = pRec->n18;
-                                if (nSize > lbl_80282230->players[nPlayer].clips[i][nStyle][nClub].nMaxSize) {
-                                    if (nSize % 0x800 != 0) {
-                                        nSize += 0x800 - nSize % 0x800;
-                                    }
-                                    lbl_80282230->players[nPlayer].clips[i][nStyle][nClub].nMaxSize = nSize;
-                                }
-                                pIndex++;
-                            }
+                if (!fn_800C9828(nGroup, nStyle, nClub, -1)) continue;
+                if (pStyle[nClub] < 0) continue;
+                pClub = (AnimClubNode*)(pLib->pTree + pStyle[nClub]);
+                if (pClub->nDefault < 0) continue;
+                pLeaf = (AnimLeaf*)(pLib->pTree + pClub->nDefault);
+                pIndex = &pLib->pIndex[pLeaf->nFirst];
+                for (k = 0; k < pLeaf->nCount; k++) {
+                    pRec = &pLib->pRecords[*pIndex];
+                    pRec->n12 |= 4;
+                    nSize = pRec->n18;
+                    if (nSize > lbl_80282230->players[nPlayer].clips[i][nStyle][nClub].nMaxSize) {
+                        if (nSize % 0x800 != 0) {
+                            nSize += 0x800 - nSize % 0x800;
                         }
+                        lbl_80282230->players[nPlayer].clips[i][nStyle][nClub].nMaxSize = nSize;
                     }
+                    pIndex++;
                 }
             }
         }

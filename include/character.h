@@ -557,6 +557,16 @@ typedef struct AnimLeaf {
     u32 uMask;                  // 0x4
 } AnimLeaf;
 
+// A club node of the clip tree (see AnimLib).
+typedef struct AnimClubNode {
+    s16 n0;                     // 0x00
+    s16 nDefault;               // 0x02  the default leaf
+    s16 aKeys[11];              // 0x04  the leaf of each key
+    u8  unk1A[2];
+    u32 uFlags;                 // 0x1C  1: AnimStream also takes the character's base clips here
+} AnimClubNode;
+LAYOUT_ASSERT(AnimClubNode, 0x20);
+
 // What the merge adds up as it walks.
 typedef struct MergeCtx {
     u32  n0;                    // 0x00
