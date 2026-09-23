@@ -188,6 +188,46 @@ void fn_800CB668(u8 bGlobal, int bFemale, int nPlayer, char* szPath) {
     sprintf(szPath, "%sdata\\CharStrm\\AnimChar\\%02dchr.sac", lbl_80281530, fn_8001C558(nPlayer) + 1);
 }
 
+// Packs up to 12 characters of pName into a base-40 code, stored with its bytes reversed. A
+// character without a code becomes '_'. Returns 0, 1 when the name is longer than 12 characters,
+// or 2 when a character was replaced.
+int fn_800CB700(u64* pId, const char* pName) {
+    int nResult = 0;
+    int i;
+    char c;
+    int bValid;
+    u8 aBytes[8];
+
+    *pId = 0;
+    for (i = 0; i < 12; i++) {
+        if (*pName != '\0') {
+            c = *pName;
+            bValid = 0;
+            // EA bug: char is signed, so a character above 127 is negative and reads before the table
+            if (c < 128 && lbl_80191520[c] != -1) {
+                bValid = 1;
+            }
+            if (!bValid) {
+                c = '_';
+                nResult = 2;
+            }
+            pName++;
+            *pId *= 40;
+            *pId += lbl_80191520[c];
+        } else {
+            *pId *= 40;
+        }
+    }
+    if (*pName != '\0') {
+        nResult = 1;
+    }
+    for (i = 0; i < 8; i++) {
+        aBytes[7 - i] = ((u8*)pId)[i];
+    }
+    memcpy(pId, aBytes, sizeof(u64));
+    return nResult;
+}
+
 // Unpacks a name code (fn_800CB700) into its 12 characters.
 void fn_800CB868(u64* pId, char* szName) {
     int i;
