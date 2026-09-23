@@ -60,7 +60,7 @@ extern u8  lbl_802822D7;                    // the HUD on screen 3 (split screen
 extern u8  lbl_802822D8;                    // the HUD on screen 2 (split screen, player 1)
 extern u8  lbl_802822D9;                    // the HUD on the single screen
 extern u8  lbl_802822DA;
-void  fn_800E5DA0(u8* p);
+void  fn_800E5DA0(void);
 void  fn_800E3B04(void);
 void  fn_800E3E0C(void);
 void  fn_800E5A4C(int a, int b, int* pA, f32* pF, int* pB);
@@ -105,7 +105,7 @@ void fn_800E3B28(void) {
     lbl_802822BD = 0;
     lbl_802822BC = 0;
     lbl_80282280 = 0;
-    fn_800E5DA0(lbl_802822DC);
+    fn_800E5DA0();
     fn_800E3B04();
 }
 
@@ -360,11 +360,9 @@ u8 fn_800E415C(void) {
 // in mode 11.
 void fn_800E4164(int nMsg, int nPlayer, f32 f) {
     int nWho;
-    int nId = nMsg;
-    f32 fVal = f;
     if (Game_GetMode() != 11) {
         nWho = nPlayer + 1;
-        fn_800E5A4C(5, 2, &nId, &fVal, &nWho);
+        fn_800E5A4C(5, 2, &nMsg, &f, &nWho);
         lbl_802822DB = 1;
     }
 }
@@ -385,8 +383,8 @@ void fn_800E4204(void) {
 }
 
 void fn_800E4238(int i) {
-    lbl_802822DA = 0;
     lbl_802822DC[i] = 1;
+    lbl_802822DA = 0;
     lbl_802822DB = 0;
 }
 
