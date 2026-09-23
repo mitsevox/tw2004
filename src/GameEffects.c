@@ -43,7 +43,20 @@ void  fn_800A6DCC(int nMusic, int a);
 u8    fn_800451A8(CamScript* pScript, CamShot* pShot, int nPlayer);
 
 // Starts a scripted GameBreaker for nPlayer, for reason nReason (a bit in uFlags).
-#define GB_START(nPlayer, nReason)                                                                     if (!lbl_80202898.bGameBreaker || lbl_80202898.bClosing || lbl_80202898.nGBType != 0) {                lbl_80202898.bClosing = 0;                                                                         lbl_80202898.bGameBreaker = 1;                                                                     lbl_80202898.fGBTime = 0.0f;                                                                       lbl_80202898.f24 = 0.0f;                                                                           lbl_80202898.b19 = 0;                                                                              lbl_80202898.nGBType = 0;                                                                          lbl_80202898.nPlayer = nPlayer;                                                                    lbl_80202898.bPaused = 0;                                                                          lbl_80202898.uFlags = 1 << (nReason);                                                              lbl_80202898.nHeartbeats = 0;                                                                      EVENT_Trigger(nPlayer, 0x3D, 0, -1);                                                           }
+#define GB_START(nPlayer, nReason)                                                          \
+    if (!lbl_80202898.bGameBreaker || lbl_80202898.bClosing || lbl_80202898.nGBType != 0) { \
+        lbl_80202898.bClosing = 0;                                                          \
+        lbl_80202898.bGameBreaker = 1;                                                      \
+        lbl_80202898.fGBTime = 0.0f;                                                        \
+        lbl_80202898.f24 = 0.0f;                                                            \
+        lbl_80202898.b19 = 0;                                                               \
+        lbl_80202898.nGBType = 0;                                                           \
+        lbl_80202898.nPlayer = nPlayer;                                                     \
+        lbl_80202898.bPaused = 0;                                                           \
+        lbl_80202898.uFlags = 1 << (nReason);                                               \
+        lbl_80202898.nHeartbeats = 0;                                                       \
+        EVENT_Trigger(nPlayer, 0x3D, 0, -1);                                                \
+    }
 
 // TW06: GameEffects_InitGameEffectSettings (by position and size).
 void fn_800DAE44(void) {
