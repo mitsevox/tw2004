@@ -400,7 +400,7 @@ config.libs = [
         "progress_category": "sdk",
         "src_dir": "extern/gauntlet",
         "objects": [
-            Object(NonMatching, "src/dolphin/db/odenotstub.c"),
+            Object(Matching, "src/dolphin/db/odenotstub.c", extra_cflags=["-inline deferred"]),
         ],
     },
     {
@@ -1226,7 +1226,6 @@ config.libs = [
             Object(Matching, "unsorted/sweep_8012C83C.c"),
             Object(Matching, "unsorted/sweep_8012CCC0.c"),
             Object(Matching, "unsorted/sweep_801338E0.c"),
-            Object(Matching, "unsorted/sweep_80150F24.c"),
             Object(Matching, "unsorted/sweep_80155F40.c"),
         ],
     },

@@ -1584,11 +1584,10 @@ dolphin/ai.c:
 	.sdata      start:0x80281AF8 end:0x80281B00
 	.sbss       start:0x80282980 end:0x802829C0
 
-unsorted/sweep_80150F24.c:
-	.text       start:0x80150F24 end:0x80150F2C
-
 src/dolphin/db/odenotstub.c:
-	.text       start:0x80150F2C end:0x801519A4
+	.text       start:0x80150F24 end:0x801519A4
+	.sdata      start:0x80281B00 end:0x80281B08
+	.sbss       start:0x802829C0 end:0x802829D8
 
 runtime/__va_arg.c:
 	.text       start:0x801519A4 end:0x80151A6C
