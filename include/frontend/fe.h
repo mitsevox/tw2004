@@ -207,8 +207,9 @@ typedef struct CrAPAsset {
     u64  aVariant[4];           // 0x090  } them) and the id of each one's variant (fn_80106A64)
     u64  aSet[4];               // 0x0B0  the ids of four skin sets; taking the asset off puts
                                 //        them back to "Defaults" (fn_80106DA0)
-    u8   unkD0[0x112 - 0xD0];
-    s16  n112;                  // 0x112  } offsets of strings in 'CR_S' (fn_801064EC); n114 is
+    u8   unkD0[0x110 - 0xD0];
+    s16  n110;                  // 0x110  the offset in 'CR_S' of its unlock text (-1: none; fn_8010651C)
+    s16  n112;                 // 0x112  } offsets of strings in 'CR_S' (fn_801064EC); n114 is
     s16  n114;                  // 0x114  } passed to fn_8008E724 with the asset's name (fn_80104094)
     u8   unk116[2];
 } CrAPAsset;

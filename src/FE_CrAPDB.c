@@ -703,6 +703,42 @@ char* fn_801064EC(int nCategory) {
     return lbl_80282460->pStrings + nCategory;
 }
 
+// Copy how a part's choice i is unlocked into pDst: the Game Boy Advance link for lock kind 2,
+// otherwise its text in 'CR_S' (pDst is left as it is when it has none).
+u8 fn_8010651C(s16 nPart, int b, int i, char* pDst) {
+    int nAsset;
+    int nWanted = fn_80104AF4(nPart, b);
+    int n;
+    CrAPAsset* pAsset;
+
+    if (lbl_80282460->pStrings == NULL) {
+        return 0;
+    }
+    if (pDst == NULL) {
+        return 0;
+    }
+    n = 0;
+    for (nAsset = 0; nAsset < lbl_80282460->nAssets; nAsset++) {
+        if (nPart == lbl_80282460->pAssets[nAsset].nPart &&
+            fn_801061C8(lbl_80282460->pAssets[nAsset].n40) &&
+            fn_801061F8(nPart, lbl_80282460->pAssets[nAsset].nCategory, nWanted)) {
+            if (n == i) {
+                pAsset = &lbl_80282460->pAssets[nAsset];
+                if (pAsset->nLockKind == 2) {
+                    strcpy(pDst, "Game Boy\xAE Advance Link Required");
+                    return 1;
+                }
+                if (pAsset->n110 != -1) {
+                    strcpy(pDst, lbl_80282460->pStrings + pAsset->n110);
+                }
+                return 1;
+            }
+            n++;
+        }
+    }
+    return 0;
+}
+
 // Put the asset on a skin: each of its parts the skin has gets the asset's variant.
 void fn_80106A64(CrAPAsset* pAsset, Skin* pSkin) {
     int i;
