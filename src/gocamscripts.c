@@ -167,3 +167,31 @@ f32 fn_80044F58(int nPlayer) {
     }
     return 1.0f;
 }
+
+// ---- sweep code (not yet cleaned up) ----
+
+u8 fn_8004561C(void);
+
+void fn_80045470(CamLens* pLens, f32 fFov) {
+    pLens->fFov = fFov;
+    fn_800763BC(pLens);
+}
+
+u8 fn_8004560C(void) {
+    return lbl_80202898.bGameBreaker;
+}
+
+u8 fn_8004561C(void) {
+    return lbl_80202898.b10;
+}
+
+u8 fn_8004562C(CamShot* pShot) {
+    u8 nKind = pShot->bAC;
+
+    if (nKind == 0 || (u8)(nKind - 13) <= 2U || nKind == 23) {
+        return 1;
+    }
+    return 0;
+}
+
+// ---- end of sweep code ----
