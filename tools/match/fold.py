@@ -9,7 +9,7 @@ For a unit that already has a source (widened with `mkunit.py --extend`), each s
 put in a sweep block where its address falls, before, between or after the unit's functions, and
 the rest of the file is kept (merge_sweeps.py); if the build or the check fails, the source is put
 back as it was."""
-import json, pathlib, re, subprocess, sys
+import difflib, json, pathlib, re, subprocess, sys
 ROOT = pathlib.Path(__file__).resolve().parents[2]   # the checkout this script lives in
 HERE = pathlib.Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
@@ -26,11 +26,58 @@ def run(cmd):
     return subprocess.run(cmd, shell=True, cwd=ROOT, capture_output=True, text=True)
 
 
+MINE = [f'{name}.c'] + sweeps                        # the only units mkunit.py touched
+
+
+def undo_mkunit():
+    """Put configure.py and splits.txt back to HEAD, when every change in them is mkunit.py's for
+    this unit and these sweeps; otherwise say what else changed and leave them."""
+    files = ['configure.py', 'config/GW4E69/splits.txt']
+    head = {}
+    for f in files:
+        g = subprocess.run(['git', 'show', f'HEAD:{f}'], cwd=ROOT, capture_output=True)
+        if g.returncode:
+            return print(f'cannot read {f} at HEAD: roll back configure.py and splits.txt by hand')
+        head[f] = g.stdout
+    other = []
+    for ln in difflib.ndiff(head['configure.py'].decode('utf-8').splitlines(),
+                            (ROOT / 'configure.py').read_text(encoding='utf-8').splitlines()):
+        if ln[:2] in ('+ ', '- ') and ln[2:].strip() \
+                and not any(f'"{u}"' in ln for u in MINE):
+            other.append('configure.py: ' + ln)
+
+    def blocks(text):
+        return {b.split(':\n')[0]: b.strip() for b in re.split(r'\n(?=\S[^\n]*:\n)', text)}
+    old = blocks(head['config/GW4E69/splits.txt'].decode('utf-8'))
+    new = blocks((ROOT / 'config/GW4E69/splits.txt').read_text(encoding='utf-8'))
+    for k in sorted(set(old) | set(new)):
+        if old.get(k) != new.get(k) and k not in MINE:
+            other.append('splits.txt: block ' + k)
+    if other:
+        print('NOT rolled back: configure.py / splits.txt have changes besides this unit\'s:')
+        print('\n'.join('    ' + o for o in other[:10]))
+        return
+    for f in files:
+        (ROOT / f).write_bytes(head[f])
+    run('python configure.py')
+    print(f'configure.py and splits.txt put back as at HEAD ({name} is not a unit any more); '
+          'run ninja to rebuild')
+
+
 def fail(msg):
     print(msg)
     if extending:
         path.write_text(before, encoding='utf-8', newline='\n')
-        print(f'src/{name}.c put back as it was')
+        print(f'src/{name}.c put back as it was; its widened range (mkunit.py --extend) is kept, '
+              'so fold.py can be run again once the problem is fixed')
+    else:
+        # a new unit: take the whole half-made unit away (its source, mkunit.py's edits)
+        if before is None:
+            path.unlink(missing_ok=True)
+            print(f'src/{name}.c removed')
+        else:
+            path.write_text(before, encoding='utf-8', newline='\n')
+        undo_mkunit()
     sys.exit(1)
 
 
