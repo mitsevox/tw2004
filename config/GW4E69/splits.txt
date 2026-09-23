@@ -495,14 +495,8 @@ uiProcessInterface.c:
 fe_movies.c:
 	.text       start:0x80090B80 end:0x800922A8
 
-unsorted/sweep_800929E0.c:
-	.text       start:0x800929E0 end:0x800929E4
-
-unsorted/sweep_80092BA0.c:
-	.text       start:0x80092BA0 end:0x80092BE8
-
-unsorted/sweep_80092C38.c:
-	.text       start:0x80092C38 end:0x80092CE8
+uiText.c:
+	.text       start:0x800922A8 end:0x80092CE8
 
 uiTransform.c:
 	.text       start:0x80092CE8 end:0x80093524
