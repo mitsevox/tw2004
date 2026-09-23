@@ -228,6 +228,12 @@ s32  fn_80050BEC(SurfaceType* pSurface);   // a surface's row in gSurfaceTypes, 
 
 // ---- the ball (Ball.c) ----------------------------------------------------------------------
 
+// One club's carry for a shot kind, in yards: fDist[0] at power 0.1 up to fDist[10] at 1.1
+// (fDist[9], full power, is the club's reach). Ball.c's gClubRows1..7 hold one per club, 0..24.
+typedef struct ClubRow {
+    f32 fDist[11];
+} ClubRow;
+
 void Ball_SetSimulating(u8 bOn);        // rehearsals and look-aheads: no sounds, effects or tree roll
 void fn_80050D2C(u8 b);
 f32  fn_80050D34(f32 fDist);            // putt power for a distance
