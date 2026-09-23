@@ -24,8 +24,8 @@ void fn_801686F8(UIStudio* pStudio, u8 bOn, u16 uGroup, u16 uScreen) {
         if (nIndex < pStudio->nScreens) {
             pScreen = &pStudio->pScreens[nIndex];
             if (pScreen->bUnloading == 0) {
-                pScreen->pData->pNodes[0].pDesc->n4 = 1;
-                pScreen->pData->pNodes[0].pDesc->u0 = 1;
+                pScreen->pData->pNodes[0].pInfo->u4 = 1;
+                pScreen->pData->pNodes[0].pInfo->p0 = (void*)1;  // port: a marker, not an owner
                 pStudio->nCurScreen = nIndex;
                 if (pStudio->pfnScreen24 != NULL) {
                     pStudio->pfnScreen24(pScreen->uGroup, pScreen->uScreen);

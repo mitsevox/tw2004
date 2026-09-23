@@ -219,11 +219,11 @@ void fn_80165C74(UIStudio* pStudio) {
 }
 
 // Marks a rate function as finished.
-void fn_80165D2C(UIStudio* pStudio, u32 u18, u32 uId) {
+void fn_80165D2C(UIStudio* pStudio, UISNodeInfo* pNodeInfo, u32 uId) {
     u32 i;
 
     for (i = 0; i < pStudio->nRateFns; i++) {
-        if (pStudio->pRateFns[i].uId == uId && pStudio->pRateFns[i].u18 == u18) break;
+        if (pStudio->pRateFns[i].uId == uId && pStudio->pRateFns[i].pNodeInfo == pNodeInfo) break;
     }
     if (i < pStudio->nRateFns) {
         pStudio->pRateFns[i].uState = 1;
@@ -232,7 +232,8 @@ void fn_80165D2C(UIStudio* pStudio, u32 u18, u32 uId) {
 
 // Loads a rate function with no duration, replacing one with the same ID. Refused while the
 // screen is being unloaded.
-void fn_80165D90(UIStudio* pStudio, UISScreen* pScreen, u32 u18, u32 uId, u32 uStepHandler, u32 u10) {
+void fn_80165D90(UIStudio* pStudio, UISScreen* pScreen, UISNodeInfo* pNodeInfo, u32 uId, u8* pStepScript,
+                 u32 u10) {
     char szMsg[256];
     u32 i;
     UISRateFn* pRateFn;
@@ -246,15 +247,15 @@ void fn_80165D90(UIStudio* pStudio, UISScreen* pScreen, u32 u18, u32 uId, u32 uS
         return;
     }
     for (i = 0; i < pStudio->nRateFns; i++) {
-        if (pStudio->pRateFns[i].uId == uId && pStudio->pRateFns[i].u18 == u18) break;
+        if (pStudio->pRateFns[i].uId == uId && pStudio->pRateFns[i].pNodeInfo == pNodeInfo) break;
     }
     if (i == pStudio->nRateFns) {
         pStudio->nRateFns++;
     }
     pRateFn = &pStudio->pRateFns[i];
-    pRateFn->u18 = u18;
+    pRateFn->pNodeInfo = pNodeInfo;
     pRateFn->uId = uId;
-    pRateFn->uStepHandler = uStepHandler;
+    pRateFn->pStepScript = pStepScript;
     pRateFn->u10 = u10;
     pRateFn->n8 = 0;
     pRateFn->nC = 0;
@@ -262,13 +263,13 @@ void fn_80165D90(UIStudio* pStudio, UISScreen* pScreen, u32 u18, u32 uId, u32 uS
     pRateFn->uState = 0;
     pRateFn->u20 = 0;
     pRateFn->fTarget = 0.0f;
-    pRateFn->uDoneHandler = 0;
+    pRateFn->pDoneScript = NULL;
 }
 
 // Loads a rate function that moves a variable to fTarget in uTime, replacing one with the same
 // ID. The step per tick is the distance left divided by the number of ticks.
-void fn_80165E9C(UIStudio* pStudio, UISScreen* pScreen, u32 u18, s32 n30, u32 uId, u32 uDoneHandler,
-                 u32 uStepHandler, u32 uTime, f32 fTarget, u32 u20) {
+void fn_80165E9C(UIStudio* pStudio, UISScreen* pScreen, UISNodeInfo* pNodeInfo, s32 n30, u32 uId,
+                 u8* pDoneScript, u8* pStepScript, u32 uTime, f32 fTarget, u32 u20) {
     char szMsg[256];
     u32 i;
     UISRateFn* pRateFn;
@@ -287,34 +288,34 @@ void fn_80165E9C(UIStudio* pStudio, UISScreen* pScreen, u32 u18, s32 n30, u32 uI
         return;
     }
     for (i = 0; i < pStudio->nRateFns; i++) {
-        if (pStudio->pRateFns[i].uId == uId && pStudio->pRateFns[i].u18 == u18) break;
+        if (pStudio->pRateFns[i].uId == uId && pStudio->pRateFns[i].pNodeInfo == pNodeInfo) break;
     }
     if (i == pStudio->nRateFns) {
         pStudio->nRateFns++;
     }
     pRateFn = &pStudio->pRateFns[i];
-    pRateFn->u18 = u18;
+    pRateFn->pNodeInfo = pNodeInfo;
     pRateFn->n30 = n30;
     pRateFn->pScreen = pScreen;
     pRateFn->uId = uId;
-    pRateFn->uStepHandler = uStepHandler;
+    pRateFn->pStepScript = pStepScript;
     pRateFn->u10 = pStudio->uMsPerTick;
     pRateFn->n8 = 0;
     pRateFn->nC = 0;
     pRateFn->uState = 0;
     pRateFn->u20 = u20;
     pRateFn->fTarget = fTarget;
-    pRateFn->uDoneHandler = uDoneHandler;
+    pRateFn->pDoneScript = pDoneScript;
     pRateFn->fStep =
-        (fTarget - *fn_8016C1A4(pRateFn->u20, pRateFn->n30)) / ((f32)uTime / (f32)pStudio->uMsPerTick);
+        (fTarget - *fn_8016C1A4(pRateFn->u20, pRateFn->pInfo)) / ((f32)uTime / (f32)pStudio->uMsPerTick);
 }
 
 // Returns the index of a rate function, or the count when there is none.
-u32 fn_8016604C(UIStudio* pStudio, u32 u18, u32 uId) {
+u32 fn_8016604C(UIStudio* pStudio, UISNodeInfo* pNodeInfo, u32 uId) {
     u32 i;
 
     for (i = 0; i < pStudio->nRateFns; i++) {
-        if (pStudio->pRateFns[i].uId == uId && pStudio->pRateFns[i].u18 == u18) break;
+        if (pStudio->pRateFns[i].uId == uId && pStudio->pRateFns[i].pNodeInfo == pNodeInfo) break;
     }
     return i;
 }

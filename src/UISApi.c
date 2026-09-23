@@ -211,7 +211,7 @@ u8 fn_80169308(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 n) {
                     pFrame = pRec->pFrame;
                     *pFrame = pRec->frame;
                     pFrame->pC[-1] = n;
-                    if (fn_80166098(pStudio, pRec->p1C, pFrame, pRec->pScreen, pRec->pDesc) != 3) {
+                    if (fn_80166098(pStudio, pRec->p1C, pFrame, pRec->pScreen, pRec->pInfo) != 3) {
                         pFrame->pC = p1C;
                     }
                 }
@@ -246,7 +246,7 @@ s32 fn_801694A0(UIStudio* pStudio, u16 uGroup, u16 uScreen, u8 nArgs, s32* pArgs
 
 // Makes pFile the studio's UI file, fixing up its offsets the first time it is seen. Returns
 // whether the file can be used; a file that cannot is dropped.
-u8 fn_80169520(UIStudio* pStudio, UISFile* pFile) {
+u8 fn_80169520(UIStudio* pStudio, UISScreenFile* pFile) {
     u8 bOk;
 
     bOk = 0;
@@ -284,7 +284,7 @@ static inline s32 Screen_BringBack(UIStudio* pStudio, u16 uGroup, u16 uScreen, u
     }
     pStudio->uFlags &= ~4;
     fn_80165C74(pStudio);
-    pScreen->pData->pNodes[0].pDesc->n4 = 1;
+    pScreen->pData->pNodes[0].pInfo->u4 = 1;
     bOut = 0;
     if (nArgs == 0xFF) {
         nArgs = pArgs[10];
@@ -335,7 +335,7 @@ s32 fn_80169590(UIStudio* pStudio, u16 uGroup, u16 uScreen, u8 bPush, u8 nArgs, 
         uIndex = fn_8016C6C4(pStudio, uGroup, uScreen);
         if (uIndex < (s32)pStudio->nScreens) {  // fake match: this compare is signed
             pRec = &pStudio->p60[nRecord];
-            pRec->pDesc = pStudio->pScreens[uIndex].pData->pNodes[0].pDesc;
+            pRec->pInfo = pStudio->pScreens[uIndex].pData->pNodes[0].pInfo;
             uIndex = fn_8016C6C4(pStudio, nPrevGroup, nPrevScreen);
             if (uIndex < (s32)pStudio->nScreens) {  // fake match: this compare is signed
                 pRec->pScreen = &pStudio->pScreens[uIndex];
@@ -373,10 +373,10 @@ s32 fn_80169858(UIStudio* pStudio, u16 uGroup, u16 uScreen, u16 uPrevGroup, u16 
     pScreen->uPrevScreen = uPrevScreen;
     pScreen->uMask = 0;
     pScreen->bUnloading = 0;
-    pScreen->pData = (UISFile*)uFile;  // port: the load callback returns the file's address as a u32
+    pScreen->pData = (UISScreenFile*)uFile;  // port: the load callback returns the file's address as a u32
     bFixed = fn_80169DC4(pScreen->pData);
     fn_8016AEEC(pStudio, pScreen, 0, -1);
-    pScreen->pData->pNodes[0].pDesc->n4 = 1;
+    pScreen->pData->pNodes[0].pInfo->u4 = 1;
     if (bFixed) {
         bOut = 0;
         pStudio->uFlags |= 2;
@@ -511,40 +511,40 @@ u32 fn_80169D90(u32 nScreens, u32 nHandlers, u32 nRateFns, u32 n60, u32 nEventWo
 
 // Turns a file offset stored in a pointer field into the pointer.
 // port: the UI file keeps 32-bit offsets in its pointer fields.
-static inline void* UISFile_Fix(UISFile* pFile, void* p) {
+static inline void* UISFile_Fix(UISScreenFile* pFile, void* p) {
     return (u8*)pFile + (uptr)p;
 }
 
 // Fixes up a UI file the first time it is seen: every offset in it becomes a pointer, and each
 // link word names its pEntriesC entry by pointer (0 when out of range). Returns 1, or -1 when the
 // file was already fixed up (its node table then lies after its start).
-s32 fn_80169DC4(UISFile* pFile) {
+s32 fn_80169DC4(UISScreenFile* pFile) {
     u32 i;
     u32 j;
     u32 k;
     UISNode* pNode;
-    UISNodeList* pList;
-    UISNodeItem* pItem;
+    UISGroup* pGroup;
+    UISEntry* pEntry;
     u32* pLink;
 
     if ((u8*)pFile->pNodes < (u8*)pFile) {
         pFile->pNodes = (UISNode*)UISFile_Fix(pFile, pFile->pNodes);
         for (i = 0; i < pFile->nNodes; i++) {
             pNode = &pFile->pNodes[i];
-            pNode->pDesc = (UISNodeDesc*)UISFile_Fix(pFile, pNode->pDesc);
-            pNode->ppLists = (UISNodeList**)UISFile_Fix(pFile, pNode->ppLists);
-            j = pNode->nLists;
+            pNode->pInfo = (UISNodeInfo*)UISFile_Fix(pFile, pNode->pInfo);
+            pNode->ppGroups = (UISGroup**)UISFile_Fix(pFile, pNode->ppGroups);
+            j = pNode->nGroups;
             while (j-- != 0) {
-                pNode->ppLists[j] = (UISNodeList*)UISFile_Fix(pFile, pNode->ppLists[j]);
-                pList = pNode->ppLists[j];
-                pList->p0 = UISFile_Fix(pFile, pList->p0);
-                pList->pItems = (UISNodeItem*)UISFile_Fix(pFile, pList->pItems);
-                k = pList->nItems;
+                pNode->ppGroups[j] = (UISGroup*)UISFile_Fix(pFile, pNode->ppGroups[j]);
+                pGroup = pNode->ppGroups[j];
+                pGroup->pInfo = (UISNodeInfo*)UISFile_Fix(pFile, pGroup->pInfo);
+                pGroup->pEntries = (UISEntry*)UISFile_Fix(pFile, pGroup->pEntries);
+                k = pGroup->nEntries;
                 while (k-- != 0) {
-                    pItem = &pList->pItems[k];
-                    if (pItem->uId != 0xFFFF) {
-                        pItem->u2 = 0;
-                        pItem->p4 = UISFile_Fix(pFile, pItem->p4);
+                    pEntry = &pGroup->pEntries[k];
+                    if (pEntry->uHandler != 0xFFFF) {
+                        pEntry->n2 = 0;
+                        pEntry->u4.pnOffset = (u32*)UISFile_Fix(pFile, pEntry->u4.pnOffset);
                     }
                 }
             }
@@ -552,7 +552,7 @@ s32 fn_80169DC4(UISFile* pFile) {
             k = pNode->nHandlers;
             while (k-- != 0) {
                 if (pNode->pHandlers[k].uEvent != 0xFFFF) {
-                    pNode->pHandlers[k].u4 = (uptr)UISFile_Fix(pFile, (void*)pNode->pHandlers[k].u4);
+                    pNode->pHandlers[k].u4.pScript = (u8*)UISFile_Fix(pFile, pNode->pHandlers[k].u4.pScript);
                 }
             }
         }
@@ -571,11 +571,11 @@ s32 fn_80169DC4(UISFile* pFile) {
                 *pLink = 0;
             }
         }
-        pFile->pEntries1C = (UISFileEntry1C*)UISFile_Fix(pFile, pFile->pEntries1C);
-        i = pFile->nEntries1C;
+        pFile->pStart = (UISEntry*)UISFile_Fix(pFile, pFile->pStart);
+        i = pFile->nStart;
         while (i-- != 0) {
-            if (pFile->pEntries1C[i].p4 != NULL) {
-                pFile->pEntries1C[i].p4 = UISFile_Fix(pFile, pFile->pEntries1C[i].p4);
+            if (pFile->pStart[i].u4.pnOffset != NULL) {
+                pFile->pStart[i].u4.pnOffset = (u32*)UISFile_Fix(pFile, pFile->pStart[i].u4.pnOffset);
             }
         }
         return 1;
@@ -584,8 +584,8 @@ s32 fn_80169DC4(UISFile* pFile) {
 }
 
 // Runs the rate functions for uMs milliseconds. Each running one steps once per u10 ms: its
-// n4 handler (if any) gives the step's scale, the variable moves by fStep times it, and once it
-// reaches fTarget the function finishes and its n2C handler (or the first node's event -14
+// step script (if any) gives the step's scale, the variable moves by fStep times it, and once it
+// reaches fTarget the function finishes and its done script (or the first node's event -14
 // handler) runs.
 void fn_8016A030(UIStudio* pStudio, u32 uMs) {
     u32 i;
@@ -595,11 +595,11 @@ void fn_8016A030(UIStudio* pStudio, u32 uMs) {
     UISWordStack* pStack;
     s32 nLeft;
     s32 nArgs;
-    u32 uHandler;
+    u8* pScript;
     f32 fScale;
     f32* pfVar;
     f32 fValue;
-    f32 fOut;
+    UISWord wScale;
     s32 aArgs[3];
 
     fn_80165C74(pStudio);
@@ -616,9 +616,9 @@ void fn_8016A030(UIStudio* pStudio, u32 uMs) {
         while (nLeft >= (s32)pRate->u10) {
             nLeft -= pRate->u10;
             pRate->nC += pRate->u10;
-            if (pRate->uStepHandler != 0) {
+            if (pRate->pStepScript != NULL) {
                 if (pRate->uState != 2) break;
-                fOut = 1.0f;
+                wScale.f = 1.0f;
                 aArgs[0] = pRate->uId;
                 aArgs[1] = pRate->nC;
                 if (pRate->u20 == 0) {
@@ -627,14 +627,14 @@ void fn_8016A030(UIStudio* pStudio, u32 uMs) {
                 } else {
                     nArgs = 2;
                 }
-                fn_8016C270(pStudio, pScreen, pRate->u18, pStack, pRate->uStepHandler, nArgs, aArgs, 0, 0, 0,
-                            -1, &fOut);
-                fScale = fOut;
+                fn_8016C270(pStudio, pScreen, pRate->pNodeInfo, pStack, pRate->pStepScript, nArgs, aArgs, 0,
+                            NULL, 0, -1, &wScale.n);
+                fScale = wScale.f;
             } else {
                 fScale = 1.0f;
             }
             if (pRate->u20 != 0) {
-                pfVar = fn_8016C1A4(pRate->u20, pRate->n30);
+                pfVar = fn_8016C1A4(pRate->u20, pRate->pInfo);
                 if (fScale < 0.0f) {
                     fScale = 1.0f;
                 }
@@ -645,16 +645,16 @@ void fn_8016A030(UIStudio* pStudio, u32 uMs) {
                 } else {
                     *pfVar = pRate->fTarget;
                     pRate->uState = 1;
-                    if (pRate->uDoneHandler != 0) {
+                    if (pRate->pDoneScript != NULL) {
                         aArgs[0] = pRate->uId;
-                        fn_8016C270(pStudio, pScreen, pRate->u18, pStack, pRate->uDoneHandler, 1, aArgs, 0, 0,
-                                    0, -1, NULL);
+                        fn_8016C270(pStudio, pScreen, pRate->pNodeInfo, pStack, pRate->pDoneScript, 1, aArgs,
+                                    0, NULL, 0, -1, NULL);
                     } else {
-                        uHandler = fn_8016C674(pScreen->pData->pNodes, -14);
-                        if (uHandler != 0) {
+                        pScript = fn_8016C674(pScreen->pData->pNodes, -14);
+                        if (pScript != NULL) {
                             aArgs[0] = pRate->uId;
-                            fn_8016C270(pStudio, pScreen, pRate->u18, pStack, uHandler, 1, aArgs, 0, 0, 0, -1,
-                                        NULL);
+                            fn_8016C270(pStudio, pScreen, pRate->pNodeInfo, pStack, pScript, 1, aArgs, 0,
+                                        NULL, 0, -1, NULL);
                         }
                     }
                 }
