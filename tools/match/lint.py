@@ -68,6 +68,38 @@ def lint(path, protos):
             elif '//' not in m.group(4):
                 hits.append((i, 'proto-mismatch', '%s differs from %s with no comment saying why'
                              % (m.group(2), hname)))
+    return hits + ub_check(path, lines)
+
+
+# Undefined behaviour the game's own compiler can see. Unlike the style rules, these are bugs in
+# the C even when the function matches; one is accepted only with a "fake match:" comment on the
+# line or the line before, saying why the original must have had it.
+UB = [('ub-missing-return', 'return value expected'),
+      ('ub-uninitialized', 'is not initialized before being used')]
+CFLAGS = ['-nodefaults', '-proc', 'gekko', '-align', 'powerpc', '-enum', 'int', '-fp', 'hardware',
+          '-Cpp_exceptions', 'off', '-O4,p', '-inline', 'smart', '-nosyspath', '-RTTI', 'off',
+          '-fp_contract', 'on', '-str', 'reuse', '-common', 'on', '-multibyte', '-lang=c',
+          '-i', 'include', '-i', 'build/GW4E69/include', '-DBUILD_VERSION=0', '-DVERSION_GW4E69',
+          '-DVERSION=0', '-DNDEBUG=1', '-w', 'all', '-msgstyle', 'gcc']
+
+
+def ub_check(path, lines):
+    import subprocess, tempfile
+    cc = ROOT / 'build/compilers/GC/2.5/mwcceppc.exe'
+    with tempfile.TemporaryDirectory() as tmp:
+        out = subprocess.run([str(cc)] + CFLAGS + ['-c', str(path.resolve()), '-o', tmp + '/x.o'],
+                             cwd=ROOT, capture_output=True, text=True)
+    hits = []
+    for l in (out.stdout + out.stderr).splitlines():
+        m = re.match(r'(.*?):(\d+): warning: (.*)', l)
+        if not m or pathlib.Path(m.group(1)).name != path.name:
+            continue
+        for name, text in UB:
+            if text in m.group(3):
+                i = int(m.group(2))
+                near = lines[i - 1] + (lines[i - 2] if i > 1 else '')
+                if 'fake match' not in near:
+                    hits.append((i, name, lines[i - 1].strip()))
     return hits
 
 

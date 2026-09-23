@@ -440,7 +440,7 @@ s32 fn_800FA4B8(int nPlayer) {
     return n;
 }
 
-// EA's code falls off the end when the count is out (it returns the count, 0 or -1).
+// Counts the timer down; returns 1 while it runs, then the count itself (0, or -1 when off).
 s32 fn_800FA518(int nPlayer) {
     if (gPlayers[nPlayer].nC38 != -1) {
         gPlayers[nPlayer].nC38--;

@@ -139,8 +139,8 @@ The fixes that come up most often. Each points to its full entry below.
   stores plus a one-iteration remainder loop) and unrolls a 34-iteration loop by two. Writing
   the loop, not the stores, is what matches (`AI_TargetsLoad`, `Golfer_TableSetup` exact).
 - **[verified] `while (i < N) a[i++] = v;` and `for` unroll differently.** Clearing an 18-entry
-  array, the `while (h < 18) sel[h++] = 0;` form unrolls by 9 and the `for` form by 6; count the
-  stores per iteration to tell which one EA wrote. Likewise a five-player reset in GameMode16
+  array (GameMode2 `fn_800F8B08`), the `while (h < 18)` form unrolls by 9 and the `for` form by
+  6; count the stores per iteration to tell which one EA wrote. Likewise a five-player reset in GameMode16
   `fn_800F57C8` matched only as `i = 0; while (i < 5) gPlayers[i++].nDC0 = 20;`, not as a `for`
   or a pointer walk.
 
@@ -295,7 +295,7 @@ The fixes that come up most often. Each points to its full entry below.
 - **[verified] `u8` returned from an `int` local** gives `clrlwi r3, rX, 24` at the return; a `u8`
   local gives a plain `mr`.
 - **[verified] Array index cast to `u32` moves the hoisting.** In the GameMode2 (Skins) honors
-  loop, `gPlayers[(u32)i].field[h]` is what gives the original's base + h*4 hoisted out of the
+  loop (`fn_800F8278`), `gPlayers[(u32)i].field[h]` is what gives the original's base + h*4 hoisted out of the
   loop; the plain `int` index computes it differently.
 
 ### Function calls and parameters
@@ -342,7 +342,8 @@ The fixes that come up most often. Each points to its full entry below.
 - **[verified] A shared tail** (`beq L; lfs; fmuls; L:` where ours has two copies of the
   multiply) is one `if` with the conditions merged: `if ((a && b) || (rand & 1)) x *= -1;`.
 - **[observed] A redundant test is really in the source.** `if (a == 5 || a != 5 && x < y)`
-  compiles to an extra compare and branch that looks like dead code; when the original has a
+  compiles to an extra compare and branch that looks like dead code (GameMode2 `fn_800F8624`,
+  exact); when the original has a
   second test of the same variable right after the first, write the redundant form out.
 
 ### Returns, early exits and switch
@@ -381,9 +382,11 @@ The fixes that come up most often. Each points to its full entry below.
   return p; ... p = 1.1f; return p;` (`fn_80050D34`, found by the permuter).
 - **[verified] A boolean result** `return a && b;` (u8 function) gives `li r5,0 ... mr r5,r3` where
   r3 still holds the constant 1 used in the test; nested ifs setting a flag do not.
-- **[verified] "Falls off the end" returns have no final `return`.** When a non-void function's
-  last path just leaves a value in `r3` from earlier work (no `li r3`/`mr r3` at the end), EA
-  wrote it without a final `return` statement. Adding `return x;` adds instructions.
+- **[verified] A draft that "falls off the end" still has real returns.** m2c sometimes shows a
+  non-void function whose last path returns nothing, because the value is already in `r3`. The
+  original still returned it explicitly: `fn_800FA518` (GameMode8) matched as
+  `if (gPlayers[nPlayer].nC38 <= 0) return gPlayers[nPlayer].nC38; return 1;`. Leaving the return
+  out is undefined behaviour; `lint.py` reports it (`ub-missing-return`), and no unit has one.
 
 ### Inlining and inline helpers
 

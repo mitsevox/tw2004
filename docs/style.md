@@ -5,7 +5,9 @@ How the C in `src/` is written. Matching decides *what* the compiler must produc
 decides how the source reads, so every unit looks like one author wrote it. Model files:
 `src/GameMode10.c` and `src/GameMode14.c`.
 
-`python tools/match/lint.py <files>` checks the mechanical rules below. Run it before every commit.
+`python tools/match/lint.py <files>` checks the mechanical rules below, and compiles each file
+with the game's compiler to catch two kinds of undefined behaviour (see "Odd code vs wrong
+code"). Run it before every commit.
 
 Files
 -----
@@ -73,6 +75,39 @@ reader knows it is deliberate:
 - Rules that explain *normal* EA style (repeated `gPlayers[n].field`, `while` loops) are not
   fake matches and need no comment.
 - No `goto` unless the control flow cannot be matched without it; mark it as a fake match.
+
+Odd code vs wrong code
+----------------------
+
+A matching decomp is allowed to look strange. It is not allowed to be wrong. Two different things:
+
+**Tolerated when the match needs it** (style complaints, not bugs; mark the unnatural ones as a
+fake match):
+
+- unused variables or parameters (EA's signatures are fixed by the callers)
+- suspicious casts, odd signed/unsigned comparisons
+- seemingly redundant assignments, or assignments that exist only for register allocation
+- weird control flow, and code that looks unreachable but is there because of how the compiler
+  lays out branches
+- non-idiomatic pointer arithmetic
+- declarations in strange places or orders, because moving them changes the match
+
+**Investigated even when the function matches** (undefined behaviour or a real correctness
+problem; the current compiler producing the right bytes does not make the C right):
+
+- a non-void function that can reach its end without `return` (`lint.py`: `ub-missing-return`)
+- reading a variable before it is set (`lint.py`: `ub-uninitialized`)
+- indexing past an array's declared size: the declaration is wrong, fix the size (the replay
+  array `nDE4` was declared `[18]` until code was found using 40 entries)
+- a struct field whose type or offset disagrees with how the code uses it
+- calling a function with no prototype in scope, or through one whose return type or parameter
+  count disagrees with the definition. A deliberate per-file parameter type (see Prototypes) is
+  the only exception, and it carries a comment
+- shifts by the type's width or more, signed overflow the code relies on, a variable modified
+  twice without a sequence point (`i++ + i++`)
+
+When the original itself has the bug (the bytes prove EA wrote it), keep it, since the match
+requires it, and say so: `// EA bug: reads nC38 of player 5, one past the last player`.
 
 Formatting
 ----------
