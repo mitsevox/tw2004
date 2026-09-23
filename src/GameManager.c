@@ -36,7 +36,6 @@ void  GM_CheckBallForUIHints(int nPlayer);
 u8    fn_8008AC40(void);
 void  fn_800D9350(int nPlayer);
 void  fn_800BB0A8(void);
-void  fn_800335F8(int a);
 void  fn_8006C4C0(int nPlayer);
 
 u8    GM_bIsZoomButtonPressed(int nPlayer);
@@ -50,9 +49,6 @@ u8    fn_800BB1F8(int nPlayer);
 
 int   GM_vGetAllTimeRecordsHeld(SaveProfile* pProfile);
 f32   GM_GetBonusProgress(SaveProfile* pProfile);
-
-extern s32 lbl_80189528[14];
-extern s32 lbl_801894D0[6];
 
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
 // 1.0f (0x802845C0), before every constant the functions below use first (only the progress

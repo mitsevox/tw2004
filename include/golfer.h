@@ -419,12 +419,13 @@ typedef struct PlayerProfile {
 LAYOUT_ASSERT(PlayerProfile, 0x40);
 
 // A course's records (the 'rcrd' stream block, Session_OnRecordsLoaded; 0x320 bytes per course).
+// Like the all-time records (recA): 8 kinds, the top 5 of each (fn_800D8458 reads them).
+// GameEffects compares kind 0's best with a player's strokes + 1, and kind 2's with three times
+// Player.fA64.
 typedef struct CourseRecord {
-    s32  n0;                    // 0x000  compared with a player's strokes + 1 (GameEffects)
-    u8   unk4[0xC8 - 0x4];
-    s32  nC8;                   // 0x0C8  compared with three times Player.fA64 (GameEffects)
-    u8   unkCC[0x320 - 0xCC];
+    RecordEntry aRecord[8][5];  // 0x000
 } CourseRecord;
+LAYOUT_ASSERT(CourseRecord, 0x320);
 
 #define NUM_COURSE_RECORDS 21   // 0xF00..0x50A0 of the session
 

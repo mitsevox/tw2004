@@ -886,8 +886,9 @@ void fn_800BF658(View* pView, int nPlayer) {
             pView->f114 += gSession.fFrameTime;
         }
         if (gSession.fFrameTime != 0.0f) {
-            fUp = fDist * fn_800095F0(DEG(20.0f));     // camera 8's height over the golfer; not used here
-            fBack = fDist * fn_80009638(DEG(20.0f));
+            // 20 degrees, written out: DEG(20.0f) rounds one bit lower than the original's constant
+            fUp = fDist * fn_800095F0(20.0f * PI / 180.0f);    // camera 8's height over the golfer; unused
+            fBack = fDist * fn_80009638(20.0f * PI / 180.0f);
             fSin = fn_800095F0(gPlayers[nPlayer].fA88);
             fCos = fn_80009638(gPlayers[nPlayer].fA88);
             fX = fBack * -fSin;
@@ -2145,7 +2146,7 @@ void GolfCamera_InitTutorialWaitCamera(View* pView, int nPlayer) {
     lbl_80282220->shot6C.f74 = 2.0f;
     lbl_80282220->shot6C.f68 = 2.0f;
     lbl_80282220->shot6C.f6C = 20.0f;
-    lbl_80282220->shot6C.f78 = DEG(40.0f);
+    lbl_80282220->shot6C.f78 = 40.0f * PI / 180.0f;    // not DEG(40.0f): that rounds one bit lower
     lbl_80282220->shot6C.f7C = lbl_80282220->shot6C.f78;
     lbl_80282220->shot6C.f80 = 0.0f;
     lbl_80282220->shot6C.f9C = 0.0f;
@@ -2167,7 +2168,7 @@ void GolfCamera_InitTutorialWaitCamera(View* pView, int nPlayer) {
     lbl_80282220->shot12C.f74 = 2.0f;
     lbl_80282220->shot12C.f68 = 2.0f;
     lbl_80282220->shot12C.f6C = 20.0f;
-    lbl_80282220->shot12C.f78 = DEG(40.0f);
+    lbl_80282220->shot12C.f78 = 40.0f * PI / 180.0f;
     lbl_80282220->shot12C.f7C = lbl_80282220->shot12C.f78;
     lbl_80282220->shot12C.f80 = 0.0f;
     lbl_80282220->shot12C.f9C = 0.0f;

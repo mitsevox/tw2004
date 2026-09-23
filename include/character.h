@@ -171,6 +171,20 @@ typedef struct ClipBlend {
     BlendClip* pD8;             // 0xD8  fn_800204A0 samples it
 } ClipBlend;
 
+// One of a character's four data buffers (Character.buffers): pBuf holds three runs of 16-byte
+// entries, p0C..p18 mark where they start and end, their counts read from p04's +0x60, +0x58 and
+// +0x5C (the code at 0x8001FE50 fills them; fn_8001DB98 empties them, fn_8001C0E0 frees pBuf).
+typedef struct CharBuffer {
+    s32   n00;                  // 0x00  -1 when empty
+    void* p04;                  // 0x04  what the buffer was filled for
+    u8*   pBuf;                 // 0x08
+    u8*   p0C;                  // 0x0C
+    u8*   p10;                  // 0x10
+    u8*   p14;                  // 0x14
+    u8*   p18;                  // 0x18
+} CharBuffer;
+LAYOUT_ASSERT(CharBuffer, 0x1C);
+
 // The golfer's character object (0x1798 bytes or more); only the fields read so far. Anim_SetRate,
 // Anim_SetTime and fn_8007326C take the address of its animation player at 0x164, whose fields
 // from 0x168 on are named here directly.
@@ -178,7 +192,8 @@ typedef struct Character {
     s32   nIndex;               // 0x000  its entry in lbl_801B9624 (fn_8001C21C)
     s32   nPlayer;              // 0x004  the player it belongs to (Player_SetGolfer); 1000 for the
                                 //        characters fn_8001D324 finds by id
-    s32   nId;                  // 0x008  (fn_8001D324)
+    u32   uId;                  // 0x008  the id of the 'SKLO' object it was built from (fn_8001D3EC);
+                                //        fn_8001D324 finds it by this
     u8    unkC[0x10 - 0xC];
     u32   u10;                  // 0x010  bit 0x40 tested by the game manager and the swing; bit 0x8000
                                 //        cleared by CharacterState_AddSKABlendData
@@ -205,7 +220,7 @@ typedef struct Character {
     struct ClipRecord* pRecords;    // 0x3DC  records for its merged library (skalib)
     u8    unk3E0[0x40C - 0x3E0];
     SKABlendNode blend;         // 0x40C  the root of its blend tree
-    u8    unk43C[0x4AC - 0x43C];
+    CharBuffer buffers[4];      // 0x43C
     struct { u32 bSet; f32 fTime; u8 unk8[8]; } events[18];   // 0x4AC  animation events, by 64-bit id
     s32   n5CC;                 // 0x5CC
     u8    unk5D0[0x1624 - 0x5D0];
@@ -228,8 +243,9 @@ typedef struct Character {
     s32   nClubHeadBone;        // 0x16A0  bone 0x53's index: the club head (the swing trail's end)
     s32   nGripBone;            // 0x16A4  bone 0x52's index: the grip (the trail's other end)
     s32   n16A8;                // 0x16A8  fn_8001EEE4's answer for bone 0x15
-    u8    unk16AC[0x16D4 - 0x16AC];
-    s32   n16D4;                // 0x16D4  the key for clip lookups (Char_SetClip)
+    u8    unk16AC[0x16D0 - 0x16AC];
+    s32   nShotKind;            // 0x16D0  the player's shot kind (fn_8001C724)
+    s32   n16D4;              // 0x16D4  the key for clip lookups (Char_SetClip)
     u8    unk16D8[0x16DC - 0x16D8];
     s32   n16DC;                // 0x16DC  twice the players set up so far, in split screen 2
                                 //         (Player_SetGolfer)
@@ -322,6 +338,7 @@ void  Character_SetPosition(Character* pChar, f32* pPos, int a);
 void  fn_8001C724(Character* pChar, int nKind);
 void  fn_8001C774(Character* pChar, int nClub);
 void  fn_8001C7FC(Character* pChar, int nStyle);   // the animation style (nStyle)
+Character* fn_8001D324(int nId);        // the character with this id (100: the flag, by its clips), or NULL
 void  fn_8001D7A4(Character* pChar);
 void  fn_8001DA04(Character* pChar, u8* pA, u8* pB);
 void  fn_8001DB04(Character* pChar, f32* pOut);    // the golfer's position
@@ -541,6 +558,8 @@ void* AnimLib_Pick(int nPlayer, AnimLib* pLib, int nGroup, int nStyle, int nClub
                    const char* pName);
 void* Char_SetClip(Character* pChar, int nGroup, int nStyle, const char* pName);
 s32   AnimLib_MergeOverlay(u8* pData, int nSlot);   // skalib.c; char.c's 'SAC ' handler
+void  AnimLib_FreeWorkCopies(void);
+void  AnimLib_ReloadSlot(void);
 
 // Swing.c
 f32   fn_8005CB78(Character* pChar, u64 uEvent);    // the time of an animation event
