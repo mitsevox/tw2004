@@ -8,9 +8,6 @@ extern u8  lbl_8028227C;
 extern s32 lbl_802823D0;
 extern s32 lbl_802823D4;
 
-u8    fn_800F9D00(int a);
-s32   fn_800F9F04(void);
-
 void fn_800F944C(void) {
     gpGame->pfn1C8 = fn_800F944C;
     gpGame->pfn1CC = fn_800F9A58;
@@ -18,8 +15,8 @@ void fn_800F944C(void) {
     gpGame->pfn1D0 = fn_800F9B34;
     gpGame->pfn1D4 = fn_800F9BF8;
     gpGame->pfn1D8 = fn_800F9C00;
-    gpGame->pfn1DC = fn_800F9D00;
-    gpGame->pfn1E0 = fn_800F9F04;
+    gpGame->pfn1DC = (u8 (*)(int))fn_800F9D00;
+    gpGame->pfn1E0 = (s32 (*)(void))fn_800F9F04;
     gpGame->pfn1E8 = fn_800F9C48;
     gpGame->pfn1F4 = fn_800F9E00;
     gpGame->pfn1E4 = fn_800F9824;

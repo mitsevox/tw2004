@@ -49,9 +49,7 @@ u8    fn_800F6848(int nPlayer, int a);
 void  fn_800F68C4(s32 nSurface, s32* pPoints, s32* pBalls);
 u8    fn_800F6990(int nPlayer);
 u8    fn_800F69C8(int nPlayer);
-s32   fn_800F6A00(void);
 s32   fn_800F6A08(int nPlayer, int i);
-s32   fn_800F6A34(void);
 void  fn_800F6A3C(void);
 
 // Mode 17 starts: one player at a time, no wind, no gimmes, no mulligans.
@@ -449,7 +447,7 @@ u8 fn_800F69C8(int nPlayer) {
     return 1;
 }
 
-s32 fn_800F6A00(void) {
+s32 fn_800F6A00(s32 a) {
     return lbl_802823A8;
 }
 
@@ -458,7 +456,7 @@ s32 fn_800F6A08(int nPlayer, int i) {
     return i != gPlayers[nPlayer].nNextTarget;
 }
 
-s32 fn_800F6A34(void) {
+s32 fn_800F6A34(s32 a) {
     return lbl_802823A4;
 }
 

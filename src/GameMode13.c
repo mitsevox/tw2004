@@ -50,8 +50,6 @@ void  fn_800F7CA0(void);
 void  fn_800F7CD4(void);
 void  fn_800F7D4C(int nPlayer);
 u8    fn_800F7D8C(int a);
-s32   fn_800F7D94(void);
-s32   fn_800F7D9C(void);
 void  fn_800F7DA4(void);
 void  fn_800F7ED8(int nPlayer);
 void  fn_800F7EF8(int nPlayer);
@@ -59,7 +57,6 @@ void  fn_800F7F1C(int nPlayer, int nTime);
 u8    fn_800F7F70(int nPlayer, int a);
 void  fn_800F7FF4(int nPlayer, int nId);
 s32   fn_800F8068(int nPlayer, int i);
-s32   fn_800F80A0(void);
 void  fn_800F80A8(void);
 
 // Mode 13 starts: one player at a time, no wind, no gimmes, one mulligan.
@@ -500,11 +497,11 @@ u8 fn_800F7D8C(int a) {
     return 1;
 }
 
-s32 fn_800F7D94(void) {
+s32 fn_800F7D94(s32 a) {
     return lbl_802823BC;
 }
 
-s32 fn_800F7D9C(void) {
+s32 fn_800F7D9C(s32 a) {
     return lbl_802823B8;
 }
 
@@ -574,7 +571,7 @@ s32 fn_800F8068(int nPlayer, int i) {
     return 0;
 }
 
-s32 fn_800F80A0(void) {
+s32 fn_800F80A0(s32 a) {
     return lbl_802823B4;
 }
 

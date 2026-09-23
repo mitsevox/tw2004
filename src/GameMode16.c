@@ -47,8 +47,6 @@ u8    fn_800F5848(int a);
 void  fn_800F5850(int nPlayer);
 u8    fn_800F5870(int nPlayer, int a);
 void  fn_800F58B4(s32 nSurface, s32* pPoints);
-s32   fn_800F59CC(void);
-s32   fn_800F59D4(void);
 s32   fn_800F59DC(int nPlayer, int i);
 void  fn_800F5A14(int nPlayer, int nId);
 void  fn_800F5A88(void);
@@ -399,11 +397,11 @@ void fn_800F58B4(s32 nSurface, s32* pPoints) {
     }
 }
 
-s32 fn_800F59CC(void) {
+s32 fn_800F59CC(s32 a) {
     return lbl_80282398;
 }
 
-s32 fn_800F59D4(void) {
+s32 fn_800F59D4(s32 a) {
     return lbl_80282394;
 }
 

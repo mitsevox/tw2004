@@ -31,6 +31,7 @@ void fn_80062B78(int nPlayer);
 void fn_80062C38(void);
 void fn_80062C5C(void);
 void fn_80062C80(int a, u8 b);
+void fn_80062CE0(u8 a);
 void fn_80062D0C(int nPlayer);
 void fn_80062D38(int a, int b, int nPlayer);
 void fn_80062D6C(int a, int nPlayer);
@@ -153,7 +154,10 @@ void fn_800E56D0(int a, int b, int c);
 void fn_800E5714(int a);
 void fn_800E5724(int a);
 void fn_800E58B4(int nMsg);             // send a message with no values
-void fn_800E5B0C(int nMsg, u32 uFloats, void* a, void* b, void* c, void* d, void* e);   // five values
+void fn_800E5A4C(int nMsg, u32 uFloats, void* pA, void* pB, void* pC);   // three values; uFloats bit n: a float
+void fn_800E5B0C(int nMsg, u32 uFloats, void* pA, void* pB, void* pC, void* pD, void* pE);   // five values
+void fn_800E5C08(int nMsg, char* pStr);  // send a message with a string
+u8   fn_800E5C84(void);
 void fn_800E5DA0(void);
 
 // ---- the game modes --------------------------------------------------------------------------
@@ -230,6 +234,17 @@ s32  fn_800F266C(s32 n, int i);         // scale n by table entry i
 u8   fn_800F2788(int nPlayer, f32 f);   // whether f is far enough for the player's tees
 s32  fn_800F2810(s32 n);
 void fn_800F2958(s32 nMsg, s32 a);
+// The modes' own getters behind the dispatchers fn_800F2408..fn_800F2534, which pass their
+// argument on; the getters ignore it.
+s32  fn_800F37F8(s32 a);                // GameMode14.c
+s32  fn_800F59CC(s32 a);                // GameMode16.c
+s32  fn_800F59D4(s32 a);                // GameMode16.c
+s32  fn_800F6A00(s32 a);                // GameMode17.c
+s32  fn_800F6A34(s32 a);                // GameMode17.c
+s32  fn_800F7D94(s32 a);                // GameMode13.c
+s32  fn_800F7D9C(s32 a);                // GameMode13.c
+s32  fn_800F80A0(s32 a);                // GameMode13.c
+
 void fn_800F3828(void);                 // GameMode14.c
 void fn_800F3980(int nMsg, s32 a, s32 b, s32 c, s32 d, s32 e);    // GameMode14.c
 void fn_800F39CC(s32 a);                // GameMode14.c
@@ -248,7 +263,9 @@ void fn_800F9B34(void);
 s32  fn_800F9BF8(int nPlayer);
 u8   fn_800F9C00(int nPlayer, int a);
 void fn_800F9C48(void);
+u8   fn_800F9D00(u8 bCheck);
 void fn_800F9E00(void);
+u8   fn_800F9F04(u8 bCheck);
 u8   fn_800FA118(int nPlayer, int a);
 u8   fn_800FA148(int a);
 s32  fn_800FA2C8(void);

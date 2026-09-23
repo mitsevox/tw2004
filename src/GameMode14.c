@@ -410,7 +410,7 @@ void fn_800F36A4(void) {
     }
 }
 
-s32 fn_800F37F8(void) {
+s32 fn_800F37F8(s32 a) {
     return lbl_80282374;
 }
 

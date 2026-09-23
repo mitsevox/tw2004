@@ -49,7 +49,6 @@ extern u8  lbl_802822D8;                    // the HUD on screen 2 (split screen
 extern u8  lbl_802822D9;                    // the HUD on the single screen
 extern u8  lbl_802822DA;
 void  fn_800E3E0C(void);
-void  fn_800E5A4C(int a, int b, int* pA, f32* pF, int* pB);
 
 // Clears every display flag and timer at the start of a round.
 void fn_800E3B28(void) {
@@ -128,17 +127,13 @@ extern UIQueueItem lbl_80202B94[10];        // queue 11 (lbl_80282288)
         (q)[i].c = c;       \
     }
 
-void  fn_800E5C08(int a, u8* p);
-
 typedef struct Vec4 { f32 x, y, z, w; } Vec4;
 extern Vec4 lbl_80184D90;
-extern u8   lbl_80281640[8];
+extern char lbl_80281640[8];
 
-void  fn_80062CE0(int a);
 void  fn_80095444(int a);
 void  fn_80125814(int a);
 void  fn_80101EDC(void);
-u8    fn_800E5C84(void);
 void  fn_800A7350(int a);
 extern u8 gNumPlayersSetUp;                 // 0x80281D48 (Golfer.c)
 

@@ -57,6 +57,11 @@ void fn_8001C724(int nHandle, int nKind);
 void fn_8001C774(int nHandle, int nClub);
 void fn_8001C804(int nPlayer, int a, int b);
 void fn_8001D8DC(int nPlayer);
+
+typedef struct AnimLib AnimLib;        // skalib.c
+void* AnimLib_Pick(int nPlayer, AnimLib* pLib, int nGroup, int nStyle, int nClub, int nKey, u32* pFlags,
+                   const char* pName);
+
 void fn_80045494(u8 bOn, int nPlayer);
 void fn_80045558(int a, int nPlayer);
 u8   fn_8004560C(void);

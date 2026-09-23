@@ -27,7 +27,6 @@ extern FrontEnd* lbl_80281F1C;
 
 void  fn_8016B09C(void* pHandler, int nMsg, int nArgs, MsgArg* pArgs);
 u32   strlen(const char* s);
-void  fn_800E5A4C(int nMsg, u32 uFloats, void* p0, void* p1, void* p2);
 extern s32 lbl_80282278;
 extern u8 lbl_802822DF;
 extern s32 lbl_802822B0;
@@ -64,12 +63,10 @@ extern s32 lbl_802822E0;
 void fn_800E572C(int p0);
 void fn_800E573C(void);
 void fn_800E5908(int nMsg);
-void fn_800E5C84(void);
-void fn_800E5C08(int nMsg, char* pStr);
 void fn_800E5D40(int p0);
 void fn_800E5D68(char* p0);
 extern u8 lbl_801D87C0[];
-s32 fn_800E5D90(void);
+u8  fn_800E5D90(void);
 
 void fn_800E4FFC(int p0) {
     fn_80062D6C(48, p0);
@@ -469,8 +466,8 @@ void fn_800E5C08(int nMsg, char* pStr) {
     fn_8016B09C(lbl_80281F1C->pHandler, nMsg, 1, &arg);
 }
 
-void fn_800E5C84(void) {
-    fn_800E5D90();
+u8 fn_800E5C84(void) {
+    return fn_800E5D90();
 }
 
 // Message 0x42: seven ints and a float (the sixth value).
@@ -497,8 +494,8 @@ void fn_800E5D68(char* p0) {
     fn_800E5C08(90, p0);
 }
 
-s32 fn_800E5D90(void) {
-    return *(u8*)lbl_801D87C0;
+u8 fn_800E5D90(void) {
+    return lbl_801D87C0[0];
 }
 
 void fn_800E5DA0(void) {
