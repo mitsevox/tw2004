@@ -1794,38 +1794,11 @@ FEgolferanim.c:
 unsorted/sweep_8008EBB4.c:
 	.text       start:0x8008EBB4 end:0x8008EC0C
 
-unsorted/sweep_8008EC60.c:
-	.text       start:0x8008EC60 end:0x8008EC68
-
 uiLoadFile.c:
-	.text       start:0x8008EC68 end:0x8008F310
-
-unsorted/sweep_8008F354.c:
-	.text       start:0x8008F354 end:0x8008F35C
-
-unsorted/sweep_8008F35C.c:
-	.text       start:0x8008F35C end:0x8008F39C
-
-unsorted/sweep_8008F39C.c:
-	.text       start:0x8008F39C end:0x8008F3A4
-
-unsorted/sweep_8008F644.c:
-	.text       start:0x8008F644 end:0x8008F648
+	.text       start:0x8008EC30 end:0x8008F39C
 
 uiProcessInterface.c:
-	.text       start:0x8008F648 end:0x800907AC
-
-unsorted/sweep_80090890.c:
-	.text       start:0x80090890 end:0x80090898
-
-unsorted/sweep_80090898.c:
-	.text       start:0x80090898 end:0x800908BC
-
-unsorted/sweep_800908BC.c:
-	.text       start:0x800908BC end:0x800908D4
-
-unsorted/sweep_800908D4.c:
-	.text       start:0x800908D4 end:0x80090940
+	.text       start:0x8008F39C end:0x80090940
 
 unsorted/sweep_80091454.c:
 	.text       start:0x80091454 end:0x80091460
@@ -2314,23 +2287,8 @@ unsorted/sweep_800ADAF0.c:
 unsorted/sweep_800ADDC8.c:
 	.text       start:0x800ADDC8 end:0x800ADE54
 
-unsorted/sweep_800ADE70.c:
-	.text       start:0x800ADE70 end:0x800ADE88
-
-unsorted/sweep_800ADEC8.c:
-	.text       start:0x800ADEC8 end:0x800ADF08
-
-unsorted/sweep_800ADF6C.c:
-	.text       start:0x800ADF6C end:0x800AE00C
-
-unsorted/sweep_800AE00C.c:
-	.text       start:0x800AE00C end:0x800AE03C
-
-unsorted/sweep_800AE03C.c:
-	.text       start:0x800AE03C end:0x800AE084
-
-unsorted/sweep_800AE1AC.c:
-	.text       start:0x800AE1AC end:0x800AE1DC
+UAudContainers.c:
+	.text       start:0x800ADE70 end:0x800AE1F8
 
 unsorted/sweep_800AE380.c:
 	.text       start:0x800AE380 end:0x800AE3C4
@@ -2351,17 +2309,11 @@ unsorted/sweep_800AF31C.c:
 	.text       start:0x800AF31C end:0x800AF324
 
 startUp.c:
-	.text       start:0x800AF324 end:0x800B1A40
+	.text       start:0x800AF324 end:0x800B1AA8
 	.data       start:0x8018FE98 end:0x8018FF68
 	.sdata      start:0x80281498 end:0x802814A8
 	.sbss       start:0x802820E8 end:0x80282158
 	.sdata2     start:0x80284070 end:0x802840B0
-
-unsorted/sweep_800B1A88.c:
-	.text       start:0x800B1A88 end:0x800B1A9C
-
-unsorted/sweep_800B1A9C.c:
-	.text       start:0x800B1A9C end:0x800B1AA8
 
 unsorted/sweep_800B1AA8.c:
 	.text       start:0x800B1AA8 end:0x800B1AB0
@@ -3969,6 +3921,9 @@ Common/SharedFileIO/SharedFileIO.c:
 	.rodata     start:0x80186274 end:0x801863D4
 	.data       start:0x8019D210 end:0x8019D2C0
 	.sdata      start:0x80281B54 end:0x80281B5C
+
+NGC/SharedFileIO/llSharedFileIO.c:
+	.text       start:0x80171308 end:0x801730C8
 
 Common/TagFile/TagFile.c:
 	.text       start:0x801730C8 end:0x80175F54
