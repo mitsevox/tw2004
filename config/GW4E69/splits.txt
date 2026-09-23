@@ -84,23 +84,8 @@ ObjList.c:
 LoadData.c:
 	.text       start:0x8000B884 end:0x8000BF20
 
-unsorted/sweep_8000BF8C.c:
-	.text       start:0x8000BF8C end:0x8000BF9C
-
-unsorted/sweep_8000C0F0.c:
-	.text       start:0x8000C0F0 end:0x8000C104
-
-unsorted/sweep_8000C244.c:
-	.text       start:0x8000C244 end:0x8000C278
-
-unsorted/sweep_8000C594.c:
-	.text       start:0x8000C594 end:0x8000C5A4
-
-unsorted/sweep_8000C5A4.c:
-	.text       start:0x8000C5A4 end:0x8000C5D4
-
-unsorted/sweep_8000C5FC.c:
-	.text       start:0x8000C5FC end:0x8000C624
+TerrainData.c:
+	.text       start:0x8000BF20 end:0x8000C624
 
 UStream.c:
 	.text       start:0x8000C624 end:0x8000E830
