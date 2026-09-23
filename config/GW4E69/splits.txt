@@ -1943,6 +1943,7 @@ unsorted/sweep_80092C38.c:
 
 uiTransform.c:
 	.text       start:0x80092F8C end:0x8009349C
+	.sdata2     start:0x80283C20 end:0x80283C40
 
 unsorted/sweep_800934F8.c:
 	.text       start:0x800934F8 end:0x80093524
@@ -2776,6 +2777,9 @@ GameEffects.c:
 
 GameManager.c:
 	.text       start:0x800DCAD8 end:0x800E0AF0
+	.rodata     start:0x80184D30 end:0x80184D40
+	.data       start:0x80192010 end:0x80192030
+	.sdata2     start:0x802845C0 end:0x80284610
 
 GameRound.c:
 	.text       start:0x800E0AF0 end:0x800E3B28
