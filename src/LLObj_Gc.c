@@ -1,7 +1,10 @@
-// Visibility tests: move an object's bounding sphere into camera space, then cull it.
-// Original file name unknown.
+// LLObj_Gc.c (EA's name, from its asserts; also in EA's 2002 source tree): not yet decompiled.
+// The code below is the visibility tests (0x80007BC4..: move an object's bounding sphere into
+// camera space, then cull it), written earlier as unsorted/code_80007BC4.c and not yet cleaned up.
 
 #include "unsorted/cull.h"
+
+// ---- sweep code (not yet cleaned up) ----
 
 int fn_80007BC4(RenderObj* obj, Camera* cam, float* outDepth, int mode, float scale) {
     Sphere sphere;
@@ -97,3 +100,5 @@ int fn_80007D74(Sphere* s, Camera* cam, int mode) {
         return 4;
     }
 }
+
+// ---- end of sweep code ----

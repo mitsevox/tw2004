@@ -303,7 +303,7 @@ f32 Swing_TeeSweetSpot(int nPlayer, f32 fPower) {
         if (fT > gpSwing->fKnot1X && fT < gpSwing->fKnot2X) {
             f32 fBonus;
             fHalf  = (gpSwing->fKnot2X - gpSwing->fKnot1X) / 2.0f;
-            fBonus = 1.0f - (f32)fabsf(fHalf - (fT - gpSwing->fKnot1X)) / fHalf;
+            fBonus = 1.0f - (f32)fabs(fHalf - (fT - gpSwing->fKnot1X)) / fHalf;
             fBonus *= gpSwing->fTeeBonus;
             return fPower + fBonus;
         }
@@ -383,7 +383,7 @@ void Swing_ApplyForgiveness(int nPlayer) {
         }
     }
     TABLE_PAIR(nRowThresh, nRowScale, nAttr, fThresh, fScale);
-    if (fabsf(fError) < fThresh) {
+    if (fabs(fError) < fThresh) {
         fError *= fScale;
     }
     gPlayers[nPlayer].swing.fMishitAngle = fError;
@@ -413,7 +413,7 @@ void Swing_MisHitRumble(int nPlayer) {
         break;
     }
     fScale = TABLE_AT(ROW_RUMBLE, nAttr);
-    gPlayers[nPlayer].swing.nVibrateCount = (int)(fScale * fabsf(gPlayers[nPlayer].swing.fMishitAngle));
+    gPlayers[nPlayer].swing.nVibrateCount = (int)(fScale * fabs(gPlayers[nPlayer].swing.fMishitAngle));
     if (gPlayers[nPlayer].swing.nVibrateCount > 30) {
         gPlayers[nPlayer].swing.nVibrateCount = 30;
     }
@@ -557,7 +557,7 @@ f32 Swing_ComputePower(int nPlayer) {
     p      = &gPlayers[nPlayer];
     fPower = p->fPower;
     pPower = &p->fPower;
-    fError = fabsf(p->swing.fMishitAngle);
+    fError = fabs(p->swing.fMishitAngle);
     p->swing.fNonPowerShotPower = Swing_ApplyPowerBoost(nPlayer, fPower) - fError;
     switch (p->nShotKind) {
     case SHOT_TYPE_PUTT_e: {
@@ -770,7 +770,7 @@ f32 Swing_CurveAngle(s32* pClub, f32 fBackAngle) {
     f32 fRange = gpSwing->fCurveMin +
                  ((f32)gClubCurve[*pClub] / 26.0f) * (gpSwing->fCurveMax - gpSwing->fCurveMin);
 
-    fT = (f32)fabsf(fT);
+    fT = (f32)fabs(fT);
     if (fT < gpSwing->fKnot1X) {
         fOut = gpSwing->fKnot1Y * fT / gpSwing->fKnot1X;
     } else {
@@ -1411,7 +1411,7 @@ int Swing_UpdateBackswing(int nPlayer) {
         fRange  = fTop - fStart;
         fTarget = fStart + (fMag / 100.0f) * fRange;
         fDelta  = fTarget - fAnimTime;
-        fRate   = 1.0f + (f32)fabsf(fDelta) / fRange;
+        fRate   = 1.0f + (f32)fabs(fDelta) / fRange;
         fRate   = fRate * fRate - 1.0f;
         if (fRate >= 1.0f) {
             fRate = 1.0f;

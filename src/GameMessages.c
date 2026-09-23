@@ -25,7 +25,6 @@ typedef struct FrontEnd {
 } FrontEnd;
 
 extern FrontEnd* lbl_80281F1C;
-extern s32 lbl_80282278;
 extern u8 lbl_80202B88[];
 extern u8 lbl_802822E4;
 extern s32 lbl_802822E0;

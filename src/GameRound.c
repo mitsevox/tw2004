@@ -930,7 +930,7 @@ char* GameManager_GetHoleName(int nHole) {
 // Seconds since the round's clock was last reset (gpGame->n12C holds the session's frame count
 // then).
 int fn_800E27C0(void) {
-    return (1.0f / 59.94f) * (f32)(u32)(gSession.unk24 - gpGame->n12C);
+    return (1.0f / FRAME_RATE) * (f32)(u32)(gSession.nFrameCount - gpGame->n12C);
 }
 
 // Runs the mode's player choice twice (fn_800E292C runs it once).

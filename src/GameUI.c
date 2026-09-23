@@ -67,14 +67,11 @@ u8    fn_80127004(void);
         (q)[i].n8 = c;       \
     }
 
-typedef struct Vec4 { f32 x, y, z, w; } Vec4;
-extern Vec4 lbl_80184D90;
 extern char lbl_80281640[8];
 
 void  fn_80095444(int a);
 void  fn_80125814(int a);
 void  fn_800A7350(int a);
-extern u8 gNumPlayersSetUp;                 // 0x80281D48 (Golfer.c)
 
 void fn_800E3BEC(void) {
     fn_8001437C();
@@ -89,7 +86,7 @@ void fn_800E3C0C(u8 b) {
         fn_80062D6C(1, 1);
     }
     lbl_802822D9 = b;
-    lbl_802822D0 = gSession.unk24;
+    lbl_802822D0 = gSession.nFrameCount;
 }
 
 // The same for split screen's first view.
@@ -101,7 +98,7 @@ void fn_800E3C70(u8 b) {
         fn_80062D6C(1, 2);
     }
     lbl_802822D8 = b;
-    lbl_802822CC = gSession.unk24;
+    lbl_802822CC = gSession.nFrameCount;
 }
 
 // And its second view.
@@ -113,7 +110,7 @@ void fn_800E3CD4(u8 b) {
         fn_80062D6C(1, 3);
     }
     lbl_802822D7 = b;
-    lbl_802822C8 = gSession.unk24;
+    lbl_802822C8 = gSession.nFrameCount;
 }
 
 // Shows or hides a player's HUD.
@@ -212,7 +209,7 @@ void fn_800E3EE0(void) {
         }
         if (lbl_80282282) {
             fn_800A72EC(0, 0);
-            gSession.unk11[1] = 1;
+            gSession.b12 = 1;
             lbl_80282282 = 0;
             fn_800A76E4();
         }
@@ -236,7 +233,7 @@ void fn_800E3EE0(void) {
             }
             fn_800A76E4();
         }
-        if ((s8)SESSION_OPTIONS->unk0[4] == 0) {
+        if ((s8)gSession.options.a0[4] == 0) {
             fn_800A76E4();
         }
     }
@@ -540,7 +537,6 @@ void fn_800E4D88(void) {
 // The end-of-hole screen, as fn_800E4C20 does the end-of-round one; in the side-by-side modes
 // 22 and 26 both players' cameras are moved first.
 void fn_800E4D94(u8 bHuman) {
-    Vec4 v;
     if (lbl_802822DC[0] || lbl_802822DC[1] || lbl_802822DC[2] || lbl_802822B8 != 0 || lbl_802822B4 != 0 ||
         lbl_802822B0 != 0 || lbl_802822AC != 0 || lbl_802822A8 != 0 || lbl_802822A4 != 0 ||
         lbl_8028229C != 0 || lbl_80282298 != 0 || lbl_80282294 != 0 || lbl_80282290 != 0 ||
@@ -558,9 +554,9 @@ void fn_800E4D94(u8 bHuman) {
         lbl_80282282 = 1;
         GameEffects_ResetGameEffectSettings();
         if ((Game_GetMode() == 26 || Game_GetMode() == 22) && gSession.nSplitScreen) {
-            v = lbl_80184D90;
-            fn_80063B98(fn_80017028(gPlayers[0].nView[0]), 0.0f, (f32*)&v);
-            fn_80063B98(fn_80017028(gPlayers[1].nView[0]), 0.0f, (f32*)&v);
+            f32 v[4] = {0.0f, 0.0f, 0.0f, 1.0f};
+            fn_80063B98(fn_80017028(gPlayers[0].nView[0]), 0.0f, v);
+            fn_80063B98(fn_80017028(gPlayers[1].nView[0]), 0.0f, v);
         }
         if (bHuman) {
             fn_80062D38(0xE, 2, 1);

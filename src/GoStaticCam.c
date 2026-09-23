@@ -1,11 +1,34 @@
-// Small functions found by the sweep (sweep.py). Original file and meanings unknown.
+// GoStaticCam.c (EA's name, from its asserts; also in EA's 2002 source tree): not yet decompiled;
+// the sweep code below is the matched small functions.
 
 #include "game_types.h"
 
-s32 fn_80009E70();
-extern void* lbl_80281E18;
+// ---- sweep code (not yet cleaned up) ----
 
+extern u8 lbl_801885F8[];
+extern s32 lbl_80281E18;
+s32 fn_80009B34();
+void fn_80009E70();
 void fn_80064EA4(void);
+void fn_80064E2C(void);
+void fn_80064E74(void);
+void Vec3Copy();
+void fn_80064F54(u8* p0, s32 p1, s32 p2);
+
+void fn_80064E2C(void) {
+    s32 t0;
+    t0 = fn_80009B34(7784, 2, 0, lbl_801885F8, 380);
+    lbl_80281E18 = t0;
+    *(s32*)(((u8*)t0) + 0x1E64) = 0;
+    fn_80064EA4();
+}
+
+void fn_80064E74(void) {
+    fn_80064EA4();
+    fn_80009E70(lbl_80281E18);
+    lbl_80281E18 = 0;
+}
+
 void fn_80064EA4(void) {
     (*(s32*)((u8*)(lbl_80281E18) + 0x1E04)) = 0;
     (*(s32*)((u8*)(lbl_80281E18) + 0x1E00)) = 0;
@@ -26,3 +49,9 @@ void fn_80064EA4(void) {
     (*(u32*)((u8*)(lbl_80281E18) + 0x1E64)) = 0U;
     (*(s32*)((u8*)(lbl_80281E18) + 0x1E60)) = 0;
 }
+
+void fn_80064F54(u8* p0, s32 p1, s32 p2) {
+    Vec3Copy((p0 + 0x20), p2);
+}
+
+// ---- end of sweep code ----

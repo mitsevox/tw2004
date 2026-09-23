@@ -56,8 +56,8 @@ unsorted/sweep_80007368.c:
 unsorted/sweep_800073A8.c:
 	.text       start:0x800073A8 end:0x800073B4
 
-unsorted/code_80007BC4.c:
-	.text       start:0x80007BC4 end:0x800080D0
+LLObj_Gc.c:
+	.text       start:0x800073B4 end:0x800080D0
 	.sdata2     start:0x80282A80 end:0x80282A88
 
 unsorted/code_800080D0.c:
@@ -108,26 +108,8 @@ unsorted/sweep_8000A0AC.c:
 unsorted/sweep_8000A0E8.c:
 	.text       start:0x8000A0E8 end:0x8000A194
 
-unsorted/sweep_8000AD34.c:
-	.text       start:0x8000AD34 end:0x8000AD78
-
-unsorted/sweep_8000AD78.c:
-	.text       start:0x8000AD78 end:0x8000ADC0
-
-src/MSL/atanf.c:
-	.text       start:0x8000AE94 end:0x8000AE9C
-
-unsorted/sweep_8000AF1C.c:
-	.text       start:0x8000AF1C end:0x8000AF20
-
-unsorted/sweep_8000AF20.c:
-	.text       start:0x8000AF20 end:0x8000AF58
-
-unsorted/sweep_8000AF58.c:
-	.text       start:0x8000AF58 end:0x8000AF7C
-
-unsorted/sweep_8000AF7C.c:
-	.text       start:0x8000AF7C end:0x8000AFA0
+UMemPool.c:
+	.text       start:0x8000A194 end:0x8000B058
 
 unsorted/sweep_8000B058.c:
 	.text       start:0x8000B058 end:0x8000B078
@@ -714,29 +696,8 @@ unsorted/sweep_80039520.c:
 unsorted/sweep_8003954C.c:
 	.text       start:0x8003954C end:0x80039554
 
-unsorted/sweep_80039FF8.c:
-	.text       start:0x80039FF8 end:0x8003A074
-
-unsorted/sweep_8003A074.c:
-	.text       start:0x8003A074 end:0x8003A148
-
-unsorted/sweep_8003A76C.c:
-	.text       start:0x8003A76C end:0x8003A7C8
-
-unsorted/sweep_8003CAFC.c:
-	.text       start:0x8003CAFC end:0x8003CB80
-
-unsorted/sweep_8003CBD4.c:
-	.text       start:0x8003CBD4 end:0x8003CBE8
-
-unsorted/sweep_8003D0A0.c:
-	.text       start:0x8003D0A0 end:0x8003D0BC
-
-unsorted/sweep_8003D7A0.c:
-	.text       start:0x8003D7A0 end:0x8003D810
-
-unsorted/sweep_8003DAC8.c:
-	.text       start:0x8003DAC8 end:0x8003DBA8
+GoDynamicCam.c:
+	.text       start:0x80039554 end:0x8003DC30
 
 unsorted/sweep_8003DC78.c:
 	.text       start:0x8003DC78 end:0x8003DCAC
@@ -885,14 +846,8 @@ unsorted/sweep_800642B0.c:
 unsorted/sweep_800644CC.c:
 	.text       start:0x800644CC end:0x800644F4
 
-unsorted/sweep_80064E2C.c:
-	.text       start:0x80064E2C end:0x80064EA4
-
-unsorted/sweep_80064EA4.c:
-	.text       start:0x80064EA4 end:0x80064F54
-
-unsorted/sweep_80064F54.c:
-	.text       start:0x80064F54 end:0x80064F7C
+GoStaticCam.c:
+	.text       start:0x800644F4 end:0x8006596C
 
 unsorted/sweep_8006596C.c:
 	.text       start:0x8006596C end:0x800659F4
@@ -2936,6 +2891,7 @@ GameRound.c:
 
 GameUI.c:
 	.text       start:0x800E3B28 end:0x800E4FFC
+	.rodata     start:0x80184D90 end:0x80184DA0
 	.data       start:0x80192558 end:0x80192588
 	.sdata2     start:0x80284628 end:0x80284630
 
@@ -2950,6 +2906,7 @@ GameAnalysis.c:
 
 GameModeAlternateShot.c:
 	.text       start:0x800E68F0 end:0x800E7980
+	.rodata     start:0x80184DA0 end:0x80184DB0
 	.sdata2     start:0x80284648 end:0x80284650
 
 GameModeBattle.c:
@@ -2970,6 +2927,7 @@ GameMode5.c:
 
 GameMode9.c:
 	.text       start:0x800ED738 end:0x800EDD18
+	.rodata     start:0x80184DD0 end:0x80184DE0
 	.sdata2     start:0x80284670 end:0x80284688
 
 GameModeDriverPGATour.c:
@@ -3034,10 +2992,12 @@ GameMode12.c:
 
 GameModeStroke.c:
 	.text       start:0x800FF700 end:0x800FFF34
+	.rodata     start:0x80184DF0 end:0x80184E00
 	.sdata2     start:0x802847E0 end:0x802847E8
 
 GameMode11.c:
 	.text       start:0x800FFF34 end:0x80101FEC
+	.rodata     start:0x80184E00 end:0x80184E10
 	.data       start:0x80192D20 end:0x80193130
 	.sdata2     start:0x802847E8 end:0x80284808
 

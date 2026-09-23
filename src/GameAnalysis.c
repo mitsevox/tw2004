@@ -4,8 +4,6 @@
 #include "golfer.h"
 #include "game.h"
 
-extern u8 gNumPlayersSetUp;                 // 0x80281D48 (Golfer.c)
-
 u8  fn_800E6020(int nMode, int nTip);
 u8  fn_800E60E4(u32 nTip);
 f32 fn_800E6578(int nPlayer, u32 nStat);
