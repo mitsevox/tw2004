@@ -212,6 +212,59 @@ void fn_800CA268(int nPlayer, int a, int nGroup, int nClub, int nStyle) {
     }
 }
 
+// With streaming on, goes through a player's library over a range of the stream's groups (by
+// index), styles and club classes: marks the records of each streamed clip set's default clips
+// (flag 4) and keeps the set's largest clip size, rounded up to 0x800 bytes.
+void fn_800CA610(int nPlayer, AnimLib* pLib, int nFirst, int nLast, int nStyleFirst, int nStyleLast,
+                 int nClubFirst, int nClubLast) {
+    int i;
+    int nGroup;
+    int nStyle;
+    int nClub;
+    int nOff;
+    int k;
+    int nSize;
+    s16* pStyle;
+    s16* pLeaf;
+    s16* pIndex;
+    ClipRecord* pRec;
+
+    if (lbl_80282230->bOn == 0) return;
+    for (i = nFirst; i <= nLast; i++) {
+        nGroup = lbl_80191490[i].nGroup;
+        if (pLib->groups[nGroup] < 0) continue;
+        for (nStyle = nStyleFirst; nStyle <= nStyleLast; nStyle++) {
+            nOff = ((s16*)(pLib->pTree + pLib->groups[nGroup]))[1 + nStyle];
+            if (nOff < 0) continue;
+            pStyle = (s16*)(pLib->pTree + nOff);
+            for (nClub = nClubFirst; nClub <= nClubLast; nClub++) {
+                if (fn_800C9828(nGroup, nStyle, nClub, -1)) {
+                    nOff = pStyle[nClub];
+                    if (nOff >= 0) {
+                        nOff = ((s16*)(pLib->pTree + nOff))[1];
+                        if (nOff >= 0) {
+                            pLeaf = (s16*)(pLib->pTree + nOff);
+                            pIndex = &pLib->pIndex[pLeaf[1]];
+                            for (k = 0; k < pLeaf[0]; k++) {
+                                pRec = &pLib->pRecords[*pIndex];
+                                pRec->n12 |= 4;
+                                nSize = pRec->n18;
+                                if (nSize > lbl_80282230->players[nPlayer].clips[i][nStyle][nClub].nMaxSize) {
+                                    if (nSize % 0x800 != 0) {
+                                        nSize += 0x800 - nSize % 0x800;
+                                    }
+                                    lbl_80282230->players[nPlayer].clips[i][nStyle][nClub].nMaxSize = nSize;
+                                }
+                                pIndex++;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 // With streaming on, adds up the bytes each player's clips need, gives each group, style and club
 // class two buffers as big as the largest player's clips, and the read buffer as big as the
 // largest of all.
