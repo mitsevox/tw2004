@@ -72,6 +72,10 @@ DSError TRKSuppAccessFile(u32 file_handle, u8* data, size_t* count, DSIOResult* 
 				}
 
 				if (replyLength != length) {
+					// this game's TRK: a short transfer with no error reported is an I/O error
+					if ((!read || replyLength >= length) && replyIOResult == DS_IONoError) {
+						replyIOResult = DS_IOError;
+					}
 					length = replyLength;
 					exit   = TRUE;
 				}

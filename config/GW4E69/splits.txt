@@ -1839,6 +1839,7 @@ MetroTRK/msghndlr.c:
 
 MetroTRK/support.c:
 	.text       start:0x80161A94 end:0x801621C8
+	.rodata     start:0x80185CC0 end:0x80185D68
 
 MetroTRK/mutex_TRK.c:
 	.text       start:0x801621C8 end:0x801621E0
