@@ -12,7 +12,12 @@ the core are folded in unchanged, inside the sweep block (sweepblock.py); identi
 merged and a function declared twice keeps its typed prototype. A declaration that clashes (the same
 name with two different types) stops the file. Sweep files are removed only after their code is
 found verbatim in the new source. Then rebuild: main.dol must stay OK and no function's score may
-change (docs/workflow.md, "Creating units from the file map")."""
+change (docs/workflow.md, "Creating units from the file map").
+
+The merged file can fail to compile where two sweeps saw a function differently: a call with fewer
+arguments than the definition takes (m2c missed an argument passed through in r3/r4), or another
+return type (the notes list these). Fix the call to pass what the function takes, with a cast where
+the types differ; the code stays the same, which the unchanged scores confirm."""
 import json, pathlib, re, sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]   # the checkout this script lives in
@@ -22,6 +27,7 @@ import sweepblock                                    # noqa: E402
 SPLITS = ROOT / 'config/GW4E69/splits.txt'
 CONFIGURE = ROOT / 'configure.py'
 MAP = ROOT / 'config/GW4E69/filemap.json'
+NOTES = []                                           # what to look at if a new unit does not compile
 UNIT_HEAD = re.compile(r'\n(?=\S[^\n]*:\n)')
 
 
@@ -102,9 +108,9 @@ def candidates(blocks, exclude):
 
 def merge_sweeps(sweeps):
     """Includes, declarations (merged) and bodies of the sweep sources, in address order."""
-    includes, decls, bodies = [], [], []
+    includes, decls, bodies, owner, sweep_code = [], [], [], {}, {}
     for s in sweeps:
-        cur, depth = [], 0
+        cur, depth, first_body = [], 0, len(bodies)
         for ln in read(ROOT / 'src' / s).split('\n'):
             if depth == 0:
                 if ln.startswith('//') or ln.strip() == '':
@@ -118,6 +124,7 @@ def merge_sweeps(sweeps):
                 if ln.rstrip().endswith(';') and '{' not in ln:
                     if ln not in decls:
                         decls.append(ln)
+                        owner[ln] = s
                     continue
             cur.append(ln)
             depth += ln.count('{') - ln.count('}')
@@ -126,13 +133,17 @@ def merge_sweeps(sweeps):
                 cur = []
         if depth != 0 or ''.join(cur).strip():
             raise ValueError('cannot parse ' + s)
-    keep, funcs, data = [], {}, {}
+        sweep_code[s] = '\n'.join(bodies[first_body:])
+    keep, funcs, data, rets = [], {}, {}, {}
     for d in decls:
         m = re.match(r'^(?:extern\s+)?[A-Za-z_][\w \*]*?\b(\w+)\((.*)\);$', d)
         if m:                                          # a function: keep the first typed prototype
             nm, args = m.group(1), m.group(2).strip()
+            ret = re.sub(r'\s+', ' ', d[:d.index(nm + '(')].replace('extern', '')).strip()
             if nm in funcs:
                 i, old = funcs[nm]
+                if rets[nm] != ret:
+                    NOTES.append('%s returns %s in one sweep and %s in another' % (nm, rets[nm], ret))
                 if old == '' and args != '':
                     keep[i] = d
                     funcs[nm] = (i, args)
@@ -140,12 +151,22 @@ def merge_sweeps(sweeps):
                     raise ValueError('%s is declared with two parameter lists' % nm)
                 continue
             funcs[nm] = (len(keep), args)
+            rets[nm] = ret
         else:
             m = re.match(r'^extern\s+(.*?)\b(\w+)\s*(\[[^\]]*\])?\s*;$', d)
             if m:                                      # data: one type per name
-                if m.group(2) in data:
-                    raise ValueError('%s is declared as %r and %r' % (m.group(2), data[m.group(2)], d))
-                data[m.group(2)] = d
+                nm = m.group(2)
+                used = lambda x: re.search(r'\b%s\b' % nm, sweep_code[owner[x]]) is not None
+                if nm in data:                         # a clash: a declaration its sweep never uses goes
+                    i, old = data[nm]
+                    if not used(d):
+                        continue
+                    if not used(old):
+                        keep[i] = d
+                        data[nm] = (i, d)
+                        continue
+                    raise ValueError('%s is declared as %r and %r' % (nm, old, d))
+                data[nm] = (len(keep), d)
         keep.append(d)
     return includes, keep, bodies
 
@@ -285,6 +306,9 @@ def main():
             continue
         print('%s: 0x%08X-0x%08X, %d sweeps folded (%d declarations, %d functions)' % (
             f['name'], lo, hi, len(sweeps), nd, nb))
+        for n in NOTES:
+            print('  note: ' + n)
+        del NOTES[:]
     check()
 
 
