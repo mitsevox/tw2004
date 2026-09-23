@@ -89,7 +89,7 @@ int fn_800E9F90(int nPlayer) {
     for (h = Game_CurHoleIndex() - 1; h >= 0; h--) {
         if (gpGame->bHoleSelected[h]) {
             for (i = 0; i < gNumPlayersSetUp; i++) {
-                if (i != nPlayer && gPlayers[i].nModePoints[h] != 0) {
+                if (i != nPlayer && gPlayers[(u32)i].nModePoints[h] != 0) {
                     return i;
                 }
             }
