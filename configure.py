@@ -708,7 +708,7 @@ config.libs = [
         "objects": [
             Object(Matching, "dolphin/dvd/fstload.c"),
             Object(Matching, "dolphin/dvd/dvdlow.c"),
-            Object(NonMatching, "dolphin/dvd/dvdfs.c"),
+            Object(Matching, "dolphin/dvd/dvdfs.c"),
             Object(Matching, "dolphin/dvd/dvderror.c"),
             Object(Matching, "dolphin/dvd/dvdqueue.c"),
             Object(Matching, "dolphin/dvd/dvdidutils.c"),

@@ -3523,6 +3523,9 @@ dolphin/dvd/dvdlow.c:
 
 dolphin/dvd/dvdfs.c:
 	.text       start:0x8013AF10 end:0x8013B3C4
+	.data       start:0x80199AB8 end:0x80199BB8
+	.sdata      start:0x80281A10 end:0x80281A18
+	.sbss       start:0x802827C0 end:0x802827E0
 
 unsorted/sweep_8013B3C4.c:
 	.text       start:0x8013B3C4 end:0x8013B3C8
