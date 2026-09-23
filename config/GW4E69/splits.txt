@@ -2077,53 +2077,11 @@ unsorted/sweep_800A7A34.c:
 unsorted/sweep_800A7AD0.c:
 	.text       start:0x800A7AD0 end:0x800A7AF0
 
-unsorted/sweep_800A7C24.c:
-	.text       start:0x800A7C24 end:0x800A7C30
+AudTable.c:
+	.text       start:0x800A7AF0 end:0x800A85CC
 
-unsorted/sweep_800A85FC.c:
-	.text       start:0x800A85FC end:0x800A8604
-
-unsorted/sweep_800A86B0.c:
-	.text       start:0x800A86B0 end:0x800A86BC
-
-unsorted/sweep_800A8700.c:
-	.text       start:0x800A8700 end:0x800A8708
-
-unsorted/sweep_800A871C.c:
-	.text       start:0x800A871C end:0x800A874C
-
-unsorted/sweep_800A874C.c:
-	.text       start:0x800A874C end:0x800A8754
-
-unsorted/sweep_800A87A4.c:
-	.text       start:0x800A87A4 end:0x800A87B0
-
-unsorted/sweep_800A87B0.c:
-	.text       start:0x800A87B0 end:0x800A87B4
-
-unsorted/sweep_800A87B4.c:
-	.text       start:0x800A87B4 end:0x800A87D8
-
-unsorted/sweep_800A8824.c:
-	.text       start:0x800A8824 end:0x800A882C
-
-unsorted/sweep_800A8D00.c:
-	.text       start:0x800A8D00 end:0x800A8D54
-
-unsorted/sweep_800A8D54.c:
-	.text       start:0x800A8D54 end:0x800A8D88
-
-unsorted/sweep_800A8D88.c:
-	.text       start:0x800A8D88 end:0x800A8DC8
-
-unsorted/sweep_800A9374.c:
-	.text       start:0x800A9374 end:0x800A93AC
-
-unsorted/sweep_800A942C.c:
-	.text       start:0x800A942C end:0x800A9438
-
-unsorted/sweep_800A955C.c:
-	.text       start:0x800A955C end:0x800A9564
+hlaudmovie.c:
+	.text       start:0x800A85CC end:0x800A9808
 
 unsorted/sweep_800A9AC4.c:
 	.text       start:0x800A9AC4 end:0x800A9AC8
