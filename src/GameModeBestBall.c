@@ -138,8 +138,6 @@ void fn_800E83F8(void) {
 // player farthest from the pin (off the green first) whose team is still playing.
 s32 fn_800E84B0(int nPlayer) {
     TeeOrder order;
-    int h;
-    int nLead;
     int a;
     int b;
     int w;
@@ -149,6 +147,8 @@ s32 fn_800E84B0(int nPlayer) {
     int nHole;
     f32 fBest;
     int nBest;
+    int h;
+    int nLead;
     f32 dx;
     f32 dz;
     f32 d;
@@ -192,10 +192,10 @@ s32 fn_800E84B0(int nPlayer) {
             }
         }
     }
-    for (i = 0; i < gNumPlayersSetUp; i++) {
-        if (nPlayer != order.a[i] && Player_OnTee(order.a[i]) && !gPlayers[order.a[i]].bPlayerCut &&
-            !fn_800E82AC(fn_800E8848(order.a[i]))) {
-            return order.a[i];
+    for (h = 0; h < gNumPlayersSetUp; h++) {
+        if (nPlayer != order.a[h] && Player_OnTee(order.a[h]) && !gPlayers[order.a[h]].bPlayerCut &&
+            !fn_800E82AC(fn_800E8848(order.a[h]))) {
+            return order.a[h];
         }
     }
     pCourse = fn_8000C594();

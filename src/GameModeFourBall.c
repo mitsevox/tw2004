@@ -166,8 +166,6 @@ void fn_800E90FC(void) {
 // green first) whose team is still playing.
 s32 fn_800E9178(int nPlayer) {
     TeeOrder order;
-    int h;
-    int nLead;
     int w;
     int t;
     int i;
@@ -175,6 +173,8 @@ s32 fn_800E9178(int nPlayer) {
     int nHole;
     f32 fBest;
     int nBest;
+    int h;
+    int nLead;
     f32 dx;
     f32 dz;
     f32 d;
@@ -205,9 +205,9 @@ s32 fn_800E9178(int nPlayer) {
             }
         }
     }
-    for (i = 0; i < gNumPlayersSetUp; i++) {
-        if (nPlayer != order.a[i] && Player_OnTee(order.a[i]) && !fn_800E8E24(fn_800E947C(order.a[i]))) {
-            return order.a[i];
+    for (h = 0; h < gNumPlayersSetUp; h++) {
+        if (nPlayer != order.a[h] && Player_OnTee(order.a[h]) && !fn_800E8E24(fn_800E947C(order.a[h]))) {
+            return order.a[h];
         }
     }
     pCourse = fn_8000C594();

@@ -812,7 +812,7 @@ config.libs = [
             Object(Matching, "GameUI.c"),
             Object(Matching, "GameMessages.c"),
             Object(Matching, "GameAnalysis.c"),
-            Object(NonMatching, "GameModeAlternateShot.c"),
+            Object(Matching, "GameModeAlternateShot.c"),
             Object(Matching, "GameModeBattle.c"),
             Object(NonMatching, "GameModeBestBall.c"),
             Object(NonMatching, "GameModeFourBall.c"),
