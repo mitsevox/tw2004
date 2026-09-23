@@ -915,9 +915,7 @@ f32 fn_80052598(Ball* pBall, f32* pNormal, SurfaceType* pSurface) {
         fT = fT * fT;
         fS = fS * fS;
         fSi = fn_80009680(fT + fS);
-        fT = pBall->vVel[0] * pBall->vVel[0];
-        fS = pBall->vVel[2] * pBall->vVel[2];
-        fLen = fn_80009680(fT + fS);
+        fLen = fn_80009680(pBall->vVel[0] * pBall->vVel[0] + pBall->vVel[2] * pBall->vVel[2]);
         if (fLen < 5.28000021f) {
             if (fSi > 2.9333334f) {
                 fn_8001EF34(pBall->vSpin, 2.9333334f / fSi, pBall->vSpin);
@@ -935,13 +933,7 @@ f32 fn_80052598(Ball* pBall, f32* pNormal, SurfaceType* pSurface) {
     }
     fSpeed = fn_80009680(fn_80009744(pBall->vVel));
     fD     = fn_8000C5FC(pBall->vVel, pNormal);
-    fT = pNormal[0] * fD;
-    fS = pNormal[1] * fD;
-    fLen = pNormal[2] * fD;
-    fT = fT * fT;
-    fS = fS * fS;
-    fLen = fLen * fLen;
-    fImpact = fLen + (fT + fS);
+    fImpact = (pNormal[0] * fD) * (pNormal[0] * fD) + (pNormal[1] * fD) * (pNormal[1] * fD) + (pNormal[2] * fD) * (pNormal[2] * fD);
     fn_8000C5D4(pNormal, pBall->vVel, 1.0f / fSpeed, vBent);
     fn_80055EF8(vBent, vBent);
     fA = fn_8000AD9C(fD) / pSurface->f24;
