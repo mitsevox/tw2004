@@ -79,7 +79,13 @@ extern s32 lbl_80282338;
 s32  fn_801190D8(s32 a);
 void fn_800E4364(u32 nQueue, s32 a, s32 b, s32 c);
 s32  fn_800EFBD0(s32 i);
-u8   fn_800EF83C(u16* pId, s32* pOut);
+u8   fn_800EF83C(u16 nDate, s32* pId, s32* pRound);
+void fn_800D2714(u16* pDate, s32* pDay, s32* pMonth, s32* pYear);
+s32  fn_8011A7C8(s32 nPlayer, s32 nHole);
+s32  fn_80119588(s32 a);
+s32  fn_800E1904(s32 nPlayer, s32 a);
+s32  Game_CurHoleIndex(void);
+extern u8 gPlayers[];
 char* strcpy(char* pDst, const char* pSrc);
 int   sprintf(char* pDst, const char* pFmt, ...);
 int   UStream_RegisterHandler();
@@ -237,10 +243,11 @@ s32 fn_800EFB88(void) {
     return PROFILES[0].nB634;
 }
 
-u8* fn_800EFC80(void) {
-    u16 nId;
-    s32 n;
-    if (fn_800EF83C(&nId, &n)) {
+// The tournament being played on a date.
+u8* fn_800EFC80(u16 nDate) {
+    s32 nId;
+    s32 nRound;
+    if (fn_800EF83C(nDate, &nId, &nRound)) {
         return fn_800EFA70(nId);
     }
     return 0;
@@ -348,4 +355,67 @@ void fn_800F01CC(s32 i, char* pDst) {
         sprintf(pDst, "%d", SEASON[i].nPlace);
         return;
     }
+}
+
+#define STROKES(n, h) (*(s32*)(gPlayers + (n) * 0xEF8 + (h) * 4 + 0x154))
+
+// Strokes behind the leader (in a playoff, on this hole).
+s32 fn_800EE778(s32 nPlayer) {
+    if (((u8*)gpGame)[0xD4]) {
+        return fn_8011A7C8(nPlayer, Game_CurHoleIndex()) - STROKES(nPlayer, Game_CurHoleIndex());
+    }
+    return fn_80119588(1) - fn_800E1904(nPlayer, 0);
+}
+
+s32 fn_800EE810(s32 nPlayer) {
+    if (((u8*)gpGame)[0xD4]) {
+        return fn_8011A7C8(nPlayer, Game_CurHoleIndex()) - (STROKES(nPlayer, Game_CurHoleIndex()) + 1);
+    }
+    return fn_80119588(1) - (fn_800E1904(nPlayer, 1) + 1);
+}
+
+// Whether the player trails the leader by more than one stroke.
+u8 fn_800EE5B4(s32 nPlayer) {
+    u8 bBehind;
+    if (((u8*)gpGame)[0xD4]) {
+        return STROKES(nPlayer, Game_CurHoleIndex()) + 1 < fn_8011A7C8(nPlayer, Game_CurHoleIndex());
+    }
+    bBehind = 0;
+    if (fn_800E1904(nPlayer, 0) >= fn_80119588(1)) {
+        if (fn_800E1904(nPlayer, 1) + 1 < fn_80119588(1)) {
+            bBehind = 1;
+        }
+    }
+    return bBehind;
+}
+
+// Which tournament (and which of its rounds) is played on a date: each tournament starts on a
+// date per season (a50, seasons from 2004).
+u8 fn_800EF83C(u16 nDate, s32* pId, s32* pRound) {
+    s32 nDay;
+    s32 nMonth;
+    s32 i;
+    s32 d;
+    s32 nYear;
+    s32 nSeason;
+    u8 bFound;
+    fn_800D2714(&nDate, &nDay, &nMonth, &nYear);
+    bFound = 0;
+    nSeason = nYear - 2004;
+    if (nSeason >= 0 && nSeason < 10) {
+        for (i = 0; i < 31; i++) {
+            d = nDate - LESSONS[i].a50[nSeason];
+            if (d >= 0 && d < fn_800EFA9C(i)) {
+                *pId = i;
+                bFound = 1;
+                *pRound = d;
+                break;
+            }
+        }
+    }
+    if (!bFound) {
+        *pId = -1;
+        *pRound = 0;
+    }
+    return bFound;
 }
