@@ -184,28 +184,7 @@ GoRenderSurface.c:
 	.text       start:0x8002F1D4 end:0x8002F4FC
 
 LLPict_Gc.c:
-	.text       start:0x8002F4FC end:0x8003001C
-
-unsorted/sweep_8003001C.c:
-	.text       start:0x8003001C end:0x80030040
-
-unsorted/sweep_8003009C.c:
-	.text       start:0x8003009C end:0x800300A0
-
-unsorted/sweep_800301D0.c:
-	.text       start:0x800301D0 end:0x800301F4
-
-unsorted/sweep_800301F4.c:
-	.text       start:0x800301F4 end:0x8003020C
-
-unsorted/sweep_8003020C.c:
-	.text       start:0x8003020C end:0x80030214
-
-unsorted/sweep_80030214.c:
-	.text       start:0x80030214 end:0x8003024C
-
-unsorted/sweep_8003024C.c:
-	.text       start:0x8003024C end:0x80030254
+	.text       start:0x8002F4FC end:0x80030254
 
 GoTerrain.c:
 	.text       start:0x80030254 end:0x80035640
