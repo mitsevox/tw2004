@@ -100,9 +100,16 @@ int  GM_Earnings_RateGolfer(int nPlayer);          // the player's earnings rati
 s32  GM_Earnings_ComputeBonusModifiers(s32 nPoints, int nPlayer, u8 bCourse, u8 bTee, u8 bHole, CourseMoneyTracking* pMoney);
 int  GM_Earnings_ComputeTOURCardModifiers(int nReward, int nPlayer, CourseMoneyTracking* pMoney);
 s32  fn_800D7660(int nPlayer, Ball* pBall, u8 b);   // one of GameEffects' GameBreaker checks
-u8   fn_800DA174(void);
-u8   fn_800DA1D4(void);
-u8   fn_800DA234(void);                 // the current hole is the flagged one
+
+// GameHoleContests.c: the longest-drive, closest-to-the-pin and hole-in-one contests
+u8   fn_800DA174(void);                 // the longest drive is played on this hole
+u8   fn_800DA1D4(void);                 // closest to the pin is played on this hole
+u8   fn_800DA234(void);                 // the hole-in-one prize is on this hole
+u8   fn_800DA264(void);                 // the player whose turn it is is on the tee
+u8   fn_800DA2AC(void);                 // every player has teed off on the contest hole
+void fn_800DA36C(void);
+void fn_800DA48C(int nPlayer);
+void fn_800DAD54(void);                 // pay the contest's winner
 
 // GameEffects.c: slow motion, the GameBreaker (letterbox), the heartbeat rumble. The effects
 // state (0x58 bytes):
@@ -203,6 +210,7 @@ void fn_800E1404(int nHole);
 void fn_800E1434(void);
 void fn_800E1480(int nHole);            // make a hole of the round the current one
 void fn_800E14E0(int nCourse);
+u8   fn_800E1734(void);                 // the current hole is the round's first
 int  fn_800E177C(void);
 int  fn_800E1788(int nPlayer);          // the player's total for the round
 int  fn_800E17AC(int nPlayer);          // the player's total strokes
@@ -400,6 +408,7 @@ int  fn_800EC558(void);
 void fn_800ECBE4(void);
 u8   fn_800ED540(void);
 void fn_800ED548(void);
+u8   fn_800ED6F0(void);
 void fn_800ED6F8(f32 x);
 void fn_800ED710(s32 a);
 
