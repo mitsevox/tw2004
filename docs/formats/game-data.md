@@ -59,6 +59,24 @@ number + 1:
 (08 and 30 are `MALECRAP` / `FEMALECRAP`, the create-a-player sets; the four created-golfer
 slots in the table read 01.)
 
+**EA's working names.** Every `NNchar.gcb`, `NNcharfe.gcb` and `NNchrsac.gcb` keeps the path
+it was exported from, as `<folder>\EXPORTED/<code>.CHG` (`.SAC`, `_FE.CHG`). Only the tail of the
+path is stored (7 characters of the folder in the game files, 4 in the front-end ones), and no
+longer copy exists on either disc (searched 2026-09-23). Most folders are the final name
+(`…STERSON` EM, `TAAVATU` BM, `ANIGAWA` MT, `SEVERIN` EV, `RTAINER` CE). The ones that differ:
+
+| # | Character | Folder (tail) | Code | Reading |
+|---|---|---|---|---|
+| 06 | Felicia "Downtown" Brown | `…IALOCKS` | FL | Felicia Locks (initials fit) |
+| 09 | Dominic "The Don" Donatello | `…ICAPONE` | GC | G… Capone |
+| 16 | Hamish "Mulligan" McGregor | `…MCGRUFF` | SM | S… McGruff |
+| 18 | Takeharu "Tsunami" Moto | `TSUNAMI` | T2 | the folder is the nickname; "T2" unexplained |
+| 24 | Val "Sunshine" Summers | `…HINGTON` | GW | G… W…hington, probably Washington |
+| 01, 02 | Tiger Woods, Sunday Tiger | `…ERWOODS` | HT, HS | S is likely Sunday; H unexplained |
+| 08, 30 | created male / female | `…ALECRAP` | MR, FR | MALECRAP / FEMALECRAP |
+
+`glbchar.gcb` holds `…TA_GLOBAL\FLAG\FLAG.CHG` (the pin flag).
+
 **Column names (confirmed from code).** The front-end data (`Data/Fend/FEnd.gcb`, `DATS`
 object) carries the attribute screen's names and tooltips and a debug options menu that lists
 twelve attributes; the attribute screen (`FE_GolferAttributes`, `0x800BBB10`) reads them through
