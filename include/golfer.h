@@ -635,6 +635,7 @@ extern f32          gClubDistAtPower0[CLUB_MAX_e];   // 0x80187580  reach at POW
 extern f32          gClubPowerStep[CLUB_MAX_e];      // 0x801875E8  reach gained per POWER point over 100
 
 int  Game_GetMode(void);                // 0x8000BED8
+void fn_8002EBA4(u8* pObj, u8 nValue);  // set byte 7 of the options (a7[0]) and apply it (Golfer.c)
 int  fn_800D2B08(void);
 int  fn_80100744(void);                 // shot kind override, 8 = none
 int  fn_801006F0(int nPlayer);          // club override, 26 = none

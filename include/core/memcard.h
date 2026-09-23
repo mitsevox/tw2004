@@ -14,7 +14,8 @@
 #ifndef CORE_MEMCARD_H
 #define CORE_MEMCARD_H
 
-#include "engine.h"
+#include "game.h"
+#include "game/save.h"
 
 #define MC_NUM_PORTS 2              // GameCube card slots A and B
 #define MC_NUM_SLOTS 1              // multitap slots per port
@@ -84,20 +85,70 @@ LAYOUT_ASSERT(MCCardPos, 0xC);
 
 #define MC_BUFFER_SIZE  0x50000     // one save file image in memory
 
+// The session's record tables as the save file keeps them: a copy of gSession from aCourseRecord
+// to recC (0xF00..0x5B2C, the same layout).
+typedef struct SaveRecords {
+    CourseRecord aCourseRecord[NUM_COURSE_RECORDS];    // 0x0000
+    RecordEntry recA[8][5];     // 0x41A0
+    RecordEntry recB[3][3][5];  // 0x44C0
+    RecordEntry recC[5][2][5];  // 0x4844
+} SaveRecords;
+LAYOUT_ASSERT(SaveRecords, 0x4C2C);
+
+// The end of the saved data: a mark and a checksum of everything before it (fn_800A23BC).
+typedef struct SaveTrailer {
+    char aMagic[3];             // 0x0  "@BE" (fn_800A233C also takes "@BD")
+    u8   unk3;
+    u32  uChecksum;             // 0x4  fn_800A23BC over the image up to here, this word read as 0
+} SaveTrailer;
+LAYOUT_ASSERT(SaveTrailer, 0x8);
+
+#define NUM_SAVE_REPLAYS    5   // the replay bits of SaveImage.uFlags
+#define NUM_SAVE_PROFILES   4   // the profile bits
+
+// The save file, as it is read and written whole (MC_BUFFER_SIZE bytes). It starts with the
+// GameCube's comment strings, banner and icon (fn_8009E544 fills them); uFlags says which of the
+// parts after it hold data.
+// port: raw big-endian bytes on the card; a port reads and writes it field by field.
+typedef struct SaveImage {
+    char szGameName[32];        // 0x00000  the card's comment strings (fn_8009E544)
+    char szComment[32];         // 0x00020
+    u8   aBanner[0x1800];       // 0x00040  from the 'MCB ' object
+    u8   aIcon[0x800];          // 0x01840  from the 'MCI ' object
+    u32  uFlags;                // 0x02040  MC_SAVE_* below
+    GameOptions options;        // 0x02044  gSession.options
+    SaveRecords records;        // 0x020CC
+    Replay aReplay[NUM_SAVE_REPLAYS];           // 0x06CF8  saved shots (gReplayData)
+    SaveProfile aProfile[NUM_SAVE_PROFILES];    // 0x0B8C0
+    s32  n4D0C0;                // 0x4D0C0  -> lbl_80281FF8 when MC_SAVE_4D0C0 is set
+    SaveTrailer trailer;        // 0x4D0C4
+    u8   unk4D0CC[MC_BUFFER_SIZE - 0x4D0CC];
+} SaveImage;
+LAYOUT_ASSERT(SaveImage, MC_BUFFER_SIZE);
+
+// SaveImage.uFlags
+#define MC_SAVE_OPTIONS     0x0002
+#define MC_SAVE_RECORDS     0x0004
+#define MC_SAVE_PROFILE(n)  (0x8 << (n))    // aProfile[n]
+#define MC_SAVE_REPLAY(n)   (0x80 << (n))   // aReplay[n]
+#define MC_SAVE_4D0C0       0x1000          // n4D0C0
+
 extern MCCardState lbl_801F1510[MC_NUM_PORTS][MC_NUM_SLOTS];
 extern u8    lbl_80281FD0[MC_NUM_PORTS];    // the card in this port had an I/O error: its
                                             // operations fail with -25 until the next start
 extern s32   lbl_80282000[MC_NUM_PORTS];    // slots per port (1)
 extern u8    lbl_80282008[MC_NUM_PORTS];    // the port has a multitap (0)
 
-// Two save file images (MC_BUFFER_SIZE each), each reached through three pointers. MC_Gc.c
-// allocates them, or borrows skalib's scratch memory, and parks them in ARAM between uses.
-extern void* lbl_80281FD8;      // } the second image
-extern void* lbl_80281FDC;      // }
-extern void* lbl_80281FE0;      // }
-extern void* lbl_80281FE4;      // } the first image
-extern void* lbl_80281FE8;      // }
-extern void* lbl_80281FEC;      // }
+// Two save file images, each reached through three pointers. MC_Gc.c allocates them, or borrows
+// skalib's scratch memory, and parks them in ARAM between uses. MC.c reads the card into the
+// first and builds what it writes in the second.
+extern SaveImage* lbl_80281FD8; // } the second image
+extern SaveImage* lbl_80281FDC; // }
+extern SaveImage* lbl_80281FE0; // }
+extern SaveImage* lbl_80281FE4; // } the first image
+extern SaveImage* lbl_80281FE8; // }
+extern SaveImage* lbl_80281FEC; // }
+extern s32   lbl_80281FF8;      // SaveImage.n4D0C0 of the save loaded (0 when it has none)
 extern u32   lbl_80281FC0;      // the size parked in ARAM (MC_BUFFER_SIZE + 0x20)
 extern u32   lbl_80281FC4;      // the ARAM address they are parked at (0: none yet)
 extern UStreamObject* lbl_80281FB8;     // the 'MCI ' object (fn_8009EB30)
@@ -109,6 +160,8 @@ void fn_8009CC00(void);
 void fn_8009CC88(void);
 void fn_8009CD10(void);
 void fn_8009CD7C(void);
+// The space a save needs: compared with MCCardState.nFreeBlocks (EASportsBio.c passes 0, 3).
+s32  fn_8009D1D8(s32 nPort, s32 nSlot, s32 arg2, s32 arg3);
 s32  fn_8009D3DC(s32 nPort, s32 nSlot);
 s32  fn_8009D50C(s32 nPort, s32 nSlot);     // new files an EA Sports Bio save needs (0 or 1)
 s32  fn_8009D614(s32 nPort, s32 nSlot, const char* pName);
@@ -116,11 +169,20 @@ s32  fn_8009D74C(s32 nPort, s32 nSlot);     // mount the card; 0, or -22 when it
 s32  fn_8009DBAC(s32 nPort, s32 nSlot);     // unmount it
 void fn_8009DCEC(s32 nPort, s32 nSlot);
 s32  fn_8009DD44(s32 nPort, s32 nSlot, const char* pName);
+s32  fn_8009DD94(s32 nPort, s32 nSlot, const char* pName, void* pBuf, s32 nLen);  // read a file
+// Fill in the file's comment strings (szGameName, szComment), banner and icon.
+void fn_8009E544(char* pGameName, char* pComment, u8* pIcon, u8* pBanner);
+// Write a file. pBackupName (the PS2's backup copy) is not used here.
+s32  fn_8009E604(s32 nPort, s32 nSlot, const char* pName, void* pBuf, s32 nLen,
+                 const char* pBackupName);
 s32  fn_8009E918(s32 nPort, s32 nSlot);     // format the card
 void fn_8009EA98(void);
 void fn_8009EAF0(void);
 s32  fn_8009EE28(s32 nPort, s32 nSlot);
 u32  fn_8009EF90(void);
+void fn_8009F02C(void);             // bring the images back from ARAM (fn_8009EF98 parks them)
+// Create pName with nLen bytes, but only when it is the save directory's name (the PS2's mkdir).
+s32  fn_8009F514(s32 nPort, s32 nSlot, const char* pName, s32 nLen);
 s32  fn_8009F5E4(s32 nPort, s32 nSlot, const char* pName);    // delete the save file
 
 // Look through the card's files for one whose name holds "BASLUS-20572": 0 if there is one, else
@@ -142,6 +204,13 @@ s32  fn_800A0A7C(s32 nPort, s32 nSlot);
 void fn_800A1BE0(void);
 void fn_800A1D4C(UStreamObject* pObject);  // the 'eagm' handler
 s32  fn_800A2100(s32 nPort, s32 nSlot);
+
+// ---- the save file's checksum (0x800A233C) -------------------------------------------------------
+
+// Whether the data from pData up to pTrailer is a good save: the mark, then the checksum.
+u8   fn_800A233C(void* pData, SaveTrailer* pTrailer);
+// The checksum of pData up to the end of pTrailer (a CRC-32), its uChecksum read as 0.
+u32  fn_800A23BC(void* pData, SaveTrailer* pTrailer);
 
 // ---- the CARD library (port: GameCube only) ------------------------------------------------------
 

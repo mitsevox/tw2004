@@ -687,7 +687,7 @@ u8 fn_800D7770(int nPlayer, Award* pAward) {
 
 // Whether nValue and szName are among the top five of course k's record i. Never on a round whose
 // holes are not one course's 1..18.
-int fn_800D8458(int i, int nValue, const char* szName, int k) {
+u8 fn_800D8458(int i, int nValue, const char* szName, int k) {
     RecordEntry* pRec;
     int j;
 
@@ -709,7 +709,7 @@ int fn_800D8458(int i, int nValue, const char* szName, int k) {
 }
 
 // Whether nValue and szName are among the top five of all-time record recB[k][i].
-int fn_800D853C(int i, int nValue, const char* szName, int k) {
+u8 fn_800D853C(int i, int nValue, const char* szName, int k) {
     RecordEntry* pRec;
     int j;
 
@@ -723,7 +723,7 @@ int fn_800D853C(int i, int nValue, const char* szName, int k) {
 }
 
 // The same for recC[k][i].
-int fn_800D85DC(int i, int nValue, const char* szName, int k) {
+u8 fn_800D85DC(int i, int nValue, const char* szName, int k) {
     RecordEntry* pRec;
     int j;
 
