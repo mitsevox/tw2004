@@ -645,6 +645,32 @@ void fn_801296CC(u8* pBuffer, s32* pnOffset, u32 uSize, u16* sz, u16 uLanguage) 
     *pnOffset += uSize;
 }
 
+// Packs the totals into pBuffer (uSize bytes, cleared first): the save file's 'HEAD' record.
+void fn_80129754(EASBTotals* pTotals, u8* pBuffer, u32 uSize) {
+    s32 nOffset;
+
+    nOffset = 0;
+    memset(pBuffer, 0, uSize);
+    fn_80129290(pBuffer, &nOffset, 4, pTotals->u0, 0, 0xFFFFFFFF);
+    fn_80129290(pBuffer, &nOffset, 4, pTotals->u4, 0, 0xFFFFFFFF);
+    fn_80129290(pBuffer, &nOffset, 4, pTotals->u8, 0, 0xFFFFFFFF);
+    fn_80129290(pBuffer, &nOffset, 4, pTotals->uC, 0, pTotals->u8);
+    fn_80129290(pBuffer, &nOffset, 1, pTotals->nProducts, 1, 250);
+}
+
+// Unpacks the totals from a 'HEAD' record.
+void fn_80129828(EASBTotals* pTotals, u8* pBuffer) {
+    s32 nOffset;
+
+    nOffset = 0;
+    memset(pTotals, 0, sizeof(EASBTotals));
+    pTotals->u0 = fn_801293F8(pBuffer, &nOffset, 4, 0, 0xFFFFFFFF);
+    pTotals->u4 = fn_801293F8(pBuffer, &nOffset, 4, 0, 0xFFFFFFFF);
+    pTotals->u8 = fn_801293F8(pBuffer, &nOffset, 4, 0, 0xFFFFFFFF);
+    pTotals->uC = fn_801293F8(pBuffer, &nOffset, 4, 0, pTotals->u8);
+    pTotals->nProducts = fn_801293F8(pBuffer, &nOffset, 1, 0, 250);
+}
+
 // ---- sweep code (not yet cleaned up) ----
 
 s32 TagFile_Delete(s32*, s32, s32);
@@ -656,7 +682,6 @@ extern u8* lbl_802825B0;
 s32 TagFile_DeleteSession(u8*);
 s32 TagFile_End(u8*);
 s32 TagFile_Write(u8*, s32, u8, s32*, s32);
-s32 fn_80129754();
 s32 fn_80129D70(s32, s32, s32*, s32);
 s32 TagFile_FreeBuffer();
 s32 TagFile_Shutdown();
@@ -767,7 +792,7 @@ s32 fn_8012B004(s32* arg0) {
     }
     temp_r0 = *arg0;
     if (temp_r0 == 0) {
-        fn_80129754((*(u8**)((u8*)(lbl_802825B0) + 0x184)), (*(s32**)((u8*)(lbl_802825B0) + 0x9C)), (*(s32*)((u8*)(lbl_802825B0) + 0xA0)));
+        fn_80129754((*(EASBTotals**)((u8*)(lbl_802825B0) + 0x184)), (*(u8**)((u8*)(lbl_802825B0) + 0x9C)), (*(u32*)((u8*)(lbl_802825B0) + 0xA0)));
         TagFile_Write(lbl_802825B0 + 0x120, 0x48454144, 0U, (*(s32**)((u8*)(lbl_802825B0) + 0x9C)), 0x11);
         var_r4 = fn_8012C98C();
         *arg0 = 1;
