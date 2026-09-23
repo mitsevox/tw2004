@@ -3663,23 +3663,8 @@ GameMode15.c:
 GameMode16.c:
 	.text       start:0x800F4B40 end:0x800F5AAC
 
-unsorted/sweep_800F5D10.c:
-	.text       start:0x800F5D10 end:0x800F5D18
-
-unsorted/sweep_800F673C.c:
-	.text       start:0x800F673C end:0x800F6760
-
-unsorted/sweep_800F6760.c:
-	.text       start:0x800F6760 end:0x800F67E0
-
-unsorted/sweep_800F6820.c:
-	.text       start:0x800F6820 end:0x800F6848
-
-unsorted/sweep_800F6A00.c:
-	.text       start:0x800F6A00 end:0x800F6A08
-
-unsorted/sweep_800F6A34.c:
-	.text       start:0x800F6A34 end:0x800F6A60
+GameMode17.c:
+	.text       start:0x800F5AAC end:0x800F6A60
 
 unsorted/sweep_800F6D0C.c:
 	.text       start:0x800F6D0C end:0x800F6D14
