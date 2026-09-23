@@ -286,15 +286,15 @@ int fn_80049230(DynObj* pObj, int a, int b) {
 // Records the pair (a, b) on the object, in its first free pair; when all four are taken and
 // bOverflow is set, in lbl_801D5228 instead. 0 when it could not be recorded.
 int fn_80049298(DynObj* pObj, int a, int b, int bOverflow) {
-    int i;
+    int i = 0;
 
-    for (i = 0; i < 4; i++) {
+    do {
         if (pObj->a138[i].b0 == 0) {
             pObj->a138[i].b0 = a;
             pObj->a138[i].b1 = b;
             return 1;
         }
-    }
+    } while (++i < 4);
     if (bOverflow) {
         return fn_80049230(pObj, a, b);
     }
