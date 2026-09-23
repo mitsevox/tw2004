@@ -8,11 +8,6 @@
 
 extern u8 lbl_80282330;                     // the hole is being restarted
 
-typedef struct Vec4 {
-    f32 x, y, z, w;
-} Vec4;
-extern Vec4 lbl_80184DD0;                   // 0, 0, 0, 0.5
-
 void fn_800ED890(void);
 void fn_800ED8B8(void);
 void fn_800ED8E0(void);
@@ -130,9 +125,9 @@ void fn_800EDA34(int nPlayer) {
 
 // The player goes to "place ball", and the camera moves.
 void fn_800EDA74(void) {
-    Vec4 v = lbl_80184DD0;
+    f32 v[4] = {0.0f, 0.0f, 0.0f, 0.5f};
     GOLFERSTATE_Set(GS_PLACE_BALL, 0);
-    fn_80063B98(fn_80017028(gPlayers[0].nView[0]), 0.5f, (f32*)&v);
+    fn_80063B98(fn_80017028(gPlayers[0].nView[0]), 0.5f, v);
 }
 
 // The pad's sticks (beyond the 96..160 dead zone) scaled to -1..1 into the player's fA7C..fA84.

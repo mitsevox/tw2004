@@ -1756,11 +1756,11 @@ u8   fn_80077B18(void);
 // 0x4000 is set.
 void Options_SetDefaults(GameOptions* pOpt) {
     int i, j;
-    pOpt->unk0[0]  = 4;
-    pOpt->unk0[1]  = 4;
-    pOpt->unk0[2]  = 5;
-    pOpt->unk0[3]  = 1;
-    pOpt->unk0[4]  = 4;
+    pOpt->a0[0]  = 4;
+    pOpt->a0[1]  = 4;
+    pOpt->a0[2]  = 5;
+    pOpt->a0[3]  = 1;
+    pOpt->a0[4]  = 4;
     pOpt->a7[1]    = 1;
     pOpt->a7[2]    = 1;
     pOpt->bGimmes  = 1;
@@ -1815,15 +1815,15 @@ void Session_Init(void) {
     pSession->a8[0]     = 0;
     pSession->nC          = 0;
     pSession->nSplitScreen = 0;
-    pSession->unk11[0]    = 0;
-    pSession->unk11[1]    = 0;
+    pSession->b11         = 0;
+    pSession->b12         = 0;
     pSession->bReplay     = 0;
     pSession->n14       = 0;
     pSession->uFlags     &= ~0x60;
     pSession->fFrameTime  = 0.0f;
     pSession->f1C         = 0.0f;
     pSession->n20         = 0;
-    pSession->unk24       = 0;
+    pSession->nFrameCount = 0;
     pSession->n28         = 0;
     Options_SetDefaults(&gSession.options);
     gSession.nSeed = Rand_Next(0);

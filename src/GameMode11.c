@@ -58,12 +58,7 @@ s16 lbl_80192F2C[12 * 16] = {
     60, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 };
 
-typedef struct Vec4 {
-    f32 x, y, z, w;
-} Vec4;
-extern Vec4 lbl_80184E00;                   // 0, 0, 0, 0.5
-
-extern s32 lbl_802816D8;                    // the options' unkC, saved while the mode runs
+extern s32 lbl_802816D8;                    // the options' nC, saved while the mode runs
 extern u8  lbl_802823E0;
 extern u8  lbl_802823E1;
 extern u8  lbl_802823E2;
@@ -152,11 +147,11 @@ void fn_800FFF34(void) {
     gpGame->n10 = 1;
     gpGame->b276 = 1;
     fn_80055C1C(1);
-    lbl_8028240B = gSession.options.unk0[4];
+    lbl_8028240B = gSession.options.a0[4];
     lbl_8028240A = gSession.options.b84;
     lbl_80282409 = gSession.options.bBoostEnabled;
     lbl_80282408 = gSession.options.bSpinEnabled;
-    gSession.options.unk0[4] = 4;
+    gSession.options.a0[4] = 4;
     gSession.options.b84 = 0;
     gSession.options.bBoostEnabled = 1;
     gSession.options.bSpinEnabled = 1;
@@ -212,7 +207,7 @@ void fn_80100230(void) {
     fn_80055C1C(0);
     // fake match: &gSession re-taken inside the first store after the call, as the original
     // recomputes it
-    (pSession = &gSession)->options.unk0[4] = lbl_8028240B;
+    (pSession = &gSession)->options.a0[4] = lbl_8028240B;
     (pSession)->options.b84 = lbl_8028240A;
     (pSession)->options.bBoostEnabled = lbl_80282409;
     (pSession)->options.bSpinEnabled = lbl_80282408;
@@ -517,9 +512,8 @@ static inline int Hint(void) {
 // 7 the player's tries with their hints, 8..11 a failed try, 12 a passed one, 13..19 the screens
 // between lessons.
 void fn_80100C08(void) {
-    Vec4 v;
+    f32 v[4] = {0.0f, 0.0f, 0.0f, 0.5f};
     int nView;
-    v = lbl_80184E00;
     if (lbl_802823F8) {
         fn_800E58B4(39);
         lbl_802823F8 = 0;
@@ -538,7 +532,7 @@ void fn_80100C08(void) {
             if (lbl_80282424 == 13) {
                 lbl_80282428 = 18;
                 lbl_80282424 = 13;
-                fn_80063BF4(fn_80017028(gPlayers[0].nView[0]), 0.25f, &v.x);
+                fn_80063BF4(fn_80017028(gPlayers[0].nView[0]), 0.25f, v);
             }
         }
         break;
@@ -806,7 +800,7 @@ void fn_80100C08(void) {
         lbl_80282428 = 1;
         break;
     case 13:
-        gSession.unk11[1] = 1;
+        gSession.b12 = 1;
         EVENT_Trigger(0, 5, 0, -1);
         break;
     case 17:

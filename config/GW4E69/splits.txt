@@ -2891,6 +2891,7 @@ GameRound.c:
 
 GameUI.c:
 	.text       start:0x800E3B28 end:0x800E4FFC
+	.rodata     start:0x80184D90 end:0x80184DA0
 	.data       start:0x80192558 end:0x80192588
 	.sdata2     start:0x80284628 end:0x80284630
 
@@ -2905,6 +2906,7 @@ GameAnalysis.c:
 
 GameModeAlternateShot.c:
 	.text       start:0x800E68F0 end:0x800E7980
+	.rodata     start:0x80184DA0 end:0x80184DB0
 	.sdata2     start:0x80284648 end:0x80284650
 
 GameModeBattle.c:
@@ -2925,6 +2927,7 @@ GameMode5.c:
 
 GameMode9.c:
 	.text       start:0x800ED738 end:0x800EDD18
+	.rodata     start:0x80184DD0 end:0x80184DE0
 	.sdata2     start:0x80284670 end:0x80284688
 
 GameModeDriverPGATour.c:
@@ -2989,10 +2992,12 @@ GameMode12.c:
 
 GameModeStroke.c:
 	.text       start:0x800FF700 end:0x800FFF34
+	.rodata     start:0x80184DF0 end:0x80184E00
 	.sdata2     start:0x802847E0 end:0x802847E8
 
 GameMode11.c:
 	.text       start:0x800FFF34 end:0x80101FEC
+	.rodata     start:0x80184E00 end:0x80184E10
 	.data       start:0x80192D20 end:0x80193130
 	.sdata2     start:0x802847E8 end:0x80284808
 
