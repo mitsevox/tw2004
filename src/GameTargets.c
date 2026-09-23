@@ -8,11 +8,6 @@
 #include "golfer.h"
 #include "ball.h"
 
-// EA's build addressed each global separately; with data pooling on (CodeWarrior's default),
-// fn_800F266C would reach its three tables through one shared base. Every game unit still matches
-// with this set globally, so it is probably a project-wide setting (see the report).
-#pragma pool_data off
-
 // The target list (see GameMode10.c): up to lbl_80282360 points (w = 1).
 extern f32 lbl_80211D38[][4];
 extern s8  lbl_80282360;
