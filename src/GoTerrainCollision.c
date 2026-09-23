@@ -2022,6 +2022,7 @@ void fn_80050794(CourseInfo* pCourse) {
 }
 
 // The difference a - b of two three-float vectors, into pOut.
+#ifdef __MWERKS__
 asm void fn_8005097C(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
@@ -2034,8 +2035,17 @@ asm void fn_8005097C(register f32* pA, register f32* pB, register f32* pOut) {
     psq_st f3, 8(pOut), 1, 0
     blr
 }
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void fn_8005097C(f32* pA, f32* pB, f32* pOut) {
+    pOut[0] = pA[0] - pB[0];
+    pOut[1] = pA[1] - pB[1];
+    pOut[2] = pA[2] - pB[2];
+}
+#endif
 
 // A three-float vector negated, into pOut.
+#ifdef __MWERKS__
 asm void fn_800509A0(register f32* pA, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
@@ -2046,8 +2056,17 @@ asm void fn_800509A0(register f32* pA, register f32* pOut) {
     psq_st f1, 8(pOut), 1, 0
     blr
 }
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void fn_800509A0(f32* pA, f32* pOut) {
+    pOut[0] = -pA[0];
+    pOut[1] = -pA[1];
+    pOut[2] = -pA[2];
+}
+#endif
 
 // A four-float vector negated, into pOut.
+#ifdef __MWERKS__
 asm void fn_800509BC(register f32* pA, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
@@ -2058,6 +2077,15 @@ asm void fn_800509BC(register f32* pA, register f32* pOut) {
     psq_st f1, 8(pOut), 0, 0
     blr
 }
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void fn_800509BC(f32* pA, f32* pOut) {
+    pOut[0] = -pA[0];
+    pOut[1] = -pA[1];
+    pOut[2] = -pA[2];
+    pOut[3] = -pA[3];
+}
+#endif
 
 // TW06: Ter_GetBarycentricCoords (an inline in goterrainutils.h there). The weights of a point
 // against a triangle's three corners, in the x-z plane.

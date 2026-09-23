@@ -2205,6 +2205,7 @@ void fn_80055E28(f32 fAngle, f32* pSin, f32* pCos) {
 }
 
 // b + a into out (three floats)
+#ifdef __MWERKS__
 asm void fn_80055E7C(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
@@ -2217,8 +2218,17 @@ asm void fn_80055E7C(register f32* pA, register f32* pB, register f32* pOut) {
     psq_st f3, 8(pOut), 1, 0
     blr
 }
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void fn_80055E7C(f32* pA, f32* pB, f32* pOut) {
+    pOut[0] = pB[0] + pA[0];
+    pOut[1] = pB[1] + pA[1];
+    pOut[2] = pB[2] + pA[2];
+}
+#endif
 
 // a - b into out (three floats)
+#ifdef __MWERKS__
 asm void fn_80055EA0(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
@@ -2231,8 +2241,17 @@ asm void fn_80055EA0(register f32* pA, register f32* pB, register f32* pOut) {
     psq_st f3, 8(pOut), 1, 0
     blr
 }
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void fn_80055EA0(f32* pA, f32* pB, f32* pOut) {
+    pOut[0] = pA[0] - pB[0];
+    pOut[1] = pA[1] - pB[1];
+    pOut[2] = pA[2] - pB[2];
+}
+#endif
 
 // b scaled by a . b into out (b's fourth float included)
+#ifdef __MWERKS__
 asm void fn_80055EC4(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
     psq_l    f0, 0(pA), 0, 0
@@ -2249,8 +2268,19 @@ asm void fn_80055EC4(register f32* pA, register f32* pB, register f32* pOut) {
     psq_st   f3, 8(pOut), 0, 0
     blr
 }
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void fn_80055EC4(f32* pA, f32* pB, f32* pOut) {
+    f32 fDot = pA[2] * pB[2] + (pA[0] * pB[0] + pA[1] * pB[1]);
+    pOut[0] = pB[0] * fDot;
+    pOut[1] = pB[1] * fDot;
+    pOut[2] = pB[2] * fDot;
+    pOut[3] = pB[3] * fDot;
+}
+#endif
 
 // -a into out (three floats)
+#ifdef __MWERKS__
 asm void fn_80055EF8(register f32* pA, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
@@ -2261,6 +2291,14 @@ asm void fn_80055EF8(register f32* pA, register f32* pOut) {
     psq_st f1, 8(pOut), 1, 0
     blr
 }
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void fn_80055EF8(f32* pA, f32* pOut) {
+    pOut[0] = -pA[0];
+    pOut[1] = -pA[1];
+    pOut[2] = -pA[2];
+}
+#endif
 
 void fn_80055F14(void) {
 }

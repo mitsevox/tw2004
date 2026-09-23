@@ -69,10 +69,6 @@ enum { SFIO_STATE_BUSY_A = 0xB, SFIO_STATE_BUSY_B = 0xC, SFIO_STATE_BUSY_C = 0xD
 extern void  fn_8012C8D0(void* pLock, int unused);
 extern int   TagFile_SetDescriptor(void* pDescriptor);
 extern int   fn_8012C98C(int eError);
-extern void* memcpy(void* pDst, const void* pSrc, u32 uLen);
-extern void* memset(void* pDst, int c, u32 uLen);
-extern char* strcpy(char* pDst, const char* pSrc);
-extern u32   strlen(const char* p);
 extern void  fn_80172FA4(int);
 extern void  fn_80171308(int eDevice, void* pInfo);
 extern void  fn_80172D7C(void* pDescriptor, void* pA, void* pB);

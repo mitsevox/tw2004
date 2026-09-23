@@ -29,6 +29,54 @@ PORT = [
     ('port-literal-size', re.compile(r'\b(Mem_cpy|memcpy|memset|fn_80005AE8)\s*\([^;]*,\s*(0x[0-9A-Fa-f]{2,}|\d{3,})\s*\)')),
     ('port-frame-rate', re.compile(r'\b59\.94|\b0\.01668')),
 ]
+# port-asm-no-fallback: CodeWarrior-only code with no plain-C version for a port. An `asm` function
+# must sit under `#ifdef __MWERKS__` with an `#else` holding a C version; a compiler intrinsic
+# (__cntlzw, ...) needs a C fallback in game_types.h or platform.h. Exempt with `port: <why>`.
+INTRINSIC = re.compile(r'\b(__cntlzw|__rlwimi|__rlwinm|__lwbrx|__lhbrx|__stwbrx|__sthbrx|__fabs|__fnabs|'
+                       r'__frsqrte|__fres|__fmadd|__fmsub|__fnmadd|__fnmsub|__fsel|__dcbf|__dcbt|__dcbz|'
+                       r'__dcbst|__icbi|__sync|__eieio|__isync)\s*\(')
+
+
+def intrinsic_fallbacks():
+    """Intrinsics that game_types.h or platform.h define as plain C for a port."""
+    out = set()
+    for h in ('game_types.h', 'platform.h'):
+        f = ROOT / 'include' / h
+        if f.exists():
+            t = f.read_text(encoding='utf-8', errors='replace')
+            out |= set(re.findall(r'^(?:static\s+inline\s+[\w \*]+?|#define\s+)(__\w+)\s*\(', t, re.M))
+    return out
+
+
+def asm_fallback_hits(lines):
+    """Lines of asm functions and intrinsics with no plain-C version (port-asm-no-fallback)."""
+    hits, stack, have = [], [], intrinsic_fallbacks()
+    for i, l in enumerate(lines, 1):
+        s = l.strip()
+        exempt = 'port:' in l or (i > 1 and 'port:' in lines[i - 2])
+        if re.match(r'#\s*if', s):
+            stack.append({'mw': re.match(r'#\s*(ifdef\s+__MWERKS__|if\s+defined\s*\(?\s*__MWERKS__)', s)
+                          is not None, 'else': False, 'asm': []})
+        elif re.match(r'#\s*(else|elif)', s) and stack:
+            stack[-1]['else'] = True
+        elif re.match(r'#\s*endif', s) and stack:
+            blk = stack.pop()
+            if not blk['else']:
+                hits += blk['asm']
+        elif re.match(r'^asm\b', l) and not exempt:
+            blk = next((b for b in reversed(stack) if b['mw']), None)
+            hit = (i, 'port-asm-no-fallback', s)
+            if blk is None:
+                hits.append(hit)
+            elif not blk['else']:
+                blk['asm'].append(hit)
+        else:
+            m = INTRINSIC.search(l)
+            if m and m.group(1) not in have and not exempt and not s.startswith('//'):
+                hits.append((i, 'port-asm-no-fallback', s))
+    return hits
+
+
 # The statement after the condition is return/break/continue. Checked separately: a regex
 # lookahead after `\(.*\)` can backtrack to an inner parenthesis of the condition.
 EARLY_EXIT = re.compile(r'\)\s*(return\b[^;]*|break|continue);\s*(//.*)?$')
@@ -92,6 +140,7 @@ def lint(path, protos):
             elif '//' not in m.group(4):
                 hits.append((i, 'proto-mismatch', '%s differs from %s with no comment saying why'
                              % (m.group(2), hname)))
+    hits += [h for h in asm_fallback_hits(lines) if h[0] not in raw_sweep]
     return hits + ub_check(path, lines)
 
 

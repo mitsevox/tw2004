@@ -227,10 +227,10 @@ void Skalib_Init(void) {
     lbl_80281CC8 = lbl_801C5C50;
     lbl_80281CCC = lbl_801BF9C0;
     lbl_80281CD0 = lbl_801B9730;
-    lbl_80281CC4 = (u8*)((((u32)lbl_80281CC4 >> 5) + 1) << 5);
-    lbl_80281CC8 = (u8*)((((u32)lbl_80281CC8 >> 5) + 1) << 5);
-    lbl_80281CCC = (u8*)((((u32)lbl_80281CCC >> 5) + 1) << 5);
-    lbl_80281CD0 = (u8*)((((u32)lbl_80281CD0 >> 5) + 1) << 5);
+    lbl_80281CC4 = (u8*)((((uptr)lbl_80281CC4 >> 5) + 1) << 5);
+    lbl_80281CC8 = (u8*)((((uptr)lbl_80281CC8 >> 5) + 1) << 5);
+    lbl_80281CCC = (u8*)((((uptr)lbl_80281CCC >> 5) + 1) << 5);
+    lbl_80281CD0 = (u8*)((((uptr)lbl_80281CD0 >> 5) + 1) << 5);
 }
 
 void AnimLib_Free(AnimLib* pLib);
@@ -1391,8 +1391,8 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
             pRec = &pSrc->pRecords[i];
             if (pRec->n10 <= 0 || pRec->n18 == 0) continue;
             pBank->ppClips[pSlot->n150] = pEnd;
-            fn_80020BC8(pData + (u32)pSrc->pRecords[i].pClip);
-            pClipSrc = pData + (u32)pSrc->pRecords[i].pClip;
+            fn_80020BC8(pData + (uptr)pSrc->pRecords[i].pClip);
+            pClipSrc = pData + (uptr)pSrc->pRecords[i].pClip;
             pHdr     = (Clip*)pEnd;
             nHdr     = ((Clip*)pClipSrc)->pD0 - pClipSrc;
             Mem_cpy(pEnd, pClipSrc, nHdr);
@@ -1403,7 +1403,7 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
                 pOut += ((Clip*)pClipSrc)->n2C;
                 nCopied = nHdr + ((Clip*)pClipSrc)->n2C;
             }
-            uPad = 16 - ((u32)pOut & 15);
+            uPad = 16 - ((uptr)pOut & 15);
             if (uPad == 16) uPad = 0;
             if (uPad != 0) {
                 Mem_cpy(pOut, aPad, uPad);
@@ -1871,7 +1871,7 @@ AnimLib* AnimLib_Load(u8* pData, ClipBank* pBank) {
     u8*       p;
     int       i;
 
-    uPad = 16 - ((u32)pData & 15);
+    uPad = 16 - ((uptr)pData & 15);
     if (uPad == 16) uPad = 0;
     pLib        = (AnimLib*)(pData + uPad);
     pLib->pFile = pData;
@@ -1890,14 +1890,18 @@ AnimLib* AnimLib_Load(u8* pData, ClipBank* pBank) {
         if (pLib->uId != pBank->uId) {
             for (i = 0; i < pLib->nClips; i++) pLib->ppClips[i] = pBank->ppClips[0];
         } else {
-            for (i = 0; i < pLib->nClips; i++) pLib->ppClips[i] = pBank->ppClips[(u32)pLib->ppClips[i]];
+            for (i = 0; i < pLib->nClips; i++) {
+                pLib->ppClips[i] = pBank->ppClips[(uptr)pLib->ppClips[i]];
+            }
         }
         pLib->pBank = pBank;
     } else {
         pLib->pIndex  = (s16*)p;
         p += pLib->nClips * 2;
         pLib->nClips2 = pLib->nClips;
-        if ((u32)p & 15) p = (u8*)((((u32)p >> 4) + 1) << 4);
+        if ((uptr)p & 15) {
+            p = (u8*)((((uptr)p >> 4) + 1) << 4);
+        }
         pLib->pRecords = (ClipRecord*)p;
         p += pLib->nRecords * sizeof(ClipRecord);
         pLib->pTree = p;
@@ -1907,11 +1911,14 @@ AnimLib* AnimLib_Load(u8* pData, ClipBank* pBank) {
         pDst = pSrc = pLib->pRecords;
         fn_8001F08C(&pSrc, &pDst, recFmt, 7, pLib->nRecords);
         if (pLib->uFlags & 1) {
-            if ((u32)p & 15) p = (u8*)((((u32)p >> 4) + 1) << 4);
+            if ((uptr)p & 15) {
+                p = (u8*)((((uptr)p >> 4) + 1) << 4);
+            }
             pLib->pClipData = p;
             pLib->ppClips   = fn_80009B34(pLib->nClips * 4, 2, 0x40, "skalib.c", 4164);
             for (i = 0; i < pLib->nRecords; i++) {
-                pLib->pRecords[i].pClip = fn_80020DD4(pLib->pClipData + (u32)pLib->pRecords[i].pClip, NULL, 16);
+                pLib->pRecords[i].pClip =
+                    fn_80020DD4(pLib->pClipData + (uptr)pLib->pRecords[i].pClip, NULL, 16);
             }
             for (i = 0; i < pLib->nClips; i++) pLib->ppClips[i] = pLib->pRecords[pLib->pIndex[i]].pClip;
         } else {
@@ -1935,7 +1942,7 @@ ClipBank* ClipBank_Load(u8* pFile, u32 uAlign) {
     u8*       pData;
 
     pData = pFile;
-    uPad = uAlign - ((u32)pData & (uAlign - 1));
+    uPad = uAlign - ((uptr)pData & (uAlign - 1));
     if (uPad == uAlign) uPad = 0;
     pBank = (ClipBank*)(pData + uPad);
     ClipBank_SwapHeader(pBank);
@@ -1945,11 +1952,11 @@ ClipBank* ClipBank_Load(u8* pFile, u32 uAlign) {
     pSrc = pBank->ppClips;
     fn_80076158(&pSrc, pBank->ppClips, pBank->nClips * 4, 4);
     pData += pBank->nClips * 4;
-    uPad = 16 - ((u32)pData & 15);
+    uPad = 16 - ((uptr)pData & 15);
     if (uPad == 16) uPad = 0;
     pData += uPad;
     for (i = 0; i < pBank->nClips; i++) {
-        pBank->ppClips[i] = fn_80020DD4(pData + (u32)pBank->ppClips[i], &uUnused, 16);
+        pBank->ppClips[i] = fn_80020DD4(pData + (uptr)pBank->ppClips[i], &uUnused, 16);
     }
     return pBank;
 }
