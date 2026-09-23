@@ -75,7 +75,7 @@ longer copy exists on either disc (searched 2026-09-23). Most folders are the fi
 | 01, 02 | Tiger Woods, Sunday Tiger | `…ERWOODS` | HT, HS | S is likely Sunday; H unexplained |
 | 08, 30 | created male / female | `…ALECRAP` | MR, FR | MALECRAP / FEMALECRAP |
 
-`glbchar.gcb` holds `…TA_GLOBAL\FLAG\FLAG.CHG` (the pin flag).
+`glbchar.gcb` holds `…TA_GLOBAL\FLAG\FLAG.CHG` (a flag model, presumably the pin flag).
 
 **Column names (confirmed from code).** The front-end data (`Data/Fend/FEnd.gcb`, `DATS`
 object) carries the attribute screen's names and tooltips and a debug options menu that lists
