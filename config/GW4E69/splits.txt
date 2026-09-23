@@ -3460,12 +3460,19 @@ dolphin/ar/ar.c:
 
 libs/dolphin/src/ar/arq.c:
 	.text       start:0x8013538C end:0x80135810
+	.data       start:0x80195DE8 end:0x80195E30
+	.sdata      start:0x802819E0 end:0x802819E8
+	.sbss       start:0x80282660 end:0x80282690
 
 src/ax/AX.c:
 	.text       start:0x80135810 end:0x8013584C
+	.data       start:0x80195E30 end:0x80195E78
+	.sdata      start:0x802819E8 end:0x802819F0
 
 src/ax/AXAlloc.c:
 	.text       start:0x8013584C end:0x80135BE0
+	.bss        start:0x80261460 end:0x80261560
+	.sbss       start:0x80282690 end:0x80282698
 
 src/ax/AXAux.c:
 	.text       start:0x80135BE0 end:0x80136058
@@ -3616,12 +3623,16 @@ dolphin/gx/GXTev.c:
 
 dolphin/gx/GXPixel.c:
 	.text       start:0x801442C4 end:0x80144898
+	.data       start:0x8019A410 end:0x8019A430
+	.sdata2     start:0x80284C00 end:0x80284C30
 
 dolphin/gx/GXStubs.c:
 	.text       start:0x80144898 end:0x8014489C
 
 src/gx/GXDisplayList.c:
 	.text       start:0x8014489C end:0x80144AA8
+	.bss        start:0x8027AC40 end:0x8027B160
+	.sbss       start:0x80282890 end:0x80282898
 
 src/gx/GXTransform.c:
 	.text       start:0x80144AA8 end:0x80145140
@@ -3759,9 +3770,12 @@ runtime/runtime.c:
 
 src/Runtime.PPCEABI.H/GCN_mem_alloc.c:
 	.text       start:0x801520F8 end:0x801521B0
+	.rodata     start:0x80184FE8 end:0x80185060
 
 src/MSL_C/PPCEABI/bare/H/abort_exit.c:
 	.text       start:0x801521B0 end:0x801522A0
+	.bss        start:0x8027D4C0 end:0x8027D5C0
+	.sbss       start:0x802829E0 end:0x802829F0
 
 src/MSL_C/PPCEABI/bare/H/alloc.c:
 	.text       start:0x801522A0 end:0x80152754
@@ -3798,7 +3812,7 @@ runtime/mem.c:
 	.text       start:0x80156C78 end:0x80156DE8
 
 src/MSL_C/PPCEABI/bare/H/mem_funcs.c:
-	.text       start:0x80156DE8 end:0x80156F54
+	.text       start:0x80156DE8 end:0x801570B8
 
 runtime/misc_io.c:
 	.text       start:0x801570B8 end:0x801570C8
@@ -3818,6 +3832,7 @@ src/MSL_C/strtold.c:
 
 src/MSL_C/strtoul.c:
 	.text       start:0x8015B8DC end:0x8015C120
+	.data       start:0x8019CCC0 end:0x8019CD48
 
 unsorted/sweep_8015C120.c:
 	.text       start:0x8015C120 end:0x8015C128
@@ -3851,6 +3866,8 @@ runtime/e_log.c:
 
 src/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common_Embedded/Math/Double_precision/e_pow.c:
 	.text       start:0x8015D03C end:0x8015D8F0
+	.rodata     start:0x80185588 end:0x801855B8
+	.sdata2     start:0x80284EB8 end:0x80284FC8
 
 runtime/e_rem_pio2.c:
 	.text       start:0x8015D8F0 end:0x8015DC90
@@ -3922,6 +3939,8 @@ MetroTRK/nubevent.c:
 
 MetroTRK/nubinit.c:
 	.text       start:0x8015FBF0 end:0x8015FD88
+	.rodata     start:0x80185890 end:0x801858C0
+	.bss        start:0x8027D920 end:0x8027D928
 
 MetroTRK/msg.c:
 	.text       start:0x8015FD88 end:0x8015FDCC
@@ -3929,15 +3948,21 @@ MetroTRK/msg.c:
 
 MetroTRK/msgbuf.c:
 	.text       start:0x8015FDCC end:0x80160608
+	.rodata     start:0x801858E8 end:0x80185908
+	.bss        start:0x8027D928 end:0x8027F2D8
 
 MetroTRK/serpoll.c:
 	.text       start:0x80160608 end:0x801608C0
+	.rodata     start:0x80185908 end:0x80185A98
+	.bss        start:0x8027F2D8 end:0x8027F2F0
 
 MetroTRK/usr_put.c:
 	.text       start:0x801608C0 end:0x8016094C
 
 MetroTRK/dispatch.c:
 	.text       start:0x8016094C end:0x80160AC4
+	.rodata     start:0x80185A98 end:0x80185AD8
+	.data       start:0x8019CD48 end:0x8019CDB8
 
 MetroTRK/msghndlr.c:
 	.text       start:0x80160AC4 end:0x80161A94
@@ -3961,11 +3986,11 @@ runtime/__mem.c:
 	.init       start:0x800033A8 end:0x800034E0
 
 MetroTRK/mem_TRK.c:
-	.init       start:0x80003510 end:0x80003534
-	.text       start:0x801622B0 end:0x80162378
+	.init       start:0x800034E0 end:0x80003534
+	.text       start:0x801622B0 end:0x80162368
 
 MetroTRK/targimpl.c:
-	.text       start:0x80162378 end:0x80163DD0
+	.text       start:0x80162368 end:0x80163DB0
 
 MetroTRK/mpc_7xx_603e.c:
 	.text       start:0x80163DD0 end:0x80164140
@@ -3993,6 +4018,7 @@ MetroTRK/targcont.c:
 
 MetroTRK/target_options.c:
 	.text       start:0x801649AC end:0x801649C8
+	.bss        start:0x8027F890 end:0x8027F898
 
 MetroTRK/mslsupp.c:
 	.text       start:0x801649C8 end:0x80164B40
@@ -4063,6 +4089,7 @@ Common/TagFile/TagFile.c:
 
 src/gba/GBA.c:
 	.text       start:0x80176270 end:0x80176280
+	.sbss       start:0x80282A38 end:0x80282A40
 
 src/card/CARDBios.c:
 	.text       start:0x80176A38 end:0x80177DA4

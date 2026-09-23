@@ -3,6 +3,6 @@
 #include "game_types.h"
 
 
-void fn_80165524(void);
-void fn_80165524(void) {
+void MWInitializeCriticalSection(void);
+void MWInitializeCriticalSection(void) {
 }
