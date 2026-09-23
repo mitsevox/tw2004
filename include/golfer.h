@@ -215,7 +215,8 @@ typedef struct Player {
     // exactly. Only strokes and matchwins are confirmed by our code so far.
     s32  nStrokes[18];          // 0x154  strokes taken per hole
     s32  nPutts[18];            // 0x19C  putts per hole (GM_PlayerAddStroke). TW06: putts
-    u8   unk1E4[0x278 - 0x1E4]; // 0x1E4  TW06: modepoints[18], skinwin[18] (0x22C), skinwins (0x274)
+    s32  nModePoints[18];       // 0x1E4  per hole, the mode's points (match play: 1 = hole won). TW06: modepoints
+    u8   unk22C[0x278 - 0x22C]; // 0x22C  TW06: skinwin[18], skinwins (0x274)
     s32  nHolesWon;             // 0x278  match play. TW06: matchwins
     u8   unk27C[0x28C - 0x27C]; // 0x27C  TW06: roundscore[4]
     u8   unk28C;                // 0x28C  TW06: playercut
@@ -277,7 +278,10 @@ typedef struct Player {
     s32  nRehearseState;        // 0xC30  AI_RehearseShot state machine
     u8   unkC34[0xC58 - 0xC34];
     s32  nC58;                  // 0xC58
-    u8   unkC5C[0xEE8 - 0xC5C];
+    u8   unkC5C[0xEE0 - 0xC5C];
+    u8   bEE0;                  // 0xEE0
+    u8   unkEE1[3];
+    s32  nEE4;                  // 0xEE4  2 or 3 picks a message after a shot (GM_PlayerTookShot)
     u32  uFlags;                // 0xEE8
     u8   unkEEC[0xEF0 - 0xEEC];
     u32  uFlagsEF0;             // 0xEF0  bit 1: target is over water

@@ -71,6 +71,53 @@ u8    Ter_SearchAreaForDropLocation(int nPlayer, int a, int b, f32* pOut);
 u8    Physics_DropBall(u8* pBall, f32* pPos);
 void  fn_80055AA8(u8* pBall, f32* pPos, int nPlayer);
 
+u8    fn_800E23EC(void);
+void  fn_800E0AC4(int a);
+void  fn_800E0A98(int a);
+void  fn_800D8FE4(int nPlayer);
+void  fn_800D3DDC(int nPlayer);
+void  fn_800DA48C(int nPlayer);
+u8    fn_800DA2AC(void);
+void  fn_800DAD54(void);
+u8    fn_800DA174(void);
+u8    fn_800DA1D4(void);
+void  fn_800E4364(int a, int b, int c, int d);
+u8    fn_800E2DB4(int nPlayer);
+void  fn_800D9458(int nPlayer);
+void  fn_800D4030(int nPlayer);
+void  GM_CheckBallForUIHints(int nPlayer);
+u8    fn_800E23B0(int nPlayer, int nStrokes);
+u8    fn_8008AC40(void);
+int   Game_CurHoleIndex(void);
+void  fn_800D9350(int nPlayer);
+int   fn_800D2B08(void);                    // the hole's par
+u8    fn_800E53B8(void);
+int   GOLFERSTATE_GetCurrentState(int nPlayer);
+void  GOLFERSTATE_Switch(int nState, int nPlayer);
+void  fn_800BB0A8(void);
+void  fn_800335F8(int a);
+void  fn_800A76E4(void);
+void  fn_8006C4C0(int nPlayer);
+void  fn_8006C4A0(void);
+void  fn_800C70F8(void* pView, int a);
+void  fn_800957D8(int nHandle);
+void  fn_800957FC(int nHandle, int a);
+u8*   fn_80016CFC(int nView);
+int   fn_80015464(void);
+CourseInfo* fn_8000C594(void);
+void  fn_800E0AF0(f32* pFrom, f32* pTo, f32* pOut);
+f32   fn_80009744(f32* pVec);               // dot with itself
+u32   Rand_Next(int nStream);
+
+extern u8  gReplayData[];                   // 0x801D6030
+extern u8* lbl_80281F78;
+
+// The tee positions follow the pins in the per-hole data (fn_8000C594).
+typedef struct HoleTees {
+    u8     unk0[0xB0];
+    PinPos tee[4];                          // 0xB0  one per tee set
+} HoleTees;
+
 extern u8  lbl_80202898[];
 extern s32 lbl_80282278;
 extern u8  lbl_8028227C;
@@ -397,6 +444,27 @@ u8 GM_CheckForBallOOB(int nPlayer) {
     return 0;
 }
 
+// TW06: GM_CheckBallForUIHints. The score message after holing out: a hole in one, or strokes
+// against par from albatross (-3, message 5) to triple bogey (+3, message 11), else "+N".
+void GM_CheckBallForUIHints(int nPlayer) {
+    int nDiff;
+    if (gPlayers[nPlayer].nStrokes[gpGame->nCurHole] == 1) {
+        fn_800E4164(4, nPlayer, 0.0f);
+        return;
+    }
+    nDiff = gPlayers[nPlayer].nStrokes[gpGame->nCurHole] - fn_800D2B08();
+    switch (nDiff) {
+    case -3: fn_800E4164(5, nPlayer, 0.0f); break;
+    case -2: fn_800E4164(6, nPlayer, 0.0f); break;
+    case -1: fn_800E4164(7, nPlayer, 0.0f); break;
+    case 0:  fn_800E4164(8, nPlayer, 0.0f); break;
+    case 1:  fn_800E4164(9, nPlayer, 0.0f); break;
+    case 2:  fn_800E4164(10, nPlayer, 0.0f); break;
+    case 3:  fn_800E4164(11, nPlayer, 0.0f); break;
+    default: fn_800E4164(12, nPlayer, nDiff); break;
+    }
+}
+
 // TW06: GM_ShowYardage. With the mode's yardage display on: how far the ball went, flat.
 void GM_ShowYardage(int nPlayer) {
     if (gpGame->bShowYardage) {
@@ -432,6 +500,162 @@ void GM_BumpBallForObstructions(int nPlayer) {
             }
         }
     }
+}
+
+// TW06: GM_PlayerTookShot. After every shot: replay bookkeeping, the stroke, the out-of-bounds
+// check, then - if the ball is in play - holed (score message, the mode's hook), or the hole's
+// stroke limit reached (the ball is picked up: lie "holed", 10 or 11 strokes, putts 999), or a
+// mode message, or the yardage. Out of bounds goes to the mode's hook instead.
+void GM_PlayerTookShot(int nPlayer) {
+    u8   bOut;
+    if (fn_800E23EC() && !(gPlayers[nPlayer].uFlags & 8)) {
+        fn_800E0AC4(1);
+    }
+    if (!Player_IsCPU(nPlayer) && gSession.nSplitScreen == 0 && gpGame->b287 && gReplayData[0xF10]) {
+        fn_800E0A98(1);
+    }
+    GM_PlayerAddStroke(nPlayer);
+    bOut = GM_CheckForBallOOB(nPlayer);
+    if (!bOut) {
+        fn_800D8FE4(nPlayer);
+        fn_800D3DDC(nPlayer);
+    }
+    fn_800DA48C(nPlayer);
+    if (fn_800DA2AC()) {
+        fn_800DAD54();
+        if (fn_800DA174()) {
+            fn_800E4364(1, 10, 0, 0);
+        }
+        if (fn_800DA1D4()) {
+            fn_800E4364(1, 11, 0, 0);
+        }
+    }
+    if (!bOut) {
+        if (fn_800E2DB4(nPlayer)) {
+            fn_800D9458(nPlayer);
+            fn_800D4030(nPlayer);
+            GM_CheckBallForUIHints(nPlayer);
+            gpGame->pfn218(nPlayer);
+        } else {
+            if (fn_800E23B0(nPlayer, gPlayers[nPlayer].nStrokes[gpGame->nCurHole])) {
+                gPlayers[nPlayer].nLie = LIE_HOLED;
+                gPlayers[nPlayer].unkC2D = 1;
+                if (fn_800EE470()) {
+                    gPlayers[nPlayer].nStrokes[gpGame->nCurHole] = 10;
+                } else {
+                    gPlayers[nPlayer].nStrokes[gpGame->nCurHole] = 11;
+                }
+                gPlayers[nPlayer].nPutts[gpGame->nCurHole] = 999;
+                fn_800D9458(nPlayer);
+                fn_800E4164(3, nPlayer, 0.0f);
+                gpGame->pfn218(nPlayer);
+                gpGame->pfn21C(nPlayer);
+            } else if (fn_8008AC40() && gPlayers[nPlayer].bEE0) {
+                int n = gPlayers[nPlayer].nEE4;
+                if (n == 3) {
+                    fn_800E4164(0x13, nPlayer, n);
+                    if (nPlayer == 0) {
+                        gPlayers[1].nModePoints[Game_CurHoleIndex()] = 1;
+                        gPlayers[1].nHolesWon++;
+                    } else {
+                        gPlayers[0].nModePoints[Game_CurHoleIndex()] = 1;
+                        gPlayers[0].nHolesWon++;
+                    }
+                } else if (n == 2) {
+                    fn_800E4164(0x12, nPlayer, n);
+                } else {
+                    fn_800E4164(0x11, nPlayer, n);
+                }
+            } else {
+                GM_ShowYardage(nPlayer);
+            }
+        }
+    } else {
+        gpGame->pfn250(nPlayer);
+    }
+    fn_800D9350(nPlayer);
+}
+
+// Taking a mulligan. Not allowed when mulligans are off, the hole was conceded, or fn_800E53B8
+// says no; in mulligan mode 2 each player gets one (0xC28). The shot is undone: effects stopped,
+// the mode told, the golfer back in the Swing state, and the views of other players sharing this
+// screen (and still playing the hole) updated.
+u8 GM_PlayerTakeMulligan(int nPlayer) {
+    int     i;
+    Player* q;
+    if (fn_800E177C() == 0) {
+        return 0;
+    }
+    if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) == GS_CONCEDED) {
+        return 0;
+    }
+    if (fn_800E53B8()) {
+        return 0;
+    }
+    if (fn_800E177C() == 2) {
+        if (gPlayers[nPlayer].unkC28) {
+            return 0;
+        }
+        gPlayers[nPlayer].unkC28 = 1;
+    }
+    fn_800BB0A8();
+    fn_800E4204();
+    fn_800335F8(1);
+    fn_800A76E4();
+    fn_8006C4C0(nPlayer);
+    gPlayers[nPlayer].unkC2E = 1;
+    gPlayers[nPlayer].unkC2F = 1;
+    gpGame->pfn254(nPlayer);
+    if (gSession.bReplay) {
+        fn_8006C4A0();
+    }
+    fn_800C70F8(fn_80017028(gPlayers[nPlayer].nView0), 1);
+    fn_800957D8(gPlayers[nPlayer].nShotHandle);
+    fn_800957FC(gPlayers[nPlayer].nShotHandle, 1);
+    GOLFERSTATE_Switch(GS_SWING, nPlayer);
+    fn_800E3D38(nPlayer, 1);
+    fn_80016CFC(gPlayers[nPlayer].nView0)[0x275] = 1;
+    for (i = 0, q = gPlayers; i < gSession.nNumPlayers; i++, q++) {
+        if (q->unk28C == 0 && q->nView0 == gPlayers[nPlayer].nView0 &&
+            q->nLie != 10 && q->nLie != LIE_GREEN && q->nLie != LIE_HOLED) {
+            fn_80016CFC(gPlayers[nPlayer].nView0)[0x275] = 0;
+        }
+    }
+    return 1;
+}
+
+// Whether to play the pre-shot routine (our reading; TW06's name for this one is not certain).
+// The mode's setting 0x290: 0 never, 1 always; otherwise always off the tee, never with clubs 0-8
+// (woods and long irons) from elsewhere, never with an obstruction nearby, else 85% of the time.
+// On course 18, hole 10, not within 40 yards of the tee.
+int fn_800DDFB4(int nPlayer) {
+    f32 v[4];
+    if ((gSession.uFlags & 0x4000) && (gSession.uFlags & 0x8000)) {
+        return gPlayers[nPlayer].nLie == 0;
+    }
+    if (gpGame->n290 == 0) {
+        return 0;
+    }
+    if (Game_GetCourse() == 0x12 && fn_80015464() == 10) {
+        fn_800E0AF0(&gPlayers[nPlayer].fBallX, &((HoleTees*)fn_8000C594())->tee[gSession.nTeeSet[nPlayer]].x, v);
+        v[1] = 0.0f;
+        if ((f32)fn_80009680(fn_80009744(v)) < 40.0f) {
+            return 0;
+        }
+    }
+    if (gpGame->n290 == 1) {
+        return 1;
+    }
+    if (gPlayers[nPlayer].nLie == 0) {
+        return 1;
+    }
+    if (gPlayers[nPlayer].nLie != 0 && gPlayers[nPlayer].nClub < 9) {
+        return 0;
+    }
+    if (Ter_CheckObjectAndHazardObstruction(gPlayers[nPlayer].ball, 0, 1, 1, *(f32*)(lbl_80281F78 + 0x16C), 4.0f, 0.577f)) {
+        return 0;
+    }
+    return (Rand_Next(1) % 100) < 85;
 }
 
 // TW06: GM_GetGolferDistanceToPin.
