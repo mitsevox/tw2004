@@ -115,6 +115,7 @@ void   fn_80055EF8(f32* pA, f32* pOut);
 f32    fn_80051124(Ball* pBall, f32 fAim, f32* pNormal);
 f32    fn_800511F0(Ball* pBall, f32 fAim, f32* pNormal);
 int    Game_GetCourse(void);                     // 0x80008830
+int    Game_CurrentHole(void);                   // Golfer.c
 int    Hole_WindDir(void);
 f32    Hole_WindSpeed(void);
 int    fn_801021FC(void);
