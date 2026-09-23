@@ -1132,29 +1132,8 @@ hlaudtrackstm.c:
 hlaudvoice.c:
 	.text       start:0x800AC330 end:0x800ACECC
 
-unsorted/sweep_800AD1C4.c:
-	.text       start:0x800AD1C4 end:0x800AD1C8
-
-unsorted/sweep_800AD950.c:
-	.text       start:0x800AD950 end:0x800AD9AC
-
-unsorted/sweep_800AD9AC.c:
-	.text       start:0x800AD9AC end:0x800ADA08
-
-unsorted/sweep_800ADA08.c:
-	.text       start:0x800ADA08 end:0x800ADA28
-
-unsorted/sweep_800ADA28.c:
-	.text       start:0x800ADA28 end:0x800ADA94
-
-unsorted/sweep_800ADA94.c:
-	.text       start:0x800ADA94 end:0x800ADAF0
-
-unsorted/sweep_800ADAF0.c:
-	.text       start:0x800ADAF0 end:0x800ADB4C
-
-unsorted/sweep_800ADDC8.c:
-	.text       start:0x800ADDC8 end:0x800ADE54
+hlaudemitter.c:
+	.text       start:0x800ACECC end:0x800ADE70
 
 UAudContainers.c:
 	.text       start:0x800ADE70 end:0x800AE1F8
