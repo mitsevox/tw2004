@@ -7,6 +7,11 @@
 
 #include "game_types.h"
 
+typedef struct View View;                   // GoGolfCam.c, Swing.c
+
+typedef struct CourseInfo CourseInfo;       // golfer.h
+typedef struct SurfaceType SurfaceType;     // golfer.h
+
 // ---- memory and strings ----------------------------------------------------------------------
 
 void* Mem_cpy(void* pDst, const void* pSrc, u32 uLen);    // returns pDst
@@ -21,10 +26,25 @@ int  sprintf(char* pBuf, const char* pFmt, ...);
 
 // ---- math and random numbers -----------------------------------------------------------------
 
+void Vec3Copy(f32* pSrc, f32* pDst);    // 0x80008304
+f32  fn_800095F0(f32 fAngle);           // sin
+f32  fn_80009638(f32 fAngle);           // cos
+double fn_80009680(double x);           // sqrt
 f32  fn_80009744(f32* pVec);            // dot with itself
+void Vec_Copy(f32* pSrc, f32* pDst);    // 0x8000AD10
 f32  fn_8000AD78(f32 y, f32 x);         // atan2f
 f32  fn_8000AD9C(f32 x);                // fabsf
+double fabsf(double x);                 // 0x8000AE94; double: Swing.c needs it to match
+u32  Rand_Next(int nStream);            // 0x8000B130  EA's lagged-Fibonacci generator
 void fn_8000B1D4(int nStream, u32 uSeed);   // seed a random stream
+f32  Rand_Float(int nStream);           // 0x8000B428  [0, 1)
+double fn_8015F824(double x, double y); // pow
+
+// ---- the course ------------------------------------------------------------------------------
+
+CourseInfo* fn_8000C594(void);          // the current course
+SurfaceType* fn_800CC190(CourseInfo* pCourse, f32* pPos);   // surface type under a point
+f32  Terrain_HeightAt(f32* pPos, SurfaceType** ppSurface);   // 0x800447DC
 
 // ---- the file streamer (UStream.c) -----------------------------------------------------------
 
@@ -59,6 +79,7 @@ void fn_8001C724(int nHandle, int nKind);
 void fn_8001C774(int nHandle, int nClub);
 void fn_8001C804(int nPlayer, int a, int b);
 void fn_8001D8DC(int nPlayer);
+void fn_8001EF34(f32* pIn, f32 f, f32* pOut);   // scale a vector (paired singles)
 
 typedef struct AnimLib AnimLib;        // skalib.c
 void* AnimLib_Pick(int nPlayer, AnimLib* pLib, int nGroup, int nStyle, int nClub, int nKey, u32* pFlags,
@@ -69,12 +90,16 @@ void fn_80045558(u8 bOn, int nPlayer);
 u8   fn_8004560C(void);
 void View_SetCamera(void* pView, int nCamera, int nPlayer, int nView);
 void fn_80063B98(void* pView, f32 f, f32* pVec);
+void fn_80062F1C(View* pView);
 void fn_80063BF4(void* pView, f32 f, f32* pVec);
+u8   fn_80063C7C(View* pView);
 u8   fn_80063C90(void* pView);          // the camera is still moving
+void fn_80063CF0(View* pView, int nCamera, int nPlayer);
 void fn_8006434C(void* pView, f32* pPos, f32* pX, f32* pY, int a);   // a world position on screen (0..1)
 void fn_8006A8D4(void* pView, f32* pX, f32* pY);
 void EVENT_Trigger(int nPlayer, int nEvent, int a, int b);    // through the event table at lbl_80188628
 void fn_800689D4(int nPlayer);
+u8   fn_80068AC8(int nPlayer);
 void fn_80069330(int nPlayer, f32* pPos);
 void PlaceBall_UpdateMomentums(int nPlayer, f32 f);
 void fn_8006A6C4(int nPlayer);
@@ -95,6 +120,9 @@ int  fn_80095780(int nHandle);          // the animation playing
 int  fn_80095798(int nHandle);
 void fn_800957D8(int nHandle);
 void fn_800957FC(int nHandle, int a);
+void CharacterState_AddSKABlendData(u8* pChar, int a, int nGroup, void* pfn, int c, int d, f32 f1, f32 f2,
+                                    f32 f3, f32 f4, f32 f5);
+void CharAnim_StartTapIn(u8* pChar);
 void fn_8009B970(int nView);
 void fn_8009EF98(void);
 void fn_800A30E4(int nKind, u8* pBall, int nPlayer, int a, f32 f);
@@ -110,7 +138,9 @@ void Vec_Normalize(f32* pSrc, f32* pDst);
 void fn_800BAF04(f32* pSrc, f32* pDst);   // normalise
 f32  Vec_Distance(f32* pA, f32* pB);
 u8   fn_800C6CB0(void);
+void fn_800C70F8(View* pView, int a);
 void BreakLine_Start(int nView);
+int  fn_8011937C(int nPlayer, int a, u8 b);
 void fn_80125854(int a);
 void fn_80125910(u8 b);
 

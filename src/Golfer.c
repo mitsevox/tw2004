@@ -859,8 +859,6 @@ extern s32 gSimClub[6];             // 0x801C65A0  per player: club the rehearsa
 #define SIM_BALL_X     (*(f32*)&gSimBall[0x00])
 #define SIM_BALL_Z     (*(f32*)&gSimBall[0x08])
 
-void Ball_Launch(void* pBall, int nClub, int nKind, f32 fPower, f32 fAim, int nTrajectory, f32* pA, f32* pB);
-void Ball_SimStep(void* pBall, f32 fDt, f32 fScale);              // 0x8005585C
 
 // +n on every modifier the rehearsal cares about (not LUCK), aggression the other way.
 #define BUMP_MODIFIERS(p, n)                                                                       \
@@ -1009,7 +1007,8 @@ u8 AI_RehearseShot(int nPlayer, f32* pOutDist2, u8 bFast, f32 fTolerance) {
         fPower = p->fPower * AI_PowerScale(nPlayer);
         if (fPower > 1.5f) fPower = 1.5f;
         Ball_SetSimulating(1);
-        Ball_Launch(gSimBall, p->nClub, p->nShotKind, fPower, p->fAim, 1, p->vLaunchA, p->vLaunchB);   // always the normal trajectory
+        // Always the normal trajectory.
+        Ball_Launch((Ball*)gSimBall, p->nClub, p->nShotKind, fPower, p->fAim, 1, p->vLaunchA, p->vLaunchB);
         Ball_SetSimulating(0);
         p->nRehearseState = 1;
         break;
@@ -1018,9 +1017,9 @@ u8 AI_RehearseShot(int nPlayer, f32* pOutDist2, u8 bFast, f32 fTolerance) {
         gSimAborted = 0;
         Ball_SetSimulating(1);
         if (bFast) {
-            Ball_SimStep(gSimBall, 0.1f, 1.0f);
+            Ball_SimStep((Ball*)gSimBall, 0.1f, 1.0f);
         } else {
-            Ball_SimStep(gSimBall, 0.2f, 1.0f);
+            Ball_SimStep((Ball*)gSimBall, 0.2f, 1.0f);
         }
         Ball_SetSimulating(0);
         if (gSimAborted) {
@@ -1344,7 +1343,6 @@ u8 Lie_AllowsFullSwing(int nPlayer) {
 
 // ---- ground probes ------------------------------------------------------------------------------
 
-SurfaceType* fn_800CC190(CourseInfo* pCourse, f32* pPos);          // surface type under a point
 
 // Is the ground fDist yards from the ball toward the pin of class 3 (the green)? True when the
 // ball is on the pin. The CPU putts from the fringe when the green starts within 1.5 yards and
@@ -1572,9 +1570,6 @@ void fn_8002EBA4(u8* pObj, u8 nValue) {
 // power and aim - provided they were playing roughly the same shot: a club within two of the
 // rehearsed one, the same shot kind, an aim within 5 degrees. Otherwise the shot is not perfect
 // after all. A taken lucky shot puts the player's odds back to 1 in 12.
-
-f32 fabsf(f32 x);                 // fabsf
-
 void Luck_TakePerfectShot(int nPlayer) {
     f32  fDiff;
 

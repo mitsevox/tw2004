@@ -14,11 +14,6 @@ typedef struct SwingStateDef {
 } SwingStateDef;
 extern SwingStateDef sGolferStateEngineTable[];        // 0x801883D8
 
-void  fn_80062CB0(int a, int b);
-void  fn_80062F1C(void);
-s32   fn_800E27C0(void);
-void  fn_800E3C70(int a);
-void  fn_800E3CD4(int a);
 extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
 extern u8* gpSaveData;
 extern u8  lbl_8028227C;
@@ -50,7 +45,6 @@ typedef struct SGLog {
 extern SGLog lbl_802120F8[100];
 extern s32 lbl_802823CC;
 extern u8  lbl_802823C8;
-SurfaceType* Ter_GetSupportingWorldMaterial(CourseInfo* pCourse, u8* pBall);
 u8    fn_800A7720(void);
 extern u8  lbl_801D7148[];                  // per profile slot: nonzero to show the profile's name
 void  fn_800FE190(f32* pA, f32* pB, f32* pOut);
@@ -471,8 +465,7 @@ void fn_800FA608(int nPlayer) {
     fn_800957D8(gPlayers[nPlayer].nShotHandle);
     fn_80095744(gPlayers[nPlayer].nShotHandle, 5);
     Emotion_UpdatePlayerEmotion(nPlayer);
-    fn_80017028(gPlayers[nPlayer].nView0);
-    fn_80062F1C();
+    fn_80062F1C(fn_80017028(gPlayers[nPlayer].nView0));
     i = gPlayers[nPlayer].nView0;
     View_SetCamera(fn_80017028(i), 12, nPlayer, i);
     gPlayers[nPlayer].nC54 = 74;
@@ -634,7 +627,8 @@ u8 fn_800FAD54(int nPlayer) {
     if (Game_GetMode() != 7) {
         GM_PlayerAddStroke(nPlayer);
         if (GM_CheckForBallOOB(nPlayer)) {
-            pSurf = Ter_GetSupportingWorldMaterial(gPlayers[nPlayer].pBallCourse, gPlayers[nPlayer].ball);
+            pSurf = Ter_GetSupportingWorldMaterial(gPlayers[nPlayer].pBallCourse,
+                                                   (f32*)gPlayers[nPlayer].ball);
             if (pSurf != NULL && pSurf->nClass == 7) {
                 fn_800DEB5C(nPlayer);
                 gPlayers[nPlayer].nC3C &= ~1;
@@ -655,7 +649,7 @@ u8 fn_800FAD54(int nPlayer) {
     nStrokes = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
     nOtherStrokes = gPlayers[nOther].nStrokes[Game_CurHoleIndex()];
     if (GM_CheckForBallOOB(nPlayer)) {
-        pSurf = Ter_GetSupportingWorldMaterial(gPlayers[nPlayer].pBallCourse, gPlayers[nPlayer].ball);
+        pSurf = Ter_GetSupportingWorldMaterial(gPlayers[nPlayer].pBallCourse, (f32*)gPlayers[nPlayer].ball);
         if (pSurf != NULL && pSurf->nClass == 7) {
             if (gPlayers[nPlayer].nC3C & 0x10) {
                 fn_800FAAB8(nPlayer, 0x1F);
