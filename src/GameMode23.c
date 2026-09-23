@@ -27,7 +27,6 @@ s32 fn_800EFE3C(s32 i);
 u8* fn_800EFE60(s32 p0);
 void fn_800F009C(void);
 u8 fn_8011908C(s32, s32);
-s32 fn_8011937C(s32, s32, u8);
 void fn_800F018C(void);
 
 // One tournament of the season (0x64 bytes).

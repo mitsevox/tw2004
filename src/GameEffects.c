@@ -82,7 +82,6 @@ void  fn_800DC290(f32 fHeight);
 int   fn_800E17AC(int nPlayer);           // the player's total strokes
 int   fn_800F354C(int nPlayer);
 int   fn_800F1D34(int nPlayer);
-void* fn_800CC190(CourseInfo* pCourse, f32* pPos);   // surface type under a point
 extern u8* gpSaveData;
 int   fn_800D8750(int a, int b, int c, u8* pProfile, int nPlayer);
 u8    fn_800DCB10(int nPlayer);

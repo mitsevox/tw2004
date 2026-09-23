@@ -37,7 +37,6 @@ extern s32 lbl_8028238C;                    // the leader (5 = none)
 
 void  fn_800A6394(void);
 void  fn_800A640C(void);
-void* fn_80017004(int nView);
 void  fn_8006434C(void* pView, f32* pPos, f32* pX, f32* pY, int a);
 void  fn_8006A8D4(void* pView, f32* pX, f32* pY);
 

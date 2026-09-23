@@ -38,10 +38,8 @@ void  GM_EndOfGolferTurn_GameFinished(int nPlayer);
 void  GM_HoleFinished_GameNotFinished(int nPlayer);
 u8    GM_CheckForAIConcede(int nPlayer);
 
-SurfaceType* Ter_GetSupportingWorldMaterial(CourseInfo* pCourse, u8* pBall);
 u8    Ter_PointInFreeDropNetwork(u8* pBall);
 void  fn_800E4164(int nMessage, int nPlayer, f32 f);
-void  fn_80063CF0(void* pView, int nCamera, int nPlayer);
 u8    Ter_CheckObjectAndHazardObstruction(u8* pBall, int a, int b, int c, f32 f1, f32 f2, f32 f3);
 u8    Ter_SearchAreaForDropLocation(int nPlayer, int a, int b, f32* pOut);
 
@@ -65,7 +63,6 @@ void  fn_800BB0A8(void);
 void  fn_800335F8(int a);
 void  fn_8006C4C0(int nPlayer);
 void  fn_8006C4A0(void);
-void  fn_800C70F8(void* pView, int a);
 void  fn_800957FC(int nHandle, int a);
 u8*   fn_80016CFC(int nView);
 void  fn_800E0AF0(f32* pFrom, f32* pTo, f32* pOut);
@@ -91,7 +88,6 @@ void  fn_800C6C8C(void);
 void  fn_800E41C8(void);
 u8    Ter_PointInOOBNetwork(u8* pBall);
 
-void  Vec3Copy(void* pSrc, void* pDst);
 int   fn_8006AA9C(int nPlayer);             // how the shot turned out (0..4, 8+)
 void  fn_8006AAB4(int nPlayer, int a);
 
@@ -99,7 +95,6 @@ typedef struct Vec4 { f32 x, y, z, w; } Vec4;
 u32   fn_800136DC(int nController);         // buttons: held << 16 | pressed this frame
 u32   fn_800142AC(int nButton, int a);      // a button's mask
 u8    fn_80014300(u32 uMask);               // any pad pressed these buttons
-u8    fn_80063C7C(void* pView);
 u8    fn_80063C90(void* pView);             // the camera is still moving
 void  fn_80063BF4(void* pView, f32 f, f32* pVec);
 void  fn_80062D0C(int nPlayer);
@@ -121,7 +116,6 @@ u8    GM_bIsZoomButtonPressed(int nPlayer);
 u8    GM_bIsElevatorCamButtonPressed(int nPlayer);
 u8    fn_800E012C(int nPlayer);
 u8    fn_800DFF0C(int nPlayer);
-u8    fn_80068AC8(int nPlayer);
 
 u64   fn_800954A4(int a);                   // a time stamp
 f32   fn_8006E118(u64 tEnd, u64 tStart);    // seconds between two time stamps
@@ -457,7 +451,8 @@ void GM_PlayerAddStroke(int nPlayer) {
 u8 GM_CheckForBallOOB(int nPlayer) {
     u8*          pBall = gPlayers[nPlayer].ball;
     u8           bOut  = fn_800E2B40(nPlayer, (Ball*)pBall);
-    SurfaceType* pSurf = Ter_GetSupportingWorldMaterial(*(CourseInfo**)(gPlayers[nPlayer].ball + 0x7C), pBall);
+    SurfaceType* pSurf = Ter_GetSupportingWorldMaterial(*(CourseInfo**)(gPlayers[nPlayer].ball + 0x7C),
+                                                        (f32*)pBall);
     u8           bDrop;
     Player*      p;
 
@@ -983,7 +978,7 @@ void GM_MovePlayerToBall(int nPlayer) {
     f32*        pPos  = &p->fBallX;
     CourseInfo* pCourse;
     f32         f;
-    Vec3Copy(pBall, pPos);
+    Vec3Copy((f32*)pBall, pPos);
     Vec_Copy((f32*)pBall, p->vPreShot);
     pCourse = fn_8000C594();
     if (pCourse) {

@@ -53,6 +53,7 @@ typedef struct Ball {
 u8   Ter_PointInOOBNetwork(u8* pBall);
 f32  fn_8004D5C0(CourseInfo* pCourse, f32* pPos);   // ground height, -65536.1 if none
 f32  fn_8004D620(CourseInfo* pCourse, f32* pPos);   // ground height, -60000 and below if none
+SurfaceType* Ter_GetSupportingWorldMaterial(CourseInfo* pCourse, f32* pPos);   // the surface under a point
 void Ter_GetEnclosingGroundHeight(CourseInfo* pCourse, f32* pPos, f32* pLow, f32* pHigh);
 void Ter_GetEnclosingGroundData(CourseInfo* pCourse, f32* pPos, f32* pHeight, SurfaceType** ppSurface, f32* pNormal,
                                 f32* pHeight2, SurfaceType** ppSurface2, f32* pNormal2);

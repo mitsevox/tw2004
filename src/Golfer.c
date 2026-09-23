@@ -1584,9 +1584,6 @@ void fn_8002EBA4(u8* pObj, u8 nValue) {
 // power and aim - provided they were playing roughly the same shot: a club within two of the
 // rehearsed one, the same shot kind, an aim within 5 degrees. Otherwise the shot is not perfect
 // after all. A taken lucky shot puts the player's odds back to 1 in 12.
-
-f32 fabsf(f32 x);                 // fabsf
-
 void Luck_TakePerfectShot(int nPlayer) {
     f32  fDiff;
 

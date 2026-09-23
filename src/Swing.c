@@ -102,7 +102,6 @@ extern SwingState* gpSwing;                  // 0x80281188
 extern f32         gForgivenessTable[3][27]; // 0x80188168  rows: value at attribute 0 / 100 / 110
 extern s32         gBoostSteps[8];           // 0x80188148  power boost per level: 1 2 4 6 9 12 16 20
 
-double fabsf(double x);                // fabs
 void   fn_800130F8(int nPad, int n);         // rumble on
 void   fn_80013130(int nPad, int n);         // rumble strength
 
@@ -1662,8 +1661,6 @@ void Swing_ClearFrameFlag(int nPlayer) {
     gPlayers[nPlayer].swing.nNumInBlurQueue = 0;
 }
 
-void fn_8001EF34(f32* pSrc, f32* pDst, f32 fScale);   // scale
-
 // Record the club for its trail: the head (bone 0x53) and grip (0x52) go on the front of the
 // 25-entry history. When the head has moved more than 0.3 since the last entry, five in-between
 // entries are added instead, each blended from the last entry to now with the shaft re-extended
@@ -1707,8 +1704,8 @@ void fn_8005A0FC(int nPlayer) {
         fLen = fn_80009680(fn_8005CC18(v8));
         for (i = 1; i <= 5; i++) {
             f = (f32)i / 5.0f;
-            fn_8001EF34(v38, v18, f);
-            fn_8001EF34(v48, v28, f);
+            fn_8001EF34(v38, f, v18);
+            fn_8001EF34(v48, f, v28);
             Vec_Add(v18, v78, v18);
             Vec_Add(v28, v58, v28);
             Vec_Sub(v18, v28, v8);
@@ -1716,7 +1713,7 @@ void fn_8005A0FC(int nPlayer) {
                 v8[3] = 0.0f;
                 Vec_Normalize(v8, v8);
             }
-            fn_8001EF34(v8, v8, fLen);
+            fn_8001EF34(v8, fLen, v8);
             Vec_Add(v8, v28, v8);
             for (k = 24; k > 0; k--) {
                 Mem_cpy(&pSw->prevClub[k], &pSw->prevClub[k - 1], 0x20);
@@ -2664,7 +2661,7 @@ void STATEFUNC_RemoveBallInit(int nPlayer) {
         Character_SetPosition(gPlayers[nPlayer].nShotHandle, pPin, 1);
         Physics_DropBall((Ball*)pBall, pPin);
         gPlayers[nPlayer].nLie = LIE_HOLED;
-        Vec3Copy(pBall, pBallBefore);
+        Vec3Copy((f32*)pBall, (f32*)pBallBefore);
     }
     fn_80095744(gPlayers[nPlayer].nShotHandle, 12);
 }
@@ -2922,7 +2919,6 @@ void STATEFUNC_TapInUpdate(int nPlayer) {
 
 void  fn_800C6010(void* pView, int nPlayer);
 void  fn_800C60E8(void* pView, int nPlayer);
-void  fn_80068AC8(int nPlayer);
 
 // State 8: a free camera while button 19 is held (release pops the state). Buttons 11/12 and
 // 13/14 play the four pan sounds; button 4 switches between two camera modes.
@@ -3034,7 +3030,6 @@ void STATEFUNC_ShotSetupInit(int nPlayer) {
 
 
 void  fn_800170F4(int nView);
-void  fn_80017004(int nView);
 void  fn_80012EF0(void);
 void  fn_800171D8(f32 x, f32 y, f32 w, f32 h);
 void  fn_8001D8DC(int nPlayer);
@@ -3399,9 +3394,7 @@ void fn_80062D98(void);
 u8    fn_800C44A8(View* pView, int nPlayer);
 u8    fn_800C44CC(View* pView, int nPlayer);
 u8    fn_800C44E0(View* pView, int nPlayer);
-void  CharAnim_StartTapIn(int nHandle);
 u8    fn_800C6D80(void);
-void  CharacterState_AddSKABlendData(int nHandle, int a, int b, void* pfn, int c, int d, f32 f1, f32 f2, f32 f3, f32 f4, f32 f5);
 void  fn_80072ACC(void);
 void  SKEL_SetIKSolutionWeight(u8* p, f32 f);
 void  fn_80047EF0(u8* pBall, int nPlayer, int a);   // tee the ball up
@@ -3436,12 +3429,14 @@ void STATEFUNC_ReplaySwingInit(int nPlayer) {
     *(s32*)(gPlayers[nPlayer].nShotHandle + 0x20) = 7;
     *(s32*)(gPlayers[nPlayer].nShotHandle + 0x1C) = 7;
     if (gPlayers[nPlayer].uFlags & 8) {
-        CharAnim_StartTapIn(gPlayers[nPlayer].nShotHandle);
+        CharAnim_StartTapIn((u8*)gPlayers[nPlayer].nShotHandle);
     } else {
         if (fn_800C6D80() || fn_800C44A8(pV, nPlayer) || fn_800C44CC(pV, nPlayer) || fn_800C44E0(pV, nPlayer)) {
-            CharacterState_AddSKABlendData(gPlayers[nPlayer].nShotHandle, 1, 0, fn_80072ACC, 1, 8, -20000.0f, -30000.0f, -10000.0f, 0.0f, -10000.0f);
+            CharacterState_AddSKABlendData((u8*)gPlayers[nPlayer].nShotHandle, 1, 0, fn_80072ACC, 1, 8,
+                                           -20000.0f, -30000.0f, -10000.0f, 0.0f, -10000.0f);
         } else {
-            CharacterState_AddSKABlendData(gPlayers[nPlayer].nShotHandle, 1, 0, fn_80072ACC, 1, 8, -20000.0f, -90000.0f, -10000.0f, 0.0f, -10000.0f);
+            CharacterState_AddSKABlendData((u8*)gPlayers[nPlayer].nShotHandle, 1, 0, fn_80072ACC, 1, 8,
+                                           -20000.0f, -90000.0f, -10000.0f, 0.0f, -10000.0f);
         }
         SKEL_SetIKSolutionWeight(*(u8**)(*(u8**)(gPlayers[nPlayer].nShotHandle + 0x38) + 0x38), 1.0f);
     }
@@ -3497,9 +3492,11 @@ void STATEFUNC_ReplaySwingUpdate(int nPlayer) {
                 bSpecial = fn_800C5FE4(pV, nPlayer);
             }
             if (bSpecial) {
-                CharacterState_AddSKABlendData(gPlayers[nPlayer].nShotHandle, 1, 0x12, fn_80072ACC, 1, 8, -20000.0f, -30000.0f, -10000.0f, 0.0f, -10000.0f);
+                CharacterState_AddSKABlendData((u8*)gPlayers[nPlayer].nShotHandle, 1, 0x12, fn_80072ACC, 1, 8,
+                                               -20000.0f, -30000.0f, -10000.0f, 0.0f, -10000.0f);
             } else {
-                CharacterState_AddSKABlendData(gPlayers[nPlayer].nShotHandle, 1, 0, fn_80072ACC, 1, 8, -20000.0f, -90000.0f, -10000.0f, 0.0f, -10000.0f);
+                CharacterState_AddSKABlendData((u8*)gPlayers[nPlayer].nShotHandle, 1, 0, fn_80072ACC, 1, 8,
+                                               -20000.0f, -90000.0f, -10000.0f, 0.0f, -10000.0f);
             }
             fn_800957D8(gPlayers[nPlayer].nShotHandle);
             Swing_ClearFrameFlag(nPlayer);
@@ -3513,7 +3510,6 @@ void STATEFUNC_ReplaySwingUpdate(int nPlayer) {
 }
 
 
-void  fn_80062F1C(void* pView);
 void  fn_800CC5C0(int nHandle, char* pA, char* pB);   // an attachment (the glove) on / off
 void  fn_8009B970(int nView);
 int   fn_800DDFB4(int nPlayer);
