@@ -1,6 +1,9 @@
 Tiger Woods PGA Tour 2004
 =========================
 
+[![Code progress](https://decomp.dev/mitsevox/tw2004.svg?mode=shield&measure=code&label=Code)](https://decomp.dev/mitsevox/tw2004)
+[![Functions](https://decomp.dev/mitsevox/tw2004.svg?mode=shield&measure=functions&label=Functions)](https://decomp.dev/mitsevox/tw2004)
+
 A work-in-progress decompilation and asset-format research project for
 Tiger Woods PGA Tour 2004 (GameCube).
 
