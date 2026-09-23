@@ -9,10 +9,7 @@ int   Game_CurHoleIndex(void);
 int   Game_CurrentHole(void);
 u8    Player_IsHoled(int nPlayer);
 u8    Player_OnTee(int nPlayer);
-u8    Player_IsCPU(int nPlayer);
 void  GOLFERSTATE_Set(int nState, int nPlayer);
-CourseInfo* fn_8000C594(void);
-u32   Rand_Next(int nStream);
 void  fn_800E1480(int nHole);
 void  fn_800E45C0();
 void  fn_800E4364(u32 nQueue, int a, int b, int c);
@@ -41,26 +38,6 @@ void fn_800F8EDC(void);
 void fn_800F9100(void);
 s32  fn_800F9254(void);
 s32  fn_800F9308(void);
-
-#define PLAYER_AT(i) (&gPlayers[i])
-#define PLAYER_U(i) (&gPlayers[(u32)(i)])
-// Clears every player's round (all 18 holes) for a playoff.
-#define CLEAR_ROUNDS(P)                             \
-    for (i = 0; i < gNumPlayersSetUp; i++) {        \
-        for (h = 0; h < 18; h++) {                  \
-            P(i)->nStrokes[h] = 0;                  \
-            P(i)->nPutts[h] = 0;                    \
-            P(i)->nModePoints[h] = 0;               \
-            P(i)->n22C[h] = 0;                      \
-            P(i)->n290[h] = 0;                      \
-            P(i)->b2F6[h] = 0;                      \
-            P(i)->b2E4[h] = 0;                      \
-        }                                           \
-        P(i)->n2D8 = 0;                             \
-        P(i)->n2DC = 0;                             \
-        P(i)->n2E0 = 0;                             \
-        P(i)->n308 = 0;                             \
-    }
 
 // Mode 2 starts: up to four players, CPUs may concede.
 void fn_800F80FC(void) {
@@ -104,8 +81,8 @@ void fn_800F81FC(void) {
 }
 
 // TW06: GameModeSkins::GetHonors. Only players who can still win the hole (fewer strokes than the
-// best holed score) play. On the tee: a player who won a skin (latest hole first), then anyone; otherwise the player
-// farthest from the pin (off the green first).
+// best holed score) play. On the tee: a player who won a skin (latest hole first), then anyone;
+// otherwise the player farthest from the pin (off the green first).
 s32 fn_800F8278(int nPlayer) {
     int i;
     int h;
@@ -193,7 +170,8 @@ u8 fn_800F8624(int nPlayer, int a) {
     int nSecond = 5;
     for (i = 0; i < gNumPlayersSetUp; i++) {
         if (Player_IsHoled(i)) {
-            if (nBest == 5 || nBest != 5 && PLAYER(i)->nStrokes[Game_CurHoleIndex()] < gPlayers[nBest].nStrokes[Game_CurHoleIndex()]) {
+            if (nBest == 5 || nBest != 5 && PLAYER(i)->nStrokes[Game_CurHoleIndex()] <
+                                            gPlayers[nBest].nStrokes[Game_CurHoleIndex()]) {
                 nBest = i;
             }
             if (nBest != i && (nSecond == 5 || nSecond != 5 && PLAYER(i)->nStrokes[Game_CurHoleIndex()] <
@@ -205,17 +183,18 @@ u8 fn_800F8624(int nPlayer, int a) {
     if (nBest == 5) {
         return 0;
     }
-    if (nSecond == 5 || nSecond != 5 && gPlayers[nSecond].nStrokes[Game_CurHoleIndex()] > gPlayers[nBest].nStrokes[Game_CurHoleIndex()]) {
+    if (nSecond == 5 || nSecond != 5 && gPlayers[nSecond].nStrokes[Game_CurHoleIndex()] >
+                                        gPlayers[nBest].nStrokes[Game_CurHoleIndex()]) {
         for (i = 0; i < gNumPlayersSetUp; i++) {
-            if (!Player_IsHoled(i) &&
-                PLAYER(i)->nStrokes[Game_CurHoleIndex()] + 1 <= gPlayers[nBest].nStrokes[Game_CurHoleIndex()]) {
+            if (!Player_IsHoled(i) && PLAYER(i)->nStrokes[Game_CurHoleIndex()] + 1 <=
+                                      gPlayers[nBest].nStrokes[Game_CurHoleIndex()]) {
                 return 0;
             }
         }
     } else {
         for (i = 0; i < gNumPlayersSetUp; i++) {
-            if (!Player_IsHoled(i) &&
-                PLAYER(i)->nStrokes[Game_CurHoleIndex()] + 1 < gPlayers[nBest].nStrokes[Game_CurHoleIndex()]) {
+            if (!Player_IsHoled(i) && PLAYER(i)->nStrokes[Game_CurHoleIndex()] + 1 <
+                                      gPlayers[nBest].nStrokes[Game_CurHoleIndex()]) {
                 return 0;
             }
         }
@@ -246,7 +225,19 @@ u8 fn_800F8880(u8 bCheck) {
             fn_800E1480(Rand_Next(0) % 18);
         }
         gpGame->bHoleSelected[Game_CurHoleIndex()] = 1;
-        CLEAR_ROUNDS(PLAYER_AT);
+        // Every player's scores are cleared for the new playoff hole.
+        for (i = 0; i < gNumPlayersSetUp; i++) {
+            for (h = 0; h < 18; h++) {
+                // fake match: one chained assignment (stored right to left, so nStrokes first, as in
+                // fn_800F8B08) for the original register order
+                gPlayers[i].b2E4[h] = gPlayers[i].b2F6[h] = gPlayers[i].n290[h] = gPlayers[i].n22C[h] =
+                    gPlayers[i].nModePoints[h] = gPlayers[i].nPutts[h] = gPlayers[i].nStrokes[h] = 0;
+            }
+            gPlayers[i].n2D8 = 0;
+            gPlayers[i].n2DC = 0;
+            gPlayers[i].n2E0 = 0;
+            gPlayers[i].n308 = 0;
+        }
         fn_800E45C0();
     } else {
         nLeft = 0;
@@ -295,7 +286,22 @@ u8 fn_800F8B08(u8 bCheck) {
         fn_800E1480(Rand_Next(0) % 18);
     }
     gpGame->bHoleSelected[Game_CurHoleIndex()] = 1;
-    CLEAR_ROUNDS(PLAYER);
+    // Every player's scores are cleared for the playoff.
+    for (i = 0; i < gNumPlayersSetUp; i++) {
+        for (h = 0; h < 18; h++) {
+            PLAYER(i)->nStrokes[h] = 0;
+            PLAYER(i)->nPutts[h] = 0;
+            PLAYER(i)->nModePoints[h] = 0;
+            PLAYER(i)->n22C[h] = 0;
+            PLAYER(i)->n290[h] = 0;
+            PLAYER(i)->b2F6[h] = 0;
+            PLAYER(i)->b2E4[h] = 0;
+        }
+        PLAYER(i)->n2D8 = 0;
+        PLAYER(i)->n2DC = 0;
+        PLAYER(i)->n2E0 = 0;
+        PLAYER(i)->n308 = 0;
+    }
     gpGame->bD4 = 1;
     fn_800E45C0(gpGame->nD8++);
     return 1;
@@ -307,11 +313,11 @@ void fn_800F8EDC(void) {
     int i;
     int nBest = 5;
     int nSecond = 5;
-    int nHole;
     s32 n;
     for (i = 0; i < gNumPlayersSetUp; i++) {
         if (Player_IsHoled(i)) {
-            if (nBest == 5 || nBest != 5 && PLAYER(i)->nStrokes[Game_CurHoleIndex()] < gPlayers[nBest].nStrokes[Game_CurHoleIndex()]) {
+            if (nBest == 5 || nBest != 5 && PLAYER(i)->nStrokes[Game_CurHoleIndex()] <
+                                            gPlayers[nBest].nStrokes[Game_CurHoleIndex()]) {
                 nBest = i;
             }
             if (nBest != i && (nSecond == 5 || nSecond != 5 && PLAYER(i)->nStrokes[Game_CurHoleIndex()] <
@@ -320,10 +326,10 @@ void fn_800F8EDC(void) {
             }
         }
     }
-    if (nSecond != 5 && gPlayers[nBest].nStrokes[Game_CurHoleIndex()] == gPlayers[nSecond].nStrokes[Game_CurHoleIndex()]) {
+    if (nSecond != 5 && gPlayers[nBest].nStrokes[Game_CurHoleIndex()] ==
+                        gPlayers[nSecond].nStrokes[Game_CurHoleIndex()]) {
         if (!gpGame->bD4) {
-            n = Game_CurHoleIndex();
-            lbl_802823C4 += fn_800D3D64(fn_800D3C1C(), n);
+            lbl_802823C4 += fn_800D3D64(fn_800D3C1C(), Game_CurHoleIndex());
             lbl_802823C0++;
         }
     } else {
@@ -331,10 +337,9 @@ void fn_800F8EDC(void) {
         gPlayers[nBest].n22C[Game_CurHoleIndex()] = n;
         gPlayers[nBest].n274 += gPlayers[nBest].n22C[Game_CurHoleIndex()];
         gPlayers[nBest].nModePoints[Game_CurHoleIndex()] = 1;
-        n = fn_800F9308();
+        gPlayers[nBest].nHolesWon += fn_800F9308();
         lbl_802823C4 = 0;
         lbl_802823C0 = 0;
-        gPlayers[nBest].nHolesWon += n;
     }
 }
 
