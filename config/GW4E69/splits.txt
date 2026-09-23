@@ -573,11 +573,8 @@ GoDynObjBase.c:
 GoAnimalActors.c:
 	.text       start:0x80049B40 end:0x8004ABBC
 
-unsorted/sweep_8004AD54.c:
-	.text       start:0x8004AD54 end:0x8004ADDC
-
-unsorted/sweep_8004AF28.c:
-	.text       start:0x8004AF28 end:0x8004AF2C
+GoDynObjTypes.c:
+	.text       start:0x8004ABBC end:0x8004AFA0
 
 GoTerrainCollision.c:
 	.text       start:0x8004AFA0 end:0x80050C2C
