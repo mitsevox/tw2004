@@ -267,6 +267,7 @@ void FE_MakeMoviePath(char* pName, char* pPath);        // "data/movies/<name>.N
 void FE_MakeCameoMoviePath(char* pName, char* pPath);   // "data/movies/cameos/<name>.NGC"
 void FE_CrAP_TurnOnPart(s16 nPart, int b, int c);      // FE_CrAPDB.c
 SaveProfile* fn_80077ACC(void);         // the profile being worked on
+int  fn_80078604(int a, int b, int c);  // a date (month, day, year from fn_8011E020) packed
 int  fn_80077B08(void);                 // its player slot
 u8   fn_80077B18(int nGolfer);          // a yes/no list over golfers 0..28 (Golfer.c asks it)
 void fn_80077B78(void);                 // pick the day's random assets (fn_80077C1C)

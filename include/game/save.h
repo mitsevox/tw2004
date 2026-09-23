@@ -169,11 +169,15 @@ typedef struct SaveProfile {
     s32  n74;                   // 0x00074  stroke-play rounds counted
     s32  n78;                   // 0x00078  their strokes
     s32  n7C;                   // 0x0007C  full rounds counted
-    u8   unk80[8];
-    s32  n88;                   // 0x00088  drives counted (the tee shot of a par 4 or 5 off class-1
+    s32  n80;                   // 0x00080  holes whose putts are counted (fewer than 10; fn_800D9458)
+    s32  n84;                   // 0x00084  their putts
+    s32  n88;                  // 0x00088  drives counted (the tee shot of a par 4 or 5 off class-1
                                 //          ground; fn_800D8FE4)
     s32  n8C;                   // 0x0008C  their distance together
-    u8   unk90[0xA0 - 0x90];
+    s32  n90;                   // 0x00090  } par 4 and 5 holes counted (fn_800D9458), and those where
+    s32  n94;                   // 0x00094  } the player's b2E4 was set
+    s32  n98;                   // 0x00098  } every hole counted, and those where the player's b2F6
+    s32  n9C;                   // 0x0009C  } was set
     s32  nA0;                   // 0x000A0  the longest of those drives
     s32  nA4;                   // 0x000A4  the longest putt, in feet (fn_800D8FE4)
     s32  nA8;                   // 0x000A8  the best stroke-play round (0: none yet)
@@ -274,5 +278,6 @@ s16  fn_800588E8(void);             // lbl_80281DF0's value
 // 0x800588F4: marked hole i's kind-0 byte (a5004/a10578) or kind-1 value (a504C/a1057C); -1 for
 // another kind.
 int  fn_800588F4(SaveProfile* pProfile, int nKind, int i);
+void fn_8005897C(SaveProfile* pProfile, int nKind, int i, int nValue);  // and set it
 
 #endif
