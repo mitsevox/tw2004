@@ -21,7 +21,10 @@ typedef struct SurfaceType {
     f32  f20;                   // 0x20  roll: rolling friction
     f32  f24;                   // 0x24  bounce: how hard a landing it takes to bend the normal (softness)
     f32  f28;                   // 0x28  bounce: base softness
-    u32  nClass;                // 0x2C  2, 3 = green, 4, 5 = rough, 6 = sand, 7/16 = water, 11, 12/18 = the cup, 17 = tree
+    u32  nClass;                // 0x2C  surface class (TW06: lieID), not a Lie_t. Ball_SetLie makes the lie
+                                //       from it: 1, 2 fairway; 3 green; 4 fringe; 5, 11 rough; 6, 20 sand;
+                                //       7, 16 water; 8 cart path; 12 the cup; 18 green (holes a ball, as 12).
+                                //       17 = tree; 19 = not playable (Ter_CalcLowestPlayableWorldHeight)
     u8   unk30[4];
     u32  u34;                   // 0x34  bit 0x10: event 0x25 on landing
     u8   unk38[0x44 - 0x38];
@@ -36,14 +39,28 @@ typedef struct PinPos {
     f32  x, y, z, w;
 } PinPos;
 
-// The current hole's terrain data (fn_8000C594); only what the game code reads so far. TW06:
-// TGD_TerrainInfo.
-typedef struct CourseInfo {
-    u8     unk0[0x6C];
-    f32    fFloor;              // 0x6C  a ball in the air above this with no ground under it is still in play
-    PinPos pin[4];              // 0x70  the hole's four pin positions: gpGame->nPinSet[] picks one
-    PinPos tee[4];              // 0xB0  the tee of each tee set (gSession.nTeeSet[])
-} CourseInfo;
+// One strip of ground triangles (8 bytes). TW06: TGD_PolygonReference (0xC bytes, the same up
+// to 0x8).
+typedef struct TerPolyRef {
+    u16  nVertex;               // 0x0  first vertex, low 16 bits. TW06: uiVertexIndex
+    u16  n2;                    // 0x2  TW06: uiSourceObject
+    u8   u4;                    // 0x4  TW06: flags
+    u8   nTris;                 // 0x5  TW06: uiPolygonCount
+    u8   nSurface;              // 0x6  row of gSurfaceTypes. TW06: uiMaterialType
+    u8   nVertexHi;             // 0x7  first vertex, high bits. TW06: uiVertexIndexHi
+} TerPolyRef;
+
+#define TER_FIRST_VERTEX(pRef) (((pRef)->nVertexHi << 16) + (pRef)->nVertex)
+
+// One cell of the ground grid (0xC bytes). TW06: TGD_Cell.
+typedef struct TerCell {
+    s16  nMaxHeight;            // 0x0  highest ground in the cell, whole yards. TW06: maxHeightYards
+    s16  nMinHeight;            // 0x2  TW06: minHeightYards
+    u32  uRefs;                 // 0x4  its strips: the first TerPolyRef << 12 | the count.
+                                //      TW06: uiPolygonReferenceListOffsetAndCount
+    u16  nObjRefs;              // 0x8  TW06: uiObjectReferenceCount
+    u16  nObjRefOffset;         // 0xA  TW06: uiObjectReferenceListOffset
+} TerCell;
 
 // A course object (0x24 bytes): a tree, a building, the pin. TW06: TGD_ObjectInstanceInfo (0x28
 // bytes, the same up to 0x24).
@@ -55,6 +72,36 @@ typedef struct TerObject {
     u16  nPatch;                // 0x20  TW06: uiPatchNum
     u16  nObjList;              // 0x22  TW06: uiObjectListNum
 } TerObject;
+
+// The current hole's terrain data (fn_8000C594): the ground as collision data. TW06:
+// TGD_TerrainInfo, the same offsets up to 0x2C; TW06 has three more pointers before the polygon
+// list. The ground is triangle strips: each TerPolyRef names a first vertex and a triangle count,
+// and triangle k of a strip is vertices k, k+1, k+2.
+typedef struct CourseInfo {
+    u32    nGridWidth;          // 0x00  cells across (x). TW06: uiReferenceGridWidth
+    u32    nGridLength;         // 0x04  cells along (z). TW06: uiReferenceGridLength
+    f32    fGridOrigin[2];      // 0x08  x, z of the grid's corner. TW06: fReferenceGridOrigin
+    f32    fGridCellSize[2];    // 0x10  TW06: fReferenceGridCellSize
+    u8     unk18[0x20 - 0x18];
+    u32    nPolyRefs;           // 0x20  TW06: uiPolygonReferencesListSize
+    u8     unk24[4];
+    f32  (*pVerts)[3];          // 0x28  TW06: pVertexList
+    u8*    pTriFlags;           // 0x2C  per vertex, for the triangle that ends there: bits 0-2 = 0 skip it;
+                                //       bit 3 done (fn_80050794); bits 4-5 / 6-7 its highest / lowest corner
+    u8*    pLight;              // 0x30  per vertex: the light on the ground there, 0..255 (fn_8004B78C)
+    TerCell* pGrid;             // 0x34  nGridWidth x nGridLength cells, row by row. TW06: pTerrainGrid (0x3C)
+    u8*    p38;                 // 0x38  four optional blocks (NULL when absent); TW06 has its fog, sun,
+    u8*    p3C;                 // 0x3C    sky and lighting data in the same place
+    u8*    p40;                 // 0x40
+    u8*    p44;                 // 0x44
+    TerObject* pObjects;        // 0x48  the course objects. TW06: pObjectInstanceTable (0x54)
+    TerPolyRef* pPolyRefs;      // 0x4C  TW06: pPolygonReferenceList (at 0x58 there)
+    u16*   pObjRefs;            // 0x50  per cell, the objects in it (indices). TW06: pObjectReferenceList (0x5C)
+    u8     unk54[0x6C - 0x54];
+    f32    fFloor;              // 0x6C  a ball in the air above this with no ground under it is still in play
+    PinPos pin[4];              // 0x70  the hole's four pin positions: gpGame->nPinSet[] picks one
+    PinPos tee[4];              // 0xB0  the tee of each tee set (gSession.nTeeSet[])
+} CourseInfo;
 
 // A golf ball in flight or at rest (0xBC bytes): Player.ball and Player.ballBefore hold one each.
 typedef struct Ball {
@@ -104,18 +151,56 @@ typedef struct Ball {
 
 // ---- the terrain ----------------------------------------------------------------------------
 
-extern f32 lbl_801D5888[4][4];  // per player: the last spot where the ball could be dropped
-extern f32 lbl_801D58C8[4][4];  // per player: the last such spot with a preferred lie
+// A closed outline on the course (TW06: TNetwork, 0x14 bytes): the free-drop areas and the
+// in-bounds outlines. Only the header is read so far.
+typedef struct TNetwork {
+    s16  nExportType;           // 0x0  TW06: ExportType
+    s16  nNumNodes;             // 0x2  TW06: NumNodes
+} TNetwork;
+
+#define MAX_FREE_DROP_NETWORKS 25
+#define MAX_OOB_NETWORKS       5
+
+// The bounds of one set of 3D cup geometry (0x20 bytes).
+typedef struct TerBox {
+    f32  vMin[4];               // 0x00
+    f32  vMax[4];               // 0x10
+} TerBox;
+
+#define NUM_CUP_POSITIONS 4     // one set of cup geometry per pin position (CourseInfo.pin)
+
+// The terrain manager (GoTerrain.c, 0x11C8 bytes); only its course is read so far. TW06:
+// Ter_TerrainGameDataMgr, whose GetTGD returns this pointer.
+typedef struct TerrainMgr {
+    u8          unk0[8];
+    CourseInfo* pCourse;        // 0x008
+    u8          unkC[0x11C8 - 0xC];
+} TerrainMgr;
+
+#define MAX_OBJECTS 1000        // course objects a line test can mark
+#define TER_NO_GROUND -65536.125f   // the height the ground lookups return when nothing is under the point
+
+extern TerrainMgr lbl_801D3CB0;
+extern TerBox    lbl_801D53A8[NUM_CUP_POSITIONS];  // the 3D cup geometry of each pin position
+extern TNetwork* lbl_801D5428[MAX_FREE_DROP_NETWORKS];
+extern TNetwork* lbl_801D548C[MAX_OOB_NETWORKS];
+extern u8        lbl_801D54A0[MAX_OBJECTS];        // objects near the current line
+extern f32       lbl_801D5888[4][4];  // per player: the last spot where the ball could be dropped
+extern f32       lbl_801D58C8[4][4];  // per player: the last such spot with a preferred lie
+extern u8        lbl_80281DC0;        // the cup is real geometry
+extern s32       lbl_80281DC4;        // free-drop networks loaded
+extern s32       lbl_80281DC8;        // out-of-bounds networks loaded
 
 CourseInfo* fn_8000C594(void);          // the current hole's terrain data
 SurfaceType* fn_800CC190(CourseInfo* pCourse, f32* pPos);   // surface type under a point
 f32  Terrain_HeightAt(f32* pPos, SurfaceType** ppSurface);   // 0x800447DC
 
 // GoTerrainCollision (TW06's goterraincollision.c; types from its definitions)
+u8   Ter_Use3DCupGeometry(void);               // the cup is real geometry the ball drops into
 u8   Ter_PointInFreeDropNetwork(f32* pPos);    // inside a free-drop area
 u8   Ter_PointInOOBNetwork(f32* pPos);         // inside the in-bounds outlines (always, with none loaded)
 u8   Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 a, u8 b, f32 f, u8 c, f32 g);
-u8   Ter_SearchAreaForDropLocation(int nPlayer, u8 bPreferred, u8 bCheck, f32* pOut);   // where to drop the ball
+u8   Ter_SearchForDropLocation(int nPlayer, u8 bPreferred, u8 bCheck, f32* pOut);   // where to drop the ball
 f32  Ter_CheckForDropLocation(CourseInfo* pCourse, f32* pPos, u8 bOnDropSurface, u8* pbDrop, u8* pbPreferred,
                               SurfaceType** ppSurface);   // whether a ball could be dropped at a point
 u8   Ter_IsValidDropSurface(s32 nSurface);

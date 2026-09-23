@@ -532,7 +532,7 @@ void GM_BumpBallForObstructions(int nPlayer) {
         if (p->ball.nLie != 0) {
             pBall = &p->ball;
             if (Ter_CheckObjectAndHazardObstruction(pBall->vPos, 1.5f, 0, 1, 2.0f, 1, 0.577f)) {
-                if (Ter_SearchAreaForDropLocation(n, 0, 0, vDrop)) {
+                if (Ter_SearchForDropLocation(n, 0, 0, vDrop)) {
                     Physics_DropBall(pBall, vDrop);
                     return;
                 }
@@ -885,7 +885,7 @@ void GM_ReplaceOOBBall(int nPlayer) {
     Ball* pBall;
     if ((gPlayers[nPlayer].b30E ||
          (Ter_PointInOOBNetwork(gPlayers[nPlayer].ball.vPos) && !gPlayers[nPlayer].bLowIQPenalty)) &&
-        Ter_SearchAreaForDropLocation(nPlayer, 1, 1, v)) {
+        Ter_SearchForDropLocation(nPlayer, 1, 1, v)) {
         Physics_DropBall(&gPlayers[nPlayer].ball, v);
         return;
     }
@@ -903,7 +903,7 @@ void fn_800DEB5C(int nPlayer) {
     f32   v[4];
     f32*  pPre;
     Ball* pBall;
-    if (Ter_SearchAreaForDropLocation(nPlayer, 1, 1, v)) {
+    if (Ter_SearchForDropLocation(nPlayer, 1, 1, v)) {
         Physics_DropBall(&gPlayers[nPlayer].ball, v);
         return;
     }
