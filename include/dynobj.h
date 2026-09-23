@@ -181,10 +181,29 @@ typedef struct DynObjTurning {
 } DynObjTurning;
 LAYOUT_ASSERT(DynObjTurning, 0x194);
 
+// A point of an animal's route (our name; 0x30 bytes).
+typedef struct AnimalNode {
+    f32  vPos[4];               // 0x00
+    s16  nNext;                 // 0x10  the point after it
+    u8   unk12[0x30 - 0x12];
+} AnimalNode;
+LAYOUT_ASSERT(AnimalNode, 0x30);
+
+// An animal's route (our name): points chained through nNext.
+typedef struct AnimalRoute {
+    u8   unk0[2];
+    s16  nNodes;                // 0x02
+    AnimalNode aNodes[1];       // 0x04  nNodes of them (as many as the data holds)
+} AnimalRoute;
+
 // Type 11 (GoAnimalActors.c): an animal.
 typedef struct DynObjAnimal {
     DynObj base;                // 0x000
-    u8   unk16C[0x1AC - 0x16C];
+    f32  f16C;                  // 0x16C  } divided by the route's length (fn_8004A14C)
+    f32  f170;                  // 0x170
+    f32  f174;                  // 0x174  }
+    u8   unk178[0x1A8 - 0x178];
+    AnimalRoute* pRoute;        // 0x1A8
     s32  n1AC;                  // 0x1AC  } copied to its UObject's n108 and f10C before it is drawn
     u8   unk1B0[4];             //        }
     f32  f1B4;                  // 0x1B4  }
