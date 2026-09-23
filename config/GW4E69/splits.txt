@@ -3619,22 +3619,7 @@ GameManager.c:
 	.text       start:0x800DCA94 end:0x800E0AF0
 
 GameRound.c:
-	.text       start:0x800E0AF0 end:0x800E2810
-
-Gimme.c:
-	.text       start:0x800E2810 end:0x800E292C
-
-unsorted/sweep_800E292C.c:
-	.text       start:0x800E292C end:0x800E295C
-
-unsorted/sweep_800E39F0.c:
-	.text       start:0x800E39F0 end:0x800E3A54
-
-unsorted/sweep_800E3A54.c:
-	.text       start:0x800E3A54 end:0x800E3AA0
-
-unsorted/sweep_800E3AA0.c:
-	.text       start:0x800E3AA0 end:0x800E3B28
+	.text       start:0x800E0AF0 end:0x800E3B28
 
 unsorted/sweep_800E3BEC.c:
 	.text       start:0x800E3BEC end:0x800E3C0C

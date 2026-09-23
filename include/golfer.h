@@ -416,7 +416,7 @@ typedef struct GameState {
     s32  (*pfn1D4)(int a);      // 0x1D4
     u8   (*pfn1D8)(int nPlayer, int a); // 0x1D8  nonzero blocks a gimme (Gimme_Allowed asks with a = 1)
     u8   (*pfn1DC)(int a);      // 0x1DC  nonzero: the game is over
-    void (*pfn1E0)(void);       // 0x1E0
+    s32  (*pfn1E0)(void);       // 0x1E0
     void (*pfn1E4)(void);       // 0x1E4  hole start
     void (*pfn1E8)(void);       // 0x1E8  hole finished
     void (*pfn1EC)(void);       // 0x1EC
@@ -440,7 +440,7 @@ typedef struct GameState {
     u8   (*pfn234)(void);       // 0x234  a controller was pulled
     u8   (*pfn238)(int nPlayer); // 0x238  nonzero: skip addressing the ball (swing state 1)
     void (*pfn23C)(int nPlayer); // 0x23C
-    void (*pfn240)(void);       // 0x240
+    s32  (*pfn240)(void);       // 0x240
     void (*pfn244)(int nPlayer); // 0x244
     void (*pfn248)(int nPlayer); // 0x248  end of a golfer's turn
     void (*pfn24C)(int nPlayer); // 0x24C  called when a swing leaves state 20
@@ -451,7 +451,7 @@ typedef struct GameState {
     void (*pfn260)(int nPlayer); // 0x260
     u8   (*pfn264)(int nPlayer); // 0x264  "aim at the pin?" for a re-plan
     void (*pfn268)(void);       // 0x268
-    void (*pfn26C)(void);       // 0x26C
+    s32  (*pfn26C)(void);       // 0x26C
     u8   bShowYardage;          // 0x270  show how far each shot went
     u8   b271;                  // 0x271
     u8   bStrokeLimit;          // 0x272  a hole ends at 10 strokes

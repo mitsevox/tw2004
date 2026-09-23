@@ -31,7 +31,7 @@ void  fn_800E3AF4(void);
 s32   fn_800E3AEC(int a);
 u8    fn_800E3AE4(int nPlayer, int a);
 u8    fn_800E3ADC(int a);
-void  fn_800E3AD4(void);
+s32   fn_800E3AD4(void);
 void  fn_800CF158(int nPlayer);
 u8    fn_800CF450(int nPlayer);
 void  fn_800CFE74(void);
@@ -41,10 +41,10 @@ void  fn_800E3AD0(int nPlayer);
 u8    fn_800E3AC8(int nPlayer);
 u8    fn_800E3AC0(void);
 u8    fn_800E3AB8(int nPlayer);
-void  fn_800E3AB0(void);
+s32   fn_800E3AB0(void);
 void  fn_800E3AAC(void);
 void  fn_800E3AA8(void);
-void  fn_800E3AA0(void);
+s32   fn_800E3AA0(void);
 void  fn_800FF700(void);
 void  fn_800E9E40(void);
 void  fn_800F80FC(void);
@@ -72,6 +72,8 @@ void  fn_800E7980(void);
 void  fn_8010C4A0(void);
 void  fn_80125E68(void);
 extern s32 lbl_80282278;
+void  fn_800E58B4(int a);
+f32   fn_800D0478(int nPlayer);           // the ball's distance from the pin (yards)
 
 extern u8* gpSaveData;
 extern u8  lbl_8028227C;
@@ -899,4 +901,99 @@ char* GameManager_GetHoleName(int nHole) {
 // then).
 int fn_800E27C0(void) {
     return (1.0f / 59.94f) * (f32)(u32)(gSession.unk24 - gpGame->n12C);
+}
+
+// A gimme (formerly its own unit, Gimme.c): the Gimmes option is on, it is not split screen or a
+// replay, the session is not in the mode with both flag bits 0x4000 and 0x8000, the game mode
+// allows gimmes and its rules callback does not object, and the ball is within half a yard
+// (18 inches) of the pin - on the putter, or in any shot of a one-player game. Called from swing
+// state 14; yes leads to state 15 (the tap-in is planned) and 16 (played for the player).
+u8 Gimme_Allowed(int nPlayer) {
+    if (!SESSION_OPTIONS->bGimmes) return 0;
+    if (gSession.nSplitScreen) return 0;
+    if (gSession.bReplay) return 0;
+    if ((gSession.uFlags & 0x4000) && (gSession.uFlags & 0x8000)) return 0;
+    if (!gpGame->bGimmesAllowed) return 0;
+    if (gpGame->pfn1D8(nPlayer, 1)) return 0;
+    if (fn_800D0478(nPlayer) > 0.5f) return 0;
+    if (gPlayers[nPlayer].nClub != CLUB_PUTTER && gSession.nNumPlayers > 1) return 0;
+    return 1;
+}
+
+void fn_800E292C(void) {
+    gpGame->pfn1D4(5);
+}
+
+// Modes 13-17.
+int fn_800E39F0(void) {
+    if (Game_GetMode() == 13 || Game_GetMode() == 14 || Game_GetMode() == 15 || Game_GetMode() == 16 ||
+        Game_GetMode() == 17) {
+        return 1;
+    }
+    return 0;
+}
+
+// Modes 6-8.
+int fn_800E3A54(void) {
+    if (Game_GetMode() == 6 || Game_GetMode() == 7 || Game_GetMode() == 8) {
+        return 1;
+    }
+    return 0;
+}
+
+// The default mode callbacks fn_800E0B38 installs.
+s32 fn_800E3AA0(void) {
+    return 0;
+}
+
+void fn_800E3AA8(void) {
+}
+
+void fn_800E3AAC(void) {
+}
+
+s32 fn_800E3AB0(void) {
+    return 0;
+}
+
+u8 fn_800E3AB8(int nPlayer) {
+    return 1;
+}
+
+u8 fn_800E3AC0(void) {
+    return 1;
+}
+
+u8 fn_800E3AC8(int nPlayer) {
+    return 0;
+}
+
+void fn_800E3AD0(int nPlayer) {
+}
+
+s32 fn_800E3AD4(void) {
+    return 0;
+}
+
+u8 fn_800E3ADC(int a) {
+    return 0;
+}
+
+u8 fn_800E3AE4(int nPlayer, int a) {
+    return 0;
+}
+
+s32 fn_800E3AEC(int a) {
+    return 0;
+}
+
+void fn_800E3AF4(void) {
+}
+
+u8 fn_800E3AF8(void) {
+    return gpGame->b135;
+}
+
+void fn_800E3B04(void) {
+    fn_800E58B4(31);
 }
