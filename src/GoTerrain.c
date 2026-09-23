@@ -6,16 +6,27 @@
 
 #include "golfer.h"
 #include "ball.h"
+#include "game.h"
 #include "engine.h"
 
 void* fn_800073B4(u8* pData, int n);
 void  fn_800075CC(void* p);         // frees what fn_800073B4 made
 void  fn_80019358(Character* pChar, f32* pDir, f32 f);
 void  fn_8001BE88(Character* pChar, void* pClip, int n, f32 f);
+void  fn_800F199C(f32 x, f32 y, f32 z);
 void  fn_80030894(void);
 void  fn_80030A40(void* p, int n);
+f32   fn_800351D8(u32 n, f32 fPeriod);
+void  fn_8003519C(int nRow, void* pData);   // calls row nRow's function of lbl_80188E88 with pData
+void  fn_80035240(s32 p0);
+void  fn_800352E4(void);
+void  fn_80035308(void);
+void  fn_80035338(s32 p0);
 s32   fn_800318AC(const void* pA, const void* pB);
+void  fn_8003272C(int n);
 void  fn_80031938(Ter_LODPlane* pPlanes, f32 fStep, s32 a, s32 b, s32 c, s32 d);
+void  fn_80032B7C(void* pGround, s32 eClipMethod, s32 nPass, s32 n1C, s32 n18, s32 n20, u8* pbFirst, u8 b1,
+                  u8 b2, f32 fNear, f32 fFar);
 void  fn_80032F88(Ter_ObjectDrawData* pList, s32 nCount, s32 eFilterMin, s32 eFilterMag);
 void  fn_800341A4(UStreamObject* pObject);
 void  fn_800342B4(UStreamObject* pObject);
@@ -92,6 +103,38 @@ void fn_8003084C(void) {
     fn_80012EF8();
 }
 
+// Sets the renderer up for the terrain, then hands rows 4 and 5 of lbl_80188E88 the frame count,
+// row 4 with four waves between 0 and 1 whose cycles are 1591.2 x (5.5 + i) / 1000 seconds.
+void fn_80030894(void) {
+    TerWaveData wave;
+    u32 nFrame;
+    int i;
+
+    fn_80035240(0);
+    fn_80016B9C();
+    fn_80016B9C();
+    fn_80016B9C();
+    fn_80035118(4, 5);
+    fn_80012F50(1, 6, 1);
+    fn_80012F18(3);
+    fn_80035338(2);
+    fn_80035308();
+    fn_800352E4();
+    fn_80014118(0x70);
+    fn_80013EEC(fn_8001614C());
+    fn_80012EF8();
+    for (i = 0; i < 4; i++) {
+        f32 fPeriod = 1591.2f * (5.5f + (f32)i) / 1000.0f;
+
+        wave.aWave[i] = 0.5f * fn_800095F0(6.2831855f * fn_800351D8(gSession.nFrameCount, fPeriod) / fPeriod)
+                        + 0.5f;
+    }
+    wave.nFrame = gSession.nFrameCount;
+    fn_8003519C(4, &wave);
+    nFrame = gSession.nFrameCount;
+    fn_8003519C(5, &nFrame);
+}
+
 // Sorts pObjectSortList by distance, except when gSession.b11 is set.
 void fn_8003185C(void) {
     if (gSession.b11 == 0) {
@@ -146,6 +189,72 @@ u8 fn_80031E40(void) {
     return lbl_802810E4 != -1;
 }
 
+// Draws render pass nRenderPass's sorted patches, if it has any: each list (the pass a patch is
+// drawn in, 0..2) one clip method at a time, then the deferred items with the terrain's filters.
+void fn_80032518(int nRenderPass) {
+    u8 bFirst = 1;
+    u8 bAny;
+    int nList;
+    int nClip;
+    Ter_PatchReference* pPatch;
+
+    bAny = 0;
+    for (nList = 0; nList < 3; nList++) {
+        for (nClip = 0; nClip < 3; nClip++) {
+            if (lbl_801D3CB0.pSortedPatchList[nRenderPass][nList][nClip] != NULL) {
+                bAny = 1;
+                break;
+            }
+        }
+    }
+    if (bAny) {
+        if (nRenderPass == 2) {
+            fn_8003272C(0);
+        }
+        fn_80012EF8();
+        fn_80014118(0x70);
+        fn_80012F50(0, 6, 1);
+        for (nList = 0; nList <= 2; nList++) {
+            if (nRenderPass != 2) {
+                if (nList == 0) {
+                    fn_8003272C(1);
+                } else {
+                    fn_8003272C(0);
+                }
+            }
+            for (nClip = 0; nClip <= 2; nClip++) {
+                if (lbl_801D3CB0.pSortedPatchList[nRenderPass][nList][nClip] != NULL) {
+                    switch (nClip) {
+                    case 2:
+                        fn_80035138(1);
+                        break;
+                    case 1:
+                        fn_80035138(1);
+                        break;
+                    default:
+                        fn_80035138(0);
+                        break;
+                    }
+                    fn_80012EF8();
+                    for (pPatch = lbl_801D3CB0.pSortedPatchList[nRenderPass][nList][nClip]; pPatch != NULL;
+                         pPatch = pPatch->pNext[nList]) {
+                        fn_80032B7C(pPatch->pGround, nClip, nList, pPatch->n1C, pPatch->n18, pPatch->n20,
+                                    &bFirst, 0, 0, pPatch->fDistance,
+                                    pPatch->fDistance + 2.0f * pPatch->fBoundingRadius);
+                    }
+                }
+            }
+        }
+        fn_80032F88(lbl_801D3CB0.pDeferredItemsList, lbl_801D3CB0.iDeferredItems,
+                    lbl_801D3CB0.eTerrainFilterMin, lbl_801D3CB0.eTerrainFilterMag);
+        lbl_801D3CB0.iDeferredItems = 0;
+        fn_80012F50(1, 6, 1);
+        fn_80012EF8();
+        fn_8003272C(1);
+        fn_80012EF8();
+    }
+}
+
 void fn_8003272C(int n) {
     if (lbl_801D3CB0.boManageZUpdate) {
         fn_80012F34(n);
@@ -162,6 +271,43 @@ void fn_80032954(void) {
     }
     fn_80012F50(1, 6, 128);
     fn_80012EF8();
+}
+
+// Draws the post-draw terrain patches, each in every pass (bits 0..2 of n1C) it takes part in.
+void fn_800329CC(void) {
+    u8 bFirst = 1;
+    int i;
+    int nPass;
+    int nPassBit;
+
+    fn_80030894();
+    fn_80014118(0x70);
+    for (i = 0; i < lbl_801D3CB0.iTotalPostDrawTerrainPatches; i++) {
+        switch (lbl_801D3CB0.pPostDrawTerrainList[i].eClipMethod) {
+        case 2:
+            fn_80035138(1);
+            break;
+        case 1:
+            fn_80035138(1);
+            break;
+        default:
+            fn_80035138(0);
+            break;
+        }
+        fn_80012EF8();
+        for (nPass = 0, nPassBit = 1; nPass <= 2; nPass++, nPassBit <<= 1) {
+            if (nPassBit & lbl_801D3CB0.pPostDrawTerrainList[i].n1C) {
+                fn_80032B7C(lbl_801D3CB0.pPostDrawTerrainList[i].pGround,
+                            lbl_801D3CB0.pPostDrawTerrainList[i].eClipMethod, nPass,
+                            lbl_801D3CB0.pPostDrawTerrainList[i].n1C, lbl_801D3CB0.pPostDrawTerrainList[i].n18,
+                            lbl_801D3CB0.pPostDrawTerrainList[i].n20, &bFirst, 1, 0,
+                            lbl_801D3CB0.pPostDrawTerrainList[i].fDistance,
+                            lbl_801D3CB0.pPostDrawTerrainList[i].fDistance
+                                + 2.0f * lbl_801D3CB0.pPostDrawTerrainList[i].fBoundingRadius);
+            }
+        }
+    }
+    fn_8003084C();
 }
 
 void fn_80032AEC(void) {
@@ -181,6 +327,48 @@ void fn_80032AEC(void) {
 void fn_800332F4(void) {
     lbl_802810CC = -1;
     lbl_802810C8 = -1.0f;
+}
+
+// Starts the crowd's animation: after fDelay seconds when that is above 0 (fn_80033744 counts it
+// down, then calls here again), otherwise now, for fDuration, each crowd object from a
+// pseudo-random point of its cycle. EA passes the share of the crowd that starts, but sets it to 1.
+void fn_8003349C(f32 fPercentage, f32 fDuration, f32 fDelay) {
+    f32 fRand = 0.0f;
+    int i;
+
+    fPercentage = 1.0f;
+    if (fDelay > fRand) {
+        lbl_801D3CB0.fCrowdAnimationDelayedStartTimer = fDelay;
+        lbl_801D3CB0.fCrowdAnimationDelayedStartPercentage = fPercentage;
+        lbl_801D3CB0.fCrowdAnimationDelayedStartDuration = fDuration;
+        return;
+    }
+    lbl_801D3CB0.fCrowdAnimationCountdown = fDuration;
+    lbl_801D3CB0.fCrowdAnimationDelayedStartPercentage = fPercentage;
+    for (i = 0; i < TER_NUM_OBJECTS; i++) {
+        s32 nFlags = lbl_801D3CB0.pObjectStateList[i].a20[0];
+        s32 nFlags3 = lbl_801D3CB0.pObjectStateList[i].a20[3];
+
+        if (nFlags & 1) {
+            if ((nFlags & 2) && !(nFlags3 & 0x40)) {
+                if (fPercentage >= fRand) {
+                    lbl_801D3CB0.pObjectStateList[i].n1C = 3;
+                    lbl_801D3CB0.pObjectStateList[i].f14 = lbl_801D3CB0.pObjectStateList[i].f10;
+                }
+                fRand *= 131.2934f;
+                fRand += 82.459f;
+                fRand -= fn_80035074(fRand);
+            } else if ((nFlags & 2) && (nFlags3 & 0x40)) {
+                if (fPercentage >= fRand) {
+                    lbl_801D3CB0.pObjectStateList[i].n1C = 1;
+                    lbl_801D3CB0.pObjectStateList[i].f14 = lbl_801D3CB0.pObjectStateList[i].f10;
+                }
+                fRand *= 131.2934f;
+                fRand += 82.459f;
+                fRand -= fn_80035074(fRand);
+            }
+        }
+    }
 }
 
 // Stops the crowd's animation and puts every object with bits 0 and 1 of a20[0] back: n1C to 0,
@@ -296,15 +484,39 @@ void fn_8003467C(void) {
 
 // A tee's position arrived: into its row of the course's tees, if the course is loaded.
 void fn_80034720(UStreamObject* pObject) {
-    TerTeeData* pTee = (TerTeeData*)pObject->pData;
+    TerPosData* pTee = (TerPosData*)pObject->pData;
 
     if (lbl_801D3CB0.pCourse != NULL) {
-        lbl_801D3CB0.pCourse->tee[pTee->nTeeSet].x = pTee->vPos[0];
-        lbl_801D3CB0.pCourse->tee[pTee->nTeeSet].y = pTee->vPos[1];
-        lbl_801D3CB0.pCourse->tee[pTee->nTeeSet].z = pTee->vPos[2];
-        lbl_801D3CB0.pCourse->tee[pTee->nTeeSet].w = 1.0f;
+        lbl_801D3CB0.pCourse->tee[pTee->nIndex].x = pTee->vPos[0];
+        lbl_801D3CB0.pCourse->tee[pTee->nIndex].y = pTee->vPos[1];
+        lbl_801D3CB0.pCourse->tee[pTee->nIndex].z = pTee->vPos[2];
+        lbl_801D3CB0.pCourse->tee[pTee->nIndex].w = 1.0f;
     }
     fn_80009E70(pObject);
+}
+
+// A pin position arrived (UKernel.c hands it on). With fn_800E39F0 set it goes to fn_800F199C;
+// otherwise a pin the course already has (w not 0) is copied into the chunk, and a missing one is
+// taken from it.
+int fn_800347B4(UStreamObject* pObject) {
+    TerPosData* pPin = (TerPosData*)pObject->pData;
+
+    if (lbl_801D3CB0.pCourse != NULL) {
+        if (fn_800E39F0()) {
+            fn_800F199C(pPin->vPos[0], pPin->vPos[1], pPin->vPos[2]);
+        } else if (0.0f != lbl_801D3CB0.pCourse->pin[pPin->nIndex].w) {
+            pPin->vPos[0] = lbl_801D3CB0.pCourse->pin[pPin->nIndex].x;
+            pPin->vPos[1] = lbl_801D3CB0.pCourse->pin[pPin->nIndex].y;
+            pPin->vPos[2] = lbl_801D3CB0.pCourse->pin[pPin->nIndex].z;
+        } else {
+            lbl_801D3CB0.pCourse->pin[pPin->nIndex].x = pPin->vPos[0];
+            lbl_801D3CB0.pCourse->pin[pPin->nIndex].y = pPin->vPos[1];
+            lbl_801D3CB0.pCourse->pin[pPin->nIndex].z = pPin->vPos[2];
+            lbl_801D3CB0.pCourse->pin[pPin->nIndex].w = 1.0f;
+        }
+    }
+    fn_80009E70(pObject);
+    return 0;
 }
 
 // The flag follows the wind: it turns to face it and plays "flagcalm" below 5, "flagbrzy" below
@@ -342,6 +554,89 @@ void fn_800349CC(int n) {
         fn_80030A40(lbl_801D3CB0.pCurrentHoleData, n);
         fn_8003084C();
     }
+}
+
+// Draws the grass patches of render pass nRenderPass that take part in the first pass (bit 0 of
+// n1C), farthest first, one clip method at a time.
+// Not exact (97.1%): the original tests bit 0 with `and.` against a register holding 1 (one more
+// saved register); every spelling tried folds the 1 into `clrlwi.` (a local, s32/int counters).
+void fn_80034CAC(int nRenderPass) {
+    u8 bFirst = 1;
+    int i;
+    s32 nClip;
+
+    fn_80012EF8();
+    fn_80014118(0x70);
+    for (nClip = 0; nClip <= 2; nClip++) {
+        switch (nClip) {
+        case 2:
+            fn_80035138(1);
+            break;
+        case 1:
+            fn_80035138(1);
+            break;
+        default:
+            fn_80035138(0);
+            break;
+        }
+        fn_80012EF8();
+        for (i = lbl_801D3CB0.iNumGrassPatches - 1; i >= 0; i--) {
+            if (lbl_801D3CB0.xpGrassPatchList[i].eClipMethod == nClip
+                && lbl_801D3CB0.xpGrassPatchList[i].iRenderPass == nRenderPass
+                && (lbl_801D3CB0.xpGrassPatchList[i].n1C & 1)) {
+                fn_80032B7C(lbl_801D3CB0.xpGrassPatchList[i].pGround, nClip, 0,
+                            lbl_801D3CB0.xpGrassPatchList[i].n1C, lbl_801D3CB0.xpGrassPatchList[i].n18,
+                            lbl_801D3CB0.xpGrassPatchList[i].n20, &bFirst, 0, 1,
+                            lbl_801D3CB0.xpGrassPatchList[i].fDistance,
+                            lbl_801D3CB0.xpGrassPatchList[i].fDistance
+                                + 2.0f * lbl_801D3CB0.xpGrassPatchList[i].fBoundingRadius);
+            }
+        }
+    }
+    fn_80012F50(1, 6, 1);
+    fn_80012EF8();
+    fn_8003272C(1);
+    fn_80012EF8();
+}
+
+// Draws the grass patches in list 0x80 of n1C (pass 3), farthest first, one clip method at a time.
+void fn_80034DE4(void) {
+    u8 bFirst = 1;
+    int i;
+    s32 nClip;
+
+    fn_8003272C(0);
+    fn_80012EF8();
+    fn_80014118(0x70);
+    for (nClip = 0; nClip <= 2; nClip++) {
+        switch (nClip) {
+        case 2:
+            fn_80035138(1);
+            break;
+        case 1:
+            fn_80035138(1);
+            break;
+        default:
+            fn_80035138(0);
+            break;
+        }
+        fn_80012EF8();
+        for (i = lbl_801D3CB0.iNumGrassPatches - 1; i >= 0; i--) {
+            if (nClip == lbl_801D3CB0.xpGrassPatchList[i].eClipMethod
+                && (lbl_801D3CB0.xpGrassPatchList[i].n1C & 0x80)) {
+                fn_80032B7C(lbl_801D3CB0.xpGrassPatchList[i].pGround, nClip, 3,
+                            lbl_801D3CB0.xpGrassPatchList[i].n1C, lbl_801D3CB0.xpGrassPatchList[i].n18,
+                            lbl_801D3CB0.xpGrassPatchList[i].n20, &bFirst, 0, 1,
+                            lbl_801D3CB0.xpGrassPatchList[i].fDistance,
+                            lbl_801D3CB0.xpGrassPatchList[i].fDistance
+                                + 2.0f * lbl_801D3CB0.xpGrassPatchList[i].fBoundingRadius);
+            }
+        }
+    }
+    fn_80012F50(1, 6, 1);
+    fn_80012EF8();
+    fn_8003272C(1);
+    fn_80012EF8();
 }
 
 // Sets boManageZUpdate and returns what it was.

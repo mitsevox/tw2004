@@ -21,11 +21,13 @@ typedef struct Ter_PatchReference {
     void*  pObjects;            // 0x04  TW06: pObjects
     f32    fDistance;           // 0x08  from the camera, less the radius. TW06: fDistance
     f32    fBoundingRadius;     // 0x0C  TW06: fBoundingRadius
-    s32    n10;                 // 0x10  0..2, its row of pSortedPatchList's last index
-    s32    n14;                 // 0x14  0..2, its row of pSortedPatchList's first index
+    s32    eClipMethod;         // 0x10  how it is clipped (0..2; 3, off screen, is not listed): the last
+                                //       index of its pSortedPatchList rows. TW06: eClipMethod (at 0x24)
+    s32    iRenderPass;         // 0x14  0..2: the first index of its pSortedPatchList rows. TW06:
+                                //       iRenderPass (at 0x20)
     s32    n18;                 // 0x18  } bytes of its model (fn_800354D0 3, 2, 1)
-    s32    n1C;                 // 0x1C  }   bits 0x1, 0x2, 0x4, 0x80: the lists it goes in
-    s32    n20;                 // 0x20  }
+    s32    n1C;                 // 0x1C  }   bits 0x1, 0x2, 0x4: the passes it is drawn in; with 0x80,
+    s32    n20;                 // 0x20  }   the lists it goes in
     struct Ter_PatchReference* pNext[4];   // 0x24  the next in each of its lists. TW06: pNext
 } Ter_PatchReference;
 LAYOUT_ASSERT(Ter_PatchReference, 0x34);
@@ -76,12 +78,20 @@ typedef struct Ter_LODPlane {
 } Ter_LODPlane;
 LAYOUT_ASSERT(Ter_LODPlane, 8);
 
-// The data of the chunk fn_80034720 is given (by UKernel.c): the position of one tee.
-typedef struct TerTeeData {
+// The data of the chunks fn_80034720 and fn_800347B4 are given (by UKernel.c): the position of one
+// tee or one pin.
+typedef struct TerPosData {
     u8   unk0[0x10];
     f32  vPos[3];               // 0x10
-    u8   nTeeSet;               // 0x1C  its row of CourseInfo.tee
-} TerTeeData;
+    u8   nIndex;                // 0x1C  its row of CourseInfo.tee or CourseInfo.pin
+} TerPosData;
+
+// What fn_80030894 hands to row 4 of the table fn_8003519C calls through: four values that swing
+// between 0 and 1 over cycles of different lengths, and the frame count they were made for.
+typedef struct TerWaveData {
+    f32  aWave[4];              // 0x00
+    u32  nFrame;                // 0x10  gSession.nFrameCount
+} TerWaveData;
 
 // The data of the 'tLOD' chunk (fn_800341A4); only two values are read.
 typedef struct TerLODData {
@@ -197,7 +207,8 @@ void fn_800335F8(u8 bReset);
 f32  fn_800336E4(void);
 f32  fn_800336F4(void);
 f32  fn_80035074(f32 x);            // floor
-void fn_80034720(struct UStreamObject* pObject);   // a tee's position (TerTeeData)
+void fn_80034720(struct UStreamObject* pObject);   // a tee's position (TerPosData)
+int  fn_800347B4(struct UStreamObject* pObject);   // a pin's position (TerPosData)
 void fn_80035118(int a, int b);     // renderer state: n10 and n14
 void fn_80035138(int a);            // renderer state: uFC
 
