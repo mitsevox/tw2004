@@ -31,7 +31,9 @@ typedef struct CamShot {
     struct CamShot* p44;        // 0x44  in View.shot19C: the shot camera 13 goes back to
     f32  f48;                   // 0x48  how long the shot lasts
     f32  f4C;                   // 0x4C
-    u8   unk50[0x60 - 0x50];
+    u32  u50;                   // 0x50  on the CrAP screen: bit n for CrAPGolfer.nC = n up to 32
+    u32  u54;                   // 0x54  ... bit n - 32 above that (fn_8003D294)
+    u8   unk58[0x60 - 0x58];
     f32  f60;                   // 0x60
     f32  f64;                   // 0x64
     f32  f68;                   // 0x68
@@ -51,7 +53,7 @@ typedef struct CamShot {
     u8   unkA0[0xA4 - 0xA0];
     s32  nA4;                   // 0xA4
     u8   bA8;                   // 0xA8
-    u8   unkA9;
+    u8   bA9;                   // 0xA9  another shot's p40 leads here (fn_80039C5C)
     u8   bAA;                   // 0xAA
     u8   bAB;                   // 0xAB
     u8   bAC;                   // 0xAC
@@ -79,9 +81,14 @@ typedef struct CamSequence {
     s32  nChoices;              // 0x3C  how many shot choices p4C holds
     u32  uCourses;              // 0x40  one bit per course it is used on
     u8   b44;                   // 0x44  its kind
-    u8   unk45;
+    u8   b45;                   // 0x45  the clubs it is for (fn_8003CBE8)
     u8   b46;                   // 0x46  6: the ball-flight camera keeps one for shot kind 5
-    u8   unk47[0x4B - 0x47];
+    u8   b47;                   // 0x47  0 humans, 1 CPU players, 2 not in a replay, 3 in a replay,
+                                //       4 in a replay or a CPU player (fn_8003CEEC)
+    u8   b48;                   // 0x48  0 single-view play outside modes 9 and 11 and fn_800E39F0;
+                                //       1 split screen or modes 9 and 11; 2 fn_800E39F0 (fn_8003D140)
+    u8   b49;                   // 0x49  a bit mask
+    u8   b4A;                   // 0x4A  a bit mask
     s8   n4B;                   // 0x4B  one bit per value of fn_800D2B08
     struct CamChoice* p4C;      // 0x4C  its shot choices (dyncam.h)
 } CamSequence;
