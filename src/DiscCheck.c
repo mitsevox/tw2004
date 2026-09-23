@@ -1,4 +1,10 @@
+// DiscCheck.c (our name): which disc is in the drive. It reads "data/fend/d_layout.bin", checks
+// the disc's ID (DVDGetCurrentDiskID), asks for a disc change (DVDChangeDiskAsync) and builds
+// course file paths ("\hole.hog"). Not yet decompiled beyond the sweep code.
+
 #include "game_types.h"
+
+// ---- sweep code (not yet cleaned up) ----
 
 extern u8 lbl_802824D9;
 void fn_80110178(u8 v);
