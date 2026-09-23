@@ -11,7 +11,6 @@
 
 // fake match: the (s8) on GOLFERSTATE_GetCurrentState (see game.h).
 
-void  fn_800D29E8(void);
 void  GM_Earnings_FreeStreamMemory(void);
 void  fn_800D8D38(int nPlayer);
 u8    fn_800E0A90(int nPlayer);

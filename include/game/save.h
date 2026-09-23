@@ -139,6 +139,16 @@ typedef struct TourWin {
     s16  n6;                    // 0x6  the tournament's aPrize[bracket][1]
 } TourWin;
 
+// One entry of SaveProfile.a1054C: a switch and a value (our name). lbl_80281DF0 is one more,
+// outside the profiles: user.c clears it and the code at 0x80057D64 copies it into a new profile's
+// first entry.
+typedef struct SaveLockEntry {
+    u8   b;                     // 0x0
+    u8   unk1;
+    s16  n;                     // 0x2
+} SaveLockEntry;
+LAYOUT_ASSERT(SaveLockEntry, 4);
+
 // One save profile (0x10600 bytes).
 typedef struct SaveProfile {
     u8   bActive;               // 0x00000  1: the slot holds a profile; payouts are scaled and awards given only then
@@ -208,11 +218,7 @@ typedef struct SaveProfile {
     u32  aB4BC[94];             // 0x0B4BC
     TourSeason tour;            // 0x0B634
     u8   unk104D0[0x1054C - 0x104D0];
-    struct {
-        u8  b;
-        u8  unk1;
-        s16 n;
-    } a1054C[11];               // 0x1054C  cleared by the profile setup; fn_80078008's lock kinds
+    SaveLockEntry a1054C[11];   // 0x1054C  cleared by the profile setup; fn_80078008's lock kinds
                                 //          10 and 11 read them
     u8   a10578[4];             // 0x10578  marked holes 71..74: fn_800588F4's kind 0
     s32  a1057C[4];             // 0x1057C  and kind 1
@@ -222,10 +228,16 @@ LAYOUT_ASSERT(SaveProfile, 0x10600);
 
 extern SaveProfile* gpSaveData;
 extern SaveProfile* lbl_80281DF4;       // unlocks that hold for every profile (the cheat codes set them)
+extern SaveLockEntry lbl_80281DF0;
 extern u32 lbl_801D5948[8];             // a bit array the code at 0x80056480 keeps; fn_80078008's lock
                                         // kind 6 tests bits 1..5 of it
+extern u32 lbl_801D5908[16];            // a bit array the cheat codes of lbl_80188024 set (fn_800564AC)
 extern s32 lbl_80189528[14];            // the golfers GM_GetGameProgress counts as unlockable
 extern s32 lbl_801894D0[6];             // the courses GM_GetGameProgress counts as unlockable
+
+// The password manager (0x80056480-0x80057F18; TW06's passwordmanager.cpp)
+void fn_80056B8C(void);
+void fn_80057364(int nSlot);    // sets up save profile nSlot
 
 // GameManager.c: the profile's completion score (fn_800D439C raises the TOUR card level with it)
 f32  GM_GetGameProgress(SaveProfile* pProfile);

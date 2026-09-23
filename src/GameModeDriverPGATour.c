@@ -27,8 +27,6 @@ s32 lbl_80282338;               // the options' nWind from before the tour (fn_8
 s32  fn_8008AC00(void);
 void fn_800907AC(s32 nMoney, char* pDst);               // money as text
 void fn_800D27CC(u16* pDate, s32 nDays);                // moves a date on by nDays
-s32  fn_800D2FB4(s32 nTeeSet);
-u8   fn_800D3080(int nHole);
 
 void GameModeDriverPGATour_LoadPGAcFromStream(UStreamObject* pObject);
 void GameModeDriverPGATour_LoadPGAtFromStream(UStreamObject* pObject);

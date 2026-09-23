@@ -1,28 +1,53 @@
-// GoShaderObjectCommon_MorphAnimManager_Gc.c (EA's name, from its asserts): not yet decompiled; the
-// sweep code below is the matched small functions.
+// GoShaderObjectCommon_MorphAnimManager_Gc.c (EA's name, from its asserts): the list of morph
+// animations the shader objects play (include/morphanim.h): a count, the total of their frames and
+// a slot per animation.
 
-#include "game_types.h"
+#include "morphanim.h"
 
-// ---- sweep code (not yet cleaned up) ----
-
-extern u8 lbl_80189D30[];
-extern s32 lbl_80281F70;
-void fn_80005AE8();
-s32 fn_80009B34();
-void fn_80009E70();
-void fn_80097208(void);
-void fn_80097250(void);
+void fn_800975FC(MorphAnim* pAnim);
 
 void fn_80097208(void) {
-    s32 t0;
-    t0 = fn_80009B34(2408, 2, 32, lbl_80189D30, 85);
-    lbl_80281F70 = t0;
-    fn_80005AE8(t0, 0, 2408);
+    lbl_80281F70 = fn_80009B34(sizeof(MorphAnimMgr), 2, 32, "GoShaderObjectCommon_MorphAnimManager_Gc.c",
+                               85);
+    fn_80005AE8(lbl_80281F70, 0, sizeof(MorphAnimMgr));
 }
 
 void fn_80097250(void) {
     fn_80009E70(lbl_80281F70);
-    lbl_80281F70 = 0;
+    lbl_80281F70 = NULL;
 }
 
-// ---- end of sweep code ----
+// Add an animation: it takes the next slot, which starts empty.
+void fn_800975B0(MorphAnim* pAnim) {
+    pAnim->nIndex = lbl_80281F70->nCount;
+    lbl_80281F70->nFrames += pAnim->nFrames;
+    lbl_80281F70->ap8[lbl_80281F70->nCount] = NULL;
+    lbl_80281F70->nCount++;
+}
+
+// Take an animation's frames off the totals.
+void fn_800975FC(MorphAnim* pAnim) {
+    lbl_80281F70->nCount--;
+    lbl_80281F70->nFrames -= pAnim->nFrames;
+}
+
+// Free an animation's data.
+void fn_80097624(MorphAnim* pAnim) {
+    if (pAnim->nFrames != 0) {
+        fn_80009E70(pAnim->p10);
+        fn_80009E70(pAnim->p14);
+        fn_80009E70(pAnim->p18);
+        pAnim->p10 = NULL;
+        pAnim->p14 = NULL;
+        pAnim->p18 = NULL;
+        fn_800975FC(pAnim);
+    }
+}
+
+s32 fn_80097688(void) {
+    return lbl_80281F70->nCount;
+}
+
+void* fn_80097694(u8 nIndex) {
+    return lbl_80281F70->ap8[nIndex];
+}

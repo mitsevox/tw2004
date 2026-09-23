@@ -35,7 +35,7 @@ typedef struct FEState {
     u8  unk12[2];
     s32 nMode;                  // 0x014  the game mode the menus start in (fn_80079AD4): the
                                 //        session's, or 4, 23, 27 or 28
-    u8  b18;                    // 0x018  set by fn_80076E48
+    u8  b18;                    // 0x018  set by fn_80076E48; cleared by the "THEKITCHENSINK" cheat code
     u8  unk19[3];
     s32 n1C;                    // 0x01C  cleared by fn_80076E48
     s32 nMovieNext;             // 0x020  } the movie queue: the next to play, and where the next
