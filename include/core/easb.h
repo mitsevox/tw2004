@@ -98,11 +98,21 @@ typedef struct EASBState {
 
 #define EASB_PRODUCT_BUFFER_SIZE 0x1B328
 
+// What the game passes to fn_8012D394 to start the library (TW06's EASBInitParams_t).
+typedef struct EASBInitParams {
+    char* szProductName;            // 0x00: this game's name in the Bio
+    u16* szGamesPlayedType;         // 0x04: what the Bio counts this game's games in (wide text)
+    struct SFIOCallbacks* pCallbacks;   // 0x08: the memory-card glue (TibExt.c)
+    u32 uHeapID;                    // 0x0C
+    u16 uGamesPlayedTypeLanguage;   // 0x10: the language of szGamesPlayedType, two letters
+} EASBInitParams;
+
 extern EASBState* lbl_802825B8;
 
 // TibExt.c: the library's memory and clock glue.
 void TibExtMemFree(void* pAllocator, void* p, u32 uSize, u32 uAlign);
 u32 TibExtCurrentTimeGet(void);     // the real-time clock, in seconds since 1970
+struct SFIOCallbacks* fn_801221F0(void);    // fills in and returns the memory-card callbacks
 
 // The code before EASB.c (still sweep code).
 u32 fn_80128468(u32 uA, u32 uB);    // uA + uB, saturating at 0xFFFFFFFF
@@ -124,6 +134,7 @@ EASBErrorE fn_8012CD8C(void);
 EASBErrorE fn_8012CF00(void);
 EASBErrorE fn_8012D0D4(void);
 EASBErrorE fn_8012D1A0(void);
+EASBErrorE fn_8012D394(EASBInitParams* pParams);
 EASBErrorE fn_8012D560(void);
 EASBErrorE fn_8012D5B0(void);
 EASBErrorE fn_8012D5E4(void* p0, void* p1);
@@ -181,6 +192,10 @@ void EASBio_IncrementGamesPlayed(u32 uCount);
 void EASBio_SetAccomplishment(const char* szName, s32 arg1);
 
 extern EASBioMgr* lbl_80281988;
+extern EASBInitParams lbl_80261040;
+extern char lbl_80195308[28];       // "Tiger Woods PGA TOUR(R) 2004"
+extern u16 lbl_80195324[14];        // "Rounds Played", 16-bit characters
+extern s32 lbl_80195340[35];        // the memory-card error code for each EASBErrorE
 extern u8 lbl_80282568;
 extern u8 lbl_80282569;
 extern u8 lbl_8028256A;
