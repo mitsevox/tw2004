@@ -88,7 +88,9 @@ typedef struct SaveProfile {
     u16  aMedalDate[29];        // 0x051E4  the day each was earned (fn_800D2994)
     u8   unk521E[0x5230 - 0x521E];
     SavedRound aSavedRound[NUM_SAVED_ROUNDS];   // 0x05230
-    u8   unk5380[0x54C2 - 0x5380];
+    GolferRecord createdGolfer; // 0x05380  the created golfer's record (fn_80077A80: golfers
+                                //          from FIRST_CREATED_GOLFER on are read here)
+    u8   unk54C0[0x54C2 - 0x54C0];
     // The created golfer kept in this slot (golfer FIRST_CREATED_GOLFER + the slot), copied into
     // the session's PlayerProfile by Golfer.c.
     u8   n54C2;                 // 0x054C2  -> PlayerProfile.unk2
