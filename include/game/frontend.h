@@ -13,4 +13,14 @@ typedef struct FrontEnd {
 
 extern FrontEnd* lbl_80281F1C;
 
+// One value of a message: an int or a float (the mask passed with it says which), or a pointer.
+typedef union MsgArg {
+    s32   i;
+    f32   f;
+    void* p;
+} MsgArg;
+
+// Send message nMsg with nArgs values to a front-end handler (fn_8016B09C also sends through it).
+void fn_8016B0F8(void* pHandler, int nMsg, int nArgs, MsgArg* pArgs);
+
 #endif

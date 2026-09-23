@@ -135,6 +135,9 @@ extern u32   lbl_80282108;      // the blocks' ARAM address
 extern void* lbl_8028210C;      // the heap's bookkeeping (0x2A4 bytes)
 extern u8    lbl_80282110;      // set when that DMA is done
 
+// DMA nLen bytes from main memory to ARAM; pfnDone is called when it is done. Returns 1.
+int fn_800B044C(u32 uAram, void* pSrc, int nLen, void (*pfnDone)(void), int n);
+
 // ---- the built-in sounds ----------------------------------------------------------------------
 
 // One of the two sounds in startUp.c's own data, copied to ARAM at boot (fn_800B07A0).
@@ -155,5 +158,6 @@ extern u16   lbl_80282118;      // the next voice fn_800B0858 plays on
 extern s32   lbl_80281498;      // } where fn_800B13FC's search stopped; -1 to start again
 extern s32   lbl_8028149C;      // }
 extern u8    lbl_802814A0;
+extern u8    lbl_80282120;      // fn_800B0960 keeps a memory-card result here
 
 #endif

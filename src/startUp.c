@@ -4,6 +4,7 @@
 // Most of it talks to the GameCube's audio libraries; see core/startup.h.
 
 #include "core/startup.h"
+#include "game/frontend.h"
 
 void   fn_800AF324(void);
 void   fn_800AF93C(void* pVpb);
@@ -16,7 +17,6 @@ s16    fn_800AFF9C(s16 nVolume);
 void   fn_800B00A4(u16 nVoice, u32 u, int a);
 void   fn_800B0114(u16 nVoice, VoiceEnvelope* pEnv);
 void   fn_800B01B4(u16 nVoice, u8 bA, u8 bB);
-int    fn_800B044C(u32 uAram, void* pSrc, int nLen, void (*pfnDone)(void), int n);
 void   fn_800B04EC(void* p, u32 uLen, int nDir);
 void   fn_800B051C(void* p, u32 uLen, int nDir);
 void   fn_800B055C(void);
@@ -43,6 +43,15 @@ void   fn_800B65C0(void* pSrc, u32 uAram, u32 uLen, int a, int b, void (*pfnDone
                    int c);                                            // ARAM DMA
 f32    fn_8000AF7C(f32 x);              // natural logarithm
 void   fn_8009527C(void* p);            // frees what fn_800951A0 allocated
+
+// The memory card code (MC.c, MC_Gc.c).
+void   fn_8009CD10(void);
+void   fn_8009CD7C(void);
+void   fn_8009DCEC(s32 a, s32 b);
+u8     fn_8009F850(void);
+void   fn_8009FAD0(void);
+s32    fn_800A0A7C(s32 a, s32 b);
+s32    fn_800A2100(s32 a, s32 b);
 
 // The hardware dropped a voice (to play one of higher priority): mark ours lost and stop it. The
 // mixer callback asks for it back after 255 passes.
@@ -439,11 +448,110 @@ void fn_800B0954(void) {
     lbl_802814A0 = 0;
 }
 
+void fn_800B0960(void) {
+    MsgArg arg;
+    if (!lbl_802814A0) {
+        fn_80005AE8(&arg, 0, sizeof(arg));
+        fn_8016B0F8(lbl_80281F1C->pHandler, 0x86, 1, &arg);
+        return;
+    }
+    fn_8009CD10();
+    fn_8009FAD0();
+    lbl_80282120 = fn_8009F850();
+    fn_8009CD7C();
+}
+
+// The messages below have no values: their one value is cleared and not counted.
+
+void fn_800B0DB8(void) {
+    MsgArg arg;
+    fn_80005AE8(&arg, 0, sizeof(arg));
+    fn_8016B0F8(lbl_80281F1C->pHandler, 0x87, 0, &arg);
+}
+
+void fn_800B0DFC(void) {
+    MsgArg arg;
+    fn_80005AE8(&arg, 0, sizeof(arg));
+    fn_8016B0F8(lbl_80281F1C->pHandler, 0x88, 0, &arg);
+}
+
+void fn_800B0E40(void) {
+    MsgArg arg;
+    fn_80005AE8(&arg, 0, sizeof(arg));
+    fn_8016B0F8(lbl_80281F1C->pHandler, 0x89, 0, &arg);
+}
+
+void fn_800B0E84(void) {
+    MsgArg arg;
+    fn_80005AE8(&arg, 0, sizeof(arg));
+    fn_8016B0F8(lbl_80281F1C->pHandler, 0x8A, 0, &arg);
+}
+
+void fn_800B0EC8(void) {
+    MsgArg arg;
+    fn_80005AE8(&arg, 0, sizeof(arg));
+    fn_8016B0F8(lbl_80281F1C->pHandler, 0x8C, 0, &arg);
+}
+
+void fn_800B0F0C(void) {
+    MsgArg arg;
+    fn_80005AE8(&arg, 0, sizeof(arg));
+    fn_8016B0F8(lbl_80281F1C->pHandler, 0x83, 0, &arg);
+}
+
+void fn_800B0F50(void) {
+    MsgArg arg;
+    fn_80005AE8(&arg, 0, sizeof(arg));
+    fn_8016B0F8(lbl_80281F1C->pHandler, 0x81, 0, &arg);
+}
+
+void fn_800B0F94(void) {
+    MsgArg arg;
+    fn_80005AE8(&arg, 0, sizeof(arg));
+    fn_8016B0F8(lbl_80281F1C->pHandler, 0x8B, 0, &arg);
+}
+
+void fn_800B0FD8(void) {
+    MsgArg arg;
+    fn_80005AE8(&arg, 0, sizeof(arg));
+    fn_8016B0F8(lbl_80281F1C->pHandler, 0x80, 0, &arg);
+}
+
+void fn_800B101C(void) {
+    MsgArg arg;
+    fn_80005AE8(&arg, 0, sizeof(arg));
+    fn_8016B0F8(lbl_80281F1C->pHandler, 0x82, 0, &arg);
+}
+
+void fn_800B1060(void) {
+    MsgArg arg;
+    fn_80005AE8(&arg, 0, sizeof(arg));
+    fn_8016B0F8(lbl_80281F1C->pHandler, 0x8C, 0, &arg);
+}
+
 // Start a search from the beginning (fn_800B13FC continues it).
 int fn_800B14E4(s32* pnA, s32* pnB) {
     lbl_80281498 = -1;
     lbl_8028149C = -1;
     return fn_800B13FC(pnA, pnB);
+}
+
+void fn_800B1510(s32 a, s32 b) {
+    MsgArg arg;
+    s32 n = fn_800A2100(a, b);
+    fn_8009DCEC(a, b);
+    fn_80005AE8(&arg, 0, sizeof(arg));
+    arg.i = n;
+    fn_8016B0F8(lbl_80281F1C->pHandler, 0x84, 1, &arg);
+}
+
+void fn_800B158C(s32 a, s32 b) {
+    MsgArg arg;
+    s32 n = fn_800A0A7C(a, b);
+    fn_8009DCEC(a, b);
+    fn_80005AE8(&arg, 0, sizeof(arg));
+    arg.i = n;
+    fn_8016B0F8(lbl_80281F1C->pHandler, 0x8D, 1, &arg);
 }
 
 void fn_800B1608(void) {
