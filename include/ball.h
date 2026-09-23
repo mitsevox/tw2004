@@ -1,7 +1,47 @@
+// ball.h (our name): the ball and the ground it lies on. The Ball struct and Ball.c's physics,
+// the surface types, the current hole's terrain data (its pins and tees) and the terrain queries
+// (GoTerrainCollision, 0x8004AFA0..) that other files call. Players are in golfer.h, which
+// includes this file.
+
 #ifndef BALL_H
 #define BALL_H
 
-#include "golfer.h"
+#include "game_types.h"
+
+// A row of gSurfaceTypes (0x44 bytes): how a ball behaves on one kind of ground.
+typedef struct SurfaceType {
+    f32  f00;                   // 0x00  launch: share of the speed kept; + the ball's f70 (fn_800510EC)
+    f32  f04;                   // 0x04  lie: size of the random lie quality (Ball_SetLie)
+    f32  f08;                   // 0x08  launch: spin factor
+    f32  f0C;                   // 0x0C  bounce restitution; below 0: branches/leaves (randomised, LUCK)
+    f32  f10;                   // 0x10  bounce: friction at the contact
+    f32  f14;                   // 0x14  skid: 1 - this scales the slope pull
+    f32  f18;                   // 0x18  skid: friction building roll spin
+    f32  f1C;                   // 0x1C  0.375 on surfaces a ball may stop on; roll: break strength
+    f32  f20;                   // 0x20  roll: rolling friction
+    f32  f24;                   // 0x24  bounce: how hard a landing it takes to bend the normal (softness)
+    f32  f28;                   // 0x28  bounce: base softness
+    u32  nClass;                // 0x2C  2, 3 = green, 4, 5 = rough, 6 = sand, 7/16 = water, 11, 12/18 = the cup, 17 = tree
+    u8   unk30[4];
+    u32  u34;                   // 0x34  bit 0x10: event 0x25 on landing
+    u8   unk38[0x44 - 0x38];
+} SurfaceType;
+
+#define NUM_SURFACE_TYPES 156   // rows in gSurfaceTypes
+
+extern SurfaceType gSurfaceTypes[NUM_SURFACE_TYPES];   // 0x8017E9B8
+
+// A point on the course: x, y (up), z, and w = 1.
+typedef struct PinPos {
+    f32  x, y, z, w;
+} PinPos;
+
+// The current hole's terrain data (fn_8000C594); only what the game code reads so far.
+typedef struct CourseInfo {
+    u8     unk0[0x6C];
+    f32    fFloor;              // 0x6C  a ball in the air above this with no ground under it is still in play
+    PinPos pin[18];             // 0x70
+} CourseInfo;
 
 // A golf ball in flight or at rest (0xBC bytes): Player.ball and Player.ballBefore hold one each.
 typedef struct Ball {
@@ -32,7 +72,7 @@ typedef struct Ball {
     CourseInfo* pCourse;        // 0x7C  TW06: pTerrainData (TGD_TerrainInfo*)
     s32  nCollideCount;         // 0x80  TW06: collideCount
     s32  nSolidCollideCount;    // 0x84  TW06: solidCollideCount
-    struct SurfaceType* pHitSurface;   // 0x88  what it last hit. TW06: pLastCollisionSurface
+    SurfaceType* pHitSurface;   // 0x88  what it last hit. TW06: pLastCollisionSurface
     s32  n8C;                   // 0x8C  TW06: pLastCollisionObject
     s32  n90;                   // 0x90  what the ball last hit (fn_80054040). TW06: pLastCollisionActor
     s32  nPlayer;               // 0x94  -1 when nobody's. TW06: playerID
@@ -49,7 +89,13 @@ typedef struct Ball {
     f32  fTimeSinceLastCheck;   // 0xB8  time since the last stall check. TW06: same name
 } Ball;
 
-// Terrain
+// ---- the terrain ----------------------------------------------------------------------------
+
+CourseInfo* fn_8000C594(void);          // the current hole's terrain data
+SurfaceType* fn_800CC190(CourseInfo* pCourse, f32* pPos);   // surface type under a point
+f32  Terrain_HeightAt(f32* pPos, SurfaceType** ppSurface);   // 0x800447DC
+
+// GoTerrainCollision
 u8   Ter_PointInOOBNetwork(u8* pBall);
 f32  fn_8004D5C0(CourseInfo* pCourse, f32* pPos);   // ground height, -65536.1 if none
 f32  fn_8004D620(CourseInfo* pCourse, f32* pPos);   // ground height, -60000 and below if none
@@ -58,7 +104,8 @@ void Ter_GetEnclosingGroundHeight(CourseInfo* pCourse, f32* pPos, f32* pLow, f32
 void Ter_GetEnclosingGroundData(CourseInfo* pCourse, f32* pPos, f32* pHeight, SurfaceType** ppSurface, f32* pNormal,
                                 f32* pHeight2, SurfaceType** ppSurface2, f32* pNormal2);
 
-// Ball.c
+// ---- the ball (Ball.c) ----------------------------------------------------------------------
+
 void Ball_SetSimulating(u8 bOn);        // rehearsals and look-aheads: no sounds, effects or tree roll
 void fn_80050D2C(u8 b);
 void fn_80051A18(Ball* pBall, f32* pDir, f32 fSpeed, f32* pFrom);

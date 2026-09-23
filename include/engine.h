@@ -9,9 +9,6 @@
 
 typedef struct View View;                   // GoGolfCam.c, Swing.c
 
-typedef struct CourseInfo CourseInfo;       // golfer.h
-typedef struct SurfaceType SurfaceType;     // golfer.h
-
 // ---- memory and strings ----------------------------------------------------------------------
 
 void* Mem_cpy(void* pDst, const void* pSrc, u32 uLen);    // returns pDst
@@ -39,12 +36,6 @@ u32  Rand_Next(int nStream);            // 0x8000B130  EA's lagged-Fibonacci gen
 void fn_8000B1D4(int nStream, u32 uSeed);   // seed a random stream
 f32  Rand_Float(int nStream);           // 0x8000B428  [0, 1)
 double fn_8015F824(double x, double y); // pow
-
-// ---- the course ------------------------------------------------------------------------------
-
-CourseInfo* fn_8000C594(void);          // the current course
-SurfaceType* fn_800CC190(CourseInfo* pCourse, f32* pPos);   // surface type under a point
-f32  Terrain_HeightAt(f32* pPos, SurfaceType** ppSurface);   // 0x800447DC
 
 // ---- the file streamer (UStream.c) -----------------------------------------------------------
 

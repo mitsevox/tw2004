@@ -7,6 +7,7 @@
 
 #include "game_types.h"
 #include "engine.h"
+#include "ball.h"
 
 // ---- attributes -----------------------------------------------------------------------------
 
@@ -305,7 +306,7 @@ typedef struct Player {
     s32  nBallStartSurface;     // 0xB08  the ball's nStartSurface (Ball + 0x78)
     void* pBallCourse;          // 0xB0C  the ball's pCourse (Ball + 0x7C)
     u8   unkB10[0xB18 - 0xB10];
-    struct SurfaceType* pBallHitSurface;   // 0xB18  the ball's pHitSurface (Ball + 0x88)
+    SurfaceType* pBallHitSurface;   // 0xB18  the ball's pHitSurface (Ball + 0x88)
     u8   unkB1C[0xB24 - 0xB1C];
     s32  nBallOwner;            // 0xB24  the ball's nPlayer (Ball + 0x94)
     u8   unkB28[0xB4C - 0xB28];
@@ -398,25 +399,6 @@ typedef struct Replay {
     s16    nF1E;                // 0xF1E  -> fn_80055CD0
     s16    nStrokes;            // 0xF20  strokes on the hole before the shot
 } Replay;
-
-// Terrain surface descriptors (0x44 bytes each); only the index of one is used here.
-typedef struct SurfaceType {
-    f32  f00;                   // 0x00  launch: share of the speed kept; + the ball's f70 (fn_800510EC)
-    f32  f04;                   // 0x04  lie: size of the random lie quality (Ball_SetLie)
-    f32  f08;                   // 0x08  launch: spin factor
-    f32  f0C;                   // 0x0C  bounce restitution; below 0: branches/leaves (randomised, LUCK)
-    f32  f10;                   // 0x10  bounce: friction at the contact
-    f32  f14;                   // 0x14  skid: 1 - this scales the slope pull
-    f32  f18;                   // 0x18  skid: friction building roll spin
-    f32  f1C;                   // 0x1C  0.375 on surfaces a ball may stop on; roll: break strength
-    f32  f20;                   // 0x20  roll: rolling friction
-    f32  f24;                   // 0x24  bounce: how hard a landing it takes to bend the normal (softness)
-    f32  f28;                   // 0x28  bounce: base softness
-    u32  nClass;                // 0x2C  2, 3 = green, 4, 5 = rough, 6 = sand, 7/16 = water, 11, 12/18 = the cup, 17 = tree
-    u8   unk30[4];
-    u32  u34;                   // 0x34  bit 0x10: event 0x25 on landing
-    u8   unk38[0x44 - 0x38];
-} SurfaceType;
 
 // An all-time record: the value and who holds it (gSession.recA/B/C).
 typedef struct RecordEntry {
@@ -600,18 +582,6 @@ typedef struct AITarget {
     s8   nPowerReq;             // 0x0B
 } AITarget;
 
-// Per-course data: only the pin positions are read here.
-typedef struct PinPos {
-    f32  x, y, z, w;
-} PinPos;
-
-typedef struct CourseInfo {
-    u8     unk0[0x6C];
-    f32    fFloor;              // 0x6C  a ball in the air above this with no ground under it is still in play
-
-    PinPos pin[18];             // 0x70
-} CourseInfo;
-
 extern GolferRecord gGolferTable[34];   // 0x801CB300  STATS_GC.BIN as loaded
 extern GolferRecord gCurGolferRecord;   // 0x801CB1C0  the created golfer being edited
 extern Player       gPlayers[5];        // 0x801C66E8
@@ -627,7 +597,6 @@ extern s32          gNumAITargets;      // 0x80281D44
 extern u8           gClubKindTable[8][NUM_CLUBS];   // 0x801874B0  which clubs each shot kind allows
 extern f32          gClubDistAtPower0[NUM_CLUBS];   // 0x80187580  reach at POWER 0 (245 for the woods)
 extern f32          gClubPowerStep[NUM_CLUBS];      // 0x801875E8  reach gained per POWER point over 100
-extern SurfaceType  gSurfaceTypes[];    // 0x8017E9B8
 
 int  Game_GetMode(void);                // 0x8000BED8
 int  fn_800D2B08(void);
