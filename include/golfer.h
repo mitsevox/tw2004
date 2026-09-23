@@ -308,7 +308,7 @@ typedef struct Player {
     Character* pChar;           // 0xC18  the golfer on screen
     f32  fThinkTime;            // 0xC1C  seconds a CPU has spent in state 2
     f32  fC20;                  // 0xC20
-    u8   unkC24[4];
+    s32  nC24;                  // 0xC24  added to TourStats.n8 at the end of a hole (fn_800EF2B8)
     u8   bMulliganUsed;         // 0xC28  the one mulligan of a one-per-player mode is used (GM_PlayerTakeMulligan)
     u8   bLowIQPenalty;         // 0xC29  quarters the IQ overconfidence term when set
     s8   nLevel;                // 0xC2A  CPU difficulty level: 25 modifier points per level

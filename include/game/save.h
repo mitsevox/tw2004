@@ -154,7 +154,10 @@ typedef struct SaveProfile {
     TourStats tourStats;        // 0x0F66C  the career totals
     u8   unkF6C4[0x104C8 - 0xF6C4];
     u16  n104C8;                // 0x104C8  counts the tournaments started
-    u8   unk104CA[0x10578 - 0x104CA];
+    u8   unk104CA[2];
+    u16  n104CC;                // 0x104CC  a run of tour rounds, counted on each 18th hole
+                                //          (fn_800EF2B8); reset to 0 when the run breaks
+    u8   unk104CE[0x10578 - 0x104CE];
     u8   a10578[4];             // 0x10578  marked holes 71..74: fn_800588F4's kind 0
     s32  a1057C[4];             // 0x1057C  and kind 1
     u8   unk1058C[0x10600 - 0x1058C];

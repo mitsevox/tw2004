@@ -78,6 +78,10 @@ s32  fn_800EF0E0(s32 nPlayer);
 void fn_80117E98(s32 nPlayer);
 s32  fn_80119A2C(s32 nPlayer, s32 a);
 void fn_801178C8(s32 nPlayer, SeasonEvent* pEvent, s32 nRound, s32 n, s32 k);
+u8   fn_800D3080(int nHole);
+s32  fn_800D2FB4(s32 nTeeSet);
+s32  fn_80119638(s32 a, s32 b, s32 nRound);
+void fn_801198F8(s32 a, s32 nHole);
 
 // TW06: GameModeDriverPGATour::Init. Stroke play's hole and honors rules, the tour's own round and
 // playoff handling; no mulligans, one player.
@@ -509,6 +513,114 @@ void fn_800EF130(s32 nPlayer, u8 bQuick) {
 
 void fn_800EF294(void) {
     fn_80119934(0);
+}
+
+// TW06: GameModeDriverPGATour::EndHole (by its slot). Outside a playoff, the hole just finished goes
+// into the round's statistics (lbl_80205ED8): strokes and putts, the hole's result against par,
+// counts per par 3, 4 and 5, and the longest values; after the 18th hole the profile's n104CC run
+// goes on or ends. Then the tour simulation (fn_801198F8) is given the next hole. The u16 casts on
+// the sums are in the original (a clrlwi before each add).
+void fn_800EF2B8(void) {
+    PlayerNumber_t nPlayer;
+    TourStats* pRound;
+    Player* p;
+    int nHole;
+    int nPar;
+    int nStrokes;
+    int nPutts;
+    u8 bUnder;
+    int nPrev;
+    s32 n;
+    if (gpGame->bD4) {
+        return;
+    }
+    pRound = &lbl_80205ED8;
+    nPlayer = PLR_1_e;
+    p = &gPlayers[0];
+    nHole = Game_CurHoleIndex();
+    nPar = fn_800D2B08();
+    nStrokes = gPlayers[0].nStrokes[nHole];
+    nPutts = gPlayers[0].nPutts[nHole];
+    bUnder = nStrokes < nPar;
+    if (nPutts > 10) {
+        nPutts = 0;
+    }
+    pRound->n14++;
+    pRound->n36 += (u16)nStrokes;
+    if (p->b310) {
+        pRound->n1C++;
+        if (nStrokes <= nPar) {
+            pRound->n1A++;
+        }
+    }
+    if (nPar >= 4) {
+        pRound->n10++;
+        if (p->b2E4[nHole]) {
+            pRound->nE++;
+        }
+    }
+    if (p->b2F6[nHole]) {
+        pRound->n12++;
+        pRound->n18 += (u16)nPutts;
+        if (bUnder) {
+            pRound->n34++;
+        }
+    } else if (nStrokes <= nPar) {
+        pRound->n1E++;
+    }
+    pRound->n16 += (u16)nPutts;
+    if (bUnder) {
+        if (nStrokes < nPar - 1) {
+            pRound->n24++;
+        }
+        pRound->n26++;
+    } else if (nStrokes > nPar) {
+        pRound->n22++;
+    }
+    switch (nPar) {
+    case 3:
+        pRound->n2A++;
+        pRound->n38 += (u16)nStrokes;
+        if (bUnder) {
+            pRound->n28++;
+        }
+        break;
+    case 4:
+        pRound->n2E++;
+        pRound->n3A += (u16)nStrokes;
+        if (bUnder) {
+            pRound->n2C++;
+        }
+        break;
+    case 5:
+        pRound->n32++;
+        pRound->n3C += (u16)nStrokes;
+        if (bUnder) {
+            pRound->n30++;
+        }
+        break;
+    }
+    if (nHole >= 1 && bUnder) {
+        nPrev = nHole - 1;
+        if (p->nStrokes[nPrev] > fn_800D2AD8(nPrev)) {
+            pRound->n20++;
+        }
+    }
+    if (fn_800D3080(nHole)) {
+        pRound->n6++;
+        pRound->n8 += p->nC24;
+    }
+    pRound->n4 = pRound->n4 <= (u16)p->n2DC ? (u16)p->n2DC : pRound->n4;
+    pRound->nC = pRound->nC <= (u16)p->n2E0 ? (u16)p->n2E0 : pRound->nC;
+    if (nHole == 17) {
+        n = fn_80119638(0, 0, gpSaveData[nPlayer].tour.nRound);
+        if (n <= fn_800D2FB4(gSession.nTeeSet[0])) {
+            gpSaveData[nPlayer].n104CC++;
+        } else {
+            gpSaveData[nPlayer].n104CC = 0;
+        }
+    }
+    fn_801198F8(0, nHole + 1);
 }
 
 // TW06: GameModeDriverPGATour::GameFinished (by its slot). Whether the round is over: no selected
