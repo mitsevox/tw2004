@@ -52,10 +52,7 @@ void     fn_800A68C0(u8 nPlayer);
 void     fn_80039344(int nView, f32 f);                 // a per-view float (Swing.c's declaration)
 f32      fn_80014280(f32 x);                            // tan, as a float
 void     fn_800638B8(View* pView, int nPlayer);
-f32      fn_80044EA8(int nPlayer, CamScript* pScript);  // how far the ball's flight has run
-u8       fn_800451A8(CamScript* pScript, CamShot* pShot, int nPlayer);   // GameEffects.c's declaration
 f32      fn_800D04AC(int nPlayer);                      // Swing.c's declaration
-void     CameraScript_UpdateLandingEstimate(CamScript* pScript, int nPlayer);
 f32      fn_800C54FC(View* pView, f32* pCam, f32* pSub, int nPlayer);
 f32      fn_800C5A70(View* pView, f32* pCam, f32* pSub, int nPlayer);
 u8       fn_800C7450(void);
