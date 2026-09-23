@@ -389,10 +389,11 @@ void fn_800F57A0(void) {
 
 // 20 balls each.
 void fn_800F57C8(void) {
-    Player* p;
+    int i;
     fn_800F1EE4();
-    for (p = gPlayers; p < gPlayers + 5; p++) {
-        p->nDC0 = 20;
+    i = 0;
+    while (i < 5) {
+        gPlayers[i++].nDC0 = 20;
     }
 }
 
