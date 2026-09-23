@@ -1,7 +1,8 @@
 // GameMode11.c (our name): game mode 11, the lessons (the code's "scenarios"). One player on hole 14
-// of course 10; twelve lessons (lbl_802823FC, 1..12), each a shot from a set spot with a required
-// shot kind, club and shape (lbl_80192DF8). The mode saves some of the player's options when it
-// starts and puts them back when it ends. Golfer.c, Swing.c and skalib.c ask it what the lesson allows.
+// of course 10; eleven lessons (lbl_802823FC, 1..11; 12 when all are done), each a shot from a set
+// spot with a required shot kind, club and shape (lbl_80192DF8). The mode saves some of the player's
+// options when it starts and puts them back when it ends. Golfer.c, Swing.c and skalib.c ask it what
+// the lesson allows.
 
 #include "golfer.h"
 #include "game.h"
@@ -14,14 +15,47 @@ typedef struct Lesson {
     s32 nClub;                  // 0x14  26 = any
     s32 nShape;                 // 0x18  7 = any
 } Lesson;
-extern Lesson lbl_80192DF8[11];
 
 // Each lesson's demonstration animation: the second table from step 6 on (index 0 unused).
-extern char* lbl_80192D98[12];
-extern char* lbl_80192DC8[12];
+char* lbl_80192D98[12] = {
+    "tdlpre01", "tdlpre04", "gdlpre03", "gdlpre53", "g3lpre02", "g3lpre01",
+    "g3lpre03", "gplpre51", "tdlpre04", "tdlpre05", "tdlpre04", "g3lpre04",
+};
+char* lbl_80192DC8[12] = {
+    "tdlpre01", "tdlpre04", "gdlpre03", "gdlpre53", "g3lpre02", "g3lpre01",
+    "g3lpre02", "gplpre51", "tdlpre04", "tdlpre05", "tdlpre04", "g3lpre04",
+};
 
-// The lessons' message lists: 16 message ids per lesson (-1 = none); lbl_80282420 is the lesson's row.
-extern s16 lbl_80192F2C[12 * 16];
+// The lessons, indexed by lbl_802823FC - 1.
+Lesson lbl_80192DF8[11] = {
+    {{-1.0f, -1.0f, -1.0f, 1.0f}, 8, 26, 7},
+    {{-372.0f, 0.0f, 324.0f, 1.0f}, 3, 26, 7},
+    {{-406.9f, 0.0f, 312.5f, 1.0f}, 5, 26, 7},
+    {{-296.5f, 0.0f, 281.5f, 1.0f}, 4, 13, 7},
+    {{-344.0f, 0.0f, 303.0f, 1.0f}, 1, 23, 7},
+    {{-407.0f, 0.0f, 340.0f, 1.0f}, 2, 21, 7},
+    {{-398.0f, 0.0f, 330.0f, 1.0f}, 8, 26, 7},
+    {{-1.0f, -1.0f, -1.0f, 1.0f}, 8, 26, 6},
+    {{-1.0f, -1.0f, -1.0f, 1.0f}, 8, 26, 5},
+    {{-1.0f, -1.0f, -1.0f, 1.0f}, 8, 26, 7},
+    {{-407.0f, 0.0f, 340.0f, 1.0f}, 8, 26, 7},
+};
+
+// The lessons' message lists: 16 message ids per row (-1 = none); lbl_80282420 is the lesson's row.
+s16 lbl_80192F2C[12 * 16] = {
+    3, 4, 5, -1, -1, -1, -1, -1, 6, 7, 8, 9, 10, 11, 12, -1,
+    -1, 13, 14, 15, 16, 17, -1, -1, 6, 7, 8, 18, 19, 20, 21, 12,
+    -1, 22, 23, 24, 25, 26, -1, -1, 6, 7, 8, 18, -1, 20, 21, 12,
+    -1, 0, 1, 33, 34, 35, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, 27, 28, 29, 34, 35, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, 2, -1, 33, 34, 35, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, 36, -1, 33, 34, 35, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, 39, 40, 33, 34, 35, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, 42, 43, 44, 46, 61, 62, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, 49, 50, -1, -1, -1, -1, -1, 6, 7, 8, 9, 10, 53, 54, -1,
+    -1, 55, 57, 63, 59, -1, -1, -1, 58, -1, -1, -1, -1, 59, 63, 58,
+    60, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+};
 
 // A shot animation object (Player.nShotHandle); only its progress is read here.
 typedef struct ShotAnim {
@@ -76,12 +110,6 @@ extern s32 lbl_80282420;                    // the lesson's row in lbl_80192F2C
 extern s32 lbl_80282424;
 extern s32 lbl_80282428;                    // the lesson's step
 
-int   strcmp(const char* a, const char* b);
-void  fn_800E14E0(int nCourse);
-void  Session_SetGolfer(int nGolfer, int nPlayer);
-void  fn_80055C1C(u8 b);
-void  GM_FlyByMode_Init(void);
-void  fn_80125854(int a);
 void  fn_800A6EC8(void);
 void  fn_800E5200(int a);
 void  AI_ChooseTarget(int nPlayer);
@@ -201,13 +229,16 @@ void fn_80100160(void) {
 
 // The mode ends: the saved options go back.
 void fn_80100230(void) {
+    Session* pSession;
     SESSION_OPTIONS->unkC = lbl_802816D8;
     SESSION_OPTIONS->nWind = lbl_802823EC;
     fn_80055C1C(0);
-    SESSION_OPTIONS->unk0[4] = lbl_8028240B;
-    SESSION_OPTIONS->unk84 = lbl_8028240A;
-    SESSION_OPTIONS->bBoostEnabled = lbl_80282409;
-    SESSION_OPTIONS->bSpinEnabled = lbl_80282408;
+    // fake match: &gSession re-taken inside the first store after the call, as the original
+    // recomputes it
+    SESSION_OPTIONS_OF(pSession = &gSession)->unk0[4] = lbl_8028240B;
+    SESSION_OPTIONS_OF(pSession)->unk84 = lbl_8028240A;
+    SESSION_OPTIONS_OF(pSession)->bBoostEnabled = lbl_80282409;
+    SESSION_OPTIONS_OF(pSession)->bSpinEnabled = lbl_80282408;
 }
 
 // Is a lesson running (mode 11)?
@@ -235,72 +266,70 @@ void fn_80100308(void) {
 // On to the next lesson: its row of messages and two counts.
 void fn_80100328(void) {
     switch (++lbl_802823FC) {
-    case 0:
+    case 1:
         lbl_80282420 = 0x00;
         lbl_8028241C = 5;
         lbl_80282418 = 2;
         break;
-    case 7:
+    case 8:
         lbl_80282420 = 0x10;
         lbl_8028241C = 4;
         lbl_80282418 = 3;
         break;
-    case 8:
+    case 9:
         lbl_80282420 = 0x20;
         lbl_8028241C = 6;
         lbl_80282418 = 1;
         break;
-    case 1:
+    case 2:
         lbl_80282420 = 0x30;
         lbl_8028241C = 5;
         lbl_80282418 = 2;
         break;
-    case 4:
+    case 5:
         lbl_80282420 = 0x40;
         lbl_8028241C = 5;
         lbl_80282418 = 2;
         break;
-    case 5:
+    case 6:
         lbl_80282420 = 0x50;
         lbl_8028241C = 5;
         lbl_80282418 = 2;
         break;
-    case 2:
+    case 3:
         lbl_80282420 = 0x60;
         lbl_8028241C = 5;
         lbl_80282418 = 2;
         break;
-    case 3:
+    case 4:
         lbl_80282420 = 0x70;
         lbl_8028241C = 5;
         lbl_80282418 = 2;
         break;
-    case 6:
+    case 7:
         SESSION_OPTIONS->unk84 = 1;
         lbl_80282420 = 0x80;
         lbl_8028241C = 5;
         lbl_80282418 = 2;
         break;
-    case 9:
+    case 10:
         SESSION_OPTIONS->unk84 = 0;
         lbl_80282420 = 0x90;
         lbl_8028241C = 5;
         lbl_80282418 = 2;
         break;
-    case 10:
+    case 11:
         lbl_80282420 = 0xA0;
         lbl_8028241C = 5;
         lbl_80282418 = 2;
         lbl_802823E5 = 1;
         break;
-    case 11:
+    case 12:
         lbl_80282420 = 0xB0;
         fn_80101F40(0, 0);
         fn_800E5200(-1);
         fn_80101F18(0);
         fn_80100798(0, 1);
-        break;
-    case 12:
         break;
     }
     lbl_802823F4 = lbl_802823FC - 1;
@@ -372,17 +401,6 @@ int fn_80100744(void) {
     return lbl_80192DF8[n].nShotKind;
 }
 
-// The lesson's demonstration animation (none outside lessons 1..11).
-char* fn_801008A8(void) {
-    if (lbl_802823FC > 0 && lbl_802823FC < 12) {
-        if (lbl_80282428 >= 6) {
-            return lbl_80192D98[lbl_802823FC];
-        }
-        return lbl_80192DC8[lbl_802823FC];
-    }
-    return 0;
-}
-
 // Shows the next message of one of the lesson's lists, skipping empty entries; nonzero if there
 // was one.
 int fn_80100798(int nList, int nCount) {
@@ -406,6 +424,17 @@ int fn_80100798(int nList, int nCount) {
         }
     }
     return !(pList[i] == -1);
+}
+
+// The lesson's demonstration animation (none outside lessons 1..11).
+char* fn_801008A8(void) {
+    if (lbl_802823FC > 0 && lbl_802823FC < 12) {
+        if (lbl_80282428 >= 6) {
+            return lbl_80192D98[lbl_802823FC];
+        }
+        return lbl_80192DC8[lbl_802823FC];
+    }
+    return 0;
 }
 
 // The lesson restarts: the ball back at its spot, the demonstration again from step 7.

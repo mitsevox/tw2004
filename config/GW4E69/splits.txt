@@ -3584,6 +3584,8 @@ GameModeStroke.c:
 
 GameMode11.c:
 	.text       start:0x800FFF34 end:0x80101FEC
+	.data       start:0x80192D20 end:0x80193130
+	.sdata2     start:0x802847E8 end:0x80284808
 
 unsorted/sweep_801020BC.c:
 	.text       start:0x801020BC end:0x801020C0

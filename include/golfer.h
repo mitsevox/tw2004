@@ -722,7 +722,8 @@ typedef struct PlayerProfile {
     u8   unk3A[6];
 } PlayerProfile;
 
-#define SESSION_OPTIONS  ((GameOptions*)((u8*)&gSession + 0xE78))
+#define SESSION_OPTIONS_OF(pSession) ((GameOptions*)((u8*)(pSession) + 0xE78))
+#define SESSION_OPTIONS  SESSION_OPTIONS_OF(&gSession)
 #define SESSION_PROFILE(i) ((PlayerProfile*)((u8*)&gSession + 0xD38) + (i))
 
 #endif
