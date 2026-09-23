@@ -150,6 +150,13 @@ The fixes that come up most often. Each points to its full entry below.
 
 ### Registers, declaration order and the stack
 
+- **[verified] A value computed before a call and kept in a saved register gets its own local.**
+  `nMoney *= 2;` puts the shift after the following call (58.5%); `s32 nPaid = nMoney * 2;` is
+  exact (Earnings `fn_800D39B4`). Reusing locals for a second value swaps float registers
+  (Earnings `fn_800D6A70`, 99.9% until separate locals).
+- **[verified] Locals take the higher volatile registers in declaration order; compiler
+  temporaries take the lower ones.** In GetHonors' sort all 5040 orders of 7 variables gave two
+  outcomes: only the relative order of `nScore` and `nHigh` mattered.
 - **[verified] Declaration order picks the saved registers.** Register order for callee-saved
   locals follows declaration order (first declared gets r31). Two loop counters in fn_8005A0FC
   came out swapped (r27/r28) until their declarations were swapped. Try this first on any diff
@@ -233,6 +240,9 @@ The fixes that come up most often. Each points to its full entry below.
 
 ### Structs, arrays and pointers
 
+- **[verified] The `(u32)` index habit applies to other global arrays too:** a loop over
+  `gSwingStacks` with a separate base and 6-byte offset is `gSwingStacks[(u32)i]` (Swing
+  `fn_8005CD94` 84.2% -> 100, `GOLFERSTATE_Update` 86.6% -> 100).
 - **[verified] Other global arrays follow the gPlayers rule.** `gSwingStacks[n].nState[
   gSwingStacks[n].nTop]` written out each time, not `SwingStack* p` / `s8* pTop` locals (Swing
   `GOLFERSTATE_Pop` 98.53% -> 100; the permuter found it).
@@ -373,6 +383,12 @@ The fixes that come up most often. Each points to its full entry below.
 
 ### Function calls and parameters
 
+- **[verified] A wrong prototype can hide the real call shape and still score in the 80s-90s.**
+  Check each prototype against the real definition, then check r3/r4 are set or kept live
+  before each `bl`: `fn_80039344(View*, f32)` was really `(int nView, f32)` (Swing
+  `STATEFUNC_GreenMorphExit` 94.8% -> 100); `GM_BumpBallForObstructions(void)` really takes
+  `nPlayer` (`STATEFUNC_ShowYardageExit` 88.8% -> 100). `fabsf` is `double fabsf(double)`: an
+  `f32` declaration changes Swing's calls (`Swing_MisHitRumble` 99.5% -> 100 with `double`).
 - **[verified] A callee that ignores r3, called while r3 still holds the caller's first
   parameter, takes that parameter.** `Scenario_RequiredShape()` -> `(nPlayer)` (Golfer
   `AI_FaceVector` 99.72% -> 100). Likewise a callee starting `clrlwi. r0, r3, 24` has a `u8`
@@ -413,6 +429,10 @@ The fixes that come up most often. Each points to its full entry below.
 
 ### Compares and conditions
 
+- **[verified] `return !(x == -1);` and `return x != -1;` end in a different instruction order**
+  (GameMode11 `fn_80100798`, 93.9% -> 100).
+- **[verified] A two-value choice `h = (n == 2) ? 6 : 7` compiles branch-free (`subi/nor/srawi`);**
+  the original's `li 7; bne; li 6` is `h = 7; if (n == 2) h = 6;` (GameMode11 `fn_80100C08`).
 - **[verified] A boolean chain assigned to an `int` keeps the original's register order where
   `if (...) b = 1;` does not**: `bDown = (A || B) && (C || D) && (E || F);` (GameMode8
   `fn_800FCC38`, 98.9% -> 100).
@@ -498,6 +518,13 @@ The fixes that come up most often. Each points to its full entry below.
 
 ### Inlining and inline helpers
 
+- **[verified] An inline helper that reads a global itself, rather than being passed it,
+  changes register choice** (GameMode11 `fn_80100C08`'s hint helper).
+- **[verified] An inline helper that takes a value by pointer changes register choice.** The
+  GetHonors sort append matched only as `static inline void AddIfScore(s32* aList, int* pnCount,
+  ...) { if (...) { aList[*pnCount] = nPlayer; (*pnCount)++; } }` (Stableford `fn_800FE3FC`,
+  Stroke `fn_800FF894`, 99.6% -> 100). GameMode12's used-up check likewise needed `s32* pPoints`
+  copied into a local inside the helper. By value, or a plain append helper, stays at 99.6%.
 - **[verified] No automatic inlining in game code.** Calling `GOLFERSTATE_Kill()` from a later
   function stays a `bl`; where the original has the body pasted in, write the body out.
 - **[verified] Automatic inlining.** With `-inline auto` the compiler pastes small functions into
@@ -566,6 +593,30 @@ The fixes that come up most often. Each points to its full entry below.
 
 ### Data, constants and symbols
 
+- **[verified] objdiff scores a switch 100% even when its jump table points at the wrong case
+  bodies**: it masks relocations. GameMode11 `fn_80100328` had case labels off by one and read
+  100%; only the linked DOL (`doldiff.py`) showed it. A function with a `switch` in a unit that is
+  not linked yet is not proven: linking is the real check.
+- **[verified] An object's `.data` is 8-aligned**, so a `.data` range in `splits.txt` must start on
+  an 8-byte boundary; a misaligned start adds padding and shifts all later data. `datamap.py` only
+  lists data our object emits; a file that owns tables we still declare `extern` needs its range
+  widened to the file's whole data block (GameMode11: 0x80192D20, not 0x801930AC).
+- **[verified] A dead-stripped function leaves its constants in the pool.** GameMode12's
+  `.sdata2` has 0.0 and 0.5 early, where no remaining function uses them first; an unreferenced
+  function using 0.0f then 0.5f at that point makes the unit link. Such a placeholder is a fake
+  match with its body unknown: say so in its comment (style.md).
+- **[verified] Float literals are pooled in `.sdata2` in the order they first appear in the
+  source**; compiler-made constants (the int-to-float double) follow that function's literals.
+  Folded or dead literals (`x * 1.0f`, `if (0)`, unused locals or inlines) get no slot.
+- **[verified] A file-scope `const f32` is folded at every use and still emitted, so the value
+  appears twice; a one-entry `const f32 x[1]` is loaded from the object instead.** GameMode8's lone
+  1.0 at the start of its pool (`lbl_80284708`) is reproduced only by the array (a fake match: the
+  bytes don't show what EA wrote).
+- **[verified] A constant one bit off after linking can be a folded division.** GameMode8's
+  0x3F7FBE76 is `59.94f / 60.0f`; the literal `0.999f` rounds to ...77.
+- **[verified] An inline helper moves arithmetic after a call**: `n += SG_Score(t, s)` puts the
+  multiply after the second call, where `n += s * 3 + t` computes it first (GameMode8
+  `fn_800FDC5C`, 89.9% -> 98.2%).
 - **[verified] An exact unit can still fail the link on function order.** objdiff scores each
   function by name, so a function defined out of address order reads 100% while the linked
   `.text` shifts. GameUI `fn_800E3ECC` was defined after `fn_800E3EE0`; moving it fixed the DOL.

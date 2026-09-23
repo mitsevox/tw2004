@@ -5,6 +5,7 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include "golfer.h"
 #include "ball.h"
 
 // ---- the round -------------------------------------------------------------------------------
@@ -32,6 +33,7 @@ void fn_80062B78(int nPlayer);
 void fn_80062C38(void);
 void fn_80062C5C(void);
 void fn_80062C80(int a, u8 b);
+void fn_80062CB0(int a, u8 b);
 void fn_80062CE0(u8 a);
 void fn_80062D0C(int nPlayer);
 void fn_80062D38(int a, int b, int nPlayer);
@@ -39,38 +41,62 @@ void fn_80062D6C(int a, int nPlayer);
 
 // ---- the game manager ------------------------------------------------------------------------
 
+// How a payout was made up (TW06: CourseMoneyTracking_t). Earnings.c fills it in; fn_800D3548 adds
+// it to the player's totals, which keep the same layout at Player + 0x314.
+typedef struct CourseMoneyTracking {
+    s32  n0;                    // 0x00  the payout
+    u8   unk4[0x20 - 0x4];
+    s32  nBase;                 // 0x20  the points, rounded to $25
+    s32  n24;                   // 0x24  the payout
+    s32  nCourse;               // 0x28  what the course multiplier added
+    s32  n2C;                   // 0x2C  what the multiplier for the hole's gpGame->holeOrder value added
+    s32  nTee;                  // 0x30  what the tee multiplier added
+    s32  nTourCard;             // 0x34  what the TOUR card level added
+    s32  n38;                   // 0x38
+    s32  n3C;                   // 0x3C
+} CourseMoneyTracking;
+
 f32  fn_800D0478(int nPlayer);          // the ball's distance from the pin (yards)
 f32  fn_800D0550(int nPlayer);          // the shot's length
 int  Hole_ScoreAfterTapIn(int nPlayer); // HoleScore.c
 void fn_800D2714(u16* pDate, s32* pDay, s32* pMonth, s32* pYear);
 int  fn_800D2ABC(int nCourse, int nHole);   // a hole's par on a course
 int  fn_800D2AD8(int nHole);            // a hole's par
-void fn_800D3548(int nPlayer, int nMoney, s32* pTotals);   // pTotals may be NULL
+void fn_800D3548(int nPlayer, int nMoney, CourseMoneyTracking* pMoney);   // pMoney may be NULL
 int  fn_800D36E0(int nWinner, int nLoser, int nMargin, int* pPrize);
 int  fn_800D37BC(int nWinner, int nLoser, int nMargin, int* pPrize);
-int  fn_800D3C7C(int nPlayer);          // the player's golfer
-s32  fn_800D6A70(s32 nPoints, int nPlayer, int a, int b, int c, int d);
-int  fn_800D7220(int nReward, int a, s32* pOut);
+int  fn_800D3C7C(int nPlayer);          // the player's earnings rating, 0..25
+s32  fn_800D6A70(s32 nPoints, int nPlayer, u8 bCourse, u8 bTee, u8 bHole, CourseMoneyTracking* pMoney);
+int  fn_800D7220(int nReward, int nPlayer, CourseMoneyTracking* pMoney);
 u8   fn_800DA174(void);
 u8   fn_800DA1D4(void);
 u8   fn_800DA234(void);                 // the current hole is the flagged one
 
 // GameEffects.c
+typedef struct GameEffects GameEffects;
+GameEffects* fn_800DAF74(void);
 void GameEffects_ResetGameEffectSettings(void);
 int  GameEffects_BallUpdatesThisFrame(int nPlayer);   // preview speed: ghost steps per frame
 void fn_800DB4E8(int nPlayer);
 void fn_800DB714(int nPlayer);
+void fn_800DBDA8(int nPlayer);
+void GameEffects_SetSuperSlowMo(u8 bOn, int nPlayer, f32 fRate);
 void fn_800DC9D4(int a);                // pause or resume a GameBreaker
 
 // GameManager.c
 void fn_800DCAD8(void);
 void GM_vCloseModuleONCE(void);
+u8   fn_800DCB00(void);
+u8   fn_800DCB08(void);
 u8   fn_800DCB3C(void);
+u8   fn_800DCB74(void);
+void fn_800DCB84(f32* pA, f32* pB, f32* pOut);   // out = a - b
 int  GM_GotoNextSelectedHole(void);
 void GM_EndOfGolferTurn(int nPlayer);
 void GM_BallHit(int nPlayer);
 void GM_PlayerAddStroke(int nPlayer);
 u8   GM_CheckForBallOOB(int nPlayer);
+void GM_BumpBallForObstructions(int nPlayer);
 void GM_PlayerTookShot(int nPlayer);
 u8   GM_PlayerTakeMulligan(int nPlayer);
 int  fn_800DDFB4(int nPlayer);
@@ -100,9 +126,13 @@ void fn_800E1480(int nHole);            // make a hole of the round the current 
 void fn_800E14E0(int nCourse);
 int  fn_800E177C(void);
 int  fn_800E17AC(int nPlayer);          // the player's total strokes
+int  fn_800E1904(int nPlayer, u8 bCurrent);
 u8   fn_800E1BBC(void);                 // whether the round plays every hole
 u8   fn_800E23B0(int nPlayer, int nStrokes);
+u8   fn_800E23EC(int nPlayer);
 void fn_800E2470(void);
+u8   fn_800E27A8(void);
+int  fn_800E27C0(void);
 u8   Gimme_Allowed(int nPlayer);
 void fn_800E299C(void);
 void fn_800E2A88(void);
@@ -110,12 +140,16 @@ u8   fn_800E2B40(int nPlayer, Ball* pBall);   // out of bounds
 void fn_800E2BA4(void);                 // a random hole from the selection
 u8   fn_800E2DB4(int nPlayer);
 u8   fn_800E39F0(void);
+u8   fn_800E3A54(void);                 // modes 6, 7 and 8
 void fn_800E3B04(void);
 
 // GameUI.c
 void fn_800E3B28(void);
 void fn_800E3BEC(void);
 void fn_800E3C0C(u8 b);                 // show or hide the HUD on the single screen
+void fn_800E3C70(u8 b);
+void fn_800E3CD4(u8 b);
+void fn_800E3D38(int nPlayer, u8 b);    // show or hide a player's HUD
 void fn_800E3D90(void);                 // hide every HUD
 u8   fn_800E3DDC(int nPlayer);
 void fn_800E3EE0(void);
@@ -136,6 +170,8 @@ void fn_800E4D88(void);
 void fn_800E4D94(u8 bHuman);            // the end-of-hole screen
 
 // GameMessages.c
+void fn_800E4FFC(int a);
+void fn_800E502C(int a);
 void fn_800E505C(int a);
 u8   fn_800E5098(void);
 u8   fn_800E5110(void);
@@ -160,6 +196,8 @@ void fn_800E56D0(int a, int b, int c);
 void fn_800E5714(int a);
 void fn_800E5724(int a);
 void fn_800E58B4(int nMsg);             // send a message with no values
+void fn_800E590C(int nMsg, u32 uFloats, void* pA);    // one value; uFloats bit 0: a float
+void fn_800E5998(int nMsg, u32 uFloats, void* pA, void* pB);
 void fn_800E5A4C(int nMsg, u32 uFloats, void* pA, void* pB, void* pC);   // three values; uFloats bit n: a float
 void fn_800E5B0C(int nMsg, u32 uFloats, void* pA, void* pB, void* pC, void* pD, void* pE);   // five values
 void fn_800E5C08(int nMsg, char* pStr);  // send a message with a string
@@ -201,12 +239,15 @@ u8   fn_800EA278(int nPlayer, u8 bCheck);
 u8   fn_800EA548(u8 bCheck);            // the game is over
 u8   fn_800EA758(u8 bCheck);
 void fn_800EAA40(void);
+s32  fn_800EAC7C(void);
 int  fn_800EAC94(int n);
 
 // GameMode5.c
 void fn_800EADD8(void);
 void fn_800EAE38(s32 a);
 void fn_800EAF7C(void);
+typedef struct Challenge Challenge;
+void fn_800EC544(Challenge* pList, s32 nCount);
 u8   fn_800EC550(void);
 int  fn_800EC558(void);
 void fn_800ECBE4(void);
@@ -293,12 +334,25 @@ u8   fn_800FDF60(void);
 
 // GameModeStroke.c: stroke play (mode 0)
 void fn_800FF7DC(void);
+u8   fn_800FFCCC(int nPlayer, int a);
+u8   fn_800FFD54(int a);
 s32  fn_800FF894(int nPlayer);          // TW06 GetHonors: who plays next (5: nobody)
+u8   fn_800FFCCC(int nPlayer, int a);   // TW06 HoleFinished
+u8   fn_800FFD54(int a);                // TW06 GameFinished
 s32  fn_800FFDB0(void);                 // TW06 GoToPlayoff: stroke play has none
+
+// GetHonors' tee-order sort (GameModeStroke.c, GameModeStableford.c): appends nPlayer to aList
+// (*pnCount entries) if their score on hole nHole is nScore.
+static inline void AddIfScore(s32* aList, int* pnCount, int nPlayer, int nHole, s32 nScore) {
+    if (gPlayers[nPlayer].nStrokes[nHole] == nScore) {
+        aList[*pnCount] = nPlayer;
+        (*pnCount)++;
+    }
+}
 
 // GameMode11.c: the lessons
 u8   fn_80100294(void);                 // in a lesson (mode 11)
-int  Scenario_RequiredShape(void);      // the lesson's shape in mode 11, else 7 (none)
+int  Scenario_RequiredShape(int nPlayer); // the lesson's shape in mode 11, else 7 (none); nPlayer unused
 u8   fn_80100AF8(void);                 // lesson 5 of mode 11
 u8   fn_80100C00(void);
 u8   fn_80101738(void);

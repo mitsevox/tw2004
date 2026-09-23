@@ -220,7 +220,6 @@ extern GolfCamState* lbl_80282220;
 extern CamTuning*    lbl_80281F78;
 extern CrAPState*    lbl_80281EE0;
 
-void*    fn_80017004(int nView);
 void*    fn_80008370(void* pCamera);
 void     fn_80045470(void* pLens, f32 fFov);
 void*    fn_80012EF0(void* p);

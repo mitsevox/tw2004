@@ -96,7 +96,6 @@ typedef struct ChallengeSave {
 #define PROFILE_MEDAL(n, i) ((ChallengeSave*)(gpSaveData + (n) * 0x10600))->aMedal[i]
 #define PROFILE_STAMP(n, i) ((ChallengeSave*)(gpSaveData + (n) * 0x10600))->aStamp[i]
 int   fn_800ECF9C(int i);
-void fn_800EC544(Challenge* p0, s32 p1);
 extern u8 lbl_802822FC;
 s32 fn_800ECA08(void);
 extern u8 lbl_80282314;
@@ -653,7 +652,7 @@ void fn_800EBEF0(void) {
 // message; for a profile, the medal's reward, then two bonuses (0x1C, and 0xC once every challenge
 // has a medal).
 void fn_800EC1E0(void) {
-    s32 aOut[18];
+    s32 aOut[18];               // the payout's breakdown, handed on as a CourseMoneyTracking
     int nMedal;
     int nReward;
     int nProfile;
@@ -680,7 +679,7 @@ void fn_800EC1E0(void) {
             fn_800EC170(nMedal);
             nProfile = gPlayers[0].nIndex;
             if (gpSaveData[nProfile * 0x10600]) {
-                nMoney = fn_800D7220(nReward, 0, aOut);
+                nMoney = fn_800D7220(nReward, 0, (CourseMoneyTracking*)aOut);
                 if (nMoney) {
                     switch (nMedal) {
                     case 0:
@@ -694,7 +693,7 @@ void fn_800EC1E0(void) {
                         break;
                     }
                 }
-                fn_800D3548(0, nMoney, aOut);
+                fn_800D3548(0, nMoney, (CourseMoneyTracking*)aOut);
                 if (fn_800ED6F0() && fn_800D9998(0, 0x1C) && fn_800D750C(0, 0x1C)) {
                     fn_800E4364(6, 0x1C, PRIZE_AT(0xA24), nProfile);
                     fn_800D3548(0, PRIZE_AT(0xA24), 0);
