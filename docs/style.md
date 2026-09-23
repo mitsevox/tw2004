@@ -75,7 +75,10 @@ Prototypes
 - **A prototype local to a file** is for functions only that file calls.
 - **Headers:** `game.h` (game manager, rounds, modes, golfer states, sessions), `engine.h`
   (memory, math, streams, views, events, sound, animation), `golfer.h` (players and golfers),
-  `ball.h` (the ball, surfaces and the hole's terrain; `golfer.h` includes it).
+  `ball.h` (the ball, surfaces and the hole's terrain; `golfer.h` includes it), `camera.h` (the
+  golf cameras' types), `game/save.h` (the save profile), `game/modes/*.h` (data a family of game
+  modes shares: `challenge.h`, `pgatour.h`, `rte.h`). A header includes only the headers below it
+  (`game_types.h` < `engine.h` < `camera.h`, `ball.h` < `golfer.h` < `game.h`).
 - **No per-file re-declaration with other types.** CodeWarrior rejects a second prototype whose
   parameter types differ (even `int` vs `s32`) as "identifier redeclared". When one file's calls
   need a different argument type to match, cast at the call site (`fn((u16)x)`) and say why.
@@ -140,7 +143,8 @@ the patterns that break there:
   a handle that is really a pointer gets the pointer's type.
 - `port-literal-size`: a copy or clear whose size is a number (`Mem_cpy(a, b, 0xBC)`). Write
   `sizeof(Ball)`: the size of a struct holding pointers changes on a 64-bit machine.
-- `port-frame-rate`: the frame rate as a bare number (`59.94f`). Use the named constant.
+- `port-frame-rate`: the frame rate as a bare number (`59.94f`). Use `FRAME_RATE` or `FRAME_TIME`
+  (engine.h); CodeWarrior folds `1.0f / FRAME_RATE` to the same constant as `0.016683351f`.
 
 When the original's code can only be matched with one of these, keep it and say why with
 `// port: <why>` on the line or the line before, so a porter knows to look there. Data read from
