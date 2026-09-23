@@ -16,7 +16,6 @@ void     fn_80035240(int a);
 void     CameraScript_RecordCurrentCam(CamShot* pShot, void* pCam, void* pSub, int nPlayer, void* pScript,
                                        int a);
 void     fn_8003F2E0(void* pScript, f32 fTime);
-void     fn_8000C5D4(f32* pA, f32* pB, f32 f, f32* pOut);   // a + f x b
 u8       fn_800635D0(int nPlayer);
 u8       fn_800B36F4(View* pView, int nPlayer, f32 fFrameTime);
 void     fn_800C73B8(f32* pA, f32* pB, f32* pOut);
@@ -42,7 +41,6 @@ u8       fn_800B4908(void);
 void     GolfCamera_ComputeSteepSlopeCamVectors(View* pView, int nPlayer);
 void     fn_800C5D64(View* pView, f32* pCam, f32* pSub, int nPlayer);
 u8       CameraScript_WillGolferBeOccludedInThisView(int nPlayer, CamShot* pShot, void* pScript);
-f32      fn_8000C5FC(f32* pA, f32* pB);                         // dot product
 u8       fn_800C708C(View* pView);
 void     fn_80038010(u8 a, int n, f32* pVec);
 void     fn_80038054(u8 a, int n, f32 f1, f32 f2);
@@ -176,7 +174,7 @@ void fn_800BF094(View* pView, int nPlayer) {
 void fn_800BF110(View* pView, int nPlayer) {
     fn_8001731C(pView);
     fn_80017314(pView);
-    fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView0)), DEG(60.0f));
+    fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[0])), DEG(60.0f));
     pView->n194 = 0;
     pView->p74 = NULL;
     pView->p130 = NULL;
@@ -186,7 +184,7 @@ void fn_800BF110(View* pView, int nPlayer) {
 void fn_800BF5E4(View* pView, int nPlayer) {
     fn_8001731C(pView);
     fn_80017314(pView);
-    fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView0)), DEG(60.0f));
+    fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[0])), DEG(60.0f));
     pView->n194 = 0;
     pView->p130 = NULL;
     pView->p74 = NULL;
@@ -226,7 +224,7 @@ void fn_800BFC80(View* pView, int nPlayer) {
         pView->shot19C.f68 = gPlayers[nPlayer].ball.vPos[1];
         pView->p130 = NULL;
         pView->p134 = NULL;
-        fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView0)), DEG(30.0f));
+        fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[0])), DEG(30.0f));
     }
 }
 
@@ -242,7 +240,7 @@ void fn_800C0364(View* pView, int nPlayer) {
         Vec3Copy(&pCourse->pin[nPinSet].x, pSub);
         pView->p130 = NULL;
         pView->p134 = NULL;
-        fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView0)), DEG(30.0f));
+        fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[0])), DEG(30.0f));
         pView->fCamTime = 0.0f;
     }
 }
@@ -266,7 +264,7 @@ void fn_800C0414(View* pView, int nPlayer) {
     if (pCourse != NULL) {
         Vec3Copy(pCam, vOld);
         pPin = &pCourse->pin[Game_CurrentPinSet()].x;
-        fn_800C73DC(pPin, &gPlayers[nPlayer].fBallX, vToPin);
+        fn_800C73DC(pPin, gPlayers[nPlayer].vBall, vToPin);
         vToPin[1] = 0.0f;
         fDist = fn_80009680(fn_80009744(vToPin));
         if (fDist < 0.1f) {
@@ -499,7 +497,7 @@ void fn_800C1338(View* pView, int nPlayer) {
     if (pView->n140 == 6 || pView->n140 == 8 || pView->n140 == 9 || pView->n140 == 10) {
         pView->p134 = NULL;
     }
-    if (fn_800DC514(nPlayer) && gSession.unk14 == 0) {
+    if (fn_800DC514(nPlayer) && gSession.n14 == 0) {
         fTime = FRAME_TIME;
     }
     fn_8003DCE8(nPlayer, pCam, pSub, &pView->script, &pView->shot19C, 0, fTime);
@@ -576,7 +574,7 @@ void fn_800C1670(View* pView, int nPlayer) {
 
 // Undo what camera 20 set up (b56): the view's rectangle back to 0,0-1,1 and the render state reset.
 void fn_800C1790(View* pView, int nPlayer) {
-    int nView = gPlayers[nPlayer].nView0;
+    int nView = gPlayers[nPlayer].nView[0];
     if (lbl_80282220->b56) {
         fn_800171D8(fn_80012EF0(fn_80017004(nView)), 0.0f, 0.0f, 1.0f, 1.0f);
         fn_800352BC();
@@ -597,7 +595,7 @@ void fn_800C16C4(View* pView, int nPlayer) {
     int nView;
     pCam = fn_8001731C(pView);
     pSub = fn_80017314(pView);
-    nView = gPlayers[nPlayer].nView0;
+    nView = gPlayers[nPlayer].nView[0];
     if (fn_800B36F4(pView, nPlayer, gSession.fFrameTime)) {
         fn_800C1790(pView, nPlayer);
         View_SetCamera(fn_80017028(nView), 14, nPlayer, nView);
@@ -644,7 +642,7 @@ void GolfCamera_ProcessHeartBeatCamera(View* pView, int nPlayer) {
     f32* pSub = fn_80017314(pView);
     CamShot* pShot = NULL;
     f32 v[4] = {0.0f, 0.0f, 0.0f, 0.5f};
-    if (gSession.unk14 == 0) {
+    if (gSession.n14 == 0) {
         if (lbl_80282220->b5A) {
             if (pView->nCamera == 5) {
                 if (pView->n194 >= lbl_80281F78->nBeats * lbl_80281F78->nBeatFrames) {
@@ -847,8 +845,8 @@ void fn_800C38BC(View* pView, int nPlayer) {
     pCam = fn_8001731C(pView);
     pSub = fn_80017314(pView);
     pView->p130 = NULL;
-    pCam[0] = gPlayers[nPlayer].fBallX;
-    pCam[2] = gPlayers[nPlayer].fBallZ;
+    pCam[0] = gPlayers[nPlayer].vBall[0];
+    pCam[2] = gPlayers[nPlayer].vBall[2];
     pCam[1] = 1.5f;
     pSub[0] = pCam[0] - 1.0f;
     pSub[1] = pCam[1];
@@ -1068,8 +1066,8 @@ int fn_800C4518(View* pView) {
 
 // Is the target too steep from the ball: |dy / dx| at least fUp going up, fDown going down.
 u8 fn_800C4520(View* pView, int nPlayer, f32 fUp, f32 fDown) {
-    f32 dx = gPlayers[nPlayer].fTargetX - gPlayers[nPlayer].ball.vPos[0];
-    f32 dy = gPlayers[nPlayer].fTargetY - gPlayers[nPlayer].ball.vPos[1];
+    f32 dx = gPlayers[nPlayer].vTarget[0] - gPlayers[nPlayer].ball.vPos[0];
+    f32 dy = gPlayers[nPlayer].vTarget[1] - gPlayers[nPlayer].ball.vPos[1];
     f32 fSlope;
     if (fabsf(dx) < 1e-6f) {
         return 0;
@@ -1093,7 +1091,7 @@ u8 fn_800C4604(View* pView, int nPlayer) {
     f32 vNormal[4];
     SurfaceType* pSurface;
     TerObject* pObj;
-    return Ter_CheckForGroundCollision(gPlayers[nPlayer].ball.pCourse, pView->v0, &gPlayers[nPlayer].fTargetX,
+    return Ter_CheckForGroundCollision(gPlayers[nPlayer].ball.pCourse, pView->v0, gPlayers[nPlayer].vTarget,
                                        vHit, vNormal, &pSurface, &pObj);
 }
 
@@ -1101,7 +1099,7 @@ u8 fn_800C4604(View* pView, int nPlayer) {
 // fn_800635D0 fails.
 u8 fn_800C4650(View* pView, int nPlayer) {
     u8 bMove;
-    if (gPlayers[nPlayer].nClub == CLUB_PUTTER) {
+    if (gPlayers[nPlayer].nClub == CLUB_PUTTER_e) {
         return 0;
     }
     bMove = 0;
@@ -1190,7 +1188,7 @@ void fn_800C4E80(View* pView, int nPlayer) {
 f32 fn_800C54FC(View* pView, f32* pCam, f32* pSub, int nPlayer) {
     f32 fTime = 0.0f;
     CamShot* pShot;
-    if (gSession.unk14 == 0) {
+    if (gSession.n14 == 0) {
         fn_80038054(1, fn_80016D10(), 0.0f, lbl_80281F78->f64);
     }
     if (pView->p134 == NULL) {
@@ -1214,7 +1212,7 @@ f32 fn_800C54FC(View* pView, f32* pCam, f32* pSub, int nPlayer) {
             pView->p134->p44 = pShot;
         }
     }
-    if (gSession.unk14 == 0) {
+    if (gSession.n14 == 0) {
         if (lbl_80281F78->f60) {
             if (pView->f18C > lbl_80281F78->f60) {
                 fTime = lbl_80281F78->f60;
@@ -1239,7 +1237,7 @@ f32 fn_800C5A70(View* pView, f32* pCam, f32* pSub, int nPlayer) {
     CamTuning* pTune;
     f32 t;
     f32 f;
-    if (gSession.unk14 == 0) {
+    if (gSession.n14 == 0) {
         pTune = lbl_80281F78;
         fn_80038054(1, fn_80016D10(), pTune->f8C, pTune->f88);
     }
@@ -1284,7 +1282,7 @@ f32 fn_800C5A70(View* pView, f32* pCam, f32* pSub, int nPlayer) {
         lbl_80282220->shot12C.f78 = lbl_80281F78->f80;
         lbl_80282220->shot12C.f7C = lbl_80281F78->f80;
     }
-    if (gSession.unk14 == 0) {
+    if (gSession.n14 == 0) {
         fTime = FRAME_TIME;
     }
     return fTime;
@@ -1375,7 +1373,7 @@ void fn_800C5EC0(View* pView, f32* pCam, f32* pSub, int nPlayer) {
 // aim point.
 void fn_800C6010(View* pView, int nPlayer) {
     f32 v[4];
-    fn_800C73DC(gPlayers[nPlayer].vTarget2, &gPlayers[nPlayer].fBallX, v);
+    fn_800C73DC(gPlayers[nPlayer].vTarget2, gPlayers[nPlayer].vBall, v);
     v[1] = 0.0f;
     if (pView->shot19C.f60 + 0.1f < (f32)fn_80009680(fn_80009744(v)) - 3.0f) {
         pView->shot19C.f60 += 0.1f;

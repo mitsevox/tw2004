@@ -203,7 +203,7 @@ inline int GE_CurrentTarget(int nPlayer) {
 // only with the game's GameBreaker option on.
 void fn_800DB30C(int nPlayer, int nReason) {
     if ((!(gSession.uFlags & 0x4000) || !(gSession.uFlags & 0x8000)) && !gSession.bReplay &&
-        !gSession.nSplitScreen && !gSession.unk8[0]) {
+        !gSession.nSplitScreen && !gSession.a8[0]) {
         if (!gpGame->b285) {
             return;
         }
@@ -228,7 +228,7 @@ void fn_800DB4E8(int nPlayer) {
     int nReason;
     int i;
     int n;
-    if (!gSession.bReplay && !gSession.nSplitScreen && !gSession.unk8[0]) {
+    if (!gSession.bReplay && !gSession.nSplitScreen && !gSession.a8[0]) {
         switch (Game_GetCourse()) {
         case 7:
             break;
@@ -293,19 +293,19 @@ int fn_800DB86C(int nPlayer) {
     if (!pSurface) {
         return 0;
     }
-    if (gPlayers[nPlayer].ball.nLie == LIE_GREEN && nPar - nStrokes >= 2) {
+    if (gPlayers[nPlayer].ball.nLie == LIE_GREEN_e && nPar - nStrokes >= 2) {
         bPossible = 1;
-    } else if (gPlayers[nPlayer].ball.nLie == LIE_GREEN &&
+    } else if (gPlayers[nPlayer].ball.nLie == LIE_GREEN_e &&
                fn_800D8750(2, fDist, 0, gpSaveData[nPlayer].szName, nPlayer)) {
         bPossible = 1;
-    } else if (gPlayers[nPlayer].ball.nLie == LIE_GREEN && fn_800DCB10(nPlayer)) {
+    } else if (gPlayers[nPlayer].ball.nLie == LIE_GREEN_e && fn_800DCB10(nPlayer)) {
         bPossible = 1;
-    } else if (gPlayers[nPlayer].ball.nLie == LIE_GREEN && fn_800BCD24(nPlayer)) {
+    } else if (gPlayers[nPlayer].ball.nLie == LIE_GREEN_e && fn_800BCD24(nPlayer)) {
         bPossible = 1;
-    } else if (gPlayers[nPlayer].ball.nLie == LIE_GREEN && fn_800D0620(nPlayer, 0, 0) == 11 &&
+    } else if (gPlayers[nPlayer].ball.nLie == LIE_GREEN_e && fn_800D0620(nPlayer, 0, 0) == 11 &&
                Hole_ScoreAfterTapIn(nPlayer) < 0) {
         bPossible = 1;
-    } else if (gPlayers[nPlayer].ball.nLie == LIE_GREEN && fn_800D089C(nPlayer, 0) == 1 &&
+    } else if (gPlayers[nPlayer].ball.nLie == LIE_GREEN_e && fn_800D089C(nPlayer, 0) == 1 &&
                Hole_ScoreAfterTapIn(nPlayer) < -1) {
         bPossible = 1;
     }
@@ -328,7 +328,7 @@ void fn_800DB714(int nPlayer) {
         fDist *= fn_8005B64C(nPlayer);
         fn_80045494(0, nPlayer);
         fn_80045558(0, nPlayer);
-        pView = fn_80017028(gPlayers[nPlayer].nView0);
+        pView = fn_80017028(gPlayers[nPlayer].nView[0]);
         pView->p74 = fn_8003BDBC(nPlayer, nLie, 3, 0xC, 1, fDist);
         lbl_80202898.b19 = 1;
         if (lbl_80202898.f24 > 0.8f) {
@@ -355,7 +355,7 @@ void fn_800DBA50(int nPlayer) {
     f32 v2[4];
     f32 v[4];
     if ((!(gSession.uFlags & 0x4000) || !(gSession.uFlags & 0x8000)) && !gSession.bReplay &&
-        !gSession.nSplitScreen && !gSession.unk8[0]) {
+        !gSession.nSplitScreen && !gSession.a8[0]) {
         if (!gpGame->b285) {
             return;
         }
@@ -394,13 +394,13 @@ void fn_800DBA50(int nPlayer) {
                 lbl_80202898.nHeartbeats = 0;
                 fn_80045494(0, nPlayer);
                 fn_80045558(0, nPlayer);
-                pView = fn_80017028(gPlayers[nPlayer].nView0);
+                pView = fn_80017028(gPlayers[nPlayer].nView[0]);
                 pSeq = fn_8003BDBC(nPlayer, nLie, nClass, 0xB, 1, fDist);
                 pShot = fn_8003A950(pSeq, 0, &nKind, &fTime, &f2, &nB, &f3, nPlayer);
                 if (pShot != NULL && pView->p130 != pShot && pView->p134 != pShot &&
                     !fn_800451A8(&pView->script, pShot, nPlayer)) {
                     if (nKind == 5 && fn_8003DC78(pShot)) {
-                        if (gPlayers[nPlayer].nShotKind != SHOT_PUTT &&
+                        if (gPlayers[nPlayer].nShotKind != SHOT_TYPE_PUTT_e &&
                             fn_80095780(gPlayers[nPlayer].pChar) != 9) {
                             fn_80095744(gPlayers[nPlayer].pChar, 14);
                             if (0.0f == fTime) {
@@ -458,7 +458,7 @@ void fn_800DBDA8(int nPlayer) {
 
 // TW06: GameEffects_RenderGameBreakerEffects (by position).
 void fn_800DBF34(void) {
-    if (lbl_80202898.bGameBreaker && gSession.unk14 == 0 && !lbl_80202898.bPaused) {
+    if (lbl_80202898.bGameBreaker && gSession.n14 == 0 && !lbl_80202898.bPaused) {
         switch (lbl_80202898.nGBType) {
         case 1:
             fn_800DBFAC();
@@ -488,7 +488,7 @@ void fn_800DBFAC(void) {
     v[1] = 0.0f;
     fDist = fn_80009680(fn_80009744(v));
     if (!Player_IsCPU(lbl_80202898.nPlayer)) {
-        if (gPlayers[lbl_80202898.nPlayer].nShotKind == SHOT_PUTT) {
+        if (gPlayers[lbl_80202898.nPlayer].nShotKind == SHOT_TYPE_PUTT_e) {
             if (fDist < 2.0f && !lbl_80202898.bClosing) {
                 fn_80045494(1, lbl_80202898.nPlayer);
             } else {
@@ -575,7 +575,7 @@ f32 fn_800DC3A4(void) {
     if (!lbl_80202898.bGameBreaker) {
         return 0.0f;
     }
-    if (gSession.unk14 != 0) {
+    if (gSession.n14 != 0) {
         return 0.0f;
     }
     if (lbl_80202898.bPaused) {
@@ -603,7 +603,7 @@ f32 fn_800DC45C(void) {
 
 // TW06: GameEffects_SimulateBall (by position). A putt always; otherwise once the spin window is done.
 u8 fn_800DC464(int nPlayer) {
-    if (gPlayers[nPlayer].nShotKind == SHOT_PUTT) {
+    if (gPlayers[nPlayer].nShotKind == SHOT_TYPE_PUTT_e) {
         return 1;
     }
     return lbl_80202898.bSpinWindowDone;
@@ -630,9 +630,9 @@ void GameEffects_SetSuperSlowMo(u8 bOn, int nPlayer, f32 fRate) {
     if (bOn) {
         if (!lbl_80202898.bSlowMo) {
             if (fRate < 1.0f) {
-                EVENT_Trigger(nPlayer, 0x35, &gPlayers[nPlayer].fBallX, -1);
+                EVENT_Trigger(nPlayer, 0x35, gPlayers[nPlayer].vBall, -1);
             } else {
-                EVENT_Trigger(nPlayer, 0x37, &gPlayers[nPlayer].fBallX, -1);
+                EVENT_Trigger(nPlayer, 0x37, gPlayers[nPlayer].vBall, -1);
             }
             lbl_80202898.bSlowMo = bOn;
         }
@@ -644,10 +644,10 @@ void GameEffects_SetSuperSlowMo(u8 bOn, int nPlayer, f32 fRate) {
     if (lbl_80202898.bSlowMo) {
         lbl_80202898.bSlowMo = bOn;
         if (lbl_80202898.fSlowMo < 1.0f) {
-            EVENT_Trigger(nPlayer, 0x36, &gPlayers[nPlayer].fBallX, -1);
+            EVENT_Trigger(nPlayer, 0x36, gPlayers[nPlayer].vBall, -1);
             return;
         }
-        EVENT_Trigger(nPlayer, 0x38, &gPlayers[nPlayer].fBallX, -1);
+        EVENT_Trigger(nPlayer, 0x38, gPlayers[nPlayer].vBall, -1);
     }
 }
 
@@ -703,7 +703,7 @@ u8 fn_800DC818(Ball* pBall, int nPlayer, u8 bNext) {
     int a;
     int b;
     int nStrokes;
-    if (pBall->nLie != LIE_GREEN || !(lbl_80202898.uFlags & 0x4000)) {
+    if (pBall->nLie != LIE_GREEN_e || !(lbl_80202898.uFlags & 0x4000)) {
         bEagle = 0;
     } else if (fn_800D2B08() != 5) {
         bEagle = 0;
@@ -724,7 +724,7 @@ u8 fn_800DC818(Ball* pBall, int nPlayer, u8 bNext) {
     } else {
         nStrokes = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1;
     }
-    if ((pBall->nLie == LIE_HOLED && !fn_800E23B0(nPlayer, nStrokes - 1)) || bEagle || b || a) {
+    if ((pBall->nLie == LIE_INCUP_e && !fn_800E23B0(nPlayer, nStrokes - 1)) || bEagle || b || a) {
         return 1;
     }
     return 0;

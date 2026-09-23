@@ -7,6 +7,7 @@
 
 #include "game_types.h"
 #include "engine.h"
+#include "physics.h"
 #include "camera.h"
 #include "character.h"
 #include "ball.h"
@@ -36,9 +37,6 @@ enum {
 #define NUM_GOLFERS          34   // records in gGolferTable
 #define FIRST_CREATED_GOLFER 30   // table slots 30..33 are the created golfers
 #define CONTROLLER_CPU       9
-#define NUM_CLUBS            26   // clubs 0..24 are the bag, 25 the putter
-#define CLUB_PUTTER          25
-#define CLUB_SAND_WEDGE      21
 // A CPU shot's shape (TW06: ShotShape_t), from the authored aim point. The rehearsal compensates
 // each one when it fails: the curves by turning the aim 1 or 2 degrees, the trajectories by 5
 // yards of distance. High/low pick gTrajLoft's +5 / -5 degrees (Shot_Trajectory).
@@ -52,12 +50,6 @@ enum {
     SHAPE_HOOK   = 6        // clubface x -0.04
 };
 
-#define SHOT_PUTT            0    // shot kinds (Player.nShotKind)
-#define SHOT_FULL            1
-#define SHOT_CHIP            2
-#define SHOT_PITCH           3
-#define LIE_GREEN            9
-#define LIE_HOLED            12   // the ball is in the hole
 #define NUM_AI_LINKS         10   // candidate aim points per zone
 #define NUM_AI_TARGETS       25   // aim points per hole (gAITargets)
 
@@ -286,20 +278,13 @@ typedef struct Player {
     u8   bPerfect;              // 0x3AC  no error / no forgiveness when set. TW06: perfect
     u8   unk3AD[3];
     s32  nShotKind2;            // 0x3B0
-    f32  fBallX;                // 0x3B4
-    f32  fBallY;                // 0x3B8
-    f32  fBallZ;                // 0x3BC
-    f32  fBallW;                // 0x3C0
+    f32  vBall[4];              // 0x3B4
     f32  vPreShot[4];           // 0x3C4  where the ball lay before the shot (GM_BumpBallForObstructions drops it
                                 //        back here). TW06: PreShotBallPos
     SwingData swing;            // 0x3D4  the swing meter's state for this player
     s32  nController;           // 0xA08  CONTROLLER_CPU for the AI. TW06: Controller (PlayerCtrl_t, 9 = AI)
-    s32  nView0;                // 0xA0C  TW06: viewControllerID[2]
-    s32  nView1;                // 0xA10
-    f32  fTargetX;              // 0xA14
-    f32  fTargetY;              // 0xA18
-    f32  fTargetZ;              // 0xA1C
-    f32  fTargetW;              // 0xA20
+    s32  nView[2];              // 0xA0C  the views (ViewController) the player uses. TW06: viewControllerID[2]
+    f32  vTarget[4];            // 0xA14
     f32  vTargetCopy[4];        // 0xA24  copy of the planned target. Probably TW06's originalTargetPos
     f32  vTarget2[4];           // 0xA34  copy of the chosen aim point
     f32  vA44[4];               // 0xA44  compared with the ball position (GM_BumpBallForObstructions)
@@ -328,8 +313,8 @@ typedef struct Player {
     u8   bPlanReady;            // 0xC2B  the gimme's tap-in was solved when the camera arrived
     u8   bRehearsalDone;        // 0xC2C  the gimme's tap-in rehearsal (GS_FADE_TO_TAP_IN) has settled
     u8   bC2D;                  // 0xC2D  set when the stroke limit holes the ball; no mulligan then
-    u8   unkC2E;                // 0xC2E
-    u8   bC2F;                  // 0xC2F  set with unkC2E when a mulligan is taken
+    u8   bC2E;                  // 0xC2E  set when a mulligan is taken (GameManager.c), cleared by Swing.c
+    u8   bC2F;                  // 0xC2F  set with bC2E when a mulligan is taken
     s32  nRehearseState;        // 0xC30  AI_RehearseShot state machine
     u8   unkC34[4];
     s32  nC38;                  // 0xC38  a frame countdown (speed golf)
@@ -400,7 +385,7 @@ typedef struct GameOptions {
     s32  n18;                   // 0x18  -> fn_80055C40
     s32  n1C;                   // 0x1C  -> fn_80055CD0
     u8   unk20[4];
-    u8   unk24[8];              // 0x24  eight on/off options, default on; [7] (0xEA3) the swing trail
+    u8   a24[8];                // 0x24  eight on/off options, default on; [7] (0xEA3) the swing trail
     u8   bBoostEnabled;         // 0x2C  (gSession + 0xEA4)
     u8   bSpinEnabled;          // 0x2D  (gSession + 0xEA5)
     u8   rows[4][19];           // 0x2E  four rows of 19 flags
@@ -440,14 +425,14 @@ typedef struct Session {
     u32  uFlags;                // 0x000  bit 1: use the alternate attribute block everywhere;
                                 //        bit 9: every club in the bag
     s32  nGameType;             // 0x004  4 gets a second view
-    u8   unk8[4];
+    u8   a8[4];                 // 0x008  [0] nonzero: no GameBreaker (GameEffects.c)
     s32  nC;                    // 0x00C
     u8   nSplitScreen;          // 0x010  0 single view, else split screen (2 = side by side); no luck, no caddie
     u8   b11;                   // 0x011  cleared by Session_Init
     u8   b12;                   // 0x012  set by the pause menu, a replay and the lessons; GameManager
                                 //        tests it
     u8   bReplay;               // 0x013  a saved replay is playing: no luck swap, no spin, instant launch
-    s32  unk14;                 // 0x014
+    s32  n14;                   // 0x014  nonzero while the game is paused (GameUI.c; GameMessages.c sets 2)
     f32  fFrameTime;            // 0x018  seconds per frame
     f32  f1C;                   // 0x01C
     s32  n20;                   // 0x020
@@ -637,9 +622,9 @@ extern GameState*   gpGame;             // 0x80281588
 
 extern AITarget     gAITargets[25];     // 0x801C65B8
 extern s32          gNumAITargets;      // 0x80281D44
-extern u8           gClubKindTable[8][NUM_CLUBS];   // 0x801874B0  which clubs each shot kind allows
-extern f32          gClubDistAtPower0[NUM_CLUBS];   // 0x80187580  reach at POWER 0 (245 for the woods)
-extern f32          gClubPowerStep[NUM_CLUBS];      // 0x801875E8  reach gained per POWER point over 100
+extern u8           gClubKindTable[8][CLUB_MAX_e];   // 0x801874B0  which clubs each shot kind allows
+extern f32          gClubDistAtPower0[CLUB_MAX_e];   // 0x80187580  reach at POWER 0 (245 for the woods)
+extern f32          gClubPowerStep[CLUB_MAX_e];      // 0x801875E8  reach gained per POWER point over 100
 
 int  Game_GetMode(void);                // 0x8000BED8
 int  fn_800D2B08(void);

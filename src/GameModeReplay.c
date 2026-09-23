@@ -111,9 +111,9 @@ void fn_800F15AC(void) {
     Mem_cpy(&gPlayers[0].nShotKind2, &gReplayData.player.nShotKind2, 4);
     Mem_cpy(&gPlayers[0].swing, &gReplayData.player.swing, 0x630);
     gPlayers[0].uFlags = gReplayData.player.uFlags;
-    Vec_Copy(&gReplayData.player.fBallX, &gPlayers[0].fBallX);
+    Vec_Copy(gReplayData.player.vBall, gPlayers[0].vBall);
     Vec_Copy(gReplayData.player.vPreShot, gPlayers[0].vPreShot);
-    Vec_Copy(&gReplayData.player.fTargetX, &gPlayers[0].fTargetX);
+    Vec_Copy(gReplayData.player.vTarget, gPlayers[0].vTarget);
     Vec_Copy(gReplayData.player.vTargetCopy, gPlayers[0].vTargetCopy);
     Vec_Copy(gReplayData.player.vTarget2, gPlayers[0].vTarget2);
     Vec_Copy(gReplayData.player.vA44, gPlayers[0].vA44);

@@ -127,7 +127,7 @@ void fn_800EDA34(int nPlayer) {
 void fn_800EDA74(void) {
     f32 v[4] = {0.0f, 0.0f, 0.0f, 0.5f};
     GOLFERSTATE_Set(GS_PLACE_BALL, 0);
-    fn_80063B98(fn_80017028(gPlayers[0].nView0), 0.5f, v);
+    fn_80063B98(fn_80017028(gPlayers[0].nView[0]), 0.5f, v);
 }
 
 // The pad's sticks (beyond the 96..160 dead zone) scaled to -1..1 into the player's fA7C..fA84.
