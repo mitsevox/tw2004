@@ -86,6 +86,14 @@ void fn_800FE344(void) {
     }
 }
 
+// Appends nPlayer to aList (*pnCount entries) if their score on hole nHole is nScore.
+static inline void AddIfScore(s32* aList, int* pnCount, int nPlayer, int nHole, s32 nScore) {
+    if (gPlayers[nPlayer].nStrokes[nHole] == nScore) {
+        aList[*pnCount] = nPlayer;
+        (*pnCount)++;
+    }
+}
+
 // TW06: GameModeStableford::GetHonors. Who plays next after nPlayer (5 = nobody). On the tee the
 // honor goes by the scores on the holes played so far (the latest hole first, ties by the hole
 // before); otherwise to the player farthest from the pin, off the green first.
@@ -121,10 +129,7 @@ s32 fn_800FE3FC(int nPlayer) {
             n = 0;
             for (nScore = nLow; nScore <= nHigh; nScore++) {
                 for (k = 0; k < gNumPlayersSetUp; k++) {
-                    if (nScore == gPlayers[(u32)aOrder[k]].nStrokes[h]) {
-                        aSorted[n] = aOrder[k];
-                        n++;
-                    }
+                    AddIfScore(aSorted, &n, aOrder[k], h, nScore);
                 }
             }
             for (i = 0; i < gNumPlayersSetUp; i++) {

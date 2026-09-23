@@ -75,6 +75,14 @@ void fn_800FF7DC(void) {
     }
 }
 
+// Appends nPlayer to aList (*pnCount entries) if their score on hole nHole is nScore.
+static inline void AddIfScore(s32* aList, int* pnCount, int nPlayer, int nHole, s32 nScore) {
+    if (gPlayers[nPlayer].nStrokes[nHole] == nScore) {
+        aList[*pnCount] = nPlayer;
+        (*pnCount)++;
+    }
+}
+
 // TW06: GameModeStroke::GetHonors. Who plays next after nPlayer (5 = nobody): on the tee, the order
 // of the scores on each hole played so far (ties keep the order of the hole before); otherwise the
 // player farthest from the pin (off the green first). Players who were cut do not play.
@@ -111,10 +119,7 @@ s32 fn_800FF894(int nPlayer) {
             k = 0;
             for (n = nLow; n <= nHigh; n++) {
                 for (i = 0; i < gNumPlayersSetUp; i++) {
-                    if (n == gPlayers[order.a[i]].nStrokes[h]) {
-                        aSorted[k] = order.a[i];
-                        k++;
-                    }
+                    AddIfScore(aSorted, &k, order.a[i], h, n);
                 }
             }
             for (i = 0; i < gNumPlayersSetUp; i++) {
