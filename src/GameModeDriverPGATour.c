@@ -1,6 +1,6 @@
-// GameMode23.c (our name): game mode 23, a tour season of 31 tournaments (gPgaData, 0x64 bytes
-// each, loaded from the 'PGAc' stream object), with the player's results kept in the save profile
-// (+0xB634..): "Did Not Play", "Cut", a finishing place, "Tied (%d players)".
+// GameModeDriverPGATour.c (TW06's GameModeDriverPGATour): game mode 23, a PGA Tour season of 31
+// tournaments (gPgaData, loaded from the 'PGA' stream objects), with the player's results kept in
+// the save profile (TourSeason): "Did Not Play", "Cut", a finishing place, "Tied (%d players)".
 
 #include "golfer.h"
 #include "game.h"
@@ -111,6 +111,15 @@ s32  fn_800EFA9C(s32 i);
 void fn_800EDE78(void) {
 }
 
+// TW06: GameModeDriverPGATour::RegisterStreamClients.
+void fn_800EDE7C(void) {
+    UStream_RegisterHandler('PGAc', fn_800EDF34);
+    UStream_RegisterHandler('PGAt', fn_800EDF60);
+    UStream_RegisterHandler('PGAp', fn_800EDF90);
+    UStream_RegisterHandler('PGAn', fn_800EDFC0);
+}
+
+// TW06: GameModeDriverPGATour::UnregisterStreamClients.
 void fn_800EDEE8(void) {
     UStream_UnregisterHandler('PGAc');
     UStream_UnregisterHandler('PGAt');
@@ -118,16 +127,40 @@ void fn_800EDEE8(void) {
     UStream_UnregisterHandler('PGAn');
 }
 
+// TW06: GameModeDriverPGATour::LoadPGAcFromStream.
 void fn_800EDF34(UStreamObject* pObject) {
     fn_8000E790(pObject, sizeof(gPgaData.aTournament), gPgaData.aTournament);
 }
 
+// TW06: GameModeDriverPGATour::LoadPGAtFromStream.
 void fn_800EDF60(UStreamObject* pObject) {
     fn_8000E790(pObject, sizeof(gPgaData.aTourEvent), gPgaData.aTourEvent);
 }
 
+// TW06: GameModeDriverPGATour::LoadPGApFromStream.
 void fn_800EDF90(UStreamObject* pObject) {
     fn_8000E790(pObject, sizeof(gPgaData.aTriple), gPgaData.aTriple);
+}
+
+// TW06: GameModeDriverPGATour::Locale_PgaTourMode_LoadPGAnFromStream. The 'PGAn' object: the names
+// block is copied out.
+void fn_800EDFC0(UStreamObject* pObject) {
+    void* pData;
+    u32 nSize = fn_8000E81C(pObject, &pData);
+    if (nSize) {
+        gPgaData.pNames = fn_800951A0(nSize, 0x10, 1);
+        Mem_cpy(gPgaData.pNames, pData, nSize);
+        fn_80009E70(pObject);
+    }
+}
+
+// The mode ends: one player back, and the options it changed come back.
+void fn_800EE02C(void) {
+    gpGame->nC = 1;
+    gpGame->n10 = 1;
+    SESSION_OPTIONS->unkC = lbl_80281670;
+    SESSION_OPTIONS->nWind = lbl_80282338;
+    lbl_8028233C = 0;
 }
 
 // The current tournament's number of rounds goes into the game state.
@@ -140,83 +173,45 @@ u8 fn_800EE470(void) {
     return lbl_8028233C;
 }
 
+// Whether the player trails the leader by more than one stroke.
+u8 fn_800EE5B4(s32 nPlayer) {
+    int bBehind;
+    if (gpGame->bD4) {
+        return gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1 <
+               fn_8011A7C8(nPlayer, Game_CurHoleIndex());
+    }
+    bBehind = 0;
+    if (fn_800E1904(nPlayer, 0) >= fn_80119588(nPlayer, 1)) {
+        if (fn_800E1904(nPlayer, 1) + 1 < fn_80119588(nPlayer, 1)) {
+            bBehind = 1;
+        }
+    }
+    return bBehind;
+}
+
+// TW06: GameModeDriverPGATour::GetCurrentLead. Strokes behind the leader (in a playoff, on this hole).
+s32 fn_800EE778(s32 nPlayer) {
+    if (gpGame->bD4) {
+        return fn_8011A7C8(nPlayer, Game_CurHoleIndex()) - gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
+    }
+    return fn_80119588(nPlayer, 1) - fn_800E1904(nPlayer, 0);
+}
+
+// TW06: GameModeDriverPGATour::GetPotentialLead.
+s32 fn_800EE810(s32 nPlayer) {
+    if (gpGame->bD4) {
+        return fn_8011A7C8(nPlayer, Game_CurHoleIndex()) -
+               (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1);
+    }
+    return fn_80119588(nPlayer, 1) - (fn_800E1904(nPlayer, 1) + 1);
+}
+
 s32 fn_800EE8B0(void) {
     return 3;
 }
 
 u8* fn_800EE8B8(void) {
     return lbl_80205F30;
-}
-
-void fn_800EF294(void) {
-    fn_80119934(0);
-}
-
-s32 fn_800EF834(void) {
-    return 31;
-}
-
-s32 fn_800EFBAC(void) {
-    s32 t0;
-    t0 = fn_800EFB88();
-    return (t0 + 2004);
-}
-
-char* fn_800EFDFC(s32 i) {
-    return gPgaData.pNames + gPgaData.aTournament[i].nName;
-}
-
-s32 fn_800EFE3C(s32 i) {
-    return fn_800EFA70(i)->n10;
-}
-
-char* fn_800EFE60(s32 i) {
-    return gPgaData.aTournament[i].szChampName;
-}
-
-void fn_800F009C(void) {
-    s32 t0;
-    s32 t1;
-    t0 = fn_801197CC(0, 0);
-    t1 = fn_8011908C(0, t0);
-    fn_8011937C(0, t0, (((u32)__cntlzw((t1 & 0xFF)) >> 5) & 0xFF));
-}
-
-void fn_800F018C(void) {
-    fn_8011937C(0, 0, (u8) (fn_8011908C(0, 0) == 0));
-}
-
-// The mode ends: one player back, and the options it changed come back.
-void fn_800EE02C(void) {
-    gpGame->nC = 1;
-    gpGame->n10 = 1;
-    SESSION_OPTIONS->unkC = lbl_80281670;
-    SESSION_OPTIONS->nWind = lbl_80282338;
-    lbl_8028233C = 0;
-}
-
-// The tournament profile 0 is on, and its round.
-s32 fn_800EF908(s32* pRound) {
-    PlayerNumber_t nPlayer = PLR_1_e;
-    *pRound = gpSaveData[nPlayer].tour.nRound;
-    return gpSaveData[nPlayer].tour.nEvent;
-}
-
-// The tournament after the current one.
-void fn_800EF940(void) {
-    PlayerNumber_t nPlayer = PLR_1_e;
-    fn_800EFBD0(gpSaveData[nPlayer].tour.nEvent + 1);
-}
-
-// The last tournament there is.
-s32 fn_800EF984(void) {
-    s32 nLast = 0;
-    s32 i = fn_800EFBD0(1);
-    while (i != -1) {
-        nLast = i;
-        i = fn_800EFBD0(i + 1);
-    }
-    return nLast;
 }
 
 void fn_800EF094(s32 n) {
@@ -235,6 +230,70 @@ u16 fn_800EF0E0(void) {
     return n;
 }
 
+void fn_800EF294(void) {
+    fn_80119934(0);
+}
+
+s32 fn_800EF834(void) {
+    return 31;
+}
+
+// TW06: GameModeDriverPGATour::GetEventByDate.
+// Which tournament (and which of its rounds) is played on a date: each tournament starts on a
+// date per season (aStartDate, seasons from 2004).
+u8 fn_800EF83C(u16 nDate, s32* pId, s32* pRound) {
+    s32 nDay;
+    s32 nMonth;
+    s32 i;
+    s32 d;
+    s32 nYear;
+    s32 nSeason;
+    u8 bFound;
+    fn_800D2714(&nDate, &nDay, &nMonth, &nYear);
+    bFound = 0;
+    nSeason = nYear - 2004;
+    if (nSeason >= 0 && nSeason < 10) {
+        for (i = 0; i < 31; i++) {
+            d = nDate - gPgaData.aTournament[i].aStartDate[nSeason];
+            if (d >= 0 && d < fn_800EFA9C(i)) {
+                *pId = i;
+                bFound = 1;
+                *pRound = d;
+                break;
+            }
+        }
+    }
+    if (!bFound) {
+        *pId = -1;
+        *pRound = 0;
+    }
+    return bFound;
+}
+
+// TW06: GameModeDriverPGATour::GetSelectedEvent. The tournament profile 0 is on, and its round.
+s32 fn_800EF908(s32* pRound) {
+    PlayerNumber_t nPlayer = PLR_1_e;
+    *pRound = gpSaveData[nPlayer].tour.nRound;
+    return gpSaveData[nPlayer].tour.nEvent;
+}
+
+// TW06: GameModeDriverPGATour::GetNextEvent. The tournament after the current one.
+void fn_800EF940(void) {
+    PlayerNumber_t nPlayer = PLR_1_e;
+    fn_800EFBD0(gpSaveData[nPlayer].tour.nEvent + 1);
+}
+
+// TW06: GameModeDriverPGATour::GetFinalEventOfSeason. The last tournament there is.
+s32 fn_800EF984(void) {
+    s32 nLast = 0;
+    s32 i = fn_800EFBD0(1);
+    while (i != -1) {
+        nLast = i;
+        i = fn_800EFBD0(i + 1);
+    }
+    return nLast;
+}
+
 // Tournament i (0..30), or none.
 Tournament* fn_800EFA70(s32 i) {
     if (i != -1 && i < 31) {
@@ -243,7 +302,7 @@ Tournament* fn_800EFA70(s32 i) {
     return 0;
 }
 
-// Tournament i's number of rounds (from its format; 1 without one).
+// TW06: GameModeDriverPGATour::GetRounds. Tournament i's number of rounds (from its format; 1 without one).
 s32 fn_800EFA9C(s32 i) {
     if (gPgaData.aTournament[i].nTourEvent) {
         return gPgaData.aTourEvent[gPgaData.aTournament[i].nTourEvent - 1].nRounds;
@@ -251,10 +310,16 @@ s32 fn_800EFA9C(s32 i) {
     return 1;
 }
 
-// Profile 0's season, 0 = 2004.
+// TW06: GameModeDriverPGATour::GetCurrentSeason. Profile 0's season, 0 = 2004.
 s32 fn_800EFB88(void) {
     PlayerNumber_t nPlayer = PLR_1_e;
     return gpSaveData[nPlayer].tour.nSeason;
+}
+
+s32 fn_800EFBAC(void) {
+    s32 t0;
+    t0 = fn_800EFB88();
+    return (t0 + 2004);
 }
 
 // The tournament being played on a date.
@@ -284,20 +349,75 @@ u16 fn_800EFD38(s32 i) {
     return p->aStartDate[fn_800EFB88()];
 }
 
-// Profile 0's current tournament.
+// TW06: GameModeDriverPGATour::GetName.
+char* fn_800EFDFC(s32 i) {
+    return gPgaData.pNames + gPgaData.aTournament[i].nName;
+}
+
+// TW06: GameModeDriverPGATour::GetCurrentEventID. Profile 0's current tournament.
 s32 fn_800EFE18(void) {
     PlayerNumber_t nPlayer = PLR_1_e;
     return gpSaveData[nPlayer].tour.nEvent;
 }
 
+s32 fn_800EFE3C(s32 i) {
+    return fn_800EFA70(i)->n10;
+}
+
+// TW06: GameModeDriverPGATour::GetInitialChampName.
+char* fn_800EFE60(s32 i) {
+    return gPgaData.aTournament[i].szChampName;
+}
+
+// TW06: GameModeDriverPGATour::GetInitialChampScore.
 s32 fn_800EFE78(s32 i) {
     return gPgaData.aTournament[i].nChampScore;
 }
 
+// TW06: GameModeDriverPGATour::GetCurrentEventLeader. The leader's name, or "Tied (%d players)".
+void fn_800F0010(char* pDst) {
+    s32 n = fn_80118684(0);
+    if (n > 1) {
+        sprintf(pDst, "Tied (%d players)", n);
+        return;
+    }
+    strcpy(pDst, fn_80118E30(0, fn_80119118(0, fn_801197CC(0, 0))));
+}
+
+void fn_800F009C(void) {
+    s32 t0;
+    s32 t1;
+    t0 = fn_801197CC(0, 0);
+    t1 = fn_8011908C(0, t0);
+    fn_8011937C(0, t0, (((u32)__cntlzw((t1 & 0xFF)) >> 5) & 0xFF));
+}
+
+void fn_800F018C(void) {
+    fn_8011937C(0, 0, (u8) (fn_8011908C(0, 0) == 0));
+}
+
+// TW06: GameModeDriverPGATour::GetUserFinishString. A tournament's result for the season screen:
+// "Did Not Play", "Cut", or the place.
+void fn_800F01CC(s32 i, char* pDst) {
+    switch (gpSaveData->tour.aEvent[i].nUserRankType) {
+    case 0:
+        strcpy(pDst, "Did Not Play");
+        return;
+    case 1:
+        strcpy(pDst, "Cut");
+        return;
+    case 2:
+        sprintf(pDst, "%d", gpSaveData->tour.aEvent[i].nUserRank);
+        return;
+    }
+}
+
+// TW06: GameModeDriverPGATour::GetChamp.
 void fn_800F0258(s32 i, char* pDst) {
     strcpy(pDst, gpSaveData->tour.aEvent[i].szChampName);
 }
 
+// TW06: GameModeDriverPGATour::GetChampScore.
 s32 fn_800F0290(s32 i) {
     return gpSaveData->tour.aEvent[i].nChampScore;
 }
@@ -328,110 +448,4 @@ s32 fn_800F0304(s32 i) {
 
 s32 fn_800F0428(s32 nPlayer) {
     return gpSaveData[nPlayer].tour.nEvent;
-}
-
-void fn_800EDE7C(void) {
-    UStream_RegisterHandler('PGAc', fn_800EDF34);
-    UStream_RegisterHandler('PGAt', fn_800EDF60);
-    UStream_RegisterHandler('PGAp', fn_800EDF90);
-    UStream_RegisterHandler('PGAn', fn_800EDFC0);
-}
-
-// The 'PGAn' object: the names block is copied out.
-void fn_800EDFC0(UStreamObject* pObject) {
-    void* pData;
-    u32 nSize = fn_8000E81C(pObject, &pData);
-    if (nSize) {
-        gPgaData.pNames = fn_800951A0(nSize, 0x10, 1);
-        Mem_cpy(gPgaData.pNames, pData, nSize);
-        fn_80009E70(pObject);
-    }
-}
-
-// The leader's name, or "Tied (%d players)".
-void fn_800F0010(char* pDst) {
-    s32 n = fn_80118684(0);
-    if (n > 1) {
-        sprintf(pDst, "Tied (%d players)", n);
-        return;
-    }
-    strcpy(pDst, fn_80118E30(0, fn_80119118(0, fn_801197CC(0, 0))));
-}
-
-// A tournament's result for the season screen: "Did Not Play", "Cut", or the place.
-void fn_800F01CC(s32 i, char* pDst) {
-    switch (gpSaveData->tour.aEvent[i].nUserRankType) {
-    case 0:
-        strcpy(pDst, "Did Not Play");
-        return;
-    case 1:
-        strcpy(pDst, "Cut");
-        return;
-    case 2:
-        sprintf(pDst, "%d", gpSaveData->tour.aEvent[i].nUserRank);
-        return;
-    }
-}
-
-// Strokes behind the leader (in a playoff, on this hole).
-s32 fn_800EE778(s32 nPlayer) {
-    if (gpGame->bD4) {
-        return fn_8011A7C8(nPlayer, Game_CurHoleIndex()) - gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
-    }
-    return fn_80119588(nPlayer, 1) - fn_800E1904(nPlayer, 0);
-}
-
-s32 fn_800EE810(s32 nPlayer) {
-    if (gpGame->bD4) {
-        return fn_8011A7C8(nPlayer, Game_CurHoleIndex()) -
-               (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1);
-    }
-    return fn_80119588(nPlayer, 1) - (fn_800E1904(nPlayer, 1) + 1);
-}
-
-// Whether the player trails the leader by more than one stroke.
-u8 fn_800EE5B4(s32 nPlayer) {
-    int bBehind;
-    if (gpGame->bD4) {
-        return gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1 <
-               fn_8011A7C8(nPlayer, Game_CurHoleIndex());
-    }
-    bBehind = 0;
-    if (fn_800E1904(nPlayer, 0) >= fn_80119588(nPlayer, 1)) {
-        if (fn_800E1904(nPlayer, 1) + 1 < fn_80119588(nPlayer, 1)) {
-            bBehind = 1;
-        }
-    }
-    return bBehind;
-}
-
-// Which tournament (and which of its rounds) is played on a date: each tournament starts on a
-// date per season (aStartDate, seasons from 2004).
-u8 fn_800EF83C(u16 nDate, s32* pId, s32* pRound) {
-    s32 nDay;
-    s32 nMonth;
-    s32 i;
-    s32 d;
-    s32 nYear;
-    s32 nSeason;
-    u8 bFound;
-    fn_800D2714(&nDate, &nDay, &nMonth, &nYear);
-    bFound = 0;
-    nSeason = nYear - 2004;
-    if (nSeason >= 0 && nSeason < 10) {
-        for (i = 0; i < 31; i++) {
-            d = nDate - gPgaData.aTournament[i].aStartDate[nSeason];
-            if (d >= 0 && d < fn_800EFA9C(i)) {
-                *pId = i;
-                bFound = 1;
-                *pRound = d;
-                break;
-            }
-        }
-    }
-    if (!bFound) {
-        *pId = -1;
-        *pRound = 0;
-    }
-    return bFound;
 }

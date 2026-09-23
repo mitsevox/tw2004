@@ -80,9 +80,9 @@ int  fn_800EAC94(int n);
 
 void fn_800EADD8(void);                 // GameMode5.c
 u8   fn_800EC550(void);                 // GameMode5.c
-void fn_800EDE78(void);                 // GameMode23.c
-u8   fn_800EE470(void);                 // GameMode23.c
-u8   fn_800F0818(void);                 // GameMode24.c
+void fn_800EDE78(void);                 // GameModeDriverPGATour.c
+u8   fn_800EE470(void);                 // GameModeDriverPGATour.c
+u8   fn_800F0818(void);                 // GameModeDriverRTE.c
 
 // GameTargets.c: what the target games (modes 13..17) share
 void fn_800F19D4(void);                 // sort the targets by distance from the tee
