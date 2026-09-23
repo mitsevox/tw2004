@@ -27,12 +27,13 @@ typedef struct CamShot {
     f32  f74;                   // 0x74
     f32  f78;                   // 0x78
     f32  f7C;                   // 0x7C
-    u8   unk80[4];
+    f32  f80;                   // 0x80
     f32  f84;                   // 0x84
     u8   unk88[0x94 - 0x88];
     f32  f94;                   // 0x94
     f32  f98;                   // 0x98
-    u8   unk9C[0xA4 - 0x9C];
+    f32  f9C;                   // 0x9C
+    u8   unkA0[0xA4 - 0xA0];
     s32  nA4;                   // 0xA4
     u8   bA8;                   // 0xA8
     u8   unkA9;
@@ -206,7 +207,7 @@ typedef struct GolfCamState {
     s32     n60;                // 0x060  passed to fn_8006509C
     f32     f64;                // 0x064  camera 7's slow-motion rate while b5A is set
     f32     f68;                // 0x068
-    CamShot shot6C;             // 0x06C
+    CamShot shot6C;             // 0x06C  the tutorial wait's two hand-made shots (camera 18)
     CamShot shot12C;            // 0x12C
     s32     n1EC[5];            // 0x1EC
 } GolfCamState;

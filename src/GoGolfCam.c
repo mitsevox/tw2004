@@ -639,22 +639,6 @@ void fn_800C1670(View* pView, int nPlayer) {
     lbl_80282220->b56 = 1;
 }
 
-// Undo what camera 20 set up (b56): the view's rectangle back to 0,0-1,1 and the render state reset.
-void fn_800C1790(View* pView, int nPlayer) {
-    int nView = gPlayers[nPlayer].nView[0];
-    if (lbl_80282220->b56) {
-        fn_800171D8(fn_80012EF0(fn_80017004(nView)), 0.0f, 0.0f, 1.0f, 1.0f);
-        fn_800352BC();
-        fn_80035240(0);
-        fn_80013CCC(fn_8001614C());
-        fn_80013EEC(fn_8001614C());
-        fn_80016B9C();
-        fn_80012EF8();
-        lbl_80282220->b56 = 0;
-        lbl_80282220->b57 = 0;
-    }
-}
-
 // Camera 20: once fn_800B36F4 is done, back to the full view and on to the flight camera (14).
 void fn_800C16C4(View* pView, int nPlayer) {
     f32* pCam;
@@ -669,6 +653,22 @@ void fn_800C16C4(View* pView, int nPlayer) {
         GolfCamera_ProcessBallFlightCamera(pView, nPlayer);
     } else {
         fn_8003DCE8(nPlayer, pCam, pSub, &pView->script, &pView->shot19C, 0, gSession.fFrameTime);
+    }
+}
+
+// Undo what camera 20 set up (b56): the view's rectangle back to 0,0-1,1 and the render state reset.
+void fn_800C1790(View* pView, int nPlayer) {
+    int nView = gPlayers[nPlayer].nView[0];
+    if (lbl_80282220->b56) {
+        fn_800171D8(fn_80012EF0(fn_80017004(nView)), 0.0f, 0.0f, 1.0f, 1.0f);
+        fn_800352BC();
+        fn_80035240(0);
+        fn_80013CCC(fn_8001614C());
+        fn_80013EEC(fn_8001614C());
+        fn_80016B9C();
+        fn_80012EF8();
+        lbl_80282220->b56 = 0;
+        lbl_80282220->b57 = 0;
     }
 }
 
@@ -769,12 +769,6 @@ void GolfCamera_InitShutterCamera(View* pView, int nPlayer) {
     lbl_80282220->b5B = 1;
     pView->f190 = 0.0f;     // stored twice, as in the original
     GameEffects_SetSuperSlowMo(1, nPlayer, 1.0f);
-}
-
-// Camera 17: the script steps on one fixed frame (FRAME_TIME) at a time.
-void fn_800C34F8(View* pView, int nPlayer) {
-    fn_8003F2E0(&pView->script, FRAME_TIME);
-    pView->f114 += FRAME_TIME;
 }
 
 // Camera 15, the post-shot camera: the crowd flyby, else shot 0x40 of the plan or shot 5 of the
@@ -885,6 +879,74 @@ void fn_800C3478(View* pView, int nPlayer) {
     if (fn_80063C7C(pView) || fn_80063C90(pView)) {
         fn_80063B98(pView, lbl_80281F78->f170, v);
     }
+}
+
+// Camera 17: the script steps on one fixed frame (FRAME_TIME) at a time.
+void fn_800C34F8(View* pView, int nPlayer) {
+    fn_8003F2E0(&pView->script, FRAME_TIME);
+    pView->f114 += FRAME_TIME;
+}
+
+// Camera 18, the tutorial wait: the flagstick back in, and two hand-made "TUTORIAL WAIT" shots in the
+// shared state, the current one (f60 15, its p40 pointing back at itself) and the next (f60 -15),
+// with 40 s on the current one.
+void GolfCamera_InitTutorialWaitCamera(View* pView, int nPlayer) {
+    f32 v[4] = {0.0f, 0.0f, 0.0f, 0.5f};
+    char szName[] = "TUTORIAL WAIT";
+    if (fn_80063C7C(pView)) {
+        fn_80063B98(pView, lbl_80281F78->f170, v);
+    }
+    fn_80016CFC(gPlayers[nPlayer].nView[0])->bFlagOut = 0;
+    strcpy(lbl_80282220->shot6C.szName, szName);
+    lbl_80282220->shot6C.p40 = &lbl_80282220->shot6C;
+    lbl_80282220->shot6C.f60 = 15.0f;
+    lbl_80282220->shot6C.f64 = 0.0f;
+    lbl_80282220->shot6C.f70 = 0.0f;
+    lbl_80282220->shot6C.f74 = 2.0f;
+    lbl_80282220->shot6C.f68 = 2.0f;
+    lbl_80282220->shot6C.f6C = 20.0f;
+    lbl_80282220->shot6C.f78 = DEG(40.0f);
+    lbl_80282220->shot6C.f7C = lbl_80282220->shot6C.f78;
+    lbl_80282220->shot6C.f80 = 0.0f;
+    lbl_80282220->shot6C.f9C = 0.0f;
+    lbl_80282220->shot6C.f84 = 0.0f;
+    lbl_80282220->shot6C.bA8 = 1;
+    lbl_80282220->shot6C.bAA = 0;
+    lbl_80282220->shot6C.bAC = 10;
+    lbl_80282220->shot6C.bB1 = 2;
+    lbl_80282220->shot6C.bB2 = 0;
+    lbl_80282220->shot6C.bAF = 10;
+    lbl_80282220->shot6C.bB0 = 1;
+    lbl_80282220->shot6C.bAD = 5;
+    lbl_80282220->shot6C.p44 = NULL;
+    strcpy(lbl_80282220->shot12C.szName, szName);
+    lbl_80282220->shot12C.p40 = NULL;
+    lbl_80282220->shot12C.f60 = -15.0f;
+    lbl_80282220->shot12C.f64 = 0.0f;
+    lbl_80282220->shot12C.f70 = 0.0f;
+    lbl_80282220->shot12C.f74 = 2.0f;
+    lbl_80282220->shot12C.f68 = 2.0f;
+    lbl_80282220->shot12C.f6C = 20.0f;
+    lbl_80282220->shot12C.f78 = DEG(40.0f);
+    lbl_80282220->shot12C.f7C = lbl_80282220->shot12C.f78;
+    lbl_80282220->shot12C.f80 = 0.0f;
+    lbl_80282220->shot12C.f9C = 0.0f;
+    lbl_80282220->shot12C.f84 = 0.0f;
+    lbl_80282220->shot12C.bA8 = 1;
+    lbl_80282220->shot12C.bAA = 0;
+    lbl_80282220->shot12C.bAC = 10;
+    lbl_80282220->shot12C.bB1 = 2;
+    lbl_80282220->shot12C.bB2 = 0;
+    lbl_80282220->shot12C.bAF = 10;
+    lbl_80282220->shot12C.bB0 = 1;
+    lbl_80282220->shot12C.bAD = 5;
+    lbl_80282220->shot12C.p44 = NULL;
+    pView->p130 = &lbl_80282220->shot6C;
+    pView->p134 = &lbl_80282220->shot12C;
+    pView->n140 = 7;
+    pView->f110 = 40.0f;
+    pView->n154 = 1;
+    pView->fCamTime = 0.00001f;
 }
 
 // Camera 18 (the tutorial wait): with no shot to go to, fall back on the state's own two shots.
@@ -1365,17 +1427,6 @@ void fn_800C5CEC(View* pView, int nPlayer) {
     fn_800C5D64(pView, pCam, pSub, nPlayer);
 }
 
-u8 fn_800C5FE4(View* pView, int nPlayer) {
-    u8 bOn = 0;
-    if (pView->n260 == 11) {
-        bOn = 1;
-    }
-    if (bOn) {
-        pView->n198 = 1;
-    }
-    return bOn;
-}
-
 // Camera 13's process: a new angle from the current shot each time (script 13), up to
 // fn_800C6B38's count, then back to the saved shot. Kinds 15 and 16 use script 0x22 instead.
 // The callers pass the view's position and aim, but it fetches them again.
@@ -1434,6 +1485,17 @@ void fn_800C5EC0(View* pView, f32* pCam, f32* pSub, int nPlayer) {
         t = (fTime - fTop) / (fEnd - fTop);
         pView->fCamTime = (t < 0.0f) ? 0.0f : ((t > 1.0f) ? 1.0f : t);
     }
+}
+
+u8 fn_800C5FE4(View* pView, int nPlayer) {
+    u8 bOn = 0;
+    if (pView->n260 == 11) {
+        bOn = 1;
+    }
+    if (bOn) {
+        pView->n198 = 1;
+    }
+    return bOn;
 }
 
 // Step shot19C.f60 up by 0.1 a frame, but keep it 3 short of the ground distance from the ball to the
