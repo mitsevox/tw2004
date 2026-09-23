@@ -247,7 +247,32 @@ straight one?
 **Where to look:** `AI_ApplyError` (`Golfer.c`), `AI_RehearseShot`, `Ball_CupPull`, the green slope
 code (`GoGreenGrid.c`, `0x8009B68C`) and the putt part of the ball physics.
 
-**Status:** open.
+**Result (2026-09-22):** **half right: distance is coded, but break causes misses by itself.**
+Two separate things decide a CPU putt:
+
+- **Distance is in the code.** Putts under 1.5 yd (4.5 ft) are never missed, and under 5 yd
+  (15 ft) the aim error is halved. The error is an *angle*: 0.25 degree minimum, up to 8 degrees
+  times `(100 - PUTTING)%`. Skill is capped at 98, so even the best putter is off by 0.25..0.41
+  degree. An angle turns into a bigger sideways miss the longer the putt: 0.3 degree is about
+  1.9 in at 30 ft. The cup is about 1.9 in in radius.
+- **A deterministic pace bias makes break matter on its own.** The rehearsal solves for the ball
+  *dying at the hole*. Then `Swing_ComputePower` hits every CPU putt (except a gimme) **5% harder
+  than the rehearsal did** (`fPower *= 1.05f`, `Swing.c`). On a straight putt that does nothing to
+  the line; the ball just arrives firmer and drops. On a breaking putt a firmer ball breaks
+  less, so it **misses on the high side, and the more break, the bigger the miss**. It happens on
+  every breaking CPU putt at any skill, and no random number is involved.
+- The error is applied as a rotation and stretch of the rehearsal's (already break-adjusted) aim
+  point around the ball, and the power is re-solved for the moved point. So an aim or pace error
+  on a breaking putt also changes how much it breaks.
+
+So "more break = more miss" is real and matches the user's mechanism ("the AI pulls back from
+its deterministic result"). But "distance isn't factored at all" is wrong: the aim error grows
+with length. For a strong putter on a mid-length putt the 5% pace bias against the break is
+probably the bigger of the two. Measuring the exact balance needs the green physics in a test
+harness (not built yet).
+
+**Status:** answered - partly confirmed (break misses: yes, by a hidden +5% pace; distance: also
+counts).
 
 7. Power boost's full meter needs a non-linear number of Z presses
 -------------------------------------------------------------------
@@ -269,7 +294,28 @@ presses into a level.
 **Where to look:** `Swing.c` (the swing phases and state machine; search for the Z button mask and
 for writes of the boost level), and the meter drawing code that fills the ball.
 
-**Status:** open.
+**Result (2026-09-22, `Swing_BoostInput` re-read):** **refuted on the count, but the difficulty
+is real and has a different cause.** Each Z **tap** adds exactly one level, up to 8: a straight
+line. (Correction: `gameplay.md` said "held, one level per frame". The button word keeps held
+buttons in its top half and *newly pressed* ones in the bottom half, and the boost asks for the
+bottom half with action 0x1F = `PAD_TRIGGER_Z`. So holding Z adds one level; each new press
+adds one.) What makes a full ball hard:
+
+- **The window is only the backswing itself.** Taps count only in swing phase 1 (the club going
+  back), and only while the stick is pulled past 93 of its ~127 range. Taps before the backswing
+  starts do nothing. Once the club reaches the top (phase 2) the boost code is not called, so
+  **taps while holding at the top are ignored**. The exception is a frame where the stick reading
+  wobbles, which drops back to phase 1 for a frame. Holding at the top also costs power (up to
+  -30%).
+- So all 8 taps must land during one backswing, which at full pull plays at normal animation
+  speed: roughly 8+ taps a second.
+- **The reward is back-loaded**, which is probably why it *feels* non-linear: level n gives
+  step[n] = 1 2 4 6 9 12 16 20 (times 0.005..0.011 by POWER BOOST). Half the taps (level 4) give
+  only 30% of the full bonus; the last two taps give 40% of it.
+- Backing the stick down for 1/12 s wipes the level.
+
+**Status:** answered - refuted (the presses are linear); the cause is a short tap window and a
+back-loaded reward.
 
 8. The heartbeat comes from a quick look-ahead simulation after the strike
 -----------------------------------------------------------------------------
@@ -291,7 +337,77 @@ runs another, or just watches the real ball is the question.
 banks or a string in `main.dol`), then its callers. Also check the swing states after launch
 (`Swing.c`) and `Ball.c`.
 
-**Status:** open.
+**Result (2026-09-22, `fn_800DF824`, read):** **confirmed, almost exactly as predicted.** The
+moment the ball is struck (swing state 12 starting), the game copies the launched ball into a
+second ball in the player (`+0xB5C`). Every frame of the flight it first moves the real ball, then
+**runs the copy ahead in fast-forward** with sounds and effects off. It fits in as many physics
+ticks as the frame has spare time for: roughly 0.7 ms of CPU a frame, or exactly 2 ticks in one
+special case. When the copy comes to rest:
+
+- a HUD message is queued, and **if the copy ended in the hole, the camera cuts to camera 11** (presumably the cup camera)
+  - so the game knows it is going in long before it does;
+- the predicted result is classified and stored (`fn_8006B2C4`);
+- then, once the *real* ball is between 2 and 5.5 yd from the pin and still getting closer (within
+  0.3 yd of its closest approach so far), if the prediction was **holed with par or better, a
+  50% coin flip**, or **not holed but passing within 0.2 yd (7.2 in) of the pin**, the golfer's
+  reaction animation 9 plays (the "come on, get in" moment). It is decided once per shot, and
+  only for two particular outcome classes of the prediction (not yet identified).
+
+Not done in split screen, and a gimme skips the in-hole camera. One detail differs from the
+prediction: the look-ahead does not finish instantly. It runs alongside the real ball, a burst
+each frame, so the reaction lands "shortly after takeoff". The sample that makes the heartbeat
+*sound* itself was not found; it is presumably attached to the camera-11 cut or the reaction
+animation.
+
+**Status:** answered - confirmed (the look-ahead sim and its closeness thresholds); the exact
+heartbeat sample is still unlocated.
+
+9. Gimme lip-outs that still count, and "straight in" reads that miss
+-----------------------------------------------------------------------
+
+**Prediction (2026-09-22):** in Tiger Woods 2003 there is a known glitch where a gimme's animation
+sometimes lips out and misses the hole, but the putt still counts as made. This is probably the
+same root cause as putts the caddy tip calls "straight in" that still miss: what the game *says*
+about a putt (the caddy read, the gimme result) is decided separately from what the ball physics
+actually does.
+
+**What would settle it:** two things. (a) How a gimme is handled: is the stroke counted as holed
+before or regardless of the ball's roll, and is the roll a real physics run that can lip out?
+(b) How the caddy tip decides "straight in": what it measures (slope under the ball? along the
+line? just at the start?) compared with the slope the rolling ball actually feels.
+
+**Leads already known:** the cup capture (`Ball_CupPull`) acts only within 5.5 in of the pin and
+30 degrees of heading, so a ball can reach the cup and still be rejected. This game is 2004, not
+2003, so the glitch itself may have been fixed; the code will say whether the gimme path still
+lets the ball roll freely.
+
+**Where to look:** the gimme or "concede" logic (strings like `GIMME`, the putt distance check),
+the caddy tip text (`STRAIGHT`, `BREAK` strings) and whatever computes it, and the hole-out
+check in the ball code.
+
+**Result (2026-09-22):** **right about gimmes, wrong about the caddie read.**
+
+- **A gimme counts no matter where the ball goes: confirmed, in the code.** A gimme sets player
+  flag 8 (`SwingState16_Enter`), then plays the tap-in as a *real* putt: the CPU's rehearsal
+  solution, launched through the normal physics, no skill error, no +5% pace. When that ball comes
+  to rest, `SwingState12_Update` checks flag 8 and **sets the lie to "holed" whatever the ball did**.
+  The holed-out state then moves the ball to the pin. So if a tap-in lips out, it still counts.
+  That is exactly the TW2003 glitch; TW2004 keeps the same rule. In 2004 the tap-in is the
+  rehearsed putt (which solved within 1.8 in, run on the same 1-tick physics as the real ball), so
+  it should normally drop. Why 2003's sometimes did not cannot be shown from the 2004 disc.
+- **The "straight in" read is not decided separately.** It is the same rehearsal, the real
+  physics. The HUD gets two numbers in feet (how far left or right of the hole to aim, and how far
+  past or short) from `fn_800C9038`, and the wording ("straight in") is made from them in the
+  front-end, not in `main.dol`. What makes a correct "straight in" read miss is the **stroke**:
+  every human swing gets a hidden random wobble (`Swing_MeterError`: +-15 stick units added to the
+  x of both the top and the impact samples, x scaled by 0.03 on a putt). Even a perfect stick
+  motion can come out up to about 0.4 degree off on a full stroke, and more on a short one, because the
+  wobble is compared with how far the stick travelled. 0.4 degree is 2.5 in at 30 ft, more than
+  the cup's radius. Pace only changes the line when there is break, and a "straight in" read has
+  none.
+
+**Status:** answered - gimme half confirmed; caddie half refuted (the read is real physics, the
+misses come from a random wobble on your stroke).
 
 Facts already established that bear on these
 ---------------------------------------------

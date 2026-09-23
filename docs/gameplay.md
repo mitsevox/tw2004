@@ -109,10 +109,14 @@ of how far along the backswing is - half a backswing is 71% power - snapping to 
 anything but a putt, `(hold - 0.05)^2` comes off, at most 0.3 - so a 0.6 s pause is -30%.
 `Swing_ComputePower` then applies boost, the error's cost and the tee bonus.
 
-**Power boost** (`Swing_BoostInput`, every backswing frame): with the boost option on, a boost
-button held while the stick is pulled past 93 of its range adds one level **per frame**, to a
-maximum of 8 - about an eighth of a second of holding at the top. Backing the stick down for
-1/12 s clears it. `Swing_ApplyPowerBoost` turns the level into power through the POWER BOOST
+**Power boost** (`Swing_BoostInput`, every backswing frame): with the boost option on, each
+**new press of Z** while the stick is pulled past 93 of its range adds one level, to a maximum of
+8. (The pad word `fn_800136DC` returns held buttons in its top 16 bits and buttons pressed this
+frame in the bottom 16; `fn_800142AC(action, bHeld)` picks the half, and the boost asks for
+action 0x1F = Z, not held. Corrected 2026-09-22: this paragraph used to say "held, one level per
+frame".) It is only called in phase 1, so **taps before the backswing or while holding at the
+top do not count**; all eight have to land while the club is going back. Backing the stick down
+for 1/12 s clears it. `Swing_ApplyPowerBoost` turns the level into power through the POWER BOOST
 attribute.
 
 **At the top (2).** The animation waggles +-0.0076 either side of the top while the stick is
@@ -380,6 +384,14 @@ of the pin (`fn_800D0478`), and either the club is the putter or it is a one-pla
 state 15 (the CPU rehearsal runs on the player until it settles) and state 16: animation 11,
 camera 12, and `Swing_Launch` with the controller set to the CPU for the call.
 
+**It always counts** (hypothesis 9). `SwingState16_Enter` sets player flag 8 (`uFlags` at
+`0xEE8`). The tap-in is a real putt: the rehearsal's solution (tolerance 1.8 in, fast mode) goes
+through `Swing_Launch` with no skill error, and flag 8 skips the CPU's +5% putt pace and the
+power clamp. When the ball comes to rest, `SwingState12_Update` sees flag 8 and **sets the lie
+to 12 (holed) wherever the ball is**; state 18 then puts the ball at the pin. So a tap-in that
+lips out is still scored as made. This is the rule behind the known TW2003 glitch. Flag 8 also
+stops the look-ahead's in-hole camera cut (below).
+
 **Which animation** (animation 11 -> `fn_800965DC`): a style from the score the tap-in will give
 (`fn_800D0AA0` = strokes + 1 - par: under par 6, par 5, over 2) is stored on the golfer, then
 clip group 9 is looked up in the golfer's animation library (`fn_800176E8` -> `fn_800258B4` ->
@@ -507,6 +519,65 @@ The drawn break line (`BreakLine_Start` / `BreakLine_Step`, `GoBreakLine.c`) is 
 same way: it launches a putt at your *current* aim with the computed power, runs the real
 physics without randomness, and draws 450 samples of the trail, recomputing only once your aim
 has been still for less than an inch of movement.
+
+**What the tip hands the HUD** (`fn_800C9038`, read; reached through a front-end callback table
+set up in `fn_80085120`): two numbers in **feet**, both measured from the ball-to-pin line. One is
+how far left or right of the hole the solved aim point sits (the break); the other is how far
+past or short of the hole it sits (the pace). -999 means not ready, 999 means gave up. The words
+("straight in", "cups left") are made from these by the front-end, not in `main.dol`; neither the
+string nor the threshold is in the executable.
+
+**Why a correct "straight in" read still misses** (hypothesis 9): your stroke. Every human swing's
+direction comes from `Swing_MeterError`, which adds a random +-15 (of +-128) to the x of both the
+top-of-backswing and the impact sample before comparing the two paths. On a putt x is scaled by
+0.03, and the wobble is measured against how far the stick travelled, so a full stroke can be up
+to about 0.4 degree off with a perfectly straight stick, and a short stroke more. 0.4 degree is
+2.5 in at 30 ft; the cup is about 1.9 in in radius. A CPU or a lucky "perfect" shot gets no
+wobble.
+
+CPU putts are hit 5% firm (`Swing_ComputePower`)
+-----------------------------------------------
+
+The rehearsal launches with `fPower x AI_PowerScale` and solves for the ball **dying at the
+hole**. The real CPU swing uses the same power **times 1.05 on a putt** (not a gimme: flag 8), with
+a 0.1 floor. On a straight putt that only makes it arrive firmer. On a breaking putt the firmer
+ball takes less break than the rehearsal did, so **every breaking CPU putt is pushed toward the
+high side, more for more break, at any skill**. On top of that is the random skill error from
+`AI_ApplyError` (hypothesis 6): an aim angle, which grows with distance, and a pace error, which on a
+breaking putt changes the line too.
+
+The look-ahead ball and the "this could go in" moment (`fn_800DF824`, read)
+---------------------------------------------------------------------------
+
+At the strike, `SwingState12_Enter` copies the launched ball into a second ball in the player
+(`+0xB5C`; our struct still calls it `ballBefore`). Every frame of the flight, `fn_800DF824`
+(called from `SwingState12_Update`):
+
+1. moves the real ball: `fn_800DB1C4` ticks of 20 ms, each `Ball_Tick(ball, 1.0)`. The
+   rehearsal's sim uses the same 1.0 tick, so the rehearsal and the real ball integrate
+   identically;
+2. if not split screen, **runs the copy ahead** with `Ball_SetSimulating(1)`: tick after tick
+   while the frame's time budget lasts. The budget is `0.83 - 1000 x elapsed`, stopping at 0.1,
+   read as roughly 0.7 ms of CPU; when `fn_8008AC40` is true it is exactly 2 ticks. So the
+   prediction races ahead of the real ball;
+3. when the copy stops (state 0, 1 or 5), unless it is a gimme: event 0x3C
+   (`fn_80066DC4`) queues a front-end message and, **if the copy is holed (lie 12), cuts to
+   camera 11**; then `fn_8006B2C4(player, 1)` classifies the predicted outcome into
+   `lbl_801D5F78[player]` (fields 0xC..0x14; the live result later fills 0x0..0x8);
+4. once per shot (`+0xC2C`), when the prediction's outcome class is 8 or 9 and the **real** ball
+   is between **2 and 5.5 yd** from the pin and within **0.3 yd** of its closest approach so far
+   (still closing): if the prediction is **holed** and the score would be par or better
+   (`Hole_ScoreAfterTapIn <= 0`), a **50% roll** (`Rand_Next(1) % 100 < 50`); if **not holed** but
+   its closest approach (ball `+0x60`, a running minimum kept by `Ball_Tick`) is **under 0.2 yd
+   (7.2 in)**, always. Either way: flag 4 on the player, the distance saved at `+0xEEC`, and golfer
+   animation 9 (clip group 10 or 5, by `fn_80096530`).
+
+Separately, `fn_8006BB5C` (every frame, live ball) keeps a crowd-style intensity level 0..3 from
+the live ball's closest approach while rolling (thresholds 0.5, 2, 4.5, 9.3 yd), and toggles HUD
+items 4 and 5 when a ball in the air comes within 40 yd.
+
+Still unknown: which outcome classes 8 and 9 are, and which sound is the heartbeat (camera 11 and
+animation 9 are the two candidates).
 
 The CPU's per-shot modifiers (`AI_SetShotModifiers`, `0x8002A630`, exact)
 --------------------------------------------------------------------------

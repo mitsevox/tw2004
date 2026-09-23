@@ -115,8 +115,20 @@ Dated log of what was done and decided, newest last. Facts and lessons belong in
 - **Three new hypotheses from the user** (`hypotheses.md` 6-8): CPU putt misses come from
   break, not distance; the power boost's full meter needs a non-linear number of Z presses;
   the heartbeat comes from a look-ahead sim right after the strike. Leads are written in each entry.
-- **Next:** explore hypotheses 6-8 (in that order is fine; 7 is probably quickest: find the Z
-  press -> boost level code in `Swing.c`). Then `SwingState01_Update`; then `Ball.c`; optional register polish in `skalib.c`
+- **Hypotheses 6-9 answered** (9 added by the user: gimme lip-outs that still count, and
+  "straight in" reads that miss). Results in `hypotheses.md`, mechanics in `gameplay.md`:
+  6 half right: distance is coded (an angle error, none under 1.5 yd), but every CPU putt is hit
+  5% firmer than its rehearsal, so breaking putts miss high more the more they break.
+  7 refuted on the count: each Z *tap* is one level (the pad word's low half is "pressed this
+  frame"; the old "held, per frame" note was wrong), but taps count only while the club goes back
+  and the reward is back-loaded (1 2 4 6 9 12 16 20). 8 confirmed: at the strike the ball is copied
+  to `+0xB5C` and run ahead in fast-forward each frame (`fn_800DF824`); predicted holed -> camera 11,
+  predicted close -> golfer reaction animation 9 once the real ball is 2-5.5 yd out. 9: a gimme sets
+  flag 8 and the ball at rest is forced to lie 12 (holed) wherever it is; the caddie read is real
+  physics, and the misses come from the random +-15 stick wobble added to every human stroke.
+  `Player.ballBefore` (0xB5C) is really the look-ahead ball (rename pending). Helpers:
+  `dolread.py` (read main.dol by address), `grepfn.py` (asm grep with the enclosing function).
+- **Next:** `SwingState01_Update`; then `Ball.c`; optional register polish in `skalib.c`
   (`AnimLib_MergeOverlay`, `AnimLib_PlanBank`, `AnimLib_WalkPair`). Scratch tools in `C:\dev\scratch\tw\`:
   `sbs2.py` (normalised diff), `fnsrc.py`, `regress.py` (who lost 100%), `insert_fns.py` (add
   functions at address positions), `unwritten.py`, `find_fn.py` (search asm by regexes),
