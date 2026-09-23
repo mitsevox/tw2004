@@ -107,3 +107,16 @@ void fn_80048584(u8* p, u8 v) {
 }
 
 // ---- end of sweep code ----
+
+// ---- sweep code (not yet cleaned up) ----
+
+void fn_800486EC(void);
+void fn_800486F0(void);
+
+void fn_800486EC(void) {
+}
+
+void fn_800486F0(void) {
+}
+
+// ---- end of sweep code ----

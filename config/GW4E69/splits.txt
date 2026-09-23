@@ -235,16 +235,10 @@ unsorted/sweep_80045F6C.c:
 	.text       start:0x80045F6C end:0x80045F74
 
 GoDynObj.c:
-	.text       start:0x80045F74 end:0x80048680
-
-unsorted/sweep_800486EC.c:
-	.text       start:0x800486EC end:0x800486F4
+	.text       start:0x80045F74 end:0x800486F4
 
 UObject.c:
-	.text       start:0x800486F4 end:0x80048A84
-
-unsorted/sweep_80048AC4.c:
-	.text       start:0x80048AC4 end:0x80048AD4
+	.text       start:0x800486F4 end:0x80048AF4
 
 UKernel.c:
 	.text       start:0x80048AF4 end:0x800496E0

@@ -1123,7 +1123,6 @@ config.libs = [
             Object(Matching, "unsorted/sweep_8006F4E0.c"),
             Object(Matching, "unsorted/sweep_8006F608.c"),
             Object(Matching, "unsorted/sweep_8009AA18.c"),
-            Object(Matching, "unsorted/sweep_80048AC4.c"),
 
             Object(Matching, "unsorted/sweep_8000C594.c"),
             Object(Matching, "unsorted/sweep_80026B34.c"),
@@ -1193,7 +1192,6 @@ config.libs = [
             Object(Matching, "unsorted/sweep_800136F4.c"),
             Object(Matching, "unsorted/sweep_80045E3C.c"),
             Object(Matching, "unsorted/sweep_80045F14.c"),
-            Object(Matching, "unsorted/sweep_800486EC.c"),
             Object(NonMatching, "event.c"),
             Object(Matching, "unsorted/sweep_8006F5F8.c"),
             Object(Matching, "unsorted/sweep_80092BA0.c"),
