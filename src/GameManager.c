@@ -36,7 +36,6 @@ void  GM_CheckBallForUIHints(int nPlayer);
 u8    fn_8008AC40(void);
 void  fn_800D9350(int nPlayer);
 void  fn_800BB0A8(void);
-void  fn_800335F8(int a);
 void  fn_8006C4C0(int nPlayer);
 
 u8    GM_bIsZoomButtonPressed(int nPlayer);

@@ -396,7 +396,6 @@ void   fn_80052268(Ball* pBall, f32 fTicks);
 void   Ball_FlightStep(Ball* pBall, f32 fTicks);
 f32    fn_80055324(Ball* pBall);
 u8     fn_80054040(Ball* pBall, f32 fTicks);
-f32    Wind_Get(f32* pOut);
 
 extern u8  gSimulating;                          // 0x80281DD0  a rehearsal: no sounds or effects
 extern u8  gSimFullCup;                          // a sim that still gets the cup pull and near-cup gravity

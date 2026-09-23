@@ -27,8 +27,6 @@ void CalcAllStats(int nPlayer);
 void fn_80117694(UStreamObject* pObject);
 
 f32  fn_8000B318(int nStream);          // a normally distributed random number (mean 0, deviation 1)
-// qsort
-void fn_8015929C(void* pBase, u32 nCount, u32 nSize, s32 (*pfnCompare)(const void* pA, const void* pB));
 int  fn_800D31A4(int nPar);             // the number of the 18 holes with that par
 
 PgaEntrant* GetEntrantNonMCPtr(int nEntrant) {
