@@ -1311,7 +1311,7 @@ void AI_TargetsClear(void) {
 void AI_TargetsLoad(u8* pChunk) {
     int          i, k;
     AITargetDef* pDef;
-    s8*          pReq;
+    u8*          pReq;
 
     gNumAITargets = 0;
     // port: the course's AI targets are big-endian and read in place: AITargetDef is laid over the
@@ -1328,9 +1328,8 @@ void AI_TargetsLoad(u8* pChunk) {
         }
         gNumAITargets++;
     }
-    pReq = (s8*)pDef;
+    pReq = (u8*)pDef;
     for (i = 0; i < BES16(pChunk + 2); i++, pReq += 8) {
-        gAITargets[i].bEnabled  = 1;
         gAITargets[i].nTeeSet   = pReq[0];
         gAITargets[i].nPinSet   = pReq[1];
         gAITargets[i].nSkillReq = pReq[2];
@@ -1338,6 +1337,7 @@ void AI_TargetsLoad(u8* pChunk) {
         gAITargets[i].bPriority = pReq[4];
         gAITargets[i].nType     = pReq[5];
         gAITargets[i].nPowerReq = pReq[6];
+        gAITargets[i].bEnabled  = 1;
     }
     gAITargetsLoaded = 1;
 }
@@ -1402,23 +1402,20 @@ u8 AI_GreenTowardPin(int nPlayer, f32 fDist) {
     u8          bGreen  = 0;
     int         nPinSet = Game_CurrentPinSet();
     CourseInfo* pCourse = fn_8000C594();
-    Player*     p       = &gPlayers[nPlayer];
-    f32*        pBall   = p->ball.vPos;
-    f32*        pBallZ  = &p->ball.vPos[2];
     f32         vDir[4];
     f32         fHeight;
     SurfaceType* pSurface;
 
+    vDir[0] = pCourse->pin[nPinSet].x - gPlayers[nPlayer].ball.vPos[0];
     vDir[1] = 0.0f;
-    vDir[0] = pCourse->pin[nPinSet].x - *pBall;
+    vDir[2] = pCourse->pin[nPinSet].z - gPlayers[nPlayer].ball.vPos[2];
     vDir[3] = 0.0f;
-    vDir[2] = pCourse->pin[nPinSet].z - *pBallZ;
     if (0.0f == vDir[0] && 0.0f == vDir[2]) {
         return 1;
     }
     Vec_Normalize(vDir, vDir);
-    vDir[0] = *pBall + vDir[0] * fDist;
-    vDir[2] = *pBallZ + vDir[2] * fDist;
+    vDir[0] = gPlayers[nPlayer].ball.vPos[0] + vDir[0] * fDist;
+    vDir[2] = gPlayers[nPlayer].ball.vPos[2] + vDir[2] * fDist;
     fHeight = fn_8004D5C0(pCourse, vDir);
     if (fHeight != -65536.1f) {
         vDir[1]  = 10.0f + fHeight;
@@ -1690,7 +1687,7 @@ void  fn_80095504(int n);
 // In split screen, bRightSide picks the half; otherwise view 0, plus view 2 in game type 4.
 void Player_SetGolfer(int nPlayer, int nGolfer, int nController, u32 uBag, int bRightSide) {
     Player* p = &gPlayers[nPlayer];
-    int     i;
+    s32     i;
 
     p->nIndex = nPlayer;
     Mem_cpy(&p->golfer, &gGolferTable[nGolfer], sizeof(GolferRecord));
@@ -1823,7 +1820,7 @@ void fn_8002E25C(void) {
 
 // ---- the session and its options ---------------------------------------------------------------
 
-extern char gszEmpty[];             // 0x802810B8
+extern char gszEmpty[8];            // 0x802810B8  "" (small data)
 extern char lbl_80187650[];         // "cl_bbsd" ... the default name at +0x1A
 
 void fn_800CB700(char* pDst, char* pSrc);       // string copy
@@ -1895,7 +1892,7 @@ void Session_Init(void) {
     pSession->b12         = 0;
     pSession->bReplay     = 0;
     pSession->nPaused   = 0;
-    pSession->uFlags     &= ~0x60;
+    pSession->uFlags     &= ~0x40;
     pSession->fFrameTime  = 0.0f;
     pSession->f1C         = 0.0f;
     pSession->n20         = 0;
