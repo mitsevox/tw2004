@@ -202,7 +202,12 @@ typedef struct CrAPAsset {
     s16  n46;                   // 0x046
     s16  n48;                   // 0x048
     s8   a4A[0x58 - 0x4A];      // 0x04A  indexed by fn_80105644's last argument
-    u8   unk58[0x118 - 0x58];
+    u8   unk58[0x70 - 0x58];
+    u64  aPart[4];              // 0x070  } the ids of four skin parts it sets (fn_800CDAFC finds
+    u64  aVariant[4];           // 0x090  } them) and the id of each one's variant (fn_80106A64)
+    u64  aSet[4];               // 0x0B0  the ids of four skin sets; taking the asset off puts
+                                //        them back to "Defaults" (fn_80106DA0)
+    u8   unkD0[0x118 - 0xD0];
 } CrAPAsset;
 LAYOUT_ASSERT(CrAPAsset, 0x118);
 

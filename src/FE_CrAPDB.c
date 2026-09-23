@@ -437,6 +437,56 @@ char* fn_801064EC(int nCategory) {
     return lbl_80282460->pStrings + nCategory;
 }
 
+// Put the asset on a skin: each of its parts the skin has gets the asset's variant.
+void fn_80106A64(CrAPAsset* pAsset, Skin* pSkin) {
+    int i;
+    s32 nPart;
+    s32 nVariant;
+
+    for (i = 0; i < 4; i++) {
+        nPart = fn_800CDAFC(pSkin, pAsset->aPart[i]);
+        nVariant = fn_800CDBB0(pSkin, nPart, pAsset->aVariant[i]);
+        if (nPart >= 0 && nVariant >= 0) {
+            fn_800CCB08(pSkin, nPart, nVariant);
+        }
+    }
+}
+
+// Take the asset's parts off a skin: each goes back to variant 0.
+void fn_80106D24(CrAPAsset* pAsset, Skin* pSkin) {
+    int i;
+    s32 nPart;
+
+    if (pAsset != NULL) {
+        for (i = 0; i < 4; i++) {
+            nPart = fn_800CDAFC(pSkin, pAsset->aPart[i]);
+            if (nPart >= 0) {
+                fn_800CCB08(pSkin, nPart, 0);
+            }
+        }
+    }
+}
+
+// And its sets: each goes back to its "Defaults" variant (or 0).
+void fn_80106DA0(CrAPAsset* pAsset, Skin* pSkin) {
+    int i;
+    int nSet;
+    s32 nVariant;
+
+    if (pAsset != NULL) {
+        for (i = 0; i < 4; i++) {
+            nSet = fn_800CDC2C(pSkin, pAsset->aSet[i]);
+            if (nSet >= 0) {
+                nVariant = fn_800CDD5C(pSkin, nSet, "Defaults");
+                if (nVariant < 0) {
+                    nVariant = 0;
+                }
+                fn_800CCF90(pSkin, nSet, nVariant, 0);
+            }
+        }
+    }
+}
+
 // How many of the profile's slots hold an asset whose n2C is n.
 int fn_80106E48(s16 n) {
     s16 i;
