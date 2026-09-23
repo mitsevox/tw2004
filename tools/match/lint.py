@@ -88,6 +88,19 @@ CFLAGS = ['-nodefaults', '-proc', 'gekko', '-align', 'powerpc', '-enum', 'int', 
           '-DVERSION=0', '-DNDEBUG=1', '-w', 'all', '-msgstyle', 'gcc']
 
 
+def is_definition(lines, i):
+    """Whether line i (1-based) ends a function definition's header. The compiler reports the line
+    of the opening brace, and a header can wrap: walk back over the brace line and indented
+    continuation lines to the header's first line (column 0; statements are indented)."""
+    j = i
+    if lines[j - 1].strip() == '{' and j > 1:
+        j -= 1
+    while j > 1 and lines[j - 1][:1].isspace():
+        j -= 1
+    head = ' '.join(l.strip() for l in lines[j - 1:i])
+    return re.match(r'^[A-Za-z_][\w \*]*\b\w+\s*\([^;{}]*\)\s*\{?\s*$', head) is not None
+
+
 def ub_check(path, lines):
     import subprocess, tempfile
     cc = ROOT / 'build/compilers/GC/2.5/mwcceppc.exe'
@@ -95,6 +108,15 @@ def ub_check(path, lines):
         out = subprocess.run([str(cc)] + CFLAGS + ['-c', str(path.resolve()), '-o', tmp + '/x.o'],
                              cwd=ROOT, capture_output=True, text=True)
     hits = []
+    if out.returncode:
+        # The checks below read compiler warnings; a file that does not compile here gives none,
+        # so a failure must be a finding, not a silent pass.
+        err = [l for l in (out.stdout + out.stderr).splitlines()
+               if re.match(r'.*?:\d+: ', l) and ': warning:' not in l]
+        m = re.match(r'(.*?):(\d+): (.*)', err[0]) if err else None
+        hits.append((int(m.group(2)) if m and pathlib.Path(m.group(1)).name == path.name else 1,
+                     'compile-error', m.group(3) if m else 'the compiler failed on this file'))
+        return hits
     # Calls with no prototype in scope: the compiler assumes `int` (a float result is then read as
     # an int). -requireprotos also flags definitions without an earlier declaration; skip those.
     with tempfile.TemporaryDirectory() as tmp:
@@ -107,7 +129,7 @@ def ub_check(path, lines):
             continue
         i = int(m.group(2))
         src = lines[i - 1] if i <= len(lines) else ''
-        if i in seen or re.match(r'^[A-Za-z_][\w \*]*\b\w+\s*\([^;]*\)\s*\{?\s*$', src):
+        if i in seen or is_definition(lines, i):
             continue            # a definition, not a call
         seen.add(i)
         if 'fake match' not in src:
@@ -184,4 +206,5 @@ def main():
     sys.exit(1 if total else 0)
 
 
-main()
+if __name__ == '__main__':
+    main()

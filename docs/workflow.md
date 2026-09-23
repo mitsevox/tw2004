@@ -129,10 +129,22 @@ Before you commit
 ```
 rm -f build/GW4E69/ok; ninja                          # main.dol: OK
 python tools/match/lint.py --diff main                # style check on the lines you changed
+python tools/match/typeaudit.py --count               # no number higher than on main
+python tools/match/symaudit.py --count                # no number higher than on main
 ```
 
 Lint must report 0 findings on your lines (see [`style.md`](style.md) for each rule). If a file
-you own has older findings, clean them as part of your work, keeping every function exact.
+you own has older findings, clean them as part of your work, keeping every function exact. A file
+that does not compile is a finding too (`compile-error`): the undefined-behaviour checks need the
+compiler's warnings.
+
+`typeaudit.py` counts globals declared with different types in different files, types defined in
+more than one file, and `extern`/`typedef` lines written in `.c` files (they belong in headers).
+`symaudit.py` compares each global's declared size (the compiler's own `sizeof`) with its size
+and section in `symbols.txt`: a global of 8 bytes or less lives in small data and is reached
+through r13/r2, so declaring it larger, or unsized (`extern u8 x[];`), makes every use compile to
+lis/addi instead. It also checks `static` against the symbol's scope where symbols.txt knows it.
+`symaudit.py --all` lists partial views too (a declaration smaller than the object).
 
 Finishing a unit
 ----------------
