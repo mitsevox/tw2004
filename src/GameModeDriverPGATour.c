@@ -60,9 +60,9 @@ void GameModeDriverPGATour_Init(void) {
     gpGame->pfnInit = GameModeDriverPGATour_Init;
     gpGame->pfnShutdown = fn_800EE02C;
     gpGame->pfn1E4 = fn_800EF294;
-    gpGame->pfnSetupNextGolfer = fn_800FF7DC;
-    gpGame->pfnGetHonors = fn_800FF894;
-    gpGame->pfnHoleFinished = fn_800FFCCC;
+    gpGame->pfnSetupNextGolfer = GameModeStroke_SetupNextGolfer;
+    gpGame->pfnGetHonors = GameModeStroke_GetHonors;
+    gpGame->pfnHoleFinished = GameModeStroke_HoleFinished;
     gpGame->pfnGameFinished = GameModeDriverPGATour_GameFinished;
     gpGame->pfnGoToPlayoff = GameModeDriverPGATour_GoToPlayoff;
     gpGame->pfn1EC = fn_800EE064;

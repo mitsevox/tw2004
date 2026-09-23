@@ -267,7 +267,7 @@ void fn_800F31E0(void) {
     s32 nMsg = -1;
     lbl_80282370 = 0;
     fn_800F2030();
-    fn_800FF7DC();
+    GameModeStroke_SetupNextGolfer();
     n0 = fn_800F354C(0);
     n1 = fn_800F354C(1);
     for (i = 0; i < gNumPlayersSetUp; i++) {

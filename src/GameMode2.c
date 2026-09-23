@@ -16,12 +16,12 @@ extern s32 lbl_802823C4;                    // the money carried over
 
 void fn_800F81EC(void);
 void fn_800F81FC(void);
-s32  fn_800F8278(int nPlayer);
+s32  GameModeSkins_GetHonors(int nPlayer);
 u8   fn_800F8624(int nPlayer, u8 bCheck);
-u8   fn_800F8880(u8 bCheck);
-u8   fn_800F8B08(u8 bCheck);
-void fn_800F8EDC(void);
-void fn_800F9100(void);
+u8   GameModeSkins_GameFinished(u8 bCheck);
+u8   GameModeSkins_GoToPlayoff(u8 bCheck);
+void GameModeSkins_EndHole(void);
+void GameModeSkins_EndGame(void);
 s32  fn_800F9254(void);
 s32  fn_800F9308(void);
 
@@ -29,13 +29,13 @@ s32  fn_800F9308(void);
 void fn_800F80FC(void) {
     gpGame->pfnInit = fn_800F80FC;
     gpGame->pfnSetupNextGolfer = fn_800F81FC;
-    gpGame->pfnGetHonors = fn_800F8278;
+    gpGame->pfnGetHonors = GameModeSkins_GetHonors;
     gpGame->pfnHoleFinished = fn_800F8624;
-    gpGame->pfnGameFinished = fn_800F8880;
-    gpGame->pfnGoToPlayoff = fn_800F8B08;
-    gpGame->pfnEndHole = fn_800F8EDC;
+    gpGame->pfnGameFinished = GameModeSkins_GameFinished;
+    gpGame->pfnGoToPlayoff = GameModeSkins_GoToPlayoff;
+    gpGame->pfnEndHole = GameModeSkins_EndHole;
     gpGame->pfn1EC = fn_800F81EC;
-    gpGame->pfnEndGame = fn_800F9100;
+    gpGame->pfnEndGame = GameModeSkins_EndGame;
     gpGame->b274 = 0;
     gpGame->bAIConcedes = 1;
     gpGame->n4 = 2;
@@ -66,10 +66,10 @@ void fn_800F81FC(void) {
     }
 }
 
-// TW06: GameModeSkins::GetHonors. Only players who can still win the hole (fewer strokes than the
+// Only players who can still win the hole (fewer strokes than the
 // best holed score) play. On the tee: a player who won a skin (latest hole first), then anyone;
 // otherwise the player farthest from the pin (off the green first).
-s32 fn_800F8278(int nPlayer) {
+s32 GameModeSkins_GetHonors(int nPlayer) {
     int i;
     int h;
     CourseInfo* pCourse;
@@ -188,9 +188,9 @@ u8 fn_800F8624(int nPlayer, u8 bCheck) {
     return 1;
 }
 
-// TW06: GameModeSkins::GameFinished. In the playoff, a hole won ends it; otherwise play on to a
+// In the playoff, a hole won ends it; otherwise play on to a
 // new random hole.
-u8 fn_800F8880(u8 bCheck) {
+u8 GameModeSkins_GameFinished(u8 bCheck) {
     int nLeft;
     int h;
     int i;
@@ -215,7 +215,7 @@ u8 fn_800F8880(u8 bCheck) {
         for (i = 0; i < gNumPlayersSetUp; i++) {
             for (h = 0; h < 18; h++) {
                 // fake match: one chained assignment (stored right to left, so nStrokes first, as in
-                // fn_800F8B08) for the original register order
+                // GameModeSkins_GoToPlayoff) for the original register order
                 gPlayers[i].b2E4[h] = gPlayers[i].b2F6[h] = gPlayers[i].n290[h] = gPlayers[i].n22C[h] =
                     gPlayers[i].nModePoints[h] = gPlayers[i].nPutts[h] = gPlayers[i].nStrokes[h] = 0;
             }
@@ -233,14 +233,14 @@ u8 fn_800F8880(u8 bCheck) {
             }
         }
         if (nLeft == 0) {
-            return !fn_800F8B08(bCheck);
+            return !GameModeSkins_GoToPlayoff(bCheck);
         }
     }
     return 0;
 }
 
-// TW06: GameModeSkins::GoToPlayoff. After the last hole, a skin still carried over goes to a playoff.
-u8 fn_800F8B08(u8 bCheck) {
+// After the last hole, a skin still carried over goes to a playoff.
+u8 GameModeSkins_GoToPlayoff(u8 bCheck) {
     int h;
     int i;
     int nHole;
@@ -294,9 +294,9 @@ u8 fn_800F8B08(u8 bCheck) {
     return 1;
 }
 
-// TW06: GameModeSkins::EndHole. A clear winner takes the skin and everything carried over; a tie
+// A clear winner takes the skin and everything carried over; a tie
 // carries it over.
-void fn_800F8EDC(void) {
+void GameModeSkins_EndHole(void) {
     int i;
     int nBest = 5;
     int nSecond = 5;
@@ -330,8 +330,8 @@ void fn_800F8EDC(void) {
     }
 }
 
-// TW06: GameModeSkins::EndGame. Humans with a profile are paid their skins.
-void fn_800F9100(void) {
+// Humans with a profile are paid their skins.
+void GameModeSkins_EndGame(void) {
     int i;
     int nProfile;
     u8 bFirst = 1;

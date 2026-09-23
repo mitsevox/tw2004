@@ -8,17 +8,17 @@
 #include "game/save.h"
 #include "game/earnings.h"
 
-void fn_800FFDB8(void);
+void GameModeStroke_EndGame(void);
 
-// TW06: GameModeStroke::Init. Up to four players, one mulligan each.
-void fn_800FF700(void) {
-    gpGame->pfnInit = fn_800FF700;
-    gpGame->pfnSetupNextGolfer = fn_800FF7DC;
-    gpGame->pfnGetHonors = fn_800FF894;
-    gpGame->pfnHoleFinished = fn_800FFCCC;
-    gpGame->pfnGameFinished = fn_800FFD54;
+// Up to four players, one mulligan each.
+void GameModeStroke_Init(void) {
+    gpGame->pfnInit = GameModeStroke_Init;
+    gpGame->pfnSetupNextGolfer = GameModeStroke_SetupNextGolfer;
+    gpGame->pfnGetHonors = GameModeStroke_GetHonors;
+    gpGame->pfnHoleFinished = GameModeStroke_HoleFinished;
+    gpGame->pfnGameFinished = GameModeStroke_GameFinished;
     gpGame->pfnGoToPlayoff = fn_800FFDB0;
-    gpGame->pfnEndGame = fn_800FFDB8;
+    gpGame->pfnEndGame = GameModeStroke_EndGame;
     gpGame->n4 = 0;
     gpGame->nMulligans = 2;
     gpGame->nC = 4;
@@ -28,9 +28,9 @@ void fn_800FF700(void) {
     gSession.nSplitScreen = 0;
 }
 
-// TW06: GameModeStroke::SetupNextGolfer. The hole starts: in split screen everyone
+// The hole starts: in split screen everyone
 // plays at once; otherwise the first golfer gets ready and the others wait.
-void fn_800FF7DC(void) {
+void GameModeStroke_SetupNextGolfer(void) {
     int i;
     if (gSession.nSplitScreen == 1) {
         for (i = 0; i < gNumPlayersSetUp; i++) {
@@ -48,10 +48,10 @@ void fn_800FF7DC(void) {
     }
 }
 
-// TW06: GameModeStroke::GetHonors. Who plays next after nPlayer (5 = nobody): on the tee, the order
+// Who plays next after nPlayer (5 = nobody): on the tee, the order
 // of the scores on each hole played so far (ties keep the order of the hole before); otherwise the
 // player farthest from the pin (off the green first). Players who were cut do not play.
-s32 fn_800FF894(int nPlayer) {
+s32 GameModeStroke_GetHonors(int nPlayer) {
     s32 aOrder[4] = {0, 1, 2, 3};  // the tee order before any hole is played
     s32 aSorted[4];
     int h;
@@ -144,8 +144,8 @@ s32 fn_800FF894(int nPlayer) {
     return nBest;
 }
 
-// TW06: GameModeStroke::HoleFinished. Everyone still playing has holed out.
-u8 fn_800FFCCC(int nPlayer, u8 bCheck) {
+// Everyone still playing has holed out.
+u8 GameModeStroke_HoleFinished(int nPlayer, u8 bCheck) {
     int i;
     for (i = 0; i < gNumPlayersSetUp; i++) {
         if (!Player_IsHoled(i) && !PLAYER(i)->bPlayerCut) {
@@ -155,8 +155,8 @@ u8 fn_800FFCCC(int nPlayer, u8 bCheck) {
     return 1;
 }
 
-// TW06: GameModeStroke::GameFinished. No selected hole is left.
-u8 fn_800FFD54(u8 bCheck) {
+// No selected hole is left.
+u8 GameModeStroke_GameFinished(u8 bCheck) {
     int h;
     for (h = Game_CurHoleIndex() + 1; h < 18; h++) {
         if (gpGame->bHoleSelected[h]) {
@@ -171,10 +171,10 @@ u8 fn_800FFDB0(u8 bCheck) {
     return 0;
 }
 
-// TW06: GameModeStroke::EndGame. Each human with a profile who beat CPU golfers wins the prize for
+// Each human with a profile who beat CPU golfers wins the prize for
 // the best earnings rating among them: its base prize plus its per-stroke prize for up to 5 strokes
 // of margin.
-void fn_800FFDB8(void) {
+void GameModeStroke_EndGame(void) {
     int i;
     int j;
     int nScore;

@@ -66,11 +66,11 @@ void fn_80101FEC(void) {
     gpGame->pfnInit = fn_80101FEC;
     gpGame->pfnShutdown = fn_80102404;
     gpGame->pfnSetupNextGolfer = fn_800E9F14;
-    gpGame->pfnGetHonors = fn_800EA084;
-    gpGame->pfnHoleFinished = fn_800EA278;
-    gpGame->pfnGameFinished = fn_800EA548;
-    gpGame->pfnGoToPlayoff = fn_800EA758;
-    gpGame->pfnEndHole = fn_800EAA40;
+    gpGame->pfnGetHonors = GameModeMatch_GetHonors;
+    gpGame->pfnHoleFinished = GameModeMatch_HoleFinished;
+    gpGame->pfnGameFinished = GameModeMatch_GameFinished;
+    gpGame->pfnGoToPlayoff = GameModeMatch_GoToPlayoff;
+    gpGame->pfnEndHole = GameModeMatch_EndHole;
     gpGame->pfnEndGame = fn_801025FC;
     gpGame->n4 = 1;
     gpGame->nMulligans = 0;

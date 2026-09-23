@@ -2,11 +2,11 @@
 
 #include "game_types.h"
 
-u8 fn_800E8128(s32, s32, void*);
+u8 GameModeBattle_CanAddClub(s32, s32, void*);
 
 void fn_8008A240(void* arg0, s32* arg1);
 void fn_8008A240(void* arg0, s32* arg1) {
-    if (fn_800E8128((*(s32*)((u8*)(arg0) + 0)), (*(s32*)((u8*)(arg0) + 4)), arg0) != 0) {
+    if (GameModeBattle_CanAddClub((*(s32*)((u8*)(arg0) + 0)), (*(s32*)((u8*)(arg0) + 4)), arg0) != 0) {
         *arg1 = 1;
         return;
     }

@@ -11,25 +11,25 @@
 // The points for 3 under par .. 2 or more over. TW06: GameModeStableford::stablefordPointTable.
 extern s8  lbl_802816D0[6];
 
-u8   fn_800FE2B4(int nPlayer);
-void fn_800FE344(void);
-s32  fn_800FE3FC(int nPlayer);
-u8   fn_800FE7EC(int nPlayer, u8 bCheck);
-u8   fn_800FE844(u8 bCheck);
+u8   GameModeStableford_PlayerDoneHole(int nPlayer);
+void GameModeStableford_SetupNextGolfer(void);
+s32  GameModeStableford_GetHonors(int nPlayer);
+u8   GameModeStableford_HoleFinished(int nPlayer, u8 bCheck);
+u8   GameModeStableford_GameFinished(u8 bCheck);
 u8   fn_800FE8A0(u8 bCheck);
-void fn_800FE8A8(void);
-void fn_800FE980(void);
+void GameModeStableford_EndHole(void);
+void GameModeStableford_EndGame(void);
 
-// TW06: GameModeStableford::Init. One mulligan per player per round; the CPU may concede.
-void fn_800FE1B4(void) {
-    gpGame->pfnInit = fn_800FE1B4;
-    gpGame->pfnSetupNextGolfer = fn_800FE344;
-    gpGame->pfnGetHonors = fn_800FE3FC;
-    gpGame->pfnHoleFinished = fn_800FE7EC;
-    gpGame->pfnGameFinished = fn_800FE844;
+// One mulligan per player per round; the CPU may concede.
+void GameModeStableford_Init(void) {
+    gpGame->pfnInit = GameModeStableford_Init;
+    gpGame->pfnSetupNextGolfer = GameModeStableford_SetupNextGolfer;
+    gpGame->pfnGetHonors = GameModeStableford_GetHonors;
+    gpGame->pfnHoleFinished = GameModeStableford_HoleFinished;
+    gpGame->pfnGameFinished = GameModeStableford_GameFinished;
     gpGame->pfnGoToPlayoff = fn_800FE8A0;
-    gpGame->pfnEndHole = fn_800FE8A8;
-    gpGame->pfnEndGame = fn_800FE980;
+    gpGame->pfnEndHole = GameModeStableford_EndHole;
+    gpGame->pfnEndGame = GameModeStableford_EndGame;
     gpGame->bAIConcedes = 1;
     gpGame->n4 = 3;
     gpGame->nMulligans = 2;
@@ -40,9 +40,9 @@ void fn_800FE1B4(void) {
     gSession.nSplitScreen = 0;
 }
 
-// TW06: GameModeStableford::PlayerDoneHole. Holed, cut, or already at par + 1 strokes: the best
+// Holed, cut, or already at par + 1 strokes: the best
 // left is double bogey, which scores no better than giving up.
-u8 fn_800FE2B4(int nPlayer) {
+u8 GameModeStableford_PlayerDoneHole(int nPlayer) {
     if (!Player_IsHoled(nPlayer) && !gPlayers[nPlayer].bPlayerCut &&
         gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] < fn_800D2B08() + 1) {
         return 0;
@@ -50,9 +50,9 @@ u8 fn_800FE2B4(int nPlayer) {
     return 1;
 }
 
-// TW06: GameModeStableford::SetupNextGolfer. In split screen everyone plays at once; otherwise the
+// In split screen everyone plays at once; otherwise the
 // player with the honor gets ready and the others wait.
-void fn_800FE344(void) {
+void GameModeStableford_SetupNextGolfer(void) {
     int i;
     if (gSession.nSplitScreen == 1) {
         for (i = 0; i < gNumPlayersSetUp; i++) {
@@ -70,10 +70,10 @@ void fn_800FE344(void) {
     }
 }
 
-// TW06: GameModeStableford::GetHonors. Who plays next after nPlayer (5 = nobody). On the tee the
+// Who plays next after nPlayer (5 = nobody). On the tee the
 // honor goes by the scores on the holes played so far (the latest hole first, ties by the hole
 // before); otherwise to the player farthest from the pin, off the green first.
-s32 fn_800FE3FC(int nPlayer) {
+s32 GameModeStableford_GetHonors(int nPlayer) {
     s32 aOrder[4] = {0, 1, 2, 3};
     s32 aSorted[4];
     int n;
@@ -114,13 +114,14 @@ s32 fn_800FE3FC(int nPlayer) {
         }
     }
     for (h = 0; h < gNumPlayersSetUp; h++) {
-        if (nPlayer != aOrder[h] && Player_OnTee(aOrder[h]) && !fn_800FE2B4(aOrder[h])) {
+        if (nPlayer != aOrder[h] && Player_OnTee(aOrder[h]) &&
+            !GameModeStableford_PlayerDoneHole(aOrder[h])) {
             return aOrder[h];
         }
     }
     nBest = 5;
     for (i = 0; i < gNumPlayersSetUp; i++) {
-        if (i != nPlayer && !fn_800FE2B4(i)) {
+        if (i != nPlayer && !GameModeStableford_PlayerDoneHole(i)) {
             nBest = i;
             break;
         }
@@ -133,7 +134,7 @@ s32 fn_800FE3FC(int nPlayer) {
     fBest = 0.0f;
     nBest = 5;
     for (i = 0; i < gNumPlayersSetUp; i++) {
-        if (i != nPlayer && PLAYER(i)->ball.nLie != LIE_GREEN_e && !fn_800FE2B4(i)) {
+        if (i != nPlayer && PLAYER(i)->ball.nLie != LIE_GREEN_e && !GameModeStableford_PlayerDoneHole(i)) {
             dx = PLAYER(i)->ball.vPos[0] - pCourse->pin[nPinSet].x;
             dz = PLAYER(i)->ball.vPos[2] - pCourse->pin[nPinSet].z;
             d = fn_80009680(dx * dx + dz * dz);
@@ -147,7 +148,7 @@ s32 fn_800FE3FC(int nPlayer) {
         fBest = 0.0f;
         nBest = 5;
         for (i = 0; i < gNumPlayersSetUp; i++) {
-            if (i != nPlayer && !fn_800FE2B4(i)) {
+            if (i != nPlayer && !GameModeStableford_PlayerDoneHole(i)) {
                 dx = PLAYER(i)->ball.vPos[0] - pCourse->pin[nPinSet].x;
                 dz = PLAYER(i)->ball.vPos[2] - pCourse->pin[nPinSet].z;
                 d = fn_80009680(dx * dx + dz * dz);
@@ -164,19 +165,19 @@ s32 fn_800FE3FC(int nPlayer) {
     return nBest;
 }
 
-// TW06: GameModeStableford::HoleFinished. The hole is over when every player is done with it.
-u8 fn_800FE7EC(int nPlayer, u8 bCheck) {
+// The hole is over when every player is done with it.
+u8 GameModeStableford_HoleFinished(int nPlayer, u8 bCheck) {
     int i;
     for (i = 0; i < gNumPlayersSetUp; i++) {
-        if (!fn_800FE2B4(i)) {
+        if (!GameModeStableford_PlayerDoneHole(i)) {
             return 0;
         }
     }
     return 1;
 }
 
-// TW06: GameModeStableford::GameFinished. Over when no selected hole is left.
-u8 fn_800FE844(u8 bCheck) {
+// Over when no selected hole is left.
+u8 GameModeStableford_GameFinished(u8 bCheck) {
     int h;
     for (h = Game_CurHoleIndex() + 1; h < 18; h++) {
         if (gpGame->bHoleSelected[h]) {
@@ -191,9 +192,9 @@ u8 fn_800FE8A0(u8 bCheck) {
     return 0;
 }
 
-// TW06: GameModeStableford::EndHole. A player who did not hole out is scored par + 2 (double
+// A player who did not hole out is scored par + 2 (double
 // bogey); every player gets the points for the hole.
-void fn_800FE8A8(void) {
+void GameModeStableford_EndHole(void) {
     int nHole;
     s32 nPar;
     int i;
@@ -210,10 +211,10 @@ void fn_800FE8A8(void) {
     }
 }
 
-// TW06: GameModeStableford::EndGame (empty there). Each human with a profile who finished the round
+// Empty there. Each human with a profile who finished the round
 // in fewer strokes than a CPU player wins money: the prize for the best earnings rating among those
 // CPU players, its base plus its per-stroke prize for up to 5 strokes of margin.
-void fn_800FE980(void) {
+void GameModeStableford_EndGame(void) {
     int i;
     int j;
     int nBest;

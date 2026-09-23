@@ -9,32 +9,32 @@
 
 u8 lbl_80281648[2] = {0, 0};                // per team: 1 when the second partner (1 or 3) hits next
 
-u8  fn_800E69CC(int nTeam);
-int fn_800E6A48(int nPlayer);
+u8  GameModeAlternateShot_TeamDone(int nTeam);
+int GameModeAlternateShot_GetPartner(int nPlayer);
 u8  fn_800E6A98(int nPlayer);
 int fn_800E6AF8(int nPlayer);
-int fn_800E6B08(int nTeam);
-int fn_800E6BA4(int nTeam);
+int GameModeAlternateShot_TeamBestPossibleScore(int nTeam);
+int GameModeAlternateShot_TeamMatchWins(int nTeam);
 void fn_800E6C10(void);
-s32  fn_800E6C8C(int nPlayer);
-void fn_800E6F88(int nPlayer);
-u8   fn_800E7038(int nPlayer, u8 bCheck);
-u8   fn_800E723C(u8 bCheck);
-u8   fn_800E7474(u8 bCheck);
-void fn_800E7740(void);
-void fn_800E7828(void);
+s32  GameModeAlternateShot_GetHonors(int nPlayer);
+void GameModeAlternateShot_EndGolferTurn(int nPlayer);
+u8   GameModeAlternateShot_HoleFinished(int nPlayer, u8 bCheck);
+u8   GameModeAlternateShot_GameFinished(u8 bCheck);
+u8   GameModeAlternateShot_GoToPlayoff(u8 bCheck);
+void GameModeAlternateShot_EndHole(void);
+void GameModeAlternateShot_EndGame(void);
 
-// TW06: GameModeAlternateShot::Init. Four players, no mulligans, no gimmes, one view.
-void fn_800E68F0(void) {
-    gpGame->pfnInit = fn_800E68F0;
+// Four players, no mulligans, no gimmes, one view.
+void GameModeAlternateShot_Init(void) {
+    gpGame->pfnInit = GameModeAlternateShot_Init;
     gpGame->pfnSetupNextGolfer = fn_800E6C10;
-    gpGame->pfnGetHonors = fn_800E6C8C;
-    gpGame->pfnEndGolferTurn = fn_800E6F88;
-    gpGame->pfnHoleFinished = fn_800E7038;
-    gpGame->pfnGameFinished = fn_800E723C;
-    gpGame->pfnGoToPlayoff = fn_800E7474;
-    gpGame->pfnEndHole = fn_800E7740;
-    gpGame->pfnEndGame = fn_800E7828;
+    gpGame->pfnGetHonors = GameModeAlternateShot_GetHonors;
+    gpGame->pfnEndGolferTurn = GameModeAlternateShot_EndGolferTurn;
+    gpGame->pfnHoleFinished = GameModeAlternateShot_HoleFinished;
+    gpGame->pfnGameFinished = GameModeAlternateShot_GameFinished;
+    gpGame->pfnGoToPlayoff = GameModeAlternateShot_GoToPlayoff;
+    gpGame->pfnEndHole = GameModeAlternateShot_EndHole;
+    gpGame->pfnEndGame = GameModeAlternateShot_EndGame;
     gpGame->bGimmesAllowed = 0;
     gpGame->n4 = 1;
     gpGame->nMulligans = 0;
@@ -44,8 +44,8 @@ void fn_800E68F0(void) {
     gSession.nSplitScreen = 0;
 }
 
-// TW06: GameModeAlternateShot::TeamDone. The team's ball is in the hole.
-u8 fn_800E69CC(int nTeam) {
+// The team's ball is in the hole.
+u8 GameModeAlternateShot_TeamDone(int nTeam) {
     int nHole = Game_CurHoleIndex();
     int a;
     int bDone;
@@ -65,8 +65,7 @@ u8 fn_800E69CC(int nTeam) {
     return bDone;
 }
 
-// TW06: GameModeAlternateShot::GetPartner.
-int fn_800E6A48(int nPlayer) {
+int GameModeAlternateShot_GetPartner(int nPlayer) {
     switch (nPlayer) {
     case 0:
         return 1;
@@ -92,9 +91,9 @@ int fn_800E6AF8(int nPlayer) {
     return nPlayer / 2;
 }
 
-// TW06: GameModeAlternateShot::TeamBestPossibleScore. The team's score on this hole if it holes the
+// The team's score on this hole if it holes the
 // next shot (at most 9), or its score once holed.
-int fn_800E6B08(int nTeam) {
+int GameModeAlternateShot_TeamBestPossibleScore(int nTeam) {
     int nHole = Game_CurHoleIndex();
     int a;
     int n;
@@ -113,8 +112,7 @@ int fn_800E6B08(int nTeam) {
     return n;
 }
 
-// TW06: GameModeAlternateShot::TeamMatchWins.
-int fn_800E6BA4(int nTeam) {
+int GameModeAlternateShot_TeamMatchWins(int nTeam) {
     int nHole = Game_CurHoleIndex();
     int b;
     int a;
@@ -142,10 +140,10 @@ void fn_800E6C10(void) {
     }
 }
 
-// TW06: GameModeAlternateShot::GetHonors. Who plays next after nPlayer (5 = nobody): on the tee the
+// Who plays next after nPlayer (5 = nobody): on the tee the
 // team that won the last decided hole goes first; otherwise whoever's turn it is on the team that is
 // farthest from the pin and off the green, then anyone farthest.
-s32 fn_800E6C8C(int nPlayer) {
+s32 GameModeAlternateShot_GetHonors(int nPlayer) {
     s32 aOrder[4] = {0, 1, 2, 3};  // the tee order before anyone has won a hole
     int nBest;
     CourseInfo* pCourse;
@@ -186,7 +184,7 @@ s32 fn_800E6C8C(int nPlayer) {
     // register (h, t or w all match)
     for (h = 0; h < gNumPlayersSetUp; h++) {
         if (nPlayer != aOrder[h] && Player_OnTee(aOrder[h]) && fn_800E6A98(aOrder[h]) &&
-            !fn_800E69CC(fn_800E6AF8(aOrder[h]))) {
+            !GameModeAlternateShot_TeamDone(fn_800E6AF8(aOrder[h]))) {
             return aOrder[h];
         }
     }
@@ -195,8 +193,8 @@ s32 fn_800E6C8C(int nPlayer) {
     fBest = 0.0f;
     nBest = 5;
     for (i = 0; i < gNumPlayersSetUp; i++) {
-        if (i != nPlayer && !Player_IsHoled(i) && fn_800E6A98(i) && !fn_800E69CC(fn_800E6AF8(i)) &&
-            PLAYER(i)->ball.nLie != LIE_GREEN_e) {
+        if (i != nPlayer && !Player_IsHoled(i) && fn_800E6A98(i) &&
+            !GameModeAlternateShot_TeamDone(fn_800E6AF8(i)) && PLAYER(i)->ball.nLie != LIE_GREEN_e) {
             dx = PLAYER(i)->ball.vPos[0] - pCourse->pin[nPinSet].x;
             dz = PLAYER(i)->ball.vPos[2] - pCourse->pin[nPinSet].z;
             d = fn_80009680(dx * dx + dz * dz);
@@ -210,7 +208,8 @@ s32 fn_800E6C8C(int nPlayer) {
         fBest = 0.0f;
         nBest = 5;
         for (i = 0; i < gNumPlayersSetUp; i++) {
-            if (i != nPlayer && !Player_IsHoled(i) && fn_800E6A98(i) && !fn_800E69CC(fn_800E6AF8(i))) {
+            if (i != nPlayer && !Player_IsHoled(i) && fn_800E6A98(i) &&
+                !GameModeAlternateShot_TeamDone(fn_800E6AF8(i))) {
                 dx = PLAYER(i)->ball.vPos[0] - pCourse->pin[nPinSet].x;
                 dz = PLAYER(i)->ball.vPos[2] - pCourse->pin[nPinSet].z;
                 d = fn_80009680(dx * dx + dz * dz);
@@ -227,10 +226,10 @@ s32 fn_800E6C8C(int nPlayer) {
     return nBest;
 }
 
-// TW06: GameModeAlternateShot::EndGolferTurn. The partner takes over the ball (and the stroke
+// The partner takes over the ball (and the stroke
 // count), and it becomes the partner's turn.
-void fn_800E6F88(int nPlayer) {
-    int nPartner = fn_800E6A48(nPlayer);
+void GameModeAlternateShot_EndGolferTurn(int nPlayer) {
+    int nPartner = GameModeAlternateShot_GetPartner(nPlayer);
     int nTeam;
     Mem_cpy(&gPlayers[nPartner].ball, &gPlayers[nPlayer].ball, sizeof(Ball));
     gPlayers[nPartner].bLowIQPenalty = gPlayers[nPlayer].bLowIQPenalty;
@@ -240,22 +239,22 @@ void fn_800E6F88(int nPlayer) {
     lbl_80281648[nTeam] = 1 - lbl_80281648[nTeam];
 }
 
-// TW06: GameModeAlternateShot::HoleFinished. Both teams holed; or one team holed and the other can
+// Both teams holed; or one team holed and the other can
 // no longer beat it (can only tie, when the holed team is dormie); lbl_80282240 excuses the
 // holed team's own players.
-u8 fn_800E7038(int nPlayer, u8 bCheck) {
+u8 GameModeAlternateShot_HoleFinished(int nPlayer, u8 bCheck) {
     int nLeft;
     int h;
-    if (fn_800E69CC(0) && fn_800E69CC(1)) {
+    if (GameModeAlternateShot_TeamDone(0) && GameModeAlternateShot_TeamDone(1)) {
         return 1;
     }
-    if (fn_800E69CC(0) && (!lbl_80282240 || (u32)nPlayer > 1)) {
-        if (fn_800E6B08(0) < fn_800E6B08(1)) {
+    if (GameModeAlternateShot_TeamDone(0) && (!lbl_80282240 || (u32)nPlayer > 1)) {
+        if (GameModeAlternateShot_TeamBestPossibleScore(0) < GameModeAlternateShot_TeamBestPossibleScore(1)) {
             return 1;
         }
     }
-    if (fn_800E69CC(1) && (!lbl_80282240 || (u32)(nPlayer - 2) > 1)) {
-        if (fn_800E6B08(1) < fn_800E6B08(0)) {
+    if (GameModeAlternateShot_TeamDone(1) && (!lbl_80282240 || (u32)(nPlayer - 2) > 1)) {
+        if (GameModeAlternateShot_TeamBestPossibleScore(1) < GameModeAlternateShot_TeamBestPossibleScore(0)) {
             return 1;
         }
     }
@@ -265,16 +264,18 @@ u8 fn_800E7038(int nPlayer, u8 bCheck) {
             nLeft++;
         }
     }
-    if (fn_800E69CC(0) && (!lbl_80282240 || (u32)nPlayer > 1)) {
-        if (nLeft + fn_800E6BA4(1) == fn_800E6BA4(0)) {
-            if (fn_800E6B08(0) <= fn_800E6B08(1)) {
+    if (GameModeAlternateShot_TeamDone(0) && (!lbl_80282240 || (u32)nPlayer > 1)) {
+        if (nLeft + GameModeAlternateShot_TeamMatchWins(1) == GameModeAlternateShot_TeamMatchWins(0)) {
+            if (GameModeAlternateShot_TeamBestPossibleScore(0) <=
+                GameModeAlternateShot_TeamBestPossibleScore(1)) {
                 return 1;
             }
         }
     }
-    if (fn_800E69CC(1) && (!lbl_80282240 || (u32)(nPlayer - 2) > 1)) {
-        if (nLeft + fn_800E6BA4(0) == fn_800E6BA4(1)) {
-            if (fn_800E6B08(1) <= fn_800E6B08(0)) {
+    if (GameModeAlternateShot_TeamDone(1) && (!lbl_80282240 || (u32)(nPlayer - 2) > 1)) {
+        if (nLeft + GameModeAlternateShot_TeamMatchWins(0) == GameModeAlternateShot_TeamMatchWins(1)) {
+            if (GameModeAlternateShot_TeamBestPossibleScore(1) <=
+                GameModeAlternateShot_TeamBestPossibleScore(0)) {
                 return 1;
             }
         }
@@ -301,15 +302,15 @@ u8 fn_800E7038(int nPlayer, u8 bCheck) {
         P(i)->n308 = 0;                           \
     }
 
-// TW06: GameModeAlternateShot::GameFinished. In a playoff: over once a team is ahead; otherwise
+// In a playoff: over once a team is ahead; otherwise
 // (unless only checking) the next playoff hole starts. In the round: over when no holes are left and
 // no playoff starts, or when a team leads by more than the holes left.
-u8 fn_800E723C(u8 bCheck) {
+u8 GameModeAlternateShot_GameFinished(u8 bCheck) {
     int nLeft;
     int h;
     int i;
     if (gpGame->bD4) {
-        if (fn_800E6BA4(0) != fn_800E6BA4(1)) {
+        if (GameModeAlternateShot_TeamMatchWins(0) != GameModeAlternateShot_TeamMatchWins(1)) {
             return 1;
         }
         if (!bCheck) {
@@ -326,18 +327,19 @@ u8 fn_800E723C(u8 bCheck) {
             }
         }
         if (nLeft == 0) {
-            return !fn_800E7474(bCheck);
+            return !GameModeAlternateShot_GoToPlayoff(bCheck);
         }
-        if (nLeft + fn_800E6BA4(0) < fn_800E6BA4(1) || nLeft + fn_800E6BA4(1) < fn_800E6BA4(0)) {
+        if (nLeft + GameModeAlternateShot_TeamMatchWins(0) < GameModeAlternateShot_TeamMatchWins(1) ||
+            nLeft + GameModeAlternateShot_TeamMatchWins(1) < GameModeAlternateShot_TeamMatchWins(0)) {
             return 1;
         }
     }
     return 0;
 }
 
-// TW06: GameModeAlternateShot::GoToPlayoff. After the last hole with the match tied: a playoff
+// After the last hole with the match tied: a playoff
 // starts (bD5 when the round played all 18 holes).
-u8 fn_800E7474(u8 bCheck) {
+u8 GameModeAlternateShot_GoToPlayoff(u8 bCheck) {
     int h;
     int i;
     for (h = Game_CurHoleIndex() + 1; h < 18; h++) {
@@ -345,7 +347,7 @@ u8 fn_800E7474(u8 bCheck) {
             return 0;
         }
     }
-    if (fn_800E6BA4(0) == fn_800E6BA4(1)) {
+    if (GameModeAlternateShot_TeamMatchWins(0) == GameModeAlternateShot_TeamMatchWins(1)) {
         if (bCheck) {
             return 1;
         }
@@ -365,24 +367,26 @@ u8 fn_800E7474(u8 bCheck) {
     return 0;
 }
 
-// TW06: GameModeAlternateShot::EndHole. A team that holed out and cannot be caught wins the hole
+// A team that holed out and cannot be caught wins the hole
 // (the point goes on players 0 and 2); on the next hole the other partner tees off.
-void fn_800E7740(void) {
+void GameModeAlternateShot_EndHole(void) {
     int nHole = Game_CurHoleIndex();
-    if (fn_800E69CC(0) && fn_800E6B08(0) < fn_800E6B08(1)) {
+    if (GameModeAlternateShot_TeamDone(0) &&
+        GameModeAlternateShot_TeamBestPossibleScore(0) < GameModeAlternateShot_TeamBestPossibleScore(1)) {
         gPlayers[0].nModePoints[nHole] = 1;
         gPlayers[0].nHolesWon++;
     }
-    if (fn_800E69CC(1) && fn_800E6B08(1) < fn_800E6B08(0)) {
+    if (GameModeAlternateShot_TeamDone(1) &&
+        GameModeAlternateShot_TeamBestPossibleScore(1) < GameModeAlternateShot_TeamBestPossibleScore(0)) {
         gPlayers[2].nModePoints[nHole] = 1;
         gPlayers[2].nHolesWon++;
     }
     lbl_80281648[0] = lbl_80281648[1] = 1 - (nHole & 1);
 }
 
-// TW06: GameModeAlternateShot::EndGame. The winning team's human players with a profile get the
+// The winning team's human players with a profile get the
 // prize money (by the margin).
-void fn_800E7828(void) {
+void GameModeAlternateShot_EndGame(void) {
     int nPrize;
     Player* p;
     int nLoser;
@@ -400,7 +404,7 @@ void fn_800E7828(void) {
         default:
             return;
         }
-        if (fn_800E6BA4(0) > fn_800E6BA4(1)) {
+        if (GameModeAlternateShot_TeamMatchWins(0) > GameModeAlternateShot_TeamMatchWins(1)) {
             nWinner = 0;
             nLoser = 1;
             nMargin = gPlayers[0].nHolesWon - gPlayers[2].nHolesWon;

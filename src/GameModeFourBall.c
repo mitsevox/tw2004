@@ -6,29 +6,29 @@
 #include "game.h"
 #include "game/save.h"
 
-u8   fn_800E8E24(int nTeam);
-u8   fn_800E8F20(int nTeam);
-int  fn_800E8FC8(int nTeam);
-int  fn_800E90AC(int nTeam);
+u8   GameModeFourBall_TeamDone(int nTeam);
+u8   GameModeFourBall_TeamConceded(int nTeam);
+int  GameModeFourBall_TeamBestPossibleScore(int nTeam);
+int  GameModeFourBall_TeamMatchWins(int nTeam);
 void fn_800E90FC(void);
-s32  fn_800E9178(int nPlayer);
-int  fn_800E947C(int nPlayer);
-u8   fn_800E948C(int nPlayer, u8 bCheck);
-u8   fn_800E96B8(u8 bCheck);
-u8   fn_800E98F0(u8 bCheck);
-void fn_800E9BBC(void);
-void fn_800E9CF4(void);
+s32  GameModeFourBall_GetHonors(int nPlayer);
+int  GameModeFourBall_GetPlayerTeam(int nPlayer);
+u8   GameModeFourBall_HoleFinished(int nPlayer, u8 bCheck);
+u8   GameModeFourBall_GameFinished(u8 bCheck);
+u8   GameModeFourBall_GoToPlayoff(u8 bCheck);
+void GameModeFourBall_EndHole(void);
+void GameModeFourBall_EndGame(void);
 
-// TW06: GameModeFourBall::Init. Four players; the CPU may concede.
-void fn_800E8D58(void) {
-    gpGame->pfnInit = fn_800E8D58;
+// Four players; the CPU may concede.
+void GameModeFourBall_Init(void) {
+    gpGame->pfnInit = GameModeFourBall_Init;
     gpGame->pfnSetupNextGolfer = fn_800E90FC;
-    gpGame->pfnGetHonors = fn_800E9178;
-    gpGame->pfnHoleFinished = fn_800E948C;
-    gpGame->pfnGameFinished = fn_800E96B8;
-    gpGame->pfnGoToPlayoff = fn_800E98F0;
-    gpGame->pfnEndHole = fn_800E9BBC;
-    gpGame->pfnEndGame = fn_800E9CF4;
+    gpGame->pfnGetHonors = GameModeFourBall_GetHonors;
+    gpGame->pfnHoleFinished = GameModeFourBall_HoleFinished;
+    gpGame->pfnGameFinished = GameModeFourBall_GameFinished;
+    gpGame->pfnGoToPlayoff = GameModeFourBall_GoToPlayoff;
+    gpGame->pfnEndHole = GameModeFourBall_EndHole;
+    gpGame->pfnEndGame = GameModeFourBall_EndGame;
     gpGame->bAIConcedes = 1;
     gpGame->n4 = 1;
     gpGame->nMulligans = 0;
@@ -38,9 +38,9 @@ void fn_800E8D58(void) {
     gSession.nSplitScreen = 0;
 }
 
-// TW06: GameModeFourBall::TeamDone. A partner has holed out and the other can no longer beat that
+// A partner has holed out and the other can no longer beat that
 // score.
-u8 fn_800E8E24(int nTeam) {
+u8 GameModeFourBall_TeamDone(int nTeam) {
     int nHole = Game_CurHoleIndex();
     int a;
     int bDone;
@@ -61,8 +61,8 @@ u8 fn_800E8E24(int nTeam) {
     return bDone;
 }
 
-// TW06: GameModeFourBall::TeamConceded. Both partners picked up.
-u8 fn_800E8F20(int nTeam) {
+// Both partners picked up.
+u8 GameModeFourBall_TeamConceded(int nTeam) {
     int nHole = Game_CurHoleIndex();
     int bConceded;
     int b;
@@ -83,9 +83,9 @@ u8 fn_800E8F20(int nTeam) {
     return bConceded;
 }
 
-// fake match: fn_800E8FC8 gets the team's players through these two helpers, and the const on the
-// return types is what schedules its first loads like the original (found by the permuter); the
-// other team functions above only match with the same code written out.
+// fake match: GameModeFourBall_TeamBestPossibleScore gets the team's players through these two
+// helpers, and the const on the return types is what schedules its first loads like the original
+// (found by the permuter); the other team functions above only match with the same code written out.
 // The team's first player (0 or 2).
 static inline const int FourBall_TeamFirst(int nTeam) {
     int a = 2;
@@ -104,9 +104,9 @@ static inline const int FourBall_TeamSecond(int nTeam) {
     return b;
 }
 
-// TW06: GameModeFourBall::TeamBestPossibleScore. The team's best score on this hole if a partner
+// The team's best score on this hole if a partner
 // holes the next shot (at most 9), or its score once holed.
-int fn_800E8FC8(int nTeam) {
+int GameModeFourBall_TeamBestPossibleScore(int nTeam) {
     int nHole = Game_CurHoleIndex();
     int a;
     int n;
@@ -129,8 +129,8 @@ int fn_800E8FC8(int nTeam) {
     return nBest;
 }
 
-// TW06: GameModeFourBall::TeamMatchWins (kept on the team's first player).
-int fn_800E90AC(int nTeam) {
+// Kept on the team's first player.
+int GameModeFourBall_TeamMatchWins(int nTeam) {
     int nHole = Game_CurHoleIndex();
     int a;
     a = 2;
@@ -153,10 +153,10 @@ void fn_800E90FC(void) {
     }
 }
 
-// TW06: GameModeFourBall::GetHonors. On the tee the team that won the last decided hole, and (on
+// On the tee the team that won the last decided hole, and (on
 // team 0 only) the better score of the pair; otherwise the player farthest from the pin (off the
 // green first) whose team is still playing.
-s32 fn_800E9178(int nPlayer) {
+s32 GameModeFourBall_GetHonors(int nPlayer) {
     s32 aOrder[4] = {0, 1, 2, 3};  // the tee order before anyone has won a hole
     s32* pOrder;        // fake match: the within-team compare reads aOrder through a pointer
     int w;
@@ -200,7 +200,8 @@ s32 fn_800E9178(int nPlayer) {
         }
     }
     for (j = 0; j < gNumPlayersSetUp; j++) {
-        if (nPlayer != aOrder[j] && Player_OnTee(aOrder[j]) && !fn_800E8E24(fn_800E947C(aOrder[j]))) {
+        if (nPlayer != aOrder[j] && Player_OnTee(aOrder[j]) &&
+            !GameModeFourBall_TeamDone(GameModeFourBall_GetPlayerTeam(aOrder[j]))) {
             return aOrder[j];
         }
     }
@@ -209,7 +210,8 @@ s32 fn_800E9178(int nPlayer) {
     fBest = 0.0f;
     nBest = 5;
     for (i = 0; i < gNumPlayersSetUp; i++) {
-        if (i != nPlayer && !Player_IsHoled(i) && !fn_800E8E24(fn_800E947C(i)) &&
+        if (i != nPlayer && !Player_IsHoled(i) &&
+            !GameModeFourBall_TeamDone(GameModeFourBall_GetPlayerTeam(i)) &&
             PLAYER(i)->ball.nLie != LIE_GREEN_e) {
             dx = PLAYER(i)->ball.vPos[0] - pCourse->pin[nPinSet].x;
             dz = PLAYER(i)->ball.vPos[2] - pCourse->pin[nPinSet].z;
@@ -224,7 +226,8 @@ s32 fn_800E9178(int nPlayer) {
         fBest = 0.0f;
         nBest = 5;
         for (i = 0; i < gNumPlayersSetUp; i++) {
-            if (i != nPlayer && !Player_IsHoled(i) && !fn_800E8E24(fn_800E947C(i))) {
+            if (i != nPlayer && !Player_IsHoled(i) &&
+                !GameModeFourBall_TeamDone(GameModeFourBall_GetPlayerTeam(i))) {
                 dx = PLAYER(i)->ball.vPos[0] - pCourse->pin[nPinSet].x;
                 dz = PLAYER(i)->ball.vPos[2] - pCourse->pin[nPinSet].z;
                 d = fn_80009680(dx * dx + dz * dz);
@@ -241,29 +244,28 @@ s32 fn_800E9178(int nPlayer) {
     return nBest;
 }
 
-// TW06: GameModeFourBall::GetPlayerTeam.
-int fn_800E947C(int nPlayer) {
+int GameModeFourBall_GetPlayerTeam(int nPlayer) {
     return nPlayer / 2;
 }
 
-// TW06: GameModeFourBall::HoleFinished. Both teams done or one conceded; or one team done and the
+// Both teams done or one conceded; or one team done and the
 // other can no longer beat it (or only tie, when dormie).
-u8 fn_800E948C(int nPlayer, u8 bCheck) {
+u8 GameModeFourBall_HoleFinished(int nPlayer, u8 bCheck) {
     int nLeft;
     int h;
-    if (fn_800E8E24(0) && fn_800E8E24(1)) {
+    if (GameModeFourBall_TeamDone(0) && GameModeFourBall_TeamDone(1)) {
         return 1;
     }
-    if (fn_800E8F20(0) || fn_800E8F20(1)) {
+    if (GameModeFourBall_TeamConceded(0) || GameModeFourBall_TeamConceded(1)) {
         return 1;
     }
-    if (fn_800E8E24(0) && (!lbl_80282240 || (u32)nPlayer > 1)) {
-        if (fn_800E8FC8(0) < fn_800E8FC8(1)) {
+    if (GameModeFourBall_TeamDone(0) && (!lbl_80282240 || (u32)nPlayer > 1)) {
+        if (GameModeFourBall_TeamBestPossibleScore(0) < GameModeFourBall_TeamBestPossibleScore(1)) {
             return 1;
         }
     }
-    if (fn_800E8E24(1) && (!lbl_80282240 || (u32)(nPlayer - 2) > 1)) {
-        if (fn_800E8FC8(1) < fn_800E8FC8(0)) {
+    if (GameModeFourBall_TeamDone(1) && (!lbl_80282240 || (u32)(nPlayer - 2) > 1)) {
+        if (GameModeFourBall_TeamBestPossibleScore(1) < GameModeFourBall_TeamBestPossibleScore(0)) {
             return 1;
         }
     }
@@ -273,16 +275,16 @@ u8 fn_800E948C(int nPlayer, u8 bCheck) {
             nLeft++;
         }
     }
-    if (fn_800E8E24(0) && (!lbl_80282240 || (u32)nPlayer > 1)) {
-        if (nLeft + fn_800E90AC(1) == fn_800E90AC(0)) {
-            if (fn_800E8FC8(0) <= fn_800E8FC8(1)) {
+    if (GameModeFourBall_TeamDone(0) && (!lbl_80282240 || (u32)nPlayer > 1)) {
+        if (nLeft + GameModeFourBall_TeamMatchWins(1) == GameModeFourBall_TeamMatchWins(0)) {
+            if (GameModeFourBall_TeamBestPossibleScore(0) <= GameModeFourBall_TeamBestPossibleScore(1)) {
                 return 1;
             }
         }
     }
-    if (fn_800E8E24(1) && (!lbl_80282240 || (u32)(nPlayer - 2) > 1)) {
-        if (nLeft + fn_800E90AC(0) == fn_800E90AC(1)) {
-            if (fn_800E8FC8(1) <= fn_800E8FC8(0)) {
+    if (GameModeFourBall_TeamDone(1) && (!lbl_80282240 || (u32)(nPlayer - 2) > 1)) {
+        if (nLeft + GameModeFourBall_TeamMatchWins(0) == GameModeFourBall_TeamMatchWins(1)) {
+            if (GameModeFourBall_TeamBestPossibleScore(1) <= GameModeFourBall_TeamBestPossibleScore(0)) {
                 return 1;
             }
         }
@@ -309,15 +311,15 @@ u8 fn_800E948C(int nPlayer, u8 bCheck) {
         P(i)->n308 = 0;                             \
     }
 
-// TW06: GameModeFourBall::GameFinished. In a playoff: over once a team is ahead; otherwise (unless
+// In a playoff: over once a team is ahead; otherwise (unless
 // only checking) the next playoff hole starts. In the round: over when no holes are left and no
 // playoff starts, or when a team leads by more than the holes left.
-u8 fn_800E96B8(u8 bCheck) {
+u8 GameModeFourBall_GameFinished(u8 bCheck) {
     int nLeft;
     int h;
     int i;
     if (gpGame->bD4) {
-        if (fn_800E90AC(0) != fn_800E90AC(1)) {
+        if (GameModeFourBall_TeamMatchWins(0) != GameModeFourBall_TeamMatchWins(1)) {
             return 1;
         }
         if (!bCheck) {
@@ -334,18 +336,19 @@ u8 fn_800E96B8(u8 bCheck) {
             }
         }
         if (nLeft == 0) {
-            return !fn_800E98F0(bCheck);
+            return !GameModeFourBall_GoToPlayoff(bCheck);
         }
-        if (nLeft + fn_800E90AC(0) < fn_800E90AC(1) || nLeft + fn_800E90AC(1) < fn_800E90AC(0)) {
+        if (nLeft + GameModeFourBall_TeamMatchWins(0) < GameModeFourBall_TeamMatchWins(1) ||
+            nLeft + GameModeFourBall_TeamMatchWins(1) < GameModeFourBall_TeamMatchWins(0)) {
             return 1;
         }
     }
     return 0;
 }
 
-// TW06: GameModeFourBall::GoToPlayoff. After the last hole with the match tied: a playoff starts
+// After the last hole with the match tied: a playoff starts
 // (bD5 when the round played all 18 holes).
-u8 fn_800E98F0(u8 bCheck) {
+u8 GameModeFourBall_GoToPlayoff(u8 bCheck) {
     int h;
     int i;
     for (h = Game_CurHoleIndex() + 1; h < 18; h++) {
@@ -353,7 +356,7 @@ u8 fn_800E98F0(u8 bCheck) {
             return 0;
         }
     }
-    if (fn_800E90AC(0) == fn_800E90AC(1)) {
+    if (GameModeFourBall_TeamMatchWins(0) == GameModeFourBall_TeamMatchWins(1)) {
         if (bCheck) {
             return 1;
         }
@@ -373,18 +376,20 @@ u8 fn_800E98F0(u8 bCheck) {
     return 0;
 }
 
-// TW06: GameModeFourBall::EndHole. The hole goes to the other team when a team conceded, or to a
+// The hole goes to the other team when a team conceded, or to a
 // team that holed out and cannot be caught (the point goes on players 0 and 2).
-void fn_800E9BBC(void) {
+void GameModeFourBall_EndHole(void) {
     int nWinner = -1;
     int nHole = Game_CurHoleIndex();
-    if (fn_800E8F20(0)) {
+    if (GameModeFourBall_TeamConceded(0)) {
         nWinner = 1;
-    } else if (fn_800E8F20(1)) {
+    } else if (GameModeFourBall_TeamConceded(1)) {
         nWinner = 0;
-    } else if (fn_800E8E24(0) && fn_800E8FC8(0) < fn_800E8FC8(1)) {
+    } else if (GameModeFourBall_TeamDone(0) &&
+               GameModeFourBall_TeamBestPossibleScore(0) < GameModeFourBall_TeamBestPossibleScore(1)) {
         nWinner = 0;
-    } else if (fn_800E8E24(1) && fn_800E8FC8(1) < fn_800E8FC8(0)) {
+    } else if (GameModeFourBall_TeamDone(1) &&
+               GameModeFourBall_TeamBestPossibleScore(1) < GameModeFourBall_TeamBestPossibleScore(0)) {
         nWinner = 1;
     }
     switch (nWinner) {
@@ -399,9 +404,9 @@ void fn_800E9BBC(void) {
     }
 }
 
-// TW06: GameModeFourBall::EndGame. The winning team's human players with a profile get the prize
+// The winning team's human players with a profile get the prize
 // money (by the margin).
-void fn_800E9CF4(void) {
+void GameModeFourBall_EndGame(void) {
     int nPrize;
     Player* p;
     int nLoser;
@@ -418,7 +423,7 @@ void fn_800E9CF4(void) {
         default:
             return;
         }
-        if (fn_800E90AC(0) > fn_800E90AC(1)) {
+        if (GameModeFourBall_TeamMatchWins(0) > GameModeFourBall_TeamMatchWins(1)) {
             nWinner = 0;
             nLoser = 1;
             nMargin = gPlayers[0].nHolesWon - gPlayers[2].nHolesWon;
