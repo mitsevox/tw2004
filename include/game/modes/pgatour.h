@@ -78,7 +78,7 @@ u16  GameModeDriverPGATour_GetEndDate(s32 i);
 char* GameModeDriverPGATour_GetName(s32 i);
 s32  fn_800EFE3C(s32 i);
 int  fn_800F009C(void);                 // the leader's score in the current tournament
-int  fn_800F018C(void);                 // the player's own score in it
+int  fn_800F018C(s32 nEvent);           // the player's own score in it (nEvent is not used)
 s32  fn_800F0428(s32 nPlayer);
 
 #endif
