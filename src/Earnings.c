@@ -29,9 +29,30 @@ typedef struct EarningsTable {
 extern EarningsTable lbl_80200538;
 
 // A save profile (0x10600 bytes each); only what this file reads.
+// An award in a save profile: whether it is won, and when.
+typedef struct Award {
+    u8   bWon;                  // 0x0
+    u8   unk1;
+    s16  nDate;                 // 0x2  fn_800D2994's date when it was won
+} Award;
 typedef struct Profile {
     u8   b0;                    // 0x00000  payouts are scaled (and awards given, at 1) only when set
-    u8   unk1[0x5000 - 0x1];
+    u8   unk1[0x70 - 0x1];
+    u8   b70;                   // 0x00070  set when an award is won or a round is counted
+    u8   unk71[3];
+    s32  n74;                   // 0x00074  stroke-play rounds counted
+    s32  n78;                   // 0x00078  their strokes
+    s32  n7C;                   // 0x0007C  full rounds counted
+    u8   unk80[0xA8 - 0x80];
+    s32  nA8;                   // 0x000A8  the best stroke-play round (0: none yet)
+    u8   unkAC[0xC8 - 0xAC];
+    struct {
+        u8 b;
+        u8 unk1[7];
+    } aC8[31];                  // 0x000C8
+    u8   unk1C0[0x39C - 0x1C0];
+    Award aAward[39];           // 0x0039C
+    u8   aReplay[5][0xF28];     // 0x00438  the replays saved with awards 0, 6, 9, 3 and 13
     s32  n5000;                 // 0x05000  the TOUR card level, 0..6
     u8   unk5004[0x10600 - 0x5004];
 } Profile;
@@ -64,14 +85,19 @@ extern s32 lbl_802003F8[10];
 extern s32 lbl_80200420[10];
 extern u8  lbl_801FFAE8[0x280];
 extern u8  lbl_801FFD90[0x280];
+extern Replay gReplayData;
 extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
 extern s32 lbl_80282248;
 extern s32 lbl_8028224C;
 extern s32 lbl_80282250;
 extern s32 lbl_80282254;
 extern s32 lbl_80191A08[39];
+extern f32 lbl_80191AA4[70];
 
 void* memcpy(void* pDst, const void* pSrc, u32 uLen);
+
+s16   fn_800D2994(void);                    // today's date
+u8    fn_800CF450(int nPlayer);
 
 void  fn_800D344C(UStreamObject* pObject);
 int   fn_800584DC(int nProfile);
@@ -81,6 +107,8 @@ int   fn_800D3CF8(int nRating);
 s32   fn_800D477C(int nPlayer, u8* pBall, u8 b);
 void  fn_800D4F14(int nPlayer, u8 b);
 f32   fn_800D6EEC(void);
+u8    fn_800D76AC(int nPlayer, int nAward);
+s32   fn_800D7770(int nPlayer, Award* pAward);
 s32   fn_800D9954(void);
 
 // Put the working tables back to their saved copies.
@@ -125,6 +153,28 @@ void fn_800D344C(UStreamObject* pObject) {
     fn_8000E790(pObject, sizeof(lbl_80200538), &lbl_80200538);
 }
 
+// TW06: GM_Earnings_TournamentPayout. With a row of lbl_80191AA4, n scaled down by how far it is
+// into nTotal (against the row 0 share), rounded to $10; row 0 leaves n as it is.
+s32 fn_800D3478(int nTotal, int n, int nRow) {
+    f32 f;
+    s32 nRounded;
+    s32 nRet;
+
+    if (nRow == 0) {
+        nRet = n;
+    } else {
+        f = 0.1f * (((1.0f - (f32)n / (f32)nTotal) / (1.0f - lbl_80191AA4[0])) *
+                    ((f32)nTotal * lbl_80191AA4[nRow]));
+        if (f > 0.0f) {
+            nRounded = (s32)(0.5f + f);
+        } else {
+            nRounded = -(s32)(0.5f - f);
+        }
+        nRet = nRounded * 10;
+    }
+    return nRet;
+}
+
 // TW06: GM_Earnings_GetStrokeWinnings. Beating a CPU golfer pays by their earnings rating: a base
 // prize and so much a stroke of the margin (at most 5). *pPrize gets the base.
 int fn_800D36E0(int nWinner, int nLoser, int nMargin, int* pPrize) {
@@ -144,8 +194,6 @@ int fn_800D36E0(int nWinner, int nLoser, int nMargin, int* pPrize) {
 
 // TW06: GM_Earnings_GetStrokeWinningsTeam. The same for a team (0: players 0 and 1, 1: players 2 and
 // 3) beating a CPU team: the average of what the two losers would pay.
-// 99.2%: only the order of the four table loads in the return differs. Tried: all 24 orders of the
-// flat sum, the grouped forms, an inline per-golfer helper; the nBase locals took it from 82% to 98%.
 int fn_800D37BC(int nWinner, int nLoser, int nMargin, int* pPrize) {
     int nFirst;
     int nSecond;
@@ -153,6 +201,7 @@ int fn_800D37BC(int nWinner, int nLoser, int nMargin, int* pPrize) {
     int nRating2;
     int nBase1;
     int nBase2;
+    int nTotal;
 
     if (fn_800E177C() != 0) return 0;
     if (Team_IsAllCPU(nWinner) || !Team_IsAllCPU(nLoser)) return 0;
@@ -173,10 +222,11 @@ int fn_800D37BC(int nWinner, int nLoser, int nMargin, int* pPrize) {
     if (pPrize != NULL) {
         *pPrize = (nBase1 + nBase2) / 2;
     }
-    return (lbl_80200538.aStrokePrize[nRating2].nBase +
-            (lbl_80200538.aStrokePrize[nRating2].nPerStroke * nMargin +
-             (lbl_80200538.aStrokePrize[nRating1].nBase +
-              lbl_80200538.aStrokePrize[nRating1].nPerStroke * nMargin))) / 2;
+    nTotal = lbl_80200538.aStrokePrize[nRating1].nBase +
+             lbl_80200538.aStrokePrize[nRating1].nPerStroke * nMargin;
+    nTotal += lbl_80200538.aStrokePrize[nRating2].nBase +
+              lbl_80200538.aStrokePrize[nRating2].nPerStroke * nMargin;
+    return nTotal / 2;
 }
 
 // Pay a player twice nMoney, booked in the breakdown's n24 and n3C.
@@ -261,9 +311,84 @@ u8 fn_800D4010(int nId) {
     return b;
 }
 
+s32 fn_800D4694(u32 n) {
+    if (n == 1) return 0;
+    if (n == 2) return 1;
+    if (n == 5) return 2;
+    if (n == 6) return 3;
+    if (n == 3) return 4;
+    return 6;
+}
+
+s32 fn_800D46E8(int n) {
+    int r;
+
+    if (n == 0) return 0;
+    if (n == 1 || n == 2 || n == 10) return 1;
+    if (n == 3 || n == 4 || n == 5 || n == 14 || n == 15 || n == 17) return 2;
+    if (n == 6 || n == 7 || n == 8) return 3;
+    if (n == 9) return 4;
+    r = 6;                      // fake match: a plain "return 6" makes the last test branch-free
+    if (n == 12) {
+        r = 5;
+    }
+    return r;
+}
+
 // Whether bit nBit of uMask is set.
 u8 fn_800D4EF8(u32 uMask, int nBit) {
     return (uMask & (1 << nBit)) != 0;
+}
+
+// Without bCheck: whether the profile has every one of its 31 aC8 flags. With it: whether this is
+// game mode 23 with 30 of them and fn_800CF450 agrees.
+u8 fn_800D68CC(int nPlayer, u8 bCheck) {
+    Profile* pProfile;
+    int i;
+    int n;
+    u8 bAll;
+
+    pProfile = &gpSaveData[gPlayers[nPlayer].nIndex];
+    if (pProfile->b0 == 0) return 0;
+    if (!bCheck) {
+        bAll = 1;
+        for (i = 0; i < 31; i++) {
+            if (!pProfile->aC8[i].b) {
+                bAll = 0;
+            }
+        }
+        return bAll;
+    }
+    n = 0;
+    for (i = 0; i < 31; i++) {
+        if (pProfile->aC8[i].b) {
+            n++;
+        }
+    }
+    if (Game_GetMode() == 23 && n == 30 && fn_800CF450(nPlayer)) return 1;
+    return 0;
+}
+
+// Without bCheck: whether the profile has any of its aC8 flags. With it: whether this is game mode
+// 23 and fn_800CF450 agrees.
+u8 fn_800D69B8(int nPlayer, u8 bCheck) {
+    Profile* pProfile;
+    int i;
+    u8 bAny;
+
+    pProfile = &gpSaveData[gPlayers[nPlayer].nIndex];
+    if (pProfile->b0 == 0) return 0;
+    if (!bCheck) {
+        bAny = 0;
+        for (i = 0; i < 31; i++) {
+            if (pProfile->aC8[i].b) {
+                bAny = 1;
+            }
+        }
+        return bAny;
+    }
+    if (Game_GetMode() == 23 && fn_800CF450(nPlayer)) return 1;
+    return 0;
 }
 
 // TW06: GM_Earnings_ComputeBonusModifiers. The points, rounded to $25, earn a bonus on top for the
@@ -387,6 +512,44 @@ int fn_800D7220(int nReward, int nPlayer, CourseMoneyTracking* pMoney) {
     return nTotal;
 }
 
+// Whether a human player's profile can earn awards.
+u8 fn_800D748C(int nPlayer) {
+    if (Player_IsCPU(nPlayer)) return 0;
+    if (fn_800E177C() != 0) return 0;
+    return gpSaveData[gPlayers[nPlayer].nIndex].b0 == 1;
+}
+
+// Give a player award nAward if they do not have it yet. Five awards also keep the shot's replay.
+u8 fn_800D750C(int nPlayer, int nAward) {
+    int nProfile;
+    int nSlot;
+
+    if (fn_800E177C() != 0) return 0;
+    if (fn_800D76AC(nPlayer, nAward)) {
+        nProfile = gPlayers[nPlayer].nIndex;
+        if (gpSaveData[nProfile].b0 != 1) return 0;
+        fn_800D7770(nPlayer, &gpSaveData[nProfile].aAward[nAward]);
+        gpSaveData[nProfile].b70 = 1;
+        nSlot = 5;
+        if (nAward == 0) {
+            nSlot = 0;
+        } else if (nAward == 6) {
+            nSlot = 1;
+        } else if (nAward == 9) {
+            nSlot = 2;
+        } else if (nAward == 3) {
+            nSlot = 3;
+        } else if (nAward == 13) {
+            nSlot = 4;
+        }
+        if (nSlot != 5 && gReplayData.bF10) {
+            Mem_cpy(gpSaveData[nProfile].aReplay[nSlot], &gReplayData, sizeof(gpSaveData->aReplay[0]));
+        }
+        return 1;
+    }
+    return 0;
+}
+
 s32 fn_800D7660(int nPlayer, u8* pBall, u8 b) {
     fn_800D477C(nPlayer, pBall, b);
     return fn_800D9954();
@@ -395,6 +558,73 @@ s32 fn_800D7660(int nPlayer, u8* pBall, u8 b) {
 s32 fn_800D7684(int nPlayer, int a, u8 b) {
     fn_800D4F14(nPlayer, b);
     return fn_800D9954();
+}
+
+// Whether a human player can still win award nAward (0..38).
+u8 fn_800D76AC(int nPlayer, int nAward) {
+    if (fn_800E177C() != 0) return 0;
+    if (nAward == 39) return 0;
+    if (Player_IsCPU(nPlayer)) return 0;
+    if (gpSaveData[gPlayers[nPlayer].nIndex].b0 != 1) return 0;
+    return gpSaveData[gPlayers[nPlayer].nIndex].aAward[nAward].bWon != 1;
+}
+
+// Mark an award won, with today's date; 1 if it was not won before.
+s32 fn_800D7770(int nPlayer, Award* pAward) {
+    if (fn_800E177C() != 0) return 0;
+    if (Player_IsCPU(nPlayer)) return 0;
+    if (gpSaveData[gPlayers[nPlayer].nIndex].b0 != 1) return 0;
+    if (pAward->bWon) return 0;
+    pAward->bWon = 1;
+    pAward->nDate = fn_800D2994();
+    return 1;
+}
+
+// Whether nValue and szName are among the top five of all-time record recB[k][i].
+int fn_800D853C(int i, int nValue, const char* szName, int k) {
+    RecordEntry* pRec;
+    int j;
+
+    for (j = 0; j < 5; j++) {
+        pRec = &gSession.recB[k][i][j];
+        if (pRec->nValue == nValue && strcmp(pRec->szName, szName) == 0) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+// The same for recC[k][i].
+int fn_800D85DC(int i, int nValue, const char* szName, int k) {
+    RecordEntry* pRec;
+    int j;
+
+    for (j = 0; j < 5; j++) {
+        pRec = &gSession.recC[k][i][j];
+        if (pRec->nValue == nValue && strcmp(pRec->szName, szName) == 0) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+// Whether nValue breaks record kind nKind's nRecord: kinds 0 and 4 go low, 1..9 high.
+u8 fn_800D867C(int nKind, int nValue, int nRecord) {
+    switch (nKind) {
+    case 0:
+    case 4:
+        return nValue <= nRecord;
+    case 1:
+    case 2:
+    case 3:
+    case 5:
+    case 6:
+    case 7:
+    case 8:
+    case 9:
+        return nRecord <= nValue;
+    }
+    return 0;
 }
 
 s32 fn_800D86DC(s32 n) {
@@ -418,6 +648,75 @@ s32 fn_800D8720(s32 n) {
         return 1;
     default:
         return 2;
+    }
+}
+
+// Clear the flags fn_800D9350 sets.
+void fn_800D8D38(int nPlayer) {
+    gPlayers[nPlayer].b310 = 0;
+    gPlayers[nPlayer].b311 = 0;
+    gPlayers[nPlayer].b312 = 0;
+}
+
+// At the end of a hole: carry the flags over, and set bit 0 of n308 for a hole in one on a par 4 or 5
+// that finished on the green or in the hole.
+void fn_800D9350(int nPlayer) {
+    int nLie;
+    int nStrokes;
+    int nPar;
+
+    if (fn_800E177C() == 0) {
+        nLie = gPlayers[nPlayer].nLie;
+        if (gPlayers[nPlayer].b30F) {
+            gPlayers[nPlayer].b310 = 1;
+        }
+        if (gPlayers[nPlayer].b30E) {
+            gPlayers[nPlayer].b311 = 1;
+            gPlayers[nPlayer].n308 |= 2;
+        }
+        if (nLie == LIE_GREEN || nLie == LIE_HOLED) {
+            gPlayers[nPlayer].b312 = 1;
+        }
+        nStrokes = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
+        nPar = fn_800D2B08();
+        if (nStrokes == 1 && nPar >= 4 && gPlayers[nPlayer].b312) {
+            gPlayers[nPlayer].n308 |= 1;
+        }
+    }
+}
+
+// At the end of a round: count it in the profile (a full round; in stroke play also its strokes and
+// the best score).
+void fn_800D9834(int nPlayer) {
+    int nProfile;
+    int nStrokes;
+
+    if (gpGame->b27D) {
+        switch (fn_800EC550()) {    // fake match: a plain "if (...) return" folds the branch over a branch
+        case 0:
+            break;
+        default:
+            return;
+        }
+        if (fn_800E177C() == 0) {
+            nProfile = gPlayers[nPlayer].nIndex;
+            if (gpSaveData[nProfile].b0) {
+                if (fn_800E1BBC()) {
+                    gpSaveData[nProfile].n7C++;
+                    if (gpGame->n4 == 0) {
+                        nStrokes = fn_800E17AC(nPlayer);
+                        gpSaveData[nProfile].n74++;
+                        gpSaveData[nProfile].n78 += nStrokes;
+                        if (gpSaveData[nProfile].nA8 == 0) {
+                            gpSaveData[nProfile].nA8 = nStrokes;
+                        } else if (nStrokes < gpSaveData[nProfile].nA8) {
+                            gpSaveData[nProfile].nA8 = nStrokes;
+                        }
+                    }
+                }
+                gpSaveData[nProfile].b70 = 1;
+            }
+        }
     }
 }
 

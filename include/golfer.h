@@ -242,7 +242,11 @@ typedef struct Player {
     s32  n308;                  // 0x308
     u8   unk30C[2];
     u8   b30E;                  // 0x30E  a replaced ball must be dropped (GM_ReplaceOOBBall)
-    u8   unk30F[0x31C - 0x30F];
+    u8   b30F;                  // 0x30F  copied to b310 at the end of the hole (fn_800D9350)
+    u8   b310;                  // 0x310  cleared by fn_800D8D38
+    u8   b311;                  // 0x311  set at the end of a hole with b30E
+    u8   b312;                  // 0x312  set when the ball finished on the green or in the hole
+    u8   unk313[0x31C - 0x313];
     s32  n31C;                  // 0x31C  bonuses won (GameMode5 EndGame)
     s32  n320;                  // 0x320  a ladder event's prize is added (GameMode4 EndGame)
     s32  n324;                  // 0x324  n338 minus the last match prize (GameModeMatch EndGame)
