@@ -57,8 +57,8 @@ typedef struct PgaData {
 extern PgaData gPgaData;
 
 // The current round's statistics: cleared as each round of a tournament starts (fn_800EE2C8),
-// added to the profile's career totals as it ends (fn_800EED0C).
-extern TourStats lbl_80205ED8;
+// added to the player's season counts in the profile as it ends (fn_800EED0C).
+extern PgaStatCounts lbl_80205ED8;
 
 extern s32 lbl_80281670;        // the options' nC from before the tour (fn_800EE02C puts it back)
 extern s32 lbl_80281674;        // the options' n18 from before a tour round (fn_800EE0A0 keeps it)
