@@ -19,7 +19,8 @@ typedef struct GameAudioView {
     f32  fC;                    // 0xC
     s32  n10;                   // 0x10
     s32  n14;                   // 0x14
-    u8   unk18[0x20 - 0x18];
+    s32  n18;                   // 0x18
+    u8   unk1C[0x20 - 0x1C];
 } GameAudioView;
 LAYOUT_ASSERT(GameAudioView, 0x20);
 

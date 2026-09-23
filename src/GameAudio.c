@@ -32,6 +32,10 @@ u8   fn_8006BAD8(int nPlayer, s32* pOut);
 f32  fn_8006C630(void);
 u8   fn_800AD280(s16 nSound, s32 n, int a, int b, void* p);    // hlaudemitter.c; types unproven
 void fn_800ADA08(s16 nSound, u8 nTrack, u8 n);
+void fn_800AD734(u8 nId, int n);
+void fn_800AD450(u8 nId);
+void fn_8001EB8C(Character* pChar, int nBone, f32* pPos);
+void fn_800A6BA8(u8 nPlayer);
 void fn_800BA734(int n, s8 nTrack);
 
 void fn_800A3F38(u8 b, u8 b2);
@@ -846,6 +850,36 @@ void fn_800A4E34(void) {
     lbl_8028202A = 1;
     lbl_80282041 = 0;
     lbl_80282040 = 0;
+}
+
+void fn_800A562C(u8 nPlayer) {
+    Player* pPlayer;
+    GameAudioView* pView;
+    u8 nId;
+    f32 vPos[3];
+
+    pPlayer = &gPlayers[nPlayer];
+    lbl_80282030 = 0;
+    pView = &lbl_801F1790[pPlayer->nView[0]];
+    lbl_80282032 = 0;
+    nId = pView->n0;
+    lbl_80282034 = 0;
+    lbl_8028202F = 0;
+    lbl_80281424 = -1;
+    fn_800A6EC8();
+    fn_800A6BA8(nPlayer);
+    fn_800AD734(pView->n2, 0);
+    fn_800AD734(pView->n3, 0);
+    if (fn_80016CFC(pPlayer->nView[0])->bFlagOut) {
+        fn_800AD450(lbl_80281420);
+        lbl_80281420 = 0xFF;
+    }
+    fn_8001EB8C(pPlayer->pChar, 0x53, vPos);
+    fn_800AD800(nId, vPos, 0, 0);
+    fn_800ADA28(nId, 0, 1, 1);
+    pView->f8 = 0.0f;
+    pView->fC = 1.0f / 59.94f;
+    pView->n18 = 0;
 }
 
 void fn_800A5EC0(u8 nPlayer) {
