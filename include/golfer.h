@@ -376,7 +376,7 @@ typedef struct GameState {
     void (*pfn1F0)(void);       // 0x1F0
     void (*pfn1F4)(void);       // 0x1F4  game finished
     void (*pfn1F8)(int nPlayer); // 0x1F8
-    void (*pfn1FC)(void);       // 0x1FC
+    u8   (*pfn1FC)(int nPlayer); // 0x1FC  asked before the special ball pick-up
     u8   unk200[0x20C - 0x200];
     void (*pfn20C)(int nPlayer); // 0x20C  called as a swing begins (state 1)
     void (*pfn210)(int nPlayer); // 0x210  the hole is over, the game is not

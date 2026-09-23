@@ -134,6 +134,31 @@ void  fn_800E5724(int nPlayer);
 void  fn_800E41C8(void);
 u8    Ter_PointInOOBNetwork(u8* pBall);
 
+void  Vec3Copy(void* pSrc, void* pDst);
+void  Ter_GetEnclosingGroundHeight(CourseInfo* pCourse, f32* pPos, f32* pLow, f32* pHigh);
+u8    fn_800E27A8(void);
+int   fn_8006AA9C(int nPlayer);             // how the shot turned out (0..4, 8+)
+void  fn_8006AAB4(int nPlayer, int a);
+int   fn_80095780(int nHandle);             // the golfer's current animation
+
+typedef struct Vec4 { f32 x, y, z, w; } Vec4;
+u32   fn_800136DC(int nController);         // buttons: held << 16 | pressed this frame
+u32   fn_800142AC(int nButton, int a);      // a button's mask
+u8    fn_80014300(u32 uMask);               // any pad pressed these buttons
+u8    fn_80063C7C(void* pView);
+u8    fn_80063C90(void* pView);             // the camera is still moving
+void  fn_80063BF4(void* pView, f32 f, f32* pVec);
+void  fn_80062D0C(int nPlayer);
+void  fn_80062B78(int nPlayer);
+void  fn_80062B74(int nPlayer);
+void  fn_80062B70(void);
+u8    fn_800E4254(int nPlayer);
+u8    Player_IsNotCPU(int nPlayer);
+void  fn_800E41D4(int nPlayer);
+void  fn_8006C300(int nPlayer);
+
+extern Vec4 lbl_80184D30;
+
 extern u8  lbl_80202898[];
 extern s32 lbl_80282278;
 extern u8  lbl_8028227C;
@@ -809,4 +834,142 @@ void GM_GolferConcede_Hole(int nPlayer) {
     fn_800E5724(nPlayer);
     fn_800E41C8();
     GOLFERSTATE_Switch(GS_CONCEDED, nPlayer);
+}
+
+// TW06: GM_MovePlayerToBall. The player's position becomes the ball's, the pre-shot position is
+// saved, and the height is set from the ground under it: the upper surface unless there is none
+// or it is more than a quarter yard above, then the lower one, else the height is kept.
+void GM_MovePlayerToBall(int nPlayer) {
+    f32         fLow;
+    f32         fHigh;
+    Player*     p     = &gPlayers[nPlayer];
+    u8*         pBall = p->ball;
+    f32*        pPos  = &p->fBallX;
+    CourseInfo* pCourse;
+    f32         f;
+    Vec3Copy(pBall, pPos);
+    Vec_Copy((f32*)pBall, p->vPreShot);
+    pCourse = fn_8000C594();
+    if (pCourse) {
+        Ter_GetEnclosingGroundHeight(pCourse, pPos, &fLow, &fHigh);
+        f = fHigh;
+        if (-65536.125f == f || f > 0.25f + gPlayers[nPlayer].fBallY) {
+            f = fLow;
+            if (-65536.125f == fLow) {
+                f = gPlayers[nPlayer].fBallY;
+            }
+        }
+        gPlayers[nPlayer].fBallY = f;
+    }
+}
+
+// TW06: GM_DoPostShotInHoleUI. Every frame after a holed ball, until the golfer's turn ends: with
+// the score display (flag 8) the turn ends as soon as the camera is done; otherwise the camera
+// is moved on, and a human may take a mulligan (button 25), watch the replay (button 24, if one
+// was recorded, the mode allows it and the hole was not conceded) or continue (button 0); a CPU
+// continues on any pad's button 0.
+void GM_DoPostShotInHoleUI(int nPlayer) {
+    void* pView = fn_80017028(gPlayers[nPlayer].nView0);
+    Vec4  vOffset = lbl_80184D30;
+    if ((gPlayers[nPlayer].uFlags & 8) && fn_80063C7C(pView)) {
+        GM_EndOfGolferTurn(nPlayer);
+        fn_80062D0C(nPlayer);
+        return;
+    }
+    if (fn_800E46B4()) {
+        return;
+    }
+    if (!fn_800E4254(nPlayer)) {
+        if (fn_80063C7C(pView)) {
+            GM_EndOfGolferTurn(nPlayer);
+            return;
+        }
+        if (fn_80063C90(pView)) {
+            return;
+        }
+        fn_80062B78(nPlayer);
+        fn_80062B74(nPlayer);
+        fn_80062B70();
+        fn_80063BF4(pView, *(f32*)(lbl_80281F78 + 0x170), (f32*)&vOffset);
+        return;
+    }
+    if (Player_IsNotCPU(nPlayer) && gSession.nSplitScreen == 0) {
+        if (gSession.bReplay == 0 && (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x19, 0)) &&
+            !(gPlayers[nPlayer].uFlags & 8)) {
+            if (GM_PlayerTakeMulligan(nPlayer)) {
+                fn_80062D0C(nPlayer);
+            }
+            return;
+        }
+        if (gReplayData[0xF10] && (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x18, 0)) &&
+            gpGame->b287 && (s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_CONCEDED && !fn_800E53B8() &&
+            !(*(u32*)((u8*)gPlayers[nPlayer].nShotHandle + 0x10) & 0x40)) {
+            fn_80062D0C(nPlayer);
+            fn_8006C300(nPlayer);
+            GOLFERSTATE_Switch(GS_REPLAY_SWING, nPlayer);
+            return;
+        }
+        if ((fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0, 0)) && !fn_8008AC40()) {
+            fn_800E41D4(nPlayer);
+        }
+    } else if (Player_IsNotCPU(nPlayer)) {
+        if (!fn_8008AC40() && (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0, 0))) {
+            fn_800E41D4(nPlayer);
+        }
+    } else if (Player_IsCPU(nPlayer) && !fn_8008AC40() && fn_80014300(fn_800142AC(0, 0))) {
+        fn_800E41D4(nPlayer);
+    }
+}
+
+// TW06: GM_ChooseRemoveBallState (by position). Whether the golfer takes the ball out of the cup
+// with the special animation: never in the special session mode, when fn_800E27A8 says no, or
+// after a picked-up ball. A shot of kind 2 first asks the mode (with the stroke taken back). Then
+// yes if 0xC2B is set; no during animation 9, beyond 5 yards (0xA64), or off the green; a scripted
+// answer in uFlags bits 0/1; otherwise 10% of the time two or more under par, else 25%.
+int GM_ChooseRemoveBallState(int nPlayer) {
+    if ((gSession.uFlags & 0x4000) && (gSession.uFlags & 0x8000)) {
+        return 0;
+    }
+    if (!fn_800E27A8()) {
+        return 0;
+    }
+    if (gPlayers[nPlayer].unkC2D) {
+        return 0;
+    }
+    if (fn_8006AA9C(nPlayer) == 2) {
+        gPlayers[nPlayer].nStrokes[gpGame->nCurHole]--;
+        if (!gpGame->pfn1FC(nPlayer)) {
+            gPlayers[nPlayer].nStrokes[gpGame->nCurHole]++;
+            if (gPlayers[nPlayer].bPlanReady) {
+                fn_8006AAB4(nPlayer, 1);
+                return 1;
+            }
+            return 0;
+        }
+        gPlayers[nPlayer].nStrokes[gpGame->nCurHole]++;
+    }
+    if (gPlayers[nPlayer].bPlanReady) {
+        return 1;
+    }
+    if (fn_80095780(gPlayers[nPlayer].nShotHandle) == 9) {
+        return 0;
+    }
+    if (gPlayers[nPlayer].fA64 > 5.0f) {
+        return 0;
+    }
+    if (*(s32*)(gPlayers[nPlayer].ball + 0x78) < 0 || *(s32*)(gPlayers[nPlayer].ball + 0x78) >= 156 ||
+        gSurfaceTypes[*(s32*)(gPlayers[nPlayer].ball + 0x78)].nClass != 3) {
+        return 0;
+    }
+    if (gPlayers[nPlayer].uFlags & 1) {
+        return (gPlayers[nPlayer].uFlags >> 1) & 1;
+    }
+    if (fn_800D2B08() - gPlayers[nPlayer].nStrokes[gpGame->nCurHole] > 1) {
+        if (Rand_Next(1) % 10 == 0) {
+            return 1;
+        }
+    } else if (!(Rand_Next(1) & 3)) {
+        return 1;
+    }
+    return 0;
 }

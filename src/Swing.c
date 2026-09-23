@@ -3386,7 +3386,7 @@ void STATEFUNC_GreenWatchRollUpdate(int nPlayer) {
 }
 
 
-int   fn_800DF5B4(int nPlayer);
+int   GM_ChooseRemoveBallState(int nPlayer);
 void  fn_800C7168(View* pView, int a);
 u8    fn_800C7170(View* pView);
 void  fn_800C7158(View* pView, int a);
@@ -3410,7 +3410,7 @@ void STATEFUNC_InTheHoleUpdate(int nPlayer) {
 
     if (lbl_80281E12 != 0) {
         lbl_80281E12 = 0;
-        fn_800C7168(pV, fn_800DF5B4(nPlayer));
+        fn_800C7168(pV, GM_ChooseRemoveBallState(nPlayer));
         if (fn_800C7170(pV)) {
             fn_800C7158(pV, 1);
             return;
