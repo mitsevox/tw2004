@@ -18,8 +18,8 @@ void fn_800A8134(AudSource* pSource, u32* auStreams, u16 uMask);
 
 AudSource* lbl_80282058;
 
-int fn_800A7AF0(void) {
-    int bOk;
+u8 fn_800A7AF0(void) {
+    u8 bOk;
     s32 i;
 
     bOk = 0;

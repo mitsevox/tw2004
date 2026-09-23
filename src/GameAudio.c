@@ -7,6 +7,7 @@
 // .sdata2 0x80283F48-0x80283F88), and all its functions share those globals.
 
 #include "core/gameaudio.h"
+#include "core/audtrack.h"
 
 // hlaudmovie.c
 void fn_800A874C(s32 n);
@@ -142,7 +143,6 @@ u8 lbl_80282020;
 // ---- sweep code (not yet cleaned up) ----
 
 u8 fn_800A3FF4(void);
-u8 fn_800A7AF0();
 u8 fn_800A8604();
 s32 fn_800A86BC(s32);
 u8 fn_800A8754();
@@ -231,8 +231,6 @@ void fn_800AD0C4();
 void fn_800AD1C4();
 s32 fn_800A7A34(s32 p0, s32 p1, s32 p2);
 void fn_800A7A98(s32 p0);
-void fn_800A94F4();
-void fn_800A7AD0(void);
 
 u8 fn_800A3E3C(s32 arg0) {
     u8 var_r3;
@@ -576,9 +574,6 @@ void fn_800A7A98(s32 p0) {
     fn_800A8D88(p0);
 }
 
-void fn_800A7AD0(void) {
-    fn_800A94F4();
-}
 
 // ---- end of sweep code ----
 
@@ -936,7 +931,7 @@ void fn_800A562C(u8 nPlayer) {
     fn_800AD800(nId, vPos, NULL, 0);
     fn_800ADA28(nId, 0, 1, 1);
     pView->f8 = 0.0f;
-    pView->fC = 1.0f / 59.94f;
+    pView->fC = 1.0f / FRAME_RATE;
     pView->n18 = 0;
 }
 
@@ -965,7 +960,7 @@ void fn_800A573C(u8 nPlayer) {
                 if (pView->n18 == 1 && pView->n18 != nState) {
                     fn_800ADA28(nId, 0, 1, 1);
                 } else {
-                    fSpeed = Vec_Distance(vPos, vLast) / (59.94f * pView->fC);
+                    fSpeed = Vec_Distance(vPos, vLast) / (FRAME_RATE * pView->fC);
                     fPitch = fSpeed * lbl_80281438;
                     fVolume = fSpeed * lbl_8028143C;
                     fPitch = (fPitch <= lbl_80281444) ? lbl_80281444 : fPitch;
@@ -1526,6 +1521,10 @@ void fn_800A77E0(f32 fVolume) {
 void fn_800A78F0(f32 fVolume) {
     fVolume *= lbl_8018E988[14];
     fn_800A3FB4(14, fVolume);
+}
+
+void fn_800A7AD0(s16 nSound, u8 nTrack, u8 bOn) {
+    fn_800A94F4(nSound, nTrack, bOn);
 }
 
 void fn_800A7968(u8 nId, u8 nTrack, u8 a, u16 b, s32 c) {
