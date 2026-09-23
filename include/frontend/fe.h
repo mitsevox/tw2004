@@ -52,7 +52,10 @@ extern FEState lbl_801D7148;
 // The front end's screen state (lbl_801D87C0, 0x4C bytes). Only what the cleaned code reads.
 typedef struct FEScreen {
     u8  b0;                     // 0x00  set by fn_80079AD4
-    u8  unk1[0x38 - 0x1];
+    u8  a1[9];                  // 0x01  read by a menu message (fn_8007C7EC: 1 for index 9)
+    u8  unkA[0x2C - 0xA];
+    u8  a2C[4];                 // 0x2C  read and cleared by menu messages
+    u8  unk30[0x38 - 0x30];
     s32 n38;                    // 0x38  a menu message reads it (fn_8007DAD4)
     u8  unk3C[0x44 - 0x3C];
     f32 fFade;                  // 0x44  the fade to black before a movie, 0 to 1

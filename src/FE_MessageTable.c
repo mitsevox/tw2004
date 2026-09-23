@@ -54,6 +54,15 @@ f32  fn_80012C30(char* sz);             // UFont.c
 void GetGolferName(int nGolfer, char* szName);
 void fn_8007E458(int n, MsgArg* pArgs, MsgArg* pResult);
 
+// The handlers, by message number (fn_80079EA8 fills it).
+#define FE_NUM_MESSAGES 770
+MsgHandler lbl_801D77A8[FE_NUM_MESSAGES];
+
+// Run message nMsg's handler.
+void fn_80079E6C(int nMsg, MsgArg* pArgs, MsgArg* pResult) {
+    lbl_801D77A8[nMsg](pArgs, pResult);
+}
+
 void fn_8007BBA0(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = fn_800E2520((u8)pArgs[0].i);
 }
@@ -113,8 +122,16 @@ void fn_8007C12C(MsgArg* pArgs, MsgArg* pResult) {
     Session_SetGolfer(pArgs[1].i, pArgs[0].i);
 }
 
+void fn_8007C118(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = (gSession.uFlags >> 14) & 1;
+}
+
 void fn_8007C17C(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gSession.nNumPlayers;
+}
+
+void fn_8007C1F8(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = gSession.nGolfer[pArgs[0].i];
 }
 
 void fn_8007C218(MsgArg* pArgs, MsgArg* pResult) {
@@ -185,6 +202,17 @@ void fn_8007C7B0(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = (s8)fn_80077A80(pArgs[0].i)->bAvailable;
 }
 
+void fn_8007C7EC(MsgArg* pArgs, MsgArg* pResult) {
+    s32 n;
+
+    n = pArgs[0].i;
+    if (n == 9) {
+        pResult->i = 1;
+        return;
+    }
+    pResult->i = lbl_801D87C0.a1[n];
+}
+
 void fn_8007C94C(MsgArg* pArgs, MsgArg* pResult) {
 }
 
@@ -240,6 +268,14 @@ void fn_8007D270(MsgArg* pArgs, MsgArg* pResult) {
         lbl_80281ED4->b11702 = 1;
     } else {
         lbl_80281ED4->b11702 = 0;
+    }
+}
+
+void fn_8007D2A4(MsgArg* pArgs, MsgArg* pResult) {
+    if (lbl_80281ED4->b11702 != 0) {
+        pResult->i = 1;
+    } else {
+        pResult->i = 0;
     }
 }
 
@@ -335,6 +371,19 @@ void fn_8007DAD0(MsgArg* pArgs, MsgArg* pResult) {
 
 void fn_8007DAD4(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = lbl_801D87C0.n38;
+}
+
+void fn_8007DAE8(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = lbl_801D87C0.a2C[pArgs[0].i];
+}
+
+void fn_8007DB04(MsgArg* pArgs, MsgArg* pResult) {
+    s32 n;
+
+    n = pArgs[0].i;
+    if (n < 4) {
+        lbl_801D87C0.a2C[n] = 0;
+    }
 }
 
 void fn_8007DB28(MsgArg* pArgs, MsgArg* pResult) {
@@ -454,6 +503,14 @@ void fn_8007E8F0(MsgArg* pArgs, MsgArg* pResult) {
     lbl_801D7148.b0F = pArgs[0].i;
 }
 
+void fn_8007E904(MsgArg* pArgs, MsgArg* pResult) {
+    if (gSession.uFlags & 0x4000) {
+        pResult->i = 60;
+        return;
+    }
+    pResult->i = 30;
+}
+
 void fn_8007E92C(MsgArg* pArgs, MsgArg* pResult) {
     lbl_80281EE0->b83 = pArgs[0].i;
 }
@@ -500,6 +557,10 @@ void fn_8007FED8(MsgArg* pArgs, MsgArg* pResult) {
 
 void fn_8007FF3C(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = lbl_80281EE0->b86;
+}
+
+void fn_8007FF4C(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = gSession.nController[pArgs[0].i];
 }
 
 // The saved replay's course, hole and golfer.
@@ -571,6 +632,14 @@ void fn_80080CA8(MsgArg* pArgs, MsgArg* pResult) {
     *(s32*)pArgs[2].p = 0;
     *(s32*)pArgs[3].p = 0;
     *(s32*)pArgs[4].p = 0;
+}
+
+void fn_800810BC(MsgArg* pArgs, MsgArg* pResult) {
+    lbl_801D7148.aCPU[pArgs[0].i] = pArgs[1].i;
+}
+
+void fn_800810D8(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = lbl_801D7148.aCPU[pArgs[0].i];
 }
 
 // Pick the saved custom round the holes come from.
@@ -748,6 +817,25 @@ void fn_800833A4(MsgArg* pArgs, MsgArg* pResult) {
 
 void fn_800833C4(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
+}
+
+void fn_800833D0(MsgArg* pArgs, MsgArg* pResult) {
+    s32 n;
+
+    n = pArgs[0].i;
+    gSession.nGolfer[n] = (u8)(n + 30);
+}
+
+// No player slot has a backup row.
+void fn_800833F4(MsgArg* pArgs, MsgArg* pResult) {
+    lbl_801D7148.aBackup[0] = -1;
+    lbl_801D7148.aBackup[1] = -1;
+    lbl_801D7148.aBackup[2] = -1;
+    lbl_801D7148.aBackup[3] = -1;
+}
+
+void fn_80083414(MsgArg* pArgs, MsgArg* pResult) {
+    lbl_801D7148.aBackup[pArgs[0].i] = -1;
 }
 
 // The pad in port pArgs[0] is a WaveBird (its SI device type).
