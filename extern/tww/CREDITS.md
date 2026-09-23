@@ -13,3 +13,5 @@ Changed for this game (so the units link into the DOL):
   (TWW leaves it empty) and it and `unicode_to_UTF8` are declared `inline`: this game's copy is
   built with GC/1.3 (see configure.py), which inlines only those two, into `mbtowc` and `wcstombs`.
   This code is ours, not TWW's.
+- `src/dolphin/dvd/dvd.c`: `DVDChangeDiskAsync`'s panic for a missing company name gives line
+  2854, this game's revision of the file.

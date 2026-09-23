@@ -1361,7 +1361,10 @@ unsorted/sweep_8013B3C4.c:
 
 src/dolphin/dvd/dvd.c:
 	.text       start:0x8013B3C8 end:0x8013DCB4
-	.data       start:0x80199C40 end:0x80199C80
+	.data       start:0x80199BB8 end:0x80199D38
+	.bss        start:0x8027A5A0 end:0x8027A638
+	.sdata      start:0x80281A18 end:0x80281A38
+	.sbss       start:0x802827E0 end:0x80282830
 
 dolphin/dvd/dvdqueue.c:
 	.text       start:0x8013DCB4 end:0x8013DEAC

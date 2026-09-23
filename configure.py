@@ -493,7 +493,7 @@ config.libs = [
         "progress_category": "sdk",
         "src_dir": "extern/tww",
         "objects": [
-            Object(NonMatching, "src/dolphin/dvd/dvd.c"),
+            Object(Matching, "src/dolphin/dvd/dvd.c"),
             Object(Matching, "src/dolphin/os/OSMemory.c"),
             Object(Matching, "src/dolphin/os/OSThread.c"),
         ],
