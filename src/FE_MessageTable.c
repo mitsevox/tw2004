@@ -22,10 +22,6 @@ void fn_8009CD80(s32 nPort, s32 nSlot); // MC_Gc.c
 s32  fn_8009D390(s32 nPort, s32 nSlot); // MC_Gc.c
 s32  fn_8009EB44(s32 nPort, s32 nSlot); // MC_Gc.c
 s32  fn_800A1164(s32 nPort, s32 nSlot, char* pName, s32 n);     // MC.c
-u8   fn_800A2604(int n);                // lbl_80281FF0: a 0x4C-byte record's first byte
-char* fn_800A2614(int n);               // and the string at its 0xC
-s32  fn_800A2628(void);                 // lbl_80281FF4
-s32  fn_800A27F4(void);                 // lbl_80281FF8
 u8   fn_800E22E4(int nSlot, int a, int b);      // GameRound.c
 int  fn_800E2520(int nMode);            // GameRound.c
 void fn_800E25E0(void);                 // GameRound.c
