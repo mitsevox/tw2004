@@ -3,33 +3,29 @@
 // 214 command functions and fn_800850E4 runs one: most answer a question about the round (a
 // player's state, the score, the wind, Battle mode's clubs, the PGA Tour event) or act on it.
 
-#include "game_types.h"
+#include "game.h"
+#include "game/frontend.h"
+#include "game/modes/pgatoursim.h"
 
 // ---- sweep code (not yet cleaned up) ----
 
-s32 Game_CurHoleIndex();
 void fn_80086208(s32 p0, u8* p1);
 extern u8 lbl_80281F18;
 void fn_800A7350();
-void fn_800E3E3C();
-s32 fn_800E4BF8();
+void fn_800E3E3C(void);
+void fn_800E5240(int n);
 void fn_8008633C(void);
-extern u8 gNumPlayersSetUp;
 void fn_80086378(s32 p0, u8* p1);
 void fn_800E4238();
 void fn_800E42F4();
 void fn_80086384(u8* p);
 void fn_800863A8(u8* p);
-f32 AI_MaxDistance();
 f32 GM_GetGolferDistanceToPin();
 void fn_8008642C(u8* p0, u8* p1);
 void fn_80086460(u8* p0, u8* p1);
-extern u8 gPlayers[];
-s32 fn_800E27C0();
 void fn_800865E0(s32 p0, u8* p1);
 void fn_80086610(s32 p0, u8* p1);
 void fn_800866E8(void);
-s32 Game_GetMode();
 s32 fn_800FA4B8();
 void fn_80086940(s32 p0, u8* p1);
 void fn_80086970(u8* p0, u8* p1);
@@ -39,21 +35,9 @@ s32 fn_800F9254();
 s32 fn_800F9308();
 void fn_80086DFC(s32 p0, u8* p1);
 void fn_80086E2C(s32 p0, u8* p1);
-s32 fn_800E1788(s32);
-s32 fn_800E1904(s32, s32);
 s32 fn_800E8CA8(s32, s32);
-s32 fn_8011937C(s32, s32, s32);
 void fn_80086F0C(s32* arg0, s32* arg1);
-s32 fn_80118E30();
-s32 fn_8011908C();
-s32 fn_801190D8();
-s32 fn_80119118();
-s32 fn_80119638();
-s32 fn_801197CC();
 s32 fn_80119808();
-s32 fn_80119A04();
-void strcpy();
-void fn_80087038(u8* p0);
 void fn_8008709C(u8* p0, u8* p1);
 void fn_800870E4(u8* p0, u8* p1);
 void fn_80087130(u8* p0, u8* p1);
@@ -63,16 +47,12 @@ void fn_80087238(s32 p0, u8* p1);
 void fn_80087270(s32 p0, u8* p1);
 s32 fn_800FD704();
 void fn_800872F8(u8* p0, u8* p1);
-u8 Player_IsCPU(s32);
 void fn_800873D4(s32* arg0, s32* arg1);
-extern s32 gpSaveData;
-void fn_800C9038();
+void fn_800C9038(s32 nView, s32 a, s32 b);
 void fn_80087420(u8* p0);
 void fn_801002C0();
 void fn_800874F0(void);
-extern void* gpGame;
 void fn_80087510(void* arg0);
-void fn_800E5240();
 void fn_80100B38();
 void fn_80087574(u8* p0);
 s32 fn_8008AB4C();
@@ -102,7 +82,6 @@ s32 fn_800A2100();
 void fn_80087E9C(u8* p0, u8* p1);
 s32 fn_8008AC00();
 void fn_8008802C(s32 p0, u8* p1);
-s8 GOLFERSTATE_GetCurrentState(s32);
 void fn_8008805C(s32* arg0, s32* arg1);
 void fn_800ED974();
 void fn_800880AC(void);
@@ -111,12 +90,10 @@ void fn_80101CFC();
 void fn_80101D24();
 void fn_800881A8(void);
 void fn_800881C8(void);
-u8 fn_800E39F0();
 s32 fn_800F1DF0();
 s32 fn_800FDADC();
 void fn_80088208(void);
 void fn_8008823C(s32* arg0, s32* arg1);
-s32 fn_800E1BBC();
 s32 fn_800FDC5C();
 void fn_8008828C(u8* p0, u8* p1);
 void fn_800882C0(s32 p0, u8* p1);
@@ -142,17 +119,13 @@ void fn_80088654(s32 a, u8* p);
 s32 fn_800F1E1C();
 void fn_80088804(void);
 void fn_80088830(void);
-s32 strlen();
-void fn_80088834(u8* p0, u8* p1);
 void fn_800907AC();
 void fn_80088CC4(u8* p0);
-f32 fn_800D0478();
 void fn_800894B4(u8* p0, u8* p1);
 void fn_80089584(s32 a, u8* p);
 u8 fn_800DAD44();
 s32 fn_800DAD4C();
 void fn_80089590(s32* arg0, s32* arg1);
-s32 Rand_Next();
 void fn_80089648(s32 p0, u8* p1);
 void fn_8008967C(s32 a, u8* p);
 void fn_80089688(void);
@@ -164,8 +137,7 @@ void fn_800896D0(void);
 s32 fn_800E53A4(s32);
 void fn_80089A50(s32* arg0);
 void fn_80089AD0(void);
-extern u8 gSession[];
-u8* fn_80089B78(void);
+Session* fn_80089B78(void);
 extern u8 lbl_80189900[];
 s32 fn_800DADC0();
 void fn_80089B8C(s32 p0, u8* p1);
@@ -180,39 +152,30 @@ void fn_80089C4C(s32* arg0);
 void fn_800A6148();
 void fn_80089CAC(void);
 void fn_800834E8();
-void fn_800E4204();
 void fn_800E53AC();
 void fn_800E53C0();
 void fn_80089D04(void);
 void fn_80089D28(void);
 void fn_80089D48(void);
-extern s32 lbl_80282278;
 void fn_80089D68(u8* p0);
 void fn_80089D98(s32 a, u8* p);
 void fn_80089DA4(s32 a, u8* p);
 void fn_80089E5C(void);
 void fn_80089E60(void);
 void fn_80089E98(void);
-s32 Bag_CountClubs();
 void fn_80089E9C(u8* p0, u8* p1);
-u8 Bag_HasClub(s32, s32, void*);
-void fn_80089ED0(void* arg0, s32* arg1);
 s32 GameModeBattle_RemoveClub(s32, s32);
 s32 GameModeBattle_AddClub(s32, s32);
 void fn_80089F24(void* arg0);
 void fn_8008A184(void);
-s32 fn_800ED280();
-s32 fn_800ED2C8();
-void fn_8008A188(u8* p0);
-void fn_8008A1C8(u8* p0);
+char* fn_800ED280(int nId);
+char* fn_800ED2C8(int nId);
 void fn_8008A208(void);
 s32 fn_800E8114();
 void fn_8008A20C(u8* p0, u8* p1);
-u8 GameModeBattle_CanAddClub(s32, s32, void*);
-void fn_8008A240(void* arg0, s32* arg1);
-s32 GameModeDriverPGATour_GetName();
-void GameModeDriverPGATour_GetCurrentEventID();
-void fn_8008A468(u8* p0);
+int GameModeBattle_CanAddClub(int nPlayer, int nClub);
+char* GameModeDriverPGATour_GetName(s32 i);
+s32 GameModeDriverPGATour_GetCurrentEventID(void);
 s32 fn_800A7528();
 void fn_8008A758(s32 p0, u8* p1);
 f32 fn_80012C30(s32);
@@ -232,14 +195,12 @@ void fn_8008A914(void** arg0, s32* arg1);
 s32 fn_800E53E8(s32);
 void fn_8008A964(s32* arg0);
 void fn_8008AAAC(s32 a, u8* p);
-s32 fn_801197A4();
 void fn_8008AAB8(u8* p0, u8* p1);
 void fn_8008AB04(u8* p0, u8* p1);
 s32 fn_8008AB40(void);
 void fn_8008AC3C(void);
 s32 fn_8008AC40(void);
 void fn_8008AC48(s32 p0, s32 p1);
-void fn_800A7664();
 void fn_8008AC78(s32 p0, s32 p1);
 void fn_8008ACA4(s32 p0, s32 p1);
 void fn_8008ACD0(s32 p0, s32 p1);
@@ -350,14 +311,14 @@ void fn_80086F0C(s32* arg0, s32* arg1) {
     }
 }
 
-void fn_80087038(u8* p0) {
+void fn_80087038(MsgArg* pArgs) {
     s32 t0;
     s32 t1;
-    s32 t2;
-    t0 = fn_801197CC(0, *(s32*)p0);
+    char* t2;
+    t0 = fn_801197CC(0, pArgs[0].i);
     t1 = fn_80119118(0, t0);
     t2 = fn_80118E30(0, t1);
-    strcpy(*(s32*)(((u8*)*(s32*)(p0 + 0x4)) + 0x8), t2, *(s32*)(p0 + 0x4));
+    strcpy(((MsgString*)pArgs[1].p)->pStr, t2);
 }
 
 void fn_8008709C(u8* p0, u8* p1) {
@@ -429,7 +390,7 @@ void fn_800873D4(s32* arg0, s32* arg1) {
 }
 
 void fn_80087420(u8* p0) {
-    fn_800C9038(*(s32*)((gPlayers + (*(s32*)p0 * 3832)) + 0xA0C), *(s32*)(p0 + 0x4), *(s32*)(p0 + 0x8), gPlayers);
+    fn_800C9038(gPlayers[*(s32*)p0].nView[0], *(s32*)(p0 + 0x4), *(s32*)(p0 + 0x8));
 }
 
 void fn_800874F0(void) {
@@ -437,7 +398,7 @@ void fn_800874F0(void) {
 }
 
 void fn_80087510(void* arg0) {
-    (*(s32 (**)(s32, s32, void*))((u8*)(gpGame) + 0x25C))((*(s32*)((u8*)(arg0) + 0)), (*(s32*)((u8*)(arg0) + 4)), arg0);
+    gpGame->pfn25C(((s32*)arg0)[0], ((s32*)arg0)[1]);
 }
 
 void fn_80087574(u8* p0) {
@@ -518,7 +479,7 @@ void fn_8008802C(s32 p0, u8* p1) {
 }
 
 void fn_8008805C(s32* arg0, s32* arg1) {
-    if (GOLFERSTATE_GetCurrentState(*arg0) == 3) {
+    if ((s8)GOLFERSTATE_GetCurrentState(*arg0) == 3) {
         *arg1 = 1;
         return;
     }
@@ -549,7 +510,7 @@ void fn_80088208(void) {
 }
 
 void fn_8008823C(s32* arg0, s32* arg1) {
-    if (GOLFERSTATE_GetCurrentState(*arg0) == 4) {
+    if ((s8)GOLFERSTATE_GetCurrentState(*arg0) == 4) {
         *arg1 = 1;
         return;
     }
@@ -628,10 +589,8 @@ void fn_80088804(void) {
 void fn_80088830(void) {
 }
 
-void fn_80088834(u8* p0, u8* p1) {
-    s32 t0;
-    t0 = strlen(*(s32*)(((u8*)*(s32*)p0) + 0x8));
-    *(s32*)p1 = t0;
+void fn_80088834(MsgArg* pArgs, s32* pResult) {
+    *pResult = strlen(((MsgString*)pArgs[0].p)->pStr);
 }
 
 void fn_80088CC4(u8* p0) {
@@ -708,9 +667,9 @@ void fn_80089A50(s32* arg0) {
 void fn_80089AD0(void) {
 }
 
-u8* fn_80089B78(void) {
-    *(s32*)(gSession + 0xC) = 2;
-    return gSession;
+Session* fn_80089B78(void) {
+    gSession.nC = 2;
+    return &gSession;
 }
 
 void fn_80089B8C(s32 p0, u8* p1) {
@@ -787,7 +746,7 @@ void fn_80089E9C(u8* p0, u8* p1) {
 }
 
 void fn_80089ED0(void* arg0, s32* arg1) {
-    if (Bag_HasClub((*(s32*)((u8*)(arg0) + 0)), (*(s32*)((u8*)(arg0) + 4)), arg0) != 0) {
+    if (Bag_HasClub(((s32*)arg0)[0], ((s32*)arg0)[1]) != 0) {
         *arg1 = 1;
         return;
     }
@@ -805,16 +764,12 @@ void fn_80089F24(void* arg0) {
 void fn_8008A184(void) {
 }
 
-void fn_8008A188(u8* p0) {
-    s32 t0;
-    t0 = fn_800ED280(*(s32*)(p0 + 0x4));
-    strcpy(*(s32*)(((u8*)*(s32*)p0) + 0x8), t0, *(s32*)p0);
+void fn_8008A188(MsgArg* pArgs) {
+    strcpy(((MsgString*)pArgs[0].p)->pStr, fn_800ED280(pArgs[1].i));
 }
 
-void fn_8008A1C8(u8* p0) {
-    s32 t0;
-    t0 = fn_800ED2C8(*(s32*)(p0 + 0x4));
-    strcpy(*(s32*)(((u8*)*(s32*)p0) + 0x8), t0, *(s32*)p0);
+void fn_8008A1C8(MsgArg* pArgs) {
+    strcpy(((MsgString*)pArgs[0].p)->pStr, fn_800ED2C8(pArgs[1].i));
 }
 
 void fn_8008A208(void) {
@@ -827,18 +782,17 @@ void fn_8008A20C(u8* p0, u8* p1) {
 }
 
 void fn_8008A240(void* arg0, s32* arg1) {
-    if (GameModeBattle_CanAddClub((*(s32*)((u8*)(arg0) + 0)), (*(s32*)((u8*)(arg0) + 4)), arg0) != 0) {
+    // the caller tests only the low byte of the result
+    if ((u8)GameModeBattle_CanAddClub(((s32*)arg0)[0], ((s32*)arg0)[1]) != 0) {
         *arg1 = 1;
         return;
     }
     *arg1 = 0;
 }
 
-void fn_8008A468(u8* p0) {
-    s32 t1;
-    GameModeDriverPGATour_GetCurrentEventID();
-    t1 = GameModeDriverPGATour_GetName();
-    strcpy(*(s32*)(((u8*)*(s32*)p0) + 0x8), t1, *(s32*)p0);
+void fn_8008A468(MsgArg* pArgs) {
+    strcpy(((MsgString*)pArgs[0].p)->pStr,
+           GameModeDriverPGATour_GetName(GameModeDriverPGATour_GetCurrentEventID()));
 }
 
 void fn_8008A758(s32 p0, u8* p1) {
@@ -914,7 +868,7 @@ void fn_8008AB04(u8* p0, u8* p1) {
 }
 
 s32 fn_8008AB40(void) {
-    return *(s32*)((u8*)gpGame + 0x4);
+    return gpGame->n4;
 }
 
 void fn_8008AC3C(void) {
