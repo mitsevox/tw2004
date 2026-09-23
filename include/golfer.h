@@ -611,11 +611,13 @@ typedef struct CourseInfo {
     f32  (*pVerts)[3];          // 0x28  TW06: pVertexList
     u8*    pTriFlags;           // 0x2C  per vertex, for the triangle that ends there: bits 0-2 = 0 skip it;
                                 //       bit 3 done (fn_80050794); bits 4-5 / 6-7 its highest / lowest corner
-    u8     unk30[4];
+    u8*    pLight;              // 0x30  per vertex: the light on the ground there, 0..255 (fn_8004B78C)
     struct TerCell* pGrid;      // 0x34  nGridWidth x nGridLength cells, row by row. TW06: pTerrainGrid (0x3C)
-    u8     unk38[0x4C - 0x38];
+    u8     unk38[0x48 - 0x38];
+    struct TerObject* pObjects; // 0x48  the course objects. TW06: pObjectInstanceTable (0x54)
     struct TerPolyRef* pPolyRefs;   // 0x4C  TW06: pPolygonReferenceList (at 0x58 there)
-    u8     unk50[0x6C - 0x50];
+    u16*   pObjRefs;            // 0x50  per cell, the objects in it (indices). TW06: pObjectReferenceList (0x5C)
+    u8     unk54[0x6C - 0x54];
     f32    fFloor;              // 0x6C  a ball in the air above this with no ground under it is still in play
 
     PinPos pin[18];             // 0x70

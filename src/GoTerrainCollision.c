@@ -30,6 +30,19 @@ typedef struct TerCell {
     u16  nObjRefOffset;         // 0xA  TW06: uiObjectReferenceListOffset
 } TerCell;
 
+// A course object (0x24 bytes): a tree, a building, the pin. TW06: TGD_ObjectInstanceInfo (0x28
+// bytes, the same up to 0x24).
+typedef struct TerObject {
+    f32  vCentre[3];            // 0x00  TW06: fBoundingSphereOrigin
+    f32  fRadius;               // 0x0C  TW06: fBoundingSphereRadius
+    f32  vBase[3];              // 0x10  TW06: fBoundingCylinderBase
+    f32  fBaseRadius;           // 0x1C  TW06: fBoundingCylinderRadius
+    u16  nPatch;                // 0x20  TW06: uiPatchNum
+    u16  nObjList;              // 0x22  TW06: uiObjectListNum
+} TerObject;
+
+#define MAX_OBJECTS 1000
+
 #define TER_FIRST_VERTEX(pRef) (((pRef)->nVertexHi << 16) + (pRef)->nVertex)
 
 // A closed outline on the course (TW06: TNetwork, 0x14 bytes): the free-drop areas and the
@@ -49,6 +62,7 @@ extern s32       lbl_80281DC4;                          // free-drop networks lo
 extern s32       lbl_80281DC8;                          // out-of-bounds networks loaded
 extern TNetwork* lbl_801D5428[MAX_FREE_DROP_NETWORKS];
 extern TNetwork* lbl_801D548C[MAX_OOB_NETWORKS];
+extern u8        lbl_801D54A0[MAX_OBJECTS];        // objects near the current line
 
 u8    Course_RegisterLoader(int nChunk, void (*pfn)(u8*));   // 0x8000C0B4
 s32   fn_8000C140(f32* pPos, TNetwork* pNet, s32 nNodes);   // point in outline. TW06: wn_PnPoly
@@ -69,6 +83,17 @@ void  fn_800509A0(f32* pSrc, f32* pDst);                  // negate (paired-sing
 f32   fn_800CBEE0(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** ppRef, f32 (**ppTri)[3],
                   s32* pTri);
 f32   fn_80035074(f32 x);                                 // floor
+f32   fn_8004C8E0(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** ppRef, f32 (**ppTri)[3],
+                  s32* pTri);
+f32   fn_8004CB30(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** ppRef, f32 (**ppTri)[3],
+                  s32* pTri);
+f32   fn_8004D01C(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** ppRef, f32 (**ppTri)[3],
+                  s32* pTri);
+f32   Ter_CheckForDropLocation(CourseInfo* pCourse, f32* pPos, u8 bOnDropSurface, u8* pbDrop, u8* pbPreferred,
+                               SurfaceType** ppSurface);
+void  fn_8004D2E0(CourseInfo* pCourse, f32* pPos, TerPolyRef** ppRefLow, f32* pLow, f32 (**ppTriLow)[3],
+                  TerPolyRef** ppRefHigh, f32* pHigh, f32 (**ppTriHigh)[3]);
+u8    fn_8004E0D4(f32* pFrom, f32* pDir, f32 fRange, f32* pCentre, f32 fRadius);
 u8    fn_80050A9C(f32* pA, f32* pB, f32* pC, f32 fX, f32 fZ);
 void  fn_800509D8(f32* pTri, f32* pPos, f32* pA, f32* pB, f32* pC);
 
@@ -181,6 +206,30 @@ u8 fn_8004B6F8(f32* pFrom, f32* pTo, f32* pHit) {
         if (fn_8000C3C8(pFrom, pTo, lbl_801D548C[i], lbl_801D548C[i]->nNumNodes, pHit)) return 1;
     }
     return 0;
+}
+
+// TW06: f32 Ter_GetAmbientLight(TGD_TerrainInfo*, f32*). The light on the ground at a point, 0..1,
+// from the brightness byte of the triangle's vertex: the ground covering the point when it is
+// less than a quarter of a yard above it, else the ground under it, else the lowest ground. 1
+// (full light) with no ground, or on an object.
+f32 fn_8004B78C(CourseInfo* pCourse, f32* pPos) {
+    TerCell* pCell;
+    TerPolyRef* pRef;
+    f32 (*pTri)[3];
+    s32 nTri;
+    f32 fHeight;
+
+    fHeight = fn_8004D01C(pCourse, pPos, &pCell, &pRef, &pTri, &nTri);
+    if (fHeight == TER_NO_GROUND || fHeight > pPos[1] + 0.25f) {
+        fHeight = fn_800CBEE0(pCourse, pPos, &pCell, &pRef, &pTri, &nTri);
+        if (fHeight == TER_NO_GROUND) {
+            fHeight = fn_8004CB30(pCourse, pPos, &pCell, &pRef, &pTri, &nTri);
+        }
+    }
+    if (fHeight != TER_NO_GROUND && pRef->n2 == 0) {
+        return (pCourse->pLight + TER_FIRST_VERTEX(pRef))[nTri] / 255.0f;
+    }
+    return 1.0f;
 }
 
 // TW06: f32 Ter_CheckForDropLocation(TGD_TerrainInfo*, f32*, bool, bool*, bool*, TGD_MaterialInfo**).
@@ -781,6 +830,83 @@ void Ter_GetEnclosingGroundData(CourseInfo* pCourse, f32* pPos, f32* pLow, Surfa
     }
 }
 
+// TW06: f32 Ter_GetSupportingWorldData(TGD_TerrainInfo*, f32*, TGD_MaterialInfo**, f32*). The
+// height of whatever supports a point (objects included), with its surface and upward normal;
+// TER_NO_GROUND and no surface when there is none.
+f32 fn_8004DBB0(CourseInfo* pCourse, f32* pPos, SurfaceType** ppSurface, f32* pNormal) {
+    f32 vA[4];
+    f32 vB[4];
+    f32 vC[4];
+    f32 vAB[4];
+    f32 vBC[4];
+    TerCell* pCell;
+    TerPolyRef* pRef;
+    f32 (*pTri)[3];
+    f32 fHeight;
+
+    fHeight = fn_8004CD94(pCourse, pPos, &pCell, &pRef, &pTri);
+    if (fHeight != TER_NO_GROUND) {
+        Vec3Copy(pTri[0], vA);
+        Vec3Copy(pTri[1], vB);
+        Vec3Copy(pTri[2], vC);
+        fn_8005097C(vA, vB, vAB);
+        fn_8005097C(vB, vC, vBC);
+        vec4flt_CrossProduct(vAB, vBC, pNormal);
+        fn_800BAF04(pNormal, pNormal);
+        if (pNormal[1] < 0.0f) {
+            fn_800509A0(pNormal, pNormal);
+        }
+        *ppSurface = &gSurfaceTypes[pRef->nSurface];
+    } else {
+        *ppSurface = NULL;
+    }
+    return fHeight;
+}
+
+// Mark in lbl_801D54A0 the objects of grid cell (nX, nZ) that the line from pFrom along pDir
+// passes within fRange of (entry 0 is always marked).
+void fn_8004DF10(CourseInfo* pCourse, f32* pFrom, f32* pDir, int nX, int nZ, f32 fRange) {
+    int i;
+    u16* pRefs;
+    TerCell* pCell;
+    TerObject* pObj;
+
+    lbl_801D54A0[0] = 1;
+    for (i = 1; i < MAX_OBJECTS; i++) {
+        lbl_801D54A0[i] = 0;
+    }
+    if (nX >= 0 && nX < pCourse->nGridWidth && nZ >= 0 && nZ < pCourse->nGridLength) {
+        pCell = &pCourse->pGrid[nX + nZ * pCourse->nGridWidth];
+        pRefs = &pCourse->pObjRefs[pCell->nObjRefOffset];
+        for (i = pCell->nObjRefs - 1; i >= 0; i--) {
+            pObj = &pCourse->pObjects[*pRefs];
+            if (fn_8004E0D4(pFrom, pDir, fRange, pObj->vCentre, pObj->fRadius)) {
+                lbl_801D54A0[*pRefs] = 1;
+            }
+            pRefs++;
+        }
+    }
+}
+
+// TW06: bool Ter_LineSphereIntersection(f32*, f32*, f32, f32*, f32). Whether a sphere (centre,
+// radius) is within fRange of pFrom and either around it or ahead of it along pDir.
+u8 fn_8004E0D4(f32* pFrom, f32* pDir, f32 fRange, f32* pCentre, f32 fRadius) {
+    f32 vTo[4];
+    f32 vCentre[4];
+    f32 fDist;
+
+    vCentre[0] = pCentre[0];
+    vCentre[1] = pCentre[1];
+    vCentre[2] = pCentre[2];
+    vCentre[3] = 1.0f;
+    fn_8005097C(vCentre, pFrom, vTo);
+    fDist = (f32)fn_80009680(fn_80009744(vTo)) - fRadius;
+    if (fDist > fRange) return 0;
+    if (fDist < 0.0f) return 1;
+    if (fn_8000C5FC(vTo, pDir) < 0.0f) return 0;
+    return 1;
+}
+
 // Mark every ground triangle's highest and lowest corner in its flags (bits 4-5 and 6-7), using
 // bit 3 to do each triangle once, then clear bit 3 again. TW06 has the two halves as
 // Ter_ComputeHighestPointInEveryTriangle and Ter_ClearVertexProcessedBit.
@@ -852,6 +978,44 @@ void fn_80050794(CourseInfo* pCourse) {
     }
 }
 
+// The difference a - b of two three-float vectors, into pOut.
+asm void fn_8005097C(register f32* pA, register f32* pB, register f32* pOut) {
+    nofralloc
+    psq_l  f0, 0(pA), 0, 0
+    psq_l  f1, 8(pA), 1, 0
+    psq_l  f2, 0(pB), 0, 0
+    psq_l  f3, 8(pB), 1, 0
+    ps_sub f2, f0, f2
+    ps_sub f3, f1, f3
+    psq_st f2, 0(pOut), 0, 0
+    psq_st f3, 8(pOut), 1, 0
+    blr
+}
+
+// A three-float vector negated, into pOut.
+asm void fn_800509A0(register f32* pA, register f32* pOut) {
+    nofralloc
+    psq_l  f0, 0(pA), 0, 0
+    psq_l  f1, 8(pA), 1, 0
+    ps_neg f0, f0
+    ps_neg f1, f1
+    psq_st f0, 0(pOut), 0, 0
+    psq_st f1, 8(pOut), 1, 0
+    blr
+}
+
+// A four-float vector negated, into pOut.
+asm void fn_800509BC(register f32* pA, register f32* pOut) {
+    nofralloc
+    psq_l  f0, 0(pA), 0, 0
+    psq_l  f1, 8(pA), 0, 0
+    ps_neg f0, f0
+    ps_neg f1, f1
+    psq_st f0, 0(pOut), 0, 0
+    psq_st f1, 8(pOut), 0, 0
+    blr
+}
+
 // TW06: Ter_GetBarycentricCoords (an inline in goterrainutils.h there). The weights of a point
 // against a triangle's three corners, in the x-z plane.
 void fn_800509D8(f32* pTri, f32* pPos, f32* pA, f32* pB, f32* pC) {
@@ -889,6 +1053,12 @@ u8 fn_80050A9C(f32* pA, f32* pB, f32* pC, f32 fX, f32 fZ) {
         if ((pA[0] - pC[0]) * (fZ - pC[2]) - (pA[2] - pC[2]) * (fX - pC[0]) < 0.0f) return 0;
     }
     return 1;
+}
+
+// A signed byte of an object's data: its +0x24 + n. Called with n = 0 from
+// Ter_CheckObjectAndHazardObstruction, which tests bit 0x40 of it.
+int fn_80050BD8(s8** ppData, int n) {
+    return (*ppData)[n + 0x24];
 }
 
 // TW06: s32 MaterialTypes::getMaterialID(const TGD_MaterialInfo*). A surface's row in
