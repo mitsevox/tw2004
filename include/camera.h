@@ -7,6 +7,19 @@
 
 #include "engine.h"
 
+// A render camera's lens (our name; unsorted/cull.h called it CameraSub): what fn_80008370 returns,
+// the pointer at the render camera's +0x10. Only the fields read so far; its size is unknown.
+typedef struct CamLens {
+    s32  nType;                 // 0x00  0: a perspective camera, else flat (LLObj_Gc.c)
+    f32  v4[3];                 // 0x04  a position: the green zoom-to-aim camera copies it to View.v20
+    u8   unk10[0x34 - 0x10];
+    f32  v34[3];                // 0x34  a position: GameMode8 measures the ball's distance to it
+    u8   unk40[0xB0 - 0x40];
+    f32  fB0;                   // 0xB0  fn_8001EFFC; the zoom-to-aim camera divides its distance by it
+    f32  fB4;                  // 0xB4  a flat camera's view width (guess)
+    f32  fB8;                   // 0xB8  its view height (guess)
+} CamLens;
+
 // A camera shot (0xC0 bytes): a named script position the camera script moves to. The shots of a
 // sequence are chained through p40.
 typedef struct CamShot {
@@ -112,7 +125,9 @@ typedef struct View {
     u8       unk151[2];
     u8       b153;              // 0x153
     s32      n154;              // 0x154
-    u8       unk158[0x164 - 0x158];
+    u8       unk158[4];
+    f32      f15C;              // 0x15C  camera 8: the ground height it follows
+    u8       unk160[4];
     s32      n164;              // 0x164  a shot kind for fn_8003A950 (25 = none)
     f32      f168;              // 0x168
     u8       unk16C[0x18C - 0x16C];
@@ -172,7 +187,8 @@ typedef struct CamTuning {
     f32  f8C;                   // 0x08C
     u8   unk90[4];
     f32  f94;                   // 0x094  the elevator camera's first blend value
-    u8   unk98[0xB8 - 0x98];
+    f32  f98;                   // 0x098  camera 8: 1 - this is its height's share of the move a frame
+    u8   unk9C[0xB8 - 0x9C];
     f32  fB8;                   // 0x0B8  camera 15 waits this long on a ball near the green
     s32  nBeats;                // 0x0BC  the heartbeat camera's beats
     s32  nBeatFrames;           // 0x0C0

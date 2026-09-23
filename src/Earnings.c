@@ -290,8 +290,8 @@ u8 fn_800D4EF8(u32 uMask, int nBit) {
     return (uMask & (1 << nBit)) != 0;
 }
 
-// Without bCheck: whether the profile has every one of its 31 aC8 flags. With it: whether this is
-// game mode 23 with 30 of them and fn_800CF450 agrees.
+// Without bCheck: whether the profile has won all 31 PGA TOUR tournaments. With it: whether this is
+// game mode 23 with 30 won and fn_800CF450 agrees.
 u8 fn_800D68CC(int nPlayer, u8 bCheck) {
     SaveProfile* pProfile;
     int i;
@@ -303,7 +303,7 @@ u8 fn_800D68CC(int nPlayer, u8 bCheck) {
     if (!bCheck) {
         bAll = 1;
         for (i = 0; i < 31; i++) {
-            if (!pProfile->aC8[i].b) {
+            if (!pProfile->aC8[i].award.bWon) {
                 bAll = 0;
             }
         }
@@ -311,7 +311,7 @@ u8 fn_800D68CC(int nPlayer, u8 bCheck) {
     }
     n = 0;
     for (i = 0; i < 31; i++) {
-        if (pProfile->aC8[i].b) {
+        if (pProfile->aC8[i].award.bWon) {
             n++;
         }
     }
@@ -319,8 +319,8 @@ u8 fn_800D68CC(int nPlayer, u8 bCheck) {
     return 0;
 }
 
-// Without bCheck: whether the profile has any of its aC8 flags. With it: whether this is game mode
-// 23 and fn_800CF450 agrees.
+// Without bCheck: whether the profile has won any PGA TOUR tournament. With it: whether this is
+// game mode 23 and fn_800CF450 agrees.
 u8 fn_800D69B8(int nPlayer, u8 bCheck) {
     SaveProfile* pProfile;
     int i;
@@ -331,7 +331,7 @@ u8 fn_800D69B8(int nPlayer, u8 bCheck) {
     if (!bCheck) {
         bAny = 0;
         for (i = 0; i < 31; i++) {
-            if (pProfile->aC8[i].b) {
+            if (pProfile->aC8[i].award.bWon) {
                 bAny = 1;
             }
         }
@@ -520,7 +520,7 @@ u8 fn_800D76AC(int nPlayer, int nAward) {
 }
 
 // Mark an award won, with today's date; 1 if it was not won before.
-s32 fn_800D7770(int nPlayer, Award* pAward) {
+u8 fn_800D7770(int nPlayer, Award* pAward) {
     if (fn_800E177C() != 0) return 0;
     if (Player_IsCPU(nPlayer)) return 0;
     if (gpSaveData[gPlayers[nPlayer].nIndex].bActive != 1) return 0;
