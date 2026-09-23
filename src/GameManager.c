@@ -947,8 +947,8 @@ void GM_RestartHole(void) {
         GameEffects_ResetGameEffectSettings();
         fn_800C6C8C();
         for (i = 0; i < gSession.nNumPlayers; i++) {
-            fn_800957D8(gPlayers[i].nShotHandle);
-            fn_800957FC(gPlayers[i].nShotHandle, 1);
+            fn_800957D8(PLAYER(i)->nShotHandle);
+            fn_800957FC(PLAYER(i)->nShotHandle, 1);
         }
         fn_800E5714(2);
     }
@@ -1004,8 +1004,8 @@ void fn_800DEB5C(int nPlayer) {
 void GM_GolferConcede_Hole(int nPlayer) {
     Player* p;
     int     i;
-    int     n;
     int     nPlayers;
+    int     n;
     fn_800E3D38(nPlayer, 0);
     p = &gPlayers[nPlayer];
     p->nLie = LIE_HOLED;
@@ -1016,15 +1016,15 @@ void GM_GolferConcede_Hole(int nPlayer) {
         nPlayers = gNumPlayersSetUp;
         n = 0;
         for (i = 0; i < nPlayers; i++) {
-            if (gPlayers[i].nLie != LIE_HOLED) {
+            if (PLAYER(i)->nLie != LIE_HOLED) {
                 n++;
             }
         }
         if (n == 1) {
             for (i = 0; i < nPlayers; i++) {
                 if (i != nPlayer) {
-                    gPlayers[i].nLie = LIE_HOLED;
-                    *(s32*)(gPlayers[i].ball + 0x64) = 0;
+                    PLAYER(i)->nLie = LIE_HOLED;
+                    *(s32*)(PLAYER(i)->ball + 0x64) = 0;
                 }
             }
         }

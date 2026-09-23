@@ -511,6 +511,10 @@ typedef struct CourseInfo {
 extern GolferRecord gGolferTable[34];   // 0x801CB300  STATS_GC.BIN as loaded
 extern GolferRecord gCurGolferRecord;   // 0x801CB1C0  the created golfer being edited
 extern Player       gPlayers[5];        // 0x801C66E8
+
+// Player i by byte offset. Some of EA's loops index the players this way: it is the only form
+// that gives the original's separate base and offset registers (tested against the compiler).
+#define PLAYER(i) ((Player*)((u8*)gPlayers + (i) * sizeof(Player)))
 extern Session      gSession;           // 0x801CDD80
 extern GameState*   gpGame;             // 0x80281588
 

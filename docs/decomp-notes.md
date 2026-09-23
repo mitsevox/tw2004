@@ -181,6 +181,18 @@ Reading compiler output
   the mask call inline: `if (fn_800136DC(x) & fn_800142AC(k, m))`. A `uMask` local assigned
   first gives `and. r0, rM, r3`, and swapping the operands in the source changes nothing. Applied
   to every single-use mask in Swing.c (States 04/05/08/09/10 exact, 06/12/14/22 closer).
+- **[verified] A loop over the players with a separate base and offset register** (`addi rB,
+  gPlayers@l` before the loop, `add rP, rB, rOff` inside, `addi rOff, rOff, 0xEF8`) comes from
+  byte arithmetic: `(Player*)((u8*)gPlayers + i * sizeof(Player))` (the `PLAYER(i)` macro in
+  `golfer.h`). Every other spelling (`&gPlayers[i]`, `gPlayers + i`, a local base pointer, an
+  unsized array, other counter types) walks one pointer instead. Found with ten-line test
+  functions (2026-09-23): `GM_RestartHole` exact, `fn_800E1074` 85 -> 98%, `GM_GolferConcede_Hole`
+  85 -> 99.6%. Not every player loop uses it (`GM_CheckForAIConcede` got worse).
+- **[verified] Three identical branches after one compare** (`cmpw; blt; blt; blt`) are
+  `(a >= b && a >= b && a >= b)`: a comparison macro written for several fields that are all
+  the same value here (`RECORD_AT_LEAST` in `GameManager.c`).
+- **[verified] GC/2.0, 2.5 and 2.6 compile the game units identically; GC/2.0p1 is worse**
+  (Golfer 70 -> 67, Ball 63 -> 46, Swing 139 -> 133). Tested on every game unit, 2026-09-23.
 - **[verified] `x / 2.0f` becomes `x * 0.5f`** with the constant loaded first (`lfs f0, 0.5;
   lfs f2, x`). Writing `x * 0.5f` loads them the other way round. (STATEFUNC_ShowYardageUpdate.)
 - **[verified] `!(a >= b || c > d)` vs `a < b && c <= d`.** The original's float compares follow
