@@ -3387,11 +3387,8 @@ unsorted/sweep_800BF094.c:
 unsorted/sweep_800C06C8.c:
 	.text       start:0x800C06C8 end:0x800C0744
 
-unsorted/sweep_800C0804.c:
-	.text       start:0x800C0804 end:0x800C0880
-
-unsorted/sweep_800C3EB8.c:
-	.text       start:0x800C3EB8 end:0x800C3EDC
+GoGolfCam.c:
+	.text       start:0x800C0804 end:0x800C3EDC
 
 unsorted/sweep_800C44A8.c:
 	.text       start:0x800C44A8 end:0x800C44CC
