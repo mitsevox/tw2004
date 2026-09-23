@@ -108,6 +108,19 @@ void fn_80079AD4(void);
 void fn_80079D30(void);
 void fn_80079DAC(void);
 
+// This file's globals (fe.h), each section in reverse address order as the compiler lays it out.
+FEState lbl_801D7148;
+FEProfile* lbl_80281ED4;
+u32 lbl_80281ED0;
+u32 lbl_80281ECC;
+u8* lbl_80281EC8;
+
+// fake match: stands in for a function the original linker stripped. The file's pool starts with
+// 1.0f (0x80283AC0), before the 0.0f and 0.05f FE_GetBIOMovieName uses first; its body is unknown.
+static f32 FE_Manager_StrippedFn(f32 x) {
+    return x + 1.0f;
+}
+
 // The 'BIO ' stream object's handler: keep a copy of its data.
 void fn_80076F80(UStreamObject* pObject) {
     lbl_80281EC8 = fn_80009B34(pObject->uSize, 2, 32, "FE_Manager.c", 285);
@@ -852,7 +865,10 @@ u8 fn_80078B84(CrAPAsset* pAsset) {
     if (fn_8015F844(pAsset->szName, "Purple") == 0) {
         return 1;
     }
-    return fn_8015F844(pAsset->szName, "Blue") == 0;
+    if (fn_8015F844(pAsset->szName, "Blue") == 0) {
+        return 1;
+    }
+    return 0;
 }
 
 // Anything worn on the head but a plain hat (one worn backwards counts) or a visor.
@@ -896,7 +912,10 @@ u8 fn_80078D24(CrAPAsset* pAsset) {
     if (fn_8015F844(pAsset->szName, "Purple") == 0) {
         return 1;
     }
-    return fn_8015F844(pAsset->szName, "Blue") == 0;
+    if (fn_8015F844(pAsset->szName, "Blue") == 0) {
+        return 1;
+    }
+    return 0;
 }
 
 // A random created golfer: random parts 10, 9 and 16; hair (part 3) with a 10% chance of corn
