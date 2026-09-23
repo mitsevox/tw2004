@@ -306,3 +306,11 @@ void fn_8010A3C8(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // ---- end of sweep code ----
+
+// ---- sweep code (not yet cleaned up) ----
+
+void fn_8010A400(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = fn_801074D4(fn_80104FA8(pArgs[0].i, pArgs[1].i, pArgs[2].i));
+}
+
+// ---- end of sweep code ----
