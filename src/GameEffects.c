@@ -258,6 +258,11 @@ int GameEffects_BallUpdatesThisFrame(int nPlayer) {
     return 0.5f + gSession.fFrameTime / (1.0f / 59.94f);
 }
 
+// The player's current target (an inline in EA's source; calling fn_800F1D34 directly does not match).
+inline int GE_CurrentTarget(int nPlayer) {
+    return fn_800F1D34(nPlayer);
+}
+
 // TW06: GameEffects_CheckScriptedGB (by position). A scripted GameBreaker for a record chance:
 // reason 12 while the round can still beat the course record, reason 15 when the drive beats the
 // longest-drive record (the record is in feet). Only for a human, one view, not in a replay, and
@@ -318,7 +323,7 @@ void fn_800DB4E8(int nPlayer) {
                     nReason = 23;
                 }
             } else if ((Game_GetMode() == 16 || Game_GetMode() == 16) && fn_800F20C0(nPlayer) == 39 &&
-                       gPlayers[nPlayer].nDE4[fn_800F1D34(nPlayer)] == 0) {
+                       gPlayers[nPlayer].nDE4[GE_CurrentTarget(nPlayer)] == 0) {
                 bStart = 1;
                 nReason = 23;
             }
