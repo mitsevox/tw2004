@@ -84,8 +84,8 @@ void vec4flt_CrossProduct(f32* pA, f32* pB, f32* pOut);   // cross product
 
 // A texture in a bank (0x50 bytes; the bank's p8 is an array of them). Only what the game code reads.
 typedef struct TexEntry {
-    u8   unk0[8];
-    u32  uPixels;               // 0x08  where its pixels start in the bank's p18
+    u64  u0;                    // 0x00  compared as one value (fn_80073878)
+    u32  uPixels;              // 0x08  where its pixels start in the bank's p18
     u8   unkC[0x3C - 0xC];
     s16  nPalette;              // 0x3C  its row in the bank's pC
     u8   unk3E[0x50 - 0x3E];
@@ -101,8 +101,10 @@ LAYOUT_ASSERT(TexPalette, 0xC);
 
 // A loaded texture bank (up to 200, listed at lbl_801A26DC). Only what the game code reads.
 typedef struct TexBank {
-    u8   unk0[8];
-    TexEntry*   p8;             // 0x08  its textures
+    u8   unk0[2];
+    s16  n2;                    // 0x02  how many textures p8 holds
+    u8   unk4[4];
+    TexEntry*   p8;            // 0x08  its textures
     TexPalette* pC;             // 0x0C  its palettes
     u8   unk10[0x18 - 0x10];
     u8*  p18;                   // 0x18  the pixel data
