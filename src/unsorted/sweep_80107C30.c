@@ -1,9 +1,7 @@
 // Small functions found by the sweep (sweep.py). Original file and meanings unknown.
 
-#include "game_types.h"
+#include "game/frontend.h"
 
-
-void fn_80107C30(s32 a, u8* p);
-void fn_80107C30(s32 a, u8* p) {
-    *(s32*)(p + 0x0) = 0;
+void fn_80107C30(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = 0;
 }

@@ -224,7 +224,8 @@ typedef struct SaveProfile {
     u32  aB344[94];             // 0x0B344
     u32  aB4BC[94];             // 0x0B4BC
     TourSeason tour;            // 0x0B634
-    u8   unk104D0[0x1054C - 0x104D0];
+    u8   unk104D0[0x10548 - 0x104D0];
+    u32  a10548[1];             // 0x10548  a bit array: FE_CrAPMessages.c's fn_80108E4C tests bit n
     SaveLockEntry a1054C[11];   // 0x1054C  cleared by the profile setup; fn_80078008's lock kinds
                                 //          10 and 11 read them
     u8   a10578[4];             // 0x10578  marked holes 71..74: fn_800588F4's kind 0

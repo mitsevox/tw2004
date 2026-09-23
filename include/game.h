@@ -196,6 +196,9 @@ void fn_800D2884(s32 nMonth, s32 nYear, s32* pMonth, s32* pYear);  // the month 
 void fn_800D28B0(s32 nMonth, s32 nYear, s32* pMonth, s32* pYear);  // the month after
 void fn_800D28DC(u16 nDate, char* szOut);       // a date as text
 u16  fn_800D2994(void);                 // today's date
+u8   fn_800D256C(u32 nYear);            // a leap year (1900 counts as one)
+s32  fn_800D2608(u16 nDate);            // a date's day of the month
+s32  fn_800D2640(u16 nDate);            // a date's month
 int  fn_800D2ABC(int nCourse, int nHole);   // a hole's par on a course
 int  fn_800D2AD8(int nHole);            // a hole's par
 void fn_800D3548(int nPlayer, int nMoney, CourseMoneyTracking* pMoney);   // pMoney may be NULL

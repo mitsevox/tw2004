@@ -1,18 +1,12 @@
 // Small functions found by the sweep (sweep.py). Original file and meanings unknown.
 
-#include "game_types.h"
+#include "charstate.h"
+#include "frontend/fe.h"
+#include "game/frontend.h"
 
-s32 fn_8001E9CC();
-s32 fn_80077ACC();
-s32 fn_80104FA8();
-
-void fn_80108B10(u8* p0, u8* p1);
-void fn_80108B10(u8* p0, u8* p1) {
-    s32 t0;
-    s32 t1;
-    s32 t2;
-    t0 = fn_80077ACC();
-    t1 = fn_80104FA8(((s16)*(s32*)p0), *(s32*)(p0 + 0x4), *(s32*)(p0 + 0x8));
-    t2 = fn_8001E9CC(((t0 + 0x10000) - 19644), t1);
-    *(s32*)p1 = (t2 & 0xFF);
+// A part's choice has its aB344 bit set.
+void fn_80108B10(MsgArg* pArgs, MsgArg* pResult) {
+    SaveProfile* pProfile = fn_80077ACC();
+    int nAsset = fn_80104FA8(pArgs[0].i, pArgs[1].i, pArgs[2].i);
+    pResult->i = fn_8001E9CC(pProfile->aB344, nAsset);
 }

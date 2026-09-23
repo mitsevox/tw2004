@@ -1,10 +1,9 @@
 // Small functions found by the sweep (sweep.py). Original file and meanings unknown.
 
-#include "game_types.h"
+#include "frontend/fe.h"
+#include "game/frontend.h"
 
-s32 fn_801072CC(s16, s32, s32, s32, s32);
-
-void fn_80109EAC(void* arg0);
-void fn_80109EAC(void* arg0) {
-    fn_801072CC((s16) (*(s32*)((u8*)(arg0) + 0)), (*(s32*)((u8*)(arg0) + 0xC)), (*(s32*)((u8*)(arg0) + 8)), (*(s32*)((u8*)(arg0) + 0x10)), (*(s32*)((u8*)(arg0) + 4)));
+// Count a part's offered assets into four results.
+void fn_80109EAC(MsgArg* pArgs, MsgArg* pResult) {
+    fn_801072CC(pArgs[0].i, pArgs[3].p, pArgs[2].p, pArgs[4].p, pArgs[1].p);
 }
