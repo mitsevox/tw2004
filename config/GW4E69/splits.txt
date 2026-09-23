@@ -3065,28 +3065,7 @@ TibExt.c:
 	.text       start:0x801220D4 end:0x801228E0
 
 gbacable.c:
-	.text       start:0x80122CFC end:0x80123E34
-
-unsorted/sweep_80123FF8.c:
-	.text       start:0x80123FF8 end:0x8012402C
-
-unsorted/sweep_8012402C.c:
-	.text       start:0x8012402C end:0x8012408C
-
-unsorted/sweep_8012408C.c:
-	.text       start:0x8012408C end:0x801240A8
-
-unsorted/sweep_801240A8.c:
-	.text       start:0x801240A8 end:0x8012411C
-
-unsorted/sweep_801241AC.c:
-	.text       start:0x801241AC end:0x80124238
-
-unsorted/sweep_80124238.c:
-	.text       start:0x80124238 end:0x80124280
-
-unsorted/sweep_80124280.c:
-	.text       start:0x80124280 end:0x801242D0
+	.text       start:0x801228E0 end:0x801247C0
 
 unsorted/sweep_801247C0.c:
 	.text       start:0x801247C0 end:0x80124814
