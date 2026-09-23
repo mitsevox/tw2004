@@ -351,7 +351,7 @@ s32   fn_800FF49C(int nPlayer);
 s32   fn_800FF4B4(int nPlayer);
 s32   fn_800FF4CC(int nPlayer);
 s32   fn_800FF514(int nPlayer);
-s32   fn_800FF604(void);
+s32   fn_800FF604(int nPlayer);   // GameMode12.c defines it without the (unused) player
 s32   fn_800FF60C(int nPlayer, int i);
 s32   fn_800FF620(int nPlayer, int i);
 void  fn_800FF634(int nPlayer);
@@ -563,9 +563,9 @@ void fn_80085120(void) {
     lbl_801D83B0[181] = fn_8008A0CC;
     lbl_801D83B0[197] = fn_8008A128;
     lbl_801D83B0[182] = fn_800860C8;
-    lbl_801D83B0[183] = fn_8008A184;
     lbl_801D83B0[184] = fn_8008A188;
     lbl_801D83B0[185] = fn_8008A1C8;
+    lbl_801D83B0[183] = fn_8008A184;
     lbl_801D83B0[186] = fn_8008A208;
     lbl_801D83B0[187] = fn_8008A20C;
     lbl_801D83B0[188] = fn_8008A240;
@@ -605,7 +605,7 @@ u8 fn_80085BC0(int nController) {
     }
     for (i = 0; i < gSession.nNumPlayers; i++) {
         if (((s8)GOLFERSTATE_GetCurrentState(i) != GS_WAIT || Game_GetMode() == 7) &&
-            (nController == gPlayers[i].nController || Player_IsCPU(i))) {
+            (nController == PLAYER(i)->nController || Player_IsCPU(i))) {
             return 1;
         }
     }
@@ -684,41 +684,29 @@ void fn_80085F5C(MsgArg* pArgs, MsgArg* pResult) {
 
 // A player's strokes on a hole; "hole" 18 is the front nine, 19 the back nine, 20 the round.
 void fn_80085FDC(MsgArg* pArgs, MsgArg* pResult) {
-    switch (pArgs[1].i) {
-    case 18:
+    if (pArgs[1].i == 18) {
         pResult->i = fn_800E19A4(pArgs[0].i, 9);
-        return;
-    case 19:
+    } else if (pArgs[1].i == 19) {
         pResult->i = fn_800E1788(pArgs[0].i) - fn_800E19A4(pArgs[0].i, 9);
-        return;
-    case 20:
+    } else if (pArgs[1].i == 20) {
         pResult->i = fn_800E1788(pArgs[0].i);
-        return;
-    default:
-        if (Game_GetMode() == 19) {
-            pResult->i = fn_800E8C24((u8)pArgs[0].i, pArgs[1].i);
-            return;
-        }
+    } else if (Game_GetMode() == 19) {
+        pResult->i = fn_800E8C24((u8)pArgs[0].i, pArgs[1].i);
+    } else {
         pResult->i = gPlayers[pArgs[0].i].nStrokes[pArgs[1].i];
-        return;
     }
 }
 
 // The same for the mode's points.
 void fn_800860C8(MsgArg* pArgs, MsgArg* pResult) {
-    switch (pArgs[1].i) {
-    case 18:
+    if (pArgs[1].i == 18) {
         pResult->i = fn_800E19A4(pArgs[0].i, 9);
-        return;
-    case 19:
+    } else if (pArgs[1].i == 19) {
         pResult->i = fn_800E1788(pArgs[0].i) - fn_800E19A4(pArgs[0].i, 9);
-        return;
-    case 20:
+    } else if (pArgs[1].i == 20) {
         pResult->i = fn_800E1788(pArgs[0].i);
-        return;
-    default:
+    } else {
         pResult->i = gPlayers[pArgs[0].i].nModePoints[pArgs[1].i];
-        return;
     }
 }
 
@@ -893,26 +881,23 @@ void fn_800866EC(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_80086738(MsgArg* pArgs, MsgArg* pResult) {
-    u8 b1;
-    u8 b2;
-    u8 b3;
-    u8 b4;
-    u8 bNear;
+    u8 bView6E44;
+    u8 bView708C;
+    u8 bCharFlag;               // the golfer's uFlags bit 1
+    u8 bOtherN20;               // the golfer's n20 is not 9, 11 or 12
+    u8 bNearEnd;                // his animation has less than the camera tuning's f170 left
 
     if (pArgs[0].i >= 5) {
         pResult->i = 1;
         return;
     }
-    b1 = fn_800C6E44(fn_80017028(gPlayers[pArgs[0].i].nView[0]));
-    b2 = fn_800C708C(fn_80017028(gPlayers[pArgs[0].i].nView[0]));
-    b3 = fn_80062C1C(gPlayers[pArgs[0].i].pChar);
-    b4 = 0;
-    if (gPlayers[pArgs[0].i].pChar->n20 != 9 && gPlayers[pArgs[0].i].pChar->n20 != 11 &&
-        gPlayers[pArgs[0].i].pChar->n20 != 12) {
-        b4 = 1;
-    }
-    bNear = fn_80062C28(gPlayers[pArgs[0].i].pChar) < lbl_80281F78->f170;
-    if ((b1 && (!b2 || b3 || bNear)) || b4) {
+    bView6E44 = fn_800C6E44(fn_80017028(gPlayers[pArgs[0].i].nView[0]));
+    bView708C = fn_800C708C(fn_80017028(gPlayers[pArgs[0].i].nView[0]));
+    bCharFlag = fn_80062C1C(gPlayers[pArgs[0].i].pChar);
+    bOtherN20 = gPlayers[pArgs[0].i].pChar->n20 != 9 && gPlayers[pArgs[0].i].pChar->n20 != 11 &&
+                gPlayers[pArgs[0].i].pChar->n20 != 12;
+    bNearEnd = fn_80062C28(gPlayers[pArgs[0].i].pChar) < lbl_80281F78->f170;
+    if ((bView6E44 && (!bView708C || bCharFlag || bNearEnd)) || bOtherN20) {
         pResult->i = 1;
         return;
     }
@@ -921,19 +906,14 @@ void fn_80086738(MsgArg* pArgs, MsgArg* pResult) {
 
 // A hole's par; "hole" 18 is the front nine, 19 the back nine, 20 the course.
 void fn_8008685C(MsgArg* pArgs, MsgArg* pResult) {
-    switch (pArgs[0].i) {
-    case 18:
+    if (pArgs[0].i == 18) {
         pResult->i = fn_800D2E60();
-        return;
-    case 19:
+    } else if (pArgs[0].i == 19) {
         pResult->i = fn_800D2EB0();
-        return;
-    case 20:
+    } else if (pArgs[0].i == 20) {
         pResult->i = fn_800D2FB4(gSession.nTeeSet[pArgs[1].i]);
-        return;
-    default:
+    } else {
         pResult->i = fn_800D2AD8(pArgs[0].i);
-        return;
     }
 }
 
@@ -1065,19 +1045,14 @@ void fn_80086D24(MsgArg* pArgs, MsgArg* pResult) {
 
 // A hole's length from a tee set; "hole" 18 is the front nine, 19 the back nine, 20 the course.
 void fn_80086D58(MsgArg* pArgs, MsgArg* pResult) {
-    switch (pArgs[0].i) {
-    case 18:
+    if (pArgs[0].i == 18) {
         pResult->i = fn_800D2DA0(pArgs[1].i);
-        return;
-    case 19:
+    } else if (pArgs[0].i == 19) {
         pResult->i = fn_800D2E00(pArgs[1].i);
-        return;
-    case 20:
+    } else if (pArgs[0].i == 20) {
         pResult->i = fn_800D2D40(pArgs[1].i);
-        return;
-    default:
+    } else {
         pResult->i = fn_800D2C30(pArgs[0].i, pArgs[1].i);
-        return;
     }
 }
 
@@ -1120,11 +1095,12 @@ void fn_80086F0C(MsgArg* pArgs, MsgArg* pResult) {
 
 // A player's score in one round of the tournament (PGA TOUR mode: from the simulation).
 void fn_80086FB4(MsgArg* pArgs, MsgArg* pResult) {
-    if (Game_GetMode() != 23) {
-        pResult->i = gPlayers[pArgs[0].i].nRoundScore[pArgs[1].i];
+    switch (Game_GetMode()) {
+    case 23:
+        pResult->i = fn_80119638(pArgs[0].i, 0, pArgs[1].i);
         return;
     }
-    pResult->i = fn_80119638(pArgs[0].i, 0, pArgs[1].i);
+    pResult->i = gPlayers[pArgs[0].i].nRoundScore[pArgs[1].i];
 }
 
 // The PGA TOUR leaderboard: the name of the golfer on row pArgs[0].
@@ -1488,14 +1464,14 @@ void fn_80087D8C(MsgArg* pArgs, MsgArg* pResult) {
     MCCardState card;
 
     fn_8009F7F4(&card, pArgs[0].i, pArgs[1].i);
-    pResult->i = (card.uFlags >> 1) & 1;
+    pResult->i = (card.uFlags & MC_CARD_PRESENT) != 0;
 }
 
 void fn_80087DD4(MsgArg* pArgs, MsgArg* pResult) {
     MCCardState card;
 
     fn_8009F7F4(&card, pArgs[0].i, pArgs[1].i);
-    pResult->i = (card.uFlags >> 3) & 1;
+    pResult->i = (card.uFlags & 0x08) != 0;
 }
 
 // The card's free blocks.
@@ -1573,7 +1549,9 @@ void fn_800880CC(MsgArg* pArgs, MsgArg* pResult) {
 void fn_800880D0(MsgArg* pArgs, MsgArg* pResult) {
     int nState = (s8)GOLFERSTATE_GetCurrentState(pArgs[0].i);
 
-    if ((nState >= GS_SHOT_SETUP && nState <= GS_ELEVATOR || nState == GS_KNEE_CAM || nState == GS_SWING) &&
+    // fake match: states 2 to 4 tested as one unsigned compare
+    if (((u32)(nState - GS_SHOT_SETUP) <= GS_ELEVATOR - GS_SHOT_SETUP || nState == GS_KNEE_CAM ||
+         nState == GS_SWING) &&
         gPlayers[pArgs[0].i].swing.nState == SW_IDLE_SWING) {
         pResult->i = 1;
         return;
@@ -1668,9 +1646,11 @@ void fn_80088428(MsgArg* pArgs, MsgArg* pResult) {
 
 // The contest hole: its number (-1: none), and into pArgs its par and length.
 void fn_80088474(MsgArg* pArgs, MsgArg* pResult) {
+    int nHole;
     s32 nPar = 0;
     s32 nLength = 0;
-    int nHole = fn_800E16F4();
+
+    nHole = fn_800E16F4();
 
     if (nHole != -1) {
         nPar = fn_800D2AD8(nHole);
@@ -1730,7 +1710,7 @@ void fn_80088660(MsgArg* pArgs, MsgArg* pResult) {
         fn_800FF634(pArgs[0].i);
         return;
     case 1:
-        pResult->i = fn_800FF604();
+        pResult->i = fn_800FF604(pArgs[0].i);
         return;
     case 2:
         pResult->i = fn_800FF60C(pArgs[0].i, pArgs[1].i);
@@ -1966,6 +1946,9 @@ void fn_80088CF0(MsgArg* pArgs, MsgArg* pResult) {
             pResult->i = 0;
             return;
         }
+        // EA bug: a level outside 0..6 leaves nMult unset (here and in case 104). EA indexes the
+        // multipliers as one table (0x940 + 4 * (23..28)), not aTourPct: 99.9% until earnings.h
+        // has that table.
         switch (gpSaveData[gPlayers[pArgs[0].i].nIndex].nTourCardLevel) {
         case 0:
         case 1:
@@ -2070,6 +2053,7 @@ void fn_800894E8(MsgArg* pArgs, MsgArg* pResult) {
     if (pArgs[0].i < 0 || pArgs[0].i >= lbl_802823D0) {
         *(s32*)pArgs[1].p = 0;
         *(s32*)pArgs[2].p = -1;
+        return;
     }
     *(s32*)pArgs[1].p = lbl_802120F8[pArgs[0].i].nPlayer;
     *(s32*)pArgs[2].p = lbl_802120F8[pArgs[0].i].nEvent;
@@ -2189,23 +2173,24 @@ void fn_800897F0(MsgArg* pArgs, MsgArg* pResult) {
         return;
     }
     if (gpGame->b139 != 0) {
-        switch (gpGame->b139) {
-        case 1:
+        // the regions follow the courses: region 1 is 24
+        switch (gpGame->b139 + 23) {
+        case 24:
             strcpy(((MsgString*)pArgs[1].p)->pStr, "US Northwest");
             return;
-        case 2:
+        case 25:
             strcpy(((MsgString*)pArgs[1].p)->pStr, "US Southwest");
             return;
-        case 3:
+        case 26:
             strcpy(((MsgString*)pArgs[1].p)->pStr, "US East");
             return;
-        case 4:
+        case 27:
             strcpy(((MsgString*)pArgs[1].p)->pStr, "Europe");
             return;
-        case 5:
+        case 28:
             strcpy(((MsgString*)pArgs[1].p)->pStr, "Pacific");
             return;
-        case 6:
+        case 29:
             strcpy(((MsgString*)pArgs[1].p)->pStr, "S. Hemisphere");
             return;
         default:
@@ -2560,8 +2545,7 @@ void fn_8008A468(MsgArg* pArgs, MsgArg* pResult) {
 
 // Pass on to fn_800A61C4 a number for pArgs[0] and pArgs[1] (0 or 2); nothing in modes 22 and 26.
 void fn_8008A4A8(MsgArg* pArgs, MsgArg* pResult) {
-    if (Game_GetMode() == 26) return;
-    if (Game_GetMode() == 22) return;
+    if (Game_GetMode() == 26 || Game_GetMode() == 22) return;
     switch (pArgs[1].i) {
     case 0:
         switch (pArgs[0].i) {
@@ -2767,19 +2751,14 @@ void fn_8008A9A0(MsgArg* pArgs, MsgArg* pResult) {
 
 // The same as fn_80085FDC, without mode 19's count.
 void fn_8008A9E8(MsgArg* pArgs, MsgArg* pResult) {
-    switch (pArgs[1].i) {
-    case 18:
+    if (pArgs[1].i == 18) {
         pResult->i = fn_800E19A4(pArgs[0].i, 9);
-        return;
-    case 19:
+    } else if (pArgs[1].i == 19) {
         pResult->i = fn_800E1788(pArgs[0].i) - fn_800E19A4(pArgs[0].i, 9);
-        return;
-    case 20:
+    } else if (pArgs[1].i == 20) {
         pResult->i = fn_800E1788(pArgs[0].i);
-        return;
-    default:
+    } else {
         pResult->i = gPlayers[pArgs[0].i].nStrokes[pArgs[1].i];
-        return;
     }
 }
 
