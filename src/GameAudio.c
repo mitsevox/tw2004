@@ -36,6 +36,11 @@ void fn_800AD734(u8 nId, int n);
 void fn_800AD450(u8 nId);
 void fn_8001EB8C(Character* pChar, int nBone, f32* pPos);
 void fn_800A6BA8(u8 nPlayer);
+void fn_800A6854(u8 nPlayer);
+void fn_800A6D48(u8 nPlayer);
+void fn_800A714C(void);
+void fn_800A71E4(void);
+void fn_800A7294(void);
 void fn_800BA734(int n, s8 nTrack);
 
 void fn_800A3F38(u8 b, u8 b2);
@@ -850,6 +855,55 @@ void fn_800A4E34(void) {
     lbl_8028202A = 1;
     lbl_80282041 = 0;
     lbl_80282040 = 0;
+}
+
+// Stops the game's sounds and clears every view's emitters.
+void fn_800A5428(void) {
+    int nViews;
+    int i;
+
+    lbl_80282042 = 0;
+    nViews = (gSession.nSplitScreen != 0) + 1;
+    if (lbl_8028203C == 2) {
+        fn_800AD450(lbl_8028141A);
+        lbl_8028141A = 0xFF;
+    } else {
+        fn_800A75B4();
+    }
+    fn_800AD450(lbl_80281419);
+    lbl_80281419 = 0xFF;
+    fn_800A6EC8();
+    fn_800A6854(0);
+    fn_800A6660(0);
+    fn_800A6D48(0);
+    fn_800A6BA8(0);
+    fn_800A707C();
+    fn_800A714C();
+    fn_800A7294();
+    fn_800A71E4();
+    for (i = 0; i < nViews; i++) {
+        lbl_801F1790[i].n0 = 0xFF;
+        lbl_801F1790[i].n1 = 0xFF;
+        lbl_801F1790[i].n2 = 0xFF;
+        lbl_801F1790[i].n3 = 0xFF;
+        lbl_801F1790[i].n4 = 0;
+        lbl_801F1790[i].n5 = 0;
+        lbl_801F1790[i].f8 = 0.0f;
+        lbl_801F1790[i].fC = 0.0f;
+        lbl_801F1790[i].n14 = 0;
+        lbl_801F1790[i].n10 = 0;
+    }
+    lbl_80281419 = 0xFF;
+    lbl_80281418 = 0xFF;
+    lbl_8028141C = 0xFF;
+    lbl_8028141D = 0xFF;
+    lbl_8028141E = 0xFF;
+    lbl_8028141F = 0xFF;
+    lbl_8028141A = 0xFF;
+    lbl_8028141B = 0xFF;
+    lbl_80281420 = 0xFF;
+    lbl_80282029 = 0;
+    fn_800A3F58(0, 0);
 }
 
 void fn_800A562C(u8 nPlayer) {
