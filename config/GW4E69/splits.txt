@@ -3025,6 +3025,9 @@ fe_stats.c:
 EventInfo.c:
 	.text       start:0x8011D280 end:0x8011E020
 
+llrtclock.c:
+	.text       start:0x8011E020 end:0x8011E170
+
 GoGrass.c:
 	.text       start:0x8011E170 end:0x80120298
 

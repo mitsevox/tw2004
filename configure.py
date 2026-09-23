@@ -932,6 +932,7 @@ config.libs = [
             Object(NonMatching, "SkinMorph.c"),
             Object(NonMatching, "fe_stats.c"),
             Object(NonMatching, "EventInfo.c"),
+            Object(NonMatching, "llrtclock.c"),
             Object(NonMatching, "GoGrass.c"),
             Object(NonMatching, "GameMode4Menu.c"),
             Object(NonMatching, "TibExt.c"),

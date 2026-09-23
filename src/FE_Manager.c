@@ -40,8 +40,6 @@ s8   fn_80103BC0(int nAsset);           // } its kind, fn_80107444's count, and 
 s16  fn_8010742C(int nAsset);           // } choice
 int  fn_80107444(int nAsset);           // }
 void fn_80105FF8(int nAsset, s16* pKind, s32* pPart, s32* pChoice);    // }
-
-void fn_8011E020(s32* pMonth, s32* pDay, s32* pYear, s32* pHour, s32* pMinute, s32* pSecond, s32* pMsec);
 f32  GM_GetGameProgress(SaveProfile* pProfile);         // GameManager.c
 u8   fn_80056480(int a);
 u8   fn_800564AC(int n);
