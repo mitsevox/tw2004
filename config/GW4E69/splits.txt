@@ -348,23 +348,8 @@ unsorted/sweep_80070168.c:
 DynamicRenderingBuffer.c:
 	.text       start:0x8007018C end:0x80070EC4
 
-unsorted/sweep_80070F00.c:
-	.text       start:0x80070F00 end:0x80070F34
-
-unsorted/sweep_80070F34.c:
-	.text       start:0x80070F34 end:0x80070F5C
-
-unsorted/sweep_80070F5C.c:
-	.text       start:0x80070F5C end:0x80070FB0
-
-unsorted/sweep_80070FB0.c:
-	.text       start:0x80070FB0 end:0x80070FBC
-
-unsorted/sweep_80070FBC.c:
-	.text       start:0x80070FBC end:0x80070FF0
-
-unsorted/sweep_80070FF0.c:
-	.text       start:0x80070FF0 end:0x80071028
+Code80070EC4.c:
+	.text       start:0x80070EC4 end:0x8007110C
 
 GoShaderObject_PrelitUVAnimation_Gc.c:
 	.text       start:0x8007110C end:0x80071AD0
