@@ -7,9 +7,8 @@
 #include "game.h"
 #include "engine.h"
 #include "game/save.h"
+#include "game/earnings.h"
 
-void* fn_800D3C1C(void);
-s32   fn_800D3D64(void* p, int nHole);      // a hole's skin value
 void  fn_80102704(void);
 void  fn_80102874(void);
 extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
