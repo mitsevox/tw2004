@@ -97,7 +97,6 @@ u8    Ter_PointInFreeDropNetwork(f32* pPos);
 u8    Ter_LieIsPreferred(u32 nLie);
 f32   Ter_GetSupportingGroundData(CourseInfo* pCourse, f32* pPos, SurfaceType** ppSurface, f32* pNormal);
 void  fn_8004B63C(TNetwork* pNet);
-void  Vec3Copy(f32* pSrc, f32* pDst);                     // 0x80008304
 void  vec4flt_CrossProduct(f32* pA, f32* pB, f32* pOut);
 f32   fn_8000C5FC(f32* pA, f32* pB);                      // dot product
 void  fn_8005097C(f32* pA, f32* pB, f32* pOut);           // a - b (paired-single assembly)
@@ -146,7 +145,6 @@ u8    fn_8004FCB4(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32
                   f32* pNormal, SurfaceType** ppSurface, TerObject** ppObj);
 u8    fn_800504F4(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32* pDir, f32 fMax, f32* pHit,
                   f32* pNormal, SurfaceType** ppSurface, TerObject** ppObj);
-SurfaceType* fn_800CC190(CourseInfo* pCourse, f32* pPos);   // the playable ground under a point
 u8    fn_8004E0D4(f32* pFrom, f32* pDir, f32 fRange, f32* pCentre, f32 fRadius);
 u8    fn_80050A9C(f32* pA, f32* pB, f32* pC, f32 fX, f32 fZ);
 void  fn_800509D8(f32* pTri, f32* pPos, f32* pA, f32* pB, f32* pC);
