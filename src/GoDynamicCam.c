@@ -260,7 +260,8 @@ void fn_80039D0C(int nSequences) {
             if (lbl_80281D88->pSequences[i].p4C[j].b16 < 13 || lbl_80281D88->pSequences[i].p4C[j].b16 > 22) {
                 lbl_80281D88->pSequences[i].p4C[j].b16 = 25;
             }
-            if (lbl_80281D88->pSequences[i].p4C[j].b16 >= 13 && lbl_80281D88->pSequences[i].p4C[j].b16 <= 22) {
+            if (lbl_80281D88->pSequences[i].p4C[j].b16 >= 13 &&
+                lbl_80281D88->pSequences[i].p4C[j].b16 <= 22) {
                 bFound = 0;
                 for (k = 0; k < lbl_80281D88->pSequences[i].nChoices; k++) {
                     if (lbl_80281D88->pSequences[i].p4C[j].b16 == lbl_80281D88->pSequences[i].p4C[k].b14) {
