@@ -12,7 +12,8 @@ typedef struct Challenge {
     s32 nCourse;                // 0x10
     s32 nType;                  // 0x14  0 one hole, 1 all 18, 2/3 a nine, 4/5/6 the par 5s/4s/3s
     s32 nHole;                  // 0x18  1-based
-    u8  unk1C[0x28 - 0x1C];
+    u8  unk1C[0x24 - 0x1C];
+    s32 uClubs;                 // 0x24  the bag for the challenge (bits, see fn_800EBEF0), 0 = the golfer's own
     s32 n28;                    // 0x28
     s32 n2C[3];                 // 0x2C
     u8  unk38[0x3C - 0x38];
@@ -20,11 +21,19 @@ typedef struct Challenge {
     s32 nTargetBase;            // 0x40
     s32 nHoleKind;              // 0x44  what the challenge hole adds
     s32 nHoleExtra;             // 0x48
-    u8  unk4C[0x64 - 0x4C];
+    u8  bPlaceBall;             // 0x4C  the ball starts at the spot in lbl_80203170
+    u8  b4D;                    // 0x4D  f54 goes to fn_800ED6F8
+    u8  unk4E[0x54 - 0x4E];
+    f32 f54;                    // 0x54
+    u8  unk58[0x5C - 0x58];
+    s32 bMedal2;                // 0x5C  medal 2: given, and its score (n60)
+    s32 n60;
     s32 n64;                    // 0x64
-    u8  unk68[0x70 - 0x68];
+    s32 bMedal1;                // 0x68  medal 1: given, and its score (n6C)
+    s32 n6C;
     s32 n70;                    // 0x70
-    u8  unk74[0x7C - 0x74];
+    s32 bMedal0;                // 0x74  medal 0: given, and its score (n78)
+    s32 n78;
     s32 n7C;                    // 0x7C
 } Challenge;
 
@@ -92,6 +101,11 @@ void  fn_800E0B38(int nMode);
 void  fn_800F07C8(void);
 u8    fn_800E4BF8(void);
 int   Game_CurHoleIndex(void);
+int   fn_800ECF9C(int i);
+u8    fn_800E5110(void);
+void  fn_80055AA8(u8* pBall, f32* pPos, int nPlayer);
+u8    Physics_DropBall(u8* pBall, f32* pPos);
+void  Vec_Copy(f32* pSrc, f32* pDst);
 void fn_800EC544(Challenge* p0, s32 p1);
 extern u8 lbl_802822FC;
 u8 fn_800EC550(void);
@@ -101,8 +115,8 @@ extern u8 lbl_80282314;
 u8 fn_800ED540(void);
 void fn_800ED548(void);
 extern u8 lbl_802822FE;
-extern s32 (*lbl_8028231C)();
-s32 fn_800ED5C8(void);
+extern u8 (*lbl_8028231C)(int nPlayer, int bCheck);
+u8 fn_800ED5C8(int nPlayer, int bCheck);
 extern u8 lbl_802822FD;
 void fn_800ED6E8(u8 v);
 u8 fn_800ED6F0(void);
@@ -224,11 +238,12 @@ void fn_800ED548(void) {
     lbl_80282314 = 0;
 }
 
-s32 fn_800ED5C8(void) {
+// Hole finished: always after a restart; otherwise the challenge's own test.
+u8 fn_800ED5C8(int nPlayer, int bCheck) {
     if ((u8) lbl_802822FE != 0) {
         return 1;
     }
-    return lbl_8028231C();
+    return lbl_8028231C(nPlayer, bCheck);
 }
 
 void fn_800ED6E8(u8 v) {
@@ -277,7 +292,7 @@ u8 fn_800EC4F0(int n) {
 }
 
 // The total of fn_800ED028 over the current challenge's group.
-int fn_800ECF9C(void) {
+int fn_800ECF9C(int iUnused) {
     int n = 0;
     int i;
     for (i = 0; i < lbl_80281668; i++) {
@@ -475,4 +490,178 @@ int fn_800ED028(int i) {
         }
     }
     return nTarget;
+}
+
+// The score for medal k (0..2) over the current group: the last challenge's mark minus the target
+// so far (-1 when the challenge gives no such medal).
+s32 fn_800ECA34(int k) {
+    int i;
+    int nLast = lbl_802822F4;
+    int nTarget;
+    for (i = 0; i < lbl_80281668; i++) {
+        if (lbl_80281664[i].nGroup == lbl_80281664[lbl_802822F4].nGroup && i > nLast) {
+            nLast = i;
+        }
+    }
+    nTarget = fn_800ECF9C(lbl_802822F4);
+    if ((lbl_80281664[lbl_802822F4].nTargetKind == 7 && Game_GetMode() == 0) ||
+        lbl_80281664[lbl_802822F4].nTargetKind == 1) {
+        nTarget = 0;
+    }
+    switch (k) {
+    case 0:
+        if (lbl_80281664[lbl_802822F4].bMedal0 == 0) {
+            return -1;
+        } else {
+            return lbl_80281664[nLast].n78 - nTarget;
+        }
+    case 1:
+        if (lbl_80281664[lbl_802822F4].bMedal1 == 0) {
+            return -1;
+        } else {
+            return lbl_80281664[nLast].n6C - nTarget;
+        }
+    case 2:
+        if (lbl_80281664[lbl_802822F4].bMedal2 == 0) {
+            return -1;
+        } else {
+            return lbl_80281664[nLast].n60 - nTarget;
+        }
+    default:
+        return 0;
+    }
+}
+
+// The holes left in the group: the rest of this round, plus each later challenge's holes (one, 18,
+// a nine, or the par 5s/4s/3s of its course).
+int fn_800ED314(void) {
+    int h;
+    int i;
+    int n = 0;
+    for (h = Game_CurHoleIndex() + 1; h < 18; h++) {
+        if (gpGame->bHoleSelected[h]) {
+            n++;
+        }
+    }
+    i = lbl_802822F4 + (fn_800ED5C8(0, 1) == 0);
+    if (fn_800ED508(lbl_80281664[lbl_802822F4].nGroup) > 1) {
+        for (; i < lbl_80281668; i++) {
+            if (lbl_80281664[i].nGroup == lbl_80281664[lbl_802822F4].nGroup) {
+                switch (lbl_80281664[i].nType) {
+                case 0:
+                    n += 1;
+                    break;
+                case 1:
+                    n += 18;
+                    break;
+                case 2:
+                    n += 9;
+                    break;
+                case 3:
+                    n += 9;
+                    break;
+                case 4:
+                    for (h = 0; h < 18; h++) {
+                        if (fn_800D2ABC(lbl_80281664[i].nCourse, h) == 5) {
+                            n++;
+                        }
+                    }
+                    break;
+                case 5:
+                    for (h = 0; h < 18; h++) {
+                        if (fn_800D2ABC(lbl_80281664[i].nCourse, h) == 4) {
+                            n++;
+                        }
+                    }
+                    break;
+                case 6:
+                    for (h = 0; h < 18; h++) {
+                        if (fn_800D2ABC(lbl_80281664[i].nCourse, h) == 3) {
+                            n++;
+                        }
+                    }
+                    break;
+                case 7:
+                    break;
+                }
+            }
+        }
+    }
+    if (fn_800E5110()) {
+        return 0;
+    }
+    fn_800E4BF8();
+    return n;
+}
+
+// The challenge's setup: the ball placed at its spot, its bag (bit n of uClubs gives the n-th club
+// of the list below; club 25 is always in), and fn_800ED6F8's value.
+void fn_800EBEF0(void) {
+    f32 v[4];
+    if (lbl_80281664[lbl_802822F4].bPlaceBall) {
+        v[0] = lbl_80203170[lbl_802822F4].f0;
+        v[1] = lbl_80203170[lbl_802822F4].f4;
+        v[2] = lbl_80203170[lbl_802822F4].f8;
+        v[3] = 1.0f;
+        fn_80055AA8(gPlayers[0].ball, v, 0);
+        Physics_DropBall(gPlayers[0].ball, v);
+        Vec_Copy(v, &gPlayers[0].fBallX);
+    }
+    if (lbl_80281664[lbl_802822F4].uClubs) {
+        gPlayers[0].golfer.uBagMask = 0x2000000;
+        if (lbl_80281664[lbl_802822F4].uClubs & 1) {
+            gPlayers[0].golfer.uBagMask |= 0x1;
+        }
+        if (lbl_80281664[lbl_802822F4].uClubs & 2) {
+            gPlayers[0].golfer.uBagMask |= 0x40;
+        }
+        if (lbl_80281664[lbl_802822F4].uClubs & 4) {
+            gPlayers[0].golfer.uBagMask |= 0x80;
+        }
+        if (lbl_80281664[lbl_802822F4].uClubs & 8) {
+            gPlayers[0].golfer.uBagMask |= 0x100;
+        }
+        if (lbl_80281664[lbl_802822F4].uClubs & 0x10) {
+            gPlayers[0].golfer.uBagMask |= 0x200;
+        }
+        if (lbl_80281664[lbl_802822F4].uClubs & 0x20) {
+            gPlayers[0].golfer.uBagMask |= 0x400;
+        }
+        if (lbl_80281664[lbl_802822F4].uClubs & 0x40) {
+            gPlayers[0].golfer.uBagMask |= 0x800;
+        }
+        if (lbl_80281664[lbl_802822F4].uClubs & 0x80) {
+            gPlayers[0].golfer.uBagMask |= 0x1000;
+        }
+        if (lbl_80281664[lbl_802822F4].uClubs & 0x100) {
+            gPlayers[0].golfer.uBagMask |= 0x2000;
+        }
+        if (lbl_80281664[lbl_802822F4].uClubs & 0x200) {
+            gPlayers[0].golfer.uBagMask |= 0x4000;
+        }
+        if (lbl_80281664[lbl_802822F4].uClubs & 0x400) {
+            gPlayers[0].golfer.uBagMask |= 0x8000;
+        }
+        if (lbl_80281664[lbl_802822F4].uClubs & 0x800) {
+            gPlayers[0].golfer.uBagMask |= 0x10000;
+        }
+        if (lbl_80281664[lbl_802822F4].uClubs & 0x1000) {
+            gPlayers[0].golfer.uBagMask |= 0x20000;
+        }
+        if (lbl_80281664[lbl_802822F4].uClubs & 0x2000) {
+            gPlayers[0].golfer.uBagMask |= 0x40000;
+        }
+        if (lbl_80281664[lbl_802822F4].uClubs & 0x4000) {
+            gPlayers[0].golfer.uBagMask |= 0x80000;
+        }
+        if (lbl_80281664[lbl_802822F4].uClubs & 0x8000) {
+            gPlayers[0].golfer.uBagMask |= 0x200000;
+        }
+        if (lbl_80281664[lbl_802822F4].uClubs & 0x10000) {
+            gPlayers[0].golfer.uBagMask |= 0x800000;
+        }
+    }
+    if (lbl_80281664[lbl_802822F4].b4D) {
+        fn_800ED6F8(lbl_80281664[lbl_802822F4].f54);
+    }
 }
