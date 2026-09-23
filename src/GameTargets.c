@@ -41,19 +41,8 @@ f32 lbl_80192880[15] = {
     1.1f, 1.1f, 1.0f, 1.0f, 1.0f, 1.1f, 1.2f, 1.3f, 1.0f, 1.3f, 1.4f, 1.4f, 1.3f, 1.0f, 1.0f,
 };
 
-f32   Vec_Distance(f32* pA, f32* pB);
 int   fn_8001D324(int n);
-void  Character_SetPosition(int nHandle, f32* pPos, int a);
-void  Shot_Prepare(int nPlayer, u8 bNotify);
 void  fn_800A631C(void);
-s32   fn_800F37F8(s32);
-s32   fn_800F59CC(s32);
-s32   fn_800F6A00(s32);
-s32   fn_800F7D94(s32);
-s32   fn_800F7D9C(s32);
-s32   fn_800F59D4(s32);
-s32   fn_800F80A0(s32);
-s32   fn_800F6A34(s32);
 
 u8   fn_800F2358(int nPlayer);
 

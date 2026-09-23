@@ -14,16 +14,12 @@
 #define CUP_DIAMETER 0.10717f       // 3.86 in (a real cup is 4.25)
 
 void   Vec3Copy(f32* pSrc, f32* pDst);           // 0x80008304
-f32    Vec_Distance(f32* pA, f32* pB);           // 0x800BB050
-f32    fn_8000AD78(f32 y, f32 x);                // atan2f
 void   Ball_Stop(Ball* pBall);                   // 0x80054340
 void   fn_8000AE28(f32* pIn, f32 f, f32* pOut);  // scale a vector
 void   Ball_SetLie(Ball* pBall, SurfaceType* pSurface);
 void   Ball_Tick(Ball* pBall, f32 fTicks);
 void   Physics_FixBallHeight(Ball* pBall, u8 bSettle, f32 fTicks);
 SurfaceType* Ter_GetSupportingWorldMaterial(CourseInfo* pCourse, Ball* pBall);   // the surface under a point
-f32    fn_8004D620(CourseInfo* pCourse, f32* pPos);   // ground height, -60000 and below if none
-f32    fn_8004D5C0(CourseInfo* pCourse, f32* pPos);   // the same from another source
 u8     Ter_IsValidDropSurface(s32 nSurface);
 void   Ter_CheckForDropLocation(CourseInfo* pCourse, Ball* pBall, int a, u8* pA, u8* pB, int b);
 // One club's distances for a shot kind: power 0.1, 0.2 .. 1.1 (fDist[9], full power, is "the
@@ -61,7 +57,6 @@ extern f32 gFairwaySpeedMul[3];                  // 0x801834A8  by gFairwaySetti
 extern f32 gRoughMul[3];                         // 0x801834B4  by options +0x1C: 1.3 1.0 0.7 (class 5)
 void   PsBallFx_TriggerTrail(Ball* pBall, int nPlayer);    // rolling sound / effect
 void   Ball_CupPull(Ball* pBall, f32 fDt);
-void   fn_800BAF04(f32* pSrc, f32* pDst);        // normalise
 f32    fn_8000C5FC(f32* pA, f32* pB);            // dot product
 void   fn_8000C5D4(f32* pA, f32* pB, f32 f, f32* pOut);   // a + f x b
 void   vec4flt_CrossProduct(f32* pA, f32* pB, f32* pOut); // cross product
@@ -85,8 +80,6 @@ f32    Ball_DistanceToPin(f32* pPos);
 void   Ball_Holed(Ball* pBall);
 void   Ball_SimSeconds(Ball* pBall, f32 fSeconds, f32 fTick);
 
-void   Ter_GetEnclosingGroundData(CourseInfo* pCourse, Ball* pBall, f32* pHeight, SurfaceType** ppSurface, f32* pNormal,
-                   f32* pHeight2, SurfaceType** ppSurface2, f32* pNormal2);
 int    fn_80050BEC(SurfaceType* pSurface);       // a surface's index
 u8     fn_800B1B18(int nPlayer, f32* pTo, f32* pFrom, f32* pHit, f32* pNormal, s32* pWhat);
 u8     fn_80053E98(Ball* pBall, void* pObj, f32* pHit, f32* pNormal);
@@ -99,7 +92,6 @@ u8     Ter_CheckForPinCollision(CourseInfo* pCourse, int nPlayer, f32* pFrom, f3
 u8     fn_8004E558(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal, SurfaceType** ppSurface, s32* pWhat, u8* pOut);
 u8     fn_8004EE20(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal, SurfaceType** ppSurface, s32* pWhat);
 void   fn_800B1AB0(u8* pObj, f32* pPos, f32* pRadius);   // the flagstick's position and radius
-int    Golfer_GetAttribute(Player* pPlayer, int nAttr, int nMode);
 u8     Ball_Collide(Ball* pBall, f32 fTicks);
 void   Ball_GroundContact(Ball* pBall, f32 fTicks);
 void   fn_80052268(Ball* pBall, f32 fTicks);
@@ -729,7 +721,8 @@ u8 Physics_GetSurfaceInfo(Ball* pBall, SurfaceType** ppSurface, f32* pNormal) {
     f32          vNormal2[4];
     f32          fDrop;
     int          nPlayer;
-    Ter_GetEnclosingGroundData(pBall->pCourse, pBall, &lbl_80281DE0, &pSurface, vNormal, &lbl_80281DDC, &pSurface2, vNormal2);
+    Ter_GetEnclosingGroundData(pBall->pCourse, pBall->vPos, &lbl_80281DE0, &pSurface, vNormal, &lbl_80281DDC,
+                               &pSurface2, vNormal2);
     lbl_80281DE4 = 1;
     if (lbl_80281DE0 < -60000.0f) {
         if (!Ball_NoGround(lbl_80281DDC)) {
@@ -1788,7 +1781,8 @@ f32 fn_80055324(Ball* pBall) {
     SurfaceType* pSurface;
     SurfaceType* pSurface2;
     if (pBall->nState != 2) return 0.0f;
-    Ter_GetEnclosingGroundData(pBall->pCourse, pBall, &fHeight, &pSurface, vNormal, &fHeight2, &pSurface2, vNormal2);
+    Ter_GetEnclosingGroundData(pBall->pCourse, pBall->vPos, &fHeight, &pSurface, vNormal, &fHeight2,
+                               &pSurface2, vNormal2);
     if (fHeight < -60000.0f) {
         Vec_Copy(PIN(pBall), vPin);
         vPin[1] += BALL_RADIUS;

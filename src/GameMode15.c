@@ -40,7 +40,6 @@ void  fn_800A640C(void);
 void* fn_80017004(int nView);
 void  fn_8006434C(void* pView, f32* pPos, f32* pX, f32* pY, int a);
 void  fn_8006A8D4(void* pView, f32* pX, f32* pY);
-void  fn_800F39CC(s32 p0);
 
 void  fn_800F3C2C(void);
 void  fn_800F3C48(void);

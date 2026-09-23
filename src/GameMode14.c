@@ -28,10 +28,6 @@ extern u8  lbl_80282370;                    // the round was ended
 extern s32 lbl_80282374;                    // the points of the last claim
 extern s32 lbl_801928F0[];                  // points per rank
 
-void  fn_800E5B0C(int nMsg, u32 uFloats, void* p0, void* p1, void* p2, void* p3, void* p4);
-int   fn_800F1D34(int nPlayer);
-s32   fn_800F266C(s32 n, int i);
-
 void  fn_800F2BBC(void);
 void  fn_800F2BD8(void);
 s32   fn_800F2C2C(void);
@@ -46,13 +42,11 @@ void  fn_800F33D0(int nPlayer);
 u8    fn_800F3410(int a);
 void  fn_800F3418(int nPlayer);
 u8    fn_800F3438(int nPlayer, int a);
-s32   fn_800F354C(int nPlayer);
 s32   fn_800F3668(int n);
 void  fn_800F36A4(void);
 void  fn_800F3800(int nPlayer);
 void  fn_800F3860(void);
 s32   fn_800F392C(int a, int i);
-void  fn_800F39CC(s32 p0);
 
 // Mode 14 starts: two players, no wind, no gimmes, no mulligans.
 void fn_800F2984(void) {
@@ -370,7 +364,7 @@ s32 fn_800F34F0(int nPlayer) {
 }
 
 // How many targets the player holds.
-s32 fn_800F354C(int nPlayer) {
+int fn_800F354C(int nPlayer) {
     s32 n = 0;
     int i;
     for (i = 0; i < 40; i++) {
@@ -415,7 +409,7 @@ void fn_800F36A4(void) {
     }
 }
 
-s32 fn_800F37F8(void) {
+s32 fn_800F37F8(s32 a) {
     return lbl_80282374;
 }
 

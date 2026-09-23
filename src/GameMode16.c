@@ -32,9 +32,6 @@ extern s32 lbl_80282390;
 extern s32 lbl_80282394;                    // the points multiplier from bonuses
 extern s32 lbl_80282398;                    // the points of the last shot
 
-void  fn_800F21B4(int nPlayer);
-s32   fn_800F2810(s32 n);
-
 void  fn_800F4D6C(void);
 void  fn_800F4D88(void);
 s32   fn_800F4DB4(void);
@@ -50,8 +47,6 @@ u8    fn_800F5848(int a);
 void  fn_800F5850(int nPlayer);
 u8    fn_800F5870(int nPlayer, int a);
 void  fn_800F58B4(s32 nSurface, s32* pPoints);
-s32   fn_800F59CC(void);
-s32   fn_800F59D4(void);
 s32   fn_800F59DC(int nPlayer, int i);
 void  fn_800F5A14(int nPlayer, int nId);
 void  fn_800F5A88(void);
@@ -402,11 +397,11 @@ void fn_800F58B4(s32 nSurface, s32* pPoints) {
     }
 }
 
-s32 fn_800F59CC(void) {
+s32 fn_800F59CC(s32 a) {
     return lbl_80282398;
 }
 
-s32 fn_800F59D4(void) {
+s32 fn_800F59D4(s32 a) {
     return lbl_80282394;
 }
 

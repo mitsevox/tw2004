@@ -652,14 +652,32 @@ u8   Team_IsAllHuman(int nTeam);        // team 0 is players 0 and 1, team 1 pla
 void AI_PlanShot(int nPlayer, f32* pTarget);
 u8   AI_GreenTowardPin(int nPlayer, f32 fDist);
 u8   AI_RehearseShot(int nPlayer, f32* pOutDist2, u8 bFast, f32 fTolerance);
+void AI_ApplyError(int nPlayer);
 u8   Lie_AllowsFullSwing(int nPlayer);
 void Shot_FitTargetToClub(int nPlayer);
+void Shot_Prepare(int nPlayer, u8 bNotify);
 int  Shot_Trajectory(int nPlayer);
 void Shot_DefaultSpin(int nPlayer, f32* pOut);
 void Shot_FaceVector(int nPlayer, f32* pOut);
 f32  Shot_AimAngle(int nPlayer);
 void AI_ClubLonger(int nPlayer, s32* pClub, int nStep);
 void AI_ClubShorter(int nPlayer, s32* pClub, int nStep);
+f32  AI_PowerScale(int nPlayer);
+void AI_FaceVector(int nPlayer, f32* pOut);
+void Caddie_Start(int nPlayer);
+void Caddie_Stop(void);
+void Caddie_Update(int nPlayer);
+void Luck_TakePerfectShot(int nPlayer);
+void Caddie_ApplyTip(int nPlayer);
+int  Golfer_GetAttribute(Player* pPlayer, int nAttr, int nMode);
+u8   Player_IsHoledNotState23(int nPlayer);
+u8   Team_IsAllCPU(int nTeam);
+u8   Player_IsNotCPU(int nPlayer);
+u8   Bag_AddClub(int nPlayer, int nBit);
+u8   Bag_RemoveClub(int nPlayer, int nBit);
+u8   Bag_HasClub(int nPlayer, int nBit);
+int  Bag_CountClubs(int nPlayer);
+void Session_SetGolfer(int nGolfer, int nPlayer);
 
 // Game options at gSession + 0xE78 (the wind setting is nWind, at gSession + 0xE88).
 typedef struct GameOptions {
