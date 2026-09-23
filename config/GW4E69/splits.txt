@@ -3169,14 +3169,8 @@ SkinMorph.c:
 unsorted/sweep_8011CD84.c:
 	.text       start:0x8011CD84 end:0x8011CDE8
 
-unsorted/sweep_8011D05C.c:
-	.text       start:0x8011D05C end:0x8011D09C
-
-unsorted/sweep_8011D09C.c:
-	.text       start:0x8011D09C end:0x8011D0A8
-
-unsorted/sweep_8011D268.c:
-	.text       start:0x8011D268 end:0x8011D280
+fe_stats.c:
+	.text       start:0x8011CEB0 end:0x8011D280
 
 unsorted/sweep_8011D858.c:
 	.text       start:0x8011D858 end:0x8011D878
