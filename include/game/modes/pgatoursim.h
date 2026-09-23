@@ -155,5 +155,29 @@ void  fn_8011A720(int nPlayer, int nHole);
 s32   fn_8011A7C8(int nPlayer, int nHole);
 void  fn_8011C058(u8 bDirty);                   // TW06: GM_PgaTourSim_SetStatsDirty
 void  fn_8011C060(u8 bDirty);                   // TW06: GM_PgaTourSim_SetScoresDirty
+void  GM_PgaTourSim_GetStatValString(GM_Pga_StatTypes_t nStat, f32 fValue, char* szOut);
+s32   GM_PgaTourSim_GetStatRankFromGolferID(int nPlayer, int nGolfer, GM_Pga_StatTypes_t nStat);
+f32   GM_PgaTourSim_GetStatValueFromGolferID(int nPlayer, int nGolfer, GM_Pga_StatTypes_t nStat);
+s32   GM_PgaTourSim_GetGolferIDFromStatRow(int nPlayer, GM_Pga_StatTypes_t nStat, int nRow);
+s32   GM_PgaTourSim_GetStatView(GM_Pga_StatTypes_t nStat);
+u16   fn_8011903C(int nPlayer, int nGolfer);    // the golfer's tournaments this season
+u16   fn_80119064(int nPlayer, int nGolfer);    // the golfer's rounds this season
+
+// ---- fe_stats.c: the tour statistics screen ----
+
+// How a statistic's value is printed (TW06's StatsUnits_t).
+typedef enum StatsUnits {
+    UNITS_NONE = 0,
+    UNITS_MONEY = 1,
+    UNITS_YARDS = 2,
+    UNITS_PERCENT = 3
+} StatsUnits;
+
+#define FE_STATS_NUM_CATEGORIES 29      // the screen's rows, one per category
+
+extern char* lbl_8019439C[FE_STATS_NUM_CATEGORIES];     // per category: its title
+extern s32 lbl_80194410[FE_STATS_NUM_CATEGORIES];       // per category: its statistic, -1 none yet
+extern StatsUnits lbl_80194484[FE_STATS_NUM_CATEGORIES];    // per category: its units
+extern s32 lbl_80282508;        // the category the leader board shows
 
 #endif

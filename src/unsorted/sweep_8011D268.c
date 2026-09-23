@@ -1,14 +1,12 @@
 // Small functions found by the sweep (sweep.py). Original file and meanings unknown.
 
-#include "game_types.h"
+#include "game/frontend.h"
+#include "game/modes/pgatoursim.h"
 
-
-void fn_8011D268(s32 a, u8* p);
-void fn_8011D274(s32 a, u8* p);
-void fn_8011D268(s32 a, u8* p) {
-    *(s32*)(p + 0x0) = 175;
+void fn_8011D268(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = PGA_NUM_GOLFERS;
 }
 
-void fn_8011D274(s32 a, u8* p) {
-    *(s32*)(p + 0x0) = 29;
+void fn_8011D274(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = FE_STATS_NUM_CATEGORIES;
 }

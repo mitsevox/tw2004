@@ -1,10 +1,8 @@
 // Small functions found by the sweep (sweep.py). Original file and meanings unknown.
 
-#include "game_types.h"
+#include "game/frontend.h"
+#include "game/modes/pgatoursim.h"
 
-extern s32 lbl_80282508;
-
-void fn_8011D09C(u8* p0);
-void fn_8011D09C(u8* p0) {
-    lbl_80282508 = *(s32*)p0;
+void fn_8011D09C(MsgArg* pArgs, MsgArg* pResult) {
+    lbl_80282508 = pArgs[0].i;
 }

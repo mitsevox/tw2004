@@ -365,6 +365,14 @@ s32 GM_PgaTourSim_GetStatView(GM_Pga_StatTypes_t nStat) {
     return lbl_80194074[nStat];
 }
 
+u16 fn_8011903C(int nPlayer, int nGolfer) {
+    return gpSaveData[nPlayer].tour.aStats[nGolfer].nEvents;
+}
+
+u16 fn_80119064(int nPlayer, int nGolfer) {
+    return gpSaveData[nPlayer].tour.aStats[nGolfer].nRounds;
+}
+
 // Entrant 0 is the player's slot; it is the player when it holds the player's golfer.
 u8 fn_8011908C(int nPlayer, int nEntrant) {
     PgaEntrantMC* pEntrant = GetEntrantMCPtr(nPlayer, nEntrant);
