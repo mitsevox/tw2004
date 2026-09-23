@@ -2227,26 +2227,8 @@ unsorted/sweep_800AB374.c:
 unsorted/sweep_800AB39C.c:
 	.text       start:0x800AB39C end:0x800AB3A4
 
-unsorted/sweep_800AB608.c:
-	.text       start:0x800AB608 end:0x800AB658
-
-unsorted/sweep_800ABBC8.c:
-	.text       start:0x800ABBC8 end:0x800ABC34
-
-unsorted/sweep_800ABC34.c:
-	.text       start:0x800ABC34 end:0x800ABC54
-
-unsorted/sweep_800ABC54.c:
-	.text       start:0x800ABC54 end:0x800ABC9C
-
-unsorted/sweep_800ABD7C.c:
-	.text       start:0x800ABD7C end:0x800ABDB0
-
-unsorted/sweep_800AC310.c:
-	.text       start:0x800AC310 end:0x800AC328
-
-unsorted/sweep_800AC328.c:
-	.text       start:0x800AC328 end:0x800AC330
+hlaudtrackstm.c:
+	.text       start:0x800AB3A4 end:0x800AC330
 
 unsorted/sweep_800AC470.c:
 	.text       start:0x800AC470 end:0x800AC494
