@@ -86,20 +86,22 @@ void fn_80048894(UObject* pObj) {
 // Draws the object: its level of detail's mesh, unless fn_80007B2C finds it off screen (3); lit by
 // the ground under it (outside game type 3) when its mesh asks for it.
 void fn_800488B4(UObject* pObj) {
-    UObjMesh* pMesh = pObj->pModel->apLod[fn_80048AE8(pObj)];
-    f32 fFov = fn_8001F004()->fFov;
+    int bLit;
+    int nFlags0;
+    int nClip;
+    UObjMesh* pMesh;
+    f32 fFov;
     f32 fMax;
     f32 fSize;
-    int nClip;
-    int nFlags0;
     int nFlags2;
-    int bLit;
     f32 fLod;
 
+    pMesh = pObj->pModel->apLod[fn_80048AE8(pObj)];
+    fFov = fn_8001F004()->fFov;
     fn_8003526C();
     fMax = 0.75f * fFov * fn_8001414C();
     fn_80035240(pObj->m80);
-    fSize = fn_80014280(0.5f * (fFov <= fMax ? fFov : fMax));
+    fSize = fn_80014280(0.5f * (fFov > fMax ? fMax : fFov));
     nClip = fn_80007B2C(pMesh, fn_8001614C(), 0.0f, fSize, 1.0f);
     if (nClip == 3) return;
     nFlags0 = fn_80048AD4(pMesh, 0);
