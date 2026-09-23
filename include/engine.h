@@ -39,6 +39,7 @@ f32  Rand_Float(int nStream);           // 0x8000B428  [0, 1)
 void fn_8000C5D4(f32* pA, f32* pB, f32 f, f32* pOut);   // out = a + f x b
 f32  fn_8000C5FC(f32* pA, f32* pB);     // dot product
 double fn_8015F824(double x, double y); // pow
+f32  powf(f32 x, f32 y);                // 0x8002C8D0 (Golfer.c): pow rounded to a float
 f32  fn_800BB028(f32* pA, f32* pB);     // squared distance
 void vec4flt_CrossProduct(f32* pA, f32* pB, f32* pOut);   // cross product
 

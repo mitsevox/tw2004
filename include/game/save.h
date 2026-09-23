@@ -54,6 +54,51 @@ typedef struct TourWin {
     s16  n6;                    // 0x6  the tournament's aPrize[bracket][1]
 } TourWin;
 
+// PGA TOUR statistics (0x58 bytes): counted for the current tournament round in lbl_80205ED8
+// (GameModeDriverPGATour.c) and added to the profile's career totals as each round ends (fn_800EED0C).
+typedef struct TourStats {
+    u16  n0;                    // 0x00  tournaments started (the round counted was a first round)
+    u16  n2;                    // 0x02  rounds played
+    u16  n4;                    // 0x04  the career keeps the highest
+    u16  n6;                    // 0x06
+    s32  n8;                    // 0x08
+    u16  nC;                    // 0x0C  the career keeps the highest
+    u16  nE;                    // 0x0E
+    u16  n10;                   // 0x10
+    u16  n12;                   // 0x12
+    u16  n14;                   // 0x14
+    u16  n16;                   // 0x16
+    u16  n18;                   // 0x18
+    u16  n1A;                   // 0x1A
+    u16  n1C;                   // 0x1C
+    u16  n1E;                   // 0x1E
+    u16  n20;                   // 0x20
+    u16  n22;                   // 0x22
+    u16  n24;                   // 0x24
+    u16  n26;                   // 0x26
+    u16  n28;                   // 0x28
+    u16  n2A;                   // 0x2A
+    u16  n2C;                   // 0x2C
+    u16  n2E;                   // 0x2E
+    u16  n30;                   // 0x30
+    u16  n32;                   // 0x32
+    u16  n34;                   // 0x34
+    u16  n36;                   // 0x36
+    u16  n38;                   // 0x38
+    u16  n3A;                   // 0x3A
+    u16  n3C;                   // 0x3C
+    u8   unk3E[2];
+    s32  n40;                   // 0x40
+    s32  n44;                   // 0x44
+    u16  n48;                   // 0x48
+    u8   n4A;                   // 0x4A
+    u8   unk4B[5];
+    s32  n50;                   // 0x50
+    u16  n54;                   // 0x54
+    u8   unk56[2];
+} TourStats;
+LAYOUT_ASSERT(TourStats, 0x58);
+
 // One save profile (0x10600 bytes).
 typedef struct SaveProfile {
     u8   bActive;               // 0x00000  1: the slot holds a profile; payouts are scaled and awards given only then
@@ -105,9 +150,14 @@ typedef struct SaveProfile {
     u8   nGolferBallType;       // 0x054F9  -> PlayerProfile.nBallType
     u8   unk54FA[0xB634 - 0x54FA];
     TourSeason tour;            // 0x0B634
-    u8   unkBA9C[0x104C8 - 0xBA9C];
+    u8   unkBA9C[0xF66C - 0xBA9C];
+    TourStats tourStats;        // 0x0F66C  the career totals
+    u8   unkF6C4[0x104C8 - 0xF6C4];
     u16  n104C8;                // 0x104C8  counts the tournaments started
-    u8   unk104CA[0x10578 - 0x104CA];
+    u8   unk104CA[2];
+    u16  n104CC;                // 0x104CC  a run of tour rounds, counted on each 18th hole
+                                //          (fn_800EF2B8); reset to 0 when the run breaks
+    u8   unk104CE[0x10578 - 0x104CE];
     u8   a10578[4];             // 0x10578  marked holes 71..74: fn_800588F4's kind 0
     s32  a1057C[4];             // 0x1057C  and kind 1
     u8   unk1058C[0x10600 - 0x1058C];
