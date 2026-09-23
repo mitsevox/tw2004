@@ -825,6 +825,7 @@ config.libs = [
             Object(NonMatching, "mtalib.c"),
             Object(NonMatching, "Skeleton.c"),
             Object(NonMatching, "Golfer.c"),
+            Object(NonMatching, "GoRenderSurface.c"),
             Object(NonMatching, "LLPict_Gc.c"),
             Object(NonMatching, "GoTerrain.c"),
             Object(NonMatching, "Skin.c"),

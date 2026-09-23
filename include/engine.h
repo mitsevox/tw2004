@@ -115,6 +115,31 @@ extern RenderState lbl_801B8980;
 
 void fn_8005CC64(TexBank* pBank, TexEntry* pTex);  // set the texture of the next draw
 
+// A render surface (GoRenderSurface.c; our name, after the file): one of five 0x2C-byte slots at
+// lbl_801D3950. A slot whose n0 is not 1 owns a buffer of nSize bytes. Only what the code reads.
+typedef struct RenderSurface {
+    s32   n0;                   // 0x00  given when it is made; 0: the slot is free
+    s32   nWidth;               // 0x04  in pixels (512 x 448 for surface 0)
+    s32   nHeight;              // 0x08
+    s32   nC;                   // 0x0C  } fn_8002F38C's four values; made as the width, the
+    s32   n10;                  // 0x10  }   height, 0 and the pixel kind
+    s32   n14;                  // 0x14  }
+    s32   n18;                  // 0x18  }
+    s32   n1C;                  // 0x1C  the pixel kind: 1 or 2 is 4 bytes a pixel, 4 is 2, 8 or 16 is 1
+    s32   n20;                  // 0x20
+    void* pBuffer;              // 0x24
+    s32   nSize;                // 0x28  bytes: width x height x bytes a pixel
+} RenderSurface;
+LAYOUT_ASSERT(RenderSurface, 0x2C);
+
+extern RenderSurface lbl_801D3950[5];
+extern s32 lbl_80281D50;        // the surface fn_8002F38C selected last
+
+// GoRenderSurface.c
+int  fn_8002F260(s32 n0, s32 nWidth, s32 nHeight, s32 nKind, s32 n20, s32 nSurface);   // 0: no memory
+void fn_8002F38C(s32 nSurface, s32 nC, s32 n10, s32 n14, u32 uFlags, s32 n18);
+s32  fn_8002F454(s32 nSurface);     // the surface's buffer size, 0 if the slot is free
+
 // ---- the file streamer (UStream.c) -----------------------------------------------------------
 
 // An object built from SHOC chunks. The header is 0x34 bytes, then the copied chunk header
