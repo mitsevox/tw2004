@@ -548,7 +548,7 @@ config.libs = [
             Object(NonMatching, "MetroTRK/__exception.s"),
             Object(Matching, "MetroTRK/mainloop.c"),
             Object(Matching, "MetroTRK/nubevent.c"),
-            Object(NonMatching, "MetroTRK/nubinit.c"),
+            Object(Matching, "MetroTRK/nubinit.c"),
             Object(Matching, "MetroTRK/msg.c"),
             Object(Matching, "MetroTRK/msgbuf.c"),
             Object(NonMatching, "MetroTRK/serpoll.c"),
