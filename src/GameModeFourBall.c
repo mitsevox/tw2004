@@ -411,10 +411,10 @@ void fn_800E9CF4(void) {
     Player* p;
     int nLoser;
     int nMargin;
-    int nMoney;
     int nFirst;
     int nWinner;
     int i;
+    int nMoney;
     int k;
     if (fn_800E1BBC()) {
         switch (fn_800EC550()) {
