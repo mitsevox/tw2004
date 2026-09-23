@@ -239,8 +239,8 @@ void GolfCamera_InitGreenZoomToAimCamera(View* pView, int nPlayer) {
     pCourse = fn_8000C594();
     if (pCourse != NULL) {
         Vec_Copy(gPlayers[nPlayer].vTargetCopy, vAim);
-        Ter_GetEnclosingGroundData(fn_8000C594(), pCam, &fLow, &pSurfaceLow, vNormalLow, &fHigh, &pSurfaceHigh,
-                                   vNormalHigh);
+        Ter_GetEnclosingGroundData(fn_8000C594(), pCam, &fLow, &pSurfaceLow, vNormalLow, &fHigh,
+                                   &pSurfaceHigh, vNormalHigh);
         if (fLow < -60000.0f) {
             if (!(fHigh < -60000.0f)) {
                 fGround = fHigh;
