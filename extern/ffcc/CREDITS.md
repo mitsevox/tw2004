@@ -11,3 +11,4 @@ How they were chosen: `docs/tw2004-notes.md`, "SDK from other decompilations".
 Changed for this game (so the units link into the DOL):
 - `include/dolphin/gx/__gx.h`: the GX state pointer is `__GXData` (FFCC calls it `gx`), the name
   the rest of this game's GX library uses; `gx` is kept as a macro for it.
+- `src/ax/AX.c`: the release build string is this game's AX build (Sep  5 2002 05:34:31).
