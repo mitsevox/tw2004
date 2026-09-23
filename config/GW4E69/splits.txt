@@ -3657,26 +3657,8 @@ GameMode10.c:
 GameMode14.c:
 	.text       start:0x800F2984 end:0x800F39F4
 
-unsorted/sweep_800F3C74.c:
-	.text       start:0x800F3C74 end:0x800F3C7C
-
-unsorted/sweep_800F4698.c:
-	.text       start:0x800F4698 end:0x800F46BC
-
-unsorted/sweep_800F46BC.c:
-	.text       start:0x800F46BC end:0x800F471C
-
-unsorted/sweep_800F475C.c:
-	.text       start:0x800F475C end:0x800F4784
-
-unsorted/sweep_800F4878.c:
-	.text       start:0x800F4878 end:0x800F4894
-
-unsorted/sweep_800F4894.c:
-	.text       start:0x800F4894 end:0x800F48C4
-
-unsorted/sweep_800F4B00.c:
-	.text       start:0x800F4B00 end:0x800F4B14
+GameMode15.c:
+	.text       start:0x800F39F4 end:0x800F4B40
 
 unsorted/sweep_800F4DB4.c:
 	.text       start:0x800F4DB4 end:0x800F4DBC
