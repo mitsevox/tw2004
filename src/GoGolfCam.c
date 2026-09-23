@@ -11,7 +11,6 @@
 #include "dyncam.h"
 
 CamLens* fn_80008370(void* pCamera);                    // the render camera's lens
-void     fn_80045470(CamLens* pLens, f32 fFov);
 void     fn_800352BC(void);
 void     fn_80035240(int a);
 u8       fn_800635D0(int nPlayer);
@@ -31,7 +30,6 @@ void     fn_800C5D64(View* pView, f32* pCam, f32* pSub, int nPlayer);
 u8       fn_800C708C(View* pView);
 void     fn_80038010(u8 a, int n, f32* pVec);
 void     fn_800380A8(u8 a, f32* pVec, u8 b, int nSlot, f32 f1, f32 f2);
-u8       fn_8004562C(CamShot* pShot);                   // the shot's bAC is 0, 13..15 or 0x17
 int      fn_800636EC(void);
 void     fn_8000A194(f32 (*m)[4], f32 a, f32 b, f32 c);  // a rotation matrix from three angles
 void     fn_800BADB4(f32 (*m)[4], f32* pIn, f32* pOut);  // a vector through a matrix

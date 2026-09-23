@@ -335,7 +335,7 @@ typedef struct Character {
     u8    unk16E4[0x1788 - 0x16E4];
     Clip* pCurClip;             // 0x1788  the clip Char_SetClip picked
     u8    unk178C[0x1790 - 0x178C];
-    void* p1790;                // 0x1790  cleared by fn_80062BFC; CharacterState_AddSKABlendData plays it for
+    Clip* p1790;                // 0x1790  cleared by fn_80062BFC; CharacterState_AddSKABlendData plays it for
                                 //         groups 5, 6 and 10
     void* p1794;                // 0x1794  cleared by fn_80062BE8; the same for group 9
 } Character;
@@ -417,6 +417,7 @@ void  fn_8001C724(Character* pChar, int nKind);
 void  fn_8001C774(Character* pChar, int nClub);
 void  fn_8001C7FC(Character* pChar, int nStyle);   // the animation style (nStyle)
 Character* fn_8001D324(int nId);        // the character with this id (100: the flag, by its clips), or NULL
+void  fn_8001D624(int n);               // set gSession.aD2D[n]
 void  fn_8001D7A4(Character* pChar);
 void  fn_8001DA04(Character* pChar, u8* pA, u8* pB);
 void  fn_8001DB04(Character* pChar, f32* pOut);    // the golfer's position

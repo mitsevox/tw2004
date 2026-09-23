@@ -16,7 +16,9 @@ typedef struct CamLens {
     f32  v24[3];                // 0x24  a direction: goballfx.c's fn_80093A50 takes its angle to a light
     u8   unk30[0x34 - 0x30];
     f32  v34[3];                // 0x34  a position: GameMode8 measures the ball's distance to it
-    u8   unk40[0xB0 - 0x40];
+    u8   unk40[0xA4 - 0x40];
+    f32  fFov;                  // 0xA4  the field of view (GoGolfCam.c sets DEG(60.0f) or DEG(30.0f))
+    u8   unkA8[0xB0 - 0xA8];
     f32  fB0;                   // 0xB0  fn_8001EFFC; the zoom-to-aim camera divides its distance by it
     f32  fB4;                  // 0xB4  a flat camera's view width (guess)
     f32  fB8;                   // 0xB8  its view height (guess)
@@ -260,7 +262,9 @@ typedef struct CamTuning {
     u8   unk174[0x178 - 0x174];
     f32  f178;                  // 0x178
     f32  v17C[4];               // 0x17C
-    u8   unk18C[0x1C0 - 0x18C];
+    u8   unk18C[0x19C - 0x18C];
+    f32  f19C;                  // 0x19C  the steepest a camera direction may tilt (fn_8003D810, radians)
+    u8   unk1A0[0x1C0 - 0x1A0];
     s32  n1C0;                  // 0x1C0  nonzero enables camera 19
     u8   unk1C4[0x1C8 - 0x1C4];
     s32  bCheckSlope;           // 0x1C8  fn_800C4650 tests the slope to the target (fn_800C4520)
@@ -449,7 +453,8 @@ CamShot* fn_8003A950(CamSequence* pSequence, int nKind, int* pA, f32* pF1, f32* 
                      int nPlayer);
 CamSequence* fn_8003BDBC(int nPlayer, int nLie, int nClass, int nKind, int a, f32 fDist);
 CamSequence* DynamicCam_ChoosePreFlightSequence(int nPlayer, int nLie, int nKind);
-u8       fn_8003C9D0(int nPlayer, int a, CamSequence** ppSeq, CamShot** ppShot);
+// The sequence and shot named after the golfer's clip (with b, Character.p1790 first).
+u8       fn_8003C9D0(int nPlayer, u8 b, CamSequence** ppSeq, CamShot** ppShot);
 u8       fn_8003D7A0(CamSequence* pSequence, int nPlayer);   // it suits the player's club and shot
 u8     fn_8003DC78(CamShot* pShot);     // the shot's bAC is 1..6 or 7
 // 0 when gSession.nGameType is 3, else fn_8001EDF4 of the player's golfer (Player.pChar) as a flag;
@@ -475,6 +480,11 @@ u8       CameraScript_IsDefaultSwingCam(CamShot* pShot, int nPlayer, f32* pCam);
 u8       CamScript_KeepAboveGround(int nPlayer, f32* pNew, f32* pOld, int a, u8* pb1, f32* pf, u8* pb2,
                                    f32 fClearance);
 u8       CameraScript_WillGolferBeOccludedInThisView(int nPlayer, CamShot* pShot, void* pScript);
+void     fn_80045470(CamLens* pLens, f32 fFov);   // sets the lens's field of view
+u8       fn_8004562C(CamShot* pShot);             // the shot's bAC is 0, 13..15 or 23
+
+// GoCamera.c: works out the lens's fB0 from its field of view.
+void     fn_800763BC(CamLens* pLens);
 
 // ---- camera script helpers (gocamscripts, 0x800C7480..) -------------------------------------
 
