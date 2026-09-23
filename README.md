@@ -30,7 +30,8 @@ Last updated 2026-09-23.
 - SDK and runtime: 764 of 841 configured functions matched.
 - Named: about 1,300 functions. About 6,340 are still `fn_ADDRESS`.
 - Compiler: CodeWarrior GC/2.5, `-O4,p`. See `docs/compiler.md`.
-- Asset formats: animation libraries decoded; the rest inventoried. See `docs/formats`.
+- Asset formats: the CTRL container (`.hog`/`.gcb`/`.ngc`, with an extractor), course textures
+  (exported to PNG) and animation libraries decoded; the rest inventoried. See `docs/formats`.
 - Gameplay: nine gameplay hypotheses tested against the code (`docs/hypotheses.md`), with the
   mechanics written up in plain English in `docs/gameplay.md` (swing error, CPU putting, the
   cup pull, lucky shots, lies, wind, bounces).
