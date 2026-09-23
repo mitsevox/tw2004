@@ -89,6 +89,7 @@ Track B: Asset reverse engineering (disc data)
 
 Format notes live in [`docs/formats`](docs/formats/README.md). Compiler findings live in [`docs/compiler.md`](docs/compiler.md).
 
+How to match a function, step by step: [`docs/workflow.md`](docs/workflow.md) (scripts in `tools/match/`).
 Knowledge base: [`docs/tw2004-notes.md`](docs/tw2004-notes.md) (what we know about this game) and
 [`docs/decomp-notes.md`](docs/decomp-notes.md) (general CodeWarrior / GameCube pitfalls and good practice).
 What happened when, and why: [`docs/journal.md`](docs/journal.md).
