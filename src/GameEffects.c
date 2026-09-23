@@ -111,6 +111,11 @@ int   fn_800D089C(int nPlayer, int a);
 int   Hole_ScoreAfterTapIn(int nPlayer);
 void  fn_800BD83C(int nSound, int a);
 void  fn_800A6DCC(int nMusic, int a);
+u32   fn_8003A950(int nCam, int a, s32* pKind, f32* pTime, s32* p3, s32* p4, s32* p5, int nPlayer);
+u8    fn_800451A8(void* pList, u32 uTarget, int nPlayer);
+u8    fn_8003DC78(u32 uTarget);
+int   fn_80095780(int nHandle);             // the golfer's current animation
+void  fn_80095744(int nHandle, int nAnim);  // play an animation
 extern u8 gNumPlayersSetUp;                 // 0x80281D48 (Golfer.c)
 
 // A course's records (the 'rcrd' block at gSession + 0xF00, 0x320 bytes per course).
@@ -389,6 +394,86 @@ void fn_800DB714(int nPlayer) {
     }
 }
 
+// TW06: GameEffects_StartPredictedGB (by position). The look-ahead ball says the shot drops: a
+// predicted GameBreaker starts, for a human's shot that went far enough (1 with the putter, 10 for
+// a chip, 5 otherwise), with its own camera; a golfer mid-swing may get a reaction animation.
+void fn_800DBA50(int nPlayer) {
+    int nClass;
+    int nLie;
+    void* pView;
+    int nCam;
+    u32 uTarget;
+    f32 fDist;
+    f32 fTime;
+    s32 n14;
+    s32 nKind;
+    s32 nC;
+    s32 n8;
+    f32 v2[4];
+    f32 v[4];
+    if ((!(gSession.uFlags & 0x4000) || !(gSession.uFlags & 0x8000)) && !gSession.bReplay &&
+        !gSession.nSplitScreen && !gSession.unk8[0]) {
+        if (!gpGame->b285) {
+            return;
+        }
+        if (!(gPlayers[nPlayer].uFlags & 8) && !Player_IsCPU(nPlayer) && lbl_80202898.bGameBreaker != 1) {
+            fn_800DCB84(gPlayers[nPlayer].ball, gPlayers[nPlayer].ballBefore, v);
+            v[1] = 0.0f;
+            fDist = fn_80009680(fn_80009744(v));
+            if (gPlayers[nPlayer].nClub == 25) {
+                if (fDist < 1.0f) {
+                    return;
+                }
+            } else if (gPlayers[nPlayer].nShotKind == 1) {
+                if (fDist < 10.0f) {
+                    return;
+                }
+            } else if (fDist < 5.0f) {
+                return;
+            }
+            if (!gPlayers[nPlayer].unk30C[1] && fn_8000C594()) {
+                fn_800DCB84(gPlayers[nPlayer].ball + 0x40, gPlayers[nPlayer].ballBefore, v2);
+                v2[1] = 0.0f;
+                fDist = fn_80009680(fn_80009744(v2));
+                nLie = gPlayers[nPlayer].nLie;
+                if (*(s32*)(gPlayers[nPlayer].ballBefore + 0x74) >= 0) {
+                    nClass = gSurfaceTypes[*(s32*)(gPlayers[nPlayer].ballBefore + 0x74)].nClass;
+                } else {
+                    nClass = 10;
+                }
+                lbl_80202898.bClosing = 0;
+                lbl_80202898.bGameBreaker = 1;
+                lbl_80202898.fGBTime = 0.0f;
+                lbl_80202898.f24 = 0.0f;
+                lbl_80202898.nGBType = 1;
+                lbl_80202898.nPlayer = nPlayer;
+                lbl_80202898.bPaused = 0;
+                lbl_80202898.nHeartbeats = 0;
+                fn_80045494(0, nPlayer);
+                fn_80045558(0, nPlayer);
+                pView = fn_80017028(gPlayers[nPlayer].nView0);
+                nCam = fn_8003BDBC(nPlayer, nLie, nClass, 0xB, 1, fDist);
+                uTarget = fn_8003A950(nCam, 0, &nKind, &fTime, &n14, &nC, &n8, nPlayer);
+                if (uTarget && *(u32*)((u8*)pView + 0x130) != uTarget && *(u32*)((u8*)pView + 0x134) != uTarget &&
+                    !fn_800451A8((u8*)pView + 0x84, uTarget, nPlayer)) {
+                    if (nKind == 5 && fn_8003DC78(uTarget)) {
+                        if (gPlayers[nPlayer].nShotKind != SHOT_PUTT && fn_80095780(gPlayers[nPlayer].nShotHandle) != 9) {
+                            fn_80095744(gPlayers[nPlayer].nShotHandle, 14);
+                            if (0.0f == fTime) {
+                                fTime = 1.0f / 59.94f;
+                            }
+                        }
+                    }
+                    *(s32*)((u8*)pView + 0x74) = nCam;
+                    *(s32*)((u8*)pView + 0x148) = 0;
+                    *(s32*)((u8*)pView + 0x14C) = 25;
+                }
+                EVENT_Trigger(nPlayer, 0x3F, 0, -1);
+            }
+        }
+    }
+}
+
 // TW06: GameEffects_EndGB (by position). The letterbox starts closing, with the end event; the
 // GameBreaker music stops, or (a scripted one that failed) the old music comes back.
 void fn_800DBDA8(void) {
@@ -448,12 +533,14 @@ void fn_800DBFAC(void) {
     f32 fHeight;
     f32 fDist;
     f32 v[3];
+    GameEffects* pGE;
     if (lbl_80202898.fGBTime < 0.8f) {
         fHeight = 0.15f * (lbl_80202898.fGBTime / 0.8f);
     } else {
         fHeight = 0.15f;
     }
-    fn_800DCB84(gPlayers[lbl_80202898.nPlayer].ball, gPlayers[lbl_80202898.nPlayer].ballBefore, v);
+    pGE = &lbl_80202898;       // steers the register choice (found by the permuter)
+    fn_800DCB84(gPlayers[pGE->nPlayer].ball, gPlayers[pGE->nPlayer].ballBefore, v);
     v[1] = 0.0f;
     fDist = fn_80009680(fn_80009744(v));
     if (!Player_IsCPU(lbl_80202898.nPlayer)) {
@@ -461,22 +548,22 @@ void fn_800DBFAC(void) {
             if (fDist < 2.0f && !lbl_80202898.bClosing) {
                 fn_80045494(1, lbl_80202898.nPlayer);
             } else {
-                fn_80045494(0, lbl_80202898.nPlayer);
+                fn_80045494(0, pGE->nPlayer);
             }
         } else if (fDist < 4.0f && !lbl_80202898.bClosing) {
-            fn_80045494(1, lbl_80202898.nPlayer);
+            fn_80045494(1, pGE->nPlayer);
         } else {
-            fn_80045494(0, lbl_80202898.nPlayer);
+            fn_80045494(0, pGE->nPlayer);
         }
     } else {
-        fn_80045494(0, lbl_80202898.nPlayer);
+        fn_80045494(0, pGE->nPlayer);
     }
     fn_800DC290(fHeight);
     if (lbl_80202898.bClosing) {
         lbl_80202898.fGBTime -= gSession.fFrameTime;
         if (lbl_80202898.fGBTime < 0.0f) {
             lbl_80202898.bGameBreaker = 0;
-            fn_80045494(0, lbl_80202898.nPlayer);
+            fn_80045494(0, pGE->nPlayer);
         }
     } else {
         lbl_80202898.fGBTime += gSession.fFrameTime;
