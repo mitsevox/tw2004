@@ -2981,37 +2981,10 @@ unsorted/sweep_80113E54.c:
 	.text       start:0x80113E54 end:0x80113E60
 
 DynChain.c:
-	.text       start:0x80113E60 end:0x801164D4
+	.text       start:0x80113E60 end:0x80116540
 
-unsorted/sweep_80116540.c:
-	.text       start:0x80116540 end:0x80116598
-
-unsorted/sweep_80116598.c:
-	.text       start:0x80116598 end:0x801165A0
-
-unsorted/sweep_801165A0.c:
-	.text       start:0x801165A0 end:0x801165B0
-
-unsorted/sweep_80116DD4.c:
-	.text       start:0x80116DD4 end:0x80116DD8
-
-unsorted/sweep_80116F80.c:
-	.text       start:0x80116F80 end:0x80116FA4
-
-unsorted/sweep_801170EC.c:
-	.text       start:0x801170EC end:0x8011710C
-
-unsorted/sweep_8011714C.c:
-	.text       start:0x8011714C end:0x80117180
-
-unsorted/sweep_80117180.c:
-	.text       start:0x80117180 end:0x80117188
-
-unsorted/sweep_801174B8.c:
-	.text       start:0x801174B8 end:0x801174E4
-
-unsorted/sweep_801174E4.c:
-	.text       start:0x801174E4 end:0x80117510
+GameModeDriver.c:
+	.text       start:0x80116540 end:0x80117600
 
 PGATourSimulation.c:
 	.text       start:0x80117600 end:0x8011C068
