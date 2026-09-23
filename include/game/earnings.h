@@ -99,6 +99,15 @@ int  fn_800D38F0(int nWinner, int nLoser, int nMargin, s32* pPrize);   // a ladd
 int  fn_800D3C1C(void);                // TW06 GM_GetHighestRatedGolfer: the best rating among the players
 s32  fn_800D3D64(int nRating, int nHole);   // TW06 GM_Earnings_GetSkinsHoleValue
 u8   fn_800D750C(int nPlayer, int nAward);  // give an award if the player does not have it yet
+// Whether nValue and szName are already among the top five of a record (i the kind, k the table:
+// course k's records, recB[k], recC[k]). MC.c tests the u8 result.
+u8   fn_800D8458(int i, int nValue, const char* szName, int k);
+u8   fn_800D853C(int i, int nValue, const char* szName, int k);
+u8   fn_800D85DC(int i, int nValue, const char* szName, int k);
+// Offer nValue and szName to record kind nKind of the table that the game mode and
+// gpGame->nCurHoleNum pick (MC.c sets both to reach recB and recC, and passes nPlayer 5).
+// Earnings.c tests for 2 or 4, a new best.
+int  fn_800D8750(int nKind, int nValue, int a, const char* szName, int nPlayer);
 void fn_800D8D10(int nPlayer);          // clear the player's flags b30C..b30F
 void fn_800D8D38(int nPlayer);          // clear the flags fn_800D9350 sets (b310..b312)
 void fn_800D8D5C(int nPlayer);          // clear the player's money breakdown for the round

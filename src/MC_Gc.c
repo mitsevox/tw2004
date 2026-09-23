@@ -396,8 +396,8 @@ void fn_8009EF98(void) {
 void fn_8009F02C(void) {
     if (lbl_80281FE8 == NULL) {
         if (gSession.nGameType == 6) {
-            lbl_80281FE8 = lbl_80281FEC = lbl_80281FE4 = Skalib_ScratchToAram(0);
-            lbl_80281FDC = lbl_80281FE0 = lbl_80281FD8 = Skalib_ScratchToAram(1);
+            lbl_80281FE8 = lbl_80281FEC = lbl_80281FE4 = (SaveImage*)Skalib_ScratchToAram(0);
+            lbl_80281FDC = lbl_80281FE0 = lbl_80281FD8 = (SaveImage*)Skalib_ScratchToAram(1);
         } else {
             lbl_80281FE8 = lbl_80281FEC = lbl_80281FE4 =
                 fn_80009B34(lbl_80281FC0, 1, 0x20, "MC_Gc.c", 2805);
