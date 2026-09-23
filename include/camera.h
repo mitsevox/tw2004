@@ -123,7 +123,7 @@ typedef struct View {
     u8       unk26B;
 } View;
 
-// One of the four views on screen (lbl_801B8BA8, 0x288 bytes each; Player.nView0/nView1, TW06's
+// One of the four views on screen (lbl_801B8BA8, 0x288 bytes each; Player.nView[], TW06's
 // viewControllerID, index them): the render camera, the view's camera controller, the player it
 // follows.
 typedef struct ViewController {

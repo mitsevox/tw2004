@@ -184,9 +184,9 @@ void fn_800F3EBC(int nPlayer) {
                     gPlayers[nPlayer].nDD8 = 0;
                 }
                 if (!gSession.bReplay) {
-                    fn_8006434C(fn_80017004(gPlayers[nPlayer].nView0), gPlayers[nPlayer].ball.vPrev, &x, &y,
+                    fn_8006434C(fn_80017004(gPlayers[nPlayer].nView[0]), gPlayers[nPlayer].ball.vPrev, &x, &y,
                                 0);
-                    fn_8006A8D4(fn_80017004(gPlayers[nPlayer].nView0), &x, &y);
+                    fn_8006A8D4(fn_80017004(gPlayers[nPlayer].nView[0]), &x, &y);
                     fn_800F3980(0x33, lbl_80282380, 512.0f * x, 448.0f * y, nSurface, 1);
                 }
             }

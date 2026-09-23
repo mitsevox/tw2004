@@ -935,7 +935,7 @@ void fn_800E299C(void) {
         gPlayers[i].ball.nLie = 0;
         fn_80055AA8(&gPlayers[i].ball, &pCourse->tee[gSession.nTeeSet[i]].x, i);
         Mem_cpy(&gPlayers[i].ballBefore, &gPlayers[i].ball, sizeof(Ball));
-        Vec_Copy(&pCourse->tee[gSession.nTeeSet[i]].x, &gPlayers[i].fBallX);
+        Vec_Copy(&pCourse->tee[gSession.nTeeSet[i]].x, gPlayers[i].vBall);
         Vec_Copy(&pCourse->tee[gSession.nTeeSet[i]].x, gPlayers[i].vA44);
         GOLFERSTATE_Set(GS_WAIT, (u8)i);
         gPlayers[i].bLowIQPenalty = 0;

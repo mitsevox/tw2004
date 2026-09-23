@@ -272,20 +272,13 @@ typedef struct Player {
     u8   bPerfect;              // 0x3AC  no error / no forgiveness when set. TW06: perfect
     u8   unk3AD[3];
     s32  nShotKind2;            // 0x3B0
-    f32  fBallX;                // 0x3B4
-    f32  fBallY;                // 0x3B8
-    f32  fBallZ;                // 0x3BC
-    f32  fBallW;                // 0x3C0
+    f32  vBall[4];              // 0x3B4
     f32  vPreShot[4];           // 0x3C4  where the ball lay before the shot (GM_BumpBallForObstructions drops it
                                 //        back here). TW06: PreShotBallPos
     SwingData swing;            // 0x3D4  the swing meter's state for this player
     s32  nController;           // 0xA08  CONTROLLER_CPU for the AI. TW06: Controller (PlayerCtrl_t, 9 = AI)
-    s32  nView0;                // 0xA0C  TW06: viewControllerID[2]
-    s32  nView1;                // 0xA10
-    f32  fTargetX;              // 0xA14
-    f32  fTargetY;              // 0xA18
-    f32  fTargetZ;              // 0xA1C
-    f32  fTargetW;              // 0xA20
+    s32  nView[2];              // 0xA0C  the views (ViewController) the player uses. TW06: viewControllerID[2]
+    f32  vTarget[4];            // 0xA14
     f32  vTargetCopy[4];        // 0xA24  copy of the planned target. Probably TW06's originalTargetPos
     f32  vTarget2[4];           // 0xA34  copy of the chosen aim point
     f32  vA44[4];               // 0xA44  compared with the ball position (GM_BumpBallForObstructions)

@@ -176,7 +176,7 @@ void fn_800BF094(View* pView, int nPlayer) {
 void fn_800BF110(View* pView, int nPlayer) {
     fn_8001731C(pView);
     fn_80017314(pView);
-    fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView0)), DEG(60.0f));
+    fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[0])), DEG(60.0f));
     pView->n194 = 0;
     pView->p74 = NULL;
     pView->p130 = NULL;
@@ -186,7 +186,7 @@ void fn_800BF110(View* pView, int nPlayer) {
 void fn_800BF5E4(View* pView, int nPlayer) {
     fn_8001731C(pView);
     fn_80017314(pView);
-    fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView0)), DEG(60.0f));
+    fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[0])), DEG(60.0f));
     pView->n194 = 0;
     pView->p130 = NULL;
     pView->p74 = NULL;
@@ -226,7 +226,7 @@ void fn_800BFC80(View* pView, int nPlayer) {
         pView->shot19C.f68 = gPlayers[nPlayer].ball.vPos[1];
         pView->p130 = NULL;
         pView->p134 = NULL;
-        fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView0)), DEG(30.0f));
+        fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[0])), DEG(30.0f));
     }
 }
 
@@ -242,7 +242,7 @@ void fn_800C0364(View* pView, int nPlayer) {
         Vec3Copy(&pCourse->pin[nPinSet].x, pSub);
         pView->p130 = NULL;
         pView->p134 = NULL;
-        fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView0)), DEG(30.0f));
+        fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[0])), DEG(30.0f));
         pView->fCamTime = 0.0f;
     }
 }
@@ -266,7 +266,7 @@ void fn_800C0414(View* pView, int nPlayer) {
     if (pCourse != NULL) {
         Vec3Copy(pCam, vOld);
         pPin = &pCourse->pin[Game_CurrentPinSet()].x;
-        fn_800C73DC(pPin, &gPlayers[nPlayer].fBallX, vToPin);
+        fn_800C73DC(pPin, gPlayers[nPlayer].vBall, vToPin);
         vToPin[1] = 0.0f;
         fDist = fn_80009680(fn_80009744(vToPin));
         if (fDist < 0.1f) {
@@ -576,7 +576,7 @@ void fn_800C1670(View* pView, int nPlayer) {
 
 // Undo what camera 20 set up (b56): the view's rectangle back to 0,0-1,1 and the render state reset.
 void fn_800C1790(View* pView, int nPlayer) {
-    int nView = gPlayers[nPlayer].nView0;
+    int nView = gPlayers[nPlayer].nView[0];
     if (lbl_80282220->b56) {
         fn_800171D8(fn_80012EF0(fn_80017004(nView)), 0.0f, 0.0f, 1.0f, 1.0f);
         fn_800352BC();
@@ -597,7 +597,7 @@ void fn_800C16C4(View* pView, int nPlayer) {
     int nView;
     pCam = fn_8001731C(pView);
     pSub = fn_80017314(pView);
-    nView = gPlayers[nPlayer].nView0;
+    nView = gPlayers[nPlayer].nView[0];
     if (fn_800B36F4(pView, nPlayer, gSession.fFrameTime)) {
         fn_800C1790(pView, nPlayer);
         View_SetCamera(fn_80017028(nView), 14, nPlayer, nView);
@@ -847,8 +847,8 @@ void fn_800C38BC(View* pView, int nPlayer) {
     pCam = fn_8001731C(pView);
     pSub = fn_80017314(pView);
     pView->p130 = NULL;
-    pCam[0] = gPlayers[nPlayer].fBallX;
-    pCam[2] = gPlayers[nPlayer].fBallZ;
+    pCam[0] = gPlayers[nPlayer].vBall[0];
+    pCam[2] = gPlayers[nPlayer].vBall[2];
     pCam[1] = 1.5f;
     pSub[0] = pCam[0] - 1.0f;
     pSub[1] = pCam[1];
@@ -1068,8 +1068,8 @@ int fn_800C4518(View* pView) {
 
 // Is the target too steep from the ball: |dy / dx| at least fUp going up, fDown going down.
 u8 fn_800C4520(View* pView, int nPlayer, f32 fUp, f32 fDown) {
-    f32 dx = gPlayers[nPlayer].fTargetX - gPlayers[nPlayer].ball.vPos[0];
-    f32 dy = gPlayers[nPlayer].fTargetY - gPlayers[nPlayer].ball.vPos[1];
+    f32 dx = gPlayers[nPlayer].vTarget[0] - gPlayers[nPlayer].ball.vPos[0];
+    f32 dy = gPlayers[nPlayer].vTarget[1] - gPlayers[nPlayer].ball.vPos[1];
     f32 fSlope;
     if (fabsf(dx) < 1e-6f) {
         return 0;
@@ -1093,7 +1093,7 @@ u8 fn_800C4604(View* pView, int nPlayer) {
     f32 vNormal[4];
     SurfaceType* pSurface;
     TerObject* pObj;
-    return Ter_CheckForGroundCollision(gPlayers[nPlayer].ball.pCourse, pView->v0, &gPlayers[nPlayer].fTargetX,
+    return Ter_CheckForGroundCollision(gPlayers[nPlayer].ball.pCourse, pView->v0, gPlayers[nPlayer].vTarget,
                                        vHit, vNormal, &pSurface, &pObj);
 }
 
@@ -1375,7 +1375,7 @@ void fn_800C5EC0(View* pView, f32* pCam, f32* pSub, int nPlayer) {
 // aim point.
 void fn_800C6010(View* pView, int nPlayer) {
     f32 v[4];
-    fn_800C73DC(gPlayers[nPlayer].vTarget2, &gPlayers[nPlayer].fBallX, v);
+    fn_800C73DC(gPlayers[nPlayer].vTarget2, gPlayers[nPlayer].vBall, v);
     v[1] = 0.0f;
     if (pView->shot19C.f60 + 0.1f < (f32)fn_80009680(fn_80009744(v)) - 3.0f) {
         pView->shot19C.f60 += 0.1f;

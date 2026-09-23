@@ -323,20 +323,20 @@ void fn_80100508(void) {
     if (-1.0f == lbl_80192DF8[n].vPos[0] && -1.0f == lbl_80192DF8[n].vPos[1] &&
         -1.0f == lbl_80192DF8[n].vPos[2]) {
         pCourse = fn_8000C594();
-        Vec_Copy(&pCourse->tee[gSession.nTeeSet[0]].x, &gPlayers[0].fBallX);
+        Vec_Copy(&pCourse->tee[gSession.nTeeSet[0]].x, gPlayers[0].vBall);
     } else {
         fHeight = Terrain_HeightAt(lbl_80192DF8[n].vPos, NULL);
         if (-65536.125f != fHeight) {
             lbl_80192DF8[n].vPos[1] = fHeight;
         }
-        Vec_Copy(lbl_80192DF8[n].vPos, &gPlayers[0].fBallX);
+        Vec_Copy(lbl_80192DF8[n].vPos, gPlayers[0].vBall);
     }
-    Vec_Copy(&gPlayers[0].fBallX, gPlayers[0].vPreShot);
-    Vec_Copy(&gPlayers[0].fBallX, gPlayers[0].ball.vPos);
-    fn_80055AA8(&gPlayers[0].ball, &gPlayers[0].fBallX, 0);
+    Vec_Copy(gPlayers[0].vBall, gPlayers[0].vPreShot);
+    Vec_Copy(gPlayers[0].vBall, gPlayers[0].ball.vPos);
+    fn_80055AA8(&gPlayers[0].ball, gPlayers[0].vBall, 0);
     // EA bug: always true (|| where && was meant), so the ball is always dropped.
     if (lbl_802823FC != 1 || lbl_802823FC != 8 || lbl_802823FC != 9 || lbl_802823FC != 11) {
-        Physics_DropBall(&gPlayers[0].ball, &gPlayers[0].fBallX);
+        Physics_DropBall(&gPlayers[0].ball, gPlayers[0].vBall);
     }
     gPlayers[0].attrMod[0] = 0;
     gPlayers[0].attrMod[8] = 0;
@@ -430,8 +430,8 @@ void fn_801008F8(void) {
     if (lbl_802823FC == 7) {
         AI_DefaultTarget(0);
         Shot_Prepare(0, 1);
-        BreakLine_Start(gPlayers[0].nView0);
-        fn_8009B970(gPlayers[0].nView0);
+        BreakLine_Start(gPlayers[0].nView[0]);
+        fn_8009B970(gPlayers[0].nView[0]);
         fn_8001C804(0, 1, 1);
         fn_800957D8(gPlayers[0].pChar);
         fn_80058FA4(0);
@@ -458,8 +458,8 @@ void fn_80100A3C(int nPlayer) {
     Shot_Prepare(0, 1);
     gPlayers[0].nShotKind = nShotKind;
     gPlayers[0].nClub = nClub;
-    BreakLine_Start(gPlayers[0].nView0);
-    fn_8009B970(gPlayers[0].nView0);
+    BreakLine_Start(gPlayers[0].nView[0]);
+    fn_8009B970(gPlayers[0].nView[0]);
     fn_8001C804(0, 1, 1);
     fn_800957D8(gPlayers[0].pChar);
     fn_80095744(gPlayers[0].pChar, 5);
@@ -540,12 +540,12 @@ void fn_80100C08(void) {
             if (lbl_80282424 == 13) {
                 lbl_80282428 = 18;
                 lbl_80282424 = 13;
-                fn_80063BF4(fn_80017028(gPlayers[0].nView0), 0.25f, &v.x);
+                fn_80063BF4(fn_80017028(gPlayers[0].nView[0]), 0.25f, &v.x);
             }
         }
         break;
     case 18:
-        if (fn_80063C7C(fn_80017028(gPlayers[0].nView0))) {
+        if (fn_80063C7C(fn_80017028(gPlayers[0].nView[0]))) {
             lbl_80282428 = lbl_80282424;
         }
         break;
@@ -819,8 +819,8 @@ void fn_80100C08(void) {
         }
         // falls through
     case 19:
-        if (fn_80063C7C(fn_80017028(gPlayers[0].nView0))) {
-            nView = gPlayers[0].nView0;
+        if (fn_80063C7C(fn_80017028(gPlayers[0].nView[0]))) {
+            nView = gPlayers[0].nView[0];
             View_SetCamera(fn_80017028(nView), 18, 0, nView);
             if (lbl_802823FC == 12) {
                 lbl_80282424 = 13;

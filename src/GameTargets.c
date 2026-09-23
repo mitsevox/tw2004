@@ -105,7 +105,7 @@ s8 fn_800F1C74(int nPlayer) {
 
 // The target nearest the player's aim point.
 int fn_800F1D34(int nPlayer) {
-    f32* pTarget = &gPlayers[nPlayer].fTargetX;
+    f32* pTarget = gPlayers[nPlayer].vTarget;
     int i;
     int nBest = 0;
     f32 fBest = Vec_Distance(lbl_80211D38[0], pTarget);

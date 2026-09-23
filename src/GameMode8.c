@@ -452,15 +452,15 @@ void fn_800FA608(int nPlayer) {
     GM_MovePlayerToBall(nPlayer);
     Shot_Plan(nPlayer, 1);
     for (i = 0; i < 2; i++) {
-        fn_8001704C((&gPlayers[nPlayer].nView0)[i], nPlayer);
+        fn_8001704C(gPlayers[nPlayer].nView[i], nPlayer);
     }
     fn_8001D8DC(nPlayer);
     fn_8001C804(nPlayer, 1, 1);
     fn_800957D8(gPlayers[nPlayer].pChar);
     fn_80095744(gPlayers[nPlayer].pChar, 5);
     Emotion_UpdatePlayerEmotion(nPlayer);
-    fn_80062F1C(fn_80017028(gPlayers[nPlayer].nView0));
-    i = gPlayers[nPlayer].nView0;
+    fn_80062F1C(fn_80017028(gPlayers[nPlayer].nView[0]));
+    i = gPlayers[nPlayer].nView[0];
     View_SetCamera(fn_80017028(i), 12, nPlayer, i);
     gPlayers[nPlayer].nC54 = 74;
     gPlayers[nPlayer].nC3C |= 2;
@@ -600,7 +600,7 @@ void fn_800FAAB8(int nPlayer, int nEvent) {
 // A shot has come to rest (from state 12's update): count the stroke, and after out of bounds
 // drop the ball (water) or replace it. Returns 0 when the golfer goes back to state 1. In the
 // two-player stroke game (mode 7) it also scores events: the penalties (4/5, or 0x1E/0x1F with
-// nC3C bit 4), and the distance from fBallX/fBallZ against the other player's (events 1, 0x18
+// nC3C bit 4), and the distance from vBall[0]/vBall[2] against the other player's (events 1, 0x18
 // and 0x19).
 u8 fn_800FAD54(int nPlayer) {
     int nOther;
@@ -673,8 +673,8 @@ u8 fn_800FAD54(int nPlayer) {
         }
         return 0;
     }
-    fX = gPlayers[nPlayer].fBallX;
-    fZ = gPlayers[nPlayer].fBallZ;
+    fX = gPlayers[nPlayer].vBall[0];
+    fZ = gPlayers[nPlayer].vBall[2];
     if (fX == gPlayers[nPlayer].vA44[0] && fZ == gPlayers[nPlayer].vA44[2]) {
         dx = gPlayers[nPlayer].ball.vPos[0] - fX;
         dz = gPlayers[nPlayer].ball.vPos[2] - fZ;
@@ -1014,7 +1014,7 @@ void fn_800FBD2C(int nPlayer) {
                 }
                 pHole = fn_8000C594();
                 fn_80055AA8(&p->ball, &pHole->tee[gSession.nTeeSet[nPlayer]].x, nPlayer);
-                Vec_Copy(&pHole->tee[gSession.nTeeSet[nPlayer]].x, &p->fBallX);
+                Vec_Copy(&pHole->tee[gSession.nTeeSet[nPlayer]].x, p->vBall);
                 Vec_Copy(&pHole->tee[gSession.nTeeSet[nPlayer]].x, p->vA44);
                 gPlayers[nPlayer].nC3C &= ~1;
                 if (lbl_802823C8) {
@@ -1140,10 +1140,10 @@ void fn_800FBD2C(int nPlayer) {
     case 1:
         break;
     case 0:
-        Vec_Copy(&p->fBallX, vStart);
+        Vec_Copy(p->vBall, vStart);
         fn_80069330(nPlayer, vStart);
         fn_8006A6C4(nPlayer);
-        n = gPlayers[nPlayer].nView0;
+        n = gPlayers[nPlayer].nView[0];
         View_SetCamera(fn_80017028(n), 9, nPlayer, n);
         gPlayers[nPlayer].nC3C |= 1;
         fn_80062C80(gPlayers[nPlayer].nC58, 0);
@@ -1205,7 +1205,7 @@ void fn_800FBD2C(int nPlayer) {
         fToPlace = fn_80009680(vDir[0] * vDir[0] + vDir[2] * vDir[2]);
         // the distance to a position in the view's object (+0x34), if that is nearer; the second
         // square root is written twice, as a MIN() macro would expand
-        fn_800FE190(pBall->vPos, (f32*)(fn_80008370(*(u8**)fn_80016CFC(gPlayers[nPlayer].nView0)) + 0x34),
+        fn_800FE190(pBall->vPos, (f32*)(fn_80008370(*(u8**)fn_80016CFC(gPlayers[nPlayer].nView[0])) + 0x34),
                     vDir);
         fDist = (fToPlace <= (f32)fn_80009680(vDir[0] * vDir[0] + vDir[2] * vDir[2]))
 
@@ -1213,7 +1213,7 @@ void fn_800FBD2C(int nPlayer) {
                     : (f32)fn_80009680(vDir[0] * vDir[0] + vDir[2] * vDir[2]);
         if (gPlayers[nPlayer].ball.nState == 0) {
             if (fDist < 5.0f) {
-                Vec_Copy(pBall->vPos, &p->fBallX);
+                Vec_Copy(pBall->vPos, p->vBall);
                 gPlayers[nPlayer].nC3C &= ~1;
                 fn_80062C80(gPlayers[nPlayer].nC58, 1);
                 fn_800FE0AC(gPlayers[nPlayer].nC58, 0);
@@ -1246,7 +1246,7 @@ void fn_800FBD2C(int nPlayer) {
 
 // States 12 and 24, exit: camera 25.
 void fn_800FCBDC(int nPlayer) {
-    int nView = gPlayers[nPlayer].nView0;
+    int nView = gPlayers[nPlayer].nView[0];
     View_SetCamera(fn_80017028(nView), 25, nPlayer, nView);
 }
 
@@ -1325,7 +1325,7 @@ void fn_800FCCF0(void) {
                         fn_80055AA8(&gPlayers[nPlayer].ball,
                                     &pHole->tee[gSession.nTeeSet[nPlayer]].x, nPlayer);
                         Vec_Copy(&pHole->tee[gSession.nTeeSet[nPlayer]].x,
-                                 &gPlayers[nPlayer].fBallX);
+                                 gPlayers[nPlayer].vBall);
                         Vec_Copy(&pHole->tee[gSession.nTeeSet[nPlayer]].x,
                                  gPlayers[nPlayer].vA44);
                         gPlayers[nPlayer].nC3C &= ~1;
@@ -1347,7 +1347,7 @@ void fn_800FCCF0(void) {
                   gPlayers[i].ball.nLie != 16))) {
                 pHole = fn_8000C594();
                 fn_80055AA8(&gPlayers[i].ball, &pHole->tee[gSession.nTeeSet[i]].x, i);
-                Vec_Copy(&pHole->tee[gSession.nTeeSet[i]].x, &gPlayers[i].fBallX);
+                Vec_Copy(&pHole->tee[gSession.nTeeSet[i]].x, gPlayers[i].vBall);
                 Vec_Copy(&pHole->tee[gSession.nTeeSet[i]].x, gPlayers[i].vA44);
                 gPlayers[i].nC3C &= ~1;
                 fn_800FE0AC(gPlayers[i].nC58, 0);
@@ -1691,7 +1691,7 @@ u8 fn_800FDF60(void) {
         if (gPlayers[0].nC54 < 71) {
             return 1;
         }
-    } else if (!fn_80063C90(fn_80017028(gPlayers[0].nView0))) {
+    } else if (!fn_80063C90(fn_80017028(gPlayers[0].nView[0]))) {
         return 1;
     }
     return 0;

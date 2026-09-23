@@ -319,7 +319,7 @@ void fn_800DB714(int nPlayer) {
         fDist *= fn_8005B64C(nPlayer);
         fn_80045494(0, nPlayer);
         fn_80045558(0, nPlayer);
-        pView = fn_80017028(gPlayers[nPlayer].nView0);
+        pView = fn_80017028(gPlayers[nPlayer].nView[0]);
         pView->p74 = fn_8003BDBC(nPlayer, nLie, 3, 0xC, 1, fDist);
         lbl_80202898.b19 = 1;
         if (lbl_80202898.f24 > 0.8f) {
@@ -385,7 +385,7 @@ void fn_800DBA50(int nPlayer) {
                 lbl_80202898.nHeartbeats = 0;
                 fn_80045494(0, nPlayer);
                 fn_80045558(0, nPlayer);
-                pView = fn_80017028(gPlayers[nPlayer].nView0);
+                pView = fn_80017028(gPlayers[nPlayer].nView[0]);
                 pSeq = fn_8003BDBC(nPlayer, nLie, nClass, 0xB, 1, fDist);
                 pShot = fn_8003A950(pSeq, 0, &nKind, &fTime, &f2, &nB, &f3, nPlayer);
                 if (pShot != NULL && pView->p130 != pShot && pView->p134 != pShot &&
@@ -621,9 +621,9 @@ void GameEffects_SetSuperSlowMo(u8 bOn, int nPlayer, f32 fRate) {
     if (bOn) {
         if (!lbl_80202898.bSlowMo) {
             if (fRate < 1.0f) {
-                EVENT_Trigger(nPlayer, 0x35, &gPlayers[nPlayer].fBallX, -1);
+                EVENT_Trigger(nPlayer, 0x35, gPlayers[nPlayer].vBall, -1);
             } else {
-                EVENT_Trigger(nPlayer, 0x37, &gPlayers[nPlayer].fBallX, -1);
+                EVENT_Trigger(nPlayer, 0x37, gPlayers[nPlayer].vBall, -1);
             }
             lbl_80202898.bSlowMo = bOn;
         }
@@ -635,10 +635,10 @@ void GameEffects_SetSuperSlowMo(u8 bOn, int nPlayer, f32 fRate) {
     if (lbl_80202898.bSlowMo) {
         lbl_80202898.bSlowMo = bOn;
         if (lbl_80202898.fSlowMo < 1.0f) {
-            EVENT_Trigger(nPlayer, 0x36, &gPlayers[nPlayer].fBallX, -1);
+            EVENT_Trigger(nPlayer, 0x36, gPlayers[nPlayer].vBall, -1);
             return;
         }
-        EVENT_Trigger(nPlayer, 0x38, &gPlayers[nPlayer].fBallX, -1);
+        EVENT_Trigger(nPlayer, 0x38, gPlayers[nPlayer].vBall, -1);
     }
 }
 

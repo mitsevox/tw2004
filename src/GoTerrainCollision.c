@@ -374,7 +374,7 @@ u8 Ter_SearchForDropLocation(int nPlayer, u8 bPreferred, u8 bCheck, f32* pOut) {
     }
 done:
     if (p->ball.vStart[0] == pOut[0] && p->ball.vStart[2] == pOut[2]) return 0;
-    if (bCheck && p->vA44[0] == p->fBallX && p->vA44[2] == p->fBallZ
+    if (bCheck && p->vA44[0] == p->vBall[0] && p->vA44[2] == p->vBall[2]
         && fn_800BB028(pOut, p->vA44) < 2500.0f) {
         return 0;
     }
@@ -1132,7 +1132,7 @@ u8 Ter_CheckForPinCollision(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* p
     f32 fT;
 
     if (nPlayer < 0) return 0;
-    if (fn_80016CFC(gPlayers[nPlayer].nView0)->bFlagOut) return 0;
+    if (fn_80016CFC(gPlayers[nPlayer].nView[0])->bFlagOut) return 0;
     // the line relative to the pin
     vFrom[0] = pFrom[0] - pCourse->pin[Game_CurrentPinSet()].x;
     vFrom[1] = pFrom[1] - pCourse->pin[Game_CurrentPinSet()].y;
