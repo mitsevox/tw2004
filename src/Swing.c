@@ -593,9 +593,14 @@ void Swing_Launch(int nPlayer) {
         fAim = p->fAim + fn_8005CC84(gPlayers[nPlayer].vLaunchA[0] / gPlayers[nPlayer].vLaunchA[2]) +
                gPlayers[nPlayer].swing.fMishitAngle;
     }
-    while (fAim < -PI) fAim += 2 * PI;
-    while (fAim > PI) fAim -= 2 * PI;
-    Ball_Launch(pBall, nClub, nKind, gPlayers[nPlayer].swing.fShotPower, fAim, nTrajectory, pLaunchA, pLaunchB);
+    while (fAim < -PI) {
+        fAim += 2 * PI;
+    }
+    while (fAim > PI) {
+        fAim -= 2 * PI;
+    }
+    Ball_Launch(pBall, nClub, nKind, gPlayers[nPlayer].swing.fShotPower, fAim, nTrajectory, pLaunchA,
+                pLaunchB);
 }
 
 
@@ -2826,14 +2831,14 @@ extern Vec4 lbl_80183640;
 // State 12: the ball is away. In a replay with the kept ball unset, a special path; otherwise
 // the ball as it lies is kept. Camera 14 unless the swing animation is 11 or the view says no.
 void STATEFUNC_SimulateInit(int nPlayer) {
-    void* pV = fn_80017028(gPlayers[nPlayer].nView0);
-    Player* p = &gPlayers[nPlayer];
-    if (gSession.bReplay != 0 && *(s32*)(p->ballBefore + 0x64) == 0) {
+    void* pV   = fn_80017028(gPlayers[nPlayer].nView0);
+    u8*  pBallBefore = gPlayers[nPlayer].ballBefore;
+    if (gSession.bReplay != 0 && *(s32*)(pBallBefore + 0x64) == 0) {
         fn_8006B2C4(nPlayer, 1);
     } else {
-        Mem_cpy(p->ballBefore, p->ball, 0xBC);
+        Mem_cpy(pBallBefore, gPlayers[nPlayer].ball, 0xBC);
     }
-    p->nBallBeforeOwner = -1;
+    *(s32*)(pBallBefore + 0x94) = -1;
     if (fn_80095780(gPlayers[nPlayer].nShotHandle) != 11 && fn_80101738() && !fn_800C6CB0()) {
         int nView = gPlayers[nPlayer].nView0;
         View_SetCamera(fn_80017028(nView), 0xE, nPlayer, nView);
