@@ -226,7 +226,10 @@ typedef struct Player {
 
 // Terrain surface descriptors (0x44 bytes each); only the index of one is used here.
 typedef struct SurfaceType {
-    u8   unk[0x2C];
+    f32  f00;                   // 0x00  added to the ball's f70 (fn_800510EC)
+    u8   unk4[0x1C - 0x4];
+    f32  f1C;                   // 0x1C  0.375 on surfaces a ball may stop on (Ball_Stop)
+    u8   unk20[0x2C - 0x20];
     u32  nClass;                // 0x2C  3 = green
     u8   unk30[0x44 - 0x30];
 } SurfaceType;
@@ -299,7 +302,9 @@ typedef struct GameState {
     u8   unk285;
     u8   b286;                  // 0x286  the flight camera toggles are allowed
     u8   b287;                  // 0x287  in-flight replays are allowed
-    u8   unk288[0x290 - 0x288];
+    u8   unk288[0x28B - 0x288];
+    u8   bNoWind;               // 0x28B  wind off
+    u8   unk28C[0x290 - 0x28C];
     s32  n290;                  // 0x290
     s32  n294;                  // 0x294
 } GameState;
@@ -361,7 +366,7 @@ f32  Terrain_HeightAt(f32* pPos, SurfaceType** ppSurface);   // 0x800447DC
 f32  fn_80050D34(f32 fDist);            // putt power for a distance
 f32  fn_80050F44(int nKind, int nClub); // a club's table reach for a shot kind
 f32  fn_80050F88(f32 fDist, u8* pParams, int nKind, int nClub);   // chip power
-f32  fn_800510EC(u8* pParams);          // distance scale
+f32  fn_800510EC(u8* pBall);            // the ball's f70 + its surface's +0x00
 int  fn_80100744(void);                 // shot kind override, 8 = none
 int  fn_801006F0(int nPlayer);          // club override, 26 = none
 CourseInfo* fn_8000C594(void);

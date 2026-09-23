@@ -116,6 +116,14 @@ Reading compiler output
   square first in evaluation order, i.e. `dx*dx + dz*dz` where `dz` was computed first; a fused
   `x + y*z` shows up as `fmadds` where the original has separate `fmuls`/`fadds` - use a
   temporary for the product.
+- **[verified] A float parameter reused as the running value.** When the original's product
+  lands in a different callee-saved register than ours and the operands of `fmuls` are swapped
+  (`f1, f0` vs `f0, f1`), the source overwrote the parameter: `fSeconds *= 60.0f; do { ...
+  fSeconds -= fTick; } while (fSeconds > 0)` rather than a new `fLeft` local. (`Ball_SimSeconds`.)
+- **[verified] An unexplained `mr r3, r4` before the first call** means an unused first
+  parameter: the function takes something in r3 it never reads (`fn_80051124(Ball*, f32, f32*)`).
+- **[verified] A constant compared both ways as `x < c && x > -c` with `fneg`** comes from a local:
+  `eps = 1e-6f; if (y < eps && y > -eps)`. Writing the literal `-1e-6f` loads a second constant.
 - **[verified] `abs()` on an int** is emitted inline as `srawi t,v,31; xor; subf` (no call).
 - **[verified] The `lwzu`/`lfsu` idiom is a repeated field access, not a pointer local.** When the
   same `gPlayers[n].field` is read again after a call, CodeWarrior makes a pointer to the field
