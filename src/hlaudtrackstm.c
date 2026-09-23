@@ -10,7 +10,6 @@
 int  fn_80006478(s32 hFile, u8* pDst, u32 uLen, u32 uOffset,
                  void (*pfnDone)(int nBytes, int nError, AudTrack* pTrack, u8 nId), int n,
                  AudTrack* pTrack, u8 nId, int n19);                 // read from disc, not waiting
-s32  DVDGetDriveStatus(void);
 
 void fn_800AB860(AudTrack* pTrack);
 void fn_800ABC54(AudTrack* pTrack);

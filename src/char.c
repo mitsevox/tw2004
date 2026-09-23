@@ -41,6 +41,8 @@ void  fn_8001CE5C(UStreamObject* pObject);
 void  fn_8001D020(UStreamObject* pObject);
 void  fn_8001D3EC(UStreamObject* pObject);
 void  fn_8001D7EC(void);
+void  fn_8001C5B4(Character* pChar, int n);
+void  fn_800BBADC(int nValue);         // SitDevFile.c
 void  fn_8001EBD8(Character* pChar, int nBone, f32* pPos);
 u8    fn_8001EC48(Character* pChar);
 f32 (*fn_8001EC6C(Character* pChar, int nBone))[4];
@@ -57,6 +59,12 @@ void  fn_8009555C(void);
 void  fn_80095560(void);
 void  fn_80095564(void);
 void  fn_800955F0(int nPlayer);
+void  fn_8001744C(void* pChar, void* pModel, struct ProfileLogos* pLogos);   // char_tex_manager.c
+void  fn_8010BA2C(void* p);
+void  fn_8008B704(void);               // FEgolferanim.c
+void  fn_8008B754(int nNext);           // FEgolferanim.c
+int   fn_8008B990(void);
+u8    fn_8008E924(void);                // FEgolferanim.c
 void  fn_8008E918(s32 v);
 u8    fn_8008E938(void);
 void  fn_8008EAC8(u8 v);
@@ -111,6 +119,16 @@ void fn_8001C650(void* arg0, s32 arg1) {
 }
 
 // ---- end of sweep code ----
+
+// Clear the character's animation events: none set, all at time 2^30 (never).
+void fn_80017508(Character* pChar) {
+    s32 i;
+
+    for (i = 0; i < 18; i++) {
+        pChar->events[i].bSet = 0;
+        pChar->events[i].fTime = 1073741824.0f;
+    }
+}
 
 // Pick the character's clip for an animation group and style from its animation library, keyed
 // also by the character's club class (class 1 looks up as 0) and n16D4. The lookup's fallback flags
@@ -182,6 +200,20 @@ void fn_80019648(void) {
     fn_8001A4BC();
 }
 
+// Replays the character's blend at its current time: fAnimTime from f180, the blend's time
+// (fn_8001F02C) and v1638[1], then one animation update of no length.
+void fn_8001966C(Character* pChar) {
+    if (pChar != NULL && pChar->pBlend != NULL) {
+        pChar->u10 |= 0x10000;
+        pChar->u10 |= 8;
+        pChar->u10 |= 4;
+        pChar->pModel->pSkel->n2C = 0;
+        pChar->fAnimTime = pChar->f180 + fn_8001F02C(pChar->pBlend, 2) - pChar->v1638[1];
+        Character_UpdateAnimation(pChar, 0, 0.0f);
+        pChar->pModel->pSkel->n2C = 0;
+    }
+}
+
 // Give back the character's pool entries and free what it holds.
 void fn_8001971C(Character* pChar) {
     fn_8001A3B0(pChar);
@@ -231,6 +263,15 @@ void fn_8001A0FC(Character* pChar) {
     if (fn_8008E938() == 0) {
         fn_8001A024(pChar);
     }
+}
+
+void fn_8001A20C(Character* pChar) {
+    fn_80019C84(pChar);
+    fn_80019CEC(pChar);
+    fn_8001744C(pChar, pChar->a64[pChar->n74], pChar->pLogos);
+    fn_8010BA2C(pChar->a64[pChar->n74]);
+    pChar->bE0 = 1;
+    lbl_801B95E8.a[6].p = NULL;
 }
 
 // Reset every pool entry and mark it free.
@@ -411,11 +452,55 @@ u8 fn_8001C584(int nPlayer) {
     return b;
 }
 
+// Set the club class, and put the club head bone at the class's height.
+void fn_8001C5B4(Character* pChar, int n) {
+    int nBone;
+
+    if (pChar == NULL || pChar->pModel == NULL || pChar->nSlot < 0 || pChar->nSlot >= 3) {
+        return;
+    }
+    nBone = fn_8001EED8(pChar->pModel, 0x53);
+    if (pChar->p16D8 != NULL) {
+        pChar->nClubClass = n;
+        pChar->pModel->pBones[nBone].v1C[1] = pChar->p16D8->afC[pChar->nClubClass];
+    }
+}
+
+// The player's golfer takes the player's shot kind and club; when either changed, it goes back
+// to animation 5.
+void fn_8001C680(int nPlayer) {
+    Player* pPlayer = &gPlayers[nPlayer];
+    Character* pChar = pPlayer->pChar;
+    int nKind = pChar->nShotKind;
+    int nClub;
+
+    fn_8001C724(pChar, pPlayer->nShotKind);
+    nClub = pChar->nClub;
+    fn_8001C774(pChar, pPlayer->nClub);
+    if (nClub != pPlayer->nClub || nKind != pPlayer->nShotKind) {
+        pChar->nAnim = 0;
+        pChar->u10 |= 0x80;
+        fn_80095744(pChar, 5);
+        fn_8001C804(nPlayer, 1, 1);
+    }
+}
+
 // Set the character's shot kind and the clip key that goes with it.
 void fn_8001C724(Character* pChar, int nKind) {
     if (pChar != NULL) {
         fn_8001C650(pChar, lbl_80187164[nKind]);
         pChar->nShotKind = nKind;
+    }
+}
+
+void fn_8001C774(Character* pChar, int nClub) {
+    // per club: what fn_8001C5B4 gets
+    int aKind[26] = {0, 0, 0, 0, 0, 0, 1, 1, 1, 3, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 2};
+
+    if (pChar != NULL) {
+        fn_800BBADC(nClub);
+        pChar->nClub = nClub;
+        fn_8001C5B4(pChar, aKind[nClub]);
     }
 }
 
@@ -544,6 +629,21 @@ void fn_8001D624(int n) {
     gSession.aD2D[n] = 1;
 }
 
+// Each index set by fn_8001D624 is taken once the CrAP camera's golfer runs its script, the front
+// end is not in state 4 and fn_8008E924 agrees: the front end is aborted into state 4.
+void fn_8001D63C(void) {
+    int i;
+
+    for (i = 0; i < 5; i++) {
+        if (gSession.aD2D[i] && lbl_80281EE0->pB4 != NULL && lbl_80281EE0->pB4->b18 &&
+            fn_8008B990() != 4 && fn_8008E924()) {
+            gSession.aD2D[i] = 0;
+            fn_8008B704();
+            fn_8008B754(4);
+        }
+    }
+}
+
 void fn_8001D6D8(int n) {
     gSession.aD28[n] = 1;
 }
@@ -561,6 +661,22 @@ void fn_8001D8DC(int nPlayer) {
     if (!gSession.nSplitScreen && lbl_80281CAC != nPlayer) {
         fn_8001D6D8(nPlayer);
         lbl_80281CAC = nPlayer;
+    }
+}
+
+// Where the ball sits on the hand: bone 0x1A's position, moved 0.05 along the bone's x axis (the
+// other way while the model's bEE is set).
+void Character_GetBallOnFingerPosition(Character* pChar, f32* pPos) {
+    f32 (*pMtx)[4] = fn_8001EC6C(pChar, 0x1A);
+    f32 vAxis[3];
+
+    Vec_Copy(pMtx[3], pPos);
+    Vec3Copy(pMtx[0], vAxis);
+    fn_800BAF04(vAxis, vAxis);
+    if (fn_8001EDF4(pChar)) {
+        fn_8000C5D4(pPos, vAxis, 0.05f, pPos);
+    } else {
+        fn_8000C5D4(pPos, vAxis, -0.05f, pPos);
     }
 }
 

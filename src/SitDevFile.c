@@ -249,7 +249,7 @@ u32 fn_800BB6FC(f32* pPos) {
     if (lbl_80282210 == 0) return 0;
     for (i = 0; i < lbl_80282210; i++) {
         if (fn_8000C140(pPos, &lbl_801FA1C0[i]->net, lbl_801FA1C0[i]->net.nNumNodes)) {
-            uBits |= *(u32*)lbl_801FA1C0[i]->aNodes[lbl_801FA1C0[i]->net.nNumNodes];
+            uBits |= *(u32*)&lbl_801FA1C0[i]->net.aNodes[lbl_801FA1C0[i]->net.nNumNodes];
         }
     }
     return uBits;

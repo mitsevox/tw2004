@@ -205,6 +205,36 @@ int  fn_800102DC(u64 uHash, TexBank** ppBank, TexEntry** ppTex);
 // Makes a texture bank from a 'txf ' stream object's data (LLTex.c), in pBank or, when it is NULL,
 // a new allocation.
 TexBank* fn_8000FB88(struct UStreamObject* pObject, TexBank* pBank, int n);
+void fn_8000FFAC(TexBank* pBank);       // LLTex.c: free a bank's pixel and palette data
+
+// The texture banks from 'txf2' stream objects (LoadData.c): a bank per object id (modulo
+// 100000), searched by name with fn_8000BDF8.
+#define NUM_TXF2_BANKS 200
+#define TXF2_KEPT_SIZE 0x8000           // how much of the id-10000 'txf2' object's data is kept
+extern TexBank* lbl_801A26DC[NUM_TXF2_BANKS];
+void fn_8000B884(void);                 // clear the banks
+void fn_8000B8F4(void);                 // free the banks
+void fn_8000B984(void);                 // allocate the buffers of the 'load' and 'txf2' objects
+void fn_8000B9E4(void);                 // register the 'txf2' handler
+void fn_8000BA14(void);                 // unregister it
+void fn_8000BAE0(void);                 // load the loading-screen stream file of the current mode/course
+u8   fn_8000BD80(char* pName, u8** ppPixels);   // a texture's pixels by name; 0 if none
+// Find a texture by name: its bank's index, or -1 (bank and entry NULL).
+int  fn_8000BDF8(char* pName, TexBank** ppBank, TexEntry** ppTex);
+
+// What LoadData.c keeps of the 'load' stream object (fe_movies.c shows it): its data is copied
+// into the buffer at lbl_80281C04.
+typedef struct LoadObjInfo {
+    u8   unk0[0x1C];
+    u32  uSize;                 // 0x1C  the data's size
+    u8   unk20[4];
+} LoadObjInfo;
+LAYOUT_ASSERT(LoadObjInfo, 0x24);
+extern LoadObjInfo lbl_801A25F0;
+extern u8* lbl_80281C04;                // the 'load' object's data (147700 bytes)
+
+void fn_80014544(int n);                // load the numbered stream file (sprintf'd name)
+void fn_800147A4(void);                 // streammanagerhole.c
 
 // The texture bank list (LLTexGrp.c): the banks loaded from 'txf ' stream objects, searched by
 // fn_800102DC.
@@ -383,14 +413,17 @@ extern s32 lbl_80281B88;        // bit 0: the video field being drawn
 
 // ---- the file streamer (UStream.c) -----------------------------------------------------------
 
-// An object built from SHOC chunks. The header is 0x34 bytes, then the copied chunk header
-// (from SHDR chunk offset 0x14) and, 0x80-aligned, the data.
+// An object built from SHOC chunks. The header is 0x34 bytes (LoadData.c copies one with
+// Mem_cpy(p, pObject, 0x34); ObjList.c's list head lbl_801A25B8 is one), then the rest of the
+// copied chunk header (chunk+0x30 onward: a word, the name's length at 0x38, the name at 0x40)
+// and, 0x80-aligned, the data.
 typedef struct UStreamObject {
     u8*   pData;                  // 0x00
     u32   uUnk4;                  // 0x04
-    u32   uUnk8;                  // 0x08
-    struct UStreamObject* pPrev;  // 0x0C  finished-object queue
-    struct UStreamObject* pNext;  // 0x10
+    void (*pfn8)(struct UStreamObject* pObject);   // 0x08  called when ObjList.c releases the
+                                  //       object (fn_8000B588)
+    struct UStreamObject* pPrev;  // 0x0C  finished-object queue; ObjList.c: toward the list's tail
+    struct UStreamObject* pNext;  // 0x10  ObjList.c: toward the list's head
     int   nUnk14;                 // 0x14
     u32   uFlags;                 // 0x18  chunk+0x14; set to 1 for txf / Cpyr / Cact / txf2
     u32   uType;                  // 0x1C  chunk+0x18, e.g. 'ter '
@@ -401,16 +434,38 @@ typedef struct UStreamObject {
     u32   uRef28;                 // 0x28  chunk+0x24 } rebased by the RPNS value when the
     u32   uRef2C;                 // 0x2C  chunk+0x28 } object is delivered
     u32   uRef30;                 // 0x30  chunk+0x2C }
-    u32   uUnk34;                 // 0x34  chunk+0x30
-    u32   uNameLen;               // 0x38  chunk+0x34
-    u32   uUnk3C;                 // 0x3C  chunk+0x38
-    char  szName[4];              // 0x40  chunk+0x3C
 } UStreamObject;
+LAYOUT_ASSERT(UStreamObject, 0x34);
 
 int  UStream_RegisterHandler(int nType, void (*pfnHandler)(UStreamObject*));
 int  UStream_UnregisterHandler(int nType);
 u32  fn_8000E790(UStreamObject* pObject, u32 uMax, void* pDst);   // copy the data out, free the object
 u32  fn_8000E81C(UStreamObject* pObject, void** ppData);          // the data and its size
+
+// The list of kept stream objects (ObjList.c). Objects are added at the head or the tail
+// (fn_8000B4B0 picks which), around a fixed mark object; fn_8000B68C releases one side of it.
+void fn_8000B46C(void);                 // empty the list (only the mark in it)
+void fn_8000B4B0(int nEnd);             // where fn_8000B4B8 adds: 0 the head, 1 the tail
+void fn_8000B4B8(UStreamObject* pObject);   // add an object
+u8   fn_8000B508(UStreamObject* pObject);   // an object of the same type and id is in the list
+u8   fn_8000B54C(u32 uType, u32 uId);   // an object of this type and id is in the list
+void fn_8000B588(UStreamObject* pObject);   // take an object out of the list and free it
+void fn_8000B63C(void);                 // release every object
+void fn_8000B68C(int nEnd);             // release the objects before (0) or after (1) the mark
+UStreamObject* fn_8000B70C(u32 uType, u32 uId);   // find an object by type and id (NULL: none)
+
+// A record in a block of tagged records (fn_8000B748): this header, then the data, then padding
+// to 4 bytes.
+typedef struct TagRecord {
+    u32  uTag;                  // 0x0
+    u32  uSize;                 // 0x4  the record's size, header included (before the padding)
+    u32  uId;                   // 0x8
+} TagRecord;
+LAYOUT_ASSERT(TagRecord, 0xC);
+
+void* fn_8000B748(u8* pBlock, u32 uLen, u32 uTag, u32 uId);   // the record's data
+TagRecord* fn_8000B7B0(u8* pBlock, u32 uLen, u32 uTag, u32 uId);   // the record (NULL: none)
+void fn_8000B830(UStreamObject* pObject);   // free an object
 
 // Files on disc: a handle from open, -1 for none.
 int  fn_800060E0(const char* pName);    // file open
@@ -419,6 +474,9 @@ int  fn_8000633C(int hFile);            // file close
 // 0: the read could not be queued.
 int  fn_80006444(int hFile, void* pDst, u32 uLen, u32 uOffset, void (*pfnDone)(int nBytes, int nError));
 u32  fn_800065B0(int hFile);            // file size
+// LLFileIO_Gc.c: read a whole file into a new block aligned to nAlign; its size goes to *puSize.
+// NULL if the file is missing or cannot be read.
+void* fn_800065C8(const char* pName, u32* puSize, int nAlign);
 
 // ---- fonts -----------------------------------------------------------------------------------
 

@@ -60,7 +60,6 @@ void fn_8007744C(void);
 void Golfer_LoadCreatedFromSave(void);
 int  fn_80077BDC(int n);
 void fn_80077C1C(int a, int b);
-u8   fn_80078008(s32 nAsset, SaveProfile* pProfile);
 void fn_80078680(SaveProfile* pProfile);
 void fn_8007873C(SaveProfile* pProfile);
 u8   FE_CrAP_IsAssetUndesirable(s16 nPart, CrAPAsset* pAsset);

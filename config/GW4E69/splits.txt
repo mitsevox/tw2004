@@ -78,41 +78,14 @@ UMemPool.c:
 urandom.c:
 	.text       start:0x8000B130 end:0x8000B46C
 
-unsorted/sweep_8000B4B0.c:
-	.text       start:0x8000B4B0 end:0x8000B4B8
+ObjList.c:
+	.text       start:0x8000B46C end:0x8000B884
 
-unsorted/sweep_8000B984.c:
-	.text       start:0x8000B984 end:0x8000B9E4
+LoadData.c:
+	.text       start:0x8000B884 end:0x8000BF20
 
-unsorted/sweep_8000BA14.c:
-	.text       start:0x8000BA14 end:0x8000BA3C
-
-unsorted/sweep_8000BA6C.c:
-	.text       start:0x8000BA6C end:0x8000BA94
-
-unsorted/sweep_8000BEC8.c:
-	.text       start:0x8000BEC8 end:0x8000BED8
-
-unsorted/sweep_8000BED8.c:
-	.text       start:0x8000BED8 end:0x8000BEE4
-
-unsorted/sweep_8000BF8C.c:
-	.text       start:0x8000BF8C end:0x8000BF9C
-
-unsorted/sweep_8000C0F0.c:
-	.text       start:0x8000C0F0 end:0x8000C104
-
-unsorted/sweep_8000C244.c:
-	.text       start:0x8000C244 end:0x8000C278
-
-unsorted/sweep_8000C594.c:
-	.text       start:0x8000C594 end:0x8000C5A4
-
-unsorted/sweep_8000C5A4.c:
-	.text       start:0x8000C5A4 end:0x8000C5D4
-
-unsorted/sweep_8000C5FC.c:
-	.text       start:0x8000C5FC end:0x8000C624
+TerrainData.c:
+	.text       start:0x8000BF20 end:0x8000C624
 
 UStream.c:
 	.text       start:0x8000C624 end:0x8000E830
@@ -239,9 +212,13 @@ UObject.c:
 
 UKernel.c:
 	.text       start:0x80048AF4 end:0x800496E0
+	.data       start:0x80187D58 end:0x80187D68
+	.sdata2     start:0x80283200 end:0x80283208
 
 GoDynObjBase.c:
 	.text       start:0x800496E0 end:0x80049B40
+	.data       start:0x80187D68 end:0x80187DF0
+	.sdata2     start:0x80283208 end:0x80283218
 
 GoAnimalActors.c:
 	.text       start:0x80049B40 end:0x8004ABBC
