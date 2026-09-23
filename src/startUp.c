@@ -20,7 +20,6 @@ void   fn_800B00A4(u16 nVoice, u32 u, int a);
 void   fn_800B0114(u16 nVoice, VoiceEnvelope* pEnv);
 void   fn_800B01B4(u16 nVoice, u8 bA, u8 bB);
 void   fn_800B055C(u32 n);
-u32    fn_800B0698(u32 uSize);
 s32    fn_800B09C8(int nPort, int nSlot);
 void   fn_800B0DB8(void);
 void   fn_800B0DFC(void);

@@ -7,50 +7,43 @@
 
 #include "core/audtrack.h"
 
-// The emitter functions below 0x800A85CC (not placed yet).
-void fn_800A8248(u8 nId, s32 n1, s32 n2);
-void fn_800A82CC(u8 nId, s32 n1, s32 n2);
-void fn_800A834C(void);
-void fn_800A8394(u8 nId, s32 n1, s32 n2, s32 n3);
-void fn_800A8424(u8 nId, s32 n1, f32 f);
-void fn_800A84A4(u8 nId, s32 n1, f32 f);
-
 AudInstance* fn_800AD674(u8 nId);
 
 void fn_800AD1C4(void) {
 }
 
-void fn_800AD950(u8 nId, s32 n1, s32 n2) {
+// The calls below pass on to AudTable.c's entry nId (the same number as the instance).
+void fn_800AD950(u8 nId, u8 nTrack, u8 n) {
     if (fn_800AD674(nId) != NULL) {
-        fn_800A8248(nId, n1, n2);
+        fn_800A8248(nId, nTrack, n);
     }
 }
 
-void fn_800AD9AC(u8 nId, s32 n1, s32 n2) {
+void fn_800AD9AC(u8 nId, u8 nTrack, u8 n) {
     if (fn_800AD674(nId) != NULL) {
-        fn_800A82CC(nId, n1, n2);
+        fn_800A82CC(nId, nTrack, n);
     }
 }
 
-void fn_800ADA08(void) {
-    fn_800A834C();
+void fn_800ADA08(s16 nSound, u8 nTrack, u8 n) {
+    fn_800A834C(nSound, nTrack, n);
 }
 
-void fn_800ADA28(u8 nId, s32 n1, s32 n2, s32 n3) {
+void fn_800ADA28(u8 nId, u8 nTrack, u8 n, int bCheck) {
     if (fn_800AD674(nId) != NULL) {
-        fn_800A8394(nId, n1, n2, n3);
+        fn_800A8394(nId, nTrack, n, bCheck);
     }
 }
 
-void fn_800ADA94(u8 nId, s32 n1, f32 f) {
+void fn_800ADA94(u8 nId, u8 nTrack, f32 fVolume) {
     if (fn_800AD674(nId) != NULL) {
-        fn_800A8424(nId, n1, f);
+        fn_800A8424(nId, nTrack, fVolume);
     }
 }
 
-void fn_800ADAF0(u8 nId, s32 n1, f32 f) {
+void fn_800ADAF0(u8 nId, u8 nTrack, f32 fPitch) {
     if (fn_800AD674(nId) != NULL) {
-        fn_800A84A4(nId, n1, f);
+        fn_800A84A4(nId, nTrack, fPitch);
     }
 }
 
