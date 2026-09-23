@@ -343,7 +343,7 @@ s32 fn_800F266C(s32 n, int i) {
     return n;
 }
 
-// Is f far enough for the player's tees (313 back, 300 middle, 293 front)?
+// Is f far enough for the player's tee set (0: 313, 1: 300, 2 and 3: 293)?
 u8 fn_800F2788(int nPlayer, f32 f) {
     switch (gSession.nTeeSet[nPlayer]) {
     case 0:

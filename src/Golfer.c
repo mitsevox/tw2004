@@ -8,6 +8,8 @@
 #include "engine.h"
 #include "game/save.h"
 
+// fake match: the (s8) on GOLFERSTATE_GetCurrentState (see game.h).
+
 // ---- small accessors ------------------------------------------------------------------------
 
 u8 Player_IsCPU(int nPlayer) {
@@ -1186,7 +1188,7 @@ void Shot_DefaultSpin(int nPlayer, f32* pOut) {
 // The x part is 0.02 either way for a slight curve and 0.04 for a big one, then the vector is normalised.
 void AI_FaceVector(int nPlayer, f32* pOut) {
     Player* p = &gPlayers[nPlayer];
-    int     nShape = Scenario_RequiredShape(nPlayer);
+    int     nShape = fn_8010069C(nPlayer);
     if (nShape != 7) {
         p->nShotShape = nShape;
     }
@@ -1878,7 +1880,7 @@ void Session_Init(void) {
     pSession->b11         = 0;
     pSession->b12         = 0;
     pSession->bReplay     = 0;
-    pSession->n14       = 0;
+    pSession->nPaused   = 0;
     pSession->uFlags     &= ~0x60;
     pSession->fFrameTime  = 0.0f;
     pSession->f1C         = 0.0f;

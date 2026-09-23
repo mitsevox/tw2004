@@ -271,11 +271,13 @@ u8 fn_800EA758(u8 bCheck) {
 
 // TW06: GameModeMatch::EndHole. The player who holed out in fewer strokes wins the hole.
 void fn_800EAA40(void) {
-    if (Player_IsHoled(0) && gPlayers[0].nStrokes[Game_CurHoleIndex()] < gPlayers[1].nStrokes[Game_CurHoleIndex()]) {
+    if (Player_IsHoled(0) &&
+        gPlayers[0].nStrokes[Game_CurHoleIndex()] < gPlayers[1].nStrokes[Game_CurHoleIndex()]) {
         gPlayers[0].nModePoints[Game_CurHoleIndex()] = 1;
         gPlayers[0].nHolesWon++;
     }
-    if (Player_IsHoled(1) && gPlayers[1].nStrokes[Game_CurHoleIndex()] < gPlayers[0].nStrokes[Game_CurHoleIndex()]) {
+    if (Player_IsHoled(1) &&
+        gPlayers[1].nStrokes[Game_CurHoleIndex()] < gPlayers[0].nStrokes[Game_CurHoleIndex()]) {
         gPlayers[1].nModePoints[Game_CurHoleIndex()] = 1;
         gPlayers[1].nHolesWon++;
     }

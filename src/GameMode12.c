@@ -29,7 +29,7 @@ void fn_800FF3F8(void);
 void fn_800FF5B4(int nPlayer);
 void fn_800FF6C0(int nPlayer);
 
-// Mode 12 starts: stroke play with mode 0's turn order, one mulligan per player per round.
+// Mode 12 starts: stroke play with mode 0's turn order, any number of mulligans.
 void fn_800FEAFC(void) {
     gpGame->pfnInit = fn_800FEAFC;
     gpGame->pfnGetHonors = fn_800FF894;

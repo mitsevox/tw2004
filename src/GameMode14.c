@@ -8,6 +8,8 @@
 #include "game.h"
 #include "engine.h"
 
+// fake match: the (s8) on GOLFERSTATE_GetCurrentState (see game.h).
+
 // One target's claim: how close the claiming shot was (0 best .. 4, 5 = unclaimed) and who holds it
 // (5 = nobody).
 typedef struct Claim {
@@ -15,7 +17,6 @@ typedef struct Claim {
     s32 nOwner;                 // 0x4
 } Claim;
 extern Claim lbl_80211FB8[40];
-#define CLAIMS lbl_80211FB8
 
 extern s32 lbl_80281688;                    // the options saved while the game runs
 extern s32 lbl_80282368;
@@ -169,22 +170,22 @@ void fn_800F2E08(int nPlayer) {
         if (nSurface >= 0x85 && nSurface <= 0x90 && !fn_800F2788(nPlayer, fLength)) {
             nTarget = fn_800F1C74(nPlayer);
             nRank = fn_800F1E58(nSurface);
-            if (CLAIMS[nTarget].nRank == 0) {
+            if (lbl_80211FB8[nTarget].nRank == 0) {
                 fn_800F3980(0x33, 0, 0, 0, 0xCD, 1);
                 fn_800A63D0();
                 nMsg = 2;
-            } else if (nRank >= CLAIMS[nTarget].nRank) {
+            } else if (nRank >= lbl_80211FB8[nTarget].nRank) {
                 fn_800F3980(0x33, 0, 0, 0, 0xCC, 1);
                 nMsg = 0x10;
             } else {
                 nText = 0;
-                if (CLAIMS[nTarget].nRank == 5) {
+                if (lbl_80211FB8[nTarget].nRank == 5) {
                     if (!(Rand_Next(0) & 1)) {
                         nMsg = 0x1A;
                     } else {
                         nMsg = 0x52;
                     }
-                } else if (nPlayer == CLAIMS[nTarget].nOwner) {
+                } else if (nPlayer == lbl_80211FB8[nTarget].nOwner) {
                     nMsg = 0x42;
                 } else {
                     nText = 0xD4;
@@ -215,8 +216,8 @@ void fn_800F2E08(int nPlayer) {
                     }
                     nKind = 2;
                 }
-                CLAIMS[nTarget].nRank = nRank;
-                CLAIMS[nTarget].nOwner = nPlayer;
+                lbl_80211FB8[nTarget].nRank = nRank;
+                lbl_80211FB8[nTarget].nOwner = nPlayer;
                 gPlayers[nPlayer].aCD4[gPlayers[nPlayer].nCD0] = nSurface;
                 gPlayers[nPlayer].nCD0++;
                 gPlayers[nPlayer].nD70[Game_CurHoleIndex()]++;
@@ -310,8 +311,8 @@ void fn_800F3358(void) {
     int i;
     fn_800F1EE4();
     for (i = 0; i < 40; i++) {
-        CLAIMS[i].nRank = 5;
-        CLAIMS[i].nOwner = 5;
+        lbl_80211FB8[i].nRank = 5;
+        lbl_80211FB8[i].nOwner = 5;
     }
 }
 
@@ -349,14 +350,14 @@ s32 fn_800F3490(int nPlayer) {
     if (gPlayers[nPlayer].nSurface < 0x85 || gPlayers[nPlayer].nSurface > 0x90) {
         return -1;
     }
-    return CLAIMS[CurrentTarget(nPlayer)].nOwner;
+    return lbl_80211FB8[CurrentTarget(nPlayer)].nOwner;
 }
 
 s32 fn_800F34F0(int nPlayer) {
     if (gPlayers[nPlayer].nSurface < 0x85 || gPlayers[nPlayer].nSurface > 0x90) {
         return -1;
     }
-    return CLAIMS[fn_800F1D34(nPlayer)].nRank;
+    return lbl_80211FB8[fn_800F1D34(nPlayer)].nRank;
 }
 
 // How many targets the player holds.
@@ -364,7 +365,7 @@ int fn_800F354C(int nPlayer) {
     s32 n = 0;
     int i;
     for (i = 0; i < 40; i++) {
-        if (nPlayer == CLAIMS[i].nOwner) {
+        if (nPlayer == lbl_80211FB8[i].nOwner) {
             n++;
         }
     }
@@ -372,17 +373,17 @@ int fn_800F354C(int nPlayer) {
 }
 
 s32 fn_800F363C(int i) {
-    return CLAIMS[i].nOwner;
+    return lbl_80211FB8[i].nOwner;
 }
 
 s32 fn_800F3654(s32 p0) {
-    return CLAIMS[p0].nRank;
+    return lbl_80211FB8[p0].nRank;
 }
 
 // A claimed target's points.
 s32 fn_800F3668(int n) {
-    if (CLAIMS[n].nOwner != 5) {
-        return lbl_801928F0[CLAIMS[n].nRank];
+    if (lbl_80211FB8[n].nOwner != 5) {
+        return lbl_801928F0[lbl_80211FB8[n].nRank];
     }
     return 0;
 }
@@ -395,12 +396,12 @@ void fn_800F36A4(void) {
         PLAYER(i)->nDD8 = 0;
     }
     for (i = 0; i < 40; i++) {
-        if (CLAIMS[i].nOwner != 5) {
+        if (lbl_80211FB8[i].nOwner != 5) {
             n = fn_800F3668(i);
             n = fn_800F266C(n, i);
-            n = fn_800D6A70(n, CLAIMS[i].nOwner, 1, 1, 1, 0);
-            n = fn_800D7220(n, CLAIMS[i].nOwner, 0);
-            gPlayers[CLAIMS[i].nOwner].nDD8 += n;
+            n = fn_800D6A70(n, lbl_80211FB8[i].nOwner, 1, 1, 1, 0);
+            n = fn_800D7220(n, lbl_80211FB8[i].nOwner, 0);
+            gPlayers[lbl_80211FB8[i].nOwner].nDD8 += n;
         }
     }
 }
@@ -444,13 +445,13 @@ void fn_800F3860(void) {
 
 // A target's state for the HUD: 1 claimed with a hole-out, 2 player 0's, 3 player 1's, 0 free.
 s32 fn_800F392C(int a, int i) {
-    if (CLAIMS[i].nRank == 0) {
+    if (lbl_80211FB8[i].nRank == 0) {
         return 1;
     }
-    if (CLAIMS[i].nOwner == 0) {
+    if (lbl_80211FB8[i].nOwner == 0) {
         return 2;
     }
-    return CLAIMS[i].nOwner == 1 ? 3 : 0;
+    return lbl_80211FB8[i].nOwner == 1 ? 3 : 0;
 }
 
 void fn_800F3980(int nMsg, s32 a, s32 b, s32 c, s32 d, s32 e) {

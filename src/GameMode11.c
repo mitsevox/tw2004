@@ -1,13 +1,15 @@
-// GameMode11.c (our name): game mode 11, the lessons (the code's "scenarios"). One player on hole 14
-// of course 10; eleven lessons (lbl_802823FC, 1..11; 12 when all are done), each a shot from a set
-// spot with a required shot kind, club and shape (lbl_80192DF8). The mode saves some of the player's
-// options when it starts and puts them back when it ends. Golfer.c, Swing.c and skalib.c ask it what
-// the lesson allows.
+// GameMode11.c (our name): game mode 11, the lessons. One player on hole 14 of course 10; eleven
+// lessons (lbl_802823FC, 1..11; 12 when all are done), each a shot from a set spot with a required
+// shot kind, club and shape (lbl_80192DF8). The mode saves some of the player's options when it
+// starts and puts them back when it ends. Golfer.c, Swing.c and skalib.c ask it what the lesson
+// allows.
 
 #include "golfer.h"
 #include "game.h"
 #include "engine.h"
 #include "game/save.h"
+
+// fake match: the (s8) on GOLFERSTATE_GetCurrentState (see game.h).
 
 // One lesson: where the ball is placed and what the shot must be (lessons 1..11; 12 is the end).
 typedef struct Lesson {
@@ -17,7 +19,8 @@ typedef struct Lesson {
     s32 nShape;                 // 0x18  7 = any
 } Lesson;
 
-// Each lesson's demonstration animation: the second table from step 6 on (index 0 unused).
+// Each lesson's animation (index 0 unused), picked by fn_801008A8: lbl_80192D98 from step 6 on
+// (the player's tries), lbl_80192DC8 before it (the demonstration). Only lesson 6 differs.
 char* lbl_80192D98[12] = {
     "tdlpre01", "tdlpre04", "gdlpre03", "gdlpre53", "g3lpre02", "g3lpre01",
     "g3lpre03", "gplpre51", "tdlpre04", "tdlpre05", "tdlpre04", "g3lpre04",
@@ -347,7 +350,7 @@ void fn_80100508(void) {
 }
 
 // The shape the lesson requires, 7 (any) outside mode 11.
-int Scenario_RequiredShape(int nPlayer) {
+int fn_8010069C(int nPlayer) {
     int n = lbl_802823FC - 1;
     if (Game_GetMode() != 11) {
         return 7;
@@ -409,7 +412,8 @@ char* fn_801008A8(void) {
     return 0;
 }
 
-// The lesson restarts: the ball back at its spot, the demonstration again from step 7.
+// The player tries the lesson again: the ball back at its spot and the golfer reset, at step 7 (the
+// player's try; the demonstration is steps 2..5).
 void fn_801008F8(void) {
     fn_80101F40(0, 0);
     fn_800E5200(-1);
@@ -471,7 +475,7 @@ void fn_80100B38(void) {
     if (!fn_80100294() || lbl_802823FC == 12) {
         return;
     }
-    if (gSession.n14 == 0 && lbl_80282428 != 17) {
+    if (gSession.nPaused == 0 && lbl_80282428 != 17) {
         fn_800A76E4();
         if (lbl_802823FC == 0) {
             lbl_802823FC = 1;
@@ -889,7 +893,7 @@ void fn_8010179C(void) {
             bMissed = 1;
         }
         break;
-    case 80:
+    case 80:            // EA bug: 80 for 6 (asm 8010185C cmpwi 0x50), so lesson 6 is never judged
         if (nLie != LIE_GREEN_e && nLie != 12) {
             bMissed = 1;
         }

@@ -312,8 +312,8 @@ def check():
         if str(p.relative_to(ROOT / 'src')).replace('\\', '/') not in split_units:
             problems.append('%s: source left with no unit' % p.relative_to(ROOT))
     for fn, where in defs.items():
-        if len(where) > 1:
-            problems.append('%s defined in %s' % (fn, ', '.join(where)))
+        if len(set(where)) > 1:                        # twice in one file: the #ifdef __MWERKS__ and port versions
+            problems.append('%s defined in %s' % (fn, ', '.join(sorted(set(where)))))
     print('%d units from the map checked, %d problems' % (n, len(problems)))
     for p in problems:
         print('  ' + p)

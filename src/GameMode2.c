@@ -363,6 +363,8 @@ void fn_800F9100(void) {
             if (bWon) {
                 fn_80102704();
             } else {
+                // EA bug: a lost ladder event is scored as won as well: fn_80102874 marks its
+                // award, unlocks its pro and reward (asm 800F923C; GameMode4 calls it only on a win)
                 fn_80102874();
             }
         }

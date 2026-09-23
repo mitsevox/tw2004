@@ -7,33 +7,20 @@
 #include "engine.h"
 #include "game/save.h"
 
-void  fn_800DCAD8(void);
+// fake match: the (s8) on GOLFERSTATE_GetCurrentState (see game.h).
+
 void  fn_800131C4(int nController);
-void  fn_80013130(int nController, int nStrength);
-u8    fn_800DCB3C(void);
 void  fn_8001425C(int a);
-void  fn_80012F34(int a);
 void  fn_80012F18(int a);
-void  fn_80012F50(int a, int b, int c);
-void  fn_80014118(int a);
-void  fn_80012EF8(void);
 void  fn_800141F8(f32* pA, f32* pB, f32 x0, f32 y0, f32 x1, f32 y1);
 void  fn_80014194(f32* pColour);
 void  fn_8001644C(int a, f32* pA, int b, f32* pB, int c);
 int   fn_800D782C(int nPlayer, Ball* pBall, int a, u8 b, int c);
-u8    fn_800E5344(void);
-u8    fn_800E23B0(int nPlayer, int nStrokes);
 u8    fn_800DC818(Ball* pBall, int nPlayer, u8 bNext);
-u8    fn_8005D2DC(void);
-void  GM_vCloseModuleONCE(void);
 u8    fn_800B4AE0(void);
-f32   fn_8005B64C(int nPlayer);
 void  fn_800DBFAC(void);
 void  fn_800DC18C(void);
 void  fn_800DC290(f32 fHeight);
-int   fn_800E17AC(int nPlayer);           // the player's total strokes
-int   fn_800F354C(int nPlayer);
-int   fn_800F1D34(int nPlayer);
 int   fn_800D8750(int a, int b, int c, char* szName, int nPlayer);   // szName: a profile's name
 u8    fn_800BCD24(int nPlayer);
 int   fn_800D0620(int nPlayer, int a, int b);
@@ -116,14 +103,14 @@ f32 fn_800DAF98(f32 fFrameTime) {
     int i;
     f32 d;
     if (fn_800DCB08() && 0.0f != fFrameTime) {
-        fFrameTime = 1.0f / 59.94f;
+        fFrameTime = FRAME_TIME;
     }
     if (fn_8005D2DC()) {
         fFrameTime = 0.0f;
     }
     if (fn_800DCB00()) {
         if (0.0f != fFrameTime) {
-            fFrameTime = 1.0f / 59.94f;
+            fFrameTime = FRAME_TIME;
         }
         GM_vCloseModuleONCE();
     }
@@ -131,7 +118,7 @@ f32 fn_800DAF98(f32 fFrameTime) {
         return 0.0f;
     }
     for (i = 0; i < 5; i++) {
-        d = fn_8000AD9C(i / 59.94f - fFrameTime);
+        d = fabsf(i / FRAME_RATE - fFrameTime);
         if (d < fBest) {
             fBest = d;
         } else if (i > 0) {
@@ -159,12 +146,12 @@ f32 fn_800DAF98(f32 fFrameTime) {
         }
     }
     if (lbl_80202898.bSlowMo) {
-        return 1.0f / 59.94f * fTicks * lbl_80202898.fSlowMo;
+        return FRAME_TIME * fTicks * lbl_80202898.fSlowMo;
     }
-    return 1.0f / 59.94f * fTicks;
+    return FRAME_TIME * fTicks;
 }
 
-// How many physics steps the ball takes this frame: one per 1/59.94 s of frame time (rounded;
+// How many physics steps the ball takes this frame: one per FRAME_TIME of frame time (rounded;
 // twice that in mode 26), none while paused (no frame time), one outside the ball's flight.
 // With the slow-down on, it moves only on every n2C-th frame.
 int GameEffects_BallUpdatesThisFrame(int nPlayer) {
@@ -177,19 +164,19 @@ int GameEffects_BallUpdatesThisFrame(int nPlayer) {
     if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_SIMULATE) {
         return 1;
     }
-    if (fn_800DCB74() && gSession.fFrameTime < 1.0f / 59.94f) {
+    if (fn_800DCB74() && gSession.fFrameTime < FRAME_TIME) {
         return fn_800DCB3C() != 0;
     }
     if (Game_GetMode() == 26) {
-        if (gSession.fFrameTime <= 1.0f / 59.94f) {
+        if (gSession.fFrameTime <= FRAME_TIME) {
             return 2;
         }
-        return 0.5f + 2.0f * gSession.fFrameTime / (1.0f / 59.94f);
+        return 0.5f + 2.0f * gSession.fFrameTime / FRAME_TIME;
     }
-    if (gSession.fFrameTime <= 1.0f / 59.94f) {
+    if (gSession.fFrameTime <= FRAME_TIME) {
         return 1;
     }
-    return 0.5f + gSession.fFrameTime / (1.0f / 59.94f);
+    return 0.5f + gSession.fFrameTime / FRAME_TIME;
 }
 
 // The player's current target (an inline in EA's source; calling fn_800F1D34 directly does not match).
@@ -197,10 +184,10 @@ static inline int GE_CurrentTarget(int nPlayer) {
     return fn_800F1D34(nPlayer);
 }
 
-// TW06: GameEffects_CheckScriptedGB (by position). A scripted GameBreaker for a record chance:
-// reason 12 while the round can still beat the course record, reason 15 when the drive beats the
-// longest-drive record (the record is in feet). Only for a human, one view, not in a replay, and
-// only with the game's GameBreaker option on.
+// TW06: GameEffects_ScriptedGameBreakerTrigger (by position; the same player and reason arguments).
+// A scripted GameBreaker for a record chance: reason 12 while the round can still beat the course
+// record, reason 15 when the drive beats the longest-drive record (the record is in feet). Only for
+// a human, one view, not in a replay, and only with the game's GameBreaker option on.
 void fn_800DB30C(int nPlayer, int nReason) {
     if ((!(gSession.uFlags & 0x4000) || !(gSession.uFlags & 0x8000)) && !gSession.bReplay &&
         !gSession.nSplitScreen && !gSession.a8[0]) {
@@ -269,9 +256,10 @@ void fn_800DB4E8(int nPlayer) {
     }
 }
 
-// TW06: GameEffects_IsGBPossible (by position). Whether this lie is worth a GameBreaker: on the
-// green putting for two under par or better, or one of the other big-putt checks, or a birdie or
-// eagle putt (by the score after a tap-in).
+// No TW06 name settled (by position it falls among ScriptedGameBreakerBallHitTrigger and
+// IsScriptedGameBreaker). Whether this lie is worth a GameBreaker: on the green putting for two
+// under par or better, or one of the other big-putt checks, or a birdie or eagle putt (by the score
+// after a tap-in).
 int fn_800DB86C(int nPlayer) {
     int bPossible = 0;
     int nPar;
@@ -337,9 +325,10 @@ void fn_800DB714(int nPlayer) {
     }
 }
 
-// TW06: GameEffects_StartPredictedGB (by position). The look-ahead ball says the shot drops: a
-// predicted GameBreaker starts, for a human's shot that went far enough (1 with the putter, 10 for
-// a chip, 5 otherwise), with its own camera; a golfer mid-swing may get a reaction animation.
+// TW06: GameEffects_InFlightGameBreakerTrigger (by position). The look-ahead ball says the shot
+// drops: a predicted GameBreaker starts, for a human's shot that went far enough (1 with the
+// putter, 10 for a chip, 5 otherwise), with its own camera; a golfer mid-swing may get a reaction
+// animation.
 void fn_800DBA50(int nPlayer) {
     int nClass;
     int nLie;
@@ -404,7 +393,7 @@ void fn_800DBA50(int nPlayer) {
                             fn_80095780(gPlayers[nPlayer].pChar) != 9) {
                             fn_80095744(gPlayers[nPlayer].pChar, 14);
                             if (0.0f == fTime) {
-                                fTime = 1.0f / 59.94f;
+                                fTime = FRAME_TIME;
                             }
                         }
                     }
@@ -418,8 +407,8 @@ void fn_800DBA50(int nPlayer) {
     }
 }
 
-// TW06: GameEffects_EndGB (by position). The letterbox starts closing, with the end event; the
-// GameBreaker music stops, or (a scripted one that failed) the old music comes back.
+// TW06: GameEffects_EndGameBreaker (by position). The letterbox starts closing, with the end event;
+// the GameBreaker music stops, or (a scripted one that failed) the old music comes back.
 void fn_800DBDA8(int nPlayer) {
     if (lbl_80202898.bGameBreaker) {
         lbl_80202898.bClosing = 1;
@@ -458,7 +447,7 @@ void fn_800DBDA8(int nPlayer) {
 
 // TW06: GameEffects_RenderGameBreakerEffects (by position).
 void fn_800DBF34(void) {
-    if (lbl_80202898.bGameBreaker && gSession.n14 == 0 && !lbl_80202898.bPaused) {
+    if (lbl_80202898.bGameBreaker && gSession.nPaused == 0 && !lbl_80202898.bPaused) {
         switch (lbl_80202898.nGBType) {
         case 1:
             fn_800DBFAC();
@@ -483,7 +472,7 @@ void fn_800DBFAC(void) {
     } else {
         fHeight = 0.15f;
     }
-    pGE = &lbl_80202898;       // steers the register choice (found by the permuter)
+    pGE = &lbl_80202898;       // fake match: steers the register choice (found by the permuter)
     fn_800DCB84(gPlayers[pGE->nPlayer].ball.vPos, gPlayers[pGE->nPlayer].ballBefore.vPos, v);
     v[1] = 0.0f;
     fDist = fn_80009680(fn_80009744(v));
@@ -575,7 +564,7 @@ f32 fn_800DC3A4(void) {
     if (!lbl_80202898.bGameBreaker) {
         return 0.0f;
     }
-    if (gSession.n14 != 0) {
+    if (gSession.nPaused != 0) {
         return 0.0f;
     }
     if (lbl_80202898.bPaused) {

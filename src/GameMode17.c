@@ -8,6 +8,8 @@
 #include "engine.h"
 #include "game/earnings.h"
 
+// fake match: the (s8) on GOLFERSTATE_GetCurrentState (see game.h).
+
 extern s32 lbl_802816A0;                    // the options saved while the game runs
 extern s32 lbl_802823A0;
 extern s32 lbl_802823A4;                    // the extra balls of the last shot
