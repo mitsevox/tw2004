@@ -11,7 +11,7 @@ void fn_80037CD8(void* arg0);
 void fn_80037CD8(void* arg0) {
     void* temp_r3;
 
-    fn_80037708();
+    fn_80037708(arg0);
     fn_8011CD84(arg0);
     fn_800CD56C(arg0);
     temp_r3 = (*(void**)((u8*)(arg0) + 0));
