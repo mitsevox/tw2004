@@ -427,6 +427,25 @@ void fn_8001C5B4(Character* pChar, int n) {
     }
 }
 
+// The player's golfer takes the player's shot kind and club; when either changed, it goes back
+// to animation 5.
+void fn_8001C680(int nPlayer) {
+    Player* pPlayer = &gPlayers[nPlayer];
+    Character* pChar = pPlayer->pChar;
+    int nKind = pChar->nShotKind;
+    int nClub;
+
+    fn_8001C724(pChar, pPlayer->nShotKind);
+    nClub = pChar->nClub;
+    fn_8001C774(pChar, pPlayer->nClub);
+    if (nClub != pPlayer->nClub || nKind != pPlayer->nShotKind) {
+        pChar->nAnim = 0;
+        pChar->u10 |= 0x80;
+        fn_80095744(pChar, 5);
+        fn_8001C804(nPlayer, 1, 1);
+    }
+}
+
 // Set the character's shot kind and the clip key that goes with it.
 void fn_8001C724(Character* pChar, int nKind) {
     if (pChar != NULL) {
