@@ -726,104 +726,23 @@ unsorted/sweep_800676AC.c:
 unsorted/sweep_800676E8.c:
 	.text       start:0x800676E8 end:0x80067710
 
-unsorted/sweep_80069428.c:
-	.text       start:0x80069428 end:0x80069498
-
-unsorted/sweep_80069498.c:
-	.text       start:0x80069498 end:0x800694A0
-
-unsorted/sweep_8006A89C.c:
-	.text       start:0x8006A89C end:0x8006A8D4
-
-unsorted/sweep_8006A8D4.c:
-	.text       start:0x8006A8D4 end:0x8006A964
+target.c:
+	.text       start:0x80067B80 end:0x8006AA70
 
 emotion.c:
 	.text       start:0x8006AA70 end:0x8006BED4
 
-unsorted/sweep_8006BED4.c:
-	.text       start:0x8006BED4 end:0x8006BF4C
-
-unsorted/sweep_8006BF4C.c:
-	.text       start:0x8006BF4C end:0x8006BF60
-
 Replay.c:
-	.text       start:0x8006BF60 end:0x8006C300
+	.text       start:0x8006BED4 end:0x8006C630
 
-unsorted/sweep_8006C630.c:
-	.text       start:0x8006C630 end:0x8006C63C
-
-unsorted/sweep_8006C63C.c:
-	.text       start:0x8006C63C end:0x8006C69C
-
-unsorted/sweep_8006C6F0.c:
-	.text       start:0x8006C6F0 end:0x8006C7A8
-
-unsorted/sweep_8006C7A8.c:
-	.text       start:0x8006C7A8 end:0x8006C8EC
-
-unsorted/sweep_8006CB2C.c:
-	.text       start:0x8006CB2C end:0x8006CBDC
-
-unsorted/sweep_8006CFC8.c:
-	.text       start:0x8006CFC8 end:0x8006D01C
-
-unsorted/sweep_8006D7E8.c:
-	.text       start:0x8006D7E8 end:0x8006D838
-
-unsorted/sweep_8006D838.c:
-	.text       start:0x8006D838 end:0x8006D8E8
-
-unsorted/sweep_8006DC20.c:
-	.text       start:0x8006DC20 end:0x8006DC34
-
-unsorted/sweep_8006DC34.c:
-	.text       start:0x8006DC34 end:0x8006DC4C
-
-unsorted/sweep_8006DC4C.c:
-	.text       start:0x8006DC4C end:0x8006DCA0
-
-unsorted/sweep_8006DCA0.c:
-	.text       start:0x8006DCA0 end:0x8006DCA8
-
-unsorted/sweep_8006DD44.c:
-	.text       start:0x8006DD44 end:0x8006DD84
-
-unsorted/sweep_8006DD84.c:
-	.text       start:0x8006DD84 end:0x8006DDA8
-
-unsorted/sweep_8006DDA8.c:
-	.text       start:0x8006DDA8 end:0x8006DDE8
-
-unsorted/sweep_8006DE28.c:
-	.text       start:0x8006DE28 end:0x8006DE68
-
-unsorted/sweep_8006DEA8.c:
-	.text       start:0x8006DEA8 end:0x8006DEE8
-
-unsorted/sweep_8006DF28.c:
-	.text       start:0x8006DF28 end:0x8006DF68
-
-unsorted/sweep_8006DFA8.c:
-	.text       start:0x8006DFA8 end:0x8006DFE8
-
-unsorted/sweep_8006E028.c:
-	.text       start:0x8006E028 end:0x8006E068
-
-unsorted/sweep_8006E0A8.c:
-	.text       start:0x8006E0A8 end:0x8006E0C0
-
-unsorted/sweep_8006E0F8.c:
-	.text       start:0x8006E0F8 end:0x8006E118
+gomainloop.c:
+	.text       start:0x8006C630 end:0x8006E150
 
 GoFrameBuf.c:
 	.text       start:0x8006E150 end:0x8006E2A4
 
 GoLighting.c:
-	.text       start:0x8006E2A4 end:0x8006EFB8
-
-unsorted/sweep_8006F144.c:
-	.text       start:0x8006F144 end:0x8006F154
+	.text       start:0x8006E2A4 end:0x8006F154
 
 unsorted/sweep_8006F400.c:
 	.text       start:0x8006F400 end:0x8006F430
@@ -856,13 +775,7 @@ unsorted/sweep_8006F64C.c:
 	.text       start:0x8006F64C end:0x8006F650
 
 GoShaderObjectContainer_OBFData_Gc.c:
-	.text       start:0x8006F650 end:0x8006FDCC
-
-unsorted/sweep_8006FDCC.c:
-	.text       start:0x8006FDCC end:0x8006FDD4
-
-unsorted/sweep_8006FED4.c:
-	.text       start:0x8006FED4 end:0x8006FF2C
+	.text       start:0x8006F650 end:0x8006FF2C
 
 unsorted/sweep_8006FF2C.c:
 	.text       start:0x8006FF2C end:0x8006FF80
@@ -931,67 +844,10 @@ unsorted/sweep_80070FF0.c:
 	.text       start:0x80070FF0 end:0x80071028
 
 GoShaderObject_PrelitUVAnimation_Gc.c:
-	.text       start:0x8007110C end:0x80071574
+	.text       start:0x8007110C end:0x80071AD0
 
-unsorted/sweep_80071574.c:
-	.text       start:0x80071574 end:0x80071578
-
-unsorted/sweep_80071578.c:
-	.text       start:0x80071578 end:0x800715D0
-
-unsorted/sweep_800715D0.c:
-	.text       start:0x800715D0 end:0x80071624
-
-unsorted/sweep_80071624.c:
-	.text       start:0x80071624 end:0x80071628
-
-unsorted/sweep_80071628.c:
-	.text       start:0x80071628 end:0x80071680
-
-unsorted/sweep_80071680.c:
-	.text       start:0x80071680 end:0x800716D4
-
-unsorted/sweep_800716D4.c:
-	.text       start:0x800716D4 end:0x800717AC
-
-unsorted/sweep_80071828.c:
-	.text       start:0x80071828 end:0x80071850
-
-unsorted/sweep_80071850.c:
-	.text       start:0x80071850 end:0x8007185C
-
-unsorted/sweep_8007185C.c:
-	.text       start:0x8007185C end:0x800718C4
-
-unsorted/sweep_800718C4.c:
-	.text       start:0x800718C4 end:0x800718E4
-
-unsorted/sweep_800718E4.c:
-	.text       start:0x800718E4 end:0x8007190C
-
-unsorted/sweep_8007190C.c:
-	.text       start:0x8007190C end:0x80071914
-
-unsorted/sweep_80071A14.c:
-	.text       start:0x80071A14 end:0x80071A54
-
-unsorted/sweep_800725BC.c:
-	.text       start:0x800725BC end:0x8007260C
-
-unsorted/sweep_8007325C.c:
-	.text       start:0x8007325C end:0x8007326C
-
-unsorted/sweep_8007326C.c:
-	.text       start:0x8007326C end:0x8007327C
-
-unsorted/sweep_8007327C.c:
-	.text       start:0x8007327C end:0x800732B8
-
-unsorted/sweep_800732B8.c:
-	.text       start:0x800732B8 end:0x800732F4
-
-unsorted/sweep_800734A0.c:
-	.text       start:0x800734A0 end:0x800734D0
+animblender.c:
+	.text       start:0x80071AD0 end:0x80073878
 
 GoShaderObjectCommon_ShaderObjectsData_Gc.c:
 	.text       start:0x80073878 end:0x80075280
