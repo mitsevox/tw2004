@@ -813,17 +813,8 @@ UObject.c:
 unsorted/sweep_80048AC4.c:
 	.text       start:0x80048AC4 end:0x80048AD4
 
-unsorted/UKernel/sweep_80048E44.c:
-	.text       start:0x80048E44 end:0x80048E4C
-
-unsorted/UKernel/sweep_80048FEC.c:
-	.text       start:0x80048FEC end:0x80049018
-
-unsorted/UKernel/sweep_800490B8.c:
-	.text       start:0x800490B8 end:0x800490EC
-
-unsorted/UKernel/sweep_8004950C.c:
-	.text       start:0x8004950C end:0x80049514
+UKernel.c:
+	.text       start:0x80048AF4 end:0x800496E0
 
 unsorted/sweep_800496E0.c:
 	.text       start:0x800496E0 end:0x80049728
@@ -1296,41 +1287,8 @@ unsorted/sweep_80076F54.c:
 unsorted/sweep_80076F58.c:
 	.text       start:0x80076F58 end:0x80076F80
 
-unsorted/sweep_80076F80.c:
-	.text       start:0x80076F80 end:0x80076FDC
-
-unsorted/sweep_80076FDC.c:
-	.text       start:0x80076FDC end:0x80077030
-
-unsorted/sweep_80077148.c:
-	.text       start:0x80077148 end:0x80077168
-
-unsorted/sweep_800772E0.c:
-	.text       start:0x800772E0 end:0x8007731C
-
-unsorted/sweep_8007731C.c:
-	.text       start:0x8007731C end:0x8007734C
-
-unsorted/sweep_8007739C.c:
-	.text       start:0x8007739C end:0x80077428
-
-unsorted/sweep_80077428.c:
-	.text       start:0x80077428 end:0x8007744C
-
-unsorted/sweep_80077B18.c:
-	.text       start:0x80077B18 end:0x80077B78
-
-unsorted/sweep_80077B78.c:
-	.text       start:0x80077B78 end:0x80077BDC
-
-unsorted/sweep_80077BDC.c:
-	.text       start:0x80077BDC end:0x80077C1C
-
-unsorted/sweep_80079664.c:
-	.text       start:0x80079664 end:0x8007975C
-
-unsorted/sweep_80079974.c:
-	.text       start:0x80079974 end:0x80079AD4
+FE_Manager.c:
+	.text       start:0x80076F80 end:0x80079E44
 
 unsorted/sweep_80079E44.c:
 	.text       start:0x80079E44 end:0x80079E6C
@@ -2064,134 +2022,8 @@ unsorted/sweep_8008AC3C.c:
 unsorted/sweep_8008AC4C.c:
 	.text       start:0x8008AC4C end:0x8008AD80
 
-unsorted/FEgolferanim/sweep_8008B00C.c:
-	.text       start:0x8008B00C end:0x8008B044
-
-unsorted/FEgolferanim/sweep_8008B204.c:
-	.text       start:0x8008B204 end:0x8008B20C
-
-unsorted/FEgolferanim/sweep_8008B3C8.c:
-	.text       start:0x8008B3C8 end:0x8008B3CC
-
-unsorted/FEgolferanim/sweep_8008B3CC.c:
-	.text       start:0x8008B3CC end:0x8008B430
-
-unsorted/FEgolferanim/sweep_8008B430.c:
-	.text       start:0x8008B430 end:0x8008B450
-
-unsorted/FEgolferanim/sweep_8008B4A0.c:
-	.text       start:0x8008B4A0 end:0x8008B4C0
-
-unsorted/FEgolferanim/sweep_8008B570.c:
-	.text       start:0x8008B570 end:0x8008B574
-
-unsorted/FEgolferanim/sweep_8008B5FC.c:
-	.text       start:0x8008B5FC end:0x8008B61C
-
-unsorted/FEgolferanim/sweep_8008B674.c:
-	.text       start:0x8008B674 end:0x8008B694
-
-unsorted/FEgolferanim/sweep_8008B6E4.c:
-	.text       start:0x8008B6E4 end:0x8008B704
-
-unsorted/FEgolferanim/sweep_8008B760.c:
-	.text       start:0x8008B760 end:0x8008B790
-
-unsorted/FEgolferanim/sweep_8008B820.c:
-	.text       start:0x8008B820 end:0x8008B850
-
-unsorted/FEgolferanim/sweep_8008B850.c:
-	.text       start:0x8008B850 end:0x8008B864
-
-unsorted/FEgolferanim/sweep_8008B990.c:
-	.text       start:0x8008B990 end:0x8008B9A0
-
-unsorted/FEgolferanim/sweep_8008C844.c:
-	.text       start:0x8008C844 end:0x8008C8C4
-
-unsorted/FEgolferanim/sweep_8008C8C4.c:
-	.text       start:0x8008C8C4 end:0x8008C938
-
-unsorted/FEgolferanim/sweep_8008C938.c:
-	.text       start:0x8008C938 end:0x8008C93C
-
-unsorted/FEgolferanim/sweep_8008CE2C.c:
-	.text       start:0x8008CE2C end:0x8008CE88
-
-unsorted/FEgolferanim/sweep_8008D8CC.c:
-	.text       start:0x8008D8CC end:0x8008D8F4
-
-unsorted/FEgolferanim/sweep_8008E02C.c:
-	.text       start:0x8008E02C end:0x8008E0B0
-
-unsorted/FEgolferanim/sweep_8008E244.c:
-	.text       start:0x8008E244 end:0x8008E254
-
-unsorted/FEgolferanim/sweep_8008E354.c:
-	.text       start:0x8008E354 end:0x8008E358
-
-unsorted/FEgolferanim/sweep_8008E358.c:
-	.text       start:0x8008E358 end:0x8008E364
-
-unsorted/FEgolferanim/sweep_8008E364.c:
-	.text       start:0x8008E364 end:0x8008E420
-
-unsorted/FEgolferanim/sweep_8008E420.c:
-	.text       start:0x8008E420 end:0x8008E44C
-
-unsorted/FEgolferanim/sweep_8008E44C.c:
-	.text       start:0x8008E44C end:0x8008E468
-
-unsorted/FEgolferanim/sweep_8008E6D4.c:
-	.text       start:0x8008E6D4 end:0x8008E718
-
-unsorted/FEgolferanim/sweep_8008E718.c:
-	.text       start:0x8008E718 end:0x8008E724
-
-unsorted/FEgolferanim/sweep_8008E724.c:
-	.text       start:0x8008E724 end:0x8008E818
-
-unsorted/FEgolferanim/sweep_8008E818.c:
-	.text       start:0x8008E818 end:0x8008E824
-
-unsorted/FEgolferanim/sweep_8008E824.c:
-	.text       start:0x8008E824 end:0x8008E860
-
-unsorted/FEgolferanim/sweep_8008E860.c:
-	.text       start:0x8008E860 end:0x8008E8D0
-
-unsorted/FEgolferanim/sweep_8008E8D0.c:
-	.text       start:0x8008E8D0 end:0x8008E918
-
-unsorted/FEgolferanim/sweep_8008E918.c:
-	.text       start:0x8008E918 end:0x8008E924
-
-unsorted/FEgolferanim/sweep_8008E924.c:
-	.text       start:0x8008E924 end:0x8008E938
-
-unsorted/FEgolferanim/sweep_8008E938.c:
-	.text       start:0x8008E938 end:0x8008E944
-
-unsorted/FEgolferanim/sweep_8008E944.c:
-	.text       start:0x8008E944 end:0x8008E960
-
-unsorted/FEgolferanim/sweep_8008E960.c:
-	.text       start:0x8008E960 end:0x8008E9A8
-
-unsorted/FEgolferanim/sweep_8008E9A8.c:
-	.text       start:0x8008E9A8 end:0x8008E9B4
-
-unsorted/FEgolferanim/sweep_8008E9B4.c:
-	.text       start:0x8008E9B4 end:0x8008EA38
-
-unsorted/FEgolferanim/sweep_8008EA38.c:
-	.text       start:0x8008EA38 end:0x8008EA44
-
-unsorted/FEgolferanim/sweep_8008EAB0.c:
-	.text       start:0x8008EAB0 end:0x8008EB10
-
-unsorted/FEgolferanim/sweep_8008EB70.c:
-	.text       start:0x8008EB70 end:0x8008EBB4
+FEgolferanim.c:
+	.text       start:0x8008AD80 end:0x8008EBB4
 
 unsorted/sweep_8008EBB4.c:
 	.text       start:0x8008EBB4 end:0x8008EC0C
@@ -2199,29 +2031,8 @@ unsorted/sweep_8008EBB4.c:
 unsorted/sweep_8008EC60.c:
 	.text       start:0x8008EC60 end:0x8008EC68
 
-unsorted/uiLoadFile/sweep_8008ED28.c:
-	.text       start:0x8008ED28 end:0x8008ED80
-
-unsorted/uiLoadFile/sweep_8008F0C0.c:
-	.text       start:0x8008F0C0 end:0x8008F0C8
-
-unsorted/uiLoadFile/sweep_8008F0C8.c:
-	.text       start:0x8008F0C8 end:0x8008F0F0
-
-unsorted/uiLoadFile/sweep_8008F0F0.c:
-	.text       start:0x8008F0F0 end:0x8008F0FC
-
-unsorted/uiLoadFile/sweep_8008F15C.c:
-	.text       start:0x8008F15C end:0x8008F164
-
-unsorted/uiLoadFile/sweep_8008F164.c:
-	.text       start:0x8008F164 end:0x8008F18C
-
-unsorted/uiLoadFile/sweep_8008F18C.c:
-	.text       start:0x8008F18C end:0x8008F194
-
-unsorted/uiLoadFile/sweep_8008F24C.c:
-	.text       start:0x8008F24C end:0x8008F294
+uiLoadFile.c:
+	.text       start:0x8008EC68 end:0x8008F310
 
 unsorted/sweep_8008F354.c:
 	.text       start:0x8008F354 end:0x8008F35C
@@ -2436,38 +2247,8 @@ unsorted/sweep_8009B604.c:
 GoGreenGrid.c:
 	.text       start:0x8009B630 end:0x8009C914
 
-unsorted/MC_Gc/sweep_8009CC00.c:
-	.text       start:0x8009CC00 end:0x8009CC88
-
-unsorted/MC_Gc/sweep_8009CC88.c:
-	.text       start:0x8009CC88 end:0x8009CD10
-
-unsorted/MC_Gc/sweep_8009CD7C.c:
-	.text       start:0x8009CD7C end:0x8009CDA0
-
-unsorted/MC_Gc/sweep_8009DCE8.c:
-	.text       start:0x8009DCE8 end:0x8009DCEC
-
-unsorted/MC_Gc/sweep_8009DCEC.c:
-	.text       start:0x8009DCEC end:0x8009DD44
-
-unsorted/MC_Gc/sweep_8009EAF0.c:
-	.text       start:0x8009EAF0 end:0x8009EB30
-
-unsorted/MC_Gc/sweep_8009EB30.c:
-	.text       start:0x8009EB30 end:0x8009EB44
-
-unsorted/MC_Gc/sweep_8009EF68.c:
-	.text       start:0x8009EF68 end:0x8009EF90
-
-unsorted/MC_Gc/sweep_8009EF90.c:
-	.text       start:0x8009EF90 end:0x8009EF98
-
-unsorted/MC_Gc/sweep_8009F208.c:
-	.text       start:0x8009F208 end:0x8009F258
-
-unsorted/MC_Gc/sweep_8009F35C.c:
-	.text       start:0x8009F35C end:0x8009F36C
+MC_Gc.c:
+	.text       start:0x8009CC00 end:0x8009F6A0
 
 unsorted/sweep_8009F780.c:
 	.text       start:0x8009F780 end:0x8009F7E4
@@ -2895,20 +2676,8 @@ unsorted/sweep_800B3438.c:
 unsorted/sweep_800B3484.c:
 	.text       start:0x800B3484 end:0x800B34F0
 
-unsorted/GoComicCam/sweep_800B34F0.c:
-	.text       start:0x800B34F0 end:0x800B352C
-
-unsorted/GoComicCam/sweep_800B352C.c:
-	.text       start:0x800B352C end:0x800B3550
-
-unsorted/GoComicCam/sweep_800B3D64.c:
-	.text       start:0x800B3D64 end:0x800B3D68
-
-unsorted/GoComicCam/sweep_800B3F4C.c:
-	.text       start:0x800B3F4C end:0x800B3F9C
-
-unsorted/GoComicCam/sweep_800B4908.c:
-	.text       start:0x800B4908 end:0x800B4914
+GoComicCam.c:
+	.text       start:0x800B34F0 end:0x800B4AE0
 
 GoShaderObject_Rain_Gc.c:
 	.text       start:0x800B4B5C end:0x800B58B4
@@ -3284,77 +3053,8 @@ unsorted/sweep_80103BB4.c:
 unsorted/sweep_80103D6C.c:
 	.text       start:0x80103D6C end:0x80103DE0
 
-unsorted/sweep_80104020.c:
-	.text       start:0x80104020 end:0x80104094
-
-unsorted/sweep_801048B0.c:
-	.text       start:0x801048B0 end:0x801048EC
-
-unsorted/sweep_80104F68.c:
-	.text       start:0x80104F68 end:0x80104F7C
-
-unsorted/sweep_80104F7C.c:
-	.text       start:0x80104F7C end:0x80104FA8
-
-unsorted/sweep_80105140.c:
-	.text       start:0x80105140 end:0x80105154
-
-unsorted/sweep_80105154.c:
-	.text       start:0x80105154 end:0x80105188
-
-unsorted/sweep_80105240.c:
-	.text       start:0x80105240 end:0x80105264
-
-unsorted/sweep_80105264.c:
-	.text       start:0x80105264 end:0x80105298
-
-unsorted/sweep_80105298.c:
-	.text       start:0x80105298 end:0x801052CC
-
-unsorted/sweep_801052CC.c:
-	.text       start:0x801052CC end:0x80105300
-
-unsorted/sweep_80105300.c:
-	.text       start:0x80105300 end:0x80105334
-
-unsorted/sweep_80105334.c:
-	.text       start:0x80105334 end:0x80105368
-
-unsorted/sweep_80105368.c:
-	.text       start:0x80105368 end:0x8010539C
-
-unsorted/sweep_8010539C.c:
-	.text       start:0x8010539C end:0x801053D0
-
-unsorted/sweep_801053D0.c:
-	.text       start:0x801053D0 end:0x80105404
-
-unsorted/sweep_80105404.c:
-	.text       start:0x80105404 end:0x80105494
-
-unsorted/sweep_80105574.c:
-	.text       start:0x80105574 end:0x801055A8
-
-unsorted/sweep_801055A8.c:
-	.text       start:0x801055A8 end:0x801055DC
-
-unsorted/sweep_80105B4C.c:
-	.text       start:0x80105B4C end:0x80105B80
-
-unsorted/sweep_80105C00.c:
-	.text       start:0x80105C00 end:0x80105C0C
-
-unsorted/sweep_80105C30.c:
-	.text       start:0x80105C30 end:0x80105C44
-
-unsorted/sweep_80105EFC.c:
-	.text       start:0x80105EFC end:0x80105F00
-
-unsorted/sweep_801061C8.c:
-	.text       start:0x801061C8 end:0x801061F8
-
-unsorted/sweep_8010645C.c:
-	.text       start:0x8010645C end:0x801064EC
+FE_CrAPDB.c:
+	.text       start:0x80103EFC end:0x801069AC
 
 unsorted/sweep_801077EC.c:
 	.text       start:0x801077EC end:0x80107828
@@ -3482,26 +3182,8 @@ unsorted/sweep_8010F52C.c:
 unsorted/sweep_8010F574.c:
 	.text       start:0x8010F574 end:0x8010F5AC
 
-unsorted/sweep_8010F6C8.c:
-	.text       start:0x8010F6C8 end:0x8010F7C0
-
-unsorted/sweep_8010F7C0.c:
-	.text       start:0x8010F7C0 end:0x8010F7D8
-
-unsorted/sweep_8010F7D8.c:
-	.text       start:0x8010F7D8 end:0x8010F7E4
-
-unsorted/sweep_8010F7E4.c:
-	.text       start:0x8010F7E4 end:0x8010F7FC
-
-unsorted/sweep_8010F880.c:
-	.text       start:0x8010F880 end:0x8010F890
-
-unsorted/sweep_8010F90C.c:
-	.text       start:0x8010F90C end:0x8010F978
-
-unsorted/sweep_8010F978.c:
-	.text       start:0x8010F978 end:0x8010FA00
+FE_LogoDesign.c:
+	.text       start:0x8010F6C8 end:0x8010FB70
 
 unsorted/sweep_8010FBC4.c:
 	.text       start:0x8010FBC4 end:0x8010FBCC
@@ -3725,35 +3407,8 @@ unsorted/sweep_8011D268.c:
 unsorted/sweep_8011D858.c:
 	.text       start:0x8011D858 end:0x8011D878
 
-unsorted/sweep_8011E3B0.c:
-	.text       start:0x8011E3B0 end:0x8011E3B4
-
-unsorted/sweep_8011E4A4.c:
-	.text       start:0x8011E4A4 end:0x8011E4D8
-
-unsorted/sweep_8011E974.c:
-	.text       start:0x8011E974 end:0x8011E9D8
-
-unsorted/sweep_8011EAB8.c:
-	.text       start:0x8011EAB8 end:0x8011EB04
-
-unsorted/sweep_8011EBF8.c:
-	.text       start:0x8011EBF8 end:0x8011EC2C
-
-unsorted/sweep_8011EC2C.c:
-	.text       start:0x8011EC2C end:0x8011EC84
-
-unsorted/sweep_8011EE4C.c:
-	.text       start:0x8011EE4C end:0x8011EF88
-
-unsorted/sweep_8011EF88.c:
-	.text       start:0x8011EF88 end:0x8011EFE4
-
-unsorted/sweep_8011F374.c:
-	.text       start:0x8011F374 end:0x8011F3AC
-
-unsorted/sweep_8011FDC4.c:
-	.text       start:0x8011FDC4 end:0x8011FDEC
+GoGrass.c:
+	.text       start:0x8011E170 end:0x80120194
 
 unsorted/sweep_8012022C.c:
 	.text       start:0x8012022C end:0x80120244
@@ -3875,59 +3530,8 @@ unsorted/sweep_80124A98.c:
 unsorted/sweep_80124B10.c:
 	.text       start:0x80124B10 end:0x80124B54
 
-unsorted/EASportsBio/sweep_801250C0.c:
-	.text       start:0x801250C0 end:0x80125118
-
-unsorted/EASportsBio/sweep_80125194.c:
-	.text       start:0x80125194 end:0x801251EC
-
-unsorted/EASportsBio/sweep_80125280.c:
-	.text       start:0x80125280 end:0x801252D0
-
-unsorted/EASportsBio/sweep_801252D0.c:
-	.text       start:0x801252D0 end:0x80125354
-
-unsorted/EASportsBio/sweep_80125354.c:
-	.text       start:0x80125354 end:0x801253F0
-
-unsorted/EASportsBio/sweep_801253F0.c:
-	.text       start:0x801253F0 end:0x80125434
-
-unsorted/EASportsBio/sweep_80125434.c:
-	.text       start:0x80125434 end:0x801254B8
-
-unsorted/EASportsBio/sweep_801254B8.c:
-	.text       start:0x801254B8 end:0x801254EC
-
-unsorted/EASportsBio/sweep_801254EC.c:
-	.text       start:0x801254EC end:0x80125520
-
-unsorted/EASportsBio/sweep_80125520.c:
-	.text       start:0x80125520 end:0x80125528
-
-unsorted/EASportsBio/sweep_801255C4.c:
-	.text       start:0x801255C4 end:0x801255F8
-
-unsorted/EASportsBio/sweep_801255F8.c:
-	.text       start:0x801255F8 end:0x80125600
-
-unsorted/EASportsBio/sweep_80125648.c:
-	.text       start:0x80125648 end:0x8012566C
-
-unsorted/EASportsBio/sweep_8012566C.c:
-	.text       start:0x8012566C end:0x80125694
-
-unsorted/EASportsBio/sweep_80125694.c:
-	.text       start:0x80125694 end:0x801256B8
-
-unsorted/EASportsBio/sweep_801257A0.c:
-	.text       start:0x801257A0 end:0x80125814
-
-unsorted/EASportsBio/sweep_80125814.c:
-	.text       start:0x80125814 end:0x80125874
-
-unsorted/EASportsBio/sweep_80125910.c:
-	.text       start:0x80125910 end:0x80125928
+EASportsBio.c:
+	.text       start:0x80124B54 end:0x8012597C
 
 unsorted/sweep_801260B8.c:
 	.text       start:0x801260B8 end:0x801260C0
