@@ -2083,17 +2083,8 @@ MC_Gc.c:
 MC.c:
 	.text       start:0x8009F850 end:0x800A27FC
 
-unsorted/sweep_800A2958.c:
-	.text       start:0x800A2958 end:0x800A295C
-
-unsorted/sweep_800A298C.c:
-	.text       start:0x800A298C end:0x800A29B4
-
 PsMgr.c:
-	.text       start:0x800A2A80 end:0x800A2B34
-
-unsorted/sweep_800A2BA8.c:
-	.text       start:0x800A2BA8 end:0x800A2BBC
+	.text       start:0x800A27FC end:0x800A2C3C
 
 PsBallFx.c:
 	.text       start:0x800A2C3C end:0x800A3D6C
