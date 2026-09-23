@@ -5,88 +5,10 @@
 #include "golfer.h"
 #include "game.h"
 #include "engine.h"
+#include "game/save.h"
+#include "game/modes/pgatour.h"
 
-// One tournament of the season (0x64 bytes). TW06: GM_PgaTour_EventSlot_t, which has the name
-// index first and the champion's name and score together further on.
-typedef struct Tournament {
-    s32  nName;                 // 0x00  offset into the names block. TW06: nameIdx
-    s32  nTourEvent;            // 0x04  1-based entry in aTourEvent (0 = one round)
-    u8   unk8[8];
-    s32  n10;                   // 0x10
-    char szChampName[0x10];     // 0x14  the champion before the season is played. TW06: champName
-    s32  nChampScore;           // 0x24  TW06: champScore
-    s16  aPrize[10][2];         // 0x28  per bracket (fn_800EF0E0): first prize and purse, in thousands
-    u16  aStartDate[10];        // 0x50  per season (fn_800EFB88). TW06: startDate
-} Tournament;
-
-// One round of a tournament's format (0xC bytes).
-typedef struct TourRound {
-    s32  nCourse;               // 0x0
-    u8   unk4[8];
-} TourRound;
-
-// A tournament's format (0x54 bytes). TW06: Tournament_events_t, which starts with nRounds too.
-typedef struct TourEvent {
-    s32  nRounds;               // 0x00
-    TourRound aRound[6];        // 0x04
-    u8   unk4C[0x54 - 0x4C];
-} TourEvent;
-
-typedef struct Triple {
-    s32  n0;                    // 0x0
-    s32  n4;                    // 0x4
-    s32  n8;                    // 0x8
-} Triple;
-
-// The tour's data, loaded from the 'PGA' stream objects. TW06: PGA_Master (GameModeDriverPGATour::m_PgaData).
-typedef struct PgaData {
-    Tournament aTournament[31]; // 0x0000  'PGAc'
-    TourEvent  aTourEvent[31];  // 0x0C1C  'PGAt'
-    u8         unk1648[0x6FC8 - 0x1648];
-    Triple     aTriple[11];     // 0x6FC8  'PGAp'
-    char*      pNames;          // 0x704C  'PGAn'. TW06: pStrTable
-    u8         unk7050[4];
-} PgaData;
-extern PgaData gPgaData;
-
-typedef struct Pga80205F30 {
-    u8   b0;                    // 0x0
-    u8   unk1[3];
-    s32  n4;                    // 0x4
-    s32  n8;                    // 0x8
-} Pga80205F30;
-extern Pga80205F30 lbl_80205F30;
 Pga80205F30* fn_800EE8B8(void);
-
-// A tournament of the season in a save profile (TW06: PGATourSeason_EventData, the same layout).
-typedef struct SeasonEvent {
-    char szChampName[0x10];     // 0x00  the tournament's champion. TW06: champName
-    s32  nChampScore;           // 0x10  TW06: champScore
-    u16  nEventPar;             // 0x14  TW06: eventPar
-    u16  nUserBracket;          // 0x16  the player's bracket when it was played. TW06: userBracket
-    s32  nUserScore;            // 0x18  TW06: userScore
-    s32  nUserRank;             // 0x1C  the player's finishing place. TW06: userRank
-    s32  nUserRankType;         // 0x20  0 did not play, 1 missed the cut, 2 placed. TW06: eUserRankType
-} SeasonEvent;
-
-// The tour season in a save profile (TW06: PGATourSeason_t, which has 29 tournaments).
-typedef struct TourSeason {
-    s32  nSeason;               // 0x00  0 = 2004. TW06: season
-    s32  nEvent;                // 0x04  the current tournament. TW06: eventID
-    s32  nRound;                // 0x08  its round. TW06: round
-    SeasonEvent aEvent[31];     // 0x0C
-} TourSeason;
-
-// A save profile (0x10600 bytes; the other files see gpSaveData as bytes).
-typedef struct Profile {
-    u8         unk0[0xB634];
-    TourSeason tour;            // 0xB634
-    u8         unkBA9C[0x104C8 - 0xBA9C];
-    u16        n104C8;          // 0x104C8  counts the tournaments started
-    u8         unk104CA[0x10600 - 0x104CA];
-} Profile;
-extern Profile* gpSaveData;
-
 void fn_800EDEE8(void);
 void fn_800EDF34(UStreamObject* pObject);
 void fn_800EDF60(UStreamObject* pObject);
@@ -674,12 +596,12 @@ s32 fn_800F0290(s32 i) {
     return gpSaveData->tour.aEvent[i].nChampScore;
 }
 
-// How many tournaments are won (flag 1 in the profile's list at +0xC8, 8 bytes each).
+// How many tournaments profile 0 has won.
 s32 fn_800F02A8(void) {
     s32 n = 0;
     s32 i;
     for (i = 0; i < 31; i++) {
-        if (((u8*)gpSaveData)[0xC8 + i * 8] == 1) {
+        if (gpSaveData->aC8[i].b == 1) {
             n++;
         }
     }
