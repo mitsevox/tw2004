@@ -8,14 +8,36 @@
 #include "game_types.h"
 #include "platform.h"
 
+// The menu UI's file (the 'DATS' object uiLoadFile.c keeps). Its tables hold offsets from the
+// file's start until fn_8008F488 adds the file's address to them.
+typedef struct UIFile {
+    u32  u0;                    // 0x0
+    u32* p4;                    // 0x4  a count, then that many pairs of words
+    u32* p8;                    // 0x8  a count, then that many tables (each a count and its words)
+} UIFile;
+
 typedef struct FrontEnd {
-    u8    unk0[4];
+    UIFile* pFile;              // 0x0
     void* pHandler;             // 0x4  where GameMessages.c sends its messages (fn_8016B09C)
     u8    unk8[4];
     void* pC;                   // 0xC  a block uiLoadFile.c frees (fn_8008F24C)
 } FrontEnd;
 
 extern FrontEnd* lbl_80281F1C;
+
+// What uiLoadFile.c's stream handlers loaded (lbl_801D87A8): up to five objects, freed together
+// by fn_8008F0FC.
+#define UI_NUM_LOADED 5
+typedef struct UILoaded {
+    s32   nCount;               // 0x0  how many ap4 holds
+    void* ap4[UI_NUM_LOADED];   // 0x4  from fn_8000FB88 (fn_8008EE1C)
+} UILoaded;
+LAYOUT_ASSERT(UILoaded, 0x18);
+
+extern UILoaded lbl_801D87A8;
+
+// Print nValue into szOut with a comma between every three digits ("1,234,567").
+void fn_800907AC(int nValue, char* szOut);
 
 // One value of a message: an int or a float (the mask passed with it says which), or a pointer.
 typedef union MsgArg {
