@@ -1,51 +1,227 @@
-#include "game_types.h"
+// GameHoleContests.c (our name): the hole contests of a multiplayer stroke round. At the start of the
+// round up to three holes are drawn: a par 4 or 5 for the longest drive (lbl_80281568), a par 3 for
+// closest to the pin (lbl_8028156C) and, one round in five, another par 3 with a $100,000 prize for
+// a hole in one (lbl_80281570). Each player's result on the contest hole is kept by player
+// (lbl_80202828 names, lbl_80202884 distances) and the winner (lbl_80282264) is paid $2,500.
+// fn_800DA6D0 (0x800DA6D0, 1612 bytes: decides the contest and fills in the names) is not
+// decompiled yet.
 
-s32 Game_CurHoleIndex();
-u8 fn_800ED6F0();
-extern void* gpGame;
-extern s32 lbl_80281568;
-u8 fn_800DA174(void);
-extern s32 lbl_8028156C;
-u8 fn_800DA1D4(void);
-extern u8 gPlayers[];
-extern s32 lbl_80281570;
-extern s32 lbl_80282278;
-s32 fn_800DA234(void);
-extern u8 lbl_80202828[];
-extern u8 lbl_80202870[];
-u8* fn_800DAD1C(s32 p0);
-s32 fn_800DAD30(s32 p0);
-extern u8 lbl_80282260;
-extern s32 lbl_80282268;
-u8 fn_800DAD44(void);
-s32 fn_800DAD4C(void);
+#include "golfer.h"
+#include "game.h"
+#include "game/save.h"
 
+s32  lbl_80281568 = -1;         // the longest-drive hole, -1 none
+s32  lbl_8028156C = -1;         // the closest-to-the-pin hole, -1 none
+s32  lbl_80281570 = -1;         // the hole-in-one prize hole, -1 none
+char lbl_80202828[5][14];       // per player: the name shown with the result
+s32  lbl_80202870[5];           // per player
+f32  lbl_80202884[5];           // per player: the drive's length or the distance from the pin
+u8   lbl_80282260;              // a contest has a winner (fn_800DA6D0), or the hole in one was made
+u8   lbl_80282261;              // the contest on this hole is decided
+s32  lbl_80282264;              // the contest's winner, 5 = nobody
+s32  lbl_80282268;
+
+u8   fn_800D304C(int nHole);    // a flag of the hole's course data (byte 0x35): the drive can count
+u8   fn_800D0D54(int nPlayer);  // the ball lies on a fairway, the green or in the cup
+
+u8   fn_800D9E5C(void);
+void fn_800D9F34(void);
+void fn_800DA6D0(void);
+
+// A new round: no contest holes until they are drawn.
+void fn_800D9E14(void) {
+    lbl_80281568 = -1;
+    lbl_8028156C = -1;
+    lbl_80281570 = -1;
+    lbl_80282260 = 0;
+    lbl_80282261 = 0;
+    if (fn_800D9E5C()) {
+        fn_800D9F34();
+    }
+}
+
+// Whether this round has hole contests: several players in a plain stroke round of every hole,
+// without mulligans.
+u8 fn_800D9E5C(void) {
+    if (gpGame->nMulligans != 0) return 0;
+    if (gSession.nNumPlayers == 1) return 0;
+    if (!fn_800E1BBC()) return 0;
+    if (gSession.a8[0] != 0) return 0;
+    if (fn_800EC550()) return 0;
+    if (fn_800ED6F0()) return 0;
+    if (Game_GetMode() == 0 || Game_GetMode() == 1 || Game_GetMode() == 2) {
+        return 1;
+    }
+    return 0;
+}
+
+// Draws the contest holes at random among the round's 18.
+void fn_800D9F34(void) {
+    u8 bFound;
+    int i;
+    int h;
+    u8 bPar3;
+
+    bFound = 0;
+    for (i = 0; i < 18; i++) {
+        if (fn_800D2AD8(i) > 3 && fn_800D304C(i)) {
+            bFound = 1;
+        }
+    }
+    if (bFound) {
+        lbl_80281568 = Rand_Next(0) % 18;
+        while (fn_800D2AD8(lbl_80281568) == 3 || !fn_800D304C(lbl_80281568)) {
+            lbl_80281568 = Rand_Next(0) % 18;
+        }
+    } else {
+        lbl_80281568 = -1;
+    }
+
+    bPar3 = 0;
+    for (h = 0; h < 18; h++) {
+        if (fn_800D2AD8(h) == 3) {
+            bPar3 = 1;
+        }
+    }
+    if (bPar3) {
+        lbl_8028156C = Rand_Next(0) % 18;
+        while (fn_800D2AD8(lbl_8028156C) > 3) {
+            lbl_8028156C = Rand_Next(0) % 18;
+        }
+    } else {
+        lbl_8028156C = -1;
+    }
+
+    if ((int)(Rand_Next(0) % 100) < 20) {
+        bPar3 = 0;
+        for (h = 0; h < 18; h++) {
+            if (fn_800D2AD8(h) == 3 && h != lbl_8028156C) {
+                bPar3 = 1;
+            }
+        }
+        if (bPar3) {
+            lbl_80281570 = Rand_Next(0) % 18;
+            while (fn_800D2AD8(lbl_80281570) > 3 || lbl_80281570 == lbl_8028156C) {
+                lbl_80281570 = Rand_Next(0) % 18;
+            }
+        } else {
+            lbl_80281570 = -1;
+        }
+    }
+}
+
+// The longest drive is played on this hole. On the round's last hole of a GameMode5 challenge the
+// contest is always on.
 u8 fn_800DA174(void) {
-    if ((fn_800ED6F0() != 0) && (Game_CurHoleIndex() == 0x11) && ((u8) (*(u8*)((u8*)(gpGame) + 0xD4)) == 0)) {
-        return 1U;
+    if (fn_800ED6F0() && Game_CurHoleIndex() == 17 && gpGame->bD4 == 0) {
+        return 1;
     }
-    return (u8) (lbl_80281568 == Game_CurHoleIndex());
+    return lbl_80281568 == Game_CurHoleIndex();
 }
 
+// Closest to the pin is played on this hole (always on the 17th of a GameMode5 challenge).
 u8 fn_800DA1D4(void) {
-    if ((fn_800ED6F0() != 0) && (Game_CurHoleIndex() == 0x10) && ((u8) (*(u8*)((u8*)(gpGame) + 0xD4)) == 0)) {
-        return 1U;
+    if (fn_800ED6F0() && Game_CurHoleIndex() == 16 && gpGame->bD4 == 0) {
+        return 1;
     }
-    return (u8) (lbl_8028156C == Game_CurHoleIndex());
+    return lbl_8028156C == Game_CurHoleIndex();
 }
 
-s32 fn_800DA234(void) {
-    s32 t0;
-    t0 = Game_CurHoleIndex();
-    return (((u32)__cntlzw((t0 - lbl_80281570)) >> 5) & 0xFF);
+// The hole-in-one prize is on this hole.
+u8 fn_800DA234(void) {
+    return Game_CurHoleIndex() == lbl_80281570;
 }
 
-u8* fn_800DAD1C(s32 p0) {
-    return (lbl_80202828 + (p0 * 14));
+// The player whose turn it is has not played a stroke on this hole yet: they are on the tee.
+u8 fn_800DA264(void) {
+    return gPlayers[lbl_80282278].nStrokes[Game_CurHoleIndex()] == 0;
 }
 
-s32 fn_800DAD30(s32 p0) {
-    return *(s32*)(lbl_80202870 + (p0 << 2));
+// The contest on this hole is ready to be decided: every player has played their tee shot.
+u8 fn_800DA2AC(void) {
+    int i;
+    u8 bDone;
+
+    if (!fn_800DA174() && !fn_800DA1D4()) return 0;
+    if (lbl_80282261) return 0;
+    bDone = 1;
+    for (i = 0; i < gNumPlayersSetUp; i++) {
+        if (PLAYER(i)->nStrokes[Game_CurHoleIndex()] == 0) {
+            bDone = 0;
+        }
+    }
+    return bDone;
+}
+
+// Clears every player's contest result.
+void fn_800DA36C(void) {
+    int i;
+    int n;
+    int j;
+
+    n = gNumPlayersSetUp;
+    i = 0;
+    while (n-- > 0) {
+        lbl_80202884[i++] = -1.0f;
+    }
+    for (j = 0; j < 5; j++) {
+        strcpy(lbl_80202828[j], "");
+        lbl_80202870[j] = 0;
+    }
+    lbl_80282261 = 0;
+    lbl_80282264 = 5;
+    if (fn_800E1734()) {
+        fn_800D9E14();
+    }
+}
+
+// After a player's shot: a tee shot on a contest hole enters the contest (the drive's length when it
+// stays on the fairway or green; the distance from the pin in feet, or 0 holed, when it finds the
+// green), and a hole in one on the prize hole wins $100,000. A mulligan's shot does not count.
+void fn_800DA48C(int nPlayer) {
+    CourseMoneyTracking money;
+
+    if (fn_800DA174()) {
+        if (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] == 1 && fn_800D0D54(nPlayer) &&
+            gPlayers[nPlayer].bC2F == 0) {
+            lbl_80202884[nPlayer] = fn_800D0550(nPlayer);
+        }
+        fn_800DA6D0();
+    }
+    if (fn_800DA1D4()) {
+        if (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] == 1 && gPlayers[nPlayer].ball.nLie == 9 &&
+            gPlayers[nPlayer].bC2F == 0) {
+            lbl_80202884[nPlayer] = 3.0f * fn_800D0478(nPlayer);
+        }
+        if (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] == 1 &&
+            gPlayers[nPlayer].ball.nLie == LIE_INCUP_e && gPlayers[nPlayer].bC2F == 0) {
+            lbl_80202884[nPlayer] = 0.0f;
+        }
+        fn_800DA6D0();
+    }
+    if (fn_800DA234()) {
+        if (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] == 1 && fn_800E2DB4(nPlayer) &&
+            gPlayers[nPlayer].bC2F == 0) {
+            lbl_80282260 = 1;
+            lbl_80282268 = 1;
+            fn_80005AE8(&money, 0, sizeof(money));
+            money.n24 = 100000;
+            money.n0 = 100000;
+            money.n38 = 100000;
+            fn_800D3548(nPlayer, 100000, &money);
+            if (gpSaveData[gPlayers[nPlayer].nIndex].bActive) {
+                fn_800E4364(0, 0x74, 100000, gPlayers[nPlayer].nIndex);
+            }
+        }
+    }
+}
+
+char* fn_800DAD1C(int nPlayer) {
+    return lbl_80202828[nPlayer];
+}
+
+s32 fn_800DAD30(int nPlayer) {
+    return lbl_80202870[nPlayer];
 }
 
 u8 fn_800DAD44(void) {
@@ -54,4 +230,31 @@ u8 fn_800DAD44(void) {
 
 s32 fn_800DAD4C(void) {
     return lbl_80282268;
+}
+
+// Pays the contest's winner.
+void fn_800DAD54(void) {
+    CourseMoneyTracking money;
+
+    lbl_80282261 = 1;
+    if (lbl_80282264 == 5) return;
+    if (!lbl_80282260) return;
+    fn_80005AE8(&money, 0, sizeof(money));
+    money.n24 = 2500;
+    money.n0 = 2500;
+    money.n38 = 2500;
+    fn_800D3548(lbl_80282264, 2500, &money);
+}
+
+// The winner's ball: 1 holed, 2 within a foot of the pin, else 0.
+s32 fn_800DADC0(void) {
+    if (lbl_80282260) {
+        if (gPlayers[lbl_80282264].ball.nLie == LIE_INCUP_e && gPlayers[lbl_80282264].bPlanReady == 0) {
+            return 1;
+        }
+        if (3.0f * fn_800D0478(lbl_80282264) < 1.0f) {
+            return 2;
+        }
+    }
+    return 0;
 }
