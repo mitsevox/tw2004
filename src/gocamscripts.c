@@ -168,14 +168,96 @@ f32 fn_80044F58(int nPlayer) {
     return 1.0f;
 }
 
-// ---- sweep code (not yet cleaned up) ----
+u8 fn_800453C8(int nPlayer, CamShot* pShot) {
+    if (gSession.nGameType == 3) {
+        return 0;
+    }
+    return fn_8001EDF4(gPlayers[nPlayer].pChar) != 0;
+}
 
-u8 fn_8004561C(void);
+// a - b into out (three floats)
+#ifdef __MWERKS__
+asm void fn_80045428(register f32* pA, register f32* pB, register f32* pOut) {
+    nofralloc
+    psq_l  f0, 0(pA), 0, 0
+    psq_l  f1, 8(pA), 1, 0
+    psq_l  f2, 0(pB), 0, 0
+    psq_l  f3, 8(pB), 1, 0
+    ps_sub f2, f0, f2
+    ps_sub f3, f1, f3
+    psq_st f2, 0(pOut), 0, 0
+    psq_st f3, 8(pOut), 1, 0
+    blr
+}
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void fn_80045428(f32* pA, f32* pB, f32* pOut) {
+    pOut[0] = pA[0] - pB[0];
+    pOut[1] = pA[1] - pB[1];
+    pOut[2] = pA[2] - pB[2];
+}
+#endif
+
+// a + b into out (three floats)
+#ifdef __MWERKS__
+asm void fn_8004544C(register f32* pA, register f32* pB, register f32* pOut) {
+    nofralloc
+    psq_l  f0, 0(pA), 0, 0
+    psq_l  f1, 8(pA), 1, 0
+    psq_l  f2, 0(pB), 0, 0
+    psq_l  f3, 8(pB), 1, 0
+    ps_add f2, f2, f0
+    ps_add f3, f3, f1
+    psq_st f2, 0(pOut), 0, 0
+    psq_st f3, 8(pOut), 1, 0
+    blr
+}
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void fn_8004544C(f32* pA, f32* pB, f32* pOut) {
+    pOut[0] = pB[0] + pA[0];
+    pOut[1] = pB[1] + pA[1];
+    pOut[2] = pB[2] + pA[2];
+}
+#endif
 
 void fn_80045470(CamLens* pLens, f32 fFov) {
     pLens->fFov = fFov;
     fn_800763BC(pLens);
 }
+
+// The quarter-speed slow motion (GameEffects.b11) on or off, with its sound events (0x35 on,
+// 0x36 off); every second of its frames moves the ball.
+void fn_80045494(u8 bOn, int nPlayer) {
+    lbl_80202898.n2C = 2;
+    if (bOn) {
+        if (!lbl_80202898.b11) {
+            EVENT_Trigger(nPlayer, 0x35, gPlayers[nPlayer].vBall, -1);
+            lbl_80202898.b11 = bOn;
+            lbl_80202898.n28 = 0;
+        }
+    } else if (lbl_80202898.b11) {
+        EVENT_Trigger(nPlayer, 0x36, gPlayers[nPlayer].vBall, -1);
+        lbl_80202898.b11 = bOn;
+    }
+}
+
+// The half-speed slow motion (GameEffects.b10) on or off, with its sound events (0x37 on, 0x38 off).
+void fn_80045558(u8 bOn, int nPlayer) {
+    if (bOn) {
+        if (!lbl_80202898.b10) {
+            EVENT_Trigger(nPlayer, 0x37, gPlayers[nPlayer].vBall, -1);
+            lbl_80202898.b10 = bOn;
+        }
+    } else if (lbl_80202898.b10) {
+        EVENT_Trigger(nPlayer, 0x38, gPlayers[nPlayer].vBall, -1);
+        lbl_80202898.b10 = bOn;
+    }
+}
+
+// ---- sweep code (not yet cleaned up) ----
+
+u8 fn_8004561C(void);
 
 u8 fn_8004560C(void) {
     return lbl_80202898.bGameBreaker;

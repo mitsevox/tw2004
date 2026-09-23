@@ -57,4 +57,10 @@ extern DynCamTables* lbl_80281D88;
 extern s32 lbl_80187988[20];            // fn_8003CB80's table
 extern s32 lbl_801879D8[17];            // fn_8003CBD4's table
 
+// GoDynamicCam.c: register and unregister the camera files' stream handlers.
+void fn_80039454(void);
+void fn_800394AC(void);
+void fn_800394F0(void);
+void fn_80039520(void);
+
 #endif

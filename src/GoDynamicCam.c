@@ -18,19 +18,30 @@ void fn_80039EB8(int nSize);
 u8   fn_8003D0EC(CamSequence* pSequence, int nKind);
 u8   fn_8003D240(CamShot* pShot, int nKind);
 u8   fn_8003D294(CamShot* pShot);
-
-// ---- sweep code (not yet cleaned up) ----
-
 void fn_8003954C(void);
-void fn_800394AC(void);
 void fn_80039550(void);
-void fn_80039520(void);
+void fn_80039554(UStreamObject* pObject);
+void fn_80039690(UStreamObject* pObject);
+void fn_80039754(UStreamObject* pObject);
+void fn_800397EC(UStreamObject* pObject);
+
+// Registers the handlers of the camera files ('CAMS', 'CAMV', 'CAMA').
+void fn_80039454(void) {
+    UStream_RegisterHandler('CAMS', fn_80039554);
+    UStream_RegisterHandler('CAMV', fn_80039690);
+    UStream_RegisterHandler('CAMA', fn_800397EC);
+}
 
 void fn_800394AC(void) {
     UStream_UnregisterHandler('CAMS');
     UStream_UnregisterHandler('CAMV');
     UStream_UnregisterHandler('CAMA');
     fn_8003954C();
+}
+
+// The same for the other 'CAMV' handler alone.
+void fn_800394F0(void) {
+    UStream_RegisterHandler('CAMV', fn_80039754);
 }
 
 void fn_80039520(void) {
@@ -43,8 +54,6 @@ void fn_8003954C(void) {
 
 void fn_80039550(void) {
 }
-
-// ---- end of sweep code ----
 
 // The stream handler for the shot file: takes the shots unless some are loaded already.
 void fn_80039690(UStreamObject* pObject) {
@@ -589,7 +598,51 @@ f32 fn_8003DBA8(f32 f) {
     return f;
 }
 
-// ---- sweep code (not yet cleaned up) ----
+// a + b into out (three floats)
+#ifdef __MWERKS__
+asm void fn_8003DC30(register f32* pA, register f32* pB, register f32* pOut) {
+    nofralloc
+    psq_l  f0, 0(pA), 0, 0
+    psq_l  f1, 8(pA), 1, 0
+    psq_l  f2, 0(pB), 0, 0
+    psq_l  f3, 8(pB), 1, 0
+    ps_add f2, f2, f0
+    ps_add f3, f3, f1
+    psq_st f2, 0(pOut), 0, 0
+    psq_st f3, 8(pOut), 1, 0
+    blr
+}
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void fn_8003DC30(f32* pA, f32* pB, f32* pOut) {
+    pOut[0] = pB[0] + pA[0];
+    pOut[1] = pB[1] + pA[1];
+    pOut[2] = pB[2] + pA[2];
+}
+#endif
+
+// a - b into out (three floats)
+#ifdef __MWERKS__
+asm void fn_8003DC54(register f32* pA, register f32* pB, register f32* pOut) {
+    nofralloc
+    psq_l  f0, 0(pA), 0, 0
+    psq_l  f1, 8(pA), 1, 0
+    psq_l  f2, 0(pB), 0, 0
+    psq_l  f3, 8(pB), 1, 0
+    ps_sub f2, f0, f2
+    ps_sub f3, f1, f3
+    psq_st f2, 0(pOut), 0, 0
+    psq_st f3, 8(pOut), 1, 0
+    blr
+}
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void fn_8003DC54(f32* pA, f32* pB, f32* pOut) {
+    pOut[0] = pA[0] - pB[0];
+    pOut[1] = pA[1] - pB[1];
+    pOut[2] = pA[2] - pB[2];
+}
+#endif
 
 u8 fn_8003DC78(CamShot* pShot) {
     u8 nKind = pShot->bAC;
@@ -600,4 +653,12 @@ u8 fn_8003DC78(CamShot* pShot) {
     return 0;
 }
 
-// ---- end of sweep code ----
+// The GameBreaker letterbox is up, for a predicted GameBreaker or while b19 is set.
+u8 fn_8003DCAC(void) {
+    int bResult = 0;
+
+    if (lbl_80202898.bGameBreaker && (lbl_80202898.nGBType != 0 || lbl_80202898.b19 == 1)) {
+        bResult = 1;
+    }
+    return bResult;
+}
