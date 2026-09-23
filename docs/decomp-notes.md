@@ -86,6 +86,16 @@ Rules for reading CodeWarrior output while matching, grouped by topic. Start wit
 
 The fixes that come up most often. Each points to its full entry below.
 
+- **Every float constant: read its hex from the original's data and write the exact expression
+  EA wrote.** EA writes fractions and unit conversions, not decimals: `1.0f / 72.0f` (0x3C638E39),
+  `59.94f / 60.0f` (0x3F7FBE76), `0.92f / 36.0f`, `1.0f / 65536.0f`, `DEG(x)`, `PI / 180.0f`. A
+  decimal like `0.0138889f` is a few bits off. objdiff masks constant values, so the function
+  still reads 100% while the value is wrong: a real parity bug in a port, and a common reason a
+  unit won't link. Decimals are right only when the hex round-trips exactly (0.5, 0.25, 20.0).
+  `tools/match/constcheck.py` (when present) lists every mismatch and suggests the fraction. How
+  the expression is written can also change the code (`x * (1.0f/65536.0f)` gives `fmuls`,
+  `x / 65536.0f` gives `fdivs`). See [Floating point](#floating-point).
+
 - Only register numbers differ: swap the declaration order, then try moving initializers out of
   the declarations. See [Registers](#registers-declaration-order-and-the-stack).
 - Register numbers still off after reordering: make the loop counter `long`. See
