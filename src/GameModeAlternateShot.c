@@ -169,15 +169,15 @@ void fn_800E6C10(void) {
 // farthest from the pin and off the green, then anyone farthest.
 s32 fn_800E6C8C(int nPlayer) {
     TeeOrder order;
-    int nLead;
-    int h;
+    int nBest;
+    CourseInfo* pCourse;
     int w;
     int t;
     int i;
-    CourseInfo* pCourse;
-    f32* pPin;
+    int h;
+    int nHole;
     f32 fBest;
-    int nBest;
+    int nLead;
     f32 dx;
     f32 dz;
     f32 d;
@@ -212,14 +212,14 @@ s32 fn_800E6C8C(int nPlayer) {
         }
     }
     pCourse = fn_8000C594();
+    nHole = Game_CurrentHole();
     fBest = 0.0f;
-    pPin = (f32*)&pCourse->pin[Game_CurrentHole()];
     nBest = 5;
     for (i = 0; i < gNumPlayersSetUp; i++) {
         if (i != nPlayer && !Player_IsHoled(i) && fn_800E6A98(i) && !fn_800E69CC(fn_800E6AF8(i)) &&
-            gPlayers[i].nLie != LIE_GREEN) {
-            dx = ((Ball*)gPlayers[i].ball)->vPos[0] - pPin[0];
-            dz = ((Ball*)gPlayers[i].ball)->vPos[2] - pPin[2];
+            PLAYER(i)->nLie != LIE_GREEN) {
+            dx = *(f32*)(PLAYER(i)->ball + 0) - pCourse->pin[nHole].x;
+            dz = *(f32*)(PLAYER(i)->ball + 8) - pCourse->pin[nHole].z;
             d = fn_80009680(dx * dx + dz * dz);
             if (d > fBest) {
                 fBest = d;
@@ -232,8 +232,8 @@ s32 fn_800E6C8C(int nPlayer) {
         nBest = 5;
         for (i = 0; i < gNumPlayersSetUp; i++) {
             if (i != nPlayer && !Player_IsHoled(i) && fn_800E6A98(i) && !fn_800E69CC(fn_800E6AF8(i))) {
-                dx = ((Ball*)gPlayers[i].ball)->vPos[0] - pPin[0];
-                dz = ((Ball*)gPlayers[i].ball)->vPos[2] - pPin[2];
+                dx = *(f32*)(PLAYER(i)->ball + 0) - pCourse->pin[nHole].x;
+                dz = *(f32*)(PLAYER(i)->ball + 8) - pCourse->pin[nHole].z;
                 d = fn_80009680(dx * dx + dz * dz);
                 if (d > fBest) {
                     fBest = d;
