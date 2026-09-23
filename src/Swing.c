@@ -4176,7 +4176,7 @@ void STATEFUNC_SwingUpdate(int nPlayer) {
 
 u8    fn_800E46B4(void);
 u8    fn_800E4254(int nPlayer);
-void  fn_800DEA44(int nPlayer);
+void  GM_ReplaceOOBBall(int nPlayer);
 f32 fn_80062C28(int nHandle);
 void fn_80062B78(int nPlayer);
 void fn_80062B74(int nPlayer);
@@ -4219,7 +4219,7 @@ void STATEFUNC_ShowYardageUpdate(int nPlayer) {
     if (!fn_800E4254(nPlayer)) {
         if (fn_80063C7C(pV)) {
             if (gPlayers[nPlayer].bLowIQPenalty != 0) {
-                fn_800DEA44(nPlayer);
+                GM_ReplaceOOBBall(nPlayer);
             }
             GM_EndOfGolferTurn(nPlayer);
             return;

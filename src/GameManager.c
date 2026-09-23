@@ -28,7 +28,7 @@ void  Wind_Generate(void);
 void  GameEffects_ResetGameEffectSettings(void);
 void  fn_800E3B28(void);
 void  fn_800DA36C(void);
-void  fn_800DE828(void);
+void  GM_FlyByMode_Init(void);
 void  fn_800D8D38(int nPlayer);
 void  EVENT_Trigger(int nPlayer, int nEvent, int a, int b);
 void  Caddie_Stop(void);
@@ -54,7 +54,7 @@ void  fn_80062D6C(int a, int nPlayer);
 void  fn_800E3D38(int nPlayer, int a);
 u8    fn_800EE470(void);
 void  fn_8011989C(int nPlayer, int nStrokes);
-void  fn_800DEC34(int nPlayer);
+void  GM_GolferConcede_Hole(int nPlayer);
 void  GM_EndOfGolferTurn_HoleFinished(int nPlayer);
 void  GM_EndOfGolferTurn_GameFinished(int nPlayer);
 void  GM_HoleFinished_GameNotFinished(int nPlayer);
@@ -117,6 +117,22 @@ typedef struct HoleTees {
     u8     unk0[0xB0];
     PinPos tee[4];                          // 0xB0  one per tee set
 } HoleTees;
+
+f32   fn_800336E4(void);
+f32   fn_800336F4(void);
+void  GOLFERSTATE_Push(int nState, int nPlayer);
+void  fn_8001704C(int nView, int nPlayer);
+u8    fn_800E5110(void);
+u8    fn_800E415C(void);
+u8    fn_800E45CC(void);
+u8    fn_800E46B4(void);
+void  fn_800E2A88(void);
+void  fn_800E1018(int nPlayer, int nHole);
+void  fn_800C6C8C(void);
+void  fn_800E5714(int a);
+void  fn_800E5724(int nPlayer);
+void  fn_800E41C8(void);
+u8    Ter_PointInOOBNetwork(u8* pBall);
 
 extern u8  lbl_80202898[];
 extern s32 lbl_80282278;
@@ -222,7 +238,7 @@ void GM_InitForHole(void) {
     fn_800E3B28();
     fn_800DA36C();
     if (gpGame->b27F) {
-        fn_800DE828();
+        GM_FlyByMode_Init();
     }
     for (i = 0; i < gNumPlayersSetUp; i++) {
         fn_800D8D38(i);
@@ -261,7 +277,7 @@ void GM_EndOfGolferTurn(int nPlayer) {
         bWait = 1;
     } else if (gpGame->bAIConcedes) {
         if (GM_CheckForAIConcede(nPlayer)) {
-            fn_800DEC34(nPlayer);
+            GM_GolferConcede_Hole(nPlayer);
         } else {
             bWait = 1;
         }
@@ -471,8 +487,8 @@ void GM_ShowYardage(int nPlayer) {
         Player* p = &gPlayers[nPlayer];
         f32     dx;
         f32     dz;
-        dz = *(f32*)(p->ball + 8) - p->fBallZ;
         dx = *(f32*)(p->ball + 0) - p->fBallX;
+        dz = *(f32*)(p->ball + 8) - p->fBallZ;
         fn_800E4164(1, nPlayer, fn_80009680(dx * dx + dz * dz));
     }
 }
@@ -480,22 +496,23 @@ void GM_ShowYardage(int nPlayer) {
 // TW06: GM_BumpBallForObstructions. A ball at rest against an obstruction or hazard is moved to
 // a drop point nearby, or else back where it was before the shot.
 void GM_BumpBallForObstructions(int nPlayer) {
+    int n;                      // a copy of nPlayer: register order only (a "fake match", found by the permuter)
     f32 vDrop[4];
     if (gpGame->bBumpObstructions) {
         Player* p;
         u8*     pBall;
         p = &gPlayers[nPlayer];
+        n = nPlayer;
         if (p->nLie != 0) {
             pBall = p->ball;
             if (Ter_CheckObjectAndHazardObstruction(pBall, 0, 1, 1, 1.5f, 2.0f, 0.577f)) {
-                if (Ter_SearchAreaForDropLocation(nPlayer, 0, 0, vDrop)) {
+                if (Ter_SearchAreaForDropLocation(n, 0, 0, vDrop)) {
                     Physics_DropBall(pBall, vDrop);
                     return;
                 }
-                Physics_DropBall(pBall, p->vPreShot);
-                if (gPlayers[nPlayer].vA44[0] == gPlayers[nPlayer].fBallX &&
-                    gPlayers[nPlayer].vA44[2] == gPlayers[nPlayer].fBallZ) {
-                    fn_80055AA8(pBall, p->vPreShot, nPlayer);
+                Physics_DropBall(pBall, gPlayers[nPlayer].vPreShot);
+                if (gPlayers[n].vA44[0] == gPlayers[n].fBallX && gPlayers[n].vA44[2] == gPlayers[n].fBallZ) {
+                    fn_80055AA8(pBall, gPlayers[nPlayer].vPreShot, n);
                 }
             }
         }
@@ -658,7 +675,138 @@ int fn_800DDFB4(int nPlayer) {
     return (Rand_Next(1) % 100) < 85;
 }
 
+// TW06: GM_ShowPostShotCrowdFlyby (by position). Two measures of the shot (fn_800336E4 at least 5,
+// fn_800336F4 at least 0.5).
+int GM_ShowPostShotCrowdFlyby(void) {
+    if (fn_800336E4() >= 5.0f && fn_800336F4() >= 0.5f) {
+        return 1;
+    }
+    return 0;
+}
+
+// TW06: GM_FlyByMode_Init. The player the mode picks starts the hole flyover.
+void GM_FlyByMode_Init(void) {
+    int n = gpGame->pfn1D4(5);
+    GOLFERSTATE_Push(GS_INITIAL_FLY_BY, n);
+    fn_8001704C(gPlayers[n].nView0, n);
+}
+
+// TW06: GM_Update.
+void GM_Update(void) {
+    if (gSession.nGameType == 6) {
+        gpGame->pfn220();
+        if ((fn_800E5110() && fn_800E415C()) || fn_800E45CC()) {
+            fn_800E46B4();
+        } else if (gpGame->b27E && !fn_800E4BF8()) {
+            fn_800E2A88();
+        }
+        gpGame->n12C = gSession.unk24;
+    }
+}
+
+// TW06: GM_RestartHole. Every player back to the hole's start, the mode told, the flyover again
+// if the mode has one, effects reset.
+void GM_RestartHole(void) {
+    int i;
+    if (gpGame->b279) {
+        for (i = 0; i < 5; i++) {
+            fn_800E1018(i, gpGame->nCurHole);
+        }
+        fn_800E299C();
+        gpGame->pfn224();
+        if (gpGame->b27F) {
+            GM_FlyByMode_Init();
+        }
+        gpGame->n12C = gSession.unk24;
+        fn_800E3D90();
+        fn_800E3B28();
+        GameEffects_ResetGameEffectSettings();
+        fn_800C6C8C();
+        for (i = 0; i < gSession.nNumPlayers; i++) {
+            fn_800957D8(gPlayers[i].nShotHandle);
+            fn_800957FC(gPlayers[i].nShotHandle, 1);
+        }
+        fn_800E5714(2);
+    }
+}
+
 // TW06: GM_GetGolferDistanceToPin.
 f32 GM_GetGolferDistanceToPin(int nPlayer) {
     return fn_800D0478(nPlayer);
+}
+
+// TW06: GM_ReplaceOOBBall. A ball out of bounds (or flagged at 0x30E) is dropped at a legal point
+// nearby when there is one; otherwise it goes back where it was before the shot.
+void GM_ReplaceOOBBall(int nPlayer) {
+    f32  v[4];
+    f32* pPre;
+    u8*  pBall;
+    if ((gPlayers[nPlayer].b30E ||
+         (Ter_PointInOOBNetwork(gPlayers[nPlayer].ball) && !gPlayers[nPlayer].bLowIQPenalty)) &&
+        Ter_SearchAreaForDropLocation(nPlayer, 1, 1, v)) {
+        Physics_DropBall(gPlayers[nPlayer].ball, v);
+        return;
+    }
+    pBall = gPlayers[nPlayer].ball;
+    pPre  = gPlayers[nPlayer].vPreShot;
+    Physics_DropBall(pBall, pPre);
+    if (gPlayers[nPlayer].vA44[0] == gPlayers[nPlayer].fBallX &&
+        gPlayers[nPlayer].vA44[2] == gPlayers[nPlayer].fBallZ) {
+        fn_80055AA8(pBall, pPre, nPlayer);
+    }
+}
+
+// The same drop without the out-of-bounds test.
+void fn_800DEB5C(int nPlayer) {
+    f32  v[4];
+    f32* pPre;
+    u8*  pBall;
+    if (Ter_SearchAreaForDropLocation(nPlayer, 1, 1, v)) {
+        Physics_DropBall(gPlayers[nPlayer].ball, v);
+        return;
+    }
+    pBall = gPlayers[nPlayer].ball;
+    pPre  = gPlayers[nPlayer].vPreShot;
+    Physics_DropBall(pBall, pPre);
+    if (gPlayers[nPlayer].vA44[0] == gPlayers[nPlayer].fBallX &&
+        gPlayers[nPlayer].vA44[2] == gPlayers[nPlayer].fBallZ) {
+        fn_80055AA8(pBall, pPre, nPlayer);
+    }
+}
+
+// TW06: GM_GolferConcede_Hole. The player picks up: lie "holed", 999 strokes and putts. If that
+// leaves one golfer on the hole (outside mode 18), everyone else is finished too - in match play
+// the opponent wins the hole without putting out. Then the Conceded state.
+void GM_GolferConcede_Hole(int nPlayer) {
+    Player* p;
+    int     i;
+    int     n;
+    int     nPlayers;
+    fn_800E3D38(nPlayer, 0);
+    p = &gPlayers[nPlayer];
+    p->nLie = LIE_HOLED;
+    p->nStrokes[gpGame->nCurHole] = 999;
+    p->nPutts[gpGame->nCurHole] = 999;
+    *(s32*)(p->ball + 0x64) = 0;
+    if (Game_GetMode() != 0x12) {
+        nPlayers = gNumPlayersSetUp;
+        n = 0;
+        for (i = 0; i < nPlayers; i++) {
+            if (gPlayers[i].nLie != LIE_HOLED) {
+                n++;
+            }
+        }
+        if (n == 1) {
+            for (i = 0; i < nPlayers; i++) {
+                if (i != nPlayer) {
+                    gPlayers[i].nLie = LIE_HOLED;
+                    *(s32*)(gPlayers[i].ball + 0x64) = 0;
+                }
+            }
+        }
+    }
+    fn_800E5714(1);
+    fn_800E5724(nPlayer);
+    fn_800E41C8();
+    GOLFERSTATE_Switch(GS_CONCEDED, nPlayer);
 }

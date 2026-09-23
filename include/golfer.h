@@ -220,7 +220,9 @@ typedef struct Player {
     s32  nHolesWon;             // 0x278  match play. TW06: matchwins
     u8   unk27C[0x28C - 0x27C]; // 0x27C  TW06: roundscore[4]
     u8   unk28C;                // 0x28C  TW06: playercut
-    u8   unk28D[0x354 - 0x28D];
+    u8   unk28D[0x30E - 0x28D];
+    u8   b30E;                  // 0x30E  a replaced ball must be dropped (GM_ReplaceOOBBall)
+    u8   unk30F[0x354 - 0x30F];
     // Shot block, TW06 AIshot_t (which has 6 preferred clubs where we have 8).
     s32  nClub;                 // 0x354  TW06: club
     s32  nClubPerKind[8];       // 0x358  the club Shot_Prepare would pick for each shot kind. TW06: preferredClub
@@ -381,8 +383,8 @@ typedef struct GameState {
     u8   unk214[4];
     void (*pfn218)(int nPlayer); // 0x218
     void (*pfn21C)(int nPlayer); // 0x21C
-    void (*pfn220)(int nPlayer); // 0x220
-    void (*pfn224)(int nPlayer); // 0x224
+    void (*pfn220)(void);       // 0x220  every frame in game type 6
+    void (*pfn224)(void);       // 0x224  the hole restarts
     void (*pfn228)(int nPlayer); // 0x228  called every frame of the shot setup (state 10)
     void (*pfn22C)(int nPlayer); // 0x22C  called after a re-plan in swing state 9
     u8   unk230[0x238 - 0x230];

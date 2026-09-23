@@ -210,7 +210,7 @@ Functions still unnamed or named from TW06:
 | `800D1530` | `fn_800D1530` | `GameAnalysis_GetSidehillLie` | medium | PS2 anchor(1)+graph |
 | `800DD904` | `GM_BumpBallForObstructions` | `GM_BumpBallForObstructions` | medium | PS2 nbr(r0,2) |
 | `800DDFB4` | `fn_800DDFB4` | `GM_DoPreshotAnimation` | medium | PS2 nbr(r1,2) |
-| `800DEA44` | `fn_800DEA44` | `GM_ReplaceOOBBall` | medium | PS2 nbr(r4,2) |
+| `800DEA44` | `GM_ReplaceOOBBall` | `GM_ReplaceOOBBall` | medium | PS2 nbr(r4,2) |
 | `800E53B8` | `fn_800E53B8` | `GUI_IsAwardUIAnimating` | medium | PS2 calls(r0,2) |
 | `80114540` | `fn_80114540` | `DynChain_DoBoobSimulation` | medium | Xbox anchor(1)+graph |
 | `8011E020` | `fn_8011E020` | `GetLocalTime` | medium | Xbox calls(r1,1) |
