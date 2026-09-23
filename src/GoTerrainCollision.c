@@ -29,7 +29,6 @@ void  fn_800509BC(f32* pSrc, f32* pDst);                  // negate, four floats
 // first vertex and its number in the strip. Probably TW06's Ter_GetSupportingGroundTriangle.
 f32   fn_800CBEE0(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** ppRef, f32 (**ppTri)[3],
                   s32* pTri);
-f32   fn_80035074(f32 x);                                 // floor
 
 // Every floor in this file goes through an inline (probably EA's wrapper around floorf):
 // fn_8004DCC4 matches only that way, and every other function matches either way.

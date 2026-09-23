@@ -25,7 +25,7 @@ typedef struct Skeleton {
     s32  nChains;               // 0x0004
     u8   unk8[4];
     IKChain* pChains;           // 0x000C
-    u8   unk10[0x20 - 0x10];
+    u32  a10[4];                // 0x0010  a bit per bone (128; fn_8001EB6C clears one)
     f32  (*p20)[4];             // 0x0020  a quaternion per bone
     f32  (*p24)[4];             // 0x0024  a quaternion per bone
     f32  (*p28)[4];             // 0x0028  p20 at an IK weight of 0 or 1, otherwise p24
@@ -60,9 +60,10 @@ typedef struct CharModel {
     u8        unkC[0x34 - 0xC];
     void*     p34;              // 0x034  freed with the model
     Skeleton* pSkel;            // 0x038
-    u8        aBoneIndex[0x59]; // 0x03C  the model's bone for each of the 0x59 standard bones, 0xFF
-                                //        none (fn_8001EED8; fn_80029664 fills it in by name)
-    u8        a95[0x59];        // 0x095  fn_8001EEE4 reads it through aBoneIndex
+    u8        aBone[0x59];      // 0x03C  each bone id's index (fn_8001EED8), 0xFF none; fn_80029664
+                                //        fills it in by name
+    u8        aBone2[0x59];     // 0x095  the index fn_8001EEE4 gives while bEE is set, by bone index
+                                //        (fn_80029804: itself, or the other bone of a pair)
     u8        bEE;              // 0x0EE  fn_8001EDF4
     u8        unkEF;
     struct DynChain* pF0;       // 0x0F0  } freed with the model (fn_80114398)
@@ -149,7 +150,7 @@ typedef struct ClipBlend {
 // Anim_SetTime and fn_8007326C take the address of its animation player at 0x164, whose fields
 // from 0x168 on are named here directly.
 typedef struct Character {
-    u8    unk0[4];
+    s32   nIndex;               // 0x000  its entry in lbl_801B9624 (fn_8001C21C)
     s32   nPlayer;              // 0x004  the player it belongs to (Player_SetGolfer); 1000 for the
                                 //        characters fn_8001D324 finds by id
     s32   nId;                  // 0x008  (fn_8001D324)
@@ -304,6 +305,7 @@ int   fn_8001EE90(Character* pChar);
 int   fn_8001EED8(CharModel* pModel, int nBone);    // a bone's index
 int   fn_8001EEE4(CharModel* pModel, int nBone);
 void  Anim_SetRate(u8* pAnim, f32 fRate);           // 0x8001F084
+void  fn_8001E85C(f32* pSrc, f32* pDst);            // copy a quaternion
 void  SKEL_SetIKSolutionWeight(Skeleton* pSkel, f32 f);
 void  fn_80027808(CharModel* pModel, f32* pRot);
 void  fn_8002792C(Skeleton* pSkel);
@@ -510,6 +512,7 @@ extern f32         lbl_80281D1C;
 void* AnimLib_Pick(int nPlayer, AnimLib* pLib, int nGroup, int nStyle, int nClub, int nKey, u32* pFlags,
                    const char* pName);
 void* Char_SetClip(Character* pChar, int nGroup, int nStyle, const char* pName);
+s32   AnimLib_MergeOverlay(u8* pData, int nSlot);   // skalib.c; char.c's 'SAC ' handler
 
 // Swing.c
 f32   fn_8005CB78(Character* pChar, u64 uEvent);    // the time of an animation event

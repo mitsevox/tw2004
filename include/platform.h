@@ -48,6 +48,7 @@ char*  strstr(const char* pStr, const char* pFind);
 int    sprintf(char* pBuf, const char* pFmt, ...);
 double atan(double x);
 double fabs(double x);                  // 0x8000AE94
+double floor(double x);
 #else
 #include <math.h>
 #include <stdio.h>

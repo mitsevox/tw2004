@@ -4,7 +4,6 @@
 
 #include "character.h"
 
-void fn_8001E85C(f32* pSrc, f32* pDst);                 // copy a quaternion
 void fn_8002703C(Skeleton* pSkel, IKChain* pChain, f32 fWeight);
 void fn_800284DC(Skeleton* pSkel);                      // frees a skeleton
 void fn_80009710(f32* pQuat);                           // identity (0, 0, 0, 1)
@@ -145,22 +144,22 @@ void fn_8002957C(CharModel* pModel) {
     fn_80009E70(pModel);
 }
 
-// Fills in a95: each standard bone maps to itself, except the pairs in lbl_8018742C, where the
-// model's first bone maps to its second.
+// Fills in aBone2: each bone maps to itself, except the pairs in lbl_8018742C, where the model's
+// first bone maps to its second.
 void fn_80029804(CharModel* pModel) {
     int i;
     int nA;
     int nB;
 
-    pModel->a95[0] = 0;     // fake match: bone 0 on its own (a loop from 0 unrolls differently)
+    pModel->aBone2[0] = 0;  // fake match: bone 0 on its own (a loop from 0 unrolls differently)
     for (i = 1; i < 0x59; i++) {
-        pModel->a95[i] = i;
+        pModel->aBone2[i] = i;
     }
     for (i = 0; i < 0x29; i++) {
         nA = fn_8001EED8(pModel, lbl_8018742C[i][0]);
         nB = fn_8001EED8(pModel, lbl_8018742C[i][1]);
         if (nA != 0xFF && nB != 0xFF) {
-            pModel->a95[nA] = nB;
+            pModel->aBone2[nA] = nB;
         }
     }
 }
