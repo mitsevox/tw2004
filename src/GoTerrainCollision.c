@@ -1,11 +1,12 @@
 // GoTerrainCollision.c (TW06's goterraincollision.c): the course's ground as collision data
-// (CourseInfo, TW06's TGD_TerrainInfo): heights, normals and surfaces under a point, the drop
-// checks, and the ball's collision tests against the ground, the pin and the course objects.
-// The ground is triangle strips found through a grid; each triangle's surface is a row of
-// gSurfaceTypes. The original file starts before this unit, at 0x8004AFA0 (the code from there
-// on shares one constant pool), and ends where Ball.c begins.
+// (CourseInfo, TW06's TGD_TerrainInfo): the free-drop and out-of-bounds networks, the drop
+// checks, heights, normals and surfaces under a point, and the ball's collision tests against the
+// ground, the pin and the course objects. The ground is triangle strips found through a grid;
+// each triangle's surface is a row of gSurfaceTypes. The file starts at 0x8004AFA0 (the code from
+// there on shares one constant pool) and ends where Ball.c begins.
 
 #include "golfer.h"
+#include "physics.h"
 
 // One strip of ground triangles (8 bytes). TW06: TGD_PolygonReference (0xC bytes, the same up
 // to 0x8).
@@ -21,6 +22,9 @@ typedef struct TerPolyRef {
 
 #define TER_NO_GROUND -65536.125f   // the height the lookups return when nothing is under the point
 
+extern u8  lbl_80281DC0;                 // the cup is real geometry
+extern s32 lbl_80281DC8;                 // out-of-bounds networks loaded
+
 void  Vec3Copy(f32* pSrc, f32* pDst);                     // 0x80008304
 void  vec4flt_CrossProduct(f32* pA, f32* pB, f32* pOut);
 void  fn_800BAF04(f32* pSrc, f32* pDst);                  // normalise
@@ -30,6 +34,26 @@ void  fn_800509A0(f32* pSrc, f32* pDst);                  // negate (paired-sing
 // first vertex and its number in the strip. Probably TW06's Ter_GetSupportingGroundTriangle.
 f32   fn_800CBEE0(CourseInfo* pCourse, f32* pPos, void** ppCell, TerPolyRef** ppRef, f32 (**ppTri)[3],
                   s32* pTri);
+
+// TW06: bool Ter_Use3DCupGeometry(void). Whether the cup is real geometry the ball drops into;
+// without it, GameRound.c holes a ball that stops within half a yard of the pin.
+u8 fn_8004B580(void) {
+    return lbl_80281DC0;
+}
+
+// TW06: s32 Ter_iNumOOBNetworksLoaded(void).
+s32 fn_8004B65C(void) {
+    return lbl_80281DC8;
+}
+
+// Lies from which a drop may be taken: the fairways and the roughs.
+u8 Ter_LieIsPreferred(u32 nLie) {
+    if (nLie == LIE_FAIRWAY_e || nLie == LIE_FAIRWAY_TIGHT_e || nLie == LIE_ROUGH_HIGH_e
+        || nLie == LIE_ROUGH_e) {
+        return 1;
+    }
+    return 0;
+}
 
 // TW06: bool Ter_IsValidDropSurface(s32). Surfaces of class 3, 12 and 18.
 u8 Ter_IsValidDropSurface(s32 nSurface) {
