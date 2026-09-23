@@ -19,6 +19,7 @@ void fn_80103920(void);
 void fn_80103EFC(CrAPAsset* pAsset);
 void sTurnOnLogo(s16 nPart, int b, int i);
 void FE_CrAP_TurnOnAsset(CrAPAsset* pAsset);
+u8   fn_801048B0(int nPart);
 int  fn_80104AF4(s16 nPart, int n);     // the category of a part's entry n (-1 or 0x40: none)
 int  fn_80104F7C(CrAPAsset* pAsset);
 int  fn_80105140(s16 nPart);
@@ -28,9 +29,13 @@ void fn_80105240(void);
 void fn_80105B80(CrAPAsset* pAsset, char* pName);
 void fn_80105DAC(void);
 void fn_80105EFC(void);
+void FE_CheckSpecialCaseConnections(CrAPAsset* pAsset);
 u8   fn_801061F8(s16 nPart, int nCategory, int nWanted);
+u8   fn_80106658(CrAPAsset* pAsset);
 int  fn_80106750(CrAPAsset* pAsset, Skin** apSkins);
+u8   fn_801069AC(CrAPAsset* pAsset);
 void fn_80106A64(CrAPAsset* pAsset, Skin* pSkin);
+void fn_80106B04(CrAPAsset* pAsset, Skin* pSkin);
 void fn_80106BF8(CrAPAsset* pAsset, Skin* pSkin);
 void fn_80106D24(CrAPAsset* pAsset, Skin* pSkin);
 void fn_80106DA0(CrAPAsset* pAsset, Skin* pSkin);
@@ -296,6 +301,95 @@ void fn_801042D0(CrAPAsset* pAsset) {
     } else {
         fn_8008E818(1);
     }
+}
+
+// Put the asset (the one it takes its attributes from) on the golfer being edited, in place of the
+// one in its slot of the profile, and have the golfer show it off: club assets on the club skins
+// (the golfer takes up the club), balls, or the body skin; then play the asset's animation.
+void FE_CrAP_TurnOnAsset(CrAPAsset* pAsset) {
+    int nPart;
+    u8 bLoop;
+    s8 nPlay;
+    Skin* pSkin;
+    f32 fAngle;
+    int nOld;
+
+    fn_80077ACC();
+    fAngle = 0.0f;
+    bLoop = 0;
+    nPlay = 1;
+    pSkin = lbl_80281EE0->pB4->pChar->pSkin;
+    pAsset = fn_80103B4C(pAsset);
+    lbl_802816E8 = fn_80103D14(pAsset->n2E);
+    lbl_802816EC = fn_80104F7C(pAsset);
+    if (pAsset->n2E == -1) {
+        return;
+    }
+    nPart = pAsset->nPart;
+    fn_8008EA38(1);
+    if (fn_80106658(pAsset)) {
+        fn_8008EABC(0);
+        fn_8001D624(lbl_80281EE0->pB4->n10);
+        if (stricmp(fn_801064EC(pAsset->n112), "gdlcrp07") == 0 ||
+            stricmp(fn_801064EC(pAsset->n112), "fdlcrp07") == 0) {
+            fAngle = 4.0f;
+            fn_8008E860(0);
+        } else if (fn_8008E9A8() != 1) {
+            fn_8008E8D0(1);
+            if (stricmp(fn_801064EC(pAsset->nCategory), "Fairway Woods") == 0) {
+                fn_8008E718(1);
+            } else if (stricmp(fn_801064EC(pAsset->nCategory), "Iron Sets") == 0) {
+                fn_8008E718(3);
+            } else if (stricmp(fn_801064EC(pAsset->nCategory), "Wedge Sets") == 0) {
+                fn_8008E718(5);
+            } else if (stricmp(fn_801064EC(pAsset->nCategory), "Putters") == 0) {
+                fn_8008E718(2);
+            }
+        } else {
+            fn_8008E9B4();
+            bLoop = 1;
+            nPlay = 0;
+        }
+        fn_80103DE0();
+        fn_80103BD8(pAsset);
+    } else if (fn_801069AC(pAsset)) {
+        if (fn_8008E9A8() != 2) {
+            fn_8008E8D0(2);
+        } else {
+            nPlay = 0;
+        }
+        fn_80103BD8(pAsset);
+    } else {
+        nOld = fn_80103D14(pAsset->n2E);
+        if (nOld >= 0) {
+            fn_80103EFC(fn_80104F68(nOld));
+        }
+        fn_80106A64(pAsset, pSkin);
+        fn_80106B04(pAsset, pSkin);
+        fn_8001D624(lbl_80281EE0->pB4->n10);
+        fn_80103D6C();
+        if (fn_8008E9A8() != 0) {
+            fn_8008E8D0(0);
+        }
+    }
+    if (strcmp(fn_801064EC(pAsset->n112), "") == 0 || strcmp(fn_801064EC(pAsset->n112), "0") == 0 ||
+        !fn_801048B0(nPart)) {
+        fn_8008E944(0, 0.0f);
+        if (fn_8008E6BC() == NULL || strcmp(fn_8008E6BC(), fn_801064EC(pAsset->n112)) != 0) {
+            fn_8008E468(fn_801064EC(pAsset->n112), fn_801064EC(pAsset->n114), 1);
+        } else {
+            fn_8008E818(1);
+        }
+        if (nPart != fn_8008EB04()) {
+            fn_8008E2F8(1, 0.0f);
+        }
+        fn_8008EAF8(nPart);
+    } else {
+        fn_8008E944(1, fAngle);
+        fn_8008E724(fn_801064EC(pAsset->n112), fn_801064EC(pAsset->n114), nPlay, bLoop);
+    }
+    fn_80103C2C(pAsset);
+    FE_CheckSpecialCaseConnections(pAsset);
 }
 
 // Put a part's choice i (from the list b) on the golfer being edited: part 13 by its name, part 17
