@@ -909,6 +909,7 @@ config.libs = [
             Object(NonMatching, "UFstPart.c"),
             Object(NonMatching, "BootCourse.c"),
             Object(NonMatching, "SunFlr_Gc.c"),
+            Object(NonMatching, "Code8009AA28.c"),
             Object(NonMatching, "GoGreenGrid.c"),
             Object(NonMatching, "MC_Gc.c"),
             Object(NonMatching, "MC.c"),
