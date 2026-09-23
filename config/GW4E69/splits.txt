@@ -3950,8 +3950,8 @@ unsorted/sweep_801654F4.c:
 unsorted/sweep_80165524.c:
 	.text       start:0x80165524 end:0x80165528
 
-unsorted/sweep_80165C6C.c:
-	.text       start:0x80165C6C end:0x80165C74
+UISEvent.c:
+	.text       start:0x80165528 end:0x80166098
 
 unsorted/sweep_80169B0C.c:
 	.text       start:0x80169B0C end:0x80169B28
