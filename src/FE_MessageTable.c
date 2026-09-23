@@ -3693,6 +3693,22 @@ void fn_800834DC(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
+// For the card in slot pArgs[0], pArgs[1]: fn_8009D3DC's answer, and fn_8009D1D8's with kind 0.
+void fn_800834E8(MsgArg* pArgs, MsgArg* pResult) {
+    fn_8009CD80(pArgs[0].i, pArgs[1].i);
+    *(s32*)pArgs[2].p = fn_8009D3DC(pArgs[0].i, pArgs[1].i);
+    *(s32*)pArgs[3].p = fn_8009D1D8(pArgs[0].i, pArgs[1].i, 0, 0);
+    fn_8009CD7C();
+}
+
+// The same for an EA Sports Bio save: the new files it needs, and fn_8009D1D8's with kind 3.
+void fn_80083550(MsgArg* pArgs, MsgArg* pResult) {
+    fn_8009CD80(pArgs[0].i, pArgs[1].i);
+    *(s32*)pArgs[2].p = fn_8009D50C(pArgs[0].i, pArgs[1].i);
+    *(s32*)pArgs[3].p = fn_8009D1D8(pArgs[0].i, pArgs[1].i, 0, 3);
+    fn_8009CD7C();
+}
+
 void fn_800835B8(MsgArg* pArgs, MsgArg* pResult) {
 }
 
@@ -3702,6 +3718,18 @@ void fn_800835BC(MsgArg* pArgs, MsgArg* pResult) {
 
 void fn_800835C8(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
+}
+
+// Give player pArgs[0] their golfer's bag: a created golfer's own, else the default bag.
+void fn_800835D4(MsgArg* pArgs, MsgArg* pResult) {
+    s32 nPlayer = pArgs[0].i;
+    GolferRecord* pRecord = fn_80077A80(gSession.nGolfer[nPlayer]);
+
+    if (gSession.nGolfer[nPlayer] < FIRST_CREATED_GOLFER) {
+        gSession.uBag[nPlayer] = 0x02A7FC44;
+        return;
+    }
+    gSession.uBag[nPlayer] = pRecord->uBagMask;
 }
 
 void fn_80083860(MsgArg* pArgs, MsgArg* pResult) {
@@ -3935,8 +3963,32 @@ void fn_80084544(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = EASBio_IsBioLoaded();
 }
 
+// 0 when card slot 0, 0 answers fn_80125354 with error -43 (then fn_801253F0 runs anyway), else 1.
+void fn_80084578(MsgArg* pArgs, MsgArg* pResult) {
+    if (fn_80125354(0, 0) == -43) {
+        pResult->i = 0;
+    } else {
+        pResult->i = 1;
+    }
+    fn_801253F0(0, 0);
+}
+
 void fn_800845D4(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = fn_80125528(pArgs[0].i, pArgs[1].i);
+}
+
+// 1 when fn_80125354 answers error -18 for card slot 0, 0; fn_801253F0 follows when it succeeds.
+void fn_80084614(MsgArg* pArgs, MsgArg* pResult) {
+    s32 nError = fn_80125354(0, 0);
+
+    if (nError == -18) {
+        pResult->i = 1;
+    } else {
+        pResult->i = 0;
+    }
+    if (nError == 0) {
+        fn_801253F0(0, 0);
+    }
 }
 
 void fn_80084678(MsgArg* pArgs, MsgArg* pResult) {
@@ -3956,6 +4008,18 @@ void fn_800846D4(MsgArg* pArgs, MsgArg* pResult) {
 
     pN = pArgs[0].p;
     *pN = fn_80125928();
+}
+
+// Whether an EA Sports Bio reward is waiting (fn_801256B8); its message is set up either way.
+void fn_80084704(MsgArg* pArgs, MsgArg* pResult) {
+    EASBio_eReward eReward = fn_801256B8();
+
+    if (eReward != -1) {
+        pResult->i = 1;
+    } else {
+        pResult->i = 0;
+    }
+    EASBio_SetCurrentRewardMessage(eReward);
 }
 
 void fn_80084750(MsgArg* pArgs, MsgArg* pResult) {
