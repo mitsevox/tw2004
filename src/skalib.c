@@ -90,7 +90,7 @@ void  Skalib_SetBudgets(void);
 int   fn_80023F7C(int nSlot);
 AnimLib* AnimLib_Load(u8* pData, ClipBank* pBank);
 u32   fn_8009EF90(void);
-int   fn_80023CE8(int n);
+int   Skalib_HasOverlays(int nSlot);
 u8    fn_800C9828(int nGroup, int nStyle, int nClub, int nKey);
 void  AnimLib_FreeCopies(void);
 void  ClipBank_FreeAram(void);
@@ -455,7 +455,7 @@ u8 Skalib_IsDoubleBuffered(void) {
 u32 Skalib_NextSlot(void) {
     if (Skalib_IsDoubleBuffered()) {
         lbl_80281078 = (lbl_80281078 == 0);
-    } else if (fn_80023CE8(0)) {
+    } else if (Skalib_HasOverlays(0)) {
         lbl_80281078 = 0;
     } else {
         lbl_80281078 = 1;
@@ -486,7 +486,7 @@ void Skalib_SetBudgets(void) {
     aBytes[2] = 0xE6000;
     aBytes[3] = 0xE6000;
     lbl_80281CD8 = 0;
-    if (!fn_80023CE8(0) || !fn_80023CE8(1)) {
+    if (!Skalib_HasOverlays(0) || !Skalib_HasOverlays(1)) {
         lbl_80281074 = aKeepSingle[gSession.nNumPlayers - 1];
         lbl_80281CDC = aBytes[0];
     } else {
@@ -783,6 +783,87 @@ int AnimLib_DropCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB,
         }
     }
     return 0;
+}
+
+// Copies record nRec of a library into pOut, following it to where it was moved; flags the copy
+// 2 when it was moved, 4 (keeping the original's n20 unless it moved) when the original was
+// linked (4) and bLink is set. Returns the clip, or NULL for a linked record.
+void* AnimLib_ResolveRecord(AnimLib* pLib, int nRec, ClipRecord* pOut, u8 bLink) {
+    ClipRecord* pRec    = &pLib->pRecords[nRec];
+    u8          bMoved  = 0;
+    u8          bLinked = 0;
+    s32         n20;
+    s32         bMove;
+
+    if ((pRec->n12 & 4) && bLink) bLinked = 1;
+    n20 = pRec->n20;
+    while ((bMove = pRec->n12 & 2) || (pRec->n12 & 0x10)) {
+        if (bMove) bMoved = 1;
+        pRec = (ClipRecord*)pRec->pClip;
+    }
+    fn_80005628(pOut, pRec, sizeof(ClipRecord));
+    if (bMoved) pOut->n12 |= 2;
+    if (bLinked) pOut->n12 |= 4;
+    if (bLinked && !bMoved) pOut->n20 = n20;
+    if (bLinked) return NULL;
+    return pRec->pClip;
+}
+
+// Whether a slot has overlay libraries.
+int Skalib_HasOverlays(int nSlot) {
+    return lbl_801C6068[nSlot].nOverlays > 0;
+}
+
+// Cuts a library and its overlays down until their clips fit pCtx->nTarget: rounds of lowering
+// the per-leaf limit, marking clips to keep (by n18, or at random), and dropping the rest from
+// leaves longer than lbl_80281070 (3 down to 1). First the overlays are trimmed, then the
+// library itself. TRUE when the target was reached.
+u8 AnimLib_TrimToFit(MergeCtx* pCtx, AnimLib* pLib, LibOverlay* pOvs, int nOvs, u8 bBest) {
+    int      nRet = 0;
+    int      i;
+    AnimLib* pOvLib;
+
+    pCtx->nMaxUsers = 100000;
+    lbl_80281074    = 0;
+    AnimLib_WalkPair(pLib, NULL, (AnimLibWalkFn)AnimLib_MaxCountCb, pCtx);
+    for (i = 0; i < nOvs; i++) AnimLib_WalkPair(NULL, pOvs[i].pWork, (AnimLibWalkFn)AnimLib_MaxCountCb, pCtx);
+    pCtx->nKeep = lbl_80281074;
+    for (lbl_80281070 = 3; lbl_80281070 >= 1; lbl_80281070--) {
+        while (pCtx->nKeep > lbl_80281070) {
+            pCtx->nKeep--;
+            for (i = 0; i < nOvs; i++) {
+                pOvLib = pOvs[i].pWork;
+                if (bBest) {
+                    AnimLib_WalkPair(NULL, pOvLib, (AnimLibWalkFn)AnimLib_KeepBestCb, pCtx);
+                } else {
+                    AnimLib_WalkPair(NULL, pOvLib, (AnimLibWalkFn)AnimLib_KeepRandomCb, pCtx);
+                }
+            }
+            nRet = AnimLib_WalkPair(pLib, NULL, (AnimLibWalkFn)AnimLib_DropCb, pCtx);
+            if (nRet == 0) {
+                for (i = 0; i < nOvs; i++) {
+                    nRet = AnimLib_WalkPair(NULL, pOvs[i].pWork, (AnimLibWalkFn)AnimLib_DropCb, pCtx);
+                    if (nRet != 0) break;
+                }
+            }
+            if (nRet != 0) goto done;
+        }
+    }
+    pCtx->nKeep = lbl_80281074;
+    for (lbl_80281070 = 3; lbl_80281070 >= 1; lbl_80281070--) {
+        while (pCtx->nKeep > lbl_80281070) {
+            pCtx->nKeep--;
+            if (bBest) {
+                AnimLib_WalkPair(pLib, NULL, (AnimLibWalkFn)AnimLib_KeepBestCb, pCtx);
+            } else {
+                AnimLib_WalkPair(pLib, NULL, (AnimLibWalkFn)AnimLib_KeepRandomCb, pCtx);
+            }
+            nRet = AnimLib_WalkPair(pLib, NULL, (AnimLibWalkFn)AnimLib_DropCb, pCtx);
+            if (nRet != 0) goto done;
+        }
+    }
+done:
+    return nRet == 1;
 }
 
 // The scratch area for slot n, uSize bytes: while only one of the first two slots has a bank,
