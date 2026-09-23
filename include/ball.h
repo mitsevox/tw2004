@@ -253,6 +253,7 @@ void fn_80055C40(int n);
 void fn_80055CAC(int n);
 void fn_80055CD0(int n);
 void Wind_Set(int nDir, f32 fSpeed);
+f32  Wind_Get(f32* pOut);               // the wind's speed; its vector (direction x speed) into pOut
 void Wind_Generate(void);
 
 void fn_80047B6C(Ball* pBall, int nPlayer);
