@@ -21,6 +21,8 @@ f32   fn_800351D8(u32 n, f32 fPeriod);
 void  fn_8003519C(int nRow, void* pData);   // calls row nRow's function of lbl_80188E88 with pData
 void  fn_80035240(s32 p0);
 void  fn_800352E4(void);
+void  fn_80035308(void);
+void  fn_80035338(s32 p0);
 s32   fn_800318AC(const void* pA, const void* pB);
 void  fn_8003272C(int n);
 void  fn_80031938(Ter_LODPlane* pPlanes, f32 fStep, s32 a, s32 b, s32 c, s32 d);

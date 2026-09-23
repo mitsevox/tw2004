@@ -200,6 +200,8 @@ void  fn_80062D98(void);
 void  fn_80047EF0(Ball* pBall, int nPlayer, int a);  // tee the ball up
 void  fn_800A573C(u8 nPlayer);
 void  fn_800A3CB0(f32* pPos, int nPlayer);
+void  fn_800A3D6C(f32* pPos, int nPlayer);
+void  fn_800A3DF4(int nPlayer);
 void  fn_80062DDC(f32* pA, f32* pB, f32* pOut);  // a - b
 void  fn_8006BB5C(int nPlayer);
 void  fn_800A562C(u8 nPlayer);
