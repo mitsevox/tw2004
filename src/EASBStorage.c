@@ -918,6 +918,7 @@ void fn_8012A050(EASBProduct* pInto, EASBProduct* pFrom) {
 #define EASB_PROD_SIZE 0x1104
 #define EASB_IMAG_SIZE 0x4301
 
+EASBErrorE fn_8012A4C4(EASBProcessE* peProcess);
 EASBErrorE fn_8012C98C(int eTagError);
 EASBErrorE fn_8012CAA8(SFIOFuncTable* pCallbacks, int* pDevices);
 EASBErrorE fn_8012CB98(EASBProcessE* peProcess);
@@ -1627,7 +1628,7 @@ EASBErrorE fn_8012BD0C(u32 uHeapID, SFIOFuncTable* pCallbacks) {
     lbl_802825B0->bFileOpen = 0;
     lbl_802825B0->b92 = 0;
     lbl_802825B0->nOperation = EASB_OPERATION_NONE;
-    lbl_802825B0->n1A4 = 0;
+    lbl_802825B0->eStepProcess = EASB_PROCESS_NONE;
     lbl_802825B0->pnSteps = NULL;
     lbl_802825B0->n94 = 0;
     lbl_802825B0->nSlot = EASB_PRODUCT_NONE;
@@ -1680,7 +1681,7 @@ EASBErrorE fn_8012BF18(s32 nOperation, EASBStorageArgs* pArgs) {
         }
         if (eError == EASB_ERROR_NONE) {
             lbl_802825B0->nOperation = nOperation;
-            lbl_802825B0->n1A4 = 0;
+            lbl_802825B0->eStepProcess = EASB_PROCESS_NONE;
             lbl_802825B0->pnSteps = lbl_80195520[nOperation].anSteps;
             lbl_802825B0->nResult = EASB_ERROR_NONE;
             lbl_802825B0->nLastOperation = EASB_OPERATION_NONE;
@@ -1704,7 +1705,7 @@ EASBErrorE fn_8012C03C(s32 nOperation) {
     eError = EASB_ERROR_NONE;
     if (nOperation == lbl_802825B0->nOperation) {
         lbl_802825B0->nOperation = EASB_OPERATION_NONE;
-        lbl_802825B0->n1A4 = 0;
+        lbl_802825B0->eStepProcess = EASB_PROCESS_NONE;
         lbl_802825B0->pnSteps = NULL;
         lbl_802825B0->nRecord = 0;
         if (lbl_80195520[nOperation].bStopTagFile) {
@@ -1734,6 +1735,158 @@ EASBErrorE fn_8012C03C(s32 nOperation) {
         eError = EASB_ERROR_NO_PROCESS_IN_PROGRESS;
     } else {
         eError = EASB_ERROR_PROCESS_IN_PROGRESS;
+    }
+    return eError;
+}
+
+// After a step fails. A card error (100-118) in operations 0, 4 and 5, and any error in
+// operation 6 or the clean-up itself, ends the operation there; any other failure starts the
+// clean-up operation, which later returns the error.
+void fn_8012C1AC(EASBErrorE* peError, EASBProcessE* peProcess) {
+    EASBStorageArgs args;
+    s32 nOperation;
+    u8 bCleanUp;
+
+    nOperation = lbl_802825B0->nOperation;
+    if (nOperation == EASB_OPERATION_NONE) {
+        return;
+    }
+    if (nOperation == EASB_OPERATION_ERROR || nOperation == 6) {
+        bCleanUp = 0;
+    } else if (nOperation == 0 || nOperation == 4 || nOperation == 5) {
+        if (lbl_802825B0->nLastError < 100 || lbl_802825B0->nLastError > 118) {
+            bCleanUp = 1;
+        } else {
+            bCleanUp = 0;
+        }
+    } else {
+        bCleanUp = 1;
+    }
+    if (bCleanUp == 1) {
+        lbl_802825B0->nOperation = EASB_OPERATION_NONE;
+        memset(&args, 0, sizeof(EASBStorageArgs));
+        fn_8012BF18(EASB_OPERATION_ERROR, &args);
+        *peProcess = EASB_PROCESS_CONTINUE;
+        lbl_802825B0->nLastOperation = nOperation;
+        lbl_802825B0->nResult = *peError;
+        *peError = EASB_ERROR_NONE;
+        return;
+    }
+    *peProcess = EASB_PROCESS_COMPLETE;
+    lbl_802825B0->nOperation = EASB_OPERATION_NONE;
+    lbl_802825B0->eStepProcess = EASB_PROCESS_NONE;
+    lbl_802825B0->pnSteps = NULL;
+    lbl_802825B0->nRecord = 0;
+    if (lbl_80195520[nOperation].bStartTagFile || lbl_80195520[nOperation].bStopTagFile) {
+        if ((BOOL)TagFile_IsInitialised()) {  // fake match: tested as a byte (clrlwi.)
+            fn_8012CC48();
+        }
+        lbl_802825B0->bFileOpen = 0;
+    }
+    if (nOperation == EASB_OPERATION_ERROR) {
+        if (lbl_802825B0->nLastOperation == 0 || lbl_802825B0->nLastOperation == 4) {
+            memset(&lbl_802825B0->session, 0, sizeof(TagSession));
+            lbl_802825B0->bFileOpen = 0;
+            lbl_802825B0->b90 = 0;
+            lbl_802825B0->b92 = 0;
+            lbl_802825B0->n94 = 0;
+            lbl_802825B0->nSlot = EASB_PRODUCT_NONE;
+        }
+        *peError = lbl_802825B0->nResult;
+    }
+}
+
+// Runs the current operation's step once. *peProcess says whether the operation goes on,
+// *pnOperation which operation it is.
+EASBErrorE fn_8012C388(EASBProcessE* peProcess, s32* pnOperation) {
+    EASBErrorE eError;
+
+    eError = EASB_ERROR_NONE;
+    if (lbl_802825B0->nOperation != EASB_OPERATION_NONE && lbl_802825B0->pnSteps == NULL) {
+        return EASB_ERROR_INTERNAL;
+    }
+    *pnOperation = lbl_802825B0->nOperation;
+    if (lbl_802825B0->nOperation == EASB_OPERATION_NONE) {
+        *peProcess = EASB_PROCESS_NONE;
+        return EASB_ERROR_NONE;
+    }
+    switch (*lbl_802825B0->pnSteps) {
+    case 0:
+        eError = fn_8012A2A8(&lbl_802825B0->eStepProcess);
+        break;
+    case 1:
+        eError = fn_8012A364(&lbl_802825B0->eStepProcess);
+        break;
+    case 2:
+        eError = fn_8012A434(&lbl_802825B0->eStepProcess);
+        break;
+    case 3:
+        eError = fn_8012A4C4(&lbl_802825B0->eStepProcess);
+        break;
+    case 4:
+        eError = fn_8012A95C(&lbl_802825B0->eStepProcess);
+        break;
+    case 5:
+        eError = fn_8012AA7C(&lbl_802825B0->eStepProcess);
+        break;
+    case 6:
+        eError = fn_8012AC40(&lbl_802825B0->eStepProcess);
+        break;
+    case 9:
+        eError = fn_8012B190(&lbl_802825B0->eStepProcess);
+        break;
+    case 7:
+        eError = fn_8012AE40(&lbl_802825B0->eStepProcess);
+        break;
+    case 10:
+        eError = fn_8012B0D8(&lbl_802825B0->eStepProcess);
+        break;
+    case 8:
+        eError = fn_8012B004(&lbl_802825B0->eStepProcess);
+        break;
+    case 11:
+        eError = fn_8012B27C(&lbl_802825B0->eStepProcess);
+        break;
+    case 12:
+        eError = fn_8012A900(&lbl_802825B0->eStepProcess);
+        break;
+    case 15:
+        eError = fn_8012B3B0(&lbl_802825B0->eStepProcess);
+        break;
+    case 17:
+        eError = fn_8012B4C0(&lbl_802825B0->eStepProcess);
+        break;
+    case 18:
+        eError = fn_8012B708(&lbl_802825B0->eStepProcess);
+        break;
+    case 19:
+        eError = fn_8012B8E4(&lbl_802825B0->eStepProcess);
+        break;
+    case 13:
+        eError = fn_8012BA58(&lbl_802825B0->eStepProcess);
+        break;
+    case 14:
+        eError = fn_8012BBD8(&lbl_802825B0->eStepProcess);
+        break;
+    case 16:
+        eError = fn_8012A848(&lbl_802825B0->eStepProcess);
+        break;
+    default:
+        eError = EASB_ERROR_UNKNOWN;
+        break;
+    }
+    *peProcess = lbl_802825B0->eStepProcess;
+    if (lbl_802825B0->eStepProcess == EASB_PROCESS_COMPLETE && eError == EASB_ERROR_NONE) {
+        lbl_802825B0->pnSteps++;
+        if (*lbl_802825B0->pnSteps != EASB_STEP_END) {
+            lbl_802825B0->eStepProcess = EASB_PROCESS_NONE;
+            *peProcess = EASB_PROCESS_CONTINUE;
+        } else {
+            eError = fn_8012C03C(lbl_802825B0->nOperation);
+        }
+    }
+    if (eError != EASB_ERROR_NONE) {
+        fn_8012C1AC(&eError, peProcess);
     }
     return eError;
 }

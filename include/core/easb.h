@@ -238,7 +238,7 @@ typedef struct EASBStorage {
     EASBStorageArgs args;           // 0x180: the running operation's arguments
     s32 nOperation;                 // 0x19C: EASB_OPERATION_NONE when idle
     s32* pnSteps;                   // 0x1A0: the running operation's steps (EASBStorageOp.anSteps)
-    s32 n1A4;                       // 0x1A4
+    EASBProcessE eStepProcess;      // 0x1A4: where the running step has got to (fn_8012C388)
 } EASBStorage;
 LAYOUT_ASSERT(EASBStorage, 0x1A8);
 
