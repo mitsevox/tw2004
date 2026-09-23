@@ -7,6 +7,7 @@
 
 u8 fn_8008AC40(void);
 
+Session lbl_801DB8A0;           // the session as it was before fn_80099ED8 changed it
 u8  lbl_80281F94;               // the timer ran out
 f32 lbl_80281F98;               // seconds counted
 
@@ -29,4 +30,14 @@ u8 fn_8009A180(void) {
 
 u8 fn_8009A1EC(void) {
     return lbl_80281F94;
+}
+
+// Put the session back as fn_80099ED8 found it, all but n28.
+void fn_8009A1F4(void) {
+    s32 n28;
+    if (gSession.a8[0] != 0) {
+        n28 = gSession.n28;
+        Mem_cpy(&gSession, &lbl_801DB8A0, sizeof(Session));
+        gSession.n28 = n28;
+    }
 }
