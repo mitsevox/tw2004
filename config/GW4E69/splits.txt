@@ -239,6 +239,8 @@ UObject.c:
 
 UKernel.c:
 	.text       start:0x80048AF4 end:0x800496E0
+	.data       start:0x80187D58 end:0x80187D68
+	.sdata2     start:0x80283200 end:0x80283208
 
 GoDynObjBase.c:
 	.text       start:0x800496E0 end:0x80049B40
