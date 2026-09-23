@@ -461,7 +461,7 @@ config.libs = [
         "progress_category": "sdk",
         "src_dir": "extern/ffcc",
         "objects": [
-            Object(NonMatching, "src/vi/vi.c"),
+            Object(Matching, "src/vi/vi.c"),
             Object(Matching, "src/ax/AX.c"),
             Object(Matching, "src/ax/AXAux.c"),
             Object(Matching, "src/ax/AXCL.c"),
