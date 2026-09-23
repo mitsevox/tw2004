@@ -150,6 +150,9 @@ The fixes that come up most often. Each points to its full entry below.
 
 ### Registers, declaration order and the stack
 
+- **[verified] Locals take the higher volatile registers in declaration order; compiler
+  temporaries take the lower ones.** In GetHonors' sort all 5040 orders of 7 variables gave two
+  outcomes: only the relative order of `nScore` and `nHigh` mattered.
 - **[verified] Declaration order picks the saved registers.** Register order for callee-saved
   locals follows declaration order (first declared gets r31). Two loop counters in fn_8005A0FC
   came out swapped (r27/r28) until their declarations were swapped. Try this first on any diff
@@ -498,6 +501,11 @@ The fixes that come up most often. Each points to its full entry below.
 
 ### Inlining and inline helpers
 
+- **[verified] An inline helper that takes a value by pointer changes register choice.** The
+  GetHonors sort append matched only as `static inline void AddIfScore(s32* aList, int* pnCount,
+  ...) { if (...) { aList[*pnCount] = nPlayer; (*pnCount)++; } }` (Stableford `fn_800FE3FC`,
+  Stroke `fn_800FF894`, 99.6% -> 100). GameMode12's used-up check likewise needed `s32* pPoints`
+  copied into a local inside the helper. By value, or a plain append helper, stays at 99.6%.
 - **[verified] No automatic inlining in game code.** Calling `GOLFERSTATE_Kill()` from a later
   function stays a `bl`; where the original has the body pasted in, write the body out.
 - **[verified] Automatic inlining.** With `-inline auto` the compiler pastes small functions into
@@ -566,6 +574,10 @@ The fixes that come up most often. Each points to its full entry below.
 
 ### Data, constants and symbols
 
+- **[verified] A dead-stripped function leaves its constants in the pool.** GameMode12's
+  `.sdata2` has 0.0 and 0.5 early, where no remaining function uses them first; an unreferenced
+  function using 0.0f then 0.5f at that point makes the unit link. Such a placeholder is a fake
+  match with its body unknown: say so in its comment (style.md).
 - **[verified] Float literals are pooled in `.sdata2` in the order they first appear in the
   source**; compiler-made constants (the int-to-float double) follow that function's literals.
   Folded or dead literals (`x * 1.0f`, `if (0)`, unused locals or inlines) get no slot.
