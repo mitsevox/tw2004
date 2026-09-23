@@ -273,7 +273,9 @@ typedef struct Player {
     u8   unkA7C[0xA90 - 0xA7C];
     u8   ball[0x68];            // 0xA90  the player's Ball (0xBC bytes, see Ball.c) - nLie is its +0x68
     s32  nLie;                  // 0xAF8
-    u8   unkAFC[0xB4C - 0xAFC];
+    u8   unkAFC[0xB24 - 0xAFC];
+    s32  nBallOwner;            // 0xB24  the ball's nPlayer (Ball + 0x94)
+    u8   unkB28[0xB4C - 0xB28];
     f32  vOrient[4];            // 0xB4C  a quaternion, identity at setup. TW06: ballRot
     u8   ballBefore[0xBC];      // 0xB5C  copy of the Ball as it lay before the shot
     s32  nShotHandle;           // 0xC18

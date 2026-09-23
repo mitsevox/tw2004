@@ -41,7 +41,7 @@ int fn_800E6BA4(int nTeam);
 void fn_800E6C10(void);
 s32  fn_800E6C8C(int nPlayer);
 void fn_800E6F88(int nPlayer);
-u8   fn_800E7038(int nPlayer, int a);
+u8   fn_800E7038(u32 nPlayer, int a);
 u8   fn_800E723C(u8 bCheck);
 u8   fn_800E7474(u8 bCheck);
 void fn_800E7740(void);
@@ -53,7 +53,7 @@ void fn_800E68F0(void) {
     gpGame->pfn1D0 = fn_800E6C10;
     gpGame->pfn1D4 = fn_800E6C8C;
     gpGame->pfn248 = fn_800E6F88;
-    gpGame->pfn1D8 = fn_800E7038;
+    gpGame->pfn1D8 = (u8 (*)(int, int))fn_800E7038;
     gpGame->pfn1DC = (u8 (*)(int))fn_800E723C;
     gpGame->pfn1E0 = (s32 (*)(void))fn_800E7474;
     gpGame->pfn1E8 = fn_800E7740;
@@ -255,7 +255,7 @@ void fn_800E6F88(int nPlayer) {
     int nTeam;
     Mem_cpy(gPlayers[nPartner].ball, gPlayers[nPlayer].ball, 0xBC);
     gPlayers[nPartner].bLowIQPenalty = gPlayers[nPlayer].bLowIQPenalty;
-    ((Ball*)gPlayers[nPartner].ball)->nPlayer = nPartner;
+    gPlayers[nPartner].nBallOwner = nPartner;
     gPlayers[nPartner].nStrokes[Game_CurHoleIndex()] = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
     nTeam = fn_800E6AF8(nPlayer);
     lbl_80281648[nTeam] = 1 - lbl_80281648[nTeam];
@@ -264,18 +264,18 @@ void fn_800E6F88(int nPlayer) {
 // TW06: GameModeAlternateShot::HoleFinished. Both teams holed; or one team holed and the other can
 // no longer beat it (can only tie, when the holed team is dormie); lbl_80282240 excuses the
 // holed team's own players.
-u8 fn_800E7038(int nPlayer, int a) {
+u8 fn_800E7038(u32 nPlayer, int a) {
     int nLeft;
     int h;
     if (fn_800E69CC(0) && fn_800E69CC(1)) {
         return 1;
     }
-    if (fn_800E69CC(0) && (!lbl_80282240 || (nPlayer != 0 && nPlayer != 1))) {
+    if (fn_800E69CC(0) && (!lbl_80282240 || nPlayer > 1)) {
         if (fn_800E6B08(0) < fn_800E6B08(1)) {
             return 1;
         }
     }
-    if (fn_800E69CC(1) && (!lbl_80282240 || (nPlayer != 2 && nPlayer != 3))) {
+    if (fn_800E69CC(1) && (!lbl_80282240 || nPlayer - 2 > 1)) {
         if (fn_800E6B08(1) < fn_800E6B08(0)) {
             return 1;
         }
@@ -286,14 +286,14 @@ u8 fn_800E7038(int nPlayer, int a) {
             nLeft++;
         }
     }
-    if (fn_800E69CC(0) && (!lbl_80282240 || (nPlayer != 0 && nPlayer != 1))) {
-        if (nLeft + fn_800E6BA4(0) == fn_800E6BA4(1)) {
+    if (fn_800E69CC(0) && (!lbl_80282240 || nPlayer > 1)) {
+        if (nLeft + fn_800E6BA4(1) == fn_800E6BA4(0)) {
             if (fn_800E6B08(0) <= fn_800E6B08(1)) {
                 return 1;
             }
         }
     }
-    if (fn_800E69CC(1) && (!lbl_80282240 || (nPlayer != 2 && nPlayer != 3))) {
+    if (fn_800E69CC(1) && (!lbl_80282240 || nPlayer - 2 > 1)) {
         if (nLeft + fn_800E6BA4(0) == fn_800E6BA4(1)) {
             if (fn_800E6B08(1) <= fn_800E6B08(0)) {
                 return 1;
@@ -304,21 +304,22 @@ u8 fn_800E7038(int nPlayer, int a) {
 }
 
 // Clears every player's round (all 18 holes) for a playoff.
-#define CLEAR_ROUNDS()                                  \
+#define PLAYER_AT(i) (&gPlayers[i])
+#define CLEAR_ROUNDS(P)                                  \
     for (i = 0; i < gNumPlayersSetUp; i++) {            \
         for (h = 0; h < 18; h++) {                      \
-            gPlayers[i].nStrokes[h] = 0;                \
-            gPlayers[i].nPutts[h] = 0;                  \
-            gPlayers[i].nModePoints[h] = 0;             \
-            gPlayers[i].n22C[h] = 0;                    \
-            gPlayers[i].n290[h] = 0;                    \
-            gPlayers[i].b2F6[h] = 0;                    \
-            gPlayers[i].b2E4[h] = 0;                    \
+            P(i)->nStrokes[h] = 0;                \
+            P(i)->nPutts[h] = 0;                  \
+            P(i)->nModePoints[h] = 0;             \
+            P(i)->n22C[h] = 0;                    \
+            P(i)->n290[h] = 0;                    \
+            P(i)->b2F6[h] = 0;                    \
+            P(i)->b2E4[h] = 0;                    \
         }                                               \
-        gPlayers[i].n2D8 = 0;                           \
-        gPlayers[i].n2DC = 0;                           \
-        gPlayers[i].n2E0 = 0;                           \
-        gPlayers[i].n308 = 0;                           \
+        P(i)->n2D8 = 0;                           \
+        P(i)->n2DC = 0;                           \
+        P(i)->n2E0 = 0;                           \
+        P(i)->n308 = 0;                           \
     }
 
 // TW06: GameModeAlternateShot::GameFinished. In a playoff: over once a team is ahead; otherwise
@@ -334,22 +335,22 @@ u8 fn_800E723C(u8 bCheck) {
         }
         if (!bCheck) {
             fn_800E2BA4(gpGame->nD8++);
-            CLEAR_ROUNDS();
+            CLEAR_ROUNDS(PLAYER_AT);
             fn_800E45C0();
         }
-        return 0;
-    }
-    nLeft = 0;
-    for (h = Game_CurHoleIndex() + 1; h < 18; h++) {
-        if (gpGame->bHoleSelected[h]) {
-            nLeft++;
+    } else {
+        nLeft = 0;
+        for (h = Game_CurHoleIndex() + 1; h < 18; h++) {
+            if (gpGame->bHoleSelected[h]) {
+                nLeft++;
+            }
         }
-    }
-    if (nLeft == 0) {
-        return !fn_800E7474(bCheck);
-    }
-    if (nLeft + fn_800E6BA4(0) < fn_800E6BA4(1) || nLeft + fn_800E6BA4(0) > fn_800E6BA4(1)) {
-        return 1;
+        if (nLeft == 0) {
+            return !fn_800E7474(bCheck);
+        }
+        if (nLeft + fn_800E6BA4(0) < fn_800E6BA4(1) || nLeft + fn_800E6BA4(1) < fn_800E6BA4(0)) {
+            return 1;
+        }
     }
     return 0;
 }
@@ -375,7 +376,7 @@ u8 fn_800E7474(u8 bCheck) {
             }
         }
         fn_800E2BA4();
-        CLEAR_ROUNDS();
+        CLEAR_ROUNDS(PLAYER);
         gpGame->bD4 = 1;
         fn_800E45C0(gpGame->nD8++);
         return 1;
