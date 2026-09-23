@@ -1739,6 +1739,7 @@ f32 fn_800C7394(View* pView) {
 }
 
 // Adds two vectors (three floats) into pOut.
+#ifdef __MWERKS__
 asm void fn_800C73B8(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
@@ -1751,8 +1752,17 @@ asm void fn_800C73B8(register f32* pA, register f32* pB, register f32* pOut) {
     psq_st f3, 8(pOut), 1, 0
     blr
 }
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void fn_800C73B8(f32* pA, f32* pB, f32* pOut) {
+    pOut[0] = pB[0] + pA[0];
+    pOut[1] = pB[1] + pA[1];
+    pOut[2] = pB[2] + pA[2];
+}
+#endif
 
 // Subtracts pB from pA (three floats) into pOut.
+#ifdef __MWERKS__
 asm void fn_800C73DC(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
@@ -1765,8 +1775,17 @@ asm void fn_800C73DC(register f32* pA, register f32* pB, register f32* pOut) {
     psq_st f3, 8(pOut), 1, 0
     blr
 }
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void fn_800C73DC(f32* pA, f32* pB, f32* pOut) {
+    pOut[0] = pA[0] - pB[0];
+    pOut[1] = pA[1] - pB[1];
+    pOut[2] = pA[2] - pB[2];
+}
+#endif
 
 // Negates a vector (three floats) into pOut.
+#ifdef __MWERKS__
 asm void fn_800C7400(register f32* pA, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
@@ -1777,6 +1796,14 @@ asm void fn_800C7400(register f32* pA, register f32* pOut) {
     psq_st f1, 8(pOut), 1, 0
     blr
 }
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void fn_800C7400(f32* pA, f32* pOut) {
+    pOut[0] = -pA[0];
+    pOut[1] = -pA[1];
+    pOut[2] = -pA[2];
+}
+#endif
 
 // An animation event's time in the character's blend tree (0 without a character).
 f32 fn_800C741C(Character* pChar, u64 uEvent) {

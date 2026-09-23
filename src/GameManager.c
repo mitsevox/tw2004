@@ -138,6 +138,7 @@ u8 fn_800DCB74(void) {
 }
 
 // out = a - b (three floats); the same helper as Ball.c's fn_80055EA0.
+#ifdef __MWERKS__
 asm void fn_800DCB84(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
@@ -150,6 +151,14 @@ asm void fn_800DCB84(register f32* pA, register f32* pB, register f32* pOut) {
     psq_st f3, 8(pOut), 1, 0
     blr
 }
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void fn_800DCB84(f32* pA, f32* pB, f32* pOut) {
+    pOut[0] = pA[0] - pB[0];
+    pOut[1] = pA[1] - pB[1];
+    pOut[2] = pA[2] - pB[2];
+}
+#endif
 
 void fn_800DCBA8(void) {
     lbl_8028227C = 0;

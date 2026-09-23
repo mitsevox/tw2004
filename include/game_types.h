@@ -27,6 +27,19 @@ typedef int32_t            s32;
 typedef uint64_t           u64;
 typedef int64_t            s64;
 typedef uintptr_t          uptr;
+
+// CodeWarrior's intrinsics, as plain C (port: untested). __cntlzw counts the leading zero bits.
+static inline u32 __cntlzw(u32 x) {
+    u32 n = 0;
+    if (x == 0) {
+        return 32;
+    }
+    while (!(x & 0x80000000u)) {
+        x <<= 1;
+        n++;
+    }
+    return n;
+}
 #endif
 typedef float              f32;
 typedef double             f64;

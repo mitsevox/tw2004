@@ -75,6 +75,7 @@ int   fn_800D3118(int nRound, int nHole);    // a built round's course for a hol
 int   fn_800D315C(int nRound, int nHole);    // and its hole number (1-based)
 
 // out = a - b (four floats)
+#ifdef __MWERKS__
 asm void fn_800E0AF0(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
@@ -87,6 +88,15 @@ asm void fn_800E0AF0(register f32* pA, register f32* pB, register f32* pOut) {
     psq_st f3, 8(pOut), 0, 0
     blr
 }
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void fn_800E0AF0(f32* pA, f32* pB, f32* pOut) {
+    pOut[0] = pA[0] - pB[0];
+    pOut[1] = pA[1] - pB[1];
+    pOut[2] = pA[2] - pB[2];
+    pOut[3] = pA[3] - pB[3];
+}
+#endif
 
 int   fn_80110180(void);                    // the current hole can be played (inferred)
 int   fn_800D2ABC(int nCourse, int nHole);  // a hole's par
@@ -101,6 +111,7 @@ extern CourseList lbl_80184D40;
 #define COURSE_UNLOCKED(c, k) (gpSaveData[k].aCourseUnlocked[c] || lbl_80281DF4->aCourseUnlocked[c])
 
 // out = a - b (three floats)
+#ifdef __MWERKS__
 asm void fn_800E0B14(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
@@ -113,6 +124,14 @@ asm void fn_800E0B14(register f32* pA, register f32* pB, register f32* pOut) {
     psq_st f3, 8(pOut), 1, 0
     blr
 }
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void fn_800E0B14(f32* pA, f32* pB, f32* pOut) {
+    pOut[0] = pA[0] - pB[0];
+    pOut[1] = pA[1] - pB[1];
+    pOut[2] = pA[2] - pB[2];
+}
+#endif
 
 // Sets up a game mode: every rule flag and callback to its default (the callbacks are mostly
 // empty stubs), then the mode's own setup (27 modes), then the round as holes 1..18.
