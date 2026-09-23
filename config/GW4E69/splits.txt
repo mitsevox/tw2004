@@ -3770,6 +3770,9 @@ src/MSL_C/PPCEABI/bare/H/abort_exit.c:
 
 src/MSL_C/PPCEABI/bare/H/alloc.c:
 	.text       start:0x801522A0 end:0x80152754
+	.rodata     start:0x80185060 end:0x80185078
+	.bss        start:0x8027D5C0 end:0x8027D5F8
+	.sbss       start:0x802829F0 end:0x802829F8
 
 src/MSL_C/PPCEABI/bare/H/ansi_files.c:
 	.text       start:0x80152754 end:0x8015286C

@@ -19,3 +19,5 @@ Changed for this game (so the units link into the DOL):
   written for this game: the linker strips them, but their messages share the string pool with
   that `""`, in this order. `include/errno.h` is new for them (its comment says which values
   are proven). These additions are ours, not FFCC's.
+- `src/MSL_C/PPCEABI/bare/H/alloc.c`: the malloc pool's flag is one `unsigned char initialized`
+  (FFCC has an `int` read through a byte cast, plus an unused `init` static the game lacks).
