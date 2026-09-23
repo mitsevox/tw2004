@@ -14,6 +14,7 @@
 #include "game_types.h"
 #include "engine.h"
 #include "ustream.h"
+#include "endian.h"
 
 // ---- state -------------------------------------------------------------------------------
 // Everything here is private to the file. CodeWarrior lays out a file's static data in the
@@ -170,7 +171,7 @@ static void UStream_ReadDone(int nBytes, int nError) {
             }
         }
         bDropped = 0;
-        if (*(u32*)gpReadBuffer->data == TAG('S', 'W', 'V', 'R')) {
+        if (BE32(gpReadBuffer->data) == TAG('S', 'W', 'V', 'R')) {
             if (pStream->bWaitingForSWVR) {
                 pStream->bEOF = 1;
                 bDropped = 1;
@@ -501,6 +502,8 @@ static void UStream_ParseChunks(void) {
     while (pBuffer != NULL) {
         while (pBuffer->uPos < USTREAM_BUFFER_SIZE) {
             pChunk = (UStreamChunk*)(pBuffer->data + pBuffer->uPos);
+            // port: the chunk header is big-endian and read through UStreamChunk (and copied into the
+            // object by UStream_BeginObject): a little-endian port converts its 0x40 bytes here
             uTag = pChunk->uTag;
             uLen = pChunk->uLength;
             switch (uTag) {
@@ -535,7 +538,7 @@ static void UStream_ParseChunks(void) {
                     uLen -= 0x40;
                     if (gpCurObject != NULL) {
                         // the piece's unpacked size, then the packed bytes
-                        u32 uUnpacked = *(u32*)(pChunk + 1);
+                        u32 uUnpacked = BE32(pChunk + 1);
                         UStream_Decompress((u32*)(pChunk + 1) + 1, gpCurObject->pData + gCurObjectPos,
                                            uUnpacked);
                         gCurObjectPos += uUnpacked;
@@ -746,7 +749,7 @@ int UStream_Update(void) {
                 }
             }
             fn_8000B4B8(pObject);
-            gRPNSBase = *(u32*)pObject->pData;
+            gRPNSBase = BE32(pObject->pData);
         } else if (pObject->uType == TAG('C', 'c', 't', 'r')) {
             fn_80009E70(pObject);
         } else {

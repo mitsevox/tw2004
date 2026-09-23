@@ -8,12 +8,13 @@
 #include "golfer.h"
 #include "game.h"
 #include "engine.h"
+#include "endian.h"
 
 #define AXIS3(n) ((n) == 0 ? 0 : 2)    // grid axis 0 (x) or 1 (z) as an index into a 3D vector
 #define PIN_RADIUS_SQ 0.00077160494f   // the flagstick's radius squared: (1 inch)^2 in square yards
 // port: the course file keeps each list's offset from its start in the pointer field itself, and
 // loading turns it into the pointer in place; with 64-bit pointers the file needs its own layout.
-#define TER_RELOCATE(pCourse, field) ((pCourse)->field = (void*)((u8*)(pCourse) + (u32)(pCourse)->field))
+#define TER_RELOCATE(pCourse, field) ((pCourse)->field = (void*)((u8*)(pCourse) + BE32(&(pCourse)->field)))
 
 u8    Course_RegisterLoader(int nChunk, void (*pfn)(u8*));   // 0x8000C0B4
 s32   fn_8000C140(f32* pPos, TNetwork* pNet, s32 nNodes);   // point in outline. TW06: wn_PnPoly
@@ -125,6 +126,9 @@ void fn_8004B1EC(CourseInfo* pCourse) {
     int nPinSet;
     f32 (*pVert)[3];
 
+    // port: the course data is big-endian and read in place through CourseInfo, TerCell, TerPolyRef,
+    // TerObject and the vertex list: a little-endian port converts it here, before the offsets
+    // are turned into pointers (docs/format-byteorder.md)
     TER_RELOCATE(pCourse, pVerts);
     TER_RELOCATE(pCourse, pTriFlags);
     TER_RELOCATE(pCourse, pLight);
