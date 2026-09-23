@@ -80,6 +80,7 @@ u8       fn_8006BEA4(void);                             // the GameBreaker lette
 void     fn_800A68C0(u8 nPlayer);
 u8       CameraScript_IsDefaultSwingCam(CamShot* pShot, int nPlayer, f32* pCam);
 u8       fn_8003D7A0(CamSequence* pSequence, int nPlayer);
+void     fn_80039344(int nView, f32 f);                 // a per-view float (Swing.c's declaration)
 void     fn_8001966C(Character* pChar);                 // char.c
 void     fn_8007325C(u8* pAnim);                        // set bit 2 of the animation player's flags
 u8       fn_800C43C0(View* pView, int nPlayer);
@@ -548,6 +549,111 @@ void fn_800BFC80(View* pView, int nPlayer) {
         pView->p130 = NULL;
         pView->p134 = NULL;
         fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[0])), DEG(30.0f));
+    }
+}
+
+// Camera 4's tick. While shot19C.f6C is under 1 the camera moves in from where it started (v30/v40
+// to v0/v10), faster with button 0x2E or 0x30 held, and back out without. In place, those buttons
+// grow f54 and buttons 0x31/0x32 turn the camera round between the ball and the pin (fCamTime is
+// its angle, -2..2). The camera stays above the ground and over the ball.
+void fn_800BFE00(View* pView, int nPlayer) {
+    f32 vOld[4];
+    f32 vA[4];
+    f32 vB[4];
+    f32 fAbove;
+    f32* pCam;
+    f32* pSub;
+    f32* pTo;
+    f32* pFrom;
+    f32 fT;
+    f32 f;
+    pCam = fn_8001731C(pView);
+    pSub = fn_80017314(pView);
+    Vec3Copy(pCam, vOld);
+    if (pView->shot19C.f6C < 1.0f) {
+        pView->f54 = 1.001f;
+        if ((fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x2E, 1))
+            || (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x30, 1))) {
+            pView->shot19C.f6C += lbl_80281F78->f210 * gSession.fFrameTime;
+        } else {
+            pView->shot19C.f6C -= lbl_80281F78->f210 * gSession.fFrameTime;
+            if (pView->shot19C.f6C <= 0.0f) {
+                pView->shot19C.f6C = 0.0f;
+                pView->f54 = 1.0f;
+            }
+        }
+        fn_80039344(gPlayers[nPlayer].nView[0], pView->shot19C.f6C);
+    } else {
+        if ((fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x2E, 1))
+            || (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x30, 1))) {
+            if (pView->f54 + lbl_80281F78->f214 * gSession.fFrameTime < lbl_80281F78->f20C) {
+                pView->f54 += lbl_80281F78->f214 * gSession.fFrameTime;
+            }
+        } else {
+            pView->f54 -= lbl_80281F78->f214 * gSession.fFrameTime;
+            if (pView->f54 < 1.0f) {
+                pView->f54 = 1.0f;
+            }
+        }
+        fn_80039344(gPlayers[nPlayer].nView[0], 1.0f);
+    }
+    if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x31, 1)) {
+        pView->fCamTime += lbl_80281F78->f218 * gSession.fFrameTime;
+        if (pView->fCamTime >= 2.0f) {
+            pView->fCamTime -= 4.0f;
+        }
+    } else if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x32, 1)) {
+        pView->fCamTime -= lbl_80281F78->f218 * gSession.fFrameTime;
+        if (pView->fCamTime < -2.0f) {
+            pView->fCamTime = 4.0f + pView->fCamTime;
+        }
+    }
+    if (fabsf(pView->fCamTime) > 0.5f && fabsf(pView->fCamTime) <= 1.5f) {
+        // to one side: swing both the camera and its aim about the ball
+        if (pView->fCamTime > 0.0f) {
+            fT = -lbl_80281F78->f21C;
+        } else {
+            fT = lbl_80281F78->f21C;
+        }
+        fn_800C7D14(pView->script.v0, pView->script.v10, 1, 1, pCam, fabsf(pView->fCamTime) - 0.5f, fT);
+        fn_800C7D14(pView->script.v0, pView->script.v10, 1, 1, pSub, fabsf(pView->fCamTime) - 0.5f, 0.0f);
+    } else {
+        // behind the ball (looking at the pin) or behind the pin (looking at the ball)
+        if (fabsf(pView->fCamTime) >= 1.5f) {
+            pFrom = pView->script.v0;
+            pTo = pView->script.v10;
+            fT = 2.5f + pView->fCamTime;
+            if (fT > 1.0f) {
+                fT -= 4.0f;
+            }
+        } else {
+            pFrom = pView->script.v10;
+            pTo = pView->script.v0;
+            fT = 0.5f + pView->fCamTime;
+        }
+        fn_800C7D14(pFrom, pTo, 1, 1, vA, 1.0f, -lbl_80281F78->f21C);
+        fn_800C7D14(pFrom, pTo, 1, 1, vB, 1.0f, lbl_80281F78->f21C);
+        fn_800C7E50(vA, vB, pTo, 2, pCam, fT);
+        Vec_Copy(pTo, pSub);
+    }
+    CamScript_KeepAboveGround(nPlayer, pCam, vOld, 1, NULL, &fAbove, NULL, lbl_80281F78->f220);
+    if (pCam[1] < pView->shot19C.f68 + lbl_80281F78->f220) {
+        pCam[1] = pView->shot19C.f68 + lbl_80281F78->f220;
+    }
+    f = lbl_80281F78->f224 * (lbl_80281F78->f20C - 1.0f);
+    if (lbl_80281F78->n228) {
+        pSub[1] = pCam[1];
+    } else {
+        pSub[1] += f;
+    }
+    if (pView->shot19C.f6C < 1.0f) {
+        fn_800C7D14(pView->v30, pView->v0, 1, 1, pCam, pView->shot19C.f6C, 0.0f);
+        fn_800C7D14(pView->v40, pView->v10, 1, 1, pSub, pView->shot19C.f6C, 0.0f);
+    }
+    if (pView->shot19C.f6C >= 1.0f) {
+        pView->f5C = 0.0f;
+        pView->f60 = pCam[1] - pView->shot19C.f68;
+        pView->f64 = 0.0f;
     }
 }
 

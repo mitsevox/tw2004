@@ -95,7 +95,9 @@ typedef struct View {
     f32      f50;               // 0x050
     f32      f54;               // 0x054
     f32      f58;               // 0x058
-    u8       unk5C[0x68 - 0x5C];
+    f32      f5C;               // 0x05C
+    f32      f60;               // 0x060  camera 4: the camera's height over the ball once it is in place
+    f32      f64;               // 0x064
     f32      fFade;             // 0x068  how far the view has faded (the ball-in-flight state waits for 0.5)
     u8       bFade;             // 0x06C  the fade is on
     u8       unk6D[3];
@@ -232,6 +234,15 @@ typedef struct CamTuning {
     f32  f1F4;                  // 0x1F4  ... how far the aim may move per call
     f32  fMaxPitchUp;           // 0x1F8  fn_800C4AB0: the steepest camera angle above the horizontal (degrees)
     f32  fMaxPitchDown;         // 0x1FC  and below it
+    u8   unk200[0x20C - 0x200];
+    f32  f20C;                  // 0x20C  camera 4: the most View.f54 grows to
+    f32  f210;                  // 0x210  camera 4: how fast (per second) it moves in from its start
+    f32  f214;                  // 0x214  camera 4: how fast View.f54 grows and shrinks
+    f32  f218;                  // 0x218  camera 4: how fast (per second) buttons 0x31/0x32 turn it round
+    f32  f21C;                  // 0x21C  camera 4: the angle of its swing between the ball and the pin
+    f32  f220;                  // 0x220  camera 4: its ground clearance, and its least height over the ball
+    f32  f224;                  // 0x224  camera 4: (f20C - 1) times this raises the aim each frame ...
+    s32  n228;                  // 0x228  ... unless this is set: then the aim is at the camera's height
 } CamTuning;
 
 extern CamTuning* lbl_80281F78;         // EA's file list has GoCamTuningVars
@@ -311,7 +322,15 @@ u8     fn_8003DC78(CamShot* pShot);     // the shot's bAC is 1..6 or 7
 // the shot is not read.
 u8     fn_800453C8(int nPlayer, CamShot* pShot);
 
-// ---- the camera controller (0x80062F38..) ---------------------------------------------------
+// ---- camera script helpers (gocamscripts, 0x800C7480..) -------------------------------------
+
+// Not decompiled yet. Both write a point into pOut: fn_800C7D14 from the direction between pA and
+// pB (its y cleared unless b1, normalised unless b2), a distance f and an angle; fn_800C7E50 from
+// three points and fT.
+void   fn_800C7D14(f32* pA, f32* pB, u8 b1, u8 b2, f32* pOut, f32 f, f32 fAngle);
+void   fn_800C7E50(f32* pA, f32* pB, f32* pC, int n, f32* pOut, f32 fT);
+
+// ---- the camera controller (0x80062F38..)---------------------------------------------------
 
 void   View_SetCamera(View* pView, int nCamera, int nPlayer, int nView);
 void   fn_80062F1C(View* pView);
