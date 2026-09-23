@@ -12,3 +12,5 @@ Changed for this game (so the units link into the DOL):
 - `include/dolphin/gx/__gx.h`: the GX state pointer is `__GXData` (FFCC calls it `gx`), the name
   the rest of this game's GX library uses; `gx` is kept as a macro for it.
 - `src/ax/AX.c`: the release build string is this game's AX build (Sep  5 2002 05:34:31).
+- `src/axfx/reverb_hi.c`: this game's `DoCrossTalk` scales by 0.6 (`value0_6`), not by a 1.0
+  constant; `value1_0` is gone and `value0_6` comes before `value0_3`, the game's constant order.
