@@ -1222,7 +1222,6 @@ void fn_800FBD2C(int nPlayer) {
     case 1:
         break;
     case 0:
-
         Vec_Copy(&p->fBallX, vStart);
         fn_80069330(nPlayer, vStart);
         fn_8006A6C4(nPlayer);
@@ -1325,6 +1324,28 @@ void fn_800FBD2C(int nPlayer) {
         }
         break;
     }
+}
+
+// States 12 and 24, exit: camera 25.
+void fn_800FCBDC(int nPlayer) {
+    int nView = gPlayers[nPlayer].nView0;
+    View_SetCamera(fn_80017028(nView), 25, nPlayer, nView);
+}
+
+// 1 when the player's pad has buttons 0x1000, 0x400 and 0x800 (Start, X and Y on a GameCube pad)
+// all down, each pressed this frame or held; 0 for the CPU and for any other controller.
+u8 fn_800FCC38(int nPlayer) {
+    int bDown;
+    int nCtrl = gPlayers[nPlayer].nController;  // fake match: only the first read goes through nCtrl
+    if (nCtrl >= 8) {
+        return 0;
+    }
+    bDown = (fn_800136DC(nCtrl) & 0x1000 || fn_800136DC(gPlayers[nPlayer].nController) & 0x10000000) &&
+            (fn_800136DC(gPlayers[nPlayer].nController) & 0x400 ||
+             fn_800136DC(gPlayers[nPlayer].nController) & 0x4000000) &&
+            (fn_800136DC(gPlayers[nPlayer].nController) & 0x800 ||
+             fn_800136DC(gPlayers[nPlayer].nController) & 0x8000000);
+    return bDown;
 }
 
 void fn_800FD6A0(int nPlayer) {
