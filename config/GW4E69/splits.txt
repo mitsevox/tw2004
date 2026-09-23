@@ -1129,20 +1129,8 @@ hlaudtrackseq.c:
 hlaudtrackstm.c:
 	.text       start:0x800AB3A4 end:0x800AC330
 
-unsorted/sweep_800AC470.c:
-	.text       start:0x800AC470 end:0x800AC494
-
-unsorted/sweep_800AC494.c:
-	.text       start:0x800AC494 end:0x800AC4A0
-
-unsorted/sweep_800ACA5C.c:
-	.text       start:0x800ACA5C end:0x800ACA94
-
-unsorted/sweep_800ACB28.c:
-	.text       start:0x800ACB28 end:0x800ACB98
-
-unsorted/sweep_800ACEC4.c:
-	.text       start:0x800ACEC4 end:0x800ACECC
+hlaudvoice.c:
+	.text       start:0x800AC330 end:0x800ACECC
 
 unsorted/sweep_800AD1C4.c:
 	.text       start:0x800AD1C4 end:0x800AD1C8
