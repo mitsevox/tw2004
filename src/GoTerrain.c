@@ -233,7 +233,6 @@ f32 fn_800351D8(u32 n, f32 fPeriod) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-extern s32 lbl_80280DF0;
 void fn_80013D68();
 void fn_80013D9C();
 void fn_80035240(s32 p0);

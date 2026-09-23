@@ -291,6 +291,10 @@ extern CrAPState* lbl_80281EE0;
 
 // ---- the views ------------------------------------------------------------------------------
 
+// Points at the slot holding the current render camera (lbl_80281C90): fn_8001614C reads it,
+// fn_80013D5C sets it.
+extern void** lbl_80280DF0;
+
 ViewController* fn_80016CFC(int nView);
 void*  fn_80017004(int nView);          // the view's render camera
 View*  fn_80017028(int nView);
