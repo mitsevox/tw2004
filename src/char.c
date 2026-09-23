@@ -31,6 +31,8 @@ void  Character_UpdateTestPoints(Character* pChar);
 void  Character_UpdateFeetTerrainInfo(Character* pChar, int a);
 void  Character_PlaceFeetOnGround(Character* pChar);
 void  SKEL_TransformBones(CharModel* pModel, u32* auBits);
+void  fn_800B28D4(Character* pChar, int a, int b);
+void  fn_800B2FB0(Character* pChar, int a, int b);
 void  fn_8001CCF8(UStreamObject* pObject);
 void  fn_8001CD80(UStreamObject* pObject);
 void  fn_8001CE5C(UStreamObject* pObject);
@@ -480,6 +482,20 @@ void fn_8001D238(void) {
 
 void fn_8001D268(void) {
     UStream_UnregisterHandler('CHR ');
+}
+
+// Runs fn_800B28D4 and fn_800B2FB0 on each character found by id (nPlayer 1000) whose n1658 is not
+// 2 and that has neither bit 0x01 nor 0x40 of u10 set.
+void fn_8001D290(void) {
+    int i;
+
+    for (i = 0; i < lbl_80281CA8; i++) {
+        if (lbl_801B9624[i]->nPlayer == 1000 && lbl_801B9624[i]->n1658 != 2 &&
+            !(lbl_801B9624[i]->u10 & 0x41)) {
+            fn_800B28D4(lbl_801B9624[i], 1, 0);
+            fn_800B2FB0(lbl_801B9624[i], 1, 0);
+        }
+    }
 }
 
 // The character built from the 'SKLO' object with this id (fn_8001D3EC), or NULL.
