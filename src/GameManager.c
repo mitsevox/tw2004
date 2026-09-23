@@ -174,6 +174,25 @@ u8    fn_800DFF0C(int nPlayer);
 u8    fn_80068AC8(int nPlayer);
 void  Emotion_UpdatePlayerEmotion(int nPlayer);
 
+u64   fn_800954A4(int a);                   // a time stamp
+f32   fn_8006E118(u64 tEnd, u64 tStart);    // seconds between two time stamps
+int   GameEffects_BallUpdatesThisFrame(int nPlayer);
+u8    fn_800C71A4(void* pView, int nPlayer);
+void  Physics_Simulate(u8* pBall, int nTicks);
+void  Ball_SetSimulating(int b);
+void  fn_80050D2C(int a);
+void  fn_8006B2C4(int nPlayer, int a);
+u8    fn_800BB1F8(int nPlayer);
+int   Hole_ScoreAfterTapIn(int nPlayer);
+
+void  fn_8001DB04(int nHandle, f32* pOut);  // the golfer's position
+void  Ter_GetEnclosingGroundData(CourseInfo* pCourse, f32* pPos, f32* pHighA, SurfaceType** ppSurfA, f32* pNormA,
+                                 f32* pHighB, SurfaceType** ppSurfB, f32* pNormB);
+f32   fn_8000AD9C(f32 x);                   // fabsf
+void  fn_800E0B14(f32* pA, f32* pB, f32* pOut);
+u8    fn_8004560C(void);
+int   fn_80095798(int nHandle);
+
 extern u8  lbl_80202898[];
 extern s32 lbl_80282278;
 extern u8  lbl_8028227C;
@@ -217,6 +236,20 @@ u8 fn_800DCB3C(void) {
 
 s32 fn_800DCB74(void) {
     return *(u8*)(lbl_80202898 + 0x11);
+}
+
+// out = a - b (three floats); the same helper as Ball.c's fn_80055EA0.
+asm void fn_800DCB84(register f32* pA, register f32* pB, register f32* pOut) {
+    nofralloc
+    psq_l  f0, 0(pA), 0, 0
+    psq_l  f1, 8(pA), 1, 0
+    psq_l  f2, 0(pB), 0, 0
+    psq_l  f3, 8(pB), 1, 0
+    ps_sub f2, f0, f2
+    ps_sub f3, f1, f3
+    psq_st f2, 0(pOut), 0, 0
+    psq_st f3, 8(pOut), 1, 0
+    blr
 }
 
 void fn_800DCBA8(void) {
@@ -715,6 +748,120 @@ int fn_800DDFB4(int nPlayer) {
     return (Rand_Next(1) % 100) < 85;
 }
 
+// TW06: GM_ShowPostShotAnimation. Whether the golfer plays a reaction after the shot. Never on
+// course 18's 10th within 40 yards of the tee, in one special stance on surface 45, or when the
+// golfer stands out of bounds, in water, or on a slope steeper than 0.1 with the ball 0.2 above.
+// Then by how the shot turned out (0..4): after a putt 80%, always, always, 70%, 90%, else 50%;
+// after other shots 35%, always, always, 70%, 90%, else 50%.
+int GM_ShowPostShotAnimation(int nPlayer) {
+    f32          vPos[4];
+    f32          vNormA[4];
+    f32          vNormB[4];
+    f32          vFlat[4];
+    f32          vTee[4];
+    SurfaceType* pSurfA;
+    SurfaceType* pSurfB;
+    f32          fHighA;
+    f32          fHighB;
+    int          nResult;
+    CourseInfo*  pCourse;
+    SurfaceType* pSurf;
+    f32          fHigh;
+    f32          fLen;
+    f32          fRise;
+    f32          fSlope;
+
+    nResult = fn_8006AA9C(nPlayer);
+    if (!fn_800E27A8()) {
+        return 0;
+    }
+    if (Game_GetCourse() == 0x12 && fn_80015464() == 10) {
+        fn_800E0AF0(&gPlayers[nPlayer].fBallX, &((HoleTees*)fn_8000C594())->tee[gSession.nTeeSet[nPlayer]].x, vTee);
+        vTee[1] = 0.0f;
+        if ((f32)fn_80009680(fn_80009744(vTee)) < 40.0f) {
+            return 0;
+        }
+    }
+    if (*(s32*)((u8*)gPlayers[nPlayer].nShotHandle + 0x438) == 11 && *(s32*)(gPlayers[nPlayer].ball + 0x78) == 0x2D) {
+        return 0;
+    }
+    pCourse = fn_8000C594();
+    if (pCourse) {
+        fn_8001DB04(gPlayers[nPlayer].nShotHandle, vPos);
+        Ter_GetEnclosingGroundData(pCourse, vPos, &fHighA, &pSurfA, vNormA, &fHighB, &pSurfB, vNormB);
+        if (-65536.125f == fHighA && -65536.125f == fHighB) {
+            return 0;
+        }
+        if (-65536.125f == fHighA) {
+            fHigh = fHighB;
+            pSurf = pSurfB;
+        } else if (-65536.125f == fHighB) {
+            fHigh = fHighA;
+            pSurf = pSurfA;
+        } else {
+            fHigh = fn_8000AD9C(fHighB - gPlayers[nPlayer].fBallY);
+            if (fn_8000AD9C(fHighA - gPlayers[nPlayer].fBallY) < fHigh) {
+                fHigh = fHighA;
+                pSurf = pSurfA;
+            } else {
+                fHigh = fHighB;
+                pSurf = pSurfB;
+            }
+        }
+        fn_800E0B14(vPos, &gPlayers[nPlayer].fBallX, vFlat);
+        vFlat[1] = 0.0f;
+        fLen  = fn_80009680(fn_80009744(vFlat));
+        fRise = gPlayers[nPlayer].fBallY - fHigh;
+        if (0.0f != fLen) {
+            fSlope = fRise / fLen;
+        } else {
+            fSlope = 0.0f;
+        }
+        if (!Ter_PointInOOBNetwork((u8*)vPos) || (pSurf != NULL && !(pSurf->u34 & 1)) || pSurf->nClass == 7 ||
+            pSurf->nClass == 16 || (fn_8000AD9C(fSlope) > 0.1f && fRise > 0.2f)) {
+            return 0;
+        }
+    }
+    if ((gSession.uFlags & 0x4000) && (gSession.uFlags & 0x8000)) {
+        if (gPlayers[nPlayer].nLie == LIE_HOLED || *(s32*)(gPlayers[nPlayer].ball + 0x78) == 16 ||
+            nResult == 2 || nResult == 1) {
+            return 1;
+        }
+        return 0;
+    }
+    if (gPlayers[nPlayer].bPlanReady) {
+        return nResult == 2;
+    }
+    if (fn_8004560C()) {
+        return 1;
+    }
+    if (fn_80095780(gPlayers[nPlayer].nShotHandle) == 9 || fn_80095798(gPlayers[nPlayer].nShotHandle) == 9) {
+        return 1;
+    }
+    if (gPlayers[nPlayer].uFlags & 1) {
+        return *(s32*)((u8*)gPlayers[nPlayer].nShotHandle + 0x1790) != 0;
+    }
+    if (gPlayers[nPlayer].nShotKind == SHOT_PUTT) {
+        switch (nResult) {
+        case 0:  return Rand_Next(1) % 100 < 80;
+        case 1:  return Rand_Next(1) % 100 < 100;
+        case 2:  return 1;
+        case 3:  return Rand_Next(1) % 100 < 70;
+        case 4:  return Rand_Next(1) % 100 < 90;
+        default: return Rand_Next(1) % 100 < 50;
+        }
+    } else {
+        switch (fn_8006AA9C(nPlayer)) {
+        case 0:  return Rand_Next(1) % 100 < 35;
+        case 1:  return Rand_Next(1) % 100 < 100;
+        case 2:  return 1;
+        case 3:  return Rand_Next(1) % 100 < 70;
+        case 4:  return Rand_Next(1) % 100 < 90;
+        default: return Rand_Next(1) % 100 < 50;
+        }
+    }
+}
+
 // TW06: GM_ShowPostShotCrowdFlyby (by position). Two measures of the shot (fn_800336E4 at least 5,
 // fn_800336F4 at least 0.5).
 int GM_ShowPostShotCrowdFlyby(void) {
@@ -1061,4 +1208,106 @@ int GM_ChooseRemoveBallState(int nPlayer) {
         return 1;
     }
     return 0;
+}
+
+// TW06: GM_SimulateBallMovement. Each frame of a shot: the ball's physics steps for this frame
+// (none while the view holds it), then the look-ahead copy (ballBefore) is run on ahead within a
+// time budget of 0.83 ms minus what the real ball took, until it comes to rest. When it has, the
+// golfer's reaction can start early: for a shot of kind 8 or 9 that will stop 2 to 5.5 yards out
+// (close to the nearest it got), a holed ball at par or better starts it half the time, and a
+// miss that came within 0.2 of the hole always does (animation 9). A scripted reaction (uFlags
+// bit 0) plays when the ball passes the saved distance instead.
+void GM_SimulateBallMovement(int nPlayer) {
+    int     nSteps = 0;
+    u64     t0;
+    int     nUpdates;
+    int     i;
+    f32     fBudget;
+    f32     fMs;
+    Player* p;
+    u8*     pBall;
+    s32*    pState;
+    u64     t1;
+    u8      bReact;
+    u8      bOn;
+    f32     fDist;
+    u32*    pFlags;
+    u8*     pDone;
+    s32*    pLie;
+
+    t0 = fn_800954A4(0);
+    nUpdates = GameEffects_BallUpdatesThisFrame(nPlayer);
+    if (gpGame->n294 != 0 && fn_800C71A4(fn_80017028(gPlayers[nPlayer].nView0), nPlayer)) {
+        nUpdates = 0;
+    }
+    p = &gPlayers[nPlayer];
+    pBall = p->ball;
+    for (i = 0; i < nUpdates; i++) {
+        Physics_Simulate(pBall, 20);
+    }
+    fMs = 1000.0f * fn_8006E118(fn_800954A4(0), t0);
+    fBudget = 0.83f - fMs;
+    if (fn_8008AC40()) {
+        fBudget = 0.83f;
+    }
+    if (gSession.nSplitScreen == 0 && gSession.fFrameTime > 0.0f) {
+        Ball_SetSimulating(1);
+        fn_80050D2C(1);
+        pBall = p->ballBefore;
+        pState = (s32*)(p->ballBefore + 0x64);
+        while (*pState != 1 && *pState != 5 && *pState != 0 && fBudget > 0.1f) {
+            t1 = fn_800954A4(0);
+            Physics_Simulate(pBall, 20);
+            fMs = 1000.0f * fn_8006E118(fn_800954A4(0), t1);
+            nSteps++;
+            fBudget -= fMs;
+            if (fn_8008AC40()) {
+                if (nSteps < 2) {
+                    fBudget = 0.83f;
+                } else {
+                    fBudget = 0.0f;
+                }
+            }
+            if (*pState == 1 || *pState == 5 || *pState == 0) {
+                if (!(gPlayers[nPlayer].uFlags & 8)) {
+                    EVENT_Trigger(nPlayer, 0x3C, 0, -1);
+                    fn_8006B2C4(nPlayer, 1);
+                }
+                break;
+            }
+        }
+        fn_80050D2C(0);
+        Ball_SetSimulating(0);
+        if (fn_800BB1F8(nPlayer)) {
+            bReact = (u32)(fn_8006AA9C(nPlayer) - 8) <= 1;
+            bOn    = fn_800E27A8();
+            fDist  = fn_800D0478(nPlayer);
+            if (bOn) {
+                pFlags = &gPlayers[nPlayer].uFlags;
+                if (*pFlags & 1) {
+                    if ((*pFlags & 4) && fDist < gPlayers[nPlayer].fEEC) {
+                        fn_80095744(gPlayers[nPlayer].nShotHandle, 9);
+                    }
+                } else if (bReact) {
+                    pDone = &gPlayers[nPlayer].bRehearsalDone;
+                    if (!*pDone && fDist < 5.5f && fDist > 2.0f &&
+                        fDist - *(f32*)(gPlayers[nPlayer].ball + 0x60) < 0.3f) {
+                        pLie = (s32*)(gPlayers[nPlayer].ballBefore + 0x68);
+                        if (*pLie == LIE_HOLED && Hole_ScoreAfterTapIn(nPlayer) <= 0) {
+                            if (Rand_Next(1) % 100 < 50) {
+                                *pFlags |= 4;
+                                gPlayers[nPlayer].fEEC = fDist;
+                                fn_80095744(gPlayers[nPlayer].nShotHandle, 9);
+                            }
+                        } else if (*pLie != LIE_HOLED && *(f32*)(gPlayers[nPlayer].ballBefore + 0x60) < 0.2f) {
+                            *pFlags |= 4;
+                            gPlayers[nPlayer].fEEC = fDist;
+                            fn_80095744(gPlayers[nPlayer].nShotHandle, 9);
+                        }
+                        *pDone = 1;
+                    }
+                }
+            }
+        }
+    }
 }

@@ -284,8 +284,8 @@ typedef struct Player {
     u8   bEE0;                  // 0xEE0
     u8   unkEE1[3];
     s32  nEE4;                  // 0xEE4  2 or 3 picks a message after a shot (GM_PlayerTookShot)
-    u32  uFlags;                // 0xEE8
-    u8   unkEEC[0xEF0 - 0xEEC];
+    u32  uFlags;                // 0xEE8  bit 0: scripted reaction, bit 2: the early reaction has played, bit 3: score display
+    f32  fEEC;                  // 0xEEC  distance to the pin when the early reaction started (GM_SimulateBallMovement)
     u32  uFlagsEF0;             // 0xEF0  bit 1: target is over water
     u8   unkEF4[0xEF8 - 0xEF4];
 } Player;
