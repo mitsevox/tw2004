@@ -81,7 +81,8 @@ void     fn_800A68C0(u8 nPlayer);
 u8       CameraScript_IsDefaultSwingCam(CamShot* pShot, int nPlayer, f32* pCam);
 u8       fn_8003D7A0(CamSequence* pSequence, int nPlayer);
 void     fn_80039344(int nView, f32 f);                 // a per-view float (Swing.c's declaration)
-u8       fn_8012022C(void);                             // (sweep code) lbl_80281900's +0x370 is nonzero
+void     fn_800130F8(int nPad, int n);                  // the pad's rumble (Swing.c's declaration)
+u8       fn_8012022C(void);                            // (sweep code) lbl_80281900's +0x370 is nonzero
 void     fn_8001966C(Character* pChar);                 // char.c
 void     fn_8007325C(u8* pAnim);                        // set bit 2 of the animation player's flags
 u8       fn_800C43C0(View* pView, int nPlayer);
@@ -90,6 +91,13 @@ void     fn_800C4FF0(View* pView, f32* pFrom, f32* pTo, int nPlayer);
 void     fn_800C56B4(View* pView, f32* pFrom, f32* pTo, int nPlayer);
 u8       Ter_CheckForGroundCollision(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
                                      SurfaceType** ppSurface, TerObject** ppObj);
+
+// The first-person camera's state, per player (fn_800BF658).
+f32 lbl_80191334[5] = {0};                          // the step's bob, 0..16
+f32 lbl_80191348[5] = {8.0f, 8.0f, 8.0f, 8.0f};     // the sideways sway, 0..16
+f32 lbl_8019135C[5] = {1.0f, 1.0f, 1.0f, 1.0f};     // the eye height: 1 standing, 0 in water
+s32 lbl_80191370[5] = {0};                          // which side the sway is on
+s32 lbl_80191384[5] = {0};                          // frames since the last step's rumble (-1: waiting)
 
 // Allocate the shared camera state: every flag off, each course's elevator height 10.
 void fn_800BD894(void) {
@@ -513,6 +521,146 @@ void fn_800BF5E4(View* pView, int nPlayer) {
     pView->n194 = 0;
     pView->p130 = NULL;
     pView->p74 = NULL;
+}
+
+// The first-person camera's tick (camera 9's process, after camera 8's): the eye at the golfer's
+// position facing along fA88, 1.4 over the ground (0.1 in water), bobbing and swaying with the
+// golfer's steps, with a rumble on each step for a human player. It looks ahead, at a height set by
+// the pad's stick (fA8C).
+void fn_800BF658(View* pView, int nPlayer) {
+    f32 vOld[4];
+    f32 fAbove;
+    f32* pCam;
+    f32* pSub;
+    SurfaceType* pSurface;
+    u32 nClass;
+    f32 fUp;
+    f32 fBack;
+    f32 fSin;
+    f32 fCos;
+    f32 fX;
+    f32 fZ;
+    f32 fStep;
+    f32 fSway;
+    f32 fY;
+    f32 fDist = 10.0f;
+    pCam = fn_8001731C(pView);
+    pSub = fn_80017314(pView);
+    if (fn_8000C594() != NULL) {
+        Vec3Copy(pCam, vOld);
+        Game_CurrentPinSet();
+        if (gSession.nPaused == 0) {
+            fn_8003F2E0(&pView->script, gSession.fFrameTime);
+            pView->f114 += gSession.fFrameTime;
+        }
+        if (gSession.fFrameTime != 0.0f) {
+            fUp = fDist * fn_800095F0(DEG(20.0f));     // camera 8's height over the golfer; not used here
+            fBack = fDist * fn_80009638(DEG(20.0f));
+            fSin = fn_800095F0(gPlayers[nPlayer].fA88);
+            fCos = fn_80009638(gPlayers[nPlayer].fA88);
+            fX = fBack * -fSin;
+            fZ = fBack * fCos;
+            pCam[0] = gPlayers[nPlayer].vPlacement[0];
+            pCam[2] = gPlayers[nPlayer].vPlacement[2];
+            pCam[1] = (1.4f + gPlayers[nPlayer].vPlacement[1]) * lbl_8019135C[nPlayer]
+                      + (0.1f + gPlayers[nPlayer].vPlacement[1]) * (1.0f - lbl_8019135C[nPlayer]);
+            CamScript_KeepAboveGround(nPlayer, pCam, vOld, 1, NULL, &fAbove, NULL, lbl_80281F78->f168);
+            pSurface = Ter_GetSupportingWorldMaterial(gPlayers[nPlayer].ball.pCourse, pCam);
+            if (pSurface != NULL) {
+                nClass = pSurface->nClass;
+            } else {
+                nClass = 0;
+            }
+            // down to the water line in water (classes 7 and 16), back up out of it
+            if (nClass == 7 || nClass == 16) {
+                lbl_8019135C[nPlayer] -= 0.1f;
+            } else {
+                lbl_8019135C[nPlayer] += 0.1f;
+            }
+            if (lbl_8019135C[nPlayer] > 1.0f) {
+                lbl_8019135C[nPlayer] = 1.0f;
+            } else if (lbl_8019135C[nPlayer] < 0.0f) {
+                lbl_8019135C[nPlayer] = 0.0f;
+            }
+            if (lbl_80191384[nPlayer] >= 0) {
+                lbl_80191384[nPlayer]++;
+            }
+            if ((lbl_80191384[nPlayer] >= 2 || lbl_80191384[nPlayer] < 0) && !Player_IsCPU(nPlayer)) {
+                fn_800130F8(gPlayers[nPlayer].nController, 0);
+            }
+            if (nClass != 7) {
+                // the step: the length of three times vCBC's x and z, per 60th of a second
+                fStep = (f32)fn_80009680((f32)(fn_8015F824(3.0f * gPlayers[nPlayer].vCBC[2], 2.0)
+                                                + fn_8015F824(3.0f * gPlayers[nPlayer].vCBC[0], 2.0)))
+                        / (FRAME_RATE / 60.0f);
+                lbl_80191334[nPlayer] += fStep;
+                lbl_80191348[nPlayer] += fStep;
+                if (lbl_80191334[nPlayer] > 16.0f) {
+                    lbl_80191334[nPlayer] -= 16.0f;
+                }
+                if (lbl_80191334[nPlayer] < 8.0f) {
+                    pCam[1] += lbl_80191334[nPlayer] / 16.0f;
+                    if (lbl_80191334[nPlayer] < 3.0f && !Player_IsCPU(nPlayer)) {
+                        lbl_80191384[nPlayer] = -1;
+                    }
+                } else {
+                    pCam[1] += 0.5f - (lbl_80191334[nPlayer] - 8.0f) / 16.0f;
+                    if (lbl_80191334[nPlayer] > 14.0f && fStep > 0.1f && lbl_80191384[nPlayer] == -1
+                        && !Player_IsCPU(nPlayer)) {
+                        fn_800130F8(gPlayers[nPlayer].nController, 1);
+                        lbl_80191384[nPlayer] = 0;
+                    }
+                }
+                if (lbl_80191348[nPlayer] > 16.0f) {
+                    lbl_80191348[nPlayer] -= 16.0f;
+                    lbl_80191370[nPlayer] ^= 1;
+                }
+                if (lbl_80191370[nPlayer] == 0) {
+                    if (lbl_80191348[nPlayer] < 8.0f) {
+                        fSway = 0.7f * (lbl_80191348[nPlayer] / 16.0f);
+                    } else {
+                        fSway = 0.7f * (0.5f - (lbl_80191348[nPlayer] - 8.0f) / 16.0f);
+                    }
+                } else {
+                    if (lbl_80191348[nPlayer] < 8.0f) {
+                        fSway = 0.7f * -(lbl_80191348[nPlayer] / 16.0f);
+                    } else {
+                        fSway = 0.7f * -(0.5f - (lbl_80191348[nPlayer] - 8.0f) / 16.0f);
+                    }
+                }
+                pCam[0] += fSway * fCos;
+                pCam[2] += fSway * fSin;
+            }
+            if (pView->n194 != 0) {
+                CamScript_KeepAboveGround(nPlayer, pCam, vOld, 1, NULL, &fAbove, NULL, lbl_80281F78->f168);
+            }
+            pSub[0] = gPlayers[nPlayer].vPlacement[0];
+            pSub[2] = gPlayers[nPlayer].vPlacement[2];
+            fY = gPlayers[nPlayer].vPlacement[1];
+            if (fY < pCam[1] - 5.0f) {
+                fY = pCam[1] - 5.0f;
+            }
+            if (fY < -60000.0f) {
+                fY = 0.0f;
+            }
+            if (pView->n194 != 0) {
+                if (fY - pSub[1] < -5.0f) {
+                    pSub[1] = 5.0f + fY;
+                }
+                pSub[1] = fY - lbl_80281F78->f98 * (fY - pSub[1]);
+            } else {
+                pSub[1] = fY;
+            }
+            // the height just worked out is replaced: the stick tilts the view up and down
+            pSub[1] = (4.0f * gPlayers[nPlayer].fA8C + pCam[1]) * lbl_8019135C[nPlayer]
+                      + (2.0f + pCam[1] + gPlayers[nPlayer].fA8C) * (1.0f - lbl_8019135C[nPlayer]);
+            pSub[0] = pCam[0] - fX / 3.0f;
+            pSub[2] = pCam[2] - fZ / 3.0f;
+            if (pView->n194 == 0) {
+                pView->n194 = 1;
+            }
+        }
+    }
 }
 
 // Camera 4 (holding button 0x30 starts it 2 s in): the ball and the pin into the script, a
