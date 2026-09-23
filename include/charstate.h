@@ -287,6 +287,7 @@ void  fn_800CECE0(Skin* pSkin, int nSet, int nVariant, int nOption, u8* p);
 u8    fn_800CEE90(void);
 
 // Bit n of a bit array of 32-bit words: test, set, clear.
+void  fn_8001E938(u32* aBits, u32 nBits);  // clears a bit array
 u8    fn_8001E9CC(u32* aBits, u32 n);
 void  fn_8001EA34(u32* aBits, u32 n);
 void  fn_8001EB6C(u32* aBits, u32 n);

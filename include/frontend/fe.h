@@ -336,6 +336,7 @@ int  fn_80105644(s16 nPart, int b, int i, int n);
 void fn_8010568C(s16 nPart, int b, int i, int n, u8* pColor);  // pColor: 4 bytes
 void fn_80105B4C(s16 nPart, int b, int i, char* pName);
 u8   fn_80106374(s16 nPart, int b, int i);
+u8   fn_8010651C(s16 nPart, int b, int i, char* pDst);
 
 void FE_MakeMoviePath(char* pName, char* pPath);        // "data/movies/<name>.NGC"
 void FE_MakeCameoMoviePath(char* pName, char* pPath);   // "data/movies/cameos/<name>.NGC"
@@ -345,6 +346,7 @@ u8   fn_80078008(s32 nAsset, SaveProfile* pProfile);  // the asset is locked (FE
 int  fn_80078604(int a, int b, int c);  // a date (month, day, year from fn_8011E020) packed
 int  fn_80077B08(void);                 // its player slot
 int  fn_80077BDC(int n);                // -1, -2, -3 to 0, 1, 2; anything else to 0
+void fn_80078680(SaveProfile* pProfile);    // note which assets are locked (aAssetLocked)
 u8   fn_80077B18(int nGolfer);          // a yes/no list over golfers 0..28 (Golfer.c asks it)
 void fn_80077B78(void);                 // pick the day's random assets (fn_80077C1C)
 FEMovie* fn_800770FC(void);             // the next free place in the movie queue

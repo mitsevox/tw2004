@@ -349,6 +349,39 @@ void fn_801089DC(MsgArg* pArgs, MsgArg* pResult) {
     fn_8010F90C(pArgs[0].i, pArgs[1].i, pArgs[2].i);
 }
 
+// ---- end of sweep code ----
+
+// Check the assets' locks again; count the assets that were locked and are now unlocked and
+// offered, and set their aB344 bits.
+void fn_80108A0C(MsgArg* pArgs, MsgArg* pResult) {
+    u32 aWasLocked[94];                 // the size is unknown (the frame allows up to 97 words)
+    int nUnlocked = 0;
+    SaveProfile* pProfile = fn_80077ACC();
+    s32 nAssets = fn_80105C00();
+    int i;
+
+    fn_8001E938(aWasLocked, 3000);
+    for (i = 0; i < nAssets; i++) {
+        if (fn_8001E9CC(pProfile->aAssetLocked, i)) {
+            fn_8001EA34(aWasLocked, i);
+        } else {
+            fn_8001EB6C(aWasLocked, i);
+        }
+    }
+    fn_80078680(pProfile);
+    for (i = 0; i < nAssets; i++) {
+        if (!fn_8001E9CC(pProfile->aAssetLocked, i) && fn_8001E9CC(aWasLocked, i)) {
+            if (fn_801061C8(fn_80103BC0(i))) {
+                nUnlocked++;
+                fn_8001EA34(pProfile->aB344, i);
+            }
+        }
+    }
+    pResult->i = nUnlocked;
+}
+
+// ---- sweep code (not yet cleaned up) ----
+
 void fn_80108B10(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = fn_80077ACC();
     int nAsset = fn_80104FA8(pArgs[0].i, pArgs[1].i, pArgs[2].i);
@@ -392,6 +425,39 @@ void fn_80108CA8(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
+// Four buttons of controller pArgs[0] (bits 19, 18, 16 and 17 of what it holds), when one is
+// plugged in.
+void fn_80108D1C(MsgArg* pArgs, MsgArg* pResult) {
+    int nChan = pArgs[0].i;
+    s32* pA = pArgs[1].p;
+    s32* pB = pArgs[2].p;
+    s32* pC = pArgs[3].p;
+    s32* pD = pArgs[4].p;
+
+    if (fn_80013070(nChan)) {
+        if (fn_800136DC(nChan) & 0x80000) {
+            *pA = 1;
+        } else {
+            *pA = 0;
+        }
+        if (fn_800136DC(nChan) & 0x40000) {
+            *pB = 1;
+        } else {
+            *pB = 0;
+        }
+        if (fn_800136DC(nChan) & 0x10000) {
+            *pC = 1;
+        } else {
+            *pC = 0;
+        }
+        if (fn_800136DC(nChan) & 0x20000) {
+            *pD = 1;
+        } else {
+            *pD = 0;
+        }
+    }
+}
+
 // Set or clear bit pArgs[0] of the profile's a10548.
 void fn_80108DF4(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = fn_80077ACC();
@@ -428,6 +494,16 @@ void fn_801090B4(MsgArg* pArgs, MsgArg* pResult) {
     *(s32*)pArgs[0].p = nMonth;
     *(s32*)pArgs[1].p = nDay;
     *(s32*)pArgs[2].p = nYear;
+}
+
+// A random whole number 1..99, as a float.
+void fn_80109120(MsgArg* pArgs, MsgArg* pResult) {
+    u32 n = 0;
+
+    while (n == 0) {
+        n = (u32)(100.0f * fn_8000B318(0)) % 100;
+    }
+    pResult->f = n;
 }
 
 // The logo's name.
@@ -472,6 +548,23 @@ void fn_80109388(MsgArg* pArgs, MsgArg* pResult) {
     fn_8010645C(pArgs[0].i, ((MsgString*)pArgs[1].p)->pStr);
 }
 
+// ---- end of sweep code ----
+
+// A part's choice i: its unlock text (fn_8010651C), when there is such a choice.
+void fn_801093B4(MsgArg* pArgs, MsgArg* pResult) {
+    s16 nPart = pArgs[0].i;
+    int b = pArgs[1].i;
+    int nChoices = fn_801048EC(nPart, b);
+    int i = pArgs[2].i;
+
+    if (i < 0 || i >= nChoices) {
+        return;
+    }
+    fn_8010651C(nPart, b, i, ((MsgString*)pArgs[3].p)->pStr);
+}
+
+// ---- sweep code (not yet cleaned up) ----
+
 void fn_80109430(MsgArg* pArgs, MsgArg* pResult) {
 }
 
@@ -496,6 +589,30 @@ void fn_801094FC(MsgArg* pArgs, MsgArg* pResult) {
 
 void fn_80109500(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = lbl_80281ED4->bCopy;
+}
+
+// Start (pArgs[0] set) or stop editing the profile's logo fn_8010F7D8: a logo not made yet
+// starts blank (colour 0x1C), named "MyLogo <n>".
+void fn_80109514(MsgArg* pArgs, MsgArg* pResult) {
+    char szName[32];                    // the size is unknown (the frame allows up to 0x20)
+    SaveProfile* pProfile = fn_80077ACC();
+    s32 bStart = pArgs[0].i;
+    s32 nLogo = fn_8010F7D8();
+
+    if (bStart == 0) {
+        lbl_80281ED4->b10640 = 0;
+        return;
+    }
+    if (pProfile->aLogos[nLogo].b1020) {
+        Mem_cpy(&lbl_80281ED4->logo106E0, &pProfile->aLogos[nLogo], sizeof(LogoRecord));
+    } else {
+        sprintf(szName, "MyLogo %d", nLogo + 1);
+        strcpy(lbl_80281ED4->logo106E0.szName, szName);
+        lbl_80281ED4->logo106E0.b1020 = 0;
+        lbl_80281ED4->logo106E0.nShape = 0;
+        memset(lbl_80281ED4->logo106E0.aPixels, 0x1C, sizeof(lbl_80281ED4->logo106E0.aPixels));
+    }
+    lbl_80281ED4->b10640 = 1;
 }
 
 // A palette colour's components.
@@ -537,6 +654,32 @@ void fn_80109738(MsgArg* pArgs, MsgArg* pResult) {
 
 void fn_80109760(MsgArg* pArgs, MsgArg* pResult) {
     fn_8008E824();
+}
+
+// fn_8008E860 for part 12's entry n: 1 for entries 0..4, 2 for entry 6, else 0.
+void fn_80109780(MsgArg* pArgs, MsgArg* pResult) {
+    s32 nPart = pArgs[0].i;
+    s32 n = pArgs[1].i;
+
+    if (nPart == 12) {
+        switch (n) {
+        case 0:
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+            fn_8008E860(1);
+            break;
+        case 6:
+            fn_8008E860(2);
+            break;
+        default:
+            fn_8008E860(0);
+            break;
+        }
+    } else {
+        fn_8008E860(0);
+    }
 }
 
 void fn_801097FC(MsgArg* pArgs, MsgArg* pResult) {
