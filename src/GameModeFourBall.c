@@ -433,7 +433,7 @@ void fn_800E9CF4(void) {
                 if (gpSaveData[p->nIndex].bActive && nMoney) {
                     fn_800E4364(0, 0x6B, nPrize, p->nIndex);
                     fn_800D3548(i, nMoney, 0);
-                    p->n328 += nMoney;
+                    p->money.n14 += nMoney;
                 }
             }
         }

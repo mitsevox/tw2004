@@ -263,7 +263,7 @@ void fn_800F9E00(void) {
                     fn_800E4364(0, 0x6B, nPrize, nProfile);
                 }
                 fn_800D3548(nWinner, nMoney, NULL);
-                gPlayers[nWinner].n330 += nMoney;
+                gPlayers[nWinner].money.n1C += nMoney;
             }
         }
     }
@@ -1631,7 +1631,7 @@ s32 fn_800FDC5C(s32* pMoney) {
         }
         if (nWinner != -1) {
             fn_800D3548(nWinner, n, NULL);
-            gPlayers[nWinner].n330 += n;
+            gPlayers[nWinner].money.n1C += n;
         }
     } else {
         n = gPlayers[0].nC44 - 3000;
@@ -1649,7 +1649,7 @@ s32 fn_800FDC5C(s32* pMoney) {
                 n = 4500;
             }
             fn_800D3548(nWinner, n, NULL);
-            gPlayers[nWinner].n330 += n;
+            gPlayers[nWinner].money.n1C += n;
         }
     }
     *pMoney = n;

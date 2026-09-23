@@ -606,12 +606,12 @@ void fn_800EC1E0(void) {
                 if (fn_800ED6F0() && fn_800D9998(0, 0x1C) && fn_800D750C(0, 0x1C)) {
                     fn_800E4364(6, 0x1C, lbl_80200538.nA24, nProfile);
                     fn_800D3548(0, lbl_80200538.nA24, 0);
-                    gPlayers[0].n31C += lbl_80200538.nA24;
+                    gPlayers[0].money.n8 += lbl_80200538.nA24;
                 }
                 if (fn_800EC4F0(nProfile) && fn_800D750C(0, 0xC)) {
                     fn_800E4364(2, 0xC, lbl_80200538.n9E4, nProfile);
                     fn_800D3548(0, lbl_80200538.n9E4, 0);
-                    gPlayers[0].n31C += lbl_80200538.n9E4;
+                    gPlayers[0].money.n8 += lbl_80200538.n9E4;
                 }
             }
         }

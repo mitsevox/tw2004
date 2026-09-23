@@ -45,21 +45,6 @@ void fn_80062D6C(int a, int nPlayer);
 
 // ---- the game manager ------------------------------------------------------------------------
 
-// How a payout was made up (TW06: CourseMoneyTracking_t). Earnings.c fills it in; fn_800D3548 adds
-// it to the player's totals, which keep the same layout at Player + 0x314.
-typedef struct CourseMoneyTracking {
-    s32  n0;                    // 0x00  the payout
-    u8   unk4[0x20 - 0x4];
-    s32  nBase;                 // 0x20  the points, rounded to $25
-    s32  n24;                   // 0x24  the payout
-    s32  nCourse;               // 0x28  what the course multiplier added
-    s32  n2C;                   // 0x2C  what the multiplier for the hole's pin set added
-    s32  nTee;                  // 0x30  what the tee multiplier added
-    s32  nTourCard;             // 0x34  what the TOUR card level added
-    s32  n38;                   // 0x38
-    s32  n3C;                   // 0x3C
-} CourseMoneyTracking;
-
 f32  fn_800D0478(int nPlayer);          // the ball's distance from the pin (yards)
 f32  fn_800D0550(int nPlayer);          // the shot's length
 int  Hole_ScoreAfterTapIn(int nPlayer); // HoleScore.c

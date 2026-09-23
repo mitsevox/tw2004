@@ -351,7 +351,7 @@ void fn_800F9100(void) {
                         fn_800E4364(0, 0x6C, PLAYER(i)->n274, nProfile);
                     }
                     fn_800D3548(i, PLAYER(i)->n274, 0);
-                    PLAYER(i)->n32C += PLAYER(i)->n274;
+                    PLAYER(i)->money.n18 += PLAYER(i)->n274;
                 }
             }
         }

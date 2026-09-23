@@ -212,6 +212,27 @@ typedef struct SwingData {
     u8   unk631[3];
 } SwingData;
 
+// Money by kind (0x40 bytes; TW06: CourseMoneyTracking_t): how a payout was made up (Earnings.c
+// fills it in), and a player's totals (Player.money), which fn_800D3548 adds it to field by field.
+typedef struct CourseMoneyTracking {
+    s32  n0;                    // 0x00  the payout
+    u8   unk4[4];
+    s32  n8;                    // 0x08  bonuses won (GameMode5 EndGame)
+    s32  nC;                    // 0x0C  a ladder event's prize (GameMode4 EndGame)
+    s32  n10;                   // 0x10  n24 minus the last match prize (GameModeMatch EndGame)
+    s32  n14;                   // 0x14  a total the match modes add their prize (or money) to
+    s32  n18;                   // 0x18  skins money won (GameMode2 EndGame)
+    s32  n1C;                   // 0x1C  match money won (GameMode8 EndGame)
+    s32  nBase;                 // 0x20  the points, rounded to $25
+    s32  n24;                   // 0x24  the payout
+    s32  nCourse;               // 0x28  what the course multiplier added
+    s32  n2C;                   // 0x2C  what the multiplier for the hole's pin set added
+    s32  nTee;                  // 0x30  what the tee multiplier added
+    s32  nTourCard;             // 0x34  what the TOUR card level added
+    s32  n38;                   // 0x38
+    s32  n3C;                   // 0x3C
+} CourseMoneyTracking;
+
 // A player in the current round (human or CPU). 0xEF8 bytes; only the fields read so far.
 // TW06: GamePlayer (0xFE0). EA later grouped these fields into sub-structs in a different
 // order, so only blocks are matched: the score block is the first 0x200 bytes of TW06's
@@ -247,16 +268,8 @@ typedef struct Player {
     u8   b310;                  // 0x310  cleared by fn_800D8D38
     u8   b311;                  // 0x311  set at the end of a hole with b30E
     u8   b312;                  // 0x312  set when the ball finished on the green or in the hole
-    u8   unk313[0x31C - 0x313];
-    s32  n31C;                  // 0x31C  bonuses won (GameMode5 EndGame)
-    s32  n320;                  // 0x320  a ladder event's prize is added (GameMode4 EndGame)
-    s32  n324;                  // 0x324  n338 minus the last match prize (GameModeMatch EndGame)
-    s32  n328;                  // 0x328  a total the match modes add their prize (or money) to
-    s32  n32C;                  // 0x32C  skins money won (GameMode2 EndGame)
-    s32  n330;                  // 0x330  match money won (GameMode8 EndGame)
-    u8   unk334[4];
-    s32  n338;                  // 0x338
-    u8   unk33C[0x354 - 0x33C];
+    u8   unk313;
+    CourseMoneyTracking money;  // 0x314  the round's money by kind (fn_800D3548)
     // Shot block, TW06 AIshot_t (which has 6 preferred clubs where we have 8).
     s32  nClub;                 // 0x354  TW06: club
     s32  nClubPerKind[8];       // 0x358  the club Shot_Prepare would pick for each shot kind. TW06: preferredClub

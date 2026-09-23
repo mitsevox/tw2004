@@ -316,8 +316,8 @@ void fn_800EAB44(void) {
                 if (nMoney) {
                     fn_800E4364(0, 0x6B, nPrize, nProfile);
                     fn_800D3548(nWinner, nMoney, 0);
-                    gPlayers[nWinner].n328 += nPrize;
-                    gPlayers[nWinner].n324 = gPlayers[nWinner].n338 - nPrize;
+                    gPlayers[nWinner].money.n14 += nPrize;
+                    gPlayers[nWinner].money.n10 = gPlayers[nWinner].money.n24 - nPrize;
                 }
             }
         }

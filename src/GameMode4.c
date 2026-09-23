@@ -258,8 +258,8 @@ void fn_801025FC(void) {
             fn_800E4364(0, 0x6E, nPrize, nProfile);
             fn_800D3548(0, nMoney, NULL);
             nEvent = fn_801021FC();
-            gPlayers[0].n320 += lbl_80200538.aLadderPrize[nEvent].nBase;
-            gPlayers[0].n324 += lbl_80200538.aLadderPrize[nEvent].nPerHole * nMargin;
+            gPlayers[0].money.nC += lbl_80200538.aLadderPrize[nEvent].nBase;
+            gPlayers[0].money.n10 += lbl_80200538.aLadderPrize[nEvent].nPerHole * nMargin;
             fn_80102874();
         }
     }
@@ -272,7 +272,7 @@ void fn_80102704(void) {
     if (nMoney != 0 && gpSaveData[gPlayers[0].nIndex].bActive) {
         fn_800E4364(0, 0x6E, nPrize, gPlayers[0].nIndex);
         fn_800D3548(0, nMoney, NULL);
-        gPlayers[0].n320 += nMoney;
+        gPlayers[0].money.nC += nMoney;
     }
     fn_80102874();
 }
@@ -334,7 +334,7 @@ void fn_80102874(void) {
                 if (fn_800D750C(0, 15)) {
                     fn_800E4364(2, 15, lbl_80200538.nLadderDone, nProfile);
                     fn_800D3548(0, lbl_80200538.nLadderDone, NULL);
-                    gPlayers[0].n31C += lbl_80200538.nLadderDone;
+                    gPlayers[0].money.n8 += lbl_80200538.nLadderDone;
                 }
             } else if ((nEvent + 1) % 4 == 0) {
                 fn_800E4364(5, nEvent / 4 + 20, 0, nProfile);
