@@ -300,12 +300,6 @@ typedef struct GolfCamState {
     s32     n1EC[5];            // 0x1EC  per player: the next swing camera kind (View.n260) to use, 1..11 in turn
 } GolfCamState;
 
-extern GolfCamState* lbl_80282220;
-extern s32 lbl_80281520;                // the steep-slope camera's tries last time (-1: none yet)
-extern f32 lbl_801FA1E8[4];             // the target the steep-slope camera last worked for
-extern f32 lbl_80191398[4];             // (1, 0, 0)
-extern f32 lbl_801913A8[4];             // (0, 0, 1)
-
 // The create-a-player (CrAP) screen's state at lbl_80281EE0; only what the CrAP camera reads.
 typedef struct CrAPGolfer {
     u8   unk0[8];

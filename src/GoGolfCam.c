@@ -103,12 +103,17 @@ void     fn_800C56B4(View* pView, f32* pFrom, f32* pTo, int nPlayer);
 u8       Ter_CheckForGroundCollision(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
                                      SurfaceType** ppSurface, TerObject** ppObj);
 
-// The first-person camera's state, per player (fn_800BF658).
-f32 lbl_80191334[5] = {0};                          // the step's bob, 0..16
-f32 lbl_80191348[5] = {8.0f, 8.0f, 8.0f, 8.0f};     // the sideways sway, 0..16
-f32 lbl_8019135C[5] = {1.0f, 1.0f, 1.0f, 1.0f};     // the eye height: 1 standing, 0 in water
-s32 lbl_80191370[5] = {0};                          // which side the sway is on
-s32 lbl_80191384[5] = {0};                          // frames since the last step's rumble (-1: waiting)
+// .bss and .sbss (one object each, so the reverse-order rule does not come into it).
+f32 lbl_801FA1E8[4];                                // the target the steep-slope camera last worked for
+GolfCamState* lbl_80282220;                         // the shared state (fn_800BD894)
+
+s32 lbl_80281520 = -1;                              // the steep-slope camera's tries last time (-1: none yet)
+
+// fake match: stands in for a function the original linker stripped. The file's pool starts with
+// 1.0f (0x802842C0), before the 0.0f and 10.0f fn_800BD894 uses first; its body is unknown.
+static f32 GoGolfCam_StrippedFn(f32 x) {
+    return x + 1.0f;
+}
 
 // Allocate the shared camera state: every flag off, each course's elevator height 10.
 void fn_800BD894(void) {
@@ -387,7 +392,8 @@ void GolfCamera_ProcessZoomToAimCamera(View* pView, int nPlayer) {
     if (pView->f18C < 0.0f || fDist / fTotal > 0.5f) {
         f = fAimY;
     } else {
-        f = fAimY + (1.0f - fDist / fTotal / 0.5f) * (fCamY - fAimY);
+        f = fDist / fTotal * 2.0f;
+        f = fAimY + (1.0f - f) * (fCamY - fAimY);
     }
     if (pView->f18C >= 1.0f) {
         pCam[1] = pCam[1] + lbl_80281F78->f2C * (f - pCam[1]);
@@ -757,8 +763,8 @@ void fn_800BF184(View* pView, int nPlayer) {
             pView->f114 += gSession.fFrameTime;
         }
         if (gSession.fFrameTime != 0.0f) {
-            fUp = fn_800095F0(DEG(20.0f));
-            fBack = fn_80009638(DEG(20.0f));
+            fUp = fn_800095F0(20.0f * PI / 180.0f);    // not DEG(20.0f): see fn_800BF658
+            fBack = fn_80009638(20.0f * PI / 180.0f);
             fUp *= 10.0f;
             fBack *= 10.0f;
             fSin = fn_800095F0(gPlayers[nPlayer].fA88);
@@ -863,6 +869,16 @@ void fn_800BF5E4(View* pView, int nPlayer) {
     pView->p130 = NULL;
     pView->p74 = NULL;
 }
+
+// The first-person camera's state, per player, and two axes fn_800C3FC0 uses. Defined here, after
+// the functions that use the file's string literals, so the .data comes out in the original's order.
+f32 lbl_80191334[5] = {0};                          // the step's bob, 0..16
+f32 lbl_80191348[5] = {8.0f, 8.0f, 8.0f, 8.0f};     // the sideways sway, 0..16
+f32 lbl_8019135C[5] = {1.0f, 1.0f, 1.0f, 1.0f};     // the eye height: 1 standing, 0 in water
+s32 lbl_80191370[5] = {0};                          // which side the sway is on
+s32 lbl_80191384[5] = {0};                          // frames since the last step's rumble (-1: waiting)
+f32 lbl_80191398[4] = {1.0f, 0.0f, 0.0f, 0.0f};     // the x axis
+f32 lbl_801913A8[4] = {0.0f, 0.0f, 1.0f, 0.0f};     // the z axis
 
 // The first-person camera's tick (camera 9's process, after camera 8's): the eye at the golfer's
 // position facing along fA88, 1.4 over the ground (0.1 in water), bobbing and swaying with the

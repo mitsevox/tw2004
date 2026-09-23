@@ -2683,6 +2683,12 @@ unsorted/sweep_800BD83C.c:
 
 GoGolfCam.c:
 	.text       start:0x800BD894 end:0x800C7480
+	.rodata     start:0x80184C78 end:0x80184D20
+	.data       start:0x80191308 end:0x80191440
+	.bss        start:0x801FA1E8 end:0x801FA1F8
+	.sdata      start:0x80281520 end:0x80281528
+	.sbss       start:0x80282220 end:0x80282228
+	.sdata2     start:0x802842C0 end:0x802843B8
 
 GoBreakLine.c:
 	.text       start:0x800C808C end:0x800C9310
