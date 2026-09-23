@@ -11,6 +11,9 @@ s32   fn_800FF894(int nPlayer);
 u8    fn_800FFCCC(int nPlayer, int a);
 u8    fn_800FFD54(int a);
 extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
+void* fn_80017004(int nView);
+void  fn_8006434C(void* pView, f32* pPos, f32* pX, f32* pY, int a);
+void  fn_8006A8D4(void* pView, f32* pX, f32* pY);
 extern u8* gpSaveData;
 extern s32 lbl_802823DC;                    // the surface the ball stopped on (-1: none)
 
@@ -82,6 +85,60 @@ s32 fn_800FEC78(void) {
     return 0;
 }
 
+// A surface is used up once it has scored 5 times (1 time for one that costs points).
+static inline u8 SurfaceUsedUp(s32 nPoints, s32 nHits) {
+    u8 bUsed = 1;
+    if (nPoints < 0 && nHits < 1) {
+        bUsed = 0;
+    }
+    if (nPoints > 0 && nHits < 5) {
+        bUsed = 0;
+    }
+    return bUsed;
+}
+
+// The ball stopped on a surface that still scores: a higher multiplier is taken, the points are
+// added (more for each earlier time on the same surface), the bonus meter fills; each shows a
+// message at the ball's place on screen.
+void fn_800FEC80(int nPlayer) {
+    s32 nHits;
+    s32 nScore;
+    s32 nPoints;
+    s32 nMeter;
+    s32 nMult;
+    f32 x;
+    f32 y;
+    if (lbl_802823DC >= 0) {
+        fn_800FEF00(lbl_802823DC, &nPoints, &nMeter, &nMult);
+        nHits = fn_800FEFF8(nPlayer, lbl_802823DC);
+        if (!SurfaceUsedUp(nPoints, nHits)) {
+            fn_8006434C(fn_80017004(gPlayers[nPlayer].nView0), (f32*)(gPlayers[nPlayer].ball + 0x10), &x, &y, 0);
+            fn_8006A8D4(fn_80017004(gPlayers[nPlayer].nView0), &x, &y);
+            if (nMult > gPlayers[nPlayer].nDBC) {
+                gPlayers[nPlayer].nDBC = nMult;
+                fn_800E53F0(0x35, nMult, 512.0f * x, 448.0f * y);
+            }
+            if (nPoints != 0) {
+                gPlayers[nPlayer].aCD4[gPlayers[nPlayer].nCD0] = lbl_802823DC;
+                gPlayers[nPlayer].nCD0++;
+                gPlayers[nPlayer].nD70[Game_CurHoleIndex()]++;
+                nScore = nPoints * (nHits + 1);
+                gPlayers[nPlayer].nDB8 += nScore * gPlayers[nPlayer].nDBC;
+                if (!gSession.bReplay) {
+                    fn_800F3980(0x33, nScore, 512.0f * x, 448.0f * y, lbl_802823DC, nHits + 1);
+                }
+            }
+            if (nMeter != 0) {
+                gPlayers[nPlayer].nD24 += nMeter;
+                if (gPlayers[nPlayer].nD24 > 100) {
+                    gPlayers[nPlayer].nD24 = 100;
+                }
+                fn_800E53F0(0x34, nMeter, 512.0f * x, 448.0f * y);
+            }
+        }
+    }
+}
+
 // A surface's row in the prize table: its points, bonus-meter points and shot multiplier (all 0
 // when it has none).
 void fn_800FEF00(s32 nSurface, s32* pPoints, s32* pMeter, s32* pMult) {
@@ -110,18 +167,6 @@ s32 fn_800FEFF8(int nPlayer, s32 nSurface) {
     return n;
 }
 
-// A surface is used up once it has scored 5 times (1 time for one that costs points).
-static inline u8 SurfaceUsedUp(s32 nPoints, s32 nHits) {
-    u8 bUsed = 1;
-    if (nPoints < 0 && nHits < 1) {
-        bUsed = 0;
-    }
-    if (nPoints > 0 && nHits < 5) {
-        bUsed = 0;
-    }
-    return bUsed;
-}
-
 // Where the ball stopped (lbl_802823DC). A surface with points scores up to 5 times, one that costs
 // points once. Always returns 0.
 s32 fn_800FF038(int nPlayer) {
@@ -141,6 +186,47 @@ s32 fn_800FF038(int nPlayer) {
         }
     }
     return 0;
+}
+
+// Hole finished: each player's points for the hole are multiplied by the score: 32 for a hole in
+// one, then 16 for 3 under par down to 0.33 for 3 over, nothing worse than that.
+void fn_800FF114(void) {
+    int i;
+    f32 fMult;
+    for (i = 0; i < gNumPlayersSetUp; i++) {
+        if (PLAYER(i)->nStrokes[Game_CurHoleIndex()] == 1) {
+            fMult = 32.0f;
+        } else {
+            switch (PLAYER(i)->nStrokes[Game_CurHoleIndex()] - fn_800D2B08()) {
+            case -3:
+                fMult = 16.0f;
+                break;
+            case -2:
+                fMult = 8.0f;
+                break;
+            case -1:
+                fMult = 4.0f;
+                break;
+            case 0:
+                fMult = 2.0f;
+                break;
+            case 1:
+                fMult = 0.66f;
+                break;
+            case 2:
+                fMult = 0.5f;
+                break;
+            case 3:
+                fMult = 0.33f;
+                break;
+            default:
+                fMult = 0.0f;
+                break;
+            }
+        }
+        PLAYER(i)->nD28[Game_CurHoleIndex()] = fMult * PLAYER(i)->nD28[Game_CurHoleIndex()];
+        fn_800E4364(0, 0x73, PLAYER(i)->nD28[Game_CurHoleIndex()], PLAYER(i)->nIndex);
+    }
 }
 
 // Game finished: each human with a profile is paid the round's points.
