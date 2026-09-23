@@ -11,8 +11,26 @@ Sections:
 	.sdata2     type:rodata align:32
 	.sbss2      type:bss align:32
 
+unsorted/sweep_800055D4.c:
+	.text       start:0x800055D4 end:0x800055D8
+
+unsorted/sweep_80005BC8.c:
+	.text       start:0x80005BC8 end:0x80005BE8
+
+unsorted/sweep_800060DC.c:
+	.text       start:0x800060DC end:0x800060E0
+
 unsorted/sweep_8000724C.c:
 	.text       start:0x8000724C end:0x80007264
+
+unsorted/sweep_800072E0.c:
+	.text       start:0x800072E0 end:0x800072E8
+
+unsorted/sweep_80007320.c:
+	.text       start:0x80007320 end:0x80007328
+
+unsorted/sweep_800073A8.c:
+	.text       start:0x800073A8 end:0x800073B4
 
 unsorted/code_80007BC4.c:
 	.text       start:0x80007BC4 end:0x800080D0
@@ -30,32 +48,92 @@ unsorted/sweep_80008820.c:
 unsorted/sweep_800097C4.c:
 	.text       start:0x800097C4 end:0x800097CC
 
+unsorted/sweep_80009918.c:
+	.text       start:0x80009918 end:0x8000991C
+
 unsorted/sweep_8000A0AC.c:
 	.text       start:0x8000A0AC end:0x8000A0E8
+
+unsorted/sweep_8000AF1C.c:
+	.text       start:0x8000AF1C end:0x8000AF20
+
+unsorted/sweep_8000AF58.c:
+	.text       start:0x8000AF58 end:0x8000AF7C
+
+unsorted/sweep_8000B058.c:
+	.text       start:0x8000B058 end:0x8000B078
+
+unsorted/sweep_8000B244.c:
+	.text       start:0x8000B244 end:0x8000B264
+
+unsorted/sweep_8000B30C.c:
+	.text       start:0x8000B30C end:0x8000B318
 
 unsorted/sweep_8000B3E8.c:
 	.text       start:0x8000B3E8 end:0x8000B428
 
+unsorted/sweep_8000B4B0.c:
+	.text       start:0x8000B4B0 end:0x8000B4B8
+
+unsorted/sweep_8000BED8.c:
+	.text       start:0x8000BED8 end:0x8000BEE4
+
 UStream.c:
 	.text       start:0x8000C624 end:0x8000E708
+
+unsorted/sweep_8000F0E8.c:
+	.text       start:0x8000F0E8 end:0x8000F0EC
+
+unsorted/sweep_8000FB88.c:
+	.text       start:0x8000FB88 end:0x8000FBB0
 
 unsorted/sweep_800106A0.c:
 	.text       start:0x800106A0 end:0x800106C4
 
+unsorted/sweep_80010754.c:
+	.text       start:0x80010754 end:0x80010760
+
+unsorted/sweep_800107C0.c:
+	.text       start:0x800107C0 end:0x800107E4
+
+unsorted/sweep_80011160.c:
+	.text       start:0x80011160 end:0x80011164
+
+unsorted/sweep_80011C8C.c:
+	.text       start:0x80011C8C end:0x80011C90
+
+unsorted/sweep_80012438.c:
+	.text       start:0x80012438 end:0x80012444
+
 unsorted/sweep_800124A4.c:
 	.text       start:0x800124A4 end:0x800124CC
+
+unsorted/sweep_80012520.c:
+	.text       start:0x80012520 end:0x80012540
 
 unsorted/sweep_80012898.c:
 	.text       start:0x80012898 end:0x800128B0
 
+unsorted/sweep_80012E1C.c:
+	.text       start:0x80012E1C end:0x80012E24
+
+unsorted/sweep_80012E4C.c:
+	.text       start:0x80012E4C end:0x80012E54
+
 unsorted/sweep_80012ED0.c:
 	.text       start:0x80012ED0 end:0x80012F18
+
+unsorted/sweep_80012FA0.c:
+	.text       start:0x80012FA0 end:0x80012FA4
 
 unsorted/sweep_80013030.c:
 	.text       start:0x80013030 end:0x80013070
 
 unsorted/sweep_800136F4.c:
 	.text       start:0x800136F4 end:0x8001371C
+
+unsorted/sweep_800137B0.c:
+	.text       start:0x800137B0 end:0x800137D0
 
 unsorted/sweep_80013D58.c:
 	.text       start:0x80013D58 end:0x80013D68
@@ -69,35 +147,182 @@ unsorted/sweep_80014134.c:
 unsorted/sweep_8001425C.c:
 	.text       start:0x8001425C end:0x80014280
 
+unsorted/sweep_800142A4.c:
+	.text       start:0x800142A4 end:0x800142AC
+
+unsorted/sweep_80014524.c:
+	.text       start:0x80014524 end:0x80014544
+
+unsorted/sweep_80014590.c:
+	.text       start:0x80014590 end:0x80014594
+
+unsorted/sweep_80014A60.c:
+	.text       start:0x80014A60 end:0x80014A64
+
+unsorted/sweep_80014DF8.c:
+	.text       start:0x80014DF8 end:0x80014DFC
+
 unsorted/sweep_80014E68.c:
 	.text       start:0x80014E68 end:0x80014E98
+
+unsorted/sweep_80015464.c:
+	.text       start:0x80015464 end:0x80015470
+
+unsorted/sweep_80015620.c:
+	.text       start:0x80015620 end:0x80015624
+
+unsorted/sweep_8001614C.c:
+	.text       start:0x8001614C end:0x80016158
+
+unsorted/sweep_8001618C.c:
+	.text       start:0x8001618C end:0x80016198
 
 unsorted/sweep_800162A0.c:
 	.text       start:0x800162A0 end:0x800162AC
 
+unsorted/sweep_80016CF4.c:
+	.text       start:0x80016CF4 end:0x80016CFC
+
+unsorted/sweep_80016D10.c:
+	.text       start:0x80016D10 end:0x80016D18
+
+unsorted/sweep_8001731C.c:
+	.text       start:0x8001731C end:0x80017320
+
 CharClip.c:
 	.text       start:0x800176E8 end:0x800177A0
+
+unsorted/sweep_80019648.c:
+	.text       start:0x80019648 end:0x8001966C
+
+unsorted/sweep_8001A484.c:
+	.text       start:0x8001A484 end:0x8001A488
+
+unsorted/sweep_8001A73C.c:
+	.text       start:0x8001A73C end:0x8001A75C
+
+unsorted/sweep_8001B1E8.c:
+	.text       start:0x8001B1E8 end:0x8001B208
+
+unsorted/sweep_8001C2E4.c:
+	.text       start:0x8001C2E4 end:0x8001C304
+
+unsorted/sweep_8001C7FC.c:
+	.text       start:0x8001C7FC end:0x8001C804
 
 unsorted/sweep_8001EE88.c:
 	.text       start:0x8001EE88 end:0x8001EE98
 
+unsorted/sweep_8001EFFC.c:
+	.text       start:0x8001EFFC end:0x8001F004
+
+unsorted/sweep_8001F084.c:
+	.text       start:0x8001F084 end:0x8001F08C
+
+unsorted/sweep_8001F558.c:
+	.text       start:0x8001F558 end:0x8001F578
+
+unsorted/sweep_8001FCD4.c:
+	.text       start:0x8001FCD4 end:0x8001FCF4
+
+unsorted/sweep_80021978.c:
+	.text       start:0x80021978 end:0x80021980
+
 skalib.c:
 	.text       start:0x80021ADC end:0x80026844
+
+unsorted/sweep_80027738.c:
+	.text       start:0x80027738 end:0x80027740
+
+unsorted/sweep_8002955C.c:
+	.text       start:0x8002955C end:0x8002957C
+
+unsorted/sweep_80029948.c:
+	.text       start:0x80029948 end:0x80029968
+
+unsorted/sweep_80029A74.c:
+	.text       start:0x80029A74 end:0x80029A7C
+
+unsorted/sweep_80029A88.c:
+	.text       start:0x80029A88 end:0x80029A90
+
+unsorted/sweep_8002A020.c:
+	.text       start:0x8002A020 end:0x8002A024
+
+unsorted/sweep_8002A3A4.c:
+	.text       start:0x8002A3A4 end:0x8002A3AC
+
+unsorted/sweep_8002A624.c:
+	.text       start:0x8002A624 end:0x8002A630
 
 Golfer.c:
 	.text       start:0x8002A630 end:0x8002F1D4
 
+unsorted/sweep_8002FEAC.c:
+	.text       start:0x8002FEAC end:0x8002FEB0
+
+unsorted/sweep_8002FF94.c:
+	.text       start:0x8002FF94 end:0x8002FF98
+
+unsorted/sweep_8003009C.c:
+	.text       start:0x8003009C end:0x800300A0
+
+unsorted/sweep_8003020C.c:
+	.text       start:0x8003020C end:0x80030214
+
+unsorted/sweep_8003024C.c:
+	.text       start:0x8003024C end:0x80030254
+
 unsorted/sweep_800352E4.c:
 	.text       start:0x800352E4 end:0x80035338
+
+unsorted/sweep_8003534C.c:
+	.text       start:0x8003534C end:0x80035370
+
+unsorted/sweep_8003541C.c:
+	.text       start:0x8003541C end:0x80035440
 
 unsorted/sweep_800354B4.c:
 	.text       start:0x800354B4 end:0x800354C4
 
+unsorted/sweep_80035500.c:
+	.text       start:0x80035500 end:0x80035508
+
+unsorted/sweep_8003556C.c:
+	.text       start:0x8003556C end:0x80035574
+
+unsorted/sweep_80035584.c:
+	.text       start:0x80035584 end:0x80035590
+
+unsorted/sweep_80035600.c:
+	.text       start:0x80035600 end:0x80035604
+
+unsorted/sweep_80035F1C.c:
+	.text       start:0x80035F1C end:0x80035F40
+
 unsorted/sweep_80035FBC.c:
 	.text       start:0x80035FBC end:0x80035FFC
 
+unsorted/sweep_8003612C.c:
+	.text       start:0x8003612C end:0x8003614C
+
+unsorted/sweep_80036460.c:
+	.text       start:0x80036460 end:0x80036464
+
+unsorted/sweep_800364A0.c:
+	.text       start:0x800364A0 end:0x800364AC
+
+unsorted/sweep_80038A6C.c:
+	.text       start:0x80038A6C end:0x80038A90
+
+unsorted/sweep_8003944C.c:
+	.text       start:0x8003944C end:0x80039454
+
 unsorted/sweep_8003954C.c:
 	.text       start:0x8003954C end:0x80039554
+
+unsorted/sweep_80045D5C.c:
+	.text       start:0x80045D5C end:0x80045D80
 
 unsorted/sweep_80045E3C.c:
 	.text       start:0x80045E3C end:0x80045EC0
@@ -105,17 +330,62 @@ unsorted/sweep_80045E3C.c:
 unsorted/sweep_80045F14.c:
 	.text       start:0x80045F14 end:0x80045F38
 
+unsorted/sweep_80045F6C.c:
+	.text       start:0x80045F6C end:0x80045F74
+
+unsorted/sweep_80046264.c:
+	.text       start:0x80046264 end:0x80046288
+
+unsorted/sweep_80048584.c:
+	.text       start:0x80048584 end:0x8004858C
+
 unsorted/sweep_800486EC.c:
 	.text       start:0x800486EC end:0x800486F4
 
+unsorted/sweep_80048804.c:
+	.text       start:0x80048804 end:0x80048808
+
+unsorted/sweep_80048894.c:
+	.text       start:0x80048894 end:0x800488B4
+
+unsorted/sweep_80048E44.c:
+	.text       start:0x80048E44 end:0x80048E4C
+
 unsorted/sweep_8004950C.c:
 	.text       start:0x8004950C end:0x80049514
+
+unsorted/sweep_8004ABB4.c:
+	.text       start:0x8004ABB4 end:0x8004ABBC
+
+unsorted/sweep_8004AF28.c:
+	.text       start:0x8004AF28 end:0x8004AF2C
+
+unsorted/sweep_8004B580.c:
+	.text       start:0x8004B580 end:0x8004B588
+
+unsorted/sweep_8004B65C.c:
+	.text       start:0x8004B65C end:0x8004B664
 
 Ball.c:
 	.text       start:0x80050C2C end:0x8005620C
 
 Swing.c:
 	.text       start:0x800589F8 end:0x80062E40
+
+unsorted/sweep_800642B0.c:
+	.text       start:0x800642B0 end:0x800642D0
+
+unsorted/sweep_80065B44.c:
+	.text       start:0x80065B44 end:0x80065B50
+
+unsorted/sweep_80065B98.c:
+	.text       start:0x80065B98 end:0x80065B9C
+
+unsorted/sweep_80065D6C.c:
+	.text       start:0x80065D6C end:0x80065D70
+
+unsorted/sweep_80065E98.c:
+	.text       start:0x80065E98 end:0x80065E9C
 
 unsorted/sweep_800664D8.c:
 	.text       start:0x800664D8 end:0x80066558
@@ -135,6 +405,12 @@ unsorted/sweep_80066FA8.c:
 unsorted/sweep_8006752C.c:
 	.text       start:0x8006752C end:0x80067560
 
+unsorted/sweep_800676AC.c:
+	.text       start:0x800676AC end:0x800676B8
+
+unsorted/sweep_80069498.c:
+	.text       start:0x80069498 end:0x800694A0
+
 unsorted/sweep_8006A89C.c:
 	.text       start:0x8006A89C end:0x8006A8D4
 
@@ -144,17 +420,35 @@ unsorted/sweep_8006DC34.c:
 unsorted/sweep_8006DCA0.c:
 	.text       start:0x8006DCA0 end:0x8006DCA8
 
+unsorted/sweep_8006DD84.c:
+	.text       start:0x8006DD84 end:0x8006DDA8
+
 unsorted/sweep_8006E0A8.c:
 	.text       start:0x8006E0A8 end:0x8006E0C0
+
+unsorted/sweep_8006E0F8.c:
+	.text       start:0x8006E0F8 end:0x8006E118
 
 unsorted/sweep_8006E1C0.c:
 	.text       start:0x8006E1C0 end:0x8006E1C8
 
+unsorted/sweep_8006E214.c:
+	.text       start:0x8006E214 end:0x8006E234
+
 unsorted/sweep_8006F144.c:
 	.text       start:0x8006F144 end:0x8006F154
 
+unsorted/sweep_8006F430.c:
+	.text       start:0x8006F430 end:0x8006F438
+
+unsorted/sweep_8006F4F0.c:
+	.text       start:0x8006F4F0 end:0x8006F518
+
 unsorted/sweep_8006F5F8.c:
 	.text       start:0x8006F5F8 end:0x8006F608
+
+unsorted/sweep_8006F64C.c:
+	.text       start:0x8006F64C end:0x8006F650
 
 unsorted/sweep_8006FCC4.c:
 	.text       start:0x8006FCC4 end:0x8006FCDC
@@ -162,11 +456,29 @@ unsorted/sweep_8006FCC4.c:
 unsorted/sweep_8006FDCC.c:
 	.text       start:0x8006FDCC end:0x8006FDD4
 
+unsorted/sweep_8006FFD4.c:
+	.text       start:0x8006FFD4 end:0x8006FFF8
+
+unsorted/sweep_80070168.c:
+	.text       start:0x80070168 end:0x8007018C
+
+unsorted/sweep_80070B74.c:
+	.text       start:0x80070B74 end:0x80070B78
+
+unsorted/sweep_80071574.c:
+	.text       start:0x80071574 end:0x80071578
+
+unsorted/sweep_80071624.c:
+	.text       start:0x80071624 end:0x80071628
+
 unsorted/sweep_800716D4.c:
 	.text       start:0x800716D4 end:0x800717AC
 
 unsorted/sweep_80071850.c:
 	.text       start:0x80071850 end:0x8007185C
+
+unsorted/sweep_800718C4.c:
+	.text       start:0x800718C4 end:0x800718E4
 
 unsorted/sweep_8007190C.c:
 	.text       start:0x8007190C end:0x80071914
@@ -174,11 +486,17 @@ unsorted/sweep_8007190C.c:
 unsorted/sweep_80071A14.c:
 	.text       start:0x80071A14 end:0x80071A54
 
+unsorted/sweep_8007524C.c:
+	.text       start:0x8007524C end:0x80075250
+
 unsorted/sweep_8007531C.c:
 	.text       start:0x8007531C end:0x8007535C
 
 unsorted/sweep_80075C48.c:
 	.text       start:0x80075C48 end:0x80075C88
+
+unsorted/sweep_80076088.c:
+	.text       start:0x80076088 end:0x80076090
 
 unsorted/sweep_800760A0.c:
 	.text       start:0x800760A0 end:0x800760B0
@@ -186,17 +504,44 @@ unsorted/sweep_800760A0.c:
 unsorted/sweep_800763B4.c:
 	.text       start:0x800763B4 end:0x800763BC
 
+unsorted/sweep_8007644C.c:
+	.text       start:0x8007644C end:0x8007646C
+
 unsorted/sweep_80076A04.c:
 	.text       start:0x80076A04 end:0x80076A14
 
 unsorted/sweep_80076AC4.c:
 	.text       start:0x80076AC4 end:0x80076ACC
 
+unsorted/sweep_80076B18.c:
+	.text       start:0x80076B18 end:0x80076B38
+
+unsorted/sweep_80076F20.c:
+	.text       start:0x80076F20 end:0x80076F24
+
+unsorted/sweep_80076F54.c:
+	.text       start:0x80076F54 end:0x80076F58
+
 unsorted/sweep_8007731C.c:
 	.text       start:0x8007731C end:0x8007734C
 
+unsorted/sweep_80077428.c:
+	.text       start:0x80077428 end:0x8007744C
+
 unsorted/sweep_8007BCA0.c:
 	.text       start:0x8007BCA0 end:0x8007BCC4
+
+unsorted/sweep_8007BD18.c:
+	.text       start:0x8007BD18 end:0x8007BD1C
+
+unsorted/sweep_8007BEEC.c:
+	.text       start:0x8007BEEC end:0x8007BEF0
+
+unsorted/sweep_8007C248.c:
+	.text       start:0x8007C248 end:0x8007C254
+
+unsorted/sweep_8007C488.c:
+	.text       start:0x8007C488 end:0x8007C48C
 
 unsorted/sweep_8007C4B8.c:
 	.text       start:0x8007C4B8 end:0x8007C4F8
@@ -204,8 +549,29 @@ unsorted/sweep_8007C4B8.c:
 unsorted/sweep_8007C784.c:
 	.text       start:0x8007C784 end:0x8007C79C
 
+unsorted/sweep_8007C7AC.c:
+	.text       start:0x8007C7AC end:0x8007C7B0
+
+unsorted/sweep_8007C94C.c:
+	.text       start:0x8007C94C end:0x8007C950
+
+unsorted/sweep_8007CDF0.c:
+	.text       start:0x8007CDF0 end:0x8007CDF4
+
+unsorted/sweep_8007CE1C.c:
+	.text       start:0x8007CE1C end:0x8007CE20
+
+unsorted/sweep_8007CE58.c:
+	.text       start:0x8007CE58 end:0x8007CE7C
+
 unsorted/sweep_8007D25C.c:
 	.text       start:0x8007D25C end:0x8007D270
+
+unsorted/sweep_8007D2D0.c:
+	.text       start:0x8007D2D0 end:0x8007D2D4
+
+unsorted/sweep_8007D3B4.c:
+	.text       start:0x8007D3B4 end:0x8007D3D8
 
 unsorted/sweep_8007D408.c:
 	.text       start:0x8007D408 end:0x8007D428
@@ -213,11 +579,29 @@ unsorted/sweep_8007D408.c:
 unsorted/sweep_8007D6D8.c:
 	.text       start:0x8007D6D8 end:0x8007D6E0
 
+unsorted/sweep_8007D964.c:
+	.text       start:0x8007D964 end:0x8007D968
+
+unsorted/sweep_8007DAD0.c:
+	.text       start:0x8007DAD0 end:0x8007DAD4
+
 unsorted/sweep_8007DB28.c:
 	.text       start:0x8007DB28 end:0x8007DB3C
 
+unsorted/sweep_8007E200.c:
+	.text       start:0x8007E200 end:0x8007E204
+
+unsorted/sweep_8007E288.c:
+	.text       start:0x8007E288 end:0x8007E28C
+
+unsorted/sweep_8007E354.c:
+	.text       start:0x8007E354 end:0x8007E358
+
 unsorted/sweep_8007E744.c:
 	.text       start:0x8007E744 end:0x8007E74C
+
+unsorted/sweep_8007E798.c:
+	.text       start:0x8007E798 end:0x8007E79C
 
 unsorted/sweep_8007E8B4.c:
 	.text       start:0x8007E8B4 end:0x8007E8C4
@@ -225,17 +609,56 @@ unsorted/sweep_8007E8B4.c:
 unsorted/sweep_8007E9A0.c:
 	.text       start:0x8007E9A0 end:0x8007E9A8
 
+unsorted/sweep_8007EE7C.c:
+	.text       start:0x8007EE7C end:0x8007EE80
+
+unsorted/sweep_8007EF9C.c:
+	.text       start:0x8007EF9C end:0x8007EFA0
+
+unsorted/sweep_80080300.c:
+	.text       start:0x80080300 end:0x80080304
+
+unsorted/sweep_800804D8.c:
+	.text       start:0x800804D8 end:0x800804E4
+
+unsorted/sweep_800805F0.c:
+	.text       start:0x800805F0 end:0x800805F4
+
+unsorted/sweep_800807D0.c:
+	.text       start:0x800807D0 end:0x800807DC
+
+unsorted/sweep_80081BD4.c:
+	.text       start:0x80081BD4 end:0x80081C18
+
+unsorted/sweep_80081CF8.c:
+	.text       start:0x80081CF8 end:0x80081CFC
+
+unsorted/sweep_8008281C.c:
+	.text       start:0x8008281C end:0x80082828
+
 unsorted/sweep_80082978.c:
 	.text       start:0x80082978 end:0x80082980
 
 unsorted/sweep_800829D4.c:
 	.text       start:0x800829D4 end:0x800829EC
 
+unsorted/sweep_800829EC.c:
+	.text       start:0x800829EC end:0x80082A10
+
 unsorted/sweep_80082A44.c:
 	.text       start:0x80082A44 end:0x80082A50
 
+unsorted/sweep_80082CA4.c:
+	.text       start:0x80082CA4 end:0x80082CA8
+
+unsorted/sweep_80083354.c:
+	.text       start:0x80083354 end:0x80083358
+
 unsorted/sweep_800833A4.c:
 	.text       start:0x800833A4 end:0x800833D0
+
+unsorted/sweep_800834DC.c:
+	.text       start:0x800834DC end:0x800834E8
 
 unsorted/sweep_800835B8.c:
 	.text       start:0x800835B8 end:0x800835D4
@@ -246,20 +669,68 @@ unsorted/sweep_80083890.c:
 unsorted/sweep_80083904.c:
 	.text       start:0x80083904 end:0x80083934
 
+unsorted/sweep_80083970.c:
+	.text       start:0x80083970 end:0x80083974
+
 unsorted/sweep_80083A44.c:
 	.text       start:0x80083A44 end:0x80083A4C
+
+unsorted/sweep_80083BA4.c:
+	.text       start:0x80083BA4 end:0x80083BC8
 
 unsorted/sweep_80083E70.c:
 	.text       start:0x80083E70 end:0x80083EE0
 
+unsorted/sweep_80083F54.c:
+	.text       start:0x80083F54 end:0x80083F60
+
 unsorted/sweep_80084158.c:
 	.text       start:0x80084158 end:0x80084160
+
+unsorted/sweep_80084208.c:
+	.text       start:0x80084208 end:0x8008422C
+
+unsorted/sweep_80084288.c:
+	.text       start:0x80084288 end:0x800842D0
+
+unsorted/sweep_800846C8.c:
+	.text       start:0x800846C8 end:0x800846D4
+
+unsorted/sweep_80084750.c:
+	.text       start:0x80084750 end:0x80084754
+
+unsorted/sweep_800847BC.c:
+	.text       start:0x800847BC end:0x800847E0
+
+unsorted/sweep_800848E4.c:
+	.text       start:0x800848E4 end:0x800848E8
+
+unsorted/sweep_80084BE4.c:
+	.text       start:0x80084BE4 end:0x80084BE8
 
 unsorted/sweep_80084F04.c:
 	.text       start:0x80084F04 end:0x80084F0C
 
+unsorted/sweep_80084F3C.c:
+	.text       start:0x80084F3C end:0x80084F40
+
+unsorted/sweep_80084FF0.c:
+	.text       start:0x80084FF0 end:0x80084FF8
+
+unsorted/sweep_80086384.c:
+	.text       start:0x80086384 end:0x800863CC
+
+unsorted/sweep_800866E8.c:
+	.text       start:0x800866E8 end:0x800866EC
+
+unsorted/sweep_800874F0.c:
+	.text       start:0x800874F0 end:0x80087510
+
 unsorted/sweep_80087D14.c:
 	.text       start:0x80087D14 end:0x80087D54
+
+unsorted/sweep_80087E60.c:
+	.text       start:0x80087E60 end:0x80087E80
 
 unsorted/sweep_800880AC.c:
 	.text       start:0x800880AC end:0x800880D0
@@ -273,11 +744,29 @@ unsorted/sweep_80088354.c:
 unsorted/sweep_80088634.c:
 	.text       start:0x80088634 end:0x80088660
 
+unsorted/sweep_80088830.c:
+	.text       start:0x80088830 end:0x80088834
+
+unsorted/sweep_80089584.c:
+	.text       start:0x80089584 end:0x80089590
+
 unsorted/sweep_8008967C.c:
 	.text       start:0x8008967C end:0x8008968C
 
+unsorted/sweep_800896A8.c:
+	.text       start:0x800896A8 end:0x800896B4
+
+unsorted/sweep_800896D0.c:
+	.text       start:0x800896D0 end:0x800896F0
+
+unsorted/sweep_80089AD0.c:
+	.text       start:0x80089AD0 end:0x80089AD4
+
 unsorted/sweep_80089BD0.c:
 	.text       start:0x80089BD0 end:0x80089C20
+
+unsorted/sweep_80089CAC.c:
+	.text       start:0x80089CAC end:0x80089CCC
 
 unsorted/sweep_80089D04.c:
 	.text       start:0x80089D04 end:0x80089D68
@@ -288,20 +777,137 @@ unsorted/sweep_80089D98.c:
 unsorted/sweep_80089E5C.c:
 	.text       start:0x80089E5C end:0x80089E64
 
+unsorted/sweep_80089E98.c:
+	.text       start:0x80089E98 end:0x80089E9C
+
+unsorted/sweep_8008A184.c:
+	.text       start:0x8008A184 end:0x8008A188
+
+unsorted/sweep_8008A208.c:
+	.text       start:0x8008A208 end:0x8008A20C
+
+unsorted/sweep_8008A7C8.c:
+	.text       start:0x8008A7C8 end:0x8008A7D4
+
+unsorted/sweep_8008A800.c:
+	.text       start:0x8008A800 end:0x8008A804
+
+unsorted/sweep_8008A86C.c:
+	.text       start:0x8008A86C end:0x8008A870
+
+unsorted/sweep_8008AAAC.c:
+	.text       start:0x8008AAAC end:0x8008AAB8
+
+unsorted/sweep_8008AB40.c:
+	.text       start:0x8008AB40 end:0x8008AB4C
+
 unsorted/sweep_8008AC3C.c:
 	.text       start:0x8008AC3C end:0x8008AC4C
 
 unsorted/sweep_8008B204.c:
 	.text       start:0x8008B204 end:0x8008B20C
 
+unsorted/sweep_8008B3C8.c:
+	.text       start:0x8008B3C8 end:0x8008B3CC
+
+unsorted/sweep_8008B430.c:
+	.text       start:0x8008B430 end:0x8008B450
+
+unsorted/sweep_8008B4A0.c:
+	.text       start:0x8008B4A0 end:0x8008B4C0
+
+unsorted/sweep_8008B570.c:
+	.text       start:0x8008B570 end:0x8008B574
+
+unsorted/sweep_8008B5FC.c:
+	.text       start:0x8008B5FC end:0x8008B61C
+
+unsorted/sweep_8008B674.c:
+	.text       start:0x8008B674 end:0x8008B694
+
+unsorted/sweep_8008B6E4.c:
+	.text       start:0x8008B6E4 end:0x8008B704
+
+unsorted/sweep_8008C938.c:
+	.text       start:0x8008C938 end:0x8008C93C
+
+unsorted/sweep_8008D8CC.c:
+	.text       start:0x8008D8CC end:0x8008D8F4
+
+unsorted/sweep_8008E354.c:
+	.text       start:0x8008E354 end:0x8008E358
+
+unsorted/sweep_8008E718.c:
+	.text       start:0x8008E718 end:0x8008E724
+
+unsorted/sweep_8008E818.c:
+	.text       start:0x8008E818 end:0x8008E824
+
+unsorted/sweep_8008E918.c:
+	.text       start:0x8008E918 end:0x8008E924
+
+unsorted/sweep_8008E938.c:
+	.text       start:0x8008E938 end:0x8008E944
+
+unsorted/sweep_8008E9A8.c:
+	.text       start:0x8008E9A8 end:0x8008E9B4
+
+unsorted/sweep_8008EA38.c:
+	.text       start:0x8008EA38 end:0x8008EA44
+
 unsorted/sweep_8008EAB0.c:
 	.text       start:0x8008EAB0 end:0x8008EB10
+
+unsorted/sweep_8008EC60.c:
+	.text       start:0x8008EC60 end:0x8008EC68
+
+unsorted/sweep_8008F0C0.c:
+	.text       start:0x8008F0C0 end:0x8008F0C8
+
+unsorted/sweep_8008F0F0.c:
+	.text       start:0x8008F0F0 end:0x8008F0FC
+
+unsorted/sweep_8008F15C.c:
+	.text       start:0x8008F15C end:0x8008F164
+
+unsorted/sweep_8008F18C.c:
+	.text       start:0x8008F18C end:0x8008F194
+
+unsorted/sweep_8008F354.c:
+	.text       start:0x8008F354 end:0x8008F35C
+
+unsorted/sweep_8008F39C.c:
+	.text       start:0x8008F39C end:0x8008F3A4
+
+unsorted/sweep_8008F644.c:
+	.text       start:0x8008F644 end:0x8008F648
 
 unsorted/sweep_80090890.c:
 	.text       start:0x80090890 end:0x80090898
 
+unsorted/sweep_80090898.c:
+	.text       start:0x80090898 end:0x800908BC
+
 unsorted/sweep_800908BC.c:
 	.text       start:0x800908BC end:0x800908D4
+
+unsorted/sweep_80091454.c:
+	.text       start:0x80091454 end:0x80091460
+
+unsorted/sweep_80091708.c:
+	.text       start:0x80091708 end:0x8009170C
+
+unsorted/sweep_80091EE4.c:
+	.text       start:0x80091EE4 end:0x80091EE8
+
+unsorted/sweep_8009220C.c:
+	.text       start:0x8009220C end:0x80092210
+
+unsorted/sweep_800922A0.c:
+	.text       start:0x800922A0 end:0x800922A8
+
+unsorted/sweep_800929E0.c:
+	.text       start:0x800929E0 end:0x800929E4
 
 unsorted/sweep_80092BA0.c:
 	.text       start:0x80092BA0 end:0x80092BE8
@@ -309,14 +915,38 @@ unsorted/sweep_80092BA0.c:
 unsorted/sweep_80093268.c:
 	.text       start:0x80093268 end:0x80093280
 
+unsorted/sweep_80093AD4.c:
+	.text       start:0x80093AD4 end:0x80093AE0
+
+unsorted/sweep_80094274.c:
+	.text       start:0x80094274 end:0x80094278
+
+unsorted/sweep_80095364.c:
+	.text       start:0x80095364 end:0x80095368
+
 unsorted/sweep_8009554C.c:
 	.text       start:0x8009554C end:0x80095564
 
 CharAnim.c:
 	.text       start:0x800965DC end:0x80096690
 
+unsorted/sweep_80097688.c:
+	.text       start:0x80097688 end:0x80097694
+
 unsorted/sweep_80098844.c:
 	.text       start:0x80098844 end:0x8009884C
+
+unsorted/sweep_8009A1EC.c:
+	.text       start:0x8009A1EC end:0x8009A1F4
+
+unsorted/sweep_8009A340.c:
+	.text       start:0x8009A340 end:0x8009A344
+
+unsorted/sweep_8009A704.c:
+	.text       start:0x8009A704 end:0x8009A708
+
+unsorted/sweep_8009A968.c:
+	.text       start:0x8009A968 end:0x8009A990
 
 unsorted/sweep_8009B314.c:
 	.text       start:0x8009B314 end:0x8009B340
@@ -324,20 +954,62 @@ unsorted/sweep_8009B314.c:
 unsorted/sweep_8009B604.c:
 	.text       start:0x8009B604 end:0x8009B630
 
+unsorted/sweep_8009B894.c:
+	.text       start:0x8009B894 end:0x8009B898
+
 unsorted/sweep_8009CD7C.c:
 	.text       start:0x8009CD7C end:0x8009CDA0
+
+unsorted/sweep_8009DCE8.c:
+	.text       start:0x8009DCE8 end:0x8009DCEC
 
 unsorted/sweep_8009EB30.c:
 	.text       start:0x8009EB30 end:0x8009EB44
 
+unsorted/sweep_8009EF90.c:
+	.text       start:0x8009EF90 end:0x8009EF98
+
 unsorted/sweep_8009F35C.c:
 	.text       start:0x8009F35C end:0x8009F36C
+
+unsorted/sweep_8009F7E4.c:
+	.text       start:0x8009F7E4 end:0x8009F7E8
+
+unsorted/sweep_800A19F4.c:
+	.text       start:0x800A19F4 end:0x800A19F8
+
+unsorted/sweep_800A218C.c:
+	.text       start:0x800A218C end:0x800A2194
+
+unsorted/sweep_800A2628.c:
+	.text       start:0x800A2628 end:0x800A2630
+
+unsorted/sweep_800A27F4.c:
+	.text       start:0x800A27F4 end:0x800A27FC
+
+unsorted/sweep_800A2958.c:
+	.text       start:0x800A2958 end:0x800A295C
+
+unsorted/sweep_800A3F38.c:
+	.text       start:0x800A3F38 end:0x800A3F58
 
 unsorted/sweep_800A3F94.c:
 	.text       start:0x800A3F94 end:0x800A3FF4
 
+unsorted/sweep_800A4038.c:
+	.text       start:0x800A4038 end:0x800A4044
+
+unsorted/sweep_800A4080.c:
+	.text       start:0x800A4080 end:0x800A4084
+
+unsorted/sweep_800A5620.c:
+	.text       start:0x800A5620 end:0x800A562C
+
 unsorted/sweep_800A6448.c:
 	.text       start:0x800A6448 end:0x800A6450
+
+unsorted/sweep_800A7644.c:
+	.text       start:0x800A7644 end:0x800A7664
 
 unsorted/sweep_800A7924.c:
 	.text       start:0x800A7924 end:0x800A7968
@@ -345,29 +1017,107 @@ unsorted/sweep_800A7924.c:
 unsorted/sweep_800A7994.c:
 	.text       start:0x800A7994 end:0x800A7A34
 
+unsorted/sweep_800A7AD0.c:
+	.text       start:0x800A7AD0 end:0x800A7AF0
+
 unsorted/sweep_800A7C24.c:
 	.text       start:0x800A7C24 end:0x800A7C30
 
 unsorted/sweep_800A86B0.c:
 	.text       start:0x800A86B0 end:0x800A86BC
 
+unsorted/sweep_800A8700.c:
+	.text       start:0x800A8700 end:0x800A8708
+
+unsorted/sweep_800A874C.c:
+	.text       start:0x800A874C end:0x800A8754
+
+unsorted/sweep_800A87B0.c:
+	.text       start:0x800A87B0 end:0x800A87B4
+
+unsorted/sweep_800A8824.c:
+	.text       start:0x800A8824 end:0x800A882C
+
 unsorted/sweep_800A942C.c:
 	.text       start:0x800A942C end:0x800A9438
+
+unsorted/sweep_800A9AC4.c:
+	.text       start:0x800A9AC4 end:0x800A9AC8
 
 unsorted/sweep_800AA2EC.c:
 	.text       start:0x800AA2EC end:0x800AA34C
 
+unsorted/sweep_800AA444.c:
+	.text       start:0x800AA444 end:0x800AA44C
+
+unsorted/sweep_800AA694.c:
+	.text       start:0x800AA694 end:0x800AA698
+
+unsorted/sweep_800AAAA0.c:
+	.text       start:0x800AAAA0 end:0x800AAAA4
+
+unsorted/sweep_800AAD14.c:
+	.text       start:0x800AAD14 end:0x800AAD18
+
+unsorted/sweep_800AADE8.c:
+	.text       start:0x800AADE8 end:0x800AAE08
+
+unsorted/sweep_800AAE70.c:
+	.text       start:0x800AAE70 end:0x800AAE90
+
+unsorted/sweep_800AB39C.c:
+	.text       start:0x800AB39C end:0x800AB3A4
+
+unsorted/sweep_800ABC34.c:
+	.text       start:0x800ABC34 end:0x800ABC54
+
+unsorted/sweep_800AC328.c:
+	.text       start:0x800AC328 end:0x800AC330
+
 unsorted/sweep_800AC494.c:
 	.text       start:0x800AC494 end:0x800AC4A0
+
+unsorted/sweep_800AD1C4.c:
+	.text       start:0x800AD1C4 end:0x800AD1C8
+
+unsorted/sweep_800ADA08.c:
+	.text       start:0x800ADA08 end:0x800ADA28
+
+unsorted/sweep_800AF140.c:
+	.text       start:0x800AF140 end:0x800AF144
+
+unsorted/sweep_800AF2D8.c:
+	.text       start:0x800AF2D8 end:0x800AF2DC
 
 unsorted/sweep_800AF31C.c:
 	.text       start:0x800AF31C end:0x800AF324
 
+unsorted/sweep_800AFB48.c:
+	.text       start:0x800AFB48 end:0x800AFB50
+
 unsorted/sweep_800B0430.c:
 	.text       start:0x800B0430 end:0x800B044C
 
+unsorted/sweep_800B04CC.c:
+	.text       start:0x800B04CC end:0x800B04EC
+
+unsorted/sweep_800B055C.c:
+	.text       start:0x800B055C end:0x800B0568
+
 unsorted/sweep_800B0790.c:
 	.text       start:0x800B0790 end:0x800B07A0
+
+unsorted/sweep_800B0954.c:
+	.text       start:0x800B0954 end:0x800B0960
+
+unsorted/sweep_800B1608.c:
+	.text       start:0x800B1608 end:0x800B160C
+
+unsorted/sweep_800B1AA8.c:
+	.text       start:0x800B1AA8 end:0x800B1AB0
+
+unsorted/sweep_800B1F9C.c:
+	.text       start:0x800B1F9C end:0x800B1FBC
 
 unsorted/sweep_800B204C.c:
 	.text       start:0x800B204C end:0x800B208C
@@ -378,23 +1128,68 @@ unsorted/sweep_800B21D0.c:
 unsorted/sweep_800B22D4.c:
 	.text       start:0x800B22D4 end:0x800B2314
 
+unsorted/sweep_800B235C.c:
+	.text       start:0x800B235C end:0x800B2360
+
+unsorted/sweep_800B246C.c:
+	.text       start:0x800B246C end:0x800B2470
+
+unsorted/sweep_800B352C.c:
+	.text       start:0x800B352C end:0x800B3550
+
+unsorted/sweep_800B3D64.c:
+	.text       start:0x800B3D64 end:0x800B3D68
+
+unsorted/sweep_800B4908.c:
+	.text       start:0x800B4908 end:0x800B4914
+
 unsorted/sweep_800B4BB0.c:
 	.text       start:0x800B4BB0 end:0x800B4BB8
+
+unsorted/sweep_800B4BFC.c:
+	.text       start:0x800B4BFC end:0x800B4C00
 
 unsorted/sweep_800B5C30.c:
 	.text       start:0x800B5C30 end:0x800B5C40
 
+unsorted/sweep_800B5F28.c:
+	.text       start:0x800B5F28 end:0x800B5F4C
+
 unsorted/sweep_800B655C.c:
 	.text       start:0x800B655C end:0x800B6564
+
+unsorted/sweep_800B6C0C.c:
+	.text       start:0x800B6C0C end:0x800B6C14
+
+unsorted/sweep_800B6CD0.c:
+	.text       start:0x800B6CD0 end:0x800B6CD8
 
 unsorted/sweep_800B7684.c:
 	.text       start:0x800B7684 end:0x800B769C
 
+unsorted/sweep_800BAA4C.c:
+	.text       start:0x800BAA4C end:0x800BAA50
+
 unsorted/sweep_800BB0A8.c:
 	.text       start:0x800BB0A8 end:0x800BB0E8
 
+unsorted/sweep_800BB4B0.c:
+	.text       start:0x800BB4B0 end:0x800BB4B4
+
 unsorted/sweep_800BCD50.c:
 	.text       start:0x800BCD50 end:0x800BCD68
+
+unsorted/sweep_800C4518.c:
+	.text       start:0x800C4518 end:0x800C4520
+
+unsorted/sweep_800C6C8C.c:
+	.text       start:0x800C6C8C end:0x800C6CB0
+
+unsorted/sweep_800C7080.c:
+	.text       start:0x800C7080 end:0x800C708C
+
+unsorted/sweep_800C70F8.c:
+	.text       start:0x800C70F8 end:0x800C7100
 
 unsorted/sweep_800C7138.c:
 	.text       start:0x800C7138 end:0x800C7178
@@ -414,14 +1209,38 @@ unsorted/sweep_800CEEF4.c:
 HoleScore.c:
 	.text       start:0x800D0AA0 end:0x800D0AF4
 
+unsorted/sweep_800D1D30.c:
+	.text       start:0x800D1D30 end:0x800D1D38
+
+unsorted/sweep_800D29E8.c:
+	.text       start:0x800D29E8 end:0x800D29EC
+
+unsorted/sweep_800D33F0.c:
+	.text       start:0x800D33F0 end:0x800D33F4
+
+unsorted/sweep_800D7660.c:
+	.text       start:0x800D7660 end:0x800D7684
+
+unsorted/sweep_800D9954.c:
+	.text       start:0x800D9954 end:0x800D995C
+
 unsorted/sweep_800DAD44.c:
 	.text       start:0x800DAD44 end:0x800DAD54
 
 unsorted/sweep_800DCAD8.c:
 	.text       start:0x800DCAD8 end:0x800DCB10
 
+unsorted/sweep_800DCBB8.c:
+	.text       start:0x800DCBB8 end:0x800DCBBC
+
+unsorted/sweep_800DEA24.c:
+	.text       start:0x800DEA24 end:0x800DEA44
+
 unsorted/sweep_800E0A84.c:
 	.text       start:0x800E0A84 end:0x800E0A98
+
+unsorted/sweep_800E177C.c:
+	.text       start:0x800E177C end:0x800E1788
 
 Gimme.c:
 	.text       start:0x800E2810 end:0x800E292C
@@ -429,17 +1248,71 @@ Gimme.c:
 unsorted/sweep_800E3AA0.c:
 	.text       start:0x800E3AA0 end:0x800E3B28
 
+unsorted/sweep_800E3BEC.c:
+	.text       start:0x800E3BEC end:0x800E3C0C
+
+unsorted/sweep_800E415C.c:
+	.text       start:0x800E415C end:0x800E4164
+
+unsorted/sweep_800E41C8.c:
+	.text       start:0x800E41C8 end:0x800E41D4
+
+unsorted/sweep_800E45C0.c:
+	.text       start:0x800E45C0 end:0x800E45CC
+
+unsorted/sweep_800E4D88.c:
+	.text       start:0x800E4D88 end:0x800E4D94
+
+unsorted/sweep_800E508C.c:
+	.text       start:0x800E508C end:0x800E5098
+
+unsorted/sweep_800E5110.c:
+	.text       start:0x800E5110 end:0x800E5118
+
+unsorted/sweep_800E5228.c:
+	.text       start:0x800E5228 end:0x800E522C
+
 unsorted/sweep_800E53A4.c:
 	.text       start:0x800E53A4 end:0x800E53C0
+
+unsorted/sweep_800E53E8.c:
+	.text       start:0x800E53E8 end:0x800E53F0
 
 unsorted/sweep_800E542C.c:
 	.text       start:0x800E542C end:0x800E5474
 
+unsorted/sweep_800E5708.c:
+	.text       start:0x800E5708 end:0x800E5714
+
+unsorted/sweep_800E5724.c:
+	.text       start:0x800E5724 end:0x800E572C
+
+unsorted/sweep_800E5908.c:
+	.text       start:0x800E5908 end:0x800E590C
+
+unsorted/sweep_800E5C84.c:
+	.text       start:0x800E5C84 end:0x800E5CA4
+
 unsorted/sweep_800E7A7C.c:
 	.text       start:0x800E7A7C end:0x800E7ABC
 
+unsorted/sweep_800E7F68.c:
+	.text       start:0x800E7F68 end:0x800E7F88
+
 unsorted/sweep_800E81B4.c:
 	.text       start:0x800E81B4 end:0x800E81C4
+
+unsorted/sweep_800E8904.c:
+	.text       start:0x800E8904 end:0x800E890C
+
+unsorted/sweep_800EADD8.c:
+	.text       start:0x800EADD8 end:0x800EADDC
+
+unsorted/sweep_800EAE6C.c:
+	.text       start:0x800EAE6C end:0x800EAE74
+
+unsorted/sweep_800EC550.c:
+	.text       start:0x800EC550 end:0x800EC558
 
 unsorted/sweep_800ED540.c:
 	.text       start:0x800ED540 end:0x800ED554
@@ -450,8 +1323,35 @@ unsorted/sweep_800ED6E8.c:
 unsorted/sweep_800ED8E0.c:
 	.text       start:0x800ED8E0 end:0x800ED908
 
+unsorted/sweep_800ED9A0.c:
+	.text       start:0x800ED9A0 end:0x800ED9AC
+
+unsorted/sweep_800EDE78.c:
+	.text       start:0x800EDE78 end:0x800EDE7C
+
+unsorted/sweep_800EE470.c:
+	.text       start:0x800EE470 end:0x800EE478
+
 unsorted/sweep_800EE8B0.c:
 	.text       start:0x800EE8B0 end:0x800EE8C4
+
+unsorted/sweep_800EF294.c:
+	.text       start:0x800EF294 end:0x800EF2B8
+
+unsorted/sweep_800EF834.c:
+	.text       start:0x800EF834 end:0x800EF83C
+
+unsorted/sweep_800F0818.c:
+	.text       start:0x800F0818 end:0x800F0820
+
+unsorted/sweep_800F0E18.c:
+	.text       start:0x800F0E18 end:0x800F0E20
+
+unsorted/sweep_800F102C.c:
+	.text       start:0x800F102C end:0x800F1034
+
+unsorted/sweep_800F1404.c:
+	.text       start:0x800F1404 end:0x800F1424
 
 unsorted/sweep_800F193C.c:
 	.text       start:0x800F193C end:0x800F194C
@@ -459,11 +1359,32 @@ unsorted/sweep_800F193C.c:
 unsorted/sweep_800F2664.c:
 	.text       start:0x800F2664 end:0x800F266C
 
+unsorted/sweep_800F2C2C.c:
+	.text       start:0x800F2C2C end:0x800F2C34
+
+unsorted/sweep_800F330C.c:
+	.text       start:0x800F330C end:0x800F3330
+
 unsorted/sweep_800F3410.c:
 	.text       start:0x800F3410 end:0x800F3438
 
+unsorted/sweep_800F37F8.c:
+	.text       start:0x800F37F8 end:0x800F3800
+
+unsorted/sweep_800F3C74.c:
+	.text       start:0x800F3C74 end:0x800F3C7C
+
+unsorted/sweep_800F4698.c:
+	.text       start:0x800F4698 end:0x800F46BC
+
 unsorted/sweep_800F475C.c:
 	.text       start:0x800F475C end:0x800F4784
+
+unsorted/sweep_800F4DB4.c:
+	.text       start:0x800F4DB4 end:0x800F4DBC
+
+unsorted/sweep_800F577C.c:
+	.text       start:0x800F577C end:0x800F57A0
 
 unsorted/sweep_800F5848.c:
 	.text       start:0x800F5848 end:0x800F5870
@@ -471,38 +1392,167 @@ unsorted/sweep_800F5848.c:
 unsorted/sweep_800F59CC.c:
 	.text       start:0x800F59CC end:0x800F59DC
 
+unsorted/sweep_800F5A88.c:
+	.text       start:0x800F5A88 end:0x800F5AAC
+
+unsorted/sweep_800F5D10.c:
+	.text       start:0x800F5D10 end:0x800F5D18
+
+unsorted/sweep_800F673C.c:
+	.text       start:0x800F673C end:0x800F6760
+
 unsorted/sweep_800F6820.c:
 	.text       start:0x800F6820 end:0x800F6848
+
+unsorted/sweep_800F6A00.c:
+	.text       start:0x800F6A00 end:0x800F6A08
 
 unsorted/sweep_800F6A34.c:
 	.text       start:0x800F6A34 end:0x800F6A60
 
+unsorted/sweep_800F6D0C.c:
+	.text       start:0x800F6D0C end:0x800F6D14
+
+unsorted/sweep_800F7C00.c:
+	.text       start:0x800F7C00 end:0x800F7C24
+
 unsorted/sweep_800F7D8C.c:
 	.text       start:0x800F7D8C end:0x800F7DA4
+
+unsorted/sweep_800F7ED8.c:
+	.text       start:0x800F7ED8 end:0x800F7EF8
+
+unsorted/sweep_800F80A0.c:
+	.text       start:0x800F80A0 end:0x800F80A8
+
+unsorted/sweep_800F9824.c:
+	.text       start:0x800F9824 end:0x800F9844
+
+unsorted/sweep_800F9BF8.c:
+	.text       start:0x800F9BF8 end:0x800F9C00
+
+unsorted/sweep_800FA2C8.c:
+	.text       start:0x800FA2C8 end:0x800FA2D0
+
+unsorted/sweep_800FA994.c:
+	.text       start:0x800FA994 end:0x800FA998
+
+unsorted/sweep_800FD6A0.c:
+	.text       start:0x800FD6A0 end:0x800FD6A4
 
 unsorted/sweep_800FDF38.c:
 	.text       start:0x800FDF38 end:0x800FDF60
 
+unsorted/sweep_800FE8A0.c:
+	.text       start:0x800FE8A0 end:0x800FE8A8
+
+unsorted/sweep_800FEC78.c:
+	.text       start:0x800FEC78 end:0x800FEC80
+
+unsorted/sweep_800FF604.c:
+	.text       start:0x800FF604 end:0x800FF60C
+
+unsorted/sweep_800FFDB0.c:
+	.text       start:0x800FFDB0 end:0x800FFDB8
+
 unsorted/sweep_801000E8.c:
 	.text       start:0x801000E8 end:0x80100128
+
+unsorted/sweep_80100C00.c:
+	.text       start:0x80100C00 end:0x80100C08
+
+unsorted/sweep_80101CD8.c:
+	.text       start:0x80101CD8 end:0x80101CFC
+
+unsorted/sweep_80101EDC.c:
+	.text       start:0x80101EDC end:0x80101EE8
+
+unsorted/sweep_80101F70.c:
+	.text       start:0x80101F70 end:0x80101F94
+
+unsorted/sweep_801020BC.c:
+	.text       start:0x801020BC end:0x801020C0
 
 unsorted/sweep_80102134.c:
 	.text       start:0x80102134 end:0x8010217C
 
+unsorted/sweep_801021FC.c:
+	.text       start:0x801021FC end:0x80102204
+
+unsorted/sweep_80102308.c:
+	.text       start:0x80102308 end:0x80102310
+
+unsorted/sweep_801025F4.c:
+	.text       start:0x801025F4 end:0x801025FC
+
+unsorted/sweep_80102AC4.c:
+	.text       start:0x80102AC4 end:0x80102AC8
+
 unsorted/sweep_80103B4C.c:
 	.text       start:0x80103B4C end:0x80103B8C
+
+unsorted/sweep_80103BB4.c:
+	.text       start:0x80103BB4 end:0x80103BC0
+
+unsorted/sweep_80105240.c:
+	.text       start:0x80105240 end:0x80105264
 
 unsorted/sweep_80105404.c:
 	.text       start:0x80105404 end:0x80105494
 
+unsorted/sweep_80105C00.c:
+	.text       start:0x80105C00 end:0x80105C0C
+
+unsorted/sweep_80105EFC.c:
+	.text       start:0x80105EFC end:0x80105F00
+
 unsorted/sweep_80107994.c:
 	.text       start:0x80107994 end:0x8010799C
+
+unsorted/sweep_80107BA4.c:
+	.text       start:0x80107BA4 end:0x80107BA8
+
+unsorted/sweep_80107C30.c:
+	.text       start:0x80107C30 end:0x80107C3C
+
+unsorted/sweep_801088A4.c:
+	.text       start:0x801088A4 end:0x801088C8
+
+unsorted/sweep_801089BC.c:
+	.text       start:0x801089BC end:0x801089DC
+
+unsorted/sweep_80109430.c:
+	.text       start:0x80109430 end:0x80109458
+
+unsorted/sweep_801094FC.c:
+	.text       start:0x801094FC end:0x80109500
+
+unsorted/sweep_80109734.c:
+	.text       start:0x80109734 end:0x80109738
+
+unsorted/sweep_80109760.c:
+	.text       start:0x80109760 end:0x80109780
 
 unsorted/sweep_8010988C.c:
 	.text       start:0x8010988C end:0x801098B0
 
+unsorted/sweep_80109DDC.c:
+	.text       start:0x80109DDC end:0x80109DE0
+
 unsorted/sweep_8010A3A4.c:
 	.text       start:0x8010A3A4 end:0x8010A3C8
+
+unsorted/sweep_8010A780.c:
+	.text       start:0x8010A780 end:0x8010A788
+
+unsorted/sweep_8010AD10.c:
+	.text       start:0x8010AD10 end:0x8010AD18
+
+unsorted/sweep_8010BC64.c:
+	.text       start:0x8010BC64 end:0x8010BC94
+
+unsorted/sweep_8010C714.c:
+	.text       start:0x8010C714 end:0x8010C718
 
 unsorted/sweep_8010C73C.c:
 	.text       start:0x8010C73C end:0x8010C764
@@ -513,17 +1563,65 @@ unsorted/sweep_8010C8B8.c:
 unsorted/sweep_8010C934.c:
 	.text       start:0x8010C934 end:0x8010C978
 
+unsorted/sweep_8010D230.c:
+	.text       start:0x8010D230 end:0x8010D250
+
 unsorted/sweep_8010D32C.c:
 	.text       start:0x8010D32C end:0x8010D33C
+
+unsorted/sweep_8010EF80.c:
+	.text       start:0x8010EF80 end:0x8010EF8C
 
 unsorted/sweep_8010F52C.c:
 	.text       start:0x8010F52C end:0x8010F574
 
+unsorted/sweep_8010F7D8.c:
+	.text       start:0x8010F7D8 end:0x8010F7E4
+
+unsorted/sweep_8010FBC4.c:
+	.text       start:0x8010FBC4 end:0x8010FBCC
+
+unsorted/sweep_80110178.c:
+	.text       start:0x80110178 end:0x80110180
+
 unsorted/sweep_80110450.c:
 	.text       start:0x80110450 end:0x80110468
 
+unsorted/sweep_801104A0.c:
+	.text       start:0x801104A0 end:0x801104AC
+
+unsorted/sweep_80110A1C.c:
+	.text       start:0x80110A1C end:0x80110A24
+
+unsorted/sweep_80112438.c:
+	.text       start:0x80112438 end:0x8011243C
+
+unsorted/sweep_80112964.c:
+	.text       start:0x80112964 end:0x8011296C
+
+unsorted/sweep_80113840.c:
+	.text       start:0x80113840 end:0x80113844
+
+unsorted/sweep_8011387C.c:
+	.text       start:0x8011387C end:0x8011389C
+
+unsorted/sweep_801138E8.c:
+	.text       start:0x801138E8 end:0x801138EC
+
+unsorted/sweep_80113A7C.c:
+	.text       start:0x80113A7C end:0x80113A9C
+
+unsorted/sweep_80113B14.c:
+	.text       start:0x80113B14 end:0x80113B34
+
+unsorted/sweep_80113BAC.c:
+	.text       start:0x80113BAC end:0x80113BCC
+
 unsorted/sweep_80113E54.c:
 	.text       start:0x80113E54 end:0x80113E60
+
+unsorted/sweep_8011407C.c:
+	.text       start:0x8011407C end:0x80114080
 
 unsorted/sweep_80116540.c:
 	.text       start:0x80116540 end:0x80116598
@@ -531,17 +1629,68 @@ unsorted/sweep_80116540.c:
 unsorted/sweep_801165A0.c:
 	.text       start:0x801165A0 end:0x801165B0
 
+unsorted/sweep_80116DD4.c:
+	.text       start:0x80116DD4 end:0x80116DD8
+
+unsorted/sweep_801170EC.c:
+	.text       start:0x801170EC end:0x8011710C
+
+unsorted/sweep_80117180.c:
+	.text       start:0x80117180 end:0x80117188
+
+unsorted/sweep_80117DE0.c:
+	.text       start:0x80117DE0 end:0x80117DE8
+
 unsorted/sweep_8011C054.c:
 	.text       start:0x8011C054 end:0x8011C068
 
+unsorted/sweep_8011C84C.c:
+	.text       start:0x8011C84C end:0x8011C850
+
 unsorted/sweep_8011D268.c:
 	.text       start:0x8011D268 end:0x8011D280
+
+unsorted/sweep_8011D858.c:
+	.text       start:0x8011D858 end:0x8011D878
+
+unsorted/sweep_8011E3B0.c:
+	.text       start:0x8011E3B0 end:0x8011E3B4
+
+unsorted/sweep_801202F8.c:
+	.text       start:0x801202F8 end:0x80120304
+
+unsorted/sweep_80120D68.c:
+	.text       start:0x80120D68 end:0x80120D74
+
+unsorted/sweep_801213F0.c:
+	.text       start:0x801213F0 end:0x801213F4
+
+unsorted/sweep_8012214C.c:
+	.text       start:0x8012214C end:0x80122150
+
+unsorted/sweep_80122488.c:
+	.text       start:0x80122488 end:0x80122494
+
+unsorted/sweep_80122630.c:
+	.text       start:0x80122630 end:0x80122654
+
+unsorted/sweep_80122868.c:
+	.text       start:0x80122868 end:0x8012288C
 
 unsorted/sweep_8012408C.c:
 	.text       start:0x8012408C end:0x801240A8
 
 unsorted/sweep_801241AC.c:
 	.text       start:0x801241AC end:0x80124238
+
+unsorted/sweep_80124814.c:
+	.text       start:0x80124814 end:0x80124838
+
+unsorted/sweep_80125520.c:
+	.text       start:0x80125520 end:0x80125528
+
+unsorted/sweep_801255F8.c:
+	.text       start:0x801255F8 end:0x80125600
 
 unsorted/sweep_80125694.c:
 	.text       start:0x80125694 end:0x801256B8
@@ -555,8 +1704,17 @@ unsorted/sweep_80125910.c:
 unsorted/sweep_801260B8.c:
 	.text       start:0x801260B8 end:0x801260C0
 
+unsorted/sweep_80126130.c:
+	.text       start:0x80126130 end:0x80126150
+
+unsorted/sweep_8012632C.c:
+	.text       start:0x8012632C end:0x80126334
+
 unsorted/sweep_80126418.c:
 	.text       start:0x80126418 end:0x8012645C
+
+unsorted/sweep_80126E68.c:
+	.text       start:0x80126E68 end:0x80126E88
 
 unsorted/sweep_80126F7C.c:
 	.text       start:0x80126F7C end:0x80126F84
@@ -566,6 +1724,12 @@ unsorted/sweep_8012C83C.c:
 
 unsorted/sweep_8012CCC0.c:
 	.text       start:0x8012CCC0 end:0x8012CCD8
+
+unsorted/sweep_8012D7F0.c:
+	.text       start:0x8012D7F0 end:0x8012D7F8
+
+unsorted/sweep_8012E818.c:
+	.text       start:0x8012E818 end:0x8012E820
 
 dolphin/vi.c:
 	.text       start:0x8012E950 end:0x8013042C
@@ -594,8 +1758,23 @@ dolphin/ar/ar.c:
 dolphin/ar/arq.c:
 	.text       start:0x8013538C end:0x80135728
 
+unsorted/sweep_80136064.c:
+	.text       start:0x80136064 end:0x8013606C
+
+unsorted/sweep_80136980.c:
+	.text       start:0x80136980 end:0x8013698C
+
+unsorted/sweep_801369E4.c:
+	.text       start:0x801369E4 end:0x801369F0
+
 unsorted/sweep_80136DF4.c:
 	.text       start:0x80136DF4 end:0x80136E08
+
+unsorted/sweep_801372C0.c:
+	.text       start:0x801372C0 end:0x801372C8
+
+unsorted/sweep_80137C2C.c:
+	.text       start:0x80137C2C end:0x80137C38
 
 dolphin/PPCArch.c:
 	.text       start:0x801393D0 end:0x801394C0
@@ -621,6 +1800,9 @@ dolphin/dvd/dvdlow.c:
 
 dolphin/dvd/dvdfs.c:
 	.text       start:0x8013AF10 end:0x8013B3C4
+
+unsorted/sweep_8013B3C4.c:
+	.text       start:0x8013B3C4 end:0x8013B3C8
 
 dolphin/dvd/dvd.c:
 	.text       start:0x8013B3C8 end:0x8013DCB4
@@ -649,6 +1831,9 @@ dolphin/gx/GXInit.c:
 
 dolphin/gx/GXFifo.c:
 	.text       start:0x8013F57C end:0x8013FF30
+
+unsorted/sweep_8013FF30.c:
+	.text       start:0x8013FF30 end:0x8013FF38
 
 dolphin/gx/GXAttr.c:
 	.text       start:0x8013FF38 end:0x801410A8
@@ -692,6 +1877,9 @@ dolphin/gx/GXTransform.c:
 dolphin/gx/GXPerf.c:
 	.text       start:0x80145140 end:0x80145998
 	.data       start:0x8019A430 end:0x8019A520
+
+unsorted/sweep_80145B1C.c:
+	.text       start:0x80145B1C end:0x80145B24
 
 dolphin/mtx/mtx.c:
 	.text       start:0x80147B94 end:0x80147DB0
@@ -747,6 +1935,9 @@ dolphin/os/OSRtc.c:
 
 dolphin/os/OSSync.c:
 	.text       start:0x8014C9FC end:0x8014CA80
+
+unsorted/sweep_8014CA80.c:
+	.text       start:0x8014CA80 end:0x8014CA84
 
 dolphin/os/OSThread.c:
 	.text       start:0x8014CA84 end:0x8014E48C
@@ -812,6 +2003,9 @@ runtime/sscanf.c:
 
 runtime/string.c:
 	.text       start:0x8015A5F4 end:0x8015A8D0
+
+unsorted/sweep_8015C120.c:
+	.text       start:0x8015C120 end:0x8015C128
 
 runtime/wchar_io.c:
 	.text       start:0x8015C1F8 end:0x8015C280
@@ -981,6 +2175,18 @@ MetroTRK/gdev/main.c:
 
 MetroTRK/MWTrace.c:
 	.text       start:0x80165480 end:0x801654D0
+
+unsorted/sweep_801654D0.c:
+	.text       start:0x801654D0 end:0x801654F4
+
+unsorted/sweep_80165524.c:
+	.text       start:0x80165524 end:0x80165528
+
+unsorted/sweep_80165C6C.c:
+	.text       start:0x80165C6C end:0x80165C74
+
+unsorted/sweep_80169B28.c:
+	.text       start:0x80169B28 end:0x80169B30
 
 unsorted/sweep_80169B3C.c:
 	.text       start:0x80169B3C end:0x80169B4C
