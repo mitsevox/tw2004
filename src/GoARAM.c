@@ -288,7 +288,7 @@ void fn_800B62DC(void) {
 
     ARInit(NULL, 0);
     uBase = ARGetBaseAddress();
-    uEnd = fn_80133B18();
+    uEnd = ARGetSize();
     lbl_802814C8->pHeapMem = fn_800951A0(sizeof(ARAMHeap) + ARAM_NUM_BLOCKS * sizeof(ARAMBlock), 16, 1);
     lbl_802814C8->pHeap = fn_800B5C40(uEnd - uBase, uBase, ARAM_NUM_BLOCKS, lbl_802814C8->pHeapMem);
     lbl_802814C8->p8 = fn_800951A0(ARAM_NUM_TRANSFERS * sizeof(ARAMTransfer), 16, 1);

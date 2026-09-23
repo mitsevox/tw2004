@@ -47,7 +47,7 @@ LAYOUT_ASSERT(ARQRequest, 0x20);
 
 u32  ARInit(u32* pStack, u32 nEntries);
 u32  ARGetBaseAddress(void);
-u32  fn_80133B18(void);         // the end of the ARAM GoARAM.c manages
+u32  ARGetSize(void);           // the ARAM's size, so the end of the ARAM GoARAM.c manages
 void ARQPostRequest(ARQRequest* pRequest, u32 uOwner, u32 uType, u32 uPriority, u32 uSource, u32 uDest,
                     u32 uLength, void (*pfnCallback)(ARQRequest* pRequest));
 void ARQRemoveRequest(ARQRequest* pRequest);
