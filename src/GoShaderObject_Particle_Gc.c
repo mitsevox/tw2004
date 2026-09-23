@@ -1,5 +1,8 @@
-// GoShaderObject_Particle_Gc.c (EA's name, from its asserts; also in EA's 2002 source tree): not
-// yet decompiled; the sweep code below is the matched small functions.
+// GoShaderObject_Particle_Gc.c (EA's name, from its asserts; also in EA's 2002 source tree): the
+// particle shader's buffers and drawing, and at its end the game's main-memory heap (made from the
+// OS arena by fn_80095108) and the stopwatches the main loop times its frames with. The heap and
+// the stopwatches are this file's by their data: its .sdata (0x802813A8-0x802813B8) and .sbss
+// (0x80281F58-0x80281F70). Where it ends between 0x8009554C and char_state.c is not proven.
 
 #include "engine.h"
 
