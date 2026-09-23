@@ -21,7 +21,12 @@ void fn_80093AE0(Ball* pBall, int nPlayer);    // GoObjShadow.c
 void fn_80048584(UObject* pObj, s8 nLod);
 void fn_8000ADC0(f32 (*pMtx)[4]);                   // identity
 int  fn_800636EC(void);
-void fn_8000C5A4(f32 (*pMtx)[4]);void fn_80047290(void);
+void fn_8004858C(f32* pOut, f32 fTurn, f32 fTilt);
+void fn_8000C5A4(f32 (*pMtx)[4]);
+void fn_8000A194(f32 (*pMtx)[4], f32 a, f32 b, f32 c);  // a rotation matrix from three angles
+void fn_8000A0E8(f32 (*pSrc)[4], f32 (*pDst)[4]);
+void fn_800BADF8(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
+void fn_80047290(void);
 void fn_8004731C(u8* pState);
 void fn_80047C24(int nPlayer);
 void fn_80048184(int nPlayer);
@@ -314,7 +319,56 @@ void fn_80046B8C(int nView) {
     }
 }
 
-// ---- 0x80046C34..0x80046FDC: not yet decompiled ----
+// ---- 0x80046C34..0x80046E1C: not yet decompiled ----
+
+// Puts the player's 'TEO ' 10001 object on the ground at pPos, turned to the player's aim; the
+// first time it is made (a type 0 object, flags 0xC00).
+void fn_80046E1C(f32* pPos, int nPlayer) {
+    f32 mTurn[4][4];
+    f32 mObj[4][4];
+    DynObjDef def;
+    DynObjSetup setup;
+    DynObjModel model;
+    f32 vPos[4];
+    f32 vNormal[4];
+    SurfaceType* pSurface;
+    f32 fGround;
+    s32 nId;
+
+    vPos[0] = pPos[0];
+    vPos[1] = pPos[1];
+    vPos[2] = pPos[2];
+    vPos[3] = 1.0f;
+    fGround = Ter_GetSupportingGroundData(fn_8000C594(), vPos, &pSurface, vNormal);
+    if (lbl_80281DA0->apPlayer[nPlayer] == NULL) {
+        // EA bug: def.n1A is never set, and type 0's setup copies it to DynObj.n14E
+        vPos[1] = 0.01f + fGround;
+        def.n0 = 0;
+        def.n4 = 0;
+        def.aPos[0] = vPos[0];
+        def.aPos[1] = vPos[1];
+        def.aPos[2] = vPos[2];
+        def.u14 = 0xC00;
+        def.n18 = 0;
+        setup.pDef = &def;
+        setup.pModel = &model;
+        model.aEntries[0].uType = 'TEO ';
+        setup.pModel->aEntries[0].u.pRef = (DynObjModelRef*)fn_8000B70C('TEO ', 10001);
+        setup.pfnHandler = fn_800499B0(setup.pDef->n4);
+        setup.pC = NULL;
+        nId = fn_800490B8(&setup);
+        if (nId != -2) {
+            lbl_80281DA0->apPlayer[nPlayer] = fn_80048E4C(nId);
+        }
+    }
+    fn_8000ADC0(mTurn);
+    fn_8000ADC0(lbl_80281DA0->apPlayer[nPlayer]->obj.m0);
+    fn_8000A194(mTurn, -gPlayers[nPlayer].fAim, 0.0f, 0.0f);
+    fn_800BADF8(lbl_80281DA0->apPlayer[nPlayer]->obj.m0, mTurn, mObj, 4);
+    fn_8000A0E8(mObj, lbl_80281DA0->apPlayer[nPlayer]->obj.m0);
+    Vec_Copy(vPos, lbl_80281DA0->apPlayer[nPlayer]->obj.m80[3]);
+    fn_8000C5A4(lbl_80281DA0->apPlayer[nPlayer]->obj.m0);
+}
 
 // Draws a 'TEO ' model (10006 + the target's kind) at each target of the target games.
 void fn_80046FDC(int nView) {
@@ -484,6 +538,35 @@ int fn_80048574(Character* pChar, u64 uEvent) {
 // Sets the level of detail the object is drawn with.
 void fn_80048584(UObject* pObj, s8 nLod) {
     pObj->n104 = nLod;
+}
+
+// A direction (x, y, z, 0): straight up tilted by fTilt, towards the heading fTurn.
+void fn_8004858C(f32* pOut, f32 fTurn, f32 fTilt) {
+    f32 fSinTilt;
+    f32 fCosTilt;
+    f32 fSinTurn;
+    f32 fCosTurn;
+
+    if (0.0f == fTilt) {
+        pOut[1] = 1.0f;
+        pOut[2] = 0.0f;
+        pOut[0] = 0.0f;
+    } else {
+        fSinTilt = fn_800095F0(fTilt);
+        fCosTilt = fn_80009638(fTilt);
+        if (0.0f == fTurn) {
+            pOut[0] = 0.0f;
+            pOut[1] = fCosTilt;
+            pOut[2] = fSinTilt;
+        } else {
+            fSinTurn = fn_800095F0(fTurn);
+            fCosTurn = fn_80009638(fTurn);
+            pOut[1] = fCosTilt;
+            pOut[0] = fSinTilt * fSinTurn;
+            pOut[2] = fSinTilt * fCosTurn;
+        }
+    }
+    pOut[3] = 0.0f;
 }
 
 // a - b into out (three floats)

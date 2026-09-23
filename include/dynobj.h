@@ -23,8 +23,14 @@ typedef struct DynObjDef {
     u8   n18;                   // 0x18  -> DynObj.n147 (type 0)
     u8   unk19;
     s16  n1A;                   // 0x1A  -> DynObj.n14E
-    f32  f1C;                   // 0x1C  type 2: its turning speed, degrees a second
 } DynObjDef;
+LAYOUT_ASSERT(DynObjDef, 0x1C);     // GoDynObj.c builds one on the stack: 0x1C bytes there
+
+// Type 2's definition: a DynObjDef and its turning speed.
+typedef struct DynObjTurningDef {
+    DynObjDef base;             // 0x00
+    f32  fSpeed;                // 0x1C  degrees a second
+} DynObjTurningDef;
 
 // The stream object an object's model comes from (a view of UStreamObject: its +4 is the model).
 typedef struct DynObjModelRef {

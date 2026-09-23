@@ -146,10 +146,10 @@ DynObjHandler fn_800499B0(int nType) {
 }
 
 void fn_80049A14(DynObjTurning* pObj, DynObjSetup* pSetup) {
-    DynObjDef* pDef = pSetup->pDef;
+    DynObjTurningDef* pDef = (DynObjTurningDef*)pSetup->pDef;
 
     fn_80049514(&pObj->base, pSetup);
-    pObj->fSpeed = pDef->f1C;
+    pObj->fSpeed = pDef->fSpeed;
 }
 
 // Turn by fSpeed degrees a second, a frame being 1/60 s.
