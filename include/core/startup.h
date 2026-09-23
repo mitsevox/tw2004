@@ -12,7 +12,12 @@
 
 // ---- the GameCube libraries (port: GameCube only) ---------------------------------------------
 
-typedef struct AXVPB AXVPB;             // a hardware voice (AX); only its address is used here
+// A hardware voice (AX): only the fields this code touches.
+typedef struct AXVPB {
+    u8   unk0[0x1B2];
+    u16  n1B2;                  // 0x1B2  } where the voice is playing, in 4-bit units, as two
+    u16  n1B4;                  // 0x1B4  } halves (Voice.u14 is copied here when it starts)
+} AXVPB;
 
 int    OSDisableInterrupts(void);       // returns whether interrupts were on
 int    OSRestoreInterrupts(int bEnabled);
@@ -135,6 +140,9 @@ extern u32   lbl_80282108;      // the blocks' ARAM address
 extern void* lbl_8028210C;      // the heap's bookkeeping (0x2A4 bytes)
 extern u8    lbl_80282110;      // set when that DMA is done
 
+// DMA nLen bytes from main memory to ARAM; pfnDone is called when it is done. Returns 1.
+int fn_800B044C(u32 uAram, void* pSrc, int nLen, void (*pfnDone)(void), int n);
+
 // ---- the built-in sounds ----------------------------------------------------------------------
 
 // One of the two sounds in startUp.c's own data, copied to ARAM at boot (fn_800B07A0).
@@ -152,8 +160,22 @@ extern u16   lbl_80282118;      // the next voice fn_800B0858 plays on
 
 // ---- the rest ---------------------------------------------------------------------------------
 
-extern s32   lbl_80281498;      // } where fn_800B13FC's search stopped; -1 to start again
+// The memory-card status table: for each of the two card slots, lbl_80282138[slot] entries
+// (always 1), each with the status fn_800B09C8 read (lbl_80282150), the status last reported
+// (lbl_80282148) and whether it has been reported (lbl_80282140).
+#define NUM_CARD_SLOTS 2
+extern s32   lbl_80282138[NUM_CARD_SLOTS];
+extern s32   lbl_80282140[NUM_CARD_SLOTS][1];
+extern s32   lbl_80282148[NUM_CARD_SLOTS][1];
+extern s32   lbl_80282150[NUM_CARD_SLOTS][1];
+extern s32   lbl_80281498;      // } the entry and slot the reports reached; -1 to start again
 extern s32   lbl_8028149C;      // }
 extern u8    lbl_802814A0;
+extern u8    lbl_80282120;      // fn_800B0960 keeps a memory-card result here
+extern s32   lbl_80282124;      // how many 'LEGL' objects fn_800B166C has kept (it keeps two)
+extern u32   lbl_80282128;      // the second one's size
+extern u32   lbl_8028212C;      // the first one's size
+extern void* lbl_80282130;      // the second one's copy
+extern void* lbl_80282134;      // the first one's copy
 
 #endif
