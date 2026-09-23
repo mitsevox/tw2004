@@ -3642,23 +3642,8 @@ GameModeMatch.c:
 GameMode5.c:
 	.text       start:0x800EACD8 end:0x800ED738
 
-unsorted/sweep_800ED890.c:
-	.text       start:0x800ED890 end:0x800ED8E0
-
-unsorted/sweep_800ED8E0.c:
-	.text       start:0x800ED8E0 end:0x800ED908
-
-unsorted/sweep_800ED974.c:
-	.text       start:0x800ED974 end:0x800ED9A0
-
-unsorted/sweep_800ED9A0.c:
-	.text       start:0x800ED9A0 end:0x800ED9AC
-
-unsorted/sweep_800EDA08.c:
-	.text       start:0x800EDA08 end:0x800EDA34
-
-unsorted/sweep_800EDA34.c:
-	.text       start:0x800EDA34 end:0x800EDA74
+GameMode9.c:
+	.text       start:0x800ED738 end:0x800EDD18
 
 unsorted/sweep_800EDE78.c:
 	.text       start:0x800EDE78 end:0x800EDE7C

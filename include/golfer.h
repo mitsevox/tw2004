@@ -275,7 +275,10 @@ typedef struct Player {
     f32  fA64;                  // 0xA64  a distance, set when a swing state 16 begins
     s32  nSurface;              // 0xA68  surface type under the target, -1 none, 16 water. TW06: targetedSurfaceID
     f32  vPlacement[4];         // 0xA6C  where the ball may be placed (swing state 22)
-    u8   unkA7C[0xA90 - 0xA7C];
+    f32  fA7C;                  // 0xA7C  pad stick x, -1..1 (GameMode9 fn_800EDAE0)
+    f32  fA80;                  // 0xA80
+    f32  fA84;                  // 0xA84
+    u8   unkA88[0xA90 - 0xA88];
     u8   ball[0x68];            // 0xA90  the player's Ball (0xBC bytes, see Ball.c) - nLie is its +0x68
     s32  nLie;                  // 0xAF8
     u8   unkAFC[0xB24 - 0xAFC];
