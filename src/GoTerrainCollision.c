@@ -60,7 +60,9 @@ f32 Ter_CalcLowestPlayableWorldHeight(CourseInfo* pCourse) {
             for (k = 0; k < pRef->nTris + 2; k++) {
                 if ((k <= pRef->nTris + 1 && (pFlags[0] & 7)) || (k <= pRef->nTris && (pFlags[1] & 7))
                     || (k <= pRef->nTris - 1 && (pFlags[2] & 7))) {
-                    if (pVert[1] < fLowest) fLowest = pVert[1];
+                    if (pVert[1] < fLowest) {
+                        fLowest = pVert[1];
+                    }
                 }
                 pVert += 3;
                 pFlags++;
@@ -95,7 +97,9 @@ f32 Ter_GetSupportingGroundData(CourseInfo* pCourse, f32* pPos, SurfaceType** pp
         fn_8005097C(vB, vC, vBC);
         vec4flt_CrossProduct(vAB, vBC, pNormal);
         fn_800BAF04(pNormal, pNormal);
-        if (pNormal[1] < 0.0f) fn_800509A0(pNormal, pNormal);
+        if (pNormal[1] < 0.0f) {
+            fn_800509A0(pNormal, pNormal);
+        }
         *ppSurface = &gSurfaceTypes[pRef->nSurface];
     } else {
         *ppSurface = NULL;
