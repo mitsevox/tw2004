@@ -298,7 +298,9 @@ typedef struct Player {
     s32  nBallSurface;          // 0xB04  the ball's nSurface (Ball + 0x74)
     u8   unkB08[4];
     void* pBallCourse;          // 0xB0C  the ball's pCourse (Ball + 0x7C)
-    u8   unkB10[0xB24 - 0xB10];
+    u8   unkB10[0xB18 - 0xB10];
+    struct SurfaceType* pBallHitSurface;   // 0xB18  the ball's pHitSurface (Ball + 0x88)
+    u8   unkB1C[0xB24 - 0xB1C];
     s32  nBallOwner;            // 0xB24  the ball's nPlayer (Ball + 0x94)
     u8   unkB28[0xB4C - 0xB28];
     f32  vOrient[4];            // 0xB4C  a quaternion, identity at setup. TW06: ballRot
@@ -337,7 +339,7 @@ typedef struct Player {
     u8   unkCBC[0xCD0 - 0xCBC];
     s32  nCD0;                  // 0xCD0  cleared per game (fn_800F2030)
     s32  aCD4[20];              // 0xCD4
-    u8   unkD24[4];
+    s32  nD24;                  // 0xD24  mode 12: a bonus meter, 0..100
     s32  nD28[18];              // 0xD28  per hole
     s32  nD70[18];              // 0xD70  per hole
     s32  nDB8;                  // 0xDB8

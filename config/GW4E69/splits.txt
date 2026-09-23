@@ -3603,12 +3603,17 @@ GameMode8.c:
 
 GameModeStableford.c:
 	.text       start:0x800FE1B4 end:0x800FEAFC
+	.rodata     start:0x80184DE0 end:0x80184DF0
+	.sdata2     start:0x802847A0 end:0x802847A8
 
 GameMode12.c:
 	.text       start:0x800FEAFC end:0x800FF700
+	.data       start:0x80192D00 end:0x80192D1C
+	.sdata2     start:0x802847A8 end:0x802847E0
 
 GameModeStroke.c:
 	.text       start:0x800FF700 end:0x800FFF34
+	.sdata2     start:0x802847E0 end:0x802847E8
 
 GameMode11.c:
 	.text       start:0x800FFF34 end:0x80101FEC
