@@ -1,5 +1,7 @@
-// LLDynTex.c (EA's name, from its asserts): not yet decompiled; the sweep code below is the matched
-// small functions.
+// FE_CrAPMessages.c (our name, after EA's FE_PGATourMessages.c): the Create-A-Player screens'
+// message handlers, registered in the front end's message table (FE_MessageTable.c). They read
+// and set the golfer being created through the Create-A-Player database (FE_CrAPDB.c), the logo
+// editor (FE_LogoDesign.c) and the menu golfer (FEgolferanim.c).
 
 #include "game_types.h"
 

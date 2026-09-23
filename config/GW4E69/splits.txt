@@ -1574,7 +1574,7 @@ unsorted/sweep_80108B84.c:
 unsorted/sweep_80108E4C.c:
 	.text       start:0x80108E4C end:0x80108E9C
 
-LLDynTex.c:
+FE_CrAPMessages.c:
 	.text       start:0x80109120 end:0x80109EAC
 
 unsorted/sweep_80109EAC.c:
