@@ -716,7 +716,7 @@ typedef struct GameOptions {
 
 // A player's profile block at gSession + 0xD38, 0x40 each.
 typedef struct PlayerProfile {
-    u8   unk0;                  // 0x00
+    s8   n0;                    // 0x00  0..3; bumped for a CPU opponent playing the same golfer (GameMode5)
     u8   unk1;                  // 0x01
     u8   unk2;                  // 0x02
     u8   unk3[5];

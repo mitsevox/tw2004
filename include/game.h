@@ -203,6 +203,43 @@ u8   fn_800EA758(u8 bCheck);
 void fn_800EAA40(void);
 int  fn_800EAC94(int n);
 
+// GameMode5.c: one challenge of game mode 5 (0x80 bytes); lbl_80281664 points to the list.
+typedef struct Challenge {
+    s32 n0;
+    s32 n4;
+    s32 nGroup;                 // 0x08  challenges with the same group are played together
+    s32 nMode;                  // 0x0C  the game mode it is played as (fn_800E0B38)
+    s32 nCourse;                // 0x10
+    s32 nType;                  // 0x14  0 one hole, 1 all 18, 2/3 a nine, 4/5/6 the par 5s/4s/3s
+    s32 nHole;                  // 0x18  1-based
+    s32 nTeeSet;                // 0x1C  for every player
+    s32 n20;                    // 0x20  1 + the value for gSession.unk5B38 and the pins (0: none)
+    s32 uClubs;                 // 0x24  the bag (bits, see fn_800EBEF0); 0 = the golfer's own
+    s32 nOpponents;             // 0x28  CPU players, 0..3
+    s32 aOpponent[3];           // 0x2C  their golfers
+    u8  unk38[0x3C - 0x38];
+    s32 nTargetKind;            // 0x3C  how the target is built (see fn_800ED028)
+    s32 nTargetBase;            // 0x40
+    s32 nHoleKind;              // 0x44  what the challenge hole adds
+    s32 nHoleExtra;             // 0x48
+    u8  bPlaceBall;             // 0x4C  the ball starts at the spot in lbl_80203170
+    u8  b4D;                    // 0x4D  f54 goes to fn_800ED6F8
+    u8  unk4E[2];
+    s32 nWind;                  // 0x50  the wind option while it is played
+    f32 f54;                    // 0x54
+    s32 nScoring;               // 0x58  0 the round's totals, 1 this hole
+    // Three medals (0 the best): the rule (0 none, see fn_800EC558), its mark, the reward.
+    s32 bMedal2;                // 0x5C  medal 0's rule (named by fn_800ECA34's index: 2)
+    s32 n60;                    //       its mark
+    s32 n64;                    //       its reward
+    s32 bMedal1;                // 0x68  medal 1
+    s32 n6C;
+    s32 n70;
+    s32 bMedal0;                // 0x74  medal 2
+    s32 n78;
+    s32 n7C;
+} Challenge;
+
 // GameMode5.c
 void fn_800EADD8(void);
 void fn_800EAE38(s32 a);
