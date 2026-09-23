@@ -1869,38 +1869,11 @@ FEgolferanim.c:
 unsorted/sweep_8008EBB4.c:
 	.text       start:0x8008EBB4 end:0x8008EC0C
 
-unsorted/sweep_8008EC60.c:
-	.text       start:0x8008EC60 end:0x8008EC68
-
 uiLoadFile.c:
-	.text       start:0x8008EC68 end:0x8008F310
-
-unsorted/sweep_8008F354.c:
-	.text       start:0x8008F354 end:0x8008F35C
-
-unsorted/sweep_8008F35C.c:
-	.text       start:0x8008F35C end:0x8008F39C
-
-unsorted/sweep_8008F39C.c:
-	.text       start:0x8008F39C end:0x8008F3A4
-
-unsorted/sweep_8008F644.c:
-	.text       start:0x8008F644 end:0x8008F648
+	.text       start:0x8008EC30 end:0x8008F39C
 
 uiProcessInterface.c:
-	.text       start:0x8008F648 end:0x800907AC
-
-unsorted/sweep_80090890.c:
-	.text       start:0x80090890 end:0x80090898
-
-unsorted/sweep_80090898.c:
-	.text       start:0x80090898 end:0x800908BC
-
-unsorted/sweep_800908BC.c:
-	.text       start:0x800908BC end:0x800908D4
-
-unsorted/sweep_800908D4.c:
-	.text       start:0x800908D4 end:0x80090940
+	.text       start:0x8008F39C end:0x80090940
 
 unsorted/sweep_80091454.c:
 	.text       start:0x80091454 end:0x80091460
