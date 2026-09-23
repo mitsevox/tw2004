@@ -2,11 +2,8 @@
 // fairways, greens) and the loading-screen tip that quotes one of them.
 
 #include "golfer.h"
+#include "game.h"
 
-u8    fn_800EC550(void);
-u32   Rand_Next(int nStream);
-int   Game_CurHoleIndex(void);
-int   fn_800D2AD8(int nHole);               // a hole's par
 extern u8 gNumPlayersSetUp;                 // 0x80281D48 (Golfer.c)
 extern u8 lbl_80203138[14];                 // the tips already shown (GameMessages.c)
 

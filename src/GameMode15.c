@@ -3,8 +3,11 @@
 // makes you the leader. Five letters and you are out; the last player in wins.
 
 #include "golfer.h"
+#include "ball.h"
+#include "game.h"
+#include "engine.h"
 
-// The prize rows at lbl_80200538 + 0x710 (see GameMode10.c); nMode15 is the points for a surface.
+// The prize rows at lbl_80200538 + 0x710 (see GameTargets.c); nMode15 is the points for a surface.
 typedef struct MiniPrize {
     s32 nId;                    // 0x00  a surface id (0x85..0x90 are the target rings), 999 the prize row
     s32 nMode13;                // 0x04
@@ -32,45 +35,11 @@ extern s8  lbl_80282384;                    // the leader's target
 extern s32 lbl_80282388;                    // the leader's rank (0 best .. 4)
 extern s32 lbl_8028238C;                    // the leader (5 = none)
 
-void  fn_800E1480(int nHole);
-u32   Rand_Next(int nStream);
-int   Game_CurHoleIndex(void);
-void  Mem_cpy(void* pDst, void* pSrc, int nBytes);
-void  fn_80055AA8(u8* pBall, f32* pPos, int nPlayer);
-f32   fn_800D0550(int nPlayer);             // the shot's length
-int   GOLFERSTATE_GetCurrentState(int nPlayer);
-void  GOLFERSTATE_Switch(int nState, int nPlayer);
-void  AI_DefaultTarget(int nPlayer);
-void  fn_800A6278(void);
-void  fn_800A62E0(void);
-void  fn_800A6358(void);
 void  fn_800A6394(void);
 void  fn_800A640C(void);
-void  fn_800A30E4(int nKind, u8* pBall, int nPlayer, int a, f32 f);
-s32   fn_800D6A70(s32 nPoints, int nPlayer, int a, int b, int c, int d);
-int   fn_800D7220(int nReward, int a, s32* pOut);
-void  fn_800D3548(int nPlayer, int nMoney, s32* p);
-void  fn_800E3D90(void);
-void  fn_800E58B4(int a);
-void  fn_80062D6C(int a, int b);
 void* fn_80017004(int nView);
 void  fn_8006434C(void* pView, f32* pPos, f32* pX, f32* pY, int a);
 void  fn_8006A8D4(void* pView, f32* pX, f32* pY);
-void  fn_800FF7DC(void);
-void  fn_80125910(int a);
-void  fn_800F19D4(void);
-void  fn_800F1ABC(int nPlayer, int n);
-void  fn_800F1B60(int nPlayer, int n);
-u8    fn_800F1BD8(int nPlayer);
-u8    fn_800F1C34(int nPlayer);
-s8    fn_800F1C74(int nPlayer);
-s32   fn_800F1E58(s32 n);
-void  fn_800F1EE4(void);
-void  fn_800F2030(void);
-void  fn_800F263C(s32 p0);
-u8    fn_800F2788(int nPlayer, f32 f);
-void  fn_800F2958(s32 p0, s32 p1);
-void  fn_800F3980(int nMsg, s32 a, s32 b, s32 c, s32 d, s32 e);
 void  fn_800F39CC(s32 p0);
 
 void  fn_800F3C2C(void);
@@ -193,7 +162,7 @@ void fn_800F3E00(int nPlayer) {
     if (gReplayData.bF10) {
         Mem_cpy(gPlayers[nPlayer].ball, gReplayData.player.ball, 0xBC);
     } else {
-        fn_80055AA8(gPlayers[nPlayer].ball,
+        fn_80055AA8((Ball*)gPlayers[nPlayer].ball,
                     (f32*)((u8*)gPlayers[nPlayer].pBallCourse + gSession.nTeeSet[nPlayer] * 0x10 + 0xB0), nPlayer);
     }
     gPlayers[nPlayer].nDC0++;
