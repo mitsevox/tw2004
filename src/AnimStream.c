@@ -13,6 +13,7 @@ AnimLib* fn_80026AC0(Character* pChar);  // the overlay library loaded for the c
 AnimLib* fn_80026B34(Character* pChar);  // the library of the character's animation slot
 u8 fn_8001C558(int nPlayer);            // the model id of the player's golfer
 void fn_800CB668(u8 bGlobal, int bFemale, int nPlayer, char* szPath);
+int fn_800CB568(int nId);
 u8 fn_800CB5B0(int nPlayer, Clip* pClip);
 
 char lbl_80281530[8] = "";              // the folder the stream files' paths start from
@@ -161,6 +162,41 @@ void fn_800CA9DC(int nSlot) {
             fn_800CA2E4(i, fn_80026AC0(gPlayers[i].pChar), fn_80026B34(gPlayers[i].pChar));
         }
     }
+}
+
+// The buffer holding a player's clips for a group, style and club class (style 0's when that style
+// has none), after giving the player one of the stream's two slots if it has none; NULL when the
+// player (2 and up) can not have one.
+void* fn_800CAA7C(int nPlayer, int nGroup, int nStyle, int nClub) {
+    int nIndex;
+    int nOther;
+    void* pData;
+    int i;
+
+    nIndex = fn_800C98DC(nGroup);
+    if (lbl_80282230->players[nPlayer].nId == -1) {
+        if (nPlayer < 2) {
+            for (i = nPlayer; i < 2; i++) {
+                nOther = fn_800CB568(i);
+                if (nOther != nPlayer) {
+                    lbl_80282230->players[nPlayer].nId = i;
+                    // EA bug: when no player has slot i, nOther is -1 and this writes before players[0]
+                    lbl_80282230->players[nOther].nId = -1;
+                    break;
+                }
+            }
+        } else {
+            return NULL;
+        }
+    }
+    pData = lbl_80282230->bufs[lbl_80282230->players[nPlayer].nId][nIndex][nStyle][nClub].pData;
+    if (pData == NULL) {
+        pData = lbl_80282230->bufs[lbl_80282230->players[nPlayer].nId][nIndex][0][nClub].pData;
+        nStyle = 0;
+    }
+    fn_800CA268(nPlayer, lbl_80282230->players[nPlayer].nId, nGroup, nClub, nStyle);
+    fn_8001DB98(gPlayers[nPlayer].pChar);
+    return pData;
 }
 
 // With streaming on, starts each of every player's streamed clip sets at a random clip.
