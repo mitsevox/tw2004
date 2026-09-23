@@ -23,6 +23,19 @@ s32 fn_800F0F30(s32 p0);
 s32 fn_800F1008(s32 i);
 s32 fn_800F102C(void);
 
+// An award in a save profile (TW06: AwardInfoBase).
+typedef struct AwardInfo {
+    u8   bWon;                  // 0x0  TW06: bWon
+    u8   unk1;
+    u16  nDateWon;              // 0x2  TW06: dateWon
+} AwardInfo;
+
+// The start of a save profile as this file reads it (the profiles are 0x10600 bytes apart).
+typedef struct RTESave {
+    u8        unk0[0x20C];
+    AwardInfo aAward[75];       // 0x20C  per event id. TW06: rteEventAwardInfo (RealTimeEventUserData)
+} RTESave;
+
 // One calendar event (0x30 bytes).
 typedef struct RTEvent {
     s32 nName;                  // 0x00  offset into the names block
@@ -214,13 +227,14 @@ void fn_800F07C8(void) {
     gpGame->pfn1F4 = fn_800F0BBC;
 }
 
-// How many events profile 0 has done (flags at +0x20C, 4 bytes apart; 75 of them).
+// How many events profile 0 has won.
 s32 fn_800F0820(void) {
-    u8* p = gpSaveData + 0 * 0x10600;
+    PlayerNumber_t nPlayer = PLR_1_e;
+    RTESave* p = (RTESave*)(gpSaveData + nPlayer * 0x10600);
     s32 n = 0;
     s32 i;
     for (i = 0; i < 75; i++) {
-        if (p[0x20C + i * 4] == 1) {
+        if (p->aAward[i].bWon == 1) {
             n++;
         }
     }
