@@ -37,7 +37,8 @@ struct AnimLib {
 typedef struct ClipRecord {
     char   name[16];            // 0x00
     s16    n10;                 // 0x10  leaves using the clip, while merging
-    s16    n12;                 // 0x12  merge flags: 1 keep, 2 / 0x10 moved (pClip then points to the record it went to)
+    s16    n12;                 // 0x12  merge flags: 1 keep, 2 / 0x10 moved (pClip then points to the
+                                //       record it went to)
     s32    n14;                 // 0x14
     s32    n18;                 // 0x18
     void*  pClip;               // 0x1C  offset into the clip data on disc, pointer once loaded
@@ -62,8 +63,9 @@ typedef struct SwapField {
     s32 nSize;
 } SwapField;
 
-void  fn_8001F08C(void** ppSrc, void** ppDst, SwapField* pFormat, int nFields, int nCount);  // byte-swap by format
-void  fn_80076158(void** ppSrc, void* pDst, int nBytes, int nSize);                           // byte-swap a run
+void  fn_8001F08C(void** ppSrc, void** ppDst, SwapField* pFormat, int nFields, int nCount);   // byte-swap
+                                                                                            // by format
+void  fn_80076158(void** ppSrc, void* pDst, int nBytes, int nSize);   // byte-swap a run
 void* fn_80020DD4(void* pClip, void* pOut, int nAlign);
 ClipBank* ClipBank_Get(u32 nSlot);
 u32   fn_800B6564(u32 uSize);                          // ARAM alloc
@@ -150,7 +152,9 @@ extern char (*lbl_80281D14)[2][8][6][16];   // the last clip name played: [playe
 void* AnimLib_FindByName(AnimLib* pLib, const char* pName) {
     int i;
     for (i = 0; i < pLib->nClips; i++) {
-        if (pLib->ppClips[i] != NULL && strcmp((char*)pLib->ppClips[i] + 0xA0, pName) == 0) return pLib->ppClips[i];
+        if (pLib->ppClips[i] != NULL && strcmp(((Clip*)pLib->ppClips[i])->name, pName) == 0) {
+            return pLib->ppClips[i];
+        }
     }
     return NULL;
 }
@@ -181,9 +185,11 @@ void Skalib_Init(void) {
             lbl_801C6068[i].overlays[j].pWork   = NULL;
         }
     }
-    if (gSession.nGameType == 3 || gSession.nGameType == 10) lbl_80281D18 = 0;
-    lbl_80281D14 = fn_80009B34(0x1800, 2, 0, "skalib.c", 508);
-    fn_80005AE8(lbl_80281D14, 0, 0x1800);
+    if (gSession.nGameType == 3 || gSession.nGameType == 10) {
+        lbl_80281D18 = 0;
+    }
+    lbl_80281D14 = fn_80009B34(4 * sizeof(*lbl_80281D14), 2, 0, "skalib.c", 508);   // four players
+    fn_80005AE8(lbl_80281D14, 0, 4 * sizeof(*lbl_80281D14));
     lbl_80281CC4 = lbl_801C5E2C;
     lbl_80281CC8 = lbl_801C5C50;
     lbl_80281CCC = lbl_801BF9C0;
@@ -210,7 +216,9 @@ void Skalib_Shutdown(void) {
             lbl_801C605C[i] = NULL;
         }
         if (lbl_801C6050[i] != NULL) {
-            if (lbl_801C6050[i]->pFile == lbl_80281CE0) lbl_80281CE0 = NULL;
+            if (lbl_801C6050[i]->pFile == lbl_80281CE0) {
+                lbl_80281CE0 = NULL;
+            }
             ClipBank_Free(lbl_801C6050[i]);
             lbl_801C6050[i] = NULL;
         }
@@ -222,13 +230,23 @@ void Skalib_Shutdown(void) {
 // for its own clips), otherwise each part it was built from.
 void AnimLib_Free(AnimLib* pLib) {
     if (pLib->pFile != NULL) {
-        if (pLib->pClipData != NULL) fn_80009E70(pLib->ppClips);
+        if (pLib->pClipData != NULL) {
+            fn_80009E70(pLib->ppClips);
+        }
         fn_80009E70(pLib->pFile);
     } else {
-        if (pLib->ppClips != NULL) fn_80009E70(pLib->ppClips);
-        if (pLib->pIndex != NULL) fn_80009E70(pLib->pIndex);
-        if (pLib->pTree != NULL) fn_80009E70(pLib->pTree);
-        if (pLib->pRecords != NULL) fn_80009E70(pLib->pRecords);
+        if (pLib->ppClips != NULL) {
+            fn_80009E70(pLib->ppClips);
+        }
+        if (pLib->pIndex != NULL) {
+            fn_80009E70(pLib->pIndex);
+        }
+        if (pLib->pTree != NULL) {
+            fn_80009E70(pLib->pTree);
+        }
+        if (pLib->pRecords != NULL) {
+            fn_80009E70(pLib->pRecords);
+        }
         fn_80009E70(pLib);
     }
 }
@@ -240,7 +258,9 @@ void ClipBank_Free(ClipBank* pBank) {
 
     for (i = 0; i < pBank->nClips; i++) {
         pClip = pBank->ppClips[i];
-        if (pClip != NULL && (pClip->uFlags & 4)) fn_800B6594(pClip->uAram);
+        if (pClip != NULL && (pClip->uFlags & 4)) {
+            fn_800B6594(pClip->uAram);
+        }
     }
     if (pBank->pFile != NULL) {
         fn_80009E70(pBank->pFile);
@@ -258,12 +278,15 @@ ClipBank* ClipBank_Get(u32 nSlot) {
 // Called for each position of two clip trees walked side by side: level 0 the default leaves,
 // 1 a group (its default leaves), 2 a style, 3 a club (its default leaves), 4 a key's leaves.
 // nIndex is the group, style, club or key. A result above 0 stops the walk.
-typedef int (*AnimLibWalkFn)(AnimLib* pA, AnimLib* pB, void* pLeafA, void* pLeafB, void* pCtx, int nLevel, int nIndex);
+typedef int (*AnimLibWalkFn)(AnimLib* pA, AnimLib* pB, void* pLeafA, void* pLeafB, void* pCtx, int nLevel,
+                             int nIndex);
 
 // The node at offset nOff of a library's tree, or NULL when there is no library or no node.
-#define SKA_NODE(pLib, nOff)          (((pLib) != NULL && (nOff) >= 0) ? (s16*)((pLib)->pTree + (nOff)) : NULL)
+#define SKA_NODE(pLib, nOff) \
+    (((pLib) != NULL && (nOff) >= 0) ? (s16*)((pLib)->pTree + (nOff)) : NULL)
 // The child nIdx of a node, or NULL.
-#define SKA_CHILD(pLib, pNode, nIdx)  (((pNode) != NULL && (pNode)[nIdx] >= 0) ? (s16*)((pLib)->pTree + (pNode)[nIdx]) : NULL)
+#define SKA_CHILD(pLib, pNode, nIdx) \
+    (((pNode) != NULL && (pNode)[nIdx] >= 0) ? (s16*)((pLib)->pTree + (pNode)[nIdx]) : NULL)
 
 // Walks the clip trees of two libraries together (either may be NULL), telling pfn about every
 // group, style, club and key either one has. lbl_80281CE8..CF4 hold where the walk is.
@@ -351,11 +374,16 @@ typedef struct MergeCtx {
 
 // Merge walk, sizing pass: counts the tree bytes the merged library needs (a leaf, then the
 // node for this level) and decides for each leaf pair which side wins.
-int AnimLib_MergeSizeCb(AnimLib* pLibA, AnimLib* pLib, AnimLeaf* pLeaf, AnimLeaf* pOver, MergeCtx* pCtx, int nLevel, int nIndex) {
+int AnimLib_MergeSizeCb(AnimLib* pLibA, AnimLib* pLib, AnimLeaf* pLeaf, AnimLeaf* pOver, MergeCtx* pCtx,
+                        int nLevel, int nIndex) {
     int bAny = 0;
 
-    if (pLeaf != NULL || pOver != NULL) bAny = 1;
-    if (bAny) pLib->nTreeSize += 8;
+    if (pLeaf != NULL || pOver != NULL) {
+        bAny = 1;
+    }
+    if (bAny) {
+        pLib->nTreeSize += 8;
+    }
     switch (nLevel) {
     case 0:
         break;
@@ -379,7 +407,9 @@ int AnimLib_MergeSizeCb(AnimLib* pLibA, AnimLib* pLib, AnimLeaf* pLeaf, AnimLeaf
             } else if (lbl_80281CE8 == 20) {
                 pOver->uMask |= 2;
             } else {
-                if (!(pOver->uMask & 1)) pLib->nClips -= pLeaf->nCount;
+                if (!(pOver->uMask & 1)) {
+                    pLib->nClips -= pLeaf->nCount;
+                }
                 if (!(pOver->uMask & 1) && !(pLeaf->uMask & 1)) {
                     pLeaf->uMask |= 2;
                 } else {
@@ -399,7 +429,8 @@ int AnimLib_MergeSizeCb(AnimLib* pLibA, AnimLib* pLib, AnimLeaf* pLeaf, AnimLeaf
 
 // Merge walk, release pass: every clip of a replaced leaf loses a user; the ones nobody uses any
 // more come off the totals.
-int AnimLib_MergeReleaseCb(AnimLib* pLibA, AnimLib* pLibB, AnimLeaf* pLeafA, AnimLeaf* pLeafB, MergeCtx* pCtx, int nLevel, int nIndex) {
+int AnimLib_MergeReleaseCb(AnimLib* pLibA, AnimLib* pLibB, AnimLeaf* pLeafA, AnimLeaf* pLeafB, MergeCtx* pCtx,
+                           int nLevel, int nIndex) {
     ClipRecord* pRec;
     int         i;
     s16*        pIdx;
@@ -473,7 +504,9 @@ void Skalib_SetBudgets(void) {
         lbl_80281CDC = aBytes[0];
     } else {
         n = gSession.nNumPlayers;
-        if (n > 1) lbl_80281CD8 = 1;
+        if (n > 1) {
+            lbl_80281CD8 = 1;
+        }
         lbl_80281074 = aKeepDouble[n - 1];
         lbl_80281CDC = aBytes[n - 1];
     }
@@ -483,8 +516,12 @@ void Skalib_SetBudgets(void) {
         pSlot1 = &lbl_801C6068[1];
         nSize0 = pSlot0->pLib->n140;
         nSize1 = pSlot1->pLib->n140;
-        for (i = 0; pSlot0->nOverlays > i; i++) nSize0 += pSlot0->overlays[i].pWork->n140;
-        for (i = 0; pSlot1->nOverlays > i; i++) nSize1 += pSlot1->overlays[i].pWork->n140;
+        for (i = 0; pSlot0->nOverlays > i; i++) {
+            nSize0 += pSlot0->overlays[i].pWork->n140;
+        }
+        for (i = 0; pSlot1->nOverlays > i; i++) {
+            nSize1 += pSlot1->overlays[i].pWork->n140;
+        }
         lbl_80281D1C = (f32)nSize0 / (f32)(nSize0 + nSize1);
         lbl_80281D1C = (lbl_80281D1C < 0.44f) ? 0.44f : ((lbl_80281D1C > 0.56f) ? 0.56f : lbl_80281D1C);
     }
@@ -494,7 +531,8 @@ f32 Skalib_Random(void);
 
 // Merge walk, trim pass: cuts each leaf down to the clip limit (none for a leaf being replaced,
 // all of them for the ones fn_800C9828 protects), keeping a run of clips at a random start.
-int AnimLib_TrimCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB, MergeCtx* pCtx, int nLevel, int nIndex) {
+int AnimLib_TrimCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB, MergeCtx* pCtx, int nLevel,
+                   int nIndex) {
     s32         nKeep;
     s32         nCount;
     int         nStart;
@@ -562,11 +600,13 @@ f32 Skalib_Random(void) {
 // A clip that can still be kept: not moved (2, 0x10), not kept already (1), and used by
 // between 1 and nMaxUsers leaves.
 #define SKA_KEEPABLE(pRec, pCtx) \
-    (!((pRec)->n12 & 2) && !((pRec)->n12 & 0x10) && !((pRec)->n12 & 1) && (pRec)->n10 > 0 && (pRec)->n10 <= (pCtx)->nMaxUsers)
+    (!((pRec)->n12 & 2) && !((pRec)->n12 & 0x10) && !((pRec)->n12 & 1) && (pRec)->n10 > 0 && \
+     (pRec)->n10 <= (pCtx)->nMaxUsers)
 
 // Merge walk, keep pass: marks nCount - nKeep more clips of each leaf to keep, picked at random
 // (the next keepable one from a random start, looking forward, then back).
-int AnimLib_KeepRandomCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB, MergeCtx* pCtx, int nLevel, int nIndex) {
+int AnimLib_KeepRandomCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB, MergeCtx* pCtx,
+                         int nLevel, int nIndex) {
     AnimLeaf*   pLeaf;
     AnimLib*    pLib;
     ClipRecord* pRec;
@@ -594,11 +634,17 @@ int AnimLib_KeepRandomCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* p
                 nStart = Rand_Next(1) % pLeaf->nCount;
                 for (j = nStart; j < pLeaf->nCount; j++) {
                     pRec = &pLib->pRecords[pIdx[j]];
-                    if (SKA_KEEPABLE(pRec, pCtx)) goto found;
+                    if (SKA_KEEPABLE(pRec, pCtx)) {
+                        // fake match: the search's exit as a jump (not tested without it)
+                        goto found;
+                    }
                 }
                 for (j = nStart; j >= 0; j--) {
                     pRec = &pLib->pRecords[pIdx[j]];
-                    if (SKA_KEEPABLE(pRec, pCtx)) goto found;
+                    if (SKA_KEEPABLE(pRec, pCtx)) {
+                        // fake match: the search's exit as a jump (not tested without it)
+                        goto found;
+                    }
                 }
                 continue;
             found:
@@ -616,13 +662,23 @@ int AnimLib_KeepRandomCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* p
                 nStart = Rand_Next(1) % pLeaf->nCount;
                 for (j = nStart; j < pLeaf->nCount; j++) {
                     pRec = &pLib->pRecords[pIdx[j]];
-                    while ((pRec->n12 & 2) || (pRec->n12 & 0x10)) pRec = (ClipRecord*)pRec->pClip;
-                    if (!(pRec->n12 & 1) && pRec->n10 > 0 && pRec->n10 <= pCtx->nMaxUsers) goto found2;
+                    while ((pRec->n12 & 2) || (pRec->n12 & 0x10)) {
+                        pRec = (ClipRecord*)pRec->pClip;
+                    }
+                    if (!(pRec->n12 & 1) && pRec->n10 > 0 && pRec->n10 <= pCtx->nMaxUsers) {
+                        // fake match: the search's exit as a jump (not tested without it)
+                        goto found2;
+                    }
                 }
                 for (j = nStart; j >= 0; j--) {
                     pRec = &pLib->pRecords[pIdx[j]];
-                    while ((pRec->n12 & 2) || (pRec->n12 & 0x10)) pRec = (ClipRecord*)pRec->pClip;
-                    if (!(pRec->n12 & 1) && pRec->n10 > 0 && pRec->n10 <= pCtx->nMaxUsers) goto found2;
+                    while ((pRec->n12 & 2) || (pRec->n12 & 0x10)) {
+                        pRec = (ClipRecord*)pRec->pClip;
+                    }
+                    if (!(pRec->n12 & 1) && pRec->n10 > 0 && pRec->n10 <= pCtx->nMaxUsers) {
+                        // fake match: the search's exit as a jump (not tested without it)
+                        goto found2;
+                    }
                 }
                 continue;
             found2:
@@ -640,7 +696,8 @@ int AnimLib_KeepRandomCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* p
 }
 
 // Merge walk, keep pass: marks nCount - nKeep more clips of each leaf to keep, highest n18 first.
-int AnimLib_KeepBestCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB, MergeCtx* pCtx, int nLevel, int nIndex) {
+int AnimLib_KeepBestCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB, MergeCtx* pCtx,
+                       int nLevel, int nIndex) {
     AnimLeaf*   pLeaf;
     AnimLib*    pLib;
     int         nExtra;
@@ -669,7 +726,9 @@ int AnimLib_KeepBestCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLe
                 for (j = 0; j < pLeaf->nCount; j++) {
                     pRec = &pLib->pRecords[pIdx[j]];
                     if (SKA_KEEPABLE(pRec, pCtx)) {
-                        if (pBest == NULL || pRec->n18 > pBest->n18) pBest = pRec;
+                        if (pBest == NULL || pRec->n18 > pBest->n18) {
+                            pBest = pRec;
+                        }
                     }
                 }
                 if (pBest != NULL) {
@@ -688,9 +747,13 @@ int AnimLib_KeepBestCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLe
                 pBest = NULL;
                 for (j = 0; j < pLeaf->nCount; j++) {
                     pRec = &pLib->pRecords[pIdx[j]];
-                    while ((pRec->n12 & 2) || (pRec->n12 & 0x10)) pRec = (ClipRecord*)pRec->pClip;
+                    while ((pRec->n12 & 2) || (pRec->n12 & 0x10)) {
+                        pRec = (ClipRecord*)pRec->pClip;
+                    }
                     if (!(pRec->n12 & 1) && pRec->n10 > 0 && pRec->n10 <= pCtx->nMaxUsers) {
-                        if (pBest == NULL || pRec->n18 > pBest->n18) pBest = pRec;
+                        if (pBest == NULL || pRec->n18 > pBest->n18) {
+                            pBest = pRec;
+                        }
                     }
                 }
                 if (pBest != NULL) {
@@ -709,7 +772,8 @@ int AnimLib_KeepBestCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLe
 }
 
 // Merge walk: the largest clip count of any leaf still in play goes into lbl_80281074.
-int AnimLib_MaxCountCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB, MergeCtx* pCtx, int nLevel, int nIndex) {
+int AnimLib_MaxCountCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB, MergeCtx* pCtx,
+                       int nLevel, int nIndex) {
     AnimLeaf* pLeaf;
     AnimLib*  pLib;
 
@@ -722,14 +786,17 @@ int AnimLib_MaxCountCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLe
     }
     if (pLeaf != NULL && pLib != NULL) {
         if (pLeaf->uMask & 2) return 0;
-        if (pLeaf->nCount > lbl_80281074) lbl_80281074 = pLeaf->nCount;
+        if (pLeaf->nCount > lbl_80281074) {
+            lbl_80281074 = pLeaf->nCount;
+        }
     }
     return 0;
 }
 
 // Merge walk, drop pass: takes the clips marked 1 out of leaves longer than lbl_80281070, freeing
 // the ones nobody uses any more; stops (returning 1) once the bytes in use fall under the target.
-int AnimLib_DropCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB, MergeCtx* pCtx, int nLevel, int nIndex) {
+int AnimLib_DropCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB, MergeCtx* pCtx, int nLevel,
+                   int nIndex) {
     int         bDone = 0;
     AnimLeaf*   pLeaf;
     AnimLib*    pLib;
@@ -754,7 +821,9 @@ int AnimLib_DropCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB,
             p    = &pIdx[i];
             pRec = &pLib->pRecords[*p];
             if (pLeaf == pLeafB) {
-                while ((pRec->n12 & 2) || (pRec->n12 & 0x10)) pRec = (ClipRecord*)pRec->pClip;
+                while ((pRec->n12 & 2) || (pRec->n12 & 0x10)) {
+                    pRec = (ClipRecord*)pRec->pClip;
+                }
             }
             if (pRec->n12 & 1) {
                 pRec->n10--;
@@ -763,9 +832,13 @@ int AnimLib_DropCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB,
                     pRec->n10--;
                     pCtx->nBytes -= pRec->n14;
                     (*pCtx->pCount)--;
-                    if (pCtx->nBytes < pCtx->nTarget) bDone = 1;
+                    if (pCtx->nBytes < pCtx->nTarget) {
+                        bDone = 1;
+                    }
                 }
-                for (j = i; j < pLeaf->nCount - 1; j++, p++) *p = p[1];
+                for (j = i; j < pLeaf->nCount - 1; j++, p++) {
+                    *p = p[1];
+                }
                 pLeaf->nCount = pLeaf->nCount - 1;
                 i--;
                 if (bDone) return bDone;
@@ -792,7 +865,8 @@ typedef struct BuildCtx {
 // Merge walk, build pass: writes the merged tree into pCtx->pLib (a node for each group, style
 // and club, a leaf wherever either side has one) and copies the clips of each leaf: from the one
 // side that has it, or from both when the overlay's clips are added to the library's.
-int AnimLib_BuildCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB, BuildCtx* pCtx, int nLevel, int nIndex) {
+int AnimLib_BuildCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB, BuildCtx* pCtx, int nLevel,
+                    int nIndex) {
     AnimLeaf*   pSrc    = NULL;
     AnimLib*    pSrcLib = NULL;
     int         bAny    = 0;
@@ -804,12 +878,16 @@ int AnimLib_BuildCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB
     s32         i;
     s16*        pIdx;
 
-    if (pLeafA != NULL || pLeafB != NULL) bAny = 1;
+    if (pLeafA != NULL || pLeafB != NULL) {
+        bAny = 1;
+    }
     bAny   = (bAny != 0);
     bFromA = 0;
     switch (nLevel) {
     case 0:
-        for (i = 0; i < 21; i++) pLib->groups[i] = -1;
+        for (i = 0; i < 21; i++) {
+            pLib->groups[i] = -1;
+        }
         if (bAny) {
             pLib->nDefault = pLib->nTreeSize;
             SKA_ALLOC(pLib, pNew, 8);
@@ -826,12 +904,16 @@ int AnimLib_BuildCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB
         } else {
             lbl_80281CF8[0] = -1;
         }
-        for (i = 0; i < 8; i++) lbl_80281CF8[1 + i] = -1;
+        for (i = 0; i < 8; i++) {
+            lbl_80281CF8[1 + i] = -1;
+        }
         break;
     case 2:
         lbl_80281CF8[1 + nIndex] = pLib->nTreeSize;
         SKA_ALLOC(pLib, lbl_80281CFC, 0xC);
-        for (i = 0; i < 6; i++) lbl_80281CFC[i] = -1;
+        for (i = 0; i < 6; i++) {
+            lbl_80281CFC[i] = -1;
+        }
         break;
     case 3:
         lbl_80281CFC[nIndex] = pLib->nTreeSize;
@@ -842,7 +924,9 @@ int AnimLib_BuildCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB
         } else {
             lbl_80281D00[1] = -1;
         }
-        for (i = 0; i < 11; i++) lbl_80281D00[2 + i] = -1;
+        for (i = 0; i < 11; i++) {
+            lbl_80281D00[2 + i] = -1;
+        }
         break;
     case 4:
         if (bAny) {
@@ -855,7 +939,9 @@ int AnimLib_BuildCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB
     }
     if (pNew == NULL) return 0;
     bKeep = fn_800C9828(lbl_80281CE8, lbl_80281CEC, lbl_80281CF0, lbl_80281CF4);
-    if (lbl_80281CE8 == 20) pLeafB = NULL;
+    if (lbl_80281CE8 == 20) {
+        pLeafB = NULL;
+    }
     if (pLeafA != NULL && pLeafB == NULL) {
         pSrc    = pLeafA;
         pSrcLib = pA;
@@ -866,7 +952,10 @@ int AnimLib_BuildCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB
         pSrcLib = pB;
     } else if (pLeafA != NULL && pLeafB != NULL) {
         if ((pLeafA->uMask & 2) || !(pLeafB->uMask & 1)) {
-            if (!bKeep || !(pLeafB->uMask & 1)) goto useB;
+            if (!bKeep || !(pLeafB->uMask & 1)) {
+                // fake match: a jump into the other branch (without: 97.4%, not 99.8%)
+                goto useB;
+            }
         }
     } else {
         return 0;
@@ -879,7 +968,9 @@ int AnimLib_BuildCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB
         for (i = 0; i < pNew->nCount; i++) {
             pLib->ppClips[pLib->nClips] = AnimLib_ResolveRecord(pSrcLib, *pIdx, &pRecs[pLib->nClips], bKeep);
             pIdx++;
-            if (bFromA) pRecs[pLib->nClips].n12 |= 2;
+            if (bFromA) {
+                pRecs[pLib->nClips].n12 |= 2;
+            }
             pLib->nClips++;
         }
     } else {
@@ -890,14 +981,18 @@ int AnimLib_BuildCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB
         for (i = 0; i < pLeafA->nCount; i++) {
             pLib->ppClips[pLib->nClips] = AnimLib_ResolveRecord(pA, *pIdx, &pRecs[pLib->nClips], bKeep);
             pIdx++;
-            if (bFromA || bKeep) pRecs[pLib->nClips].n12 |= 2;
+            if (bFromA || bKeep) {
+                pRecs[pLib->nClips].n12 |= 2;
+            }
             pLib->nClips++;
         }
         pIdx = pB->pIndex + pLeafB->nFirst;
         for (i = 0; i < pLeafB->nCount; i++) {
             pLib->ppClips[pLib->nClips] = AnimLib_ResolveRecord(pB, *pIdx, &pRecs[pLib->nClips], bKeep);
             pIdx++;
-            if (bFromA) pRecs[pLib->nClips].n12 |= 2;
+            if (bFromA) {
+                pRecs[pLib->nClips].n12 |= 2;
+            }
             pLib->nClips++;
         }
     }
@@ -914,16 +1009,26 @@ void* AnimLib_ResolveRecord(AnimLib* pLib, int nRec, ClipRecord* pOut, u8 bLink)
     s32         n20;
     s32         bMove;
 
-    if ((pRec->n12 & 4) && bLink) bLinked = 1;
+    if ((pRec->n12 & 4) && bLink) {
+        bLinked = 1;
+    }
     n20 = pRec->n20;
     while ((bMove = pRec->n12 & 2) || (pRec->n12 & 0x10)) {
-        if (bMove) bMoved = 1;
+        if (bMove) {
+            bMoved = 1;
+        }
         pRec = (ClipRecord*)pRec->pClip;
     }
     Mem_cpy(pOut, pRec, sizeof(ClipRecord));
-    if (bMoved) pOut->n12 |= 2;
-    if (bLinked) pOut->n12 |= 4;
-    if (bLinked && !bMoved) pOut->n20 = n20;
+    if (bMoved) {
+        pOut->n12 |= 2;
+    }
+    if (bLinked) {
+        pOut->n12 |= 4;
+    }
+    if (bLinked && !bMoved) {
+        pOut->n20 = n20;
+    }
     if (bLinked) return NULL;
     return pRec->pClip;
 }
@@ -945,7 +1050,9 @@ u8 AnimLib_TrimToFit(MergeCtx* pCtx, AnimLib* pLib, LibOverlay* pOvs, int nOvs, 
     pCtx->nMaxUsers = 100000;
     lbl_80281074    = 0;
     AnimLib_WalkPair(pLib, NULL, (AnimLibWalkFn)AnimLib_MaxCountCb, pCtx);
-    for (i = 0; i < nOvs; i++) AnimLib_WalkPair(NULL, pOvs[i].pWork, (AnimLibWalkFn)AnimLib_MaxCountCb, pCtx);
+    for (i = 0; i < nOvs; i++) {
+        AnimLib_WalkPair(NULL, pOvs[i].pWork, (AnimLibWalkFn)AnimLib_MaxCountCb, pCtx);
+    }
     pCtx->nKeep = lbl_80281074;
     for (lbl_80281070 = 3; lbl_80281070 >= 1; lbl_80281070--) {
         while (pCtx->nKeep > lbl_80281070) {
@@ -965,7 +1072,10 @@ u8 AnimLib_TrimToFit(MergeCtx* pCtx, AnimLib* pLib, LibOverlay* pOvs, int nOvs, 
                     if (nRet != 0) break;
                 }
             }
-            if (nRet != 0) goto done;
+            if (nRet != 0) {
+                // fake match: the shared exit as a jump (without: 90.9%, not 100%)
+                goto done;
+            }
         }
     }
     pCtx->nKeep = lbl_80281074;
@@ -978,7 +1088,10 @@ u8 AnimLib_TrimToFit(MergeCtx* pCtx, AnimLib* pLib, LibOverlay* pOvs, int nOvs, 
                 AnimLib_WalkPair(pLib, NULL, (AnimLibWalkFn)AnimLib_KeepRandomCb, pCtx);
             }
             nRet = AnimLib_WalkPair(pLib, NULL, (AnimLibWalkFn)AnimLib_DropCb, pCtx);
-            if (nRet != 0) goto done;
+            if (nRet != 0) {
+                // fake match: the shared exit as a jump (without: 90.9%, not 100%)
+                goto done;
+            }
         }
     }
 done:
@@ -1039,8 +1152,13 @@ u32 AnimLib_PlanBank(u32 nSlot) {
     s32         nBudget;
     ClipBank*   pBank;
 
-    if (lbl_801C6068[0].nOverlays != 0 && lbl_801C6068[1].nOverlays != 0) bBoth = 1;
-    if (pSlot->nOverlays == 0) goto done;
+    if (lbl_801C6068[0].nOverlays != 0 && lbl_801C6068[1].nOverlays != 0) {
+        bBoth = 1;
+    }
+    if (pSlot->nOverlays == 0) {
+        // fake match: the shared exit as a jump (without: 88.7%, not 91.6%)
+        goto done;
+    }
     nOvs   = pSlot->nOverlays;
     pLib   = pSlot->pLib;
     nClips = 0;
@@ -1059,9 +1177,13 @@ u32 AnimLib_PlanBank(u32 nSlot) {
         if (pOvLib != NULL) {
             pOvs[i].nTree     = pOvLib->nTreeSize;
             pOvLib->nTreeSize = 0;
-            if (pLib != NULL) pOvLib->nClips += pLib->nClips;
+            if (pLib != NULL) {
+                pOvLib->nClips += pLib->nClips;
+            }
             AnimLib_WalkPair(pLib, pOvLib, (AnimLibWalkFn)AnimLib_MergeSizeCb, NULL);
-            if (pOvLib->nTreeSize & 15) pOvLib->nTreeSize = ((pOvLib->nTreeSize >> 4) + 1) << 4;
+            if (pOvLib->nTreeSize & 15) {
+                pOvLib->nTreeSize = ((pOvLib->nTreeSize >> 4) + 1) << 4;
+            }
             pOvs[i].n14 = pOvs[i].n10 - 3;
         }
     }
@@ -1088,7 +1210,10 @@ u32 AnimLib_PlanBank(u32 nSlot) {
                 pOther = pLib;
                 pp     = pOvs - 1;
                 do {
-                    if (pOther == NULL) goto skip;
+                    if (pOther == NULL) {
+                        // fake match: the search's exit as a jump (not tested without it)
+                        goto skip;
+                    }
                     for (m = 0; m < pOther->nRecords; m++) {
                         pRecO = &pOther->pRecords[m];
                         if (strcmp(pRec->name, pRecO->name) == 0) {
@@ -1104,6 +1229,7 @@ u32 AnimLib_PlanBank(u32 nSlot) {
                             } else {
                                 pRec->n12 |= 2;
                             }
+                            // fake match: the search's exit as a jump (not tested without it)
                             goto next;
                         }
                     }
@@ -1116,7 +1242,10 @@ u32 AnimLib_PlanBank(u32 nSlot) {
                 pOther = pLib;
                 pp     = pOvs - 1;
                 do {
-                    if (pOther == NULL) goto skip2;
+                    if (pOther == NULL) {
+                        // fake match: the search's exit as a jump (not tested without it)
+                        goto skip2;
+                    }
                     for (m = 0; m < pOther->nRecords; m++) {
                         pRecO = &pOther->pRecords[m];
                         if (strcmp(pRec->name, pRecO->name) == 0) {
@@ -1124,6 +1253,7 @@ u32 AnimLib_PlanBank(u32 nSlot) {
                             nLeft--;
                             pRec->n10   = 0;
                             pRec->pClip = pRecO;
+                            // fake match: the search's exit as a jump (not tested without it)
                             goto next;
                         }
                     }
@@ -1140,12 +1270,17 @@ u32 AnimLib_PlanBank(u32 nSlot) {
     }
     ctx.nBytes = nBytes;
     ctx.pCount = &nLibClips;
-    if (pLib != NULL && nClips != 0) AnimLib_WalkPair(pLib, NULL, (AnimLibWalkFn)AnimLib_MergeReleaseCb, &ctx);
+    if (pLib != NULL && nClips != 0) {
+        AnimLib_WalkPair(pLib, NULL, (AnimLibWalkFn)AnimLib_MergeReleaseCb, &ctx);
+    }
     for (i = 0; i < nOvs; i++) {
     }
     nClipsAll = nClips + nLibClips;
     nClips    = nClipsAll;
-    if (nClipsAll == 0) goto done;
+    if (nClipsAll == 0) {
+        // fake match: the shared exit as a jump (without: 88.7%, not 91.6%)
+        goto done;
+    }
     nIndexSize = ((nClipsAll * 4 >> 4) + 1) << 4;
     nRecSize   = ((nClipsAll >> 4) + 1) << 4;
     nTotal     = ctx.nBytes + nIndexSize + nRecSize + 0x20;
@@ -1174,7 +1309,8 @@ u32 AnimLib_PlanBank(u32 nSlot) {
             pTreeCopy = fn_80009B34(pLib->nTreeSize, 1, 0, "skalib.c", 2082);
             Mem_cpy(pTreeCopy, pLib->pTree, pLib->nTreeSize);
             for (i = 0; i < nOvs; i++) {
-                apRecords[i] = fn_80009B34(pOvs[i].pWork->nRecords * sizeof(ClipRecord), 1, 0, "skalib.c", 2086);
+                apRecords[i] =
+                    fn_80009B34(pOvs[i].pWork->nRecords * sizeof(ClipRecord), 1, 0, "skalib.c", 2086);
                 Mem_cpy(apRecords[i], pOvs[i].pWork->pRecords, pOvs[i].pWork->nRecords * sizeof(ClipRecord));
                 apIndex[i] = fn_80009B34(pOvs[i].pWork->nClips2 * 2, 1, 0, "skalib.c", 2088);
                 Mem_cpy(apIndex[i], pOvs[i].pWork->pIndex, pOvs[i].pWork->nClips2 * 2);
@@ -1192,7 +1328,8 @@ u32 AnimLib_PlanBank(u32 nSlot) {
                 Mem_cpy(pLib->pIndex, pIndexCopy, pLib->nClips2 * 2);
                 Mem_cpy(pLib->pTree, pTreeCopy, pLib->nTreeSize);
                 for (i = 0; i < nOvs; i++) {
-                    Mem_cpy(pOvs[i].pWork->pRecords, apRecords[i], pOvs[i].pWork->nRecords * sizeof(ClipRecord));
+                    Mem_cpy(pOvs[i].pWork->pRecords, apRecords[i],
+                            pOvs[i].pWork->nRecords * sizeof(ClipRecord));
                     Mem_cpy(pOvs[i].pWork->pIndex, apIndex[i], pOvs[i].pWork->nClips2 * 2);
                     Mem_cpy(pOvs[i].pWork->pTree, apTree[i], pOvs[i].nTree);
                 }
@@ -1221,7 +1358,9 @@ u32 AnimLib_PlanBank(u32 nSlot) {
         lbl_801C6008[nSlot].nBudget = nBudget;
         lbl_801C6008[nSlot].n04     = 0;
         pBank = lbl_801C6050[nSlot];
-        if (pBank == NULL) pBank = fn_80009B34(nBudget, 2, 0x40, "skalib.c", 2159);
+        if (pBank == NULL) {
+            pBank = fn_80009B34(nBudget, 2, 0x40, "skalib.c", 2159);
+        }
         nRet = nBudget;
     } else {
         pBank = fn_80009B34(nTotal, 2, 0x40, "skalib.c", 2175);
@@ -1231,7 +1370,9 @@ u32 AnimLib_PlanBank(u32 nSlot) {
     pBank->uId     = 0;
     pBank->pFile   = NULL;
     pBank->ppClips = (void**)((u8*)pBank + 0x20);
-    for (i = 0; i < nClips; i++) pBank->ppClips[i] = NULL;
+    for (i = 0; i < nClips; i++) {
+        pBank->ppClips[i] = NULL;
+    }
     pBank->pRecords      = (u8*)pBank->ppClips + nIndexSize;
     lbl_801C6050[nSlot]  = pBank;
     pSlot->pEnd          = pBank->pRecords + nRecSize;
@@ -1259,7 +1400,9 @@ u8* Skalib_ScratchToAram(int n) {
         p = (u8*)lbl_801C6050[n];
     }
     lbl_80281D0C[n] = uSize;
-    if (lbl_80281D04[n] == 0) lbl_80281D04[n] = fn_800B6564(lbl_80281D0C[n]);
+    if (lbl_80281D04[n] == 0) {
+        lbl_80281D04[n] = fn_800B6564(lbl_80281D0C[n]);
+    }
     fn_800B6844(p, lbl_80281D04[n], lbl_80281D0C[n]);
     fn_800B67EC();
     return p;
@@ -1334,6 +1477,7 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
                 if (pOv->n10 == nSlot) {
                     k       = pOv->pChar->nSlot;
                     pOv->n10 = -1;
+                    // fake match: the search's exit as a jump (not tested without it)
                     goto found;
                 }
             }
@@ -1365,7 +1509,9 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
                 nCopied = nHdr + ((Clip*)pClipSrc)->n2C;
             }
             uPad = 16 - ((uptr)pOut & 15);
-            if (uPad == 16) uPad = 0;
+            if (uPad == 16) {
+                uPad = 0;
+            }
             if (uPad != 0) {
                 Mem_cpy(pOut, aPad, uPad);
                 pOut += uPad;
@@ -1392,19 +1538,27 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
             pHdr->pFC = pOut;
             nCopied += n;
             nStride1 = pHdr->n8C * 2;
-            if (nStride1 & 31) nStride1 = ((nStride1 >> 5) + 1) << 5;
+            if (nStride1 & 31) {
+                nStride1 = ((nStride1 >> 5) + 1) << 5;
+            }
             nStride2 = pHdr->n8E;
-            if (nStride2 & 31) nStride2 = ((nStride2 >> 5) + 1) << 5;
+            if (nStride2 & 31) {
+                nStride2 = ((nStride2 >> 5) + 1) << 5;
+            }
             pSrc1      = (u8*)((Clip*)pClipSrc)->uAram;
             pSrc2      = ((Clip*)pClipSrc)->pE4;
             pHdr->n38  = nStride1 * pHdr->nFrames;
             pHdr->n04  = nStride2 * pHdr->nFrames;
             n4C        = pHdr->n4C;
             n4CAl      = n4C;
-            if (n4C & 31) n4CAl = ((n4C >> 5) + 1) << 5;
+            if (n4C & 31) {
+                n4CAl = ((n4C >> 5) + 1) << 5;
+            }
             n50   = pHdr->n50;
             n50Al = n50;
-            if (n50 & 31) n50Al = ((n50 >> 5) + 1) << 5;
+            if (n50 & 31) {
+                n50Al = ((n50 >> 5) + 1) << 5;
+            }
             uAram      = fn_800B6564(pHdr->n38 + pHdr->n04 + n50Al + n4CAl);
             uAramStart = uAram;
             if (pHdr->n38 != 0) {
@@ -1468,11 +1622,15 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
             pNew->nTreeSize = 0;
             pNew->nClips    = 0;
             pNew->pBank     = pBank;
-            if (pChar->pRecords == NULL) pChar->pRecords = fn_80009B34(pSrc->nClips * sizeof(ClipRecord), 2, 0, "skalib.c", 2943);
+            if (pChar->pRecords == NULL) {
+                pChar->pRecords = fn_80009B34(pSrc->nClips * sizeof(ClipRecord), 2, 0, "skalib.c", 2943);
+            }
             ctx.pLib     = pNew;
             ctx.pRecords = pChar->pRecords;
             AnimLib_WalkPair(pLibFile, pSrc, (AnimLibWalkFn)AnimLib_BuildCb, &ctx);
-            if (pNew->nTreeSize & 15) pNew->nTreeSize = ((pNew->nTreeSize >> 4) + 1) << 4;
+            if (pNew->nTreeSize & 15) {
+                pNew->nTreeSize = ((pNew->nTreeSize >> 4) + 1) << 4;
+            }
             pChar->pLib = pNew;
         } else {
             for (p = 0; p < gSession.nNumPlayers; p++) {
@@ -1516,7 +1674,9 @@ void AnimLib_FreeWorkCopies(void) {
             }
             pSlot->n150 = 0;
         }
-        if (pSlot->pLib != NULL) AnimLib_Free(pSlot->pLib);
+        if (pSlot->pLib != NULL) {
+            AnimLib_Free(pSlot->pLib);
+        }
         pSlot->pLib = NULL;
     }
 }
@@ -1538,7 +1698,9 @@ void AnimLib_FreeCopies(void) {
             }
         }
         pSlot->nOverlays = 0;
-        if (pSlot->pCopy != NULL) fn_80009E70(pSlot->pCopy);
+        if (pSlot->pCopy != NULL) {
+            fn_80009E70(pSlot->pCopy);
+        }
         pSlot->pCopy = NULL;
     }
 }
@@ -1564,7 +1726,9 @@ void fn_80025478(void) {
     u32 i;
     int nTotal = 0;
     Skalib_SetBudgets();
-    for (i = 0; i < 3; i++) nTotal += AnimLib_PlanBank(i);
+    for (i = 0; i < 3; i++) {
+        nTotal += AnimLib_PlanBank(i);
+    }
 }
 
 // Rebuilds the current slot's libraries from their pristine copies (they are swapped in place
@@ -1580,7 +1744,9 @@ void AnimLib_ReloadSlot(void) {
 
     for (i = 0; i < lbl_801C6050[nSlot]->nClips; i++) {
         pClip = lbl_801C6050[nSlot]->ppClips[i];
-        if (pClip != NULL && (pClip->uFlags & 4)) fn_800B6594(pClip->uAram);
+        if (pClip != NULL && (pClip->uFlags & 4)) {
+            fn_800B6594(pClip->uAram);
+        }
     }
     pSlot = &lbl_801C6068[nSlot];
     if (pSlot->nOverlays != 0) {
@@ -1611,7 +1777,9 @@ void** AnimLib_Find(AnimLib* pLib, int nGroup, int nStyle, int nClub, int nKey, 
     s32  nOff;
     s16* pLeaf;
 
-    if (ppUsed != NULL) *ppUsed = NULL;
+    if (ppUsed != NULL) {
+        *ppUsed = NULL;
+    }
     if (nGroup >= 0 && nGroup < 21 && nStyle >= 0 && nStyle < 8 && nClub >= 0 && nClub < 6 && nKey >= 0 &&
         nKey < 11) {
         *pCount = 1;
@@ -1619,26 +1787,41 @@ void** AnimLib_Find(AnimLib* pLib, int nGroup, int nStyle, int nClub, int nKey, 
         if (nOff < 0) {
             *pFlags |= 1;
             nOff = pLib->nDefault;
+            // fake match: the search's exit as a jump (not tested without it)
             goto leaf;
         }
         pNode = (s16*)(pLib->pTree + nOff);
         nOff  = pNode[1 + nStyle];
-        if (nOff < 0 && nStyle != 0) nOff = pNode[1];
+        if (nOff < 0 && nStyle != 0) {
+            nOff = pNode[1];
+        }
         if (nOff < 0) {
             *pFlags |= 1;
             nOff = pNode[0];
-            if (nOff >= 0) goto leaf;
+            if (nOff >= 0) {
+                // fake match: the search's exit as a jump (not tested without it)
+                goto leaf;
+            }
             nOff = pLib->nDefault;
-            if (nOff >= 0) goto leaf;
+            if (nOff >= 0) {
+                // fake match: the search's exit as a jump (not tested without it)
+                goto leaf;
+            }
             return NULL;
         }
         nOff = *(s16*)(pLib->pTree + nOff + nClub * 2);
         if (nOff < 0) {
             *pFlags |= 1;
             nOff = pNode[0];
-            if (nOff >= 0) goto leaf;
+            if (nOff >= 0) {
+                // fake match: the search's exit as a jump (not tested without it)
+                goto leaf;
+            }
             nOff = pLib->nDefault;
-            if (nOff >= 0) goto leaf;
+            if (nOff >= 0) {
+                // fake match: the search's exit as a jump (not tested without it)
+                goto leaf;
+            }
             return NULL;
         }
         pClub = (s16*)(pLib->pTree + nOff);
@@ -1646,18 +1829,31 @@ void** AnimLib_Find(AnimLib* pLib, int nGroup, int nStyle, int nClub, int nKey, 
         if (nOff < 0) {
             *pFlags |= 2;
             nOff = pClub[1];
-            if (nOff >= 0) goto leaf;
+            if (nOff >= 0) {
+                // fake match: the search's exit as a jump (not tested without it)
+                goto leaf;
+            }
             nOff = pNode[0];
-            if (nOff >= 0) goto leaf;
+            if (nOff >= 0) {
+                // fake match: the search's exit as a jump (not tested without it)
+                goto leaf;
+            }
             nOff = pLib->nDefault;
-            if (nOff >= 0) goto leaf;
+            if (nOff >= 0) {
+                // fake match: the search's exit as a jump (not tested without it)
+                goto leaf;
+            }
             return NULL;
         }
 leaf:
         pLeaf   = (s16*)(pLib->pTree + nOff);
         *pCount = pLeaf[0];
-        if (ppUsed != NULL) *ppUsed = (u32*)(pLeaf + 2);
-        if (pFirst != NULL) *pFirst = pLeaf[1];
+        if (ppUsed != NULL) {
+            *ppUsed = (u32*)(pLeaf + 2);
+        }
+        if (pFirst != NULL) {
+            *pFirst = pLeaf[1];
+        }
         return pLib->ppClips + pLeaf[1];
     }
     return NULL;
@@ -1712,8 +1908,11 @@ void* AnimLib_Pick(int nPlayer, AnimLib* pLib, int nGroup, int nStyle, int nClub
             if (pName == NULL) {
                 pSlot = NULL;
                 nPick = AnimLib_RandomIndex(*pUsed, nCount);
-                if (nCount > 1 && AnimLib_WasLastPlayed(nPlayer, (char*)ppClips[nPick] + 0xA0, &pSlot, nGroup, nStyle, nClub)) {
-                    if (++nPick >= nCount) nPick = 0;
+                if (nCount > 1 && AnimLib_WasLastPlayed(nPlayer, ((Clip*)ppClips[nPick])->name, &pSlot,
+                                                        nGroup, nStyle, nClub)) {
+                    if (++nPick >= nCount) {
+                        nPick = 0;
+                    }
                 }
                 if (nPick < 32 && pUsed != NULL) {
                     uUsed = *pUsed;
@@ -1723,13 +1922,19 @@ void* AnimLib_Pick(int nPlayer, AnimLib* pLib, int nGroup, int nStyle, int nClub
                     } else {
                         uBit = 1 << nPick;
                         while (uUsed & uBit) {
-                            if (++nPick >= nCount) nPick = 0;
+                            if (++nPick >= nCount) {
+                                nPick = 0;
+                            }
                             uBit = 1 << nPick;
                         }
                         uUsed |= uBit;
-                        if ((uAll & uUsed) == uAll) uUsed = 1 << nPick;
+                        if ((uAll & uUsed) == uAll) {
+                            uUsed = 1 << nPick;
+                        }
                     }
-                    if (pSlot != NULL) strcpy(pSlot, (char*)ppClips[nPick] + 0xA0);
+                    if (pSlot != NULL) {
+                        strcpy(pSlot, (char*)ppClips[nPick] + 0xA0);
+                    }
                     *pUsed |= uUsed;
                 }
                 return ppClips[nPick];
@@ -1791,13 +1996,17 @@ void AnimLib_SwapTree(AnimLib* pLib, u8* pSrc, u8* pDst) {
     s16* pStyle;
     s16* pClub;
 
-    if (pLib->nDefault >= 0) AnimLib_SwapLeaf(pSrc + pLib->nDefault, pDst + pLib->nDefault);
+    if (pLib->nDefault >= 0) {
+        AnimLib_SwapLeaf(pSrc + pLib->nDefault, pDst + pLib->nDefault);
+    }
     for (nGroup = 0; nGroup < 21; nGroup++) {
         nOff = pLib->groups[nGroup];
         if (nOff < 0) continue;
         pNode = (s16*)(pDst + nOff);
         AnimLib_SwapGroupNode(pSrc + nOff, pNode);
-        if (pNode[0] >= 0) AnimLib_SwapLeaf(pSrc + pNode[0], pDst + pNode[0]);
+        if (pNode[0] >= 0) {
+            AnimLib_SwapLeaf(pSrc + pNode[0], pDst + pNode[0]);
+        }
         for (nStyle = 0; nStyle < 8; nStyle++) {
             nOff = pNode[1 + nStyle];
             if (nOff <= 0) continue;
@@ -1808,10 +2017,14 @@ void AnimLib_SwapTree(AnimLib* pLib, u8* pSrc, u8* pDst) {
                 if (nOff <= 0) continue;
                 pClub = (s16*)(pDst + nOff);
                 AnimLib_SwapClubNode(pSrc + nOff, pClub);
-                if (pClub[1] >= 0) AnimLib_SwapLeaf(pSrc + pClub[1], pDst + pClub[1]);
+                if (pClub[1] >= 0) {
+                    AnimLib_SwapLeaf(pSrc + pClub[1], pDst + pClub[1]);
+                }
                 for (nKey = 0; nKey < 11; nKey++) {
                     nOff = pClub[2 + nKey];
-                    if (nOff > 0) AnimLib_SwapLeaf(pSrc + nOff, pDst + nOff);
+                    if (nOff > 0) {
+                        AnimLib_SwapLeaf(pSrc + nOff, pDst + nOff);
+                    }
                 }
             }
         }
@@ -1823,7 +2036,9 @@ void AnimLib_SwapTree(AnimLib* pLib, u8* pSrc, u8* pDst) {
 // bank's plays the bank's first clip for everything. NULL when it needs a bank and there is none.
 AnimLib* AnimLib_Load(u8* pData, ClipBank* pBank) {
 
-    SwapField hdrFmt[19] = {{0x100, 4}, {8, -8}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, -4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {2, 2}, {2, 2}};
+    SwapField hdrFmt[19] = {{0x100, 4}, {8, -8}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4},
+                            {4, 4},     {4, -4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {2, 2},
+                            {2, 2}};
     SwapField recFmt[7]  = {{0x10, -1}, {2, 2}, {2, 2}, {4, 4}, {4, 4}, {4, 4}, {4, 4}};
     void*     pDst;
     void*     pSrc;
@@ -1833,7 +2048,9 @@ AnimLib* AnimLib_Load(u8* pData, ClipBank* pBank) {
     int       i;
 
     uPad = 16 - ((uptr)pData & 15);
-    if (uPad == 16) uPad = 0;
+    if (uPad == 16) {
+        uPad = 0;
+    }
     pLib        = (AnimLib*)(pData + uPad);
     pLib->pFile = pData;
     p           = (u8*)pLib + sizeof(AnimLib);
@@ -1849,7 +2066,9 @@ AnimLib* AnimLib_Load(u8* pData, ClipBank* pBank) {
         pDst = pSrc = pLib->ppClips;
         fn_80076158(&pSrc, pDst, pLib->nClips * 4, 4);
         if (pLib->uId != pBank->uId) {
-            for (i = 0; i < pLib->nClips; i++) pLib->ppClips[i] = pBank->ppClips[0];
+            for (i = 0; i < pLib->nClips; i++) {
+                pLib->ppClips[i] = pBank->ppClips[0];
+            }
         } else {
             for (i = 0; i < pLib->nClips; i++) {
                 pLib->ppClips[i] = pBank->ppClips[(uptr)pLib->ppClips[i]];
@@ -1881,7 +2100,9 @@ AnimLib* AnimLib_Load(u8* pData, ClipBank* pBank) {
                 pLib->pRecords[i].pClip =
                     fn_80020DD4(pLib->pClipData + (uptr)pLib->pRecords[i].pClip, NULL, 16);
             }
-            for (i = 0; i < pLib->nClips; i++) pLib->ppClips[i] = pLib->pRecords[pLib->pIndex[i]].pClip;
+            for (i = 0; i < pLib->nClips; i++) {
+                pLib->ppClips[i] = pLib->pRecords[pLib->pIndex[i]].pClip;
+            }
         } else {
             pLib->pClipData = NULL;
             pLib->ppClips   = NULL;
@@ -1904,7 +2125,9 @@ ClipBank* ClipBank_Load(u8* pFile, u32 uAlign) {
 
     pData = pFile;
     uPad = uAlign - ((uptr)pData & (uAlign - 1));
-    if (uPad == uAlign) uPad = 0;
+    if (uPad == uAlign) {
+        uPad = 0;
+    }
     pBank = (ClipBank*)(pData + uPad);
     ClipBank_SwapHeader(pBank);
     pBank->pFile   = NULL;
@@ -1914,7 +2137,9 @@ ClipBank* ClipBank_Load(u8* pFile, u32 uAlign) {
     fn_80076158(&pSrc, pBank->ppClips, pBank->nClips * 4, 4);
     pData += pBank->nClips * 4;
     uPad = 16 - ((uptr)pData & 15);
-    if (uPad == 16) uPad = 0;
+    if (uPad == 16) {
+        uPad = 0;
+    }
     pData += uPad;
     for (i = 0; i < pBank->nClips; i++) {
         pBank->ppClips[i] = fn_80020DD4(pData + (uptr)pBank->ppClips[i], &uUnused, 16);
@@ -1941,7 +2166,9 @@ void AnimLib_OnLoaded(UStreamObject* pFile) {
         }
         bFree = 0;
     }
-    if (bFree) fn_80009E70(pFile);
+    if (bFree) {
+        fn_80009E70(pFile);
+    }
 }
 
 void ClipBank_Stash(int nSlot);
@@ -1963,7 +2190,9 @@ void ClipBank_Install(UStreamObject* pFile) {
         bFree                      = 0;
         lbl_801C6050[nSlot]->pFile = pFile;
     }
-    if (bFree) fn_80009E70(pFile);
+    if (bFree) {
+        fn_80009E70(pFile);
+    }
 }
 
 // Forgets a slot's bank.
@@ -1977,7 +2206,9 @@ void ClipBank_Release(int nSlot) {
             lbl_801C6050[nSlot] = NULL;
         }
     }
-    if (lbl_801C6488[nSlot] != NULL) lbl_801C6488[nSlot] = NULL;
+    if (lbl_801C6488[nSlot] != NULL) {
+        lbl_801C6488[nSlot] = NULL;
+    }
 }
 
 // Copies a slot's bank file to ARAM and frees it; the first time, allocates the buffer it is
@@ -1985,10 +2216,14 @@ void ClipBank_Release(int nSlot) {
 void ClipBank_Stash(int nSlot) {
     if (lbl_801C6488[nSlot] != NULL) {
         lbl_801C647C[nSlot] = ((lbl_801C6488[nSlot]->uSize + 0x80) / 32 + 1) * 32;
-        if (lbl_801C6470[nSlot] == 0) lbl_801C6470[nSlot] = fn_800B6564(lbl_801C647C[nSlot]);
+        if (lbl_801C6470[nSlot] == 0) {
+            lbl_801C6470[nSlot] = fn_800B6564(lbl_801C647C[nSlot]);
+        }
         fn_800B6844(lbl_801C6488[nSlot], lbl_801C6470[nSlot], lbl_801C647C[nSlot]);
         fn_800B67EC();
-        if (lbl_801C6488[nSlot] != lbl_80281CE0) fn_80009E70(lbl_801C6488[nSlot]);
+        if (lbl_801C6488[nSlot] != lbl_80281CE0) {
+            fn_80009E70(lbl_801C6488[nSlot]);
+        }
         lbl_801C6488[nSlot] = NULL;
         if (nSlot == 0 && lbl_80281CE0 == NULL) {
             lbl_80281CE0 = fn_80009B34(lbl_801C647C[nSlot], 2, 0x20, "skalib.c", 4671);
