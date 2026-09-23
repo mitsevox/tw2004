@@ -389,10 +389,10 @@ void fn_800F57A0(void) {
 
 // 20 balls each.
 void fn_800F57C8(void) {
-    int i;
+    Player* p;
     fn_800F1EE4();
-    for (i = 0; i < 5; i++) {
-        gPlayers[i].nDC0 = 20;
+    for (p = gPlayers; p < gPlayers + 5; p++) {
+        p->nDC0 = 20;
     }
 }
 
@@ -442,14 +442,17 @@ s32 fn_800F59D4(void) {
 
 // A target's state for the HUD: 1 when it has paid out 3 times.
 s32 fn_800F59DC(int nPlayer, int i) {
-    return gPlayers[nPlayer].nDE4[i] > 3;
+    if (gPlayers[nPlayer].nDE4[i] > 3) {
+        return 1;
+    }
+    return 0;
 }
 
 // A bonus was collected: the multiplier goes up.
 void fn_800F5A14(int nPlayer, int nId) {
     s32 n = fn_800F2810(nId);
     fn_800A30E4(8, gPlayers[nPlayer].ball, nPlayer, 0, 0.0f);
-    lbl_80282394 = n + lbl_80282394 + 2;
+    lbl_80282394 += n + 2;
 }
 
 void fn_800F5A88(void) {
