@@ -474,7 +474,7 @@ void UStream_Decompress(const void* pSrc, void* pDst, u32 uSize) {
 }
 
 // A buffer's data was handed to an object: count the reference.
-static void UStream_AddBufferRef(UStreamBuffer** ppList) {
+void UStream_AddBufferRef(UStreamBuffer** ppList) {
     if (gnCurStream == -1) return;
     (*ppList)->nRefs++;
 }
