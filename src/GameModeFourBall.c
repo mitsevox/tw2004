@@ -432,7 +432,7 @@ void GameModeFourBall_EndGame(void) {
             nLoser = 0;
             nMargin = gPlayers[2].nHolesWon - gPlayers[0].nHolesWon;
         }
-        nMoney = GM_Earnings_GetStrokeWinningsTeam(nWinner, nLoser, nMargin, &nPrize);
+        nMoney = fn_800D37BC(nWinner, nLoser, nMargin, &nPrize);
         if (Team_IsAllHuman(nWinner)) {
             nFirst = 2;
             if (nWinner == 0) {

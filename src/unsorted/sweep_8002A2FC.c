@@ -1,13 +1,9 @@
 // Small functions found by the sweep (sweep.py). Original file and meanings unknown.
 
 #include "game_types.h"
+#include "gx.h"
 
 extern u8 lbl_80281D28;
-void GXSetAlphaUpdate();
-void GXSetTevAlphaIn();
-void GXSetTevAlphaOp();
-void GXSetTevColorIn();
-void GXSetTevColorOp();
 void fn_80012EF8();
 void fn_80012F50();
 

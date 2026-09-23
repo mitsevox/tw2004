@@ -25,7 +25,7 @@ s32 fn_800F0E18(s32 i);
 s32 fn_800F0E20(s32* pRound);
 void fn_800F0E30(s32 nId, s32 nRound);
 s32 fn_800F1008(s32 i);
-s32 fn_800F102C(void);
+
 void  GameModeDriverRTE_Locale_LoadRTEnFromStream(UStreamObject* pObject);
 void  fn_800F0678(void);
 void  fn_800F0BBC(void);
@@ -381,7 +381,7 @@ s32 fn_800F1008(s32 i) {
     return GameModeDriverRTE_GetCalData(i)->n14;
 }
 
-s32 fn_800F102C(void) {
+u8 fn_800F102C(void) {
     return 0;
 }
 

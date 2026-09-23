@@ -5,6 +5,7 @@
 // result for fn_8012288C, the library's update call.
 
 #include "engine.h"
+#include "game.h"
 #include "core/easb.h"
 #include "Common/SharedFileIO.h"
 #include "core/memcard.h"
