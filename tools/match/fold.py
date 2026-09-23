@@ -5,10 +5,11 @@ builds, and checks that every folded function is exact. Only then does it git rm
 commit. Nothing is deleted unless the DOL is OK and every folded function matches. Pushes only
 with --push (agents working in a worktree leave pushing to the orchestrator).
 
-For a unit that already has a source (widened with `mkunit.py --extend`), the sweeps' code is
-appended in a sweep block and the rest of the file is kept (merge_sweeps.py); if the build or the
-check fails, the source is put back as it was."""
-import json, pathlib, re, subprocess, sys
+For a unit that already has a source (widened with `mkunit.py --extend`), each sweep function is
+put in a sweep block where its address falls, before, between or after the unit's functions, and
+the rest of the file is kept (merge_sweeps.py); if the build or the check fails, the source is put
+back as it was."""
+import difflib, json, pathlib, re, subprocess, sys
 ROOT = pathlib.Path(__file__).resolve().parents[2]   # the checkout this script lives in
 HERE = pathlib.Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
@@ -25,33 +26,125 @@ def run(cmd):
     return subprocess.run(cmd, shell=True, cwd=ROOT, capture_output=True, text=True)
 
 
+MINE = [f'{name}.c'] + sweeps                        # the only units mkunit.py touched
+
+
+def undo_mkunit():
+    """Put configure.py and splits.txt back to HEAD, when every change in them is mkunit.py's for
+    this unit and these sweeps; otherwise say what else changed and leave them."""
+    files = ['configure.py', 'config/GW4E69/splits.txt']
+    head = {}
+    for f in files:
+        g = subprocess.run(['git', 'show', f'HEAD:{f}'], cwd=ROOT, capture_output=True)
+        if g.returncode:
+            return print(f'cannot read {f} at HEAD: roll back configure.py and splits.txt by hand')
+        head[f] = g.stdout
+    other = []
+    for ln in difflib.ndiff(head['configure.py'].decode('utf-8').splitlines(),
+                            (ROOT / 'configure.py').read_text(encoding='utf-8').splitlines()):
+        if ln[:2] in ('+ ', '- ') and ln[2:].strip() \
+                and not any(f'"{u}"' in ln for u in MINE):
+            other.append('configure.py: ' + ln)
+
+    def blocks(text):
+        return {b.split(':\n')[0]: b.strip() for b in re.split(r'\n(?=\S[^\n]*:\n)', text)}
+    old = blocks(head['config/GW4E69/splits.txt'].decode('utf-8'))
+    new = blocks((ROOT / 'config/GW4E69/splits.txt').read_text(encoding='utf-8'))
+    for k in sorted(set(old) | set(new)):
+        if old.get(k) != new.get(k) and k not in MINE:
+            other.append('splits.txt: block ' + k)
+    if other:
+        print('NOT rolled back: configure.py / splits.txt have changes besides this unit\'s:')
+        print('\n'.join('    ' + o for o in other[:10]))
+        return
+    for f in files:
+        (ROOT / f).write_bytes(head[f])
+    run('python configure.py')
+    print(f'configure.py and splits.txt put back as at HEAD ({name} is not a unit any more); '
+          'run ninja to rebuild')
+
+
 def fail(msg):
     print(msg)
     if extending:
         path.write_text(before, encoding='utf-8', newline='\n')
-        print(f'src/{name}.c put back as it was')
+        print(f'src/{name}.c put back as it was; its widened range (mkunit.py --extend) is kept, '
+              'so fold.py can be run again once the problem is fixed')
+    else:
+        # a new unit: take the whole half-made unit away (its source, mkunit.py's edits)
+        if before is None:
+            path.unlink(missing_ok=True)
+            print(f'src/{name}.c removed')
+        else:
+            path.write_text(before, encoding='utf-8', newline='\n')
+        undo_mkunit()
     sys.exit(1)
 
 
 folded = [n for s in sweeps for _, n in defined((ROOT / 'src' / s).read_text(encoding='utf-8'))]
 run('python configure.py')
+# Sweeps that declare one name with two types (with each other, or with the unit and its headers)
+# cannot be merged: find them before anything is written, and let the lane fix them first.
+d = run(f'python "{HERE / "declcheck.py"}" {name} ' + ' '.join(sweeps))
+print(d.stdout.strip() or d.stderr.strip()[-1000:])
+if d.returncode:
+    fail('declarations conflict: nothing merged')
 m = run(f'python "{HERE / "merge_sweeps.py"}" {name}.c ' + ' '.join(sweeps))
 print(m.stdout.strip())
 if m.returncode:
     fail('merge failed: ' + (m.stderr.strip() or m.stdout.strip())[-500:])
-print(run(f'python "{HERE / "dedupe_decls.py"}" src/{name}.c').stdout.strip())
-run('rm -f build/GW4E69/ok')
+dd = run(f'python "{HERE / "dedupe_decls.py"}" src/{name}.c')
+print(dd.stdout.strip())
+if dd.returncode:
+    fail('conflicting prototypes after the merge (see CONFLICT above)')
+
+
+def compile_errors(out):
+    """The compiler's messages in ninja's output (from each FAILED: line to the next [n/m] line)."""
+    keep, on = [], False
+    for ln in out.splitlines():
+        if ln.startswith('FAILED:'):
+            on = True
+        elif re.match(r'^\[\d+/\d+\]', ln) or ln.startswith('ninja:'):
+            on = False
+        if on and not ln.startswith('FAILED:') and len(ln) < 400:
+            keep.append(ln)
+    return '\n'.join(keep).strip()
+
+
+# A NonMatching unit is not linked, so main.dol can be OK while the unit does not even compile:
+# build its object first, on its own, and stop on a compile error.
+obj = ROOT / 'build/GW4E69/src' / f'{name}.o'
+c = run(f'ninja build/GW4E69/src/{name}.o')
+if c.returncode or not obj.exists() or obj.stat().st_mtime < path.stat().st_mtime:
+    print(compile_errors(c.stdout) or c.stdout[-2000:] or c.stderr[-2000:])
+    fail(f'src/{name}.c DOES NOT COMPILE (ninja exit {c.returncode})')
+(ROOT / 'build/GW4E69/ok').unlink(missing_ok=True)
 b = run('ninja')
-if 'main.dol: OK' not in b.stdout:
-    print(b.stdout[-2000:])
+if b.returncode or 'main.dol: OK' not in b.stdout:
+    print(compile_errors(b.stdout) or b.stdout[-2000:])
     fail('BUILD NOT OK')
-run('ninja build/GW4E69/report.json')
-r = json.load(open(ROOT / 'build/GW4E69/report.json'))
-u = [u for u in r['units'] if u['name'] == 'main/' + name][0]
-ex = {f['name'] for f in u['functions'] if f.get('fuzzy_match_percent') == 100}
-miss = [d for d in folded if d not in ex]
-print(len(folded), 'folded, not exact:', miss, 'total fns', len(u['functions']))
-if miss or not folded:
+# Judge only on a report made now: ninja does not rebuild report.json when a target object (from
+# the split) changes, and leaves the old one in place when any source fails to build.
+report = ROOT / 'build/GW4E69/report.json'
+report.unlink(missing_ok=True)
+rp = run('ninja build/GW4E69/report.json')
+if rp.returncode or not report.exists():
+    print(compile_errors(rp.stdout) or rp.stdout[-2000:] or rp.stderr[-2000:])
+    fail('REPORT NOT GENERATED (ninja exit %d)' % rp.returncode)
+r = json.load(open(report))
+us = [u for u in r['units'] if u['name'] == 'main/' + name]
+if not us:
+    fail(f'main/{name} is not in the new report.json')
+u = us[0]
+have = {f['name'] for f in u.get('functions', [])}
+ex = {f['name'] for f in u.get('functions', []) if f.get('fuzzy_match_percent') == 100}
+absent = [d for d in folded if d not in have]
+miss = [d for d in folded if d in have and d not in ex]
+print(len(folded), 'folded, not exact:', miss, 'total fns', len(have))
+if absent:
+    print('not in the unit at all (outside its range, or renamed?):', absent)
+if miss or absent or not folded:
     fail('NOT deleting sweeps')
 rm = run('git rm -q ' + ' '.join('src/' + s for s in sweeps))
 if rm.returncode != 0:

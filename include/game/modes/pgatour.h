@@ -66,4 +66,19 @@ typedef struct Pga80205F30 {
     s32  n8;                    // 0x8
 } Pga80205F30;
 
+// GameModeDriverPGATour.c, as the career calendar (GameModeDriver.c) uses it
+u8   GameModeDriverPGATour_GetEventByDate(u16 nDate, s32* pId, s32* pRound);
+s32  GameModeDriverPGATour_GetSelectedEvent(s32* pRound);
+s32  GameModeDriverPGATour_GetFinalEventOfSeason(void);
+void fn_800EF9D0(s32 nEvent);
+Tournament* fn_800EFA70(s32 i);
+s32  GameModeDriverPGATour_GetRounds(s32 i);
+u16  fn_800EFD38(s32 i);                // the tournament's start date
+u16  GameModeDriverPGATour_GetEndDate(s32 i);
+char* GameModeDriverPGATour_GetName(s32 i);
+s32  fn_800EFE3C(s32 i);
+int  fn_800F009C(void);                 // the leader's score in the current tournament
+int  fn_800F018C(void);                 // the player's own score in it
+s32  fn_800F0428(s32 nPlayer);
+
 #endif
