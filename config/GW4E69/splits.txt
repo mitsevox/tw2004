@@ -4073,6 +4073,7 @@ MetroTRK/targcont.c:
 
 MetroTRK/target_options.c:
 	.text       start:0x801649AC end:0x801649C8
+	.bss        start:0x8027F890 end:0x8027F898
 
 MetroTRK/mslsupp.c:
 	.text       start:0x801649C8 end:0x80164B40

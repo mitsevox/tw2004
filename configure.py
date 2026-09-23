@@ -565,7 +565,7 @@ config.libs = [
             Object(NonMatching, "MetroTRK/dolphin_trk.c"),
             Object(Matching, "MetroTRK/main_TRK.c"),
             Object(Matching, "MetroTRK/targcont.c"),
-            Object(NonMatching, "MetroTRK/target_options.c"),
+            Object(Matching, "MetroTRK/target_options.c"),
             Object(NonMatching, "MetroTRK/mslsupp.c"),
             Object(Matching, "MetroTRK/UDP_Stubs.c"),
             Object(NonMatching, "MetroTRK/ddh/main.c"),
