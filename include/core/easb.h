@@ -180,6 +180,24 @@ EASBio_eReward fn_801256B8(void);
 void EASBio_IncrementGamesPlayed(u32 uCount);
 void EASBio_SetAccomplishment(const char* szName, s32 arg1);
 
+// The memory-card screens' Bio requests. nPort and nSlot are the card the menus picked; most of
+// these do not use them (the Bio always goes to card 0).
+f32  fn_80124BDC(void);
+s32  fn_80125194(s32 nPort, s32 nSlot);
+s32  fn_80125280(s32 nPort, s32 nSlot);
+s32  fn_801252D0(s32 nPort, s32 nSlot);
+s32  fn_80125354(s32 nPort, s32 nSlot);
+s32  fn_801253F0(s32 nPort, s32 nSlot);
+s32  fn_80125434(s32 nPort, s32 nSlot);
+s32  fn_801254B8(void);
+s32  fn_801254EC(void);
+u8   fn_80125528(s32 nPort, s32 nSlot);
+void fn_80125600(s32 a0, s32 a1);
+void fn_80125648(s32 p0, s32 p1, s32 p2);
+void fn_8012566C(s32 p0);
+void fn_80125680(s32 p0);
+s32  fn_80125928(void);             // the Bio's level (0: none loaded)
+
 extern EASBioMgr* lbl_80281988;
 extern u8 lbl_80282568;
 extern u8 lbl_80282569;

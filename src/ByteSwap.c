@@ -5,8 +5,8 @@
 // either.
 
 #include "game_types.h"
+#include "endian.h"
 
-void fn_80076158(u8** ppSrc, u8* pDst, int nBytes, int nWidth);
 void fn_800763B4(void);
 void fn_800763B8(void);
 

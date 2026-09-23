@@ -105,7 +105,8 @@ s32 fn_801251EC(s32* pArgs) {
     return nError & ((-nError | nError) >> 31);
 }
 
-s32 fn_80125280(void) {
+// nPort and nSlot are unused, as in the ones below: the menus pass the card they picked.
+s32 fn_80125280(s32 nPort, s32 nSlot) {
     s32 nError;
     EASBErrorE eError;
 
@@ -117,7 +118,7 @@ s32 fn_80125280(void) {
     return 0;
 }
 
-s32 fn_801252D0(void) {
+s32 fn_801252D0(s32 nPort, s32 nSlot) {
     s32 nMount;
     s32 nError;
     EASBErrorE eError;
@@ -196,7 +197,7 @@ s32 fn_80125520(u8 b) {
 }
 
 // TRUE when the Bio's file status (fn_8012D744) is 1.
-u8 fn_80125528(void) {
+u8 fn_80125528(s32 nPort, s32 nSlot) {
     u32 uStatus;
 
     // EA bug: the error is ignored, so uStatus is read unset when the library is not running
@@ -346,7 +347,7 @@ u8 EASBio_IsCurrentGameWon(void) {
 }
 
 // The Bio's level, or 0 when no Bio is loaded.
-u16 fn_80125928(void) {
+s32 fn_80125928(void) {
     u16 uLevel = 0;
     f32 fProgress = 0.0f;
 
