@@ -219,7 +219,8 @@ u32  fn_8009EF90(void);
 void fn_8009F02C(void);             // bring the images back from ARAM (fn_8009EF98 parks them)
 // Up to nMax names of the card's files whose name holds pPattern, into apName; how many in pnFound.
 s32  fn_8009F0F0(s32 nPort, s32 nSlot, const char* pPattern, char** apName, s32 nMax, s32* pnFound);
-s32  fn_8009F208(s32 nFile, void* pBuf, s32 nLen);          // read from open file nFile
+// Read from open file nFile, on from the last read. arg3 is not used (TibExt passes 0).
+s32  fn_8009F208(s32 nFile, void* pBuf, s32 nLen, s32 arg3);
 s32  fn_8009F258(s32 nFile, void* pBuf, s32 nLen);          // write to open file nFile
 s32  fn_8009F2D8(s32 nFile, s32 nOffset, u8 bFromStart);    // move open file nFile's position
 s32  fn_8009F35C(void);             // always 0

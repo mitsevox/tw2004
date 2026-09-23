@@ -49,8 +49,6 @@ CamShot* fn_80064F7C(int nPlayer, int nKind, int a, CamShot* pShot);
 CamShot* fn_800C4DF8(int nFirst, int nPlayer);
 void     fn_800C5EC0(View* pView, f32* pCam, f32* pSub, int nPlayer);
 f32      fn_800C7394(View* pView);
-f32      fn_80009614(f32 x);                            // arc cosine
-void     fn_8000AE28(f32* pIn, f32 f, f32* pOut);       // scale a vector
 void     fn_8000923C(f32* pRot, f32* pQuat);            // a rotation vector (axis * angle) as a quaternion
 void     fn_800090E4(f32* pQuat, f32* pIn, f32* pOut);  // rotate a vector by a quaternion
 u8       fn_8006BEA4(void);                             // the GameBreaker letterbox is up, scripted

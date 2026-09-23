@@ -7,18 +7,9 @@
 #include "core/audtrack.h"
 #include "core/startup.h"
 
-// The audio locks (0x800B5934): the name is EA's label for who holds them.
-void fn_800B596C(const char* szWho);    // take the stream lock
-void fn_800B5994(const char* szWho);    // give it back
-void fn_800B59BC(const char* szWho);    // take the read-queue lock
-void fn_800B59EC(const char* szWho);    // give it back
-
 int  fn_80006478(s32 hFile, u8* pDst, u32 uLen, u32 uOffset,
                  void (*pfnDone)(int nBytes, int nError, AudTrack* pTrack, u8 nId), int n,
                  AudTrack* pTrack, u8 nId, int n19);                 // read from disc, not waiting
-u8*  fn_800A942C(u32 uSize, u8 nPlayList);                          // the stream buffer
-void fn_800A9434(u8* pBuffer, u32 uSize, u8 nPlayList);             // give it back
-u32  fn_800A955C(u8 nPlayList);                                      // the buffer size it needs
 s32  DVDGetDriveStatus(void);
 
 void fn_800AB860(AudTrack* pTrack);
