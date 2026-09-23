@@ -390,7 +390,7 @@ config.libs = [
         "src_dir": "extern/sonicheroes",
         "objects": [
             Object(NonMatching, "src/MSL_C/strtold.c"),
-            Object(NonMatching, "src/MSL_C/strtoul.c"),
+            Object(Matching, "src/MSL_C/strtoul.c"),
         ],
     },
     {
