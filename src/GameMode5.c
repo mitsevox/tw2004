@@ -2,6 +2,9 @@
 // 'PLY ' stream object), each an entry of 0x80 bytes; probably TW2004's Tiger Challenge.
 
 #include "golfer.h"
+#include "ball.h"
+#include "game.h"
+#include "engine.h"
 
 // One challenge (0x80 bytes).
 typedef struct Challenge {
@@ -38,18 +41,14 @@ typedef struct Challenge {
     s32 n7C;
 } Challenge;
 
-void fn_800EADD8(void);
 extern s32 lbl_802822F4;
 extern s32 lbl_802822F8;
-s32 fn_800EAC94();
 void fn_800EAE38(s32 p0);
-void fn_800EAE44(void);
+void fn_800EAE44(int nId);
 s32 fn_800EAE6C(void);
 extern Challenge lbl_80203554[83];
-void UStream_UnregisterHandler();
-void fn_8000E790();
 void fn_800EAEB8(void);
-void fn_800EAEEC(s32 p0);
+void fn_800EAEEC(UStreamObject* pObject);
 extern Challenge* lbl_80281664;
 extern s32 lbl_80281668;
 
@@ -67,19 +66,8 @@ extern s32 lbl_802822F0;
 extern void (*lbl_8028232C)(void);
 extern void (*lbl_80282324)(void);
 extern void (*lbl_80282318)(int nPlayer);
-int   UStream_RegisterHandler();
-u32   fn_8000E81C(void* pObj, void** ppData);
-void* fn_800951A0(u32 nSize, int nAlign, int a);
-void  Mem_cpy(void* pDst, void* pSrc, int nBytes);   // memcpy
-void  fn_80009E70(void* p);                 // free
-u32   Rand_Next(int nStream);
-void  fn_800E4364(u32 nQueue, int a, int b, int c);
 extern u8* gpSaveData;
 int   fn_800ED028(int i);
-void  GM_EndOfGolferTurn(int nPlayer);
-void  fn_800E5714(int a);
-s32   fn_800E1074();
-u8    fn_800F0818(void);
 void  fn_800F06DC(void);
 void  fn_800EAF7C(void);
 void  fn_80019648(void);
@@ -89,28 +77,20 @@ void  fn_800EAD6C(void);
 void  fn_800EBD28(void);
 void  fn_800EC1E0(void);
 void  fn_800ED604(int nPlayer);
-void  fn_800EAF18(void* pObj);
+void  fn_800EAF18(UStreamObject* pObject);
 extern u8  (*lbl_80282320)(void);
 extern s32 lbl_80282300;
 extern s32 lbl_80282304;
 extern s32 lbl_80282308;
 extern s32 lbl_8028230C;
-int   fn_800D2AD8(int nHole);               // a hole's par
 int   fn_800D2ABC(int nCourse, int nHole);  // a hole's par on a course
-void  fn_800E1260(int nPreset);
 void  fn_800E0B38(int nMode);
 void  fn_800F07C8(void);
-u8    fn_800E4BF8(void);
-int   Game_CurHoleIndex(void);
-int   fn_800D2B08(void);                    // the hole's par
-u8    fn_800E39F0(void);
 extern u8 gNumPlayersSetUp;                 // 0x80281D48 (Golfer.c)
 extern void (*lbl_80282328)(void);
 int   fn_800EC558(void);
 u8    fn_801025F4(void);
-s16   fn_800D2994();
-int   fn_800D7220(int nReward, int a, s32* pOut);
-void  fn_800D3548(int nPlayer, int nMoney, s32* p);
+s16   fn_800D2994(void);
 u8    fn_800D9998(int nPlayer, int nAward);
 u8    fn_800D750C(int nPlayer, int nAward);
 extern u8 lbl_80200538[];                   // prize data: bonuses at +0x9E4 and +0xA24
@@ -125,13 +105,8 @@ typedef struct ChallengeSave {
 #define PROFILE_MEDAL(n, i) ((ChallengeSave*)(gpSaveData + (n) * 0x10600))->aMedal[i]
 #define PROFILE_STAMP(n, i) ((ChallengeSave*)(gpSaveData + (n) * 0x10600))->aStamp[i]
 int   fn_800ECF9C(int i);
-u8    fn_800E5110(void);
-void  fn_80055AA8(u8* pBall, f32* pPos, int nPlayer);
-u8    Physics_DropBall(u8* pBall, f32* pPos);
-void  Vec_Copy(f32* pSrc, f32* pDst);
 void fn_800EC544(Challenge* p0, s32 p1);
 extern u8 lbl_802822FC;
-u8 fn_800EC550(void);
 s32 fn_800ECA08(void);
 void fn_800ECBE4(void);
 extern u8 lbl_80282314;
@@ -145,7 +120,6 @@ void fn_800ED6E8(u8 v);
 u8 fn_800ED6F0(void);
 extern s32 lbl_802811F0;
 void fn_800ED6F8(f32 x0);
-void fn_80062D6C();
 void fn_800ED710(s32 p0);
 
 // Game mode 5 starts: its callbacks, one player, the challenge list.
@@ -196,11 +170,10 @@ void fn_800EAE38(s32 p0) {
     lbl_802822F8 = p0;
 }
 
-void fn_800EAE44(void) {
-    s32 t0;
-    t0 = fn_800EAC94();
-    lbl_802822F4 = t0;
-    lbl_802822F8 = t0;
+void fn_800EAE44(int nId) {
+    int i = fn_800EAC94(nId);
+    lbl_802822F4 = i;
+    lbl_802822F8 = i;
 }
 
 s32 fn_800EAE6C(void) {
@@ -208,27 +181,27 @@ s32 fn_800EAE6C(void) {
 }
 
 void fn_800EAE74(void) {
-    UStream_RegisterHandler('PLY ', fn_800EAEEC, 'PL\0\0');
-    UStream_RegisterHandler('PLYs', fn_800EAF18, 'PL\0\0');
+    UStream_RegisterHandler('PLY ', fn_800EAEEC);
+    UStream_RegisterHandler('PLYs', fn_800EAF18);
 }
 
 void fn_800EAEB8(void) {
-    UStream_UnregisterHandler(1347180832);
-    UStream_UnregisterHandler(1347180915);
+    UStream_UnregisterHandler('PLY ');
+    UStream_UnregisterHandler('PLYs');
 }
 
-void fn_800EAEEC(s32 p0) {
-    fn_8000E790(p0, 10624, lbl_80203554);
+void fn_800EAEEC(UStreamObject* pObject) {
+    fn_8000E790(pObject, 10624, lbl_80203554);
 }
 
 // The 'PLYs' object: the challenge text block is copied out.
-void fn_800EAF18(void* pObj) {
+void fn_800EAF18(UStreamObject* pObject) {
     void* pData;
-    u32 nSize = fn_8000E81C(pObj, &pData);
+    u32 nSize = fn_8000E81C(pObject, &pData);
     if (nSize) {
         lbl_80282310 = fn_800951A0(nSize, 0x10, 1);
         Mem_cpy(lbl_80282310, pData, nSize);
-        fn_80009E70(pObj);
+        fn_80009E70(pObject);
     }
 }
 
@@ -627,8 +600,8 @@ void fn_800EBEF0(void) {
         v[1] = lbl_80203170[lbl_802822F4].f4;
         v[2] = lbl_80203170[lbl_802822F4].f8;
         v[3] = 1.0f;
-        fn_80055AA8(gPlayers[0].ball, v, 0);
-        Physics_DropBall(gPlayers[0].ball, v);
+        fn_80055AA8((Ball*)gPlayers[0].ball, v, 0);
+        Physics_DropBall((Ball*)gPlayers[0].ball, v);
         Vec_Copy(v, &gPlayers[0].fBallX);
     }
     if (lbl_80281664[lbl_802822F4].uClubs) {

@@ -3,6 +3,8 @@
 // (+0xB634..): "Did Not Play", "Cut", a finishing place, "Tied (%d players)".
 
 #include "golfer.h"
+#include "game.h"
+#include "engine.h"
 
 // One tournament of the season (0x64 bytes). TW06: GM_PgaTour_EventSlot_t, which has the name
 // index first and the champion's name and score together further on.
@@ -65,20 +67,16 @@ typedef struct Profile {
 } Profile;
 extern Profile* gpSaveData;
 
-void fn_800EDE78(void);
-void UStream_UnregisterHandler();
-void fn_8000E790();
 void fn_800EDEE8(void);
-void fn_800EDF34(s32 p0);
-void fn_800EDF60(s32 p0);
-void fn_800EDF90(s32 p0);
+void fn_800EDF34(UStreamObject* pObject);
+void fn_800EDF60(UStreamObject* pObject);
+void fn_800EDF90(UStreamObject* pObject);
 void fn_800EE064(void);
 extern u8 lbl_8028233C;
-u8 fn_800EE470(void);
 extern u8 lbl_80205F30[];
 s32 fn_800EE8B0(void);
 u8* fn_800EE8B8(void);
-void fn_80119934();
+void fn_80119934(int a);
 void fn_800EF294(void);
 s32 fn_800EF834(void);
 s32 fn_800EFB88(void);
@@ -87,7 +85,6 @@ char* fn_800EFDFC(s32 i);
 Tournament* fn_800EFA70(s32 i);
 s32 fn_800EFE3C(s32 i);
 char* fn_800EFE60(s32 i);
-s32 fn_801197CC();
 void fn_800F009C(void);
 u8 fn_8011908C(s32, s32);
 s32 fn_8011937C(s32, s32, u8);
@@ -96,26 +93,18 @@ void fn_800F018C(void);
 extern s32 lbl_80281670;
 extern s32 lbl_80282338;
 s32  fn_801190D8(s32 a);
-void fn_800E4364(u32 nQueue, s32 a, s32 b, s32 c);
 s32  fn_800EFBD0(s32 i);
 u8   fn_800EF83C(u16 nDate, s32* pId, s32* pRound);
 void fn_800D2714(u16* pDate, s32* pDay, s32* pMonth, s32* pYear);
 s32  fn_8011A7C8(s32 nPlayer, s32 nHole);
 s32  fn_80119588(s32 nPlayer, s32 a);
 s32  fn_800E1904(s32 nPlayer, s32 a);
-s32  Game_CurHoleIndex(void);
-char* strcpy(char* pDst, const char* pSrc);
 int   sprintf(char* pDst, const char* pFmt, ...);
-int   UStream_RegisterHandler();
-u32   fn_8000E81C(void* pObj, void** ppData);
-void* fn_800951A0(u32 nSize, int nAlign, int a);
-void  Mem_cpy(void* pDst, void* pSrc, int nBytes);   // memcpy
-void  fn_80009E70(void* p);                 // free
 s32   fn_80118684(s32 a);
 char* fn_80118E30(s32 a, s32 b);
 s32   fn_80119118(s32 a, s32 b);
 s32   fn_801197CC(s32 a, s32 b);
-void  fn_800EDFC0(void* pObj);
+void  fn_800EDFC0(UStreamObject* pObject);
 s32  fn_800F02A8(void);
 s32  fn_800EFA9C(s32 i);
 
@@ -123,22 +112,22 @@ void fn_800EDE78(void) {
 }
 
 void fn_800EDEE8(void) {
-    UStream_UnregisterHandler(1346847075);
-    UStream_UnregisterHandler(1346847092);
-    UStream_UnregisterHandler(1346847088);
-    UStream_UnregisterHandler(1346847086);
+    UStream_UnregisterHandler('PGAc');
+    UStream_UnregisterHandler('PGAt');
+    UStream_UnregisterHandler('PGAp');
+    UStream_UnregisterHandler('PGAn');
 }
 
-void fn_800EDF34(s32 p0) {
-    fn_8000E790(p0, sizeof(gPgaData.aTournament), gPgaData.aTournament);
+void fn_800EDF34(UStreamObject* pObject) {
+    fn_8000E790(pObject, sizeof(gPgaData.aTournament), gPgaData.aTournament);
 }
 
-void fn_800EDF60(s32 p0) {
-    fn_8000E790(p0, sizeof(gPgaData.aTourEvent), gPgaData.aTourEvent);
+void fn_800EDF60(UStreamObject* pObject) {
+    fn_8000E790(pObject, sizeof(gPgaData.aTourEvent), gPgaData.aTourEvent);
 }
 
-void fn_800EDF90(s32 p0) {
-    fn_8000E790(p0, sizeof(gPgaData.aTriple), gPgaData.aTriple);
+void fn_800EDF90(UStreamObject* pObject) {
+    fn_8000E790(pObject, sizeof(gPgaData.aTriple), gPgaData.aTriple);
 }
 
 // The current tournament's number of rounds goes into the game state.
@@ -342,20 +331,20 @@ s32 fn_800F0428(s32 nPlayer) {
 }
 
 void fn_800EDE7C(void) {
-    UStream_RegisterHandler('PGAc', fn_800EDF34, 'PG\0\0');
-    UStream_RegisterHandler('PGAt', fn_800EDF60, 'PG\0\0');
-    UStream_RegisterHandler('PGAp', fn_800EDF90, 'PG\0\0');
-    UStream_RegisterHandler('PGAn', fn_800EDFC0, 'PG\0\0');
+    UStream_RegisterHandler('PGAc', fn_800EDF34);
+    UStream_RegisterHandler('PGAt', fn_800EDF60);
+    UStream_RegisterHandler('PGAp', fn_800EDF90);
+    UStream_RegisterHandler('PGAn', fn_800EDFC0);
 }
 
 // The 'PGAn' object: the names block is copied out.
-void fn_800EDFC0(void* pObj) {
+void fn_800EDFC0(UStreamObject* pObject) {
     void* pData;
-    u32 nSize = fn_8000E81C(pObj, &pData);
+    u32 nSize = fn_8000E81C(pObject, &pData);
     if (nSize) {
         gPgaData.pNames = fn_800951A0(nSize, 0x10, 1);
         Mem_cpy(gPgaData.pNames, pData, nSize);
-        fn_80009E70(pObj);
+        fn_80009E70(pObject);
     }
 }
 
@@ -395,7 +384,7 @@ s32 fn_800EE778(s32 nPlayer) {
 s32 fn_800EE810(s32 nPlayer) {
     if (gpGame->bD4) {
         return fn_8011A7C8(nPlayer, Game_CurHoleIndex()) -
-            (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1);
+               (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1);
     }
     return fn_80119588(nPlayer, 1) - (fn_800E1904(nPlayer, 1) + 1);
 }
@@ -405,7 +394,7 @@ u8 fn_800EE5B4(s32 nPlayer) {
     int bBehind;
     if (gpGame->bD4) {
         return gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1 <
-            fn_8011A7C8(nPlayer, Game_CurHoleIndex());
+               fn_8011A7C8(nPlayer, Game_CurHoleIndex());
     }
     bBehind = 0;
     if (fn_800E1904(nPlayer, 0) >= fn_80119588(nPlayer, 1)) {
