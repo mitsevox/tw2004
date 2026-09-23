@@ -411,7 +411,7 @@ config.libs = [
         "progress_category": "sdk",
         "src_dir": "extern/ffcc",
         "objects": [
-            Object(NonMatching, "src/ax/AXAlloc.c"),
+            Object(Matching, "src/ax/AXAlloc.c"),
             Object(NonMatching, "src/os/OSAlloc.c"),
             Object(NonMatching, "src/card/CARDWrite.c"),
         ],
