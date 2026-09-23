@@ -12,10 +12,11 @@
 // (UKernel.c passes 0 for the second when a message has one).
 typedef int (*DynObjHandler)(int nMsg, struct DynObj* pObj, void* pArg, void* pArg2);
 
-// An object's definition in the course data.
+// An object's definition in the course data: its 'tACT' chunk from the chunk's id on
+// (fn_80048BDC; DynObjChunk).
 typedef struct DynObjDef {
-    s32  n0;                    // 0x00  -> DynObj.n140
-    u8   n4;                    // 0x04  -> DynObj.n146
+    s32  n0;                    // 0x00  the chunk's id -> DynObj.n140
+    u8   n4;                    // 0x04  its type (fn_800499B0) -> DynObj.n146
     u8   unk5[3];
     f32  aPos[3];               // 0x08  where it stands
     u32  u14;                   // 0x14  -> DynObj.uFlags (type 0)
@@ -25,15 +26,35 @@ typedef struct DynObjDef {
     f32  f1C;                   // 0x1C  type 2: its turning speed, degrees a second
 } DynObjDef;
 
+// The stream object an object's model comes from (a view of UStreamObject: its +4 is the model).
 typedef struct DynObjModelRef {
     u8   unk0[4];
     struct UObjModel* p4;       // 0x04  goes to fn_800486F4
 } DynObjModelRef;
 
+// One stream object an object's 'aRSL' chunk names, found by UKernel.c's fn_80048BDC.
+typedef struct DynObjModelEntry {
+    u32  uType;                 // 0x0  the stream object's type
+    union {
+        s32  nId;               // 0x4  its id in the file (0: none) ...
+        DynObjModelRef* pRef;   //      ... replaced by the object once it is found
+    } u;
+} DynObjModelEntry;
+
+// An object's 'aRSL' chunk, laid over the chunk from its id on (DynObjChunk): the stream objects
+// it uses, the first its model.
 typedef struct DynObjModel {
-    u8   unk0[8];
-    DynObjModelRef* p8;         // 0x08  the model, if any
+    s32  nEntries;              // 0x0  set from the chunk's size
+    DynObjModelEntry aEntries[1]; // 0x4  nEntries of them (as many as the chunk holds)
 } DynObjModel;
+
+// A tagged piece of a stream object's data: fn_8000B748 finds one by tag and id and returns what
+// follows the header, fn_8000B7B0 returns the header.
+typedef struct DynObjChunk {
+    u32  uTag;                  // 0x0
+    u32  uSize;                 // 0x4  header included
+    u32  uId;                   // 0x8
+} DynObjChunk;
 
 // The names an object passes to fn_8000EA1C (DynObjSetup.pC).
 typedef struct DynObjNames {

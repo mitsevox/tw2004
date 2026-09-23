@@ -3,6 +3,7 @@
 // lbl_80281DB8. Only part is decompiled so far.
 
 #include "dynobj.h"
+#include "terrain.h"
 
 DynObj* fn_80049018(DynObjSetup* pSetup);
 int  fn_8000EA1C(const char* pName, int a, int b, void* pObj);
@@ -10,8 +11,18 @@ void fn_8000E830(DynObj* pObj);
 void fn_8000ADC0(f32 (*pMtx)[4]);                   // identity
 void fn_8000C5A4(f32 (*pMtx)[4]);
 
+void* fn_8000B748(u8* pData, u32 uSize, u32 uTag, u32 uId);
+DynObjChunk* fn_8000B7B0(u8* pData, u32 uSize, u32 uTag, u32 uId);
+UStreamObject* fn_8000B70C(u32 uType, u32 uId);
+void fn_800646D0(UStreamObject* pObject);
+void fn_80064A0C(UStreamObject* pObject);
+void fn_8009943C(u8* pData, u32 uSize);
+void fn_800A4CB8(UStreamObject* pObject, int n);
+void fn_800EADDC(void* pObj);
+
 void fn_80048B70(void* p);
 void fn_80048BDC(UStreamObject* pObject);
+s32  fn_800490B8(DynObjSetup* pSetup);
 void fn_800490EC(void);
 
 // Memory for an object of nSize bytes: a node of the small or the large pool while one is free,
@@ -35,6 +46,65 @@ void fn_80048B70(void* p) {
     } else {
         fn_80009E70(p);
     }
+}
+
+// The 'Cact' stream handler: an object's definition arrived. Some types are handed to their own
+// systems (the tee and pin positions, types 7 to 10, 200 and 201); the others get their stream
+// objects looked up and become a dynamic object, whose id is kept in the stream object.
+void fn_80048BDC(UStreamObject* pObject) {
+    DynObjSetup setup;
+    DynObjChunk* pChunk;
+    int i;
+
+    setup.pDef = (DynObjDef*)((u8*)fn_8000B748(pObject->pData, pObject->uSize, 'tACT', pObject->uId) -
+                              sizeof(u32));
+    switch (setup.pDef->n4) {
+    case 200:
+        fn_800646D0(pObject);
+        return;
+    case 201:
+        fn_80064A0C(pObject);
+        return;
+    case 5:
+        fn_80034720(pObject);
+        return;
+    case 6:
+        if (!fn_800347B4(pObject)) return;
+        break;
+    case 7:
+        fn_8009943C(pObject->pData, pObject->uSize);
+        fn_80009E70(pObject);
+        return;
+    case 8:
+        fn_80009E70(pObject);
+        return;
+    case 10:
+        fn_800EADDC(pObject);
+        return;
+    case 9:
+        fn_800A4CB8(pObject, 1);
+        fn_80009E70(pObject);
+        return;
+    }
+    pChunk = fn_8000B7B0(pObject->pData, pObject->uSize, 'aRSL', pObject->uId);
+    if (pChunk != NULL) {
+        setup.pModel = (DynObjModel*)&pChunk->uId;
+        setup.pModel->nEntries = (pChunk->uSize - sizeof(DynObjChunk)) / sizeof(DynObjModelEntry);
+        for (i = 0; i < setup.pModel->nEntries; i++) {
+            if (setup.pModel->aEntries[i].u.nId != 0) {
+                setup.pModel->aEntries[i].u.pRef = (DynObjModelRef*)fn_8000B70C(
+                    setup.pModel->aEntries[i].uType, setup.pModel->aEntries[i].u.nId);
+            }
+        }
+    } else {
+        setup.pModel = NULL;
+    }
+    setup.pfnHandler = fn_800499B0(setup.pDef->n4);
+    setup.pC = (DynObjNames*)pObject;
+    pObject->pData = (u8*)setup.pModel;
+    pObject->uUnk8 = 0;
+    pObject->uUnk4 = fn_800490B8(&setup);
+    fn_80009E70(pObject);
 }
 
 // Sets the kernel up: the 'Cact' stream handler, the two node pools and an empty list.
@@ -331,7 +401,7 @@ void fn_80049514(DynObj* pObj, DynObjSetup* pSetup) {
         pObj->uFlags |= 0x02000000;
     }
     if (pSetup->pModel != NULL) {
-        pModel = pSetup->pModel->p8;
+        pModel = pSetup->pModel->aEntries[0].u.pRef;
     } else {
         pModel = NULL;
     }

@@ -49,7 +49,7 @@ void fn_8004ABBC(DynObj* pObj, DynObjSetup* pSetup) {
         pObj->uFlags |= 0x02000000;
     }
     if (pSetup->pModel != NULL) {
-        pModel = pSetup->pModel->p8;
+        pModel = pSetup->pModel->aEntries[0].u.pRef;
     } else {
         pModel = NULL;
     }
