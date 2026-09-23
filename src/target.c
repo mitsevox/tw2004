@@ -4,6 +4,8 @@
 
 #include "game_types.h"
 
+// ---- sweep code (not yet cleaned up) ----
+
 s32 fn_8000C140();
 s32 Ter_iNumOOBNetworksLoaded();
 s32 Ter_PointInOOBNetwork();
@@ -64,3 +66,5 @@ void fn_8006A8D4(s32 p0, u8* p1, u8* p2) {
     t4 = fn_80012ED0(t0);
     *(f32*)p2 = (*(f32*)p2 * t4 + t3);
 }
+
+// ---- end of sweep code ----

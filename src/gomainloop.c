@@ -4,6 +4,8 @@
 
 #include "game_types.h"
 
+// ---- sweep code (not yet cleaned up) ----
+
 extern s32 lbl_802811F0;
 f32 fn_8006C630(void);
 u8 OSGetResetButtonState();
@@ -531,3 +533,5 @@ void fn_8006E0BC(void) {
 void fn_8006E0F8(void) {
     fn_8009B134();
 }
+
+// ---- end of sweep code ----

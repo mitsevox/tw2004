@@ -1,4 +1,10 @@
+// animblender.c (TW06's golf/animation/animblender.c by its place in the link order; the name is
+// not proven, and TW06's SKATime_* functions sit near its end): blends the golfer's animations.
+// Mostly not yet decompiled; the machine-style code below is the sweep's.
+
 #include "game_types.h"
+
+// ---- sweep code (not yet cleaned up) ----
 
 f32 fn_800728D8();
 f32 fn_80072938();
@@ -55,3 +61,5 @@ s32 fn_800734A0(void) {
     t0 = fn_800734D0();
     return ((u32)((1 - t0) | (t0 - 1)) >> 31);
 }
+
+// ---- end of sweep code ----
