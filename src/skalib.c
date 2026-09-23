@@ -1868,7 +1868,6 @@ AnimLib* AnimLib_Load(u8* pData, ClipBank* pBank) {
     void*     pSrc;
     u32       uPad;
     AnimLib*  pLib;
-    u8*       p;
     int       i;
 
     uPad = 16 - ((uptr)pData & 15);
@@ -1877,7 +1876,7 @@ AnimLib* AnimLib_Load(u8* pData, ClipBank* pBank) {
     }
     pLib        = (AnimLib*)(pData + uPad);
     pLib->pFile = pData;
-    p           = (u8*)pLib + sizeof(AnimLib);
+    pData       = (u8*)pLib + sizeof(AnimLib);   // from here on, where the next part of the file is
     pDst = pSrc = pLib;
     // port: an animation library's header ('SAL ', and 'SAC ' overlays), little-endian on disc; a
     //       little-endian port does not swap here.
@@ -1886,10 +1885,10 @@ AnimLib* AnimLib_Load(u8* pData, ClipBank* pBank) {
     if (pLib->pBank != NULL) {
         if (pBank == NULL) return NULL;
         pLib->pClipData = NULL;
-        pLib->ppClips   = (void**)p;
-        p += pLib->nClips * 4;
+        pLib->ppClips   = (void**)pData;
+        pData += pLib->nClips * 4;
         pLib->nClips2   = pLib->nClips;
-        pLib->pTree = p;
+        pLib->pTree = pData;
         pDst = pSrc = pLib->ppClips;
         // port: the library's clip numbers into its bank, little-endian on disc; a little-endian port does
         //       not swap here
@@ -1905,16 +1904,16 @@ AnimLib* AnimLib_Load(u8* pData, ClipBank* pBank) {
         }
         pLib->pBank = pBank;
     } else {
-        pLib->pIndex  = (s16*)p;
-        p += pLib->nClips * 2;
+        pLib->pIndex  = (s16*)pData;
+        pData += pLib->nClips * 2;
         pLib->nClips2 = pLib->nClips;
-        if ((uptr)p & 15) {
-            p = (u8*)((((uptr)p >> 4) + 1) << 4);
+        if ((uptr)pData & 15) {
+            pData = (u8*)((((uptr)pData >> 4) + 1) << 4);
         }
-        pLib->pRecords = (ClipRecord*)p;
-        p += pLib->nRecords * sizeof(ClipRecord);
-        pLib->pTree = p;
-        p += pLib->nTreeSize;
+        pLib->pRecords = (ClipRecord*)pData;
+        pData += pLib->nRecords * sizeof(ClipRecord);
+        pLib->pTree = pData;
+        pData += pLib->nTreeSize;
         pDst = pSrc = pLib->pIndex;
         // port: the library's clip index, little-endian on disc; a little-endian port does not swap here
         fn_80076158(&pSrc, pDst, pLib->nClips * 2, 2);
@@ -1923,10 +1922,10 @@ AnimLib* AnimLib_Load(u8* pData, ClipBank* pBank) {
         //       little-endian port does not swap here
         fn_8001F08C(&pSrc, &pDst, recFmt, 7, pLib->nRecords);
         if (pLib->uFlags & 1) {
-            if ((uptr)p & 15) {
-                p = (u8*)((((uptr)p >> 4) + 1) << 4);
+            if ((uptr)pData & 15) {
+                pData = (u8*)((((uptr)pData >> 4) + 1) << 4);
             }
-            pLib->pClipData = p;
+            pLib->pClipData = pData;
             pLib->ppClips   = fn_80009B34(pLib->nClips * 4, 2, 0x40, "skalib.c", 4164);
             for (i = 0; i < pLib->nRecords; i++) {
                 pLib->pRecords[i].pClip =
