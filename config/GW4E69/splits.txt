@@ -109,13 +109,7 @@ unsorted/sweep_8000A0E8.c:
 	.text       start:0x8000A0E8 end:0x8000A194
 
 UMemPool.c:
-	.text       start:0x8000A194 end:0x8000B058
-
-unsorted/sweep_8000B058.c:
-	.text       start:0x8000B058 end:0x8000B078
-
-unsorted/sweep_8000B078.c:
-	.text       start:0x8000B078 end:0x8000B0D4
+	.text       start:0x8000A194 end:0x8000B130
 
 urandom.c:
 	.text       start:0x8000B130 end:0x8000B46C

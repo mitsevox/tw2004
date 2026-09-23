@@ -16,7 +16,28 @@ void* fn_80005AE8(void* pDst, int nValue, u32 uLen);      // memset; returns pDs
 void* fn_80009B34(u32 uSize, u32 uFlags, u32 uAlign, const char* pFile, int nLine);  // alloc
 void  fn_80009E70(void* p);             // free
 void* fn_800951A0(u32 uSize, int nAlign, int a);
+void  fn_8009527C(void* p);             // frees what fn_800951A0 allocated
 void  fn_800953C8(int a);
+
+// A pool of fixed-size nodes carved from one allocation (UMemPool.c): the header, then the nodes.
+// A free node holds the next free one in its first word.
+typedef struct UMemPoolNode {
+    struct UMemPoolNode* pNext; // 0x0  the next free node
+} UMemPoolNode;
+
+typedef struct UMemPool {
+    u32  uNodeSize;             // 0x0  one node, rounded up to the alignment
+    u8*  pEnd;                  // 0x4  the end of the pool's memory
+    u16  nNodes;                // 0x8
+    u16  nFree;                 // 0xA
+    UMemPoolNode* pFree;        // 0xC  the free list
+} UMemPool;
+LAYOUT_ASSERT(UMemPool, 0x10);
+
+UMemPool* fn_8000AFA0(int nNodes, u32 uNodeSize, u32 uFlags, u32 uAlign);   // create
+void  fn_8000B058(UMemPool* pPool);                     // destroy
+void* fn_8000B078(UMemPool* pPool);                     // take a node (NULL when none is free)
+void  fn_8000B0D4(UMemPool* pPool, void* pNode);        // give a node back
 // Sorts nCount items of nSize bytes with pfnCompare (the C library's qsort, by its arguments).
 void  fn_8015929C(void* pBase, u32 nCount, u32 nSize, s32 (*pfnCompare)(const void* pA, const void* pB));
 
@@ -36,6 +57,10 @@ void Vec_Copy(f32* pSrc, f32* pDst);    // 0x8000AD10
 f32  fn_8000AD78(f32 y, f32 x);         // atan2f
 f32  fabsf(f32 x);                      // 0x8000AD9C: fabs (0x8000AE94, platform.h) rounded to a float
 f32  fn_8000AF7C(f32 x);                // natural logarithm
+void fn_8000AF20(void);                 // make the log2 table (lbl_80281BD8)
+void fn_8000AF58(void);                 // free the log2 table
+double fn_8015F7C4(double y, double x); // atan2
+double fn_8015F804(double x);           // log
 u32  Rand_Next(int nStream);            // 0x8000B130  EA's lagged-Fibonacci generator
 f32  fn_8000B318(int nStream);          // a normally distributed random number (mean 0, deviation 1):
                                         // Box-Muller on two Rand_Floats, the second value kept
