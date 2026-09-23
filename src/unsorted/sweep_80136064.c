@@ -2,9 +2,9 @@
 
 #include "game_types.h"
 
-extern s32 lbl_802826D8;
+extern s32 __AXCommandListCycles;
 
 s32 fn_80136064(void);
 s32 fn_80136064(void) {
-    return lbl_802826D8;
+    return __AXCommandListCycles;
 }

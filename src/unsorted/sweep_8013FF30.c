@@ -4,7 +4,7 @@
 
 extern s32 CPUFifo;
 
-s32 fn_8013FF30(void);
-s32 fn_8013FF30(void) {
+s32 GXGetCPUFifo(void);
+s32 GXGetCPUFifo(void) {
     return CPUFifo;
 }
