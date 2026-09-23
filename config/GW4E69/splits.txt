@@ -3576,6 +3576,7 @@ src/dolphin/ax/AXVPB.c:
 
 src/ax/AXProf.c:
 	.text       start:0x80138184 end:0x801381CC
+	.sbss       start:0x80282740 end:0x80282750
 
 src/axfx/reverb_hi.c:
 	.text       start:0x801381CC end:0x80138EC8
