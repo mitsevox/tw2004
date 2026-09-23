@@ -590,13 +590,19 @@ typedef struct PinPos {
 // more pointers before the polygon list). The ground is triangle strips: each TerPolyRef names a
 // first vertex and a triangle count, and triangle k of a strip is vertices k, k+1, k+2.
 typedef struct CourseInfo {
-    u8     unk0[0x20];
+    u32    nGridWidth;          // 0x00  cells across (x). TW06: uiReferenceGridWidth
+    u32    nGridLength;         // 0x04  cells along (z). TW06: uiReferenceGridLength
+    f32    fGridOrigin[2];      // 0x08  x, z of the grid's corner. TW06: fReferenceGridOrigin
+    f32    fGridCellSize[2];    // 0x10  TW06: fReferenceGridCellSize
+    u8     unk18[0x20 - 0x18];
     u32    nPolyRefs;           // 0x20  TW06: uiPolygonReferencesListSize
     u8     unk24[4];
     f32  (*pVerts)[3];          // 0x28  TW06: pVertexList
     u8*    pTriFlags;           // 0x2C  per vertex, for the triangle that ends there: bits 0-2 = 0 skip it;
                                 //       bit 3 done (fn_80050794); bits 4-5 / 6-7 its highest / lowest corner
-    u8     unk30[0x4C - 0x30];
+    u8     unk30[4];
+    struct TerCell* pGrid;      // 0x34  nGridWidth x nGridLength cells, row by row. TW06: pTerrainGrid (0x3C)
+    u8     unk38[0x4C - 0x38];
     struct TerPolyRef* pPolyRefs;   // 0x4C  TW06: pPolygonReferenceList (at 0x58 there)
     u8     unk50[0x6C - 0x50];
     f32    fFloor;              // 0x6C  a ball in the air above this with no ground under it is still in play
