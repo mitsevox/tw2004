@@ -291,7 +291,9 @@ typedef struct Player {
     s32  nBallOwner;            // 0xB24  the ball's nPlayer (Ball + 0x94)
     u8   unkB28[0xB4C - 0xB28];
     f32  vOrient[4];            // 0xB4C  a quaternion, identity at setup. TW06: ballRot
-    u8   ballBefore[0xBC];      // 0xB5C  copy of the Ball as it lay before the shot
+    u8   ballBefore[0x94];      // 0xB5C  copy of the Ball as it lay before the shot (0xBC bytes)
+    s32  nBallBeforeOwner;      // 0xBF0  the copy's nPlayer (Ball + 0x94), -1 for nobody's
+    u8   unkBF4[0xC18 - 0xBF4];
     s32  nShotHandle;           // 0xC18
     f32  fThinkTime;            // 0xC1C  seconds a CPU has spent in state 2
     f32  fC20;                  // 0xC20
