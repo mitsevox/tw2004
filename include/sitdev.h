@@ -5,6 +5,8 @@
 #define SITDEV_H
 
 #include "engine.h"
+#include "endian.h"
+#include "ball.h"
 
 #define SITDEV_NUM_VALUES 96
 
@@ -22,19 +24,64 @@ LAYOUT_ASSERT(SitDevData, 0x140);
 
 extern SitDevData* lbl_802811B8;    // 0x802811B8 (.sdata): &lbl_801D5AB0
 
+// A halfword the loader rewrites (fn_800BB52C): on disc its two bit-fields are in the other bit
+// order, so it reads the raw value and stores its low 11 bits and its top 5 bits back as fields.
+typedef union SitDevBits {
+    u16 uRaw;
+    struct {
+        u16 n11 : 11;           // bits 15..5
+        u16 n5 : 5;             // bits 4..0
+    } s;
+} SitDevBits;
+
+// An entry of the scripts' first table (SitDevScripts.p14, 0x30 bytes; 0x80067710 runs them).
+typedef struct SitDevEntry {
+    u8         unk0[2];
+    SitDevBits b2;              // 0x02
+    u8         unk4[0x30 - 0x4];
+} SitDevEntry;
+
+// An entry of the scripts' third table (SitDevScripts.p1C, 8 bytes).
+typedef struct SitDevEntry8 {
+    u8         unk0[2];
+    SitDevBits b2;              // 0x02
+    u8         unk4[0x8 - 0x4];
+} SitDevEntry8;
+
 // The situation scripts' header (lbl_80282208): the block whose address is the first word of
 // SitDev_LoadScripts' argument. fn_800BB4B4 turns the offsets at 0x14..0x20 into pointers.
 typedef struct SitDevScripts {
-    s32   nEntries;             // 0x00  entries of 0x30 bytes at p14 (0x80067710)
-    u8    unk4[0x10 - 0x4];
+    u32   nEntries;             // 0x00  entries at p14 (0x80067710)
+    u32   n04;                  // 0x04  entries at p18
+    u32   n08;                  // 0x08  entries at p1C
+    u32   n0C;                  // 0x0C  words at p20
     u32   n10;                  // 0x10  bytes in SitDevData.pD4 (fn_800BD74C clears them)
-    u8*   p14;                  // 0x14
+    SitDevEntry*  p14;          // 0x14
     u8*   p18;                  // 0x18  entries of 0x68 bytes (fn_800BCD68)
-    u8*   p1C;                  // 0x1C
+    SitDevEntry8* p1C;          // 0x1C
     u8*   p20;                  // 0x20
 } SitDevScripts;
 
 extern SitDevScripts* lbl_80282208; // 0x80282208 (.sbss), NULL until the scripts are loaded
+
+// The byte-swap layouts of the header and the p14, p18 and p1C entries (fn_8001F08C).
+extern SwapField lbl_80191168[9];
+extern SwapField lbl_801911B0[7];
+extern SwapField lbl_801911E8[5];
+extern SwapField lbl_80191210[4];
+
+// A situation zone, from chunk 5 of the hole's data (fn_800BB6DC): an outline, its nNumNodes
+// nodes of 0x30 bytes, and then the zone's bits (a u32 right after the last node).
+typedef struct SitDevZone {
+    TNetwork net;               // 0x0
+    u8       aNodes[1][0x30];   // 0x4  net.nNumNodes of them
+} SitDevZone;
+
+extern SitDevZone* lbl_801FA1C0[10];    // the hole's zones
+extern s32 lbl_80282210;                // how many
+
+// Per game mode: the bit fn_800BB3F8 returns for it, -1 for none.
+extern s32 lbl_801910F8[28];
 
 void fn_800BD74C(void);             // clear SitDevData.pD4
 extern s32 lbl_801FA198[5];         // per player; cleared by fn_800BB1C0

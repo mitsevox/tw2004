@@ -7,6 +7,7 @@
 #include "golfer.h"
 #include "sitdev.h"
 #include "game.h"
+#include "game/modes/pgatoursim.h"
 
 // Defined here, last address first (CodeWarrior lays out .sbss in reverse).
 u8    lbl_80282200;     // 0x80282200  the watched ball has reached surface 105
@@ -14,6 +15,7 @@ Ball* lbl_802821FC;     // 0x802821FC  the watched ball, NULL for none
 u32   lbl_802821F8;     // 0x802821F8  gSession.nFrameCount when it started
 
 void fn_80067710(int nPlayer, int a, int b);   // also declared in Swing.c; belongs in a header
+void fn_800BB4B0(void);
 
 // ---- the watched ball ----------------------------------------------------------------------
 
@@ -75,9 +77,183 @@ u8 fn_800BB1F8(int nPlayer) {
     return lbl_801FA1AC[nPlayer] == 1;
 }
 
+// ---- picking without repeats ---------------------------------------------------------------
+
+// A list of nCount u16 values used as a deck: the top bit marks one already drawn, 0xFFF0 is an
+// empty slot.
+
+// The slots in use.
+int fn_800BB218(u16* pList, int nCount) {
+    int i;
+    int nUsed = 0;
+    for (i = 0; i < nCount; i++) {
+        if (pList[i] != 0xFFF0) {
+            nUsed++;
+        }
+    }
+    return nUsed;
+}
+
+// The values not drawn yet; when every one is drawn, put them all back and return nCount.
+int fn_800BB248(u16* pList, int nCount) {
+    int nLeft = 0;
+    int i;
+    u16* p = pList;
+    for (i = 0; i < nCount; i++) {
+        if ((*pList & 0x8000) != 0x8000) {
+            nLeft++;
+        }
+        pList++;
+    }
+    if (nLeft == 0) {
+        i = nCount;
+        while (i-- > 0) {
+            *p &= 0x7FFF;
+            p++;
+        }
+        return nCount;
+    }
+    return nLeft;
+}
+
+// Draw the nPick'th value not drawn yet (nLeft: fn_800BB248's count) and mark it drawn.
+u32 fn_800BB334(u16* pList, int nCount, int nLeft, u32 nPick) {
+    int i;
+    u32 n = 0;
+    for (i = 0; i < nCount; i++) {
+        if (!(*pList & 0x8000)) {
+            if (nPick == n) {
+                nPick = *pList;
+                *pList |= 0x8000;
+                break;
+            }
+            n++;
+        }
+        pList++;
+    }
+    return nPick;
+}
+
+// The player's place in the PGA Tour event (1 outside mode 23) as a band: 0 for the top 3,
+// 1 for the top 10, 2 for the top 25, 3 below.
+int fn_800BB37C(int nPlayer) {
+    int nRank;
+    if (Game_GetMode() == 23) {
+        nRank = fn_801190D8(nPlayer, 0);
+    } else {
+        nRank = 1;
+    }
+    if (nRank <= 3) return 0;
+    if (nRank <= 10) return 1;
+    return nRank <= 25 ? 2 : 3;
+}
+
+// The game mode's bit (lbl_801910F8), 0 for a mode without one.
+u16 fn_800BB3F8(int nMode) {
+    s32 nBit = lbl_801910F8[nMode];
+    return nBit == -1 ? 0 : 1 << nBit;
+}
+
 // ---- scripts -------------------------------------------------------------------------------
 
+void fn_800BB4E8(void);
+void fn_800BB4B4(SitDevScripts* pScripts);
+void fn_800BB52C(void);
+
+// Take the loaded scripts (the first time, byte-swap them and fix up their pointers) and allocate
+// their per-entry bytes.
+void SitDev_LoadScripts(SitDevScripts** ppScripts) {
+    fn_800BB4B0();
+    lbl_802811B8->pCC = ppScripts;
+    if (lbl_80282208 == NULL) {
+        lbl_80282208 = *ppScripts;
+        fn_800BB4E8();
+        fn_800BB4B4(lbl_80282208);
+        fn_800BB52C();
+    }
+    lbl_802811B8->pD4 = fn_80009B34(lbl_80282208->n10, 2, 16, "SitDevFile.c", 105);
+    fn_800BD74C();
+}
+
 void fn_800BB4B0(void) {
+}
+
+// The header's table offsets are from its start.
+void fn_800BB4B4(SitDevScripts* pScripts) {
+    pScripts->p14 = (SitDevEntry*)((u8*)pScripts->p14 + (uptr)pScripts);
+    pScripts->p18 = pScripts->p18 + (uptr)pScripts;
+    pScripts->p1C = (SitDevEntry8*)((u8*)pScripts->p1C + (uptr)pScripts);
+    pScripts->p20 = pScripts->p20 + (uptr)pScripts;
+}
+
+// Byte-swap the header in place.
+void fn_800BB4E8(void) {
+    void* pSrc = lbl_80282208;
+    void* pDst = lbl_80282208;
+    fn_8001F08C(&pSrc, &pDst, lbl_80191168, 9, 1);
+}
+
+// Byte-swap the tables in place, then put the bit-fields of the p14 and p1C entries in order.
+void fn_800BB52C(void) {
+    u32 i;
+    void* pSrc;
+    void* pDst;
+    SitDevEntry* pEntry;
+    SitDevEntry8* pEntry8;
+    u16 uRaw;
+    if (lbl_80282208->nEntries != 0) {
+        pSrc = lbl_80282208->p14;
+        pDst = lbl_80282208->p14;
+        fn_8001F08C(&pSrc, &pDst, lbl_801911B0, 7, lbl_80282208->nEntries);
+    }
+    if (lbl_80282208->n04 != 0) {
+        pSrc = lbl_80282208->p18;
+        pDst = lbl_80282208->p18;
+        fn_8001F08C(&pSrc, &pDst, lbl_801911E8, 5, lbl_80282208->n04);
+    }
+    if (lbl_80282208->n08 != 0) {
+        pSrc = lbl_80282208->p1C;
+        pDst = lbl_80282208->p1C;
+        fn_8001F08C(&pSrc, &pDst, lbl_80191210, 4, lbl_80282208->n08);
+    }
+    if (lbl_80282208->n0C != 0) {
+        pSrc = lbl_80282208->p20;
+        pDst = lbl_80282208->p20;
+        // EA bug: the byte count and the value width are swapped, and the address of pDst is
+        // passed for pDst (the call is shaped like fn_8001F08C's)
+        fn_80076158((u8**)&pSrc, (u8*)&pDst, 4, lbl_80282208->n0C * 4);
+    }
+    for (i = 0; i < lbl_80282208->nEntries; i++) {
+        pEntry = &lbl_80282208->p14[i];
+        uRaw = pEntry->b2.uRaw;
+        pEntry->b2.s.n11 = uRaw;
+        lbl_80282208->p14[i].b2.s.n5 = uRaw >> 11;
+    }
+    for (i = 0; i < lbl_80282208->n08; i++) {
+        pEntry8 = &lbl_80282208->p1C[i];
+        uRaw = pEntry8->b2.uRaw;
+        pEntry8->b2.s.n11 = uRaw;
+        lbl_80282208->p1C[i].b2.s.n5 = uRaw >> 11;
+    }
+}
+
+// Course loader for chunk 5 of a hole: one more situation zone.
+void fn_800BB6DC(u8* pChunk) {
+    lbl_801FA1C0[lbl_80282210] = (SitDevZone*)pChunk;
+    lbl_80282210++;
+}
+
+// The bits of every zone the point is in (0 when the hole has none).
+u32 fn_800BB6FC(f32* pPos) {
+    int i;
+    u32 uBits = 0;
+    if (lbl_80282210 == 0) return 0;
+    for (i = 0; i < lbl_80282210; i++) {
+        if (fn_8000C140(pPos, &lbl_801FA1C0[i]->net, lbl_801FA1C0[i]->net.nNumNodes)) {
+            uBits |= *(u32*)lbl_801FA1C0[i]->aNodes[lbl_801FA1C0[i]->net.nNumNodes];
+        }
+    }
+    return uBits;
 }
 
 // Set value 5 of the shared block.

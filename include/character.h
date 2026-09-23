@@ -479,13 +479,6 @@ typedef struct ClipBank {
 } ClipBank;
 LAYOUT_ASSERT(ClipBank, 0x20);
 
-// One field of a byte-swap description: nBytes bytes made of nSize-byte values (negative: not
-// swapped).
-typedef struct SwapField {
-    s32 nBytes;                 // 0x0
-    s32 nSize;                  // 0x4
-} SwapField;
-
 // A library that can be layered over a slot's own.
 typedef struct LibOverlay {
     AnimLib* pWork;             // 0x00  the loaded (swapped) copy
