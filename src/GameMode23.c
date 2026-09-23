@@ -6,7 +6,6 @@
 #include "game.h"
 #include "engine.h"
 
-void fn_800EDE78(void);
 void fn_800EDEE8(void);
 void fn_800EDF34(UStreamObject* pObject);
 void fn_800EDF60(UStreamObject* pObject);
@@ -17,7 +16,7 @@ extern u8 lbl_8028233C;
 extern u8 lbl_80205F30[];
 s32 fn_800EE8B0(void);
 u8* fn_800EE8B8(void);
-void fn_80119934();
+void fn_80119934(int a);
 void fn_800EF294(void);
 s32 fn_800EF834(void);
 s32 fn_800EFB88(void);
@@ -26,7 +25,6 @@ s32 fn_800EFDFC(s32 p0);
 u8* fn_800EFA70(s32 i);
 s32 fn_800EFE3C(s32 i);
 u8* fn_800EFE60(s32 p0);
-s32 fn_801197CC();
 void fn_800F009C(void);
 u8 fn_8011908C(s32, s32);
 s32 fn_8011937C(s32, s32, u8);

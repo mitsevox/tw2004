@@ -13,7 +13,6 @@ void  fn_8006A8B0(void);
 void  fn_800E0AC4(int a);
 void  fn_800E0A98(int a);
 void  fn_800E5474(int a);
-void  fn_800A72EC(int a, int b);
 
 extern u8  lbl_80282281;                    // the end-of-round screen is up
 extern u8  lbl_80282282;                    // the end-of-hole screen is up

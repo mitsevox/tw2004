@@ -59,7 +59,6 @@ u8    fn_800F7D8C(int a);
 s32   fn_800F7D94(void);
 s32   fn_800F7D9C(void);
 void  fn_800F7DA4(void);
-void  fn_800F7DE8(void);
 void  fn_800F7ED8(int nPlayer);
 void  fn_800F7EF8(int nPlayer);
 void  fn_800F7F1C(int nPlayer, int nTime);

@@ -11,13 +11,8 @@
 typedef struct View View;
 
 void  fn_800E0A84(u8 v);
-s32   fn_800E1074();
-s32   fn_800E1434();
-s32   fn_800D29E8();
-s32   fn_800D33F0();
-s32   fn_800E3BEC();
-s32   fn_800EADD8();
-s32   fn_800EDE78();
+void  fn_800D29E8(void);
+void  fn_800D33F0(void);
 int   fn_800E177C(void);
 void  fn_800E2470(void);
 void  fn_8006F4B4(void);

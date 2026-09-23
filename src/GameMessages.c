@@ -61,7 +61,6 @@ extern u8 lbl_802822BC;
 extern u8 lbl_802822DA;
 void fn_800E53A4(u8 v);
 void fn_800E53AC(void);
-void fn_800A72EC();
 void fn_800E53C0(void);
 extern u8 lbl_80282280;
 void fn_800E53E8(u8 v);

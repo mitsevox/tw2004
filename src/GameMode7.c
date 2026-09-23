@@ -14,7 +14,6 @@ u8    fn_800FA148(int a);
 s32   fn_800FA2C8(void);
 void  fn_800FA3AC(void);
 void  fn_800FA410(void);
-void  fn_800FA570();
 void  fn_800FDF38(void);
 void  fn_800FA998(int nPlayer);
 

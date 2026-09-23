@@ -39,7 +39,9 @@ void fn_800DC9D4(int a);                // pause or resume a GameBreaker
 void GM_EndOfGolferTurn(int nPlayer);
 
 // GameRound.c
+void fn_800E1074(void);
 void fn_800E1260(int nPreset);          // a hole-selection preset for the round
+void fn_800E1434(void);
 void fn_800E1480(int nHole);            // make a hole of the round the current one
 u8   fn_800E1BBC(void);                 // whether the round plays every hole
 u8   fn_800E2B40(int nPlayer, Ball* pBall);   // out of bounds
@@ -47,6 +49,7 @@ void fn_800E2BA4(void);                 // a random hole from the selection
 u8   fn_800E39F0(void);
 
 // GameUI.c
+void fn_800E3BEC(void);
 void fn_800E3C0C(u8 b);                 // show or hide the HUD on the single screen
 void fn_800E3D90(void);                 // hide every HUD
 void fn_800E4204(void);
@@ -73,8 +76,11 @@ s32  fn_800EA084(int nPlayer);
 u8   fn_800EA278(int nPlayer, u8 bCheck);
 u8   fn_800EA548(u8 bCheck);            // the game is over
 u8   fn_800EA758(u8 bCheck);
+int  fn_800EAC94(int n);
 
+void fn_800EADD8(void);                 // GameMode5.c
 u8   fn_800EC550(void);                 // GameMode5.c
+void fn_800EDE78(void);                 // GameMode23.c
 u8   fn_800EE470(void);                 // GameMode23.c
 u8   fn_800F0818(void);                 // GameMode24.c
 
@@ -95,7 +101,10 @@ void fn_800F2664(int nPlayer);
 void fn_800F2668(int nPlayer);
 u8   fn_800F2788(int nPlayer, f32 f);   // whether f is far enough for the player's tees
 void fn_800F2958(s32 nMsg, s32 a);
+void fn_800F3828(void);                 // GameMode14.c
 void fn_800F3980(int nMsg, s32 a, s32 b, s32 c, s32 d, s32 e);    // GameMode14.c
+void fn_800F48C4(void);                 // GameMode15.c
+void fn_800F7DE8(void);                 // GameMode13.c
 
 void fn_800F9824(void);                 // GameMode7.c
 
@@ -105,6 +114,7 @@ void fn_800F9AB0(void);
 void fn_800F9B34(void);
 s32  fn_800F9BF8(int nPlayer);
 u8   fn_800FA118(int nPlayer, int a);
+void fn_800FA570(void);
 void fn_800FDA30(int nPlayer, int a);
 u8   fn_800FDF58(int nPlayer);
 u8   fn_800FDF60(void);

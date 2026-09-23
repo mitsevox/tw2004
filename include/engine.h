@@ -37,6 +37,7 @@ u32  fn_8000E81C(UStreamObject* pObject, void** ppData);          // the data an
 void* fn_80017028(int nView);           // the view
 void fn_8001704C(int nView, int nPlayer);   // attach a player
 void fn_8001C804(int nPlayer, int a, int b);
+void fn_80045494(u8 bOn, int nPlayer);
 void View_SetCamera(void* pView, int nCamera, int nPlayer, int nView);
 void fn_80063B98(void* pView, f32 f, f32* pVec);
 void EVENT_Trigger(int nPlayer, int nEvent, int a, int b);    // through the event table at lbl_80188628
@@ -50,6 +51,8 @@ void fn_800A62A4(void);
 void fn_800A62E0(void);
 void fn_800A6358(void);
 void fn_800A63D0(void);
+void fn_800A72EC(u8 a, u8 b);
+void fn_800A7664(int nKind, int nMsg, int a);
 void fn_800A76E4(void);
 void fn_80125910(u8 b);
 

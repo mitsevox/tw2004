@@ -41,12 +41,10 @@ typedef struct Challenge {
     s32 n7C;
 } Challenge;
 
-void fn_800EADD8(void);
 extern s32 lbl_802822F4;
 extern s32 lbl_802822F8;
-s32 fn_800EAC94();
 void fn_800EAE38(s32 p0);
-void fn_800EAE44(void);
+void fn_800EAE44(int nId);
 s32 fn_800EAE6C(void);
 extern Challenge lbl_80203554[83];
 void fn_800EAEB8(void);
@@ -71,7 +69,6 @@ extern void (*lbl_80282318)(int nPlayer);
 u32   Rand_Next(int nStream);
 extern u8* gpSaveData;
 int   fn_800ED028(int i);
-s32   fn_800E1074();
 void  fn_800F06DC(void);
 void  fn_800EAF7C(void);
 void  fn_80019648(void);
@@ -95,7 +92,7 @@ extern u8 gNumPlayersSetUp;                 // 0x80281D48 (Golfer.c)
 extern void (*lbl_80282328)(void);
 int   fn_800EC558(void);
 u8    fn_801025F4(void);
-s16   fn_800D2994();
+s16   fn_800D2994(void);
 u8    fn_800D9998(int nPlayer, int nAward);
 u8    fn_800D750C(int nPlayer, int nAward);
 extern u8 lbl_80200538[];                   // prize data: bonuses at +0x9E4 and +0xA24
@@ -176,11 +173,10 @@ void fn_800EAE38(s32 p0) {
     lbl_802822F8 = p0;
 }
 
-void fn_800EAE44(void) {
-    s32 t0;
-    t0 = fn_800EAC94();
-    lbl_802822F4 = t0;
-    lbl_802822F8 = t0;
+void fn_800EAE44(int nId) {
+    int i = fn_800EAC94(nId);
+    lbl_802822F4 = i;
+    lbl_802822F8 = i;
 }
 
 s32 fn_800EAE6C(void) {

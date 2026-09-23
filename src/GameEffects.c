@@ -82,7 +82,6 @@ u8    fn_800B4AE0(void);
 f32   AI_MaxDistance(int nPlayer, int nKind, int nClub);
 f32   fn_800510EC(u8* pBall);
 f32   fn_8005B64C(int nPlayer);
-void  fn_80045494();                      // (bOn, nPlayer); EA calls it with one argument too
 void  fn_80045558(int a, int nPlayer);
 int   fn_8003BDBC(int nPlayer, int nLie, int a, int b, int c, f32 fDist);
 void  fn_800DBFAC(void);

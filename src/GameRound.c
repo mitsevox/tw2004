@@ -9,7 +9,6 @@
 
 int  fn_800E19A4(int nPlayer, int nHoles);
 void fn_800E25CC(u8 b);
-void fn_800E1434(void);
 int  fn_800E1CE8(int a, int b);
 u8   fn_800588F4(u8* pProfile, int a, int i);
 
