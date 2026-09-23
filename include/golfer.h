@@ -407,13 +407,16 @@ typedef struct GameState {
     s32  n144[5];               // 0x144  per player, cleared at the start of a hole
     s32  n158[5];               // 0x158  per player, cleared at the start of a hole
     u8   b16C[5][18];           // 0x16C  per player and hole, cleared with the hole's score
-    u8   unk1C6[0x1CC - 0x1C6];
+    u8   unk1C6[0x1C8 - 0x1C6];
+    // The mode's callbacks (0x1C8..0x26C). fn_800E0B38 sets them all to defaults (mostly empty
+    // stubs), then the mode's own setup replaces the ones it needs.
+    void (*pfn1C8)(void);       // 0x1C8
     void (*pfn1CC)(void);       // 0x1CC
-    u8   unk1D0[4];
+    void (*pfn1D0)(void);       // 0x1D0
     s32  (*pfn1D4)(int a);      // 0x1D4
     u8   (*pfn1D8)(int nPlayer, int a); // 0x1D8  nonzero blocks a gimme (Gimme_Allowed asks with a = 1)
     u8   (*pfn1DC)(int a);      // 0x1DC  nonzero: the game is over
-    u8   unk1E0[4];
+    void (*pfn1E0)(void);       // 0x1E0
     void (*pfn1E4)(void);       // 0x1E4  hole start
     void (*pfn1E8)(void);       // 0x1E8  hole finished
     void (*pfn1EC)(void);       // 0x1EC
@@ -421,28 +424,34 @@ typedef struct GameState {
     void (*pfn1F4)(void);       // 0x1F4  game finished
     void (*pfn1F8)(int nPlayer); // 0x1F8
     u8   (*pfn1FC)(int nPlayer); // 0x1FC  asked before the special ball pick-up
-    u8   unk200[0x20C - 0x200];
+    void (*pfn200)(void);       // 0x200
+    void (*pfn204)(void);       // 0x204
+    void (*pfn208)(void);       // 0x208
     void (*pfn20C)(int nPlayer); // 0x20C  called as a swing begins (state 1)
     void (*pfn210)(int nPlayer); // 0x210  the hole is over, the game is not
-    u8   unk214[4];
+    void (*pfn214)(void);       // 0x214
     void (*pfn218)(int nPlayer); // 0x218
     void (*pfn21C)(int nPlayer); // 0x21C
     void (*pfn220)(void);       // 0x220  every frame in game type 6
     void (*pfn224)(void);       // 0x224  the hole restarts
     void (*pfn228)(int nPlayer); // 0x228  called every frame of the shot setup (state 10)
     void (*pfn22C)(int nPlayer); // 0x22C  called after a re-plan in swing state 9
-    u8   unk230[4];
+    u8   (*pfn230)(int nPlayer); // 0x230
     u8   (*pfn234)(void);       // 0x234  a controller was pulled
     u8   (*pfn238)(int nPlayer); // 0x238  nonzero: skip addressing the ball (swing state 1)
-    u8   unk23C[0x248 - 0x23C];
+    void (*pfn23C)(int nPlayer); // 0x23C
+    void (*pfn240)(void);       // 0x240
+    void (*pfn244)(int nPlayer); // 0x244
     void (*pfn248)(int nPlayer); // 0x248  end of a golfer's turn
     void (*pfn24C)(int nPlayer); // 0x24C  called when a swing leaves state 20
     void (*pfn250)(int nPlayer); // 0x250  the ball went out of bounds
     void (*pfn254)(int nPlayer); // 0x254  a mulligan was taken
     u8   (*pfn258)(int nPlayer); // 0x258  the re-plan button is allowed
-    u8   unk25C[0x264 - 0x25C];
+    void (*pfn25C)(void);       // 0x25C
+    void (*pfn260)(int nPlayer); // 0x260
     u8   (*pfn264)(int nPlayer); // 0x264  "aim at the pin?" for a re-plan
-    u8   unk268[0x270 - 0x268];
+    void (*pfn268)(void);       // 0x268
+    void (*pfn26C)(void);       // 0x26C
     u8   bShowYardage;          // 0x270  show how far each shot went
     u8   b271;                  // 0x271
     u8   bStrokeLimit;          // 0x272  a hole ends at 10 strokes
@@ -454,7 +463,9 @@ typedef struct GameState {
     u8   bGimmesAllowed;        // 0x278  this mode allows gimmes
     u8   b279;                  // 0x279
     u8   bAIConcedes;           // 0x27A  a CPU may concede the hole (GM_CheckForAIConcede)
-    u8   unk27B[0x27E - 0x27B];
+    u8   b27B;                  // 0x27B
+    u8   b27C;                  // 0x27C
+    u8   b27D;                  // 0x27D
     u8   b27E;                  // 0x27E
     u8   b27F;                  // 0x27F
     u8   b280;                  // 0x280  the mid-hole flyover button works
@@ -462,10 +473,12 @@ typedef struct GameState {
     u8   b282;                  // 0x282
     u8   b283;                  // 0x283  the special swing cameras may be used
     u8   b284;                  // 0x284  the re-plan button works
-    u8   unk285;
+    u8   b285;                  // 0x285
     u8   b286;                  // 0x286  the flight camera toggles are allowed
     u8   b287;                  // 0x287  in-flight replays are allowed
-    u8   unk288[0x28B - 0x288];
+    u8   b288;                  // 0x288
+    u8   b289;                  // 0x289
+    u8   b28A;                  // 0x28A
     u8   bNoWind;               // 0x28B  wind off
     u8   bBumpObstructions;     // 0x28C  move a ball resting against an obstruction
     u8   b28D;                  // 0x28D

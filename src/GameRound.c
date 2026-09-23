@@ -27,6 +27,52 @@ int   Game_GetCourse(void);
 extern u8   gNumPlayersSetUp;               // 0x80281D48 (Golfer.c)
 extern char lbl_80282270[8];                // the hole name
 
+void  fn_800E3AF4(void);
+s32   fn_800E3AEC(int a);
+u8    fn_800E3AE4(int nPlayer, int a);
+u8    fn_800E3ADC(int a);
+void  fn_800E3AD4(void);
+void  fn_800CF158(int nPlayer);
+u8    fn_800CF450(int nPlayer);
+void  fn_800CFE74(void);
+void  fn_800D0098(void);
+void  fn_800D030C(void);
+void  fn_800E3AD0(int nPlayer);
+u8    fn_800E3AC8(int nPlayer);
+u8    fn_800E3AC0(void);
+u8    fn_800E3AB8(int nPlayer);
+void  fn_800E3AB0(void);
+void  fn_800E3AAC(void);
+void  fn_800E3AA8(void);
+void  fn_800E3AA0(void);
+void  fn_800FF700(void);
+void  fn_800E9E40(void);
+void  fn_800F80FC(void);
+void  fn_80101FEC(void);
+void  fn_800F944C(void);
+void  fn_800F9610(void);
+void  fn_800F986C(void);
+void  fn_800ED738(void);
+void  fn_800EACD8(void);
+void  fn_800F125C(void);
+void  fn_800FFF34(void);
+void  fn_800FEAFC(void);
+void  fn_800F6A60(void);
+void  fn_800F2984(void);
+void  fn_800F39F4(void);
+void  fn_800F4B40(void);
+void  fn_800F5AAC(void);
+void  fn_800FE1B4(void);
+void  fn_800E81C4(void);
+void  fn_800E8D58(void);
+void  fn_800E68F0(void);
+void  fn_800EDD18(void);
+void  fn_800F0448(void);
+void  fn_800E7980(void);
+void  fn_8010C4A0(void);
+void  fn_80125E68(void);
+extern s32 lbl_80282278;
+
 extern u8* gpSaveData;
 extern u8  lbl_8028227C;
 
@@ -56,6 +102,180 @@ asm void fn_800E0B14(register f32* pA, register f32* pB, register f32* pOut) {
     psq_st f2, 0(pOut), 0, 0
     psq_st f3, 8(pOut), 1, 0
     blr
+}
+
+// Sets up a game mode: every rule flag and callback to its default (the callbacks are mostly
+// empty stubs), then the mode's own setup (27 modes), then the round as holes 1..18.
+void fn_800E0B38(int nMode) {
+    int i;
+    gpGame->nMode = nMode;
+    gpGame->bD4 = 0;
+    gpGame->nD8 = 0;
+    gpGame->b136 = 0;
+    gpGame->b137 = 0;
+    gpGame->b138 = 0;
+    gpGame->b139 = 0;
+    gpGame->nSaveSlot = 5;
+    gpGame->nSaveCourse = 0;
+    gpGame->bShowYardage = 1;
+    gpGame->b271 = 1;
+    gpGame->bStrokeLimit = 1;
+    gpGame->b273 = 1;
+    gpGame->b274 = 1;
+    gpGame->b275 = 1;
+    gpGame->b276 = 1;
+    gpGame->b277 = 1;
+    gpGame->bGimmesAllowed = 1;
+    gpGame->b279 = 1;
+    gpGame->bAIConcedes = 0;
+    gpGame->b27B = 1;
+    gpGame->b27C = 1;
+    gpGame->b27D = 1;
+    gpGame->b27E = 1;
+    gpGame->b27F = 1;
+    gpGame->b280 = 1;
+    gpGame->b281 = 1;
+    gpGame->b282 = 1;
+    gpGame->b283 = 1;
+    gpGame->b284 = 1;
+    gpGame->b285 = 1;
+    gpGame->b286 = 1;
+    gpGame->b287 = 1;
+    gpGame->b288 = 1;
+    gpGame->b289 = 1;
+    gpGame->b28A = 1;
+    gpGame->bNoWind = 0;
+    gpGame->bBumpObstructions = 1;
+    gpGame->b28D = 0;
+    gpGame->n290 = 2;
+    gpGame->n294 = 1;
+    gpGame->b28E = 0;
+    gpGame->pfn1C8 = fn_800E3AF4;
+    gpGame->pfn1CC = fn_800E3AF4;
+    gpGame->pfn1D0 = fn_800E3AF4;
+    gpGame->pfn1D4 = fn_800E3AEC;
+    gpGame->pfn1D8 = fn_800E3AE4;
+    gpGame->pfn1DC = fn_800E3ADC;
+    gpGame->pfn1E0 = fn_800E3AD4;
+    gpGame->pfn1E4 = fn_800E3AF4;
+    gpGame->pfn1E8 = fn_800E3AF4;
+    gpGame->pfn1EC = fn_800E3AF4;
+    gpGame->pfn1F0 = fn_800E3AF4;
+    gpGame->pfn1F4 = fn_800E3AF4;
+    gpGame->pfn1F8 = fn_800CF158;
+    gpGame->pfn1FC = fn_800CF450;
+    gpGame->pfn200 = fn_800CFE74;
+    gpGame->pfn204 = fn_800D0098;
+    gpGame->pfn208 = fn_800D030C;
+    gpGame->pfn210 = fn_800E3AD0;
+    gpGame->pfn214 = fn_800E3AF4;
+    gpGame->pfn218 = fn_800E3AD0;
+    gpGame->pfn21C = fn_800E3AD0;
+    gpGame->pfn220 = fn_800E3AF4;
+    gpGame->pfn224 = fn_800E3AF4;
+    gpGame->pfn228 = fn_800E3AD0;
+    gpGame->pfn22C = fn_800E3AD0;
+    gpGame->pfn230 = fn_800E3AC8;
+    gpGame->pfn234 = fn_800E3AC0;
+    gpGame->pfn238 = fn_800E3AB8;
+    gpGame->pfn23C = fn_800E3AD0;
+    gpGame->pfn240 = fn_800E3AB0;
+    gpGame->pfn244 = fn_800E3AD0;
+    gpGame->pfn248 = fn_800E3AD0;
+    gpGame->pfn24C = fn_800E3AD0;
+    gpGame->pfn250 = fn_800E3AD0;
+    gpGame->pfn254 = fn_800E3AD0;
+    gpGame->pfn258 = fn_800E3AC8;
+    gpGame->pfn25C = fn_800E3AAC;
+    gpGame->pfn260 = fn_800E3AD0;
+    gpGame->pfn264 = fn_800E3AC8;
+    gpGame->pfn268 = fn_800E3AA8;
+    gpGame->pfn26C = fn_800E3AA0;
+    gpGame->pfn20C = fn_800E3AD0;
+    lbl_80282278 = 0;
+    switch (Game_GetMode()) {
+    case 0:
+        fn_800FF700();
+        break;
+    case 1:
+        fn_800E9E40();
+        break;
+    case 2:
+        fn_800F80FC();
+        break;
+    case 4:
+        fn_80101FEC();
+        break;
+    case 6:
+        fn_800F944C();
+        break;
+    case 7:
+        fn_800F9610();
+        break;
+    case 8:
+        fn_800F986C();
+        break;
+    case 9:
+        fn_800ED738();
+        break;
+    case 5:
+        fn_800EACD8();
+        break;
+    case 10:
+        fn_800F125C();
+        break;
+    case 11:
+        fn_800FFF34();
+        break;
+    case 12:
+        fn_800FEAFC();
+        break;
+    case 13:
+        fn_800F6A60();
+        break;
+    case 14:
+        fn_800F2984();
+        break;
+    case 15:
+        fn_800F39F4();
+        break;
+    case 16:
+        fn_800F4B40();
+        break;
+    case 17:
+        fn_800F5AAC();
+        break;
+    case 18:
+        fn_800FE1B4();
+        break;
+    case 19:
+        fn_800E81C4();
+        break;
+    case 20:
+        fn_800E8D58();
+        break;
+    case 21:
+        fn_800E68F0();
+        break;
+    case 23:
+        fn_800EDD18();
+        break;
+    case 24:
+        fn_800F0448();
+        break;
+    case 25:
+        fn_800E7980();
+        break;
+    case 26:
+        fn_8010C4A0();
+        break;
+    case 22:
+        fn_80125E68();
+        break;
+    }
+    for (i = 0; i < 18; i++) {
+        gpGame->nHoleNum[i] = i;
+    }
 }
 
 // Clears one player's record of one hole: strokes, putts, points and the rest.
