@@ -147,7 +147,14 @@ LAYOUT_ASSERT(ViewController, 0x288);
 
 // The camera tuning values (GoGolfCam.c); only the fields read so far.
 typedef struct CamTuning {
-    u8   unk0[0x4C];
+    u8   unk0[4];
+    f32  f4;                    // 0x004  the zoom-to-aim camera's distance back from the target
+    u8   unk8[4];
+    f32  fC;                    // 0x00C  ... closer in when the ball is within this of it plus f4
+    f32  f10;                   // 0x010  ... as a share of the ball's distance
+    u8   unk14[0x38 - 0x14];
+    f32  f38;                   // 0x038  ... its distance back on a putt
+    u8   unk3C[0x4C - 0x3C];
     f32  f4C;                   // 0x04C  camera 5's height over the ball
     f32  f50;                   // 0x050  camera 5: the ball-to-pin distance of a full swing out
     f32  f54;                   // 0x054  camera 5: how long the swing out lasts
@@ -224,6 +231,8 @@ typedef struct GolfCamState {
 extern GolfCamState* lbl_80282220;
 extern s32 lbl_80281520;                // the steep-slope camera's tries last time (-1: none yet)
 extern f32 lbl_801FA1E8[4];             // the target the steep-slope camera last worked for
+extern f32 lbl_80191398[4];             // (1, 0, 0)
+extern f32 lbl_801913A8[4];             // (0, 0, 1)
 
 // The create-a-player (CrAP) screen's state at lbl_80281EE0; only what the CrAP camera reads.
 typedef struct CrAPGolfer {

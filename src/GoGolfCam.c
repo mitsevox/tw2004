@@ -53,6 +53,12 @@ void     fn_800B5918(f32* pSrc, f32* pDst);             // copy three floats
 void     fn_800636B4(int nPlayer);
 void     fn_800C4AB0(f32* pFrom, f32* pTo, f32* pOut);
 int      fn_800C4D2C(f32* pFrom, f32* pTo, f32* pOut, f32 fMax);
+u8       fn_80069428(f32* pPos);                        // the point is in bounds
+TNetwork* fn_80069498(void);                            // the course's boundary outline, if any
+// The segment crosses the outline (at pHit).
+u8       fn_8000C3C8(f32* pFrom, f32* pTo, TNetwork* pNet, s32 nNodes, f32* pHit);
+u8       fn_8004B6F8(f32* pFrom, f32* pTo, f32* pHit);
+f32      fn_8001EFFC(u8* pLens);
 void     fn_80038054(u8 a, int n, f32 f1, f32 f2);
 u8       CamScript_KeepAboveGround(int nPlayer, f32* pNew, f32* pOld, int a, void* p1, void* p2, void* p3,
                                    f32 fClearance);
@@ -1269,6 +1275,102 @@ void fn_800C3EDC(View* pView, int nPlayer) {
     fn_8000C5D4(pCam, m[1], 0.1f, pCam);
     pCam[3] = 1.0f;
     fn_800C7400(m[0], pView->v20);
+}
+
+// The zoom-to-aim camera's positions. pAim: out from the ball towards the target by the shot's
+// f60, then across by f64, at height v30[1]. pCam: back from the target through pAim, by the
+// tuning's distance (f4, or f38 on a putt) scaled for the lens, closer in when the ball is near
+// the target. When pCam is out of bounds it is pulled in to the boundary, or mirrored through the
+// ball (returns 1). pCam never ends up past pAim.
+u8 fn_800C3FC0(View* pView, int nPlayer, f32* pSub, f32* pAim, f32* pCam) {
+    f32 vTarget[4];
+    f32 vDir[4];
+    f32 vOff[4];
+    f32 vBack[4];
+    f32 v[4];
+    f32 vHit[4];
+    f32* pBall;
+    u8 bMoved;
+    f32 fDist;
+    f32 fBack;
+    f32 fNear;
+    TNetwork* pNet;
+    bMoved = 0;
+    fn_8000C594();
+    Vec_Copy(gPlayers[nPlayer].vTargetCopy, vTarget);
+    pBall = gPlayers[nPlayer].vBall;
+    fn_800C73DC(vTarget, pBall, vDir);
+    vDir[1] = 0.0f;
+    fDist = fn_80009680(fn_80009744(vDir));
+    if (vDir[0] != 0.0f || vDir[1] != 0.0f || vDir[2] != 0.0f) {
+        fn_800BAF04(vDir, vDir);
+    }
+    fn_8001EF34(vDir, pView->shot19C.f60, vOff);
+    fn_800C73B8(pBall, vOff, pAim);
+    pAim[0] += pView->shot19C.f64 * -fn_8000C5FC(vDir, lbl_801913A8);
+    pAim[2] += pView->shot19C.f64 * fn_8000C5FC(vDir, lbl_80191398);
+    pAim[1] = pView->shot19C.v30[1];
+    fn_800C73DC(vTarget, pAim, vBack);
+    vBack[1] = 0.0f;
+    if (vBack[0] != 0.0f || vBack[1] != 0.0f || vBack[2] != 0.0f) {
+        fn_800BAF04(vBack, vBack);
+    }
+    if (gPlayers[nPlayer].nShotKind != 0) {
+        fBack = lbl_80281F78->f4;
+    } else {
+        fBack = lbl_80281F78->f38;
+    }
+    fBack *= 1.0f / fn_8001EFFC(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[0])));
+    if (fBack + lbl_80281F78->fC > fDist && gPlayers[nPlayer].nShotKind != 0) {
+        if (fBack > fDist) {
+            fBack = lbl_80281F78->f10 * fDist;
+        } else {
+            fNear = lbl_80281F78->f10 * fDist;
+            fBack = ((fDist - fBack) / lbl_80281F78->fC) * (fBack - fNear) + fNear;
+        }
+    }
+    pCam[0] = vTarget[0] - vBack[0] * fBack;
+    pCam[2] = vTarget[2] - vBack[2] * fBack;
+    pCam[1] = 0.0f;
+    if (!fn_80069428(pCam)) {
+        pNet = fn_80069498();
+        if (pNet != NULL) {
+            if (fn_8000C3C8(pCam, pAim, pNet, pNet->nNumNodes, vHit)) {
+                bMoved = 1;
+                pCam[0] = vHit[0];
+                pCam[2] = vHit[2];
+            } else if (fn_8004B6F8(pCam, pAim, vHit)) {
+                bMoved = 1;
+                pCam[0] = vHit[0];
+                pCam[2] = vHit[2];
+            } else {
+                bMoved = 1;
+                pCam[0] = gPlayers[nPlayer].vBall[0] + (gPlayers[nPlayer].vBall[0] - pAim[0]);
+                pCam[2] = gPlayers[nPlayer].vBall[2] + (gPlayers[nPlayer].vBall[2] - pAim[2]);
+            }
+        } else if (fn_8004B6F8(pCam, pAim, vHit)) {
+            bMoved = 1;
+            pCam[0] = vHit[0];
+            pCam[2] = vHit[2];
+        } else {
+            bMoved = 1;
+            pCam[0] = gPlayers[nPlayer].vBall[0] + (gPlayers[nPlayer].vBall[0] - pAim[0]);
+            pCam[2] = gPlayers[nPlayer].vBall[2] + (gPlayers[nPlayer].vBall[2] - pAim[2]);
+        }
+    }
+    fn_800C73DC(pCam, pSub, vBack);
+    vBack[1] = 0.0f;
+    fn_800C73DC(vTarget, pAim, vDir);
+    fn_800C73DC(pCam, pAim, v);
+    v[1] = 0.0f;
+    vDir[1] = 0.0f;
+    if (fn_8000C5FC(vDir, v) < 0.0f) {
+        pCam[0] = pAim[0];
+        pCam[2] = pAim[2];
+        fn_800C73DC(pCam, pSub, vBack);
+        vBack[1] = 0.0f;
+    }
+    return bMoved;
 }
 
 u8 fn_800C43C0(View* pView, int nPlayer) {
