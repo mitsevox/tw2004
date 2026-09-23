@@ -7,6 +7,7 @@
 #define BALL_H
 
 #include "game_types.h"
+#include "platform.h"
 
 // A row of gSurfaceTypes (0x44 bytes): how a ball behaves on one kind of ground.
 typedef struct SurfaceType {
@@ -29,6 +30,7 @@ typedef struct SurfaceType {
     u32  u34;                   // 0x34  bit 0x10: event 0x25 on landing
     u8   unk38[0x44 - 0x38];
 } SurfaceType;
+LAYOUT_ASSERT(SurfaceType, 0x44);
 
 #define NUM_SURFACE_TYPES 156   // rows in gSurfaceTypes
 
@@ -157,6 +159,7 @@ typedef struct Ball {
     f32  fLastDistFromInitShotPos; // 0xB4  distance from the start at the last stall check. TW06: same name
     f32  fTimeSinceLastCheck;   // 0xB8  time since the last stall check. TW06: same name
 } Ball;
+LAYOUT_ASSERT(Ball, 0xBC);
 
 // ---- the terrain ----------------------------------------------------------------------------
 

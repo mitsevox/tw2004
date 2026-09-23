@@ -1,12 +1,13 @@
 #ifndef GAME_TYPES_H
 #define GAME_TYPES_H
 
-// Basic types for the game-side units, which do not see the SDK headers. Under CodeWarrior s32 and
-// u32 are `long`, as the original was built: the compiler treats int and long as different types,
-// and some functions only match with long. Elsewhere they are the fixed-size <stdint.h> types, so a
-// 64-bit port keeps 32-bit fields 32 bits wide. uptr is an unsigned integer as wide as a pointer, for
-// address arithmetic (alignment, offsets stored in pointer fields).
-#ifdef __MWERKS__
+// Basic types for the game-side units, which do not see the SDK headers. For the GameCube build
+// (CodeWarrior, and ProDG for the Common library) s32 and u32 are `long`, as the original was
+// built: CodeWarrior treats int and long as different types, and some functions only match with
+// long. A port defines TW_PORT and gets the fixed-size <stdint.h> types instead, so a 64-bit build
+// keeps 32-bit fields 32 bits wide. uptr is an unsigned integer as wide as a pointer, for address
+// arithmetic (alignment, offsets stored in pointer fields).
+#ifndef TW_PORT
 typedef unsigned char      u8;
 typedef unsigned short     u16;
 typedef unsigned long      u32;

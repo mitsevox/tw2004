@@ -134,9 +134,6 @@ void SFIOPlatformCall80172F48(const ChecksumInterface** ppInterface);
 // Host memory functions (CodeWarrior side).
 extern void* TibExtMemAlloc(void* pAllocator, u32 uSize, u32 uAlign, const char* pFile, int uLine);
 extern void  fn_80122128(void* pAllocator, void* p, u32 uSize, u32 uAlign);
-extern void* memcpy(void* pDst, const void* pSrc, u32 uLen);
-extern void* memset(void* pDst, int c, u32 uLen);
-extern int   memcmp(const void* pA, const void* pB, u32 uLen);
 
 int TagFile_AllocBuffer(void** ppBuffer, void* pAllocator, u32 uSize, int eType);
 int TagFile_FreeBuffer(void* pBuffer, void* pAllocator, u32 uSize, int eType);

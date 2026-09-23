@@ -90,6 +90,7 @@ typedef struct GolferRecord {
     u32  uBagMask;              // 0x090  bit n set = club n is in the bag. TW06: clubAvailable
     u8   unk94[0x140 - 0x94];
 } GolferRecord;
+LAYOUT_ASSERT(GolferRecord, 0x140);
 
 // Golfer states: the rows of sGolferStateEngineTable (init, update, exit), kept on a per-player
 // stack by GOLFERSTATE_Push/Pop/Switch/Set. Names from TW06's table (docs/tw06-names.md); TW06
@@ -205,6 +206,7 @@ typedef struct SwingData {
     u8   unk630;                // 0x630  (0xA04) cleared by Player_SetGolfer; not in TW06
     u8   unk631[3];
 } SwingData;
+LAYOUT_ASSERT(SwingData, 0x634);
 
 // Money by kind (0x40 bytes; TW06: CourseMoneyTracking_t): how a payout was made up (Earnings.c
 // fills it in), and a player's totals (Player.money), which fn_800D3548 adds it to field by field.
@@ -365,6 +367,7 @@ typedef struct Player {
     u32  uFlagsEF0;             // 0xEF0  bit 1: target is over water
     u8   unkEF4[0xEF8 - 0xEF4];
 } Player;
+LAYOUT_ASSERT(Player, 0xEF8);
 
 // An all-time record: the value and who holds it (gSession.recA/B/C).
 typedef struct RecordEntry {
@@ -398,6 +401,7 @@ typedef struct GameOptions {
     s32  n80;                   // 0x80
     u8   b84;                   // 0x84  cleared while the lessons run (GameMode11)
 } GameOptions;
+LAYOUT_ASSERT(GameOptions, 0x88);
 
 // A player's profile block (Session.aProfile, 0x40 bytes each).
 typedef struct PlayerProfile {
@@ -410,6 +414,7 @@ typedef struct PlayerProfile {
     u8   nBallType;             // 0x39  0..3, from the SPIN attribute for a pro
     u8   unk3A[6];
 } PlayerProfile;
+LAYOUT_ASSERT(PlayerProfile, 0x40);
 
 // A course's records (the 'rcrd' stream block, Session_OnRecordsLoaded; 0x320 bytes per course).
 typedef struct CourseRecord {
@@ -461,6 +466,7 @@ typedef struct Session {
     f32  f5B48;                 // 0x5B48  1
     u8   unk5B4C[0x5BD0 - 0x5B4C];
 } Session;
+LAYOUT_ASSERT(Session, 0x5BD0);
 
 // Kept for the files that still use them (Ball.c, GameUI.c, Swing.c); new code writes the fields.
 #define SESSION_OPTIONS    (&gSession.options)

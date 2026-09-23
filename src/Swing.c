@@ -147,7 +147,6 @@ extern Vec4          lbl_80183620;          // 0, 0, 0, 0.5 (assigned)
 
 void  fn_800130F8(int nPad, int n);              // rumble on
 void  fn_8006C2C8(int nPlayer, f32* pX, f32* pY);
-double atan(double x);
 void  Swing_FaceVector(int nPlayer, f32* pOut);
 f32   Swing_MeterError(int nPlayer);
 void  Swing_ShapeVector(int nPlayer, f32* pOut);

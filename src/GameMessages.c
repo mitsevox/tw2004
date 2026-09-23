@@ -32,7 +32,6 @@ extern s32 lbl_802822E0;
 extern u8 lbl_801D87C0[];
 
 void  fn_8016B09C(void* pHandler, int nMsg, int nArgs, MsgArg* pArgs);
-u32   strlen(const char* s);
 void  fn_800E508C(void);
 void  fn_800E50FC(void);
 void  fn_800E5200(int n);

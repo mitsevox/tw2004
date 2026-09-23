@@ -36,6 +36,7 @@ typedef struct Replay {
     s16    nF1E;                // 0xF1E  -> fn_80055CD0
     s16    nStrokes;            // 0xF20  strokes on the hole before the shot
 } Replay;
+LAYOUT_ASSERT(Replay, 0xF28);
 
 extern Replay gReplayData;              // 0x801D6030
 
@@ -139,6 +140,7 @@ typedef struct GameEffects {
     u32  uFlags;                // 0x50  bit 0x4000: an eagle on a par 5 counts
     f32  f54;                   // 0x54
 } GameEffects;
+LAYOUT_ASSERT(GameEffects, 0x58);
 
 extern GameEffects lbl_80202898;        // 0x80202898
 

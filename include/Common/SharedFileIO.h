@@ -5,6 +5,7 @@
 // notation come from assert strings in the binary; everything else is ours.
 
 #include "game_types.h"
+#include "platform.h"
 
 typedef u8             BOOL;   // byte-sized: SFIOIsInitialized() is truncated to 8 bits after use
 #define TRUE  1
