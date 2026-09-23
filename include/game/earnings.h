@@ -1,7 +1,7 @@
 // earnings.h (our name): the prize table (lbl_80200538, 0x22F0 bytes, loaded from the 'ERN '
 // stream by Earnings.c) and the Earnings.c functions the game modes call. Multipliers are
 // percentages (100 = x1). Prizes that depend on a golfer are indexed by earnings rating
-// (fn_800D3C7C, 0..25).
+// (GM_Earnings_RateGolfer, 0..25).
 
 #ifndef GAME_EARNINGS_H
 #define GAME_EARNINGS_H
@@ -96,8 +96,8 @@ extern s32 lbl_80282258;        // their count
 
 // Earnings.c
 int  fn_800D38F0(int nWinner, int nLoser, int nMargin, s32* pPrize);   // a ladder event's winnings
-int  fn_800D3C1C(void);                // TW06 GM_GetHighestRatedGolfer: the best rating among the players
-s32  fn_800D3D64(int nRating, int nHole);   // TW06 GM_Earnings_GetSkinsHoleValue
+int  GM_GetHighestRatedGolfer(void);                // TW06 GM_GetHighestRatedGolfer: the best rating among the players
+s32  GM_Earnings_GetSkinsHoleValue(int nRating, int nHole);   // TW06 GM_Earnings_GetSkinsHoleValue
 u8   fn_800D750C(int nPlayer, int nAward);  // give an award if the player does not have it yet
 // Whether nValue and szName are already among the top five of a record (i the kind, k the table:
 // course k's records, recB[k], recC[k]). MC.c tests the u8 result.

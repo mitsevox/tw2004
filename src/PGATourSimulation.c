@@ -35,8 +35,8 @@ void CalcAllStats(int nPlayer);
 void fn_80117694(UStreamObject* pObject);
 
 int  fn_800D31A4(int nPar);             // the number of the 18 holes with that par
-char* fn_800EFE60(s32 i);               // GameModeDriverPGATour.c: a tournament's first champion
-s32  fn_800EFE78(s32 i);                // and the champion's score
+char* GameModeDriverPGATour_GetInitialChampName(s32 i);               // a tournament's first champion
+s32  GameModeDriverPGATour_GetInitialChampScore(s32 i);                // and the champion's score
 s32  fn_800EF0E0(s32 nPlayer);          // GameModeDriverPGATour.c: the player's bracket
 s32  fn_800D2FB4(s32 nTeeSet);          // the course's par from the tee set
 
@@ -68,8 +68,8 @@ void fn_801176C0(TourSeason* pTour) {
 
     fn_80005AE8(pTour, 0, sizeof(*pTour));
     for (i = 0; i < 31; i++) {
-        strcpy(pTour->aEvent[i].szChampName, fn_800EFE60(i));
-        pTour->aEvent[i].nChampScore = fn_800EFE78(i);
+        strcpy(pTour->aEvent[i].szChampName, GameModeDriverPGATour_GetInitialChampName(i));
+        pTour->aEvent[i].nChampScore = GameModeDriverPGATour_GetInitialChampScore(i);
     }
     for (i = 0; i < PGA_NUM_PROS; i++) {
         pTour->aStats[i].nCareerWinnings = lbl_8024B9CC[i].nCareerWinnings;
