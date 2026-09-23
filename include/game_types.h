@@ -48,6 +48,19 @@ static inline double __frsqrte(double x) {
     return 1.0 / sqrt(x);
 }
 
+// __fabs is the absolute value of a double: the sign bit cleared, as the fabs instruction does
+// (so -0.0 gives +0.0).
+static inline double __fabs(double x) {
+    union {
+        double d;
+        u64 u;
+    } v;
+
+    v.d = x;
+    v.u &= ~((u64)1 << 63);
+    return v.d;
+}
+
 // __stwbrx stores the word x byte-reversed at p + n.
 static inline void __stwbrx(u32 x, void* p, int n) {
     u8* pOut = (u8*)p + n;

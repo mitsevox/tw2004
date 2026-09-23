@@ -76,7 +76,9 @@ typedef struct Bone {
     u64  uId;                   // 0x00  fn_800298F4 finds a bone by it
     u8   unk8[4];
     f32  q0C[4];                // 0x0C  a rotation (quaternion)
-    u8   unk1C[0x30 - 0x1C];
+    f32  v1C[4];                // 0x1C  a position (the root bone's is the character's,
+                                //       Character_SetPosition)
+    u8   unk2C[0x30 - 0x2C];
 } Bone;
 LAYOUT_ASSERT(Bone, 0x30);
 
@@ -132,7 +134,8 @@ typedef struct Clip {
     s32    n50;                 // 0x50
     u8     unk54[0x10];
     s32    n64;                 // 0x64
-    u8     unk68[0x24];
+    u8     unk68[0x80 - 0x68];
+    f32    v80[3];              // 0x80  a point fn_8001DB04 puts through bone 0's matrix
     s16    n8C;                 // 0x8C  halfwords per frame, first stream
     s16    n8E;                 // 0x8E  bytes per frame, second stream
     u8     unk90[0x10];
@@ -332,7 +335,8 @@ typedef struct Character {
                                 //         (Player_SetGolfer)
     s32   nStyle;               // 0x16E0  the animation style (fn_8001C7FC); at -1
                                 //         CharacterState_AddSKABlendData does nothing
-    u8    unk16E4[0x1788 - 0x16E4];
+    u8    unk16E4[0x1784 - 0x16E4];
+    s32   n1784;                // 0x1784  set to -1 by Character_SetPosition
     Clip* pCurClip;             // 0x1788  the clip Char_SetClip picked
     u8    unk178C[0x1790 - 0x178C];
     Clip* p1790;                // 0x1790  cleared by fn_80062BFC; CharacterState_AddSKABlendData plays it for
@@ -412,7 +416,7 @@ extern AnimStream* lbl_80282230;
 u8    fn_800C9828(int nGroup, int nStyle, int nClub, int nKey);   // the clips are streamed
 void  fn_800CA9DC(int nSlot);
 
-void  Character_SetPosition(Character* pChar, f32* pPos, int a);
+void  Character_SetPosition(Character* pChar, f32* pPos, u8 bPlace);
 void  fn_8001C724(Character* pChar, int nKind);
 void  fn_8001C774(Character* pChar, int nClub);
 void  fn_8001C7FC(Character* pChar, int nStyle);   // the animation style (nStyle)

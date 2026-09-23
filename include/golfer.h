@@ -62,10 +62,6 @@ typedef enum PlayerNumber_t {
     PLR_MAX_e
 } PlayerNumber_t;
 
-#define PI    3.14159265f
-#define TWOPI 6.28318531f
-#define DEG(x) ((x) * (PI / 180.0f))
-
 #define IABS(v) (((v) ^ ((v) >> 31)) - ((v) >> 31))   // what the compiler emits for abs()
 
 // One 320-byte row of STATS_GC.BIN as it sits in gGolferTable. The file has a 2-byte header,

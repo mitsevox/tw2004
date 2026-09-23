@@ -66,13 +66,18 @@ void RTClock_GetDateTimeString(char* szOut);   // "M/D/YYYY H:MM AM"
 
 // ---- math and random numbers -----------------------------------------------------------------
 
+#define PI    3.14159265f
+#define TWOPI 6.28318531f
+#define DEG(x) ((x) * (PI / 180.0f))
+
 void Vec3Copy(const f32* pSrc, f32* pDst);   // 0x80008304 (const: see code_800082F8.c)
 f32  fn_800095F0(f32 fAngle);           // sin
 f32  fn_80009638(f32 fAngle);           // cos
+f32  fn_8000965C(f32 x);                // asin
 double fn_80009680(double x);           // sqrt
 f32  fn_80009744(f32* pVec);            // dot with itself (at most FLT_MAX)
 extern f32 lbl_80281B40[];              // FLT_MAX (MSL's)
-void Vec_Copy(f32* pSrc, f32* pDst);    // 0x8000AD10
+void Vec_Copy(const f32* pSrc, f32* pDst);   // 0x8000AD10 (const: see Vec3Copy)
 f32  fn_8000AD78(f32 y, f32 x);         // atan2f
 f32  fabsf(f32 x);                      // 0x8000AD9C: fabs (0x8000AE94, platform.h) rounded to a float
 f32  fn_8000AF7C(f32 x);                // natural logarithm
@@ -91,6 +96,9 @@ void fn_8000B2B8(u32 uSeed);            // seed all three random streams
 void fn_8000B30C(void);                 // drop the kept normal value (fn_8000B318)
 f32  Rand_Float(int nStream);           // 0x8000B428  [0, 1)
 void fn_8000883C(f32* pA, f32* pB, f32 fT);   // quaternion slerp from a to b by fT, into b
+void fn_80008BB8(f32* pOut, f32 fA, f32 fB, f32 fC);   // the quaternion of three (negated) angles
+void fn_8000923C(f32* pRot, f32* pOut); // a rotation vector (axis * angle) as a quaternion
+void fn_80009710(f32* pQ);              // the identity quaternion (0, 0, 0, 1)
 f32  fn_80029B64(f32 x);                // square root (Skeleton.c); x itself when x <= 0
 void fn_8000C5D4(f32* pA, f32* pB, f32 f, f32* pOut);   // out = a + f x b
 f32  fn_8000C5FC(f32* pA, f32* pB);     // dot product
