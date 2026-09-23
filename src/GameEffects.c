@@ -70,6 +70,25 @@ u8    fn_800E5344(void);
 u8    fn_800E23B0(int nPlayer, int nStrokes);
 u8    fn_800DC818(u8* pBall, int nPlayer, u8 bNext);
 GameEffects* fn_800DAF74(void);
+u8    fn_800DCB08(void);
+u8    fn_800DCB00(void);
+u8    fn_8005D2DC(void);
+void  GM_vCloseModuleONCE(void);
+u8    fn_800C6CCC(void);
+f32   fn_8000AD9C(f32 x);                  // fabsf
+u8    fn_800C6CB0(void);
+u8    fn_800B4AE0(void);
+int   Game_GetCourse(void);
+f32   AI_MaxDistance(int nPlayer, int nKind, int nClub);
+f32   fn_800510EC(u8* pBall);
+f32   fn_8005B64C(int nPlayer);
+void  fn_80045494(int a, int nPlayer);
+void  fn_80045558(int a, int nPlayer);
+void* fn_80017028(int nView);
+int   fn_8003BDBC(int nPlayer, int nLie, int a, int b, int c, f32 fDist);
+void  fn_800DBFAC(void);
+void  fn_800DC18C(void);
+void  fn_800DC290(f32 fHeight);
 
 // TW06: GameEffects_InitGameEffectSettings (by position and size).
 void fn_800DAE44(void) {
@@ -121,6 +140,62 @@ GameEffects* fn_800DAF74(void) {
     return &lbl_80202898;
 }
 
+// TW06: GameEffects_AdjustTimeRate (by position). The game's time step for a frame that took
+// fFrameTime: rounded to whole 60 Hz ticks, then scaled by the effects.
+f32 fn_800DAF98(f32 fFrameTime) {
+    f32 fTicks = 1.0f;
+    f32 fBest = 10000.0f;
+    int i;
+    f32 d;
+    if (fn_800DCB08() && 0.0f != fFrameTime) {
+        fFrameTime = 1.0f / 59.94f;
+    }
+    if (fn_8005D2DC()) {
+        fFrameTime = 0.0f;
+    }
+    if (fn_800DCB00()) {
+        if (0.0f != fFrameTime) {
+            fFrameTime = 1.0f / 59.94f;
+        }
+        GM_vCloseModuleONCE();
+    }
+    if (fn_800C6CCC()) {
+        return 0.0f;
+    }
+    for (i = 0; i < 5; i++) {
+        d = fn_8000AD9C(i / 59.94f - fFrameTime);
+        if (d < fBest) {
+            fBest = d;
+        } else if (i > 0) {
+            fTicks = i - 1;
+            break;
+        }
+    }
+    if (fn_800C6CB0()) {
+        if (!fn_800B4AE0()) {
+            fTicks *= 0.75f;
+        }
+    } else if (lbl_80202898.b9) {
+        fTicks *= 2.0f;
+        lbl_80202898.fC -= fFrameTime;
+        if (lbl_80202898.fC < 0.0f) {
+            lbl_80202898.b9 = 0;
+        }
+    } else {
+        if (lbl_80202898.b10) {
+            fTicks *= 2.0f;
+        }
+        if (lbl_80202898.b11) {
+            fTicks *= 0.5f;
+            lbl_80202898.n28++;
+        }
+    }
+    if (lbl_80202898.bSlowMo) {
+        return 1.0f / 59.94f * fTicks * lbl_80202898.fSlowMo;
+    }
+    return 1.0f / 59.94f * fTicks;
+}
+
 // How many physics steps the ball takes this frame: one per 1/59.94 s of frame time (rounded;
 // twice that in mode 26), none while paused (no frame time), one outside the ball's flight.
 // With the slow-down on, it moves only on every n2C-th frame.
@@ -147,6 +222,100 @@ int GameEffects_BallUpdatesThisFrame(int nPlayer) {
         return 1;
     }
     return 0.5f + gSession.fFrameTime / (1.0f / 59.94f);
+}
+
+// The GameBreaker camera: none on course 7; otherwise a camera at the shot's full distance.
+void fn_800DB714(int nPlayer) {
+    int nLie;
+    f32 fDist;
+    void* pView;
+    if ((!(gSession.uFlags & 0x4000) || !(gSession.uFlags & 0x8000)) && lbl_80202898.bGameBreaker) {
+        if (Game_GetCourse() == 7) {
+            lbl_80202898.b19 = 1;
+            return;
+        }
+        nLie = gPlayers[nPlayer].nLie;
+        fDist = AI_MaxDistance(nPlayer, gPlayers[nPlayer].nShotKind, gPlayers[nPlayer].nClub);
+        fDist *= fn_800510EC(gPlayers[nPlayer].ball);
+        fDist *= fn_8005B64C(nPlayer);
+        fn_80045494(0, nPlayer);
+        fn_80045558(0, nPlayer);
+        pView = fn_80017028(gPlayers[nPlayer].nView0);
+        *(s32*)((u8*)pView + 0x74) = fn_8003BDBC(nPlayer, nLie, 3, 0xC, 1, fDist);
+        lbl_80202898.b19 = 1;
+        if (lbl_80202898.f24 > 0.8f) {
+            lbl_80202898.f24 = 0.8f;
+        }
+    }
+}
+
+// TW06: GameEffects_RenderGameBreakerEffects (by position).
+void fn_800DBF34(void) {
+    if (lbl_80202898.bGameBreaker && gSession.unk14 == 0 && !lbl_80202898.bPaused) {
+        switch (lbl_80202898.nGBType) {
+        case 1:
+            fn_800DBFAC();
+            return;
+        case 0:
+            fn_800DC18C();
+            break;
+        }
+    }
+}
+
+// TW06: GameEffects_RenderScriptedGB (by position). The letterbox opens (or closes) at the
+// game's pace; once closed the GameBreaker is over.
+void fn_800DC18C(void) {
+    f32 fHeight;
+    if (lbl_80202898.b19) {
+        lbl_80202898.f24 -= gSession.fFrameTime;
+    } else {
+        lbl_80202898.f24 += gSession.fFrameTime;
+    }
+    if (lbl_80202898.b19) {
+        if (lbl_80202898.fGBTime < 0.8f) {
+            fHeight = 0.15f * (lbl_80202898.fGBTime / 0.8f);
+        } else {
+            fHeight = 0.15f;
+        }
+        fn_800DC290(fHeight);
+        if (lbl_80202898.bClosing) {
+            lbl_80202898.fGBTime -= gSession.fFrameTime;
+            if (lbl_80202898.fGBTime < 0.0f) {
+                lbl_80202898.bGameBreaker = 0;
+            }
+        } else {
+            lbl_80202898.fGBTime += gSession.fFrameTime;
+        }
+    }
+}
+
+// TW06: GameEffects_DrawLetterBoxes (by position). Two half-transparent black bars of fHeight
+// (a fraction of the screen), at the top and bottom.
+void fn_800DC290(f32 fHeight) {
+    f32 colour[4];
+    f32 xy[8];
+    f32 uv[8];
+    fn_8001425C(0);
+    fn_80012F34(0);
+    fn_80012F18(7);
+    fn_80012F50(0, 6, 0x80);
+    fn_80014118(0);
+    fn_80012EF8();
+    colour[0] = 0.0f;
+    colour[1] = 0.0f;
+    colour[2] = 0.0f;
+    colour[3] = 0.5f;
+    fn_800141F8(xy, uv, 0.0f, 0.0f, 1.0f, fHeight);
+    fn_80014194(colour);
+    fn_8001644C(0xA1, xy, 0, uv, 2);
+    fn_800141F8(xy, uv, 0.0f, 1.0f - fHeight, 1.0f, 1.0f);
+    fn_80014194(colour);
+    fn_8001644C(0xA1, xy, 0, uv, 2);
+    fn_80012F34(1);
+    fn_80012F50(1, 6, 0x80);
+    fn_80012F18(3);
+    fn_80012EF8();
 }
 
 // TW06: GameEffects_FieldOfViewChange (by position). The letterbox's field-of-view change: up to
