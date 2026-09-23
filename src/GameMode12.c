@@ -8,8 +8,6 @@
 #include "game.h"
 
 s32   fn_800FF894(int nPlayer);
-u8    fn_800FFCCC(int nPlayer, u8 bCheck);
-u8    fn_800FFD54(u8 bCheck);
 extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
 extern u8* gpSaveData;
 extern s32 lbl_802823D8;
@@ -31,8 +29,8 @@ void fn_800FF6C0(int nPlayer);
 void fn_800FEAFC(void) {
     gpGame->pfn1C8 = fn_800FEAFC;
     gpGame->pfn1D4 = fn_800FF894;
-    gpGame->pfn1D8 = (u8 (*)(int, int))fn_800FFCCC;
-    gpGame->pfn1DC = (u8 (*)(int))fn_800FFD54;
+    gpGame->pfn1D8 = fn_800FFCCC;
+    gpGame->pfn1DC = fn_800FFD54;
     gpGame->pfn1E0 = fn_800FEC78;
     gpGame->pfn1F4 = fn_800FF288;
     gpGame->pfn23C = fn_800FEC80;

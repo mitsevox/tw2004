@@ -26,13 +26,11 @@ void  fn_800D8D38(int nPlayer);
 void  Caddie_Stop(void);
 void  fn_8001D7A4(int nHandle);
 u8    fn_800E0A90(int nPlayer);
-u8    fn_800E3A54(void);
-u8    fn_800E1CA8(void);
+u8    fn_800E1CA8(void);                  // int in GameRound.c; the callers here test the byte
 void  fn_800D439C(int nPlayer, int a);
 void  fn_800D9834(int nPlayer);
 u8    fn_8012591C(void);
 void  fn_80125854(int a);
-void  fn_800E3D38(int nPlayer, int a);
 void  fn_8011989C(int nPlayer, int nStrokes);
 void  GM_GolferConcede_Hole(int nPlayer);
 void  GM_EndOfGolferTurn_HoleFinished(int nPlayer);
@@ -47,7 +45,6 @@ void  fn_80063CF0(void* pView, int nCamera, int nPlayer);
 u8    Ter_CheckObjectAndHazardObstruction(u8* pBall, int a, int b, int c, f32 f1, f32 f2, f32 f3);
 u8    Ter_SearchAreaForDropLocation(int nPlayer, int a, int b, f32* pOut);
 
-u8    fn_800E23EC(void);
 void  fn_800E0AC4(int a);
 void  fn_800E0A98(int a);
 void  fn_800D8FE4(int nPlayer);
@@ -95,7 +92,6 @@ void  fn_800E41C8(void);
 u8    Ter_PointInOOBNetwork(u8* pBall);
 
 void  Vec3Copy(void* pSrc, void* pDst);
-u8    fn_800E27A8(void);
 int   fn_8006AA9C(int nPlayer);             // how the shot turned out (0..4, 8+)
 void  fn_8006AAB4(int nPlayer, int a);
 
@@ -190,11 +186,11 @@ void fn_800DCAD8(void) {
 void GM_vCloseModuleONCE(void) {
 }
 
-s32 fn_800DCB00(void) {
+u8 fn_800DCB00(void) {
     return 0;
 }
 
-s32 fn_800DCB08(void) {
+u8 fn_800DCB08(void) {
     return 0;
 }
 
@@ -209,7 +205,7 @@ u8 fn_800DCB3C(void) {
     return (*(s32*)(lbl_80202898 + 0x28) % *(s32*)(lbl_80202898 + 0x2C)) == 0;
 }
 
-s32 fn_800DCB74(void) {
+u8 fn_800DCB74(void) {
     return *(u8*)(lbl_80202898 + 0x11);
 }
 
@@ -576,7 +572,7 @@ void GM_BumpBallForObstructions(int nPlayer) {
 // mode message, or the yardage. Out of bounds goes to the mode's hook instead.
 void GM_PlayerTookShot(int nPlayer) {
     u8   bOut;
-    if (fn_800E23EC() && !(gPlayers[nPlayer].uFlags & 8)) {
+    if (fn_800E23EC(nPlayer) && !(gPlayers[nPlayer].uFlags & 8)) {
         fn_800E0AC4(1);
     }
     if (!Player_IsCPU(nPlayer) && gSession.nSplitScreen == 0 && gpGame->b287 && gReplayData[0xF10]) {

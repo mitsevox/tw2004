@@ -18,13 +18,8 @@ void  STATEFUNC_SimulateInit(int nPlayer);
 void  STATEFUNC_SimulateUpdate(int nPlayer);
 void  STATEFUNC_SimulateExit(int nPlayer);
 void  GM_MovePlayerToBall(int nPlayer);
-void  Shot_Plan(int nPlayer, int a);
 void  fn_8001D8DC(int nPlayer);
-void  fn_80062CB0(int a, int b);
 void  fn_80062F1C(void);
-s32   fn_800E27C0(void);
-void  fn_800E3C70(int a);
-void  fn_800E3CD4(int a);
 void  fn_800F80D4(s32 p0);
 extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
 extern u8* gpSaveData;

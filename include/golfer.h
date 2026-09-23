@@ -647,6 +647,7 @@ u8   AI_RehearseShot(int nPlayer, f32* pOutDist2, u8 bFast, f32 fTolerance);
 void AI_ApplyError(int nPlayer);
 u8   Lie_AllowsFullSwing(int nPlayer);
 void Shot_FitTargetToClub(int nPlayer);
+void Shot_Plan(int nPlayer, u8 bNotify);
 void Shot_Prepare(int nPlayer, u8 bNotify);
 int  Shot_Trajectory(int nPlayer);
 void Shot_DefaultSpin(int nPlayer, f32* pOut);

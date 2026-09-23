@@ -2082,11 +2082,9 @@ void Swing_ResetBoostAndSpin(int nPlayer) {
 // sGolferStateEngineTable is a table of 27 (enter, update, exit) callbacks; the current state is the top of
 // the player's SwingStack. Most of these drive the camera, HUD and sounds around the swing.
 
-void  fn_800E3D38(int nPlayer, int a);
 void  GM_DoPostShotInHoleUI(int nPlayer);
 u8    fn_80063C90(void* pView);              // the camera is still moving
 void  fn_80063BF4(void* pView, f32 f, f32* pVec);
-void  GM_BumpBallForObstructions(void);
 extern u8  lbl_80281E10;
 typedef struct Vec4 { f32 x, y, z, w; } Vec4;
 extern Vec4 lbl_80183660;
@@ -2212,13 +2210,9 @@ void fn_80062D0C(int nPlayer) {
     fn_80062D6C(9, nPlayer + 1);
 }
 
-void fn_800E5998(int a, int b, int* pC, int* pD);
-
 void fn_80062D38(int a, int b, int nPlayer) {
     fn_800E5998(a, 0, &b, &nPlayer);
 }
-
-void fn_800E590C(int a, int b, int* pC);
 
 void fn_80062D6C(int a, int nPlayer) {
     fn_800E590C(a, 0, &nPlayer);
@@ -2284,7 +2278,7 @@ void STATEFUNC_WaitUpdate(int nPlayer) {
 
 void STATEFUNC_ShowYardageExit(int nPlayer) {
     if (gPlayers[nPlayer].unkC2E == 0 && lbl_80281E10 == 0) {
-        GM_BumpBallForObstructions();
+        GM_BumpBallForObstructions(nPlayer);
     }
     lbl_80281E10 = 0;
 }
@@ -2321,7 +2315,6 @@ void STATEFUNC_FadeToRemoveBallInit(int nPlayer) {
 int   fn_8001707C(int nView);                 // the player a view belongs to
 void GOLFERSTATE_Pop(int nPlayer);
 void  fn_80067710(int nPlayer, int a, int b);
-void  GameEffects_SetSuperSlowMo(int a, int nPlayer, f32 f);
 void  fn_800C6E14(void);
 extern u8 lbl_80281E13;
 
@@ -3146,7 +3139,6 @@ void STATEFUNC_PlaceBallInit(int nPlayer) {
 
 
 void  BreakLine_Start(int nView);            // GoBreakLine.c
-void fn_80062CB0(int a, u8 b);
 void  GM_CheckForShotChanges(int nPlayer);
 void  fn_800EDAE0(int nPlayer);
 u8    GM_PlayerTakeMulligan(int nPlayer);
@@ -3415,7 +3407,6 @@ void  SKEL_SetIKSolutionWeight(u8* p, f32 f);
 void  fn_80047EF0(u8* pBall, int nPlayer, int a);   // tee the ball up
 void  fn_80047B6C(u8* pBall, int nPlayer);
 void  fn_80047BC0(u8* pBall, int nPlayer);
-void  fn_800DAF74(void);
 f32   fn_800C6B7C(View* pView);
 
 // State 11 begins: the swing animation. The camera is 12 in a replay, else one of the three
@@ -3834,7 +3825,6 @@ u8 fn_80062DD4(View* pView);               // the view has faded out
 f32 fn_80062DCC(View* pView);               // and how far
 void  GM_PlayerTookShot(int nPlayer);
 void  fn_8006C4A0(void);                      // take the shot back (a mulligan)
-void  fn_800DBDA8(int nPlayer);
 u8 fn_80058F5C(int nPlayer);              // the per-frame swing poll: the ball was struck
 void  fn_8006BB5C(int nPlayer);
 u8    fn_8004560C(void);
@@ -3937,9 +3927,6 @@ u8    fn_800DA234(void);
 void  fn_800E505C(int nTip);
 void  fn_800D1DAC(int nPlayer);
 u8    fn_800ED540(void);
-void  fn_800EAC7C(void);
-void  fn_800E502C(void);
-void  fn_800E4FFC(void);
 void  fn_800ED548(void);
 void  Caddie_Start(int nPlayer);              // Golfer.c
 void fn_80062C5C(void);
@@ -4006,11 +3993,9 @@ void STATEFUNC_SwingInit(int nPlayer) {
     }
     if (gPlayers[nPlayer].unkC2E == 0 && !Player_IsCPU(nPlayer) && fn_800EC550() && fn_800ED540()) {
         if (fn_800F0818()) {
-            fn_800EAC7C();
-            fn_800E502C();
+            fn_800E502C(fn_800EAC7C());
         } else {
-            fn_800EAC7C();
-            fn_800E4FFC();
+            fn_800E4FFC(fn_800EAC7C());
         }
         fn_800E3D38(nPlayer, 0);
         fn_80062C80(gPlayers[nPlayer].nC58, 0);
