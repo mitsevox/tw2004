@@ -190,8 +190,8 @@ EASBErrorE fn_801283B0(EASBInitParams* pParams);
 void fn_80128488(EASBProduct* pProduct, u8 bValid, char* szName, u16* szGamesPlayedType, u16 uLanguage);
 u32 fn_80128468(u32 uA, u32 uB);    // uA + uB, saturating at 0xFFFFFFFF
 void fn_80128528(EASBTotals* pTotals, EASBProduct* pProduct);
-void fn_80128624(EASBProduct* aProducts, s32 nCount);          // a shell sort of the records
-void fn_8012872C(EASBAccomplishment** apList, s32 nCount, s32 nSort);
+void fn_80128624(EASBProduct* aProducts, u32 nCount);          // a shell sort of the records
+void fn_8012872C(EASBAccomplishment** apList, u32 nCount, s32 nSort);
 s32 fn_80128CA0(char* szA, char* szB, u8 bCase);                // compares two texts (0: same)
 char* fn_80128BF8(char* szDest, char* szSrc, u32 uSize);        // bounded string copy
 u16* fn_80128C4C(u16* szDest, u16* szSrc, u32 uLength);         // the same for wide text

@@ -254,20 +254,21 @@ void fn_80128580(EASBTotals* pTotals, EASBProduct* pProduct) {
 }
 
 // Sorts nCount product records (a shell sort, gaps 1, 4, 13, ...).
-void fn_80128624(EASBProduct* aProducts, s32 nCount) {
+void fn_80128624(EASBProduct* aProducts, u32 nCount) {
     EASBProduct product;
-    s32 nGap;
     s32 i;
+    s32 nGap;
     s32 j;
 
     nGap = 1;
-    while (nGap <= nCount / 9) {
+    while (nGap <= (s32)(nCount / 9)) {
         nGap = nGap * 3 + 1;
     }
     for (; nGap > 0; nGap /= 3) {
-        for (i = nGap; i < nCount; i++) {
+        for (i = nGap; i < (s32)nCount; i++) {
             memcpy(&product, &aProducts[i], sizeof(EASBProduct));
-            for (j = i - nGap; j >= 0 && fn_80127D84(&product, &aProducts[j]) < 0; j -= nGap) {
+            for (j = i - nGap; j >= 0; j -= nGap) {
+                if (fn_80127D84(&product, &aProducts[j]) >= 0) break;
                 memcpy(&aProducts[j + nGap], &aProducts[j], sizeof(EASBProduct));
             }
             memcpy(&aProducts[j + nGap], &product, sizeof(EASBProduct));
@@ -276,20 +277,21 @@ void fn_80128624(EASBProduct* aProducts, s32 nCount) {
 }
 
 // Sorts a list of nCount accomplishments the same way (fn_80127E44's order).
-void fn_8012872C(EASBAccomplishment** apList, s32 nCount, s32 nSort) {
-    EASBAccomplishment* pAccomplishment;
-    s32 nGap;
+void fn_8012872C(EASBAccomplishment** apList, u32 nCount, s32 nSort) {
     s32 i;
+    s32 nGap;
     s32 j;
+    EASBAccomplishment* pAccomplishment;
 
     nGap = 1;
-    while (nGap <= nCount / 9) {
+    while (nGap <= (s32)(nCount / 9)) {
         nGap = nGap * 3 + 1;
     }
     for (; nGap > 0; nGap /= 3) {
-        for (i = nGap; i < nCount; i++) {
+        for (i = nGap; i < (s32)nCount; i++) {
             pAccomplishment = apList[i];
-            for (j = i - nGap; j >= 0 && fn_80127E44(pAccomplishment, apList[j], nSort) < 0; j -= nGap) {
+            for (j = i - nGap; j >= 0; j -= nGap) {
+                if (fn_80127E44(pAccomplishment, apList[j], nSort) >= 0) break;
                 apList[j + nGap] = apList[j];
             }
             apList[j + nGap] = pAccomplishment;
@@ -365,21 +367,24 @@ u16* fn_80128C4C(u16* szDest, u16* szSrc, u32 uLength) {
 
 // Compares two texts like strcmp; bCase 0 ignores the case of a-z.
 s32 fn_80128CA0(char* szA, char* szB, u8 bCase) {
-    if (szA == szB || szA == NULL || szB == NULL) return 0;
+    u8* pA;
+    u8* pB;
+
+    pA = (u8*)szA;
+    pB = (u8*)szB;
+    if (pA == pB || pA == NULL || pB == NULL) return 0;
     if (bCase) {
-        while ((u8)*szA == (u8)*szB++) {
-            if ((u8)*szA++ == '\0') return 0;
+        while (*pA == *pB++) {
+            if (*pA++ == '\0') return 0;
         }
-        return (u8)*szA - (u8)szB[-1];
+        return *pA - pB[-1];
     }
-    for (;;) {
-        if (EASB_TO_UPPER((u8)*szA) != EASB_TO_UPPER((u8)*szB)) {
-            return EASB_TO_UPPER((u8)*szA) - EASB_TO_UPPER((u8)*szB);
-        }
-        if ((u8)*szA == '\0') return 0;
-        szA++;
-        szB++;
+    while (EASB_TO_UPPER(*pA) == EASB_TO_UPPER(*pB)) {
+        if (*pA == '\0') return 0;
+        pA++;
+        pB++;
     }
+    return EASB_TO_UPPER(*pA) - EASB_TO_UPPER(*pB);
 }
 
 // Compares two wide texts like strcmp.
