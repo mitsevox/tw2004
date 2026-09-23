@@ -434,3 +434,24 @@ Windows setup, with the helpers in the scratch folder (`C:\dev\scratch\tw\`):
   Score 0 is a match (checked: an exact function scores 0). Results land in `perm/<fn>/output-*`
   with a `diff.txt` against the base; carry the change back into `src/` by hand (macros are
   expanded in `base.c`) and confirm with `ninja`.
+
+CI and decomp.dev
+-----------------
+
+Set up 2026-09-23 following `docs/github_actions.md`.
+
+- `mitsevox/tw2004-build` (**private**) holds only `orig/GW4E69/sys/main.dol` and builds the
+  container `ghcr.io/mitsevox/tw2004-build:main`; `tw2004` has Read access to it (package
+  settings, "Manage Actions access").
+- `.github/workflows/build.yml` builds on every push and uploads `GW4E69_report` (the progress
+  report decomp.dev reads) and `GW4E69_maps`. Unlike the template, it does not pass
+  `--compilers /compilers --binutils /binutils`: the container's packages are older than the
+  versions pinned in `configure.py`, so the build downloads its own, as a local build does.
+- The ProDG step runs the Windows compiler through the build's wrapper (wibo) off Windows
+  (`tools/prodg/prodgcc.py --wrapper`); CI rebuilds `main.dol` byte-identical on Linux.
+- Pitfall: when the build repo is created from its template, the template's initial-commit
+  container build can finish *after* the commit that adds `main.dol` and overwrite the `:main`
+  tag with an empty image ("orig/GW4E69/sys/main.dol not found"). Re-run the latest container
+  build.
+- Pushing workflow files needs the `workflow` scope on the GitHub CLI token
+  (`gh auth refresh -h github.com -s workflow`).
