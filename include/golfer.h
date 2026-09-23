@@ -237,7 +237,8 @@ typedef struct Player {
     s32  n324;                  // 0x324  n338 minus the last match prize (GameModeMatch EndGame)
     s32  n328;                  // 0x328  a total the match modes add their prize (or money) to
     s32  n32C;                  // 0x32C  skins money won (GameMode2 EndGame)
-    u8   unk330[0x338 - 0x330];
+    s32  n330;                  // 0x330  match money won (GameMode8 EndGame)
+    u8   unk334[4];
     s32  n338;                  // 0x338
     u8   unk33C[0x354 - 0x33C];
     // Shot block, TW06 AIshot_t (which has 6 preferred clubs where we have 8).
@@ -304,13 +305,15 @@ typedef struct Player {
     u8   unkC2E;                // 0xC2E
     u8   unkC2F;
     s32  nRehearseState;        // 0xC30  AI_RehearseShot state machine
-    u8   unkC34[0xC3C - 0xC34];
+    u8   unkC34[4];
+    s32  nC38;                  // 0xC38  a frame countdown (speed golf)
     s32  nC3C;                  // 0xC3C
     s32  nC40;                  // 0xC40
     s32  nC44;                  // 0xC44  3000 at the start of a round
     s32  nC48;                  // 0xC48
     s32  nC4C;                  // 0xC4C
-    u8   unkC50[0xC58 - 0xC50];
+    u8   unkC50[4];
+    s32  nC54;                  // 0xC54  a frame countdown (speed golf's run to the ball)
     s32  nC58;                  // 0xC58
     u8   unkC5C[0xC6C - 0xC5C];
     s32  nC6C[18];              // 0xC6C  cleared at the start of a round
