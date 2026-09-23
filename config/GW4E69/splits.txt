@@ -280,6 +280,9 @@ GoStaticCam.c:
 event.c:
 	.text       start:0x80065B44 end:0x80067710
 
+Code80067710.c:
+	.text       start:0x80067710 end:0x80067B80
+
 target.c:
 	.text       start:0x80067B80 end:0x8006AA70
 
