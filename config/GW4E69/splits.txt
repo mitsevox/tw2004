@@ -864,23 +864,8 @@ unsorted/sweep_80070FF0.c:
 GoShaderObject_PrelitUVAnimation_Gc.c:
 	.text       start:0x8007110C end:0x80071AD0
 
-unsorted/sweep_800725BC.c:
-	.text       start:0x800725BC end:0x8007260C
-
-unsorted/sweep_8007325C.c:
-	.text       start:0x8007325C end:0x8007326C
-
-unsorted/sweep_8007326C.c:
-	.text       start:0x8007326C end:0x8007327C
-
-unsorted/sweep_8007327C.c:
-	.text       start:0x8007327C end:0x800732B8
-
-unsorted/sweep_800732B8.c:
-	.text       start:0x800732B8 end:0x800732F4
-
-unsorted/sweep_800734A0.c:
-	.text       start:0x800734A0 end:0x800734D0
+animblender.c:
+	.text       start:0x80071AD0 end:0x80073878
 
 GoShaderObjectCommon_ShaderObjectsData_Gc.c:
 	.text       start:0x80074BE0 end:0x8007524C
