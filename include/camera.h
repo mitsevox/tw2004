@@ -186,9 +186,18 @@ typedef struct CamTuning {
     u8   unk8[4];
     f32  fC;                    // 0x00C  ... closer in when the ball is within this of it plus f4
     f32  f10;                   // 0x010  ... as a share of the ball's distance
-    u8   unk14[0x38 - 0x14];
+    u8   unk14[0x1C - 0x14];
+    f32  f1C;                   // 0x01C  the green zoom-to-aim camera's slow motion at full speed
+    u8   unk20[4];
+    f32  f24;                   // 0x024  ... it has arrived within this of its goal
+    u8   unk28[0x30 - 0x28];
+    f32  f30;                   // 0x030  ... it slows down over this last distance
+    f32  f34;                   // 0x034  ... its base speed
     f32  f38;                   // 0x038  ... its distance back on a putt
-    u8   unk3C[0x4C - 0x3C];
+    f32  f3C;                   // 0x03C  ... View.shot19C.f74 falls by this each frame
+    f32  f40;                   // 0x040  ... once there, its height moves by this a frame
+    f32  f44;                   // 0x044  ... its height over the goal (for a lens of fB0 1)
+    f32  f48;                   // 0x048  ... the aim marker's lag
     f32  f4C;                   // 0x04C  camera 5's height over the ball
     f32  f50;                   // 0x050  camera 5: the ball-to-pin distance of a full swing out
     f32  f54;                   // 0x054  camera 5: how long the swing out lasts
@@ -221,7 +230,9 @@ typedef struct CamTuning {
     f32  fC4;                   // 0x0C4
     f32  fC8;                   // 0x0C8
     f32  fCC;                   // 0x0CC
-    u8   unkD0[0x168 - 0xD0];
+    u8   unkD0[0xDC - 0xD0];
+    f32  fDC;                   // 0x0DC  the green zoom-to-aim camera's aim marker (CameraScript_LagAimMarker)
+    u8   unkE0[0x168 - 0xE0];
     f32  f168;                  // 0x168  the ground clearance for CamScript_KeepAboveGround
     f32  f16C;                  // 0x16C  the obstruction radius around the ball for the pre-shot routine
     f32  f170;                  // 0x170  a blend for fn_80063B98 / fn_80063BF4
@@ -354,6 +365,7 @@ u8     fn_80063C90(View* pView);        // the camera is still moving
 void   fn_80063CBC(View* pView, f32* pVec);   // nCamera 3, the vector into vC4
 void   fn_80063CF0(View* pView, int nCamera, int nPlayer);
 void   fn_800642D0(View* pView, int nPlayer);
+void   fn_80063F08(f32* pA, f32* pB, f32* pOut);   // the green zoom-to-aim camera: View.v20 as pA and pOut
 
 // ---- the golf cameras (GoGolfCam.c) ---------------------------------------------------------
 
