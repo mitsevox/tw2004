@@ -43,3 +43,5 @@ u8 fn_80110460(void) {
 u8* fn_801104A0(void) {
     return lbl_80213B80;
 }
+
+// ---- end of sweep code ----

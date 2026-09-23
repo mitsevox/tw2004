@@ -90,3 +90,5 @@ void fn_8010BFA0(s32 n) {
         lbl_80282488->b975 = 1;
     }
 }
+
+// ---- end of sweep code ----
