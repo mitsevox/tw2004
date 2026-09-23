@@ -14,16 +14,17 @@ s32  fn_800CCEA0(Skin* pSkin);          // SkinPart.c: and aSets[3]
 // This file, in address order.
 void fn_80103920(void);
 void fn_80103EFC(CrAPAsset* pAsset);
+int  fn_80104AF4(s16 nPart, int n);     // the category of a part's entry n (-1 or 0x40: none)
 int  fn_80104F7C(CrAPAsset* pAsset);
 void fn_80105188(UStreamObject* pObject);
 void fn_801051F4(UStreamObject* pObject);
 void fn_80105240(void);
 void fn_80105B80(CrAPAsset* pAsset, char* pName);
-void fn_80106D24(CrAPAsset* pAsset, Skin* pSkin);
-void fn_80106DA0(CrAPAsset* pAsset, Skin* pSkin);
 void fn_80105DAC(void);
 void fn_80105EFC(void);
 u8   fn_801061F8(s16 nPart, int nCategory, int nWanted);
+void fn_80106D24(CrAPAsset* pAsset, Skin* pSkin);
+void fn_80106DA0(CrAPAsset* pAsset, Skin* pSkin);
 int  fn_8010766C(MsgArg* pArg, char* sz);
 
 // UISScreen.c's sender, with the front end's view of its arguments (as GameMessages.c declares it;
@@ -188,6 +189,30 @@ u8 fn_801048B0(int nPart) {
         return 1;
     }
     return 0;
+}
+
+u8 fn_80104DB8(s16 nPart, int n, char* pDst) {
+    int nCategory;
+
+    if (lbl_80282460->pStrings == NULL) {
+        return 0;
+    }
+    if (pDst == NULL) {
+        return 0;
+    }
+    if (lbl_801932C8[nPart][0] != '\0' && n == 0) {
+        strcpy(pDst, lbl_801932C8[nPart]);
+        return 1;
+    }
+    nCategory = fn_80104AF4(nPart, n);
+    if (nCategory == 0x40) {
+        return 0;
+    }
+    if (nCategory == -1) {
+        return 0;
+    }
+    strcpy(pDst, lbl_80282460->pStrings + nCategory);
+    return 1;
 }
 
 CrAPAsset* fn_80104F68(int nAsset) {
@@ -449,6 +474,28 @@ int fn_80106244(s16 nPart) {
         nAsset = fn_80103D14(i);
         if (nAsset >= 0 && nPart == lbl_80282460->pAssets[nAsset].nPart) {
             return nAsset;
+        }
+    }
+    return -1;
+}
+
+// The asset in the first of the profile's slots whose asset is of the part and fits the part's
+// entry n (-1: none).
+int fn_801062C8(s16 nPart, int n) {
+    s16 i;
+    int nAsset;
+    int nWanted;
+    CrAPAsset* pAsset;
+
+    fn_80077ACC();
+    nWanted = fn_80104AF4(nPart, n);
+    for (i = 0; i < 53; i++) {
+        nAsset = fn_80103D14(i);
+        if (nAsset >= 0) {
+            pAsset = &lbl_80282460->pAssets[nAsset];
+            if (nPart == pAsset->nPart && fn_801061F8(nPart, pAsset->nCategory, nWanted)) {
+                return nAsset;
+            }
         }
     }
     return -1;
