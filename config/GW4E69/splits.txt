@@ -654,47 +654,8 @@ unsorted/sweep_80065E70.c:
 unsorted/sweep_80065E98.c:
 	.text       start:0x80065E98 end:0x80065E9C
 
-unsorted/sweep_800664D8.c:
-	.text       start:0x800664D8 end:0x80066558
-
-unsorted/sweep_80066994.c:
-	.text       start:0x80066994 end:0x80066A14
-
-unsorted/sweep_80066A14.c:
-	.text       start:0x80066A14 end:0x80066A3C
-
-unsorted/sweep_80066BE8.c:
-	.text       start:0x80066BE8 end:0x80066C2C
-
-unsorted/sweep_80066D0C.c:
-	.text       start:0x80066D0C end:0x80066D54
-
-unsorted/sweep_80066D54.c:
-	.text       start:0x80066D54 end:0x80066D78
-
-unsorted/sweep_80066E6C.c:
-	.text       start:0x80066E6C end:0x80066EDC
-
-unsorted/sweep_80066F30.c:
-	.text       start:0x80066F30 end:0x80066FA8
-
-unsorted/sweep_80066FA8.c:
-	.text       start:0x80066FA8 end:0x80066FD4
-
-unsorted/sweep_80067004.c:
-	.text       start:0x80067004 end:0x8006702C
-
-unsorted/sweep_8006752C.c:
-	.text       start:0x8006752C end:0x80067560
-
-unsorted/sweep_8006765C.c:
-	.text       start:0x8006765C end:0x800676AC
-
-unsorted/sweep_800676AC.c:
-	.text       start:0x800676AC end:0x800676B8
-
-unsorted/sweep_800676E8.c:
-	.text       start:0x800676E8 end:0x80067710
+event.c:
+	.text       start:0x80065E9C end:0x80067710
 
 target.c:
 	.text       start:0x80067B80 end:0x8006AA70

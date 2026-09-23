@@ -35,6 +35,7 @@ typedef struct SitDevScripts {
 } SitDevScripts;
 
 extern SitDevScripts* lbl_80282208; // 0x80282208 (.sbss), NULL until the scripts are loaded
+extern s32 lbl_80282210;            // 0x80282210 (.sbss): entries in use in lbl_801FA1C0 (fn_800BB6DC)
 
 void fn_800BD74C(void);             // clear SitDevData.pD4
 extern s32 lbl_801FA198[5];         // per player; cleared by fn_800BB1C0
