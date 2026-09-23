@@ -313,7 +313,7 @@ void fn_800F5014(int nPlayer) {
 void fn_800F56D4(void) {
     int i;
     fn_800F2030();
-    fn_800FF7DC();
+    GameModeStroke_SetupNextGolfer();
     for (i = 0; i < gNumPlayersSetUp; i++) {
         if ((s8)GOLFERSTATE_GetCurrentState(i) == 1) {
             fn_800F21B4(i);

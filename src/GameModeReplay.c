@@ -8,25 +8,25 @@
 #include "game.h"
 #include "engine.h"
 
-void fn_800F1388(void);
-void fn_800F1404(void);
-void fn_800F1424(void);
-void fn_800F15AC(void);
+void GameModeReplay_LoadHole(void);
+void GameModeReplay_RestartHole(void);
+void GameModeReplay_StartGamePreData(void);
+void GameModeReplay_SetupNextGolfer(void);
 void fn_800F18C8(void);
-u8   fn_800F193C(int nPlayer, u8 bCheck);
-u8   fn_800F1944(u8 bCheck);
-void fn_800F194C(void);
+u8   GameModeReplay_HoleFinished(int nPlayer, u8 bCheck);
+u8   GameModeReplay_GameFinished(u8 bCheck);
+void GameModeReplay_EndGame(void);
 
-// TW06: GameModeReplay::Init. Mode 10 starts: one player, no mulligans, the saved shot's hole.
-void fn_800F125C(void) {
-    gpGame->pfnInit = fn_800F125C;
-    gpGame->pfnSetupNextGolfer = fn_800F15AC;
-    gpGame->pfnHoleFinished = fn_800F193C;
-    gpGame->pfnGameFinished = fn_800F1944;
-    gpGame->pfn1EC = fn_800F1424;
-    gpGame->pfnEndGame = fn_800F194C;
-    gpGame->pfn1E4 = fn_800F1388;
-    gpGame->pfn224 = fn_800F1404;
+// Mode 10 starts: one player, no mulligans, the saved shot's hole.
+void GameModeReplay_Init(void) {
+    gpGame->pfnInit = GameModeReplay_Init;
+    gpGame->pfnSetupNextGolfer = GameModeReplay_SetupNextGolfer;
+    gpGame->pfnHoleFinished = GameModeReplay_HoleFinished;
+    gpGame->pfnGameFinished = GameModeReplay_GameFinished;
+    gpGame->pfn1EC = GameModeReplay_StartGamePreData;
+    gpGame->pfnEndGame = GameModeReplay_EndGame;
+    gpGame->pfn1E4 = GameModeReplay_LoadHole;
+    gpGame->pfn224 = GameModeReplay_RestartHole;
     gpGame->b273 = 0;
     gpGame->b276 = 0;
     gpGame->b27B = 0;
@@ -45,16 +45,15 @@ void fn_800F125C(void) {
     gSession.nNumPlayers = 1;
 }
 
-// TW06: GameModeReplay::LoadHole. The saved wind and conditions.
-void fn_800F1388(void) {
+// The saved wind and conditions.
+void GameModeReplay_LoadHole(void) {
     Wind_Set(gReplayData.nWindDir, gReplayData.nWindSpeed);
     fn_80055C40(gReplayData.nF1A);
     fn_80055CAC(gReplayData.nF1C);
     fn_80055CD0(gReplayData.nF1E);
 }
 
-// TW06: GameModeReplay::RestartHole.
-void fn_800F1404(void) {
+void GameModeReplay_RestartHole(void) {
     fn_800F18C8();
 }
 
@@ -63,8 +62,8 @@ static inline s8 Replay_SetPinSet(void) {
     return gSession.nPinSet = gReplayData.nPinSet;
 }
 
-// TW06: GameModeReplay::StartGamePreData. The saved course, hole, pins and tees.
-void fn_800F1424(void) {
+// The saved course, hole, pins and tees.
+void GameModeReplay_StartGamePreData(void) {
     int i;
     for (i = 0; i < 18; i++) {
         gpGame->nPinSet[i] = Replay_SetPinSet();
@@ -84,9 +83,9 @@ void fn_800F1424(void) {
     Replay_SetPinSet();
 }
 
-// TW06: GameModeReplay::SetupNextGolfer. Put player 0 back as they were before the shot, then
+// Put player 0 back as they were before the shot, then
 // start it.
-void fn_800F15AC(void) {
+void GameModeReplay_SetupNextGolfer(void) {
     Ball ball;
     f32 fF08;
     f32 fF0C;
@@ -154,18 +153,15 @@ void fn_800F18C8(void) {
     }
 }
 
-// TW06: GameModeReplay::HoleFinished.
-u8 fn_800F193C(int nPlayer, u8 bCheck) {
+u8 GameModeReplay_HoleFinished(int nPlayer, u8 bCheck) {
     return 1;
 }
 
-// TW06: GameModeReplay::GameFinished.
-u8 fn_800F1944(u8 bCheck) {
+u8 GameModeReplay_GameFinished(u8 bCheck) {
     return 1;
 }
 
-// TW06: GameModeReplay::EndGame.
-void fn_800F194C(void) {
+void GameModeReplay_EndGame(void) {
     gSession.b12 = 1;
 }
 

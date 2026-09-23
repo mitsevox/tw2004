@@ -1,6 +1,6 @@
 // GameMode9.c (our name): game mode 9, one player playing holes with no opponent and a restart
 // option; probably TW06's GameModePractice. It borrows mode 0's GetHonors and GoToPlayoff
-// (fn_800FF894, fn_800FFDB0).
+// (GameModeStroke_GetHonors, fn_800FFDB0).
 
 #include "golfer.h"
 #include "game.h"
@@ -23,7 +23,7 @@ void fn_800EDA74(void);
 void fn_800ED738(void) {
     gpGame->pfnInit = fn_800ED738;
     gpGame->pfnSetupNextGolfer = fn_800ED8E0;
-    gpGame->pfnGetHonors = fn_800FF894;
+    gpGame->pfnGetHonors = GameModeStroke_GetHonors;
     gpGame->pfnHoleFinished = fn_800ED908;
     gpGame->pfnGameFinished = fn_800ED9AC;
     gpGame->pfnGoToPlayoff = fn_800FFDB0;

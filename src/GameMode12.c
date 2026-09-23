@@ -32,9 +32,9 @@ void fn_800FF6C0(int nPlayer);
 // Mode 12 starts: stroke play with mode 0's turn order, any number of mulligans.
 void fn_800FEAFC(void) {
     gpGame->pfnInit = fn_800FEAFC;
-    gpGame->pfnGetHonors = fn_800FF894;
-    gpGame->pfnHoleFinished = fn_800FFCCC;
-    gpGame->pfnGameFinished = fn_800FFD54;
+    gpGame->pfnGetHonors = GameModeStroke_GetHonors;
+    gpGame->pfnHoleFinished = GameModeStroke_HoleFinished;
+    gpGame->pfnGameFinished = GameModeStroke_GameFinished;
     gpGame->pfnGoToPlayoff = fn_800FEC78;
     gpGame->pfnEndGame = fn_800FF288;
     gpGame->pfn23C = fn_800FEC80;
@@ -262,7 +262,7 @@ void fn_800FF3F8(void) {
             PLAYER(i)->aCD4[j] = 0;
         }
     }
-    fn_800FF7DC();
+    GameModeStroke_SetupNextGolfer();
 }
 
 s32 fn_800FF49C(int nPlayer) {

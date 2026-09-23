@@ -203,10 +203,10 @@ void fn_800E0B38(int nMode) {
     lbl_80282278 = 0;
     switch (Game_GetMode()) {
     case 0:
-        fn_800FF700();
+        GameModeStroke_Init();
         break;
     case 1:
-        fn_800E9E40();
+        GameModeMatch_Init();
         break;
     case 2:
         fn_800F80FC();
@@ -230,7 +230,7 @@ void fn_800E0B38(int nMode) {
         fn_800EACD8();
         break;
     case 10:
-        fn_800F125C();
+        GameModeReplay_Init();
         break;
     case 11:
         fn_800FFF34();
@@ -254,16 +254,16 @@ void fn_800E0B38(int nMode) {
         fn_800F5AAC();
         break;
     case 18:
-        fn_800FE1B4();
+        GameModeStableford_Init();
         break;
     case 19:
-        fn_800E81C4();
+        GameModeBestBall_Init();
         break;
     case 20:
-        fn_800E8D58();
+        GameModeFourBall_Init();
         break;
     case 21:
-        fn_800E68F0();
+        GameModeAlternateShot_Init();
         break;
     case 23:
         fn_800EDD18();
@@ -272,7 +272,7 @@ void fn_800E0B38(int nMode) {
         fn_800F0448();
         break;
     case 25:
-        fn_800E7980();
+        GameModeBattle_Init();
         break;
     case 26:
         fn_8010C4A0();

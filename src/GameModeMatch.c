@@ -11,19 +11,19 @@
 
 extern s32 lbl_80281658;                    // who has the honor in the playoff (5 = nobody yet)
 
-int  fn_800E9F90(int nPlayer);
-void fn_800EAB44(void);
+int  GameModeMatch_GetTeeHonors(int nPlayer);
+void GameModeMatch_EndGame(void);
 
-// TW06: GameModeMatch::Init. Two players; the CPU may concede.
-void fn_800E9E40(void) {
-    gpGame->pfnInit = fn_800E9E40;
+// Two players; the CPU may concede.
+void GameModeMatch_Init(void) {
+    gpGame->pfnInit = GameModeMatch_Init;
     gpGame->pfnSetupNextGolfer = fn_800E9F14;
-    gpGame->pfnGetHonors = fn_800EA084;
-    gpGame->pfnHoleFinished = fn_800EA278;
-    gpGame->pfnGameFinished = fn_800EA548;
-    gpGame->pfnGoToPlayoff = fn_800EA758;
-    gpGame->pfnEndHole = fn_800EAA40;
-    gpGame->pfnEndGame = fn_800EAB44;
+    gpGame->pfnGetHonors = GameModeMatch_GetHonors;
+    gpGame->pfnHoleFinished = GameModeMatch_HoleFinished;
+    gpGame->pfnGameFinished = GameModeMatch_GameFinished;
+    gpGame->pfnGoToPlayoff = GameModeMatch_GoToPlayoff;
+    gpGame->pfnEndHole = GameModeMatch_EndHole;
+    gpGame->pfnEndGame = GameModeMatch_EndGame;
     gpGame->bAIConcedes = 1;
     gpGame->n4 = 1;
     gpGame->nMulligans = 0;
@@ -47,9 +47,9 @@ void fn_800E9F14(void) {
     }
 }
 
-// TW06: GameModeMatch::GetTeeHonors. In the playoff the player who had the honor at its start;
+// In the playoff the player who had the honor at its start;
 // otherwise the winner of the last decided hole, else the first other player (5 = nobody).
-int fn_800E9F90(int nPlayer) {
+int GameModeMatch_GetTeeHonors(int nPlayer) {
     int h;
     int i;
     if (gpGame->bD4 && nPlayer != lbl_80281658) {
@@ -72,9 +72,9 @@ int fn_800E9F90(int nPlayer) {
     return 5;
 }
 
-// TW06: GameModeMatch::GetHonors. On the tee the honor; otherwise the player farthest from the pin
+// On the tee the honor; otherwise the player farthest from the pin
 // (off the green first).
-s32 fn_800EA084(int nPlayer) {
+s32 GameModeMatch_GetHonors(int nPlayer) {
     int i;
     CourseInfo* pCourse;
     int nPinSet;
@@ -83,7 +83,7 @@ s32 fn_800EA084(int nPlayer) {
     f32 dx;
     f32 dz;
     f32 d;
-    nBest = fn_800E9F90(nPlayer);
+    nBest = GameModeMatch_GetTeeHonors(nPlayer);
     if (nBest != 5 && Player_OnTee(nBest)) {
         return nBest;
     }
@@ -133,10 +133,10 @@ s32 fn_800EA084(int nPlayer) {
     return nBest;
 }
 
-// TW06: GameModeMatch::HoleFinished. Both holed; or one holed and the other can no longer win the
+// Both holed; or one holed and the other can no longer win the
 // hole (nor halve it when the holed player is dormie). Unless only checking, the loser's score gets
 // a stroke for the putt they did not take.
-u8 fn_800EA278(int nPlayer, u8 bCheck) {
+u8 GameModeMatch_HoleFinished(int nPlayer, u8 bCheck) {
     int nLeft;
     int h;
     if (Player_IsHoled(0) && Player_IsHoled(1)) {
@@ -204,8 +204,7 @@ u8 fn_800EA278(int nPlayer, u8 bCheck) {
         P(i)->n308 = 0;                             \
     }
 
-// TW06: GameModeMatch::GameFinished.
-u8 fn_800EA548(u8 bCheck) {
+u8 GameModeMatch_GameFinished(u8 bCheck) {
     int nLeft;
     int h;
     int i;
@@ -227,7 +226,7 @@ u8 fn_800EA548(u8 bCheck) {
             }
         }
         if (nLeft == 0) {
-            return !fn_800EA758(bCheck);
+            return !GameModeMatch_GoToPlayoff(bCheck);
         }
         if (gPlayers[1].nHolesWon + nLeft < gPlayers[0].nHolesWon ||
             gPlayers[0].nHolesWon + nLeft < gPlayers[1].nHolesWon) {
@@ -237,8 +236,8 @@ u8 fn_800EA548(u8 bCheck) {
     return 0;
 }
 
-// TW06: GameModeMatch::GoToPlayoff. The honor for the playoff is worked out as if on the next hole.
-u8 fn_800EA758(u8 bCheck) {
+// The honor for the playoff is worked out as if on the next hole.
+u8 GameModeMatch_GoToPlayoff(u8 bCheck) {
     int h;
     int i;
     for (h = Game_CurHoleIndex() + 1; h < 18; h++) {
@@ -251,7 +250,7 @@ u8 fn_800EA758(u8 bCheck) {
             return 1;
         }
         gpGame->nCurHole++;
-        lbl_80281658 = fn_800E9F90(5);
+        lbl_80281658 = GameModeMatch_GetTeeHonors(5);
         gpGame->nCurHole--;
         gpGame->bD5 = 1;
         for (h = 0; h < 18; h++) {
@@ -269,8 +268,8 @@ u8 fn_800EA758(u8 bCheck) {
     return 0;
 }
 
-// TW06: GameModeMatch::EndHole. The player who holed out in fewer strokes wins the hole.
-void fn_800EAA40(void) {
+// The player who holed out in fewer strokes wins the hole.
+void GameModeMatch_EndHole(void) {
     if (Player_IsHoled(0) &&
         gPlayers[0].nStrokes[Game_CurHoleIndex()] < gPlayers[1].nStrokes[Game_CurHoleIndex()]) {
         gPlayers[0].nModePoints[Game_CurHoleIndex()] = 1;
@@ -283,8 +282,8 @@ void fn_800EAA40(void) {
     }
 }
 
-// TW06: GameModeMatch::EndGame. A human winner with a profile gets the prize.
-void fn_800EAB44(void) {
+// A human winner with a profile gets the prize.
+void GameModeMatch_EndGame(void) {
     int nPrize;
     int nWinner;
     int nLoser;

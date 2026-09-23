@@ -338,7 +338,7 @@ void fn_800F4584(void) {
     int i;
     lbl_8028237D = 0;
     fn_800F2030();
-    fn_800FF7DC();
+    GameModeStroke_SetupNextGolfer();
     for (i = 0; i < gNumPlayersSetUp; i++) {
         if ((s8)GOLFERSTATE_GetCurrentState(i) == 1) {
             fn_800F39CC(900);

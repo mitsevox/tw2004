@@ -13,27 +13,27 @@ extern s32 lbl_801925B8[5];                 // per player: the club taken from t
 extern s32 lbl_80281650;                    // the winner of the last hole (5 = nobody)
 extern u8  lbl_802822E8;                    // a club is to be taken
 
-void fn_800E7A7C(void);
+void GameModeBattle_Shutdown(void);
 void fn_800E7A9C(void);
-u8   fn_800E7ABC(u8 bCheck);
-void fn_800E7B58(void);
-void fn_800E7CBC(void);
-u8   fn_800E7E64(int nClub);
-int  fn_800E7E88(int nPlayer);
-void fn_800E7F88(void);
-void fn_800E800C(void);
+u8   GameModeBattle_GameFinished(u8 bCheck);
+void GameModeBattle_EndHole(void);
+void GameModeBattle_EndGame(void);
+u8   GameModeBattle_ClubIsRequired(int nClub);
+int  GameModeBattle_NumRemovableClubsLeft(int nPlayer);
+void GameModeBattle_SaveClubSetup(void);
+void GameModeBattle_RestoreClubSetup(void);
 
-// TW06: GameModeBattle::Init. Two players; the CPU may concede.
-void fn_800E7980(void) {
-    gpGame->pfnInit = fn_800E7980;
-    gpGame->pfnShutdown = fn_800E7A7C;
+// Two players; the CPU may concede.
+void GameModeBattle_Init(void) {
+    gpGame->pfnInit = GameModeBattle_Init;
+    gpGame->pfnShutdown = GameModeBattle_Shutdown;
     gpGame->pfnSetupNextGolfer = fn_800E9F14;
-    gpGame->pfnGetHonors = fn_800EA084;
-    gpGame->pfnHoleFinished = fn_800EA278;
-    gpGame->pfnGameFinished = fn_800E7ABC;
-    gpGame->pfnGoToPlayoff = fn_800EA758;
-    gpGame->pfnEndHole = fn_800E7B58;
-    gpGame->pfnEndGame = fn_800E7CBC;
+    gpGame->pfnGetHonors = GameModeMatch_GetHonors;
+    gpGame->pfnHoleFinished = GameModeMatch_HoleFinished;
+    gpGame->pfnGameFinished = GameModeBattle_GameFinished;
+    gpGame->pfnGoToPlayoff = GameModeMatch_GoToPlayoff;
+    gpGame->pfnEndHole = GameModeBattle_EndHole;
+    gpGame->pfnEndGame = GameModeBattle_EndGame;
     gpGame->pfn1F0 = fn_800E7A9C;
     gpGame->bAIConcedes = 1;
     gpGame->n4 = 1;
@@ -44,32 +44,32 @@ void fn_800E7980(void) {
     gSession.nSplitScreen = 0;
 }
 
-// TW06: GameModeBattle::Shutdown. The bags go back to how they were.
-void fn_800E7A7C(void) {
-    fn_800E800C();
+// The bags go back to how they were.
+void GameModeBattle_Shutdown(void) {
+    GameModeBattle_RestoreClubSetup();
 }
 
 // The round starts: the bags are saved.
 void fn_800E7A9C(void) {
-    fn_800E7F88();
+    GameModeBattle_SaveClubSetup();
 }
 
-// TW06: GameModeBattle::GameFinished. The usual match-play end, or a player with at most one club
+// The usual match-play end, or a player with at most one club
 // left to lose who has just lost a hole.
-u8 fn_800E7ABC(u8 bCheck) {
-    if (fn_800EA548(bCheck)) {
+u8 GameModeBattle_GameFinished(u8 bCheck) {
+    if (GameModeMatch_GameFinished(bCheck)) {
         return 1;
     }
-    if ((fn_800E7E88(0) <= 1 && gPlayers[1].nModePoints[Game_CurHoleIndex()] != 0) ||
-        (fn_800E7E88(1) <= 1 && gPlayers[0].nModePoints[Game_CurHoleIndex()] != 0)) {
+    if ((GameModeBattle_NumRemovableClubsLeft(0) <= 1 && gPlayers[1].nModePoints[Game_CurHoleIndex()] != 0) ||
+        (GameModeBattle_NumRemovableClubsLeft(1) <= 1 && gPlayers[0].nModePoints[Game_CurHoleIndex()] != 0)) {
         return 1;
     }
     return 0;
 }
 
-// TW06: GameModeBattle::EndHole. The player who holed out in fewer strokes wins the hole and may
+// The player who holed out in fewer strokes wins the hole and may
 // take a club (not when that ends the game).
-void fn_800E7B58(void) {
+void GameModeBattle_EndHole(void) {
     lbl_802822E8 = 0;
     lbl_80281650 = 5;
     if (Player_IsHoled(0) &&
@@ -86,7 +86,7 @@ void fn_800E7B58(void) {
         lbl_80281650 = 1;
         gPlayers[1].nHolesWon++;
     }
-    if (fn_800E7ABC(1)) {
+    if (GameModeBattle_GameFinished(1)) {
         lbl_802822E8 = 0;
     }
     lbl_801925B8[0] = 26;
@@ -96,9 +96,9 @@ void fn_800E7B58(void) {
     lbl_801925B8[4] = 26;
 }
 
-// TW06: GameModeBattle::EndGame. Prize money for a human winner with a profile (no margin when the
+// Prize money for a human winner with a profile (no margin when the
 // game ended on clubs).
-void fn_800E7CBC(void) {
+void GameModeBattle_EndGame(void) {
     int nPrize;
     int nWinner;
     int nLoser;
@@ -112,11 +112,13 @@ void fn_800E7CBC(void) {
         default:
             return;
         }
-        if (fn_800E7E88(0) <= 1 && gPlayers[1].nModePoints[Game_CurHoleIndex()] != 0) {
+        if (GameModeBattle_NumRemovableClubsLeft(0) <= 1 &&
+            gPlayers[1].nModePoints[Game_CurHoleIndex()] != 0) {
             nWinner = 1;
             nLoser = 0;
             nMargin = 0;
-        } else if (fn_800E7E88(1) <= 1 && gPlayers[0].nModePoints[Game_CurHoleIndex()] != 0) {
+        } else if (GameModeBattle_NumRemovableClubsLeft(1) <= 1 &&
+                   gPlayers[0].nModePoints[Game_CurHoleIndex()] != 0) {
             nWinner = 0;
             nLoser = 1;
             nMargin = 0;
@@ -144,8 +146,8 @@ void fn_800E7CBC(void) {
     }
 }
 
-// TW06: GameModeBattle::ClubIsRequired. Clubs 13, 21 and 25 cannot be taken.
-u8 fn_800E7E64(int nClub) {
+// Clubs 13, 21 and 25 cannot be taken.
+u8 GameModeBattle_ClubIsRequired(int nClub) {
     u8 bRequired = 0;
     if ((1 << nClub) & 0x2202000) {
         bRequired = 1;
@@ -153,22 +155,20 @@ u8 fn_800E7E64(int nClub) {
     return bRequired;
 }
 
-// TW06: GameModeBattle::NumRemovableClubsLeft.
-int fn_800E7E88(int nPlayer) {
+int GameModeBattle_NumRemovableClubsLeft(int nPlayer) {
     int i;
     int n = 0;
     for (i = 0; i < 26; i++) {
-        if (Bag_HasClub(nPlayer, i) && !fn_800E7E64(i)) {
+        if (Bag_HasClub(nPlayer, i) && !GameModeBattle_ClubIsRequired(i)) {
             n++;
         }
     }
     return n;
 }
 
-// TW06: GameModeBattle::RemoveClub.
-u8 fn_800E7F00(int nPlayer, int nClub) {
+u8 GameModeBattle_RemoveClub(int nPlayer, int nClub) {
     u8 bRemoved;
-    if (fn_800E7E64(nClub)) {
+    if (GameModeBattle_ClubIsRequired(nClub)) {
         return 0;
     }
     bRemoved = Bag_RemoveClub(nPlayer, nClub);
@@ -176,13 +176,11 @@ u8 fn_800E7F00(int nPlayer, int nClub) {
     return bRemoved;
 }
 
-// TW06: GameModeBattle::AddClub.
-void fn_800E7F68(int nPlayer, int nClub) {
+void GameModeBattle_AddClub(int nPlayer, int nClub) {
     Bag_AddClub(nPlayer, nClub);
 }
 
-// TW06: GameModeBattle::SaveClubSetup.
-void fn_800E7F88(void) {
+void GameModeBattle_SaveClubSetup(void) {
     int i;
     for (i = 0; i < gSession.nNumPlayers; i++) {
         *(u32*)((u8*)lbl_8020315C + i * sizeof(u32)) = PLAYER(i)->golfer.uBagMask;
@@ -190,8 +188,7 @@ void fn_800E7F88(void) {
     }
 }
 
-// TW06: GameModeBattle::RestoreClubSetup.
-void fn_800E800C(void) {
+void GameModeBattle_RestoreClubSetup(void) {
     int i;
     for (i = 0; i < gSession.nNumPlayers; i++) {
         PLAYER(i)->golfer.uBagMask = *(u32*)((u8*)lbl_8020315C + i * sizeof(u32));
@@ -202,8 +199,8 @@ s32 fn_800E8114(int nPlayer) {
     return lbl_80203148[nPlayer];
 }
 
-// TW06: GameModeBattle::CanAddClub. A club the player started with and no longer has.
-int fn_800E8128(int nPlayer, int nClub) {
+// A club the player started with and no longer has.
+int GameModeBattle_CanAddClub(int nPlayer, int nClub) {
     u32 uBit = 1 << nClub;
     int bCan = 0;
     if (Bag_HasClub(nPlayer, nClub)) {
@@ -219,12 +216,11 @@ s32 fn_800E81A0(int nPlayer) {
     return lbl_801925B8[nPlayer];
 }
 
-// TW06: GameModeBattle::IsClubStealingFinished (inverted: nonzero while a club is to be taken).
-u8 fn_800E81B4(void) {
+// Inverted: nonzero while a club is to be taken.
+u8 GameModeBattle_IsClubStealingFinished(void) {
     return lbl_802822E8;
 }
 
-// TW06: GameModeBattle::GetWinner.
-s32 fn_800E81BC(void) {
+s32 GameModeBattle_GetWinner(void) {
     return lbl_80281650;
 }

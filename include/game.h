@@ -354,15 +354,15 @@ void fn_800E5DA0(void);
 // ---- the game modes --------------------------------------------------------------------------
 
 // Each mode's setup, called by fn_800E0B38.
-void fn_800E68F0(void);                 // mode 21 (GameModeAlternateShot.c)
-void fn_800E7980(void);                 // mode 25 (GameModeBattle.c)
-void fn_800E81C4(void);                 // mode 19 (GameModeBestBall.c)
-void fn_800E8D58(void);                 // mode 20 (GameModeFourBall.c)
-void fn_800E9E40(void);                 // mode 1 (GameModeMatch.c)
+void GameModeAlternateShot_Init(void);                 // mode 21 (GameModeAlternateShot.c)
+void GameModeBattle_Init(void);                 // mode 25 (GameModeBattle.c)
+void GameModeBestBall_Init(void);                 // mode 19 (GameModeBestBall.c)
+void GameModeFourBall_Init(void);                 // mode 20 (GameModeFourBall.c)
+void GameModeMatch_Init(void);                 // mode 1 (GameModeMatch.c)
 void fn_800EACD8(void);                 // mode 5
 void fn_800ED738(void);                 // mode 9
 void fn_800F0448(void);                 // mode 24
-void fn_800F125C(void);                 // mode 10
+void GameModeReplay_Init(void);                 // mode 10
 void fn_800F2984(void);                 // mode 14
 void fn_800F39F4(void);                 // mode 15
 void fn_800F4B40(void);                 // mode 16
@@ -372,9 +372,9 @@ void fn_800F80FC(void);                 // mode 2
 void fn_800F944C(void);                 // mode 6
 void fn_800F9610(void);                 // mode 7
 void fn_800F986C(void);                 // mode 8
-void fn_800FE1B4(void);                 // mode 18 (GameModeStableford.c)
+void GameModeStableford_Init(void);                 // mode 18 (GameModeStableford.c)
 void fn_800FEAFC(void);                 // mode 12 (GameMode12.c)
-void fn_800FF700(void);                 // mode 0 (GameModeStroke.c)
+void GameModeStroke_Init(void);                 // mode 0 (GameModeStroke.c)
 void fn_800FFF34(void);                 // mode 11 (GameMode11.c)
 void fn_80101FEC(void);                 // mode 4 (GameMode4.c)
 
@@ -383,11 +383,11 @@ int  fn_800E8C24(int nPlayer, int nHole);   // GameModeBestBall.c
 // GameModeMatch.c: match play, which the other two-player modes build on
 extern u8  lbl_80282240;                // the hole-finished test excuses the holed side's own players
 void fn_800E9F14(void);
-s32  fn_800EA084(int nPlayer);
-u8   fn_800EA278(int nPlayer, u8 bCheck);
-u8   fn_800EA548(u8 bCheck);            // the game is over
-u8   fn_800EA758(u8 bCheck);
-void fn_800EAA40(void);
+s32  GameModeMatch_GetHonors(int nPlayer);
+u8   GameModeMatch_HoleFinished(int nPlayer, u8 bCheck);
+u8   GameModeMatch_GameFinished(u8 bCheck);            // the game is over
+u8   GameModeMatch_GoToPlayoff(u8 bCheck);
+void GameModeMatch_EndHole(void);
 s32  fn_800EAC7C(void);
 int  fn_800EAC94(int n);
 
@@ -485,10 +485,10 @@ u8   fn_800FDF58(int nPlayer);
 u8   fn_800FDF60(void);
 
 // GameModeStroke.c: stroke play (mode 0)
-void fn_800FF7DC(void);
-s32  fn_800FF894(int nPlayer);          // TW06 GetHonors: who plays next (5: nobody)
-u8   fn_800FFCCC(int nPlayer, u8 bCheck);   // TW06 HoleFinished
-u8   fn_800FFD54(u8 bCheck);                // TW06 GameFinished
+void GameModeStroke_SetupNextGolfer(void);
+s32  GameModeStroke_GetHonors(int nPlayer);          // TW06 GetHonors: who plays next (5: nobody)
+u8   GameModeStroke_HoleFinished(int nPlayer, u8 bCheck);   // TW06 HoleFinished
+u8   GameModeStroke_GameFinished(u8 bCheck);                // TW06 GameFinished
 u8   fn_800FFDB0(u8 bCheck);            // TW06 GoToPlayoff: stroke play has none
 
 // GetHonors' tee-order sort (GameModeStroke.c, GameModeStableford.c): appends nPlayer to aList
