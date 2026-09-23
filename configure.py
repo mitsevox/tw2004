@@ -548,7 +548,7 @@ config.libs = [
         "progress_category": "sdk",
         "src_dir": "extern/trk",
         "objects": [
-            Object(NonMatching, "MetroTRK/__exception.s"),
+            Object(Matching, "MetroTRK/__exception.s"),
             Object(Matching, "MetroTRK/mainloop.c"),
             Object(Matching, "MetroTRK/nubevent.c"),
             Object(Matching, "MetroTRK/nubinit.c"),
