@@ -21,6 +21,8 @@ typedef struct FrontEnd {
     void* pHandler;             // 0x4  where GameMessages.c sends its messages (fn_8016B09C)
     u8    unk8[4];
     void* pC;                   // 0xC  a block uiLoadFile.c frees (fn_8008F24C)
+    u8    unk10[8];
+    f32   f18;                  // 0x18  set to 1 when a round starts (gomainloop fn_8006DC20)
 } FrontEnd;
 
 extern FrontEnd* lbl_80281F1C;
@@ -59,6 +61,27 @@ typedef void (*MsgHandler)(MsgArg* pArgs, MsgArg* pResult);
 
 // Send message nMsg with nArgs values to a front-end handler (fn_8016B09C also sends through it).
 void fn_8016B0F8(void* pHandler, int nMsg, int nArgs, MsgArg* pArgs);
+
+// The menu UI's commands go to one of these, by the session's game type (uiProcessInterface.c's
+// fn_8008F568): each runs the handler for message nMsg of its table.
+void fn_80079E6C(int nMsg, MsgArg* pArgs, MsgArg* pResult);    // the menus (FE_MessageTable.c)
+void fn_800850E4(int nMsg, MsgArg* pArgs, MsgArg* pResult);    // a round (GameUICommands.c)
+
+// The round's handlers (GameUICommands.c): fn_80085120 fills the table. Entries 0 and 119 stay
+// empty.
+#define UI_NUM_ROUND_COMMANDS 214
+extern MsgHandler lbl_801D83B0[UI_NUM_ROUND_COMMANDS];
+
+// Menu handlers (FE_MessageTable.c) that the round's table also runs, or that round handlers
+// pass on to.
+void fn_8007E9BC(MsgArg* pArgs, MsgArg* pResult);
+void fn_8008299C(MsgArg* pArgs, MsgArg* pResult);
+void fn_80082DBC(MsgArg* pArgs, MsgArg* pResult);
+void fn_80082E10(MsgArg* pArgs, MsgArg* pResult);
+void fn_800834A8(MsgArg* pArgs, MsgArg* pResult);
+void fn_800834E8(MsgArg* pArgs, MsgArg* pResult);
+
+extern u8 lbl_80281F18;         // set by the pause handler (GameUICommands.c fn_8008633C)
 
 // Four words a UI element passes down its transform stack, copied as one struct (what they hold is
 // not known yet).

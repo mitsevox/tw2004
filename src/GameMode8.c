@@ -55,12 +55,6 @@ SGCourse lbl_80192C00[21] = {
     {750, 675, 600}, {750, 675, 600}, {750, 675, 600}, {750, 675, 600}, {750, 675, 600},
     {750, 675, 600},
 };
-// The last 100 events.
-typedef struct SGLog {
-    s32 nEvent;
-    s32 nPlayer;
-} SGLog;
-extern SGLog lbl_802120F8[100];
 extern s32 lbl_802823CC;
 extern u8  lbl_802823C8;
 u8    fn_800A7720(void);

@@ -1943,6 +1943,9 @@ src/MSL_C/PPCEABI/bare/H/ansi_files.c:
 
 src/MSL_C/PPCEABI/bare/H/ansi_fp.c:
 	.text       start:0x8015286C end:0x80155E48
+	.rodata     start:0x80185078 end:0x80185158
+	.data       start:0x8019C520 end:0x8019C688
+	.sdata2     start:0x80284C60 end:0x80284C90
 
 runtime/buffer_io.c:
 	.text       start:0x80155E48 end:0x80155F40
@@ -1951,7 +1954,7 @@ unsorted/sweep_80155F40.c:
 	.text       start:0x80155F40 end:0x80155F4C
 
 runtime/ctype.c:
-	.text       start:0x80155F4C end:0x80155F70
+	.text       start:0x80155F4C end:0x80155F88
 	.data       start:0x8019C688 end:0x8019C988
 
 src/MSL_C/PPCEABI/bare/H/direct_io.c:
@@ -1965,6 +1968,7 @@ runtime/FILE_POS.c:
 
 src/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common/Src/mbstring.c:
 	.text       start:0x80156954 end:0x80156C78
+	.sdata2     start:0x80284C90 end:0x80284C98
 
 runtime/mem.c:
 	.text       start:0x80156C78 end:0x80156DE8
@@ -1977,7 +1981,13 @@ runtime/misc_io.c:
 
 runtime/printf.c:
 	.text       start:0x801570C8 end:0x8015929C
+	.rodata     start:0x80185160 end:0x80185188
 	.data       start:0x8019C9C0 end:0x8019CBEC
+	.sdata      start:0x80281B08 end:0x80281B0A
+	.sdata2     start:0x80284C98 end:0x80284CA0
+
+runtime/qsort.c:
+	.text       start:0x8015929C end:0x80159408
 
 runtime/sscanf.c:
 	.text       start:0x801594CC end:0x8015955C
@@ -1989,6 +1999,8 @@ src/MSL_C/PPCEABI/bare/H/string.c:
 
 src/MSL_C/strtold.c:
 	.text       start:0x8015A8D0 end:0x8015B8DC
+	.rodata     start:0x80185540 end:0x80185578
+	.sdata2     start:0x80284CA0 end:0x80284CB8
 
 src/MSL_C/strtoul.c:
 	.text       start:0x8015B8DC end:0x8015C120
@@ -2085,8 +2097,26 @@ runtime/s_tan.c:
 	.text       start:0x8015F70C end:0x8015F784
 	.sdata2     start:0x80285190 end:0x80285198
 
-unsorted/sweep_8015F784.c:
-	.text       start:0x8015F784 end:0x8015F844
+runtime/w_acos.c:
+	.text       start:0x8015F784 end:0x8015F7A4
+
+runtime/w_asin.c:
+	.text       start:0x8015F7A4 end:0x8015F7C4
+
+runtime/w_atan2.c:
+	.text       start:0x8015F7C4 end:0x8015F7E4
+
+runtime/w_fmod.c:
+	.text       start:0x8015F7E4 end:0x8015F804
+
+runtime/w_log.c:
+	.text       start:0x8015F804 end:0x8015F824
+
+runtime/w_pow.c:
+	.text       start:0x8015F824 end:0x8015F844
+
+runtime/extras.c:
+	.text       start:0x8015F844 end:0x8015F8D0
 
 MetroTRK/mainloop.c:
 	.text       start:0x8015F8D0 end:0x8015F9C8

@@ -282,7 +282,7 @@ typedef struct Character {
     u8    unk16AC[0x16D0 - 0x16AC];
     s32   nShotKind;            // 0x16D0  the player's shot kind (fn_8001C724)
     s32   n16D4;              // 0x16D4  the key for clip lookups (Char_SetClip)
-    u8    unk16D8[0x16DC - 0x16D8];
+    struct CharSkinSet* p16D8;  // 0x16D8  six more skins (SkinPart.c)
     s32   n16DC;                // 0x16DC  twice the players set up so far, in split screen 2
                                 //         (Player_SetGolfer)
     s32   nStyle;               // 0x16E0  the animation style (fn_8001C7FC); at -1
