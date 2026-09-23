@@ -200,6 +200,20 @@ void fn_80019648(void) {
     fn_8001A4BC();
 }
 
+// Replays the character's blend at its current time: fAnimTime from f180, the blend's time
+// (fn_8001F02C) and v1638[1], then one animation update of no length.
+void fn_8001966C(Character* pChar) {
+    if (pChar != NULL && pChar->pBlend != NULL) {
+        pChar->u10 |= 0x10000;
+        pChar->u10 |= 8;
+        pChar->u10 |= 4;
+        pChar->pModel->pSkel->n2C = 0;
+        pChar->fAnimTime = pChar->f180 + fn_8001F02C(pChar->pBlend, 2) - pChar->v1638[1];
+        Character_UpdateAnimation(pChar, 0, 0.0f);
+        pChar->pModel->pSkel->n2C = 0;
+    }
+}
+
 // Give back the character's pool entries and free what it holds.
 void fn_8001971C(Character* pChar) {
     fn_8001A3B0(pChar);

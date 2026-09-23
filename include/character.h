@@ -58,7 +58,8 @@ typedef struct Skeleton {
     f32  (*p20)[4];             // 0x0020  a quaternion per bone
     f32  (*p24)[4];             // 0x0024  a quaternion per bone
     f32  (*p28)[4];             // 0x0028  p20 at an IK weight of 0 or 1, otherwise p24
-    u8   unk2C[0x1070 - 0x2C];
+    s32  n2C;                   // 0x002C  cleared before and after fn_8001966C's animation update
+    u8   unk30[0x1070 - 0x30];
     f32  fIKWeight;             // 0x1070  SKEL_SetIKSolutionWeight
     f32  f1074;                 // 0x1074  } set by fn_8002792C and SKEL_TransitionIK
     f32  f1078;                 // 0x1078  }
@@ -294,7 +295,7 @@ typedef struct Character {
                                 //        it with cmpwi
     u8    unk16C[0x17C - 0x16C];
     f32   fAnimTime;            // 0x17C
-    u8    unk180[0x184 - 0x180];
+    f32   f180;                 // 0x180  fn_8001966C: fAnimTime = f180 + the blend's time - v1638[1]
     f32   fAnimEnd;             // 0x184  the animation's end time
     u8    unk188[0x29C - 0x188];
     AnimPlayer anim29C;         // 0x29C  a second animation player
@@ -437,6 +438,7 @@ u8    fn_8001EDF4(Character* pChar);    // the model's bEE
 int   fn_8001EE90(Character* pChar);
 int   fn_8001EED8(CharModel* pModel, int nBone);    // a bone's index
 int   fn_8001EEE4(CharModel* pModel, int nBone);
+f32   fn_8001F02C(struct ClipBlend* pBlend, u64 uEvent);   // an event's time (by its 64-bit id)
 void  Anim_SetRate(u8* pAnim, f32 fRate);           // 0x8001F084
 void  fn_8001E85C(f32* pSrc, f32* pDst);            // copy a quaternion
 void  SKEL_SetIKSolutionWeight(Skeleton* pSkel, f32 f);
