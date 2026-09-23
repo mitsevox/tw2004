@@ -1017,6 +1017,8 @@ int fn_800ED028(int i) {
 // Challenge text lines (offsets into the text block).
 char* fn_800ED280(int nId) {
     int i = fn_800EAC94(nId);
+    // EA bug: fn_800EAC94 returns 0, never -1, for a group it does not find, so this test never
+    // passes and an unknown id gets challenge 0's line.
     if (i == -1) {
         return 0;
     }
@@ -1025,6 +1027,7 @@ char* fn_800ED280(int nId) {
 
 char* fn_800ED2C8(int nId) {
     int i = fn_800EAC94(nId);
+    // EA bug: never -1, as above.
     if (i == -1) {
         return 0;
     }
@@ -1089,6 +1092,8 @@ int fn_800ED314(void) {
     if (fn_800E5110()) {
         return 0;
     }
+    // fake match: the binary calls fn_800E4BF8 and branches on its result, but both paths return
+    // n (a bare call without the test loses the compare: 99.2%).
     if (fn_800E4BF8()) {
         return n;
     }
@@ -1134,7 +1139,7 @@ void fn_800ED554(void) {
 
 // Hole finished: always after a restart; otherwise the challenge's own test.
 u8 fn_800ED5C8(int nPlayer, int bCheck) {
-    if ((u8) lbl_802822FE != 0) {
+    if (lbl_802822FE) {
         return 1;
     }
     return lbl_8028231C(nPlayer, bCheck);
