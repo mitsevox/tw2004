@@ -37,7 +37,9 @@ void fn_800ADCD0(s16 nKind, u8 nTrack, u8 n, u8 b);
 void fn_800DC6E8(int nPlayer);
 u8   fn_8006BAD8(int nPlayer, s32* pOut);
 f32  fn_8006C630(void);
-u8   fn_800AD280(s16 nSound, s32 n, int a, int b, void* p);    // hlaudemitter.c; types unproven
+// hlaudemitter.c: makes an emitter for sound nSound; the callback is told when a track stops
+// (fn_800ADDC8). The other types are unproven.
+u8   fn_800AD280(s16 nSound, s32 n, int a, int b, void (*pfnCallback)(u8 nId, u8 nTrack, s32 n));
 void fn_800ADA08(s16 nSound, u8 nTrack, u8 n);
 void fn_800AD734(u8 nId, int n);
 void fn_800AD450(u8 nId);
@@ -64,6 +66,9 @@ void fn_800A42B0(u8 n);
 void fn_800A7220(f32 fAmount);
 void fn_800A754C(u8 a, u16 b);
 void fn_800A3F58(u8 bLow, u8 bHigh);
+void fn_800A3F94(u8 n);
+void fn_800A4044(u8 nIndex, u8 nValue);
+void fn_800A7AD0(s16 nSound, u8 nTrack, u8 bOn);
 void fn_800A4170(u8 nId, u8 nTrack, s32 n);
 void fn_800A5980(u8 nPlayer);
 void fn_800A6C98(u8 nPlayer, u8 n);
@@ -903,6 +908,97 @@ void fn_800A5428(void) {
     lbl_80281420 = 0xFF;
     lbl_80282029 = 0;
     fn_800A3F58(0, 0);
+}
+
+// Sets up the round's sounds: each view's emitters (0 the swing, 1 the ball, 2 and 3 the crowd
+// either side), the music and the ambience.
+void fn_800A500C(void) {
+    GameAudioView* pView;
+    Player* pPlayer;
+    int nViews;
+    int nCourse;
+    int nMode;
+    u8 n;
+    int i;
+    f32 vPos[3];
+
+    nViews = (gSession.nSplitScreen != 0) + 1;
+    nCourse = Game_GetCourse();
+    nMode = Game_GetMode();
+    n = fn_80015464();
+    pView = lbl_801F1790;
+    pPlayer = gPlayers;
+    if (lbl_80282028 == 0) {
+        fn_800A78F0(0.2f * (s8)gSession.options.a0[4]);
+        fn_800A3F94(2);
+        lbl_80282028 = 1;
+    }
+    vPos[0] = 0.0f;
+    vPos[1] = 0.0f;
+    vPos[2] = 0.0f;
+    for (i = 0; i < nViews; i++, pPlayer++, pView++) {
+        pView->n0 = fn_800AD280(1, -1, 0, 0, NULL);
+        fn_800AD800(pView->n0, pPlayer->vBall, NULL, 0);
+        pView->n1 = fn_800AD280(2, -1, 0, 0, NULL);
+        fn_800AD800(pView->n1, pPlayer->ball.vPos, NULL, 0);
+        fn_800AD698(pView->n1, 0, 1);
+        pView->n2 = fn_800AD280(4, -1, 1, 1, fn_800A4170);
+        pView->n3 = fn_800AD280(4, -1, 1, 1, NULL);
+        vPos[0] = -lbl_80281454;
+        vPos[1] = 0.0f;
+        vPos[2] = 0.0f;
+        fn_800AD800(pView->n2, vPos, NULL, 0);
+        vPos[0] = lbl_80281454;
+        fn_800AD800(pView->n3, vPos, NULL, 0);
+    }
+    vPos[0] = 0.0f;
+    vPos[1] = 0.0f;
+    vPos[2] = 1.0f;
+    lbl_8028141B = fn_800AD280(10, -1, 1, 1, NULL);
+    fn_800AD800(lbl_8028141B, vPos, NULL, 0);
+    lbl_8028203C = 0;
+    lbl_80281419 = 0xFF;
+    lbl_8028141A = 0xFF;
+    lbl_80281418 = 0xFF;
+    lbl_80282041 = 0;
+    vPos[0] = 0.0f;
+    vPos[1] = 0.0f;
+    vPos[2] = 10.0f;
+    lbl_80281419 = fn_800AD280(5, -1, 1, 1, NULL);
+    fn_800AD800(lbl_80281419, vPos, NULL, 0);
+    fn_800A77E0(0.2f * (s8)gSession.options.a0[0]);
+    fn_800A44A0();
+    lbl_8028141C = fn_800AD280(7, -1, 1, 1, NULL);
+    vPos[0] = lbl_80281458;
+    vPos[1] = 0.0f;
+    vPos[2] = 0.0f;
+    fn_800AD800(lbl_8028141C, vPos, NULL, 0);
+    lbl_8028141D = fn_800AD280(7, -1, 1, 1, NULL);
+    vPos[0] = -lbl_80281458;
+    fn_800AD800(lbl_8028141D, vPos, NULL, 0);
+    if (nCourse == 7 && n == 2) {
+        fn_800A4044(0, 17);
+        fn_800A7AD0(2, 0, 1);
+        fn_800A7AD0(1, 0, 1);
+        fn_800A7AD0(1, 2, 1);
+        fn_800A7AD0(1, 1, 1);
+    }
+    fn_800A3F38(0, 0);
+    lbl_8028202A = 1;
+    lbl_8028202B = 0;
+    lbl_8028202C = 0;
+    lbl_8028202E = 0;
+    lbl_8028202D = 0;
+    lbl_8028202F = 0;
+    lbl_80282032 = 0;
+    lbl_80281424 = -1;
+    lbl_80281428 = -1;
+    lbl_80282030 = 0;
+    lbl_80282031 = 0;
+    lbl_80282033 = 0;
+    lbl_80282034 = 0;
+    // the modes 0-2, 4, 5, 10, 18-21, 23-25 (bit mask 0x03BC0437)
+    lbl_80282040 = ((1 << nMode) & 0x03BC0437) != 0;
 }
 
 void fn_800A562C(u8 nPlayer) {
