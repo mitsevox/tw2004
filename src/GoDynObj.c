@@ -11,9 +11,15 @@
 #include "game.h"
 
 void fn_80045FC8(UStreamObject* pObject);   // the 'BALL' stream handler
-void fn_80046FDC(int nPlayer);
-void fn_800470B0(int nPlayer);
-void fn_80047208(u8* pState);
+void fn_80046FDC(int nView);
+void fn_800470B0(int nView);
+void fn_80047208(u8* aState);
+int  fn_800F1960(void);                 // GameModeReplay.c: how many targets the target games have
+void fn_800F196C(int i, f32* pOut);     // GameModeReplay.c: target i's position
+void fn_80093DB8(Ball* pBall, int nPlayer);    // GoObjShadow.c
+void fn_80093AE0(Ball* pBall, int nPlayer);    // GoObjShadow.c
+void fn_80048584(UObject* pObj, s8 nLod);
+void fn_8000ADC0(f32 (*pMtx)[4]);                   // identity
 void fn_80047290(void);
 void fn_8004731C(u8* pState);
 void fn_80047C24(int nPlayer);
@@ -213,8 +219,8 @@ void fn_800467B4(void) {
     }
 }
 
-// Draws every object (message 3), and with fn_800E39F0 the player's 'TEO ' models.
-void fn_80046828(int nPlayer) {
+// Draws every object (message 3), and with fn_800E39F0 the targets' 'TEO ' models.
+void fn_80046828(int nView) {
     fn_80035118(4, 5);
     fn_80012F50(1, 6, 0x80);
     fn_80012F18(3);
@@ -224,8 +230,8 @@ void fn_80046828(int nPlayer) {
     fn_80012EF8();
     fn_80048F68(3, NULL, NULL);
     if (fn_800E39F0()) {
-        fn_80046FDC(nPlayer);
-        fn_800470B0(nPlayer);
+        fn_80046FDC(nView);
+        fn_800470B0(nView);
     }
 }
 
@@ -279,7 +285,84 @@ void fn_80046B8C(int nView) {
     }
 }
 
-// ---- 0x80046C34..0x80047B6C: not yet decompiled ----
+// ---- 0x80046C34..0x80046FDC: not yet decompiled ----
+
+// Draws a 'TEO ' model (10006 + the target's kind) at each target of the target games.
+void fn_80046FDC(int nView) {
+    f32 vPos[4];
+    int i;
+    int nKind;
+
+    for (i = 0; i < fn_800F1960(); i++) {
+        fn_800F196C(i, vPos);
+        nKind = gpGame->pfn26C(fn_8001707C(nView), i);
+        if (lbl_80281DA0->apTeo10006[nKind] != NULL) {
+            fn_80048584(lbl_80281DA0->apTeo10006[nKind], 0);
+            fn_8000ADC0(lbl_80281DA0->apTeo10006[nKind]->m80);
+            Vec_Copy(vPos, lbl_80281DA0->apTeo10006[nKind]->m80[3]);
+            fn_80048894(lbl_80281DA0->apTeo10006[nKind]);
+        }
+    }
+}
+
+// The same with the 'TEO ' 10020..10022 models, for the target kinds 0, 2 and 3.
+void fn_800470B0(int nView) {
+    f32 vPos[4];
+    int i;
+    int nModel;
+
+    fn_80012F50(0, 6, 0x80);
+    fn_80012F34(0);
+    fn_80012EF8();
+    for (i = 0; i < fn_800F1960(); i++) {
+        fn_800F196C(i, vPos);
+        switch (gpGame->pfn26C(fn_8001707C(nView), i)) {
+        case 0:
+            nModel = 0;
+            break;
+        case 2:
+            nModel = 1;
+            break;
+        case 3:
+            nModel = 2;
+            break;
+        default:
+            nModel = -1;
+            break;
+        }
+        if (nModel != -1 && lbl_80281DA0->apTeo10020[nModel] != NULL) {
+            fn_80048584(lbl_80281DA0->apTeo10020[nModel], 0);
+            fn_8000ADC0(lbl_80281DA0->apTeo10020[nModel]->m80);
+            Vec_Copy(vPos, lbl_80281DA0->apTeo10020[nModel]->m80[3]);
+            fn_80048894(lbl_80281DA0->apTeo10020[nModel]);
+        }
+    }
+    fn_80012F50(1, 6, 0x80);
+    fn_80012F34(1);
+    fn_80012EF8();
+}
+
+void fn_80047208(u8* aState) {
+    int i;
+
+    for (i = 0; i < gSession.nNumPlayers; i++) {
+        if (aState[i]) {
+            fn_80093DB8(&gPlayers[i].ball, i);
+        }
+    }
+}
+
+void fn_80047290(void) {
+    int i;
+
+    for (i = 0; i < gSession.nNumPlayers; i++) {
+        if (fn_80046B1C(i)) {
+            fn_80093AE0(&PLAYER(i)->ball, i);
+        }
+    }
+}
+
+// ---- 0x8004731C..0x80047B6C: not yet decompiled ----
 
 // Gives up the player's object.
 void fn_80047B6C(Ball* pBall, int nPlayer) {
