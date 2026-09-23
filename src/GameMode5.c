@@ -48,7 +48,6 @@ extern u8 (*lbl_8028231C)(int nPlayer, u8 bCheck);   // and HoleFinished
 u8 fn_800ED5C8(int nPlayer, u8 bCheck);
 extern u8 lbl_802822FD;
 void fn_800ED6E8(u8 v);
-u8 fn_800ED6F0(void);
 // What lbl_802811F0 points to (its code, around 0x8006F650, is not decompiled): fn_800ED6F8 sets
 // f18 and flags it in b1C.
 typedef struct Unk802811F0 {
