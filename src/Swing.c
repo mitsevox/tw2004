@@ -2677,22 +2677,22 @@ void STATEFUNC_RemoveBallInit(int nPlayer) {
 
 // State 21: each of the player's views saves its camera and takes camera 10.
 void STATEFUNC_MidHoleFlyByInit(int nPlayer) {
-    s32*  pViews;
     View* pV;
+    int   nView;
     int   k, j;
     u8    bShared;
     EVENT_Trigger(nPlayer, 0x4A, 0, -1);
-    pViews = &gPlayers[nPlayer].nView0;
     for (k = 0; k < 2; k++) {
-        pV      = (View*)fn_80017028(pViews[k]);
+        pV      = (View*)fn_80017028((&gPlayers[nPlayer].nView0)[k]);
         bShared = 0;
         for (j = 0; j < k; j++) {
-            if (pV == (View*)fn_80017028(pViews[j])) bShared = 1;
+            if (pV == (View*)fn_80017028((&gPlayers[nPlayer].nView0)[j])) {
+                bShared = 1;
+            }
         }
         if (!bShared) {
-            int nView;
             pV->nSavedCamera = pV->nCurCamera;
-            nView = pViews[k];
+            nView = (&gPlayers[nPlayer].nView0)[k];
             View_SetCamera(fn_80017028(nView), 10, nPlayer, nView);
         }
     }
@@ -2858,13 +2858,12 @@ void STATEFUNC_FadeToTapInUpdate(int nPlayer) {
 
     fn_80050D2C(1);
     if (gPlayers[nPlayer].bRehearsalDone == 0) {
-        f32* pBallPos    = &gPlayers[nPlayer].fBallX;
         int  nController = gPlayers[nPlayer].nController;
         gPlayers[nPlayer].nController = CONTROLLER_CPU;
-        Vec3Copy(pBallPos, vSaved);
-        Vec3Copy((f32*)gPlayers[nPlayer].ball, pBallPos);
+        Vec3Copy(&gPlayers[nPlayer].fBallX, vSaved);
+        Vec3Copy((f32*)gPlayers[nPlayer].ball, &gPlayers[nPlayer].fBallX);
         gPlayers[nPlayer].bRehearsalDone = AI_RehearseShot(nPlayer, NULL, 1, CPU_TOLERANCE);
-        Vec3Copy(vSaved, pBallPos);
+        Vec3Copy(vSaved, &gPlayers[nPlayer].fBallX);
         gPlayers[nPlayer].nController = nController;
     }
     if (fn_80063C50(fn_80017028(gPlayers[nPlayer].nView0))) {
@@ -3204,11 +3203,12 @@ void STATEFUNC_GreenMorphUpdate(int nPlayer) {
 // 26..29 play the pan sounds, and button 25 off the tee (if allowed) re-does the setup.
 void STATEFUNC_PlaceBallUpdate(int nPlayer) {
     if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x23, 0)) {
+        u8*     pBall;
         Player* p = &gPlayers[nPlayer];
         if (p->uFlagsEF0 & 1) {
-            u8* pBall = p->ball;
+            pBall = p->ball;
             if (Physics_DropBall((Ball*)pBall, p->vPlacement)) {
-                if (gSurfaceTypes[*(s32*)(gPlayers[nPlayer].ball + 0x74)].nClass == 1) {
+                if (gSurfaceTypes[gPlayers[nPlayer].nBallSurface].nClass == 1) {
                     fn_80055AA8((Ball*)pBall, (f32*)pBall, nPlayer);
                 }
                 Vec_Copy((f32*)pBall, &p->fBallX);
