@@ -20,7 +20,7 @@ void   fn_800B0114(u16 nVoice, VoiceEnvelope* pEnv);
 void   fn_800B01B4(u16 nVoice, u8 bA, u8 bB);
 void   fn_800B04EC(void* p, u32 uLen, int nDir);
 void   fn_800B051C(void* p, u32 uLen, int nDir);
-void   fn_800B055C(void);
+void   fn_800B055C(u32 n);
 u32    fn_800B0698(u32 uSize);
 s32    fn_800B09C8(int nPort, int nSlot);
 void   fn_800B0DB8(void);
@@ -52,10 +52,10 @@ void   fn_80136DF4(void (*pfn)(void));  // AX: the callback run after each audio
 void*  fn_800B5BD8(u32 uSize);
 u32    fn_800B5D34(void* pHeap, u32 uSize, u32 uAlign);   // ARAM heap: allocate, returns the address
 void   fn_800B5E88(void* pHeap, u32 uAddr);               // ARAM heap: free
-void   fn_800B6728(u32 u);
+void   fn_800B6728(void* pOwner);
 u32    fn_800B6564(u32 uSize);          // take ARAM, returns its address
 void*  fn_800B5C40(u32 uSize, u32 uAram, u32 uAlign, void* pInfo);   // ARAM heap: create
-void   fn_800B65C0(void* pSrc, u32 uAram, u32 uLen, int a, int b, void (*pfnDone)(void), int n,
+void   fn_800B65C0(void* pSrc, u32 uAram, u32 uLen, int a, int b, void (*pfnDone)(u32 n), int n,
                    int c);                                            // ARAM DMA
 void   AXSetVoiceSrc(AXVPB* pVpb, f32 fRatio);          // the playback rate
 void   AXSetVoiceAdpcm(AXVPB* pVpb, u32* pCoefs);
@@ -637,15 +637,15 @@ void fn_800B0448(void) {
 }
 
 // DMA nLen bytes from main memory to ARAM; pfnDone is called when it is done.
-int fn_800B044C(u32 uAram, void* pSrc, int nLen, void (*pfnDone)(void), int n) {
+int fn_800B044C(u32 uAram, void* pSrc, int nLen, void (*pfnDone)(u32 n), int n) {
     fn_800B051C(pSrc, nLen, 0);
     fn_800B65C0(pSrc, uAram, nLen, 0, 1, pfnDone, n, 3);
     fn_800B04EC(pSrc, nLen, 0);
     return 1;
 }
 
-void fn_800B04CC(u32 u) {
-    fn_800B6728(u);
+void fn_800B04CC(void* pOwner) {
+    fn_800B6728(pOwner);
 }
 
 // After a DMA between main memory and ARAM: when the data came into main memory (nDir 1), drop
@@ -674,7 +674,7 @@ void fn_800B051C(void* p, u32 uLen, int nDir) {
 }
 
 // The DMA callback of fn_800B0568.
-void fn_800B055C(void) {
+void fn_800B055C(u32 n) {
     lbl_80282110 = 1;
 }
 

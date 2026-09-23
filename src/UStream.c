@@ -483,7 +483,7 @@ static void UStream_AddBufferRef(UStreamBuffer** ppList) {
     (*ppList)->nRefs++;
 }
 
-static void UStream_NullCallback(void) {
+static void UStream_NullCallback(u32 n) {
 }
 
 // Walk the chunks of the current buffers. SHOC chunks build objects, SONO chunks build sound
