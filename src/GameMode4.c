@@ -251,7 +251,7 @@ void fn_80102468(void) {
             gSession.nTeeSet[0] = lbl_802124B8[nEvent].nTeeSet;
             gSession.nTeeSet[1] = lbl_802124B8[nEvent].nTeeSet;
             if (nPins != 0) {
-                gSession.unk5B38 = nPins - 1;
+                gSession.nPinSet = nPins - 1;
             }
         }
     }

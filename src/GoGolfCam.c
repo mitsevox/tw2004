@@ -256,8 +256,8 @@ void fn_800C0364(View* pView, int nPlayer) {
     pSub = fn_80017314(pView);
     pCourse = fn_8000C594();
     if (pCourse != NULL) {
-        int nHole = Game_CurrentHole();
-        Vec3Copy(&pCourse->pin[nHole].x, pSub);
+        int nPinSet = Game_CurrentPinSet();
+        Vec3Copy(&pCourse->pin[nPinSet].x, pSub);
         pView->p130 = NULL;
         pView->p134 = NULL;
         fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView0)), DEG(30.0f));

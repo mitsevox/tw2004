@@ -373,7 +373,7 @@ typedef struct Replay {
     s32    nCourse;             // 0xF00
     s16    nHole;               // 0xF04
     s8     nTeeSet;             // 0xF06
-    s8     nF07;                // 0xF07
+    s8     nPinSet;             // 0xF07  the session's pin set when the shot was saved
     f32    fF08;                // 0xF08
     f32    fF0C;                // 0xF0C
     u8     bF10;                // 0xF10  in-flight replays are on (GameManager.c)
@@ -422,7 +422,8 @@ typedef struct Session {
     u32  nSeed;                 // 0x5B2C
     u8   unk5B30[4];
     s32  unk5B34;               // 0x5B34
-    s8   unk5B38;               // 0x5B38
+    s8   nPinSet;               // 0x5B38  the pin position every hole uses (0..3; -1 = 0), copied to
+                                //         gpGame->nPinSet[] at the start of a round
     u8   unk5B39;               // 0x5B39
     u8   unk5B3A[2];
     f32  f5B3C;                 // 0x5B3C
@@ -453,7 +454,7 @@ typedef struct GameState {
     s32  nD8;                   // 0x0D8
     s32  nDC;                   // 0x0DC
     s32  nE0;                   // 0x0E0
-    s32  holeOrder[18];         // 0x0E4
+    s32  nPinSet[18];           // 0x0E4  per hole: which of its four pin positions (CourseInfo.pin) is used
     s32  n12C;                  // 0x12C
     f32* p130;                  // 0x130  a position: speed golf measures the ball's distance to it
     u8   b134;                  // 0x134  cleared at the start of a hole
@@ -562,7 +563,7 @@ typedef struct AITarget {
     AITargetDef* pDef;          // 0x00
     u8   bEnabled;              // 0x04
     s8   nTeeSet;               // 0x05  -1 = any
-    s8   nHole;                 // 0x06  -1 = any
+    s8   nPinSet;               // 0x06  the pin position it is for, -1 = any
     s8   nSkillReq;             // 0x07
     s8   nAggrReq;              // 0x08
     s8   bPriority;             // 0x09  taken when nothing else qualifies (and by humans)

@@ -114,7 +114,7 @@ static inline f32 Ball_Clamp(f32 x, f32 fLo, f32 fHi) {
     return x;
 }
 
-#define PIN(pBall) ((f32*)&(pBall)->pCourse->pin[Game_CurrentHole()])
+#define PIN(pBall) ((f32*)&(pBall)->pCourse->pin[Game_CurrentPinSet()])
 
 // A landing: a player's ball fires 0x25 on flagged surfaces, then 0x26 on the cup (surface 90),
 // 0x24 on an object, 0x23 on the ground; a look-ahead ball's first landing (Player.ballBefore) tells
@@ -1518,7 +1518,7 @@ u8 Ball_Collide(Ball* pBall, f32 fTicks) {
     }
     if (pSurface->nClass == 12 || pSurface->nClass == 18 ||
         (nIndex == 90 && Vec_Distance(pBall->vPos, PIN(pBall)) < 2.0f)) {
-        if (pBall->pCourse->pin[Game_CurrentHole()].y - pBall->vPos[1] > 0.0694444478f) {
+        if (pBall->pCourse->pin[Game_CurrentPinSet()].y - pBall->vPos[1] > 0.0694444478f) {
             Ball_Holed(pBall);
             return 1;
         }
@@ -1569,7 +1569,7 @@ u8 Ball_Collide(Ball* pBall, f32 fTicks) {
 f32 Ball_DistanceToPin(f32* pPos) {
     CourseInfo* pCourse = fn_8000C594();
     if (pCourse != NULL) {
-        return Vec_Distance(pPos, (f32*)&pCourse->pin[Game_CurrentHole()]);
+        return Vec_Distance(pPos, (f32*)&pCourse->pin[Game_CurrentPinSet()]);
     }
     return 1000.0f;
 }
@@ -1658,7 +1658,7 @@ void Ball_GroundContact(Ball* pBall, f32 fTicks) {
     pBall->nSurface = fn_80050BEC(pSurface);
     if (pSurface->nClass == 12 || pSurface->nClass == 18 ||
         (pBall->nSurface == 90 && Vec_Distance(pBall->vPos, PIN(pBall)) < 2.0f)) {
-        if (pBall->pCourse->pin[Game_CurrentHole()].y - pBall->vPos[1] > 0.055555556f) {
+        if (pBall->pCourse->pin[Game_CurrentPinSet()].y - pBall->vPos[1] > 0.055555556f) {
             Ball_Holed(pBall);
             return;
         }

@@ -96,7 +96,7 @@ void fn_800F4B40(void) {
     gpGame->n294 = 0;
     gpGame->nDC = 0;
     lbl_80282360 = 0;
-    gSession.unk5B38 = 0;
+    gSession.nPinSet = 0;
     fn_800E1480(0);
 }
 

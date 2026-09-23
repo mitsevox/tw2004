@@ -95,7 +95,7 @@ void fn_800F2984(void) {
     fn_800E1480(0);
     lbl_80282360 = 0;
     gSession.nSplitScreen = 0;
-    gSession.unk5B38 = 0;
+    gSession.nPinSet = 0;
 }
 
 // Game finished: the saved options go back.

@@ -2600,15 +2600,15 @@ void STATEFUNC_FadeToTapInInit(int nPlayer) {
 void STATEFUNC_RemoveBallInit(int nPlayer) {
     Ball* pBall       = &gPlayers[nPlayer].ball;
     Ball* pBallBefore = &gPlayers[nPlayer].ballBefore;
-    int  nHole;
+    int  nPinSet;
     CourseInfo* pCourse;
     Mem_cpy(pBallBefore, pBall, sizeof(Ball));
     Emotion_UpdatePlayerEmotion(nPlayer);
-    nHole   = Game_CurrentHole();
+    nPinSet = Game_CurrentPinSet();
     pCourse = fn_8000C594();
     if (pCourse != NULL) {
-        Character_SetPosition(gPlayers[nPlayer].nShotHandle, (f32*)&pCourse->pin[nHole], 1);
-        Physics_DropBall(pBall, (f32*)&pCourse->pin[nHole]);
+        Character_SetPosition(gPlayers[nPlayer].nShotHandle, (f32*)&pCourse->pin[nPinSet], 1);
+        Physics_DropBall(pBall, (f32*)&pCourse->pin[nPinSet]);
         gPlayers[nPlayer].ball.nLie = LIE_HOLED;
         Vec3Copy(pBall->vPos, pBallBefore->vPos);
     }
@@ -3250,9 +3250,9 @@ void STATEFUNC_GreenWatchRollUpdate(int nPlayer) {
                 fn_80063BF4(fn_80017028(*pView), 0.25f, (f32*)&vOffset);
             }
         } else if (!fn_80063C90(fn_80017028(*pView)) && pCourse != NULL) {
-            int nHole = Game_CurrentHole();
+            int nPinSet = Game_CurrentPinSet();
             if (*pGhostMinDist < 0.5f ||
-                !(*pGhostMinDist < Vec_Distance(pGhost->vPos, (f32*)&pCourse->pin[nHole]) - 0.1f)) {
+                !(*pGhostMinDist < Vec_Distance(pGhost->vPos, (f32*)&pCourse->pin[nPinSet]) - 0.1f)) {
                 fn_80063BF4(fn_80017028(*pView), 0.25f, (f32*)&vOffset);
             }
         }

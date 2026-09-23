@@ -205,8 +205,8 @@ void fn_80100160(void) {
     fn_800E1434();
     gSession.nTeeSet[0] = 0;
     gSession.nTeeSet[1] = 0;
-    gSession.unk5B38 = 0;
-    gpGame->holeOrder[Game_CurHoleIndex()] = 0;
+    gSession.nPinSet = 0;
+    gpGame->nPinSet[Game_CurHoleIndex()] = 0;
     lbl_802816D8 = SESSION_OPTIONS->unkC;
     lbl_802823EC = SESSION_OPTIONS->nWind;
     SESSION_OPTIONS->unkC = 4;

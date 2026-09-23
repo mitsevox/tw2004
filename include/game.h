@@ -12,7 +12,7 @@
 
 int  Game_GetCourse(void);              // 0x80008830
 int  Game_CurHoleIndex(void);           // 0..17 in the round (Golfer.c)
-int  Game_CurrentHole(void);            // the index mapped through the hole order (Golfer.c)
+int  Game_CurrentPinSet(void);          // the current hole's pin position, 0..3 (Golfer.c)
 void Session_SetNumPlayers(int n);      // Golfer.c
 
 // ---- golfer states (Swing.c) -----------------------------------------------------------------
@@ -49,7 +49,7 @@ typedef struct CourseMoneyTracking {
     s32  nBase;                 // 0x20  the points, rounded to $25
     s32  n24;                   // 0x24  the payout
     s32  nCourse;               // 0x28  what the course multiplier added
-    s32  n2C;                   // 0x2C  what the multiplier for the hole's gpGame->holeOrder value added
+    s32  n2C;                   // 0x2C  what the multiplier for the hole's pin set added
     s32  nTee;                  // 0x30  what the tee multiplier added
     s32  nTourCard;             // 0x34  what the TOUR card level added
     s32  n38;                   // 0x38

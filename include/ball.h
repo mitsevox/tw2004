@@ -41,7 +41,7 @@ typedef struct PinPos {
 typedef struct CourseInfo {
     u8     unk0[0x6C];
     f32    fFloor;              // 0x6C  a ball in the air above this with no ground under it is still in play
-    PinPos pin[4];              // 0x70  the hole's four pin positions: gpGame->holeOrder[] picks one
+    PinPos pin[4];              // 0x70  the hole's four pin positions: gpGame->nPinSet[] picks one
     PinPos tee[4];              // 0xB0  the tee of each tee set (gSession.nTeeSet[])
 } CourseInfo;
 

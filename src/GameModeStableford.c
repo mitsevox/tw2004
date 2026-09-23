@@ -100,7 +100,7 @@ s32 fn_800FE3FC(int nPlayer) {
     s32 nScore;
     s32 nHigh;
     CourseInfo* pCourse;
-    int nHole;
+    int nPinSet;
     f32 fBest;
     int nBest;
     f32 dx;
@@ -145,13 +145,13 @@ s32 fn_800FE3FC(int nPlayer) {
         return 5;
     }
     pCourse = fn_8000C594();
-    nHole = Game_CurrentHole();
+    nPinSet = Game_CurrentPinSet();
     fBest = 0.0f;
     nBest = 5;
     for (i = 0; i < gNumPlayersSetUp; i++) {
         if (i != nPlayer && PLAYER(i)->ball.nLie != LIE_GREEN && !fn_800FE2B4(i)) {
-            dx = PLAYER(i)->ball.vPos[0] - pCourse->pin[nHole].x;
-            dz = PLAYER(i)->ball.vPos[2] - pCourse->pin[nHole].z;
+            dx = PLAYER(i)->ball.vPos[0] - pCourse->pin[nPinSet].x;
+            dz = PLAYER(i)->ball.vPos[2] - pCourse->pin[nPinSet].z;
             d = fn_80009680(dx * dx + dz * dz);
             if (d > fBest) {
                 fBest = d;
@@ -164,8 +164,8 @@ s32 fn_800FE3FC(int nPlayer) {
         nBest = 5;
         for (i = 0; i < gNumPlayersSetUp; i++) {
             if (i != nPlayer && !fn_800FE2B4(i)) {
-                dx = PLAYER(i)->ball.vPos[0] - pCourse->pin[nHole].x;
-                dz = PLAYER(i)->ball.vPos[2] - pCourse->pin[nHole].z;
+                dx = PLAYER(i)->ball.vPos[0] - pCourse->pin[nPinSet].x;
+                dz = PLAYER(i)->ball.vPos[2] - pCourse->pin[nPinSet].z;
                 d = fn_80009680(dx * dx + dz * dz);
                 if (d > fBest) {
                     fBest = d;

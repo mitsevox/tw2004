@@ -345,10 +345,10 @@ void fn_800E1074(void) {
         }
     }
     for (i = 0; i < 18; i++) {
-        if (gSession.unk5B38 == -1) {
-            gpGame->holeOrder[i] = 0;
+        if (gSession.nPinSet == -1) {
+            gpGame->nPinSet[i] = 0;
         } else {
-            gpGame->holeOrder[i] = gSession.unk5B38;
+            gpGame->nPinSet[i] = gSession.nPinSet;
         }
     }
     fn_800E2470();
@@ -1006,7 +1006,7 @@ void fn_800E2BA4(void) {
 // already holed, or, when it says no, when the ball is within half a yard of the pin.
 u8 fn_800E2DB4(int nPlayer) {
     CourseInfo* pCourse;
-    int         nHole;
+    int         nPinSet;
     f32         dx;
     f32         dz;
     f32         fDist;
@@ -1015,9 +1015,9 @@ u8 fn_800E2DB4(int nPlayer) {
         return 0;
     }
     pCourse = fn_8000C594();
-    nHole = Game_CurrentHole();
-    dx = gPlayers[nPlayer].ball.vPos[0] - pCourse->pin[nHole].x;
-    dz = gPlayers[nPlayer].ball.vPos[2] - pCourse->pin[nHole].z;
+    nPinSet = Game_CurrentPinSet();
+    dx = gPlayers[nPlayer].ball.vPos[0] - pCourse->pin[nPinSet].x;
+    dz = gPlayers[nPlayer].ball.vPos[2] - pCourse->pin[nPinSet].z;
     fDist = fn_80009680(dx * dx + dz * dz);
     b = fn_8004B580();
     if ((b && gPlayers[nPlayer].ball.nLie == LIE_HOLED) || (!b && fDist < 0.5f)) {

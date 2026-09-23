@@ -75,16 +75,16 @@ void fn_800F1404(void) {
     fn_800F18C8();
 }
 
-// Sets the session's nF07 from the replay and returns it (an inline in EA's source).
-static inline s8 Replay_SetF07(void) {
-    return gSession.unk5B38 = gReplayData.nF07;
+// Sets the session's pin set from the replay and returns it (an inline in EA's source).
+static inline s8 Replay_SetPinSet(void) {
+    return gSession.nPinSet = gReplayData.nPinSet;
 }
 
-// TW06: GameModeReplay::StartGamePreData. The saved course, hole and tees.
+// TW06: GameModeReplay::StartGamePreData. The saved course, hole, pins and tees.
 void fn_800F1424(void) {
     int i;
     for (i = 0; i < 18; i++) {
-        gpGame->holeOrder[i] = Replay_SetF07();
+        gpGame->nPinSet[i] = Replay_SetPinSet();
     }
     fn_800E14E0(gReplayData.nCourse);
     fn_800E1260(0);
@@ -96,7 +96,7 @@ void fn_800F1424(void) {
         fn_800ED6F8(gReplayData.nF14 / 100.0f);
     }
     gSession.nTeeSet[0] = gReplayData.nTeeSet;
-    Replay_SetF07();
+    Replay_SetPinSet();
 }
 
 // TW06: GameModeReplay::SetupNextGolfer. Put player 0 back as they were before the shot, then
