@@ -38,9 +38,16 @@ int  fn_80105494(int nAsset);           // } the two attributes an asset raises 
 int  fn_80105504(int nAsset);           // }
 int  fn_801054CC(int nAsset);           // } and the tier it raises each to
 int  fn_8010553C(int nAsset);           // }
-s32  fn_80105C00(void);                 // FE_CrAPDB.c
+void fn_80103B8C(s8 b);                 // } FE_CrAPDB.c: set b; an asset's b (2: either),
+s8   fn_80103BC0(int nAsset);           // } its kind, fn_80107444's count, and its part and
+s16  fn_8010742C(int nAsset);           // } choice
+int  fn_80107444(int nAsset);           // }
+void fn_80105FF8(int nAsset, s16* pKind, s32* pPart, s32* pChoice);    // }
+s32  fn_80105C00(void);                 // FE_CrAPDB.c: how many assets there are
 u8   fn_80105C30(void);                 // the Create-A-Player database is loaded (FE_CrAPDB.c)
 
+void fn_8011E020(s32* pMonth, s32* pDay, s32* pYear, s32* pHour, s32* pMinute, s32* pSecond, s32* pMsec);
+u32  fn_8000B244(void);                 // a random seed from the clock
 void fn_80076EEC(void);                 // frees lbl_80281EC8
 void fn_80076F20(void);
 u8   fn_80079E44(int nAttr);            // a hidden attribute: ATTR_AGGRESSION, ATTR_IQ, ATTR_SPEED
@@ -72,6 +79,7 @@ GolferRecord* fn_80077A80(int nGolfer);
 void fn_80077B78(void);
 int  fn_80077BDC(int n);
 void fn_80077C1C(int a, int b);
+u8   fn_80078008(int nAsset, SaveProfile* pProfile);
 int  fn_80078604(int a, int b, int c);
 void fn_80078620(int n, int* pA, int* pB, int* pC);
 void fn_8007873C(SaveProfile* pProfile);
@@ -396,6 +404,100 @@ int fn_80077BDC(int n) {
     default:
         return 0;
     }
+}
+
+// For b and category a (-1, -2 or -3), seeded by today's date: one of the category's asset kinds
+// at random, then up to five different random assets of that kind that fit b (fn_80103BC0 gives
+// b or 2) and pass fn_80078008. Then the random stream is seeded from the clock again.
+void fn_80077C1C(int a, int b) {
+    int aFound[3000];
+    int aKinds[88];         // fake match: 4 are used; 88 gives the original's stack frame
+    s32 nMonth;
+    s32 nDay;
+    s32 nYear;
+    s32 nHour;
+    s32 nMinute;
+    s32 nSecond;
+    s32 nMsec;
+    s32 nPart;
+    s32 nChoice;
+    s16 nKind;
+    int j;
+    SaveProfile* pProfile;
+    int nCount;
+    int nCategory;
+    int nSeed;
+    int i;
+    int nFound;
+    int nKinds;
+    s8 nB;                  // b as fn_80103B8C and fn_80103BC0 take it
+    pProfile = fn_80077ACC();
+    nFound = 0;
+    nCount = fn_80105C00();
+    nKind = 0;
+    nPart = 0;
+    nChoice = 0;
+    nCategory = fn_80077BDC(a);
+    switch (a) {
+    case -1:
+        aKinds[0] = 0;
+        aKinds[1] = 1;
+        aKinds[2] = 2;
+        aKinds[3] = 7;
+        nKinds = 4;
+        break;
+    case -2:
+        aKinds[0] = 8;
+        aKinds[1] = 19;
+        aKinds[2] = 20;
+        nKinds = 3;
+        break;
+    case -3:
+        aKinds[0] = 12;
+        nKinds = 1;
+        break;
+    default:
+        return;
+    }
+    fn_8011E020(&nMonth, &nDay, &nYear, &nHour, &nMinute, &nSecond, &nMsec);
+    nSeed = fn_80078604(nMonth, nDay, nYear);
+    for (j = 0; j < 5; j++) {
+        lbl_80281ED4->aPart[b][nCategory][j] = -1;
+        lbl_80281ED4->aChoice[b][nCategory][j] = -1;
+    }
+    lbl_80281ED4->nDateSeed = nSeed;
+    if (lbl_80281ED4->nDateSeed == 0) {
+        lbl_80281ED4->nDateSeed = 3081979;          // 8/3/1979, packed as fn_80078604 does
+    }
+    fn_8000B1D4(0, lbl_80281ED4->nDateSeed);
+    lbl_80281ED4->aKind[b][nCategory] = aKinds[Rand_Next(0) % nKinds];
+    nB = b;
+    for (i = 0; i < nCount; i++) {
+        fn_80103B8C(fn_80103BC0(i));
+        nKind = fn_8010742C(i);
+        if (nKind == lbl_80281ED4->aKind[b][nCategory] &&
+            (fn_80103BC0(i) == nB || fn_80103BC0(i) == 2) &&
+            !fn_80078008(i, pProfile) && fn_80107444(i) > 0) {
+            aFound[nFound] = i;
+            nFound++;
+        }
+    }
+    fn_80103B8C(nB);
+    for (j = 0; j < 5; j++) {
+        if (j >= nFound) break;
+    retry:
+        fn_80105FF8(aFound[Rand_Next(0) % nFound], &nKind, &nPart, &nChoice);
+        lbl_80281ED4->aPart[b][nCategory][j] = nPart;
+        lbl_80281ED4->aChoice[b][nCategory][j] = nChoice;
+        for (i = 0; i < j; i++) {
+            if (lbl_80281ED4->aPart[b][nCategory][j] == lbl_80281ED4->aPart[b][nCategory][i] &&
+                lbl_80281ED4->aChoice[b][nCategory][j] == lbl_80281ED4->aChoice[b][nCategory][i]) {
+                goto retry;                         // fake match: a do-while scores 98.3
+            }
+        }
+    }
+    gSession.nSeed = fn_8000B244();
+    fn_8000B1D4(0, gSession.nSeed);
 }
 
 // Pack three numbers into one, b * 1000000 + a * 10000 + c; fn_80078620 unpacks it.

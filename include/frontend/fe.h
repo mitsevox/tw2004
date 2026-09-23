@@ -92,7 +92,12 @@ typedef struct FEProfile {
     u8  unk10610[0x1063F - 0x10610];
     u8  bCopy;                  // 0x1063F  the working copy is the profile, not the slot's own
     u8  b10640;                 // 0x10640
-    u8  unk10641[0x106D0 - 0x10641];
+    u8  unk10641[3];
+    s32 nDateSeed;              // 0x10644  } fn_80077C1C, from today's date: per b (0, 1) and
+    s16 aKind[2][3];            // 0x10648  } category (-1, -2, -3), a random asset kind, and up
+    s16 aPart[2][3][5];         // 0x10654  } to five random assets of it (fn_80105FF8's part
+    s16 aChoice[2][3][5];       // 0x10690  } and choice; -1: none)
+    u8  unk106CC[0x106D0 - 0x106CC];
     u64 uSquareHash;            // 0x106D0  the hash of "__LogoSquare" (the square logo's texture)
     u64 uRectHash;              // 0x106D8  the hash of "__LogoRect"
     u8  unk106E0[0x11702 - 0x106E0];
