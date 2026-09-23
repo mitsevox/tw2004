@@ -27,6 +27,10 @@ void  fn_8001B878(Character* pChar, int n);
 void  fn_8001C0E0(Character* pChar);
 Character* fn_8001C21C(Character* pChar);
 void  Character_UpdateAnimation(Character* pChar, int a, f32 f);
+void  Character_UpdateTestPoints(Character* pChar);
+void  Character_UpdateFeetTerrainInfo(Character* pChar, int a);
+void  Character_PlaceFeetOnGround(Character* pChar);
+void  SKEL_TransformBones(CharModel* pModel, u32* auBits);
 void  fn_8001CCF8(UStreamObject* pObject);
 void  fn_8001CD80(UStreamObject* pObject);
 void  fn_8001CE5C(UStreamObject* pObject);
@@ -137,6 +141,24 @@ void fn_80018484(Character* pChar, CharModel* pModel) {
         pChar->nClubHeadBone = fn_8001EED8(pChar->pModel, 0x53);
         pChar->nGripBone     = fn_8001EED8(pChar->pModel, 0x52);
         pChar->n16A8         = fn_8001EEE4(pChar->pModel, 0x15);
+    }
+}
+
+// Moves the character to pPos (its root bone's position); with bPlace, the bones are transformed
+// again and the feet put back on the ground.
+void Character_SetPosition(Character* pChar, f32* pPos, u8 bPlace) {
+    u32 auBits[4];
+
+    fn_8001E8A4(auBits, 0x80);
+    if (pChar != NULL) {
+        Vec_Copy(pPos, pChar->pModel->pBones->v1C);
+        if (bPlace) {
+            SKEL_TransformBones(pChar->pModel, auBits);
+            Character_UpdateTestPoints(pChar);
+            pChar->n1784 = -1;
+            Character_UpdateFeetTerrainInfo(pChar, 1);
+            Character_PlaceFeetOnGround(pChar);
+        }
     }
 }
 
