@@ -745,6 +745,61 @@ void fn_80129B30(EASBProduct* pProduct, u8* pBuffer) {
     }
 }
 
+// Packs a picture into pBuffer (uSize bytes, cleared first): bLoaded, the colour table as red,
+// green, blue, then the pixels.
+void fn_80129D70(EASBImage* pImage, u8 bLoaded, u8* pBuffer, u32 uSize) {
+    s32 nOffset;
+    u32 i;
+    u32 j;
+
+    nOffset = 0;
+    memset(pBuffer, 0, uSize);
+    fn_80129290(pBuffer, &nOffset, 1, bLoaded, 0, 1);
+    for (i = 0; i < 256; i++) {
+        fn_80129290(pBuffer, &nOffset, 1, pImage->aColorTable[i * 4 + 2], 0, 0xFF);
+        fn_80129290(pBuffer, &nOffset, 1, pImage->aColorTable[i * 4 + 1], 0, 0xFF);
+        fn_80129290(pBuffer, &nOffset, 1, pImage->aColorTable[i * 4 + 0], 0, 0xFF);
+    }
+    for (j = 0; j < sizeof(pImage->aData); j++) {
+        fn_80129290(pBuffer, &nOffset, 1, pImage->aData[j], 0, 0xFF);
+    }
+}
+
+// Unpacks a picture from pBuffer (fn_80129D70's layout).
+void fn_80129E88(EASBImageSlot* pSlot, u8* pBuffer) {
+    s32 nOffset;
+    u32 i;
+    u32 j;
+
+    nOffset = 0;
+    memset(pSlot, 0, sizeof(EASBImageSlot));
+    pSlot->bLoaded = fn_801293F8(pBuffer, &nOffset, 1, 0, 1);
+    for (i = 0; i < 256; i++) {
+        pSlot->aColorTable[i * 4 + 2] = fn_801293F8(pBuffer, &nOffset, 1, 0, 0xFF);
+        pSlot->aColorTable[i * 4 + 1] = fn_801293F8(pBuffer, &nOffset, 1, 0, 0xFF);
+        pSlot->aColorTable[i * 4 + 0] = fn_801293F8(pBuffer, &nOffset, 1, 0, 0xFF);
+    }
+    for (j = 0; j < sizeof(pSlot->aData); j++) {
+        pSlot->aData[j] = fn_801293F8(pBuffer, &nOffset, 1, 0, 0xFF);
+    }
+}
+
+// Adds pAdd into pTotals, keeping u8 at least uC; the record count comes from pAdd, one more
+// (up to 250) unless nMode is 3.
+void fn_80129F98(EASBTotals* pTotals, EASBTotals* pAdd, s32 nMode) {
+    pTotals->u0 = fn_80128468(pTotals->u0, pAdd->u0);
+    pTotals->u4 = fn_80128468(pTotals->u4, pAdd->u4);
+    pTotals->u8 = fn_80128468(pTotals->u8, pAdd->u8);
+    pTotals->uC = fn_80128468(pTotals->uC, pAdd->uC);
+    if (pTotals->uC > pTotals->u8) {
+        pTotals->u8 = pTotals->uC;
+    }
+    pTotals->nProducts = pAdd->nProducts;
+    if (nMode != 3 && pTotals->nProducts < 250) {
+        pTotals->nProducts++;
+    }
+}
+
 // ---- sweep code (not yet cleaned up) ----
 
 s32 TagFile_Delete(s32*, s32, s32);
@@ -756,7 +811,6 @@ extern u8* lbl_802825B0;
 s32 TagFile_DeleteSession(u8*);
 s32 TagFile_End(u8*);
 s32 TagFile_Write(u8*, s32, u8, s32*, s32);
-s32 fn_80129D70(s32, s32, s32*, s32);
 s32 TagFile_FreeBuffer();
 s32 TagFile_Shutdown();
 s32 fn_8012CCC0(void);
@@ -892,7 +946,7 @@ s32 fn_8012B0D8(s32* arg0) {
     }
     temp_r0 = *arg0;
     if (temp_r0 == 0) {
-        fn_80129D70((*(s32*)((u8*)(lbl_802825B0) + 0x190)), 1, (*(s32**)((u8*)(lbl_802825B0) + 0x9C)), (*(s32*)((u8*)(lbl_802825B0) + 0xA0)));
+        fn_80129D70((*(EASBImage**)((u8*)(lbl_802825B0) + 0x190)), 1, (*(u8**)((u8*)(lbl_802825B0) + 0x9C)), (*(u32*)((u8*)(lbl_802825B0) + 0xA0)));
         TagFile_Write(lbl_802825B0 + 0x120, 0x494D4147, (*(u8*)((u8*)(lbl_802825B0) + 0x98)), (*(s32**)((u8*)(lbl_802825B0) + 0x9C)), 0x4301);
         var_r4 = fn_8012C98C();
         *arg0 = 1;
