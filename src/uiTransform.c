@@ -157,7 +157,7 @@ void fn_80093280(int nOp, UITransformDesc* p) {
         lbl_80281F38->aLevel[lbl_80281F38->nTop].f78 = 0.0f;
         lbl_80281F38->aLevel[lbl_80281F38->nTop].f6C = 1.0f;
         lbl_80281F38->aLevel[lbl_80281F38->nTop].f70 = 1.0f;
-        lbl_801D91F0[0] = 0.87266463f;
+        lbl_801D91F0[0] = DEG(50.0f);
         lbl_801D91F0[1] = fn_80014280(0.5f * lbl_801D91F0[0]);
         lbl_801D91F0[2] = 256.0f * (1.0f / lbl_801D91F0[1]);
         break;
