@@ -1,0 +1,95 @@
+Code style
+==========
+
+How the C in `src/` is written. Matching decides *what* the compiler must produce; this file
+decides how the source reads, so every unit looks like one author wrote it. Model files:
+`src/GameMode10.c` and `src/GameMode14.c`.
+
+`python tools/match/lint.py <files>` checks the mechanical rules below. Run it before every commit.
+
+Files
+-----
+
+- **Header comment.** Every unit starts with `// <File>.c (our name): <what it does>`, two to four
+  lines in plain English: which game mode or system, the main data it works on. "(our name)"
+  marks names we chose; EA's file names are unknown.
+- **Order inside a file:** includes, then types local to the file, then `extern` data, then
+  prototypes, then functions in address order (the order is fixed by the binary).
+- **Includes:** `golfer.h` (players, sessions, shared game types), `ball.h`, `physics.h` as needed.
+  No includes of other units' `.c` files.
+
+Names
+-----
+
+- **Functions and globals:** use a real name when there is evidence (a TW06 name from
+  `tw06-names.md`, a string in the binary, an unambiguous role). Otherwise keep the address name
+  (`fn_800FA518`, `lbl_80211D38`). Do not invent names from guesses.
+- **Renaming a global or function** is done in `config/GW4E69/symbols.txt`, so every file and the
+  assembly see the new name. Never alias with `#define NICE_NAME lbl_XXXXXXXX`.
+- **Style of names:** EA's own. Functions `System_Verb` (`View_SetCamera`, `Session_SetNumPlayers`)
+  or `fn_XXXXXXXX`. Globals `gName`. Locals and fields in Hungarian with a type prefix:
+  `n` integer, `f` float, `b` flag, `u` unsigned bit mask, `p` pointer, `a` array, `pfn` function
+  pointer, `sz` string. Parameters that are a player index are `nPlayer`, a hole `nHole`, a
+  view `nView`.
+- **Struct fields whose meaning is unknown** keep their type prefix plus the hex offset: `nC38`,
+  `fF08`, `aCD4[20]`. Padding and fields never read are `unkXXX`. Every field in a shared struct
+  has its offset in a trailing comment (`// 0xC38`).
+- **Macros** are for real abstractions (`PLAYER(i)`, a table's row count), in the header next to
+  the thing they describe. Not for shortening a name.
+
+Data access
+-----------
+
+- **Use struct fields, never raw offsets.** `gPlayers[n].nC38`, not `*(s32*)((u8*)p + 0xC38)`. If
+  the field is missing, add it to the struct (with its offset comment) in the right header.
+- Write player access the way EA did, `gPlayers[nPlayer].field` each time; see
+  `decomp-notes.md`, "Structs, arrays and pointers", for when `PLAYER(i)` or a local pointer is
+  needed instead.
+- Tables get a `typedef struct` describing one row, declared where they are used, or in a
+  header once a second file uses them.
+
+Prototypes
+----------
+
+- **A function used by more than one file** is declared once, in the header of the system it
+  belongs to (`golfer.h` for game and player functions for now).
+- **A prototype local to a file** is for functions only that file calls.
+- **An intentional mismatch** (a file must see a different parameter type to match, see
+  "Function calls and parameters" in `decomp-notes.md`) gets a comment on the prototype:
+  `// s8 here, int in golfer.h: the callers in this file sign-extend`.
+
+Matching tricks
+---------------
+
+Code that exists only to make the compiler emit the original instructions is marked, so a
+reader knows it is deliberate:
+
+```c
+    long j;         // fake match: long, not int, for the original register order
+```
+
+- Use `// fake match: <why>` for anything a person would not naturally write (a redundant copy
+  of a variable, an odd type, a useless cast, a strange statement order).
+- Rules that explain *normal* EA style (repeated `gPlayers[n].field`, `while` loops) are not
+  fake matches and need no comment.
+- No `goto` unless the control flow cannot be matched without it; mark it as a fake match.
+
+Formatting
+----------
+
+- 4 spaces, no tabs. Opening brace on the same line, functions included
+  (`void fn_800F125C(void) {`). Always braces on `if`/`for`/`while` bodies, except a one-line
+  early exit: `if (nPlayer < 0) return 0;` (also `break;`, `continue;`).
+- `if (a == 5)`, `for (i = 0; i < n; i++)`: spaces around binary operators and after keywords,
+  none inside parentheses.
+- Lines up to about 110 columns. LF line endings, no trailing whitespace, a final newline.
+- Declarations at the top of the block (C89, as the compiler needs), one per line when they carry
+  a comment.
+- Comments explain *why* or what the game does ("the winner gets the whole pool"), not what the
+  C says. No commented-out code; no m2c leftovers (`temp_r3`, `var_r31`, `M2C_ERROR`, `?` types).
+
+Sweep files
+-----------
+
+`src/unsorted/sweep_*.c` are machine-generated placeholders and are exempt from this file until
+they are folded into a named unit. Once folded, the code follows these rules like any other.

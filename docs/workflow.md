@@ -104,6 +104,17 @@ timeout 2700 python C:/dev/tools/decomp-permuter/permuter.py build/perm/<fn> -j6
 Output lands in `build/perm/<fn>/output-*`. Read the diff it found and apply the idea by hand;
 its code is often ugly but it points at the real change (a type, an order, a temporary).
 
+Before you commit
+-----------------
+
+```
+rm -f build/GW4E69/ok; ninja                          # main.dol: OK
+python tools/match/lint.py --diff main                # style check on the lines you changed
+```
+
+Lint must report 0 findings on your lines (see [`style.md`](style.md) for each rule). If a file
+you own has older findings, clean them as part of your work, keeping every function exact.
+
 When stuck
 ----------
 

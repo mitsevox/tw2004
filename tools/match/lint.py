@@ -1,0 +1,123 @@
+"""Check unit sources against docs/style.md (the mechanical rules only).
+    python tools/match/lint.py [files...]        default: every src/*.c (sweeps are exempt)
+    python tools/match/lint.py --summary [files]  counts per file and rule instead of each line
+    python tools/match/lint.py --diff main       only lines added or changed since main (use this
+                                                  on a branch: old debt in untouched lines is skipped)
+Exits 1 if anything is found. Rules and the reason for each are in docs/style.md."""
+import pathlib, re, sys
+
+ROOT = pathlib.Path(__file__).resolve().parents[2]   # the checkout this script lives in
+
+CHECKS = [
+    ('m2c-leftover', re.compile(r'\b(temp|var)_[rf]\d+\b|\bM2C_|\bsp[0-9A-F]{1,3}\b|^\s*\?\*? \w+;')),
+    ('raw-offset', re.compile(r'\*\s*\(\s*[\w ]+\*\s*\)\s*\(.*\+\s*0x[0-9A-Fa-f]+\s*\)')),
+    ('alias-macro', re.compile(r'^#define\s+\w+\s+\(?(lbl|fn)_[0-9A-F]{8}\b')),
+    ('tab', re.compile(r'\t')),
+    ('trailing-space', re.compile(r'[ \t]+$')),
+    ('no-braces', re.compile(r'^\s*(if|for|while)\s*\(.*\)\s*(?!return\b|break;|continue;)[^{\s;][^{]*;\s*(//.*)?$')),
+    ('commented-code', re.compile(r'^\s*//\s*([\w\[\]\.>-]+\s*[-+*/|&]?=[^=][^;]*|\w+\([^)]*\)|return\b[^;]*|(if|for|while)\s*\(.*\)\s*\{?)\s*;?\s*$')),
+]
+
+
+def header_protos():
+    """name -> normalized signature, from the top-level headers."""
+    out = {}
+    for h in (ROOT / 'include').glob('*.h'):
+        for m in re.finditer(r'^(?!typedef|#|\s)([\w \*]+?)\b(\w+)\s*\(([^;{}]*)\)\s*;',
+                             h.read_text(encoding='utf-8', errors='replace'), re.M):
+            out[m.group(2)] = (norm(m.group(1), m.group(3)), h.name)
+    return out
+
+
+def norm(ret, params):
+    ps = []
+    for p in params.split(','):
+        p = ' '.join(p.replace('*', ' * ').split())
+        toks = p.split(' ')
+        if len(toks) > 1 and re.match(r'^\w+$', toks[-1]) and toks[-1] not in ('void', 'int'):
+            toks = toks[:-1]           # drop the parameter name
+        ps.append(' '.join(toks))
+    return ' '.join(ret.replace('*', ' * ').split()) + '(' + ','.join(ps) + ')'
+
+
+def lint(path, protos):
+    raw = path.read_bytes()
+    text = raw.decode('utf-8', errors='replace')
+    lines = text.split('\n')
+    hits = []
+    if b'\r\n' in raw:
+        hits.append((1, 'crlf', 'CRLF line endings'))
+    if not text.endswith('\n'):
+        hits.append((len(lines), 'final-newline', 'no newline at end of file'))
+    if not re.match(r'// \w+\.c\b', lines[0]):
+        hits.append((1, 'header-comment', 'first line should be "// <File>.c (our name): ..."'))
+    for i, l in enumerate(lines, 1):
+        l = l.rstrip('\r')
+        for name, rx in CHECKS:
+            if rx.search(l):
+                hits.append((i, name, l.strip()))
+        if len(l) > 110:
+            hits.append((i, 'long-line', '%d columns' % len(l)))
+        if re.search(r'\bgoto\b', l) and 'fake match' not in l and 'fake match' not in lines[i - 2]:
+            hits.append((i, 'goto-unmarked', l.strip()))
+        m = re.match(r'^(?!typedef|return|#|static)([A-Za-z_][\w \*]*?[\s\*])(\w+)\s*\(([^;{}]*)\)\s*;(.*)$', l)
+        if m and m.group(2) in protos:
+            sig, hname = protos[m.group(2)]
+            if norm(m.group(1), m.group(3)) == sig:
+                hits.append((i, 'dup-prototype', '%s is already declared in %s' % (m.group(2), hname)))
+            elif '//' not in m.group(4):
+                hits.append((i, 'proto-mismatch', '%s differs from %s with no comment saying why'
+                             % (m.group(2), hname)))
+    return hits
+
+
+def changed_lines(rev):
+    """file name -> set of line numbers added or changed since rev (working tree included)."""
+    import subprocess
+    out = subprocess.run(['git', 'diff', '-U0', rev, '--', 'src'], cwd=ROOT,
+                         capture_output=True, text=True).stdout
+    res, cur = {}, None
+    for l in out.splitlines():
+        if l.startswith('+++ '):
+            cur = pathlib.Path(l[6:]).name if l != '+++ /dev/null' else None
+            res.setdefault(cur, set())
+        m = re.match(r'@@ -\S+ \+(\d+)(?:,(\d+))? @@', l)
+        if m and cur:
+            a, n = int(m.group(1)), int(m.group(2) or 1)
+            res[cur].update(range(a, a + n))
+    return res
+
+
+def main():
+    argv = sys.argv[1:]
+    rev = None
+    if '--diff' in argv:
+        k = argv.index('--diff'); rev = argv[k + 1]; del argv[k:k + 2]
+    args = [a for a in argv if a != '--summary']
+    files = [pathlib.Path(a) for a in args] or sorted((ROOT / 'src').glob('*.c'))
+    protos = header_protos()
+    changed = changed_lines(rev) if rev else None
+    total = 0
+    for f in files:
+        if 'unsorted' in f.parts:
+            continue
+        if changed is not None and f.name not in changed:
+            continue
+        hits = lint(f, protos)
+        if changed is not None:     # file-level checks (line 1) count only if line 1 changed too
+            hits = [h for h in hits if h[0] in changed[f.name]]
+        total += len(hits)
+        if '--summary' in sys.argv:
+            if hits:
+                counts = {}
+                for _, n, _ in hits:
+                    counts[n] = counts.get(n, 0) + 1
+                print('%-28s %s' % (f.name, ', '.join('%s %d' % kv for kv in sorted(counts.items()))))
+        else:
+            for ln, n, msg in hits:
+                print('%s:%d: %s: %s' % (f.name, ln, n, msg[:100]))
+    print(total, 'findings')
+    sys.exit(1 if total else 0)
+
+
+main()
