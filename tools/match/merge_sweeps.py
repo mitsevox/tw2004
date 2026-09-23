@@ -174,8 +174,13 @@ def main():
     if path.exists() and path.read_text(encoding='utf-8').strip():
         append(path, includes, decls, bodies)
         return
+    # A new unit: a header comment, the includes, then everything else in one sweep block, so the
+    # machine-written code (raw offsets, externs) is marked as not yet cleaned, as in a widened unit.
     bodies = [b for _, b in by_address(bodies, addresses())]
-    text ='\n'.join(includes) + '\n\n' + '\n'.join(decls) + '\n\n' + '\n\n'.join(bodies) + '\n'
+    head = '// %s (our name): made by fold.py from %d sweep files; not yet described.' \
+        % (pathlib.Path(out_name).name, len(files))
+    text = '\n'.join([head, ''] + includes + ['', sweepblock.BEGIN, ''] + decls + ['']
+                     + '\n\n'.join(bodies).split('\n') + ['', sweepblock.END]) + '\n'
     path.write_text(text, encoding='utf-8', newline='\n')
     print(len(decls), 'decls', len(bodies), 'bodies')
 
