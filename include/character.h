@@ -611,4 +611,20 @@ int   fn_80062C10(Character* pChar);    // uFlags bit 4
 int   fn_80062C1C(Character* pChar);    // uFlags bit 1
 f32   fn_80062C28(Character* pChar);    // how far the animation still has to run
 
+// ---- mtalib.c --------------------------------------------------------------------------------
+
+// A group of items of a 'MAL ' bank.
+typedef struct MalGroup {
+    int    nNum;                // 0x0
+    void** apItem;              // 0x4
+} MalGroup;
+
+// A bank loaded from a 'MAL ' stream object (0x1C bytes): up to three groups of items, one picked
+// at random by fn_8001F79C.
+typedef struct MalBank {
+    int      nNumGroups;        // 0x00
+    MalGroup aGroup[3];         // 0x04
+} MalBank;
+LAYOUT_ASSERT(MalBank, 0x1C);
+
 #endif

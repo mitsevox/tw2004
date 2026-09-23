@@ -24,13 +24,11 @@ void GameModeDriverRTE_LoadRTEsFromStream(UStreamObject* pObject);
 s32 fn_800F0E18(s32 i);
 s32 fn_800F0E20(s32* pRound);
 void fn_800F0E30(s32 nId, s32 nRound);
-s32 fn_800F1008(s32 i);
 
 void  GameModeDriverRTE_Locale_LoadRTEnFromStream(UStreamObject* pObject);
 void  fn_800F0678(void);
 void  fn_800F0BBC(void);
 s32   fn_800F0820(void);
-u8    GameModeDriverRTE_GetEventByDate(u16 nDate, s32* pId, s32* pRound);
 u8    fn_800F0DB8(s32 nMonth, s32 nDay, s32 nYear, s32* pId, s32* pRound);
 s32   fn_800F0F54(void);
 

@@ -76,7 +76,7 @@ def parse_report(path):
     """The parts of an objdiff report.json the page needs."""
     r = json.load(open(path))
     units, fns = [], {}
-    unsplit = {'code': 0, 'data': 0, 'units': 0}
+    unsplit = {'code': 0, 'data': 0, 'units': 0, 'by_cat': {}}
     for u in r.get('units', []):
         md = u.get('metadata', {})
         um = measures(u.get('measures', {}))
@@ -86,9 +86,17 @@ def parse_report(path):
             if addr is not None:
                 fns[addr] = (num(f.get('size')), f.get('fuzzy_match_percent', 0) >= 100, linked, u['name'])
         if md.get('auto_generated'):
+            # dtk's gap units: code no source file covers yet. The ones configure.py puts in a
+            # category (tools/match/autocat.py) are counted in it as well: by_cat keeps them apart
+            # so the page shows them inside their category, not as extra code beside it.
             unsplit['code'] += um.get('total_code', 0)
             unsplit['data'] += um.get('total_data', 0)
             unsplit['units'] += 1
+            if um.get('total_code', 0):
+                cat = (md.get('progress_categories') or [''])[0]
+                g = unsplit['by_cat'].setdefault(cat, {'code': 0, 'units': 0})
+                g['code'] += um.get('total_code', 0)
+                g['units'] += 1
             continue
         name = u['name'][5:] if u['name'].startswith('main/') else u['name']
         cats = md.get('progress_categories', [])
@@ -238,6 +246,8 @@ h2{font-size:13px;font-weight:600;margin:0 0 12px;color:var(--text-2);letter-spa
 .cats{margin-top:16px;border-top:1px solid var(--line);padding-top:12px;display:grid;gap:12px}
 .cat .row{display:flex;justify-content:space-between;gap:10px;font-size:13px}
 .cat .row span:last-child{color:var(--text-2);text-align:right}
+.cat.sub{margin:-6px 0 0 18px}.cat.sub .row{font-size:12.5px;color:var(--text-2)}
+.cat small{color:var(--text-3);font-size:12px}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:14px}
 .stats .card{margin-top:0;padding:14px 16px}
 .stat .k{font-size:12.5px;color:var(--text-2)}
@@ -346,8 +356,13 @@ const BADGE={linked:'<span class="badge linked">&#10003; Linked</span>',ready:'<
 
 function codeCard(m,cats,uns){
  const T=m.total_code,L=m.complete_code,M=m.matched_code;
- const catRows=cats.map(c=>{const x=c.measures;return `<div class="cat"><div class="row"><span>${esc(c.name)}</span><span>${pf(pct(x.matched_code,x.total_code),1)} matched &middot; ${pf(pct(x.complete_code,x.total_code),1)} linked &middot; ${fmt(x.total_code)} B</span></div>${bar(x.complete_code,x.matched_code,x.total_code,'sm')}</div>`}).join('')+
-  (uns.code?`<div class="cat"><div class="row"><span>Not yet in a source file</span><span>${uns.units} auto-split pieces &middot; ${fmt(uns.code)} B</span></div>${bar(0,0,uns.code,'sm')}</div>`:'');
+ // Gap units (code not yet in a source file) that belong to a category are already inside its
+ // total: they are shown as an "of which" line under it, never as extra code beside it.
+ const gaps=(uns.by_cat||{}),gapRow=(label,g,top)=>`<div class="cat${top?'':' sub'}"><div class="row"><span>${label}</span><span>${g.units} gaps &middot; ${fmt(g.code)} B</span></div>${bar(0,0,g.code,'sm')}</div>`;
+ const catRows=cats.map(c=>{const x=c.measures,g=gaps[c.id];return `<div class="cat"><div class="row"><span>${esc(c.name)}${g?' <small>(all its code, gaps included)</small>':''}</span><span>${pf(pct(x.matched_code,x.total_code),1)} matched &middot; ${pf(pct(x.complete_code,x.total_code),1)} linked &middot; ${fmt(x.total_code)} B</span></div>${bar(x.complete_code,x.matched_code,x.total_code,'sm')}</div>`+
+  (g?gapRow(`of which not yet in a source file`,g):'')}).join('')+
+  (gaps['']?gapRow('Not yet in a source file, in no category (gaps among the SDK libraries)',gaps[''],1):'')+
+  (!uns.by_cat&&uns.code?gapRow('Not yet in a source file',{units:uns.units,code:uns.code},1):'');
  return `<section class="card"><h2>Code</h2>
  <div class="figs"><div class="fig"><div class="n">${pf(pct(M,T))}</div><div class="l"><i class="sw matched"></i>matched</div></div>
  <div class="fig"><div class="n">${pf(pct(L,T))}</div><div class="l"><i class="sw linked"></i>fully linked</div></div></div>
