@@ -337,6 +337,8 @@ ViewController* fn_80016CFC(int nView);
 void*  fn_80017004(int nView);          // the view's render camera
 View*  fn_80017028(int nView);
 void   fn_8001704C(int nView, int nPlayer);   // the player the view follows
+int    fn_8001707C(int nView);          // the player the view follows (as set above)
+u8     fn_800170A0(int nView);          // the view is in use
 void   fn_800170C4(int nView, int a);
 f32*   fn_8001731C(View* pView);        // the camera's position (v0)
 f32*   fn_80017314(View* pView);        // where it looks (v10)
@@ -414,7 +416,7 @@ u8     fn_80063C90(View* pView);        // the camera is still moving
 void   fn_80063CBC(View* pView, f32* pVec);   // nCamera 3, the vector into vC4
 void   fn_80063CF0(View* pView, int nCamera, int nPlayer);
 void   fn_800642D0(View* pView, int nPlayer);
-void   fn_800642B0(void);
+u8     fn_800642B0(void);               // fn_800C6CB0's answer (gomainloop tests it)
 void   fn_80063F08(f32* pA, f32* pB, f32* pOut);   // the green zoom-to-aim camera: View.v20 as pA and pOut
 
 // ---- the golf cameras (GoGolfCam.c) ---------------------------------------------------------

@@ -70,7 +70,7 @@ void fn_800A2BA8(void) {
     lbl_802813F8->n4 = 1 - lbl_802813F8->n4;
 }
 
-void fn_800A2BBC(void) {
+void fn_800A2BBC(int nView) {
     f32 fFrameTime;
     if (lbl_801F16F4[0] != NULL) {
         fFrameTime = gSession.fFrameTime;
@@ -78,7 +78,7 @@ void fn_800A2BBC(void) {
     }
 }
 
-void fn_800A2C08(void) {
+void fn_800A2C08(int nView) {
     if (lbl_801F16F4[0] != NULL) {
         fn_800B4FA4(lbl_801F16F4[0]);
     }

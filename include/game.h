@@ -51,6 +51,16 @@ LAYOUT_ASSERT(ReplayBuffer, 0x15260);
 
 extern ReplayBuffer* lbl_80281E48;      // 0x80281E48
 
+// gomainloop.c
+extern u8    lbl_80281B8E;              // the reset button was pressed (OSGetResetButtonState)
+extern u8    lbl_80281E50;              // set after a create-a-player frame, cleared otherwise
+extern void*       lbl_80281E54;        // the render camera made from the three below (fn_8001371C)
+extern void*       lbl_80281E58;        // } made by fn_80076ACC,
+extern GoFrameBuf* lbl_80281E5C;        // }   fn_8006E1C8
+extern void*       lbl_80281E60;        // }   and fn_80076400 when a game type starts
+extern s32   lbl_801888D0[4];           // the order the views are drawn in (0, 1, 2, 3)
+extern u8*   lbl_802811E8;              // [1]: the round is over (fn_8006DC34)
+
 // Replay.c
 void fn_8006BED4(void);                 // make the replay buffer
 void fn_8006BF20(void);                 // free it

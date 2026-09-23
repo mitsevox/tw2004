@@ -219,8 +219,8 @@ void fn_800642A4(View* pView, f32 f174, f32 f178) {
     pView->f178 = f178;
 }
 
-void fn_800642B0(void) {
-    fn_800C6CB0();
+u8 fn_800642B0(void) {
+    return fn_800C6CB0();
 }
 
 // Blends the view's script into its current shot.
