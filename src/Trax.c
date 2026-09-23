@@ -1,4 +1,10 @@
+// Trax.c (our name): the EA Trax music display: the 'TRAX' and 'TRXT' stream chunks (the track
+// list and its text) and the on-screen name of the song playing ("%s" in quotes), kept in
+// lbl_801F8458. Not yet decompiled beyond the sweep code below.
+
 #include "game_types.h"
+
+// ---- sweep code (not yet cleaned up) ----
 
 extern u8 lbl_801F8458[];
 u8 fn_800BA080(void);
@@ -79,3 +85,5 @@ f32 fn_800BA700(void) {
     }
     return lbl_8028420C;
 }
+
+// ---- end of sweep code ----
