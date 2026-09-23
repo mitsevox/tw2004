@@ -327,7 +327,8 @@ typedef struct Character {
     s32   nClubHeadBone;        // 0x16A0  bone 0x53's index: the club head (the swing trail's end)
     s32   nGripBone;            // 0x16A4  bone 0x52's index: the grip (the trail's other end)
     s32   n16A8;                // 0x16A8  fn_8001EEE4's answer for bone 0x15
-    u8    unk16AC[0x16D0 - 0x16AC];
+    u8    unk16AC[0x16CC - 0x16AC];
+    s32   nClub;                // 0x16CC  the club (fn_8001C774)
     s32   nShotKind;            // 0x16D0  the player's shot kind (fn_8001C724)
     s32   n16D4;              // 0x16D4  the key for clip lookups (Char_SetClip)
     struct CharSkinSet* p16D8;  // 0x16D8  six more skins (SkinPart.c)

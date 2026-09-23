@@ -41,6 +41,8 @@ void  fn_8001CE5C(UStreamObject* pObject);
 void  fn_8001D020(UStreamObject* pObject);
 void  fn_8001D3EC(UStreamObject* pObject);
 void  fn_8001D7EC(void);
+void  fn_8001C5B4(Character* pChar, int n);
+void  fn_800BBADC(int nValue);         // SitDevFile.c
 void  fn_8001EBD8(Character* pChar, int nBone, f32* pPos);
 u8    fn_8001EC48(Character* pChar);
 f32 (*fn_8001EC6C(Character* pChar, int nBone))[4];
@@ -416,6 +418,17 @@ void fn_8001C724(Character* pChar, int nKind) {
     if (pChar != NULL) {
         fn_8001C650(pChar, lbl_80187164[nKind]);
         pChar->nShotKind = nKind;
+    }
+}
+
+void fn_8001C774(Character* pChar, int nClub) {
+    // per club: what fn_8001C5B4 gets
+    int aKind[26] = {0, 0, 0, 0, 0, 0, 1, 1, 1, 3, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 2};
+
+    if (pChar != NULL) {
+        fn_800BBADC(nClub);
+        pChar->nClub = nClub;
+        fn_8001C5B4(pChar, aKind[nClub]);
     }
 }
 
