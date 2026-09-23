@@ -446,7 +446,7 @@ u8 Ter_SearchAreaForDropLocation(int nPlayer, u8 bPreferred, u8 bCheck, f32* pOu
                 if ((bPreferred && bPreferredLie) || (!bPreferred && bDrop)) {
                     if (pSurface->nClass == gSurfaceTypes[p->nBallSurface].nClass) {
                         Vec_Copy(vPos, pOut);
-                        goto done;      // leaves both loops (a goto, as the original jumps straight past them)
+                        goto done;  // fake match: leaves both loops (not yet verified)
                     }
                     if (fRadius < fDist) {      // EA bug: a distance against a squared one
                         Vec_Copy(vPos, pOut);
