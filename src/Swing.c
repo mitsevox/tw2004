@@ -174,7 +174,7 @@ void  fn_80036100(u8* pMesh, void* pDesc, int n);
 void  fn_800360D4(u8* pMesh);
 void  fn_80098C70(void);
 void  GOLFERSTATE_Pop(int nPlayer);
-void  fn_80067710(int nPlayer, int a, int b);
+void  fn_80067710(int nPlayer, int a, u8 nEvent);
 s8    GOLFERSTATE_GetPreviousState(int nPlayer);  // the state below the top of the stack
 void  fn_80017158(int nView);
 void  fn_80039344(int nView, f32 f);             // a per-view float (0x801D5010[nView])

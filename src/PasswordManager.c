@@ -26,7 +26,7 @@ u8 fn_800564AC(int n) {
 }
 
 // Tests a typed code; if it is a cheat, sets what it unlocks and returns 1.
-int PasswordManager_TestPassword(char* szCode) {
+u8 PasswordManager_TestPassword(char* szCode) {
     s32 aBit[5] = {1, 2, 3, 4, 5};
     char aszCode[5][32] = {"A", "B", "C", "D", "E"};
     int i;
