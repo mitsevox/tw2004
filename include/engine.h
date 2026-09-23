@@ -216,7 +216,7 @@ int  fn_8006AA9C(int nPlayer);          // how the shot turned out (0..4, 8+)
 void fn_8006AAB4(int nPlayer, int a);
 void fn_8006ACF8(int nPlayer, int a);
 void Emotion_UpdatePlayerEmotion(int nPlayer);
-void fn_8006B2C4(int nPlayer, int a);
+void fn_8006B2C4(int nPlayer, u8 bBefore);   // the shot's outcome from the ball (bBefore: ballBefore)
 void fn_8006BAA8(int nPlayer);
 void fn_8006BF60(int nPlayer);          // the replay recorder
 void fn_8006C300(int nPlayer);
@@ -226,6 +226,8 @@ u8   fn_80095430(int a);
 void fn_8009B970(int nView);
 void fn_8009EF98(void);
 void fn_800A6278(void);
+void fn_800A6FE0(void);
+void fn_800A707C(void);
 void fn_800A62A4(void);
 void fn_800A62E0(void);
 void fn_800A6358(void);
