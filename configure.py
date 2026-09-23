@@ -472,7 +472,7 @@ config.libs = [
             Object(Matching, "src/dvd/dvdFatal.c"),
             Object(NonMatching, "src/gx/GXDisplayList.c"),
             Object(NonMatching, "src/gx/GXTransform.c"),
-            Object(NonMatching, "src/os/OSFont.c"),
+            Object(Matching, "src/os/OSFont.c"),
             Object(Matching, "src/os/OSLink.c"),
             Object(Matching, "src/os/__ppc_eabi_init.c"),
             Object(NonMatching, "src/gba/GBA.c"),

@@ -3740,6 +3740,7 @@ dolphin/os/OSError.c:
 
 src/os/OSFont.c:
 	.text       start:0x8014A758 end:0x8014A7B0
+	.sdata      start:0x80281AC8 end:0x80281AD0
 
 dolphin/os/OSInterrupt.c:
 	.text       start:0x8014A7B0 end:0x8014B01C
