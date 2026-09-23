@@ -88,6 +88,26 @@ typedef struct UIArc {
     f32  fEnd;                  // 0x34  message 4: degrees
 } UIArc;
 
+// A menu UI text element (uiText.c): a string drawn in a font, in a colour of its own or of the
+// front end's colour table, optionally with a shadow. Only what the code reads so far.
+typedef struct UIText {
+    s32  nText;                 // 0x00  messages 3 and 4: its string (a MsgString), as an offset
+                                //       from the element
+    s32  n4;                    // 0x04  its font (fn_80012868)
+    s16  n8;                    // 0x08  message 8, low half: an entry of the colour table, -1: aColor
+    s16  nA;                    // 0x0A  message 8, high half
+    s16  nFlags;                // 0x0C  bits 0/1: message 5; 0x10: a shadow; 0x100/0x200: f30/f34
+    s16  nE;                    // 0x0E  messages 16 and 17
+    u8   aColor[4];             // 0x10  message 0: red, green, blue, alpha
+    u8   aShadowColor[4];       // 0x14  message 1
+    f32  v18[3];                // 0x18  message 6
+    f32  f24;                   // 0x24  } passed to fn_80092C38 when it has a shadow
+    f32  f28;                   // 0x28  }
+    u8   unk2C[4];
+    f32  f30;                   // 0x30  messages 18 and 20, as an int
+    f32  f34;                   // 0x34  messages 19 and 21, as an int
+} UIText;
+
 // The menu UI's commands go to one of these, by the session's game type (uiProcessInterface.c's
 // fn_8008F568): each runs the handler for message nMsg of its table.
 void fn_80079E6C(int nMsg, MsgArg* pArgs, MsgArg* pResult);    // the menus (FE_MessageTable.c)
