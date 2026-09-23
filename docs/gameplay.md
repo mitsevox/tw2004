@@ -539,6 +539,38 @@ to about 0.4 degree off with a perfectly straight stick, and a short stroke more
 2.5 in at 30 ft; the cup is about 1.9 in in radius. A CPU or a lucky "perfect" shot gets no
 wobble.
 
+Putt power and club distances (`Ball.c`, in C)
+---------------------------------------------
+
+**Putts** (`fn_80050D34`, distance -> power; used by the CPU and by your putt meter). A table of
+23 distances at power 0, 0.05, 0.10 .. 1.10 (`gPuttDist`), times a **green-speed scale**
+(`gPuttSpeedScale[setting]`: 0.606, 0.65, **1.0**, 1.3, 1.82 for settings 0..4; default 2),
+interpolated. On a medium green the table is almost exactly **distance = 43.4 yd x power^2**:
+a full-power putt rolls 43 yd (130 ft); the maximum, 1.1, rolls 52 yd. Your putt's power is the
+meter fraction times this function's answer for the distance to your aim marker, so 100% on the
+meter rolls exactly to the marker (over 75% on the meter counts as 100%).
+
+Because roll grows with the *square* of power, **the CPU's +5% putt pace (above) is +10% of
+distance**: a putt planned to die at the hole would finish about 10% of its length past it.
+
+**Full shots, chips and the rest** (`fn_80050DE4` picks the table, `fn_80050F88` interpolates):
+seven tables, one per shot kind 1..7, of 25 clubs x 11 distances at power 0.0, 0.1 .. 1.0
+(`gClubRows1..7`). The tenth column (power 0.9) is the club's "reach" that `AI_PowerScale`
+divides a golfer's own distance by. Some rows, in yards at power 0.5 / 0.9 / 1.0:
+
+    kind            club 0         club 10        club 22
+    1 full swing    184 310 334    131 219 236    50 100 112
+    2 chip          -              -              14  30  34   (clubs 13..24 only)
+    3 pitch          86 163 180     46  94 106     7  18  21
+    4               137 210 230    104 198 220    39  82  93
+    5                31  66  74     31  66  74    12  30  35
+    6                70 136 153     68 133 147    21  50  57
+    7                36  77  86     25  55  62     2   5   6
+
+`fn_80050F88` also adds the difference between the table's reference surface (45; 14 for chips)
+and the surface under the ball (`SurfaceType +0x00`), so the lie changes the power a distance
+needs.
+
 CPU putts are hit 5% firm (`Swing_ComputePower`)
 -----------------------------------------------
 

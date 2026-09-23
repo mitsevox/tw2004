@@ -41,7 +41,11 @@ typedef struct Ball {
     u8   b9A;                   // 0x9A
     u8   b9B;                   // 0x9B
     u8   unk9C;                 // 0x9C
-    u8   unk9D[0xBC - 0x9D];
+    u8   unk9D[0xAC - 0x9D];
+    f32  fAC;                   // 0xAC
+    u8   unkB0[4];
+    f32  fB4;                   // 0xB4
+    f32  fB8;                   // 0xB8
 } Ball;
 
 void   Vec3Copy(f32* pSrc, f32* pDst);           // 0x80008304
@@ -62,7 +66,25 @@ f32    fn_8004D620(CourseInfo* pCourse, f32* pPos);   // ground height, -60000 a
 f32    fn_8004D5C0(CourseInfo* pCourse, f32* pPos);   // the same from another source
 u8     fn_8004C798(s32 nSurface);
 void   fn_8004C590(CourseInfo* pCourse, Ball* pBall, int a, u8* pA, u8* pB, int b);
-u8     fn_80050DE4(int nKind, int nClub, int a, u8** ppOut, int b);
+// One club's distances for a shot kind: power 0.0, 0.1 .. 1.0 (fDist[9], "the reach", is what
+// AI_PowerScale divides by).
+typedef struct ClubRow {
+    f32  fDist[11];
+} ClubRow;
+
+u8     fn_80050DE4(int nKind, int nClub, int a, ClubRow** ppRow, s32* pSurface);
+f32    fn_8004D890(CourseInfo* pCourse, Ball* pBall, SurfaceType** ppSurface, f32* pNormal);   // ground height, surface and normal
+void   fn_8001EF34(f32* pIn, f32 f, f32* pOut);   // scale a vector
+u8     fn_800512BC(Ball* pBall, int nClub, int nKind, f32 fPower, f32 fAim, int nTrajectory, f32* pA, f32* pB, f32* pVel, f32* pSpin);
+extern f32     gPuttDist[23];                    // 0x80181604  putt distance at power 0, 0.05 .. 1.1
+extern f32     gPuttSpeedScale[5];               // 0x80181660  x by the green-speed setting
+extern ClubRow gClubRows1[25];                   // 0x80181674  full swing
+extern ClubRow gClubRows2[25];                   // 0x80181AC0  chip (wedges and putter only)
+extern ClubRow gClubRows3[25];                   // 0x80181F0C
+extern ClubRow gClubRows4[25];                   // 0x80182358
+extern ClubRow gClubRows5[25];                   // 0x801827A4
+extern ClubRow gClubRows6[25];                   // 0x80182BF0
+extern ClubRow gClubRows7[25];                   // 0x8018303C
 int    Game_GetCourse(void);                     // 0x80008830
 int    Hole_WindDir(void);
 f32    Hole_WindSpeed(void);
@@ -83,7 +105,7 @@ extern u8  lbl_80281DD1;
 extern u8  lbl_80281DD2;
 extern s32 lbl_80281DD4;                         // course setting (options +0x18), 0..2
 extern s32 lbl_80281DD8;                         // course setting, 0..2
-extern s32 lbl_80281130;                         // course setting, 0..4, default 2
+extern s32 lbl_80281130;                         // green speed, 0..4, default 2 (gPuttSpeedScale)
 extern s32 lbl_80281134;                         // course setting (options +0x1C), 0..2, default 1
 extern u8  lbl_80281DE4;
 extern f32 gWindSpeed;                           // 0x80281DE8
@@ -127,13 +149,95 @@ void fn_80050D2C(u8 b) {
     lbl_80281DD1 = b;
 }
 
+// Putt power for a distance: the putt table (22 steps of 0.05 power, distance ~ 43.4 x power
+// squared on a medium green) scaled by the green-speed setting, interpolated; 1.1 beyond it.
+f32 fn_80050D34(f32 fDist) {
+    f32 fScale = gPuttSpeedScale[lbl_80281130];
+    int i;
+    for (i = 1; i < 23; i++) {
+        f32 fHi = fScale * gPuttDist[i];
+        if (fDist <= fHi) {
+            f32 fLo = fScale * gPuttDist[i - 1];
+            return 0.05f * ((fDist - fLo) / (fHi - fLo)) + 0.05f * (i - 1);
+        }
+    }
+    return 1.1f;
+}
+
+
+// A club's distance row for a shot kind (1..7, clubs 0..24): the row, and the surface the
+// table assumes (45; 14 for the chip table). 0 for a putt or a bad club.
+u8 fn_80050DE4(int nKind, int nClub, int a, ClubRow** ppRow, s32* pSurface) {
+    if (nClub < 0 || nClub >= 25) return 0;
+    switch (nKind) {
+    case 1:
+        *ppRow = &gClubRows1[nClub];
+        if (pSurface != NULL) *pSurface = 45;
+        break;
+    case 2:
+        *ppRow = &gClubRows2[nClub];
+        if (pSurface != NULL) *pSurface = 14;
+        break;
+    case 3:
+        *ppRow = &gClubRows3[nClub];
+        if (pSurface != NULL) *pSurface = 45;
+        break;
+    case 4:
+        *ppRow = &gClubRows4[nClub];
+        if (pSurface != NULL) *pSurface = 45;
+        break;
+    case 5:
+        *ppRow = &gClubRows5[nClub];
+        if (pSurface != NULL) *pSurface = 45;
+        break;
+    case 6:
+        *ppRow = &gClubRows6[nClub];
+        if (pSurface != NULL) *pSurface = 45;
+        break;
+    case 7:
+        *ppRow = &gClubRows7[nClub];
+        if (pSurface != NULL) *pSurface = 45;
+        break;
+    default:
+        return 0;
+    }
+    return 1;
+}
+
 // A club's reach for a shot kind (the table entry's +0x24), 1 if there is none.
 f32 fn_80050F44(int nKind, int nClub) {
-    u8* pEntry;
-    if (fn_80050DE4(nKind, nClub, 0, &pEntry, 0)) {
-        return *(f32*)(pEntry + 0x24);
+    ClubRow* pRow;
+    if (fn_80050DE4(nKind, nClub, 0, &pRow, NULL)) {
+        return pRow->fDist[9];
     }
     return 1.0f;
+}
+
+// Power for a distance with a club: the row's 11 distances are power 0.0 to 1.0, interpolated,
+// plus the difference between the table's surface and the one under the ball (a surface that
+// is not a stopping surface counts as 14); 1.1 beyond the row.
+f32 fn_80050F88(f32 fDist, u8* p, int nKind, int nClub) {
+    Ball*        pBall = (Ball*)p;
+    s32          nSurface;
+    SurfaceType* pSurface;
+    ClubRow*     pRow;
+    f32          vNormal[4];
+    f32          fBase, fAdj, fFrac;
+    int          i;
+    if (pBall == NULL) return 0.0f;
+    if (!fn_80050DE4(nKind, nClub, 0, &pRow, &nSurface)) return 1.0f;
+    fBase = gSurfaceTypes[nSurface].f00;
+    if (fn_8004D890(pBall->pCourse, pBall, &pSurface, vNormal) < -60000.0f || 0.375f != pSurface->f1C) {
+        pSurface = &gSurfaceTypes[14];
+    }
+    fAdj = fBase - pSurface->f00;
+    for (i = 1; i < 12; i++) {
+        if (fDist <= pRow->fDist[i]) {
+            fFrac = (fDist - pRow->fDist[i - 1]) / (pRow->fDist[i] - pRow->fDist[i - 1]);
+            return 0.1f * fFrac + 0.1f * (i - 1) + fAdj;
+        }
+    }
+    return 1.1f;
 }
 
 // The ball's f70 plus its surface's first value; 1 without a ball or a surface.
@@ -192,6 +296,68 @@ f32 fn_800511F0(Ball* pBall, f32 fAim, f32* pNormal) {
     if (fAngle < -0.76794487f) return -0.76794487f;
     if (fAngle > 0.76794487f) return 0.76794487f;
     return fAngle;
+}
+
+// Launch the ball from a point along a direction at a speed (x 0.489): in the air, no spin.
+void fn_80051A18(Ball* pBall, f32* pDir, f32 fSpeed, f32* pFrom) {
+    pBall->nState = 2;
+    Vec_Copy(pFrom, pBall->vStart);
+    Vec_Copy(pFrom, pBall->vPos);
+    Vec_Copy(pFrom, pBall->vPrev);
+    fn_8001EF34(pDir, 0.48888889f * fSpeed, pBall->vVel);
+    pBall->vSpin[0] = 0.0f;
+    pBall->vSpin[1] = 0.0f;
+    pBall->vSpin[2] = 0.0f;
+    pBall->f3C      = 0.0f;
+    pBall->fAC      = 0.0f;
+    pBall->fB4      = 0.0f;
+    pBall->fB8      = 0.0f;
+    pBall->fSpinY   = 0.0f;
+    pBall->fSpinX   = 0.0f;
+    pBall->n84      = 0;
+    pBall->n80      = 0;
+    pBall->unk9C    = 0;
+    pBall->b99      = 1;
+    pBall->b9B      = 1;
+    pBall->b9A      = 1;
+}
+
+// Strike the ball: fn_800512BC turns club, kind, power, aim, trajectory and the two launch
+// blocks into its velocity and spin (failing that it is a hazard). A putt (kind 0, or the
+// putter) starts rolling (state 3), anything else is in the air (state 2). Event 10.
+void Ball_Launch(Ball* pBall, int nClub, int nKind, f32 fPower, f32 fAim, int nTrajectory, f32* pA, f32* pB) {
+    Vec_Copy(pBall->vPos, pBall->vStart);
+    pBall->fAC    = 0.0f;
+    pBall->fB4    = 0.0f;
+    pBall->fB8    = 0.0f;
+    pBall->fSpinY = 0.0f;
+    pBall->fSpinX = 0.0f;
+    pBall->n84    = 0;
+    pBall->n80    = 0;
+    pBall->unk9C  = 0;
+    if (!fn_800512BC(pBall, nClub, nKind, fPower, fAim, nTrajectory, pA, pB, pBall->vVel, pBall->vSpin)) {
+        fn_80050CAC(pBall, 1);
+        return;
+    }
+    if (nKind == SHOT_PUTT || nClub == CLUB_PUTTER) {
+        pBall->b99    = 1;
+        pBall->b9B    = 1;
+        pBall->b9A    = 1;
+        pBall->nState = 3;
+    } else {
+        pBall->b99    = 0;
+        pBall->b9B    = 0;
+        pBall->b9A    = 0;
+        pBall->nState = 2;
+    }
+    pBall->f70 = 0.0f;
+    if (pBall->nPlayer >= 0 && pBall->nPlayer <= 3) {
+        Vec3Copy(pBall->vPos, lbl_801D5888[pBall->nPlayer]);
+        Vec3Copy(pBall->vPos, lbl_801D58C8[pBall->nPlayer]);
+    }
+    if (pBall->nPlayer >= 0) {
+        fn_80067074(pBall->nPlayer, 10, (int)pBall, !gSimulating);
+    }
 }
 
 // The spin stick's input: each axis must be within -1..1; stored x 15.

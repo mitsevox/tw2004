@@ -136,13 +136,18 @@ Dated log of what was done and decided, newest last. Facts and lessons belong in
   `&gPlayers[n]` in a register where the original folds the state read into `lwzu` and recomputes
   the base each time. Pointer local, value local and nested-if variants and 24 declaration orders
   did not change it. New fields: `Game.pfn238`, `View.fCamTime` (0x104), `ShotObj.fAnimEnd` (0x184).
-- **`Ball.c` checkpoint 1: the small functions (46 of 68 exact).** Wind (`Wind_Get`/`Set`/
+- **`Ball.c` checkpoint 1: the small functions (47 of 68 exact).** Wind (`Wind_Get`/`Set`/
   `Generate`, `gWindDirs` named), four course settings with their setters and getters (two
   come from options +0x18/+0x1C and are nudged on courses 6 and 15), the stance slope angles
   (+-44 degrees), spin input (x 15), ball reset / place / drop, `Ball_Stop`, the 20 ms stepper,
   `Ball_SimSeconds`, and the paired-single vector helpers. `Ball` struct filled in to 0x9C.
-- **Next:** `Ball.c` checkpoint 2 (putt power curve `fn_80050D34`, club table `fn_80050DE4`,
-  `fn_80050F88`, `Ball_Launch`, `fn_80051A18`); then the physics core; optional register polish in `skalib.c`
+- **`Ball.c` checkpoint 2 (50 of 68 exact).** Putt power curve (`gPuttDist`, `gPuttSpeedScale`:
+  distance = 43.4 yd x power^2 on a medium green, so the CPU's +5% putt pace is +10% of roll),
+  the club distance tables (`gClubRows1..7`, `ClubRow`), chip power, `fn_80051A18`, `Ball_Launch`.
+  The two interpolations are at 86% / 89% (the int-to-float term's register and schedule).
+  `lbl_80281130` is the green speed.
+- **Next:** `Ball.c` checkpoint 3 = `fn_800512BC` (launch physics, 500 instructions); then the
+  flight / tick / ground / collision core; optional register polish in `skalib.c`
   (`AnimLib_MergeOverlay`, `AnimLib_PlanBank`, `AnimLib_WalkPair`). Scratch tools in `C:\dev\scratch\tw\`:
   `sbs2.py` (normalised diff), `fnsrc.py`, `regress.py` (who lost 100%), `insert_fns.py` (add
   functions at address positions), `unwritten.py`, `find_fn.py` (search asm by regexes),
