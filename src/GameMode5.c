@@ -11,10 +11,16 @@ typedef struct Challenge {
     s32 nC;
     s32 nCourse;                // 0x10
     s32 nType;                  // 0x14  0 one hole, 1 all 18, 2/3 a nine, 4/5/6 the par 5s/4s/3s
-    u8  unk18[0x28 - 0x18];
+    s32 nHole;                  // 0x18  1-based
+    u8  unk1C[0x28 - 0x1C];
     s32 n28;                    // 0x28
     s32 n2C[3];                 // 0x2C
-    u8  unk38[0x64 - 0x38];
+    u8  unk38[0x3C - 0x38];
+    s32 nTargetKind;            // 0x3C  how the target is built (see fn_800ED028)
+    s32 nTargetBase;            // 0x40
+    s32 nHoleKind;              // 0x44  what the challenge hole adds
+    s32 nHoleExtra;             // 0x48
+    u8  unk4C[0x64 - 0x4C];
     s32 n64;                    // 0x64
     u8  unk68[0x70 - 0x68];
     s32 n70;                    // 0x70
@@ -74,6 +80,18 @@ void  fn_800EBD28(void);
 void  fn_800EC1E0(void);
 void  fn_800ED604(int nPlayer);
 void  fn_800EAF18(void* pObj);
+extern u8  (*lbl_80282320)(void);
+extern s32 lbl_80282300;
+extern s32 lbl_80282304;
+extern s32 lbl_80282308;
+extern s32 lbl_8028230C;
+int   fn_800D2AD8(int nHole);               // a hole's par
+int   fn_800D2ABC(int nCourse, int nHole);  // a hole's par on a course
+void  fn_800E1260(int nPreset);
+void  fn_800E0B38(int nMode);
+void  fn_800F07C8(void);
+u8    fn_800E4BF8(void);
+int   Game_CurHoleIndex(void);
 void fn_800EC544(Challenge* p0, s32 p1);
 extern u8 lbl_802822FC;
 u8 fn_800EC550(void);
@@ -346,4 +364,115 @@ s32 fn_800ED69C(int i, int k) {
         return lbl_80281664[i].n2C[1];
     }
     return lbl_80281664[i].n2C[2];
+}
+
+// The round ends: the round's totals are added up; then the next challenge in the group starts
+// (unless only checking), or the group is over (1).
+u8 fn_800EBD60(u8 bCheck) {
+    int h;
+    int nStrokes;
+    int i;
+    if (lbl_802822FE) {
+        return 0;
+    }
+    if (lbl_80282320()) {
+        nStrokes = 0;
+        for (h = 0; h < 18; h++) {
+            if (gpGame->bHoleSelected[h]) {
+                nStrokes += gPlayers[0].nStrokes[h];
+                lbl_80282308 += fn_800D2AD8(h);
+                lbl_80282304++;
+                lbl_80282300 += gPlayers[0].n290[h];
+            }
+        }
+        lbl_8028230C += nStrokes;
+        fn_800E1260(0);
+        for (i = lbl_802822F4 + 1; i < lbl_80281668; i++) {
+            if (lbl_80281664[i].nGroup == lbl_80281664[lbl_802822F4].nGroup) {
+                if (bCheck) {
+                    return 0;
+                }
+                lbl_802822F4 = i;
+                if (fn_800F0818()) {
+                    fn_800E0B38(24);
+                    fn_800F07C8();
+                } else {
+                    fn_800E0B38(5);
+                    fn_800EAF7C();
+                }
+                gpGame->b134 = 1;
+                return 0;
+            }
+        }
+        return 1;
+    }
+    return 0;
+}
+
+// A challenge's target score (in mode 0 only): a fixed number (1); par for the holes before the
+// challenge hole plus a number (2); birdie (3), par (4) or bogey (5) on each of them; or the
+// opponent's strokes so far (7); then the challenge hole adds a number (1), par plus a number (2),
+// birdie (3), par (4) or bogey (5).
+int fn_800ED028(int i) {
+    int nTarget = 0;
+    int nHole = lbl_80281664[i].nHole - 1;
+    int k;               // a loop counter, and in case 7 the current hole once it is over
+    int h;
+    if (Game_GetMode() == 0) {
+        switch (lbl_80281664[i].nTargetKind) {
+        case 1:
+            nTarget = lbl_80281664[i].nTargetBase;
+            break;
+        case 2:
+            for (k = 0; k < nHole; k++) {
+                nTarget += fn_800D2ABC(lbl_80281664[i].nCourse, k);
+            }
+            nTarget += lbl_80281664[i].nTargetBase;
+            break;
+        case 3:
+            for (h = 0; h < nHole; h++) {
+                nTarget += fn_800D2ABC(lbl_80281664[i].nCourse, h) - 1;
+            }
+            break;
+        case 4:
+            for (h = 0; h < nHole; h++) {
+                nTarget += fn_800D2ABC(lbl_80281664[i].nCourse, h);
+            }
+            break;
+        case 5:
+            for (h = 0; h < nHole; h++) {
+                nTarget += fn_800D2ABC(lbl_80281664[i].nCourse, h) + 1;
+            }
+            break;
+        case 7:
+            k = 0;
+            if (fn_800E4BF8()) {
+                k = 1;
+            }
+            for (h = 0; h < k + Game_CurHoleIndex(); h++) {
+                if (gpGame->bHoleSelected[h]) {
+                    nTarget += gPlayers[1].nStrokes[h];
+                }
+            }
+            break;
+        }
+        switch (lbl_80281664[i].nHoleKind) {
+        case 1:
+            nTarget += lbl_80281664[i].nHoleExtra;
+            break;
+        case 2:
+            nTarget += fn_800D2ABC(lbl_80281664[i].nCourse, nHole) + lbl_80281664[i].nHoleExtra;
+            break;
+        case 3:
+            nTarget += fn_800D2ABC(lbl_80281664[i].nCourse, nHole) - 1;
+            break;
+        case 4:
+            nTarget += fn_800D2ABC(lbl_80281664[i].nCourse, nHole);
+            break;
+        case 5:
+            nTarget += fn_800D2ABC(lbl_80281664[i].nCourse, nHole) + 1;
+            break;
+        }
+    }
+    return nTarget;
 }
