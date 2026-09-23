@@ -4771,6 +4771,7 @@ dolphin/os/OSReboot.c:
 
 dolphin/os/OSReset.c:
 	.text       start:0x8014B8F0 end:0x8014BCD4
+	.sbss       start:0x80282920 end:0x80282928
 
 dolphin/os/OSResetSW.c:
 	.text       start:0x8014BCD4 end:0x8014C060
