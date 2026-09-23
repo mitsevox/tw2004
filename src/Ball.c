@@ -14,7 +14,6 @@
 #define CUP_DIAMETER 0.10717f       // 3.86 in (a real cup is 4.25)
 
 void   Vec3Copy(f32* pSrc, f32* pDst);           // 0x80008304
-f32    Vec_Distance(f32* pA, f32* pB);           // 0x800BB050
 f32    fn_8000AD78(f32 y, f32 x);                // atan2f
 void   Ball_Stop(Ball* pBall);                   // 0x80054340
 void   fn_8000AE28(f32* pIn, f32 f, f32* pOut);  // scale a vector
@@ -22,8 +21,6 @@ void   Ball_SetLie(Ball* pBall, SurfaceType* pSurface);
 void   Ball_Tick(Ball* pBall, f32 fTicks);
 void   Physics_FixBallHeight(Ball* pBall, u8 bSettle, f32 fTicks);
 SurfaceType* Ter_GetSupportingWorldMaterial(CourseInfo* pCourse, Ball* pBall);   // the surface under a point
-f32    fn_8004D620(CourseInfo* pCourse, f32* pPos);   // ground height, -60000 and below if none
-f32    fn_8004D5C0(CourseInfo* pCourse, f32* pPos);   // the same from another source
 u8     Ter_IsValidDropSurface(s32 nSurface);
 void   Ter_CheckForDropLocation(CourseInfo* pCourse, Ball* pBall, int a, u8* pA, u8* pB, int b);
 // One club's distances for a shot kind: power 0.1, 0.2 .. 1.1 (fDist[9], full power, is "the
@@ -61,7 +58,6 @@ extern f32 gFairwaySpeedMul[3];                  // 0x801834A8  by gFairwaySetti
 extern f32 gRoughMul[3];                         // 0x801834B4  by options +0x1C: 1.3 1.0 0.7 (class 5)
 void   PsBallFx_TriggerTrail(Ball* pBall, int nPlayer);    // rolling sound / effect
 void   Ball_CupPull(Ball* pBall, f32 fDt);
-void   fn_800BAF04(f32* pSrc, f32* pDst);        // normalise
 f32    fn_8000C5FC(f32* pA, f32* pB);            // dot product
 void   fn_8000C5D4(f32* pA, f32* pB, f32 f, f32* pOut);   // a + f x b
 void   vec4flt_CrossProduct(f32* pA, f32* pB, f32* pOut); // cross product
@@ -99,7 +95,6 @@ u8     Ter_CheckForPinCollision(CourseInfo* pCourse, int nPlayer, f32* pFrom, f3
 u8     fn_8004E558(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal, SurfaceType** ppSurface, s32* pWhat, u8* pOut);
 u8     fn_8004EE20(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal, SurfaceType** ppSurface, s32* pWhat);
 void   fn_800B1AB0(u8* pObj, f32* pPos, f32* pRadius);   // the flagstick's position and radius
-int    Golfer_GetAttribute(Player* pPlayer, int nAttr, int nMode);
 u8     Ball_Collide(Ball* pBall, f32 fTicks);
 void   Ball_GroundContact(Ball* pBall, f32 fTicks);
 void   fn_80052268(Ball* pBall, f32 fTicks);

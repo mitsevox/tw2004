@@ -6,9 +6,6 @@
 #include "game.h"
 #include "engine.h"
 
-void  fn_800E4D88(void);
-void  fn_800E3EE0(void);
-u8*   fn_800136C4(int nController);         // the pad's state: stick bytes at +0, +2, +3
 s32   fn_800FF894(int nPlayer);
 s32   fn_800FFDB0(void);
 extern u8 gNumPlayersSetUp;                 // 0x80281D48 (Golfer.c)

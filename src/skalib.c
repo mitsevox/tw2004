@@ -5,8 +5,6 @@
 #include "game.h"
 #include "engine.h"
 
-int   strcmp(const char* pA, const char* pB);
-
 // An animation library (a SAL object: glbchar.gcb holds the shared male/female ones, and each
 // character's CHR object embeds its own). On disc it is little-endian; the loader swaps it and
 // fills in the pointers. Clips are found through a tree of s16 byte offsets into pTree:
@@ -96,7 +94,6 @@ int   Skalib_HasOverlays(int nSlot);
 u8    fn_800C9828(int nGroup, int nStyle, int nClub, int nKey);
 void  AnimLib_FreeCopies(void);
 void  ClipBank_FreeAram(void);
-int   strcmp(const char* pA, const char* pB);
 
 // A library that can be layered over a slot's own (0x20 bytes).
 typedef struct LibOverlay {

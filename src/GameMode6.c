@@ -8,10 +8,7 @@ extern u8  lbl_8028227C;
 extern s32 lbl_802823D0;
 extern s32 lbl_802823D4;
 
-u8    fn_800F9C00(int nPlayer, int a);
-void  fn_800F9C48(void);
 u8    fn_800F9D00(int a);
-void  fn_800F9E00(void);
 s32   fn_800F9F04(void);
 
 void fn_800F944C(void) {

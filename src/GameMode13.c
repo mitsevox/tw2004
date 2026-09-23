@@ -35,10 +35,6 @@ extern s32 lbl_802823B8;                    // the seconds added by the last sho
 extern s32 lbl_802823BC;                    // the points of the last shot
 
 void  fn_800A624C(void);
-void  fn_800ED710(s32 p0);
-void  fn_800F21B4(int nPlayer);
-s32   fn_800F266C(s32 n, int i);
-s32   fn_800F2810(s32 n);
 
 void  fn_800F6CC4(void);
 void  fn_800F6CE0(void);
@@ -65,7 +61,6 @@ void  fn_800F7FF4(int nPlayer, int nId);
 s32   fn_800F8068(int nPlayer, int i);
 s32   fn_800F80A0(void);
 void  fn_800F80A8(void);
-void  fn_800F80D4(s32 p0);
 
 // Mode 13 starts: one player at a time, no wind, no gimmes, one mulligan.
 void fn_800F6A60(void) {

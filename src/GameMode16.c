@@ -32,9 +32,6 @@ extern s32 lbl_80282390;
 extern s32 lbl_80282394;                    // the points multiplier from bonuses
 extern s32 lbl_80282398;                    // the points of the last shot
 
-void  fn_800F21B4(int nPlayer);
-s32   fn_800F2810(s32 n);
-
 void  fn_800F4D6C(void);
 void  fn_800F4D88(void);
 s32   fn_800F4DB4(void);

@@ -49,9 +49,20 @@ typedef struct Ball {
     f32  fTimeSinceLastCheck;   // 0xB8  time since the last stall check. TW06: same name
 } Ball;
 
+// Terrain
+u8   Ter_PointInOOBNetwork(u8* pBall);
+f32  fn_8004D5C0(CourseInfo* pCourse, f32* pPos);   // ground height, -65536.1 if none
+f32  fn_8004D620(CourseInfo* pCourse, f32* pPos);   // ground height, -60000 and below if none
+void Ter_GetEnclosingGroundHeight(CourseInfo* pCourse, f32* pPos, f32* pLow, f32* pHigh);
+
+// Ball.c
 void Ball_SetSimulating(u8 bOn);        // rehearsals and look-aheads: no sounds, effects or tree roll
 u8   Physics_DropBall(Ball* pBall, f32* pPos);          // put the ball on the ground at a point
 u8   fn_80055AA8(Ball* pBall, f32* pPos, int nPlayer);  // a fresh ball for a player at a point
-void Ter_GetEnclosingGroundHeight(CourseInfo* pCourse, f32* pPos, f32* pLow, f32* pHigh);
+void fn_80055C40(int n);
+void fn_80055CAC(int n);
+void fn_80055CD0(int n);
+void Wind_Set(int nDir, f32 fSpeed);
+void Wind_Generate(void);
 
 #endif
