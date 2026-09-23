@@ -99,12 +99,41 @@ typedef struct CamSequence {
 } CamSequence;
 LAYOUT_ASSERT(CamSequence, 0x50);
 
-// A view's camera script (0x40 bytes at View + 0x84).
+// A view's camera script (0xD0 bytes at View + 0x84): the shot the camera plays, the one after it,
+// and the move it makes between them. The camera script functions (gocamscripts.c) and
+// DynamicCam_GetLocation take it as pScript; every caller passes &pView->script.
 typedef struct CamScript {
     f32  v0[4];                 // 0x00  camera 4 puts the ball here
     f32  v10[4];                // 0x10  and the pin here
     f32  a20[8];                // 0x20  cleared with the rest by fn_80062E40
+    f32  v40[4];                // 0x40  the move's vector (fn_80063B98, fn_80063BF4, fn_80063CBC)
+    f32  v50[4];                // 0x50  the ball-flight camera: where the shot should land (the aim, at
+                                //       the club's full distance)
+    u8   unk60[0x70 - 0x60];
+    f32  v70[4];                // 0x70  (0, 0, 0, 1) when the view is set up (fn_80062E40)
+    f32  fCamTime;              // 0x80  time on this camera
+    u8   unk84[0x8C - 0x84];
+    f32  f8C;                   // 0x8C  how long the next shot lasts (its f48; fn_8006351C)
+    f32  f90;                   // 0x90  } the move's time so far and its length: fn_80063B98 sets
+    f32  f94;                   // 0x94  } 0 and its time
+    f32  f98;                   // 0x98
+    u8   unk9C[0xA0 - 0x9C];
+    f32  fA0;                   // 0xA0
+    f32  fA4;                   // 0xA4
+    u8   unkA8[0xAC - 0xA8];
+    CamShot* pShot;             // 0xAC  the current shot
+    CamShot* pNextShot;         // 0xB0  the next one (the current shot's p40; fn_8006351C)
+    CamShot* pB4;               // 0xB4  where SwitchCrAPCamera records the current camera
+    CamShot* pB8;               // 0xB8  the shot before (GolfCamera_CutToGolferDoneAnimatingCam)
+    s32  nBC;                   // 0xBC  the next shot's kind (its bAB; fn_8006351C)
+    s32  nCamera;               // 0xC0  the move's kind (1..5; fn_8003F2E0 switches on it)
+    s32  nC4;                   // 0xC4  the shot kind asked for
+    s32  nC8;                   // 0xC8  the shot kind last started
+    u8   bCC;                   // 0xCC
+    u8   unkCD[0xCF - 0xCD];
+    u8   bCF;                   // 0xCF
 } CamScript;
+LAYOUT_ASSERT(CamScript, 0xD0);
 
 // A view's camera controller (View_SetCamera is TW06's CameraController_SetCameraMode): the
 // camera mode, its shots and script. It sits at +4 in a ViewController; only the fields read so far.
@@ -129,32 +158,6 @@ typedef struct View {
     CamSequence* p7C;           // 0x07C  the swing camera's sequence, kept for the replay
     CamShot* p80;               // 0x080
     CamScript script;           // 0x084  the camera script the camera functions drive
-    f32      vC4[4];            // 0x0C4
-    f32      vD4[4];            // 0x0D4  the ball-flight camera: where the shot should land (the aim, at
-                                //        the club's full distance)
-    u8       unkE4[0xF4 - 0xE4];
-    f32      vF4[4];            // 0x0F4  (0, 0, 0, 1) when the view is set up (fn_80062E40)
-    f32      fCamTime;          // 0x104  time on this camera
-    u8       unk108[0x110 - 0x108];
-    f32      f110;              // 0x110
-    f32      f114;              // 0x114
-    f32      f118;              // 0x118
-    f32      f11C;              // 0x11C
-    u8       unk120[0x124 - 0x120];
-    f32      f124;              // 0x124
-    f32      f128;              // 0x128
-    u8       unk12C[4];
-    CamShot* p130;              // 0x130  the current shot
-    CamShot* p134;              // 0x134  the next one
-    CamShot* p138;              // 0x138  where SwitchCrAPCamera records the current camera
-    CamShot* p13C;              // 0x13C  the shot before (GolfCamera_CutToGolferDoneAnimatingCam)
-    s32      n140;              // 0x140
-    s32      nCamera;           // 0x144
-    s32      n148;              // 0x148  the shot kind asked for
-    s32      n14C;              // 0x14C  the shot kind last started
-    u8       b150;              // 0x150
-    u8       unk151[2];
-    u8       b153;              // 0x153
     s32      n154;              // 0x154
     u8       unk158[4];
     f32      f15C;              // 0x15C  camera 8: the ground height it follows
@@ -503,7 +506,7 @@ void   fn_80063BF4(View* pView, f32 f, f32* pVec);
 u8     fn_80063C50(View* pView);
 u8     fn_80063C7C(View* pView);
 u8     fn_80063C90(View* pView);        // the camera is still moving
-void   fn_80063CBC(View* pView, f32* pVec);   // nCamera 3, the vector into vC4
+void   fn_80063CBC(View* pView, f32* pVec);   // script.nCamera 3, the vector into script.v40
 void   fn_80063CF0(View* pView, int nCamera, int nPlayer);
 void   fn_800642D0(View* pView, int nPlayer);
 u8     fn_800642B0(void);               // fn_800C6CB0's answer (gomainloop tests it)

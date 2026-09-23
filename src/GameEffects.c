@@ -376,7 +376,7 @@ void fn_800DBA50(int nPlayer) {
             pView = fn_80017028(gPlayers[nPlayer].nView[0]);
             pSeq = fn_8003BDBC(nPlayer, nLie, nClass, 0xB, 1, fDist);
             pShot = fn_8003A950(pSeq, 0, &nKind, &fTime, &f2, &nB, &f3, nPlayer);
-            if (pShot != NULL && pView->p130 != pShot && pView->p134 != pShot &&
+            if (pShot != NULL && pView->script.pShot != pShot && pView->script.pNextShot != pShot &&
                 !fn_800451A8(&pView->script, pShot, nPlayer)) {
                 if (nKind == 5 && fn_8003DC78(pShot)) {
                     if (gPlayers[nPlayer].nShotKind != SHOT_TYPE_PUTT_e &&
@@ -388,8 +388,8 @@ void fn_800DBA50(int nPlayer) {
                     }
                 }
                 pView->p74 = pSeq;
-                pView->n148 = 0;
-                pView->n14C = 25;
+                pView->script.nC4 = 0;
+                pView->script.nC8 = 25;
             }
             EVENT_Trigger(nPlayer, 0x3F, 0, -1);
         }
