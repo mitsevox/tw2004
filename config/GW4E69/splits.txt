@@ -2442,6 +2442,10 @@ unsorted/sweep_800AF31C.c:
 
 startUp.c:
 	.text       start:0x800AF324 end:0x800B1A40
+	.data       start:0x8018FE98 end:0x8018FF68
+	.sdata      start:0x80281498 end:0x802814A8
+	.sbss       start:0x802820E8 end:0x80282158
+	.sdata2     start:0x80284070 end:0x802840B0
 
 unsorted/sweep_800B1A88.c:
 	.text       start:0x800B1A88 end:0x800B1A9C
@@ -2831,6 +2835,10 @@ GameMode9.c:
 
 GameModeDriverPGATour.c:
 	.text       start:0x800EDD18 end:0x800F0448
+	.data       start:0x801926A8 end:0x80192810
+	.bss        start:0x80205ED8 end:0x8020CF90
+	.sdata      start:0x80281670 end:0x80281680
+	.sbss       start:0x80282338 end:0x80282348
 
 GameModeDriverRTE.c:
 	.text       start:0x800F0448 end:0x800F125C
