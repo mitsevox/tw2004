@@ -95,6 +95,23 @@ def ub_check(path, lines):
         out = subprocess.run([str(cc)] + CFLAGS + ['-c', str(path.resolve()), '-o', tmp + '/x.o'],
                              cwd=ROOT, capture_output=True, text=True)
     hits = []
+    # Calls with no prototype in scope: the compiler assumes `int` (a float result is then read as
+    # an int). -requireprotos also flags definitions without an earlier declaration; skip those.
+    with tempfile.TemporaryDirectory() as tmp:
+        rp = subprocess.run([str(cc)] + CFLAGS + ['-requireprotos', '-maxerrors', '1000', '-c',
+                            str(path.resolve()), '-o', tmp + '/x.o'], cwd=ROOT, capture_output=True, text=True)
+    seen = set()
+    for l in (rp.stdout + rp.stderr).splitlines():
+        m = re.match(r'(.*?):(\d+):(?: warning:)? function has no prototype', l)
+        if not m or pathlib.Path(m.group(1)).name != path.name:
+            continue
+        i = int(m.group(2))
+        src = lines[i - 1] if i <= len(lines) else ''
+        if i in seen or re.match(r'^[A-Za-z_][\w \*]*\b\w+\s*\([^;]*\)\s*\{?\s*$', src):
+            continue            # a definition, not a call
+        seen.add(i)
+        if 'fake match' not in src:
+            hits.append((i, 'ub-no-prototype', src.strip()))
     for l in (out.stdout + out.stderr).splitlines():
         m = re.match(r'(.*?):(\d+): warning: (.*)', l)
         if not m or pathlib.Path(m.group(1)).name != path.name:

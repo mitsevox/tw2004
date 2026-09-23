@@ -3453,41 +3453,8 @@ unsorted/sweep_800D3118.c:
 unsorted/sweep_800D3208.c:
 	.text       start:0x800D3208 end:0x800D3244
 
-unsorted/sweep_800D33F0.c:
-	.text       start:0x800D33F0 end:0x800D33F4
-
-unsorted/sweep_800D3424.c:
-	.text       start:0x800D3424 end:0x800D344C
-
-unsorted/sweep_800D344C.c:
-	.text       start:0x800D344C end:0x800D3478
-
-unsorted/sweep_800D4010.c:
-	.text       start:0x800D4010 end:0x800D4030
-
-unsorted/sweep_800D4EF8.c:
-	.text       start:0x800D4EF8 end:0x800D4F14
-
-unsorted/sweep_800D7660.c:
-	.text       start:0x800D7660 end:0x800D7684
-
-unsorted/sweep_800D7684.c:
-	.text       start:0x800D7684 end:0x800D76AC
-
-unsorted/sweep_800D86DC.c:
-	.text       start:0x800D86DC end:0x800D8720
-
-unsorted/sweep_800D8720.c:
-	.text       start:0x800D8720 end:0x800D8750
-
-unsorted/sweep_800D9954.c:
-	.text       start:0x800D9954 end:0x800D995C
-
-unsorted/sweep_800D995C.c:
-	.text       start:0x800D995C end:0x800D9998
-
-unsorted/sweep_800D9E00.c:
-	.text       start:0x800D9E00 end:0x800D9E14
+Earnings.c:
+	.text       start:0x800D3244 end:0x800D9E14
 
 unsorted/sweep_800DA174.c:
 	.text       start:0x800DA174 end:0x800DA1D4
@@ -3598,48 +3565,30 @@ GameMode7.c:
 
 GameMode8.c:
 	.text       start:0x800F986C end:0x800FE1B4
+	.sdata      start:0x802816B0 end:0x802816D0
+	.sdata2     start:0x80284708 end:0x802847A0
 
 GameModeStableford.c:
 	.text       start:0x800FE1B4 end:0x800FEAFC
+	.rodata     start:0x80184DE0 end:0x80184DF0
+	.sdata2     start:0x802847A0 end:0x802847A8
 
 GameMode12.c:
 	.text       start:0x800FEAFC end:0x800FF700
+	.data       start:0x80192D00 end:0x80192D1C
+	.sdata2     start:0x802847A8 end:0x802847E0
 
 GameModeStroke.c:
 	.text       start:0x800FF700 end:0x800FFF34
+	.sdata2     start:0x802847E0 end:0x802847E8
 
 GameMode11.c:
 	.text       start:0x800FFF34 end:0x80101FEC
+	.data       start:0x80192D20 end:0x80193130
+	.sdata2     start:0x802847E8 end:0x80284808
 
-unsorted/sweep_801020BC.c:
-	.text       start:0x801020BC end:0x801020C0
-
-unsorted/sweep_801020C0.c:
-	.text       start:0x801020C0 end:0x801020EC
-
-unsorted/sweep_80102134.c:
-	.text       start:0x80102134 end:0x8010217C
-
-unsorted/sweep_801021FC.c:
-	.text       start:0x801021FC end:0x80102204
-
-unsorted/sweep_80102308.c:
-	.text       start:0x80102308 end:0x80102310
-
-unsorted/sweep_80102354.c:
-	.text       start:0x80102354 end:0x8010237C
-
-unsorted/sweep_8010237C.c:
-	.text       start:0x8010237C end:0x801023A8
-
-unsorted/sweep_801025F4.c:
-	.text       start:0x801025F4 end:0x801025FC
-
-unsorted/sweep_80102A44.c:
-	.text       start:0x80102A44 end:0x80102A58
-
-unsorted/sweep_80102AC4.c:
-	.text       start:0x80102AC4 end:0x80102AC8
+GameMode4.c:
+	.text       start:0x80101FEC end:0x80102AC8
 
 unsorted/sweep_80103B4C.c:
 	.text       start:0x80103B4C end:0x80103B8C
@@ -4553,6 +4502,9 @@ src/vi/vi.c:
 
 dolphin/exi/EXIBios.c:
 	.text       start:0x8013042C end:0x80131D08
+	.data       start:0x80195B20 end:0x80195BF0
+	.bss        start:0x802611A0 end:0x80261260
+	.sdata      start:0x802819C8 end:0x802819D0
 
 dolphin/exi/EXIUart.c:
 	.text       start:0x80131D08 end:0x80131F78
@@ -4560,6 +4512,10 @@ dolphin/exi/EXIUart.c:
 
 dolphin/si/SIBios.c:
 	.text       start:0x80131F78 end:0x801337D8
+	.data       start:0x80195BF0 end:0x80195D08
+	.bss        start:0x80261260 end:0x80261460
+	.sdata      start:0x802819D0 end:0x802819D8
+	.sbss       start:0x80282628 end:0x80282638
 
 dolphin/si/SISamplingRate.c:
 	.text       start:0x801337D8 end:0x801338E0
@@ -4647,6 +4603,9 @@ dolphin/dsp/dsp_task.c:
 
 dolphin/dvd/dvdlow.c:
 	.text       start:0x8013A0D0 end:0x8013AF10
+	.bss        start:0x8027A4C0 end:0x8027A590
+	.sdata      start:0x80281A08 end:0x80281A10
+	.sbss       start:0x80282778 end:0x802827C0
 
 dolphin/dvd/dvdfs.c:
 	.text       start:0x8013AF10 end:0x8013B3C4
@@ -4746,6 +4705,7 @@ src/dolphin/os/OS.c:
 
 dolphin/os/OSAlarm.c:
 	.text       start:0x80148790 end:0x80148E40
+	.sbss       start:0x802828D8 end:0x802828E0
 
 src/os/OSAlloc.c:
 	.text       start:0x80148E40 end:0x80149150
@@ -4789,6 +4749,7 @@ dolphin/os/OSReboot.c:
 
 dolphin/os/OSReset.c:
 	.text       start:0x8014B8F0 end:0x8014BCD4
+	.sbss       start:0x80282920 end:0x80282928
 
 dolphin/os/OSResetSW.c:
 	.text       start:0x8014BCD4 end:0x8014C060
@@ -4796,6 +4757,7 @@ dolphin/os/OSResetSW.c:
 
 dolphin/os/OSRtc.c:
 	.text       start:0x8014C060 end:0x8014C8D4
+	.bss        start:0x8027CA20 end:0x8027CA78
 
 dolphin/os/OSSync.c:
 	.text       start:0x8014C9FC end:0x8014CA80
@@ -4805,9 +4767,14 @@ unsorted/sweep_8014CA80.c:
 
 src/dolphin/os/OSThread.c:
 	.text       start:0x8014CA84 end:0x8014E48C
+	.data       start:0x8019BAD0 end:0x8019C2E0
+	.bss        start:0x8027CA78 end:0x8027D470
+	.sdata      start:0x80281AD0 end:0x80281AD8
+	.sbss       start:0x80282948 end:0x80282958
 
 dolphin/os/OSTime.c:
 	.text       start:0x8014E48C end:0x8014E8B0
+	.data       start:0x8019C2E0 end:0x8019C340
 
 src/os/__ppc_eabi_init.c:
 	.text       start:0x8014E8B0 end:0x8014E944
@@ -4822,6 +4789,9 @@ src/dolphin/pad/Pad.c:
 
 dolphin/ai.c:
 	.text       start:0x80150658 end:0x80150F24
+	.data       start:0x8019C398 end:0x8019C3E0
+	.sdata      start:0x80281AF8 end:0x80281B00
+	.sbss       start:0x80282980 end:0x802829C0
 
 unsorted/sweep_80150F24.c:
 	.text       start:0x80150F24 end:0x80150F2C
@@ -4837,6 +4807,7 @@ src/Runtime.PPCEABI.H/global_destructor_chain.c:
 
 runtime/runtime.c:
 	.text       start:0x80151AB4 end:0x801520F8
+	.rodata     start:0x80184FD0 end:0x80184FE8
 
 src/Runtime.PPCEABI.H/GCN_mem_alloc.c:
 	.text       start:0x801520F8 end:0x801521B0
@@ -5059,6 +5030,9 @@ MetroTRK/main_TRK.c:
 
 src/TRK_MINNOW_DOLPHIN/dolphin_trk_glue.c:
 	.text       start:0x80164420 end:0x80164978
+	.rodata     start:0x80185E10 end:0x80185F18
+	.data       start:0x8019CE60 end:0x8019CE88
+	.bss        start:0x8027F888 end:0x8027F890
 
 MetroTRK/targcont.c:
 	.text       start:0x80164978 end:0x801649AC

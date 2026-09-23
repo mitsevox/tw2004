@@ -5,7 +5,6 @@
 #include "engine.h"
 
 void fn_8001C7FC(u8* pChar, int nStyle);   // the character's animation style (+0x16E0)
-void CharacterState_AddSKABlendData(u8* pChar, int a, int nGroup, void* pfn, int c, int d, f32 f1, f32 f2, f32 f3, f32 f4, f32 f5);
 
 // Animation 11, the gimme tap-in: the style is the score the tap-in will give (under par 6, par
 // 5, over par 2; the style-0 branch repeats the par test and can never be taken), then clip group

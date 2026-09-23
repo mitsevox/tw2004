@@ -41,7 +41,6 @@ extern RTEvent lbl_8020CF90[];
 void  GM_vCloseModuleONCE(void);
 void  fn_800EAA40(void);
 void  fn_800E0B38(int nMode);
-void  fn_800EC544(void* pList, s32 n);
 void  fn_800EAE38(s32 i);
 void  fn_800EAF7C(void);
 int   fn_800EC558(void);
@@ -179,7 +178,7 @@ void fn_800F06DC(void) {
         if (EVENTS[lbl_80282350].nChallenge != 0) {
             gSession.nNumPlayers = 1;
             fn_800E0B38(5);
-            fn_800EC544(EVENT_BYTES + 0x1620, 111);
+            fn_800EC544((Challenge*)(EVENT_BYTES + 0x1620), 111);
             fn_800EAE38(EVENTS[lbl_80282350].nChallenge - 1);
             fn_800EAF7C();
             lbl_8028235C = gpGame->pfn1CC;

@@ -41,8 +41,6 @@ extern UIQueueItem lbl_802030BC[10];
 extern u8 lbl_80203138[14];
 
 extern u8 lbl_802822BE;
-void fn_800E4FFC(int p0);
-void fn_800E502C(int p0);
 void fn_800E508C(void);
 extern u8 lbl_802822BD;
 void fn_800E50FC(void);

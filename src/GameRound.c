@@ -884,7 +884,7 @@ void fn_800E25E0(void) {
     }
 }
 
-int fn_800E27A8(void) {
+u8 fn_800E27A8(void) {
     return gpGame->n294 != 0;
 }
 
@@ -1318,7 +1318,7 @@ u8 fn_800E39F0(void) {
 }
 
 // Modes 6-8.
-int fn_800E3A54(void) {
+u8 fn_800E3A54(void) {
     if (Game_GetMode() == 6 || Game_GetMode() == 7 || Game_GetMode() == 8) {
         return 1;
     }

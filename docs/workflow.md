@@ -86,6 +86,19 @@ t.trial('fn_800FA518', old_text, [variant1, variant2])   # keeps the first varia
 t.apply(old_text, new_text)                              # plain edit, no scoring
 ```
 
+**Sweep hundreds of variants.** `trial.py` takes about 15 s per variant; `tools/match/quicktrial.py`
+takes under a second, because it compiles only the function's permuter snapshot
+(`build/perm/<fn>/base.c`, made by `perm_setup.py`) and compares it with the original. Use it for
+large sweeps (every declaration order, every spelling of a loop), then confirm the winner in the
+unit with `trial.py`:
+
+```python
+import sys; sys.path.insert(0, r'<checkout>/tools/match')
+from quicktrial import base, score           # after: python tools/match/perm_setup.py <Unit> <fn>
+src = base('fn_800FE3FC')
+print(score('fn_800FE3FC', src.replace(old_text, new_text)))   # differing instructions, 0 = exact
+```
+
 **Declaration order** changes register allocation. `declperm.py` tries every order of a
 function's first N declaration lines and keeps the best:
 
@@ -156,7 +169,9 @@ second copy. The steps:
    original was two files) or the constants are shared with neighbouring code (the unit is a
    slice of a larger file).
 
-Leave the unit `NonMatching` until the DOL passes.
+Leave the unit `NonMatching` until the DOL passes. Linking is also the only real check of
+`switch` statements: objdiff masks relocations, so a jump table pointing at the wrong case bodies
+still scores 100% until the DOL comparison catches it.
 
 When stuck
 ----------
