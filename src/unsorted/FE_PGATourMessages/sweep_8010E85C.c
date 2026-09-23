@@ -1,4 +1,4 @@
-// Small functions found by the sweep (sweep.py). Original file and meanings unknown.
+// Small functions found by the sweep (sweep.py). Original file: FE_PGATourMessages.c (EA's name, from its asserts; placed by the file map).
 
 #include "game_types.h"
 

@@ -1,4 +1,4 @@
-// Small functions found by the sweep (sweep.py). Original file and meanings unknown.
+// Small functions found by the sweep (sweep.py). Original file: uiTransform.c (EA's name, from its asserts; also in EA's 2002 source tree; placed by the file map).
 
 #include "game_types.h"
 

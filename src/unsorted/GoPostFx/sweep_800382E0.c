@@ -1,4 +1,4 @@
-// Small functions found by the sweep (sweep.py). Original file and meanings unknown.
+// Small functions found by the sweep (sweep.py). Original file: GoPostFx.c (EA's name, from its asserts; also in TW06; placed by the file map).
 
 #include "game_types.h"
 
