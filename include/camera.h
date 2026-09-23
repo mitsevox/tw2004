@@ -10,10 +10,10 @@
 // A camera shot (0xC0 bytes): a named script position the camera script moves to. The shots of a
 // sequence are chained through p40.
 typedef struct CamShot {
-    char szName[0x24];          // 0x00
-    f32  f24;                   // 0x24  height; the elevator camera adds the course's own
-    u8   unk28[0x30 - 0x28];
-    f32  v30[4];                // 0x30  the zoom-to-aim camera's start position
+    char szName[0x20];          // 0x00
+    f32  v20[4];                // 0x20  a position ([1]: the elevator camera adds the course's height)
+    f32  v30[4];                // 0x30  a second position (the super zoom's target, the zoom-to-aim
+                                //       camera's start)
     struct CamShot* p40;       // 0x40
     struct CamShot* p44;        // 0x44  in View.shot19C: the shot camera 13 goes back to
     f32  f48;                   // 0x48  how long the shot lasts
@@ -160,7 +160,7 @@ typedef struct CamTuning {
     f32  f78;                   // 0x078  ... over this many seconds
     f32  f7C;                   // 0x07C  camera 13's fallback shots' f78/f7C: from this value ...
     f32  f80;                   // 0x080  ... to this one
-    u8   unk84[4];
+    f32  f84;                   // 0x084  how long the super zoom's first shot lasts
     f32  f88;                   // 0x088
     f32  f8C;                   // 0x08C
     u8   unk90[4];
@@ -184,10 +184,16 @@ typedef struct CamTuning {
     u8   unk1C4[0x1C8 - 0x1C4];
     s32  bCheckSlope;           // 0x1C8  fn_800C4650 tests the slope to the target (fn_800C4520)
     s32  bCheckTerrain;         // 0x1CC  and the ground in between (fn_800C4604)
-    u8   unk1D0[0x1E0 - 0x1D0];
+    f32  f1D0;                  // 0x1D0  the steep-slope camera: height step per try (down going up, up going down)
+    f32  f1D4;                  // 0x1D4  ... distance step back per try
+    f32  f1D8;                  // 0x1D8  ... first distance back from the ball
+    s32  n1DC;                  // 0x1DC  ... most tries
     f32  fSlopeUp;              // 0x1E0
     f32  fSlopeDown;            // 0x1E4
-    u8   unk1E8[0x1F8 - 0x1E8];
+    f32  f1E8;                  // 0x1E8  the steep-slope camera's base: x offset from the ball
+    f32  f1EC;                  // 0x1EC  ... height over the ball
+    f32  f1F0;                  // 0x1F0  ... how far the camera may move per call
+    f32  f1F4;                  // 0x1F4  ... how far the aim may move per call
     f32  fMaxPitchUp;           // 0x1F8  fn_800C4AB0: the steepest camera angle above the horizontal (degrees)
     f32  fMaxPitchDown;         // 0x1FC  and below it
 } CamTuning;
@@ -216,6 +222,8 @@ typedef struct GolfCamState {
 } GolfCamState;
 
 extern GolfCamState* lbl_80282220;
+extern s32 lbl_80281520;                // the steep-slope camera's tries last time (-1: none yet)
+extern f32 lbl_801FA1E8[4];             // the target the steep-slope camera last worked for
 
 // The create-a-player (CrAP) screen's state at lbl_80281EE0; only what the CrAP camera reads.
 typedef struct CrAPGolfer {

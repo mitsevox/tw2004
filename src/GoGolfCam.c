@@ -48,6 +48,11 @@ u8       fn_8004562C(CamShot* pShot);                   // the shot's bAC is 0, 
 int      fn_800636EC(void);
 void     fn_8000A194(f32 (*m)[4], f32 a, f32 b, f32 c);  // a rotation matrix from three angles
 void     fn_800BADB4(f32 (*m)[4], f32* pIn, f32* pOut);  // a vector through a matrix
+f32      fn_80014278(void* pLens);                      // the lens's field of view
+void     fn_800B5918(f32* pSrc, f32* pDst);             // copy three floats
+void     fn_800636B4(int nPlayer);
+void     fn_800C4AB0(f32* pFrom, f32* pTo, f32* pOut);
+int      fn_800C4D2C(f32* pFrom, f32* pTo, f32* pOut, f32 fMax);
 void     fn_80038054(u8 a, int n, f32 f1, f32 f2);
 u8       CamScript_KeepAboveGround(int nPlayer, f32* pNew, f32* pOld, int a, void* p1, void* p2, void* p3,
                                    f32 fClearance);
@@ -230,7 +235,7 @@ void GolfCamera_InitElevatorCamera(View* pView, int nPlayer) {
     if (pView->p130 != NULL) {
         CameraScript_RecordCurrentCam(&pView->shot19C, pCam, pSub, nPlayer, &pView->script, 0);
         strcpy(pView->shot19C.szName, "ELEVATOR CAM");
-        pView->shot19C.f24 += lbl_80282220->fElevatorHeight[Game_GetCourse()];
+        pView->shot19C.v20[1] += lbl_80282220->fElevatorHeight[Game_GetCourse()];
         pView->shot19C.bAC = 9;
         CameraScript_InterpToNewScript(&pView->script, &pView->shot19C, nPlayer, pCam, pSub, 1,
                                        lbl_80281F78->f94, 100.0f, 0x19, 0.0f);
@@ -910,8 +915,8 @@ void GolfCamera_ProcessPostShotCamera(View* pView, int nPlayer) {
         fDist = 0.01f * (fDist - pView->p130->f74);     // one local for the target and the step
         pView->p130->f74 += fDist;
     } else if (pView->n148 == 10) {
-        if (pView->p130->f24 - fn_8004D620(fn_8000C594(), gPlayers[nPlayer].vBall) < 1.0f) {
-            pView->p130->f24 += 0.01f;
+        if (pView->p130->v20[1] - fn_8004D620(fn_8000C594(), gPlayers[nPlayer].vBall) < 1.0f) {
+            pView->p130->v20[1] += 0.01f;
         }
     }
     if ((fn_80062C1C(gPlayers[nPlayer].pChar) || fn_80062C10(gPlayers[nPlayer].pChar))
@@ -1377,6 +1382,103 @@ u8 fn_800C4650(View* pView, int nPlayer) {
     return bMove;
 }
 
+// The steep-slope camera: from a base point by the ball, back away from the target (and down when
+// looking up, up when looking down) until the ground no longer hides the target, up to n1DC tries
+// (at least 2; fewer when the target has not moved). The view moves there, looking at the target,
+// no faster than the tuning allows, and not steeper than fn_800C4AB0 allows.
+void GolfCamera_ComputeSteepSlopeCamVectors(View* pView, int nPlayer) {
+    f32 vTarget[4];
+    f32 vOldCam[4];
+    f32 vOldSub[4];
+    f32 vPrevCam[4];
+    f32 vPrevSub[4];
+    f32 vCam[4];
+    f32 vBase[4];
+    f32 vDelta[4];
+    f32 vDir[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+    f32 vHit[4];
+    f32 vNormal[4];
+    SurfaceType* pSurface;
+    TerObject* pObj;
+    int nMax;
+    int nTries;
+    u8 bUp;
+    Ball* pBall;
+    int i;
+    u8 bDone;
+    u8 bClear;
+    f32* pTarget;
+    u8 bHit;
+    f32 fBack;
+    pTarget = gPlayers[nPlayer].vTarget;
+    Vec_Copy(pTarget, vTarget);
+    pBall = &gPlayers[nPlayer].ball;
+    if (lbl_80281520 == -1) {
+        fn_800B5918(pTarget, lbl_801FA1E8);
+        nMax = lbl_80281F78->n1DC;
+    } else if (fn_800BB028(lbl_801FA1E8, pTarget) > 0.1f) {
+        fn_800B5918(pTarget, lbl_801FA1E8);
+        nMax = (lbl_80281520 + 1 <= lbl_80281F78->n1DC) ? lbl_80281520 + 1 : lbl_80281F78->n1DC;
+    } else {
+        nMax = lbl_80281520;
+    }
+    nTries = (nMax > 2) ? nMax : 2;
+    vBase[0] = lbl_80281F78->f1E8 + gPlayers[nPlayer].ball.vPos[0];
+    vBase[1] = lbl_80281F78->f1EC + gPlayers[nPlayer].ball.vPos[1];
+    vBase[2] = gPlayers[nPlayer].ball.vPos[2];
+    vBase[3] = 0.0f;
+    fn_800C73DC(vTarget, vBase, vDelta);
+    if (vDelta[0] != 0.0f || vDelta[1] != 0.0f || vDelta[2] != 0.0f) {
+        fn_800BAF04(vDelta, vDir);
+    } else {
+        vDir[0] = 0.0f;
+        vDir[1] = 0.0f;
+        vDir[2] = 0.0f;
+    }
+    if (vDelta[1] > 0.0f) {
+        bUp = 1;
+    } else {
+        bUp = 0;
+    }
+    fBack = lbl_80281F78->f1D8;
+    fn_8000C5D4(vBase, vDir, -fBack, vCam);
+    fn_800B5918(pView->v0, vOldCam);
+    fn_800B5918(pView->v10, vOldSub);
+    i = 0;
+    bDone = 0;
+    bClear = 0;
+    while (!bDone && i < nTries) {
+        vCam[1] = (pBall->vPos[1] + 0.1f <= vCam[1]) ? vCam[1] : pBall->vPos[1] + 0.1f;
+        fn_800B5918(pView->v0, vPrevCam);
+        fn_800B5918(pView->v10, vPrevSub);
+        fn_800B5918(vCam, pView->v0);
+        fn_800B5918(vTarget, pView->v10);
+        fn_800352BC();
+        fn_80013CCC(fn_8001614C());
+        bHit = Ter_CheckForGroundCollision(pBall->pCourse, vCam, vTarget, vHit, vNormal, &pSurface, &pObj);
+        fn_800636B4(nPlayer);
+        if (bHit || bClear) {
+            fBack += lbl_80281F78->f1D4;
+            fn_8000C5D4(vBase, vDir, -fBack, vCam);
+            if (bUp) {
+                vCam[1] -= lbl_80281F78->f1D0;
+            } else {
+                vCam[1] += lbl_80281F78->f1D0;
+            }
+        } else {
+            bClear = 1;
+        }
+        if (bClear && i >= lbl_80281520 - 2) {
+            bDone = 1;
+        }
+        i++;
+    }
+    lbl_80281520 = i;
+    fn_800C4D2C(vOldCam, pView->v0, pView->v0, lbl_80281F78->f1F0);
+    fn_800C4D2C(vOldSub, pView->v10, pView->v10, lbl_80281F78->f1F4);
+    fn_800C4AB0(pView->v0, pView->v10, pView->v10);
+}
+
 // The point pTo as seen from pFrom, but with the direction turned back towards the horizontal when
 // it is steeper than the tuning's fMaxPitchUp (going up) or fMaxPitchDown (going down); into pOut.
 // Nothing is written when the direction is within the limits.
@@ -1543,6 +1645,89 @@ f32 fn_800C54FC(View* pView, f32* pCam, f32* pSub, int nPlayer) {
         }
     }
     return fTime;
+}
+
+// The super zoom: two hand-made "SUPER ZOOM" shots in the shared state, both looking at pTo; from
+// pFrom for kind 13, else from the far side of pTo at pFrom's height. The second zooms the lens in
+// to the view's field of view less the letterbox's change (stored in the tuning's f80). The first
+// goes back to the current shot after the tuning's f84 seconds.
+void fn_800C56B4(View* pView, f32* pFrom, f32* pTo, int nPlayer) {
+    f32 v[4];
+    f32 vFrom[4];
+    char szName[] = "SUPER ZOOM";
+    f32 fChange;
+    CamTuning* pTune;
+    Vec_Copy(pFrom, vFrom);
+    fn_800C73DC(pTo, vFrom, v);
+    v[1] = 0.0f;
+    fn_800C73B8(pTo, v, v);
+    v[1] = vFrom[1];
+    strcpy(lbl_80282220->shot6C.szName, szName);
+    if (pView->n260 == 13) {
+        Vec3Copy(pFrom, lbl_80282220->shot6C.v20);
+    } else {
+        Vec3Copy(v, lbl_80282220->shot6C.v20);
+    }
+    Vec3Copy(pTo, lbl_80282220->shot6C.v30);
+    lbl_80282220->shot6C.p40 = NULL;
+    lbl_80282220->shot6C.f60 = 0.0f;
+    lbl_80282220->shot6C.f64 = 0.0f;
+    lbl_80282220->shot6C.f70 = 0.0f;
+    lbl_80282220->shot6C.f74 = 0.0f;
+    lbl_80282220->shot6C.f68 = 0.2f;
+    lbl_80282220->shot6C.f6C = 20.0f;
+    lbl_80282220->shot6C.f78 = lbl_80281F78->f7C;
+    lbl_80282220->shot6C.f7C = lbl_80282220->shot6C.f78;
+    lbl_80282220->shot6C.f80 = 0.0f;
+    lbl_80282220->shot6C.f4C = 0.1f;
+    lbl_80282220->shot6C.f9C = -2.0f * PI;
+    lbl_80282220->shot6C.f84 = 0.0f;
+    lbl_80282220->shot6C.bA8 = 0;
+    lbl_80282220->shot6C.bAA = 1;
+    lbl_80282220->shot6C.bAC = 0x18;
+    lbl_80282220->shot6C.bB1 = 9;
+    lbl_80282220->shot6C.bB2 = 0;
+    lbl_80282220->shot6C.bAD = 3;
+    lbl_80282220->shot6C.p44 = pView->p130;
+    strcpy(lbl_80282220->shot12C.szName, szName);
+    Vec3Copy(lbl_80282220->shot6C.v20, lbl_80282220->shot12C.v20);
+    Vec3Copy(pTo, lbl_80282220->shot12C.v30);
+    lbl_80282220->shot12C.p40 = NULL;
+    lbl_80282220->shot12C.f60 = 0.0f;
+    lbl_80282220->shot12C.f64 = 0.0f;
+    lbl_80282220->shot12C.f70 = 0.0f;
+    lbl_80282220->shot12C.f74 = 0.0f;
+    lbl_80282220->shot12C.f68 = 0.2f;
+    lbl_80282220->shot12C.f6C = 20.0f;
+    fChange = fn_800DC3A4();
+    lbl_80281F78->f80 = fn_80014278(fn_80008370(fn_80016CFC(gPlayers[nPlayer].nView[0])->pCamera)) - fChange;
+    lbl_80282220->shot12C.f78 = lbl_80281F78->f80;
+    lbl_80282220->shot12C.f7C = lbl_80282220->shot12C.f78;
+    lbl_80282220->shot12C.f80 = 0.0f;
+    lbl_80282220->shot12C.f4C = 0.1f;
+    lbl_80282220->shot12C.f9C = 0.0f;
+    lbl_80282220->shot12C.f84 = 0.0f;
+    lbl_80282220->shot12C.bA8 = 0;
+    lbl_80282220->shot12C.bAA = 1;
+    lbl_80282220->shot12C.bAC = 0x18;
+    lbl_80282220->shot12C.bB1 = 9;
+    lbl_80282220->shot12C.bB2 = 0;
+    lbl_80282220->shot12C.bAD = 3;
+    lbl_80282220->shot12C.p44 = pView->p130;
+    pTune = lbl_80281F78;
+    fn_80038054(1, fn_80016D10(), pTune->f8C, pTune->f88);
+    pView->p130 = &lbl_80282220->shot6C;
+    pView->p134 = &lbl_80282220->shot12C;
+    pView->f110 = lbl_80281F78->f84;
+    pView->n140 = 1;
+    pView->fCamTime = 0.0f;
+    if (pView->p74 != NULL) {
+        pView->p134->f4C = pView->p74->f38;
+    } else {
+        pView->p134->f4C = 0.5f;
+    }
+    pView->p134->bAD = 4;
+    pView->p134->f4C = 1.0f;    // f4C is set just above; the original overwrites it
 }
 
 // Camera 13's tick for kinds 15 and 16: after 0.05 s with no next shot, clear b58 (a freeze-time
