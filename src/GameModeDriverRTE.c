@@ -69,11 +69,16 @@ void fn_800F0570(void) {
 
 // TW06: GameModeDriverRTE::Locale_LoadRTEcFromStream.
 void fn_800F05B0(UStreamObject* pObject) {
+    // port: the 'RTEc' object is copied straight into gRTEs.aEvent (RTEvent[118]); it is big-endian
+    // on disc, so a little-endian port converts it field by field here (docs/format-byteorder.md)
     fn_8000E790(pObject, sizeof(gRTEs.aEvent), gRTEs.aEvent);
 }
 
 // TW06: GameModeDriverRTE::LoadRTEsFromStream.
 void fn_800F05DC(UStreamObject* pObject) {
+    // port: the 'RTEs' object is copied straight into gRTEs.aChallenge (Challenge[111]); it is
+    // big-endian on disc, so a little-endian port converts it field by field here
+    // (docs/format-byteorder.md)
     fn_8000E790(pObject, sizeof(gRTEs.aChallenge), gRTEs.aChallenge);
 }
 
