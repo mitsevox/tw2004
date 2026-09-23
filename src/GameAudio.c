@@ -1211,6 +1211,83 @@ void fn_800A6854(u8 nPlayer) {
     fn_800AD698(pView->n3, 0, 0);
 }
 
+void fn_800A68C0(u8 nPlayer) {
+    GameAudioView* pView;
+    int nKind;
+    u8 bPlay;
+    u8 n;
+
+    pView = &lbl_801F1790[0];
+    nKind = fn_800C7138(fn_80017028(0));
+    bPlay = 1;
+    n = 0;
+    if (Game_GetMode() < 6 || Game_GetMode() > 8) {
+        fn_800A3F58(0, 1);
+        switch (nKind) {
+        case 1:
+        case 6:
+            lbl_80282034 = 1;
+            break;
+        case 13:
+        case 14:
+            n = 2;
+            lbl_80282034 = 1;
+            break;
+        case 15:
+        case 16:
+            fn_800A6C98(nPlayer, 2);
+            lbl_80282034 = 1;
+            break;
+        case 4:
+            bPlay = 0;
+            lbl_80282034 = 1;
+            break;
+        case 7:
+            fn_800AD698(pView->n2, 2, 1);
+            fn_800AD698(pView->n3, 2, 1);
+            fn_800AD9AC(pView->n2, 6, 5);
+            fn_800AD9AC(pView->n3, 6, 5);
+            fn_800AD950(pView->n2, 6, 0);
+            fn_800AD950(pView->n3, 6, 1);
+            fn_800AD698(pView->n2, 6, 1);
+            fn_800AD698(pView->n3, 6, 1);
+            fn_800A6C98(nPlayer, 2);
+            bPlay = 0;
+            lbl_80282034 = 1;
+            break;
+        case 9:
+            bPlay = 0;
+            lbl_80282034 = 1;
+            break;
+        case 10:
+            n = 1;
+            lbl_80282034 = 1;
+            break;
+        case 2:
+        case 8:
+        case 11:
+            bPlay = 0;
+            lbl_80282034 = 3;
+            break;
+        case 5:
+            bPlay = 0;
+            lbl_80282034 = 2;
+            break;
+        default:
+            bPlay = 0;
+            lbl_80282034 = 0;
+            break;
+        }
+        if (bPlay) {
+            fn_800AD9AC(pView->n2, 1, n);
+            fn_800AD9AC(pView->n3, 1, n);
+            fn_800AD698(pView->n2, 1, 1);
+            fn_800AD698(pView->n3, 1, 1);
+        }
+        lbl_80282032 = 1;
+    }
+}
+
 void fn_800A6AC8(u8 nPlayer, u8 n) {
     GameAudioView* pView;
 
