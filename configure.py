@@ -479,6 +479,7 @@ config.libs = [
             Object(NonMatching, "src/gx/GXTransform.c"),
             Object(Matching, "src/os/OSFont.c"),
             Object(Matching, "src/os/OSLink.c"),
+            Object(Matching, "src/os/OSSemaphore.c"),
             Object(Matching, "src/os/__ppc_eabi_init.c"),
             Object(Matching, "src/gba/GBA.c"),
             Object(NonMatching, "src/card/CARDBios.c"),
