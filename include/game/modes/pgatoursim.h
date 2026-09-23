@@ -100,9 +100,21 @@ LAYOUT_ASSERT(PgaStatCounts, 0x58);
 
 // A tour pro (0x68 bytes): the 'PGST' stream object's data.
 typedef struct PgaPro {
-    char szName[0x50];          // 0x00  (GM_PgaTourSim_GetNameFromGolferID)
-    f32  f50;                   // 0x50
-    u8   unk54[0x68 - 0x54];
+    char szName[0x18];          // 0x00  (GM_PgaTourSim_GetNameFromGolferID)
+    // The pro's season form, which the simulated holes follow (fn_8011A074):
+    f32  fDriveAvg;             // 0x18  driving distance (a drive: this plus 30 x a normal random number)
+    f32  fFairwayPct;           // 0x1C  fairways hit, percent
+    f32  fGIRPct;               // 0x20  greens in regulation, percent
+    f32  fPuttAvg;              // 0x24  putts per round (per hole: this / 18)
+    u8   unk28[4];
+    f32  fSandSavePct;          // 0x2C  sand saves, percent
+    u8   unk30[0x50 - 0x30];
+    f32  f50;                  // 0x50  sorts the entrants, lowest first (fn_80118A5C)
+    u8   unk54[4];
+    f32  fPar3Avg;              // 0x58  scoring average on par 3s (fn_80119B54)
+    f32  fPar4Avg;              // 0x5C  on par 4s
+    f32  fPar5Avg;              // 0x60  on par 5s
+    u8   unk64[0x68 - 0x64];
 } PgaPro;
 LAYOUT_ASSERT(PgaPro, 0x68);
 extern PgaPro lbl_8024B9CC[PGA_NUM_PROS];
@@ -111,7 +123,8 @@ extern PgaPro lbl_8024B9CC[PGA_NUM_PROS];
 // PgaTourSim_Entrant_MC_t, laid out differently.
 typedef struct PgaEntrantMC {
     s16  nGolfer;               // 0x00  golfer id (PGA_USER_GOLFER: the player)
-    u8   unk2[0x14 - 0x2];
+    s16  nTargetScore;          // 0x02  the four-round total the simulation aims at (fn_80119E28)
+    u8   unk4[0x14 - 0x4];
     s32  bWasCut;               // 0x14  set with the golfer's consecutive-cuts count cleared (0x80117C50)
     s32  n18;                   // 0x18
 } PgaEntrantMC;
@@ -150,6 +163,16 @@ typedef struct PgaStatRanking {
 LAYOUT_ASSERT(PgaStatRanking, 0x1324);
 extern PgaStatRanking lbl_80226870[GM_PGA_STAT_COUNT];
 
+// What the statistic sort comparisons read (they get only two golfer ids): the statistic being
+// ranked and the player whose profile holds the counts. nStat is -1 outside a sort.
+typedef struct PgaStatSort {
+    s32  nStat;                 // 0x0
+    s32  nPlayer;               // 0x4
+} PgaStatSort;
+extern PgaStatSort lbl_80281840;
+extern s32 lbl_80281848;        // the same for the score sorts: the player
+// Per statistic: its sort comparison, fn_8011BCFC (higher is better) or fn_8011BBD8 (lower).
+extern s32 (*lbl_80193FF8[GM_PGA_STAT_COUNT])(const void* pA, const void* pB);
 extern s32 lbl_80194074[GM_PGA_STAT_COUNT];     // per statistic: GM_PgaTourSim_GetStatView
 extern s32 lbl_801940F0[32];    // per statistic: the decimal places GM_PgaTourSim_GetStatValString prints
 extern u8  gbStatsDirty;        // the statistics need working out again

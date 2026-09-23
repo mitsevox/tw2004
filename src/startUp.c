@@ -22,6 +22,17 @@ void   fn_800B051C(void* p, u32 uLen, int nDir);
 void   fn_800B055C(void);
 u32    fn_800B0698(u32 uSize);
 s32    fn_800B09C8(int nSlot, int n);
+void   fn_800B0DB8(void);
+void   fn_800B0DFC(void);
+void   fn_800B0E40(void);
+void   fn_800B0E84(void);
+void   fn_800B0EC8(void);
+void   fn_800B0F0C(void);
+void   fn_800B0F50(void);
+void   fn_800B0F94(void);
+void   fn_800B0FD8(void);
+void   fn_800B101C(void);
+void   fn_800B1060(void);
 void   fn_800B10A4(void);
 u8     fn_800B1180(void);
 s32    fn_800B12FC(s32* pnSlot, s32* pn);
@@ -47,6 +58,8 @@ void   fn_800B65C0(void* pSrc, u32 uAram, u32 uLen, int a, int b, void (*pfnDone
                    int c);                                            // ARAM DMA
 f32    fn_8000AF7C(f32 x);              // natural logarithm
 void   fn_8009527C(void* p);            // frees what fn_800951A0 allocated
+void   fn_800B1A88(f32* pA, f32* pB);   // swap two floats
+void   fn_80110458(u8 b);
 
 // The memory card code (MC.c, MC_Gc.c).
 void   fn_8009CD10(void);
@@ -54,9 +67,17 @@ void   fn_8009CD7C(void);
 void   fn_8009DCEC(s32 a, s32 b);
 u8     fn_8009F7E8(int nSlot);
 u8     fn_8009F850(void);
-void   fn_8009FAD0(void);
+s32    fn_8009FAD0(void);               // returns the card result, 0 when it worked
 s32    fn_800A0A7C(s32 a, s32 b);
 s32    fn_800A2100(s32 a, s32 b);
+void   fn_8009F7F4(CardInfo* pInfo, int nSlot, int n);     // copy out a card's state
+s32    fn_8009D3DC(s32 nSlot, s32 n);
+s32    fn_8009D50C(s32 nSlot, s32 n);
+s32    fn_8009EE28(s32 nSlot, s32 n);
+
+// The save kinds (a table of functions at lbl_8018C7D8).
+void   fn_80084FF0(s32 nKind);          // pick a save kind
+s32    fn_80084FB4(CardPos* pPos);      // the picked save kind's size on that card
 
 // The hardware dropped a voice (to play one of higher priority): mark ours lost and stop it. The
 // mixer callback asks for it back after 255 passes.
@@ -304,6 +325,66 @@ void fn_800B01B4(u16 nVoice, u8 bA, u8 bB) {
     OSRestoreInterrupts(bEnabled);
 }
 
+// A streamed sound's first chunk (nBuffer 0, the first half of its ARAM buffer) sets the voice's
+// decoder: the chunk's coefficients and its first frame's header, also used when it loops.
+void fn_800B0268(u16 nVoice, StreamChunk* pChunk, u32 uSize, int nBuffer) {
+    Voice* p = &lbl_802820E8[nVoice];
+    if (nBuffer == 0) {
+        u8 nHeader = pChunk->aData[0];
+        int bEnabled = OSDisableInterrupts();
+        p->a18[0] = pChunk->a0[0];
+        p->a18[1] = pChunk->a0[1];
+        p->a18[2] = pChunk->a0[2];
+        p->a18[3] = pChunk->a0[3];
+        p->a18[4] = pChunk->a0[4];
+        p->a18[5] = pChunk->a0[5];
+        p->a18[6] = pChunk->a0[6];
+        p->a18[7] = pChunk->a0[7];
+        p->n3A = nHeader;
+        p->n50 = nHeader;
+        if (!p->flags.b.b6_10) {
+            p->flags.b.bSetAdpcm = 1;
+        }
+        p->flags.b.bSetLoop = 1;
+        OSRestoreInterrupts(bEnabled);
+    }
+}
+
+// Set a movie voice's decoder from a block of the movie's sound: channel 0 (left) or 1 (right).
+// nMode 0 also sets the header used when it loops.
+void fn_800B0338(u16 nVoice, MovieSoundBlock* pBlock, int nChannel, int nMode) {
+    Voice* p = &lbl_802820E8[nVoice];
+    int bEnabled = OSDisableInterrupts();
+    u32* pCoefs;
+    u16 nHeader;
+    // port: the coefficients sit at a 2-byte boundary and EA copies them as words, which the
+    // GameCube allows; a port should copy the 32 bytes with memcpy.
+    if (nChannel == 0) {
+        pCoefs = (u32*)pBlock->a1A;
+        nHeader = pBlock->aDataL[0];
+    } else {
+        pCoefs = (u32*)pBlock->a3C;
+        nHeader = pBlock->aDataR[0];
+    }
+    p->a18[0] = pCoefs[0];
+    p->a18[1] = pCoefs[1];
+    p->a18[2] = pCoefs[2];
+    p->a18[3] = pCoefs[3];
+    p->a18[4] = pCoefs[4];
+    p->a18[5] = pCoefs[5];
+    p->a18[6] = pCoefs[6];
+    p->a18[7] = pCoefs[7];
+    if (!p->flags.b.b6_10) {
+        p->flags.b.bSetAdpcm = 1;
+    }
+    p->n3A = nHeader;
+    if (nMode == 0) {
+        p->n50 = nHeader;
+        p->flags.b.bSetLoop = 1;
+    }
+    OSRestoreInterrupts(bEnabled);
+}
+
 void fn_800B0430(void) {
 }
 
@@ -476,6 +557,166 @@ void fn_800B0960(void) {
     fn_8009FAD0();
     lbl_80282120 = fn_8009F850();
     fn_8009CD7C();
+}
+
+// The status of card slot nSlot's entry n, for the status table (fn_800B10A4): 0 while flag 0x02
+// is clear, then 7, 6 (a sector size other than 0x2000), 8, 9 or 1 from the card's flags, 10 when
+// fn_8009EE28 fails with -18, 3 when the card's two counts cover what the save needs (save kinds 0
+// and 3, and fn_8009D3DC + fn_8009D50C), and 2 when not.
+s32 fn_800B09C8(int nSlot, int n) {
+    CardInfo info;
+    CardPos pos;
+    s32 nStatus = 0;
+    s32 nNeed;
+    s32 nNeed3;
+    s32 nNeed2;
+    lbl_802814A0 = 1;
+    fn_8009F7F4(&info, nSlot, n);
+    if (info.uFlags & 0x2) {
+        if (info.uFlags & 0x10) {
+            nStatus = 7;
+        } else if (info.n88 != 0x2000) {
+            nStatus = 6;
+        } else if (info.uFlags & 0x20) {
+            nStatus = 8;
+        } else if (info.uFlags & 0x40) {
+            nStatus = 9;
+        } else if (info.uFlags & 0x8) {
+            if (info.uFlags & 0x80) {
+                nStatus = 1;
+            } else {
+                pos.nSlot = nSlot;
+                pos.n = n;
+                fn_80084FF0(0);
+                nStatus = 2;
+                nNeed = fn_80084FB4(&pos);
+                fn_80084FF0(3);
+                nNeed3 = fn_80084FB4(&pos);
+                fn_80084FF0(0);
+                nNeed += nNeed3;
+                nNeed2 = fn_8009D50C(nSlot, n) + fn_8009D3DC(nSlot, n);
+                if (fn_8009EE28(nSlot, n) == -18) {
+                    nStatus = 10;
+                } else if (info.n4 >= nNeed && info.n84 >= nNeed2) {
+                    nStatus = 3;
+                }
+            }
+        } else {
+            nStatus = 1;
+        }
+    }
+    return nStatus;
+}
+
+// Build the memory-card status table from scratch, every status reported, and send the message
+// for the first status that has one; message 0x80 when a status is 3 or out of range first, 0x81
+// when no status sends one.
+void fn_800B0B1C(void) {
+    int i;
+    int j;
+    int n;
+    u8 bFound;
+    fn_8009CD10();
+    lbl_80281498 = -1;
+    lbl_8028149C = -1;
+    for (i = 0; i < NUM_CARD_SLOTS; i++) {
+        lbl_80282140[i][0] = 0;
+        if (fn_8009F7E8(i)) {
+            lbl_80282138[i] = n = 1;
+        } else {
+            lbl_80282138[i] = n = 1;
+        }
+        for (j = 0; j < n; j++) {
+            lbl_80282150[i][j] = 0;
+        }
+        for (j = 0; j < n; j++) {
+            lbl_80282150[i][j] = fn_800B09C8(i, j);
+            lbl_80282148[i][j] = lbl_80282150[i][j];
+        }
+    }
+    bFound = 0;
+    for (i = 0; i < NUM_CARD_SLOTS; i++) {
+        for (j = 0; j < 1; j++) {
+            switch (lbl_80282150[i][j]) {
+            case 0:
+                // slot 1's status 0 is reported only when slot 0's is not 0
+                if (i == 1 && lbl_80282150[0][0] != 0) {
+                    lbl_80281498 = j;
+                    lbl_8028149C = i;
+                    fn_800B0F94();
+                    fn_8009CD7C();
+                    return;
+                }
+                break;
+            case 1:
+                lbl_80281498 = j;
+                lbl_8028149C = i;
+                fn_800B0F0C();
+                fn_8009CD7C();
+                return;
+            case 10:
+                lbl_80281498 = j;
+                lbl_8028149C = i;
+                fn_800B1060();
+                fn_8009CD7C();
+                return;
+            case 6:
+                lbl_80281498 = j;
+                lbl_8028149C = i;
+                fn_800B0DB8();
+                fn_8009CD7C();
+                return;
+            case 7:
+                lbl_80281498 = j;
+                lbl_8028149C = i;
+                fn_800B0DFC();
+                fn_8009CD7C();
+                return;
+            case 8:
+                lbl_80281498 = j;
+                lbl_8028149C = i;
+                fn_800B0E40();
+                fn_8009CD7C();
+                return;
+            case 9:
+                lbl_80281498 = j;
+                lbl_8028149C = i;
+                fn_800B0E84();
+                fn_8009CD7C();
+                return;
+            case 11:
+                lbl_80281498 = j;
+                lbl_8028149C = i;
+                fn_800B0EC8();
+                fn_8009CD7C();
+                return;
+            case 2:
+                lbl_80281498 = j;
+                lbl_8028149C = i;
+                fn_800B101C();
+                fn_8009CD7C();
+                return;
+            case 3:
+            case 4:
+            case 5:
+            default:
+                bFound = 1;
+                // fake match: leaves both loops in one jump (a flag test after each loop adds code)
+                goto done;
+            }
+        }
+    }
+done:
+    fn_8009CD7C();
+    lbl_80281498 = j;
+    lbl_8028149C = i;
+    if (bFound) {
+        fn_800B0FD8();
+    } else {
+        lbl_80281498 = -1;
+        lbl_8028149C = -1;
+        fn_800B0F50();
+    }
 }
 
 // The messages below have no values: their one value is cleared and not counted.
@@ -721,4 +962,98 @@ void fn_800B166C(UStreamObject* pObject) {
         lbl_80282124++;
     }
     fn_80009E70(pObject);
+}
+
+// fn_800B0B1C without the messages: build the status table from scratch, then look for the first
+// status that is 3 or out of range and, when there is one, load from the card (fn_8009FAD0).
+void fn_800B1748(void) {
+    int i;
+    int j;
+    int n;
+    u8 bFound;
+    fn_8009CD10();
+    lbl_80281498 = -1;
+    lbl_8028149C = -1;
+    for (i = 0; i < NUM_CARD_SLOTS; i++) {
+        lbl_80282140[i][0] = 0;
+        if (fn_8009F7E8(i)) {
+            lbl_80282138[i] = n = 1;
+        } else {
+            lbl_80282138[i] = n = 1;
+        }
+        for (j = 0; j < n; j++) {
+            lbl_80282150[i][j] = 0;
+        }
+        for (j = 0; j < n; j++) {
+            lbl_80282150[i][j] = fn_800B09C8(i, j);
+            lbl_80282148[i][j] = lbl_80282150[i][j];
+        }
+    }
+    bFound = 0;
+    for (i = 0; i < NUM_CARD_SLOTS; i++) {
+        for (j = 0; j < 1; j++) {
+            switch (lbl_80282150[i][j]) {
+            case 0:
+            case 1:
+            case 2:
+            case 6:
+            case 7:
+            case 8:
+            case 9:
+            case 10:
+            case 11:
+                lbl_80281498 = j;
+                lbl_8028149C = i;
+                fn_80110458(0);
+                fn_8009CD7C();
+                break;
+            case 3:     // fake match: listed although default covers it; it sets the compare order
+            default:
+                bFound = 1;
+                // fake match: leaves both loops in one jump (a flag test after each loop adds code)
+                goto done;
+            }
+        }
+    }
+done:
+    fn_8009CD7C();
+    lbl_80281498 = j;
+    lbl_8028149C = i;
+    if (bFound) {
+        fn_8009CD10();
+        if (fn_8009FAD0() == 0) {
+            fn_80110458(1);
+        } else {
+            fn_80110458(0);
+        }
+        fn_8009CD7C();
+    } else {
+        lbl_80281498 = -1;
+        lbl_8028149C = -1;
+    }
+}
+
+// Estimate the length of the vector (v[0], v[1]) without a square root, from its longer side a
+// and its shorter side b.
+f32 fn_800B1960(f32* v) {
+    f32 a = v[0];
+    f32 b = v[1];
+    f32 s;
+    f32 d;
+    if (a < 0.0f) {
+        a = -a;
+    }
+    if (b < 0.0f) {
+        b = -b;
+    }
+    if (b > a) {
+        fn_800B1A88(&a, &b);
+    }
+    if (b > 0.5f * a) {
+        s = a + b;
+        d = a - b;
+        a = (32.0f * b + (a + (2.0f * s + (64.0f * s + 8.0f * s)))) / 128.0f;
+        b = d;
+    }
+    return a + 0.25f * b - 0.0078125f * b;
 }

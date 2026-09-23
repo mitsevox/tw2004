@@ -161,7 +161,6 @@ void  fn_800360A0(void* p);
 void  Swing_LoadTuning(int nPlayer);
 void  fn_80036054(void* p, int a, s32* pDesc);
 void  fn_8005A788(int nPlayer, int a);
-void  Swing_RumbleOff(int nPlayer);
 void  fn_800AE3C4(int nPlayer);
 u8*   Pad_State(int nPlayer, int nController);   // the pad's state: [1] main stick y, [3] C-stick y
 int   Swing_StickX(int nPlayer, u8* pPad);       // 0x80058F04  main or C-stick by bUsingCStick
@@ -175,8 +174,6 @@ void  Swing_BoostInput(int nPlayer);
 void  fn_8005AD20(Character* pObj, SwingData* pSw, int nStickX);
 int   fn_8005CC5C(void);
 void  fn_800AE3F8(int nView);
-void  fn_80035138(int a);
-void  fn_80035118(int a, int b);
 void  fn_80036100(u8* pMesh, void* pDesc, int n);
 void  fn_800360D4(u8* pMesh);
 void  fn_80008BB8(f32* pOut, f32 x, f32 y, f32 z);
@@ -1773,53 +1770,51 @@ void fn_8005A478(int nPlayer) {
             }
         }
     }
-    {
-        if ((pObj->nAnim == 6 || pObj->nAnim == 7) && gPlayers[nPlayer].nShotKind != 0 && pObj->n1698 == 0) {
-            if (fn_8001EE90(pObj) == 2) return;
-            if (pObj->nAnim == 6 || pObj->nAnim == 7) {
-                pSw = &gPlayers[nPlayer].swing;
-                if (Game_GetMode() == 11 && Player_IsCPU(nPlayer)) {
-                    if (fn_8005CC5C() == 8) {
-                        nStickX = 0;
-                    } else {
-                        nStickX = 0xFF;
-                    }
-                } else {
-                    pPad    = Pad_State(nPlayer, gPlayers[nPlayer].nController);
-                    nStickX = Swing_StickX(nPlayer, pPad);
-                    Swing_StickY(nPlayer, pPad);
-                }
-                Vec_Copy(pObj->pModel->pMatrices[nBone][3], vPos);
-                if (pObj->nAnim == 6) {
-                    if (nStickX < pSw->nCalibrateX) {
-                        pSw->fRedColor = 0.0f;
-                        pSw->fGreenColor = 0.0f;
-                        pSw->fBlueColor = 0.5f;
-                        pSw->fAlpha =
-                            gpSwing->fFC * (f32)(pSw->nCalibrateX - nStickX) / (f32)pSw->nCalibrateX;
-                    } else {
-                        pSw->fRedColor = 0.5f;
-                        pSw->fGreenColor = 0.5f;
-                        pSw->fBlueColor = 0.0f;
-                        pSw->fAlpha = gpSwing->fFC * (f32)(nStickX - pSw->nCalibrateX) /
-                                      (f32)(0xFF - pSw->nCalibrateX);
-                    }
-                    fn_8005AD20(pObj, pSw, nStickX);
-                } else if (pObj->nAnim == 7) {
-                    pSw->fBlueColor = gpSwing->fF4;
-                    pSw->fGreenColor = gpSwing->fF0;
-                    pSw->fRedColor = gpSwing->fEC;
-                    fT = pObj->fAnimTime - pSw->fTimeBallHit;
-                    if (fT >= 0.0f && fT <= 1.0f) {
-                        pSw->fAlpha = gpSwing->fF8 * (1.0f - fT);
-                    } else if (fT < 0.0f) {
-                        pSw->fAlpha = gpSwing->fF8;
-                    } else {
-                        pSw->fAlpha = 0.0f;
-                    }
-                    fn_8005AD20(pObj, pSw, pSw->nBackSwingX);
-                }
+    if ((pObj->nAnim != 6 && pObj->nAnim != 7) || gPlayers[nPlayer].nShotKind == 0 || pObj->n1698 != 0 ||
+        fn_8001EE90(pObj) == 2) {
+        return;
+    }
+    if (pObj->nAnim == 6 || pObj->nAnim == 7) {
+        pSw = &gPlayers[nPlayer].swing;
+        if (Game_GetMode() == 11 && Player_IsCPU(nPlayer)) {
+            if (fn_8005CC5C() == 8) {
+                nStickX = 0;
+            } else {
+                nStickX = 0xFF;
             }
+        } else {
+            pPad    = Pad_State(nPlayer, gPlayers[nPlayer].nController);
+            nStickX = Swing_StickX(nPlayer, pPad);
+            Swing_StickY(nPlayer, pPad);
+        }
+        Vec_Copy(pObj->pModel->pMatrices[nBone][3], vPos);
+        if (pObj->nAnim == 6) {
+            if (nStickX < pSw->nCalibrateX) {
+                pSw->fRedColor = 0.0f;
+                pSw->fGreenColor = 0.0f;
+                pSw->fBlueColor = 0.5f;
+                pSw->fAlpha = gpSwing->fFC * (f32)(pSw->nCalibrateX - nStickX) / (f32)pSw->nCalibrateX;
+            } else {
+                pSw->fRedColor = 0.5f;
+                pSw->fGreenColor = 0.5f;
+                pSw->fBlueColor = 0.0f;
+                pSw->fAlpha = gpSwing->fFC * (f32)(nStickX - pSw->nCalibrateX) /
+                              (f32)(0xFF - pSw->nCalibrateX);
+            }
+            fn_8005AD20(pObj, pSw, nStickX);
+        } else if (pObj->nAnim == 7) {
+            pSw->fBlueColor = gpSwing->fF4;
+            pSw->fGreenColor = gpSwing->fF0;
+            pSw->fRedColor = gpSwing->fEC;
+            fT = pObj->fAnimTime - pSw->fTimeBallHit;
+            if (fT >= 0.0f && fT <= 1.0f) {
+                pSw->fAlpha = gpSwing->fF8 * (1.0f - fT);
+            } else if (fT < 0.0f) {
+                pSw->fAlpha = gpSwing->fF8;
+            } else {
+                pSw->fAlpha = 0.0f;
+            }
+            fn_8005AD20(pObj, pSw, pSw->nBackSwingX);
         }
     }
 }
@@ -2641,14 +2636,12 @@ void STATEFUNC_TapInInit(int nPlayer) {
 void STATEFUNC_GreenWatchRollInit(int nPlayer) {
     u8    shotSaved[0x5C];
     Ball  ballSaved;
-    u8*   pShot;
     Ball* pBall;
+    u8*   pShot;
     int   nController;
-    int   nView;
 
-    nView = gPlayers[nPlayer].nView[0];
-    View_SetCamera(fn_80017028(nView), 5, nPlayer, nView);
-    pShot = (u8*)&gPlayers[nPlayer].nClub;
+    View_SetCamera(fn_80017028(gPlayers[nPlayer].nView[0]), 5, nPlayer, gPlayers[nPlayer].nView[0]);
+    pShot =(u8*)&gPlayers[nPlayer].nClub;
     Mem_cpy(shotSaved, pShot, 0x5C);   // port: the shot block, nClub..unk3AD (no pointers)
     Caddie_ApplyTip(nPlayer);
     pBall = &gPlayers[nPlayer].ball;
@@ -2877,7 +2870,7 @@ void STATEFUNC_ElevatorUpdate(int nPlayer) {
 // animation 2. The ball is kept as it lies and marked stopped, the live ball's state cleared,
 // the player's distance to the pin stored, and the "shot begins" sound played.
 void STATEFUNC_ShotSetupInit(int nPlayer) {
-    int   nView;
+    s32   nView;
     Ball* pBall;
     if (Player_IsCPU(nPlayer) && gpGame->n290 != 0) {
         nView = gPlayers[nPlayer].nView[0];
@@ -3678,9 +3671,8 @@ void STATEFUNC_SimulateUpdate(int nPlayer) {
             !(gPlayers[nPlayer].uFlags & 8) &&
             (s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_CONCEDED && !fn_800E53B8() &&
             !(gPlayers[nPlayer].pChar->u10 & 0x40)) {
-            s32* pKeptState = &gPlayers[nPlayer].ballBefore.nState;
-            if (*pKeptState != 0) {
-                *pKeptState = 1;
+            if (gPlayers[nPlayer].ballBefore.nState != 0) {
+                gPlayers[nPlayer].ballBefore.nState = 1;
             }
             if (fn_800C6D28()) {
                 fn_800C6DE4();
@@ -3713,6 +3705,7 @@ void STATEFUNC_SwingInit(int nPlayer) {
     View* pV    = fn_80017028(gPlayers[nPlayer].nView[0]);
     int   nView;
     Ball* pBall;
+    Ball* pOwnBall;
     int   i;
 
     if (pV->nCurCamera == 0 && Player_IsCPU(nPlayer) && Game_GetMode() != 11) {
@@ -3776,9 +3769,9 @@ void STATEFUNC_SwingInit(int nPlayer) {
             fn_80047BC0(pBall, i);
         }
     }
-    pBall = &gPlayers[nPlayer].ball;
-    fn_80047B6C(pBall, nPlayer);
-    fn_80047BC0(pBall, nPlayer);
+    pOwnBall = &gPlayers[nPlayer].ball;
+    fn_80047B6C(pOwnBall, nPlayer);
+    fn_80047BC0(pOwnBall, nPlayer);
     gPlayers[nPlayer].bC2E = 0;
     gPlayers[nPlayer].bPlanReady = 0;
     gPlayers[nPlayer].uFlags     = 0;
