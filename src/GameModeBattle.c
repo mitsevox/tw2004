@@ -88,15 +88,15 @@ void fn_800E7B58(void) {
     lbl_802822E8 = 0;
     lbl_80281650 = 5;
     if (Player_IsHoled(0) && gPlayers[0].nStrokes[Game_CurHoleIndex()] < gPlayers[1].nStrokes[Game_CurHoleIndex()]) {
-        lbl_802822E8 = 1;
         gPlayers[0].nModePoints[Game_CurHoleIndex()] = 1;
+        lbl_802822E8 = 1;
         lbl_80281650 = 0;
         gPlayers[0].nHolesWon++;
     }
     if (Player_IsHoled(1) && gPlayers[1].nStrokes[Game_CurHoleIndex()] < gPlayers[0].nStrokes[Game_CurHoleIndex()]) {
+        gPlayers[1].nModePoints[Game_CurHoleIndex()] = 1;
         lbl_802822E8 = 1;
         lbl_80281650 = 1;
-        gPlayers[1].nModePoints[Game_CurHoleIndex()] = 1;
         gPlayers[1].nHolesWon++;
     }
     if (fn_800E7ABC(1)) {
@@ -198,8 +198,8 @@ void fn_800E7F68(int nPlayer, int nClub) {
 void fn_800E7F88(void) {
     int i;
     for (i = 0; i < gSession.nNumPlayers; i++) {
-        lbl_8020315C[i] = gPlayers[i].golfer.uBagMask;
-        lbl_80203148[i] = Bag_CountClubs(i);
+        *(u32*)((u8*)lbl_8020315C + i * sizeof(u32)) = PLAYER(i)->golfer.uBagMask;
+        *(s32*)((u8*)lbl_80203148 + i * sizeof(s32)) = Bag_CountClubs(i);
     }
 }
 
@@ -207,7 +207,7 @@ void fn_800E7F88(void) {
 void fn_800E800C(void) {
     int i;
     for (i = 0; i < gSession.nNumPlayers; i++) {
-        gPlayers[i].golfer.uBagMask = lbl_8020315C[i];
+        PLAYER(i)->golfer.uBagMask = *(u32*)((u8*)lbl_8020315C + i * sizeof(u32));
     }
 }
 
