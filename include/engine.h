@@ -165,7 +165,7 @@ u8   fn_80014300(u32 uMask);            // any pad pressed these buttons
 
 // ---- events, sound, effects ------------------------------------------------------------------
 
-void fn_8001C804(int nPlayer, int a, int b);
+void fn_8001C804(int nPlayer, u8 a, u8 b);  // char.c: sets bits of the player's character's u10
 void fn_8001D8DC(int nPlayer);
 void fn_8001EF34(f32* pIn, f32 f, f32* pOut);   // scale a vector (paired singles)
 
