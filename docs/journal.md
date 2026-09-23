@@ -252,7 +252,7 @@ Dated log of what was done and decided, newest last. Facts and lessons belong in
      "Structs". The matcher was not re-run: no new functions were decompiled, so nothing it
      uses changed.
   1b. ~~Name the swing states~~ **done 2026-09-23**: our table is TW06's
-     `sGolferStateEngineTable`; all 23 states named (`STATEFUNC_*`, 66 callbacks), plus 9 stack
+     `sGolferStateEngineTable`; all 23 states named (`STATEFUNC_*`, 67 callbacks), plus 9 stack
      functions (`GOLFERSTATE_*`) and a `GS_*` enum. Placed by shared callees, by the camera
      numbers (TW06's `CameraMode_t` still fits the low ones) and by position. State 8 is the knee
      cam, which TW06 dropped. **Correction:** state 15 is FadeToTapIn - entered only for a gimme -
