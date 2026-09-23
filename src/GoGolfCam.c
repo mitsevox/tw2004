@@ -79,6 +79,13 @@ void     Swing_RumbleOff(int nPlayer);                  // Swing.c
 u8       fn_8006BEA4(void);                             // the GameBreaker letterbox is up, scripted (nGBType 0)
 void     fn_800A68C0(u8 nPlayer);
 u8       CameraScript_IsDefaultSwingCam(CamShot* pShot, int nPlayer, f32* pCam);
+u8       fn_8003D7A0(CamSequence* pSequence, int nPlayer);
+void     fn_8001966C(Character* pChar);                 // char.c
+void     fn_8007325C(u8* pAnim);                        // set bit 2 of the animation player's flags
+u8       fn_800C43C0(View* pView, int nPlayer);
+u8       fn_800C44F4(View* pView, int nPlayer);
+void     fn_800C4FF0(View* pView, f32* pFrom, f32* pTo, int nPlayer);
+void     fn_800C56B4(View* pView, f32* pFrom, f32* pTo, int nPlayer);
 u8       Ter_CheckForGroundCollision(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
                                      SurfaceType** ppSurface, TerObject** ppObj);
 
@@ -1067,6 +1074,112 @@ void fn_800C1D3C(View* pView, int nPlayer) {
                                                0x19, 0.0f);
             }
         }
+    }
+}
+
+// The ball-flight camera: pick the flight sequence (the pre-flight sequence's follow-on if it has
+// one, else one for the shot's lie, surface class and distance), fall back on the current camera as
+// a hand-made shot, and start the matrix camera or the super zoom when the swing camera asks.
+void GolfCamera_InitBallFlightCamera(View* pView, int nPlayer) {
+    f32 vAim[4];
+    f32 vDiff[4];
+    f32* pCam;
+    f32* pSub;
+    int nClass;
+    int nLie;
+    f32 fDist;
+    CamSequence* pSeq;
+    pCam = fn_8001731C(pView);
+    pSub = fn_80017314(pView);
+    pView->b153 = 0;
+    nLie = gPlayers[nPlayer].ball.nLie;
+    if (gSession.bReplay && gPlayers[nPlayer].ballBefore.nState == 0) {
+        // a replay whose look-ahead ball has stopped: the distance that ball went
+        if (gPlayers[nPlayer].ballBefore.nSurface >= 0) {
+            nClass = gSurfaceTypes[gPlayers[nPlayer].ballBefore.nSurface].nClass;
+        } else {
+            nClass = 10;
+        }
+        fn_800C73DC(gPlayers[nPlayer].ballBefore.vPos, gPlayers[nPlayer].ball.vStart, vDiff);
+        fDist = fn_80009680(fn_80009744(vDiff));
+    } else {
+        fDist = AI_MaxDistance(nPlayer, gPlayers[nPlayer].nShotKind, gPlayers[nPlayer].nClub);
+        fDist *= fn_800510EC(&gPlayers[nPlayer].ball);
+        fDist *= fn_8005B64C(nPlayer);
+        nClass = 2;
+        fn_800C73DC(gPlayers[nPlayer].vTarget, gPlayers[nPlayer].vBall, vAim);
+        fn_800BAF04(vAim, vAim);
+        fn_8001EF34(vAim, fDist, vAim);
+        fn_800C73B8(vAim, gPlayers[nPlayer].vBall, pView->vD4);
+    }
+    if (pView->p74 != NULL && pView->p74->b44 == 3 && pView->p74->p20 != pView->p74 && pView->p74->p20 != NULL
+        && pView->p74->p20->b44 == 4 && fn_8003D7A0(pView->p74->p20, nPlayer)) {
+        pView->p74 = pView->p74->p20;
+    } else {
+        pView->p74 = fn_8003BDBC(nPlayer, nLie, nClass, 4, 1, fDist);
+    }
+    if (gPlayers[nPlayer].nShotKind == 5 && (pView->p74 == NULL || pView->p74->b46 != 6)) {
+        pSeq = fn_8003BDBC(nPlayer, nLie, nClass, 4, 0, fDist);
+        if (pSeq != NULL && pSeq->b46 == 6) {
+            pView->p74 = pSeq;
+        }
+    }
+    if (pView->p74 == NULL) {
+        CameraScript_RecordCurrentCam(&pView->shot19C, pCam, pSub, nPlayer, &pView->script, 0);
+        pView->p130 = &pView->shot19C;
+        pView->p134 = NULL;
+        pView->fCamTime = 0.0f;
+        pView->p130->f98 = 0.0f;
+    }
+    if (pView->p130 != NULL && pView->p134 != NULL && pView->n140 == 6) {
+        pView->n140 = 0;
+        pView->fCamTime = 0.0f;
+        pView->b150 = 1;
+    } else if (pView->p130 != NULL && pView->p134 != NULL && pView->n140 == 8) {
+        pView->n140 = 2;
+        pView->fCamTime = 0.0f;
+        pView->b150 = 1;
+    } else if (pView->p134 == NULL) {
+        if (fn_800C44A8(pView, nPlayer)) {
+            CameraScript_RecordCurrentCam(&pView->shot19C, pCam, pSub, nPlayer, &pView->script, 0);
+            pView->shot19C.p44 = pView->p130;
+            pView->p130 = &pView->shot19C;
+            pView->fCamTime = 0.0f;
+            pView->p130->f4C = -1.0f;
+            pView->p134 = NULL;
+        } else {
+            CameraScript_RecordCurrentCam(&pView->shot19C, pCam, pSub, nPlayer, &pView->script, 0);
+            pView->shot19C.p44 = pView->p130;
+            pView->p130 = &pView->shot19C;
+            pView->fCamTime = 0.0f;
+            if (pView->p74 != NULL) {
+                pView->p130->f4C = pView->p74->f38;
+            } else {
+                pView->p130->f4C = 1.0f;
+            }
+            pView->p134 = NULL;
+        }
+    }
+    pView->p13C = NULL;
+    if (fn_800C43C0(pView, nPlayer)) {
+        lbl_80282220->b54 = 1;
+        fn_8001966C(gPlayers[nPlayer].pChar);
+        fn_8007325C(gPlayers[nPlayer].pChar->anim);
+        fn_800C4FF0(pView, pCam, pSub, nPlayer);
+        pView->f18C = 0.0f;
+        EVENT_Trigger(nPlayer, 0x32, NULL, -1);
+    } else if (fn_800C44F4(pView, nPlayer)) {
+        lbl_80282220->b58 = 1;
+        fn_8007325C(gPlayers[nPlayer].pChar->anim);
+        fn_800C56B4(pView, pCam, pSub, nPlayer);
+        EVENT_Trigger(nPlayer, 0x39, NULL, -1);
+    } else if (pView->n260 == 15 || pView->n260 == 16) {
+        pView->p130->f4C = 1.0f;
+    }
+    pView->n148 = 0;
+    pView->n14C = 9;
+    if (pView->nCamera != 0 && pView->nCamera != 2) {
+        pView->nCamera = 0;
     }
 }
 

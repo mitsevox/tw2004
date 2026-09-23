@@ -73,6 +73,8 @@ typedef struct CamSequence {
     f32  f38;                   // 0x38  its length
     u8   unk3C[0x44 - 0x3C];
     u8   b44;                   // 0x44  its kind
+    u8   unk45;
+    u8   b46;                   // 0x46  6: the ball-flight camera keeps one for shot kind 5
 } CamSequence;
 
 // A view's camera script (0x40 bytes at View + 0x84).
@@ -104,7 +106,9 @@ typedef struct View {
     CamShot* p80;               // 0x080
     CamScript script;           // 0x084  the camera script the camera functions drive
     f32      vC4[4];            // 0x0C4
-    u8       unkD4[0x104 - 0xD4];
+    f32      vD4[4];            // 0x0D4  the ball-flight camera: where the shot should land (the aim, at
+                                //        the club's full distance)
+    u8       unkE4[0x104 - 0xE4];
     f32      fCamTime;          // 0x104  time on this camera
     u8       unk108[0x110 - 0x108];
     f32      f110;              // 0x110
