@@ -316,9 +316,9 @@ void fn_800E8A68(void) {
                         nRating2 = fn_800D3C7C(nOther2);
                         nSum = lbl_80200538.aStrokePrize[nRating1].nBase +
                                lbl_80200538.aStrokePrize[nRating2].nBase;
-                        nBase = nSum / 2;
                         nMoney = nSum + lbl_80200538.aStrokePrize[nRating1].nPerStroke * nMargin;
                         nMoney += lbl_80200538.aStrokePrize[nRating2].nPerStroke * nMargin;
+                        nBase = nSum / 2;
                         nMoney /= 2;
                         for (i = 0; i < 2; i++) {
                             nProfile = gPlayers[nFirst + i].nIndex;
