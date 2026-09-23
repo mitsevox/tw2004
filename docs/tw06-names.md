@@ -353,10 +353,125 @@ their `fn_` names until the rest of each file is confirmed.
 
 | File | Mode | TW06 | Notes |
 |---|---|---|---|
-| `GameEffects.c` | - | `GameEffects_*` | Init/Reset/AdjustTimeRate/FieldOfViewChange/SimulateBall/SpinWindowDone/UpdateGameEffects/VibrateControllerForHeartbeat/SkipOtherCommentary/ScriptedGBDidIt/Pause/RenderGameBreakerEffects/RenderPredictedGB/RenderScriptedGB/DrawLetterBoxes/EndGB/StartPredictedGB/CheckScriptedGB/IsGBPossible |
+| `GameEffects.c` | - | `GameEffects_*` | InitGameEffectSettings, ResetGameEffectSettings, ResetGameEffectTimeSettings, AdjustTimeRate, BallUpdatesThisFrame, ScriptedGameBreakerTrigger (DB30C, same player and reason arguments), InFlightGameBreakerTrigger (DBA50), EndGameBreaker (DBDA8), FieldOfViewChange, SimulateBall, SpinWindowDone, UpdateGameEffects, VibrateControllerForHeartbeat, SkipOtherCommentary, ScriptedGBDidIt, Pause, RenderGameBreakerEffects, RenderPredictedGB, RenderScriptedGB, DrawLetterBoxes. DB86C (whether a lie is worth a GameBreaker) has no settled name. The earlier names `EndGB`, `StartPredictedGB`, `CheckScriptedGB` and `IsGBPossible` are not TW06 names (in neither build) |
 | `GameAnalysis.c` | - | `GameAnalysis_*` | CountTotalPuttsSoFarThisRound (6170), CountTotalHoleScores (6204), CountBogeysOrWorse (62B4), CountCompletedHoles (6484); the tip picker is ours |
 | `GameModeMatch.c` | 1 | `GameModeMatch::` | Init, GetTeeHonors, GetHonors, HoleFinished, GameFinished, GoToPlayoff, EndHole, EndGame |
 | `GameModeBestBall.c` | 19 | `GameModeBestBall::` | also `GM_BestBallMode_GetTeamHoleScore` (8C24) and `..._GetTeamRelativeScore` (8CA8) |
 | `GameModeFourBall.c` | 20 | `GameModeFourBall::` | TeamDone, TeamConceded, TeamBestPossibleScore, TeamMatchWins, GetPlayerTeam |
 | `GameModeAlternateShot.c` | 21 | `GameModeAlternateShot::` | TeamDone, GetPartner, TeamBestPossibleScore, TeamMatchWins, EndGolferTurn (partner takes the ball) |
 | `GameModeBattle.c` | 25 | `GameModeBattle::` | ClubIsRequired (clubs 13, 21, 25), NumRemovableClubsLeft, RemoveClub, AddClub, Save/RestoreClubSetup, CanAddClub, GetWinner |
+| `GameModeStroke.c` | 0 | `GameModeStroke::` | Init, SetupNextGolfer, GetHonors, HoleFinished, GameFinished, EndGame (GoToPlayoff is the base class's; ours returns 0) |
+| `GameModeStableford.c` | 18 | `GameModeStableford::` | Init, PlayerDoneHole, SetupNextGolfer, GetHonors, HoleFinished, GameFinished, EndHole, EndGame; the data table `stablefordPointTable` (lbl_802816D0) |
+| `GameMode2.c` | 2 | `GameModeSkins::` | GetHonors, GameFinished, GoToPlayoff, EndHole, EndGame (the file keeps its own name) |
+| `GameModeReplay.c` | 10 | `GameModeReplay::` | Init, SetupNextGolfer, HoleFinished, GameFinished, EndGame, LoadHole, RestartHole, StartGamePreData |
+| `GameModeDriverPGATour.c` | 23 | `GameModeDriverPGATour::` | the file's TW06 class; 31 methods, rows below |
+| `GameModeDriverRTE.c` | 24 | `GameModeDriverRTE::` | the file's TW06 class; 13 methods, rows below |
+| `Earnings.c` | - | `GM_Earnings_*`, `EarningsInfo::` | TournamentPayout, GetStrokeWinnings(Team), RateGolfer, GetSkinsHoleValue, ComputeBonusModifiers, ComputeTOURCardModifiers, FreeStreamMemory; `roundToNearest25`, `GM_GetHighestRatedGolfer`; the stream clients are `EarningsInfo::(Un)RegisterStreamClients` in TW06 (there is no `GM_Earnings_RegisterStreamClients`). The file name is EA's, from the TW2003 tree (`Golf/GameMode/Earnings.c`), not TW06's |
+
+Tier `position`: the name comes from the method order of TW06's class in the PS2 map (which is in
+source order), checked against the code's shape and, for virtual methods, against the other modes.
+Every name below exists in the builds named in the Evidence column. The symbols keep their `fn_` names.
+
+| Address | Now | TW06 name | Tier | Evidence |
+|---|---|---|---|---|
+| `800FF700` | `fn_800FF700` | `GameModeStroke::Init` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800FF7DC` | `fn_800FF7DC` | `GameModeStroke::SetupNextGolfer` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800FF894` | `fn_800FF894` | `GameModeStroke::GetHonors` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800FFCCC` | `fn_800FFCCC` | `GameModeStroke::HoleFinished` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800FFD54` | `fn_800FFD54` | `GameModeStroke::GameFinished` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800FFDB8` | `fn_800FFDB8` | `GameModeStroke::EndGame` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800FE1B4` | `fn_800FE1B4` | `GameModeStableford::Init` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800FE2B4` | `fn_800FE2B4` | `GameModeStableford::PlayerDoneHole` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800FE344` | `fn_800FE344` | `GameModeStableford::SetupNextGolfer` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800FE3FC` | `fn_800FE3FC` | `GameModeStableford::GetHonors` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800FE7EC` | `fn_800FE7EC` | `GameModeStableford::HoleFinished` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800FE844` | `fn_800FE844` | `GameModeStableford::GameFinished` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800FE8A8` | `fn_800FE8A8` | `GameModeStableford::EndHole` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800FE980` | `fn_800FE980` | `GameModeStableford::EndGame` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800F8278` | `fn_800F8278` | `GameModeSkins::GetHonors` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800F8880` | `fn_800F8880` | `GameModeSkins::GameFinished` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800F8B08` | `fn_800F8B08` | `GameModeSkins::GoToPlayoff` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800F8EDC` | `fn_800F8EDC` | `GameModeSkins::EndHole` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800F9100` | `fn_800F9100` | `GameModeSkins::EndGame` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800F125C` | `fn_800F125C` | `GameModeReplay::Init` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800F1388` | `fn_800F1388` | `GameModeReplay::LoadHole` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800F1404` | `fn_800F1404` | `GameModeReplay::RestartHole` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800F1424` | `fn_800F1424` | `GameModeReplay::StartGamePreData` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800F15AC` | `fn_800F15AC` | `GameModeReplay::SetupNextGolfer` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800F193C` | `fn_800F193C` | `GameModeReplay::HoleFinished` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800F1944` | `fn_800F1944` | `GameModeReplay::GameFinished` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800F194C` | `fn_800F194C` | `GameModeReplay::EndGame` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800EDE7C` | `fn_800EDE7C` | `GameModeDriverPGATour::RegisterStreamClients` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800EDEE8` | `fn_800EDEE8` | `GameModeDriverPGATour::UnregisterStreamClients` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800EDF34` | `fn_800EDF34` | `GameModeDriverPGATour::LoadPGAcFromStream` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800EDF60` | `fn_800EDF60` | `GameModeDriverPGATour::LoadPGAtFromStream` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800EDF90` | `fn_800EDF90` | `GameModeDriverPGATour::LoadPGApFromStream` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800EDFC0` | `fn_800EDFC0` | `GameModeDriverPGATour::Locale_PgaTourMode_LoadPGAnFromStream` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800EE5B4` | `fn_800EE5B4` | `GameModeDriverPGATour::IsPuttForLead` | position | PS2 map and Xbox PDB; just before IsPuttForWin, which calls it in a playoff; tests whether the putt takes the lead |
+| `800EE6A0` | `fn_800EE6A0` | `GameModeDriverPGATour::IsPuttForWin` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800EE778` | `fn_800EE778` | `GameModeDriverPGATour::GetCurrentLead` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800EE810` | `fn_800EE810` | `GameModeDriverPGATour::GetPotentialLead` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800EF83C` | `fn_800EF83C` | `GameModeDriverPGATour::GetEventByDate` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800EF908` | `fn_800EF908` | `GameModeDriverPGATour::GetSelectedEvent` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800EF940` | `fn_800EF940` | `GameModeDriverPGATour::GetNextEvent` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800EF984` | `fn_800EF984` | `GameModeDriverPGATour::GetFinalEventOfSeason` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800EFA9C` | `fn_800EFA9C` | `GameModeDriverPGATour::GetRounds` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800EFB88` | `fn_800EFB88` | `GameModeDriverPGATour::GetCurrentSeason` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800EFBD0` | `fn_800EFBD0` | `GameModeDriverPGATour::GetEventOnOrAfter` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800EFD84` | `fn_800EFD84` | `GameModeDriverPGATour::GetEndDate` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800EFDFC` | `fn_800EFDFC` | `GameModeDriverPGATour::GetName` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800EFE18` | `fn_800EFE18` | `GameModeDriverPGATour::GetCurrentEventID` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800EFE60` | `fn_800EFE60` | `GameModeDriverPGATour::GetInitialChampName` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800EFE78` | `fn_800EFE78` | `GameModeDriverPGATour::GetInitialChampScore` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800EFE90` | `fn_800EFE90` | `GameModeDriverPGATour::GetCourses` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800EFF7C` | `fn_800EFF7C` | `GameModeDriverPGATour::GetWinnerEarningsString` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800F0010` | `fn_800F0010` | `GameModeDriverPGATour::GetCurrentEventLeader` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800F00F8` | `fn_800F00F8` | `GameModeDriverPGATour::GetPurseString` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800F01CC` | `fn_800F01CC` | `GameModeDriverPGATour::GetUserFinishString` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800F0258` | `fn_800F0258` | `GameModeDriverPGATour::GetChamp` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800F0290` | `fn_800F0290` | `GameModeDriverPGATour::GetChampScore` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800F0518` | `fn_800F0518` | `GameModeDriverRTE::RegisterStreamClients` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800F0570` | `fn_800F0570` | `GameModeDriverRTE::UnregisterStreamClients` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800F05B0` | `fn_800F05B0` | `GameModeDriverRTE::Locale_LoadRTEcFromStream` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800F05DC` | `fn_800F05DC` | `GameModeDriverRTE::LoadRTEsFromStream` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800F060C` | `fn_800F060C` | `GameModeDriverRTE::Locale_LoadRTEnFromStream` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800F06DC` | `fn_800F06DC` | `GameModeDriverRTE::StartEvent` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800F0C74` | `fn_800F0C74` | `GameModeDriverRTE::GetCurrentDate` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800F0CEC` | `fn_800F0CEC` | `GameModeDriverRTE::GetEventByDate` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800F0EA0` | `fn_800F0EA0` | `GameModeDriverRTE::GetCalData` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800F0EF4` | `fn_800F0EF4` | `GameModeDriverRTE::GetName` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800F0F10` | `fn_800F0F10` | `GameModeDriverRTE::GetDescription` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800F1034` | `fn_800F1034` | `GameModeDriverRTE::GetNextEvent` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800F1224` | `fn_800F1224` | `GameModeDriverRTE::IsEventComplete` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800D33A8` | `fn_800D33A8` | `roundToNearest25` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800D33F0` | `fn_800D33F0` | `GM_Earnings_FreeStreamMemory` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800D33F4` | `fn_800D33F4` | `EarningsInfo::RegisterStreamClients` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800D3424` | `fn_800D3424` | `EarningsInfo::UnRegisterStreamClients` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800D3478` | `fn_800D3478` | `GM_Earnings_TournamentPayout` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800D36E0` | `fn_800D36E0` | `GM_Earnings_GetStrokeWinnings` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800D37BC` | `fn_800D37BC` | `GM_Earnings_GetStrokeWinningsTeam` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800D3C1C` | `fn_800D3C1C` | `GM_GetHighestRatedGolfer` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800D3C7C` | `fn_800D3C7C` | `GM_Earnings_RateGolfer` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800D3D64` | `fn_800D3D64` | `GM_Earnings_GetSkinsHoleValue` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800D6A70` | `fn_800D6A70` | `GM_Earnings_ComputeBonusModifiers` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800D7220` | `fn_800D7220` | `GM_Earnings_ComputeTOURCardModifiers` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+
+The game-state callback slots (`GameState`, `include/golfer.h`) are named after the TW06
+`GameModeBase` virtual methods their implementations carry:
+
+| Slot | Our field | TW06 method | Evidence |
+|---|---|---|---|
+| 0x1C8 | `pfnInit` | `Init` | every mode's setup stores itself here; Stroke, Stableford, Match, BestBall, FourBall, AlternateShot, Battle and Replay's are `::Init` by method order |
+| 0x1CC | `pfnShutdown` | `Shutdown` | GameModeBattle's (restores the bags) |
+| 0x1D0 | `pfnSetupNextGolfer` | `SetupNextGolfer` | Stroke, Stableford, Replay |
+| 0x1D4 | `pfnGetHonors` | `GetHonors` | Stroke, Stableford, Match, BestBall, FourBall, AlternateShot, Skins. TW06 passes (PlayerNumber_t, u8); our callers pass one argument |
+| 0x1D8 | `pfnHoleFinished` | `HoleFinished(PlayerNumber_t, u8)` | seven modes; the u8 is TW06's and our callers pass 0 or 1 |
+| 0x1DC | `pfnGameFinished` | `GameFinished(u8)` | eight modes |
+| 0x1E0 | `pfnGoToPlayoff` | `GoToPlayoff(u8)` | Match, FourBall, AlternateShot, Skins; nothing in the binary calls the slot (0x800CFB88 only adds the slots up) |
+| 0x1E8 | `pfnEndHole` | `EndHole` | Match, Stableford, BestBall, FourBall, AlternateShot, Battle, Skins |
+| 0x1F4 | `pfnEndGame` | `EndGame` | every mode that pays out |
+| 0x234 | `pfn234` | `CheckControllerPulled` | by position only (GM_CheckControllerPulled asks it); not renamed |
+| 0x248 | `pfnEndGolferTurn` | `EndGolferTurn` | AlternateShot's (the partner takes the ball) |
+
+The slots at 0x1E4, 0x1EC, 0x1F0 and the rest keep offset names: TW2004's slot order does not follow
+TW06's virtual order closely enough to name them from position.

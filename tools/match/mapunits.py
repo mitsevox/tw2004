@@ -281,7 +281,9 @@ def check():
     problems, n = [], 0
     defs = {}
     for p in (ROOT / 'src').rglob('*.c'):
-        for m in re.finditer(r'^\w[\w \*]*\b(fn_[0-9A-F]{8})\([^;{]*\)\s*\{', read(p), re.M):
+        # the plain-C port version of an asm function (its #else branch) is not a second definition
+        text = re.sub(r'^#else\b.*?^#endif\b', '', read(p), flags=re.M | re.S)
+        for m in re.finditer(r'^\w[\w \*]*\b(fn_[0-9A-F]{8})\([^;{]*\)\s*\{', text, re.M):
             defs.setdefault(m.group(1), []).append(str(p.relative_to(ROOT)))
     for f in json.loads(read(MAP))['files']:
         t = f.get('text') or {}

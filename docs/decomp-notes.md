@@ -392,7 +392,7 @@ The fixes that come up most often. Each points to its full entry below.
   calls (`Swing_MisHitRumble` 99.5% -> 100 with `double`). The real `fabsf` is 0x8000AD9C, which
   calls it and rounds with `frsp`.
 - **[verified] A callee that ignores r3, called while r3 still holds the caller's first
-  parameter, takes that parameter.** `Scenario_RequiredShape()` -> `(nPlayer)` (Golfer
+  parameter, takes that parameter.** `fn_8010069C()` -> `(nPlayer)` (Golfer
   `AI_FaceVector` 99.72% -> 100). Likewise a callee starting `clrlwi. r0, r3, 24` has a `u8`
   first parameter, and its callers pass a `u8` without `clrlwi` (Swing `fn_80045494/5558`).
 - **[verified] `fn(15, (u8)a, b)` and `fn(15, a & 0xFF, b)` differ for an int parameter `a`.**

@@ -62,7 +62,12 @@ f32  fn_8005B64C(int nPlayer);          // the swing's shot power
 void GOLFERSTATE_Push(int nState, int nPlayer);     // push a state and run its enter callback
 void GOLFERSTATE_Set(int nState, int nPlayer);      // pop everything and start again from one state
 void GOLFERSTATE_Switch(int nState, int nPlayer);   // replace the current state
-int  GOLFERSTATE_GetCurrentState(int nPlayer);      // GS_*, or -1
+// GS_*, or -1. The definition returns the state byte zero-extended (lbzx, Swing.c) and -1 as a full
+// int, so its return type is int. Many callers sign-extend the result, as if their own prototype
+// said s8; they write (s8)GOLFERSTATE_GetCurrentState(n), a fake match (without it GameMode8 falls
+// to 61/66). The same holds for the (u8) some callers put on GOLFERSTATE_Set's player (GameMode8,
+// GameRound). Both casts are harmless for the values these take (-1..0x30, 0..4).
+int  GOLFERSTATE_GetCurrentState(int nPlayer);
 u8   fn_8005D2DC(void);
 void STATEFUNC_SimulateInit(int nPlayer);
 void STATEFUNC_SimulateUpdate(int nPlayer);
@@ -76,8 +81,8 @@ void fn_80062C80(int a, u8 b);
 void fn_80062CB0(int a, u8 b);
 void fn_80062CE0(u8 a);
 void fn_80062D0C(int nPlayer);
-void fn_80062D38(int a, int b, int nPlayer);
-void fn_80062D6C(int a, int nPlayer);
+void fn_80062D38(int nMsg, int nA, int nB);    // send message nMsg with two values (fn_800E5998)
+void fn_80062D6C(int nMsg, int nValue);        // send message nMsg with one value (fn_800E590C)
 
 // ---- the game manager ------------------------------------------------------------------------
 
@@ -412,7 +417,7 @@ void fn_800F1B60(int nPlayer, s8 n);
 u8   fn_800F1BD8(int nPlayer);          // previous target
 u8   fn_800F1C34(int nPlayer);          // next target
 s8   fn_800F1C74(int nPlayer);          // the target nearest the ball
-int  fn_800F1D34(int nPlayer);          // the player's current target
+int  fn_800F1D34(int nPlayer);          // the target nearest the player's aim point
 s32  fn_800F1E58(s32 n);
 void fn_800F1EE4(void);                 // every player's target-game state cleared
 void fn_800F2030(void);
@@ -496,7 +501,7 @@ static inline void AddIfScore(s32* aList, int* pnCount, int nPlayer, int nHole, 
 // GameMode11.c: the lessons
 extern s32 lbl_802823FC;                // the current lesson, 1..12
 u8   fn_80100294(void);                 // in a lesson (mode 11)
-int  Scenario_RequiredShape(int nPlayer); // the lesson's shape in mode 11, else 7 (none); nPlayer unused
+int  fn_8010069C(int nPlayer); // the lesson's shape in mode 11, else 7 (none); nPlayer unused
 u8   fn_80100AF8(void);                 // lesson 5 of mode 11
 u8   fn_80100C00(void);
 u8   fn_80101738(void);

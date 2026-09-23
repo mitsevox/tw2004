@@ -76,7 +76,8 @@ u8 fn_800E8F20(int nTeam) {
         b = 1;
     }
     bConceded = 0;
-    if (Player_IsHoled(a) && !Player_IsHoledNotState23(a) && Player_IsHoled(b) && !Player_IsHoledNotState23(b)) {
+    if (Player_IsHoled(a) && !Player_IsHoledNotState23(a) &&
+        Player_IsHoled(b) && !Player_IsHoledNotState23(b)) {
         bConceded = 1;
     }
     return bConceded;

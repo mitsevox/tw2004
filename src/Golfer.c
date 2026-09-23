@@ -8,6 +8,8 @@
 #include "engine.h"
 #include "game/save.h"
 
+// fake match: the (s8) on GOLFERSTATE_GetCurrentState (see game.h).
+
 // ---- small accessors ------------------------------------------------------------------------
 
 u8 Player_IsCPU(int nPlayer) {
@@ -74,7 +76,8 @@ int Golfer_GetAttribute(Player* pPlayer, int nAttr, int nMode) {
     if (nMode == ATTR_BASE || nMode == ATTR_TOTAL) {
         if (Controller_IsCPU(pPlayer->nController) && pPlayer->golfer.nIndex < FIRST_CREATED_GOLFER &&
             (Game_GetMode() == 4 || (gSession.uFlags & 2))) {
-            nValue = (s8)((s32)pPlayer->golfer.attrAlt[nAttr] + Golfer_TierBonus(pPlayer->golfer.tier[nAttr]));
+            nValue =
+                (s8)((s32)pPlayer->golfer.attrAlt[nAttr] + Golfer_TierBonus(pPlayer->golfer.tier[nAttr]));
         } else {
             nValue = (s8)((s32)pPlayer->golfer.attr[nAttr] + Golfer_TierBonus(pPlayer->golfer.tier[nAttr]));
         }
@@ -179,7 +182,9 @@ void AI_ChooseTarget(int nPlayer) {
                 } else {
                     nSkill += (int)(40.0f * (AI_Pow(fDumb, 2.0f) / 100.0f) / 100.0f);
                 }
-                if ((s8)nSkill > 100) nSkill = 100;
+                if ((s8)nSkill > 100) {
+                    nSkill = 100;
+                }
             }
             if (t->nSkillReq < 0 && (s8)nSkill > IABS((int)t->nSkillReq)) continue;
             if ((s8)nSkill < t->nSkillReq) continue;
@@ -274,7 +279,9 @@ void AI_ApplyError(int nPlayer) {
         fDist1    = 20.0f;
         fDist2    = 10.0f;
         if (p->fDistance < 1.5f) return;
-        if (p->fDistance < 5.0f) fMaxAngle *= 0.5f;
+        if (p->fDistance < 5.0f) {
+            fMaxAngle *= 0.5f;
+        }
     } else if (nAttr == ATTR_RECOVERY) {
         fSkill = (f32)(s8)Golfer_GetAttribute(p, ATTR_RECOVERY, ATTR_TOTAL);
         nSpin  = Golfer_GetAttribute(p, ATTR_SPIN, ATTR_TOTAL);
@@ -319,17 +326,25 @@ void AI_ApplyError(int nPlayer) {
         }
     }
 
-    if (fSkill > 98.0f) fSkill = 98.0f;
+    if (fSkill > 98.0f) {
+        fSkill = 98.0f;
+    }
     if (fSkill < 100.0f) {
         f32 fDX, fDZ;
-        if (fSkill < 15.0f) fSkill = 15.0f;
+        if (fSkill < 15.0f) {
+            fSkill = 15.0f;
+        }
 
         // Aim: up to the angle limit, at least a quarter of a degree, either side.
         fRand   = Rand_Float(0);
         fMiss   = 100.0f - fSkill;
         fAimErr = fMaxAngle * (fMiss * fRand) / 100.0f;
-        if (fAimErr < DEG(0.25f)) fAimErr += DEG(0.25f);
-        if (Rand_Next(0) & 1) fAimErr *= -1.0f;
+        if (fAimErr < DEG(0.25f)) {
+            fAimErr += DEG(0.25f);
+        }
+        if (Rand_Next(0) & 1) {
+            fAimErr *= -1.0f;
+        }
         p->fAim += fAimErr;
         if (p->fAim < -PI) {
             p->fAim += TWOPI;
@@ -454,7 +469,8 @@ int AI_ShotKindForDistance(int nPlayer, f32 fDist) {
         fDist /= fn_800510EC(&p->ball);
         if (p->ball.nLie == LIE_GREEN_e || AI_GreenTowardPin(nPlayer, 1.5f)) {
             nKind = SHOT_TYPE_PUTT_e;
-        } else if ((p->golfer.uBagMask & (1 << 21)) && fDist < 15.0f && AI_GreenTowardPin(nPlayer, 5.0f) && Lie_AllowsFullSwing(nPlayer)) {
+        } else if ((p->golfer.uBagMask & (1 << 21)) && fDist < 15.0f && AI_GreenTowardPin(nPlayer, 5.0f) &&
+                   Lie_AllowsFullSwing(nPlayer)) {
             nKind = SHOT_TYPE_CHIP_e;
         } else if ((p->golfer.uBagMask & (1 << 23)) && fDist < 20.0f) {
             nKind = SHOT_TYPE_PITCH_e;
@@ -497,7 +513,8 @@ int AI_ClubForShot(int nPlayer, int nKind, u8 bUnderOnly, f32 fDist) {
         }
     } else {
         nClub = AI_FirstUsableClub(nPlayer, nKind);
-        if (Game_GetMode() == 6 || Game_GetMode() == 7 || Game_GetMode() == 8 || Controller_IsCPU(p->nController)) {
+        if (Game_GetMode() == 6 || Game_GetMode() == 7 || Game_GetMode() == 8 ||
+            Controller_IsCPU(p->nController)) {
             fDist /= fn_800510EC(&p->ball);
         }
         for (c = 0; c < CLUB_MAX_e; c++) {
@@ -671,7 +688,9 @@ u8 Golfer_IsLucky(int nPlayer) {
         int nLuck = (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_LUCK, ATTR_TOTAL);
         nLuck = nLuck < 0 ? 0 : (nLuck > 110 ? 110 : nLuck);
         uOdds -= uOdds * (nLuck >> 1) / 100;
-        if (uOdds < 1) uOdds = 1;
+        if (uOdds < 1) {
+            uOdds = 1;
+        }
     }
     uRoll = Rand_Next(0) % uOdds;
     if (gPlayers[nPlayer].ball.nLie != LIE_GREEN_e && gPlayers[nPlayer].nShotKind != SHOT_TYPE_PUTT_e &&
@@ -827,7 +846,8 @@ void Caddie_Update(int nPlayer) {
     gCaddieFrames++;
 }
 
-// 0 = no tip for this shot, 1 = tip ready (the aim point in pOut), 2 = gave up.
+// Returns 0 when there is no tip for this shot, 1 when a tip is ready (the aim point in pOut), 2 when
+// it gave up.
 int Caddie_GetTip(int nPlayer, f32* pOut) {
     if (gPlayers[nPlayer].nShotKind != SHOT_TYPE_PUTT_e || Player_IsCPU(nPlayer) || gSession.nSplitScreen) {
         pOut[0] = 0.0f;
@@ -968,7 +988,9 @@ void AI_ClubLonger(int nPlayer, s32* pClub, int nStep) {
         nClub--;
         bOk = Club_UsableForKind(nPlayer, nClub, gPlayers[nPlayer].nShotKind);
     }
-    if (bOk) *pClub = nClub;
+    if (bOk) {
+        *pClub = nClub;
+    }
 }
 
 // *pClub goes nStep clubs shorter (higher index), then further until one is usable.
@@ -982,7 +1004,9 @@ void AI_ClubShorter(int nPlayer, s32* pClub, int nStep) {
         nClub++;
         bOk = Club_UsableForKind(nPlayer, nClub, gPlayers[nPlayer].nShotKind);
     }
-    if (bOk) *pClub = nClub;
+    if (bOk) {
+        *pClub = nClub;
+    }
 }
 
 // One frame of the rehearsal. Returns 1 once the aim is settled. pOutDist2, when given, receives
@@ -995,7 +1019,9 @@ u8 AI_RehearseShot(int nPlayer, f32* pOutDist2, u8 bFast, f32 fTolerance) {
     int     nState;
     s8      nTries;
 
-    if (pOutDist2 != NULL) *pOutDist2 = 1e10f;
+    if (pOutDist2 != NULL) {
+        *pOutDist2 = 1e10f;
+    }
 
     switch (p->nRehearseState) {
     case 2:     // reset
@@ -1010,7 +1036,9 @@ u8 AI_RehearseShot(int nPlayer, f32* pOutDist2, u8 bFast, f32 fTolerance) {
     case 0:     // launch
         Mem_cpy(&gSimBall, &p->ball, sizeof(gSimBall));
         fPower = p->fPower * AI_PowerScale(nPlayer);
-        if (fPower > 1.5f) fPower = 1.5f;
+        if (fPower > 1.5f) {
+            fPower = 1.5f;
+        }
         Ball_SetSimulating(1);
         // Always the normal trajectory.
         Ball_Launch(&gSimBall, p->nClub, p->nShotKind, fPower, p->fAim, 1, p->vLaunchA, p->vLaunchB);
@@ -1057,7 +1085,9 @@ u8 AI_RehearseShot(int nPlayer, f32* pOutDist2, u8 bFast, f32 fTolerance) {
             fDX    = gSimBall.vPos[0] - p->vTarget2[0];
             fDZ    = gSimBall.vPos[2] - p->vTarget2[2];
             fDist2 = fDX * fDX + fDZ * fDZ;
-            if (pOutDist2 != NULL) *pOutDist2 = fDist2;
+            if (pOutDist2 != NULL) {
+                *pOutDist2 = fDist2;
+            }
             gSimHaveResult = 1;
             if (fDist2 < gSimBestDist) {
                 gSimBestAim[0] = p->vTarget[0];
@@ -1090,7 +1120,9 @@ u8 AI_RehearseShot(int nPlayer, f32* pOutDist2, u8 bFast, f32 fTolerance) {
             AI_PlanShot(nPlayer, p->vTarget);
             Shot_Prepare(nPlayer, 0);
         }
-        if (!bDone) p->nRehearseState = 0;
+        if (!bDone) {
+            p->nRehearseState = 0;
+        }
         break;
 
     case 3:     // told to stop: settle for the best, or start over with a fresh target
@@ -1153,10 +1185,10 @@ void Shot_DefaultSpin(int nPlayer, f32* pOut) {
 }
 
 // A CPU's clubface vector from its shot shape (a lesson in mode 11 can dictate the shape):
-// x = +-0.02 for a slight curve, +-0.04 for a big one, normalised.
+// The x part is 0.02 either way for a slight curve and 0.04 for a big one, then the vector is normalised.
 void AI_FaceVector(int nPlayer, f32* pOut) {
     Player* p = &gPlayers[nPlayer];
-    int     nShape = Scenario_RequiredShape(nPlayer);
+    int     nShape = fn_8010069C(nPlayer);
     if (nShape != 7) {
         p->nShotShape = nShape;
     }
@@ -1240,9 +1272,13 @@ void Shot_FitTargetToClub(int nPlayer) {
 // Plan the next shot: a CPU sets its modifiers, everyone picks a target, Shot_Prepare fills in
 // the rest, the rehearsal is reset, and the luck roll decides whether this shot is perfect.
 void Shot_Plan(int nPlayer, u8 bNotify) {
-    if (Player_IsCPU(nPlayer)) AI_SetShotModifiers(nPlayer);
+    if (Player_IsCPU(nPlayer)) {
+        AI_SetShotModifiers(nPlayer);
+    }
     AI_ChooseTarget(nPlayer);
-    if (Player_IsCPU(nPlayer)) AI_OnTargetChosen(nPlayer);
+    if (Player_IsCPU(nPlayer)) {
+        AI_OnTargetChosen(nPlayer);
+    }
     Shot_Prepare(nPlayer, bNotify);
     gPlayers[nPlayer].nRehearseState = 2;
     gPlayers[nPlayer].bPerfect       = Golfer_IsLucky(nPlayer);
@@ -1278,7 +1314,9 @@ void AI_TargetsLoad(u8* pChunk) {
         gAITargets[i].pDef = pDef;
         // A point that links to itself links to nothing.
         for (k = 0; k < NUM_AI_LINKS; k++) {
-            if (pDef->nLinks[k] == i) pDef->nLinks[k] = -1;
+            if (pDef->nLinks[k] == i) {
+                pDef->nLinks[k] = -1;
+            }
         }
         gNumAITargets++;
     }
@@ -1334,7 +1372,9 @@ void Luck_ResetAllOdds2(void) {
 void Luck_TightenOdds(void) {
     int i;
     for (i = 0; i < 5; i++) {
-        if (gLuckOdds[i] > 9) gLuckOdds[i]--;
+        if (gLuckOdds[i] > 9) {
+            gLuckOdds[i]--;
+        }
     }
 }
 
@@ -1405,7 +1445,7 @@ void Golfer_TableByteSwap(void) {
 
 // The 'stat' handler: copy the file over the table, fix its endianness, set it up.
 void Golfer_OnStatsLoaded(UStreamObject* pObject) {
-    Mem_cpy(gGolferTable, *(u8**)pObject, *(u32*)((u8*)pObject + 0x24));
+    Mem_cpy(gGolferTable, pObject->pData, pObject->uSize);
     Golfer_TableByteSwap();
     fn_80009E70(pObject);
     Golfer_TableSetup();
@@ -1522,7 +1562,9 @@ u8 Bag_HasClub(int nPlayer, int nBit) {
     Player* p = &gPlayers[nPlayer];
     u32     uBit = 1 << nBit;
     u8      bHas = 0;
-    if (p->golfer.uBagMask & uBit) bHas = 1;
+    if (p->golfer.uBagMask & uBit) {
+        bHas = 1;
+    }
     return bHas;
 }
 
@@ -1531,7 +1573,9 @@ int Bag_CountClubs(int nPlayer) {
     int     nCount = 0;
     int     i;
     for (i = 0; i < CLUB_MAX_e; i++) {
-        if (p->golfer.uBagMask & (1 << i)) nCount++;
+        if (p->golfer.uBagMask & (1 << i)) {
+            nCount++;
+        }
     }
     return nCount;
 }
@@ -1592,8 +1636,12 @@ void Luck_TakePerfectShot(int nPlayer) {
             return;
         }
         fDiff = gPlayers[nPlayer].fAim - gPlayers[CADDIE_SLOT].fAim;
-        while (fDiff < -PI) fDiff += 2 * PI;
-        while (fDiff > PI) fDiff -= 2 * PI;
+        while (fDiff < -PI) {
+            fDiff += 2 * PI;
+        }
+        while (fDiff > PI) {
+            fDiff -= 2 * PI;
+        }
         if (fabs(fDiff) > 0.0872665) {
             gPlayers[nPlayer].bPerfect = 0;
             return;
@@ -1632,9 +1680,15 @@ void Player_SetGolfer(int nPlayer, int nGolfer, int nController, u32 uBag, int b
     p->nIndex = nPlayer;
     Mem_cpy(&p->golfer, &gGolferTable[nGolfer], sizeof(GolferRecord));
     p->golfer.nIndex = nGolfer;
-    if (gSession.uFlags & 0x200) uBag |= BAG_ALL;
-    if (uBag != 0) p->golfer.uBagMask = uBag;
-    if (p->golfer.uBagMask == 0) p->golfer.uBagMask = BAG_DEFAULT;
+    if (gSession.uFlags & 0x200) {
+        uBag |= BAG_ALL;
+    }
+    if (uBag != 0) {
+        p->golfer.uBagMask = uBag;
+    }
+    if (p->golfer.uBagMask == 0) {
+        p->golfer.uBagMask = BAG_DEFAULT;
+    }
     for (i = 0; i < NUM_ATTRS; i++) {
         p->attrMod[i] = 0;
     }
@@ -1657,25 +1711,33 @@ void Player_SetGolfer(int nPlayer, int nGolfer, int nController, u32 uBag, int b
     p->bMulliganUsed = 0;
     if (gSession.nSplitScreen) {
         if (bRightSide == 0) {
-            if (!fn_800170A0(0)) fn_80016D18(0, 0.0f, 0.0f, 0.5f, 1.0f);
+            if (!fn_800170A0(0)) {
+                fn_80016D18(0, 0.0f, 0.0f, 0.5f, 1.0f);
+            }
             p->nView[0] = 0;
             p->nView[1] = 0;
             fn_8001704C(p->nView[0], nPlayer);
             fn_8001704C(p->nView[1], nPlayer);
         } else if (bRightSide == 1) {
-            if (!fn_800170A0(1)) fn_80016D18(1, 0.5f, 0.0f, 0.5f, 1.0f);
+            if (!fn_800170A0(1)) {
+                fn_80016D18(1, 0.5f, 0.0f, 0.5f, 1.0f);
+            }
             p->nView[0] = 1;
             p->nView[1] = 1;
             fn_8001704C(p->nView[0], nPlayer);
             fn_8001704C(p->nView[1], nPlayer);
         }
     } else {
-        if (!fn_800170A0(0)) fn_80016D18(0, 0.0f, 0.0f, 1.0f, 1.0f);
+        if (!fn_800170A0(0)) {
+            fn_80016D18(0, 0.0f, 0.0f, 1.0f, 1.0f);
+        }
         p->nView[0] = 0;
         fn_8001704C(p->nView[0], nPlayer);
         if (gSession.nGameType == 4) {
             int nView;
-            if (!fn_800170A0(2)) fn_80016D18(2, 0.0f, 0.0f, 1.0f, 1.0f);
+            if (!fn_800170A0(2)) {
+                fn_80016D18(2, 0.0f, 0.0f, 1.0f, 1.0f);
+            }
             p->nView[1] = 2;
             fn_8001704C(p->nView[1], nPlayer);
             nView = p->nView[1];
@@ -1818,7 +1880,7 @@ void Session_Init(void) {
     pSession->b11         = 0;
     pSession->b12         = 0;
     pSession->bReplay     = 0;
-    pSession->n14       = 0;
+    pSession->nPaused   = 0;
     pSession->uFlags     &= ~0x60;
     pSession->fFrameTime  = 0.0f;
     pSession->f1C         = 0.0f;

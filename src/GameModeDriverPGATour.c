@@ -89,16 +89,25 @@ void fn_800EDEE8(void) {
 
 // TW06: GameModeDriverPGATour::LoadPGAcFromStream.
 void fn_800EDF34(UStreamObject* pObject) {
+    // port: the 'PGAc' object is copied straight into gPgaData.aTournament (Tournament[31]); it is
+    // big-endian on disc, so a little-endian port converts it field by field here
+    // (docs/format-byteorder.md)
     fn_8000E790(pObject, sizeof(gPgaData.aTournament), gPgaData.aTournament);
 }
 
 // TW06: GameModeDriverPGATour::LoadPGAtFromStream.
 void fn_800EDF60(UStreamObject* pObject) {
+    // port: the 'PGAt' object is copied straight into gPgaData.aTourEvent (TourEvent[31]); it is
+    // big-endian on disc, so a little-endian port converts it field by field here
+    // (docs/format-byteorder.md)
     fn_8000E790(pObject, sizeof(gPgaData.aTourEvent), gPgaData.aTourEvent);
 }
 
 // TW06: GameModeDriverPGATour::LoadPGApFromStream.
 void fn_800EDF90(UStreamObject* pObject) {
+    // port: the 'PGAp' object is copied straight into gPgaData.aTriple (PgaTriple[11]); it is
+    // big-endian on disc, so a little-endian port converts it field by field here
+    // (docs/format-byteorder.md)
     fn_8000E790(pObject, sizeof(gPgaData.aTriple), gPgaData.aTriple);
 }
 

@@ -261,10 +261,10 @@ typedef struct Player {
     u8   b30C;                  // 0x30C  the start of the block GameModeReplay restores from a replay
     u8   b30D;                  // 0x30D  tested with the course check by GameEffects
     u8   b30E;                  // 0x30E  a replaced ball must be dropped (GM_ReplaceOOBBall)
-    u8   b30F;                  // 0x30F  copied to b310 at the end of the hole (fn_800D9350)
+    u8   b30F;                  // 0x30F  copied to b310 after a shot (fn_800D9350)
     u8   b310;                  // 0x310  cleared by fn_800D8D38
-    u8   b311;                  // 0x311  set at the end of a hole with b30E
-    u8   b312;                  // 0x312  set when the ball finished on the green or in the hole
+    u8   b311;                  // 0x311  set after a shot with b30E (fn_800D9350)
+    u8   b312;                  // 0x312  set when a shot finished on the green or in the hole (fn_800D9350)
     u8   unk313;
     CourseMoneyTracking money;  // 0x314  the round's money by kind (fn_800D3548)
     // Shot block, TW06 AIshot_t (which has 6 preferred clubs where we have 8).
@@ -437,7 +437,8 @@ typedef struct Session {
     u8   b12;                   // 0x012  set by the pause menu, a replay and the lessons; GameManager
                                 //        tests it
     u8   bReplay;               // 0x013  a saved replay is playing: no luck swap, no spin, instant launch
-    s32  n14;                   // 0x014  nonzero while the game is paused (GameUI.c; GameMessages.c sets 2)
+    s32  nPaused;               // 0x014  0 running, 1 paused (GameUI fn_800E3E3C), 2 paused until the last
+                                //        menu screen closes (fn_800E5240 then unpauses)
     f32  fFrameTime;            // 0x018  seconds per frame
     f32  f1C;                   // 0x01C
     s32  n20;                   // 0x020
@@ -448,7 +449,10 @@ typedef struct Session {
     s32  nGolfer[5];            // 0x044  golfer index per player
     s32  nTeeSet[5];            // 0x058
     u32  uBag[5];               // 0x06C  per player, 0 = the record's own
-    u8   unk80[0xD38 - 0x80];
+    u8   unk80[0xD28 - 0x80];
+    u8   aD28[5];               // 0xD28  per index, set by fn_8001D6D8
+    u8   aD2D[5];               // 0xD2D  per index, set by fn_8001D624
+    u8   unkD32[0xD38 - 0xD32];
     PlayerProfile aProfile[5];  // 0x0D38
     GameOptions options;        // 0x0E78
     CourseRecord aCourseRecord[NUM_COURSE_RECORDS];    // 0x0F00  per course
@@ -475,7 +479,7 @@ LAYOUT_ASSERT(Session, 0x5BD0);
 typedef struct GameState {
     s32  nMode;                 // 0x000
     s32  n4;                    // 0x004
-    s32  nMulligans;            // 0x008  0 none, 2 one per player per round (GM_PlayerTakeMulligan)
+    s32  nMulligans;            // 0x008  0 none, 1 any number, 2 one per player per round (GM_PlayerTakeMulligan)
     s32  nC;                    // 0x00C  4 in the team modes
     s32  n10;                   // 0x010  4 in the team modes
     s32  nCurCourse;            // 0x014  the course of the current hole
@@ -539,7 +543,7 @@ typedef struct GameState {
     void (*pfn228)(int nPlayer); // 0x228  called every frame of the shot setup (state 10)
     void (*pfn22C)(int nPlayer); // 0x22C  called after a re-plan in swing state 9
     u8   (*pfn230)(int nPlayer); // 0x230
-    u8   (*pfn234)(void);       // 0x234  a controller was pulled
+    u8   (*pfn234)(void);       // 0x234  GM_CheckControllerPulled asks it (TW06 CheckControllerPulled)
     u8   (*pfn238)(int nPlayer); // 0x238  nonzero: skip addressing the ball (swing state 1)
     void (*pfn23C)(int nPlayer); // 0x23C
     s32  (*pfn240)(int nPlayer); // 0x240  called from 0x800A3460 with the player

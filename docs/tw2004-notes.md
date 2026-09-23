@@ -340,6 +340,37 @@ In-progress files are kept `NonMatching` (original code is linked) until every f
 because GCC emits the shared assert strings as private labels that the not-yet-written functions
 still reference from the auto units. Per-function progress comes from `report.json`.
 
+The save profile (`gpSaveData`)
+------------------------------
+
+`gpSaveData` points to five profiles, one per player slot, 0x10600 bytes each (`SaveProfile` in
+`include/game/save.h`). What the code proves so far:
+
+| Offset | Field | What it is |
+|---|---|---|
+| 0x0 | `bActive` | 1 when the slot holds a profile |
+| 0x1 | `szName` | the profile's name (compared with the all-time record holders) |
+| 0x1C | `aGolferUnlocked[30]` | per golfer (`fn_80058278` sets, `fn_8005832C` tests) |
+| 0x3A | `aCourseUnlocked[23]` | per course |
+| 0x51 | `aRewardUnlocked` | per reward (`fn_80058428` sets), up to 0x70 |
+| 0x70 | `b70` | set when an award is won, a round counted or a challenge started; cleared at round setup |
+| 0xC8 | `aC8[31]` | one per PGA TOUR tournament, 8 bytes each; byte 0 is 1 once it is won |
+| 0x20C | `aRTEAward[75]` | the real-time events' awards (4 bytes: won flag, the day) |
+| 0x338 | `aLadderAward[25]` | the ladder events' awards; the earnings rating counts the won ones |
+| 0x39C | `aAward[39]` | the other awards |
+| 0x438 | `aReplay[5]` | saved replays (0xF28 bytes each) |
+| 0x5000 | `nTourCardLevel` | 0..6: level 1 from the lessons, the rest from `fn_800D439C`; scales payouts |
+| 0x5004, 0x504C | `a5004[71]`, `a504C[71]` | per marked hole (`fn_800588F4`), continued at 0x10578 / 0x1057C for holes 71..74 |
+| 0x516C | `aMedal[29]` | the best challenge medal per group (0 best, 3 none), and the day at 0x51E4 |
+| 0x5230 | `aSavedRound[3]` | three saved custom rounds, 0x70 bytes each (the profile setup at 0x80057C88 clears three) |
+| 0x54C2 | | the created golfer kept in this slot: its names at 0x54C8, outfit 0x54F8, ball 0x54F9 |
+| 0xB634 | `tour` | the PGA TOUR season (TW06 `PGATourSeason_t`, 31 tournaments of 0x24 bytes) |
+
+A second block with the same layout, `lbl_80281DF4`, holds unlocks that apply to every profile.
+Two cheat codes, compared with `strcmp` at 0x8005655C, fill it: `"THEKITCHENSINK"` sets all 30
+golfers (0x1C..), 23 courses (0x3A..) and 18 rewards (0x51..) and TOUR card level 1;
+`"ALLTHETRACKS"` sets the courses.
+
 Leads and loose ends
 --------------------
 

@@ -9,23 +9,16 @@
 #include "engine.h"
 #include "game/save.h"
 
-void  fn_800E0A84(u8 v);
+// fake match: the (s8) on GOLFERSTATE_GetCurrentState (see game.h).
+
 void  fn_800D29E8(void);
 void  fn_800D33F0(void);
-int   fn_800E177C(void);
-void  fn_800E2470(void);
-void  fn_8006F4B4(void);
-void  fn_800E299C(void);
-void  fn_800E3B28(void);
 void  fn_800DA36C(void);
-void  GM_FlyByMode_Init(void);
 void  fn_800D8D38(int nPlayer);
-void  Caddie_Stop(void);
 u8    fn_800E0A90(int nPlayer);
 void  fn_800D439C(int nPlayer, int a);
 void  fn_800D9834(int nPlayer);
 u8    fn_8012591C(void);
-void  fn_80125854(int a);
 void  fn_8011989C(int nPlayer, int nStrokes);
 void  GM_GolferConcede_Hole(int nPlayer);
 void  GM_EndOfGolferTurn_HoleFinished(int nPlayer);
@@ -33,58 +26,23 @@ void  GM_EndOfGolferTurn_GameFinished(int nPlayer);
 void  GM_HoleFinished_GameNotFinished(int nPlayer);
 u8    GM_CheckForAIConcede(int nPlayer);
 
-void  fn_800E4164(int nMessage, int nPlayer, f32 f);
-
-void  fn_800E0AC4(int a);
-void  fn_800E0A98(int a);
 void  fn_800D8FE4(int nPlayer);
 void  fn_800D3DDC(int nPlayer);
 void  fn_800DA48C(int nPlayer);
 u8    fn_800DA2AC(void);
 void  fn_800DAD54(void);
-u8    fn_800DA174(void);
-u8    fn_800DA1D4(void);
-u8    fn_800E2DB4(int nPlayer);
 void  fn_800D9458(int nPlayer);
 void  fn_800D4030(int nPlayer);
 void  GM_CheckBallForUIHints(int nPlayer);
-u8    fn_800E23B0(int nPlayer, int nStrokes);
 u8    fn_8008AC40(void);
 void  fn_800D9350(int nPlayer);
 void  fn_800BB0A8(void);
 void  fn_800335F8(int a);
 void  fn_8006C4C0(int nPlayer);
-void  fn_8006C4A0(void);
-void  fn_800E0AF0(f32* pFrom, f32* pTo, f32* pOut);
 
 f32   fn_800336E4(void);
 f32   fn_800336F4(void);
-void  GOLFERSTATE_Push(int nState, int nPlayer);
-u8    fn_800E415C(void);
-u8    fn_800E45CC(void);
-u8    fn_800E46B4(void);
-void  fn_800E2A88(void);
-void  fn_800E1018(int nPlayer, int nHole);
-void  fn_800E41C8(void);
 
-int   fn_8006AA9C(int nPlayer);             // how the shot turned out (0..4, 8+)
-void  fn_8006AAB4(int nPlayer, int a);
-
-u32   fn_800136DC(int nController);         // buttons: held << 16 | pressed this frame
-u32   fn_800142AC(int nButton, int a);      // a button's mask
-u8    fn_80014300(u32 uMask);               // any pad pressed these buttons
-void  fn_80062D0C(int nPlayer);
-void  fn_80062B78(int nPlayer);
-void  fn_80062B74(int nPlayer);
-void  fn_80062B70(void);
-u8    Player_IsNotCPU(int nPlayer);
-void  fn_800E41D4(int nPlayer);
-void  fn_8006C300(int nPlayer);
-
-void  Shot_Prepare(int nPlayer, u8 bNotify);
-void  BreakLine_Start(int nView);            // GoBreakLine.c
-void  fn_8009B970(int nView);
-void  fn_800689D4(int nPlayer);
 u8    GM_bIsZoomButtonPressed(int nPlayer);
 u8    GM_bIsElevatorCamButtonPressed(int nPlayer);
 u8    fn_800E012C(int nPlayer);
@@ -92,14 +50,7 @@ u8    fn_800DFF0C(int nPlayer);
 
 u64   fn_800954A4(int a);                   // a time stamp
 f32   fn_8006E118(u64 tEnd, u64 tStart);    // seconds between two time stamps
-int   GameEffects_BallUpdatesThisFrame(int nPlayer);
-void  fn_8006B2C4(int nPlayer, int a);
 u8    fn_800BB1F8(int nPlayer);
-
-void  fn_800E0B14(f32* pA, f32* pB, f32* pOut);
-u8    fn_8004560C(void);
-
-void  fn_800E5228(void);
 
 int   GM_vGetAllTimeRecordsHeld(SaveProfile* pProfile);
 f32   GM_GetBonusProgress(SaveProfile* pProfile);
@@ -228,7 +179,7 @@ void GM_InitForHole(void) {
     lbl_80282278 = gpGame->pfnGetHonors(5);
     EVENT_Trigger(0xFF, 0, 0, -1);
     for (i = 0; i < 5; i++) {
-        int j;              // j only steers the register choice (found by the permuter)
+        int j;              // fake match: j only steers the register choice (found by the permuter)
         gpGame->n144[i] = 0;
         j = i;
         gpGame->n158[j] = 0;
@@ -480,7 +431,7 @@ void GM_ShowYardage(int nPlayer) {
 // TW06: GM_BumpBallForObstructions. A ball at rest against an obstruction or hazard is moved to
 // a drop point nearby, or else back where it was before the shot.
 void GM_BumpBallForObstructions(int nPlayer) {
-    int n;                      // a copy of nPlayer: register order only (a "fake match", found by the permuter)
+    int n;                      // fake match: a copy of nPlayer for the register order (permuter)
     f32 vDrop[4];
     if (gpGame->bBumpObstructions) {
         Player* p;
@@ -579,9 +530,9 @@ void GM_PlayerTookShot(int nPlayer) {
 }
 
 // Taking a mulligan. Not allowed when mulligans are off, the hole was conceded, or fn_800E53B8
-// says no; in mulligan mode 2 each player gets one (0xC28). The shot is undone: effects stopped,
-// the mode told, the golfer back in the Swing state, and the views of other players sharing this
-// screen (and still playing the hole) updated.
+// says no; in mulligan mode 2 each player gets one (bMulliganUsed), mode 1 allows any number. The
+// shot is undone: effects stopped, the mode told, the golfer back in the Swing state, and the views
+// of other players sharing this screen (and still playing the hole) updated.
 u8 GM_PlayerTakeMulligan(int nPlayer) {
     int     i;
     Player* q;
@@ -1269,14 +1220,14 @@ u8 fn_800DFF0C(int nPlayer) {
     return 0;
 }
 
-// TW06: GM_bIsZoomButtonPressed. Button 8 held: counts frames (at 59.94 a second) and says yes
+// TW06: GM_bIsZoomButtonPressed. Button 8 held: counts frames (FRAME_RATE a second) and says yes
 // once it has been held for 6.
 u8 GM_bIsZoomButtonPressed(int nPlayer) {
     if ((fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(8, 0)) && gpGame->n144[nPlayer] == 0) {
         gpGame->n144[nPlayer]++;
     } else if (gpGame->n144[nPlayer] > 0) {
         if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(8, 1)) {
-            gpGame->n144[nPlayer] += (int)(59.94f * gSession.fFrameTime + 0.5f);
+            gpGame->n144[nPlayer] += (int)(FRAME_RATE * gSession.fFrameTime + 0.5f);
             if (gpGame->n144[nPlayer] >= 6) {
                 gpGame->n144[nPlayer] = 0;
                 return 1;
@@ -1311,7 +1262,7 @@ u8 GM_bIsElevatorCamButtonPressed(int nPlayer) {
         gpGame->n158[nPlayer]++;
     } else if (gpGame->n158[nPlayer] > 0) {
         if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x2F, 1)) {
-            gpGame->n158[nPlayer] += (int)(59.94f * gSession.fFrameTime + 0.5f);
+            gpGame->n158[nPlayer] += (int)(FRAME_RATE * gSession.fFrameTime + 0.5f);
             if (gpGame->n158[nPlayer] >= 20) {
                 gpGame->n158[nPlayer] = 0;
                 return 1;
@@ -1349,6 +1300,7 @@ int GM_vGetAllTimeRecordsHeld(SaveProfile* pProfile) {
                     for (b = 0; b < 3; b++) {
                         if (RECORD_AT_LEAST(gSession.recB[k][i][j].nValue, gSession.recB[b][i][0].nValue)) {
                             n++;
+                            // fake match: leaves all three loops (ending them by setting their counters: 83%)
                             goto nextB;
                         }
                     }
@@ -1364,6 +1316,7 @@ int GM_vGetAllTimeRecordsHeld(SaveProfile* pProfile) {
                     for (b = 0; b < 3; b++) {
                         if (RECORD_AT_LEAST(gSession.recC[k][i][j].nValue, gSession.recC[b][i][0].nValue)) {
                             n++;
+                            // fake match: as above
                             goto nextC;
                         }
                     }

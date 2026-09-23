@@ -8,6 +8,8 @@
 #include "engine.h"
 #include "game/earnings.h"
 
+// fake match: the (s8) on GOLFERSTATE_GetCurrentState (see game.h).
+
 extern s32 lbl_80281690;                    // the options saved while the game runs
 extern s32 lbl_80282378;
 extern u8  lbl_8028237C;                    // a new leader was just set
