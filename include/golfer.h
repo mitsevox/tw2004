@@ -671,6 +671,8 @@ void Shot_FaceVector(int nPlayer, f32* pOut);
 f32  Shot_AimAngle(int nPlayer);
 void AI_ClubLonger(int nPlayer, s32* pClub, int nStep);
 void AI_ClubShorter(int nPlayer, s32* pClub, int nStep);
+void AI_ChooseTarget(int nPlayer);
+void GOLFERSTATE_Kill(int nPlayer);      // Swing.c: pop every state
 f32  AI_PowerScale(int nPlayer);
 void AI_FaceVector(int nPlayer, f32* pOut);
 void Caddie_Start(int nPlayer);

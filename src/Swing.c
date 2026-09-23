@@ -967,7 +967,6 @@ void GOLFERSTATE_Update(void) {
     }
 }
 
-void GOLFERSTATE_Kill(int nPlayer);
 
 // Pop every player's states.
 void fn_8005CD94(void) {
@@ -1651,6 +1650,8 @@ void Swing_ClearFrameFlag(int nPlayer) {
 }
 
 void fn_8001EF34(f32* pSrc, f32* pDst, f32 fScale);   // scale
+int  fn_8001EED8(void* pSkel, int nBone);             // a bone's index
+void Vec3Copy(void* pSrc, void* pDst);   // copy x, y, z
 
 // Record the club for its trail: the head (bone 0x53) and grip (0x52) go on the front of the
 // 25-entry history. When the head has moved more than 0.3 since the last entry, five in-between
@@ -2612,6 +2613,7 @@ void fn_80062B64(int nPlayer);
 void fn_80062B60(int nPlayer);
 void  fn_800C7140(int a);
 void  fn_80045824(int nPlayer);
+void  Shot_Plan(int nPlayer, u8 bNotify);     // Golfer.c
 extern Vec4 lbl_80183630;
 
 // State 15 (fade to tap-in), entered only when a gimme is allowed: plan the tap-in from where the
@@ -3700,7 +3702,6 @@ void STATEFUNC_PreShotUpdate(int nPlayer) {
 
 
 u8    fn_8001DBF4(int nHandle);               // the ball is in the golfer's hand
-int   fn_8001EED8(void* pSkel, int nBone);    // a bone's index
 void fn_80062DDC(f32* pA, f32* pB, f32* pOut);       // a - b
 void  fn_80051A18(u8* pBall, f32* pDir, f32 fSpeed, u8* pFrom);   // Ball.c: launch with a velocity
 extern Vec4 lbl_80183680;
