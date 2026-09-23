@@ -885,7 +885,7 @@ config.libs = [
             Object(Matching, "GameModeAlternateShot.c"),
             Object(Matching, "GameModeBattle.c"),
             Object(NonMatching, "GameModeBestBall.c"),
-            Object(NonMatching, "GameModeFourBall.c"),
+            Object(Matching, "GameModeFourBall.c"),
             Object(Matching, "GameModeMatch.c"),
             Object(NonMatching, "GameMode5.c"),
             Object(Matching, "GameMode9.c"),

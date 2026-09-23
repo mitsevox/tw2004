@@ -7,7 +7,7 @@
 #include "engine.h"
 #include "game/save.h"
 
-extern u8  lbl_80281648[2];                 // per team: 1 when the second partner (1 or 3) hits next
+u8 lbl_80281648[2] = {0, 0};                // per team: 1 when the second partner (1 or 3) hits next
 
 u8  fn_800E69CC(int nTeam);
 int fn_800E6A48(int nPlayer);
