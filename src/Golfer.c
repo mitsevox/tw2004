@@ -786,8 +786,6 @@ extern u8  gCaddieDone;             // 0x80281D49
 extern u8  gCaddieActive;           // 0x80281D4A
 extern s32 gCaddieFrames;           // 0x80281D4C
 
-u8 AI_RehearseShot(int nPlayer, f32* pOutDist2, u8 bFast, f32 fTolerance);   // 0x8002B030
-
 void Caddie_Start(int nPlayer) {
     if (!gPlayers[nPlayer].bPerfect && gPlayers[nPlayer].nShotKind != SHOT_PUTT) return;
     if (Player_IsCPU(nPlayer)) return;
@@ -869,8 +867,6 @@ void Ball_Launch(void* pBall, int nClub, int nKind, f32 fPower, f32 fAim, int nT
 void Ball_SimStep(void* pBall, f32 fDt, f32 fScale);              // 0x8005585C
 void fn_8001C774(int nHandle, int nClub);
 void fn_8001C724(int nHandle, int nKind);
-f32  fn_800095F0(f32 x);                                          // sinf
-f32  fn_80009638(f32 x);                                          // cosf
 
 // +n on every modifier the rehearsal cares about (not LUCK), aggression the other way.
 #define BUMP_MODIFIERS(p, n)                                                                       \

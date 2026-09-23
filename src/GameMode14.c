@@ -28,8 +28,6 @@ extern u8  lbl_80282370;                    // the round was ended
 extern s32 lbl_80282374;                    // the points of the last claim
 extern s32 lbl_801928F0[];                  // points per rank
 
-u32   Rand_Next(int nStream);
-void  AI_DefaultTarget(int nPlayer);
 void  fn_800E5B0C(int nMsg, u32 uFloats, void* p0, void* p1, void* p2, void* p3, void* p4);
 int   fn_800F1D34(int nPlayer);
 s32   fn_800F266C(s32 n, int i);

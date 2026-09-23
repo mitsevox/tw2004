@@ -34,8 +34,6 @@ extern s32 lbl_802823B4;                    // the points multiplier from bonuse
 extern s32 lbl_802823B8;                    // the seconds added by the last shot
 extern s32 lbl_802823BC;                    // the points of the last shot
 
-u32   Rand_Next(int nStream);
-void  AI_DefaultTarget(int nPlayer);
 void  fn_800A624C(void);
 void  fn_800ED710(s32 p0);
 void  fn_800F21B4(int nPlayer);

@@ -17,9 +17,6 @@ void   Vec3Copy(f32* pSrc, f32* pDst);           // 0x80008304
 f32    Vec_Distance(f32* pA, f32* pB);           // 0x800BB050
 f32    fn_8000AD78(f32 y, f32 x);                // atan2f
 void   Ball_Stop(Ball* pBall);                   // 0x80054340
-void   Vec_Copy(f32* pSrc, f32* pDst);           // 0x8000AD10
-f32    fn_800095F0(f32 x);                       // sinf
-f32    fn_80009638(f32 x);                       // cosf
 void   fn_8000AE28(f32* pIn, f32 f, f32* pOut);  // scale a vector
 void   Ball_SetLie(Ball* pBall, SurfaceType* pSurface);
 void   Ball_Tick(Ball* pBall, f32 fTicks);
@@ -88,7 +85,6 @@ f32    Ball_DistanceToPin(f32* pPos);
 void   Ball_Holed(Ball* pBall);
 void   Ball_SimSeconds(Ball* pBall, f32 fSeconds, f32 fTick);
 
-double fn_80009680(double x);                    // sqrt
 void   Ter_GetEnclosingGroundData(CourseInfo* pCourse, Ball* pBall, f32* pHeight, SurfaceType** ppSurface, f32* pNormal,
                    f32* pHeight2, SurfaceType** ppSurface2, f32* pNormal2);
 int    fn_80050BEC(SurfaceType* pSurface);       // a surface's index

@@ -4,7 +4,6 @@
 #include "golfer.h"
 #include "game.h"
 
-u32   Rand_Next(int nStream);
 extern u8 gNumPlayersSetUp;                 // 0x80281D48 (Golfer.c)
 extern u8 lbl_80203138[14];                 // the tips already shown (GameMessages.c)
 

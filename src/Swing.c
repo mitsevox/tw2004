@@ -103,8 +103,6 @@ extern f32         gForgivenessTable[3][27]; // 0x80188168  rows: value at attri
 extern s32         gBoostSteps[8];           // 0x80188148  power boost per level: 1 2 4 6 9 12 16 20
 
 double fabsf(double x);                // fabs
-f32    fn_80050D34(f32 fDist);               // putt power for a distance
-f32    fn_80050F88(f32 fDist, u8* pParams, int nKind, int nClub);   // chip power
 void   fn_800130F8(int nPad, int n);         // rumble on
 void   fn_80013130(int nPad, int n);         // rumble strength
 
@@ -609,7 +607,6 @@ extern f32 gSwingXScale[8];                  // 0x801882CC  the same values agai
 
 void Vec_Sub(f32* pA, f32* pB, f32* pOut);   // 0x8005CBF4  a - b
 void Vec_Add(f32* pA, f32* pB, f32* pOut);   // 0x8005CBD0  a + b
-f32  Rand_Float(int nStream);                // 0x8000B1B8  0..1
 
 // The analog swing's error: the angle between the stick's path back (centre to the top of the
 // backswing) and its path through (top to impact). Both x samples get a random +-15 (of a

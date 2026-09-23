@@ -20,7 +20,6 @@ void  fn_800E3050(int nCourse);
 int   fn_8011937C(int nPlayer, int a, u8 b);
 
 int   fn_800E8C24(int nPlayer, int nHole);
-u8    Player_IsCPU(int nPlayer);
 int   sprintf(char* pBuf, const char* pFmt, ...);
 
 extern u8   gNumPlayersSetUp;               // 0x80281D48 (Golfer.c)
@@ -72,14 +71,10 @@ void  fn_8010C4A0(void);
 void  fn_80125E68(void);
 extern s32 lbl_80282278;
 
-CourseInfo* fn_8000C594(void);
-void  Vec_Copy(f32* pSrc, f32* pDst);
 u8    Ter_PointInOOBNetwork(u8* pBall);
 u8    fn_800E3AF8(void);
 void  fn_800E0A84(u8 v);
-u32   Rand_Next(int nStream);
 void  fn_800E1404(int nHole);
-double fn_80009680(double x);               // sqrt
 u8    fn_8004B580(void);
 void  fn_80057364(int a);
 int   fn_800D3118(int nRound, int nHole);    // a built round's course for a hole

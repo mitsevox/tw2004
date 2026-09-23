@@ -50,7 +50,6 @@ typedef struct GameEffects {
 extern GameEffects lbl_80202898;
 
 void  fn_800DCAD8(void);
-u8    Controller_IsPad(int nController);
 void  fn_800131C4(int nController);
 void  fn_80013130(int nController, int nStrength);
 u8    fn_800C714C(void);
@@ -65,7 +64,6 @@ void  fn_80012EF8(void);
 void  fn_800141F8(f32* pA, f32* pB, f32 x0, f32 y0, f32 x1, f32 y1);
 void  fn_80014194(f32* pColour);
 void  fn_8001644C(int a, f32* pA, int b, f32* pB, int c);
-int   fn_800D2B08(void);                    // the hole's par
 int   fn_800D7660(int nPlayer, u8* pBall, u8 b);
 int   fn_800D782C(int nPlayer, u8* pBall, int a, u8 b, int c);
 u8    fn_800E5344(void);
@@ -79,8 +77,6 @@ void  GM_vCloseModuleONCE(void);
 u8    fn_800C6CCC(void);
 u8    fn_800C6CB0(void);
 u8    fn_800B4AE0(void);
-f32   AI_MaxDistance(int nPlayer, int nKind, int nClub);
-f32   fn_800510EC(u8* pBall);
 f32   fn_8005B64C(int nPlayer);
 void  fn_80045558(int a, int nPlayer);
 int   fn_8003BDBC(int nPlayer, int nLie, int a, int b, int c, f32 fDist);
@@ -91,7 +87,6 @@ int   fn_800E17AC(int nPlayer);           // the player's total strokes
 void  fn_800DCB84(u8* pA, u8* pB, f32* pOut);
 int   fn_800F354C(int nPlayer);
 int   fn_800F1D34(int nPlayer);
-CourseInfo* fn_8000C594(void);
 void* fn_800CC190(CourseInfo* pCourse, f32* pPos);   // surface type under a point
 extern u8* gpSaveData;
 int   fn_800D8750(int a, int b, int c, u8* pProfile, int nPlayer);

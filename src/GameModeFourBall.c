@@ -6,7 +6,6 @@
 #include "game.h"
 
 u8    Player_IsHoledNotState23(int nPlayer);
-CourseInfo* fn_8000C594(void);
 int   fn_800D37BC(int nWinner, int nLoser, int nMargin, int* pPrize);
 extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
 extern u8* gpSaveData;

@@ -35,8 +35,6 @@ extern s8  lbl_80282384;                    // the leader's target
 extern s32 lbl_80282388;                    // the leader's rank (0 best .. 4)
 extern s32 lbl_8028238C;                    // the leader (5 = none)
 
-u32   Rand_Next(int nStream);
-void  AI_DefaultTarget(int nPlayer);
 void  fn_800A6394(void);
 void  fn_800A640C(void);
 void* fn_80017004(int nView);

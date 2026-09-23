@@ -44,7 +44,6 @@ SurfaceType* Ter_GetSupportingWorldMaterial(CourseInfo* pCourse, u8* pBall);
 u8    Ter_PointInFreeDropNetwork(u8* pBall);
 void  fn_800E4164(int nMessage, int nPlayer, f32 f);
 void  fn_80063CF0(void* pView, int nCamera, int nPlayer);
-double fn_80009680(double x);               // sqrt
 u8    Ter_CheckObjectAndHazardObstruction(u8* pBall, int a, int b, int c, f32 f1, f32 f2, f32 f3);
 u8    Ter_SearchAreaForDropLocation(int nPlayer, int a, int b, f32* pOut);
 
@@ -65,7 +64,6 @@ void  GM_CheckBallForUIHints(int nPlayer);
 u8    fn_800E23B0(int nPlayer, int nStrokes);
 u8    fn_8008AC40(void);
 void  fn_800D9350(int nPlayer);
-int   fn_800D2B08(void);                    // the hole's par
 void  fn_800BB0A8(void);
 void  fn_800335F8(int a);
 void  fn_8006C4C0(int nPlayer);
@@ -73,10 +71,7 @@ void  fn_8006C4A0(void);
 void  fn_800C70F8(void* pView, int a);
 void  fn_800957FC(int nHandle, int a);
 u8*   fn_80016CFC(int nView);
-int   fn_80015464(void);
-CourseInfo* fn_8000C594(void);
 void  fn_800E0AF0(f32* pFrom, f32* pTo, f32* pOut);
-u32   Rand_Next(int nStream);
 
 extern u8  gReplayData[];                   // 0x801D6030
 extern u8* lbl_80281F78;

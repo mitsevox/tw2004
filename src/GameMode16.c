@@ -32,8 +32,6 @@ extern s32 lbl_80282390;
 extern s32 lbl_80282394;                    // the points multiplier from bonuses
 extern s32 lbl_80282398;                    // the points of the last shot
 
-u32   Rand_Next(int nStream);
-void  AI_DefaultTarget(int nPlayer);
 void  fn_800F21B4(int nPlayer);
 s32   fn_800F2810(s32 n);
 

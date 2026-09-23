@@ -7,7 +7,6 @@
 #include "game.h"
 #include "engine.h"
 
-CourseInfo* fn_8000C594(void);
 extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
 extern u8* gpSaveData;
 extern s32 lbl_80282278;                    // the player whose turn it is

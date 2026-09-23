@@ -46,7 +46,6 @@ void  fn_800EAE38(s32 i);
 void  fn_800EAF7C(void);
 int   fn_800EC558(void);
 void  fn_800D7770(int nPlayer, u8* pFlag);
-u32   Rand_Next(int nStream);
 void  fn_8011E020(s32* pYear, s32* pMonth, s32* pDay, s32* a, s32* b, s32* c, s32* d);
 void  fn_800D2714(u16* pDate, s32* pDay, s32* pMonth, s32* pYear);
 void  fn_800D2678(u16* pDate, s32 nYear, s32 nMonth, s32 nDay);
