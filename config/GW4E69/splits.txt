@@ -1572,7 +1572,10 @@ dolphin/pad/PadClamp.c:
 
 src/dolphin/pad/Pad.c:
 	.text       start:0x8014EB88 end:0x80150658
-	.sdata      start:0x80281AEC end:0x80281AF0
+	.data       start:0x8019C340 end:0x8019C398
+	.bss        start:0x8027D470 end:0x8027D4C0
+	.sdata      start:0x80281AD8 end:0x80281AF8
+	.sbss       start:0x80282958 end:0x80282980
 
 dolphin/ai.c:
 	.text       start:0x80150658 end:0x80150F24

@@ -422,7 +422,7 @@ config.libs = [
         "progress_category": "sdk",
         "src_dir": "extern/tww",
         "objects": [
-            Object(NonMatching, "src/dolphin/pad/Pad.c"),
+            Object(Matching, "src/dolphin/pad/Pad.c"),
         ],
     },
     {
