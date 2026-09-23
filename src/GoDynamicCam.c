@@ -9,7 +9,87 @@
 #include "frontend/fe.h"
 
 u8   fn_8001E9CC(u32* pBits, int nBit);         // the bit is set
+void fn_800399E0(u8* pSrc, CamShot* pDst, u32 nCount);
+void fn_80039A48(u8* pSrc, DynCamSet* pDst, u32 nCount);
+void fn_80039B14(int nSize);
+void fn_80039C5C(int nSize);
+void fn_80039D0C(int nSequences);
+void fn_80039EB8(int nSize);
 u8   fn_8003D0EC(CamSequence* pSequence, int nKind);
+u8   fn_8003D240(CamShot* pShot, int nKind);
+u8   fn_8003D294(CamShot* pShot);
+
+// The stream handler for the shot file: takes the shots unless some are loaded already.
+void fn_80039690(UStreamObject* pObject) {
+    lbl_80281D88->n1C++;
+    if (lbl_80281D88->n1C > 2) {
+        lbl_80281D88->n1C = 1;
+    }
+    if (lbl_80281D88->pShots != NULL) {
+        fn_80009E70(pObject);
+        return;
+    }
+    lbl_80281D88->pShots = fn_80009B34(pObject->uSize, 2, 0, "GoDynamicCam.c", 454);
+    fn_800399E0(pObject->pData, lbl_80281D88->pShots, pObject->uSize / sizeof(CamShot));
+    fn_80039B14(pObject->uSize);
+    fn_80009E70(pObject);
+}
+
+// The stream handler for another shot file: the same, but the load is not counted and the shots
+// are not clamped (fn_80039C5C).
+void fn_80039754(UStreamObject* pObject) {
+    if (lbl_80281D88->pShots != NULL) {
+        fn_80009E70(pObject);
+        return;
+    }
+    lbl_80281D88->pShots = fn_80009B34(pObject->uSize, 2, 0, "GoDynamicCam.c", 495);
+    fn_800399E0(pObject->pData, lbl_80281D88->pShots, pObject->uSize / sizeof(CamShot));
+    fn_80039C5C(pObject->uSize);
+    fn_80009E70(pObject);
+}
+
+// The stream handler for the file of sets (a shot and four sequences each).
+void fn_800397EC(UStreamObject* pObject) {
+    if (lbl_80281D88->pSets != NULL) {
+        fn_80009E70(pObject);
+        return;
+    }
+    lbl_80281D88->pSets = fn_80009B34(pObject->uSize, 2, 0, "GoDynamicCam.c", 536);
+    fn_80039A48(pObject->pData, lbl_80281D88->pSets, pObject->uSize / sizeof(DynCamSet));
+    fn_80039EB8(pObject->uSize);
+    fn_80009E70(pObject);
+}
+
+// Sets up nSize bytes of freshly loaded shots, as fn_80039C5C does, and first keeps f68 at least
+// the ground clearance, f6C at least f68 and f8C within 0..0.49. Once the sequences are loaded
+// too, their choices are checked (fn_80039D0C).
+void fn_80039B14(int nSize) {
+    int i;
+
+    lbl_80281D88->nShots = 0;
+    lbl_80281D88->nShots = nSize / sizeof(CamShot);
+    for (i = 0; i < lbl_80281D88->nShots; i++) {
+        // port: the file keeps an index in the pointer field
+        if (i == (s32)lbl_80281D88->pShots[i].p40) {
+            lbl_80281D88->pShots[i].p40 = NULL;
+        } else {
+            lbl_80281D88->pShots[i].p40 = &lbl_80281D88->pShots[(s32)lbl_80281D88->pShots[i].p40];
+            lbl_80281D88->pShots[i].p40->bA9 = 1;
+        }
+        if (lbl_80281D88->pShots[i].f68 < lbl_80281F78->f168) {
+            lbl_80281D88->pShots[i].f68 = lbl_80281F78->f168;
+        }
+        if (lbl_80281D88->pShots[i].f6C < lbl_80281D88->pShots[i].f68) {
+            lbl_80281D88->pShots[i].f6C = lbl_80281D88->pShots[i].f68;
+        }
+        lbl_80281D88->pShots[i].f8C = (lbl_80281D88->pShots[i].f8C < 0.0f) ? 0.0f
+            : ((lbl_80281D88->pShots[i].f8C > 0.49f) ? 0.49f : lbl_80281D88->pShots[i].f8C);
+        lbl_80281D88->pShots[i].f7C = lbl_80281D88->pShots[i].f78;
+    }
+    if (lbl_80281D88->n1C == 2) {
+        fn_80039D0C(lbl_80281D88->nSequences);
+    }
+}
 
 // Sets up nSize bytes of freshly loaded shots: turns each shot's follow-on index (p40) into a
 // pointer, NULL when it names the shot itself, and marks the follow-on; f6C and f7C start at f68
@@ -46,6 +126,42 @@ void fn_80039E58(void) {
     }
 }
 
+// Sets up nSize bytes of freshly loaded sets: each shot and sequence index becomes a pointer
+// (NULL for a negative index).
+void fn_80039EB8(int nSize) {
+    int i;
+
+    lbl_80281D88->nSets = nSize / sizeof(DynCamSet);
+    for (i = 0; i < lbl_80281D88->nSets; i++) {
+        // port: the file keeps indexes in the pointer fields
+        if ((s32)lbl_80281D88->pSets[i].pShot >= 0) {
+            lbl_80281D88->pSets[i].pShot = &lbl_80281D88->pShots[(s32)lbl_80281D88->pSets[i].pShot];
+        } else {
+            lbl_80281D88->pSets[i].pShot = NULL;
+        }
+        if ((s32)lbl_80281D88->pSets[i].p14 >= 0) {
+            lbl_80281D88->pSets[i].p14 = &lbl_80281D88->pSequences[(s32)lbl_80281D88->pSets[i].p14];
+        } else {
+            lbl_80281D88->pSets[i].p14 = NULL;
+        }
+        if ((s32)lbl_80281D88->pSets[i].p18 >= 0) {
+            lbl_80281D88->pSets[i].p18 = &lbl_80281D88->pSequences[(s32)lbl_80281D88->pSets[i].p18];
+        } else {
+            lbl_80281D88->pSets[i].p18 = NULL;
+        }
+        if ((s32)lbl_80281D88->pSets[i].p1C >= 0) {
+            lbl_80281D88->pSets[i].p1C = &lbl_80281D88->pSequences[(s32)lbl_80281D88->pSets[i].p1C];
+        } else {
+            lbl_80281D88->pSets[i].p1C = NULL;
+        }
+        if ((s32)lbl_80281D88->pSets[i].p20 >= 0) {
+            lbl_80281D88->pSets[i].p20 = &lbl_80281D88->pSequences[(s32)lbl_80281D88->pSets[i].p20];
+        } else {
+            lbl_80281D88->pSets[i].p20 = NULL;
+        }
+    }
+}
+
 // Allocates the dynamic cameras' tables, empty.
 void fn_80039FF8(void) {
     DynCamTables* pTables = fn_80009B34(sizeof(DynCamTables), 2, 0, "GoDynamicCam.c", 938);
@@ -53,11 +169,11 @@ void fn_80039FF8(void) {
     lbl_80281D88 = pTables;
     pTables->pSequences = NULL;
     lbl_80281D88->pShots = NULL;
-    lbl_80281D88->p8 = NULL;
+    lbl_80281D88->pSets = NULL;
     lbl_80281D88->pChoices = NULL;
     lbl_80281D88->nShots = 0;
     lbl_80281D88->nSequences = 0;
-    lbl_80281D88->n18 = 0;
+    lbl_80281D88->nSets = 0;
     lbl_80281D88->nChoicesUsed = 0;
 }
 
@@ -65,7 +181,7 @@ void fn_80039FF8(void) {
 void fn_8003A074(void) {
     lbl_80281D88->nShots = 0;
     lbl_80281D88->nSequences = 0;
-    lbl_80281D88->n18 = 0;
+    lbl_80281D88->nSets = 0;
     lbl_80281D88->nChoicesUsed = 0;
     if (lbl_80281D88->pSequences != NULL) {
         fn_80009E70(lbl_80281D88->pSequences);
@@ -75,9 +191,9 @@ void fn_8003A074(void) {
         fn_80009E70(lbl_80281D88->pShots);
         lbl_80281D88->pShots = NULL;
     }
-    if (lbl_80281D88->p8 != NULL) {
-        fn_80009E70(lbl_80281D88->p8);
-        lbl_80281D88->p8 = NULL;
+    if (lbl_80281D88->pSets != NULL) {
+        fn_80009E70(lbl_80281D88->pSets);
+        lbl_80281D88->pSets = NULL;
     }
     if (lbl_80281D88->pChoices != NULL) {
         fn_80009E70(lbl_80281D88->pChoices);
@@ -96,6 +212,27 @@ u8 fn_8003A76C(CamShot* pShot) {
         return 1;
     }
     return 0;
+}
+
+// A shot of the kind, picked at random from the first 50 that may be used now, are no other
+// shot's follow-on and are not pShot; NULL when there is none.
+CamShot* fn_8003A7C8(int nPlayer, int nKind, CamShot* pShot) {
+    int aPick[50];
+    int* pPick = aPick;
+    int nCount = 0;
+    int i;
+
+    for (i = 0; i < lbl_80281D88->nShots; i++) {
+        if (nCount >= 50) break;
+        if (fn_8003D240(&lbl_80281D88->pShots[i], nKind) && fn_8003D294(&lbl_80281D88->pShots[i])
+            && !lbl_80281D88->pShots[i].bA9 && &lbl_80281D88->pShots[i] != pShot) {
+            *pPick++ = i;
+            nCount++;
+        }
+    }
+    if (nCount == 0) return NULL;
+    i = Rand_Next(1) % nCount;
+    return &lbl_80281D88->pShots[aPick[i]];
 }
 
 // The shot with this name (case ignored), or NULL.

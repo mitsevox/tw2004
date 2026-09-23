@@ -7,6 +7,21 @@
 #include "game.h"
 #include "camera.h"
 
+void fn_80045428(f32* pA, f32* pB, f32* pOut);  // pOut = pA - pB (paired singles)
+
+// Raises pPos by fUp and moves it fSide sideways, square to the line from pTarget to it.
+void fn_8004255C(f32* pPos, f32* pTarget, f32 fUp, f32 fSide) {
+    f32 vDir[4];
+
+    pPos[1] += fUp;
+    fn_80045428(pPos, pTarget, vDir);
+    if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
+        fn_800BAF04(vDir, vDir);
+    }
+    pPos[0] += fSide * -vDir[2];
+    pPos[2] += fSide * vDir[0];
+}
+
 // The pin, when pPos is near no AI target: pOut gets the nearest target, or the current pin
 // position of the hole.
 void fn_80044768(f32* pPos, f32* pOut) {
@@ -68,6 +83,30 @@ u8 fn_80044E74(CamShot* pShot) {
         return 1;
     }
     return 0;
+}
+
+// How much of the way from the shot's start to the pin the ball has covered, over the ground
+// (0 at the start, 1 at the pin); 0 without a hole loaded.
+f32 fn_80044F58(int nPlayer) {
+    CourseInfo* pCourse = fn_8000C594();
+    f32* pPin;
+    f32 vStart[4];
+    f32 vBall[4];
+    f32 fStart;
+    f32 fBall;
+
+    if (pCourse == NULL) return 0.0f;
+    pPin = &pCourse->pin[Game_CurrentPinSet()].x;
+    fn_80045428(pPin, gPlayers[nPlayer].ball.vStart, vStart);
+    fn_80045428(pPin, gPlayers[nPlayer].ball.vPos, vBall);
+    vStart[1] = 0.0f;
+    vBall[1] = 0.0f;
+    fStart = fn_80009680(fn_80009744(vStart));
+    fBall = fn_80009680(fn_80009744(vBall));
+    if (fStart > 0.0f) {
+        return 1.0f - fBall / fStart;
+    }
+    return 1.0f;
 }
 
 // ---- sweep code (not yet cleaned up) ----

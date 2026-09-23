@@ -342,15 +342,40 @@ void   fn_8006A8D4(void* pCamera, f32* pX, f32* pY);
 
 // ---- camera shots and sequences (0x8003A7C8..) ----------------------------------------------
 
+CamShot* fn_8003A7C8(int nPlayer, int nKind, CamShot* pShot);
+CamShot* fn_8003A8C4(char* szName);     // the shot with this name (case ignored), or NULL
 // A shot of kind nKind from the sequence, picked at random, and its blend values (each out
 // pointer may be NULL).
 CamShot* fn_8003A950(CamSequence* pSequence, int nKind, int* pA, f32* pF1, f32* pF2, int* pB, f32* pF3,
                      int nPlayer);
 CamSequence* fn_8003BDBC(int nPlayer, int nLie, int nClass, int nKind, int a, f32 fDist);
+CamSequence* DynamicCam_ChoosePreFlightSequence(int nPlayer, int nLie, int nKind);
+u8       fn_8003C9D0(int nPlayer, int a, CamSequence** ppSeq, CamShot** ppShot);
+u8       fn_8003D7A0(CamSequence* pSequence, int nPlayer);   // it suits the player's club and shot
 u8     fn_8003DC78(CamShot* pShot);     // the shot's bAC is 1..6 or 7
 // 0 when gSession.nGameType is 3, else fn_8001EDF4 of the player's golfer (Player.pChar) as a flag;
 // the shot is not read.
 u8     fn_800453C8(int nPlayer, CamShot* pShot);
+
+// ---- the camera scripts (gocamscripts.c, 0x8003DCE8..) ----------------------------------------
+
+void     fn_8003DCE8(int nPlayer, void* pCam, void* pSub, void* pScript, CamShot* pShot, int a,
+                     f32 fFrameTime);
+void     fn_8003E624(int nPlayer, void* pCam, void* pSub, void* pScript, CamShot* pShot, int a,
+                     f32 fFrameTime);
+void     fn_8003EA50(int nPlayer, void* pCam, void* pSub, void* pScript, CamShot* pShot, int a,
+                     f32 fFrameTime);
+void     fn_8003F2E0(void* pScript, f32 fTime);
+void     CameraScript_RecordCurrentCam(CamShot* pShot, void* pCam, void* pSub, int nPlayer, void* pScript,
+                                       int a);
+void     CameraScript_InterpToNewScript(void* pScript, CamShot* pShot, int nPlayer, void* pCam, void* pSub,
+                                        int nA, f32 f1, f32 f2, int nB, f32 f3);
+u8       CameraScript_IsDefaultSwingCam(CamShot* pShot, int nPlayer, f32* pCam);
+// Keep pNew above the ground (by fClearance); the out values are optional (NULL): two flags and a
+// float.
+u8       CamScript_KeepAboveGround(int nPlayer, f32* pNew, f32* pOld, int a, u8* pb1, f32* pf, u8* pb2,
+                                   f32 fClearance);
+u8       CameraScript_WillGolferBeOccludedInThisView(int nPlayer, CamShot* pShot, void* pScript);
 
 // ---- camera script helpers (gocamscripts, 0x800C7480..) -------------------------------------
 
@@ -360,7 +385,7 @@ u8     fn_800453C8(int nPlayer, CamShot* pShot);
 void   fn_800C7D14(f32* pA, f32* pB, u8 b1, u8 b2, f32* pOut, f32 f, f32 fAngle);
 void   fn_800C7E50(f32* pA, f32* pB, f32* pC, int n, f32* pOut, f32 fT);
 
-// ---- the camera controller (0x80062F38..)---------------------------------------------------
+// ---- the camera controller (0x80062F38..) ---------------------------------------------------
 
 void   View_SetCamera(View* pView, int nCamera, int nPlayer, int nView);
 void   fn_80062F1C(View* pView);
