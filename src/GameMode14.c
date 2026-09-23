@@ -42,7 +42,6 @@ void  fn_800F33D0(int nPlayer);
 u8    fn_800F3410(int a);
 void  fn_800F3418(int nPlayer);
 u8    fn_800F3438(int nPlayer, int a);
-s32   fn_800F354C(int nPlayer);
 s32   fn_800F3668(int n);
 void  fn_800F36A4(void);
 void  fn_800F3800(int nPlayer);
@@ -365,7 +364,7 @@ s32 fn_800F34F0(int nPlayer) {
 }
 
 // How many targets the player holds.
-s32 fn_800F354C(int nPlayer) {
+int fn_800F354C(int nPlayer) {
     s32 n = 0;
     int i;
     for (i = 0; i < 40; i++) {

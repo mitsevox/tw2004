@@ -363,8 +363,8 @@ void fn_800E42F4(int i) {
     lbl_802822DB = 0;
 }
 
-int fn_800E430C(int nPlayer) {
-    u8 b = 0;
+u8 fn_800E430C(int nPlayer) {
+    int b = 0;
     if (fn_800E415C() || fn_800E4254(nPlayer)) {
         b = 1;
     }
@@ -427,7 +427,7 @@ void fn_800E45C0(void) {
 }
 
 // Whether any of the display timers or flags is still running.
-int fn_800E45CC(void) {
+u8 fn_800E45CC(void) {
     if (lbl_802822B8 != 0 || lbl_802822B4 != 0 || lbl_802822B0 != 0 || lbl_802822AC != 0 || lbl_802822A8 != 0 ||
         lbl_802822A4 != 0 || lbl_802822C3 != 0 || lbl_802822C4 != 0 || lbl_802822C1 != 0 || lbl_802822C2 != 0 ||
         lbl_8028229C != 0 || lbl_80282298 != 0 || lbl_80282294 != 0 || lbl_80282290 != 0 || lbl_8028228C != 0 ||
@@ -444,8 +444,8 @@ int fn_800E45CC(void) {
 // Two copy-and-paste slips in the original are kept: queue 4 reads its item's second and third
 // values with queue 3's count (always 0 here, so from the entry before the queue), and queue 8
 // reads its third value from one entry past the item.
-int fn_800E46B4(void) {
-    int bBusy = 0;
+u8 fn_800E46B4(void) {
+    u8 bBusy = 0;
     if (lbl_802822BC) {
         return 1;
     }

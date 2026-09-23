@@ -122,8 +122,11 @@ void fn_800E41C8(void);
 void fn_800E41D4(int nPlayer);
 void fn_800E4204(void);
 u8   fn_800E4254(int nPlayer);          // whether a message or screen still holds the player
+u8   fn_800E430C(int nPlayer);
 void fn_800E4364(u32 nQueue, int a, int b, int c);    // add an item to a display queue
 void fn_800E45C0(void);
+u8   fn_800E45CC(void);                 // whether any display timer or flag is still running
+u8   fn_800E46B4(void);                 // the display pump; nonzero while anything is showing
 u8   fn_800E4BF8(void);
 void fn_800E4C20(u8 bHuman);            // the end-of-round screen
 void fn_800E4D88(void);
@@ -236,6 +239,7 @@ s32  fn_800F2810(s32 n);
 void fn_800F2958(s32 nMsg, s32 a);
 // The modes' own getters behind the dispatchers fn_800F2408..fn_800F2534, which pass their
 // argument on; the getters ignore it.
+int  fn_800F354C(int nPlayer);          // GameMode14.c
 s32  fn_800F37F8(s32 a);                // GameMode14.c
 s32  fn_800F59CC(s32 a);                // GameMode16.c
 s32  fn_800F59D4(s32 a);                // GameMode16.c
