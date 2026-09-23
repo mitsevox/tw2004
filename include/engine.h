@@ -425,6 +425,9 @@ void fn_800A6DCC(int nMusic, int a);
 void fn_800A72EC(u8 a, u8 b);
 void fn_800A7664(int nKind, int nMsg, int a);
 void fn_800A76E4(void);
+void fn_800A77E0(f32 f);                // } the options menu passes them 0.2 x options.a0[0], a0[4]
+void fn_800A78F0(f32 f);                // } and a0[1] (FE_MessageTable.c, GameUICommands.c)
+void fn_800A7924(f32 f);                // }
 void Vec_Normalize(f32* pSrc, f32* pDst);
 void fn_800BAF04(f32* pSrc, f32* pDst);   // normalise
 f32  Vec_Distance(f32* pA, f32* pB);

@@ -272,8 +272,6 @@ void  fn_800A6F38(void);
 void  fn_800A7350(int a);
 void  fn_800A73C0(u8 a, int b);
 s32   fn_800A7528(void);
-void  fn_800A77E0(f32 f);
-void  fn_800A78F0(f32 f);
 void  fn_800A7944(void);
 u8    fn_800C6E44(View* pView);
 u8    fn_800C708C(View* pView);

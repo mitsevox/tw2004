@@ -21,7 +21,6 @@ void fn_8008F80C(s32 p0, s32 p1);       // uiProcessInterface.c
 void fn_8008E358(s32 p0);               // FEgolferanim.c
 s32  fn_800A0C6C(MCCardPosStr* pPos);   // MC.c
 s32  fn_800A0230(MCCardPos* pPos);      // MC.c: load a replay from the card
-void fn_800A78F0(f32 f);
 void fn_8009CD80(s32 nPort, s32 nSlot); // MC_Gc.c
 s32  fn_8009D390(s32 nPort, s32 nSlot); // MC_Gc.c
 s32  fn_8009EB44(s32 nPort, s32 nSlot); // MC_Gc.c
@@ -2573,6 +2572,104 @@ void fn_8007E9BC(MsgArg* pArgs, MsgArg* pResult) {
         return;
     }
     pResult->i = 0;
+}
+
+// Option a0[1]: the menus' choices 1..6 are the values 5, 0, 1, 2, 3, 4; it is passed on times 0.2.
+void fn_8007EA70(MsgArg* pArgs, MsgArg* pResult) {
+    switch (pArgs[0].i) {
+    case 1:
+        gSession.options.a0[1] = 5;
+        break;
+    case 2:
+        gSession.options.a0[1] = 0;
+        break;
+    case 3:
+        gSession.options.a0[1] = 1;
+        break;
+    case 4:
+        gSession.options.a0[1] = 2;
+        break;
+    case 5:
+        gSession.options.a0[1] = 3;
+        break;
+    case 6:
+        gSession.options.a0[1] = 4;
+        break;
+    }
+    fn_800A7924(0.2f * (s8)gSession.options.a0[1]);
+}
+
+// Option a0[0], the same way.
+void fn_8007EB70(MsgArg* pArgs, MsgArg* pResult) {
+    switch (pArgs[0].i) {
+    case 1:
+        gSession.options.a0[0] = 5;
+        break;
+    case 2:
+        gSession.options.a0[0] = 0;
+        break;
+    case 3:
+        gSession.options.a0[0] = 1;
+        break;
+    case 4:
+        gSession.options.a0[0] = 2;
+        break;
+    case 5:
+        gSession.options.a0[0] = 3;
+        break;
+    case 6:
+        gSession.options.a0[0] = 4;
+        break;
+    }
+    fn_800A77E0(0.2f * (s8)gSession.options.a0[0]);
+}
+
+// Option a0[1] as the menus' choice (1..6).
+void fn_8007EC70(MsgArg* pArgs, MsgArg* pResult) {
+    switch ((s8)gSession.options.a0[1]) {
+    case 5:
+        pResult->i = 1;
+        return;
+    case 0:
+        pResult->i = 2;
+        return;
+    case 1:
+        pResult->i = 3;
+        return;
+    case 2:
+        pResult->i = 4;
+        return;
+    case 3:
+        pResult->i = 5;
+        return;
+    case 4:
+        pResult->i = 6;
+        return;
+    }
+}
+
+// Option a0[0] as the menus' choice (1..6).
+void fn_8007ECFC(MsgArg* pArgs, MsgArg* pResult) {
+    switch ((s8)gSession.options.a0[0]) {
+    case 5:
+        pResult->i = 1;
+        return;
+    case 0:
+        pResult->i = 2;
+        return;
+    case 1:
+        pResult->i = 3;
+        return;
+    case 2:
+        pResult->i = 4;
+        return;
+    case 3:
+        pResult->i = 5;
+        return;
+    case 4:
+        pResult->i = 6;
+        return;
+    }
 }
 
 void fn_8007ED88(MsgArg* pArgs, MsgArg* pResult) {
