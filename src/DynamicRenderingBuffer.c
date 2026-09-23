@@ -196,3 +196,87 @@ void fn_80070B5C(u16 nIndex) {
 void fn_80070B68(u16 nIndex) {
     *(volatile u16*)0xCC008000 = nIndex;
 }
+
+// ---- sweep code (not yet cleaned up) ----
+
+void fn_80070B74(void);
+void fn_80074DA8();
+void fn_8007524C();
+void fn_80070B78(u8* p0, s32 p1);
+void fn_80070BAC(u8* p0);
+s32 fn_80070168(s32, s32);
+void fn_80070BD0(void* arg0);
+void fn_80070C24(u8* p0, s32 p1);
+void fn_80070C58(u8* p0);
+void fn_80070C7C(void* arg0);
+void fn_80070CD0(u8* p0, s32 p1);
+void fn_80070D04(u8* p0);
+void fn_80070D28(void* arg0);
+extern f32 lbl_80281E70;
+void fn_80070D7C(u8* p0);
+void fn_80070D88(u8* p0, s32 p1);
+void fn_80097624();
+void fn_80070DBC(u8* p0);
+
+void fn_80070B74(void) {
+}
+
+void fn_80070B78(u8* p0, s32 p1) {
+    fn_80074DA8(*(s32*)(p0 + 0x24), *(s32*)(p0 + 0x0), (p0 + 0x4), p1);
+}
+
+void fn_80070BAC(u8* p0) {
+    fn_8007524C((p0 + 0x4));
+}
+
+void fn_80070BD0(void* arg0) {
+    if ((u8) (*(u8*)((u8*)(arg0) + 0xC)) != 0) {
+        GXSetArray(9, *(*(void***)((u8*)(arg0) + 0x24)), 0xC);
+    }
+    fn_80070168((*(s32*)((u8*)(arg0) + 8)), (*(s32*)((u8*)(arg0) + 4)));
+}
+
+void fn_80070C24(u8* p0, s32 p1) {
+    fn_80074DA8(*(s32*)(p0 + 0x24), *(s32*)(p0 + 0x0), (p0 + 0x4), p1);
+}
+
+void fn_80070C58(u8* p0) {
+    fn_8007524C((p0 + 0x4));
+}
+
+void fn_80070C7C(void* arg0) {
+    if ((u8) (*(u8*)((u8*)(arg0) + 0xC)) != 0) {
+        GXSetArray(9, *(*(void***)((u8*)(arg0) + 0x24)), 0xC);
+    }
+    fn_80070168((*(s32*)((u8*)(arg0) + 8)), (*(s32*)((u8*)(arg0) + 4)));
+}
+
+void fn_80070CD0(u8* p0, s32 p1) {
+    fn_80074DA8(*(s32*)(p0 + 0x24), *(s32*)(p0 + 0x0), (p0 + 0x4), p1);
+}
+
+void fn_80070D04(u8* p0) {
+    fn_8007524C((p0 + 0x4));
+}
+
+void fn_80070D28(void* arg0) {
+    if ((u8) (*(u8*)((u8*)(arg0) + 0xC)) != 0) {
+        GXSetArray(9, *(*(void***)((u8*)(arg0) + 0x24)), 0xC);
+    }
+    fn_80070168((*(s32*)((u8*)(arg0) + 8)), (*(s32*)((u8*)(arg0) + 4)));
+}
+
+void fn_80070D7C(u8* p0) {
+    lbl_80281E70 = *(f32*)p0;
+}
+
+void fn_80070D88(u8* p0, s32 p1) {
+    fn_80074DA8(*(s32*)(p0 + 0x24), *(s32*)(p0 + 0x0), (p0 + 0x4), p1);
+}
+
+void fn_80070DBC(u8* p0) {
+    fn_80097624((p0 + 0x4));
+    fn_8007524C((p0 + 0x4));
+}
+
+// ---- end of sweep code ----
