@@ -164,6 +164,28 @@ typedef struct Vec4 { f32 x, y, z, w; } Vec4;
 extern Vec4 lbl_80184D90;
 extern u8   lbl_80281640[8];
 
+void  fn_800E5714(int a);
+void  fn_80062CE0(int a);
+u8    fn_80095430(int a);
+void  fn_80095444(int a);
+void  fn_800953C8(int a);
+void  fn_800DC9D4(int a);
+void  fn_80125814(int a);
+u8    fn_800EC550(void);
+void  fn_800ECBE4(void);
+u8    fn_80100294(void);
+void  fn_80101EDC(void);
+u8    fn_800E5C84(void);
+void  fn_800A7350(int a);
+void  fn_8009EF98(void);
+u8    fn_800E39F0(void);
+void  fn_800A76E4(void);
+void  fn_800E1018(int nPlayer, int nHole);
+int   Game_CurHoleIndex(void);
+void  fn_8006F4B4(void);
+int   GM_GotoNextSelectedHole(void);
+extern u8 gNumPlayersSetUp;                 // 0x80281D48 (Golfer.c)
+
 void fn_800E3BEC(void) {
     fn_8001437C();
 }
@@ -244,6 +266,85 @@ void fn_800E3E0C(void) {
     fn_80062C38();
     fn_80062C5C();
     fn_8006A8B0();
+}
+
+// Pauses the game (gSession.unk14): the pause menu, sounds held, the HUD's pause flag.
+void fn_800E3E3C(void) {
+    if (gSession.unk14 == 0) {
+        fn_800E5714(4);
+        fn_8001437C();
+        fn_80062CE0(0);
+        if (fn_80095430(1)) {
+            fn_80095444(1);
+        }
+        lbl_802822DF = 1;
+        gSession.unk14 = 1;
+        fn_800DC9D4(1);
+        fn_80125814(0);
+        if (fn_800EC550()) {
+            fn_800ECBE4();
+        }
+    }
+}
+
+// Unpauses, and finishes whatever the pause was covering: the end-of-hole screen (the hole is
+// marked done) or the end-of-round screen (the mode is told; mode 12 replays the same hole,
+// otherwise the next selected hole, and every ball goes back on the tee lie).
+void fn_800E3EE0(void) {
+    int i;
+    int j;
+    if (gSession.unk14 != 0) {
+        fn_800E5714(8);
+        if (fn_80100294()) {
+            fn_80101EDC();
+        }
+        if (!fn_800E5C84()) {
+            if (!fn_80095430(1)) {
+                fn_800953C8(1);
+            }
+            lbl_802822DF = 0;
+            gSession.unk14 = 0;
+            fn_800DC9D4(0);
+            fn_800A7350(0);
+            fn_80125814(1);
+        }
+        fn_8009EF98();
+        if (gSession.bReplay && Game_GetMode() != 11 && Game_GetMode() != 10) {
+            fn_80062CE0(1);
+        }
+        if (fn_800E39F0() && !lbl_80282282) {
+            fn_800A72EC(0, 1);
+        }
+        if (lbl_80282282) {
+            fn_800A72EC(0, 0);
+            gSession.unk11[1] = 1;
+            lbl_80282282 = 0;
+            fn_800A76E4();
+        }
+        if (lbl_80282281) {
+            fn_800A72EC(0, 0);
+            EVENT_Trigger(0, 0x46, 0, -1);
+            gpGame->pfn214();
+            if (Game_GetMode() == 12) {
+                for (i = 0; i < 5; i++) {
+                    fn_800E1018(i, Game_CurHoleIndex());
+                }
+                fn_8006F4B4();
+            } else if (gpGame->bD4 || gpGame->b134) {
+                fn_8006F4B4();
+            } else {
+                GM_GotoNextSelectedHole();
+            }
+            lbl_80282281 = 0;
+            for (j = 0; j < gNumPlayersSetUp; j++) {
+                gPlayers[j].nLie = 0;
+            }
+            fn_800A76E4();
+        }
+        if ((s8)SESSION_OPTIONS->unk0[4] == 0) {
+            fn_800A76E4();
+        }
+    }
 }
 
 void fn_800E3ECC(void) {
