@@ -6,6 +6,8 @@
 #include "golfer.h"
 #include "game.h"
 #include "engine.h"
+#include "game/save.h"
+#include "game/earnings.h"
 
 // One event of the ladder.
 typedef struct LadderEvent {
@@ -31,29 +33,6 @@ typedef struct LadderNames {
 } LadderNames;
 extern LadderNames lbl_8028243C;
 
-// The prize table (stream 'ERN '); only what this file reads.
-typedef struct MatchPrize {
-    s32 nBase;                  // for the win
-    s32 nPerHole;               // and for each hole of the margin, up to 5
-    s32 n8;
-} MatchPrize;
-typedef struct PrizeTable {
-    u8         unk0[0x5E4];
-    MatchPrize aEvent[25];      // 0x5E4  per ladder event
-    u8         unk710[0x9F0 - 0x710];
-    s32        nLadderDone;     // 0x9F0  paid when the last event is won
-} PrizeTable;
-extern PrizeTable lbl_80200538;
-
-// A save profile (0x10600 bytes); only what this file reads.
-typedef struct LadderSave {
-    u8  bActive;                // 0x000  the profile is in use
-    u8  unk1[0x338 - 0x1];
-    u8  aWon[25][4];            // 0x338  per event: [0] set once it is won
-    u8  unk39C[0x10600 - 0x39C];
-} LadderSave;
-extern LadderSave* gpSaveData;
-
 extern s32 lbl_802816E0;                    // the options' unkC, saved while a match is played
 extern s32 lbl_80282430;                    // the wind option, saved
 extern u8  lbl_80282434;                    // a ladder event is being played
@@ -66,8 +45,6 @@ extern void (*lbl_80282450)(void);          // the challenge's own end-of-mode c
 int   fn_800584DC(int nProfile);            // the profile's earnings rating
 int   fn_800D38F0(int nPlayer, int a, int nMargin, s32* pPrize);
 void  fn_800D39B4(int nPlayer, int nMoney);
-void  fn_800D7770(int nPlayer, u8* pFlag);
-u8    fn_800D750C(int nPlayer, int nAward);
 void  fn_80058278(int nProfile, int nGolfer);
 u8    fn_8005832C(int nProfile, int nGolfer);  // the golfer is unlocked for the profile
 void  fn_80058428(int nProfile, int nReward);
@@ -154,7 +131,7 @@ int fn_801021FC(void) {
 
 // Has the profile won the event?
 u8 fn_80102204(int nProfile, int nEvent) {
-    return gpSaveData[nProfile].aWon[nEvent][0];
+    return gpSaveData[nProfile].aLadderAward[nEvent].bWon;
 }
 
 // Has the profile won every event this one needs?
@@ -281,8 +258,8 @@ void fn_801025FC(void) {
             fn_800E4364(0, 0x6E, nPrize, nProfile);
             fn_800D3548(0, nMoney, NULL);
             nEvent = fn_801021FC();
-            gPlayers[0].n320 += lbl_80200538.aEvent[nEvent].nBase;
-            gPlayers[0].n324 += lbl_80200538.aEvent[nEvent].nPerHole * nMargin;
+            gPlayers[0].n320 += lbl_80200538.aLadderPrize[nEvent].nBase;
+            gPlayers[0].n324 += lbl_80200538.aLadderPrize[nEvent].nPerHole * nMargin;
             fn_80102874();
         }
     }
@@ -333,7 +310,9 @@ void fn_80102874(void) {
     if (gpSaveData[nProfile].bActive) {
         nEvent = fn_801021FC();
         fn_801027A4();
-        fn_800D7770(nProfile, gpSaveData[nProfile].aWon[nEvent]);
+        // EA bug: the profile number goes in as the player number, so fn_800D7770 checks
+        // gPlayers[nProfile] (player 0 only while player 0 plays profile 0).
+        fn_800D7770(nProfile, &gpSaveData[nProfile].aLadderAward[nEvent]);
         if (lbl_80282448 != 34 && !fn_8005832C(nProfile, lbl_80282448)) {
             fn_80058278(nProfile, lbl_80282448);
             fn_800E4364(4, lbl_80282448, 0, nProfile);

@@ -7,9 +7,9 @@
 #include "game.h"
 #include "engine.h"
 #include "game/modes/challenge.h"
+#include "game/save.h"
 
 extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
-extern u8* gpSaveData;
 extern s32 lbl_80282278;                    // the player whose turn it is
 extern u8  lbl_80282240;
 extern s32 lbl_80281658;                    // who has the honor in the playoff (5 = nobody yet)
@@ -311,7 +311,7 @@ void fn_800EAB44(void) {
         nMoney = fn_800D36E0(nWinner, nLoser, nMargin, &nPrize);
         if (!Player_IsCPU(nWinner)) {
             nProfile = gPlayers[nWinner].nIndex;
-            if (gpSaveData[nProfile * 0x10600]) {
+            if (gpSaveData[nProfile].bActive) {
                 fn_80125910(1);
                 if (nMoney) {
                     fn_800E4364(0, 0x6B, nPrize, nProfile);

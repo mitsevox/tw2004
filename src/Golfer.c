@@ -6,6 +6,7 @@
 #include "ball.h"
 #include "game.h"
 #include "engine.h"
+#include "game/save.h"
 
 // ---- small accessors ------------------------------------------------------------------------
 
@@ -1750,7 +1751,6 @@ void fn_8002E25C(void) {
 
 
 extern char gszEmpty[];             // 0x802810B8
-extern u8*  gpSaveData;             // 0x80281DF8  created-golfer profiles at +0x54C2 + n * 0x10600
 extern char lbl_80187650[];         // "cl_bbsd" ... the default name at +0x1A
 
 void fn_800CB700(char* pDst, char* pSrc);       // string copy
@@ -1871,14 +1871,14 @@ void Session_SetupProfiles(void) {
         pProf->nOutfit = gGolferTable[pSession->nGolfer[i]].unk62[0];
         nGolfer = pSession->nGolfer[i];
         if (nGolfer >= FIRST_CREATED_GOLFER) {
-            u8* pSave = gpSaveData + (nGolfer - FIRST_CREATED_GOLFER) * 0x10600;
+            SaveProfile* pSave = &gpSaveData[nGolfer - FIRST_CREATED_GOLFER];
             for (j = 0; j < 6; j++) {
-                ((u32*)pProf->szNames[j])[0] = ((u32*)(pSave + 0x54C8 + j * 8))[0];
-                ((u32*)pProf->szNames[j])[1] = ((u32*)(pSave + 0x54C8 + j * 8))[1];
+                ((u32*)pProf->szNames[j])[0] = ((u32*)pSave->szGolferNames[j])[0];
+                ((u32*)pProf->szNames[j])[1] = ((u32*)pSave->szGolferNames[j])[1];
             }
-            pProf->unk2      = pSave[0x54C2];
-            pProf->nBallType = pSave[0x54F9];
-            pProf->nOutfit   = pSave[0x54F8];
+            pProf->unk2      = pSave->n54C2;
+            pProf->nBallType = pSave->nGolferBallType;
+            pProf->nOutfit   = pSave->nGolferOutfit;
         } else if (nGolfer == 0 || nGolfer == 1) {
             fn_800CB700(pProf->szNames[0], lbl_80187650 + 0x1A);
             pProf->unk2      = 0;
