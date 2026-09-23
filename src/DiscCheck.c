@@ -8,10 +8,36 @@
 
 // ---- sweep code (not yet cleaned up) ----
 
-s32 DVDGetCurrentDiskID();
 extern u8 lbl_80213B80[];
 
 // ---- end of sweep code ----
+
+// Note which disc is in the drive and read the list of each disc's files from
+// "data/fend/d_layout.bin": the two counts (the first byte of each of two words), then disc 1's
+// names and disc 2's, 0x80 bytes each. Each name's last character is cut off.
+void fn_8010FF9C(void) {
+    u32 uSize;
+    char* pData;
+    char* pName;
+    int i;
+
+    lbl_802824D4 = DVDGetCurrentDiskID()->nDiskNumber;
+    pData = fn_800065C8("data/fend/d_layout.bin", &uSize, 32);
+    lbl_802824C8 = pData[0];
+    lbl_802824CC = pData[4];
+    pName = pData + 8;
+    for (i = 0; i < lbl_802824C8; i++) {
+        strcpy(lbl_8021BBB0[i], pName);
+        pName += 0x80;
+        lbl_8021BBB0[i][strlen(lbl_8021BBB0[i]) - 1] = '\0';
+    }
+    for (i = 0; i < lbl_802824CC; i++) {
+        strcpy(lbl_80213BB0[i], pName);
+        pName += 0x80;
+        lbl_80213BB0[i][strlen(lbl_80213BB0[i]) - 1] = '\0';
+    }
+    lbl_802824D2 = 1;
+}
 
 // Whether a file is on the disc in the drive: szName is looked up, ignoring case, in that disc's
 // list of names.
@@ -60,15 +86,9 @@ int fn_80110180(void) {
     return 0;
 }
 
-// ---- sweep code (not yet cleaned up) ----
-
 s32 fn_8011027C(void) {
-    s32 t0;
-    t0 = DVDGetCurrentDiskID();
-    return ((u32)((-*(u8*)(((u8*)t0) + 0x6)) | *(u8*)(((u8*)t0) + 0x6)) >> 31);
+    return DVDGetCurrentDiskID()->nDiskNumber != 0;
 }
-
-// ---- end of sweep code ----
 
 // Callers compare the answer as an int (no clrlwi after the call).
 int fn_80110450(void) {
@@ -81,6 +101,14 @@ void fn_80110458(u8 b) {
 
 u8 fn_80110460(void) {
     return lbl_802824D1;
+}
+
+// The disc in the drive: its disk number, or the one noted when the lists were read.
+int fn_80110468(void) {
+    if (lbl_802824D2 == 0) {
+        return DVDGetCurrentDiskID()->nDiskNumber;
+    }
+    return lbl_802824D4;
 }
 
 // ---- sweep code (not yet cleaned up) ----

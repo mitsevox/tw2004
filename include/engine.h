@@ -372,6 +372,9 @@ int  fn_8000633C(int hFile);            // file close
 // 0: the read could not be queued.
 int  fn_80006444(int hFile, void* pDst, u32 uLen, u32 uOffset, void (*pfnDone)(int nBytes, int nError));
 u32  fn_800065B0(int hFile);            // file size
+// LLFileIO_Gc.c: read a whole file into a new block aligned to nAlign; its size goes to *puSize.
+// NULL if the file is missing or cannot be read.
+void* fn_800065C8(const char* pName, u32* puSize, int nAlign);
 
 // ---- fonts -----------------------------------------------------------------------------------
 
