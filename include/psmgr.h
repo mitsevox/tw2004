@@ -27,8 +27,8 @@ void fn_800A298C(void);         // and unregister it
 s32  fn_800A2A80(s32 nKind, f32* pArg, s32 n3);
 void fn_800A2B34(s32 nKind);    // stop it
 void fn_800A2BA8(void);
-void fn_800A2BBC(void);         // move the rain on by a frame
-void fn_800A2C08(void);         // draw it
+void fn_800A2BBC(int nView);    // move the rain on by a frame (the view is not used)
+void fn_800A2C08(int nView);    // draw it (the view is not used)
 
 // ---- PsBallFx.c (EA's name, from its asserts): the ball's particle effects ----------------------
 

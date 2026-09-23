@@ -757,8 +757,7 @@ s8 fn_8016C270(UIStudio* pStudio, UISScreen* pScreen, UISNodeInfo* pInfo, UISWor
     *pStack->pC = 0;
     pStack->pC++;
     pStack->p10 = pScript;
-    // port: the interpreter takes the info pointer as a word (its last parameter)
-    nResult = fn_80166098(pStudio, pFrame, pStack, pScreen, (s32)pInfo);
+    nResult = fn_80166098(pStudio, pFrame, pStack, pScreen, pInfo);
     if (pnSaved != NULL) {
         *pnSaved = *pFrame;
     }

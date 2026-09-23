@@ -102,6 +102,10 @@ def check(name, sweeps, cmd=None):
         head, sources = [], []
         for _, t in texts:
             head += [l for l in t.split('\n') if l.startswith('#include') and l not in head]
+    if not any(l.lstrip().startswith('#include') for l in head):
+        # a unit with no includes yet (only its header comment): the merge will bring the sweeps'
+        # game_types.h, and without it every s32/u8 line is a syntax error, not a clash
+        head = ['#include "game_types.h"'] + head
     probe, origin = list(head), {}
     for label, t in texts:
         protos = dict(def_protos(t))
