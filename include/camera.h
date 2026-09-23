@@ -328,6 +328,7 @@ extern CrAPState* lbl_80281EE0;
 // fn_80013D5C sets it.
 extern void** lbl_80280DF0;
 
+ViewController* fn_80016CF4(void);     // the current view (lbl_80281CA4)
 ViewController* fn_80016CFC(int nView);
 void*  fn_80017004(int nView);          // the view's render camera
 View*  fn_80017028(int nView);

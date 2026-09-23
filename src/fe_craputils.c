@@ -1,51 +1,49 @@
-#include "game_types.h"
+// fe_craputils.c (TW06's golf/ui core/frontend/fe_craputils.c): the Create-A-Player (CrAP) data in
+// a save profile. FE_CrAP_InitCrAPInfo resets it; the rest unlock golfers, courses and rewards,
+// rate the profile, and compare CrAP names. Not decompiled yet beyond the functions below.
 
-extern s32 gpSaveData;
-void fn_80058208(u8* p0);
-void fn_8001E9CC();
-void fn_80058304(s32 p0);
-extern s32 lbl_80281DF0;
-void fn_800588D4(s16 arg0);
-s16 fn_800588E8(void);
+#include "game/save.h"
+#include "charstate.h"
 
-void fn_80058208(u8* p0) {
-    *(u8*)(p0 + 0x5EB4) = 50;
-    *(u8*)(p0 + 0x5EB5) = 50;
-    *(u8*)(p0 + 0x5EB6) = 50;
-    *(u8*)(p0 + 0x5EB7) = 50;
-    *(u8*)(p0 + 0x5EB8) = 50;
-    *(u8*)(p0 + 0x5EB9) = 50;
-    *(u8*)(p0 + 0x5EBA) = 50;
-    *(u8*)(p0 + 0x5EBB) = 50;
-    *(u8*)(p0 + 0x5EBC) = 50;
-    *(u8*)(p0 + 0x5EBD) = 50;
-    *(u8*)(p0 + 0x5EBE) = 50;
-    *(u8*)(p0 + 0x5EBF) = 50;
-    *(u8*)(p0 + 0x5EC0) = 50;
-    *(u8*)(p0 + 0x5EC1) = 50;
-    *(u8*)(p0 + 0x5EC2) = 50;
-    *(u8*)(p0 + 0x5EC3) = 50;
-    *(u8*)(p0 + 0x5EC4) = 50;
-    *(u8*)(p0 + 0x5EC5) = 50;
-    *(u8*)(p0 + 0x5EC6) = 50;
-    *(u8*)(p0 + 0x5EC7) = 50;
-    *(u8*)(p0 + 0x5EC8) = 50;
-    *(u8*)(p0 + 0x5EC9) = 50;
-    *(u8*)(p0 + 0x5ECA) = 50;
-    *(u8*)(p0 + 0x5ECB) = 50;
-    *(u8*)(p0 + 0x5ECD) = 50;
-    *(u8*)(p0 + 0x5ECC) = 50;
+// The 26 bytes at 0x5EB4 start at 50, set one by one (the last two in EA's order: 25, then 24).
+void fn_80058208(SaveProfile* pProfile) {
+    pProfile->a5EB4[0] = 50;
+    pProfile->a5EB4[1] = 50;
+    pProfile->a5EB4[2] = 50;
+    pProfile->a5EB4[3] = 50;
+    pProfile->a5EB4[4] = 50;
+    pProfile->a5EB4[5] = 50;
+    pProfile->a5EB4[6] = 50;
+    pProfile->a5EB4[7] = 50;
+    pProfile->a5EB4[8] = 50;
+    pProfile->a5EB4[9] = 50;
+    pProfile->a5EB4[10] = 50;
+    pProfile->a5EB4[11] = 50;
+    pProfile->a5EB4[12] = 50;
+    pProfile->a5EB4[13] = 50;
+    pProfile->a5EB4[14] = 50;
+    pProfile->a5EB4[15] = 50;
+    pProfile->a5EB4[16] = 50;
+    pProfile->a5EB4[17] = 50;
+    pProfile->a5EB4[18] = 50;
+    pProfile->a5EB4[19] = 50;
+    pProfile->a5EB4[20] = 50;
+    pProfile->a5EB4[21] = 50;
+    pProfile->a5EB4[22] = 50;
+    pProfile->a5EB4[23] = 50;
+    pProfile->a5EB4[25] = 50;
+    pProfile->a5EB4[24] = 50;
 }
 
-void fn_80058304(s32 p0) {
-    fn_8001E9CC(((p0 + 0x10000) + 1352));
+u8 fn_80058304(SaveProfile* pProfile, int nBit) {
+    return fn_8001E9CC(&pProfile->u10548, nBit);
 }
 
-void fn_800588D4(s16 arg0) {
-    (*(s8*)((u8*)(&lbl_80281DF0) + 0)) = 1;
-    (*(s16*)((u8*)(&lbl_80281DF0) + 2)) = arg0;
+void fn_800588D4(s16 n) {
+    lbl_80281DF0.b = 1;
+    lbl_80281DF0.n = n;
 }
 
 s16 fn_800588E8(void) {
-    return (*(s16*)((u8*)(&lbl_80281DF0) + 2));
+    return lbl_80281DF0.n;
 }
