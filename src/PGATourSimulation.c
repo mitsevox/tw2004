@@ -12,22 +12,15 @@
 
 PgaEntrantMC* GetEntrantMCPtr(int nPlayer, int nEntrant);
 void fn_80117BF4(int nPlayer, int nEntrant);
-void fn_80117C50(int nPlayer, int nEntrant);
-void fn_80117AF8(int nPlayer);
-void fn_80117B58(int nPlayer);
-void fn_80117D80(int nPlayer);
-void fn_80117DF0(int nPlayer);
 s32  fn_80119A50(int nPlayer);
 void fn_801187F0(PgaEntrantMC* aEntrant, s16* pnEntrants, u8 bUser);
 void fn_80118B0C(int nPlayer, int n);
 void fn_80119B54(int nPlayer, int nRound, int nEntrant, int nHole);
 void fn_80119E28(int nPlayer, int nEntrant, int nRound);
-void fn_8011A538(int nPlayer);
 s32  fn_80119AE0(int nPlayer);
-s32  fn_8011BDF8(const void* pA, const void* pB);
-s32  fn_8011BF74(const void* pA, const void* pB);
+int  fn_8011BDF8(const void* pA, const void* pB);
+int  fn_8011BF74(const void* pA, const void* pB);
 s32  fn_80118664(int nPlayer);
-s32  fn_801191D0(int nPlayer, int nEntrant, u8 b);
 s32  TotalEntrantHoleScores(int nEntrant);
 void fn_8011A074(int nPlayer, int nRound, int nEntrant, int nHole);
 void fn_8011A890(int nPlayer);
@@ -314,13 +307,13 @@ void fn_801187F0(PgaEntrantMC* aEntrant, s16* pnEntrants, u8 bUser) {
     }
 }
 
-// A sort comparison for s32s, smallest first.
-s32 IntCompareIncreasing(const void* pA, const void* pB) {
+// A sort comparison for s32s, smallest first. The sort comparisons return int, as qsort takes them.
+int IntCompareIncreasing(const void* pA, const void* pB) {
     return *(const s32*)pA - *(const s32*)pB;
 }
 
 // A sort comparison for entrants: by their pro's f50, smallest first; the player's golfer last.
-s32 fn_80118A5C(const void* pA, const void* pB) {
+int fn_80118A5C(const void* pA, const void* pB) {
     s32 nEntrantB = *(const s32*)pB;
     s32 nGolfer;
     f32 fA;
@@ -1066,7 +1059,7 @@ void CalcBallStriking(int nGolfer, f32* pfValue) {
 // value, a golfer with no value (0) last; the same printed value goes by name.
 
 // Lower is better.
-s32 fn_8011BBD8(const void* pA, const void* pB) {
+int fn_8011BBD8(const void* pA, const void* pB) {
     s32 nGolferA = *(const s32*)pA;
     s32 nGolferB = *(const s32*)pB;
     s32 nRet;
@@ -1097,7 +1090,7 @@ s32 fn_8011BBD8(const void* pA, const void* pB) {
 }
 
 // Higher is better.
-s32 fn_8011BCFC(const void* pA, const void* pB) {
+int fn_8011BCFC(const void* pA, const void* pB) {
     s32 nGolferA = *(const s32*)pA;
     s32 nGolferB = *(const s32*)pB;
     s32 nRet;
@@ -1121,8 +1114,9 @@ s32 fn_8011BCFC(const void* pA, const void* pB) {
 
 // The score sort comparisons (lbl_80281848 is the player). Lower scores first, then by name.
 
-// All entrants: a cut entrant sorts last, the winner first.
-s32 fn_8011BDF8(const void* pA, const void* pB) {
+// All entrants: a cut entrant sorts last, the winner first. 97.4%: only nPlayer and nEntrantA/nScoreB
+// swap saved registers (declaration orders, int/s32, an inline score helper and the permuter tried).
+int fn_8011BDF8(const void* pA, const void* pB) {
     s32 nEntrantA = *(const s32*)pA;
     s32 nEntrantB = *(const s32*)pB;
     s32 nPlayer = lbl_80281848;
@@ -1153,7 +1147,7 @@ s32 fn_8011BDF8(const void* pA, const void* pB) {
 }
 
 // The cut entrants among themselves.
-s32 fn_8011BF74(const void* pA, const void* pB) {
+int fn_8011BF74(const void* pA, const void* pB) {
     s32 nEntrantA = *(const s32*)pA;
     s32 nEntrantB = *(const s32*)pB;
     s32 nPlayer = lbl_80281848;

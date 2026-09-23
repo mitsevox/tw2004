@@ -16,7 +16,7 @@ s32 lbl_80281674 = 1;           // the options' n18 from before a tour round (fn
 
 PgaData gPgaData;
 Pga80205F30 lbl_80205F30;
-TourStats lbl_80205ED8;
+PgaStatCounts lbl_80205ED8;
 
 s32 lbl_80282340;               // the playoff hole index: set to 16, each playoff moves it on
                                 //   (17, 15, 16, 17, ...; fn_800EF720)
