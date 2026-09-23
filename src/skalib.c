@@ -1303,7 +1303,7 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
 
     if (nSlot < 3) {
         k        = nSlot;
-        pSlot    = &lbl_801C6068[nSlot];
+        pSlot    = &lbl_801C6068[k];
         pLibFile = pSlot->pLib;
         pSrc     = pLibFile;
     } else {
