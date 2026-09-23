@@ -351,7 +351,7 @@ u8 fn_8001DBF4(Character* pChar) {
     return 0;
 }
 
-// Copy a 4-vector.
+// Copy a quaternion (Skeleton.c's use).
 void fn_8001E85C(f32* pSrc, f32* pDst) {
     pDst[3] = pSrc[3];
     pDst[0] = pSrc[0];

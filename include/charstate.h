@@ -16,8 +16,7 @@ u8    fn_8001E9CC(u32* aBits, u32 n);
 void  fn_8001EA34(u32* aBits, u32 n);
 void  fn_8001EB6C(u32* aBits, u32 n);
 
-// 4-vectors.
-void  fn_8001E85C(f32* pSrc, f32* pDst);  // copy
+// 4-vectors (the quaternion copy, fn_8001E85C, is declared with the skeleton code).
 void  fn_8001E880(f32* pSrc, f32* pDst);  // a point to a 4-vector with w = 1
 f32   fn_8001EEA4(f32* pA, f32* pB);      // dot product
 
