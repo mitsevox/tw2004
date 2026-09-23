@@ -180,7 +180,7 @@ int GameEffects_BallUpdatesThisFrame(int nPlayer) {
 }
 
 // The player's current target (an inline in EA's source; calling fn_800F1D34 directly does not match).
-inline int GE_CurrentTarget(int nPlayer) {
+static inline int GE_CurrentTarget(int nPlayer) {
     return fn_800F1D34(nPlayer);
 }
 
