@@ -2,7 +2,7 @@
 // loop: starting up and shutting down every system, the frame update and the render passes.
 // Mostly not yet decompiled; the machine-style code below is the sweep's.
 
-#include "game_types.h"
+#include "engine.h"
 
 // ---- sweep code (not yet cleaned up) ----
 
@@ -37,7 +37,7 @@ void fn_800DCBA8();
 void fn_800DCBB8();
 void fn_8010F6C8();
 void fn_8010F718();
-void fn_801249A8();
+void EASBio_InitOnce();
 void fn_8006C6F0(void);
 void fn_8006C720(void);
 void fn_8006C770(void);
@@ -46,9 +46,6 @@ void UStream_CloseAll();
 void UStream_Init();
 void fn_800080D4();
 void fn_800081C4();
-s32 fn_8000B244();
-void fn_8000B2B8();
-void fn_8000B30C();
 void fn_8000B46C();
 void fn_8000B63C();
 void fn_8000C0F0();
@@ -229,7 +226,7 @@ void fn_8006C720(void) {
     fn_800DCBA8();
     fn_800A2064();
     fn_8010F6C8();
-    fn_801249A8();
+    EASBio_InitOnce();
     fn_80009918();
 }
 
@@ -244,7 +241,7 @@ void fn_8006C770(void) {
 }
 
 void fn_8006C7A8(void) {
-    s32 t20;
+    u32 t20;
     fn_8006BF4C();
     fn_8000989C();
     fn_800B5C38();
@@ -267,7 +264,7 @@ void fn_8006C7A8(void) {
     fn_8002F180();
     t20 = fn_8000B244();
     *(s32*)(gSession + 0x5B2C) = t20;
-    fn_8000B2B8(t20, gSession);
+    fn_8000B2B8(t20);
     fn_80055F14();
     fn_80045D18();
     fn_800486EC();
@@ -535,3 +532,40 @@ void fn_8006E0F8(void) {
 }
 
 // ---- end of sweep code ----
+
+// The six per-frame hooks of module nRow (lbl_80188E88), each called if set.
+void fn_8006DDE8(s32 nRow) {
+    if (lbl_80188E88[nRow].pfn10 != NULL) {
+        lbl_80188E88[nRow].pfn10();
+    }
+}
+
+void fn_8006DE68(s32 nRow) {
+    if (lbl_80188E88[nRow].pfn18 != NULL) {
+        lbl_80188E88[nRow].pfn18();
+    }
+}
+
+void fn_8006DEE8(s32 nRow) {
+    if (lbl_80188E88[nRow].pfn20 != NULL) {
+        lbl_80188E88[nRow].pfn20();
+    }
+}
+
+void fn_8006DF68(s32 nRow) {
+    if (lbl_80188E88[nRow].pfn1C != NULL) {
+        lbl_80188E88[nRow].pfn1C();
+    }
+}
+
+void fn_8006DFE8(s32 nRow) {
+    if (lbl_80188E88[nRow].pfn14 != NULL) {
+        lbl_80188E88[nRow].pfn14();
+    }
+}
+
+void fn_8006E068(s32 nRow) {
+    if (lbl_80188E88[nRow].pfnC != NULL) {
+        lbl_80188E88[nRow].pfnC();
+    }
+}

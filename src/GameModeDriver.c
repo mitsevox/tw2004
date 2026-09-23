@@ -20,7 +20,6 @@ void fn_8011D858(int nKind, char* szTitle, char* szText);
 void fn_8011D878(int nKind, char* szTitle, char* szText);
 void fn_8011DA44(int nKind, char* szTitle, char* szText);
 void fn_8011DC30(int nKind, char* szTitle, char* szText);
-void RTClock_GetDateTimeString(char* szOut);
 
 void fn_80116798(int nPlace, char* sz);
 void fn_80117264(u16 nDate, char* sz);

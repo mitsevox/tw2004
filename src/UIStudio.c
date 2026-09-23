@@ -9,14 +9,16 @@
 void fn_80168B80(UIStudio* pStudio, u32 uEvent) {
     s32 i;
     s32 n;
+    UISScreen* pScreen;
     u8 bOut;
 
     fn_80165528(pStudio, 0);
     n = pStudio->nScreens;
     for (i = 0; i < n; i++) {
+        pScreen = &pStudio->pScreens[i];
         bOut = 0;
         pStudio->uFlags |= 2;
-        fn_8016A2D4(pStudio, &pStudio->pScreens[i], &pStudio->stack64, 0, uEvent, -10, 0, NULL, &bOut);
+        fn_8016A2D4(pStudio, pScreen, &pStudio->stack64, 0, uEvent, -10, 0, NULL, &bOut);
         pStudio->uFlags &= ~2;
     }
 }
