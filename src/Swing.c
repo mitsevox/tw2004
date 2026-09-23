@@ -2607,8 +2607,8 @@ void STATEFUNC_RemoveBallInit(int nPlayer) {
     nPinSet = Game_CurrentPinSet();
     pCourse = fn_8000C594();
     if (pCourse != NULL) {
-        Character_SetPosition(gPlayers[nPlayer].nShotHandle, (f32*)&pCourse->pin[nPinSet], 1);
-        Physics_DropBall(pBall, (f32*)&pCourse->pin[nPinSet]);
+        Character_SetPosition(gPlayers[nPlayer].nShotHandle, &pCourse->pin[nPinSet].x, 1);
+        Physics_DropBall(pBall, &pCourse->pin[nPinSet].x);
         gPlayers[nPlayer].ball.nLie = LIE_HOLED;
         Vec3Copy(pBall->vPos, pBallBefore->vPos);
     }
@@ -3252,7 +3252,7 @@ void STATEFUNC_GreenWatchRollUpdate(int nPlayer) {
         } else if (!fn_80063C90(fn_80017028(*pView)) && pCourse != NULL) {
             int nPinSet = Game_CurrentPinSet();
             if (*pGhostMinDist < 0.5f ||
-                !(*pGhostMinDist < Vec_Distance(pGhost->vPos, (f32*)&pCourse->pin[nPinSet]) - 0.1f)) {
+                !(*pGhostMinDist < Vec_Distance(pGhost->vPos, &pCourse->pin[nPinSet].x) - 0.1f)) {
                 fn_80063BF4(fn_80017028(*pView), 0.25f, (f32*)&vOffset);
             }
         }

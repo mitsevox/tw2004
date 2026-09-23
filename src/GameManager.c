@@ -18,7 +18,6 @@ void  fn_800E2470(void);
 void  fn_8006F4B4(void);
 void  fn_800170C4(int nView, int a);
 void  fn_800E299C(void);
-void  Wind_Generate(void);
 void  fn_800E3B28(void);
 void  fn_800DA36C(void);
 void  GM_FlyByMode_Init(void);

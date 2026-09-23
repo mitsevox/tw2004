@@ -114,7 +114,7 @@ static inline f32 Ball_Clamp(f32 x, f32 fLo, f32 fHi) {
     return x;
 }
 
-#define PIN(pBall) ((f32*)&(pBall)->pCourse->pin[Game_CurrentPinSet()])
+#define PIN(pBall) (&(pBall)->pCourse->pin[Game_CurrentPinSet()].x)
 
 // A landing: a player's ball fires 0x25 on flagged surfaces, then 0x26 on the cup (surface 90),
 // 0x24 on an object, 0x23 on the ground; a look-ahead ball's first landing (Player.ballBefore) tells
@@ -1569,7 +1569,7 @@ u8 Ball_Collide(Ball* pBall, f32 fTicks) {
 f32 Ball_DistanceToPin(f32* pPos) {
     CourseInfo* pCourse = fn_8000C594();
     if (pCourse != NULL) {
-        return Vec_Distance(pPos, (f32*)&pCourse->pin[Game_CurrentPinSet()]);
+        return Vec_Distance(pPos, &pCourse->pin[Game_CurrentPinSet()].x);
     }
     return 1000.0f;
 }
