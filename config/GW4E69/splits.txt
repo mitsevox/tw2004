@@ -3627,20 +3627,8 @@ GameAnalysis.c:
 GameModeAlternateShot.c:
 	.text       start:0x800E68F0 end:0x800E7980
 
-unsorted/sweep_800E7A7C.c:
-	.text       start:0x800E7A7C end:0x800E7ABC
-
-unsorted/sweep_800E7F68.c:
-	.text       start:0x800E7F68 end:0x800E7F88
-
-unsorted/sweep_800E8114.c:
-	.text       start:0x800E8114 end:0x800E8128
-
-unsorted/sweep_800E81A0.c:
-	.text       start:0x800E81A0 end:0x800E81B4
-
-unsorted/sweep_800E81B4.c:
-	.text       start:0x800E81B4 end:0x800E81C4
+GameModeBattle.c:
+	.text       start:0x800E7980 end:0x800E81C4
 
 unsorted/sweep_800E83A8.c:
 	.text       start:0x800E83A8 end:0x800E83F8
