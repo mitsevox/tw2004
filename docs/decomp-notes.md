@@ -163,6 +163,25 @@ Reading compiler output
 - **[verified] Register numbering, declared-first-highest in some functions.** In fn_8005A850 the
   earliest-declared local took r30 and later ones descended; one `s8` (instead of `u8`) on a
   colour byte fixed the last permutation. When the lowest-first order does not help, try the reverse.
+- **[verified] Unrolled loops: the guard tells you the counter's type and the bound's form.** CW
+  unrolls counted loops and puts a guard in front. With an `int` counter and a constant bound the
+  guard folds away; declared `s32` (a `long`) it stays as `li rX, 0; cmpwi rX, N; bge`
+  (skalib.c `AnimLib_BuildCb`, `Skalib_Init`). With a variable bound, `for (i = 0; i < p->n; i++)`
+  inside an `if` followed by more code gives `cmpw i, n; bge`, while the original's
+  `cmpwi n, 0; ble` came from the bound held in a local or written `p->n > i`
+  (`Skalib_SetBudgets`, `AnimLib_FreeWorkCopies`). Tested in isolation in
+  `C:\dev\scratch\tw\looptest\`.
+- **[verified] An initialiser placed after early exits is in an inner block.** A local array copied
+  from `.rodata` only after the function's first checks means `if (ok) { u32 aPad[4] = {0}; ... }`,
+  not a declaration at the top (`AnimLib_MergeOverlay`).
+- **[verified] Extra spilled address temps mean array indexing, not a pointer.** Four more stack
+  words holding `&table[n].field` addresses went away only when `pStats->x` was written
+  `lbl_801C6008[nSlot].x` (`AnimLib_PlanBank`, frame 0x140 -> 0x150 like the original).
+- **[verified] A return through the common exit is a `goto`/single `return`.** An early
+  `return nRet;` (known 0) compiles to `li r3, 0`; the original's `beq end` that reloads the
+  variable at the shared epilogue came from `goto done;` with `done: return nRet;`.
+- **[verified] A parameter can be copied to a local.** `ClipBank_Load` kept its data pointer in the
+  lowest saved register only when the parameter was copied into a local declared last.
 - **[verified] One variable, two jobs.** When the original reuses one FPR for two unrelated values
   (a distance, later a blend step), the source reused one local.
 - **[verified] Chained assignment stores backwards.** `a[0] = a[1] = a[2] = 0` stores 2, 1, 0;

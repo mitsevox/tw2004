@@ -100,9 +100,20 @@ Dated log of what was done and decided, newest last. Facts and lessons belong in
   `skalib.c` (EA's name), `CharClip.c`, `CharAnim.c`, `HoleScore.c`, `Gimme.c` (ours): 7/8 exact.
   Golfer -> character file map in `formats/game-data.md` (Donatello's and McGregor's files keep
   EA's working names Capone / McGruff).
-- **Next:** finish `skalib.c` (EA's file, ~18 KB, 0x80021C90..0x8002669C by its asserts: the
-  library loader `fn_80025F38`, the merge `fn_80024B18`, clip streaming) - fresh context from the
-  gimme work; then `SwingState01_Update`; then `Ball.c`. Scratch tools in `C:\dev\scratch\tw\`:
+- **`skalib.c` written in full.** The unit now spans EA's whole file, 0x80021ADC-0x80026844 (it
+  starts at the find-clip-by-name and ends with the `'SAL '` / `'BNK '` stream-handler pair; the
+  8 KB before it has no asserts and is too big for skalib's first 500 lines, so it is another file).
+  53 functions, 40 exact, the unit 97% fuzzy. It covers the loaders and byte-swapping, three slots
+  with double buffering, the ARAM stash of banks, the paired clip-tree walker, the merge passes
+  (size, release, trim, keep, drop, build), the per-round budget, and the overlay merge. The last
+  two are at 92% and 87%, and the rest of the misses are register numbering. Game facts are in
+  `gameplay.md` ("Animation memory"), compiler rules in `decomp-notes.md`: an `s32` loop counter
+  keeps the unroll guard, a bound held in a local or written `n > i` folds it, an initialiser
+  after early exits is an inner block, and `table[n].x` rather than a pointer produces the
+  original's spilled address temps. Also: GC/2.0-2.7 all compile these identically, so it is
+  not a compiler-version question (`try_compilers.py`).
+- **Next:** `SwingState01_Update`; then `Ball.c`; optional register polish in `skalib.c`
+  (`AnimLib_MergeOverlay`, `AnimLib_PlanBank`, `AnimLib_WalkPair`). Scratch tools in `C:\dev\scratch\tw\`:
   `sbs2.py` (normalised diff), `fnsrc.py`, `regress.py` (who lost 100%), `insert_fns.py` (add
   functions at address positions), `unwritten.py`, `find_fn.py` (search asm by regexes),
   `alldiffs.py`. The extracted discs are in `C:\dev\scratch\tw\disc\d1`, `d2`; the Dolphin install

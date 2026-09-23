@@ -409,6 +409,37 @@ cue on the first gimme. A created golfer's own library (character 08) has no gro
 creator's 111-animation playlist (group 20) has no tap-ins, so without the code they never get it. So it is a one-in-three
 gimme for six golfers, every gimme for Pops, and never for anyone else - including Tiger.
 
+Animation memory: libraries, clip banks and the per-round budget (`skalib.c`, in C)
+----------------------------------------------------------------------------------
+
+EA's `skalib.c` (0x80021ADC-0x80026844, all 53 functions in C, 40 exact) manages the animation
+libraries. Two file types are registered with the streamer: **`SAL `** (a library: the clip tree
+and clip records) and **`BNK `** (a clip bank: the clips themselves). There are **three
+animation slots**. A slot holds a base library plus up to **10 overlay libraries**, one for each
+golfer's own character file; the overlays are merged onto the base. When slots 0 and 1 both have
+overlays the game **double-buffers**: each new load goes into the other slot (`Skalib_NextSlot`).
+Bank files are parked in ARAM and brought back into a single buffer when needed.
+
+Merging the overlays (`AnimLib_PlanBank`, `AnimLib_MergeOverlay`):
+
+- A clip with the same name in two libraries is stored **once**. Later copies point at the first.
+- Each round has a clip-memory budget of **942,080 bytes (920 KB)** per slot. With double buffering
+  the two slots split it by library size, and each slot's share is **kept between 44% and 56%**.
+- **One player keeps every clip. With 2 to 4 players, each animation situation (a leaf of the
+  tree: group, style, club, key) keeps at most 10 clips**, as one run of consecutive clips
+  starting at a random clip (`AnimLib_TrimCb`).
+- Still over budget: the game lowers the per-leaf limit and drops clips in rounds, working
+  through the overlays first and then the base library. Its first attempt keeps a random
+  selection. If that cannot fit, it restores the libraries from backups and tries again,
+  keeping the highest-ranked clips instead (the record's field at 0x18).
+- Some positions are protected (`fn_800C9828` true: every clip kept), and group 20 (the
+  create-a-player animation playlist) is handled apart.
+- The per-frame data of each kept clip is streamed out to ARAM, 32-byte aligned. Only the
+  header, keys and curves stay in main memory.
+
+So in multiplayer, a golfer with many variants of one reaction can lose some of them for that
+round. The gimme group has three clips at most, so the pool-cue tap-in is never trimmed.
+
 The CPU's shot rehearsal (`AI_RehearseShot`, `0x8002B030`, in C)
 -------------------------------------------------------------------
 
