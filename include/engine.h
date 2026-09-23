@@ -443,6 +443,29 @@ u8   fn_80014300(u32 uMask);            // any pad pressed these buttons
 
 // ---- events, sound, effects ------------------------------------------------------------------
 
+// A node of Code8009B340.c's list (lbl_80281FA0): something drawn by fn_8009B260 that fades out
+// (fAlpha falls by fAlphaSpeed a second) and is freed once it has faded.
+typedef struct FadeAnchor {
+    u8   unk0[0x30];
+    f32  a30[4];                // 0x30  drawn at, when a node has one
+} FadeAnchor;
+
+typedef struct FadeNode {
+    struct FadeNode* pNext;     // 0x00
+    f32  a4[4];                 // 0x04  drawn at, when p34 is NULL
+    u32  uFlags;                // 0x14  1, 2: how it is drawn; 0x80000000: faded, to be freed
+    f32  f18;                   // 0x18  grows by f30 a second
+    f32  f1C;                   // 0x1C  f18 + f20, at least 0
+    f32  f20;                   // 0x20
+    u32  uColor;                // 0x24  its top byte is fAlpha * 255
+    f32  fAlpha;                // 0x28
+    f32  fAlphaSpeed;           // 0x2C
+    f32  f30;                   // 0x30
+    FadeAnchor* p34;            // 0x34
+} FadeNode;
+
+extern FadeNode* lbl_80281FA0;
+
 void fn_8001C804(int nPlayer, u8 a, u8 b);  // char.c: sets bits of the player's character's u10
 void fn_8001D8DC(int nPlayer);
 void fn_8001EF34(f32* pIn, f32 f, f32* pOut);   // scale a vector (paired singles)
