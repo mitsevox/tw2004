@@ -57,13 +57,6 @@ typedef struct UITransformStack {
 } UITransformStack;
 LAYOUT_ASSERT(UITransformStack, 0x3E4);
 
-// The current level of the stack.
-#define UI_TRANSFORM_TOP (lbl_80281F38->aLevel[lbl_80281F38->nTop])
-
-extern UITransformStack* lbl_80281F38;
-extern UITransform       lbl_801D91FC;      // a copy of the current level
-extern f32               lbl_801D91F0[3];   // the UI view: field of view, tan of half of it, distance
-
 // A UI element's transform, as pushed onto the stack (fn_80093280, op 1): moved, then rotated and
 // scaled about a pivot.
 typedef struct UITransformDesc {
