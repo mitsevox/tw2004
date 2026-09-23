@@ -505,7 +505,7 @@ config.libs = [
         "progress_category": "sdk",
         "src_dir": "extern/tww",
         "objects": [
-            Object(NonMatching, "src/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common/Src/mbstring.c"),
+            Object(Matching, "src/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common/Src/mbstring.c", mw_version="GC/1.3"),
             Object(Matching, "src/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common_Embedded/Math/Double_precision/e_pow.c"),
         ],
     },
