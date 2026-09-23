@@ -35,11 +35,20 @@ def fail(msg):
 
 folded = [n for s in sweeps for _, n in defined((ROOT / 'src' / s).read_text(encoding='utf-8'))]
 run('python configure.py')
+# Sweeps that declare one name with two types (with each other, or with the unit and its headers)
+# cannot be merged: find them before anything is written, and let the lane fix them first.
+d = run(f'python "{HERE / "declcheck.py"}" {name} ' + ' '.join(sweeps))
+print(d.stdout.strip() or d.stderr.strip()[-1000:])
+if d.returncode:
+    fail('declarations conflict: nothing merged')
 m = run(f'python "{HERE / "merge_sweeps.py"}" {name}.c ' + ' '.join(sweeps))
 print(m.stdout.strip())
 if m.returncode:
     fail('merge failed: ' + (m.stderr.strip() or m.stdout.strip())[-500:])
-print(run(f'python "{HERE / "dedupe_decls.py"}" src/{name}.c').stdout.strip())
+dd = run(f'python "{HERE / "dedupe_decls.py"}" src/{name}.c')
+print(dd.stdout.strip())
+if dd.returncode:
+    fail('conflicting prototypes after the merge (see CONFLICT above)')
 
 
 def compile_errors(out):
