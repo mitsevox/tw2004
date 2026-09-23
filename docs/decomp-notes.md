@@ -335,6 +335,10 @@ The fixes that come up most often. Each points to its full entry below.
 
 ### Types, casts and sign extension
 
+- **[verified] `int` vs `s32` matters for parameters too.** PGATour `fn_800EE6A0(s32 nPlayer)` is
+  exact; as `(int nPlayer)` it gives `addis r3, r4, 1; add r3, r3, r29` instead of the original's
+  `addis r0, r4, 1; add r3, r0, r29` (99.81). Its neighbours were unaffected either way.
+
 - **[verified] An enum-typed local holding 0 is not folded into an index multiply.** EA's
   `PlayerNumber_t nPlayer = PLR_1_e; gpSaveData[nPlayer]` gives `li rX, 0; mullw`; a literal 0,
   any integer local, a const global, an inline helper and `(Enum)0` all fold the multiply away
@@ -447,6 +451,11 @@ The fixes that come up most often. Each points to its full entry below.
 
 ### Compares and conditions
 
+- **[verified] Nested `if`s vs one `&&`, and a flag vs a direct return.** `if (A) { if (B) x = 1; }`
+  and `if (A && B) x = 1;` get different saved registers (PGATour `fn_800EE5B4`, 99.75 -> 100). A u8
+  function's `bWin = 0; if (A && B) { if (C) bWin = 1; } return bWin;` was really
+  `return A && B && C;` (`fn_800EE6A0`, 99.44 -> 100; no order of the flag form matched).
+
 - **[verified] `return !(x == -1);` and `return x != -1;` end in a different instruction order**
   (GameMode11 `fn_80100798`, 93.9% -> 100).
 - **[verified] A two-value choice `h = (n == 2) ? 6 : 7` compiles branch-free (`subi/nor/srawi`);**
@@ -539,6 +548,12 @@ The fixes that come up most often. Each points to its full entry below.
 
 ### Inlining and inline helpers
 
+- **[verified] A `const` on an inline helper's return type moves the caller's first loads.**
+  FourBall `fn_800E8FC8`: `static inline int FourBall_TeamSecond(int)` -> `static inline const int`,
+  94.39 -> 100 (`volatile` works the same; `s32`/`u32`/`long`/`short` go far worse). Label it a fake
+  match. Getting repeated "pick the team's player" code through small helpers fixed the register
+  numbers there (10 -> 4 differing) but made two neighbouring functions worse: decide per function.
+
 - **[verified] An inline helper that reads a global itself, rather than being passed it,
   changes register choice** (GameMode11 `fn_80100C08`'s hint helper).
 - **[verified] An inline helper that takes a value by pointer changes register choice.** The
@@ -572,6 +587,13 @@ The fixes that come up most often. Each points to its full entry below.
   in the helper, keeps the wrong registers.
 
 ### Floating point
+
+- **[verified] `x *= c` vs `x = x * c` on an address-taken array element.** `v[3] *= 2.0f` loads the
+  element first; `v[3] = v[3] * 2.0f` loads the constant first, as the original did (GoGolfCam
+  `fn_800C1D3C`, 4 differing -> 0).
+- **[verified] An unwanted fused multiply-add goes away when one local holds the step.**
+  `f74 += 0.01f * (fDist - f74)` fused; `fDist = 0.01f * (fDist - f74); f74 += fDist;` kept the
+  original's separate `fmuls`/`fadds` (GoGolfCam `GolfCamera_ProcessPostShotCamera`, 99.07 -> 100).
 
 - **[verified] A MIN-style ternary whose result lands in a scratch register is its own
   variable.** `r = a <= b ? a : b;` with `r` separate matched; writing it back into `a` let the
@@ -614,6 +636,12 @@ The fixes that come up most often. Each points to its full entry below.
   into the "wrong" FPR number: the original declared `f32 fInv = 1.0f / 128.0f;` at the top.
 
 ### Data, constants and symbols
+
+- **[observed] An all-zero small array in `.sdata` (not `.sbss`) was written with an initializer.**
+  `u8 lbl_80281648[2] = {0, 0};` lands in `.sdata` and links (AlternateShot).
+- **[verified] Base-last indexing of a big-struct global.** `gpSaveData[n].f` adds the base first;
+  `((SaveProfile*)gpSaveData)[n].f`, an inline accessor returning `&gpSaveData[n]`, or a pointer local
+  all give the original's `addis idx; addi; lhzx/stwx base` (PGATour `fn_800EE478`, 92.08 -> 100).
 
 - **[verified] objdiff scores a switch 100% even when its jump table points at the wrong case
   bodies**: it masks relocations. GameMode11 `fn_80100328` had case labels off by one and read
