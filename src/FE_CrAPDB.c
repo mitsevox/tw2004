@@ -20,7 +20,6 @@ void fn_80103EFC(CrAPAsset* pAsset);
 void sTurnOnLogo(s16 nPart, int b, int i);
 void FE_CrAP_TurnOnAsset(CrAPAsset* pAsset);
 u8   fn_801048B0(int nPart);
-int  fn_80104AF4(s16 nPart, int n);     // the category of a part's entry n (-1 or 0x40: none)
 int  fn_80104F7C(CrAPAsset* pAsset);
 int  fn_80105140(s16 nPart);
 void fn_80105188(UStreamObject* pObject);

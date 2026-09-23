@@ -489,7 +489,7 @@ void fn_80012F34(int a);
 void fn_80012F50(int a, int b, int c);
 void fn_80013030(void);
 u32  fn_80013050(int nChan);            // the pad's device type (SIProbe)
-s32  fn_80013070(int nChan);            // a controller the game takes is plugged in
+u8   fn_80013070(int nChan);            // a controller the game takes is plugged in
 void fn_800130EC(u8 bOn);               // the main stick also presses the D-pad
 void fn_800130F8(int nController, int bOn);         // rumble on or off
 void fn_80013130(int nController, int nStrength);   // rumble strength

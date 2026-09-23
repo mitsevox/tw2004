@@ -126,7 +126,7 @@ typedef struct FEProfile {
     u8  unk106CC[0x106D0 - 0x106CC];
     u64 uSquareHash;            // 0x106D0  the hash of "__LogoSquare" (the square logo's texture)
     u64 uRectHash;              // 0x106D8  the hash of "__LogoRect"
-    u8  unk106E0[0x11702 - 0x106E0];
+    LogoRecord logo106E0;       // 0x106E0  copied into the profile's logo fn_8010F7D8 (fn_80109294)
     u8  b11702;                 // 0x11702
     u8  b11703;                 // 0x11703
     s32 n11704;                 // 0x11704
@@ -314,6 +314,28 @@ s16  fn_80105610(int nAsset);           // } asset)
 s32  fn_80105C00(void);                 // how many assets there are
 u8   fn_80105C30(void);                 // the Create-A-Player database is allocated
 char* fn_801064EC(int nCategory);       // a category's name
+int  fn_80104AF4(s16 nPart, int n);     // the category of a part's entry n (-1 or 0x40: none)
+u8   fn_80103C98(CrAPAsset* pAsset);
+void fn_80103F94(s16 nPart, int b, int i);
+// A part's choice i, by the part, its entry b and i.
+char* fn_80105264(s16 nPart, int b, int i);
+s16  fn_80105298(s16 nPart, int b, int i);
+s16  fn_801052CC(s16 nPart, int b, int i);
+s16  fn_80105300(s16 nPart, int b, int i);
+s16  fn_80105334(s16 nPart, int b, int i);
+s32  fn_80105368(s16 nPart, int b, int i);
+s32  fn_8010539C(s16 nPart, int b, int i);
+s32  fn_801053D0(s16 nPart, int b, int i);
+int  fn_80105404(s16 nPart, int b, int i);
+int  fn_80105428(s16 nPart, int b, int i);
+int  fn_8010544C(s16 nPart, int b, int i);
+int  fn_80105470(s16 nPart, int b, int i);
+s8   fn_80105574(s16 nPart, int b, int i);
+s16  fn_801055A8(s16 nPart, int b, int i);
+int  fn_80105644(s16 nPart, int b, int i, int n);
+void fn_8010568C(s16 nPart, int b, int i, int n, u8* pColor);  // pColor: 4 bytes
+void fn_80105B4C(s16 nPart, int b, int i, char* pName);
+u8   fn_80106374(s16 nPart, int b, int i);
 
 void FE_MakeMoviePath(char* pName, char* pPath);        // "data/movies/<name>.NGC"
 void FE_MakeCameoMoviePath(char* pName, char* pPath);   // "data/movies/cameos/<name>.NGC"
@@ -322,6 +344,7 @@ SaveProfile* fn_80077ACC(void);         // the profile being worked on
 u8   fn_80078008(s32 nAsset, SaveProfile* pProfile);  // the asset is locked (FE_Manager.c)
 int  fn_80078604(int a, int b, int c);  // a date (month, day, year from fn_8011E020) packed
 int  fn_80077B08(void);                 // its player slot
+int  fn_80077BDC(int n);                // -1, -2, -3 to 0, 1, 2; anything else to 0
 u8   fn_80077B18(int nGolfer);          // a yes/no list over golfers 0..28 (Golfer.c asks it)
 void fn_80077B78(void);                 // pick the day's random assets (fn_80077C1C)
 FEMovie* fn_800770FC(void);             // the next free place in the movie queue

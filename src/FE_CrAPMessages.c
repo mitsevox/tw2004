@@ -28,6 +28,48 @@ void fn_801077EC(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = fn_801048EC(pArgs[0].i, pArgs[1].i);
 }
 
+// ---- end of sweep code ----
+
+// Value n of a part's choice i (0 when there is no such choice).
+void fn_80107828(MsgArg* pArgs, MsgArg* pResult) {
+    s16 nPart = pArgs[0].i;
+    int b = pArgs[1].i;
+    int nChoices = fn_801048EC(nPart, b);
+    int i = pArgs[2].i;
+    int n = pArgs[3].i;
+
+    if (i < 0 || i >= nChoices) {
+        pResult->i = 0;
+    } else {
+        pResult->i = fn_80105644(nPart, b, i, n);
+    }
+}
+
+// Colour n of a part's choice i, as four components (opaque red when there is no such choice).
+void fn_801078B8(MsgArg* pArgs, MsgArg* pResult) {
+    u8 aColor[4];
+    s16 nPart = pArgs[0].i;
+    int b = pArgs[1].i;
+    int nChoices = fn_801048EC(nPart, b);
+    int i = pArgs[2].i;
+    int n = pArgs[3].i;
+
+    if (i < 0 || i >= nChoices || nChoices == 0) {
+        *(s32*)pArgs[4].p = 0xFF;
+        *(s32*)pArgs[5].p = 0;
+        *(s32*)pArgs[6].p = 0;
+        *(s32*)pArgs[7].p = 0xFF;
+    } else {
+        fn_8010568C(nPart, b, i, n, aColor);
+        *(s32*)pArgs[4].p = aColor[0];
+        *(s32*)pArgs[5].p = aColor[1];
+        *(s32*)pArgs[6].p = aColor[2];
+        *(s32*)pArgs[7].p = aColor[3];
+    }
+}
+
+// ---- sweep code (not yet cleaned up) ----
+
 void fn_80107994(MsgArg* pArgs, MsgArg* pResult) {
 }
 
@@ -37,12 +79,142 @@ void fn_80107998(MsgArg* pArgs, MsgArg* pResult) {
 void fn_80107BA4(MsgArg* pArgs, MsgArg* pResult) {
 }
 
+// ---- end of sweep code ----
+
+// Slider n of the created golfer (the profile's a5EB4, read signed).
+void fn_80107BA8(MsgArg* pArgs, MsgArg* pResult) {
+    SaveProfile* pProfile = fn_80077ACC();
+    pResult->i = (s8)pProfile->a5EB4[pArgs[0].i];
+}
+
+// ---- sweep code (not yet cleaned up) ----
+
 void fn_80107BF4(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = fn_80105C44(pArgs[0].i, pArgs[1].i);
 }
 
 void fn_80107C30(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
+}
+
+// ---- end of sweep code ----
+
+// A part's choice i: its name and four values ("Coming Soon" in a demo session, "No Entry Found"
+// otherwise, when there is no such choice).
+void fn_80107C3C(MsgArg* pArgs, MsgArg* pResult) {
+    s16 nPart = pArgs[0].i;
+    int b = pArgs[1].i;
+    int nChoices = fn_801048EC(nPart, b);
+    int i = pArgs[2].i;
+
+    if (i < 0 || i >= nChoices) {
+        if (gSession.uFlags & 0x4000) {
+            strcpy(((MsgString*)pArgs[3].p)->pStr, "Coming Soon");
+        } else {
+            strcpy(((MsgString*)pArgs[3].p)->pStr, "No Entry Found");
+        }
+        *(s32*)pArgs[4].p = 0;
+        *(s32*)pArgs[5].p = 0;
+        *(s32*)pArgs[6].p = 0;
+        *(s32*)pArgs[7].p = 0;
+        *(s32*)pArgs[8].p = 0;
+    } else {
+        strcpy(((MsgString*)pArgs[3].p)->pStr, fn_80105264(nPart, b, i));
+        *(s32*)pArgs[4].p = fn_80105298(nPart, b, i);
+        *(s32*)pArgs[5].p = fn_801052CC(nPart, b, i);
+        *(s32*)pArgs[6].p = fn_80105300(nPart, b, i);
+        *(s32*)pArgs[7].p = fn_80105334(nPart, b, i);
+        *(s32*)pArgs[8].p = fn_801053D0(nPart, b, i);
+    }
+}
+
+// Four more values of a part's choice i (0 when there is no such choice).
+void fn_80107DBC(MsgArg* pArgs, MsgArg* pResult) {
+    s16 nPart = pArgs[0].i;
+    int b = pArgs[1].i;
+    int nChoices = fn_801048EC(nPart, b);
+    int i = pArgs[2].i;
+
+    if (i < 0 || i >= nChoices) {
+        *(s32*)pArgs[3].p = 0;
+        *(s32*)pArgs[4].p = 0;
+        *(s32*)pArgs[5].p = 0;
+        *(s32*)pArgs[6].p = 0;
+    } else {
+        *(s32*)pArgs[3].p = fn_80105404(nPart, b, i);
+        *(s32*)pArgs[4].p = fn_80105428(nPart, b, i);
+        *(s32*)pArgs[5].p = fn_8010544C(nPart, b, i);
+        *(s32*)pArgs[6].p = fn_80105470(nPart, b, i);
+    }
+}
+
+// Four more values of a part's choice i (0 when there is no such choice).
+void fn_80107EB0(MsgArg* pArgs, MsgArg* pResult) {
+    s16 nPart = pArgs[0].i;
+    int b = pArgs[1].i;
+    int nChoices = fn_801048EC(nPart, b);
+    int i = pArgs[2].i;
+
+    if (i < 0 || i >= nChoices) {
+        *(s32*)pArgs[3].p = 0;
+        *(s32*)pArgs[4].p = 0;
+        *(s32*)pArgs[5].p = 0;
+        *(s32*)pArgs[6].p = 0;
+    } else {
+        *(s32*)pArgs[3].p = fn_80105368(nPart, b, i);
+        *(s32*)pArgs[4].p = fn_8010539C(nPart, b, i);
+        *(s32*)pArgs[5].p = fn_80105574(nPart, b, i);
+        *(s32*)pArgs[6].p = fn_801055A8(nPart, b, i);
+    }
+}
+
+// Put a part's choice i on the created golfer, and save the profile. Part 17 is always turned on
+// directly; for the others fn_80103F94 does it when fn_80103C98 and fn_801074D4 allow.
+void fn_80107FAC(MsgArg* pArgs, MsgArg* pResult) {
+    SaveProfile* pProfile = fn_80077ACC();
+    s16 nPart = pArgs[0].i;
+    int b = pArgs[1].i;
+    int i = pArgs[2].i;
+    int nAsset;
+
+    if (nPart == 17) {
+        FE_CrAP_TurnOnPart(nPart, b, i);
+        return;
+    }
+    nAsset = fn_80104FA8(nPart, b, i);
+    if (nAsset != -1) {
+        if (fn_80103C98(fn_80104F68(nAsset)) && fn_801074D4(nAsset)) {
+            fn_80103F94(nPart, b, i);
+        } else {
+            FE_CrAP_TurnOnPart(nPart, b, i);
+        }
+        fn_8007873C(pProfile);
+    }
+}
+
+// fn_80107FAC without saving the profile.
+void fn_80108070(MsgArg* pArgs, MsgArg* pResult) {
+    s16 nPart;
+    int b;
+    int i;
+    int nAsset;
+
+    fn_80077ACC();
+    nPart = pArgs[0].i;
+    b = pArgs[1].i;
+    i = pArgs[2].i;
+    if (nPart == 17) {
+        FE_CrAP_TurnOnPart(nPart, b, i);
+        return;
+    }
+    nAsset = fn_80104FA8(nPart, b, i);
+    if (nAsset != -1) {
+        if (fn_80103C98(fn_80104F68(nAsset)) && fn_801074D4(nAsset)) {
+            fn_80103F94(nPart, b, i);
+            return;
+        }
+        FE_CrAP_TurnOnPart(nPart, b, i);
+    }
 }
 
 void fn_80108140(MsgArg* pArgs, MsgArg* pResult) {
@@ -53,11 +225,49 @@ void fn_80108300(MsgArg* pArgs, MsgArg* pResult) {
     lbl_80281ED4->bCopy = pArgs[0].i;
 }
 
+// ---- end of sweep code ----
+
+// A part's choice i is locked (never in a demo session).
+void fn_80108314(MsgArg* pArgs, MsgArg* pResult) {
+    SaveProfile* pProfile = fn_80077ACC();
+    s16 nPart = pArgs[0].i;
+    int b = pArgs[1].i;
+    int i = pArgs[2].i;
+
+    if (gSession.uFlags & 0x4000) {
+        pResult->i = 0;
+    } else {
+        pResult->i = fn_80078008(fn_80104FA8(nPart, b, i), pProfile);
+    }
+}
+
+// ---- sweep code (not yet cleaned up) ----
+
 void fn_80108398(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = fn_80077ACC();
     int nAsset = fn_80104FA8(pArgs[0].i, pArgs[1].i, pArgs[2].i);
     pResult->i = fn_8001E9CC(pProfile->aB1CC, nAsset);
 }
+
+// ---- end of sweep code ----
+
+// Buy a part's choice i: take its price from the money, mark it bought (aB1CC), put it on the
+// created golfer and save the profile.
+void fn_8010840C(MsgArg* pArgs, MsgArg* pResult) {
+    SaveProfile* pProfile = fn_80077ACC();
+    s16 nPart = pArgs[0].i;
+    int b = pArgs[1].i;
+    int i = pArgs[2].i;
+    s32 nPrice = pArgs[3].i;
+    int nAsset = fn_80104FA8(nPart, b, i);
+
+    pProfile->n6C -= nPrice;
+    fn_8001EA34(pProfile->aB1CC, nAsset);
+    FE_CrAP_TurnOnPart(nPart, b, i);
+    fn_8007873C(pProfile);
+}
+
+// ---- sweep code (not yet cleaned up) ----
 
 void fn_80108494(MsgArg* pArgs, MsgArg* pResult) {
     fn_80077ACC();
@@ -67,6 +277,53 @@ void fn_80108494(MsgArg* pArgs, MsgArg* pResult) {
     }
     pResult->i = 0;
 }
+
+// ---- end of sweep code ----
+
+// A part's choice i is in the profile's list b: for part 13 by its name, else by fn_80106374.
+void fn_801084F4(MsgArg* pArgs, MsgArg* pResult) {
+    char szName[16];                    // the size is unknown (the frame allows up to 20)
+    SaveProfile* pProfile = fn_80077ACC();
+    s16 nPart = pArgs[0].i;
+    int b = pArgs[1].i;
+    int i = pArgs[2].i;
+
+    fn_80104AF4(nPart, b);
+    if (nPart == 13) {
+        fn_80105B4C(nPart, b, i, szName);
+        pResult->i = fn_800587A8(pProfile, b, szName);
+    } else {
+        pResult->i = fn_80106374(nPart, b, i);
+    }
+}
+
+// Today's random asset kind of category pArgs[0] (-1, -2, -3) for the database's n4, and the
+// choices of its five random assets (fn_80077C1C).
+void fn_80108594(MsgArg* pArgs, MsgArg* pResult) {
+    int nCategory = fn_80077BDC(pArgs[0].i);
+    s8 b = fn_80103BB4();
+
+    *(s32*)pArgs[1].p = lbl_80281ED4->aKind[b][nCategory];
+    *(s32*)pArgs[2].p = lbl_80281ED4->aChoice[b][nCategory][0];
+    *(s32*)pArgs[3].p = lbl_80281ED4->aChoice[b][nCategory][1];
+    *(s32*)pArgs[4].p = lbl_80281ED4->aChoice[b][nCategory][2];
+    *(s32*)pArgs[5].p = lbl_80281ED4->aChoice[b][nCategory][3];
+    *(s32*)pArgs[6].p = lbl_80281ED4->aChoice[b][nCategory][4];
+}
+
+// The parts of the five random assets of category pArgs[0].
+void fn_80108690(MsgArg* pArgs, MsgArg* pResult) {
+    int nCategory = fn_80077BDC(pArgs[0].i);
+    s8 b = fn_80103BB4();
+
+    *(s32*)pArgs[1].p = lbl_80281ED4->aPart[b][nCategory][0];
+    *(s32*)pArgs[2].p = lbl_80281ED4->aPart[b][nCategory][1];
+    *(s32*)pArgs[3].p = lbl_80281ED4->aPart[b][nCategory][2];
+    *(s32*)pArgs[4].p = lbl_80281ED4->aPart[b][nCategory][3];
+    *(s32*)pArgs[5].p = lbl_80281ED4->aPart[b][nCategory][4];
+}
+
+// ---- sweep code (not yet cleaned up) ----
 
 void fn_801088A4(MsgArg* pArgs, MsgArg* pResult) {
     fn_8010F7C0(pArgs[0].i);
@@ -106,12 +363,72 @@ void fn_80108B84(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
+// ---- end of sweep code ----
+
+// Clear every asset's aB344 and aB4BC bits where both are set.
+void fn_80108C00(MsgArg* pArgs, MsgArg* pResult) {
+    SaveProfile* pProfile = fn_80077ACC();
+    s32 nAssets = fn_80105C00();
+    u32 i;
+
+    for (i = 0; i < nAssets; i++) {
+        if (fn_8001E9CC(pProfile->aB344, i) && fn_8001E9CC(pProfile->aB4BC, i)) {
+            fn_8001EB6C(pProfile->aB344, i);
+            fn_8001EB6C(pProfile->aB4BC, i);
+        }
+    }
+}
+
+// Whether a controller in any of the four ports holds button bit 24 (held).
+void fn_80108CA8(MsgArg* pArgs, MsgArg* pResult) {
+    int i;
+
+    for (i = 0; i < 4; i++) {
+        if (fn_80013070(i) && (fn_800136DC(i) & 0x1000000)) {
+            pResult->i = 1;
+            return;
+        }
+    }
+    pResult->i = 0;
+}
+
+// Set or clear bit pArgs[0] of the profile's a10548.
+void fn_80108DF4(MsgArg* pArgs, MsgArg* pResult) {
+    SaveProfile* pProfile = fn_80077ACC();
+    s32 bSet = pArgs[1].i;
+    s32 nBit = pArgs[0].i;
+
+    if (bSet) {
+        fn_8001EA34(pProfile->a10548, nBit);
+    } else {
+        fn_8001EB6C(pProfile->a10548, nBit);
+    }
+}
+
+// ---- sweep code (not yet cleaned up) ----
+
 void fn_80108E4C(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = fn_80077ACC();
     pResult->i = fn_8001E9CC(pProfile->a10548, pArgs[0].i);
 }
 
 // ---- end of sweep code ----
+
+// Today's date: month, day and year.
+void fn_801090B4(MsgArg* pArgs, MsgArg* pResult) {
+    s32 nMonth;
+    s32 nDay;
+    s32 nYear;
+    s32 nHour;
+    s32 nMinute;
+    s32 nSecond;
+    s32 nMsec;
+
+    fn_8011E020(&nMonth, &nDay, &nYear, &nHour, &nMinute, &nSecond, &nMsec);
+    *(s32*)pArgs[0].p = nMonth;
+    *(s32*)pArgs[1].p = nDay;
+    *(s32*)pArgs[2].p = nYear;
+}
 
 // The logo's name.
 void fn_801091B8(MsgArg* pArgs, MsgArg* pResult) {
@@ -123,6 +440,28 @@ void fn_801091B8(MsgArg* pArgs, MsgArg* pResult) {
 // Name the logo.
 void fn_8010920C(MsgArg* pArgs, MsgArg* pResult) {
     strcpy(fn_8010FB70()->szName, ((MsgString*)pArgs[1].p)->pStr);
+}
+
+// The profile's logo n's b1020.
+void fn_80109248(MsgArg* pArgs, MsgArg* pResult) {
+    SaveProfile* pProfile = fn_80077ACC();
+    pResult->i = pProfile->aLogos[pArgs[0].i].b1020;
+}
+
+// Keep the edited logo: copy it into the profile's logo fn_8010F7D8.
+void fn_80109294(MsgArg* pArgs, MsgArg* pResult) {
+    SaveProfile* pProfile = fn_80077ACC();
+    s32 nLogo = fn_8010F7D8();
+
+    lbl_80281ED4->logo106E0.b1020 = 1;
+    Mem_cpy(&pProfile->aLogos[nLogo], &lbl_80281ED4->logo106E0, sizeof(LogoRecord));
+    lbl_80281ED4->b10640 = 0;
+}
+
+// Golfer pArgs[0]'s equipment tier for attribute pArgs[1].
+void fn_80109304(MsgArg* pArgs, MsgArg* pResult) {
+    GolferRecord* pRecord = fn_80077A80(pArgs[0].i);
+    pResult->i = pRecord->tier[pArgs[1].i];
 }
 
 void fn_80109354(MsgArg* pArgs, MsgArg* pResult) {

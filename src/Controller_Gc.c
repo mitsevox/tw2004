@@ -41,8 +41,8 @@ u32 fn_80013050(int nChan) {
 
 // Whether the port holds a controller the game takes: a standard pad or a WaveBird, or a WaveBird
 // receiver whose controller is off.
-s32 fn_80013070(int nChan) {
-    u8 bResult;
+u8 fn_80013070(int nChan) {
+    s32 bResult;
 
     if (fn_80013050(nChan) == 0x88000000) {
         return 1;
