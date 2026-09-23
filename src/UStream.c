@@ -69,42 +69,43 @@ typedef struct UStreamNode {
 } UStreamNode;
 
 // ---- state -------------------------------------------------------------------------------
-// The arrays are not static: CodeWarrior folds static data into one section symbol and
-// addresses it from a single base register, while the original takes each array's address
-// separately. The scalars written from the DVD-read callback are volatile (the original
-// reloads them after every statement; the main-thread-only ones it does not).
+// Everything here is private to the file. CodeWarrior lays out a file's static data in the
+// reverse of the order it is declared, so it is declared last-first: the original has these
+// arrays at 0x801A2AC0.. and the scalars at 0x80281C18.. in the opposite order. The scalars
+// written from the DVD-read callback are volatile (the original reloads them after every
+// statement; the main-thread-only ones it does not).
 
-UStream          gStreams[USTREAM_MAX_STREAMS];          // lbl_801A2AD4
-UStreamBuffer*   gFreeRing[USTREAM_NUM_BUFFERS];         // lbl_801A3094
-UStreamBuffer*   gReadyRing[USTREAM_NUM_BUFFERS];        // lbl_801A30DC
-UStreamHandler   gHandlers[USTREAM_MAX_HANDLERS];        // lbl_801A3124
-u32              gSoundHeader[5];                        // lbl_801A2AC0 (SONO state)
-char             gSWVRName[0x14];                        // lbl_801A3424
+static char             gSWVRName[0x14];                        // 0x801A3424
+static UStreamHandler   gHandlers[USTREAM_MAX_HANDLERS];        // 0x801A3124
+static UStreamBuffer*   gReadyRing[USTREAM_NUM_BUFFERS];        // 0x801A30DC
+static UStreamBuffer*   gFreeRing[USTREAM_NUM_BUFFERS];         // 0x801A3094
+static UStream          gStreams[USTREAM_MAX_STREAMS];          // 0x801A2AD4
+static u32              gSoundHeader[5];                        // 0x801A2AC0 (SONO state)
 
-static s8   gbPaused;             // lbl_80281C18
-static s8   gbAutoRead;           // lbl_80281C19  keep reading after each completed read
-static int  gnReadErrors;         // lbl_80281C1C
-static UStreamObject* gpQueueTail;   // lbl_80281C20
-static UStreamObject* gpQueueHead;   // lbl_80281C24
-static volatile s8 gbReadPending;        // lbl_80281C28
-static int  gnNumStreams;         // lbl_80281C2C
-static int  gnCurStream;          // lbl_80281C30  -1 = none
-static void* gpBufferMemory;      // lbl_80281C34
-static UStreamNode* gpDoneList;   // lbl_80281C38  objects finished by the parser
-static void* gpNodePool;          // lbl_80281C3C
-static UStreamObject* gpCurObject;   // lbl_80281C40  object being filled
-static u32  gCurObjectPos;        // lbl_80281C44
-static UStreamBuffer* gpUsedList; // lbl_80281C48  parsed buffers that objects still reference
-static UStreamBuffer* gpCurList;  // lbl_80281C4C  buffers being parsed
-static UStreamBuffer* gpFreeList; // lbl_80281C50  released buffers not yet back in the ring
-static s8   gFreeRingHead;        // lbl_80281C54
-static s8   gReadyRingTail;       // lbl_80281C55
-static volatile s8 gFreeRingTail;        // lbl_80281C56
-static volatile s8 gReadyRingHead;       // lbl_80281C57
-static UStreamBuffer* volatile gpReadBuffer;  // lbl_80281C58  buffer of the read in flight
-static u32  gRPNSBase;            // lbl_80281C5C  value of the last RPNS object
+static u32  gRPNSBase;            // 0x80281C5C  value of the last RPNS object
+static UStreamBuffer* volatile gpReadBuffer;  // 0x80281C58  buffer of the read in flight
+static volatile s8 gReadyRingHead;       // 0x80281C57
+static volatile s8 gFreeRingTail;        // 0x80281C56
+static s8   gReadyRingTail;       // 0x80281C55
+static s8   gFreeRingHead;        // 0x80281C54
+static UStreamBuffer* gpFreeList; // 0x80281C50  released buffers not yet back in the ring
+static UStreamBuffer* gpCurList;  // 0x80281C4C  buffers being parsed
+static UStreamBuffer* gpUsedList; // 0x80281C48  parsed buffers that objects still reference
+static u32  gCurObjectPos;        // 0x80281C44
+static UStreamObject* gpCurObject;   // 0x80281C40  object being filled
+static void* gpNodePool;          // 0x80281C3C
+static UStreamNode* gpDoneList;   // 0x80281C38  objects finished by the parser
+static void* gpBufferMemory;      // 0x80281C34
+static int  gnCurStream;          // 0x80281C30  -1 = none
+static int  gnNumStreams;         // 0x80281C2C
+static volatile s8 gbReadPending;        // 0x80281C28
+static UStreamObject* gpQueueHead;   // 0x80281C24
+static UStreamObject* gpQueueTail;   // 0x80281C20
+static int  gnReadErrors;         // 0x80281C1C
+static s8   gbAutoRead;           // 0x80281C19  keep reading after each completed read
+static s8   gbPaused;             // 0x80281C18
 
-int gnNumHandlers = 0;            // lbl_80280DB8 (.sdata)
+int gnNumHandlers = -1;           // 0x80280DB8 (.sdata): -1 until UStream_Init
 
 // ---- externals ---------------------------------------------------------------------------
 
