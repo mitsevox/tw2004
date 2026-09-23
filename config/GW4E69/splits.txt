@@ -2741,20 +2741,8 @@ unsorted/sweep_800D3208.c:
 Earnings.c:
 	.text       start:0x800D3244 end:0x800D9E14
 
-unsorted/sweep_800DA174.c:
-	.text       start:0x800DA174 end:0x800DA1D4
-
-unsorted/sweep_800DA1D4.c:
-	.text       start:0x800DA1D4 end:0x800DA234
-
-unsorted/sweep_800DA234.c:
-	.text       start:0x800DA234 end:0x800DA264
-
-unsorted/sweep_800DAD1C.c:
-	.text       start:0x800DAD1C end:0x800DAD44
-
-unsorted/sweep_800DAD44.c:
-	.text       start:0x800DAD44 end:0x800DAD54
+GameHoleContests.c:
+	.text       start:0x800D9E14 end:0x800DAE44
 
 GameEffects.c:
 	.text       start:0x800DAE44 end:0x800DCAD8
