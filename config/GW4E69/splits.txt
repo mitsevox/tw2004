@@ -846,22 +846,10 @@ unsorted/sweep_800B59EC.c:
 	.text       start:0x800B59EC end:0x800B5A14
 
 UAudMemStack.c:
-	.text       start:0x800B5A14 end:0x800B5B80
-
-unsorted/sweep_800B5C30.c:
-	.text       start:0x800B5C30 end:0x800B5C40
-
-unsorted/sweep_800B5D08.c:
-	.text       start:0x800B5D08 end:0x800B5D34
-
-unsorted/sweep_800B5F28.c:
-	.text       start:0x800B5F28 end:0x800B5F4C
-
-unsorted/sweep_800B6034.c:
-	.text       start:0x800B6034 end:0x800B6060
+	.text       start:0x800B5A14 end:0x800B5C40
 
 GoARAM.c:
-	.text       start:0x800B61B4 end:0x800B6924
+	.text       start:0x800B5C40 end:0x800B6924
 
 DiscError.c:
 	.text       start:0x800B6924 end:0x800B769C
