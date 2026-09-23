@@ -482,7 +482,7 @@ config.libs = [
             Object(Matching, "src/os/OSSemaphore.c"),
             Object(Matching, "src/os/__ppc_eabi_init.c"),
             Object(Matching, "src/gba/GBA.c"),
-            Object(NonMatching, "src/card/CARDBios.c"),
+            Object(Matching, "src/card/CARDBios.c"),
             Object(Matching, "src/card/CARDRdwr.c"),
         ],
     },

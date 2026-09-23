@@ -1964,7 +1964,10 @@ src/gba/GBA.c:
 
 src/card/CARDBios.c:
 	.text       start:0x80176A38 end:0x80177DA4
-	.data       start:0x8019D380 end:0x8019D3A0
+	.data       start:0x8019D338 end:0x8019D3A0
+	.bss        start:0x80280B60 end:0x80280DA0
+	.sdata      start:0x80281B68 end:0x80281B70
+	.sbss       start:0x80282A40 end:0x80282A42
 
 dolphin/card/CARDUnlock.c:
 	.text       start:0x80177DA4 end:0x80179004
