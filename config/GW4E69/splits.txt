@@ -910,23 +910,11 @@ uiTransform.c:
 	.sbss       start:0x80281F38 end:0x80281F40
 	.sdata2     start:0x80283C20 end:0x80283C40
 
-unsorted/sweep_80093824.c:
-	.text       start:0x80093824 end:0x80093854
+goballfx.c:
+	.text       start:0x80093524 end:0x80093D3C
 
-unsorted/sweep_80093900.c:
-	.text       start:0x80093900 end:0x80093990
-
-unsorted/sweep_80093990.c:
-	.text       start:0x80093990 end:0x800939CC
-
-unsorted/sweep_800939CC.c:
-	.text       start:0x800939CC end:0x80093A04
-
-unsorted/sweep_80093AD4.c:
-	.text       start:0x80093AD4 end:0x80093AE0
-
-unsorted/sweep_80093D14.c:
-	.text       start:0x80093D14 end:0x80093D3C
+GoObjShadow.c:
+	.text       start:0x80093D3C end:0x8009414C
 
 GoShaderObject_Particle_Gc.c:
 	.text       start:0x8009414C end:0x80095088
@@ -965,16 +953,7 @@ CharAnim.c:
 	.text       start:0x800957FC end:0x80097208
 
 GoShaderObjectCommon_MorphAnimManager_Gc.c:
-	.text       start:0x80097208 end:0x800975B0
-
-unsorted/sweep_800975FC.c:
-	.text       start:0x800975FC end:0x80097624
-
-unsorted/sweep_80097624.c:
-	.text       start:0x80097624 end:0x80097688
-
-unsorted/sweep_80097688.c:
-	.text       start:0x80097688 end:0x80097694
+	.text       start:0x80097208 end:0x800977CC
 
 unsorted/sweep_800977CC.c:
 	.text       start:0x800977CC end:0x800977F8
@@ -986,7 +965,7 @@ unsorted/sweep_80097E98.c:
 	.text       start:0x80097E98 end:0x80097F44
 
 GoShaderObject_Glows_Gc.c:
-	.text       start:0x80097F44 end:0x80098740
+	.text       start:0x80097F44 end:0x80098844
 
 unsorted/sweep_80098844.c:
 	.text       start:0x80098844 end:0x8009884C
@@ -1004,16 +983,10 @@ unsorted/sweep_800988D8.c:
 	.text       start:0x800988D8 end:0x80098938
 
 UFstPart.c:
-	.text       start:0x80098A98 end:0x80099C50
+	.text       start:0x80098A98 end:0x80099ED8
 
-unsorted/sweep_80099EA4.c:
-	.text       start:0x80099EA4 end:0x80099EB4
-
-unsorted/sweep_8009A16C.c:
-	.text       start:0x8009A16C end:0x8009A180
-
-unsorted/sweep_8009A1EC.c:
-	.text       start:0x8009A1EC end:0x8009A1F4
+BootCourse.c:
+	.text       start:0x80099ED8 end:0x8009A250
 
 SunFlr_Gc.c:
 	.text       start:0x8009A250 end:0x8009A844
@@ -1040,43 +1013,19 @@ unsorted/sweep_8009B604.c:
 	.text       start:0x8009B604 end:0x8009B630
 
 GoGreenGrid.c:
-	.text       start:0x8009B630 end:0x8009C914
+	.text       start:0x8009B630 end:0x8009CB9C
 
 MC_Gc.c:
 	.text       start:0x8009CB9C end:0x8009F850
 
 MC.c:
-	.text       start:0x8009F850 end:0x800A233C
-
-unsorted/sweep_800A2604.c:
-	.text       start:0x800A2604 end:0x800A2614
-
-unsorted/sweep_800A2628.c:
-	.text       start:0x800A2628 end:0x800A2630
-
-unsorted/sweep_800A2630.c:
-	.text       start:0x800A2630 end:0x800A26D8
-
-unsorted/sweep_800A26D8.c:
-	.text       start:0x800A26D8 end:0x800A2774
-
-unsorted/sweep_800A27F4.c:
-	.text       start:0x800A27F4 end:0x800A27FC
-
-unsorted/sweep_800A2958.c:
-	.text       start:0x800A2958 end:0x800A295C
-
-unsorted/sweep_800A298C.c:
-	.text       start:0x800A298C end:0x800A29B4
+	.text       start:0x8009F850 end:0x800A27FC
 
 PsMgr.c:
-	.text       start:0x800A2A80 end:0x800A2B34
-
-unsorted/sweep_800A2BA8.c:
-	.text       start:0x800A2BA8 end:0x800A2BBC
+	.text       start:0x800A27FC end:0x800A2C3C
 
 PsBallFx.c:
-	.text       start:0x800A2C3C end:0x800A3D6C
+	.text       start:0x800A2C3C end:0x800A3E3C
 
 unsorted/sweep_800A3E3C.c:
 	.text       start:0x800A3E3C end:0x800A3F38
@@ -1195,53 +1144,11 @@ unsorted/sweep_800A7A34.c:
 unsorted/sweep_800A7AD0.c:
 	.text       start:0x800A7AD0 end:0x800A7AF0
 
-unsorted/sweep_800A7C24.c:
-	.text       start:0x800A7C24 end:0x800A7C30
+AudTable.c:
+	.text       start:0x800A7AF0 end:0x800A85CC
 
-unsorted/sweep_800A85FC.c:
-	.text       start:0x800A85FC end:0x800A8604
-
-unsorted/sweep_800A86B0.c:
-	.text       start:0x800A86B0 end:0x800A86BC
-
-unsorted/sweep_800A8700.c:
-	.text       start:0x800A8700 end:0x800A8708
-
-unsorted/sweep_800A871C.c:
-	.text       start:0x800A871C end:0x800A874C
-
-unsorted/sweep_800A874C.c:
-	.text       start:0x800A874C end:0x800A8754
-
-unsorted/sweep_800A87A4.c:
-	.text       start:0x800A87A4 end:0x800A87B0
-
-unsorted/sweep_800A87B0.c:
-	.text       start:0x800A87B0 end:0x800A87B4
-
-unsorted/sweep_800A87B4.c:
-	.text       start:0x800A87B4 end:0x800A87D8
-
-unsorted/sweep_800A8824.c:
-	.text       start:0x800A8824 end:0x800A882C
-
-unsorted/sweep_800A8D00.c:
-	.text       start:0x800A8D00 end:0x800A8D54
-
-unsorted/sweep_800A8D54.c:
-	.text       start:0x800A8D54 end:0x800A8D88
-
-unsorted/sweep_800A8D88.c:
-	.text       start:0x800A8D88 end:0x800A8DC8
-
-unsorted/sweep_800A9374.c:
-	.text       start:0x800A9374 end:0x800A93AC
-
-unsorted/sweep_800A942C.c:
-	.text       start:0x800A942C end:0x800A9438
-
-unsorted/sweep_800A955C.c:
-	.text       start:0x800A955C end:0x800A9564
+hlaudmovie.c:
+	.text       start:0x800A85CC end:0x800A9808
 
 unsorted/sweep_800A9AC4.c:
 	.text       start:0x800A9AC4 end:0x800A9AC8
