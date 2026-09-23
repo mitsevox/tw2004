@@ -4,7 +4,10 @@
 Every conflict in configure.py's unit lists comes from two lanes adding units (mkunit.py) or
 removing folded sweeps (fold.py), so a conflict block is resolved by keeping every line from both
 sides, once, and dropping the Object line of a sweep that is gone after the merge (its file is
-deleted, or its block is no longer in splits.txt). The kept lines are put in address order (their
+deleted, or its block is no longer in splits.txt). When both sides carry an Object line for the
+same source and only one of them has args (extra_cflags=, mw_version=, ...), the one with args is
+kept; when they differ in any other way (two different args, Matching against NonMatching), the
+block is left for a person. The kept lines are put in address order (their
 .text start in splits.txt; a line without one stays after the line it followed).
 
 Then it checks, and prints, without failing:
@@ -41,9 +44,41 @@ def gone(unit, root, units):
         not (root / 'src' / unit).exists() or (units is not None and unit not in units))
 
 
-def resolve(text, root, units):
-    """-> (text, blocks resolved, blocks left, resolved line ranges as (first, last) unit names)"""
+def obj_args(line):
+    """The arguments after the source path in an Object line ('' for none), e.g.
+    'extra_cflags=["-inline auto"]'."""
+    rest = line[OBJ.match(line).end():]
+    return re.sub(r'\)\s*,?\s*(#.*)?$', '', rest.strip()).strip(' ,')
+
+
+def one_line_per_unit(lines, why):
+    """Both sides may carry an Object line for the same source (one side added args to it with
+    mkunit.py, e.g. extra_cflags or mw_version). Keep one line per source: the one with args.
+    -> the lines to keep, or None when a person must choose (both sides differ in some other way,
+    e.g. two different args, or Matching against NonMatching); `why` gets the reason."""
+    by_unit = {}
+    for l in lines:
+        o = OBJ.match(l)
+        if o and l not in by_unit.setdefault(o.group(1), []):
+            by_unit[o.group(1)].append(l)
+    drop = set()
+    for unit, variants in by_unit.items():
+        if len(variants) < 2:
+            continue
+        with_args = [l for l in variants if obj_args(l)]
+        if len(with_args) != 1:
+            why.append('%s: %d different Object lines (%s)' % (
+                unit, len(variants), ' / '.join(obj_args(l) or 'no args' for l in variants)))
+            return None
+        drop.update(l for l in variants if l != with_args[0])
+    return [l for l in lines if l not in drop]
+
+
+def resolve(text, root, units, why=None):
+    """-> (text, blocks resolved, blocks left, resolved line ranges as (first, last) unit names).
+    Reasons a block was left for a person are appended to `why`."""
     done, left, spans = 0, 0, []
+    why = [] if why is None else why
 
     def one(m):
         nonlocal done, left
@@ -51,9 +86,14 @@ def resolve(text, root, units):
         if not all(OBJ.match(l) or not l.strip() or l.strip().startswith('#')
                    for l in theirs + ours):
             left += 1
+            why.append('a block holds something besides Object lines and comments')
+            return m.group(0)
+        both = one_line_per_unit(theirs + ours, why)   # main's side first
+        if both is None:
+            left += 1
             return m.group(0)
         keep = []
-        for l in theirs + ours:                      # main's side first
+        for l in both:
             o = OBJ.match(l)
             if l in keep or (o and gone(o.group(1), root, units)):
                 continue
@@ -111,8 +151,11 @@ def main():
     path = root / 'configure.py'
     text = path.read_text(encoding='utf-8')
     units = split_units(root)
-    out, done, left, spans = resolve(text, root, units)
+    why = []
+    out, done, left, spans = resolve(text, root, units, why)
     print('configure.py: %d conflict blocks resolved, %d left for a person' % (done, left))
+    for w in why:
+        print('  left:', w)
     for note in check(out, root, units, spans):
         print('  check:', note)
     if '--dry-run' not in argv and out != text:

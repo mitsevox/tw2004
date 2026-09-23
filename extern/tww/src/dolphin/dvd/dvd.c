@@ -1296,7 +1296,7 @@ int DVDChangeDiskAsync(DVDCommandBlock* block, DVDDiskID* id, DVDCBCallback call
 
     if (id->company[0] == 0) {
         OSReport("DVDChangeDiskAsync(): You can't specify NULL to company name.  \n");
-        DVD_ASSERTMSGLINE(2902, 0, "");
+        DVD_ASSERTMSGLINE(2854, 0, "");  // this game's dvd.c revision: line 2854
     }
 
     block->command = DVD_COMMAND_CHANGE_DISK;
