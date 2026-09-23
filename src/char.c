@@ -3,7 +3,7 @@
 // matrices, and small setters; the sweep code in the marked block is the other matched small
 // functions, not yet cleaned up.
 
-#include "golfer.h"
+#include "game.h"
 #include "charstate.h"
 #include "unsorted/cull.h"
 #include "game_types.h"
@@ -26,6 +26,7 @@ void* fn_8001B208(u8* pData);
 void  fn_8001B878(Character* pChar, int n);
 void  fn_8001C0E0(Character* pChar);
 Character* fn_8001C21C(Character* pChar);
+void  Character_UpdateAnimation(Character* pChar, int a, f32 f);
 void  fn_8001CCF8(UStreamObject* pObject);
 void  fn_8001CD80(UStreamObject* pObject);
 void  fn_8001CE5C(UStreamObject* pObject);
@@ -285,6 +286,17 @@ void fn_8001A81C(void) {
         AnimLib_FreeWorkCopies();
     }
     fn_800C9FE0();
+}
+
+// Advances every character's animation by fTime, except in game type 6 while fn_800E415C holds.
+void fn_8001BC8C(f32 fTime) {
+    int i;
+
+    if (gSession.nGameType != 6 || !fn_800E415C()) {
+        for (i = 0; i < lbl_80281CA8; i++) {
+            Character_UpdateAnimation(lbl_801B9624[i], 0, fTime);
+        }
+    }
 }
 
 // Add a character to the table of characters (up to five); NULL when it is full.
