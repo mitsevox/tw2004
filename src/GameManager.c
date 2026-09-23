@@ -1359,13 +1359,27 @@ void GM_CheckControllerPulled(void) {
     }
 }
 
+// A course record in the save data (0x70 bytes; the rest unknown).
+typedef struct SavedCourse {
+    u8   unk0[2];
+    u8   nPar[18];              // 0x02  signed values
+    s32  nYards[18];            // 0x14
+    u8   unk5C[0x70 - 0x5C];
+} SavedCourse;
+
+typedef struct SaveSlot {
+    u8          unk0[0x5244];
+    SavedCourse course[1];      // 0x5244
+    u8          unk52B4[0x10600 - 0x52B4];
+} SaveSlot;
+
 // Copies a course's pars and yardages from the save data into the game state (a created or
 // saved course: slot nSaveSlot, record nSaveCourse).
 void fn_800DFC6C(void) {
     int i;
     for (i = 0; i < 18; i++) {
-        gpGame->nHolePar[i] = (s8)gpSaveData[gpGame->nSaveSlot * 0x10600 + gpGame->nSaveCourse * 0x70 + i + 0x5246];
-        gpGame->nHoleYards[i] = *(s32*)(gpSaveData + (gpGame->nSaveSlot * 0x10600 + gpGame->nSaveCourse * 0x70 + i * 4 + 0x5258));
+        gpGame->nHolePar[i] = (s8)((SaveSlot*)gpSaveData)[gpGame->nSaveSlot].course[gpGame->nSaveCourse].nPar[i];
+        gpGame->nHoleYards[i] = ((SaveSlot*)gpSaveData)[gpGame->nSaveSlot].course[gpGame->nSaveCourse].nYards[i];
     }
 }
 

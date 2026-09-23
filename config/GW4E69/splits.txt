@@ -3618,23 +3618,8 @@ unsorted/sweep_800DC514.c:
 GameManager.c:
 	.text       start:0x800DCA94 end:0x800E0AF0
 
-unsorted/sweep_800E177C.c:
-	.text       start:0x800E177C end:0x800E1788
-
-unsorted/sweep_800E1788.c:
-	.text       start:0x800E1788 end:0x800E17AC
-
-unsorted/sweep_800E22E4.c:
-	.text       start:0x800E22E4 end:0x800E234C
-
-unsorted/sweep_800E234C.c:
-	.text       start:0x800E234C end:0x800E23B0
-
-unsorted/sweep_800E25CC.c:
-	.text       start:0x800E25CC end:0x800E25E0
-
-unsorted/sweep_800E27A8.c:
-	.text       start:0x800E27A8 end:0x800E27C0
+GameRound.c:
+	.text       start:0x800E0AF0 end:0x800E2810
 
 Gimme.c:
 	.text       start:0x800E2810 end:0x800E292C

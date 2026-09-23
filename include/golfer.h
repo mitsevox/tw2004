@@ -356,7 +356,9 @@ typedef struct Session {
 // turned this into the GameModeDriver class). Only what our files use is named.
 typedef struct GameState {
     s32  nMode;                 // 0x000
-    u8   unk4[0x14 - 0x4];
+    u8   unk4[4];
+    s32  nMulligans;            // 0x008  0 none, 2 one per player per round (GM_PlayerTakeMulligan)
+    u8   unkC[0x14 - 0xC];
     s32  unk14;                 // 0x014
     s32  nHoleYards[18];        // 0x018  from the save data's course (fn_800DFC6C)
     s32  n60;                   // 0x060
