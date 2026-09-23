@@ -1666,8 +1666,11 @@ unsorted/sweep_801104A0.c:
 hwsBurn.c:
 	.text       start:0x801104AC end:0x80111F58
 
+CalendarScreen.c:
+	.text       start:0x80111F58 end:0x80112614
+
 hwsMaterial_Gc.c:
-	.text       start:0x8011206C end:0x80112804
+	.text       start:0x80112614 end:0x80112804
 
 hwsOverride_Gc.c:
 	.text       start:0x80112804 end:0x80112B80

@@ -958,6 +958,7 @@ config.libs = [
             Object(NonMatching, "FE_PGATourMessages.c"),
             Object(Matching, "FE_LogoDesign.c"),
             Object(NonMatching, "hwsBurn.c"),
+            Object(NonMatching, "CalendarScreen.c"),
             Object(NonMatching, "hwsMaterial_Gc.c"),
             Object(NonMatching, "hwsOverride_Gc.c"),
             Object(NonMatching, "hwsRender_Gc.c"),
