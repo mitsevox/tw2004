@@ -81,20 +81,8 @@ urandom.c:
 ObjList.c:
 	.text       start:0x8000B46C end:0x8000B884
 
-unsorted/sweep_8000B984.c:
-	.text       start:0x8000B984 end:0x8000B9E4
-
-unsorted/sweep_8000BA14.c:
-	.text       start:0x8000BA14 end:0x8000BA3C
-
-unsorted/sweep_8000BA6C.c:
-	.text       start:0x8000BA6C end:0x8000BA94
-
-unsorted/sweep_8000BEC8.c:
-	.text       start:0x8000BEC8 end:0x8000BED8
-
-unsorted/sweep_8000BED8.c:
-	.text       start:0x8000BED8 end:0x8000BEE4
+LoadData.c:
+	.text       start:0x8000B884 end:0x8000BF20
 
 unsorted/sweep_8000BF8C.c:
 	.text       start:0x8000BF8C end:0x8000BF9C
