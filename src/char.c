@@ -103,6 +103,8 @@ void fn_8001A73C(void) {
     fn_8010BF68();
 }
 
+// port: the 'SAC ' handler; the overlay library is little-endian on disc and AnimLib_MergeOverlay
+//       swaps it (fn_80020BC8 > fn_80076158): a little-endian port does not swap there.
 void fn_8001A75C(u8* p0) {
     AnimLib_MergeOverlay(*(s32*)p0, *(s32*)(p0 + 0x20));
     fn_80009E70(p0);
@@ -175,6 +177,8 @@ void fn_8001D268(void) {
     UStream_UnregisterHandler(1128813088);
 }
 
+// port: the 'SKLO' handler; the skeleton is little-endian on disc and fn_8001A9F4 swaps it
+//       (fn_80076158): a little-endian port does not swap there.
 void fn_8001D3EC(u8* p0) {
     s32 t1;
     fn_8001A9F4(*(s32*)p0, 0, 0, *(s32*)(p0 + 0x20), 0, 0);

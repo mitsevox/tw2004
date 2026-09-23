@@ -1496,6 +1496,8 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
             pRec = &pSrc->pRecords[i];
             if (pRec->n10 <= 0 || pRec->n18 == 0) continue;
             pBank->ppClips[pSlot->n150] = pEnd;
+            // port: a clip of an overlay library ('SAL '/'SAC '), little-endian on disc; a little-endian
+            //       port does not swap here (Clip is then read in place)
             fn_80020BC8(pData + (uptr)pSrc->pRecords[i].pClip);
             pClipSrc = pData + (uptr)pSrc->pRecords[i].pClip;
             pHdr     = (Clip*)pEnd;
@@ -1961,27 +1963,32 @@ void ClipBank_SwapHeader(void* p) {
     SwapField fmt[5] = {{8, -8}, {4, 4}, {4, 4}, {4, 4}, {4, 4}};
     void*     pSrc = p;
     void*     pDst = p;
+    // port: a clip bank's header ('BNK '), little-endian on disc; a little-endian port does not swap here
     fn_8001F08C(&pSrc, &pDst, fmt, 5, 1);
 }
 
 // Swap one node of the clip tree (see AnimLib).
 void AnimLib_SwapGroupNode(void* pSrc, void* pDst) {
     SwapField fmt[3] = {{2, 2}, {0x10, 2}, {2, 1}};
+    // port: a clip-tree group node ('SAL '), little-endian on disc; a little-endian port does not swap here
     fn_8001F08C(&pSrc, &pDst, fmt, 3, 1);
 }
 
 void AnimLib_SwapStyleNode(void* pSrc, void* pDst) {
     SwapField fmt[2] = {{12, 2}, {2, 1}};
+    // port: a clip-tree style node ('SAL '), little-endian on disc; a little-endian port does not swap here
     fn_8001F08C(&pSrc, &pDst, fmt, 2, 1);
 }
 
 void AnimLib_SwapClubNode(void* pSrc, void* pDst) {
     SwapField fmt[5] = {{2, 2}, {2, 2}, {0x16, 2}, {2, 2}, {4, 4}};
+    // port: a clip-tree club node ('SAL '), little-endian on disc; a little-endian port does not swap here
     fn_8001F08C(&pSrc, &pDst, fmt, 5, 1);
 }
 
 void AnimLib_SwapLeaf(void* pSrc, void* pDst) {
     SwapField fmt[3] = {{2, 2}, {2, 2}, {4, 4}};
+    // port: a clip-tree leaf ('SAL '), little-endian on disc; a little-endian port does not swap here
     fn_8001F08C(&pSrc, &pDst, fmt, 3, 1);
 }
 
@@ -2055,6 +2062,9 @@ AnimLib* AnimLib_Load(u8* pData, ClipBank* pBank) {
     pLib->pFile = pData;
     p           = (u8*)pLib + sizeof(AnimLib);
     pDst = pSrc = pLib;
+    // port: an animation library's header ('SAL ', and 'SAC ' overlays), little-endian on disc; a
+    //       little-endian port does not swap here.
+    // port: The library is then used in place (AnimLib over the bytes; its offsets become 32-bit pointers).
     fn_8001F08C(&pSrc, &pDst, hdrFmt, 19, 1);
     if (pLib->pBank != NULL) {
         if (pBank == NULL) return NULL;
@@ -2064,6 +2074,8 @@ AnimLib* AnimLib_Load(u8* pData, ClipBank* pBank) {
         pLib->nClips2   = pLib->nClips;
         pLib->pTree = p;
         pDst = pSrc = pLib->ppClips;
+        // port: the library's clip numbers into its bank, little-endian on disc; a little-endian port does
+        //       not swap here
         fn_80076158(&pSrc, pDst, pLib->nClips * 4, 4);
         if (pLib->uId != pBank->uId) {
             for (i = 0; i < pLib->nClips; i++) {
@@ -2087,8 +2099,11 @@ AnimLib* AnimLib_Load(u8* pData, ClipBank* pBank) {
         pLib->pTree = p;
         p += pLib->nTreeSize;
         pDst = pSrc = pLib->pIndex;
+        // port: the library's clip index, little-endian on disc; a little-endian port does not swap here
         fn_80076158(&pSrc, pDst, pLib->nClips * 2, 2);
         pDst = pSrc = pLib->pRecords;
+        // port: the library's clip records (ClipRecord, laid over the bytes), little-endian on disc; a
+        //       little-endian port does not swap here
         fn_8001F08C(&pSrc, &pDst, recFmt, 7, pLib->nRecords);
         if (pLib->uFlags & 1) {
             if ((uptr)p & 15) {
@@ -2129,11 +2144,15 @@ ClipBank* ClipBank_Load(u8* pFile, u32 uAlign) {
         uPad = 0;
     }
     pBank = (ClipBank*)(pData + uPad);
+    // port: a clip bank ('BNK '), little-endian on disc; a little-endian port does not swap here; the bank
+    //       is then used in place
+    // port: (ClipBank over the bytes, its clip offsets turned into 32-bit pointers)
     ClipBank_SwapHeader(pBank);
     pBank->pFile   = NULL;
     pData += 0x20;
     pBank->ppClips = (void**)pData;
     pSrc = pBank->ppClips;
+    // port: the bank's clip offsets, little-endian on disc; a little-endian port does not swap here
     fn_80076158(&pSrc, pBank->ppClips, pBank->nClips * 4, 4);
     pData += pBank->nClips * 4;
     uPad = 16 - ((uptr)pData & 15);
