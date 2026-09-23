@@ -1120,26 +1120,8 @@ AudTable.c:
 hlaudmovie.c:
 	.text       start:0x800A85CC end:0x800A9808
 
-unsorted/sweep_800A9AC4.c:
-	.text       start:0x800A9AC4 end:0x800A9AC8
-
-unsorted/sweep_800AA0D8.c:
-	.text       start:0x800AA0D8 end:0x800AA118
-
-unsorted/sweep_800AA2A4.c:
-	.text       start:0x800AA2A4 end:0x800AA2EC
-
-unsorted/sweep_800AA2EC.c:
-	.text       start:0x800AA2EC end:0x800AA34C
-
-unsorted/sweep_800AA3D4.c:
-	.text       start:0x800AA3D4 end:0x800AA400
-
-unsorted/sweep_800AA444.c:
-	.text       start:0x800AA444 end:0x800AA44C
-
-unsorted/sweep_800AA498.c:
-	.text       start:0x800AA498 end:0x800AA4BC
+hlaudtrack.c:
+	.text       start:0x800A9808 end:0x800AA4BC
 
 unsorted/sweep_800AA694.c:
 	.text       start:0x800AA694 end:0x800AA698
