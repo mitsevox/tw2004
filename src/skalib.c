@@ -1,67 +1,11 @@
-// skalib.c (EA's name, from its asserts): the skeletal animation library. So far only the clip
-// lookup and pick, the part that chooses which clip a golfer plays.
+// skalib.c (EA's name, from its asserts): the skeletal animation library. Loads the animation
+// libraries (SAL) and clip banks (BNK) of the three animation slots, merges a slot's overlay
+// libraries into it within the round's clip budget (clips kept in ARAM), and picks the clip a
+// golfer plays for an animation group, style, club class and key. The types are in character.h.
 
 #include "golfer.h"
 #include "game.h"
 #include "engine.h"
-
-// An animation library (a SAL object: glbchar.gcb holds the shared male/female ones, and each
-// character's CHR object embeds its own). On disc it is little-endian; the loader swaps it and
-// fills in the pointers. Clips are found through a tree of s16 byte offsets into pTree:
-//   group node:  [0] default leaf, [1 + style] style node (8 styles)
-//   style node:  [club] club node (6 club classes)
-//   club node:   [1] default leaf, [2 + key] leaf (11 keys)
-//   leaf:        [0] clip count, [1] first entry in ppClips, then a u32 "played" mask
-struct AnimLib {
-    s32    groups[64];          // 0x000  byte offset of each group's node, -1 none (21 used)
-    u64    uId;                 // 0x100  must match the clip bank's when the clips live there
-    s32    n108;                // 0x108
-    s32    nDefault;            // 0x10C  the leaf used when a group has nothing
-    s32    nTreeSize;           // 0x110
-    s32    nClips;              // 0x114  entries in ppClips
-    s32    nRecords;            // 0x118  36-byte clip records (a 16-character name first)
-    u8*    pTree;               // 0x11C
-    void** ppClips;             // 0x120  clip pointers; a clip's name is at +0xA0
-    s16*   pIndex;              // 0x124  record of each clip
-    void*  pFile;               // 0x128  the loaded file this library sits in
-    s32    n12C;                // 0x12C
-    struct ClipRecord* pRecords;  // 0x130
-    u8*    pClipData;           // 0x134  the library's own clips
-    struct ClipBank* pBank;     // 0x138  set in the file: the clips are in a bank instead
-    u32    uFlags;              // 0x13C  1: the library carries its own clips
-    s32    n140;                // 0x140
-    s16    n144;                // 0x144
-    s16    nClips2;             // 0x146
-};
-
-typedef struct ClipRecord {
-    char   name[16];            // 0x00
-    s16    n10;                 // 0x10  leaves using the clip, while merging
-    s16    n12;                 // 0x12  merge flags: 1 keep, 2 / 0x10 moved (pClip then points to the
-                                //       record it went to)
-    s32    n14;                 // 0x14
-    s32    n18;                 // 0x18
-    void*  pClip;               // 0x1C  offset into the clip data on disc, pointer once loaded
-    s32    n20;                 // 0x20
-} ClipRecord;
-
-// A clip bank: clips shared by several libraries (a 0x20-byte header, the clip offsets, then the
-// clips, each 16-aligned).
-typedef struct ClipBank {
-    u64    uId;                 // 0x00
-    s32    nClips;              // 0x08
-    s32    n0C;                 // 0x0C
-    void** ppClips;             // 0x10
-    void*  pFile;               // 0x14  the loaded file, while the bank owns it
-    u8*    pRecords;            // 0x18  a planned bank: where its records go
-    u32    n1C;                 // 0x1C
-} ClipBank;
-
-// One field of a byte-swap description: nBytes bytes made of nSize-byte values (negative: not swapped).
-typedef struct SwapField {
-    s32 nBytes;
-    s32 nSize;
-} SwapField;
 
 void  fn_8001F08C(void** ppSrc, void** ppDst, SwapField* pFormat, int nFields, int nCount);   // byte-swap
                                                                                             // by format
@@ -88,67 +32,7 @@ u8    fn_800C9828(int nGroup, int nStyle, int nClub, int nKey);
 void  AnimLib_FreeCopies(void);
 void  ClipBank_FreeAram(void);
 
-// A library that can be layered over a slot's own (0x20 bytes).
-typedef struct LibOverlay {
-    AnimLib* pWork;             // 0x00  the loaded (swapped) copy
-    void*  pCopy;               // 0x04  the file as it came off the disc
-    u32    nSize;               // 0x08
-    Character* pChar;           // 0x0C  the golfer it was loaded for
-    s32    n10;                 // 0x10
-    s32    n14;                 // 0x14
-    u8     bActive;             // 0x18
-    u8     pad19[3];
-    s32    nTree;               // 0x1C  the tree size before a merge
-} LibOverlay;
-
-// One of the three animation slots (0x158 bytes).
-typedef struct LibSlot {
-    AnimLib*   pLib;            // 0x000  the loaded (swapped) library
-    void*      pCopy;           // 0x004  the file as it came off the disc
-    u32        nSize;           // 0x008
-    LibOverlay overlays[10];    // 0x00C
-    s32        nOverlays;       // 0x14C
-    s32        n150;            // 0x150
-    u8*        pEnd;            // 0x154  the end of the slot's clip bank records
-} LibSlot;
-
-extern ClipBank*   lbl_801C6050[3];   // the clip bank of each slot
-extern AnimLib*    lbl_801C605C[3];   // the library of each slot, when its clips are in the bank
-extern LibSlot     lbl_801C6068[3];
-extern u32         lbl_801C6470[3];   // ARAM copy of each slot's bank file
-extern u32         lbl_801C647C[3];   // its size
-extern UStreamObject* lbl_801C6488[3];   // each slot's bank file, while it is in main memory
-extern UStreamObject* lbl_80281CE0;      // the buffer banks are brought back from ARAM into
-extern u8          lbl_80281CE4;
-extern u32         lbl_80281078;      // the current slot
-extern u32         lbl_80281D04[2];   // ARAM copy of each scratch area
-extern u32         lbl_80281D0C[2];   // its size
-extern u8          lbl_801D9908[0xC8];
-extern u32         lbl_80281D18;
-extern u8          lbl_80281CD8;      // double buffering: libraries alternate between slots 0 and 1
-extern s32         lbl_80281CE8;      // group, style, club and key being merged
-extern s32         lbl_80281CEC;
-extern s32         lbl_80281CF0;
-extern s32         lbl_80281CF4;
-extern s32         lbl_80281074;      // clips a leaf may keep this round
-extern u32         lbl_80281CDC;      // bytes of clips a slot may keep
-extern f32         lbl_80281D1C;
-extern s32         lbl_80281070;
-extern s16*        lbl_80281CF8;      // the group, style and club node being built
-extern s16*        lbl_80281CFC;
-extern s16*        lbl_80281D00;      // leaves this short are left alone by the drop pass
-extern u8*         lbl_80281CC4;      // staging buffers (32-aligned), see Skalib_Init
-extern u8*         lbl_80281CC8;
-extern u8*         lbl_80281CCC;
-extern u8*         lbl_80281CD0;
-extern u8          lbl_801C5E2C[0x1DC];
-extern u8          lbl_801C5C50[0x1DC];
-extern u8          lbl_801BF9C0[0x6290];
-extern u8          lbl_801B9730[0x6290];
-
-extern char (*lbl_80281D14)[2][8][6][16];   // the last clip name played: [player][reaction kind][style][club]
-
-// The clip with this name (at +0xA0 in each clip), or NULL.
+// The clip with this name, or NULL.
 void* AnimLib_FindByName(AnimLib* pLib, const char* pName) {
     int i;
     for (i = 0; i < pLib->nClips; i++) {
@@ -191,12 +75,12 @@ void Skalib_Init(void) {
     lbl_80281D14 = fn_80009B34(4 * sizeof(*lbl_80281D14), 2, 0, "skalib.c", 508);   // four players
     fn_80005AE8(lbl_80281D14, 0, 4 * sizeof(*lbl_80281D14));
     lbl_80281CC4 = lbl_801C5E2C;
-    lbl_80281CC8 = lbl_801C5C50;
-    lbl_80281CCC = lbl_801BF9C0;
-    lbl_80281CD0 = lbl_801B9730;
     lbl_80281CC4 = (u8*)((((uptr)lbl_80281CC4 >> 5) + 1) << 5);
+    lbl_80281CC8 = lbl_801C5C50;
     lbl_80281CC8 = (u8*)((((uptr)lbl_80281CC8 >> 5) + 1) << 5);
+    lbl_80281CCC = lbl_801BF9C0;
     lbl_80281CCC = (u8*)((((uptr)lbl_80281CCC >> 5) + 1) << 5);
+    lbl_80281CD0 = lbl_801B9730;
     lbl_80281CD0 = (u8*)((((uptr)lbl_80281CD0 >> 5) + 1) << 5);
 }
 
@@ -275,12 +159,6 @@ ClipBank* ClipBank_Get(u32 nSlot) {
     return lbl_801C6050[nSlot];
 }
 
-// Called for each position of two clip trees walked side by side: level 0 the default leaves,
-// 1 a group (its default leaves), 2 a style, 3 a club (its default leaves), 4 a key's leaves.
-// nIndex is the group, style, club or key. A result above 0 stops the walk.
-typedef int (*AnimLibWalkFn)(AnimLib* pA, AnimLib* pB, void* pLeafA, void* pLeafB, void* pCtx, int nLevel,
-                             int nIndex);
-
 // The node at offset nOff of a library's tree, or NULL when there is no library or no node.
 #define SKA_NODE(pLib, nOff) \
     (((pLib) != NULL && (nOff) >= 0) ? (s16*)((pLib)->pTree + (nOff)) : NULL)
@@ -353,24 +231,6 @@ int AnimLib_WalkPair(AnimLib* pA, AnimLib* pB, AnimLibWalkFn pfn, void* pCtx) {
     }
     return 0;
 }
-
-// A leaf of the clip tree (see AnimLib); while two trees are merged its mask holds flags
-// instead: 1 keep this one, 2 replace it.
-typedef struct AnimLeaf {
-    s16 nCount;                 // 0x0
-    s16 nFirst;                 // 0x2
-    u32 uMask;                  // 0x4
-} AnimLeaf;
-
-// What the merge adds up as it walks.
-typedef struct MergeCtx {
-    u32  n0;
-    s32* pCount;                // 0x04  clips still in use
-    s32  nBytes;                // 0x08  bytes of clip data still in use
-    s32  nTarget;               // 0x0C  bytes to get down to
-    s32  nKeep;                 // 0x10  clips a leaf keeps
-    s32  nMaxUsers;             // 0x14  clips shared by more leaves than this are not picked
-} MergeCtx;
 
 // Merge walk, sizing pass: counts the tree bytes the merged library needs (a leaf, then the
 // node for this level) and decides for each leaf pair which side wins.
@@ -534,7 +394,8 @@ f32 Skalib_Random(void);
 int AnimLib_TrimCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB, MergeCtx* pCtx, int nLevel,
                    int nIndex) {
     s32         nKeep;
-    s32         nCount;
+    s32         nCountA;
+    s32         nCountB;
     int         nStart;
     int         i;
     ClipRecord* pRec;
@@ -546,8 +407,8 @@ int AnimLib_TrimCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB,
     } else {
         nKeep = lbl_80281074;
     }
-    if (pLeafA != NULL && (nCount = pLeafA->nCount) > nKeep) {
-        nStart = (nCount - nKeep) * Skalib_Random();
+    if (pLeafA != NULL && (nCountA = pLeafA->nCount) > nKeep) {
+        nStart = (nCountA - nKeep) * Skalib_Random();
         for (i = 0; i < nStart; i++) {
             pRec = &pA->pRecords[pA->pIndex[pLeafA->nFirst + i]];
             pRec->n10--;
@@ -567,8 +428,8 @@ int AnimLib_TrimCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB,
         pLeafA->nFirst += (s16)nStart;
         pLeafA->nCount = nKeep;
     }
-    if (pLeafB != NULL && (nCount = pLeafB->nCount) > nKeep) {
-        nStart = (nCount - nKeep) * Skalib_Random();
+    if (pLeafB != NULL && (nCountB = pLeafB->nCount) > nKeep) {
+        nStart = (nCountB - nKeep) * Skalib_Random();
         for (i = 0; i < nStart; i++) {
             pRec = &pB->pRecords[pB->pIndex[pLeafB->nFirst + i]];
             pRec->n10--;
@@ -609,13 +470,13 @@ int AnimLib_KeepRandomCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* p
                          int nLevel, int nIndex) {
     AnimLeaf*   pLeaf;
     AnimLib*    pLib;
-    ClipRecord* pRec;
-    int         nMarked;
     s16*        pIdx;
-    int         i;
+    ClipRecord* pRec;
     int         nStart;
-    int         j;
+    int         i;
+    int         nMarked;
     int         nExtra;
+    int         j;
 
     if (pLeafA != NULL) {
         pLeaf = pLeafA;
@@ -851,12 +712,6 @@ int AnimLib_DropCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB,
 
 void* AnimLib_ResolveRecord(AnimLib* pLib, int nRec, ClipRecord* pOut, u8 bLink);
 
-// The library a merge writes, and the records it copies clips into.
-typedef struct BuildCtx {
-    AnimLib*    pLib;
-    ClipRecord* pRecords;
-} BuildCtx;
-
 // Space for a node or leaf at the end of the tree being built.
 #define SKA_ALLOC(pLib, p, nSize)                  \
     (p) = (void*)((pLib)->pTree + (pLib)->nTreeSize); \
@@ -867,16 +722,16 @@ typedef struct BuildCtx {
 // side that has it, or from both when the overlay's clips are added to the library's.
 int AnimLib_BuildCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB, BuildCtx* pCtx, int nLevel,
                     int nIndex) {
-    AnimLeaf*   pSrc    = NULL;
-    AnimLib*    pSrcLib = NULL;
-    int         bAny    = 0;
     AnimLib*    pLib    = pCtx->pLib;
     ClipRecord* pRecs   = pCtx->pRecords;
+    AnimLeaf*   pSrc    = NULL;
+    AnimLib*    pSrcLib = NULL;
     AnimLeaf*   pNew    = NULL;
-    u8          bFromA;
     u8          bKeep;
+    int         bAny    = 0;
     s32         i;
     s16*        pIdx;
+    u8          bFromA;
 
     if (pLeafA != NULL || pLeafB != NULL) {
         bAny = 1;
@@ -1097,18 +952,6 @@ u8 AnimLib_TrimToFit(MergeCtx* pCtx, AnimLib* pLib, LibOverlay* pOvs, int nOvs, 
 done:
     return nRet == 1;
 }
-
-// What was spent on each slot's clip bank, kept for reference.
-typedef struct SlotStats {
-    s32 nBudget;                // 0x00  bytes the bank may use
-    s32 n04;                    // 0x04
-    s32 nBytes;                 // 0x08  clip bytes wanted before trimming
-    s32 nTrimmed;               // 0x0C  bytes the trim took off
-    s32 nKeep;                  // 0x10  clips per leaf it settled on
-    s32 nMaxUsers;              // 0x14
-} SlotStats;
-
-extern SlotStats lbl_801C6008[3];
 
 // Plans the clip bank for a slot: merges the slot's library with its overlays (clips with the
 // same name are shared, later copies pointing at the first), and, unless it is slot 2, trims
@@ -1662,8 +1505,8 @@ void AnimLib_FreeWorkCopies(void) {
     u32         i;
     LibOverlay* pOv;
 
-    pSlot = lbl_801C6068;
-    for (i = 0; i < 3; i++, pSlot++) {
+    for (i = 0; i < 3; i++) {
+        pSlot = &lbl_801C6068[i];
         if (lbl_80281CE4 != 0 && i != lbl_80281078) continue;
         if (pSlot->nOverlays != 0) {
             for (k = 0; pSlot->nOverlays > k; k++) {
@@ -1690,8 +1533,8 @@ void AnimLib_FreeCopies(void) {
     u32         i;
     int         j;
 
-    pSlot = lbl_801C6068;
-    for (i = 0; i < 3; i++, pSlot++) {
+    for (i = 0; i < 3; i++) {
+        pSlot = &lbl_801C6068[i];
         if (pSlot->nOverlays != 0) {
             for (j = 0; j < pSlot->nOverlays; j++) {
                 pOv = &pSlot->overlays[j];
@@ -1935,7 +1778,7 @@ void* AnimLib_Pick(int nPlayer, AnimLib* pLib, int nGroup, int nStyle, int nClub
                         }
                     }
                     if (pSlot != NULL) {
-                        strcpy(pSlot, (char*)ppClips[nPick] + 0xA0);
+                        strcpy(pSlot, ((Clip*)ppClips[nPick])->name);
                     }
                     *pUsed |= uUsed;
                 }
@@ -2147,8 +1990,10 @@ ClipBank* ClipBank_Load(u8* pFile, u32 uAlign) {
     // port: a clip bank ('BNK '), little-endian on disc; a little-endian port does not swap here; the bank
     //       is then used in place
     // port: (ClipBank over the bytes, its clip offsets turned into 32-bit pointers)
-    ClipBank_SwapHeader(pBank);
+    ClipBank_SwapHeader(pData + uPad);
     pBank->pFile   = NULL;
+    // The clip offsets are found from the file's start, not the aligned bank: this is only right for a
+    // file that is already aligned (ClipBank_Restore's buffer is).
     pData += 0x20;
     pBank->ppClips = (void**)pData;
     pSrc = pBank->ppClips;
