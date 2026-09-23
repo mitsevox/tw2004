@@ -333,7 +333,7 @@ static u16 __MIXGetVolume(int db);
 static int __MIXGetPanL(int pan);
 static int __MIXGetPanR(int pan);
 static void __MIXResetChannel(MIXChannel* channel);
-static void __MIXSetPan(MIXChannel* channel);
+void __MIXSetPan(MIXChannel* channel);
 static int __MIXClampPan(int pan);
 
 static u16 __MIXGetVolume(int db_) {
@@ -347,7 +347,8 @@ static u16 __MIXGetVolume(int db_) {
     return __MIXVolumeTable[db + 0x388];
 }
 
-static void __MIXSetPan(MIXChannel* channel) {
+// Global in this game, as symbols.txt has it (FFCC has it static).
+void __MIXSetPan(MIXChannel* channel) {
     int pan, span;
     int ipan, ispan;
 
