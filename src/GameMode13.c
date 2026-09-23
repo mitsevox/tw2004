@@ -228,7 +228,7 @@ void fn_800F6ED4(int nPlayer) {
     f32 fScale;
     s32 nMult;
     u8* pBall;
-    int j;
+    long j;
     s32 nHits;
     nMsg = -1;
     nSurface = gPlayers[nPlayer].nBallSurface;
