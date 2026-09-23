@@ -99,7 +99,7 @@ LAYOUT_ASSERT(CamSequence, 0x50);
 typedef struct CamScript {
     f32  v0[4];                 // 0x00  camera 4 puts the ball here
     f32  v10[4];                // 0x10  and the pin here
-    u8   unk20[0x20];
+    f32  a20[8];                // 0x20  cleared with the rest by fn_80062E40
 } CamScript;
 
 // A view's camera controller (View_SetCamera is TW06's CameraController_SetCameraMode): the
@@ -128,7 +128,8 @@ typedef struct View {
     f32      vC4[4];            // 0x0C4
     f32      vD4[4];            // 0x0D4  the ball-flight camera: where the shot should land (the aim, at
                                 //        the club's full distance)
-    u8       unkE4[0x104 - 0xE4];
+    u8       unkE4[0xF4 - 0xE4];
+    f32      vF4[4];            // 0x0F4  (0, 0, 0, 1) when the view is set up (fn_80062E40)
     f32      fCamTime;          // 0x104  time on this camera
     u8       unk108[0x110 - 0x108];
     f32      f110;              // 0x110
@@ -156,7 +157,11 @@ typedef struct View {
     u8       unk160[4];
     s32      n164;              // 0x164  a shot kind for fn_8003A950 (25 = none)
     f32      f168;              // 0x168
-    u8       unk16C[0x18C - 0x16C];
+    u8       b16C;              // 0x16C
+    u8       unk16D[0x174 - 0x16D];
+    f32      f174;              // 0x174  } set together by fn_800642A4
+    f32      f178;              // 0x178  }
+    u8       unk17C[0x18C - 0x17C];
     f32      f18C;              // 0x18C
     f32      f190;              // 0x190
     s32      n194;              // 0x194
@@ -223,7 +228,8 @@ typedef struct CamTuning {
     f32  f84;                   // 0x084  how long the super zoom's first shot lasts
     f32  f88;                   // 0x088
     f32  f8C;                   // 0x08C
-    u8   unk90[4];
+    f32  f90;                   // 0x090  fn_800638B8 switches to camera 2 while the ball is below this
+                                //        height (and falling, not yet bounced)
     f32  f94;                   // 0x094  the elevator camera's first blend value
     f32  f98;                   // 0x098  camera 8: 1 - this is its height's share of the move a frame
     f32  f9C;                   // 0x09C  the swing camera: the least shot power for one (fn_800C6618)
@@ -310,7 +316,12 @@ typedef struct CrAPGolfer {
 } CrAPGolfer;
 typedef struct CrAPState {
     s32  n0;                    // 0x00  0..4: picks the shot the CrAP camera frames (fn_800C39A8)
-    u8   unk4[0xB4 - 0x4];
+    u8   unk4[0x83 - 0x4];
+    u8   b83;                   // 0x83  set by a menu message (FE_MessageTable.c)
+    u8   unk84[2];
+    u8   b86;                   // 0x86  set by a menu message; a change while n0 is 3 calls
+                                //       fn_8008E354
+    u8   unk87[0xB4 - 0x87];
     CrAPGolfer* pB4;            // 0xB4
 } CrAPState;
 
@@ -331,13 +342,19 @@ f32*   fn_8001731C(View* pView);        // the camera's position (v0)
 f32*   fn_80017314(View* pView);        // where it looks (v10)
 u8     fn_800172C4(View* pView);        // the camera move has finished
 f32*   fn_80012EF0(void* pCamera);      // a render camera's screen rectangle
+f32    fn_80012ED0(f32* pRect);         // the rectangle's [3]: its height
+f32    fn_80012ED8(f32* pRect);         // [2]: its width
+f32    fn_80012EE0(f32* pRect);         // [1]: its top
+f32    fn_80012EE8(f32* pRect);         // [0]: its left
 void*  fn_8001614C(void);               // the current render camera
 void   fn_80013CCC(void* pCamera);
 void   fn_80013EEC(void* pCamera);
 void   fn_80016B9C(void);
 int    fn_80016D10(void);
 void   fn_800171D8(f32* pRect, f32 x, f32 y, f32 w, f32 h);   // set a screen rectangle (fractions)
-void   fn_8006434C(void* pCamera, f32* pPos, f32* pX, f32* pY, int a);   // a world position on screen (0..1)
+// A world position on screen (0..1 across and down; pZ, if not NULL, gets a third value). Returns
+// 1, or 0 when one of its tests fails (not decompiled yet).
+u8     fn_8006434C(void* pCamera, f32* pPos, f32* pX, f32* pY, f32* pZ);
 void   fn_8006A8D4(void* pCamera, f32* pX, f32* pY);
 
 // ---- camera shots and sequences (0x8003A7C8..) ----------------------------------------------
@@ -397,6 +414,7 @@ u8     fn_80063C90(View* pView);        // the camera is still moving
 void   fn_80063CBC(View* pView, f32* pVec);   // nCamera 3, the vector into vC4
 void   fn_80063CF0(View* pView, int nCamera, int nPlayer);
 void   fn_800642D0(View* pView, int nPlayer);
+void   fn_800642B0(void);
 void   fn_80063F08(f32* pA, f32* pB, f32* pOut);   // the green zoom-to-aim camera: View.v20 as pA and pOut
 
 // ---- the golf cameras (GoGolfCam.c) ---------------------------------------------------------

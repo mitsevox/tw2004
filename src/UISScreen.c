@@ -6,7 +6,6 @@
 
 #include "frontend/uistudio.h"
 
-void fn_8016B0F8(UIStudio* pStudio, u32 uEvent, s32 nArgs, const s32* pArgs);
 void fn_8016B188(UIStudio* pStudio, UISScreen* pScreen, UISWordStack* pStack, u32 nNode, u32 uEvent,
                  s32 nArgs, const s32* pArgs);
 
@@ -14,15 +13,15 @@ void fn_8016B188(UIStudio* pStudio, UISScreen* pScreen, UISWordStack* pStack, u3
 // fn_8016B4D4 have them inlined, so their bodies were visible before those two.
 
 // The node's handler of the kind marked 0x4000 for an event.
-u32 fn_8016C5C4(UISNode* pNode, u16 uEvent) {
+u8* fn_8016C5C4(UISNode* pNode, u16 uEvent) {
     u32 i;
     for (i = 0; i < pNode->nHandlers; i++) {
         UISHandler* pHandler = &pNode->pHandlers[i];
         if ((pHandler->uFlags & 0x4000) && pHandler->uEvent == uEvent) {
-            return pHandler->u4;
+            return pHandler->u4.pScript;
         }
     }
-    return 0;
+    return NULL;
 }
 
 // The index of a loaded screen, or the number of screens when it is not loaded.
@@ -43,7 +42,7 @@ s32 fn_8016A2D4(UIStudio* pStudio, UISScreen* pScreen, UISWordStack* pStack, u32
     s32 nResult;
     UISNode* pNode;
     u32 i;
-    u32 uHandler;
+    u8* pScript;
     u8 bOut;
 
     nResult = 0;
@@ -55,12 +54,12 @@ s32 fn_8016A2D4(UIStudio* pStudio, UISScreen* pScreen, UISWordStack* pStack, u32
             UISHandler* pHandler = &pNode->pHandlers[i];
             if (pHandler->uEvent == 0xFFFF) {
                 bOut = 0;
-                nResult =
-                    fn_8016A2D4(pStudio, pScreen, pStack, pHandler->u4, uEvent, n5, nArgs, pArgs, &bOut);
+                nResult = fn_8016A2D4(pStudio, pScreen, pStack, pHandler->u4.nNode, uEvent, n5, nArgs, pArgs,
+                                      &bOut);
                 if (bOut == 1) {
-                    u32 uLinked = fn_8016C614(pNode, (u16)pHandler->u4, n5);
-                    if (uLinked != 0) {
-                        s32 nRet = fn_8016C270(pStudio, pScreen, pNode->pInfo, pStack, uLinked, nArgs, pArgs,
+                    u8* pLinked = fn_8016C614(pNode, (u16)pHandler->u4.nNode, n5);
+                    if (pLinked != NULL) {
+                        s32 nRet = fn_8016C270(pStudio, pScreen, pNode->pInfo, pStack, pLinked, nArgs, pArgs,
                                                0, NULL, 1, uEvent, NULL);
                         if (nRet == 2) return nRet;
                     }
@@ -68,14 +67,14 @@ s32 fn_8016A2D4(UIStudio* pStudio, UISScreen* pScreen, UISWordStack* pStack, u32
             }
         }
         fn_80165528(pStudio, 1);
-        uHandler = fn_8016C674(pNode, n5);
+        pScript = fn_8016C674(pNode, n5);
         // Events -6 and -7 go only to the node their third word names.
         // port: the event word holds a pointer
         if ((n5 == (u32)-6 || n5 == (u32)-7) && pNode->pInfo != (UISNodeInfo*)pArgs[2]) {
-            uHandler = 0;
+            pScript = NULL;
         }
-        if (uHandler != 0) {
-            nResult = fn_8016C270(pStudio, pScreen, pNode->pInfo, pStack, uHandler, nArgs, pArgs, 0, NULL, 1,
+        if (pScript != NULL) {
+            nResult = fn_8016C270(pStudio, pScreen, pNode->pInfo, pStack, pScript, nArgs, pArgs, 0, NULL, 1,
                                   uEvent, NULL);
         }
         if (nResult == 2) return nResult;
@@ -319,18 +318,18 @@ void fn_8016B188(UIStudio* pStudio, UISScreen* pScreen, UISWordStack* pStack, u3
                  s32 nArgs, const s32* pArgs) {
     UISNode* pNode;
     u32 i;
-    u32 uHandler;
+    u8* pScript;
 
     pNode = &pScreen->pData->pNodes[nNode];
     for (i = 0; i < pNode->nHandlers; i++) {
         UISHandler* pHandler = &pNode->pHandlers[i];
         if (pHandler->uEvent == 0xFFFF) {
-            fn_8016B188(pStudio, pScreen, pStack, pHandler->u4, uEvent, nArgs, pArgs);
+            fn_8016B188(pStudio, pScreen, pStack, pHandler->u4.nNode, uEvent, nArgs, pArgs);
         }
     }
-    uHandler = fn_8016C5C4(pNode, uEvent);
-    if (uHandler != 0) {
-        fn_8016C270(pStudio, pScreen, pNode->pInfo, pStack, uHandler, nArgs, pArgs, 0, NULL, 0, 0, NULL);
+    pScript = fn_8016C5C4(pNode, uEvent);
+    if (pScript != NULL) {
+        fn_8016C270(pStudio, pScreen, pNode->pInfo, pStack, pScript, nArgs, pArgs, 0, NULL, 0, 0, NULL);
     }
 }
 
@@ -511,9 +510,9 @@ f32* fn_8016C1A4(s32 n20, UISNodeInfo* pInfo) {
 }
 
 // Pushes a call frame on pStack (the saved word, the extra word, both argument lists, the node's
-// info and a 0) and runs handler uHandler on it. The frame stays on the stack only when the
-// handler returns 3.
-s8 fn_8016C270(UIStudio* pStudio, UISScreen* pScreen, UISNodeInfo* pInfo, UISWordStack* pStack, u32 uHandler,
+// info and a 0) and runs pScript on it. The frame stays on the stack only when the script
+// returns 3 (it paused).
+s8 fn_8016C270(UIStudio* pStudio, UISScreen* pScreen, UISNodeInfo* pInfo, UISWordStack* pStack, u8* pScript,
                u32 nArgs, const s32* pArgs, u32 nArgs2, const s32* pArgs2, u8 bExtra, s32 nExtra,
                s32* pnSaved) {
     s32* pFrame;
@@ -539,12 +538,14 @@ s8 fn_8016C270(UIStudio* pStudio, UISScreen* pScreen, UISNodeInfo* pInfo, UISWor
         *pStack->pC = pArgs2[i];
         pStack->pC++;
     }
-    *pStack->pC = (s32)pInfo;  // port: the frame keeps the info pointer in a word
+    // port: the frame keeps the info pointer in a word
+    *pStack->pC = (s32)pInfo;
     pStack->pC++;
     *pStack->pC = 0;
     pStack->pC++;
-    pStack->u10 = uHandler;
-    nResult = fn_80166098(pStudio, pFrame, pStack, pScreen, pInfo);
+    pStack->p10 = pScript;
+    // port: the interpreter takes the info pointer as a word (its last parameter)
+    nResult = fn_80166098(pStudio, pFrame, pStack, pScreen, (s32)pInfo);
     if (pnSaved != NULL) {
         *pnSaved = *pFrame;
     }
@@ -555,26 +556,26 @@ s8 fn_8016C270(UIStudio* pStudio, UISScreen* pScreen, UISNodeInfo* pInfo, UISWor
 }
 
 // A node's plain handler (neither kind bit) with the given ID for an event.
-u32 fn_8016C614(UISNode* pNode, u16 uId, u16 uEvent) {
+u8* fn_8016C614(UISNode* pNode, u16 uId, u16 uEvent) {
     u32 i;
     for (i = 0; i < pNode->nHandlers; i++) {
         UISHandler* pHandler = &pNode->pHandlers[i];
         if (!(pHandler->uFlags & 0xC000) && pHandler->uEvent == uEvent &&
             (pHandler->uFlags & 0x2FFF) == uId) {
-            return pHandler->u4;
+            return pHandler->u4.pScript;
         }
     }
-    return 0;
+    return NULL;
 }
 
 // A node's handler of the kind marked 0x8000 for an event.
-u32 fn_8016C674(UISNode* pNode, u16 uEvent) {
+u8* fn_8016C674(UISNode* pNode, u16 uEvent) {
     u32 i;
     for (i = 0; i < pNode->nHandlers; i++) {
         UISHandler* pHandler = &pNode->pHandlers[i];
         if ((pHandler->uFlags & 0x8000) && pHandler->uEvent == uEvent) {
-            return pHandler->u4;
+            return pHandler->u4.pScript;
         }
     }
-    return 0;
+    return NULL;
 }

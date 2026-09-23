@@ -150,7 +150,21 @@ extern SaveImage* lbl_80281FE4; // } the first image
 extern SaveImage* lbl_80281FE8; // }
 extern SaveImage* lbl_80281FEC; // }
 extern s32   lbl_80281FF8;      // SaveImage.n4D0C0 of the save loaded (0 when it has none)
-extern u32   lbl_80281FC0;      // the size parked in ARAM (MC_BUFFER_SIZE + 0x20)
+
+// One entry of the list the 'eagm' stream object carries (fn_800A1D4C builds it, 0x4C bytes).
+typedef struct MCEagmEntry {
+    u8    b0;                   // 0x00  cleared when the list is loaded
+    u8    unk1[3];
+    char* p4;                   // 0x04  n8 names of 16 characters each
+    s32   n8;                   // 0x08
+    char  szName[0x40];         // 0x0C
+} MCEagmEntry;
+LAYOUT_ASSERT(MCEagmEntry, 0x4C);
+
+extern u32   lbl_801F1110[256]; // the save checksum's CRC table (fn_800A253C)
+extern MCEagmEntry* lbl_80281FF0;   // the 'eagm' list (fn_800A1BE0 frees it)
+extern s32   lbl_80281FF4;      // its number of entries
+extern u32   lbl_80281FC0;     // the size parked in ARAM (MC_BUFFER_SIZE + 0x20)
 extern u32   lbl_80281FC4;      // the ARAM address they are parked at (0: none yet)
 extern UStreamObject* lbl_80281FB8;     // the 'MCI ' object (fn_8009EB30)
 extern UStreamObject* lbl_80281FBC;     // the 'MCB ' object (fn_8009EB38)
@@ -176,12 +190,26 @@ void fn_8009E544(char* pGameName, char* pComment, u8* pIcon, u8* pBanner);
 // Write a file. pBackupName (the PS2's backup copy) is not used here.
 s32  fn_8009E604(s32 nPort, s32 nSlot, const char* pName, void* pBuf, s32 nLen,
                  const char* pBackupName);
+s32  fn_8009E758(s32 nPort, s32 nSlot, const char* pName);
 s32  fn_8009E918(s32 nPort, s32 nSlot);     // format the card
 void fn_8009EA98(void);
 void fn_8009EAF0(void);
 s32  fn_8009EE28(s32 nPort, s32 nSlot);
 u32  fn_8009EF90(void);
 void fn_8009F02C(void);             // bring the images back from ARAM (fn_8009EF98 parks them)
+// Up to nMax names of the card's files whose name holds pPattern, into apName; how many in pnFound.
+s32  fn_8009F0F0(s32 nPort, s32 nSlot, const char* pPattern, char** apName, s32 nMax, s32* pnFound);
+s32  fn_8009F208(s32 nFile, void* pBuf, s32 nLen);          // read from open file nFile
+s32  fn_8009F258(s32 nFile, void* pBuf, s32 nLen);          // write to open file nFile
+s32  fn_8009F2D8(s32 nFile, s32 nOffset, u8 bFromStart);    // move open file nFile's position
+s32  fn_8009F35C(void);             // always 0
+s32  fn_8009F364(void);             // always 0
+s32  fn_8009F36C(s32 nPort, s32 nSlot, s32* pnFreeBytes);   // the card's free space
+// The card's free directory entries. pName is not used.
+s32  fn_8009F3A0(s32 nPort, s32 nSlot, const char* pName, s32* pnFreeFiles);
+// Open pName, its file number into pnFile.
+s32  fn_8009F3D4(s32 nPort, s32 nSlot, const char* pName, u32 uFlags, s32* pnFile);
+s32  fn_8009F488(s32 nFile);        // close open file nFile
 // Create pName with nLen bytes, but only when it is the save directory's name (the PS2's mkdir).
 s32  fn_8009F514(s32 nPort, s32 nSlot, const char* pName, s32 nLen);
 s32  fn_8009F5E4(s32 nPort, s32 nSlot, const char* pName);    // delete the save file
@@ -192,6 +220,7 @@ s32  fn_8009F6A0(s32 nPort, s32 nSlot);
 // The card's state as an error code: -4 no card, -1 when uFlags bit 0x08 is clear (a mount sets it,
 // a format in progress or an encoding error clears it), -35 not mounted, else 0.
 s32  fn_8009F734(s32 nPort, s32 nSlot);
+s32  fn_8009F728(int nPort);        // lbl_80281FD0[nPort] (the menus read it as a whole word)
 u8   fn_8009F7E8(int nPort);        // lbl_80282008[nPort]
 void fn_8009F7F4(MCCardState* pState, int nPort, int nSlot);   // copy out lbl_801F1510[nPort][nSlot]
 MCCardState* fn_8009F834(s32 nPort, s32 nSlot);                 // &lbl_801F1510[nPort][nSlot]
@@ -205,13 +234,27 @@ s32  fn_800A0A7C(s32 nPort, s32 nSlot);
 void fn_800A1BE0(void);
 void fn_800A1D4C(UStreamObject* pObject);  // the 'eagm' handler
 s32  fn_800A2100(s32 nPort, s32 nSlot);
+s32  fn_800A218C(s32 nPort, s32 nSlot);    // always MC_ERR_NOFILE
+s32  fn_800A2194(s32 nPort, s32 nSlot);
 
 // ---- the save file's checksum (0x800A233C) -------------------------------------------------------
 
 // Whether the data from pData up to pTrailer is a good save: the mark, then the checksum.
 u8   fn_800A233C(void* pData, SaveTrailer* pTrailer);
-// The checksum of pData up to the end of pTrailer (a CRC-32), its uChecksum read as 0.
+// The checksum (a CRC-32) of pData up to pTrailer's uChecksum, the mark included. uChecksum is
+// set to 0 while it runs and put back after, though the sum stops short of it.
 u32  fn_800A23BC(void* pData, SaveTrailer* pTrailer);
+
+// ---- the 'eagm' list and string helpers (MC.c) ----------------------------------------------------
+
+u8    fn_800A2604(s32 nEntry);      // lbl_80281FF0[nEntry].b0
+char* fn_800A2614(s32 nEntry);      // lbl_80281FF0[nEntry].szName
+s32   fn_800A2628(void);            // lbl_80281FF4
+s32   fn_800A27F4(void);            // lbl_80281FF8
+// Copy a string of 16-bit characters into 8-bit ones (and back), nMax characters at most, the
+// terminator included. A character above 0xFF becomes 0xAC.
+void  fn_800A2774(const u16* szSrc, char* szDst, s32 nMax);
+void  fn_800A27BC(const char* szSrc, u16* szDst, s32 nMax);
 
 // ---- MC_Gc.c's CARD state (the CARD library itself is in core/card.h) ----------------------------
 

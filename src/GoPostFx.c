@@ -2,11 +2,12 @@
 // matched small functions.
 
 #include "game_types.h"
+#include "gx.h"
 
 // ---- sweep code (not yet cleaned up) ----
 
 s32 fn_80009E70();
-extern u32 lbl_80281D80;
+extern void* lbl_80281D80;
 void fn_80037F80(void);
 void fn_80038010(u8 arg0, s32 arg1, s32 arg2);
 void fn_80037FB4(u8 arg0, s32 arg1);
@@ -22,18 +23,12 @@ void fn_8002A024();
 void fn_80038A2C(s32 p0, u8* p1);
 void fn_8002A164();
 void fn_80038A6C(void);
-s32 GXCopyTex(u32, s32);
-s32 GXInvalidateTexAll();
-s32 GXPixModeSync();
-s32 GXSetTexCopyDst(s32, s32, s32, s32);
-s32 GXSetTexCopySrc(s32, s32, s32, s32);
-s32 GXSetZMode(s32, s32, s32);
 void fn_800392D0(void);
 
 void fn_80037F80(void) {
-    if ((u32) lbl_80281D80 != 0U) {
+    if (lbl_80281D80 != NULL) {
         fn_80009E70(lbl_80281D80);
-        lbl_80281D80 = 0U;
+        lbl_80281D80 = NULL;
     }
 }
 
@@ -68,7 +63,7 @@ void fn_80038A6C(void) {
 }
 
 void fn_800392D0(void) {
-    if ((u32) lbl_80281D80 != 0U) {
+    if (lbl_80281D80 != NULL) {
         GXSetZMode(0, 3, 0);
         GXSetTexCopySrc(0, 0, 0x200, 0x1C0);
         GXSetTexCopyDst(0x100, 0xE0, 6, 1);

@@ -292,8 +292,9 @@ typedef struct Player {
     f32  vA44[4];               // 0xA44  compared with the ball position (GM_BumpBallForObstructions)
     f32  fDistance;             // 0xA54  to the target. TW06: targetDistance
     f32  fDistance2;            // 0xA58
-    u8   unkA5C[8];
-    f32  fA64;                  // 0xA64  a distance, set when a swing state 16 begins
+    f32  fA5C;                  // 0xA5C  } placing the ball (state 22): how fast the spot moves along x and
+    f32  fA60;                  // 0xA60  } z, -1..1, built up while the stick is held (target.c)
+    f32  fA64;                 // 0xA64  a distance, set when a swing state 16 begins
     s32  nSurface;              // 0xA68  surface type under the target, -1 none, 16 water. TW06: targetedSurfaceID
     f32  vPlacement[4];         // 0xA6C  where the ball may be placed (swing state 22)
     f32  fA7C;                  // 0xA7C  pad stick x, -1..1 (GameMode9 fn_800EDAE0)
@@ -366,7 +367,8 @@ typedef struct Player {
     s32  nEE4;                  // 0xEE4  2 or 3 picks a message after a shot (GM_PlayerTookShot)
     u32  uFlags;                // 0xEE8  bit 0: scripted reaction, bit 2: the early reaction has played, bit 3: score display
     f32  fEEC;                  // 0xEEC  distance to the pin when the early reaction started (GM_SimulateBallMovement)
-    u32  uFlagsEF0;             // 0xEF0  bit 1: target is over water
+    u32  uFlagsEF0;             // 0xEF0  0x1: the ball can be placed at vPlacement (fn_800693A4);
+                                //        0x2: target is over water
     u8   unkEF4[0xEF8 - 0xEF4];
 } Player;
 LAYOUT_ASSERT(Player, 0xEF8);
@@ -618,6 +620,31 @@ typedef struct AITarget {
     s8   nType;                 // 0x0A
     s8   nPowerReq;             // 0x0B
 } AITarget;
+
+// How a player's aim marker is drawn (our name; 0x2C bytes, one per player at lbl_801D5BF0,
+// target.c): the "tball" texture drawn at the target. Putts get a different set (fn_800689D4).
+typedef struct TargetMarker {
+    f32  f0;                    // 0x00
+    f32  f4;                    // 0x04
+    f32  f8;                    // 0x08
+    f32  fC;                    // 0x0C
+    s32  n10;                   // 0x10
+    f32  f14;                   // 0x14
+    f32  f18;                   // 0x18
+    f32  f1C;                   // 0x1C
+    f32  f20;                   // 0x20
+    f32  f24;                   // 0x24  twice this is a size (fn_80067DAC)
+    u8   unk28[4];
+} TargetMarker;
+LAYOUT_ASSERT(TargetMarker, 0x2C);
+
+extern TargetMarker lbl_801D5BF0[5];   // per player
+extern TNetwork*    lbl_80281E30;       // the hole's chunk 3 (fn_8006A7A8): an outline the placed ball
+                                        // must be inside, NULL when the hole has none
+extern TexBank*     lbl_80281E34;       // } the "shadow" texture
+extern TexEntry*    lbl_80281E38;       // }
+extern TexBank*     lbl_80281E3C;       // } the "tball" texture (the aim marker)
+extern TexEntry*    lbl_80281E40;       // }
 
 // A player's emotion state (our name; 0x24 bytes, one per player at lbl_801D5F78): what the golfer
 // feels about the last shot, which picks his reaction (TW06's emotion.c, golf/ai/emotion.c).
