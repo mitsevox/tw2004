@@ -5,15 +5,7 @@
 #include "game.h"
 #include "engine.h"
 #include "game/frontend.h"
-
-// A string value: the message holds a pointer to this.
-typedef struct MsgString {
-    s32   n0;
-    s32   nLen;
-    char* pStr;
-} MsgString;
-
-extern u8 lbl_801D87C0[];
+#include "frontend/fe.h"
 
 void  fn_8016B09C(void* pHandler, int nMsg, int nArgs, MsgArg* pArgs);
 void  fn_800E508C(void);
@@ -464,7 +456,7 @@ void fn_800E5D68(char* pStr) {
 }
 
 u8 fn_800E5D90(void) {
-    return lbl_801D87C0[0];
+    return lbl_801D87C0.b0;
 }
 
 void fn_800E5DA0(void) {

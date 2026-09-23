@@ -257,7 +257,7 @@ void fn_800FE980(void) {
                     nMoney = nBase + lbl_80200538.aStrokePrize[nBest].nPerStroke * nMargin;
                     if (gpSaveData[nProfile].bActive) {
                         if (bFirst) {
-                            fn_80125854(1);
+                            EASBio_IncrementGamesWon(1);
                             bFirst = 0;
                         }
                         if (nBase) {

@@ -156,17 +156,18 @@ void fn_800EE064(void) {
 
 // The course of the tournament format i's current round: everyone plays its tee set, every hole its
 // pin position, and its GameOptions.n18 replaces the player's (kept in lbl_80281674).
-// Not exact yet (only gPgaData's and gSession's address loads come out in the other order); the
-// tee set's store back to the tournament is in the original.
+// The tee set is written back to the tournament unchanged; the original has that store.
 void fn_800EE0A0(s32 i) {
     PlayerNumber_t nPlayer = PLR_1_e;
     TourEvent* pEvent = &gPgaData.aTourEvent[i];
-    int k;
+    PlayerNumber_t k;
     int h;
+    s32 nTee;
+    nTee = pEvent->nTeeSet;
     for (k = 0; k < 5; k++) {
-        gSession.nTeeSet[k] = pEvent->nTeeSet;
+        gSession.nTeeSet[k] = nTee;
     }
-    pEvent->nTeeSet = gSession.nTeeSet[4];
+    pEvent->nTeeSet = nTee;
     fn_800E14E0(gPgaData.aTourEvent[i].aRound[gpGame->nDC].nCourse);
     gSession.nPinSet = gPgaData.aTourEvent[i].aRound[gpSaveData[nPlayer].tour.nRound].nPinSet - 1;
     for (h = 0; h < 18; h++) {

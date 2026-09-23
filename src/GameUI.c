@@ -126,7 +126,6 @@ u8    fn_80127004(void);
     }
 
 void  fn_80095444(int a);
-void  fn_80125814(int a);
 void  fn_800A7350(int a);
 
 void fn_800E3BEC(void) {
@@ -223,7 +222,7 @@ void fn_800E3E3C(void) {
         lbl_802822DF = 1;
         gSession.nPaused = 1;
         fn_800DC9D4(1);
-        fn_80125814(0);
+        EASBio_SetGamePlayState(0);
         if (fn_800EC550()) {
             fn_800ECBE4();
         }
@@ -254,7 +253,7 @@ void fn_800E3EE0(void) {
             gSession.nPaused = 0;
             fn_800DC9D4(0);
             fn_800A7350(0);
-            fn_80125814(1);
+            EASBio_SetGamePlayState(1);
         }
         fn_8009EF98();
         if (gSession.bReplay && Game_GetMode() != 11 && Game_GetMode() != 10) {

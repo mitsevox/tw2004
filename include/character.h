@@ -9,14 +9,39 @@
 
 typedef struct AnimLib AnimLib;         // skalib.c
 
+// A link of an IK chain: one bone.
+typedef struct IKLink {
+    u8   b0;                    // 0x00  cleared by fn_80028208
+    u8   nBone;                 // 0x01  the model's bone index (fn_8001EEE4)
+    u8   pad2[2];
+    f32  f4;                    // 0x04  only links above 0 are posed (fn_80026B4C, fn_80026F90)
+    s32  n8;                    // 0x08
+    f32  fC;                    // 0x0C
+    f32  f10;                   // 0x10
+    s32  nPrev;                 // 0x14  the link before it in the chain, -1 for the first
+    u8   unk18[0x58 - 0x18];
+    f32  v58[3];                // 0x58  its rotation as a vector (axis * angle)
+    u8   unk64[0x78 - 0x64];
+} IKLink;
+LAYOUT_ASSERT(IKLink, 0x78);
+
 // An IK chain of a skeleton (Skeleton.pChains).
 typedef struct IKChain {
     s8   nLinks;                // 0x00
     u8   unk1[3];
-    struct IKLink* pLinks;      // 0x04  0x78 bytes each; the bone's index at +1
-    u8   unk8[0x20 - 0x8];
+    IKLink* pLinks;             // 0x04
+    u8   unk8[0x18 - 0x8];
+    s32  n18;                   // 0x18
+    f32  f1C;                   // 0x1C
 } IKChain;
 LAYOUT_ASSERT(IKChain, 0x20);
+
+// A bone's pose in a model (CharModel.p34).
+typedef struct BonePose {
+    f32  q0[4];                 // 0x00  its rotation (quaternion)
+    f32  v10[4];                // 0x10  its position (SKEL_TranslateIKChainY moves its y)
+} BonePose;
+LAYOUT_ASSERT(BonePose, 0x20);
 
 // A character's skeleton data (CharModel.pSkel; the SKEL_ functions take it): its IK chains and
 // how strongly their solution is applied (the IK weight, 0..1); only what the code reads.
@@ -58,7 +83,7 @@ typedef struct CharModel {
     f32     (*pMatrices)[4][4]; // 0x008  one per bone (fn_8001EED8 gives a bone's index); row 3 is its
                                 //        position
     u8        unkC[0x34 - 0xC];
-    void*     p34;              // 0x034  freed with the model
+    BonePose* pPoses;           // 0x034  one per bone; freed with the model
     Skeleton* pSkel;            // 0x038
     u8        aBone[0x59];      // 0x03C  each bone id's index (fn_8001EED8), 0xFF none; fn_80029664
                                 //        fills it in by name
@@ -276,7 +301,7 @@ typedef struct AnimStream {
     s32   nBytes;               // 0x1CB8  bytes the stream uses in all
     s32   hFile;                // 0x1CBC  the open file, -1 none
     s32   nState;               // 0x1CC0  0 idle, 1 reading, 2 read (fn_800C9EFC)
-    s32   nResult;              // 0x1CC4  what the last read returned
+    s32   nResult;              // 0x1CC4  the bytes the last read got (its callback's nBytes)
     s32   n1CC8;                // 0x1CC8
     u8    bReadDone;            // 0x1CCC  set when a waited-for read finishes (fn_800CB550)
     u8    bOn;                  // 0x1CCD  streaming is on (off in split screen, multiplayer and some
@@ -286,6 +311,9 @@ typedef struct AnimStream {
 LAYOUT_ASSERT(AnimStream, 0x1CD0);
 
 extern AnimStream* lbl_80282230;
+
+u8    fn_800C9828(int nGroup, int nStyle, int nClub, int nKey);   // the clips are streamed
+void  fn_800CA9DC(int nSlot);
 
 // The blend callback CharacterState_AddSKABlendData attaches (fn_80072ACC is one).
 typedef void (*SKABlendFn)(SKABlendNode* pNode, int* pn, f32 fTime);

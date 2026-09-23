@@ -443,5 +443,5 @@ s32 fn_800F6A34(s32 a) {
 }
 
 void fn_800F6A3C(void) {
-    fn_80125910(1);
+    EASBio_SetCurrentGameWon(1);
 }

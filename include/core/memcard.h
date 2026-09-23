@@ -42,6 +42,40 @@ LAYOUT_ASSERT(MCCardState, 0x98);
 #define MC_CARD_BROKEN      0x40    // CARD_RESULT_BROKEN
 #define MC_CARD_ENCODING    0x80    // CARD_RESULT_ENCODING, or a card with a non-ASCII encoding
 
+// The game's memory card results (0 is success). Most are MC_Gc.c's translation of a CARD library
+// result, named after it: fn_8009CDA0, fn_8009CEF8, fn_8009DFD8, fn_8009E130 and the others turn
+// CARD_RESULT_X into MC_ERR_X. The rest are the game's own, named from where they are returned.
+typedef enum MCError {
+    MC_ERR_NOCARD       = -3,   // CARD_RESULT_NOCARD
+    MC_ERR_INSSPACE     = -5,   // CARD_RESULT_INSSPACE: the card is full
+    MC_ERR_NAMETOOLONG  = -6,   // CARD_RESULT_NAMETOOLONG
+    MC_ERR_NOFILE       = -12,  // CARD_RESULT_NOFILE: no such file; also "no file open" (fn_8009F488)
+    MC_ERR_BADDATA      = -18,  // the file read back is not a good save (the wrong size or
+                                // attributes, or fn_800A233C rejects it)
+    MC_ERR_MOUNTED      = -22,  // fn_8009D74C: the card was mounted already (callers treat it as 0,
+                                // but do not unmount after)
+    MC_ERR_NOPERM       = -23,  // CARD_RESULT_NOPERM
+    MC_ERR_BROKEN       = -24,  // CARD_RESULT_BROKEN
+    MC_ERR_IOERROR      = -25,  // CARD_RESULT_IOERROR; the card is then marked damaged (lbl_80281FD0)
+    MC_ERR_NOENT        = -26,  // CARD_RESULT_NOENT: no free directory entry
+    MC_ERR_CANCELED     = -27,  // CARD_RESULT_CANCELED
+    MC_ERR_UNKNOWN      = -28,  // any CARD result not handled
+    MC_ERR_ENCODING     = -29,  // CARD_RESULT_ENCODING
+    MC_ERR_WRONGDEVICE  = -31,  // CARD_RESULT_WRONGDEVICE
+    MC_ERR_EXIST        = -32,  // CARD_RESULT_EXIST
+    MC_ERR_FATAL        = -33,  // CARD_RESULT_FATAL_ERROR
+    MC_ERR_LIMIT        = -34,  // CARD_RESULT_LIMIT
+    MC_ERR_NOTMOUNTED   = -35   // fn_8009F734, fn_8009E918: the card is not mounted
+} MCError;
+
+// A card and something on it, as MC.c's file functions take them (12 bytes).
+typedef struct MCCardPos {
+    s32  nPort;                 // 0x0
+    s32  nSlot;                 // 0x4
+    s32  n8;                    // 0x8  a bit index into the save image's flags (MC.c)
+} MCCardPos;
+LAYOUT_ASSERT(MCCardPos, 0xC);
+
 // The save file's names on the card: EA kept the PlayStation 2 names (SLUS-20757 is the PS2
 // release), the second a backup copy.
 #define MC_FILE_NAME    "BASLUS-20757"
@@ -82,6 +116,7 @@ s32  fn_8009D3DC(s32 nPort, s32 nSlot);
 s32  fn_8009D50C(s32 nPort, s32 nSlot);
 void fn_8009DCEC(s32 nPort, s32 nSlot);
 s32  fn_8009DD44(s32 nPort, s32 nSlot, const char* pName);
+s32  fn_8009E918(s32 nPort, s32 nSlot);     // format the card
 void fn_8009EA98(void);
 void fn_8009EAF0(void);
 s32  fn_8009EE28(s32 nPort, s32 nSlot);
@@ -90,6 +125,9 @@ s32  fn_8009F5E4(s32 nPort, s32 nSlot, const char* pName);    // delete the save
 
 // ---- between MC_Gc.c and MC.c (0x8009F6A0..0x8009FAD0, not yet in a unit) ------------------------
 
+// Look through the card's files for one whose name holds "BASLUS-20572": 0 if there is one, else
+// MC_ERR_NOFILE. nSlot is not used.
+s32  fn_8009F6A0(s32 nPort, s32 nSlot);
 // The card's state as an error code: -4 no card, -1 when uFlags bit 0x08 is clear (a mount sets it,
 // a format in progress or an encoding error clears it), -35 not mounted, else 0.
 s32  fn_8009F734(s32 nPort, s32 nSlot);
@@ -107,6 +145,24 @@ s32  fn_800A2100(s32 nPort, s32 nSlot);
 
 // ---- the CARD library (port: GameCube only) ------------------------------------------------------
 
+// The CARD library's results that MC_Gc.c handles.
+#define CARD_RESULT_READY           0
+#define CARD_RESULT_BUSY            -1
+#define CARD_RESULT_WRONGDEVICE     -2
+#define CARD_RESULT_NOCARD          -3
+#define CARD_RESULT_NOFILE          -4
+#define CARD_RESULT_IOERROR         -5
+#define CARD_RESULT_BROKEN          -6
+#define CARD_RESULT_EXIST           -7
+#define CARD_RESULT_NOENT           -8
+#define CARD_RESULT_INSSPACE        -9
+#define CARD_RESULT_NOPERM          -10
+#define CARD_RESULT_LIMIT           -11
+#define CARD_RESULT_NAMETOOLONG     -12
+#define CARD_RESULT_ENCODING        -13
+#define CARD_RESULT_CANCELED        -14
+#define CARD_RESULT_FATAL_ERROR     -128
+
 // An open file on a card.
 typedef struct CARDFileInfo {
     s32  chan;                  // 0x00
@@ -118,8 +174,19 @@ typedef struct CARDFileInfo {
 } CARDFileInfo;
 LAYOUT_ASSERT(CARDFileInfo, 0x14);
 
+// A file's directory entry (0x6C bytes); only the fields the game reads.
+typedef struct CARDStat {
+    char fileName[32];          // 0x00
+    u8   unk20[0x6C - 0x20];
+} CARDStat;
+LAYOUT_ASSERT(CARDStat, 0x6C);
+
 s32  CARDClose(CARDFileInfo* pFile);
+s32  CARDGetStatus(s32 nChan, s32 nFileNo, CARDStat* pStat);
+s32  CARDOpen(s32 nChan, const char* pName, CARDFileInfo* pFile);
+s32  CARDProbeEx(s32 nChan, s32* pnMemSize, s32* pnSectorSize);
 s32  CARDRead(CARDFileInfo* pFile, void* pBuf, s32 nLen, s32 nOffset);
+s32  CARDUnmount(s32 nChan);
 
 extern CARDFileInfo lbl_801E3180[127];  // the open files, by file number
 extern s32   lbl_802813D8;      // the file open through fn_8009F3D4 (-1: none)

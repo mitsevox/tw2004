@@ -59,11 +59,6 @@ int gnNumHandlers = -1;           // 0x80280DB8 (.sdata): -1 until UStream_Init
 // ---- other files' functions -----------------------------------------------------------
 
 int   fn_80005BC8(const void* pA, const void* pB);           // string/name compare
-int   fn_800060E0(const char* pName);                        // file open
-int   fn_8000633C(int hFile);                                // file close
-// async read
-int   fn_80006444(int hFile, void* pDst, u32 uLen, u32 uOffset, void (*pfnDone)(int, int));
-u32   fn_800065B0(int hFile);                                // file size
 void* fn_8000AFA0(u32 uNodeSize, u32 uAlign, int a, int b);  // UMemPool create
 void  fn_8000B058(void* pPool);                              // UMemPool destroy
 void* fn_8000B078(void* pPool);                              // UMemPool take node
