@@ -781,6 +781,7 @@ void fn_80035398(void) {
 // ---- sweep code (not yet cleaned up) ----
 
 void fn_8006F154();
+void fn_800082CC(void* p);
 void fn_800354B4(u8* p, f32 v);
 s32 fn_80035500(u8* p);
 s32 fn_80035508(u8* p0);
@@ -803,9 +804,61 @@ void fn_8003541C(void) {
     fn_8006F154();
 }
 
+// ---- end of sweep code ----
+
+// Takes a copy of the settings the renderer's colour and distances are made from.
 void fn_80035440(TerSettings* pSettings) {
     Mem_cpy(lbl_802811E0, pSettings, sizeof(TerSettings));
 }
+
+// a - b into out, three floats; the same helper as Ball.c's fn_80055EA0.
+#ifdef __MWERKS__
+asm void fn_8003546C(register f32* pA, register f32* pB, register f32* pOut) {
+    nofralloc
+    psq_l  f0, 0(pA), 0, 0
+    psq_l  f1, 8(pA), 1, 0
+    psq_l  f2, 0(pB), 0, 0
+    psq_l  f3, 8(pB), 1, 0
+    ps_sub f2, f0, f2
+    ps_sub f3, f1, f3
+    psq_st f2, 0(pOut), 0, 0
+    psq_st f3, 8(pOut), 1, 0
+    blr
+}
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void fn_8003546C(f32* pA, f32* pB, f32* pOut) {
+    pOut[0] = pA[0] - pB[0];
+    pOut[1] = pA[1] - pB[1];
+    pOut[2] = pA[2] - pB[2];
+}
+#endif
+
+// a - b into out, four floats.
+#ifdef __MWERKS__
+asm void fn_80035490(register f32* pA, register f32* pB, register f32* pOut) {
+    nofralloc
+    psq_l  f0, 0(pA), 0, 0
+    psq_l  f1, 8(pA), 0, 0
+    psq_l  f2, 0(pB), 0, 0
+    psq_l  f3, 8(pB), 0, 0
+    ps_sub f2, f0, f2
+    ps_sub f3, f1, f3
+    psq_st f2, 0(pOut), 0, 0
+    psq_st f3, 8(pOut), 0, 0
+    blr
+}
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void fn_80035490(f32* pA, f32* pB, f32* pOut) {
+    pOut[0] = pA[0] - pB[0];
+    pOut[1] = pA[1] - pB[1];
+    pOut[2] = pA[2] - pB[2];
+    pOut[3] = pA[3] - pB[3];
+}
+#endif
+
+// ---- sweep code (not yet cleaned up) ----
 
 void fn_800354B4(u8* p, f32 v) {
     *(f32*)(p + 0xAC) = v;
@@ -817,6 +870,12 @@ s32 fn_800354BC(s32 p) {
 
 void* fn_800354C4(u8** p0) {
     return *p0 + 88;
+}
+
+// A byte of the object's model (from 0x24 on); the patch code reads bytes 1-3. The object's type
+// is not described yet, so this keeps the handle-style prototype its callers above use.
+s32 fn_800354D0(s32 pObject, s32 n) {
+    return (*(s8**)pObject)[n + 0x24];
 }
 
 s32 fn_800354E4(s32 p0, s32 p1) {
@@ -833,6 +892,16 @@ s32 fn_80035500(u8* p) {
 
 s32 fn_80035508(u8* p0) {
     return (*(s32*)p0 + 104);
+}
+
+// If the object's current entry (n28) is switched on, hands its 0x2C-byte record to LLObj_Gc.c's
+// fn_800082CC. Raw offsets until the object's type is described.
+void fn_80035514(u8* pObject) {
+    s32 n = *(s32*)(pObject + 0x28);
+
+    if (pObject[n + 0x1C] != 0) {
+        fn_800082CC(*(u8**)(pObject + 0x18) + n * 0x2C);
+    }
 }
 
 s32 fn_80035554(u8* p0) {
