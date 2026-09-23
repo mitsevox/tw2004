@@ -696,29 +696,8 @@ unsorted/sweep_80039520.c:
 unsorted/sweep_8003954C.c:
 	.text       start:0x8003954C end:0x80039554
 
-unsorted/sweep_80039FF8.c:
-	.text       start:0x80039FF8 end:0x8003A074
-
-unsorted/sweep_8003A074.c:
-	.text       start:0x8003A074 end:0x8003A148
-
-unsorted/sweep_8003A76C.c:
-	.text       start:0x8003A76C end:0x8003A7C8
-
-unsorted/sweep_8003CAFC.c:
-	.text       start:0x8003CAFC end:0x8003CB80
-
-unsorted/sweep_8003CBD4.c:
-	.text       start:0x8003CBD4 end:0x8003CBE8
-
-unsorted/sweep_8003D0A0.c:
-	.text       start:0x8003D0A0 end:0x8003D0BC
-
-unsorted/sweep_8003D7A0.c:
-	.text       start:0x8003D7A0 end:0x8003D810
-
-unsorted/sweep_8003DAC8.c:
-	.text       start:0x8003DAC8 end:0x8003DBA8
+GoDynamicCam.c:
+	.text       start:0x80039554 end:0x8003DC30
 
 unsorted/sweep_8003DC78.c:
 	.text       start:0x8003DC78 end:0x8003DCAC
@@ -867,14 +846,8 @@ unsorted/sweep_800642B0.c:
 unsorted/sweep_800644CC.c:
 	.text       start:0x800644CC end:0x800644F4
 
-unsorted/sweep_80064E2C.c:
-	.text       start:0x80064E2C end:0x80064EA4
-
-unsorted/sweep_80064EA4.c:
-	.text       start:0x80064EA4 end:0x80064F54
-
-unsorted/sweep_80064F54.c:
-	.text       start:0x80064F54 end:0x80064F7C
+GoStaticCam.c:
+	.text       start:0x800644F4 end:0x8006596C
 
 unsorted/sweep_8006596C.c:
 	.text       start:0x8006596C end:0x800659F4
