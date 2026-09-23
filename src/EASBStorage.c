@@ -736,8 +736,8 @@ void fn_80129754(EASBTotals* pTotals, u8* pBuffer, u32 uSize) {
     fn_80129290(pBuffer, &nOffset, 1, pTotals->nProducts, 1, 250);
 }
 
-// Unpacks the totals from a 'HEAD' record.
-void fn_80129828(EASBTotals* pTotals, u8* pBuffer) {
+// Unpacks the totals from a 'HEAD' record (uSize is not used).
+void fn_80129828(EASBTotals* pTotals, u8* pBuffer, u32 uSize) {
     s32 nOffset;
 
     nOffset = 0;
@@ -904,222 +904,617 @@ void fn_8012A050(EASBProduct* pInto, EASBProduct* pFrom) {
     }
 }
 
-// ---- sweep code (not yet cleaned up) ----
+// ---- The memory-card steps, through the tag-file library ----
+// The Bio file holds a HEAD record (the totals), a PROD record per product and an IMAG record
+// per picture. Each operation (EASBStorageOp) runs as a list of steps; a step is called with
+// the process state until it reports EASB_PROCESS_COMPLETE.
 
-s32 TagFile_Delete(s32*, s32, s32);
-s32 TagFile_GetSession(u8*);
-s32 fn_8012C98C();
-s32 fn_8012CB98();
-extern s32 lbl_802819B0;
-extern u8* lbl_802825B0;
-s32 TagFile_DeleteSession(u8*);
-s32 TagFile_End(u8*);
-s32 TagFile_Write(u8*, s32, u8, s32*, s32);
-s32 TagFile_FreeBuffer();
-s32 TagFile_Shutdown();
-s32 fn_8012CCC0(void);
-void fn_8012CCCC(s32 v);
+#define EASB_TAG_HEAD 0x48454144    // 'HEAD'
+#define EASB_TAG_PROD 0x50524F44    // 'PROD'
+#define EASB_TAG_IMAG 0x494D4147    // 'IMAG'
 
-s32 fn_8012A2A8(s32* arg0) {
-    s32 temp_r0;
-    s32 temp_r3;
-    s32 var_r4;
+// The packed size of each record (fn_80129754, fn_801298FC, fn_80129D70).
+#define EASB_HEAD_SIZE 0x11
+#define EASB_PROD_SIZE 0x1104
+#define EASB_IMAG_SIZE 0x4301
 
-    var_r4 = 0;
-    if (arg0 == NULL) {
-        return 3;
+EASBErrorE fn_8012C98C(int eTagError);
+EASBErrorE fn_8012CAA8(SFIOFuncTable* pCallbacks, int* pDevices);
+EASBErrorE fn_8012CB98(EASBProcessE* peProcess);
+EASBErrorE fn_8012CC48(void);
+
+// Checks that the file holds nCount records tagged uTag, each uSize bytes.
+EASBErrorE fn_8012A164(TagSession* pSession, u32 uTag, u32 nCount, u32 uSize) {
+    u32 nFound;
+    u32 uFound;
+    u32 i;
+
+    if (fn_8012C98C(TagFile_Count(pSession, uTag, &nFound)) != EASB_ERROR_NONE || nFound != nCount) {
+        return EASB_ERROR_FILE_CORRUPT;
     }
-    temp_r0 = *arg0;
-    if (temp_r0 == 0) {
-        TagFile_Delete(&lbl_802819B0, -1, 0);
-        var_r4 = fn_8012C98C();
-        *arg0 = 1;
-    } else if (temp_r0 == 1) {
-        var_r4 = fn_8012CB98(arg0);
-        if ((var_r4 == 0) && ((s32) *arg0 == 2)) {
-            TagFile_GetSession(lbl_802825B0 + 0x120);
-            temp_r3 = fn_8012C98C();
-            (*(s8*)((u8*)(lbl_802825B0) + 0x91)) = 1;
-            var_r4 = temp_r3;
-            (*(s8*)((u8*)(lbl_802825B0) + 0x92)) = 1;
-            (*(s8*)((u8*)(lbl_802825B0) + 0x90)) = 1;
+    for (i = 0; i < nCount; i++) {
+        if (fn_8012C98C(TagFile_GetSize(pSession, uTag, i, &uFound)) != EASB_ERROR_NONE || uFound != uSize) {
+            return EASB_ERROR_FILE_CORRUPT;
         }
     }
-    return var_r4;
+    return EASB_ERROR_NONE;
 }
 
-s32 fn_8012A364(s32* arg0) {
-    s32 temp_r0;
-    s32 var_r5;
+// Whether the HEAD record or any PROD record is in state nState.
+u8 fn_8012A20C(s32 nState) {
+    s32 i;
 
-    var_r5 = 0;
-    if (arg0 == NULL) {
-        return 3;
+    if (lbl_802825B0->nHeadState == nState) {
+        return 1;
     }
-    if ((u8) (*(u8*)((u8*)(lbl_802825B0) + 0x92)) == 0) {
-        return 0x11;
-    }
-    if ((u8) (*(u8*)((u8*)(lbl_802825B0) + 0x90)) == 0) {
-        return 0x11;
-    }
-    temp_r0 = *arg0;
-    if (temp_r0 == 0) {
-        TagFile_DeleteSession(lbl_802825B0 + 0x120);
-        var_r5 = fn_8012C98C();
-        *arg0 = 1;
-    } else if (temp_r0 == 1) {
-        var_r5 = fn_8012CB98(arg0);
-        if ((var_r5 == 0) && ((s32) *arg0 == 2)) {
-            TagFile_GetSession(lbl_802825B0 + 0x120);
-            var_r5 = fn_8012C98C();
-            (*(s8*)((u8*)(lbl_802825B0) + 0x91)) = 1;
+    for (i = 0; i < EASB_MAX_PRODUCTS; i++) {
+        if (lbl_802825B0->anProductState[i] == nState) {
+            return 1;
         }
-    }
-    return var_r5;
-}
-
-s32 fn_8012A434(s32* arg0) {
-    s32 temp_r0;
-    s32 var_r4;
-
-    var_r4 = 0;
-    if (arg0 == NULL) {
-        return 3;
-    }
-    temp_r0 = *arg0;
-    if (temp_r0 == 0) {
-        TagFile_End(lbl_802825B0 + 0x120);
-        var_r4 = fn_8012C98C();
-        *arg0 = 1;
-    } else if (temp_r0 == 1) {
-        var_r4 = fn_8012CB98(arg0);
-    }
-    if ((s32) *arg0 == 2) {
-        (*(s8*)((u8*)(lbl_802825B0) + 0x91)) = 0;
-    }
-    return var_r4;
-}
-
-s32 fn_8012A900(s32* arg0) {
-    if (arg0 == NULL) {
-        return 3;
-    }
-    if ((s32) *arg0 == 0) {
-        fn_80128528((*(void**)((u8*)(lbl_802825B0) + 0x184)), (*(void**)((u8*)(lbl_802825B0) + 0x188)));
-        *arg0 = 2;
     }
     return 0;
 }
 
-s32 fn_8012B004(s32* arg0) {
-    s32 temp_r0;
-    s32 var_r4;
+// Step: runs TagFile_Delete on the Bio file; when it completes, keeps its session and marks the
+// file open.
+EASBErrorE fn_8012A2A8(EASBProcessE* peProcess) {
+    EASBErrorE eError;
 
-    var_r4 = 0;
-    if (arg0 == NULL) {
-        return 3;
+    eError = EASB_ERROR_NONE;
+    if (peProcess == NULL) {
+        return EASB_ERROR_NULL_PARAMETERS;
     }
-    if ((u8) (*(u8*)((u8*)(lbl_802825B0) + 0x91)) == 0) {
-        return 0x21;
+    if (*peProcess == EASB_PROCESS_NONE) {
+        eError = fn_8012C98C(TagFile_Delete("EASB", SFIO_DEVICE_INVALID, 0));
+        *peProcess = EASB_PROCESS_CONTINUE;
+    } else if (*peProcess == EASB_PROCESS_CONTINUE) {
+        eError = fn_8012CB98(peProcess);
+        if (eError == EASB_ERROR_NONE && *peProcess == EASB_PROCESS_COMPLETE) {
+            eError = fn_8012C98C(TagFile_GetSession(&lbl_802825B0->session));
+            lbl_802825B0->bFileOpen = 1;
+            lbl_802825B0->b92 = 1;
+            lbl_802825B0->b90 = 1;
+        }
     }
-    temp_r0 = *arg0;
-    if (temp_r0 == 0) {
-        fn_80129754((*(EASBTotals**)((u8*)(lbl_802825B0) + 0x184)), (*(u8**)((u8*)(lbl_802825B0) + 0x9C)), (*(u32*)((u8*)(lbl_802825B0) + 0xA0)));
-        TagFile_Write(lbl_802825B0 + 0x120, 0x48454144, 0U, (*(s32**)((u8*)(lbl_802825B0) + 0x9C)), 0x11);
-        var_r4 = fn_8012C98C();
-        *arg0 = 1;
-    } else if (temp_r0 == 1) {
-        var_r4 = fn_8012CB98(arg0);
-    }
-    if (((s32) *arg0 == 2) && (var_r4 == 0)) {
-        (*(s32*)((u8*)(lbl_802825B0) + 0xA4)) = 1;
-    }
-    return var_r4;
+    return eError;
 }
 
-s32 fn_8012B0D8(s32* arg0) {
-    s32 temp_r0;
-    s32 var_r4;
+// Step: deletes the open Bio file; when that completes, keeps the session and marks it open.
+EASBErrorE fn_8012A364(EASBProcessE* peProcess) {
+    EASBErrorE eError;
 
-    var_r4 = 0;
-    if (arg0 == NULL) {
-        return 3;
+    eError = EASB_ERROR_NONE;
+    if (peProcess == NULL) {
+        return EASB_ERROR_NULL_PARAMETERS;
     }
-    if ((u8) (*(u8*)((u8*)(lbl_802825B0) + 0x91)) == 0) {
-        return 0x21;
+    if (lbl_802825B0->b92 == 0) {
+        return EASB_ERROR_CANNOT_REOPEN;
     }
-    temp_r0 = *arg0;
-    if (temp_r0 == 0) {
-        fn_80129D70((*(EASBImage**)((u8*)(lbl_802825B0) + 0x190)), 1, (*(u8**)((u8*)(lbl_802825B0) + 0x9C)), (*(u32*)((u8*)(lbl_802825B0) + 0xA0)));
-        TagFile_Write(lbl_802825B0 + 0x120, 0x494D4147, (*(u8*)((u8*)(lbl_802825B0) + 0x98)), (*(s32**)((u8*)(lbl_802825B0) + 0x9C)), 0x4301);
-        var_r4 = fn_8012C98C();
-        *arg0 = 1;
-    } else if (temp_r0 == 1) {
-        var_r4 = fn_8012CB98(arg0);
+    if (lbl_802825B0->b90 == 0) {
+        return EASB_ERROR_CANNOT_REOPEN;
     }
-    return var_r4;
+    if (*peProcess == EASB_PROCESS_NONE) {
+        eError = fn_8012C98C(TagFile_DeleteSession(&lbl_802825B0->session));
+        *peProcess = EASB_PROCESS_CONTINUE;
+    } else if (*peProcess == EASB_PROCESS_CONTINUE) {
+        eError = fn_8012CB98(peProcess);
+        if (eError == EASB_ERROR_NONE && *peProcess == EASB_PROCESS_COMPLETE) {
+            eError = fn_8012C98C(TagFile_GetSession(&lbl_802825B0->session));
+            lbl_802825B0->bFileOpen = 1;
+        }
+    }
+    return eError;
+}
+
+// Step: closes the Bio file.
+EASBErrorE fn_8012A434(EASBProcessE* peProcess) {
+    EASBErrorE eError;
+
+    eError = EASB_ERROR_NONE;
+    if (peProcess == NULL) {
+        return EASB_ERROR_NULL_PARAMETERS;
+    }
+    if (*peProcess == EASB_PROCESS_NONE) {
+        eError = fn_8012C98C(TagFile_End(&lbl_802825B0->session));
+        *peProcess = EASB_PROCESS_CONTINUE;
+    } else if (*peProcess == EASB_PROCESS_CONTINUE) {
+        eError = fn_8012CB98(peProcess);
+    }
+    if (*peProcess == EASB_PROCESS_COMPLETE) {
+        lbl_802825B0->bFileOpen = 0;
+    }
+    return eError;
+}
+
+// Step: checks the file holds one HEAD record, 25 PROD records and no IMAG record, of the
+// packed sizes.
+EASBErrorE fn_8012A848(EASBProcessE* peProcess) {
+    EASBErrorE eError;
+
+    eError = EASB_ERROR_NONE;
+    if (peProcess == NULL) {
+        return EASB_ERROR_NULL_PARAMETERS;
+    }
+    if (*peProcess == EASB_PROCESS_NONE) {
+        if (eError == EASB_ERROR_NONE) {
+            eError = fn_8012A164(&lbl_802825B0->session, EASB_TAG_HEAD, 1, EASB_HEAD_SIZE);
+        }
+        if (eError == EASB_ERROR_NONE) {
+            eError = fn_8012A164(&lbl_802825B0->session, EASB_TAG_PROD, EASB_MAX_PRODUCTS, EASB_PROD_SIZE);
+        }
+        if (eError == EASB_ERROR_NONE) {
+            eError = fn_8012A164(&lbl_802825B0->session, EASB_TAG_IMAG, 0, EASB_IMAG_SIZE);
+        }
+        *peProcess = EASB_PROCESS_COMPLETE;
+    }
+    return eError;
+}
+
+// Step: raises the totals with the product's.
+EASBErrorE fn_8012A900(EASBProcessE* peProcess) {
+    if (peProcess == NULL) {
+        return EASB_ERROR_NULL_PARAMETERS;
+    }
+    if (*peProcess == EASB_PROCESS_NONE) {
+        fn_80128528(lbl_802825B0->args.pTotals, lbl_802825B0->args.pProduct);
+        *peProcess = EASB_PROCESS_COMPLETE;
+    }
+    return EASB_ERROR_NONE;
+}
+
+// Step: reads the HEAD record into the totals.
+EASBErrorE fn_8012A95C(EASBProcessE* peProcess) {
+    EASBErrorE eError;
+
+    eError = EASB_ERROR_NONE;
+    if (peProcess == NULL) {
+        return EASB_ERROR_NULL_PARAMETERS;
+    }
+    if (lbl_802825B0->bFileOpen == 0) {
+        return EASB_ERROR_INTERNAL;
+    }
+    if (lbl_802825B0->nSlot == EASB_PRODUCT_NONE) {
+        return EASB_ERROR_INTERNAL;
+    }
+    if (*peProcess == EASB_PROCESS_NONE) {
+        lbl_802825B0->nHeadState = 0;
+        eError = fn_8012C98C(TagFile_Read(&lbl_802825B0->session, EASB_TAG_HEAD, 0, lbl_802825B0->pBuffer,
+                                          EASB_HEAD_SIZE));
+        *peProcess = EASB_PROCESS_CONTINUE;
+    } else if (*peProcess == EASB_PROCESS_CONTINUE) {
+        eError = fn_8012CB98(peProcess);
+    }
+    if (eError == EASB_ERROR_NONE && *peProcess == EASB_PROCESS_COMPLETE) {
+        fn_80129828(&lbl_802825B0->totals, lbl_802825B0->pBuffer, lbl_802825B0->uBufferSize);
+        lbl_802825B0->nHeadState = 1;
+    } else if (eError == EASB_ERROR_SECTION_CORRUPT && *peProcess == EASB_PROCESS_COMPLETE) {
+        lbl_802825B0->nHeadState = 2;
+    }
+    return eError;
+}
+
+// Step: writes the totals as the HEAD record.
+EASBErrorE fn_8012B004(EASBProcessE* peProcess) {
+    EASBErrorE eError;
+
+    eError = EASB_ERROR_NONE;
+    if (peProcess == NULL) {
+        return EASB_ERROR_NULL_PARAMETERS;
+    }
+    if (lbl_802825B0->bFileOpen == 0) {
+        return EASB_ERROR_INTERNAL;
+    }
+    if (*peProcess == EASB_PROCESS_NONE) {
+        fn_80129754(lbl_802825B0->args.pTotals, lbl_802825B0->pBuffer, lbl_802825B0->uBufferSize);
+        eError = fn_8012C98C(TagFile_Write(&lbl_802825B0->session, EASB_TAG_HEAD, 0, lbl_802825B0->pBuffer,
+                                           EASB_HEAD_SIZE));
+        *peProcess = EASB_PROCESS_CONTINUE;
+    } else if (*peProcess == EASB_PROCESS_CONTINUE) {
+        eError = fn_8012CB98(peProcess);
+    }
+    if (*peProcess == EASB_PROCESS_COMPLETE && eError == EASB_ERROR_NONE) {
+        lbl_802825B0->nHeadState = 1;
+    }
+    return eError;
+}
+
+// Step: writes the game's picture as the IMAG record of its slot.
+EASBErrorE fn_8012B0D8(EASBProcessE* peProcess) {
+    EASBErrorE eError;
+
+    eError = EASB_ERROR_NONE;
+    if (peProcess == NULL) {
+        return EASB_ERROR_NULL_PARAMETERS;
+    }
+    if (lbl_802825B0->bFileOpen == 0) {
+        return EASB_ERROR_INTERNAL;
+    }
+    if (*peProcess == EASB_PROCESS_NONE) {
+        fn_80129D70(lbl_802825B0->args.pImage, 1, lbl_802825B0->pBuffer, lbl_802825B0->uBufferSize);
+        eError = fn_8012C98C(TagFile_Write(&lbl_802825B0->session, EASB_TAG_IMAG, lbl_802825B0->nSlot,
+                                           lbl_802825B0->pBuffer, EASB_IMAG_SIZE));
+        *peProcess = EASB_PROCESS_CONTINUE;
+    } else if (*peProcess == EASB_PROCESS_CONTINUE) {
+        eError = fn_8012CB98(peProcess);
+    }
+    return eError;
+}
+
+// Starts the storage code: the state, with no file, slot or operation, and a copy of the
+// memory-card callbacks.
+EASBErrorE fn_8012BD0C(u32 uHeapID, SFIOFuncTable* pCallbacks) {
+    if (lbl_802825B0 != NULL) {
+        return EASB_ERROR_INITIALIZED;
+    }
+    lbl_802825B0 = TibExtMemAlloc(uHeapID, sizeof(EASBStorage), 4);
+    if (lbl_802825B0 == NULL) {
+        return EASB_ERROR_OUT_OF_MEMORY;
+    }
+    memset(lbl_802825B0, 0, sizeof(EASBStorage));
+    lbl_802825B0->uHeapID = uHeapID;
+    lbl_802825B0->b90 = 0;
+    lbl_802825B0->bFileOpen = 0;
+    lbl_802825B0->b92 = 0;
+    lbl_802825B0->nOperation = EASB_OPERATION_NONE;
+    lbl_802825B0->n1A4 = 0;
+    lbl_802825B0->pnSteps = NULL;
+    lbl_802825B0->u94 = 0;
+    lbl_802825B0->nSlot = EASB_PRODUCT_NONE;
+    lbl_802825B0->pBuffer = NULL;
+    memset(&lbl_802825B0->nHeadState, 0, sizeof(lbl_802825B0->nHeadState));
+    memset(lbl_802825B0->anProductState, 0, sizeof(lbl_802825B0->anProductState));
+    // The buffer holds the biggest record.
+    lbl_802825B0->uBufferSize = EASB_HEAD_SIZE;
+    if (lbl_802825B0->uBufferSize < EASB_PROD_SIZE) {
+        lbl_802825B0->uBufferSize = EASB_PROD_SIZE;
+    }
+    if (lbl_802825B0->uBufferSize < EASB_IMAG_SIZE) {
+        lbl_802825B0->uBufferSize = EASB_IMAG_SIZE;
+    }
+    lbl_802825B0->callbacks = *pCallbacks;
+    return EASB_ERROR_NONE;
+}
+
+// Stops the storage code; not while the file is open.
+EASBErrorE fn_8012BE74(void) {
+    EASBErrorE eError;
+
+    if (lbl_802825B0 == NULL) {
+        return EASB_ERROR_NOT_INITIALIZED;
+    }
+    if (lbl_802825B0->bFileOpen == 1) {
+        return EASB_ERROR_FILE_OPEN;
+    }
+    if (lbl_802825B0->pBuffer != NULL) {
+        eError = fn_8012C98C(TagFile_FreeBuffer(lbl_802825B0->pBuffer, (void*)lbl_802825B0->uHeapID,
+                                                lbl_802825B0->uBufferSize, 0));
+        lbl_802825B0->pBuffer = NULL;
+    } else {
+        eError = EASB_ERROR_NONE;
+    }
+    TibExtMemFree(lbl_802825B0->uHeapID, lbl_802825B0, sizeof(EASBStorage), 4);
+    lbl_802825B0 = NULL;
+    return eError;
+}
+
+// Starts operation nOperation with pArgs, first starting the tag-file library if it needs it.
+EASBErrorE fn_8012BF18(s32 nOperation, EASBStorageArgs* pArgs) {
+    int aDevices[2] = {SFIO_DEVICE_FIRST, SFIO_DEVICE_INVALID};
+    EASBErrorE eError;
+
+    eError = EASB_ERROR_NONE;
+    if (lbl_802825B0->nOperation == EASB_OPERATION_NONE) {
+        if (lbl_80195520[nOperation].bStartTagFile) {
+            eError = fn_8012CAA8(&lbl_802825B0->callbacks, aDevices);
+        }
+        if (eError == EASB_ERROR_NONE) {
+            lbl_802825B0->nOperation = nOperation;
+            lbl_802825B0->n1A4 = 0;
+            lbl_802825B0->pnSteps = lbl_80195520[nOperation].anSteps;
+            lbl_802825B0->nResult = EASB_ERROR_NONE;
+            lbl_802825B0->nLastOperation = EASB_OPERATION_NONE;
+            if (lbl_802825B0->nOperation != EASB_OPERATION_ERROR) {
+                memcpy(&lbl_802825B0->session, &lbl_802825B0->savedSession, sizeof(TagSession));
+            }
+            lbl_802825B0->b168 = 0;
+            memcpy(&lbl_802825B0->args, pArgs, sizeof(EASBStorageArgs));
+        }
+    } else {
+        eError = EASB_ERROR_PROCESS_IN_PROGRESS;
+    }
+    return eError;
+}
+
+// Ends operation nOperation, shutting the tag-file library down if it started it. After the
+// clean-up operation (EASB_OPERATION_ERROR) the result is the failed operation's error.
+EASBErrorE fn_8012C03C(s32 nOperation) {
+    EASBErrorE eError;
+
+    eError = EASB_ERROR_NONE;
+    if (nOperation == lbl_802825B0->nOperation) {
+        lbl_802825B0->nOperation = EASB_OPERATION_NONE;
+        lbl_802825B0->n1A4 = 0;
+        lbl_802825B0->pnSteps = NULL;
+        lbl_802825B0->b168 = 0;
+        if (lbl_80195520[nOperation].bStopTagFile) {
+            eError = fn_8012CC48();
+            lbl_802825B0->bFileOpen = 0;
+        }
+        if (nOperation == EASB_OPERATION_ERROR) {
+            if (lbl_802825B0->nLastOperation == 0 || lbl_802825B0->nLastOperation == 4) {
+                memset(&lbl_802825B0->session, 0, sizeof(TagSession));
+                lbl_802825B0->bFileOpen = 0;
+                lbl_802825B0->b90 = 0;
+                lbl_802825B0->b92 = 0;
+                lbl_802825B0->u94 = 0;
+                lbl_802825B0->nSlot = EASB_PRODUCT_NONE;
+            }
+            eError = lbl_802825B0->nResult;
+        } else if (nOperation == 2) {
+            lbl_802825B0->bFileOpen = 0;
+            lbl_802825B0->b90 = 0;
+            lbl_802825B0->b92 = 0;
+            lbl_802825B0->u94 = 0;
+            lbl_802825B0->nSlot = EASB_PRODUCT_NONE;
+        } else {
+            memcpy(&lbl_802825B0->savedSession, &lbl_802825B0->session, sizeof(TagSession));
+        }
+    } else if (lbl_802825B0->nOperation == EASB_OPERATION_NONE) {
+        eError = EASB_ERROR_NO_PROCESS_IN_PROGRESS;
+    } else {
+        eError = EASB_ERROR_PROCESS_IN_PROGRESS;
+    }
+    return eError;
+}
+
+// Operations 4 and 5 (fn_8012D394's): 4 when no file has been opened yet, else 5, which needs
+// b92.
+EASBErrorE fn_8012C5F8(EASBTotals* pTotals, EASBProduct* pProduct, u8* p2) {
+    EASBStorageArgs args;
+
+    memset(&args, 0, sizeof(EASBStorageArgs));
+    if (lbl_802825B0->b90 == 0) {
+        lbl_802825B0->nSlot = EASB_PRODUCT_NONE;
+        args.pTotals = pTotals;
+        args.pProduct = pProduct;
+        args.p00 = p2;
+        return fn_8012BF18(4, &args);
+    }
+    if (lbl_802825B0->b92 == 0) {
+        return EASB_ERROR_CANNOT_REOPEN;
+    }
+    return fn_8012BF18(5, &args);
+}
+
+EASBErrorE fn_8012C69C(void) {
+    EASBStorageArgs args;
+
+    memset(&args, 0, sizeof(EASBStorageArgs));
+    return fn_8012BF18(6, &args);
+}
+
+EASBErrorE fn_8012C6D4(EASBTotals* pTotals, EASBProduct* pProduct, u32 u18, u32 u14, EASBImage* pImage) {
+    EASBStorageArgs args;
+
+    memset(&args, 0, sizeof(EASBStorageArgs));
+    args.pTotals = pTotals;
+    args.pProduct = pProduct;
+    args.u18 = u18;
+    args.u14 = u14;
+    args.pImage = pImage;
+    return fn_8012BF18(0, &args);
+}
+
+EASBErrorE fn_8012C73C(void) {
+    EASBStorageArgs args;
+
+    memset(&args, 0, sizeof(EASBStorageArgs));
+    return fn_8012BF18(1, &args);
+}
+
+EASBErrorE fn_8012C774(EASBProduct* pProducts) {
+    EASBStorageArgs args;
+
+    memset(&args, 0, sizeof(EASBStorageArgs));
+    args.pProduct = pProducts;
+    return fn_8012BF18(8, &args);
+}
+
+// Operation 7; not without a slot for the game.
+EASBErrorE fn_8012C7BC(EASBTotals* pTotals, EASBProduct* pProduct, EASBImage* pImage) {
+    EASBStorageArgs args;
+
+    if (lbl_802825B0->nSlot >= EASB_MAX_PRODUCTS) {
+        return EASB_ERROR_INVALID_PRODUCT;
+    }
+    memset(&args, 0, sizeof(EASBStorageArgs));
+    args.pTotals = pTotals;
+    args.pProduct = pProduct;
+    args.pImage = pImage;
+    return fn_8012BF18(7, &args);
 }
 
 u8 fn_8012C83C(void) {
-    return *(u8*)(lbl_802825B0 + 0x91);
+    return lbl_802825B0->bFileOpen;
 }
 
 u8 fn_8012C848(void) {
-    return *(u8*)(lbl_802825B0 + 0x92);
+    return lbl_802825B0->b92;
 }
 
-EASBErrorE fn_8012C854(u8* arg0) {
-    if (arg0 == NULL) {
-        return 3;
+EASBErrorE fn_8012C854(u8* pnSlot) {
+    if (pnSlot == NULL) {
+        return EASB_ERROR_NULL_PARAMETERS;
     }
-    if ((void* ) lbl_802825B0 == NULL) {
-        return 0x10;
+    if (lbl_802825B0 == NULL) {
+        return EASB_ERROR_NOT_INITIALIZED;
     }
-    *arg0 = (*(u8*)((u8*)(lbl_802825B0) + 0x98));
-    return 0;
+    *pnSlot = lbl_802825B0->nSlot;
+    return EASB_ERROR_NONE;
 }
 
-EASBErrorE fn_8012C888(u32* arg0) {
-    s32 var_r5;
+EASBErrorE fn_8012C888(u32* pOut) {
+    EASBErrorE eError;
 
-    var_r5 = 0;
-    if (arg0 == NULL) {
-        return 3;
+    eError = EASB_ERROR_NONE;
+    if (pOut == NULL) {
+        return EASB_ERROR_NULL_PARAMETERS;
     }
-    if ((void* ) lbl_802825B0 == NULL) {
-        return 0x10;
+    if (lbl_802825B0 == NULL) {
+        return EASB_ERROR_NOT_INITIALIZED;
     }
-    *arg0 = (*(s32*)((u8*)(lbl_802825B0) + 0x94));
-    if ((s32) *arg0 == 0) {
-        var_r5 = 1;
+    *pOut = lbl_802825B0->u94;
+    if ((s32)*pOut == 0) {  // fake match: the original compares signed (cmpwi)
+        eError = EASB_ERROR_NOFILE;
     }
-    return var_r5;
+    return eError;
 }
 
-void fn_8012CC48(void) {
-    s32 var_r31;
-    s32 var_r3;
+// The EASB error for a tag-file library error; the library's own code is kept for later.
+EASBErrorE fn_8012C98C(int eTagError) {
+    EASBErrorE eError;
 
-    var_r31 = 0;
-    if ((u32) (*(u32*)((u8*)(lbl_802825B0) + 0x9C)) != 0U) {
-        var_r31 = TagFile_FreeBuffer((*(u32*)((u8*)(lbl_802825B0) + 0x9C)), (*(s32*)((u8*)(lbl_802825B0) + 0x8C)), (*(s32*)((u8*)(lbl_802825B0) + 0xA0)), 0);
-        var_r3 = fn_8012C98C();
-        (*(u32*)((u8*)(lbl_802825B0) + 0x9C)) = 0U;
+    switch (eTagError) {
+    case 0:
+        eError = EASB_ERROR_NONE;
+        break;
+    case 1:
+        eError = EASB_ERROR_INITIALIZED;
+        break;
+    case 2:
+        eError = EASB_ERROR_NOT_INITIALIZED;
+        break;
+    case 4:
+        eError = EASB_ERROR_INVALID_PARAMETERS;
+        break;
+    case 6:
+    case 0x6B:
+        eError = EASB_ERROR_OUT_OF_MEMORY;
+        break;
+    case 0x68:
+        eError = EASB_ERROR_NOFILE;
+        break;
+    case 0x67:
+        eError = EASB_ERROR_NODEVICE;
+        break;
+    case 0x72:
+        eError = EASB_ERROR_NOT_ENOUGH_SPACE;
+        break;
+    case 9:
+        eError = EASB_ERROR_WRONG_FILE;
+        break;
+    case 0x6C:
+        eError = EASB_ERROR_FILE_EXISTS;
+        break;
+    case 0xA:
+        eError = EASB_ERROR_SECTION_CORRUPT;
+        break;
+    case 3:
+    case 7:
+    case 0x6E:
+        eError = EASB_ERROR_FILE_CORRUPT;
+        break;
+    default:
+        eError = EASB_ERROR_UNKNOWN;
+        break;
+    }
+    lbl_802825B0->nLastError = eTagError;
+    return eError;
+}
+
+// Starts the tag-file library with the memory-card callbacks and the cipher (keyed with EA's
+// copyright line), and allocates the record buffer.
+EASBErrorE fn_8012CAA8(SFIOFuncTable* pCallbacks, int* pDevices) {
+    char szKey[] = "Copyright Electronic Arts";
+    TagFileInitParams params;
+    EASBErrorE eError;
+
+    params.uMaxEntries = 26;
+    params.pDevices = pDevices;
+    params.pFuncs = pCallbacks;
+    params.pKey = (u8*)szKey;
+    params.uKeyLen = sizeof(szKey);
+    params.pCipher = (const CipherInterface*)Cipher_GetInterface();
+    params.pAllocator = (void*)lbl_802825B0->uHeapID;
+    eError = fn_8012C98C(TagFile_Init(&params));
+    if (eError == EASB_ERROR_NONE && lbl_802825B0->pBuffer == NULL) {
+        eError = TagFile_AllocBuffer((void**)&lbl_802825B0->pBuffer, (void*)lbl_802825B0->uHeapID,
+                                     lbl_802825B0->uBufferSize, 0);
+        if (eError == 0) {
+            if (lbl_802825B0->pBuffer == NULL) {
+                eError = EASB_ERROR_OUT_OF_MEMORY;
+            } else {
+                eError = fn_8012C98C(eError);
+            }
+        } else {
+            eError = fn_8012C98C(eError);
+        }
+    }
+    return eError;
+}
+
+// Runs the tag-file library's current operation once: *peProcess becomes where it has got to,
+// or EASB_PROCESS_COMPLETE on an error.
+EASBErrorE fn_8012CB98(EASBProcessE* peProcess) {
+    int nProcess;
+    int nResult;
+    EASBProcessE eProcess;
+    EASBErrorE eError;
+
+    eProcess = EASB_PROCESS_NONE;
+    if (peProcess == NULL) {
+        return EASB_ERROR_NULL_PARAMETERS;
+    }
+    eError = fn_8012C98C(TagFile_Update(&nProcess, &nResult));
+    if (eError == EASB_ERROR_NONE) {
+        switch (nProcess) {
+        case 0:
+            eProcess = EASB_PROCESS_NONE;
+            break;
+        case 1:
+            eProcess = EASB_PROCESS_CONTINUE;
+            break;
+        case 2:
+            eProcess = EASB_PROCESS_COMPLETE;
+            break;
+        default:
+            eError = EASB_ERROR_UNKNOWN;
+            break;
+        }
+    }
+    *peProcess = eProcess;
+    if (eError != EASB_ERROR_NONE) {
+        *peProcess = EASB_PROCESS_COMPLETE;
+    }
+    return eError;
+}
+
+// Frees the record buffer and shuts the tag-file library down.
+EASBErrorE fn_8012CC48(void) {
+    int eTagError;
+    EASBErrorE eError;
+
+    eTagError = 0;
+    if (lbl_802825B0->pBuffer != NULL) {
+        eTagError = TagFile_FreeBuffer(lbl_802825B0->pBuffer, (void*)lbl_802825B0->uHeapID,
+                                       lbl_802825B0->uBufferSize, 0);
+        eError = fn_8012C98C(eTagError);
+        lbl_802825B0->pBuffer = NULL;
     } else {
-        var_r3 = 0x22;
+        eError = EASB_ERROR_UNKNOWN;
     }
-    if (var_r3 == 0) {
+    if (eError == EASB_ERROR_NONE) {
+        // The shutdown's own error is dropped: the free's is converted again.
         TagFile_Shutdown();
-        fn_8012C98C(var_r31);
+        eError = fn_8012C98C(eTagError);
     }
+    return eError;
 }
 
 s32 fn_8012CCC0(void) {
-    return *(s32*)(lbl_802825B0 + 0x17C);
+    return lbl_802825B0->nLastOperation;
 }
 
-void fn_8012CCCC(s32 v) {
-    *(s32*)(lbl_802825B0 + 0x120) = v;
+void fn_8012CCCC(int uHandle) {
+    lbl_802825B0->session.Sfio.uHandle = uHandle;
 }
-
-// ---- end of sweep code ----
