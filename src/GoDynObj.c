@@ -20,7 +20,8 @@ void fn_80093DB8(Ball* pBall, int nPlayer);    // GoObjShadow.c
 void fn_80093AE0(Ball* pBall, int nPlayer);    // GoObjShadow.c
 void fn_80048584(UObject* pObj, s8 nLod);
 void fn_8000ADC0(f32 (*pMtx)[4]);                   // identity
-void fn_80047290(void);
+int  fn_800636EC(void);
+void fn_8000C5A4(f32 (*pMtx)[4]);void fn_80047290(void);
 void fn_8004731C(u8* pState);
 void fn_80047C24(int nPlayer);
 void fn_80048184(int nPlayer);
@@ -244,6 +245,34 @@ u8 fn_800468B4(int nPlayer) {
     return 1;
 }
 
+u8 fn_80046928(int nPlayer) {
+    int nLie = gPlayers[nPlayer].ball.nLie;
+    u32 nClass;
+
+    if (nLie == 16) {
+        if (gPlayers[nPlayer].ball.nSurface < 0 || gPlayers[nPlayer].ball.nSurface >= NUM_SURFACE_TYPES) {
+            return 0;
+        }
+        nClass = gSurfaceTypes[gPlayers[nPlayer].ball.nSurface].nClass;
+        if (nClass == 7 || nClass == 15 || nClass == 16) {
+            return 0;
+        }
+        if (gPlayers[nPlayer].ball.fHeight > 0.5f) {
+            return 0;
+        }
+    }
+    if ((nLie == 0 || nLie == 12 || nLie == 9) && (s8)GOLFERSTATE_GetCurrentState(nPlayer) == 19) {
+        return 0;
+    }
+    if (!fn_800468B4(nPlayer)) {
+        return 0;
+    }
+    if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) == 18 && nPlayer == fn_800636EC()) {
+        return 0;
+    }
+    return 1;
+}
+
 u8 fn_80046A54(int nPlayer) {
     if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) == 1 && fn_80048574(gPlayers[nPlayer].pChar, 3)) {
         return 0;
@@ -362,7 +391,50 @@ void fn_80047290(void) {
     }
 }
 
-// ---- 0x8004731C..0x80047B6C: not yet decompiled ----
+// ---- 0x8004731C..0x80047A24: not yet decompiled ----
+
+// Puts the player's 'TEO ' 10002 object at pPos, facing against the aim; the first time it is made
+// (as a type 0 object, flag 0x200).
+void fn_80047A24(f32* pPos, int nPlayer) {
+    DynObjDef def;
+    DynObjSetup setup;
+    DynObjModel model;
+    GoDynObjPlayerB* pB = &lbl_80281DA0->aB[nPlayer];
+    s32 nId;
+
+    pB->v20[0] = pPos[0];
+    pB->v20[1] = pPos[1];
+    pB->v20[2] = pPos[2];
+    pB->v20[3] = 1.0f;
+    pB->fC = -gPlayers[nPlayer].fAim;
+    pB->bF5 = 1;
+    pB->b0 = 1;
+    if (!pB->bF4) {
+        // EA bug: def.n1A is never set, and type 0's setup copies it to DynObj.n14E
+        def.n0 = 0;
+        def.n4 = 0;
+        def.aPos[0] = pB->v20[0];
+        def.aPos[1] = pB->v20[1];
+        def.aPos[2] = pB->v20[2];
+        def.u14 = 0x200;
+        def.n18 = 0;
+        setup.pDef = &def;
+        setup.pModel = &model;
+        model.aEntries[0].uType = 'TEO ';
+        setup.pModel->aEntries[0].u.pRef = (DynObjModelRef*)fn_8000B70C('TEO ', 10002);
+        setup.pfnHandler = fn_800499B0(setup.pDef->n4);
+        setup.pC = NULL;
+        nId = fn_800490B8(&setup);
+        if (nId != -2) {
+            pB->pF0 = fn_80048E4C(nId);
+        }
+        pB->bF4 = 1;
+    } else {
+        fn_8000ADC0(pB->pF0->obj.m0);
+        Vec_Copy(pB->v20, pB->pF0->obj.m80[3]);
+        fn_8000C5A4(pB->pF0->obj.m0);
+    }
+}
 
 // Gives up the player's object.
 void fn_80047B6C(Ball* pBall, int nPlayer) {

@@ -210,10 +210,16 @@ typedef struct GoDynObjPlayerA {
 LAYOUT_ASSERT(GoDynObjPlayerA, 0x104);
 
 typedef struct GoDynObjPlayerB {
-    u8   unk0[0xF0];
-    DynObj* pF0;                // 0xF0  an object, given up by fn_80047BC0
+    u8   b0;                    // 0x00  set by fn_80047A24
+    u8   unk1[0xC - 0x1];
+    f32  fC;                    // 0x0C  minus the player's aim when placed
+    u8   unk10[0x20 - 0x10];
+    f32  v20[4];                // 0x20  where fn_80047A24 put pF0 (x, y, z, 1)
+    u8   unk30[0xF0 - 0x30];
+    DynObj* pF0;                // 0xF0  a 'TEO ' 10002 object (fn_80047A24), given up by fn_80047BC0
     u8   bF4;                   // 0xF4  pF0 is in use
-    u8   unkF5[0x100 - 0xF5];
+    u8   bF5;                   // 0xF5  set by fn_80047A24
+    u8   unkF6[0x100 - 0xF6];
 } GoDynObjPlayerB;
 LAYOUT_ASSERT(GoDynObjPlayerB, 0x100);
 
@@ -258,6 +264,7 @@ extern UMemPool* lbl_80281DA8;
 DynObj* fn_80048E44(void);                                  // the first object
 DynObj* fn_80048E4C(int nId);                               // the object with this id, or NULL
 void fn_80048FEC(DynObj* pObj);                             // adds it at the end of the list
+s32  fn_800490B8(DynObjSetup* pSetup);                      // a new object's id, -2 when none
 void fn_800490EC(void);                                     // sweeps out the objects given up
 void fn_800491C4(DynObj* pObj);
 void fn_80049514(DynObj* pObj, DynObjSetup* pSetup);    // type 0's message 2
