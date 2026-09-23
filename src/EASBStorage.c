@@ -552,6 +552,99 @@ EASBErrorE fn_80129218(u16 uLevel, u16 u1160, u16* puLevel) {
     return EASB_ERROR_NONE;
 }
 
+// The save file's byte packing. Each call works at pBuffer + *pnOffset and moves *pnOffset past
+// what it wrote or read.
+
+// Writes uValue, kept within uMin..uMax, as nBytes bytes, lowest first.
+void fn_80129290(u8* pBuffer, s32* pnOffset, u8 nBytes, u32 uValue, u32 uMin, u32 uMax) {
+    u8 i;
+
+    if (uValue < uMin) {
+        uValue = uMin;
+    } else if (uValue > uMax) {
+        uValue = uMax;
+    }
+    for (i = 0; i < nBytes; i++) {
+        pBuffer[*pnOffset + i] = uValue;
+        uValue >>= 8;
+    }
+    *pnOffset += nBytes;
+}
+
+// Reads a value of nBytes bytes, lowest first, and keeps it within uMin..uMax.
+u32 fn_801293F8(u8* pBuffer, s32* pnOffset, u8 nBytes, u32 uMin, u32 uMax) {
+    u32 uValue;
+    u8 i;
+
+    uValue = 0;
+    for (i = 0; i < nBytes; i++) {
+        uValue |= pBuffer[*pnOffset + i] << (i * 8);
+    }
+    *pnOffset += nBytes;
+    if (uValue < uMin) {
+        uValue = uMin;
+    } else if (uValue > uMax) {
+        uValue = uMax;
+    }
+    return uValue;
+}
+
+// Writes uLength characters of sz, each through fn_80128E28's table.
+void fn_8012956C(u8* pBuffer, s32* pnOffset, u32 uLength, char* sz) {
+    char* pc;
+    u32 i;
+    u8 c;
+
+    pc = sz;
+    for (i = 0; i < uLength; i++) {
+        c = fn_80128E28(*pc);
+        pc++;
+        pBuffer[*pnOffset + i] = c;
+    }
+    *pnOffset += uLength;
+}
+
+// Reads uLength characters into sz, each through fn_80128E28's table.
+void fn_801295D8(u8* pBuffer, s32* pnOffset, u32 uLength, char* sz) {
+    char* pc;
+    u32 i;
+
+    pc = sz;
+    for (i = 0; i < uLength; i++, pc++) {
+        *pc = fn_80128E28(pBuffer[*pnOffset + i]);
+    }
+    *pnOffset += uLength;
+}
+
+// Writes uSize bytes of wide text, each character through fn_80128E6C, lowest byte first.
+void fn_80129644(u8* pBuffer, s32* pnOffset, u32 uSize, u16* sz, u16 uLanguage) {
+    u16* pc;
+    u32 i;
+    u16 c;
+
+    pc = sz;
+    for (i = 0; i < uSize; i += 2) {
+        c = fn_80128E6C(*pc, uLanguage);
+        pc++;
+        pBuffer[*pnOffset + i] = c;
+        pBuffer[*pnOffset + i + 1] = c >> 8;
+    }
+    *pnOffset += uSize;
+}
+
+// Reads uSize bytes of wide text into sz, each character through fn_80128E6C.
+void fn_801296CC(u8* pBuffer, s32* pnOffset, u32 uSize, u16* sz, u16 uLanguage) {
+    u16* pc;
+    u32 i;
+
+    pc = sz;
+    for (i = 0; i < uSize; i += 2) {
+        *pc = fn_80128E6C((pBuffer[*pnOffset + i + 1] << 8) + pBuffer[*pnOffset + i], uLanguage);
+        pc++;
+    }
+    *pnOffset += uSize;
+}
+
 // ---- sweep code (not yet cleaned up) ----
 
 s32 TagFile_Delete(s32*, s32, s32);
