@@ -750,14 +750,8 @@ target.c:
 emotion.c:
 	.text       start:0x8006AA70 end:0x8006BED4
 
-unsorted/sweep_8006BED4.c:
-	.text       start:0x8006BED4 end:0x8006BF4C
-
-unsorted/sweep_8006BF4C.c:
-	.text       start:0x8006BF4C end:0x8006BF60
-
 Replay.c:
-	.text       start:0x8006BF60 end:0x8006C300
+	.text       start:0x8006BED4 end:0x8006C630
 
 unsorted/sweep_8006C630.c:
 	.text       start:0x8006C630 end:0x8006C63C
