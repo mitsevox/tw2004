@@ -754,15 +754,17 @@ void fn_800EC1E0(void) {
 // plus a number, against par, birdie or par or bogey golf, penalties below a mark, a match margin,
 // the best of the n274 counts, n DD8) or against this hole.
 int fn_800EC558(void) {
+    int m;
     int nRule;
     int nMark;
     int nStrokes;
     int nPen;
     int nSum;
     int nPar;
-    int m;
-    int bBest;
+    int nHoles;
+    u8 bBest;
     int i;
+    int nPlayoff;
     for (m = 0; m < 3; m++) {
         switch (m) {
         case 0:
@@ -781,6 +783,8 @@ int fn_800EC558(void) {
         switch (lbl_80281664[lbl_802822F4].nScoring) {
         case 0:
             nStrokes = lbl_8028230C;
+            nPar = lbl_80282308;
+            nHoles = lbl_80282304;
             nPen = lbl_80282300;
             switch (nRule) {
             case 1:
@@ -789,22 +793,22 @@ int fn_800EC558(void) {
                 }
                 break;
             case 2:
-                if (nStrokes - lbl_80282308 <= nMark) {
+                if (nStrokes - nPar <= nMark) {
                     return m;
                 }
                 break;
             case 3:
-                if (nStrokes <= lbl_80282308 - lbl_80282304) {
+                if (nStrokes <= nPar - nHoles) {
                     return m;
                 }
                 break;
             case 4:
-                if (nStrokes <= lbl_80282308) {
+                if (nStrokes <= nPar) {
                     return m;
                 }
                 break;
             case 5:
-                if (nStrokes <= lbl_80282308 + lbl_80282304) {
+                if (nStrokes <= nPar + nHoles) {
                     return m;
                 }
                 break;
@@ -817,10 +821,11 @@ int fn_800EC558(void) {
                 if (gpGame->n4 == 1) {
                     if (fn_800ED6F0()) {
                         if (gpGame->bD4) {
+                            nPlayoff = 2;
                             if (gPlayers[0].nHolesWon > gPlayers[1].nHolesWon) {
-                                return 1;
+                                nPlayoff = 1;
                             }
-                            return 2;
+                            return nPlayoff;
                         }
                         if (gPlayers[0].nHolesWon - gPlayers[1].nHolesWon >= nMark) {
                             return m;
@@ -850,7 +855,7 @@ int fn_800EC558(void) {
             case 8:
                 bBest = 1;
                 for (i = 1; i < gNumPlayersSetUp; i++) {
-                    if (gPlayers[0].n274 <= gPlayers[i].n274) {
+                    if (gPlayers[0].n274 <= PLAYER(i)->n274) {
                         bBest = 0;
                     }
                 }
