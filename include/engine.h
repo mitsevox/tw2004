@@ -293,6 +293,53 @@ LAYOUT_ASSERT(ModuleHooks, 0x44);
 
 extern ModuleHooks lbl_80188E88[20];
 
+// A dynamic rendering buffer (DynamicRenderingBuffer.c; our name, after the header its allocations
+// name, "GoShaderObjectCommon_DynamicRenderingBuffer_Gc.h"): vertices a shader object rewrites every
+// frame. The vertex arrays are double-buffered (nBuffer picks the pair being filled); indices and
+// the list of draws are single.
+typedef struct DynRenderDraw {
+    s32   nStart;               // 0x00  first index
+    s32   nCount;               // 0x04  indices
+    s32   nPrim;                // 0x08  primitive kind: a row of lbl_8018C7C8
+} DynRenderDraw;                // 0x0C
+
+typedef struct DynRenderDrawList {
+    u32           nDraws;       // 0x00
+    DynRenderDraw aDraws[1];    // 0x04  really as many as the buffer was made for
+} DynRenderDrawList;
+
+// A draw as callers hand it in (8 bytes).
+typedef struct DynRenderDrawIn {
+    s32   nPrim;                // 0x00
+    u16   nStart;               // 0x04
+    u16   nCount;               // 0x06
+} DynRenderDrawIn;
+
+typedef struct DynRenderBuffer {
+    DynRenderDrawList* pDraws;      // 0x00
+    u16*  pIndices;                 // 0x04
+    f32*  apPos[2];                 // 0x08  3 floats per vertex
+    u32*  apColour[2];              // 0x10  one RGBA colour per vertex
+    f32*  apTexCoord[2];            // 0x18  2 floats per vertex
+    s32   nMaxVerts;                // 0x20
+    s32   nMaxDraws;                // 0x24
+    s32   nIndices;                 // 0x28  indices written so far
+    s32   nVerts;                   // 0x2C  vertices written so far
+    u8    nBuffer;                  // 0x30  0 or 1
+} DynRenderBuffer;
+LAYOUT_ASSERT(DynRenderBuffer, 0x34);
+
+extern u32 lbl_8018C7C8[4];     // the GX primitive for each DynRenderDraw nPrim
+
+DynRenderBuffer* fn_8007018C(int nMaxVerts, int nMaxDraws);    // make
+void fn_80070348(DynRenderBuffer* pBuf);                         // free
+void fn_800703B8(DynRenderBuffer* pBuf, u32 nStart, u16 nCount, int nPrim);  // draw
+void fn_800704C4(DynRenderBuffer* pBuf, const void* pPos, const void* pColour, const void* pTexCoord,
+                 int nVerts, u8 bFlip);                          // add vertices
+void fn_800705F0(DynRenderBuffer* pBuf, u16* pIndices, u32 nCount, u8 bRestart);  // add indices
+void fn_80070764(DynRenderBuffer* pBuf, const DynRenderDrawIn* pDraws, u16 nCount, int nPrim,
+                 u8 bRestart);                                   // add draws
+
 // A render surface (GoRenderSurface.c; our name, after the file): one of five 0x2C-byte slots at
 // lbl_801D3950. A slot whose n0 is not 1 owns a buffer of nSize bytes. Only what the code reads.
 typedef struct RenderSurface {

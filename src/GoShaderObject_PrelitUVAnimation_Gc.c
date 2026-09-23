@@ -2,6 +2,7 @@
 // sweep code below is the matched small functions.
 
 #include "game_types.h"
+#include "engine.h"
 
 // ---- sweep code (not yet cleaned up) ----
 
@@ -13,8 +14,6 @@ void fn_8007117C(u8* p0);
 s32 GXSetArray(s32, s32, s32);
 s32 fn_80070168(s32, s32);
 void fn_800711A4(void* arg0);
-void fn_80009E70();
-void fn_80070348();
 void fn_800712B4(u8* p0);
 
 void fn_80071148(u8* p0, s32 p1) {
@@ -34,8 +33,8 @@ void fn_800711A4(void* arg0) {
 }
 
 void fn_800712B4(u8* p0) {
-    fn_80009E70(*(s32*)(p0 + 0x8));
-    fn_80070348(*(s32*)(p0 + 0x4));
+    fn_80009E70(*(void**)(p0 + 0x8));
+    fn_80070348(*(DynRenderBuffer**)(p0 + 0x4));
 }
 
 // ---- end of sweep code ----
