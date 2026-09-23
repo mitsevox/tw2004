@@ -48,7 +48,7 @@ void   MIXInit(void);
 void   AXSetMode(u32 uMode);
 u32    OSGetSoundMode(void);
 void   fn_80145B1C(u32 uMode);          // MIX: the output mode (mono, stereo, surround)
-void   fn_80136DF4(void (*pfn)(void));  // AX: the callback run after each audio frame
+void   AXRegisterCallback(void (*pfn)(void));  // the callback run after each audio frame
 void*  fn_800B5BD8(u32 uSize);
 u32    fn_800B5D34(void* pHeap, u32 uSize, u32 uAlign);   // ARAM heap: allocate, returns the address
 void   fn_800B5E88(void* pHeap, u32 uAddr);               // ARAM heap: free
@@ -57,7 +57,7 @@ u32    fn_800B6564(u32 uSize);          // take ARAM, returns its address
 void*  fn_800B5C40(u32 uSize, u32 uAram, u32 uAlign, void* pInfo);   // ARAM heap: create
 void   fn_800B65C0(void* pSrc, u32 uAram, u32 uLen, int a, int b, void (*pfnDone)(void), int n,
                    int c);                                            // ARAM DMA
-void   AXSetVoiceSrc(AXVPB* pVpb, f32 fRatio);          // the playback rate
+void   AXSetVoiceSrcRatio(AXVPB* pVpb, f32 fRatio);     // the playback rate
 void   AXSetVoiceAdpcm(AXVPB* pVpb, u32* pCoefs);
 void   AXSetVoiceAdpcmLoop(AXVPB* pVpb, u16* pLoop);
 void   AXSetVoiceType(AXVPB* pVpb, u32 uType);
@@ -178,7 +178,7 @@ void fn_800AF324(void) {
         }
         if (p->flags.b.bSetSrc) {
             p->flags.b.bSetSrc = 0;
-            AXSetVoiceSrc(p->pVpb, (1.0f / 65536.0f) * p->u40);
+            AXSetVoiceSrcRatio(p->pVpb, (1.0f / 65536.0f) * p->u40);
         }
         if (p->flags.b.bSetAuxA) {
             p->flags.b.bSetAuxA = 0;
@@ -368,7 +368,7 @@ int fn_800AFAB0(void) {
         fn_800AF9BC(i);
         fn_800AFA2C(i);
     }
-    fn_80136DF4(fn_800AF324);
+    AXRegisterCallback(fn_800AF324);
     return 1;
 }
 
