@@ -339,7 +339,7 @@ typedef struct Player {
     s32  nDDC;                  // 0xDDC
     s32  nDE0;                  // 0xDE0
     s32  nDE4[40];              // 0xDE4  per target (fn_800F1D34), 0 = not yet hit
-    s8   nTarget;               // 0xE84  the current target (GameMode10.c)
+    s8   nTarget;               // 0xE84  the current target (set in GameTargets.c)
     u8   unkE85[3];
     s32  nE88;                  // 0xE88  below 5: still in (mode 15)
     s32  nE8C;                  // 0xE8C

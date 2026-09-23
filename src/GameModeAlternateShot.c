@@ -193,6 +193,8 @@ s32 fn_800E6C8C(int nPlayer) {
             }
         }
     }
+    // fake match: the tee-order loop reuses the hole counter h; a counter of its own gets another
+    // register (h, t or w all match)
     for (h = 0; h < gNumPlayersSetUp; h++) {
         if (nPlayer != order.a[h] && Player_OnTee(order.a[h]) && fn_800E6A98(order.a[h]) &&
             !fn_800E69CC(fn_800E6AF8(order.a[h]))) {

@@ -158,6 +158,7 @@ s32 fn_800E9178(int nPlayer) {
     int w;
     int t;
     int i;
+    int j;
     CourseInfo* pCourse;
     int nHole;
     f32 fBest;
@@ -195,9 +196,9 @@ s32 fn_800E9178(int nPlayer) {
             }
         }
     }
-    for (h = 0; h < gNumPlayersSetUp; h++) {
-        if (nPlayer != order.a[h] && Player_OnTee(order.a[h]) && !fn_800E8E24(fn_800E947C(order.a[h]))) {
-            return order.a[h];
+    for (j = 0; j < gNumPlayersSetUp; j++) {
+        if (nPlayer != order.a[j] && Player_OnTee(order.a[j]) && !fn_800E8E24(fn_800E947C(order.a[j]))) {
+            return order.a[j];
         }
     }
     pCourse = fn_8000C594();
