@@ -24,6 +24,13 @@ typedef union MsgArg {
     void* p;
 } MsgArg;
 
+// A string value: the message holds a pointer to this.
+typedef struct MsgString {
+    s32   n0;
+    s32   nLen;
+    char* pStr;
+} MsgString;
+
 // Send message nMsg with nArgs values to a front-end handler (fn_8016B09C also sends through it).
 void fn_8016B0F8(void* pHandler, int nMsg, int nArgs, MsgArg* pArgs);
 
