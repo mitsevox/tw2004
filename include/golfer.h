@@ -6,6 +6,7 @@
 #define GOLFER_H
 
 #include "game_types.h"
+#include "engine.h"
 
 // ---- attributes -----------------------------------------------------------------------------
 
@@ -614,21 +615,12 @@ extern SurfaceType  gSurfaceTypes[];    // 0x8017E9B8
 
 int  Game_GetMode(void);                // 0x8000BED8
 int  fn_800D2B08(void);
-u32  Rand_Next(int nStream);            // 0x8000B130  EA's lagged-Fibonacci generator
-f32  Rand_Float(int nStream);           // 0x8000B428  [0, 1)
-f32  fn_800095F0(f32 fAngle);           // sin
-f32  fn_80009638(f32 fAngle);           // cos
-double fn_80009680(double x);           // sqrt
-double fn_8015F824(double x, double y); // pow
-void Vec_Copy(f32* pSrc, f32* pDst);   // 0x8000AD10
-f32  Terrain_HeightAt(f32* pPos, SurfaceType** ppSurface);   // 0x800447DC
 f32  fn_80050D34(f32 fDist);            // putt power for a distance
 f32  fn_80050F44(int nKind, int nClub); // a club's table reach for a shot kind
 f32  fn_80050F88(f32 fDist, u8* pParams, int nKind, int nClub);   // chip power
 f32  fn_800510EC(u8* pBall);            // the ball's f70 + its surface's +0x00
 int  fn_80100744(void);                 // shot kind override, 8 = none
 int  fn_801006F0(int nPlayer);          // club override, 26 = none
-CourseInfo* fn_8000C594(void);
 int  fn_80015464(void);
 u8   fn_80101DF4(void);
 f32  fn_8005C418(int nSpin);
