@@ -16,6 +16,20 @@ if '-j' in args:
 unit, fn = args[0], args[1]
 jobs = min(jobs, 4)                  # the machine is shared (docs/workflow.md)
 
+def kill_orphan_workers():
+    """Kill permuter pool workers whose parent is gone. Windows does not end a multiprocessing
+    worker when its parent dies, so a permuter that finished, crashed or was stopped from outside
+    this script leaves its pool behind (60 idle workers holding 2.9 GB were found on 2026-09-23)."""
+    if os.name != 'nt':
+        return
+    ps = ("$p = Get-CimInstance Win32_Process; $alive = $p.ProcessId; "
+          "$p | Where-Object { $_.CommandLine -match 'spawn_main\\(parent_pid=(\\d+)' -and "
+          "-not ($alive -contains [int]$Matches[1]) } | "
+          "ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }")
+    subprocess.run(['powershell', '-NoProfile', '-Command', ps], capture_output=True)
+
+
+kill_orphan_workers()                # leftovers of earlier runs
 subprocess.run([sys.executable, str(ROOT / 'tools/match/perm_setup.py'), unit, fn], check=True)
 out = ROOT / 'build/perm' / fn
 p = subprocess.Popen([sys.executable, PERMUTER, str(out), '-j%d' % jobs, '--best-only'],
@@ -23,11 +37,15 @@ p = subprocess.Popen([sys.executable, PERMUTER, str(out), '-j%d' % jobs, '--best
 try:
     p.wait(timeout=minutes * 60)
 except subprocess.TimeoutExpired:
-    if os.name == 'nt':
-        subprocess.run(['taskkill', '/PID', str(p.pid), '/T', '/F'], capture_output=True)
-    else:
-        p.kill()
-    p.wait()
+    pass
+finally:                             # whatever ended the wait, the whole tree goes
+    if p.poll() is None:
+        if os.name == 'nt':
+            subprocess.run(['taskkill', '/PID', str(p.pid), '/T', '/F'], capture_output=True)
+        else:
+            p.kill()
+        p.wait()
+    kill_orphan_workers()
 print('permuter stopped after', 'the time limit' if p.returncode else 'finishing', f'({minutes} min)')
 best = sorted(glob.glob(str(out / 'output-*')), key=lambda d: int(d.split('output-')[1].split('-')[0]))
 if not best:
