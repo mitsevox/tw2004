@@ -144,10 +144,14 @@ f32 fn_8000C244(f32* pA, f32* pB, f32* pP) {
 
 // Where the segments a-b and c-d cross, in x and z (pOut's x and z); 0 if they do not.
 u8 fn_8000C278(f32* pA, f32* pB, f32* pC, f32* pD, f32* pOut) {
-    f32 fDx1 = pB[0] - pA[0];
-    f32 fDz1 = pB[2] - pA[2];
-    f32 fDx2 = pD[0] - pC[0];
-    f32 fDz2 = pD[2] - pC[2];
+    f32 fAx = pA[0];
+    f32 fAz = pA[2];
+    f32 fCx = pC[0];
+    f32 fCz = pC[2];
+    f32 fDx1 = pB[0] - fAx;
+    f32 fDz1 = pB[2] - fAz;
+    f32 fDx2 = pD[0] - fCx;
+    f32 fDz2 = pD[2] - fCz;
     f32 fDen = fDz2 * fDx1 - fDx2 * fDz1;
     f32 fT1;
     f32 fT2;
@@ -155,22 +159,26 @@ u8 fn_8000C278(f32* pA, f32* pB, f32* pC, f32* pD, f32* pOut) {
     if (0.0f == fDen) {
         return 0;
     }
-    fT1 = (fDx2 * (pA[2] - pC[2]) - fDz2 * (pA[0] - pC[0])) / fDen;
-    fT2 = (fDx1 * (pA[2] - pC[2]) - fDz1 * (pA[0] - pC[0])) / fDen;
+    fT1 = (fDx2 * (fAz - fCz) - fDz2 * (fAx - fCx)) / fDen;
+    fT2 = (fDx1 * (fAz - fCz) - fDz1 * (fAx - fCx)) / fDen;
     if (fT1 < 0.0f || fT1 > 1.0f || fT2 < 0.0f || fT2 > 1.0f) {
         return 0;
     }
-    pOut[0] = fT1 * fDx1 + pA[0];
-    pOut[2] = fT1 * fDz1 + pA[2];
+    pOut[0] = fT1 * fDx1 + fAx;
+    pOut[2] = fT1 * fDz1 + fAz;
     return 1;
 }
 
 // The ray from a through b crosses the segment c-d (x and z).
 u8 fn_8000C328(f32* pA, f32* pB, f32* pC, f32* pD) {
-    f32 fDx1 = pB[0] - pA[0];
-    f32 fDz1 = pB[2] - pA[2];
-    f32 fDx2 = pD[0] - pC[0];
-    f32 fDz2 = pD[2] - pC[2];
+    f32 fAx = pA[0];
+    f32 fAz = pA[2];
+    f32 fCx = pC[0];
+    f32 fCz = pC[2];
+    f32 fDx1 = pB[0] - fAx;
+    f32 fDz1 = pB[2] - fAz;
+    f32 fDx2 = pD[0] - fCx;
+    f32 fDz2 = pD[2] - fCz;
     f32 fDen = fDz2 * fDx1 - fDx2 * fDz1;
     f32 fT1;
     f32 fT2;
@@ -178,8 +186,8 @@ u8 fn_8000C328(f32* pA, f32* pB, f32* pC, f32* pD) {
     if (0.0f == fDen) {
         return 0;
     }
-    fT1 = (fDx2 * (pA[2] - pC[2]) - fDz2 * (pA[0] - pC[0])) / fDen;
-    fT2 = (fDx1 * (pA[2] - pC[2]) - fDz1 * (pA[0] - pC[0])) / fDen;
+    fT1 = (fDx2 * (fAz - fCz) - fDz2 * (fAx - fCx)) / fDen;
+    fT2 = (fDx1 * (fAz - fCz) - fDz1 * (fAx - fCx)) / fDen;
     if (fT1 < 0.0f) {
         return 0;
     }
