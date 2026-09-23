@@ -8,9 +8,6 @@
 #include "game/save.h"
 #include "game/earnings.h"
 
-extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
-extern s32 lbl_80282278;                    // the player whose turn it is
-
 // The tee order before any hole is played (lbl_80184DF0: 0, 1, 2, 3).
 typedef struct TeeOrder {
     s32 a[4];
@@ -21,13 +18,13 @@ void fn_800FFDB8(void);
 
 // TW06: GameModeStroke::Init. Up to four players, one mulligan each.
 void fn_800FF700(void) {
-    gpGame->pfn1C8 = fn_800FF700;
-    gpGame->pfn1D0 = fn_800FF7DC;
-    gpGame->pfn1D4 = fn_800FF894;
-    gpGame->pfn1D8 = fn_800FFCCC;
-    gpGame->pfn1DC = fn_800FFD54;
-    gpGame->pfn1E0 = fn_800FFDB0;
-    gpGame->pfn1F4 = fn_800FFDB8;
+    gpGame->pfnInit = fn_800FF700;
+    gpGame->pfnSetupNextGolfer = fn_800FF7DC;
+    gpGame->pfnGetHonors = fn_800FF894;
+    gpGame->pfnHoleFinished = fn_800FFCCC;
+    gpGame->pfnGameFinished = fn_800FFD54;
+    gpGame->pfnGoToPlayoff = fn_800FFDB0;
+    gpGame->pfnEndGame = fn_800FFDB8;
     gpGame->n4 = 0;
     gpGame->nMulligans = 2;
     gpGame->nC = 4;
@@ -47,7 +44,7 @@ void fn_800FF7DC(void) {
         }
         return;
     }
-    lbl_80282278 = gpGame->pfn1D4(5);
+    lbl_80282278 = gpGame->pfnGetHonors(5);
     for (i = 0; i < gNumPlayersSetUp; i++) {
         if (i == lbl_80282278) {
             GOLFERSTATE_Set(GS_PRE_SHOT, i);
@@ -155,7 +152,7 @@ s32 fn_800FF894(int nPlayer) {
 }
 
 // TW06: GameModeStroke::HoleFinished. Everyone still playing has holed out.
-u8 fn_800FFCCC(int nPlayer, int a) {
+u8 fn_800FFCCC(int nPlayer, u8 bCheck) {
     int i;
     for (i = 0; i < gNumPlayersSetUp; i++) {
         if (!Player_IsHoled(i) && !PLAYER(i)->bPlayerCut) {
@@ -166,7 +163,7 @@ u8 fn_800FFCCC(int nPlayer, int a) {
 }
 
 // TW06: GameModeStroke::GameFinished. No selected hole is left.
-u8 fn_800FFD54(int a) {
+u8 fn_800FFD54(u8 bCheck) {
     int h;
     for (h = Game_CurHoleIndex() + 1; h < 18; h++) {
         if (gpGame->bHoleSelected[h]) {
@@ -177,7 +174,7 @@ u8 fn_800FFD54(int a) {
 }
 
 // GoToPlayoff: stroke play has none.
-s32 fn_800FFDB0(void) {
+u8 fn_800FFDB0(u8 bCheck) {
     return 0;
 }
 

@@ -25,15 +25,15 @@ void fn_800E800C(void);
 
 // TW06: GameModeBattle::Init. Two players; the CPU may concede.
 void fn_800E7980(void) {
-    gpGame->pfn1C8 = fn_800E7980;
-    gpGame->pfn1CC = fn_800E7A7C;
-    gpGame->pfn1D0 = fn_800E9F14;
-    gpGame->pfn1D4 = fn_800EA084;
-    gpGame->pfn1D8 = (u8 (*)(int, int))fn_800EA278;
-    gpGame->pfn1DC = (u8 (*)(int))fn_800E7ABC;
-    gpGame->pfn1E0 = (s32 (*)(void))fn_800EA758;
-    gpGame->pfn1E8 = fn_800E7B58;
-    gpGame->pfn1F4 = fn_800E7CBC;
+    gpGame->pfnInit = fn_800E7980;
+    gpGame->pfnShutdown = fn_800E7A7C;
+    gpGame->pfnSetupNextGolfer = fn_800E9F14;
+    gpGame->pfnGetHonors = fn_800EA084;
+    gpGame->pfnHoleFinished = fn_800EA278;
+    gpGame->pfnGameFinished = fn_800E7ABC;
+    gpGame->pfnGoToPlayoff = fn_800EA758;
+    gpGame->pfnEndHole = fn_800E7B58;
+    gpGame->pfnEndGame = fn_800E7CBC;
     gpGame->pfn1F0 = fn_800E7A9C;
     gpGame->bAIConcedes = 1;
     gpGame->n4 = 1;
@@ -135,7 +135,7 @@ void fn_800E7CBC(void) {
                 if (nMoney) {
                     fn_800E4364(0, 0x6B, nPrize, nProfile);
                     fn_800D3548(nWinner, nMoney, 0);
-                    gPlayers[nWinner].n328 += nMoney;
+                    gPlayers[nWinner].money.n14 += nMoney;
                 }
             }
         }
