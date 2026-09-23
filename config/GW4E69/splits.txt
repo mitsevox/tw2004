@@ -3624,8 +3624,8 @@ GameMessages.c:
 GameAnalysis.c:
 	.text       start:0x800E5E54 end:0x800E68F0
 
-unsorted/sweep_800E6A48.c:
-	.text       start:0x800E6A48 end:0x800E6A98
+GameModeAlternateShot.c:
+	.text       start:0x800E68F0 end:0x800E7980
 
 unsorted/sweep_800E7A7C.c:
 	.text       start:0x800E7A7C end:0x800E7ABC

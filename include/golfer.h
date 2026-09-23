@@ -231,7 +231,9 @@ typedef struct Player {
     s32  n308;                  // 0x308
     u8   unk30C[2];
     u8   b30E;                  // 0x30E  a replaced ball must be dropped (GM_ReplaceOOBBall)
-    u8   unk30F[0x354 - 0x30F];
+    u8   unk30F[0x328 - 0x30F];
+    s32  nMoney;                // 0x328  prize money won (GameModeAlternateShot EndGame)
+    u8   unk32C[0x354 - 0x32C];
     // Shot block, TW06 AIshot_t (which has 6 preferred clubs where we have 8).
     s32  nClub;                 // 0x354  TW06: club
     s32  nClubPerKind[8];       // 0x358  the club Shot_Prepare would pick for each shot kind. TW06: preferredClub
@@ -383,7 +385,8 @@ typedef struct GameState {
     s32  nMode;                 // 0x000
     s32  n4;                    // 0x004
     s32  nMulligans;            // 0x008  0 none, 2 one per player per round (GM_PlayerTakeMulligan)
-    u8   unkC[0x14 - 0xC];
+    s32  nC;                    // 0x00C  4 in the team modes
+    s32  n10;                   // 0x010  4 in the team modes
     s32  nCurCourse;            // 0x014  the course of the current hole
     s32  nHoleCourse[18];       // 0x018  the round's 18 holes: which course each comes from
     s32  nCurHoleNum;           // 0x060  the current hole's number on its course
