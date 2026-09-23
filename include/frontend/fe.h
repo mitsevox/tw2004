@@ -351,5 +351,10 @@ int  fn_8010FBCC(int nX, int nY, u32* pR, u32* pG, u32* pB, u32* pA);  // a pixe
                                         // and its colour as fn_8010F7FC gives it
 void fn_8010FC3C(u8* pDst, u8* pSrc, int a, int nWidth, int nHeight);   // copy pixels: a = 0
                                         // from a texture into the logo, 1 from the logo into one
+u8*  fn_8010FF5C(u8* pLogo, int nWidth, int nHeight);   // the logo's pixels as a texture (in
+                                        // lbl_80212B60)
+
+extern u8 lbl_80212B60[64 * 64];        // a logo's pixels laid out as a texture (fn_8010FF5C);
+                                        // 64 x 64 or 128 x 32
 
 #endif
