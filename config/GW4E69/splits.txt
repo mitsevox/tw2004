@@ -3635,6 +3635,7 @@ dolphin/dvd/dvdidutils.c:
 
 src/dvd/dvdFatal.c:
 	.text       start:0x8013E13C end:0x8013E16C
+	.sbss       start:0x80282830 end:0x80282838
 
 dolphin/dvd/fstload.c:
 	.text       start:0x8013E16C end:0x8013E3AC
