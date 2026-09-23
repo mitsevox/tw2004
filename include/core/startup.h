@@ -14,7 +14,15 @@
 
 // A hardware voice (AX): only the fields this code touches.
 typedef struct AXVPB {
-    u8   unk0[0x1B2];
+    u8   unk0[0x1C];
+    u32  u1C;                   // 0x1C   which parts of the voice to send to the hardware
+    u8   unk20[0x146 - 0x20];
+    u16  n146;                  // 0x146  nonzero while the voice plays
+    u8   unk148[0x1A6 - 0x148];
+    u16  n1A6;                  // 0x1A6  Voice 0x08..0x53 is copied here when it starts
+    u8   unk1A8[0x1AE - 0x1A8];
+    u16  n1AE;                  // 0x1AE  } where the sound ends, in 4-bit units, as two halves
+    u16  n1B0;                  // 0x1B0  }
     u16  n1B2;                  // 0x1B2  } where the voice is playing, in 4-bit units, as two
     u16  n1B4;                  // 0x1B4  } halves (Voice.u14 is copied here when it starts)
 } AXVPB;
@@ -30,6 +38,14 @@ void   AXSetVoiceState(AXVPB* pVpb, u16 uState);   // 0 stopped, 1 running
 // MIX: set a new voice's input, aux A and aux B levels (dB x 10), pan, surround pan and fader.
 void   fn_80145B24(AXVPB* pVpb, u32 uMode, int nInput, int nAuxA, int nAuxB, int nPan, int nSPan,
                    int nFader);
+
+// Keeps a global the code never uses through the linker's dead-stripping (startUp.c's data has
+// three). `#pragma force_active` does not mark uninitialised data; this does.
+#ifdef __MWERKS__
+#define KEEP_UNUSED __declspec(export)
+#else
+#define KEEP_UNUSED
+#endif
 
 // ---- the voice table --------------------------------------------------------------------------
 
@@ -123,8 +139,6 @@ typedef struct Voice {
 } Voice;
 LAYOUT_ASSERT(Voice, 0x68);
 
-extern Voice* lbl_802820E8;     // NUM_VOICES entries
-
 // One 0x8000-byte chunk of a streamed sound (fn_800AB72C): the decoder's coefficients, then the
 // ADPCM data it DMAs into one half of the voice's ARAM buffer. The data's first byte is its first
 // frame's header (predictor and scale).
@@ -152,16 +166,6 @@ typedef struct MovieSoundBlock {
 #define ARAM_HEAP_SIZE 0x3FC000
 #define ARAM_ZERO_SIZE 0x400            // the silent block at the start of the heap (fn_800B0568)
 
-extern u32   lbl_802820F0;      // which of the eight 0xFE00-byte blocks at lbl_80282108 are taken
-extern s32   lbl_802820F4;      // how many are taken
-extern void* lbl_802820F8;      // the ARAM heap
-extern u32   lbl_802820FC;      // its ARAM address
-extern u32   lbl_80282100;      // the silent block's ARAM address
-extern void* lbl_80282104;      // the zeroes DMA'd into it, freed once the DMA is done
-extern u32   lbl_80282108;      // the blocks' ARAM address
-extern void* lbl_8028210C;      // the heap's bookkeeping (0x2A4 bytes)
-extern u8    lbl_80282110;      // set when that DMA is done
-
 // DMA nLen bytes from main memory to ARAM; pfnDone is called when it is done. Returns 1.
 int fn_800B044C(u32 uAram, void* pSrc, int nLen, void (*pfnDone)(void), int n);
 
@@ -177,48 +181,18 @@ typedef struct BootSound {
 } BootSound;
 LAYOUT_ASSERT(BootSound, 0x48);
 
-extern BootSound lbl_8018FE98[2];
-extern u16   lbl_80282118;      // the next voice fn_800B0858 plays on
+extern u8    lbl_8018F040[0x600];   // } the two sounds' ADPCM data: game data, so it stays in the
+extern u8    lbl_8018F640[0x858];   // } DOL's own data (split before startUp.c's)
 
-// ---- the rest ---------------------------------------------------------------------------------
+// ---- the memory-card status table -------------------------------------------------------------
 
-// A memory card's state as the card code (MC_Gc.c) keeps it, one per slot and entry; fn_8009F7F4
-// copies one out. Only the fields fn_800B09C8 reads.
-typedef struct CardInfo {
-    u32  uFlags;                // 0x00  0x02, 0x08, 0x10, 0x20, 0x40, 0x80: see fn_800B09C8
-    s32  n4;                    // 0x04  compared with what the save kinds 0 and 3 need
-    u8   unk8[0x84 - 0x8];
-    s32  n84;                   // 0x84  compared with fn_8009D3DC + fn_8009D50C
-    s32  n88;                   // 0x88  the sector size (fn_800B09C8 wants 0x2000)
-    u8   unk8C[0x98 - 0x8C];
-} CardInfo;
-LAYOUT_ASSERT(CardInfo, 0x98);
-
-// A card slot and entry, as the save-kind functions (fn_80084FB4) take them. 12 bytes: the size
-// fn_800B09C8's stack frame proves; the last word is never read there.
+// A card port and slot (core/memcard.h), as the save-kind functions (fn_80084FB4) take them.
+// 12 bytes: the size fn_800B09C8's stack frame proves; the last word is never read there.
 typedef struct CardPos {
-    s32  nSlot;                 // 0x0
-    s32  n;                     // 0x4
+    s32  nPort;                 // 0x0
+    s32  nSlot;                 // 0x4
     u8   unk8[4];
 } CardPos;
 LAYOUT_ASSERT(CardPos, 0xC);
-
-// The memory-card status table: for each of the two card slots, lbl_80282138[slot] entries
-// (always 1), each with the status fn_800B09C8 read (lbl_80282150), the status last reported
-// (lbl_80282148) and whether it has been reported (lbl_80282140).
-#define NUM_CARD_SLOTS 2
-extern s32   lbl_80282138[NUM_CARD_SLOTS];
-extern s32   lbl_80282140[NUM_CARD_SLOTS][1];
-extern s32   lbl_80282148[NUM_CARD_SLOTS][1];
-extern s32   lbl_80282150[NUM_CARD_SLOTS][1];
-extern s32   lbl_80281498;      // } the entry and slot the reports reached; -1 to start again
-extern s32   lbl_8028149C;      // }
-extern u8    lbl_802814A0;
-extern u8    lbl_80282120;      // fn_800B0960 keeps a memory-card result here
-extern s32   lbl_80282124;      // how many 'LEGL' objects fn_800B166C has kept (it keeps two)
-extern u32   lbl_80282128;      // the second one's size
-extern u32   lbl_8028212C;      // the first one's size
-extern void* lbl_80282130;      // the second one's copy
-extern void* lbl_80282134;      // the first one's copy
 
 #endif
