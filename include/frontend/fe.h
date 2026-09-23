@@ -8,6 +8,11 @@
 #include "game_types.h"
 #include "platform.h"
 
+// ---- the menu screens (FE_Manager.c) ---------------------------------------------------------
+
+void FE_MakeMoviePath(char* pName, char* pPath);        // "data/movies/<name>.NGC"
+void FE_MakeCameoMoviePath(char* pName, char* pPath);   // "data/movies/cameos/<name>.NGC"
+
 // ---- the logo editor (FE_LogoDesign.c) -------------------------------------------------------
 
 // A logo is 8-bit colour indexes into a 256-colour palette, either 64 x 64 (shape 0, drawn into
