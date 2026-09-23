@@ -8,6 +8,7 @@
 #include "game/earnings.h"
 #include "game/modes/pgatour.h"
 #include "game/modes/pgatoursim.h"
+#include "game/modes/rte.h"
 #include "core/memcard.h"
 #include "core/startup.h"
 #include "frontend/fe.h"
@@ -256,10 +257,7 @@ u8    GameModeBattle_IsClubStealingFinished(void);
 int   GameModeBattle_NumRemovableClubsLeft(int nPlayer);
 u8    GameModeBattle_RemoveClub(int nPlayer, int nClub);
 s32   GameModeDriverPGATour_GetCurrentEventID(void);          // GameModeDriverPGATour.c
-u16   GameModeDriverPGATour_GetEndDate(s32 i);
-char* GameModeDriverPGATour_GetName(s32 i);
 char* GameModeDriverRTE_GetDescription(s32 i);                // GameModeDriverRTE.c
-char* GameModeDriverRTE_GetName(s32 i);
 f32   fn_80012C30(char* sz);                                  // UFont.c: a string's width
 void  fn_8001A870(void);
 u8    fn_8003DCAC(void);
