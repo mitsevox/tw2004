@@ -56,7 +56,9 @@ typedef struct ShotObj {
     s32   uFlags;               // 0x168  bit 0x40: the backswing is being backed down (signed: the original tests it with cmpwi)
     u8    unk16C[0x17C - 0x16C];
     f32   fAnimTime;            // 0x17C
-    u8    unk180[0x4AC - 0x180];
+    u8    unk180[0x184 - 0x180];
+    f32   fAnimEnd;             // 0x184  the animation's end time
+    u8    unk188[0x4AC - 0x188];
     struct { u32 bSet; f32 fTime; u8 unk8[8]; } events[18];   // 0x4AC  animation events, by 64-bit id
     s32   n5CC;                 // 0x5CC
     u8    unk5D0[0x1624 - 0x5D0];
@@ -81,7 +83,9 @@ typedef struct View {
     s32  nCurCamera;            // 0x070
     u8   unk74[0xC4 - 0x74];
     f32  vC4[4];                // 0x0C4
-    u8   unkD4[0x114 - 0xD4];
+    u8   unkD4[0x104 - 0xD4];
+    f32  fCamTime;              // 0x104  time on this camera (state 1 moves on after 10 s)
+    u8   unk108[0x114 - 0x108];
     f32  f114;                  // 0x114
     f32  f118;                  // 0x118
     f32  f11C;                  // 0x11C
@@ -1575,7 +1579,7 @@ int Swing_UpdateDownswing(int nPlayer) {
 
 // ---- after impact ---------------------------------------------------------------------------------
 
-u32  fn_800136DC(int nController);           // buttons held
+u32  fn_800136DC(int nController);           // buttons: held << 16 | pressed this frame
 u32  fn_800142AC(int nButton, int a);        // a button's mask
 unsigned long long fn_8000BEE4(char* pName);   // a tuning name's 64-bit hash
 void fn_800102DC(unsigned long long uHash, void* pOwner, u32* pOut);   // bind a named resource
@@ -3646,11 +3650,146 @@ void SwingState01_Enter(int nPlayer) {
     }
 }
 
+void  fn_8001D95C(int nHandle, f32* pPos);
+u8    fn_80063C7C(View* pView);
+u8    fn_800559BC(u8* pBall, u8* pBall2);
+void  fn_800A3CB0(f32* pPos, int nPlayer);
+void  fn_800A3D6C(f32* pPos, int nPlayer);
+void  fn_800A3DF4(int nPlayer);
+void  fn_8001DA04(int nHandle, u8* pA, u8* pB);
+void  fn_800C70F8(View* pView, int a);
+void  fn_800C7080(View* pView);
+u8    fn_800C6E88(View* pView, int nPlayer);
+u8    fn_800C6F7C(View* pView, int nPlayer, f32 f);
+void  fn_80063CF0(View* pView, int nCamera, int nPlayer);
+extern u8*  lbl_80281DA0;                    // per player, 0x104 bytes each
+extern Vec4 lbl_801835E0;
+
+// State 1 update: addressing the ball. The game's 0x238 hook can skip it (unless the camera is
+// 0 or 11). The golfer's animation places the ball: while its "ball" event (3; 0x10 and 0x11 for
+// two other props) is pending the ball rides in the hand, and once it fires the ball is set down
+// - on the tee, 2 in up and teed. A ball still moving is stepped. Button 0 hurries the camera
+// (a CPU also rehearses here once its ball is still). When the camera is done the ball is put
+// in place and it is state 2; after 10 s on a camera it is state 2 anyway.
+void SwingState01_Update(int nPlayer) {
+    Vec4    vOffset = lbl_801835E0;
+    u8      bInHand = 0;
+    View*   pV;
+    u8*     pSlot;
+    int     nSteps, i;
+    s32*    pState;
+    f32     vHand[4];
+
+    pV    = (View*)fn_80017028(gPlayers[nPlayer].nView0);
+    pSlot = lbl_80281DA0 + nPlayer * 0x104;
+    if (pV->nCurCamera != 11 && pV->nCurCamera != 0 && gpGame->pfn238(nPlayer)) {
+        SwingStack_Push(2, nPlayer);
+        return;
+    }
+    if (fn_80095780(gPlayers[nPlayer].nShotHandle) == 10) {
+        if (fn_80048574(gPlayers[nPlayer].nShotHandle, 3)) {
+            if (fn_80062BB0(gPlayers[nPlayer].nShotHandle, 3)) {
+                fn_80062B98(gPlayers[nPlayer].nShotHandle, 3);
+                if (!fn_800559BC(gPlayers[nPlayer].ball, gPlayers[nPlayer].ball)) {
+                    fn_8005587C(gPlayers[nPlayer].ball, (f32*)gPlayers[nPlayer].ball);
+                }
+            } else {
+                fn_8001D95C(gPlayers[nPlayer].nShotHandle, (f32*)gPlayers[nPlayer].ball);
+                bInHand = 1;
+            }
+        }
+    } else if (fn_80048574(gPlayers[nPlayer].nShotHandle, 0x10)) {
+        if (fn_80062BB0(gPlayers[nPlayer].nShotHandle, 0x10)) {
+            fn_8001D95C(gPlayers[nPlayer].nShotHandle, vHand);
+            fn_80062B98(gPlayers[nPlayer].nShotHandle, 0x10);
+            fn_800A3CB0(vHand, nPlayer);
+        }
+    } else if (fn_80048574(gPlayers[nPlayer].nShotHandle, 0x11)) {
+        if (fn_80062BB0(gPlayers[nPlayer].nShotHandle, 0x11)) {
+            fn_80062B98(gPlayers[nPlayer].nShotHandle, 0x11);
+            fn_800A3DF4(nPlayer);
+        } else {
+            fn_8001D95C(gPlayers[nPlayer].nShotHandle, vHand);
+            fn_800A3D6C(vHand, nPlayer);
+        }
+    }
+    if (gPlayers[nPlayer].nLie == 0 && fn_80048574(gPlayers[nPlayer].nShotHandle, 3)) {
+        if (fn_80062BB0(gPlayers[nPlayer].nShotHandle, 3)) {
+            fn_80062B98(gPlayers[nPlayer].nShotHandle, 3);
+            *(f32*)(gPlayers[nPlayer].ball + 4) += 2.0f;
+            fn_80055AA8(gPlayers[nPlayer].ball, gPlayers[nPlayer].ball, nPlayer);
+            fn_80047EF0(gPlayers[nPlayer].ball, nPlayer, 0);
+        } else {
+            fn_8001D95C(gPlayers[nPlayer].nShotHandle, (f32*)gPlayers[nPlayer].ball);
+            fn_8001DA04(gPlayers[nPlayer].nShotHandle, pSlot + 0x30, pSlot + 0x50);
+            bInHand = 1;
+        }
+    } else if (gPlayers[nPlayer].nLie == 0) {
+        fn_80047EF0(gPlayers[nPlayer].ball, nPlayer, 0);
+    }
+    pState = (s32*)(gPlayers[nPlayer].ball + 0x64);
+    if (*pState != 0 && *(s32*)(gPlayers[nPlayer].ball + 0x80) == 0) {
+        nSteps = fn_800DB1C4(nPlayer);
+        Ball_SetSimulating(1);
+        for (i = 0; i < nSteps; i++) {
+            fn_8005567C(gPlayers[nPlayer].ball, 20);
+        }
+        Ball_SetSimulating(0);
+    } else if (*pState != 0) {
+        fn_8005587C(gPlayers[nPlayer].ball, (f32*)gPlayers[nPlayer].ball);
+    }
+    if (!Player_IsCPU(nPlayer)) {
+        if ((fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0, 0)) && !fn_80100294()) {
+            fn_800C70F8(pV, 1);
+            if (!fn_80063C90(pV)) {
+                fn_80063BF4(pV, 0.25f, (f32*)&vOffset);
+                fn_800C7080(pV);
+            }
+        }
+    } else {
+        if (*pState == 0 && !bInHand) {
+            AI_RehearseShot(nPlayer, NULL, 0, CPU_TOLERANCE);
+        }
+        if (!fn_80100294() && fn_80014300(fn_800142AC(0, 0))) {
+            fn_800C70F8(pV, 1);
+            if (!fn_80063C90(pV)) {
+                fn_80063BF4(pV, 0.25f, (f32*)&vOffset);
+                fn_800C7080(pV);
+            }
+        }
+    }
+    if (fn_80095780(gPlayers[nPlayer].nShotHandle) != 10 && fn_80095780(gPlayers[nPlayer].nShotHandle) != 1 && fn_800C6E88(pV, nPlayer)) {
+        fn_80095744(gPlayers[nPlayer].nShotHandle, 5);
+        fn_80096690(gPlayers[nPlayer].nShotHandle);
+        fn_80063CF0(pV, 0x17, nPlayer);
+    }
+    if (fn_80063C7C(pV) && (fn_800C6F7C(pV, nPlayer, 0.25f) || !fn_800C6E88(pV, nPlayer))) {
+        if (bInHand) {
+            if (fn_80095780(gPlayers[nPlayer].nShotHandle) == 10) {
+                fn_8005587C(gPlayers[nPlayer].ball, &gPlayers[nPlayer].fBallX);
+            } else {
+                fn_80055AA8(gPlayers[nPlayer].ball, gPlayers[nPlayer].ball + 0x10, nPlayer);
+            }
+        }
+        SwingStack_Push(2, nPlayer);
+        return;
+    }
+    if (pV->fCamTime > 10.0f) {
+        SwingStack_Push(2, nPlayer);
+    }
+    if (fn_80095780(gPlayers[nPlayer].nShotHandle) != 10 && fn_80095780(gPlayers[nPlayer].nShotHandle) != 1 && fn_800C6F7C(pV, nPlayer, 0.25f) &&
+        !fn_80063C90(pV)) {
+        fn_80063BF4(pV, 0.25f, (f32*)&vOffset);
+    } else if ((fn_80095780(gPlayers[nPlayer].nShotHandle) == 10 || fn_80095780(gPlayers[nPlayer].nShotHandle) == 1) &&
+               ((ShotObj*)gPlayers[nPlayer].nShotHandle)->fAnimTime > ((ShotObj*)gPlayers[nPlayer].nShotHandle)->fAnimEnd - 0.25f && !fn_80063C90(pV)) {
+        fn_80063BF4(pV, 0.25f, (f32*)&vOffset);
+    }
+}
+
 
 u8    fn_8001DBF4(int nHandle);               // the ball is in the golfer's hand
 int   fn_8001EED8(void* pSkel, int nBone);    // a bone's index
 f32   fn_8004D620(CourseInfo* pCourse, f32* pPos);   // ground height, -60000 and below if none
-void  fn_8001D95C(int nHandle, f32* pPos);
 void fn_80062DDC(f32* pA, f32* pB, f32* pOut);       // a - b
 double fn_80009744(f32* pVec);                // dot with itself
 void  fn_800BAF04(f32* pSrc, f32* pDst);      // normalise (3)
@@ -4037,7 +4176,6 @@ void SwingState10_Update(int nPlayer) {
 
 u8    fn_800E46B4(void);
 u8    fn_800E4254(int nPlayer);
-u8    fn_80063C7C(View* pView);
 void  fn_800DEA44(int nPlayer);
 f32 fn_80062C28(int nHandle);
 void fn_80062B78(int nPlayer);

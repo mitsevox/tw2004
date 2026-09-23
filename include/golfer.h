@@ -281,7 +281,9 @@ typedef struct GameState {
     u8   unk210[0x228 - 0x210];
     void (*pfn228)(int nPlayer); // 0x228  called every frame of the shot setup (state 10)
     void (*pfn22C)(int nPlayer); // 0x22C  called after a re-plan in swing state 9
-    u8   unk230[0x24C - 0x230];
+    u8   unk230[0x238 - 0x230];
+    u8   (*pfn238)(int nPlayer); // 0x238  nonzero: skip addressing the ball (swing state 1)
+    u8   unk23C[0x24C - 0x23C];
     void (*pfn24C)(int nPlayer); // 0x24C  called when a swing leaves state 20
     u8   unk250[0x264 - 0x250];
     u8   (*pfn264)(int nPlayer); // 0x264  "aim at the pin?" for a re-plan

@@ -128,7 +128,15 @@ Dated log of what was done and decided, newest last. Facts and lessons belong in
   physics, and the misses come from the random +-15 stick wobble added to every human stroke.
   `Player.ballBefore` (0xB5C) is really the look-ahead ball (rename pending). Helpers:
   `dolread.py` (read main.dol by address), `grepfn.py` (asm grep with the enclosing function).
-- **Next:** `SwingState01_Update`; then `Ball.c`; optional register polish in `skalib.c`
+- **`SwingState01_Update` in C (96.1%).** State 1 is addressing the ball, not the swing: the
+  golfer's animation places or tees the ball (it rides in the hand until event 3), a moving ball
+  is stepped, a CPU rehearses, button 0 hurries the camera, state 2 when the camera is done or
+  after 10 s. The swing phase table runs in state 10 (and 12); `gameplay.md`'s table is fixed. Same
+  instruction count as the original; the rest is CSE: from the ball-state block on, ours keeps
+  `&gPlayers[n]` in a register where the original folds the state read into `lwzu` and recomputes
+  the base each time. Pointer local, value local and nested-if variants and 24 declaration orders
+  did not change it. New fields: `Game.pfn238`, `View.fCamTime` (0x104), `ShotObj.fAnimEnd` (0x184).
+- **Next:** `Ball.c`; optional register polish in `skalib.c`
   (`AnimLib_MergeOverlay`, `AnimLib_PlanBank`, `AnimLib_WalkPair`). Scratch tools in `C:\dev\scratch\tw\`:
   `sbs2.py` (normalised diff), `fnsrc.py`, `regress.py` (who lost 100%), `insert_fns.py` (add
   functions at address positions), `unwritten.py`, `find_fn.py` (search asm by regexes),

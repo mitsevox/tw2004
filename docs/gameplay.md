@@ -41,19 +41,23 @@ both stick axes every frame: forward of it the reading maps smoothly down to 1, 
 reading jumps to ~179 and runs to 255 - so the first frame past the gate already reads a third
 of the way back. A CPU or a replay starts the swing immediately.
 
-The swing states (`gSwingStates`, 27 x enter/update/exit; 43 of 67 in C)
+The swing states (`gSwingStates`, 27 x enter/update/exit; 44 of 67 in C)
 --------------------------------------------------------------------------
 
 Around the swing itself sits a state machine on a per-player stack (`SwingStack_*`). What the
 states do, from their code:
 
-    1   the swing (the phase table below runs inside it); leaving it puts the ball back
+    1   addressing the ball: the golfer's animation places or tees the ball (it rides in the
+        hand until the animation's event 3 fires), a still-moving ball is stepped, a CPU
+        rehearses once its ball is still, button 0 hurries the camera; state 2 when the camera
+        is done (or after 10 s on it); leaving it puts the ball back
     2   a CPU thinks (its rehearsal); a human goes straight to 10
     3   aiming (camera 1, camera 2 on a putt); the caddie updates here
     4-7 setup sub-states: cameras 3/4/6, button polling; the caddie updates in 4 and 6
     6   the putt preview: the caddie's solved putt is launched as a ghost (below)
     8   camera 7, then back to 12 or 0
-    10  shot setup: starts the caddie, HUD, sounds
+    10  shot setup: starts the caddie, HUD, sounds; the swing phase table below runs here
+        (`fn_80058F5C`), and in 12 for the follow-through
     11  the swing animation plays; Swing_Launch at its impact frame
     12  the ball is away
     13, 14  the ball has come to rest (a copy is kept as "before the shot")
