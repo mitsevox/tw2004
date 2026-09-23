@@ -2,15 +2,14 @@
 
 #include "game_types.h"
 
-extern s32 lbl_802813B8;
-void Vec_Copy();
+extern u8* lbl_802813B8;
 
-void fn_80035590(s32 p0);
-void fn_800355B8(s32 p0);
-void fn_80035590(s32 p0) {
-    Vec_Copy(p0, (lbl_802813B8 + 4));
+void fn_80035590(f32* p0);
+void fn_800355B8(f32* p0);
+void fn_80035590(f32* p0) {
+    Vec_Copy(p0, (f32*)(lbl_802813B8 + 4));
 }
 
-void fn_800355B8(s32 p0) {
-    Vec_Copy(p0, (lbl_802813B8 + 20));
+void fn_800355B8(f32* p0) {
+    Vec_Copy(p0, (f32*)(lbl_802813B8 + 20));
 }

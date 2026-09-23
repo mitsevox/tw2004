@@ -3,7 +3,6 @@
 #include "game_types.h"
 
 
-s32 fn_800354C4(u8* p0);
-s32 fn_800354C4(u8* p0) {
-    return (*(s32*)p0 + 88);
+void* fn_800354C4(u8** p0) {
+    return *p0 + 88;
 }
