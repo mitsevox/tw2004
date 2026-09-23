@@ -31,9 +31,6 @@ typedef struct TeeOrder {
 } TeeOrder;
 extern TeeOrder lbl_80184DF0;
 
-s32  fn_800FF894(int nPlayer);
-u8   fn_800FFCCC(int nPlayer, int a);
-u8   fn_800FFD54(int a);
 s32  fn_800FFDB0(void);
 void fn_800FFDB8(void);
 
@@ -111,10 +108,7 @@ s32 fn_800FF894(int nPlayer) {
             k = 0;
             for (n = nLow; n <= nHigh; n++) {
                 for (i = 0; i < gNumPlayersSetUp; i++) {
-                    if (n == gPlayers[order.a[i]].nStrokes[h]) {
-                        aSorted[k] = order.a[i];
-                        k++;
-                    }
+                    AddIfScore(aSorted, &k, order.a[i], h, n);
                 }
             }
             for (i = 0; i < gNumPlayersSetUp; i++) {

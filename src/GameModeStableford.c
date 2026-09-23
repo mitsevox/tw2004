@@ -121,10 +121,7 @@ s32 fn_800FE3FC(int nPlayer) {
             n = 0;
             for (nScore = nLow; nScore <= nHigh; nScore++) {
                 for (k = 0; k < gNumPlayersSetUp; k++) {
-                    if (nScore == gPlayers[(u32)aOrder[k]].nStrokes[h]) {
-                        aSorted[n] = aOrder[k];
-                        n++;
-                    }
+                    AddIfScore(aSorted, &n, aOrder[k], h, nScore);
                 }
             }
             for (i = 0; i < gNumPlayersSetUp; i++) {

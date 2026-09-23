@@ -3453,41 +3453,8 @@ unsorted/sweep_800D3118.c:
 unsorted/sweep_800D3208.c:
 	.text       start:0x800D3208 end:0x800D3244
 
-unsorted/sweep_800D33F0.c:
-	.text       start:0x800D33F0 end:0x800D33F4
-
-unsorted/sweep_800D3424.c:
-	.text       start:0x800D3424 end:0x800D344C
-
-unsorted/sweep_800D344C.c:
-	.text       start:0x800D344C end:0x800D3478
-
-unsorted/sweep_800D4010.c:
-	.text       start:0x800D4010 end:0x800D4030
-
-unsorted/sweep_800D4EF8.c:
-	.text       start:0x800D4EF8 end:0x800D4F14
-
-unsorted/sweep_800D7660.c:
-	.text       start:0x800D7660 end:0x800D7684
-
-unsorted/sweep_800D7684.c:
-	.text       start:0x800D7684 end:0x800D76AC
-
-unsorted/sweep_800D86DC.c:
-	.text       start:0x800D86DC end:0x800D8720
-
-unsorted/sweep_800D8720.c:
-	.text       start:0x800D8720 end:0x800D8750
-
-unsorted/sweep_800D9954.c:
-	.text       start:0x800D9954 end:0x800D995C
-
-unsorted/sweep_800D995C.c:
-	.text       start:0x800D995C end:0x800D9998
-
-unsorted/sweep_800D9E00.c:
-	.text       start:0x800D9E00 end:0x800D9E14
+Earnings.c:
+	.text       start:0x800D3244 end:0x800D9E14
 
 unsorted/sweep_800DA174.c:
 	.text       start:0x800DA174 end:0x800DA1D4
@@ -3603,12 +3570,17 @@ GameMode8.c:
 
 GameModeStableford.c:
 	.text       start:0x800FE1B4 end:0x800FEAFC
+	.rodata     start:0x80184DE0 end:0x80184DF0
+	.sdata2     start:0x802847A0 end:0x802847A8
 
 GameMode12.c:
 	.text       start:0x800FEAFC end:0x800FF700
+	.data       start:0x80192D00 end:0x80192D1C
+	.sdata2     start:0x802847A8 end:0x802847E0
 
 GameModeStroke.c:
 	.text       start:0x800FF700 end:0x800FFF34
+	.sdata2     start:0x802847E0 end:0x802847E8
 
 GameMode11.c:
 	.text       start:0x800FFF34 end:0x80101FEC
