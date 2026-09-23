@@ -6,6 +6,7 @@
 #include "core/startup.h"
 #include "core/memcard.h"
 #include "game/frontend.h"
+#include "game_types.h"
 
 void   fn_800AF324(void);
 void   fn_800AF93C(void* pVpb);
@@ -1292,3 +1293,23 @@ f32 fn_800B1960(f32* v) {
     }
     return a + 0.25f * b - 0.0078125f * b;
 }
+
+// ---- sweep code (not yet cleaned up) ----
+
+void fn_800B1A88(f32* arg0, f32* arg1);
+void fn_800B1A9C(u8* p0, f32 x0, f32 x1);
+
+void fn_800B1A88(f32* arg0, f32* arg1) {
+    f32 temp_f1;
+
+    temp_f1 = *arg1;
+    *arg1 = *arg0;
+    *arg0 = temp_f1;
+}
+
+void fn_800B1A9C(u8* p0, f32 x0, f32 x1) {
+    *(f32*)p0 = x0;
+    *(f32*)(p0 + 0x4) = x1;
+}
+
+// ---- end of sweep code ----

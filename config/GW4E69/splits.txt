@@ -2411,17 +2411,11 @@ unsorted/sweep_800AF31C.c:
 	.text       start:0x800AF31C end:0x800AF324
 
 startUp.c:
-	.text       start:0x800AF324 end:0x800B1A40
+	.text       start:0x800AF324 end:0x800B1AA8
 	.data       start:0x8018FE98 end:0x8018FF68
 	.sdata      start:0x80281498 end:0x802814A8
 	.sbss       start:0x802820E8 end:0x80282158
 	.sdata2     start:0x80284070 end:0x802840B0
-
-unsorted/sweep_800B1A88.c:
-	.text       start:0x800B1A88 end:0x800B1A9C
-
-unsorted/sweep_800B1A9C.c:
-	.text       start:0x800B1A9C end:0x800B1AA8
 
 unsorted/sweep_800B1AA8.c:
 	.text       start:0x800B1AA8 end:0x800B1AB0
