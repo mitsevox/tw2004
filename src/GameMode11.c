@@ -375,7 +375,7 @@ void fn_80100508(void) {
 }
 
 // The shape the lesson requires, 7 (any) outside mode 11.
-int Scenario_RequiredShape(void) {
+int Scenario_RequiredShape(int nPlayer) {
     int n = lbl_802823FC - 1;
     if (Game_GetMode() != 11) {
         return 7;

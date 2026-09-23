@@ -578,15 +578,13 @@ s8 AI_NearestTarget(f32* pPos, f32* pOut) {
 // Fill in everything that follows from a target: the landing surface, the target height, the
 // distance, and (for a human) a snap to the club's reach when it is just under.
 void AI_PlanShot(int nPlayer, f32* pTarget) {
-    f32*         pDst;
     SurfaceType* pSurface = NULL;
     f32          fHeight;
     f32          fDX, fDZ;
     int          nType;
 
-    pDst = &gPlayers[nPlayer].fTargetX;
-    Vec_Copy(pTarget, pDst);
-    fHeight = Terrain_HeightAt(pDst, &pSurface);
+    Vec_Copy(pTarget, &gPlayers[nPlayer].fTargetX);
+    fHeight = Terrain_HeightAt(&gPlayers[nPlayer].fTargetX, &pSurface);
     gPlayers[nPlayer].uFlagsEF0 &= ~2;
     if (pSurface != NULL) {
         nType = pSurface - gSurfaceTypes;
@@ -620,7 +618,7 @@ void AI_PlanShot(int nPlayer, f32* pTarget) {
         }
     }
     gPlayers[nPlayer].fDistance2 = gPlayers[nPlayer].fDistance;
-    Vec_Copy(pDst, gPlayers[nPlayer].vTargetCopy);
+    Vec_Copy(&gPlayers[nPlayer].fTargetX, gPlayers[nPlayer].vTargetCopy);
 }
 
 // Aim at the pin.
@@ -638,8 +636,6 @@ void AI_DefaultTarget(int nPlayer) {
 }
 
 extern s8 gLuckOdds[8];                 // 0x802810B0  "1 in n" per player: 12 12 12 12
-u8   fn_80101D4C(int nPlayer);          // a CPU in game mode 11 is always lucky
-u8   fn_800DA234(void);                 // the current hole is the flagged one
 
 // ---- luck -------------------------------------------------------------------------------------
 
@@ -787,38 +783,38 @@ extern u8  gCaddieActive;           // 0x80281D4A
 extern s32 gCaddieFrames;           // 0x80281D4C
 
 void Caddie_Start(int nPlayer) {
-    if (!gPlayers[nPlayer].bPerfect && gPlayers[nPlayer].nShotKind != SHOT_PUTT) return;
-    if (Player_IsCPU(nPlayer)) return;
-    switch ((u32)gSession.nSplitScreen) {   // a switch, not an if: the original branches over a branch
-    case 0:
-        Mem_cpy(&gPlayers[CADDIE_SLOT], &gPlayers[nPlayer], sizeof(Player));
-        gPlayers[CADDIE_SLOT].nController = CONTROLLER_CPU;
-        AI_DefaultTarget(CADDIE_SLOT);
-        gCaddieDone   = 0;
-        gPlayers[CADDIE_SLOT].nRehearseState = 2;
-        gCaddieActive = 1;
-        gCaddieFrames = 0;
-        break;
+    if ((!gPlayers[nPlayer].bPerfect && gPlayers[nPlayer].nShotKind != SHOT_PUTT) || Player_IsCPU(nPlayer) ||
+        gSession.nSplitScreen) {
+        return;
     }
+    Mem_cpy(&gPlayers[CADDIE_SLOT], &gPlayers[nPlayer], sizeof(Player));
+    gPlayers[CADDIE_SLOT].nController = CONTROLLER_CPU;
+    AI_DefaultTarget(CADDIE_SLOT);
+    gPlayers[CADDIE_SLOT].nRehearseState = 2;
+    gCaddieDone   = 0;
+    gCaddieActive = 1;
+    gCaddieFrames = 0;
 }
 
 void Caddie_Update(int nPlayer) {
-    if (!gPlayers[nPlayer].bPerfect && gPlayers[nPlayer].nShotKind != SHOT_PUTT) return;
-    if (Player_IsCPU(nPlayer)) return;
-    switch ((u32)gSession.nSplitScreen) {   // a switch, not an if: the original branches over a branch
-    case 0:
-        if (!gCaddieActive) return;
-        if (gPlayers[nPlayer].bPerfect) {
-            f32 fDist2;
-            AI_RehearseShot(CADDIE_SLOT, &fDist2, 0, CADDIE_TOLERANCE);
-            if (fDist2 < 0.0625f) gCaddieDone = 1;
-        } else {
-            if (gCaddieDone) return;
-            if (AI_RehearseShot(CADDIE_SLOT, NULL, 0, CADDIE_TOLERANCE)) gCaddieDone = 1;
-        }
-        gCaddieFrames++;
-        break;
+    f32 fDist2;
+    if ((!gPlayers[nPlayer].bPerfect && gPlayers[nPlayer].nShotKind != SHOT_PUTT) || Player_IsCPU(nPlayer) ||
+        gSession.nSplitScreen) {
+        return;
     }
+    if (!gCaddieActive) return;
+    if (gPlayers[nPlayer].bPerfect) {
+        AI_RehearseShot(CADDIE_SLOT, &fDist2, 0, CADDIE_TOLERANCE);
+        if (fDist2 < 0.0625f) {
+            gCaddieDone = 1;
+        }
+    } else {
+        if (gCaddieDone) return;
+        if (AI_RehearseShot(CADDIE_SLOT, NULL, 0, CADDIE_TOLERANCE)) {
+            gCaddieDone = 1;
+        }
+    }
+    gCaddieFrames++;
 }
 
 // 0 = no tip for this shot, 1 = tip ready (the aim point in pOut), 2 = gave up.
@@ -863,8 +859,6 @@ extern s32 gSimClub[6];             // 0x801C65A0  per player: club the rehearsa
 #define SIM_BALL_X     (*(f32*)&gSimBall[0x00])
 #define SIM_BALL_Z     (*(f32*)&gSimBall[0x08])
 
-void fn_8001C774(int nHandle, int nClub);
-void fn_8001C724(int nHandle, int nKind);
 
 // +n on every modifier the rehearsal cares about (not LUCK), aggression the other way.
 #define BUMP_MODIFIERS(p, n)                                                                       \
@@ -892,7 +886,7 @@ void Shot_Prepare(int nPlayer, u8 bNotify) {
     p->fAim = Shot_AimAngle(nPlayer);
     for (i = 0; i < 8; i++) {
         p->nShotKind      = i;
-        p->nClubPerKind[i] = AI_ClubForShot(nPlayer, p->nShotKind, 0, p->fDistance);
+        p->nClubPerKind[(u32)i] = AI_ClubForShot(nPlayer, p->nShotKind, 0, p->fDistance);
     }
     p->nShotKind  = AI_ShotKindForDistance(nPlayer, p->fDistance);
     p->nShotKind2 = p->nShotKind;
@@ -928,18 +922,17 @@ void Shot_Prepare(int nPlayer, u8 bNotify) {
 
 // Turn the aim by fDelta radians (wrapped to -pi..pi) and re-plan the target at the same distance.
 void AI_NudgeAim(int nPlayer, f32 fDelta) {
-    Player* p = &gPlayers[nPlayer];
     f32     vTarget[4];
     f32     fSin, fCos;
 
-    p->fAim += fDelta;
-    if (p->fAim < -PI) {
-        p->fAim += 2 * PI;
-    } else if (p->fAim > PI) {
-        p->fAim -= 2 * PI;
+    gPlayers[nPlayer].fAim += fDelta;
+    if (gPlayers[nPlayer].fAim < -PI) {
+        gPlayers[nPlayer].fAim += 2 * PI;
+    } else if (gPlayers[nPlayer].fAim > PI) {
+        gPlayers[nPlayer].fAim -= 2 * PI;
     }
-    fSin = fn_800095F0(p->fAim);
-    fCos = fn_80009638(p->fAim);
+    fSin = fn_800095F0(gPlayers[nPlayer].fAim);
+    fCos = fn_80009638(gPlayers[nPlayer].fAim);
     vTarget[0] = gPlayers[nPlayer].fBallX + -fSin * gPlayers[nPlayer].fDistance;
     vTarget[2] = gPlayers[nPlayer].fBallZ + fCos * gPlayers[nPlayer].fDistance;
     AI_PlanShot(nPlayer, vTarget);
@@ -947,19 +940,14 @@ void AI_NudgeAim(int nPlayer, f32 fDelta) {
 
 // Lengthen the shot by fDelta and re-plan the target on the same line.
 void AI_NudgeDistance(int nPlayer, f32 fDelta) {
-    Player* p = &gPlayers[nPlayer];
-    f32*    pAim;
-    f32*    pDist;
     f32     vTarget[4];
     f32     fSin, fCos;
 
-    p->fDistance += fDelta;
-    pAim  = &p->fAim;
-    pDist = &p->fDistance;
-    fSin  = fn_800095F0(*pAim);
-    fCos  = fn_80009638(*pAim);
-    vTarget[0] = gPlayers[nPlayer].fBallX + -fSin * *pDist;
-    vTarget[2] = gPlayers[nPlayer].fBallZ + fCos * *pDist;
+    gPlayers[nPlayer].fDistance += fDelta;
+    fSin = fn_800095F0(gPlayers[nPlayer].fAim);
+    fCos = fn_80009638(gPlayers[nPlayer].fAim);
+    vTarget[0] = gPlayers[nPlayer].fBallX + -fSin * gPlayers[nPlayer].fDistance;
+    vTarget[2] = gPlayers[nPlayer].fBallZ + fCos * gPlayers[nPlayer].fDistance;
     AI_PlanShot(nPlayer, vTarget);
 }
 
@@ -1124,8 +1112,6 @@ u8 AI_RehearseShot(int nPlayer, f32* pOutDist2, u8 bFast, f32 fTolerance) {
 // ---- shot setup helpers -------------------------------------------------------------------------
 
 double fn_8015F7C4(double y, double x);   // atan2
-void Vec_Normalize(f32* pSrc, f32* pDst);   // 0x800BAEB0
-int  Scenario_RequiredShape(void);      // 0x8010069C  the lesson's shape in mode 11, else 7 (none)
 
 // The aim angle from the ball to the target, wrapped to -pi..pi. 0 is +z; positive turns left.
 f32 Shot_AimAngle(int nPlayer) {
@@ -1165,8 +1151,10 @@ void Shot_DefaultSpin(int nPlayer, f32* pOut) {
 // x = +-0.02 for a slight curve, +-0.04 for a big one, normalised.
 void AI_FaceVector(int nPlayer, f32* pOut) {
     Player* p = &gPlayers[nPlayer];
-    int     nShape = Scenario_RequiredShape();
-    if (nShape != 7) p->nShotShape = nShape;
+    int     nShape = Scenario_RequiredShape(nPlayer);
+    if (nShape != 7) {
+        p->nShotShape = nShape;
+    }
     pOut[0] = 0.0f;
     pOut[1] = 0.0f;
     pOut[2] = 1.0f;
@@ -1355,8 +1343,6 @@ u8 Lie_AllowsFullSwing(int nPlayer) {
 
 // ---- ground probes ------------------------------------------------------------------------------
 
-f32          fn_8004D5C0(CourseInfo* pCourse, f32* pPos);          // ground height, -65536.1 if none
-SurfaceType* fn_800CC190(CourseInfo* pCourse, f32* pPos);          // surface type under a point
 
 // Is the ground fDist yards from the ball toward the pin of class 3 (the green)? True when the
 // ball is on the pin. The CPU putts from the fringe when the green starts within 1.5 yards and
@@ -1768,8 +1754,6 @@ extern u8*  gpSaveData;             // 0x80281DF8  created-golfer profiles at +0
 extern char lbl_80187650[];         // "cl_bbsd" ... the default name at +0x1A
 
 void fn_800CB700(char* pDst, char* pSrc);       // string copy
-void fn_80055C40(int n);
-void fn_80055CD0(int n);
 u8   fn_80077B18(void);
 
 // Options_SetDefaults(): the defaults, then the debug "all 105" variant when session flag

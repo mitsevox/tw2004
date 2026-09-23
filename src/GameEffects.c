@@ -74,7 +74,6 @@ u8    fn_800C6CCC(void);
 u8    fn_800C6CB0(void);
 u8    fn_800B4AE0(void);
 f32   fn_8005B64C(int nPlayer);
-void  fn_80045558(int a, int nPlayer);
 int   fn_8003BDBC(int nPlayer, int nLie, int a, int b, int c, f32 fDist);
 void  fn_800DBFAC(void);
 void  fn_800DC18C(void);
