@@ -244,9 +244,16 @@ Dated log of what was done and decided, newest last. Facts and lessons belong in
   "Starting a new area: check the references first".
 - Numbers at the end of the day: **26.06% code, 3,714 of 7,647 functions**; EA 14.4%, SDK 82.6%.
 - **Next:**
-  1. **Golfer and Swing structs from TW06** (next up): follow the checklist; TW06 types for the
-     golfer, swing states and shot data should name most of `Golfer.c`/`Swing.c`'s `nXX`/`fXX`
-     fields. Then re-run the name matcher.
+  1. ~~Golfer and Swing structs from TW06~~ **done 2026-09-23**: `SwingData` is TW06's
+     `SW_sSwingData` (50 fields renamed: the ones our code really uses were checked against it, a few it only
+     clears were taken on the alignment; the trail colours were misread, TW06 had them right). Swing states enum added. CPU shot shapes 3/4 were swapped
+     (3 is high: +5 degrees of loft). `GolferRecord` = `GolferData_t` (2 renames); `Player` =
+     `GamePlayer` regrouped, so TW06 names are comments there. Details: `tw06-names.md`,
+     "Structs". The matcher was not re-run: no new functions were decompiled, so nothing it
+     uses changed.
+  1b. **Next up: name the 27 swing states.** TW06's `GolferStateFunctionList_t` is our
+     `gSwingStates` row exactly (init, update, close), and the PS2 map has 94 `STATEFUNC_*`
+     names. Line the tables up and our `SwingStateNN_*` get EA's names.
   2. The plain m2c sweep is exhausted (every size to 512 bytes, plus the repair pass); rerunning
      it unchanged finds nothing. Only two things reopen it: (a) literal-pool functions (float
      constants, strings), never attempted, which need units that own their `.sdata2`/`.rodata`
