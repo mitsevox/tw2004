@@ -923,7 +923,7 @@ config.libs = [
             Object(NonMatching, "shadow.c"),
             Object(NonMatching, "GoComicCam.c"),
             Object(NonMatching, "GoShaderObject_Rain_Gc.c"),
-            Object(NonMatching, "UAudMemStack.c"),
+            Object(Matching, "UAudMemStack.c"),
             Object(NonMatching, "GoARAM.c"),
             Object(NonMatching, "DiscError.c"),
             Object(NonMatching, "rcmp_mad_codec.c"),

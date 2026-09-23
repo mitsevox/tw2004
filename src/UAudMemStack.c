@@ -14,9 +14,10 @@ void  fn_800B5C34(void);
 void  fn_800B5C38(void);
 void  fn_800B5C3C(void);
 
-UAudMemStackBlock lbl_801F6360[64];     // the table of the sound engine's stack
+// Defined last-address-first: CodeWarrior lays out .bss in reverse order of definition.
+void* lbl_80282180;                     // the buffer of the sound engine's stack
 UAudMemStack lbl_801F6660;              // the sound engine's stack
-void* lbl_80282180;                     // its buffer
+UAudMemStackBlock lbl_801F6360[64];     // its table
 
 // Sets up a stack over [pMem, pMem + uSize). With no table given, the stack allocates its own.
 void fn_800B5A14(UAudMemStack* pStack, u8* pMem, u32 uSize, u32 nMaxBlocks, UAudMemStackBlock* pBlocks,

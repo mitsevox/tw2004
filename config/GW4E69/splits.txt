@@ -847,6 +847,9 @@ unsorted/sweep_800B59EC.c:
 
 UAudMemStack.c:
 	.text       start:0x800B5A14 end:0x800B5C40
+	.data       start:0x8018FFA8 end:0x8018FFB8
+	.bss        start:0x801F6360 end:0x801F6680
+	.sbss       start:0x80282180 end:0x80282188
 
 GoARAM.c:
 	.text       start:0x800B5C40 end:0x800B6924
