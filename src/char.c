@@ -66,7 +66,6 @@ f32 fn_8001EFFC(u8* p);
 void* fn_8001F004(void);
 extern f32 lbl_80282BC0;
 extern f32 lbl_80282BF8;
-extern s32 lbl_80280DF0;
 void* fn_80008370();
 
 void fn_80017864(void* arg0, s32 arg1) {
