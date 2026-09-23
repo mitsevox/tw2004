@@ -1,6 +1,6 @@
-// GameMode10.c (our name): game mode 10, playing back a saved shot (gReplayData), then the code the
-// target games (modes 13..17) share: a list of target points, the target a player aims at, the
-// shot multiplier, and dispatchers into each mode's own file.
+// GameMode10.c (our name): game mode 10, playing back a saved shot (gReplayData): the saved
+// course, hole, wind and player are put back and the shot starts again. Also the target games'
+// target list (lbl_80211D38, lbl_80282360 points); the rest of their shared code is GameTargets.c.
 
 #include "golfer.h"
 #include "ball.h"
@@ -12,28 +12,6 @@ extern Replay gReplayData;
 // The target list of the target games: up to lbl_80282360 points (w = 1).
 extern f32 lbl_80211D38[][4];
 extern s8  lbl_80282360;
-#define TARGETS lbl_80211D38
-#define NUM_TARGETS lbl_80282360
-
-// Prize rows (0x1C bytes) at lbl_80200538 + 0x710; the row with id 999 holds the target games' prizes.
-typedef struct MiniPrize {
-    s32 nId;                    // 0x00
-    s32 nMode13;                // 0x04
-    s32 nMode16;                // 0x08
-    s32 nMode17;                // 0x0C
-    u8  unk10[0xC];
-} MiniPrize;
-typedef struct PrizeTable {
-    u8        unk0[0x710];
-    MiniPrize mini[20];         // 0x710
-} PrizeTable;
-extern PrizeTable lbl_80200538;
-#define MINI_PRIZES lbl_80200538.mini
-
-extern f32 lbl_80192810[];
-extern f32 lbl_80192844[];
-extern f32 lbl_80192880[];
-extern u8 gNumPlayersSetUp;
 
 void  fn_800E14E0(int nCourse);
 void  fn_800E1404(int nHole);
@@ -42,22 +20,9 @@ void  Wind_Set(int nDir, f32 fSpeed);
 void  fn_80055C40(int n);
 void  fn_80055CAC(int n);
 void  fn_80055CD0(int n);
-f32   Vec_Distance(f32* pA, f32* pB);
 void  fn_8001C774(int nHandle, int nClub);
 void  fn_8001C724(int nHandle, int nKind);
 void  fn_8006BF60(int nPlayer);
-int   fn_8001D324(int n);
-void  Character_SetPosition(int nHandle, f32* pPos, int a);
-void  Shot_Prepare(int nPlayer, u8 bNotify);
-void  fn_800A631C(void);
-s32   fn_800F37F8(s32);
-s32   fn_800F59CC(s32);
-s32   fn_800F6A00(s32);
-s32   fn_800F7D94(s32);
-s32   fn_800F7D9C(s32);
-s32   fn_800F59D4(s32);
-s32   fn_800F80A0(s32);
-s32   fn_800F6A34(s32);
 
 void fn_800F1388(void);
 void fn_800F1404(void);
@@ -67,7 +32,6 @@ void fn_800F18C8(void);
 u8   fn_800F193C(int nPlayer, int a);
 u8   fn_800F1944(int a);
 void fn_800F194C(void);
-u8   fn_800F2358(int nPlayer);
 
 // Mode 10 starts: one player, no mulligans, the saved shot's hole.
 void fn_800F125C(void) {
@@ -209,391 +173,27 @@ void fn_800F194C(void) {
     gSession.unk11[1] = 1;
 }
 
+// fake match: the original's .sdata2 has a 0.0f here (0x80284694, after 100.0f and before 1.0f)
+// that no code loads; where it came from is unknown (a stripped function's constant would be
+// stripped with it). Defined as data, kept through the linker's dead-stripping, so the file's
+// constants line up.
+#pragma force_active on
+const f32 lbl_80284694 = 0.0f;
+#pragma force_active reset
+
 // The target games' target list.
 int fn_800F1960(void) {
-    return NUM_TARGETS;
+    return lbl_80282360;
 }
 
 void fn_800F196C(int i, f32* pOut) {
-    Vec_Copy(TARGETS[i], pOut);
+    Vec_Copy(lbl_80211D38[i], pOut);
 }
 
 void fn_800F199C(f32 x, f32 y, f32 z) {
-    TARGETS[NUM_TARGETS][0] = x;
-    TARGETS[NUM_TARGETS][1] = y;
-    TARGETS[NUM_TARGETS][2] = z;
-    TARGETS[NUM_TARGETS][3] = 1.0f;
-    NUM_TARGETS++;
-}
-
-// Sort the targets by distance from the tee, nearest first.
-void fn_800F19D4(void) {
-    f32 tmp[4];
-    int i;
-    int j;
-    f32* pTee = (f32*)((u8*)fn_8000C594() + gSession.nTeeSet[0] * 0x10 + 0xB0);
-    for (i = 0; i < NUM_TARGETS - 1; i++) {
-        for (j = i + 1; j < NUM_TARGETS; j++) {
-            if (Vec_Distance(TARGETS[i], pTee) > Vec_Distance(TARGETS[j], pTee)) {
-                Vec_Copy(TARGETS[i], tmp);
-                Vec_Copy(TARGETS[j], TARGETS[i]);
-                Vec_Copy(tmp, TARGETS[j]);
-            }
-        }
-    }
-}
-
-// Aim the player at target n (wrapping round): the pin moves there.
-void fn_800F1ABC(int nPlayer, s8 n) {
-    u32 h;
-    gPlayers[nPlayer].nTarget = n % NUM_TARGETS;
-    Vec_Copy(TARGETS[gPlayers[nPlayer].nTarget], (f32*)fn_8000C594()->pin);
-    h = fn_8001D324(100);
-    if (h) {
-        Character_SetPosition(h, TARGETS[gPlayers[nPlayer].nTarget], 1);
-    }
-}
-
-void fn_800F1B60(int nPlayer, s8 n) {
-    fn_800F1ABC(nPlayer, n);
-    AI_DefaultTarget(nPlayer);
-    Shot_Prepare(nPlayer, 1);
-    fn_8001C804(nPlayer, 1, 1);
-    fn_800957D8(gPlayers[nPlayer].nShotHandle);
-    fn_80095744(gPlayers[nPlayer].nShotHandle, 5);
-    fn_80062C38();
-}
-
-// Previous target.
-u8 fn_800F1BD8(int nPlayer) {
-    if (gPlayers[nPlayer].nTarget == 0) {
-        fn_800F1ABC(nPlayer, NUM_TARGETS - 1);
-    } else {
-        fn_800F1ABC(nPlayer, gPlayers[nPlayer].nTarget - 1);
-    }
-    return 1;
-}
-
-// Next target.
-u8 fn_800F1C34(int nPlayer) {
-    fn_800F1ABC(nPlayer, gPlayers[nPlayer].nTarget + 1);
-    return 1;
-}
-
-// The target nearest the ball.
-s8 fn_800F1C74(int nPlayer) {
-    f32* pBall = (f32*)gPlayers[nPlayer].ball;
-    s8 i;
-    s8 nBest = 0;
-    f32 fBest = Vec_Distance(TARGETS[0], pBall);
-    for (i = 1; i < NUM_TARGETS; i++) {
-        f32 f = Vec_Distance(TARGETS[i], pBall);
-        if (f < fBest) {
-            fBest = f;
-            nBest = i;
-        }
-    }
-    return nBest;
-}
-
-// The target nearest the player's aim point.
-int fn_800F1D34(int nPlayer) {
-    f32* pTarget = &gPlayers[nPlayer].fTargetX;
-    int i;
-    int nBest = 0;
-    f32 fBest = Vec_Distance(TARGETS[0], pTarget);
-    for (i = 1; i < NUM_TARGETS; i++) {
-        f32 f = Vec_Distance(TARGETS[i], pTarget);
-        if (f < fBest) {
-            fBest = f;
-            nBest = i;
-        }
-    }
-    return nBest;
-}
-
-void fn_800F1DF0(void) {
-    if (Game_GetMode() == 0xD) {
-        fn_800F7DE8();
-    }
-}
-
-void fn_800F1E1C(void) {
-    if (Game_GetMode() == 0xE) {
-        fn_800F3828();
-    }
-    if (Game_GetMode() == 0xF) {
-        fn_800F48C4();
-    }
-}
-
-s32 fn_800F1E58(s32 n) {
-    switch (n) {
-    case 0x85: return 0;
-    case 0x86: return 1;
-    case 0x87: return 2;
-    case 0x88: return 0;
-    case 0x89: return 1;
-    case 0x8A: return 2;
-    case 0x8B: return 3;
-    case 0x8C: return 0;
-    case 0x8D: return 1;
-    case 0x8E: return 2;
-    case 0x8F: return 3;
-    case 0x90: return 4;
-    default: return 5;
-    }
-}
-
-// Every player's target-game state is cleared and aimed at the first target.
-void fn_800F1EE4(void) {
-    int i;
-    int j;
-    for (i = 0; i < 5; i++) {
-        Player* p = PLAYER(i);
-        p->nDC0 = 0;
-        for (j = 0; j < 5; j++) {
-            p->aDC4[j] = 0;
-        }
-        p->nDD8 = 0;
-        p->nDDC = 0;
-        p->nDE0 = 0;
-        p->nE88 = 0;
-        p->nE8C = 0;
-        p->nE90 = 0;
-        p->nE94 = 0;
-        p->nE98 = 0;
-        p->bE9D = 0;
-        p->bE9E = 0;
-        for (j = 0; j < 40; j++) {
-            p->nDE4[j] = 0;
-        }
-        fn_800F1ABC(i, 0);
-    }
-    fn_800F2030();
-}
-
-void fn_800F2030(void) {
-    int i;
-    int j;
-    for (i = 0; i < gNumPlayersSetUp; i++) {
-        PLAYER(i)->nCD0 = 0;
-        PLAYER(i)->nDBC = 1;
-        PLAYER(i)->nDB8 = 0;
-        for (j = 0; j < 20; j++) {
-            PLAYER(i)->aCD4[j] = 0;
-        }
-    }
-}
-
-// How many targets the player has hit.
-s32 fn_800F20C0(int nPlayer) {
-    int i;
-    s32 n = 0;
-    for (i = 0; i < 40; i++) {
-        if (gPlayers[nPlayer].nDE4[i] != 0) {
-            n++;
-        }
-    }
-    return n;
-}
-
-// After a shot, maybe a multiplier for the next one: x5, x3 or x2, more often after 10 shots
-// without one.
-void fn_800F21B4(int nPlayer) {
-    s32 nMsg = -1;
-    s32 r;
-    if (!fn_800F2358(nPlayer)) {
-        if (gPlayers[nPlayer].nE98 >= 10) {
-            r = Rand_Next(0) % 20;
-        } else {
-            r = Rand_Next(0) % 100;
-        }
-        if (r <= 5) {
-            gPlayers[nPlayer].nDBC = 5;
-        } else if (r <= 10) {
-            gPlayers[nPlayer].nDBC = 3;
-        } else if (r <= 20) {
-            gPlayers[nPlayer].nDBC = 2;
-        }
-    }
-    if (gPlayers[nPlayer].nDBC > 1) {
-        gPlayers[nPlayer].nE98 = 0;
-    } else {
-        gPlayers[nPlayer].nE98++;
-    }
-    if (gPlayers[nPlayer].nDBC > 1) {
-        fn_800A631C();
-        switch (gPlayers[nPlayer].nDBC) {
-        case 2:
-            nMsg = 0x3A;
-            break;
-        case 3:
-            nMsg = 0x3B;
-            break;
-        case 4:
-            break;
-        case 5:
-            nMsg = 0x3D;
-            break;
-        }
-    }
-    if (nMsg != -1) {
-        fn_800F2958((u16)nMsg, 0);
-    }
-}
-
-// The player's game is over (all shots taken).
-u8 fn_800F2358(int nPlayer) {
-    if (Game_GetMode() == 0x10) {
-        if (gPlayers[nPlayer].nDC0 == 20) {
-            return 1;
-        }
-    } else if (Game_GetMode() == 0x11) {
-        if (gPlayers[nPlayer].nDC0 == 5) {
-            return 1;
-        }
-    } else if (gPlayers[nPlayer].nDC0 == 0) {
-        return 1;
-    }
-    return 0;
-}
-
-s32 fn_800F2408(s32 arg0) {
-    if (Game_GetMode() == 0xD) {
-        return fn_800F7D94(arg0);
-    }
-    if (Game_GetMode() == 0xE) {
-        return fn_800F37F8(arg0);
-    }
-    if (Game_GetMode() == 0x10) {
-        return fn_800F59CC(arg0);
-    }
-    if (Game_GetMode() == 0x11) {
-        return fn_800F6A00(arg0);
-    }
-    return 0;
-}
-
-s32 fn_800F2494(s32 arg0) {
-    if (Game_GetMode() == 0xD) {
-        return fn_800F7D9C(arg0);
-    }
-    return 0;
-}
-
-s32 fn_800F24D8(s32 arg0) {
-    if (Game_GetMode() == 0xD) {
-        return fn_800F80A0(arg0);
-    }
-    if (Game_GetMode() == 0x10) {
-        return fn_800F59D4(arg0);
-    }
-    return 0;
-}
-
-s32 fn_800F2534(s32 arg0) {
-    if (Game_GetMode() == 0x11) {
-        return fn_800F6A34(arg0);
-    }
-    return 0;
-}
-
-// The target game's prize (from the prize row with id 999).
-s32 fn_800F2578(void) {
-    int i;
-    for (i = 0; i < 20; i++) {
-        if (MINI_PRIZES[i].nId == 999) {
-            if (Game_GetMode() == 0xD) {
-                return MINI_PRIZES[i].nMode13;
-            }
-            if (Game_GetMode() == 0x10) {
-                return MINI_PRIZES[i].nMode16;
-            }
-            if (Game_GetMode() == 0x11) {
-                return MINI_PRIZES[i].nMode17;
-            }
-        }
-    }
-    return 0;
-}
-
-void fn_800F263C(s32 nMsg) {
-    fn_800F2958((nMsg & 0xFFFF), 1);
-}
-
-void fn_800F2664(int nPlayer) {
-}
-
-void fn_800F2668(int nPlayer) {
-}
-
-// Scale n by table entry i; which table depends on fn_80015464 (0..2).
-s32 fn_800F266C(s32 n, int i) {
-    if (fn_80015464() == 0) {
-        return n * lbl_80192810[i];
-    }
-    if (fn_80015464() == 1) {
-        return n * lbl_80192844[i];
-    }
-    if (fn_80015464() == 2) {
-        return n * lbl_80192880[i];
-    }
-    return n;
-}
-
-// Is f far enough for the player's tees (313 back, 300 middle, 293 front)?
-u8 fn_800F2788(int nPlayer, f32 f) {
-    switch (gSession.nTeeSet[nPlayer]) {
-    case 0:
-        if (f >= 313.0f) {
-            return 1;
-        }
-        break;
-    case 1:
-        if (f >= 300.0f) {
-            return 1;
-        }
-        break;
-    case 2:
-    case 3:
-        if (f >= 293.0f) {
-            return 1;
-        }
-        break;
-    }
-    return 0;
-}
-
-s32 fn_800F2810(s32 n) {
-    if (fn_80015464() == 0) {
-        switch (n) {
-        case 0xD7: return 0;
-        case 0xD5: return 1;
-        case 0xD4: return 2;
-        case 0xD6: return 3;
-        case 0xD8: return 4;
-        }
-    } else if (fn_80015464() == 1) {
-        switch (n) {
-        case 0x3B: return 0;
-        case 0x3C: return 1;
-        case 0x3D: return 2;
-        case 0x3E: return 3;
-        case 0x3F: return 4;
-        }
-    } else if (fn_80015464() == 2) {
-        switch (n) {
-        case 24: return 0;
-        case 25: return 1;
-        case 26: return 2;
-        case 27: return 3;
-        case 28: return 4;
-        }
-    }
-    return 4;
-}
-
-void fn_800F2958(s32 nMsg, s32 a) {
-    fn_800A7664(7, nMsg, a);
+    lbl_80211D38[lbl_80282360][0] = x;
+    lbl_80211D38[lbl_80282360][1] = y;
+    lbl_80211D38[lbl_80282360][2] = z;
+    lbl_80211D38[lbl_80282360][3] = 1.0f;
+    lbl_80282360++;
 }

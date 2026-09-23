@@ -2548,9 +2548,9 @@ void STATEFUNC_ZoomExit(int nPlayer) {
 
 // Leaving state 20: every set-up player's view takes this view's camera.
 void STATEFUNC_InitialFlyByExit(int nPlayer) {
+    int   i;
     View* pSrc;
     View* pDst;
-    int   i;
     fn_80017158(gPlayers[nPlayer].nView0);
     pSrc = (View*)fn_80017028(gPlayers[nPlayer].nView0);
     for (i = 0; i < gNumPlayersSetUp; i++) {
@@ -2612,14 +2612,16 @@ void STATEFUNC_GreenMorphExit(int nPlayer) {
 // player's is the same view.
 void STATEFUNC_MidHoleFlyByExit(int nPlayer) {
     View* pV;
+    int   nView;
     int   k, j;
     u8    bShared;
-    int   nView;
     for (k = 0; k < 2; k++) {
         pV      = (View*)fn_80017028((&gPlayers[nPlayer].nView0)[k]);
         bShared = 0;
         for (j = 0; j < k; j++) {
-            if (pV == (View*)fn_80017028((&gPlayers[nPlayer].nView0)[j])) bShared = 1;
+            if (pV == (View*)fn_80017028((&gPlayers[nPlayer].nView0)[j])) {
+                bShared = 1;
+            }
         }
         if (!bShared) {
             nView = (&gPlayers[nPlayer].nView0)[k];
@@ -2793,21 +2795,20 @@ void STATEFUNC_MidHoleFlyByUpdate(int nPlayer) {
 // State 20 (another camera state), the same idea with a confirm step.
 void STATEFUNC_InitialFlyByUpdate(int nPlayer) {
     u8 bDone = 0;
-    if (gSession.unk8[0] != 0 && fn_80014300(0)) {
-        return;
-    }
-    if (SESSION_OPTIONS->bSkipCameras) {
-        bDone = 1;
-    } else if (fn_800172C4(fn_80017028(gPlayers[nPlayer].nView0))) {
-        bDone = 1;
-    } else if (!fn_80100294()) {
-        if (fn_80014300(fn_800142AC(0, 0)) || fn_80062B90()) {
-            if (fn_80062B88(nPlayer)) {
-                bDone = 1;
-                fn_80062B84(0);
-                fn_800A76E4();
-            } else if (fn_80062B7C()) {
-                fn_80062B84(0);
+    if (gSession.unk8[0] == 0 || !fn_80014300(0)) {
+        if (SESSION_OPTIONS->bSkipCameras) {
+            bDone = 1;
+        } else if (fn_800172C4(fn_80017028(gPlayers[nPlayer].nView0))) {
+            bDone = 1;
+        } else if (!fn_80100294()) {
+            if (fn_80014300(fn_800142AC(0, 0)) || fn_80062B90()) {
+                if (fn_80062B88(nPlayer)) {
+                    bDone = 1;
+                    fn_80062B84(0);
+                    fn_800A76E4();
+                } else if (fn_80062B7C()) {
+                    fn_80062B84(0);
+                }
             }
         }
     }

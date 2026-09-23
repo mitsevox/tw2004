@@ -84,7 +84,7 @@ void fn_800EDE78(void);                 // GameMode23.c
 u8   fn_800EE470(void);                 // GameMode23.c
 u8   fn_800F0818(void);                 // GameMode24.c
 
-// GameMode10.c: what the target games (modes 13..17) share
+// GameTargets.c: what the target games (modes 13..17) share
 void fn_800F19D4(void);                 // sort the targets by distance from the tee
 void fn_800F1ABC(int nPlayer, s8 n);
 void fn_800F1B60(int nPlayer, s8 n);

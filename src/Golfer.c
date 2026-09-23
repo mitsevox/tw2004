@@ -1462,17 +1462,27 @@ u8 Player_IsHoledNotState23(int nPlayer) {
 
 // Team 0 is players 0 and 1, team 1 players 2 and 3.
 u8 Team_IsAllCPU(int nTeam) {
+    s32 i;
     int nFirst = 2;
-    if (nTeam == 0) nFirst = 0;
-    if (gPlayers[nFirst].nController == CONTROLLER_CPU && gPlayers[nFirst + 1].nController == CONTROLLER_CPU) return 1;
-    return 0;
+    if (nTeam == 0) {
+        nFirst = 0;
+    }
+    for (i = 0; i < 2; i++) {
+        if (gPlayers[nFirst + i].nController != CONTROLLER_CPU) return 0;
+    }
+    return 1;
 }
 
 u8 Team_IsAllHuman(int nTeam) {
+    s32 i;
     int nFirst = 2;
-    if (nTeam == 0) nFirst = 0;
-    if (gPlayers[nFirst].nController != CONTROLLER_CPU && gPlayers[nFirst + 1].nController != CONTROLLER_CPU) return 1;
-    return 0;
+    if (nTeam == 0) {
+        nFirst = 0;
+    }
+    for (i = 0; i < 2; i++) {
+        if (gPlayers[nFirst + i].nController == CONTROLLER_CPU) return 0;
+    }
+    return 1;
 }
 
 u8 Player_IsController8(int nPlayer) {

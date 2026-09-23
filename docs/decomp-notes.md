@@ -229,6 +229,10 @@ The fixes that come up most often. Each points to its full entry below.
 
 ### Structs, arrays and pointers
 
+- **[verified] `a[k] = x; k++;` and `a[k++] = x;` compile differently.** The split form gives
+  walking pointers (`&a[k]` stepped by `addi 4`, and `&a[0]` kept for a later loop); `k++` in the
+  index gives `stwx` with a scaled index; a `*p++ = x` walk gives one pointer. GameMode0
+  `fn_800FF894`: the split form took it from 94.9% to 99.6%.
 - **[verified] The `lwzu`/`lfsu` idiom is a repeated field access, not a pointer local.** When the
   same `gPlayers[n].field` is read again after a call, CodeWarrior makes a pointer to the field
   itself and folds the first read into `lwzu rD, off(rP)`; later reads are `lwz rD, 0(rP)`. An
@@ -289,6 +293,16 @@ The fixes that come up most often. Each points to its full entry below.
 
 ### Types, casts and sign extension
 
+- **[verified] Two neighbouring words handled with 64-bit operations are one `u64`.** When the
+  code ORs, ANDs and tests two adjacent words together (`and`/`xor`/`or.` on both halves, an AND
+  with `li -1` for the upper word), declare one `u64` field. Player 0xC48/0xC4C as two `s32`s
+  could not match in any statement order; as `u64 uC48` GameMode8 `fn_800FAAB8` went 93.3% ->
+  99.2%, then exact with statement order.
+- **[verified] The ball position is read as bytes of the Player, not through a `Ball*`.**
+  `*(f32*)(gPlayers[n].ball + 0)` / `+ 8` matches; `((Ball*)gPlayers[n].ball)->vPos[0]` and
+  `((f32*)gPlayers[n].ball)[0]` add an `addi r3, r3, 0xa90` pointer temp (GameMode8
+  `fn_800FAD54`, 99.66%). Same rule as the GetHonors shape above, for `gPlayers[n]`. It is the
+  one sanctioned raw offset until `Player.ball` gets a real type that matches.
 - **[verified] `int` vs `long` changes the code.** For an `int` local CodeWarrior folds
   `n += 3` into every later use (`addi r5, rN, 3` at a call, `addi r0, rN, 3; cmpwi r0, 8`, ...),
   even when that costs instructions, and treats `n += *p` / `n = n + *p` as an in-place update.
@@ -487,6 +501,16 @@ The fixes that come up most often. Each points to its full entry below.
 
 ### Data, constants and symbols
 
+- **[verified] An exact unit can still fail the link on function order.** objdiff scores each
+  function by name, so a function defined out of address order reads 100% while the linked
+  `.text` shifts. GameUI `fn_800E3ECC` was defined after `fn_800E3EE0`; moving it fixed the DOL.
+- **[verified] A constant the original has twice means the original was two files.**
+  CodeWarrior keeps one copy of each constant per file. GameMode10's code emits one int-to-float
+  conversion double; the original has two (`lbl_80284688`, `lbl_802846A0`), each with the
+  constants of one half of the unit, so the unit is two original files.
+- **[verified] Constants shared with undecompiled neighbours mean the unit is a slice.** CharAnim
+  uses three constants from a pool at 0x80283CD8 that neighbouring code also uses; it can link
+  only once the unit is widened to own the whole pool.
 - **[verified] An exact unit can still break the linked build.** objdiff compares functions; the
   DOL check also needs the data layout. A unit whose C makes the compiler emit its own data (the
   8-byte int-to-float constant `0x4330000080000000` in `.sdata2`, a string literal, a static)

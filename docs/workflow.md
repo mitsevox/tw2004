@@ -93,6 +93,11 @@ function's first N declaration lines and keeps the best:
 python tools/match/declperm.py <Unit> src/<Unit>.c <fn> <N>
 ```
 
+Prefer an exact order close to the natural one: a reader should not wonder why the declarations
+are shuffled. When full permutations only find scrambled orders, try orders a few adjacent swaps
+from the natural one first (GameMode0 `fn_800FFDB8`: 137 of 633 such orders were exact, one a
+single swap from natural).
+
 **The permuter** searches random rewrites for you. It is slow (minutes to hours) but has solved
 functions nothing else did (`fn_800F6ED4`: the loop counter had to be `long`).
 
@@ -123,10 +128,27 @@ compiled for scoring only; the DOL is still built from the original code for the
 function is exact, change the unit to `Object(Matching, ...)` in `configure.py`, run
 `python configure.py`, and rebuild: `main.dol: OK` now proves the unit byte for byte.
 
-If the DOL fails, the unit's data does not line up yet: usually float constants (`.sdata2`),
-strings or tables it owns are still split into the surrounding `auto_*` units. Give the unit its
-data ranges in `splits.txt` (see "Data, constants and symbols" in `decomp-notes.md`) and try
-again. Leave it `NonMatching` until the DOL passes.
+If the DOL fails, the unit's data does not line up yet: its float constants (`.sdata2`) or
+switch tables (`.data`) are still split into the surrounding `auto_*` units, so linking adds a
+second copy. The steps:
+
+1. `python tools/match/datamap.py <Unit>` lists the data sections our object emits and, for each
+   constant, the original symbol, its address and size, and which units use it.
+2. Continue only if the unit is the only user and the addresses are contiguous. Each object's
+   `.sdata2` is 8-aligned, so a lone 4-byte float owns 8 bytes; a range runs from the unit's first
+   constant to the next unit's first constant, and its length equals our section size rounded up
+   to 8.
+3. `python tools/match/graduate.py <Unit>.c ".sdata2 0x... 0x..." [".data 0x... 0x..."]` adds the
+   ranges, switches the unit to Matching and rebuilds; it puts both files back if the DOL fails.
+4. Still failing: `python tools/match/doldiff.py orig/GW4E69/sys/main.dol build/GW4E69/main.dol`
+   prints the differing ranges. A shifted block inside the unit's `.text` means a function is
+   defined out of address order (objdiff scores by name, so it still showed 100%); differences
+   only in data mean a range is wrong.
+5. Stop and report, don't force it, when one of our constants maps to two original symbols (the
+   original was two files) or the constants are shared with neighbouring code (the unit is a
+   slice of a larger file).
+
+Leave the unit `NonMatching` until the DOL passes.
 
 When stuck
 ----------

@@ -7,7 +7,7 @@
 #include "game.h"
 #include "engine.h"
 
-// The prize rows at lbl_80200538 + 0x710 (see GameMode10.c).
+// The prize rows at lbl_80200538 + 0x710 (see GameTargets.c).
 typedef struct MiniPrize {
     s32 nId;                    // 0x00  a surface id (0x85..0x90 are the target rings), 999 the prize row
     s32 nMode13;                // 0x04
