@@ -123,8 +123,6 @@ f32   GM_GetBonusProgress(SaveProfile* pProfile);
 extern s32 lbl_80189528[14];
 extern s32 lbl_801894D0[6];
 
-int   strcmp(const char* a, const char* b);
-
 void fn_800DCAD8(void) {
     fn_800E58B4(50);
 }

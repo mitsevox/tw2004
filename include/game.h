@@ -296,6 +296,7 @@ void fn_800FE1B4(void);                 // mode 18 (GameModeStableford.c)
 void fn_800FEAFC(void);                 // mode 12 (GameMode12.c)
 void fn_800FF700(void);                 // mode 0 (GameModeStroke.c)
 void fn_800FFF34(void);                 // mode 11 (GameMode11.c)
+void fn_80101FEC(void);                 // mode 4 (GameMode4.c)
 
 int  fn_800E8C24(int nPlayer, int nHole);   // GameModeBestBall.c
 

@@ -20,7 +20,6 @@ void  fn_800E3050(int nCourse);
 int   fn_8011937C(int nPlayer, int a, u8 b);
 
 int   fn_800E8C24(int nPlayer, int nHole);
-int   sprintf(char* pBuf, const char* pFmt, ...);
 
 extern char lbl_80282270[8];                // the hole name
 
@@ -45,7 +44,6 @@ s32   fn_800E3AA0(int a, int nTarget);
 void  fn_800FF700(void);
 void  fn_800E9E40(void);
 void  fn_800F80FC(void);
-void  fn_80101FEC(void);
 void  fn_800F944C(void);
 void  fn_800F9610(void);
 void  fn_800F986C(void);
