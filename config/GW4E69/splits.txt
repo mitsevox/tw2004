@@ -3399,32 +3399,8 @@ unsorted/sweep_8012CC48.c:
 unsorted/sweep_8012CCC0.c:
 	.text       start:0x8012CCC0 end:0x8012CCD8
 
-unsorted/sweep_8012D0D4.c:
-	.text       start:0x8012D0D4 end:0x8012D1A0
-
-unsorted/sweep_8012D744.c:
-	.text       start:0x8012D744 end:0x8012D794
-
-unsorted/sweep_8012D7F0.c:
-	.text       start:0x8012D7F0 end:0x8012D7F8
-
-unsorted/sweep_8012DD24.c:
-	.text       start:0x8012DD24 end:0x8012DD7C
-
-unsorted/sweep_8012DDE0.c:
-	.text       start:0x8012DDE0 end:0x8012DE38
-
-unsorted/sweep_8012DE38.c:
-	.text       start:0x8012DE38 end:0x8012DE90
-
-unsorted/sweep_8012E818.c:
-	.text       start:0x8012E818 end:0x8012E820
-
-unsorted/sweep_8012E820.c:
-	.text       start:0x8012E820 end:0x8012E8A8
-
-unsorted/sweep_8012E8A8.c:
-	.text       start:0x8012E8A8 end:0x8012E950
+EASB.c:
+	.text       start:0x8012CCD8 end:0x8012E950
 
 src/vi/vi.c:
 	.text       start:0x8012E950 end:0x8013042C
