@@ -24,5 +24,7 @@ Changed for this game (so the units link into the DOL):
   `__AXDSPTask` and `__AXDramImage` are globals, laid out after `__AXLocalProfile`.
 - `src/ax/AXVPB.c`: `__AXServiceVPB` does not copy the current address back to the user's
   parameter block when only the loop or end address changed.
+- `src/mix/mix.c`: this game's MIX takes 6 dB (not 3 dB) off the rear channel, and in mono and
+  stereo `MIXInitChannel` gives the dry rear level (`vS`) no cut at all.
 - `src/MSL_C/PPCEABI/bare/H/alloc.c`: the malloc pool's flag is one `unsigned char initialized`
   (FFCC has an `int` read through a byte cast, plus an unused `init` static the game lacks).

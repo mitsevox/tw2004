@@ -3470,8 +3470,11 @@ dolphin/gx/GXPerf.c:
 	.text       start:0x80145140 end:0x80145998
 	.data       start:0x8019A430 end:0x8019A520
 
-unsorted/sweep_80145B1C.c:
-	.text       start:0x80145B1C end:0x80145B24
+src/mix/mix.c:
+	.text       start:0x80145998 end:0x80147B94
+	.data       start:0x8019A520 end:0x8019B0E0
+	.bss        start:0x8027B160 end:0x8027C960
+	.sbss       start:0x80282898 end:0x802828A8
 
 dolphin/mtx/mtx.c:
 	.text       start:0x80147B94 end:0x80147DB0
