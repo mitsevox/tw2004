@@ -2144,6 +2144,24 @@ void fn_8007D9D0(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = lbl_80281ED4->nSlot;
 }
 
+// Move on to the next slot with a loaded profile: its number, or -1 past the last player.
+void fn_8007D9E4(MsgArg* pArgs, MsgArg* pResult) {
+    lbl_80281ED4->nSlot++;
+    while (lbl_80281ED4->nSlot < 4 && gpSaveData[lbl_80281ED4->nSlot].bActive == 0) {
+        lbl_80281ED4->nSlot++;
+    }
+    if (lbl_80281ED4->nSlot >= 4 || lbl_80281ED4->nSlot + 1 > gSession.nNumPlayers) {
+        pResult->i = -1;
+        return;
+    }
+    pResult->i = lbl_80281ED4->nSlot;
+}
+
+// Slot pArgs[0]'s profile name.
+void fn_8007DA6C(MsgArg* pArgs, MsgArg* pResult) {
+    strcpy(((MsgString*)pArgs[1].p)->pStr, gpSaveData[pArgs[0].i].szName);
+}
+
 void fn_8007DAB0(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gpSaveData[pArgs[0].i].bActive;
 }
@@ -2186,6 +2204,58 @@ void fn_8007DB38(MsgArg* pArgs, MsgArg* pResult) {
 // A slot's profile's numbers.
 void fn_8007DB3C(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gpSaveData[pArgs[0].i].n7C;
+}
+
+// Slot pArgs[0]'s strokes per stroke-play round.
+void fn_8007DB60(MsgArg* pArgs, MsgArg* pResult) {
+    SaveProfile* pProfile = &gpSaveData[pArgs[0].i];
+
+    if (pProfile->n74 != 0) {
+        pResult->f = (f32)pProfile->n78 / (f32)pProfile->n74;
+        return;
+    }
+    pResult->f = 0.0f;
+}
+
+void fn_8007DBD8(MsgArg* pArgs, MsgArg* pResult) {
+    SaveProfile* pProfile = &gpSaveData[pArgs[0].i];
+
+    if (pProfile->n80 != 0) {
+        pResult->f = (f32)pProfile->n84 / (f32)pProfile->n80;
+        return;
+    }
+    pResult->f = 0.0f;
+}
+
+// Slot pArgs[0]'s average drive.
+void fn_8007DC50(MsgArg* pArgs, MsgArg* pResult) {
+    SaveProfile* pProfile = &gpSaveData[pArgs[0].i];
+
+    if (pProfile->n88 != 0) {
+        pResult->i = (f32)pProfile->n8C / (f32)pProfile->n88;
+        return;
+    }
+    pResult->i = 0;
+}
+
+void fn_8007DCD4(MsgArg* pArgs, MsgArg* pResult) {
+    SaveProfile* pProfile = &gpSaveData[pArgs[0].i];
+
+    if (pProfile->n90 != 0) {
+        pResult->i = 100.0f * (f32)pProfile->n94 / (f32)pProfile->n90;
+        return;
+    }
+    pResult->i = 0;
+}
+
+void fn_8007DD60(MsgArg* pArgs, MsgArg* pResult) {
+    SaveProfile* pProfile = &gpSaveData[pArgs[0].i];
+
+    if (pProfile->n98 != 0) {
+        pResult->i = 100.0f * ((f32)pProfile->n9C / (f32)pProfile->n98);
+        return;
+    }
+    pResult->i = 0;
 }
 
 void fn_8007DDEC(MsgArg* pArgs, MsgArg* pResult) {
