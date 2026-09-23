@@ -361,7 +361,8 @@ typedef struct Session {
     RecordEntry recB[3][3][5];  // 0x53C0  3 x 3 kinds, top 5 each
     RecordEntry recC[5][2][5];  // 0x5744  5 x 2 kinds, top 5 each
     u32  nSeed;                 // 0x5B2C
-    u8   unk5B30[8];
+    u8   unk5B30[4];
+    s32  unk5B34;               // 0x5B34
     s8   unk5B38;               // 0x5B38
     u8   unk5B39;               // 0x5B39
     u8   unk5B3A[2];
@@ -385,7 +386,7 @@ typedef struct GameState {
     s32  nCurHole;              // 0x064  0..17 in the round
     s32  nHoleNum[18];          // 0x068  and which hole of that course (a custom round mixes courses)
     u8   bHoleSelected[18];     // 0x0B0  holes this round plays (GM_GotoNextSelectedHole)
-    u8   unkC2[0xD4 - 0xC2];
+    u8   bHoleSaved[18];        // 0x0C2  a copy of the selection (random-hole play, fn_800E2BA4)
     u8   bD4;                   // 0x0D4
     u8   bD5;                   // 0x0D5
     u8   unkD6[2];

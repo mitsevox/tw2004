@@ -14,7 +14,7 @@ void  fn_800D8D5C(int nPlayer, int a);
 void  fn_800E2470(void);
 void  fn_800E30D4(void);
 void  fn_800E2FD8(void);
-void  fn_800E3050(void);
+void  fn_800E3050(int nCourse);
 int   fn_800D2AD8(int nHole);               // a hole's par
 u8    fn_800EE470(void);
 int   fn_8011937C(int nPlayer, int a, u8 b);
@@ -74,6 +74,34 @@ void  fn_80125E68(void);
 extern s32 lbl_80282278;
 void  fn_800E58B4(int a);
 f32   fn_800D0478(int nPlayer);           // the ball's distance from the pin (yards)
+
+CourseInfo* fn_8000C594(void);
+void  fn_80055AA8(u8* pBall, f32* pPos, int nPlayer);
+void  Mem_cpy(void* pDst, void* pSrc, int nBytes);   // memcpy
+void  Vec_Copy(f32* pSrc, f32* pDst);
+void  GOLFERSTATE_Set(int nState, int nPlayer);
+int   GOLFERSTATE_GetCurrentState(int nPlayer);
+u8    Player_IsHoled(int nPlayer);
+u8    Ter_PointInOOBNetwork(u8* pBall);
+u8    fn_800E3AF8(void);
+void  fn_800E0A84(u8 v);
+int   Game_CurHoleIndex(void);
+u32   Rand_Next(int nStream);
+void  fn_800E1260(int nPreset);
+void  fn_800E1404(int nHole);
+int   fn_800E39F0(void);
+int   Game_CurrentHole(void);
+double fn_80009680(double x);               // sqrt
+u8    fn_8004B580(void);
+void  fn_80057364(int a);
+int   fn_800D3118(int nRound, int nHole);    // a built round's course for a hole
+int   fn_800D315C(int nRound, int nHole);    // and its hole number (1-based)
+
+// The tee positions follow the pins in the per-hole data (fn_8000C594).
+typedef struct HoleTees {
+    u8     unk0[0xB0];
+    PinPos tee[4];                          // 0xB0  one per tee set
+} HoleTees;
 
 extern u8* gpSaveData;
 extern u8  lbl_8028227C;
@@ -440,7 +468,7 @@ void fn_800E14E0(int nCourse) {
     gpGame->b138 = 0;
     if (nCourse >= 24 && nCourse < 30) {
         gpGame->b139 = nCourse - 23;
-        fn_800E3050();
+        fn_800E3050(nCourse);
         gpGame->nCurCourse = gpGame->nHoleCourse[gpGame->nCurHole];
     } else {
         gpGame->b139 = 0;
@@ -901,6 +929,162 @@ char* GameManager_GetHoleName(int nHole) {
 // then).
 int fn_800E27C0(void) {
     return (1.0f / 59.94f) * (f32)(u32)(gSession.unk24 - gpGame->n12C);
+}
+
+// Runs the mode's player choice twice (fn_800E292C runs it once).
+void fn_800E295C(void) {
+    gpGame->pfn1D4(gpGame->pfn1D4(5));
+}
+
+// The start of a hole: every player's ball on their tee, the look-ahead copy and the saved
+// positions reset, and everyone waiting.
+void fn_800E299C(void) {
+    CourseInfo* pCourse = fn_8000C594();
+    int         i;
+    for (i = 0; i < gNumPlayersSetUp; i++) {
+        gPlayers[i].nLie = 0;
+        fn_80055AA8(gPlayers[i].ball, &((HoleTees*)pCourse)->tee[gSession.nTeeSet[i]].x, i);
+        Mem_cpy(gPlayers[i].ballBefore, gPlayers[i].ball, 0xBC);
+        Vec_Copy(&((HoleTees*)pCourse)->tee[gSession.nTeeSet[i]].x, &gPlayers[i].fBallX);
+        Vec_Copy(&((HoleTees*)pCourse)->tee[gSession.nTeeSet[i]].x, gPlayers[i].vA44);
+        GOLFERSTATE_Set(GS_WAIT, (u8)i);
+        gPlayers[i].bLowIQPenalty = 0;
+    }
+}
+
+// When every player is waiting (in split screen, those not holed yet are sent back to their
+// pre-shot state instead), the mode's "everyone done" callback.
+void fn_800E2A88(void) {
+    int i;
+    u8  bBusy = 0;
+    for (i = 0; i < gNumPlayersSetUp; i++) {
+        if ((s8)GOLFERSTATE_GetCurrentState(i) != GS_WAIT) {
+            bBusy = 1;
+        } else if (gSession.nSplitScreen && !Player_IsHoled(i)) {
+            GOLFERSTATE_Set(GS_PRE_SHOT, i);
+            bBusy = 1;
+        }
+    }
+    if (!bBusy) {
+        gpGame->pfn1D0();
+    }
+}
+
+// Out of bounds: outside the in-bounds area, or the ball out (state 5) or in lie 16.
+u8 fn_800E2B40(int nPlayer, u8* pBall) {
+    if (!Ter_PointInOOBNetwork(pBall)) {
+        return 1;
+    }
+    if (*(s32*)(pBall + 0x64) == 5 || *(s32*)(pBall + 0x68) == 16) {
+        return 1;
+    }
+    return 0;
+}
+
+// A random hole from the round's selection, not the one just played.
+void fn_800E2BA4(void) {
+    int  nHoles[18];
+    int  n = 0;
+    int  i;
+    int  nCur;
+    if (fn_800E3AF8()) {
+        for (i = 0; i < 18; i++) {
+            gpGame->bHoleSaved[i] = gpGame->bHoleSelected[i];
+        }
+        fn_800E0A84(0);
+    }
+    nCur = Game_CurHoleIndex();
+    for (i = 0; i < 18; i++) {
+        if (gpGame->bHoleSaved[i] && i != nCur) {
+            nHoles[n] = i;
+            n++;
+        }
+    }
+    if (n == 0) {
+        fn_800E1260(0);
+        fn_800E1480(nCur);
+        fn_800E1404(nCur);
+        return;
+    }
+    fn_800E1260(0);
+    nCur = nHoles[Rand_Next(0) % n];
+    fn_800E1480(nCur);
+    fn_800E1404(nCur);
+}
+
+// Whether the ball is in the hole: it is (lie "holed") when fn_8004B580 says so and the lie is
+// already holed, or, when it says no, when the ball is within half a yard of the pin.
+u8 fn_800E2DB4(int nPlayer) {
+    CourseInfo* pCourse;
+    PinPos*     pPin;
+    f32         fDist;
+    u8          b;
+    if (fn_800E39F0()) {
+        return 0;
+    }
+    pCourse = fn_8000C594();
+    pPin = &pCourse->pin[Game_CurrentHole()];
+    fDist = fn_80009680((*(f32*)(gPlayers[nPlayer].ball + 0) - pPin->x) * (*(f32*)(gPlayers[nPlayer].ball + 0) - pPin->x) +
+                        (*(f32*)(gPlayers[nPlayer].ball + 8) - pPin->z) * (*(f32*)(gPlayers[nPlayer].ball + 8) - pPin->z));
+    b = fn_8004B580();
+    if ((b && gPlayers[nPlayer].nLie == LIE_HOLED) || (!b && fDist < 0.5f)) {
+        gPlayers[nPlayer].nLie = LIE_HOLED;
+        return 1;
+    }
+    return 0;
+}
+
+// Whether the player is placing the ball (state 22) or the mode says so.
+u8 fn_800E2EAC(int nPlayer) {
+    s8  nState = GOLFERSTATE_GetCurrentState(nPlayer);
+    int b = 0;
+    if (nState == GS_PLACE_BALL || gpGame->pfn230(nPlayer)) {
+        b = 1;
+    }
+    return b;
+}
+
+// With none of the five save slots in use and player 1 human, fn_80057364(0).
+void fn_800E2F14(void) {
+    int i;
+    u8  bDead = 0;
+    u8  bAny;
+    if (gSession.unk5B34 == 0) {
+        // Dead code in the original: a loop over the holes testing a flag that is always 0 here.
+        // Only the empty counting loop survives compilation, so the body is unknown.
+        for (i = 0; i < 18; i++) {
+            if (bDead) {
+                fn_80057364(i);
+            }
+        }
+    }
+    bAny = 0;
+    for (i = 0; i < 5; i++) {
+        if (gpSaveData[i * 0x10600] == 1) {
+            bAny = 1;
+        }
+    }
+    if (!bAny && !Player_IsCPU(0)) {
+        fn_80057364(0);
+    }
+}
+
+// Builds mixed round 22 from its table: each hole's course and hole number.
+void fn_800E2FD8(void) {
+    int i;
+    for (i = 0; i < 18; i++) {
+        gpGame->nHoleCourse[i] = fn_800D3118(22, i);
+        gpGame->nHoleNum[i] = fn_800D315C(22, i) - 1;
+    }
+}
+
+// The same for rounds 24-29.
+void fn_800E3050(int nCourse) {
+    int i;
+    for (i = 0; i < 18; i++) {
+        gpGame->nHoleCourse[i] = fn_800D3118(nCourse, i);
+        gpGame->nHoleNum[i] = fn_800D315C(nCourse, i) - 1;
+    }
 }
 
 // A gimme (formerly its own unit, Gimme.c): the Gimmes option is on, it is not split screen or a
