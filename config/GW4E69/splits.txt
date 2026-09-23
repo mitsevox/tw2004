@@ -1345,35 +1345,8 @@ llrtclock.c:
 GoGrass.c:
 	.text       start:0x8011E170 end:0x80120298
 
-unsorted/sweep_80120298.c:
-	.text       start:0x80120298 end:0x801202F8
-
-unsorted/sweep_801202F8.c:
-	.text       start:0x801202F8 end:0x80120304
-
-unsorted/sweep_80120A40.c:
-	.text       start:0x80120A40 end:0x80120A90
-
-unsorted/sweep_80120D68.c:
-	.text       start:0x80120D68 end:0x80120D74
-
-unsorted/sweep_80120D74.c:
-	.text       start:0x80120D74 end:0x80120D8C
-
-unsorted/sweep_80120DD0.c:
-	.text       start:0x80120DD0 end:0x80120E24
-
-unsorted/sweep_801213F0.c:
-	.text       start:0x801213F0 end:0x801213F4
-
-unsorted/sweep_801213F4.c:
-	.text       start:0x801213F4 end:0x80121404
-
-unsorted/sweep_80121404.c:
-	.text       start:0x80121404 end:0x8012141C
-
-unsorted/sweep_8012141C.c:
-	.text       start:0x8012141C end:0x80121430
+GoShaderObject_Grass_Gc.c:
+	.text       start:0x80120298 end:0x80121430
 
 GameMode4Menu.c:
 	.text       start:0x80121430 end:0x801220D4
@@ -1393,38 +1366,8 @@ unsorted/sweep_80124814.c:
 EASportsBio.c:
 	.text       start:0x801249A8 end:0x8012597C
 
-unsorted/sweep_801260B8.c:
-	.text       start:0x801260B8 end:0x801260C0
-
-unsorted/sweep_80126130.c:
-	.text       start:0x80126130 end:0x80126150
-
-unsorted/sweep_8012632C.c:
-	.text       start:0x8012632C end:0x80126334
-
-unsorted/sweep_80126418.c:
-	.text       start:0x80126418 end:0x8012645C
-
-unsorted/sweep_80126E68.c:
-	.text       start:0x80126E68 end:0x80126E88
-
-unsorted/sweep_80126E88.c:
-	.text       start:0x80126E88 end:0x80126EC0
-
-unsorted/sweep_80126F7C.c:
-	.text       start:0x80126F7C end:0x80126F84
-
-unsorted/sweep_80126F84.c:
-	.text       start:0x80126F84 end:0x80126F94
-
-unsorted/sweep_80126FA0.c:
-	.text       start:0x80126FA0 end:0x80126FB0
-
-unsorted/sweep_80126FD8.c:
-	.text       start:0x80126FD8 end:0x80127004
-
-unsorted/sweep_80127098.c:
-	.text       start:0x80127098 end:0x801270F0
+GameMode22.c:
+	.text       start:0x8012597C end:0x801270F0
 
 SkinBurn.c:
 	.text       start:0x801270F0 end:0x80127D84
