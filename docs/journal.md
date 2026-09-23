@@ -247,8 +247,11 @@ Dated log of what was done and decided, newest last. Facts and lessons belong in
   1. **Golfer and Swing structs from TW06** (next up): follow the checklist; TW06 types for the
      golfer, swing states and shot data should name most of `Golfer.c`/`Swing.c`'s `nXX`/`fXX`
      fields. Then re-run the name matcher.
-  2. More m2c/repair passes as new seeds and names arrive; literal-pool functions still need
-     units that own their `.sdata2`/`.rodata`.
+  2. The plain m2c sweep is exhausted (every size to 512 bytes, plus the repair pass); rerunning
+     it unchanged finds nothing. Only two things reopen it: (a) literal-pool functions (float
+     constants, strings), never attempted, which need units that own their `.sdata2`/`.rodata`
+     (proper file boundaries); (b) better inputs - feed TW06 signatures (argument counts and
+     types) to m2c/`retry.py`, since a wrong argument count is m2c's commonest miss.
   3. `Ball.c` last five; the 57 medium TW06 names as their areas come up.
   Scratch tools added this round (`C:\dev\scratch\tw\`): `dolread.py` (read main.dol by
   address), `grepfn.py` (asm grep with enclosing function), `unitfns.py <unit>` (non-exact
