@@ -34,6 +34,8 @@ void CalcScoreRankingsIfDirty(int nPlayer);
 void CalcAllStats(int nPlayer);
 void fn_80117694(UStreamObject* pObject);
 
+// qsort (a heap sort). GoTerrain.c declares it the same way; it moves to engine.h once that one goes.
+void fn_8015929C(void* pBase, u32 nCount, u32 nSize, int (*pfnCompare)(const void*, const void*));
 int  fn_800D31A4(int nPar);             // the number of the 18 holes with that par
 char* fn_800EFE60(s32 i);               // GameModeDriverPGATour.c: a tournament's first champion
 s32  fn_800EFE78(s32 i);                // and the champion's score
