@@ -116,7 +116,7 @@ EASBErrorE fn_8012C774(u8* pBuffer);
 EASBErrorE fn_8012C7BC(u32* p0, EASBProduct* pProduct, s32 arg2);
 u8 fn_8012C83C(void);
 u8 fn_8012C848(void);
-s32 fn_8012C888(s32 arg0);
+EASBErrorE fn_8012C888(u32* pOut);
 
 // EASB.c
 EASBErrorE fn_8012CCD8(s32 nNeed);
@@ -126,22 +126,51 @@ EASBErrorE fn_8012D0D4(void);
 EASBErrorE fn_8012D1A0(void);
 EASBErrorE fn_8012D560(void);
 EASBErrorE fn_8012D5B0(void);
+EASBErrorE fn_8012D5E4(void* p0, void* p1);
 EASBErrorE fn_8012D694(void);
 EASBErrorE fn_8012D6C8(void);
 EASBErrorE fn_8012D710(void);
-EASBErrorE fn_8012D744(s32 arg0);
+EASBErrorE fn_8012D744(u32* pOut);
 EASBErrorE fn_8012D794(s32 arg0);
-s32 fn_8012D7F0(void);
+EASBErrorE fn_8012D7F0(void);
 EASBErrorE fn_8012D8C4(u32 uCount);
 EASBErrorE fn_8012D93C(u32 uCount);
+EASBErrorE fn_8012D9B4(u16* puLevel);
 EASBErrorE fn_8012DAB8(u16 uLevel);
-s32 fn_8012DB30(s32 arg0, s32 arg1, s32 arg2, u32 uTime);
-void fn_8012DD24(s32 arg0, s32 arg1, s32 arg2);
+EASBErrorE fn_8012DB30(u16* szName, s32 arg1, s32 nLanguage, u32 uTime);
+EASBErrorE fn_8012DD24(u16* szName, s32 arg1, s32 nLanguage);
 EASBErrorE fn_8012DD7C(u8 bFlag);
 EASBErrorE fn_8012DDE0(u32* pOut);
 EASBErrorE fn_8012DE38(u32* pOut);
-s32 fn_8012E818(void);
+EASBErrorE fn_8012DF4C(u16* puLevel, f32* pfProgress);
+EASBErrorE fn_8012E818(u8 n, void* pImage);
 EASBErrorE fn_8012E820(s32 arg0, s32 arg1, u32 arg2, u32 arg3, u32 arg4);
 EASBErrorE fn_8012E8A8(s32 arg0, s32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5, u32 arg6);
+
+// ---- EASportsBio.c: the game's side ----
+
+// The game's Bio manager (TW06's EASBio_MgrT; same fields at the same offsets).
+typedef struct EASBioMgr {
+    void* pCurrentGameImage;        // 0x00
+    void* pOurGameImage;            // 0x04
+    void* pIcon;                    // 0x08
+    u8 bBioLoaded;                  // 0x0C
+    u8 bGameWon;                    // 0x0D
+    u16 uCurLevel;                  // 0x0E
+    u8 bNewAccomplishment;          // 0x10
+    u8 unk11[3];
+    s32 eCurrentRewardMessage;      // 0x14
+} EASBioMgr;
+
+extern EASBioMgr* lbl_80281988;
+extern u8 lbl_80282568;
+extern u8 lbl_80282569;
+extern u8 lbl_8028256A;
+extern s32 lbl_8028256C;
+extern s32 lbl_80282570;
+extern s32 lbl_80282574;
+extern s32 lbl_80282578;
+extern u8 lbl_8028257C;
+extern u8 lbl_8028257D;
 
 #endif

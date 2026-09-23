@@ -140,13 +140,13 @@ EASBErrorE fn_8012D710(void) {
     }
 }
 
-EASBErrorE fn_8012D744(s32 arg0) {
+EASBErrorE fn_8012D744(u32* pOut) {
     EASBErrorE eError;
 
-    if (arg0 == 0) return EASB_ERROR_NULL_PARAMETERS;
+    if (pOut == NULL) return EASB_ERROR_NULL_PARAMETERS;
     eError = fn_8012CCD8(EASB_NEED_ANY);
     if (eError != EASB_ERROR_NONE) return eError;
-    return fn_8012C888(arg0);
+    return fn_8012C888(pOut);
 }
 
 EASBErrorE fn_8012D794(s32 arg0) {
@@ -164,8 +164,9 @@ EASBErrorE fn_8012D794(s32 arg0) {
     }
 }
 
-s32 fn_8012D7F0(void) {
-    return 32;
+// Images are not supported on this platform.
+EASBErrorE fn_8012D7F0(void) {
+    return EASB_ERROR_IMAGE_NOT_SUPPORTED;
 }
 
 // Adds uCount to this game's counter at 0x58 and the Bio's at 0x5C.
@@ -215,8 +216,8 @@ EASBErrorE fn_8012DAB8(u16 uLevel) {
     }
 }
 
-void fn_8012DD24(s32 arg0, s32 arg1, s32 arg2) {
-    fn_8012DB30(arg0, arg1, arg2, fn_80122150());
+EASBErrorE fn_8012DD24(u16* szName, s32 arg1, s32 nLanguage) {
+    return fn_8012DB30(szName, arg1, nLanguage, fn_80122150());
 }
 
 // Switches which play-time counter runs, adding up the time so far first.
@@ -259,8 +260,9 @@ EASBErrorE fn_8012DE38(u32* pOut) {
     return eResult;
 }
 
-s32 fn_8012E818(void) {
-    return 32;
+// Images are not supported on this platform.
+EASBErrorE fn_8012E818(u8 n, void* pImage) {
+    return EASB_ERROR_IMAGE_NOT_SUPPORTED;
 }
 
 EASBErrorE fn_8012E820(s32 arg0, s32 arg1, u32 arg2, u32 arg3, u32 arg4) {
