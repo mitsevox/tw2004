@@ -340,10 +340,11 @@ A Gecko code that turns the lucky shot off (keeping lesson mode 11's scripted on
 `tools/codes/no_lucky_shots.txt` - **untested**: one instruction, `Golfer_IsLucky` always takes
 its "not lucky" exit after the CPU / split-screen test.
 
-What the event does is in the lie code (`0x80053594`, read, not decompiled): landing in the
-rough is a coin flip between the good rough lie and the bad one, and `(roll & 127) < LUCK/2`
-forces the good one - 50% good at LUCK 0, ~70% at 100. On a worse surface, `(LUCK/4 + 16)/128`
-is the chance of getting the rough treatment instead of the worst lie (12.5% at 0, 32% at 100).
+What the event does is in the lie code (`Ball_SetLie`, now in C - full rules under "Landings,
+lies, trees and water" below): landing in the rough is a coin flip between the good rough lie
+and the bad one, and `(roll & 127) < LUCK/2` forces the good one - 50% good at LUCK 0, ~70% at
+100. On a worse surface, `(LUCK/4 + 16)/128` is the chance of getting the rough treatment
+instead of the worst lie (12.5% at 0, 32% at 100).
 And in the collision code (`0x80052598`, read) a bounce-direction term has `0.005 x LUCK`
 subtracted, floored at -1: the kinder deflection off trees the tooltip promises.
 
@@ -382,9 +383,8 @@ half a second in the zone and picks up under an inch per second sideways: a few 
 bend, an inch or so at the cup. Enough to turn a lip-out into a drop, not enough to save a putt that
 was never close. No attribute and no human/CPU test anywhere in it.
 
-Two other things in the same file, read but not decompiled: hitting a tree (surface kind 17)
-deflects the ball by a random 12..19 degrees in two axes unless the player is flagged perfect
-(`0x800539F8`), and out of bounds is 600 m from the shot's start (`0x80054450`).
+Hitting a tree and out of bounds: see "Landings, lies, trees and water" below (in C now; the
+earlier "no deflection when perfect" was wrong - a perfect shot gets a fixed deflection).
 
 Gimmes and the pool-cue tap-in
 ------------------------------
@@ -604,17 +604,19 @@ spin. Every number here is from the code.
   (the caddie's and the lucky shot's rehearsal copy).
 - **The lie takes speed and spin**:
 
-      lie                 speed kept   spin
-      6 rough (light)        80%        90%
-      7 rough                70%        80%
-      8 rough (deep)         60%        70%
-      3 sand                 90%        70%
-      4 sand                 80%        70%
-      anything else       surface table (+0x00, +0x08)
+      lie                     speed kept   spin
+      6 sand, clean              80%        90%
+      7 sand, worse              70%        80%
+      8 sand, plugged            60%        70%
+      3 rough, good lie          90%        70%
+      4 rough, bad lie           80%        70%
+      anything else           surface table (+0x00, +0x08)
+
+  (Lie numbers corrected 2026-09-23 from `Ball_SetLie`: 3/4 are the rough, 6/7/8 the sand.)
 
   plus the ball's own `+0x70`, and **each club step gives back 1.25% of what was lost** - a
-  wedge (step 15) keeps about 19% more of the lost speed than a driver. A chip from lie 3, 4 or
-  5 loses another 10%.
+  wedge (step 15) keeps about 19% more of the lost speed than a driver. A chip from the rough
+  (lie 3, 4 or 5) loses another 10%.
 - **Spin** = cross(the part of the launch direction off the spin axis, the axis) x club spin
   (`gClubSpin`: 0.87 for the woods down to 0.11 for club 24) x kind spin (`gKindSpin`: kind 4
   x 1.5, kind 5 x 0.01 - a flop has no spin) x 0.85 x the lie's spin / 0.84.
@@ -706,6 +708,56 @@ CPU both know. Settings 3 and 4 (faster) are never set by anything we have found
 sticky, but `fn_80050D34` (putt power for a distance) ignores it. That does not break the aim
 marker - the caddie and the CPU rehearse on the real physics - but a putt struck at the power the
 table gives for a distance rolls further on faster menu greens than the table says.
+
+Landings, lies, trees and water (`Ball_Collide`, `Ball_SetLie`, `fn_800539F8`, in C)
+------------------------------------------------------------------------------------
+
+**Out of bounds** is 600 yards from where the shot started (squared distance over 360,000).
+
+**The lie** (`Ball_SetLie`, 99%), by surface class. LUCK (0..110, humans and CPUs in slots 0-3)
+enters three rolls; a simulation rolls 0, which always gives the kind result:
+
+- 1, 2 -> lie 1 (fairway). 3, 18 -> lie 9 (green). 4 -> lie 10. 7, 16 -> lie 13 (water).
+  8 -> lie 11. 12 -> holed. Anything else -> lie 17.
+- **5, rough**: a coin flip between lie 3 (good) and lie 4 (bad); `(roll & 127) < LUCK/2`
+  forces the good one. **On course 6 the rough is always the bad lie** - the code skips the good
+  one there. Surface 145 is always lie 4.
+- **11** (the thick stuff): lie 5, unless `(roll & 127) < LUCK/4 + 16` (12.5% at LUCK 0, 34% at
+  110) gives it the rough treatment above.
+- **6, sand**: three lies - 6 (clean), 7 (worse), 8 (**plugged**). The first time a shot lands in
+  sand the game keeps where and how hard it landed. If the ball stays within 6 in of that
+  point and landed hard (impact 6 or more), it is heading for a plug: lie 8 unless
+  `(roll & 127) < LUCK/4 + 16`, then lie 7 unless `< LUCK/4`, then clean. A medium landing (5-6)
+  starts at lie 7. A soft landing, or a ball that rolled away, is clean unless
+  `(roll & 127) < 16 - LUCK/16` sends it down the plug path. So **hard, steep shots into sand
+  plug; LUCK helps a little at each step.**
+- Then a random **lie quality** (`Ball +0x70`, added to the next strike's speed kept): +- a
+  random 0..1 less LUCK/200 (not below 0), times the surface's `+0x04`. LUCK shrinks how far a
+  lie can swing either way.
+
+**Trees** (`fn_800539F8`, surface class 17): the surface normal at the hit is turned by
+12..19 degrees on two axes before the bounce. The sign test is `(roll & 31) != 0` - so it is
+**negative 31 times in 32**, a fixed world direction, not relative to your shot; it looks like a
+typo for a coin flip. A simulation, slot 4, or a perfect (lucky) shot rolls 0: a fixed +12, +12.
+So the CPU's rehearsal cannot predict where a tree sends the real ball.
+
+**The flagstick** (`fn_80053E98`): the pole (object type 11) stops a ball that reaches it along
+the course's z axis only (the normal is +-z whatever the ball's direction), and a real ball sets
+the flag swaying by how far off-centre and how fast it hit. Nothing happens while it is still
+swaying.
+
+**Spin you add with the stick is applied at the first bounce** (event 0x1D reads the stick,
+`fn_800539F8` applies it): backspin x (1.9 - the green-speed multiplier), sidespin x (1.95 -
+it) - so **on faster menu greens the spin you add is weaker** (backspin x 0.9 / 0.8 / 0.7).
+
+**Water skipping** (`Ball_Collide`): on water surfaces 41, 47 and 104, a ball that bounces up
+off the water faster than 2.93 and travels on at more than 1.71x that (and over 5.87) **skips**,
+its rise cut to a quarter. Any other water landing is a hazard.
+
+**Events** a landing fires: 0x23 ground, 0x24 an object, 0x25 flagged surfaces, 0x26 the cup;
+0x1D the first bounce (camera 3, the spin stick), 0x1C the top of the flight (camera 1, golfer
+animation 13). The look-ahead ball's first landing sends its owner 0x49, which queues front-end
+message 0x1D.
 
 CPU putts are hit 5% firm (`Swing_ComputePower`)
 -----------------------------------------------

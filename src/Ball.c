@@ -34,17 +34,19 @@ typedef struct Ball {
     CourseInfo* pCourse;        // 0x7C
     s32  n80;                   // 0x80
     s32  n84;                   // 0x84
-    u8   unk88[0x90 - 0x88];
+    struct SurfaceType* pHitSurface;   // 0x88  what it last hit
+    s32  n8C;                   // 0x8C
     s32  n90;                   // 0x90  what the ball last hit (fn_80054040)
     s32  nPlayer;               // 0x94  -1 when nobody's
     u8   bHoled;                // 0x98
     u8   b99;                   // 0x99
     u8   b9A;                   // 0x9A
     u8   b9B;                   // 0x9B
-    u8   unk9C;                 // 0x9C
-    u8   unk9D[0xAC - 0x9D];
+    u8   unk9C;                 // 0x9C  landed in sand (class 6) this shot
+    u8   unk9D[0xA0 - 0x9D];
+    f32  vLand[3];              // 0xA0  where it first landed in sand
     f32  fAC;                   // 0xAC  ticks spent with no ground under a rolling ball
-    u8   unkB0[4];
+    f32  fLandImpact;           // 0xB0  how hard it landed there (sqrt of fn_80052598's result)
     f32  fB4;                   // 0xB4  distance from the start at the last stall check
     f32  fB8;                   // 0xB8  time since the last stall check
 } Ball;
@@ -135,11 +137,18 @@ void   fn_8004D9A8(CourseInfo* pCourse, Ball* pBall, f32* pHeight, f32* pHeight2
 int    fn_80050BEC(SurfaceType* pSurface);       // a surface's index
 u8     fn_800E2B40(int nPlayer, Ball* pBall);
 u8     fn_800B1B18(int nPlayer, f32* pTo, f32* pFrom, f32* pHit, f32* pNormal, s32* pWhat);
-u8     fn_80053E98(Ball* pBall, s32 nWhat, f32* pHit, f32* pNormal);
-u8     fn_800539F8(Ball* pBall, f32* pHit, f32* pNormal, SurfaceType* pSurface, int a, u8* pOut, f32 fTicks);
+u8     fn_80053E98(Ball* pBall, void* pObj, f32* pHit, f32* pNormal);
+u8     fn_800539F8(Ball* pBall, f32* pHit, f32* pNormal, SurfaceType* pSurface, s32 nWhat, f32* pFrac, f32 fTicks);
 u8     fn_80053240(Ball* pBall, f32 fTicks);
-void   fn_80052598(Ball* pBall, f32* pNormal, SurfaceType* pSurface);
-void   Ball_Collide(Ball* pBall, f32 fTicks);
+f32    fn_80052598(Ball* pBall, f32* pNormal, SurfaceType* pSurface);   // the bounce; returns the impact
+f32    fn_800BB028(f32* pA, f32* pB);            // squared distance
+u8     fn_8004FF34(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal, SurfaceType** ppSurface, s32* pWhat);
+u8     fn_8004E1B0(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal, SurfaceType** ppSurface, s32* pWhat);
+u8     fn_8004E558(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal, SurfaceType** ppSurface, s32* pWhat, u8* pOut);
+u8     fn_8004EE20(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal, SurfaceType** ppSurface, s32* pWhat);
+void   fn_800B1AB0(u8* pObj, f32* pPos, f32* pRadius);   // the flagstick's position and radius
+int    Golfer_GetAttribute(Player* pPlayer, int nAttr, int nMode);
+u8     Ball_Collide(Ball* pBall, f32 fTicks);
 void   Ball_GroundContact(Ball* pBall, f32 fTicks);
 void   fn_80052268(Ball* pBall, f32 fTicks);
 void   Ball_FlightStep(Ball* pBall, f32 fTicks);
@@ -174,6 +183,42 @@ static inline f32 Ball_Clamp(f32 x, f32 fLo, f32 fHi) {
 }
 
 #define PIN(pBall) ((f32*)&(pBall)->pCourse->pin[Game_CurrentHole()])
+
+// A landing: a player's ball fires 0x25 on flagged surfaces, then 0x26 on the cup (surface 90),
+// 0x24 on an object, 0x23 on the ground; a look-ahead ball's first landing (Player +0xB5C) tells
+// its player (0x49).
+#define BALL_LANDING_EVENTS(pBall, pSurface, nWhat)                                                \
+    if ((pBall)->nPlayer >= 0) {                                                                   \
+        if ((pSurface)->u34 & 0x10) {                                                              \
+            fn_80067074((pBall)->nPlayer, 0x25, (int)(pBall), !gSimulating);                       \
+        }                                                                                          \
+        if (fn_80050BEC(pSurface) == 90) {                                                         \
+            fn_80067074((pBall)->nPlayer, 0x26, (int)(pBall), !gSimulating);                       \
+        } else if (nWhat) {                                                                        \
+            fn_80067074((pBall)->nPlayer, 0x24, (int)(pBall), !gSimulating);                       \
+        } else {                                                                                   \
+            fn_80067074((pBall)->nPlayer, 0x23, (int)(pBall), !gSimulating);                       \
+        }                                                                                          \
+    } else if ((pBall)->n80 == 0) {                                                                \
+        int     nOwner;                                                                            \
+        Player* pP = gPlayers;                                                                     \
+        nOwner = 0;                                                                                \
+        if ((pBall) != (Ball*)pP[0].ballBefore) {                                                  \
+            nOwner = 1;                                                                            \
+            if ((pBall) != (Ball*)pP[1].ballBefore) {                                              \
+                nOwner = 2;                                                                        \
+                if ((pBall) != (Ball*)pP[2].ballBefore) {                                          \
+                    nOwner = 3;                                                                    \
+                    if ((pBall) != (Ball*)pP[3].ballBefore) {                                      \
+                        nOwner = 4;                                                                \
+                        if ((pBall) != (Ball*)pP[4].ballBefore) nOwner = 5;                        \
+                    }                                                                              \
+                }                                                                                  \
+            }                                                                                      \
+        }                                                                                          \
+        fn_80067074(nOwner, 0x49, (int)(pBall), 1);                                                \
+    }
+
 
 // The ball dropped in: park it in the cup and stop it.
 void Ball_Holed(Ball* pBall) {
@@ -800,6 +845,329 @@ void fn_80052268(Ball* pBall, f32 fTicks) {
     }
 }
 
+// A ball on the ground: did it run into anything between last tick and this one? Out of
+// bounds (600 yd from the start) is a hazard. Within 10 ft of the pin the detailed test
+// (fn_8004E1B0) runs, elsewhere fn_8004FF34. On a hit: the landing events, the bounce, and a
+// nudge along the velocity. Returns 1 on a hit.
+u8 fn_80053240(Ball* pBall, f32 fTicks) {
+    f32          vHit[4];
+    f32          vNormal[4];
+    f32          vFrom[4];
+    f32          vTo[4];
+    u32          nWhat;
+    SurfaceType* pSurface;
+    if (pBall->pCourse == NULL) return 0;
+    Vec3Copy(pBall->vPrev, vFrom);
+    vFrom[1] -= BALL_RADIUS;
+    Vec3Copy(pBall->vPos, vTo);
+    vTo[1] -= BALL_RADIUS;
+    if (fn_800BB028(vTo, pBall->vStart) > 360000.0f) {
+        fn_80050CAC(pBall, 1);
+        return 0;
+    }
+    if (pBall->nSurface < 0 || pBall->nSurface >= 156) return 0;
+    pSurface = &gSurfaceTypes[pBall->nSurface];
+    if (fn_800BB028(PIN(pBall), pBall->vPos) > 11.1111107f) {
+        if (!fn_8004FF34(pBall->pCourse, vFrom, vTo, vHit, vNormal, &pSurface, (s32*)&nWhat)) return 0;
+    } else {
+        if (!fn_8004E1B0(pBall->pCourse, pBall->nPlayer, vFrom, vTo, vHit, vNormal, &pSurface, (s32*)&nWhat)) return 0;
+    }
+    if (pSurface == NULL) return 0;
+    if (0.375f != pSurface->f1C) {
+        pSurface = &gSurfaceTypes[14];
+    }
+    fn_800BAF04(vNormal, vNormal);
+    if (pSurface->f0C >= 0.0f) {
+        Vec3Copy(vHit, pBall->vPos);
+        pBall->vPos[1] += 0.027055556f;
+    }
+    pBall->pHitSurface = pSurface;
+    pBall->n8C = nWhat;
+    BALL_LANDING_EVENTS(pBall, pSurface, nWhat);
+    fn_80052598(pBall, vNormal, pSurface);
+    if (pSurface->f0C >= 0.0f) {
+        Vec3Copy(pBall->vPos, pBall->vPrev);
+        fn_8000C5D4(pBall->vPos, pBall->vVel, 9.25925906e-06f, pBall->vPos);
+    }
+    return 1;
+}
+
+// The lie from the surface class, with LUCK (0..110, players 0..3) in the rolls; a sim or
+// lbl_80281DD2 rolls 0 (the kind result):
+//   1, 2: lie 1.  3, 18: lie 9 (green).  4: lie 10.  7, 16: lie 13.  8: lie 11.
+//   5 (rough): surface 145 is lie 4; else a coin flip, forced good when (r & 127) < LUCK/2 -
+//     good = lie 3 / surface 27 (never on course 6), bad = lie 4 / surface 28.
+//   11: (r & 127) < LUCK/4 + 16 gives the rough treatment instead of lie 5 / surface 26.
+//   6, 20 (sand): lie 6 (clean, surface 35), 7 (surface 36) or 8 (plugged, surface 34),
+//     from where and how hard it landed and three LUCK rolls; class 20 is surface 146.
+//   12: holed (event 0x21 the first time).  Anything else: lie 17.
+// Then a random lie quality (+0x70), +-(Rand_Float - LUCK/200, not below 0) x surface +0x04.
+void Ball_SetLie(Ball* pBall, SurfaceType* pSurface) {
+    SurfaceType* pLie;
+    u32          uLuck;
+    u32          r;
+    int          nLuck;
+    f32          f;
+    pBall->nSurface = fn_80050BEC(pSurface);
+    uLuck = 0;
+    if (pBall->nPlayer >= 0 && pBall->nPlayer <= 3) {
+        nLuck = (s8)Golfer_GetAttribute(&gPlayers[pBall->nPlayer], ATTR_LUCK, ATTR_TOTAL);
+        if (nLuck < 0) {
+            uLuck = 0;
+        } else {
+            uLuck = nLuck > 110 ? 110 : nLuck;
+        }
+    }
+    switch (pSurface->nClass) {
+    case 1:
+    case 2:
+        pBall->nLie = 1;
+        break;
+    case 3:
+    case 18:
+        pBall->nLie = 9;
+        break;
+    case 4:
+        pBall->nLie = 10;
+        break;
+    case 5:
+        if (pBall->nSurface == 145) {
+            pBall->nLie = 4;
+            break;
+        }
+        if (gSimulating || lbl_80281DD2) {
+            r = 0;
+        } else {
+            r = Rand_Next(0);
+        }
+    rough:
+        if ((r & 127) < uLuck / 2) r = 0;
+        if (!(r & 1) && gpGame != NULL && Game_GetCourse() != 6) {
+            pBall->nLie     = 3;
+            pBall->nSurface = 27;
+        } else {
+            pBall->nLie     = 4;
+            pBall->nSurface = 28;
+        }
+        break;
+    case 11:
+        if (gSimulating || lbl_80281DD2) {
+            r = 0;
+        } else {
+            r = Rand_Next(0);
+        }
+        if ((r & 127) < uLuck / 4 + 16) {
+            r >>= 8;
+            goto rough;
+        }
+        pBall->nLie     = 5;
+        pBall->nSurface = 26;
+        break;
+    case 6:
+    case 20:
+        if (gSimulating || lbl_80281DD2) {
+            r = 0;
+        } else {
+            r = Rand_Next(0);
+        }
+        if (!pBall->unk9C || fn_8000AD9C(pBall->vPos[0] - pBall->vLand[0]) >= 0.16666667f ||
+            fn_8000AD9C(pBall->vPos[1] - pBall->vLand[1]) >= 0.16666667f ||
+            fn_8000AD9C(pBall->vPos[2] - pBall->vLand[2]) >= 0.16666667f || pBall->fLandImpact < 5.0f) {
+            if ((r & 127) < 16 - uLuck / 16) {
+                r >>= 8;
+                goto sandC;
+            }
+        sandClean:
+            pBall->nLie     = 6;
+            pBall->nSurface = 35;
+            goto sandEnd;
+        }
+        if (!(pBall->fLandImpact < 6.0f)) goto sandC;
+    sandB:
+        if ((r & 127) < uLuck / 4) goto sandClean;
+        pBall->nLie     = 7;
+        pBall->nSurface = 36;
+        goto sandEnd;
+    sandC:
+        if ((r & 127) < uLuck / 4 + 16) {
+            r >>= 8;
+            goto sandB;
+        }
+        pBall->nLie     = 8;
+        pBall->nSurface = 34;
+    sandEnd:
+        if (pSurface->nClass == 20) {
+            pBall->nSurface = 146;
+        }
+        break;
+    case 7:
+    case 16:
+        pBall->nLie = 13;
+        break;
+    case 8:
+        pBall->nLie = 11;
+        break;
+    case 12:
+        pBall->bHoled = 1;
+        if (pBall->nLie != 12) {
+            pBall->nLie = 12;
+            if (pBall->nPlayer >= 0) {
+                fn_80067074(pBall->nPlayer, 0x21, (int)pBall, !gSimulating);
+            }
+        }
+        break;
+    default:
+        pBall->nLie = 17;
+        break;
+    }
+    pBall->n6C = 0;
+    pBall->f70 = 0.0f;
+    if (pBall->nSurface >= 0 && pBall->nSurface < 156) {
+        pLie = &gSurfaceTypes[pBall->nSurface];
+        if (pLie->f04) {
+            if (gSimulating || lbl_80281DD2) {
+                f = 0.0f;
+                r = 0;
+            } else {
+                r = Rand_Next(0);
+                f = Rand_Float(0) - 0.5f * (0.01f * uLuck);
+                if (f < 0.0f) f = 0.0f;
+                f *= pLie->f04;
+            }
+            if (r & 1) f = -f;
+            pBall->f70 = f;
+        }
+    }
+}
+
+// The ball has hit something (a surface, or an object as surface 13). A tree (class 17) tilts
+// the hit normal by 12..19 degrees on two axes - negative unless the roll's low 5 bits are 0,
+// so almost always negative; a sim, lbl_80281DD2, slot 4 or a perfect shot rolls 0 (+12, +12).
+// The ball is put at the hit point (backed off along its velocity on a solid surface), a
+// fraction of the tick used is returned in *pFrac, a surface-108 hit is a hazard, and gravity is
+// given back for the part of the tick not flown. First bounce of a shot in flight: event 0x1D,
+// and the spin stick's input becomes the ball's spin (backspin x (1.9 - green setting), side x
+// (1.95 - green setting)), turned to the direction of travel; event 0x1F.
+u8 fn_800539F8(Ball* pBall, f32* pHit, f32* pNormal, SurfaceType* pSurface, s32 nWhat, f32* pFrac, f32 fTicks) {
+    f32 vSpin[4];
+    f32 fSin, fCos;
+    s32 r;
+    int nA, nB;
+    f32 fPrev, fNow, fBack, fAngle, fS, fC;
+    if (pSurface->nClass == 17) {
+        if (gSimulating || lbl_80281DD2 || pBall->nPlayer == 4 ||
+            (pBall->nPlayer >= 0 && pBall->nPlayer <= 3 && gPlayers[pBall->nPlayer].bPerfect)) {
+            r = 0;
+        } else {
+            r = Rand_Next(0);
+        }
+        nA = (r & 7) + 12;
+        if (r & 31) nA = -nA;
+        r >>= 8;
+        nB = (r & 7) + 12;
+        if (r & 31) nB = -nB;
+        fn_800BAF04(pNormal, pNormal);
+        fn_80055E28(0.017453292f * nA, &fSin, &fCos);
+        fn_80055D70(&pNormal[0], &pNormal[1], fSin, fCos);
+        fn_80055E28(0.017453292f * nB, &fSin, &fCos);
+        fn_80055D70(&pNormal[2], &pNormal[1], fSin, fCos);
+    }
+    fn_800BAF04(pNormal, pNormal);
+    pHit[1] += BALL_RADIUS;
+    if (pNormal[1] > 0.0f) {
+        pHit[1] += 0.0013888889f;
+    }
+    fPrev = Vec_Distance(pBall->vPrev, pBall->vPos);
+    fNow  = Vec_Distance(pBall->vPrev, pHit);
+    if (fPrev <= 2.77777799e-05f) fPrev = 2.77777799e-05f;
+    if (fPrev < fNow) fPrev = 2.77777799e-05f + fNow;
+    if (fPrev != 0.0f) {
+        *pFrac = fNow / fPrev;
+        if (*pFrac > 0.97f) *pFrac = 0.97f;
+    } else {
+        *pFrac = 0.97f;
+    }
+    Vec3Copy(pHit, pBall->vPos);
+    if (pSurface->f0C >= 0.0f) {
+        fn_8000C5D4(pBall->vPos, pBall->vVel, -9.25925906e-06f, pBall->vPos);
+    }
+    if (pSurface->nClass == 19 && pSurface == &gSurfaceTypes[108]) {
+        fn_80050CAC(pBall, 1);
+        return 0;
+    }
+    if (pNormal[1] >= 0.0f && pBall->vVel[1] < 0.0f) {
+        pBall->vVel[1] += (1.05f - *pFrac) * (0.107170001f * fTicks);
+        if (pBall->vVel[1] >= 0.0f) {
+            pBall->vVel[1] = -0.000178616669f;
+        }
+    }
+    pBall->pHitSurface = pSurface;
+    pBall->n8C         = nWhat;
+    if (pSurface->f0C >= 0.0f && !pBall->b99 && pBall->nPlayer >= 0 && pBall->nState == 2) {
+        if (!pBall->b99) {
+            pBall->b99 = 1;
+            fn_80067074(pBall->nPlayer, 0x1D, (int)pBall, !gSimulating);
+        }
+        if (pBall->fSpinX != 0.0f || pBall->fSpinY != 0.0f) {
+            fBack = pBall->fSpinY;
+            if (fBack < 0.0f) {
+                fBack *= 1.9f - gGreenSpeedMul[gGreenSpeedSetting];
+            }
+            vSpin[0] = fBack * (f32)(1 - pBall->n84);
+            vSpin[1] = 0.0f;
+            vSpin[2] = pBall->fSpinX * (1.95f - gGreenSpeedMul[gGreenSpeedSetting]) * (f32)(1 - pBall->n84);
+            fAngle = -fn_8000AD78(pBall->vVel[0], pBall->vVel[2]);
+            fS = fn_800095F0(fAngle);
+            fC = fn_80009638(fAngle);
+            fn_80055D70(&vSpin[0], &vSpin[2], fS, fC);
+            Vec3Copy(vSpin, pBall->vSpin);
+        }
+        pBall->b9B = 1;
+        fn_80067074(pBall->nPlayer, 0x1F, (int)pBall, !gSimulating);
+    }
+    return 1;
+}
+
+// The flagstick (object type 11 at +0x146; any other object is a plain hit). Not while it is
+// still swaying (+0x19C). A hit is within the pole's radius (at least 1 in) plus 2 ft and within
+// 8 in of it along z; the ball is stopped against it along z (normal +-z), and a real ball sets
+// the flag swaying by how far off centre and how fast it hit.
+u8 fn_80053E98(Ball* pBall, void* pv, f32* pHit, f32* pNormal) {
+    u8* pObj = (u8*)pv;
+    f32 vPole[4];
+    f32 fRadius;
+    f32 fDX, fDZ, fDist2;
+    if (pObj[0x146] != 11) return 1;
+    if (0.0f != *(f32*)(pObj + 0x19C)) return 0;
+    fDist2 = pHit[0] - pBall->vPos[0];
+    fDZ = pHit[2] - pBall->vPos[2];
+    fDX = fDist2 * fDist2;
+    fDZ = fDZ * fDZ;
+    fDist2 = fDX + fDZ;
+    fn_800B1AB0(pObj, vPole, &fRadius);
+    if (fRadius < 0.027777778f || fDist2 >= fRadius * fRadius + 0.444444478f) return 0;
+    fDZ = vPole[2] - pBall->vPos[2];
+    if (fn_8000AD9C(fDZ) > 0.222222224f) return 0;
+    pNormal[1] = 0.0f;
+    pNormal[0] = 0.0f;
+    if (fDZ <= 0.0f) {
+        pNormal[2] = 1.0f;
+        pHit[2]    = vPole[2] - 0.222222224f;
+    } else {
+        pNormal[2] = -1.0f;
+        pHit[2]    = 0.222222224f + vPole[2];
+    }
+    pHit[0] = pBall->vPos[0];
+    pHit[1] = pBall->vPos[1];
+    if (!gSimulating) {
+        fDZ = 18.849556f;
+        fDZ = fDZ * ((vPole[0] - pBall->vPos[0]) / fRadius);
+        fDZ = fDZ * (pBall->fSpeed / 29.333334f);
+        *(f32*)(pObj + 0x19C) = -fDZ;
+    }
+    return 1;
+}
+
 // Did the ball hit something (a tree, an object) between last tick and this one? fn_800B1B18
 // sweeps the path, fn_80053E98 and fn_800539F8 decide; then event 0x27 and the bounce off it
 // as surface 13. Returns 1 on a hit.
@@ -809,16 +1177,16 @@ u8 fn_80054040(Ball* pBall, f32 fTicks) {
     f32          vFrom[4];
     f32          vTo[4];
     s32          nWhat;
-    u8           bOut;
+    f32          fFrac;
     SurfaceType* pSurface;
     Vec3Copy(pBall->vPrev, vFrom);
     vFrom[1] -= BALL_RADIUS;
     Vec3Copy(pBall->vPos, vTo);
     vTo[1] -= BALL_RADIUS;
     if (!fn_800B1B18(pBall->nPlayer, vTo, vFrom, vHit, vNormal, &nWhat)) return 0;
-    if (!fn_80053E98(pBall, nWhat, vHit, vNormal)) return 0;
+    if (!fn_80053E98(pBall, (u8*)nWhat, vHit, vNormal)) return 0;
     pSurface = &gSurfaceTypes[13];
-    if (!fn_800539F8(pBall, vHit, vNormal, pSurface, 0, &bOut, fTicks)) return 0;
+    if (!fn_800539F8(pBall, vHit, vNormal, pSurface, 0, &fFrac, fTicks)) return 0;
     if (pBall->nPlayer >= 0) {
         pBall->n90 = nWhat;
         fn_80067074(pBall->nPlayer, 0x27, (int)pBall, !gSimulating);
@@ -896,6 +1264,102 @@ void Ball_Stop(Ball* pBall) {
     if (pBall->nPlayer >= 0) {
         fn_80067074(pBall->nPlayer, 0x20, (int)pBall, !gSimulating);
     }
+}
+
+// A ball in the air meets the ground. Out of bounds (600 yd) is a hazard. fn_8004E558 finds
+// the hit; fn_800539F8 handles it; landing events; the cup (surface 90) kills spin; the bounce
+// (fn_80052598) - on sand (class 6) the first landing point and impact are kept for the lie. On
+// a cup surface more than 2.5 in below the pin: holed. Then the ball flies on for the rest of the
+// tick (fn_8004EE20 for a second hit). Water (class 7 or 16): surfaces 47, 41 and 104 let a ball
+// that bounces up faster than 2.93 and moves on more than 1.71 x that (and over 5.87) skip, its
+// rise quartered; anything else is a hazard.
+u8 Ball_Collide(Ball* pBall, f32 fTicks) {
+    f32          vHit[4];
+    f32          vNormal[4];
+    f32          vFrom[4];
+    f32          vTo[4];
+    f32          fFrac;
+    SurfaceType* pSurface;
+    u32          nWhat;
+    u8           bOut;
+    int          nIndex;
+    f32          fImpact, fAcross;
+    if (pBall->pCourse == NULL) return 0;
+    Vec3Copy(pBall->vPrev, vFrom);
+    vFrom[1] -= BALL_RADIUS;
+    Vec3Copy(pBall->vPos, vTo);
+    vTo[1] -= BALL_RADIUS;
+    if (fn_800BB028(vTo, pBall->vStart) > 360000.0f) {
+        fn_80050CAC(pBall, 1);
+        return 0;
+    }
+    if (!fn_8004E558(pBall->pCourse, pBall->nPlayer, vFrom, vTo, vHit, vNormal, &pSurface, (s32*)&nWhat, &bOut)) return 0;
+    if (pSurface == NULL) return 0;
+    if (0.375f != pSurface->f1C) {
+        pSurface = &gSurfaceTypes[14];
+    }
+    if ((pSurface->u34 & 0x10) && pSurface->f0C < 0.0f && bOut <= 1) return 0;
+    if (!fn_800539F8(pBall, vHit, vNormal, pSurface, nWhat, &fFrac, fTicks)) return 0;
+    BALL_LANDING_EVENTS(pBall, pSurface, nWhat);
+    nIndex = fn_80050BEC(pSurface);
+    if (nIndex == 90) {
+        pBall->vSpin[0] = 0.0f;
+        pBall->vSpin[1] = 0.0f;
+        pBall->vSpin[2] = 0.0f;
+    }
+    fImpact = fn_80052598(pBall, vNormal, pSurface);
+    if (pSurface->nClass == 6 && !pBall->unk9C) {
+        pBall->unk9C       = 1;
+        pBall->fLandImpact = fn_80009680(fImpact);
+        Vec3Copy(pBall->vPos, pBall->vLand);
+    }
+    if (pSurface->nClass == 12 || pSurface->nClass == 18 ||
+        (nIndex == 90 && Vec_Distance(pBall->vPos, PIN(pBall)) < 2.0f)) {
+        if (pBall->pCourse->pin[Game_CurrentHole()].y - pBall->vPos[1] > 0.0694444478f) {
+            Ball_Holed(pBall);
+            return 1;
+        }
+    }
+    if (pBall->nState == 4) {
+        if (pSurface->nClass == 12) {
+            pBall->bHoled = 1;
+            Ball_Stop(pBall);
+            return 1;
+        }
+        pBall->vVel[1] = 0.0293333326f;
+    }
+    Vec3Copy(pBall->vPos, vFrom);
+    vFrom[1] -= BALL_RADIUS;
+    Vec3Copy(vFrom, vTo);
+    if (vNormal[1] >= 0.0f && pBall->vVel[1] > 0.0f) {
+        pBall->vVel[1] -= (1.05f - fFrac) * (0.107170001f * fTicks);
+        if (pBall->vVel[1] <= 0.0f) {
+            pBall->vVel[1] = 0.000178616669f;
+        }
+    }
+    fn_8000C5D4(vTo, pBall->vVel, ((fTicks - 0.05f) * (1.0f - fFrac)) / 36.0f, vTo);
+    if (fn_8004EE20(pBall->pCourse, pBall->nPlayer, vFrom, vTo, vHit, vNormal, &pSurface, (s32*)&nWhat)) {
+        Vec3Copy(pBall->vPos, pBall->vPrev);
+        fn_8000C5D4(pBall->vPos, pBall->vVel, 9.25925906e-06f, pBall->vPos);
+    } else {
+        vFrom[1] += BALL_RADIUS;
+        Vec3Copy(vFrom, pBall->vPrev);
+        vTo[1] += BALL_RADIUS;
+        Vec3Copy(vTo, pBall->vPos);
+    }
+    if (pSurface->nClass == 7 || pSurface->nClass == 16) {
+        nIndex = fn_80050BEC(pSurface);
+        if ((nIndex == 47 || nIndex == 41 || nIndex == 104) && pBall->vVel[1] > 2.9333334f) {
+            fAcross = fn_80009680(pBall->vVel[0] * pBall->vVel[0] + pBall->vVel[2] * pBall->vVel[2]);
+            if (fAcross > 1.71f * pBall->vVel[1] && fAcross > 5.86666679f) {
+                pBall->vVel[1] *= 0.25f;
+                return 1;
+            }
+        }
+        fn_80050CAC(pBall, 1);
+        return 0;
+    }
+    return 1;
 }
 
 // Distance from a point to the pin, 1000 when there is no course.

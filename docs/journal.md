@@ -164,8 +164,14 @@ Dated log of what was done and decided, newest last. Facts and lessons belong in
   (`gameplay.md` "The cup" corrected, hypotheses 6 and 9 updated). Course settings identified:
   `gTurfSpeed` (was `lbl_80281130`) is the weather - rain sets 1/0, slower turf and a shorter
   putt table; options +0x18 / +0x1C are green friction / rough friction.
-- **Next:** `Ball.c` checkpoint 5b = `Ball_Collide`, `fn_80053240`, `Ball_SetLie`, the tree hit
-  (`fn_800539F8`, `fn_80053E98`); then `fn_80052598` (bounce); optional register polish in `skalib.c`
+- **`Ball.c` checkpoint 5b: landings, lies, trees, water.** `Ball_Collide`, `fn_80053240`,
+  `Ball_SetLie`, `fn_800539F8`, `fn_80053E98` all at 99.2-99.9% (register numbering). The
+  landing events are a macro (`BALL_LANDING_EVENTS`), not an inline function - the original
+  re-reads the stack locals. Findings: lies 3/4 are rough and 6/7/8 sand (the strike table was
+  labelled backwards; fixed); sand plugs on hard landings; course 6 has only the bad rough lie;
+  tree deflection is biased 31/32 one way (`& 31` sign test); stick spin is applied at the
+  first bounce and weakened on faster greens; water skipping on three water surfaces.
+- **Next:** `Ball.c` checkpoint 6 = `fn_80052598` (the bounce, 3.2 KB); then polish; optional register polish in `skalib.c`
   (`AnimLib_MergeOverlay`, `AnimLib_PlanBank`, `AnimLib_WalkPair`). Scratch tools in `C:\dev\scratch\tw\`:
   `sbs2.py` (normalised diff), `fnsrc.py`, `regress.py` (who lost 100%), `insert_fns.py` (add
   functions at address positions), `unwritten.py`, `find_fn.py` (search asm by regexes),
