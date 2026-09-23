@@ -15,6 +15,7 @@
 #include "engine.h"
 #include "ustream.h"
 #include "endian.h"
+#include "core/startup.h"
 
 // ---- state -------------------------------------------------------------------------------
 // Everything here is private to the file. CodeWarrior lays out a file's static data in the
@@ -81,7 +82,6 @@ void* fn_800A925C(u32 uSize, u32 uType);
 void  fn_800A929C(u32 uType);
 void* fn_800A9374(u32 uSize);
 void  fn_800A93AC(void);
-void  fn_800B044C(void* pDst, const void* pSrc, u32 uLen, void (*pfn)(void), int);
 void  fn_800B7490(void);                                     // yield / pump
 void  fn_8009527C(void* p);
 void  fn_8000E708(UStreamParams* p);
@@ -583,7 +583,9 @@ static void UStream_ParseChunks(void) {
                         if (gSoundHeader.uKind == TAG('s', 'h', 'd', 'r')) {
                             Mem_cpy(pDst, (u8*)(pChunk + 1), uCopy);
                         } else if (gSoundHeader.uKind == TAG('s', 'a', 'm', 'p')) {
-                            fn_800B044C(pDst, (u8*)(pChunk + 1), uCopy, UStream_NullCallback, 0);
+                            // port: for sample data pDst holds an ARAM address, not a pointer
+                            fn_800B044C((u32)(uptr)pDst, (u8*)(pChunk + 1), uCopy, UStream_NullCallback,
+                                        0);
                         }
                     }
                     gSoundHeader.uPos += uCopy;
