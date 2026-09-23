@@ -2389,23 +2389,8 @@ unsorted/sweep_800ADAF0.c:
 unsorted/sweep_800ADDC8.c:
 	.text       start:0x800ADDC8 end:0x800ADE54
 
-unsorted/sweep_800ADE70.c:
-	.text       start:0x800ADE70 end:0x800ADE88
-
-unsorted/sweep_800ADEC8.c:
-	.text       start:0x800ADEC8 end:0x800ADF08
-
-unsorted/sweep_800ADF6C.c:
-	.text       start:0x800ADF6C end:0x800AE00C
-
-unsorted/sweep_800AE00C.c:
-	.text       start:0x800AE00C end:0x800AE03C
-
-unsorted/sweep_800AE03C.c:
-	.text       start:0x800AE03C end:0x800AE084
-
-unsorted/sweep_800AE1AC.c:
-	.text       start:0x800AE1AC end:0x800AE1DC
+UAudContainers.c:
+	.text       start:0x800ADE70 end:0x800AE1F8
 
 unsorted/sweep_800AE380.c:
 	.text       start:0x800AE380 end:0x800AE3C4
