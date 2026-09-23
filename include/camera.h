@@ -7,6 +7,18 @@
 
 #include "engine.h"
 
+// A render camera's lens (our name; unsorted/cull.h called it CameraSub): what fn_80008370 returns,
+// the pointer at the render camera's +0x10. Only the fields read so far; its size is unknown.
+typedef struct CamLens {
+    s32  nType;                 // 0x00  0: a perspective camera, else flat (LLObj_Gc.c)
+    f32  v4[3];                 // 0x04  a position: the green zoom-to-aim camera copies it to View.v20
+    u8   unk10[0x34 - 0x10];
+    f32  v34[3];                // 0x34  a position: GameMode8 measures the ball's distance to it
+    u8   unk40[0xB4 - 0x40];
+    f32  fB4;                   // 0xB4  a flat camera's view width (guess)
+    f32  fB8;                   // 0xB8  its view height (guess)
+} CamLens;
+
 // A camera shot (0xC0 bytes): a named script position the camera script moves to. The shots of a
 // sequence are chained through p40.
 typedef struct CamShot {

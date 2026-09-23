@@ -25,7 +25,7 @@ void  fn_800953C8(int a);
 
 // ---- math and random numbers -----------------------------------------------------------------
 
-void Vec3Copy(f32* pSrc, f32* pDst);    // 0x80008304
+void Vec3Copy(const f32* pSrc, f32* pDst);   // 0x80008304 (const: see code_800082F8.c)
 f32  fn_800095F0(f32 fAngle);           // sin
 f32  fn_80009638(f32 fAngle);           // cos
 double fn_80009680(double x);           // sqrt

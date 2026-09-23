@@ -14,7 +14,9 @@ typedef struct {
     /* 0x4 */ void (*unk4)(UnkObj* obj);
 } UnkModeFuncs;
 
-// May be the same struct as CameraSub in cull.h: both have a type index at 0x0.
+// Not the render camera's lens (camera.h's CamLens, cull.h's CameraSub before), though both start
+// with a type index: at 0x34 this holds a function-table pointer that is called through, where
+// the lens holds a position GameMode8 reads as floats.
 struct UnkObj {
     /* 0x00 */ int type;
     /* 0x04 */ char pad4[0x20];
