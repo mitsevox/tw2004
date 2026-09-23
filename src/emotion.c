@@ -7,7 +7,6 @@
 
 int  fn_8006AA70(int nPlayer);
 int  fn_8006AA84(int nPlayer);
-void fn_8006ACE0(int nPlayer, int nResult);
 void fn_8006AE50(int nPlayer);
 void fn_8006B0B8(int nPlayer);
 void fn_8006B250(int nPlayer);

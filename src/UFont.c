@@ -5,7 +5,7 @@
 
 // ---- sweep code (not yet cleaned up) ----
 
-s32 fn_80012EC4();
+s32 fn_80012EC4(void);
 void fn_80012868(s32 p0);
 extern u8* lbl_80280DE0;
 void fn_80012898(s32 v);
@@ -31,6 +31,35 @@ void fn_80012E00(void* arg0);
 void fn_80012E1C(u8* p, s32 v);
 extern f32 lbl_80282B4C;
 void fn_80012E24(void* arg0, void* arg1);
+
+void fn_8001256C(void);
+void fn_800127D8(u32 uId, u8* pData, s32 bFlag);
+void fn_800125BC(UStreamObject* pObject);
+s32 fn_80012E4C(u8* p);
+
+void fn_8001256C(void) {
+    *(s32*)(lbl_80280DE0 + 0xB8) = 0;
+    *(s32*)(lbl_80280DE0 + 0xBC) = 0;
+    *(s32*)(lbl_80280DE0 + 0xC0) = 0;
+    *(s32*)(lbl_80280DE0 + 0xC4) = 0;
+    *(s32*)(lbl_80280DE0 + 0xC8) = 0;
+    *(s32*)(lbl_80280DE0 + 0xCC) = 0;
+    *(s32*)(lbl_80280DE0 + 0xD4) = *(s32*)(lbl_80280DE0 + 0xD0);
+    *(s32*)(lbl_80280DE0 + 0x1C0) = *(s32*)(lbl_80280DE0 + 0x1BC);
+}
+
+void fn_800125BC(UStreamObject* pObject) {
+    s32 bFlag;
+    u32 uId;
+
+    bFlag = 0;
+    uId = pObject->uId;
+    if (uId & 0x80) {
+        bFlag = 1;
+    }
+    fn_800127D8(uId & ~0x80, pObject->pData, bFlag);
+    fn_80009E70(pObject);
+}
 
 void fn_80012868(s32 p0) {
     s32 t0;
@@ -119,6 +148,18 @@ void fn_80012E24(void* arg0, void* arg1) {
     if (((s32) (*(s32*)((u8*)(arg1) + 0x10)) != 0) || (lbl_80282B4C != (*(f32*)((u8*)(arg1) + 0xB8)))) {
         (*(s32*)((u8*)(arg0) + 0x474)) = 1;
     }
+}
+
+// ---- end of sweep code ----
+
+// ---- sweep code (not yet cleaned up) ----
+
+s32 fn_80012E4C(u8* p) {
+    return *(s32*)(p + 0x474);
+}
+
+s32 fn_80012EC4(void) {
+    return (s32)(lbl_80280DE0 + 224);
 }
 
 // ---- end of sweep code ----

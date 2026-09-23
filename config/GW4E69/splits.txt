@@ -127,43 +127,10 @@ LLTexGrp.c:
 	.text       start:0x8001013C end:0x800107F4
 
 LLFont.c:
-	.text       start:0x800107F4 end:0x80012438
-
-unsorted/sweep_80012438.c:
-	.text       start:0x80012438 end:0x80012444
-
-unsorted/sweep_8001247C.c:
-	.text       start:0x8001247C end:0x800124A4
-
-unsorted/sweep_800124A4.c:
-	.text       start:0x800124A4 end:0x800124CC
-
-unsorted/sweep_80012520.c:
-	.text       start:0x80012520 end:0x80012540
-
-unsorted/sweep_80012540.c:
-	.text       start:0x80012540 end:0x80012550
-
-unsorted/sweep_80012550.c:
-	.text       start:0x80012550 end:0x8001255C
-
-unsorted/sweep_8001255C.c:
-	.text       start:0x8001255C end:0x8001256C
-
-unsorted/sweep_8001256C.c:
-	.text       start:0x8001256C end:0x800125BC
-
-unsorted/sweep_800125BC.c:
-	.text       start:0x800125BC end:0x8001260C
+	.text       start:0x800107F4 end:0x8001256C
 
 UFont.c:
-	.text       start:0x8001260C end:0x80012E4C
-
-unsorted/sweep_80012E4C.c:
-	.text       start:0x80012E4C end:0x80012E54
-
-unsorted/sweep_80012EC4.c:
-	.text       start:0x80012EC4 end:0x80012ED0
+	.text       start:0x8001256C end:0x80012ED0
 
 unsorted/sweep_80012ED0.c:
 	.text       start:0x80012ED0 end:0x80012F18
@@ -171,23 +138,8 @@ unsorted/sweep_80012ED0.c:
 unsorted/sweep_80012FA0.c:
 	.text       start:0x80012FA0 end:0x80012FA4
 
-unsorted/sweep_80013030.c:
-	.text       start:0x80013030 end:0x80013070
-
-unsorted/sweep_80013070.c:
-	.text       start:0x80013070 end:0x800130EC
-
-unsorted/sweep_800131C4.c:
-	.text       start:0x800131C4 end:0x80013200
-
-unsorted/sweep_80013268.c:
-	.text       start:0x80013268 end:0x800132F8
-
-unsorted/sweep_800132F8.c:
-	.text       start:0x800132F8 end:0x8001333C
-
-unsorted/sweep_800136C4.c:
-	.text       start:0x800136C4 end:0x800136DC
+Controller_Gc.c:
+	.text       start:0x80012FA4 end:0x800136F4
 
 unsorted/sweep_800136F4.c:
 	.text       start:0x800136F4 end:0x8001371C
@@ -892,98 +844,20 @@ AudTable.c:
 hlaudmovie.c:
 	.text       start:0x800A85CC end:0x800A9808
 
-unsorted/sweep_800A9AC4.c:
-	.text       start:0x800A9AC4 end:0x800A9AC8
+hlaudtrack.c:
+	.text       start:0x800A9808 end:0x800AA4BC
 
-unsorted/sweep_800AA0D8.c:
-	.text       start:0x800AA0D8 end:0x800AA118
-
-unsorted/sweep_800AA2A4.c:
-	.text       start:0x800AA2A4 end:0x800AA2EC
-
-unsorted/sweep_800AA2EC.c:
-	.text       start:0x800AA2EC end:0x800AA34C
-
-unsorted/sweep_800AA3D4.c:
-	.text       start:0x800AA3D4 end:0x800AA400
-
-unsorted/sweep_800AA444.c:
-	.text       start:0x800AA444 end:0x800AA44C
-
-unsorted/sweep_800AA498.c:
-	.text       start:0x800AA498 end:0x800AA4BC
-
-unsorted/sweep_800AA694.c:
-	.text       start:0x800AA694 end:0x800AA698
-
-unsorted/sweep_800AAAA0.c:
-	.text       start:0x800AAAA0 end:0x800AAAA4
-
-unsorted/sweep_800AAB48.c:
-	.text       start:0x800AAB48 end:0x800AAB8C
-
-unsorted/sweep_800AAD14.c:
-	.text       start:0x800AAD14 end:0x800AAD18
-
-unsorted/sweep_800AADE8.c:
-	.text       start:0x800AADE8 end:0x800AAE08
-
-unsorted/sweep_800AAE70.c:
-	.text       start:0x800AAE70 end:0x800AAE90
-
-unsorted/sweep_800AAEEC.c:
-	.text       start:0x800AAEEC end:0x800AAEFC
-
-unsorted/sweep_800AB32C.c:
-	.text       start:0x800AB32C end:0x800AB374
-
-unsorted/sweep_800AB374.c:
-	.text       start:0x800AB374 end:0x800AB384
-
-unsorted/sweep_800AB39C.c:
-	.text       start:0x800AB39C end:0x800AB3A4
+hlaudtrackseq.c:
+	.text       start:0x800AA4BC end:0x800AB3A4
 
 hlaudtrackstm.c:
 	.text       start:0x800AB3A4 end:0x800AC330
 
-unsorted/sweep_800AC470.c:
-	.text       start:0x800AC470 end:0x800AC494
+hlaudvoice.c:
+	.text       start:0x800AC330 end:0x800ACECC
 
-unsorted/sweep_800AC494.c:
-	.text       start:0x800AC494 end:0x800AC4A0
-
-unsorted/sweep_800ACA5C.c:
-	.text       start:0x800ACA5C end:0x800ACA94
-
-unsorted/sweep_800ACB28.c:
-	.text       start:0x800ACB28 end:0x800ACB98
-
-unsorted/sweep_800ACEC4.c:
-	.text       start:0x800ACEC4 end:0x800ACECC
-
-unsorted/sweep_800AD1C4.c:
-	.text       start:0x800AD1C4 end:0x800AD1C8
-
-unsorted/sweep_800AD950.c:
-	.text       start:0x800AD950 end:0x800AD9AC
-
-unsorted/sweep_800AD9AC.c:
-	.text       start:0x800AD9AC end:0x800ADA08
-
-unsorted/sweep_800ADA08.c:
-	.text       start:0x800ADA08 end:0x800ADA28
-
-unsorted/sweep_800ADA28.c:
-	.text       start:0x800ADA28 end:0x800ADA94
-
-unsorted/sweep_800ADA94.c:
-	.text       start:0x800ADA94 end:0x800ADAF0
-
-unsorted/sweep_800ADAF0.c:
-	.text       start:0x800ADAF0 end:0x800ADB4C
-
-unsorted/sweep_800ADDC8.c:
-	.text       start:0x800ADDC8 end:0x800ADE54
+hlaudemitter.c:
+	.text       start:0x800ACECC end:0x800ADE70
 
 UAudContainers.c:
 	.text       start:0x800ADE70 end:0x800AE1F8
@@ -1471,35 +1345,8 @@ llrtclock.c:
 GoGrass.c:
 	.text       start:0x8011E170 end:0x80120298
 
-unsorted/sweep_80120298.c:
-	.text       start:0x80120298 end:0x801202F8
-
-unsorted/sweep_801202F8.c:
-	.text       start:0x801202F8 end:0x80120304
-
-unsorted/sweep_80120A40.c:
-	.text       start:0x80120A40 end:0x80120A90
-
-unsorted/sweep_80120D68.c:
-	.text       start:0x80120D68 end:0x80120D74
-
-unsorted/sweep_80120D74.c:
-	.text       start:0x80120D74 end:0x80120D8C
-
-unsorted/sweep_80120DD0.c:
-	.text       start:0x80120DD0 end:0x80120E24
-
-unsorted/sweep_801213F0.c:
-	.text       start:0x801213F0 end:0x801213F4
-
-unsorted/sweep_801213F4.c:
-	.text       start:0x801213F4 end:0x80121404
-
-unsorted/sweep_80121404.c:
-	.text       start:0x80121404 end:0x8012141C
-
-unsorted/sweep_8012141C.c:
-	.text       start:0x8012141C end:0x80121430
+GoShaderObject_Grass_Gc.c:
+	.text       start:0x80120298 end:0x80121430
 
 GameMode4Menu.c:
 	.text       start:0x80121430 end:0x801220D4
@@ -1519,38 +1366,8 @@ unsorted/sweep_80124814.c:
 EASportsBio.c:
 	.text       start:0x801249A8 end:0x8012597C
 
-unsorted/sweep_801260B8.c:
-	.text       start:0x801260B8 end:0x801260C0
-
-unsorted/sweep_80126130.c:
-	.text       start:0x80126130 end:0x80126150
-
-unsorted/sweep_8012632C.c:
-	.text       start:0x8012632C end:0x80126334
-
-unsorted/sweep_80126418.c:
-	.text       start:0x80126418 end:0x8012645C
-
-unsorted/sweep_80126E68.c:
-	.text       start:0x80126E68 end:0x80126E88
-
-unsorted/sweep_80126E88.c:
-	.text       start:0x80126E88 end:0x80126EC0
-
-unsorted/sweep_80126F7C.c:
-	.text       start:0x80126F7C end:0x80126F84
-
-unsorted/sweep_80126F84.c:
-	.text       start:0x80126F84 end:0x80126F94
-
-unsorted/sweep_80126FA0.c:
-	.text       start:0x80126FA0 end:0x80126FB0
-
-unsorted/sweep_80126FD8.c:
-	.text       start:0x80126FD8 end:0x80127004
-
-unsorted/sweep_80127098.c:
-	.text       start:0x80127098 end:0x801270F0
+GameMode22.c:
+	.text       start:0x8012597C end:0x801270F0
 
 SkinBurn.c:
 	.text       start:0x801270F0 end:0x80127D84
@@ -2037,8 +1854,10 @@ runtime/printf.c:
 runtime/qsort.c:
 	.text       start:0x8015929C end:0x80159408
 
-runtime/sscanf.c:
-	.text       start:0x801594CC end:0x8015955C
+src/MSL_C/scanf.c:
+	.text       start:0x80159408 end:0x8015A450
+	.rodata     start:0x80185188 end:0x801851B0
+	.data       start:0x8019CBF0 end:0x8019CCC0
 
 src/MSL_C/PPCEABI/bare/H/string.c:
 	.text       start:0x8015A450 end:0x8015A8D0

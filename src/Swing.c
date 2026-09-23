@@ -145,7 +145,6 @@ extern u8*           lbl_80281DA0;               // per player, 0x104 bytes each
 extern f32           gRealBallRadiusIn;          // 0x80283300  0.84: a real golf ball, in inches
 extern Vec4          lbl_80183620;          // 0, 0, 0, 0.5 (assigned)
 
-void  fn_800130F8(int nPad, int n);              // rumble on
 void  Swing_FaceVector(int nPlayer, f32* pOut);
 f32   Swing_MeterError(int nPlayer);
 void  Swing_ShapeVector(int nPlayer, f32* pOut);

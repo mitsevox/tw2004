@@ -40,3 +40,53 @@ void fn_80011C8C(void) {
 }
 
 // ---- end of sweep code ----
+
+// ---- sweep code (not yet cleaned up) ----
+
+void fn_80012438(u8* p);
+void GXSetTexCoordGen2();
+void fn_8001247C(s32 p0, s32 p1, s32 p2, s32 p3);
+void fn_800124CC();
+void fn_800124A4(void);
+void fn_800124A8(void);
+void GXBegin();
+void fn_80012520(void);
+void fn_80012540(f32 farg0, f32 farg1);
+void fn_80012550(s32 p0);
+void fn_8001255C(f32 farg0, f32 farg1);
+
+void fn_80012438(u8* p) {
+    *(s32*)(p + 0x474) = 0;
+}
+
+void fn_8001247C(s32 p0, s32 p1, s32 p2, s32 p3) {
+    GXSetTexCoordGen2(p0, p1, p2, p3, 0, 125);
+}
+
+void fn_800124A4(void) {
+}
+
+void fn_800124A8(void) {
+    fn_800124A4();
+    fn_800124CC();
+}
+
+void fn_80012520(void) {
+    GXBegin();
+}
+
+void fn_80012540(f32 farg0, f32 farg1) {
+    *(f32* )0xCC008000 = farg0;
+    *(f32* )0xCC008000 = farg1;
+}
+
+void fn_80012550(s32 p0) {
+    *(volatile s32*)0xCC008000 = p0;
+}
+
+void fn_8001255C(f32 farg0, f32 farg1) {
+    *(f32* )0xCC008000 = farg0;
+    *(f32* )0xCC008000 = farg1;
+}
+
+// ---- end of sweep code ----
