@@ -148,7 +148,10 @@ extern s32         lbl_80281CF4;
 extern s32         lbl_80281074;      // clips a leaf may keep this round
 extern u32         lbl_80281CDC;      // bytes of clips a slot may keep
 extern f32         lbl_80281D1C;
-extern s32         lbl_80281070;      // leaves this short are left alone by the drop pass
+extern s32         lbl_80281070;
+extern s16*        lbl_80281CF8;      // the group, style and club node being built
+extern s16*        lbl_80281CFC;
+extern s16*        lbl_80281D00;      // leaves this short are left alone by the drop pass
 u8                 fn_80100294(void);
 u8                 fn_80101E34(struct ClipRecord* pRec);      // slot 0's share of the memory when double buffering
 extern u8*         lbl_80281CC4;      // staging buffers (32-aligned), see Skalib_Init
@@ -177,7 +180,7 @@ void* AnimLib_FindByName(AnimLib* pLib, const char* pName) {
 // four 32-aligned staging buffers used when overlay clips are merged in.
 void Skalib_Init(void) {
     int i;
-    int j;
+    s32 j;
 
     lbl_801C605C[0] = NULL;
     lbl_801C6050[0] = NULL;
@@ -780,6 +783,134 @@ int AnimLib_DropCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB,
                 i--;
                 if (bDone) return bDone;
             }
+        }
+    }
+    return 0;
+}
+
+void* AnimLib_ResolveRecord(AnimLib* pLib, int nRec, ClipRecord* pOut, u8 bLink);
+
+// The library a merge writes, and the records it copies clips into.
+typedef struct BuildCtx {
+    AnimLib*    pLib;
+    ClipRecord* pRecords;
+} BuildCtx;
+
+// Space for a node or leaf at the end of the tree being built.
+#define SKA_ALLOC(pLib, p, nSize)                  \
+    (p) = (void*)((pLib)->pTree + (pLib)->nTreeSize); \
+    (pLib)->nTreeSize += (nSize)
+
+// Merge walk, build pass: writes the merged tree into pCtx->pLib (a node for each group, style
+// and club, a leaf wherever either side has one) and copies the clips of each leaf: from the one
+// side that has it, or from both when the overlay's clips are added to the library's.
+int AnimLib_BuildCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB, BuildCtx* pCtx, int nLevel, int nIndex) {
+    AnimLeaf*   pSrc    = NULL;
+    AnimLib*    pSrcLib = NULL;
+    int         bAny    = 0;
+    AnimLib*    pLib    = pCtx->pLib;
+    ClipRecord* pRecs   = pCtx->pRecords;
+    AnimLeaf*   pNew    = NULL;
+    u8          bFromA;
+    u8          bKeep;
+    s32         i;
+    s16*        pIdx;
+
+    if (pLeafA != NULL || pLeafB != NULL) bAny = 1;
+    bAny   = (bAny != 0);
+    bFromA = 0;
+    switch (nLevel) {
+    case 0:
+        for (i = 0; i < 21; i++) pLib->groups[i] = -1;
+        if (bAny) {
+            pLib->nDefault = pLib->nTreeSize;
+            SKA_ALLOC(pLib, pNew, 8);
+        } else {
+            pLib->nDefault = -1;
+        }
+        break;
+    case 1:
+        pLib->groups[nIndex] = (s16)pLib->nTreeSize;
+        SKA_ALLOC(pLib, lbl_80281CF8, 0x14);
+        if (bAny) {
+            lbl_80281CF8[0] = pLib->nTreeSize;
+            SKA_ALLOC(pLib, pNew, 8);
+        } else {
+            lbl_80281CF8[0] = -1;
+        }
+        for (i = 0; i < 8; i++) lbl_80281CF8[1 + i] = -1;
+        break;
+    case 2:
+        lbl_80281CF8[1 + nIndex] = pLib->nTreeSize;
+        SKA_ALLOC(pLib, lbl_80281CFC, 0xC);
+        for (i = 0; i < 6; i++) lbl_80281CFC[i] = -1;
+        break;
+    case 3:
+        lbl_80281CFC[nIndex] = pLib->nTreeSize;
+        SKA_ALLOC(pLib, lbl_80281D00, 0x20);
+        if (bAny) {
+            lbl_80281D00[1] = pLib->nTreeSize;
+            SKA_ALLOC(pLib, pNew, 8);
+        } else {
+            lbl_80281D00[1] = -1;
+        }
+        for (i = 0; i < 11; i++) lbl_80281D00[2 + i] = -1;
+        break;
+    case 4:
+        if (bAny) {
+            lbl_80281D00[2 + nIndex] = pLib->nTreeSize;
+            SKA_ALLOC(pLib, pNew, 8);
+        } else {
+            lbl_80281D00[2 + nIndex] = -1;
+        }
+        break;
+    }
+    if (pNew == NULL) return 0;
+    bKeep = fn_800C9828(lbl_80281CE8, lbl_80281CEC, lbl_80281CF0, lbl_80281CF4);
+    if (lbl_80281CE8 == 20) pLeafB = NULL;
+    if (pLeafA != NULL && pLeafB == NULL) {
+        pSrc    = pLeafA;
+        pSrcLib = pA;
+        bFromA  = 1;
+    } else if (pLeafA == NULL && pLeafB != NULL) {
+    useB:
+        pSrc    = pLeafB;
+        pSrcLib = pB;
+    } else if (pLeafA != NULL && pLeafB != NULL) {
+        if ((pLeafA->uMask & 2) || !(pLeafB->uMask & 1)) {
+            if (!bKeep || !(pLeafB->uMask & 1)) goto useB;
+        }
+    } else {
+        return 0;
+    }
+    if (pSrc != NULL) {
+        pNew->nCount = pSrc->nCount;
+        pNew->nFirst = pLib->nClips;
+        pNew->uMask  = 0;
+        pIdx         = pSrcLib->pIndex + pSrc->nFirst;
+        for (i = 0; i < pNew->nCount; i++) {
+            pLib->ppClips[pLib->nClips] = AnimLib_ResolveRecord(pSrcLib, *pIdx, &pRecs[pLib->nClips], bKeep);
+            pIdx++;
+            if (bFromA) pRecs[pLib->nClips].n12 |= 2;
+            pLib->nClips++;
+        }
+    } else {
+        pNew->nCount = pLeafA->nCount + pLeafB->nCount;
+        pNew->nFirst = pLib->nClips;
+        pNew->uMask  = 0;
+        pIdx         = pA->pIndex + pLeafA->nFirst;
+        for (i = 0; i < pLeafA->nCount; i++) {
+            pLib->ppClips[pLib->nClips] = AnimLib_ResolveRecord(pA, *pIdx, &pRecs[pLib->nClips], bKeep);
+            pIdx++;
+            if (bFromA || bKeep) pRecs[pLib->nClips].n12 |= 2;
+            pLib->nClips++;
+        }
+        pIdx = pB->pIndex + pLeafB->nFirst;
+        for (i = 0; i < pLeafB->nCount; i++) {
+            pLib->ppClips[pLib->nClips] = AnimLib_ResolveRecord(pB, *pIdx, &pRecs[pLib->nClips], bKeep);
+            pIdx++;
+            if (bFromA) pRecs[pLib->nClips].n12 |= 2;
+            pLib->nClips++;
         }
     }
     return 0;
