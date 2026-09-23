@@ -266,6 +266,82 @@ ClipBank* ClipBank_Get(u32 nSlot) {
     return lbl_801C6050[nSlot];
 }
 
+// Called for each position of two clip trees walked side by side: level 0 the default leaves,
+// 1 a group (its default leaves), 2 a style, 3 a club (its default leaves), 4 a key's leaves.
+// nIndex is the group, style, club or key. A result above 0 stops the walk.
+typedef int (*AnimLibWalkFn)(AnimLib* pA, AnimLib* pB, void* pLeafA, void* pLeafB, void* pCtx, int nLevel, int nIndex);
+
+// The node at offset nOff of a library's tree, or NULL when there is no library or no node.
+#define SKA_NODE(pLib, nOff)          (((pLib) != NULL && (nOff) >= 0) ? (s16*)((pLib)->pTree + (nOff)) : NULL)
+// The child nIdx of a node, or NULL.
+#define SKA_CHILD(pLib, pNode, nIdx)  (((pNode) != NULL && (pNode)[nIdx] >= 0) ? (s16*)((pLib)->pTree + (pNode)[nIdx]) : NULL)
+
+// Walks the clip trees of two libraries together (either may be NULL), telling pfn about every
+// group, style, club and key either one has. lbl_80281CE8..CF4 hold where the walk is.
+int AnimLib_WalkPair(AnimLib* pA, AnimLib* pB, AnimLibWalkFn pfn, void* pCtx) {
+    int  nRet;
+    int  nGroup;
+    int  nStyle;
+    int  nClub;
+    int  nKey;
+    s16* pGroupA;
+    s16* pGroupB;
+    s16* pStyleA;
+    s16* pStyleB;
+    s16* pClubA;
+    s16* pClubB;
+    s16* pLeafA;
+    s16* pLeafB;
+
+    lbl_80281CE8 = -1;
+    lbl_80281CEC = -1;
+    lbl_80281CF0 = -1;
+    lbl_80281CF4 = -1;
+    nRet = pfn(pA, pB, SKA_NODE(pA, pA->nDefault), SKA_NODE(pB, pB->nDefault), pCtx, 0, 0);
+    if (nRet > 0) return nRet;
+    for (nGroup = 0; nGroup < 21; nGroup++) {
+        lbl_80281CE8 = nGroup;
+        lbl_80281CEC = -1;
+        lbl_80281CF0 = -1;
+        lbl_80281CF4 = -1;
+        pGroupA = SKA_NODE(pA, pA->groups[nGroup]);
+        pGroupB = SKA_NODE(pB, pB->groups[nGroup]);
+        if (pGroupA == NULL && pGroupB == NULL) continue;
+        pLeafA = SKA_CHILD(pA, pGroupA, 0);
+        pLeafB = SKA_CHILD(pB, pGroupB, 0);
+        nRet = pfn(pA, pB, pLeafA, pLeafB, pCtx, 1, nGroup);
+        if (nRet > 0) return nRet;
+        for (nStyle = 0; nStyle < 8; nStyle++) {
+            lbl_80281CEC = nStyle;
+            lbl_80281CF0 = -1;
+            pStyleA = SKA_CHILD(pA, pGroupA, 1 + nStyle);
+            pStyleB = SKA_CHILD(pB, pGroupB, 1 + nStyle);
+            if (pStyleA == NULL && pStyleB == NULL) continue;
+            nRet = pfn(pA, pB, NULL, NULL, pCtx, 2, nStyle);
+            if (nRet > 0) return nRet;
+            for (nClub = 0; nClub < 6; nClub++) {
+                lbl_80281CF0 = nClub;
+                lbl_80281CF4 = -1;
+                pClubA = SKA_CHILD(pA, pStyleA, nClub);
+                pClubB = SKA_CHILD(pB, pStyleB, nClub);
+                if (pClubA == NULL && pClubB == NULL) continue;
+                pLeafA = SKA_CHILD(pA, pClubA, 1);
+                pLeafB = SKA_CHILD(pB, pClubB, 1);
+                nRet = pfn(pA, pB, pLeafA, pLeafB, pCtx, 3, nClub);
+                if (nRet > 0) return nRet;
+                for (nKey = 0; nKey < 11; nKey++) {
+                    lbl_80281CF4 = nKey;
+                    pLeafA = SKA_CHILD(pA, pClubA, 2 + nKey);
+                    pLeafB = SKA_CHILD(pB, pClubB, 2 + nKey);
+                    nRet = pfn(pA, pB, pLeafA, pLeafB, pCtx, 4, nKey);
+                    if (nRet > 0) return nRet;
+                }
+            }
+        }
+    }
+    return 0;
+}
+
 // A leaf of the clip tree (see AnimLib); while two trees are merged its mask holds flags
 // instead: 1 keep this one, 2 replace it.
 typedef struct AnimLeaf {
@@ -283,7 +359,7 @@ typedef struct MergeCtx {
 
 // Merge walk, sizing pass: counts the tree bytes the merged library needs (a leaf, then the
 // node for this level) and decides for each leaf pair which side wins.
-int AnimLib_MergeSizeCb(AnimLib* pLibA, AnimLib* pLib, AnimLeaf* pLeaf, AnimLeaf* pOver, MergeCtx* pCtx, int nLevel) {
+int AnimLib_MergeSizeCb(AnimLib* pLibA, AnimLib* pLib, AnimLeaf* pLeaf, AnimLeaf* pOver, MergeCtx* pCtx, int nLevel, int nIndex) {
     int bAny = 0;
 
     if (pLeaf != NULL || pOver != NULL) bAny = 1;
@@ -331,7 +407,7 @@ int AnimLib_MergeSizeCb(AnimLib* pLibA, AnimLib* pLib, AnimLeaf* pLeaf, AnimLeaf
 
 // Merge walk, release pass: every clip of a replaced leaf loses a user; the ones nobody uses any
 // more come off the totals.
-int AnimLib_MergeReleaseCb(AnimLib* pLibA, AnimLib* pLibB, AnimLeaf* pLeafA, AnimLeaf* pLeafB, MergeCtx* pCtx, int nLevel) {
+int AnimLib_MergeReleaseCb(AnimLib* pLibA, AnimLib* pLibB, AnimLeaf* pLeafA, AnimLeaf* pLeafB, MergeCtx* pCtx, int nLevel, int nIndex) {
     ClipRecord* pRec;
     int         i;
     s16*        pIdx;
