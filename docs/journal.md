@@ -198,6 +198,14 @@ Dated log of what was done and decided, newest last. Facts and lessons belong in
   reused floats), `Ball_FlightStep` (one hoisted address), `Ball_SetLie` (one `beq; b` branch),
   `Ball_Collide` / `fn_80053240` (the owner chain's base pointer in r5, not r4). Permuter jobs
   for all five were running at the end of the session (`C:\dev\scratch\tw\perm\`).
+- **Small-function sweep: +1,138 functions exact, 17.06% -> 18.33% code, 1,236 -> 2,374 functions.**
+  `C:\dev\scratch\tw\sweep.py` writes C for mechanical shapes (empty functions, constant returns,
+  field and global getters/setters, one-call wrappers whose arguments are parameters, constants,
+  globals or fields) into `src/unsorted/sweep_<address>.c` units, builds them as NonMatching,
+  keeps only units whose every function is exact (`sweep.py keep`) and links those. 1,138 of
+  1,138 generated functions matched. Units are runs of adjacent functions, or single functions;
+  they are placeholders until the real file boundaries are known (merging is mechanical).
+  Data symbols in literal pools (`.sdata2`, `.rodata`) are left alone. README numbers updated.
 - **Next (agreed with the user, in this order):**
   1. ~~Putt test harness for hypothesis 6~~ (done, entry above). Build a host-side (PC) C or Python model of the roll
      physics now in C (`fn_80052268` skid, `Ball_GroundContact` roll incl. break = slope / (0.457
