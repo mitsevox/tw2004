@@ -3989,6 +3989,7 @@ MetroTRK/nubinit.c:
 
 MetroTRK/msg.c:
 	.text       start:0x8015FD88 end:0x8015FDCC
+	.rodata     start:0x801858C0 end:0x801858E8
 
 MetroTRK/msgbuf.c:
 	.text       start:0x8015FDCC end:0x80160610
