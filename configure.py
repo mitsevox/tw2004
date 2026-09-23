@@ -832,7 +832,7 @@ config.libs = [
             Object(Matching, "GameMode2.c"),
             Object(Matching, "GameMode6.c"),
             Object(Matching, "GameMode7.c"),
-            Object(NonMatching, "GameMode8.c"),
+            Object(Matching, "GameMode8.c"),
             Object(NonMatching, "GameModeStableford.c"),
             Object(NonMatching, "GameMode12.c"),
             Object(NonMatching, "GameModeStroke.c"),

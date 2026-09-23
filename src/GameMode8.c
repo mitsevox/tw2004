@@ -70,12 +70,18 @@ void  fn_800FE190(f32* pA, f32* pB, f32* pOut);
 u8*   fn_800136C4(int nController);         // the pad's state: stick bytes at +0..+3
 u32   fn_800136DC(int nController);         // buttons: held << 16 | pressed this frame
 u32   fn_800142AC(int nButton, int a);      // a button's mask
-extern f32 lbl_802816B0;
-extern f32 lbl_802816B4;
-extern f32 lbl_802816C0;
-extern f32 lbl_802816C4;
-extern f32 lbl_802816B8;
-extern f32 lbl_802816BC;
+// The run's pace (fCB4): a button press adds lbl_802816B0; it falls by lbl_802816B4 a frame, or
+// lbl_802816C0 once the button has not been pressed for lbl_802816C4 seconds; it stays within
+// lbl_802816B8..lbl_802816BC.
+f32 lbl_802816B0 = 0.13f;
+f32 lbl_802816B4 = 0.012f;
+f32 lbl_802816B8 = 0.65f;
+f32 lbl_802816BC = 1.85f;
+f32 lbl_802816C0 = 0.065f;
+f32 lbl_802816C4 = 0.25f;
+// fake match: a one-entry array, so the compiler loads it where fn_800FBD2C compares with it
+// instead of folding in its own 1.0f (the original has this constant first in the file's .sdata2)
+const f32 lbl_80284708[1] = {1.0f};
 f32   fn_8000AD78(f32 y, f32 x);                // atan2f
 void  fn_800BAF04(f32* pSrc, f32* pDst);        // normalise
 int   Golfer_GetAttribute(Player* pPlayer, int nAttr, int nMode);
@@ -911,7 +917,7 @@ void fn_800FB774(int nPlayer) {
                 fn_800FE080(gPlayers[nPlayer].nC58, 1);
             }
         }
-        fStep = 0.999f * (59.94f * gSession.fFrameTime);
+        fStep = 59.94f / 60.0f * (59.94f * gSession.fFrameTime);
         if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x24, 0)) {
             gPlayers[nPlayer].fCB4 += lbl_802816B0;
             gPlayers[nPlayer].nCB8 = 0;
@@ -1107,7 +1113,7 @@ void fn_800FBD2C(int nPlayer) {
                 if (gPlayers[nPlayer].nLie == LIE_GREEN) {
                     if (Game_GetMode() == 7) {
                         fDist = fn_800FB41C(p->vPreShot, (f32*)pBall);
-                        if (fn_800FB41C((f32*)pBall, gpGame->p130) <= 1.0f && fDist >= 20.0f) {
+                        if (fn_800FB41C((f32*)pBall, gpGame->p130) <= lbl_80284708[0] && fDist >= 20.0f) {
                             fn_800FAAB8(nPlayer, 0x14);
                         }
                         if (!(gPlayers[nPlayer].nC3C & 0x40)) {
