@@ -6,6 +6,7 @@
 #include "endian.h"
 
 void fn_8006C63C(void);                 // called while waiting for a read
+u8 fn_800C9D14(int nSlot, int nPlayer, int nIndex, int nStyle, int nClub);
 void fn_800C9EFC(int nBytes, int nError);
 void fn_800C9F14(u8 bForce);
 void fn_800CB550(int nBytes, int nError);
@@ -91,6 +92,75 @@ int fn_800C9928(int nIndex) {
         }
     }
     return -1;
+}
+
+// In game type 6, with streaming on and no read going: finishes a done read, then starts reading
+// the next marked clip set (b8 == 1), trying the slots in turn from the one after the first
+// player's to play.
+void fn_800C9970(void) {
+    int nStart;
+    int nSlot;
+    int nPlayer;
+    int i;
+    int nStyle;
+    int nClub;
+    int nFirst;
+
+    if (gSession.nGameType != 6) return;
+    if (lbl_80282230 == NULL) return;
+    if (lbl_80282230->bOn == 0) return;
+    if (lbl_80282230->nState == 2) {
+        fn_800C9F14(0);
+    }
+    if (lbl_80282230->p0 != NULL) return;
+    nFirst = fn_800E292C();
+    if (nFirst == 5) return;
+    nStart = lbl_80282230->players[nFirst].nId;
+    if (nStart < 0) {
+        nStart = 0;
+    }
+    nStart = (nStart + 1) % 2;
+    for (nSlot = nStart; nSlot < 2; nSlot++) {
+        nPlayer = fn_800CB568(nSlot);
+        if (nPlayer < 0 || lbl_80282230->p0 != NULL) break;
+        for (i = 0; i < 2; i++) {
+            for (nStyle = 0; nStyle < 8; nStyle++) {
+                for (nClub = 0; nClub < 6; nClub++) {
+                    if (lbl_80282230->players[nPlayer].clips[i][nStyle][nClub].b8 == 1) {
+                        lbl_80282230->p0 = &lbl_80282230->bufs[nSlot][i][nStyle][nClub];
+                        lbl_80282230->p4 = &lbl_80282230->players[nPlayer].clips[i][nStyle][nClub];
+                        if (fn_800C9D14(nSlot, nPlayer, i, nStyle, nClub) == 0) {
+                            lbl_80282230->p0 = NULL;
+                            lbl_80282230->p4 = NULL;
+                            continue;
+                        }
+                        return;
+                    }
+                }
+            }
+        }
+    }
+    if (lbl_80282230->p0 != NULL) return;
+    for (nSlot = 0; nSlot < nStart; nSlot++) {
+        nPlayer = fn_800CB568(nSlot);
+        if (nPlayer < 0 || lbl_80282230->p0 != NULL) return;
+        for (i = 0; i < 2; i++) {
+            for (nStyle = 0; nStyle < 8; nStyle++) {
+                for (nClub = 0; nClub < 6; nClub++) {
+                    if (lbl_80282230->players[nPlayer].clips[i][nStyle][nClub].b8 == 1) {
+                        lbl_80282230->p0 = &lbl_80282230->bufs[nSlot][i][nStyle][nClub];
+                        lbl_80282230->p4 = &lbl_80282230->players[nPlayer].clips[i][nStyle][nClub];
+                        if (fn_800C9D14(nSlot, nPlayer, i, nStyle, nClub) == 0) {
+                            lbl_80282230->p0 = NULL;
+                            lbl_80282230->p4 = NULL;
+                            continue;
+                        }
+                        return;
+                    }
+                }
+            }
+        }
+    }
 }
 
 // In game type 6, with streaming on: waits for a read in progress, then finishes it.
