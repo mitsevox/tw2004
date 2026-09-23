@@ -86,6 +86,13 @@ void  fn_800509BC(f32* pSrc, f32* pDst);                  // negate, four floats
 f32   fn_800CBEE0(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** ppRef, f32 (**ppTri)[3],
                   s32* pTri);
 f32   fn_80035074(f32 x);                                 // floor
+
+// The grid cell a coordinate falls in (it may be outside the grid). The four line walkers go
+// through this helper; the point lookups write the cast out (each matches only its own way).
+static inline int Ter_GridCell(f32 fCells) {
+    return (int)fn_80035074(fCells);
+}
+
 f32   fn_8004C8E0(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** ppRef, f32 (**ppTri)[3],
                   s32* pTri);
 f32   fn_8004CB30(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** ppRef, f32 (**ppTri)[3],
@@ -1087,10 +1094,10 @@ u8 fn_8004E558(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit
     if (Ter_CheckForPinCollision(pCourse, nPlayer, pFrom, pTo, pHit, pNormal, ppSurface, ppObj)) {
         fBest = fn_800BB028(pFrom, pHit);
     }
-    nCell[0] = (int)fn_80035074((pFrom[0] - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
-    nCell[1] = (int)fn_80035074((pFrom[2] - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
-    nEndX = (int)fn_80035074((pTo[0] - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
-    nEndZ = (int)fn_80035074((pTo[2] - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
+    nCell[0] = Ter_GridCell((pFrom[0] - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
+    nCell[1] = Ter_GridCell((pFrom[2] - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
+    nEndX = Ter_GridCell((pTo[0] - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
+    nEndZ = Ter_GridCell((pTo[2] - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
     vDelta[0] = pTo[0] - pFrom[0];
     vDelta[1] = pTo[2] - pFrom[2];
     vStart[0] = pFrom[0];
@@ -1135,9 +1142,8 @@ u8 fn_8004E558(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit
         if (nCell[0] == nEndX && nCell[1] == nEndZ) {
             Vec_Copy(pTo, vPos);
         } else {
-            fRun = vEdge[nMajor] - vStart[nMajor];
-            if (fRun != 0.0f) {
-                fRatio = (vEdge[nMinor] - vStart[nMinor]) / fRun;
+            if (vEdge[nMajor] - vStart[nMajor] != 0.0f) {
+                fRatio = (vEdge[nMinor] - vStart[nMinor]) / (vEdge[nMajor] - vStart[nMajor]);
             } else {
                 fRatio = 1000000.0f;
             }
@@ -1285,10 +1291,10 @@ u8 fn_8004EE20(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit
     if (Ter_CheckForPinCollision(pCourse, nPlayer, pFrom, pTo, pHit, pNormal, ppSurface, ppObj)) {
         fBest = fn_800BB028(pFrom, pHit);
     }
-    nCell[0] = (int)fn_80035074((pFrom[0] - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
-    nCell[1] = (int)fn_80035074((pFrom[2] - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
-    nEndX = (int)fn_80035074((pTo[0] - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
-    nEndZ = (int)fn_80035074((pTo[2] - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
+    nCell[0] = Ter_GridCell((pFrom[0] - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
+    nCell[1] = Ter_GridCell((pFrom[2] - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
+    nEndX = Ter_GridCell((pTo[0] - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
+    nEndZ = Ter_GridCell((pTo[2] - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
     vDelta[0] = pTo[0] - pFrom[0];
     vDelta[1] = pTo[2] - pFrom[2];
     vStart[0] = pFrom[0];
@@ -1333,9 +1339,8 @@ u8 fn_8004EE20(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit
         if (nCell[0] == nEndX && nCell[1] == nEndZ) {
             Vec_Copy(pTo, vPos);
         } else {
-            fRun = vEdge[nMajor] - vStart[nMajor];
-            if (fRun != 0.0f) {
-                fRatio = (vEdge[nMinor] - vStart[nMinor]) / fRun;
+            if (vEdge[nMajor] - vStart[nMajor] != 0.0f) {
+                fRatio = (vEdge[nMinor] - vStart[nMinor]) / (vEdge[nMajor] - vStart[nMajor]);
             } else {
                 fRatio = 1000000.0f;
             }
@@ -1476,10 +1481,10 @@ u8 Ter_CheckForGroundCollision(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* p
     f32 fDist;
 
     if (pFrom[0] == pTo[0] && pFrom[1] == pTo[1] && pFrom[2] == pTo[2]) return 0;
-    nCell[0] = (int)fn_80035074((pFrom[0] - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
-    nCell[1] = (int)fn_80035074((pFrom[2] - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
-    nEndX = (int)fn_80035074((pTo[0] - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
-    nEndZ = (int)fn_80035074((pTo[2] - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
+    nCell[0] = Ter_GridCell((pFrom[0] - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
+    nCell[1] = Ter_GridCell((pFrom[2] - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
+    nEndX = Ter_GridCell((pTo[0] - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
+    nEndZ = Ter_GridCell((pTo[2] - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
     vDelta[0] = pTo[0] - pFrom[0];
     vDelta[1] = pTo[2] - pFrom[2];
     vStart[0] = pFrom[0];
@@ -1524,9 +1529,8 @@ u8 Ter_CheckForGroundCollision(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* p
         if (nCell[0] == nEndX && nCell[1] == nEndZ) {
             Vec_Copy(pTo, vPos);
         } else {
-            fRun = vEdge[nMajor] - vStart[nMajor];
-            if (fRun != 0.0f) {
-                fRatio = (vEdge[nMinor] - vStart[nMinor]) / fRun;
+            if (vEdge[nMajor] - vStart[nMajor] != 0.0f) {
+                fRatio = (vEdge[nMinor] - vStart[nMinor]) / (vEdge[nMajor] - vStart[nMajor]);
             } else {
                 fRatio = 1000000.0f;
             }
@@ -1662,10 +1666,10 @@ u8 fn_8004FF34(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNorma
     f32 fDist;
 
     if (pFrom[0] == pTo[0] && pFrom[1] == pTo[1] && pFrom[2] == pTo[2]) return 0;
-    nCell[0] = (int)fn_80035074((pFrom[0] - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
-    nCell[1] = (int)fn_80035074((pFrom[2] - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
-    nEndX = (int)fn_80035074((pTo[0] - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
-    nEndZ = (int)fn_80035074((pTo[2] - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
+    nCell[0] = Ter_GridCell((pFrom[0] - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
+    nCell[1] = Ter_GridCell((pFrom[2] - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
+    nEndX = Ter_GridCell((pTo[0] - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
+    nEndZ = Ter_GridCell((pTo[2] - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
     vDelta[0] = pTo[0] - pFrom[0];
     vDelta[1] = pTo[2] - pFrom[2];
     vStart[0] = pFrom[0];
@@ -1710,9 +1714,8 @@ u8 fn_8004FF34(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNorma
         if (nCell[0] == nEndX && nCell[1] == nEndZ) {
             Vec_Copy(pTo, vPos);
         } else {
-            fRun = vEdge[nMajor] - vStart[nMajor];
-            if (fRun != 0.0f) {
-                fRatio = (vEdge[nMinor] - vStart[nMinor]) / fRun;
+            if (vEdge[nMajor] - vStart[nMajor] != 0.0f) {
+                fRatio = (vEdge[nMinor] - vStart[nMinor]) / (vEdge[nMajor] - vStart[nMajor]);
             } else {
                 fRatio = 1000000.0f;
             }
