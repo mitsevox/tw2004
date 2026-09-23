@@ -7,6 +7,195 @@
 f32 fn_80008EF0(f32* pQ);
 void fn_8000972C(f32* pQ);
 
+// Spherical interpolation from a to b by fT, into b. b is flipped when the two are more than a
+// half turn apart, and a straight blend is used when they are almost the same.
+void fn_8000883C(f32* pA, f32* pB, f32 fT) {
+    f32 fX;
+    f32 fY;
+    f32 fZ;
+    f32 fW;
+    f32 fScaleA;
+    f32 fSin;
+    f32 fAngle;
+    f32 fScaleB;
+    f32 fCos;
+
+    // fake match: b is copied inside the dot product, for the original's load order
+    fCos = pA[3] * (fW = pB[3]) +
+           (pA[2] * (fZ = pB[2]) + (pA[0] * (fX = pB[0]) + pA[1] * (fY = pB[1])));
+    if (fCos < 0.0f) {
+        fCos = -fCos;
+        fX = -fX;
+        fY = -fY;
+        fZ = -fZ;
+        fW = -fW;
+    }
+    if (1.0f - fCos > 0.01f) {
+        fAngle = fn_80009614(fCos);
+        fSin = fn_800095F0(fAngle);
+        fScaleA = fn_800095F0((1.0f - fT) * fAngle) / fSin;
+        fScaleB = fn_800095F0(fT * fAngle) / fSin;
+    } else {
+        fScaleA = 1.0f - fT;
+        fScaleB = fT;
+    }
+    pB[0] = fScaleA * pA[0] + fScaleB * fX;
+    pB[1] = fScaleA * pA[1] + fScaleB * fY;
+    pB[2] = fScaleA * pA[2] + fScaleB * fZ;
+    pB[3] = fScaleA * pA[3] + fScaleB * fW;
+}
+
+// The unit quaternion of a rotation matrix, into pQ: from the trace when it is positive,
+// otherwise from the largest diagonal element.
+void fn_800089D4(f32 (*m)[4], f32* pQ) {
+    int anNext[3] = {1, 2, 0};
+    f32 aQ[4];
+    f32 fTrace;
+    f32 fS;
+    int i;
+    int j;
+    int k;
+
+    fTrace = m[2][2] + (m[0][0] + m[1][1]);
+    if (fTrace > 0.0f) {
+        fS = fn_80009680(fTrace + 1.0f);
+        pQ[3] = 0.5f * fS;
+        fS = 0.5f / fS;
+        pQ[0] = fS * -(m[1][2] - m[2][1]);
+        pQ[1] = fS * -(m[2][0] - m[0][2]);
+        pQ[2] = fS * -(m[0][1] - m[1][0]);
+        return;
+    }
+    i = 0;
+    if (m[1][1] > m[0][0]) {
+        i = 1;
+    }
+    if (m[2][2] > m[i][i]) {
+        i = 2;
+    }
+    j = anNext[i];
+    k = anNext[j];
+    fS = fn_80009680(m[i][i] - (m[j][j] + m[k][k]) + 1.0f);
+    aQ[i] = 0.5f * fS;
+    if (fS != 0.0f) {
+        fS = 0.5f / fS;
+    }
+    aQ[3] = fS * (m[j][k] - m[k][j]);
+    aQ[j] = fS * (m[i][j] + m[j][i]);
+    aQ[k] = fS * (m[i][k] + m[k][i]);
+    pQ[3] = aQ[3];
+    pQ[0] = -aQ[0];
+    pQ[1] = -aQ[1];
+    pQ[2] = -aQ[2];
+}
+
+// The quaternion of three angles (each negated), into pOut. An angle of exactly 0 skips its sin
+// and cos.
+void fn_80008BB8(f32* pOut, f32 fA, f32 fB, f32 fC) {
+    f32 fHalf;
+    f32 fSinA;
+    f32 fCosA;
+    f32 fSinB;
+    f32 fCosB;
+    f32 fSinC;
+    f32 fCosC;
+    f32 fSS;
+    f32 fCC;
+    f32 fSC;
+    f32 fCS;
+
+    fA = -fA;
+    fB = -fB;
+    fC = -fC;
+    if (fA != 0.0f) {
+        if (fB != 0.0f) {
+            if (fC != 0.0f) {
+                fHalf = 0.5f * fA;
+                fSinA = fn_800095F0(fHalf);
+                fCosA = fn_80009638(fHalf);
+                fHalf = 0.5f * fB;
+                fSinB = fn_800095F0(fHalf);
+                fCosB = fn_80009638(fHalf);
+                fHalf = 0.5f * fC;
+                fSinC = fn_800095F0(fHalf);
+                fCosC = fn_80009638(fHalf);
+                fSS = fSinB * fSinA;
+                fCS = fCosB * fSinA;
+                fSC = fSinB * fCosA;
+                fCC = fCosB * fCosA;
+                pOut[3] = fCosC * fCC + fSinC * fSS;
+                pOut[0] = fSinC * fCC - fCosC * fSS;
+                pOut[1] = fCosC * fSC + fSinC * fCS;
+                pOut[2] = fCosC * fCS - fSinC * fSC;
+                return;
+            }
+            fHalf = 0.5f * fA;
+            fSinA = fn_800095F0(fHalf);
+            fCosA = fn_80009638(fHalf);
+            fHalf = 0.5f * fB;
+            fSinB = fn_800095F0(fHalf);
+            fCosB = fn_80009638(fHalf);
+            pOut[3] = fCosB * fCosA;
+            pOut[0] = -fSinB * fSinA;
+            pOut[1] = fSinB * fCosA;
+            pOut[2] = fCosB * fSinA;
+            return;
+        }
+        if (fC != 0.0f) {
+            fHalf = 0.5f * fA;
+            fSinA = fn_800095F0(fHalf);
+            fCosA = fn_80009638(fHalf);
+            fHalf = 0.5f * fC;
+            fSinC = fn_800095F0(fHalf);
+            fCosC = fn_80009638(fHalf);
+            pOut[3] = fCosC * fCosA;
+            pOut[0] = fSinC * fCosA;
+            pOut[1] = fSinC * fSinA;
+            pOut[2] = fCosC * fSinA;
+            return;
+        }
+        fHalf = 0.5f * fA;
+        fSinA = fn_800095F0(fHalf);
+        pOut[3] = fn_80009638(fHalf);
+        pOut[0] = 0.0f;
+        pOut[1] = 0.0f;
+        pOut[2] = fSinA;
+        return;
+    }
+    if (fB != 0.0f) {
+        if (fC != 0.0f) {
+            fHalf = 0.5f * fB;
+            fSinB = fn_800095F0(fHalf);
+            fCosB = fn_80009638(fHalf);
+            fHalf = 0.5f * fC;
+            fSinC = fn_800095F0(fHalf);
+            fCosC = fn_80009638(fHalf);
+            pOut[3] = fCosC * fCosB;
+            pOut[0] = fSinC * fCosB;
+            pOut[1] = fCosC * fSinB;
+            pOut[2] = -fSinC * fSinB;
+            return;
+        }
+        fHalf = 0.5f * fB;
+        fSinB = fn_800095F0(fHalf);
+        pOut[3] = fn_80009638(fHalf);
+        pOut[0] = 0.0f;
+        pOut[1] = fSinB;
+        pOut[2] = 0.0f;
+        return;
+    }
+    if (fC != 0.0f) {
+        fHalf = 0.5f * fC;
+        fSinC = fn_800095F0(fHalf);
+        pOut[3] = fn_80009638(fHalf);
+        pOut[0] = fSinC;
+        pOut[1] = 0.0f;
+        pOut[2] = 0.0f;
+        return;
+    }
+    fn_80009710(pOut);
+}
+
 // The quaternion's squared length.
 f32 fn_80008EF0(f32* pQ) {
     return pQ[2] * pQ[2] + (pQ[1] * pQ[1] + (pQ[3] * pQ[3] + pQ[0] * pQ[0]));
@@ -162,6 +351,25 @@ void fn_80009474(f32 fAngle, f32* pOut) {
     fHalf = 0.5f * -fAngle;
     pOut[0] = fn_800095F0(fHalf);
     pOut[3] = fn_80009638(fHalf);
+}
+
+// The three angles of a unit quaternion, into *pA, *pB and *pC (the middle one from an asin,
+// its sine clamped to -1..1).
+void fn_800094D8(f32* pQ, f32* pA, f32* pB, f32* pC) {
+    f32 fTanA;
+    f32 fTanC;
+    f32 fSinB;
+    f32 fClamped;
+
+    fTanA = 2.0f * (pQ[0] * pQ[1] + pQ[3] * pQ[2]) /
+            (pQ[3] * pQ[3] + pQ[0] * pQ[0] - pQ[1] * pQ[1] - pQ[2] * pQ[2]);
+    fTanC = 2.0f * (pQ[3] * pQ[0] + pQ[1] * pQ[2]) /
+            (pQ[2] * pQ[2] + (pQ[3] * pQ[3] - pQ[0] * pQ[0] - pQ[1] * pQ[1]));
+    fSinB = -2.0f * (pQ[0] * pQ[2] - pQ[3] * pQ[1]);
+    fClamped = (fSinB < -1.0f) ? -1.0f : ((fSinB > 1.0f) ? 1.0f : fSinB);
+    *pA = atan(fTanA);
+    *pB = fn_8000965C(fClamped);
+    *pC = atan(fTanC);
 }
 
 f32 fn_800095F0(f32 fAngle) {
