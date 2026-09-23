@@ -39,7 +39,7 @@ void fn_80168CD8(UIStudio* pStudio, UISWordStack* pStack, u32 uEvent, s32 n, u8 
     }
     for (; i < nEnd; i++) {
         pScreen = &pStudio->pScreens[i];
-        if (n != -8 || pScreen->bUnloading != 1) {
+        if ((u32)n != -8 || pScreen->bUnloading != 1) {  // fake match: the original compares unsigned
             bOut = 0;
             fn_8016A2D4(pStudio, pScreen, pStack, 0, uEvent, n, b, p, &bOut);
         }
@@ -53,8 +53,8 @@ void fn_80168DB0(UIStudio* pStudio, u32 uEvent, s32 n, u8 b, void* p, u8 bAll) {
     s32 nLast;
     u32 i;
     u32 nEnd;
-    u32 uMask;
-    u32 uTaken;
+    UISScreen* pScreen;
+    s32 nTaken;
     u8 bOut;
 
     fn_80165528(pStudio, 0);
@@ -70,13 +70,14 @@ void fn_80168DB0(UIStudio* pStudio, u32 uEvent, s32 n, u8 b, void* p, u8 bAll) {
         nEnd = i + 1;
         if (i == -1) return;
     }
-    uMask = 1 << uEvent;
     for (; i < nEnd; i++) {
-        uTaken = pStudio->pScreens[i].uMask & uMask;
-        if ((uTaken == 1 && n < 0) || uTaken == 0) {
+        pScreen = &pStudio->pScreens[i];
+        nTaken = pScreen->uMask & (1 << uEvent);
+        // EA bug: the masked bit equals 1 only for event 0, so the resend works for that event alone
+        if ((nTaken == 1 && n < 0) || nTaken == 0) {
             bOut = 0;
             pStudio->uFlags |= 2;
-            fn_8016A2D4(pStudio, &pStudio->pScreens[i], &pStudio->stack64, 0, uEvent, n, b, p, &bOut);
+            fn_8016A2D4(pStudio, pScreen, &pStudio->stack64, 0, uEvent, n, b, p, &bOut);
             pStudio->uFlags &= ~2;
         }
     }
@@ -171,15 +172,21 @@ void fn_80169B44(UIStudio* pStudio, UISCommandFn pfnCommand) {
 // studio as no longer set up.
 void fn_80169B4C(UIStudio* pStudio) {
     s32 i;
+    UISScreen* pScreen;
     s32 nArg;
     UISEventData data;
+    u16 uGroup;
+    u16 uScreen;
 
     pStudio->bUnloadingAll = 1;
     for (i = pStudio->nScreens - 1; i >= 0; i--) {
+        pScreen = &pStudio->pScreens[i];
+        uScreen = pScreen->uScreen;
+        uGroup = pScreen->uGroup;
         nArg = 0;
-        data.aw[0] = pStudio->pScreens[i].uGroup;
-        data.aw[1] = pStudio->pScreens[i].uScreen;
-        fn_80165B90(pStudio->pScreens[i].uGroup, pStudio->pScreens[i].uScreen, pStudio, 1, &data, 1, &nArg);
+        data.aw[0] = uGroup;
+        data.aw[1] = uScreen;
+        fn_80165B90(uGroup, uScreen, pStudio, 1, &data, 1, &nArg);
         fn_80165528(pStudio, 0);
     }
     pStudio->uMagic = 0;
