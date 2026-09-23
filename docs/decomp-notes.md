@@ -229,6 +229,10 @@ The fixes that come up most often. Each points to its full entry below.
 
 ### Structs, arrays and pointers
 
+- **[verified] `a[k] = x; k++;` and `a[k++] = x;` compile differently.** The split form gives
+  walking pointers (`&a[k]` stepped by `addi 4`, and `&a[0]` kept for a later loop); `k++` in the
+  index gives `stwx` with a scaled index; a `*p++ = x` walk gives one pointer. GameMode0
+  `fn_800FF894`: the split form took it from 94.9% to 99.6%.
 - **[verified] The `lwzu`/`lfsu` idiom is a repeated field access, not a pointer local.** When the
   same `gPlayers[n].field` is read again after a call, CodeWarrior makes a pointer to the field
   itself and folds the first read into `lwzu rD, off(rP)`; later reads are `lwz rD, 0(rP)`. An
