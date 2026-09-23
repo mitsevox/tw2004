@@ -96,7 +96,6 @@ typedef struct ChallengeSave {
 #define PROFILE_MEDAL(n, i) ((ChallengeSave*)(gpSaveData + (n) * 0x10600))->aMedal[i]
 #define PROFILE_STAMP(n, i) ((ChallengeSave*)(gpSaveData + (n) * 0x10600))->aStamp[i]
 int   fn_800ECF9C(int i);
-void fn_800EC544(Challenge* p0, s32 p1);
 extern u8 lbl_802822FC;
 s32 fn_800ECA08(void);
 extern u8 lbl_80282314;
