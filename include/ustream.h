@@ -64,6 +64,15 @@ typedef struct {
     void* apClosedArg[USTREAM_MAX_FILES];            // 0x264
 } UStreamParams;
 
+// The stream manager's file lists (lbl_80280DF8): streammanagerhole.c and FEgolferanim.c open
+// one of them with UStream_Open and keep the stream; LoadData.c empties list 2. Only the part
+// the code reaches is known.
+typedef struct StreamLists {
+    UStreamParams aParams[7];   // 0x000
+    int  nStream;               // 0x119C  the open stream (UStream_Open)
+} StreamLists;
+extern StreamLists* lbl_80280DF8;
+
 // A stream (0x2E0 bytes).
 typedef struct {
     int   hFile;             // 0x00  -1 when nothing is open

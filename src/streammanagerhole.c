@@ -108,7 +108,6 @@ void fn_80014E88(void);
 void fn_80014E8C(void);
 void fn_80014E90(void);
 void fn_80014E94(void);
-extern s32 lbl_80280DF8;
 void UStream_Close();
 s32 UStream_Open();
 void fn_800150B8(void);
@@ -356,71 +355,71 @@ void fn_80014E94(void) {
 }
 
 void fn_800150B8(void) {
-    UStream_Close(*(s32*)(((u8*)lbl_80280DF8) + 0x119C));
+    UStream_Close(lbl_80280DF8->nStream);
 }
 
 void fn_800150E0(void) {
     s32 t0;
-    t0 = UStream_Open(lbl_80280DF8);
-    *(s32*)(((u8*)lbl_80280DF8) + 0x119C) = t0;
+    t0 = UStream_Open(&lbl_80280DF8->aParams[0]);
+    lbl_80280DF8->nStream = t0;
 }
 
 void fn_8001510C(void) {
-    UStream_Close(*(s32*)(((u8*)lbl_80280DF8) + 0x119C));
+    UStream_Close(lbl_80280DF8->nStream);
 }
 
 void fn_80015134(void) {
     s32 t0;
-    t0 = UStream_Open((lbl_80280DF8 + 644));
-    *(s32*)(((u8*)lbl_80280DF8) + 0x119C) = t0;
+    t0 = UStream_Open(&lbl_80280DF8->aParams[1]);
+    lbl_80280DF8->nStream = t0;
 }
 
 void fn_80015164(void) {
-    UStream_Close(*(s32*)(((u8*)lbl_80280DF8) + 0x119C));
+    UStream_Close(lbl_80280DF8->nStream);
 }
 
 void fn_8001518C(void) {
     s32 t0;
-    t0 = UStream_Open((lbl_80280DF8 + 1288));
-    *(s32*)(((u8*)lbl_80280DF8) + 0x119C) = t0;
+    t0 = UStream_Open(&lbl_80280DF8->aParams[2]);
+    lbl_80280DF8->nStream = t0;
 }
 
 void fn_800151BC(void) {
-    UStream_Close(*(s32*)(((u8*)lbl_80280DF8) + 0x119C));
+    UStream_Close(lbl_80280DF8->nStream);
 }
 
 void fn_800151E4(void) {
     s32 t0;
-    t0 = UStream_Open((lbl_80280DF8 + 3220));
-    *(s32*)(((u8*)lbl_80280DF8) + 0x119C) = t0;
+    t0 = UStream_Open(&lbl_80280DF8->aParams[5]);
+    lbl_80280DF8->nStream = t0;
 }
 
 void fn_80015214(void) {
     s32 t0;
-    t0 = UStream_Open((lbl_80280DF8 + 2576));
-    *(s32*)(((u8*)lbl_80280DF8) + 0x119C) = t0;
+    t0 = UStream_Open(&lbl_80280DF8->aParams[4]);
+    lbl_80280DF8->nStream = t0;
 }
 
 void fn_80015244(void) {
-    UStream_Close(*(s32*)(((u8*)lbl_80280DF8) + 0x119C));
+    UStream_Close(lbl_80280DF8->nStream);
 }
 
 void fn_8001526C(void) {
     s32 t0;
-    t0 = UStream_Open((lbl_80280DF8 + 3864));
-    *(s32*)(((u8*)lbl_80280DF8) + 0x119C) = t0;
+    t0 = UStream_Open(&lbl_80280DF8->aParams[6]);
+    lbl_80280DF8->nStream = t0;
 }
 
 void fn_80015324(void) {
-    *(s32*)(((u8*)lbl_80280DF8) + 0xF18) = 0;
+    lbl_80280DF8->aParams[6].nNumFiles = 0;
 }
 
 void fn_800153BC(void) {
-    *(s32*)((u8*)lbl_80280DF8) = 0;
+    lbl_80280DF8->aParams[0].nNumFiles = 0;
 }
 
 void fn_80015454(void) {
-    *(s32*)(((u8*)lbl_80280DF8) + 0x78C) = 0;
+    lbl_80280DF8->aParams[3].nNumFiles = 0;
 }
 
 s32 fn_80015464(void) {
