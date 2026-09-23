@@ -5,6 +5,7 @@
 #include "engine.h"
 #include "game.h"
 #include "charstate.h"
+#include "core/easb.h"
 #include "frontend/fe.h"
 
 // Outside this file.
@@ -55,8 +56,7 @@ f32  GM_GetGameProgress(SaveProfile* pProfile);         // GameManager.c
 u8   fn_80056480(int a);
 u8   fn_800564AC(int n);
 u8   fn_80058304(SaveProfile* pProfile, int a);
-u8   fn_80125694(void);                 // } EASportsBio.c
-s32  fn_801258E8(void);                 // }
+s32  fn_801258E8(void);                 // EASportsBio.c
 s8   fn_801055DC(int nAsset);           // } FE_CrAPDB.c: an asset's lock kind and number
 s16  fn_80105610(int nAsset);           // } (fn_80078008)
 void fn_80076EEC(void);                 // frees lbl_80281EC8
@@ -598,7 +598,7 @@ u8 fn_80078008(s32 nAsset, SaveProfile* pProfile) {
         }
         break;
     case 12:
-        if (fn_80125694() && n <= fn_801258E8()) {
+        if (EASBio_IsBioLoaded() && n <= fn_801258E8()) {
             bLocked = 0;
         } else {
             bLocked = 1;
