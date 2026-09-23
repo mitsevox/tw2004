@@ -957,7 +957,7 @@ uiArc.c:
 	.text       start:0x80102AC8 end:0x801037F8
 
 FE_CrAPDB.c:
-	.text       start:0x801037F8 end:0x801074D4
+	.text       start:0x801037F8 end:0x801077EC
 
 FE_CrAPMessages.c:
 	.text       start:0x801077EC end:0x8010A448

@@ -12,7 +12,6 @@
 
 int  fn_800E19A4(int nPlayer, int nHoles);
 void fn_800E25CC(u8 b);
-int  fn_800E1CE8(int a, int b);
 
 void  fn_800D8D5C(int nPlayer);   // clears the player's words at 0x314-0x350
 void  fn_800E30D4(void);

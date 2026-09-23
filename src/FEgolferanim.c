@@ -84,7 +84,6 @@ void fn_8008DD50(u8 bNoBlend);
 Clip* fn_8008E02C(void);
 void fn_8008E254(u8 b);
 void fn_8008E2F8(u8 bTarget, f32 fAngle);
-u8   fn_8008E944(u8 b, f32 f);
 void fn_8008EA44(u8 b);
 void fn_8008EBB4(void);
 void fn_8008EBE4(void);

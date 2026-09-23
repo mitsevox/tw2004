@@ -3079,7 +3079,7 @@ void fn_800804E4(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // For the working slot's marked hole pArgs[0], pArgs[1] (from 1): its value unpacked into
-// pArgs[2..4] (fn_80078620), or zeros when the hole is not marked.
+// pArgs[2..4] (a date packed by fn_80078604), or zeros when the hole is not marked.
 void fn_8008052C(MsgArg* pArgs, MsgArg* pResult) {
     s32 nA = pArgs[0].i;
     s32 nB = pArgs[1].i - 1;
