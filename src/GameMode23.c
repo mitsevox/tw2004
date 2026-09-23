@@ -1,8 +1,69 @@
-// GameMode23.c (our name): game mode 23, a tour season of 31 tournaments (lbl_80205F3C, 0x64 bytes
+// GameMode23.c (our name): game mode 23, a tour season of 31 tournaments (gPgaData, 0x64 bytes
 // each, loaded from the 'PGAc' stream object), with the player's results kept in the save profile
 // (+0xB634..): "Did Not Play", "Cut", a finishing place, "Tied (%d players)".
 
-#include "game_types.h"
+#include "golfer.h"
+
+// One tournament of the season (0x64 bytes). TW06: GM_PgaTour_EventSlot_t, which has the name
+// index first and the champion's name and score together further on.
+typedef struct Tournament {
+    s32  nName;                 // 0x00  offset into the names block. TW06: nameIdx
+    s32  nTourEvent;            // 0x04  1-based entry in aTourEvent (0 = one round)
+    u8   unk8[8];
+    s32  n10;                   // 0x10
+    char szChampName[0x10];     // 0x14  the champion before the season is played. TW06: champName
+    s32  nChampScore;           // 0x24  TW06: champScore
+    s16  aTimes[10][2];         // 0x28  per round, in seconds
+    u16  aStartDate[10];        // 0x50  per season (fn_800EFB88). TW06: startDate
+} Tournament;
+
+// A tournament's format (0x54 bytes). TW06: Tournament_events_t, which starts with nRounds too.
+typedef struct TourEvent {
+    s32  nRounds;               // 0x00
+    u8   unk4[0x54 - 0x4];
+} TourEvent;
+
+typedef struct Triple {
+    s32  n0;                    // 0x0
+    s32  n4;                    // 0x4
+    s32  n8;                    // 0x8
+} Triple;
+
+// The tour's data, loaded from the 'PGA' stream objects. TW06: PGA_Master (GameModeDriverPGATour::m_PgaData).
+typedef struct PgaData {
+    Tournament aTournament[31]; // 0x0000  'PGAc'
+    TourEvent  aTourEvent[31];  // 0x0C1C  'PGAt'
+    u8         unk1648[0x6FC8 - 0x1648];
+    Triple     aTriple[11];     // 0x6FC8  'PGAp'
+    char*      pNames;          // 0x704C  'PGAn'. TW06: pStrTable
+    u8         unk7050[4];
+} PgaData;
+extern PgaData gPgaData;
+
+// A tournament of the season in a save profile (TW06: PGATourSeason_EventData, the same layout).
+typedef struct SeasonEvent {
+    char szChampName[0x10];     // 0x00  the tournament's champion. TW06: champName
+    s32  nChampScore;           // 0x10  TW06: champScore
+    u8   unk14[0x1C - 0x14];
+    s32  nUserRank;             // 0x1C  the player's finishing place. TW06: userRank
+    s32  nUserRankType;         // 0x20  0 did not play, 1 missed the cut, 2 placed. TW06: eUserRankType
+} SeasonEvent;
+
+// The tour season in a save profile (TW06: PGATourSeason_t, which has 29 tournaments).
+typedef struct TourSeason {
+    s32  nSeason;               // 0x00  0 = 2004. TW06: season
+    s32  nEvent;                // 0x04  the current tournament. TW06: eventID
+    s32  nRound;                // 0x08  its round. TW06: round
+    SeasonEvent aEvent[31];     // 0x0C
+} TourSeason;
+
+// A save profile (0x10600 bytes; the other files see gpSaveData as bytes).
+typedef struct Profile {
+    u8         unk0[0xB634];
+    TourSeason tour;            // 0xB634
+    u8         unkBA9C[0x10600 - 0xBA9C];
+} Profile;
+extern Profile* gpSaveData;
 
 void fn_800EDE78(void);
 void UStream_UnregisterHandler();
@@ -11,8 +72,6 @@ void fn_800EDEE8(void);
 void fn_800EDF34(s32 p0);
 void fn_800EDF60(s32 p0);
 void fn_800EDF90(s32 p0);
-extern s32 gpGame;
-extern s32 gpSaveData;
 void fn_800EE064(void);
 extern u8 lbl_8028233C;
 u8 fn_800EE470(void);
@@ -24,57 +83,17 @@ void fn_800EF294(void);
 s32 fn_800EF834(void);
 s32 fn_800EFB88(void);
 s32 fn_800EFBAC(void);
-s32 fn_800EFDFC(s32 p0);
-u8* fn_800EFA70(s32 i);
+char* fn_800EFDFC(s32 i);
+Tournament* fn_800EFA70(s32 i);
 s32 fn_800EFE3C(s32 i);
-u8* fn_800EFE60(s32 p0);
+char* fn_800EFE60(s32 i);
 s32 fn_801197CC();
 void fn_800F009C(void);
 u8 fn_8011908C(s32, s32);
 s32 fn_8011937C(s32, s32, u8);
 void fn_800F018C(void);
 
-// One tournament of the season (0x64 bytes).
-typedef struct Lesson {
-    s32  n0;
-    s32  nPlan;                 // 0x04  1-based entry in the round table (0 = one round)
-    u8   unk8[8];
-    s32  n10;                   // 0x10
-    char szName[0x10];          // 0x14
-    s32  n24;                   // 0x24
-    s16  aTimes[10][2];         // 0x28  per round, in seconds
-    u16  a50[10];               // 0x50  per season (fn_800EFB88)
-} Lesson;
-extern Lesson lbl_80205F3C[];
-#define LESSONS lbl_80205F3C
-#define LESSON_BYTES ((u8*)lbl_80205F3C)
-
-typedef struct Triple {
-    s32 a, b, c;
-} Triple;
-#define TRIPLES ((Triple*)(LESSON_BYTES + 0x6FC8))
-
-// The tour-season part of a save profile (0x10600 bytes).
-typedef struct LessonSave {
-    char szName[0x10];          // 0x00
-    s32  n10;                   // 0x10
-    u8   unk14[0x1C - 0x14];
-    s32  nPlace;                // 0x1C  the finishing place
-    s32  nResult;               // 0x20  0 did not play, 1 missed the cut, 2 placed
-} LessonSave;
-typedef struct Profile {
-    u8         unk0[0xB634];
-    s32        nB634;           // 0xB634
-    s32        nLesson;         // 0xB638  the current tournament
-    s32        nStep;           // 0xB63C  its round
-    LessonSave aLesson[31];     // 0xB640  per tournament
-    u8         unkBA9C[0x10600 - 0xBA9C];
-} Profile;
-#define PROFILES ((Profile*)gpSaveData)
-#define SEASON ((LessonSave*)((u8*)gpSaveData + 0xB640))   // profile 0's results
-
-extern u8  lbl_80281670[];
-extern u8  gSession[];
+extern s32 lbl_80281670;
 extern s32 lbl_80282338;
 s32  fn_801190D8(s32 a);
 void fn_800E4364(u32 nQueue, s32 a, s32 b, s32 c);
@@ -82,10 +101,9 @@ s32  fn_800EFBD0(s32 i);
 u8   fn_800EF83C(u16 nDate, s32* pId, s32* pRound);
 void fn_800D2714(u16* pDate, s32* pDay, s32* pMonth, s32* pYear);
 s32  fn_8011A7C8(s32 nPlayer, s32 nHole);
-s32  fn_80119588(s32 a);
+s32  fn_80119588(s32 nPlayer, s32 a);
 s32  fn_800E1904(s32 nPlayer, s32 a);
 s32  Game_CurHoleIndex(void);
-extern u8 gPlayers[];
 char* strcpy(char* pDst, const char* pSrc);
 int   sprintf(char* pDst, const char* pFmt, ...);
 int   UStream_RegisterHandler();
@@ -112,19 +130,21 @@ void fn_800EDEE8(void) {
 }
 
 void fn_800EDF34(s32 p0) {
-    fn_8000E790(p0, 3100, LESSON_BYTES);
+    fn_8000E790(p0, sizeof(gPgaData.aTournament), gPgaData.aTournament);
 }
 
 void fn_800EDF60(s32 p0) {
-    fn_8000E790(p0, 2604, (LESSON_BYTES + 0xC1C));
+    fn_8000E790(p0, sizeof(gPgaData.aTourEvent), gPgaData.aTourEvent);
 }
 
 void fn_800EDF90(s32 p0) {
-    fn_8000E790(p0, 132, (LESSON_BYTES + 0x6FC8));
+    fn_8000E790(p0, sizeof(gPgaData.aTriple), gPgaData.aTriple);
 }
 
+// The current tournament's number of rounds goes into the game state.
 void fn_800EE064(void) {
-    *(s32*)(((u8*)gpGame) + 0xE0) = *(s32*)((LESSON_BYTES + ((*(s32*)((LESSON_BYTES + (*(s32*)(((u8*)(gpSaveData + 0x10000)) - 0x49C8) * 100)) + 0x4) - 1) * 84)) + 0xC1C);
+    s32 nTourEvent = gPgaData.aTournament[gpSaveData->tour.nEvent].nTourEvent - 1;
+    gpGame->nE0 = gPgaData.aTourEvent[nTourEvent].nRounds;
 }
 
 u8 fn_800EE470(void) {
@@ -153,16 +173,16 @@ s32 fn_800EFBAC(void) {
     return (t0 + 2004);
 }
 
-s32 fn_800EFDFC(s32 p0) {
-    return (*(s32*)(LESSON_BYTES + 0x704C) + *(s32*)(LESSON_BYTES + (p0 * 100)));
+char* fn_800EFDFC(s32 i) {
+    return gPgaData.pNames + gPgaData.aTournament[i].nName;
 }
 
 s32 fn_800EFE3C(s32 i) {
-    return *(s32*)(fn_800EFA70(i) + 0x10);
+    return fn_800EFA70(i)->n10;
 }
 
-u8* fn_800EFE60(s32 p0) {
-    return ((LESSON_BYTES + (p0 * 100)) + 0x14);
+char* fn_800EFE60(s32 i) {
+    return gPgaData.aTournament[i].szChampName;
 }
 
 void fn_800F009C(void) {
@@ -179,24 +199,27 @@ void fn_800F018C(void) {
 
 // The mode ends: one player back, and the options it changed come back.
 void fn_800EE02C(void) {
-    ((s32*)gpGame)[0xC / 4] = 1;
-    ((s32*)gpGame)[0x10 / 4] = 1;
-    *(s32*)(gSession + 0xE84) = *(s32*)lbl_80281670;
-    *(s32*)(gSession + 0xE88) = lbl_80282338;
+    gpGame->nC = 1;
+    gpGame->n10 = 1;
+    SESSION_OPTIONS->unkC = lbl_80281670;
+    SESSION_OPTIONS->nWind = lbl_80282338;
     lbl_8028233C = 0;
 }
 
-// The lesson and step profile 0 is on.
-s32 fn_800EF908(s32* pStep) {
-    *pStep = PROFILES[0].nStep;
-    return PROFILES[0].nLesson;
+// The tournament profile 0 is on, and its round.
+s32 fn_800EF908(s32* pRound) {
+    PlayerNumber_t nPlayer = PLR_1_e;
+    *pRound = gpSaveData[nPlayer].tour.nRound;
+    return gpSaveData[nPlayer].tour.nEvent;
 }
 
+// The tournament after the current one.
 void fn_800EF940(void) {
-    fn_800EFBD0(PROFILES[0].nLesson + 1);
+    PlayerNumber_t nPlayer = PLR_1_e;
+    fn_800EFBD0(gpSaveData[nPlayer].tour.nEvent + 1);
 }
 
-// The last lesson there is.
+// The last tournament there is.
 s32 fn_800EF984(void) {
     s32 nLast = 0;
     s32 i = fn_800EFBD0(1);
@@ -213,7 +236,7 @@ void fn_800EF094(s32 n) {
     *(s32*)(lbl_80205F30 + 8) = n;
 }
 
-// A progress bar out of 10: lessons done x 10 / 31, at most 9.
+// A progress bar out of 10: tournaments won x 10 / 31, at most 9.
 u16 fn_800EF0E0(void) {
     u16 n = 9;
     u16 t = fn_800F02A8() * 10 / 31;
@@ -223,28 +246,30 @@ u16 fn_800EF0E0(void) {
     return n;
 }
 
-// Lesson i (0..30), or none.
-u8* fn_800EFA70(s32 i) {
+// Tournament i (0..30), or none.
+Tournament* fn_800EFA70(s32 i) {
     if (i != -1 && i < 31) {
-        return (u8*)&LESSONS[i];
+        return &gPgaData.aTournament[i];
     }
     return 0;
 }
 
-// Lesson i's step count (from its entry in the second table; 1 without one).
+// Tournament i's number of rounds (from its format; 1 without one).
 s32 fn_800EFA9C(s32 i) {
-    if (LESSONS[i].nPlan) {
-        return *(s32*)(LESSON_BYTES + LESSONS[i].nPlan * 0x54 + 0xBC8);
+    if (gPgaData.aTournament[i].nTourEvent) {
+        return gPgaData.aTourEvent[gPgaData.aTournament[i].nTourEvent - 1].nRounds;
     }
     return 1;
 }
 
+// Profile 0's season, 0 = 2004.
 s32 fn_800EFB88(void) {
-    return PROFILES[0].nB634;
+    PlayerNumber_t nPlayer = PLR_1_e;
+    return gpSaveData[nPlayer].tour.nSeason;
 }
 
 // The tournament being played on a date.
-u8* fn_800EFC80(u16 nDate) {
+Tournament* fn_800EFC80(u16 nDate) {
     s32 nId;
     s32 nRound;
     if (fn_800EF83C(nDate, &nId, &nRound)) {
@@ -253,40 +278,42 @@ u8* fn_800EFC80(u16 nDate) {
     return 0;
 }
 
-// Two times of a lesson's step k, in milliseconds.
+// Two times of tournament i's round k, in milliseconds.
 s32 fn_800EFCC0(s32 i, s32 k) {
-    return ((Lesson*)fn_800EFA70(i))->aTimes[k][0] * 1000;
+    return fn_800EFA70(i)->aTimes[k][0] * 1000;
 }
 
 s32 fn_800EFCFC(s32 i, s32 k) {
-    return ((Lesson*)fn_800EFA70(i))->aTimes[k][1] * 1000;
+    return fn_800EFA70(i)->aTimes[k][1] * 1000;
 }
 
 u16 fn_800EFD38(s32 i) {
-    u8* p = fn_800EFA70(i);
+    Tournament* p = fn_800EFA70(i);
     if (!p) {
         return 0xFFFF;
     }
-    return ((Lesson*)p)->a50[fn_800EFB88()];
+    return p->aStartDate[fn_800EFB88()];
 }
 
+// Profile 0's current tournament.
 s32 fn_800EFE18(void) {
-    return PROFILES[0].nLesson;
+    PlayerNumber_t nPlayer = PLR_1_e;
+    return gpSaveData[nPlayer].tour.nEvent;
 }
 
 s32 fn_800EFE78(s32 i) {
-    return LESSONS[i].n24;
+    return gPgaData.aTournament[i].nChampScore;
 }
 
 void fn_800F0258(s32 i, char* pDst) {
-    strcpy(pDst, PROFILES->aLesson[i].szName);
+    strcpy(pDst, gpSaveData->tour.aEvent[i].szChampName);
 }
 
 s32 fn_800F0290(s32 i) {
-    return PROFILES->aLesson[i].n10;
+    return gpSaveData->tour.aEvent[i].nChampScore;
 }
 
-// How many lessons are done (flag 1 in the profile's list at +0xC8, 8 bytes each).
+// How many tournaments are won (flag 1 in the profile's list at +0xC8, 8 bytes each).
 s32 fn_800F02A8(void) {
     s32 n = 0;
     s32 i;
@@ -299,19 +326,19 @@ s32 fn_800F02A8(void) {
 }
 
 s32 fn_800F02D4(s32 i) {
-    return TRIPLES[i].a;
+    return gPgaData.aTriple[i].n0;
 }
 
 s32 fn_800F02EC(s32 i) {
-    return TRIPLES[i].b;
+    return gPgaData.aTriple[i].n4;
 }
 
 s32 fn_800F0304(s32 i) {
-    return TRIPLES[i].c;
+    return gPgaData.aTriple[i].n8;
 }
 
-s32 fn_800F0428(s32 n) {
-    return PROFILES[n].nLesson;
+s32 fn_800F0428(s32 nPlayer) {
+    return gpSaveData[nPlayer].tour.nEvent;
 }
 
 void fn_800EDE7C(void) {
@@ -326,8 +353,8 @@ void fn_800EDFC0(void* pObj) {
     void* pData;
     u32 nSize = fn_8000E81C(pObj, &pData);
     if (nSize) {
-        *(void**)(LESSON_BYTES + 0x704C) = fn_800951A0(nSize, 0x10, 1);
-        Mem_cpy(*(void**)(LESSON_BYTES + 0x704C), pData, nSize);
+        gPgaData.pNames = fn_800951A0(nSize, 0x10, 1);
+        Mem_cpy(gPgaData.pNames, pData, nSize);
         fn_80009E70(pObj);
     }
 }
@@ -344,7 +371,7 @@ void fn_800F0010(char* pDst) {
 
 // A tournament's result for the season screen: "Did Not Play", "Cut", or the place.
 void fn_800F01CC(s32 i, char* pDst) {
-    switch (SEASON[i].nResult) {
+    switch (gpSaveData->tour.aEvent[i].nUserRankType) {
     case 0:
         strcpy(pDst, "Did Not Play");
         return;
@@ -352,37 +379,37 @@ void fn_800F01CC(s32 i, char* pDst) {
         strcpy(pDst, "Cut");
         return;
     case 2:
-        sprintf(pDst, "%d", SEASON[i].nPlace);
+        sprintf(pDst, "%d", gpSaveData->tour.aEvent[i].nUserRank);
         return;
     }
 }
 
-#define STROKES(n, h) (*(s32*)(gPlayers + (n) * 0xEF8 + (h) * 4 + 0x154))
-
 // Strokes behind the leader (in a playoff, on this hole).
 s32 fn_800EE778(s32 nPlayer) {
-    if (((u8*)gpGame)[0xD4]) {
-        return fn_8011A7C8(nPlayer, Game_CurHoleIndex()) - STROKES(nPlayer, Game_CurHoleIndex());
+    if (gpGame->bD4) {
+        return fn_8011A7C8(nPlayer, Game_CurHoleIndex()) - gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
     }
-    return fn_80119588(1) - fn_800E1904(nPlayer, 0);
+    return fn_80119588(nPlayer, 1) - fn_800E1904(nPlayer, 0);
 }
 
 s32 fn_800EE810(s32 nPlayer) {
-    if (((u8*)gpGame)[0xD4]) {
-        return fn_8011A7C8(nPlayer, Game_CurHoleIndex()) - (STROKES(nPlayer, Game_CurHoleIndex()) + 1);
+    if (gpGame->bD4) {
+        return fn_8011A7C8(nPlayer, Game_CurHoleIndex()) -
+            (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1);
     }
-    return fn_80119588(1) - (fn_800E1904(nPlayer, 1) + 1);
+    return fn_80119588(nPlayer, 1) - (fn_800E1904(nPlayer, 1) + 1);
 }
 
 // Whether the player trails the leader by more than one stroke.
 u8 fn_800EE5B4(s32 nPlayer) {
-    u8 bBehind;
-    if (((u8*)gpGame)[0xD4]) {
-        return STROKES(nPlayer, Game_CurHoleIndex()) + 1 < fn_8011A7C8(nPlayer, Game_CurHoleIndex());
+    int bBehind;
+    if (gpGame->bD4) {
+        return gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1 <
+            fn_8011A7C8(nPlayer, Game_CurHoleIndex());
     }
     bBehind = 0;
-    if (fn_800E1904(nPlayer, 0) >= fn_80119588(1)) {
-        if (fn_800E1904(nPlayer, 1) + 1 < fn_80119588(1)) {
+    if (fn_800E1904(nPlayer, 0) >= fn_80119588(nPlayer, 1)) {
+        if (fn_800E1904(nPlayer, 1) + 1 < fn_80119588(nPlayer, 1)) {
             bBehind = 1;
         }
     }
@@ -390,7 +417,7 @@ u8 fn_800EE5B4(s32 nPlayer) {
 }
 
 // Which tournament (and which of its rounds) is played on a date: each tournament starts on a
-// date per season (a50, seasons from 2004).
+// date per season (aStartDate, seasons from 2004).
 u8 fn_800EF83C(u16 nDate, s32* pId, s32* pRound) {
     s32 nDay;
     s32 nMonth;
@@ -404,7 +431,7 @@ u8 fn_800EF83C(u16 nDate, s32* pId, s32* pRound) {
     nSeason = nYear - 2004;
     if (nSeason >= 0 && nSeason < 10) {
         for (i = 0; i < 31; i++) {
-            d = nDate - LESSONS[i].a50[nSeason];
+            d = nDate - gPgaData.aTournament[i].aStartDate[nSeason];
             if (d >= 0 && d < fn_800EFA9C(i)) {
                 *pId = i;
                 bFound = 1;
