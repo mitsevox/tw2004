@@ -53,7 +53,6 @@ void  fn_800DCAD8(void);
 void  fn_800131C4(int nController);
 void  fn_80013130(int nController, int nStrength);
 u8    fn_800C714C(void);
-u8    fn_800DCB74(void);
 u8    fn_800DCB3C(void);
 void  fn_8001425C(int a);
 void  fn_80012F34(int a);
@@ -69,9 +68,6 @@ int   fn_800D782C(int nPlayer, u8* pBall, int a, u8 b, int c);
 u8    fn_800E5344(void);
 u8    fn_800E23B0(int nPlayer, int nStrokes);
 u8    fn_800DC818(u8* pBall, int nPlayer, u8 bNext);
-GameEffects* fn_800DAF74(void);
-u8    fn_800DCB08(void);
-u8    fn_800DCB00(void);
 u8    fn_8005D2DC(void);
 void  GM_vCloseModuleONCE(void);
 u8    fn_800C6CCC(void);
@@ -84,10 +80,8 @@ void  fn_800DBFAC(void);
 void  fn_800DC18C(void);
 void  fn_800DC290(f32 fHeight);
 int   fn_800E17AC(int nPlayer);           // the player's total strokes
-void  fn_800DCB84(u8* pA, u8* pB, f32* pOut);
 int   fn_800F354C(int nPlayer);
 int   fn_800F1D34(int nPlayer);
-void* fn_800CC190(CourseInfo* pCourse, f32* pPos);   // surface type under a point
 extern u8* gpSaveData;
 int   fn_800D8750(int a, int b, int c, u8* pProfile, int nPlayer);
 u8    fn_800DCB10(int nPlayer);
@@ -408,7 +402,7 @@ void fn_800DBA50(int nPlayer) {
             return;
         }
         if (!(gPlayers[nPlayer].uFlags & 8) && !Player_IsCPU(nPlayer) && lbl_80202898.bGameBreaker != 1) {
-            fn_800DCB84(gPlayers[nPlayer].ball, gPlayers[nPlayer].ballBefore, v);
+            fn_800DCB84((f32*)gPlayers[nPlayer].ball, (f32*)gPlayers[nPlayer].ballBefore, v);
             v[1] = 0.0f;
             fDist = fn_80009680(fn_80009744(v));
             if (gPlayers[nPlayer].nClub == 25) {
@@ -423,7 +417,7 @@ void fn_800DBA50(int nPlayer) {
                 return;
             }
             if (!gPlayers[nPlayer].unk30C[1] && fn_8000C594()) {
-                fn_800DCB84(gPlayers[nPlayer].ball + 0x40, gPlayers[nPlayer].ballBefore, v2);
+                fn_800DCB84((f32*)(gPlayers[nPlayer].ball + 0x40), (f32*)gPlayers[nPlayer].ballBefore, v2);
                 v2[1] = 0.0f;
                 fDist = fn_80009680(fn_80009744(v2));
                 nLie = gPlayers[nPlayer].nLie;
@@ -467,7 +461,7 @@ void fn_800DBA50(int nPlayer) {
 
 // TW06: GameEffects_EndGB (by position). The letterbox starts closing, with the end event; the
 // GameBreaker music stops, or (a scripted one that failed) the old music comes back.
-void fn_800DBDA8(void) {
+void fn_800DBDA8(int nPlayer) {
     if (lbl_80202898.bGameBreaker) {
         lbl_80202898.bClosing = 1;
         if (lbl_80202898.fGBTime > 0.8f) {
@@ -531,7 +525,7 @@ void fn_800DBFAC(void) {
         fHeight = 0.15f;
     }
     pGE = &lbl_80202898;       // steers the register choice (found by the permuter)
-    fn_800DCB84(gPlayers[pGE->nPlayer].ball, gPlayers[pGE->nPlayer].ballBefore, v);
+    fn_800DCB84((f32*)gPlayers[pGE->nPlayer].ball, (f32*)gPlayers[pGE->nPlayer].ballBefore, v);
     v[1] = 0.0f;
     fDist = fn_80009680(fn_80009744(v));
     if (!Player_IsCPU(lbl_80202898.nPlayer)) {
