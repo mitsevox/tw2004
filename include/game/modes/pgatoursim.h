@@ -62,7 +62,7 @@ typedef struct PgaPro {
     f32  fPar3Avg;              // 0x58  scoring average on par 3s (fn_80119B54)
     f32  fPar4Avg;              // 0x5C  on par 4s
     f32  fPar5Avg;              // 0x60  on par 5s
-    u8   unk64[0x68 - 0x64];
+    s32  nCareerWinnings;       // 0x64  before the game's first season (0x801176C0)
 } PgaPro;
 LAYOUT_ASSERT(PgaPro, 0x68);
 extern PgaPro lbl_8024B9CC[PGA_NUM_PROS];

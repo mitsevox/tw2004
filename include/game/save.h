@@ -94,6 +94,14 @@ typedef struct PgaEntrantMC {
 } PgaEntrantMC;
 LAYOUT_ASSERT(PgaEntrantMC, 0x1C);
 
+// The current tournament's field in a save profile (0xE04 bytes, cleared as one by 0x80117AF8).
+typedef struct PgaField {
+    s16  nEntrants;             // 0x000  (GM_PgaTourSim_GetNumEntrants)
+    s16  nWinner;               // 0x002  the winning entrant, -1 while the tournament is on (0x80117E98)
+    PgaEntrantMC aEntrant[PGA_MAX_ENTRANTS];    // 0x004
+} PgaField;
+LAYOUT_ASSERT(PgaField, 0xE04);
+
 // The PGA TOUR in a save profile (0x4E9C bytes, cleared as one by 0x801176C0): the season (TW06:
 // PGATourSeason_t, which has 29 tournaments), every tour golfer's season counts, and the current
 // tournament's field.
@@ -103,9 +111,7 @@ typedef struct TourSeason {
     s32  nRound;                // 0x0008  its round. TW06: round
     SeasonEvent aEvent[31];     // 0x000C
     PgaStatCounts aStats[PGA_NUM_GOLFERS];      // 0x0468  per golfer id
-    s16  nEntrants;             // 0x4090  the field's size (GM_PgaTourSim_GetNumEntrants)
-    s16  nWinner;               // 0x4092  the winning entrant, -1 while the tournament is on (0x80117E98)
-    PgaEntrantMC aEntrant[PGA_MAX_ENTRANTS];    // 0x4094
+    PgaField field;             // 0x4090
     u16  n4E94;                 // 0x4E94  counts the tournaments started
     u8   unk4E96[2];
     u16  n4E98;                 // 0x4E98  a run of tour rounds, counted on each 18th hole
