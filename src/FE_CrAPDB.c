@@ -15,6 +15,7 @@ s32  fn_800CCEA0(Skin* pSkin);          // SkinPart.c: and aSets[3]
 // This file, in address order.
 void fn_80103920(void);
 void fn_80103EFC(CrAPAsset* pAsset);
+void sTurnOnLogo(s16 nPart, int b, int i);
 void FE_CrAP_TurnOnAsset(CrAPAsset* pAsset);
 int  fn_80104AF4(s16 nPart, int n);     // the category of a part's entry n (-1 or 0x40: none)
 int  fn_80104F7C(CrAPAsset* pAsset);
@@ -273,6 +274,55 @@ void fn_80104094(CrAPAsset* pAsset, int b) {
         }
     }
     fn_8008E944(0, 0.0f);
+}
+
+// A part 18 asset: set the menu golfer's n0 from it and have the golfer play its animation (unless
+// it already does).
+void fn_801042D0(CrAPAsset* pAsset) {
+    fn_8008E944(0, 0.0f);
+    if (pAsset->n0 != fn_8008EAEC()) {
+        fn_8008E2F8(1, 0.0f);
+    }
+    fn_8008EAE0(pAsset->n0);
+    if (fn_8008E6BC() == NULL || strcmp(fn_8008E6BC(), fn_801064EC(pAsset->n112)) != 0) {
+        if (fn_8008E468(fn_801064EC(pAsset->n112), fn_801064EC(pAsset->n114), 1)) {
+            fn_8008E818(1);
+        }
+    } else {
+        fn_8008E818(1);
+    }
+}
+
+// Put a part's choice i (from the list b) on the golfer being edited: part 13 by its name, part 17
+// the logo, part 18 an animation, the others as an asset.
+void FE_CrAP_TurnOnPart(s16 nPart, int b, int i) {
+    int nAsset;
+    CrAPAsset* pAsset = NULL;
+
+    fn_80077ACC();
+    if (lbl_80281EE0->pB4->pChar == NULL) {
+        return;
+    }
+    if (nPart != 17) {
+        fn_80104AF4(nPart, b);
+        nAsset = fn_80104FA8(nPart, b, i);
+        pAsset = fn_80104F68(nAsset);
+    }
+    if (pAsset == NULL && nPart != 17) {
+        return;
+    }
+    fn_8008E818(0);
+    if (nPart == 13) {
+        lbl_802816EC = nAsset;
+        lbl_802816E8 = -1;
+        fn_80104094(pAsset, b);
+    } else if (nPart == 17) {
+        sTurnOnLogo(nPart, b, i);
+    } else if (nPart == 18) {
+        fn_801042D0(pAsset);
+    } else if (pAsset != NULL) {
+        FE_CrAP_TurnOnAsset(pAsset);
+    }
 }
 
 // Put on the asset waiting in lbl_802816E8, or else take off the one in lbl_802816EC; then clear

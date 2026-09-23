@@ -201,7 +201,7 @@ LAYOUT_ASSERT(FEGolferMachine, 0xC);
 // A Create-A-Player asset (0x118 bytes): a hat, a shirt, a colour... The 'CR_A' stream object is
 // the array of them all (fn_80105188). Only what the cleaned code reads.
 typedef struct CrAPAsset {
-    u8   unk0[4];
+    s32  n0;                    // 0x000  part 18's assets pass it to fn_8008EAE0 (fn_801042D0)
     char szName[0x28 - 0x4];    // 0x004  "White", "Bright Red", "... backwards" ...
     s16  nPart;                 // 0x028  the part it is a choice for
     s16  nCategory;             // 0x02A  its category: where the category's name ("Hats",
@@ -351,15 +351,27 @@ extern s32 lbl_80281FFC;                // set by fn_80084FF0: the lbl_8018C7D8 
 int  fn_8008B990(void);
 void fn_8008DAEC(void);
 void fn_8008E244(void);
+void fn_8008E2F8(u8 bTarget, f32 fAngle);
 void fn_8008E364(int n);
 int  fn_8008E420(void);
 int  fn_8008E44C(void);
+u8   fn_8008E468(char* szAnim, char* szShot, u8 bNoBlend);  // 1: the animation was started
 char* fn_8008E6BC(void);
 void fn_8008E6D4(int n);
+void fn_8008E718(int n);
 void fn_8008E724(char* szAnim, char* szShot, s8 n, u8 bLoop);
+void fn_8008E818(int n);
 void fn_8008E824(void);
 void fn_8008E860(int n);
+void fn_8008E8D0(int n);
 u8   fn_8008E944(u8 b, f32 f);
+int  fn_8008E9A8(void);
+void fn_8008E9B4(void);
+void fn_8008EABC(u8 b);
+void fn_8008EAE0(int n);
+int  fn_8008EAEC(void);
+void fn_8008EAF8(int n);
+int  fn_8008EB04(void);
 void fn_8008EB70(void);
 
 // ---- the logo editor (FE_LogoDesign.c) -------------------------------------------------------
