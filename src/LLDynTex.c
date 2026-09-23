@@ -1,12 +1,15 @@
+// LLDynTex.c (EA's name, from its asserts): textures whose pixels the game rewrites while they are
+// shown; the menu golfer (FEgolferanim.c) drives them. Not yet decompiled beyond the sweep code.
+
 #include "engine.h"
 #include "lldyntex.h"
-#include "game_types.h"
 
-void fn_80009E70();
-void fn_8001052C();
-void fn_8010A668(u8* p0);
-s32 fn_8010A780(u8* p);
-s32 fn_8010AD10(u8* p);
+// ---- sweep code (not yet cleaned up) ----
+
+void fn_8001052C(s16 n);
+void fn_8010A668(DynTex* pTex);
+void* fn_8010A780(DynTex* pTex);
+s32 fn_8010AD10(DynTex* pTex);
 void fn_8010B098(void* arg0);
 s32 fn_8010C458(s16);
 s32 fn_8010B664(void* arg0);
@@ -20,18 +23,19 @@ void fn_8010A4E8(void) {
     fn_80009E70(lbl_80282488);
 }
 
-void fn_8010A668(u8* p0) {
-    fn_8001052C(*(s16*)(p0 + 0x1C));
-    fn_80009E70(*(s32*)(p0 + 0x18));
-    fn_80009E70(p0);
+// Free a dynamic texture.
+void fn_8010A668(DynTex* pTex) {
+    fn_8001052C(pTex->n1C);
+    fn_80009E70(pTex->p18);
+    fn_80009E70(pTex);
 }
 
-s32 fn_8010A780(u8* p) {
-    return *(s32*)(p + 0x4);
+void* fn_8010A780(DynTex* pTex) {
+    return pTex->p4;
 }
 
-s32 fn_8010AD10(u8* p) {
-    return *(s32*)(p + 0x8);
+s32 fn_8010AD10(DynTex* pTex) {
+    return pTex->n8;
 }
 
 void fn_8010B098(void* arg0) {

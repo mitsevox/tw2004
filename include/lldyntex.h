@@ -32,4 +32,16 @@ LAYOUT_ASSERT(DynTexState, 0xA9C);
 
 extern DynTexState* lbl_80282488;
 
+// A dynamic texture (made by fn_8010A520, freed by fn_8010A668); only what the code reads so far.
+typedef struct DynTex {
+    void* p0;                   // 0x00
+    void* p4;                   // 0x04
+    s32   n8;                   // 0x08
+    s32   nC;                   // 0x0C  fn_8010A520's first argument
+    s32   n10;                  // 0x10  the size of p18
+    s32   n14;                  // 0x14
+    void* p18;                  // 0x18  a buffer of n10 bytes
+    s16   n1C;                  // 0x1C  from fn_800106F0; fn_8001052C takes it back
+} DynTex;
+
 #endif
