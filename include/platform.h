@@ -38,6 +38,7 @@
 
 #ifndef TW_PORT
 void*  memcpy(void* pDst, const void* pSrc, u32 uLen);
+void*  memmove(void* pDst, const void* pSrc, u32 uLen);
 void*  memset(void* pDst, int nValue, u32 uLen);
 int    memcmp(const void* pA, const void* pB, u32 uLen);
 u32    strlen(const char* p);
