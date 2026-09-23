@@ -171,7 +171,15 @@ Dated log of what was done and decided, newest last. Facts and lessons belong in
   labelled backwards; fixed); sand plugs on hard landings; course 6 has only the bad rough lie;
   tree deflection is biased 31/32 one way (`& 31` sign test); stick spin is applied at the
   first bounce and weakened on faster greens; water skipping on three water surfaces.
-- **Next:** `Ball.c` checkpoint 6 = `fn_80052598` (the bounce, 3.2 KB); then polish; optional register polish in `skalib.c`
+- **`Ball.c` checkpoint 6: the bounce, `fn_80052598` (98%). All 68 functions are now in C (unit
+  99% fuzzy).** Soft ground bends the normal toward the incoming ball; restitution from surface
+  +0x0C; negative restitution = branches the ball passes through, randomised with LUCK pulling
+  toward a cleaner pass (the LUCK tooltip's "kinder bounce"); rain deadens bounces; an automatic
+  backspin "check" for shots from over 63 yd on dry short grass, cut to a tenth when the spin
+  stick was used. The original reuses nine float variables for many jobs; the C now mirrors
+  that reuse.
+- **Next:** polish the near-misses in `Ball.c` (the two interpolations, `Ball_FlightStep`,
+  `Ball_CupPull`, the bounce); optional register polish in `skalib.c`
   (`AnimLib_MergeOverlay`, `AnimLib_PlanBank`, `AnimLib_WalkPair`). Scratch tools in `C:\dev\scratch\tw\`:
   `sbs2.py` (normalised diff), `fnsrc.py`, `regress.py` (who lost 100%), `insert_fns.py` (add
   functions at address positions), `unwritten.py`, `find_fn.py` (search asm by regexes),

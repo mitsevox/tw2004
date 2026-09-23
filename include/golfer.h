@@ -229,13 +229,14 @@ typedef struct SurfaceType {
     f32  f00;                   // 0x00  launch: share of the speed kept; + the ball's f70 (fn_800510EC)
     f32  f04;                   // 0x04  lie: size of the random lie quality (Ball_SetLie)
     f32  f08;                   // 0x08  launch: spin factor
-    f32  f0C;                   // 0x0C  below 0: soft (the ball is not backed off a hit)
-    u8   unk10[0x14 - 0x10];
+    f32  f0C;                   // 0x0C  bounce restitution; below 0: branches/leaves (randomised, LUCK)
+    f32  f10;                   // 0x10  bounce: friction at the contact
     f32  f14;                   // 0x14  skid: 1 - this scales the slope pull
     f32  f18;                   // 0x18  skid: friction building roll spin
     f32  f1C;                   // 0x1C  0.375 on surfaces a ball may stop on; roll: break strength
     f32  f20;                   // 0x20  roll: rolling friction
-    u8   unk24[0x2C - 0x24];
+    f32  f24;                   // 0x24  bounce: how hard a landing it takes to bend the normal (softness)
+    f32  f28;                   // 0x28  bounce: base softness
     u32  nClass;                // 0x2C  2, 3 = green, 4, 5 = rough, 6 = sand, 7/16 = water, 11, 12/18 = the cup, 17 = tree
     u8   unk30[4];
     u32  u34;                   // 0x34  bit 0x10: event 0x25 on landing

@@ -759,6 +759,40 @@ its rise cut to a quarter. Any other water landing is a hazard.
 animation 13). The look-ahead ball's first landing sends its owner 0x49, which queues front-end
 message 0x1D.
 
+The bounce (`fn_80052598`, 98%)
+------------------------------
+
+Every ground contact of a ball in the air, and every hop, runs this. It returns the square of
+the speed into the surface (for sand, the "how hard did it land" that decides a plugged lie).
+
+- **Water** quarters the spin. Elsewhere sideways spin is capped: at 2.93, or at the ball's
+  ground speed once that is 5.28 or more.
+- **Soft ground bends the bounce.** The surface normal is bent toward the incoming ball by
+  (speed into the ground / surface `+0x24`, x the course settings) + surface `+0x28` (x 0.667
+  in rough, x 0.5 for class 11). Past a full bend the ball comes straight back along its path.
+  The menu green speed and rain change how firm greens and fairways are here too.
+- **Restitution** is surface `+0x0C` (anything from 0.5 to 1 is treated as 0.5). Fast landings
+  on short grass bounce less (x 1 - 1.2 x (speed - 8.8) / `+0x24`), soft landings on short grass
+  and rough lose up to 15% more, and **rain deadens every bounce** (x 1 + 0.11 x (turf - 1)).
+- **Branches and leaves** (surfaces with a negative `+0x0C`): a negative restitution means the
+  ball goes *through*, keeping about -(restitution) of its speed into the surface (and 1 +
+  restitution of its spin). A real ball's value is randomised by +-0.75 x (1 + it), and **LUCK
+  pushes the roll down by 0.005 per point** (LUCK 100: -0.5), so a lucky golfer's ball **punches
+  through the canopy more cleanly**: this is the "kinder bounce off trees" the LUCK tooltip
+  promises. **Course 9** makes its foliage easier to pass through as well. A simulation, slot 4 or
+  a perfect shot gets no randomness.
+- **Friction** at the contact (surface `+0x10` x 0.3, x rain) takes sliding speed and turns it
+  into spin. Each bounce in rough keeps 80% of velocity and spin (class 11: 60%).
+- **Check and spin-back.** When the ball stops hopping (rising under 0.67, ground speed under
+  1.91) it starts rolling. If this happens **within its first five bounces, on short grass, not
+  in heavy rain, and more than 63 yards from where it was hit**, its backspin bites: velocity is
+  pushed back by 13.3 x the contact friction x the spin. **If you used the spin stick, or the
+  spin is not backspin, the bite is only a tenth as strong.** So a full approach from over 63
+  yards checks on its own - and dialling in spin with the stick replaces that natural bite
+  with whatever the stick gave (applied at the first bounce, see above).
+- Short grass taking a soft landing (`+0x24` of 80 or less, ball slower than that) loses up to
+  35% of its rebound height.
+
 CPU putts are hit 5% firm (`Swing_ComputePower`)
 -----------------------------------------------
 

@@ -845,6 +845,253 @@ void fn_80052268(Ball* pBall, f32 fTicks) {
     }
 }
 
+// The bounce. Returns the square of the speed into the surface (Ball_Collide keeps its root as
+// the sand-landing impact).
+// - Water (class 7, 16) quarters the spin; elsewhere sideways spin is capped (2.93, or the
+//   ball's ground speed once that is 5.28 or more).
+// - The normal is bent toward the incoming ball by how soft the ground is: speed into it /
+//   surface +0x24 (x the course settings; the green-speed setting and rain make it firmer or
+//   softer) + surface +0x28 (x 0.667 in rough, x 0.5 for class 11); past a full bend the ball
+//   comes straight back.
+// - In the frame of that normal: restitution is surface +0x0C (0.5..1 counts as 0.5); on
+//   surfaces with a negative +0x0C (branches, leaves) a real ball's value is randomised by
+//   +-0.75 x (1 + it), pushed down by 0.005 x LUCK - the "kinder" deflection - and course 9
+//   halves it first. Fast balls on short grass bounce less (x 1 - 1.2 x (speed - 8.8) / +0x24),
+//   short grass and rough lose a bit more when slow, and rain deadens the bounce.
+// - Friction at the contact point (surface +0x10 x 0.3, x rain) takes sliding speed and turns
+//   it into spin; a soft surface scales spin by (1 + restitution) instead. Rough x 0.8 and class
+//   11 x 0.6 on everything.
+// - A ball that has stopped bouncing (rising under 0.67, ground speed under 1.91) starts to
+//   roll; on its first five bounces, on dry short grass more than 63 yd from where it was
+//   hit, backspin makes it check or spin back (x 13.3 x friction; a tenth of that if the spin
+//   stick was used or the spin is not backspin).
+// - Short grass with a soft landing speed (+0x24 of 80 or less) loses up to 35% of its rise.
+f32 fn_80052598(Ball* pBall, f32* pNormal, SurfaceType* pSurface) {
+    f32 vBent[4];
+    f32 vDown[4];
+    f32 vCon[4];
+    f32 vSlide[4];
+    f32 vDir[4];
+    f32 vSlip[4];
+    f32 fA;
+    f32 fSpeed;
+    f32 fImpact;
+    f32 fRest;
+    f32 fCo;
+    f32 fC;
+    f32 fD;
+    f32 fB;
+    f32 fSi;
+    f32 fT, fS, fLen, fBounce, fGrip, fBite, fScale;
+    u8  bFlip;
+
+    pBall->n80++;
+    if (pSurface->nClass == 7 || pSurface->nClass == 16) {
+        fn_8001EF34(pBall->vSpin, 0.25f, pBall->vSpin);
+    } else {
+        fT = 0.84f * pBall->vSpin[0];
+        fS = 0.84f * pBall->vSpin[2];
+        fT = fT * fT;
+        fS = fS * fS;
+        fSi = fn_80009680(fT + fS);
+        fT = pBall->vVel[0] * pBall->vVel[0];
+        fS = pBall->vVel[2] * pBall->vVel[2];
+        fLen = fn_80009680(fT + fS);
+        if (fLen < 5.28000021f) {
+            if (fSi > 2.9333334f) {
+                fn_8001EF34(pBall->vSpin, 2.9333334f / fSi, pBall->vSpin);
+            }
+        } else if (fSi > fLen) {
+            fn_8001EF34(pBall->vSpin, fLen / fSi, pBall->vSpin);
+        }
+    }
+    bFlip = 0;
+    if (pNormal[1] < 0.0f) {
+        fn_80055EF8(pNormal, pNormal);
+        fn_80055EF8(pBall->vVel, pBall->vVel);
+        fn_80055EF8(pBall->vSpin, pBall->vSpin);
+        bFlip = 1;
+    }
+    fSpeed = fn_80009680(fn_80009744(pBall->vVel));
+    fD     = fn_8000C5FC(pBall->vVel, pNormal);
+    fT = pNormal[0] * fD;
+    fS = pNormal[1] * fD;
+    fLen = pNormal[2] * fD;
+    fT = fT * fT;
+    fS = fS * fS;
+    fLen = fLen * fLen;
+    fImpact = fLen + (fT + fS);
+    fn_8000C5D4(pNormal, pBall->vVel, 1.0f / fSpeed, vBent);
+    fn_80055EF8(vBent, vBent);
+    fA = fn_8000AD9C(fD) / pSurface->f24;
+    if (pSurface->nClass == 3) fA *= 2.0f - gGreenSpeedMul[gGreenSpeedSetting];
+    if (pSurface->nClass == 2) fA *= 2.0f - gFairwaySpeedMul[gFairwaySetting];
+    if (pSurface->nClass == 5) fA *= 2.0f - gRoughMul[gRoughSetting];
+    if (pSurface->nClass == 3 || pSurface->nClass == 4 || pSurface->nClass == 2) {
+        fA *= 2.0f - (1.4f * (gTurfSpeedMul[gTurfSpeed] - 1.0f) + 1.0f);
+    }
+    fT = pSurface->f28;
+    if (pSurface->nClass == 5) fT *= 0.667f;
+    if (pSurface->nClass == 11) fT *= 0.5f;
+    fA += fT;
+    fLen = fn_80009680(fn_80009744(vBent));
+    if (fLen < fA) {
+        fn_80055EF8(pBall->vVel, pNormal);
+    } else if (fLen != 0.0f) {
+        fn_8000C5D4(pNormal, vBent, fA / fLen, pNormal);
+    }
+    fn_800BAF04(pNormal, pNormal);
+    fn_8001EF34(pNormal, -0.839999974f, vDown);
+    fn_8001EF78(pBall->vSpin, vDown, vCon);
+    fn_80055E7C(vCon, pBall->vVel, vCon);
+    fn_8000C5D4(vCon, pNormal, -fn_8000C5FC(vCon, pNormal), vSlide);
+    if (fn_80009744(vSlide) != 0.0f) {
+        fn_800BAF04(vSlide, vDir);
+    } else {
+        Vec3Copy(pNormal, vDir);
+    }
+    fA  = fn_8000AD78(pNormal[0], pNormal[1]);
+    fB  = fn_800095F0(fA);
+    fCo = fn_80009638(fA);
+    vBent[0] = fn_80055E1C(pNormal[0], pNormal[1], fB, fCo);
+    vBent[1] = fn_80055E10(pNormal[1], pNormal[0], fB, fCo);
+    vBent[2] = pNormal[2];
+    fD    = fn_80055E1C(vDir[0], vDir[1], fB, fCo);
+    fC    = fn_80055E10(vDir[1], vDir[0], fB, fCo);
+    fRest = vDir[2];
+    fn_80055D70(&pBall->vVel[0], &pBall->vVel[1], fB, fCo);
+    fn_80055D70(&pBall->vSpin[0], &pBall->vSpin[1], fB, fCo);
+    fB  = -fn_8000AD78(vBent[2], vBent[1]);
+    fCo = fn_800095F0(fB);
+    fSi = fn_80009638(fB);
+    fT  = fn_80055E1C(fC, fRest, fCo, fSi);
+    fC  = fn_80055E10(fRest, fT, fCo, fSi);
+    fn_80055D70(&pBall->vVel[1], &pBall->vVel[2], fCo, fSi);
+    fn_80055D70(&pBall->vSpin[1], &pBall->vSpin[2], fCo, fSi);
+    fC  = fn_8000AD78(fD, fC);
+    fSi = fn_800095F0(fC);
+    fCo = fn_80009638(fC);
+    fn_80055D70(&pBall->vVel[0], &pBall->vVel[2], fSi, fCo);
+    fn_80055D70(&pBall->vSpin[0], &pBall->vSpin[2], fSi, fCo);
+    vSlip[0] = 0.462857157f * (0.839999974f * pBall->vSpin[2] + pBall->vVel[0]);
+    fRest = pSurface->f0C;
+    if (fRest > 0.5f && fRest < 1.0f) {
+        fRest = 0.5f;
+    }
+    if (fRest < 0.0f) {
+        if (!(gSimulating || lbl_80281DD2 || pBall->nPlayer == 4 ||
+              (pBall->nPlayer >= 0 && pBall->nPlayer <= 3 && gPlayers[pBall->nPlayer].bPerfect))) {
+            fD = 1.0f - 2.0f * Rand_Float(0);
+            fD -= 0.005f * (s8)Golfer_GetAttribute(&gPlayers[pBall->nPlayer], ATTR_LUCK, ATTR_TOTAL);
+            if (fD < -1.0f) fD = -1.0f;
+            if (Game_GetCourse() == 9) {
+                fRest -= 0.5f * (1.0f + fRest);
+            }
+            fRest = (0.75f * (1.0f + fRest)) * fD + fRest;
+        }
+    } else {
+        pBall->n84++;
+    }
+    if (fSpeed > 8.80000019f && fRest >= 0.0f) {
+        fT = 1.0f - 1.20000005f * ((fSpeed - 8.80000019f) / pSurface->f24);
+    } else {
+        fT = 1.0f;
+    }
+    fBounce = 0.0350000001f + (fRest * fT + 1.0f);
+    if (fRest >= 0.0f) {
+        if (pSurface->nClass == 4 || pSurface->nClass == 2 || pSurface->nClass == 3 || pSurface->nClass == 5) {
+            if (pSurface->f24 <= 80.0f && fSpeed < pSurface->f24) {
+                fBounce -= ((0.150000006f * fRest) * (pSurface->f24 - fSpeed)) / pSurface->f24;
+            }
+            if (pSurface->nClass == 3 || pSurface->nClass == 4 || pSurface->nClass == 2) {
+                fBounce *= 0.109999999f * (gTurfSpeedMul[gTurfSpeed] - 1.0f) + 1.0f;
+            }
+        }
+    } else if (pBall->fSpeed < 2.44444442f) {
+        fBounce = 0.0f;
+    }
+    vSlip[1] = 1.62f * (fBounce * pBall->vVel[1]);
+    vSlip[2] = 0.462857157f * (pBall->vVel[2] - 0.839999974f * pBall->vSpin[0]);
+    fT = vSlip[0] * vSlip[0];
+    fS = vSlip[2] * vSlip[2];
+    fD = fn_80009680(fT + fS);
+    fGrip = pSurface->f10 * fn_8000AD9C(vSlip[1]) * 0.3f;
+    if (pSurface->nClass == 4 || pSurface->nClass == 3 || pSurface->nClass == 2) {
+        fGrip *= gTurfSpeedMul[gTurfSpeed];
+    }
+    if (fGrip < fD && fD != 0.0f) {
+        fGrip = pSurface->f10 * 0.3f;
+        if (pSurface->nClass == 3 || pSurface->nClass == 4 || pSurface->nClass == 2) {
+            fGrip *= gTurfSpeedMul[gTurfSpeed];
+        }
+        fScale = fn_8000AD9C(fGrip * vSlip[1] / fD);
+        vSlip[0] *= fScale;
+        vSlip[2] *= fScale;
+    }
+    fn_8000C5D4(pBall->vVel, vSlip, -0.61728394f, pBall->vVel);
+    if (fRest >= 0.0f) {
+        pBall->vSpin[0] = 1.83715463f * vSlip[2] + pBall->vSpin[0];
+        pBall->vSpin[2] = 1.83715463f * vSlip[0] + pBall->vSpin[2];
+    } else {
+        fn_8001EF34(pBall->vSpin, 1.0f + fRest, pBall->vSpin);
+    }
+    if (pSurface->nClass == 5 || pSurface->nClass == 11) {
+        if (pSurface->nClass == 5) {
+            fSi = 0.8f;
+        } else {
+            fSi = 0.6f;
+        }
+        fn_8001EF34(pBall->vVel, fSi, pBall->vVel);
+        fn_8001EF34(pBall->vSpin, fSi, pBall->vSpin);
+    }
+    if (pSurface != NULL && pSurface->f0C >= 0.0f && pBall->vVel[1] < 0.674666584f &&
+        (f32)fn_80009680(pBall->vVel[0] * pBall->vVel[0] + pBall->vVel[2] * pBall->vVel[2]) < 1.90666652f) {
+        if (pBall->n84 < 6 && (pSurface->nClass == 4 || pSurface->nClass == 3 || pSurface->nClass == 2) &&
+            gTurfSpeedMul[gTurfSpeed] > 0.7f &&
+            (f32)fn_80009680((pBall->vPos[0] - pBall->vStart[0]) * (pBall->vPos[0] - pBall->vStart[0]) +
+                             (pBall->vPos[2] - pBall->vStart[2]) * (pBall->vPos[2] - pBall->vStart[2])) > 63.0f) {
+            fBite = 13.333333f * (0.3f * pSurface->f10);
+            if (pBall->fSpinX != 0.0f || pBall->fSpinY != 0.0f) {
+                fBite *= 0.1f;
+            } else if (-0.839999974f * (pBall->vVel[0] * pBall->vSpin[2]) + -0.839999974f * (pBall->vVel[2] * -pBall->vSpin[0]) >= 0.0f) {
+                fBite *= 0.1f;
+            }
+            pBall->vVel[0] = pBall->vVel[0] - fBite * (-0.839999974f * -pBall->vSpin[2]);
+            pBall->vVel[2] = pBall->vVel[2] - fBite * (-0.839999974f * pBall->vSpin[0]);
+        }
+        if (pBall->nState != 4) {
+            pBall->nState   = 4;
+            pBall->nSurface = fn_80050BEC(pSurface);
+        }
+    }
+    fD  = -fC;
+    fC  = fn_800095F0(fD);
+    fD  = fn_80009638(fD);
+    fn_80055D70(&pBall->vVel[0], &pBall->vVel[2], fC, fD);
+    fn_80055D70(&pBall->vSpin[0], &pBall->vSpin[2], fC, fD);
+    fD  = -fB;
+    fC  = fn_800095F0(fD);
+    fD  = fn_80009638(fD);
+    fn_80055D70(&pBall->vVel[1], &pBall->vVel[2], fC, fD);
+    fn_80055D70(&pBall->vSpin[1], &pBall->vSpin[2], fC, fD);
+    fD  = -fA;
+    fC  = fn_800095F0(fD);
+    fD  = fn_80009638(fD);
+    fn_80055D70(&pBall->vVel[0], &pBall->vVel[1], fC, fD);
+    fn_80055D70(&pBall->vSpin[0], &pBall->vSpin[1], fC, fD);
+    if (pSurface != NULL && pSurface->f0C >= 0.0f &&
+        (pSurface->nClass == 4 || pSurface->nClass == 3 || pSurface->nClass == 2) &&
+        pSurface->f24 <= 80.0f && fSpeed < pSurface->f24) {
+        pBall->vVel[1] *= 1.0f - 0.349999994f * ((pSurface->f24 - fSpeed) / pSurface->f24);
+    }
+    if (bFlip) {
+        fn_80055EF8(pNormal, pNormal);
+        fn_80055EF8(pBall->vVel, pBall->vVel);
+        fn_80055EF8(pBall->vSpin, pBall->vSpin);
+    }
+    return fImpact;
+}
+
 // A ball on the ground: did it run into anything between last tick and this one? Out of
 // bounds (600 yd from the start) is a hazard. Within 10 ft of the pin the detailed test
 // (fn_8004E1B0) runs, elsewhere fn_8004FF34. On a hit: the landing events, the bounce, and a
