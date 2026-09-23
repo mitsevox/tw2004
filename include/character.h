@@ -25,7 +25,7 @@ typedef struct Skeleton {
     s32  nChains;               // 0x0004
     u8   unk8[4];
     IKChain* pChains;           // 0x000C
-    u8   unk10[0x20 - 0x10];
+    u32  a10[4];                // 0x0010  a bit per bone (128; fn_8001EB6C clears one)
     f32  (*p20)[4];             // 0x0020  a quaternion per bone
     f32  (*p24)[4];             // 0x0024  a quaternion per bone
     f32  (*p28)[4];             // 0x0028  p20 at an IK weight of 0 or 1, otherwise p24
@@ -42,20 +42,44 @@ typedef struct Skeleton {
     s32  n10E4;                 // 0x10E4  set to 4 as a swing starts
 } Skeleton;
 
+// A bone of a character's model (CharModel.pBones).
+typedef struct Bone {
+    u64  uId;                   // 0x00  fn_800298F4 finds a bone by it
+    u8   unk8[4];
+    f32  q0C[4];                // 0x0C  a rotation (quaternion)
+    u8   unk1C[0x30 - 0x1C];
+} Bone;
+LAYOUT_ASSERT(Bone, 0x30);
+
 // A character's model: its bones; only what the game code reads.
 typedef struct CharModel {
     s32       nBones;           // 0x000
-    u8        unk4[4];
+    Bone*     pBones;           // 0x004
     f32     (*pMatrices)[4][4]; // 0x008  one per bone (fn_8001EED8 gives a bone's index); row 3 is its
                                 //        position
-    u8        unkC[0x38 - 0xC];
+    u8        unkC[0x34 - 0xC];
+    void*     p34;              // 0x034  freed with the model
     Skeleton* pSkel;            // 0x038
-    u8        aBone[0x59];      // 0x03C  each bone id's index (fn_8001EED8)
+    u8        aBone[0x59];      // 0x03C  each bone id's index (fn_8001EED8), 0xFF none; fn_80029664
+                                //        fills it in by name
     u8        aBone2[0x59];     // 0x095  the index fn_8001EEE4 gives while bEE is set, by bone index
+                                //        (fn_80029804: itself, or the other bone of a pair)
     u8        bEE;              // 0x0EE  fn_8001EDF4
-    u8        unkEF[0x140 - 0xEF];
+    u8        unkEF;
+    struct DynChain* pF0;       // 0x0F0  } freed with the model (fn_80114398)
+    struct DynChain* pF4;       // 0x0F4  }
+    struct DynChain* pF8;       // 0x0F8  }
+    struct DynChain* apFC[6];   // 0x0FC  }
+    struct DynChain* ap114[6];  // 0x114  }
+    u8        unk12C[0x140 - 0x12C];
     f32       a140[128][3];     // 0x140  per bone, a factor for each axis: reset to 1 by fn_80028A3C,
                                 //        multiplied by fn_80028A70 (the next field is at 0x740)
+    f32       q740[4];          // 0x740  } rotations (quaternions) fn_80029968 fills in
+    f32       q750[4];          // 0x750  }
+    void*     p760;             // 0x760  } fn_80029A90 does nothing unless all three are set
+    f32     (*p764)[4][4];      // 0x764  }   a matrix per bone, transformed into p768
+    f32     (*p768)[4][4];      // 0x768  }
+    s32       n76C;             // 0x76C  matrices in p768
 } CharModel;
 
 // A clip's header (the fields used here). In a file, pD0 marks the end of the header and
@@ -221,6 +245,7 @@ extern ViewSlot gViewSlots[5];          // 0x80187124  per player
 // Skeleton.c
 extern f32 lbl_801C6498[4];             // the identity rotation (quaternion), set by fn_80029530
 extern u8  lbl_802810A6;                // IK on (fn_80027738); off, the IK functions do nothing
+extern u8  lbl_8018742C[42][2];         // pairs of standard bones (fn_80029804 reads the first 41)
 
 // AnimStream.c: the animation groups it streams clips for (groups 1 and 5, the reactions), and the
 // index each has in its tables.
@@ -231,6 +256,52 @@ typedef struct AnimStreamGroup {
 LAYOUT_ASSERT(AnimStreamGroup, 8);
 
 extern AnimStreamGroup lbl_80191490[2];
+
+// A buffer the stream reads clips into.
+typedef struct AnimStreamBuf {
+    void* pData;                // 0x0  64-aligned
+    s32   nSize;                // 0x4
+} AnimStreamBuf;
+LAYOUT_ASSERT(AnimStreamBuf, 8);
+
+// A player's streamed clips for one group, style and club class.
+typedef struct AnimStreamClips {
+    s32  nNext;                 // 0x0  the next of them to play (wraps around)
+    s32  nMaxSize;              // 0x4  the largest of them, in bytes
+    u8   b8;                    // 0x8  set by fn_800CA268
+    u8   pad9[3];
+} AnimStreamClips;
+LAYOUT_ASSERT(AnimStreamClips, 0xC);
+
+// A player's part of the stream.
+typedef struct AnimStreamPlayer {
+    s32  nId;                   // 0x000  -1 unused; fn_800CB568 finds a player's part by it
+    AnimStreamClips clips[2][8][6];     // 0x004  [group index][style][club class]
+} AnimStreamPlayer;
+LAYOUT_ASSERT(AnimStreamPlayer, 0x484);
+
+// The stream's state (lbl_80282230, allocated by fn_800C937C).
+typedef struct AnimStream {
+    void* p0;                   // 0x0000  the current request
+    void* p4;                   // 0x0004
+    AnimStreamBuf bufs[2][2][8][6];     // 0x0008  [double buffer][group index][style][club class]
+    AnimStreamPlayer players[5];        // 0x0608
+    void* pRead;                // 0x1C9C  the read buffer
+    s32   nReadSize;            // 0x1CA0
+    s32   aPlayerBytes[5];      // 0x1CA4  bytes each player's clips need
+    s32   nBytes;               // 0x1CB8  bytes the stream uses in all
+    s32   hFile;                // 0x1CBC  the open file, -1 none
+    s32   nState;               // 0x1CC0  0 idle, 1 reading, 2 read (fn_800C9EFC)
+    s32   nResult;              // 0x1CC4  what the last read returned
+    s32   n1CC8;                // 0x1CC8
+    u8    bReadDone;            // 0x1CCC  set when a waited-for read finishes (fn_800CB550)
+    u8    bOn;                  // 0x1CCD  streaming is on (off in split screen, multiplayer and some
+                                //         modes)
+    u8    pad1CCE[2];
+} AnimStream;
+LAYOUT_ASSERT(AnimStream, 0x1CD0);
+
+extern AnimStream* lbl_80282230;
 
 // The blend callback CharacterState_AddSKABlendData attaches (fn_80072ACC is one).
 typedef void (*SKABlendFn)(SKABlendNode* pNode, int* pn, f32 fTime);
@@ -250,12 +321,23 @@ int   fn_8001EE90(Character* pChar);
 int   fn_8001EED8(CharModel* pModel, int nBone);    // a bone's index
 int   fn_8001EEE4(CharModel* pModel, int nBone);
 void  Anim_SetRate(u8* pAnim, f32 fRate);           // 0x8001F084
+void  fn_8001E85C(f32* pSrc, f32* pDst);            // copy a quaternion
 void  SKEL_SetIKSolutionWeight(Skeleton* pSkel, f32 f);
 void  fn_80027808(CharModel* pModel, f32* pRot);
 void  fn_8002792C(Skeleton* pSkel);
 void  SKEL_TransitionIK(Skeleton* pSkel, u8 b, f32 f);
 void  fn_80028A3C(CharModel* pModel);
 void  fn_80028A70(CharModel* pModel, int nBone, u32 uAxes, f32 f);
+void  fn_80029530(void);
+void  fn_8002955C(void);
+void  fn_8002957C(CharModel* pModel);
+int   fn_800298F4(CharModel* pModel, u64 uId);
+void  fn_80029948(CharModel* pModel, struct DynChain* pChain, f32 f);
+void  fn_80029A74(CharModel* pModel, void* p);
+void  fn_80029A7C(CharModel* pModel, f32 (*pMatrices)[4][4], s32 nMatrices);
+void  fn_80029A88(CharModel* pModel, f32 (*pMatrices)[4][4]);
+void  fn_80029A90(CharModel* pModel, f32 (*pMtx)[4], int nBone);
+void  fn_80029AF8(CharModel* pModel);
 int   fn_80048574(Character* pChar, u64 uEvent);    // the character's animation has event uEvent
 void  fn_80072ACC(SKABlendNode* pNode, int* pn, f32 fTime);
 f32   fn_80072CB8(SKABlendNode* pNode, u64 uEvent); // an event's time in a blend tree
