@@ -16,8 +16,6 @@ f32  fn_80072938(SKABlendNode* pNode);
 void fn_8007325C(u8* pAnim);
 f32  fn_800732B8(f32 fTime, f32 fNow, f32 fStart, f32 fEnd);
 int  fn_800734D0(SKABlendNode* pNode);
-u8   fn_80073554(SKABlendNode* pNode, void* pSrc);
-u8   fn_80073610(SKABlendNode* pNode, void* pSrc);
 
 // How many source nodes the tree under pNode has; *pppOldest gets the slot of the one that ends
 // first (left alone when it already holds an earlier one).
