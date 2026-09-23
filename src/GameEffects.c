@@ -29,6 +29,8 @@ void  fn_800BD83C(int nSound, int a);
 void  fn_800A6DCC(int nMusic, int a);
 u8    fn_800451A8(CamScript* pScript, CamShot* pShot, int nPlayer);
 
+GameEffects lbl_80202898;   // the effects state (game.h; GameManager, GoGolfCam and others read it)
+
 // Starts a scripted GameBreaker for player nWho, for reason nWhy (a bit in uFlags).
 #define GB_START(nWho, nWhy)                                                                \
     if (!lbl_80202898.bGameBreaker || lbl_80202898.bClosing || lbl_80202898.nGBType != 0) { \

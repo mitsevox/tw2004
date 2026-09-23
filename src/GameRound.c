@@ -14,7 +14,7 @@ int  fn_800E19A4(int nPlayer, int nHoles);
 void fn_800E25CC(u8 b);
 int  fn_800E1CE8(int a, int b);
 
-void  fn_800D8D5C(int nPlayer, int a);
+void  fn_800D8D5C(int nPlayer);   // clears the player's words at 0x314-0x350
 void  fn_800E30D4(void);
 void  fn_800E2FD8(void);
 void  fn_800E3050(int nCourse);
@@ -304,7 +304,7 @@ void fn_800E1074(void) {
         for (j = 0; j < 18; j++) {
             fn_800E1018(i, j);
         }
-        p = (Player*)((u8*)gPlayers + i * sizeof(Player));
+        p = PLAYER(i);
         for (j = 0; j < 4; j++) {
             p->nRoundScore[j] = 0;
         }
@@ -321,7 +321,7 @@ void fn_800E1074(void) {
         for (j = 0; j < 18; j++) {
             p->nC6C[j] = 0;
         }
-        fn_800D8D5C(i, 0);
+        fn_800D8D5C(i);
         if (gpSaveData[p->nIndex].bActive != 0) {
             gpSaveData[p->nIndex].b70 = 0;
         }
