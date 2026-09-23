@@ -3,7 +3,13 @@ Code style
 
 How the C in `src/` is written. Matching decides *what* the compiler must produce; this file
 decides how the source reads, so every unit looks like one author wrote it. Model files:
-`src/GameMode10.c` and `src/GameMode14.c`.
+`src/GameTargets.c` and `src/GameModeReplay.c`.
+
+The goal is source that can be ported to PC and modded. The byte match proves the C is right; it
+is not the goal. So the C must mean what the original did, on any compiler: prototypes that match
+their definitions, no undefined behaviour, real fields and types instead of offsets, pointers kept
+as pointers, sizes written as `sizeof`, and one shared definition of shared data (see
+"Portability").
 
 `python tools/match/lint.py <files>` checks the mechanical rules below, and compiles each file
 with the game's compiler to catch two kinds of undefined behaviour (see "Odd code vs wrong
@@ -57,14 +63,15 @@ Data access
 - Write player access the way EA did, `gPlayers[nPlayer].field` each time; see
   `decomp-notes.md`, "Structs, arrays and pointers", for when `PLAYER(i)` or a local pointer is
   needed instead.
-- Tables get a `typedef struct` describing one row, declared where they are used, or in a
-  header once a second file uses them.
+- Tables get a `typedef struct` describing one row, in the header of the system that owns the
+  table (no `typedef` or `extern` in a `.c` file; `typeaudit.py` counts them and merges may not
+  add any).
 
 Prototypes
 ----------
 
 - **A function used by more than one file** is declared once, in the header of the system it
-  belongs to (`golfer.h` for game and player functions for now).
+  belongs to.
 - **A prototype local to a file** is for functions only that file calls.
 - **Headers:** `game.h` (game manager, rounds, modes, golfer states, sessions), `engine.h`
   (memory, math, streams, views, events, sound, animation), `golfer.h` (players and golfers),
@@ -122,6 +129,23 @@ problem; the current compiler producing the right bytes does not make the C righ
 
 When the original itself has the bug (the bytes prove EA wrote it), keep it, since the match
 requires it, and say so: `// EA bug: reads nC38 of player 5, one past the last player`.
+
+Portability
+-----------
+
+A port rebuilds this C with another compiler, likely 64-bit and little-endian. `lint.py` flags
+the patterns that break there:
+
+- `port-ptr-int`: a pointer cast to an integer (`(int)pBall`). Keep pointers as pointer types;
+  a handle that is really a pointer gets the pointer's type.
+- `port-literal-size`: a copy or clear whose size is a number (`Mem_cpy(a, b, 0xBC)`). Write
+  `sizeof(Ball)`: the size of a struct holding pointers changes on a 64-bit machine.
+- `port-frame-rate`: the frame rate as a bare number (`59.94f`). Use the named constant.
+
+When the original's code can only be matched with one of these, keep it and say why with
+`// port: <why>` on the line or the line before, so a porter knows to look there. Data read from
+the disc or the memory card is big-endian and laid out for a 32-bit machine: read it through the
+loader's byte-order helpers, never by laying a struct over the buffer in new code.
 
 Formatting
 ----------

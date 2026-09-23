@@ -17,6 +17,14 @@ CHECKS = [
     ('no-braces', re.compile(r'^\s*(if|for|while)\s*\(.*\)\s*[^{\s;][^{]*;\s*(//.*)?$')),
     ('commented-code', re.compile(r'^\s*//\s*([\w\[\]\.>-]+\s*[-+*/|&]?=[^=][^;]*|\w+\([^)]*\)|return\b[^;]*|(if|for|while)\s*\(.*\)\s*\{?)\s*;?\s*$')),
 ]
+# Portability (the goal is source a PC port can build, 64-bit and little-endian): a pointer squeezed
+# into an integer, a copy whose size is a literal instead of sizeof, the frame rate as a bare number.
+# A line that must stay this way says why with `port: <why>` on the line or the line before.
+PORT = [
+    ('port-ptr-int', re.compile(r'\(\s*(int|s32|u32|long)\s*\)\s*(&\s*\w|p[A-Z]\w*\b(?!\s*(\[|->|\.)))')),
+    ('port-literal-size', re.compile(r'\b(Mem_cpy|memcpy|memset|fn_80005AE8)\s*\([^;]*,\s*(0x[0-9A-Fa-f]{2,}|\d{3,})\s*\)')),
+    ('port-frame-rate', re.compile(r'\b59\.94|\b0\.01668')),
+]
 # The statement after the condition is return/break/continue. Checked separately: a regex
 # lookahead after `\(.*\)` can backtrack to an inner parenthesis of the condition.
 EARLY_EXIT = re.compile(r'\)\s*(return\b[^;]*|break|continue);\s*(//.*)?$')
@@ -60,6 +68,9 @@ def lint(path, protos):
             if name == 'no-braces' and EARLY_EXIT.search(l):
                 continue            # a one-line early exit is allowed (style.md, Formatting)
             if rx.search(l):
+                hits.append((i, name, l.strip()))
+        for name, rx in PORT:
+            if rx.search(l) and 'port:' not in l and 'port:' not in lines[i - 2]:
                 hits.append((i, name, l.strip()))
         if len(l) > 110:
             hits.append((i, 'long-line', '%d columns' % len(l)))
