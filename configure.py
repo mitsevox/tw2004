@@ -891,7 +891,7 @@ config.libs = [
             Object(Matching, "GameModeMatch.c"),
             Object(NonMatching, "GameMode5.c"),
             Object(Matching, "GameMode9.c"),
-            Object(NonMatching, "GameModeDriverPGATour.c"),
+            Object(Matching, "GameModeDriverPGATour.c"),
             Object(NonMatching, "GameModeDriverRTE.c"),
             Object(Matching, "GameModeReplay.c"),
             Object(Matching, "GameTargets.c"),
