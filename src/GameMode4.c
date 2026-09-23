@@ -190,8 +190,8 @@ void fn_80102404(void) {
     }
     gpGame->nC = 1;
     gpGame->n10 = 1;
-    SESSION_OPTIONS->unkC = lbl_802816E0;
-    SESSION_OPTIONS->nWind = lbl_80282430;
+    gSession.options.nC = lbl_802816E0;
+    gSession.options.nWind = lbl_80282430;
     lbl_80282434 = 0;
 }
 
@@ -199,10 +199,10 @@ void fn_80102404(void) {
 void fn_80102468(void) {
     int nEvent;
     int nPins;
-    lbl_802816E0 = SESSION_OPTIONS->unkC;
-    lbl_80282430 = SESSION_OPTIONS->nWind;
-    SESSION_OPTIONS->unkC = 4;
-    SESSION_OPTIONS->nWind = 0;
+    lbl_802816E0 = gSession.options.nC;
+    lbl_80282430 = gSession.options.nWind;
+    gSession.options.nC = 4;
+    gSession.options.nWind = 0;
     lbl_80282434 = 1;
     nEvent = fn_801021FC();
     lbl_80282448 = lbl_802124B8[nEvent].nGolfer;

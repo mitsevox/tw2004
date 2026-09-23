@@ -95,19 +95,19 @@ void fn_800F0678(void) {
     }
     gpGame->nC = 1;
     gpGame->n10 = 1;
-    SESSION_OPTIONS->unkC = lbl_80281680;
-    SESSION_OPTIONS->nWind = lbl_80282348;
+    gSession.options.nC = lbl_80281680;
+    gSession.options.nWind = lbl_80282348;
     lbl_8028234C = 0;
 }
 
 // TW06: GameModeDriverRTE::StartEvent. Starts today's event: the options are saved (wind off), and
 // its challenge runs in mode 5 with this file's start and end wrapped around it.
 void fn_800F06DC(void) {
-    lbl_80281680 = SESSION_OPTIONS->unkC;
+    lbl_80281680 = gSession.options.nC;
     lbl_8028234C = 1;
-    lbl_80282348 = SESSION_OPTIONS->nWind;
-    SESSION_OPTIONS->unkC = 4;
-    SESSION_OPTIONS->nWind = 0;
+    lbl_80282348 = gSession.options.nWind;
+    gSession.options.nC = 4;
+    gSession.options.nWind = 0;
     if (gRTEs.aEvent[lbl_80282350].bOff == 0) {
         if (gRTEs.aEvent[lbl_80282350].nChallenge != 0) {
             gSession.nNumPlayers = 1;

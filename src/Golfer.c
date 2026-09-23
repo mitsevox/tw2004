@@ -1542,9 +1542,9 @@ int Golfer_FindById(int nId) {
     return -1;
 }
 
-// The 'rcrd' handler: 0xF00 into the session.
+// The 'rcrd' handler: the courses' records into the session.
 void Session_OnRecordsLoaded(UStreamObject* pObject) {
-    Mem_cpy((u8*)&gSession + 0xF00, *(u8**)pObject, *(u32*)((u8*)pObject + 0x24));
+    Mem_cpy(gSession.aCourseRecord, pObject->pData, pObject->uSize);
     fn_80009E70(pObject);
 }
 
@@ -1765,32 +1765,32 @@ void Options_SetDefaults(GameOptions* pOpt) {
     pOpt->unk0[2]  = 5;
     pOpt->unk0[3]  = 1;
     pOpt->unk0[4]  = 4;
-    pOpt->unk7[1]  = 1;
-    pOpt->unk7[2]  = 1;
+    pOpt->a7[1]    = 1;
+    pOpt->a7[2]    = 1;
     pOpt->bGimmes  = 1;
     pOpt->bSkipCameras = 0;
-    pOpt->unkC     = 2;
+    pOpt->nC       = 2;
     pOpt->nWind    = 0;
-    pOpt->unk14    = 0;
-    pOpt->unk18    = 1;
-    pOpt->unk1C    = 1;
+    pOpt->n14      = 0;
+    pOpt->n18      = 1;
+    pOpt->n1C      = 1;
     for (i = 0; i < 8; i++) {
         pOpt->unk24[i] = 1;
     }
     pOpt->bBoostEnabled = 1;
     pOpt->bSpinEnabled  = 1;
-    pOpt->unk7E = 0;
-    pOpt->unk80 = 1;
+    pOpt->b7E = 0;
+    pOpt->n80 = 1;
     for (i = 0; i < 4; i++) {
         for (j = 0; j < 19; j++) {
             pOpt->rows[i][j] = 1;
         }
     }
-    pOpt->unk7A = 1;
-    pOpt->unk7B = 0;
-    pOpt->unk7C = 1;
-    pOpt->unk7D = 0;
-    pOpt->unk84 = 0;
+    pOpt->b7A = 1;
+    pOpt->b7B = 0;
+    pOpt->b7C = 1;
+    pOpt->b7D = 0;
+    pOpt->b84 = 0;
     fn_8002EBA4((u8*)pOpt, 1);
     if (gSession.uFlags & 0x4000) {
         for (i = 0; i < 4; i++) {
@@ -1798,15 +1798,15 @@ void Options_SetDefaults(GameOptions* pOpt) {
                 pOpt->rows[i][j] = 0;
             }
         }
-        pOpt->unk7A      = 1;
+        pOpt->b7A      = 1;
         pOpt->rows[0][13] = 1;
         pOpt->rows[0][15] = 1;
         pOpt->rows[0][17] = 1;
         pOpt->rows[1][0]  = 1;
         fn_8002EBA4((u8*)pOpt, 0);
     }
-    fn_80055C40(pOpt->unk18);
-    fn_80055CD0(pOpt->unk1C);
+    fn_80055C40(pOpt->n18);
+    fn_80055CD0(pOpt->n1C);
 }
 
 // A fresh session: one player, every slot a CPU on tee set 2 with an empty profile.
@@ -1817,7 +1817,7 @@ void Session_Init(void) {
     pSession->uFlags      = 0;
     pSession->nGameType   = 0;
     pSession->unk8[0]     = 0;
-    pSession->unkC        = 0;
+    pSession->nC          = 0;
     pSession->nSplitScreen = 0;
     pSession->unk11[0]    = 0;
     pSession->unk11[1]    = 0;
@@ -1826,25 +1826,25 @@ void Session_Init(void) {
     pSession->uFlags     &= ~0x60;
     pSession->fFrameTime  = 0.0f;
     pSession->f1C         = 0.0f;
-    pSession->unk20       = 0;
+    pSession->n20         = 0;
     pSession->unk24       = 0;
-    pSession->unk28       = 0;
-    Options_SetDefaults(SESSION_OPTIONS);
+    pSession->n28         = 0;
+    Options_SetDefaults(&gSession.options);
     gSession.nSeed = Rand_Next(0);
     fn_8000B1D4(0, gSession.nSeed);
     gSession.nNumPlayers = 1;
     gSession.nPinSet     = -1;
-    gSession.unk5B39     = 1;
+    gSession.bStrokeLimit = 1;
     for (i = 0; i < 5; i++) {
         gSession.nController[i] = CONTROLLER_CPU;
         gSession.nGolfer[i]     = 0;
         gSession.nTeeSet[i]     = 2;
         gSession.uBag[i]        = 0;
-        SESSION_PROFILE(i)->n0 = 0;
-        SESSION_PROFILE(i)->unk1 = 0;
-        SESSION_PROFILE(i)->unk2 = 0;
+        gSession.aProfile[i].n0 = 0;
+        gSession.aProfile[i].n1 = 0;
+        gSession.aProfile[i].n2 = 0;
         for (j = 0; j < 6; j++) {
-            fn_800CB700(SESSION_PROFILE(i)->szNames[j], gszEmpty);
+            fn_800CB700(gSession.aProfile[i].szNames[j], gszEmpty);
         }
     }
     gSession.f5B3C = 0.0f;
@@ -1861,9 +1861,10 @@ void Session_SetupProfiles(void) {
     s8       nSpin;
 
     for (i = 0; i < pSession->nNumPlayers; i++) {
-        PlayerProfile* pProf = SESSION_PROFILE(i);
+        // fake match: the cast keeps this near-miss at 70.9% (&gSession.aProfile[i]: 70.1%)
+        PlayerProfile* pProf = (PlayerProfile*)gSession.aProfile + i;
         int            nGolfer;
-        pProf->unk1 = 0;
+        pProf->n1 = 0;
         nSpin = gGolferTable[pSession->nGolfer[i]].attr[ATTR_SPIN];
         for (j = 0; j < 6; j++) {
             fn_800CB700(pProf->szNames[j], gszEmpty);
@@ -1876,18 +1877,18 @@ void Session_SetupProfiles(void) {
                 ((u32*)pProf->szNames[j])[0] = ((u32*)pSave->szGolferNames[j])[0];
                 ((u32*)pProf->szNames[j])[1] = ((u32*)pSave->szGolferNames[j])[1];
             }
-            pProf->unk2      = pSave->n54C2;
+            pProf->n2        = pSave->n54C2;
             pProf->nBallType = pSave->nGolferBallType;
             pProf->nOutfit   = pSave->nGolferOutfit;
         } else if (nGolfer == 0 || nGolfer == 1) {
             fn_800CB700(pProf->szNames[0], lbl_80187650 + 0x1A);
-            pProf->unk2      = 0;
+            pProf->n2        = 0;
             pProf->nBallType = 0;
         } else if (fn_80077B18()) {
-            pProf->unk2      = 0;
+            pProf->n2        = 0;
             pProf->nBallType = 0;
         } else {
-            pProf->unk2 = 0;
+            pProf->n2 = 0;
             if (nSpin >= 100) {
                 pProf->nBallType = 3;
             } else if (nSpin >= 75) {

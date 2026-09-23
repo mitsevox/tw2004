@@ -98,15 +98,15 @@ void fn_800F6A60(void) {
 }
 
 void fn_800F6CC4(void) {
-    SESSION_OPTIONS->unkC = lbl_802816A8;
-    SESSION_OPTIONS->nWind = lbl_802823B0;
+    gSession.options.nC = lbl_802816A8;
+    gSession.options.nWind = lbl_802823B0;
 }
 
 void fn_800F6CE0(void) {
-    lbl_802816A8 = SESSION_OPTIONS->unkC;
-    lbl_802823B0 = SESSION_OPTIONS->nWind;
-    SESSION_OPTIONS->unkC = 4;
-    SESSION_OPTIONS->nWind = 0;
+    lbl_802816A8 = gSession.options.nC;
+    lbl_802823B0 = gSession.options.nWind;
+    gSession.options.nC = 4;
+    gSession.options.nWind = 0;
 }
 
 u8 fn_800F6D0C(u8 bCheck) {

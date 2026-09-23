@@ -57,7 +57,7 @@ void fn_800FEAFC(void) {
     fn_800E1480(0);
     lbl_802823DC = -1;
     gSession.nSplitScreen = 0;
-    SESSION_OPTIONS->unkC = 0;
+    gSession.options.nC = 0;
 }
 
 u8 fn_800FEC78(u8 bCheck) {

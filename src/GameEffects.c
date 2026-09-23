@@ -49,8 +49,6 @@ u8    fn_800451A8(void* pList, u32 uTarget, int nPlayer);
 u8    fn_8003DC78(u32 uTarget);
 extern u8 gNumPlayersSetUp;                 // 0x80281D48 (Golfer.c)
 
-// A course's records (the 'rcrd' block at gSession + 0xF00, 0x320 bytes per course).
-#define COURSE_RECORD(off) (*(s32*)((u8*)&gSession + 0xF00 + Game_GetCourse() * 0x320 + (off)))
 
 // Starts a scripted GameBreaker for nPlayer, for reason nReason (a bit in uFlags).
 #define GB_START(nPlayer, nReason)                                                                     if (!lbl_80202898.bGameBreaker || lbl_80202898.bClosing || lbl_80202898.nGBType != 0) {                lbl_80202898.bClosing = 0;                                                                         lbl_80202898.bGameBreaker = 1;                                                                     lbl_80202898.fGBTime = 0.0f;                                                                       lbl_80202898.f24 = 0.0f;                                                                           lbl_80202898.b19 = 0;                                                                              lbl_80202898.nGBType = 0;                                                                          lbl_80202898.nPlayer = nPlayer;                                                                    lbl_80202898.bPaused = 0;                                                                          lbl_80202898.uFlags = 1 << (nReason);                                                              lbl_80202898.nHeartbeats = 0;                                                                      EVENT_Trigger(nPlayer, 0x3D, 0, -1);                                                           }
@@ -206,10 +204,11 @@ void fn_800DB30C(int nPlayer, int nReason) {
         }
         if (lbl_80202898.bGameBreaker != 1 && !Player_IsCPU(nPlayer)) {
             if (nReason == 12) {
-                if (fn_800E17AC(nPlayer) + 1 >= COURSE_RECORD(0)) {
+                if (fn_800E17AC(nPlayer) + 1 >= gSession.aCourseRecord[Game_GetCourse()].n0) {
                     return;
                 }
-            } else if (nReason == 15 && !(3.0f * gPlayers[nPlayer].fA64 > COURSE_RECORD(0xC8))) {
+            } else if (nReason == 15 &&
+                       !(3.0f * gPlayers[nPlayer].fA64 > gSession.aCourseRecord[Game_GetCourse()].nC8)) {
                 return;
             }
             GB_START(nPlayer, nReason);

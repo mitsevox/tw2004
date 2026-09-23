@@ -100,16 +100,16 @@ void fn_800F2984(void) {
 
 // Game finished: the saved options go back.
 void fn_800F2BBC(void) {
-    SESSION_OPTIONS->unkC = lbl_80281688;
-    SESSION_OPTIONS->nWind = lbl_80282368;
+    gSession.options.nC = lbl_80281688;
+    gSession.options.nWind = lbl_80282368;
 }
 
 // Round setup: options saved and replaced, and a random first player.
 void fn_800F2BD8(void) {
-    lbl_80281688 = SESSION_OPTIONS->unkC;
-    lbl_80282368 = SESSION_OPTIONS->nWind;
-    SESSION_OPTIONS->unkC = 4;
-    SESSION_OPTIONS->nWind = 0;
+    lbl_80281688 = gSession.options.nC;
+    lbl_80282368 = gSession.options.nWind;
+    gSession.options.nC = 4;
+    gSession.options.nWind = 0;
     lbl_8028236C = Rand_Next(0) & 1;
 }
 

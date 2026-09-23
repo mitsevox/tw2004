@@ -87,7 +87,9 @@ void fn_800F1424(void) {
     fn_800E1404(gReplayData.nHole);
     Session_SetNumPlayers(1);
     gSession.bReplay = 1;
-    SESSION_OPTIONS->unkC = gReplayData.nF12;
+    // fake match: a no-op cast of &gSession; written plainly the address is scheduled
+    // differently (96.9%)
+    ((Session*)&gSession)->options.nC = gReplayData.nF12;
     if (gReplayData.nF12 == 3) {
         fn_800ED6F8(gReplayData.nF14 / 100.0f);
     }

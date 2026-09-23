@@ -1000,7 +1000,7 @@ void GM_CheckForShotChanges(int nPlayer) {
         } else if (!gpGame->b28D && fn_800E012C(nPlayer)) {
             fn_800C4E80(fn_80017028(gPlayers[nPlayer].nView0), nPlayer);
         } else if (fn_800DFF0C(nPlayer)) {
-            if (SESSION_OPTIONS->bSkipCameras) return;
+            if (gSession.options.bSkipCameras) return;
             if (fn_8008AC40()) return;
             GOLFERSTATE_Push(GS_MID_HOLE_FLY_BY, nPlayer);
         }

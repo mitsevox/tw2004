@@ -100,15 +100,15 @@ void fn_800F39F4(void) {
 }
 
 void fn_800F3C2C(void) {
-    SESSION_OPTIONS->unkC = lbl_80281690;
-    SESSION_OPTIONS->nWind = lbl_80282378;
+    gSession.options.nC = lbl_80281690;
+    gSession.options.nWind = lbl_80282378;
 }
 
 void fn_800F3C48(void) {
-    lbl_80281690 = SESSION_OPTIONS->unkC;
-    lbl_80282378 = SESSION_OPTIONS->nWind;
-    SESSION_OPTIONS->unkC = 4;
-    SESSION_OPTIONS->nWind = 0;
+    lbl_80281690 = gSession.options.nC;
+    lbl_80282378 = gSession.options.nWind;
+    gSession.options.nC = 4;
+    gSession.options.nWind = 0;
 }
 
 u8 fn_800F3C74(u8 bCheck) {

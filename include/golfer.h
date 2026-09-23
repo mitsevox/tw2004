@@ -395,36 +395,87 @@ typedef struct RecordEntry {
 } RecordEntry;
 
 // The round / session state at gSession (0x5BD0 bytes); only what this file reads.
+// The game options (Session.options, 0x88 bytes).
+typedef struct GameOptions {
+    u8   unk0[5];               // 0x00
+    u8   bGimmes;               // 0x05  (gSession + 0xE7D) the Gimmes option, default on
+    u8   bSkipCameras;          // 0x06  (gSession + 0xE7E) camera states end at once (inferred)
+    u8   a7[5];                 // 0x07  [1] and [2] default to 1
+    s32  nC;                    // 0x0C  0, 3 or 4, set by the modes while they run
+    s32  nWind;                 // 0x10  0..3 calm..gusty, 4+ none
+    s32  n14;                   // 0x14
+    s32  n18;                   // 0x18  -> fn_80055C40
+    s32  n1C;                   // 0x1C  -> fn_80055CD0
+    u8   unk20[4];
+    u8   unk24[8];              // 0x24  eight on/off options, default on; [7] (0xEA3) the swing trail
+    u8   bBoostEnabled;         // 0x2C  (gSession + 0xEA4)
+    u8   bSpinEnabled;          // 0x2D  (gSession + 0xEA5)
+    u8   rows[4][19];           // 0x2E  four rows of 19 flags
+    u8   b7A;                   // 0x7A
+    u8   b7B;                   // 0x7B
+    u8   b7C;                   // 0x7C
+    u8   b7D;                   // 0x7D
+    u8   b7E;                   // 0x7E
+    u8   unk7F;
+    s32  n80;                   // 0x80
+    u8   b84;                   // 0x84  cleared while the lessons run (GameMode11)
+} GameOptions;
+
+// A player's profile block (Session.aProfile, 0x40 bytes each).
+typedef struct PlayerProfile {
+    s8   n0;                    // 0x00  0..3; bumped for a CPU opponent playing the same golfer (GameMode5)
+    u8   n1;                    // 0x01  cleared by Session_Init and the golfer setup
+    u8   n2;                    // 0x02  a created golfer's byte 0x54C2 of its save slot, else 0
+    u8   unk3[5];
+    char szNames[6][8];         // 0x08
+    u8   nOutfit;               // 0x38  the record's byte 0x60
+    u8   nBallType;             // 0x39  0..3, from the SPIN attribute for a pro
+    u8   unk3A[6];
+} PlayerProfile;
+
+// A course's records (the 'rcrd' stream block, Session_OnRecordsLoaded; 0x320 bytes per course).
+typedef struct CourseRecord {
+    s32  n0;                    // 0x000  compared with a player's strokes + 1 (GameEffects)
+    u8   unk4[0xC8 - 0x4];
+    s32  nC8;                   // 0x0C8  compared with three times Player.fA64 (GameEffects)
+    u8   unkCC[0x320 - 0xCC];
+} CourseRecord;
+
+#define NUM_COURSE_RECORDS 21   // 0xF00..0x50A0 of the session
+
 typedef struct Session {
     u32  uFlags;                // 0x000  bit 1: use the alternate attribute block everywhere;
                                 //        bit 9: every club in the bag
     s32  nGameType;             // 0x004  4 gets a second view
     u8   unk8[4];
-    s32  unkC;                  // 0x00C
+    s32  nC;                    // 0x00C
     u8   nSplitScreen;          // 0x010  0 single view, else split screen (2 = side by side); no luck, no caddie
     u8   unk11[2];
     u8   bReplay;               // 0x013  a saved replay is playing: no luck swap, no spin, instant launch
     s32  unk14;                 // 0x014
     f32  fFrameTime;            // 0x018  seconds per frame
     f32  f1C;                   // 0x01C
-    s32  unk20;                 // 0x020
+    s32  n20;                   // 0x020
     s32  unk24;                 // 0x024
-    s32  unk28;                 // 0x028
+    s32  n28;                   // 0x028
     s32  nNumPlayers;           // 0x02C
     s32  nController[5];        // 0x030  per player (slot 4 is the caddie / lucky-shot copy)
     s32  nGolfer[5];            // 0x044  golfer index per player
     s32  nTeeSet[5];            // 0x058
     u32  uBag[5];               // 0x06C  per player, 0 = the record's own
-    u8   unk80[0x50A0 - 0x80];  // profiles at 0xD38 (PlayerProfile x 5), options at 0xE78
+    u8   unk80[0xD38 - 0x80];
+    PlayerProfile aProfile[5];  // 0x0D38
+    GameOptions options;        // 0x0E78
+    CourseRecord aCourseRecord[NUM_COURSE_RECORDS];    // 0x0F00  per course
     RecordEntry recA[8][5];     // 0x50A0  all-time records: 8 kinds, top 5 each
     RecordEntry recB[3][3][5];  // 0x53C0  3 x 3 kinds, top 5 each
     RecordEntry recC[5][2][5];  // 0x5744  5 x 2 kinds, top 5 each
     u32  nSeed;                 // 0x5B2C
     u8   unk5B30[4];
-    s32  unk5B34;               // 0x5B34
+    s32  n5B34;                 // 0x5B34
     s8   nPinSet;               // 0x5B38  the pin position every hole uses (0..3; -1 = 0), copied to
                                 //         gpGame->nPinSet[] at the start of a round
-    u8   unk5B39;               // 0x5B39
+    u8   bStrokeLimit;          // 0x5B39  the stroke-limit option (GameRound.c), on by default
     u8   unk5B3A[2];
     f32  f5B3C;                 // 0x5B3C
     f32  f5B40;                 // 0x5B40  150
@@ -432,6 +483,10 @@ typedef struct Session {
     f32  f5B48;                 // 0x5B48  1
     u8   unk5B4C[0x5BD0 - 0x5B4C];
 } Session;
+
+// Kept for the files that still use them (Ball.c, GameUI.c, Swing.c); new code writes the fields.
+#define SESSION_OPTIONS    (&gSession.options)
+#define SESSION_PROFILE(i) (&gSession.aProfile[i])
 
 // The game state gpGame points at: the current game mode's rules (data and callbacks; TW06
 // turned this into the GameModeDriver class). Only what our files use is named.
@@ -647,46 +702,5 @@ u8   Bag_HasClub(int nPlayer, int nBit);
 int  Bag_CountClubs(int nPlayer);
 void Session_SetGolfer(int nGolfer, int nPlayer);
 
-// Game options at gSession + 0xE78 (the wind setting is nWind, at gSession + 0xE88).
-typedef struct GameOptions {
-    u8   unk0[5];               // 0x00
-    u8   bGimmes;               // 0x05  (gSession + 0xE7D) the Gimmes option, default on
-    u8   bSkipCameras;          // 0x06  (gSession + 0xE7E) camera states end at once (inferred)
-    u8   unk7[5];
-    s32  unkC;                  // 0x0C
-    s32  nWind;                 // 0x10  0..3 calm..gusty, 4+ none
-    s32  unk14;                 // 0x14
-    s32  unk18;                 // 0x18  -> fn_80055C40
-    s32  unk1C;                 // 0x1C  -> fn_80055CD0
-    u8   unk20[4];
-    u8   unk24[8];              // 0x24  eight on/off options, default on; [7] (0xEA3) the swing trail
-    u8   bBoostEnabled;         // 0x2C  (gSession + 0xEA4)
-    u8   bSpinEnabled;          // 0x2D  (gSession + 0xEA5)
-    u8   rows[4][19];           // 0x2E  four rows of 19 flags
-    u8   unk7A;                 // 0x7A
-    u8   unk7B;
-    u8   unk7C;
-    u8   unk7D;
-    u8   unk7E;
-    u8   unk7F;
-    s32  unk80;                 // 0x80
-    u8   unk84;                 // 0x84
-} GameOptions;
-
-// A player's profile block at gSession + 0xD38, 0x40 each.
-typedef struct PlayerProfile {
-    s8   n0;                    // 0x00  0..3; bumped for a CPU opponent playing the same golfer (GameMode5)
-    u8   unk1;                  // 0x01
-    u8   unk2;                  // 0x02
-    u8   unk3[5];
-    char szNames[6][8];         // 0x08
-    u8   nOutfit;               // 0x38  the record's byte 0x60
-    u8   nBallType;             // 0x39  0..3, from the SPIN attribute for a pro
-    u8   unk3A[6];
-} PlayerProfile;
-
-#define SESSION_OPTIONS_OF(pSession) ((GameOptions*)((u8*)(pSession) + 0xE78))
-#define SESSION_OPTIONS  SESSION_OPTIONS_OF(&gSession)
-#define SESSION_PROFILE(i) ((PlayerProfile*)((u8*)&gSession + 0xD38) + (i))
 
 #endif

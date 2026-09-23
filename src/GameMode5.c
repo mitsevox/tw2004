@@ -83,8 +83,8 @@ void fn_800EAD6C(void) {
     }
     gpGame->nC = 1;
     gpGame->n10 = 1;
-    SESSION_OPTIONS->unkC = lbl_80281660;
-    SESSION_OPTIONS->nWind = lbl_802822F0;
+    gSession.options.nC = lbl_80281660;
+    gSession.options.nWind = lbl_802822F0;
     lbl_802822FC = 0;
 }
 
@@ -157,8 +157,8 @@ void fn_800EAF7C(void) {
     int nPar;
     int nHoles;
     u8 bFound;
-    lbl_80281660 = SESSION_OPTIONS->unkC;
-    lbl_802822F0 = SESSION_OPTIONS->nWind;
+    lbl_80281660 = gSession.options.nC;
+    lbl_802822F0 = gSession.options.nWind;
     fn_800E1074();
     if (gpSaveData[gPlayers[0].nIndex].bActive) {
         gpSaveData[gPlayers[0].nIndex].b70 = 1;
@@ -197,10 +197,10 @@ void fn_800EAF7C(void) {
         gSession.nTeeSet[1] = lbl_80281664[lbl_802822F4].nTeeSet;
         gNumPlayersSetUp = 2;
         if (gSession.nGolfer[0] == gSession.nGolfer[1] &&
-            SESSION_PROFILE(0)->n0 == SESSION_PROFILE(1)->n0) {
-            SESSION_PROFILE(1)->n0++;
-            if (SESSION_PROFILE(1)->n0 >= 4) {
-                SESSION_PROFILE(1)->n0 = 0;
+            gSession.aProfile[0].n0 == gSession.aProfile[1].n0) {
+            gSession.aProfile[1].n0++;
+            if (gSession.aProfile[1].n0 >= 4) {
+                gSession.aProfile[1].n0 = 0;
             }
         }
     }
@@ -210,10 +210,10 @@ void fn_800EAF7C(void) {
         gSession.nTeeSet[2] = lbl_80281664[lbl_802822F4].nTeeSet;
         gNumPlayersSetUp = 3;
         if (gSession.nGolfer[0] == gSession.nGolfer[2] &&
-            SESSION_PROFILE(0)->n0 == SESSION_PROFILE(2)->n0) {
-            SESSION_PROFILE(2)->n0++;
-            if (SESSION_PROFILE(2)->n0 >= 4) {
-                SESSION_PROFILE(2)->n0 = 0;
+            gSession.aProfile[0].n0 == gSession.aProfile[2].n0) {
+            gSession.aProfile[2].n0++;
+            if (gSession.aProfile[2].n0 >= 4) {
+                gSession.aProfile[2].n0 = 0;
             }
         }
     }
@@ -223,10 +223,10 @@ void fn_800EAF7C(void) {
         gSession.nTeeSet[3] = lbl_80281664[lbl_802822F4].nTeeSet;
         gNumPlayersSetUp = 4;
         if (gSession.nGolfer[0] == gSession.nGolfer[3] &&
-            SESSION_PROFILE(0)->n0 == SESSION_PROFILE(3)->n0) {
-            SESSION_PROFILE(3)->n0++;
-            if (SESSION_PROFILE(3)->n0 >= 4) {
-                SESSION_PROFILE(3)->n0 = 0;
+            gSession.aProfile[0].n0 == gSession.aProfile[3].n0) {
+            gSession.aProfile[3].n0++;
+            if (gSession.aProfile[3].n0 >= 4) {
+                gSession.aProfile[3].n0 = 0;
             }
         }
     }
@@ -385,12 +385,12 @@ void fn_800EAF7C(void) {
         break;
     }
     if (lbl_80281664[lbl_802822F4].b4D) {
-        SESSION_OPTIONS->unkC = 3;
+        gSession.options.nC = 3;
     } else {
-        SESSION_OPTIONS->unkC = 0;
+        gSession.options.nC = 0;
     }
     gpGame->nMulligans = 0;
-    SESSION_OPTIONS->nWind = lbl_80281664[lbl_802822F4].nWind;
+    gSession.options.nWind = lbl_80281664[lbl_802822F4].nWind;
     bFound = 0;
     for (i = lbl_802822F4 - 1; i >= 0; i--) {
         if (lbl_80281664[i].nGroup == lbl_80281664[lbl_802822F4].nGroup) {

@@ -119,8 +119,8 @@ void fn_800EDFC0(UStreamObject* pObject) {
 void fn_800EE02C(void) {
     gpGame->nC = 1;
     gpGame->n10 = 1;
-    SESSION_OPTIONS->unkC = lbl_80281670;
-    SESSION_OPTIONS->nWind = lbl_80282338;
+    gSession.options.nC = lbl_80281670;
+    gSession.options.nWind = lbl_80282338;
     lbl_8028233C = 0;
 }
 

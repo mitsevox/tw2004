@@ -781,7 +781,7 @@ int fn_800E234C(int nSlot, int a, int b) {
 // The hole's stroke limit: with the session's limit option (0x5B39) on and the mode using it,
 // 10 strokes ends the hole (GM_PlayerTookShot picks the ball up).
 u8 fn_800E23B0(int nPlayer, int nStrokes) {
-    if (gSession.unk5B39 && gpGame->bStrokeLimit && nStrokes >= 10) {
+    if (gSession.bStrokeLimit && gpGame->bStrokeLimit && nStrokes >= 10) {
         return 1;
     }
     return 0;
@@ -1042,7 +1042,7 @@ void fn_800E2F14(void) {
     int i;
     u8  bDead = 0;
     u8  bAny;
-    if (gSession.unk5B34 == 0) {
+    if (gSession.n5B34 == 0) {
         // Dead code in the original: a loop over the holes testing a flag that is always 0 here.
         // Only the empty counting loop survives compilation, so the body is unknown.
         for (i = 0; i < 18; i++) {
@@ -1286,7 +1286,7 @@ void fn_800E30D4(void) {
 // (18 inches) of the pin - on the putter, or in any shot of a one-player game. Called from swing
 // state 14; yes leads to state 15 (the tap-in is planned) and 16 (played for the player).
 u8 Gimme_Allowed(int nPlayer) {
-    if (!SESSION_OPTIONS->bGimmes) return 0;
+    if (!gSession.options.bGimmes) return 0;
     if (gSession.nSplitScreen) return 0;
     if (gSession.bReplay) return 0;
     if ((gSession.uFlags & 0x4000) && (gSession.uFlags & 0x8000)) return 0;
