@@ -82,7 +82,20 @@ enum {
                (gForgivenessTable[2][row] - gForgivenessTable[1][row]))
 
 // Two rows at once (threshold and scale), one branch on the attribute.
-#define TABLE_PAIR(rowT, rowS, attr, outT, outS)                                                   if ((attr) <= 100) {                                                                               f32 t = (f32)(attr) / 100.0f;                                                                  outT = gForgivenessTable[0][rowT] + t * (gForgivenessTable[1][rowT] - gForgivenessTable[0][rowT]);         outS = gForgivenessTable[0][rowS] + t * (gForgivenessTable[1][rowS] - gForgivenessTable[0][rowS]);     } else {                                                                                           f32 t = ((f32)(attr) - 100.0f) / 10.0f;                                                        outT = gForgivenessTable[1][rowT] + t * (gForgivenessTable[2][rowT] - gForgivenessTable[1][rowT]);         outS = gForgivenessTable[1][rowS] + t * (gForgivenessTable[2][rowS] - gForgivenessTable[1][rowS]);     }
+#define TABLE_PAIR(rowT, rowS, attr, outT, outS)                                               \
+    if ((attr) <= 100) {                                                                       \
+        f32 t = (f32)(attr) / 100.0f;                                                          \
+        outT = gForgivenessTable[0][rowT] +                                                    \
+               t * (gForgivenessTable[1][rowT] - gForgivenessTable[0][rowT]);                  \
+        outS = gForgivenessTable[0][rowS] +                                                    \
+               t * (gForgivenessTable[1][rowS] - gForgivenessTable[0][rowS]);                  \
+    } else {                                                                                   \
+        f32 t = ((f32)(attr) - 100.0f) / 10.0f;                                                \
+        outT = gForgivenessTable[1][rowT] +                                                    \
+               t * (gForgivenessTable[2][rowT] - gForgivenessTable[1][rowT]);                  \
+        outS = gForgivenessTable[1][rowS] +                                                    \
+               t * (gForgivenessTable[2][rowS] - gForgivenessTable[1][rowS]);                  \
+    }
 
 // How much spin the SPIN attribute allows: 0.15 at 0, 0.6 at 100, 1.0 at 110.
 f32 Swing_SpinScale(int nSpin) {
@@ -264,17 +277,27 @@ void Swing_MisHitRumble(int nPlayer) {
     int nAttr;
     f32 fScale;
     switch (gPlayers[nPlayer].nShotKind) {
-    case SHOT_PUTT:  nAttr = (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_PUTTING, ATTR_TOTAL); break;
+    case SHOT_PUTT:
+        nAttr = (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_PUTTING, ATTR_TOTAL);
+        break;
     case SHOT_CHIP:
-    case SHOT_PITCH: nAttr = (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_APPROACH, ATTR_TOTAL); break;
+    case SHOT_PITCH:
+        nAttr = (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_APPROACH, ATTR_TOTAL);
+        break;
     case 5:
     case 6:
-    case 7:          nAttr = (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_RECOVERY, ATTR_TOTAL); break;
-    default:         nAttr = (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_BALL_STRIKING, ATTR_TOTAL); break;
+    case 7:
+        nAttr = (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_RECOVERY, ATTR_TOTAL);
+        break;
+    default:
+        nAttr = (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_BALL_STRIKING, ATTR_TOTAL);
+        break;
     }
     fScale = TABLE_AT(ROW_RUMBLE, nAttr);
     gPlayers[nPlayer].swing.nVibrateCount = (int)(fScale * fabsf(gPlayers[nPlayer].swing.fMishitAngle));
-    if (gPlayers[nPlayer].swing.nVibrateCount > 30) gPlayers[nPlayer].swing.nVibrateCount = 30;
+    if (gPlayers[nPlayer].swing.nVibrateCount > 30) {
+        gPlayers[nPlayer].swing.nVibrateCount = 30;
+    }
     if (gPlayers[nPlayer].swing.nVibrateCount > 0) {
         gPlayers[nPlayer].swing.bVibrating = 1;
         fn_800130F8(nPad, 1);
@@ -390,7 +413,9 @@ f32 Swing_ComputePower(int nPlayer) {
         fPower = p->fPower * AI_PowerScale(nPlayer);
         if (p->nShotKind == SHOT_PUTT && !(p->uFlags & 8)) {
             fPower *= 1.05f;
-            if (fPower < 0.1f) fPower = 0.1f;
+            if (fPower < 0.1f) {
+                fPower = 0.1f;
+            }
         }
         goto clamp;         // fake match: the shared clamp as a jump (without the gotos: 83.9%, not 84.9%)
     }
@@ -402,10 +427,14 @@ f32 Swing_ComputePower(int nPlayer) {
     switch (p->nShotKind) {
     case SHOT_PUTT: {
         f32 fDist = p->fDistance < 1.0f ? 1.0f : p->fDistance;
-        if (*pPower > gpSwing->fPuttFullPower) *pPower = 1.0f;
+        if (*pPower > gpSwing->fPuttFullPower) {
+            *pPower = 1.0f;
+        }
         fPower = *pPower * fn_80050D34(fDist);
         Golfer_GetAttribute(p, ATTR_PUTTING, ATTR_TOTAL);
-        if (fPower < 0.1f) fPower = 0.1f;
+        if (fPower < 0.1f) {
+            fPower = 0.1f;
+        }
         goto clamp;         // fake match: the shared clamp as a jump (without the gotos: 83.9%, not 84.9%)
     }
     case SHOT_CHIP:
@@ -416,7 +445,9 @@ f32 Swing_ComputePower(int nPlayer) {
         }
         fPower = Swing_ApplyPowerBoost(nPlayer, f);
         Golfer_GetAttribute(p, ATTR_APPROACH, ATTR_TOTAL);
-        if (fPower < 0.1f) fPower = 0.1f;
+        if (fPower < 0.1f) {
+            fPower = 0.1f;
+        }
         goto clamp;         // fake match: the shared clamp as a jump (without the gotos: 83.9%, not 84.9%)
     }
     case 5:
@@ -621,7 +652,8 @@ extern s32 gClubCurve[NUM_CLUBS];            // 0x80183578  per club, 0..26: how
 f32 Swing_CurveAngle(s32* pClub, f32 fBackAngle) {
     f32 fOut   = 0.0f;
     f32 fT     = fBackAngle / (PI / 2);
-    f32 fRange = gpSwing->fCurveMin + ((f32)gClubCurve[*pClub] / 26.0f) * (gpSwing->fCurveMax - gpSwing->fCurveMin);
+    f32 fRange = gpSwing->fCurveMin +
+                 ((f32)gClubCurve[*pClub] / 26.0f) * (gpSwing->fCurveMax - gpSwing->fCurveMin);
 
     fT = (f32)fabsf(fT);
     if (fT < gpSwing->fKnot1X) {
@@ -629,7 +661,8 @@ f32 Swing_CurveAngle(s32* pClub, f32 fBackAngle) {
     } else {
         fOut += gpSwing->fKnot1Y;
         if (fT < gpSwing->fKnot2X) {
-            fOut += (gpSwing->fKnot2Y - gpSwing->fKnot1Y) * ((fT - gpSwing->fKnot1X) / (gpSwing->fKnot2X - gpSwing->fKnot1X));
+            fOut += (gpSwing->fKnot2Y - gpSwing->fKnot1Y) *
+                    ((fT - gpSwing->fKnot1X) / (gpSwing->fKnot2X - gpSwing->fKnot1X));
         } else {
             fOut += gpSwing->fKnot2Y - gpSwing->fKnot1Y;
             fOut += (1.0f - gpSwing->fKnot2Y) * ((fT - gpSwing->fKnot2X) / (1.0f - gpSwing->fKnot2X));
@@ -662,7 +695,9 @@ void Swing_FaceVector(int nPlayer, f32* pOut) {
     fCentreX = p->swing.nCalibrateX;
     fTopX    = p->swing.nBackSwingX;
     fTopY    = p->swing.nBackSwingY;
-    if (0.0f == fCentreX) fCentreX = 1.0f;
+    if (0.0f == fCentreX) {
+        fCentreX = 1.0f;
+    }
     fDY = fTopY - (f32)gPlayers[nPlayer].swing.nCalibrateY;
     if (0.0f == fDY) {
         pOut[0] = 0.0f;
@@ -971,7 +1006,8 @@ void STATEFUNC_ShotSetupUpdate(int nPlayer) {
             fMax = 4.0f;
             break;
         }
-        if ((bDone && gPlayers[nPlayer].fThinkTime > fMin && fn_800C7100(pView)) || gPlayers[nPlayer].fThinkTime > fMax) {
+        if ((bDone && gPlayers[nPlayer].fThinkTime > fMin && fn_800C7100(pView)) ||
+            gPlayers[nPlayer].fThinkTime > fMax) {
             if (!bDone) {
                 gPlayers[nPlayer].nRehearseState = 3;
                 AI_RehearseShot(nPlayer, NULL, 0, CPU_TOLERANCE);
@@ -1312,14 +1348,19 @@ int Swing_UpdateBackswing(int nPlayer) {
             int nDY = Swing_DeadZone(nY) - 128;
             fMag = (f32)fn_80009680(nDX * nDX + nDY * nDY);
         }
-        if (fMag > 100.0f) fMag = 100.0f;
+        if (fMag > 100.0f) {
+            fMag = 100.0f;
+        }
         fRange  = fTop - fStart;
         fTarget = fStart + (fMag / 100.0f) * fRange;
         fDelta  = fTarget - fAnimTime;
         fRate   = 1.0f + (f32)fabsf(fDelta) / fRange;
         fRate   = fRate * fRate - 1.0f;
-        if (fRate >= 1.0f) fRate = 1.0f;
-        if (gPlayers[nPlayer].nShotKind == 1 || gPlayers[nPlayer].nShotKind == 2 || gPlayers[nPlayer].nShotKind == 3) {
+        if (fRate >= 1.0f) {
+            fRate = 1.0f;
+        }
+        if (gPlayers[nPlayer].nShotKind == 1 || gPlayers[nPlayer].nShotKind == 2 ||
+            gPlayers[nPlayer].nShotKind == 3) {
             fRange = fRange / gSwingRange[gPlayers[nPlayer].nShotKind];
         } else {
             fRange = 1.0f;
@@ -1334,7 +1375,9 @@ int Swing_UpdateBackswing(int nPlayer) {
             Swing_HoldAtTop(nPlayer);
             pSw->nState = 2;
         } else if (pObj->uFlags & 0x40) {
-            if (fDelta > 0.0f) pObj->uFlags &= ~0x40;
+            if (fDelta > 0.0f) {
+                pObj->uFlags &= ~0x40;
+            }
         } else if (fDelta < 0.0f) {
             pObj->uFlags |= 0x40;
             pSw->fPowerBoostDieTime = 1.0f / 12.0f;
@@ -1707,12 +1750,14 @@ void fn_8005A478(int nPlayer) {
                         pSw->fRedColor = 0.0f;
                         pSw->fGreenColor = 0.0f;
                         pSw->fBlueColor = 0.5f;
-                        pSw->fAlpha = gpSwing->fFC * (f32)(pSw->nCalibrateX - nStickX) / (f32)pSw->nCalibrateX;
+                        pSw->fAlpha =
+                            gpSwing->fFC * (f32)(pSw->nCalibrateX - nStickX) / (f32)pSw->nCalibrateX;
                     } else {
                         pSw->fRedColor = 0.5f;
                         pSw->fGreenColor = 0.5f;
                         pSw->fBlueColor = 0.0f;
-                        pSw->fAlpha = gpSwing->fFC * (f32)(nStickX - pSw->nCalibrateX) / (f32)(0xFF - pSw->nCalibrateX);
+                        pSw->fAlpha = gpSwing->fFC * (f32)(nStickX - pSw->nCalibrateX) /
+                                      (f32)(0xFF - pSw->nCalibrateX);
                     }
                     fn_8005AD20(pObj, pSw, nStickX);
                 } else if (pObj->nAnim == 7) {
@@ -1742,7 +1787,8 @@ void fn_800AE3F8(int nView);
 
 void fn_8005A7A0(int nPlayer) {
     if ((gPlayers[nPlayer].swing.nPowerBoost > 0 || gPlayers[nPlayer].swing.nSpinBoost > 0) &&
-        gPlayers[nPlayer].nShotKind != 0 && gPlayers[nPlayer].swing.bDrawBoostUI != 0 && gSession.bReplay == 0 &&
+        gPlayers[nPlayer].nShotKind != 0 && gPlayers[nPlayer].swing.bDrawBoostUI != 0 &&
+        gSession.bReplay == 0 &&
         gSession.unk14 == 0 && !fn_800C6CB0()) {
         fn_800AE3F8(gPlayers[nPlayer].nView[0]);
     }
@@ -1828,7 +1874,8 @@ void fn_8005A850(int nPlayer) {
                 gpSwing->p9C[nView][i * 4 + 4] = nRed;    // vertex colour R
                 gpSwing->p9C[nView][i * 4 + 5] = nGreen;  // G
                 gpSwing->p9C[nView][i * 4 + 6] = nBlue;   // B
-                gpSwing->p9C[nView][i * 4 + 7] = 128.0f * pSw->fAlpha * (1.0f - (f32)i / pSw->nNumInBlurQueue);
+                gpSwing->p9C[nView][i * 4 + 7] =
+                    128.0f * pSw->fAlpha * (1.0f - (f32)i / pSw->nNumInBlurQueue);
                 idx[i + 1] = i + 1;
             }
             fn_80035138(0);
@@ -1883,8 +1930,12 @@ void fn_8005AD20(Character* pObj, SwingData* pSw, int nStickX) {
         fAmount = (pObj->fAnimTime - pSw->fTimeSwingTop) / (pSw->fTimeBallHit - pSw->fTimeSwingTop);
         fAmount *= fAmount;
         fAmount = 1.0f - fAmount;
-        if (fAmount < 0.0f) fAmount = 0.0f;
-        if (fAmount > 1.0f) fAmount = 1.0f;
+        if (fAmount < 0.0f) {
+            fAmount = 0.0f;
+        }
+        if (fAmount > 1.0f) {
+            fAmount = 1.0f;
+        }
     }
     pSw->f14 = (f32)nStickX / 255.0f - 0.5f;
     fDelta = pSw->f14 - pSw->f10;
@@ -1922,16 +1973,23 @@ void Swing_UpdatePower(int nPlayer) {
     if (!Player_IsCPU(nPlayer)) {
         fPower = (f32)fn_80009680(fPower);
     }
-    if (1.0f - fPower < 0.03f) fPower = 1.0f;
-    if (gPlayers[nPlayer].swing.fFidgetTimeElapsed < 0.05f || gPlayers[nPlayer].nShotKind == SHOT_PUTT || 1.0f != fPower) {
+    if (1.0f - fPower < 0.03f) {
+        fPower = 1.0f;
+    }
+    if (gPlayers[nPlayer].swing.fFidgetTimeElapsed < 0.05f || gPlayers[nPlayer].nShotKind == SHOT_PUTT ||
+        1.0f != fPower) {
         fPenalty = 0.0f;
     } else {
         fPenalty = gPlayers[nPlayer].swing.fFidgetTimeElapsed - 0.05f;
         fPenalty = -(fPenalty * fPenalty);
     }
-    if (fPenalty < -0.3f) fPenalty = -0.3f;
+    if (fPenalty < -0.3f) {
+        fPenalty = -0.3f;
+    }
     gPlayers[nPlayer].fPower = fPower + fPenalty;
-    if (gPlayers[nPlayer].fPower < 0.0f) gPlayers[nPlayer].fPower = 0.0f;
+    if (gPlayers[nPlayer].fPower < 0.0f) {
+        gPlayers[nPlayer].fPower = 0.0f;
+    }
 }
 
 
@@ -3262,7 +3320,8 @@ void STATEFUNC_ReplaySwingInit(int nPlayer) {
     if (gPlayers[nPlayer].uFlags & 8) {
         CharAnim_StartTapIn(gPlayers[nPlayer].pChar);
     } else {
-        if (fn_800C6D80() || fn_800C44A8(pV, nPlayer) || fn_800C44CC(pV, nPlayer) || fn_800C44E0(pV, nPlayer)) {
+        if (fn_800C6D80() || fn_800C44A8(pV, nPlayer) || fn_800C44CC(pV, nPlayer) ||
+            fn_800C44E0(pV, nPlayer)) {
             CharacterState_AddSKABlendData(gPlayers[nPlayer].pChar, 1, 0, fn_80072ACC, 1, 8,
                                            -20000.0f, -30000.0f, -10000.0f, 0.0f, -10000.0f);
         } else {
@@ -3655,7 +3714,9 @@ void STATEFUNC_SimulateUpdate(int nPlayer) {
     if (!fn_80062DD4(pV)) {
         s32* pState = &gPlayers[nPlayer].ball.nState;
         if (*pState == 1 || *pState == 5 || *pState == 0) {
-            if (*pState != 5) *pState = 0;
+            if (*pState != 5) {
+                *pState = 0;
+            }
             if (gPlayers[nPlayer].uFlags & 8) {
                 gPlayers[nPlayer].ball.nLie = LIE_HOLED;
             }
@@ -3682,7 +3743,9 @@ void STATEFUNC_SimulateUpdate(int nPlayer) {
             }
         }
         fn_80045558(bA, nPlayer);
-        if (bA) bB = 0;
+        if (bA) {
+            bB = 0;
+        }
         fn_80045494(bB, nPlayer);
     }
     if (Player_IsCPU(nPlayer)) return;
@@ -3690,22 +3753,34 @@ void STATEFUNC_SimulateUpdate(int nPlayer) {
     if (fn_800E430C(nPlayer)) return;
     if (fn_80100294()) return;
     if (gReplayData.bF10 != 0 && gpGame->b287 != 0) {
-        if ((fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x18, 0)) && !(gPlayers[nPlayer].uFlags & 8) &&
+        if ((fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x18, 0)) &&
+            !(gPlayers[nPlayer].uFlags & 8) &&
             (s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_CONCEDED && !fn_800E53B8() &&
             !(gPlayers[nPlayer].pChar->u10 & 0x40)) {
             s32* pKeptState = &gPlayers[nPlayer].ballBefore.nState;
-            if (*pKeptState != 0) *pKeptState = 1;
-            if (fn_800C6D28()) fn_800C6DE4();
-            if (fn_800C6D64()) fn_800C6DFC();
+            if (*pKeptState != 0) {
+                *pKeptState = 1;
+            }
+            if (fn_800C6D28()) {
+                fn_800C6DE4();
+            }
+            if (fn_800C6D64()) {
+                fn_800C6DFC();
+            }
             fn_8006C300(nPlayer);
             GOLFERSTATE_Switch(GS_REPLAY_SWING, nPlayer);
             return;
         }
     }
-    if ((fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x19, 0)) && !(gPlayers[nPlayer].uFlags & 8) && GM_PlayerTakeMulligan(nPlayer)) {
+    if ((fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x19, 0)) &&
+        !(gPlayers[nPlayer].uFlags & 8) && GM_PlayerTakeMulligan(nPlayer)) {
         fn_8006C4A0();
-        if (fn_800C6D28()) fn_800C6DE4();
-        if (fn_800C6D64()) fn_800C6DFC();
+        if (fn_800C6D28()) {
+            fn_800C6DE4();
+        }
+        if (fn_800C6D64()) {
+            fn_800C6DFC();
+        }
     }
 }
 
@@ -3823,9 +3898,13 @@ void STATEFUNC_SwingUpdate(int nPlayer) {
     }
     if (gpGame->b282 != 0) {
         if (fn_800E3DDC(nPlayer)) {
-            if (gPlayers[nPlayer].swing.nState != 0) fn_800E3D38(nPlayer, 0);
+            if (gPlayers[nPlayer].swing.nState != 0) {
+                fn_800E3D38(nPlayer, 0);
+            }
         } else {
-            if (gPlayers[nPlayer].swing.nState == 0) fn_800E3D38(nPlayer, 1);
+            if (gPlayers[nPlayer].swing.nState == 0) {
+                fn_800E3D38(nPlayer, 1);
+            }
         }
     }
     gpGame->pfn228(nPlayer);
@@ -3841,7 +3920,8 @@ void STATEFUNC_SwingUpdate(int nPlayer) {
             EVENT_Trigger(nPlayer, 0x3B, 0, 0);
         }
         if (gpGame->b283 != 0 &&
-            (fn_800C441C(pV, nPlayer) || fn_800C44A8(pV, nPlayer) || fn_800C44CC(pV, nPlayer) || fn_800C44E0(pV, nPlayer))) {
+            (fn_800C441C(pV, nPlayer) || fn_800C44A8(pV, nPlayer) || fn_800C44CC(pV, nPlayer) ||
+             fn_800C44E0(pV, nPlayer))) {
             GOLFERSTATE_Switch(GS_REPLAY_SWING, nPlayer);
         } else {
             GOLFERSTATE_Switch(GS_SIMULATE, nPlayer);
@@ -3880,7 +3960,8 @@ void STATEFUNC_SwingUpdate(int nPlayer) {
         }
         gpGame->pfn22C(nPlayer);
     } else {
-        if ((fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(5, 0)) && gPlayers[nPlayer].nShotKind == SHOT_PUTT) {
+        if ((fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(5, 0)) &&
+            gPlayers[nPlayer].nShotKind == SHOT_PUTT) {
             GOLFERSTATE_Push(GS_GREEN_REVERSE_PUTT, nPlayer);
         } else {
             GM_CheckForShotChanges(nPlayer);
@@ -3958,7 +4039,8 @@ void STATEFUNC_ShowYardageUpdate(int nPlayer) {
         }
         if (gReplayData.bF10 != 0) {
             if ((fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x18, 0)) && gpGame->b287 != 0 &&
-                !(gPlayers[nPlayer].uFlags & 8) && (s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_CONCEDED && !fn_800E53B8() &&
+                !(gPlayers[nPlayer].uFlags & 8) && (s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_CONCEDED &&
+                !fn_800E53B8() &&
                 !(gPlayers[nPlayer].pChar->u10 & 0x40)) {
                 lbl_80281E10 = 1;
                 fn_80062D0C(nPlayer);

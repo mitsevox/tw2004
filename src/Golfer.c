@@ -86,7 +86,12 @@ int Golfer_GetAttribute(Player* pPlayer, int nAttr, int nMode) {
 }
 
 // Keep base + modifiers inside [10, cap]: 110 for power, IQ and aggression, 100 for the rest.
-#define CLAMP_ATTR(pPlayer, nAttr, nCap)                                                         if ((s8)Golfer_GetAttribute(pPlayer, nAttr, ATTR_TOTAL) > (nCap)) {                              (pPlayer)->attrMod[nAttr] = (nCap) - Golfer_GetAttribute(pPlayer, nAttr, ATTR_BASE);     } else if ((s8)Golfer_GetAttribute(pPlayer, nAttr, ATTR_TOTAL) < 10) {                           (pPlayer)->attrMod[nAttr] = 10 - Golfer_GetAttribute(pPlayer, nAttr, ATTR_BASE);         }
+#define CLAMP_ATTR(pPlayer, nAttr, nCap)                                                       \
+    if ((s8)Golfer_GetAttribute(pPlayer, nAttr, ATTR_TOTAL) > (nCap)) {                        \
+        (pPlayer)->attrMod[nAttr] = (nCap) - Golfer_GetAttribute(pPlayer, nAttr, ATTR_BASE);   \
+    } else if ((s8)Golfer_GetAttribute(pPlayer, nAttr, ATTR_TOTAL) < 10) {                     \
+        (pPlayer)->attrMod[nAttr] = 10 - Golfer_GetAttribute(pPlayer, nAttr, ATTR_BASE);       \
+    }
 
 void Golfer_ClampModifiers(Player* pPlayer) {
     CLAMP_ATTR(pPlayer, ATTR_POWER, 110);
