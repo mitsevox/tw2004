@@ -169,7 +169,7 @@ void fn_80165E9C(UIStudio* pStudio, UISScreen* pScreen, u32 u18, s32 n30, u32 uI
     pRateFn->fTarget = fTarget;
     pRateFn->n2C = n2C;
     pRateFn->fStep =
-        (fTarget - *fn_8016C1A4(pRateFn->n20, pRateFn->n30)) / ((f32)uTime / (f32)pStudio->uMsPerTick);
+        (fTarget - *fn_8016C1A4(pRateFn->n20, pRateFn->pInfo)) / ((f32)uTime / (f32)pStudio->uMsPerTick);
 }
 
 // Returns the index of a rate function, or the count when there is none.

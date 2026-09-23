@@ -124,7 +124,7 @@ LAYOUT_ASSERT(TourSeason, 0x4E9C);
 // A new profile has three, emptied by the profile setup at 0x80057C88.
 typedef struct SavedRound {
     s8   n0;                    // 0x00  cleared by the setup; set by a menu message (fn_80083860)
-    u8   unk1[0x15 - 0x1];
+    char szName[0x14];          // 0x01  the round's name, shown as its course (GameUICommands.c)
     s8   n15;                   // 0x15  set to 1 by the setup; menu messages set and read it
                                 //       (read signed: fn_80080C2C)
     s8   nHoleNum[18];          // 0x16  -1 = none
@@ -204,7 +204,8 @@ typedef struct SaveProfile {
     s32  aMedal[29];            // 0x0516C  the best medal per challenge group (0 best, 3 none)
     u8   unk51E0[4];
     u16  aMedalDate[29];        // 0x051E4  the day each was earned (fn_800D2994)
-    u8   unk521E[0x5230 - 0x521E];
+    u8   unk521E[0x522F - 0x521E];
+    u8   b522F;                 // 0x0522F  set by a menu command during a round (GameUICommands.c)
     SavedRound aSavedRound[NUM_SAVED_ROUNDS];   // 0x05230
     GolferRecord createdGolfer; // 0x05380  the created golfer's record (fn_80077A80: golfers
                                 //          from FIRST_CREATED_GOLFER on are read here)

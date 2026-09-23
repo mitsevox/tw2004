@@ -14,9 +14,12 @@
 void* Mem_cpy(void* pDst, const void* pSrc, u32 uLen);    // returns pDst
 void* fn_80005884(void* pDst, const void* pSrc, u32 uLen); // a copy the ranges may overlap in
 void* fn_80005AE8(void* pDst, int nValue, u32 uLen);      // memset; returns pDst
+int   fn_80005BC8(const void* pA, const void* pB, u32 uLen);   // memcmp
 // Allocates from the static heap (StaticMemory.c); nMode picks where (see there).
 void* fn_80009B34(int nSize, int nMode, int nAlign, const char* pFile, int nLine);
 void  fn_80009E70(void* p);             // free
+void  fn_8000A0AC(s32 v);               // } a value callers pass on as fn_80009B34's uFlags
+s32   fn_8000A0B4(void);                // } (EASportsBio.c sets 0 while the Bio starts, then 2)
 void* fn_800951A0(u32 uSize, int nAlign, int a);
 void  fn_8009527C(void* p);             // frees what fn_800951A0 allocated
 void  fn_800953C8(int a);
@@ -48,19 +51,28 @@ void  fn_8015929C(void* pBase, u32 nCount, u32 nSize, s32 (*pfnCompare)(const vo
 #define FRAME_RATE 59.94f               // frames a second (NTSC)
 #define FRAME_TIME (1.0f / FRAME_RATE)  // one frame, in seconds
 
+// llrtclock.c: the real-time clock as a date: month 1-12, day, year, hour 0-23, minute, second,
+// millisecond. Always TRUE.
+int  fn_8011E020(s32* pnMonth, s32* pnDay, s32* pnYear, s32* pnHour, s32* pnMinute, s32* pnSecond,
+                 s32* pnMsec);
+void RTClock_GetDateTimeString(char* szOut);   // "M/D/YYYY H:MM AM"
+
 // ---- math and random numbers -----------------------------------------------------------------
 
 void Vec3Copy(const f32* pSrc, f32* pDst);   // 0x80008304 (const: see code_800082F8.c)
 f32  fn_800095F0(f32 fAngle);           // sin
 f32  fn_80009638(f32 fAngle);           // cos
 double fn_80009680(double x);           // sqrt
-f32  fn_80009744(f32* pVec);            // dot with itself
+f32  fn_80009744(f32* pVec);            // dot with itself (at most FLT_MAX)
+extern f32 lbl_80281B40[];              // FLT_MAX (MSL's)
 void Vec_Copy(f32* pSrc, f32* pDst);    // 0x8000AD10
 f32  fn_8000AD78(f32 y, f32 x);         // atan2f
 f32  fabsf(f32 x);                      // 0x8000AD9C: fabs (0x8000AE94, platform.h) rounded to a float
 f32  fn_8000AF7C(f32 x);                // natural logarithm
 void fn_8000AF20(void);                 // make the log2 table (lbl_80281BD8)
 void fn_8000AF58(void);                 // free the log2 table
+double fn_8015F784(double x);           // acos
+double fn_8015F7A4(double x);           // asin
 double fn_8015F7C4(double y, double x); // atan2
 double fn_8015F804(double x);           // log
 u32  Rand_Next(int nStream);            // 0x8000B130  EA's lagged-Fibonacci generator
@@ -84,8 +96,8 @@ void vec4flt_CrossProduct(f32* pA, f32* pB, f32* pOut);   // cross product
 
 // A texture in a bank (0x50 bytes; the bank's p8 is an array of them). Only what the game code reads.
 typedef struct TexEntry {
-    u64  u0;                    // 0x00  compared as one value (fn_80073878)
-    u32  uPixels;              // 0x08  where its pixels start in the bank's p18
+    u64  u0;                    // 0x00  its name's hash (fn_8000BEE4; fn_8001005C finds a texture by it)
+    u32  uPixels;               // 0x08  where its pixels start in the bank's p18
     u8   unkC[0x3C - 0xC];
     s16  nPalette;              // 0x3C  its row in the bank's pC
     u8   unk3E[0x50 - 0x3E];
@@ -99,23 +111,68 @@ typedef struct TexPalette {
 } TexPalette;
 LAYOUT_ASSERT(TexPalette, 0xC);
 
-// A loaded texture bank (up to 200, listed at lbl_801A26DC). Only what the game code reads.
+// A loaded texture bank (0x30 bytes, followed by its tables; up to 200, listed at lbl_801A26DC).
 typedef struct TexBank {
     u8   unk0[2];
     s16  n2;                    // 0x02  how many textures p8 holds
-    u8   unk4[4];
-    TexEntry*   p8;            // 0x08  its textures
+    s16  n4;                    // 0x04  how many rows pC holds
+    u8   unk6[2];
+    TexEntry*   p8;             // 0x08  its textures
     TexPalette* pC;             // 0x0C  its palettes
-    u8   unk10[0x18 - 0x10];
+    void* p10;                  // 0x10
+    void* p14;                  // 0x14
     u8*  p18;                   // 0x18  the pixel data
     u8   unk1C[0x20 - 0x1C];
     u8*  p20;                   // 0x20  the palette data
     u32  u24;                   // 0x24  the size of one palette (FE_LogoDesign copies this much)
+    u8   unk28[0x2D - 0x28];
+    u8   b2D;                   // 0x2D  1: p18 and p20 are not the bank's own (never freed)
+    u8   unk2E[2];
 } TexBank;
+LAYOUT_ASSERT(TexBank, 0x30);
 
 u64  fn_8000BEE4(char* pName);          // a name's 64-bit hash
 // Find a loaded texture by its name's hash: its bank and entry (both NULL if none).
 int  fn_800102DC(u64 uHash, TexBank** ppBank, TexEntry** ppTex);
+// Makes a texture bank from a 'txf ' stream object's data (LLTex.c), in pBank or, when it is NULL,
+// a new allocation.
+TexBank* fn_8000FB88(struct UStreamObject* pObject, TexBank* pBank, int n);
+
+// The texture bank list (LLTexGrp.c): the banks loaded from 'txf ' stream objects, searched by
+// fn_800102DC.
+typedef struct TexGrpSlot {
+    TexBank* pBank;             // 0x0  NULL: a free slot
+    int  n4;                    // 0x4  the list's n8 when the bank came in (fn_80010608 frees by it)
+    int  n8;                    // 0x8  -1, or the list's n10 when the bank came in
+} TexGrpSlot;
+LAYOUT_ASSERT(TexGrpSlot, 0xC);
+
+// How to load a 'txf ' object whose id (modulo 100000) is 20000 or more (0x18 bytes).
+typedef struct TexGrpRec {
+    u8   b0;                    // 0x00  set: the object's bank is not loaded
+    u8   unk1[3];
+    u32  uId;                   // 0x04  the object id (modulo 100000) it is for
+    int  n8;                    // 0x08  goes to the slot's n8
+    int  nC;                    // 0x0C  passed on to fn_8000FB88
+    int  nSlot;                 // 0x10  the slot the bank went into
+    u8   bUsed;                 // 0x14  set once an object took it
+    u8   unk15[3];
+} TexGrpRec;
+LAYOUT_ASSERT(TexGrpRec, 0x18);
+
+typedef struct TexGrpList {
+    TexGrpSlot* pSlots;         // 0x00
+    int  nNumSlots;             // 0x04  100
+    int  n8;                    // 0x08
+    u8   bUseRecs;              // 0x0C  set: objects are loaded as pRecs says
+    u8   unkD[3];
+    int  n10;                   // 0x10
+    u8   b14;                   // 0x14  set: fn_800102DC only looks in slots whose n8 is n10
+    u8   unk15[3];
+    int  nNumRecs;              // 0x18
+    TexGrpRec* pRecs;           // 0x1C
+} TexGrpList;
+LAYOUT_ASSERT(TexGrpList, 0x20);
 
 // ---- the renderer ----------------------------------------------------------------------------
 
