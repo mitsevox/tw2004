@@ -752,7 +752,7 @@ config.libs = [
             Object(NonMatching, "dolphin/os/OSError.c"),
             Object(NonMatching, "dolphin/os/OSContext.c"),
             Object(NonMatching, "dolphin/os/OSReboot.c"),
-            Object(NonMatching, "dolphin/os/OSAlarm.c"),
+            Object(Matching, "dolphin/os/OSAlarm.c"),
             Object(NonMatching, "dolphin/os/OSArena.c"),
             Object(NonMatching, "dolphin/os/OSCache.c"),
             Object(NonMatching, "dolphin/os/OSReset.c"),
