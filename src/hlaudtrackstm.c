@@ -18,8 +18,6 @@ void fn_800ACA5C(AudVoice* pVoice, int bPause);
 u8   fn_800ACE38(AudVoice* pVoice, u32* puPos);
 s32  DVDGetDriveStatus(void);
 
-void Stm_SetPlayList(AudTrack* pTrack, u8 nPlayList);
-void Stm_SetStream(AudTrack* pTrack, u16 nStream, int nMode);
 void fn_800AB860(AudTrack* pTrack);
 void fn_800ABC54(AudTrack* pTrack);
 void fn_800AC310(AudTrack* pTrack);

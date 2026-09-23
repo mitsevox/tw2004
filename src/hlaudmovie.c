@@ -10,9 +10,6 @@
 #include "core/audtrack.h"
 #include "core/startup.h"
 
-void fn_800A7C2C(void);
-s32  fn_800A7C24(void);
-void fn_800A8524(AudSound* pSound, int nSound);
 u8   fn_800A9A50(u8 a, u8 b);
 void fn_800A9AC4(void);
 u8   fn_800AC494(void);

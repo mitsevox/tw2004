@@ -123,7 +123,7 @@ typedef struct AudSound {
     u8   unk1[0x3 - 0x1];
     u8   n3;                    // 0x3    bit 0: placed in the world (distance, pan and doppler);
                                 //        bit 1: no doppler
-    u8   unk4[0x8 - 0x4];
+    f32  f4;                    // 0x4    placed sounds: how far away it is heard
     AudTrackTmpl aTracks[1];    // 0x8    nTracks of them
 } AudSound;
 
@@ -265,6 +265,8 @@ extern f32 lbl_801F17D0[32];            // the volume of each curve (fn_800AA44C
 extern AudStreamFile* lbl_80282070;     // the stream file's header (hlaudmovie.c)
 extern AudBank* lbl_80282074;           // bank 1 (hlaudmovie.c)
 extern AudBank* lbl_80282078;           // bank 0 (hlaudmovie.c)
+extern u32 lbl_8028207C;                // what is loaded (hlaudmovie.c): 0x01 set up, 0x04/0x08
+                                        // bank 0 and its samples, 0x10/0x20 bank 1 and its samples
 
 // The audio locks (0x800B5934): the name is EA's label for who holds them.
 void fn_800B596C(const char* szWho);    // take the stream lock
@@ -275,6 +277,22 @@ void fn_800B59EC(const char* szWho);    // give it back
 // The audio memory stack (UAudMemStack.c).
 void* fn_800B5BD8(u32 uSize);
 void  fn_800B5C04(void* p);
+
+// AudTable.c
+int            fn_800A7AF0(void);
+s32            fn_800A7C24(void);
+void           fn_800A7C2C(void);
+AudTableEntry* fn_800A7C30(u8 nEntry, s16 nSound);
+void           fn_800A7CA4(u8 nEntry, u8 uMaskA, u8 uMaskB, u32* auStreams, s32 n, u16 uMask);
+void           fn_800A8200(u8 nEntry);
+void           fn_800A8248(u8 nEntry, u8 nTrack, s32 n);
+void           fn_800A82CC(u8 nEntry, u8 nTrack, s32 n);
+void           fn_800A834C(s16 nSound, u8 nTrack, s8 n);
+void           fn_800A8394(u8 nEntry, u8 nTrack, s32 n, u8 b);
+void           fn_800A8424(u8 nEntry, u8 nTrack, f32 fVolume);
+void           fn_800A84A4(u8 nEntry, u8 nTrack, f32 fPitch);
+void           fn_800A8524(AudSound* pSound, int n);
+void           fn_800A8584(AudTableEntry* pEntry, u8 nTrack, s32 n);
 
 // hlaudmovie.c
 AudSound*    fn_800A85CC(s16 nSound);
@@ -287,6 +305,10 @@ u32          fn_800A955C(u8 nPlayList);                              // the buff
 AudPlayList* fn_800A9564(u8 nPlayList);
 void         fn_800A9590(AudTableEntry* pEntry, AudTrack* pTrack, f32 fVolume);
 void         fn_800A96DC(AudTableEntry* pEntry, AudTrack* pTrack, f32 fVolume);
+
+// hlaudtrackstm.c
+void Stm_SetPlayList(AudTrack* pTrack, u8 nPlayList);
+void Stm_SetStream(AudTrack* pTrack, u16 nStream, int nMode);
 
 // hlaudvoice.c (0x800AC4A0-)
 AudVoice* fn_800AC4A0(AudVoiceRequest* pRequest);
