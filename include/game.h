@@ -90,6 +90,13 @@ f32  fn_800D0478(int nPlayer);          // the ball's distance from the pin (yar
 f32  fn_800D0550(int nPlayer);          // the shot's length
 int  Hole_ScoreAfterTapIn(int nPlayer); // HoleScore.c
 void fn_800D2714(u16* pDate, s32* pMonth, s32* pDay, s32* pYear);
+void fn_800D2678(u16* pDate, s32 nMonth, s32 nDay, s32 nYear);    // make a date
+void fn_800D27CC(u16* pDate, s32 nDays);        // move a date on by nDays
+s32  fn_800D27E0(u16* pDate);                   // its day of the week, 1..7
+s32  fn_800D2814(s32 nMonth, s32 nYear);        // the days in a month
+void fn_800D2884(s32 nMonth, s32 nYear, s32* pMonth, s32* pYear);  // the month before
+void fn_800D28B0(s32 nMonth, s32 nYear, s32* pMonth, s32* pYear);  // the month after
+void fn_800D28DC(u16 nDate, char* szOut);       // a date as text
 u16  fn_800D2994(void);                 // today's date
 int  fn_800D2ABC(int nCourse, int nHole);   // a hole's par on a course
 int  fn_800D2AD8(int nHole);            // a hole's par
@@ -418,6 +425,28 @@ u8   fn_800EE470(void);                 // GameModeDriverPGATour.c
 void GameModeDriverRTE_StartEvent(void);                 // GameModeDriverRTE.c
 void fn_800F07C8(void);                 // GameModeDriverRTE.c
 u8   fn_800F0818(void);                 // GameModeDriverRTE.c
+
+// GameModeDriver.c: the career calendar. Its functions come in tables of three, indexed by
+// CareerCalendar.nDriver: no career, the PGA TOUR season (GameModeDriverPGATour.c), the real-time
+// events (GameModeDriverRTE.c). The calendar shows one month as a grid of 35 day cells.
+typedef struct CareerCalendar {
+    u16  nToday;                // 0x00  the career's current day (fn_80117188)
+    u16  nSelected;             // 0x02  the day the cursor is on
+    s32  nMonth;                // 0x04  the month shown, 1..12
+    u32  nYear;                 // 0x08  and its year
+    u32  nFirstCell;            // 0x0C  the cell of the month's first day
+    u32  nEndCell;              // 0x10  the cell after its last day
+    u32  nPrevMonthDays;        // 0x14  the days in the month before
+    s32  nDriver;               // 0x18  0 none, 1 PGA TOUR, 2 real-time events
+    s32  n1C;                   // 0x1C  which panel the day's details show (PGA TOUR 0..3, RTE 4..6)
+    u8   bSeasonOver;           // 0x20  the PGA TOUR season has no event left
+    u8   unk21[0x28 - 0x21];
+} CareerCalendar;
+LAYOUT_ASSERT(CareerCalendar, 0x28);
+
+extern CareerCalendar lbl_80223C48;
+extern char* (*lbl_80193EDC[3])(u16 nDate);    // the name of the event on a day ("" none)
+extern u16 (*lbl_80193EC4[3])(void);           // the career's current day
 
 // GameTargets.c: what the target games (modes 13..17) share
 extern f32 lbl_80211D38[40][4];         // the target list: lbl_80282360 points (w = 1)
