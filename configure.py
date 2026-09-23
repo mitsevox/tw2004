@@ -775,7 +775,7 @@ config.libs = [
         "src_dir": "extern/sdk",
         "objects": [
             Object(NonMatching, "runtime/printf.c"),
-            Object(NonMatching, "runtime/runtime.c"),
+            Object(Matching, "runtime/runtime.c"),
             Object(NonMatching, "runtime/FILE_POS.c"),
             Object(Matching, "runtime/ctype.c"),
             Object(Matching, "runtime/e_acos.c"),

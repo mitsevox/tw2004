@@ -4824,6 +4824,7 @@ src/Runtime.PPCEABI.H/global_destructor_chain.c:
 
 runtime/runtime.c:
 	.text       start:0x80151AB4 end:0x801520F8
+	.rodata     start:0x80184FD0 end:0x80184FE8
 
 src/Runtime.PPCEABI.H/GCN_mem_alloc.c:
 	.text       start:0x801520F8 end:0x801521B0
