@@ -4,15 +4,11 @@
 
 #include "game.h"
 
-void fn_8011E020(s32* pMonth, s32* pDay, s32* pYear, s32* pHour, s32* pMinute, s32* pSecond, s32* pMsec);
-
 u8  fn_800D256C(u32 nYear);
 u32 fn_800D25D4(u32 nYear);
-u32 fn_800D2814(u32 nMonth, u32 nYear);
-void fn_800D27CC(u16* pDate, s32 nDays);
-s32 fn_800D27E0(u16* pDate);
-void fn_800D2884(s32 nMonth, s32 nYear, s32* pMonth, s32* pYear);
-void fn_800D28B0(s32 nMonth, s32 nYear, s32* pMonth, s32* pYear);
+s32 fn_800D2608(u16 nDate);
+s32 fn_800D2640(u16 nDate);
+void fn_800D293C(u16 nDate, char* pBuf);
 
 u8 lbl_80191798[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};    // days in each month
 
@@ -46,15 +42,15 @@ s32 fn_800D2608(u16 nDate) {
 
 // A date's month.
 s32 fn_800D2640(u16 nDate) {
-    s32 nYear;
+    s32 nOther;
     s32 nMonth;
 
-    fn_800D2714(&nDate, &nMonth, &nYear, &nYear);
+    fn_800D2714(&nDate, &nMonth, &nOther, &nOther);
     return nMonth;
 }
 
 // The day number of a date.
-void fn_800D2678(u16* pDate, u32 nMonth, s32 nDay, u32 nYear) {
+void fn_800D2678(u16* pDate, s32 nMonth, s32 nDay, u32 nYear) {
     u32 i;
     u32 nYearAt;
     s32 nDays;
@@ -82,9 +78,10 @@ void fn_800D2714(u16* pDate, s32* pMonth, s32* pDay, s32* pYear) {
     u32 nYear;
     u32 nDays;
     u32 n;
-    u32 nInMonth;
+    s32 nInMonth;
 
     nDays = *pDate;
+    // EA bug: day 36525 (31 December 1999) comes out as 0 January 2000
     if (nDays >= 36525) {
         nYear = 2000;
         nDays -= 36525;
@@ -120,7 +117,7 @@ s32 fn_800D27E0(u16* pDate) {
 }
 
 // The days in a month.
-u32 fn_800D2814(u32 nMonth, u32 nYear) {
+s32 fn_800D2814(u32 nMonth, u32 nYear) {
     s32 bLeap;
 
     bLeap = 0;
