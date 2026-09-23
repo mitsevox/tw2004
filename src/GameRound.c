@@ -74,8 +74,6 @@ void fn_800E0AF0(f32* pA, f32* pB, f32* pOut) {
 }
 #endif
 
-int   fn_80110180(void);                    // the current hole can be played (inferred)
-
 // The 20 course ids the mixed rounds pick from (lbl_80184D40).
 typedef struct CourseList {
     u32 a[20];
@@ -925,13 +923,14 @@ u8 Gimme_Allowed(int nPlayer) {
     return 1;
 }
 
-void fn_800E292C(void) {
-    gpGame->pfnGetHonors(5);
+// The first player to play: the one the mode says plays after nobody (5).
+s32 fn_800E292C(void) {
+    return gpGame->pfnGetHonors(5);
 }
 
-// Runs the mode's player choice twice (fn_800E292C runs it once).
-void fn_800E295C(void) {
-    gpGame->pfnGetHonors(gpGame->pfnGetHonors(5));
+// The player after the first (the mode's choice run twice).
+s32 fn_800E295C(void) {
+    return gpGame->pfnGetHonors(gpGame->pfnGetHonors(5));
 }
 
 // The start of a hole: every player's ball on their tee, the look-ahead copy and the saved

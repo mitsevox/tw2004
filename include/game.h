@@ -342,9 +342,13 @@ int  fn_800E1CE8(int a, int b);         // a course and hole to its marked-hole 
 u8   fn_800E23B0(int nPlayer, int nStrokes);
 u8   fn_800E23EC(int nPlayer);
 void fn_800E2470(void);
+char* fn_800E2680(void);                // the course's folder name ("01_Peb")
+char* GameManager_GetHoleName(int nHole);   // "HOLE_01".."HOLE_18"
 u8   fn_800E27A8(void);
 int  fn_800E27C0(void);
 u8   Gimme_Allowed(int nPlayer);
+s32  fn_800E292C(void);                 // the first player to play (the mode's choice after nobody)
+s32  fn_800E295C(void);                 // the player after that one
 void fn_800E299C(void);
 void fn_800E2A88(void);
 u8   fn_800E2B40(int nPlayer, Ball* pBall);   // out of bounds
@@ -674,5 +678,28 @@ u8   fn_80101E34(char* szName);         // one of the lessons' demonstration ani
 void fn_80101EDC(void);
 
 u8   fn_801025F4(void);
+
+// DiscCheck.c: which disc is in the drive, and changing discs
+extern char lbl_80213BB0[256][0x80];    // } the file names listed for each disc (fn_8010FF9C reads
+extern char lbl_8021BBB0[256][0x80];    // } them from "data/fend/d_layout.bin")
+extern s32 lbl_802824C8;                // } how many names lbl_8021BBB0 holds
+extern s32 lbl_802824CC;                // } and lbl_80213BB0
+extern s32 lbl_802824D4;                // the disc in the drive: 0 looks names up in lbl_8021BBB0,
+                                        // else in lbl_80213BB0
+extern u8 lbl_802824D0;                 // the disc change has finished (set by its callback)
+extern u8 lbl_802824D1;                 // fn_80110458 sets it, fn_80110460 answers it
+extern u8 lbl_802824D2;                 // the lists have been read (fn_8010FF9C)
+extern u8 lbl_802824D9;                 // fn_80110180 also looks for the hole's file
+void fn_8010FF9C(void);                 // read the lists (at startup, gomainloop.c)
+u8   fn_801100AC(char* szName);         // the file is on the disc in the drive
+void fn_80110178(u8 b);
+int  fn_80110180(void);                 // the current hole's course is on the disc in the drive
+s32  fn_8011027C(void);                 // the disc in the drive is not disc 1 (its disk number is not 0)
+void fn_801102AC(void);                 // ask for the other disc and wait for it
+int  fn_80110450(void);                 // the disc change has finished (lbl_802824D0)
+void fn_80110458(u8 b);
+u8   fn_80110460(void);
+int  fn_80110468(void);                 // the disc in the drive (its disk number; 0: disc 1)
+u8*  fn_801104A0(void);                 // the disc change's command block
 
 #endif

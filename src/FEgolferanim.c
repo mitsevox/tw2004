@@ -83,7 +83,6 @@ u8   fn_8008DCF0(int nGolfer, CrAPGolfer* pGolfer);
 void fn_8008DD50(u8 bNoBlend);
 Clip* fn_8008E02C(void);
 void fn_8008E254(u8 b);
-void fn_8008E2F8(u8 bTarget, f32 fAngle);
 void fn_8008EA44(u8 b);
 void fn_8008EBB4(void);
 void fn_8008EBE4(void);
@@ -800,7 +799,7 @@ int fn_8008E44C(void) {
 
 // Play the animation szAnim on the golfer (for golfer 29, with an 'f' in front if it has no
 // such animation) and point the camera with szShot.
-int fn_8008E468(char* szAnim, char* szShot, u8 bNoBlend) {
+u8 fn_8008E468(char* szAnim, char* szShot, u8 bNoBlend) {
     char szName[0x20];
     View* pView;
     Clip* pClip;
