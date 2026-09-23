@@ -2513,17 +2513,8 @@ GoBreakLine.c:
 AnimStream.c:
 	.text       start:0x800C937C end:0x800CC1EC
 
-unsorted/sweep_800CCA1C.c:
-	.text       start:0x800CCA1C end:0x800CCA40
-
-unsorted/sweep_800CCA40.c:
-	.text       start:0x800CCA40 end:0x800CCA70
-
-unsorted/sweep_800CCEA0.c:
-	.text       start:0x800CCEA0 end:0x800CCED0
-
 SkinPart.c:
-	.text       start:0x800CD404 end:0x800CEA30
+	.text       start:0x800CC1EC end:0x800CEA30
 
 unsorted/sweep_800CEDE0.c:
 	.text       start:0x800CEDE0 end:0x800CEE04
