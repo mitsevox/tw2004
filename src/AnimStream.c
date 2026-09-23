@@ -483,7 +483,8 @@ void fn_800CB078(void) {
                                             lbl_80282230->bufs[nPlayer][i][nStyle][nClub].nSize,
                                             pRecords[nFirst].n20);
                                 lbl_80282230->bufs[nPlayer][i][nStyle][nClub].pData =
-                                    fn_80020DD4(lbl_80282230->bufs[nPlayer][i][nStyle][nClub].pData, NULL, 16);
+                                    fn_80020DD4(lbl_80282230->bufs[nPlayer][i][nStyle][nClub].pData,
+                                                NULL, 16);
                                 lbl_80282230->players[nPlayer].clips[i][nStyle][nClub].b8 = 0;
                             }
                         }
@@ -537,7 +538,8 @@ void fn_800CB2B0(int nSlot) {
                                             lbl_80282230->bufs[nPlayer][i][nStyle][nClub].nSize,
                                             pRecords[nFirst].n20);
                                 lbl_80282230->bufs[nPlayer][i][nStyle][nClub].pData =
-                                    fn_80020DD4(lbl_80282230->bufs[nPlayer][i][nStyle][nClub].pData, NULL, 16);
+                                    fn_80020DD4(lbl_80282230->bufs[nPlayer][i][nStyle][nClub].pData,
+                                                NULL, 16);
                                 lbl_80282230->players[nPlayer].clips[i][nStyle][nClub].b8 = 0;
                             }
                         }
