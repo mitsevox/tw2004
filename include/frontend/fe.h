@@ -309,6 +309,7 @@ void fn_8008E6D4(int n);
 void fn_8008E724(char* szAnim, char* szShot, s8 n, u8 bLoop);
 void fn_8008E824(void);
 void fn_8008E860(int n);
+u8   fn_8008E944(u8 b, f32 f);
 
 // ---- the logo editor (FE_LogoDesign.c) -------------------------------------------------------
 

@@ -19,6 +19,8 @@ void fn_80105188(UStreamObject* pObject);
 void fn_801051F4(UStreamObject* pObject);
 void fn_80105240(void);
 void fn_80105B80(CrAPAsset* pAsset, char* pName);
+void fn_80106D24(CrAPAsset* pAsset, Skin* pSkin);
+void fn_80106DA0(CrAPAsset* pAsset, Skin* pSkin);
 void fn_80105DAC(void);
 void fn_80105EFC(void);
 u8   fn_801061F8(s16 nPart, int nCategory, int nWanted);
@@ -123,6 +125,50 @@ void fn_80103DE0(void) {
         pSkin = lbl_80281EE0->pB4->pChar->p16D8->apSkins[i];
         Mem_cpy(pProfile->a5AF4[i], pSkin->aParts[3], fn_800CCA40(pSkin) * sizeof(SkinChoice));
         Mem_cpy(pProfile->a5CD4[i], pSkin->aSets[3], fn_800CCEA0(pSkin) * sizeof(SkinChoice));
+    }
+}
+
+// Take the asset's name out of the profile's list b when it is there.
+void fn_80103E88(CrAPAsset* pAsset, int b) {
+    SaveProfile* pProfile = fn_80077ACC();
+    char szName[16];
+
+    fn_80105B80(pAsset, szName);
+    if (fn_800587A8(pProfile, b, szName)) {
+        fn_80058624(pProfile, b, szName);
+    }
+}
+
+// Take the asset (the one it takes its attributes from) off the golfer being edited and out of its
+// slot of the profile.
+void fn_80103EFC(CrAPAsset* pAsset) {
+    Skin* pSkin;
+    CrAPAsset* pBase;
+
+    fn_80077ACC();
+    pBase = fn_80103B4C(pAsset);
+    if (pBase->n2E != -1) {
+        pSkin = lbl_80281EE0->pB4->pChar->pSkin;
+        fn_80106D24(pBase, pSkin);
+        fn_80106DA0(pBase, pSkin);
+        fn_8008E944(0, 0.0f);
+        fn_8001D624(lbl_80281EE0->pB4->n10);
+        fn_80103D6C();
+        fn_80103BD8(pBase);
+    }
+}
+
+// Take a part's choice i off the golfer being edited (part 13 by its name, from the list b).
+void fn_80103F94(s16 nPart, int b, int i) {
+    CrAPAsset* pAsset;
+
+    fn_80077ACC();
+    if (lbl_80281EE0->pB4->pChar != NULL && (pAsset = fn_80104E84(nPart, b, i)) != NULL) {
+        if (nPart == 13) {
+            fn_80103E88(pAsset, b);
+        } else {
+            fn_80103EFC(pAsset);
+        }
     }
 }
 

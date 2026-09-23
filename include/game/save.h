@@ -274,6 +274,8 @@ u8   fn_800D7770(int nPlayer, Award* pAward);   // mark an award won today; 1 if
 
 // fe_craputils.c (TW06's FE_CrAP_ utilities)
 u8   fn_80058304(SaveProfile* pProfile, int nBit);  // bit nBit of pProfile->u10548
+void fn_80058624(SaveProfile* pProfile, int nKind, char* pName);  // take pName out of list nKind
+u8   fn_800587A8(SaveProfile* pProfile, int nKind, char* pName);  // pName is in list nKind (0..2)
 void fn_800588D4(s16 n);            // set lbl_80281DF0 (switched on, value n)
 s16  fn_800588E8(void);             // lbl_80281DF0's value
 
