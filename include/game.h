@@ -63,7 +63,8 @@ typedef struct CourseMoneyTracking {
 f32  fn_800D0478(int nPlayer);          // the ball's distance from the pin (yards)
 f32  fn_800D0550(int nPlayer);          // the shot's length
 int  Hole_ScoreAfterTapIn(int nPlayer); // HoleScore.c
-void fn_800D2714(u16* pDate, s32* pDay, s32* pMonth, s32* pYear);
+void fn_800D2714(u16* pDate, s32* pMonth, s32* pDay, s32* pYear);
+u16  fn_800D2994(void);                 // today's date
 int  fn_800D2ABC(int nCourse, int nHole);   // a hole's par on a course
 int  fn_800D2AD8(int nHole);            // a hole's par
 void fn_800D3548(int nPlayer, int nMoney, CourseMoneyTracking* pMoney);   // pMoney may be NULL
@@ -295,8 +296,6 @@ int  fn_800EAC94(int n);
 void fn_800EADD8(void);
 void fn_800EAE38(s32 a);
 void fn_800EAF7C(void);
-typedef struct Challenge Challenge;
-void fn_800EC544(Challenge* pList, s32 nCount);
 u8   fn_800EC550(void);
 int  fn_800EC558(void);
 void fn_800ECBE4(void);
@@ -306,11 +305,11 @@ void fn_800ED6F8(f32 x);
 void fn_800ED710(s32 a);
 
 void fn_800EDAE0(int nPlayer);          // GameMode9.c
-void fn_800EDE78(void);                 // GameMode23.c
-u8   fn_800EE470(void);                 // GameMode23.c
-void fn_800F06DC(void);                 // GameMode24.c
-void fn_800F07C8(void);                 // GameMode24.c
-u8   fn_800F0818(void);                 // GameMode24.c
+void fn_800EDE78(void);                 // GameModeDriverPGATour.c
+u8   fn_800EE470(void);                 // GameModeDriverPGATour.c
+void fn_800F06DC(void);                 // GameModeDriverRTE.c
+void fn_800F07C8(void);                 // GameModeDriverRTE.c
+u8   fn_800F0818(void);                 // GameModeDriverRTE.c
 
 // GameTargets.c: what the target games (modes 13..17) share
 void fn_800F19D4(void);                 // sort the targets by distance from the tee

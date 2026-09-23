@@ -1,122 +1,38 @@
-// GameMode24.c (our name): game mode 24, events on the calendar ('RTEc'/'RTEs'/'RTEn' stream
-// objects; probably "real-time events"): 118 dated entries, each starting one of 111 challenges
-// (the mode 5 code in GameMode5.c runs them) on its date, by the console's clock.
+// GameModeDriverRTE.c (TW06's GameModeDriverRTE): game mode 24, real-time events on the calendar
+// ('RTEc'/'RTEs'/'RTEn' stream objects): 118 dated entries, each starting one of 111 challenges (the
+// mode 5 code in GameMode5.c runs them) on its date, by the console's clock.
 
 #include "golfer.h"
 #include "game.h"
 #include "engine.h"
+#include "game/save.h"
+#include "game/modes/rte.h"
 
 void fn_800F0570(void);
 void fn_800F05B0(UStreamObject* pObject);
 void fn_800F05DC(UStreamObject* pObject);
 extern u8 lbl_8028234C;
-s32 fn_800F0E18(void);
+s32 fn_800F0E18(s32 i);
 extern s32 lbl_80282350;
 extern s32 lbl_80282354;
-s32 fn_800F0E20(u8* p0);
-void fn_800F0E30(s32 p0, s32 p1);
-u8* fn_800F0EA0(s32 p0);
-s32 fn_800F0EF4(s32 p0);
-s32 fn_800F0F10(s32 p0);
-s32 fn_800F0F30(s32 p0);
+s32 fn_800F0E20(s32* pRound);
+void fn_800F0E30(s32 nId, s32 nRound);
 s32 fn_800F1008(s32 i);
 s32 fn_800F102C(void);
 
-// One calendar event (0x30 bytes).
-typedef struct RTEvent {
-    s32 nName;                  // 0x00  offset into the names block
-    s32 n4;
-    s32 bOff;                   // 0x08  nonzero: not playable
-    s32 nChallenge;             // 0x0C  1-based, in aChallenge
-    s32 nId;                    // 0x10  the event's id (its flag in the save profile)
-    s32 n14;                    // 0x14
-    u8  unk18[4];
-    u16 aDate[10];              // 0x1C  the start date per season (from 2003; 0 = not held)
-} RTEvent;
-extern RTEvent lbl_8020CF90[];
-#define EVENTS lbl_8020CF90
-#define EVENT_BYTES ((u8*)lbl_8020CF90)
-#define EVENT_NAMES (*(char**)(EVENT_BYTES + 0x4DA0))
-
-void  GM_vCloseModuleONCE(void);
-void  fn_800EAA40(void);
-void  fn_800E0B38(int nMode);
-void  fn_800EAE38(s32 i);
-void  fn_800EAF7C(void);
-int   fn_800EC558(void);
-void  fn_800D7770(int nPlayer, u8* pFlag);
-void  fn_8011E020(s32* pYear, s32* pMonth, s32* pDay, s32* a, s32* b, s32* c, s32* d);
-void  fn_800D2714(u16* pDate, s32* pDay, s32* pMonth, s32* pYear);
-void  fn_800D2678(u16* pDate, s32 nYear, s32 nMonth, s32 nDay);
+void  fn_8011E020(s32* pMonth, s32* pDay, s32* pYear, s32* pHour, s32* pMinute, s32* pSecond, s32* pMsec);
+void  fn_800D2678(u16* pDate, s32 nMonth, s32 nDay, s32 nYear);
 extern void (*lbl_8028235C)(void);
 extern void (*lbl_80282358)(void);
 extern s32 lbl_80281680;
 extern s32 lbl_80282348;
-extern u8* gpSaveData;
-void  fn_800F05DC(UStreamObject* pObject);
 void  fn_800F060C(UStreamObject* pObject);
 void  fn_800F0678(void);
 void  fn_800F0BBC(void);
 s32   fn_800F0820(void);
 u8    fn_800F0CEC(u16 nDate, s32* pId, s32* pRound);
-u8    fn_800F0DB8(s32 nYear, s32 nMonth, s32 nDay, s32* pId, s32* pRound);
+u8    fn_800F0DB8(s32 nMonth, s32 nDay, s32 nYear, s32* pId, s32* pRound);
 s32   fn_800F0F54(void);
-
-void fn_800F0570(void) {
-    UStream_UnregisterHandler('RTEc');
-    UStream_UnregisterHandler('RTEs');
-    UStream_UnregisterHandler('RTEn');
-}
-
-void fn_800F05B0(UStreamObject* pObject) {
-    fn_8000E790(pObject, 5664, EVENT_BYTES);
-}
-
-void fn_800F05DC(UStreamObject* pObject) {
-    fn_8000E790(pObject, 14208, (EVENT_BYTES + 0x1620));
-}
-
-u8 fn_800F0818(void) {
-    return lbl_8028234C;
-}
-
-s32 fn_800F0E18(void) {
-    return 1;
-}
-
-s32 fn_800F0E20(u8* p0) {
-    *(s32*)p0 = lbl_80282354;
-    return lbl_80282350;
-}
-
-void fn_800F0E30(s32 p0, s32 p1) {
-    lbl_80282354 = p1;
-    lbl_80282350 = p0;
-}
-
-u8* fn_800F0EA0(s32 p0) {
-    return (EVENT_BYTES + (p0 * 48));
-}
-
-s32 fn_800F0EF4(s32 p0) {
-    return (*(s32*)(EVENT_BYTES + 0x4DA0) + *(s32*)(EVENT_BYTES + (p0 * 48)));
-}
-
-s32 fn_800F0F10(s32 p0) {
-    return (*(s32*)(EVENT_BYTES + 0x4DA0) + *(s32*)((EVENT_BYTES + (p0 * 48)) + 0x4));
-}
-
-s32 fn_800F0F30(s32 p0) {
-    return *(s32*)((EVENT_BYTES + (*(s32*)((EVENT_BYTES + (p0 * 48)) + 0xC) << 7)) + 0x1604);
-}
-
-s32 fn_800F1008(s32 i) {
-    return *(s32*)(fn_800F0EA0(i) + 0x14);
-}
-
-s32 fn_800F102C(void) {
-    return 0;
-}
 
 // Mode 24 starts: match-play callbacks (GameModeMatch) around the event's own start and end.
 void fn_800F0448(void) {
@@ -137,19 +53,37 @@ void fn_800F0448(void) {
     gSession.nSplitScreen = 0;
 }
 
+// TW06: GameModeDriverRTE::RegisterStreamClients.
 void fn_800F0518(void) {
     UStream_RegisterHandler('RTEc', fn_800F05B0);
     UStream_RegisterHandler('RTEs', fn_800F05DC);
     UStream_RegisterHandler('RTEn', fn_800F060C);
 }
 
-// The 'RTEn' object: the names block is copied out.
+// TW06: GameModeDriverRTE::UnregisterStreamClients.
+void fn_800F0570(void) {
+    UStream_UnregisterHandler('RTEc');
+    UStream_UnregisterHandler('RTEs');
+    UStream_UnregisterHandler('RTEn');
+}
+
+// TW06: GameModeDriverRTE::Locale_LoadRTEcFromStream.
+void fn_800F05B0(UStreamObject* pObject) {
+    fn_8000E790(pObject, sizeof(gRTEs.aEvent), gRTEs.aEvent);
+}
+
+// TW06: GameModeDriverRTE::LoadRTEsFromStream.
+void fn_800F05DC(UStreamObject* pObject) {
+    fn_8000E790(pObject, sizeof(gRTEs.aChallenge), gRTEs.aChallenge);
+}
+
+// TW06: GameModeDriverRTE::Locale_LoadRTEnFromStream. The 'RTEn' object: the names block is copied out.
 void fn_800F060C(UStreamObject* pObject) {
     void* pData;
     u32 nSize = fn_8000E81C(pObject, &pData);
     if (nSize) {
-        EVENT_NAMES = fn_800951A0(nSize, 0x10, 1);
-        Mem_cpy(EVENT_NAMES, pData, nSize);
+        gRTEs.pNames = fn_800951A0(nSize, 0x10, 1);
+        Mem_cpy(gRTEs.pNames, pData, nSize);
         fn_80009E70(pObject);
     }
 }
@@ -166,20 +100,20 @@ void fn_800F0678(void) {
     lbl_8028234C = 0;
 }
 
-// Starts today's event: the options are saved (wind off), and its challenge runs in mode 5 with
-// this file's start and end wrapped around it.
+// TW06: GameModeDriverRTE::StartEvent. Starts today's event: the options are saved (wind off), and
+// its challenge runs in mode 5 with this file's start and end wrapped around it.
 void fn_800F06DC(void) {
-    lbl_8028234C = 1;
     lbl_80281680 = SESSION_OPTIONS->unkC;
+    lbl_8028234C = 1;
     lbl_80282348 = SESSION_OPTIONS->nWind;
     SESSION_OPTIONS->unkC = 4;
     SESSION_OPTIONS->nWind = 0;
-    if (EVENTS[lbl_80282350].bOff == 0) {
-        if (EVENTS[lbl_80282350].nChallenge != 0) {
+    if (gRTEs.aEvent[lbl_80282350].bOff == 0) {
+        if (gRTEs.aEvent[lbl_80282350].nChallenge != 0) {
             gSession.nNumPlayers = 1;
             fn_800E0B38(5);
-            fn_800EC544((Challenge*)(EVENT_BYTES + 0x1620), 111);
-            fn_800EAE38(EVENTS[lbl_80282350].nChallenge - 1);
+            fn_800EC544(gRTEs.aChallenge, 111);
+            fn_800EAE38(gRTEs.aEvent[lbl_80282350].nChallenge - 1);
             fn_800EAF7C();
             lbl_8028235C = gpGame->pfn1CC;
             lbl_80282358 = gpGame->pfn1F4;
@@ -198,27 +132,32 @@ void fn_800F07C8(void) {
     gpGame->pfn1F4 = fn_800F0BBC;
 }
 
-// How many events profile 0 has done (flags at +0x20C, 4 bytes apart; 75 of them).
+u8 fn_800F0818(void) {
+    return lbl_8028234C;
+}
+
+// How many events profile 0 has won.
 s32 fn_800F0820(void) {
-    u8* p = gpSaveData + 0 * 0x10600;
+    PlayerNumber_t nPlayer = PLR_1_e;
+    SaveProfile* p = &gpSaveData[nPlayer];
     s32 n = 0;
     s32 i;
     for (i = 0; i < 75; i++) {
-        if (p[0x20C + i * 4] == 1) {
+        if (p->aRTEAward[i].bWon == 1) {
             n++;
         }
     }
     return n;
 }
 
-// The message after an event: every event done (0), or one for the event, else one of four at
-// random.
+// The message after an event (before its award is marked won): the first win (0), or one for the
+// event, else one of four at random.
 void fn_800F08A8(void) {
-    u8 bAll = 0;
+    u8 bFirst = 0;
     u8 bSaid;
     if (!fn_800F0820()) {
         fn_800E4364(10, 0, 0, 0);
-        bAll = 1;
+        bFirst = 1;
     }
     bSaid = 1;
     switch (lbl_80282350) {
@@ -272,7 +211,7 @@ void fn_800F08A8(void) {
         bSaid = 0;
         break;
     }
-    if (!bAll && !bSaid) {
+    if (!bFirst && !bSaid) {
         switch (Rand_Next(0) & 3) {
         case 0:
             fn_800E4364(10, 2, 0, 0);
@@ -295,43 +234,47 @@ void fn_800F0BBC(void) {
     s32 nReward;
     lbl_80282358();
     if (fn_800EC558() != 3) {
-        nReward = *(s32*)(EVENT_BYTES + (EVENTS[lbl_80282350].nChallenge << 7) + 0x1604);
+        nReward = gRTEs.aChallenge[gRTEs.aEvent[lbl_80282350].nChallenge - 1].aMedal[0].nReward;
         fn_800D3548(0, nReward, 0);
         fn_800E4364(0, 0x6F, nReward, 0);
         fn_800F08A8();
-        fn_800D7770(0, gpSaveData + EVENTS[lbl_80282350].nId * 4 + 0x20C);
+        fn_800D7770(0, &gpSaveData->aRTEAward[gRTEs.aEvent[lbl_80282350].nId]);
     }
 }
 
-// Today's date from the clock.
-void fn_800F0C74(s32* pYear, s32* pMonth, s32* pDay) {
-    s32 nYear;
+// TW06: GameModeDriverRTE::GetCurrentDate. Today's date from the clock.
+void fn_800F0C74(s32* pMonth, s32* pDay, s32* pYear) {
     s32 nMonth;
     s32 nDay;
-    s32 a;
-    s32 b;
-    s32 c;
-    s32 d;
-    fn_8011E020(&nYear, &nMonth, &nDay, &a, &b, &c, &d);
-    *pYear = nYear;
+    s32 nYear;
+    s32 nHour;
+    s32 nMinute;
+    s32 nSecond;
+    s32 nMsec;
+    fn_8011E020(&nMonth, &nDay, &nYear, &nHour, &nMinute, &nSecond, &nMsec);
     *pMonth = nMonth;
     *pDay = nDay;
+    *pYear = nYear;
 }
 
-// The event held on a date (and which of its days).
+// TW06: GameModeDriverRTE::GetEventByDate. The event held on a date (and which of its days).
 u8 fn_800F0CEC(u16 nDate, s32* pId, s32* pRound) {
-    s32 nDay;
     s32 nMonth;
+    s32 nDay;
     s32 nYear;
-    u8 bFound;
     s32 i;
     s32 d;
-    fn_800D2714(&nDate, &nDay, &nMonth, &nYear);
+    s32 nSeason;
+    u8 bFound;
+    fn_800D2714(&nDate, &nMonth, &nDay, &nYear);
     bFound = 0;
+    nSeason = nYear - 2003;
+    // EA bug: nSeason is not checked against the ten seasons (fn_800F1034 checks it), so a date
+    // outside 2003..2012 reads past aDate.
     for (i = 0; i < 118; i++) {
-        if (EVENTS[i].aDate[nYear - 2003] != 0) {
-            d = nDate - EVENTS[i].aDate[nYear - 2003];
-            if (d >= 0 && d < fn_800F0E18()) {
+        if (gRTEs.aEvent[i].aDate[nSeason] != 0) {
+            d = nDate - gRTEs.aEvent[i].aDate[nSeason];
+            if (d >= 0 && d < fn_800F0E18(i)) {
                 *pId = i;
                 bFound = 1;
                 *pRound = d + 1;
@@ -346,34 +289,71 @@ u8 fn_800F0CEC(u16 nDate, s32* pId, s32* pRound) {
     return bFound;
 }
 
-u8 fn_800F0DB8(s32 nYear, s32 nMonth, s32 nDay, s32* pId, s32* pRound) {
+u8 fn_800F0DB8(s32 nMonth, s32 nDay, s32 nYear, s32* pId, s32* pRound) {
     u16 nDate;
-    fn_800D2678(&nDate, nYear, nMonth, nDay);
+    fn_800D2678(&nDate, nMonth, nDay, nYear);
     return fn_800F0CEC(nDate, pId, pRound);
+}
+
+// How many days event i lasts: always one.
+s32 fn_800F0E18(s32 i) {
+    return 1;
+}
+
+// The current event, and its day.
+s32 fn_800F0E20(s32* pRound) {
+    *pRound = lbl_80282354;
+    return lbl_80282350;
+}
+
+// Event nId, on its day nRound, becomes the current one.
+void fn_800F0E30(s32 nId, s32 nRound) {
+    lbl_80282354 = nRound;
+    lbl_80282350 = nId;
 }
 
 // Today's event becomes the current one.
 s32 fn_800F0E3C(void) {
-    s32 nYear;
     s32 nMonth;
     s32 nDay;
+    s32 nYear;
     s32 nId;
     s32 nRound;
-    fn_800F0C74(&nYear, &nMonth, &nDay);
-    if (fn_800F0DB8(nYear, nMonth, nDay, &nId, &nRound)) {
+    fn_800F0C74(&nMonth, &nDay, &nYear);
+    if (fn_800F0DB8(nMonth, nDay, nYear, &nId, &nRound)) {
         fn_800F0E30(nId, nRound);
         return 1;
     }
     return 0;
 }
 
-u8* fn_800F0EB4(u16 nDate) {
+// TW06: GameModeDriverRTE::GetCalData.
+RTEvent* fn_800F0EA0(s32 i) {
+    return &gRTEs.aEvent[i];
+}
+
+RTEvent* fn_800F0EB4(u16 nDate) {
     s32 nId;
     s32 nRound;
     if (fn_800F0CEC(nDate, &nId, &nRound)) {
         return fn_800F0EA0(nId);
     }
     return 0;
+}
+
+// TW06: GameModeDriverRTE::GetName.
+char* fn_800F0EF4(s32 i) {
+    return gRTEs.pNames + gRTEs.aEvent[i].nName;
+}
+
+// TW06: GameModeDriverRTE::GetDescription.
+char* fn_800F0F10(s32 i) {
+    return gRTEs.pNames + gRTEs.aEvent[i].nDesc;
+}
+
+// The reward for event i.
+s32 fn_800F0F30(s32 i) {
+    return gRTEs.aChallenge[gRTEs.aEvent[i].nChallenge - 1].aMedal[0].nReward;
 }
 
 // This year's season (0..9 from 2003), or 0.
@@ -383,8 +363,8 @@ s32 fn_800F0F54(void) {
     s32 bOk;
     s32 nSeason;
     fn_8011E020(&n, &n, &nYear, &n, &n, &n, &n);
-    bOk = 0;
     nSeason = nYear - 2003;
+    bOk = 0;
     if (nSeason >= 0 && nSeason < 10) {
         bOk = 1;
     }
@@ -392,33 +372,41 @@ s32 fn_800F0F54(void) {
 }
 
 u16 fn_800F0FBC(s32 i) {
-    u8* p = fn_800F0EA0(i);
-    if (!p) {
+    RTEvent* p = fn_800F0EA0(i);
+    if (p == NULL) {
         return 0xFFFF;
     }
-    return ((RTEvent*)p)->aDate[fn_800F0F54()];
+    return p->aDate[fn_800F0F54()];
 }
 
-// The next event from today (-1 if none this season).
+s32 fn_800F1008(s32 i) {
+    return fn_800F0EA0(i)->n14;
+}
+
+s32 fn_800F102C(void) {
+    return 0;
+}
+
+// TW06: GameModeDriverRTE::GetNextEvent. The next event from today (-1 if none this season).
 s32 fn_800F1034(void) {
-    s32 nBest = -1;
-    s32 nYear;
+    s32 nNext;
     s32 nMonth;
     s32 nDay;
+    s32 nYear;
     u16 nToday;
     s32 nSeason;
-    s32 nNext;
-    u8 bFound;
+    s32 nBest = -1;
     s32 i;
     s32 d;
-    fn_800F0C74(&nYear, &nMonth, &nDay);
-    nSeason = nDay - 2003;
-    fn_800D2678(&nToday, nYear, nMonth, nDay);
+    u8 bFound;
+    fn_800F0C74(&nMonth, &nDay, &nYear);
+    nSeason = nYear - 2003;
+    fn_800D2678(&nToday, nMonth, nDay, nYear);
     if (nSeason >= 0 && nSeason < 10) {
         bFound = 0;
         for (i = 0; i < 118; i++) {
-            if (EVENTS[i].aDate[nSeason] != 0) {
-                d = EVENTS[i].aDate[nSeason] - nToday;
+            if (gRTEs.aEvent[i].aDate[nSeason] != 0) {
+                d = gRTEs.aEvent[i].aDate[nSeason] - nToday;
                 if (d >= 0 && (nBest == -1 || d < nBest)) {
                     nNext = i;
                     nBest = d;
@@ -439,8 +427,8 @@ s32 fn_800F1034(void) {
 s32 fn_800F1154(s32 nId) {
     s32 i;
     for (i = 0; i < 118; i++) {
-        if (nId == EVENTS[i].nId) {
-            return EVENTS[i].n14;
+        if (nId == gRTEs.aEvent[i].nId) {
+            return gRTEs.aEvent[i].n14;
         }
     }
     return 0;
@@ -450,17 +438,18 @@ s32 fn_800F1154(s32 nId) {
 void fn_800F11A0(s32 nId, char* pDst) {
     s32 i;
     for (i = 0; i < 118; i++) {
-        if (nId == EVENTS[i].nId) {
-            strcpy(pDst, EVENT_NAMES + EVENTS[i].nName);
+        if (nId == gRTEs.aEvent[i].nId) {
+            strcpy(pDst, gRTEs.pNames + gRTEs.aEvent[i].nName);
         }
     }
 }
 
 s32 fn_800F120C(s32 i) {
-    return EVENTS[i].nId;
+    return gRTEs.aEvent[i].nId;
 }
 
-// Whether a profile has done event i.
+// TW06: GameModeDriverRTE::IsEventComplete. Whether a profile has done event i.
 u8 fn_800F1224(s32 nProfile, s32 i) {
-    return gpSaveData[nProfile * 0x10600 + 0x20C + EVENTS[i].nId * 4];
+    SaveProfile* p = &gpSaveData[nProfile];
+    return p->aRTEAward[gRTEs.aEvent[i].nId].bWon;
 }
