@@ -10,6 +10,35 @@
 
 // ---- the round -------------------------------------------------------------------------------
 
+extern s32 lbl_80282278;                // the player whose turn it is
+extern u8  lbl_8028227C;                // the split-screen choice (fn_800E25CC); the modes that
+                                        // force one view put it back when they end
+
+// A saved shot (gReplayData, 0x801D6030): the seed, player 0 as it was, and the conditions.
+typedef struct Replay {
+    u32    nSeed;               // 0x000
+    u8     unk4[4];
+    Player player;              // 0x008  player 0 before the shot
+    s32    nCourse;             // 0xF00
+    s16    nHole;               // 0xF04
+    s8     nTeeSet;             // 0xF06
+    s8     nPinSet;             // 0xF07  the session's pin set when the shot was saved
+    f32    fF08;                // 0xF08
+    f32    fF0C;                // 0xF0C
+    u8     bF10;                // 0xF10  in-flight replays are on (GameManager.c)
+    u8     unkF11;
+    s16    nF12;                // 0xF12  1..3: fn_800ED6F8 is set from nF14
+    s16    nF14;                // 0xF14  hundredths
+    s16    nWindDir;            // 0xF16
+    s16    nWindSpeed;          // 0xF18
+    s16    nF1A;                // 0xF1A  -> fn_80055C40
+    s16    nF1C;                // 0xF1C  -> fn_80055CAC
+    s16    nF1E;                // 0xF1E  -> fn_80055CD0
+    s16    nStrokes;            // 0xF20  strokes on the hole before the shot
+} Replay;
+
+extern Replay gReplayData;              // 0x801D6030
+
 int  Game_GetCourse(void);              // 0x80008830
 int  Game_CurHoleIndex(void);           // 0..17 in the round (Golfer.c)
 int  Game_CurrentPinSet(void);          // the current hole's pin position, 0..3 (Golfer.c)
@@ -271,6 +300,7 @@ void fn_800FFF34(void);                 // mode 11 (GameMode11.c)
 int  fn_800E8C24(int nPlayer, int nHole);   // GameModeBestBall.c
 
 // GameModeMatch.c: match play, which the other two-player modes build on
+extern u8  lbl_80282240;                // the hole-finished test excuses the holed side's own players
 void fn_800E9F14(void);
 s32  fn_800EA084(int nPlayer);
 u8   fn_800EA278(int nPlayer, u8 bCheck);
@@ -300,6 +330,8 @@ void fn_800F07C8(void);                 // GameModeDriverRTE.c
 u8   fn_800F0818(void);                 // GameModeDriverRTE.c
 
 // GameTargets.c: what the target games (modes 13..17) share
+extern f32 lbl_80211D38[40][4];         // the target list: lbl_80282360 points (w = 1)
+extern s8  lbl_80282360;                // the number of targets (GameModeReplay.c)
 void fn_800F19D4(void);                 // sort the targets by distance from the tee
 void fn_800F1ABC(int nPlayer, s8 n);
 void fn_800F1B60(int nPlayer, s8 n);
@@ -346,7 +378,10 @@ s32  fn_800F9414(int h);                // the selected hole before h (-1: none)
 void fn_800F9824(void);
 void fn_800F9844(void);
 
-// GameMode8.c
+// GameMode8.c (modes 6, 7 and 8 share it)
+extern u8  lbl_802823C9;
+extern s32 lbl_802823D0;                // the next entry of the event log lbl_802120F8 (0..99)
+extern s32 lbl_802823D4;
 void fn_800F9A58(void);
 void fn_800F9AB0(void);
 void fn_800F9B34(void);
@@ -370,12 +405,10 @@ u8   fn_800FDF60(void);
 
 // GameModeStroke.c: stroke play (mode 0)
 void fn_800FF7DC(void);
-u8   fn_800FFCCC(int nPlayer, u8 bCheck);
-u8   fn_800FFD54(u8 bCheck);
 s32  fn_800FF894(int nPlayer);          // TW06 GetHonors: who plays next (5: nobody)
 u8   fn_800FFCCC(int nPlayer, u8 bCheck);   // TW06 HoleFinished
 u8   fn_800FFD54(u8 bCheck);                // TW06 GameFinished
-u8   fn_800FFDB0(u8 bCheck);                 // TW06 GoToPlayoff: stroke play has none
+u8   fn_800FFDB0(u8 bCheck);            // TW06 GoToPlayoff: stroke play has none
 
 // GetHonors' tee-order sort (GameModeStroke.c, GameModeStableford.c): appends nPlayer to aList
 // (*pnCount entries) if their score on hole nHole is nScore.

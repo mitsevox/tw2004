@@ -9,9 +9,6 @@
 #include "game/modes/challenge.h"
 #include "game/save.h"
 
-extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
-extern s32 lbl_80282278;                    // the player whose turn it is
-extern u8  lbl_80282240;
 extern s32 lbl_80281658;                    // who has the honor in the playoff (5 = nobody yet)
 
 int  fn_800E9F90(int nPlayer);

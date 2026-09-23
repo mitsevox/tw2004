@@ -860,7 +860,6 @@ extern f32 gSimBestAim[3];          // 0x801C64D8  the aim that produced it
 extern Ball gSimBall;               // 0x801C64E4  the rehearsal's own ball
 extern s32 gSimClub[6];             // 0x801C65A0  per player: club the rehearsal started with
 
-
 // +n on every modifier the rehearsal cares about (not LUCK), aggression the other way.
 #define BUMP_MODIFIERS(p, n)                                                                       \
     (p)->attrMod[ATTR_POWER]         += (n);                                                       \
@@ -1233,7 +1232,6 @@ void Shot_FitTargetToClub(int nPlayer) {
 
 // ---- planning a shot ------------------------------------------------------------------------------
 
-
 // Plan the next shot: a CPU sets its modifiers, everyone picks a target, Shot_Prepare fills in
 // the rest, the rehearsal is reset, and the luck roll decides whether this shot is perfect.
 void Shot_Plan(int nPlayer, u8 bNotify) {
@@ -1343,7 +1341,6 @@ u8 Lie_AllowsFullSwing(int nPlayer) {
 }
 
 // ---- ground probes ------------------------------------------------------------------------------
-
 
 // Is the ground fDist yards from the ball toward the pin of class 3 (the green)? True when the
 // ball is on the pin. The CPU putts from the fringe when the green starts within 1.5 yards and
@@ -1612,8 +1609,6 @@ void Luck_TakePerfectShot(int nPlayer) {
 #define BAG_ALL      0x03FFFFFF     // every club
 #define BAG_DEFAULT  0x01FFFC7F     // a bag with no clubs 7, 8, 9 (the 3-, 4-, 5-woods?) or 25
 
-extern u8 gNumPlayersSetUp;         // 0x80281D48
-
 typedef struct ViewSlot { void* pUnk; void* pShot; } ViewSlot;
 extern ViewSlot gViewSlots[];       // 0x80187124  per player
 
@@ -1739,8 +1734,6 @@ void fn_8002F180(void) {
     fn_800953C8(0);
 }
 
-
-
 void fn_8002E258(void) {
 }
 
@@ -1748,7 +1741,6 @@ void fn_8002E25C(void) {
 }
 
 // ---- the session and its options ---------------------------------------------------------------
-
 
 extern char gszEmpty[];             // 0x802810B8
 extern char lbl_80187650[];         // "cl_bbsd" ... the default name at +0x1A

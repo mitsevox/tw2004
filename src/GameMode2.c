@@ -11,8 +11,6 @@
 
 void  fn_80102704(void);
 void  fn_80102874(void);
-extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
-extern s32 lbl_80282278;                    // the player whose turn it is
 extern s32 lbl_802823C0;                    // skins carried over
 extern s32 lbl_802823C4;                    // the money carried over
 

@@ -22,7 +22,6 @@ int   fn_8011937C(int nPlayer, int a, u8 b);
 int   fn_800E8C24(int nPlayer, int nHole);
 int   sprintf(char* pBuf, const char* pFmt, ...);
 
-extern u8   gNumPlayersSetUp;               // 0x80281D48 (Golfer.c)
 extern char lbl_80282270[8];                // the hole name
 
 void  fn_800E3AF4(void);
@@ -69,7 +68,6 @@ void  fn_800F0448(void);
 void  fn_800E7980(void);
 void  fn_8010C4A0(void);
 void  fn_80125E68(void);
-extern s32 lbl_80282278;
 
 u8    fn_800E3AF8(void);
 void  fn_800E0A84(u8 v);
@@ -77,8 +75,6 @@ void  fn_800E1404(int nHole);
 void  fn_80057364(int a);
 int   fn_800D3118(int nRound, int nHole);    // a built round's course for a hole
 int   fn_800D315C(int nRound, int nHole);    // and its hole number (1-based)
-
-extern u8  lbl_8028227C;
 
 // out = a - b (four floats)
 asm void fn_800E0AF0(register f32* pA, register f32* pB, register f32* pOut) {
@@ -105,7 +101,6 @@ extern CourseList lbl_80184D40;
 
 // A course counts as unlocked when any of the five profiles (or the second block) has its flag.
 #define COURSE_UNLOCKED(c, k) (gpSaveData[k].aCourseUnlocked[c] || lbl_80281DF4->aCourseUnlocked[c])
-
 
 // out = a - b (three floats)
 asm void fn_800E0B14(register f32* pA, register f32* pB, register f32* pOut) {

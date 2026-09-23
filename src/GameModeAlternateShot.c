@@ -7,9 +7,6 @@
 #include "engine.h"
 #include "game/save.h"
 
-extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
-extern s32 lbl_80282278;                    // the player whose turn it is
-extern u8  lbl_80282240;
 extern u8  lbl_80281648[2];                 // per team: 1 when the second partner (1 or 3) hits next
 
 // The tee order before anyone has won a hole (lbl_80184DA0: 0, 1, 2, 3).

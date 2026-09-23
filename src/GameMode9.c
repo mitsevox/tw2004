@@ -6,7 +6,6 @@
 #include "game.h"
 #include "engine.h"
 
-extern u8 gNumPlayersSetUp;                 // 0x80281D48 (Golfer.c)
 extern u8 lbl_80282330;                     // the hole is being restarted
 
 typedef struct Vec4 {

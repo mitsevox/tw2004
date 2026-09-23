@@ -4,11 +4,6 @@
 #include "golfer.h"
 #include "game.h"
 
-extern u8  lbl_8028227C;
-extern u8  lbl_802823C9;
-extern s32 lbl_802823D0;
-extern s32 lbl_802823D4;
-
 void fn_800F9610(void) {
     gpGame->pfnInit = fn_800F9610;
     gpGame->pfnShutdown = fn_800F9A58;

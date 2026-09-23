@@ -10,7 +10,6 @@
 #include "game/save.h"
 #include "game/earnings.h"
 
-extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
 extern s32 lbl_802823DC;                    // the surface the ball stopped on (-1: none)
 
 // The surfaces a player has scored on, for the HUD (fn_800FF634): lbl_802823D8 entries.

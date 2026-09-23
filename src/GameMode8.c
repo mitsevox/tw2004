@@ -15,12 +15,7 @@ typedef struct SwingStateDef {
 } SwingStateDef;
 extern SwingStateDef sGolferStateEngineTable[];        // 0x801883D8
 
-extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
-extern u8  lbl_8028227C;
-extern u8  lbl_802823C9;
 extern u8  lbl_802823CA;
-extern s32 lbl_802823D0;
-extern s32 lbl_802823D4;
 extern u16 lbl_80192BA8[];                  // per event, a sound (0xFFFF = none)
 // Three values per course, largest first (750, 675 and 600 for the first course).
 typedef struct SGCourse {

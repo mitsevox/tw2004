@@ -8,10 +8,6 @@
 #include "engine.h"
 #include "game/earnings.h"
 
-extern Replay gReplayData;
-extern u8  gNumPlayersSetUp;
-extern s32 lbl_80282278;                    // the player whose turn it is
-extern s8  lbl_80282360;                    // the number of targets (GameModeReplay.c)
 extern s32 lbl_80281690;                    // the options saved while the game runs
 extern s32 lbl_80282378;
 extern u8  lbl_8028237C;                    // a new leader was just set

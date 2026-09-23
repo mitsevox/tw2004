@@ -45,7 +45,6 @@ void fn_8011A5F8(s32 a);
 u8   fn_800EF720(s32 nPlayer);
 s32  fn_8011A684(s32 a);
 u8   fn_8011A6F4(s32 a, s32 b);
-extern u8  gNumPlayersSetUp;
 extern s32 lbl_80282340;
 s32  fn_80119A04(s32 a, s32 b);
 u8   fn_801197A4(s32 nPlayer, s32 b);

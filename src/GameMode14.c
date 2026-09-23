@@ -17,10 +17,6 @@ typedef struct Claim {
 extern Claim lbl_80211FB8[40];
 #define CLAIMS lbl_80211FB8
 
-extern Replay gReplayData;
-extern u8  gNumPlayersSetUp;
-extern s32 lbl_80282278;                    // the player whose turn it is
-extern s8  lbl_80282360;                    // the number of targets (GameModeReplay.c)
 extern s32 lbl_80281688;                    // the options saved while the game runs
 extern s32 lbl_80282368;
 extern s32 lbl_8028236C;                    // who starts: 0 or 1, at random

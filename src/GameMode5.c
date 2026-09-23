@@ -34,7 +34,6 @@ extern s32 lbl_80282300;
 extern s32 lbl_80282304;
 extern s32 lbl_80282308;
 extern s32 lbl_8028230C;
-extern u8 gNumPlayersSetUp;                 // 0x80281D48 (Golfer.c)
 extern void (*lbl_80282328)(void);
 int   fn_800ECF9C(int i);
 void  fn_800EC170(int n);

@@ -47,8 +47,6 @@ void  fn_800A6DCC(int nMusic, int a);
 u32   fn_8003A950(int nCam, int a, s32* pKind, f32* pTime, s32* p3, s32* p4, s32* p5, int nPlayer);
 u8    fn_800451A8(void* pList, u32 uTarget, int nPlayer);
 u8    fn_8003DC78(u32 uTarget);
-extern u8 gNumPlayersSetUp;                 // 0x80281D48 (Golfer.c)
-
 
 // Starts a scripted GameBreaker for nPlayer, for reason nReason (a bit in uFlags).
 #define GB_START(nPlayer, nReason)                                                                     if (!lbl_80202898.bGameBreaker || lbl_80202898.bClosing || lbl_80202898.nGBType != 0) {                lbl_80202898.bClosing = 0;                                                                         lbl_80202898.bGameBreaker = 1;                                                                     lbl_80202898.fGBTime = 0.0f;                                                                       lbl_80202898.f24 = 0.0f;                                                                           lbl_80202898.b19 = 0;                                                                              lbl_80202898.nGBType = 0;                                                                          lbl_80202898.nPlayer = nPlayer;                                                                    lbl_80202898.bPaused = 0;                                                                          lbl_80202898.uFlags = 1 << (nReason);                                                              lbl_80202898.nHeartbeats = 0;                                                                      EVENT_Trigger(nPlayer, 0x3D, 0, -1);                                                           }

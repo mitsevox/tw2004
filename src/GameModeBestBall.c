@@ -8,9 +8,6 @@
 #include "game/save.h"
 #include "game/earnings.h"
 
-extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
-extern s32 lbl_80282278;                    // the player whose turn it is
-
 // The tee order before anyone has a lower team score (lbl_80184DB0: 0, 1, 2, 3).
 typedef struct TeeOrder {
     s32 a[4];

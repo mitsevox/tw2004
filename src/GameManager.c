@@ -63,8 +63,6 @@ void  fn_800957FC(int nHandle, int a);
 u8*   fn_80016CFC(int nView);
 void  fn_800E0AF0(f32* pFrom, f32* pTo, f32* pOut);
 
-extern u8  gReplayData[];                   // 0x801D6030
-
 f32   fn_800336E4(void);
 f32   fn_800336F4(void);
 void  GOLFERSTATE_Push(int nState, int nPlayer);
@@ -126,10 +124,6 @@ extern s32 lbl_80189528[14];
 extern s32 lbl_801894D0[6];
 
 int   strcmp(const char* a, const char* b);
-
-extern s32 lbl_80282278;
-extern u8  lbl_8028227C;
-extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
 
 void fn_800DCAD8(void) {
     fn_800E58B4(50);
@@ -527,7 +521,7 @@ void GM_PlayerTookShot(int nPlayer) {
     if (fn_800E23EC(nPlayer) && !(gPlayers[nPlayer].uFlags & 8)) {
         fn_800E0AC4(1);
     }
-    if (!Player_IsCPU(nPlayer) && gSession.nSplitScreen == 0 && gpGame->b287 && gReplayData[0xF10]) {
+    if (!Player_IsCPU(nPlayer) && gSession.nSplitScreen == 0 && gpGame->b287 && gReplayData.bF10) {
         fn_800E0A98(1);
     }
     GM_PlayerAddStroke(nPlayer);
@@ -1065,7 +1059,7 @@ void GM_DoPostShotInHoleUI(int nPlayer) {
             }
             return;
         }
-        if (gReplayData[0xF10] && (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x18, 0)) &&
+        if (gReplayData.bF10 && (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x18, 0)) &&
             gpGame->b287 && (s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_CONCEDED && !fn_800E53B8() &&
             !(*(u32*)((u8*)gPlayers[nPlayer].nShotHandle + 0x10) & 0x40)) {
             fn_80062D0C(nPlayer);

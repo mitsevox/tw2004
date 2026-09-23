@@ -8,12 +8,6 @@
 #include "game.h"
 #include "engine.h"
 
-extern Replay gReplayData;
-
-// The target list of the target games: up to lbl_80282360 points (w = 1).
-extern f32 lbl_80211D38[][4];
-extern s8  lbl_80282360;
-
 void  fn_800E14E0(int nCourse);
 void  fn_800E1404(int nHole);
 void  fn_800ED6F8(f32 x0);
