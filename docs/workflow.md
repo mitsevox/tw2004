@@ -102,11 +102,12 @@ single swap from natural).
 functions nothing else did (`fn_800F6ED4`: the loop counter had to be `long`).
 
 ```
-python tools/match/perm_setup.py <Unit> <fn>
-timeout 2700 python C:/dev/tools/decomp-permuter/permuter.py build/perm/<fn> -j6 --best-only
+python tools/match/permute.py <Unit> <fn> --minutes 20 -j 4
 ```
 
-Output lands in `build/perm/<fn>/output-*`. Read the diff it found and apply the idea by hand;
+It sets up `build/perm/<fn>`, runs the permuter and stops it at the time limit, killing the whole
+process tree (Git Bash's `timeout` does not stop it on Windows; a run once went 51 minutes). The
+machine is shared, so keep `-j 4` or less. Output lands in `build/perm/<fn>/output-*`. Read the diff it found and apply the idea by hand;
 its code is often ugly but it points at the real change (a type, an order, a temporary).
 
 Before you commit
