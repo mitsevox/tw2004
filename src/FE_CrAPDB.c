@@ -298,6 +298,28 @@ u8 fn_80104DB8(s16 nPart, int n, char* pDst) {
     return 1;
 }
 
+CrAPAsset* fn_80104E84(s16 nPart, int b, int i) {
+    int nAsset;
+    int n;
+    int nWanted;
+    int nFirst;
+
+    nFirst = fn_80105140(nPart);
+    nWanted = fn_80104AF4(nPart, b);
+    n = 0;
+    for (nAsset = nFirst; nAsset < lbl_80282460->nAssets; nAsset++) {
+        if (nPart == lbl_80282460->pAssets[nAsset].nPart &&
+            fn_801061C8(lbl_80282460->pAssets[nAsset].n40) &&
+            fn_801061F8(nPart, lbl_80282460->pAssets[nAsset].nCategory, nWanted)) {
+            if (n == i) {
+                return &lbl_80282460->pAssets[nAsset];
+            }
+            n++;
+        }
+    }
+    return NULL;
+}
+
 CrAPAsset* fn_80104F68(int nAsset) {
     return &lbl_80282460->pAssets[nAsset];
 }
