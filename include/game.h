@@ -27,6 +27,7 @@ typedef struct SwingStateDef {
 extern SwingStateDef sGolferStateEngineTable[GS_NUM];   // 0x801883D8  one row per GS_* state
 
 u8   fn_80058F5C(int nPlayer);          // the per-frame swing poll: the ball was struck
+void fn_80058FA4(int nPlayer);          // reset the player's swing
 f32  fn_8005B64C(int nPlayer);          // the swing's shot power
 void GOLFERSTATE_Push(int nState, int nPlayer);     // push a state and run its enter callback
 void GOLFERSTATE_Set(int nState, int nPlayer);      // pop everything and start again from one state
