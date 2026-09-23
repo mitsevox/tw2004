@@ -207,6 +207,25 @@ The fixes that come up most often. Each points to its full entry below.
   argument that was never used (`fn_800E5DA0(lbl)` vs `fn_800E5DA0()`) changes the code.
 - **[verified] Chained assignment stores backwards.** `a[0] = a[1] = a[2] = 0` stores 2, 1, 0;
   the original wrote four statements in order.
+- **[verified] ...but a chain gets its zero register first.** A run of zero stores whose only
+  difference is the loop's volatile registers (the zero in `r7` instead of `r4`, pointers shifted
+  by one) matched as one chain written last field first, so the stores still come out in field
+  order: GameMode2 `fn_800F8880`, 96.9% -> 100 (in field order the chain scores 94.8). The
+  permuter's 30 exact variants all made the zero one shared value. It is per function, not EA
+  style: the same seven stores in `fn_800F8B08` and GameModeMatch `fn_800EA548` match only as
+  separate statements. Mark the chain as a fake match.
+- **[verified] Nested call arguments are evaluated last argument first.** In
+  `f(g(), Game_CurHoleIndex())` the hole index is fetched before `g()`. Writing it into a local
+  first keeps the same call order but a different saved register (GameMode2 `fn_800F8EDC`,
+  99.93% -> 100 with the call inline).
+- **[verified] A call result used once stays inline.** `n = f(); x = 0; y = 0; p->a += n;` and
+  `p->a += f(); x = 0; y = 0;` schedule the same, but the local changes the scratch registers
+  (GameMode2 `fn_800F8EDC`, 99.56% -> 99.93).
+- **[verified] A table read before its range check was a local.** When the original loads
+  `table[n]` before testing `n`, the source read it into a local at the top:
+  `u16 nSound = lbl_80192BA8[nEvent]; if (nEvent >= 37 || nSound == 0xFFFF) return;` (GameMode8
+  `fn_800FAA70`, 71.7% -> 93.9, then exact with the or-chain). Check the table is big enough for
+  every index the callers pass; if not, it is an EA bug and gets a comment.
 
 ### Structs, arrays and pointers
 
@@ -220,6 +239,10 @@ The fixes that come up most often. Each points to its full entry below.
   player field means EA repeated `gPlayers[n].field`; a local `Player* p` or `s8* pField` gives
   `lwz 0xOFF(rN)` instead, and the add comes out in a different place (GameMode10 fn_800F1ABC,
   fn_800F1B60, fn_800F21B4).
+- **[verified] One function can use both.** When the original keeps `&gPlayers[n]` in one saved
+  register for the first statements and computes the player offset afresh after the calls, the
+  source used a `Player* p` for the first part and `gPlayers[n].field` at the end (GameMode8
+  `fn_800FA9E0`, 77% -> 100; `p` throughout gives 83.7%).
 - **[verified] `Player* p = &gPlayers[n]` vs `gPlayers[n].field`** pick different address shapes:
   the pointer form gives `mulli r5; addi r0, rB, sym@l; add r3, r0, r5`; direct indexing gives
   `mulli r0; addi r3, r3, sym@l; add r3, r3, r0`. Match whichever the original has per function.
@@ -326,6 +349,9 @@ The fixes that come up most often. Each points to its full entry below.
 
 ### Compares and conditions
 
+- **[verified] `n ? 0 : 1` and `n == 0` give the same instructions, different saved registers.**
+  GameMode8 `fn_800FAAB8`: `nOther = nPlayer ? 0 : 1;` put `nOther` in the original's register
+  (91.7% -> 93.1); `nOther = nPlayer == 0;` and `!nPlayer` (89.4%) did not.
 - **[verified] Float compares.** `if (a < b) return;` gives `fcmpo; blt`; `if (a >= b) return;`
   gives `fcmpo; cror eq,gt,eq; beq` (the NaN-safe form). When the original has a plain `bge`,
   the source was `if (a < b) { ...rest... }` - a block, not an early return.
