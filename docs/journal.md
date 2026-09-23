@@ -206,21 +206,28 @@ Dated log of what was done and decided, newest last. Facts and lessons belong in
   1,138 generated functions matched. Units are runs of adjacent functions, or single functions;
   they are placeholders until the real file boundaries are known (merging is mechanical).
   Data symbols in literal pools (`.sdata2`, `.rodata`) are left alone. README numbers updated.
-- **Next (agreed with the user, in this order):**
-  1. ~~Putt test harness for hypothesis 6~~ (done, entry above). Build a host-side (PC) C or Python model of the roll
-     physics now in C (`fn_80052268` skid, `Ball_GroundContact` roll incl. break = slope / (0.457
-     x spin), 5/7 g along the line, rolling friction x 0.575 on greens, `Ball_CupPull`, the cup
-     test) on a planar green of chosen slope. Solve a putt to die at the hole (like the CPU
-     rehearsal: aim point moved 45% of the miss, tolerance 1.8 in, **no cup pull**), then replay
-     it at +5% power (CPU pace; distance ~ power^2 via `gPuttDist`) **with** the cup pull, and
-     report make/miss and the miss size vs break and length. Surface values for a green come
-     from `gSurfaceTypes` (dump the class-3 entries' +0x14/+0x18/+0x1C/+0x20/+0x24/+0x28 from
-     main.dol with `dolread.py`). Report in plain English; update hypotheses 6 in `hypotheses.md`.
-  2. **Polish `Ball.c` near-misses**: `fn_80050D34` 85.9, `fn_80050F88` 88.9, `Ball_CupPull` 95.7,
-     `fn_80052598` 98.2, `Ball_FlightStep` 98.3, `Ball_GroundContact` 99.0, `fn_80052088` 99.1,
-     `Ball_SetLie` 99.2, `fn_800539F8` 99.7, `fn_80053E98` 99.7, `fn_80053240` 99.9,
-     `Ball_Collide` 99.9. All register/schedule issues; notes on what was tried are in the
-     checkpoint entries above.
+- **CI and decomp.dev.** The build runs on GitHub on every push (private `mitsevox/tw2004-build`
+  holds only `main.dol`); the project is listed at https://decomp.dev/mitsevox/tw2004 with README
+  badges. Setup and pitfalls in `tw2004-notes.md` ("CI and decomp.dev").
+- **Sweep continued, then m2c.** The sweep's translators grew: a general straight-line translator
+  (any branch-free function: loads, stores, arithmetic, calls with results in temporaries, plain
+  stack frames), then m2c (github.com/matt-kempster/m2c, cloned to `C:\dev\tools\m2c`) for
+  functions with branches, its output cleaned to plain C (`sweep_m2c.py`, `sweep.py gen N 1 --m2c`).
+  A skip list keyed on the generated C (`sweep_skip.json`) stops retrying failures until a
+  translator changes. Pitfall: an exact unit can still break the linked DOL if it brings data -
+  16 m2c units carried the int-to-float constant in `.sdata2`; `keep` now rejects any unit
+  object with a data section. Result: **22.08% code, 3,483 of 7,647 functions**. Split: EA's code
+  (below `0x8012E950`, 79% of the executable) **11.43%**, 2,570 of 6,433 functions; Nintendo SDK
+  and runtime (the rest, 21%) **62.71%**, 913 of 1,213. Most of the headline number is SDK;
+  the EA figure is the one to watch.
+- **Next:**
+  1. More m2c sweep: larger sizes (256, 512 bytes), and a second pass over the 1,060 m2c units
+     that compiled but were not exact (common fixes: signed/unsigned compares, `u8` vs `s32`
+     returns, argument counts of pass-through calls).
+  2. Literal-pool functions (float constants, strings) are still excluded; they need the unit to
+     own its `.sdata2`/`.rodata` range, which means proper file boundaries.
+  3. `Ball.c` last five (see the checkpoint entries above); caveat for sweep units: pass-through
+     wrappers may take parameters the C does not show (the code is the same either way).
   Scratch tools added this round (`C:\dev\scratch\tw\`): `dolread.py` (read main.dol by
   address), `grepfn.py` (asm grep with enclosing function), `unitfns.py <unit>` (non-exact
   functions of a unit), `insert_fns.py <module.py> <File.c>` (insert CODE dict at address

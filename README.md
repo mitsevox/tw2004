@@ -24,14 +24,16 @@ Status
 Last updated 2026-09-23.
 
 - Builds byte-identical to the retail `main.dol`.
-- Matched code: **20.7%** (321,256 of 1,550,720 bytes), **3,149 of 7,647 functions** (41.2%).
-  Counting partial matches: 24.3%.
+- Matched code: **22.1%** (342,448 of 1,550,720 bytes), **3,483 of 7,647 functions** (45.5%).
+  Counting partial matches: 25.7%.
+  - EA's code (the game and EA's engine libraries, 79% of the executable): **11.4%** matched,
+    2,570 of 6,433 functions.
+  - Nintendo SDK and compiler runtime (the other 21%): **62.7%** matched, 913 of 1,213 functions.
 - Game code in C so far: the swing and its state machine (`Swing.c`), golfer attributes and the
   CPU's shot planning (`Golfer.c`), ball physics (`Ball.c`, 63 of 68 functions exact), the
-  animation library (`skalib.c`), the asset stream decompressor (`UStream.c`), and about 1,900
-  small functions (accessors, setters and call wrappers) in `unsorted/sweep_*` files, pending their
-  real file names.
-- SDK and runtime: 764 of 841 configured functions matched.
+  animation library (`skalib.c`), the asset stream decompressor (`UStream.c`), and about 2,240
+  small functions (accessors, setters, call wrappers and short functions decompiled with m2c) in
+  `unsorted/sweep_*` files, pending their real file names.
 - Named: about 1,300 functions. About 6,340 are still `fn_ADDRESS`.
 - Compiler: CodeWarrior GC/2.5, `-O4,p`. See `docs/compiler.md`.
 - Asset formats: the CTRL container (`.hog`/`.gcb`/`.ngc`, with an extractor), course textures

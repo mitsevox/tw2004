@@ -150,6 +150,11 @@ Reading compiler output
 - **[verified] Repeated small expressions can be inline helpers.** `(f32)(1 - pBall->n84)`, used
   twice, matched as a one-line `static inline` (`Ball_SpinKeep`, `fn_800539F8`); a value scaled
   in place (`x = pBall->fSpinX; x *= k;`) matched where `pBall->fSpinX * k` did not.
+- **[verified] An exact unit can still break the linked build.** objdiff compares functions; the
+  DOL check also needs the data layout. A unit whose C makes the compiler emit its own data (the
+  8-byte int-to-float constant `0x4330000080000000` in `.sdata2`, a string literal, a static)
+  adds that data to the link and shifts the original's, so `main.dol` fails although every
+  function is 100%. Check each new unit's object for data sections before marking it Matching.
 - **Permuter results need a human.** Most of its "wins" are nonsense (`if (!x && !x) {}`,
   `vPin[(long long)1]`, dummy variables) that happen to nudge the allocator. Use them as hints
   for what to change and look for a plausible spelling that gives the same code; never commit

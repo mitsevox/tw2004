@@ -455,3 +455,28 @@ Set up 2026-09-23 following `docs/github_actions.md`.
   build.
 - Pushing workflow files needs the `workflow` scope on the GitHub CLI token
   (`gh auth refresh -h github.com -s workflow`).
+
+The small-function sweep
+------------------------
+
+Scripted matching of functions that need no judgement. Tools in `C:\dev\scratch\tw\` (outside
+the repo): `sweep.py`, `sweep_m2c.py`, `smallsurvey.py`.
+
+- `python sweep.py gen <maxbytes> 1 [--m2c]` finds functions not yet in any unit, writes C for
+  each one a translator can handle, and adds them as `src/unsorted/sweep_<address>.c` units
+  (NonMatching) to `splits.txt` and `configure.py`. Units that do not compile on their own are
+  dropped at once. Then `python configure.py`, `ninja`, `ninja build/GW4E69/report.json`.
+- `python sweep.py keep` marks a unit Matching only if every function in it is exact **and** its
+  object has no data section; everything else is removed. Then `python configure.py`, `ninja`
+  and check `main.dol: OK` before committing. A second `gen` pass picks up exact neighbours of
+  dropped functions.
+- Translators, tried in order: fixed shapes (empty, constant, field/global get and set,
+  wrappers); a one-call wrapper translator; a straight-line translator (no branches; loads,
+  stores, arithmetic, calls, plain stack frames); m2c for the rest (its own unit per function).
+- `sweep_skip.json` maps a function to the C that failed; it is retried only when a translator
+  produces different C. `m2c_cache.json` caches m2c output.
+- Excluded on purpose: functions using literal pools (float constants, strings in `.sdata2` /
+  `.rodata`) and paired-single assembly. Sweep units are placeholders: when a real source file is
+  identified, its sweep units are merged into it.
+- Caveat: a wrapper that passes its parameters straight on compiles the same whether or not the
+  C names them, so sweep wrappers may show fewer parameters than the original had.
