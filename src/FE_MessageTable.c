@@ -2333,10 +2333,68 @@ void fn_8007E194(MsgArg* pArgs, MsgArg* pResult) {
 void fn_8007E200(MsgArg* pArgs, MsgArg* pResult) {
 }
 
+// Whether club pArgs[1] is in player pArgs[0]'s golfer's bag; the player's bag starts as the
+// golfer's.
+void fn_8007E204(MsgArg* pArgs, MsgArg* pResult) {
+    GolferRecord* pRecord = fn_80077A80(gSession.nGolfer[pArgs[0].i]);
+
+    pResult->i = pRecord->uBagMask & (1 << pArgs[1].i);
+    gSession.uBag[pArgs[0].i] = pRecord->uBagMask;
+}
+
 void fn_8007E288(MsgArg* pArgs, MsgArg* pResult) {
 }
 
+// Put club pArgs[1] into player pArgs[0]'s bag or take it out (not with session flag 0x4000). A
+// created golfer, or any golfer in game mode 4, keeps the new bag in its record.
+void fn_8007E28C(MsgArg* pArgs, MsgArg* pResult) {
+    GolferRecord* pRecord;
+    s32 nClub;
+
+    pRecord = fn_80077A80(gSession.nGolfer[pArgs[0].i]);
+    nClub = pArgs[1].i;
+    if (!(gSession.uFlags & 0x4000)) {
+        gSession.uBag[pArgs[0].i] ^= 1 << nClub;
+        if (gSession.nGolfer[pArgs[0].i] >= FIRST_CREATED_GOLFER || Game_GetMode() == 4) {
+            Game_GetMode();     // the original calls it again and ignores the result
+            pRecord->uBagMask = gSession.uBag[pArgs[0].i];
+        }
+    }
+}
+
 void fn_8007E354(MsgArg* pArgs, MsgArg* pResult) {
+}
+
+// The wind option: menu choices 1-4 are wind settings 0-3 (calm to gusty).
+void fn_8007E358(MsgArg* pArgs, MsgArg* pResult) {
+    switch (pArgs[0].i) {
+    case 1:
+        gSession.options.nWind = 0;
+        return;
+    case 2:
+        gSession.options.nWind = 1;
+        return;
+    case 3:
+        gSession.options.nWind = 2;
+        return;
+    case 4:
+        gSession.options.nWind = 3;
+        return;
+    }
+}
+
+// Option a7[0]: menu choice 1 turns it on, 2 off.
+void fn_8007E3D4(MsgArg* pArgs, MsgArg* pResult) {
+    switch (pArgs[0].i) {
+    case 1:
+        fn_8002EBA4((u8*)&gSession.options, 1);
+        gSession.options.a7[0] = 1;
+        return;
+    case 2:
+        fn_8002EBA4((u8*)&gSession.options, 0);
+        gSession.options.a7[0] = 0;
+        return;
+    }
 }
 
 void fn_8007E51C(MsgArg* pArgs, MsgArg* pResult) {
