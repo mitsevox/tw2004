@@ -234,6 +234,25 @@ void fn_800863A8(u8* p) {
     fn_800E4238(*(s32*)(p + 0x0));
 }
 
+// ---- end of sweep code ----
+
+// The player's club.
+void fn_800863CC(s32* pArgs, s32* pResult) {
+    *pResult = gPlayers[pArgs[0]].nClub;
+}
+
+// The player's kind of shot.
+void fn_800863EC(s32* pArgs, s32* pResult) {
+    *pResult = gPlayers[pArgs[0]].nShotKind;
+}
+
+// The player's trajectory (low, normal, high).
+void fn_8008640C(s32* pArgs, s32* pResult) {
+    *pResult = gPlayers[pArgs[0]].nTrajectory;
+}
+
+// ---- sweep code (not yet cleaned up) ----
+
 void fn_8008642C(u8* p0, u8* p1) {
     f32 t0;
     t0 = GM_GetGolferDistanceToPin(*(s32*)p0);
@@ -245,6 +264,23 @@ void fn_80086460(u8* p0, u8* p1) {
     t0 = AI_MaxDistance(*(s32*)p0, *(s32*)(p0 + 0x4), *(s32*)(p0 + 0x8));
     *(f32*)p1 = t0;
 }
+
+// ---- end of sweep code ----
+
+// The ball's lie, or 99 when it is on surface 151.
+void fn_800864A0(s32* pArgs, s32* pResult) {
+    if (gPlayers[pArgs[0]].ball.nSurface == 151) {
+        *pResult = 99;
+        return;
+    }
+    *pResult = gPlayers[pArgs[0]].ball.nLie;
+}
+
+void fn_800864D8(s32* pArgs, s32* pResult) {
+    *pResult = gPlayers[pArgs[0]].ball.n6C;
+}
+
+// ---- sweep code (not yet cleaned up) ----
 
 void fn_800865E0(s32 p0, u8* p1) {
     s32 t0;
@@ -258,8 +294,35 @@ void fn_80086610(s32 p0, u8* p1) {
     *(s32*)p1 = t0;
 }
 
+// ---- end of sweep code ----
+
+// The mode's points for a player on a hole.
+void fn_80086640(s32* pArgs, s32* pResult) {
+    *pResult = gPlayers[pArgs[0]].nModePoints[pArgs[1]];
+}
+
+// ---- sweep code (not yet cleaned up) ----
+
 void fn_800866E8(void) {
 }
+
+// ---- end of sweep code ----
+
+// Whether the round plays a hole.
+void fn_800868E8(s32* pArgs, s32* pResult) {
+    *pResult = gpGame->bHoleSelected[pArgs[0]];
+}
+
+// The holes a player has won (match play).
+void fn_80086900(s32* pArgs, s32* pResult) {
+    *pResult = gPlayers[pArgs[0]].nHolesWon;
+}
+
+void fn_80086920(s32* pArgs, s32* pResult) {
+    *pResult = gPlayers[pArgs[0]].n274;
+}
+
+// ---- sweep code (not yet cleaned up) ----
 
 void fn_80086940(s32 p0, u8* p1) {
     s32 t0;
@@ -278,6 +341,15 @@ void fn_80086D24(u8* p0, u8* p1) {
     t0 = fn_800D2B4C(*(s32*)p0);
     *(s32*)p1 = t0;
 }
+
+// ---- end of sweep code ----
+
+// The tee set a player plays from.
+void fn_80086DDC(s32* pArgs, s32* pResult) {
+    *pResult = gSession.nTeeSet[pArgs[0]];
+}
+
+// ---- sweep code (not yet cleaned up) ----
 
 void fn_80086DFC(s32 p0, u8* p1) {
     s32 t0;
@@ -401,6 +473,19 @@ void fn_80087510(void* arg0) {
     gpGame->pfn25C(((s32*)arg0)[0], ((s32*)arg0)[1]);
 }
 
+// ---- end of sweep code ----
+
+// Whether GameBreaker is off.
+void fn_80087548(s32* pArgs, s32* pResult) {
+    if (gSession.a8[0] != 0) {
+        *pResult = 1;
+        return;
+    }
+    *pResult = 0;
+}
+
+// ---- sweep code (not yet cleaned up) ----
+
 void fn_80087574(u8* p0) {
     fn_800E5240(*(s32*)p0);
     fn_80100B38();
@@ -411,6 +496,19 @@ void fn_80087628(s32 p0, u8* p1) {
     t0 = fn_8008AB4C();
     *(s32*)p1 = t0;
 }
+
+// ---- end of sweep code ----
+
+// The same question as fn_80087548, under a second command.
+void fn_80087658(s32* pArgs, s32* pResult) {
+    if (gSession.a8[0] != 0) {
+        *pResult = 1;
+        return;
+    }
+    *pResult = 0;
+}
+
+// ---- sweep code (not yet cleaned up) ----
 
 void fn_800876CC(s32 p0, u8* p1) {
     s32 t0;
@@ -501,6 +599,15 @@ void fn_800881C8(void) {
     fn_80101D24();
 }
 
+// ---- end of sweep code ----
+
+// Who controls the player (CONTROLLER_CPU for the AI).
+void fn_800881E8(s32* pArgs, s32* pResult) {
+    *pResult = gPlayers[pArgs[0]].nController;
+}
+
+// ---- sweep code (not yet cleaned up) ----
+
 void fn_80088208(void) {
     if (fn_800E39F0() != 0) {
         fn_800F1DF0();
@@ -579,6 +686,26 @@ void fn_80088634(void) {
 void fn_80088654(s32 a, u8* p) {
     *(s32*)(p + 0x0) = 0;
 }
+
+// ---- end of sweep code ----
+
+void fn_8008879C(s32* pArgs, s32* pResult) {
+    if (gSession.uFlags & 0x4000) {
+        *pResult = 1;
+        return;
+    }
+    *pResult = 0;
+}
+
+void fn_800887C4(s32* pArgs, s32* pResult) {
+    if (gSession.nGameType == 6 && (gSession.nPaused == 2 || gSession.nPaused == 3)) {
+        *pResult = 1;
+        return;
+    }
+    *pResult = 0;
+}
+
+// ---- sweep code (not yet cleaned up) ----
 
 void fn_80088804(void) {
     if (fn_800E39F0() != 0) {
@@ -701,9 +828,34 @@ void fn_80089C4C(s32* arg0) {
     fn_8008AC4C((u16) temp_r31, 0);
 }
 
+// ---- end of sweep code ----
+
+void fn_80089C84(s32* pArgs, s32* pResult) {
+    if (gpGame->bD4 != 0) {
+        *pResult = 1;
+        return;
+    }
+    *pResult = 0;
+}
+
+// ---- sweep code (not yet cleaned up) ----
+
 void fn_80089CAC(void) {
     fn_800A6148();
 }
+
+// ---- end of sweep code ----
+
+// Whether the player missed the cut.
+void fn_80089CCC(s32* pArgs, s32* pResult) {
+    if (gPlayers[pArgs[0]].bPlayerCut != 0) {
+        *pResult = 1;
+        return;
+    }
+    *pResult = 0;
+}
+
+// ---- sweep code (not yet cleaned up) ----
 
 void fn_80089D04(void) {
     fn_800E4204();
@@ -735,6 +887,18 @@ void fn_80089E5C(void) {
 
 void fn_80089E60(void) {
 }
+
+// ---- end of sweep code ----
+
+void fn_80089E64(s32* pArgs, s32* pResult) {
+    if ((gSession.uFlags & 0x4000) && (gSession.uFlags & 0x8000)) {
+        *pResult = 1;
+        return;
+    }
+    *pResult = 0;
+}
+
+// ---- sweep code (not yet cleaned up) ----
 
 void fn_80089E98(void) {
 }
@@ -809,6 +973,18 @@ void fn_8008A7C8(s32 a, u8* p) {
     *(s32*)(p + 0x0) = 0;
 }
 
+// ---- end of sweep code ----
+
+void fn_8008A7D4(s32* pArgs, s32* pResult) {
+    if (gSession.options.a24[1] != 0) {
+        *pResult = 1;
+        return;
+    }
+    *pResult = 0;
+}
+
+// ---- sweep code (not yet cleaned up) ----
+
 void fn_8008A800(void) {
 }
 
@@ -832,6 +1008,19 @@ void fn_8008A8B8(s32 p0, u8* p1) {
     t0 = GameModeBattle_GetWinner();
     *(s32*)p1 = t0;
 }
+
+// ---- end of sweep code ----
+
+// Whether the game is paused.
+void fn_8008A8E8(s32* pArgs, s32* pResult) {
+    if (gSession.nPaused != 0) {
+        *pResult = 1;
+        return;
+    }
+    *pResult = 0;
+}
+
+// ---- sweep code (not yet cleaned up) ----
 
 void fn_8008A914(void** arg0, s32* arg1) {
     if (fn_800F031C((*(s32*)((u8*)(*arg0) + 8))) != 0) {
