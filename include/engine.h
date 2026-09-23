@@ -61,9 +61,14 @@ void RTClock_GetDateTimeString(char* szOut);   // "M/D/YYYY H:MM AM"
 
 // ---- math and random numbers -----------------------------------------------------------------
 
+#define PI    3.14159265f
+#define TWOPI 6.28318531f
+#define DEG(x) ((x) * (PI / 180.0f))
+
 void Vec3Copy(const f32* pSrc, f32* pDst);   // 0x80008304 (const: see code_800082F8.c)
 f32  fn_800095F0(f32 fAngle);           // sin
 f32  fn_80009638(f32 fAngle);           // cos
+f32  fn_8000965C(f32 x);                // asin
 double fn_80009680(double x);           // sqrt
 f32  fn_80009744(f32* pVec);            // dot with itself (at most FLT_MAX)
 extern f32 lbl_80281B40[];              // FLT_MAX (MSL's)

@@ -31,6 +31,184 @@ void fn_8000A144(f32 (*pSrc)[4], f32 (*pDst)[4]) {
     Vec_Copy(pSrc[2], pDst[2]);
 }
 
+// A rotation matrix from three angles (the 3x3 part and a zero fourth column; row 3 is left as
+// it is). An angle of exactly 0 skips its sin and cos.
+void fn_8000A194(f32 (*pMtx)[4], f32 fA, f32 fB, f32 fC) {
+    f32 fSinA;
+    f32 fCosA;
+    f32 fSinB;
+    f32 fCosB;
+    f32 fSinC;
+    f32 fCosC;
+    f32 fSinCSinB;
+    f32 fSinBCosC;
+
+    if (fC == 0.0f) {
+        if (fB == 0.0f) {
+            pMtx[1][1] = 1.0f;
+            pMtx[2][1] = 0.0f;
+            pMtx[1][2] = 0.0f;
+            pMtx[1][0] = 0.0f;
+            pMtx[0][1] = 0.0f;
+            if (fA != 0.0f) {
+                fSinA = fn_800095F0(fA);
+                fCosA = fn_80009638(fA);
+                pMtx[2][2] = fCosA;
+                pMtx[0][0] = fCosA;
+                pMtx[2][0] = fSinA;
+                pMtx[0][2] = -fSinA;
+            } else {
+                pMtx[2][2] = 1.0f;
+                pMtx[0][0] = 1.0f;
+                pMtx[2][0] = 0.0f;
+                pMtx[0][2] = 0.0f;
+            }
+        } else {
+            fSinB = fn_800095F0(fB);
+            fCosB = fn_80009638(fB);
+            if (fA == 0.0f) {
+                pMtx[0][0] = 1.0f;
+                pMtx[2][0] = 0.0f;
+                pMtx[1][0] = 0.0f;
+                pMtx[0][2] = 0.0f;
+                pMtx[0][1] = 0.0f;
+                pMtx[2][2] = fCosB;
+                pMtx[1][1] = fCosB;
+                pMtx[1][2] = fSinB;
+                pMtx[2][1] = -fSinB;
+            } else {
+                fSinA = fn_800095F0(fA);
+                fCosA = fn_80009638(fA);
+                pMtx[0][0] = fCosA;
+                pMtx[0][1] = 0.0f;
+                pMtx[0][2] = -fSinA;
+                pMtx[1][1] = fCosB;
+                pMtx[2][1] = -fSinB;
+                pMtx[1][0] = fSinB * fSinA;
+                pMtx[1][2] = fSinB * fCosA;
+                pMtx[2][0] = fCosB * fSinA;
+                pMtx[2][2] = fCosB * fCosA;
+            }
+        }
+    } else {
+        fSinC = fn_800095F0(fC);
+        fCosC = fn_80009638(fC);
+        if (fB == 0.0f) {
+            if (fA == 0.0f) {
+                pMtx[2][2] = 1.0f;
+                pMtx[2][1] = 0.0f;
+                pMtx[2][0] = 0.0f;
+                pMtx[1][2] = 0.0f;
+                pMtx[0][2] = 0.0f;
+                pMtx[0][0] = fCosC;
+                pMtx[1][1] = fCosC;
+                pMtx[0][1] = fSinC;
+                pMtx[1][0] = -fSinC;
+            } else {
+                fSinA = fn_800095F0(fA);
+                fCosA = fn_80009638(fA);
+                pMtx[2][0] = fSinA;
+                pMtx[2][1] = 0.0f;
+                pMtx[2][2] = fCosA;
+                pMtx[0][1] = fSinC;
+                pMtx[1][1] = fCosC;
+                pMtx[0][0] = fCosC * fCosA;
+                pMtx[0][2] = -(fCosC * fSinA);
+                pMtx[1][0] = -(fSinC * fCosA);
+                pMtx[1][2] = fSinC * fSinA;
+            }
+        } else {
+            fSinB = fn_800095F0(fB);
+            fCosB = fn_80009638(fB);
+            if (fA == 0.0f) {
+                pMtx[2][0] = 0.0f;
+                pMtx[2][1] = -fSinB;
+                pMtx[2][2] = fCosB;
+                pMtx[0][0] = fCosC;
+                pMtx[1][0] = -fSinC;
+                pMtx[0][1] = fSinC * fCosB;
+                pMtx[0][2] = fSinC * fSinB;
+                pMtx[1][1] = fCosC * fCosB;
+                pMtx[1][2] = fCosC * fSinB;
+            } else {
+                fSinA = fn_800095F0(fA);
+                fCosA = fn_80009638(fA);
+                pMtx[2][1] = -fSinB;
+                fSinCSinB = fSinC * fSinB;
+                fSinBCosC = fSinB * fCosC;
+                pMtx[0][0] = fCosC * fCosA + fSinCSinB * fSinA;
+                pMtx[0][1] = fSinC * fCosB;
+                pMtx[0][2] = fSinCSinB * fCosA - fCosC * fSinA;
+                pMtx[1][0] = fSinBCosC * fSinA - fSinC * fCosA;
+                pMtx[1][1] = fCosC * fCosB;
+                pMtx[1][2] = fSinC * fSinA + fSinBCosC * fCosA;
+                pMtx[2][0] = fCosB * fSinA;
+                pMtx[2][2] = fCosB * fCosA;
+            }
+        }
+    }
+    pMtx[2][3] = 0.0f;
+    pMtx[1][3] = 0.0f;
+    pMtx[0][3] = 0.0f;
+}
+
+// The three angles of a rotation matrix (the reverse of fn_8000A194): *pA from row 2, *pB from
+// m[2][1], *pC from row 0, with a quarter turn chosen by sign where an atan2 would divide by zero.
+void fn_8000A4E0(f32 (*pMtx)[4], f32* pA, f32* pB, f32* pC) {
+    f32 fA;
+    f32 fB;
+    f32 fC;
+
+    if (pMtx[2][2] != 0.0f) {
+        fA = fn_8000AD78(pMtx[2][0], pMtx[2][2]);
+        fB = -fn_8000965C(pMtx[2][1]);
+        if (pMtx[1][1] != 0.0f) {
+            fC = fn_8000AD78(pMtx[0][1], pMtx[1][1]);
+        } else if (pMtx[0][1] != 0.0f) {
+            if (pMtx[0][1] * fn_80009638(fB) > 0.0f) {
+                fC = PI / 2.0f;
+            } else {
+                fC = -PI / 2.0f;
+            }
+        }
+    } else if (pMtx[2][0] == 0.0f) {
+        if (pMtx[2][1] > 0.0f) {
+            fB = -PI / 2.0f;
+        } else {
+            fB = PI / 2.0f;
+        }
+        fC = 0.0f;
+        if (pMtx[0][0] == 0.0f) {
+            if (pMtx[0][2] > 0.0f) {
+                fA = -PI / 2.0f;
+            } else {
+                fA = PI / 2.0f;
+            }
+        } else {
+            // both arguments are m[0][0], as in the original
+            fA = -fn_8000AD78(pMtx[0][0], pMtx[0][0]);
+        }
+    } else {
+        fB = -fn_8000965C(pMtx[2][1]);
+        if (pMtx[2][0] * fn_80009638(fB) > 0.0f) {
+            fA = PI / 2.0f;
+        } else {
+            fA = -PI / 2.0f;
+        }
+        if (pMtx[1][1] != 0.0f) {
+            fC = fn_8000AD78(pMtx[0][1], pMtx[1][1]);
+        } else if (pMtx[0][1] * fn_80009638(fB) > 0.0f) {
+            fC = PI / 2.0f;
+        } else {
+            fC = -PI / 2.0f;
+        }
+    }
+    *pA = fA;
+    // EA bug: fC is never set when m[2][2] != 0 and m[0][1] and m[1][1] are both 0
+    *pC = fC;
+    *pB = fB;
+}
+
 // Transposes the 3x3 part of a 4x4 matrix (pSrc and pDst may be the same matrix).
 void fn_8000A6C8(f32 (*pSrc)[4], f32 (*pDst)[4]) {
     f32 f;
@@ -409,11 +587,12 @@ f32 fn_8000AF7C(f32 x) {
 UMemPool* fn_8000AFA0(int nNodes, u32 uNodeSize, u32 uFlags, u32 uAlign) {
     UMemPool* pPool;
     u32 uSize;
-    u32 uTotal;
     u8* pNode;
     UMemPoolNode* pPrev;
+    u32 uTotal;
 
-    uSize = (uAlign + uNodeSize - 1) & ~(uAlign - 1);
+    uSize = uAlign + uNodeSize;
+    uSize = (uSize - 1) & ~(uAlign - 1);
     uTotal = uAlign + nNodes * uSize;
     pPool = fn_80009B34(uTotal, uFlags, uAlign, "UMemPool.c", 82);
     if (pPool != NULL) {
