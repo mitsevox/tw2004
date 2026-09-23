@@ -677,6 +677,9 @@ void fn_80084F84(MsgArg* pArgs, MsgArg* pResult);
 #define FE_NUM_MESSAGES 770
 MsgHandler lbl_801D77A8[FE_NUM_MESSAGES];
 
+// fn_8007D428 sets it to 0 for a golfer that can be picked and 0.2 for a locked one.
+f32 lbl_80281374 = 0.25f;
+
 // Run message nMsg's handler.
 void fn_80079E6C(int nMsg, MsgArg* pArgs, MsgArg* pResult) {
     lbl_801D77A8[nMsg](pArgs, pResult);
@@ -1884,6 +1887,73 @@ void fn_8007CE58(MsgArg* pArgs, MsgArg* pResult) {
     fn_80102308(pArgs[0].i);
 }
 
+// Find golfer pArgs[0]'s bio (golfer 1 has golfer 0's) and hand back its index and its numbers.
+void fn_8007CE7C(MsgArg* pArgs, MsgArg* pResult) {
+    int i;
+    s32 nId;
+
+    nId = pArgs[0].i;
+    if (nId == 1) {
+        nId = 0;
+    }
+    for (i = 0; i < FE_NUM_BIOS; i++) {
+        if (nId == lbl_80281EC8[i].nId) break;
+    }
+    pResult->i = i;
+    *(s32*)pArgs[1].p = lbl_80281EC8[i].a34[0];
+    *(s32*)pArgs[2].p = lbl_80281EC8[i].a34[1];
+    *(s32*)pArgs[3].p = lbl_80281EC8[i].a34[2];
+    *(s32*)pArgs[4].p = lbl_80281EC8[i].a34[3];
+    *(s32*)pArgs[5].p = lbl_80281EC8[i].a34[4];
+    *(s32*)pArgs[6].p = lbl_80281EC8[i].a34[5];
+    *(s32*)pArgs[7].p = lbl_80281EC8[i].n68;
+}
+
+// Bio pArgs[0]'s texts, and its course's name.
+void fn_8007CF4C(MsgArg* pArgs, MsgArg* pResult) {
+    s32 nBio = pArgs[0].i;
+
+    strcpy(((MsgString*)pArgs[1].p)->pStr, lbl_80281EC8[nBio].sz4);
+    strcpy(((MsgString*)pArgs[2].p)->pStr, lbl_80281EC8[nBio].sz24);
+    strcpy(((MsgString*)pArgs[3].p)->pStr, lbl_80281EC8[nBio].sz4C);
+    strcpy(((MsgString*)pArgs[4].p)->pStr, lbl_80281EC8[nBio].sz70);
+    if (lbl_80281EC8[nBio].nCourse == -1) {
+        strcpy(((MsgString*)pArgs[5].p)->pStr, "N/A");
+        return;
+    }
+    strcpy(((MsgString*)pArgs[5].p)->pStr, lbl_80191990[lbl_80281EC8[nBio].nCourse]);
+}
+
+// Bio pArgs[0]'s five lines of text; missing lines are blank.
+void fn_8007D028(MsgArg* pArgs, MsgArg* pResult) {
+    char szText[sizeof(lbl_80281EC8->sz98)];
+    int i;
+    char* pLine;
+
+    strcpy(szText, lbl_80281EC8[pArgs[0].i].sz98);
+    pLine = strtok(szText, "\n");
+    for (i = 1; i <= 5; i++) {
+        if (pLine != NULL) {
+            strcpy(((MsgString*)pArgs[i].p)->pStr, pLine);
+            pLine = strtok(NULL, "\n");
+        } else {
+            strcpy(((MsgString*)pArgs[i].p)->pStr, "  ");
+        }
+    }
+}
+
+// Give the created golfer being edited model pArgs[1], in the profile and in its golfer record
+// (golfers 30 on are the slots' created golfers).
+void fn_8007D0E0(MsgArg* pArgs, MsgArg* pResult) {
+    SaveProfile* pProfile = fn_80077ACC();
+    int nSlot = lbl_80281ED4->nSlot;
+
+    pProfile->createdGolfer.nModelID = pArgs[1].i;
+    // fake match: reads nSlot again rather than using the local
+    gSession.nGolfer[nSlot] = (u8)(lbl_80281ED4->nSlot + FIRST_CREATED_GOLFER);
+    gGolferTable[gSession.nGolfer[nSlot]].nModelID = pProfile->createdGolfer.nModelID;
+}
+
 void fn_8007D25C(MsgArg* pArgs, MsgArg* pResult) {
 }
 
@@ -1952,6 +2022,55 @@ void fn_8007D420(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_8007D424(MsgArg* pArgs, MsgArg* pResult) {
+}
+
+// Whether golfer pArgs[1] can be picked: 1 when it is unlocked (by any profile or a cheat code, or
+// it is a created golfer), 0 when it is locked, -1 when it is not available at all.
+void fn_8007D428(MsgArg* pArgs, MsgArg* pResult) {
+    int i;
+
+    if (lbl_80281ED4->b11702 != 0) {
+        pResult->i = 1;
+    } else if ((s8)gGolferTable[pArgs[1].i].bAvailable != -1) {
+        pResult->i = 0;
+        if (pArgs[1].i >= FIRST_CREATED_GOLFER) {
+            pResult->i = 1;
+        }
+        for (i = 0; i < 5; i++) {
+            if (gpSaveData[i].aGolferUnlocked[pArgs[1].i] != 0) {
+                pResult->i = 1;
+            }
+        }
+        if (lbl_80281DF4->aGolferUnlocked[pArgs[1].i] != 0) {
+            pResult->i = 1;
+        }
+    } else {
+        pResult->i = -1;
+    }
+    if (pResult->i != 0) {
+        lbl_80281374 = 0.0f;
+    } else {
+        lbl_80281374 = 0.2f;
+    }
+}
+
+// Whether course pArgs[1] can be picked: 1 when a loaded profile or a cheat code has unlocked it
+// (course 23 always), else 0.
+void fn_8007D598(MsgArg* pArgs, MsgArg* pResult) {
+    int i;
+
+    pResult->i = 0;
+    if (pArgs[1].i == 23) {
+        pResult->i = 1;
+    }
+    for (i = 0; i < 5; i++) {
+        if (gpSaveData[i].aCourseUnlocked[pArgs[1].i] != 0 && gpSaveData[i].bActive != 0) {
+            pResult->i = 1;
+        }
+    }
+    if (lbl_80281DF4->aCourseUnlocked[pArgs[1].i] != 0) {
+        pResult->i = 1;
+    }
 }
 
 void fn_8007D6D8(MsgArg* pArgs, MsgArg* pResult) {

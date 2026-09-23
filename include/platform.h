@@ -48,6 +48,7 @@ char*  strcat(char* pDst, const char* pSrc);
 int    strcmp(const char* a, const char* b);
 int    strncmp(const char* a, const char* b, u32 uLen);
 char*  strstr(const char* pStr, const char* pFind);
+char*  strtok(char* pStr, const char* pDelim);
 int    atoi(const char* p);
 int    sprintf(char* pBuf, const char* pFmt, ...);
 int    snprintf(char* pBuf, u32 uLen, const char* pFmt, ...);

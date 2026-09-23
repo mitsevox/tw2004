@@ -133,7 +133,24 @@ typedef struct FEProfile {
 LAYOUT_ASSERT(FEProfile, 0x11708);
 
 extern FEProfile* lbl_80281ED4;
-extern u8* lbl_80281EC8;                // a copy of the 'BIO ' stream object's data (fn_80076F80)
+
+// One golfer's bio in the 'BIO ' stream object, as the menus show it (FE_MessageTable.c
+// fn_8007CE7C, fn_8007CF4C, fn_8007D028).
+typedef struct FEBio {
+    s32  nId;                   // 0x000  the golfer it describes (fn_8007CE7C searches on it)
+    char sz4[0x20];             // 0x004  } texts the menus show
+    char sz24[0x10];            // 0x024  }
+    s32  a34[6];                // 0x034  numbers the menus show
+    char sz4C[0x1C];            // 0x04C
+    s32  n68;                   // 0x068
+    s32  nCourse;               // 0x06C  shown as the course's name (lbl_80191990); -1: "N/A"
+    char sz70[0x28];            // 0x070
+    char sz98[0x160];           // 0x098  up to five lines, split at '\n'
+} FEBio;
+LAYOUT_ASSERT(FEBio, 0x1F8);
+
+#define FE_NUM_BIOS 29
+extern FEBio* lbl_80281EC8;             // a copy of the 'BIO ' stream object's data (fn_80076F80)
 
 // The profile backups (FEState.p658) can be moved out to ARAM (fn_80079D30) and back (fn_80079DAC).
 #define FE_BACKUP_SIZE 0x41820          // the four slots' backups (4 x 0x10600) and 0x20 more
