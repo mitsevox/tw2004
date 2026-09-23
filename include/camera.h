@@ -451,7 +451,8 @@ CamShot* fn_8003A950(CamSequence* pSequence, int nKind, int* pA, f32* pF1, f32* 
                      int nPlayer);
 CamSequence* fn_8003BDBC(int nPlayer, int nLie, int nClass, int nKind, int a, f32 fDist);
 CamSequence* DynamicCam_ChoosePreFlightSequence(int nPlayer, int nLie, int nKind);
-u8       fn_8003C9D0(int nPlayer, int a, CamSequence** ppSeq, CamShot** ppShot);
+// The sequence and shot named after the golfer's clip (with b, Character.p1790 first).
+u8       fn_8003C9D0(int nPlayer, u8 b, CamSequence** ppSeq, CamShot** ppShot);
 u8       fn_8003D7A0(CamSequence* pSequence, int nPlayer);   // it suits the player's club and shot
 u8     fn_8003DC78(CamShot* pShot);     // the shot's bAC is 1..6 or 7
 // 0 when gSession.nGameType is 3, else fn_8001EDF4 of the player's golfer (Player.pChar) as a flag;

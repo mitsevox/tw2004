@@ -17,6 +17,7 @@ void fn_80039B14(int nSize);
 void fn_80039C5C(int nSize);
 void fn_80039D0C(int nSequences);
 void fn_80039E58(void);
+u8   fn_8003C800(char* szName, CamSequence** ppSeq, CamShot** ppShot);
 void fn_80039EB8(int nSize);
 u8   fn_8003D0EC(CamSequence* pSequence, int nKind);
 u8   fn_8003D240(CamShot* pShot, int nKind);
@@ -430,6 +431,38 @@ u8 fn_8003ABEC(CamChoice* pChoice, int nPlayer) {
         return 0;
     }
     return 1;
+}
+
+// The sequence and shot named after the golfer's clip: with b, the clip in Character.p1790 when
+// there is one, else the clip it is playing. While the GameBreaker letterbox is up (fn_8003DCAC)
+// the "LB" version of the name is tried first.
+u8 fn_8003C9D0(int nPlayer, u8 b, CamSequence** ppSeq, CamShot** ppShot) {
+    char szName[0x18];          // the frame allows 12 to 24 bytes; the true size is unknown
+    char* pName = NULL;
+
+    if (ppSeq == NULL || ppShot == NULL) {
+        return 0;
+    }
+    *ppSeq = NULL;
+    *ppShot = NULL;
+    if (b && gPlayers[nPlayer].pChar->p1790 != NULL) {
+        pName = gPlayers[nPlayer].pChar->p1790->name;
+    }
+    if (pName == NULL && gPlayers[nPlayer].pChar->pCurClip != NULL) {
+        pName = gPlayers[nPlayer].pChar->pCurClip->name;
+    }
+    if (pName != NULL) {
+        if (fn_8003DCAC()) {
+            sprintf(szName, "LB%s", pName);
+            if (fn_8003C800(szName, ppSeq, ppShot) == 1) {
+                return 1;
+            }
+        }
+        if (fn_8003C800(pName, ppSeq, ppShot) == 1) {
+            return 1;
+        }
+    }
+    return 0;
 }
 
 // A default sequence of the kind: one whose name starts with "DEF".
