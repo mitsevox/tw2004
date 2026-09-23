@@ -15,6 +15,8 @@ Changed for this game:
   db.c's globals); Pikmin 2's header defines them `static`, which gave gdev/main.c its own copies.
 - `MetroTRK/support.c`: when `TRKSuppAccessFile` gets a shorter reply than asked for and no error,
   it reports an I/O error (unless it was a short read), as this game's TRK does.
+- `MetroTRK/targimpl.c`: this game's `TRKPPCAccessFPRegister` does not call `ReadFPSCR` or
+  `WriteFPSCR` for the FPSCR (register 0x20); it only masks the value to 32 bits.
 
 `include/` holds just the headers these files need, copied from the same project.
 
