@@ -116,7 +116,7 @@ extern SaveProfile* gpSaveData;
 extern SaveProfile* lbl_80281DF4;       // unlocks that hold for every profile (the cheat codes set them)
 
 // Earnings.c: the awards
-s32  fn_800D7770(int nPlayer, Award* pAward);   // mark an award won today; 1 if it was not won before
+u8   fn_800D7770(int nPlayer, Award* pAward);   // mark an award won today; 1 if it was not won before
 
 // 0x800588F4: marked hole i's kind-0 byte (a5004/a10578) or kind-1 value (a504C/a1057C); -1 for
 // another kind.

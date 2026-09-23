@@ -520,7 +520,7 @@ u8 fn_800D76AC(int nPlayer, int nAward) {
 }
 
 // Mark an award won, with today's date; 1 if it was not won before.
-s32 fn_800D7770(int nPlayer, Award* pAward) {
+u8 fn_800D7770(int nPlayer, Award* pAward) {
     if (fn_800E177C() != 0) return 0;
     if (Player_IsCPU(nPlayer)) return 0;
     if (gpSaveData[gPlayers[nPlayer].nIndex].bActive != 1) return 0;
