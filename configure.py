@@ -550,7 +550,7 @@ config.libs = [
             Object(Matching, "MetroTRK/nubevent.c"),
             Object(NonMatching, "MetroTRK/nubinit.c"),
             Object(Matching, "MetroTRK/msg.c"),
-            Object(NonMatching, "MetroTRK/msgbuf.c"),
+            Object(Matching, "MetroTRK/msgbuf.c"),
             Object(NonMatching, "MetroTRK/serpoll.c"),
             Object(NonMatching, "MetroTRK/usr_put.c"),
             Object(NonMatching, "MetroTRK/dispatch.c"),
