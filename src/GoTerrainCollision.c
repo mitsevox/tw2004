@@ -285,6 +285,9 @@ f32 fn_8004B78C(CourseInfo* pCourse, f32* pPos) {
     return 1.0f;
 }
 
+// 0x8004B89C: Ter_CheckObjectAndHazardObstruction (TW06's name; 0x898 bytes) goes here. Not written
+// yet; its prototype is in ball.h (Ter_CheckForDropLocation calls it).
+
 // TW06: Ter_SearchAreaForDropLocation (its parameters differ here). Where a player's ball is to be
 // dropped (pOut): the last good drop spot (lbl_801D5888), or with bPreferred the last spot with a
 // preferred lie (lbl_801D58C8) when that is not the shot's own start and is less than 10 yards
@@ -292,7 +295,7 @@ f32 fn_8004B78C(CourseInfo* pCourse, f32* pPos) {
 // than the ball, search rings of 1 to 4 yards around the ball, every 45 degrees starting towards
 // the pin, for a drop on the same class, else the nearest. Returns 0 when the spot is where the
 // shot started, or (with bCheck) within 50 yards of vA44.
-// Not exact yet (96.6%): the frame is 0x10 bigger and the saved registers differ; unfinished
+// Not exact yet (98.9%): the frame is 0x10 bigger and the saved registers differ; unfinished
 // when work was frozen.
 u8 Ter_SearchAreaForDropLocation(int nPlayer, u8 bPreferred, u8 bCheck, f32* pOut) {
     f32 vPos[4];
@@ -356,7 +359,8 @@ u8 Ter_SearchAreaForDropLocation(int nPlayer, u8 bPreferred, u8 bCheck, f32* pOu
                 if ((bPreferred && bPreferredLie) || (!bPreferred && bDrop)) {
                     if (pSurface->nClass == gSurfaceTypes[p->ball.nSurface].nClass) {
                         Vec_Copy(vPos, pOut);
-                        goto done;  // fake match: leaves both loops (not yet verified)
+                        goto done;  // fake match: the original branches straight to the end, past the
+                                    // ring loop's compare, which a break (and a flag) would keep
                     }
                     if (fRadius < fDist) {      // EA bug: a distance against a squared one
                         Vec_Copy(vPos, pOut);
@@ -401,6 +405,7 @@ f32 Ter_CheckForDropLocation(CourseInfo* pCourse, f32* pPos, u8 bOnDropSurface, 
         bOk = fHeight != TER_NO_GROUND && pSurface != NULL && (pSurface->u34 & 1)
               && pSurface->nClass != 10 && fn_8000AD9C(vNormal[1]) > 0.86603f
               && Ter_PointInOOBNetwork(vPos) && !Ter_PointInFreeDropNetwork(vPos)
+              // fake match: bOnDropSurface is always 0 here, but the original tests it again
               && (bOnDropSurface || !Ter_CheckObjectAndHazardObstruction(vPos, 1.5f, 0, 1, 2.0f, 1, 0.577f));
     } else {
         fHeight = 0.0f;
@@ -409,7 +414,7 @@ f32 Ter_CheckForDropLocation(CourseInfo* pCourse, f32* pPos, u8 bOnDropSurface, 
         }
         bOk = Ter_PointInOOBNetwork(vPos) && !Ter_PointInFreeDropNetwork(vPos);
     }
-    vPos[1] = fHeight;
+    vPos[1] = fHeight;              // fake match: never read again, but the original stores it
     if (bOk) {
         *pbDrop = 1;
         if (bOnDropSurface || Ter_LieIsPreferred(pSurface->nClass)) {
