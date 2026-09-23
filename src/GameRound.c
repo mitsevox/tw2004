@@ -22,6 +22,7 @@ int   fn_8011937C(int nPlayer, int a, u8 b);
 int   fn_800E8C24(int nPlayer, int nHole);
 u8    Player_IsCPU(int nPlayer);
 int   sprintf(char* pBuf, const char* pFmt, ...);
+int   Game_GetCourse(void);
 
 extern u8   gNumPlayersSetUp;               // 0x80281D48 (Golfer.c)
 extern char lbl_80282270[8];                // the hole name
@@ -114,6 +115,61 @@ void fn_800E1074(void) {
     fn_800E2470();
     gpGame->nE0 = 1;
     gpGame->bD5 = 0;
+}
+
+// A hole-selection preset for the round: 0 none, 1 all, 2 the front nine, 3 the back nine,
+// 4/5/6 only the par 5s/4s/3s, 7 all; then the first selected hole.
+void fn_800E1260(int nPreset) {
+    int i;
+    for (i = 0; i < 18; i++) {
+        switch (nPreset) {
+        case 0:
+            gpGame->bHoleSelected[i] = 0;
+            break;
+        case 1:
+            gpGame->bHoleSelected[i] = 1;
+            break;
+        case 2:
+            if (i < 9) {
+                gpGame->bHoleSelected[i] = 1;
+            } else {
+                gpGame->bHoleSelected[i] = 0;
+            }
+            break;
+        case 3:
+            if (i >= 9) {
+                gpGame->bHoleSelected[i] = 1;
+            } else {
+                gpGame->bHoleSelected[i] = 0;
+            }
+            break;
+        case 4:
+            if (fn_800D2AD8(i) == 5) {
+                gpGame->bHoleSelected[i] = 1;
+            } else {
+                gpGame->bHoleSelected[i] = 0;
+            }
+            break;
+        case 5:
+            if (fn_800D2AD8(i) == 4) {
+                gpGame->bHoleSelected[i] = 1;
+            } else {
+                gpGame->bHoleSelected[i] = 0;
+            }
+            break;
+        case 6:
+            if (fn_800D2AD8(i) == 3) {
+                gpGame->bHoleSelected[i] = 1;
+            } else {
+                gpGame->bHoleSelected[i] = 0;
+            }
+            break;
+        case 7:
+            gpGame->bHoleSelected[i] = 1;
+            break;
+        }
+    }
+    fn_800E1434();
 }
 
 // Adds a hole to the round and moves to the round's first hole.
@@ -350,6 +406,43 @@ void fn_800E2470(void) {
     }
 }
 
+// A number per game mode (1, 2 or 4; 0 for most): modes 6-8 give 1 or 2 by gpGame->n4.
+int fn_800E2520(int nMode) {
+    switch (nMode) {
+    case 0:
+        return 1;
+    case 1:
+        return 2;
+    case 2:
+        return 2;
+    case 4:
+        return 1;
+    case 5:
+        return 1;
+    case 6:
+    case 7:
+    case 8:
+        return gpGame->n4 == 0 ? 1 : 2;
+    case 9:
+        return 1;
+    case 18:
+        return 1;
+    case 19:
+        return 4;
+    case 20:
+        return 4;
+    case 21:
+        return 4;
+    case 23:
+        return 1;
+    case 24:
+        return 1;
+    case 26:
+        return 2;
+    }
+    return 0;
+}
+
 void fn_800E25CC(u8 b) {
     lbl_8028227C = b;
     gSession.nSplitScreen = b;
@@ -382,6 +475,34 @@ void fn_800E25E0(void) {
 
 int fn_800E27A8(void) {
     return gpGame->n294 != 0;
+}
+
+// The course's folder name ("01_Peb" = Pebble Beach ...). Course 5's is "22_Ant".
+char* fn_800E2680(void) {
+    switch (Game_GetCourse()) {
+    case 0:  return "01_Peb";
+    case 1:  return "02_Pri";
+    case 2:  return "03_Saw";
+    case 3:  return "04_Vol";
+    case 4:  return "22_Ant";
+    case 5:  return "06_Bet";
+    case 6:  return "07_Bir";
+    case 7:  return "08_Dri";
+    case 8:  return "09_Bay";
+    case 9:  return "10_For";
+    case 10: return "11_Spy";
+    case 11: return "12_Pop";
+    case 12: return "13_Hig";
+    case 13: return "14_Sco";
+    case 14: return "15_Tor";
+    case 15: return "16_Sai";
+    case 16: return "17_Sah";
+    case 17: return "18_Jpn";
+    case 18: return "19_Aus";
+    case 19: return "20_Kap";
+    case 20: return "21_Pin";
+    }
+    return "none";
 }
 
 // TW06: GameManager::GetHoleName. "HOLE_01" .. "HOLE_18".
