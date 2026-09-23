@@ -64,7 +64,7 @@ void* AnimLib_Pick(int nPlayer, AnimLib* pLib, int nGroup, int nStyle, int nClub
                    const char* pName);
 
 void fn_80045494(u8 bOn, int nPlayer);
-void fn_80045558(int a, int nPlayer);
+void fn_80045558(u8 bOn, int nPlayer);
 u8   fn_8004560C(void);
 void View_SetCamera(void* pView, int nCamera, int nPlayer, int nView);
 void fn_80063B98(void* pView, f32 f, f32* pVec);

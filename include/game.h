@@ -298,7 +298,7 @@ s32  fn_800FFDB0(void);                 // TW06 GoToPlayoff: stroke play has non
 
 // GameMode11.c: the lessons
 u8   fn_80100294(void);                 // in a lesson (mode 11)
-int  Scenario_RequiredShape(void);      // the lesson's shape in mode 11, else 7 (none)
+int  Scenario_RequiredShape(int nPlayer); // the lesson's shape in mode 11, else 7 (none); nPlayer unused
 u8   fn_80100AF8(void);                 // lesson 5 of mode 11
 u8   fn_80100C00(void);
 u8   fn_80101738(void);

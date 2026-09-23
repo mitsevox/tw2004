@@ -14,7 +14,6 @@ typedef struct SwingStateDef {
 } SwingStateDef;
 extern SwingStateDef sGolferStateEngineTable[];        // 0x801883D8
 
-void  Shot_Plan(int nPlayer, int a);
 void  fn_80062CB0(int a, int b);
 void  fn_80062F1C(void);
 s32   fn_800E27C0(void);

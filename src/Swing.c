@@ -2613,7 +2613,6 @@ void fn_80062B64(int nPlayer);
 void fn_80062B60(int nPlayer);
 void  fn_800C7140(int a);
 void  fn_80045824(int nPlayer);
-void  Shot_Plan(int nPlayer, u8 bNotify);     // Golfer.c
 extern Vec4 lbl_80183630;
 
 // State 15 (fade to tap-in), entered only when a gimme is allowed: plan the tap-in from where the
