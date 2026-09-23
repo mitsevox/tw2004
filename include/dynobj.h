@@ -102,7 +102,7 @@ typedef struct UObjMeshPart {
 typedef struct UObjMesh {
     UObjMeshInfo* pInfo;        // 0x00
     u8   unk4[4];
-    s32* p8;                    // 0x08  fn_80048AC4 reads it by index
+    struct UObjMesh** p8;       // 0x08  alternatives, by UObject.n108 (fn_80048AC4)
     u8   unkC[0x18 - 0xC];
     struct UObjMeshPart* p18;   // 0x18  fn_80048A84 passes entry n28 to fn_800082CC
     u8   a1C[0x28 - 0x1C];      // 0x1C  nonzero: entry i of p18 is used

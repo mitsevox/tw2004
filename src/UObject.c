@@ -3,10 +3,29 @@
 // holds one (DynObj.obj).
 
 #include "dynobj.h"
+#include "camera.h"
+#include "terrain.h"
+#include "golfer.h"
 
 void fn_8000ADC0(f32 (*pMtx)[4]);                   // identity
 void fn_800082CC(UObjMeshPart* pPart);
 void fn_800488B4(UObject* pObj);
+void fn_80048A84(UObjMesh* pMesh);
+UObjMesh* fn_80048AC4(UObjMesh* pMesh, int i);
+int  fn_80048AD4(UObjMesh* pMesh, int i);
+int  fn_80048AE8(UObject* pObj);
+CamLens* fn_8001F004(void);                 // the current camera's lens (its fFov is read)
+void fn_8003526C(void);
+f32  fn_8001414C(void);
+void fn_80035240(f32 (*pMtx)[4]);           // GoDynObj.c, GoGolfCam.c and GoComicCam.c pass 0
+f32  fn_80014280(f32 f);
+int  fn_80007B2C(UObjMesh* pMesh, void* pCamera, f32 a, f32 fSize, f32 c);   // 3: not drawn
+void fn_8004B78C(CourseInfo* pCourse, f32* pPos);  // the ground's light at pPos
+void fn_80036024(f32 f);
+void fn_80035FFC(void);
+void fn_80035FDC(UObject* pObj);
+void fn_8003519C(int nRow, void* pData);
+void fn_80035FBC(void);
 
 // Sets the object up: the three matrices to identity, the model and flags; a model whose levels of
 // detail differ gets flag 4 and a level-of-detail scale from its size.
@@ -64,13 +83,72 @@ void fn_80048894(UObject* pObj) {
     fn_800488B4(pObj);
 }
 
+// Draws the object: its level of detail's mesh, unless fn_80007B2C finds it off screen (3); lit by
+// the ground under it (outside game type 3) when its mesh asks for it.
+void fn_800488B4(UObject* pObj) {
+    UObjMesh* pMesh = pObj->pModel->apLod[fn_80048AE8(pObj)];
+    f32 fFov = fn_8001F004()->fFov;
+    f32 fMax;
+    f32 fSize;
+    int nClip;
+    int nFlags0;
+    int nFlags2;
+    int bLit;
+    f32 fLod;
+
+    fn_8003526C();
+    fMax = 0.75f * fFov * fn_8001414C();
+    fn_80035240(pObj->m80);
+    fSize = fn_80014280(0.5f * (fFov <= fMax ? fFov : fMax));
+    nClip = fn_80007B2C(pMesh, fn_8001614C(), 0.0f, fSize, 1.0f);
+    if (nClip == 3) return;
+    nFlags0 = fn_80048AD4(pMesh, 0);
+    nFlags2 = fn_80048AD4(pMesh, 2);
+    bLit = nFlags2 & 4;
+    if (bLit) {
+        if (gSession.nGameType != 3) {
+            fn_8004B78C(fn_8000C594(), pObj->m80[3]);
+            fn_80036024(0.8f);
+        }
+        fn_80035FFC();
+        fn_80035FDC(pObj);
+    } else if (nFlags0 & 1) {
+        if ((nFlags0 & 2) || (nFlags2 & 1) || (nFlags2 & 2)) {
+            pMesh = fn_80048AC4(pMesh, pObj->n108);
+        }
+        fn_80012EF8();
+        fLod = pObj->f10C;
+        fn_8003519C(3, &fLod);
+    }
+    switch (nClip) {
+    case 2:
+        fn_80016B9C();
+        fn_80035138(1);
+        break;
+    case 1:
+        fn_80016B9C();
+        fn_80035138(1);
+        break;
+    default:
+        fn_80016B9C();
+        fn_80035138(0);
+        break;
+    }
+    fn_80012EF8();
+    fn_80048A84(pMesh);
+    if (bLit) {
+        fn_80035FBC();
+    }
+}
+
 void fn_80048A84(UObjMesh* pMesh) {
     if (pMesh->a1C[pMesh->n28] != 0) {
         fn_800082CC(&pMesh->p18[pMesh->n28]);
     }
 }
 
-s32 fn_80048AC4(UObjMesh* pMesh, int i) {
+// Mesh i of the level of detail's alternatives.
+UObjMesh* fn_80048AC4(UObjMesh* pMesh, int i) {
     return pMesh->p8[i];
 }
 
