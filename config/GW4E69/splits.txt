@@ -1520,6 +1520,9 @@ GameMode11.c:
 GameMode4.c:
 	.text       start:0x80101FEC end:0x80102AC8
 
+uiArc.c:
+	.text       start:0x80102AC8 end:0x801037F8
+
 FE_CrAPDB.c:
 	.text       start:0x801037F8 end:0x801074D4
 
