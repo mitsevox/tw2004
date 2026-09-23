@@ -978,3 +978,15 @@ void UStream_Init(void) {
         gHandlers[i].nRefs = 0;
     }
 }
+
+// Clears the per-file callbacks of a stream's open parameters.
+void fn_8000E708(UStreamParams* p) {
+    int i;
+
+    for (i = 0; i < USTREAM_MAX_FILES; i++) {
+        p->apfnOpened[i] = NULL;
+        p->apfnClosed[i] = NULL;
+        p->apOpenedArg[i] = NULL;
+        p->apOpenedArg[i] = NULL;   // EA bug: clears apOpenedArg twice; apClosedArg is never cleared
+    }
+}

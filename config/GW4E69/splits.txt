@@ -33,7 +33,7 @@ LLFileIO_Gc.c:
 	.text       start:0x80005BE8 end:0x800066E4
 
 LLDisp_Gc.c:
-	.text       start:0x800067E4 end:0x800072E0
+	.text       start:0x800066E4 end:0x800072E0
 
 unsorted/sweep_800072E0.c:
 	.text       start:0x800072E0 end:0x800072E8
@@ -136,13 +136,10 @@ unsorted/sweep_8000C5FC.c:
 	.text       start:0x8000C5FC end:0x8000C624
 
 UStream.c:
-	.text       start:0x8000C624 end:0x8000E708
-
-unsorted/sweep_8000E708.c:
-	.text       start:0x8000E708 end:0x8000E790
+	.text       start:0x8000C624 end:0x8000E830
 
 LLTex.c:
-	.text       start:0x8000EA1C end:0x8000FFAC
+	.text       start:0x8000E830 end:0x8000FFAC
 
 unsorted/sweep_8000FFAC.c:
 	.text       start:0x8000FFAC end:0x80010028
