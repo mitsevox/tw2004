@@ -423,7 +423,6 @@ config.libs = [
         "progress_category": "sdk",
         "src_dir": "extern/tww",
         "objects": [
-            Object(NonMatching, "src/dolphin/os/OS.c"),
             Object(NonMatching, "src/dolphin/pad/Pad.c"),
         ],
     },
@@ -743,6 +742,7 @@ config.libs = [
         "progress_category": "sdk",
         "src_dir": "extern/sdk",
         "objects": [
+            Object(Matching, "dolphin/os/OS.c"),
             Object(Matching, "dolphin/os/OSError.c"),
             Object(Matching, "dolphin/os/OSContext.c"),
             Object(NonMatching, "dolphin/os/OSReboot.c"),

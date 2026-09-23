@@ -3645,8 +3645,12 @@ dolphin/mtx/mtx44.c:
 	.text       start:0x80147DB0 end:0x80147E48
 	.sdata2     start:0x80284C50 end:0x80284C60
 
-src/dolphin/os/OS.c:
+dolphin/os/OS.c:
 	.text       start:0x80147E48 end:0x80148790
+	.data       start:0x8019B0E0 end:0x8019B2E8
+	.bss        start:0x8027C960 end:0x8027C9B0
+	.sdata      start:0x80281AA8 end:0x80281AB0
+	.sbss       start:0x802828A8 end:0x802828D8
 
 dolphin/os/OSAlarm.c:
 	.text       start:0x80148790 end:0x80148E40
