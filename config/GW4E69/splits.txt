@@ -127,43 +127,10 @@ LLTexGrp.c:
 	.text       start:0x8001013C end:0x800107F4
 
 LLFont.c:
-	.text       start:0x800107F4 end:0x80012438
-
-unsorted/sweep_80012438.c:
-	.text       start:0x80012438 end:0x80012444
-
-unsorted/sweep_8001247C.c:
-	.text       start:0x8001247C end:0x800124A4
-
-unsorted/sweep_800124A4.c:
-	.text       start:0x800124A4 end:0x800124CC
-
-unsorted/sweep_80012520.c:
-	.text       start:0x80012520 end:0x80012540
-
-unsorted/sweep_80012540.c:
-	.text       start:0x80012540 end:0x80012550
-
-unsorted/sweep_80012550.c:
-	.text       start:0x80012550 end:0x8001255C
-
-unsorted/sweep_8001255C.c:
-	.text       start:0x8001255C end:0x8001256C
-
-unsorted/sweep_8001256C.c:
-	.text       start:0x8001256C end:0x800125BC
-
-unsorted/sweep_800125BC.c:
-	.text       start:0x800125BC end:0x8001260C
+	.text       start:0x800107F4 end:0x8001256C
 
 UFont.c:
-	.text       start:0x8001260C end:0x80012E4C
-
-unsorted/sweep_80012E4C.c:
-	.text       start:0x80012E4C end:0x80012E54
-
-unsorted/sweep_80012EC4.c:
-	.text       start:0x80012EC4 end:0x80012ED0
+	.text       start:0x8001256C end:0x80012ED0
 
 unsorted/sweep_80012ED0.c:
 	.text       start:0x80012ED0 end:0x80012F18
