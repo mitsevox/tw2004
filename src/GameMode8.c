@@ -4,6 +4,8 @@
 // the two-player stroke and match versions.
 
 #include "golfer.h"
+#include "game.h"
+#include "engine.h"
 
 typedef struct SwingStateDef {
     void (*pfnEnter)(int nPlayer);  // 0x00
@@ -15,41 +17,15 @@ extern SwingStateDef sGolferStateEngineTable[];        // 0x801883D8
 void  STATEFUNC_SimulateInit(int nPlayer);
 void  STATEFUNC_SimulateUpdate(int nPlayer);
 void  STATEFUNC_SimulateExit(int nPlayer);
-int   Game_CurHoleIndex(void);
-u8    Player_IsHoled(int nPlayer);
-int   GOLFERSTATE_GetCurrentState(int nPlayer);
-void  GOLFERSTATE_Set(int nState, int nPlayer);
-void  Session_SetNumPlayers(int n);
 void  GM_MovePlayerToBall(int nPlayer);
 void  Shot_Plan(int nPlayer, int a);
-void  Emotion_UpdatePlayerEmotion(int nPlayer);
-void  EVENT_Trigger(int nPlayer, int nEvent, int a, int b);
-void  View_SetCamera(void* pView, int nCamera, int nPlayer, int nView);
-void* fn_80017028(int nView);
-void  fn_8001704C(int nView, int nPlayer);
-void  fn_8001C804(int nPlayer, int a, int b);
 void  fn_8001D8DC(int nPlayer);
-void  fn_80062C80(int a, int b);
 void  fn_80062CB0(int a, int b);
-void  fn_80062D38();
-void  fn_80062D6C();
 void  fn_80062F1C(void);
-void  fn_80095744(int nHandle, int nAnim);
-void  fn_800957D8(int nHandle);
-void  fn_800A7664();
-u8    fn_800E1BBC(void);
-void  fn_800E2BA4();
 s32   fn_800E27C0(void);
 void  fn_800E3C70(int a);
 void  fn_800E3CD4(int a);
-u8    fn_800E4254(int nPlayer);
-void  fn_800E4364(u32 nQueue, int a, int b, int c);
-void  fn_800E45C0();
-void  fn_800E53F0();
-int   fn_800D36E0(int nWinner, int nLoser, int nMargin, int* pPrize);
-void  fn_800D3548(int nPlayer, int nMoney, int a);
 void  fn_800F80D4(s32 p0);
-void  fn_80125910(int a);
 extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
 extern u8* gpSaveData;
 extern u8  lbl_8028227C;
@@ -81,7 +57,6 @@ typedef struct SGLog {
 extern SGLog lbl_802120F8[100];
 extern s32 lbl_802823CC;
 extern u8  lbl_802823C8;
-void  GOLFERSTATE_Switch(int nState, int nPlayer);
 void  GM_PlayerAddStroke(int nPlayer);
 u8    GM_CheckForBallOOB(int nPlayer);
 void  GM_ReplaceOOBBall(int nPlayer);
@@ -98,13 +73,11 @@ extern f32 lbl_802816C4;
 extern f32 lbl_802816B8;
 extern f32 lbl_802816BC;
 f32   fn_8000AD78(f32 y, f32 x);                // atan2f
-f32   fn_8000AD9C(f32 x);                       // fabsf
 void  fn_800BAF04(f32* pSrc, f32* pDst);        // normalise
 int   Golfer_GetAttribute(Player* pPlayer, int nAttr, int nMode);
 void  GM_SimulateBallMovement(int nPlayer);
 u8    fn_80058F5C(int nPlayer);                 // the per-frame swing poll: the ball was struck
 void  fn_800ED710(s32 p0);
-void  fn_80055AA8(u8* pBall, f32* pPos, int nPlayer);
 void  Vec_Normalize(f32* pSrc, f32* pDst);
 u8    Ter_PointInOOBNetwork(u8* pBall);
 void  fn_80069330(int nPlayer, f32* pPos);
@@ -112,7 +85,6 @@ void  fn_8006A6C4(int nPlayer);
 void  PlaceBall_UpdateMomentums(int nPlayer, f32 f);
 u8*   fn_80016CFC(int nView);
 u8*   fn_80008370(u8* p);
-u8    Physics_DropBall(u8* pBall, f32* pPos);
 extern f32 lbl_801D5888[4][4];                  // per player: where the ball was last on the course
 
 // The tee positions follow the pins in the per-hole data (fn_8000C594).
@@ -120,24 +92,17 @@ typedef struct HoleTees {
     u8     unk0[0xB0];
     PinPos tee[4];                          // 0xB0  one per tee set
 } HoleTees;
-void  Mem_cpy(void* pDst, void* pSrc, int nBytes);
 void  fn_8006ACF8(int nPlayer, int a);
 void  fn_8006BAA8(int nPlayer);
 void  fn_800FE100(s32 p0, s32 p1, s32 p2);
 void  fn_800FA554(int nPlayer);
 
-void  fn_800F9824(void);
 void  fn_800F9844(void);
-void  fn_800F9A58(void);
-void  fn_800F9AB0(void);
-void  fn_800F9B34(void);
-s32   fn_800F9BF8(int nPlayer);
 u8    fn_800F9C00(int nPlayer, int a);
 void  fn_800F9C48(void);
 u8    fn_800F9D00(u8 bCheck);
 void  fn_800F9E00(void);
 u8    fn_800F9F04(u8 bCheck);
-u8    fn_800FA118(int nPlayer, int a);
 u8    fn_800FA148(int a);
 u8    fn_800FA1CC(int nPlayer, int a);
 u8    fn_800FA26C(int a);
@@ -147,7 +112,6 @@ void  fn_800FA3AC(void);
 void  fn_800FA410(void);
 s32   fn_800FA48C(int nPlayer, int nHole);
 s32   fn_800FA4B8(int nPlayer);
-void  fn_800FA570(void);
 void  fn_800FA608(int nPlayer);
 void  fn_800FA844(int nPlayer);
 void  fn_800FA994(int nPlayer);
@@ -161,10 +125,7 @@ void  fn_800FCCF0(void);
 void  fn_800FD1C0(int nPlayer);
 void  fn_800FD534(int nPlayer);
 void  fn_800FD6A0(int nPlayer);
-void  fn_800FDA30(int nPlayer, int a);
 void  fn_800FDF38(void);
-u8    fn_800FDF58(int nPlayer);
-u8    fn_800FDF60(void);
 void  fn_800FDFC4(s32 p0, s32 p1, s32 p2);
 void  fn_800FDFFC(s32 p0, s32 p1);
 void  fn_800FE02C(void);
@@ -345,7 +306,7 @@ void fn_800F9E00(void) {
                 if (nPrize) {
                     fn_800E4364(0, 0x6B, nPrize, nProfile);
                 }
-                fn_800D3548(nWinner, nMoney, 0);
+                fn_800D3548(nWinner, nMoney, NULL);
                 gPlayers[nWinner].n330 += nMoney;
             }
         }
@@ -1096,7 +1057,7 @@ void fn_800FBD2C(int nPlayer) {
                     fn_800FAAB8(nPlayer, 2);
                 }
                 pHole = fn_8000C594();
-                fn_80055AA8(p->ball, &((HoleTees*)pHole)->tee[gSession.nTeeSet[nPlayer]].x, nPlayer);
+                fn_80055AA8((Ball*)p->ball, &((HoleTees*)pHole)->tee[gSession.nTeeSet[nPlayer]].x, nPlayer);
                 Vec_Copy(&((HoleTees*)pHole)->tee[gSession.nTeeSet[nPlayer]].x, &p->fBallX);
                 Vec_Copy(&((HoleTees*)pHole)->tee[gSession.nTeeSet[nPlayer]].x, p->vA44);
                 gPlayers[nPlayer].nC3C &= ~1;
@@ -1313,7 +1274,7 @@ void fn_800FBD2C(int nPlayer) {
             if (!Player_IsCPU(nPlayer)) {
                 if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x23, 0)) {
                     if (gPlayers[nPlayer].nBallState != 1) {
-                        Physics_DropBall(pBall, lbl_801D5888[nPlayer]);
+                        Physics_DropBall((Ball*)pBall, lbl_801D5888[nPlayer]);
                         gPlayers[nPlayer].nBallState = 1;
                     }
                 } else {
@@ -1401,7 +1362,8 @@ void fn_800FCCF0(void) {
                           (s8)GOLFERSTATE_GetCurrentState(i) != 10))) {
                         fn_800FAAB8(i, 0x27);
                         pHole = fn_8000C594();
-                        fn_80055AA8(gPlayers[i].ball, &((HoleTees*)pHole)->tee[gSession.nTeeSet[i]].x, i);
+                        fn_80055AA8((Ball*)gPlayers[i].ball, &((HoleTees*)pHole)->tee[gSession.nTeeSet[i]].x,
+                                    i);
                         Vec_Copy(&((HoleTees*)pHole)->tee[gSession.nTeeSet[i]].x, &gPlayers[i].fBallX);
                         Vec_Copy(&((HoleTees*)pHole)->tee[gSession.nTeeSet[i]].x, gPlayers[i].vA44);
                         gPlayers[i].nC3C &= ~1;
@@ -1421,7 +1383,7 @@ void fn_800FCCF0(void) {
                 ((s8)GOLFERSTATE_GetCurrentState(i) == 24 ||
                  (gPlayers[i].nLie != 0 && gPlayers[i].nLie != LIE_HOLED && gPlayers[i].nLie != 16))) {
                 pHole = fn_8000C594();
-                fn_80055AA8(gPlayers[i].ball, &((HoleTees*)pHole)->tee[gSession.nTeeSet[i]].x, i);
+                fn_80055AA8((Ball*)gPlayers[i].ball, &((HoleTees*)pHole)->tee[gSession.nTeeSet[i]].x, i);
                 Vec_Copy(&((HoleTees*)pHole)->tee[gSession.nTeeSet[i]].x, &gPlayers[i].fBallX);
                 Vec_Copy(&((HoleTees*)pHole)->tee[gSession.nTeeSet[i]].x, gPlayers[i].vA44);
                 gPlayers[i].nC3C &= ~1;
@@ -1453,7 +1415,7 @@ u8 fn_800FDF58(int nPlayer) {
 }
 
 void fn_800FDFC4(s32 p0, s32 p1, s32 p2) {
-    fn_800E53F0(21, p0, p1, p2, p0);
+    fn_800E53F0(21, p0, p1, p2);
 }
 
 void fn_800FDFFC(s32 p0, s32 p1) {
@@ -1481,7 +1443,7 @@ void fn_800FE0D8(void) {
 }
 
 void fn_800FE100(s32 p0, s32 p1, s32 p2) {
-    fn_800E53F0(23, p0, p1, p2, p0);
+    fn_800E53F0(23, p0, p1, p2);
 }
 
 void fn_800FE138(s32 p0, s32 p1) {
