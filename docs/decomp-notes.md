@@ -593,6 +593,14 @@ The fixes that come up most often. Each points to its full entry below.
 
 ### Data, constants and symbols
 
+- **[verified] objdiff scores a switch 100% even when its jump table points at the wrong case
+  bodies**: it masks relocations. GameMode11 `fn_80100328` had case labels off by one and read
+  100%; only the linked DOL (`doldiff.py`) showed it. A function with a `switch` in a unit that is
+  not linked yet is not proven: linking is the real check.
+- **[verified] An object's `.data` is 8-aligned**, so a `.data` range in `splits.txt` must start on
+  an 8-byte boundary; a misaligned start adds padding and shifts all later data. `datamap.py` only
+  lists data our object emits; a file that owns tables we still declare `extern` needs its range
+  widened to the file's whole data block (GameMode11: 0x80192D20, not 0x801930AC).
 - **[verified] A dead-stripped function leaves its constants in the pool.** GameMode12's
   `.sdata2` has 0.0 and 0.5 early, where no remaining function uses them first; an unreferenced
   function using 0.0f then 0.5f at that point makes the unit link. Such a placeholder is a fake
