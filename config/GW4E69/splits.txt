@@ -3621,47 +3621,8 @@ GameManager.c:
 GameRound.c:
 	.text       start:0x800E0AF0 end:0x800E3B28
 
-unsorted/sweep_800E3BEC.c:
-	.text       start:0x800E3BEC end:0x800E3C0C
-
-unsorted/sweep_800E3E0C.c:
-	.text       start:0x800E3E0C end:0x800E3E3C
-
-unsorted/sweep_800E3ECC.c:
-	.text       start:0x800E3ECC end:0x800E3EE0
-
-unsorted/sweep_800E415C.c:
-	.text       start:0x800E415C end:0x800E4164
-
-unsorted/sweep_800E41C8.c:
-	.text       start:0x800E41C8 end:0x800E41D4
-
-unsorted/sweep_800E41D4.c:
-	.text       start:0x800E41D4 end:0x800E4238
-
-unsorted/sweep_800E430C.c:
-	.text       start:0x800E430C end:0x800E4364
-
-unsorted/sweep_800E45C0.c:
-	.text       start:0x800E45C0 end:0x800E45CC
-
-unsorted/sweep_800E45CC.c:
-	.text       start:0x800E45CC end:0x800E46B4
-
-unsorted/sweep_800E4BF8.c:
-	.text       start:0x800E4BF8 end:0x800E4C20
-
-unsorted/sweep_800E4C20.c:
-	.text       start:0x800E4C20 end:0x800E4D88
-
-unsorted/sweep_800E4D88.c:
-	.text       start:0x800E4D88 end:0x800E4D94
-
-unsorted/sweep_800E4F88.c:
-	.text       start:0x800E4F88 end:0x800E4FB0
-
-unsorted/sweep_800E4FB0.c:
-	.text       start:0x800E4FB0 end:0x800E4FFC
+GameUI.c:
+	.text       start:0x800E3B28 end:0x800E4FFC
 
 unsorted/sweep_800E4FFC.c:
 	.text       start:0x800E4FFC end:0x800E508C
