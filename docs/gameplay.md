@@ -206,7 +206,7 @@ Human swing: draw and fade (`Swing_FaceVector`, `Swing_CurveAngle`, in C)
 
 The shot's curve comes from the same three stick samples. On a full shot the angle of the
 backswing off vertical, `atan((top.x - centre.x) / (top.y - centre.y))`, is kept
-(`SwingData.fBackAngle`) and turned into a clubface angle: the angle as a fraction of a quarter
+(`SwingData.fControllerSliceAngle`) and turned into a clubface angle: the angle as a fraction of a quarter
 turn goes through a three-piece response curve (knots at 0.4 and 0.6, tuning values), is scaled
 by **the club's shaping range** (`gClubCurve[club] / 26` between two tuning values - some clubs
 curve more than others) and by a quarter turn, and keeps the backswing's sign. The face vector

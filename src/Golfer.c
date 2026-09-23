@@ -250,8 +250,8 @@ void AI_ApplyError(int nPlayer) {
     int nSpin;
     int nAttr;
 
-    p->swing.fSpinX = 0.0f;
-    p->swing.fSpinY = 0.0f;
+    p->swing.fForwardSpin = 0.0f;
+    p->swing.fSideSpin = 0.0f;
     if (p->fDistance < 1.0f) return;
     if (p->bPerfect) return;
 
@@ -349,20 +349,20 @@ void AI_ApplyError(int nPlayer) {
         // Spin in proportion to the error, scaled by the SPIN attribute. (Both clamps store +1.)
         if ((s8)nSpin != 0 && fn_80101DF4()) {
             f32 fScale = Swing_SpinScale(nSpin);
-            p->swing.fSpinX  = fDistErr / fDist1;
-            p->swing.fSpinX *= fScale;
-            p->swing.fSpinY  = fAimErr / fMaxAngle;
-            p->swing.fSpinY *= fScale;
-            p->swing.fSpinY *= -1.0f;
-            if (p->swing.fSpinX > 1.0f) {
-                p->swing.fSpinX = 1.0f;
-            } else if (p->swing.fSpinX < -1.0f) {
-                p->swing.fSpinX = 1.0f;
+            p->swing.fForwardSpin  = fDistErr / fDist1;
+            p->swing.fForwardSpin *= fScale;
+            p->swing.fSideSpin  = fAimErr / fMaxAngle;
+            p->swing.fSideSpin *= fScale;
+            p->swing.fSideSpin *= -1.0f;
+            if (p->swing.fForwardSpin > 1.0f) {
+                p->swing.fForwardSpin = 1.0f;
+            } else if (p->swing.fForwardSpin < -1.0f) {
+                p->swing.fForwardSpin = 1.0f;
             }
-            if (p->swing.fSpinY > 1.0f) {
-                p->swing.fSpinY = 1.0f;
-            } else if (p->swing.fSpinY < -1.0f) {
-                p->swing.fSpinY = 1.0f;
+            if (p->swing.fSideSpin > 1.0f) {
+                p->swing.fSideSpin = 1.0f;
+            } else if (p->swing.fSideSpin < -1.0f) {
+                p->swing.fSideSpin = 1.0f;
             }
         }
     }

@@ -269,3 +269,26 @@ Functions we had named by hand, with their TW06 equivalents (our names kept):
 | `80060BC4` | `SwingState13_Update` | `STATEFUNC_InTheHoleUpdate` | medium | PS2 nbr(r4,2) |
 | `800617A8` | `SwingState16_Update` | `STATEFUNC_TapInUpdate` | medium | PS2 nbr(r7,2) |
 | `800BBB10` | `FE_GolferAttributes` | `SitDev_SetupStateVector` | medium | PS2 nbr2(r0,2) |
+
+Structs
+-------
+
+TW06's types come from the Xbox PDB (`tpiread.py struct <name>`). Plain C structs lay out the
+same on both machines, so a TW06 struct whose fields sit at our offsets (allowing for fields
+EA added later) names ours. Only fields our code confirms are renamed; the rest get a comment.
+
+| Ours | TW06 | Notes |
+|---|---|---|
+| `Ball` (`src/Ball.c`) | `PhysicsBall_t` | TW06 inserted `terrainHeight` at 0x58. |
+| `SwingData` (`include/golfer.h`) | `SW_sSwingData` (0x648; ours 0x634) | TW06 added 4 bytes after 0x14, the second stick's fields after 0x2C (12 bytes) and two calibration fields after 0x37C, 0x18 in all. The swing-boost list at 0x49C has exactly TW06's size. |
+| swing states | `SW_eSwingState` | idle 0, back 1, fidget at the top 2, down 3, follow 4, post 5, cancel 6. Our code sets 2 when the backswing settles, goes back to 1 when the stick moves and to 0 after 0.1 s near centre. |
+| CPU shot shapes | `ShotShape_t` | normal 0, fade 1, draw 2, high 3, low 4, slice 5, hook 6: fade/slice share a sign in our code (+0.02/+0.04), draw/hook the other. |
+
+SwingData checks that decided it:
+- `nNumInBlurQueue` (was `n370`) counts the trail points drawn, capped at 25.
+- The trail colour fields are blue, red, green in TW06. Our code packs them into the vertex colour as bytes G, B, R order of the fields, i.e. R = field 2, G = field 3, B = field 1, so TW06 is right and our earlier local names `r`/`g`/`b` were wrong. The trail is blue with the stick left of centre, yellow right.
+- `fPowerBoostDieTime` (was `fBackDown`): when it runs out, the power boost level is cleared.
+- `bCanSpin` (was `bShotTaken`) gates the spin input.
+- `fForwardSpin` / `fSideSpin`: the CPU sets the first from its distance error and the second from its aim error.
+- `bDrawBoostUI`: the boost/spin display is drawn only when it is set.
+- Not renamed (no evidence either way): `f10`/`f14` (TW06 has three floats there), the four stick rest fields at 0x380 (TW06 has six), and `unk630` (not in TW06).

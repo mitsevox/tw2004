@@ -81,72 +81,87 @@ typedef struct GolferRecord {
     u8   unk94[0x140 - 0x94];
 } GolferRecord;
 
+// Swing states (TW06: SW_eSwingState), the value of SwingData.nState. Stepped by the table
+// gSwingPhaseFns; "fidget" is holding the stick at the top of the backswing.
+enum {
+    SW_IDLE_SWING       = 0,
+    SW_BACK_SWING       = 1,
+    SW_BACK_FIDGET_SWING = 2,   // TW06 spells it SW_BACK_FIGIT_SWING
+    SW_DOWN_SWING       = 3,
+    SW_FOLLOW_SWING     = 4,
+    SW_POST_SWING       = 5,
+    SW_CANCEL_SWING     = 6
+};
+
 // The swing meter's per-player state, embedded in Player at 0x3D4 (offsets below are within
-// this struct; add 0x3D4 for the player offset).
+// this struct; add 0x3D4 for the player offset). Names are TW06's SW_sSwingData, which is the
+// same struct with a few fields added: 4 bytes after 0x14, 12 after 0x2C (the second stick),
+// 8 after 0x37C, 0x18 in all by 0x390. Every renamed field was checked against our code
+// (docs/tw06-names.md, "Structs").
 typedef struct SwingData {
-    s32  nPhase;                // 0x000  (0x3D4) 1 once the swing is under way
-    f32  fMark1;                // 0x004  animation mark times
-    f32  fMark0;                // 0x008
-    f32  fMark2;                // 0x00C
-    f32  f10;                   // 0x010
-    f32  f14;                   // 0x014
-    s32  nTopX;                 // 0x018  (0x3EC) stick at the top of the backswing
-    s32  nTopY;                 // 0x01C  (0x3F0)
-    s32  nImpactX;              // 0x020  (0x3F4) stick at impact
-    s32  nImpactY;              // 0x024  (0x3F8)
-    s32  nImpactX2;             // 0x028  (0x3FC)
-    s32  nImpactY2;             // 0x02C  (0x400)
-    u8   unk30[0x3C - 0x30];
-    f32  fSwingError;           // 0x03C  (0x410) the stick's miss, after forgiveness
-    f32  fLaunchPower;          // 0x040  (0x414) Swing_ComputePower's result
-    f32  fLaunchAX;             // 0x044  (0x418) copy of vLaunchA[0]
-    f32  fPowerAfterError;      // 0x048  (0x41C)
-    f32  fBackAngle;            // 0x04C  (0x420) the backswing's sideways angle, radians (0 on a putt)
-    struct { f32 vHead[4]; f32 vGrip[4]; } trail[25];  // 0x050  (0x424) the club's last 25 positions, newest first
-    s32  n370;                  // 0x370  (0x744) cleared each phase step
-    u8   unk374;
-    u8   b375;                  // 0x375  (0x749) set by fn_8005A788
+    s32  nState;                // 0x000  (0x3D4) SW_* above
+    f32  fTimeSwingTop;         // 0x004  animation times, from the clip's marks 1, 0, 2
+    f32  fTimeSwingStart;       // 0x008
+    f32  fTimeBallHit;          // 0x00C
+    f32  f10;                   // 0x010  TW06 has time_followEnd, fClubOffScale and
+    f32  f14;                   // 0x014    fClubOffTargetScale here: one of the three is new
+    s32  nBackSwingX;           // 0x018  (0x3EC) stick at the top of the backswing
+    s32  nBackSwingY;           // 0x01C  (0x3F0)
+    s32  nFollowThroughX;       // 0x020  (0x3F4) stick at impact
+    s32  nFollowThroughY;       // 0x024  (0x3F8)
+    s32  nMishitX;              // 0x028  (0x3FC)
+    s32  nMishitY;              // 0x02C  (0x400)
+    u8   unk30[0x3C - 0x30];    // 0x030  TW06: ballFlightX, ballFlightY, fForwardSwingMagnitude
+    f32  fMishitAngle;          // 0x03C  (0x410) the stick's miss after forgiveness, added to the aim
+    f32  fShotPower;            // 0x040  (0x414) Swing_ComputePower's result
+    f32  fHookSlice;            // 0x044  (0x418) copy of the face vector's x (vLaunchA[0])
+    f32  fNonPowerShotPower;    // 0x048  (0x41C) boosted power minus the error. TW06: fNonPowerAttribAffectedShotPower
+    f32  fControllerSliceAngle; // 0x04C  (0x420) the backswing's sideways angle, radians (0 on a putt)
+    struct { f32 vClubPos[4]; f32 vHandPos[4]; } prevClub[25];  // 0x050  (0x424) the club's last 25 positions, newest first (the trail)
+    s32  nNumInBlurQueue;       // 0x370  (0x744) trail points in use, up to 25
+    u8   bUIInit;               // 0x374  unused here
+    u8   bDrawBoostUI;          // 0x375  (0x749) set by fn_8005A788
     u8   unk376[2];
-    s32  nCentreX;              // 0x378  (0x74C) stick at the start of the swing
-    s32  nCentreY;              // 0x37C  (0x750)
-    s32  nRestCX;               // 0x380  (0x754) the sticks' rest positions while waiting
-    s32  nRestCY;               // 0x384  (0x758)
-    s32  nRestX;                // 0x388  (0x75C)
+    s32  nCalibrateX;           // 0x378  (0x74C) stick at the start of the swing
+    s32  nCalibrateY;           // 0x37C  (0x750)
+    s32  nRestCX;               // 0x380  (0x754) the sticks' rest positions while waiting. TW06 has six
+    s32  nRestCY;               // 0x384  (0x758)   fields here (iCalibrateXstick2, ...Left..., ...Right...);
+    s32  nRestX;                // 0x388  (0x75C)   which four these are is not settled
     s32  nRestY;                // 0x38C  (0x760)
-    s32  bUsingCStick;          // 0x390  (0x764)
-    s32  nHistX[25];            // 0x394  (0x768) the last 25 stick samples
-    s32  nHistY[25];            // 0x3F8  (0x7CC)
-    s32  nHistIndex;            // 0x45C  (0x830)
-    s32  nRumbleFrames;         // 0x460  (0x834)
-    u8   bRumble;               // 0x464  (0x838)
-    u8   unk465[0x470 - 0x465];
-    f32  fTopTime;              // 0x470  (0x844) animation time when the backswing settled
-    s32  nTopStickY;            // 0x474
-    f32  fHoldTime;             // 0x478
-    f32  f47C;                  // 0x47C
-    f32  fHoldAtTop;            // 0x480  (0x854) seconds held at the top
-    f32  f484;                  // 0x484  (0x858) 0.5 at start
-    f32  f488;                  // 0x488  0.5
-    f32  f48C;                  // 0x48C  0.5
-    f32  f490;                  // 0x490  0
-    s32  nBoostLevel;           // 0x494  (0x868) power boost level pressed, 0..8
-    f32  fBackDown;             // 0x498  set to 1/12 when the backswing starts backing down
-    u8   unk49C[0x604 - 0x49C];
-    f32  f604;                  // 0x604
-    u8   unk608[4];
-    u8   b60C;                  // 0x60C
-    u8   b60D;                  // 0x60D
+    s32  nStickUsed;            // 0x390  (0x764) nonzero: the C stick is swinging
+    s32  nCtrlListX[25];        // 0x394  (0x768) the last 25 stick samples
+    s32  nCtrlListY[25];        // 0x3F8  (0x7CC)
+    s32  nCtrlListIndex;        // 0x45C  (0x830)
+    s32  nVibrateCount;         // 0x460  (0x834) rumble frames left
+    u8   bVibrating;            // 0x464  (0x838)
+    u8   unk465[0x470 - 0x465]; // 0x465  TW06: iVibrateStrength (0x468), fCurrentStickPower (0x46C)
+    f32  fFidgetPauseTime;      // 0x470  (0x844) animation time when the backswing settled at the top
+    s32  nFidgetPauseStickY;    // 0x474  stick y at that moment. TW06: iFigitControllerPauseVal
+    f32  fFidgetTargetTime;     // 0x478
+    f32  fFidgetWaitToIdle;     // 0x47C  time with the stick back near centre; past 0.1 s the swing goes idle
+    f32  fFidgetTimeElapsed;    // 0x480  (0x854) seconds held at the top
+    f32  fBlueColor;            // 0x484  (0x858) the trail's colour: blue when the stick is left of
+    f32  fRedColor;             // 0x488    centre, red + green (yellow) when right
+    f32  fGreenColor;           // 0x48C
+    f32  fAlpha;                // 0x490
+    s32  nPowerBoost;           // 0x494  (0x868) power boost level pressed, 0..8
+    f32  fPowerBoostDieTime;    // 0x498  1/12 s once the stick backs down; at 0 the boost is lost
+    u8   unk49C[0x604 - 0x49C]; // 0x49C  TW06: the swing-boost list (bSwingBoostsOn .. iCurBoostNum), same size
+    f32  fTimeSinceContact;     // 0x604
+    f32  fSpinAmount;           // 0x608  unused here
+    u8   bSpun;                 // 0x60C
+    u8   bSpinning;             // 0x60D
     u8   unk60E[2];
-    s32  nSpinAmount;           // 0x610  (0x9E4) how much spin was asked for, 0..20
-    s32  nSpinStickX;           // 0x614  (0x9E8) 0..255, 128 centre
-    s32  nSpinStickY;           // 0x618  (0x9EC)
-    f32  fSpinX;                // 0x61C  (0x9F0)
-    f32  fSpinY;                // 0x620  (0x9F4)
-    u8   bShotTaken;            // 0x624  (0x9F8) a human struck the ball (not in a replay)
+    s32  nSpinBoost;            // 0x610  (0x9E4) how much spin was asked for, 0..20
+    s32  nSpinCtrlX;            // 0x614  (0x9E8) 0..255, 128 centre
+    s32  nSpinCtrlY;            // 0x618  (0x9EC)
+    f32  fForwardSpin;          // 0x61C  (0x9F0) from the distance error on a CPU shot
+    f32  fSideSpin;             // 0x620  (0x9F4) from the aim error
+    u8   bCanSpin;              // 0x624  (0x9F8) a human struck the ball (not in a replay): spin input is live
     u8   unk625[3];
-    f32  f628;                  // 0x628
-    f32  f62C;                  // 0x62C
-    u8   unk630;                // 0x630  (0xA04) cleared by Player_SetGolfer
+    f32  fTargetTurnAngle;      // 0x628
+    f32  fCurrentTurnAngle;     // 0x62C
+    u8   unk630;                // 0x630  (0xA04) cleared by Player_SetGolfer; not in TW06
     u8   unk631[3];
 } SwingData;
 
