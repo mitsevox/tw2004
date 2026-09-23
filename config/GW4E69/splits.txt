@@ -3817,6 +3817,8 @@ runtime/sscanf.c:
 
 src/MSL_C/PPCEABI/bare/H/string.c:
 	.text       start:0x8015A450 end:0x8015A8D0
+	.rodata     start:0x801851B0 end:0x80185540
+	.sdata      start:0x80281B10 end:0x80281B18
 
 src/MSL_C/strtold.c:
 	.text       start:0x8015A8D0 end:0x8015B8DC

@@ -452,7 +452,7 @@ config.libs = [
             Object(Matching, "src/MSL_C/PPCEABI/bare/H/direct_io.c"),
             Object(Matching, "src/MSL_C/PPCEABI/bare/H/file_io.c"),
             Object(NonMatching, "src/MSL_C/PPCEABI/bare/H/mem_funcs.c"),
-            Object(NonMatching, "src/MSL_C/PPCEABI/bare/H/string.c"),
+            Object(Matching, "src/MSL_C/PPCEABI/bare/H/string.c"),
             Object(Matching, "src/MSL_C/PPCEABI/bare/H/s_atan.c"),
         ],
     },
