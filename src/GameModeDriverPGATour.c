@@ -15,7 +15,7 @@ typedef struct Tournament {
     s32  n10;                   // 0x10
     char szChampName[0x10];     // 0x14  the champion before the season is played. TW06: champName
     s32  nChampScore;           // 0x24  TW06: champScore
-    s16  aTimes[10][2];         // 0x28  per round, in seconds
+    s16  aPrize[10][2];         // 0x28  per bracket (fn_800EF0E0): first prize and purse, in thousands
     u16  aStartDate[10];        // 0x50  per season (fn_800EFB88). TW06: startDate
 } Tournament;
 
@@ -55,7 +55,9 @@ Pga80205F30* fn_800EE8B8(void);
 typedef struct SeasonEvent {
     char szChampName[0x10];     // 0x00  the tournament's champion. TW06: champName
     s32  nChampScore;           // 0x10  TW06: champScore
-    u8   unk14[0x1C - 0x14];
+    u16  nEventPar;             // 0x14  TW06: eventPar
+    u16  nUserBracket;          // 0x16  the player's bracket when it was played. TW06: userBracket
+    u8   unk18[0x1C - 0x18];
     s32  nUserRank;             // 0x1C  the player's finishing place. TW06: userRank
     s32  nUserRankType;         // 0x20  0 did not play, 1 missed the cut, 2 placed. TW06: eUserRankType
 } SeasonEvent;
@@ -101,6 +103,12 @@ extern s32 lbl_80281670;
 extern s32 lbl_80282338;
 s32  fn_801190D8(s32 a, s32 n);
 s32  fn_800EFBD0(s32 i);
+void fn_800D27CC(u16* pDate, s32 nDays);
+void fn_800907AC(s32 nMoney, char* pDst);
+void fn_80117C50(s32 a, s32 b);
+void fn_800EF130(s32 a, u32 b);
+void fn_800EEB94(s32 a);
+void fn_80117860(TourSeason* pTour);
 u8   fn_800EF83C(u16 nDate, s32* pId, s32* pRound);
 s32  fn_8011A7C8(s32 nPlayer, s32 nHole);
 s32  fn_80119588(s32 nPlayer, s32 a);
@@ -225,8 +233,8 @@ void fn_800EF094(s32 a, s32 n) {
     lbl_80205F30.n8 = n;
 }
 
-// A progress bar out of 10: tournaments won x 10 / 31, at most 9.
-s32 fn_800EF0E0(void) {
+// The player's bracket, 0..9: tournaments won x 10 / 31 (profile 0's awards; nPlayer is not read).
+s32 fn_800EF0E0(PlayerNumber_t nPlayer) {
     s32 n = fn_800F02A8() * 10 / 31;
     return n > 9 ? 9 : n;
 }
@@ -279,9 +287,9 @@ s32 fn_800EF908(s32* pRound) {
 }
 
 // TW06: GameModeDriverPGATour::GetNextEvent. The tournament after the current one.
-void fn_800EF940(void) {
+s32 fn_800EF940(void) {
     PlayerNumber_t nPlayer = PLR_1_e;
-    fn_800EFBD0(gpSaveData[nPlayer].tour.nEvent + 1);
+    return fn_800EFBD0(gpSaveData[nPlayer].tour.nEvent + 1);
 }
 
 // TW06: GameModeDriverPGATour::GetFinalEventOfSeason. The last tournament there is.
@@ -293,6 +301,19 @@ s32 fn_800EF984(void) {
         i = fn_800EFBD0(i + 1);
     }
     return nLast;
+}
+
+// Skips ahead to tournament nEvent: a tournament under way is abandoned, the ones before are
+// played out.
+void fn_800EF9D0(s32 nEvent) {
+    PlayerNumber_t nPlayer = PLR_1_e;
+    if (nEvent != gpSaveData[nPlayer].tour.nEvent && gpSaveData[nPlayer].tour.nRound > 0) {
+        fn_80117C50(0, 0);
+    }
+    while (gpSaveData[nPlayer].tour.nEvent < nEvent) {
+        fn_800EF130(0, 0);
+        fn_800EEB94(0);
+    }
 }
 
 // Tournament i (0..30), or none.
@@ -311,6 +332,20 @@ s32 fn_800EFA9C(s32 i) {
     return 1;
 }
 
+// The next season: 0 after the tenth, else 1 and the season starts at its first tournament.
+s32 fn_800EFAD0(void) {
+    PlayerNumber_t nPlayer = PLR_1_e;
+    gpSaveData[nPlayer].tour.nSeason++;
+    if (gpSaveData[nPlayer].tour.nSeason >= 10) {
+        gpSaveData[nPlayer].tour.nSeason = 10;
+        gpSaveData[nPlayer].tour.nEvent = 0;
+        return 0;
+    }
+    gpSaveData[nPlayer].tour.nEvent = fn_800EFBD0(0);
+    fn_80117860(&gpSaveData[nPlayer].tour);
+    return 1;
+}
+
 // TW06: GameModeDriverPGATour::GetCurrentSeason. Profile 0's season, 0 = 2004.
 s32 fn_800EFB88(void) {
     PlayerNumber_t nPlayer = PLR_1_e;
@@ -319,6 +354,28 @@ s32 fn_800EFB88(void) {
 
 s32 fn_800EFBAC(void) {
     return fn_800EFB88() + 2004;
+}
+
+// TW06: GameModeDriverPGATour::GetEventOnOrAfter. The first tournament from i on that is held this
+// season, or -1.
+s32 fn_800EFBD0(s32 i) {
+    PlayerNumber_t nPlayer = PLR_1_e;
+    s32 nEvent;
+    u8 bFound = 0;
+    while (!bFound) {
+        Tournament* p = fn_800EFA70(i);
+        if (p != NULL) {
+            if (p->aStartDate[gpSaveData[nPlayer].tour.nSeason] != 0) {
+                nEvent = i;
+                bFound = 1;
+            }
+        } else {
+            nEvent = -1;
+            bFound = 1;
+        }
+        i++;
+    }
+    return nEvent;
 }
 
 // The tournament being played on a date.
@@ -331,15 +388,17 @@ Tournament* fn_800EFC80(u16 nDate) {
     return 0;
 }
 
-// Two times of tournament i's round k, in milliseconds.
+// Tournament i's first prize in bracket k. TW06: GameModeDriverPGATour::ComputeFirstPrizeForBracket
+// (by shape).
 s32 fn_800EFCC0(s32 i, s32 k) {
     Tournament* p = fn_800EFA70(i);
-    return p->aTimes[k][0] * 1000;
+    return p->aPrize[k][0] * 1000;
 }
 
+// Tournament i's purse in bracket k. TW06: GameModeDriverPGATour::ComputePurseForBracket (by shape).
 s32 fn_800EFCFC(s32 i, s32 k) {
     Tournament* p = fn_800EFA70(i);
-    return p->aTimes[k][1] * 1000;
+    return p->aPrize[k][1] * 1000;
 }
 
 u16 fn_800EFD38(s32 i) {
@@ -348,6 +407,18 @@ u16 fn_800EFD38(s32 i) {
         return 0xFFFF;
     }
     return p->aStartDate[fn_800EFB88()];
+}
+
+// TW06: GameModeDriverPGATour::GetEndDate. The last day of tournament i this season.
+u16 fn_800EFD84(s32 i) {
+    u16 nDate;
+    Tournament* p = fn_800EFA70(i);
+    if (p == NULL) {
+        return 0xFFFF;
+    }
+    nDate = p->aStartDate[fn_800EFB88()];
+    fn_800D27CC(&nDate, fn_800EFA9C(i) - 1);
+    return nDate;
 }
 
 // TW06: GameModeDriverPGATour::GetName.
@@ -375,6 +446,20 @@ s32 fn_800EFE78(s32 i) {
     return gPgaData.aTournament[i].nChampScore;
 }
 
+// TW06: GameModeDriverPGATour::GetWinnerEarningsString. Tournament i's first prize as text: in the
+// player's bracket when it was played, else in the current one.
+void fn_800EFF7C(s32 i, char* pDst) {
+    PlayerNumber_t nPlayer = PLR_1_e;
+    SeasonEvent* p = &gpSaveData[nPlayer].tour.aEvent[i];
+    s32 nBracket;
+    if (i < fn_800EFE18()) {
+        nBracket = p->nUserBracket;
+    } else {
+        nBracket = fn_800EF0E0(nPlayer);
+    }
+    fn_800907AC(fn_800EFCC0(i, nBracket), pDst);
+}
+
 // TW06: GameModeDriverPGATour::GetCurrentEventLeader. The leader's name, or "Tied (%d players)".
 void fn_800F0010(char* pDst) {
     s32 n = fn_80118684(0);
@@ -390,6 +475,19 @@ void fn_800F0010(char* pDst) {
 void fn_800F009C(void) {
     s32 nLeader = fn_801197CC(0, 0);
     fn_8011937C(0, nLeader, fn_8011908C(0, nLeader) == 0);
+}
+
+// TW06: GameModeDriverPGATour::GetPurseString. The same for the purse.
+void fn_800F00F8(s32 i, char* pDst) {
+    PlayerNumber_t nPlayer = PLR_1_e;
+    SeasonEvent* p = &gpSaveData[nPlayer].tour.aEvent[i];
+    s32 nBracket;
+    if (i < fn_800EFE18()) {
+        nBracket = p->nUserBracket;
+    } else {
+        nBracket = fn_800EF0E0(nPlayer);
+    }
+    fn_800907AC(fn_800EFCFC(i, nBracket), pDst);
 }
 
 void fn_800F018C(void) {
