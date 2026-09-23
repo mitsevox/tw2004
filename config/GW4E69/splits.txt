@@ -1871,6 +1871,8 @@ MetroTRK/__exception.s:
 MetroTRK/dolphin_trk.c:
 	.init       start:0x80005468 end:0x80005494
 	.text       start:0x80164140 end:0x801643C8
+	.data       start:0x8019CE20 end:0x8019CE60
+	.bss        start:0x8027F878 end:0x8027F880
 
 MetroTRK/main_TRK.c:
 	.text       start:0x801643C8 end:0x80164420
