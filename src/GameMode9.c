@@ -19,7 +19,7 @@ void fn_800EDA08(void);
 void fn_800EDA34(int nPlayer);
 void fn_800EDA74(void);
 
-// Mode 9 starts: one player, one mulligan, no gimmes, no GameBreakers.
+// Mode 9 starts: one player, any number of mulligans, no gimmes, no GameBreakers.
 void fn_800ED738(void) {
     gpGame->pfnInit = fn_800ED738;
     gpGame->pfnSetupNextGolfer = fn_800ED8E0;

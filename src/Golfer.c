@@ -1158,7 +1158,7 @@ void Shot_DefaultSpin(int nPlayer, f32* pOut) {
 // x = +-0.02 for a slight curve, +-0.04 for a big one, normalised.
 void AI_FaceVector(int nPlayer, f32* pOut) {
     Player* p = &gPlayers[nPlayer];
-    int     nShape = Scenario_RequiredShape(nPlayer);
+    int     nShape = fn_8010069C(nPlayer);
     if (nShape != 7) {
         p->nShotShape = nShape;
     }

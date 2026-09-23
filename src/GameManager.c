@@ -521,9 +521,9 @@ void GM_PlayerTookShot(int nPlayer) {
 }
 
 // Taking a mulligan. Not allowed when mulligans are off, the hole was conceded, or fn_800E53B8
-// says no; in mulligan mode 2 each player gets one (0xC28). The shot is undone: effects stopped,
-// the mode told, the golfer back in the Swing state, and the views of other players sharing this
-// screen (and still playing the hole) updated.
+// says no; in mulligan mode 2 each player gets one (bMulliganUsed), mode 1 allows any number. The
+// shot is undone: effects stopped, the mode told, the golfer back in the Swing state, and the views
+// of other players sharing this screen (and still playing the hole) updated.
 u8 GM_PlayerTakeMulligan(int nPlayer) {
     int     i;
     Player* q;

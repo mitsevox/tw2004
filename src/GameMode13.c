@@ -42,7 +42,7 @@ void  fn_800F7FF4(int nPlayer, int nId);
 s32   fn_800F8068(int nPlayer, int i);
 void  fn_800F80A8(void);
 
-// Mode 13 starts: one player at a time, no wind, no gimmes, one mulligan.
+// Mode 13 starts: one player at a time, no wind, no gimmes, any number of mulligans.
 void fn_800F6A60(void) {
     gpGame->pfnInit = fn_800F6A60;
     gpGame->pfnShutdown = fn_800F6CC4;

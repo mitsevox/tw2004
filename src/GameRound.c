@@ -458,7 +458,7 @@ u8 fn_800E1734(void) {
     return 0;
 }
 
-// The mode's mulligan rule: 0 none, 2 one per player per round.
+// The mode's mulligan rule: 0 none, 1 any number, 2 one per player per round.
 int fn_800E177C(void) {
     return gpGame->nMulligans;
 }

@@ -499,7 +499,7 @@ static inline void AddIfScore(s32* aList, int* pnCount, int nPlayer, int nHole, 
 // GameMode11.c: the lessons
 extern s32 lbl_802823FC;                // the current lesson, 1..12
 u8   fn_80100294(void);                 // in a lesson (mode 11)
-int  Scenario_RequiredShape(int nPlayer); // the lesson's shape in mode 11, else 7 (none); nPlayer unused
+int  fn_8010069C(int nPlayer); // the lesson's shape in mode 11, else 7 (none); nPlayer unused
 u8   fn_80100AF8(void);                 // lesson 5 of mode 11
 u8   fn_80100C00(void);
 u8   fn_80101738(void);

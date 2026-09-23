@@ -603,8 +603,9 @@ void fn_800D8D38(int nPlayer) {
     gPlayers[nPlayer].b312 = 0;
 }
 
-// At the end of a hole: carry the flags over, and set bit 0 of n308 for a hole in one on a par 4 or 5
-// that finished on the green or in the hole.
+// After every shot (GM_PlayerTookShot calls it last), when the mode allows no mulligans: carry the
+// flags over, and set bit 0 of n308 when the hole's first stroke on a par 4 or 5 finished on the
+// green or in the hole.
 void fn_800D9350(int nPlayer) {
     int nLie;
     int nStrokes;
