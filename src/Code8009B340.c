@@ -1,11 +1,10 @@
 // Code8009B340.c (our name; what it draws is not known yet): a list of nodes (FadeNode,
-// lbl_80281FA0) that are drawn through fn_8009B260 and fade out, each freed once it has faded. Its
+// lbl_80281FA0) drawn as queued glows (fn_8009B260) that fade out, each freed once it has faded. Its
 // data is its own: the .sbss 0x80281FA0-0x80281FA8 and the .sdata2 0x80283EC0-0x80283EC8.
 // fn_8009B320 before it (it frees a node) is probably this file's too.
 
-#include "engine.h"
+#include "glows.h"
 
-void fn_8009B260(f32* pPos, u32 uColorA, u32 uColorB, int a, int b, int c, f32 f1, f32 f2, f32 f3);
 void fn_8009B320(FadeNode* pNode);
 
 FadeNode* lbl_80281FA0;

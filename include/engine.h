@@ -443,7 +443,7 @@ u8   fn_80014300(u32 uMask);            // any pad pressed these buttons
 
 // ---- events, sound, effects ------------------------------------------------------------------
 
-// A node of Code8009B340.c's list (lbl_80281FA0): something drawn by fn_8009B260 that fades out
+// A node of Code8009B340.c's list (lbl_80281FA0): glows queued by fn_8009B260 that fade out
 // (fAlpha falls by fAlphaSpeed a second) and is freed once it has faded.
 typedef struct FadeAnchor {
     u8   unk0[0x30];

@@ -58,7 +58,6 @@ void fn_800988A0(s32 p0, s32 p1, s32 p2, s32 p3);
 void fn_800988B8(f32 farg0, f32 farg1, f32 farg2);
 void fn_800988CC(s32 p0);
 extern u8 lbl_801D9A40[];
-extern s32 lbl_80281F80;
 void fn_80036054();
 void fn_800360A0();
 void fn_800988D8(void);
@@ -99,7 +98,7 @@ void fn_800988CC(s32 p0) {
 
 void fn_800988D8(void) {
     fn_80036054(lbl_801D9A40, 11, 0);
-    lbl_80281F80 = 0;
+    lbl_80281F80 = NULL;
 }
 
 void fn_80098910(void) {
