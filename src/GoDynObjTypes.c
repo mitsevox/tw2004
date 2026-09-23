@@ -1,3 +1,7 @@
+// GoDynObjTypes.c (our name): two more types of the course's dynamic objects (dynobj.h), types 6
+// (fn_8004AD54) and 9 (fn_8004AF2C, which has no model to draw). Its constant block is
+// 0x80283280-0x80283288. Not decompiled yet beyond the functions below.
+
 #include "game_types.h"
 
 s32 fn_80048894(u8*);
