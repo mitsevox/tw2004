@@ -152,7 +152,6 @@ void*    fn_8001614C(void);
 void     fn_80013CCC(void* pCamera);
 void     fn_80013EEC(void* pCamera);
 void     fn_80016B9C(void);
-void     fn_80012EF8(void);
 f32*     fn_8001731C(View* pView);   // the view's camera position
 f32*     fn_80017314(View* pView);   // where it looks
 void     Vec3Copy(f32* pSrc, f32* pDst);
@@ -197,7 +196,6 @@ void     fn_800C6E14(void);
 void     fn_800C6E2C(void);
 void     GameEffects_SetSuperSlowMo(u8 bOn, int nPlayer, f32 fRate);
 u8       fn_80063C7C(void* pView);
-u8       fn_80063C90(void* pView);             // the camera is still moving
 u8       Ter_CheckForGroundCollision(void* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal, void* pA,
                                      void* pB);
 
