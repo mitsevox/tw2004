@@ -304,6 +304,10 @@ int  fn_8000633C(int hFile);            // file close
 int  fn_80006444(int hFile, void* pDst, u32 uLen, u32 uOffset, void (*pfnDone)(int nBytes, int nError));
 u32  fn_800065B0(int hFile);            // file size
 
+// ---- fonts -----------------------------------------------------------------------------------
+
+f32  fn_80012C30(char* sz);             // UFont.c: a string's width
+
 // ---- controller input ------------------------------------------------------------------------
 
 // One controller as the pad library reads it (12 bytes a pad, filled by PADRead).
