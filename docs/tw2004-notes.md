@@ -485,3 +485,15 @@ the repo): `sweep.py`, `sweep_m2c.py`, `smallsurvey.py`.
   identified, its sweep units are merged into it.
 - Caveat: a wrapper that passes its parameters straight on compiles the same whether or not the
   C names them, so sweep wrappers may show fewer parameters than the original had.
+- **Repair pass (`retry.py`, 2026-09-23).** `python retry.py score` compiles each skipped m2c
+  function on its own and counts differing instructions against `main.elf` (linker-filled fields
+  masked; checked: known-exact functions score 0). `python retry.py try 12` then tries single
+  edits greedily and writes exact results to `retry_hits.json`, which `sweep.py gen` uses in
+  place of m2c's output. Edits: add an argument to a call, first or last (m2c drops arguments
+  that are already in `r3`/`r4` when the call happens, e.g. `free()` for `free(p)` - the most
+  common miss); remove parameter lists from prototypes; `void*` -> `u8*` (m2c does byte
+  arithmetic on `void*`, which CodeWarrior rejects); switch local/parameter/return types between
+  `u8`/`s8`/`u16`/`s16`/`s32`/`u32`. 80 functions so far. The checker is a pre-filter only: the
+  build's own comparison and `main.dol: OK` still decide.
+- The EA/SDK split in the README counts `0x8016C718`-`0x80175F54` (EA's GCC-built file library)
+  as EA, not SDK.
