@@ -3266,6 +3266,30 @@ void fn_800814F0(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
+// Option a0[2]: the menus' choices 1..6 are the values 5, 0, 1, 2, 3, 4.
+void fn_80081530(MsgArg* pArgs, MsgArg* pResult) {
+    switch (pArgs[0].i) {
+    case 1:
+        gSession.options.a0[2] = 5;
+        return;
+    case 2:
+        gSession.options.a0[2] = 0;
+        return;
+    case 3:
+        gSession.options.a0[2] = 1;
+        return;
+    case 4:
+        gSession.options.a0[2] = 2;
+        return;
+    case 5:
+        gSession.options.a0[2] = 3;
+        return;
+    case 6:
+        gSession.options.a0[2] = 4;
+        return;
+    }
+}
+
 // Option n14 as the menus' choice (1..3).
 void fn_800815E0(MsgArg* pArgs, MsgArg* pResult) {
     switch (gSession.options.n14) {
@@ -3432,6 +3456,30 @@ void fn_80081934(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
+// Option a0[2] as the menus' choice (1..6).
+void fn_80081970(MsgArg* pArgs, MsgArg* pResult) {
+    switch ((s8)gSession.options.a0[2]) {
+    case 5:
+        pResult->i = 1;
+        return;
+    case 0:
+        pResult->i = 2;
+        return;
+    case 1:
+        pResult->i = 3;
+        return;
+    case 2:
+        pResult->i = 4;
+        return;
+    case 3:
+        pResult->i = 5;
+        return;
+    case 4:
+        pResult->i = 6;
+        return;
+    }
+}
+
 // Pick the saved custom round the holes come from.
 void fn_800819FC(MsgArg* pArgs, MsgArg* pResult) {
     gpGame->b136 = pArgs[0].i;
@@ -3443,9 +3491,40 @@ void fn_800819FC(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
+// Whether backup row pArgs[0] holds a profile no player slot is using.
+void fn_80081A54(MsgArg* pArgs, MsgArg* pResult) {
+    u8 bUsed = 0;
+    int i;
+
+    for (i = 0; i < 4; i++) {
+        if (lbl_801D7148.aBackup[i] == pArgs[0].i) {
+            bUsed = 1;
+        }
+    }
+    if (bUsed) {
+        pResult->i = 0;
+        return;
+    }
+    pResult->i = lbl_801D7148.p658[pArgs[0].i].bActive;
+}
+
 // The name in slot pArgs[0]'s profile backup.
 void fn_80081B04(MsgArg* pArgs, MsgArg* pResult) {
     strcpy(((MsgString*)pArgs[1].p)->pStr, lbl_801D7148.p658[pArgs[0].i].szName);
+}
+
+// Load slot pArgs[1] from backup row pArgs[0] (the rows are swapped first when they differ), and
+// mark the slot loaded.
+void fn_80081B50(MsgArg* pArgs, MsgArg* pResult) {
+    s32 nRow = pArgs[0].i;
+    s32 nSlot = pArgs[1].i;
+
+    lbl_801D7148.aLoaded[nSlot] = 1;
+    if (nSlot != nRow) {
+        fn_800779BC(nSlot, nRow);
+    }
+    Mem_cpy(&gpSaveData[nSlot], &lbl_801D7148.p658[nSlot], sizeof(SaveProfile));
+    lbl_801D7148.aBackup[nSlot] = nSlot;
 }
 
 void fn_80081BD4(MsgArg* pArgs, MsgArg* pResult) {
@@ -3454,6 +3533,22 @@ void fn_80081BD4(MsgArg* pArgs, MsgArg* pResult) {
 
 void fn_80081BF4(MsgArg* pArgs, MsgArg* pResult) {
     fn_80077808(pArgs[0].i);
+}
+
+// Option n1C: menu choices 1-3 are the values 0-2, applied at once.
+void fn_80081C18(MsgArg* pArgs, MsgArg* pResult) {
+    switch (pArgs[0].i) {
+    case 1:
+        gSession.options.n1C = 0;
+        break;
+    case 2:
+        gSession.options.n1C = 1;
+        break;
+    case 3:
+        gSession.options.n1C = 2;
+        break;
+    }
+    fn_80055CD0(gSession.options.n1C);
 }
 
 // Option n1C as the menus' choice (1..3).
