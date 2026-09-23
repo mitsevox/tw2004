@@ -1,95 +1,85 @@
 // FE_Manager.c (EA's name, from its asserts; also in EA's 2002 source tree): the front end's
-// manager, which runs the menu screens. Partly decompiled: the movie paths are clean, the sweep
-// code around them is the matched small functions.
+// manager, which runs the menu screens: the movies played from the menus (the intro, the credits,
+// the golfers' bios), the profile being worked on, and the created golfer. Partly decompiled.
 
-#include "game_types.h"
-#include "platform.h"
+#include "engine.h"
+#include "game.h"
 #include "frontend/fe.h"
 
+// The movie player (LLVideo.c): plays a movie file until it ends or pfnSkip returns nonzero.
+void fn_80075FB8(char* pPath, int (*pfnSkip)(void), int a, int b);
+void fn_80037FB4(u8 a, f32* pColor);    // a full-screen colour (GoPostFx.c)
+void fn_80013400(void);                 // read the controllers
+void fn_8008B704(void);
+void fn_8008B754(int a);
+void fn_8008B7D0(int a);
+void fn_8008D8CC(void);
+void fn_8008D8F4(void);
+void fn_8008DAEC(void);
+void fn_8008DBE8(void);
+void fn_80092198(void);
+void fn_8009220C(void);
+void fn_800A75B4(void);
+void fn_800A7644(int a);
+void fn_80010284(void);
+void fn_80079EA8(void);
+void Golfer_LoadCreatedFromSave(void);
+
+void fn_80076F80(UStreamObject* pObject);
+int  fn_80076FDC(void);
 void fn_8007706C(char* pName, char* pDir, char* pPath);
 void fn_800770D4(char* pName, char* pPath);
-
-// ---- sweep code (not yet cleaned up) ----
-
-extern u8 lbl_80189560[];
-extern s32 lbl_80281EC8;
-void Mem_cpy();
-s32 fn_80009B34();
-void fn_80009E70();
-void fn_80076F80(u8* p0);
-s32 fn_80013400();
-u32 fn_800136DC(s32);
-s32 fn_80076FDC(void);
-extern u8 lbl_801D7148[];
-s32 fn_80077148(void);
-void fn_8008B704();
-void fn_8008B754();
-void fn_8008B7D0();
-void fn_8008DAEC();
-void fn_8008DBE8();
-void fn_80092198();
+FEMovie* fn_800770FC(void);
+u8   fn_80077148(void);
+void FE_GetBIOMovieName(void);
 void fn_800772E0(void);
-void fn_8008D8F4();
-void fn_8009220C();
 void fn_8007731C(void);
 void fn_80077340(void);
 void fn_80077344(void);
 void fn_80077348(void);
-extern u8 gReplayData[];
-void Session_SetGolfer();
-void fn_80010284();
-void fn_8007744C();
-void fn_80079DAC();
-void fn_80079EA8();
-void fn_8008D8CC();
-void fn_800E0B38();
-void fn_800E14E0();
-void fn_8007739C(s32 p0);
+void fn_8007734C(void);
+void fn_8007739C(Replay* pReplay);
 void fn_800773F8(void);
-void Golfer_LoadCreatedFromSave();
-void fn_80079D30();
 void fn_80077428(void);
-s32 fn_80077B18(u32 arg0);
-void fn_80077C1C();
+void fn_8007744C(void);
+void fn_80077780(void);
+void fn_80077968(int nSlot);
+GolferRecord* fn_80077A80(int nGolfer);
+u8   fn_80077B18(int n);
 void fn_80077B78(void);
-s32 fn_80077BDC(s32 arg0);
-s32 Rand_Next(s32);
-s32 fn_8008E6D4(s32);
-s32 FE_CrAP_TurnOnPart(s32, s32, s32);
-s32 fn_80078E34(s32);
-void fn_8007975C(s32 arg0, s32 arg1, s32 arg2);
-s32 fn_800797E0(s32, s32, s32, s32);
-void fn_80079664(s32 arg0);
-s32 fn_80077ACC();
-s32 fn_80103B74(s32);
-extern void* lbl_80281ED4;
+int  fn_80077BDC(int n);
+void fn_80077C1C(int a, int b);
+void fn_80078E34(SaveProfile* pProfile);
+void fn_80079664(SaveProfile* pProfile);
+void fn_8007975C(SaveProfile* pProfile, int a, int b);
+void fn_800797E0(SaveProfile* pProfile, int a, int nChoice, int b);
 void fn_80079974(void);
+void fn_8008E6D4(int a);
+void fn_80103B74(int a);
+int  fn_801049C8(int a);                // how many choices part a has (FE_CrAPDB.c)
+void fn_80079D30(void);
+void fn_80079DAC(void);
+int  fn_80078604(int a, int b, int c);
+void fn_80078620(int n, int* pA, int* pB, int* pC);
 
-void fn_80076F80(u8* p0) {
-    s32 t0;
-    t0 = fn_80009B34(*(s32*)(p0 + 0x24), 2, 32, lbl_80189560, 285);
-    lbl_80281EC8 = t0;
-    Mem_cpy(t0, *(s32*)p0, *(s32*)(p0 + 0x24));
-    fn_80009E70(p0);
+// The 'BIO ' stream object's handler: keep a copy of its data.
+void fn_80076F80(UStreamObject* pObject) {
+    lbl_80281EC8 = fn_80009B34(pObject->uSize, 2, 32, "FE_Manager.c", 285);
+    Mem_cpy(lbl_80281EC8, pObject->pData, pObject->uSize);
+    fn_80009E70(pObject);
 }
 
-s32 fn_80076FDC(void) {
-    s32 var_r31;
-
+// A movie's skip test: any button on any controller.
+int fn_80076FDC(void) {
+    int i;
     fn_80013400();
-    var_r31 = 0;
-loop_1:
-    if (fn_800136DC(var_r31) != 0U) {
-        return 1;
+    for (i = 0; i < 4; i++) {
+        if (fn_800136DC(i)) {
+            return 1;
+        }
     }
-    var_r31 += 1;
-    if (var_r31 >= 4) {
-        return 0;
-    }
-    goto loop_1;
+    return 0;
 }
-
-// ---- end of sweep code ----
 
 // A movie's path on the disc: "data/movies/<name>.NGC".
 void FE_MakeMoviePath(char* pName, char* pPath) {
@@ -109,12 +99,65 @@ void fn_800770D4(char* pName, char* pPath) {
     fn_8007706C(pName, "bios", pPath);
 }
 
-// ---- sweep code (not yet cleaned up) ----
+// ---- the movie queue: the menus queue a movie, the screen fades to black and it plays ----------
 
-s32 fn_80077148(void) {
-    return (((u32)__cntlzw((*(s32*)(lbl_801D7148 + 0x20) - *(s32*)(lbl_801D7148 + 0x24))) >> 5) & 0xFF);
+// Add a movie to the queue; the caller fills it in.
+FEMovie* fn_800770FC(void) {
+    FEMovie* pMovie = &lbl_801D7148.aMovies[lbl_801D7148.nMovieFree++];
+    if (lbl_801D7148.nMovieFree % FE_NUM_MOVIES == 0) {
+        lbl_801D7148.nMovieFree = 0;
+    }
+    return pMovie;
 }
 
+// The queue is empty.
+u8 fn_80077148(void) {
+    return lbl_801D7148.nMovieFree == lbl_801D7148.nMovieNext;
+}
+
+// Once a frame: while a movie is queued, fade the screen to black; once it is black, play the
+// movie and take it off the queue.
+void FE_GetBIOMovieName(void) {
+    char szPath[256];
+    char szName[32];
+    f32 vColor[4];
+    FEMovie* pMovie;
+    if (!fn_80077148()) {
+        vColor[0] = 0.0f;
+        vColor[1] = 0.0f;
+        vColor[2] = 0.0f;
+        vColor[3] = lbl_801D87C0.fFade;
+        fn_80037FB4(1, vColor);
+        lbl_801D87C0.fFade += 0.05f;
+        pMovie = &lbl_801D7148.aMovies[lbl_801D7148.nMovieNext];
+        if (lbl_801D87C0.fFade >= 1.0f) {
+            fn_800A75B4();
+            fn_800772E0();
+            switch (pMovie->nKind) {
+            case FE_MOVIE_CREDITS:
+                FE_MakeMoviePath("credits", szPath);
+                fn_80075FB8(szPath, fn_80076FDC, 0, 0);
+                break;
+            case FE_MOVIE_BIO:
+                sprintf(szName, "bio%02d", pMovie->nBio + 1);
+                fn_800770D4(szName, szPath);
+                fn_80075FB8(szPath, fn_80076FDC, 0, 0);
+                break;
+            case 4:                     // a kind 4 is taken off the queue unplayed
+                break;
+            }
+            fn_8007731C();
+            fn_800A7644(0);
+            lbl_801D87C0.fFade = 0.0f;
+            lbl_801D7148.nMovieNext++;
+            if (lbl_801D7148.nMovieNext % FE_NUM_MOVIES == 0) {
+                lbl_801D7148.nMovieNext = 0;
+            }
+        }
+    }
+}
+
+// Before a movie.
 void fn_800772E0(void) {
     fn_8008B754(1);
     fn_8008B704();
@@ -124,6 +167,7 @@ void fn_800772E0(void) {
     fn_80092198();
 }
 
+// After a movie.
 void fn_8007731C(void) {
     fn_8009220C();
     fn_8008D8F4();
@@ -138,11 +182,21 @@ void fn_80077344(void) {
 void fn_80077348(void) {
 }
 
-void fn_8007739C(s32 p0) {
-    Mem_cpy(gReplayData, p0, 3880);
+// The intro movie, unless the session says to skip it.
+void fn_8007734C(void) {
+    char szPath[64];
+    if (!(gSession.uFlags & 0x4000)) {
+        FE_MakeMoviePath("intro", szPath);
+        fn_80075FB8(szPath, fn_80076FDC, 0, 0);
+    }
+}
+
+// Play a saved shot: game mode 10 (the replay) with its golfer on its course.
+void fn_8007739C(Replay* pReplay) {
+    Mem_cpy(&gReplayData, pReplay, sizeof(Replay));
     fn_800E0B38(10);
-    Session_SetGolfer(*(u8*)(gReplayData + 0x10), 0);
-    fn_800E14E0(*(s32*)(gReplayData + 0xF00));
+    Session_SetGolfer(gReplayData.player.golfer.nIndex, 0);
+    fn_800E14E0(gReplayData.nCourse);
 }
 
 void fn_800773F8(void) {
@@ -158,8 +212,47 @@ void fn_80077428(void) {
     fn_80079D30();
 }
 
-s32 fn_80077B18(u32 arg0) {
-    if ((arg0 <= 1U) || ((u32) (arg0 - 3) <= 2U) || ((s32) arg0 == 7) || ((u32) (arg0 - 0xA) <= 1U) || ((u32) (arg0 - 0xD) <= 1U) || ((s32) arg0 == 0x12) || ((u32) (arg0 - 0x15) <= 3U) || ((s32) arg0 == 0x1C)) {
+// Back up every slot's profile, where one is loaded.
+void fn_80077780(void) {
+    int i;
+    for (i = 0; i < 4; i++) {
+        if (gpSaveData[i].bActive) {
+            Mem_cpy(&lbl_801D7148.p658[i], &gpSaveData[i], sizeof(SaveProfile));
+        }
+    }
+}
+
+// Back up one slot's profile into its backup row.
+void fn_80077968(int nSlot) {
+    Mem_cpy(&lbl_801D7148.p658[lbl_801D7148.aBackup[nSlot]], &gpSaveData[nSlot], sizeof(SaveProfile));
+}
+
+// A golfer's record: a table golfer, or the profile's created golfer.
+GolferRecord* fn_80077A80(int nGolfer) {
+    SaveProfile* pProfile = fn_80077ACC();
+    if (nGolfer < FIRST_CREATED_GOLFER) {
+        return &gGolferTable[nGolfer];
+    }
+    return &pProfile->createdGolfer;
+}
+
+// ---- the profile being worked on ---------------------------------------------------------------
+
+SaveProfile* fn_80077ACC(void) {
+    if (lbl_80281ED4->bCopy) {
+        return &lbl_80281ED4->profile;
+    }
+    return &gpSaveData[lbl_80281ED4->nSlot];
+}
+
+int fn_80077B08(void) {
+    return lbl_80281ED4->nSlot;
+}
+
+// A yes/no list over 0..28 (Golfer.c asks it); what it marks is not known yet.
+u8 fn_80077B18(int n) {
+    if (n == 0 || n == 1 || n == 3 || n == 4 || n == 5 || n == 7 || n == 10 || n == 11 || n == 13 ||
+        n == 14 || n == 18 || n == 21 || n == 22 || n == 23 || n == 24 || n == 28) {
         return 1;
     }
     return 0;
@@ -174,8 +267,9 @@ void fn_80077B78(void) {
     fn_80077C1C(-3, 1);
 }
 
-s32 fn_80077BDC(s32 arg0) {
-    switch (arg0) {
+// -1, -2, -3 to 0, 1, 2; anything else to 0.
+int fn_80077BDC(int n) {
+    switch (n) {
     case -1:
         return 0;
     case -2:
@@ -187,7 +281,25 @@ s32 fn_80077BDC(s32 arg0) {
     }
 }
 
-void fn_80079664(s32 arg0) {
+// Pack three numbers into one, b * 1000000 + a * 10000 + c; fn_80078620 unpacks it.
+int fn_80078604(int a, int b, int c) {
+    int n = c;
+    n += a * 10000;
+    n += b * 1000000;
+    return n;
+}
+
+void fn_80078620(int n, int* pA, int* pB, int* pC) {
+    *pB = n / 1000000;
+    n -= *pB * 1000000;
+    *pA = n / 10000;
+    n -= *pA * 10000;
+    *pC = n;
+}
+
+// ---- the created golfer's parts -----------------------------------------------------------------
+
+void fn_80079664(SaveProfile* pProfile) {
     FE_CrAP_TurnOnPart(0xC, 1, 0);
     FE_CrAP_TurnOnPart(0xC, 2, 0);
     FE_CrAP_TurnOnPart(0xC, 3, 0);
@@ -196,21 +308,32 @@ void fn_80079664(s32 arg0) {
     FE_CrAP_TurnOnPart(0xC, 7, 0);
     FE_CrAP_TurnOnPart(0xC, 0, 0);
     fn_8008E6D4(0);
-    fn_8007975C(arg0, 1, 0);
-    fn_8007975C(arg0, 2, 0);
-    fn_8007975C(arg0, 7, 0);
-    fn_800797E0(arg0, 7, (Rand_Next(0) & 1) + 1, 0);
-    fn_80078E34(arg0);
+    fn_8007975C(pProfile, 1, 0);
+    fn_8007975C(pProfile, 2, 0);
+    fn_8007975C(pProfile, 7, 0);
+    fn_800797E0(pProfile, 7, (Rand_Next(0) & 1) + 1, 0);
+    fn_80078E34(pProfile);
 }
 
-void fn_80079974(void) {
-    s32 temp_r31;
-    s32 var_r31;
+// Part a at a random one of its choices.
+void fn_8007975C(SaveProfile* pProfile, int a, int b) {
+    int nCount = fn_801049C8(a);
+    int nPick;
+    if (nCount > 0) {
+        nPick = Rand_Next(0) % nCount;
+    } else {
+        nPick = 0;
+    }
+    fn_800797E0(pProfile, a, nPick, b);
+}
 
-    temp_r31 = fn_80077ACC();
-    if ((u8) (*(u8*)((u8*)(lbl_80281ED4) + 0x1063F)) != 0) {
+// With a working copy of the profile: a random part 9, and a fixed set of parts turned on.
+void fn_80079974(void) {
+    SaveProfile* pProfile = fn_80077ACC();
+    int i;
+    if (lbl_80281ED4->bCopy) {
         fn_80103B74(0);
-        fn_8007975C(temp_r31, 9, 0);
+        fn_8007975C(pProfile, 9, 0);
         FE_CrAP_TurnOnPart(3, 0, 0);
         FE_CrAP_TurnOnPart(0xE, 0, 0);
         FE_CrAP_TurnOnPart(0xF, 0, 0);
@@ -223,15 +346,11 @@ void fn_80079974(void) {
         FE_CrAP_TurnOnPart(0xC, 6, 0);
         FE_CrAP_TurnOnPart(0xC, 7, 0);
         FE_CrAP_TurnOnPart(0xC, 4, 0);
-        var_r31 = 0;
-        do {
-            FE_CrAP_TurnOnPart(0xD, 0, var_r31);
-            FE_CrAP_TurnOnPart(0xD, 1, var_r31);
-            var_r31 += 1;
-        } while (var_r31 < 8);
+        for (i = 0; i < 8; i++) {
+            FE_CrAP_TurnOnPart(0xD, 0, i);
+            FE_CrAP_TurnOnPart(0xD, 1, i);
+        }
         FE_CrAP_TurnOnPart(0xD, 2, 0);
         fn_80103B74(1);
     }
 }
-
-// ---- end of sweep code ----

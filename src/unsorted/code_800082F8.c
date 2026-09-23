@@ -8,10 +8,10 @@ Sphere* fn_800082F8(RenderObj* obj) {
     return &obj->data->bounds;
 }
 
-void Vec3Copy(const Vec3* src, Vec3* dst) {
-    dst->x = src->x;
-    dst->y = src->y;
-    dst->z = src->z;
+void Vec3Copy(const f32* pSrc, f32* pDst) {
+    pDst[0] = pSrc[0];
+    pDst[1] = pSrc[1];
+    pDst[2] = pSrc[2];
 }
 
 float fn_80008320(Camera* cam) { return cam->unk220; }
@@ -24,8 +24,8 @@ float fn_80008350(Camera* cam) { return cam->unk20C; }
 float fn_80008358(Camera* cam) { return cam->unk204; }
 float fn_80008360(Camera* cam) { return cam->unk1F4; }
 float fn_80008368(Camera* cam) { return cam->unk1F8; }
-CameraSub* fn_80008370(Camera* cam) { return cam->unk10; }
-int fn_80008378(CameraSub* sub) { return sub->unk0; }
+CamLens* fn_80008370(Camera* cam) { return cam->unk10; }
+int fn_80008378(CamLens* sub) { return sub->nType; }
 
 void fn_80008380(void) {
     fn_800070DC();
