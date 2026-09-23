@@ -2,8 +2,9 @@
 // lookup and pick, the part that chooses which clip a golfer plays.
 
 #include "golfer.h"
+#include "game.h"
+#include "engine.h"
 
-char* strcpy(char* pDst, const char* pSrc);
 int   strcmp(const char* pA, const char* pB);
 
 // An animation library (a SAL object: glbchar.gcb holds the shared male/female ones, and each
@@ -75,9 +76,6 @@ typedef struct SwapField {
 void  fn_8001F08C(void** ppSrc, void** ppDst, SwapField* pFormat, int nFields, int nCount);  // byte-swap by format
 void  fn_80076158(void** ppSrc, void* pDst, int nBytes, int nSize);                           // byte-swap a run
 void* fn_80020DD4(void* pClip, void* pOut, int nAlign);
-void* fn_80009B34(u32 uSize, u32 uFlags, u32 uAlign, const char* pFile, int nLine);  // alloc
-void  fn_80009E70(void* p);                                                           // free
-void  Mem_cpy(void* pDst, void* pSrc, int nBytes);                                // memcpy
 ClipBank* ClipBank_Get(u32 nSlot);
 u32   fn_800B6564(u32 uSize);                          // ARAM alloc
 void  fn_800B6594(u32 uAram);                          // ARAM free
@@ -199,7 +197,6 @@ extern s32         lbl_80281070;
 extern s16*        lbl_80281CF8;      // the group, style and club node being built
 extern s16*        lbl_80281CFC;
 extern s16*        lbl_80281D00;      // leaves this short are left alone by the drop pass
-u8                 fn_80100294(void);
 u8                 fn_80101E34(struct ClipRecord* pRec);      // slot 0's share of the memory when double buffering
 extern u8*         lbl_80281CC4;      // staging buffers (32-aligned), see Skalib_Init
 extern u8*         lbl_80281CC8;
@@ -209,7 +206,6 @@ extern u8          lbl_801C5E2C[0x1DC];
 extern u8          lbl_801C5C50[0x1DC];
 extern u8          lbl_801BF9C0[0x6290];
 extern u8          lbl_801B9730[0x6290];
-void               fn_80005AE8(void* p, int c, int n);   // memset
 
 extern char (*lbl_80281D14)[2][8][6][16];   // the last clip name played: [player][reaction kind][style][club]
 
@@ -2072,13 +2068,11 @@ void ClipBank_FreeAram(void) {
     }
 }
 
-int UStream_RegisterHandler(u32 uType, void (*pfn)(LoadedFile*));
-int UStream_UnregisterHandler(u32 uType);
-
 // Hooks the loaders up to the file streamer: 'SAL ' animation libraries and 'BNK ' clip banks.
+// The loaders read the stream object through this file's LoadedFile view of it.
 void Skalib_Register(void) {
-    UStream_RegisterHandler('SAL ', AnimLib_OnLoaded);
-    UStream_RegisterHandler('BNK ', ClipBank_OnLoaded);
+    UStream_RegisterHandler('SAL ', (void (*)(UStreamObject*))AnimLib_OnLoaded);
+    UStream_RegisterHandler('BNK ', (void (*)(UStreamObject*))ClipBank_OnLoaded);
 }
 
 void Skalib_Unregister(void) {

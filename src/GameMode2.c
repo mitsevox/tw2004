@@ -4,18 +4,8 @@
 
 #include "golfer.h"
 #include "ball.h"
+#include "game.h"
 
-int   Game_CurHoleIndex(void);
-int   Game_CurrentHole(void);
-u8    Player_IsHoled(int nPlayer);
-u8    Player_OnTee(int nPlayer);
-void  GOLFERSTATE_Set(int nState, int nPlayer);
-void  fn_800E1480(int nHole);
-void  fn_800E45C0();
-void  fn_800E4364(u32 nQueue, int a, int b, int c);
-u8    fn_800E4BF8(void);
-u8    fn_800EC550(void);
-void  fn_800D3548(int nPlayer, int nMoney, int a);
 void* fn_800D3C1C(void);
 s32   fn_800D3D64(void* p, int nHole);      // a hole's skin value
 u8    fn_801025F4(void);
@@ -303,7 +293,8 @@ u8 fn_800F8B08(u8 bCheck) {
         PLAYER(i)->n308 = 0;
     }
     gpGame->bD4 = 1;
-    fn_800E45C0(gpGame->nD8++);
+    gpGame->nD8++;
+    fn_800E45C0();
     return 1;
 }
 
