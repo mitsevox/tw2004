@@ -4,7 +4,6 @@
 
 void fn_8006F154();
 
-void fn_8003541C(void);
 void fn_8003541C(void) {
     fn_8001614C();
     fn_8006F154();

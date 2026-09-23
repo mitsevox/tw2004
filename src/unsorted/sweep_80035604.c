@@ -2,13 +2,6 @@
 
 #include "game_types.h"
 
-void fn_80012EF8();
-void fn_80016B9C();
-void fn_80035118();
-void fn_80035240();
-void fn_80035294();
-
-void fn_80035604(void);
 void fn_80035604(void) {
     fn_80035240(0);
     fn_80035294();
