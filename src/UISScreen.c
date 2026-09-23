@@ -1,21 +1,21 @@
 // UISScreen.c (our name): the screen side of EA's UI Studio library (frontend/uistudio.h). It walks
-// a loaded screen's nodes to draw them with a colour scale and offset, finds and runs the handlers
+// a loaded screen's nodes to draw them with a scale and offset, finds and runs the handlers
 // nodes have for an event, formats text for them (a printf of its own) and finds the variable a
 // rate function drives. Called by UIStudio.c and by the game's menus.
 
 #include "frontend/uistudio.h"
 
 void fn_8016B0F8(UIStudio* pStudio, u32 uEvent, s32 nArgs, const s32* pArgs);
-u16 fn_8016B188(UIStudio* pStudio, UISScreen* pScreen, UISStack* pStack, u32 nNode, u32 uEvent, s32 nArgs,
-                const s32* pArgs);
+u16 fn_8016B188(UIStudio* pStudio, UISScreen* pScreen, UISWordStack* pStack, u32 nNode, u32 uEvent,
+                s32 nArgs, const s32* pArgs);
 
 // Send an event to every screen. While the studio is already sending one (flag 2 or 4), it is
 // queued on the event stack instead.
 void fn_8016B09C(UIStudio* pStudio, u32 uEvent, s32 nArgs, const s32* pArgs) {
-    u32 aData[4];
+    UISEventData data;
     if ((pStudio->uFlags & 2) || (pStudio->uFlags & 4)) {
-        aData[0] = uEvent;
-        fn_80165B90(-1, -1, pStudio, 9, aData, nArgs, pArgs);
+        data.au[0] = uEvent;
+        fn_80165B90(-1, -1, pStudio, 9, &data, nArgs, pArgs);
     } else {
         fn_8016B0F8(pStudio, uEvent, nArgs, pArgs);
     }
@@ -31,21 +31,22 @@ void fn_8016B0F8(UIStudio* pStudio, u32 uEvent, s32 nArgs, const s32* pArgs) {
     }
 }
 
-// The colour offset and scale every node is drawn with (red, green, blue, alpha).
-void fn_8016C15C(f32 fR, f32 fG, f32 fB, f32 fA) {
-    // fake match: the original stores alpha second
-    lbl_80280628[0] = fR;
-    lbl_80280628[3] = fA;
-    lbl_80280628[1] = fG;
-    lbl_80280628[2] = fB;
+// The offset and scale every node is drawn with. fn_8016A510 multiplies a node's four values at
+// 0x3C by the scale and adds its four at 0x4C to the offset for the node's children.
+void fn_8016C15C(f32 f1, f32 f2, f32 f3, f32 f4) {
+    // fake match: the original stores the fourth value second
+    lbl_80280628[0] = f1;
+    lbl_80280628[3] = f4;
+    lbl_80280628[1] = f2;
+    lbl_80280628[2] = f3;
 }
 
-void fn_8016C174(f32 fR, f32 fG, f32 fB, f32 fA) {
-    // fake match: the original stores alpha second
-    lbl_80280638[0] = fR;
-    lbl_80280638[3] = fA;
-    lbl_80280638[1] = fG;
-    lbl_80280638[2] = fB;
+void fn_8016C174(f32 f1, f32 f2, f32 f3, f32 f4) {
+    // fake match: the original stores the fourth value second
+    lbl_80280638[0] = f1;
+    lbl_80280638[3] = f4;
+    lbl_80280638[1] = f2;
+    lbl_80280638[2] = f3;
 }
 
 f32* fn_8016C18C(void) {
