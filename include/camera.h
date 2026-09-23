@@ -14,7 +14,9 @@ typedef struct CamLens {
     f32  v4[3];                 // 0x04  a position: the green zoom-to-aim camera copies it to View.v20
     u8   unk10[0x34 - 0x10];
     f32  v34[3];                // 0x34  a position: GameMode8 measures the ball's distance to it
-    u8   unk40[0xB0 - 0x40];
+    u8   unk40[0xA4 - 0x40];
+    f32  fFov;                  // 0xA4  the field of view (GoGolfCam.c sets DEG(60.0f) or DEG(30.0f))
+    u8   unkA8[0xB0 - 0xA8];
     f32  fB0;                   // 0xB0  fn_8001EFFC; the zoom-to-aim camera divides its distance by it
     f32  fB4;                  // 0xB4  a flat camera's view width (guess)
     f32  fB8;                   // 0xB8  its view height (guess)
@@ -473,6 +475,11 @@ u8       CameraScript_IsDefaultSwingCam(CamShot* pShot, int nPlayer, f32* pCam);
 u8       CamScript_KeepAboveGround(int nPlayer, f32* pNew, f32* pOld, int a, u8* pb1, f32* pf, u8* pb2,
                                    f32 fClearance);
 u8       CameraScript_WillGolferBeOccludedInThisView(int nPlayer, CamShot* pShot, void* pScript);
+void     fn_80045470(CamLens* pLens, f32 fFov);   // sets the lens's field of view
+u8       fn_8004562C(CamShot* pShot);             // the shot's bAC is 0, 13..15 or 23
+
+// GoCamera.c: works out the lens's fB0 from its field of view.
+void     fn_800763BC(CamLens* pLens);
 
 // ---- camera script helpers (gocamscripts, 0x800C7480..) -------------------------------------
 

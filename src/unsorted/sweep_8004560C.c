@@ -1,15 +1,13 @@
 // Small functions found by the sweep (sweep.py). Original file and meanings unknown.
 
-#include "game_types.h"
+#include "game.h"
 
-extern u8 lbl_80202898[];
+u8 fn_8004561C(void);
 
-s32 fn_8004560C(void);
-s32 fn_8004561C(void);
-s32 fn_8004560C(void) {
-    return *(u8*)(lbl_80202898 + 0x12);
+u8 fn_8004560C(void) {
+    return lbl_80202898.bGameBreaker;
 }
 
-s32 fn_8004561C(void) {
-    return *(u8*)(lbl_80202898 + 0x10);
+u8 fn_8004561C(void) {
+    return lbl_80202898.b10;
 }
