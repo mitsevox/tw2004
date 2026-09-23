@@ -14,6 +14,7 @@ s32  fn_800CCEA0(Skin* pSkin);          // SkinPart.c: and aSets[3]
 // This file, in address order.
 void fn_80103920(void);
 void fn_80103EFC(CrAPAsset* pAsset);
+void FE_CrAP_TurnOnAsset(CrAPAsset* pAsset);
 int  fn_80104AF4(s16 nPart, int n);     // the category of a part's entry n (-1 or 0x40: none)
 int  fn_80104F7C(CrAPAsset* pAsset);
 void fn_80105188(UStreamObject* pObject);
@@ -234,6 +235,33 @@ void fn_80104094(CrAPAsset* pAsset, int b) {
         }
     }
     fn_8008E944(0, 0.0f);
+}
+
+// Put on the asset waiting in lbl_802816E8, or else take off the one in lbl_802816EC; then clear
+// both.
+void fn_80104804(void) {
+    CrAPAsset* pAsset;
+    s16 nKind;
+    s32 nPart;
+    s32 nChoice;
+
+    fn_80077ACC();
+    if (lbl_802816E8 != -1) {
+        fn_80103B74(0);
+        FE_CrAP_TurnOnAsset(fn_80104F68(lbl_802816E8));
+        fn_80103B74(1);
+    } else if (lbl_802816EC != -1) {
+        pAsset = fn_80104F68(lbl_802816EC);
+        if (pAsset->nPart == 13) {
+            fn_80105FF8(lbl_802816EC, &nKind, &nPart, &nChoice);
+            fn_80103E88(pAsset, nPart);
+        } else {
+            fn_80103EFC(pAsset);
+        }
+    }
+    fn_8008EB70();
+    lbl_802816E8 = -1;
+    lbl_802816EC = -1;
 }
 
 // The parts whose choices are grouped by category, with an "All ..." entry: headwear, shirts,

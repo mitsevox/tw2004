@@ -236,6 +236,8 @@ extern s32* lbl_80282478;               // per part, 24 entries: the categories 
 extern void* lbl_8028247C;              // freed by fn_80103A64
 extern void* lbl_80282480;              // freed by fn_80103A64
 extern char lbl_801935C8[16][32];      // 16 names (fn_80107294)
+extern s32 lbl_802816E8;                // } an asset to put on and one to take off when
+extern s32 lbl_802816EC;                // } fn_80104804 runs (-1: none)
 extern char lbl_801932C8[CRAP_NUM_PARTS][32];   // per part: the name of its "All ..." entry that
                                         // lists every category ("All Headwear"), or ""
 
@@ -252,6 +254,7 @@ void fn_80104804(void);
 u8   fn_80104DB8(s16 nPart, int n, char* pDst); // copy the name of a part's entry n (for 0 its
                                         // "All ..." entry when it has one); 0 if there is none
 int  fn_80105C44(s16 nPart, int b);
+void fn_80105FF8(int nAsset, s16* pKind, s32* pPart, s32* pChoice);
 u8   fn_801061C8(s8 n);                 // an asset with this n40 is offered
 int  fn_80106244(s16 nPart);            // the asset in the first slot of aAF80 whose asset is of the part
                                         // (-1: none)
@@ -318,6 +321,7 @@ void fn_8008E724(char* szAnim, char* szShot, s8 n, u8 bLoop);
 void fn_8008E824(void);
 void fn_8008E860(int n);
 u8   fn_8008E944(u8 b, f32 f);
+void fn_8008EB70(void);
 
 // ---- the logo editor (FE_LogoDesign.c) -------------------------------------------------------
 
