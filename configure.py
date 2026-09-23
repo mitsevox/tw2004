@@ -554,7 +554,7 @@ config.libs = [
             Object(NonMatching, "MetroTRK/dispatch.c"),
             Object(NonMatching, "MetroTRK/msghndlr.c"),
             Object(NonMatching, "MetroTRK/support.c"),
-            Object(NonMatching, "MetroTRK/mutex_TRK.c"),
+            Object(Matching, "MetroTRK/mutex_TRK.c"),
             Object(Matching, "MetroTRK/notify.c"),
             Object(Matching, "MetroTRK/flush_cache.c"),
             Object(NonMatching, "MetroTRK/mem_TRK.c"),
