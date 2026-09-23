@@ -1526,35 +1526,8 @@ FE_CrAPDB.c:
 FE_CrAPMessages.c:
 	.text       start:0x801077EC end:0x8010A448
 
-unsorted/sweep_8010A4E8.c:
-	.text       start:0x8010A4E8 end:0x8010A520
-
-unsorted/sweep_8010A668.c:
-	.text       start:0x8010A668 end:0x8010A6A8
-
-unsorted/sweep_8010A780.c:
-	.text       start:0x8010A780 end:0x8010A788
-
-unsorted/sweep_8010AD10.c:
-	.text       start:0x8010AD10 end:0x8010AD18
-
-unsorted/sweep_8010B098.c:
-	.text       start:0x8010B098 end:0x8010B0C0
-
-unsorted/sweep_8010B664.c:
-	.text       start:0x8010B664 end:0x8010B6AC
-
-unsorted/sweep_8010BC64.c:
-	.text       start:0x8010BC64 end:0x8010BC94
-
-unsorted/sweep_8010BEC4.c:
-	.text       start:0x8010BEC4 end:0x8010BED4
-
-unsorted/sweep_8010BF3C.c:
-	.text       start:0x8010BF3C end:0x8010BF68
-
-unsorted/sweep_8010BFA0.c:
-	.text       start:0x8010BFA0 end:0x8010BFE0
+LLDynTex.c:
+	.text       start:0x8010A448 end:0x8010C4A0
 
 CharSliders.c:
 	.text       start:0x8010C4A0 end:0x8010DC94
