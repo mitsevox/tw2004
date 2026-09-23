@@ -137,25 +137,15 @@ extern u8            lbl_80281194[4];            // a neutral pad: both sticks c
 extern u8 (*gSwingPhaseFns[])(int nPlayer);
 extern f32           gSwingRange[8];             // 0x801882EC  backswing rate by shot kind: -, 0.85, 0.5, 0.8
 extern u8            lbl_80281E10;
-extern Vec4          lbl_80183660;
 extern u8            lbl_80281E13;
-extern Vec4          lbl_80183670;
 extern u8            lbl_80281E11;
-extern Vec4          lbl_801835F0;
 extern u8            lbl_80281E12;
 extern u8            gNumPlayersSetUp;           // 0x80281D48 (Golfer.c)
-extern Vec4          lbl_80183690;
-extern Vec4          lbl_80183610;
-extern Vec4          lbl_80183630;
-extern Vec4          lbl_80183640;
-extern Vec4          lbl_80183650;
-extern Vec4          lbl_801836A0;
-extern Vec4          lbl_80183600;
+extern Vec4          lbl_80183690;          // 0, 0, 0, 0.5 (assigned, not an initialiser: as one,
+                                                //   STATEFUNC_RemoveBallExit drops to 42.5%)
 extern u8*           lbl_80281DA0;               // per player, 0x104 bytes each
-extern Vec4          lbl_801835E0;
-extern Vec4          lbl_80183680;
 extern f32           gRealBallRadiusIn;          // 0x80283300  0.84: a real golf ball, in inches
-extern Vec4          lbl_80183620;
+extern Vec4          lbl_80183620;          // 0, 0, 0, 0.5 (assigned)
 
 void  fn_800130F8(int nPad, int n);              // rumble on
 void  fn_8006C2C8(int nPlayer, f32* pX, f32* pY);
@@ -2263,7 +2253,7 @@ void STATEFUNC_GreenMorphInit(int nPlayer) {
 }
 
 void STATEFUNC_FadeToRemoveBallInit(int nPlayer) {
-    Vec4 vOffset = lbl_80183660;
+    Vec4 vOffset = {0.0f, 0.0f, 0.0f, 0.5f};
     fn_80063BF4(fn_80017028(gPlayers[nPlayer].nView[0]), 0.5f, (f32*)&vOffset);
 }
 
@@ -2319,7 +2309,7 @@ void STATEFUNC_GreenUpdate(int nPlayer) {
 }
 
 void STATEFUNC_FadeToRemoveBallUpdate(int nPlayer) {
-    Vec4 vOffset = lbl_80183670;
+    Vec4 vOffset = {0.0f, 0.0f, 0.0f, 0.5f};
     if (fn_80063C50(fn_80017028(gPlayers[nPlayer].nView[0]))) {
         fn_80063CBC(fn_80017028(gPlayers[nPlayer].nView[0]), (f32*)&vOffset);
         GOLFERSTATE_Switch(GS_REMOVE_BALL, nPlayer);
@@ -2412,7 +2402,7 @@ void STATEFUNC_InTheHoleInit(int nPlayer) {
 // Leaving the swing: the ball goes back to where it lay; on cameras 1, 3 and 4 a quarter-second
 // camera move.
 void STATEFUNC_PreShotExit(int nPlayer) {
-    Vec4  vOffset = lbl_801835F0;
+    Vec4  vOffset = {0.0f, 0.0f, 0.0f, 0.5f};
     View* pView   = fn_80017028(gPlayers[nPlayer].nView[0]);
     int   nCamera;
     Mem_cpy(&gPlayers[nPlayer].ball, &gPlayers[nPlayer].ballBefore, sizeof(Ball));
@@ -2479,7 +2469,7 @@ void STATEFUNC_InitialFlyByExit(int nPlayer) {
 }
 
 void STATEFUNC_ConcededInit(int nPlayer) {
-    Vec4  vOffset = lbl_80183610;
+    Vec4  vOffset = {0.0f, 0.0f, 0.0f, 0.5f};
     View* pV      = fn_80017028(gPlayers[nPlayer].nView[0]);
     fn_800C7178(pV, nPlayer);
     View_SetCamera(pV, 0x19, nPlayer, gPlayers[nPlayer].nView[0]);
@@ -2547,7 +2537,7 @@ void STATEFUNC_MidHoleFlyByExit(int nPlayer) {
 // ball lies. The ball position is saved, the player's ball is moved to the lie, Shot_Plan runs,
 // and the ball position is put back.
 void STATEFUNC_FadeToTapInInit(int nPlayer) {
-    Vec4 vOffset = lbl_80183630;
+    Vec4 vOffset = {0.0f, 0.0f, 0.0f, 0.5f};
     f32  vSaved[4];
     fn_80062B64(nPlayer);
     fn_80062B60(nPlayer);
@@ -2732,7 +2722,7 @@ void STATEFUNC_SimulateInit(int nPlayer) {
 // camera finishes: solved -> camera move and state 16 (the tap-in is played for the player);
 // not yet -> the turn ends (GM_EndOfGolferTurn) unless it had been solved before.
 void STATEFUNC_FadeToTapInUpdate(int nPlayer) {
-    Vec4  vOffset = lbl_80183640;
+    Vec4  vOffset = {0.0f, 0.0f, 0.0f, 0.5f};
     f32   vSaved[4];
 
     fn_80050D2C(1);
@@ -2765,7 +2755,7 @@ void STATEFUNC_FadeToTapInUpdate(int nPlayer) {
 // error, no luck swap), then it is state 12 with the ball away.
 void STATEFUNC_TapInUpdate(int nPlayer) {
     int        nController;
-    Vec4       vOffset = lbl_80183650;
+    Vec4       vOffset = {0.0f, 0.0f, 0.0f, 0.5f};
     View*      pV      = fn_80017028(gPlayers[nPlayer].nView[0]);
     Character* pChar   = gPlayers[nPlayer].pChar;
 
@@ -2901,7 +2891,7 @@ void STATEFUNC_ShotSetupInit(int nPlayer) {
 // State 20: the walk to the tee. Camera 10 on this player's view, every other player's views
 // detached, this player attached to both of its views, Shot_Plan with the HUD told, animation 1.
 void STATEFUNC_InitialFlyByInit(int nPlayer) {
-    Vec4  vOffset = lbl_801836A0;
+    Vec4  vOffset = {0.0f, 0.0f, 0.0f, 0.5f};
     int   i, k;
 
     EVENT_Trigger(nPlayer, 0x4A, 0, -1);
@@ -3116,7 +3106,7 @@ void STATEFUNC_ZoomUpdate(int nPlayer) {
 // simulating flag up; the camera follows with quarter-second moves while the ghost is still
 // closing on the pin, and the state pops once the ghost has stopped and the camera settled.
 void STATEFUNC_GreenWatchRollUpdate(int nPlayer) {
-    Vec4        vOffset = lbl_80183600;
+    Vec4        vOffset = {0.45f, 0.45f, 0.45f, 0.5f};
     CourseInfo* pCourse = fn_8000C594();
     int         nSteps, i;
     Player*     p;
@@ -3402,7 +3392,7 @@ void STATEFUNC_PreShotInit(int nPlayer) {
 // (a CPU also rehearses here once its ball is still). When the camera is done the ball is put
 // in place and it is state 2; after 10 s on a camera it is state 2 anyway.
 void STATEFUNC_PreShotUpdate(int nPlayer) {
-    Vec4    vOffset = lbl_801835E0;
+    Vec4    vOffset = {0.0f, 0.0f, 0.0f, 0.5f};
     u8      bInHand = 0;
     View*   pV;
     u8*     pSlot;
@@ -3525,7 +3515,7 @@ void STATEFUNC_PreShotUpdate(int nPlayer) {
 // hand's speed in miles per hour, halved. Then, until event 3, the thrown ball is stepped 20
 // ticks a frame and the live ball follows it. Camera 16 over the whole thing.
 void STATEFUNC_RemoveBallUpdate(int nPlayer) {
-    Vec4  vOffset = lbl_80183680;
+    Vec4  vOffset = {0.0f, 0.0f, 0.0f, 0.5f};
     s32*  pnView  = gPlayers[nPlayer].nView;
     View* pV      = fn_80017028(*pnView);
     Character** ppChar = &gPlayers[nPlayer].pChar;
