@@ -337,6 +337,7 @@ int  fn_800E17AC(int nPlayer);          // the player's total strokes
 int  fn_800E1904(int nPlayer, u8 bCurrent);
 u8   fn_800E1BBC(void);                 // whether the round plays every hole
 u8   fn_800E1CA8(void);                 // no selected hole is left after the current one
+int  fn_800E1CE8(int a, int b);         // a course and hole to its marked-hole index, or -1
 u8   fn_800E23B0(int nPlayer, int nStrokes);
 u8   fn_800E23EC(int nPlayer);
 void fn_800E2470(void);
