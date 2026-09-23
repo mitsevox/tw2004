@@ -358,8 +358,8 @@ s32 fn_800EAC7C(void) {
 
 // The index of the entry whose n8 is n (0 if none).
 int fn_800EAC94(int n) {
-    int nFound = 0;
     int i;
+    int nFound = 0;
     for (i = 0; i < lbl_80281668; i++) {
         if (n == lbl_80281664[i].n8) {
             nFound = i;
