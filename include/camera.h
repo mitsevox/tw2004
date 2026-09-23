@@ -262,7 +262,9 @@ typedef struct CamTuning {
     u8   unk174[0x178 - 0x174];
     f32  f178;                  // 0x178
     f32  v17C[4];               // 0x17C
-    u8   unk18C[0x1C0 - 0x18C];
+    u8   unk18C[0x19C - 0x18C];
+    f32  f19C;                  // 0x19C  the steepest a camera direction may tilt (fn_8003D810, radians)
+    u8   unk1A0[0x1C0 - 0x1A0];
     s32  n1C0;                  // 0x1C0  nonzero enables camera 19
     u8   unk1C4[0x1C8 - 0x1C4];
     s32  bCheckSlope;           // 0x1C8  fn_800C4650 tests the slope to the target (fn_800C4520)

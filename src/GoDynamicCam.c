@@ -18,6 +18,9 @@ void fn_80039C5C(int nSize);
 void fn_80039D0C(int nSequences);
 void fn_80039E58(void);
 u8   fn_8003C800(char* szName, CamSequence** ppSeq, CamShot** ppShot);
+void fn_8003DC54(f32* pA, f32* pB, f32* pOut);
+void fn_8000923C(f32* pAxis, f32* pOut);                // a turn about the axis (its length the angle)
+void fn_800090E4(f32* pTurn, f32* pVec, f32* pOut);     // the vector turned by it
 void fn_80039EB8(int nSize);
 u8   fn_8003D0EC(CamSequence* pSequence, int nKind);
 u8   fn_8003D240(CamShot* pShot, int nKind);
@@ -753,6 +756,41 @@ u8 fn_8003D7A0(CamSequence* pSequence, int nPlayer) {
         return 1;
     }
     return 0;
+}
+
+// Keeps the direction pDir within the tuning's f19C (an angle) of level: with no level part at
+// all it becomes the direction from pA to pB; tilted further than f19C, it is turned back to that
+// tilt. The result is normalised.
+void fn_8003D810(f32* pDir, f32* pA, f32* pB) {
+    f32 vLevel[4];
+    f32 vAxis[4];
+    f32 qTurn[4];
+
+    if (0.0f == pDir[0] && 0.0f == pDir[2]) {
+        fn_8003DC54(pB, pA, pDir);
+        if (0.0f != pDir[0] || 0.0f != pDir[1] || 0.0f != pDir[2]) {
+            fn_800BAF04(pDir, pDir);
+        }
+        return;
+    }
+    Vec3Copy(pDir, vLevel);
+    vLevel[1] = 0.0f;
+    if (0.0f != vLevel[0] || 0.0f != vLevel[1] || 0.0f != vLevel[2]) {
+        fn_800BAF04(vLevel, vLevel);
+    }
+    if (fabsf(fn_80009614(fn_8000C5FC(vLevel, pDir))) > lbl_80281F78->f19C) {
+        vec4flt_CrossProduct(pDir, vLevel, vAxis);
+        if (0.0f != vAxis[0] || 0.0f != vAxis[1] || 0.0f != vAxis[2]) {
+            fn_800BAF04(vAxis, vAxis);
+        }
+        fn_8001EF34(vAxis, lbl_80281F78->f19C, vAxis);
+        fn_8000923C(vAxis, qTurn);
+        vLevel[3] = 0.0f;
+        fn_800090E4(qTurn, vLevel, pDir);
+        if (0.0f != pDir[0] || 0.0f != pDir[1] || 0.0f != pDir[2]) {
+            fn_800BAF04(pDir, pDir);
+        }
+    }
 }
 
 // The shot's f64 and f60 into *pA and *pB; when fn_800453C8 holds for the player they are
