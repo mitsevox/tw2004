@@ -36,6 +36,13 @@ LAYOUT_ASSERT(UILoaded, 0x18);
 
 extern UILoaded lbl_801D87A8;
 
+// One font in the 'FONS' object (uiLoadFile.c fn_8008EFFC): the font's data starts at 0x20; once
+// it is loaded into a font slot, its first word holds the slot.
+typedef struct UIFont {
+    u8  unk0[0x20];
+    s32 nSlot;                  // 0x20
+} UIFont;
+
 // Print nValue into szOut with a comma between every three digits ("1,234,567").
 void fn_800907AC(int nValue, char* szOut);
 
