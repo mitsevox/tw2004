@@ -27,6 +27,45 @@ typedef struct CharModel {
     u8        bEE;              // 0xEE  fn_8001EDF4
 } CharModel;
 
+// A clip's header (the fields used here). In a file, pD0 marks the end of the header and
+// uAram points at the end of the key data; once a clip's frames are streamed out, uAram is
+// their ARAM address and flag 4 is set.
+typedef struct Clip {
+    u32    uFlags;              // 0x00  4: its frame data is in ARAM
+    s32    n04;                 // 0x04  bytes of the second frame stream
+    u8     unk08[4];
+    s16    nFrames;             // 0x0C
+    u8     unk0E[0xE];
+    s32    n1C;                 // 0x1C
+    u8     unk20[0xC];
+    s32    n2C;                 // 0x2C
+    u8     unk30[8];
+    s32    n38;                 // 0x38  bytes of the first frame stream
+    s32    n3C;                 // 0x3C
+    s32    n40;                 // 0x40
+    u8     unk44[8];
+    s32    n4C;                 // 0x4C
+    s32    n50;                 // 0x50
+    u8     unk54[0x10];
+    s32    n64;                 // 0x64
+    u8     unk68[0x24];
+    s16    n8C;                 // 0x8C  halfwords per frame, first stream
+    s16    n8E;                 // 0x8E  bytes per frame, second stream
+    u8     unk90[0x10];
+    char   name[0x30];          // 0xA0
+    u8*    pD0;                 // 0xD0
+    u8     unkD4[8];
+    u32    uAram;               // 0xDC
+    u8     unkE0[4];
+    u8*    pE4;                 // 0xE4
+    u8     unkE8[4];
+    u8*    pEC;                 // 0xEC
+    u8*    pF0;                 // 0xF0
+    u8*    pF4;                 // 0xF4
+    u8*    pF8;                 // 0xF8
+    u8*    pFC;                 // 0xFC
+} Clip;
+
 // A node of a character's SKA blend tree (the root is at Character + 0x40C): its kind at +4 and two
 // children at +0x24 / +0x28 (fn_80072CB8 walks them); only what the game code reads.
 typedef struct SKABlendNode {
@@ -98,10 +137,18 @@ typedef struct Character {
     f32   f1634;                // 0x1634
     f32   v1638[3];             // 0x1638
     f32   f1644;                // 0x1644
-    u8    unk1648[0x1698 - 0x1648];
+    u8    unk1648[0x1654 - 0x1648];
+    s32   n1654;                // 0x1654  (fn_8001EE90)
+    s32   n1658;                // 0x1658
+    f32   f165C;                // 0x165C  } scaled by the view's lens (fn_8001EE00, fn_8001ED44)
+    f32   f1660;                // 0x1660  }
+    u8    unk1664[0x1698 - 0x1664];
     s32   n1698;                // 0x1698
     s32   nClubClass;           // 0x169C  the club class for clip lookups (Char_SetClip; 1 looks up as 0)
-    u8    unk16A0[0x16D4 - 0x16A0];
+    s32   nClubHeadBone;        // 0x16A0  bone 0x53's index: the club head (the swing trail's end)
+    s32   nGripBone;            // 0x16A4  bone 0x52's index: the grip (the trail's other end)
+    s32   n16A8;                // 0x16A8  fn_8001EEE4's answer for bone 0x15
+    u8    unk16AC[0x16D4 - 0x16AC];
     s32   n16D4;                // 0x16D4  the key for clip lookups (Char_SetClip)
     u8    unk16D8[0x16DC - 0x16D8];
     s32   n16DC;                // 0x16DC  twice the players set up so far, in split screen 2
@@ -109,7 +156,7 @@ typedef struct Character {
     s32   nStyle;               // 0x16E0  the animation style (fn_8001C7FC); at -1
                                 //         CharacterState_AddSKABlendData does nothing
     u8    unk16E4[0x1788 - 0x16E4];
-    void* pCurClip;             // 0x1788  the clip Char_SetClip picked
+    Clip* pCurClip;             // 0x1788  the clip Char_SetClip picked
     u8    unk178C[0x1790 - 0x178C];
     void* p1790;                // 0x1790  cleared by fn_80062BFC; CharacterState_AddSKABlendData plays it for
                                 //         groups 5, 6 and 10
@@ -140,7 +187,7 @@ f32 (*fn_8001ED08(Character* pChar, int nBone))[4];  // a bone's matrix
 u8    fn_8001EDF4(Character* pChar);    // the model's bEE
 int   fn_8001EE90(Character* pChar);
 int   fn_8001EED8(CharModel* pModel, int nBone);    // a bone's index
-void  fn_8001EEE4(CharModel* pModel, int nBone);
+int   fn_8001EEE4(CharModel* pModel, int nBone);
 void  Anim_SetRate(u8* pAnim, f32 fRate);           // 0x8001F084
 void  SKEL_SetIKSolutionWeight(Skeleton* pSkel, f32 f);
 void  fn_80027808(CharModel* pModel, f32* pRot);
@@ -163,7 +210,7 @@ void  CharAnim_StartTapIn(Character* pChar);
 void  CharacterState_UpdateSKAState(Character* pChar);
 void  fn_800CC5C0(Character* pChar, char* pA, char* pB);   // an attachment (the glove) on / off
 
-// The skeletal animation library (skalib.c) and the clip choice (CharClip.c).
+// The skeletal animation library (skalib.c) and the clip choice (char.c).
 void* AnimLib_Pick(int nPlayer, AnimLib* pLib, int nGroup, int nStyle, int nClub, int nKey, u32* pFlags,
                    const char* pName);
 void* Char_SetClip(Character* pChar, int nGroup, int nStyle, const char* pName);

@@ -110,45 +110,6 @@ typedef struct LibSlot {
     u8*        pEnd;            // 0x154  the end of the slot's clip bank records
 } LibSlot;
 
-// A clip's header (the fields used here). In a file, pD0 marks the end of the header and
-// uAram points at the end of the key data; once a clip's frames are streamed out, uAram is
-// their ARAM address and flag 4 is set.
-typedef struct Clip {
-    u32    uFlags;              // 0x00  4: its frame data is in ARAM
-    s32    n04;                 // 0x04  bytes of the second frame stream
-    u8     unk08[4];
-    s16    nFrames;             // 0x0C
-    u8     unk0E[0xE];
-    s32    n1C;                 // 0x1C
-    u8     unk20[0xC];
-    s32    n2C;                 // 0x2C
-    u8     unk30[8];
-    s32    n38;                 // 0x38  bytes of the first frame stream
-    s32    n3C;                 // 0x3C
-    s32    n40;                 // 0x40
-    u8     unk44[8];
-    s32    n4C;                 // 0x4C
-    s32    n50;                 // 0x50
-    u8     unk54[0x10];
-    s32    n64;                 // 0x64
-    u8     unk68[0x24];
-    s16    n8C;                 // 0x8C  halfwords per frame, first stream
-    s16    n8E;                 // 0x8E  bytes per frame, second stream
-    u8     unk90[0x10];
-    char   name[0x30];          // 0xA0
-    u8*    pD0;                 // 0xD0
-    u8     unkD4[8];
-    u32    uAram;               // 0xDC
-    u8     unkE0[4];
-    u8*    pE4;                 // 0xE4
-    u8     unkE8[4];
-    u8*    pEC;                 // 0xEC
-    u8*    pF0;                 // 0xF0
-    u8*    pF4;                 // 0xF4
-    u8*    pF8;                 // 0xF8
-    u8*    pFC;                 // 0xFC
-} Clip;
-
 extern ClipBank*   lbl_801C6050[3];   // the clip bank of each slot
 extern AnimLib*    lbl_801C605C[3];   // the library of each slot, when its clips are in the bank
 extern LibSlot     lbl_801C6068[3];
