@@ -8,6 +8,7 @@
 #include "golfer.h"
 #include "physics.h"
 #include "game.h"
+#include "engine.h"
 
 // One strip of ground triangles (8 bytes). TW06: TGD_PolygonReference (0xC bytes, the same up
 // to 0x8).
@@ -53,10 +54,16 @@ u8    Course_RegisterLoader(int nChunk, void (*pfn)(u8*));   // 0x8000C0B4
 s32   fn_8000C140(f32* pPos, TNetwork* pNet, s32 nNodes);   // point in outline. TW06: wn_PnPoly
 u8    fn_8000C3C8(f32* pFrom, f32* pTo, TNetwork* pNet, s32 nNodes, f32* pHit);   // segment crosses outline
 void  fn_8004B588(TNetwork* pNet);
+u8    Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 a, u8 b, f32 f, u8 c, f32 g);
+u8    Ter_PointInOOBNetwork(f32* pPos);
+u8    Ter_PointInFreeDropNetwork(f32* pPos);
+u8    Ter_LieIsPreferred(u32 nLie);
+f32   Ter_GetSupportingGroundData(CourseInfo* pCourse, f32* pPos, SurfaceType** ppSurface, f32* pNormal);
 void  fn_8004B63C(TNetwork* pNet);
 void  Vec3Copy(f32* pSrc, f32* pDst);                     // 0x80008304
 void  vec4flt_CrossProduct(f32* pA, f32* pB, f32* pOut);
 void  fn_800BAF04(f32* pSrc, f32* pDst);                  // normalise
+f32   fn_8000C5FC(f32* pA, f32* pB);                      // dot product
 void  fn_8005097C(f32* pA, f32* pB, f32* pOut);           // a - b (paired-single assembly)
 void  fn_800509A0(f32* pSrc, f32* pDst);                  // negate (paired-single assembly)
 // The ground triangle under a point: its height there, the grid cell, the strip, the triangle's
@@ -69,6 +76,50 @@ f32   fn_8004CB30(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef**
 f32   fn_8004CD94(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** ppRef, f32 (**ppTri)[3]);
 u8    fn_80050A9C(f32* pA, f32* pB, f32* pC, f32 fX, f32 fZ);
 void  fn_800509D8(f32* pTri, f32* pPos, f32* pA, f32* pB, f32* pC);
+
+// TW06: bool Ter_LineTriangleIntersection(f32*, f32*, f32, f32**, f32*, f32[4]*, f32[4]*). Where the
+// line from pFrom along pDir meets a triangle, as a fraction t of pDir (0 < t < fMax): t, the point
+// and the triangle's normal. A line along the triangle's plane never meets it.
+u8 fn_8004AFA0(f32* pFrom, f32* pDir, f32 fMax, f32 (*pTri)[3], f32* pT, f32* pHit, f32* pNormal) {
+    f32 vP[4];
+    f32 vQ[4];
+    f32 vS[4];
+    f32 vE1[4];
+    f32 vE2[4];
+    f32 vA[4];
+    f32 vB[4];
+    f32 vC[4];
+    f32 fDet;
+    f32 fInv;
+    f32 fU;
+    f32 fV;
+    f32 fT;
+
+    Vec3Copy(pTri[0], vA);
+    Vec3Copy(pTri[1], vB);
+    Vec3Copy(pTri[2], vC);
+    fn_8005097C(vB, vA, vE1);
+    fn_8005097C(vC, vA, vE2);
+    vec4flt_CrossProduct(pDir, vE2, vP);
+    fDet = fn_8000C5FC(vE1, vP);
+    if (fDet > -0.00001f && fDet < 0.00001f) return 0;
+    fInv = 1.0f / fDet;
+    fn_8005097C(pFrom, vA, vS);
+    fU = fInv * fn_8000C5FC(vS, vP);
+    if (fU < 0.0f || fU > 1.0f) return 0;
+    vec4flt_CrossProduct(vS, vE1, vQ);
+    fV = fInv * fn_8000C5FC(pDir, vQ);
+    if (fV < 0.0f || fU + fV > 1.0f) return 0;
+    fT = fInv * fn_8000C5FC(vE2, vQ);
+    if (fT <= 0.0f || fT >= fMax) return 0;
+    *pT = fT;
+    pHit[0] = fT * pDir[0] + pFrom[0];
+    pHit[1] = fT * pDir[1] + pFrom[1];
+    pHit[2] = fT * pDir[2] + pFrom[2];
+    vec4flt_CrossProduct(vE1, vE2, pNormal);
+    fn_800BAF04(pNormal, pNormal);
+    return 1;
+}
 
 // Probably TW06's Ter_Init (the same size and file): register the course-file loaders for the
 // out-of-bounds (chunk 1) and free-drop (chunk 4) networks and forget the old ones.
@@ -135,6 +186,54 @@ u8 fn_8004B6F8(f32* pFrom, f32* pTo, f32* pHit) {
         if (fn_8000C3C8(pFrom, pTo, lbl_801D548C[i], lbl_801D548C[i]->nNumNodes, pHit)) return 1;
     }
     return 0;
+}
+
+// TW06: f32 Ter_CheckForDropLocation(TGD_TerrainInfo*, f32*, bool, bool*, bool*, TGD_MaterialInfo**).
+// Whether a ball could be dropped at a point: in bounds and outside the free-drop areas, and, unless
+// bOnDropSurface, on ground that allows a drop (surface flag 1, not the fringe) that is no steeper
+// than 30 degrees and clear of objects and hazards. *pbPreferred says the lie there is a
+// preferred one (always, when bOnDropSurface). Returns the ground height (0 when bOnDropSurface).
+f32 Ter_CheckForDropLocation(CourseInfo* pCourse, f32* pPos, u8 bOnDropSurface, u8* pbDrop, u8* pbPreferred,
+                             SurfaceType** ppSurface) {
+    f32 vPos[4];
+    f32 vNormal[4];
+    SurfaceType* pSurface;
+    f32 fHeight;
+    u8 bOk;
+
+    vPos[0] = pPos[0];
+    vPos[1] = pPos[1];
+    vPos[2] = pPos[2];
+    vPos[3] = 1.0f;
+    if (!bOnDropSurface) {
+        fHeight = Ter_GetSupportingGroundData(pCourse, vPos, &pSurface, vNormal);
+        if (ppSurface != NULL) {
+            *ppSurface = pSurface;
+        }
+        bOk = fHeight != TER_NO_GROUND && pSurface != NULL && (pSurface->u34 & 1)
+              && pSurface->nClass != LIE_FRINGE_e && fn_8000AD9C(vNormal[1]) > 0.86603f
+              && Ter_PointInOOBNetwork(vPos) && !Ter_PointInFreeDropNetwork(vPos)
+              && (bOnDropSurface || !Ter_CheckObjectAndHazardObstruction(vPos, 1.5f, 0, 1, 2.0f, 1, 0.577f));
+    } else {
+        fHeight = 0.0f;
+        if (ppSurface != NULL) {
+            *ppSurface = NULL;
+        }
+        bOk = Ter_PointInOOBNetwork(vPos) && !Ter_PointInFreeDropNetwork(vPos);
+    }
+    vPos[1] = fHeight;
+    if (bOk) {
+        *pbDrop = 1;
+        if (bOnDropSurface || Ter_LieIsPreferred(pSurface->nClass)) {
+            *pbPreferred = 1;
+        } else {
+            *pbPreferred = 0;
+        }
+    } else {
+        *pbDrop = 0;
+        *pbPreferred = 0;
+    }
+    return fHeight;
 }
 
 // Lies from which a drop may be taken: the fairways and the roughs.
@@ -349,6 +448,77 @@ f32 Ter_GetSupportingGroundData(CourseInfo* pCourse, f32* pPos, SurfaceType** pp
         *ppSurface = NULL;
     }
     return fHeight;
+}
+
+// Mark every ground triangle's highest and lowest corner in its flags (bits 4-5 and 6-7), using
+// bit 3 to do each triangle once, then clear bit 3 again. TW06 has the two halves as
+// Ter_ComputeHighestPointInEveryTriangle and Ter_ClearVertexProcessedBit.
+// Not exact yet (94.5%): only the second pass's registers differ (it adds the strip's base to
+// the vertex index last; ours adds the low half first). Tried: its own block locals and
+// orders, a static inline helper, a named index (int, s32, u32), for/while forms.
+void fn_80050794(CourseInfo* pCourse) {
+    u8 uFlags;
+    f32 (*pVert)[3];
+    u32 i;
+    u32 j;
+    u8* pFlags;
+    TerPolyRef* pRef;
+    u8 nHigh;
+    u8 nLow;
+
+    pRef = pCourse->pPolyRefs;
+    i = pCourse->nPolyRefs;
+    while (i != 0) {
+        pVert = &pCourse->pVerts[TER_FIRST_VERTEX(pRef)];
+        pFlags = pCourse->pTriFlags + TER_FIRST_VERTEX(pRef);
+        j = pRef->nTris;
+        while (j != 0) {
+            uFlags = pFlags[2];
+            if (!(uFlags & 8) && uFlags != 0) {
+                if (pVert[0][1] > pVert[1][1]) {
+                    if (pVert[0][1] > pVert[2][1]) {
+                        nHigh = 0;
+                    } else {
+                        nHigh = 2;
+                    }
+                } else if (pVert[1][1] > pVert[2][1]) {
+                    nHigh = 1;
+                } else {
+                    nHigh = 2;
+                }
+                if (pVert[0][1] < pVert[1][1]) {
+                    if (pVert[0][1] < pVert[2][1]) {
+                        nLow = 0;
+                    } else {
+                        nLow = 2;
+                    }
+                } else if (pVert[1][1] < pVert[2][1]) {
+                    nLow = 1;
+                } else {
+                    nLow = 2;
+                }
+                pFlags[2] = uFlags | (nHigh << 4) | (nLow << 6) | 8;
+            }
+            j--;
+            pFlags++;
+            pVert++;
+        }
+        i--;
+        pRef++;
+    }
+    pRef = pCourse->pPolyRefs;
+    i = pCourse->nPolyRefs;
+    while (i != 0) {
+        pFlags = pCourse->pTriFlags + TER_FIRST_VERTEX(pRef);
+        j = pRef->nTris;
+        while (j != 0) {
+            pFlags[2] &= 0xF7;
+            j--;
+            pFlags++;
+        }
+        i--;
+        pRef++;
+    }
 }
 
 // TW06: Ter_GetBarycentricCoords (an inline in goterrainutils.h there). The weights of a point
