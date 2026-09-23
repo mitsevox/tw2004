@@ -55,6 +55,7 @@ typedef struct TNetwork {
 #define MAX_FREE_DROP_NETWORKS 25
 #define MAX_OOB_NETWORKS       5
 
+#define AXIS3(n) ((n) == 0 ? 0 : 2)    // grid axis 0 (x) or 1 (z) as an index into a 3D vector
 #define TER_NO_GROUND -65536.125f   // the height the lookups return when nothing is under the point
 
 extern u8        lbl_80281DC0;                          // the cup is real geometry
@@ -78,6 +79,7 @@ void  vec4flt_CrossProduct(f32* pA, f32* pB, f32* pOut);
 f32   fn_8000C5FC(f32* pA, f32* pB);                      // dot product
 void  fn_8005097C(f32* pA, f32* pB, f32* pOut);           // a - b (paired-single assembly)
 void  fn_800509A0(f32* pSrc, f32* pDst);                  // negate (paired-single assembly)
+void  fn_800509BC(f32* pSrc, f32* pDst);                  // negate, four floats (paired-single assembly)
 // The ground triangle under a point: its height there, the grid cell, the strip, the triangle's
 // first vertex and its number in the strip. Probably TW06's Ter_GetSupportingGroundTriangle.
 f32   fn_800CBEE0(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** ppRef, f32 (**ppTri)[3],
@@ -93,6 +95,9 @@ f32   Ter_CheckForDropLocation(CourseInfo* pCourse, f32* pPos, u8 bOnDropSurface
                                SurfaceType** ppSurface);
 void  fn_8004D2E0(CourseInfo* pCourse, f32* pPos, TerPolyRef** ppRefLow, f32* pLow, f32 (**ppTriLow)[3],
                   TerPolyRef** ppRefHigh, f32* pHigh, f32 (**ppTriHigh)[3]);
+f32   fn_800BB028(f32* pA, f32* pB);                      // squared distance
+u8    Ter_CheckForPinCollision(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
+                               SurfaceType** ppSurface, TerObject** ppObj);
 u8    fn_8004EB7C(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32* pDir, f32 fMax, f32* pHit,
                   f32* pNormal, SurfaceType** ppSurface, TerObject** ppObj, u8* pbFlags);
 u8    fn_8004F43C(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32* pDir, f32 fMax, f32* pHit,
@@ -915,6 +920,138 @@ u8 fn_8004E0D4(f32* pFrom, f32* pDir, f32 fRange, f32* pCentre, f32 fRadius) {
     return 1;
 }
 
+// TW06: bool Ter_CheckForWorldCollision(TGD_TerrainInfo*, s32, f32*, f32*, f32[4]*, f32[4]*,
+// TGD_MaterialInfo**, TGD_ObjectInstanceInfo**, u8*). The first thing the line from pFrom to pTo
+// hits: the pin, the ground or an object. Walks the grid cells the line crosses, testing each
+// cell's triangles (fn_8004EB7C) and keeping the hit nearest pFrom. The normal is turned to face
+// the line.
+u8 fn_8004E558(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
+               SurfaceType** ppSurface, TerObject** ppObj, u8* pbFlags) {
+    int nEndX;
+    int nEndZ;
+    f32 vHit[4];
+    f32 vNormal[4];
+    f32 vDir[4];
+    f32 vPrev[4];
+    f32 vPos[4];
+    int nCell[2];
+    f32 vDelta[2];
+    f32 vStart[2];
+    f32 vEdge[2];
+    SurfaceType* pSurface;
+    TerObject* pObj;
+    f32 fBest = 1000000.0f;
+    int nMajor;
+    int nMinor;
+    int nStepMajor;
+    int nStepMinor;
+    int nLast;
+    f32 fSlope;
+    f32 fRatio;
+    f32 fRun;
+    f32 fLen;
+    f32 fDist;
+
+    if (pFrom[0] == pTo[0] && pFrom[1] == pTo[1] && pFrom[2] == pTo[2]) return 0;
+    if (Ter_CheckForPinCollision(pCourse, nPlayer, pFrom, pTo, pHit, pNormal, ppSurface, ppObj)) {
+        fBest = fn_800BB028(pFrom, pHit);
+    }
+    nCell[0] = (int)fn_80035074((pFrom[0] - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
+    nCell[1] = (int)fn_80035074((pFrom[2] - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
+    nEndX = (int)fn_80035074((pTo[0] - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
+    nEndZ = (int)fn_80035074((pTo[2] - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
+    vDelta[0] = pTo[0] - pFrom[0];
+    vDelta[1] = pTo[2] - pFrom[2];
+    vStart[0] = pFrom[0];
+    vStart[1] = pFrom[2];
+    if (fn_8000AD9C(vDelta[0]) > fn_8000AD9C(vDelta[1])) {
+        nMajor = 0;
+        nMinor = 1;
+        fSlope = vDelta[1] / vDelta[0];
+    } else {
+        nMajor = 1;
+        nMinor = 0;
+        if (vDelta[1]) {
+            fSlope = vDelta[0] / vDelta[1];
+        } else {
+            fSlope = 0.0f;
+        }
+    }
+    if (vDelta[nMajor] > 0.0f) {
+        nStepMajor = 1;
+    } else {
+        nStepMajor = -1;
+    }
+    if (vDelta[nMinor] > 0.0f) {
+        nStepMinor = 1;
+    } else {
+        nStepMinor = -1;
+    }
+    // the next cell edge the line crosses on each axis
+    vEdge[nMajor] = pCourse->fGridCellSize[nMajor] * nCell[nMajor] + pCourse->fGridOrigin[nMajor];
+    vEdge[nMinor] = pCourse->fGridCellSize[nMinor] * nCell[nMinor] + pCourse->fGridOrigin[nMinor];
+    if (nStepMajor > 0) {
+        vEdge[nMajor] += pCourse->fGridCellSize[nMajor];
+    }
+    if (nStepMinor > 0) {
+        vEdge[nMinor] += pCourse->fGridCellSize[nMinor];
+    }
+    fn_8005097C(pTo, pFrom, vDir);
+    fn_800BAF04(vDir, vDir);
+    Vec_Copy(pFrom, vPos);
+    for (;;) {
+        Vec_Copy(vPos, vPrev);
+        if (nCell[0] == nEndX && nCell[1] == nEndZ) {
+            Vec_Copy(pTo, vPos);
+        } else {
+            fRun = vEdge[nMajor] - vStart[nMajor];
+            if (fRun != 0.0f) {
+                fRatio = (vEdge[nMinor] - vStart[nMinor]) / fRun;
+            } else {
+                fRatio = 1000000.0f;
+            }
+            if (fn_8000AD9C(fSlope) < fn_8000AD9C(fRatio)) {
+                fRun = vEdge[nMajor] - vStart[nMajor];
+                vPos[AXIS3(nMajor)] = vEdge[nMajor];
+                nLast = nMajor;
+                vPos[AXIS3(nMinor)] = vStart[nMinor] + fRun * vDir[AXIS3(nMinor)] / vDir[AXIS3(nMajor)];
+                vPos[1] = pFrom[1] + vDir[1] * fRun / vDir[AXIS3(nMajor)];
+            } else {
+                fRun = vEdge[nMinor] - vStart[nMinor];
+                vPos[AXIS3(nMinor)] = vEdge[nMinor];
+                nLast = nMinor;
+                vPos[AXIS3(nMajor)] = vStart[nMajor] + fRun * vDir[AXIS3(nMajor)] / vDir[AXIS3(nMinor)];
+                vPos[1] = pFrom[1] + vDir[1] * fRun / vDir[AXIS3(nMinor)];
+            }
+        }
+        fLen = Vec_Distance(vPos, vPrev);
+        fn_8004DF10(pCourse, vPrev, vDir, nCell[0], nCell[1], fLen);
+        if (fn_8004EB7C(pCourse, nCell[0], nCell[1], vPrev, vPos, vDir, fLen, vHit, vNormal, &pSurface, &pObj,
+                        pbFlags)) {
+            fDist = fn_800BB028(pFrom, vHit);
+            if (fDist < fBest) {
+                fBest = fDist;
+                Vec_Copy(vHit, pHit);
+                Vec_Copy(vNormal, pNormal);
+                *ppSurface = pSurface;
+                *ppObj = pObj;
+            }
+        }
+        if (nCell[0] == nEndX && nCell[1] == nEndZ) break;
+        if (nLast == nMajor) {
+            nCell[nMajor] += nStepMajor;
+            vEdge[nMajor] += pCourse->fGridCellSize[nMajor] * nStepMajor;
+        } else {
+            nCell[nMinor] += nStepMinor;
+            vEdge[nMinor] += pCourse->fGridCellSize[nMinor] * nStepMinor;
+        }
+    }
+    if (fBest != 1000000.0f && fn_8000C5FC(vDir, pNormal) > 0.0f) {
+        fn_800509BC(pNormal, pNormal);
+    }
+    return fBest != 1000000.0f;
+}
+
 // TW06: bool Ter_CheckForWorldCollisionOneGrid(TGD_TerrainInfo*, s32, s32, f32*, f32*, f32*, f32,
 // f32[4]*, f32[4]*, TGD_MaterialInfo**, TGD_ObjectInstanceInfo**, u8*). The nearest triangle of
 // grid cell (nX, nZ) that the line from pFrom along pDir meets before fMax (pTo is the line's end,
@@ -984,6 +1121,134 @@ u8 fn_8004EB7C(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32* p
     return 0;
 }
 
+// TW06: bool Ter_CheckForSolidWorldCollision(...), the same parameters without the flags. As
+// fn_8004E558, but a ball passes through branches and leaves (fn_8004F43C).
+u8 fn_8004EE20(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
+               SurfaceType** ppSurface, TerObject** ppObj) {
+    int nEndX;
+    int nEndZ;
+    f32 vHit[4];
+    f32 vNormal[4];
+    f32 vDir[4];
+    f32 vPrev[4];
+    f32 vPos[4];
+    int nCell[2];
+    f32 vDelta[2];
+    f32 vStart[2];
+    f32 vEdge[2];
+    SurfaceType* pSurface;
+    TerObject* pObj;
+    f32 fBest = 1000000.0f;
+    int nMajor;
+    int nMinor;
+    int nStepMajor;
+    int nStepMinor;
+    int nLast;
+    f32 fSlope;
+    f32 fRatio;
+    f32 fRun;
+    f32 fLen;
+    f32 fDist;
+
+    if (pFrom[0] == pTo[0] && pFrom[1] == pTo[1] && pFrom[2] == pTo[2]) return 0;
+    if (Ter_CheckForPinCollision(pCourse, nPlayer, pFrom, pTo, pHit, pNormal, ppSurface, ppObj)) {
+        fBest = fn_800BB028(pFrom, pHit);
+    }
+    nCell[0] = (int)fn_80035074((pFrom[0] - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
+    nCell[1] = (int)fn_80035074((pFrom[2] - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
+    nEndX = (int)fn_80035074((pTo[0] - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
+    nEndZ = (int)fn_80035074((pTo[2] - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
+    vDelta[0] = pTo[0] - pFrom[0];
+    vDelta[1] = pTo[2] - pFrom[2];
+    vStart[0] = pFrom[0];
+    vStart[1] = pFrom[2];
+    if (fn_8000AD9C(vDelta[0]) > fn_8000AD9C(vDelta[1])) {
+        nMajor = 0;
+        nMinor = 1;
+        fSlope = vDelta[1] / vDelta[0];
+    } else {
+        nMajor = 1;
+        nMinor = 0;
+        if (vDelta[1]) {
+            fSlope = vDelta[0] / vDelta[1];
+        } else {
+            fSlope = 0.0f;
+        }
+    }
+    if (vDelta[nMajor] > 0.0f) {
+        nStepMajor = 1;
+    } else {
+        nStepMajor = -1;
+    }
+    if (vDelta[nMinor] > 0.0f) {
+        nStepMinor = 1;
+    } else {
+        nStepMinor = -1;
+    }
+    // the next cell edge the line crosses on each axis
+    vEdge[nMajor] = pCourse->fGridCellSize[nMajor] * nCell[nMajor] + pCourse->fGridOrigin[nMajor];
+    vEdge[nMinor] = pCourse->fGridCellSize[nMinor] * nCell[nMinor] + pCourse->fGridOrigin[nMinor];
+    if (nStepMajor > 0) {
+        vEdge[nMajor] += pCourse->fGridCellSize[nMajor];
+    }
+    if (nStepMinor > 0) {
+        vEdge[nMinor] += pCourse->fGridCellSize[nMinor];
+    }
+    fn_8005097C(pTo, pFrom, vDir);
+    fn_800BAF04(vDir, vDir);
+    Vec_Copy(pFrom, vPos);
+    for (;;) {
+        Vec_Copy(vPos, vPrev);
+        if (nCell[0] == nEndX && nCell[1] == nEndZ) {
+            Vec_Copy(pTo, vPos);
+        } else {
+            fRun = vEdge[nMajor] - vStart[nMajor];
+            if (fRun != 0.0f) {
+                fRatio = (vEdge[nMinor] - vStart[nMinor]) / fRun;
+            } else {
+                fRatio = 1000000.0f;
+            }
+            if (fn_8000AD9C(fSlope) < fn_8000AD9C(fRatio)) {
+                fRun = vEdge[nMajor] - vStart[nMajor];
+                vPos[AXIS3(nMajor)] = vEdge[nMajor];
+                nLast = nMajor;
+                vPos[AXIS3(nMinor)] = vStart[nMinor] + fRun * vDir[AXIS3(nMinor)] / vDir[AXIS3(nMajor)];
+                vPos[1] = pFrom[1] + vDir[1] * fRun / vDir[AXIS3(nMajor)];
+            } else {
+                fRun = vEdge[nMinor] - vStart[nMinor];
+                vPos[AXIS3(nMinor)] = vEdge[nMinor];
+                nLast = nMinor;
+                vPos[AXIS3(nMajor)] = vStart[nMajor] + fRun * vDir[AXIS3(nMajor)] / vDir[AXIS3(nMinor)];
+                vPos[1] = pFrom[1] + vDir[1] * fRun / vDir[AXIS3(nMinor)];
+            }
+        }
+        fLen = Vec_Distance(vPos, vPrev);
+        fn_8004DF10(pCourse, vPrev, vDir, nCell[0], nCell[1], fLen);
+        if (fn_8004F43C(pCourse, nCell[0], nCell[1], vPrev, vPos, vDir, fLen, vHit, vNormal, &pSurface, &pObj)) {
+            fDist = fn_800BB028(pFrom, vHit);
+            if (fDist < fBest) {
+                fBest = fDist;
+                Vec_Copy(vHit, pHit);
+                Vec_Copy(vNormal, pNormal);
+                *ppSurface = pSurface;
+                *ppObj = pObj;
+            }
+        }
+        if (nCell[0] == nEndX && nCell[1] == nEndZ) break;
+        if (nLast == nMajor) {
+            nCell[nMajor] += nStepMajor;
+            vEdge[nMajor] += pCourse->fGridCellSize[nMajor] * nStepMajor;
+        } else {
+            nCell[nMinor] += nStepMinor;
+            vEdge[nMinor] += pCourse->fGridCellSize[nMinor] * nStepMinor;
+        }
+    }
+    if (fBest != 1000000.0f && fn_8000C5FC(vDir, pNormal) > 0.0f) {
+        fn_800509BC(pNormal, pNormal);
+    }
+    return fBest != 1000000.0f;
+}
+
 // TW06: bool Ter_CheckForSolidWorldCollisionOneGrid(...), the same parameters without the flags.
 // As fn_8004EB7C, but surfaces with a negative bounce (branches and leaves, which a ball passes
 // through) do not count.
@@ -1048,6 +1313,131 @@ u8 fn_8004F43C(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32* p
     }
     return 0;
 }
+// TW06: bool Ter_CheckForGroundCollision(TGD_TerrainInfo*, f32*, f32*, f32[4]*, f32[4]*,
+// TGD_MaterialInfo**, TGD_ObjectInstanceInfo**). The first ground the line from pFrom to pTo hits
+// (fn_8004FCB4 per cell); no pin and no objects.
+u8 Ter_CheckForGroundCollision(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
+                               SurfaceType** ppSurface, TerObject** ppObj) {
+    int nEndX;
+    int nEndZ;
+    f32 vHit[4];
+    f32 vNormal[4];
+    f32 vDir[4];
+    f32 vPrev[4];
+    f32 vPos[4];
+    int nCell[2];
+    f32 vDelta[2];
+    f32 vStart[2];
+    f32 vEdge[2];
+    SurfaceType* pSurface;
+    TerObject* pObj;
+    f32 fBest = 1000000.0f;
+    int nMajor;
+    int nMinor;
+    int nStepMajor;
+    int nStepMinor;
+    int nLast;
+    f32 fSlope;
+    f32 fRatio;
+    f32 fRun;
+    f32 fLen;
+    f32 fDist;
+
+    if (pFrom[0] == pTo[0] && pFrom[1] == pTo[1] && pFrom[2] == pTo[2]) return 0;
+    nCell[0] = (int)fn_80035074((pFrom[0] - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
+    nCell[1] = (int)fn_80035074((pFrom[2] - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
+    nEndX = (int)fn_80035074((pTo[0] - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
+    nEndZ = (int)fn_80035074((pTo[2] - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
+    vDelta[0] = pTo[0] - pFrom[0];
+    vDelta[1] = pTo[2] - pFrom[2];
+    vStart[0] = pFrom[0];
+    vStart[1] = pFrom[2];
+    if (fn_8000AD9C(vDelta[0]) > fn_8000AD9C(vDelta[1])) {
+        nMajor = 0;
+        nMinor = 1;
+        fSlope = vDelta[1] / vDelta[0];
+    } else {
+        nMajor = 1;
+        nMinor = 0;
+        if (vDelta[1]) {
+            fSlope = vDelta[0] / vDelta[1];
+        } else {
+            fSlope = 0.0f;
+        }
+    }
+    if (vDelta[nMajor] > 0.0f) {
+        nStepMajor = 1;
+    } else {
+        nStepMajor = -1;
+    }
+    if (vDelta[nMinor] > 0.0f) {
+        nStepMinor = 1;
+    } else {
+        nStepMinor = -1;
+    }
+    // the next cell edge the line crosses on each axis
+    vEdge[nMajor] = pCourse->fGridCellSize[nMajor] * nCell[nMajor] + pCourse->fGridOrigin[nMajor];
+    vEdge[nMinor] = pCourse->fGridCellSize[nMinor] * nCell[nMinor] + pCourse->fGridOrigin[nMinor];
+    if (nStepMajor > 0) {
+        vEdge[nMajor] += pCourse->fGridCellSize[nMajor];
+    }
+    if (nStepMinor > 0) {
+        vEdge[nMinor] += pCourse->fGridCellSize[nMinor];
+    }
+    fn_8005097C(pTo, pFrom, vDir);
+    fn_800BAF04(vDir, vDir);
+    Vec_Copy(pFrom, vPos);
+    for (;;) {
+        Vec_Copy(vPos, vPrev);
+        if (nCell[0] == nEndX && nCell[1] == nEndZ) {
+            Vec_Copy(pTo, vPos);
+        } else {
+            fRun = vEdge[nMajor] - vStart[nMajor];
+            if (fRun != 0.0f) {
+                fRatio = (vEdge[nMinor] - vStart[nMinor]) / fRun;
+            } else {
+                fRatio = 1000000.0f;
+            }
+            if (fn_8000AD9C(fSlope) < fn_8000AD9C(fRatio)) {
+                fRun = vEdge[nMajor] - vStart[nMajor];
+                vPos[AXIS3(nMajor)] = vEdge[nMajor];
+                nLast = nMajor;
+                vPos[AXIS3(nMinor)] = vStart[nMinor] + fRun * vDir[AXIS3(nMinor)] / vDir[AXIS3(nMajor)];
+                vPos[1] = pFrom[1] + vDir[1] * fRun / vDir[AXIS3(nMajor)];
+            } else {
+                fRun = vEdge[nMinor] - vStart[nMinor];
+                vPos[AXIS3(nMinor)] = vEdge[nMinor];
+                nLast = nMinor;
+                vPos[AXIS3(nMajor)] = vStart[nMajor] + fRun * vDir[AXIS3(nMajor)] / vDir[AXIS3(nMinor)];
+                vPos[1] = pFrom[1] + vDir[1] * fRun / vDir[AXIS3(nMinor)];
+            }
+        }
+        fLen = Vec_Distance(vPos, vPrev);
+        if (fn_8004FCB4(pCourse, nCell[0], nCell[1], vPrev, vPos, vDir, fLen, vHit, vNormal, &pSurface, &pObj)) {
+            fDist = fn_800BB028(pFrom, vHit);
+            if (fDist < fBest) {
+                fBest = fDist;
+                Vec_Copy(vHit, pHit);
+                Vec_Copy(vNormal, pNormal);
+                *ppSurface = pSurface;
+                *ppObj = pObj;
+            }
+        }
+        if (nCell[0] == nEndX && nCell[1] == nEndZ) break;
+        if (nLast == nMajor) {
+            nCell[nMajor] += nStepMajor;
+            vEdge[nMajor] += pCourse->fGridCellSize[nMajor] * nStepMajor;
+        } else {
+            nCell[nMinor] += nStepMinor;
+            vEdge[nMinor] += pCourse->fGridCellSize[nMinor] * nStepMinor;
+        }
+    }
+    if (fBest != 1000000.0f && fn_8000C5FC(vDir, pNormal) > 0.0f) {
+        fn_800509BC(pNormal, pNormal);
+    }
+    return fBest != 1000000.0f;
+}
+
 // TW06: bool Ter_CheckForGroundCollisionOneGrid(...). As fn_8004F43C, the ground only (no objects).
 u8 fn_8004FCB4(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32* pDir, f32 fMax, f32* pHit,
                f32* pNormal, SurfaceType** ppSurface, TerObject** ppObj) {
@@ -1109,6 +1499,130 @@ u8 fn_8004FCB4(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32* p
     }
     return 0;
 }
+// TW06: bool Ter_CheckForObjectCollision(...), the same parameters. The first object the line hits
+// (fn_800504F4 per cell).
+u8 fn_8004FF34(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal, SurfaceType** ppSurface,
+               TerObject** ppObj) {
+    int nEndX;
+    int nEndZ;
+    f32 vHit[4];
+    f32 vNormal[4];
+    f32 vDir[4];
+    f32 vPrev[4];
+    f32 vPos[4];
+    int nCell[2];
+    f32 vDelta[2];
+    f32 vStart[2];
+    f32 vEdge[2];
+    SurfaceType* pSurface;
+    TerObject* pObj;
+    f32 fBest = 1000000.0f;
+    int nMajor;
+    int nMinor;
+    int nStepMajor;
+    int nStepMinor;
+    int nLast;
+    f32 fSlope;
+    f32 fRatio;
+    f32 fRun;
+    f32 fLen;
+    f32 fDist;
+
+    if (pFrom[0] == pTo[0] && pFrom[1] == pTo[1] && pFrom[2] == pTo[2]) return 0;
+    nCell[0] = (int)fn_80035074((pFrom[0] - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
+    nCell[1] = (int)fn_80035074((pFrom[2] - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
+    nEndX = (int)fn_80035074((pTo[0] - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
+    nEndZ = (int)fn_80035074((pTo[2] - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
+    vDelta[0] = pTo[0] - pFrom[0];
+    vDelta[1] = pTo[2] - pFrom[2];
+    vStart[0] = pFrom[0];
+    vStart[1] = pFrom[2];
+    if (fn_8000AD9C(vDelta[0]) > fn_8000AD9C(vDelta[1])) {
+        nMajor = 0;
+        nMinor = 1;
+        fSlope = vDelta[1] / vDelta[0];
+    } else {
+        nMajor = 1;
+        nMinor = 0;
+        if (vDelta[1]) {
+            fSlope = vDelta[0] / vDelta[1];
+        } else {
+            fSlope = 0.0f;
+        }
+    }
+    if (vDelta[nMajor] > 0.0f) {
+        nStepMajor = 1;
+    } else {
+        nStepMajor = -1;
+    }
+    if (vDelta[nMinor] > 0.0f) {
+        nStepMinor = 1;
+    } else {
+        nStepMinor = -1;
+    }
+    // the next cell edge the line crosses on each axis
+    vEdge[nMajor] = pCourse->fGridCellSize[nMajor] * nCell[nMajor] + pCourse->fGridOrigin[nMajor];
+    vEdge[nMinor] = pCourse->fGridCellSize[nMinor] * nCell[nMinor] + pCourse->fGridOrigin[nMinor];
+    if (nStepMajor > 0) {
+        vEdge[nMajor] += pCourse->fGridCellSize[nMajor];
+    }
+    if (nStepMinor > 0) {
+        vEdge[nMinor] += pCourse->fGridCellSize[nMinor];
+    }
+    fn_8005097C(pTo, pFrom, vDir);
+    fn_800BAF04(vDir, vDir);
+    Vec_Copy(pFrom, vPos);
+    for (;;) {
+        Vec_Copy(vPos, vPrev);
+        if (nCell[0] == nEndX && nCell[1] == nEndZ) {
+            Vec_Copy(pTo, vPos);
+        } else {
+            fRun = vEdge[nMajor] - vStart[nMajor];
+            if (fRun != 0.0f) {
+                fRatio = (vEdge[nMinor] - vStart[nMinor]) / fRun;
+            } else {
+                fRatio = 1000000.0f;
+            }
+            if (fn_8000AD9C(fSlope) < fn_8000AD9C(fRatio)) {
+                fRun = vEdge[nMajor] - vStart[nMajor];
+                vPos[AXIS3(nMajor)] = vEdge[nMajor];
+                nLast = nMajor;
+                vPos[AXIS3(nMinor)] = vStart[nMinor] + fRun * vDir[AXIS3(nMinor)] / vDir[AXIS3(nMajor)];
+                vPos[1] = pFrom[1] + vDir[1] * fRun / vDir[AXIS3(nMajor)];
+            } else {
+                fRun = vEdge[nMinor] - vStart[nMinor];
+                vPos[AXIS3(nMinor)] = vEdge[nMinor];
+                nLast = nMinor;
+                vPos[AXIS3(nMajor)] = vStart[nMajor] + fRun * vDir[AXIS3(nMajor)] / vDir[AXIS3(nMinor)];
+                vPos[1] = pFrom[1] + vDir[1] * fRun / vDir[AXIS3(nMinor)];
+            }
+        }
+        fLen = Vec_Distance(vPos, vPrev);
+        if (fn_800504F4(pCourse, nCell[0], nCell[1], vPrev, vPos, vDir, fLen, vHit, vNormal, &pSurface, &pObj)) {
+            fDist = fn_800BB028(pFrom, vHit);
+            if (fDist < fBest) {
+                fBest = fDist;
+                Vec_Copy(vHit, pHit);
+                Vec_Copy(vNormal, pNormal);
+                *ppSurface = pSurface;
+                *ppObj = pObj;
+            }
+        }
+        if (nCell[0] == nEndX && nCell[1] == nEndZ) break;
+        if (nLast == nMajor) {
+            nCell[nMajor] += nStepMajor;
+            vEdge[nMajor] += pCourse->fGridCellSize[nMajor] * nStepMajor;
+        } else {
+            nCell[nMinor] += nStepMinor;
+            vEdge[nMinor] += pCourse->fGridCellSize[nMinor] * nStepMinor;
+        }
+    }
+    if (fBest != 1000000.0f && fn_8000C5FC(vDir, pNormal) > 0.0f) {
+        fn_800509BC(pNormal, pNormal);
+    }
+    return fBest != 1000000.0f;
+}
+
 // TW06: bool Ter_CheckForObjectCollisionOneGrid(...). As fn_8004F43C, objects only, plus ground
 // whose surface has flag 0x80.
 u8 fn_800504F4(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32* pDir, f32 fMax, f32* pHit,
