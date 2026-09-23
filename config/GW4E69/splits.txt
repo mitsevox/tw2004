@@ -1062,35 +1062,14 @@ unsorted/sweep_8007524C.c:
 unsorted/sweep_80075250.c:
 	.text       start:0x80075250 end:0x80075280
 
-unsorted/sweep_80075280.c:
-	.text       start:0x80075280 end:0x800752DC
-
-unsorted/sweep_8007531C.c:
-	.text       start:0x8007531C end:0x8007535C
-
 LLVideo.c:
-	.text       start:0x800754C0 end:0x80076128
-
-unsorted/sweep_80076128.c:
-	.text       start:0x80076128 end:0x80076158
+	.text       start:0x80075280 end:0x80076158
 
 unsorted/sweep_800763B4.c:
 	.text       start:0x800763B4 end:0x800763BC
 
 GoCamera.c:
-	.text       start:0x800763BC end:0x80076948
-
-unsorted/sweep_80076948.c:
-	.text       start:0x80076948 end:0x80076954
-
-unsorted/sweep_80076954.c:
-	.text       start:0x80076954 end:0x800769C0
-
-unsorted/sweep_800769C0.c:
-	.text       start:0x800769C0 end:0x80076A04
-
-unsorted/sweep_80076A04.c:
-	.text       start:0x80076A04 end:0x80076A14
+	.text       start:0x800763BC end:0x80076A54
 
 GoViewport.c:
 	.text       start:0x80076A54 end:0x80076B7C
