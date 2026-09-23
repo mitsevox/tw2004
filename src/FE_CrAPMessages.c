@@ -221,6 +221,58 @@ void fn_80108140(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = fn_801049C8(pArgs[0].i);
 }
 
+// ---- end of sweep code ----
+
+// Set one of the profile's settings: 0 its name (pArgs[1]), 1 nAF7A, 2 the date (packed as
+// fn_80078604 packs it), 3 n5613 (pArgs[2]).
+void fn_80108178(MsgArg* pArgs, MsgArg* pResult) {
+    int nMonth;
+    int nDay;
+    int nYear;
+    SaveProfile* pProfile = fn_80077ACC();
+
+    switch (pArgs[0].i) {
+    case 0:
+        fn_80057ED0(pProfile, ((MsgString*)pArgs[1].p)->pStr);
+        break;
+    case 1:
+        pProfile->nAF7A = pArgs[2].i;
+        fn_80103B8C(pProfile->nAF7A);
+        break;
+    case 2:
+        fn_80078620(pArgs[2].i, &nMonth, &nDay, &nYear);
+        pProfile->nDateDay = nDay;
+        pProfile->nDateMonth = nMonth;
+        pProfile->nDateYear = nYear;
+        break;
+    case 3:
+        pProfile->n5613 = pArgs[2].i;
+        break;
+    }
+}
+
+// Read one of the profile's settings (see fn_80108178).
+void fn_80108244(MsgArg* pArgs, MsgArg* pResult) {
+    SaveProfile* pProfile = fn_80077ACC();
+
+    switch (pArgs[0].i) {
+    case 0:
+        strcpy(((MsgString*)pArgs[1].p)->pStr, pProfile->szName);
+        break;
+    case 1:
+        *(s32*)pArgs[2].p = (s8)pProfile->nAF7A;
+        break;
+    case 2:
+        *(s32*)pArgs[2].p = fn_80078604(pProfile->nDateMonth, pProfile->nDateDay, pProfile->nDateYear);
+        break;
+    case 3:
+        *(s32*)pArgs[2].p = pProfile->n5613;
+        break;
+    }
+}
+
+// ---- sweep code (not yet cleaned up) ----
+
 void fn_80108300(MsgArg* pArgs, MsgArg* pResult) {
     lbl_80281ED4->bCopy = pArgs[0].i;
 }

@@ -17,7 +17,6 @@
 // Outside this file.
 void fn_800142A4(s8 n);                 // sets lbl_80281C98
 void fn_80057438(SaveProfile* pProfile);
-void fn_80057ED0(SaveProfile* pProfile, const char* pName);     // PasswordManager.c
 void fn_800A44A0(void);
 void fn_8008E354(void);                 // FEgolferanim.c
 void fn_8008F80C(s32 p0, s32 p1);       // uiProcessInterface.c
