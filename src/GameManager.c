@@ -154,7 +154,6 @@ struct SaveProfile {
 int   strcmp(const char* a, const char* b);
 
 extern u8* gpSaveData;
-extern u8  lbl_80202898[];
 extern s32 lbl_80282278;
 extern u8  lbl_8028227C;
 extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
@@ -179,14 +178,14 @@ void fn_800DCB10(int nPlayer) {
 }
 
 u8 fn_800DCB3C(void) {
-    if (*(s32*)(lbl_80202898 + 0x2C) == 0) {
+    if (lbl_80202898.n2C == 0) {
         return 1;
     }
-    return (*(s32*)(lbl_80202898 + 0x28) % *(s32*)(lbl_80202898 + 0x2C)) == 0;
+    return (lbl_80202898.n28 % lbl_80202898.n2C) == 0;
 }
 
 u8 fn_800DCB74(void) {
-    return *(u8*)(lbl_80202898 + 0x11);
+    return lbl_80202898.b11;
 }
 
 // out = a - b (three floats); the same helper as Ball.c's fn_80055EA0.
@@ -820,7 +819,7 @@ int GM_ShowPostShotAnimation(int nPlayer) {
 
 // TW06: GM_ShowPostShotCrowdFlyby (by position). Two measures of the shot (fn_800336E4 at least 5,
 // fn_800336F4 at least 0.5).
-int GM_ShowPostShotCrowdFlyby(void) {
+u8 GM_ShowPostShotCrowdFlyby(void) {
     if (fn_800336E4() >= 5.0f && fn_800336F4() >= 0.5f) {
         return 1;
     }

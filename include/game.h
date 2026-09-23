@@ -19,6 +19,7 @@ void Session_SetNumPlayers(int n);      // Golfer.c
 
 u8   fn_80058F5C(int nPlayer);          // the per-frame swing poll: the ball was struck
 f32  fn_8005B64C(int nPlayer);          // the swing's shot power
+f32  fn_8005CB78(int nHandle, unsigned long long uEvent);   // the time of the character's animation event
 void GOLFERSTATE_Push(int nState, int nPlayer);     // push a state and run its enter callback
 void GOLFERSTATE_Set(int nState, int nPlayer);      // pop everything and start again from one state
 void GOLFERSTATE_Switch(int nState, int nPlayer);   // replace the current state
@@ -30,6 +31,9 @@ void STATEFUNC_SimulateExit(int nPlayer);
 void fn_80062B70(void);
 void fn_80062B74(int nPlayer);
 void fn_80062B78(int nPlayer);
+int  fn_80062C10(int nHandle);          // the character's flag 4
+int  fn_80062C1C(int nHandle);          // the character's flag 1
+f32  fn_80062C28(int nHandle);          // how far the character's animation still has to run
 void fn_80062C38(void);
 void fn_80062C5C(void);
 void fn_80062C80(int a, u8 b);
@@ -73,8 +77,50 @@ u8   fn_800DA174(void);
 u8   fn_800DA1D4(void);
 u8   fn_800DA234(void);                 // the current hole is the flagged one
 
-// GameEffects.c
-typedef struct GameEffects GameEffects;
+// GameEffects.c: slow motion, the GameBreaker (letterbox), the heartbeat rumble. The effects
+// state (0x58 bytes):
+typedef struct GameEffects {
+    u8   bSlowMo;               // 0x00  super slow motion is on
+    u8   unk1[3];
+    f32  fSlowMo;               // 0x04  its rate (below 1 slows down)
+    u8   unk8;
+    u8   b9;                    // 0x09
+    u8   unkA[2];
+    f32  fC;                    // 0x0C
+    u8   b10;                   // 0x10  half speed
+    u8   b11;                   // 0x11  quarter-ish speed, counted in n28
+    u8   bGameBreaker;          // 0x12  the letterbox is up
+    u8   unk13;
+    s32  nGBType;               // 0x14  0 scripted, 1 predicted
+    u8   bClosing;              // 0x18  the letterbox is closing
+    u8   b19;                   // 0x19
+    u8   unk1A[2];
+    f32  fGBTime;               // 0x1C  seconds the letterbox has been opening (or left closing)
+    u8   unk20[4];
+    f32  f24;                   // 0x24
+    s32  n28;                   // 0x28  frames at the slow rate
+    s32  n2C;                   // 0x2C  every n2C-th of them the ball moves
+    s32  nPlayer;               // 0x30  whose shot
+    u8   unk34[8];
+    u8   bSpinWindowDone;       // 0x3C
+    u8   unk3D[3];
+    s32  nRumbleFrames;         // 0x40
+    u8   bRumble;               // 0x44
+    u8   nHeartbeats;           // 0x45
+    u8   bPaused;               // 0x46
+    u8   b47;                   // 0x47  u48 holds a sound to stop
+    u16  u48;                   // 0x48
+    u8   b4A;                   // 0x4A  u4C holds a sound to stop
+    u8   unk4B;
+    u16  u4C;                   // 0x4C
+    u8   b4E;                   // 0x4E
+    u8   n4F;                   // 0x4F  the music to go back to
+    u32  uFlags;                // 0x50  bit 0x4000: an eagle on a par 5 counts
+    f32  f54;                   // 0x54
+} GameEffects;
+
+extern GameEffects lbl_80202898;        // 0x80202898
+
 GameEffects* fn_800DAF74(void);
 void GameEffects_ResetGameEffectSettings(void);
 int  GameEffects_BallUpdatesThisFrame(int nPlayer);   // preview speed: ghost steps per frame
@@ -82,6 +128,7 @@ void fn_800DB4E8(int nPlayer);
 void fn_800DB714(int nPlayer);
 void fn_800DBDA8(int nPlayer);
 void GameEffects_SetSuperSlowMo(u8 bOn, int nPlayer, f32 fRate);
+u8   fn_800DC514(int nPlayer);          // super slow motion is on (nPlayer unused)
 void fn_800DC9D4(int a);                // pause or resume a GameBreaker
 
 // GameManager.c
@@ -102,6 +149,7 @@ void GM_PlayerTookShot(int nPlayer);
 u8   GM_PlayerTakeMulligan(int nPlayer);
 int  fn_800DDFB4(int nPlayer);
 int  GM_ShowPostShotAnimation(int nPlayer);
+u8   GM_ShowPostShotCrowdFlyby(void);
 void GM_FlyByMode_Init(void);
 void GM_ReplaceOOBBall(int nPlayer);
 void fn_800DEB5C(int nPlayer);
