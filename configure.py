@@ -231,7 +231,9 @@ cflags_base = [
     "-RTTI off",
     "-fp_contract on",
     "-str reuse",
-    "-common on",         # EA game code: uninitialised globals are COMMON (UStream.c addresses each array separately)
+    # EA's uninitialised globals sit in .bss in link order, before the SDK's .bss, so they were not
+    # COMMON (commons link after every .bss). With pool_data off, -common changes no function.
+    "-common off",
     "-use_lmw_stmw on",   # EA game code: prologues use stmw/lmw, not _savegpr
     "-multibyte",  # For Wii compilers, replace with `-enc SJIS`
     "-i include",
@@ -884,7 +886,7 @@ config.libs = [
             Object(Matching, "GameModeAlternateShot.c"),
             Object(Matching, "GameModeBattle.c"),
             Object(NonMatching, "GameModeBestBall.c"),
-            Object(NonMatching, "GameModeFourBall.c"),
+            Object(Matching, "GameModeFourBall.c"),
             Object(Matching, "GameModeMatch.c"),
             Object(NonMatching, "GameMode5.c"),
             Object(Matching, "GameMode9.c"),
@@ -910,7 +912,7 @@ config.libs = [
             Object(NonMatching, "LLDynTex.c"),
             Object(NonMatching, "CharSliders.c"),
             Object(NonMatching, "FE_PGATourMessages.c"),
-            Object(NonMatching, "FE_LogoDesign.c"),
+            Object(Matching, "FE_LogoDesign.c"),
             Object(NonMatching, "hwsBurn.c"),
             Object(NonMatching, "hwsMaterial_Gc.c"),
             Object(NonMatching, "hwsOverride_Gc.c"),

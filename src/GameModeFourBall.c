@@ -83,6 +83,27 @@ u8 fn_800E8F20(int nTeam) {
     return bConceded;
 }
 
+// fake match: fn_800E8FC8 gets the team's players through these two helpers, and the const on the
+// return types is what schedules its first loads like the original (found by the permuter); the
+// other team functions above only match with the same code written out.
+// The team's first player (0 or 2).
+static inline const int FourBall_TeamFirst(int nTeam) {
+    int a = 2;
+    if (nTeam == 0) {
+        a = 0;
+    }
+    return a;
+}
+
+// The team's second player (1 or 3).
+static inline const int FourBall_TeamSecond(int nTeam) {
+    int b = 3;
+    if (nTeam == 0) {
+        b = 1;
+    }
+    return b;
+}
+
 // TW06: GameModeFourBall::TeamBestPossibleScore. The team's best score on this hole if a partner
 // holes the next shot (at most 9), or its score once holed.
 int fn_800E8FC8(int nTeam) {
@@ -91,14 +112,8 @@ int fn_800E8FC8(int nTeam) {
     int n;
     int b;
     int nBest;
-    a = 2;
-    if (nTeam == 0) {
-        a = 0;
-    }
-    b = 3;
-    if (nTeam == 0) {
-        b = 1;
-    }
+    a = FourBall_TeamFirst(nTeam);
+    b = FourBall_TeamSecond(nTeam);
     if (gPlayers[a].nStrokes[nHole] + 1 < 9) {
         n = gPlayers[a].nStrokes[nHole] + 1;
     } else {
