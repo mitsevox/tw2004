@@ -9,6 +9,8 @@ linked (`Matching` in configure.py); the rest only provide the comparison and th
 
 Changed for this game:
 - `MetroTRK/nubinit.c`: the welcome string says v2.0, as this game's TRK does.
+- `MetroTRK/mslsupp.c`: no `__close_console`. This game's comes from the MSL UART console code
+  (0x8015C120, returns 0), which `__files` points at; a second definition here would clash with it.
 
 `include/` holds just the headers these files need, copied from the same project.
 
