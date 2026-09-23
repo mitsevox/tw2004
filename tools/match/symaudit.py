@@ -26,6 +26,7 @@ import collections, concurrent.futures, pathlib, re, struct, subprocess, sys, te
 ROOT = pathlib.Path(__file__).resolve().parents[2]   # the checkout this script lives in
 sys.path.insert(0, str(ROOT / 'tools/match'))
 from lint import CFLAGS                              # noqa: E402  (same flags as lint's compiles)
+import sweepblock                                    # noqa: E402
 
 CC = ROOT / 'build/compilers/GC/2.5/mwcceppc.exe'
 NM = ROOT / 'build/binutils/powerpc-eabi-nm.exe'
@@ -92,7 +93,9 @@ def declared_sizes(src, names):
 
 def size_findings(syms):
     objects = {n: e for n, es in syms.items() for e in es if e[2] == 'object' and e[1]}
-    work = {f: set(re.findall(r'\b[A-Za-z_]\w*\b', f.read_text(encoding='utf-8', errors='replace')))
+    # names used only inside a marked block of uncleaned sweep code are left for its cleanup
+    work = {f: set(re.findall(r'\b[A-Za-z_]\w*\b',
+                              sweepblock.strip_blocks(f.read_text(encoding='utf-8', errors='replace'))))
             & objects.keys() for f in sorted((ROOT / 'src').glob('*.c'))}
     with concurrent.futures.ThreadPoolExecutor(8) as pool:
         sizes = dict(zip(work, pool.map(lambda f: declared_sizes(f, work[f]), work)))

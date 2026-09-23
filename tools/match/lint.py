@@ -7,6 +7,10 @@ Exits 1 if anything is found. Rules and the reason for each are in docs/style.md
 import pathlib, re, sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]   # the checkout this script lives in
+sys.path.insert(0, str(ROOT / 'tools/match'))
+import sweepblock                                    # noqa: E402
+
+SWEEP_DEBT = {}                                      # file name -> lines of uncleaned sweep code
 
 CHECKS = [
     ('m2c-leftover', re.compile(r'\b(temp|var)_[rf]\d+\b|\bM2C_|\bsp[0-9A-F]{1,3}\b|^\s*\?\*? \w+;')),
@@ -62,8 +66,12 @@ def lint(path, protos):
         hits.append((len(lines), 'final-newline', 'no newline at end of file'))
     if not re.match(r'// \w+\.c\b', lines[0]):
         hits.append((1, 'header-comment', 'first line should be "// <File>.c (our name): ..."'))
+    raw_sweep = sweepblock.lines_in_blocks(lines)      # style rules wait until the code is cleaned
+    SWEEP_DEBT[path.name] = len(raw_sweep)
     for i, l in enumerate(lines, 1):
         l = l.rstrip('\r')
+        if i in raw_sweep:
+            continue
         for name, rx in CHECKS:
             if name == 'no-braces' and EARLY_EXIT.search(l):
                 continue            # a one-line early exit is allowed (style.md, Formatting)
@@ -213,6 +221,10 @@ def main():
         else:
             for ln, n, msg in hits:
                 print('%s:%d: %s: %s' % (f.name, ln, n, msg[:100]))
+    debt = {f: n for f, n in SWEEP_DEBT.items() if n}
+    if debt and changed is None:
+        print('%d lines of sweep code not yet cleaned up, in %d files (tools/match/sweepblock.py)'
+              % (sum(debt.values()), len(debt)))
     print(total, 'findings')
     sys.exit(1 if total else 0)
 

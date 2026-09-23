@@ -13,6 +13,8 @@ Sweep files (src/unsorted) are skipped. The goal is zero of all four; merges may
 import collections, pathlib, re, sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]   # the checkout this script lives in
+sys.path.insert(0, str(ROOT / 'tools/match'))
+import sweepblock                                    # noqa: E402
 
 
 def audit():
@@ -20,7 +22,8 @@ def audit():
     tdefs = collections.defaultdict(list)
     raw = collections.Counter()      # 'extern' / 'typedef' lines in .c files
     for f in sorted((ROOT / 'src').glob('*.c')):
-        s = f.read_text(encoding='utf-8', errors='replace')
+        # a marked block of uncleaned sweep code is counted by lint.py, not here (sweepblock.py)
+        s = sweepblock.strip_blocks(f.read_text(encoding='utf-8', errors='replace'))
         for m in re.finditer(r'^extern\s+([\w \*]+?)\s*\b(\w+)\s*(\[[^\]]*\])?\s*;', s, re.M):
             t = ' '.join((m.group(1) + ('[]' if m.group(3) else '')).replace('*', ' * ').split())
             ext[m.group(2)][f.name] = t
