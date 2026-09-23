@@ -403,8 +403,8 @@ typedef struct GameOptions {
     s32  n14;                   // 0x14
     s32  n18;                   // 0x18  -> fn_80055C40
     s32  n1C;                   // 0x1C  -> fn_80055CD0
-    u8   unk20[4];
-    u8   a24[8];                // 0x24  eight on/off options, default on; [7] (0xEA3) the swing trail
+    s32  n20;                   // 0x20  0..2 -> fn_80055CAC (FE_MessageTable.c fn_800811E4)
+    u8   a24[8];               // 0x24  eight on/off options, default on; [7] (0xEA3) the swing trail
     u8   bBoostEnabled;         // 0x2C  (gSession + 0xEA4)
     u8   bSpinEnabled;          // 0x2D  (gSession + 0xEA5)
     u8   rows[4][19];           // 0x2E  four rows of 19 flags
