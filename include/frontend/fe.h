@@ -160,7 +160,7 @@ typedef struct CrAPAsset {
     s16  nCategory;             // 0x02A  its category: where the category's name ("Hats",
                                 //        "Visors") starts in the 'CR_S' strings (fn_801064EC)
     s16  n2C;                   // 0x02C
-    u8   unk2E[2];
+    s16  n2E;                   // 0x02E  0..15; fn_801074D4 tests it
     s32  n30;                   // 0x030
     s32  n34;                   // 0x034
     s32  n38;                   // 0x038
@@ -201,6 +201,20 @@ extern char lbl_801932C8[CRAP_NUM_PARTS][32];   // per part: the name of its "Al
 
 int  fn_80103B28(int nAsset);           // the asset nAsset takes its attributes from (itself,
                                         // or for lock kind 28 the asset its nLock names)
+CrAPAsset* fn_80103B4C(CrAPAsset* pAsset);  // the same, by asset
+u8   fn_80103B80(void);                 // the database's b14
+s8   fn_80103BB4(void);                 // the database's n4
+int  fn_80103D14(s16 nSlot);            // the profile's aAF80[nSlot], an asset (-1 past slot 52)
+int  fn_801049C8(s16 nPart);
+void fn_80104804(void);
+int  fn_80105C44(s16 nPart, int b);
+u8   fn_801061C8(s8 n);                 // an asset with this n40 is offered
+int  fn_80106244(s16 nPart);            // the first slot of aAF80 whose asset is of the part
+                                        // (-1: none)
+u8   fn_8010645C(int nOffset, char* pDst);  // copy a 'CR_S' name ("" for "NONE")
+void fn_801072CC(s16 nPart, s32* pLocked, s32* pB1CC, s32* pB344, s32* pAll);  // count a part's
+                                        // offered assets: locked, with each bit set, and all
+u8   fn_801074D4(int nAsset);
 u8   fn_80104020(int nAsset);           // the asset may be picked: not locked when last checked,
                                         // and its aB1CC bit is set
 int  fn_801048EC(s16 nPart, int b);     // how many choices a part has
@@ -242,6 +256,19 @@ extern char* lbl_80191990[30];          // per course: a string the menus show (
                                         // picks it)
 extern s32 lbl_80281FFC;                // set by fn_80084FF0
 
+// ---- the golfers animated on menu screens (FEgolferanim.c) ------------------------------------
+
+s32  fn_8008B990(void);
+void fn_8008DAEC(void);
+void fn_8008E244(void);
+void fn_8008E364(int n);
+s32  fn_8008E420(void);
+s32  fn_8008E44C(void);
+void fn_8008E6D4(int n);
+void fn_8008E724(u32 a, u32 b, s8 c, u8 d);
+void fn_8008E824(void);
+void fn_8008E860(s32 n);
+
 // ---- the logo editor (FE_LogoDesign.c) -------------------------------------------------------
 
 // A logo is 8-bit colour indexes into a 256-colour palette, either 64 x 64 (shape 0, drawn into
@@ -262,8 +289,17 @@ extern s16* lbl_802824BC;               // the palette: 256 colours, 1-bit alpha
                                         // and 5-5-5 RGB; read signed (lha)
 extern u8 lbl_802824C0;                 // the palette has been copied from "__LogoSquare"
 
+void fn_8010F7C0(s32 n);                // pick the logo to edit (LogoEdit.n0)
+s32  fn_8010F7D8(void);                 // which logo is edited
+void fn_8010F7E4(s32 nShape);           // set its shape
+void fn_8010F7FC(int nColor, u32* pR, u32* pG, u32* pB, u32* pA);  // a palette colour, 0-255 each
+void fn_8010F880(void);                 // mark the logo changed
+void fn_8010F890(char* pName);          // load the logo from a texture
+void fn_8010F90C(int nX, int nY, int nColor);   // set a pixel
 u8*  fn_8010FB70(void);                 // the logo's pixels
 s16* fn_8010FBC4(void);                 // the palette
+int  fn_8010FBCC(int nX, int nY, u32* pR, u32* pG, u32* pB, u32* pA);  // a pixel's colour index,
+                                        // and its colour as fn_8010F7FC gives it
 void fn_8010FC3C(u8* pDst, u8* pSrc, int a, int nWidth, int nHeight);   // copy pixels: a = 0
                                         // from a texture into the logo, 1 from the logo into one
 
