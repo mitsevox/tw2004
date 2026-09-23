@@ -141,6 +141,15 @@ void fn_800FEC80(int nPlayer) {
     }
 }
 
+// fake match: stands in for a function the original linker stripped. Its constants (0.0, then 0.5)
+// are still in this file's pool; its body is unknown.
+static f32 GameMode12_StrippedFn(f32 x) {
+    if (x > 0.5f) {
+        return 0.0f;
+    }
+    return x;
+}
+
 // A surface's row in the prize table: its points, bonus-meter points and shot multiplier (all 0
 // when it has none).
 void fn_800FEF00(s32 nSurface, s32* pPoints, s32* pMeter, s32* pMult) {
