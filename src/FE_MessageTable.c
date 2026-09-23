@@ -17,6 +17,7 @@
 void fn_800142A4(s8 n);                 // sets lbl_80281C98
 void fn_80057438(SaveProfile* pProfile);
 void fn_80057ED0(SaveProfile* pProfile, const char* pName);     // PasswordManager.c
+void fn_800A44A0(void);
 void fn_8008E354(void);                 // FEgolferanim.c
 void fn_8008F80C(s32 p0, s32 p1);       // uiProcessInterface.c
 void fn_8008E358(s32 p0);               // FEgolferanim.c
@@ -3645,6 +3646,39 @@ void fn_8008281C(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 7;
 }
 
+// The card in slot pArgs[0], pArgs[1]: whether its sectors are not 8 KB, and its error flags
+// (bad encoding, not a memory card, I/O error, broken).
+void fn_80082828(MsgArg* pArgs, MsgArg* pResult) {
+    MCCardState state;
+
+    fn_8009F7F4(&state, pArgs[0].i, pArgs[1].i);
+    if (state.nSectorSize != 0x2000) {
+        *(s32*)pArgs[2].p = 1;
+    } else {
+        *(s32*)pArgs[2].p = 0;
+    }
+    if (state.uFlags & MC_CARD_ENCODING) {
+        *(s32*)pArgs[3].p = 1;
+    } else {
+        *(s32*)pArgs[3].p = 0;
+    }
+    if (state.uFlags & MC_CARD_WRONGDEVICE) {
+        *(s32*)pArgs[4].p = 1;
+    } else {
+        *(s32*)pArgs[4].p = 0;
+    }
+    if (state.uFlags & MC_CARD_IOERROR) {
+        *(s32*)pArgs[5].p = 1;
+    } else {
+        *(s32*)pArgs[5].p = 0;
+    }
+    if (state.uFlags & MC_CARD_BROKEN) {
+        *(s32*)pArgs[6].p = 1;
+        return;
+    }
+    *(s32*)pArgs[6].p = 0;
+}
+
 void fn_80082928(MsgArg* pArgs, MsgArg* pResult) {
     gSession.nC = 2;
 }
@@ -3751,6 +3785,83 @@ void fn_80082E10(MsgArg* pArgs, MsgArg* pResult) {
         n = nError;
     }
     pResult->i = n;
+}
+
+// Options b7A..b7E as the menus' choices (1 on, 2 off), and n80.
+void fn_80082E5C(MsgArg* pArgs, MsgArg* pResult) {
+    switch (gSession.options.b7A) {
+    case 1:
+        *(s32*)pArgs[0].p = 1;
+        break;
+    case 0:
+        *(s32*)pArgs[0].p = 2;
+        break;
+    }
+    switch (gSession.options.b7B) {
+    case 1:
+        *(s32*)pArgs[1].p = 1;
+        break;
+    case 0:
+        *(s32*)pArgs[1].p = 2;
+        break;
+    }
+    switch (gSession.options.b7C) {
+    case 1:
+        *(s32*)pArgs[2].p = 1;
+        break;
+    case 0:
+        *(s32*)pArgs[2].p = 2;
+        break;
+    }
+    switch (gSession.options.b7D) {
+    case 1:
+        *(s32*)pArgs[3].p = 1;
+        break;
+    case 0:
+        *(s32*)pArgs[3].p = 2;
+        break;
+    }
+    *(s32*)pArgs[4].p = gSession.options.b7E ? 1 : 2;
+    *(s32*)pArgs[5].p = gSession.options.n80;
+}
+
+// Set options b7A..b7E from the menus' choices (1 on, 2 off) and n80, then apply them.
+void fn_80082F68(MsgArg* pArgs, MsgArg* pResult) {
+    switch (pArgs[0].i) {
+    case 1:
+        gSession.options.b7A = 1;
+        break;
+    case 2:
+        gSession.options.b7A = 0;
+        break;
+    }
+    switch (pArgs[1].i) {
+    case 1:
+        gSession.options.b7B = 1;
+        break;
+    case 2:
+        gSession.options.b7B = 0;
+        break;
+    }
+    switch (pArgs[2].i) {
+    case 1:
+        gSession.options.b7C = 1;
+        break;
+    case 2:
+        gSession.options.b7C = 0;
+        break;
+    }
+    switch (pArgs[3].i) {
+    case 1:
+        gSession.options.b7D = 1;
+        break;
+    case 2:
+        gSession.options.b7D = 0;
+        break;
+    }
+    gSession.options.b7E = pArgs[4].i == 1;
+    gSession.options.n80 = pArgs[5].i;
+    fn_800A44A0();
 }
 
 void fn_80083354(MsgArg* pArgs, MsgArg* pResult) {
