@@ -296,17 +296,17 @@ void fn_800E890C(void) {
 void fn_800E8A68(void) {
     int i;
     int nFirst;
-    int nOther;
-    int nOther2;
     int nSum;
     int nOtherTeam;
-    int nOurs;
     int nTheirs;
     int nMargin;
     int x;
     int y;
+    int nOurs;
+    int nOther2;
     int nBase;
     int nMoney;
+    int nOther;
     int nProfile;
     if (fn_800E1BBC()) {
         switch (fn_800EC550()) {
@@ -329,8 +329,8 @@ void fn_800E8A68(void) {
                 if (Team_IsAllCPU(nOtherTeam)) {
                     nOurs = fn_800E1788(nFirst);
                     nOurs += fn_800E1788(nFirst + 1);
-                    nOther2 = nOther + 1;
                     nTheirs = fn_800E1788(nOther);
+                    nOther2 = nOther + 1;
                     nTheirs += fn_800E1788(nOther2);
                     if (nOurs < nTheirs) {
                         nMargin = nTheirs - nOurs;
@@ -341,7 +341,9 @@ void fn_800E8A68(void) {
                         y = fn_800D3C7C(nOther2);
                         nSum = GOLFER_PRIZE(x).nBase + GOLFER_PRIZE(y).nBase;
                         nBase = nSum / 2;
-                        nMoney = (nSum + GOLFER_PRIZE(x).nPerStroke * nMargin + GOLFER_PRIZE(y).nPerStroke * nMargin) / 2;
+                        nMoney = nSum + GOLFER_PRIZE(x).nPerStroke * nMargin;
+                        nMoney += GOLFER_PRIZE(y).nPerStroke * nMargin;
+                        nMoney /= 2;
                         for (i = 0; i < 2; i++) {
                             nProfile = gPlayers[nFirst + i].nIndex;
                             if (gpSaveData[nProfile * 0x10600]) {
