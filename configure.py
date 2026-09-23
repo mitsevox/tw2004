@@ -476,7 +476,7 @@ config.libs = [
             Object(Matching, "src/dsp/dsp.c"),
             Object(Matching, "src/dvd/dvdFatal.c"),
             Object(Matching, "src/gx/GXDisplayList.c"),
-            Object(NonMatching, "src/gx/GXTransform.c"),
+            Object(Matching, "src/gx/GXTransform.c"),
             Object(Matching, "src/os/OSFont.c"),
             Object(Matching, "src/os/OSLink.c"),
             Object(Matching, "src/os/OSSemaphore.c"),

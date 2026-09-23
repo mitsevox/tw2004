@@ -1444,6 +1444,7 @@ src/gx/GXDisplayList.c:
 
 src/gx/GXTransform.c:
 	.text       start:0x80144AA8 end:0x80145140
+	.sdata2     start:0x80284C30 end:0x80284C48
 
 dolphin/gx/GXPerf.c:
 	.text       start:0x80145140 end:0x80145998

@@ -285,6 +285,27 @@ void GXLoadTexMtxImm(const f32 mtx[][4], u32 id, GXTexMtxType type) {
 #endif
 }
 
+// Loads texture matrix `id` from entry `mtx_indx` of the indexed matrix array (CP command 0x30)
+// instead of sending the matrix itself.
+void GXLoadTexMtxIndx(u16 mtx_indx, u32 id, GXTexMtxType type) {
+    u32 reg;
+    u32 addr;
+    u32 count;
+
+    if (id >= GX_PTTEXMTX0) {
+        addr = (id - GX_PTTEXMTX0) * 4 + 0x500;
+    } else {
+        addr = id * 4;
+    }
+    count = (type == GX_MTX2x4) ? 8 : 12;
+    reg = addr;
+    reg = (reg & 0xFFFF0FFF) | ((count - 1) << 12);
+    reg = (reg & 0x0000FFFF) | ((u32)mtx_indx << 16);
+
+    GX_WRITE_U8(0x30);
+    GX_WRITE_U32(reg);
+}
+
 #pragma dont_inline on
 /*
  * --INFO--
