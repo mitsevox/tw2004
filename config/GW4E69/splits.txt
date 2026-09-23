@@ -517,52 +517,7 @@ unsorted/sweep_8003024C.c:
 	.text       start:0x8003024C end:0x80030254
 
 GoTerrain.c:
-	.text       start:0x80030254 end:0x8003541C
-
-unsorted/sweep_8003541C.c:
-	.text       start:0x8003541C end:0x80035440
-
-unsorted/sweep_80035440.c:
-	.text       start:0x80035440 end:0x8003546C
-
-unsorted/sweep_800354B4.c:
-	.text       start:0x800354B4 end:0x800354C4
-
-unsorted/sweep_800354C4.c:
-	.text       start:0x800354C4 end:0x800354D0
-
-unsorted/sweep_800354E4.c:
-	.text       start:0x800354E4 end:0x80035500
-
-unsorted/sweep_80035500.c:
-	.text       start:0x80035500 end:0x80035508
-
-unsorted/sweep_80035508.c:
-	.text       start:0x80035508 end:0x80035514
-
-unsorted/sweep_80035554.c:
-	.text       start:0x80035554 end:0x8003556C
-
-unsorted/sweep_8003556C.c:
-	.text       start:0x8003556C end:0x80035574
-
-unsorted/sweep_80035574.c:
-	.text       start:0x80035574 end:0x80035584
-
-unsorted/sweep_80035584.c:
-	.text       start:0x80035584 end:0x80035590
-
-unsorted/sweep_80035590.c:
-	.text       start:0x80035590 end:0x800355E0
-
-unsorted/sweep_800355E0.c:
-	.text       start:0x800355E0 end:0x80035600
-
-unsorted/sweep_80035600.c:
-	.text       start:0x80035600 end:0x80035604
-
-unsorted/sweep_80035604.c:
-	.text       start:0x80035604 end:0x80035640
+	.text       start:0x80030254 end:0x80035640
 
 Skin.c:
 	.text       start:0x800358E0 end:0x80037AB8

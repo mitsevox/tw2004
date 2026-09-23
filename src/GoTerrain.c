@@ -8,6 +8,7 @@
 #include "ball.h"
 #include "game.h"
 #include "engine.h"
+#include "game_types.h"
 
 void* fn_800073B4(u8* pData, int n);
 void  fn_800075CC(void* p);         // frees what fn_800073B4 made
@@ -710,7 +711,6 @@ f32 fn_800351D8(u32 n, f32 fPeriod) {
 
 void fn_80013D68();
 void fn_80013D9C();
-void fn_80035240(s32 p0);
 void fn_8003526C(void);
 void fn_80035294(void);
 void fn_800352BC(void);
@@ -718,10 +718,7 @@ extern u8* lbl_80281380;
 void fn_80035398(void);
 void fn_8003541C();
 void fn_80035440();
-void fn_800352E4(void);
-void fn_80035308(void);
 s32 fn_8003532C(void);
-void fn_80035338(s32 p0);
 void fn_8006F334();
 void fn_8003534C(void);
 void fn_8006EDC0();
@@ -780,3 +777,111 @@ void fn_80035398(void) {
     fn_800350D0(0.375f * lbl_802811E0->f50);
     fn_800350B4(4.15f * (10.0f + lbl_802811E0->f50));
 }
+
+// ---- sweep code (not yet cleaned up) ----
+
+void fn_8006F154();
+void fn_800354B4(u8* p, f32 v);
+s32 fn_80035500(u8* p);
+s32 fn_80035508(u8* p0);
+s32 fn_80035554(u8* p0);
+f32 fn_80035560(u8* p0);
+s32 fn_8003556C(u8* p);
+extern s32* lbl_802811F0;
+s32 fn_80035574(void);
+extern u8* lbl_802813B8;
+void fn_80035584(s32 v);
+void fn_80035590(f32* p0);
+void fn_800355B8(f32* p0);
+extern s32 lbl_80281B88;
+extern s32 lbl_80281D68;
+void fn_800355E0(s32 arg0);
+void fn_80035600(void);
+
+void fn_8003541C(void) {
+    fn_8001614C();
+    fn_8006F154();
+}
+
+void fn_80035440(TerSettings* pSettings) {
+    Mem_cpy(lbl_802811E0, pSettings, sizeof(TerSettings));
+}
+
+void fn_800354B4(u8* p, f32 v) {
+    *(f32*)(p + 0xAC) = v;
+}
+
+s32 fn_800354BC(s32 p) {
+    return *(s32*)((u8*)p + 0x14);
+}
+
+void* fn_800354C4(u8** p0) {
+    return *p0 + 88;
+}
+
+s32 fn_800354E4(s32 p0, s32 p1) {
+    return (*(s32**)((u8*)p0 + 0x8))[p1];
+}
+
+s32 fn_800354F4(s32 p0) {
+    return **(s16**)p0;
+}
+
+s32 fn_80035500(u8* p) {
+    return *(s32*)(p + 0xEC);
+}
+
+s32 fn_80035508(u8* p0) {
+    return (*(s32*)p0 + 104);
+}
+
+s32 fn_80035554(u8* p0) {
+    return *(u8*)(((u8*)*(s32*)p0) + 0x8B);
+}
+
+f32 fn_80035560(u8* p0) {
+    return *(f32*)(((u8*)*(s32*)p0) + 0x54);
+}
+
+s32 fn_8003556C(u8* p) {
+    return *(s32*)(p + 0xC);
+}
+
+s32 fn_80035574(void) {
+    return *lbl_802811F0 & 2;
+}
+
+void fn_80035584(s32 v) {
+    *(s32*)(lbl_802813B8 + 0x1930) = v;
+}
+
+void fn_80035590(f32* p0) {
+    Vec_Copy(p0, (f32*)(lbl_802813B8 + 4));
+}
+
+void fn_800355B8(f32* p0) {
+    Vec_Copy(p0, (f32*)(lbl_802813B8 + 20));
+}
+
+void fn_800355E0(s32 arg0) {
+    s32 var_r3;
+
+    var_r3 = arg0;
+    if (var_r3 == (s32) (lbl_80281B88 & 1)) {
+        var_r3 = lbl_80281D68 ^ 1;
+    }
+    lbl_80281D68 = var_r3;
+}
+
+void fn_80035600(void) {
+}
+
+void fn_80035604(void) {
+    fn_80035240(0);
+    fn_80035294();
+    fn_80016B9C();
+    fn_80035118(4, 5);
+    fn_80012EF8();
+}
+
+// ---- end of sweep code ----
