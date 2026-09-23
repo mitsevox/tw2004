@@ -72,6 +72,7 @@ void   fn_80146B18(void);               // MIX: pass the settings to the hardwar
 f32    fn_8000AF7C(f32 x);              // natural logarithm
 void   fn_8009527C(void* p);            // frees what fn_800951A0 allocated
 void   fn_800B1A88(f32* pA, f32* pB);   // swap two floats
+void   fn_800B1A9C(f32* v, f32 x, f32 y);
 void   fn_80110458(u8 b);
 
 // The save kinds (a table of functions at lbl_8018C7D8).
@@ -1294,22 +1295,25 @@ f32 fn_800B1960(f32* v) {
     return a + 0.25f * b - 0.0078125f * b;
 }
 
-// ---- sweep code (not yet cleaned up) ----
+// The same estimate for the 3D vector v: the length of (v[2], length of (v[0], v[1])).
+f32 fn_800B1A40(f32* v) {
+    f32 aFlat[2];
+    f32 fFlat;
 
-void fn_800B1A88(f32* arg0, f32* arg1);
-void fn_800B1A9C(u8* p0, f32 x0, f32 x1);
-
-void fn_800B1A88(f32* arg0, f32* arg1) {
-    f32 temp_f1;
-
-    temp_f1 = *arg1;
-    *arg1 = *arg0;
-    *arg0 = temp_f1;
+    fFlat = fn_800B1960(v);
+    fn_800B1A9C(aFlat, v[2], fFlat);
+    return fn_800B1960(aFlat);
 }
 
-void fn_800B1A9C(u8* p0, f32 x0, f32 x1) {
-    *(f32*)p0 = x0;
-    *(f32*)(p0 + 0x4) = x1;
+void fn_800B1A88(f32* pA, f32* pB) {
+    f32 f;
+
+    f = *pB;
+    *pB = *pA;
+    *pA = f;
 }
 
-// ---- end of sweep code ----
+void fn_800B1A9C(f32* v, f32 x, f32 y) {
+    v[0] = x;
+    v[1] = y;
+}
