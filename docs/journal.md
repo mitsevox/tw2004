@@ -178,8 +178,25 @@ Dated log of what was done and decided, newest last. Facts and lessons belong in
   backspin "check" for shots from over 63 yd on dry short grass, cut to a tenth when the spin
   stick was used. The original reuses nine float variables for many jobs; the C now mirrors
   that reuse.
-- **Next:** polish the near-misses in `Ball.c` (the two interpolations, `Ball_FlightStep`,
-  `Ball_CupPull`, the bounce); optional register polish in `skalib.c`
+- **Next (agreed with the user, in this order):**
+  1. **Putt test harness for hypothesis 6.** Build a host-side (PC) C or Python model of the roll
+     physics now in C (`fn_80052268` skid, `Ball_GroundContact` roll incl. break = slope / (0.457
+     x spin), 5/7 g along the line, rolling friction x 0.575 on greens, `Ball_CupPull`, the cup
+     test) on a planar green of chosen slope. Solve a putt to die at the hole (like the CPU
+     rehearsal: aim point moved 45% of the miss, tolerance 1.8 in, **no cup pull**), then replay
+     it at +5% power (CPU pace; distance ~ power^2 via `gPuttDist`) **with** the cup pull, and
+     report make/miss and the miss size vs break and length. Surface values for a green come
+     from `gSurfaceTypes` (dump the class-3 entries' +0x14/+0x18/+0x1C/+0x20/+0x24/+0x28 from
+     main.dol with `dolread.py`). Report in plain English; update hypotheses 6 in `hypotheses.md`.
+  2. **Polish `Ball.c` near-misses**: `fn_80050D34` 85.9, `fn_80050F88` 88.9, `Ball_CupPull` 95.7,
+     `fn_80052598` 98.2, `Ball_FlightStep` 98.3, `Ball_GroundContact` 99.0, `fn_80052088` 99.1,
+     `Ball_SetLie` 99.2, `fn_800539F8` 99.7, `fn_80053E98` 99.7, `fn_80053240` 99.9,
+     `Ball_Collide` 99.9. All register/schedule issues; notes on what was tried are in the
+     checkpoint entries above.
+  Scratch tools added this round (`C:\dev\scratch	w\`): `dolread.py` (read main.dol by
+  address), `grepfn.py` (asm grep with enclosing function), `unitfns.py <unit>` (non-exact
+  functions of a unit), `insert_fns.py <module.py> <File.c>` (insert CODE dict at address
+  positions; now takes the target file), `ball_cp*.py` (the checkpoint code modules). optional register polish in `skalib.c`
   (`AnimLib_MergeOverlay`, `AnimLib_PlanBank`, `AnimLib_WalkPair`). Scratch tools in `C:\dev\scratch\tw\`:
   `sbs2.py` (normalised diff), `fnsrc.py`, `regress.py` (who lost 100%), `insert_fns.py` (add
   functions at address positions), `unwritten.py`, `find_fn.py` (search asm by regexes),
