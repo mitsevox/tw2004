@@ -810,6 +810,7 @@ config.libs = [
             Object(NonMatching, "GameAnalysis.c"),
             Object(NonMatching, "GameModeAlternateShot.c"),
             Object(NonMatching, "GameModeBattle.c"),
+            Object(NonMatching, "GameModeBestBall.c"),
             Object(NonMatching, "GameModeFourBall.c"),
             Object(Matching, "unsorted/sweep_80079974.c"),
             Object(Matching, "unsorted/sweep_80109BA4.c"),

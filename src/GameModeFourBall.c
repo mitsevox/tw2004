@@ -1,4 +1,4 @@
-// GameModeFourBall.c (TW06's GameModeFourBall): game mode 19, two-against-two stroke play where each
+// GameModeFourBall.c (TW06's GameModeFourBall): game mode 20, two-against-two match play where each
 // team counts its better ball on every hole. Team 0 is players 0 and 1, team 1 players 2 and 3.
 
 #include "golfer.h"
@@ -7,76 +7,64 @@
 int   Game_CurHoleIndex(void);
 int   Game_CurrentHole(void);
 u8    Player_IsHoled(int nPlayer);
+u8    Player_IsHoledNotState23(int nPlayer);
 u8    Player_OnTee(int nPlayer);
 u8    Team_IsAllHuman(int nTeam);
-u8    Team_IsAllCPU(int nTeam);
 void  GOLFERSTATE_Set(int nState, int nPlayer);
 CourseInfo* fn_8000C594(void);
 u8    fn_800E1BBC(void);
 u8    fn_800EC550(void);
-void  fn_800E1480(int nHole);
-int   fn_800E1788(int nPlayer);             // the player's round total
-int   fn_800D2AD8(int nHole);               // a hole's par
-int   fn_800D3C7C(int nPlayer);             // the player's golfer
+void  fn_800E2BA4();
+void  fn_800E45C0();
+int   fn_800D37BC(int nWinner, int nLoser, int nMargin, int* pPrize);
 void  fn_800D3548(int nPlayer, int nMoney, int a);
 void  fn_800E4364(u32 nQueue, int a, int b, int c);
-void  fn_80125910(int a);
 extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
 extern u8* gpSaveData;
 extern s32 lbl_80282278;                    // the player whose turn it is
+extern u8  lbl_80282240;
 
-// Per golfer: the prize for beating them (lbl_80200538 + 0x1D4, 8 bytes each).
-typedef struct GolferPrize {
-    s32 nBase;
-    s32 nPerStroke;
-} GolferPrize;
-typedef struct PrizeTable {
-    u8          unk0[0x1D4];
-    GolferPrize prize[1];       // 0x1D4  per golfer
-} PrizeTable;
-extern PrizeTable lbl_80200538;
-#define GOLFER_PRIZE(n) lbl_80200538.prize[n]
-
-// The tee order before anyone has a lower team score (lbl_80184DB0: 0, 1, 2, 3).
+// The tee order before anyone has won a hole (lbl_80184DC0: 0, 1, 2, 3).
 typedef struct TeeOrder {
     s32 a[4];
 } TeeOrder;
-extern TeeOrder lbl_80184DB0;
+extern TeeOrder lbl_80184DC0;
 
-u8   fn_800E82AC(int nTeam);
-int  fn_800E83A8(int nPlayer);
-void fn_800E83F8(void);
-s32  fn_800E84B0(int nPlayer);
-int  fn_800E8848(int nPlayer);
-int  fn_800E8858(void);
-u8   fn_800E88A8(int a);
-s32  fn_800E8904(void);
-void fn_800E890C(void);
-void fn_800E8A68(void);
-int  fn_800E8C24(int nPlayer, int nHole);
+u8   fn_800E8E24(int nTeam);
+u8   fn_800E8F20(int nTeam);
+int  fn_800E8FC8(int nTeam);
+int  fn_800E90AC(int nTeam);
+void fn_800E90FC(void);
+s32  fn_800E9178(int nPlayer);
+int  fn_800E947C(int nPlayer);
+u8   fn_800E948C(u32 nPlayer, int a);
+u8   fn_800E96B8(u8 bCheck);
+u8   fn_800E98F0(u8 bCheck);
+void fn_800E9BBC(void);
+void fn_800E9CF4(void);
 
-// TW06: GameModeFourBall::Init. Four players, stroke play, one mulligan each.
-void fn_800E81C4(void) {
-    gpGame->pfn1C8 = fn_800E81C4;
-    gpGame->pfn1D0 = fn_800E83F8;
-    gpGame->pfn1D4 = fn_800E84B0;
-    gpGame->pfn1D8 = (u8 (*)(int, int))fn_800E8858;
-    gpGame->pfn1DC = fn_800E88A8;
-    gpGame->pfn1E0 = fn_800E8904;
-    gpGame->pfn1E8 = fn_800E890C;
-    gpGame->pfn1F4 = fn_800E8A68;
-    gpGame->n4 = 0;
-    gpGame->nMulligans = 2;
+// TW06: GameModeFourBall::Init. Four players; the CPU may concede.
+void fn_800E8D58(void) {
+    gpGame->pfn1C8 = fn_800E8D58;
+    gpGame->pfn1D0 = fn_800E90FC;
+    gpGame->pfn1D4 = fn_800E9178;
+    gpGame->pfn1D8 = (u8 (*)(int, int))fn_800E948C;
+    gpGame->pfn1DC = (u8 (*)(int))fn_800E96B8;
+    gpGame->pfn1E0 = (s32 (*)(void))fn_800E98F0;
+    gpGame->pfn1E8 = fn_800E9BBC;
+    gpGame->pfn1F4 = fn_800E9CF4;
+    gpGame->bAIConcedes = 1;
+    gpGame->n4 = 1;
+    gpGame->nMulligans = 0;
     gpGame->nC = 4;
     gpGame->n10 = 4;
     gpGame->nDC = 0;
-    fn_800E1480(0);
     gSession.nSplitScreen = 0;
 }
 
 // TW06: GameModeFourBall::TeamDone. A partner has holed out and the other can no longer beat that
 // score.
-u8 fn_800E82AC(int nTeam) {
+u8 fn_800E8E24(int nTeam) {
     int nHole = Game_CurHoleIndex();
     int a;
     int bDone;
@@ -97,32 +85,72 @@ u8 fn_800E82AC(int nTeam) {
     return bDone;
 }
 
-// TW06: GameModeFourBall::GetPartner (found by the sweep).
-int fn_800E83A8(int nPlayer) {
-    switch (nPlayer) {
-    case 0:
-        return 1;
-    case 1:
-        return 0;
-    case 2:
-        return 3;
-    case 3:
-        return 2;
-    default:
-        return 5;
+// TW06: GameModeFourBall::TeamConceded. Both partners picked up.
+u8 fn_800E8F20(int nTeam) {
+    int nHole = Game_CurHoleIndex();
+    int a;
+    int b;
+    int bConceded;
+    a = 2;
+    if (nTeam == 0) {
+        a = 0;
     }
+    b = 3;
+    if (nTeam == 0) {
+        b = 1;
+    }
+    bConceded = 0;
+    if (Player_IsHoled(a) && !Player_IsHoledNotState23(a) && Player_IsHoled(b) && !Player_IsHoledNotState23(b)) {
+        bConceded = 1;
+    }
+    return bConceded;
 }
 
-// The hole starts: in split screen everyone plays at once; otherwise the first golfer gets ready and
-// the others wait.
-void fn_800E83F8(void) {
-    int i;
-    if (gSession.nSplitScreen == 1) {
-        for (i = 0; i < gNumPlayersSetUp; i++) {
-            GOLFERSTATE_Set(GS_PRE_SHOT, i);
-        }
-        return;
+// TW06: GameModeFourBall::TeamBestPossibleScore. The team's best score on this hole if a partner
+// holes the next shot (at most 9), or its score once holed.
+int fn_800E8FC8(int nTeam) {
+    int nHole = Game_CurHoleIndex();
+    int a;
+    int b;
+    int n;
+    int nBest;
+    a = 2;
+    if (nTeam == 0) {
+        a = 0;
     }
+    b = 3;
+    if (nTeam == 0) {
+        b = 1;
+    }
+    n = 9;
+    if (gPlayers[a].nStrokes[nHole] + 1 < 9) {
+        n = gPlayers[a].nStrokes[nHole] + 1;
+    }
+    nBest = gPlayers[b].nStrokes[nHole] + 1;
+    nBest = n <= nBest ? n : nBest;
+    if (Player_IsHoled(a)) {
+        nBest = nBest <= gPlayers[a].nStrokes[nHole] ? nBest : gPlayers[a].nStrokes[nHole];
+    }
+    if (Player_IsHoled(b)) {
+        nBest = nBest <= gPlayers[b].nStrokes[nHole] ? nBest : gPlayers[b].nStrokes[nHole];
+    }
+    return nBest;
+}
+
+// TW06: GameModeFourBall::TeamMatchWins (kept on the team's first player).
+int fn_800E90AC(int nTeam) {
+    int nHole = Game_CurHoleIndex();
+    int a;
+    a = 2;
+    if (nTeam == 0) {
+        a = 0;
+    }
+    return gPlayers[a].nHolesWon;
+}
+
+// The hole starts: the first golfer to play gets ready, the others wait.
+void fn_800E90FC(void) {
+    int i;
     lbl_80282278 = gpGame->pfn1D4(5);
     for (i = 0; i < gNumPlayersSetUp; i++) {
         if (i == lbl_80282278) {
@@ -133,15 +161,13 @@ void fn_800E83F8(void) {
     }
 }
 
-// TW06: GameModeFourBall::GetHonors. Who plays next after nPlayer (5 = nobody): on the tee the team
-// with the better score on the last decided hole, and within a team the better score; otherwise the
-// player farthest from the pin (off the green first) whose team is still playing.
-s32 fn_800E84B0(int nPlayer) {
+// TW06: GameModeFourBall::GetHonors. On the tee the team that won the last decided hole, and (on
+// team 0 only) the better score of the pair; otherwise the player farthest from the pin (off the
+// green first) whose team is still playing.
+s32 fn_800E9178(int nPlayer) {
     TeeOrder order;
     int nLead;
     int h;
-    int a;
-    int b;
     int w;
     int t;
     int i;
@@ -153,20 +179,12 @@ s32 fn_800E84B0(int nPlayer) {
     f32 dz;
     f32 d;
     nLead = 0;
-    order = lbl_80184DB0;
+    order = lbl_80184DC0;
     for (h = 0; h < Game_CurHoleIndex(); h++) {
         if (gpGame->bHoleSelected[h]) {
-            a = gPlayers[1].nStrokes[h];
-            if (gPlayers[0].nStrokes[h] <= a) {
-                a = gPlayers[0].nStrokes[h];
-            }
-            b = gPlayers[3].nStrokes[h];
-            if (gPlayers[2].nStrokes[h] <= b) {
-                b = gPlayers[2].nStrokes[h];
-            }
-            if (a < b) {
+            if (gPlayers[0].nModePoints[h] != 0) {
                 w = 0;
-            } else if (b < a) {
+            } else if (gPlayers[2].nModePoints[h] != 0) {
                 w = 1;
             } else {
                 w = nLead;
@@ -181,20 +199,14 @@ s32 fn_800E84B0(int nPlayer) {
                 order.a[3] = t;
             }
             t = order.a[0];
-            if (gPlayers[t].nStrokes[h] > gPlayers[order.a[1]].nStrokes[h]) {
+            if (gPlayers[order.a[1]].nStrokes[h] < gPlayers[t].nStrokes[h]) {
                 order.a[0] = order.a[1];
                 order.a[1] = t;
-            }
-            t = order.a[2];
-            if (gPlayers[t].nStrokes[h] > gPlayers[order.a[3]].nStrokes[h]) {
-                order.a[2] = order.a[3];
-                order.a[3] = t;
             }
         }
     }
     for (i = 0; i < gNumPlayersSetUp; i++) {
-        if (nPlayer != order.a[i] && Player_OnTee(order.a[i]) && !gPlayers[order.a[i]].unk28C &&
-            !fn_800E82AC(fn_800E8848(order.a[i]))) {
+        if (nPlayer != order.a[i] && Player_OnTee(order.a[i]) && !fn_800E8E24(fn_800E947C(order.a[i]))) {
             return order.a[i];
         }
     }
@@ -203,8 +215,7 @@ s32 fn_800E84B0(int nPlayer) {
     pPin = (f32*)&pCourse->pin[Game_CurrentHole()];
     nBest = 5;
     for (i = 0; i < gNumPlayersSetUp; i++) {
-        if (i != nPlayer && !Player_IsHoled(i) && !gPlayers[i].unk28C && !fn_800E82AC(fn_800E8848(i)) &&
-            gPlayers[i].nLie != LIE_GREEN) {
+        if (i != nPlayer && !Player_IsHoled(i) && !fn_800E8E24(fn_800E947C(i)) && gPlayers[i].nLie != LIE_GREEN) {
             dx = ((Ball*)gPlayers[i].ball)->vPos[0] - pPin[0];
             dz = ((Ball*)gPlayers[i].ball)->vPos[2] - pPin[2];
             d = fn_80009680(dx * dx + dz * dz);
@@ -218,7 +229,7 @@ s32 fn_800E84B0(int nPlayer) {
         fBest = 0.0f;
         nBest = 5;
         for (i = 0; i < gNumPlayersSetUp; i++) {
-            if (i != nPlayer && !Player_IsHoled(i) && !gPlayers[i].unk28C && !fn_800E82AC(fn_800E8848(i))) {
+            if (i != nPlayer && !Player_IsHoled(i) && !fn_800E8E24(fn_800E947C(i))) {
                 dx = ((Ball*)gPlayers[i].ball)->vPos[0] - pPin[0];
                 dz = ((Ball*)gPlayers[i].ball)->vPos[2] - pPin[2];
                 d = fn_80009680(dx * dx + dz * dz);
@@ -236,85 +247,173 @@ s32 fn_800E84B0(int nPlayer) {
 }
 
 // TW06: GameModeFourBall::GetPlayerTeam.
-int fn_800E8848(int nPlayer) {
+int fn_800E947C(int nPlayer) {
     return nPlayer / 2;
 }
 
-// TW06: GameModeFourBall::HoleFinished. Both teams are done.
-int fn_800E8858(void) {
-    u8 bDone = 0;
-    if (fn_800E82AC(0) && fn_800E82AC(1)) {
-        bDone = 1;
+// TW06: GameModeFourBall::HoleFinished. Both teams done or one conceded; or one team done and the
+// other can no longer beat it (or only tie, when dormie).
+u8 fn_800E948C(u32 nPlayer, int a) {
+    int nLeft;
+    int h;
+    if (fn_800E8E24(0) && fn_800E8E24(1)) {
+        return 1;
     }
-    return bDone;
+    if (fn_800E8F20(0) || fn_800E8F20(1)) {
+        return 1;
+    }
+    if (fn_800E8E24(0) && (!lbl_80282240 || nPlayer > 1)) {
+        if (fn_800E8FC8(0) < fn_800E8FC8(1)) {
+            return 1;
+        }
+    }
+    if (fn_800E8E24(1) && (!lbl_80282240 || nPlayer - 2 > 1)) {
+        if (fn_800E8FC8(1) < fn_800E8FC8(0)) {
+            return 1;
+        }
+    }
+    nLeft = 0;
+    for (h = Game_CurHoleIndex(); h < 18; h++) {
+        if (gpGame->bHoleSelected[h]) {
+            nLeft++;
+        }
+    }
+    if (fn_800E8E24(0) && (!lbl_80282240 || nPlayer > 1)) {
+        if (nLeft + fn_800E90AC(1) == fn_800E90AC(0)) {
+            if (fn_800E8FC8(0) <= fn_800E8FC8(1)) {
+                return 1;
+            }
+        }
+    }
+    if (fn_800E8E24(1) && (!lbl_80282240 || nPlayer - 2 > 1)) {
+        if (nLeft + fn_800E90AC(0) == fn_800E90AC(1)) {
+            if (fn_800E8FC8(1) <= fn_800E8FC8(0)) {
+                return 1;
+            }
+        }
+    }
+    return 0;
 }
 
-// TW06: GameModeFourBall::GameFinished. No selected hole is left.
-u8 fn_800E88A8(int a) {
+#define PLAYER_AT(i) (&gPlayers[i])
+// Clears every player's round (all 18 holes) for a playoff.
+#define CLEAR_ROUNDS(P)                             \
+    for (i = 0; i < gNumPlayersSetUp; i++) {        \
+        for (h = 0; h < 18; h++) {                  \
+            P(i)->nStrokes[h] = 0;                  \
+            P(i)->nPutts[h] = 0;                    \
+            P(i)->nModePoints[h] = 0;               \
+            P(i)->n22C[h] = 0;                      \
+            P(i)->n290[h] = 0;                      \
+            P(i)->b2F6[h] = 0;                      \
+            P(i)->b2E4[h] = 0;                      \
+        }                                           \
+        P(i)->n2D8 = 0;                             \
+        P(i)->n2DC = 0;                             \
+        P(i)->n2E0 = 0;                             \
+        P(i)->n308 = 0;                             \
+    }
+
+// TW06: GameModeFourBall::GameFinished. In a playoff: over once a team is ahead; otherwise (unless
+// only checking) the next playoff hole starts. In the round: over when no holes are left and no
+// playoff starts, or when a team leads by more than the holes left.
+u8 fn_800E96B8(u8 bCheck) {
+    int nLeft;
     int h;
+    int i;
+    if (gpGame->bD4) {
+        if (fn_800E90AC(0) != fn_800E90AC(1)) {
+            return 1;
+        }
+        if (!bCheck) {
+            fn_800E2BA4(gpGame->nD8++);
+            CLEAR_ROUNDS(PLAYER_AT);
+            fn_800E45C0();
+        }
+    } else {
+        nLeft = 0;
+        for (h = Game_CurHoleIndex() + 1; h < 18; h++) {
+            if (gpGame->bHoleSelected[h]) {
+                nLeft++;
+            }
+        }
+        if (nLeft == 0) {
+            return !fn_800E98F0(bCheck);
+        }
+        if (nLeft + fn_800E90AC(0) < fn_800E90AC(1) || nLeft + fn_800E90AC(1) < fn_800E90AC(0)) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+// TW06: GameModeFourBall::GoToPlayoff. After the last hole with the match tied: a playoff starts
+// (bD5 when the round played all 18 holes).
+u8 fn_800E98F0(u8 bCheck) {
+    int h;
+    int i;
     for (h = Game_CurHoleIndex() + 1; h < 18; h++) {
         if (gpGame->bHoleSelected[h]) {
             return 0;
         }
     }
-    return 1;
-}
-
-// TW06: GameModeFourBall::GoToPlayoff (never).
-s32 fn_800E8904(void) {
+    if (fn_800E90AC(0) == fn_800E90AC(1)) {
+        if (bCheck) {
+            return 1;
+        }
+        gpGame->bD5 = 1;
+        for (h = 0; h < 18; h++) {
+            if (!gpGame->bHoleSelected[h]) {
+                gpGame->bD5 = 0;
+            }
+        }
+        fn_800E2BA4();
+        CLEAR_ROUNDS(PLAYER);
+        gpGame->bD4 = 1;
+        fn_800E45C0(gpGame->nD8++);
+        return 1;
+    }
     return 0;
 }
 
-// TW06: GameModeFourBall::EndHole. On each team the ball that does not count (or was not holed)
-// is marked 9.
-void fn_800E890C(void) {
+// TW06: GameModeFourBall::EndHole. The hole goes to the other team when a team conceded, or to a
+// team that holed out and cannot be caught (the point goes on players 0 and 2).
+void fn_800E9BBC(void) {
+    int nWinner = -1;
     int nHole = Game_CurHoleIndex();
-    if (Player_IsHoled(0)) {
-        if (Player_IsHoled(1)) {
-            if (gPlayers[0].nStrokes[nHole] < gPlayers[1].nStrokes[nHole]) {
-                gPlayers[1].nStrokes[nHole] = 9;
-            } else {
-                gPlayers[0].nStrokes[nHole] = 9;
-            }
-        } else {
-            gPlayers[1].nStrokes[nHole] = 9;
-        }
-    } else {
-        gPlayers[0].nStrokes[nHole] = 9;
+    if (fn_800E8F20(0)) {
+        nWinner = 1;
+    } else if (fn_800E8F20(1)) {
+        nWinner = 0;
+    } else if (fn_800E8E24(0) && fn_800E8FC8(0) < fn_800E8FC8(1)) {
+        nWinner = 0;
+    } else if (fn_800E8E24(1) && fn_800E8FC8(1) < fn_800E8FC8(0)) {
+        nWinner = 1;
     }
-    if (Player_IsHoled(2)) {
-        if (Player_IsHoled(3)) {
-            if (gPlayers[2].nStrokes[nHole] < gPlayers[3].nStrokes[nHole]) {
-                gPlayers[3].nStrokes[nHole] = 9;
-            } else {
-                gPlayers[2].nStrokes[nHole] = 9;
-            }
-        } else {
-            gPlayers[3].nStrokes[nHole] = 9;
-        }
-    } else {
-        gPlayers[2].nStrokes[nHole] = 9;
+    switch (nWinner) {
+    case 0:
+        gPlayers[0].nModePoints[nHole] = 1;
+        gPlayers[0].nHolesWon++;
+        return;
+    case 1:
+        gPlayers[2].nModePoints[nHole] = 1;
+        gPlayers[2].nHolesWon++;
+        return;
     }
 }
 
-// TW06: GameModeFourBall::EndGame. A human team that beats an all-CPU team wins money: half the two
-// CPU golfers' base prizes plus their per-stroke prizes for up to 5 strokes of margin. EA reuses the
-// team loop's counter for the inner loop, so the loop ends after the first team that wins.
-void fn_800E8A68(void) {
-    int i;
-    int nFirst;
-    int nOther;
-    int nOther2;
-    int nSum;
-    int nOtherTeam;
-    int nOurs;
-    int nTheirs;
+// TW06: GameModeFourBall::EndGame. The winning team's human players with a profile get the prize
+// money (by the margin).
+void fn_800E9CF4(void) {
+    int nPrize;
+    int nWinner;
+    int nLoser;
     int nMargin;
-    int x;
-    int y;
-    int nBase;
     int nMoney;
-    int nProfile;
+    int nFirst;
+    int k;
+    int i;
+    Player* p;
     if (fn_800E1BBC()) {
         switch (fn_800EC550()) {
         case 0:
@@ -322,75 +421,29 @@ void fn_800E8A68(void) {
         default:
             return;
         }
-        for (i = 0; i < 2; i++) {
-            if (Team_IsAllHuman(i)) {
-                if (i == 0) {
-                    nFirst = 0;
-                    nOther = 2;
-                    nOtherTeam = 1;
-                } else {
-                    nFirst = 2;
-                    nOther = 0;
-                    nOtherTeam = 0;
-                }
-                if (Team_IsAllCPU(nOtherTeam)) {
-                    nOurs = fn_800E1788(nFirst);
-                    nOurs += fn_800E1788(nFirst + 1);
-                    nOther2 = nOther + 1;
-                    nTheirs = fn_800E1788(nOther);
-                    nTheirs += fn_800E1788(nOther2);
-                    if (nOurs < nTheirs) {
-                        nMargin = nTheirs - nOurs;
-                        if (nMargin > 5) {
-                            nMargin = 5;
-                        }
-                        x = fn_800D3C7C(nOther);
-                        y = fn_800D3C7C(nOther2);
-                        nSum = GOLFER_PRIZE(x).nBase + GOLFER_PRIZE(y).nBase;
-                        nBase = nSum / 2;
-                        nMoney = (nSum + GOLFER_PRIZE(x).nPerStroke * nMargin + GOLFER_PRIZE(y).nPerStroke * nMargin) / 2;
-                        for (i = 0; i < 2; i++) {
-                            nProfile = gPlayers[nFirst + i].nIndex;
-                            if (gpSaveData[nProfile * 0x10600]) {
-                                fn_80125910(1);
-                                if (nBase) {
-                                    fn_800E4364(0, 0x76, nBase, nProfile);
-                                }
-                                fn_800D3548(nFirst + i, nMoney, 0);
-                            }
-                        }
-                    }
+        if (fn_800E90AC(0) > fn_800E90AC(1)) {
+            nWinner = 0;
+            nLoser = 1;
+            nMargin = gPlayers[0].nHolesWon - gPlayers[2].nHolesWon;
+        } else {
+            nWinner = 1;
+            nLoser = 0;
+            nMargin = gPlayers[2].nHolesWon - gPlayers[0].nHolesWon;
+        }
+        nMoney = fn_800D37BC(nWinner, nLoser, nMargin, &nPrize);
+        if (Team_IsAllHuman(nWinner)) {
+            nFirst = 2;
+            if (nWinner == 0) {
+                nFirst = 0;
+            }
+            for (k = 0, i = nFirst; k < 2; k++, i++) {
+                p = PLAYER(i);
+                if (gpSaveData[p->nIndex * 0x10600] && nMoney) {
+                    fn_800E4364(0, 0x6B, nPrize, p->nIndex);
+                    fn_800D3548(i, nMoney, 0);
+                    p->nMoney += nMoney;
                 }
             }
         }
     }
-}
-
-// The team's (better) score on a hole.
-int fn_800E8C24(int nPlayer, int nHole) {
-    if (gPlayers[nPlayer].nStrokes[nHole] <= gPlayers[fn_800E83A8(nPlayer)].nStrokes[nHole]) {
-        return gPlayers[nPlayer].nStrokes[nHole];
-    }
-    return gPlayers[fn_800E83A8(nPlayer)].nStrokes[nHole];
-}
-
-// The team's score against par so far (and on the current hole once holed, when asked).
-int fn_800E8CA8(int nPlayer, u8 bCurrent) {
-    int nPar;
-    int nScore;
-    int h;
-    int n;
-    nScore = 0;
-    nPar = 0;
-    n = gpGame->nCurHole;
-    if (bCurrent && gPlayers[nPlayer].nLie == LIE_HOLED && n < 18) {
-        n++;
-    }
-    for (h = 0; h < n; h++) {
-        if (gpGame->bHoleSelected[h]) {
-            nPar += fn_800D2AD8(h);
-            nScore += fn_800E8C24(nPlayer, h);
-        }
-    }
-    return nScore - nPar;
 }
