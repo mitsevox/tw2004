@@ -3706,6 +3706,7 @@ dolphin/mtx/mtx.c:
 
 dolphin/mtx/mtx44.c:
 	.text       start:0x80147DB0 end:0x80147E48
+	.sdata2     start:0x80284C50 end:0x80284C60
 
 src/dolphin/os/OS.c:
 	.text       start:0x80147E48 end:0x80148790
