@@ -4,7 +4,7 @@
 
 void OSRestoreInterrupts();
 
-void fn_801654D0(u8* p);
-void fn_801654D0(u8* p) {
+void MWExitCriticalSection(u8* p);
+void MWExitCriticalSection(u8* p) {
     OSRestoreInterrupts(*(s32*)(p + 0x0));
 }

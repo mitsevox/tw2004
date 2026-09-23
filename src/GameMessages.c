@@ -6,13 +6,6 @@
 #include "engine.h"
 #include "game/frontend.h"
 
-// One value of a message: an int or a float (the mask passed with it says which), or a pointer.
-typedef union MsgArg {
-    s32   i;
-    f32   f;
-    void* p;
-} MsgArg;
-
 // A string value: the message holds a pointer to this.
 typedef struct MsgString {
     s32   n0;
