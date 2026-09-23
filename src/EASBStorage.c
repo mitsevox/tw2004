@@ -671,6 +671,41 @@ void fn_80129828(EASBTotals* pTotals, u8* pBuffer) {
     pTotals->nProducts = fn_801293F8(pBuffer, &nOffset, 1, 0, 250);
 }
 
+// Packs a product record into pBuffer (uSize bytes, cleared first): names without their ends,
+// each value within its range, then every accomplishment.
+void fn_801298FC(EASBProduct* pProduct, u8* pBuffer, u32 uSize) {
+    s32 nOffset;
+    u32 i;
+    EASBAccomplishment* pAccomplishment;
+
+    nOffset = 0;
+    memset(pBuffer, 0, uSize);
+    fn_8012956C(pBuffer, &nOffset, EASB_PRODUCT_NAME_SIZE - 1, pProduct->szName);
+    fn_80129290(pBuffer, &nOffset, 2, pProduct->uGamesPlayedTypeLanguage, 0, 0xFFFF);
+    fn_80129644(pBuffer, &nOffset, (EASB_GAMES_PLAYED_TYPE_SIZE - 1) * sizeof(u16), pProduct->szGamesPlayedType,
+                pProduct->uGamesPlayedTypeLanguage);
+    fn_80129290(pBuffer, &nOffset, 4, pProduct->uTime, EASB_TIME_FIRST, EASB_TIME_LAST);
+    fn_80129290(pBuffer, &nOffset, 4, pProduct->u50, 0, 0xFFFFFFFF);
+    fn_80129290(pBuffer, &nOffset, 4, pProduct->u54, 0, 0xFFFFFFFF);
+    fn_80129290(pBuffer, &nOffset, 4, pProduct->u58, 0, 0xFFFFFFFF);
+    fn_80129290(pBuffer, &nOffset, 4, pProduct->u5C, 0, pProduct->u58);
+    fn_80129290(pBuffer, &nOffset, 2, pProduct->u1160, 0, EASB_MAX_LEVEL);
+    fn_80129290(pBuffer, &nOffset, 2, pProduct->uLevel, 0, EASB_MAX_LEVEL + 1);
+    fn_80129290(pBuffer, &nOffset, 1, pProduct->bValid, 0, 1);
+    for (i = 0; i < EASB_MAX_ACCOMPLISHMENTS; i++) {
+        pAccomplishment = &pProduct->aAccomplishments[i];
+        fn_80129290(pBuffer, &nOffset, 2, pProduct->aAccomplishments[i].uLanguage, 0, 0xFFFF);
+        fn_80129644(pBuffer, &nOffset, (EASB_ACCOMPLISHMENT_NAME_SIZE - 1) * sizeof(u16), pAccomplishment->szName,
+                    pAccomplishment->uLanguage);
+        fn_80129290(pBuffer, &nOffset, 4, pAccomplishment->uTime, EASB_TIME_FIRST, EASB_TIME_LAST);
+        if (pAccomplishment->bValid == 1) {
+            fn_80129290(pBuffer, &nOffset, 1, pAccomplishment->u86, 1, 250);
+        } else {
+            fn_80129290(pBuffer, &nOffset, 1, 0, 0, 0);
+        }
+    }
+}
+
 // ---- sweep code (not yet cleaned up) ----
 
 s32 TagFile_Delete(s32*, s32, s32);

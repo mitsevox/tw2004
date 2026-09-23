@@ -79,11 +79,13 @@ typedef struct EASBImage {
 typedef struct EASBAccomplishment {
     u16 szName[EASB_ACCOMPLISHMENT_NAME_SIZE];  // 0x00: wide text
     u32 uTime;                      // 0x80: when it was set, within 2003-2023
-    u8 unk84[2];
-    u8 u86;                         // 0x86: 1 to 250; the first sort key unless sorting by time
+    u16 uLanguage;                  // 0x84: the language of szName (fn_801298FC)
+    u8 u86;                        // 0x86: 1 to 250; the first sort key unless sorting by time
     u8 bValid;                      // 0x87
 } EASBAccomplishment;               // size 0x88
 LAYOUT_ASSERT(EASBAccomplishment, 0x88);
+
+#define EASB_MAX_ACCOMPLISHMENTS 32 // per product record
 
 // The Bio's totals over every product record (EASBState.totals; fn_80128580 adds a record in).
 typedef struct EASBTotals {
@@ -105,7 +107,7 @@ typedef struct EASBProduct {
     u32 u54;                        // 0x0054: play time while b11E0 is clear
     u32 u58;                        // 0x0058: counter raised by fn_8012D8C4
     u32 u5C;                        // 0x005C: counter raised by fn_8012D93C
-    EASBAccomplishment aAccomplishments[32];    // 0x0060: cleared by fn_8012CD8C
+    EASBAccomplishment aAccomplishments[EASB_MAX_ACCOMPLISHMENTS];  // 0x0060: cleared by fn_8012CD8C
     u16 u1160;                      // 0x1160
     u16 uLevel;                     // 0x1162: only rises, up to EASB_MAX_LEVEL
     u16 uGamesPlayedTypeLanguage;   // 0x1164: EASBInitParams.uGamesPlayedTypeLanguage
