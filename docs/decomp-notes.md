@@ -289,6 +289,16 @@ The fixes that come up most often. Each points to its full entry below.
 
 ### Types, casts and sign extension
 
+- **[verified] Two neighbouring words handled with 64-bit operations are one `u64`.** When the
+  code ORs, ANDs and tests two adjacent words together (`and`/`xor`/`or.` on both halves, an AND
+  with `li -1` for the upper word), declare one `u64` field. Player 0xC48/0xC4C as two `s32`s
+  could not match in any statement order; as `u64 uC48` GameMode8 `fn_800FAAB8` went 93.3% ->
+  99.2%, then exact with statement order.
+- **[verified] The ball position is read as bytes of the Player, not through a `Ball*`.**
+  `*(f32*)(gPlayers[n].ball + 0)` / `+ 8` matches; `((Ball*)gPlayers[n].ball)->vPos[0]` and
+  `((f32*)gPlayers[n].ball)[0]` add an `addi r3, r3, 0xa90` pointer temp (GameMode8
+  `fn_800FAD54`, 99.66%). Same rule as the GetHonors shape above, for `gPlayers[n]`. It is the
+  one sanctioned raw offset until `Player.ball` gets a real type that matches.
 - **[verified] `int` vs `long` changes the code.** For an `int` local CodeWarrior folds
   `n += 3` into every later use (`addi r5, rN, 3` at a call, `addi r0, rN, 3; cmpwi r0, 8`, ...),
   even when that costs instructions, and treats `n += *p` / `n = n + *p` as an in-place update.
