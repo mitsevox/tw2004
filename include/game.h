@@ -94,11 +94,11 @@ u16  fn_800D2994(void);                 // today's date
 int  fn_800D2ABC(int nCourse, int nHole);   // a hole's par on a course
 int  fn_800D2AD8(int nHole);            // a hole's par
 void fn_800D3548(int nPlayer, int nMoney, CourseMoneyTracking* pMoney);   // pMoney may be NULL
-int  fn_800D36E0(int nWinner, int nLoser, int nMargin, int* pPrize);
-int  fn_800D37BC(int nWinner, int nLoser, int nMargin, int* pPrize);
-int  fn_800D3C7C(int nPlayer);          // the player's earnings rating, 0..25
-s32  fn_800D6A70(s32 nPoints, int nPlayer, u8 bCourse, u8 bTee, u8 bHole, CourseMoneyTracking* pMoney);
-int  fn_800D7220(int nReward, int nPlayer, CourseMoneyTracking* pMoney);
+int  GM_Earnings_GetStrokeWinnings(int nWinner, int nLoser, int nMargin, int* pPrize);
+int  GM_Earnings_GetStrokeWinningsTeam(int nWinner, int nLoser, int nMargin, int* pPrize);
+int  GM_Earnings_RateGolfer(int nPlayer);          // the player's earnings rating, 0..25
+s32  GM_Earnings_ComputeBonusModifiers(s32 nPoints, int nPlayer, u8 bCourse, u8 bTee, u8 bHole, CourseMoneyTracking* pMoney);
+int  GM_Earnings_ComputeTOURCardModifiers(int nReward, int nPlayer, CourseMoneyTracking* pMoney);
 s32  fn_800D7660(int nPlayer, Ball* pBall, u8 b);   // one of GameEffects' GameBreaker checks
 u8   fn_800DA174(void);
 u8   fn_800DA1D4(void);
@@ -356,7 +356,7 @@ void fn_800E5DA0(void);
 // Each mode's setup, called by fn_800E0B38.
 void GameModeAlternateShot_Init(void);                 // mode 21 (GameModeAlternateShot.c)
 void GameModeBattle_Init(void);                 // mode 25 (GameModeBattle.c)
-void GameModeBestBall_Init(void);                 // mode 19 (GameModeBestBall.c)
+void fn_800E81C4(void);                 // mode 19 (GameModeBestBall.c)
 void GameModeFourBall_Init(void);                 // mode 20 (GameModeFourBall.c)
 void GameModeMatch_Init(void);                 // mode 1 (GameModeMatch.c)
 void fn_800EACD8(void);                 // mode 5
@@ -406,7 +406,7 @@ void fn_800ED710(s32 a);
 void fn_800EDAE0(int nPlayer);          // GameMode9.c
 void fn_800EDE78(void);                 // GameModeDriverPGATour.c
 u8   fn_800EE470(void);                 // GameModeDriverPGATour.c
-void fn_800F06DC(void);                 // GameModeDriverRTE.c
+void GameModeDriverRTE_StartEvent(void);                 // GameModeDriverRTE.c
 void fn_800F07C8(void);                 // GameModeDriverRTE.c
 u8   fn_800F0818(void);                 // GameModeDriverRTE.c
 

@@ -115,7 +115,7 @@ typedef struct TourSeason {
     u16  n4E94;                 // 0x4E94  counts the tournaments started
     u8   unk4E96[2];
     u16  n4E98;                 // 0x4E98  a run of tour rounds, counted on each 18th hole
-                                //         (fn_800EF2B8); reset to 0 when the run breaks
+                                //         (GameModeDriverPGATour_EndHole); reset to 0 when the run breaks
     u8   unk4E9A[2];
 } TourSeason;
 LAYOUT_ASSERT(TourSeason, 0x4E9C);
@@ -178,7 +178,7 @@ typedef struct SaveProfile {
     Award aAward[39];           // 0x0039C
     u8   aReplay[5][0xF28];     // 0x00438  a Replay each, saved with awards 0, 6, 9, 3 and 13
     s32  nTourCardLevel;        // 0x05000  0..6: level 1 comes from the lessons (GameMode11), the rest
-                                //          from fn_800D439C; it scales payouts (fn_800D7220)
+                                //          from fn_800D439C; it scales payouts (GM_Earnings_ComputeTOURCardModifiers)
     u8   a5004[71];             // 0x05004  per marked hole 0..70 (fn_800E1CE8): fn_800588F4's kind 0
     u8   unk504B;
     s32  a504C[71];             // 0x0504C  the same, fn_800588F4's kind 1

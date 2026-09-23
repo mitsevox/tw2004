@@ -19,7 +19,7 @@ typedef struct Tournament {
     char szChampName[0x10];     // 0x14  the champion before the season is played. TW06: champName
     s32  nChampScore;           // 0x24  TW06: champScore
     s16  aPrize[10][2];         // 0x28  per bracket (fn_800EF0E0): first prize and purse, in thousands
-    u16  aStartDate[10];        // 0x50  per season (fn_800EFB88). TW06: startDate
+    u16  aStartDate[10];        // 0x50  per season (GameModeDriverPGATour_GetCurrentSeason). TW06: startDate
 } Tournament;
 
 // One round of a tournament's format (0xC bytes).

@@ -8,27 +8,27 @@
 #include "game/save.h"
 #include "game/earnings.h"
 
-u8   GameModeBestBall_TeamDone(int nTeam);
-int  GameModeBestBall_GetPartner(int nPlayer);
+u8   fn_800E82AC(int nTeam);
+int  fn_800E83A8(int nPlayer);
 void fn_800E83F8(void);
-s32  GameModeBestBall_GetHonors(int nPlayer);
+s32  fn_800E84B0(int nPlayer);
 int  fn_800E8848(int nPlayer);
-u8   GameModeBestBall_HoleFinished(int nPlayer, u8 bCheck);
-u8   GameModeBestBall_GameFinished(u8 bCheck);
+u8   fn_800E8858(int nPlayer, u8 bCheck);
+u8   fn_800E88A8(u8 bCheck);
 u8   fn_800E8904(u8 bCheck);
-void GameModeBestBall_EndHole(void);
-void GameModeBestBall_EndGame(void);
+void fn_800E890C(void);
+void fn_800E8A68(void);
 
-// Four players, stroke play, one mulligan each.
-void GameModeBestBall_Init(void) {
-    gpGame->pfnInit = GameModeBestBall_Init;
+// TW06: GameModeBestBall::Init. Four players, stroke play, one mulligan each.
+void fn_800E81C4(void) {
+    gpGame->pfnInit = fn_800E81C4;
     gpGame->pfnSetupNextGolfer = fn_800E83F8;
-    gpGame->pfnGetHonors = GameModeBestBall_GetHonors;
-    gpGame->pfnHoleFinished = GameModeBestBall_HoleFinished;
-    gpGame->pfnGameFinished = GameModeBestBall_GameFinished;
+    gpGame->pfnGetHonors = fn_800E84B0;
+    gpGame->pfnHoleFinished = fn_800E8858;
+    gpGame->pfnGameFinished = fn_800E88A8;
     gpGame->pfnGoToPlayoff = fn_800E8904;
-    gpGame->pfnEndHole = GameModeBestBall_EndHole;
-    gpGame->pfnEndGame = GameModeBestBall_EndGame;
+    gpGame->pfnEndHole = fn_800E890C;
+    gpGame->pfnEndGame = fn_800E8A68;
     gpGame->n4 = 0;
     gpGame->nMulligans = 2;
     gpGame->nC = 4;
@@ -38,9 +38,9 @@ void GameModeBestBall_Init(void) {
     gSession.nSplitScreen = 0;
 }
 
-// A partner has holed out and the other can no longer beat that
+// TW06: GameModeBestBall::TeamDone. A partner has holed out and the other can no longer beat that
 // score.
-u8 GameModeBestBall_TeamDone(int nTeam) {
+u8 fn_800E82AC(int nTeam) {
     int nHole = Game_CurHoleIndex();
     int a;
     int bDone;
@@ -61,8 +61,8 @@ u8 GameModeBestBall_TeamDone(int nTeam) {
     return bDone;
 }
 
-// Found by the sweep.
-int GameModeBestBall_GetPartner(int nPlayer) {
+// TW06: GameModeBestBall::GetPartner (found by the sweep).
+int fn_800E83A8(int nPlayer) {
     switch (nPlayer) {
     case 0:
         return 1;
@@ -97,10 +97,10 @@ void fn_800E83F8(void) {
     }
 }
 
-// Who plays next after nPlayer (5 = nobody): on the tee the team
+// TW06: GameModeBestBall::GetHonors. Who plays next after nPlayer (5 = nobody): on the tee the team
 // with the better score on the last decided hole, and within a team the better score; otherwise the
 // player farthest from the pin (off the green first) whose team is still playing.
-s32 GameModeBestBall_GetHonors(int nPlayer) {
+s32 fn_800E84B0(int nPlayer) {
     s32 aOrder[4] = {0, 1, 2, 3};  // the tee order before anyone has a lower team score
     s32* pOrder;        // fake match: the within-team compares read aOrder through a pointer
     int a;
@@ -161,7 +161,7 @@ s32 GameModeBestBall_GetHonors(int nPlayer) {
     // register (h, t or w all match)
     for (h = 0; h < gNumPlayersSetUp; h++) {
         if (nPlayer != aOrder[h] && Player_OnTee(aOrder[h]) && !gPlayers[aOrder[h]].bPlayerCut &&
-            !GameModeBestBall_TeamDone(fn_800E8848(aOrder[h]))) {
+            !fn_800E82AC(fn_800E8848(aOrder[h]))) {
             return aOrder[h];
         }
     }
@@ -170,8 +170,8 @@ s32 GameModeBestBall_GetHonors(int nPlayer) {
     fBest = 0.0f;
     nBest = 5;
     for (i = 0; i < gNumPlayersSetUp; i++) {
-        if (i != nPlayer && !Player_IsHoled(i) && !PLAYER(i)->bPlayerCut &&
-            !GameModeBestBall_TeamDone(fn_800E8848(i)) && PLAYER(i)->ball.nLie != LIE_GREEN_e) {
+        if (i != nPlayer && !Player_IsHoled(i) && !PLAYER(i)->bPlayerCut && !fn_800E82AC(fn_800E8848(i)) &&
+            PLAYER(i)->ball.nLie != LIE_GREEN_e) {
             dx = PLAYER(i)->ball.vPos[0] - pCourse->pin[nPinSet].x;
             dz = PLAYER(i)->ball.vPos[2] - pCourse->pin[nPinSet].z;
             d = fn_80009680(dx * dx + dz * dz);
@@ -186,7 +186,7 @@ s32 GameModeBestBall_GetHonors(int nPlayer) {
         nBest = 5;
         for (i = 0; i < gNumPlayersSetUp; i++) {
             if (i != nPlayer && !Player_IsHoled(i) && !PLAYER(i)->bPlayerCut &&
-                !GameModeBestBall_TeamDone(fn_800E8848(i))) {
+                !fn_800E82AC(fn_800E8848(i))) {
                 dx = PLAYER(i)->ball.vPos[0] - pCourse->pin[nPinSet].x;
                 dz = PLAYER(i)->ball.vPos[2] - pCourse->pin[nPinSet].z;
                 d = fn_80009680(dx * dx + dz * dz);
@@ -208,17 +208,17 @@ int fn_800E8848(int nPlayer) {
     return nPlayer / 2;
 }
 
-// Both teams are done.
-u8 GameModeBestBall_HoleFinished(int nPlayer, u8 bCheck) {
+// TW06: GameModeBestBall::HoleFinished. Both teams are done.
+u8 fn_800E8858(int nPlayer, u8 bCheck) {
     int bDone = 0;
-    if (GameModeBestBall_TeamDone(0) && GameModeBestBall_TeamDone(1)) {
+    if (fn_800E82AC(0) && fn_800E82AC(1)) {
         bDone = 1;
     }
     return bDone;
 }
 
-// No selected hole is left.
-u8 GameModeBestBall_GameFinished(u8 bCheck) {
+// TW06: GameModeBestBall::GameFinished. No selected hole is left.
+u8 fn_800E88A8(u8 bCheck) {
     int h;
     for (h = Game_CurHoleIndex() + 1; h < 18; h++) {
         if (gpGame->bHoleSelected[h]) {
@@ -233,9 +233,9 @@ u8 fn_800E8904(u8 bCheck) {
     return 0;
 }
 
-// On each team the ball that does not count (or was not holed)
+// TW06: GameModeBestBall::EndHole. On each team the ball that does not count (or was not holed)
 // is marked 9.
-void GameModeBestBall_EndHole(void) {
+void fn_800E890C(void) {
     int nHole = Game_CurHoleIndex();
     if (Player_IsHoled(0)) {
         if (Player_IsHoled(1)) {
@@ -265,18 +265,18 @@ void GameModeBestBall_EndHole(void) {
     }
 }
 
-// A human team that beats an all-CPU team wins money: half the two
+// TW06: GameModeBestBall::EndGame. A human team that beats an all-CPU team wins money: half the two
 // CPU golfers' base prizes plus their per-stroke prizes for up to 5 strokes of margin. EA reuses the
 // team loop's counter for the inner loop, so the loop ends after the first team that wins.
 // Not exact yet: nBase and nFirst + i swap r26/r25, and the prize block schedules the two row
 // addresses and the loop's hoisted gPlayers/0x10600/i = 0 in another order. The two-statement
-// nSum (= base 1; += base 2) fixed its scratch registers (94.46 -> 94.82). Tried without effect:
-// every order and operand order of the sum/money/base statements, Earnings.c fn_800D37BC's shape
-// (nBase1/nBase2), row pointers, inline accessors and a whole-prize inline helper with an out
-// pointer, nBase reusing any earlier local, an nPlayer local for nFirst + i in every declaration
-// slot, i + nFirst, PLAYER(), (u32) index, int/s32 on eight locals (256 combinations), declaration
-// climb, GC/2.0 to 2.7, the permuter (20 min).
-void GameModeBestBall_EndGame(void) {
+// nSum (= base 1; += base 2) fixed its scratch registers (94.46 -> 94.82). Tried without effect: every order
+// and operand order of the sum/money/base statements, Earnings.c GM_Earnings_GetStrokeWinningsTeam's shape
+// (nBase1/nBase2), row pointers, inline accessors and a whole-prize inline helper with an out pointer, nBase
+// reusing any earlier local, an nPlayer local for nFirst + i in every declaration slot, i + nFirst, PLAYER(),
+// (u32) index, int/s32 on eight locals (256 combinations), declaration climb, GC/2.0 to 2.7, the permuter (20
+// min).
+void fn_800E8A68(void) {
     int i;
     int nFirst;
     int nSum;
@@ -320,8 +320,8 @@ void GameModeBestBall_EndGame(void) {
                         if (nMargin > 5) {
                             nMargin = 5;
                         }
-                        nRating1 = fn_800D3C7C(nOther);
-                        nRating2 = fn_800D3C7C(nOther2);
+                        nRating1 = GM_Earnings_RateGolfer(nOther);
+                        nRating2 = GM_Earnings_RateGolfer(nOther2);
                         nSum = lbl_80200538.aStrokePrize[nRating1].nBase;
                         nSum += lbl_80200538.aStrokePrize[nRating2].nBase;
                         nMoney = nSum + lbl_80200538.aStrokePrize[nRating1].nPerStroke * nMargin;
@@ -347,10 +347,10 @@ void GameModeBestBall_EndGame(void) {
 
 // TW06: GM_BestBallMode_GetTeamHoleScore. The team's (better) score on a hole.
 int fn_800E8C24(int nPlayer, int nHole) {
-    if (gPlayers[nPlayer].nStrokes[nHole] <= gPlayers[GameModeBestBall_GetPartner(nPlayer)].nStrokes[nHole]) {
+    if (gPlayers[nPlayer].nStrokes[nHole] <= gPlayers[fn_800E83A8(nPlayer)].nStrokes[nHole]) {
         return gPlayers[nPlayer].nStrokes[nHole];
     }
-    return gPlayers[GameModeBestBall_GetPartner(nPlayer)].nStrokes[nHole];
+    return gPlayers[fn_800E83A8(nPlayer)].nStrokes[nHole];
 }
 
 // TW06: GM_BestBallMode_GetTeamRelativeScore. The team's score against par so far (and on the
