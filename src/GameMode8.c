@@ -141,7 +141,7 @@ u8    fn_800FDF58(int nPlayer);
 u8    fn_800FDF60(void);
 void  fn_800FDFC4(s32 p0, s32 p1, s32 p2);
 void  fn_800FDFFC(s32 p0, s32 p1);
-void  fn_800FE02C();
+void  fn_800FE02C(void);
 void  fn_800FE054(s32 p0, s32 p1);
 void  fn_800FE080(s32 p0, s32 p1);
 void  fn_800FE0AC(s32 p0, s32 p1);
@@ -807,8 +807,9 @@ void fn_800FB204(int nPlayer, int nStrokes) {
     }
 }
 
-// A holed shot's length (from vPreShot to the ball): a putt of 20 feet or more is event 17; any
-// other shot of 10 yards or more is event 18, or 19 from 60 yards.
+// A shot's length (from vPreShot to the ball): a putt of 20/3 or more is event 17; any other
+// shot of 10 or more is event 18, or 19 from 60. The unit is not proven (in yards, 20/3 would be
+// 20 feet). fn_800FB41C always returns 0, so none of these fire.
 void fn_800FB35C(int nPlayer) {
     f32 fDist = fn_800FB41C(gPlayers[nPlayer].vPreShot, (f32*)gPlayers[nPlayer].ball);
     if (gPlayers[nPlayer].nClub == CLUB_PUTTER) {
@@ -955,7 +956,7 @@ void fn_800FDFFC(s32 p0, s32 p1) {
     fn_80062D38(19, p0, (p1 & 0xFF));
 }
 
-void fn_800FE02C() {
+void fn_800FE02C(void) {
     fn_80062D6C(16, 1);
 }
 
