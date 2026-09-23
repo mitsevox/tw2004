@@ -105,6 +105,9 @@ void fn_800F3828(void);                 // GameMode14.c
 void fn_800F3980(int nMsg, s32 a, s32 b, s32 c, s32 d, s32 e);    // GameMode14.c
 void fn_800F48C4(void);                 // GameMode15.c
 void fn_800F7DE8(void);                 // GameMode13.c
+s32  fn_800F9328(void);                 // GameMode2.c: the first selected hole (-1: none)
+s32  fn_800F93D8(int h);                // the next selected hole after h (-1: none)
+s32  fn_800F9414(int h);                // the selected hole before h (-1: none)
 
 void fn_800F9824(void);                 // GameMode7.c
 

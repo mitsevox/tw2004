@@ -1397,6 +1397,96 @@ void fn_800FCCF0(void) {
     }
 }
 
+// State 26, enter: the hole is over for this player. In the two-player game each played hole is
+// scored by who gained more points on it (1 won, 0 halved, 2 lost); a run of wins up to this
+// hole is event 33 (three) or 34 (more), and one win after three or more losses is event 35.
+void fn_800FD1C0(int nPlayer) {
+    int aResult[18];
+    int nHole;
+    s32 nOther;
+    int h;
+    int nMine;
+    int nTheirs;
+    int nWon;
+    int nLost;
+    nHole = Game_CurHoleIndex();
+    nOther = nPlayer ? 0 : 1;
+    if (nPlayer == 0) {
+        if (lbl_802823C9) {
+            lbl_802823C9 = 0;
+            lbl_802823CA = 1;
+        } else {
+            lbl_802823CA = 0;
+        }
+    }
+    gPlayers[nPlayer].nC54 = 134;
+    gPlayers[nPlayer].nC3C &= ~1;
+    fn_800FE0AC(gPlayers[nPlayer].nC58, 0);
+    fn_800FE080(gPlayers[nPlayer].nC58, 0);
+    fn_800FE054(gPlayers[nPlayer].nC58, 0);
+    fn_800FDFC4(gPlayers[nPlayer].nC58, gPlayers[nPlayer].nC44, 1);
+    if (Game_GetMode() == 7) {
+        gPlayers[nPlayer].nC3C |= 0x2000000;
+        gPlayers[nPlayer].nC54 = 239;
+        if (nHole != fn_800F9328()) {
+            for (h = fn_800F9328(); h != -1; h = fn_800F93D8(h)) {
+                if (h == fn_800F9328()) {
+                    nMine = gPlayers[nPlayer].nC6C[h] - 3000;
+                    nTheirs = gPlayers[nOther].nC6C[h] - 3000;
+                } else if (h == nHole) {
+                    nMine = gPlayers[nPlayer].nC44 - gPlayers[nPlayer].nC6C[fn_800F9414(h)];
+                    nTheirs = gPlayers[nOther].nC44 - gPlayers[nOther].nC6C[fn_800F9414(h)];
+                } else {
+                    nMine = gPlayers[nPlayer].nC6C[h] - gPlayers[nPlayer].nC6C[fn_800F9414(h)];
+                    nTheirs = gPlayers[nOther].nC6C[h] - gPlayers[nOther].nC6C[fn_800F9414(h)];
+                }
+                if (nMine > nTheirs) {
+                    aResult[h] = 1;
+                } else if (nMine == nTheirs) {
+                    aResult[h] = 0;
+                } else {
+                    aResult[h] = 2;
+                }
+            }
+            nWon = 0;
+            for (h = nHole; h != -1; h = fn_800F9414(h)) {
+                if (aResult[h] != 1) break;
+                nWon++;
+            }
+            if (nWon > 3) {
+                gPlayers[nPlayer].nC3C |= 0x40000;
+            } else if (nWon == 3) {
+                gPlayers[nPlayer].nC3C |= 0x20000;
+            } else if (nWon == 1) {
+                if (nHole != 0) {
+                    nLost = 0;
+                    for (h = fn_800F9414(nHole); h != -1; h = fn_800F9414(h)) {
+                        if (aResult[h] != 2) break;
+                        nLost++;
+                    }
+                }
+                // EA bug: on the first hole (nHole 0) nLost is never set
+                if (nLost > 2) {
+                    gPlayers[nPlayer].nC3C |= 0x80000;
+                }
+            }
+            if (gPlayers[nPlayer].nC3C & 0x20000) {
+                gPlayers[nPlayer].nC3C &= ~0x20000;
+                fn_800FAAB8(nPlayer, 0x21);
+                gPlayers[nPlayer].nC54 += 119;
+            } else if (gPlayers[nPlayer].nC3C & 0x40000) {
+                gPlayers[nPlayer].nC3C &= ~0x40000;
+                fn_800FAAB8(nPlayer, 0x22);
+                gPlayers[nPlayer].nC54 += 119;
+            } else if (gPlayers[nPlayer].nC3C & 0x80000) {
+                gPlayers[nPlayer].nC3C &= ~0x80000;
+                fn_800FAAB8(nPlayer, 0x23);
+                gPlayers[nPlayer].nC54 += 119;
+            }
+        }
+    }
+}
+
 void fn_800FD6A0(int nPlayer) {
 }
 
