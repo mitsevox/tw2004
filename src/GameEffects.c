@@ -669,9 +669,9 @@ void GameEffects_SetSuperSlowMo(u8 bOn, int nPlayer, f32 fRate) {
     if (bOn) {
         if (!lbl_80202898.bSlowMo) {
             if (fRate < 1.0f) {
-                EVENT_Trigger(nPlayer, 0x35, (int)&gPlayers[nPlayer].fBallX, -1);
+                EVENT_Trigger(nPlayer, 0x35, &gPlayers[nPlayer].fBallX, -1);
             } else {
-                EVENT_Trigger(nPlayer, 0x37, (int)&gPlayers[nPlayer].fBallX, -1);
+                EVENT_Trigger(nPlayer, 0x37, &gPlayers[nPlayer].fBallX, -1);
             }
             lbl_80202898.bSlowMo = bOn;
         }
@@ -683,10 +683,10 @@ void GameEffects_SetSuperSlowMo(u8 bOn, int nPlayer, f32 fRate) {
     if (lbl_80202898.bSlowMo) {
         lbl_80202898.bSlowMo = bOn;
         if (lbl_80202898.fSlowMo < 1.0f) {
-            EVENT_Trigger(nPlayer, 0x36, (int)&gPlayers[nPlayer].fBallX, -1);
+            EVENT_Trigger(nPlayer, 0x36, &gPlayers[nPlayer].fBallX, -1);
             return;
         }
-        EVENT_Trigger(nPlayer, 0x38, (int)&gPlayers[nPlayer].fBallX, -1);
+        EVENT_Trigger(nPlayer, 0x38, &gPlayers[nPlayer].fBallX, -1);
     }
 }
 

@@ -3401,7 +3401,7 @@ void STATEFUNC_ReplaySwingUpdate(int nPlayer) {
             Swing_Launch(nPlayer);
             GOLFERSTATE_Switch(GS_SIMULATE, nPlayer);
         } else if (fn_800C4518(pV) >= fn_800C6B38(pV)) {
-            EVENT_Trigger(nPlayer, 0xA, (int)&gPlayers[nPlayer].ball, 1);
+            EVENT_Trigger(nPlayer, 0xA, &gPlayers[nPlayer].ball, 1);
             fn_800C44A8(pV, nPlayer);
             fn_8002792C(*(u8**)(((ShotObj*)gPlayers[nPlayer].nShotHandle)->pView + 0x38));
             Swing_Launch(nPlayer);

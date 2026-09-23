@@ -122,14 +122,14 @@ static inline f32 Ball_Clamp(f32 x, f32 fLo, f32 fHi) {
 #define BALL_LANDING_EVENTS(pBall, pSurface, pObj)                                                 \
     if ((pBall)->nPlayer >= 0) {                                                                   \
         if ((pSurface)->u34 & 0x10) {                                                              \
-            EVENT_Trigger((pBall)->nPlayer, 0x25, (int)(pBall), !gSimulating);                       \
+            EVENT_Trigger((pBall)->nPlayer, 0x25, (pBall), !gSimulating);                            \
         }                                                                                          \
         if (fn_80050BEC(pSurface) == 90) {                                                         \
-            EVENT_Trigger((pBall)->nPlayer, 0x26, (int)(pBall), !gSimulating);                       \
+            EVENT_Trigger((pBall)->nPlayer, 0x26, (pBall), !gSimulating);                            \
         } else if (pObj) {                                                                         \
-            EVENT_Trigger((pBall)->nPlayer, 0x24, (int)(pBall), !gSimulating);                       \
+            EVENT_Trigger((pBall)->nPlayer, 0x24, (pBall), !gSimulating);                            \
         } else {                                                                                   \
-            EVENT_Trigger((pBall)->nPlayer, 0x23, (int)(pBall), !gSimulating);                       \
+            EVENT_Trigger((pBall)->nPlayer, 0x23, (pBall), !gSimulating);                            \
         }                                                                                          \
     } else if ((pBall)->nCollideCount == 0) {                                                                \
         int     nOwner;                                                                            \
@@ -148,7 +148,7 @@ static inline f32 Ball_Clamp(f32 x, f32 fLo, f32 fHi) {
                 }                                                                                  \
             }                                                                                      \
         }                                                                                          \
-        EVENT_Trigger(nOwner, 0x49, (int)(pBall), 1);                                                \
+        EVENT_Trigger(nOwner, 0x49, (pBall), 1);                                                     \
     }
 
 
@@ -172,7 +172,7 @@ void Physics_OutOfBounds(Ball* pBall, u8 bSound) {
     pBall->nState = PHYSICS_BALLSTATE_BallOutOfBounds_e;
     pBall->nLie   = LIE_OUT_OF_BOUNDS_e;
     if (bSound && pBall->nPlayer >= 0) {
-        EVENT_Trigger(pBall->nPlayer, 0x22, (int)pBall, !gSimulating);
+        EVENT_Trigger(pBall->nPlayer, 0x22, pBall, !gSimulating);
     }
 }
 
@@ -611,7 +611,7 @@ void Ball_Launch(Ball* pBall, int nClub, int nKind, f32 fPower, f32 fAim, int nT
         Vec3Copy(pBall->vPos, lbl_801D58C8[pBall->nPlayer]);
     }
     if (pBall->nPlayer >= 0) {
-        EVENT_Trigger(pBall->nPlayer, 10, (int)pBall, !gSimulating);
+        EVENT_Trigger(pBall->nPlayer, 10, pBall, !gSimulating);
     }
 }
 
@@ -677,7 +677,7 @@ void Ball_FlightStep(Ball* pBall, f32 fTicks) {
     fn_8000C5D4(pBall->vVel, vAccel, fTicks, pBall->vVel);
     if (!pBall->bHitTopArc && pBall->nPlayer >= 0 && pBall->vVel[1] < 0.0f && pBall->vVel[1] - fTicks * vAccel[1] >= 0.0f) {
         pBall->bHitTopArc = 1;
-        EVENT_Trigger(pBall->nPlayer, 0x1C, (int)pBall, !gSimulating);
+        EVENT_Trigger(pBall->nPlayer, 0x1C, pBall, !gSimulating);
     }
     fInto  = vWind[0] * pBall->vVel[0] + vWind[2] * pBall->vVel[2];
     if (fInto < 0.0f) {
@@ -1208,7 +1208,7 @@ void Ball_SetLie(Ball* pBall, SurfaceType* pSurface) {
         if (pBall->nLie != LIE_INCUP_e) {
             pBall->nLie = 12;
             if (pBall->nPlayer >= 0) {
-                EVENT_Trigger(pBall->nPlayer, 0x21, (int)pBall, !gSimulating);
+                EVENT_Trigger(pBall->nPlayer, 0x21, pBall, !gSimulating);
             }
         }
         break;
@@ -1309,7 +1309,7 @@ u8 Physics_ProcessCollision(Ball* pBall, f32* pHit, f32* pNormal, SurfaceType* p
     if (pSurface->f0C >= 0.0f && !pBall->b99 && pBall->nPlayer >= 0 && pBall->nState == 2) {
         if (!pBall->b99) {
             pBall->b99 = 1;
-            EVENT_Trigger(pBall->nPlayer, 0x1D, (int)pBall, !gSimulating);
+            EVENT_Trigger(pBall->nPlayer, 0x1D, pBall, !gSimulating);
         }
         if (pBall->fSpinX != 0.0f || pBall->fSpinY != 0.0f) {
             fBack = pBall->fSpinY;
@@ -1328,7 +1328,7 @@ u8 Physics_ProcessCollision(Ball* pBall, f32* pHit, f32* pNormal, SurfaceType* p
             Vec3Copy(vSpin, pBall->vSpin);
         }
         pBall->b9B = 1;
-        EVENT_Trigger(pBall->nPlayer, 0x1F, (int)pBall, !gSimulating);
+        EVENT_Trigger(pBall->nPlayer, 0x1F, pBall, !gSimulating);
     }
     return 1;
 }
@@ -1390,7 +1390,7 @@ u8 fn_80054040(Ball* pBall, f32 fTicks) {
     if (!Physics_ProcessCollision(pBall, vHit, vNormal, pSurface, NULL, &fFrac, fTicks)) return 0;
     if (pBall->nPlayer >= 0) {
         pBall->n90 = nWhat;
-        EVENT_Trigger(pBall->nPlayer, 0x27, (int)pBall, !gSimulating);
+        EVENT_Trigger(pBall->nPlayer, 0x27, pBall, !gSimulating);
     }
     Physics_HandleCollision(pBall, vNormal, pSurface);
     return 1;
@@ -1446,8 +1446,8 @@ void Ball_Stop(Ball* pBall) {
         pBall->nLie   = 12;
         pBall->n6C    = 0;
         if (pBall->nPlayer >= 0) {
-            EVENT_Trigger(pBall->nPlayer, 0x21, (int)pBall, !gSimulating);
-            EVENT_Trigger(pBall->nPlayer, 0x20, (int)pBall, !gSimulating);
+            EVENT_Trigger(pBall->nPlayer, 0x21, pBall, !gSimulating);
+            EVENT_Trigger(pBall->nPlayer, 0x20, pBall, !gSimulating);
         }
         return;
     }
@@ -1463,7 +1463,7 @@ void Ball_Stop(Ball* pBall) {
     pBall->nState = 1;
     Ball_SetLie(pBall, pSurface);
     if (pBall->nPlayer >= 0) {
-        EVENT_Trigger(pBall->nPlayer, 0x20, (int)pBall, !gSimulating);
+        EVENT_Trigger(pBall->nPlayer, 0x20, pBall, !gSimulating);
     }
 }
 
