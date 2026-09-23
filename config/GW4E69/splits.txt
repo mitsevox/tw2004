@@ -448,14 +448,8 @@ uiProcessInterface.c:
 fe_movies.c:
 	.text       start:0x80090B80 end:0x800922A8
 
-unsorted/sweep_800929E0.c:
-	.text       start:0x800929E0 end:0x800929E4
-
-unsorted/sweep_80092BA0.c:
-	.text       start:0x80092BA0 end:0x80092BE8
-
-unsorted/sweep_80092C38.c:
-	.text       start:0x80092C38 end:0x80092CE8
+uiText.c:
+	.text       start:0x800922A8 end:0x80092CE8
 
 uiTransform.c:
 	.text       start:0x80092CE8 end:0x80093524
@@ -471,19 +465,7 @@ GoObjShadow.c:
 	.text       start:0x80093D3C end:0x8009414C
 
 GoShaderObject_Particle_Gc.c:
-	.text       start:0x8009414C end:0x80095088
-
-unsorted/sweep_800950CC.c:
-	.text       start:0x800950CC end:0x800950DC
-
-unsorted/sweep_800950DC.c:
-	.text       start:0x800950DC end:0x800950F4
-
-unsorted/sweep_800950F4.c:
-	.text       start:0x800950F4 end:0x80095108
-
-unsorted/sweep_80095364.c:
-	.text       start:0x80095364 end:0x80095368
+	.text       start:0x8009414C end:0x8009554C
 
 unsorted/sweep_8009554C.c:
 	.text       start:0x8009554C end:0x80095564
@@ -519,22 +501,7 @@ unsorted/sweep_80097E98.c:
 	.text       start:0x80097E98 end:0x80097F44
 
 GoShaderObject_Glows_Gc.c:
-	.text       start:0x80097F44 end:0x80098844
-
-unsorted/sweep_80098844.c:
-	.text       start:0x80098844 end:0x8009884C
-
-unsorted/sweep_8009884C.c:
-	.text       start:0x8009884C end:0x800988B8
-
-unsorted/sweep_800988B8.c:
-	.text       start:0x800988B8 end:0x800988CC
-
-unsorted/sweep_800988CC.c:
-	.text       start:0x800988CC end:0x800988D8
-
-unsorted/sweep_800988D8.c:
-	.text       start:0x800988D8 end:0x80098938
+	.text       start:0x80097F44 end:0x80098A98
 
 UFstPart.c:
 	.text       start:0x80098A98 end:0x80099ED8
@@ -560,11 +527,14 @@ unsorted/sweep_8009A990.c:
 unsorted/sweep_8009AA18.c:
 	.text       start:0x8009AA18 end:0x8009AA28
 
+Code8009AA28.c:
+	.text       start:0x8009AA28 end:0x8009B314
+
 unsorted/sweep_8009B314.c:
 	.text       start:0x8009B314 end:0x8009B340
 
-unsorted/sweep_8009B604.c:
-	.text       start:0x8009B604 end:0x8009B630
+Code8009B340.c:
+	.text       start:0x8009B340 end:0x8009B630
 
 GoGreenGrid.c:
 	.text       start:0x8009B630 end:0x8009CB9C
