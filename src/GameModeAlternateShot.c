@@ -442,7 +442,7 @@ void fn_800E7828(void) {
                     if (nMoney) {
                         fn_800E4364(0, 0x6B, nPrize, nProfile);
                         fn_800D3548(i, nMoney, 0);
-                        p->nMoney += nMoney;
+                        p->n328 += nMoney;
                     }
                 }
             }

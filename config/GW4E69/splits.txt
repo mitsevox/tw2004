@@ -3636,6 +3636,9 @@ GameModeBestBall.c:
 GameModeFourBall.c:
 	.text       start:0x800E8D58 end:0x800E9E40
 
+GameModeMatch.c:
+	.text       start:0x800E9E40 end:0x800EACD8
+
 unsorted/sweep_800EADD8.c:
 	.text       start:0x800EADD8 end:0x800EADDC
 

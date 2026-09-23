@@ -443,7 +443,7 @@ void fn_800E9CF4(void) {
                 if (gpSaveData[p->nIndex * 0x10600] && nMoney) {
                     fn_800E4364(0, 0x6B, nPrize, p->nIndex);
                     fn_800D3548(i, nMoney, 0);
-                    p->nMoney += nMoney;
+                    p->n328 += nMoney;
                 }
             }
         }

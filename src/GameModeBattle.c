@@ -150,7 +150,7 @@ void fn_800E7CBC(void) {
                 if (nMoney) {
                     fn_800E4364(0, 0x6B, nPrize, nProfile);
                     fn_800D3548(nWinner, nMoney, 0);
-                    gPlayers[nWinner].nMoney += nMoney;
+                    gPlayers[nWinner].n328 += nMoney;
                 }
             }
         }

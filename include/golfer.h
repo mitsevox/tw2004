@@ -231,9 +231,12 @@ typedef struct Player {
     s32  n308;                  // 0x308
     u8   unk30C[2];
     u8   b30E;                  // 0x30E  a replaced ball must be dropped (GM_ReplaceOOBBall)
-    u8   unk30F[0x328 - 0x30F];
-    s32  nMoney;                // 0x328  prize money won (GameModeAlternateShot EndGame)
-    u8   unk32C[0x354 - 0x32C];
+    u8   unk30F[0x324 - 0x30F];
+    s32  n324;                  // 0x324  n338 minus the last match prize (GameModeMatch EndGame)
+    s32  n328;                  // 0x328  a total the match modes add their prize (or money) to
+    u8   unk32C[0x338 - 0x32C];
+    s32  n338;                  // 0x338
+    u8   unk33C[0x354 - 0x33C];
     // Shot block, TW06 AIshot_t (which has 6 preferred clubs where we have 8).
     s32  nClub;                 // 0x354  TW06: club
     s32  nClubPerKind[8];       // 0x358  the club Shot_Prepare would pick for each shot kind. TW06: preferredClub
