@@ -3617,12 +3617,17 @@ GameRound.c:
 
 GameUI.c:
 	.text       start:0x800E3B28 end:0x800E4FFC
+	.data       start:0x80192558 end:0x80192588
+	.sdata2     start:0x80284628 end:0x80284630
 
 GameMessages.c:
 	.text       start:0x800E4FFC end:0x800E5E54
+	.sdata2     start:0x80284630 end:0x80284638
 
 GameAnalysis.c:
 	.text       start:0x800E5E54 end:0x800E68F0
+	.data       start:0x80192588 end:0x801925B8
+	.sdata2     start:0x80284638 end:0x80284648
 
 GameModeAlternateShot.c:
 	.text       start:0x800E68F0 end:0x800E7980
@@ -3638,12 +3643,14 @@ GameModeFourBall.c:
 
 GameModeMatch.c:
 	.text       start:0x800E9E40 end:0x800EACD8
+	.sdata2     start:0x80284660 end:0x80284668
 
 GameMode5.c:
 	.text       start:0x800EACD8 end:0x800ED738
 
 GameMode9.c:
 	.text       start:0x800ED738 end:0x800EDD18
+	.sdata2     start:0x80284670 end:0x80284688
 
 GameMode23.c:
 	.text       start:0x800EDD18 end:0x800F0448
@@ -3656,12 +3663,15 @@ GameMode10.c:
 
 GameMode14.c:
 	.text       start:0x800F2984 end:0x800F39F4
+	.sdata2     start:0x802846B8 end:0x802846C0
 
 GameMode15.c:
 	.text       start:0x800F39F4 end:0x800F4B40
+	.sdata2     start:0x802846C0 end:0x802846D0
 
 GameMode16.c:
 	.text       start:0x800F4B40 end:0x800F5AAC
+	.sdata2     start:0x802846D0 end:0x802846E0
 
 GameMode17.c:
 	.text       start:0x800F5AAC end:0x800F6A60
@@ -3669,6 +3679,7 @@ GameMode17.c:
 
 GameMode13.c:
 	.text       start:0x800F6A60 end:0x800F80FC
+	.sdata2     start:0x802846E8 end:0x80284700
 
 GameMode2.c:
 	.text       start:0x800F80FC end:0x800F944C
