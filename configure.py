@@ -801,6 +801,7 @@ config.libs = [
             Object(Matching, "runtime/w_fmod.c"),
             Object(Matching, "runtime/w_log.c"),
             Object(Matching, "runtime/w_pow.c"),
+            Object(Matching, "runtime/extras.c"),
             Object(Matching, "runtime/__mem.c"),
             Object(Matching, "runtime/__va_arg.c"),
             Object(Matching, "runtime/buffer_io.c"),

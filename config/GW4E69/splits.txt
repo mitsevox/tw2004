@@ -2314,7 +2314,7 @@ unsorted/sweep_80155F40.c:
 	.text       start:0x80155F40 end:0x80155F4C
 
 runtime/ctype.c:
-	.text       start:0x80155F4C end:0x80155F70
+	.text       start:0x80155F4C end:0x80155F88
 	.data       start:0x8019C688 end:0x8019C988
 
 src/MSL_C/PPCEABI/bare/H/direct_io.c:
@@ -2474,6 +2474,9 @@ runtime/w_log.c:
 
 runtime/w_pow.c:
 	.text       start:0x8015F824 end:0x8015F844
+
+runtime/extras.c:
+	.text       start:0x8015F844 end:0x8015F8D0
 
 MetroTRK/mainloop.c:
 	.text       start:0x8015F8D0 end:0x8015F9C8

@@ -825,46 +825,46 @@ void fn_8007873C(SaveProfile* pProfile) {
 u8 FE_CrAP_IsAssetUndesirable(s16 nPart, CrAPAsset* pAsset) {
     switch (nPart) {
     case 10:
-        if (fn_8015F844(pAsset->szName, "Cheek Scar & Tat") == 0) {
+        if (stricmp(pAsset->szName, "Cheek Scar & Tat") == 0) {
             return 1;
         }
-        if (fn_8015F844(pAsset->szName, "Facial Tattoo") == 0) {
+        if (stricmp(pAsset->szName, "Facial Tattoo") == 0) {
             return 1;
         }
-        if (fn_8015F844(pAsset->szName, "Acne") == 0) {
+        if (stricmp(pAsset->szName, "Acne") == 0) {
             return 1;
         }
-        if (fn_8015F844(pAsset->szName, "Weathered") == 0) {
+        if (stricmp(pAsset->szName, "Weathered") == 0) {
             return 1;
         }
-        if (fn_8015F844(pAsset->szName, "Old") == 0) {
+        if (stricmp(pAsset->szName, "Old") == 0) {
             return 1;
         }
-        if (fn_8015F844(pAsset->szName, "Gold Makeup") == 0) {
+        if (stricmp(pAsset->szName, "Gold Makeup") == 0) {
             return 1;
         }
-        if (fn_8015F844(pAsset->szName, "Beauty 4") == 0) {
+        if (stricmp(pAsset->szName, "Beauty 4") == 0) {
             return 1;
         }
-        if (fn_8015F844(pAsset->szName, "Punk") == 0) {
+        if (stricmp(pAsset->szName, "Punk") == 0) {
             return 1;
         }
-        if (fn_8015F844(pAsset->szName, "Punk Makeup") == 0) {
+        if (stricmp(pAsset->szName, "Punk Makeup") == 0) {
             return 1;
         }
-        if (fn_8015F844(pAsset->szName, "Alt Punk") == 0) {
+        if (stricmp(pAsset->szName, "Alt Punk") == 0) {
             return 1;
         }
-        if (fn_8015F844(pAsset->szName, "Alt Punk Makeup") == 0) {
+        if (stricmp(pAsset->szName, "Alt Punk Makeup") == 0) {
             return 1;
         }
-        if (fn_8015F844(pAsset->szName, "Pink Makeup") == 0) {
+        if (stricmp(pAsset->szName, "Pink Makeup") == 0) {
             return 1;
         }
-        if (fn_8015F844(pAsset->szName, "Old Makeup") == 0) {
+        if (stricmp(pAsset->szName, "Old Makeup") == 0) {
             return 1;
         }
-        if (fn_8015F844(pAsset->szName, "Old") == 0) {      // EA's list tests "Old" twice
+        if (stricmp(pAsset->szName, "Old") == 0) {      // EA's list tests "Old" twice
             return 1;
         }
         break;
@@ -901,28 +901,28 @@ u8 fn_80078B84(CrAPAsset* pAsset) {
     if (pAsset == NULL) {
         return 0;
     }
-    if (fn_8015F844(pAsset->szName, "White") == 0) {
+    if (stricmp(pAsset->szName, "White") == 0) {
         return 1;
     }
-    if (fn_8015F844(pAsset->szName, "Bright Red") == 0) {
+    if (stricmp(pAsset->szName, "Bright Red") == 0) {
         return 1;
     }
-    if (fn_8015F844(pAsset->szName, "Orange") == 0) {
+    if (stricmp(pAsset->szName, "Orange") == 0) {
         return 1;
     }
-    if (fn_8015F844(pAsset->szName, "Pink") == 0) {
+    if (stricmp(pAsset->szName, "Pink") == 0) {
         return 1;
     }
-    if (fn_8015F844(pAsset->szName, "Yellow") == 0) {
+    if (stricmp(pAsset->szName, "Yellow") == 0) {
         return 1;
     }
-    if (fn_8015F844(pAsset->szName, "Green") == 0) {
+    if (stricmp(pAsset->szName, "Green") == 0) {
         return 1;
     }
-    if (fn_8015F844(pAsset->szName, "Purple") == 0) {
+    if (stricmp(pAsset->szName, "Purple") == 0) {
         return 1;
     }
-    if (fn_8015F844(pAsset->szName, "Blue") == 0) {
+    if (stricmp(pAsset->szName, "Blue") == 0) {
         return 1;
     }
     return 0;
@@ -933,11 +933,11 @@ u8 FE_CrAP_IsCrazyHat(CrAPAsset* pAsset) {
     if (pAsset == NULL) {
         return 0;
     }
-    if (fn_8015F844(fn_801064EC(pAsset->nCategory), "Hats") == 0 &&
+    if (stricmp(fn_801064EC(pAsset->nCategory), "Hats") == 0 &&
         strstr(pAsset->szName, "backwards") == NULL) {
         return 0;
     }
-    if (fn_8015F844(fn_801064EC(pAsset->nCategory), "Visors") == 0) {
+    if (stricmp(fn_801064EC(pAsset->nCategory), "Visors") == 0) {
         return 0;
     }
     return 1;
@@ -948,28 +948,28 @@ u8 fn_80078D24(CrAPAsset* pAsset) {
     if (pAsset == NULL) {
         return 0;
     }
-    if (fn_8015F844(pAsset->szName, "White") == 0) {
+    if (stricmp(pAsset->szName, "White") == 0) {
         return 1;
     }
-    if (fn_8015F844(pAsset->szName, "Bright Red") == 0) {
+    if (stricmp(pAsset->szName, "Bright Red") == 0) {
         return 1;
     }
-    if (fn_8015F844(pAsset->szName, "Orange") == 0) {
+    if (stricmp(pAsset->szName, "Orange") == 0) {
         return 1;
     }
-    if (fn_8015F844(pAsset->szName, "Pink") == 0) {
+    if (stricmp(pAsset->szName, "Pink") == 0) {
         return 1;
     }
-    if (fn_8015F844(pAsset->szName, "Yellow") == 0) {
+    if (stricmp(pAsset->szName, "Yellow") == 0) {
         return 1;
     }
-    if (fn_8015F844(pAsset->szName, "Green") == 0) {
+    if (stricmp(pAsset->szName, "Green") == 0) {
         return 1;
     }
-    if (fn_8015F844(pAsset->szName, "Purple") == 0) {
+    if (stricmp(pAsset->szName, "Purple") == 0) {
         return 1;
     }
-    if (fn_8015F844(pAsset->szName, "Blue") == 0) {
+    if (stricmp(pAsset->szName, "Blue") == 0) {
         return 1;
     }
     return 0;
@@ -999,15 +999,15 @@ void fn_80078E34(SaveProfile* pProfile) {
         nPick = Rand_Next(0) % nCount;
         pAsset = fn_80104E84(3, 0, nPick);
         if (bChance && pAsset &&
-            (fn_8015F844(pAsset->szName, "Corn Rows") == 0 || fn_8015F844(pAsset->szName, "Afro") == 0 ||
-             fn_8015F844(pAsset->szName, "Mohawk") == 0)) {
+            (stricmp(pAsset->szName, "Corn Rows") == 0 || stricmp(pAsset->szName, "Afro") == 0 ||
+             stricmp(pAsset->szName, "Mohawk") == 0)) {
             FE_CrAP_TurnOnPart(3, 0, nPick);
             bPicking = 0;
         }
         if (!bChance &&
-            (pAsset == NULL || (fn_8015F844(pAsset->szName, "Corn Rows") != 0 &&
-                                fn_8015F844(pAsset->szName, "Afro") != 0 &&
-                                fn_8015F844(pAsset->szName, "Mohawk") != 0))) {
+            (pAsset == NULL || (stricmp(pAsset->szName, "Corn Rows") != 0 &&
+                                stricmp(pAsset->szName, "Afro") != 0 &&
+                                stricmp(pAsset->szName, "Mohawk") != 0))) {
             FE_CrAP_TurnOnPart(3, 0, nPick);
             bPicking = 0;
         }
