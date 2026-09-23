@@ -7,7 +7,7 @@ void __ieee754_asin();
 void __ieee754_atan2();
 void __ieee754_fmod();
 void __ieee754_log();
-void fn_8015D03C();
+void __ieee754_pow();
 
 void fn_8015F784(void);
 void fn_8015F7A4(void);
@@ -36,5 +36,5 @@ void fn_8015F804(void) {
 }
 
 void fn_8015F824(void) {
-    fn_8015D03C();
+    __ieee754_pow();
 }

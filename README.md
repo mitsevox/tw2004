@@ -24,11 +24,14 @@ Status
 Last updated 2026-09-23.
 
 - Builds byte-identical to the retail `main.dol`.
-- Matched code: **23.0%** (357,352 of 1,550,720 bytes), **3,606 of 7,647 functions** (47.2%).
-  Counting partial matches: 26.6%.
+- Matched code: **25.1%** (389,732 of 1,550,720 bytes), **3,689 of 7,647 functions** (48.2%).
+  Counting partial matches: 28.6%.
   - EA's code (the game and EA's engine libraries, 81% of the executable): **14.7%** matched,
-    2,791 of 6,545 functions.
-  - Nintendo SDK and compiler runtime (the other 19%): **58.9%** matched, 815 of 1,102 functions.
+    2,794 of 6,545 functions.
+  - Nintendo SDK and compiler runtime (the other 19%): **69.5%** matched, 895 of 1,102 functions.
+    Most of it is source shared by other GameCube decompilations (Metroid Prime, Final Fantasy
+    Crystal Chronicles, The Wind Waker, Twilight Princess); see the `CREDITS.md` in each
+    `extern/` folder.
 - Game code in C so far: the swing and its state machine (`Swing.c`), golfer attributes and the
   CPU's shot planning (`Golfer.c`), ball physics (`Ball.c`, 63 of 68 functions exact), the
   animation library (`skalib.c`), the asset stream decompressor (`UStream.c`), and about 2,370

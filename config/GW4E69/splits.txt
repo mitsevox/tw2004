@@ -5124,7 +5124,7 @@ unsorted/sweep_8012E820.c:
 unsorted/sweep_8012E8A8.c:
 	.text       start:0x8012E8A8 end:0x8012E950
 
-dolphin/vi.c:
+src/vi/vi.c:
 	.text       start:0x8012E950 end:0x8013042C
 
 dolphin/exi/EXIBios.c:
@@ -5148,11 +5148,17 @@ unsorted/sweep_801338E0.c:
 dolphin/ar/ar.c:
 	.text       start:0x80133918 end:0x8013538C
 
-dolphin/ar/arq.c:
-	.text       start:0x8013538C end:0x80135728
+libs/dolphin/src/ar/arq.c:
+	.text       start:0x8013538C end:0x80135810
 
-unsorted/sweep_801359AC.c:
-	.text       start:0x801359AC end:0x801359BC
+src/ax/AX.c:
+	.text       start:0x80135810 end:0x8013584C
+
+src/ax/AXAlloc.c:
+	.text       start:0x8013584C end:0x80135BE0
+
+src/ax/AXAux.c:
+	.text       start:0x80135BE0 end:0x80136058
 
 unsorted/sweep_80136058.c:
 	.text       start:0x80136058 end:0x80136064
@@ -5160,8 +5166,8 @@ unsorted/sweep_80136058.c:
 unsorted/sweep_80136064.c:
 	.text       start:0x80136064 end:0x8013606C
 
-unsorted/sweep_8013677C.c:
-	.text       start:0x8013677C end:0x80136790
+src/ax/AXCL.c:
+	.text       start:0x8013606C end:0x80136790
 
 unsorted/sweep_80136980.c:
 	.text       start:0x80136980 end:0x8013698C
@@ -5172,17 +5178,23 @@ unsorted/sweep_801369E4.c:
 unsorted/sweep_80136DF4.c:
 	.text       start:0x80136DF4 end:0x80136E08
 
-unsorted/sweep_80137200.c:
-	.text       start:0x80137200 end:0x8013722C
-
-unsorted/sweep_8013722C.c:
-	.text       start:0x8013722C end:0x801372C0
+src/ax/AXSPB.c:
+	.text       start:0x80136E08 end:0x801372C0
 
 unsorted/sweep_801372C0.c:
 	.text       start:0x801372C0 end:0x801372C8
 
 unsorted/sweep_80137C2C.c:
 	.text       start:0x80137C2C end:0x80137C38
+
+src/ax/AXProf.c:
+	.text       start:0x80138184 end:0x801381CC
+
+src/axfx/reverb_hi.c:
+	.text       start:0x801381CC end:0x80138EC8
+
+src/axfx/delay.c:
+	.text       start:0x80138EC8 end:0x80139374
 
 unsorted/sweep_801393C4.c:
 	.text       start:0x801393C4 end:0x801393D0
@@ -5195,8 +5207,8 @@ dolphin/db.c:
 	.data       start:0x801998E0 end:0x801998F8
 	.sbss       start:0x80282750 end:0x80282758
 
-dolphin/dsp/dsp.c:
-	.text       start:0x801395AC end:0x80139734
+src/dsp/dsp.c:
+	.text       start:0x801395AC end:0x801397FC
 
 dolphin/dsp/dsp_debug.c:
 	.text       start:0x801397FC end:0x8013984C
@@ -5215,7 +5227,7 @@ dolphin/dvd/dvdfs.c:
 unsorted/sweep_8013B3C4.c:
 	.text       start:0x8013B3C4 end:0x8013B3C8
 
-dolphin/dvd/dvd.c:
+src/dolphin/dvd/dvd.c:
 	.text       start:0x8013B3C8 end:0x8013DCB4
 
 dolphin/dvd/dvdqueue.c:
@@ -5228,6 +5240,9 @@ dolphin/dvd/dvderror.c:
 
 dolphin/dvd/dvdidutils.c:
 	.text       start:0x8013E044 end:0x8013E13C
+
+src/dvd/dvdFatal.c:
+	.text       start:0x8013E13C end:0x8013E16C
 
 dolphin/dvd/fstload.c:
 	.text       start:0x8013E16C end:0x8013E3AC
@@ -5279,10 +5294,10 @@ dolphin/gx/GXPixel.c:
 dolphin/gx/GXStubs.c:
 	.text       start:0x80144898 end:0x8014489C
 
-dolphin/gx/GXDisplayList.c:
-	.text       start:0x80144A38 end:0x80144AA8
+src/gx/GXDisplayList.c:
+	.text       start:0x8014489C end:0x80144AA8
 
-dolphin/gx/GXTransform.c:
+src/gx/GXTransform.c:
 	.text       start:0x80144AA8 end:0x80145140
 
 dolphin/gx/GXPerf.c:
@@ -5298,14 +5313,14 @@ dolphin/mtx/mtx.c:
 dolphin/mtx/mtx44.c:
 	.text       start:0x80147DB0 end:0x80147E48
 
-dolphin/os/OS.c:
+src/dolphin/os/OS.c:
 	.text       start:0x80147E48 end:0x80148790
 
 dolphin/os/OSAlarm.c:
 	.text       start:0x80148790 end:0x80148E40
 
-unsorted/sweep_80149064.c:
-	.text       start:0x80149064 end:0x80149074
+src/os/OSAlloc.c:
+	.text       start:0x80148E40 end:0x80149150
 
 dolphin/os/OSArena.c:
 	.text       start:0x80149150 end:0x80149170
@@ -5323,12 +5338,18 @@ dolphin/os/OSContext.c:
 dolphin/os/OSError.c:
 	.text       start:0x8014A0AC end:0x8014A758
 
+src/os/OSFont.c:
+	.text       start:0x8014A758 end:0x8014A7B0
+
 dolphin/os/OSInterrupt.c:
 	.text       start:0x8014A7B0 end:0x8014B01C
 	.data       start:0x8019BA90 end:0x8019BAC0
 	.sbss       start:0x802828F8 end:0x80282910
 
-dolphin/os/OSMemory.c:
+src/os/OSLink.c:
+	.text       start:0x8014B01C end:0x8014B034
+
+src/dolphin/os/OSMemory.c:
 	.text       start:0x8014B034 end:0x8014B314
 
 dolphin/os/OSMutex.c:
@@ -5353,17 +5374,20 @@ dolphin/os/OSSync.c:
 unsorted/sweep_8014CA80.c:
 	.text       start:0x8014CA80 end:0x8014CA84
 
-dolphin/os/OSThread.c:
+src/dolphin/os/OSThread.c:
 	.text       start:0x8014CA84 end:0x8014E48C
 
 dolphin/os/OSTime.c:
 	.text       start:0x8014E48C end:0x8014E8B0
 
+src/os/__ppc_eabi_init.c:
+	.text       start:0x8014E8B0 end:0x8014E944
+
 dolphin/pad/PadClamp.c:
 	.text       start:0x8014E944 end:0x8014EB88
 	.rodata     start:0x80184FC0 end:0x80184FD0
 
-dolphin/pad/pad.c:
+src/dolphin/pad/Pad.c:
 	.text       start:0x8014EB88 end:0x80150658
 
 dolphin/ai.c:
@@ -5375,14 +5399,26 @@ unsorted/sweep_80150F24.c:
 runtime/__va_arg.c:
 	.text       start:0x801519A4 end:0x80151A6C
 
+src/Runtime.PPCEABI.H/global_destructor_chain.c:
+	.text       start:0x80151A6C end:0x80151AB4
+
 runtime/runtime.c:
 	.text       start:0x80151AB4 end:0x801520F8
 
-runtime/ansi_files.c:
+src/Runtime.PPCEABI.H/GCN_mem_alloc.c:
+	.text       start:0x801520F8 end:0x801521B0
+
+src/MSL_C/PPCEABI/bare/H/abort_exit.c:
+	.text       start:0x801521B0 end:0x801522A0
+
+src/MSL_C/PPCEABI/bare/H/alloc.c:
+	.text       start:0x801522A0 end:0x80152754
+
+src/MSL_C/PPCEABI/bare/H/ansi_files.c:
 	.text       start:0x80152754 end:0x8015286C
 
-runtime/ansi_fp.c:
-	.text       start:0x801538EC end:0x8015444C
+src/MSL_C/PPCEABI/bare/H/ansi_fp.c:
+	.text       start:0x801538EC end:0x80155BD0
 
 runtime/buffer_io.c:
 	.text       start:0x80155E48 end:0x80155F40
@@ -5394,17 +5430,23 @@ runtime/ctype.c:
 	.text       start:0x80155F4C end:0x80155F70
 	.data       start:0x8019C688 end:0x8019C988
 
-runtime/direct_io.c:
+src/MSL_C/PPCEABI/bare/H/direct_io.c:
 	.text       start:0x80155F88 end:0x80156310
 
-runtime/file_io.c:
-	.text       start:0x80156310 end:0x80156448
+src/MSL_C/PPCEABI/bare/H/file_io.c:
+	.text       start:0x80156310 end:0x80156604
 
 runtime/FILE_POS.c:
 	.text       start:0x80156604 end:0x80156954
 
+src/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common/Src/mbstring.c:
+	.text       start:0x80156954 end:0x80156C78
+
 runtime/mem.c:
 	.text       start:0x80156C78 end:0x80156DE8
+
+src/MSL_C/PPCEABI/bare/H/mem_funcs.c:
+	.text       start:0x80156DE8 end:0x80156F54
 
 runtime/misc_io.c:
 	.text       start:0x801570B8 end:0x801570C8
@@ -5415,8 +5457,14 @@ runtime/printf.c:
 runtime/sscanf.c:
 	.text       start:0x801594CC end:0x8015955C
 
-runtime/string.c:
-	.text       start:0x8015A5F4 end:0x8015A8D0
+src/MSL_C/PPCEABI/bare/H/string.c:
+	.text       start:0x8015A450 end:0x8015A8D0
+
+libs/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common/Src/strtoul.c:
+	.text       start:0x8015B8DC end:0x8015B99C
+
+src/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common/Src/strtoul.c:
+	.text       start:0x8015BDA8 end:0x8015C120
 
 unsorted/sweep_8015C120.c:
 	.text       start:0x8015C120 end:0x8015C128
@@ -5448,6 +5496,9 @@ runtime/e_log.c:
 	.sbss       start:0x80282A08 end:0x80282A10
 	.sdata2     start:0x80284E38 end:0x80284EB8
 
+src/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common_Embedded/Math/Double_precision/e_pow.c:
+	.text       start:0x8015D03C end:0x8015D8F0
+
 runtime/e_rem_pio2.c:
 	.text       start:0x8015D8F0 end:0x8015DC90
 	.rodata     start:0x801855B8 end:0x80185740
@@ -5470,6 +5521,9 @@ runtime/k_tan.c:
 	.text       start:0x8015EC78 end:0x8015EE8C
 	.rodata     start:0x80185790 end:0x801857F8
 	.sdata2     start:0x802850E0 end:0x80285118
+
+src/MSL_C/PPCEABI/bare/H/s_atan.c:
+	.text       start:0x8015EE8C end:0x8015F0A4
 
 runtime/s_copysign.c:
 	.text       start:0x8015F0A4 end:0x8015F0CC
@@ -5566,7 +5620,7 @@ MetroTRK/dolphin_trk.c:
 MetroTRK/main_TRK.c:
 	.text       start:0x801643C8 end:0x80164420
 
-MetroTRK/dolphin_trk_glue.c:
+src/TRK_MINNOW_DOLPHIN/dolphin_trk_glue.c:
 	.text       start:0x80164420 end:0x80164978
 
 MetroTRK/targcont.c:
@@ -5642,16 +5696,19 @@ Common/TagFile/TagFile.c:
 	.rodata     start:0x8018655C end:0x801866D4
 	.sbss       start:0x80282A30 end:0x80282A38
 
-dolphin/card/CARDBios.c:
-	.text       start:0x80176A38 end:0x80177C34
+src/gba/GBA.c:
+	.text       start:0x80176270 end:0x80176280
+
+src/card/CARDBios.c:
+	.text       start:0x80176A38 end:0x80177DA4
 
 dolphin/card/CARDUnlock.c:
 	.text       start:0x80177DA4 end:0x80179004
 	.data       start:0x8019D3A0 end:0x8019D500
 	.sdata      start:0x80281B70 end:0x80281B78
 
-dolphin/card/CARDRdwr.c:
-	.text       start:0x80179004 end:0x80179284
+src/card/CARDRdwr.c:
+	.text       start:0x80179004 end:0x8017929C
 
 dolphin/card/CARDBlock.c:
 	.text       start:0x8017929C end:0x801796A0
@@ -5669,7 +5726,7 @@ dolphin/card/CARDMount.c:
 dolphin/card/CARDFormat.c:
 	.text       start:0x8017B2B8 end:0x8017BA9C
 
-dolphin/card/CARDOpen.c:
+libs/dolphin/src/card/CARDOpen.c:
 	.text       start:0x8017BA9C end:0x8017C18C
 
 dolphin/card/CARDCreate.c:
@@ -5678,14 +5735,17 @@ dolphin/card/CARDCreate.c:
 dolphin/card/CARDRead.c:
 	.text       start:0x8017C4DC end:0x8017C908
 
-dolphin/card/CARDWrite.c:
-	.text       start:0x8017C950 end:0x8017CC84
+src/card/CARDWrite.c:
+	.text       start:0x8017C908 end:0x8017CC84
 
 dolphin/card/CARDDelete.c:
 	.text       start:0x8017CC84 end:0x8017CF64
 
-dolphin/card/CARDStat.c:
-	.text       start:0x8017CF64 end:0x8017D3E4
+libs/dolphin/src/card/CARDStat.c:
+	.text       start:0x8017CF64 end:0x8017D42C
 
 dolphin/card/CARDRename.c:
 	.text       start:0x8017D42C end:0x8017D628
+
+libs/dolphin/src/card/CARDStatEx.c:
+	.text       start:0x8017D628 end:0x8017DAD4

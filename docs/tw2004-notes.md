@@ -435,6 +435,36 @@ Windows setup, with the helpers in the scratch folder (`C:\dev\scratch\tw\`):
   with a `diff.txt` against the base; carry the change back into `src/` by hand (macros are
   expanded in `base.c`) and confirm with `ninja`.
 
+SDK from other decompilations
+-----------------------------
+
+2026-09-23: SDK source from three more public (CC0) GameCube decompilations, in
+`extern/ffcc` (Final Fantasy Crystal Chronicles, same Sep 5 2002 SDK build as this game),
+`extern/tww` (The Wind Waker, same build) and `extern/tp` (Twilight Princess, newer). Found by
+searching GitHub for the SDK version string `Sep  5 2002`. +80 functions, +31 KB,
+SDK side 58.9% -> 69.5%. Scripts in `C:\dev\scratch\tw\` (outside the repo):
+
+- `harvest.py`: compiles every SDK/MSL/TRK `.c` of the three projects with a few flag sets
+  (GC/1.2.5n with `-fp_contract off`/`on`/`-char unsigned` for Dolphin libraries; GC/1.3.2,
+  1.3, 1.2.5n with runtime flags for MSL) and compares each function against the game's
+  (relocation fields masked). `harvest2.py` does it per file: which game span each file covers
+  and what linking it would gain.
+- `integrate.py plan|apply`: picks files greedily by gain. A file is used only if no function in
+  its span that is exact today would be lost, and every existing unit inside the span lies wholly
+  inside it (those units are replaced: 26, mostly Prime-source units and a few sweep units). Adds
+  NonMatching text-span units (the DOL is still linked from the original objects), one
+  `configure.py` lib block per project/compiler/flags, and renames the game's `fn_` functions to
+  the source names.
+- **Pitfall: masked byte matching cannot tell tiny wrappers apart** (`CARDRead`/`CARDWrite`,
+  `fread`/`fwrite`, `__sys_alloc`/`__sys_free` differ only in the call target, which is masked).
+  Only `fn_` names are renamed, and every renamed function was checked at 100% in objdiff (which
+  does compare call targets). Renames were also applied to our own sources that called the old
+  names.
+- `prune_extern.py` keeps only the files the build uses (from `ninja -t deps`). Check that it
+  finds dependencies before trusting it: `.d` files are not kept on disk.
+- Not done yet: data sections for these units (Level 3), more flag variants for the files that
+  compile but fall a few functions short, and other projects (Pikmin 2, Sunshine, Animal Crossing).
+
 CI and decomp.dev
 -----------------
 
