@@ -3587,35 +3587,8 @@ GameMode11.c:
 	.data       start:0x80192D20 end:0x80193130
 	.sdata2     start:0x802847E8 end:0x80284808
 
-unsorted/sweep_801020BC.c:
-	.text       start:0x801020BC end:0x801020C0
-
-unsorted/sweep_801020C0.c:
-	.text       start:0x801020C0 end:0x801020EC
-
-unsorted/sweep_80102134.c:
-	.text       start:0x80102134 end:0x8010217C
-
-unsorted/sweep_801021FC.c:
-	.text       start:0x801021FC end:0x80102204
-
-unsorted/sweep_80102308.c:
-	.text       start:0x80102308 end:0x80102310
-
-unsorted/sweep_80102354.c:
-	.text       start:0x80102354 end:0x8010237C
-
-unsorted/sweep_8010237C.c:
-	.text       start:0x8010237C end:0x801023A8
-
-unsorted/sweep_801025F4.c:
-	.text       start:0x801025F4 end:0x801025FC
-
-unsorted/sweep_80102A44.c:
-	.text       start:0x80102A44 end:0x80102A58
-
-unsorted/sweep_80102AC4.c:
-	.text       start:0x80102AC4 end:0x80102AC8
+GameMode4.c:
+	.text       start:0x80101FEC end:0x80102AC8
 
 unsorted/sweep_80103B4C.c:
 	.text       start:0x80103B4C end:0x80103B8C
