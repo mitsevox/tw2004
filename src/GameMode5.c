@@ -163,7 +163,7 @@ void fn_800EAF7C(void) {
     lbl_80281660 = SESSION_OPTIONS->unkC;
     lbl_802822F0 = SESSION_OPTIONS->nWind;
     fn_800E1074();
-    if (gpSaveData[gPlayers[0].nIndex].b0) {
+    if (gpSaveData[gPlayers[0].nIndex].bActive) {
         gpSaveData[gPlayers[0].nIndex].b70 = 1;
     }
     fn_800E0B38(lbl_80281664[lbl_802822F4].nMode);
@@ -590,7 +590,7 @@ void fn_800EC1E0(void) {
             }
             fn_800EC170(nMedal);
             nProfile = gPlayers[0].nIndex;
-            if (gpSaveData[nProfile].b0) {
+            if (gpSaveData[nProfile].bActive) {
                 nMoney = fn_800D7220(nReward, 0, (CourseMoneyTracking*)aOut);
                 if (nMoney) {
                     switch (nMedal) {
@@ -621,12 +621,12 @@ void fn_800EC1E0(void) {
     }
 }
 
-// Whether profile n has done every challenge: its n5000 is set and none of the 29 best medals is
-// 3 (none).
+// Whether profile n has done every challenge: it has a TOUR card (level 1 or more) and none of the
+// 29 best medals is 3 (none).
 u8 fn_800EC4F0(int n) {
     SaveProfile* p = &gpSaveData[n];
     int i;
-    if (p->n5000 < 1) {
+    if (p->nTourCardLevel < 1) {
         return 0;
     }
     for (i = 0; i < 29; i++) {
