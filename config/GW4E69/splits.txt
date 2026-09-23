@@ -1156,11 +1156,8 @@ TibExt.c:
 gbacable.c:
 	.text       start:0x801228E0 end:0x801247C0
 
-unsorted/sweep_801247C0.c:
-	.text       start:0x801247C0 end:0x80124814
-
-unsorted/sweep_80124814.c:
-	.text       start:0x80124814 end:0x80124838
+ShaderRow19.c:
+	.text       start:0x801247C0 end:0x801249A8
 
 EASportsBio.c:
 	.text       start:0x801249A8 end:0x8012597C

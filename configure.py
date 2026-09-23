@@ -999,6 +999,7 @@ config.libs = [
             Object(NonMatching, "GameMode4Menu.c"),
             Object(NonMatching, "TibExt.c"),
             Object(NonMatching, "gbacable.c"),
+            Object(NonMatching, "ShaderRow19.c"),
             Object(NonMatching, "EASportsBio.c"),
             Object(NonMatching, "GameMode22.c"),
             Object(NonMatching, "SkinBurn.c"),
@@ -1063,7 +1064,6 @@ config.libs = [
             Object(Matching, "unsorted/sweep_800AF2DC.c"),
             Object(Matching, "unsorted/sweep_800B2150.c"),
             Object(Matching, "unsorted/sweep_800B6034.c"),
-            Object(Matching, "unsorted/sweep_801247C0.c"),
 
             Object(Matching, "unsorted/sweep_8009A844.c"),
             Object(Matching, "unsorted/sweep_80092C38.c"),
@@ -1183,7 +1183,6 @@ config.libs = [
             Object(Matching, "unsorted/sweep_800B1F9C.c"),
             Object(Matching, "unsorted/sweep_800B5F28.c"),
             Object(Matching, "unsorted/sweep_8010FBC4.c"),
-            Object(Matching, "unsorted/sweep_80124814.c"),
             Object(Matching, "unsorted/sweep_8013B3C4.c"),
             Object(Matching, "unsorted/sweep_8013FF30.c"),
             Object(Matching, "unsorted/sweep_8014CA80.c"),
