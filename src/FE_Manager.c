@@ -35,7 +35,6 @@ int  fn_80107444(int nAsset);           // }
 void fn_80105FF8(int nAsset, s16* pKind, s32* pPart, s32* pChoice);    // }
 u8   fn_80056480(int a);
 u8   fn_800564AC(int n);
-u8   fn_80058304(SaveProfile* pProfile, int a);
 s32  fn_801258E8(void);                 // EASportsBio.c
 void fn_8009170C(void);
 

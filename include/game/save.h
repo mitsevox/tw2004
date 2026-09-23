@@ -214,7 +214,7 @@ typedef struct SaveProfile {
     // the session's PlayerProfile by Golfer.c.
     u8   n54C2;                 // 0x054C2  -> PlayerProfile.unk2
     u8   unk54C3[5];
-    char szGolferNames[6][8];   // 0x054C8  -> PlayerProfile.szNames
+    u64  aGolferNames[6];       // 0x054C8  -> PlayerProfile.aNames
     u8   nGolferOutfit;         // 0x054F8  -> PlayerProfile.nOutfit
     u8   nGolferBallType;       // 0x054F9  -> PlayerProfile.nBallType
     u8   unk54FA[0x5613 - 0x54FA];
@@ -226,7 +226,9 @@ typedef struct SaveProfile {
     u8   a5754[0x5AF4 - 0x5754];    // 0x05754
     u8   a5AF4[6][0x50];            // 0x05AF4
     u8   a5CD4[6][0x50];            // 0x05CD4
-    u8   unk5EB4[0xB054 - 0x5EB4];
+    u8   a5EB4[26];             // 0x05EB4  set to 50 each when FE_CrAP_InitCrAPInfo clears
+                                //          0x5500..0xB634 (fn_80058208)
+    u8   unk5ECE[0xB054 - 0x5ECE];
     // Four bit arrays with a bit per Create-A-Player asset (0x80057F18's loop over them all, which
     // also clears aB344 and aB4BC; fn_8001E9CC tests a bit).
     u32  aAssetLocked[94];      // 0x0B054  the asset was locked (fn_80078008) when last checked
@@ -236,7 +238,7 @@ typedef struct SaveProfile {
     u32  aB4BC[94];             // 0x0B4BC
     TourSeason tour;            // 0x0B634
     u8   unk104D0[0x10548 - 0x104D0];
-    u32  a10548[1];             // 0x10548  a bit array: FE_CrAPMessages.c's fn_80108E4C tests bit n
+    u32  a10548[1];             // 0x10548  a bit array: FE_CrAPMessages.c's fn_80108E4C tests bit n; fn_80058304 tests one (bit 1 for FE_Manager)
     SaveLockEntry a1054C[11];   // 0x1054C  cleared by the profile setup; fn_80078008's lock kinds
                                 //          10 and 11 read them
     u8   a10578[4];             // 0x10578  marked holes 71..74: fn_800588F4's kind 0
@@ -263,6 +265,11 @@ f32  GM_GetGameProgress(SaveProfile* pProfile);
 
 // Earnings.c: the awards
 u8   fn_800D7770(int nPlayer, Award* pAward);   // mark an award won today; 1 if it was not won before
+
+// fe_craputils.c (TW06's FE_CrAP_ utilities)
+u8   fn_80058304(SaveProfile* pProfile, int nBit);  // bit nBit of pProfile->u10548
+void fn_800588D4(s16 n);            // set lbl_80281DF0 (switched on, value n)
+s16  fn_800588E8(void);             // lbl_80281DF0's value
 
 // 0x800588F4: marked hole i's kind-0 byte (a5004/a10578) or kind-1 value (a504C/a1057C); -1 for
 // another kind.

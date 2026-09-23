@@ -152,7 +152,6 @@ f32   fn_8005CC84(f32 fTan);                     // atanf
 void  fn_8005CCA8(int nPlayer);
 void  Vec_Sub(f32* pA, f32* pB, f32* pOut);      // 0x8005CBF4  a - b
 void  Vec_Add(f32* pA, f32* pB, f32* pOut);      // 0x8005CBD0  a + b
-void  Swing_ResetBoostAndSpin(int nPlayer);
 void  Swing_ClearFrameFlag(int nPlayer);
 void  fn_800360A0(void* p);
 void  Swing_LoadTuning(int nPlayer);

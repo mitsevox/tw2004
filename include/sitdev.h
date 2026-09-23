@@ -21,7 +21,8 @@ typedef struct SitDevData {
     u8    abPlayed[14];                         // 0x0D8  per kind of action: one has played already
     u8    unkE6[2];
     struct SitDevEntry8* pE8;                   // 0x0E8  the last line played (fn_800BD580 kind 1)
-    u8    unkEC[0x140 - 0xEC];
+    u8    unkEC[0x13C - 0xEC];
+    s32   n13C;                                 // 0x13C  cleared with the block by fn_80067608
 } SitDevData;
 LAYOUT_ASSERT(SitDevData, 0x140);
 
@@ -82,6 +83,7 @@ typedef struct SitDevScripts {
 } SitDevScripts;
 
 extern SitDevScripts* lbl_80282208; // 0x80282208 (.sbss), NULL until the scripts are loaded
+extern s32 lbl_80282210;            // 0x80282210 (.sbss): entries in use in lbl_801FA1C0 (fn_800BB6DC)
 
 // The byte-swap layouts of the header and the p14, p18 and p1C entries (fn_8001F08C).
 extern SwapField lbl_80191168[9];
@@ -114,5 +116,13 @@ extern s32 lbl_801FA1AC[5];         // per player; 1: fn_800BB1F8 is true
 
 // Store uValue in pValues[nIndex] and set bit nIndex of pSetBits.
 void fn_80067B1C(u16* pValues, int nIndex, u16 uValue, u32* pSetBits);
+
+void fn_80067710(int nPlayer, int a, int b);    // event.c's handlers call it for most events
+
+// SitDevFile.c
+void fn_800BB0C8(void);
+void fn_800BB1A8(struct Ball* pBall);
+void SitDev_LoadScripts(SitDevScripts** ppScripts); // the 'sscr' stream handler
+void fn_800BB6DC(u8* pChunk);                   // the course loader for chunk 5
 
 #endif

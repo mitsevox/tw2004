@@ -23,6 +23,8 @@ s32   fn_8000A0B4(void);                // } (EASportsBio.c sets 0 while the Bio
 void* fn_800951A0(u32 uSize, int nAlign, int a);
 void  fn_8009527C(void* p);             // frees what fn_800951A0 allocated
 void  fn_800953C8(int a);
+// Pack up to 12 characters of pName into a 64-bit code (base 40, table lbl_80191520).
+int   fn_800CB700(u64* pId, const char* pName);
 
 // A pool of fixed-size nodes carved from one allocation (UMemPool.c): the header, then the nodes.
 // A free node holds the next free one in its first word.
@@ -195,9 +197,10 @@ typedef struct RenderState {
     s32  nFC;                   // 0x0FC  bit 0x400
     TexBank*  p100;             // 0x100  } the texture of the next draw (fn_8005CC64: the swing
     TexEntry* p104;             // 0x104  } trail's, the logo editor's)
-    u8   unk108[0x110 - 0x108];
+    struct GxTexture* pTex108;  // 0x108  or this texture (fn_8002A608)
+    u8   unk10C[0x110 - 0x10C];
     u32  u110;                  // 0x110  which of the groups above changed
-    u32  uFlags;                // 0x114  bit 1: p100/p104 are set
+    u32  uFlags;                // 0x114  bit 1: p100/p104 are set; bit 2: pTex108 is
 } RenderState;
 LAYOUT_ASSERT(RenderState, 0x118);
 
@@ -249,8 +252,8 @@ int  fn_8002F260(s32 n0, s32 nWidth, s32 nHeight, s32 nKind, s32 n20, s32 nSurfa
 void fn_8002F38C(s32 nSurface, s32 nC, s32 n10, s32 n14, u32 uFlags, s32 n18);
 s32  fn_8002F454(s32 nSurface);     // the surface's buffer size, 0 if the slot is free
 
-// The graphics helpers at 0x80029FC8 (file name unknown)
-void* fn_8002A624(void);            // the screen-copy texture's pixels (lbl_80281100's first word)
+// The graphics helpers (GxUtil.c, 0x80029FC8; the rest are in gx.h)
+void* fn_8002A624(void);            // the screen copy's pixels (lbl_80281100->pPixels)
 
 // The screen copy (our name; what lbl_80281100 points at): render surface 1, set up by gomainloop
 // fn_8006DCA8 for each game type and filled by PostFx_CopyScreenToBuffer.
@@ -371,6 +374,12 @@ void fn_80013400(void);                 // read the controllers
 u8*  fn_800136C4(int nController);      // the pad's state: stick bytes at +0, +2, +3
 u32  fn_800136DC(int nController);      // buttons: held << 16 | pressed this frame
 void fn_80014118(int a);
+// A screen quad (GameEffects' letter boxes, GxUtil.c's alpha clear): fn_800141F8 fills its corners
+// (x0, y0)-(x1, y1), fn_80014194 sets its colour (four floats), fn_8001644C draws it.
+void fn_80014194(f32* pColour);
+void fn_800141F8(f32* pXY, f32* pUV, f32 x0, f32 y0, f32 x1, f32 y1);
+void fn_8001425C(int a);
+void fn_8001644C(int a, f32* pXY, int b, f32* pUV, int c);
 u32  fn_800142AC(int nButton, int a);   // a button's mask
 u8   fn_80014300(u32 uMask);            // any pad pressed these buttons
 
@@ -383,6 +392,7 @@ void fn_8001EF34(f32* pIn, f32 f, f32* pOut);   // scale a vector (paired single
 void fn_80045494(u8 bOn, int nPlayer);
 void fn_80045558(u8 bOn, int nPlayer);
 u8   fn_8004560C(void);
+typedef void (*EventHandler)(int nPlayer, int nEvent, void* pData, int nArg);   // event.c's table
 void EVENT_Trigger(int nPlayer, int nEvent, void* pData, int b);   // through the event table at
                                         // lbl_80188628; pData: the ball, a position, or NULL
 void fn_800689D4(int nPlayer);
