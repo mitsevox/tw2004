@@ -3669,11 +3669,8 @@ GameMode17.c:
 GameMode13.c:
 	.text       start:0x800F6A60 end:0x800F80FC
 
-unsorted/sweep_800F81EC.c:
-	.text       start:0x800F81EC end:0x800F81FC
-
-unsorted/sweep_800F9308.c:
-	.text       start:0x800F9308 end:0x800F9328
+GameMode2.c:
+	.text       start:0x800F80FC end:0x800F944C
 
 unsorted/sweep_800F9824.c:
 	.text       start:0x800F9824 end:0x800F9844
