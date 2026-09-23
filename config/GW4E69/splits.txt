@@ -3122,8 +3122,8 @@ UIStudio.c:
 UISApi.c:
 	.text       start:0x80168C24 end:0x8016A2D4
 
-unsorted/sweep_8016C18C.c:
-	.text       start:0x8016C18C end:0x8016C1A4
+UISScreen.c:
+	.text       start:0x8016A2D4 end:0x8016C718
 
 Common/Checksum/ChecksumCRC32.c:
 	.text       start:0x8016C718 end:0x8016CC20
@@ -3144,6 +3144,7 @@ Common/SharedFileIO/SharedFileIO.c:
 
 NGC/SharedFileIO/llSharedFileIO.c:
 	.text       start:0x80171308 end:0x801730C8
+	.rodata     start:0x801863D4 end:0x8018655C
 
 Common/TagFile/TagFile.c:
 	.text       start:0x801730C8 end:0x80175F54
