@@ -764,6 +764,13 @@ void Ball_FlightStep(Ball* pBall, f32 fTicks) {
 // the other source either (or it is more than 1 in above the ball), the ball may coast on for
 // up to two ticks on surface 109 (or its own) as if on flat ground - unless fn_800E2B40 says
 // otherwise - and is a hazard after that. Returns 0 for a hazard.
+// The player a ball belongs to, 4 for a ball with none (an inline in the original: its early
+// return gives the branch layout).
+static inline int Ball_Owner(Ball* pBall) {
+    if (pBall->nPlayer >= 0) return pBall->nPlayer;
+    return 4;
+}
+
 u8 fn_80052088(Ball* pBall, SurfaceType** ppSurface, f32* pNormal) {
     SurfaceType* pSurface;
     SurfaceType* pSurface2;
@@ -778,8 +785,7 @@ u8 fn_80052088(Ball* pBall, SurfaceType** ppSurface, f32* pNormal) {
             fDrop = lbl_80281DDC - pBall->vPos[1];
         }
         if (lbl_80281DDC < -60000.0f || fDrop > 0.028f) {
-            nPlayer = pBall->nPlayer;
-            if (nPlayer < 0) nPlayer = 4;
+            nPlayer = Ball_Owner(pBall);
             if (lbl_80281DDC < -60000.0f && pBall->fAC < 2.0f && !fn_800E2B40(nPlayer, pBall)) {
                 if (pBall->nSurface < 0 || pBall->nSurface < 156) {
                     pBall->nSurface = 109;
