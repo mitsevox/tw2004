@@ -21,7 +21,6 @@ u8    fn_8000C3C8(f32* pFrom, f32* pTo, TNetwork* pNet, s32 nNodes, f32* pHit); 
 void  fn_8004B588(TNetwork* pNet);
 u8    Ter_LieIsPreferred(u32 nClass);
 void  fn_8004B63C(TNetwork* pNet);
-f32   fn_8000C5FC(f32* pA, f32* pB);                      // dot product
 void  fn_8005097C(f32* pA, f32* pB, f32* pOut);           // a - b (paired-single assembly)
 void  fn_800509A0(f32* pSrc, f32* pDst);                  // negate (paired-single assembly)
 void  fn_800509BC(f32* pSrc, f32* pDst);                  // negate, four floats (paired-single assembly)

@@ -52,8 +52,6 @@ extern f32 gFairwaySpeedMul[3];                  // 0x801834A8  by gFairwaySetti
 extern f32 gRoughMul[3];                         // 0x801834B4  by options +0x1C: 1.3 1.0 0.7 (class 5)
 void   PsBallFx_TriggerTrail(Ball* pBall, int nPlayer);    // rolling sound / effect
 void   Ball_CupPull(Ball* pBall, f32 fDt);
-f32    fn_8000C5FC(f32* pA, f32* pB);            // dot product
-void   fn_8000C5D4(f32* pA, f32* pB, f32 f, f32* pOut);   // a + f x b
 void   fn_80055E7C(f32* pA, f32* pB, f32* pOut);
 void   fn_80055EA0(f32* pA, f32* pB, f32* pOut);
 void   fn_80055EC4(f32* pA, f32* pB, f32* pOut);

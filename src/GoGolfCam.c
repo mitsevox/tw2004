@@ -16,7 +16,6 @@ void     fn_80035240(int a);
 void     CameraScript_RecordCurrentCam(CamShot* pShot, void* pCam, void* pSub, int nPlayer, void* pScript,
                                        int a);
 void     fn_8003F2E0(void* pScript, f32 fTime);
-void     fn_8000C5D4(f32* pA, f32* pB, f32 f, f32* pOut);   // a + f x b
 u8       fn_800635D0(int nPlayer);
 u8       fn_800B36F4(View* pView, int nPlayer, f32 fFrameTime);
 void     fn_800C73B8(f32* pA, f32* pB, f32* pOut);
@@ -42,7 +41,6 @@ u8       fn_800B4908(void);
 void     GolfCamera_ComputeSteepSlopeCamVectors(View* pView, int nPlayer);
 void     fn_800C5D64(View* pView, f32* pCam, f32* pSub, int nPlayer);
 u8       CameraScript_WillGolferBeOccludedInThisView(int nPlayer, CamShot* pShot, void* pScript);
-f32      fn_8000C5FC(f32* pA, f32* pB);                         // dot product
 u8       fn_800C708C(View* pView);
 void     fn_80038010(u8 a, int n, f32* pVec);
 void     fn_80038054(u8 a, int n, f32 f1, f32 f2);
