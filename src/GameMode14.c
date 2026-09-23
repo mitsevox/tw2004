@@ -1,5 +1,5 @@
 // GameMode14.c (our name): game mode 14, a two-player target game. The targets are 40 spots on the
-// hole (the list in GameMode10.c). Landing on a target claims it for you, unless the other player
+// hole (the list in GameModeReplay.c). Landing on a target claims it for you, unless the other player
 // has one there that is at least as close. The first to hold 5 targets wins. Each target is worth
 // points by how close the claiming shot was.
 
@@ -20,7 +20,7 @@ extern Claim lbl_80211FB8[40];
 extern Replay gReplayData;
 extern u8  gNumPlayersSetUp;
 extern s32 lbl_80282278;                    // the player whose turn it is
-extern s8  lbl_80282360;                    // the number of targets (GameMode10.c)
+extern s8  lbl_80282360;                    // the number of targets (GameModeReplay.c)
 extern s32 lbl_80281688;                    // the options saved while the game runs
 extern s32 lbl_80282368;
 extern s32 lbl_8028236C;                    // who starts: 0 or 1, at random

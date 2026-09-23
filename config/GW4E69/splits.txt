@@ -3529,6 +3529,7 @@ GameAnalysis.c:
 
 GameModeAlternateShot.c:
 	.text       start:0x800E68F0 end:0x800E7980
+	.sdata2     start:0x80284648 end:0x80284650
 
 GameModeBattle.c:
 	.text       start:0x800E7980 end:0x800E81C4
@@ -3556,7 +3557,7 @@ GameMode23.c:
 GameMode24.c:
 	.text       start:0x800F0448 end:0x800F125C
 
-GameMode10.c:
+GameModeReplay.c:
 	.text       start:0x800F125C end:0x800F19D4
 	.sdata2     start:0x80284688 end:0x802846A0
 
