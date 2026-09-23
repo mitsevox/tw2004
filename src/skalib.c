@@ -8,7 +8,6 @@
 #include "engine.h"
 #include "endian.h"
 
-void* fn_80020DD4(void* pClip, void* pOut, int nAlign);
 ClipBank* ClipBank_Get(u32 nSlot);
 u32   fn_800B6564(u32 uSize);                          // ARAM alloc
 void  fn_800B6594(u32 uAram);                          // ARAM free

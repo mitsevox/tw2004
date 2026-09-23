@@ -9,6 +9,10 @@
 
 typedef struct AnimLib AnimLib;         // skalib.c
 
+// skalib.c: the clips for an animation group, style, club class and key (AnimStream.c calls it too).
+void** AnimLib_Find(AnimLib* pLib, int nGroup, int nStyle, int nClub, int nKey, s32* pCount,
+                    u32* pFlags, u32** ppUsed, s32* pFirst);
+
 // A link of an IK chain: one bone.
 typedef struct IKLink {
     u8   b0;                    // 0x00  cleared by fn_80028208
@@ -147,7 +151,14 @@ typedef struct Clip {
     u8*    pFC;                 // 0xFC
 } Clip;
 
+// char.c: run on a clip just read from disc (skalib.c, AnimStream.c).
+void* fn_80020DD4(void* pClip, void* pOut, int nAlign);
+
 typedef struct SKABlendNode SKABlendNode;
+
+// animblender.c: whether a source under pNode plays pSrc (format 0, format 1).
+u8 fn_80073554(SKABlendNode* pNode, void* pSrc);
+u8 fn_80073610(SKABlendNode* pNode, void* pSrc);
 
 // The blend callback CharacterState_AddSKABlendData attaches (fn_80072ACC is one).
 typedef void (*SKABlendFn)(SKABlendNode* pNode, int* pn, f32 fTime);
@@ -377,8 +388,8 @@ LAYOUT_ASSERT(AnimStreamPlayer, 0x484);
 
 // The stream's state (lbl_80282230, allocated by fn_800C937C).
 typedef struct AnimStream {
-    void* p0;                   // 0x0000  the current request
-    void* p4;                   // 0x0004
+    AnimStreamBuf*   p0;        // 0x0000  the buffer the current read fills (a clip, fn_800C9F14)
+    AnimStreamClips* p4;        // 0x0004  the clips it is for
     AnimStreamBuf bufs[2][2][8][6];     // 0x0008  [double buffer][group index][style][club class]
     AnimStreamPlayer players[5];        // 0x0608
     void* pRead;                // 0x1C9C  the read buffer
@@ -409,6 +420,7 @@ Character* fn_8001D324(int nId);        // the character with this id (100: the 
 void  fn_8001D7A4(Character* pChar);
 void  fn_8001DA04(Character* pChar, u8* pA, u8* pB);
 void  fn_8001DB04(Character* pChar, f32* pOut);    // the golfer's position
+void  fn_8001DB98(Character* pChar);    // empty the character's four data buffers
 u8    fn_8001DBF4(Character* pChar);    // the ball is in the golfer's hand
 void  Character_GetBallOnFingerPosition(Character* pChar, f32* pPos);
 f32 (*fn_8001ED08(Character* pChar, int nBone))[4];  // a bone's matrix
