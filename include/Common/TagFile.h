@@ -39,6 +39,8 @@ void* const* Cipher_GetInterface(void);
 int TagFile_IsInitialised(void);
 int TagFile_Init(const TagFileInitParams* pParams);
 int TagFile_Shutdown(void);
+int TagFile_BeginSave(const char* pName, int eDevice, int uSearchDirection);
+int TagFile_BeginLoad(const char* pName, int eDevice, int uSearchDirection);
 int TagFile_DeleteSession(TagSession* pSession);
 int TagFile_Delete(const char* pName, int eDevice, int uSearchDirection);
 int TagFile_End(TagSession* pSession);

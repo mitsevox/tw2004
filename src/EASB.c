@@ -153,7 +153,7 @@ EASBErrorE fn_8012D560(void) {
     } else {
         eError = fn_8012D1A0();
         if (eError == EASB_ERROR_NONE) {
-            eError = fn_8012C5F8(&lbl_802825B8->totals,&lbl_802825B8->product, lbl_802825B8->unk4);
+            eError = fn_8012C5F8(&lbl_802825B8->totals,&lbl_802825B8->product, (char*)lbl_802825B8->unk4);
         }
         return eError;
     }

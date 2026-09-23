@@ -184,13 +184,13 @@ extern s32 lbl_80194758[46];        // the file library's code for each card err
 
 // A storage operation's arguments, kept in EASBStorage.args while its steps run (fn_8012BF18).
 typedef struct EASBStorageArgs {
-    u8* p00;                        // 0x00: fn_8012C5F8's third argument
+    char* szName;                   // 0x00: the product name the game's record must have (fn_8012AA7C)
     EASBTotals* pTotals;            // 0x04
     EASBProduct* pProduct;          // 0x08: one record, or fn_8012C774's EASB_MAX_PRODUCTS
-    u32 u0C;
+    EASBImageSlot* pImageSlots;     // 0x0C: EASB_MAX_PRODUCTS pictures (fn_8012AE40)
     EASBImage* pImage;              // 0x10
-    u32 u14;
-    u32 u18;
+    void* pHeader;                  // 0x14: the save's banner and icon block (SFIOCreate)
+    int eDevice;                    // 0x18: where to create the file (TagFile_BeginSave)
 } EASBStorageArgs;                  // size 0x1C
 
 // One of the storage operations (lbl_80195520, by operation number): whether it starts the
@@ -218,7 +218,7 @@ typedef struct EASBStorage {
     u8 bFileOpen;                   // 0x091
     u8 b92;                         // 0x092
     u8 unk93;
-    u32 u94;                        // 0x094
+    s32 n94;                        // 0x094: fn_80129F98's mode; 3 once the game's record is written
     u8 nSlot;                       // 0x098: this game's record, or EASB_PRODUCT_NONE
     u8 unk99[3];
     u8* pBuffer;                    // 0x09C: one record's packed bytes (fn_8012CAA8)
@@ -268,7 +268,7 @@ u32 fn_80128BC4(u32 uTime);         // clamps a time to 2003-01-01..2023-01-01
 EASBErrorE fn_8012881C(u32 uTime, u16* pnDays, u8* pnHours, u8* pnMinutes, u8* pnSeconds);
 EASBErrorE fn_801288DC(u32 uTime, u16* pnYear, u8* pnMonth, u8* pnDay, u8* pnHours, u8* pnMinutes,
                        u8* pnSeconds);
-EASBErrorE fn_8012C5F8(EASBTotals* pTotals, EASBProduct* pProduct, u8* p2);
+EASBErrorE fn_8012C5F8(EASBTotals* pTotals, EASBProduct* pProduct, char* szName);
 EASBErrorE fn_8012C69C(void);
 EASBErrorE fn_8012C73C(void);
 EASBErrorE fn_8012C774(EASBProduct* pProducts);
