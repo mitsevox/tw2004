@@ -2551,7 +2551,7 @@ void STATEFUNC_ConcededInit(int nPlayer) {
 }
 
 
-void  fn_80039344(View* pView, f32 f);
+void  fn_80039344(int nView, f32 f);        // a per-view float (0x801D5010[nView])
 
 void STATEFUNC_GreenWatchRollExit(int nPlayer) {
     int nView;
@@ -2573,7 +2573,7 @@ void STATEFUNC_GreenMorphExit(int nPlayer) {
     ((View*)fn_80017028(gPlayers[nPlayer].nView0))->f50 = 1.0f;
     ((View*)fn_80017028(gPlayers[nPlayer].nView0))->f54 = 1.0f;
     ((View*)fn_80017028(gPlayers[nPlayer].nView0))->f58 = 1.0f;
-    fn_80039344((View*)fn_80017028(gPlayers[nPlayer].nView0), 0.0f);
+    fn_80039344(gPlayers[nPlayer].nView0, 0.0f);
     if (GOLFERSTATE_GetPreviousState(nPlayer) == GS_SWING) {
         nView = gPlayers[nPlayer].nView0;
         View_SetCamera(fn_80017028(nView), 0xC, nPlayer, nView);
@@ -2643,9 +2643,8 @@ void STATEFUNC_RemoveBallInit(int nPlayer) {
     nHole   = Game_CurrentHole();
     pCourse = fn_8000C594();
     if (pCourse != NULL) {
-        f32* pPin = (f32*)&pCourse->pin[nHole];
-        Character_SetPosition(gPlayers[nPlayer].nShotHandle, pPin, 1);
-        Physics_DropBall((Ball*)pBall, pPin);
+        Character_SetPosition(gPlayers[nPlayer].nShotHandle, (f32*)&pCourse->pin[nHole], 1);
+        Physics_DropBall((Ball*)pBall, (f32*)&pCourse->pin[nHole]);
         gPlayers[nPlayer].nLie = LIE_HOLED;
         Vec3Copy(pBall, pBallBefore);
     }
