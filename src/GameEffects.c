@@ -289,7 +289,10 @@ void fn_800DB4E8(int nPlayer) {
     int i;
     int n;
     if (!gSession.bReplay && !gSession.nSplitScreen && !gSession.unk8[0]) {
-        if (Game_GetCourse() != 7) {
+        switch (Game_GetCourse()) {
+        case 7:
+            break;
+        default:
             return;
         }
         if (lbl_80202898.bGameBreaker != 1) {

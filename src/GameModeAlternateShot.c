@@ -403,16 +403,20 @@ void fn_800E7740(void) {
 // prize money (by the margin).
 void fn_800E7828(void) {
     int nPrize;
-    int nWinner;
+    Player* p;
     int nLoser;
     int nMargin;
     int nMoney;
     int nFirst;
-    int k;
+    int nWinner;
+    int nProfile;
     int i;
-    Player* p;
+    int k;
     if (fn_800E1BBC()) {
-        if (fn_800EC550()) {
+        switch (fn_800EC550()) {
+        case 0:
+            break;
+        default:
             return;
         }
         if (fn_800E6BA4(0) > fn_800E6BA4(1)) {
@@ -431,11 +435,12 @@ void fn_800E7828(void) {
                 nFirst = 0;
             }
             for (k = 0, i = nFirst; k < 2; k++, i++) {
-                p = &gPlayers[i];
-                if (gpSaveData[p->nIndex * 0x10600]) {
+                p = PLAYER(i);
+                nProfile = p->nIndex;
+                if (gpSaveData[nProfile * 0x10600]) {
                     fn_80125910(1);
                     if (nMoney) {
-                        fn_800E4364(0, 0x6B, nPrize, p->nIndex);
+                        fn_800E4364(0, 0x6B, nPrize, nProfile);
                         fn_800D3548(i, nMoney, 0);
                         p->nMoney += nMoney;
                     }
