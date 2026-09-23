@@ -8,7 +8,6 @@
 #include "game/save.h"
 #include "game/earnings.h"
 
-void  fn_80125854(int a);
 extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
 extern s32 lbl_80282278;                    // the player whose turn it is
 
@@ -18,7 +17,6 @@ typedef struct TeeOrder {
 } TeeOrder;
 extern TeeOrder lbl_80184DF0;
 
-s32  fn_800FFDB0(void);
 void fn_800FFDB8(void);
 
 // TW06: GameModeStroke::Init. Up to four players, one mulligan each.

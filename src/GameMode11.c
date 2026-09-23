@@ -101,7 +101,6 @@ extern s32 lbl_80282428;                    // the lesson's step
 
 void  fn_800A6EC8(void);
 void  fn_800E5200(int a);
-void  AI_ChooseTarget(int nPlayer);
 void  fn_80058FA4(int nPlayer);
 void  fn_800A6DCC(int nMusic, int a);
 u8    fn_800A7720(void);

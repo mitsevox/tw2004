@@ -8,7 +8,6 @@
 #include "game/save.h"
 #include "game/earnings.h"
 
-u8    Team_IsAllCPU(int nTeam);
 extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
 extern s32 lbl_80282278;                    // the player whose turn it is
 
@@ -28,7 +27,6 @@ u8   fn_800E88A8(int a);
 s32  fn_800E8904(void);
 void fn_800E890C(void);
 void fn_800E8A68(void);
-int  fn_800E8C24(int nPlayer, int nHole);
 
 // TW06: GameModeBestBall::Init. Four players, stroke play, one mulligan each.
 void fn_800E81C4(void) {

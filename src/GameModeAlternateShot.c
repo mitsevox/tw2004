@@ -7,7 +7,6 @@
 #include "engine.h"
 #include "game/save.h"
 
-int   fn_800D37BC(int nWinner, int nLoser, int nMargin, int* pPrize);
 extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
 extern s32 lbl_80282278;                    // the player whose turn it is
 extern u8  lbl_80282240;
