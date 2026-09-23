@@ -59,7 +59,14 @@ void Ter_GetEnclosingGroundData(CourseInfo* pCourse, f32* pPos, f32* pHeight, Su
 
 // Ball.c
 void Ball_SetSimulating(u8 bOn);        // rehearsals and look-aheads: no sounds, effects or tree roll
+void fn_80050D2C(u8 b);
+void fn_80051A18(Ball* pBall, f32* pDir, f32 fSpeed, f32* pFrom);
+void Ball_Launch(Ball* pBall, int nClub, int nKind, f32 fPower, f32 fAim, int nTrajectory, f32* pA, f32* pB);
+void fn_80054A6C(Ball* pBall);
+int  Physics_Simulate(Ball* pBall, int nMs);
 u8   Physics_DropBall(Ball* pBall, f32* pPos);          // put the ball on the ground at a point
+void Ball_SimStep(Ball* pBall, f32 fSeconds, f32 fTick);
+u8   fn_800559BC(Ball* pBall, f32* pPos);
 u8   fn_80055AA8(Ball* pBall, f32* pPos, int nPlayer);  // a fresh ball for a player at a point
 void fn_80055C1C(u8 b);
 void fn_80055C40(int n);

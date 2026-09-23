@@ -525,7 +525,6 @@ f32 fn_8005B64C(int nPlayer) {
 
 extern u8 gReplayData[];                     // 0x801D6030  saved seed at +0, swing state at +0x3DC
 
-void Ball_Launch(void* pBall, int nClub, int nKind, f32 fPower, f32 fAim, int nTrajectory, f32* pA, f32* pB);
 void Luck_TakePerfectShot(int nPlayer);      // Golfer.c
 void CharacterState_UpdateSKAState(int nHandle);
 void fn_8006BF60(int nPlayer);               // the replay recorder
@@ -596,7 +595,7 @@ void Swing_Launch(int nPlayer) {
     }
     while (fAim < -PI) fAim += 2 * PI;
     while (fAim > PI) fAim -= 2 * PI;
-    Ball_Launch(pBall, nClub, nKind, *pPower, fAim, nTrajectory, pLaunchA, pLaunchB);
+    Ball_Launch((Ball*)pBall, nClub, nKind, *pPower, fAim, nTrajectory, pLaunchA, pLaunchB);
 }
 
 
@@ -2824,7 +2823,6 @@ u8    fn_800C6CB0(void);
 void  fn_8006ACF8(int nPlayer, int a);
 void  fn_800DB714(int nPlayer);
 void fn_80062DC0(void* pView);
-void  fn_80050D2C(u8 bOn);                    // Ball.c: the second sim flag
 extern Vec4 lbl_80183640;
 
 // State 12: the ball is away. In a replay with the kept ball unset, a special path; otherwise
@@ -2969,7 +2967,6 @@ void  fn_80068AA8(int nPlayer);
 void  fn_800689D4(int nPlayer);
 void  fn_800957FC(int nHandle, int a);
 void  fn_800957B0(int nHandle, int a);
-void  fn_80054A6C(u8* pBall);
 f32   fn_800D04AC(int nPlayer);
 
 // State 4: an aiming camera held while button 7 is down (the caddie keeps updating). Buttons
@@ -3037,7 +3034,7 @@ void STATEFUNC_ShotSetupInit(int nPlayer) {
         fn_800957FC(gPlayers[nPlayer].nShotHandle, 1);
         fn_800957B0(gPlayers[nPlayer].nShotHandle, 1);
     }
-    fn_80054A6C(pBall);
+    fn_80054A6C((Ball*)pBall);
     gPlayers[nPlayer].fA64 = fn_800D04AC(nPlayer);
     EVENT_Trigger(nPlayer, 6, 0, -1);
 }
@@ -3285,7 +3282,6 @@ void STATEFUNC_ZoomUpdate(int nPlayer) {
 
 
 int   GameEffects_BallUpdatesThisFrame(int nPlayer);               // preview speed: ghost steps per frame
-void  Physics_Simulate(u8* pBall, int nTicks);     // Ball.c: step a ball
 extern Vec4 lbl_80183600;
 
 // State 6, the putt preview playing. Any button ends it (any pad for a CPU). Otherwise the
@@ -3332,7 +3328,7 @@ void STATEFUNC_GreenWatchRollUpdate(int nPlayer) {
     pGhostMinDist = (f32*)(p->ballBefore + 0x60);
     for (i = 0; i < nSteps; i++) {
         Ball_SetSimulating(1);
-        Physics_Simulate(pGhost, 20);
+        Physics_Simulate((Ball*)pGhost, 20);
         Ball_SetSimulating(0);
         if (*pGhostState == 1 || *pGhostState == 5) {
             if (!fn_80063C90(fn_80017028(*pView))) {
@@ -3593,7 +3589,7 @@ void STATEFUNC_PreShotInit(int nPlayer) {
         fn_80016CFC(*pView)[0x275] = 0;
     }
     pBall = gPlayers[nPlayer].ball;
-    fn_80054A6C(pBall);
+    fn_80054A6C((Ball*)pBall);
     Mem_cpy(gPlayers[nPlayer].ballBefore, pBall, 0xBC);
     gPlayers[nPlayer].fA64 = fn_800D04AC(nPlayer);
     EVENT_Trigger(nPlayer, 3, 0, -1);
@@ -3615,7 +3611,6 @@ void STATEFUNC_PreShotInit(int nPlayer) {
 
 void  Character_GetBallOnFingerPosition(int nHandle, f32* pPos);
 u8    fn_80063C7C(View* pView);
-u8    fn_800559BC(u8* pBall, u8* pBall2);
 void  fn_800A3CB0(f32* pPos, int nPlayer);
 void  fn_800A3D6C(f32* pPos, int nPlayer);
 void  fn_800A3DF4(int nPlayer);
@@ -3653,7 +3648,7 @@ void STATEFUNC_PreShotUpdate(int nPlayer) {
         if (fn_80048574(gPlayers[nPlayer].nShotHandle, 3)) {
             if (fn_80062BB0(gPlayers[nPlayer].nShotHandle, 3)) {
                 fn_80062B98(gPlayers[nPlayer].nShotHandle, 3);
-                if (!fn_800559BC(gPlayers[nPlayer].ball, gPlayers[nPlayer].ball)) {
+                if (!fn_800559BC((Ball*)gPlayers[nPlayer].ball, (f32*)gPlayers[nPlayer].ball)) {
                     Physics_DropBall((Ball*)gPlayers[nPlayer].ball, (f32*)gPlayers[nPlayer].ball);
                 }
             } else {
@@ -3695,7 +3690,7 @@ void STATEFUNC_PreShotUpdate(int nPlayer) {
         nSteps = GameEffects_BallUpdatesThisFrame(nPlayer);
         Ball_SetSimulating(1);
         for (i = 0; i < nSteps; i++) {
-            Physics_Simulate(gPlayers[nPlayer].ball, 20);
+            Physics_Simulate((Ball*)gPlayers[nPlayer].ball, 20);
         }
         Ball_SetSimulating(0);
     } else if (*pState != 0) {
@@ -3755,7 +3750,6 @@ int   fn_8001EED8(void* pSkel, int nBone);    // a bone's index
 f32   fn_8004D620(CourseInfo* pCourse, f32* pPos);   // ground height, -60000 and below if none
 void fn_80062DDC(f32* pA, f32* pB, f32* pOut);       // a - b
 void  fn_800BAF04(f32* pSrc, f32* pDst);      // normalise (3)
-void  fn_80051A18(u8* pBall, f32* pDir, f32 fSpeed, u8* pFrom);   // Ball.c: launch with a velocity
 extern Vec4 lbl_80183680;
 extern f32  gRealBallRadiusIn;               // 0x80283300  0.84: a real golf ball, in inches
 
@@ -3812,7 +3806,7 @@ void STATEFUNC_RemoveBallUpdate(int nPlayer) {
                     fSpeed = 60.0f * (60.0f * (59.94f * (fSpeed / 1760.0f))) * 0.5f;
                     fn_80062B98(*pHandle, 4);
                     gPlayers[nPlayer].ballBefore[0x98] = 0;
-                    fn_80051A18(p->ballBefore, vDir, fSpeed, pB);
+                    fn_80051A18((Ball*)p->ballBefore, vDir, fSpeed, (f32*)pB);
                 }
             }
         }
@@ -3823,7 +3817,7 @@ void STATEFUNC_RemoveBallUpdate(int nPlayer) {
                 if (nState != 1 && nState != 5 && nState != 0) {
                     Player* p = &gPlayers[nPlayer];
                     Ball_SetSimulating(1);
-                    Physics_Simulate(p->ballBefore, 20);
+                    Physics_Simulate((Ball*)p->ballBefore, 20);
                     Vec3Copy((f32*)p->ballBefore, (f32*)p->ball);
                     Ball_SetSimulating(0);
                 }

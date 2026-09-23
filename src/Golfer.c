@@ -863,8 +863,6 @@ extern s32 gSimClub[6];             // 0x801C65A0  per player: club the rehearsa
 #define SIM_BALL_X     (*(f32*)&gSimBall[0x00])
 #define SIM_BALL_Z     (*(f32*)&gSimBall[0x08])
 
-void Ball_Launch(void* pBall, int nClub, int nKind, f32 fPower, f32 fAim, int nTrajectory, f32* pA, f32* pB);
-void Ball_SimStep(void* pBall, f32 fDt, f32 fScale);              // 0x8005585C
 void fn_8001C774(int nHandle, int nClub);
 void fn_8001C724(int nHandle, int nKind);
 
@@ -1021,7 +1019,8 @@ u8 AI_RehearseShot(int nPlayer, f32* pOutDist2, u8 bFast, f32 fTolerance) {
         fPower = p->fPower * AI_PowerScale(nPlayer);
         if (fPower > 1.5f) fPower = 1.5f;
         Ball_SetSimulating(1);
-        Ball_Launch(gSimBall, p->nClub, p->nShotKind, fPower, p->fAim, 1, p->vLaunchA, p->vLaunchB);   // always the normal trajectory
+        // Always the normal trajectory.
+        Ball_Launch((Ball*)gSimBall, p->nClub, p->nShotKind, fPower, p->fAim, 1, p->vLaunchA, p->vLaunchB);
         Ball_SetSimulating(0);
         p->nRehearseState = 1;
         break;
@@ -1030,9 +1029,9 @@ u8 AI_RehearseShot(int nPlayer, f32* pOutDist2, u8 bFast, f32 fTolerance) {
         gSimAborted = 0;
         Ball_SetSimulating(1);
         if (bFast) {
-            Ball_SimStep(gSimBall, 0.1f, 1.0f);
+            Ball_SimStep((Ball*)gSimBall, 0.1f, 1.0f);
         } else {
-            Ball_SimStep(gSimBall, 0.2f, 1.0f);
+            Ball_SimStep((Ball*)gSimBall, 0.2f, 1.0f);
         }
         Ball_SetSimulating(0);
         if (gSimAborted) {

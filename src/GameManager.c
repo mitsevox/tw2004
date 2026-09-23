@@ -131,8 +131,6 @@ u64   fn_800954A4(int a);                   // a time stamp
 f32   fn_8006E118(u64 tEnd, u64 tStart);    // seconds between two time stamps
 int   GameEffects_BallUpdatesThisFrame(int nPlayer);
 u8    fn_800C71A4(void* pView, int nPlayer);
-void  Physics_Simulate(u8* pBall, int nTicks);
-void  fn_80050D2C(int a);
 void  fn_8006B2C4(int nPlayer, int a);
 u8    fn_800BB1F8(int nPlayer);
 
@@ -1223,7 +1221,7 @@ void GM_SimulateBallMovement(int nPlayer) {
     p = &gPlayers[nPlayer];
     pBall = p->ball;
     for (i = 0; i < nUpdates; i++) {
-        Physics_Simulate(pBall, 20);
+        Physics_Simulate((Ball*)pBall, 20);
     }
     fMs = 1000.0f * fn_8006E118(fn_800954A4(0), t0);
     fBudget = 0.83f - fMs;
@@ -1237,7 +1235,7 @@ void GM_SimulateBallMovement(int nPlayer) {
         pState = (s32*)(p->ballBefore + 0x64);
         while (*pState != 1 && *pState != 5 && *pState != 0 && fBudget > 0.1f) {
             t1 = fn_800954A4(0);
-            Physics_Simulate(pBall, 20);
+            Physics_Simulate((Ball*)pBall, 20);
             fMs = 1000.0f * fn_8006E118(fn_800954A4(0), t1);
             nSteps++;
             fBudget -= fMs;
