@@ -29,7 +29,7 @@ s32 fn_80165ACC(UIStudio* pStudio, u16 uGroup, u16 uScreen) {
         pArgs = p;
         p -= 1;
         if (uA == uGroup && uB == uScreen && nType == 9
-            && fn_8016C6C4(pStudio, uA, uB) < (u32)pStudio->nScreens) {
+            && fn_8016C6C4(pStudio, uA, uB) < pStudio->nScreens) {
             fn_8016B0F8(pStudio, *pData, nArgs, pArgs);
         }
     }

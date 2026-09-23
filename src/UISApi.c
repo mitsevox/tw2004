@@ -134,7 +134,7 @@ u8 fn_80169308(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 n) {
                 pStudio->nCurScreen = -1;
                 return 1;
             }
-            if ((u32)pStudio->nCurScreen < pStudio->nScreens) {
+            if (pStudio->nCurScreen < pStudio->nScreens) {
                 p1C = pRec->p1C;
                 if (p1C != NULL) {
                     pFrame = pRec->pFrame;

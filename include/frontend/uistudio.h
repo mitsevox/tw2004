@@ -158,7 +158,7 @@ typedef struct UIStudio {
     UISScreenDataFn pfnScreen28;    // 0x28: fn_80169B3C
     s32 nCurScreen;                 // 0x2C: index into pScreens, -1 for none
     u32 nMaxScreens;                // 0x30
-    s32 nScreens;                   // 0x34
+    u32 nScreens;                   // 0x34
     UISScreen* pScreens;            // 0x38
     UISCurrent* pCurrent;           // 0x3C
     u32 nMaxHandlers;               // 0x40
