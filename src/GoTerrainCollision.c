@@ -96,8 +96,16 @@ f32   Ter_CheckForDropLocation(CourseInfo* pCourse, f32* pPos, u8 bOnDropSurface
 void  fn_8004D2E0(CourseInfo* pCourse, f32* pPos, TerPolyRef** ppRefLow, f32* pLow, f32 (**ppTriLow)[3],
                   TerPolyRef** ppRefHigh, f32* pHigh, f32 (**ppTriHigh)[3]);
 f32   fn_800BB028(f32* pA, f32* pB);                      // squared distance
-u8    Ter_CheckForPinCollision(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
-                               SurfaceType** ppSurface, TerObject** ppObj);
+u8    fn_8004E558(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
+                  SurfaceType** ppSurface, TerObject** ppObj, u8* pbFlags);
+u8    fn_8004EE20(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
+                  SurfaceType** ppSurface, TerObject** ppObj);
+u8    Ter_CheckForGroundCollision(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
+                                  SurfaceType** ppSurface, TerObject** ppObj);
+u8    fn_8004FF34(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal, SurfaceType** ppSurface,
+                  TerObject** ppObj);
+u8    Ter_CheckForPinCollision(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit,
+                               f32* pNormal, SurfaceType** ppSurface, TerObject** ppObj);
 u8    fn_8004EB7C(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32* pDir, f32 fMax, f32* pHit,
                   f32* pNormal, SurfaceType** ppSurface, TerObject** ppObj, u8* pbFlags);
 u8    fn_8004F43C(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32* pDir, f32 fMax, f32* pHit,
@@ -1224,7 +1232,8 @@ u8 fn_8004EE20(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit
         }
         fLen = Vec_Distance(vPos, vPrev);
         fn_8004DF10(pCourse, vPrev, vDir, nCell[0], nCell[1], fLen);
-        if (fn_8004F43C(pCourse, nCell[0], nCell[1], vPrev, vPos, vDir, fLen, vHit, vNormal, &pSurface, &pObj)) {
+        if (fn_8004F43C(pCourse, nCell[0], nCell[1], vPrev, vPos, vDir, fLen, vHit, vNormal, &pSurface,
+                        &pObj)) {
             fDist = fn_800BB028(pFrom, vHit);
             if (fDist < fBest) {
                 fBest = fDist;
@@ -1413,7 +1422,8 @@ u8 Ter_CheckForGroundCollision(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* p
             }
         }
         fLen = Vec_Distance(vPos, vPrev);
-        if (fn_8004FCB4(pCourse, nCell[0], nCell[1], vPrev, vPos, vDir, fLen, vHit, vNormal, &pSurface, &pObj)) {
+        if (fn_8004FCB4(pCourse, nCell[0], nCell[1], vPrev, vPos, vDir, fLen, vHit, vNormal, &pSurface,
+                        &pObj)) {
             fDist = fn_800BB028(pFrom, vHit);
             if (fDist < fBest) {
                 fBest = fDist;
@@ -1598,7 +1608,8 @@ u8 fn_8004FF34(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNorma
             }
         }
         fLen = Vec_Distance(vPos, vPrev);
-        if (fn_800504F4(pCourse, nCell[0], nCell[1], vPrev, vPos, vDir, fLen, vHit, vNormal, &pSurface, &pObj)) {
+        if (fn_800504F4(pCourse, nCell[0], nCell[1], vPrev, vPos, vDir, fLen, vHit, vNormal, &pSurface,
+                        &pObj)) {
             fDist = fn_800BB028(pFrom, vHit);
             if (fDist < fBest) {
                 fBest = fDist;
