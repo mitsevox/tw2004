@@ -4043,6 +4043,8 @@ MetroTRK/dolphin_trk.c:
 
 MetroTRK/main_TRK.c:
 	.text       start:0x801643C8 end:0x80164420
+	.rodata     start:0x80185E00 end:0x80185E10
+	.bss        start:0x8027F880 end:0x8027F888
 
 src/TRK_MINNOW_DOLPHIN/dolphin_trk_glue.c:
 	.text       start:0x80164420 end:0x80164978
