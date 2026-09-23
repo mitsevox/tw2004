@@ -19,10 +19,17 @@ typedef struct Tournament {
     u16  aStartDate[10];        // 0x50  per season (fn_800EFB88). TW06: startDate
 } Tournament;
 
+// One round of a tournament's format (0xC bytes).
+typedef struct TourRound {
+    s32  nCourse;               // 0x0
+    u8   unk4[8];
+} TourRound;
+
 // A tournament's format (0x54 bytes). TW06: Tournament_events_t, which starts with nRounds too.
 typedef struct TourEvent {
     s32  nRounds;               // 0x00
-    u8   unk4[0x54 - 0x4];
+    TourRound aRound[6];        // 0x04
+    u8   unk4C[0x54 - 0x4C];
 } TourEvent;
 
 typedef struct Triple {
@@ -109,6 +116,10 @@ void fn_80117C50(s32 a, s32 b);
 void fn_800EF130(s32 a, u32 b);
 void fn_800EEB94(s32 a);
 void fn_80117860(TourSeason* pTour);
+s32  fn_8008AC00(void);
+void fn_8011A720(s32 a, s32 nHole);
+void fn_8011A5F8(s32 a);
+u8   fn_800EF720(s32 nPlayer);
 u8   fn_800EF83C(u16 nDate, s32* pId, s32* pRound);
 s32  fn_8011A7C8(s32 nPlayer, s32 nHole);
 s32  fn_80119588(s32 nPlayer, s32 a);
@@ -202,6 +213,24 @@ u8 fn_800EE5B4(s32 nPlayer) {
     return bBehind;
 }
 
+// TW06: GameModeDriverPGATour::IsPuttForWin. In a playoff, a putt for the lead; otherwise on the
+// last round, a putt that would put the player ahead.
+u8 fn_800EE6A0(s32 nPlayer) {
+    s32 nRounds;
+    int bWin;
+    if (gpGame->bD4) {
+        return fn_800EE5B4(nPlayer);
+    }
+    nRounds = fn_800EFA9C(gpSaveData[nPlayer].tour.nEvent);
+    bWin = 0;
+    if (fn_8008AC00() == 1 && gpSaveData[nPlayer].tour.nRound + 1 >= nRounds) {
+        if (fn_800E1904(nPlayer, 1) + 1 < fn_80119588(nPlayer, 1)) {
+            bWin = 1;
+        }
+    }
+    return bWin;
+}
+
 // TW06: GameModeDriverPGATour::GetCurrentLead. Strokes behind the leader (in a playoff, on this hole).
 s32 fn_800EE778(s32 nPlayer) {
     if (gpGame->bD4) {
@@ -241,6 +270,26 @@ s32 fn_800EF0E0(PlayerNumber_t nPlayer) {
 
 void fn_800EF294(void) {
     fn_80119934(0);
+}
+
+// Whether the round is over for the player: no selected hole is left and it was the last round (in
+// a playoff, after every hole).
+u8 fn_800EF64C(s32 nPlayer) {
+    s32 i;
+    if (gpGame->bD4) {
+        fn_8011A720(0, Game_CurHoleIndex());
+        return fn_800EF720(nPlayer) == 0;
+    }
+    for (i = Game_CurHoleIndex() + 1; i < 18; i++) {
+        if (gpGame->bHoleSelected[i]) {
+            return 0;
+        }
+    }
+    if (gpGame->nDC + 1 >= gpGame->nE0) {
+        fn_8011A5F8(0);
+        return fn_800EF720(nPlayer) == 0;
+    }
+    return 1;
 }
 
 s32 fn_800EF834(void) {
@@ -444,6 +493,24 @@ char* fn_800EFE60(s32 i) {
 // TW06: GameModeDriverPGATour::GetInitialChampScore.
 s32 fn_800EFE78(s32 i) {
     return gPgaData.aTournament[i].nChampScore;
+}
+
+// TW06: GameModeDriverPGATour::GetCourses. The course of each round of a tournament; returns the
+// number of rounds.
+s32 fn_800EFE90(Tournament* p, s32* pCourses) {
+    TourEvent* pEvent = &gPgaData.aTourEvent[p->nTourEvent - 1];
+    s32 nRounds;
+    s32 i;
+    TourRound* pRound;
+    if (pEvent != NULL) {
+        nRounds = pEvent->nRounds;
+        pRound = pEvent->aRound;
+        for (i = 0; i < nRounds; i++) {
+            pCourses[i] = pRound[i].nCourse;
+        }
+        return nRounds;
+    }
+    return 0;
 }
 
 // TW06: GameModeDriverPGATour::GetWinnerEarningsString. Tournament i's first prize as text: in the
