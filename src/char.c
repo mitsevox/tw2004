@@ -640,6 +640,22 @@ void fn_8001D8DC(int nPlayer) {
     }
 }
 
+// Where the ball sits on the hand: bone 0x1A's position, moved 0.05 along the bone's x axis (the
+// other way while the model's bEE is set).
+void Character_GetBallOnFingerPosition(Character* pChar, f32* pPos) {
+    f32 (*pMtx)[4] = fn_8001EC6C(pChar, 0x1A);
+    f32 vAxis[3];
+
+    Vec_Copy(pMtx[3], pPos);
+    Vec3Copy(pMtx[0], vAxis);
+    fn_800BAF04(vAxis, vAxis);
+    if (fn_8001EDF4(pChar)) {
+        fn_8000C5D4(pPos, vAxis, 0.05f, pPos);
+    } else {
+        fn_8000C5D4(pPos, vAxis, -0.05f, pPos);
+    }
+}
+
 // Empty the character's four data buffers (their memory is kept).
 // The clip's point v80 through bone 0's matrix (fn_8001ED08) into pOut; without a clip, bone 0's
 // position (fn_8001EB8C).
