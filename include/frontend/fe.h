@@ -149,6 +149,8 @@ typedef struct FEBio {
 } FEBio;
 LAYOUT_ASSERT(FEBio, 0x1F8);
 
+extern s32 lbl_801894E8[16];            // golfer ids fn_80080388 counts as unlocked
+
 #define FE_NUM_BIOS 29
 extern FEBio* lbl_80281EC8;             // a copy of the 'BIO ' stream object's data (fn_80076F80)
 

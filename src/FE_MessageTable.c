@@ -687,7 +687,8 @@ void fn_80084F84(MsgArg* pArgs, MsgArg* pResult);
 #define FE_NUM_MESSAGES 770
 MsgHandler lbl_801D77A8[FE_NUM_MESSAGES];
 
-// fn_8007D428 sets it to 0 for a golfer that can be picked and 0.2 for a locked one.
+// fn_8007D428 and fn_80080388 set it to 0 for a golfer that can be picked and 0.2 for a locked
+// one.
 f32 lbl_80281374 = 0.25f;
 
 // Run message nMsg's handler.
@@ -3029,6 +3030,33 @@ void fn_80080358(MsgArg* pArgs, MsgArg* pResult) {
     fn_8009CD7C();
 }
 
+// Like fn_8007D428, with the golfers of lbl_801894E8 unlocked instead of the profiles' unlocks.
+void fn_80080388(MsgArg* pArgs, MsgArg* pResult) {
+    int i;
+
+    if ((s8)gGolferTable[pArgs[1].i].bAvailable != -1) {
+        pResult->i = 0;
+        if (pArgs[1].i >= FIRST_CREATED_GOLFER) {
+            pResult->i = 1;
+        }
+        for (i = 0; i < 16; i++) {
+            if (pArgs[1].i == lbl_801894E8[i]) {
+                pResult->i = 1;
+            }
+        }
+        if (lbl_80281DF4->aGolferUnlocked[pArgs[1].i] != 0) {
+            pResult->i = 1;
+        }
+    } else {
+        pResult->i = -1;
+    }
+    if (pResult->i != 0) {
+        lbl_80281374 = 0.0f;
+    } else {
+        lbl_80281374 = 0.2f;
+    }
+}
+
 void fn_800804D8(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
@@ -3075,6 +3103,25 @@ void fn_800805F4(MsgArg* pArgs, MsgArg* pResult) {
     if (lbl_80281DF4->aCourseUnlocked[pArgs[1].i] != 0) {
         pResult->i = 1;
     }
+}
+
+// How far the rewards go for slot pArgs[0]: the number of the last one its profile or a cheat
+// code has unlocked (0: none).
+void fn_80080654(MsgArg* pArgs, MsgArg* pResult) {
+    int i;
+    int n = 0;
+
+    for (i = 0; i < 18; i++) {
+        if (gpSaveData[pArgs[0].i].aRewardUnlocked[i] != 0 && i + 1 > n) {
+            n = i + 1;
+        }
+    }
+    for (i = 0; i < 18; i++) {
+        if (lbl_80281DF4->aRewardUnlocked[i] != 0 && i + 1 > n) {
+            n = i + 1;
+        }
+    }
+    pResult->i = n;
 }
 
 void fn_800807D0(MsgArg* pArgs, MsgArg* pResult) {
