@@ -3070,26 +3070,11 @@ unsorted/sweep_80121404.c:
 unsorted/sweep_8012141C.c:
 	.text       start:0x8012141C end:0x80121430
 
-unsorted/sweep_8012172C.c:
-	.text       start:0x8012172C end:0x80121770
-
-unsorted/sweep_801217C4.c:
-	.text       start:0x801217C4 end:0x80121808
-
-unsorted/sweep_80121808.c:
-	.text       start:0x80121808 end:0x8012185C
-
-unsorted/sweep_8012185C.c:
-	.text       start:0x8012185C end:0x801218BC
-
-unsorted/sweep_801218BC.c:
-	.text       start:0x801218BC end:0x801218DC
-
-unsorted/sweep_801218DC.c:
-	.text       start:0x801218DC end:0x801218FC
+GameMode4Menu.c:
+	.text       start:0x80121430 end:0x801220D4
 
 TibExt.c:
-	.text       start:0x80121C80 end:0x80122128
+	.text       start:0x801220D4 end:0x80122128
 
 unsorted/sweep_80122128.c:
 	.text       start:0x80122128 end:0x8012214C
