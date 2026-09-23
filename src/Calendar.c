@@ -1,4 +1,10 @@
+// Calendar.c (our name): dates for the tour season: a day number (u16) turned into weekday, day,
+// month and year and back, month steps, today's date (fn_800D2994) and the date strings the menus
+// print. Not yet decompiled beyond the sweep code below.
+
 #include "game_types.h"
+
+// ---- sweep code (not yet cleaned up) ----
 
 void fn_800D27CC(u8* p0, s32 p1);
 s32 fn_800D27E0(u16* arg0);
@@ -32,3 +38,5 @@ void fn_800D28B0(s32 arg0, s32 arg1, s32* arg2, s32* arg3) {
     *arg2 = arg0 + 1;
     *arg3 = arg1;
 }
+
+// ---- end of sweep code ----
