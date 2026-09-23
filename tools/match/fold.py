@@ -67,13 +67,27 @@ b = run('ninja')
 if b.returncode or 'main.dol: OK' not in b.stdout:
     print(compile_errors(b.stdout) or b.stdout[-2000:])
     fail('BUILD NOT OK')
-run('ninja build/GW4E69/report.json')
-r = json.load(open(ROOT / 'build/GW4E69/report.json'))
-u = [u for u in r['units'] if u['name'] == 'main/' + name][0]
-ex = {f['name'] for f in u['functions'] if f.get('fuzzy_match_percent') == 100}
-miss = [d for d in folded if d not in ex]
-print(len(folded), 'folded, not exact:', miss, 'total fns', len(u['functions']))
-if miss or not folded:
+# Judge only on a report made now: ninja does not rebuild report.json when a target object (from
+# the split) changes, and leaves the old one in place when any source fails to build.
+report = ROOT / 'build/GW4E69/report.json'
+report.unlink(missing_ok=True)
+rp = run('ninja build/GW4E69/report.json')
+if rp.returncode or not report.exists():
+    print(compile_errors(rp.stdout) or rp.stdout[-2000:] or rp.stderr[-2000:])
+    fail('REPORT NOT GENERATED (ninja exit %d)' % rp.returncode)
+r = json.load(open(report))
+us = [u for u in r['units'] if u['name'] == 'main/' + name]
+if not us:
+    fail(f'main/{name} is not in the new report.json')
+u = us[0]
+have = {f['name'] for f in u.get('functions', [])}
+ex = {f['name'] for f in u.get('functions', []) if f.get('fuzzy_match_percent') == 100}
+absent = [d for d in folded if d not in have]
+miss = [d for d in folded if d in have and d not in ex]
+print(len(folded), 'folded, not exact:', miss, 'total fns', len(have))
+if absent:
+    print('not in the unit at all (outside its range, or renamed?):', absent)
+if miss or absent or not folded:
     fail('NOT deleting sweeps')
 rm = run('git rm -q ' + ' '.join('src/' + s for s in sweeps))
 if rm.returncode != 0:
