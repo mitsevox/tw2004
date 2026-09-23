@@ -10,14 +10,14 @@ void fn_800BA0A0();
 void fn_800BA0E4();
 void fn_800D29EC();
 void fn_800D2A30();
-void fn_800D33F4();
-void fn_800D3424();
+void EarningsInfo_RegisterStreamClients();
+void EarningsInfo_UnRegisterStreamClients();
 void fn_800EAE74();
 void fn_800EAEB8();
-void fn_800EDE7C();
-void fn_800EDEE8();
-void fn_800F0518();
-void fn_800F0570();
+void GameModeDriverPGATour_RegisterStreamClients();
+void GameModeDriverPGATour_UnregisterStreamClients();
+void GameModeDriverRTE_RegisterStreamClients();
+void GameModeDriverRTE_UnregisterStreamClients();
 void fn_80102310();
 void fn_80102354();
 void fn_8011763C();
@@ -31,11 +31,11 @@ void fn_80014864(void) {
     fn_800BA0A0();
     fn_800D29EC();
     fn_800EAE74();
-    fn_800D33F4();
+    EarningsInfo_RegisterStreamClients();
     fn_80102310();
     fn_8011763C();
-    fn_800EDE7C();
-    fn_800F0518();
+    GameModeDriverPGATour_RegisterStreamClients();
+    GameModeDriverRTE_RegisterStreamClients();
 }
 
 void fn_800148A8(void) {
@@ -44,9 +44,9 @@ void fn_800148A8(void) {
     fn_800BA0E4();
     fn_800D2A30();
     fn_800EAEB8();
-    fn_800D3424();
+    EarningsInfo_UnRegisterStreamClients();
     fn_80102354();
     fn_8011766C();
-    fn_800EDEE8();
-    fn_800F0570();
+    GameModeDriverPGATour_UnregisterStreamClients();
+    GameModeDriverRTE_UnregisterStreamClients();
 }

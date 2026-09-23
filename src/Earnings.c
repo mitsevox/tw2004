@@ -94,23 +94,20 @@ void fn_800D3244(void) {
     memcpy(lbl_801FFD90, lbl_801FFAE8, sizeof(lbl_801FFD90));
 }
 
-// TW06: roundToNearest25. Every payout is a multiple of $25.
-s32 fn_800D33A8(s32 nMoney) {
+// Every payout is a multiple of $25.
+s32 roundToNearest25(s32 nMoney) {
     return (s32)((12.5f + (f32)nMoney) / 25.0f) * 25;
 }
 
-// TW06: GM_Earnings_FreeStreamMemory.
-void fn_800D33F0(void) {
+void GM_Earnings_FreeStreamMemory(void) {
 }
 
-// TW06: EarningsInfo::RegisterStreamClients (TW06 made it a class method). The prize table comes
-// from the stream.
-void fn_800D33F4(void) {
+// The prize table comes from the stream.
+void EarningsInfo_RegisterStreamClients(void) {
     UStream_RegisterHandler('ERN ', fn_800D344C);
 }
 
-// TW06: EarningsInfo::UnRegisterStreamClients.
-void fn_800D3424(void) {
+void EarningsInfo_UnRegisterStreamClients(void) {
     UStream_UnregisterHandler('ERN ');
 }
 
@@ -121,9 +118,9 @@ void fn_800D344C(UStreamObject* pObject) {
     fn_8000E790(pObject, sizeof(lbl_80200538), &lbl_80200538);
 }
 
-// TW06: GM_Earnings_TournamentPayout. With a row of lbl_80191AA4, n scaled down by how far it is
+// With a row of lbl_80191AA4, n scaled down by how far it is
 // into nTotal (against the row 0 share), rounded to $10; row 0 leaves n as it is.
-s32 fn_800D3478(int nTotal, int n, int nRow) {
+s32 GM_Earnings_TournamentPayout(int nTotal, int n, int nRow) {
     f32 f;
     s32 nRounded;
     s32 nRet;
@@ -173,14 +170,14 @@ void fn_800D3548(int nPlayer, int nMoney, CourseMoneyTracking* pMoney) {
     fn_800D3A20(nProfile, 1);
 }
 
-// TW06: GM_Earnings_GetStrokeWinnings. Beating a CPU golfer pays by their earnings rating: a base
+// Beating a CPU golfer pays by their earnings rating: a base
 // prize and so much a stroke of the margin (at most 5). *pPrize gets the base.
-int fn_800D36E0(int nWinner, int nLoser, int nMargin, int* pPrize) {
+int GM_Earnings_GetStrokeWinnings(int nWinner, int nLoser, int nMargin, int* pPrize) {
     int nRating;
 
     if (fn_800E177C() != 0) return 0;
     if (Player_IsCPU(nWinner) || !Player_IsCPU(nLoser)) return 0;
-    nRating = fn_800D3C7C(nLoser);
+    nRating = GM_Earnings_RateGolfer(nLoser);
     if (nMargin > 5) {
         nMargin = 5;
     }
@@ -190,9 +187,9 @@ int fn_800D36E0(int nWinner, int nLoser, int nMargin, int* pPrize) {
     return lbl_80200538.aStrokePrize[nRating].nBase + lbl_80200538.aStrokePrize[nRating].nPerStroke * nMargin;
 }
 
-// TW06: GM_Earnings_GetStrokeWinningsTeam. The same for a team (0: players 0 and 1, 1: players 2 and
+// The same for a team (0: players 0 and 1, 1: players 2 and
 // 3) beating a CPU team: the average of what the two losers would pay.
-int fn_800D37BC(int nWinner, int nLoser, int nMargin, int* pPrize) {
+int GM_Earnings_GetStrokeWinningsTeam(int nWinner, int nLoser, int nMargin, int* pPrize) {
     int nFirst;
     int nSecond;
     int nRating1;
@@ -210,8 +207,8 @@ int fn_800D37BC(int nWinner, int nLoser, int nMargin, int* pPrize) {
         nFirst = 2;
         nSecond = 3;
     }
-    nRating1 = fn_800D3C7C(nFirst);
-    nRating2 = fn_800D3C7C(nSecond);
+    nRating1 = GM_Earnings_RateGolfer(nFirst);
+    nRating2 = GM_Earnings_RateGolfer(nSecond);
     if (nMargin > 5) {
         nMargin = 5;
     }
@@ -310,15 +307,15 @@ int fn_800D3A20(int nProfile, u8 bMessage) {
     return n;
 }
 
-// TW06: GM_GetHighestRatedGolfer. The best earnings rating among the players.
-int fn_800D3C1C(void) {
+// The best earnings rating among the players.
+int GM_GetHighestRatedGolfer(void) {
     int i;
     int nBest;
     int nRating;
 
     nBest = 0;
     for (i = 0; i < gNumPlayersSetUp; i++) {
-        nRating = fn_800D3C7C(i);
+        nRating = GM_Earnings_RateGolfer(i);
         if (nRating > nBest) {
             nBest = nRating;
         }
@@ -326,8 +323,8 @@ int fn_800D3C1C(void) {
     return nBest;
 }
 
-// TW06: GM_Earnings_RateGolfer. A CPU plays at its golfer's rating; a human's comes from the profile.
-int fn_800D3C7C(int nPlayer) {
+// A CPU plays at its golfer's rating; a human's comes from the profile.
+int GM_Earnings_RateGolfer(int nPlayer) {
     int nRating;
 
     nRating = fn_800584DC(gPlayers[nPlayer].nIndex);
@@ -359,8 +356,8 @@ int fn_800D3D10(int nGolfer) {
     return gGolferTable[nGolfer].nEarningsRating;
 }
 
-// TW06: GM_Earnings_GetSkinsHoleValue. What a skin on hole nHole (0..17) is worth.
-s32 fn_800D3D64(int nRating, int nHole) {
+// What a skin on hole nHole (0..17) is worth.
+s32 GM_Earnings_GetSkinsHoleValue(int nRating, int nHole) {
     if (nHole < 6) return lbl_80200538.aSkins[nRating].aValue[0];
     if (nHole < 12) return lbl_80200538.aSkins[nRating].aValue[1];
     if (nHole < 17) return lbl_80200538.aSkins[nRating].aValue[2];
@@ -629,10 +626,11 @@ u8 fn_800D69B8(int nPlayer, u8 bCheck) {
     return 0;
 }
 
-// TW06: GM_Earnings_ComputeBonusModifiers. The points, rounded to $25, earn a bonus on top for the
+// The points, rounded to $25, earn a bonus on top for the
 // course, the tees played and the hole's gpGame->nPinSet value (each flag switches one on).
 // Each part is rounded to $25 by itself; the total is at least 0.
-s32 fn_800D6A70(s32 nPoints, int nPlayer, u8 bCourse, u8 bTee, u8 bHole, CourseMoneyTracking* pMoney) {
+s32 GM_Earnings_ComputeBonusModifiers(s32 nPoints, int nPlayer, u8 bCourse, u8 bTee, u8 bHole,
+                                       CourseMoneyTracking* pMoney) {
     f32 fCourseBonus;           // fake match: whole dollars kept as floats and added as floats, as
     f32 fTeeBonus;              // the original does (s32 locals with float casts: 87%)
     f32 fHoleBonus;
@@ -674,7 +672,7 @@ s32 fn_800D6A70(s32 nPoints, int nPlayer, u8 bCourse, u8 bTee, u8 bHole, CourseM
         fHole = (f32)lbl_80200538.aPinSetPct[3] / 100.0f;
         break;
     }
-    nBase = fn_800D33A8(nPoints);
+    nBase = roundToNearest25(nPoints);
     if (bCourse) {
         fCourse = (f32)nBase * fCourse - (f32)nBase;
     } else {
@@ -690,9 +688,9 @@ s32 fn_800D6A70(s32 nPoints, int nPlayer, u8 bCourse, u8 bTee, u8 bHole, CourseM
     } else {
         fHole = 0.0f;
     }
-    fCourseBonus = fn_800D33A8((s32)fCourse);
-    fTeeBonus = fn_800D33A8((s32)fTee);
-    fHoleBonus = fn_800D33A8((s32)fHole);
+    fCourseBonus = roundToNearest25((s32)fCourse);
+    fTeeBonus = roundToNearest25((s32)fTee);
+    fHoleBonus = roundToNearest25((s32)fHole);
     nTotal = (s32)((f32)nBase + (fHoleBonus + (fCourseBonus + fTeeBonus)));
     if (nTotal < 0) {
         nTotal = 0;
@@ -770,9 +768,9 @@ f32 fn_800D6EEC(void) {
     return fMult;
 }
 
-// TW06: GM_Earnings_ComputeTOURCardModifiers. The TOUR card level raises the payout; the extra
+// The TOUR card level raises the payout; the extra
 // goes in the breakdown. Nothing is paid when fn_800E177C says so.
-int fn_800D7220(int nReward, int nPlayer, CourseMoneyTracking* pMoney) {
+int GM_Earnings_ComputeTOURCardModifiers(int nReward, int nPlayer, CourseMoneyTracking* pMoney) {
     f32 fMult;
     s32 nTotal;
 

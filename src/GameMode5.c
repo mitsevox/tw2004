@@ -592,7 +592,7 @@ void fn_800EC1E0(void) {
             fn_800EC170(nMedal);
             nProfile = gPlayers[0].nIndex;
             if (gpSaveData[nProfile].bActive) {
-                nMoney = fn_800D7220(nReward, 0, (CourseMoneyTracking*)aOut);
+                nMoney = GM_Earnings_ComputeTOURCardModifiers(nReward, 0, (CourseMoneyTracking*)aOut);
                 if (nMoney) {
                     switch (nMedal) {
                     case 0:
@@ -1134,7 +1134,7 @@ void fn_800ED554(void) {
     fn_800E5714(2);
     fn_800E1074();
     if (fn_800F0818()) {
-        fn_800F06DC();
+        GameModeDriverRTE_StartEvent();
     } else {
         fn_800EAF7C();
     }

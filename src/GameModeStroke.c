@@ -202,7 +202,7 @@ void fn_800FFDB8(void) {
                     if (i != j && Player_IsCPU(j)) {
                         nOther = fn_800E1788(j);
                         if (nScore < nOther) {
-                            nRating = fn_800D3C7C(j);
+                            nRating = GM_Earnings_RateGolfer(j);
                             if (nRating > nBest) {
                                 nBest = nRating;
                                 nMargin = nOther - nScore;

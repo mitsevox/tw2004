@@ -45,7 +45,7 @@ s32   fn_800E3AB0(int nPlayer);
 void  fn_800E3AAC(int nPlayer, int nTime);
 void  fn_800E3AA8(int nPlayer, int nId);
 s32   fn_800E3AA0(int a, int nTarget);
-void  fn_800EDD18(void);
+void  GameModeDriverPGATour_Init(void);
 void  fn_8010C4A0(void);
 void  fn_80125E68(void);
 
@@ -266,7 +266,7 @@ void fn_800E0B38(int nMode) {
         fn_800E68F0();
         break;
     case 23:
-        fn_800EDD18();
+        GameModeDriverPGATour_Init();
         break;
     case 24:
         fn_800F0448();
@@ -896,7 +896,7 @@ char* fn_800E2680(void) {
     return "none";
 }
 
-// TW06: GameManager::GetHoleName. "HOLE_01" .. "HOLE_18".
+// "HOLE_01" .. "HOLE_18".
 char* GameManager_GetHoleName(int nHole) {
     sprintf(lbl_80282270, "HOLE_%02d", nHole + 1);
     return lbl_80282270;

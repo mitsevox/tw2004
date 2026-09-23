@@ -129,7 +129,7 @@ void fn_800E7CBC(void) {
             nWinner = 1;
             nLoser = 0;
         }
-        nMoney = fn_800D36E0(nWinner, nLoser, nMargin, &nPrize);
+        nMoney = GM_Earnings_GetStrokeWinnings(nWinner, nLoser, nMargin, &nPrize);
         if (!Player_IsCPU(nWinner)) {
             nProfile = gPlayers[nWinner].nIndex;
             if (gpSaveData[nProfile].bActive) {
