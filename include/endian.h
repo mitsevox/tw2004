@@ -1,10 +1,11 @@
 // endian.h (our name): reading the disc's and the memory card's data, which is big-endian (see
 // docs/format-byteorder.md for every format and the ones that are little-endian and swapped).
 //
-// BE16(p), BE32(p) and BEF32(p) read a big-endian value at p. Under CodeWarrior they are the plain
-// loads the game's code does (*(u32*)p and so on), so the code is the same byte for byte; anywhere
-// else they assemble the value from its bytes, which works on a machine of either byte order and
-// needs no alignment. Those portable versions are written for a port and are not tested yet.
+// BE16(p), BES16(p) (signed), BE32(p) and BEF32(p) read a big-endian value at p. Under CodeWarrior
+// they are the plain loads the game's code does (*(u32*)p and so on), so the code is the same byte for
+// byte; anywhere else they assemble the value from its bytes, which works on a machine of either
+// byte order and needs no alignment. Those portable versions are written for a port and are not
+// tested yet.
 
 #ifndef ENDIAN_H
 #define ENDIAN_H
@@ -14,6 +15,7 @@
 #ifdef __MWERKS__
 
 #define BE16(p)  (*(u16*)(p))
+#define BES16(p) (*(s16*)(p))
 #define BE32(p)  (*(u32*)(p))
 #define BEF32(p) (*(f32*)(p))
 
@@ -39,6 +41,7 @@ static f32 Endian_ReadBEF32(const void* p) {
 }
 
 #define BE16(p)  Endian_ReadBE16(p)
+#define BES16(p) ((s16)Endian_ReadBE16(p))
 #define BE32(p)  Endian_ReadBE32(p)
 #define BEF32(p) Endian_ReadBEF32(p)
 

@@ -3,6 +3,7 @@
 // written up in docs/gameplay.md; the record layout in docs/formats/game-data.md.
 
 #include "golfer.h"
+#include "endian.h"
 #include "ball.h"
 #include "game.h"
 #include "engine.h"
@@ -1309,8 +1310,11 @@ void AI_TargetsLoad(u8* pChunk) {
     s8*          pReq;
 
     gNumAITargets = 0;
+    // port: the course's AI targets are big-endian and read in place: AITargetDef is laid over the
+    // chunk (and written to), and gAITargets points into it; a little-endian port converts the
+    // chunk's AITargetDefs before this loop (the count at +2 is read with BES16).
     pDef = (AITargetDef*)(pChunk + 4);
-    for (i = 0; i < *(s16*)(pChunk + 2); pDef++, i++) {
+    for (i = 0; i < BES16(pChunk + 2); pDef++, i++) {
         gAITargets[i].pDef = pDef;
         // A point that links to itself links to nothing.
         for (k = 0; k < NUM_AI_LINKS; k++) {
@@ -1321,7 +1325,7 @@ void AI_TargetsLoad(u8* pChunk) {
         gNumAITargets++;
     }
     pReq = (s8*)pDef;
-    for (i = 0; i < *(s16*)(pChunk + 2); i++, pReq += 8) {
+    for (i = 0; i < BES16(pChunk + 2); i++, pReq += 8) {
         gAITargets[i].bEnabled  = 1;
         gAITargets[i].nTeeSet   = pReq[0];
         gAITargets[i].nPinSet   = pReq[1];
@@ -1439,6 +1443,9 @@ void Golfer_TableByteSwap(void) {
     int i;
     for (i = 0; i < NUM_GOLFERS; i++) {
         pSrc = (u8*)&gGolferTable[i] + 0x98;
+        // port: 'stat' is little-endian on disc; a little-endian port does not swap here. Only
+        // 0x98..0x140 of each record is swapped, in 8-byte units (the u32 at 0x90 is not); the
+        // records are then read in place as GolferRecord.
         fn_80076158(&pSrc, (u8*)&gGolferTable[i] + 0x98, 0xA8, 8);
     }
 }
@@ -1591,6 +1598,8 @@ int Golfer_FindById(int nId) {
 
 // The 'rcrd' handler: the courses' records into the session.
 void Session_OnRecordsLoaded(UStreamObject* pObject) {
+    // port: the records are big-endian on disc and copied straight over the course-record structs;
+    // a little-endian port converts them field by field here.
     Mem_cpy(gSession.aCourseRecord, pObject->pData, pObject->uSize);
     fn_80009E70(pObject);
 }

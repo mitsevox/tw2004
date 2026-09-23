@@ -42,15 +42,15 @@ Objects delivered by UStream
 | `Cnet` | fn_8000BF9C | asm | none seen | asm; dispatches the course's sub-chunks to the loaders registered with `Course_RegisterLoader` (below) |
 | `txf ` | fn_80010180 | asm | none seen | asm; `TXG ` texture groups, [formats/txg-textures.md](formats/txg-textures.md) |
 | `sfn ` | fn_800125BC | sweep | none seen | asm |
-| `SAC ` | fn_8001A75C | sweep | swapped: AnimLib_MergeOverlay > fn_80020BC8 > fn_80076158 | little-endian on disc |
-| `CLB ` (2) | fn_8001CCF8, fn_8001CD80 | asm | swapped: fn_8001B208 > fn_80076158 | little-endian on disc |
-| `CHR ` (2) | fn_8001CE5C, fn_8001D020 | asm | swapped: fn_80019798 > fn_80076158 | little-endian on disc |
-| `SKLO` | fn_8001D3EC | sweep | swapped: fn_8001A9F4 > fn_80076158 | little-endian on disc |
+| `SAC ` | fn_8001A75C | char.c (sweep block) | swapped: AnimLib_MergeOverlay > fn_80020BC8 > fn_80076158 | little-endian on disc; `port:` notes at the handler and at the swap in AnimLib_MergeOverlay (a little-endian port does not swap) |
+| `CLB ` (2) | fn_8001CCF8, fn_8001CD80 | char.c (asm) | swapped: fn_8001B208 > fn_80076158 | little-endian on disc |
+| `CHR ` (2) | fn_8001CE5C, fn_8001D020 | char.c (asm) | swapped: fn_80019798 > fn_80076158 | little-endian on disc |
+| `SKLO` | fn_8001D3EC | char.c (sweep block) | swapped: fn_8001A9F4 > fn_80076158 | little-endian on disc; a `port:` note at the handler |
 | `MAL ` | fn_8001FA3C | sweep | swapped: fn_8001F804 > fn_8001F08C | little-endian on disc |
-| `SAL ` | AnimLib_OnLoaded | skalib.c | swapped: AnimLib_Load > fn_8001F08C | little-endian on disc; swapped by field tables (`SwapField`) |
-| `BNK ` | ClipBank_OnLoaded | skalib.c | swapped later | the handler only stashes the file; `ClipBank_Install` > `ClipBank_Load` swaps it (`ClipBank_SwapHeader`, fn_80020BC8 per clip) |
-| `stat` | Golfer_OnStatsLoaded | Golfer.c | swapped: Golfer_TableByteSwap > fn_80076158 | yes: copied over `gGolferTable[34]` (`GolferRecord`); only 0x98..0x140 of each record is swapped, in 8-byte units; the u32 at 0x90 is not |
-| `rcrd` | Session_OnRecordsLoaded | Golfer.c | none seen | yes: copied straight over `gSession.aCourseRecord` |
+| `SAL ` | AnimLib_OnLoaded | skalib.c | swapped: AnimLib_Load > fn_8001F08C | little-endian on disc; swapped by field tables (`SwapField`); yes: `AnimLib`, `ClipRecord` and `Clip` are then read in place, their offsets turned into 32-bit pointers. `port:` notes at every swap call (header, clip numbers, index, records, tree nodes): a little-endian port does not swap there |
+| `BNK ` | ClipBank_OnLoaded | skalib.c | swapped later | the handler only stashes the file; `ClipBank_Install` > `ClipBank_Load` swaps it (`ClipBank_SwapHeader`, fn_80020BC8 per clip); yes: `ClipBank` is used in place, its clip offsets turned into 32-bit pointers. `port:` notes at the swap calls |
+| `stat` | Golfer_OnStatsLoaded | Golfer.c | swapped: Golfer_TableByteSwap > fn_80076158 | yes: copied over `gGolferTable[34]` (`GolferRecord`); only 0x98..0x140 of each record is swapped, in 8-byte units; the u32 at 0x90 is not. A `port:` note at the swap call |
+| `rcrd` | Session_OnRecordsLoaded | Golfer.c | none seen | yes: copied straight over `gSession.aCourseRecord`, big-endian; a `port:` note there (a little-endian port converts the records field by field) |
 | `ter ` | fn_800342B4 | GoTerrain.c | none seen | asm |
 | `tgd ` | fn_800342F0 | GoTerrain.c | none seen | yes: the course's collision data; `Ter_InitTGD` (fn_8004B1EC, GoTerrainCollision.c) lays `CourseInfo` (ball.h) over it and turns its offsets into pointers in place (`TER_RELOCATE`, 32-bit); `TerCell`, `TerPolyRef`, `TerObject` and the vertex list are read in place |
 | `tLOD` | fn_800341A4 | GoTerrain.c | none seen | asm |
@@ -96,7 +96,7 @@ walks; each loader gets its sub-chunk's bytes.
 
 | Sub-chunk | Loader | Unit | Swap | Overlay |
 |---|---|---|---|---|
-| 0: AI targets | AI_TargetsLoad | Golfer.c | none seen | yes: `AITargetDef` (golfer.h) laid over the chunk, count an s16 at +2; the loader also writes into the chunk (a self-link becomes -1); `gAITargets[i].pDef` points into it |
+| 0: AI targets | AI_TargetsLoad | Golfer.c | none seen | yes: `AITargetDef` (golfer.h) laid over the chunk, count an s16 at +2 (read with `BES16`, include/endian.h); the loader also writes into the chunk (a self-link becomes -1); `gAITargets[i].pDef` points into it. A `port:` note at the overlay |
 | 1: out-of-bounds outlines | fn_8004B63C | GoTerrainCollision.c | none seen | yes: `TNetwork` (ball.h) pointers into the chunk |
 | 4: free-drop outlines | fn_8004B588 | GoTerrainCollision.c | none seen | yes: `TNetwork` pointers into the chunk |
 
