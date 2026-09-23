@@ -6,9 +6,9 @@ on:
 
 jobs:
   build:
-    # This is a *private* build container.
+    # A *private* build container holding only the game's main.dol (mitsevox/tw2004-build).
     # See docs/github_actions.md for more information.
-    container: ghcr.io/my/game-build:main
+    container: ghcr.io/mitsevox/tw2004-build:main
 
     runs-on: ubuntu-latest
     strategy:
@@ -53,8 +53,9 @@ jobs:
     # Build the project
     - name: Build
       run: |
-        python configure.py --map --version ${{ matrix.version }} \
-            --binutils /binutils --compilers /compilers
+        # The container's compiler and binutils packages are older than this project's pinned
+        # versions, so configure.py downloads its own, the same as a local build.
+        python configure.py --map --version ${{ matrix.version }}
         ninja all_source progress build/${{ matrix.version }}/report.json
 
     # Upload map files
