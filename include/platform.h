@@ -46,7 +46,9 @@ char*  strcpy(char* pDst, const char* pSrc);
 char*  strncpy(char* pDst, const char* pSrc, u32 uLen);
 int    strcmp(const char* a, const char* b);
 char*  strstr(const char* pStr, const char* pFind);
+char*  strchr(const char* pStr, int c);
 int    sprintf(char* pBuf, const char* pFmt, ...);
+int    sscanf(const char* pStr, const char* pFmt, ...);   // 0x80159408, before MSL's __StringRead
 double atan(double x);
 double fabs(double x);                  // 0x8000AE94
 double floor(double x);
