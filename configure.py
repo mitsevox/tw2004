@@ -412,7 +412,7 @@ config.libs = [
         "src_dir": "extern/ffcc",
         "objects": [
             Object(Matching, "src/ax/AXAlloc.c"),
-            Object(NonMatching, "src/os/OSAlloc.c"),
+            Object(Matching, "src/os/OSAlloc.c"),
             Object(NonMatching, "src/card/CARDWrite.c"),
         ],
     },

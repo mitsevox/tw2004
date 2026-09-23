@@ -3649,6 +3649,8 @@ dolphin/os/OSAlarm.c:
 
 src/os/OSAlloc.c:
 	.text       start:0x80148E40 end:0x80149150
+	.sdata      start:0x80281AB0 end:0x80281AB8
+	.sbss       start:0x802828E0 end:0x802828F0
 
 dolphin/os/OSArena.c:
 	.text       start:0x80149150 end:0x80149170
