@@ -2,7 +2,7 @@
 
 #include "game_types.h"
 
-s32 fn_800A7720();
+u8 fn_800A7720(void);
 
 s32 fn_800A7528(void);
 s32 fn_800A7528(void) {

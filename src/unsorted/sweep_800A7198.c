@@ -2,8 +2,8 @@
 
 #include "game_types.h"
 
-s32 fn_800ADB4C();
-s32 fn_800ADC44();
+s32 fn_800ADB4C(s32, s32, s32);
+s32 fn_800ADC44(s32, s32, s32);
 extern void* gpGame;
 
 void fn_800A7198(u8 arg0);

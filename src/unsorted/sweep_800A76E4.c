@@ -4,8 +4,8 @@
 
 extern u8 lbl_80281419;
 extern u8 lbl_80282038;
-extern s32 lbl_80282054;
-void fn_800AD698();
+extern u32 lbl_80282054;
+s32 fn_800AD698(u8, s32, s32);
 
 void fn_800A76E4(void);
 void fn_800A76E4(void) {

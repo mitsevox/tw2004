@@ -5,7 +5,7 @@
 s32 fn_800A4084();
 s32 fn_800A41A4();
 s32 fn_800A43DC();
-s32 fn_800A44A0();
+void fn_800A44A0();
 s32 fn_800A4928();
 extern u8 lbl_80282029;
 extern u8 lbl_8028202A;
