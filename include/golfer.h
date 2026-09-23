@@ -82,8 +82,9 @@ typedef struct GolferRecord {
     char szFirst[32];           // 0x002
     char szLast[32];            // 0x022
     char szNick[32];            // 0x042
-    u8   unk62[6];              // 0x062  [0] = the outfit. TW06 has ballID, earningsRating,
-                                //        trajectory[3], characteristic, severity, chance here
+    u8   unk62[1];              // 0x062  [0] = the outfit. TW06 has ballID here
+    s8   nEarningsRating;       // 0x063  0..25, what beating this golfer pays (Earnings.c). TW06: earningsRating
+    u8   unk64[4];              // 0x064  TW06 has trajectory[3], characteristic, severity, chance here
     s8   attr[NUM_ATTRS];       // 0x068  block A. TW06: baseStats
     s8   attrAlt[NUM_ATTRS];    // 0x074  block B: used for CPU pros in game mode 4. TW06: crapStats
     s8   tier[NUM_ATTRS];       // 0x080  equipment tiers 0..4, one per attribute. TW06: modLevel
