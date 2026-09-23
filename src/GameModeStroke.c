@@ -5,12 +5,12 @@
 
 #include "golfer.h"
 #include "game.h"
+#include "game/save.h"
 
 int   fn_800E1788(int nPlayer);             // the player's round total
 int   fn_800D3C7C(int nPlayer);             // the player's golfer
 void  fn_80125854(int a);
 extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
-extern u8* gpSaveData;
 extern s32 lbl_80282278;                    // the player whose turn it is
 
 // Per golfer: the prize for beating them (lbl_80200538 + 0x1D4, 8 bytes each).
@@ -241,7 +241,7 @@ void fn_800FFDB8(void) {
                     nBase = GOLFER_PRIZE(nBest).nBase;
                     nMoney = nBase + GOLFER_PRIZE(nBest).nPerStroke * nMargin;
                     nProfile = PLAYER(i)->nIndex;
-                    if (gpSaveData[nProfile * 0x10600]) {
+                    if (gpSaveData[nProfile].bActive) {
                         if (bFirst) {
                             fn_80125854(1);
                             bFirst = 0;

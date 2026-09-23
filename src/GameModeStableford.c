@@ -5,6 +5,7 @@
 
 #include "golfer.h"
 #include "game.h"
+#include "game/save.h"
 
 int   fn_800E1788(int nPlayer);             // the player's round total
 int   fn_800D3C7C(int nPlayer);             // the player's golfer
@@ -13,7 +14,6 @@ extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
 extern s32 lbl_80282278;                    // the player whose turn it is
 // The points for 3 under par .. 2 or more over. TW06: GameModeStableford::stablefordPointTable.
 extern s8  lbl_802816D0[6];
-extern u8* gpSaveData;
 
 // Per golfer (gGolferTable's 34): the prize for beating them (lbl_80200538 + 0x1D4, 8 bytes each).
 typedef struct GolferPrize {
@@ -271,7 +271,7 @@ void fn_800FE980(void) {
                     nBase = GOLFER_PRIZE(nBest).nBase;
                     nProfile = PLAYER(i)->nIndex;
                     nMoney = nBase + GOLFER_PRIZE(nBest).nPerStroke * nMargin;
-                    if (gpSaveData[nProfile * 0x10600]) {
+                    if (gpSaveData[nProfile].bActive) {
                         if (bFirst) {
                             fn_80125854(1);
                             bFirst = 0;

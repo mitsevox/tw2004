@@ -5,12 +5,12 @@
 #include "ball.h"
 #include "game.h"
 #include "engine.h"
+#include "game/save.h"
 
 u8    Team_IsAllCPU(int nTeam);
 int   fn_800E1788(int nPlayer);             // the player's round total
 int   fn_800D3C7C(int nPlayer);             // the player's golfer
 extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
-extern u8* gpSaveData;
 extern s32 lbl_80282278;                    // the player whose turn it is
 
 // Per golfer: the prize for beating them (lbl_80200538 + 0x1D4, 8 bytes each).
@@ -346,7 +346,7 @@ void fn_800E8A68(void) {
                         nMoney /= 2;
                         for (i = 0; i < 2; i++) {
                             nProfile = gPlayers[nFirst + i].nIndex;
-                            if (gpSaveData[nProfile * 0x10600]) {
+                            if (gpSaveData[nProfile].bActive) {
                                 fn_80125910(1);
                                 if (nBase) {
                                     fn_800E4364(0, 0x76, nBase, nProfile);

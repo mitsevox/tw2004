@@ -6,13 +6,13 @@
 #include "ball.h"
 #include "game.h"
 #include "engine.h"
+#include "game/save.h"
 
 void* fn_800D3C1C(void);
 s32   fn_800D3D64(void* p, int nHole);      // a hole's skin value
 void  fn_80102704(void);
 void  fn_80102874(void);
 extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
-extern u8* gpSaveData;
 extern s32 lbl_80282278;                    // the player whose turn it is
 extern s32 lbl_802823C0;                    // skins carried over
 extern s32 lbl_802823C4;                    // the money carried over
@@ -343,7 +343,7 @@ void fn_800F9100(void) {
         for (i = 0; i < gNumPlayersSetUp; i++) {
             if (!Player_IsCPU(i)) {
                 nProfile = PLAYER(i)->nIndex;
-                if (gpSaveData[nProfile * 0x10600]) {
+                if (gpSaveData[nProfile].bActive) {
                     if (PLAYER(i)->n274 != 0) {
                         if (bFirst) {
                             fn_80125854(1);

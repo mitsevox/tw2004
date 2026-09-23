@@ -5,8 +5,8 @@
 #include "golfer.h"
 #include "game.h"
 #include "engine.h"
+#include "game/save.h"
 
-extern u8* gpSaveData;
 extern u32 lbl_8020315C[5];                 // the bags at the start of the round
 extern s32 lbl_80203148[5];                 // how many clubs each bag had then
 extern s32 lbl_801925B8[5];                 // per player: the club taken from them this hole (26 = none)
@@ -130,7 +130,7 @@ void fn_800E7CBC(void) {
         nMoney = fn_800D36E0(nWinner, nLoser, nMargin, &nPrize);
         if (!Player_IsCPU(nWinner)) {
             nProfile = gPlayers[nWinner].nIndex;
-            if (gpSaveData[nProfile * 0x10600]) {
+            if (gpSaveData[nProfile].bActive) {
                 fn_80125910(1);
                 if (nMoney) {
                     fn_800E4364(0, 0x6B, nPrize, nProfile);

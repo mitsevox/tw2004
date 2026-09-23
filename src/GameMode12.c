@@ -7,9 +7,9 @@
 #include "golfer.h"
 #include "game.h"
 #include "engine.h"
+#include "game/save.h"
 
 extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
-extern u8* gpSaveData;
 extern s32 lbl_802823DC;                    // the surface the ball stopped on (-1: none)
 
 // The prize rows at lbl_80200538 + 0x710 (see GameMode10.c). Mode 12 reads a surface's points
@@ -248,7 +248,7 @@ void fn_800FF288(void) {
                     nMoney += PLAYER(i)->nD28[h];
                 }
             }
-            if (gpSaveData[PLAYER(i)->nIndex * 0x10600]) {
+            if (gpSaveData[PLAYER(i)->nIndex].bActive) {
                 if (nMoney) {
                     fn_800E4364(0, 0x6A, nMoney, PLAYER(i)->nIndex);
                 }

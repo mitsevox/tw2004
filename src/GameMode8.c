@@ -6,6 +6,7 @@
 #include "golfer.h"
 #include "game.h"
 #include "engine.h"
+#include "game/save.h"
 
 typedef struct SwingStateDef {
     void (*pfnEnter)(int nPlayer);  // 0x00
@@ -15,7 +16,6 @@ typedef struct SwingStateDef {
 extern SwingStateDef sGolferStateEngineTable[];        // 0x801883D8
 
 extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
-extern u8* gpSaveData;
 extern u8  lbl_8028227C;
 extern u8  lbl_802823C9;
 extern u8  lbl_802823CA;
@@ -258,7 +258,7 @@ void fn_800F9E00(void) {
         nMoney = fn_800D36E0(nWinner, nLoser, nMargin, &nPrize);
         if (!Player_IsCPU(nWinner)) {
             nProfile = gPlayers[nWinner].nIndex;
-            if (gpSaveData[nProfile * 0x10600]) {
+            if (gpSaveData[nProfile].bActive) {
                 if (nPrize) {
                     fn_800E4364(0, 0x6B, nPrize, nProfile);
                 }
@@ -1536,14 +1536,14 @@ s32 fn_800FD8D0(char* szName1, s32* pPoints1, char* szName2, s32* pPoints2) {
         sprintf(sz, "User %d", nProfile + 1);
         strcpy(szName1, sz);
     } else {
-        strcpy(szName1, (char*)&gpSaveData[nProfile * 0x10600] + 1);
+        strcpy(szName1, gpSaveData[nProfile].szName);
     }
     nProfile = gPlayers[1].nIndex;
     if (!lbl_801D7148[nProfile]) {
         sprintf(sz, "User %d", nProfile + 1);
         strcpy(szName2, sz);
     } else {
-        strcpy(szName2, (char*)&gpSaveData[nProfile * 0x10600] + 1);
+        strcpy(szName2, gpSaveData[nProfile].szName);
     }
     *pPoints1 = gPlayers[0].nC44;
     *pPoints2 = gPlayers[1].nC44;
