@@ -29,6 +29,33 @@ void fn_800B67EC(void* arg0);
 void fn_800B6844(s32 p0, s32 p1, s32 p2);
 void fn_800B68B4(s32 p0, s32 p1, s32 p2);
 
+void fn_800B6034(void** arg0, void* arg1);
+void fn_800B5F28(u8* p, void* arg1);
+
+void fn_800B5D08(void* arg0) {
+    if ((u32) (*(u32*)((u8*)(arg0) + 0x20)) != 0U) {
+        fn_80009E70((*(u32*)((u8*)(arg0) + 0x20)));
+    }
+}
+
+void fn_800B5F28(u8* p, void* arg1) {
+    fn_800B6034(*(void***)(p + 0xC), arg1);
+}
+
+void fn_800B6034(void** arg0, void* arg1) {
+    void* temp_r5;
+
+    if (arg0 != NULL) {
+        (*(void**)((u8*)(arg1) + 0)) = (void* ) *arg0;
+        (*(void***)((u8*)(arg1) + 4)) = arg0;
+        temp_r5 = *arg0;
+        if (temp_r5 != NULL) {
+            (*(void**)((u8*)(temp_r5) + 4)) = arg1;
+        }
+        *arg0 = arg1;
+    }
+}
+
 void fn_800B61B4(void* arg0) {
     s32 (*temp_r12)(s32);
 
