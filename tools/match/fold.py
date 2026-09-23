@@ -5,9 +5,10 @@ builds, and checks that every folded function is exact. Only then does it git rm
 commit. Nothing is deleted unless the DOL is OK and every folded function matches. Pushes only
 with --push (agents working in a worktree leave pushing to the orchestrator).
 
-For a unit that already has a source (widened with `mkunit.py --extend`), the sweeps' code is
-appended in a sweep block and the rest of the file is kept (merge_sweeps.py); if the build or the
-check fails, the source is put back as it was."""
+For a unit that already has a source (widened with `mkunit.py --extend`), each sweep function is
+put in a sweep block where its address falls, before, between or after the unit's functions, and
+the rest of the file is kept (merge_sweeps.py); if the build or the check fails, the source is put
+back as it was."""
 import json, pathlib, re, subprocess, sys
 ROOT = pathlib.Path(__file__).resolve().parents[2]   # the checkout this script lives in
 HERE = pathlib.Path(__file__).resolve().parent
