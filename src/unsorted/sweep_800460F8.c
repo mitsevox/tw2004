@@ -4,7 +4,6 @@
 
 s32 UStream_RegisterHandler(s32, void (*)(void*), s32);
 s32 fn_800075CC(s32);
-s32 fn_80009E70(void*);
 void fn_800460F8(void* arg0);
 
 void fn_800460F8(void* arg0);
