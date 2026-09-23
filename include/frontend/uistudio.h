@@ -305,8 +305,9 @@ void fn_8016B09C(UIStudio* pStudio, u32 uEvent, s32 nArgs, const s32* pArgs);
 void fn_8016B0F8(UIStudio* pStudio, u32 uEvent, s32 nArgs, const s32* pArgs);
 void fn_8016B4D4(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 nMove);
 UISNodeInfo* fn_8016B6BC(UISScreen* pScreen, UISNodeInfo* pInfo);
-void fn_8016B808(u32 u0, UISText* pOut, UISText* pFormat, const UISWord* pArgs);
-s32 fn_8016B844(char* pOut, s32 nSize, const char* szFormat, const UISWord* pArgs);
+void fn_8016B808(u32 u0, UISText* pOut, UISText* pFormat, s32 nArgs, const UISWord* pArgs);
+// The studio's printf: %c %s %d %i %u %f %x %X %p, with '-', '0', a width and a precision.
+s32 fn_8016B844(char* pOut, s32 nSize, const char* szFormat, s32 nArgs, const UISWord* pArgs);
 void fn_8016C15C(f32 f1, f32 f2, f32 f3, f32 f4);
 void fn_8016C174(f32 f1, f32 f2, f32 f3, f32 f4);
 UISVec4* fn_8016C18C(void);

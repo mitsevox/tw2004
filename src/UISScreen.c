@@ -9,6 +9,7 @@
 
 void fn_8016B188(UIStudio* pStudio, UISScreen* pScreen, UISWordStack* pStack, u32 nNode, u32 uEvent,
                  s32 nArgs, const s32* pArgs);
+char* fn_8016BEDC(char* pOut, char* pEnd, s32 nWidth, s32 nPrec, f32 f);
 
 // Sends event uEvent to node nNode and, first, to the nodes it links to. A node takes events only
 // while its info has u4 and u60 set, except the studio's own events (n5 -2 to -5 and -8 to -11).
@@ -419,10 +420,233 @@ UISNodeInfo* fn_8016B6BC(UISScreen* pScreen, UISNodeInfo* pInfo) {
 }
 
 // Formats pFormat's text with pArgs into pOut's buffer.
-void fn_8016B808(u32 u0, UISText* pOut, UISText* pFormat, const UISWord* pArgs) {
+void fn_8016B808(u32 u0, UISText* pOut, UISText* pFormat, s32 nArgs, const UISWord* pArgs) {
     if (pFormat != NULL && pOut != NULL) {
-        fn_8016B844(pOut->szText, pOut->nSize, pFormat->szText, pArgs);
+        fn_8016B844(pOut->szText, pOut->nSize, pFormat->szText, nArgs, pArgs);
     }
+}
+
+// Copies sz to pOut, padded with spaces to nWidth characters (on the left, or on the right when
+// bLeft), stopping at pEnd. Returns the end of the copy.
+static inline char* UIS_PutString(char* pOut, char* pEnd, const char* sz, s32 nWidth, u8 bLeft) {
+    s32 nAbs;
+    s32 nCount;
+    s32 nPad;
+    s32 i;
+
+    nAbs = nWidth;
+    nCount = 0;
+    if (nWidth < 0) {
+        nAbs = -nWidth;
+    }
+    nPad = nAbs - strlen(sz);
+    if (!bLeft && nPad > 0) {
+        for (i = 0; i < nPad; i++) {
+            *pOut++ = ' ';
+        }
+        nCount = nPad;
+    }
+    while (*sz != 0) {
+        *pOut++ = *sz++;
+        nCount++;
+        if (pOut == pEnd) break;
+    }
+    if (bLeft == 1 && nCount < nAbs) {
+        for (i = nAbs - nCount; i > 0; i--) {
+            *pOut++ = ' ';
+        }
+    }
+    return pOut;
+}
+
+// Formats szFormat with pArgs into pOut (nSize bytes). Returns the length written, or -1.
+// EA bug: '-' is never cleared, so every conversion after one with '-' is left-justified too.
+s32 fn_8016B844(char* pOut, s32 nSize, const char* szFormat, s32 nArgs, const UISWord* pArgs) {
+    char* pStart;
+    char* pEnd;
+    u8 bLeft;
+    s32 nArg;
+    char c;
+    u8 bUnsigned;
+    s32 nWidth;
+    s32 nPrec;
+    char cPad;
+    u8 bUpper;
+    s32 nDigits;
+    s32 nPad;
+    u32 u;
+    u8 bNeg;
+    char* p;
+    char aDec[20];
+    char aHex[12];
+
+    pStart = pOut;
+    pEnd = pOut + nSize;
+    bLeft = 0;
+    if (pOut == NULL || nSize == 0 || szFormat == NULL) return -1;
+    nArg = 0;
+    while ((c = *szFormat++) != 0 && pOut < pEnd) {
+        if (c == '%') {
+            bUnsigned = 0;
+            nWidth = 0;
+            nPrec = -1;
+            c = *szFormat++;
+            cPad = ' ';
+            if (c == '-') {
+                bLeft = 1;
+                c = *szFormat++;
+            }
+            if (c == '0') {
+                cPad = c;
+                c = *szFormat++;
+            }
+            while (c >= '0' && c <= '9') {
+                nWidth = nWidth * 10 + c - '0';
+                c = *szFormat++;
+            }
+            if (c == '.') {
+                c = *szFormat++;
+            }
+            if (c >= '0' && c <= '9') {
+                nPrec = c - '0';
+                c = *szFormat++;
+            }
+            while (c >= '0' && c <= '9') {
+                nPrec = nPrec * 10 + c - '0';
+                c = *szFormat++;
+            }
+            bUpper = 0;
+            if (c >= 'A' && c <= 'Z') {
+                bUpper = 1;
+            }
+            switch (c) {
+            case 'c':
+                *pOut++ = pArgs[nArg++].n;
+                continue;
+            case 's': {
+                UISText* pText = pArgs[nArg++].pText;
+                if (pText->szText != NULL) {
+                    pOut = UIS_PutString(pOut, pEnd, pText->szText, nWidth, bLeft);
+                } else {
+                    pOut = UIS_PutString(pOut, pEnd, "(null)", nWidth, bLeft);
+                }
+                continue;
+            }
+            case 'u':
+                bUnsigned = 1;
+            case 'd':
+            case 'i':
+                nDigits = 0;
+                u = pArgs[nArg++].u;
+                bNeg = 0;
+                if (!bUnsigned && (s32)u < 0) {
+                    bNeg = 1;
+                }
+                if (bNeg) {
+                    u = -u;
+                }
+                do {
+                    aDec[nDigits++] = u % 10 + '0';
+                    u /= 10;
+                } while (u != 0);
+                if (nWidth != 0) {
+                    for (nPad = nWidth - bNeg - nDigits; nPad > 0; nPad--) {
+                        aDec[nDigits++] = cPad;
+                    }
+                }
+                if (bNeg) {
+                    aDec[nDigits++] = '-';
+                }
+                while (nDigits-- > 0 && pOut < pEnd) {
+                    *pOut++ = aDec[nDigits];
+                }
+                continue;
+            case 'f':
+                pOut = fn_8016BEDC(pOut, pEnd, nWidth, nPrec, pArgs[nArg++].f);
+                continue;
+            case 'X':
+            case 'p':
+            case 'x':
+                u = pArgs[nArg++].u;
+                nDigits = 0;
+                do {
+                    c = (u & 0xF) + '0';
+                    if (c > '9') {
+                        c += (bUpper ? 'A' : 'a') - '9' - 1;
+                    }
+                    u >>= 4;
+                    aHex[nDigits++] = c;
+                } while (u != 0);
+                if (nWidth != 0) {
+                    for (nPad = nWidth - nDigits; nPad > 0; nPad--) {
+                        aHex[nDigits++] = cPad;
+                    }
+                }
+                while (nDigits-- > 0 && pOut < pEnd) {
+                    *pOut++ = aHex[nDigits];
+                }
+                continue;
+            }
+        }
+        if (c != 0) {
+            *pOut++ = c;
+        }
+    }
+    *pOut++ = '\0';
+    return pOut - pStart - 1;
+}
+
+// Writes f with nPrec decimals (6 when negative), padded with spaces to nWidth characters, into
+// pOut up to pEnd. Returns the end of what it wrote.
+char* fn_8016BEDC(char* pOut, char* pEnd, s32 nWidth, s32 nPrec, f32 f) {
+    char aDigits[64];
+    s32 nDigits;
+    u8 bNeg;
+    f32 fRound;
+    s32 i;
+    f32 fFrac;
+    f32 fNext;
+    s32 nPad;
+
+    nDigits = 0;
+    if (nPrec < 0) {
+        nPrec = 6;
+    }
+    bNeg = f < 0.0f;
+    if (bNeg) {
+        f = -f;
+    }
+    fRound = 0.5f;
+    for (i = 0; i < nPrec; i++) {
+        fRound *= 0.1f;
+    }
+    f += fRound;
+    fFrac = f - (s32)f;
+    do {
+        fNext = f / 10.0f;
+        aDigits[nDigits++] = (s32)(f - (s32)fNext * 10) + '0';
+        f = fNext;
+    } while (f >= 1.0f);
+    if (bNeg) {
+        aDigits[nDigits++] = '-';
+    }
+    if (nWidth != 0) {
+        for (nPad = nWidth - (nPrec + (nDigits + (nPrec != 0))); nPad > 0; nPad--) {
+            aDigits[nDigits++] = ' ';
+        }
+    }
+    while (nDigits-- > 0 && pOut < pEnd) {
+        *pOut++ = aDigits[nDigits];
+    }
+    if (nPrec != 0 && pOut < pEnd) {
+        *pOut++ = '.';
+        do {
+            fFrac *= 10.0f;
+            *pOut++ = (s32)fFrac + '0';
+            fFrac -= (s32)fFrac;
+        } while (--nPrec != 0 && pOut < pEnd);
+    }
+    return pOut;
 }
 
 // The values every node is drawn with: fn_8016A510 adds a node's afAdd to the first and
