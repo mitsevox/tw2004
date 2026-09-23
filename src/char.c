@@ -66,19 +66,19 @@ void  fn_80112C64(int n);
 void  fn_80112CEC(void);
 
 // ---- sweep code (not yet cleaned up) ----
-s32 fn_8001E8A4(s32, s32);
-s32 fn_8001E938(s32, s32);
-void fn_80017864(void* arg0, s32 arg1);
+void fn_8001E8A4(u32* aBits, u32 nBits);
+void fn_8001E938(u32* aBits, u32 nBits);
+void fn_80017864(void* arg0, u32 (*arg1)[4]);
 void fn_8001B1DC(s32 p0, u8* p1, s32 p2);
 void fn_8001B1E8(void* p);
 void fn_8001C650(void* arg0, s32 arg1);
 
-void fn_80017864(void* arg0, s32 arg1) {
+void fn_80017864(void* arg0, u32 (*arg1)[4]) {
     if ((u32) (*(u32*)((u8*)(arg0) + 0x3C)) != 0U) {
-        fn_8001E8A4(arg1 + 0x20, 0x80);
-        fn_8001E8A4(arg1 + 0x30, 0x80);
-        fn_8001E938(arg1, 0x80);
-        fn_8001E938(arg1 + 0x10, 0x80);
+        fn_8001E8A4(arg1[2], 0x80);
+        fn_8001E8A4(arg1[3], 0x80);
+        fn_8001E938(arg1[0], 0x80);
+        fn_8001E938(arg1[1], 0x80);
     }
 }
 
@@ -546,6 +546,24 @@ void fn_8001E880(f32* pSrc, f32* pDst) {
     pDst[1] = pSrc[1];
     pDst[2] = pSrc[2];
     pDst[3] = 1.0f;
+}
+
+// Sets every bit of a bit array of nBits bits.
+void fn_8001E8A4(u32* aBits, u32 nBits) {
+    u32 i;
+
+    for (i = 0; i < (nBits + 31) >> 5; i++) {
+        aBits[i] = 0xFFFFFFFF;
+    }
+}
+
+// Clears every bit of a bit array of nBits bits.
+void fn_8001E938(u32* aBits, u32 nBits) {
+    u32 i;
+
+    for (i = 0; i < (nBits + 31) >> 5; i++) {
+        aBits[i] = 0;
+    }
 }
 
 u8 fn_8001E9CC(u32* aBits, u32 n) {
