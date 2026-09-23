@@ -4,7 +4,7 @@
 
 extern u8 lbl_80223C70[];
 s32 fn_80117600();
-void fn_8011ABF8();
+void fn_8011ABF8(s32 arg0);
 
 s32 fn_801197A4(void);
 s32 fn_801197CC(s32 p0, s32 p1);
@@ -15,6 +15,6 @@ s32 fn_801197A4(void) {
 }
 
 s32 fn_801197CC(s32 p0, s32 p1) {
-    fn_8011ABF8();
+    fn_8011ABF8(p0);
     return *(s32*)(lbl_80223C70 + (p1 << 2));
 }
