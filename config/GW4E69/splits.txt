@@ -1171,56 +1171,8 @@ GameMode22.c:
 SkinBurn.c:
 	.text       start:0x801270F0 end:0x80127D84
 
-unsorted/sweep_80127D84.c:
-	.text       start:0x80127D84 end:0x80127E44
-
-unsorted/sweep_80127E44.c:
-	.text       start:0x80127E44 end:0x80127F40
-
-unsorted/sweep_80128468.c:
-	.text       start:0x80128468 end:0x80128488
-
-unsorted/sweep_80128528.c:
-	.text       start:0x80128528 end:0x80128580
-
-unsorted/sweep_80128BC4.c:
-	.text       start:0x80128BC4 end:0x80128BF8
-
-unsorted/sweep_80128F58.c:
-	.text       start:0x80128F58 end:0x80128FD4
-
-unsorted/sweep_8012A2A8.c:
-	.text       start:0x8012A2A8 end:0x8012A364
-
-unsorted/sweep_8012A364.c:
-	.text       start:0x8012A364 end:0x8012A434
-
-unsorted/sweep_8012A434.c:
-	.text       start:0x8012A434 end:0x8012A4C4
-
-unsorted/sweep_8012A900.c:
-	.text       start:0x8012A900 end:0x8012A95C
-
-unsorted/sweep_8012B004.c:
-	.text       start:0x8012B004 end:0x8012B0D8
-
-unsorted/sweep_8012B0D8.c:
-	.text       start:0x8012B0D8 end:0x8012B190
-
-unsorted/sweep_8012C83C.c:
-	.text       start:0x8012C83C end:0x8012C854
-
-unsorted/sweep_8012C854.c:
-	.text       start:0x8012C854 end:0x8012C888
-
-unsorted/sweep_8012C888.c:
-	.text       start:0x8012C888 end:0x8012C8D0
-
-unsorted/sweep_8012CC48.c:
-	.text       start:0x8012CC48 end:0x8012CCC0
-
-unsorted/sweep_8012CCC0.c:
-	.text       start:0x8012CCC0 end:0x8012CCD8
+EASBStorage.c:
+	.text       start:0x80127D84 end:0x8012CCD8
 
 EASB.c:
 	.text       start:0x8012CCD8 end:0x8012E950
