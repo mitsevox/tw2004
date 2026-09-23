@@ -906,6 +906,115 @@ int fn_80105644(s16 nPart, int b, int i, int n) {
     return pAsset->a4A[n];
 }
 
+// Colour n of a part's choice i (from the list b), as RGBA bytes: the asset's own aColor[n], or for
+// colour kinds 0..2 that colour of the skin option the asset picks, on the club skin its category
+// uses (shafts and grips: the drivers' for the "fwd_" sets, else the irons') or the body skin.
+void fn_8010568C(s16 nPart, int b, int i, int n, u8* pColor) {
+    char szSet[16];                     // the size is unknown (the frame allows up to 16)
+    CrAPAsset* pAsset;
+    char* szCategory;
+    s32 nSet;
+    s32 nVariant;
+    s32 nOption;
+    f32* pOption;
+    Skin* pSkin;
+
+    pAsset = fn_80104E84(nPart, b, i);
+    if (pAsset == NULL) {
+        pColor[0] = 0;
+        pColor[1] = 0;
+        pColor[2] = 0;
+        pColor[3] = 0xFF;
+        return;
+    }
+    if (pAsset->aColorKind[n] == -1 || pAsset->aColorKind[n] > 2) {
+        pColor[0] = pAsset->aColor[n][0];
+        pColor[1] = pAsset->aColor[n][1];
+        pColor[2] = pAsset->aColor[n][2];
+        pColor[3] = pAsset->aColor[n][3];
+        return;
+    }
+    if (lbl_80281EE0->pB4->pChar == NULL) {
+        pColor[0] = pAsset->aColor[n][0];
+        pColor[1] = pAsset->aColor[n][1];
+        pColor[2] = pAsset->aColor[n][2];
+        pColor[3] = pAsset->aColor[n][3];
+        return;
+    }
+    szCategory = fn_801064EC(pAsset->nCategory);
+    if (stricmp(szCategory, "drivers") == 0) {
+        pSkin = lbl_80281EE0->pB4->pChar->p16D8->apSkins[0];
+    } else if (stricmp(szCategory, "Fairway Woods") == 0) {
+        pSkin = lbl_80281EE0->pB4->pChar->p16D8->apSkins[1];
+    } else if (stricmp(szCategory, "Iron Sets") == 0) {
+        pSkin = lbl_80281EE0->pB4->pChar->p16D8->apSkins[3];
+    } else if (stricmp(szCategory, "Wedge Sets") == 0) {
+        pSkin = lbl_80281EE0->pB4->pChar->p16D8->apSkins[5];
+    } else if (stricmp(szCategory, "Putters") == 0) {
+        pSkin = lbl_80281EE0->pB4->pChar->p16D8->apSkins[2];
+    } else if (stricmp(szCategory, "shafts") == 0) {
+        fn_800CB8F0(&pAsset->aSet[0], szSet);
+        if (stricmp(szSet, "fwd_shaft") == 0) {
+            pSkin = lbl_80281EE0->pB4->pChar->p16D8->apSkins[0];
+        } else {
+            pSkin = lbl_80281EE0->pB4->pChar->p16D8->apSkins[3];
+        }
+    } else if (stricmp(szCategory, "grips") == 0) {
+        fn_800CB8F0(&pAsset->aSet[0], szSet);
+        if (stricmp(szSet, "fwd_grip") == 0) {
+            pSkin = lbl_80281EE0->pB4->pChar->p16D8->apSkins[0];
+        } else {
+            pSkin = lbl_80281EE0->pB4->pChar->p16D8->apSkins[3];
+        }
+    } else {
+        pSkin = lbl_80281EE0->pB4->pChar->pSkin;
+    }
+    nSet = fn_800CDC2C(pSkin, pAsset->aSet[0]);
+    nVariant = fn_800CDCE0(pSkin, nSet, pAsset->aSetVariant[0]);
+    if (nSet >= 0 && nVariant >= 0) {
+        nOption = fn_800CDDB0(pSkin, nSet, nVariant, pAsset->aSetOption[0]);
+        if (nOption >= 0) {
+            // the option's data is three RGB colours, 0..1 each
+            pOption = (f32*)fn_800CD248(pSkin, nSet, nVariant, nOption);
+            if (pOption == NULL) {
+                pColor[0] = pAsset->aColor[n][0];
+                pColor[1] = pAsset->aColor[n][1];
+                pColor[2] = pAsset->aColor[n][2];
+                pColor[3] = pAsset->aColor[n][3];
+                return;
+            }
+            if (pAsset->aColorKind[n] == 0) {
+                pColor[0] = 255.0f * pOption[6];
+                pColor[1] = 255.0f * pOption[7];
+                pColor[2] = 255.0f * pOption[8];
+                pColor[3] = 0xFF;
+                return;
+            }
+            if (pAsset->aColorKind[n] == 1) {
+                pColor[0] = 255.0f * pOption[3];
+                pColor[1] = 255.0f * pOption[4];
+                pColor[2] = 255.0f * pOption[5];
+                pColor[3] = 0xFF;
+                return;
+            }
+            pColor[0] = 255.0f * pOption[0];
+            pColor[1] = 255.0f * pOption[1];
+            pColor[2] = 255.0f * pOption[2];
+            pColor[3] = 0xFF;
+            return;
+        }
+        pColor[0] = pAsset->aColor[n][0];
+        pColor[1] = pAsset->aColor[n][1];
+        pColor[2] = pAsset->aColor[n][2];
+        pColor[3] = pAsset->aColor[n][3];
+        return;
+    }
+    pColor[0] = pAsset->aColor[n][0];
+    pColor[1] = pAsset->aColor[n][1];
+    pColor[2] = pAsset->aColor[n][2];
+    pColor[3] = pAsset->aColor[n][3];
+}
+
 void fn_80105B4C(s16 nPart, int b, int i, char* pName) {
     fn_80105B80(fn_80104E84(nPart, b, i), pName);
 }
@@ -940,8 +1049,8 @@ u8 fn_80105C30(void) {
     return lbl_80282460 != NULL;
 }
 
-// How many different choices fit a part's entry b: assets of the same category and the same a58
-// bytes count once.
+// How many different choices fit a part's entry b: assets of the same category and the same first
+// colour count once.
 int fn_80105C44(s16 nPart, int b) {
     int nCount = 0;
     int i;
@@ -957,10 +1066,10 @@ int fn_80105C44(s16 nPart, int b) {
             for (j = i - 1; j >= 0; j--) {
                 if (nPart == lbl_80282460->pAssets[j].nPart && fn_801061C8(lbl_80282460->pAssets[j].n40) &&
                     lbl_80282460->pAssets[j].nCategory == lbl_80282460->pAssets[i].nCategory &&
-                    lbl_80282460->pAssets[j].a58[0] == lbl_80282460->pAssets[i].a58[0] &&
-                    lbl_80282460->pAssets[j].a58[1] == lbl_80282460->pAssets[i].a58[1] &&
-                    lbl_80282460->pAssets[j].a58[2] == lbl_80282460->pAssets[i].a58[2] &&
-                    lbl_80282460->pAssets[j].a58[3] == lbl_80282460->pAssets[i].a58[3]) {
+                    lbl_80282460->pAssets[j].aColor[0][0] == lbl_80282460->pAssets[i].aColor[0][0] &&
+                    lbl_80282460->pAssets[j].aColor[0][1] == lbl_80282460->pAssets[i].aColor[0][1] &&
+                    lbl_80282460->pAssets[j].aColor[0][2] == lbl_80282460->pAssets[i].aColor[0][2] &&
+                    lbl_80282460->pAssets[j].aColor[0][3] == lbl_80282460->pAssets[i].aColor[0][3]) {
                     bEarlier = 1;
                     break;
                 }

@@ -221,10 +221,12 @@ typedef struct CrAPAsset {
     s16  n44;                   // 0x044
     s16  n46;                   // 0x046
     s16  n48;                   // 0x048
-    s8   a4A[0x58 - 0x4A];      // 0x04A  indexed by fn_80105644's last argument
-    u8   a58[4];                // 0x058  assets of a category that differ here are different
-                                //        choices (fn_80105C44)
-    u8   unk5C[0x70 - 0x5C];
+    s8   a4A[6];                // 0x04A  indexed by fn_80105644's last argument
+    s8   aColorKind[6];         // 0x050  per colour: 0..2 take the skin option's colour of that
+                                //        kind (fn_8010568C); -1 and others use aColor
+    u8   unk56[2];
+    u8   aColor[6][4];          // 0x058  its colours, RGBA; assets of a category whose first
+                                //        colour differs are different choices (fn_80105C44)
     u64  aPart[4];            // 0x070  } the ids of four skin parts it sets (fn_800CDAFC finds
     u64  aVariant[4];           // 0x090  } them) and the id of each one's variant (fn_80106A64)
     u64  aSet[4];               // 0x0B0  the ids of four skin sets; taking the asset off puts
