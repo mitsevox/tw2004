@@ -187,6 +187,17 @@ Dated log of what was done and decided, newest last. Facts and lessons belong in
   80 by length. The +5% is "never up, never in" for average putters. The rim is modelled, not
   the game's (cup geometry not decoded); `--cup 2.25` shows the same pattern. Side find:
   surfaces 98/105 are the cup (the "water" comment in `AI_PlanShot` was wrong).
+- **`Ball.c` polish: 56 -> 63 of 68 exact** (unit 99.66%). Set up `decomp-permuter` on Windows
+  (`tw2004-notes.md`, "The permuter"). Matched: the putt and club lookups (one result variable;
+  a `ClubRow_Dist` accessor), flagstick (squared distance inline), the landing flag lookup
+  (`Ball_SpinKeep` inline), rolling (`fTurn = -fTurn` in place), the ground check (`Ball_Owner`
+  inline with an early return), the cup pull. Two real fixes found by matching: the club tables
+  are power 0.1..1.1 (reach = full power, last column 110%), and the cup pull's "no speed-up"
+  limit is on axis speed (> ~1.5 ft/s), not the heading angle; the putt harness and hypothesis 6
+  were rerun (same conclusions). Left: `fn_80052598` (bounce, saved-register choice across nine
+  reused floats), `Ball_FlightStep` (one hoisted address), `Ball_SetLie` (one `beq; b` branch),
+  `Ball_Collide` / `fn_80053240` (the owner chain's base pointer in r5, not r4). Permuter jobs
+  for all five were running at the end of the session (`C:\dev\scratch	w\perm\`).
 - **Next (agreed with the user, in this order):**
   1. ~~Putt test harness for hypothesis 6~~ (done, entry above). Build a host-side (PC) C or Python model of the roll
      physics now in C (`fn_80052268` skid, `Ball_GroundContact` roll incl. break = slope / (0.457
