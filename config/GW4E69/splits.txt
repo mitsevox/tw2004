@@ -3489,6 +3489,8 @@ src/ax/AXProf.c:
 
 src/axfx/reverb_hi.c:
 	.text       start:0x801381CC end:0x80138EC8
+	.data       start:0x801998C0 end:0x801998E0
+	.sdata2     start:0x80284B68 end:0x80284BA8
 
 src/axfx/delay.c:
 	.text       start:0x80138EC8 end:0x80139374

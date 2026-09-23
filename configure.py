@@ -469,7 +469,7 @@ config.libs = [
             Object(Matching, "src/ax/AXCL.c"),
             Object(Matching, "src/ax/AXSPB.c"),
             Object(Matching, "src/ax/AXProf.c"),
-            Object(NonMatching, "src/axfx/reverb_hi.c"),
+            Object(Matching, "src/axfx/reverb_hi.c"),
             Object(Matching, "src/axfx/delay.c"),
             Object(NonMatching, "src/dsp/dsp.c"),
             Object(Matching, "src/dvd/dvdFatal.c"),
