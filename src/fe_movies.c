@@ -1,4 +1,9 @@
+// fe_movies.c (TW06's file name, a guess from the filemap): the front end's movies. Not yet
+// decompiled; the sweep code below is the matched small functions.
+
 #include "game_types.h"
+
+// ---- sweep code (not yet cleaned up) ----
 
 extern u8 lbl_80281370;
 void fn_80091454(void);
@@ -68,3 +73,5 @@ void fn_80092274(s32 p0) {
 s32 fn_800922A0(u8* p) {
     return *(s32*)(p + 0x8);
 }
+
+// ---- end of sweep code ----
