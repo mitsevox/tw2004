@@ -542,13 +542,16 @@ EASBErrorE fn_8012E818(u8 n, void* pImage) {
     return EASB_ERROR_IMAGE_NOT_SUPPORTED;
 }
 
-EASBErrorE fn_8012E820(s32 arg0, s32 arg1, u32 arg2, u32 arg3, u32 arg4) {
+// Splits a number of seconds into days, hours, minutes and seconds.
+EASBErrorE fn_8012E820(u32 uTime, u16* pnDays, u8* pnHours, u8* pnMinutes, u8* pnSeconds) {
     EASBErrorE eError;
 
-    if (arg1 == 0 || arg2 == 0 || arg3 == 0 || arg4 == 0) return EASB_ERROR_NULL_PARAMETERS;
+    if (pnDays == NULL || pnHours == NULL || pnMinutes == NULL || pnSeconds == NULL) {
+        return EASB_ERROR_NULL_PARAMETERS;
+    }
     eError = fn_8012CCD8(EASB_NEED_ANY);
     if (eError != EASB_ERROR_NONE) return eError;
-    return fn_8012881C(arg0, arg1, arg2, arg3, arg4);
+    return fn_8012881C(uTime, pnDays, pnHours, pnMinutes, pnSeconds);
 }
 
 EASBErrorE fn_8012E8A8(s32 arg0, s32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5, u32 arg6) {

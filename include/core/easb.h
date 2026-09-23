@@ -201,7 +201,7 @@ EASBErrorE fn_80128FD4(EASBTotals* pTotals, u16* puLevel, f32* pfProgress);
 EASBErrorE fn_801291A8(u16 uLevel, u16 u1160, u16* puLevel);
 EASBErrorE fn_80129218(u16 uLevel, u16 u1160, u16* puLevel);
 u32 fn_80128BC4(u32 uTime);         // clamps a time to 2003-01-01..2023-01-01
-s32 fn_8012881C(s32 arg0, s32 arg1, u32 arg2, u32 arg3, u32 arg4);
+EASBErrorE fn_8012881C(u32 uTime, u16* pnDays, u8* pnHours, u8* pnMinutes, u8* pnSeconds);
 s32 fn_801288DC(s32 arg0, s32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5, u32 arg6);
 EASBErrorE fn_8012C5F8(EASBTotals* pTotals, EASBProduct* pProduct, u8* p2);
 EASBErrorE fn_8012C69C(void);
@@ -255,7 +255,7 @@ EASBErrorE fn_8012E2D4(u8 nProduct, u32* pOut);
 EASBErrorE fn_8012E34C(u8 nProduct, u32* pOut);
 EASBErrorE fn_8012E3C0(u8 nProduct, u32* pOut);
 EASBErrorE fn_8012E818(u8 n, void* pImage);
-EASBErrorE fn_8012E820(s32 arg0, s32 arg1, u32 arg2, u32 arg3, u32 arg4);
+EASBErrorE fn_8012E820(u32 uTime, u16* pnDays, u8* pnHours, u8* pnMinutes, u8* pnSeconds);
 EASBErrorE fn_8012E8A8(s32 arg0, s32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5, u32 arg6);
 
 // ---- EASportsBio.c: the game's side ----

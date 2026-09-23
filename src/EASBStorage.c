@@ -72,7 +72,7 @@ s32 fn_80127E44(EASBAccomplishment* pA, EASBAccomplishment* pB, s32 nSort) {
 }
 
 // Whether uYear is a leap year.
-u8 fn_80127F40(u16 uYear) {
+u8 fn_80127F40(u32 uYear) {
     if ((uYear & 3) || (uYear % 100 == 0 && uYear % 400 != 0)) {
         return 0;
     }
@@ -83,7 +83,6 @@ u8 fn_80127F40(u16 uYear) {
 // of a usable length.
 EASBErrorE fn_80127F88(EASBProduct* pProduct) {
     u32 uLength;
-    EASBErrorE eError;
 
     if (pProduct == NULL) return EASB_ERROR_NULL_PARAMETERS;
     if (pProduct->bValid == 0) return EASB_ERROR_INVALID_PRODUCT;
@@ -94,17 +93,15 @@ EASBErrorE fn_80127F88(EASBProduct* pProduct) {
     if (fn_8012835C(pProduct->szGamesPlayedType, EASB_GAMES_PLAYED_TYPE_SIZE, &uLength) != EASB_ERROR_NONE) {
         return EASB_ERROR_INVALID_PRODUCT;
     }
-    eError = EASB_ERROR_NONE;
     if (fn_8012830C(pProduct->szName, EASB_PRODUCT_NAME_SIZE, &uLength) != EASB_ERROR_NONE) {
-        eError = EASB_ERROR_INVALID_PRODUCT;
+        return EASB_ERROR_INVALID_PRODUCT;
     }
-    return eError;
+    return EASB_ERROR_NONE;
 }
 
 // Checks an accomplishment: in use, set within 2003-2023, u86 in 1-250 and a usable name.
 EASBErrorE fn_80128054(EASBAccomplishment* pAccomplishment) {
     u32 uLength;
-    EASBErrorE eError;
 
     if (pAccomplishment == NULL) return EASB_ERROR_NULL_PARAMETERS;
     if (pAccomplishment->bValid == 0) return EASB_ERROR_INVALID_ACCOMPLISHMENT;
@@ -114,11 +111,10 @@ EASBErrorE fn_80128054(EASBAccomplishment* pAccomplishment) {
     if (pAccomplishment->u86 < 1 || pAccomplishment->u86 > 250) {
         return EASB_ERROR_INVALID_ACCOMPLISHMENT;
     }
-    eError = EASB_ERROR_NONE;
     if (fn_8012835C(pAccomplishment->szName, EASB_ACCOMPLISHMENT_NAME_SIZE, &uLength) != EASB_ERROR_NONE) {
-        eError = EASB_ERROR_INVALID_ACCOMPLISHMENT;
+        return EASB_ERROR_INVALID_ACCOMPLISHMENT;
     }
-    return eError;
+    return EASB_ERROR_NONE;
 }
 
 // Whether the library knows the language uLanguage.
@@ -162,8 +158,8 @@ u8 fn_801281B4(u16 uLanguage, u16* aLanguages, u8 nLanguages) {
 // The length of sz in *puLength: too large when it fills uSize, too small when empty.
 EASBErrorE fn_8012830C(char* sz, u32 uSize, u32* puLength) {
     *puLength = 0;
-    while (sz[*puLength] != '\0' && *puLength < uSize) {
-        (*puLength)++;
+    while ((u8)sz[*puLength] != '\0' && *puLength < uSize) {
+        *puLength = *puLength + 1;
     }
     if (*puLength >= uSize) return EASB_ERROR_STRING_TOO_LARGE;
     if (*puLength == 0) return EASB_ERROR_STRING_TOO_SMALL;
@@ -174,7 +170,7 @@ EASBErrorE fn_8012830C(char* sz, u32 uSize, u32* puLength) {
 EASBErrorE fn_8012835C(u16* sz, u32 uSize, u32* puLength) {
     *puLength = 0;
     while (sz[*puLength] != 0 && *puLength < uSize) {
-        (*puLength)++;
+        *puLength = *puLength + 1;
     }
     if (*puLength >= uSize) return EASB_ERROR_STRING_TOO_LARGE;
     if (*puLength == 0) return EASB_ERROR_STRING_TOO_SMALL;
@@ -183,8 +179,8 @@ EASBErrorE fn_8012835C(u16* sz, u32 uSize, u32* puLength) {
 
 // Checks the game's start-up parameters (fn_8012D394).
 EASBErrorE fn_801283B0(EASBInitParams* pParams) {
-    u32 uNameLength;
     u32 uTypeLength;
+    u32 uNameLength;
     EASBErrorE eError;
 
     if (pParams == NULL) return EASB_ERROR_NULL_PARAMETERS;
@@ -301,6 +297,18 @@ void fn_8012872C(EASBAccomplishment** apList, s32 nCount, s32 nSort) {
     }
 }
 
+// Splits a number of seconds into days, hours, minutes and seconds.
+EASBErrorE fn_8012881C(u32 uTime, u16* pnDays, u8* pnHours, u8* pnMinutes, u8* pnSeconds) {
+    if (pnDays == NULL || pnHours == NULL || pnMinutes == NULL || pnSeconds == NULL) {
+        return EASB_ERROR_NULL_PARAMETERS;
+    }
+    *pnSeconds = uTime % 60;
+    *pnMinutes = (uTime / 60) % 60;
+    *pnHours = (uTime / 3600) % 24;
+    *pnDays = uTime / 86400;
+    return EASB_ERROR_NONE;
+}
+
 // Clamps a time to 2003-01-01..2023-01-01.
 u32 fn_80128BC4(u32 uTime) {
     u32 uClamped;
@@ -382,7 +390,7 @@ u16 fn_80128E6C(u16 c, u16 uLanguage) {
 
 // Maps every character of sz through fn_80128E28's table.
 void fn_80128EC0(char* sz) {
-    while (*sz != '\0') {
+    while ((u8)*sz != '\0') {
         *sz = fn_80128E28(*sz);
         sz++;
     }
@@ -390,9 +398,12 @@ void fn_80128EC0(char* sz) {
 
 // The same for wide text (fn_80128E6C).
 void fn_80128F04(u16* sz, u16 uLanguage) {
-    while (*sz != 0) {
-        *sz = fn_80128E6C(*sz, uLanguage);
-        sz++;
+    u16* pc;
+
+    pc = sz;
+    while (*pc != 0) {
+        *pc = fn_80128E6C(*pc, uLanguage);
+        pc++;
     }
 }
 
@@ -420,6 +431,105 @@ u32 fn_80128F58(u32 uValue, u32 uScaleB, u32 uDivisor, u32 uScaleA) {
         }
     }
     return fn_80128468(uA, uB);
+}
+
+// The Bio's level from its totals: points for the games in it, the hours played and the two
+// counters, then level n needs 20 * n + 1000 points more than level n - 1. *pfProgress is how
+// far into the next level the points go (0 to 1).
+EASBErrorE fn_80128FD4(EASBTotals* pTotals, u16* puLevel, f32* pfProgress) {
+    u32 nHours0;
+    u32 nHours4;
+    u32 uProducts;
+    u32 uHours0;
+    u32 uHours4;
+    u32 u8Points;
+    u32 uCPoints;
+    u32 uPoints;
+    u32 uLevelEnd;
+    u32 uLevelStart;
+    u16 nLevel;
+
+    if (puLevel == NULL || pfProgress == NULL) return EASB_ERROR_NULL_PARAMETERS;
+    nHours0 = pTotals->u0 / 3600;
+    *puLevel = 0;
+    nHours4 = pTotals->u4 / 3600;
+    *pfProgress = 0.0f;
+    uProducts = fn_80128F58(pTotals->nProducts, 600, 5, 1500);
+    uHours0 = fn_80128F58(nHours0, 50, 50, 150);
+    uHours4 = fn_80128F58(nHours4, 5, 1, 0);
+    u8Points = fn_80128F58(pTotals->u8, 50, 1, 0);
+    uCPoints = fn_80128F58(pTotals->uC, 150, 1, 0);
+    uPoints = fn_80128468(uProducts, uHours0);
+    uPoints = fn_80128468(uPoints, uHours4);
+    uPoints = fn_80128468(uPoints, u8Points);
+    uPoints = fn_80128468(uPoints, uCPoints);
+    uLevelEnd = 0;
+    uLevelStart = 0;
+    for (nLevel = 1; nLevel <= EASB_MAX_LEVEL; nLevel++) {
+        if (uPoints < uLevelEnd) break;
+        uLevelStart = uLevelEnd;
+        uLevelEnd = (nLevel + 1) * 20 + uLevelEnd + 1000;
+    }
+    *puLevel = nLevel - 1;
+    *pfProgress = (f32)(uPoints - uLevelStart) / (f32)(uLevelEnd - uLevelStart);
+    if (*pfProgress >= 1.0f) {
+        *pfProgress = 1.0f;
+    }
+    if (*pfProgress < 0.0f) {
+        *pfProgress = 0.0f;
+    }
+    return EASB_ERROR_NONE;
+}
+
+// The level after a drop: uLevel less (u1160 - 5), kept within 1..EASB_MAX_LEVEL; the top level
+// never drops.
+EASBErrorE fn_801291A8(u16 uLevel, u16 u1160, u16* puLevel) {
+    s32 nDrop;
+    s32 nLevel;
+
+    if (puLevel == NULL) return EASB_ERROR_NULL_PARAMETERS;
+    nDrop = u1160 - 5;
+    if (nDrop < 0) {
+        nDrop = 0;
+    }
+    nLevel = uLevel - nDrop;
+    if (nLevel < 1) {
+        *puLevel = 1;
+    } else if (nLevel > EASB_MAX_LEVEL) {
+        *puLevel = EASB_MAX_LEVEL;
+    } else {
+        *puLevel = nLevel;
+    }
+    if (uLevel == EASB_MAX_LEVEL) {
+        *puLevel = EASB_MAX_LEVEL;
+    }
+    return EASB_ERROR_NONE;
+}
+
+// The level after a rise: uLevel plus (u1160 - 5), kept within 1..EASB_MAX_LEVEL; EASB_MAX_LEVEL + 1
+// stays as it is.
+EASBErrorE fn_80129218(u16 uLevel, u16 u1160, u16* puLevel) {
+    s32 nRise;
+    s32 nLevel;
+
+    if (puLevel == NULL) return EASB_ERROR_NULL_PARAMETERS;
+    if (uLevel == EASB_MAX_LEVEL + 1) {
+        *puLevel = EASB_MAX_LEVEL + 1;
+        return EASB_ERROR_NONE;
+    }
+    nRise = u1160 - 5;
+    if (nRise < 0) {
+        nRise = 0;
+    }
+    nLevel = uLevel + nRise;
+    if (nLevel < 1) {
+        *puLevel = 1;
+    } else if (nLevel > EASB_MAX_LEVEL) {
+        *puLevel = EASB_MAX_LEVEL;
+    } else {
+        *puLevel = nLevel;
+    }
+    return EASB_ERROR_NONE;
 }
 
 // ---- sweep code (not yet cleaned up) ----
