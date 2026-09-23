@@ -6,11 +6,15 @@
 // scoring average, ...), each statistic's ranking, and the text fe_stats.c prints.
 
 #include "engine.h"
+#include "game.h"
 #include "game/save.h"
 #include "game/modes/pgatoursim.h"
 
 PgaEntrantMC* GetEntrantMCPtr(int nPlayer, int nEntrant);
 s32  fn_80118664(int nPlayer);
+s32  fn_801191D0(int nPlayer, int nEntrant, u8 b);
+s32  TotalEntrantHoleScores(int nEntrant);
+void fn_8011A074(int nPlayer, int nRound, int nEntrant, int nHole);
 void fn_8011A890(int nPlayer);
 void fn_8011AAC0(int nPlayer);
 void fn_8011AC40(int nPlayer, GM_Pga_StatTypes_t nStat);
@@ -21,6 +25,11 @@ void CalcAllStatsIfDirty(int nPlayer);
 void CalcScoreRankingsIfDirty(int nPlayer);
 void CalcAllStats(int nPlayer);
 void fn_80117694(UStreamObject* pObject);
+
+f32  fn_8000B318(int nStream);          // a normally distributed random number (mean 0, deviation 1)
+// qsort
+void fn_8015929C(void* pBase, u32 nCount, u32 nSize, s32 (*pfnCompare)(const void* pA, const void* pB));
+int  fn_800D31A4(int nPar);             // the number of the 18 holes with that par
 
 PgaEntrant* GetEntrantNonMCPtr(int nEntrant) {
     return &lbl_80224070[nEntrant];
@@ -74,6 +83,31 @@ void GM_PgaTourSim_GetStatValString(GM_Pga_StatTypes_t nStat, f32 fValue, char* 
 // A sort comparison for s32s, smallest first.
 s32 IntCompareIncreasing(const void* pA, const void* pB) {
     return *(const s32*)pA - *(const s32*)pB;
+}
+
+// A sort comparison for entrants: by their pro's f50, smallest first; the player's golfer last.
+s32 fn_80118A5C(const void* pA, const void* pB) {
+    s32 nEntrantB = *(const s32*)pB;
+    s32 nGolfer;
+    f32 fA;
+    f32 fB;
+
+    nGolfer = fn_80119118(0, *(const s32*)pA);
+    if (nGolfer == PGA_USER_GOLFER) {
+        fA = 10000.0f;
+    } else {
+        fA = lbl_8024B9CC[nGolfer].f50;
+    }
+    nGolfer = fn_80119118(0, nEntrantB);
+    if (nGolfer == PGA_USER_GOLFER) {
+        fB = 10000.0f;
+    } else {
+        fB = lbl_8024B9CC[nGolfer].f50;
+    }
+    if (fA < fB) {
+        return -1;
+    }
+    return fA > fB;
 }
 
 // The golfer's name: a tour pro's, or the player's profile name.
@@ -170,12 +204,110 @@ void fn_801198F8(int nPlayer, int nHole) {
     gbScoresDirty = 1;
 }
 
+// Moves the other entrants on 0 to 2 holes, keeping them at least one hole ahead of the player
+// and at most on the 18th.
+void fn_80119934(int nPlayer) {
+    s32 nEntrants;
+    PgaEntrant* pEntrant;
+    s32 nMinHole;
+    s32 i;
+
+    nEntrants = fn_80118664(nPlayer);
+    pEntrant = GetEntrantNonMCPtr(0);
+    GetEntrantMCPtr(nPlayer, 0);
+    nMinHole = pEntrant->nCurrentHole;
+    nMinHole++;                 // fake match: one statement, "+ 1", swaps the saved registers
+    for (i = 1; i < nEntrants; i++) {
+        pEntrant = GetEntrantNonMCPtr(i);
+        pEntrant->nCurrentHole += Rand_Next(0) % 3;
+        pEntrant->nCurrentHole = pEntrant->nCurrentHole <= nMinHole ? nMinHole : pEntrant->nCurrentHole;
+        pEntrant->nCurrentHole = 18 < pEntrant->nCurrentHole ? 18 : pEntrant->nCurrentHole;
+    }
+    gbScoresDirty = 1;
+}
+
 s32 fn_80119A04(int nPlayer, int nEntrant) {
     return GetEntrantNonMCPtr(nEntrant)->nCurrentHole;
 }
 
 s32 fn_80119A2C(int nPlayer, int nEntrant) {
     return GetEntrantMCPtr(nPlayer, nEntrant)->n18;
+}
+
+// The cut: the first score row placed below 70th (the top 70 and ties play on), else the last row.
+s32 fn_80119A50(int nPlayer) {
+    s32 nEntrants = fn_80118664(nPlayer);
+    s32 nRow = nEntrants - 1;
+    s32 i;
+
+    CalcScoreRankingsIfDirty(nPlayer);
+    for (i = 0; i < nEntrants; i++) {
+        if (lbl_80223C70.aRank[lbl_80223C70.aEntrant[i]] > 70) {
+            nRow = i;
+            break;
+        }
+    }
+    return nRow;
+}
+
+// The first score row holding an entrant who was cut, or -1.
+s32 fn_80119AE0(int nPlayer) {
+    s32 nEntrants = fn_80118664(nPlayer);
+    s32 nRow = -1;
+    s32 i;
+
+    for (i = 0; i < nEntrants; i++) {
+        if (fn_801197A4(nPlayer, lbl_80223C70.aEntrant[i])) {
+            nRow = i;
+            break;
+        }
+    }
+    return nRow;
+}
+
+// Simulates an entrant's strokes on a hole: the pro's scoring average for the hole's par (the
+// player's entrant uses the first pro's), scaled so the round's holes add up to a quarter of the
+// entrant's target score, plus a normal random spread that grows with the par; 1 to 10 strokes.
+void fn_80119B54(int nPlayer, int nRound, int nEntrant, int nHole) {
+    PgaEntrantMC* pEntrantMC = GetEntrantMCPtr(nPlayer, nEntrant);
+    PgaEntrant* pEntrant = GetEntrantNonMCPtr(nEntrant);
+    PgaPro* pPro;
+    s32 nPar;
+    f32 fScale;
+    f32 fRound;                 // the pro's average round on this course
+    f32 fPar3;
+    f32 fPar4;
+    f32 fPar5;
+    f32 fStrokes;
+    s32 nStrokes;
+
+    if (fn_8011908C(nPlayer, nEntrant)) {
+        pPro = &lbl_8024B9CC[0];
+    } else {
+        pPro = &lbl_8024B9CC[pEntrantMC->nGolfer];
+    }
+    nPar = fn_800D2AD8(nHole);
+    fRound = pPro->fPar3Avg * fn_800D31A4(3) + pPro->fPar4Avg * fn_800D31A4(4)
+           + pPro->fPar5Avg * fn_800D31A4(5);
+    fScale = 0.25f * pEntrantMC->nTargetScore / fRound;
+    fPar3 = fScale * pPro->fPar3Avg;
+    fPar4 = fScale * pPro->fPar4Avg;
+    fPar5 = fScale * pPro->fPar5Avg;
+    switch (nPar) {
+    case 3:
+        fStrokes = 0.5f * fn_8000B318(0) + fPar3;
+        break;
+    case 4:
+        fStrokes = 0.6f * fn_8000B318(0) + fPar4;
+        break;
+    case 5:
+        fStrokes = 0.7f * fn_8000B318(0) + fPar5;
+        break;
+    }
+    // EA bug: fStrokes is never set on a hole whose par is not 3, 4 or 5.
+    nStrokes = (s32)(0.5f + fStrokes);
+    nStrokes = nStrokes > 1 ? nStrokes : 1;
+    pEntrant->aHoleStrokes[nHole] = nStrokes > 10 ? 10 : nStrokes;
 }
 
 s32 TotalEntrantHoleScores(int nEntrant) {
@@ -187,6 +319,104 @@ s32 TotalEntrantHoleScores(int nEntrant) {
         nTotal += pEntrant->aHoleStrokes[i];
     }
     return nTotal;
+}
+
+// Brings an entrant's simulated round to its target: a quarter of the entrant's target score,
+// give or take up to 3 strokes at random, in the first three rounds; in the last, what is left of
+// the target. Strokes come off random holes (a par-like 2 only rarely) or go on them (a hole
+// already at 6 or more only rarely) until the round adds up.
+void fn_80119E28(int nPlayer, int nEntrant, int nRound) {
+    PgaEntrantMC* pEntrantMC = GetEntrantMCPtr(nPlayer, nEntrant);
+    PgaEntrant* pEntrant = GetEntrantNonMCPtr(nEntrant);
+    s32 nTarget;
+    f32 fTarget;
+    f32 fScore;
+
+    gbStatsDirty = 1;
+    gbScoresDirty = 1;
+    if (nRound < 3) {
+        fTarget = 0.25f * pEntrantMC->nTargetScore;
+        fScore = fTarget + fn_8000B318(0);
+        fScore = fScore <= fTarget - 3.0f ? fTarget - 3.0f : fScore;
+        fScore = fScore <= 3.0f + fTarget ? fScore : 3.0f + fTarget;
+        nTarget = (s32)(0.5f + fScore);
+    } else {
+        nTarget = pEntrantMC->nTargetScore - fn_801191D0(nPlayer, nEntrant, 0);
+    }
+    while (TotalEntrantHoleScores(nEntrant) > nTarget) {
+        s32 nHole = Rand_Next(0) % 18;
+        u8 bDone = 0;
+
+        while (!bDone) {
+            if (pEntrant->aHoleStrokes[nHole] > 1) {
+                if (pEntrant->aHoleStrokes[nHole] == 2) {
+                    if (Rand_Float(0) < 0.0005f) {
+                        bDone = 1;
+                        pEntrant->aHoleStrokes[nHole]--;
+                    }
+                } else {
+                    pEntrant->aHoleStrokes[nHole]--;
+                    bDone = 1;
+                }
+            }
+            nHole++;
+            if (nHole >= 18) {
+                nHole = 0;
+            }
+        }
+    }
+    while (TotalEntrantHoleScores(nEntrant) < nTarget) {
+        s32 nHole = Rand_Next(0) % 18;
+        u8 bDone = 0;
+
+        while (!bDone) {
+            if (pEntrant->aHoleStrokes[nHole] < 10) {
+                if (pEntrant->aHoleStrokes[nHole] >= 6) {
+                    if (Rand_Float(0) < 0.01f) {
+                        bDone = 1;
+                        pEntrant->aHoleStrokes[nHole]++;
+                    }
+                } else {
+                    pEntrant->aHoleStrokes[nHole]++;
+                    bDone = 1;
+                }
+            }
+            nHole++;
+            if (nHole >= 18) {
+                nHole = 0;
+            }
+        }
+    }
+}
+
+// The season statistics of the round for every CPU entrant still playing (everyone in the first
+// two rounds, then those who made the cut), hole by hole. TW06: GM_PgaTourSim_SimStats.
+void fn_8011A538(int nPlayer) {
+    s32 nEntrants = fn_80118664(nPlayer);
+    int i;
+    s32 nHole;
+
+    for (i = 0; i < nEntrants; i++) {
+        if (!fn_8011908C(nPlayer, i)
+            && (gpSaveData[nPlayer].tour.nRound <= 1 || !fn_801197A4(nPlayer, i))) {
+            for (nHole = 0; nHole < 18; nHole++) {
+                fn_8011A074(nPlayer, gpSaveData[nPlayer].tour.nRound, i, nHole);
+            }
+        }
+    }
+}
+
+// Starts a playoff between the entrants tied first. TW06: GM_PgaTourSim_InitPlayoff.
+void fn_8011A5F8(int nPlayer) {
+    s32 nEntrants = fn_80118664(nPlayer);
+    s32 i;
+    PgaEntrant* pEntrant;
+
+    for (i = 0; i < nEntrants; i++) {
+        pEntrant = GetEntrantNonMCPtr(i);
+        pEntrant->bInPlayoff = fn_801190D8(nPlayer, i) == 1;
+    }
+    lbl_80282504 = 0;
 }
 
 s32 fn_8011A684(int nPlayer) {
@@ -207,6 +437,46 @@ u8 fn_8011A6F4(int nPlayer, int nEntrant) {
     return GetEntrantNonMCPtr(nEntrant)->bInPlayoff;
 }
 
+// A playoff hole played: an entrant who beat the player's strokes knocks the player out, and one
+// who took more drops out. TW06: GM_PgaTourSim_UpdatePlayoffs.
+void fn_8011A720(int nPlayer, int nHole) {
+    s32 nEntrants = fn_80118664(nPlayer);
+    s32 i;
+    PgaEntrant* pEntrant;
+    PgaEntrant* pUser;
+
+    for (i = 1; i < nEntrants; i++) {
+        pEntrant = GetEntrantNonMCPtr(i);
+        if (pEntrant->bInPlayoff) {
+            if (pEntrant->aHoleStrokes[nHole] < lbl_80282504) {
+                pUser = GetEntrantNonMCPtr(0);
+                pUser->bInPlayoff = 0;
+                return;
+            }
+            if (pEntrant->aHoleStrokes[nHole] > lbl_80282504) {
+                pEntrant->bInPlayoff = 0;
+            }
+        }
+    }
+}
+
+// The fewest strokes on a playoff hole among the player's opponents still in it (999: none).
+// TW06: GM_PgaTourSim_GetBestOpponentPlayoffHoleScore.
+s32 fn_8011A7C8(int nPlayer, int nHole) {
+    s32 i;
+    s32 nBest = 999;
+    s32 nEntrants = fn_80118664(nPlayer);
+    PgaEntrant* pEntrant;
+
+    for (i = 1; i < nEntrants; i++) {
+        pEntrant = GetEntrantNonMCPtr(i);
+        if (pEntrant->bInPlayoff) {
+            nBest = nBest <= pEntrant->aHoleStrokes[nHole] ? nBest : pEntrant->aHoleStrokes[nHole];
+        }
+    }
+    return nBest;
+}
+
 void CalcAllStatsIfDirty(int nPlayer) {
     if (gbStatsDirty) {
         CalcAllStats(nPlayer);
@@ -219,6 +489,38 @@ void CalcScoreRankingsIfDirty(int nPlayer) {
         fn_8011A890(nPlayer);
         gbScoresDirty = 0;
         fn_8011AAC0(nPlayer);
+    }
+}
+
+// Ranks every tour golfer in a statistic: sorts them with the statistic's comparison, then gives
+// each its place; golfers whose values print the same share the place.
+void fn_8011AC40(int nPlayer, GM_Pga_StatTypes_t nStat) {
+    PgaStatRanking* pRanking = &lbl_80226870[nStat];
+    char* szValue;
+    s32 nRow;
+    s32 nGolfer;
+    s32 nRank;
+    char szPrev[16];
+    int i;
+
+    for (i = 0; i < PGA_NUM_GOLFERS; i++) {
+        pRanking->aGolfer[i] = i;
+    }
+    lbl_80281840.nPlayer = nPlayer;
+    lbl_80281840.nStat = nStat;
+    fn_8015929C(pRanking->aGolfer, PGA_NUM_GOLFERS, sizeof(pRanking->aGolfer[0]), lbl_80193FF8[nStat]);
+    lbl_80281840.nStat = -1;
+    lbl_80281840.nPlayer = 0;
+    sprintf(szPrev, "");
+    nRank = 0;
+    for (nRow = 0; nRow < PGA_NUM_GOLFERS; nRow++) {
+        nGolfer = pRanking->aGolfer[nRow];
+        szValue = pRanking->aValue[nGolfer].szValue;
+        if (strcmp(szPrev, szValue) != 0) {
+            nRank = nRow + 1;
+            strcpy(szPrev, szValue);
+        }
+        pRanking->aRank[nGolfer] = nRank;
     }
 }
 
@@ -447,6 +749,63 @@ void CalcTotalDriving(int nGolfer, f32* pfValue) {
 
 void CalcBallStriking(int nGolfer, f32* pfValue) {
     *pfValue = StatRank(GM_PGA_STAT_TOTALDRIVING, nGolfer) + StatRank(GM_PGA_STAT_GIR, nGolfer);
+}
+
+// The statistic sort comparisons (lbl_80193FF8). Golfers whose values print differently go by
+// value, a golfer with no value (0) last; the same printed value goes by name.
+
+// Lower is better.
+s32 fn_8011BBD8(const void* pA, const void* pB) {
+    s32 nGolferA = *(const s32*)pA;
+    s32 nGolferB = *(const s32*)pB;
+    s32 nRet;
+    int nPlayer = lbl_80281840.nPlayer;
+    f32 fA = lbl_80226870[lbl_80281840.nStat].aValue[nGolferA].fValue;
+    f32 fB = lbl_80226870[lbl_80281840.nStat].aValue[nGolferB].fValue;
+
+    if (strcmp(lbl_80226870[lbl_80281840.nStat].aValue[nGolferA].szValue,
+               lbl_80226870[lbl_80281840.nStat].aValue[nGolferB].szValue) != 0) {
+        if (fA < fB) {
+            if (0.0f == fA) {
+                nRet = 1;
+            } else {
+                nRet = -1;
+            }
+        } else if (fA > fB) {
+            if (0.0f == fB) {
+                nRet = -1;
+            } else {
+                nRet = 1;
+            }
+        }
+        // EA bug: nRet is never set when the texts differ but the values are equal.
+    } else {
+        nRet = strcmp(fn_80118E30(nPlayer, nGolferA), fn_80118E30(nPlayer, nGolferB));
+    }
+    return nRet;
+}
+
+// Higher is better.
+s32 fn_8011BCFC(const void* pA, const void* pB) {
+    s32 nGolferA = *(const s32*)pA;
+    s32 nGolferB = *(const s32*)pB;
+    s32 nRet;
+    int nPlayer = lbl_80281840.nPlayer;
+    f32 fA = lbl_80226870[lbl_80281840.nStat].aValue[nGolferA].fValue;
+    f32 fB = lbl_80226870[lbl_80281840.nStat].aValue[nGolferB].fValue;
+
+    if (strcmp(lbl_80226870[lbl_80281840.nStat].aValue[nGolferA].szValue,
+               lbl_80226870[lbl_80281840.nStat].aValue[nGolferB].szValue) != 0) {
+        if (fA > fB) {
+            nRet = -1;
+        } else if (fA < fB) {
+            nRet = 1;
+        }
+        // EA bug: nRet is never set when the texts differ but the values are equal.
+    } else {
+        nRet = strcmp(fn_80118E30(nPlayer, nGolferA), fn_80118E30(nPlayer, nGolferB));
+    }
+    return nRet;
 }
 
 // Called from fn_801180C4; empty in this build.

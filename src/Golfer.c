@@ -111,8 +111,9 @@ void Golfer_ClampModifiers(Player* pPlayer) {
 
 // ---- the CPU golfer ---------------------------------------------------------------------------
 
-f32 AI_Pow(f32 fBase, f32 fExp) {
-    return fn_8015F824(fBase, fExp);
+// The binary's only powf: the SDK's reverb effect (reverb_hi.c) calls this same function.
+f32 powf(f32 x, f32 y) {
+    return fn_8015F824(x, y);
 }
 
 // Pick where the CPU aims: the most demanding authored aim point it qualifies for. A human
@@ -181,9 +182,9 @@ void AI_ChooseTarget(int nPlayer) {
             if (Player_IsCPU(nPlayer)) {
                 // Low IQ makes the golfer think it is better than it is.
                 if (p->bLowIQPenalty) {
-                    nSkill += (int)(10.0f * (AI_Pow(fDumb, 2.0f) / 100.0f) / 100.0f);
+                    nSkill += (int)(10.0f * (powf(fDumb, 2.0f) / 100.0f) / 100.0f);
                 } else {
-                    nSkill += (int)(40.0f * (AI_Pow(fDumb, 2.0f) / 100.0f) / 100.0f);
+                    nSkill += (int)(40.0f * (powf(fDumb, 2.0f) / 100.0f) / 100.0f);
                 }
                 if ((s8)nSkill > 100) {
                     nSkill = 100;
