@@ -68,10 +68,13 @@ extern LightSets* lbl_80281380;
 LightSet* fn_8003532C(void);    // lbl_80281380->pCur
 void fn_80035338(s32 nSet);     // make aSet[nSet] the current set
 void fn_80035308(void);
+s32  fn_800352E4(void);
 
 void fn_80093524(void);         // create the lights of every set, and use set 0
 void fn_80093580(void);         // and free them
+void fn_800935CC(struct CourseLights* pLights);        // fill the current set from a hole's lights
 void fn_80093854(LightParams* pParams);
+void fn_80093900(struct CourseLightBlock* pBlock);
 
 // ---- goballfx.c's ball marker: a quad drawn on the ground under the ball ("marker" texture) ----
 

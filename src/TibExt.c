@@ -189,7 +189,7 @@ void fn_80122700(char* pDirName, int eDevice) {
 
 // Reads from the open file; the result is the bytes read.
 void fn_80122744(int uHandle, void* pBuffer, u32 uSize) {
-    s32 nErr = fn_8009F208(uHandle, pBuffer, uSize);
+    s32 nErr = fn_8009F208(uHandle, pBuffer, uSize, 0);
 
     fn_80122468(nErr);
     if (nErr != 0) {

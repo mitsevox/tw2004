@@ -21,7 +21,6 @@ void   fn_800B01B4(u16 nVoice, u8 bA, u8 bB);
 void   fn_800B04EC(void* p, u32 uLen, int nDir);
 void   fn_800B051C(void* p, u32 uLen, int nDir);
 void   fn_800B055C(u32 n);
-u32    fn_800B0698(u32 uSize);
 s32    fn_800B09C8(int nPort, int nSlot);
 void   fn_800B0DB8(void);
 void   fn_800B0DFC(void);

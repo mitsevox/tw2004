@@ -98,6 +98,8 @@ void fn_80009710(f32* pQ);              // the identity quaternion (0, 0, 0, 1)
 f32  fn_80029B64(f32 x);                // square root (Skeleton.c); x itself when x <= 0
 void fn_8000C5D4(f32* pA, f32* pB, f32 f, f32* pOut);   // out = a + f x b
 f32  fn_8000C5FC(f32* pA, f32* pB);     // dot product
+f32  fn_80009614(f32 x);                // arc cosine
+void fn_8000AE28(f32* pIn, f32 f, f32* pOut);   // scale a vector (four floats)
 double pow(double x, double y);         // 0x8015F824 (MSL)
 f32  powf(f32 x, f32 y);                // 0x8002C8D0 (Golfer.c): pow rounded to a float
 f32  fn_800BB028(f32* pA, f32* pB);     // squared distance

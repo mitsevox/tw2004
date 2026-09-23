@@ -48,10 +48,11 @@ char*  strcat(char* pDst, const char* pSrc);
 int    strcmp(const char* a, const char* b);
 int    strncmp(const char* a, const char* b, u32 uLen);
 char*  strstr(const char* pStr, const char* pFind);
+char*  strchr(const char* pStr, int c);
 int    atoi(const char* p);
 int    sprintf(char* pBuf, const char* pFmt, ...);
 int    snprintf(char* pBuf, u32 uLen, const char* pFmt, ...);
-int    atoi(const char* p);
+int    sscanf(const char* pStr, const char* pFmt, ...);   // 0x80159408, before MSL's __StringRead
 double atan(double x);
 double sin(double x);
 double cos(double x);
