@@ -9,8 +9,8 @@
 #include "engine.h"
 #include "camera.h"
 
-void*    fn_80008370(void* pCamera);
-void     fn_80045470(void* pLens, f32 fFov);
+CamLens* fn_80008370(void* pCamera);                    // the render camera's lens
+void     fn_80045470(CamLens* pLens, f32 fFov);
 void     fn_800352BC(void);
 void     fn_80035240(int a);
 void     CameraScript_RecordCurrentCam(CamShot* pShot, void* pCam, void* pSub, int nPlayer, void* pScript,
@@ -48,7 +48,7 @@ u8       fn_8004562C(CamShot* pShot);                   // the shot's bAC is 0, 
 int      fn_800636EC(void);
 void     fn_8000A194(f32 (*m)[4], f32 a, f32 b, f32 c);  // a rotation matrix from three angles
 void     fn_800BADB4(f32 (*m)[4], f32* pIn, f32* pOut);  // a vector through a matrix
-f32      fn_80014278(void* pLens);                      // the lens's field of view
+f32      fn_80014278(CamLens* pLens);                   // the lens's field of view
 void     fn_800B5918(f32* pSrc, f32* pDst);             // copy three floats
 void     fn_800636B4(int nPlayer);
 void     fn_800C4AB0(f32* pFrom, f32* pTo, f32* pOut);
@@ -58,7 +58,7 @@ TNetwork* fn_80069498(void);                            // the course's boundary
 // The segment crosses the outline (at pHit).
 u8       fn_8000C3C8(f32* pFrom, f32* pTo, TNetwork* pNet, s32 nNodes, f32* pHit);
 u8       fn_8004B6F8(f32* pFrom, f32* pTo, f32* pHit);
-f32      fn_8001EFFC(u8* pLens);
+f32      fn_8001EFFC(u8* pLens);                        // the lens's fB0 (char.c: its parameter is u8*)
 void     fn_80038054(u8 a, int n, f32 f1, f32 f2);
 u8       CamScript_KeepAboveGround(int nPlayer, f32* pNew, f32* pOld, int a, void* p1, void* p2, void* p3,
                                    f32 fClearance);
@@ -212,6 +212,98 @@ void GolfCamera_InitZoomToAimCamera(View* pView, int nPlayer) {
         fn_800C73B8(pCam, vDir, pSub);
     }
     EVENT_Trigger(nPlayer, 0x30, NULL, -1);
+}
+
+// The zoom-to-aim camera on the green: as GolfCamera_InitZoomToAimCamera, but the height is the
+// tuning's f168 over the pin or the ground under the camera, whichever is higher (0.5 more over
+// anything but green, fringe or cup, at most 1 under the camera when it is more than 5 over), and
+// the view's v20 is set from the lens.
+void GolfCamera_InitGreenZoomToAimCamera(View* pView, int nPlayer) {
+    f32 vAim[4];
+    f32 vDir[4];
+    f32 v[4];
+    f32 vNormalHigh[4];
+    f32 vNormalLow[4];
+    SurfaceType* pSurfaceLow;
+    SurfaceType* pSurfaceHigh;
+    f32 fLow;
+    f32 fHigh;
+    CamShot* pShot;
+    f32 fGround;
+    f32 fTop;
+    CourseInfo* pCourse;
+    f32* pCam;
+    f32* pSub;
+    pCam = fn_8001731C(pView);
+    pSub = fn_80017314(pView);
+    pCourse = fn_8000C594();
+    if (pCourse != NULL) {
+        Vec_Copy(gPlayers[nPlayer].vTargetCopy, vAim);
+        Ter_GetEnclosingGroundData(fn_8000C594(), pCam, &fLow, &pSurfaceLow, vNormalLow, &fHigh, &pSurfaceHigh,
+                                   vNormalHigh);
+        if (fLow < -60000.0f) {
+            if (!(fHigh < -60000.0f)) {
+                fGround = fHigh;
+                if (pSurfaceHigh != NULL && pSurfaceHigh->nClass != 3 && pSurfaceHigh->nClass != 4
+                    && pSurfaceHigh->nClass != 12 && pSurfaceHigh->nClass != 18) {
+                    fGround += 0.5f;
+                }
+            } else {
+                fGround = 0.0f;
+            }
+        } else {
+            fGround = fLow;
+            if (pSurfaceLow != NULL && pSurfaceLow->nClass != 3 && pSurfaceLow->nClass != 4
+                && pSurfaceLow->nClass != 12 && pSurfaceLow->nClass != 18) {
+                fGround += 0.5f;
+            }
+        }
+        if (pCam[1] - fGround > 5.0f) {
+            fGround = pCam[1] - 1.0f;
+        }
+        if (pView->p130 != NULL) {
+            for (pShot = pView->p130; pShot->p40 != NULL; pShot = pShot->p40) {
+                if (pShot->p40->bAB == 6 || pShot->p40->bAB == 8 || pShot->p40->bAB == 9
+                    || pShot->p40->bAB == 10) {
+                    break;
+                }
+            }
+            pView->shot19C.f74 = pShot->f74;
+            pView->shot19C.f70 = 0.0f;
+            if (pShot->bAF == 0x15 || pShot->bB0 == 0x15) {
+                pView->shot19C.f64 = pShot->f60;
+                pView->shot19C.f60 = -pShot->f64;
+            } else {
+                pView->shot19C.f60 = pShot->f60;
+                pView->shot19C.f64 = pShot->f64;
+            }
+        } else {
+            pView->shot19C.f74 = 0.0f;
+            pView->shot19C.f70 = 0.0f;
+            pView->shot19C.f60 = 0.0f;
+            pView->shot19C.f64 = 0.0f;
+        }
+        fTop = pCourse->pin[Game_CurrentPinSet()].y;
+        if (fTop <= fGround) {
+            fTop = fGround;
+        }
+        pView->shot19C.f68 = lbl_80281F78->f168 + fTop;
+        Vec3Copy(pCam, pView->shot19C.v30);
+        pView->p130 = NULL;
+        pView->f18C = -1.0f;
+        pView->f190 = 100000000.0f;
+        if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_SHOT_SETUP) {
+            fn_800C73DC(pSub, pCam, vDir);
+            if (vDir[0] != 0.0f || vDir[1] != 0.0f || vDir[2] != 0.0f) {
+                fn_800BAF04(vDir, vDir);
+            }
+            fn_800C73DC(vAim, pCam, v);
+            fn_8001EF34(vDir, fn_80009680(fn_80009744(v)), vDir);
+            fn_800C73B8(pCam, vDir, pSub);
+        }
+        EVENT_Trigger(nPlayer, 0x30, NULL, -1);
+        Vec3Copy(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[0]))->v4, pView->v20);
+    }
 }
 
 void GolfCamera_InitSteepSlopeCamera(View* pView, int nPlayer) {
@@ -1320,7 +1412,7 @@ u8 fn_800C3FC0(View* pView, int nPlayer, f32* pSub, f32* pAim, f32* pCam) {
     } else {
         fBack = lbl_80281F78->f38;
     }
-    fBack *= 1.0f / fn_8001EFFC(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[0])));
+    fBack *= 1.0f / fn_8001EFFC((u8*)fn_80008370(fn_80017004(gPlayers[nPlayer].nView[0])));
     if (fBack + lbl_80281F78->fC > fDist && gPlayers[nPlayer].nShotKind != 0) {
         if (fBack > fDist) {
             fBack = lbl_80281F78->f10 * fDist;

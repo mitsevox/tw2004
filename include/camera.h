@@ -14,8 +14,9 @@ typedef struct CamLens {
     f32  v4[3];                 // 0x04  a position: the green zoom-to-aim camera copies it to View.v20
     u8   unk10[0x34 - 0x10];
     f32  v34[3];                // 0x34  a position: GameMode8 measures the ball's distance to it
-    u8   unk40[0xB4 - 0x40];
-    f32  fB4;                   // 0xB4  a flat camera's view width (guess)
+    u8   unk40[0xB0 - 0x40];
+    f32  fB0;                   // 0xB0  fn_8001EFFC; the zoom-to-aim camera divides its distance by it
+    f32  fB4;                  // 0xB4  a flat camera's view width (guess)
     f32  fB8;                   // 0xB8  its view height (guess)
 } CamLens;
 
