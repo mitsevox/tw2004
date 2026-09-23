@@ -46,6 +46,13 @@ typedef enum EASBErrorE {
     EASB_ERROR_UNKNOWN = 34
 } EASBErrorE;
 
+// Where a memory-card operation the library runs in steps has got to (TW06's EASBProcessE).
+typedef enum EASBProcessE {
+    EASB_PROCESS_NONE = 0,
+    EASB_PROCESS_CONTINUE = 1,
+    EASB_PROCESS_COMPLETE = 2
+} EASBProcessE;
+
 // What a call needs from the memory-card session (the argument of fn_8012CCD8).
 #define EASB_NEED_FILE 0        // the Bio file must be open
 #define EASB_NEED_NO_FILE 1     // no file may be open
@@ -144,6 +151,7 @@ EASBErrorE fn_8012D710(void);
 EASBErrorE fn_8012D744(u32* pOut);
 EASBErrorE fn_8012D794(void* pImage);
 EASBErrorE fn_8012D7F0(void);
+EASBErrorE fn_8012D7F8(EASBProcessE* peProcess);  // runs the next step of the operation
 EASBErrorE fn_8012D8C4(u32 uCount);
 EASBErrorE fn_8012D93C(u32 uCount);
 EASBErrorE fn_8012D9B4(u16* puLevel);

@@ -18,24 +18,58 @@ s32 fn_801253F0(s32 arg0, s32 arg1);
 s32 fn_80125520(u8 b);
 s32 fn_801258E8(void);
 u8 fn_801257A0(void);
+void fn_8000A0AC(s32 v);
+void fn_80124B10(UStreamObject* pObject);
 
-// ---- sweep code (not yet cleaned up) ----
+// Starts the Bio library once, under this game's name, with the memory-card glue from TibExt.c.
+void fn_801249A8(void) {
+    lbl_80261040.szProductName = lbl_80195308;
+    lbl_80261040.szGamesPlayedType = lbl_80195324;
+    lbl_80261040.pCallbacks = fn_801221F0();
+    lbl_80261040.uHeapID = 0;
+    lbl_80261040.uGamesPlayedTypeLanguage = 'en';
+    fn_8000A0AC(0);
+    fn_8012D394(&lbl_80261040);
+    fn_8000A0AC(2);
+    lbl_80281988->bNewAccomplishment = 0;
+    lbl_80281988->bBioLoaded = 0;
+    fn_8012DAB8(2);
+    EASBio_SetCurrentRewardMessage(EASBio_eReward_None);
+}
 
+// The 'EASI' stream object is the Bio icon.
+void fn_80124A40(void) {
+    UStream_RegisterHandler('EASI', fn_80124B10);
+}
 
 void fn_80124A70(void) {
     UStream_UnregisterHandler('EASI');
 }
 
+// The memory-card screens' error code for a library error.
 s32 fn_80124A98(EASBErrorE eError) {
     return lbl_80195340[eError];
 }
 
+// Runs the library's memory-card operation step by step until it is complete.
+s32 fn_80124AAC(void) {
+    EASBProcessE eProcess;
+    EASBErrorE eError;
+
+    eProcess = EASB_PROCESS_NONE;
+    while (eProcess != EASB_PROCESS_COMPLETE) {
+        eError = fn_8012D7F8(&eProcess);
+        if (eError != EASB_ERROR_NONE) return fn_80124A98(eError);
+        if (eProcess == EASB_PROCESS_NONE) return 0;
+    }
+    return 0;
+}
+
+// Copies the 'EASI' icon into the manager's buffer.
 void fn_80124B10(UStreamObject* pObject) {
     Mem_cpy(lbl_80281988->pIcon, pObject->pData, pObject->uSize);
     fn_80009E70(pObject);
 }
-
-// ---- end of sweep code ----
 
 // Sets up the manager for the front end: no pictures yet, room for the icon, nothing pending.
 void fn_80124B54(void) {
