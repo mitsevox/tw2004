@@ -12,11 +12,34 @@
 // ---- memory and strings ----------------------------------------------------------------------
 
 void* Mem_cpy(void* pDst, const void* pSrc, u32 uLen);    // returns pDst
+void* fn_80005884(void* pDst, const void* pSrc, u32 uLen); // a copy the ranges may overlap in
 void* fn_80005AE8(void* pDst, int nValue, u32 uLen);      // memset; returns pDst
-void* fn_80009B34(u32 uSize, u32 uFlags, u32 uAlign, const char* pFile, int nLine);  // alloc
+// Allocates from the static heap (StaticMemory.c); nMode picks where (see there).
+void* fn_80009B34(int nSize, int nMode, int nAlign, const char* pFile, int nLine);
 void  fn_80009E70(void* p);             // free
 void* fn_800951A0(u32 uSize, int nAlign, int a);
+void  fn_8009527C(void* p);             // frees what fn_800951A0 allocated
 void  fn_800953C8(int a);
+
+// A pool of fixed-size nodes carved from one allocation (UMemPool.c): the header, then the nodes.
+// A free node holds the next free one in its first word.
+typedef struct UMemPoolNode {
+    struct UMemPoolNode* pNext; // 0x0  the next free node
+} UMemPoolNode;
+
+typedef struct UMemPool {
+    u32  uNodeSize;             // 0x0  one node, rounded up to the alignment
+    u8*  pEnd;                  // 0x4  the end of the pool's memory
+    u16  nNodes;                // 0x8
+    u16  nFree;                 // 0xA
+    UMemPoolNode* pFree;        // 0xC  the free list
+} UMemPool;
+LAYOUT_ASSERT(UMemPool, 0x10);
+
+UMemPool* fn_8000AFA0(int nNodes, u32 uNodeSize, u32 uFlags, u32 uAlign);   // create
+void  fn_8000B058(UMemPool* pPool);                     // destroy
+void* fn_8000B078(UMemPool* pPool);                     // take a node (NULL when none is free)
+void  fn_8000B0D4(UMemPool* pPool, void* pNode);        // give a node back
 // Sorts nCount items of nSize bytes with pfnCompare (the C library's qsort, by its arguments).
 void  fn_8015929C(void* pBase, u32 nCount, u32 nSize, s32 (*pfnCompare)(const void* pA, const void* pB));
 
@@ -36,6 +59,10 @@ void Vec_Copy(f32* pSrc, f32* pDst);    // 0x8000AD10
 f32  fn_8000AD78(f32 y, f32 x);         // atan2f
 f32  fabsf(f32 x);                      // 0x8000AD9C: fabs (0x8000AE94, platform.h) rounded to a float
 f32  fn_8000AF7C(f32 x);                // natural logarithm
+void fn_8000AF20(void);                 // make the log2 table (lbl_80281BD8)
+void fn_8000AF58(void);                 // free the log2 table
+double fn_8015F7C4(double y, double x); // atan2
+double fn_8015F804(double x);           // log
 u32  Rand_Next(int nStream);            // 0x8000B130  EA's lagged-Fibonacci generator
 f32  fn_8000B318(int nStream);          // a normally distributed random number (mean 0, deviation 1):
                                         // Box-Muller on two Rand_Floats, the second value kept
@@ -118,6 +145,31 @@ LAYOUT_ASSERT(RenderState, 0x118);
 extern RenderState lbl_801B8980;
 
 void fn_8005CC64(TexBank* pBank, TexEntry* pTex);  // set the texture of the next draw
+
+// A render surface (GoRenderSurface.c; our name, after the file): one of five 0x2C-byte slots at
+// lbl_801D3950. A slot whose n0 is not 1 owns a buffer of nSize bytes. Only what the code reads.
+typedef struct RenderSurface {
+    s32   n0;                   // 0x00  given when it is made; 0: the slot is free
+    s32   nWidth;               // 0x04  in pixels (512 x 448 for surface 0)
+    s32   nHeight;              // 0x08
+    s32   nC;                   // 0x0C  } fn_8002F38C's four values; made as the width, the
+    s32   n10;                  // 0x10  }   height, 0 and the pixel kind
+    s32   n14;                  // 0x14  }
+    s32   n18;                  // 0x18  }
+    s32   n1C;                  // 0x1C  the pixel kind: 1 or 2 is 4 bytes a pixel, 4 is 2, 8 or 16 is 1
+    s32   n20;                  // 0x20
+    void* pBuffer;              // 0x24
+    s32   nSize;                // 0x28  bytes: width x height x bytes a pixel
+} RenderSurface;
+LAYOUT_ASSERT(RenderSurface, 0x2C);
+
+extern RenderSurface lbl_801D3950[5];
+extern s32 lbl_80281D50;        // the surface fn_8002F38C selected last
+
+// GoRenderSurface.c
+int  fn_8002F260(s32 n0, s32 nWidth, s32 nHeight, s32 nKind, s32 n20, s32 nSurface);   // 0: no memory
+void fn_8002F38C(s32 nSurface, s32 nC, s32 n10, s32 n14, u32 uFlags, s32 n18);
+s32  fn_8002F454(s32 nSurface);     // the surface's buffer size, 0 if the slot is free
 
 // ---- the file streamer (UStream.c) -----------------------------------------------------------
 

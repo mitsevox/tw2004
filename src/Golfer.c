@@ -1152,7 +1152,6 @@ u8 AI_RehearseShot(int nPlayer, f32* pOutDist2, u8 bFast, f32 fTolerance) {
 
 // ---- shot setup helpers -------------------------------------------------------------------------
 
-double fn_8015F7C4(double y, double x);   // atan2
 
 // The aim angle from the ball to the target, wrapped to -pi..pi. 0 is +z; positive turns left.
 f32 Shot_AimAngle(int nPlayer) {

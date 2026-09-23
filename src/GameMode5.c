@@ -48,7 +48,6 @@ extern u8 (*lbl_8028231C)(int nPlayer, u8 bCheck);   // and HoleFinished
 u8 fn_800ED5C8(int nPlayer, u8 bCheck);
 extern u8 lbl_802822FD;
 void fn_800ED6E8(u8 v);
-u8 fn_800ED6F0(void);
 
 // Game mode 5 starts: its callbacks, one player, the challenge list.
 void fn_800EACD8(void) {
