@@ -142,6 +142,14 @@ int  UStream_UnregisterHandler(u32 uType);
 u32  fn_8000E790(UStreamObject* pObject, u32 uMax, void* pDst);   // copy the data out, free the object
 u32  fn_8000E81C(UStreamObject* pObject, void** ppData);          // the data and its size
 
+// Files on disc: a handle from open, -1 for none.
+int  fn_800060E0(const char* pName);    // file open
+int  fn_8000633C(int hFile);            // file close
+// Reads uLen bytes at uOffset into pDst without waiting; pfnDone is called when it is done. Below
+// 0: the read could not be queued.
+int  fn_80006444(int hFile, void* pDst, u32 uLen, u32 uOffset, void (*pfnDone)(int nBytes, int nError));
+u32  fn_800065B0(int hFile);            // file size
+
 // ---- controller input ------------------------------------------------------------------------
 
 void fn_80012EF8(void);
