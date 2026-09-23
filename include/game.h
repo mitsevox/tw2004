@@ -84,6 +84,23 @@ void fn_80062D0C(int nPlayer);
 void fn_80062D38(int nMsg, int nA, int nB);    // send message nMsg with two values (fn_800E5998)
 void fn_80062D6C(int nMsg, int nValue);        // send message nMsg with one value (fn_800E590C)
 
+// What lbl_802811F0 points to (its code, around 0x8006F650, is not decompiled; fn_8006F608 clears
+// it). GameMode5's fn_800ED6F8 sets f18 and flags it in b1C; SitDevFile.c tests the flags.
+typedef struct Unk802811F0 {
+    u32 uFlags;                 // 0x00  bit 0x2: fn_80035574
+    u32 u04;                    // 0x04  bit 0x2: fn_800BCC38
+    s32 n08;                    // 0x08
+    s32 n0C;                    // 0x0C
+    s32 n10;                    // 0x10
+    u8  b14;                    // 0x14  1 after fn_8006F608
+    u8  unk15[3];
+    f32 f18;                    // 0x18
+    u8  b1C;                    // 0x1C
+} Unk802811F0;
+extern Unk802811F0* lbl_802811F0;       // 0x802811F0
+
+u8   fn_80035574(void);                 // lbl_802811F0's flag 0x2
+
 // ---- the course table (CourseData.c) ---------------------------------------------------------
 
 #define NUM_COURSE_DATA 21      // courses in the 'CRI ' table

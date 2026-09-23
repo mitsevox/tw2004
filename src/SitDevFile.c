@@ -338,6 +338,10 @@ void fn_800BBADC(int nValue) {
 
 void fn_800BCA60(s32* pClass, int nSurface, Ball* pBall, Player* pPlayer);
 void fn_800BCB74(s32* pClass, int nSurface);
+int  fn_800BCB88(void);
+u8   fn_800BCBE0(void);
+u8   fn_800BCC38(void);
+u8   fn_800BCC48(void);
 s32  fn_800BCCA0(int nPlayer);
 s32  fn_800BCCCC(int nPlayer);
 s32  fn_800BCCF8(int nPlayer);
@@ -380,6 +384,44 @@ void fn_800BCB74(s32* pClass, int nSurface) {
     }
 }
 
+// 1, 3 or 2 by which of lbl_802811F0's flags are set (fn_800BCC48, fn_800BCBE0, flag 0x2 alone),
+// otherwise 0.
+int fn_800BCB88(void) {
+    int nResult;
+    if (fn_800BCC48()) {
+        nResult = 1;
+    } else if (fn_800BCBE0()) {
+        nResult = 3;
+    } else if (fn_80035574()) {
+        nResult = 2;
+    } else {
+        nResult = 0;
+    }
+    return nResult;
+}
+
+// Neither flag 0x2 nor b14 is set, and u04's flag 0x2 is.
+u8 fn_800BCBE0(void) {
+    int bResult = 0;
+    if (!fn_80035574() && !lbl_802811F0->b14 && fn_800BCC38()) {
+        bResult = 1;
+    }
+    return bResult;
+}
+
+u8 fn_800BCC38(void) {
+    return lbl_802811F0->u04 & 2;
+}
+
+// Flag 0x2 is set, and u04's flag 0x2 is clear or b14 is set.
+u8 fn_800BCC48(void) {
+    int bResult = 0;
+    if (fn_80035574() && (!fn_800BCC38() || lbl_802811F0->b14)) {
+        bResult = 1;
+    }
+    return bResult;
+}
+
 // The game mode's answers for the scripts (GameState's callbacks).
 s32 fn_800BCCA0(int nPlayer) {
     return gpGame->pfn204(nPlayer);
@@ -403,6 +445,14 @@ u8 fn_800BCD50(void) {
 
 s32 fn_800BCD5C(void) {
     return gpGame->nDC;
+}
+
+// Clear the scripts' per-entry bytes.
+void fn_800BD74C(void) {
+    u32 i;
+    for (i = 0; i < lbl_80282208->n10; i++) {
+        lbl_802811B8->pD4[i] = 0;
+    }
 }
 
 // ---- sounds and music ----------------------------------------------------------------------
