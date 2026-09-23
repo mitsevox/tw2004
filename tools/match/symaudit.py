@@ -14,6 +14,9 @@ compiler itself (sizeof, in a copy of each unit), and compared with the object's
   too-big   the declaration is larger than the object (it overlaps whatever follows it);
   partial   the declaration is smaller than the object (only with --all: normal while a struct is
             still being worked out, but the goal is every global at its true size).
+An `extern` with `// fake match: <why>` on its line or the line before is skipped: some originals
+really did declare a global unsized (Swing.c's lbl_80281B40 is reached with lis/addi although it
+lives in .sdata).
 
 Scope (every built object). symbols.txt knows the scope of the SDK's symbols and a few others
 (the game's own functions and data carry none, so their `static` cannot be checked this way):
@@ -95,7 +98,12 @@ def size_findings(syms):
         sizes = dict(zip(work, pool.map(lambda f: declared_sizes(f, work[f]), work)))
     hits = collections.defaultdict(list)                # (kind, name, declared) -> files
     for f, got in sizes.items():
+        text = f.read_text(encoding='utf-8', errors='replace')
         for n, d in got.items():
+            # a declaration that differs on purpose says so: `// fake match:` on its line or the one before
+            if re.search(r'fake match[^\n]*\n[^\n]*\bextern\b[^\n;]*\b%s\b|\bextern\b[^\n;]*\b%s\b[^\n]*fake match'
+                         % (n, n), text):
+                continue
             sec, size = objects[n][0], objects[n][1]
             if (sec in SMALL) != (d is not None and d <= 8):
                 kind = 'sda'
