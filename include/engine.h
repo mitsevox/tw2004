@@ -48,7 +48,27 @@ f32  Terrain_HeightAt(f32* pPos, SurfaceType** ppSurface);   // 0x800447DC
 
 // ---- the file streamer (UStream.c) -----------------------------------------------------------
 
-typedef struct UStreamObject UStreamObject;
+// An object built from SHOC chunks. The header is 0x34 bytes, then the copied chunk header
+// (from SHDR chunk offset 0x14) and, 0x80-aligned, the data.
+typedef struct UStreamObject {
+    u8*   pData;                  // 0x00
+    u32   uUnk4;                  // 0x04
+    u32   uUnk8;                  // 0x08
+    struct UStreamObject* pPrev;  // 0x0C  finished-object queue
+    struct UStreamObject* pNext;  // 0x10
+    int   nUnk14;                 // 0x14
+    u32   uFlags;                 // 0x18  chunk+0x14; set to 1 for txf / Cpyr / Cact / txf2
+    u32   uType;                  // 0x1C  chunk+0x18, e.g. 'ter '
+    u32   uHash;                  // 0x20  chunk+0x1C
+    u32   uSize;                  // 0x24  chunk+0x20 decompressed size
+    u32   uRef28;                 // 0x28  chunk+0x24 } rebased by the RPNS value when the
+    u32   uRef2C;                 // 0x2C  chunk+0x28 } object is delivered
+    u32   uRef30;                 // 0x30  chunk+0x2C }
+    u32   uUnk34;                 // 0x34  chunk+0x30
+    u32   uNameLen;               // 0x38  chunk+0x34
+    u32   uUnk3C;                 // 0x3C  chunk+0x38
+    char  szName[4];              // 0x40  chunk+0x3C
+} UStreamObject;
 
 int  UStream_RegisterHandler(u32 uType, void (*pfnHandler)(UStreamObject*));
 int  UStream_UnregisterHandler(u32 uType);
