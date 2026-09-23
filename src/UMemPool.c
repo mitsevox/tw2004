@@ -9,7 +9,7 @@ void fn_8000AD34(void* arg0, void* arg1);
 double fabs(double x);
 double fn_8015F7C4();
 f32 fn_8000AD78(f32 x0);
-f32 fn_8000AD9C(f32 x0);
+f32 fabsf(f32 x0);
 void fn_8000AF1C(void);
 extern s32 lbl_80281BD8;
 void fn_8000AE9C();
@@ -46,13 +46,13 @@ f32 fn_8000AD78(f32 x0) {
     return t0;
 }
 
-f32 fn_8000AD9C(f32 x0) {
+f32 fabsf(f32 x0) {
     f32 t0;
     t0 = fabs(x0);
     return t0;
 }
 
-// 0x8000AE94: the absolute value of a double (fn_8000AD9C, which rounds its result to a float, is
+// 0x8000AE94: the absolute value of a double (fabsf, which rounds its result to a float, is
 // the float version).
 double fabs(double x) {
     return __fabs(x);

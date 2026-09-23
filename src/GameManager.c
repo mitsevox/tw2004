@@ -704,8 +704,8 @@ int GM_ShowPostShotAnimation(int nPlayer) {
             fHigh = fHighA;
             pSurf = pSurfA;
         } else {
-            fHigh = fn_8000AD9C(fHighB - gPlayers[nPlayer].vBall[1]);
-            if (fn_8000AD9C(fHighA - gPlayers[nPlayer].vBall[1]) < fHigh) {
+            fHigh = fabsf(fHighB - gPlayers[nPlayer].vBall[1]);
+            if (fabsf(fHighA - gPlayers[nPlayer].vBall[1]) < fHigh) {
                 fHigh = fHighA;
                 pSurf = pSurfA;
             } else {
@@ -723,7 +723,7 @@ int GM_ShowPostShotAnimation(int nPlayer) {
             fSlope = 0.0f;
         }
         if (!Ter_PointInOOBNetwork(vPos) || (pSurf != NULL && !(pSurf->u34 & 1)) || pSurf->nClass == 7 ||
-            pSurf->nClass == 16 || (fn_8000AD9C(fSlope) > 0.1f && fRise > 0.2f)) {
+            pSurf->nClass == 16 || (fabsf(fSlope) > 0.1f && fRise > 0.2f)) {
             return 0;
         }
     }

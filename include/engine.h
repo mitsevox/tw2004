@@ -38,8 +38,8 @@ double fn_80009680(double x);           // sqrt
 f32  fn_80009744(f32* pVec);            // dot with itself
 void Vec_Copy(f32* pSrc, f32* pDst);    // 0x8000AD10
 f32  fn_8000AD78(f32 y, f32 x);         // atan2f
-f32  fn_8000AD9C(f32 x);                // fabsf
-double fabs(double x);                  // 0x8000AE94; fn_8000AD9C is the float version
+f32  fabsf(f32 x);                      // 0x8000AD9C: fabs rounded to a float
+double fabs(double x);                  // 0x8000AE94; fabsf is the float version
 u32  Rand_Next(int nStream);            // 0x8000B130  EA's lagged-Fibonacci generator
 void fn_8000B1D4(int nStream, u32 uSeed);   // seed a random stream
 f32  Rand_Float(int nStream);           // 0x8000B428  [0, 1)

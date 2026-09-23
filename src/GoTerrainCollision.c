@@ -407,7 +407,7 @@ f32 Ter_CheckForDropLocation(CourseInfo* pCourse, f32* pPos, u8 bOnDropSurface, 
             *ppSurface = pSurface;
         }
         bOk = fHeight != TER_NO_GROUND && pSurface != NULL && (pSurface->u34 & 1)
-              && pSurface->nClass != 10 && fn_8000AD9C(vNormal[1]) > 0.86603f
+              && pSurface->nClass != 10 && fabsf(vNormal[1]) > 0.86603f
               && Ter_PointInOOBNetwork(vPos) && !Ter_PointInFreeDropNetwork(vPos)
               // fake match: bOnDropSurface is always 0 here, but the original tests it again
               && (bOnDropSurface || !Ter_CheckObjectAndHazardObstruction(vPos, 1.5f, 0, 1, 2.0f, 1, 0.577f));
@@ -1230,7 +1230,7 @@ u8 fn_8004E558(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit
     vDelta[1] = pTo[2] - pFrom[2];
     vStart[0] = pFrom[0];
     vStart[1] = pFrom[2];
-    if (fn_8000AD9C(vDelta[0]) > fn_8000AD9C(vDelta[1])) {
+    if (fabsf(vDelta[0]) > fabsf(vDelta[1])) {
         nMajor = 0;
         nMinor = 1;
         fSlope = vDelta[1] / vDelta[0];
@@ -1275,7 +1275,7 @@ u8 fn_8004E558(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit
             } else {
                 fRatio = 1000000.0f;
             }
-            if (fn_8000AD9C(fSlope) < fn_8000AD9C(fRatio)) {
+            if (fabsf(fSlope) < fabsf(fRatio)) {
                 fRun = vEdge[nMajor] - vStart[nMajor];
                 vPos[AXIS3(nMajor)] = vEdge[nMajor];
                 nLast = nMajor;
@@ -1427,7 +1427,7 @@ u8 fn_8004EE20(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit
     vDelta[1] = pTo[2] - pFrom[2];
     vStart[0] = pFrom[0];
     vStart[1] = pFrom[2];
-    if (fn_8000AD9C(vDelta[0]) > fn_8000AD9C(vDelta[1])) {
+    if (fabsf(vDelta[0]) > fabsf(vDelta[1])) {
         nMajor = 0;
         nMinor = 1;
         fSlope = vDelta[1] / vDelta[0];
@@ -1472,7 +1472,7 @@ u8 fn_8004EE20(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit
             } else {
                 fRatio = 1000000.0f;
             }
-            if (fn_8000AD9C(fSlope) < fn_8000AD9C(fRatio)) {
+            if (fabsf(fSlope) < fabsf(fRatio)) {
                 fRun = vEdge[nMajor] - vStart[nMajor];
                 vPos[AXIS3(nMajor)] = vEdge[nMajor];
                 nLast = nMajor;
@@ -1617,7 +1617,7 @@ u8 Ter_CheckForGroundCollision(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* p
     vDelta[1] = pTo[2] - pFrom[2];
     vStart[0] = pFrom[0];
     vStart[1] = pFrom[2];
-    if (fn_8000AD9C(vDelta[0]) > fn_8000AD9C(vDelta[1])) {
+    if (fabsf(vDelta[0]) > fabsf(vDelta[1])) {
         nMajor = 0;
         nMinor = 1;
         fSlope = vDelta[1] / vDelta[0];
@@ -1662,7 +1662,7 @@ u8 Ter_CheckForGroundCollision(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* p
             } else {
                 fRatio = 1000000.0f;
             }
-            if (fn_8000AD9C(fSlope) < fn_8000AD9C(fRatio)) {
+            if (fabsf(fSlope) < fabsf(fRatio)) {
                 fRun = vEdge[nMajor] - vStart[nMajor];
                 vPos[AXIS3(nMajor)] = vEdge[nMajor];
                 nLast = nMajor;
@@ -1802,7 +1802,7 @@ u8 fn_8004FF34(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNorma
     vDelta[1] = pTo[2] - pFrom[2];
     vStart[0] = pFrom[0];
     vStart[1] = pFrom[2];
-    if (fn_8000AD9C(vDelta[0]) > fn_8000AD9C(vDelta[1])) {
+    if (fabsf(vDelta[0]) > fabsf(vDelta[1])) {
         nMajor = 0;
         nMinor = 1;
         fSlope = vDelta[1] / vDelta[0];
@@ -1847,7 +1847,7 @@ u8 fn_8004FF34(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNorma
             } else {
                 fRatio = 1000000.0f;
             }
-            if (fn_8000AD9C(fSlope) < fn_8000AD9C(fRatio)) {
+            if (fabsf(fSlope) < fabsf(fRatio)) {
                 fRun = vEdge[nMajor] - vStart[nMajor];
                 vPos[AXIS3(nMajor)] = vEdge[nMajor];
                 nLast = nMajor;
