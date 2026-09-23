@@ -11,3 +11,10 @@
 
 # decomp-toolkit writes files with LF
 config/**/*.txt  text eol=lf
+
+# Sources, headers, docs and scripts are LF everywhere (worktrees included), as the tools write them
+*.c    text eol=lf
+*.h    text eol=lf
+*.s    text eol=lf
+*.md   text eol=lf
+*.py   text eol=lf
