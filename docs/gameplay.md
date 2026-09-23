@@ -336,6 +336,10 @@ pitches, and shots from lie 1 or 2 inside 250 yards - and **split-screen play tu
 thing off** (the session byte we first took for a "no luck" option is the split-screen mode;
 the caddie is off in split screen too). A CPU never gets one.
 
+A Gecko code that turns the lucky shot off (keeping lesson mode 11's scripted one) is in
+`tools/codes/no_lucky_shots.txt` - **untested**: one instruction, `Golfer_IsLucky` always takes
+its "not lucky" exit after the CPU / split-screen test.
+
 What the event does is in the lie code (`0x80053594`, read, not decompiled): landing in the
 rough is a coin flip between the good rough lie and the bad one, and `(roll & 127) < LUCK/2`
 forces the good one - 50% good at LUCK 0, ~70% at 100. On a worse surface, `(LUCK/4 + 16)/128`

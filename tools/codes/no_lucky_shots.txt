@@ -1,0 +1,12 @@
+$No Lucky Shots [mits]
+*Tiger Woods PGA Tour 2004 (USA, GW4E69). UNTESTED.
+*Turns off the hidden "lucky shot". Normally, about one eligible shot in 10-12 (1 in 6 at
+*LUCK 100; par 3s, pitches, and shots from lies 1-2 inside 250 yd) the game silently replaces
+*your club, power and aim with a shot its CPU rehearsal has already solved to land at the pin,
+*zeroes your swing error and ignores the sidehill lie - if your club is within two, the shot
+*kind matches and your aim is within 5 degrees of that solved shot (docs/gameplay.md, "Luck").
+*With this code every shot plays your own swing and the real slope physics.
+*How: Golfer_IsLucky (0x8002D994) always takes its "not lucky" exit after the CPU /
+*split-screen test (bne -> b at 0x8002D9CC). The scripted case before it - a CPU in lesson
+*mode 11 is always lucky (fn_80101D4C) - is kept.
+0402D9CC 48000018
