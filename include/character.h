@@ -235,7 +235,7 @@ typedef struct Character {
     u8    unk2B8[0x3D8 - 0x2B8];
     AnimLib* pLib;              // 0x3D8  its animation library
     struct ClipRecord* pRecords;    // 0x3DC  records for its merged library (skalib)
-    u8    unk3E0[0x40C - 0x3E0];
+    u8    node3E0[0x40C - 0x3E0];   // 0x3E0  a blend node for anim29C (fn_800732F4 takes it as it takes blend)
     SKABlendNode blend;         // 0x40C  the root of its blend tree
     CharBuffer buffers[4];      // 0x43C
     struct { u32 bSet; f32 fTime; u8 unk8[8]; } events[18];   // 0x4AC  animation events, by 64-bit id

@@ -8,7 +8,12 @@
 
 f32   fn_8001F02C(ClipBlend* pBlend, u64 uEvent);   // an event's time (by its 64-bit id)
 
+void  fn_800732F4(void* pNode, void* pAnim, f32 fTime);   // set a blend node's time (blend or node3E0)
+
 void  fn_800958EC(AnimPlayer* pAnim, s32 n, f32 f);
+void  fn_80095FD0(Character* pChar, void* pClip, u8 bKeep, int n, SKABlendFn pfnBlend, int c, int d, f32 f1,
+                  f32 f2, f32 f3, f32 f4, f32 f5);
+void  fn_8009622C(Character* pChar, void* pClip, u8 bKeep, f32 fOffset);
 s8    fn_80096338(void);
 s32   fn_800962F8(Character* pChar);
 s32   fn_8009637C(Character* pChar);
@@ -19,6 +24,22 @@ f32   fn_800971B8(Character* pChar);
 void fn_800958EC(AnimPlayer* pAnim, s32 n, f32 f) {
     pAnim->nC  = n;
     pAnim->f10 = f;
+}
+
+// Start pClip on the second player (fn_80095FD0) and queue state 4; unless bKeep, its blend node
+// first moves to fOffset past the player's time.
+void fn_8009622C(Character* pChar, void* pClip, u8 bKeep, f32 fOffset) {
+    if (pClip == NULL) return;
+    if (!bKeep) {
+        fn_800732F4(pChar->node3E0, &pChar->anim29C, pChar->anim29C.fTime + fOffset);
+    }
+    fn_80095FD0(pChar, pClip, bKeep, 0, fn_80072ACC, 1, 5, -20000.0f, -30000.0f, -10000.0f, 0.0f, -10000.0f);
+    pChar->n2C = 4;
+    pChar->n30 = 4;
+    pChar->u28 |= 1;
+    if (pChar->n20 == 5) {
+        pChar->anim29C.f10 -= 0.95f;
+    }
 }
 
 // Start the idle wait over: a new count (fn_80096338) and the other two counters cleared.
