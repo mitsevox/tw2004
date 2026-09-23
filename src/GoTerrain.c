@@ -124,7 +124,9 @@ void fn_80030894(void) {
     fn_80013EEC(fn_8001614C());
     fn_80012EF8();
     for (i = 0; i < 4; i++) {
-        f32 fPeriod = 1591.2f * (5.5f + (f32)i) / 1000.0f;
+        // fake match: the original's 1591.2 is one bit above the literal 1591.2f, as a folded float
+        // product gives it; 26.52 x 60 is one such product (3 x 530.4 and 12 x 132.6 are others)
+        f32 fPeriod = 26.52f * 60.0f * (5.5f + (f32)i) / 1000.0f;
 
         wave.aWave[i] = 0.5f * fn_800095F0(6.2831855f * fn_800351D8(gSession.nFrameCount, fPeriod) / fPeriod)
                         + 0.5f;
