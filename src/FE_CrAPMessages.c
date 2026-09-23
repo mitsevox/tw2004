@@ -341,6 +341,18 @@ void fn_80108904(MsgArg* pArgs, MsgArg* pResult) {
     fn_8010F7FC(pArgs[0].i, pArgs[1].p, pArgs[2].p, pArgs[3].p, pArgs[4].p);
 }
 
+// ---- end of sweep code ----
+
+// Load the logo from the texture named pArgs[0].
+void fn_8010893C(MsgArg* pArgs, MsgArg* pResult) {
+    char szName[32] = "";
+
+    strcpy(szName, ((MsgString*)pArgs[0].p)->pStr);
+    fn_8010F890(szName);
+}
+
+// ---- sweep code (not yet cleaned up) ----
+
 void fn_801089BC(MsgArg* pArgs, MsgArg* pResult) {
     fn_8010F880();
 }
@@ -762,6 +774,19 @@ void fn_80109D5C(MsgArg* pArgs, MsgArg* pResult) {
 void fn_80109DDC(MsgArg* pArgs, MsgArg* pResult) {
 }
 
+// Sell a part's choice i back: a quarter of its price goes back into the money, and its bought
+// bit (aB1CC) is cleared.
+void fn_80109DE0(MsgArg* pArgs, MsgArg* pResult) {
+    SaveProfile* pProfile = fn_80077ACC();
+    s16 nPart = pArgs[0].i;
+    int b = pArgs[1].i;
+    int i = pArgs[2].i;
+    int nAsset = fn_80104FA8(nPart, b, i);
+
+    pProfile->n6C += (s32)(0.25f * fn_80105368(nPart, b, i));
+    fn_8001EB6C(pProfile->aB1CC, nAsset);
+}
+
 // ---- sweep code (not yet cleaned up) ----
 
 void fn_80109EAC(MsgArg* pArgs, MsgArg* pResult) {
@@ -771,6 +796,29 @@ void fn_80109EAC(MsgArg* pArgs, MsgArg* pResult) {
 void fn_8010A208(MsgArg* pArgs, MsgArg* pResult) {
     fn_8008E724(NULL, NULL, 0, 0);
 }
+
+// ---- end of sweep code ----
+
+// The place of the part's first slotted asset that fits its entry n, in the list of the part's
+// offered assets (0 when there is none).
+void fn_8010A238(MsgArg* pArgs, MsgArg* pResult) {
+    s16 nPart;
+    int n;
+    s32 nResult = 0;
+    s32 nPlace;
+    int nAsset;
+
+    nPart = pArgs[0].i;
+    n = pArgs[1].i;
+    nPlace = 0;
+    if (nPart >= 0 && nPart < 24 && (nAsset = fn_801062C8(nPart, n)) != -1) {
+        fn_801060F0(nAsset, nPart, n, &nPlace);
+        nResult = nPlace;
+    }
+    pResult->i = nResult;
+}
+
+// ---- sweep code (not yet cleaned up) ----
 
 void fn_8010A35C(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = fn_80104F68(fn_80104FA8(pArgs[0].i, pArgs[1].i, pArgs[2].i))->n2E;
