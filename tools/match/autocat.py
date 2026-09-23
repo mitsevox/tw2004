@@ -31,6 +31,8 @@ def first_sdk_text(units, splits):
 def categorise_auto_units(objdiff='objdiff.json', splits='config/GW4E69/splits.txt', write=True):
     """-> (boundary, units changed, their total size unknown here). Writes objdiff.json."""
     path = pathlib.Path(objdiff)
+    if not path.is_file():         # a fresh checkout: no split yet, so no objdiff.json to amend
+        return None, []
     j = json.loads(path.read_text(encoding='utf-8'))
     bound = first_sdk_text(j['units'], pathlib.Path(splits).read_text(encoding='utf-8'))
     if bound is None:
