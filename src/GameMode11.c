@@ -23,6 +23,23 @@ extern char* lbl_80192DC8[12];
 // The lessons' message lists: 16 message ids per lesson (-1 = none); lbl_80282420 is the lesson's row.
 extern s16 lbl_80192F2C[12 * 16];
 
+// A shot animation object (Player.nShotHandle); only its progress is read here.
+typedef struct ShotAnim {
+    u8  unk0[0x1628];
+    f32 fProgress;                          // 0x1628  compared with 0.45 and 0.75
+} ShotAnim;
+
+// The save data's lessons field (gpSaveData + 0x5000).
+typedef struct LessonSave {
+    u8  unk0[0x5000];
+    s32 n5000;                              // 0x5000  at least 1 once a lesson has been finished
+} LessonSave;
+
+typedef struct Vec4 {
+    f32 x, y, z, w;
+} Vec4;
+extern Vec4 lbl_80184E00;                   // 0, 0, 0, 0.5
+
 // The tee positions follow the pins in the per-hole data (fn_8000C594).
 typedef struct HoleTees {
     u8     unk0[0xB0];
@@ -39,6 +56,8 @@ extern u8  lbl_802823E5;
 extern u32 lbl_802823E8;                    // picks which message of a list is shown
 extern s32 lbl_802823EC;                    // the wind option, saved while the mode runs
 extern u8  lbl_802823F0;
+extern u8  lbl_802823F1;                    // the aim hints are showing
+extern u8  lbl_802823F2;                    // which of the two aim hints is showing
 extern s32 lbl_802823F4;
 extern u8  lbl_802823F8;
 extern s32 lbl_802823FC;                    // the current lesson, 1..12
@@ -48,6 +67,9 @@ extern u8  lbl_80282408;                    // the spin option, saved
 extern u8  lbl_80282409;                    // the boost option, saved
 extern u8  lbl_8028240A;                    // options unk84, saved
 extern u8  lbl_8028240B;                    // options unk0[4], saved
+extern s32 lbl_8028240C;                    // the highlighted one of four hints (4 = none yet)
+extern s32 lbl_80282410;                    // frames until the next highlight
+extern s32 lbl_80282414;                    // frames until the aim hints swap
 extern s32 lbl_80282418;
 extern s32 lbl_8028241C;
 extern s32 lbl_80282420;                    // the lesson's row in lbl_80192F2C
@@ -71,6 +93,13 @@ void  fn_80047B6C(u8* pBall, int nPlayer);
 void  fn_80047BC0(u8* pBall, int nPlayer);
 void  fn_800E3D38(int nPlayer, int a);
 void  fn_800A6DCC(int nMusic, int a);
+u32   fn_800136DC(int nController);         // buttons: held << 16 | pressed this frame
+u32   fn_800142AC(int nButton, int a);      // a button's mask
+u8    fn_800A7720(void);
+void  fn_80063BF4(void* pView, f32 f, f32* pVec);
+u8    fn_80063C7C(void* pView);
+f32   fn_8005C1EC(int nPlayer);
+extern u8* gpSaveData;
 
 void fn_801000E8(void);
 void fn_80100108(void);
@@ -89,6 +118,9 @@ u8   fn_80101C9C(int nPlayer, int a);
 u8   fn_80101CC4(int a);
 void fn_80101CD8(void);
 void fn_8010179C(void);
+void fn_801008F8(void);
+void fn_80101F70(void);
+void fn_80101F94(int a, int b);
 
 // Mode 11 starts: one player, most of the round's rules off, a fixed random seed. The player's
 // options that the lessons override are saved first.
@@ -465,6 +497,348 @@ void fn_80100B38(void) {
 
 u8 fn_80100C00(void) {
     return 0;
+}
+
+// The item (4..7) of the highlighted one of the four hints that take turns (lbl_8028240C).
+static inline int Hint(void) {
+    int nHint;
+    if (lbl_8028240C == 0) {
+        nHint = 4;
+    } else if (lbl_8028240C == 1) {
+        nHint = 5;
+    } else {
+        nHint = 7;
+        if (lbl_8028240C == 2) {
+            nHint = 6;
+        }
+    }
+    return nHint;
+}
+
+// Every frame: the lesson's steps (lbl_80282428). 2..5 set up a lesson and its demonstration, 6 and
+// 7 the player's tries with their hints, 8..11 a failed try, 12 a passed one, 13..19 the screens
+// between lessons.
+void fn_80100C08(void) {
+    Vec4 v;
+    int nView;
+    v = lbl_80184E00;
+    if (lbl_802823F8) {
+        fn_800E58B4(39);
+        lbl_802823F8 = 0;
+    }
+    switch (lbl_80282428) {
+    case 0:
+        if (fn_800136DC(gPlayers[0].nController) & fn_800142AC(0, 0)) {
+            lbl_80282428 = lbl_80282424;
+        }
+        break;
+    case 1:
+        lbl_802823E2 = 1;
+        if (!fn_800A7720()) {
+            lbl_802823E2 = 0;
+            lbl_80282428 = lbl_80282424;
+            if (lbl_80282424 == 13) {
+                lbl_80282428 = 18;
+                lbl_80282424 = 13;
+                fn_80063BF4(fn_80017028(gPlayers[0].nView0), 0.25f, &v.x);
+            }
+        }
+        break;
+    case 18:
+        if (fn_80063C7C(fn_80017028(gPlayers[0].nView0))) {
+            lbl_80282428 = lbl_80282424;
+        }
+        break;
+    case 2:
+        fn_800A6DCC(2, 1);
+        lbl_802823FC = 0;
+        fn_80100328();
+        fn_80100508();
+        lbl_80282428 = 3;
+        break;
+    case 3:
+        fn_80101F40(0, 0);
+        fn_80101F18(0);
+        fn_800E5200(-1);
+        fn_80100798(0, 1);
+        lbl_80282428 = 4;
+        lbl_802823E8 = 0;
+        break;
+    case 4:
+        if ((s8)GOLFERSTATE_GetCurrentState(0) != 20) {
+            fn_80100508();
+            GOLFERSTATE_Switch(GS_PRE_SHOT, 0);
+            fn_80101F40(0, 0);
+            fn_800E5200(-1);
+            fn_80101F18(0);
+            fn_80100798(1, 1);
+            lbl_80282428 = 5;
+        }
+        break;
+    case 5:
+        if ((s8)GOLFERSTATE_GetCurrentState(0) != GS_PRE_SHOT) {
+            if (gPlayers[0].swing.nState == 1 || gPlayers[0].swing.nState == 2) {
+                fn_80101F94(2, 0);
+                fn_80101F40(1, lbl_8028241C);
+                fn_800E5200(lbl_802823F4);
+                fn_80101F18(1);
+                if (lbl_802823FC == 10) {
+                    fn_80101F94(0, 1);
+                }
+            } else if (gPlayers[0].swing.nState == 3 || gPlayers[0].swing.nState == 4 ||
+                       gPlayers[0].swing.nState == 5) {
+                fn_80101F94(0, 0);
+                if (lbl_802823FC == 11 && gPlayers[0].swing.nState == 5) {
+                    if (lbl_802823E5) {
+                        fn_80101F40(1, lbl_8028241C);
+                        fn_800E5200(lbl_802823F4);
+                        fn_80101F18(3);
+                        fn_80101F94(2, 1);
+                    } else {
+                        fn_80101F40(0, 0);
+                        fn_800E5200(-1);
+                        fn_80101F18(0);
+                    }
+                } else {
+                    fn_80101F40(1, lbl_80282418);
+                    fn_800E5200(lbl_802823F4);
+                    fn_80101F18(2);
+                    fn_80101F94(2, 0);
+                }
+            } else {
+                fn_80101F40(1, 0);
+                fn_800E5200(lbl_802823F4);
+                fn_80101F94(0, 0);
+            }
+        }
+        break;
+    case 6:
+        fn_801008F8();
+        lbl_802823F1 = 0;
+        lbl_802823E5 = 0;
+        // falls through
+    case 7:
+        if (gPlayers[0].swing.nState == 0) {
+            if (lbl_802823F1) {
+                if (--lbl_80282414 <= 0) {
+                    lbl_80282414 = 59;
+                    lbl_802823F2 = !lbl_802823F2;
+                }
+                if (lbl_802823F2) {
+                    fn_80101F40(1, lbl_8028241C);
+                    fn_800E5200(lbl_802823F4);
+                    fn_80101F18(1);
+                    if (lbl_802823FC == 10) {
+                        fn_80101F94(0, 1);
+                    }
+                } else {
+                    fn_80101F40(1, lbl_80282418);
+                    fn_800E5200(lbl_802823F4);
+                    fn_80101F18(2);
+                    if (lbl_802823FC == 10) {
+                        fn_80101F94(0, 0);
+                    }
+                }
+                if ((lbl_802823FC == 6 || lbl_802823FC == 7) && --lbl_80282410 <= 0) {
+                    lbl_80282410 = 83;
+                    if (lbl_8028240C == 4) {
+                        lbl_8028240C = 0;
+                        fn_80101F94(4, 1);
+                        fn_80101F94(5, 0);
+                        fn_80101F94(6, 0);
+                        fn_80101F94(7, 0);
+                    } else {
+                        fn_80101F94(Hint(), 0);
+                        lbl_8028240C++;
+                        lbl_8028240C %= 4;
+                        fn_80101F94(Hint(), 1);
+                    }
+                }
+            } else {
+                lbl_80282410 = 389;
+                lbl_8028240C = 4;
+                lbl_80282414 = 59;
+                fn_80101F40(1, lbl_8028241C);
+                fn_800E5200(lbl_802823F4);
+                fn_80101F18(1);
+                lbl_802823F1 = 1;
+                lbl_802823F2 = 1;
+                if (lbl_802823FC == 6 || lbl_802823FC == 7) {
+                    fn_80101F94(4, 1);
+                    fn_80101F94(5, 1);
+                    fn_80101F94(6, 1);
+                    fn_80101F94(7, 1);
+                } else {
+                    fn_80101F94(4, 0);
+                    fn_80101F94(5, 0);
+                    fn_80101F94(6, 0);
+                    fn_80101F94(7, 0);
+                }
+                if (lbl_802823FC == 10) {
+                    fn_80101F94(0, 1);
+                } else if (lbl_802823FC == 8) {
+                    fn_80101F94(5, 1);
+                } else if (lbl_802823FC == 9) {
+                    fn_80101F94(4, 1);
+                } else if (lbl_802823FC == 2) {
+                    fn_80101F94(8, 1);
+                }
+            }
+        } else {
+            fn_80101F94(4, 0);
+            fn_80101F94(5, 0);
+            fn_80101F94(6, 0);
+            fn_80101F94(7, 0);
+            fn_80101F94(8, 0);
+            if (gPlayers[0].swing.nState == 2 || gPlayers[0].swing.nState == 3 ||
+                (gPlayers[0].swing.nState == 1 &&
+                 ((lbl_802823FC == 5 && ((ShotAnim*)gPlayers[0].nShotHandle)->fProgress > 0.45f) ||
+                  (lbl_802823FC != 5 && ((ShotAnim*)gPlayers[0].nShotHandle)->fProgress > 0.75f)))) {
+                fn_80101F40(1, lbl_80282418);
+                fn_800E5200(lbl_802823F4);
+                fn_80101F18(2);
+                lbl_802823E5 = 1;
+                if (lbl_802823FC == 10) {
+                    fn_80101F94(0, 0);
+                } else if (lbl_802823FC == 11) {
+                    fn_80101F94(2, 0);
+                }
+            } else if (gPlayers[0].swing.nState == 5 || gPlayers[0].swing.nState == 4) {
+                lbl_80282400 = fn_8005C1EC(0);
+                if (lbl_802823FC == 11) {
+                    fn_80101F94(2, 1);
+                    if (!lbl_802823E5) {
+                        fn_80101F40(0, 0);
+                        fn_800E5200(-1);
+                        fn_80101F18(0);
+                    } else {
+                        fn_80101F40(1, lbl_8028241C);
+                        fn_800E5200(lbl_802823F4);
+                        fn_80101F18(3);
+                    }
+                } else {
+                    fn_80101F40(0, 0);
+                    fn_800E5200(-1);
+                    fn_80101F18(0);
+                }
+            } else {
+                fn_80101F40(1, lbl_8028241C);
+                fn_800E5200(lbl_802823F4);
+                fn_80101F18(1);
+                if (lbl_802823FC == 10) {
+                    fn_80101F94(0, 1);
+                }
+            }
+        }
+        break;
+    case 8:
+        if (lbl_802823FC == 10) {
+            fn_80101F94(0, 1);
+        } else if (lbl_802823FC == 8) {
+            fn_80101F94(5, 1);
+        } else if (lbl_802823FC == 9) {
+            fn_80101F94(4, 1);
+        }
+        fn_801008F8();
+        fn_80100798(3, 5);
+        break;
+    case 9:
+        if (lbl_802823FC == 10) {
+            fn_80101F94(0, 1);
+        } else if (lbl_802823FC == 8) {
+            fn_80101F94(5, 1);
+        } else if (lbl_802823FC == 9) {
+            fn_80101F94(4, 1);
+        }
+        fn_801008F8();
+        fn_80100798(11, 2);
+        break;
+    case 10:
+        if (lbl_802823FC == 10) {
+            fn_80101F94(0, 1);
+        } else if (lbl_802823FC == 8) {
+            fn_80101F94(5, 1);
+        } else if (lbl_802823FC == 9) {
+            fn_80101F94(4, 1);
+        }
+        fn_801008F8();
+        fn_80100798(8, 3);
+        break;
+    case 11:
+        if (lbl_802823FC == 10) {
+            fn_80101F94(0, 1);
+        } else if (lbl_802823FC == 8) {
+            fn_80101F94(5, 1);
+        } else if (lbl_802823FC == 9) {
+            fn_80101F94(4, 1);
+        }
+        fn_801008F8();
+        fn_80100798(13, 2);
+        break;
+    case 12:
+        if (lbl_802823FC == 10) {
+            fn_80101F94(2, 1);
+        }
+        fn_80100328();
+        if (lbl_802823FC == 12) {
+            lbl_80282428 = 19;
+        } else if (lbl_802823FC == 8) {
+            lbl_80282428 = 19;
+        } else {
+            lbl_80282424 = 15;
+            fn_800A76E4();
+            lbl_802823E2 = 0;
+            lbl_80282428 = lbl_80282424;
+            if (lbl_80282424 == 15) {
+                GM_EndOfGolferTurn(0);
+                lbl_80282428 = 3;
+            }
+        }
+        break;
+    case 15:
+        GM_EndOfGolferTurn(0);
+        lbl_80282428 = 3;
+        break;
+    case 16:
+        GM_EndOfGolferTurn(0);
+        lbl_80282428 = 6;
+        break;
+    case 14:
+        lbl_80282424 = 15;
+        lbl_80282428 = 1;
+        break;
+    case 13:
+        gSession.unk11[1] = 1;
+        EVENT_Trigger(0, 5, 0, -1);
+        break;
+    case 17:
+        if (lbl_802823E3) {
+            lbl_80282428 = lbl_80282424;
+        } else if (lbl_802823E4) {
+            lbl_80282428 = 13;
+        }
+        // falls through
+    case 19:
+        if (fn_80063C7C(fn_80017028(gPlayers[0].nView0))) {
+            nView = gPlayers[0].nView0;
+            View_SetCamera(fn_80017028(nView), 18, 0, nView);
+            if (lbl_802823FC == 12) {
+                lbl_80282424 = 13;
+                lbl_80282428 = 1;
+                lbl_802823E2 = 1;
+                break;
+            }
+            if (((LessonSave*)gpSaveData)->n5000 < 1) {
+                ((LessonSave*)gpSaveData)->n5000 = 1;
+            }
+            lbl_80282424 = 14;
+            fn_80101F70();
+            lbl_802823E3 = 0;
+            lbl_802823E4 = 0;
+            lbl_80282428 = 17;
+        }
+        break;
+    }
 }
 
 u8 fn_80101738(void) {
