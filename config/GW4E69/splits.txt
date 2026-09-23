@@ -2784,10 +2784,15 @@ GameUI.c:
 	.text       start:0x800E3B28 end:0x800E4FFC
 	.rodata     start:0x80184D90 end:0x80184DA0
 	.data       start:0x80192558 end:0x80192588
+	.bss        start:0x80202B88 end:0x80203138
+	.sdata      start:0x80281640 end:0x80281648
+	.sbss       start:0x80282280 end:0x802822E0
 	.sdata2     start:0x80284628 end:0x80284630
 
 GameMessages.c:
 	.text       start:0x800E4FFC end:0x800E5E54
+	.bss        start:0x80203138 end:0x80203148
+	.sbss       start:0x802822E0 end:0x802822E8
 	.sdata2     start:0x80284630 end:0x80284638
 
 GameAnalysis.c:

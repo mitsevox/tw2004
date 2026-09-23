@@ -273,6 +273,7 @@ extern UIQueueItem lbl_80202CFC[UI_QUEUE_LEN];  // queue 8 (lbl_80282294)
 extern UIQueueItem lbl_80202C84[UI_QUEUE_LEN];  // queue 9 (lbl_80282290)
 extern UIQueueItem lbl_80202C0C[UI_QUEUE_LEN];  // queue 10 (lbl_8028228C)
 extern UIQueueItem lbl_80202B94[UI_QUEUE_LEN];  // queue 11 (lbl_80282288)
+extern u8          lbl_80202B88[9];             // the menu screens still open (GameMessages.c)
 extern u8          lbl_80203138[14];            // the tips already shown (GameMessages.c, GameAnalysis.c)
 
 extern u8  lbl_80282280;

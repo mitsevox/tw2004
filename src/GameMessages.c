@@ -4,6 +4,7 @@
 #include "golfer.h"
 #include "game.h"
 #include "engine.h"
+#include "game/frontend.h"
 
 // One value of a message: an int or a float (the mask passed with it says which), or a pointer.
 typedef union MsgArg {
@@ -19,15 +20,6 @@ typedef struct MsgString {
     char* pStr;
 } MsgString;
 
-typedef struct FrontEnd {
-    u8    unk0[4];
-    void* pHandler;             // 0x4
-} FrontEnd;
-
-extern FrontEnd* lbl_80281F1C;
-extern u8 lbl_80202B88[];
-extern u8 lbl_802822E4;
-extern s32 lbl_802822E0;
 extern u8 lbl_801D87C0[];
 
 void  fn_8016B09C(void* pHandler, int nMsg, int nArgs, MsgArg* pArgs);
@@ -46,6 +38,11 @@ void  fn_800E5908(int nMsg);
 void  fn_800E5D40(int n);
 void  fn_800E5D68(char* pStr);
 u8    fn_800E5D90(void);
+
+// GameMessages.c's data, defined last address first (CodeWarrior lays each section out in reverse).
+u8  lbl_802822E4;           // pending-message flags, each sent once
+s32 lbl_802822E0;           // the value sent with some of them
+u8  lbl_80203138[14];       // the tips already shown (game.h)
 
 void fn_800E4FFC(int n) {
     fn_80062D6C(48, n);
