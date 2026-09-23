@@ -20,19 +20,36 @@ extern Lesson lbl_80192DF8[11];
 extern char* lbl_80192D98[12];
 extern char* lbl_80192DC8[12];
 
+// The lessons' message lists: 16 message ids per lesson (-1 = none); lbl_80282420 is the lesson's row.
+extern s16 lbl_80192F2C[12 * 16];
+
+// The tee positions follow the pins in the per-hole data (fn_8000C594).
+typedef struct HoleTees {
+    u8     unk0[0xB0];
+    PinPos tee[4];                          // 0xB0  one per tee set
+} HoleTees;
+
 extern s32 lbl_802816D8;                    // the options' unkC, saved while the mode runs
+extern u8  lbl_802823E0;
+extern u8  lbl_802823E1;
 extern u8  lbl_802823E2;
 extern u8  lbl_802823E3;
 extern u8  lbl_802823E4;
+extern u8  lbl_802823E5;
+extern u32 lbl_802823E8;                    // picks which message of a list is shown
 extern s32 lbl_802823EC;                    // the wind option, saved while the mode runs
 extern u8  lbl_802823F0;
+extern s32 lbl_802823F4;
 extern u8  lbl_802823F8;
 extern s32 lbl_802823FC;                    // the current lesson, 1..12
+extern s32 lbl_80282404;                    // player 0's controller, kept while the CPU demonstrates
 extern u8  lbl_80282408;                    // the spin option, saved
 extern u8  lbl_80282409;                    // the boost option, saved
 extern u8  lbl_8028240A;                    // options unk84, saved
 extern u8  lbl_8028240B;                    // options unk0[4], saved
-extern s32 lbl_80282420;
+extern s32 lbl_80282418;
+extern s32 lbl_8028241C;
+extern s32 lbl_80282420;                    // the lesson's row in lbl_80192F2C
 extern s32 lbl_80282424;
 extern s32 lbl_80282428;                    // the lesson's step
 
@@ -43,6 +60,15 @@ void  fn_80055C1C(u8 b);
 void  GM_FlyByMode_Init(void);
 void  fn_80125854(int a);
 void  fn_800A6EC8(void);
+void  fn_800E5200(int a);
+void  Shot_Prepare(int nPlayer, u8 bNotify);
+void  AI_ChooseTarget(int nPlayer);
+void  BreakLine_Start(int nView);
+void  fn_8009B970(int nView);
+void  fn_80058FA4(int nPlayer);
+void  fn_80047B6C(u8* pBall, int nPlayer);
+void  fn_80047BC0(u8* pBall, int nPlayer);
+void  fn_800E3D38(int nPlayer, int a);
 
 void fn_801000E8(void);
 void fn_80100108(void);
@@ -50,6 +76,11 @@ void fn_80100128(void);
 void fn_80100160(void);
 void fn_80100230(void);
 void fn_80100308(void);
+void fn_80100508(void);
+int  fn_80100798(int nList, int nCount);
+void fn_80101F18(int nPlayer);
+void fn_80101F40(u8 a, int b);
+void fn_80101FC0(int a, int b);
 void fn_80100A3C(int nPlayer);
 void fn_80100C08(void);
 u8   fn_80101C9C(int nPlayer, int a);
@@ -174,6 +205,119 @@ void fn_80100308(void) {
     }
 }
 
+// On to the next lesson: its row of messages and two counts.
+void fn_80100328(void) {
+    switch (++lbl_802823FC) {
+    case 0:
+        lbl_80282420 = 0x00;
+        lbl_8028241C = 5;
+        lbl_80282418 = 2;
+        break;
+    case 7:
+        lbl_80282420 = 0x10;
+        lbl_8028241C = 4;
+        lbl_80282418 = 3;
+        break;
+    case 8:
+        lbl_80282420 = 0x20;
+        lbl_8028241C = 6;
+        lbl_80282418 = 1;
+        break;
+    case 1:
+        lbl_80282420 = 0x30;
+        lbl_8028241C = 5;
+        lbl_80282418 = 2;
+        break;
+    case 4:
+        lbl_80282420 = 0x40;
+        lbl_8028241C = 5;
+        lbl_80282418 = 2;
+        break;
+    case 5:
+        lbl_80282420 = 0x50;
+        lbl_8028241C = 5;
+        lbl_80282418 = 2;
+        break;
+    case 2:
+        lbl_80282420 = 0x60;
+        lbl_8028241C = 5;
+        lbl_80282418 = 2;
+        break;
+    case 3:
+        lbl_80282420 = 0x70;
+        lbl_8028241C = 5;
+        lbl_80282418 = 2;
+        break;
+    case 6:
+        SESSION_OPTIONS->unk84 = 1;
+        lbl_80282420 = 0x80;
+        lbl_8028241C = 5;
+        lbl_80282418 = 2;
+        break;
+    case 9:
+        SESSION_OPTIONS->unk84 = 0;
+        lbl_80282420 = 0x90;
+        lbl_8028241C = 5;
+        lbl_80282418 = 2;
+        break;
+    case 10:
+        lbl_80282420 = 0xA0;
+        lbl_8028241C = 5;
+        lbl_80282418 = 2;
+        lbl_802823E5 = 1;
+        break;
+    case 11:
+        lbl_80282420 = 0xB0;
+        fn_80101F40(0, 0);
+        fn_800E5200(-1);
+        fn_80101F18(0);
+        fn_80100798(0, 1);
+        break;
+    case 12:
+        break;
+    }
+    lbl_802823F4 = lbl_802823FC - 1;
+}
+
+// Puts player 0's ball where the lesson starts (the tee when the lesson has no spot) and hands the
+// player to the CPU for the demonstration.
+void fn_80100508(void) {
+    int n = lbl_802823FC - 1;
+    f32 fHeight;
+    HoleTees* pTees;
+    if (-1.0f == lbl_80192DF8[n].vPos[0] && -1.0f == lbl_80192DF8[n].vPos[1] &&
+        -1.0f == lbl_80192DF8[n].vPos[2]) {
+        pTees = (HoleTees*)fn_8000C594();
+        Vec_Copy(&pTees->tee[gSession.nTeeSet[0]].x, &gPlayers[0].fBallX);
+    } else {
+        fHeight = Terrain_HeightAt(lbl_80192DF8[n].vPos, NULL);
+        if (-65536.125f != fHeight) {
+            lbl_80192DF8[n].vPos[1] = fHeight;
+        }
+        Vec_Copy(lbl_80192DF8[n].vPos, &gPlayers[0].fBallX);
+    }
+    Vec_Copy(&gPlayers[0].fBallX, gPlayers[0].vPreShot);
+    Vec_Copy(&gPlayers[0].fBallX, (f32*)gPlayers[0].ball);
+    fn_80055AA8((Ball*)gPlayers[0].ball, &gPlayers[0].fBallX, 0);
+    // EA bug: always true (|| where && was meant), so the ball is always dropped.
+    if (lbl_802823FC != 1 || lbl_802823FC != 8 || lbl_802823FC != 9 || lbl_802823FC != 11) {
+        Physics_DropBall((Ball*)gPlayers[0].ball, &gPlayers[0].fBallX);
+    }
+    gPlayers[0].attrMod[0] = 0;
+    gPlayers[0].attrMod[8] = 0;
+    gPlayers[0].attrMod[2] = 0;
+    gPlayers[0].attrMod[3] = 0;
+    gPlayers[0].attrMod[5] = 0;
+    gPlayers[0].attrMod[6] = 0;
+    gPlayers[0].attrMod[7] = 0;
+    gPlayers[0].attrMod[11] = 0;
+    gPlayers[0].swing.nState = 0;
+    if (gPlayers[0].nController != CONTROLLER_CPU) {
+        lbl_80282404 = gPlayers[0].nController;
+    }
+    gPlayers[0].nController = CONTROLLER_CPU;
+}
+
 // The shape the lesson requires, 7 (any) outside mode 11.
 int Scenario_RequiredShape(void) {
     int n = lbl_802823FC - 1;
@@ -212,11 +356,108 @@ char* fn_801008A8(void) {
     return 0;
 }
 
+// Shows the next message of one of the lesson's lists, skipping empty entries; nonzero if there
+// was one.
+int fn_80100798(int nList, int nCount) {
+    s16* pList = &lbl_80192F2C[lbl_80282420] + nList;
+    u32 i = lbl_802823E8 % nCount;
+    int n = 0;
+    while (pList[i] == -1 && n < nCount) {
+        i = (i + 1) % nCount;
+        n++;
+    }
+    if (pList[i] != -1) {
+        fn_80101FC0((u16)pList[i], 0);
+        if (nList == 3 && lbl_802823FC == 7) {
+            if (i == 0) {
+                lbl_802823F4 = 12;
+            } else if (i == 2) {
+                lbl_802823F4 = 11;
+            } else {
+                lbl_802823F4 = 6;
+            }
+        }
+    }
+    return !(pList[i] == -1);
+}
+
+// The lesson restarts: the ball back at its spot, the demonstration again from step 7.
+void fn_801008F8(void) {
+    fn_80101F40(0, 0);
+    fn_800E5200(-1);
+    fn_80101F18(0);
+    fn_80100508();
+    gPlayers[0].nController = lbl_80282404;
+    GOLFERSTATE_Switch(GS_PRE_SHOT, 0);
+    if (lbl_80282428 == 8 || lbl_80282428 == 9 || lbl_80282428 == 10 || lbl_80282428 == 11) {
+        fn_800957D8(gPlayers[0].nShotHandle);
+    }
+    if (lbl_802823FC == 7) {
+        AI_DefaultTarget(0);
+        Shot_Prepare(0, 1);
+        BreakLine_Start(gPlayers[0].nView0);
+        fn_8009B970(gPlayers[0].nView0);
+        fn_8001C804(0, 1, 1);
+        fn_800957D8(gPlayers[0].nShotHandle);
+        fn_80058FA4(0);
+        if (lbl_80282428 != 8 && lbl_80282428 != 9 && lbl_80282428 != 10 && lbl_80282428 != 11) {
+            fn_80095744(gPlayers[0].nShotHandle, 1);
+        }
+    }
+    lbl_802823E0 = 0;
+    lbl_802823E1 = 0;
+    lbl_80282428 = 7;
+    fn_80047B6C(NULL, 0);
+    fn_80047BC0(NULL, 0);
+}
+
+// After a re-plan: the target chosen again, keeping the player's club and shot kind.
+void fn_80100A3C(int nPlayer) {
+    s32 nShotKind = gPlayers[0].nShotKind;
+    s32 nClub = gPlayers[0].nClub;
+    if (nShotKind == 0) {
+        AI_DefaultTarget(0);
+    } else {
+        AI_ChooseTarget(0);
+    }
+    Shot_Prepare(0, 1);
+    gPlayers[0].nShotKind = nShotKind;
+    gPlayers[0].nClub = nClub;
+    BreakLine_Start(gPlayers[0].nView0);
+    fn_8009B970(gPlayers[0].nView0);
+    fn_8001C804(0, 1, 1);
+    fn_800957D8(gPlayers[0].nShotHandle);
+    fn_80095744(gPlayers[0].nShotHandle, 5);
+    fn_80062C38();
+}
+
 u8 fn_80100AF8(void) {
     if (fn_80100294() && lbl_802823FC == 5) {
         return 1;
     }
     return 0;
+}
+
+// Back to the lesson's start (lesson 1 if none), unless the lessons are over.
+void fn_80100B38(void) {
+    if (!fn_80100294() || lbl_802823FC == 12) {
+        return;
+    }
+    if (gSession.unk14 == 0 && lbl_80282428 != 17) {
+        fn_800A76E4();
+        if (lbl_802823FC == 0) {
+            lbl_802823FC = 1;
+        }
+        lbl_80282428 = 4;
+        lbl_802823E8 = 0;
+        lbl_802823E2 = 0;
+        GM_EndOfGolferTurn(0);
+        fn_80062C80(gPlayers[0].nC58, 0);
+        fn_800E3D38(0, 0);
+        fn_80101F40(0, 0);
+        fn_80101F18(0);
+        fn_800E5200(-1);
+    }
 }
 
 u8 fn_80100C00(void) {
