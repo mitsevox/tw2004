@@ -3672,11 +3672,11 @@ GameMode13.c:
 GameMode2.c:
 	.text       start:0x800F80FC end:0x800F944C
 
-unsorted/sweep_800F9824.c:
-	.text       start:0x800F9824 end:0x800F9844
+GameMode6.c:
+	.text       start:0x800F944C end:0x800F9610
 
-unsorted/sweep_800F9844.c:
-	.text       start:0x800F9844 end:0x800F986C
+GameMode7.c:
+	.text       start:0x800F9610 end:0x800F986C
 
 unsorted/sweep_800F9BF8.c:
 	.text       start:0x800F9BF8 end:0x800F9C00
