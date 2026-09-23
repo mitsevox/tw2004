@@ -464,10 +464,6 @@ typedef struct Session {
     u8   unk5B4C[0x5BD0 - 0x5B4C];
 } Session;
 
-// Kept for the files that still use them (Ball.c, GameUI.c, Swing.c); new code writes the fields.
-#define SESSION_OPTIONS    (&gSession.options)
-#define SESSION_PROFILE(i) (&gSession.aProfile[i])
-
 // The game state gpGame points at: the current game mode's rules (data and callbacks; TW06
 // turned this into the GameModeDriver class). Only what our files use is named.
 typedef struct GameState {
