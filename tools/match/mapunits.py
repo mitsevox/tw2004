@@ -303,6 +303,9 @@ def main():
             nd, nb = make_unit(blocks, f, lo, hi, sweeps)
         except (ValueError, AssertionError) as e:
             print('%s: not made: %s' % (f['name'], e))
+            for n in NOTES:
+                print('  note: ' + n)
+            del NOTES[:]
             continue
         print('%s: 0x%08X-0x%08X, %d sweeps folded (%d declarations, %d functions)' % (
             f['name'], lo, hi, len(sweeps), nd, nb))
