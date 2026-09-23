@@ -21,6 +21,11 @@ char* strcpy(char* pDst, const char* pSrc);
 int  strcmp(const char* a, const char* b);
 int  sprintf(char* pBuf, const char* pFmt, ...);
 
+// ---- time ------------------------------------------------------------------------------------
+
+#define FRAME_RATE 59.94f               // frames a second (NTSC)
+#define FRAME_TIME (1.0f / FRAME_RATE)  // one frame, in seconds
+
 // ---- math and random numbers -----------------------------------------------------------------
 
 void Vec3Copy(f32* pSrc, f32* pDst);    // 0x80008304
@@ -114,16 +119,45 @@ typedef struct ShotObj {
 
 // The camera tuning values (GoGolfCam.c); only the fields read so far.
 typedef struct CamTuning {
-    u8   unk0[0x94];
+    u8   unk0[0x4C];
+    f32  f4C;                   // 0x04C  camera 5's height over the ball
+    f32  f50;                   // 0x050  camera 5: the ball-to-pin distance of a full swing out
+    f32  f54;                   // 0x054  camera 5: how long the swing out lasts
+    f32  f58;                   // 0x058  how long camera 13's closing shot lasts
+    u8   unk5C[4];
+    f32  f60;                   // 0x060  camera 13's slow-motion step length (0: every frame)
+    f32  f64;                   // 0x064
+    f32  v68[4];                // 0x068  camera 13's fn_80038010 vector; [3] shrinks as the camera's time runs
+    f32  f78;                   // 0x078  ... over this many seconds
+    f32  f7C;                   // 0x07C  camera 13's fallback shots' f78/f7C: from this value ...
+    f32  f80;                   // 0x080  ... to this one
+    u8   unk84[4];
+    f32  f88;                   // 0x088
+    f32  f8C;                   // 0x08C
+    u8   unk90[4];
     f32  f94;                   // 0x094  the elevator camera's first blend value
-    u8   unk98[0x16C - 0x98];
+    u8   unk98[0xB8 - 0x98];
+    f32  fB8;                   // 0x0B8  camera 15 waits this long on a ball near the green
+    s32  nBeats;                // 0x0BC  the heartbeat camera's beats
+    s32  nBeatFrames;           // 0x0C0
+    f32  fC4;                   // 0x0C4
+    f32  fC8;                   // 0x0C8
+    f32  fCC;                   // 0x0CC
+    u8   unkD0[0x168 - 0xD0];
+    f32  f168;                  // 0x168  the ground clearance for CamScript_KeepAboveGround
     f32  f16C;                  // 0x16C  the obstruction radius around the ball for the pre-shot routine
-    f32  f170;                  // 0x170  fn_80063BF4's blend
+    f32  f170;                  // 0x170  a blend for fn_80063B98 / fn_80063BF4
     u8   unk174[0x178 - 0x174];
     f32  f178;                  // 0x178
     f32  v17C[4];               // 0x17C
     u8   unk18C[0x1C0 - 0x18C];
     s32  n1C0;                  // 0x1C0  nonzero enables camera 19
+    u8   unk1C4[0x1C8 - 0x1C4];
+    s32  bCheckSlope;           // 0x1C8  fn_800C4650 tests the slope to the target (fn_800C4520)
+    s32  bCheckTerrain;         // 0x1CC  and the ground in between (fn_800C4604)
+    u8   unk1D0[0x1E0 - 0x1D0];
+    f32  fSlopeUp;              // 0x1E0
+    f32  fSlopeDown;            // 0x1E4
 } CamTuning;
 
 extern CamTuning* lbl_80281F78;
