@@ -1,7 +1,7 @@
 // CharSliders.c (EA's name, from its asserts; TW06): not yet decompiled; the sweep code below is
 // the matched small functions.
 
-#include "game_types.h"
+#include "engine.h"
 
 // ---- sweep code (not yet cleaned up) ----
 
@@ -9,7 +9,6 @@ void fn_8010C714(void);
 extern u8 gSession[];
 extern s32 lbl_80281764;
 u8* fn_8010C718(void);
-void fn_80125910();
 void fn_8010C73C(void);
 void fn_8010C740(void);
 void fn_8010D330(void);
@@ -48,7 +47,7 @@ void fn_8010C73C(void) {
 }
 
 void fn_8010C740(void) {
-    fn_80125910(1);
+    EASBio_SetCurrentGameWon(1);
 }
 
 void fn_8010C8B8(void) {

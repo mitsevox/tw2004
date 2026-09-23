@@ -419,7 +419,7 @@ void fn_800E7828(void) {
                 p = PLAYER(i);
                 nProfile = p->nIndex;
                 if (gpSaveData[nProfile].bActive) {
-                    fn_80125910(1);
+                    EASBio_SetCurrentGameWon(1);
                     if (nMoney) {
                         fn_800E4364(0, 0x6B, nPrize, nProfile);
                         fn_800D3548(i, nMoney, 0);
