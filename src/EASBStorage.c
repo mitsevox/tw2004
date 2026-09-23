@@ -238,8 +238,8 @@ void fn_80128528(EASBTotals* pTotals, EASBProduct* pProduct) {
     pTotals->nProducts = 0;
 }
 
-// Adds one product record into the totals.
-void fn_80128580(EASBTotals* pTotals, EASBProduct* pProduct) {
+// Adds one product record into the totals (fn_8012B4C0 passes 1 as n2, which is not used).
+void fn_80128580(EASBTotals* pTotals, EASBProduct* pProduct, s32 n2) {
     if (pProduct->bValid) {
         pTotals->u0 = fn_80128468(pTotals->u0, pProduct->u50);
         pTotals->u4 = fn_80128468(pTotals->u4, pProduct->u54);
@@ -1159,8 +1159,8 @@ EASBErrorE fn_8012AC40(EASBProcessE* peProcess) {
         return EASB_ERROR_INTERNAL;
     }
     if (*peProcess == EASB_PROCESS_NONE) {
-        lbl_802825B0->b168 = 0;
-        eError = fn_8012C98C(TagFile_Read(&lbl_802825B0->session, EASB_TAG_PROD, lbl_802825B0->b168,
+        lbl_802825B0->nRecord = 0;
+        eError = fn_8012C98C(TagFile_Read(&lbl_802825B0->session, EASB_TAG_PROD, lbl_802825B0->nRecord,
                                           lbl_802825B0->pBuffer, EASB_PROD_SIZE));
         *peProcess = EASB_PROCESS_CONTINUE;
     } else if (*peProcess == EASB_PROCESS_CONTINUE) {
@@ -1168,20 +1168,20 @@ EASBErrorE fn_8012AC40(EASBProcessE* peProcess) {
     }
     if (*peProcess == EASB_PROCESS_COMPLETE) {
         if (eError == EASB_ERROR_NONE) {
-            fn_80129B30(&lbl_802825B0->args.pProduct[lbl_802825B0->b168], lbl_802825B0->pBuffer,
+            fn_80129B30(&lbl_802825B0->args.pProduct[lbl_802825B0->nRecord], lbl_802825B0->pBuffer,
                         lbl_802825B0->uBufferSize);
-            lbl_802825B0->args.pProduct[lbl_802825B0->b168].b1167 = lbl_802825B0->b168;
+            lbl_802825B0->args.pProduct[lbl_802825B0->nRecord].b1167 = lbl_802825B0->nRecord;
         } else if (eError == EASB_ERROR_SECTION_CORRUPT) {
-            memset(&lbl_802825B0->args.pProduct[lbl_802825B0->b168], 0, sizeof(EASBProduct));
+            memset(&lbl_802825B0->args.pProduct[lbl_802825B0->nRecord], 0, sizeof(EASBProduct));
             eError = EASB_ERROR_NONE;
-            lbl_802825B0->args.pProduct[lbl_802825B0->b168].bValid = 0;
-            lbl_802825B0->anProductState[lbl_802825B0->b168] = 2;
+            lbl_802825B0->args.pProduct[lbl_802825B0->nRecord].bValid = 0;
+            lbl_802825B0->anProductState[lbl_802825B0->nRecord] = 2;
         } else {
             return eError;
         }
-        if (lbl_802825B0->b168 < EASB_MAX_PRODUCTS - 1) {
-            lbl_802825B0->b168++;
-            eError = fn_8012C98C(TagFile_Read(&lbl_802825B0->session, EASB_TAG_PROD, lbl_802825B0->b168,
+        if (lbl_802825B0->nRecord < EASB_MAX_PRODUCTS - 1) {
+            lbl_802825B0->nRecord++;
+            eError = fn_8012C98C(TagFile_Read(&lbl_802825B0->session, EASB_TAG_PROD, lbl_802825B0->nRecord,
                                               lbl_802825B0->pBuffer, EASB_PROD_SIZE));
             *peProcess = EASB_PROCESS_CONTINUE;
         }
@@ -1211,8 +1211,8 @@ EASBErrorE fn_8012AE40(EASBProcessE* peProcess) {
         return EASB_ERROR_SECTION_CORRUPT;
     }
     if (*peProcess == EASB_PROCESS_NONE) {
-        lbl_802825B0->b168 = 0;
-        eError = fn_8012C98C(TagFile_Read(&lbl_802825B0->session, EASB_TAG_IMAG, lbl_802825B0->b168,
+        lbl_802825B0->nRecord = 0;
+        eError = fn_8012C98C(TagFile_Read(&lbl_802825B0->session, EASB_TAG_IMAG, lbl_802825B0->nRecord,
                                           lbl_802825B0->pBuffer, EASB_IMAG_SIZE));
         *peProcess = EASB_PROCESS_CONTINUE;
     } else if (*peProcess == EASB_PROCESS_CONTINUE) {
@@ -1220,18 +1220,18 @@ EASBErrorE fn_8012AE40(EASBProcessE* peProcess) {
     }
     if (*peProcess == EASB_PROCESS_COMPLETE) {
         if (eError == EASB_ERROR_NONE) {
-            fn_80129E88(&lbl_802825B0->args.pImageSlots[lbl_802825B0->b168], lbl_802825B0->pBuffer,
+            fn_80129E88(&lbl_802825B0->args.pImageSlots[lbl_802825B0->nRecord], lbl_802825B0->pBuffer,
                         lbl_802825B0->uBufferSize);
         } else if (eError == EASB_ERROR_NOFILE || eError == EASB_ERROR_NODEVICE) {
             return eError;
         } else {
-            memset(&lbl_802825B0->args.pImageSlots[lbl_802825B0->b168], 0, sizeof(EASBImageSlot));
+            memset(&lbl_802825B0->args.pImageSlots[lbl_802825B0->nRecord], 0, sizeof(EASBImageSlot));
             eError = EASB_ERROR_NONE;
-            lbl_802825B0->args.pImageSlots[lbl_802825B0->b168].bLoaded = 0;
+            lbl_802825B0->args.pImageSlots[lbl_802825B0->nRecord].bLoaded = 0;
         }
-        if (lbl_802825B0->b168 < EASB_MAX_PRODUCTS - 1) {
-            lbl_802825B0->b168++;
-            eError = fn_8012C98C(TagFile_Read(&lbl_802825B0->session, EASB_TAG_IMAG, lbl_802825B0->b168,
+        if (lbl_802825B0->nRecord < EASB_MAX_PRODUCTS - 1) {
+            lbl_802825B0->nRecord++;
+            eError = fn_8012C98C(TagFile_Read(&lbl_802825B0->session, EASB_TAG_IMAG, lbl_802825B0->nRecord,
                                               lbl_802825B0->pBuffer, EASB_IMAG_SIZE));
             *peProcess = EASB_PROCESS_CONTINUE;
         }
@@ -1376,6 +1376,237 @@ EASBErrorE fn_8012B3B0(EASBProcessE* peProcess) {
     return eError;
 }
 
+// Step: reads the HEAD record, then every PROD record, adding each valid record into the
+// totals. A corrupt record is marked (state 2) and skipped.
+EASBErrorE fn_8012B4C0(EASBProcessE* peProcess) {
+    EASBProduct product;
+    EASBErrorE eError;
+
+    eError = EASB_ERROR_NONE;
+    if (peProcess == NULL) {
+        return EASB_ERROR_NULL_PARAMETERS;
+    }
+    if (lbl_802825B0->bFileOpen == 0) {
+        return EASB_ERROR_INTERNAL;
+    }
+    if (*peProcess == EASB_PROCESS_NONE) {
+        memset(&lbl_802825B0->nHeadState, 0, sizeof(lbl_802825B0->nHeadState));
+        memset(lbl_802825B0->anProductState, 0, sizeof(lbl_802825B0->anProductState));
+        memset(&lbl_802825B0->totals, 0, sizeof(EASBTotals));
+        lbl_802825B0->nRecord = EASB_PRODUCT_NONE;
+        eError = fn_8012C98C(TagFile_Read(&lbl_802825B0->session, EASB_TAG_HEAD, 0, lbl_802825B0->pBuffer,
+                                          EASB_HEAD_SIZE));
+        *peProcess = EASB_PROCESS_CONTINUE;
+    } else if (*peProcess == EASB_PROCESS_CONTINUE) {
+        eError = fn_8012CB98(peProcess);
+    }
+    if (*peProcess == EASB_PROCESS_COMPLETE && lbl_802825B0->nRecord == EASB_PRODUCT_NONE) {
+        if (eError == EASB_ERROR_NONE) {
+            lbl_802825B0->nHeadState = 1;
+        } else if (eError == EASB_ERROR_SECTION_CORRUPT) {
+            lbl_802825B0->nHeadState = 2;
+        } else {
+            return eError;
+        }
+        lbl_802825B0->nRecord = 0;
+        eError = fn_8012C98C(TagFile_Read(&lbl_802825B0->session, EASB_TAG_PROD, lbl_802825B0->nRecord,
+                                          lbl_802825B0->pBuffer, EASB_PROD_SIZE));
+        *peProcess = EASB_PROCESS_CONTINUE;
+    } else if (*peProcess == EASB_PROCESS_COMPLETE && lbl_802825B0->nRecord != EASB_PRODUCT_NONE) {
+        if (eError == EASB_ERROR_NONE) {
+            fn_80129B30(&product, lbl_802825B0->pBuffer, lbl_802825B0->uBufferSize);
+            lbl_802825B0->anProductState[lbl_802825B0->nRecord] = 1;
+            fn_80128580(&lbl_802825B0->totals, &product, 1);
+        } else if (eError == EASB_ERROR_SECTION_CORRUPT) {
+            eError = EASB_ERROR_NONE;
+            lbl_802825B0->anProductState[lbl_802825B0->nRecord] = 2;
+        } else {
+            return eError;
+        }
+        if (lbl_802825B0->nRecord < EASB_MAX_PRODUCTS - 1) {
+            lbl_802825B0->nRecord++;
+            eError = fn_8012C98C(TagFile_Read(&lbl_802825B0->session, EASB_TAG_PROD, lbl_802825B0->nRecord,
+                                              lbl_802825B0->pBuffer, EASB_PROD_SIZE));
+            *peProcess = EASB_PROCESS_CONTINUE;
+        }
+    }
+    return eError;
+}
+
+// Step: rewrites the records marked corrupt: the HEAD record from the totals, a PROD record
+// empty.
+EASBErrorE fn_8012B708(EASBProcessE* peProcess) {
+    EASBErrorE eError;
+    u8 nNext;
+
+    eError = EASB_ERROR_NONE;
+    if (peProcess == NULL) {
+        return EASB_ERROR_NULL_PARAMETERS;
+    }
+    if (lbl_802825B0->bFileOpen == 0) {
+        return EASB_ERROR_INTERNAL;
+    }
+    if (fn_8012A20C(0)) {
+        return EASB_ERROR_INTERNAL;
+    }
+    if (*peProcess == EASB_PROCESS_NONE) {
+        lbl_802825B0->nRecord = EASB_PRODUCT_NONE;
+        if (lbl_802825B0->nHeadState == 2) {
+            fn_80129754(&lbl_802825B0->totals, lbl_802825B0->pBuffer, lbl_802825B0->uBufferSize);
+            eError = fn_8012C98C(TagFile_Write(&lbl_802825B0->session, EASB_TAG_HEAD, 0, lbl_802825B0->pBuffer,
+                                               EASB_HEAD_SIZE));
+            *peProcess = EASB_PROCESS_CONTINUE;
+        } else {
+            *peProcess = EASB_PROCESS_COMPLETE;
+        }
+        if (*peProcess == EASB_PROCESS_NONE) {
+            *peProcess = EASB_PROCESS_COMPLETE;
+        }
+    } else if (*peProcess == EASB_PROCESS_CONTINUE) {
+        eError = fn_8012CB98(peProcess);
+    }
+    if (*peProcess == EASB_PROCESS_COMPLETE && eError == EASB_ERROR_NONE) {
+        nNext = lbl_802825B0->nRecord;
+        if (nNext == EASB_PRODUCT_NONE) {
+            lbl_802825B0->nHeadState = 1;
+            nNext = 0;
+        } else {
+            lbl_802825B0->anProductState[nNext] = 1;
+            nNext++;
+        }
+        lbl_802825B0->nRecord = nNext;
+        while (lbl_802825B0->nRecord < EASB_MAX_PRODUCTS) {
+            if (lbl_802825B0->anProductState[lbl_802825B0->nRecord] == 2) {
+                memset(lbl_802825B0->pBuffer, 0, EASB_PROD_SIZE);
+                eError = fn_8012C98C(TagFile_Write(&lbl_802825B0->session, EASB_TAG_PROD, lbl_802825B0->nRecord,
+                                                   lbl_802825B0->pBuffer, EASB_PROD_SIZE));
+                *peProcess = EASB_PROCESS_CONTINUE;
+                break;
+            }
+            lbl_802825B0->nRecord++;
+        }
+    }
+    return eError;
+}
+
+// Step: rewrites the PROD records marked corrupt, the game's own from its record and the
+// others empty.
+EASBErrorE fn_8012B8E4(EASBProcessE* peProcess) {
+    EASBErrorE eError;
+    u8 nNext;
+
+    eError = EASB_ERROR_NONE;
+    if (peProcess == NULL) {
+        return EASB_ERROR_NULL_PARAMETERS;
+    }
+    if (lbl_802825B0->bFileOpen == 0) {
+        return EASB_ERROR_INTERNAL;
+    }
+    if (fn_8012A20C(0)) {
+        return EASB_ERROR_INTERNAL;
+    }
+    if (*peProcess == EASB_PROCESS_CONTINUE) {
+        eError = fn_8012CB98(peProcess);
+    }
+    if (*peProcess == EASB_PROCESS_NONE || (*peProcess == EASB_PROCESS_COMPLETE && eError == EASB_ERROR_NONE)) {
+        if (*peProcess == EASB_PROCESS_NONE) {
+            nNext = 0;
+        } else {
+            nNext = lbl_802825B0->nRecord;
+            lbl_802825B0->anProductState[nNext] = 1;
+            nNext++;
+        }
+        lbl_802825B0->nRecord = nNext;
+        while (lbl_802825B0->nRecord < EASB_MAX_PRODUCTS) {
+            if (lbl_802825B0->anProductState[lbl_802825B0->nRecord] == 2) {
+                if (lbl_802825B0->nRecord == lbl_802825B0->nSlot) {
+                    fn_801298FC(lbl_802825B0->args.pProduct, lbl_802825B0->pBuffer, lbl_802825B0->uBufferSize);
+                } else {
+                    memset(lbl_802825B0->pBuffer, 0, EASB_PROD_SIZE);
+                }
+                eError = fn_8012C98C(TagFile_Write(&lbl_802825B0->session, EASB_TAG_PROD, lbl_802825B0->nRecord,
+                                                   lbl_802825B0->pBuffer, EASB_PROD_SIZE));
+                *peProcess = EASB_PROCESS_CONTINUE;
+                break;
+            }
+            lbl_802825B0->nRecord++;
+        }
+    }
+    return eError;
+}
+
+// Step: writes the 25 PROD records of a new file: the game's record in slot 0, the others
+// empty.
+EASBErrorE fn_8012BA58(EASBProcessE* peProcess) {
+    EASBErrorE eError;
+
+    eError = EASB_ERROR_NONE;
+    if (peProcess == NULL) {
+        return EASB_ERROR_NULL_PARAMETERS;
+    }
+    if (lbl_802825B0->bFileOpen == 0) {
+        return EASB_ERROR_INTERNAL;
+    }
+    if (*peProcess == EASB_PROCESS_NONE) {
+        memset(lbl_802825B0->anProductState, 0, sizeof(lbl_802825B0->anProductState));
+        fn_801298FC(lbl_802825B0->args.pProduct, lbl_802825B0->pBuffer, lbl_802825B0->uBufferSize);
+        lbl_802825B0->nRecord = 0;
+        eError = fn_8012C98C(TagFile_Write(&lbl_802825B0->session, EASB_TAG_PROD, lbl_802825B0->nRecord,
+                                           lbl_802825B0->pBuffer, EASB_PROD_SIZE));
+        *peProcess = EASB_PROCESS_CONTINUE;
+    } else if (*peProcess == EASB_PROCESS_CONTINUE) {
+        eError = fn_8012CB98(peProcess);
+    }
+    if (eError == EASB_ERROR_NONE && *peProcess == EASB_PROCESS_COMPLETE) {
+        lbl_802825B0->anProductState[lbl_802825B0->nRecord] = 1;
+        if (lbl_802825B0->nRecord == 0) {
+            lbl_802825B0->n94 = 3;
+            lbl_802825B0->nSlot = 0;
+        }
+        if (lbl_802825B0->nRecord < EASB_MAX_PRODUCTS - 1) {
+            lbl_802825B0->nRecord++;
+            memset(lbl_802825B0->pBuffer, 0, EASB_PROD_SIZE);
+            eError = fn_8012C98C(TagFile_Write(&lbl_802825B0->session, EASB_TAG_PROD, lbl_802825B0->nRecord,
+                                               lbl_802825B0->pBuffer, EASB_PROD_SIZE));
+            *peProcess = EASB_PROCESS_CONTINUE;
+        }
+    }
+    return eError;
+}
+
+// Step: writes the 25 IMAG records of a new file: the game's picture in slot 0, the others
+// empty.
+EASBErrorE fn_8012BBD8(EASBProcessE* peProcess) {
+    EASBErrorE eError;
+
+    eError = EASB_ERROR_NONE;
+    if (peProcess == NULL) {
+        return EASB_ERROR_NULL_PARAMETERS;
+    }
+    if (lbl_802825B0->bFileOpen == 0) {
+        return EASB_ERROR_INTERNAL;
+    }
+    if (*peProcess == EASB_PROCESS_NONE) {
+        fn_80129D70(lbl_802825B0->args.pImage, 1, lbl_802825B0->pBuffer, lbl_802825B0->uBufferSize);
+        lbl_802825B0->nRecord = 0;
+        eError = fn_8012C98C(TagFile_Write(&lbl_802825B0->session, EASB_TAG_IMAG, lbl_802825B0->nRecord,
+                                           lbl_802825B0->pBuffer, EASB_IMAG_SIZE));
+        *peProcess = EASB_PROCESS_CONTINUE;
+    } else if (*peProcess == EASB_PROCESS_CONTINUE) {
+        eError = fn_8012CB98(peProcess);
+    }
+    if (eError == EASB_ERROR_NONE && *peProcess == EASB_PROCESS_COMPLETE) {
+        if (lbl_802825B0->nRecord < EASB_MAX_PRODUCTS - 1) {
+            lbl_802825B0->nRecord++;
+            memset(lbl_802825B0->pBuffer, 0, EASB_IMAG_SIZE);
+            eError = fn_8012C98C(TagFile_Write(&lbl_802825B0->session, EASB_TAG_IMAG, lbl_802825B0->nRecord,
+                                               lbl_802825B0->pBuffer, EASB_IMAG_SIZE));
+            *peProcess = EASB_PROCESS_CONTINUE;
+        }
+    }
+    return eError;
+}
+
 // Starts the storage code: the state, with no file, slot or operation, and a copy of the
 // memory-card callbacks.
 EASBErrorE fn_8012BD0C(u32 uHeapID, SFIOFuncTable* pCallbacks) {
@@ -1452,7 +1683,7 @@ EASBErrorE fn_8012BF18(s32 nOperation, EASBStorageArgs* pArgs) {
             if (lbl_802825B0->nOperation != EASB_OPERATION_ERROR) {
                 memcpy(&lbl_802825B0->session, &lbl_802825B0->savedSession, sizeof(TagSession));
             }
-            lbl_802825B0->b168 = 0;
+            lbl_802825B0->nRecord = 0;
             memcpy(&lbl_802825B0->args, pArgs, sizeof(EASBStorageArgs));
         }
     } else {
@@ -1471,7 +1702,7 @@ EASBErrorE fn_8012C03C(s32 nOperation) {
         lbl_802825B0->nOperation = EASB_OPERATION_NONE;
         lbl_802825B0->n1A4 = 0;
         lbl_802825B0->pnSteps = NULL;
-        lbl_802825B0->b168 = 0;
+        lbl_802825B0->nRecord = 0;
         if (lbl_80195520[nOperation].bStopTagFile) {
             eError = fn_8012CC48();
             lbl_802825B0->bFileOpen = 0;

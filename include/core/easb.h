@@ -227,7 +227,7 @@ typedef struct EASBStorage {
     s32 anProductState[EASB_MAX_PRODUCTS];  // 0x0A8: the same for each PROD record
     EASBTotals totals;              // 0x10C: the totals in the file's HEAD record
     TagSession session;             // 0x120: the tag-file session of the running operation
-    u8 b168;                        // 0x168
+    u8 nRecord;                     // 0x168: the record a step is on (EASB_PRODUCT_NONE: HEAD)
     u8 b169;                        // 0x169
     u8 unk16A[2];
     u32 u16C;                       // 0x16C
