@@ -456,7 +456,8 @@ int fn_800ED028(int i) {
     int nHole = lbl_80281664[i].nHole - 1;
     int k;               // a loop counter, and in case 7 the current hole once it is over
     int h;
-    if (Game_GetMode() == 0) {
+    h = Game_GetMode();     // h is the mode here, a hole number below
+    if (h == 0) {
         switch (lbl_80281664[i].nTargetKind) {
         case 1:
             nTarget = lbl_80281664[i].nTargetBase;
