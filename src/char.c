@@ -6,9 +6,12 @@
 #include "golfer.h"
 #include "charstate.h"
 
+void  fn_80014BB4(void);
 void  fn_80014C9C(void);
 void  fn_80014DC0(void);
 void  fn_8001A288(void);
+void  fn_8001A33C(void);
+void  fn_8001A4BC(void);
 void  fn_8001A75C(UStreamObject* pObject);
 void  fn_8001A798(void);
 void  fn_8001A7C8(void);
@@ -28,47 +31,36 @@ f32 (*fn_8001EC6C(Character* pChar, int nBone))[4];
 f32 (*fn_8001ECA8(Character* pChar, int nBone))[4];
 void  fn_80027738(u8 bOn);
 void  fn_80035C58(void);
+void  fn_80035CC0(void);
+void  fn_80036460(int n);
+void  fn_80036464(void);
+void  fn_80095554(void);
 void  fn_8009555C(void);
+void  fn_80095560(void);
+void  fn_80095564(void);
 void  fn_800C937C(void);
+void  fn_800C9764(void);
 void  fn_800C9FE0(void);
 void  fn_800CCA1C(void);
+void  fn_800CCA3C(void);
 void  fn_800CEE88(u8 b);
+void  fn_8010BF68(void);
 void  fn_8010BFE0(void);
+void  fn_80112C64(int n);
+void  fn_80112CEC(void);
 
 // ---- sweep code (not yet cleaned up) ----
 s32 fn_8001E8A4(s32, s32);
 s32 fn_8001E938(s32, s32);
 void fn_80017864(void* arg0, s32 arg1);
 void fn_80019C84(void);
-void fn_8001A4BC();
-void fn_80095554();
-void fn_80019648(void);
 s32 fn_8008E918(s32);
 u8 fn_8008E938();
 s32 fn_8008EAC8(s32);
 s32 fn_8001A024(s32);
 void fn_8001A0FC(s32 arg0);
-void fn_8001A484(void);
-void fn_8010BF68();
-void fn_8001A73C(void);
-void fn_80014BB4();
-void fn_8001A7F0(void);
 void fn_8001B1DC(s32 p0, u8* p1, s32 p2);
 void fn_8001B1E8(void* p);
-void fn_8001A33C();
-void fn_80035CC0();
-void fn_80095560();
-void fn_800C9764();
-void fn_800CCA3C();
-void fn_8001C2B4(void);
-void fn_80095564();
-void fn_8001C2E4(void);
-void fn_80036460();
-void fn_80036464();
-void fn_80112C64();
-void fn_80112CEC();
-void fn_8001C304(void);
-void fn_8001C350(void);
 void fn_8001C650(void* arg0, s32 arg1);
 void fn_8001DB98(u8* p0);
 f32 fn_8001EFFC(u8* p);
@@ -87,11 +79,6 @@ void fn_80017864(void* arg0, s32 arg1) {
     }
 }
 
-void fn_80019648(void) {
-    fn_80095554();
-    fn_8001A4BC();
-}
-
 void fn_8001A0FC(s32 arg0) {
     fn_80019C84();
     fn_8008E918(2);
@@ -101,20 +88,6 @@ void fn_8001A0FC(s32 arg0) {
     }
 }
 
-void fn_8001A484(void) {
-}
-
-void fn_8001A73C(void) {
-    fn_8010BF68();
-}
-
-void fn_8001A7F0(void) {
-    fn_8001A798();
-    fn_80014BB4();
-    fn_80014DC0();
-    fn_8001A7C8();
-}
-
 void fn_8001B1DC(s32 p0, u8* p1, s32 p2) {
     *(s32*)p1 = p2;
     *(s32*)(p1 + 0x4) = p0;
@@ -122,35 +95,6 @@ void fn_8001B1DC(s32 p0, u8* p1, s32 p2) {
 
 void fn_8001B1E8(void* p) {
     fn_80009E70(p);
-}
-
-void fn_8001C2B4(void) {
-    fn_80035CC0();
-    fn_800CCA3C();
-    fn_800C9764();
-    fn_80095560();
-    fn_8001A33C();
-}
-
-void fn_8001C2E4(void) {
-    fn_80095564();
-}
-
-void fn_8001C304(void) {
-    fn_8001A288();
-    fn_80027738(0);
-    lbl_80280E20 = 3;
-    fn_800CCA1C();
-    fn_800CEE88(0);
-    fn_80036460(1800);
-    fn_80112C64(1);
-}
-
-void fn_8001C350(void) {
-    fn_8001A33C();
-    fn_800CCA3C();
-    fn_80036464();
-    fn_80112CEC();
 }
 
 void fn_8001C650(void* arg0, s32 arg1) {
@@ -232,10 +176,22 @@ void fn_80018484(Character* pChar, CharModel* pModel) {
     }
 }
 
+void fn_80019648(void) {
+    fn_80095554();
+    fn_8001A4BC();
+}
+
+void fn_8001A484(void) {
+}
+
 void fn_8001A488(void) {
     if (gSession.nNumPlayers > 2) {
         fn_8010BFE0();
     }
+}
+
+void fn_8001A73C(void) {
+    fn_8010BF68();
 }
 
 // The 'SAC ' handler: an animation library merged over the one of the slot the object's id names.
@@ -252,6 +208,14 @@ void fn_8001A798(void) {
 
 void fn_8001A7C8(void) {
     UStream_UnregisterHandler('SAC ');
+}
+
+// Handle the 'SAC ' overlays while fn_80014BB4 and fn_80014DC0 run.
+void fn_8001A7F0(void) {
+    fn_8001A798();
+    fn_80014BB4();
+    fn_80014DC0();
+    fn_8001A7C8();
 }
 
 // With more than one player: reload the animation slot with 'SAC ' overlays handled, then free the
@@ -294,6 +258,35 @@ void fn_8001C254(void) {
     fn_800CCA1C();
     fn_800CEE88(1);
     fn_80035C58();
+}
+
+void fn_8001C2B4(void) {
+    fn_80035CC0();
+    fn_800CCA3C();
+    fn_800C9764();
+    fn_80095560();
+    fn_8001A33C();
+}
+
+void fn_8001C2E4(void) {
+    fn_80095564();
+}
+
+void fn_8001C304(void) {
+    fn_8001A288();
+    fn_80027738(0);
+    lbl_80280E20 = 3;
+    fn_800CCA1C();
+    fn_800CEE88(0);
+    fn_80036460(1800);
+    fn_80112C64(1);
+}
+
+void fn_8001C350(void) {
+    fn_8001A33C();
+    fn_800CCA3C();
+    fn_80036464();
+    fn_80112CEC();
 }
 
 void fn_8001C518(void) {
