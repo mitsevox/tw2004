@@ -138,9 +138,10 @@ typedef struct RenderState {
     s32  nFC;                   // 0x0FC  bit 0x400
     TexBank*  p100;             // 0x100  } the texture of the next draw (fn_8005CC64: the swing
     TexEntry* p104;             // 0x104  } trail's, the logo editor's)
-    u8   unk108[0x110 - 0x108];
+    struct GxTexture* pTex108;  // 0x108  or this texture (fn_8002A608)
+    u8   unk10C[0x110 - 0x10C];
     u32  u110;                  // 0x110  which of the groups above changed
-    u32  uFlags;                // 0x114  bit 1: p100/p104 are set
+    u32  uFlags;                // 0x114  bit 1: p100/p104 are set; bit 2: pTex108 is
 } RenderState;
 LAYOUT_ASSERT(RenderState, 0x118);
 
@@ -173,7 +174,8 @@ int  fn_8002F260(s32 n0, s32 nWidth, s32 nHeight, s32 nKind, s32 n20, s32 nSurfa
 void fn_8002F38C(s32 nSurface, s32 nC, s32 n10, s32 n14, u32 uFlags, s32 n18);
 s32  fn_8002F454(s32 nSurface);     // the surface's buffer size, 0 if the slot is free
 
-// The graphics helpers at 0x80029FC8 (file name unknown)
+// The graphics helpers (GxUtil.c, 0x80029FC8; the rest are in gx.h)
+extern void** lbl_80281100;         // 0x80281100 (.sdata): &lbl_801D4F68, GoPostFx's buffers
 void* fn_8002A624(void);            // the screen-copy texture's pixels (lbl_80281100's first word)
 
 // ---- the file streamer (UStream.c) -----------------------------------------------------------
@@ -225,6 +227,12 @@ void fn_80013130(int nController, int nStrength);   // rumble strength
 u8*  fn_800136C4(int nController);      // the pad's state: stick bytes at +0, +2, +3
 u32  fn_800136DC(int nController);      // buttons: held << 16 | pressed this frame
 void fn_80014118(int a);
+// A screen quad (GameEffects' letter boxes, GxUtil.c's alpha clear): fn_800141F8 fills its corners
+// (x0, y0)-(x1, y1), fn_80014194 sets its colour (four floats), fn_8001644C draws it.
+void fn_80014194(f32* pColour);
+void fn_800141F8(f32* pXY, f32* pUV, f32 x0, f32 y0, f32 x1, f32 y1);
+void fn_8001425C(int a);
+void fn_8001644C(int a, f32* pXY, int b, f32* pUV, int c);
 u32  fn_800142AC(int nButton, int a);   // a button's mask
 u8   fn_80014300(u32 uMask);            // any pad pressed these buttons
 
