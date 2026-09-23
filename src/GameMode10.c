@@ -5,28 +5,6 @@
 #include "golfer.h"
 #include "ball.h"
 
-// A saved shot (gReplayData, 0x801D6030): the seed, player 0 as it was, and the conditions.
-typedef struct Replay {
-    u32    nSeed;               // 0x000
-    u8     unk4[4];
-    Player player;              // 0x008  player 0 before the shot
-    s32    nCourse;             // 0xF00
-    s16    nHole;               // 0xF04
-    s8     nTeeSet;             // 0xF06
-    s8     nF07;                // 0xF07
-    f32    fF08;                // 0xF08
-    f32    fF0C;                // 0xF0C
-    u8     bF10;                // 0xF10  in-flight replays are on (GameManager.c)
-    u8     unkF11;
-    s16    nF12;                // 0xF12  1..3: fn_800ED6F8 is set from nF14
-    s16    nF14;                // 0xF14  hundredths
-    s16    nWindDir;            // 0xF16
-    s16    nWindSpeed;          // 0xF18
-    s16    nF1A;                // 0xF1A  -> fn_80055C40
-    s16    nF1C;                // 0xF1C  -> fn_80055CAC
-    s16    nF1E;                // 0xF1E  -> fn_80055CD0
-    s16    nStrokes;            // 0xF20  strokes on the hole before the shot
-} Replay;
 extern Replay gReplayData;
 
 // The target list of the target games: up to lbl_80282360 points (w = 1).

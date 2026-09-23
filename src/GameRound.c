@@ -44,7 +44,7 @@ u8    fn_800E3AB8(int nPlayer);
 s32   fn_800E3AB0(void);
 void  fn_800E3AAC(void);
 void  fn_800E3AA8(void);
-s32   fn_800E3AA0(void);
+s32   fn_800E3AA0(int a, int nTarget);
 void  fn_800FF700(void);
 void  fn_800E9E40(void);
 void  fn_800F80FC(void);
@@ -1344,7 +1344,7 @@ int fn_800E3A54(void) {
 }
 
 // The default mode callbacks fn_800E0B38 installs.
-s32 fn_800E3AA0(void) {
+s32 fn_800E3AA0(int a, int nTarget) {
     return 0;
 }
 
