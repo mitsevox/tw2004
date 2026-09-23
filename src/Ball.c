@@ -256,17 +256,21 @@ void fn_80050D2C(u8 b) {
 // Putt power for a distance: the putt table (22 steps of 0.05 power, distance ~ 43.4 x power
 // squared on a medium green) scaled by the green-speed setting, interpolated; 1.1 beyond it.
 f32 fn_80050D34(f32 fDist) {
-    f32 fScale = gPuttSpeedScale[gTurfSpeed];
     int i;
+    f32 fScale = gPuttSpeedScale[gTurfSpeed];
+    f32 fPower;
     for (i = 1; i < 23; i++) {
         f32 fHi = fScale * gPuttDist[i];
         if (fDist <= fHi) {
             f32 fLo = fScale * gPuttDist[i - 1];
             f32 fT = (fDist - fLo) / (fHi - fLo);
-            return 0.05f * fT + 0.05f * (i - 1);
+            fPower = 0.05f * (i - 1);
+            fPower = 0.05f * fT + fPower;
+            return fPower;
         }
     }
-    return 1.1f;
+    fPower = 1.1f;
+    return fPower;
 }
 
 
@@ -321,12 +325,18 @@ f32 fn_80050F44(int nKind, int nClub) {
 // Power for a distance with a club: the row's 11 distances are power 0.1 to 1.1, interpolated,
 // plus the difference between the table's surface and the one under the ball (a surface that
 // is not a stopping surface counts as 14); 1.1 beyond the row.
+// A row's distance at column i (an accessor in the original: reading the array directly gives
+// different registers).
+static inline f32 ClubRow_Dist(ClubRow* pRow, int i) {
+    return pRow->fDist[i];
+}
+
 f32 fn_80050F88(f32 fDist, u8* p, int nKind, int nClub) {
     s32          nSurface;
     SurfaceType* pSurface;
     ClubRow*     pRow;
     f32          vNormal[4];
-    f32          fBase, fAdj, fFrac;
+    f32          fBase, fAdj, fFrac, fPower;
     int          i;
     if (p == NULL) return 0.0f;
     if (!fn_80050DE4(nKind, nClub, 0, &pRow, &nSurface)) return 1.0f;
@@ -336,12 +346,16 @@ f32 fn_80050F88(f32 fDist, u8* p, int nKind, int nClub) {
     }
     fAdj = fBase - pSurface->f00;
     for (i = 1; i < 12; i++) {
-        if (fDist <= pRow->fDist[i]) {
-            fFrac = (fDist - pRow->fDist[i - 1]) / (pRow->fDist[i] - pRow->fDist[i - 1]);
-            return fAdj + (0.1f * fFrac + 0.1f * i);
+        if (fDist <= ClubRow_Dist(pRow, i)) {
+            fFrac = (fDist - ClubRow_Dist(pRow, i - 1)) / (ClubRow_Dist(pRow, i) - ClubRow_Dist(pRow, i - 1));
+            fPower = 0.1f * i;
+            fPower = 0.1f * fFrac + fPower;
+            fPower += fAdj;
+            return fPower;
         }
     }
-    return 1.1f;
+    fPower = 1.1f;
+    return fPower;
 }
 
 // The ball's f70 plus its surface's first value; 1 without a ball or a surface.

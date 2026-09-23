@@ -138,6 +138,17 @@ Reading compiler output
   the heavier operand first and fuses the last product into `fmadds`; swapping the operands in
   the source changes nothing. To fuse `spin * (...)` and keep `k * speed` as the addend, compute
   the addend into a local first: `t = k * speed; x = spin * (...) + t;` (`Ball_FlightStep`).
+- **[verified] One result variable for every return.** A lookup whose float registers would
+  not settle matched once both returns went through one local: `p = k * (i - 1); p = k * t + p;
+  return p; ... p = 1.1f; return p;` (`fn_80050D34`, found by the permuter).
+- **[verified] An inline accessor changes integer registers.** Reading `pRow->fDist[i]`
+  directly swapped two integer registers; the same reads through a one-line
+  `static inline f32 ClubRow_Dist(ClubRow*, int)` matched (`fn_80050F88`, found by the permuter).
+  When only integer registers around an array read are off, try an accessor.
+- **Permuter results need a human.** Most of its "wins" are nonsense (`if (!x && !x) {}`,
+  `vPin[(long long)1]`, dummy variables) that happen to nudge the allocator. Use them as hints
+  for what to change and look for a plausible spelling that gives the same code; never commit
+  the nonsense.
 - **[verified] `x >= c` in an `&&` chain gives `cror; bne`; the original's plain `blt` is
   `!(x < c)`.** Same for `if (!(h2 < -60000.0f) && ...)`. (`fn_8005418C`, `fn_80055324`.)
 - **[verified] Two early returns that became one `bne; b`** are one `||` test:
