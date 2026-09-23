@@ -240,6 +240,41 @@ void fn_80039C5C(int nSize) {
     }
 }
 
+// Once both camera files are in (n1C is 2): turns each shot choice's shot index into a pointer, and
+// sets its b16 to 25 unless it is 13..22 and some choice of the same sequence is for that shot kind.
+void fn_80039D0C(int nSequences) {
+    int i;
+    int j;
+    int k;
+    u8 bFound;
+
+    lbl_80281D88->nSequences = nSequences;
+    if (lbl_80281D88->n1C != 2) {
+        return;
+    }
+    for (i = 0; i < lbl_80281D88->nSequences; i++) {
+        for (j = 0; j < lbl_80281D88->pSequences[i].nChoices; j++) {
+            // port: the file keeps an index in the pointer field
+            lbl_80281D88->pSequences[i].p4C[j].p10 =
+                &lbl_80281D88->pShots[(s32)lbl_80281D88->pSequences[i].p4C[j].p10];
+            if (lbl_80281D88->pSequences[i].p4C[j].b16 < 13 || lbl_80281D88->pSequences[i].p4C[j].b16 > 22) {
+                lbl_80281D88->pSequences[i].p4C[j].b16 = 25;
+            }
+            if (lbl_80281D88->pSequences[i].p4C[j].b16 >= 13 && lbl_80281D88->pSequences[i].p4C[j].b16 <= 22) {
+                bFound = 0;
+                for (k = 0; k < lbl_80281D88->pSequences[i].nChoices; k++) {
+                    if (lbl_80281D88->pSequences[i].p4C[j].b16 == lbl_80281D88->pSequences[i].p4C[k].b14) {
+                        bFound = 1;
+                    }
+                }
+                if (!bFound) {
+                    lbl_80281D88->pSequences[i].p4C[j].b16 = 25;
+                }
+            }
+        }
+    }
+}
+
 // Turns each sequence's follow-on index into a pointer; a sequence whose follow-on has no shot
 // choices follows itself.
 void fn_80039E58(void) {
