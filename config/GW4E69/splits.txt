@@ -3062,28 +3062,7 @@ GameMode4Menu.c:
 	.text       start:0x80121430 end:0x801220D4
 
 TibExt.c:
-	.text       start:0x801220D4 end:0x80122128
-
-unsorted/sweep_80122128.c:
-	.text       start:0x80122128 end:0x8012214C
-
-unsorted/sweep_8012214C.c:
-	.text       start:0x8012214C end:0x80122150
-
-unsorted/sweep_80122468.c:
-	.text       start:0x80122468 end:0x80122488
-
-unsorted/sweep_80122488.c:
-	.text       start:0x80122488 end:0x80122494
-
-unsorted/sweep_80122630.c:
-	.text       start:0x80122630 end:0x80122654
-
-unsorted/sweep_80122868.c:
-	.text       start:0x80122868 end:0x8012288C
-
-unsorted/sweep_8012288C.c:
-	.text       start:0x8012288C end:0x801228AC
+	.text       start:0x801220D4 end:0x801228E0
 
 gbacable.c:
 	.text       start:0x80122CFC end:0x80123E34
