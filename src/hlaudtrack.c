@@ -55,7 +55,7 @@ u8 fn_800A98B4(void) {
 }
 
 // Frees every track.
-s32 fn_800A9A50(void) {
+s32 fn_800A9A50(u8 a, u8 b) {
     s32 i;
     UList* pList;
     AudTrack* pTrack;
@@ -100,7 +100,7 @@ void fn_800A9AC8(void) {
                     pTrack->bits.b.bTicked = 1;
                 }
             } else if (!(lbl_8028207C & 0x40) ||
-                       (pTmpl->data.pPlayList->n3 == 0 && pTrack->pSource->n40 != 8)) {
+                       (pTmpl->data.pPlayList->n3 == 0 && pTrack->pSource->nSound != 8)) {
                 if (fn_800AA2A4(pTrack)) {
                     fn_800AA34C(pTrack);
                 } else {
@@ -124,7 +124,7 @@ AudTrack* fn_800A9BC8(AudSource* pSource, AudTrackTmpl* pTmpl, u8 nChannel, f32 
     UPool* pPool;
 
     pPool = &lbl_80282098;
-    bSorted = pSource->pTmpl->n3 & 1;
+    bSorted = pSource->pSound->n3 & 1;
     pList = &lbl_801F1868[bSorted];
     if (pPool->nFree == 0) {
         pTrack = (AudTrack*)lbl_801F1868[1].pTail;
@@ -155,7 +155,7 @@ AudTrack* fn_800A9BC8(AudSource* pSource, AudTrackTmpl* pTmpl, u8 nChannel, f32 
     pTrack->n5D = 0;
     pTrack->bits.n = 0;
     pTrack->bits.b.bSorted = bSorted;
-    pTrack->bits.b.b5 = pSource->n40 >= 0;
+    pTrack->bits.b.b5 = pSource->nSound >= 0;
     pTrack->params.flags.n = 0;
     fn_80005AE8(pTrack->apVoices, 0, sizeof(pTrack->apVoices));
     if (bSorted == 0) {
@@ -351,17 +351,18 @@ void fn_800AA34C(AudTrack* pTrack) {
     AudSource* pSource;
     AudPlayList* pList;
     f32 fCurve;
+    f32 fVolume;
 
     pSource = pTrack->pSource;
     pList = pTrack->pTmpl->data.pPlayList;
     if (pList == NULL) return;
     fCurve = fn_800AA44C(pList->n3);
-    fn_800A85FC(pTrack->f44, fCurve);
+    fVolume = fn_800A85FC(pTrack->f44, fCurve);
     if (pTrack->bits.b.bSorted == 1) {
-        fn_800A9590(pSource, pTrack);
+        fn_800A9590(pSource, pTrack, fVolume);
         return;
     }
-    fn_800A96DC(pSource, pTrack);
+    fn_800A96DC(pSource, pTrack, fVolume);
 }
 
 void fn_800AA3D4(AudTrackTmpl* pTmpl) {
