@@ -50,7 +50,7 @@ void  fn_80062D6C(int a, int nPlayer);
 void  fn_800FF7DC(void);
 void  fn_80125910(int a);
 void  fn_800F19D4(void);
-void  fn_800F1B60(int nPlayer, s8 n);
+void  fn_800F1B60(int nPlayer, int n);
 u8    fn_800F1BD8(int nPlayer);
 u8    fn_800F1C34(int nPlayer);
 s8    fn_800F1C74(int nPlayer);
@@ -78,7 +78,7 @@ u8    fn_800F3410(int a);
 void  fn_800F3418(int nPlayer);
 u8    fn_800F3438(int nPlayer, int a);
 s32   fn_800F354C(int nPlayer);
-s32   fn_800F3668(s8 n);
+s32   fn_800F3668(int n);
 void  fn_800F36A4(void);
 void  fn_800F3800(int nPlayer);
 void  fn_800F3860(void);
@@ -161,7 +161,7 @@ s32 fn_800F2C34(int nPlayer) {
     int n;
     u8 bFirst = 1;
     for (i = 0; i < gNumPlayersSetUp; i++) {
-        if (gPlayers[i].nStrokes[Game_CurHoleIndex()] != 0) {
+        if (PLAYER(i)->nStrokes[Game_CurHoleIndex()] != 0) {
             bFirst = 0;
         }
     }
@@ -311,8 +311,8 @@ void fn_800F31E0(void) {
     for (i = 0; i < gNumPlayersSetUp; i++) {
         if ((s8)GOLFERSTATE_GetCurrentState(i) == 1) {
             fn_800F39CC(900);
-            if (gPlayers[i].nDC0 == 0) {
-                fn_800F1B60(i, gPlayers[i].nTarget);
+            if (PLAYER(i)->nDC0 == 0) {
+                fn_800F1B60(i, (s8)PLAYER(i)->nTarget);
             }
             if (i == 0 && n1 >= n0 + 3) {
                 if (!(Rand_Next(0) & 1)) {
@@ -379,12 +379,16 @@ u8 fn_800F3438(int nPlayer, int a) {
     return 0;
 }
 
+static inline int CurrentTarget(int nPlayer) {
+    return fn_800F1D34(nPlayer);
+}
+
 // Who holds the target the player is aiming at (-1: not aiming at one).
 s32 fn_800F3490(int nPlayer) {
     if (gPlayers[nPlayer].nSurface < 0x85 || gPlayers[nPlayer].nSurface > 0x90) {
         return -1;
     }
-    return CLAIMS[fn_800F1D34(nPlayer)].nOwner;
+    return CLAIMS[CurrentTarget(nPlayer)].nOwner;
 }
 
 s32 fn_800F34F0(int nPlayer) {
@@ -396,8 +400,8 @@ s32 fn_800F34F0(int nPlayer) {
 
 // How many targets the player holds.
 s32 fn_800F354C(int nPlayer) {
-    int i;
     s32 n = 0;
+    int i;
     for (i = 0; i < 40; i++) {
         if (nPlayer == CLAIMS[i].nOwner) {
             n++;
@@ -415,7 +419,7 @@ s32 fn_800F3654(s32 p0) {
 }
 
 // A claimed target's points.
-s32 fn_800F3668(s8 n) {
+s32 fn_800F3668(int n) {
     if (CLAIMS[n].nOwner != 5) {
         return lbl_801928F0[CLAIMS[n].nRank];
     }
@@ -425,13 +429,17 @@ s32 fn_800F3668(s8 n) {
 // Each player's points: the sum over the targets they hold.
 void fn_800F36A4(void) {
     int i;
+    s32 n;
     for (i = 0; i < gNumPlayersSetUp; i++) {
         PLAYER(i)->nDD8 = 0;
     }
     for (i = 0; i < 40; i++) {
         if (CLAIMS[i].nOwner != 5) {
-            gPlayers[CLAIMS[i].nOwner].nDD8 += fn_800D7220(
-                fn_800D6A70(fn_800F266C(fn_800F3668(i), i), CLAIMS[i].nOwner, 1, 1, 1, 0), CLAIMS[i].nOwner, 0);
+            n = fn_800F3668(i);
+            n = fn_800F266C(n, i);
+            n = fn_800D6A70(n, CLAIMS[i].nOwner, 1, 1, 1, 0);
+            n = fn_800D7220(n, CLAIMS[i].nOwner, 0);
+            gPlayers[CLAIMS[i].nOwner].nDD8 += n;
         }
     }
 }
@@ -459,13 +467,13 @@ void fn_800F3860(void) {
     s32 nMsg = -1;
     for (i = 0; i < gNumPlayersSetUp; i++) {
         if (fn_800F354C(i) < 5) {
-            gPlayers[i].nDD8 = 0;
+            PLAYER(i)->nDD8 = 0;
             if (fn_800F354C(i) == 0) {
                 nMsg = 0x48;
             }
         } else {
             fn_80125910(1);
-            fn_800D3548(i, gPlayers[i].nDD8, 0);
+            fn_800D3548(i, PLAYER(i)->nDD8, 0);
         }
     }
     if (nMsg != -1) {
