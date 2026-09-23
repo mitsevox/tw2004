@@ -23,7 +23,7 @@ s32  lbl_80281BB8;
 s32  lbl_80281BB4;                      // bytes taken since fn_8000A0BC, while counting is on
 u8   lbl_80281BB0;                      // count the bytes taken (fn_8000A0C8 / fn_8000A0D4)
 
-void fn_8015738C(const char* pFmt, ...);    // debug print
+int printf(const char* pFmt, ...);          // MSL
 int  fn_8000991C(int nSize);
 int  fn_800099BC(int nSize);
 int  fn_80009A60(int nSize);
@@ -54,7 +54,7 @@ void fn_800097CC(void) {
     lbl_80281BC8 = 0x403;
     lbl_80281BC4 = 0x302;
     lbl_80281BD4 = fn_800951A0((lbl_80281BC8 + 1) * sizeof(s32), 16, 1);
-    fn_8015738C("StaticMemory: %d\n", 0x235F8);
+    printf("StaticMemory: %d\n", 0x235F8);
     lbl_80281BBC = (0x14C7FC3 - ((lbl_80281BC8 + 1) * sizeof(s32) + 0x1AD400)) & ~3;
     lbl_80281BC0 = fn_800951A0(lbl_80281BBC, 16, 1);
     if (lbl_80281BC0 == NULL) {     // fake match: the loop's own test, first on the returned value

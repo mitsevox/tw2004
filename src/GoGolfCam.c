@@ -924,8 +924,8 @@ void fn_800BF658(View* pView, int nPlayer) {
             }
             if (nClass != 7) {
                 // the step: the length of three times vCBC's x and z, per 60th of a second
-                fStep = (f32)fn_80009680((f32)(fn_8015F824(3.0f * gPlayers[nPlayer].vCBC[2], 2.0)
-                                                + fn_8015F824(3.0f * gPlayers[nPlayer].vCBC[0], 2.0)))
+                fStep = (f32)fn_80009680((f32)(pow(3.0f * gPlayers[nPlayer].vCBC[2], 2.0)
+                                                + pow(3.0f * gPlayers[nPlayer].vCBC[0], 2.0)))
                         / (FRAME_RATE / 60.0f);
                 lbl_80191334[nPlayer] += fStep;
                 lbl_80191348[nPlayer] += fStep;

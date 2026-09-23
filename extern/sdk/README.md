@@ -8,3 +8,7 @@ Changed for this game:
   (`OSGetConsoleType() & OS_CONSOLE_TDEV`) and always passes the text on to the debugger;
   `libc/uart.h` (new) declares the TRK serial routines it calls.
 - `dolphin/os/OS.c`: `__OSVersion` is global and `ClearArena` static, as in this game's symbols.
+- `runtime/printf.c`, `runtime/FILE_POS.c`: `printf`, `vprintf`, `ftell` and `fseek` take the stdio
+  lock (critical region 2) around their work; `libc/critical_regions.h` (new) declares it.
+  `printf.c` is built with GC/2.5 (see configure.py), and so is `runtime/qsort.c` (unchanged).
+- `runtime/extras.c` (new, ours): `stricmp`, the only function of MSL's extras the linker kept.
