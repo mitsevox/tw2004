@@ -571,6 +571,47 @@ divides a golfer's own distance by. Some rows, in yards at power 0.5 / 0.9 / 1.0
 and the surface under the ball (`SurfaceType +0x00`), so the lie changes the power a distance
 needs.
 
+The strike (`fn_800512BC`, exact)
+--------------------------------
+
+How club, shot kind, power, aim and the ground under the ball become the ball's velocity and
+spin. Every number here is from the code.
+
+- **Speed** = a per-club launch speed (`gClubSpeed`; chips and some pitches and kinds 5-7 have
+  their own) x the shot kind's factor (`gKindSpeed`: full 1.148, chip 0.5, pitch 0.58, kind 4
+  1.15, kind 5 0.4, kind 6 0.85, kind 7 0.4) x 8.33 x power.
+- **Putts**: x 7.2, pointed along the aim, **laid flat onto the green's surface under the ball**
+  (the part into or out of the slope is removed), x 1.8. No spin at all.
+- **Launch angle** = the club's loft (`gClubLoft`, in degrees by club 0..24:
+  6 7 8 9 9 10 10 11 15 16 18 19 21 23 26 29 32 35 39 45 48 52 54 57 60) + the kind's
+  (`gKindLoft`: chip -4, pitch +10, kind 4 -6, kind 5 +17, kind 6 +4, kind 7 +26) + the
+  trajectory (low -5, normal 0, high +5), clamped to 0..80. Kind 4 also loses 0.8 degrees and
+  0.01 speed per club step (`gClubStep`: 0 for clubs 0-5, then 1..15): a punch. Kind 5 is
+  tilted up a further 42 degrees: a flop.
+- **Uphill lie** (slope along the aim, `fn_800511F0`, above 0): speed x `(max - slope) / max`
+  with max = 125 degrees (75 for a pitch) - 1.8 per club step + 40 x the slope, and the ball is
+  launched that much steeper. Downhill does nothing here.
+- **Sidehill lie** (ball above or below your feet, `fn_80051124`, clamped to +-45 degrees)
+  tilts the spin axis by 0.2 of the slope, and by 0.9 of it again before the spin is made: a
+  sidehill lie curves the shot. **Not for a perfect (lucky) shot, and not for player slot 4**
+  (the caddie's and the lucky shot's rehearsal copy).
+- **The lie takes speed and spin**:
+
+      lie                 speed kept   spin
+      6 rough (light)        80%        90%
+      7 rough                70%        80%
+      8 rough (deep)         60%        70%
+      3 sand                 90%        70%
+      4 sand                 80%        70%
+      anything else       surface table (+0x00, +0x08)
+
+  plus the ball's own `+0x70`, and **each club step gives back 1.25% of what was lost** - a
+  wedge (step 15) keeps about 19% more of the lost speed than a driver. A chip from lie 3, 4 or
+  5 loses another 10%.
+- **Spin** = cross(the part of the launch direction off the spin axis, the axis) x club spin
+  (`gClubSpin`: 0.87 for the woods down to 0.11 for club 24) x kind spin (`gKindSpin`: kind 4
+  x 1.5, kind 5 x 0.01 - a flop has no spin) x 0.85 x the lie's spin / 0.84.
+
 CPU putts are hit 5% firm (`Swing_ComputePower`)
 -----------------------------------------------
 

@@ -226,8 +226,10 @@ typedef struct Player {
 
 // Terrain surface descriptors (0x44 bytes each); only the index of one is used here.
 typedef struct SurfaceType {
-    f32  f00;                   // 0x00  added to the ball's f70 (fn_800510EC)
-    u8   unk4[0x1C - 0x4];
+    f32  f00;                   // 0x00  launch: share of the speed kept; + the ball's f70 (fn_800510EC)
+    u8   unk4[4];
+    f32  f08;                   // 0x08  launch: spin factor
+    u8   unkC[0x1C - 0xC];
     f32  f1C;                   // 0x1C  0.375 on surfaces a ball may stop on (Ball_Stop)
     u8   unk20[0x2C - 0x20];
     u32  nClass;                // 0x2C  3 = green

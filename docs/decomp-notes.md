@@ -124,6 +124,16 @@ Reading compiler output
   parameter: the function takes something in r3 it never reads (`fn_80051124(Ball*, f32, f32*)`).
 - **[verified] A constant compared both ways as `x < c && x > -c` with `fneg`** comes from a local:
   `eps = 1e-6f; if (y < eps && y > -eps)`. Writing the literal `-1e-6f` loads a second constant.
+- **[verified] `if (f)` on a float** compiles to `fcmpu cr0, fX, f0` (variable first) against a
+  loaded 0.0; `if (f != 0.0f)` and `if (0.0f != f)` both give the constant first. Same test,
+  different operand order. (`fn_800512BC`.)
+- **[verified] A clamp whose result lands straight in the argument register** (`lfs f1, lo;
+  fcmpo; bge; b call`) is an inline function returning early: `static inline f32 Clamp(x, lo,
+  hi) { if (x < lo) return lo; if (x > hi) return hi; return x; }` used as the call's argument.
+- **[verified] Float locals coalesce by live range, not by name.** Two slopes computed in two
+  halves of a function got different registers until they were two variables declared in the
+  right place; the product `a *= t; b = p * (k * a)` in place of `p * (k * (a * t))` fixed the
+  register numbers of a multiply chain.
 - **[verified] `abs()` on an int** is emitted inline as `srawi t,v,31; xor; subf` (no call).
 - **[verified] The `lwzu`/`lfsu` idiom is a repeated field access, not a pointer local.** When the
   same `gPlayers[n].field` is read again after a call, CodeWarrior makes a pointer to the field

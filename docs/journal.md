@@ -146,8 +146,13 @@ Dated log of what was done and decided, newest last. Facts and lessons belong in
   the club distance tables (`gClubRows1..7`, `ClubRow`), chip power, `fn_80051A18`, `Ball_Launch`.
   The two interpolations are at 86% / 89% (the int-to-float term's register and schedule).
   `lbl_80281130` is the green speed.
-- **Next:** `Ball.c` checkpoint 3 = `fn_800512BC` (launch physics, 500 instructions); then the
-  flight / tick / ground / collision core; optional register polish in `skalib.c`
+- **`Ball.c` checkpoint 3: the strike, `fn_800512BC`, exact (51 of 68).** Club and kind tables
+  named (`gClubSpeed`, `gClubLoft`, `gClubStep`, `gClubSpin`, `gChipSpeed`, `gChipLoft`,
+  `gKindSpeed`, `gKindLoft`, `gKindSpin`, `gTrajLoft`). Mechanics in `gameplay.md` ("The
+  strike"): putts laid onto the green plane with no spin; uphill lies cost speed; sidehill lies
+  tilt the spin axis (not for a perfect shot); rough and sand speed/spin table.
+- **Next:** `Ball.c` checkpoint 4 = flight and tick (`Ball_FlightStep`, `Ball_Tick`,
+  `fn_80051C84`.., `fn_80052088`); then ground contact, collision, lie; then `fn_80052598`; optional register polish in `skalib.c`
   (`AnimLib_MergeOverlay`, `AnimLib_PlanBank`, `AnimLib_WalkPair`). Scratch tools in `C:\dev\scratch\tw\`:
   `sbs2.py` (normalised diff), `fnsrc.py`, `regress.py` (who lost 100%), `insert_fns.py` (add
   functions at address positions), `unwritten.py`, `find_fn.py` (search asm by regexes),

@@ -85,6 +85,25 @@ extern ClubRow gClubRows4[25];                   // 0x80182358
 extern ClubRow gClubRows5[25];                   // 0x801827A4
 extern ClubRow gClubRows6[25];                   // 0x80182BF0
 extern ClubRow gClubRows7[25];                   // 0x8018303C
+extern f32 gKindSpeed[8];                        // 0x80181328  launch speed x, per shot kind
+extern f32 gKindLoft[8];                         // 0x80181348  launch angle +, per shot kind (radians)
+extern f32 gKindSpin[8];                         // 0x80181368  spin x, per shot kind
+extern f32 gTrajLoft[3];                         // 0x80181388  -5, 0, +5 degrees
+extern f32 gClubSpeed[26];                       // 0x80181394  launch speed, per club
+extern f32 gClubLoft[26];                        // 0x801813FC  launch angle, per club (6 .. 60 degrees)
+extern s32 gClubStep[26];                        // 0x80181464  0 for the woods, then 1 .. 15
+extern f32 gChipLoft[26];                        // 0x801814CC  launch angle for a chip
+extern f32 gChipSpeed[26];                       // 0x80181534  launch speed for a chip
+extern f32 gClubSpin[26];                        // 0x8018159C  spin, per club
+void   fn_800BAF04(f32* pSrc, f32* pDst);        // normalise
+f32    fn_8000C5FC(f32* pA, f32* pB);            // dot product
+void   fn_8000C5D4(f32* pA, f32* pB, f32 f, f32* pOut);   // a + f x b
+void   fn_8001EF78(f32* pA, f32* pB, f32* pOut); // cross product
+void   fn_80055E7C(f32* pA, f32* pB, f32* pOut);
+void   fn_80055EA0(f32* pA, f32* pB, f32* pOut);
+void   fn_80055EC4(f32* pA, f32* pB, f32* pOut);
+f32    fn_80051124(Ball* pBall, f32 fAim, f32* pNormal);
+f32    fn_800511F0(Ball* pBall, f32 fAim, f32* pNormal);
 int    Game_GetCourse(void);                     // 0x80008830
 int    Hole_WindDir(void);
 f32    Hole_WindSpeed(void);
@@ -296,6 +315,217 @@ f32 fn_800511F0(Ball* pBall, f32 fAim, f32* pNormal) {
     if (fAngle < -0.76794487f) return -0.76794487f;
     if (fAngle > 0.76794487f) return 0.76794487f;
     return fAngle;
+}
+
+static inline f32 Ball_Clamp(f32 x, f32 fLo, f32 fHi) {
+    if (x < fLo) return fLo;
+    if (x > fHi) return fHi;
+    return x;
+}
+
+// The strike: club, shot kind, power, aim, trajectory and the two launch blocks become the
+// ball's velocity and spin, on the ground under the ball (no ground: 0).
+//
+// Speed: a per-club (chips: per-club chip; pitches with clubs 18..24 and kinds 5..7: fixed)
+// speed, less 0.01 per club step for kind 4, x the kind's factor x 8.33 x power.
+// A putt (kind 0 or the putter) is x 7.2 along pB, turned to the aim, laid onto the ground
+// plane, x 1.8, no spin. Anything else is x 12.83 along pB, then:
+// - uphill along the aim (fn_800511F0 > 0) costs speed, (max - slope) / max with max = 125
+//   degrees (75 for a pitch) - 1.8 per club step + 40 x the slope, and tilts the ball up;
+// - kind 5 is tilted up another 42 degrees;
+// - the launch angle is the club's loft (chips: their own), + the kind's, - 0.8 degrees per
+//   club step for kind 4, + the trajectory's (-5, 0, +5 degrees), clamped to 0..80 degrees,
+//   and turns pA into the spin axis;
+// - a sidehill lie (fn_80051124, +-45 degrees) turns that axis by 0.2 of the slope - not for
+//   slot 4 or a perfect shot;
+// - the lie (rough 6/7/8, sand 3/4) or the surface sets how much of the speed survives and
+//   how much spin; the club step adds 1.25% of the loss back per step; a chip from lie 3..5
+//   loses another 0.1;
+// - spin = cross(the part of the direction off the axis, the axis turned by 0.9 of the side
+//   slope) x club spin x kind spin x 0.85 x the lie's spin / 0.84.
+// Velocity and spin are then turned to the aim.
+u8 fn_800512BC(Ball* pBall, int nClub, int nKind, f32 fPower, f32 fAim, int nTrajectory, f32* pA,
+               f32* pB, f32* pVel, f32* pSpin) {
+    f32          vNormal[4];
+    f32          vDir[4];
+    f32          vAxis[4];
+    f32          vAlong[4];
+    f32          vOff[4];
+    f32          vOffPart[4];
+    f32          fSinAim, fCosAim;
+    f32          fSin, fCos;
+    f32          fSinF, fCosF;
+    f32          fSinS, fCosS;
+    SurfaceType* pSurface;
+    f32          fSpeed, fSlope, fSide, fMax, fLaunch, fKeep, fSpin;
+    int          nLie;
+
+    if (fn_8004D890(pBall->pCourse, pBall, &pSurface, vNormal) < -60000.0f) return 0;
+    if (0.375f != pSurface->f1C) {
+        pSurface = &gSurfaceTypes[14];
+    }
+    switch (nKind) {
+    case 2:
+        fSpeed = gChipSpeed[nClub];
+        break;
+    case 5:
+        fSpeed = 0.38f;
+        break;
+    case 6:
+        fSpeed = 0.3f;
+        break;
+    case 7:
+        fSpeed = 0.47f;
+        break;
+    case 3:
+        switch (nClub) {
+        case 18:
+            fSpeed = 0.386f;
+            break;
+        case 19:
+            fSpeed = 0.373f;
+            break;
+        case 20:
+            fSpeed = 0.372f;
+            break;
+        case 21:
+            fSpeed = 0.37f;
+            break;
+        case 22:
+            fSpeed = 0.299f;
+            break;
+        case 23:
+            fSpeed = 0.299f;
+            break;
+        case 24:
+            fSpeed = 0.299f;
+            break;
+        default:
+            goto normal;
+        }
+        break;
+    default:
+    normal:
+        fSpeed = gClubSpeed[nClub];
+        if (nKind == 4) {
+            fSpeed -= 0.01f * gClubStep[nClub];
+        }
+        break;
+    }
+    fSpeed *= gKindSpeed[nKind];
+    fSpeed = fPower * (8.333333f * fSpeed);
+    fn_80055E28(fAim, &fSinAim, &fCosAim);
+    if (nKind == SHOT_PUTT || nClub == CLUB_PUTTER) {
+        fSpeed *= 7.2f;
+        fn_8001EF34(pB, fSpeed, vDir);
+        fn_80055D70(&vDir[0], &vDir[2], fSinAim, fCosAim);
+        fn_800BAF04(vNormal, vNormal);
+        fn_8000C5D4(vDir, vNormal, -fn_8000C5FC(vDir, vNormal), pVel);
+        fn_8001EF34(pVel, 1.8f, pVel);
+        pSpin[0] = 0.0f;
+        pSpin[1] = 0.0f;
+        pSpin[2] = 0.0f;
+        goto done;
+    }
+    fSpeed *= 12.833333f;
+    Vec3Copy(pB, vDir);
+    fSlope = fn_800511F0(pBall, fAim, vNormal);
+    if (fSlope > 0.0f) {
+        if (nKind == 3) {
+            fMax = 40.0f * fn_8000AD9C(fSlope) + (75.0f - 1.8f * gClubStep[nClub]);
+        } else {
+            fMax = 40.0f * fn_8000AD9C(fSlope) + (125.0f - 1.8f * gClubStep[nClub]);
+        }
+        fMax = 0.017453292f * fMax;
+        fSpeed *= (1.0f / fMax) * (fMax - fSlope);
+        fn_80055E28(fSlope, &fSinF, &fCosF);
+        fn_80055D70(&vDir[2], &vDir[1], fSinF, fCosF);
+    }
+    fn_8001EF34(vDir, fSpeed, vDir);
+    if (nKind == 5) {
+        fn_80055E28(0.7330383f, &fSin, &fCos);
+        fn_80055D70(&vDir[2], &vDir[1], fSin, fCos);
+    }
+    if (nKind == 2) {
+        fLaunch = gChipLoft[nClub];
+    } else {
+        fLaunch = gClubLoft[nClub];
+    }
+    fLaunch += gKindLoft[nKind];
+    if (nKind == 4) {
+        fLaunch -= 0.013962634f * gClubStep[nClub];
+    }
+    fLaunch += gTrajLoft[nTrajectory];
+    fn_80055E28(Ball_Clamp(fLaunch, 0.0f, 1.3962634f), &fSin, &fCos);
+    Vec3Copy(pA, vAxis);
+    vAxis[3] = 0.0f;
+    fn_80055D70(&vAxis[2], &vAxis[1], fSin, fCos);
+    if (pBall->nPlayer == 4 ||
+        (pBall->nPlayer >= 0 && pBall->nPlayer <= 3 && gPlayers[pBall->nPlayer].bPerfect)) {
+        fSide = 0.0f;
+    } else {
+        fSide = fn_80051124(pBall, fAim, vNormal);
+        if (fSide) {
+            if (fSide < -0.7853982f) {
+                fSide = -0.7853982f;
+            } else if (fSide > 0.7853982f) {
+                fSide = 0.7853982f;
+            }
+            fn_80055E28(0.2f * fSide, &fSinS, &fCosS);
+            fn_80055D70(&vAxis[0], &vAxis[1], fSinS, fCosS);
+        }
+    }
+    fn_80055EC4(vDir, vAxis, vAlong);
+    fn_80055EA0(vDir, vAlong, vOff);
+    fn_8001EF34(vOff, 0.10000002f, vOffPart);
+    nLie = pBall->nLie;
+    switch (nLie) {
+    case 6:
+        fKeep = 0.8f;
+        fSpin = 0.9f;
+        break;
+    case 7:
+        fKeep = 0.7f;
+        fSpin = 0.8f;
+        break;
+    case 8:
+        fKeep = 0.6f;
+        fSpin = 0.7f;
+        break;
+    case 3:
+        fKeep = 0.9f;
+        fSpin = 0.7f;
+        break;
+    case 4:
+        fKeep = 0.8f;
+        fSpin = 0.7f;
+        break;
+    default:
+        fKeep = pSurface->f00;
+        fSpin = pSurface->f08;
+        break;
+    }
+    fKeep += pBall->f70;
+    fKeep = 0.0125f * (1.0f - fKeep) * gClubStep[nClub] + fKeep;
+    if (nKind == 2 && (nLie == 3 || nLie == 4 || nLie == 5)) {
+        fKeep -= 0.1f;
+    }
+    fn_80055E7C(vAlong, vOffPart, vAlong);
+    fn_8001EF34(vAlong, fKeep, pVel);
+    fKeep = gClubSpin[nClub] * gKindSpin[nKind];
+    fKeep *= 0.85f;
+    fSpin = 1.1904762f * (fKeep * fSpin);
+    fn_80055EA0(vOff, vOffPart, vOff);
+    if (fSide) {
+        fn_80055E28(0.9f * fSide, &fSinS, &fCosS);
+        fn_80055D70(&vAxis[0], &vAxis[1], fSinS, fCosS);
+    }
+    fn_8001EF78(vOff, vAxis, pSpin);
+    fn_8001EF34(pSpin, fSpin, pSpin);
+    fn_80055D70(&pVel[0], &pVel[2], fSinAim, fCosAim);
+    fn_80055D70(&pSpin[0], &pSpin[2], fSinAim, fCosAim);
+done:
+    return 1;
 }
 
 // Launch the ball from a point along a direction at a speed (x 0.489): in the air, no spin.
