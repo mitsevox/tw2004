@@ -1017,8 +1017,8 @@ GoShaderObjectCommon_ShaderObjectsData_Gc.c:
 LLVideo.c:
 	.text       start:0x80075280 end:0x80076158
 
-unsorted/sweep_800763B4.c:
-	.text       start:0x800763B4 end:0x800763BC
+ByteSwap.c:
+	.text       start:0x80076158 end:0x800763BC
 
 GoCamera.c:
 	.text       start:0x800763BC end:0x80076A54
