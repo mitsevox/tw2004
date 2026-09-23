@@ -28,7 +28,7 @@ void fn_8000AD34(f32* pA, f32* pB) {
 }
 
 f32 fn_8000AD78(f32 y, f32 x) {
-    return fn_8015F7C4(y, x);
+    return atan2(y, x);
 }
 
 f32 fabsf(f32 x) {
@@ -75,7 +75,7 @@ void fn_8000AF58(void) {
 }
 
 f32 fn_8000AF7C(f32 x) {
-    return fn_8015F804(x);
+    return log(x);
 }
 
 // Makes a pool of nNodes nodes of uNodeSize bytes each, every node aligned to uAlign (a power of

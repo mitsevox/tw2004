@@ -61,8 +61,18 @@ typedef struct CoursePrice {
 
 #define NUM_COURSE_PRICES 24    // the 'ERN ' data has 24 rows (0x114..0x1D4): fn_800D3A20 reads 0..20, 21 and 23
 
+// A row of the first table (12 bytes): a range of values and what it maps to. A menu message
+// (fn_8007D708) looks a value up: the first row with n0 - 1 <= value <= n4 gives n8.
+typedef struct EarningsRange {
+    s32  n0;                    // 0x0
+    s32  n4;                    // 0x4
+    s32  n8;                    // 0x8
+} EarningsRange;
+
+#define NUM_EARNINGS_RANGES 23
+
 typedef struct EarningsTable {
-    u8   unk0[0x114];
+    EarningsRange aRange[NUM_EARNINGS_RANGES];      // 0x000
     CoursePrice aCoursePrice[NUM_COURSE_PRICES];     // 0x114  per course (SaveProfile.aCourseUnlocked)
     StrokePrize aStrokePrize[NUM_EARNINGS_RATINGS];  // 0x1D4  per rating of the beaten golfer
     SkinsValue aSkins[NUM_EARNINGS_RATINGS];         // 0x2A4  per best rating in the game
@@ -73,7 +83,7 @@ typedef struct EarningsTable {
     s32  aTeePct[3];            // 0x980  the tee multiplier, as [2 - nTeeSet] (tee set 3 pays as 1)
     s32  aPinSetPct[4];         // 0x98C  the multiplier for the hole's pin set (gpGame->nPinSet) 0..3
     s32  aTourPct[6];           // 0x99C  the TOUR card multiplier per level 1..6 (level 0 pays as 1)
-    u8   unk9B4[0x9E4 - 0x9B4];
+    s32  a9B4[12];              // 0x9B4  read by index by a menu message (fn_8007E174)
     s32  n9E4;                  // 0x9E4  paid with award 0xC, once every challenge has a medal (GameMode5)
     u8   unk9E8[0x9F0 - 0x9E8];
     s32  nLadderDone;           // 0x9F0  paid when the last ladder event is won

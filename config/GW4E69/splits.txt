@@ -799,98 +799,20 @@ AudTable.c:
 hlaudmovie.c:
 	.text       start:0x800A85CC end:0x800A9808
 
-unsorted/sweep_800A9AC4.c:
-	.text       start:0x800A9AC4 end:0x800A9AC8
+hlaudtrack.c:
+	.text       start:0x800A9808 end:0x800AA4BC
 
-unsorted/sweep_800AA0D8.c:
-	.text       start:0x800AA0D8 end:0x800AA118
-
-unsorted/sweep_800AA2A4.c:
-	.text       start:0x800AA2A4 end:0x800AA2EC
-
-unsorted/sweep_800AA2EC.c:
-	.text       start:0x800AA2EC end:0x800AA34C
-
-unsorted/sweep_800AA3D4.c:
-	.text       start:0x800AA3D4 end:0x800AA400
-
-unsorted/sweep_800AA444.c:
-	.text       start:0x800AA444 end:0x800AA44C
-
-unsorted/sweep_800AA498.c:
-	.text       start:0x800AA498 end:0x800AA4BC
-
-unsorted/sweep_800AA694.c:
-	.text       start:0x800AA694 end:0x800AA698
-
-unsorted/sweep_800AAAA0.c:
-	.text       start:0x800AAAA0 end:0x800AAAA4
-
-unsorted/sweep_800AAB48.c:
-	.text       start:0x800AAB48 end:0x800AAB8C
-
-unsorted/sweep_800AAD14.c:
-	.text       start:0x800AAD14 end:0x800AAD18
-
-unsorted/sweep_800AADE8.c:
-	.text       start:0x800AADE8 end:0x800AAE08
-
-unsorted/sweep_800AAE70.c:
-	.text       start:0x800AAE70 end:0x800AAE90
-
-unsorted/sweep_800AAEEC.c:
-	.text       start:0x800AAEEC end:0x800AAEFC
-
-unsorted/sweep_800AB32C.c:
-	.text       start:0x800AB32C end:0x800AB374
-
-unsorted/sweep_800AB374.c:
-	.text       start:0x800AB374 end:0x800AB384
-
-unsorted/sweep_800AB39C.c:
-	.text       start:0x800AB39C end:0x800AB3A4
+hlaudtrackseq.c:
+	.text       start:0x800AA4BC end:0x800AB3A4
 
 hlaudtrackstm.c:
 	.text       start:0x800AB3A4 end:0x800AC330
 
-unsorted/sweep_800AC470.c:
-	.text       start:0x800AC470 end:0x800AC494
+hlaudvoice.c:
+	.text       start:0x800AC330 end:0x800ACECC
 
-unsorted/sweep_800AC494.c:
-	.text       start:0x800AC494 end:0x800AC4A0
-
-unsorted/sweep_800ACA5C.c:
-	.text       start:0x800ACA5C end:0x800ACA94
-
-unsorted/sweep_800ACB28.c:
-	.text       start:0x800ACB28 end:0x800ACB98
-
-unsorted/sweep_800ACEC4.c:
-	.text       start:0x800ACEC4 end:0x800ACECC
-
-unsorted/sweep_800AD1C4.c:
-	.text       start:0x800AD1C4 end:0x800AD1C8
-
-unsorted/sweep_800AD950.c:
-	.text       start:0x800AD950 end:0x800AD9AC
-
-unsorted/sweep_800AD9AC.c:
-	.text       start:0x800AD9AC end:0x800ADA08
-
-unsorted/sweep_800ADA08.c:
-	.text       start:0x800ADA08 end:0x800ADA28
-
-unsorted/sweep_800ADA28.c:
-	.text       start:0x800ADA28 end:0x800ADA94
-
-unsorted/sweep_800ADA94.c:
-	.text       start:0x800ADA94 end:0x800ADAF0
-
-unsorted/sweep_800ADAF0.c:
-	.text       start:0x800ADAF0 end:0x800ADB4C
-
-unsorted/sweep_800ADDC8.c:
-	.text       start:0x800ADDC8 end:0x800ADE54
+hlaudemitter.c:
+	.text       start:0x800ACECC end:0x800ADE70
 
 UAudContainers.c:
 	.text       start:0x800ADE70 end:0x800AE1F8
@@ -1898,6 +1820,9 @@ src/MSL_C/PPCEABI/bare/H/ansi_files.c:
 
 src/MSL_C/PPCEABI/bare/H/ansi_fp.c:
 	.text       start:0x8015286C end:0x80155E48
+	.rodata     start:0x80185078 end:0x80185158
+	.data       start:0x8019C520 end:0x8019C688
+	.sdata2     start:0x80284C60 end:0x80284C90
 
 runtime/buffer_io.c:
 	.text       start:0x80155E48 end:0x80155F40
@@ -1906,7 +1831,7 @@ unsorted/sweep_80155F40.c:
 	.text       start:0x80155F40 end:0x80155F4C
 
 runtime/ctype.c:
-	.text       start:0x80155F4C end:0x80155F70
+	.text       start:0x80155F4C end:0x80155F88
 	.data       start:0x8019C688 end:0x8019C988
 
 src/MSL_C/PPCEABI/bare/H/direct_io.c:
@@ -1920,6 +1845,7 @@ runtime/FILE_POS.c:
 
 src/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common/Src/mbstring.c:
 	.text       start:0x80156954 end:0x80156C78
+	.sdata2     start:0x80284C90 end:0x80284C98
 
 runtime/mem.c:
 	.text       start:0x80156C78 end:0x80156DE8
@@ -1932,7 +1858,13 @@ runtime/misc_io.c:
 
 runtime/printf.c:
 	.text       start:0x801570C8 end:0x8015929C
+	.rodata     start:0x80185160 end:0x80185188
 	.data       start:0x8019C9C0 end:0x8019CBEC
+	.sdata      start:0x80281B08 end:0x80281B0A
+	.sdata2     start:0x80284C98 end:0x80284CA0
+
+runtime/qsort.c:
+	.text       start:0x8015929C end:0x80159408
 
 runtime/sscanf.c:
 	.text       start:0x801594CC end:0x8015955C
@@ -1944,6 +1876,8 @@ src/MSL_C/PPCEABI/bare/H/string.c:
 
 src/MSL_C/strtold.c:
 	.text       start:0x8015A8D0 end:0x8015B8DC
+	.rodata     start:0x80185540 end:0x80185578
+	.sdata2     start:0x80284CA0 end:0x80284CB8
 
 src/MSL_C/strtoul.c:
 	.text       start:0x8015B8DC end:0x8015C120
@@ -2040,8 +1974,26 @@ runtime/s_tan.c:
 	.text       start:0x8015F70C end:0x8015F784
 	.sdata2     start:0x80285190 end:0x80285198
 
-unsorted/sweep_8015F784.c:
-	.text       start:0x8015F784 end:0x8015F844
+runtime/w_acos.c:
+	.text       start:0x8015F784 end:0x8015F7A4
+
+runtime/w_asin.c:
+	.text       start:0x8015F7A4 end:0x8015F7C4
+
+runtime/w_atan2.c:
+	.text       start:0x8015F7C4 end:0x8015F7E4
+
+runtime/w_fmod.c:
+	.text       start:0x8015F7E4 end:0x8015F804
+
+runtime/w_log.c:
+	.text       start:0x8015F804 end:0x8015F824
+
+runtime/w_pow.c:
+	.text       start:0x8015F824 end:0x8015F844
+
+runtime/extras.c:
+	.text       start:0x8015F844 end:0x8015F8D0
 
 MetroTRK/mainloop.c:
 	.text       start:0x8015F8D0 end:0x8015F9C8

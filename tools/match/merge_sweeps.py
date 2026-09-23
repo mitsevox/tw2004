@@ -154,8 +154,14 @@ def append(path, includes, decls, bodies):
             chunk = [sweepblock.BEGIN, ''] + code + ['', sweepblock.END, '']
         lines = lines[:at] + chunk + lines[at:]
     if missing:
-        last = max((i for i, l in enumerate(lines) if l.startswith('#include')), default=0)
-        lines = lines[:last + 1] + missing + lines[last + 1:]
+        last = max((i for i, l in enumerate(lines) if l.startswith('#include')), default=None)
+        if last is None:                             # no includes yet: after the header comment
+            at = 0
+            while at < len(lines) and lines[at].startswith('//'):
+                at += 1
+            lines = lines[:at] + [''] + missing + lines[at:]
+        else:
+            lines = lines[:last + 1] + missing + lines[last + 1:]
     out = '\n'.join(lines) + '\n'
     for b in bodies:                                 # every body verbatim, every old line kept
         assert b in out
@@ -174,8 +180,13 @@ def main():
     if path.exists() and path.read_text(encoding='utf-8').strip():
         append(path, includes, decls, bodies)
         return
+    # A new unit: a header comment, the includes, then everything else in one sweep block, so the
+    # machine-written code (raw offsets, externs) is marked as not yet cleaned, as in a widened unit.
     bodies = [b for _, b in by_address(bodies, addresses())]
-    text ='\n'.join(includes) + '\n\n' + '\n'.join(decls) + '\n\n' + '\n\n'.join(bodies) + '\n'
+    head = '// %s (our name): made by fold.py from %d sweep files; not yet described.' \
+        % (pathlib.Path(out_name).name, len(files))
+    text = '\n'.join([head, ''] + includes + ['', sweepblock.BEGIN, ''] + decls + ['']
+                     + '\n\n'.join(bodies).split('\n') + ['', sweepblock.END]) + '\n'
     path.write_text(text, encoding='utf-8', newline='\n')
     print(len(decls), 'decls', len(bodies), 'bodies')
 

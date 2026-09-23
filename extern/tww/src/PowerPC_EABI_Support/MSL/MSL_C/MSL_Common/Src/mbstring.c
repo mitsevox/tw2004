@@ -38,15 +38,64 @@ static int is_utf8_complete(const char* s, size_t n)
 	}
 }
 
-int utf8_to_unicode(wchar_t* pwc, const char* s, size_t n) {
-	/* Nonmatching */
+inline int utf8_to_unicode(wchar_t* pwc, const char* s, size_t n) {
+	wchar_t result_chr = 0;
+	int number_of_bytes;
+	int check_byte_count;
+	const char* source;
+
+	if (!s) {
+		return 0;
+	}
+
+	if (n == 0) {
+		return -1;
+	}
+
+	number_of_bytes = is_utf8_complete(s, n);
+	if (number_of_bytes < 0) {
+		return -1;
+	}
+
+	source = s;
+	switch (number_of_bytes) {
+	case 3:
+		result_chr |= (*source++ & 0x0f);
+		result_chr <<= 6;
+	case 2:
+		result_chr |= (*source++ & 0x3f);
+		result_chr <<= 6;
+	case 1:
+		result_chr |= (*source & 0x7f);
+	}
+
+	// reject an overlong encoding: the character must need exactly as many bytes as it used
+	if (result_chr == 0) {
+		check_byte_count = 0;
+	} else if (result_chr < 0x80) {
+		check_byte_count = 1;
+	} else if (result_chr < 0x800) {
+		check_byte_count = 2;
+	} else {
+		check_byte_count = 3;
+	}
+
+	if (check_byte_count != number_of_bytes) {
+		return -1;
+	}
+
+	if (pwc) {
+		*pwc = result_chr;
+	}
+
+	return number_of_bytes;
 }
 
 int mbtowc(wchar_t* pwc, const char* s, size_t n) {
 	return utf8_to_unicode(pwc, s, n);
 }
 
-static int unicode_to_UTF8(char* s, wchar_t wchar) {
+static inline int unicode_to_UTF8(char* s, wchar_t wchar) {
 	int number_of_bytes;
 	wchar_t wide_char;
 	char* target_ptr;

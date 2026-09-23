@@ -640,7 +640,7 @@ void fn_80085D04(MsgArg* pArgs, MsgArg* pResult) {
         strcpy(((MsgString*)pArgs[1].p)->pStr, gPlayers[pArgs[0].i].golfer.szNick);
         return;
     }
-    if (fn_8015F844(gPlayers[pArgs[0].i].golfer.szLast, "the entertainer") == 0) {
+    if (stricmp(gPlayers[pArgs[0].i].golfer.szLast, "the entertainer") == 0) {
         strcpy(((MsgString*)pArgs[1].p)->pStr, "CEDRIC");
         return;
     }

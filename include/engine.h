@@ -45,8 +45,8 @@ UMemPool* fn_8000AFA0(int nNodes, u32 uNodeSize, u32 uFlags, u32 uAlign);   // c
 void  fn_8000B058(UMemPool* pPool);                     // destroy
 void* fn_8000B078(UMemPool* pPool);                     // take a node (NULL when none is free)
 void  fn_8000B0D4(UMemPool* pPool, void* pNode);        // give a node back
-// Sorts nCount items of nSize bytes with pfnCompare (the C library's qsort, by its arguments).
-void  fn_8015929C(void* pBase, u32 nCount, u32 nSize, s32 (*pfnCompare)(const void* pA, const void* pB));
+// Sorts nCount items of nSize bytes with pfnCompare (MSL, 0x8015929C).
+void  qsort(void* pBase, u32 nCount, u32 nSize, s32 (*pfnCompare)(const void* pA, const void* pB));
 
 // ---- time ------------------------------------------------------------------------------------
 
@@ -73,10 +73,10 @@ f32  fabsf(f32 x);                      // 0x8000AD9C: fabs (0x8000AE94, platfor
 f32  fn_8000AF7C(f32 x);                // natural logarithm
 void fn_8000AF20(void);                 // make the log2 table (lbl_80281BD8)
 void fn_8000AF58(void);                 // free the log2 table
-double fn_8015F784(double x);           // acos
-double fn_8015F7A4(double x);           // asin
-double fn_8015F7C4(double y, double x); // atan2
-double fn_8015F804(double x);           // log
+double acos(double x);                  // 0x8015F784 (MSL)
+double asin(double x);                  // 0x8015F7A4 (MSL)
+double atan2(double y, double x);       // 0x8015F7C4 (MSL)
+double log(double x);                   // 0x8015F804 (MSL)
 u32  Rand_Next(int nStream);            // 0x8000B130  EA's lagged-Fibonacci generator
 f32  fn_8000B318(int nStream);          // a normally distributed random number (mean 0, deviation 1):
                                         // Box-Muller on two Rand_Floats, the second value kept
@@ -89,7 +89,7 @@ void fn_8000883C(f32* pA, f32* pB, f32 fT);   // quaternion slerp from a to b by
 f32  fn_80029B64(f32 x);                // square root (Skeleton.c); x itself when x <= 0
 void fn_8000C5D4(f32* pA, f32* pB, f32 f, f32* pOut);   // out = a + f x b
 f32  fn_8000C5FC(f32* pA, f32* pB);     // dot product
-double fn_8015F824(double x, double y); // pow
+double pow(double x, double y);         // 0x8015F824 (MSL)
 f32  powf(f32 x, f32 y);                // 0x8002C8D0 (Golfer.c): pow rounded to a float
 f32  fn_800BB028(f32* pA, f32* pB);     // squared distance
 void vec4flt_CrossProduct(f32* pA, f32* pB, f32* pOut);   // cross product
