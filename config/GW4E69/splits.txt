@@ -3815,6 +3815,8 @@ runtime/__va_arg.c:
 
 src/Runtime.PPCEABI.H/global_destructor_chain.c:
 	.text       start:0x80151A6C end:0x80151AB4
+	.dtors      start:0x8017DB40 end:0x8017DB44
+	.sbss       start:0x802829D8 end:0x802829E0
 
 runtime/runtime.c:
 	.text       start:0x80151AB4 end:0x801520F8
