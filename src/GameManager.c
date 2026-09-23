@@ -867,16 +867,13 @@ void GM_GolferConcede_Hole(int nPlayer) {
 void GM_MovePlayerToBall(int nPlayer) {
     f32         fLow;
     f32         fHigh;
-    Player*     p     = &gPlayers[nPlayer];
-    Ball*       pBall = &p->ball;
-    f32*        pPos  = p->vBall;
     CourseInfo* pCourse;
     f32         f;
-    Vec3Copy(pBall->vPos, pPos);
-    Vec_Copy(pBall->vPos, p->vPreShot);
+    Vec3Copy(gPlayers[nPlayer].ball.vPos, gPlayers[nPlayer].vBall);
+    Vec_Copy(gPlayers[nPlayer].ball.vPos, gPlayers[nPlayer].vPreShot);
     pCourse = fn_8000C594();
     if (pCourse) {
-        Ter_GetEnclosingGroundHeight(pCourse, pPos, &fLow, &fHigh);
+        Ter_GetEnclosingGroundHeight(pCourse, gPlayers[nPlayer].vBall, &fLow, &fHigh);
         f = fHigh;
         if (-65536.125f == f || f > 0.25f + gPlayers[nPlayer].vBall[1]) {
             f = fLow;
@@ -1081,27 +1078,24 @@ int GM_ChooseRemoveBallState(int nPlayer) {
 // miss that came within 0.2 of the hole always does (animation 9). A scripted reaction (uFlags
 // bit 0) plays when the ball passes the saved distance instead.
 void GM_SimulateBallMovement(int nPlayer) {
-    int   nSteps = 0;
-    f32   fBudget;
-    f32   fMs;
-    u64   t0;
-    Ball* pBall;
-    int   nUpdates;
-    int   i;
-    s32*  pState;
-    u8    bReact;
-    u8    bOn;
-    f32   fDist;
-    int   nResult;
+    int nSteps = 0;
+    u64 t0;
+    int nUpdates;
+    int i;
+    f32 fBudget;
+    f32 fMs;
+    u8  bReact;
+    u8  bOn;
+    f32 fDist;
+    int nResult;
 
     t0 = fn_800954A4(0);
     nUpdates = GameEffects_BallUpdatesThisFrame(nPlayer);
     if (gpGame->n294 != 0 && fn_800C71A4(fn_80017028(gPlayers[nPlayer].nView[0]), nPlayer)) {
         nUpdates = 0;
     }
-    pBall = &gPlayers[nPlayer].ball;
     for (i = 0; i < nUpdates; i++) {
-        Physics_Simulate(pBall, 20);
+        Physics_Simulate(&gPlayers[nPlayer].ball, 20);
     }
     fMs = 1000.0f * fn_8006E118(fn_800954A4(0), t0);
     fBudget = 0.83f - fMs;
@@ -1111,11 +1105,10 @@ void GM_SimulateBallMovement(int nPlayer) {
     if (gSession.nSplitScreen == 0 && gSession.fFrameTime > 0.0f) {
         Ball_SetSimulating(1);
         fn_80050D2C(1);
-        pBall = &gPlayers[nPlayer].ballBefore;
-        pState = &gPlayers[nPlayer].ballBefore.nState;
-        while (*pState != 1 && *pState != 5 && *pState != 0 && fBudget > 0.1f) {
+        while (gPlayers[nPlayer].ballBefore.nState != 1 && gPlayers[nPlayer].ballBefore.nState != 5 &&
+               gPlayers[nPlayer].ballBefore.nState != 0 && fBudget > 0.1f) {
             t0 = fn_800954A4(0);
-            Physics_Simulate(pBall, 20);
+            Physics_Simulate(&gPlayers[nPlayer].ballBefore, 20);
             fMs = 1000.0f * fn_8006E118(fn_800954A4(0), t0);
             nSteps++;
             fBudget -= fMs;
@@ -1126,7 +1119,8 @@ void GM_SimulateBallMovement(int nPlayer) {
                     fBudget = 0.0f;
                 }
             }
-            if (*pState == 1 || *pState == 5 || *pState == 0) {
+            if (gPlayers[nPlayer].ballBefore.nState == 1 || gPlayers[nPlayer].ballBefore.nState == 5 ||
+                gPlayers[nPlayer].ballBefore.nState == 0) {
                 if (!(gPlayers[nPlayer].uFlags & 8)) {
                     EVENT_Trigger(nPlayer, 0x3C, 0, -1);
                     fn_8006B2C4(nPlayer, 1);
