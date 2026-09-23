@@ -964,7 +964,6 @@ config.libs = [
             Object(Matching, "unsorted/sweep_80127E44.c"),
             Object(Matching, "unsorted/sweep_8000977C.c"),
             Object(Matching, "unsorted/sweep_8000FFAC.c"),
-            Object(Matching, "unsorted/sweep_80037CD8.c"),
             Object(Matching, "unsorted/sweep_8004AAEC.c"),
             Object(Matching, "unsorted/sweep_8004AD54.c"),
             Object(Matching, "unsorted/sweep_8006765C.c"),

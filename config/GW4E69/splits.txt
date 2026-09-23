@@ -460,7 +460,7 @@ unsorted/sweep_80021A98.c:
 	.text       start:0x80021A98 end:0x80021ADC
 
 skalib.c:
-	.text       start:0x80021ADC end:0x80026844
+	.text       start:0x80021ADC end:0x80026B34
 
 unsorted/sweep_80026B34.c:
 	.text       start:0x80026B34 end:0x80026B4C
@@ -514,10 +514,7 @@ GoTerrain.c:
 	.text       start:0x80030254 end:0x80035640
 
 Skin.c:
-	.text       start:0x800358E0 end:0x80037AB8
-
-unsorted/sweep_80037CD8.c:
-	.text       start:0x80037CD8 end:0x80037D5C
+	.text       start:0x80035640 end:0x80037DD8
 
 GoPostFx.c:
 	.text       start:0x80037DD8 end:0x8003944C
