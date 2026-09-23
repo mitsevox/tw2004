@@ -42,6 +42,7 @@ extern u8  lbl_802823F0;
 extern s32 lbl_802823F4;
 extern u8  lbl_802823F8;
 extern s32 lbl_802823FC;                    // the current lesson, 1..12
+extern f32 lbl_80282400;                    // lessons 8 and 9 test its sign
 extern s32 lbl_80282404;                    // player 0's controller, kept while the CPU demonstrates
 extern u8  lbl_80282408;                    // the spin option, saved
 extern u8  lbl_80282409;                    // the boost option, saved
@@ -69,6 +70,7 @@ void  fn_80058FA4(int nPlayer);
 void  fn_80047B6C(u8* pBall, int nPlayer);
 void  fn_80047BC0(u8* pBall, int nPlayer);
 void  fn_800E3D38(int nPlayer, int a);
+void  fn_800A6DCC(int nMusic, int a);
 
 void fn_801000E8(void);
 void fn_80100108(void);
@@ -86,6 +88,7 @@ void fn_80100C08(void);
 u8   fn_80101C9C(int nPlayer, int a);
 u8   fn_80101CC4(int a);
 void fn_80101CD8(void);
+void fn_8010179C(void);
 
 // Mode 11 starts: one player, most of the round's rules off, a fixed random seed. The player's
 // options that the lessons override are saved first.
@@ -470,6 +473,171 @@ u8 fn_80101738(void) {
         return 0;
     }
     return 1;
+}
+
+// Judges the lesson's shot: too short (step 9), off target (step 8), a lesson-specific fault
+// (step 10), several faults (step 11), or passed (step 12). Each fault counts one more try.
+void fn_8010179C(void) {
+    u8 bShort = 0;
+    u8 bMissed = 0;
+    u8 bFault = 0;
+    f32 fLength;
+    int nLesson;
+    int nLie;
+    if (lbl_80282428 == 5) {
+        fn_800A6DCC(1, 1);
+        fn_80100798(2, 1);
+        lbl_80282428 = 16;
+        return;
+    }
+    fLength = fn_800D0550(0);
+    nLesson = lbl_802823FC;
+    nLie = gPlayers[0].nLie;
+    switch (nLesson) {
+    case 1:
+        if (fLength < 260.0f) {
+            bShort = 1;
+        }
+        if (nLie != 1) {
+            bFault = 1;
+        }
+        break;
+    case 8:
+        if (lbl_80282400 < 0.01f) {
+            bMissed = 1;
+        }
+        break;
+    case 9:
+        if (lbl_80282400 > -0.01f) {
+            bMissed = 1;
+        }
+        break;
+    case 2:
+        if (nLie != LIE_GREEN && nLie != 12) {
+            bMissed = 1;
+        }
+        break;
+    case 5:
+        if (nLie != LIE_GREEN && nLie != 12) {
+            bMissed = 1;
+        }
+        break;
+    case 80:
+        if (nLie != LIE_GREEN && nLie != 12) {
+            bMissed = 1;
+        }
+        break;
+    case 3:
+        if (nLie != LIE_GREEN && nLie != 12) {
+            bMissed = 1;
+        }
+        break;
+    case 4:
+        if (nLie != LIE_GREEN && nLie != 12) {
+            bMissed = 1;
+        }
+        break;
+    case 7:
+        if (nLie != 12) {
+            bMissed = 1;
+        }
+        break;
+    case 10:
+        if (!lbl_802823E1) {
+            bMissed = 1;
+            bFault = 1;
+        }
+        if (fLength < 260.0f) {
+            bShort = 1;
+        }
+        break;
+    case 11:
+        if (!lbl_802823E0) {
+            bMissed = 1;
+        }
+        if (nLie != LIE_GREEN && nLie != 12) {
+            bFault = 1;
+        }
+        break;
+    }
+    if ((bShort & bMissed) || (bShort & bFault) || (bMissed & bFault)) {
+        lbl_80282428 = 11;
+        fn_800A6DCC(5, 1);
+        lbl_802823E8++;
+    } else if (bShort) {
+        lbl_80282428 = 9;
+        fn_800A6DCC(5, 1);
+        lbl_802823E8++;
+    } else if (bMissed) {
+        lbl_80282428 = 8;
+        fn_800A6DCC(5, 1);
+        lbl_802823E8++;
+    } else if (bFault) {
+        lbl_80282428 = 10;
+        fn_800A6DCC(5, 1);
+        lbl_802823E8++;
+    } else {
+        lbl_80282428 = 12;
+        if (nLesson == 7 || nLesson == 11) {
+            fn_800A6DCC(3, 1);
+        } else {
+            fn_800A6DCC(1, 1);
+        }
+    }
+}
+
+// A swing event during a lesson; nonzero blocks it. Event 10 changes the music, 32 and 34 end the
+// shot (it is judged), 45 and 46 are what lessons 10 and 11 wait for.
+u8 fn_80101AA8(int nPlayer, int nEvent) {
+    if (!fn_80100294()) {
+        return 0;
+    }
+    if (nEvent == 10) {
+        if (lbl_80282428 == 5) {
+            fn_800A6DCC(0, 0);
+        } else if (lbl_802823FC == 1 || lbl_802823FC == 8 || lbl_802823FC == 9 || lbl_802823FC == 10) {
+            fn_800A6DCC(2, 0);
+        } else {
+            fn_800A6DCC(0, 0);
+        }
+        return 0;
+    }
+    if (nEvent == 29) {
+        lbl_802823E5 = 0;
+        return 0;
+    }
+    if (nEvent == 28 && lbl_80282428 == 5 &&
+        (lbl_802823FC == 1 || lbl_802823FC == 10 || lbl_802823FC == 8 || lbl_802823FC == 9)) {
+        fn_80100798(2, 1);
+        lbl_80282428 = 16;
+        return 1;
+    }
+    if (nEvent == 4) {
+        return 1;
+    }
+    if (nEvent == 32 || nEvent == 34) {
+        fn_8010179C();
+        return 1;
+    }
+    if (nEvent == 46) {
+        lbl_802823E0 = 1;
+        return 1;
+    }
+    if (nEvent == 45) {
+        lbl_802823E1 = 1;
+        return 1;
+    }
+    if (lbl_802823FC == 7 && (nEvent == 20 || nEvent == 21)) {
+        return 0;
+    }
+    if (lbl_802823FC == 6 && (nEvent == 20 || nEvent == 21)) {
+        return 0;
+    }
+    if (nEvent == 13 || nEvent == 14 || nEvent == 15 || nEvent == 16 || nEvent == 17 || nEvent == 20 ||
+        nEvent == 21 || nEvent == 0 || nEvent == 1 || nEvent == 3 || nEvent == 6 || nEvent == 7) {
+        return 1;
+    }
+    return 0;
 }
 
 // HoleFinished: lesson 12 is over unless its step is 19.
