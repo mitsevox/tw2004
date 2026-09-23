@@ -334,19 +334,67 @@ void fn_800BBADC(int nValue) {
     fn_80067B1C(lbl_802811B8->aValue, 5, (u16)nValue, lbl_802811B8->aSetBits);
 }
 
-// ---- sweep code (not yet cleaned up) ----
+// ---- the values the scripts test -----------------------------------------------------------
 
-void fn_800BCB74(s32* arg0, s32 arg1);
-u8 fn_800BCD50(void);
-s32 fn_800BCD5C(void);
+void fn_800BCA60(s32* pClass, int nSurface, Ball* pBall, Player* pPlayer);
+void fn_800BCB74(s32* pClass, int nSurface);
+s32  fn_800BCCA0(int nPlayer);
+s32  fn_800BCCCC(int nPlayer);
+s32  fn_800BCCF8(int nPlayer);
+u8   fn_800BCD24(int nPlayer);
+u8   fn_800BCD50(void);
+s32  fn_800BCD5C(void);
+void fn_800BD77C(u16 uSound);
 void fn_800BD7D0(u8 nMusic);
-void fn_800BD83C(int nSound, int a);
+void fn_800BD7E8(u16 uSound);
 void fn_800BD868(int nSound, int a);
 
-void fn_800BCB74(s32* arg0, s32 arg1) {
-    if (arg1 == 0x97) {
-        *arg0 = 0x15;
+// Correct the surface class of where a ball lies (SurfaceType.nClass) for the scripts: outside the
+// course outline, or on ground a ball may not stay on, is 19 (not playable) unless it is water; a
+// ball that must be dropped counts as water (7); surface 151 is 21; class 18 (green) reads as 12.
+void fn_800BCA60(s32* pClass, int nSurface, Ball* pBall, Player* pPlayer) {
+    u8 bWater;
+    u8 bNoLie;
+    bWater = nSurface >= 0 && nSurface < NUM_SURFACE_TYPES &&
+             (gSurfaceTypes[nSurface].nClass == 7 || gSurfaceTypes[nSurface].nClass == 16);
+    bNoLie = nSurface >= 0 && nSurface < NUM_SURFACE_TYPES && !(gSurfaceTypes[nSurface].u34 & 1) &&
+             (gSurfaceTypes[nSurface].u34 & 2);
+    if ((!Ter_PointInOOBNetwork(pBall->vPos) && !bWater) || (bNoLie && !bWater)) {
+        *pClass = 19;
     }
+    if (pPlayer->b30E) {
+        *pClass = 7;
+    }
+    if (nSurface == 151) {
+        *pClass = 21;
+    }
+    if (*pClass == 18) {
+        *pClass = 12;
+    }
+}
+
+// Surface 151 is class 21 (the same test as in fn_800BCA60).
+void fn_800BCB74(s32* pClass, int nSurface) {
+    if (nSurface == 151) {
+        *pClass = 21;
+    }
+}
+
+// The game mode's answers for the scripts (GameState's callbacks).
+s32 fn_800BCCA0(int nPlayer) {
+    return gpGame->pfn204(nPlayer);
+}
+
+s32 fn_800BCCCC(int nPlayer) {
+    return gpGame->pfn208(nPlayer);
+}
+
+s32 fn_800BCCF8(int nPlayer) {
+    return gpGame->pfn200(nPlayer);
+}
+
+u8 fn_800BCD24(int nPlayer) {
+    return gpGame->pfn1FC(nPlayer);
 }
 
 u8 fn_800BCD50(void) {
@@ -357,9 +405,28 @@ s32 fn_800BCD5C(void) {
     return gpGame->nDC;
 }
 
+// ---- sounds and music ----------------------------------------------------------------------
+
+// Hand GameEffects a sound to stop later (u48), unless one is waiting already; not in mode 11.
+void fn_800BD77C(u16 uSound) {
+    if (Game_GetMode() != 11 && !lbl_80202898.b47) {
+        lbl_80202898.u48 = uSound;
+        lbl_80202898.b47 = 1;
+    }
+}
+
+// Tell GameEffects which music to go back to.
 void fn_800BD7D0(u8 nMusic) {
     lbl_80202898.b4E = 1;
     lbl_80202898.n4F = nMusic;
+}
+
+// The same as fn_800BD77C with GameEffects' second slot (u4C).
+void fn_800BD7E8(u16 uSound) {
+    if (Game_GetMode() != 11 && !lbl_80202898.b4A) {
+        lbl_80202898.u4C = uSound;
+        lbl_80202898.b4A = 1;
+    }
 }
 
 void fn_800BD83C(int nSound, int a) {
@@ -369,5 +436,3 @@ void fn_800BD83C(int nSound, int a) {
 void fn_800BD868(int nSound, int a) {
     fn_800A7664(2, nSound, a);
 }
-
-// ---- end of sweep code ----
