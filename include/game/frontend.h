@@ -87,6 +87,7 @@ void fn_800834A8(MsgArg* pArgs, MsgArg* pResult);
 void fn_800834E8(MsgArg* pArgs, MsgArg* pResult);
 
 extern u8 lbl_80281F18;         // set by the pause handler (GameUICommands.c fn_8008633C)
+extern u8 lbl_80281F19;         // (uiProcessInterface.c) FEgolferanim.c's fn_8008EB10 tests it
 
 // Four words a UI element passes down its transform stack, copied as one struct (what they hold is
 // not known yet).
