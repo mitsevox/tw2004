@@ -1822,8 +1822,6 @@ void fn_8002E25C(void) {
 extern char gszEmpty[8];            // 0x802810B8  "" (small data)
 extern char lbl_80187650[];         // "cl_bbsd" ... the default name at +0x1A
 
-void fn_800CB700(char* pDst, char* pSrc);       // string copy
-
 // Options_SetDefaults(): the defaults, then the debug "all 105" variant when session flag
 // 0x4000 is set.
 void Options_SetDefaults(GameOptions* pOpt) {
@@ -1912,7 +1910,7 @@ void Session_Init(void) {
         gSession.aProfile[i].n1 = 0;
         gSession.aProfile[i].n2 = 0;
         for (j = 0; j < 6; j++) {
-            fn_800CB700(gSession.aProfile[i].szNames[j], gszEmpty);
+            fn_800CB700(&gSession.aProfile[i].aNames[j], gszEmpty);
         }
     }
     gSession.f5B3C = 0.0f;
@@ -1929,27 +1927,25 @@ void Session_SetupProfiles(void) {
     s8       nSpin;
 
     for (i = 0; i < pSession->nNumPlayers; i++) {
-        // fake match: the cast keeps this near-miss at 70.9% (&gSession.aProfile[i]: 70.1%)
-        PlayerProfile* pProf = (PlayerProfile*)gSession.aProfile + i;
+        PlayerProfile* pProf = &gSession.aProfile[i];
         int            nGolfer;
         pProf->n1 = 0;
         nSpin = gGolferTable[pSession->nGolfer[i]].attr[ATTR_SPIN];
         for (j = 0; j < 6; j++) {
-            fn_800CB700(pProf->szNames[j], gszEmpty);
+            fn_800CB700(&pProf->aNames[j], gszEmpty);
         }
         pProf->nOutfit = gGolferTable[pSession->nGolfer[i]].nOutfit;
         nGolfer = pSession->nGolfer[i];
         if (nGolfer >= FIRST_CREATED_GOLFER) {
             SaveProfile* pSave = &gpSaveData[nGolfer - FIRST_CREATED_GOLFER];
             for (j = 0; j < 6; j++) {
-                ((u32*)pProf->szNames[j])[0] = ((u32*)pSave->szGolferNames[j])[0];
-                ((u32*)pProf->szNames[j])[1] = ((u32*)pSave->szGolferNames[j])[1];
+                pProf->aNames[j] = pSave->aGolferNames[j];
             }
             pProf->n2        = pSave->n54C2;
             pProf->nBallType = pSave->nGolferBallType;
             pProf->nOutfit   = pSave->nGolferOutfit;
         } else if (nGolfer == 0 || nGolfer == 1) {
-            fn_800CB700(pProf->szNames[0], lbl_80187650 + 0x1A);
+            fn_800CB700(&pProf->aNames[0], lbl_80187650 + 0x1A);
             pProf->n2        = 0;
             pProf->nBallType = 0;
         } else if (fn_80077B18(nGolfer)) {

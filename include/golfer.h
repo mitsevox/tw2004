@@ -411,7 +411,7 @@ typedef struct PlayerProfile {
     u8   n1;                    // 0x01  cleared by Session_Init and the golfer setup
     u8   n2;                    // 0x02  a created golfer's byte 0x54C2 of its save slot, else 0
     u8   unk3[5];
-    char szNames[6][8];         // 0x08
+    u64  aNames[6];             // 0x08  names, each packed into 64 bits (fn_800CB700)
     u8   nOutfit;               // 0x38  the golfer record's nOutfit, or the created golfer's
     u8   nBallType;             // 0x39  0..3, from the SPIN attribute for a pro
     u8   unk3A[6];

@@ -205,7 +205,7 @@ typedef struct SaveProfile {
     // the session's PlayerProfile by Golfer.c.
     u8   n54C2;                 // 0x054C2  -> PlayerProfile.unk2
     u8   unk54C3[5];
-    char szGolferNames[6][8];   // 0x054C8  -> PlayerProfile.szNames
+    u64  aGolferNames[6];       // 0x054C8  -> PlayerProfile.aNames
     u8   nGolferOutfit;         // 0x054F8  -> PlayerProfile.nOutfit
     u8   nGolferBallType;       // 0x054F9  -> PlayerProfile.nBallType
     u8   unk54FA[0x5EB4 - 0x54FA];

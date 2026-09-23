@@ -20,6 +20,8 @@ void  fn_80009E70(void* p);             // free
 void* fn_800951A0(u32 uSize, int nAlign, int a);
 void  fn_8009527C(void* p);             // frees what fn_800951A0 allocated
 void  fn_800953C8(int a);
+// Pack up to 12 characters of pName into a 64-bit code (base 40, table lbl_80191520).
+int   fn_800CB700(u64* pId, const char* pName);
 
 // A pool of fixed-size nodes carved from one allocation (UMemPool.c): the header, then the nodes.
 // A free node holds the next free one in its first word.
