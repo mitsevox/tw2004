@@ -2796,6 +2796,7 @@ GameAnalysis.c:
 GameModeAlternateShot.c:
 	.text       start:0x800E68F0 end:0x800E7980
 	.rodata     start:0x80184DA0 end:0x80184DB0
+	.sdata      start:0x80281648 end:0x80281650
 	.sdata2     start:0x80284648 end:0x80284650
 
 GameModeBattle.c:
