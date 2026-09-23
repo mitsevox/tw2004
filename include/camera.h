@@ -187,6 +187,9 @@ typedef struct CamTuning {
     u8   unk1D0[0x1E0 - 0x1D0];
     f32  fSlopeUp;              // 0x1E0
     f32  fSlopeDown;            // 0x1E4
+    u8   unk1E8[0x1F8 - 0x1E8];
+    f32  fMaxPitchUp;           // 0x1F8  fn_800C4AB0: the steepest camera angle above the horizontal (degrees)
+    f32  fMaxPitchDown;         // 0x1FC  and below it
 } CamTuning;
 
 extern CamTuning* lbl_80281F78;         // EA's file list has GoCamTuningVars
