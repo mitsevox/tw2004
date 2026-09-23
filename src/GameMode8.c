@@ -1,7 +1,7 @@
-// GameMode8.c (our name): speed golf. Each hole scores the time taken (n290, in seconds) plus 30
-// seconds per stroke. The golfer runs to the ball between shots (custom golfer states 12 and
-// 24..26 replace the normal ones). Mode 8 is solo; modes 7 and 6 (GameMode7.c, GameMode6.c) are
-// the two-player stroke and match versions.
+// GameMode8.c (our name): speed golf. Each hole scores the time taken (n290, in seconds) plus 3
+// per stroke (fn_800FDA30, the scorecard and the prize). The golfer runs to the ball between shots
+// (custom golfer states 12 and 24..26 replace the normal ones). Mode 8 is solo; modes 7 and 6
+// (GameMode7.c, GameMode6.c) are the two-player stroke and match versions.
 
 #include "golfer.h"
 #include "game.h"
@@ -192,6 +192,8 @@ void fn_800F9C48(void) {
             return;
         }
         if (Player_IsHoled(1)) {
+            // EA bug: player 1's win is marked in player 0's nModePoints (asm 800F9CDC stores
+            // through gPlayers, not gPlayers + 1)
             gPlayers[0].nModePoints[Game_CurHoleIndex()] = 1;
             gPlayers[1].nHolesWon++;
         }
@@ -300,7 +302,8 @@ u8 fn_800FA118(int nPlayer, u8 bCheck) {
     return 0;
 }
 
-// Stroke version: the game is over when a player quit (bit 13) or no hole is left.
+// Stroke version: the game is over once a player has nC3C bit 13 (fn_800FD534 sets it from bit
+// 14 after a player's points ran out) or no hole is left.
 u8 fn_800FA148(u8 bCheck) {
     int h;
     if ((gPlayers[0].nC3C & 0x2000) || (gPlayers[1].nC3C & 0x2000)) {
@@ -314,7 +317,8 @@ u8 fn_800FA148(u8 bCheck) {
     return 1;
 }
 
-// Solo: once holed, the hole's time is taken; the hole is over when holed (or given up).
+// Solo: once holed, the hole's time is taken; the hole is over when holed or when nC3C bit 26 is
+// set (fn_800FDADC ends the hole that way when both golfers are idle).
 u8 fn_800FA1CC(int nPlayer, u8 bCheck) {
     if (gPlayers[0].n290[Game_CurHoleIndex()] == 0 && Player_IsHoled(0)) {
         gPlayers[0].n290[Game_CurHoleIndex()] = fn_800E27C0();
@@ -339,7 +343,8 @@ u8 fn_800FA2C8(u8 bCheck) {
     return 0;
 }
 
-// End of hole: the time scores, or (match version) the hole winner.
+// End of hole: in stroke play fn_800FA48C for each player (its result is thrown away), in match
+// play the hole winner.
 void fn_800FA2D0(void) {
     if (gpGame->n4 == 0) {
         fn_800FA48C(0, Game_CurHoleIndex());
@@ -363,7 +368,7 @@ void fn_800FA3AC(void) {
     gPlayers[1].nC6C[Game_CurHoleIndex()] = gPlayers[1].nC44;
 }
 
-// Game finished: the totals.
+// Game finished: in stroke play fn_800FA4B8's totals (thrown away too), then fn_80125910(1).
 void fn_800FA410(void) {
     if (gpGame->n4 == 0) {
         fn_800FA4B8(0);
@@ -380,7 +385,8 @@ void fn_800FA410(void) {
     }
 }
 
-// A hole's score: the seconds taken plus 30 per stroke.
+// A hole's seconds plus 30 per stroke. Nothing uses the result (fn_800FA2D0 and fn_800FA410
+// discard it); the scores shown and paid use 3 per stroke (fn_800FDA30, SG_Score).
 s32 fn_800FA48C(int nPlayer, int nHole) {
     return gPlayers[nPlayer].n290[nHole] + gPlayers[nPlayer].nStrokes[nHole] * 30;
 }
@@ -1441,8 +1447,9 @@ void fn_800FD1C0(int nPlayer) {
 }
 
 // State 26, update: a player who lost the hole (bit 15) or won it on the other's points (bit 16)
-// gets event 40 or 41. When the countdown ends (and fn_800A7720 is clear), the player's turn is
-// over, and the other player's too if that one is not in state 26 and the ball is not in play.
+// gets event 40 or 41. When the countdown ends (and fn_800A7720 is clear), bit 14 becomes bit 13
+// and the player's turn is over; if the other player is not in state 26 and their ball is at
+// rest, both get bit 3 and the turn is ended again.
 void fn_800FD534(int nPlayer) {
     int nOther;
     if (gPlayers[nPlayer].nC3C & 0x8000) {
@@ -1464,6 +1471,8 @@ void fn_800FD534(int nPlayer) {
         if ((s8)GOLFERSTATE_GetCurrentState(nOther) != 26 && gPlayers[nOther].ball.nState == 0) {
             gPlayers[nOther].nC3C |= 8;
             gPlayers[nPlayer].nC3C |= 8;
+            // EA bug: nPlayer's turn is ended a second time; the other player's is never ended here
+            // (asm 800FD618 and 800FD664 both load r3 from r29, nPlayer)
             GM_EndOfGolferTurn(nPlayer);
         }
     }
@@ -1674,8 +1683,9 @@ u8 fn_800FDF58(int nPlayer) {
     return 0;
 }
 
-// Whether the hole may end now (pfn234): during the countdown before the clock starts, once it
-// is below 71; otherwise once the camera has stopped moving.
+// The mode's pfn234, which GM_CheckControllerPulled asks (TW06's CheckControllerPulled, by
+// position): during the countdown (nC3C bit 1) once it is below 71; otherwise once player 0's
+// camera has stopped moving.
 u8 fn_800FDF60(void) {
     if (gPlayers[0].nC3C & 2) {
         if (gPlayers[0].nC54 < 71) {
