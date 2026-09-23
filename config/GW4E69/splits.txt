@@ -3022,8 +3022,8 @@ SkinMorph.c:
 fe_stats.c:
 	.text       start:0x8011CEB0 end:0x8011D280
 
-unsorted/sweep_8011D858.c:
-	.text       start:0x8011D858 end:0x8011D878
+EventInfo.c:
+	.text       start:0x8011D280 end:0x8011E020
 
 GoGrass.c:
 	.text       start:0x8011E170 end:0x80120298
