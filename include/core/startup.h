@@ -160,7 +160,15 @@ extern u16   lbl_80282118;      // the next voice fn_800B0858 plays on
 
 // ---- the rest ---------------------------------------------------------------------------------
 
-extern s32   lbl_80281498;      // } where fn_800B13FC's search stopped; -1 to start again
+// The memory-card status table: for each of the two card slots, lbl_80282138[slot] entries
+// (always 1), each with the status fn_800B09C8 read (lbl_80282150), the status last reported
+// (lbl_80282148) and whether it has been reported (lbl_80282140).
+#define NUM_CARD_SLOTS 2
+extern s32   lbl_80282138[NUM_CARD_SLOTS];
+extern s32   lbl_80282140[NUM_CARD_SLOTS][1];
+extern s32   lbl_80282148[NUM_CARD_SLOTS][1];
+extern s32   lbl_80282150[NUM_CARD_SLOTS][1];
+extern s32   lbl_80281498;      // } the entry and slot the reports reached; -1 to start again
 extern s32   lbl_8028149C;      // }
 extern u8    lbl_802814A0;
 extern u8    lbl_80282120;      // fn_800B0960 keeps a memory-card result here

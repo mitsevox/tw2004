@@ -21,7 +21,11 @@ void   fn_800B04EC(void* p, u32 uLen, int nDir);
 void   fn_800B051C(void* p, u32 uLen, int nDir);
 void   fn_800B055C(void);
 u32    fn_800B0698(u32 uSize);
-int    fn_800B13FC(s32* pnA, s32* pnB);
+s32    fn_800B09C8(int nSlot, int n);
+void   fn_800B10A4(void);
+u8     fn_800B1180(void);
+s32    fn_800B12FC(s32* pnSlot, s32* pn);
+int    fn_800B13FC(s32* pnSlot, s32* pn);
 void   fn_800B166C(UStreamObject* pObject);
 
 // port: the GameCube's audio and ARAM libraries and their set-up.
@@ -48,6 +52,7 @@ void   fn_8009527C(void* p);            // frees what fn_800951A0 allocated
 void   fn_8009CD10(void);
 void   fn_8009CD7C(void);
 void   fn_8009DCEC(s32 a, s32 b);
+u8     fn_8009F7E8(int nSlot);
 u8     fn_8009F850(void);
 void   fn_8009FAD0(void);
 s32    fn_800A0A7C(s32 a, s32 b);
@@ -541,11 +546,133 @@ void fn_800B1060(void) {
     fn_8016B0F8(lbl_80281F1C->pHandler, 0x8C, 0, &arg);
 }
 
-// Start a search from the beginning (fn_800B13FC continues it).
-int fn_800B14E4(s32* pnA, s32* pnB) {
+// Read every card slot's status; a changed status is marked not yet reported. Here and in
+// fn_800B1180 and fn_800B13FC EA tests the slot (fn_8009F7E8) but gives it one entry either way.
+void fn_800B10A4(void) {
+    int j;
+    int i;
+    s32 n;
+    for (i = 0; i < NUM_CARD_SLOTS; i++) {
+        if (fn_8009F7E8(i)) {
+            n = 1;
+        } else {
+            n = 1;
+        }
+        if (lbl_80282138[i] != n) {
+            lbl_80282138[i] = n;
+            lbl_80282150[i][0] = 0;
+            lbl_80282148[i][0] = 0;
+            lbl_80282140[i][0] = 0;
+        }
+        for (j = 0; j < n; j++) {
+            lbl_80282150[i][j] = fn_800B09C8(i, j);
+            if (lbl_80282148[i][j] != lbl_80282150[i][j]) {
+                lbl_80282148[i][j] = lbl_80282150[i][j];
+                lbl_80282140[i][j] = 0;
+            }
+        }
+    }
+}
+
+// Whether every status is 0.
+u8 fn_800B1180(void) {
+    int i;
+    int j;
+    s32 n;
+    for (i = 0; i < NUM_CARD_SLOTS; i++) {
+        if (fn_8009F7E8(i)) {
+            n = 1;
+        } else {
+            n = 1;
+        }
+        for (j = 0; j < n; j++) {
+            if (lbl_80282150[i][j] != 0) return 0;
+        }
+    }
+    return 1;
+}
+
+// Report the entry the reports reached again, re-reading the statuses first; 5 when every status
+// is 0.
+s32 fn_800B120C(s32* pnSlot, s32* pn) {
+    fn_800B10A4();
+    if (fn_800B1180()) return 5;
+    if (lbl_8028149C == -1 || lbl_80281498 == -1) {
+        return fn_800B12FC(pnSlot, pn);
+    }
+    lbl_80282140[lbl_8028149C][lbl_80281498] = 1;
+    lbl_80282148[lbl_8028149C][lbl_80281498] = lbl_80282150[lbl_8028149C][lbl_80281498];
+    *pnSlot = lbl_8028149C;
+    *pn = lbl_80281498;
+    // EA bug: the slot is used for both indexes; for slot 1 this reads past the table (the word
+    // after it, lbl_80282158).
+    if (lbl_80282150[lbl_8028149C][lbl_8028149C] == 0 && fn_800B1180()) return 5;
+    return lbl_80282150[lbl_8028149C][lbl_80281498];
+}
+
+// Report the first status not yet reported (4 when there is none, 5 when every status is 0).
+s32 fn_800B12FC(s32* pnSlot, s32* pn) {
+    s32 n;
+    int i;
+    int j;
+    fn_800B10A4();
+    if (fn_800B1180()) return 5;
+    for (i = 0; i < NUM_CARD_SLOTS; i++) {
+        n = lbl_80282138[i];
+        for (j = 0; j < n; j++) {
+            if (lbl_80282140[i][j] == 0) {
+                lbl_8028149C = i;
+                lbl_80281498 = j;
+                lbl_80282140[i][j] = 1;
+                lbl_80282148[i][j] = lbl_80282150[i][j];
+                *pnSlot = i;
+                *pn = j;
+                if (n > 1) {
+                    (*pn)++;
+                }
+                return lbl_80282150[i][j];
+            }
+        }
+    }
     lbl_80281498 = -1;
     lbl_8028149C = -1;
-    return fn_800B13FC(pnA, pnB);
+    return 4;
+}
+
+// Find the next slot and entry after the last one found that has a status; returns whether there
+// is one.
+int fn_800B13FC(s32* pnSlot, s32* pn) {
+    int i;
+    int j;
+    s32 n;
+    for (i = 0; i < NUM_CARD_SLOTS; i++) {
+        if (fn_8009F7E8(i)) {
+            lbl_80282138[i] = n = 1;
+        } else {
+            lbl_80282138[i] = n = 1;
+        }
+        for (j = 0; j < n; j++) {
+            if (lbl_80282150[i][j] != 0 &&
+                (i > lbl_8028149C || (i == lbl_8028149C && j > lbl_80281498))) {
+                *pnSlot = i;
+                *pn = j;
+                if (n == 1) {
+                    (*pn)++;
+                }
+                lbl_8028149C = i;
+                lbl_80281498 = j;
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
+
+// Start a search from the beginning (fn_800B13FC continues it).
+int fn_800B14E4(s32* pnSlot, s32* pn) {
+    lbl_80281498 = -1;
+    lbl_8028149C = -1;
+    return fn_800B13FC(pnSlot, pn);
 }
 
 void fn_800B1510(s32 a, s32 b) {
