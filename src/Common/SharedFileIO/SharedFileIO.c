@@ -13,9 +13,8 @@ SFIODevice* _SFIO_pDevice = NULL;
 
 enum { SFIO_STATE_BUSY_A = 0xB, SFIO_STATE_BUSY_B = 0xC, SFIO_STATE_BUSY_C = 0xD };
 
-// Host (CodeWarrior side) and TagFile functions. Signatures inferred from the calls.
-extern void  fn_8012C8D0(void* pLock, int unused);
-extern int   TagFile_SetDescriptor(void* pDescriptor);
+// Host (CodeWarrior side) functions. Signatures inferred from the calls.
+extern void  fn_8012C8D0(u32* pSize, int unused);   // adds up the save's record sizes
 extern int   fn_8012C98C(int eError);
 void fn_8017124C(SFIODescriptor* pDescriptor, u32* pSize, u32* pEntries);
 u32 SFIOGetHeaderSize(void);
@@ -25,29 +24,24 @@ int SFIOLastDeviceFromMask(u16 uDeviceMask);
 extern void* TibExtMemAlloc(void* pAllocator, u32 uSize, u32 uAlign, const char* pFile, int uLine);
 extern void  TibExtMemFree(void* pAllocator, void* p, u32 uSize, u32 uAlign);
 
-typedef struct {
-    void* pAllocator;
-    u32   uSize;
-    u32   uUnk8;
-    u32   uLock;
-} SFIOCreateParams;
-
 // Default descriptor handed to callers. Starts with 'BM6D'; meaning not yet known.
 static const u32 gSFIODefaultDescriptor[14] = {
     0x424D3644, 0x00000000, 0x00003604, 0x00002800, 0x00008000, 0x00008000, 0x00000100,
     0x08000000, 0x00000040, 0x0000220B, 0x0000220B, 0x00000001, 0x00000001, 0x00000000,
 };
 
-int SFIOCreate(void* pAllocator) {
-    SFIOCreateParams params;
+// Describe the save to the library: a header block image of exactly one card block, and the data
+// size the host fills in.
+int SFIOCreate(void* pHeader) {
+    SFIODescriptor desc;
     int eTagError = 0;   // same type as the callee's return: the result goes through r0
     int eError = 0;
-    if (pAllocator == NULL) return 3;
-    params.pAllocator = pAllocator;
-    params.uSize = 0x2000;
-    params.uUnk8 = 0;
-    fn_8012C8D0(&params.uLock, 0);
-    eTagError = TagFile_SetDescriptor(&params);
+    if (pHeader == NULL) return 3;
+    desc.pHeader = pHeader;
+    desc.uSize04 = 0x2000;
+    desc.uSize08 = 0;
+    fn_8012C8D0(&desc.uDataSize, 0);
+    eTagError = TagFile_SetDescriptor(&desc);
     eError = fn_8012C98C(eTagError);
     return eError;
 }
@@ -89,7 +83,7 @@ int SFIONextDeviceFromMask(u16 uDeviceMask, int uDirection) {
     s16 sDevice = 0;
     SFIO_ASSERT(SFIOIsInitialized());
     SFIO_ASSERT(uDeviceMask != 0);
-    sDevice = _SFIO_pData->eDevice;
+    sDevice = _SFIO_pData->Session.eDevice;
     if (uDirection == 0) {
         sDevice++;
         while (sDevice <= SFIO_DEVICE_LAST) {
@@ -144,7 +138,7 @@ int SFIOStartOp18(int* pDescriptor, int* pProcess) {
     *pProcess = 1;
     _SFIO_pData->eState = SFIO_STATE_BUSY_A;
     _SFIO_pData->eOperation = 0x18;
-    _SFIO_pDevice->fn.pfnOp18(_SFIO_pData->uHandle);
+    _SFIO_pDevice->fn.pfnOp18(_SFIO_pData->Session.uHandle);
     return 0;
 }
 
@@ -155,7 +149,7 @@ int SFIOStartOp19(int* pDescriptor, int* pProcess) {
     *pProcess = 1;
     _SFIO_pData->eState = SFIO_STATE_BUSY_B;
     _SFIO_pData->eOperation = 0x19;
-    _SFIO_pDevice->fn.pfnOp19(_SFIO_pData->uHandle);
+    _SFIO_pDevice->fn.pfnOp19(_SFIO_pData->Session.uHandle);
     return 0;
 }
 
@@ -375,15 +369,15 @@ int SFIOContinueSelect(int eError, int* pProcess, int* pResult) {
     switch (_SFIO_pData->eOperation) {
     case 1:
         if (eError == 0) {
-            fn_801715B8(szSearchName, &_SFIO_pDevice->desc, _SFIO_pData->szName35);
+            fn_801715B8(szSearchName, &_SFIO_pDevice->desc, _SFIO_pData->Session.szName);
             _SFIO_pData->eOperation = 2;
-            _SFIO_pDevice->fn.pfnProbe(szSearchName, _SFIO_pData->eDevice);
+            _SFIO_pDevice->fn.pfnProbe(szSearchName, _SFIO_pData->Session.eDevice);
         } else if (eError == 3) {
             if (_SFIO_pData->eState == 3) {
-                _SFIO_pData->eDevice = SFIONextDeviceFromMask(_SFIO_pDevice->uAvailableMask, _SFIO_pData->uSearchDirection);
-                if (_SFIO_pData->eDevice != SFIO_DEVICE_INVALID) {
+                _SFIO_pData->Session.eDevice = SFIONextDeviceFromMask(_SFIO_pDevice->uAvailableMask, _SFIO_pData->uSearchDirection);
+                if (_SFIO_pData->Session.eDevice != SFIO_DEVICE_INVALID) {
                     _SFIO_pData->eOperation = 1;
-                    _SFIO_pDevice->fn.pfnStartProbe(_SFIO_pData->eDevice);
+                    _SFIO_pDevice->fn.pfnStartProbe(_SFIO_pData->Session.eDevice);
                     return 0;
                 }
             }
@@ -397,38 +391,38 @@ int SFIOContinueSelect(int eError, int* pProcess, int* pResult) {
     case 2:
         if (eError == 0) {
             if (*pResult == 1) {
-                fn_80171744(_SFIO_pData->szDirName, _SFIO_pData->szFileName, &_SFIO_pDevice->desc,
-                            _SFIO_pData->szName35);
+                fn_80171744(_SFIO_pData->Session.szDirName, _SFIO_pData->Session.szFileName, &_SFIO_pDevice->desc,
+                            _SFIO_pData->Session.szName);
                 _SFIO_pData->eOperation = 0x16;
-                _SFIO_pDevice->fn.pfnMount(_SFIO_pData->szDirName, _SFIO_pData->szFileName, _SFIO_pData->eDevice,
+                _SFIO_pDevice->fn.pfnMount(_SFIO_pData->Session.szDirName, _SFIO_pData->Session.szFileName, _SFIO_pData->Session.eDevice,
                                            0x80000004);
             } else if (*pResult == 0) {
                 SFIOSetLastError(4);
                 _SFIO_pData->eOperation = 0x1A;
-                _SFIO_pDevice->fn.pfnSelectDevice(_SFIO_pData->eDevice);
+                _SFIO_pDevice->fn.pfnSelectDevice(_SFIO_pData->Session.eDevice);
             } else {
                 *pProcess = 2;
                 return 0xA;
             }
         } else {
             SFIOSetLastError(eError);
-            return SFIOStartSelectDevice(_SFIO_pData->eDevice, pProcess);
+            return SFIOStartSelectDevice(_SFIO_pData->Session.eDevice, pProcess);
         }
         break;
     case 0x16:
         if (eError == 0) {
             if (*pResult >= 0) {
-                _SFIO_pData->uHandle = *pResult;
+                _SFIO_pData->Session.uHandle = *pResult;
                 *pProcess = 2;
                 return 0;
             } else {
-                _SFIO_pData->uHandle = *pResult;
+                _SFIO_pData->Session.uHandle = *pResult;
                 *pProcess = 2;
                 return 0xA;
             }
         } else {
             SFIOSetLastError(eError);
-            return SFIOStartSelectDevice(_SFIO_pData->eDevice, pProcess);
+            return SFIOStartSelectDevice(_SFIO_pData->Session.eDevice, pProcess);
         }
         break;
     case 0x1A:
@@ -440,10 +434,10 @@ int SFIOContinueSelect(int eError, int* pProcess, int* pResult) {
                 *pProcess = 2;
                 return 0;
             } else {
-                _SFIO_pData->eDevice = SFIONextDeviceFromMask(_SFIO_pDevice->uAvailableMask, _SFIO_pData->uSearchDirection);
-                if (_SFIO_pData->eDevice != SFIO_DEVICE_INVALID) {
+                _SFIO_pData->Session.eDevice = SFIONextDeviceFromMask(_SFIO_pDevice->uAvailableMask, _SFIO_pData->uSearchDirection);
+                if (_SFIO_pData->Session.eDevice != SFIO_DEVICE_INVALID) {
                     _SFIO_pData->eOperation = 1;
-                    _SFIO_pDevice->fn.pfnStartProbe(_SFIO_pData->eDevice);
+                    _SFIO_pDevice->fn.pfnStartProbe(_SFIO_pData->Session.eDevice);
                     return 0;
                 } else {
                     *pProcess = 2;
@@ -476,7 +470,7 @@ int SFIOContinueClose(int eError, int* pProcess, int* pResult) {
             return 0;
         } else {
             SFIOSetLastError(eError);
-            return SFIOStartOp18(&_SFIO_pData->uHandle, pProcess);
+            return SFIOStartOp18(&_SFIO_pData->Session.uHandle, pProcess);
         }
         break;
     case 0x1C:
@@ -491,7 +485,7 @@ int SFIOContinueClose(int eError, int* pProcess, int* pResult) {
             }
         } else {
             SFIOSetLastError(eError);
-            return SFIOStartOp18(&_SFIO_pData->uHandle, pProcess);
+            return SFIOStartOp18(&_SFIO_pData->Session.uHandle, pProcess);
         }
         break;
     default:
@@ -512,19 +506,19 @@ int SFIOContinueUnmount(int eError, int* pProcess, int* pResult) {
     case 0x18:
         if (eError == 0) {
             _SFIO_pData->eOperation = 0x19;
-            _SFIO_pDevice->fn.pfnOp19(_SFIO_pData->uHandle);
+            _SFIO_pDevice->fn.pfnOp19(_SFIO_pData->Session.uHandle);
         } else {
             SFIOSetLastError(eError);
-            return SFIOStartOp19(&_SFIO_pData->uHandle, pProcess);
+            return SFIOStartOp19(&_SFIO_pData->Session.uHandle, pProcess);
         }
         break;
     case 0x19:
         if (eError == 0) {
             _SFIO_pData->eOperation = 0x1A;
-            _SFIO_pDevice->fn.pfnSelectDevice(_SFIO_pData->eDevice);
+            _SFIO_pDevice->fn.pfnSelectDevice(_SFIO_pData->Session.eDevice);
         } else {
             SFIOSetLastError(eError);
-            return SFIOStartSelectDevice(_SFIO_pData->eDevice, pProcess);
+            return SFIOStartSelectDevice(_SFIO_pData->Session.eDevice, pProcess);
         }
         break;
     case 0x1A:
@@ -554,11 +548,11 @@ int SFIOContinueAbort(int eError, int* pProcess, int* pResult) {
     switch (_SFIO_pData->eOperation) {
     case 0x18:
         _SFIO_pData->eOperation = 0x19;
-        _SFIO_pDevice->fn.pfnOp19(_SFIO_pData->uHandle);
+        _SFIO_pDevice->fn.pfnOp19(_SFIO_pData->Session.uHandle);
         break;
     case 0x19:
         _SFIO_pData->eOperation = 0x1A;
-        _SFIO_pDevice->fn.pfnSelectDevice(_SFIO_pData->eDevice);
+        _SFIO_pDevice->fn.pfnSelectDevice(_SFIO_pData->Session.eDevice);
         break;
     case 0x1A:
         *pProcess = 2;
@@ -665,10 +659,10 @@ int SFIOShutdown(void) {
     return 0;
 }
 
-// Copies the session part of the state (uHandle .. uExpected54) out to the caller.
-int SFIOGetSessionInfo(void* pOut) {
+// Copies the open save's session out to the caller.
+int SFIOGetSessionInfo(SFIOSession* pOut) {
     if (pOut == NULL) return 0xC;
-    memcpy(pOut, &_SFIO_pData->uHandle, 0x44);
+    memcpy(pOut, &_SFIO_pData->Session, sizeof(SFIOSession));
     return 0;
 }
 
@@ -681,29 +675,29 @@ int SFIOBeginLoad(const char* pName, int eDevice, int uSearchDirection) {
         if (!(u16)((1 << eDevice) & _SFIO_pDevice->uAvailableMask)) return 0xB;
     }
     if (_SFIO_pData->eState != 0) return 0xD;
-    memset(&_SFIO_pData->uHandle, 0, 0x44);
+    memset(&_SFIO_pData->Session, 0, sizeof(SFIOSession));
     if (eDevice == SFIO_DEVICE_INVALID) {
         if (SFIONumDevicesInMask(_SFIO_pDevice->uAvailableMask) == 1) {
-            _SFIO_pData->eDevice = SFIOFirstDeviceFromMask(_SFIO_pDevice->uAvailableMask);
+            _SFIO_pData->Session.eDevice = SFIOFirstDeviceFromMask(_SFIO_pDevice->uAvailableMask);
             _SFIO_pData->eState = 5;
         } else if (uSearchDirection == 0) {
-            _SFIO_pData->eDevice = SFIOFirstDeviceFromMask(_SFIO_pDevice->uAvailableMask);
+            _SFIO_pData->Session.eDevice = SFIOFirstDeviceFromMask(_SFIO_pDevice->uAvailableMask);
             _SFIO_pData->eState = 2;
         } else if (uSearchDirection == 1) {
-            _SFIO_pData->eDevice = SFIOLastDeviceFromMask(_SFIO_pDevice->uAvailableMask);
+            _SFIO_pData->Session.eDevice = SFIOLastDeviceFromMask(_SFIO_pDevice->uAvailableMask);
             _SFIO_pData->eState = 2;
         } else {
             return 0xC;
         }
     } else {
-        _SFIO_pData->eDevice = eDevice;
+        _SFIO_pData->Session.eDevice = eDevice;
         _SFIO_pData->eState = 5;
     }
     SFIOSetLastError(0);
-    strcpy(_SFIO_pData->szName35, pName);
+    strcpy(_SFIO_pData->Session.szName, pName);
     _SFIO_pData->uSearchDirection = uSearchDirection;
     fn_80172FA4(1);
-    _SFIO_pDevice->fn.pfnStartProbe(_SFIO_pData->eDevice);
+    _SFIO_pDevice->fn.pfnStartProbe(_SFIO_pData->Session.eDevice);
     _SFIO_pData->eOperation = 1;
     return 0;
 }
@@ -719,29 +713,29 @@ int SFIOBeginSave(const char* pName, int eDevice, int uSearchDirection) {
         if (!(u16)((1 << eDevice) & _SFIO_pDevice->uAvailableMask)) return 0xB;
     }
     if (_SFIO_pData->eState != 0) return 0xD;
-    memset(&_SFIO_pData->uHandle, 0, 0x44);
+    memset(&_SFIO_pData->Session, 0, sizeof(SFIOSession));
     if (eDevice == SFIO_DEVICE_INVALID) {
         if (SFIONumDevicesInMask(_SFIO_pDevice->uAvailableMask) == 1) {
-            _SFIO_pData->eDevice = SFIOFirstDeviceFromMask(_SFIO_pDevice->uAvailableMask);
+            _SFIO_pData->Session.eDevice = SFIOFirstDeviceFromMask(_SFIO_pDevice->uAvailableMask);
             _SFIO_pData->eState = 4;
         } else if (uSearchDirection == 0) {
-            _SFIO_pData->eDevice = SFIOFirstDeviceFromMask(_SFIO_pDevice->uAvailableMask);
+            _SFIO_pData->Session.eDevice = SFIOFirstDeviceFromMask(_SFIO_pDevice->uAvailableMask);
             _SFIO_pData->eState = 1;
         } else if (uSearchDirection == 1) {
-            _SFIO_pData->eDevice = SFIOLastDeviceFromMask(_SFIO_pDevice->uAvailableMask);
+            _SFIO_pData->Session.eDevice = SFIOLastDeviceFromMask(_SFIO_pDevice->uAvailableMask);
             _SFIO_pData->eState = 1;
         } else {
             return 0xC;
         }
     } else {
-        _SFIO_pData->eDevice = eDevice;
+        _SFIO_pData->Session.eDevice = eDevice;
         _SFIO_pData->eState = 4;
     }
     SFIOSetLastError(0);
-    strcpy(_SFIO_pData->szName35, pName);
+    strcpy(_SFIO_pData->Session.szName, pName);
     _SFIO_pData->uSearchDirection = uSearchDirection;
     fn_80172FA4(1);
-    _SFIO_pDevice->fn.pfnStartProbe(_SFIO_pData->eDevice);
+    _SFIO_pDevice->fn.pfnStartProbe(_SFIO_pData->Session.eDevice);
     _SFIO_pData->eOperation = 1;
     return 0;
 }
@@ -755,87 +749,87 @@ int SFIOBeginDelete(const char* pName, int eDevice, int uSearchDirection) {
         if (!(u16)((1 << eDevice) & _SFIO_pDevice->uAvailableMask)) return 0xB;
     }
     if (_SFIO_pData->eState != 0) return 0xD;
-    memset(&_SFIO_pData->uHandle, 0, 0x44);
+    memset(&_SFIO_pData->Session, 0, sizeof(SFIOSession));
     if (eDevice == SFIO_DEVICE_INVALID) {
         if (SFIONumDevicesInMask(_SFIO_pDevice->uAvailableMask) == 1) {
-            _SFIO_pData->eDevice = SFIOFirstDeviceFromMask(_SFIO_pDevice->uAvailableMask);
+            _SFIO_pData->Session.eDevice = SFIOFirstDeviceFromMask(_SFIO_pDevice->uAvailableMask);
             _SFIO_pData->eState = 6;
         } else if (uSearchDirection == 0) {
-            _SFIO_pData->eDevice = SFIOFirstDeviceFromMask(_SFIO_pDevice->uAvailableMask);
+            _SFIO_pData->Session.eDevice = SFIOFirstDeviceFromMask(_SFIO_pDevice->uAvailableMask);
             _SFIO_pData->eState = 3;
         } else if (uSearchDirection == 1) {
-            _SFIO_pData->eDevice = SFIOLastDeviceFromMask(_SFIO_pDevice->uAvailableMask);
+            _SFIO_pData->Session.eDevice = SFIOLastDeviceFromMask(_SFIO_pDevice->uAvailableMask);
             _SFIO_pData->eState = 3;
         } else {
             return 0xC;
         }
     } else {
-        _SFIO_pData->eDevice = eDevice;
+        _SFIO_pData->Session.eDevice = eDevice;
         _SFIO_pData->eState = 6;
     }
     SFIOSetLastError(0);
-    strcpy(_SFIO_pData->szName35, pName);
+    strcpy(_SFIO_pData->Session.szName, pName);
     _SFIO_pData->uSearchDirection = uSearchDirection;
     fn_80172FA4(1);
-    _SFIO_pDevice->fn.pfnStartProbe(_SFIO_pData->eDevice);
+    _SFIO_pDevice->fn.pfnStartProbe(_SFIO_pData->Session.eDevice);
     _SFIO_pData->eOperation = 1;
     return 0;
 }
 
 // Close the session: copy the caller's session info back and start the unmount (op 0x18).
-int SFIOEnd(int* pSession) {
+int SFIOEnd(SFIOSession* pSession) {
     if (!SFIOIsInitialized()) return 2;
     if (pSession == NULL) return 0xC;
     if (_SFIO_pData->eState != 0) return 0xD;
-    memcpy(&_SFIO_pData->uHandle, pSession, 0x44);
+    memcpy(&_SFIO_pData->Session, pSession, sizeof(SFIOSession));
     _SFIO_pData->eState = 7;
     _SFIO_pData->eOperation = 0x18;
-    _SFIO_pDevice->fn.pfnOp18(*pSession);
+    _SFIO_pDevice->fn.pfnOp18(pSession->uHandle);
     return 0;
 }
 
 // Seek within the open save. uWhence 0 = relative to the header, otherwise absolute.
-int SFIOSeek(int* pSession, u32 uOffset, u32 uWhence) {
+int SFIOSeek(SFIOSession* pSession, u32 uOffset, u32 uWhence) {
     if (!SFIOIsInitialized()) return 2;
     if (pSession == NULL) return 0xC;
     if (_SFIO_pData->eState != 0) return 0xD;
     _SFIO_pData->eState = 8;
     _SFIO_pData->eOperation = 0x1B;
     SFIOSetLastError(0);
-    memcpy(&_SFIO_pData->uHandle, pSession, 0x44);
+    memcpy(&_SFIO_pData->Session, pSession, sizeof(SFIOSession));
     if (uWhence == 0) {
         _SFIO_pData->uExpected54 = uOffset + SFIOGetHeaderSize();
-        _SFIO_pDevice->fn.pfnSeek(_SFIO_pData->uHandle, uOffset + SFIOGetHeaderSize(), uWhence);
+        _SFIO_pDevice->fn.pfnSeek(_SFIO_pData->Session.uHandle, uOffset + SFIOGetHeaderSize(), uWhence);
     } else {
         _SFIO_pData->uExpected54 = uOffset;
-        _SFIO_pDevice->fn.pfnSeek(_SFIO_pData->uHandle, uOffset, uWhence);
+        _SFIO_pDevice->fn.pfnSeek(_SFIO_pData->Session.uHandle, uOffset, uWhence);
     }
     return 0;
 }
 
-int SFIORead(int* pSession, void* pBuffer, u32 uSize) {
+int SFIORead(SFIOSession* pSession, void* pBuffer, u32 uSize) {
     if (!SFIOIsInitialized()) return 2;
     if (pSession == NULL) return 0xC;
     if (_SFIO_pData->eState != 0) return 0xD;
     _SFIO_pData->eState = 0xA;
     _SFIO_pData->eOperation = 0x1D;
     SFIOSetLastError(0);
-    memcpy(&_SFIO_pData->uHandle, pSession, 0x44);
+    memcpy(&_SFIO_pData->Session, pSession, sizeof(SFIOSession));
     _SFIO_pData->uExpected54 = uSize;
-    _SFIO_pDevice->fn.pfnRead(*pSession, pBuffer, uSize);
+    _SFIO_pDevice->fn.pfnRead(pSession->uHandle, pBuffer, uSize);
     return 0;
 }
 
-int SFIOWrite(int* pSession, void* pBuffer, u32 uSize) {
+int SFIOWrite(SFIOSession* pSession, void* pBuffer, u32 uSize) {
     if (!SFIOIsInitialized()) return 2;
     if (pSession == NULL) return 0xC;
     if (_SFIO_pData->eState != 0) return 0xD;
     _SFIO_pData->eState = 9;
     _SFIO_pData->eOperation = 0x1C;
     SFIOSetLastError(0);
-    memcpy(&_SFIO_pData->uHandle, pSession, 0x44);
+    memcpy(&_SFIO_pData->Session, pSession, sizeof(SFIOSession));
     _SFIO_pData->uExpected54 = uSize;
-    _SFIO_pDevice->fn.pfnWrite(*pSession, pBuffer, uSize);
+    _SFIO_pDevice->fn.pfnWrite(pSession->uHandle, pBuffer, uSize);
     return 0;
 }
 
@@ -871,7 +865,7 @@ int SFIOUpdate(int* pProcess, int* pResult) {
     return eError;
 }
 
-int SFIOGetDeviceInfo(int eDevice, void* pInfo) {
+int SFIOGetDeviceInfo(int eDevice, u8* pInfo) {
     if (pInfo == NULL) return 0xC;
     if (!SFIOIsInitialized()) return 2;
     if (!(eDevice <= SFIO_DEVICE_LAST && eDevice >= SFIO_DEVICE_FIRST)) return 9;
@@ -879,7 +873,7 @@ int SFIOGetDeviceInfo(int eDevice, void* pInfo) {
     return 0;
 }
 
-int SFIOSetDescriptor(void* pDescriptor) {
+int SFIOSetDescriptor(SFIODescriptor* pDescriptor) {
     if (pDescriptor == NULL) return 0xC;
     if (!SFIOIsInitialized()) return 2;
     memcpy(&_SFIO_pDevice->desc, pDescriptor, sizeof(SFIODescriptor));
@@ -983,8 +977,8 @@ void fn_8017124C(SFIODescriptor* pDescriptor, u32* pSize, u32* pEntries) {
     fn_80172D7C(pDescriptor, pSize, pEntries);
 }
 
-void SFIOPlatformCall80172F48(void* p) {
-    fn_80172F48(p);
+void SFIOPlatformCall80172F48(void* const** ppInterface) {
+    fn_80172F48(ppInterface);
 }
 
 u32 SFIOGetHeaderSize(void) {

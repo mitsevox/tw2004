@@ -67,7 +67,7 @@ u32 fn_8000B244(void) {
 
 // The seconds, minutes and hours of the date, plus 10, mixed with the CPU's tick counter.
 u32 fn_8000B264(void) {
-    struct OSCalendarTime time;
+    OSCalendarTime time;
     u32 uSeed;
 
     OSTicksToCalendarTime(OSGetTime(), &time);

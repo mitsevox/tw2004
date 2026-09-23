@@ -12,13 +12,36 @@
 // ---- memory and strings ----------------------------------------------------------------------
 
 void* Mem_cpy(void* pDst, const void* pSrc, u32 uLen);    // returns pDst
+void* fn_80005884(void* pDst, const void* pSrc, u32 uLen); // a copy the ranges may overlap in
 void* fn_80005AE8(void* pDst, int nValue, u32 uLen);      // memset; returns pDst
-void* fn_80009B34(u32 uSize, u32 uFlags, u32 uAlign, const char* pFile, int nLine);  // alloc
+// Allocates from the static heap (StaticMemory.c); nMode picks where (see there).
+void* fn_80009B34(int nSize, int nMode, int nAlign, const char* pFile, int nLine);
 void  fn_80009E70(void* p);             // free
 void  fn_8000A0AC(s32 v);               // } a value callers pass on as fn_80009B34's uFlags
 s32   fn_8000A0B4(void);                // } (EASportsBio.c sets 0 while the Bio starts, then 2)
 void* fn_800951A0(u32 uSize, int nAlign, int a);
+void  fn_8009527C(void* p);             // frees what fn_800951A0 allocated
 void  fn_800953C8(int a);
+
+// A pool of fixed-size nodes carved from one allocation (UMemPool.c): the header, then the nodes.
+// A free node holds the next free one in its first word.
+typedef struct UMemPoolNode {
+    struct UMemPoolNode* pNext; // 0x0  the next free node
+} UMemPoolNode;
+
+typedef struct UMemPool {
+    u32  uNodeSize;             // 0x0  one node, rounded up to the alignment
+    u8*  pEnd;                  // 0x4  the end of the pool's memory
+    u16  nNodes;                // 0x8
+    u16  nFree;                 // 0xA
+    UMemPoolNode* pFree;        // 0xC  the free list
+} UMemPool;
+LAYOUT_ASSERT(UMemPool, 0x10);
+
+UMemPool* fn_8000AFA0(int nNodes, u32 uNodeSize, u32 uFlags, u32 uAlign);   // create
+void  fn_8000B058(UMemPool* pPool);                     // destroy
+void* fn_8000B078(UMemPool* pPool);                     // take a node (NULL when none is free)
+void  fn_8000B0D4(UMemPool* pPool, void* pNode);        // give a node back
 // Sorts nCount items of nSize bytes with pfnCompare (the C library's qsort, by its arguments).
 void  fn_8015929C(void* pBase, u32 nCount, u32 nSize, s32 (*pfnCompare)(const void* pA, const void* pB));
 
@@ -62,6 +85,10 @@ void Vec_Copy(f32* pSrc, f32* pDst);    // 0x8000AD10
 f32  fn_8000AD78(f32 y, f32 x);         // atan2f
 f32  fabsf(f32 x);                      // 0x8000AD9C: fabs (0x8000AE94, platform.h) rounded to a float
 f32  fn_8000AF7C(f32 x);                // natural logarithm
+void fn_8000AF20(void);                 // make the log2 table (lbl_80281BD8)
+void fn_8000AF58(void);                 // free the log2 table
+double fn_8015F7C4(double y, double x); // atan2
+double fn_8015F804(double x);           // log
 u32  Rand_Next(int nStream);            // 0x8000B130  EA's lagged-Fibonacci generator
 f32  fn_8000B318(int nStream);          // a normally distributed random number (mean 0, deviation 1):
                                         // Box-Muller on two Rand_Floats, the second value kept
@@ -83,8 +110,8 @@ void vec4flt_CrossProduct(f32* pA, f32* pB, f32* pOut);   // cross product
 
 // A texture in a bank (0x50 bytes; the bank's p8 is an array of them). Only what the game code reads.
 typedef struct TexEntry {
-    u8   unk0[8];
-    u32  uPixels;               // 0x08  where its pixels start in the bank's p18
+    u64  u0;                    // 0x00  compared as one value (fn_80073878)
+    u32  uPixels;              // 0x08  where its pixels start in the bank's p18
     u8   unkC[0x3C - 0xC];
     s16  nPalette;              // 0x3C  its row in the bank's pC
     u8   unk3E[0x50 - 0x3E];
@@ -100,8 +127,10 @@ LAYOUT_ASSERT(TexPalette, 0xC);
 
 // A loaded texture bank (up to 200, listed at lbl_801A26DC). Only what the game code reads.
 typedef struct TexBank {
-    u8   unk0[8];
-    TexEntry*   p8;             // 0x08  its textures
+    u8   unk0[2];
+    s16  n2;                    // 0x02  how many textures p8 holds
+    u8   unk4[4];
+    TexEntry*   p8;            // 0x08  its textures
     TexPalette* pC;             // 0x0C  its palettes
     u8   unk10[0x18 - 0x10];
     u8*  p18;                   // 0x18  the pixel data
