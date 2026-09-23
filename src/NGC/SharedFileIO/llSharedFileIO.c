@@ -8,7 +8,7 @@
 // (the icon names "View.ico" and "icon.sys" are the PlayStation 2's).
 
 #include "Common/SharedFileIO.h"
-#include "core/memcard.h"
+#include "core/card.h"
 
 #define SFIO_HEADER_SIZE 0x2000     // the header block at the start of every save: one card block
 
@@ -162,15 +162,15 @@ int fn_80171E94(int eError, int* pProcess, int* pResult) {
     switch (_SFIO_pData->eOperation) {
     case 1:
         if (eError == 0) {
-            fn_801715B8(szSearchName, &_SFIO_pDevice->desc, _SFIO_pData->szName35);
+            fn_801715B8(szSearchName, &_SFIO_pDevice->desc, _SFIO_pData->Session.szName);
             _SFIO_pData->eOperation = 2;
-            _SFIO_pDevice->fn.pfnProbe(szSearchName, _SFIO_pData->eDevice);
+            _SFIO_pDevice->fn.pfnProbe(szSearchName, _SFIO_pData->Session.eDevice);
         } else if (eError == 3) {
             if (_SFIO_pData->eState == 1) {
-                _SFIO_pData->eDevice = SFIONextDeviceFromMask(_SFIO_pDevice->uAvailableMask, _SFIO_pData->uSearchDirection);
-                if (_SFIO_pData->eDevice != SFIO_DEVICE_INVALID) {
+                _SFIO_pData->Session.eDevice = SFIONextDeviceFromMask(_SFIO_pDevice->uAvailableMask, _SFIO_pData->uSearchDirection);
+                if (_SFIO_pData->Session.eDevice != SFIO_DEVICE_INVALID) {
                     _SFIO_pData->eOperation = 1;
-                    _SFIO_pDevice->fn.pfnStartProbe(_SFIO_pData->eDevice);
+                    _SFIO_pDevice->fn.pfnStartProbe(_SFIO_pData->Session.eDevice);
                     return 0;
                 }
                 *pProcess = 2;
@@ -188,18 +188,18 @@ int fn_80171E94(int eError, int* pProcess, int* pResult) {
         if (eError == 0) {
             if (*pResult == 0) {
                 _SFIO_pData->eOperation = 3;
-                _SFIO_pDevice->fn.pfn08(_SFIO_pData->eDevice);
+                _SFIO_pDevice->fn.pfn08(_SFIO_pData->Session.eDevice);
             } else if (*pResult == 1) {
                 SFIOSetLastError(8);    // the save already exists
                 _SFIO_pData->eOperation = 0x1A;
-                _SFIO_pDevice->fn.pfnSelectDevice(_SFIO_pData->eDevice);
+                _SFIO_pDevice->fn.pfnSelectDevice(_SFIO_pData->Session.eDevice);
             } else {
                 *pProcess = 2;
                 return 0xA;
             }
         } else {
             SFIOSetLastError(eError);
-            return SFIOStartSelectDevice(_SFIO_pData->eDevice, pProcess);
+            return SFIOStartSelectDevice(_SFIO_pData->Session.eDevice, pProcess);
         }
         break;
     case 3:
@@ -209,15 +209,15 @@ int fn_80171E94(int eError, int* pProcess, int* pResult) {
                 return 0xA;
             } else if (_SFIO_pDevice->uFileSize <= *pResult) {
                 _SFIO_pData->eOperation = 4;
-                _SFIO_pDevice->fn.pfn0C(_SFIO_pData->eDevice);
+                _SFIO_pDevice->fn.pfn0C(_SFIO_pData->Session.eDevice);
             } else {
                 SFIOSetLastError(0xE);  // not enough space
                 _SFIO_pData->eOperation = 0x1A;
-                _SFIO_pDevice->fn.pfnSelectDevice(_SFIO_pData->eDevice);
+                _SFIO_pDevice->fn.pfnSelectDevice(_SFIO_pData->Session.eDevice);
             }
         } else {
             SFIOSetLastError(eError);
-            return SFIOStartSelectDevice(_SFIO_pData->eDevice, pProcess);
+            return SFIOStartSelectDevice(_SFIO_pData->Session.eDevice, pProcess);
         }
         break;
     case 4:
@@ -226,75 +226,75 @@ int fn_80171E94(int eError, int* pProcess, int* pResult) {
                 *pProcess = 2;
                 return 0xA;
             } else if (_SFIO_pDevice->uNumFiles <= *pResult) {
-                fn_80171744(_SFIO_pData->szDirName, _SFIO_pData->szFileName, &_SFIO_pDevice->desc,
-                            _SFIO_pData->szName35);
+                fn_80171744(_SFIO_pData->Session.szDirName, _SFIO_pData->Session.szFileName, &_SFIO_pDevice->desc,
+                            _SFIO_pData->Session.szName);
                 _SFIO_pData->eOperation = 5;
-                _SFIO_pDevice->fn.pfn20(_SFIO_pData->szFileName, _SFIO_pDevice->uFileSize, _SFIO_pData->eDevice);
+                _SFIO_pDevice->fn.pfn20(_SFIO_pData->Session.szFileName, _SFIO_pDevice->uFileSize, _SFIO_pData->Session.eDevice);
             } else {
                 SFIOSetLastError(0xE);  // no free directory entry
                 _SFIO_pData->eOperation = 0x1A;
-                _SFIO_pDevice->fn.pfnSelectDevice(_SFIO_pData->eDevice);
+                _SFIO_pDevice->fn.pfnSelectDevice(_SFIO_pData->Session.eDevice);
             }
         } else {
             SFIOSetLastError(eError);
-            return SFIOStartSelectDevice(_SFIO_pData->eDevice, pProcess);
+            return SFIOStartSelectDevice(_SFIO_pData->Session.eDevice, pProcess);
         }
         break;
     case 5:
         if (eError == 0) {
             _SFIO_pData->eOperation = 6;
-            _SFIO_pDevice->fn.pfnMount("", _SFIO_pData->szFileName, _SFIO_pData->eDevice, 4);
+            _SFIO_pDevice->fn.pfnMount("", _SFIO_pData->Session.szFileName, _SFIO_pData->Session.eDevice, 4);
         } else {
             SFIOSetLastError(eError);
-            return SFIOStartSelectDevice(_SFIO_pData->eDevice, pProcess);
+            return SFIOStartSelectDevice(_SFIO_pData->Session.eDevice, pProcess);
         }
         break;
     case 6:
         if (eError == 0) {
-            _SFIO_pData->uHandle = *pResult;
+            _SFIO_pData->Session.uHandle = *pResult;
             _SFIO_pData->eOperation = 7;
-            _SFIO_pDevice->fn.pfnWrite(_SFIO_pData->uHandle, _SFIO_pDevice->desc.pHeader,
+            _SFIO_pDevice->fn.pfnWrite(_SFIO_pData->Session.uHandle, _SFIO_pDevice->desc.pHeader,
                                        _SFIO_pDevice->desc.uSize04 + _SFIO_pDevice->desc.uSize08);
         } else {
             SFIOSetLastError(eError);
-            return SFIOStartSelectDevice(_SFIO_pData->eDevice, pProcess);
+            return SFIOStartSelectDevice(_SFIO_pData->Session.eDevice, pProcess);
         }
         break;
     case 7:
         if (eError == 0) {
             _SFIO_pData->eOperation = 0x17;
-            _SFIO_pDevice->fn.pfn3C(_SFIO_pData->uHandle, 0x44);
+            _SFIO_pDevice->fn.pfn3C(_SFIO_pData->Session.uHandle, 0x44);
         } else {
             SFIOSetLastError(eError);
-            return SFIOStartOp18(&_SFIO_pData->uHandle, pProcess);
+            return SFIOStartOp18(&_SFIO_pData->Session.uHandle, pProcess);
         }
         break;
     case 0x17:
         if (eError == 0) {
-            fn_80171400(_SFIO_pData->uHandle, _SFIO_pData->eDevice);
+            fn_80171400(_SFIO_pData->Session.uHandle, _SFIO_pData->Session.eDevice);
             _SFIO_pData->eOperation = 8;
-            _SFIO_pDevice->fn.pfnOp18(_SFIO_pData->uHandle);
+            _SFIO_pDevice->fn.pfnOp18(_SFIO_pData->Session.uHandle);
         } else {
             SFIOSetLastError(eError);
-            return SFIOStartOp18(&_SFIO_pData->uHandle, pProcess);
+            return SFIOStartOp18(&_SFIO_pData->Session.uHandle, pProcess);
         }
         break;
     case 8:
         if (eError == 0) {
             _SFIO_pData->eOperation = 9;
-            _SFIO_pDevice->fn.pfnOp19(_SFIO_pData->uHandle);
+            _SFIO_pDevice->fn.pfnOp19(_SFIO_pData->Session.uHandle);
         } else {
             SFIOSetLastError(eError);
-            return SFIOStartOp19(&_SFIO_pData->uHandle, pProcess);
+            return SFIOStartOp19(&_SFIO_pData->Session.uHandle, pProcess);
         }
         break;
     case 9:
         if (eError == 0) {
             _SFIO_pData->eOperation = 0x1A;
-            _SFIO_pDevice->fn.pfnSelectDevice(_SFIO_pData->eDevice);
+            _SFIO_pDevice->fn.pfnSelectDevice(_SFIO_pData->Session.eDevice);
         } else {
             SFIOSetLastError(eError);
-            return SFIOStartSelectDevice(_SFIO_pData->eDevice, pProcess);
+            return SFIOStartSelectDevice(_SFIO_pData->Session.eDevice, pProcess);
         }
         break;
     case 0x1A:
@@ -306,10 +306,10 @@ int fn_80171E94(int eError, int* pProcess, int* pResult) {
                 *pProcess = 2;
                 return 0;
             } else {
-                _SFIO_pData->eDevice = SFIONextDeviceFromMask(_SFIO_pDevice->uAvailableMask, _SFIO_pData->uSearchDirection);
-                if (_SFIO_pData->eDevice != SFIO_DEVICE_INVALID) {
+                _SFIO_pData->Session.eDevice = SFIONextDeviceFromMask(_SFIO_pDevice->uAvailableMask, _SFIO_pData->uSearchDirection);
+                if (_SFIO_pData->Session.eDevice != SFIO_DEVICE_INVALID) {
                     _SFIO_pData->eOperation = 1;
-                    _SFIO_pDevice->fn.pfnStartProbe(_SFIO_pData->eDevice);
+                    _SFIO_pDevice->fn.pfnStartProbe(_SFIO_pData->Session.eDevice);
                     return 0;
                 } else {
                     *pProcess = 2;
@@ -341,17 +341,17 @@ int fn_801727C8(int eError, int* pProcess, int* pResult) {
     case 1:
         SFIOSetLastError(0);
         if (eError == 0) {
-            fn_801715B8(szSearchName, &_SFIO_pDevice->desc, _SFIO_pData->szName35);
+            fn_801715B8(szSearchName, &_SFIO_pDevice->desc, _SFIO_pData->Session.szName);
             _SFIO_pData->eOperation = 2;
-            _SFIO_pDevice->fn.pfnProbe(szSearchName, _SFIO_pData->eDevice);
+            _SFIO_pDevice->fn.pfnProbe(szSearchName, _SFIO_pData->Session.eDevice);
         } else if (eError == 3) {
             // EA bug: tests the save state (1) in the load continuation (states 2 and 5), so a
             // failed probe ends the search instead of moving on to the next device.
             if (_SFIO_pData->eState == 1) {
-                _SFIO_pData->eDevice = SFIONextDeviceFromMask(_SFIO_pDevice->uAvailableMask, _SFIO_pData->uSearchDirection);
-                if (_SFIO_pData->eDevice != SFIO_DEVICE_INVALID) {
+                _SFIO_pData->Session.eDevice = SFIONextDeviceFromMask(_SFIO_pDevice->uAvailableMask, _SFIO_pData->uSearchDirection);
+                if (_SFIO_pData->Session.eDevice != SFIO_DEVICE_INVALID) {
                     _SFIO_pData->eOperation = 1;
-                    _SFIO_pDevice->fn.pfnStartProbe(_SFIO_pData->eDevice);
+                    _SFIO_pDevice->fn.pfnStartProbe(_SFIO_pData->Session.eDevice);
                     return 0;
                 }
                 *pProcess = 2;
@@ -368,39 +368,39 @@ int fn_801727C8(int eError, int* pProcess, int* pResult) {
     case 2:
         if (eError == 0) {
             if (*pResult == 1) {
-                _SFIO_pDevice->fn.pfn44(_SFIO_pData->szFileName);
+                _SFIO_pDevice->fn.pfn44(_SFIO_pData->Session.szFileName);
                 _SFIO_pData->eOperation = 0x15;
-                _SFIO_pDevice->fn.pfn24(_SFIO_pData->szDirName, _SFIO_pData->szFileName, _SFIO_pData->eDevice);
+                _SFIO_pDevice->fn.pfn24(_SFIO_pData->Session.szDirName, _SFIO_pData->Session.szFileName, _SFIO_pData->Session.eDevice);
             } else if (*pResult == 0) {
                 SFIOSetLastError(4);    // no such save
-                return SFIOStartSelectDevice(_SFIO_pData->eDevice, pProcess);
+                return SFIOStartSelectDevice(_SFIO_pData->Session.eDevice, pProcess);
             } else {
                 *pProcess = 2;
                 return 0xA;
             }
         } else {
             SFIOSetLastError(eError);
-            return SFIOStartSelectDevice(_SFIO_pData->eDevice, pProcess);
+            return SFIOStartSelectDevice(_SFIO_pData->Session.eDevice, pProcess);
         }
         break;
     case 0x15:
         if (eError == 3) {
             if (SFIOGetLastError() == 0) SFIOSetLastError(eError);
-            return SFIOStartSelectDevice(_SFIO_pData->eDevice, pProcess);
+            return SFIOStartSelectDevice(_SFIO_pData->Session.eDevice, pProcess);
         } else {
             if (eError != 4 && SFIOGetLastError() == 0) SFIOSetLastError(eError);
             _SFIO_pData->eOperation = 0x12;
-            _SFIO_pDevice->fn.pfn28(_SFIO_pData->szDirName, _SFIO_pData->eDevice);
+            _SFIO_pDevice->fn.pfn28(_SFIO_pData->Session.szDirName, _SFIO_pData->Session.eDevice);
         }
         break;
     case 0x12:
         if (eError == 0) {
             if (SFIOGetLastError() == 0) SFIOSetLastError(eError);
             _SFIO_pData->eOperation = 0x1A;
-            _SFIO_pDevice->fn.pfnSelectDevice(_SFIO_pData->eDevice);
+            _SFIO_pDevice->fn.pfnSelectDevice(_SFIO_pData->Session.eDevice);
         } else {
             if (SFIOGetLastError() == 0) SFIOSetLastError(eError);
-            return SFIOStartSelectDevice(_SFIO_pData->eDevice, pProcess);
+            return SFIOStartSelectDevice(_SFIO_pData->Session.eDevice, pProcess);
         }
         break;
     case 0x1A:
@@ -412,10 +412,10 @@ int fn_801727C8(int eError, int* pProcess, int* pResult) {
                 *pProcess = 2;
                 return 0;
             } else {
-                _SFIO_pData->eDevice = SFIONextDeviceFromMask(_SFIO_pDevice->uAvailableMask, _SFIO_pData->uSearchDirection);
-                if (_SFIO_pData->eDevice != SFIO_DEVICE_INVALID) {
+                _SFIO_pData->Session.eDevice = SFIONextDeviceFromMask(_SFIO_pDevice->uAvailableMask, _SFIO_pData->uSearchDirection);
+                if (_SFIO_pData->Session.eDevice != SFIO_DEVICE_INVALID) {
                     _SFIO_pData->eOperation = 1;
-                    _SFIO_pDevice->fn.pfnStartProbe(_SFIO_pData->eDevice);
+                    _SFIO_pDevice->fn.pfnStartProbe(_SFIO_pData->Session.eDevice);
                     return 0;
                 } else {
                     *pProcess = 2;
