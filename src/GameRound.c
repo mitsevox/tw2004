@@ -358,6 +358,170 @@ int fn_800E1904(int nPlayer, u8 bCurrent) {
     return 0;
 }
 
+// The 75 marked holes (three to five per course; the items GM_GetGameProgress counts with
+// fn_800588F4): a course and hole to the item index, or -1. EA wrote the cases as 1-based hole
+// numbers; the courses are in the original's order, which numbers the items.
+int fn_800E1CE8(int nCourse, int nHole) {
+    switch (nCourse) {
+    case 0:
+        switch (nHole + 1) {
+        case 2: return 0;
+        case 6: return 1;
+        case 14: return 2;
+        case 18: return 3;
+        default: return -1;
+        }
+    case 1:
+        switch (nHole + 1) {
+        case 2: return 4;
+        case 4: return 5;
+        case 10: return 6;
+        case 15: return 7;
+        default: return -1;
+        }
+    case 2:
+        switch (nHole + 1) {
+        case 2: return 8;
+        case 9: return 9;
+        case 11: return 10;
+        case 16: return 11;
+        default: return -1;
+        }
+    case 3:
+        switch (nHole + 1) {
+        case 2: return 12;
+        case 9: return 13;
+        case 13: return 14;
+        case 18: return 15;
+        default: return -1;
+        }
+    case 6:
+        switch (nHole + 1) {
+        case 6: return 16;
+        case 15: return 17;
+        case 17: return 18;
+        default: return -1;
+        }
+    case 12:
+        switch (nHole + 1) {
+        case 2: return 19;
+        case 6: return 20;
+        case 11: return 21;
+        case 18: return 22;
+        default: return -1;
+        }
+    case 9:
+        switch (nHole + 1) {
+        case 4: return 23;
+        case 6: return 24;
+        case 12: return 25;
+        case 16: return 26;
+        default: return -1;
+        }
+    case 10:
+        switch (nHole + 1) {
+        case 1: return 27;
+        case 7: return 28;
+        case 11: return 29;
+        case 14: return 30;
+        default: return -1;
+        }
+    case 11:
+        switch (nHole + 1) {
+        case 4: return 31;
+        case 9: return 32;
+        case 10: return 33;
+        case 12: return 34;
+        case 18: return 35;
+        default: return -1;
+        }
+    case 13:
+        switch (nHole + 1) {
+        case 3: return 36;
+        case 13: return 37;
+        case 15: return 38;
+        default: return -1;
+        }
+    case 15:
+        switch (nHole + 1) {
+        case 5: return 39;
+        case 14: return 40;
+        default: return -1;
+        }
+    case 14:
+        switch (nHole + 1) {
+        case 6: return 41;
+        case 9: return 42;
+        case 13: return 43;
+        case 18: return 44;
+        default: return -1;
+        }
+    case 16:
+        switch (nHole + 1) {
+        case 2: return 45;
+        case 6: return 46;
+        case 11: return 47;
+        default: return -1;
+        }
+    case 17:
+        switch (nHole + 1) {
+        case 1: return 48;
+        case 6: return 49;
+        case 7: return 50;
+        case 11: return 51;
+        case 15: return 52;
+        default: return -1;
+        }
+    case 18:
+        switch (nHole + 1) {
+        case 5: return 53;
+        case 8: return 54;
+        case 13: return 55;
+        case 18: return 56;
+        default: return -1;
+        }
+    case 19:
+        switch (nHole + 1) {
+        case 5: return 57;
+        case 9: return 58;
+        case 15: return 59;
+        case 18: return 60;
+        default: return -1;
+        }
+    case 20:
+        switch (nHole + 1) {
+        case 4: return 61;
+        case 10: return 62;
+        case 16: return 63;
+        default: return -1;
+        }
+    case 5:
+        switch (nHole + 1) {
+        case 4: return 64;
+        case 7: return 65;
+        case 13: return 66;
+        default: return -1;
+        }
+    case 8:
+        switch (nHole + 1) {
+        case 4: return 67;
+        case 6: return 68;
+        case 12: return 69;
+        case 16: return 70;
+        default: return -1;
+        }
+    case 4:
+        switch (nHole + 1) {
+        case 1: return 71;
+        case 7: return 72;
+        case 10: return 73;
+        case 18: return 74;
+        default: return -1;
+        }
+    }
+    return -1;
+}
+
 int fn_800E22E4(int nSlot, int a, int b) {
     int i = fn_800E1CE8(a, b);
     if (i != -1) {
