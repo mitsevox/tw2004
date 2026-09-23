@@ -90,32 +90,14 @@ unsorted/sweep_800090A0.c:
 unsorted/sweep_800095F0.c:
 	.text       start:0x800095F0 end:0x80009680
 
-unsorted/sweep_8000977C.c:
-	.text       start:0x8000977C end:0x800097C4
-
-unsorted/sweep_800097C4.c:
-	.text       start:0x800097C4 end:0x800097CC
-
-unsorted/sweep_8000989C.c:
-	.text       start:0x8000989C end:0x80009918
-
-unsorted/sweep_80009918.c:
-	.text       start:0x80009918 end:0x8000991C
-
-unsorted/sweep_8000A0AC.c:
-	.text       start:0x8000A0AC end:0x8000A0E8
+StaticMemory.c:
+	.text       start:0x8000977C end:0x8000A0E8
 
 unsorted/sweep_8000A0E8.c:
 	.text       start:0x8000A0E8 end:0x8000A194
 
 UMemPool.c:
-	.text       start:0x8000A194 end:0x8000B058
-
-unsorted/sweep_8000B058.c:
-	.text       start:0x8000B058 end:0x8000B078
-
-unsorted/sweep_8000B078.c:
-	.text       start:0x8000B078 end:0x8000B0D4
+	.text       start:0x8000A194 end:0x8000B130
 
 urandom.c:
 	.text       start:0x8000B130 end:0x8000B46C
@@ -3617,17 +3599,11 @@ unsorted/sweep_80165524.c:
 UISEvent.c:
 	.text       start:0x80165528 end:0x80166098
 
-unsorted/sweep_80169B0C.c:
-	.text       start:0x80169B0C end:0x80169B28
+UIStudio.c:
+	.text       start:0x80166098 end:0x80168C24
 
-unsorted/sweep_80169B28.c:
-	.text       start:0x80169B28 end:0x80169B30
-
-unsorted/sweep_80169B30.c:
-	.text       start:0x80169B30 end:0x80169B3C
-
-unsorted/sweep_80169B3C.c:
-	.text       start:0x80169B3C end:0x80169B4C
+UISApi.c:
+	.text       start:0x80168C24 end:0x8016A2D4
 
 unsorted/sweep_8016C18C.c:
 	.text       start:0x8016C18C end:0x8016C1A4
