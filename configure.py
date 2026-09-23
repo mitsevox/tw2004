@@ -775,7 +775,7 @@ config.libs = [
         "src_dir": "extern/sdk",
         "objects": [
             # built with the game's compiler, like ansi_fp.c: GC/1.3 misses long2str, float2str and three more
-            Object(NonMatching, "runtime/printf.c", mw_version="GC/2.5"),
+            Object(Matching, "runtime/printf.c", mw_version="GC/2.5"),
             Object(Matching, "runtime/runtime.c"),
             Object(NonMatching, "runtime/FILE_POS.c"),
             Object(Matching, "runtime/ctype.c"),

@@ -2340,7 +2340,10 @@ runtime/misc_io.c:
 
 runtime/printf.c:
 	.text       start:0x801570C8 end:0x8015929C
+	.rodata     start:0x80185160 end:0x80185188
 	.data       start:0x8019C9C0 end:0x8019CBEC
+	.sdata      start:0x80281B08 end:0x80281B0A
+	.sdata2     start:0x80284C98 end:0x80284CA0
 
 runtime/sscanf.c:
 	.text       start:0x801594CC end:0x8015955C
