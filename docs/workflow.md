@@ -115,6 +115,19 @@ python tools/match/lint.py --diff main                # style check on the lines
 Lint must report 0 findings on your lines (see [`style.md`](style.md) for each rule). If a file
 you own has older findings, clean them as part of your work, keeping every function exact.
 
+Finishing a unit
+----------------
+
+A unit is done when it is linked, not when its functions score 100%. `NonMatching` units are
+compiled for scoring only; the DOL is still built from the original code for them. Once every
+function is exact, change the unit to `Object(Matching, ...)` in `configure.py`, run
+`python configure.py`, and rebuild: `main.dol: OK` now proves the unit byte for byte.
+
+If the DOL fails, the unit's data does not line up yet: usually float constants (`.sdata2`),
+strings or tables it owns are still split into the surrounding `auto_*` units. Give the unit its
+data ranges in `splits.txt` (see "Data, constants and symbols" in `decomp-notes.md`) and try
+again. Leave it `NonMatching` until the DOL passes.
+
 When stuck
 ----------
 
