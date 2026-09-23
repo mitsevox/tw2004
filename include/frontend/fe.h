@@ -229,7 +229,8 @@ typedef struct CrAPAsset {
     u64  aVariant[4];           // 0x090  } them) and the id of each one's variant (fn_80106A64)
     u64  aSet[4];               // 0x0B0  the ids of four skin sets; taking the asset off puts
                                 //        them back to "Defaults" (fn_80106DA0)
-    u8   unkD0[0x110 - 0xD0];
+    u64  aSetVariant[4];        // 0x0D0  } putting it on gives each set the variant and option
+    u64  aSetOption[4];         // 0x0F0  } with these ids (fn_80106B04)
     s16  n110;                  // 0x110  the offset in 'CR_S' of its unlock text (-1: none; fn_8010651C)
     s16  n112;                 // 0x112  } offsets of strings in 'CR_S' (fn_801064EC); n114 is
     s16  n114;                  // 0x114  } passed to fn_8008E724 with the asset's name (fn_80104094)
@@ -366,6 +367,7 @@ void fn_8008E824(void);
 void fn_8008E860(int n);
 void fn_8008E8D0(int n);
 u8   fn_8008E944(u8 b, f32 f);
+void fn_8008E960(char* sz);
 int  fn_8008E9A8(void);
 void fn_8008E9B4(void);
 void fn_8008EABC(u8 b);

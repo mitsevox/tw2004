@@ -220,7 +220,8 @@ typedef struct SaveProfile {
     u8   n54C2;                 // 0x054C2  -> PlayerProfile.unk2
     u8   unk54C3[5];
     u64  aGolferNames[6];       // 0x054C8  -> PlayerProfile.aNames
-    u8   nGolferOutfit;         // 0x054F8  -> PlayerProfile.nOutfit
+    s8   nGolferOutfit;         // 0x054F8  -> PlayerProfile.nOutfit; fn_801069AC stores a ball's
+                                //          index there (fn_800484F4, -1: none)
     u8   nGolferBallType;       // 0x054F9  -> PlayerProfile.nBallType
     u8   unk54FA[0x5613 - 0x54FA];
     s8   n5613;                 // 0x05613  set by fn_8008DD34; FEgolferanim.c passes it to the

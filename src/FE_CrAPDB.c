@@ -6,6 +6,7 @@
 #include "game_types.h"
 #include "charstate.h"
 #include "endian.h"
+#include "dynobj.h"
 #include "frontend/fe.h"
 #include "game/frontend.h"
 
@@ -27,6 +28,9 @@ void fn_80105B80(CrAPAsset* pAsset, char* pName);
 void fn_80105DAC(void);
 void fn_80105EFC(void);
 u8   fn_801061F8(s16 nPart, int nCategory, int nWanted);
+int  fn_80106750(CrAPAsset* pAsset, Skin** apSkins);
+void fn_80106A64(CrAPAsset* pAsset, Skin* pSkin);
+void fn_80106BF8(CrAPAsset* pAsset, Skin* pSkin);
 void fn_80106D24(CrAPAsset* pAsset, Skin* pSkin);
 void fn_80106DA0(CrAPAsset* pAsset, Skin* pSkin);
 int  fn_8010766C(MsgArg* pArg, char* sz);
@@ -1075,6 +1079,98 @@ u8 fn_8010651C(s16 nPart, int b, int i, char* pDst) {
     return 0;
 }
 
+// A club asset: put it on each club skin its category uses (see fn_80106750). 0 when it is not a
+// club asset or the golfer has no club skins.
+u8 fn_80106658(CrAPAsset* pAsset) {
+    Skin* apSkins[6];
+    int nSkins;
+    int i;
+
+    if (lbl_80281EE0->pB4 == NULL || lbl_80281EE0->pB4->pChar == NULL ||
+        lbl_80281EE0->pB4->pChar->p16D8 == NULL) {
+        return 0;
+    }
+    nSkins = fn_80106750(pAsset, apSkins);
+    if (nSkins <= 0) {
+        return 0;
+    }
+    for (i = 0; i < nSkins; i++) {
+        // EA bug: the inner loop reuses i, so every club skin gets the asset once, whatever nSkins
+        // is, and apSkins is never read
+        for (i = 0; i < 6; i++) {
+            fn_80106A64(pAsset, lbl_80281EE0->pB4->pChar->p16D8->apSkins[i]);
+            fn_80106BF8(pAsset, lbl_80281EE0->pB4->pChar->p16D8->apSkins[i]);
+        }
+    }
+    return 1;
+}
+
+// The club skins an asset's category goes on, into apSkins; how many (0: not a club category).
+// The six skins are the drivers, fairway woods, putters, two of irons and the wedges.
+int fn_80106750(CrAPAsset* pAsset, Skin** apSkins) {
+    char* szCategory = fn_801064EC(pAsset->nCategory);
+
+    if (lbl_80281EE0->pB4 == NULL || lbl_80281EE0->pB4->pChar == NULL ||
+        lbl_80281EE0->pB4->pChar->p16D8 == NULL || apSkins == NULL) {
+        return 0;
+    }
+    if (stricmp(szCategory, "shafts") == 0 || stricmp(szCategory, "grips") == 0) {
+        apSkins[0] = lbl_80281EE0->pB4->pChar->p16D8->apSkins[0];
+        apSkins[1] = lbl_80281EE0->pB4->pChar->p16D8->apSkins[1];
+        apSkins[2] = lbl_80281EE0->pB4->pChar->p16D8->apSkins[2];
+        apSkins[3] = lbl_80281EE0->pB4->pChar->p16D8->apSkins[3];
+        apSkins[4] = lbl_80281EE0->pB4->pChar->p16D8->apSkins[4];
+        apSkins[5] = lbl_80281EE0->pB4->pChar->p16D8->apSkins[5];
+        return 6;
+    }
+    if (stricmp(szCategory, "drivers") == 0) {
+        apSkins[0] = lbl_80281EE0->pB4->pChar->p16D8->apSkins[0];
+        return 1;
+    }
+    if (stricmp(szCategory, "Fairway Woods") == 0) {
+        apSkins[0] = lbl_80281EE0->pB4->pChar->p16D8->apSkins[1];
+        return 1;
+    }
+    if (stricmp(szCategory, "Iron Sets") == 0) {
+        apSkins[0] = lbl_80281EE0->pB4->pChar->p16D8->apSkins[3];
+        apSkins[1] = lbl_80281EE0->pB4->pChar->p16D8->apSkins[4];
+        return 2;
+    }
+    if (stricmp(szCategory, "Wedge Sets") == 0) {
+        apSkins[0] = lbl_80281EE0->pB4->pChar->p16D8->apSkins[5];
+        return 1;
+    }
+    if (stricmp(szCategory, "Putters") == 0) {
+        apSkins[0] = lbl_80281EE0->pB4->pChar->p16D8->apSkins[2];
+        return 1;
+    }
+    return 0;
+}
+
+// A part 12 asset of the category "balls": make its ball the profile's (nGolferOutfit) and show it.
+u8 fn_801069AC(CrAPAsset* pAsset) {
+    char szName[16];                    // the size is unknown (the frame allows up to 20)
+    char* szCategory;
+    s8 nBall;
+
+    if (pAsset->nPart != 12) {
+        return 0;
+    }
+    szCategory = fn_801064EC(pAsset->nCategory);
+    if (lbl_80281EE0->pB4 == NULL || lbl_80281EE0->pB4->pChar == NULL ||
+        lbl_80281EE0->pB4->pChar->p16D8 == NULL) {
+        return 0;
+    }
+    if (stricmp(szCategory, "balls") == 0) {
+        fn_800CB8F0(&pAsset->aSetVariant[0], szName);
+        fn_8008E960(szName);
+        nBall = fn_800484F4(szName);
+        fn_80077ACC()->nGolferOutfit = nBall;
+        return 1;
+    }
+    return 0;
+}
+
 // Put the asset on a skin: each of its parts the skin has gets the asset's variant.
 void fn_80106A64(CrAPAsset* pAsset, Skin* pSkin) {
     int i;
@@ -1086,6 +1182,54 @@ void fn_80106A64(CrAPAsset* pAsset, Skin* pSkin) {
         nVariant = fn_800CDBB0(pSkin, nPart, pAsset->aVariant[i]);
         if (nPart >= 0 && nVariant >= 0) {
             fn_800CCB08(pSkin, nPart, nVariant);
+        }
+    }
+}
+
+// And each of its sets the skin has gets the asset's variant and option.
+void fn_80106B04(CrAPAsset* pAsset, Skin* pSkin) {
+    s32 nSet;
+    s32 nVariant;
+    s32 nOption;
+    int i;
+
+    for (i = 0; i < 4; i++) {
+        nSet =fn_800CDC2C(pSkin, pAsset->aSet[i]);
+        nVariant = fn_800CDCE0(pSkin, nSet, pAsset->aSetVariant[i]);
+        if (nSet >= 0 && nVariant >= 0) {
+            nOption = fn_800CDDB0(pSkin, nSet, nVariant, pAsset->aSetOption[i]);
+            fn_800CCF90(pSkin, nSet, nVariant, nOption);
+            if (fn_800CEE90() && nOption >= 0) {
+                fn_800CECE0(pSkin, nSet, nVariant, nOption,
+                            lbl_80281EE0->pB4->pChar->a64[lbl_80281EE0->pB4->pChar->n74]);
+            }
+        }
+    }
+}
+
+// The same for a club skin, except that a set's "DefaultL" variant is used instead when it has one
+// and the profile's n5613 is 1.
+void fn_80106BF8(CrAPAsset* pAsset, Skin* pSkin) {
+    s32 nSet;
+    s32 nVariant;
+    s32 nDefaultL;
+    s32 nOption;
+    int i;
+
+    for (i = 0; i < 4; i++) {
+        nSet = fn_800CDC2C(pSkin, pAsset->aSet[i]);
+        nVariant = fn_800CDCE0(pSkin, nSet, pAsset->aSetVariant[i]);
+        nDefaultL = fn_800CDD5C(pSkin, nSet, "DefaultL");
+        if (nDefaultL >= 0 && fn_80077ACC()->n5613 == 1) {
+            nVariant = nDefaultL;
+        }
+        if (nSet >= 0 && nVariant >= 0) {
+            nOption = fn_800CDDB0(pSkin, nSet, nVariant, pAsset->aSetOption[i]);
+            fn_800CCF90(pSkin, nSet, nVariant, nOption);
+            if (fn_800CEE90() && nOption >= 0) {
+                fn_800CECE0(pSkin, nSet, nVariant, nOption,
+                            lbl_80281EE0->pB4->pChar->a64[lbl_80281EE0->pB4->pChar->n74]);
+            }
         }
     }
 }
