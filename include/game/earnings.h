@@ -86,6 +86,9 @@ LAYOUT_ASSERT(EarningsTable, 0x22F0);
 
 extern EarningsTable lbl_80200538;
 extern s32 lbl_801FFD68[10];    // the courses fn_800D3A20 unlocked, for their messages
+extern s32 lbl_80200498[10];    // a working table: fn_800D3DDC messages the entries of kind 2 or 4
+extern s32 lbl_80200510[10];    // with these ids
+extern s32 lbl_80282258;        // their count
 
 // Earnings.c
 int  fn_800D38F0(int nWinner, int nLoser, int nMargin, s32* pPrize);   // a ladder event's winnings

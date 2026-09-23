@@ -35,8 +35,8 @@ extern s32 lbl_802003A8[10];
 extern s32 lbl_802003D0[10];
 extern s32 lbl_802003F8[10];
 extern s32 lbl_80200420[10];
-extern u8  lbl_801FFAE8[0x280];
-extern u8  lbl_801FFD90[0x280];
+extern CourseMoneyTracking lbl_801FFAE8[10];
+extern CourseMoneyTracking lbl_801FFD90[10];     // the breakdown of each lbl_80200150 payout
 extern s32 lbl_80282248;
 extern s32 lbl_8028224C;
 extern s32 lbl_80282250;
@@ -60,11 +60,14 @@ u8    fn_800584B4(int nProfile);
 
 int   fn_800D3A20(int nProfile, u8 bMessage);
 int   fn_800D3CF8(int nRating);
+u8    fn_800D4010(int nId);
 s32   fn_800D477C(int nPlayer, Ball* pBall, u8 b);
 void  fn_800D4F14(int nPlayer, u8 b);
 f32   fn_800D6EEC(void);
 u8    fn_800D76AC(int nPlayer, int nAward);
+int   fn_800D782C(int nPlayer, Ball* pBall, int a, u8 b, int c);
 s32   fn_800D9954(void);
+s32   fn_800D9E00(s32 i);
 
 // Put the working tables back to their saved copies.
 void fn_800D3244(void) {
@@ -356,6 +359,49 @@ s32 fn_800D3D64(int nRating, int nHole) {
     if (nHole < 12) return lbl_80200538.aSkins[nRating].aValue[1];
     if (nHole < 17) return lbl_80200538.aSkins[nRating].aValue[2];
     return lbl_80200538.aSkins[nRating].aValue[3];
+}
+
+// After a shot that stayed in bounds (GM_PlayerTookShot), for a human player with a profile: the
+// shot is checked (fn_800D782C, fn_800D477C) and what it earned is paid out from the working
+// tables, each with its message: the lbl_80200498 entries of kind 2 or 4, the shot's bonuses with
+// their breakdowns, and the awards won with their money (booked as bonuses, money.n8).
+void fn_800D3DDC(int nPlayer) {
+    int nProfile;
+    int i;
+    int nKind;
+
+    if (Game_GetMode() == 10) return;
+    if (fn_800E177C() != 0) return;
+    gpGame->pfn244(nPlayer);
+    nProfile = gPlayers[nPlayer].nIndex;
+    if (gpSaveData[nProfile].bActive == 0) return;
+    if (Player_IsCPU(nPlayer)) return;
+    fn_800D782C(nPlayer, &gPlayers[nPlayer].ball, 1, 0, 0);
+    for (i = 0; i < lbl_80282258; i++) {
+        nKind = lbl_80200498[i];
+        if (nKind == 2 || nKind == 4) {
+            fn_800E4364(1, lbl_80200510[i], nKind, nProfile);
+        }
+    }
+    fn_800D477C(nPlayer, &gPlayers[nPlayer].ball, 0);
+    fn_800D3244();
+    for (i = 0; i < lbl_8028224C; i++) {
+        if (lbl_80200150[i] != 0) {
+            fn_800E4364(0, lbl_802001C8[i], lbl_80200150[i], nProfile);
+            fn_800D3548(nPlayer, lbl_80200150[i], &lbl_801FFD90[i]);
+        }
+    }
+    for (i = 0; i < lbl_80282248; i++) {
+        if (fn_800D750C(nPlayer, lbl_802000D8[i])) {
+            if (fn_800D4010(lbl_802000D8[i])) {
+                fn_800E4364(6, fn_800D9E00(lbl_802000D8[i]), 0, nProfile);
+            } else {
+                fn_800E4364(2, fn_800D9E00(lbl_802000D8[i]), lbl_80200060[i], nProfile);
+            }
+            fn_800D3548(nPlayer, lbl_80200060[i], NULL);
+            gPlayers[nPlayer].money.n8 += lbl_80200060[i];
+        }
+    }
 }
 
 // Whether an id is one of 23..38.
