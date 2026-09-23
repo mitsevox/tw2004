@@ -109,10 +109,10 @@ void fn_800F0678(void) {
 // its challenge runs in mode 5 with this file's start and end wrapped around it.
 void fn_800F06DC(void) {
     lbl_80281680 = gSession.options.nC;
-    lbl_8028234C = 1;
     lbl_80282348 = gSession.options.nWind;
     gSession.options.nC = 4;
     gSession.options.nWind = 0;
+    lbl_8028234C = 1;
     if (gRTEs.aEvent[lbl_80282350].bOff == 0) {
         if (gRTEs.aEvent[lbl_80282350].nChallenge != 0) {
             gSession.nNumPlayers = 1;
