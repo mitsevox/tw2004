@@ -4,6 +4,7 @@
 
 #include "psmgr.h"
 #include "golfer.h"
+#include "lighting.h"
 
 void fn_800A27FC(f32 fLight1, f32 fLight2);
 void fn_800A29B4(UStreamObject* pObject);
@@ -13,6 +14,31 @@ void SD_vShaderObject_Rain_Dynamic_Init(void* pRain, f32* pStrength);
 void fn_800B4F24(void* pRain);
 void fn_800B4FA4(void* pRain);
 void fn_800B52D4(void* pRain, f32* pFrameTime, s32 n);
+
+// Scales the colour of the hole's directional lights by fDir and of its point lights by fPoint,
+// then hands the lights to the light sets again.
+void fn_800A27FC(f32 fDir, f32 fPoint) {
+    int i;
+
+    for (i = 0; i < fn_8000C594()->lights.nLights; i++) {
+        if (fn_8000C594()->lights.aLight[i].nType == 1) {
+            fn_8000AE28(fn_8000C594()->lights.aLight[i].vColor, fDir,
+                        fn_8000C594()->lights.aLight[i].vColor);
+        } else if (fn_8000C594()->lights.aLight[i].nType == 2) {
+            fn_8000AE28(fn_8000C594()->lights.aLight[i].vColor, fPoint,
+                        fn_8000C594()->lights.aLight[i].vColor);
+        }
+    }
+    fn_80035338(0);
+    fn_800935CC(&fn_8000C594()->lights);
+    fn_80093900(fn_8000C594()->p38);
+    if (fn_8000C594()->p44 != NULL) {
+        fn_80035338(2);
+        fn_80093900(fn_8000C594()->p44);
+    }
+    fn_80035308();
+    fn_800352E4();
+}
 
 void fn_800A2934(void) {
     int i;
@@ -31,6 +57,29 @@ void fn_800A295C(void) {
 
 void fn_800A298C(void) {
     UStream_UnregisterHandler('sfxd');
+}
+
+// The 'sfxd' stream handler: its data is a list like "{a=name,b=name}"; each name after an '='
+// goes into lbl_801F1640 in turn.
+void fn_800A29B4(UStreamObject* pObject) {
+    char* pEnd;
+    char* p;
+    char* pName;
+    char szName[16];
+
+    p = (char*)pObject->pData;
+    pEnd = strchr(p, '}');
+    p = strchr(p + 1, '=');
+    pName = lbl_801F1640[0];
+    while (p != NULL && p < pEnd) {
+        p++;
+        sscanf(p, "%s", szName);
+        p += strlen(szName);
+        p = strchr(p, '=');
+        strcpy(pName, szName);
+        pName += sizeof(lbl_801F1640[0]);
+    }
+    fn_80009E70(pObject);
 }
 
 s32 fn_800A2A80(s32 nKind, f32* pArg, s32 n3) {

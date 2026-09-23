@@ -409,8 +409,9 @@ void fn_8009F02C(void) {
     }
 }
 
-// Read nLen bytes of open file nFile into pBuf, from where the last read stopped.
-s32 fn_8009F208(s32 nFile, void* pBuf, s32 nLen) {
+// Read nLen bytes of open file nFile into pBuf, from where the last read stopped. arg3 is not
+// used (TibExt's fn_80122744 passes 0).
+s32 fn_8009F208(s32 nFile, void* pBuf, s32 nLen, s32 arg3) {
     CARDRead(&lbl_801E3180[nFile], pBuf, nLen, lbl_80281FC8);
     lbl_80281FC8 += nLen;
     return 0;

@@ -127,7 +127,7 @@ void fn_800AA744(AudSeqEvent* pEvent, AudTrack* pTrack) {
     if (nVolume == 0 || pTone == NULL) return;
     nChannel = pTrack->u.seq.n65;
     request.n4 = bLoops != 0;
-    if (!fn_800AB374() && pTrack->pSource->n40 == 1 && pTrack->nChannel == 0) {
+    if (!fn_800AB374() && pTrack->pSource->nSound == 1 && pTrack->nChannel == 0) {
         request.n4 = 2;
     }
     for (i = 0; i < pTmpl->n2;) {
@@ -154,7 +154,7 @@ void fn_800AA744(AudSeqEvent* pEvent, AudTrack* pTrack) {
     request.pUser = pTrack;
     request.nIndex = nChannel;
     request.flags.n = 0;
-    request.flags.b.b14 = (pTrack->pSource->pTmpl->n3 & 4) || (pTrack->pTmpl->n0 & 0x20);
+    request.flags.b.b14 = (pTrack->pSource->pSound->n3 & 4) || (pTrack->pTmpl->n0 & 0x20);
     request.nPriority = nVolume;
     request.flags.b.b9 = bLoops;
     request.n2 = 0x40;
@@ -162,8 +162,8 @@ void fn_800AA744(AudSeqEvent* pEvent, AudTrack* pTrack) {
     pVoice = fn_800AC4A0(&request);
     if (pVoice == NULL) return;
     pVoice->pTone = pTone;
-    if (pParams->flags.b.bF0) {
-        f = pParams->f0;
+    if (pParams->flags.b.bPitch) {
+        f = pParams->fPitch;
     }
     fn_800AC6D0(pVoice, pParams, pEvent->n4, f);
     pTrack->n5D++;
@@ -219,7 +219,7 @@ void fn_800AAAA4(AudSeqEvent* pEvent, AudTrack* pTrack) {
         pSource = pTrack->pSource;
         pTarget = pSource->apTracks[n];
         if (pTarget == NULL) {
-            pTarget = fn_800A9BC8(pSource, &pSource->pTmpl->aTracks[n], n, pTrack->f48);
+            pTarget = fn_800A9BC8(pSource, &pSource->pSound->aTracks[n], n, pTrack->f48);
         }
     }
     if (pTarget != NULL) {
@@ -253,7 +253,7 @@ void fn_800AAB8C(AudSeqEvent* pEvent, AudTrack* pTrack) {
     pTarget = pSource->apTracks[n];
     nPlayList = pEvent->n4;
     if (pTarget == NULL) {
-        pTarget = fn_800A9BC8(pSource, &pSource->pTmpl->aTracks[n], n, pTrack->f48);
+        pTarget = fn_800A9BC8(pSource, &pSource->pSound->aTracks[n], n, pTrack->f48);
     }
     if (pTarget != NULL) {
         Stm_SetPlayList(pTarget, nPlayList);
@@ -272,7 +272,7 @@ void fn_800AAC00(AudSeqEvent* pEvent, AudTrack* pTrack) {
     pTarget = pSource->apTracks[n];
     nStream = pEvent->n4;
     if (pTarget == NULL) {
-        pTarget = fn_800A9BC8(pSource, &pSource->pTmpl->aTracks[n], n, pTrack->f48);
+        pTarget = fn_800A9BC8(pSource, &pSource->pSound->aTracks[n], n, pTrack->f48);
     }
     if (pTarget != NULL) {
         Stm_SetStream(pTarget, nStream, 0);
@@ -281,8 +281,8 @@ void fn_800AAC00(AudSeqEvent* pEvent, AudTrack* pTrack) {
 
 // Events: set a voice setting for the next note.
 void fn_800AAC78(AudSeqEvent* pEvent, AudTrack* pTrack) {
-    pTrack->params.f0 = (u32)pEvent->n4 / 65536.0f;
-    pTrack->params.flags.b.bF0 = 1;
+    pTrack->params.fPitch = (u32)pEvent->n4 / 65536.0f;
+    pTrack->params.flags.b.bPitch = 1;
 }
 
 void fn_800AACBC(AudSeqEvent* pEvent, AudTrack* pTrack) {

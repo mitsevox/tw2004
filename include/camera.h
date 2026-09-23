@@ -12,7 +12,9 @@
 typedef struct CamLens {
     s32  nType;                 // 0x00  0: a perspective camera, else flat (LLObj_Gc.c)
     f32  v4[3];                 // 0x04  a position: the green zoom-to-aim camera copies it to View.v20
-    u8   unk10[0x34 - 0x10];
+    u8   unk10[0x24 - 0x10];
+    f32  v24[3];                // 0x24  a direction: goballfx.c's fn_80093A50 takes its angle to a light
+    u8   unk30[0x34 - 0x30];
     f32  v34[3];                // 0x34  a position: GameMode8 measures the ball's distance to it
     u8   unk40[0xA4 - 0x40];
     f32  fFov;                  // 0xA4  the field of view (GoGolfCam.c sets DEG(60.0f) or DEG(30.0f))
