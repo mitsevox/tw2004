@@ -102,6 +102,9 @@ unsorted/sweep_8000BED8.c:
 unsorted/sweep_8000BF8C.c:
 	.text       start:0x8000BF8C end:0x8000BF9C
 
+unsorted/sweep_8000C0F0.c:
+	.text       start:0x8000C0F0 end:0x8000C104
+
 unsorted/sweep_8000C244.c:
 	.text       start:0x8000C244 end:0x8000C278
 
@@ -1677,6 +1680,9 @@ unsorted/sweep_800B7684.c:
 unsorted/sweep_800B9930.c:
 	.text       start:0x800B9930 end:0x800B9944
 
+unsorted/sweep_800B9A88.c:
+	.text       start:0x800B9A88 end:0x800B9AAC
+
 unsorted/sweep_800BA080.c:
 	.text       start:0x800BA080 end:0x800BA0A0
 
@@ -1830,6 +1836,9 @@ unsorted/sweep_800E3AA0.c:
 unsorted/sweep_800E3BEC.c:
 	.text       start:0x800E3BEC end:0x800E3C0C
 
+unsorted/sweep_800E3ECC.c:
+	.text       start:0x800E3ECC end:0x800E3EE0
+
 unsorted/sweep_800E415C.c:
 	.text       start:0x800E415C end:0x800E4164
 
@@ -1847,6 +1856,9 @@ unsorted/sweep_800E4F88.c:
 
 unsorted/sweep_800E508C.c:
 	.text       start:0x800E508C end:0x800E5098
+
+unsorted/sweep_800E50FC.c:
+	.text       start:0x800E50FC end:0x800E5110
 
 unsorted/sweep_800E5110.c:
 	.text       start:0x800E5110 end:0x800E5118
