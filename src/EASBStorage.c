@@ -1027,6 +1027,87 @@ EASBErrorE fn_8012A434(EASBProcessE* peProcess) {
     return eError;
 }
 
+// Step: reads the HEAD record and every PROD record to pick the game's slot: its own record
+// (same name) if there is one, else the first empty record, else the oldest record.
+EASBErrorE fn_8012A4C4(EASBProcessE* peProcess) {
+    EASBProduct product;
+    EASBErrorE eError;
+
+    eError = EASB_ERROR_NONE;
+    if (peProcess == NULL) {
+        return EASB_ERROR_NULL_PARAMETERS;
+    }
+    if (lbl_802825B0->bFileOpen == 0) {
+        return EASB_ERROR_INTERNAL;
+    }
+    if (*peProcess == EASB_PROCESS_NONE) {
+        memset(&lbl_802825B0->nHeadState, 0, sizeof(lbl_802825B0->nHeadState));
+        memset(lbl_802825B0->anProductState, 0, sizeof(lbl_802825B0->anProductState));
+        lbl_802825B0->n94 = 0;
+        lbl_802825B0->nSlot = EASB_PRODUCT_NONE;
+        lbl_802825B0->nFoundKind = 0;
+        lbl_802825B0->nFoundSlot = EASB_PRODUCT_NONE;
+        lbl_802825B0->uOldestTime = EASB_TIME_LAST;
+        lbl_802825B0->nRecord = EASB_PRODUCT_NONE;
+        eError = fn_8012C98C(TagFile_Read(&lbl_802825B0->session, EASB_TAG_HEAD, 0, lbl_802825B0->pBuffer,
+                                          EASB_HEAD_SIZE));
+        *peProcess = EASB_PROCESS_CONTINUE;
+    } else if (*peProcess == EASB_PROCESS_CONTINUE) {
+        eError = fn_8012CB98(peProcess);
+    }
+    if (*peProcess == EASB_PROCESS_COMPLETE && lbl_802825B0->nRecord == EASB_PRODUCT_NONE) {
+        if (eError == EASB_ERROR_NONE) {
+            lbl_802825B0->nHeadState = 1;
+        } else if (eError == EASB_ERROR_SECTION_CORRUPT) {
+            lbl_802825B0->nHeadState = 2;
+        } else {
+            return eError;
+        }
+        lbl_802825B0->nRecord = 0;
+        eError = fn_8012C98C(TagFile_Read(&lbl_802825B0->session, EASB_TAG_PROD, lbl_802825B0->nRecord,
+                                          lbl_802825B0->pBuffer, EASB_PROD_SIZE));
+        *peProcess = EASB_PROCESS_CONTINUE;
+    } else if (*peProcess == EASB_PROCESS_COMPLETE && lbl_802825B0->nRecord != EASB_PRODUCT_NONE) {
+        if (eError == EASB_ERROR_NONE) {
+            fn_80129B30(&product, lbl_802825B0->pBuffer, lbl_802825B0->uBufferSize);
+            lbl_802825B0->anProductState[lbl_802825B0->nRecord] = 1;
+        } else if (eError == EASB_ERROR_SECTION_CORRUPT) {
+            eError = EASB_ERROR_NONE;
+            lbl_802825B0->anProductState[lbl_802825B0->nRecord] = 2;
+        } else {
+            return eError;
+        }
+        if (lbl_802825B0->anProductState[lbl_802825B0->nRecord] == 1 && lbl_802825B0->nFoundKind != 3) {
+            if (product.bValid == 1 && fn_80128CA0(product.szName, lbl_802825B0->args.szName, 1) == 0) {
+                lbl_802825B0->nFoundSlot = lbl_802825B0->nRecord;
+                lbl_802825B0->nFoundKind = 3;
+            } else if (product.bValid == 0
+                       && (lbl_802825B0->nFoundKind == 1 || lbl_802825B0->nFoundKind == 0)) {
+                lbl_802825B0->nFoundSlot = lbl_802825B0->nRecord;
+                lbl_802825B0->nFoundKind = 2;
+            } else if (product.bValid == 1 && product.uTime <= lbl_802825B0->uOldestTime
+                       && lbl_802825B0->nFoundKind != 2) {
+                lbl_802825B0->uOldestTime = product.uTime;
+                lbl_802825B0->nFoundSlot = lbl_802825B0->nRecord;
+                lbl_802825B0->nFoundKind = 1;
+            }
+        }
+        if (lbl_802825B0->nRecord < EASB_MAX_PRODUCTS - 1) {
+            lbl_802825B0->nRecord++;
+            eError = fn_8012C98C(TagFile_Read(&lbl_802825B0->session, EASB_TAG_PROD, lbl_802825B0->nRecord,
+                                              lbl_802825B0->pBuffer, EASB_PROD_SIZE));
+            *peProcess = EASB_PROCESS_CONTINUE;
+        } else if (lbl_802825B0->nRecord == EASB_MAX_PRODUCTS - 1) {
+            lbl_802825B0->nSlot = lbl_802825B0->nFoundSlot;
+            lbl_802825B0->n94 = lbl_802825B0->nFoundKind;
+        }
+    }
+    if (*peProcess == EASB_PROCESS_COMPLETE && eError == EASB_ERROR_NONE && fn_8012A20C(2)) {
+        eError = EASB_ERROR_SECTION_CORRUPT;
+    }
+    return eError;
+}
+
 // Step: checks the file holds one HEAD record, 25 PROD records and no IMAG record, of the
 // packed sizes.
 EASBErrorE fn_8012A848(EASBProcessE* peProcess) {
@@ -1994,6 +2075,29 @@ EASBErrorE fn_8012C888(u32* pOut) {
         eError = EASB_ERROR_NOFILE;
     }
     return eError;
+}
+
+// The size of the Bio file: a HEAD record and 25 PROD records as the tag file pads them; with
+// bCard set, what that takes on the card (fn_8017124C, which reads only the sizes it is given).
+EASBErrorE fn_8012C8D0(u32* puSize, u8 bCard) {
+    u32 uRecordSize;
+    u32 uEntries;
+    SFIODescriptor desc;
+    u32 i;
+
+    *puSize = 0;
+    TagFile_GetBufferSizeForPayload(EASB_HEAD_SIZE, &uRecordSize);
+    *puSize += uRecordSize;
+    for (i = 0; i < EASB_MAX_PRODUCTS; i++) {
+        TagFile_GetBufferSizeForPayload(EASB_PROD_SIZE, &uRecordSize);
+        *puSize += uRecordSize;
+    }
+    if (bCard == 1) {
+        desc.uDataSize = *puSize;
+        desc.uSize04 = 0x2000;
+        fn_8017124C(&desc, puSize, &uEntries);
+    }
+    return EASB_ERROR_NONE;
 }
 
 // The EASB error for a tag-file library error; the library's own code is kept for later.

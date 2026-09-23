@@ -218,7 +218,8 @@ typedef struct EASBStorage {
     u8 bFileOpen;                   // 0x091
     u8 b92;                         // 0x092
     u8 unk93;
-    s32 n94;                        // 0x094: fn_80129F98's mode; 3 once the game's record is written
+    s32 n94;                        // 0x094: how the game's slot was picked (fn_8012A4C4): 3 its own
+                                    //        record, 2 an empty one, 1 the oldest; fn_80129F98's mode
     u8 nSlot;                       // 0x098: this game's record, or EASB_PRODUCT_NONE
     u8 unk99[3];
     u8* pBuffer;                    // 0x09C: one record's packed bytes (fn_8012CAA8)
@@ -228,10 +229,10 @@ typedef struct EASBStorage {
     EASBTotals totals;              // 0x10C: the totals in the file's HEAD record
     TagSession session;             // 0x120: the tag-file session of the running operation
     u8 nRecord;                     // 0x168: the record a step is on (EASB_PRODUCT_NONE: HEAD)
-    u8 b169;                        // 0x169
+    u8 nFoundSlot;                  // 0x169: the slot fn_8012A4C4 picks for the game
     u8 unk16A[2];
-    u32 u16C;                       // 0x16C
-    u32 u170;                       // 0x170
+    u32 uOldestTime;                // 0x16C: the oldest record seen by fn_8012A4C4
+    s32 nFoundKind;                 // 0x170: how nFoundSlot was picked (becomes n94)
     s32 nLastError;                 // 0x174: the tag-file library's last error (fn_8012C98C)
     s32 nResult;                    // 0x178: the error that stopped nLastOperation (fn_8012C1AC)
     s32 nLastOperation;             // 0x17C: the operation that failed
