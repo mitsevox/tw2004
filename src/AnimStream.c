@@ -30,6 +30,64 @@ AnimStreamGroup lbl_80191490[2] = {
     { 5, 1 },
 };
 
+// Allocates the stream's state with no buffers and no player slots. Streaming is off with a
+// controller of type 8, in game mode 11, in one kind of split screen or with two or more players,
+// and in the end it is turned off in every case.
+void fn_800C937C(void) {
+    int i;
+    int j;
+    int k;
+    int m;
+
+    lbl_80282230 = fn_80009B34(sizeof(AnimStream), 2, 0, "AnimStream.c", 158);
+    lbl_80282230->p0 = NULL;
+    lbl_80282230->p4 = NULL;
+    lbl_80282230->pRead = NULL;
+    lbl_80282230->nBytes = sizeof(AnimStream);
+    lbl_80282230->nState = 0;
+    for (i = 0; i < 2; i++) {
+        for (j = 0; j < 2; j++) {
+            for (k = 0; k < 8; k++) {
+                for (m = 0; m < 6; m++) {
+                    lbl_80282230->bufs[i][j][k][m].pData = NULL;
+                    lbl_80282230->bufs[i][j][k][m].nSize = -1;
+                }
+            }
+        }
+    }
+    for (i = 0; i < 5; i++) {
+        lbl_80282230->players[i].nId = -1;
+        for (j = 0; j < 2; j++) {
+            for (k = 0; k < 8; k++) {
+                for (m = 0; m < 6; m++) {
+                    lbl_80282230->players[i].clips[j][k][m].nNext = -1;
+                    lbl_80282230->players[i].clips[j][k][m].nMaxSize = -1;
+                    lbl_80282230->players[i].clips[j][k][m].b8 = 0;
+                }
+            }
+        }
+    }
+    lbl_80282230->bOn = 1;
+    for (i = 0; i < 5; i++) {
+        if (gSession.nController[i] == 8) {
+            lbl_80282230->bOn = 0;
+        }
+    }
+    if (Game_GetMode() == 11) {
+        lbl_80282230->bOn = 0;
+    }
+    if (gSession.nSplitScreen == 1) {
+        lbl_80282230->bOn = 0;
+    }
+    if (gSession.nNumPlayers > 2) {
+        lbl_80282230->bOn = 0;
+    }
+    if (gSession.nNumPlayers > 1) {
+        lbl_80282230->bOn = 0;
+    }
+    lbl_80282230->bOn = 0;
+}
+
 // Frees the stream: the read buffer, every clip buffer, then the state itself.
 void fn_800C9764(void) {
     int i;
