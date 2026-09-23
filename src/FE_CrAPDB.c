@@ -17,6 +17,7 @@ void fn_80103EFC(CrAPAsset* pAsset);
 void FE_CrAP_TurnOnAsset(CrAPAsset* pAsset);
 int  fn_80104AF4(s16 nPart, int n);     // the category of a part's entry n (-1 or 0x40: none)
 int  fn_80104F7C(CrAPAsset* pAsset);
+int  fn_80105140(s16 nPart);
 void fn_80105188(UStreamObject* pObject);
 void fn_801051F4(UStreamObject* pObject);
 void fn_80105240(void);
@@ -303,6 +304,31 @@ CrAPAsset* fn_80104F68(int nAsset) {
 
 int fn_80104F7C(CrAPAsset* pAsset) {
     return pAsset - lbl_80282460->pAssets;
+}
+
+int fn_80104FA8(s16 nPart, int b, int i) {
+    int nAsset;
+    int n;
+    int nWanted;
+    int nFirst;
+
+    nFirst = fn_80105140(nPart);
+    nWanted = fn_80104AF4(nPart, b);
+    n = 0;
+    for (nAsset = nFirst; nAsset < lbl_80282460->nAssets; nAsset++) {
+        if (nPart == lbl_80282460->pAssets[nAsset].nPart && fn_801061C8(lbl_80282460->pAssets[nAsset].n40) &&
+            fn_801061F8(nPart, lbl_80282460->pAssets[nAsset].nCategory, nWanted)) {
+            if (n == i) {
+                return nAsset;
+            }
+            n++;
+        }
+    }
+    // The original tests this flag here although both ways end the same.
+    if (gSession.uFlags & 0x4000) {
+        return -1;
+    }
+    return -1;
 }
 
 // Take the database's stream objects as they load.
@@ -600,6 +626,30 @@ int fn_801062C8(s16 nPart, int n) {
         }
     }
     return -1;
+}
+
+// A part's choice i is the asset in its slot of the profile.
+u8 fn_80106374(s16 nPart, int b, int i) {
+    int nWanted;
+    int nAsset;
+    int n;
+    int nFirst;
+
+    fn_80077ACC();
+    nFirst = fn_80105140(nPart);
+    nWanted = fn_80104AF4(nPart, b);
+    n = -1;
+    for (nAsset = nFirst; nAsset < lbl_80282460->nAssets; nAsset++) {
+        if (nPart == lbl_80282460->pAssets[nAsset].nPart &&
+            fn_801061F8(nPart, lbl_80282460->pAssets[nAsset].nCategory, nWanted) &&
+            fn_801061C8(lbl_80282460->pAssets[nAsset].n40)) {
+            n++;
+            if (n == i) {
+                return fn_80103C98(fn_80104F68(nAsset));
+            }
+        }
+    }
+    return 0;
 }
 
 // Copy the name at nOffset in the 'CR_S' strings into pDst ("" for "NONE").
