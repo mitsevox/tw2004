@@ -1,0 +1,6390 @@
+{
+ "about": "TW2004 (GW4E69) original source files in link order, from the file map (docs/sourcefiles.md). text.start/end: best guess of the file's .text; text.core: the part certainly in the file (null: none); confidence values strong/medium/guess. Used by tools/match/mapunits.py.",
+ "files": [
+  {
+   "name": "main.c",
+   "region": "EA",
+   "name_confidence": "medium",
+   "name_evidence": [
+    "TW06"
+   ],
+   "text": {
+    "start": "0x80005520",
+    "end": "0x80005628",
+    "core": [
+     "0x80005520",
+     "0x80005628"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": "llmem_xbox.c",
+   "region": "EA",
+   "name_confidence": "medium",
+   "name_evidence": [
+    "TW06",
+    "TW06 name is the Xbox file; GC file probably llmem_Gc.c"
+   ],
+   "text": {
+    "start": "0x80005628",
+    "end": "0x800065C8",
+    "core": [
+     "0x80005628",
+     "0x80005884"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": "LLFileIO_Gc.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert"
+   ],
+   "text": {
+    "start": "0x800065C8",
+    "end": "0x800067E4",
+    "core": [
+     "0x800065C8",
+     "0x800066E4"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": "LLDisp_Gc.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert"
+   ],
+   "text": {
+    "start": "0x800067E4",
+    "end": "0x800073B4",
+    "core": [
+     "0x800067E4",
+     "0x800072E0"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "LLObj_Gc.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "2002 tree"
+   ],
+   "text": {
+    "start": "0x800073B4",
+    "end": "0x800083A4",
+    "core": [
+     "0x800073B4",
+     "0x800080D0"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "GoEntry.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "2002 tree"
+   ],
+   "text": {
+    "start": "0x800083A4",
+    "end": "0x8000977C",
+    "core": [
+     "0x800083A4",
+     "0x80008820"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": null,
+   "region": "EA",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x8000977C",
+    "end": "0x8000A0E8",
+    "core": [
+     "0x800097CC",
+     "0x8000989C"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": "UMemPool.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "2002 tree"
+   ],
+   "text": {
+    "start": "0x8000A0E8",
+    "end": "0x8000B130",
+    "core": [
+     "0x8000A194",
+     "0x8000B058"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "urandom.c",
+   "region": "EA",
+   "name_confidence": "medium",
+   "name_evidence": [
+    "TW06"
+   ],
+   "text": {
+    "start": "0x8000B130",
+    "end": "0x8000B46C",
+    "core": [
+     "0x8000B318",
+     "0x8000B46C"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "unetwork.c",
+   "region": "EA",
+   "name_confidence": "guess",
+   "name_evidence": [
+    "TW06"
+   ],
+   "text": {
+    "start": "0x8000B46C",
+    "end": "0x8000C624",
+    "core": [
+     "0x8000BF20",
+     "0x8000BF20"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": "UStream.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "TW06",
+    "2002 tree"
+   ],
+   "text": {
+    "start": "0x8000C624",
+    "end": "0x8000E708",
+    "core": [
+     "0x8000C968",
+     "0x8000CAF8"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": "LLTex.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "TW06",
+    "2002 tree"
+   ],
+   "text": {
+    "start": "0x8000E708",
+    "end": "0x8000FFAC",
+    "core": [
+     "0x8000EA1C",
+     "0x8000FFAC"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "LLTexGrp.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "2002 tree"
+   ],
+   "text": {
+    "start": "0x8000FFAC",
+    "end": "0x800107F4",
+    "core": [
+     "0x800103C0",
+     "0x8001049C"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "LLFont.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "TW06",
+    "2002 tree"
+   ],
+   "text": {
+    "start": "0x800107F4",
+    "end": "0x8001256C",
+    "core": [
+     "0x800107F4",
+     "0x80012438"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "UFont.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "2002 tree"
+   ],
+   "text": {
+    "start": "0x8001256C",
+    "end": "0x80012ED0",
+    "core": [
+     "0x8001260C",
+     "0x80012E4C"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "GoRenderCtx_Gc.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "TW06",
+    "2002 tree"
+   ],
+   "text": {
+    "start": "0x80012ED0",
+    "end": "0x800143B8",
+    "core": [
+     "0x8001371C",
+     "0x8001425C"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "streammanagerhole.cpp",
+   "region": "EA",
+   "name_confidence": "medium",
+   "name_evidence": [
+    "TW06",
+    "TW06 file is C++; the 2003 file was C (probably streammanagerhole.c)"
+   ],
+   "text": {
+    "start": "0x800143B8",
+    "end": "0x80016CB8",
+    "core": [
+     "0x800143B8",
+     "0x80016B54"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "char_tex_manager.c",
+   "region": "EA",
+   "name_confidence": "medium",
+   "name_evidence": [
+    "TW06"
+   ],
+   "text": {
+    "start": "0x80016CB8",
+    "end": "0x80017508",
+    "core": [
+     "0x80016D18",
+     "0x800172B4"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "char.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "TW06",
+    "2002 tree"
+   ],
+   "text": {
+    "start": "0x80017508",
+    "end": "0x8001F32C",
+    "core": [
+     "0x80017508",
+     "0x8001F084"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "mtalib.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "2002 tree"
+   ],
+   "text": {
+    "start": "0x8001F32C",
+    "end": "0x8001FB00",
+    "core": [
+     "0x8001F32C",
+     "0x8001F42C"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "ska_shared.c",
+   "region": "EA",
+   "name_confidence": "guess",
+   "name_evidence": [
+    "TW06"
+   ],
+   "text": {
+    "start": "0x8001FB00",
+    "end": "0x80021ADC",
+    "core": [
+     "0x8001FB00",
+     "0x80021ADC"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "skalib.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "2002 tree"
+   ],
+   "text": {
+    "start": "0x80021ADC",
+    "end": "0x80026844",
+    "core": [
+     "0x80021B78",
+     "0x800266C8"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "Skeleton.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "2002 tree"
+   ],
+   "text": {
+    "start": "0x80026844",
+    "end": "0x80029FC8",
+    "core": [
+     "0x80026B4C",
+     "0x80029BC8"
+    ],
+    "boundaries_exist": "medium"
+   }
+  },
+  {
+   "name": null,
+   "region": "EA",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x80029FC8",
+    "end": "0x8002A630",
+    "core": [
+     "0x8002A024",
+     "0x8002A164"
+    ],
+    "boundaries_exist": "medium"
+   }
+  },
+  {
+   "name": "ai_brain.cpp",
+   "region": "EA",
+   "name_confidence": "medium",
+   "name_evidence": [
+    "TW06",
+    "TW06 file is C++; the 2003 file was C (probably ai_brain.c)"
+   ],
+   "text": {
+    "start": "0x8002A630",
+    "end": "0x8002BBB0",
+    "core": [
+     "0x8002AE30",
+     "0x8002BBA4"
+    ],
+    "boundaries_exist": "medium"
+   }
+  },
+  {
+   "name": null,
+   "region": "EA",
+   "name_confidence": null,
+   "name_evidence": [
+    "part of unit Golfer.c, which spans several files"
+   ],
+   "text": {
+    "start": "0x8002BBB0",
+    "end": "0x8002C984",
+    "core": [
+     "0x8002BDEC",
+     "0x8002C8B4"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": null,
+   "region": "EA",
+   "name_confidence": null,
+   "name_evidence": [
+    "part of unit Golfer.c, which spans several files"
+   ],
+   "text": {
+    "start": "0x8002C984",
+    "end": "0x8002D8A8",
+    "core": [
+     "0x8002CD20",
+     "0x8002D6FC"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "ai_core.cpp",
+   "region": "EA",
+   "name_confidence": "guess",
+   "name_evidence": [
+    "TW06",
+    "TW06 file is C++; the 2003 file was C (probably ai_core.c)"
+   ],
+   "text": {
+    "start": "0x8002D8A8",
+    "end": "0x8002EBA4",
+    "core": [
+     "0x8002DC50",
+     "0x8002E650"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "GoRenderSurface.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert"
+   ],
+   "text": {
+    "start": "0x8002EBA4",
+    "end": "0x8002F4FC",
+    "core": [
+     "0x8002EE1C",
+     "0x8002F32C"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "LLPict_Gc.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "2002 tree"
+   ],
+   "text": {
+    "start": "0x8002F4FC",
+    "end": "0x80030254",
+    "core": [
+     "0x8002F4FC",
+     "0x8003001C"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "GoTerrain.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "2002 tree"
+   ],
+   "text": {
+    "start": "0x80030254",
+    "end": "0x80035640",
+    "core": [
+     "0x80030254",
+     "0x8003541C"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "Skin.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "2002 tree"
+   ],
+   "text": {
+    "start": "0x80035640",
+    "end": "0x80037DD8",
+    "core": [
+     "0x800358E0",
+     "0x80037AB8"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "GoPostFx.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "TW06"
+   ],
+   "text": {
+    "start": "0x80037DD8",
+    "end": "0x80039454",
+    "core": [
+     "0x80037DD8",
+     "0x8003944C"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "GoDynamicCam.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "TW06",
+    "2002 tree"
+   ],
+   "text": {
+    "start": "0x80039454",
+    "end": "0x8003DCE8",
+    "core": [
+     "0x80039554",
+     "0x8003DC30"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "gocamscripts.c",
+   "region": "EA",
+   "name_confidence": "medium",
+   "name_evidence": [
+    "TW06"
+   ],
+   "text": {
+    "start": "0x8003DCE8",
+    "end": "0x80045660",
+    "core": [
+     "0x8003DCE8",
+     "0x800453C8"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "depthfield.c",
+   "region": "EA",
+   "name_confidence": "medium",
+   "name_evidence": [
+    "TW06"
+   ],
+   "text": {
+    "start": "0x80045660",
+    "end": "0x80045D18",
+    "core": [
+     "0x80045660",
+     "0x80045D18"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": "UObject3D.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "2002 tree"
+   ],
+   "text": {
+    "start": "0x80045D18",
+    "end": "0x800461A8",
+    "core": [
+     "0x80045D80",
+     "0x80045E3C"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": "GoDynObj.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "2002 tree"
+   ],
+   "text": {
+    "start": "0x800461A8",
+    "end": "0x800486F4",
+    "core": [
+     "0x800461A8",
+     "0x80048680"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "UObject.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "2002 tree"
+   ],
+   "text": {
+    "start": "0x800486F4",
+    "end": "0x80048AF4",
+    "core": [
+     "0x800486F4",
+     "0x80048A84"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "UKernel.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "TW06",
+    "2002 tree"
+   ],
+   "text": {
+    "start": "0x80048AF4",
+    "end": "0x800496E0",
+    "core": [
+     "0x80048AF4",
+     "0x800496E0"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": null,
+   "region": "EA",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x800496E0",
+    "end": "0x80049B40",
+    "core": [
+     "0x800497BC",
+     "0x80049ACC"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "goanimalactors.c",
+   "region": "EA",
+   "name_confidence": "medium",
+   "name_evidence": [
+    "TW06"
+   ],
+   "text": {
+    "start": "0x80049B40",
+    "end": "0x8004ABBC",
+    "core": [
+     "0x80049B40",
+     "0x8004AAEC"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": null,
+   "region": "EA",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x8004ABBC",
+    "end": "0x8004AFA0",
+    "core": [
+     "0x8004ABBC",
+     "0x8004AF28"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "goterraincollision.c",
+   "region": "EA",
+   "name_confidence": "medium",
+   "name_evidence": [
+    "TW06"
+   ],
+   "text": {
+    "start": "0x8004AFA0",
+    "end": "0x80050C2C",
+    "core": [
+     "0x8004AFA0",
+     "0x80050BD8"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "physics.c",
+   "region": "EA",
+   "name_confidence": "medium",
+   "name_evidence": [
+    "TW06"
+   ],
+   "text": {
+    "start": "0x80050C2C",
+    "end": "0x80055F1C",
+    "core": [
+     "0x80050C2C",
+     "0x80055C1C"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "LLPictInt.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "TW06",
+    "2002 tree"
+   ],
+   "text": {
+    "start": "0x80055F1C",
+    "end": "0x800563C4",
+    "core": [
+     "0x80055F88",
+     "0x800563C4"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "user.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert"
+   ],
+   "text": {
+    "start": "0x800563C4",
+    "end": "0x80056480",
+    "core": [
+     "0x800563C4",
+     "0x80056454"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": "passwordmanager.cpp",
+   "region": "EA",
+   "name_confidence": "medium",
+   "name_evidence": [
+    "TW06",
+    "TW06 file is C++; the 2003 file was C (probably passwordmanager.c)"
+   ],
+   "text": {
+    "start": "0x80056480",
+    "end": "0x80057F18",
+    "core": [
+     "0x800564D8",
+     "0x80056B8C"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": "fe_craputils.c",
+   "region": "EA",
+   "name_confidence": "medium",
+   "name_evidence": [
+    "TW06"
+   ],
+   "text": {
+    "start": "0x80057F18",
+    "end": "0x800589F8",
+    "core": [
+     "0x80057F18",
+     "0x80057FBC"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": "Swing.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "TW06",
+    "2002 tree"
+   ],
+   "text": {
+    "start": "0x800589F8",
+    "end": "0x8005CCAC",
+    "core": [
+     "0x800589F8",
+     "0x8005CBB0"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "stategolfer.c",
+   "region": "EA",
+   "name_confidence": "medium",
+   "name_evidence": [
+    "TW06"
+   ],
+   "text": {
+    "start": "0x8005CCAC",
+    "end": "0x8005D44C",
+    "core": [
+     "0x8005D44C",
+     "0x8005D44C"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": "statefunc.c",
+   "region": "EA",
+   "name_confidence": "medium",
+   "name_evidence": [
+    "TW06"
+   ],
+   "text": {
+    "start": "0x8005D44C",
+    "end": "0x80062E40",
+    "core": [
+     "0x8005D44C",
+     "0x80062DCC"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": "gocamcont.c",
+   "region": "EA",
+   "name_confidence": "medium",
+   "name_evidence": [
+    "TW06"
+   ],
+   "text": {
+    "start": "0x80062E40",
+    "end": "0x8006449C",
+    "core": [
+     "0x80062E40",
+     "0x80064478"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "GoStaticCam.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "2002 tree"
+   ],
+   "text": {
+    "start": "0x8006449C",
+    "end": "0x80065E9C",
+    "core": [
+     "0x800644F4",
+     "0x8006596C"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "event.c",
+   "region": "EA",
+   "name_confidence": "medium",
+   "name_evidence": [
+    "TW06"
+   ],
+   "text": {
+    "start": "0x80065E9C",
+    "end": "0x80067710",
+    "core": [
+     "0x80065E9C",
+     "0x8006752C"
+    ],
+    "boundaries_exist": "medium"
+   }
+  },
+  {
+   "name": null,
+   "region": "EA",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x80067710",
+    "end": "0x80067B80",
+    "core": [
+     "0x80067710",
+     "0x8006795C"
+    ],
+    "boundaries_exist": "medium"
+   }
+  },
+  {
+   "name": "target.c",
+   "region": "EA",
+   "name_confidence": "medium",
+   "name_evidence": [
+    "TW06"
+   ],
+   "text": {
+    "start": "0x80067B80",
+    "end": "0x8006ACF8",
+    "core": [
+     "0x80067B80",
+     "0x8006A7A8"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "emotion.c",
+   "region": "EA",
+   "name_confidence": "medium",
+   "name_evidence": [
+    "TW06"
+   ],
+   "text": {
+    "start": "0x8006ACF8",
+    "end": "0x8006BED4",
+    "core": [
+     "0x8006AD68",
+     "0x8006BDC8"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "Replay.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "TW06"
+   ],
+   "text": {
+    "start": "0x8006BED4",
+    "end": "0x8006C6F0",
+    "core": [
+     "0x8006BF60",
+     "0x8006C300"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "gomainloop.c",
+   "region": "EA",
+   "name_confidence": "medium",
+   "name_evidence": [
+    "TW06"
+   ],
+   "text": {
+    "start": "0x8006C6F0",
+    "end": "0x8006E150",
+    "core": [
+     "0x8006C968",
+     "0x8006DBD4"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "GoFrameBuf.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "2002 tree"
+   ],
+   "text": {
+    "start": "0x8006E150",
+    "end": "0x8006E2A4",
+    "core": [
+     "0x8006E150",
+     "0x8006E26C"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "GoLighting.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "2002 tree"
+   ],
+   "text": {
+    "start": "0x8006E2A4",
+    "end": "0x8006F154",
+    "core": [
+     "0x8006E2A4",
+     "0x8006EFB8"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": null,
+   "region": "EA",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x8006F154",
+    "end": "0x8006F438",
+    "core": [
+     "0x8006F154",
+     "0x8006F3D0"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "GoShaderObjectContainer_OBFData_Gc.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "2002 tree"
+   ],
+   "text": {
+    "start": "0x8006F438",
+    "end": "0x8006FF2C",
+    "core": [
+     "0x8006F650",
+     "0x8006FDCC"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "GoShaderObjectCommon_DynamicRenderingBuffer_Gc.h",
+   "region": "EA",
+   "name_confidence": "medium",
+   "name_evidence": [
+    "assert(.h)",
+    "2002 tree"
+   ],
+   "text": {
+    "start": "0x8006FF2C",
+    "end": "0x80070EC4",
+    "core": [
+     "0x8007018C",
+     "0x80070348"
+    ],
+    "boundaries_exist": "medium"
+   }
+  },
+  {
+   "name": null,
+   "region": "EA",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x80070EC4",
+    "end": "0x8007110C",
+    "core": [
+     "0x80070EC4",
+     "0x80070F00"
+    ],
+    "boundaries_exist": "medium"
+   }
+  },
+  {
+   "name": "GoShaderObject_PrelitUVAnimation_Gc.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert"
+   ],
+   "text": {
+    "start": "0x8007110C",
+    "end": "0x80071AD0",
+    "core": [
+     "0x8007110C",
+     "0x80071574"
+    ],
+    "boundaries_exist": "medium"
+   }
+  },
+  {
+   "name": "animblender.c",
+   "region": "EA",
+   "name_confidence": "guess",
+   "name_evidence": [
+    "TW06"
+   ],
+   "text": {
+    "start": "0x80071AD0",
+    "end": "0x80073878",
+    "core": [
+     "0x80071C28",
+     "0x80073878"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "GoShaderObjectCommon_ShaderObjectsData_Gc.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert"
+   ],
+   "text": {
+    "start": "0x80073878",
+    "end": "0x8007531C",
+    "core": [
+     "0x80074BE0",
+     "0x8007524C"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "LLVideo.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "2002 tree"
+   ],
+   "text": {
+    "start": "0x8007531C",
+    "end": "0x800763BC",
+    "core": [
+     "0x800754C0",
+     "0x80076128"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "GoCamera.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "TW06",
+    "2002 tree"
+   ],
+   "text": {
+    "start": "0x800763BC",
+    "end": "0x80076A54",
+    "core": [
+     "0x800763BC",
+     "0x80076948"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "GoViewport.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "2002 tree"
+   ],
+   "text": {
+    "start": "0x80076A54",
+    "end": "0x80076B7C",
+    "core": [
+     "0x80076A54",
+     "0x80076B7C"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "GoShaderObjectCommon_TexAnimManager_Gc.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert"
+   ],
+   "text": {
+    "start": "0x80076B7C",
+    "end": "0x80076F24",
+    "core": [
+     "0x80076B7C",
+     "0x80076E48"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "FE_Manager.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "2002 tree"
+   ],
+   "text": {
+    "start": "0x80076F24",
+    "end": "0x8007BDFC",
+    "core": [
+     "0x80076F80",
+     "0x80079E44"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": "apt_fe_gamemessages.c",
+   "region": "EA",
+   "name_confidence": "medium",
+   "name_evidence": [
+    "TW06"
+   ],
+   "text": {
+    "start": "0x8007BDFC",
+    "end": "0x8007CACC",
+    "core": [
+     "0x8007BE28",
+     "0x8007BEEC"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": null,
+   "region": "EA",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x8007CACC",
+    "end": "0x80085D04",
+    "core": [
+     "0x8007CACC",
+     "0x80084008"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": null,
+   "region": "EA",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x80085D04",
+    "end": "0x800864F8",
+    "core": [
+     "0x80085D04",
+     "0x80085D04"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": null,
+   "region": "EA",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x800864F8",
+    "end": "0x8008AD80",
+    "core": [
+     "0x800864F8",
+     "0x80089C4C"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "FEgolferanim.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "TW06",
+    "2002 tree"
+   ],
+   "text": {
+    "start": "0x8008AD80",
+    "end": "0x8008EC30",
+    "core": [
+     "0x8008AD80",
+     "0x8008EBB4"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "uiLoadFile.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "2002 tree"
+   ],
+   "text": {
+    "start": "0x8008EC30",
+    "end": "0x8008F3A4",
+    "core": [
+     "0x8008EC68",
+     "0x8008F310"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "uiProcessInterface.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "2002 tree"
+   ],
+   "text": {
+    "start": "0x8008F3A4",
+    "end": "0x80090940",
+    "core": [
+     "0x8008F648",
+     "0x800907AC"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "fe_movies.c",
+   "region": "EA",
+   "name_confidence": "guess",
+   "name_evidence": [
+    "TW06"
+   ],
+   "text": {
+    "start": "0x80090940",
+    "end": "0x800922A8",
+    "core": [
+     "0x80090B80",
+     "0x80092250"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": null,
+   "region": "EA",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x800922A8",
+    "end": "0x80092CE8",
+    "core": [
+     "0x800922A8",
+     "0x800929E0"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "uiTransform.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "2002 tree"
+   ],
+   "text": {
+    "start": "0x80092CE8",
+    "end": "0x80093524",
+    "core": [
+     "0x80092F8C",
+     "0x8009349C"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "goballfx.c",
+   "region": "EA",
+   "name_confidence": "medium",
+   "name_evidence": [
+    "TW06"
+   ],
+   "text": {
+    "start": "0x80093524",
+    "end": "0x80093D3C",
+    "core": [
+     "0x800935CC",
+     "0x80093D14"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": null,
+   "region": "EA",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x80093D3C",
+    "end": "0x8009414C",
+    "core": [
+     "0x80093DB8",
+     "0x800940FC"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "GoShaderObject_Particle_Gc.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "2002 tree"
+   ],
+   "text": {
+    "start": "0x8009414C",
+    "end": "0x800957FC",
+    "core": [
+     "0x8009414C",
+     "0x80095088"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "char_state.c",
+   "region": "EA",
+   "name_confidence": "medium",
+   "name_evidence": [
+    "TW06"
+   ],
+   "text": {
+    "start": "0x800957FC",
+    "end": "0x80097208",
+    "core": [
+     "0x800957FC",
+     "0x80097208"
+    ],
+    "boundaries_exist": "medium"
+   }
+  },
+  {
+   "name": "GoShaderObjectCommon_MorphAnimManager_Gc.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert"
+   ],
+   "text": {
+    "start": "0x80097208",
+    "end": "0x800977F8",
+    "core": [
+     "0x80097208",
+     "0x800975B0"
+    ],
+    "boundaries_exist": "medium"
+   }
+  },
+  {
+   "name": "GoCamTuningVars.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert"
+   ],
+   "text": {
+    "start": "0x800977F8",
+    "end": "0x80097E98",
+    "core": [
+     "0x800977F8",
+     "0x80097E98"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "GoShaderObject_Glows_Gc.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "2002 tree"
+   ],
+   "text": {
+    "start": "0x80097E98",
+    "end": "0x80098A98",
+    "core": [
+     "0x80097F44",
+     "0x80098740"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "UFstPart.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "2002 tree"
+   ],
+   "text": {
+    "start": "0x80098A98",
+    "end": "0x80099ED8",
+    "core": [
+     "0x80098A98",
+     "0x80099C50"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": null,
+   "region": "EA",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x80099ED8",
+    "end": "0x8009A250",
+    "core": [
+     "0x8009A16C",
+     "0x8009A180"
+    ],
+    "boundaries_exist": "medium"
+   }
+  },
+  {
+   "name": "SunFlr_Gc.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert"
+   ],
+   "text": {
+    "start": "0x8009A250",
+    "end": "0x8009A928",
+    "core": [
+     "0x8009A250",
+     "0x8009A844"
+    ],
+    "boundaries_exist": "medium"
+   }
+  },
+  {
+   "name": null,
+   "region": "EA",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x8009A928",
+    "end": "0x8009B320",
+    "core": [
+     "0x8009AA28",
+     "0x8009B0D0"
+    ],
+    "boundaries_exist": "medium"
+   }
+  },
+  {
+   "name": null,
+   "region": "EA",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x8009B320",
+    "end": "0x8009B630",
+    "core": [
+     "0x8009B340",
+     "0x8009B4B4"
+    ],
+    "boundaries_exist": "medium"
+   }
+  },
+  {
+   "name": "GoGreenGrid.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "TW06"
+   ],
+   "text": {
+    "start": "0x8009B630",
+    "end": "0x8009CC00",
+    "core": [
+     "0x8009B630",
+     "0x8009C914"
+    ],
+    "boundaries_exist": "medium"
+   }
+  },
+  {
+   "name": "MC_Gc.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "2002 tree"
+   ],
+   "text": {
+    "start": "0x8009CC00",
+    "end": "0x8009F734",
+    "core": [
+     "0x8009CC00",
+     "0x8009F6A0"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "MC.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "2002 tree"
+   ],
+   "text": {
+    "start": "0x8009F734",
+    "end": "0x800A27FC",
+    "core": [
+     "0x8009FAD0",
+     "0x800A233C"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "PsMgr.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "2002 tree"
+   ],
+   "text": {
+    "start": "0x800A27FC",
+    "end": "0x800A2C3C",
+    "core": [
+     "0x800A2A80",
+     "0x800A2B34"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "PsBallFx.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "TW06",
+    "2002 tree"
+   ],
+   "text": {
+    "start": "0x800A2C3C",
+    "end": "0x800A3E3C",
+    "core": [
+     "0x800A2C3C",
+     "0x800A3D6C"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": null,
+   "region": "EA",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x800A3E3C",
+    "end": "0x800A7AF0",
+    "core": [
+     "0x800A41A4",
+     "0x800A67E8"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": null,
+   "region": "EA",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x800A7AF0",
+    "end": "0x800A8604",
+    "core": [
+     "0x800A7AF0",
+     "0x800A8524"
+    ],
+    "boundaries_exist": "medium"
+   }
+  },
+  {
+   "name": "hlaudmovie.c",
+   "region": "EA",
+   "name_confidence": "medium",
+   "name_evidence": [
+    "TW06"
+   ],
+   "text": {
+    "start": "0x800A8604",
+    "end": "0x800A9808",
+    "core": [
+     "0x800A8604",
+     "0x800A8700"
+    ],
+    "boundaries_exist": "medium"
+   }
+  },
+  {
+   "name": null,
+   "region": "EA",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x800A9808",
+    "end": "0x800AA4BC",
+    "core": [
+     "0x800A9BC8",
+     "0x800AA498"
+    ],
+    "boundaries_exist": "medium"
+   }
+  },
+  {
+   "name": null,
+   "region": "EA",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x800AA4BC",
+    "end": "0x800AB3A4",
+    "core": [
+     "0x800AA744",
+     "0x800AB32C"
+    ],
+    "boundaries_exist": "medium"
+   }
+  },
+  {
+   "name": null,
+   "region": "EA",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x800AB3A4",
+    "end": "0x800ACECC",
+    "core": [
+     "0x800AC6D0",
+     "0x800ACA5C"
+    ],
+    "boundaries_exist": "medium"
+   }
+  },
+  {
+   "name": null,
+   "region": "EA",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x800ACECC",
+    "end": "0x800AE1F8",
+    "core": [
+     "0x800AD800",
+     "0x800ADE70"
+    ],
+    "boundaries_exist": "medium"
+   }
+  },
+  {
+   "name": "uiobject.c",
+   "region": "EA",
+   "name_confidence": "medium",
+   "name_evidence": [
+    "TW06"
+   ],
+   "text": {
+    "start": "0x800AE1F8",
+    "end": "0x800AF324",
+    "core": [
+     "0x800AE1F8",
+     "0x800AF0A8"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "startUp.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "2002 tree"
+   ],
+   "text": {
+    "start": "0x800AF324",
+    "end": "0x800B2314",
+    "core": [
+     "0x800AF324",
+     "0x800B1A40"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "shadow.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "TW06",
+    "2002 tree"
+   ],
+   "text": {
+    "start": "0x800B2314",
+    "end": "0x800B34F0",
+    "core": [
+     "0x800B24E0",
+     "0x800B3438"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "GoComicCam.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "2002 tree"
+   ],
+   "text": {
+    "start": "0x800B34F0",
+    "end": "0x800B4B5C",
+    "core": [
+     "0x800B34F0",
+     "0x800B4AE0"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "GoShaderObject_Rain_Gc.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "TW06",
+    "2002 tree"
+   ],
+   "text": {
+    "start": "0x800B4B5C",
+    "end": "0x800B5A14",
+    "core": [
+     "0x800B4B5C",
+     "0x800B58B4"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "UAudMemStack.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "2002 tree"
+   ],
+   "text": {
+    "start": "0x800B5A14",
+    "end": "0x800B5C40",
+    "core": [
+     "0x800B5A14",
+     "0x800B5AAC"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "GoARAM.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert"
+   ],
+   "text": {
+    "start": "0x800B5C40",
+    "end": "0x800B6924",
+    "core": [
+     "0x800B62DC",
+     "0x800B64D8"
+    ],
+    "boundaries_exist": "medium"
+   }
+  },
+  {
+   "name": null,
+   "region": "EA",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x800B6924",
+    "end": "0x800B769C",
+    "core": [
+     "0x800B7210",
+     "0x800B7490"
+    ],
+    "boundaries_exist": "medium"
+   }
+  },
+  {
+   "name": "rcmp_mad_codec.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "2002 tree"
+   ],
+   "text": {
+    "start": "0x800B769C",
+    "end": "0x800B9FF0",
+    "core": [
+     "0x800B9100",
+     "0x800B9FF0"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": null,
+   "region": "EA",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x800B9FF0",
+    "end": "0x800BA74C",
+    "core": [
+     "0x800BA1A4",
+     "0x800BA734"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": null,
+   "region": "EA",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x800BA74C",
+    "end": "0x800BA940",
+    "core": [
+     "0x800BA74C",
+     "0x800BA940"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": null,
+   "region": "EA",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x800BA940",
+    "end": "0x800BAEB0",
+    "core": [
+     "0x800BA940",
+     "0x800BAD60"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "SitDevFile.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "TW06"
+   ],
+   "text": {
+    "start": "0x800BAEB0",
+    "end": "0x800BCD68",
+    "core": [
+     "0x800BAEB0",
+     "0x800BCA60"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": null,
+   "region": "EA",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x800BCD68",
+    "end": "0x800BD894",
+    "core": [
+     "0x800BD580",
+     "0x800BD580"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": "GoGolfCam.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "TW06"
+   ],
+   "text": {
+    "start": "0x800BD894",
+    "end": "0x800C7480",
+    "core": [
+     "0x800BD894",
+     "0x800C7450"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": null,
+   "region": "EA",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x800C7480",
+    "end": "0x800C808C",
+    "core": [
+     "0x800C7480",
+     "0x800C8068"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "GoBreakLine.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert"
+   ],
+   "text": {
+    "start": "0x800C808C",
+    "end": "0x800C937C",
+    "core": [
+     "0x800C808C",
+     "0x800C9310"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "AnimStream.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert"
+   ],
+   "text": {
+    "start": "0x800C937C",
+    "end": "0x800CC1EC",
+    "core": [
+     "0x800C937C",
+     "0x800CC1EC"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "SkinPart.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert"
+   ],
+   "text": {
+    "start": "0x800CC1EC",
+    "end": "0x800CF904",
+    "core": [
+     "0x800CD404",
+     "0x800CEA30"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": "analysisutilities.c",
+   "region": "EA",
+   "name_confidence": "medium",
+   "name_evidence": [
+    "TW06"
+   ],
+   "text": {
+    "start": "0x800CF904",
+    "end": "0x800D1698",
+    "core": [
+     "0x800D0550",
+     "0x800D1674"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": null,
+   "region": "EA",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x800D1698",
+    "end": "0x800D3244",
+    "core": [
+     "0x800D1698",
+     "0x800D2994"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "Earnings.c",
+   "region": "EA",
+   "name_confidence": "guess",
+   "name_evidence": [
+    "existing unit name (hand-made, behaviour-based)"
+   ],
+   "text": {
+    "start": "0x800D3244",
+    "end": "0x800D9E14",
+    "core": [
+     "0x800D33A8",
+     "0x800D9350"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": null,
+   "region": "EA",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x800D9E14",
+    "end": "0x800DAE44",
+    "core": [
+     "0x800DA36C",
+     "0x800DAE44"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "gameeffects.c",
+   "region": "EA",
+   "name_confidence": "medium",
+   "name_evidence": [
+    "TW06"
+   ],
+   "text": {
+    "start": "0x800DAE44",
+    "end": "0x800DCAD8",
+    "core": [
+     "0x800DAE44",
+     "0x800DCAD8"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "gamemode.c",
+   "region": "EA",
+   "name_confidence": "medium",
+   "name_evidence": [
+    "TW06"
+   ],
+   "text": {
+    "start": "0x800DCAD8",
+    "end": "0x800E0AF0",
+    "core": [
+     "0x800DD4B4",
+     "0x800E0A84"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": "gamemanager.cpp",
+   "region": "EA",
+   "name_confidence": "medium",
+   "name_evidence": [
+    "TW06",
+    "TW06 file is C++; the 2003 file was C (probably gamemanager.c)"
+   ],
+   "text": {
+    "start": "0x800E0AF0",
+    "end": "0x800E3B28",
+    "core": [
+     "0x800E276C",
+     "0x800E2810"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": "GameUI.c",
+   "region": "EA",
+   "name_confidence": "guess",
+   "name_evidence": [
+    "existing unit name (hand-made, behaviour-based)"
+   ],
+   "text": {
+    "start": "0x800E3B28",
+    "end": "0x800E4FFC",
+    "core": [
+     "0x800E4364",
+     "0x800E4FFC"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": "gameui.c",
+   "region": "EA",
+   "name_confidence": "guess",
+   "name_evidence": [
+    "TW06"
+   ],
+   "text": {
+    "start": "0x800E4FFC",
+    "end": "0x800E5E54",
+    "core": [
+     "0x800E4FFC",
+     "0x800E5E54"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": "GameAnalysis.c",
+   "region": "EA",
+   "name_confidence": "guess",
+   "name_evidence": [
+    "existing unit name (hand-made, behaviour-based)"
+   ],
+   "text": {
+    "start": "0x800E5E54",
+    "end": "0x800E68F0",
+    "core": [
+     "0x800E5E54",
+     "0x800E68F0"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": "GameModeAlternateShot.c",
+   "region": "EA",
+   "name_confidence": "guess",
+   "name_evidence": [
+    "existing unit name (hand-made, behaviour-based)"
+   ],
+   "text": {
+    "start": "0x800E68F0",
+    "end": "0x800E7980",
+    "core": [
+     "0x800E68F0",
+     "0x800E7980"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": "GameModeBattle.c",
+   "region": "EA",
+   "name_confidence": "guess",
+   "name_evidence": [
+    "existing unit name (hand-made, behaviour-based)"
+   ],
+   "text": {
+    "start": "0x800E7980",
+    "end": "0x800E81C4",
+    "core": [
+     "0x800E7980",
+     "0x800E81C4"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": "GameModeBestBall.c",
+   "region": "EA",
+   "name_confidence": "guess",
+   "name_evidence": [
+    "existing unit name (hand-made, behaviour-based)"
+   ],
+   "text": {
+    "start": "0x800E81C4",
+    "end": "0x800E8D58",
+    "core": [
+     "0x800E81C4",
+     "0x800E8D58"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": "GameModeFourBall.c",
+   "region": "EA",
+   "name_confidence": "guess",
+   "name_evidence": [
+    "existing unit name (hand-made, behaviour-based)"
+   ],
+   "text": {
+    "start": "0x800E8D58",
+    "end": "0x800E9E40",
+    "core": [
+     "0x800E8D58",
+     "0x800E9E40"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": "GameModeMatch.c",
+   "region": "EA",
+   "name_confidence": "guess",
+   "name_evidence": [
+    "existing unit name (hand-made, behaviour-based)"
+   ],
+   "text": {
+    "start": "0x800E9E40",
+    "end": "0x800EACD8",
+    "core": [
+     "0x800E9E40",
+     "0x800EACD8"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": "GameMode5.c",
+   "region": "EA",
+   "name_confidence": "guess",
+   "name_evidence": [
+    "existing unit name (hand-made, behaviour-based)"
+   ],
+   "text": {
+    "start": "0x800EACD8",
+    "end": "0x800ED738",
+    "core": [
+     "0x800EACD8",
+     "0x800EACD8"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": "GameMode9.c",
+   "region": "EA",
+   "name_confidence": "guess",
+   "name_evidence": [
+    "existing unit name (hand-made, behaviour-based)"
+   ],
+   "text": {
+    "start": "0x800ED738",
+    "end": "0x800EDD18",
+    "core": [
+     "0x800EDA74",
+     "0x800EDD18"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": "GameMode23.c",
+   "region": "EA",
+   "name_confidence": "guess",
+   "name_evidence": [
+    "existing unit name (hand-made, behaviour-based)"
+   ],
+   "text": {
+    "start": "0x800EDD18",
+    "end": "0x800F0448",
+    "core": [
+     "0x800EDD18",
+     "0x800F0448"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": "GameMode24.c",
+   "region": "EA",
+   "name_confidence": "guess",
+   "name_evidence": [
+    "existing unit name (hand-made, behaviour-based)"
+   ],
+   "text": {
+    "start": "0x800F0448",
+    "end": "0x800F125C",
+    "core": [
+     "0x800F0448",
+     "0x800F125C"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": "GameModeReplay.c",
+   "region": "EA",
+   "name_confidence": "guess",
+   "name_evidence": [
+    "existing unit name (hand-made, behaviour-based)"
+   ],
+   "text": {
+    "start": "0x800F125C",
+    "end": "0x800F19D4",
+    "core": [
+     "0x800F125C",
+     "0x800F193C"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": "GameTargets.c",
+   "region": "EA",
+   "name_confidence": "guess",
+   "name_evidence": [
+    "existing unit name (hand-made, behaviour-based)"
+   ],
+   "text": {
+    "start": "0x800F19D4",
+    "end": "0x800F2984",
+    "core": [
+     "0x800F266C",
+     "0x800F2984"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": "GameMode14.c",
+   "region": "EA",
+   "name_confidence": "guess",
+   "name_evidence": [
+    "existing unit name (hand-made, behaviour-based)"
+   ],
+   "text": {
+    "start": "0x800F2984",
+    "end": "0x800F39F4",
+    "core": [
+     "0x800F2984",
+     "0x800F2984"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": "GameMode15.c",
+   "region": "EA",
+   "name_confidence": "guess",
+   "name_evidence": [
+    "existing unit name (hand-made, behaviour-based)"
+   ],
+   "text": {
+    "start": "0x800F39F4",
+    "end": "0x800F4B40",
+    "core": [
+     "0x800F3EBC",
+     "0x800F4584"
+    ],
+    "boundaries_exist": "medium"
+   }
+  },
+  {
+   "name": "GameMode16.c",
+   "region": "EA",
+   "name_confidence": "guess",
+   "name_evidence": [
+    "existing unit name (hand-made, behaviour-based)"
+   ],
+   "text": {
+    "start": "0x800F4B40",
+    "end": "0x800F5AAC",
+    "core": [
+     "0x800F5014",
+     "0x800F5AAC"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": "GameMode17.c",
+   "region": "EA",
+   "name_confidence": "guess",
+   "name_evidence": [
+    "existing unit name (hand-made, behaviour-based)"
+   ],
+   "text": {
+    "start": "0x800F5AAC",
+    "end": "0x800F6A60",
+    "core": [
+     "0x800F5AAC",
+     "0x800F5AAC"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": "GameMode13.c",
+   "region": "EA",
+   "name_confidence": "guess",
+   "name_evidence": [
+    "existing unit name (hand-made, behaviour-based)"
+   ],
+   "text": {
+    "start": "0x800F6A60",
+    "end": "0x800F80FC",
+    "core": [
+     "0x800F6ED4",
+     "0x800F80FC"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": "GameMode2.c",
+   "region": "EA",
+   "name_confidence": "guess",
+   "name_evidence": [
+    "existing unit name (hand-made, behaviour-based)"
+   ],
+   "text": {
+    "start": "0x800F80FC",
+    "end": "0x800F944C",
+    "core": [
+     "0x800F80FC",
+     "0x800F80FC"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": "GameMode6.c",
+   "region": "EA",
+   "name_confidence": "guess",
+   "name_evidence": [
+    "existing unit name (hand-made, behaviour-based)"
+   ],
+   "text": {
+    "start": "0x800F944C",
+    "end": "0x800F9610",
+    "core": [
+     "0x800FB35C",
+     "0x800FB35C"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": "GameMode7.c",
+   "region": "EA",
+   "name_confidence": "guess",
+   "name_evidence": [
+    "existing unit name (hand-made, behaviour-based)"
+   ],
+   "text": {
+    "start": "0x800F9610",
+    "end": "0x800F986C",
+    "core": [
+     "0x800F9610",
+     "0x800F986C"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": "GameMode8.c",
+   "region": "EA",
+   "name_confidence": "guess",
+   "name_evidence": [
+    "existing unit name (hand-made, behaviour-based)"
+   ],
+   "text": {
+    "start": "0x800F986C",
+    "end": "0x800FE1B4",
+    "core": [
+     "0x800F986C",
+     "0x800FE1B4"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": "GameModeStableford.c",
+   "region": "EA",
+   "name_confidence": "guess",
+   "name_evidence": [
+    "existing unit name (hand-made, behaviour-based)"
+   ],
+   "text": {
+    "start": "0x800FE1B4",
+    "end": "0x800FEAFC",
+    "core": [
+     "0x800FE1B4",
+     "0x800FE1B4"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": "GameMode12.c",
+   "region": "EA",
+   "name_confidence": "guess",
+   "name_evidence": [
+    "existing unit name (hand-made, behaviour-based)"
+   ],
+   "text": {
+    "start": "0x800FEAFC",
+    "end": "0x800FF700",
+    "core": [
+     "0x800FEC80",
+     "0x800FF700"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": "GameModeStroke.c",
+   "region": "EA",
+   "name_confidence": "guess",
+   "name_evidence": [
+    "existing unit name (hand-made, behaviour-based)"
+   ],
+   "text": {
+    "start": "0x800FF700",
+    "end": "0x800FFF34",
+    "core": [
+     "0x800FF700",
+     "0x800FF700"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": "GameMode11.c",
+   "region": "EA",
+   "name_confidence": "guess",
+   "name_evidence": [
+    "existing unit name (hand-made, behaviour-based)"
+   ],
+   "text": {
+    "start": "0x800FFF34",
+    "end": "0x80101FEC",
+    "core": [
+     "0x80100508",
+     "0x80101FEC"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": "GameMode4.c",
+   "region": "EA",
+   "name_confidence": "guess",
+   "name_evidence": [
+    "existing unit name (hand-made, behaviour-based)"
+   ],
+   "text": {
+    "start": "0x80101FEC",
+    "end": "0x80102AC8",
+    "core": [
+     "0x80101FEC",
+     "0x80102874"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": null,
+   "region": "EA",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x80102AC8",
+    "end": "0x801037F8",
+    "core": [
+     "0x80103684",
+     "0x80103684"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": "FE_CrAPDB.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "TW06"
+   ],
+   "text": {
+    "start": "0x801037F8",
+    "end": "0x80109120",
+    "core": [
+     "0x80103EFC",
+     "0x801069AC"
+    ],
+    "boundaries_exist": "medium"
+   }
+  },
+  {
+   "name": "LLDynTex.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert"
+   ],
+   "text": {
+    "start": "0x80109120",
+    "end": "0x8010A6A8",
+    "core": [
+     "0x80109120",
+     "0x80109EAC"
+    ],
+    "boundaries_exist": "medium"
+   }
+  },
+  {
+   "name": null,
+   "region": "EA",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x8010A6A8",
+    "end": "0x8010C4A0",
+    "core": [
+     "0x8010A788",
+     "0x8010BCFC"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "CharSliders.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "TW06"
+   ],
+   "text": {
+    "start": "0x8010C4A0",
+    "end": "0x8010DC94",
+    "core": [
+     "0x8010C4A0",
+     "0x8010DC94"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "FE_PGATourMessages.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert"
+   ],
+   "text": {
+    "start": "0x8010DC94",
+    "end": "0x8010F6C8",
+    "core": [
+     "0x8010DCE8",
+     "0x8010EEA8"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "FE_LogoDesign.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert"
+   ],
+   "text": {
+    "start": "0x8010F6C8",
+    "end": "0x8010FF9C",
+    "core": [
+     "0x8010F6C8",
+     "0x8010FB70"
+    ],
+    "boundaries_exist": "medium"
+   }
+  },
+  {
+   "name": null,
+   "region": "EA",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x8010FF9C",
+    "end": "0x801104AC",
+    "core": [
+     "0x8010FF9C",
+     "0x80110234"
+    ],
+    "boundaries_exist": "medium"
+   }
+  },
+  {
+   "name": "hwsBurn.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert"
+   ],
+   "text": {
+    "start": "0x801104AC",
+    "end": "0x8011206C",
+    "core": [
+     "0x801104AC",
+     "0x80111EB0"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "hwsMaterial_Gc.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert"
+   ],
+   "text": {
+    "start": "0x8011206C",
+    "end": "0x80112804",
+    "core": [
+     "0x8011206C",
+     "0x801127A0"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "hwsOverride_Gc.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert"
+   ],
+   "text": {
+    "start": "0x80112804",
+    "end": "0x80112B80",
+    "core": [
+     "0x80112848",
+     "0x80112A10"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "hwsRender_Gc.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert"
+   ],
+   "text": {
+    "start": "0x80112B80",
+    "end": "0x80113E60",
+    "core": [
+     "0x80112C64",
+     "0x8011368C"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "DynChain.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "TW06"
+   ],
+   "text": {
+    "start": "0x80113E60",
+    "end": "0x80116678",
+    "core": [
+     "0x80113E60",
+     "0x801164D4"
+    ],
+    "boundaries_exist": "medium"
+   }
+  },
+  {
+   "name": null,
+   "region": "EA",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x80116678",
+    "end": "0x80117600",
+    "core": [
+     "0x80116678",
+     "0x80117348"
+    ],
+    "boundaries_exist": "medium"
+   }
+  },
+  {
+   "name": null,
+   "region": "EA",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x80117600",
+    "end": "0x8011C068",
+    "core": [
+     "0x80118710",
+     "0x8011BCFC"
+    ],
+    "boundaries_exist": "medium"
+   }
+  },
+  {
+   "name": "SkinMorph.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert"
+   ],
+   "text": {
+    "start": "0x8011C068",
+    "end": "0x8011CEB0",
+    "core": [
+     "0x8011C27C",
+     "0x8011CADC"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": "fe_stats.c",
+   "region": "EA",
+   "name_confidence": "medium",
+   "name_evidence": [
+    "TW06"
+   ],
+   "text": {
+    "start": "0x8011CEB0",
+    "end": "0x8011D280",
+    "core": [
+     "0x8011CEB0",
+     "0x8011D268"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": "llrtclock.c",
+   "region": "EA",
+   "name_confidence": "medium",
+   "name_evidence": [
+    "TW06"
+   ],
+   "text": {
+    "start": "0x8011D280",
+    "end": "0x8011E170",
+    "core": [
+     "0x8011D280",
+     "0x8011E170"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": "GoGrass.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "TW06"
+   ],
+   "text": {
+    "start": "0x8011E170",
+    "end": "0x80120304",
+    "core": [
+     "0x8011E170",
+     "0x80120194"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": null,
+   "region": "EA",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x80120304",
+    "end": "0x8012168C",
+    "core": [
+     "0x80120304",
+     "0x8012168C"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "TibExt.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "TW06"
+   ],
+   "text": {
+    "start": "0x8012168C",
+    "end": "0x80122AF0",
+    "core": [
+     "0x80121C80",
+     "0x80122128"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "gbacable.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert"
+   ],
+   "text": {
+    "start": "0x80122AF0",
+    "end": "0x80124A40",
+    "core": [
+     "0x80122CFC",
+     "0x80123E34"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "EASportsBio.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert"
+   ],
+   "text": {
+    "start": "0x80124A40",
+    "end": "0x8012597C",
+    "core": [
+     "0x80124B54",
+     "0x8012597C"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": null,
+   "region": "EA",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x8012597C",
+    "end": "0x801270F0",
+    "core": [
+     "0x80125A24",
+     "0x80127098"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": "SkinBurn.c",
+   "region": "EA",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert"
+   ],
+   "text": {
+    "start": "0x801270F0",
+    "end": "0x80127D84",
+    "core": [
+     "0x801270F0",
+     "0x80127B10"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
+   "name": null,
+   "region": "EA",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x80127D84",
+    "end": "0x8012E950",
+    "core": [
+     "0x80128FD4",
+     "0x8012E950"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "vi.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert"
+   ],
+   "text": {
+    "start": "0x8012E950",
+    "end": "0x8013042C",
+    "core": [
+     "0x8012E950",
+     "0x8013042C"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "EXIBios.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8013042C",
+    "end": "0x80131D08",
+    "core": [
+     "0x8013042C",
+     "0x80131D08"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "EXIUart.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x80131D08",
+    "end": "0x80131F78",
+    "core": [
+     "0x80131D08",
+     "0x80131F78"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "SIBios.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x80131F78",
+    "end": "0x801337D8",
+    "core": [
+     "0x80131F78",
+     "0x801337D8"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "SISamplingRate.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x801337D8",
+    "end": "0x801338E0",
+    "core": [
+     "0x801337D8",
+     "0x801338E0"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": null,
+   "region": "SDK",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x801338E0",
+    "end": "0x80133918",
+    "core": [
+     "0x801338E0",
+     "0x80133918"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "ar.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x80133918",
+    "end": "0x8013538C",
+    "core": [
+     "0x80133918",
+     "0x8013538C"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "arq.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8013538C",
+    "end": "0x80135810",
+    "core": [
+     "0x8013538C",
+     "0x80135810"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "AX.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x80135810",
+    "end": "0x8013584C",
+    "core": [
+     "0x80135810",
+     "0x8013584C"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "AXAlloc.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8013584C",
+    "end": "0x80135BE0",
+    "core": [
+     "0x8013584C",
+     "0x80135BE0"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "AXAux.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x80135BE0",
+    "end": "0x80136058",
+    "core": [
+     "0x80135BE0",
+     "0x80136058"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": null,
+   "region": "SDK",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x80136058",
+    "end": "0x8013606C",
+    "core": [
+     "0x80136058",
+     "0x8013606C"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "AXCL.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8013606C",
+    "end": "0x80136790",
+    "core": [
+     "0x8013606C",
+     "0x80136790"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": null,
+   "region": "SDK",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x80136790",
+    "end": "0x80136E08",
+    "core": [
+     "0x80136790",
+     "0x80136E08"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "AXSPB.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x80136E08",
+    "end": "0x801372C0",
+    "core": [
+     "0x80136E08",
+     "0x801372C0"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": null,
+   "region": "SDK",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x801372C0",
+    "end": "0x80137C38",
+    "core": [
+     "0x801372C0",
+     "0x80137C38"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "AXVPB.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x80137C38",
+    "end": "0x80138184",
+    "core": [
+     "0x80137C38",
+     "0x80138184"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "AXProf.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x80138184",
+    "end": "0x801381CC",
+    "core": [
+     "0x80138184",
+     "0x801381CC"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "reverb_hi.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x801381CC",
+    "end": "0x80138EC8",
+    "core": [
+     "0x801381CC",
+     "0x80138EC8"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "delay.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x80138EC8",
+    "end": "0x80139374",
+    "core": [
+     "0x80138EC8",
+     "0x80139374"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": null,
+   "region": "SDK",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x80139374",
+    "end": "0x801393D0",
+    "core": [
+     "0x80139374",
+     "0x801393D0"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "PPCArch.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x801393D0",
+    "end": "0x801394C0",
+    "core": [
+     "0x801393D0",
+     "0x801394C0"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "db.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x801394C0",
+    "end": "0x801395AC",
+    "core": [
+     "0x801394C0",
+     "0x801395AC"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "dsp.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x801395AC",
+    "end": "0x801397FC",
+    "core": [
+     "0x801395AC",
+     "0x801397FC"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "dsp_debug.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x801397FC",
+    "end": "0x8013984C",
+    "core": [
+     "0x801397FC",
+     "0x8013984C"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "dsp_task.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8013984C",
+    "end": "0x8013A0D0",
+    "core": [
+     "0x8013984C",
+     "0x8013A0D0"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "dvdlow.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8013A0D0",
+    "end": "0x8013AF10",
+    "core": [
+     "0x8013A0D0",
+     "0x8013AF10"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "dvdfs.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert"
+   ],
+   "text": {
+    "start": "0x8013AF10",
+    "end": "0x8013B3C4",
+    "core": [
+     "0x8013AF10",
+     "0x8013B3C4"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": null,
+   "region": "SDK",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x8013B3C4",
+    "end": "0x8013B3C8",
+    "core": [
+     "0x8013B3C4",
+     "0x8013B3C8"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "dvd.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert"
+   ],
+   "text": {
+    "start": "0x8013B3C8",
+    "end": "0x8013DCB4",
+    "core": [
+     "0x8013B3C8",
+     "0x8013DCB4"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "dvdqueue.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8013DCB4",
+    "end": "0x8013DEAC",
+    "core": [
+     "0x8013DCB4",
+     "0x8013DEAC"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "dvderror.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8013DEAC",
+    "end": "0x8013E044",
+    "core": [
+     "0x8013DEAC",
+     "0x8013E044"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "dvdidutils.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8013E044",
+    "end": "0x8013E13C",
+    "core": [
+     "0x8013E044",
+     "0x8013E13C"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "dvdFatal.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8013E13C",
+    "end": "0x8013E16C",
+    "core": [
+     "0x8013E13C",
+     "0x8013E16C"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "fstload.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8013E16C",
+    "end": "0x8013E3AC",
+    "core": [
+     "0x8013E16C",
+     "0x8013E3AC"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "GXInit.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8013E3AC",
+    "end": "0x8013F57C",
+    "core": [
+     "0x8013E3AC",
+     "0x8013F57C"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "GXFifo.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8013F57C",
+    "end": "0x8013FF30",
+    "core": [
+     "0x8013F57C",
+     "0x8013FF30"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": null,
+   "region": "SDK",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x8013FF30",
+    "end": "0x8013FF38",
+    "core": [
+     "0x8013FF30",
+     "0x8013FF38"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "GXAttr.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8013FF38",
+    "end": "0x801410A8",
+    "core": [
+     "0x8013FF38",
+     "0x801410A8"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "GXMisc.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x801410A8",
+    "end": "0x801415AC",
+    "core": [
+     "0x801410A8",
+     "0x801415AC"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "GXGeometry.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x801415AC",
+    "end": "0x8014195C",
+    "core": [
+     "0x801415AC",
+     "0x8014195C"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "GXFrameBuf.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8014195C",
+    "end": "0x80142440",
+    "core": [
+     "0x8014195C",
+     "0x80142440"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "GXLight.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x80142440",
+    "end": "0x801427D0",
+    "core": [
+     "0x80142440",
+     "0x801427D0"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "GXTexture.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x801427D0",
+    "end": "0x80143768",
+    "core": [
+     "0x801427D0",
+     "0x80143768"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "GXBump.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x80143768",
+    "end": "0x80143AE0",
+    "core": [
+     "0x80143768",
+     "0x80143AE0"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "GXTev.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x80143AE0",
+    "end": "0x801442C4",
+    "core": [
+     "0x80143AE0",
+     "0x801442C4"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "GXPixel.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x801442C4",
+    "end": "0x80144898",
+    "core": [
+     "0x801442C4",
+     "0x80144898"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "GXStubs.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x80144898",
+    "end": "0x8014489C",
+    "core": [
+     "0x80144898",
+     "0x8014489C"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "GXDisplayList.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8014489C",
+    "end": "0x80144AA8",
+    "core": [
+     "0x8014489C",
+     "0x80144AA8"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "GXTransform.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x80144AA8",
+    "end": "0x80145140",
+    "core": [
+     "0x80144AA8",
+     "0x80145140"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "GXPerf.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x80145140",
+    "end": "0x80145998",
+    "core": [
+     "0x80145140",
+     "0x80145998"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": null,
+   "region": "SDK",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x80145998",
+    "end": "0x80147B94",
+    "core": [
+     "0x80145998",
+     "0x80147B94"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "mtx.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x80147B94",
+    "end": "0x80147DB0",
+    "core": [
+     "0x80147B94",
+     "0x80147DB0"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "mtx44.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x80147DB0",
+    "end": "0x80147E48",
+    "core": [
+     "0x80147DB0",
+     "0x80147E48"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "OS.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x80147E48",
+    "end": "0x80148790",
+    "core": [
+     "0x80147E48",
+     "0x80148790"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "OSAlarm.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x80148790",
+    "end": "0x80148E40",
+    "core": [
+     "0x80148790",
+     "0x80148E40"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "OSAlloc.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x80148E40",
+    "end": "0x80149150",
+    "core": [
+     "0x80148E40",
+     "0x80149150"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "OSArena.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x80149150",
+    "end": "0x80149170",
+    "core": [
+     "0x80149150",
+     "0x80149170"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "OSAudioSystem.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x80149170",
+    "end": "0x80149404",
+    "core": [
+     "0x80149170",
+     "0x80149404"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "OSCache.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x80149404",
+    "end": "0x8014983C",
+    "core": [
+     "0x80149404",
+     "0x8014983C"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "OSContext.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8014983C",
+    "end": "0x8014A0AC",
+    "core": [
+     "0x8014983C",
+     "0x8014A0AC"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "OSError.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8014A0AC",
+    "end": "0x8014A758",
+    "core": [
+     "0x8014A0AC",
+     "0x8014A758"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "OSFont.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8014A758",
+    "end": "0x8014A7B0",
+    "core": [
+     "0x8014A758",
+     "0x8014A7B0"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "OSInterrupt.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8014A7B0",
+    "end": "0x8014B01C",
+    "core": [
+     "0x8014A7B0",
+     "0x8014B01C"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "OSLink.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8014B01C",
+    "end": "0x8014B034",
+    "core": [
+     "0x8014B01C",
+     "0x8014B034"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "OSMemory.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8014B034",
+    "end": "0x8014B314",
+    "core": [
+     "0x8014B034",
+     "0x8014B314"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "OSMutex.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8014B314",
+    "end": "0x8014B70C",
+    "core": [
+     "0x8014B314",
+     "0x8014B70C"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "OSReboot.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8014B70C",
+    "end": "0x8014B8F0",
+    "core": [
+     "0x8014B70C",
+     "0x8014B8F0"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "OSReset.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8014B8F0",
+    "end": "0x8014BCD4",
+    "core": [
+     "0x8014B8F0",
+     "0x8014BCD4"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "OSResetSW.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8014BCD4",
+    "end": "0x8014C060",
+    "core": [
+     "0x8014BCD4",
+     "0x8014C060"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "OSRtc.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8014C060",
+    "end": "0x8014C8D4",
+    "core": [
+     "0x8014C060",
+     "0x8014C8D4"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": null,
+   "region": "SDK",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x8014C8D4",
+    "end": "0x8014C9FC",
+    "core": [
+     "0x8014C8D4",
+     "0x8014C9FC"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "OSSync.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8014C9FC",
+    "end": "0x8014CA80",
+    "core": [
+     "0x8014C9FC",
+     "0x8014CA80"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": null,
+   "region": "SDK",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x8014CA80",
+    "end": "0x8014CA84",
+    "core": [
+     "0x8014CA80",
+     "0x8014CA84"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "OSThread.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8014CA84",
+    "end": "0x8014E48C",
+    "core": [
+     "0x8014CA84",
+     "0x8014E48C"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "OSTime.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8014E48C",
+    "end": "0x8014E8B0",
+    "core": [
+     "0x8014E48C",
+     "0x8014E8B0"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "__ppc_eabi_init.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8014E8B0",
+    "end": "0x8014E944",
+    "core": [
+     "0x8014E8B0",
+     "0x8014E944"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "PadClamp.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8014E944",
+    "end": "0x8014EB88",
+    "core": [
+     "0x8014E944",
+     "0x8014EB88"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "Pad.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8014EB88",
+    "end": "0x80150658",
+    "core": [
+     "0x8014EB88",
+     "0x80150658"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "ai.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x80150658",
+    "end": "0x80150F24",
+    "core": [
+     "0x80150658",
+     "0x80150F24"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": null,
+   "region": "SDK",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x80150F24",
+    "end": "0x80150F2C",
+    "core": [
+     "0x80150F24",
+     "0x80150F2C"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "odenotstub.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x80150F2C",
+    "end": "0x801519A4",
+    "core": [
+     "0x80150F2C",
+     "0x801519A4"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "__va_arg.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x801519A4",
+    "end": "0x80151A6C",
+    "core": [
+     "0x801519A4",
+     "0x80151A6C"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "global_destructor_chain.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x80151A6C",
+    "end": "0x80151AB4",
+    "core": [
+     "0x80151A6C",
+     "0x80151AB4"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "runtime.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x80151AB4",
+    "end": "0x801520F8",
+    "core": [
+     "0x80151AB4",
+     "0x801520F8"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "GCN_mem_alloc.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x801520F8",
+    "end": "0x801521B0",
+    "core": [
+     "0x801520F8",
+     "0x801521B0"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "abort_exit.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x801521B0",
+    "end": "0x801522A0",
+    "core": [
+     "0x801521B0",
+     "0x801522A0"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "alloc.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x801522A0",
+    "end": "0x80152754",
+    "core": [
+     "0x801522A0",
+     "0x80152754"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "ansi_files.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x80152754",
+    "end": "0x8015286C",
+    "core": [
+     "0x80152754",
+     "0x8015286C"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": null,
+   "region": "SDK",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x8015286C",
+    "end": "0x801538EC",
+    "core": [
+     "0x8015286C",
+     "0x801538EC"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "ansi_fp.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x801538EC",
+    "end": "0x80155BD0",
+    "core": [
+     "0x801538EC",
+     "0x80155BD0"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": null,
+   "region": "SDK",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x80155BD0",
+    "end": "0x80155E48",
+    "core": [
+     "0x80155BD0",
+     "0x80155E48"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "buffer_io.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x80155E48",
+    "end": "0x80155F40",
+    "core": [
+     "0x80155E48",
+     "0x80155F40"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": null,
+   "region": "SDK",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x80155F40",
+    "end": "0x80155F4C",
+    "core": [
+     "0x80155F40",
+     "0x80155F4C"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "ctype.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x80155F4C",
+    "end": "0x80155F70",
+    "core": [
+     "0x80155F4C",
+     "0x80155F70"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": null,
+   "region": "SDK",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x80155F70",
+    "end": "0x80155F88",
+    "core": [
+     "0x80155F70",
+     "0x80155F88"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "direct_io.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x80155F88",
+    "end": "0x80156310",
+    "core": [
+     "0x80155F88",
+     "0x80156310"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "file_io.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x80156310",
+    "end": "0x80156604",
+    "core": [
+     "0x80156310",
+     "0x80156604"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "FILE_POS.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x80156604",
+    "end": "0x80156954",
+    "core": [
+     "0x80156604",
+     "0x80156954"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "mbstring.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x80156954",
+    "end": "0x80156C78",
+    "core": [
+     "0x80156954",
+     "0x80156C78"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "mem.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x80156C78",
+    "end": "0x80156DE8",
+    "core": [
+     "0x80156C78",
+     "0x80156DE8"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "mem_funcs.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x80156DE8",
+    "end": "0x80156F54",
+    "core": [
+     "0x80156DE8",
+     "0x80156F54"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": null,
+   "region": "SDK",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x80156F54",
+    "end": "0x801570B8",
+    "core": [
+     "0x80156F54",
+     "0x801570B8"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "misc_io.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x801570B8",
+    "end": "0x801570C8",
+    "core": [
+     "0x801570B8",
+     "0x801570C8"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "printf.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x801570C8",
+    "end": "0x8015929C",
+    "core": [
+     "0x801570C8",
+     "0x8015929C"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": null,
+   "region": "SDK",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x8015929C",
+    "end": "0x801594CC",
+    "core": [
+     "0x8015929C",
+     "0x801594CC"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "sscanf.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x801594CC",
+    "end": "0x8015955C",
+    "core": [
+     "0x801594CC",
+     "0x8015955C"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": null,
+   "region": "SDK",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x8015955C",
+    "end": "0x8015A450",
+    "core": [
+     "0x8015955C",
+     "0x8015A450"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "string.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8015A450",
+    "end": "0x8015A8D0",
+    "core": [
+     "0x8015A450",
+     "0x8015A8D0"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "strtold.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8015A8D0",
+    "end": "0x8015B8DC",
+    "core": [
+     "0x8015A8D0",
+     "0x8015B8DC"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "strtoul.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8015B8DC",
+    "end": "0x8015C120",
+    "core": [
+     "0x8015B8DC",
+     "0x8015C120"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": null,
+   "region": "SDK",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x8015C120",
+    "end": "0x8015C1F8",
+    "core": [
+     "0x8015C120",
+     "0x8015C1F8"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "wchar_io.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8015C1F8",
+    "end": "0x8015C280",
+    "core": [
+     "0x8015C1F8",
+     "0x8015C280"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "e_acos.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8015C280",
+    "end": "0x8015C590",
+    "core": [
+     "0x8015C280",
+     "0x8015C590"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "e_asin.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8015C590",
+    "end": "0x8015C7F4",
+    "core": [
+     "0x8015C590",
+     "0x8015C7F4"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "e_atan2.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8015C7F4",
+    "end": "0x8015CA84",
+    "core": [
+     "0x8015C7F4",
+     "0x8015CA84"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "e_fmod.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8015CA84",
+    "end": "0x8015CDC0",
+    "core": [
+     "0x8015CA84",
+     "0x8015CDC0"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "e_log.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8015CDC0",
+    "end": "0x8015D03C",
+    "core": [
+     "0x8015CDC0",
+     "0x8015D03C"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "e_pow.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8015D03C",
+    "end": "0x8015D8F0",
+    "core": [
+     "0x8015D03C",
+     "0x8015D8F0"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "e_rem_pio2.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8015D8F0",
+    "end": "0x8015DC90",
+    "core": [
+     "0x8015D8F0",
+     "0x8015DC90"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "k_cos.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8015DC90",
+    "end": "0x8015DD84",
+    "core": [
+     "0x8015DC90",
+     "0x8015DD84"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "k_rem_pio2.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8015DD84",
+    "end": "0x8015EBD8",
+    "core": [
+     "0x8015DD84",
+     "0x8015EBD8"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "k_sin.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8015EBD8",
+    "end": "0x8015EC78",
+    "core": [
+     "0x8015EBD8",
+     "0x8015EC78"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "k_tan.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8015EC78",
+    "end": "0x8015EE8C",
+    "core": [
+     "0x8015EC78",
+     "0x8015EE8C"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "s_atan.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8015EE8C",
+    "end": "0x8015F0A4",
+    "core": [
+     "0x8015EE8C",
+     "0x8015F0A4"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "s_copysign.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8015F0A4",
+    "end": "0x8015F0CC",
+    "core": [
+     "0x8015F0A4",
+     "0x8015F0CC"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "s_cos.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8015F0CC",
+    "end": "0x8015F1A0",
+    "core": [
+     "0x8015F0CC",
+     "0x8015F1A0"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "s_floor.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8015F1A0",
+    "end": "0x8015F2E8",
+    "core": [
+     "0x8015F1A0",
+     "0x8015F2E8"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "s_frexp.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8015F2E8",
+    "end": "0x8015F374",
+    "core": [
+     "0x8015F2E8",
+     "0x8015F374"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "s_ldexp.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8015F374",
+    "end": "0x8015F538",
+    "core": [
+     "0x8015F374",
+     "0x8015F538"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "s_modf.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8015F538",
+    "end": "0x8015F634",
+    "core": [
+     "0x8015F538",
+     "0x8015F634"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "s_sin.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8015F634",
+    "end": "0x8015F70C",
+    "core": [
+     "0x8015F634",
+     "0x8015F70C"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "s_tan.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8015F70C",
+    "end": "0x8015F784",
+    "core": [
+     "0x8015F70C",
+     "0x8015F784"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": null,
+   "region": "SDK",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x8015F784",
+    "end": "0x8015F8D0",
+    "core": [
+     "0x8015F784",
+     "0x8015F8D0"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "mainloop.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8015F8D0",
+    "end": "0x8015F9C8",
+    "core": [
+     "0x8015F8D0",
+     "0x8015F9C8"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "nubevent.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8015F9C8",
+    "end": "0x8015FBF0",
+    "core": [
+     "0x8015F9C8",
+     "0x8015FBF0"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "nubinit.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8015FBF0",
+    "end": "0x8015FD88",
+    "core": [
+     "0x8015FBF0",
+     "0x8015FD88"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "msg.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8015FD88",
+    "end": "0x8015FDCC",
+    "core": [
+     "0x8015FD88",
+     "0x8015FDCC"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "msgbuf.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8015FDCC",
+    "end": "0x80160610",
+    "core": [
+     "0x8015FDCC",
+     "0x80160610"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "serpoll.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x80160610",
+    "end": "0x801608C0",
+    "core": [
+     "0x80160610",
+     "0x801608C0"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "usr_put.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x801608C0",
+    "end": "0x8016094C",
+    "core": [
+     "0x801608C0",
+     "0x8016094C"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "dispatch.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8016094C",
+    "end": "0x80160AC4",
+    "core": [
+     "0x8016094C",
+     "0x80160AC4"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "msghndlr.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x80160AC4",
+    "end": "0x80161A94",
+    "core": [
+     "0x80160AC4",
+     "0x80161A94"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "support.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x80161A94",
+    "end": "0x801621C8",
+    "core": [
+     "0x80161A94",
+     "0x801621C8"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "mutex_TRK.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x801621C8",
+    "end": "0x801621E0",
+    "core": [
+     "0x801621C8",
+     "0x801621E0"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "notify.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x801621E0",
+    "end": "0x80162278",
+    "core": [
+     "0x801621E0",
+     "0x80162278"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "flush_cache.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x80162278",
+    "end": "0x801622B0",
+    "core": [
+     "0x80162278",
+     "0x801622B0"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "mem_TRK.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x801622B0",
+    "end": "0x80162378",
+    "core": [
+     "0x801622B0",
+     "0x80162378"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "targimpl.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x80162378",
+    "end": "0x80163DD0",
+    "core": [
+     "0x80162378",
+     "0x80163DD0"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "mpc_7xx_603e.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x80163DD0",
+    "end": "0x80164140",
+    "core": [
+     "0x80163DD0",
+     "0x80164140"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "dolphin_trk.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x80164140",
+    "end": "0x801643C8",
+    "core": [
+     "0x80164140",
+     "0x801643C8"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "main_TRK.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x801643C8",
+    "end": "0x80164420",
+    "core": [
+     "0x801643C8",
+     "0x80164420"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "dolphin_trk_glue.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x80164420",
+    "end": "0x80164978",
+    "core": [
+     "0x80164420",
+     "0x80164978"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "targcont.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x80164978",
+    "end": "0x801649AC",
+    "core": [
+     "0x80164978",
+     "0x801649AC"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "target_options.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x801649AC",
+    "end": "0x801649C8",
+    "core": [
+     "0x801649AC",
+     "0x801649C8"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "mslsupp.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x801649C8",
+    "end": "0x80164B40",
+    "core": [
+     "0x801649C8",
+     "0x80164B40"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "UDP_Stubs.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x80164B40",
+    "end": "0x80164B88",
+    "core": [
+     "0x80164B40",
+     "0x80164B88"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "main.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x80164B88",
+    "end": "0x80164ECC",
+    "core": [
+     "0x80164B88",
+     "0x80164ECC"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "CircleBuffer.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x80164ECC",
+    "end": "0x80165134",
+    "core": [
+     "0x80164ECC",
+     "0x80165134"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "main.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x80165134",
+    "end": "0x80165480",
+    "core": [
+     "0x80165134",
+     "0x80165480"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "MWTrace.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x80165480",
+    "end": "0x801654D0",
+    "core": [
+     "0x80165480",
+     "0x801654D0"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": null,
+   "region": "EA-UIStudio",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x801654D0",
+    "end": "0x8016604C",
+    "core": [
+     "0x801654D0",
+     "0x8016604C"
+    ],
+    "boundaries_exist": "medium"
+   }
+  },
+  {
+   "name": "UIStudio.c",
+   "region": "EA-UIStudio",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert"
+   ],
+   "text": {
+    "start": "0x8016604C",
+    "end": "0x80168C24",
+    "core": [
+     "0x80166098",
+     "0x80168644"
+    ],
+    "boundaries_exist": "medium"
+   }
+  },
+  {
+   "name": null,
+   "region": "EA-UIStudio",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x80168C24",
+    "end": "0x8016A2D4",
+    "core": [
+     "0x80168C24",
+     "0x8016A2D4"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": null,
+   "region": "EA-UIStudio",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x8016A2D4",
+    "end": "0x8016C718",
+    "core": [
+     "0x8016BEDC",
+     "0x8016C718"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "ChecksumCRC32.c",
+   "region": "EA-GCC",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "verified unit"
+   ],
+   "text": {
+    "start": "0x8016C718",
+    "end": "0x8016CC20",
+    "core": [
+     "0x8016C718",
+     "0x8016CC20"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "CipherXOR.c",
+   "region": "EA-GCC",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "verified unit"
+   ],
+   "text": {
+    "start": "0x8016CC20",
+    "end": "0x8016CFF8",
+    "core": [
+     "0x8016CC20",
+     "0x8016CFF8"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "SharedFileIO.c",
+   "region": "EA-GCC",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "verified unit"
+   ],
+   "text": {
+    "start": "0x8016CFF8",
+    "end": "0x80171308",
+    "core": [
+     "0x8016CFF8",
+     "0x80171308"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "llSharedFileIO.c",
+   "region": "EA-GCC",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "filemap.md"
+   ],
+   "text": {
+    "start": "0x80171308",
+    "end": "0x801730C8",
+    "core": [
+     "0x80171308",
+     "0x801730C8"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "TagFile.c",
+   "region": "EA-GCC",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert",
+    "verified unit"
+   ],
+   "text": {
+    "start": "0x801730C8",
+    "end": "0x80175F54",
+    "core": [
+     "0x801730C8",
+     "0x80175F54"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "GBA.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert"
+   ],
+   "text": {
+    "start": "0x80175F54",
+    "end": "0x80176280",
+    "core": [
+     "0x80175F54",
+     "0x80176280"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": null,
+   "region": "SDK",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x80176280",
+    "end": "0x8017641C",
+    "core": [
+     "0x80176280",
+     "0x80176280"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "GBAXfer.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "assert"
+   ],
+   "text": {
+    "start": "0x8017641C",
+    "end": "0x80176A38",
+    "core": [
+     "0x80176870",
+     "0x80176A38"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "CARDBios.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x80176A38",
+    "end": "0x80177DA4",
+    "core": [
+     "0x80176A38",
+     "0x80177DA4"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "CARDUnlock.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x80177DA4",
+    "end": "0x80179004",
+    "core": [
+     "0x80177DA4",
+     "0x80179004"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "CARDRdwr.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x80179004",
+    "end": "0x8017929C",
+    "core": [
+     "0x80179004",
+     "0x8017929C"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "CARDBlock.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8017929C",
+    "end": "0x801796A0",
+    "core": [
+     "0x8017929C",
+     "0x801796A0"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "CARDDir.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x801796A0",
+    "end": "0x80179904",
+    "core": [
+     "0x801796A0",
+     "0x80179904"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "CARDCheck.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x80179904",
+    "end": "0x8017A840",
+    "core": [
+     "0x80179904",
+     "0x8017A840"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "CARDMount.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8017A840",
+    "end": "0x8017B2B8",
+    "core": [
+     "0x8017A840",
+     "0x8017B2B8"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "CARDFormat.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8017B2B8",
+    "end": "0x8017BA9C",
+    "core": [
+     "0x8017B2B8",
+     "0x8017BA9C"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "CARDOpen.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8017BA9C",
+    "end": "0x8017C18C",
+    "core": [
+     "0x8017BA9C",
+     "0x8017C18C"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "CARDCreate.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8017C18C",
+    "end": "0x8017C4DC",
+    "core": [
+     "0x8017C18C",
+     "0x8017C4DC"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "CARDRead.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8017C4DC",
+    "end": "0x8017C908",
+    "core": [
+     "0x8017C4DC",
+     "0x8017C908"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "CARDWrite.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8017C908",
+    "end": "0x8017CC84",
+    "core": [
+     "0x8017C908",
+     "0x8017CC84"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "CARDDelete.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8017CC84",
+    "end": "0x8017CF64",
+    "core": [
+     "0x8017CC84",
+     "0x8017CF64"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "CARDStat.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8017CF64",
+    "end": "0x8017D42C",
+    "core": [
+     "0x8017CF64",
+     "0x8017D42C"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "CARDRename.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8017D42C",
+    "end": "0x8017D628",
+    "core": [
+     "0x8017D42C",
+     "0x8017D628"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": "CARDStatEx.c",
+   "region": "SDK",
+   "name_confidence": "strong",
+   "name_evidence": [
+    "SDK source unit"
+   ],
+   "text": {
+    "start": "0x8017D628",
+    "end": "0x8017DAD4",
+    "core": [
+     "0x8017D628",
+     "0x8017DAD4"
+    ],
+    "boundaries_exist": "strong"
+   }
+  },
+  {
+   "name": null,
+   "region": "SDK",
+   "name_confidence": null,
+   "name_evidence": [],
+   "text": {
+    "start": "0x8017DAD4",
+    "end": "0x8017DB18",
+    "core": [
+     "0x8017DAD4",
+     "0x8017DB18"
+    ],
+    "boundaries_exist": "strong"
+   }
+  }
+ ]
+}
