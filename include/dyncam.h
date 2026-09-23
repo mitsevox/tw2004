@@ -27,13 +27,14 @@ LAYOUT_ASSERT(CamChoice, 0x48);
 // A shot and four sequences (0x28 bytes; DynCamTables.pSets), each an index in the file, -1 for
 // none.
 typedef struct DynCamSet {
-    u8   unk0[0x10];
-    CamShot* pShot;             // 0x10
-    CamSequence* p14;           // 0x14
-    CamSequence* p18;           // 0x18
-    CamSequence* p1C;           // 0x1C
-    CamSequence* p20;           // 0x20
-    u8   unk24[4];
+    char szName[0x10];          // 0x00  fn_8003C800 finds a set by it (case ignored)
+    CamShot* pShot;             // 0x10  kind 13: the set gives this shot
+    CamSequence* p14;           // 0x14  } kind 14: the set gives one of these three at random
+    CamSequence* p18;           // 0x18  }
+    CamSequence* p1C;           // 0x1C  }
+    CamSequence* p20;           // 0x20  taken first, 39 times in 100, when it has shot choices
+    u8   nKind;                 // 0x24  13 or 14
+    u8   unk25[3];
 } DynCamSet;
 LAYOUT_ASSERT(DynCamSet, 0x28);
 

@@ -433,6 +433,44 @@ u8 fn_8003ABEC(CamChoice* pChoice, int nPlayer) {
     return 1;
 }
 
+// The set named szName (case ignored) gives a sequence (*ppSeq) or a shot (*ppShot): its p20
+// 39 times in 100 when that has shot choices, else by its kind: 14 one of p14, p18 and p1C at
+// random (the next one when the pick is missing), 13 its shot. 0: no set gave one.
+u8 fn_8003C800(char* szName, CamSequence** ppSeq, CamShot** ppShot) {
+    int i;
+    u32 nPick;
+
+    for (i = 0; i < lbl_80281D88->nSets; i++) {
+        if (stricmp(lbl_80281D88->pSets[i].szName, szName) != 0) {
+            continue;
+        }
+        if (lbl_80281D88->pSets[i].p20 != NULL && lbl_80281D88->pSets[i].p20->nChoices > 0 &&
+            Rand_Next(1) % 100 > 60) {
+            *ppSeq = lbl_80281D88->pSets[i].p20;
+            return 1;
+        }
+        if (lbl_80281D88->pSets[i].nKind == 14) {
+            nPick = Rand_Next(1) % 3;
+            if (nPick == 0 && lbl_80281D88->pSets[i].p14 != NULL) {
+                *ppSeq = lbl_80281D88->pSets[i].p14;
+                return 1;
+            }
+            if (nPick == 1 && lbl_80281D88->pSets[i].p18 != NULL) {
+                *ppSeq = lbl_80281D88->pSets[i].p18;
+                return 1;
+            }
+            if (lbl_80281D88->pSets[i].p1C != NULL) {
+                *ppSeq = lbl_80281D88->pSets[i].p1C;
+                return 1;
+            }
+        } else if (lbl_80281D88->pSets[i].nKind == 13) {
+            *ppShot = lbl_80281D88->pSets[i].pShot;
+            return 1;
+        }
+    }
+    return 0;
+}
+
 // The sequence and shot named after the golfer's clip: with b, the clip in Character.p1790 when
 // there is one, else the clip it is playing. While the GameBreaker letterbox is up (fn_8003DCAC)
 // the "LB" version of the name is tried first.
