@@ -672,7 +672,7 @@ config.libs = [
         "progress_category": "sdk",
         "src_dir": "extern/sdk",
         "objects": [
-            Object(NonMatching, "dolphin/exi/EXIBios.c"),
+            Object(Matching, "dolphin/exi/EXIBios.c"),
             Object(Matching, "dolphin/exi/EXIUart.c"),
         ],
     },

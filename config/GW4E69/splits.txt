@@ -4527,6 +4527,9 @@ src/vi/vi.c:
 
 dolphin/exi/EXIBios.c:
 	.text       start:0x8013042C end:0x80131D08
+	.data       start:0x80195B20 end:0x80195BF0
+	.bss        start:0x802611A0 end:0x80261260
+	.sdata      start:0x802819C8 end:0x802819D0
 
 dolphin/exi/EXIUart.c:
 	.text       start:0x80131D08 end:0x80131F78
