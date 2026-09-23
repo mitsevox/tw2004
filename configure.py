@@ -499,7 +499,7 @@ config.libs = [
         "objects": [
             Object(NonMatching, "src/dolphin/dvd/dvd.c"),
             Object(Matching, "src/dolphin/os/OSMemory.c"),
-            Object(NonMatching, "src/dolphin/os/OSThread.c"),
+            Object(Matching, "src/dolphin/os/OSThread.c"),
         ],
     },
     {
