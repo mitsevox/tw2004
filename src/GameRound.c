@@ -497,8 +497,9 @@ int fn_800E177C(void) {
     return gpGame->nMulligans;
 }
 
-void fn_800E1788(int nPlayer) {
-    fn_800E19A4(nPlayer, 18);
+// A player's total for the round (all 18 holes).
+int fn_800E1788(int nPlayer) {
+    return fn_800E19A4(nPlayer, 18);
 }
 
 // A player's total for the first nHoles holes: the mode's points in mode 18 (match play),

@@ -8,8 +8,6 @@
 #include "game/save.h"
 
 u8    Team_IsAllCPU(int nTeam);
-int   fn_800E1788(int nPlayer);             // the player's round total
-int   fn_800D3C7C(int nPlayer);             // the player's golfer
 extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
 extern s32 lbl_80282278;                    // the player whose turn it is
 
