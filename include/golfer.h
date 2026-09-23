@@ -530,9 +530,9 @@ typedef struct GameState {
     void (*pfnEndGame)(void);   // 0x1F4  game finished. TW06: EndGame
     u8   (*pfn1F8)(int nPlayer); // 0x1F8  fn_800DCB10 returns its answer
     u8   (*pfn1FC)(int nPlayer); // 0x1FC  asked before the special ball pick-up
-    void (*pfn200)(void);       // 0x200
-    void (*pfn204)(void);       // 0x204
-    void (*pfn208)(void);       // 0x208
+    s32  (*pfn200)(int nPlayer); // 0x200  strokes behind the leader. TW06: GetCurrentLead
+    s32  (*pfn204)(int nPlayer); // 0x204  the same if this putt drops. TW06: GetPotentialLead
+    s32  (*pfn208)(int nPlayer); // 0x208
     void (*pfn20C)(int nPlayer); // 0x20C  called as a swing begins (state 1)
     void (*pfn210)(int nPlayer); // 0x210  the hole is over, the game is not
     void (*pfn214)(void);       // 0x214

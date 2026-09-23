@@ -14,7 +14,7 @@ void fn_800EDF34(UStreamObject* pObject);
 void fn_800EDF60(UStreamObject* pObject);
 void fn_800EDF90(UStreamObject* pObject);
 void fn_800EE064(void);
-s32 fn_800EE8B0(void);
+s32 fn_800EE8B0(int nPlayer);
 void fn_80119934(int a);
 void fn_800EF294(void);
 s32 fn_800EF834(void);
@@ -96,11 +96,9 @@ void fn_800EDD18(void) {
     gpGame->pfn1F8 = fn_800EE5B4;
     // IsPuttForWin's player is an s32 (long): as an int its profile index compiles differently
     gpGame->pfn1FC = (u8 (*)(int))fn_800EE6A0;
-    // port: these three slots are still typed void (*)(void) (GameRound.c's defaults are not
-    // decompiled yet); the functions return the lead, so the slots want s32 (*)(int) / s32 (*)(void)
-    gpGame->pfn200 = (void (*)(void))fn_800EE778;
-    gpGame->pfn204 = (void (*)(void))fn_800EE810;
-    gpGame->pfn208 = (void (*)(void))fn_800EE8B0;
+    gpGame->pfn200 = fn_800EE778;
+    gpGame->pfn204 = fn_800EE810;
+    gpGame->pfn208 = fn_800EE8B0;
     gpGame->b274 = 0;
     gpGame->n4 = 0;
     gpGame->nMulligans = 0;
@@ -317,7 +315,8 @@ s32 fn_800EE810(int nPlayer) {
     return fn_80119588(nPlayer, 1) - (fn_800E1904(nPlayer, 1) + 1);
 }
 
-s32 fn_800EE8B0(void) {
+// The mode's pfn208 answer for every player (GameRound.c's default works it out).
+s32 fn_800EE8B0(int nPlayer) {
     return 3;
 }
 
