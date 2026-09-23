@@ -496,6 +496,23 @@
    }
   },
   {
+   "name": null,
+   "region": "EA",
+   "name_confidence": null,
+   "name_evidence": [
+    "part of unit Golfer.c, which spans several files"
+   ],
+   "text": {
+    "start": "0x8002EBA4",
+    "end": "0x8002F1D4",
+    "core": [
+     "0x8002EE1C",
+     "0x8002F1D4"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
    "name": "GoRenderSurface.c",
    "region": "EA",
    "name_confidence": "strong",
@@ -503,13 +520,13 @@
     "assert"
    ],
    "text": {
-    "start": "0x8002EBA4",
+    "start": "0x8002F1D4",
     "end": "0x8002F4FC",
     "core": [
-     "0x8002EE1C",
+     "0x8002F1D4",
      "0x8002F32C"
     ],
-    "boundaries_exist": "strong"
+    "boundaries_exist": "guess"
    }
   },
   {
@@ -792,6 +809,23 @@
    }
   },
   {
+   "name": "wind.c",
+   "region": "EA",
+   "name_confidence": "medium",
+   "name_evidence": [
+    "TW06"
+   ],
+   "text": {
+    "start": "0x80055F1C",
+    "end": "0x8005620C",
+    "core": [
+     "0x80055F88",
+     "0x800561CC"
+    ],
+    "boundaries_exist": "guess"
+   }
+  },
+  {
    "name": "LLPictInt.c",
    "region": "EA",
    "name_confidence": "strong",
@@ -801,13 +835,13 @@
     "2002 tree"
    ],
    "text": {
-    "start": "0x80055F1C",
+    "start": "0x8005620C",
     "end": "0x800563C4",
     "core": [
-     "0x80055F88",
+     "0x8005620C",
      "0x800563C4"
     ],
-    "boundaries_exist": "strong"
+    "boundaries_exist": "guess"
    }
   },
   {
@@ -2466,7 +2500,7 @@
    }
   },
   {
-   "name": "GameMode23.c",
+   "name": "GameModeDriverPGATour.c",
    "region": "EA",
    "name_confidence": "guess",
    "name_evidence": [
@@ -2483,7 +2517,7 @@
    }
   },
   {
-   "name": "GameMode24.c",
+   "name": "GameModeDriverRTE.c",
    "region": "EA",
    "name_confidence": "guess",
    "name_evidence": [
