@@ -27,6 +27,41 @@ extern u8 lbl_80187B98[];
 u8* fn_800484E0(s32 p0);
 void fn_80048584(u8* p, u8 v);
 
+// ---- sweep code (not yet cleaned up) ----
+
+s32 UStream_RegisterHandler(s32, void (*)(void*), s32);
+s32 fn_8000B4B8(void*);
+u8 fn_8000B508();
+s32 fn_80045D80(s32);
+void fn_800460F8(void* arg0);
+void fn_80045F74(void* arg0);
+s32 fn_800075CC(s32);
+void UStream_UnregisterHandler();
+void fn_80046174(void);
+
+void fn_80045F74(void* arg0) {
+    if (fn_8000B508() == 0) {
+        (*(s32*)((u8*)(arg0) + 4)) = fn_80045D80((*(s32*)((u8*)(arg0) + 0)));
+        (*(void (**)(void*))((u8*)(arg0) + 8)) = fn_800460F8;
+        fn_8000B4B8(arg0);
+    }
+}
+
+void fn_800460F8(void* arg0) {
+    void* temp_r31;
+
+    temp_r31 = (*(void**)((u8*)(arg0) + 4));
+    fn_800075CC((*(s32*)((u8*)(temp_r31) + 0x10)));
+    fn_80009E70(temp_r31);
+}
+
+void fn_80046174(void) {
+    UStream_UnregisterHandler(1413828384);
+    UStream_UnregisterHandler(1111575628);
+}
+
+// ---- end of sweep code ----
+
 void fn_800461A8(void) {
     s32 t0;
     t0 = fn_80009B34(2736, 2, 16, lbl_80187D2C, 283);

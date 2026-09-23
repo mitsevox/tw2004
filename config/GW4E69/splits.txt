@@ -549,8 +549,8 @@ unsorted/sweep_8004560C.c:
 unsorted/sweep_8004562C.c:
 	.text       start:0x8004562C end:0x80045660
 
-unsorted/sweep_80045880.c:
-	.text       start:0x80045880 end:0x80045908
+DepthField.c:
+	.text       start:0x80045660 end:0x80045D18
 
 unsorted/sweep_80045D18.c:
 	.text       start:0x80045D18 end:0x80045D5C
@@ -579,17 +579,8 @@ unsorted/sweep_80045F50.c:
 unsorted/sweep_80045F6C.c:
 	.text       start:0x80045F6C end:0x80045F74
 
-unsorted/sweep_80045F74.c:
-	.text       start:0x80045F74 end:0x80045FC8
-
-unsorted/sweep_800460F8.c:
-	.text       start:0x800460F8 end:0x80046130
-
-unsorted/sweep_80046174.c:
-	.text       start:0x80046174 end:0x800461A8
-
 GoDynObj.c:
-	.text       start:0x800461A8 end:0x80048680
+	.text       start:0x80045F74 end:0x80048680
 
 unsorted/sweep_800486EC.c:
 	.text       start:0x800486EC end:0x800486F4
@@ -608,6 +599,9 @@ unsorted/sweep_800496E0.c:
 
 unsorted/sweep_80049A14.c:
 	.text       start:0x80049A14 end:0x80049A54
+
+GoAnimalActors.c:
+	.text       start:0x80049B40 end:0x8004AAEC
 
 unsorted/sweep_8004AAEC.c:
 	.text       start:0x8004AAEC end:0x8004AB90
@@ -651,29 +645,11 @@ unsorted/sweep_800588E8.c:
 Swing.c:
 	.text       start:0x800589F8 end:0x80062E40
 
-unsorted/sweep_80062F1C.c:
-	.text       start:0x80062F1C end:0x80062F38
-
-unsorted/sweep_80063C7C.c:
-	.text       start:0x80063C7C end:0x80063C90
-
-unsorted/sweep_80063CBC.c:
-	.text       start:0x80063CBC end:0x80063CF0
-
-unsorted/sweep_800642A4.c:
-	.text       start:0x800642A4 end:0x800642B0
-
-unsorted/sweep_800642B0.c:
-	.text       start:0x800642B0 end:0x800642D0
-
-unsorted/sweep_800644CC.c:
-	.text       start:0x800644CC end:0x800644F4
+GoCamCont.c:
+	.text       start:0x80062E40 end:0x8006449C
 
 GoStaticCam.c:
-	.text       start:0x800644F4 end:0x8006596C
-
-unsorted/sweep_8006596C.c:
-	.text       start:0x8006596C end:0x800659F4
+	.text       start:0x8006449C end:0x80065B44
 
 unsorted/sweep_80065B44.c:
 	.text       start:0x80065B44 end:0x80065B50
