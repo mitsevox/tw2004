@@ -3651,41 +3651,8 @@ GameMode23.c:
 GameMode24.c:
 	.text       start:0x800F0448 end:0x800F125C
 
-unsorted/sweep_800F1404.c:
-	.text       start:0x800F1404 end:0x800F1424
-
-unsorted/sweep_800F193C.c:
-	.text       start:0x800F193C end:0x800F194C
-
-unsorted/sweep_800F194C.c:
-	.text       start:0x800F194C end:0x800F1960
-
-unsorted/sweep_800F1DF0.c:
-	.text       start:0x800F1DF0 end:0x800F1E1C
-
-unsorted/sweep_800F1E1C.c:
-	.text       start:0x800F1E1C end:0x800F1E58
-
-unsorted/sweep_800F2408.c:
-	.text       start:0x800F2408 end:0x800F2494
-
-unsorted/sweep_800F2494.c:
-	.text       start:0x800F2494 end:0x800F24D8
-
-unsorted/sweep_800F24D8.c:
-	.text       start:0x800F24D8 end:0x800F2534
-
-unsorted/sweep_800F2534.c:
-	.text       start:0x800F2534 end:0x800F2578
-
-unsorted/sweep_800F263C.c:
-	.text       start:0x800F263C end:0x800F2664
-
-unsorted/sweep_800F2664.c:
-	.text       start:0x800F2664 end:0x800F266C
-
-unsorted/sweep_800F2958.c:
-	.text       start:0x800F2958 end:0x800F2984
+GameMode10.c:
+	.text       start:0x800F125C end:0x800F2984
 
 unsorted/sweep_800F2C2C.c:
 	.text       start:0x800F2C2C end:0x800F2C34
