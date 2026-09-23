@@ -1166,119 +1166,17 @@ GameMode11.c:
 GameMode4.c:
 	.text       start:0x80101FEC end:0x80102AC8
 
-unsorted/sweep_80103B4C.c:
-	.text       start:0x80103B4C end:0x80103B8C
-
-unsorted/sweep_80103BB4.c:
-	.text       start:0x80103BB4 end:0x80103BC0
-
-unsorted/sweep_80103D6C.c:
-	.text       start:0x80103D6C end:0x80103DE0
+uiArc.c:
+	.text       start:0x80102AC8 end:0x801037F8
 
 FE_CrAPDB.c:
-	.text       start:0x80103EFC end:0x801069AC
+	.text       start:0x801037F8 end:0x801074D4
 
-unsorted/sweep_801077EC.c:
-	.text       start:0x801077EC end:0x80107828
-
-unsorted/sweep_80107994.c:
-	.text       start:0x80107994 end:0x8010799C
-
-unsorted/sweep_80107BA4.c:
-	.text       start:0x80107BA4 end:0x80107BA8
-
-unsorted/sweep_80107BF4.c:
-	.text       start:0x80107BF4 end:0x80107C30
-
-unsorted/sweep_80107C30.c:
-	.text       start:0x80107C30 end:0x80107C3C
-
-unsorted/sweep_80108140.c:
-	.text       start:0x80108140 end:0x80108178
-
-unsorted/sweep_80108300.c:
-	.text       start:0x80108300 end:0x80108314
-
-unsorted/sweep_80108398.c:
-	.text       start:0x80108398 end:0x8010840C
-
-unsorted/sweep_80108494.c:
-	.text       start:0x80108494 end:0x801084F4
-
-unsorted/sweep_801088A4.c:
-	.text       start:0x801088A4 end:0x801088C8
-
-unsorted/sweep_801088C8.c:
-	.text       start:0x801088C8 end:0x80108904
-
-unsorted/sweep_80108904.c:
-	.text       start:0x80108904 end:0x8010893C
-
-unsorted/sweep_801089BC.c:
-	.text       start:0x801089BC end:0x801089DC
-
-unsorted/sweep_801089DC.c:
-	.text       start:0x801089DC end:0x80108A0C
-
-unsorted/sweep_80108B10.c:
-	.text       start:0x80108B10 end:0x80108B84
-
-unsorted/sweep_80108B84.c:
-	.text       start:0x80108B84 end:0x80108C00
-
-unsorted/sweep_80108E4C.c:
-	.text       start:0x80108E4C end:0x80108E9C
+FE_CrAPMessages.c:
+	.text       start:0x801077EC end:0x8010A448
 
 LLDynTex.c:
-	.text       start:0x80109120 end:0x80109EAC
-
-unsorted/sweep_80109EAC.c:
-	.text       start:0x80109EAC end:0x80109EE8
-
-unsorted/sweep_8010A208.c:
-	.text       start:0x8010A208 end:0x8010A238
-
-unsorted/sweep_8010A35C.c:
-	.text       start:0x8010A35C end:0x8010A3A4
-
-unsorted/sweep_8010A3A4.c:
-	.text       start:0x8010A3A4 end:0x8010A3C8
-
-unsorted/sweep_8010A3C8.c:
-	.text       start:0x8010A3C8 end:0x8010A400
-
-unsorted/sweep_8010A400.c:
-	.text       start:0x8010A400 end:0x8010A448
-
-unsorted/sweep_8010A4E8.c:
-	.text       start:0x8010A4E8 end:0x8010A520
-
-unsorted/sweep_8010A668.c:
-	.text       start:0x8010A668 end:0x8010A6A8
-
-unsorted/sweep_8010A780.c:
-	.text       start:0x8010A780 end:0x8010A788
-
-unsorted/sweep_8010AD10.c:
-	.text       start:0x8010AD10 end:0x8010AD18
-
-unsorted/sweep_8010B098.c:
-	.text       start:0x8010B098 end:0x8010B0C0
-
-unsorted/sweep_8010B664.c:
-	.text       start:0x8010B664 end:0x8010B6AC
-
-unsorted/sweep_8010BC64.c:
-	.text       start:0x8010BC64 end:0x8010BC94
-
-unsorted/sweep_8010BEC4.c:
-	.text       start:0x8010BEC4 end:0x8010BED4
-
-unsorted/sweep_8010BF3C.c:
-	.text       start:0x8010BF3C end:0x8010BF68
-
-unsorted/sweep_8010BFA0.c:
-	.text       start:0x8010BFA0 end:0x8010BFE0
+	.text       start:0x8010A448 end:0x8010C4A0
 
 CharSliders.c:
 	.text       start:0x8010C4A0 end:0x8010DC94
@@ -1297,23 +1195,17 @@ unsorted/sweep_8010FBC4.c:
 unsorted/sweep_8010FF5C.c:
 	.text       start:0x8010FF5C end:0x8010FF9C
 
-unsorted/sweep_80110178.c:
-	.text       start:0x80110178 end:0x80110180
-
-unsorted/sweep_8011027C.c:
-	.text       start:0x8011027C end:0x801102AC
-
-unsorted/sweep_80110450.c:
-	.text       start:0x80110450 end:0x80110468
-
-unsorted/sweep_801104A0.c:
-	.text       start:0x801104A0 end:0x801104AC
+DiscCheck.c:
+	.text       start:0x8010FF9C end:0x801104AC
 
 hwsBurn.c:
 	.text       start:0x801104AC end:0x80111F58
 
+CalendarScreen.c:
+	.text       start:0x80111F58 end:0x80112614
+
 hwsMaterial_Gc.c:
-	.text       start:0x8011206C end:0x80112804
+	.text       start:0x80112614 end:0x80112804
 
 hwsOverride_Gc.c:
 	.text       start:0x80112804 end:0x80112B80

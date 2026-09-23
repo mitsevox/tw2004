@@ -901,8 +901,8 @@ void GameModeDriverPGATour_GetPurseString(s32 i, char* pDst) {
     fn_800907AC(GameModeDriverPGATour_ComputePurseForBracket(i, nBracket), pDst);
 }
 
-// The player's own score in the current tournament.
-int fn_800F018C(void) {
+// The player's own score in the current tournament. The event (EventInfo.c passes it) is not used.
+int fn_800F018C(s32 nEvent) {
     return fn_8011937C(0, 0, fn_8011908C(0, 0) == 0);
 }
 

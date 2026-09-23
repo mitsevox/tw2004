@@ -7,15 +7,44 @@
 #include "charstate.h"
 #include "frontend/fe.h"
 
+s32  fn_800CCA40(Skin* pSkin);          // SkinPart.c: how many choices aParts[3] holds
+s32  fn_800CCEA0(Skin* pSkin);          // SkinPart.c: and aSets[3]
+
 // This file, in address order.
+int  fn_80104F7C(CrAPAsset* pAsset);
 void fn_80105188(UStreamObject* pObject);
 void fn_801051F4(UStreamObject* pObject);
 void fn_80105240(void);
 void fn_80105B80(CrAPAsset* pAsset, char* pName);
 void fn_80105DAC(void);
 void fn_80105EFC(void);
-u8   fn_801061C8(s8 n);
 u8   fn_801061F8(s16 nPart, int nCategory, int nWanted);
+
+// The asset an asset takes its attributes from.
+CrAPAsset* fn_80103B4C(CrAPAsset* pAsset) {
+    return fn_80104F68(fn_80103B28(fn_80104F7C(pAsset)));
+}
+
+void fn_80103B74(u8 b) {
+    lbl_80282460->b14 = b;
+}
+
+u8 fn_80103B80(void) {
+    return lbl_80282460->b14;
+}
+
+s8 fn_80103BB4(void) {
+    return lbl_80282460->n4;
+}
+
+// Save the created golfer's body skin entries in the profile.
+void fn_80103D6C(void) {
+    SaveProfile* pProfile = fn_80077ACC();
+    Skin* pSkin = lbl_80281EE0->pB4->pChar->pSkin;
+
+    Mem_cpy(pProfile->a5614, pSkin->aParts[3], fn_800CCA40(pSkin) * sizeof(SkinChoice));
+    Mem_cpy(pProfile->a5754, pSkin->aSets[3], fn_800CCEA0(pSkin) * sizeof(SkinChoice));
+}
 
 // The asset may be picked: it was not locked when last checked, and its aB1CC bit is set.
 u8 fn_80104020(int nAsset) {

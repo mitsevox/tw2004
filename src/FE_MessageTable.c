@@ -18,7 +18,6 @@ void fn_800142A4(s8 n);                 // sets lbl_80281C98
 void fn_80057438(SaveProfile* pProfile);
 void fn_8008E354(void);                 // FEgolferanim.c
 void fn_8008F80C(s32 p0, s32 p1);       // uiProcessInterface.c
-void fn_8008DAEC(void);                 // FE_Manager.c
 void fn_8008E358(s32 p0);               // FEgolferanim.c
 s32  fn_800A0C6C(MCCardPosStr* pPos);   // MC.c
 void fn_800A78F0(f32 f);

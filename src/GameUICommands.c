@@ -1968,7 +1968,7 @@ void fn_80088CF0(MsgArg* pArgs, MsgArg* pResult) {
             break;
         }
         fn_801025F4();
-        pResult->i = lbl_80200538.aTourPct[nMult];
+        pResult->i = lbl_80200538.aMult[EARN_MULT_TOUR + nMult];
         return;
     case 104:
         if (gpSaveData[gPlayers[pArgs[0].i].nIndex].bActive != 1) {

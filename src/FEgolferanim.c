@@ -70,7 +70,6 @@ void fn_8008B7D0(int nState);
 void fn_8008B820(void);
 void fn_8008B850(void);
 void fn_8008B864(void);
-int  fn_8008B990(void);
 void fn_8008C938(void);
 void fn_8008C93C(void);
 void fn_8008CA88(void);
@@ -78,16 +77,13 @@ void fn_8008CC30(void);
 void fn_8008CE2C(void);
 void fn_8008CE88(u8 b);
 void fn_8008D8F4(void);
-void fn_8008DAEC(void);
 void fn_8008DBE8(void);
 void fn_8008DC10(void);
 u8   fn_8008DCF0(int nGolfer, CrAPGolfer* pGolfer);
 void fn_8008DD50(u8 bNoBlend);
 Clip* fn_8008E02C(void);
-void fn_8008E244(void);
 void fn_8008E254(u8 b);
 void fn_8008E2F8(u8 bTarget, f32 fAngle);
-void fn_8008E724(char* szAnim, char* szShot, s8 n, u8 bLoop);
 u8   fn_8008E944(u8 b, f32 f);
 void fn_8008EA44(u8 b);
 void fn_8008EBB4(void);
@@ -116,15 +112,12 @@ void Session_SetupProfiles(void);
 void fn_80079974(void);
 void fn_800B9CF0(int n);
 void fn_800CEE88(u8 b);
-u8   fn_80103B80(void);
 void fn_8010B098(void* p);
 void fn_8010B9BC(void);
 void fn_8010BEC4(void);
 u8   fn_8010BFE0(void);
 void UStream_Stop(void);
 void* AnimLib_FindByName(AnimLib* pLib, const char* pName);
-// GoGolfCam.c defines it with five parameters; every caller passes a sixth (0 or 1).
-void GolfCamera_SwitchCrAPCamera(View* pView, char* szName, int nShot, u8 bBlend, u8 bForce, int n);
 
 // Make the golfer display's state and start the loader.
 void fn_8008AD80(void) {

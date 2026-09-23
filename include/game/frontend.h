@@ -69,6 +69,25 @@ typedef void (*MsgHandler)(MsgArg* pArgs, MsgArg* pResult);
 // Send message nMsg with nArgs values to a front-end handler (fn_8016B09C also sends through it).
 void fn_8016B0F8(void* pHandler, int nMsg, int nArgs, MsgArg* pArgs);
 
+// A menu UI arc (uiArc.c): nSegments pieces from fStart to fEnd degrees, shaded from colour
+// aColorA to aColorB. Only what the code reads so far.
+typedef struct UIArc {
+    s16  n0;                    // 0x00  } passed to fe_movies.c's fn_800913EC and fn_80091460
+    s16  n2;                    // 0x02  } (-1: none)
+    u8   unk4[4];
+    u16  u8;                    // 0x08
+    u16  uFlags;                // 0x0A
+    s16  nSegments;             // 0x0C  message 8
+    s16  nQuarterTurns;         // 0x0E  message 11: a rotation in degrees, as quarter turns 0..3
+    u8   aColorA[4];            // 0x10  message 6: red, green, blue, alpha
+    u8   aColorB[4];            // 0x14  message 7
+    f32  v18[2];                // 0x18  message 5
+    f32  v20[2];                // 0x20  message 1
+    f32  v28[2];                // 0x28  message 2
+    f32  fStart;                // 0x30  message 3: degrees
+    f32  fEnd;                  // 0x34  message 4: degrees
+} UIArc;
+
 // The menu UI's commands go to one of these, by the session's game type (uiProcessInterface.c's
 // fn_8008F568): each runs the handler for message nMsg of its table.
 void fn_80079E6C(int nMsg, MsgArg* pArgs, MsgArg* pResult);    // the menus (FE_MessageTable.c)

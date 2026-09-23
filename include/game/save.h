@@ -220,7 +220,13 @@ typedef struct SaveProfile {
     u8   unk54FA[0x5613 - 0x54FA];
     s8   n5613;                 // 0x05613  set by fn_8008DD34; FEgolferanim.c passes it to the
                                 //          character (fn_8008EA44)
-    u8   unk5614[0xB054 - 0x5614];
+    // The created golfer's skin choices (SkinChoice, 8 bytes each; charstate.h's SkinChoices from
+    // 0x5500 on): the body's parts and sets (fn_80103D6C), and its six other skins' (fn_80103DE0).
+    u8   a5614[0x5754 - 0x5614];    // 0x05614
+    u8   a5754[0x5AF4 - 0x5754];    // 0x05754
+    u8   a5AF4[6][0x50];            // 0x05AF4
+    u8   a5CD4[6][0x50];            // 0x05CD4
+    u8   unk5EB4[0xB054 - 0x5EB4];
     // Four bit arrays with a bit per Create-A-Player asset (0x80057F18's loop over them all, which
     // also clears aB344 and aB4BC; fn_8001E9CC tests a bit).
     u32  aAssetLocked[94];      // 0x0B054  the asset was locked (fn_80078008) when last checked
@@ -229,7 +235,8 @@ typedef struct SaveProfile {
     u32  aB344[94];             // 0x0B344
     u32  aB4BC[94];             // 0x0B4BC
     TourSeason tour;            // 0x0B634
-    u8   unk104D0[0x1054C - 0x104D0];
+    u8   unk104D0[0x10548 - 0x104D0];
+    u32  a10548[1];             // 0x10548  a bit array: FE_CrAPMessages.c's fn_80108E4C tests bit n
     SaveLockEntry a1054C[11];   // 0x1054C  cleared by the profile setup; fn_80078008's lock kinds
                                 //          10 and 11 read them
     u8   a10578[4];             // 0x10578  marked holes 71..74: fn_800588F4's kind 0

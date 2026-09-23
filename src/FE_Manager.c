@@ -20,19 +20,14 @@ void fn_8008B754(int a);
 void fn_8008B7D0(int a);
 void fn_8008D8CC(void);
 void fn_8008D8F4(void);
-void fn_8008DAEC(void);
 void fn_8008DBE8(void);
-void fn_8008E6D4(int a);
 void fn_80092198(void);
 void fn_8009220C(void);
 void fn_800A7644(int a);
 void fn_800A4FD8(void);
 void fn_80102AC4(void);
 void fn_80103B74(int a);
-int  fn_80103D14(s16 nSlot);            // the asset worn in an equipment slot, or -1 (FE_CrAPDB.c)
 void fn_801073DC(int nPart);            // FE_CrAPDB.c
-int  fn_801049C8(s16 nPart);            // how many b a part has, for fn_800797E0 (FE_CrAPDB.c)
-s8   fn_80103BB4(void);                 // FE_CrAPDB.c: the b fn_80103B8C set
 void fn_80103B8C(s8 b);                // } FE_CrAPDB.c: set b; an asset's b (2: either),
 s8   fn_80103BC0(int nAsset);           // } its kind, fn_80107444's count, and its part and
 s16  fn_8010742C(int nAsset);           // } choice

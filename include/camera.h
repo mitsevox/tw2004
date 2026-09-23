@@ -513,6 +513,8 @@ u8     fn_800C5FE4(View* pView, int nPlayer);
 void   fn_800C6010(View* pView, int nPlayer);
 void   fn_800C60E8(View* pView, int nPlayer);
 void   GolfCamera_CutToGolferDoneAnimatingCam(View* pView, int nPlayer);
+// Every caller passes a sixth argument (0 or 1) that the camera does not read.
+void   GolfCamera_SwitchCrAPCamera(View* pView, char* szName, int nShot, u8 bBlend, u8 bForce, int n6);
 u8     fn_800C6604(View* pView);
 void   fn_800C6618(View* pView, int nPlayer);
 int    fn_800C6B38(View* pView);
