@@ -10,7 +10,6 @@
 void  fn_800DCAD8(void);
 void  fn_800131C4(int nController);
 void  fn_80013130(int nController, int nStrength);
-u8    fn_800C714C(void);
 u8    fn_800DCB3C(void);
 void  fn_8001425C(int a);
 void  fn_80012F34(int a);
@@ -27,11 +26,8 @@ u8    fn_800E23B0(int nPlayer, int nStrokes);
 u8    fn_800DC818(Ball* pBall, int nPlayer, u8 bNext);
 u8    fn_8005D2DC(void);
 void  GM_vCloseModuleONCE(void);
-u8    fn_800C6CCC(void);
-u8    fn_800C6CB0(void);
 u8    fn_800B4AE0(void);
 f32   fn_8005B64C(int nPlayer);
-int   fn_8003BDBC(int nPlayer, int nLie, int a, int b, int c, f32 fDist);
 void  fn_800DBFAC(void);
 void  fn_800DC18C(void);
 void  fn_800DC290(f32 fHeight);
@@ -44,9 +40,7 @@ int   fn_800D0620(int nPlayer, int a, int b);
 int   fn_800D089C(int nPlayer, int a);
 void  fn_800BD83C(int nSound, int a);
 void  fn_800A6DCC(int nMusic, int a);
-u32   fn_8003A950(int nCam, int a, s32* pKind, f32* pTime, s32* p3, s32* p4, s32* p5, int nPlayer);
-u8    fn_800451A8(void* pList, u32 uTarget, int nPlayer);
-u8    fn_8003DC78(u32 uTarget);
+u8    fn_800451A8(CamScript* pScript, CamShot* pShot, int nPlayer);
 
 // Starts a scripted GameBreaker for nPlayer, for reason nReason (a bit in uFlags).
 #define GB_START(nPlayer, nReason)                                                                     if (!lbl_80202898.bGameBreaker || lbl_80202898.bClosing || lbl_80202898.nGBType != 0) {                lbl_80202898.bClosing = 0;                                                                         lbl_80202898.bGameBreaker = 1;                                                                     lbl_80202898.fGBTime = 0.0f;                                                                       lbl_80202898.f24 = 0.0f;                                                                           lbl_80202898.b19 = 0;                                                                              lbl_80202898.nGBType = 0;                                                                          lbl_80202898.nPlayer = nPlayer;                                                                    lbl_80202898.bPaused = 0;                                                                          lbl_80202898.uFlags = 1 << (nReason);                                                              lbl_80202898.nHeartbeats = 0;                                                                      EVENT_Trigger(nPlayer, 0x3D, 0, -1);                                                           }
@@ -309,7 +303,7 @@ int fn_800DB86C(int nPlayer) {
 void fn_800DB714(int nPlayer) {
     int nLie;
     f32 fDist;
-    void* pView;
+    View* pView;
     if ((!(gSession.uFlags & 0x4000) || !(gSession.uFlags & 0x8000)) && lbl_80202898.bGameBreaker) {
         if (Game_GetCourse() == 7) {
             lbl_80202898.b19 = 1;
@@ -322,7 +316,7 @@ void fn_800DB714(int nPlayer) {
         fn_80045494(0, nPlayer);
         fn_80045558(0, nPlayer);
         pView = fn_80017028(gPlayers[nPlayer].nView0);
-        *(s32*)((u8*)pView + 0x74) = fn_8003BDBC(nPlayer, nLie, 3, 0xC, 1, fDist);
+        pView->p74 = fn_8003BDBC(nPlayer, nLie, 3, 0xC, 1, fDist);
         lbl_80202898.b19 = 1;
         if (lbl_80202898.f24 > 0.8f) {
             lbl_80202898.f24 = 0.8f;
@@ -336,15 +330,15 @@ void fn_800DB714(int nPlayer) {
 void fn_800DBA50(int nPlayer) {
     int nClass;
     int nLie;
-    void* pView;
-    int nCam;
-    u32 uTarget;
+    View* pView;
+    CamSequence* pSeq;
+    CamShot* pShot;
     f32 fDist;
     f32 fTime;
-    s32 n14;
-    s32 nKind;
-    s32 nC;
-    s32 n8;
+    f32 f2;
+    int nKind;
+    int nB;
+    f32 f3;
     f32 v2[4];
     f32 v[4];
     if ((!(gSession.uFlags & 0x4000) || !(gSession.uFlags & 0x8000)) && !gSession.bReplay &&
@@ -388,21 +382,22 @@ void fn_800DBA50(int nPlayer) {
                 fn_80045494(0, nPlayer);
                 fn_80045558(0, nPlayer);
                 pView = fn_80017028(gPlayers[nPlayer].nView0);
-                nCam = fn_8003BDBC(nPlayer, nLie, nClass, 0xB, 1, fDist);
-                uTarget = fn_8003A950(nCam, 0, &nKind, &fTime, &n14, &nC, &n8, nPlayer);
-                if (uTarget && *(u32*)((u8*)pView + 0x130) != uTarget && *(u32*)((u8*)pView + 0x134) != uTarget &&
-                    !fn_800451A8((u8*)pView + 0x84, uTarget, nPlayer)) {
-                    if (nKind == 5 && fn_8003DC78(uTarget)) {
-                        if (gPlayers[nPlayer].nShotKind != SHOT_PUTT && fn_80095780(gPlayers[nPlayer].nShotHandle) != 9) {
-                            fn_80095744(gPlayers[nPlayer].nShotHandle, 14);
+                pSeq = fn_8003BDBC(nPlayer, nLie, nClass, 0xB, 1, fDist);
+                pShot = fn_8003A950(pSeq, 0, &nKind, &fTime, &f2, &nB, &f3, nPlayer);
+                if (pShot != NULL && pView->p130 != pShot && pView->p134 != pShot &&
+                    !fn_800451A8(&pView->script, pShot, nPlayer)) {
+                    if (nKind == 5 && fn_8003DC78(pShot)) {
+                        if (gPlayers[nPlayer].nShotKind != SHOT_PUTT &&
+                            fn_80095780(gPlayers[nPlayer].pChar) != 9) {
+                            fn_80095744(gPlayers[nPlayer].pChar, 14);
                             if (0.0f == fTime) {
                                 fTime = 1.0f / 59.94f;
                             }
                         }
                     }
-                    *(s32*)((u8*)pView + 0x74) = nCam;
-                    *(s32*)((u8*)pView + 0x148) = 0;
-                    *(s32*)((u8*)pView + 0x14C) = 25;
+                    pView->p74 = pSeq;
+                    pView->n148 = 0;
+                    pView->n14C = 25;
                 }
                 EVENT_Trigger(nPlayer, 0x3F, 0, -1);
             }

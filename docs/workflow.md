@@ -51,6 +51,28 @@ unit claims an address range and absorbs the sweeps inside it.
 3. If nothing was absorbed: create `src/<Name>.c` by hand (includes plus the functions) and run
    `python configure.py`.
 
+Creating units from the file map
+--------------------------------
+
+[`sourcefiles.md`](sourcefiles.md) names the original source files; its machine-readable copy is
+`config/GW4E69/filemap.json`. `mapunits.py` turns every file there with a strong name and a certain
+core into a unit over that core (a `NonMatching` unit with a `.text` range, a header line naming
+the file and its evidence), and folds the sweep files inside the core into it unchanged, inside
+the sweep block (see `tools/match/sweepblock.py`). A file is left out when a named unit overlaps
+its core or a sweep crosses the core's edge.
+
+```
+python tools/match/mapunits.py --dry-run [--exclude A.c,B.c]   # what it would do, and what it skips
+python tools/match/mapunits.py --only <File>.c                 # one file
+python tools/match/mapunits.py [--exclude A.c,B.c]             # every qualifying file
+python tools/match/mapunits.py --check                         # verify the units made so far
+```
+
+Use it when the map is re-run (new evidence can make more files strong) and to create a file's
+unit before matching in it; exclude files another agent is working in. Afterwards run
+`python configure.py`, rebuild (`main.dol: OK`) and compare `report.json` with the one from before:
+no function's score may change, and the exact count stays the same.
+
 Drafting C from assembly
 ------------------------
 

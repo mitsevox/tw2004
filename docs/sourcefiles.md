@@ -1,7 +1,7 @@
 Source file map
 ===============
 
-The original source files of the game in link order, with the evidence for each name and boundary (2026-09-23). Produced by a one-off analysis of the DOL (duplicate compiler constants, EA's assert file names, 8-byte data alignment) and the TW06 references ([`tw06-names.md`](tw06-names.md)). The sweep files in `src/unsorted/<File>/` are sorted by this map; see "Using this for splits.txt" below for which parts are safe to act on.
+The original source files of the game in link order, with the evidence for each name and boundary (2026-09-23). Produced by a one-off analysis of the DOL (duplicate compiler constants, EA's assert file names, 8-byte data alignment) and the TW06 references ([`tw06-names.md`](tw06-names.md)). The sweep files in `src/unsorted/<File>/` are sorted by this map; see "Using this for splits.txt" below for which parts are safe to act on. The machine-readable copy is `config/GW4E69/filemap.json` (used by `tools/match/mapunits.py`).
 
 **Read this first.** The map separates three questions for every file: *is there a file boundary here at all* (column **Ext**), *exactly where is it* (column **Left edge**: the window it can lie in; `.text` shows the best guess), and *what was the file called* (column **Name conf**). Strong = backed by EA's own strings or by duplicate compiler constants; medium = TW06 (2005) names or a single binary witness; guess = inferred. Anything marked guess should be checked before it is used for splits.
 

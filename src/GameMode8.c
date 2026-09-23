@@ -421,7 +421,7 @@ void fn_800FA570(void) {
         PLAYER(i)->nC3C = 0;
         PLAYER(i)->uC48 = 0;
         fn_8001C804(i, 1, 1);
-        fn_80095744(PLAYER(i)->nShotHandle, 1);
+        fn_80095744(PLAYER(i)->pChar, 1);
         Emotion_UpdatePlayerEmotion(i);
         GOLFERSTATE_Set(25, i);
     }
@@ -451,8 +451,8 @@ void fn_800FA608(int nPlayer) {
     }
     fn_8001D8DC(nPlayer);
     fn_8001C804(nPlayer, 1, 1);
-    fn_800957D8(gPlayers[nPlayer].nShotHandle);
-    fn_80095744(gPlayers[nPlayer].nShotHandle, 5);
+    fn_800957D8(gPlayers[nPlayer].pChar);
+    fn_80095744(gPlayers[nPlayer].pChar, 5);
     Emotion_UpdatePlayerEmotion(nPlayer);
     fn_80062F1C(fn_80017028(gPlayers[nPlayer].nView0));
     i = gPlayers[nPlayer].nView0;

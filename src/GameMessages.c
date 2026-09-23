@@ -23,61 +23,44 @@ typedef struct FrontEnd {
     u8    unk0[4];
     void* pHandler;             // 0x4
 } FrontEnd;
+
 extern FrontEnd* lbl_80281F1C;
+extern s32 lbl_80282278;
+extern u8 lbl_80202B88[];
+extern u8 lbl_802822E4;
+extern s32 lbl_802822E0;
+extern u8 lbl_801D87C0[];
 
 void  fn_8016B09C(void* pHandler, int nMsg, int nArgs, MsgArg* pArgs);
 u32   strlen(const char* s);
-extern s32 lbl_80282278;
-extern u8 lbl_802822DF;
-extern s32 lbl_802822B0;
-extern s32 lbl_8028229C;
-extern s32 lbl_802822B8;
-typedef struct UIQueueItem {
-    s32 a;
-    s32 b;
-    s32 c;
-} UIQueueItem;
-extern UIQueueItem lbl_802030BC[10];
-extern u8 lbl_80203138[14];
+void  fn_800E508C(void);
+void  fn_800E50FC(void);
+void  fn_800E5200(int n);
+void  fn_800E522C(int n);
+void  fn_800E53A4(u8 b);
+void  fn_800E53AC(void);
+void  fn_800E53C0(void);
+void  fn_800E53E8(u8 b);
+void  fn_800E5708(void);
+void  fn_800E572C(int n);
+void  fn_800E573C(void);
+void  fn_800E5908(int nMsg);
+void  fn_800E5D40(int n);
+void  fn_800E5D68(char* pStr);
+u8    fn_800E5D90(void);
 
-extern u8 lbl_802822BE;
-void fn_800E508C(void);
-extern u8 lbl_802822BD;
-void fn_800E50FC(void);
-extern u8 lbl_80282282;
-void fn_800E5200(int p0);
-extern u8 lbl_80202B88[];
-void fn_800E522C(int p0);
-extern u8 lbl_802822BC;
-extern u8 lbl_802822DA;
-void fn_800E53A4(u8 v);
-void fn_800E53AC(void);
-void fn_800E53C0(void);
-extern u8 lbl_80282280;
-void fn_800E53E8(u8 v);
-extern u8 lbl_802822E4;
-void fn_800E5708(void);
-extern s32 lbl_802822E0;
-void fn_800E572C(int p0);
-void fn_800E573C(void);
-void fn_800E5908(int nMsg);
-void fn_800E5D40(int p0);
-void fn_800E5D68(char* p0);
-extern u8 lbl_801D87C0[];
-u8  fn_800E5D90(void);
-
-void fn_800E4FFC(int p0) {
-    fn_80062D6C(48, p0);
+void fn_800E4FFC(int n) {
+    fn_80062D6C(48, n);
     lbl_802822BE = 1;
 }
 
-void fn_800E502C(int p0) {
-    fn_80062D6C(97, p0);
+void fn_800E502C(int n) {
+    fn_80062D6C(97, n);
     lbl_802822BE = 1;
 }
 
-void fn_800E505C(int p0) {
-    fn_80062D6C(57, p0);
+void fn_800E505C(int n) {
+    fn_80062D6C(57, n);
     lbl_802822BE = 1;
 }
 
@@ -135,15 +118,15 @@ void fn_800E5178(int nPlayer, f32 a, f32 b, f32 c, f32 d) {
     fn_800E5B0C(0x19, 0xF, &a, &b, &c, &d, &nView);
 }
 
-void fn_800E5200(int p0) {
-    fn_80062D6C(60, p0);
+void fn_800E5200(int n) {
+    fn_80062D6C(60, n);
 }
 
 void fn_800E5228(void) {
 }
 
-void fn_800E522C(int p0) {
-    *(u8*)(lbl_80202B88 + p0) = 1;
+void fn_800E522C(int n) {
+    lbl_80202B88[n] = 1;
 }
 
 // A menu screen closes: the next one still open comes up; with none left, the game unpauses
@@ -196,7 +179,7 @@ u8 fn_800E5344(void) {
     }
     if (lbl_802822B8 > 0) {
         for (i = 0; i < lbl_802822B8; i++) {
-            if (lbl_802030BC[i].a < 10) {
+            if (lbl_802030BC[i].n0 < 10) {
                 return 1;
             }
         }
@@ -204,8 +187,8 @@ u8 fn_800E5344(void) {
     return 0;
 }
 
-void fn_800E53A4(u8 v) {
-    lbl_802822BC = v;
+void fn_800E53A4(u8 b) {
+    lbl_802822BC = b;
 }
 
 void fn_800E53AC(void) {
@@ -220,8 +203,8 @@ void fn_800E53C0(void) {
     fn_800A72EC(1, 0);
 }
 
-void fn_800E53E8(u8 v) {
-    lbl_80282280 = v;
+void fn_800E53E8(u8 b) {
+    lbl_80282280 = b;
 }
 
 // Sends a message with three ints.
@@ -237,68 +220,68 @@ void fn_800E5450(void) {
     fn_800E58B4(4);
 }
 
-void fn_800E5474(int p0) {
-    fn_80062D6C(47, (p0 & 0xFF));
+void fn_800E5474(int n) {
+    fn_80062D6C(47, (n & 0xFF));
 }
 
-void fn_800E54A0(int p0, int p1, int p2) {
-    fn_800E53F0(96, p0, p1, p2);
+void fn_800E54A0(int nA, int nB, int nC) {
+    fn_800E53F0(96, nA, nB, nC);
 }
 
-void fn_800E54D8(int p0, int p1, int p2) {
-    fn_800E53F0(95, p0, p1, p2);
+void fn_800E54D8(int nA, int nB, int nC) {
+    fn_800E53F0(95, nA, nB, nC);
 }
 
-void fn_800E5510(int p0, int p1, int p2) {
-    fn_800E53F0(94, p0, p1, p2);
+void fn_800E5510(int nA, int nB, int nC) {
+    fn_800E53F0(94, nA, nB, nC);
 }
 
-void fn_800E5548(int p0, int p1, int p2) {
-    fn_800E53F0(93, p0, p1, p2);
+void fn_800E5548(int nA, int nB, int nC) {
+    fn_800E53F0(93, nA, nB, nC);
 }
 
-void fn_800E5580(int p0, int p1, int p2) {
-    fn_800E53F0(92, p0, p1, p2);
+void fn_800E5580(int nA, int nB, int nC) {
+    fn_800E53F0(92, nA, nB, nC);
 }
 
-void fn_800E55B8(int p0, int p1, int p2) {
-    fn_800E53F0(91, p0, p1, p2);
+void fn_800E55B8(int nA, int nB, int nC) {
+    fn_800E53F0(91, nA, nB, nC);
 }
 
-void fn_800E55F0(int p0, int p1, int p2) {
-    fn_800E53F0(27, p0, p1, p2);
+void fn_800E55F0(int nA, int nB, int nC) {
+    fn_800E53F0(27, nA, nB, nC);
 }
 
-void fn_800E5628(int p0, int p1, int p2) {
-    fn_800E53F0(12, p0, p1, p2);
+void fn_800E5628(int nA, int nB, int nC) {
+    fn_800E53F0(12, nA, nB, nC);
 }
 
-void fn_800E5660(int p0, int p1, int p2) {
-    fn_800E53F0(11, p0, p1, p2);
+void fn_800E5660(int nA, int nB, int nC) {
+    fn_800E53F0(11, nA, nB, nC);
 }
 
-void fn_800E5698(int p0, int p1, int p2) {
-    fn_800E53F0(13, p0, p1, p2);
+void fn_800E5698(int nA, int nB, int nC) {
+    fn_800E53F0(13, nA, nB, nC);
 }
 
-void fn_800E56D0(int p0, int p1, int p2) {
-    fn_800E53F0(10, p0, p1, p2);
+void fn_800E56D0(int nA, int nB, int nC) {
+    fn_800E53F0(10, nA, nB, nC);
 }
 
 void fn_800E5708(void) {
     lbl_802822E4 = 0;
 }
 
-void fn_800E5714(int p0) {
-    lbl_802822E4 = (lbl_802822E4 | p0);
+void fn_800E5714(int n) {
+    lbl_802822E4 = (lbl_802822E4 | n);
 }
 
-void fn_800E5724(int v) {
-    lbl_802822E0 = v;
+void fn_800E5724(int n) {
+    lbl_802822E0 = n;
 }
 
-void fn_800E572C(int p0) {
-    lbl_802822E4 = (lbl_802822E4 ^ p0);
+void fn_800E572C(int n) {
+    lbl_802822E4 = (lbl_802822E4 ^ n);
 }
 
 void fn_800E573C(void) {
@@ -362,92 +345,92 @@ void fn_800E5908(int nMsg) {
 }
 
 // Sends a message with one value (bit 0 of uFloats: a float).
-void fn_800E590C(int nMsg, u32 uFloats, void* p0) {
+void fn_800E590C(int nMsg, u32 uFloats, void* pA) {
     MsgArg args[1];
     fn_800E5908(nMsg);
     fn_80005AE8(args, 0, sizeof(args));
     if (uFloats & 1) {
-        args[0].f = *(f32*)p0;
+        args[0].f = *(f32*)pA;
     }
     if (!(uFloats & 1)) {
-        args[0].i = *(s32*)p0;
+        args[0].i = *(s32*)pA;
     }
     fn_8016B09C(lbl_80281F1C->pHandler, nMsg, 1, args);
 }
 
 // Two values.
-void fn_800E5998(int nMsg, u32 uFloats, void* p0, void* p1) {
+void fn_800E5998(int nMsg, u32 uFloats, void* pA, void* pB) {
     MsgArg args[2];
     fn_800E5908(nMsg);
     fn_80005AE8(args, 0, sizeof(args));
     if (uFloats & 1) {
-        args[0].f = *(f32*)p0;
+        args[0].f = *(f32*)pA;
     }
     if (!(uFloats & 1)) {
-        args[0].i = *(s32*)p0;
+        args[0].i = *(s32*)pA;
     }
     if (uFloats & 2) {
-        args[1].f = *(f32*)p1;
+        args[1].f = *(f32*)pB;
     } else {
-        args[1].i = *(s32*)p1;
+        args[1].i = *(s32*)pB;
     }
     fn_8016B09C(lbl_80281F1C->pHandler, nMsg, 2, args);
 }
 
 // Three values.
-void fn_800E5A4C(int nMsg, u32 uFloats, void* p0, void* p1, void* p2) {
+void fn_800E5A4C(int nMsg, u32 uFloats, void* pA, void* pB, void* pC) {
     MsgArg args[3];
     fn_80005AE8(args, 0, sizeof(args));
     fn_800E5908(nMsg);
     if (uFloats & 1) {
-        args[0].f = *(f32*)p0;
+        args[0].f = *(f32*)pA;
     }
     if (!(uFloats & 1)) {
-        args[0].i = *(s32*)p0;
+        args[0].i = *(s32*)pA;
     }
     if (uFloats & 2) {
-        args[1].f = *(f32*)p1;
+        args[1].f = *(f32*)pB;
     } else {
-        args[1].i = *(s32*)p1;
+        args[1].i = *(s32*)pB;
     }
     if (uFloats & 4) {
-        args[2].f = *(f32*)p2;
+        args[2].f = *(f32*)pC;
     } else {
-        args[2].i = *(s32*)p2;
+        args[2].i = *(s32*)pC;
     }
     fn_8016B09C(lbl_80281F1C->pHandler, nMsg, 3, args);
 }
 
 // Five values.
-void fn_800E5B0C(int nMsg, u32 uFloats, void* p0, void* p1, void* p2, void* p3, void* p4) {
+void fn_800E5B0C(int nMsg, u32 uFloats, void* pA, void* pB, void* pC, void* pD, void* pE) {
     MsgArg args[5];
     fn_800E5908(nMsg);
     fn_80005AE8(args, 0, sizeof(args));
     if (uFloats & 1) {
-        args[0].f = *(f32*)p0;
+        args[0].f = *(f32*)pA;
     }
     if (!(uFloats & 1)) {
-        args[0].i = *(s32*)p0;
+        args[0].i = *(s32*)pA;
     }
     if (uFloats & 2) {
-        args[1].f = *(f32*)p1;
+        args[1].f = *(f32*)pB;
     } else {
-        args[1].i = *(s32*)p1;
+        args[1].i = *(s32*)pB;
     }
     if (uFloats & 4) {
-        args[2].f = *(f32*)p2;
+        args[2].f = *(f32*)pC;
     } else {
-        args[2].i = *(s32*)p2;
+        args[2].i = *(s32*)pC;
     }
     if (uFloats & 8) {
-        args[3].f = *(f32*)p3;
+        args[3].f = *(f32*)pD;
     } else {
-        args[3].i = *(s32*)p3;
+        args[3].i = *(s32*)pD;
     }
     if (uFloats & 0x10) {
-        args[4].f = *(f32*)p4;
+        args[4].f = *(f32*)pE;
     } else {
-        args[4].i = *(s32*)p4;
+        args[4].i = *(s32*)pE;
     }
     fn_8016B09C(lbl_80281F1C->pHandler, nMsg, 5, args);
 }
@@ -484,12 +467,12 @@ void fn_800E5CA4(int a, int b, int c, int d, int e, int g, int h, f32 f) {
     fn_8016B09C(lbl_80281F1C->pHandler, 0x42, 8, args);
 }
 
-void fn_800E5D40(int p0) {
-    fn_80062D6C(89, p0);
+void fn_800E5D40(int n) {
+    fn_80062D6C(89, n);
 }
 
-void fn_800E5D68(char* p0) {
-    fn_800E5C08(90, p0);
+void fn_800E5D68(char* pStr) {
+    fn_800E5C08(90, pStr);
 }
 
 u8 fn_800E5D90(void) {

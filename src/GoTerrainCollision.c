@@ -21,7 +21,6 @@ u8    fn_8000C3C8(f32* pFrom, f32* pTo, TNetwork* pNet, s32 nNodes, f32* pHit); 
 void  fn_8004B588(TNetwork* pNet);
 u8    Ter_LieIsPreferred(u32 nClass);
 void  fn_8004B63C(TNetwork* pNet);
-void  vec4flt_CrossProduct(f32* pA, f32* pB, f32* pOut);
 f32   fn_8000C5FC(f32* pA, f32* pB);                      // dot product
 void  fn_8005097C(f32* pA, f32* pB, f32* pOut);           // a - b (paired-single assembly)
 void  fn_800509A0(f32* pSrc, f32* pDst);                  // negate (paired-single assembly)
@@ -48,7 +47,6 @@ f32   fn_8004D01C(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef**
                   s32* pTri);
 void  fn_8004D2E0(CourseInfo* pCourse, f32* pPos, TerPolyRef** ppRefLow, f32* pLow, f32 (**ppTriLow)[3],
                   TerPolyRef** ppRefHigh, f32* pHigh, f32 (**ppTriHigh)[3]);
-f32   fn_800BB028(f32* pA, f32* pB);                      // squared distance
 u8    Ter_CheckForGroundCollision(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
                                   SurfaceType** ppSurface, TerObject** ppObj);
 u8    fn_8004EB7C(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32* pDir, f32 fMax, f32* pHit,
@@ -1115,7 +1113,7 @@ u8 fn_8004E0D4(f32* pFrom, f32* pDir, f32 fRange, f32* pCentre, f32 fRadius) {
 // TW06: bool Ter_CheckForPinCollision(TGD_TerrainInfo*, s32, f32*, f32*, f32[4]*, f32[4]*,
 // TGD_MaterialInfo**, TGD_ObjectInstanceInfo**). Whether the line from pFrom to pTo hits the
 // flagstick of the current hole: a vertical cylinder of one inch radius, 2 yards tall, at the pin.
-// Not for nobody's ball, nor when the player's view has the flagstick out (view byte 0x275). On
+// Not for nobody's ball, nor when the player's view has the flagstick out (bFlagOut). On
 // a hit: the point, the stick's outward normal and surface 90 (the cup).
 u8 Ter_CheckForPinCollision(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
                             SurfaceType** ppSurface, TerObject** ppObj) {
@@ -1134,7 +1132,7 @@ u8 Ter_CheckForPinCollision(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* p
     f32 fT;
 
     if (nPlayer < 0) return 0;
-    if (fn_80016CFC(gPlayers[nPlayer].nView0)[0x275]) return 0;
+    if (fn_80016CFC(gPlayers[nPlayer].nView0)->bFlagOut) return 0;
     // the line relative to the pin
     vFrom[0] = pFrom[0] - pCourse->pin[Game_CurrentPinSet()].x;
     vFrom[1] = pFrom[1] - pCourse->pin[Game_CurrentPinSet()].y;

@@ -9,22 +9,18 @@
 #include "engine.h"
 #include "game/save.h"
 
-typedef struct View View;
-
 void  fn_800E0A84(u8 v);
 void  fn_800D29E8(void);
 void  fn_800D33F0(void);
 int   fn_800E177C(void);
 void  fn_800E2470(void);
 void  fn_8006F4B4(void);
-void  fn_800170C4(int nView, int a);
 void  fn_800E299C(void);
 void  fn_800E3B28(void);
 void  fn_800DA36C(void);
 void  GM_FlyByMode_Init(void);
 void  fn_800D8D38(int nPlayer);
 void  Caddie_Stop(void);
-void  fn_8001D7A4(int nHandle);
 u8    fn_800E0A90(int nPlayer);
 void  fn_800D439C(int nPlayer, int a);
 void  fn_800D9834(int nPlayer);
@@ -59,8 +55,6 @@ void  fn_800BB0A8(void);
 void  fn_800335F8(int a);
 void  fn_8006C4C0(int nPlayer);
 void  fn_8006C4A0(void);
-void  fn_800957FC(int nHandle, int a);
-u8*   fn_80016CFC(int nView);
 void  fn_800E0AF0(f32* pFrom, f32* pTo, f32* pOut);
 
 f32   fn_800336E4(void);
@@ -71,7 +65,6 @@ u8    fn_800E45CC(void);
 u8    fn_800E46B4(void);
 void  fn_800E2A88(void);
 void  fn_800E1018(int nPlayer, int nHole);
-void  fn_800C6C8C(void);
 void  fn_800E41C8(void);
 
 int   fn_8006AA9C(int nPlayer);             // how the shot turned out (0..4, 8+)
@@ -80,8 +73,6 @@ void  fn_8006AAB4(int nPlayer, int a);
 u32   fn_800136DC(int nController);         // buttons: held << 16 | pressed this frame
 u32   fn_800142AC(int nButton, int a);      // a button's mask
 u8    fn_80014300(u32 uMask);               // any pad pressed these buttons
-u8    fn_80063C90(void* pView);             // the camera is still moving
-void  fn_80063BF4(void* pView, f32 f, f32* pVec);
 void  fn_80062D0C(int nPlayer);
 void  fn_80062B78(int nPlayer);
 void  fn_80062B74(int nPlayer);
@@ -94,7 +85,6 @@ void  Shot_Prepare(int nPlayer, u8 bNotify);
 void  BreakLine_Start(int nView);            // GoBreakLine.c
 void  fn_8009B970(int nView);
 void  fn_800689D4(int nPlayer);
-void  fn_800C4E80(void* pView, int nPlayer);
 u8    GM_bIsZoomButtonPressed(int nPlayer);
 u8    GM_bIsElevatorCamButtonPressed(int nPlayer);
 u8    fn_800E012C(int nPlayer);
@@ -103,14 +93,11 @@ u8    fn_800DFF0C(int nPlayer);
 u64   fn_800954A4(int a);                   // a time stamp
 f32   fn_8006E118(u64 tEnd, u64 tStart);    // seconds between two time stamps
 int   GameEffects_BallUpdatesThisFrame(int nPlayer);
-u8    fn_800C71A4(void* pView, int nPlayer);
 void  fn_8006B2C4(int nPlayer, int a);
 u8    fn_800BB1F8(int nPlayer);
 
-void  fn_8001DB04(int nHandle, f32* pOut);  // the golfer's position
 void  fn_800E0B14(f32* pA, f32* pB, f32* pOut);
 u8    fn_8004560C(void);
-int   fn_80095798(int nHandle);
 
 void  fn_800E5228(void);
 
@@ -249,7 +236,7 @@ void GM_EndOfGolferTurn(int nPlayer) {
     u8 bWait;
     Caddie_Stop();
     gpGame->pfnEndGolferTurn(nPlayer);
-    fn_8001D7A4(gPlayers[nPlayer].nShotHandle);
+    fn_8001D7A4(gPlayers[nPlayer].pChar);
     EVENT_Trigger(nPlayer, 4, 0, -1);
     fn_800E4204();
     if (gpGame->pfnHoleFinished(nPlayer, 0) || fn_800E0A90(nPlayer)) {
@@ -615,15 +602,15 @@ u8 GM_PlayerTakeMulligan(int nPlayer) {
         fn_8006C4A0();
     }
     fn_800C70F8(fn_80017028(gPlayers[nPlayer].nView0), 1);
-    fn_800957D8(gPlayers[nPlayer].nShotHandle);
-    fn_800957FC(gPlayers[nPlayer].nShotHandle, 1);
+    fn_800957D8(gPlayers[nPlayer].pChar);
+    fn_800957FC(gPlayers[nPlayer].pChar, 1);
     GOLFERSTATE_Switch(GS_SWING, nPlayer);
     fn_800E3D38(nPlayer, 1);
-    fn_80016CFC(gPlayers[nPlayer].nView0)[0x275] = 1;
+    fn_80016CFC(gPlayers[nPlayer].nView0)->bFlagOut = 1;
     for (i = 0, q = gPlayers; i < gSession.nNumPlayers; i++, q++) {
         if (q->bPlayerCut == 0 && q->nView0 == gPlayers[nPlayer].nView0 &&
             q->ball.nLie != 10 && q->ball.nLie != LIE_GREEN && q->ball.nLie != LIE_HOLED) {
-            fn_80016CFC(gPlayers[nPlayer].nView0)[0x275] = 0;
+            fn_80016CFC(gPlayers[nPlayer].nView0)->bFlagOut = 0;
         }
     }
     return 1;
@@ -698,13 +685,13 @@ int GM_ShowPostShotAnimation(int nPlayer) {
             return 0;
         }
     }
-    if (((ShotObj*)gPlayers[nPlayer].nShotHandle)->n438 == 11 &&
+    if (gPlayers[nPlayer].pChar->blend.nGroup == 11 &&
         gPlayers[nPlayer].ball.nStartSurface == 0x2D) {
         return 0;
     }
     pCourse = fn_8000C594();
     if (pCourse) {
-        fn_8001DB04(gPlayers[nPlayer].nShotHandle, vPos);
+        fn_8001DB04(gPlayers[nPlayer].pChar, vPos);
         Ter_GetEnclosingGroundData(pCourse, vPos, &fHighA, &pSurfA, vNormA, &fHighB, &pSurfB, vNormB);
         if (-65536.125f == fHighA && -65536.125f == fHighB) {
             return 0;
@@ -752,11 +739,11 @@ int GM_ShowPostShotAnimation(int nPlayer) {
     if (fn_8004560C()) {
         return 1;
     }
-    if (fn_80095780(gPlayers[nPlayer].nShotHandle) == 9 || fn_80095798(gPlayers[nPlayer].nShotHandle) == 9) {
+    if (fn_80095780(gPlayers[nPlayer].pChar) == 9 || fn_80095798(gPlayers[nPlayer].pChar) == 9) {
         return 1;
     }
     if (gPlayers[nPlayer].uFlags & 1) {
-        return *(s32*)((u8*)gPlayers[nPlayer].nShotHandle + 0x1790) != 0;
+        return gPlayers[nPlayer].pChar->p1790 != NULL;
     }
     if (gPlayers[nPlayer].nShotKind == SHOT_PUTT) {
         switch (nResult) {
@@ -827,8 +814,8 @@ void GM_RestartHole(void) {
         GameEffects_ResetGameEffectSettings();
         fn_800C6C8C();
         for (i = 0; i < gSession.nNumPlayers; i++) {
-            fn_800957D8(PLAYER(i)->nShotHandle);
-            fn_800957FC(PLAYER(i)->nShotHandle, 1);
+            fn_800957D8(PLAYER(i)->pChar);
+            fn_800957FC(PLAYER(i)->pChar, 1);
         }
         fn_800E5714(2);
     }
@@ -980,8 +967,8 @@ void GM_CheckForShotChanges(int nPlayer) {
                 BreakLine_Start(gPlayers[nPlayer].nView0);
                 fn_8009B970(gPlayers[nPlayer].nView0);
                 fn_8001C804(nPlayer, 1, 1);
-                fn_800957D8(gPlayers[nPlayer].nShotHandle);
-                fn_80095744(gPlayers[nPlayer].nShotHandle, 5);
+                fn_800957D8(gPlayers[nPlayer].pChar);
+                fn_80095744(gPlayers[nPlayer].pChar, 5);
                 fn_800689D4(nPlayer);
                 fn_80062C38();
                 fn_800E3D38(nPlayer, 1);
@@ -1022,7 +1009,7 @@ void GM_CheckForShotChanges(int nPlayer) {
 // was recorded, the mode allows it and the hole was not conceded) or continue (button 0); a CPU
 // continues on any pad's button 0.
 void GM_DoPostShotInHoleUI(int nPlayer) {
-    void* pView = fn_80017028(gPlayers[nPlayer].nView0);
+    View* pView = fn_80017028(gPlayers[nPlayer].nView0);
     f32   vOffset[4] = {0.0f, 0.0f, 0.0f, 0.5f};
     if ((gPlayers[nPlayer].uFlags & 8) && fn_80063C7C(pView)) {
         GM_EndOfGolferTurn(nPlayer);
@@ -1056,7 +1043,7 @@ void GM_DoPostShotInHoleUI(int nPlayer) {
         }
         if (gReplayData.bF10 && (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x18, 0)) &&
             gpGame->b287 && (s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_CONCEDED && !fn_800E53B8() &&
-            !(*(u32*)((u8*)gPlayers[nPlayer].nShotHandle + 0x10) & 0x40)) {
+            !(gPlayers[nPlayer].pChar->u10 & 0x40)) {
             fn_80062D0C(nPlayer);
             fn_8006C300(nPlayer);
             GOLFERSTATE_Switch(GS_REPLAY_SWING, nPlayer);
@@ -1104,7 +1091,7 @@ int GM_ChooseRemoveBallState(int nPlayer) {
     if (gPlayers[nPlayer].bPlanReady) {
         return 1;
     }
-    if (fn_80095780(gPlayers[nPlayer].nShotHandle) == 9) {
+    if (fn_80095780(gPlayers[nPlayer].pChar) == 9) {
         return 0;
     }
     if (gPlayers[nPlayer].fA64 > 5.0f) {
@@ -1203,7 +1190,7 @@ void GM_SimulateBallMovement(int nPlayer) {
                 pFlags = &gPlayers[nPlayer].uFlags;
                 if (*pFlags & 1) {
                     if ((*pFlags & 4) && fDist < gPlayers[nPlayer].fEEC) {
-                        fn_80095744(gPlayers[nPlayer].nShotHandle, 9);
+                        fn_80095744(gPlayers[nPlayer].pChar, 9);
                     }
                 } else if (bReact) {
                     pDone = &gPlayers[nPlayer].bRehearsalDone;
@@ -1214,12 +1201,12 @@ void GM_SimulateBallMovement(int nPlayer) {
                             if (Rand_Next(1) % 100 < 50) {
                                 *pFlags |= 4;
                                 gPlayers[nPlayer].fEEC = fDist;
-                                fn_80095744(gPlayers[nPlayer].nShotHandle, 9);
+                                fn_80095744(gPlayers[nPlayer].pChar, 9);
                             }
                         } else if (*pLie != LIE_HOLED && gPlayers[nPlayer].ballBefore.fClosest < 0.2f) {
                             *pFlags |= 4;
                             gPlayers[nPlayer].fEEC = fDist;
-                            fn_80095744(gPlayers[nPlayer].nShotHandle, 9);
+                            fn_80095744(gPlayers[nPlayer].pChar, 9);
                         }
                         *pDone = 1;
                     }
