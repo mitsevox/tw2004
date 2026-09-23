@@ -1,255 +1,314 @@
-// FE_CrAPDB.c (EA's name, from its asserts; TW06): not yet decompiled; the sweep code below is the
-// matched small functions.
+// FE_CrAPDB.c (EA's name, from its asserts; TW06): the Create-A-Player database, every asset a
+// created golfer can wear or carry (hair, faces, shirts, hats, clubs...). The assets arrive in the
+// 'CR_A' stream object and the names they use in 'CR_S'; each asset belongs to one of the
+// CRAP_NUM_PARTS parts, has a category and a lock kind, and raises up to two attributes.
 
 #include "game_types.h"
 #include "charstate.h"
+#include "frontend/fe.h"
 
-// ---- sweep code (not yet cleaned up) ----
-
-s32 fn_80077ACC();
-s32 fn_80104020(s32 arg0);
-s32 fn_801048B0(u32 arg0);
-extern s32 lbl_80282460;
-s32 fn_80104F68(s32 p0);
-u32 fn_80104F7C(s32 arg0);
-extern s32 lbl_80282474;
-s32 fn_80105140(s32 p0);
-void fn_80105154(void);
-void fn_80077B78();
-void fn_801050D0();
+// This file, in address order.
+void fn_80105188(UStreamObject* pObject);
+void fn_801051F4(UStreamObject* pObject);
 void fn_80105240(void);
-void* fn_80104E84();
-u8* fn_80105264(void);
-s16 fn_80105298(void);
-s16 fn_801052CC(void);
-s16 fn_80105300(void);
-s16 fn_80105334(void);
-s32 fn_80105368(void);
-s32 fn_8010539C(void);
-s32 fn_801053D0(void);
-void fn_80104FA8();
-void fn_80105494();
-void fn_801054CC();
-void fn_80105504();
-void fn_8010553C();
-void fn_80105404(void);
-void fn_80105428(void);
-void fn_8010544C(void);
-void fn_80105470(void);
-s32 fn_80105574(void);
-s16 fn_801055A8(void);
-void fn_80105B80();
-void fn_80105B4C(s32 p0, s32 p1, s32 p2, s32 p3);
-s32 fn_80105C00(void);
-s32 fn_80105C30(void);
+void fn_80105B80(CrAPAsset* pAsset, char* pName);
+void fn_80105DAC(void);
 void fn_80105EFC(void);
-s32 fn_801061C8(s8 arg0);
-s32 fn_8015F844(s8*, s32*);
-extern s32 lbl_80281748;
-s32 fn_8010645C(s32 arg0, s8* arg1);
+u8   fn_801061C8(s8 n);
+u8   fn_801061F8(s16 nPart, int nCategory, int nWanted);
 
-s32 fn_80104020(s32 arg0) {
-    s32 temp_r3;
-
-    temp_r3 = fn_80077ACC();
-    if ((fn_8001E9CC((u32*)(temp_r3 + 0xB054), arg0) == 0) &&
-        (fn_8001E9CC((u32*)(temp_r3 + 0xB1CC), arg0) != 0)) {
+// The asset may be picked: it was not locked when last checked, and its aB1CC bit is set.
+u8 fn_80104020(int nAsset) {
+    SaveProfile* pProfile = fn_80077ACC();
+    if (!fn_8001E9CC(pProfile->aAssetLocked, nAsset) && fn_8001E9CC(pProfile->aB1CC, nAsset)) {
         return 1;
     }
     return 0;
 }
 
-s32 fn_801048B0(u32 arg0) {
-    if ((arg0 <= 2U) || ((u32) (arg0 - 7) <= 1U) || ((s32) arg0 == 0xC) || ((s32) arg0 == 0x13) || ((s32) arg0 == 0x14)) {
+// The parts whose choices are grouped by category, with an "All ..." entry: headwear, shirts,
+// pants and shorts, shoes, eyewear, watches and jewelry, miscellaneous; and part 12.
+u8 fn_801048B0(int nPart) {
+    if ((u32)nPart <= 2 || (u32)(nPart - 7) <= 1 || nPart == 12 || nPart == 19 || nPart == 20) {
         return 1;
     }
     return 0;
 }
 
-s32 fn_80104F68(s32 p0) {
-    return (*(s32*)(((u8*)lbl_80282460) + 0x8) + (p0 * 280));
+CrAPAsset* fn_80104F68(int nAsset) {
+    return &lbl_80282460->pAssets[nAsset];
 }
 
-u32 fn_80104F7C(s32 arg0) {
-    return (arg0 - (*(s32*)((u8*)(lbl_80282460) + 8))) / 280;
+int fn_80104F7C(CrAPAsset* pAsset) {
+    return pAsset - lbl_80282460->pAssets;
 }
 
-s32 fn_80105140(s32 p0) {
-    return *(s32*)(((u8*)lbl_80282474) + (((s16)p0) << 2));
+// Take the database's stream objects as they load.
+void fn_8010508C(void) {
+    UStream_RegisterHandler('CR_A', fn_80105188);
+    UStream_RegisterHandler('CR_S', fn_801051F4);
+}
+
+// Find each part's first asset (the assets are sorted by part; 0 when a part has none).
+void fn_801050D0(void) {
+    int nPart;
+    int i;
+    for (nPart = 0; nPart < CRAP_NUM_PARTS; nPart++) {
+        lbl_80282474[nPart] = 0;
+        for (i = 0; i < lbl_80282460->nAssets; i++) {
+            if (nPart == lbl_80282460->pAssets[i].nPart) {
+                lbl_80282474[nPart] = i;
+                break;
+            }
+        }
+    }
+}
+
+int fn_80105140(s16 nPart) {
+    return lbl_80282474[nPart];
 }
 
 void fn_80105154(void) {
-    UStream_UnregisterHandler(1129471809);
-    UStream_UnregisterHandler(1129471827);
+    UStream_UnregisterHandler('CR_A');
+    UStream_UnregisterHandler('CR_S');
 }
 
+// The 'CR_A' handler: the assets.
+void fn_80105188(UStreamObject* pObject) {
+    if (pObject != NULL) {
+        lbl_80282460->pAssets = (CrAPAsset*)pObject->pData;
+        lbl_80282460->nAssets = pObject->uSize / sizeof(CrAPAsset);
+        fn_80105DAC();
+        lbl_80282464 = pObject;
+        fn_80105240();
+    }
+}
+
+// The 'CR_S' handler: the names.
+void fn_801051F4(UStreamObject* pObject) {
+    if (pObject != NULL) {
+        lbl_80282460->pStrings = (char*)pObject->pData;
+        lbl_80282460->uStringsSize = pObject->uSize;
+        fn_80105EFC();
+        lbl_80282468 = pObject;
+    }
+}
+
+// With the assets loaded: index the parts and pick the day's random assets.
 void fn_80105240(void) {
     fn_801050D0();
     fn_80077B78();
 }
 
-u8* fn_80105264(void) {
-    u8* temp_r3;
-
-    temp_r3 = (u8*)fn_80104E84();
-    if (temp_r3 == NULL) {
+// A part's choice i: its name, and the fields below (0 or -1 when there is no such choice).
+char* fn_80105264(s16 nPart, int b, int i) {
+    CrAPAsset* pAsset = fn_80104E84(nPart, b, i);
+    if (pAsset == NULL) {
         return NULL;
     }
-    return temp_r3 + 4;
+    return pAsset->szName;
 }
 
-s16 fn_80105298(void) {
-    void* temp_r3;
-
-    temp_r3 = fn_80104E84();
-    if (temp_r3 == NULL) {
+s16 fn_80105298(s16 nPart, int b, int i) {
+    CrAPAsset* pAsset = fn_80104E84(nPart, b, i);
+    if (pAsset == NULL) {
         return 0;
     }
-    return (*(s16*)((u8*)(temp_r3) + 0x44));
+    return pAsset->n44;
 }
 
-s16 fn_801052CC(void) {
-    void* temp_r3;
-
-    temp_r3 = fn_80104E84();
-    if (temp_r3 == NULL) {
+s16 fn_801052CC(s16 nPart, int b, int i) {
+    CrAPAsset* pAsset = fn_80104E84(nPart, b, i);
+    if (pAsset == NULL) {
         return 0;
     }
-    return (*(s16*)((u8*)(temp_r3) + 0x46));
+    return pAsset->n46;
 }
 
-s16 fn_80105300(void) {
-    void* temp_r3;
-
-    temp_r3 = fn_80104E84();
-    if (temp_r3 == NULL) {
+s16 fn_80105300(s16 nPart, int b, int i) {
+    CrAPAsset* pAsset = fn_80104E84(nPart, b, i);
+    if (pAsset == NULL) {
         return 0;
     }
-    return (*(s16*)((u8*)(temp_r3) + 0x48));
+    return pAsset->n48;
 }
 
-s16 fn_80105334(void) {
-    void* temp_r3;
-
-    temp_r3 = fn_80104E84();
-    if (temp_r3 == NULL) {
+s16 fn_80105334(s16 nPart, int b, int i) {
+    CrAPAsset* pAsset = fn_80104E84(nPart, b, i);
+    if (pAsset == NULL) {
         return -1;
     }
-    return (*(s16*)((u8*)(temp_r3) + 0x2C));
+    return pAsset->n2C;
 }
 
-s32 fn_80105368(void) {
-    void* temp_r3;
-
-    temp_r3 = fn_80104E84();
-    if (temp_r3 == NULL) {
+s32 fn_80105368(s16 nPart, int b, int i) {
+    CrAPAsset* pAsset = fn_80104E84(nPart, b, i);
+    if (pAsset == NULL) {
         return -1;
     }
-    return (*(s32*)((u8*)(temp_r3) + 0x30));
+    return pAsset->n30;
 }
 
-s32 fn_8010539C(void) {
-    void* temp_r3;
-
-    temp_r3 = fn_80104E84();
-    if (temp_r3 == NULL) {
+s32 fn_8010539C(s16 nPart, int b, int i) {
+    CrAPAsset* pAsset = fn_80104E84(nPart, b, i);
+    if (pAsset == NULL) {
         return -1;
     }
-    return (*(s32*)((u8*)(temp_r3) + 0x34));
+    return pAsset->n34;
 }
 
-s32 fn_801053D0(void) {
-    void* temp_r3;
-
-    temp_r3 = fn_80104E84();
-    if (temp_r3 == NULL) {
+s32 fn_801053D0(s16 nPart, int b, int i) {
+    CrAPAsset* pAsset = fn_80104E84(nPart, b, i);
+    if (pAsset == NULL) {
         return -1;
     }
-    return (*(s32*)((u8*)(temp_r3) + 0x38));
+    return pAsset->n38;
 }
 
-void fn_80105404(void) {
-    fn_80104FA8();
-    fn_80105494();
+// A part's choice i: the attributes it raises and the tiers (see fn_80105494).
+int fn_80105404(s16 nPart, int b, int i) {
+    return fn_80105494(fn_80104FA8(nPart, b, i));
 }
 
-void fn_80105428(void) {
-    fn_80104FA8();
-    fn_801054CC();
+int fn_80105428(s16 nPart, int b, int i) {
+    return fn_801054CC(fn_80104FA8(nPart, b, i));
 }
 
-void fn_8010544C(void) {
-    fn_80104FA8();
-    fn_80105504();
+int fn_8010544C(s16 nPart, int b, int i) {
+    return fn_80105504(fn_80104FA8(nPart, b, i));
 }
 
-void fn_80105470(void) {
-    fn_80104FA8();
-    fn_8010553C();
+int fn_80105470(s16 nPart, int b, int i) {
+    return fn_8010553C(fn_80104FA8(nPart, b, i));
 }
 
-s32 fn_80105574(void) {
-    void* temp_r3;
-
-    temp_r3 = fn_80104E84();
-    if (temp_r3 == NULL) {
-        return -1U;
-    }
-    return (*(u8*)((u8*)(temp_r3) + 0x41));
+// The attributes an asset raises (-1: none) and the tier it raises each to; an asset of lock kind
+// 28 has those of the asset it names.
+int fn_80105494(int nAsset) {
+    nAsset = fn_80103B28(nAsset);
+    return lbl_80282460->pAssets[nAsset].nAttrA;
 }
 
-s16 fn_801055A8(void) {
-    void* temp_r3;
+int fn_801054CC(int nAsset) {
+    nAsset = fn_80103B28(nAsset);
+    return lbl_80282460->pAssets[nAsset].nTierA;
+}
 
-    temp_r3 = fn_80104E84();
-    if (temp_r3 == NULL) {
+int fn_80105504(int nAsset) {
+    nAsset = fn_80103B28(nAsset);
+    return lbl_80282460->pAssets[nAsset].nAttrB;
+}
+
+int fn_8010553C(int nAsset) {
+    nAsset = fn_80103B28(nAsset);
+    return lbl_80282460->pAssets[nAsset].nTierB;
+}
+
+// A part's choice i: its lock kind and number (-1: no such choice).
+s8 fn_80105574(s16 nPart, int b, int i) {
+    CrAPAsset* pAsset = fn_80104E84(nPart, b, i);
+    if (pAsset == NULL) {
         return -1;
     }
-    return (*(s16*)((u8*)(temp_r3) + 0x42));
+    return pAsset->nLockKind;
 }
 
-void fn_80105B4C(s32 p0, s32 p1, s32 p2, s32 p3) {
-    s32 t0;
-    t0 = (s32)fn_80104E84();
-    fn_80105B80(t0, p3);
+s16 fn_801055A8(s16 nPart, int b, int i) {
+    CrAPAsset* pAsset = fn_80104E84(nPart, b, i);
+    if (pAsset == NULL) {
+        return -1;
+    }
+    return pAsset->nLock;
+}
+
+s8 fn_801055DC(int nAsset) {
+    if (nAsset < 0 || nAsset >= lbl_80282460->nAssets) {
+        return -1;
+    }
+    return lbl_80282460->pAssets[nAsset].nLockKind;
+}
+
+s16 fn_80105610(int nAsset) {
+    if (nAsset < 0 || nAsset >= lbl_80282460->nAssets) {
+        return -1;
+    }
+    return lbl_80282460->pAssets[nAsset].nLock;
+}
+
+int fn_80105644(s16 nPart, int b, int i, int n) {
+    CrAPAsset* pAsset = fn_80104E84(nPart, b, i);
+    if (pAsset == NULL) {
+        return -1;
+    }
+    return pAsset->a4A[n];
+}
+
+void fn_80105B4C(s16 nPart, int b, int i, char* pName) {
+    fn_80105B80(fn_80104E84(nPart, b, i), pName);
 }
 
 s32 fn_80105C00(void) {
-    return *(s32*)(lbl_80282460 + 0x0);
+    return lbl_80282460->nAssets;
 }
 
-s32 fn_80105C30(void) {
-    return ((u32)((-lbl_80282460) | lbl_80282460) >> 31);
+s32 fn_80105C0C(int nAsset) {
+    CrAPAsset* pAsset = &lbl_80282460->pAssets[nAsset];
+    if (pAsset == NULL) {
+        return -1;
+    }
+    return pAsset->n38;
 }
 
+u8 fn_80105C30(void) {
+    return lbl_80282460 != NULL;
+}
+
+// Called when the names arrive; empty in this build.
 void fn_80105EFC(void) {
 }
 
-s32 fn_801061C8(s8 arg0) {
-    if ((arg0 == (s8) (*(u8*)((u8*)(lbl_80282460) + 4))) || (arg0 == 2)) {
+// An asset with this n40 is offered: it matches the database's n4, or 2 (any).
+u8 fn_801061C8(s8 n) {
+    if (n == lbl_80282460->n4 || n == 2) {
         return 1;
     }
     return 0;
 }
 
-s32 fn_8010645C(s32 arg0, s8* arg1) {
-    u32 temp_r0;
+// An asset of category nCategory fits the category a part's list shows (nWanted); a part with an
+// "All ..." entry shows every category for -1.
+u8 fn_801061F8(s16 nPart, int nCategory, int nWanted) {
+    if (lbl_801932C8[nPart][0] != '\0') {
+        return nWanted == -1 || nCategory == nWanted;
+    }
+    return nCategory == nWanted;
+}
 
-    temp_r0 = (*(u32*)((u8*)(lbl_80282460) + 0xC));
-    if (temp_r0 == 0U) {
+// Copy the name at nOffset in the 'CR_S' strings into pDst ("" for "NONE").
+u8 fn_8010645C(int nOffset, char* pDst) {
+    char* pStrings = lbl_80282460->pStrings;
+    if (pStrings == NULL) {
         return 0;
     }
-    if (arg1 == NULL) {
+    if (pDst == NULL) {
         return 0;
     }
-    if (arg0 == -1) {
+    if (nOffset == -1) {
         return 0;
     }
-    strcpy((char*)arg1, (char*)(temp_r0 + arg0));
-    if (fn_8015F844(arg1, &lbl_80281748) == 0) {
-        *arg1 = 0;
+    strcpy(pDst, pStrings + nOffset);
+    if (fn_8015F844(pDst, "NONE") == 0) {
+        *pDst = '\0';
     }
     return 1;
 }
 
-// ---- end of sweep code ----
+char* fn_801064EC(int nCategory) {
+    if (lbl_80282460->pStrings == NULL) {
+        return NULL;
+    }
+    if (nCategory == -1) {
+        return NULL;
+    }
+    return lbl_80282460->pStrings + nCategory;
+}
