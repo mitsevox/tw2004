@@ -63,6 +63,7 @@ void  GM_ReplaceOOBBall(int nPlayer);
 SurfaceType* Ter_GetSupportingWorldMaterial(CourseInfo* pCourse, u8* pBall);
 void  fn_800DEB5C(int nPlayer);
 u8    fn_800A7720(void);
+u8    fn_80063C90(void* pView);             // the camera is still moving
 int   sprintf(char* pDst, const char* pFmt, ...);
 extern u8  lbl_801D7148[];                  // per profile slot: nonzero to show the profile's name
 void  fn_800FE190(f32* pA, f32* pB, f32* pOut);
@@ -1627,11 +1628,113 @@ void fn_800FDC0C(s32* p0, s32* p1, s32* p2) {
     *p2 = lbl_80192C00[gpGame->nCurCourse].n8;
 }
 
+// A hole on the solo scorecard: its seconds plus 3 per stroke.
+static inline s32 SG_Score(s32 nSeconds, s32 nStrokes) {
+    return nStrokes * 3 + nSeconds;
+}
+
+// EndGame: the prize money. Solo (mode 8): the total of time plus 3 per stroke over the holes
+// played, under the course's three limits (fn_800FDC0C), wins 5000, 2500 or 1000. Two players:
+// the winner takes the points margin over 3000 (4500 from a margin of 3000). Returns the winner
+// (-1 for none) and the money in *pMoney.
+s32 fn_800FDC5C(s32* pMoney) {
+    s32 n0;
+    s32 n4;
+    s32 n8;
+    int nHole;
+    int n;
+    int nWinner;
+    int h;
+    nHole = Game_CurHoleIndex();
+    if (!fn_800E1BBC()) {
+        *pMoney = 0;
+        return -1;
+    }
+    if (Game_GetMode() == 8) {
+        n = 0;
+        for (h = 0; h < nHole; h++) {
+            if (gpGame->bHoleSelected[h]) {
+                n += SG_Score(gPlayers[0].n290[h], gPlayers[0].nStrokes[h]);
+            }
+        }
+        n += SG_Score(gPlayers[0].n290[Game_CurHoleIndex()], gPlayers[0].nStrokes[Game_CurHoleIndex()]);
+        nWinner = 0;
+        fn_800FDC0C(&n0, &n4, &n8);
+        if (n < n8) {
+            n = 5000;
+        } else if (n < n4) {
+            n = 2500;
+        } else if (n < n0) {
+            n = 1000;
+        } else {
+            n = 0;
+            nWinner = -1;
+        }
+        if (nWinner != -1) {
+            fn_800D3548(nWinner, n, NULL);
+            gPlayers[nWinner].n330 += n;
+        }
+    } else {
+        n = gPlayers[0].nC44 - 3000;
+        if (n > 0) {
+            nWinner = 0;
+        } else if (n < 0) {
+            n = -n;
+            nWinner = 1;
+        } else {
+            n = 0;
+            nWinner = -1;
+        }
+        if (nWinner != -1) {
+            if (n >= 3000) {
+                n = 4500;
+            }
+            fn_800D3548(nWinner, n, NULL);
+            gPlayers[nWinner].n330 += n;
+        }
+    }
+    *pMoney = n;
+    return nWinner;
+}
+
+// The solo scorecard: the points of the holes played so far, plus the current hole's seconds,
+// strokes and score (also returned through the pointers). nPlayer is not read: it is player 0.
+s32 fn_800FDE58(int nPlayer, s32* pSeconds, s32* pStrokes, s32* pScore) {
+    int nHole;
+    int n;
+    int h;
+    nHole = Game_CurHoleIndex();
+    n = 0;
+    for (h = 0; h < nHole; h++) {
+        if (gpGame->bHoleSelected[h]) {
+            n += gPlayers[0].nC6C[h];
+        }
+    }
+    *pStrokes = gPlayers[0].nStrokes[Game_CurHoleIndex()];
+    *pSeconds = gPlayers[0].n290[Game_CurHoleIndex()];
+    *pScore = SG_Score(*pSeconds, *pStrokes);
+    n += *pScore;
+    return n;
+}
+
 void fn_800FDF38(void) {
     fn_800FCCF0();
 }
 
 u8 fn_800FDF58(int nPlayer) {
+    return 0;
+}
+
+// Whether the hole may end now (pfn234): during the countdown before the clock starts, once it
+// is below 71; otherwise once the camera has stopped moving.
+u8 fn_800FDF60(void) {
+    if (gPlayers[0].nC3C & 2) {
+        if (gPlayers[0].nC54 < 71) {
+            return 1;
+        }
+    } else if (!fn_80063C90(fn_80017028(gPlayers[0].nView0))) {
+        return 1;
+    }
     return 0;
 }
 
