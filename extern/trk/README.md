@@ -17,6 +17,8 @@ Changed for this game:
   it reports an I/O error (unless it was a short read), as this game's TRK does.
 - `MetroTRK/targimpl.c`: this game's `TRKPPCAccessFPRegister` does not call `ReadFPSCR` or
   `WriteFPSCR` for the FPSCR (register 0x20); it only masks the value to 32 bits.
+- `MetroTRK/msghndlr.c`: this game's `TRKDoReadMemory` and `TRKDoWriteMemory` have no ARAM path
+  (`TRKTargetAccessARAM`) and use a plain 0x800-byte stack buffer, not a 32-byte aligned one.
 
 `include/` holds just the headers these files need, copied from the same project.
 

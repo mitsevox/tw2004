@@ -558,7 +558,7 @@ config.libs = [
             Object(Matching, "MetroTRK/serpoll.c", extra_cflags=["-common on"]),
             Object(Matching, "MetroTRK/usr_put.c"),
             Object(Matching, "MetroTRK/dispatch.c"),
-            Object(NonMatching, "MetroTRK/msghndlr.c"),
+            Object(Matching, "MetroTRK/msghndlr.c"),
             Object(Matching, "MetroTRK/support.c"),
             Object(Matching, "MetroTRK/mutex_TRK.c"),
             Object(Matching, "MetroTRK/notify.c"),

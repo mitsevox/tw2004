@@ -177,7 +177,7 @@ void TRKDoCPUType(void)
  */
 DSError TRKDoReadMemory(MessageBuffer* buffer)
 {
-	u8 buf[0x820] __attribute__((aligned(32)));
+	u8 buf[0x800]; // this game's TRK: no ARAM access, so no 32-byte aligned buffer
 	size_t tempLength;
 	int result;
 	int replyErr;
@@ -197,11 +197,7 @@ DSError TRKDoReadMemory(MessageBuffer* buffer)
 
 	tempLength = length;
 
-	if (options & DSMSGMEMORY_Space_data) {
-		result = TRKTargetAccessARAM(buf, start, &tempLength, TRUE);
-	} else {
-		result = TRKTargetAccessMemory(buf, start, &tempLength, options & DSMSGMEMORY_Userview ? 0 : 1, TRUE);
-	}
+	result = TRKTargetAccessMemory(buf, start, &tempLength, options & DSMSGMEMORY_Userview ? 0 : 1, TRUE);
 
 	TRKResetBuffer(buffer, 0);
 
@@ -212,12 +208,7 @@ DSError TRKDoReadMemory(MessageBuffer* buffer)
 		reply._00          = tempLength + 0x40;
 		reply.commandID.b  = DSMSG_ReplyACK;
 		TRKAppendBuffer(buffer, &reply, sizeof(CommandReply));
-
-		if (options & 0x40) {
-			result = TRKAppendBuffer(buffer, buf + (start & 0x1F), tempLength);
-		} else {
-			result = TRKAppendBuffer(buffer, buf, tempLength);
-		}
+		result = TRKAppendBuffer(buffer, buf, tempLength);
 	}
 
 	if (result) {
@@ -253,7 +244,7 @@ DSError TRKDoReadMemory(MessageBuffer* buffer)
  */
 DSError TRKDoWriteMemory(MessageBuffer* b)
 {
-	u8 buf[0x820] __attribute__((aligned(32)));
+	u8 buf[0x800]; // this game's TRK: no ARAM access, so no 32-byte aligned buffer
 	size_t tempLength;
 	int options;
 	int result;
@@ -274,13 +265,8 @@ DSError TRKDoWriteMemory(MessageBuffer* b)
 	tempLength = length;
 
 	TRKSetBufferPosition(b, DSMSGMEMORY_Space_data);
-	if (options & DSMSGMEMORY_Space_data) {
-		TRKReadBuffer(b, buf + (start & 0x1f), tempLength);
-		result = TRKTargetAccessARAM(buf, start, &tempLength, FALSE);
-	} else {
-		TRKReadBuffer(b, buf, tempLength);
-		result = TRKTargetAccessMemory(buf, start, &tempLength, options & DSMSGMEMORY_Userview ? 0 : 1, FALSE);
-	}
+	TRKReadBuffer(b, buf, tempLength);
+	result = TRKTargetAccessMemory(buf, start, &tempLength, options & DSMSGMEMORY_Userview ? 0 : 1, FALSE);
 
 	TRKResetBuffer(b, 0);
 
