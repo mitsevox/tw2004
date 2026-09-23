@@ -6,7 +6,78 @@
 // .bss 0x801F1708-0x801F17D0, .sdata 0x80281418-0x80281460, .sbss 0x80282010-0x80282058,
 // .sdata2 0x80283F48-0x80283F88), and all its functions share those globals.
 
-#include "game_types.h"
+#include "core/gameaudio.h"
+
+// hlaudmovie.c
+void fn_800A874C(s32 n);
+void fn_800A87B4(s32 a, s32 n);
+void fn_800A8F68(u8 b);
+void fn_800A8700(u8 n);
+void fn_800A8708(u8 nCurve, f32 fVolume);
+void fn_800A871C(u8 nCurves, f32* pVolumes);
+
+// hlaudemitter.c
+void fn_800AD698(u8 nId, u8 nTrack, u8 bOn);
+u8   fn_800AD618(u8 nId, u8 nTrack);
+void fn_800AD790(u8 nId, u8 nTrack, u32 uParams);
+void fn_800AD9AC(u8 nId, u8 nTrack, u8 n);
+void fn_800ADB4C(s16 nKind, u8 nTrack, u8 bOn);
+void fn_800ADC44(s16 nKind, u8 nTrack, u8 n);
+void fn_800ADCD0(s16 nKind, u8 nTrack, u8 n, u8 b);
+
+void fn_800DC6E8(int nPlayer);
+void fn_800BA734(int n, s8 nTrack);
+
+void fn_800A3F38(u8 b, u8 b2);
+void fn_800A3FB4(u8 nCurve, f32 fVolume);
+void fn_800A3FD4(u8 nCurves, f32* pVolumes);
+void fn_800A4084(void);
+void fn_800A41A4(void);
+void fn_800A43DC(void);
+void fn_800A44A0(void);
+void fn_800A47A0(void);
+void fn_800A484C(void);
+void fn_800A4928(void);
+u8   fn_800A4A24(s32 nCourse, int n);
+u8   fn_800A4A88(void);
+void fn_800A7968(u8 nId, u8 nTrack, u8 a, u16 b, s32 c);
+u8   fn_800A75F4(void);
+u8   fn_800A7720(void);
+u8   fn_800A7748(void);
+void fn_800A70E4(int n);
+void fn_800A7198(int n);
+
+// Each volume curve's volume (fn_800A4A88 hands them to hlaudmovie.c).
+f32 lbl_8018E988[32] = {
+    0.3f, 0.7f, 0.8f, 1.0f, 0.7f, 0.4f, 1.0f, 1.0f,
+    1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.7f, 0.7f, 0.4f,
+    1.5f, 1.5f, 1.5f, 1.4f, 1.0f, 1.0f, 0.4f, 1.0f,
+    1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+};
+
+GameAudioCourseSound lbl_8018EA08[9] = {
+    { 12, 3, 0 },
+    { 12, 4, 0 },
+    { 12, 9, 0 },
+    { 12, 10, 0 },
+    { 12, 11, 0 },
+    { 15, 1, 1 },
+    { 15, 18, 1 },
+    { 18, 2, 2 },
+    { 18, 18, 2 },
+};
+
+GameAudioView lbl_801F1790[2];
+
+u8 lbl_80282041;
+u8 lbl_80282033;
+u8 lbl_80282032;
+u8 lbl_80282031;
+u8 lbl_80282030;
+u8 lbl_8028202F;
+u8 lbl_8028202B;
+u8 lbl_80282024[2];
+u8 lbl_80282020;
 
 // ---- sweep code (not yet cleaned up) ----
 
@@ -30,21 +101,9 @@ u8 fn_800B0798();
 s32 fn_800B07A0();
 s32 fn_800B5B80();
 u8 fn_800A3E3C(s32 arg0);
-void fn_800A8F68();
-void fn_800A3F38(void);
-void fn_800A8700();
-void fn_800A8708();
-void fn_800A871C();
-void fn_800A3F94(void);
-void fn_800A3FB4(void);
-void fn_800A3FD4(void);
-s32 fn_80005AE8(s32*, s32, s32);
-extern u8 lbl_80282020;
-extern s32 lbl_80282024;
 s32 fn_800A402C(s32 p0);
 void fn_800A4038(void);
 void fn_800A4080(void);
-s32 fn_800AD698(u8, s32, s32);
 extern u8 lbl_8028141C;
 extern u8 lbl_8028141D;
 extern u8 lbl_80282040;
@@ -52,9 +111,7 @@ void fn_800A4374(void);
 extern u8 lbl_8028141A;
 extern s32 lbl_8028203C;
 void fn_800A49A4(u8 arg0);
-s32 fn_800A4A88();
 s32 fn_800A4BAC(void);
-s32 fn_800A7968(u8, s32, u8, u16, s32);
 s32 fn_800AD1C8();
 extern u8 lbl_80281419;
 extern u8 lbl_80282038;
@@ -63,11 +120,6 @@ extern u16 lbl_80282050;
 extern u8 lbl_80282052;
 extern u32 lbl_80282054;
 void fn_800A4BDC(void);
-s32 fn_800A4084();
-s32 fn_800A41A4();
-s32 fn_800A43DC();
-void fn_800A44A0();
-s32 fn_800A4928();
 extern u8 lbl_80282029;
 extern u8 lbl_8028202A;
 extern u8 lbl_8028202C;
@@ -81,10 +133,8 @@ void fn_800A5620(void);
 void fn_8006BAA8();
 void fn_800A707C(void);
 void fn_800A5E94(s32 p0);
-s32 fn_800ADB4C(s32, s32, s32);
 void fn_800A624C(void);
 void fn_800A6278(void);
-s32 fn_800ADC44(s32, s32, s32);
 void fn_800A62A4(void);
 void fn_800A62E0(void);
 void fn_800A631C(void);
@@ -95,29 +145,16 @@ void fn_800A640C(void);
 void fn_800A6448(void);
 void fn_800A644C(void);
 void fn_800A6EC8(void);
-void fn_800AD9AC(u8 nId, u8 nTrack, u8 n);
 void fn_800A6F38(void);
-extern void* gpGame;
-void fn_800A70E4(u8 arg0);
-void fn_800A714C(void);
-void fn_800A7198(u8 arg0);
-void fn_800A71E4(void);
-void fn_800A7294(void);
-void fn_800A47A0();
 s32 fn_800A6660(s32);
 extern u8 lbl_8028202E;
 void fn_800A72EC(u8 arg0, u8 arg1);
 void fn_800ADA28(u8 nId, u8 nTrack, u8 n, int bCheck);
 void fn_800A73C0(s32 p0, s32 p1);
 void fn_800A73F0(s32 arg0);
-u8 fn_800A7720(void);
 s32 fn_800A7528(void);
-u8 fn_800AD618(u8, s32);
-s32 fn_800A75F4(void);
 void fn_800A7644(void);
 void fn_800A76E4(void);
-void fn_800A7748(void);
-void fn_800A7924(void);
 void fn_800A7944(void);
 void Mov_Init();
 void Mov_Exit();
@@ -194,28 +231,6 @@ u8 fn_800A3E3C(s32 arg0) {
         }
     }
     return var_r3;
-}
-
-void fn_800A3F38(void) {
-    fn_800A8F68();
-}
-
-void fn_800A3F94(void) {
-    fn_800A8700();
-}
-
-void fn_800A3FB4(void) {
-    fn_800A8708();
-}
-
-void fn_800A3FD4(void) {
-    fn_800A871C();
-}
-
-u8 fn_800A3FF4(void) {
-    fn_80005AE8(&lbl_80282024, 0, 2);
-    lbl_80282020 = 0;
-    return 1;
 }
 
 s32 fn_800A402C(s32 p0) {
@@ -388,43 +403,6 @@ void fn_800A707C(void) {
     }
 }
 
-void fn_800A70E4(u8 arg0) {
-    if ((u8) (*(u8*)((u8*)(gpGame) + 0x288)) != 0) {
-        fn_800ADB4C(0, 0, 1);
-        fn_800ADC44(0, 1, arg0);
-        fn_800ADB4C(0, 1, 1);
-    }
-}
-
-void fn_800A714C(void) {
-    if ((u8) (*(u8*)((u8*)(gpGame) + 0x288)) != 0) {
-        fn_800ADB4C(0, 0, 0);
-        fn_800ADB4C(0, 1, 0);
-    }
-}
-
-void fn_800A7198(u8 arg0) {
-    if ((u8) (*(u8*)((u8*)(gpGame) + 0x288)) != 0) {
-        fn_800ADC44(1, 0, arg0);
-        fn_800ADB4C(1, 1, 1);
-    }
-}
-
-void fn_800A71E4(void) {
-    if ((u8) (*(u8*)((u8*)(gpGame) + 0x288)) != 0) {
-        fn_800ADB4C(1, 1, 0);
-    }
-}
-
-void fn_800A7294(void) {
-    if ((u8) (*(u8*)((u8*)(gpGame) + 0x288)) != 0) {
-        fn_800ADB4C(0, 2, 0);
-        if ((s32) lbl_8028203C == 2) {
-            fn_800AD698(lbl_8028141A, 2, 0);
-        }
-    }
-}
-
 void fn_800A72EC(u8 arg0, u8 arg1) {
     if ((lbl_8028202E ^ arg0) != 0) {
         lbl_8028202E = arg0;
@@ -473,14 +451,14 @@ void fn_800A75B4(void) {
     }
 }
 
-s32 fn_800A75F4(void) {
-    u8 var_r31;
+u8 fn_800A75F4(void) {
+    int bResult;
 
-    var_r31 = 0;
-    if (((s32) lbl_8028203C == 1) && (fn_800AD618(lbl_80281418, 0) != 0)) {
-        var_r31 = 1;
+    bResult = 0;
+    if (lbl_8028203C == 1 && fn_800AD618(lbl_80281418, 0)) {
+        bResult = 1;
     }
-    return var_r31;
+    return bResult;
 }
 
 void fn_800A7644(void) {
@@ -497,11 +475,7 @@ u8 fn_800A7720(void) {
     return fn_800AD618(lbl_80281419, 0);
 }
 
-void fn_800A7748(void) {
-    fn_800AD618(lbl_8028141A, 0);
-}
-
-void fn_800A7924(void) {
+void fn_800A7924(f32 f) {
     fn_800A44A0();
 }
 
@@ -548,3 +522,224 @@ void fn_800A7AD0(void) {
 }
 
 // ---- end of sweep code ----
+
+// Every caller passes a second flag (DiscError.c 1, this file 0); nothing here reads it.
+void fn_800A3F38(u8 b, u8 b2) {
+    fn_800A8F68(b);
+}
+
+void fn_800A3F58(u8 bLow, u8 bHigh) {
+    s32 nMask;
+
+    nMask = 0;
+    if (bLow) {
+        nMask |= 0xFFFF;
+    }
+    if (bHigh) {
+        nMask |= 0xFFFF0000;
+    }
+    fn_800A874C(nMask);
+}
+
+void fn_800A3F94(u8 n) {
+    fn_800A8700(n);
+}
+
+void fn_800A3FB4(u8 nCurve, f32 fVolume) {
+    fn_800A8708(nCurve, fVolume);
+}
+
+void fn_800A3FD4(u8 nCurves, f32* pVolumes) {
+    fn_800A871C(nCurves, pVolumes);
+}
+
+u8 fn_800A3FF4(void) {
+    fn_80005AE8(lbl_80282024, 0, sizeof(lbl_80282024));
+    lbl_80282020 = 0;
+    return 1;
+}
+
+void fn_800A4044(u8 nIndex, u8 nValue) {
+    if (lbl_80282024[nIndex] != nValue) {
+        lbl_80282024[nIndex] = nValue;
+        fn_800A87B4(nIndex, nValue);
+    }
+}
+
+void fn_800A4170(s32 n, u8 nState) {
+    if (nState == 2) {
+        fn_800DC6E8(fn_8001707C(0));
+    }
+}
+
+void fn_800A42B0(u8 n) {
+    if (lbl_8028202F == 0) {
+        if (lbl_80282040 == 0) return;
+        fn_800AD9AC(lbl_8028141C, 2, n);
+        fn_800AD9AC(lbl_8028141D, 2, n);
+        fn_800AD9AC(lbl_8028141C, 3, n);
+        fn_800AD9AC(lbl_8028141D, 3, n);
+        fn_800AD698(lbl_8028141C, 2, 1);
+        fn_800AD698(lbl_8028141D, 2, 1);
+        fn_800AD698(lbl_8028141C, 3, 1);
+        fn_800AD698(lbl_8028141D, 3, 1);
+    }
+}
+
+void fn_800A4928(void) {
+    switch (lbl_8028203C) {
+    case 2:
+        if (lbl_80282041 != 0 && lbl_8028202D == 0 && !fn_800A7748()) {
+            lbl_80282041 = 0;
+            fn_800A484C();
+        }
+        break;
+    case 1:
+        if (!fn_800A75F4()) {
+            fn_800A47A0();
+        }
+        break;
+    }
+}
+
+// The sound for a course and n (fn_800A484C passes fn_80015464()), or 0xFF when it has none.
+u8 fn_800A4A24(s32 nCourse, int n) {
+    u8 nSound;
+    int i;
+
+    nSound = 0xFF;
+    for (i = 0; i < 9; i++) {
+        if (nCourse == lbl_8018EA08[i].nCourse && (u8)(n + 1) == lbl_8018EA08[i].n4) {
+            nSound = lbl_8018EA08[i].nSound;
+            break;
+        }
+    }
+    return nSound;
+}
+
+void fn_800A6450(u8 nPlayer) {
+    u8 nId;
+
+    nId = lbl_801F1790[gPlayers[nPlayer].nView[0]].n0;
+    if (nId != 0xFF) {
+        fn_800AD698(nId, 2, 1);
+    }
+}
+
+// The calls below only sound when gpGame->b288 is set.
+void fn_800A70E4(int n) {
+    if (gpGame->b288) {
+        fn_800ADB4C(0, 0, 1);
+        fn_800ADC44(0, 1, n);
+        fn_800ADB4C(0, 1, 1);
+    }
+}
+
+void fn_800A714C(void) {
+    if (gpGame->b288) {
+        fn_800ADB4C(0, 0, 0);
+        fn_800ADB4C(0, 1, 0);
+    }
+}
+
+void fn_800A7198(int n) {
+    if (gpGame->b288) {
+        fn_800ADC44(1, 0, n);
+        fn_800ADB4C(1, 1, 1);
+    }
+}
+
+void fn_800A71E4(void) {
+    if (gpGame->b288) {
+        fn_800ADB4C(1, 1, 0);
+    }
+}
+
+void fn_800A7220(f32 fAmount) {
+    u8 n;
+
+    n = 3.0f * fAmount;
+    if (gpGame->b288) {
+        fn_800ADC44(0, 2, (n <= 2) ? n : 2);
+        fn_800ADB4C(0, 2, 1);
+    }
+}
+
+void fn_800A7294(void) {
+    if (gpGame->b288) {
+        fn_800ADB4C(0, 2, 0);
+        if (lbl_8028203C == 2) {
+            fn_800AD698(lbl_8028141A, 2, 0);
+        }
+    }
+}
+
+void fn_800A7350(u8 bOn) {
+    if ((lbl_8028202B ^ bOn) != 0) {
+        lbl_8028202B = bOn;
+        if (lbl_8028202E == 0) {
+            fn_800A3F38(bOn, 0);
+            if (bOn) {
+                fn_800A73C0(0, 1);
+            } else {
+                lbl_8028202C = 1;
+            }
+        }
+    }
+}
+
+void fn_800A746C(s32 nKind, int nTrack, int n) {
+    switch (nKind) {
+    case 0:
+        fn_800ADC44(5, nTrack, n);
+        fn_800ADB4C(5, nTrack, 1);
+        break;
+    case 1:
+        fn_800ADCD0(6, 0, n, 0);
+        break;
+    }
+}
+
+void fn_800A74E4(s32 nKind, int nTrack) {
+    switch (nKind) {
+    case 0:
+        fn_800ADB4C(5, nTrack, 0);
+        break;
+    case 1:
+        break;
+    }
+}
+
+void fn_800A754C(u8 a, u16 b) {
+    if (lbl_8028203C == 1) {
+        fn_800A7968(lbl_80281418, 0, a, b, 2);
+        fn_800AD698(lbl_80281418, 0, 1);
+        fn_800BA734(1, b);
+    }
+}
+
+u8 fn_800A7748(void) {
+    return fn_800AD618(lbl_8028141A, 0);
+}
+
+u8 fn_800A7770(void) {
+    int bResult;
+
+    if (gSession.nGameType == 3) {
+        return fn_800A75F4();
+    }
+    bResult = 0;
+    if (fn_800A7720() || fn_800A7748() || fn_800A75F4()) {
+        bResult = 1;
+    }
+    return bResult;
+}
+
+void fn_800A78F0(f32 fVolume) {
+    fVolume *= lbl_8018E988[14];
+    fn_800A3FB4(14, fVolume);
+}
+
+void fn_800A7968(u8 nId, u8 nTrack, u8 a, u16 b, s32 c) {
+    fn_800AD790(nId, nTrack, (c << 24) | (a << 16) | b);
+}
