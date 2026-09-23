@@ -148,5 +148,5 @@ void fn_8002A608(GxTexture* pTex) {
 }
 
 void* fn_8002A624(void) {
-    return *(void**)lbl_80281100;
+    return lbl_80281100->pPixels;
 }
