@@ -2356,6 +2356,8 @@ src/MSL_C/PPCEABI/bare/H/string.c:
 
 src/MSL_C/strtold.c:
 	.text       start:0x8015A8D0 end:0x8015B8DC
+	.rodata     start:0x80185540 end:0x80185578
+	.sdata2     start:0x80284CA0 end:0x80284CB8
 
 src/MSL_C/strtoul.c:
 	.text       start:0x8015B8DC end:0x8015C120

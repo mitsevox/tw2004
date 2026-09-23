@@ -389,7 +389,7 @@ config.libs = [
         "progress_category": "sdk",
         "src_dir": "extern/sonicheroes",
         "objects": [
-            Object(NonMatching, "src/MSL_C/strtold.c"),
+            Object(Matching, "src/MSL_C/strtold.c"),
             Object(Matching, "src/MSL_C/strtoul.c"),
         ],
     },
