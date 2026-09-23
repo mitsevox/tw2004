@@ -394,16 +394,17 @@ u8* fn_800F0EB4(u16 nDate) {
 
 // This year's season (0..9 from 2003), or 0.
 s32 fn_800F0F54(void) {
-    s32 n;
     s32 nYear;
+    s32 n;
     s32 bOk;
+    s32 nSeason;
     fn_8011E020(&n, &n, &nYear, &n, &n, &n, &n);
     bOk = 0;
-    nYear -= 2003;
-    if (nYear >= 0 && nYear < 10) {
+    nSeason = nYear - 2003;
+    if (nSeason >= 0 && nSeason < 10) {
         bOk = 1;
     }
-    return bOk ? nYear : 0;
+    return bOk ? nSeason : 0;
 }
 
 u16 fn_800F0FBC(s32 i) {
