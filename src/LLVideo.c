@@ -6,11 +6,6 @@
 #include "ustream.h"
 #include "llvideo.h"
 
-// UStream.c
-int  UStream_Update(void);
-void UStream_AddBufferRef(UStreamBuffer** ppList);
-void UStream_ReleaseObjectBuffer(UStreamBuffer** ppBuffer);
-
 int  fn_80075280(Video* pVideo, int* pnQueued);
 void fn_800752DC(Video* pVideo);
 void fn_8007531C(void* pChunk);

@@ -31,16 +31,23 @@ typedef struct {
     u32   uDataSize;         // 0x0C  the save data after the header block
 } SFIODescriptor;
 
-// Library state (allocated by SFIOCreate). Fields are named as they are learned.
+// An open save, as the caller keeps it between calls (SFIOGetSessionInfo hands it out; SFIOEnd,
+// SFIOSeek, SFIORead and SFIOWrite take it back). 0x44 bytes.
+typedef struct {
+    int   uHandle;           // 0x00  result of the last mount/open; passed to the device layer
+    int   eDevice;           // 0x04  current device index (read as a short by SFIONextDeviceFromMask)
+    char  szDirName[1];      // 0x08  the save's directory: always empty on the GameCube (fn_80171744)
+    char  szFileName[0x20];  // 0x09  the save's file name on the device (fn_80171744)
+    char  szName[0x1B];      // 0x29  the name the host asked for
+} SFIOSession;
+LAYOUT_ASSERT(SFIOSession, 0x44);
+
+// Library state (allocated by SFIOInit). Fields are named as they are learned.
 typedef struct {
     int   eState;            // 0x00  3 or 6 = idle/ready; 0xB/0xC/0xD = operation in progress
     u32   eOperation;        // 0x04  which asynchronous step is running (unsigned: switch uses cmplwi)
     int   eLastError;        // 0x08
-    int   uHandle;           // 0x0C  result of the last mount/open; passed to the device layer
-    int   eDevice;           // 0x10  current device index (read as a short by SFIONextDeviceFromMask)
-    char  szDirName[1];      // 0x14  the save's directory: always empty on the GameCube (fn_80171744)
-    char  szFileName[0x20];  // 0x15  the save's file name on the device (fn_80171744)
-    char  szName35[0x1B];    // 0x35  the name the host asked for
+    SFIOSession Session;     // 0x0C
     int   uSearchDirection;  // 0x50  passed to SFIONextDeviceFromMask
     int   uExpected54;       // 0x54  compared with the close result
 } SFIOData;
@@ -84,6 +91,22 @@ extern SFIODevice* _SFIO_pDevice;
 
 void* const* CRC32_GetInterface(void);
 
+// SharedFileIO.c: what TagFile.c calls.
+int  SFIOInit(int* pDevices, const SFIOFuncTable* pFuncs, void* pAllocator);
+int  SFIOShutdown(void);
+int  SFIOGetSessionInfo(SFIOSession* pOut);
+int  SFIOBeginLoad(const char* pName, int eDevice, int uSearchDirection);
+int  SFIOBeginSave(const char* pName, int eDevice, int uSearchDirection);
+int  SFIOBeginDelete(const char* pName, int eDevice, int uSearchDirection);
+int  SFIOEnd(SFIOSession* pSession);
+int  SFIOSeek(SFIOSession* pSession, u32 uOffset, u32 uWhence);
+int  SFIORead(SFIOSession* pSession, void* pBuffer, u32 uSize);
+int  SFIOWrite(SFIOSession* pSession, void* pBuffer, u32 uSize);
+int  SFIOUpdate(int* pProcess, int* pResult);
+int  SFIOSetDescriptor(SFIODescriptor* pDescriptor);
+void SFIOPlatformCall80172F48(void* const** ppInterface);
+
+// SharedFileIO.c: shared with the platform layer.
 BOOL SFIOIsInitialized(void);
 int  SFIOGetLastError(void);
 void SFIOSetLastError(int eError);
@@ -104,5 +127,8 @@ void fn_80172F48(void* const** ppInterface);
 void fn_80172FA4(BOOL bEnable);
 u32  fn_80173000(void);
 int  fn_80173024(SFIODescriptor* pDescriptor);
+
+// TagFile.c, called by SharedFileIO.c.
+int  TagFile_SetDescriptor(SFIODescriptor* pDescriptor);
 
 #endif
