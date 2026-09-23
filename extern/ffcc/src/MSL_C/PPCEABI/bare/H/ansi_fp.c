@@ -604,7 +604,7 @@ double __dec2num(const decimal* d)
                 if (isdigit(c))
                     c -= '0';
                 else
-                    c = (unsigned char)(tolower(c) - 'a' + 10);
+                    c = (unsigned char)(_tolower(c) - 'a' + 10);
                 if (c != 0)
                     placed_non_zero = 1;
                 if (low)
@@ -670,7 +670,9 @@ double __dec2num(const decimal* d)
             if (__less_dec(&feedback1, &dec))
             {
                 decimal feedback2, difflow, diffhigh;
-                double next_guess = nextafter(first_guess, (double)INFINITY);
+                double next_guess = first_guess;
+                unsigned long long* ull = (unsigned long long*)&next_guess;
+                ++*ull;
                 if (isinf(next_guess))
                 {
                     first_guess = next_guess;
@@ -681,7 +683,7 @@ double __dec2num(const decimal* d)
                 {
                     feedback1 = feedback2;
                     first_guess = next_guess;
-                    next_guess = nextafter(next_guess, (double)INFINITY);
+                    ++*ull;
                     if (isinf(next_guess))
                     {
                         first_guess = next_guess;
@@ -702,13 +704,15 @@ double __dec2num(const decimal* d)
             else
             {
                 decimal feedback2, difflow, diffhigh;
-                double next_guess = nextafter(first_guess, (double)(-INFINITY));
+                double next_guess = first_guess;
+                unsigned long long* ull = (unsigned long long*)&next_guess;
+                --*ull;
                 __num2dec_internal(&feedback2, next_guess);
                 while (__less_dec(&dec, &feedback2))
                 {
                     feedback1 = feedback2;
                     first_guess = next_guess;
-                    next_guess = nextafter(next_guess, (double)(-INFINITY));
+                    --*ull;
                     __num2dec_internal(&feedback2, next_guess);
                 }
                 __minus_dec(&difflow, &dec, &feedback2);

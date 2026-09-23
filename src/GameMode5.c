@@ -582,7 +582,7 @@ void fn_800EC1E0(void) {
             fn_800EC170(nMedal);
             nProfile = gPlayers[0].nIndex;
             if (gpSaveData[nProfile].bActive) {
-                nMoney = GM_Earnings_ComputeTOURCardModifiers(nReward, 0, (CourseMoneyTracking*)aOut);
+                nMoney = fn_800D7220(nReward, 0, (CourseMoneyTracking*)aOut);
                 if (nMoney) {
                     switch (nMedal) {
                     case 0:
