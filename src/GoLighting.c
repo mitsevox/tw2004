@@ -17,3 +17,24 @@ void fn_8006E424(void) {
 }
 
 // ---- end of sweep code ----
+
+// ---- sweep code (not yet cleaned up) ----
+
+void fn_8006F144(void);
+void fn_8006F148(void);
+void fn_8006F14C(void);
+void fn_8006F150(void);
+
+void fn_8006F144(void) {
+}
+
+void fn_8006F148(void) {
+}
+
+void fn_8006F14C(void) {
+}
+
+void fn_8006F150(void) {
+}
+
+// ---- end of sweep code ----

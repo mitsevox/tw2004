@@ -12,6 +12,7 @@
 
 s32 fn_800A13E8(s32 nPort, s32 nSlot, s32 n);
 s32 fn_800A2248(s32 nPort, s32 nSlot);
+void fn_800A253C(void);
 
 // At boot: no created golfer yet; try fn_800A13E8 on each card, and at the first that succeeds mark
 // player slot 0's profile loaded and return 1.
@@ -236,7 +237,7 @@ s32 fn_800A2100(s32 nPort, s32 nSlot) {
     return nResult;
 }
 
-s32 fn_800A218C(void) {
+s32 fn_800A218C(s32 nPort, s32 nSlot) {
     return MC_ERR_NOFILE;
 }
 
@@ -285,4 +286,121 @@ s32 fn_800A2248(s32 nPort, s32 nSlot) {
         fn_8009DBAC(nPort, nSlot);
     }
     return nResult;
+}
+
+// Whether the data from pData up to pTrailer is a good save: the mark "@BD" or "@BE", then the
+// checksum.
+u8 fn_800A233C(void* pData, SaveTrailer* pTrailer) {
+    u32 uSum;
+    if (pTrailer->aMagic[0] != '@' || pTrailer->aMagic[1] != 'B'
+        || (pTrailer->aMagic[2] != 'D' && pTrailer->aMagic[2] != 'E')) {
+        return 0;
+    }
+    uSum = fn_800A23BC(pData, pTrailer);
+    if (uSum != pTrailer->uChecksum) {
+        return 0;
+    }
+    return 1;
+}
+
+// The save's CRC-32, over the table fn_800A253C builds.
+u32 fn_800A23BC(void* pData, SaveTrailer* pTrailer) {
+    u32 i;
+    u8* p = pData;
+    u32 nLen = (u8*)&pTrailer->uChecksum - p;
+    u32 uCrc = 0xFFFFFFFF;
+    u32 uSaved = pTrailer->uChecksum;
+    pTrailer->uChecksum = 0;
+    for (i = 0; i < nLen; i++) {
+        uCrc = (uCrc >> 8) ^ lbl_801F1110[(uCrc ^ *p++) & 0xFF];
+    }
+    pTrailer->uChecksum = uSaved;
+    return uCrc ^ 0xFFFFFFFF;
+}
+
+// Build the CRC table, at start-up (fn_800A2064). EA shifts right but uses the polynomial's
+// unreflected form 0x04C11DB7 (the usual table takes 0xEDB88320), so this is not the standard
+// CRC-32; the game only ever checks its own sums with it.
+void fn_800A253C(void) {
+    u32 i;
+    u32 uCrc;
+    int k;
+    for (i = 0; i < 256; i++) {
+        uCrc = i;
+        for (k = 0; k < 8; k++) {
+            if (uCrc & 1) {
+                uCrc = (uCrc >> 1) ^ 0x04C11DB7;
+            } else {
+                uCrc >>= 1;
+            }
+        }
+        lbl_801F1110[i] = uCrc;
+    }
+}
+
+u8 fn_800A2604(s32 nEntry) {
+    return lbl_80281FF0[nEntry].b0;
+}
+
+char* fn_800A2614(s32 nEntry) {
+    return lbl_80281FF0[nEntry].szName;
+}
+
+s32 fn_800A2628(void) {
+    return lbl_80281FF4;
+}
+
+// Three callbacks of a table in .data (0x80189CB0 area), one per save kind, each paired with one
+// of fn_800A26D8/fn_800A270C/fn_800A2740: whether the file on the card was rejected as bad data.
+s32 fn_800A2630(MCCardPos* pPos) {
+    return fn_8009EE28(pPos->nPort, pPos->nSlot) == MC_ERR_BADDATA;
+}
+
+s32 fn_800A2668(MCCardPos* pPos) {
+    return fn_8009EE28(pPos->nPort, pPos->nSlot) == MC_ERR_BADDATA;
+}
+
+s32 fn_800A26A0(MCCardPos* pPos) {
+    return fn_8009EE28(pPos->nPort, pPos->nSlot) == MC_ERR_BADDATA;
+}
+
+// The space the three save kinds need (fn_8009D1D8's last argument).
+void fn_800A26D8(MCCardPos* pPos) {
+    fn_8009D1D8(pPos->nPort, pPos->nSlot, 0, 0);
+}
+
+void fn_800A270C(MCCardPos* pPos) {
+    fn_8009D1D8(pPos->nPort, pPos->nSlot, 0, 1);
+}
+
+void fn_800A2740(MCCardPos* pPos) {
+    fn_8009D1D8(pPos->nPort, pPos->nSlot, 0, 2);
+}
+
+void fn_800A2774(const u16* szSrc, char* szDst, s32 nMax) {
+    while (*szSrc != 0 && nMax > 1) {
+        if (*szSrc > 0xFF) {
+            *szDst = '\xAC';
+        } else {
+            *szDst = *szSrc;
+        }
+        szSrc++;
+        szDst++;
+        nMax--;
+    }
+    *szDst = 0;
+}
+
+void fn_800A27BC(const char* szSrc, u16* szDst, s32 nMax) {
+    while (*szSrc != 0 && nMax > 1) {
+        *szDst = *szSrc;
+        szSrc++;
+        nMax--;
+        szDst++;
+    }
+    *szDst = 0;
+}
+
+s32 fn_800A27F4(void) {
+    return lbl_80281FF8;
 }

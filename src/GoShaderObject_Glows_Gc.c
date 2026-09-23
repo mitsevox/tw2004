@@ -1,7 +1,7 @@
 // GoShaderObject_Glows_Gc.c (EA's name, from its asserts; also in EA's 2002 source tree): not yet
 // decompiled; the sweep code below is the matched small functions.
 
-#include "game_types.h"
+#include "glows.h"
 
 // ---- sweep code (not yet cleaned up) ----
 
@@ -26,3 +26,23 @@ void fn_80098350(void) {
 }
 
 // ---- end of sweep code ----
+
+void fn_80098740(void) {
+    s32 i;
+    lbl_801D99D0.nCount = 0;
+    for (i = 0; i < NUM_GLOWS; i++) {
+        lbl_801D99D0.a[i].p4 = NULL;
+    }
+    fn_80098350();
+}
+
+// Free the glows' data. The pointers are left as they were.
+void fn_800987D4(void) {
+    int i;
+    for (i = 0; i < NUM_GLOWS; i++) {
+        if (lbl_801D99D0.a[i].p4 != NULL) {
+            fn_80009E70(lbl_801D99D0.a[i].p4);
+            lbl_801D99D0.nCount--;
+        }
+    }
+}

@@ -15,6 +15,10 @@ typedef void (*UISReportFn)(s32 nLevel, const char* szFile, s32 nLine, const cha
 
 extern UISReportFn lbl_80282A28;
 
+// The scale and offset (four components each) screen nodes are drawn with (UISScreen.c).
+extern f32 lbl_80280628[4];
+extern f32 lbl_80280638[4];
+
 // The callbacks the game hands the studio (uiProcessInterface.c sets them). Parameters come from
 // the studio's calls, or where noted from the game's own callback.
 typedef void (*UISCommandFn)(s32 nCmd, s32 n1, s32 n2, s32 n3, s32 n4, s32 n5);  // the game's fn_8008F568
@@ -25,12 +29,29 @@ typedef void (*UISScreenFn)(u16 uGroup, u16 uScreen);
 typedef void (*UISScreenDataFn)(u16 uGroup, u16 uScreen, s32 n);
 typedef void (*UISHandlerFn)(void);                             // the table at UIStudio.ppfnHandlers
 
+// A handler a screen node has for an event (8 bytes; UISScreen.c looks them up).
+typedef struct UISHandler {
+    u16 uFlags;                     // 0x00: 0x8000 and 0x4000 mark two kinds of handler; with
+                                    //       neither, the bits under 0x2FFF are an ID
+    u16 uEvent;                     // 0x02: the event it handles
+    u32 u4;                         // 0x04: what a lookup returns (0: none)
+} UISHandler;
+
+// A node of a loaded screen (0x14 bytes).
+typedef struct UISNode {
+    u8 unk0[0xC];
+    u32 nHandlers;                  // 0x0C
+    UISHandler* pHandlers;          // 0x10
+} UISNode;
+LAYOUT_ASSERT(UISNode, 0x14);
+
 // A loaded screen (0x14 bytes, in the studio's screen table).
 typedef struct UISScreen {
     u32 uMask;                      // 0x00: one bit per event kind the screen has already taken
     u16 uGroup;                     // 0x04: the screen's group ID
     u16 uScreen;                    // 0x06: its ID within the group
-    u8 unk8[4];
+    u16 uPrevGroup;                 // 0x08: with uPrevScreen, the screen made current when this
+    u16 uPrevScreen;                // 0x0A: one is unloaded (fn_80168FC8)
     s32 bUnloading;                 // 0x0C: set while the screen waits to be unloaded
     void* pData;                    // 0x10: what the load callback returned; the unload callback gets it
 } UISScreen;
@@ -85,9 +106,24 @@ typedef struct UISRateFn {
 } UISRateFn;
 LAYOUT_ASSERT(UISRateFn, 0x34);
 
-// A 0x28-byte record in UIStudio.p60; the last one in use names the current screen.
+// Where the script interpreter (fn_80166098) is in a screen's script (0x14 bytes).
+typedef struct UISFrame {
+    s32 n0;                         // 0x00
+    s32 n4;                         // 0x04
+    s32 n8;                         // 0x08
+    s32* pC;                        // 0x0C: the value stack's top
+    u8* p10;                        // 0x10: the next opcode byte
+} UISFrame;
+LAYOUT_ASSERT(UISFrame, 0x14);
+
+// A 0x28-byte record in UIStudio.p60; the last one in use names the current screen. It keeps a
+// paused script: fn_80169308 restores the frame and runs it on when the screen it names is done.
 typedef struct UISRecord60 {
-    u8 unk0[0x24];
+    UISFrame frame;                 // 0x00: a copy of *pFrame, taken when the script paused
+    s32 n14;                        // 0x14: fn_80166098's last argument
+    UISScreen* pScreen;             // 0x18: the screen whose script paused
+    s32* p1C;                       // 0x1C: fn_80166098's second argument; also a stack top
+    UISFrame* pFrame;               // 0x20: the live frame
     u16 u24;                        // 0x24: a screen ID (fn_8016C6C4's third argument)
     u16 u26;                        // 0x26: a group ID (its second)
 } UISRecord60;
@@ -147,6 +183,7 @@ LAYOUT_ASSERT(UIStudio, 0xBC);
 
 // UISEvent.c
 void fn_80165528(UIStudio* pStudio, u8 b);
+s32 fn_80165ACC(UIStudio* pStudio, u16 uGroup, u16 uScreen);
 void fn_80165B90(s16 nA, s16 nB, UIStudio* pStudio, s32 nType, const UISEventData* pData, s32 nArgs,
                  const s32* pArgs);
 void fn_80165C6C(UISReportFn pfnReport);
@@ -158,6 +195,8 @@ void fn_80165E9C(UIStudio* pStudio, UISScreen* pScreen, u32 u18, s32 n30, u32 uI
 u32 fn_8016604C(UIStudio* pStudio, u32 u18, u32 uId);
 
 // UIStudio.c
+// Runs a screen's script from pFrame (a bytecode interpreter).
+s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, s32 n);
 void fn_80168B80(UIStudio* pStudio, u32 uEvent);
 
 // UISApi.c
@@ -181,15 +220,24 @@ u32 fn_80169D90(u32 nScreens, u32 nHandlers, u32 nRateFns, u32 n60, u32 nEventWo
 u8 fn_80169DC4(void* pFile);
 void fn_8016A030(UIStudio* pStudio, u32 uMs);
 
-// The file after UISApi.c (0x8016A2D4-0x8016C718).
+// UISScreen.c (0x8016A2D4-0x8016C718)
 // Sends event uEvent to a screen; *pbOut is set by it.
 void fn_8016A2D4(UIStudio* pStudio, UISScreen* pScreen, UISWordStack* pStack, s32 n3, u32 uEvent, s32 n5, u8 b6,
                  void* p7, u8* pbOut);
 void fn_8016A510(UIStudio* pStudio, UISScreen* pScreen, void* p, s32 n);
+void fn_8016A830(UIStudio* pStudio, s32 nOp, UISScreen* pScreen, s32 nNode);
+void fn_8016AEEC(UIStudio* pStudio, UISScreen* pScreen, s32 nNode, s32 n);
+void fn_8016B09C(UIStudio* pStudio, u32 uEvent, s32 nArgs, const s32* pArgs);
+void fn_8016B0F8(UIStudio* pStudio, u32 uEvent, s32 nArgs, const s32* pArgs);
 void fn_8016C15C(f32 f1, f32 f2, f32 f3, f32 f4);
 void fn_8016C174(f32 f1, f32 f2, f32 f3, f32 f4);
-u16 fn_8016C6C4(UIStudio* pStudio, u16 uGroup, u16 uScreen);
+f32* fn_8016C18C(void);
+f32* fn_8016C198(void);
 // Returns a pointer to the variable a rate function drives.
 f32* fn_8016C1A4(s32 n20, s32 n30);
+u32 fn_8016C5C4(UISNode* pNode, u16 uEvent);
+u32 fn_8016C614(UISNode* pNode, u16 uId, u16 uEvent);
+u32 fn_8016C674(UISNode* pNode, u16 uEvent);
+u16 fn_8016C6C4(UIStudio* pStudio, u16 uGroup, u16 uScreen);
 
 #endif

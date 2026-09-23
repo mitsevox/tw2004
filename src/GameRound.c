@@ -51,8 +51,6 @@ void  fn_80125E68(void);
 
 u8    fn_800E3AF8(void);
 void  fn_80057364(int a);
-int   fn_800D3118(int nRound, int nHole);    // a built round's course for a hole
-int   fn_800D315C(int nRound, int nHole);    // and its hole number (1-based)
 
 // Four floats: pOut gets pA minus pB.
 #ifdef __MWERKS__

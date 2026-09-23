@@ -146,7 +146,6 @@ extern f32           gRealBallRadiusIn;          // 0x80283300  0.84: a real gol
 extern Vec4          lbl_80183620;          // 0, 0, 0, 0.5 (assigned)
 
 void  fn_800130F8(int nPad, int n);              // rumble on
-void  fn_8006C2C8(int nPlayer, f32* pX, f32* pY);
 void  Swing_FaceVector(int nPlayer, f32* pOut);
 f32   Swing_MeterError(int nPlayer);
 void  Swing_ShapeVector(int nPlayer, f32* pOut);
@@ -155,7 +154,6 @@ void  fn_8005CCA8(int nPlayer);
 void  Vec_Sub(f32* pA, f32* pB, f32* pOut);      // 0x8005CBF4  a - b
 void  Vec_Add(f32* pA, f32* pB, f32* pOut);      // 0x8005CBD0  a + b
 void  Swing_ResetBoostAndSpin(int nPlayer);
-void  fn_8006C5E0(void);
 void  Swing_ClearFrameFlag(int nPlayer);
 void  fn_800360A0(void* p);
 void  Swing_LoadTuning(int nPlayer);
@@ -182,7 +180,6 @@ int   fn_8001707C(int nView);                    // the player a view belongs to
 void  GOLFERSTATE_Pop(int nPlayer);
 void  fn_80067710(int nPlayer, int a, int b);
 s8    GOLFERSTATE_GetPreviousState(int nPlayer);  // the state below the top of the stack
-void  fn_8006C608(void);
 void  fn_80017158(int nView);
 void  fn_80039344(int nView, f32 f);             // a per-view float (0x801D5010[nView])
 void  fn_80062B64(int nPlayer);
@@ -193,7 +190,6 @@ u8    fn_80062B88(int nPlayer);
 void  fn_80062B84(int a);
 u8    fn_80062B7C(void);
 void  fn_800A5980(u8 nPlayer);
-void  fn_8006C28C(int nPlayer, int nController);
 void  fn_80068AA8(int nPlayer);
 f32   fn_800D04AC(int nPlayer);
 void  fn_800170F4(int nView);
