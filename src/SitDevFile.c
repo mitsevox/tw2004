@@ -181,7 +181,7 @@ void fn_800BB4B0(void) {
 // The header's table offsets are from its start.
 void fn_800BB4B4(SitDevScripts* pScripts) {
     pScripts->p14 = (SitDevEntry*)((u8*)pScripts->p14 + (uptr)pScripts);
-    pScripts->p18 = pScripts->p18 + (uptr)pScripts;
+    pScripts->p18 = (SitDevAction*)((u8*)pScripts->p18 + (uptr)pScripts);
     pScripts->p1C = (SitDevEntry8*)((u8*)pScripts->p1C + (uptr)pScripts);
     pScripts->p20 = pScripts->p20 + (uptr)pScripts;
 }
@@ -254,6 +254,68 @@ u32 fn_800BB6FC(f32* pPos) {
         }
     }
     return uBits;
+}
+
+u8 fn_800BB8A8(SitDevEntry* pEntry, int nTest, SitDevData* pData, int nValue);
+
+// Whether every condition of the entry holds for the player. Value 86 is special: its argument
+// picks one of the 16-byte names at p20, to compare with the golfer's.
+u8 fn_800BB7AC(SitDevEntry* pEntry, SitDevData* pData, int nPlayer) {
+    int nWord;
+    int nBit;
+    int nTest = 0;
+    int nValue = 0;
+    u8 bTrue;
+    for (nWord = 0; nWord < 3; nWord++) {
+        for (nBit = 0; nBit < 32; nBit++, nValue++) {
+            if (pEntry->auTests[nWord] & (1 << nBit)) {
+                if (nValue == 86) {
+                    bTrue = strcmp(gPlayers[nPlayer].pChar->sz1614,
+                                   (char*)lbl_80282208->p20 + pEntry->aArg[nTest++] * 16) == 0;
+                } else {
+                    bTrue = fn_800BB8A8(pEntry, nTest++, pData, nValue);
+                }
+                if (!bTrue) return 0;
+            }
+        }
+    }
+    return 1;
+}
+
+// Test nTest of the entry against value nValue (signed when lbl_80193188 says so).
+u8 fn_800BB8A8(SitDevEntry* pEntry, int nTest, SitDevData* pData, int nValue) {
+    if (lbl_80193188[nValue]) {
+        switch (pEntry->aOp[nTest]) {
+        case 0:
+            return 1;
+        case 1:
+            return pEntry->aArg[nTest] == pData->aValue[nValue];
+        case 2:
+            return pEntry->aArg[nTest] != pData->aValue[nValue];
+        case 3:
+            return (s16)pData->aValue[nValue] > (s16)pEntry->aArg[nTest];
+        case 4:
+            return (s16)pData->aValue[nValue] < (s16)pEntry->aArg[nTest];
+        case 5:
+            return (pEntry->aArg[nTest] & pData->aValue[nValue]) != 0;
+        }
+    } else {
+        switch (pEntry->aOp[nTest]) {
+        case 0:
+            return 1;
+        case 1:
+            return pEntry->aArg[nTest] == pData->aValue[nValue];
+        case 2:
+            return pEntry->aArg[nTest] != pData->aValue[nValue];
+        case 3:
+            return pData->aValue[nValue] > pEntry->aArg[nTest];
+        case 4:
+            return pData->aValue[nValue] < pEntry->aArg[nTest];
+        case 5:
+            return (pEntry->aArg[nTest] & pData->aValue[nValue]) != 0;
+        }
+    }
+    return 0;
 }
 
 // Set value 5 of the shared block.
@@ -372,6 +434,134 @@ u8 fn_800BCD50(void) {
 
 s32 fn_800BCD5C(void) {
     return gpGame->nDC;
+}
+
+// ---- running a script's actions ------------------------------------------------------------
+
+u8   fn_800BCE70(SitDevAction* pAction, u8 nEvent);
+u8   fn_800BCF84(SitDevAction* pAction, int nPlayer, u8 nEvent);
+u8   fn_800BD3F8(SitDevAction* pAction, int nSit, int nPlayer, u8 nEvent);
+void fn_800BD580(SitDevEntry8* pDo, int nPlayer, u8 nEvent);
+
+// Try the entry's actions in order: each fires by its chance unless fn_800BD3F8 holds it back.
+void fn_800BCD68(SitDevEntry* pEntry, int nSit, int nPlayer, u8 nEvent) {
+    int i;
+    SitDevAction* pAction;
+    u8 bPlayed = 0;
+    for (i = 0; i < 4; i++) {
+        if (pEntry->aActions[i] == 0xFFF0) break;
+        pAction = &lbl_80282208->p18[pEntry->aActions[i]];
+        if (pAction->nChance > Rand_Next(1) % 100 && !fn_800BD3F8(pAction, nSit, nPlayer, nEvent)) {
+            if (pAction->bSound) {
+                bPlayed = fn_800BCE70(pAction, nEvent);
+            } else {
+                bPlayed = fn_800BCF84(pAction, nPlayer, nEvent);
+            }
+        }
+    }
+    if (lbl_80281E29 && !bPlayed) {
+        lbl_80281E28 = 0;
+    }
+    lbl_80281E29 = 0;
+}
+
+// Play a sound drawn from the action's deck, once per kind; not while the GameBreaker holds the
+// commentary back (then, for event 8, hand it to GameEffects for later).
+u8 fn_800BCE70(SitDevAction* pAction, u8 nEvent) {
+    int nCount;
+    u32 nLeft;
+    u32 nSound;
+    int bNot30;
+    if (lbl_802811B8->abPlayed[pAction->nKind]) return 0;
+    nCount = fn_800BB218(pAction->aList, 50);
+    nLeft = fn_800BB248(pAction->aList, nCount);
+    nSound = fn_800BB334(pAction->aList, nCount, nLeft, Rand_Next(1) % nLeft);
+    bNot30 = nEvent != 30;
+    if (!fn_800DC784()) {
+        fn_800BD83C((u16)nSound, bNot30);
+        lbl_802811B8->abPlayed[pAction->nKind] = 1;
+        return 1;
+    }
+    if (nEvent == 8) {
+        fn_800BD77C(nSound);
+    }
+    return 0;
+}
+
+// Whether an action is held back: in modes with odd holes, or for a ball in the cup, at situations
+// 21 and 22; for events 20 and 31 while the GameBreaker is up; and commentary (kinds 1 and 2)
+// during a replay, in modes 6..8 and where fn_800E39F0 says so, and everywhere but mode 11.
+u8 fn_800BD3F8(SitDevAction* pAction, int nSit, int nPlayer, u8 nEvent) {
+    int nMode = Game_GetMode();
+    if (nSit == 22 || nSit == 21) {
+        if (gpGame->b136 || gpGame->b137 || gpGame->b138 || gpGame->b139) return 1;
+        if (fn_800EC550()) {
+            if (nSit == 21) return 1;
+            if (nSit == 22 && gPlayers[nPlayer].ball.nLie != 0) return 1;
+        }
+    }
+    if (lbl_80202898.bGameBreaker && (nEvent == 20 || (nEvent == 31 && nSit != 2))) return 1;
+    if (pAction->nKind != 1 && pAction->nKind != 2) return 0;
+    if (gSession.bReplay || (u32)(nMode - 6) <= 2 || fn_800E39F0()) return 1;
+    if (!fn_800EC550() && nMode != 11) return 0;
+    if (nMode == 11) return 1;
+    return 0;
+}
+
+// Do one thing: 1 a commentary line (remembered in pE8), 11 and 10 sounds, 7 music, 4 a
+// GameBreaker for a human player, 12 and 13 set the player's emotion results.
+void fn_800BD580(SitDevEntry8* pDo, int nPlayer, u8 nEvent) {
+    int bNot30;
+    int nArg;
+    switch (pDo->nKind) {
+    case 1:
+        if (gSession.options.a0[4]) {
+            bNot30 = nEvent != 30;
+            if (!fn_800DC784()) {
+                fn_800BD83C((u16)pDo->n4, bNot30);
+            }
+            lbl_802811B8->pE8 = pDo;
+        }
+        break;
+    case 11:
+        if (gSession.options.a0[4] && !fn_800DC784()) {
+            nArg = 2;
+            if (nPlayer == 0) {
+                nArg = 0;
+            }
+            fn_800BD868((u16)pDo->n4, nArg);
+        }
+        break;
+    case 10:
+        if (gSession.options.a0[4]) {
+            fn_800BD7E8(pDo->n4);
+        }
+        break;
+    case 7:
+        if (fn_800DC784()) {
+            fn_800BD7D0(pDo->n4);
+        } else {
+            fn_800A6DCC(pDo->n4, nEvent != 5);
+        }
+        break;
+    case 4:
+        if (Player_IsNotCPU(nPlayer)) {
+            if (pDo->n4 == 0) {
+                fn_800DBA50(nPlayer);
+            } else {
+                fn_800DB30C(nPlayer, pDo->n4);
+            }
+        }
+        break;
+    case 12:
+        fn_8006AAB4(nPlayer, pDo->n4);
+        lbl_801FA198[nPlayer] = 1;
+        break;
+    case 13:
+        fn_8006ACE0(nPlayer, pDo->n4);
+        lbl_801FA1AC[nPlayer] = 1;
+        break;
+    }
 }
 
 // Clear the scripts' per-entry bytes.

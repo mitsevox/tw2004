@@ -322,6 +322,7 @@ void PlaceBall_UpdateMomentums(int nPlayer, f32 f);
 void fn_8006A6C4(int nPlayer);
 int  fn_8006AA9C(int nPlayer);          // how the shot turned out (0..4, 8+)
 void fn_8006AAB4(int nPlayer, int a);
+void fn_8006ACE0(int nPlayer, int nResult);
 void fn_8006ACF8(int nPlayer, int a);
 void Emotion_UpdatePlayerEmotion(int nPlayer);
 void fn_8006B2C4(int nPlayer, u8 bBefore);   // the shot's outcome from the ball (bBefore: ballBefore)
@@ -340,6 +341,7 @@ void fn_800A62A4(void);
 void fn_800A62E0(void);
 void fn_800A6358(void);
 void fn_800A63D0(void);
+void fn_800A6DCC(int nMusic, int a);
 void fn_800A72EC(u8 a, u8 b);
 void fn_800A7664(int nKind, int nMsg, int a);
 void fn_800A76E4(void);

@@ -18,7 +18,10 @@ typedef struct SitDevData {
     void* pD0;                                  // 0x0D0  freed by fn_8006765C when set
     u8*   pD4;                                  // 0x0D4  allocated by SitDev_LoadScripts, one byte per
                                                 //        SitDevScripts.n10; freed by fn_8006765C
-    u8    unkD8[0x140 - 0xD8];
+    u8    abPlayed[14];                         // 0x0D8  per kind of action: one has played already
+    u8    unkE6[2];
+    struct SitDevEntry8* pE8;                   // 0x0E8  the last line played (fn_800BD580 kind 1)
+    u8    unkEC[0x140 - 0xEC];
 } SitDevData;
 LAYOUT_ASSERT(SitDevData, 0x140);
 
@@ -35,17 +38,33 @@ typedef union SitDevBits {
 } SitDevBits;
 
 // An entry of the scripts' first table (SitDevScripts.p14, 0x30 bytes; 0x80067710 runs them).
+// Its conditions (fn_800BB7AC): for each bit n set in auTests, in order, test k compares
+// SitDevData.aValue[n] with aArg[k] by aOp[k].
 typedef struct SitDevEntry {
     u8         unk0[2];
     SitDevBits b2;              // 0x02
-    u8         unk4[0x30 - 0x4];
+    u32        auTests[SITDEV_NUM_VALUES / 32];   // 0x04
+    u8         aOp[8];          // 0x10  0 always true, 1 ==, 2 !=, 3 <, 4 >, 5 any common bit
+    u16        aArg[8];         // 0x18
+    u16        aActions[4];     // 0x28  SitDevScripts.p18 entries to try (fn_800BCD68), 0xFFF0 ends
 } SitDevEntry;
 
-// An entry of the scripts' third table (SitDevScripts.p1C, 8 bytes).
+// An entry of the scripts' second table (SitDevScripts.p18, 0x68 bytes): what a script does.
+typedef struct SitDevAction {
+    u8         nKind;           // 0x00  its SitDevData.abPlayed byte; kinds 1 and 2 are commentary
+    u8         nChance;         // 0x01  percent
+    u8         unk2;
+    u8         bSound;          // 0x03  nonzero: play a sound from aList (fn_800BCE70), else run
+                                //       p1C entries (fn_800BCF84)
+    u16        aList[50];       // 0x04  a deck (fn_800BB218..fn_800BB334); 0xFFF0 ends
+} SitDevAction;
+
+// An entry of the scripts' third table (SitDevScripts.p1C, 8 bytes): one thing to do.
 typedef struct SitDevEntry8 {
-    u8         unk0[2];
+    u8         nKind;           // 0x00  fn_800BD580's switch; also its SitDevData.abPlayed byte
+    u8         unk1;
     SitDevBits b2;              // 0x02
-    u8         unk4[0x8 - 0x4];
+    u32        n4;              // 0x04  its argument (a sound, a music, ...)
 } SitDevEntry8;
 
 // The situation scripts' header (lbl_80282208): the block whose address is the first word of
@@ -57,7 +76,7 @@ typedef struct SitDevScripts {
     u32   n0C;                  // 0x0C  words at p20
     u32   n10;                  // 0x10  bytes in SitDevData.pD4 (fn_800BD74C clears them)
     SitDevEntry*  p14;          // 0x14
-    u8*   p18;                  // 0x18  entries of 0x68 bytes (fn_800BCD68)
+    SitDevAction* p18;          // 0x18  (fn_800BCD68)
     SitDevEntry8* p1C;          // 0x1C
     u8*   p20;                  // 0x20
 } SitDevScripts;
@@ -79,6 +98,12 @@ typedef struct SitDevZone {
 
 extern SitDevZone* lbl_801FA1C0[10];    // the hole's zones
 extern s32 lbl_80282210;                // how many
+
+extern u8 lbl_80281E28;             // cleared by fn_800BCD68 when lbl_80281E29 is set and nothing played
+extern u8 lbl_80281E29;             // cleared by fn_800BCD68 after every run
+
+// Per value: nonzero when the scripts compare it as signed (fn_800BB8A8).
+extern u8 lbl_80193188[88];
 
 // Per game mode: the bit fn_800BB3F8 returns for it, -1 for none.
 extern s32 lbl_801910F8[28];
