@@ -43,8 +43,12 @@ typedef struct MiniPrize {
     s32 nMode17;                // 0x0C
     u8  unk10[0xC];
 } MiniPrize;
-extern u8 lbl_80200538[];
-#define MINI_PRIZES ((MiniPrize*)(lbl_80200538 + 0x710))
+typedef struct PrizeTable {
+    u8        unk0[0x710];
+    MiniPrize mini[20];         // 0x710
+} PrizeTable;
+extern PrizeTable lbl_80200538;
+#define MINI_PRIZES lbl_80200538.mini
 
 extern f32 lbl_80192810[];
 extern f32 lbl_80192844[];
@@ -150,12 +154,16 @@ void fn_800F1404(void) {
     fn_800F18C8();
 }
 
+// Sets the session's nF07 from the replay and returns it (an inline in EA's source).
+static inline s8 Replay_SetF07(void) {
+    return gSession.unk5B38 = gReplayData.nF07;
+}
+
 // Round setup: the saved course, hole and tees.
 void fn_800F1424(void) {
     int i;
     for (i = 0; i < 18; i++) {
-        gSession.unk5B38 = gReplayData.nF07;
-        gpGame->holeOrder[i] = gSession.unk5B38;
+        gpGame->holeOrder[i] = Replay_SetF07();
     }
     fn_800E14E0(gReplayData.nCourse);
     fn_800E1260(0);
@@ -166,8 +174,8 @@ void fn_800F1424(void) {
     if (gReplayData.nF12 == 3) {
         fn_800ED6F8(gReplayData.nF14 / 100.0f);
     }
-    gSession.unk5B38 = gReplayData.nF07;
     gSession.nTeeSet[0] = gReplayData.nTeeSet;
+    Replay_SetF07();
 }
 
 // Put player 0 back as they were before the shot, then start it.
@@ -200,7 +208,7 @@ void fn_800F15AC(void) {
     gPlayers[0].fDistance2 = gReplayData.player.fDistance2;
     Mem_cpy(gPlayers[0].ball, gReplayData.player.ball, 0xBC);
     fn_80055AA8(&ball, (f32*)gReplayData.player.ball, 0);
-    ((Ball*)gPlayers[0].ball)->pCourse = ball.pCourse;
+    gPlayers[0].pBallCourse = ball.pCourse;
     gPlayers[0].nBallOwner = 0;
     Physics_DropBall(&ball, (f32*)gReplayData.player.ball);
     fn_8001C774(gPlayers[0].nShotHandle, gPlayers[0].nClub);
@@ -247,7 +255,7 @@ void fn_800F194C(void) {
 }
 
 // The target games' target list.
-s8 fn_800F1960(void) {
+int fn_800F1960(void) {
     return NUM_TARGETS;
 }
 
@@ -256,11 +264,11 @@ void fn_800F196C(int i, f32* pOut) {
 }
 
 void fn_800F199C(f32 x, f32 y, f32 z) {
-    s8 n = NUM_TARGETS++;
-    TARGETS[n][0] = x;
-    TARGETS[n][1] = y;
-    TARGETS[n][2] = z;
-    TARGETS[n][3] = 1.0f;
+    TARGETS[NUM_TARGETS][0] = x;
+    TARGETS[NUM_TARGETS][1] = y;
+    TARGETS[NUM_TARGETS][2] = z;
+    TARGETS[NUM_TARGETS][3] = 1.0f;
+    NUM_TARGETS++;
 }
 
 // Sort the targets by distance from the tee, nearest first.
@@ -282,25 +290,22 @@ void fn_800F19D4(void) {
 
 // Aim the player at target n (wrapping round): the pin moves there.
 void fn_800F1ABC(int nPlayer, s8 n) {
-    Player* p = &gPlayers[nPlayer];
-    int h;
-    p->nTarget = n % NUM_TARGETS;
-    Vec_Copy(TARGETS[p->nTarget], (f32*)fn_8000C594()->pin);
+    u32 h;
+    gPlayers[nPlayer].nTarget = n % NUM_TARGETS;
+    Vec_Copy(TARGETS[gPlayers[nPlayer].nTarget], (f32*)fn_8000C594()->pin);
     h = fn_8001D324(100);
     if (h) {
-        Character_SetPosition(h, TARGETS[p->nTarget], 1);
+        Character_SetPosition(h, TARGETS[gPlayers[nPlayer].nTarget], 1);
     }
 }
 
 void fn_800F1B60(int nPlayer, s8 n) {
-    Player* p;
     fn_800F1ABC(nPlayer, n);
     AI_DefaultTarget(nPlayer);
     Shot_Prepare(nPlayer, 1);
     fn_8001C804(nPlayer, 1, 1);
-    p = &gPlayers[nPlayer];
-    fn_800957D8(p->nShotHandle);
-    fn_80095744(p->nShotHandle, 5);
+    fn_800957D8(gPlayers[nPlayer].nShotHandle);
+    fn_80095744(gPlayers[nPlayer].nShotHandle, 5);
     fn_80062C38();
 }
 
@@ -323,9 +328,9 @@ u8 fn_800F1C34(int nPlayer) {
 // The target nearest the ball.
 s8 fn_800F1C74(int nPlayer) {
     f32* pBall = (f32*)gPlayers[nPlayer].ball;
+    s8 i;
     s8 nBest = 0;
     f32 fBest = Vec_Distance(TARGETS[0], pBall);
-    s8 i;
     for (i = 1; i < NUM_TARGETS; i++) {
         f32 f = Vec_Distance(TARGETS[i], pBall);
         if (f < fBest) {
@@ -339,9 +344,9 @@ s8 fn_800F1C74(int nPlayer) {
 // The target nearest the player's aim point.
 int fn_800F1D34(int nPlayer) {
     f32* pTarget = &gPlayers[nPlayer].fTargetX;
+    int i;
     int nBest = 0;
     f32 fBest = Vec_Distance(TARGETS[0], pTarget);
-    int i;
     for (i = 1; i < NUM_TARGETS; i++) {
         f32 f = Vec_Distance(TARGETS[i], pTarget);
         if (f < fBest) {
@@ -417,11 +422,11 @@ void fn_800F2030(void) {
     int i;
     int j;
     for (i = 0; i < gNumPlayersSetUp; i++) {
-        gPlayers[i].nCD0 = 0;
-        gPlayers[i].nDBC = 1;
-        gPlayers[i].nDB8 = 0;
+        PLAYER(i)->nCD0 = 0;
+        PLAYER(i)->nDBC = 1;
+        PLAYER(i)->nDB8 = 0;
         for (j = 0; j < 20; j++) {
-            gPlayers[i].aCD4[j] = 0;
+            PLAYER(i)->aCD4[j] = 0;
         }
     }
 }
@@ -442,7 +447,6 @@ s32 fn_800F20C0(int nPlayer) {
 // without one.
 void fn_800F21B4(int nPlayer) {
     s32 nMsg = -1;
-    Player* p;
     s32 r;
     if (!fn_800F2358(nPlayer)) {
         if (gPlayers[nPlayer].nE98 >= 10) {
@@ -458,15 +462,14 @@ void fn_800F21B4(int nPlayer) {
             gPlayers[nPlayer].nDBC = 2;
         }
     }
-    p = &gPlayers[nPlayer];
-    if (p->nDBC > 1) {
+    if (gPlayers[nPlayer].nDBC > 1) {
         gPlayers[nPlayer].nE98 = 0;
     } else {
         gPlayers[nPlayer].nE98++;
     }
-    if (p->nDBC > 1) {
+    if (gPlayers[nPlayer].nDBC > 1) {
         fn_800A631C();
-        switch (p->nDBC) {
+        switch (gPlayers[nPlayer].nDBC) {
         case 2:
             nMsg = 0x3A;
             break;
@@ -475,13 +478,13 @@ void fn_800F21B4(int nPlayer) {
             break;
         case 4:
             break;
-        default:
+        case 5:
             nMsg = 0x3D;
             break;
         }
     }
     if (nMsg != -1) {
-        fn_800F2958(nMsg, 0);
+        fn_800F2958((u16)nMsg, 0);
     }
 }
 
