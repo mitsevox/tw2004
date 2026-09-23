@@ -368,8 +368,6 @@ void   fn_80055EC4(f32* pA, f32* pB, f32* pOut);
 void   fn_80055EF8(f32* pA, f32* pOut);
 f32    fn_80051124(Ball* pBall, f32 fAim, f32* pNormal);
 f32    fn_800511F0(Ball* pBall, f32 fAim, f32* pNormal);
-int    Hole_WindDir(void);
-f32    Hole_WindSpeed(void);
 int    fn_801021FC(void);
 void   fn_800348DC(void);
 

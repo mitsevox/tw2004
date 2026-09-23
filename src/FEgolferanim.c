@@ -11,13 +11,13 @@ void fn_8008B820(void);
 void fn_8008DBE8();
 void fn_8008DC10();
 void fn_8008B00C(void);
+void fn_8008EBB4(void);
+void fn_8008EBE4(void);
 void fn_8008B204(void);
 void fn_8008B208(void);
 void fn_8008B3C8(void);
 void fn_80014DFC();
-void fn_8008EBB4();
 void fn_8008B3CC(void);
-void fn_8008EBE4();
 void fn_8008B430(void);
 void UStream_Stop();
 void fn_8008B4A0(void);
@@ -418,6 +418,24 @@ void fn_8008EB70(void) {
     fn_8008E724(0, 0, 0, 0);
     fn_8008DD50(0);
     fn_8008E944(0, lbl_80283B40);
+}
+
+// ---- end of sweep code ----
+
+// ---- sweep code (not yet cleaned up) ----
+
+extern s32 lbl_80280DF8;
+void UStream_Close();
+s32 UStream_Open();
+
+void fn_8008EBB4(void) {
+    s32 t0;
+    t0 = UStream_Open((lbl_80280DF8 + 1932));
+    *(s32*)(((u8*)lbl_80280DF8) + 0x119C) = t0;
+}
+
+void fn_8008EBE4(void) {
+    UStream_Close(*(s32*)(((u8*)lbl_80280DF8) + 0x119C));
 }
 
 // ---- end of sweep code ----

@@ -58,12 +58,9 @@ typedef struct {
     int (*pfnReset)(void);
 } CipherInterface;
 
-// The caller's session block (0x48 bytes), also what SharedFileIO calls the process/session.
+// The caller's session block (0x48 bytes): the SFIO session plus the map's checksum.
 typedef struct {
-    int  uProcess;        // 0x00  SFIO process state; 1 = running, 2 = complete
-    int  eDevice;         // 0x04
-    u8   unk8[0x21];      // 0x08
-    char szName[0x1B];    // 0x29
+    SFIOSession Sfio;     // 0x00
     u32  uChecksum;       // 0x44  checksum of the map, written by TagFile_End
 } TagSession;
 
@@ -105,7 +102,7 @@ typedef struct {
 typedef struct {
     u32                      uMaxEntries;   // 0x00
     int*                     pDevices;      // 0x04
-    const void*              pFuncs;        // 0x08
+    const SFIOFuncTable*     pFuncs;        // 0x08
     const u8*                pKey;          // 0x0C
     u32                      uKeyLen;       // 0x10
     const CipherInterface*   pCipher;       // 0x14
@@ -117,20 +114,6 @@ static TagFileData* _TagFile_pData;
 // GCC 2.95 emits unused statics even at -O0. Name and type unknown; only its size matters.
 static u32 _TagFile_uUnused;
 
-// SharedFileIO.c
-int  SFIOInit(int* pDevices, const void* pFuncs, void* pAllocator);
-int  SFIOShutdown(void);
-int  SFIOGetSessionInfo(void* pOut);
-int  SFIOBeginLoad(const char* pName, int eDevice, int uSearchDirection);
-int  SFIOBeginSave(const char* pName, int eDevice, int uSearchDirection);
-int  SFIOBeginDelete(const char* pName, int eDevice, int uSearchDirection);
-int  SFIOEnd(TagSession* pSession);
-int  SFIOSeek(TagSession* pSession, u32 uOffset, u32 uWhence);
-int  SFIORead(TagSession* pSession, void* pBuffer, u32 uSize);
-int  SFIOWrite(TagSession* pSession, void* pBuffer, u32 uSize);
-int  SFIOUpdate(int* pProcess, int* pResult);
-int  SFIOSetDescriptor(void* pDescriptor);
-void SFIOPlatformCall80172F48(const ChecksumInterface** ppInterface);
 // Host memory functions (CodeWarrior side).
 extern void* TibExtMemAlloc(void* pAllocator, u32 uSize, u32 uAlign, const char* pFile, int uLine);
 extern void  TibExtMemFree(void* pAllocator, void* p, u32 uSize, u32 uAlign);
@@ -437,14 +420,14 @@ static int TagFile_StartDelete(const char* pName, int eDevice, int uSearchDirect
 static int TagFile_SeekToStart(void) {
     int eError = 0;
     _TagFile_pData->eStep = 9;
-    eError = SFIOSeek(&_TagFile_pData->Session, 0, 0);
+    eError = SFIOSeek(&_TagFile_pData->Session.Sfio, 0, 0);
     return TagFile_SFIOError(eError);
 }
 
 static int TagFile_ReadHeader(void) {
     int eError = 0;
     _TagFile_pData->eStep = 7;
-    eError = SFIORead(&_TagFile_pData->Session, _TagFile_pData->pHeader, TagFile_GetBufferSize(0, 1));
+    eError = SFIORead(&_TagFile_pData->Session.Sfio, _TagFile_pData->pHeader, TagFile_GetBufferSize(0, 1));
     return TagFile_SFIOError(eError);
 }
 
@@ -465,7 +448,7 @@ static int TagFile_ProcessHeader(void) {
     if (_TagFile_pData->Map.uNextOffset == uOffset) {
         return TAG_ERROR_MAP_FULL;
     }
-    eSFIOError = SFIOSeek(&_TagFile_pData->Session, _TagFile_pData->Map.uNextOffset, 0);
+    eSFIOError = SFIOSeek(&_TagFile_pData->Session.Sfio, _TagFile_pData->Map.uNextOffset, 0);
     return TagFile_SFIOError(eSFIOError);
 }
 
@@ -487,7 +470,7 @@ static int TagFile_WriteRecord(void) {
     if (eError != 0) {
         return eError;
     }
-    eSFIOError = SFIOWrite(&_TagFile_pData->Session, pHeader, TagFile_GetBufferSize(_TagFile_pData->uSize, 2));
+    eSFIOError = SFIOWrite(&_TagFile_pData->Session.Sfio, pHeader, TagFile_GetBufferSize(_TagFile_pData->uSize, 2));
     return TagFile_SFIOError(eSFIOError);
 }
 
@@ -496,7 +479,7 @@ static int TagFile_ReadRecord(void) {
     int eSFIOError = 0;
     _TagFile_pData->eStep = 0xA;
     pHeader = TagFile_GetHeader(_TagFile_pData->pBuffer, FALSE);
-    eSFIOError = SFIORead(&_TagFile_pData->Session, pHeader, TagFile_GetBufferSize(_TagFile_pData->uSize, 1));
+    eSFIOError = SFIORead(&_TagFile_pData->Session.Sfio, pHeader, TagFile_GetBufferSize(_TagFile_pData->uSize, 1));
     return TagFile_SFIOError(eSFIOError);
 }
 
@@ -562,7 +545,9 @@ int TagFile_Init(const TagFileInitParams* pParams) {
     if (_TagFile_pData == NULL) {
         return TAG_ERROR_NO_MEMORY;
     }
-    SFIOPlatformCall80172F48(&_TagFile_pData->pChecksum);
+    // The checksum module hands out its interface as a table of function addresses; this file
+    // reads the same table as a ChecksumInterface.
+    SFIOPlatformCall80172F48((void* const**)&_TagFile_pData->pChecksum);
     eChecksumError = _TagFile_pData->pChecksum->pfnInit(pParams->pAllocator);
     if (eChecksumError != 0) {
         return TagFile_ChecksumError(eChecksumError);
@@ -658,7 +643,7 @@ int TagFile_BeginLoad(const char* pName, int eDevice, int uSearchDirection) {
 // Delete the file an existing session refers to.
 int TagFile_DeleteSession(TagSession* pSession) {
     memcpy(&_TagFile_pData->Session, pSession, sizeof(TagSession));
-    return TagFile_StartDelete(pSession->szName, pSession->eDevice, -1, 5);
+    return TagFile_StartDelete(pSession->Sfio.szName, pSession->Sfio.eDevice, -1, 5);
 }
 
 int TagFile_Delete(const char* pName, int eDevice, int uSearchDirection) {
@@ -672,7 +657,7 @@ int TagFile_End(TagSession* pSession) {
     _TagFile_pData->Map.uNextOffset = 0;
     _TagFile_pData->eOperation = 3;
     _TagFile_pData->eStep = 3;
-    eError = SFIOEnd(pSession);
+    eError = SFIOEnd(&pSession->Sfio);
     return TagFile_SFIOError(eError);
 }
 
@@ -701,7 +686,7 @@ int TagFile_Write(TagSession* pSession, u32 uTag, u32 uIndex, void* pBuffer, u32
         uOffset = pEntry->uOffset;
         TagFile_UpdateEntryChecksum(uTag, uIndex, &_TagFile_pData->uRecordChecksum);
     }
-    eSFIOError = SFIOSeek(pSession, uOffset, 0);
+    eSFIOError = SFIOSeek(&pSession->Sfio, uOffset, 0);
     return TagFile_SFIOError(eSFIOError);
 }
 
@@ -724,7 +709,7 @@ int TagFile_Read(TagSession* pSession, u32 uTag, u32 uIndex, void* pBuffer, u32 
     }
     uOffset = pEntry->uOffset;
     _TagFile_pData->uReadOffset = uOffset;
-    eSFIOError = SFIOSeek(pSession, uOffset, 0);
+    eSFIOError = SFIOSeek(&pSession->Sfio, uOffset, 0);
     return TagFile_SFIOError(eSFIOError);
 }
 
@@ -864,7 +849,7 @@ int TagFile_Update(int* pProcess, int* pResult) {
                     _TagFile_pData->bBusy = FALSE;
                     return TagFile_SFIOError(eSFIOError);
                 }
-                eSFIOError = SFIOGetSessionInfo(&_TagFile_pData->Session);
+                eSFIOError = SFIOGetSessionInfo(&_TagFile_pData->Session.Sfio);
 #line 2686
                 SFIO_ASSERT(SFIO_ERROR_NONE == eSFIOError);
                 *pProcess = 1;
@@ -925,7 +910,7 @@ int TagFile_Update(int* pProcess, int* pResult) {
     return TagFile_SFIOError(eSFIOError);
 }
 
-int TagFile_SetDescriptor(void* pDescriptor) {
+int TagFile_SetDescriptor(SFIODescriptor* pDescriptor) {
     int eError = 0;
     if (!TagFile_IsInitialised()) {
         return TAG_ERROR_NOT_INITIALISED;

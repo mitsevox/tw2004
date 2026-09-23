@@ -4,6 +4,7 @@
 // picks and unlocks.
 
 #include "engine.h"
+#include "ustream.h"
 #include "game.h"
 #include "charstate.h"
 #include "core/easb.h"
@@ -47,11 +48,15 @@ u8   fn_80056480(int a);
 u8   fn_800564AC(int n);
 u8   fn_80058304(SaveProfile* pProfile, int a);
 s32  fn_801258E8(void);                 // EASportsBio.c
-void fn_80076EEC(void);                 // frees lbl_80281EC8
-void fn_80076F20(void);
-u8   fn_80079E44(int nAttr);            // a hidden attribute: ATTR_AGGRESSION, ATTR_IQ, ATTR_SPEED
+void fn_8009170C(void);
 
 // This file, in address order.
+void fn_80076E48(void);
+void fn_80076EEC(void);                 // frees lbl_80281EC8
+void fn_80076F20(void);
+void fn_80076F24(void);
+void fn_80076F54(void);
+void fn_80076F58(void);
 void fn_80076F80(UStreamObject* pObject);
 int  fn_80076FDC(void);
 void fn_8007706C(char* pName, char* pDir, char* pPath);
@@ -95,6 +100,7 @@ void fn_80079974(void);
 void fn_80079AD4(void);
 void fn_80079D30(void);
 void fn_80079DAC(void);
+u8   fn_80079E44(int nAttr);            // a hidden attribute: ATTR_AGGRESSION, ATTR_IQ, ATTR_SPEED
 
 // This file's globals (fe.h), each section in reverse address order as the compiler lays it out.
 FEState lbl_801D7148;
@@ -107,6 +113,49 @@ u8* lbl_80281EC8;
 // 1.0f (0x80283AC0), before the 0.0f and 0.05f FE_GetBIOMovieName uses first; its body is unknown.
 static f32 FE_Manager_StrippedFn(f32 x) {
     return x + 1.0f;
+}
+
+// Set the front end's state up: no profiles loaded, no CPU players, no backups, no movies.
+void fn_80076E48(void) {
+    int i;
+    for (i = 0; i < 5; i++) {
+        lbl_801D7148.aLoaded[i] = 0;
+        lbl_801D7148.aCPU[i] = 0;
+        lbl_801D7148.aBackup[i] = -1;
+    }
+    lbl_801D7148.b0F = 1;
+    lbl_801D7148.b10 = 1;
+    lbl_801D7148.nMode = -1;
+    lbl_801D7148.b11 = 0;
+    lbl_801D7148.b18 = 1;
+    lbl_801D7148.n1C = 0;
+    lbl_801D7148.nMovieNext = 0;
+    lbl_801D7148.nMovieFree = 0;
+    lbl_801D7148.p658 = NULL;
+    fn_8009170C();
+    lbl_801D8858.n30 = 0;
+}
+
+// Free the copy of the 'BIO ' stream object's data.
+void fn_80076EEC(void) {
+    if (lbl_80281EC8 != NULL) {
+        fn_80009E70(lbl_80281EC8);
+        lbl_80281EC8 = NULL;
+    }
+}
+
+void fn_80076F20(void) {
+}
+
+void fn_80076F24(void) {
+    UStream_RegisterHandler(TAG('B', 'I', 'O', ' '), fn_80076F80);
+}
+
+void fn_80076F54(void) {
+}
+
+void fn_80076F58(void) {
+    UStream_UnregisterHandler(TAG('B', 'I', 'O', ' '));
 }
 
 // The 'BIO ' stream object's handler: keep a copy of its data.
@@ -1273,4 +1322,13 @@ void fn_80079DAC(void) {
             lbl_80281ED0 = 0;
         }
     }
+}
+
+// Whether an attribute is one of the hidden ones.
+u8 fn_80079E44(int nAttr) {
+    int bHidden = 0;
+    if (nAttr == ATTR_AGGRESSION || nAttr == ATTR_IQ || nAttr == ATTR_SPEED) {
+        bHidden = 1;
+    }
+    return bHidden;
 }
