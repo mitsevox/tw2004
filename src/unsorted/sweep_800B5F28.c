@@ -2,9 +2,9 @@
 
 #include "game_types.h"
 
-void fn_800B6034();
+void fn_800B6034(void** arg0, void* arg1);
 
-void fn_800B5F28(u8* p);
-void fn_800B5F28(u8* p) {
-    fn_800B6034(*(s32*)(p + 0xC));
+void fn_800B5F28(u8* p, void* arg1);
+void fn_800B5F28(u8* p, void* arg1) {
+    fn_800B6034(*(void***)(p + 0xC), arg1);
 }
