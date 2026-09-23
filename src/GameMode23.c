@@ -4,7 +4,6 @@
 #include "game_types.h"
 
 void fn_800EDE78(void);
-extern u8 lbl_80205F3C[];
 void UStream_UnregisterHandler();
 void fn_8000E790();
 void fn_800EDEE8(void);
@@ -45,12 +44,14 @@ typedef struct Lesson {
     s16  aTimes[10][2];         // 0x28  per step, in seconds
     u16  a50[10];               // 0x50  per step
 } Lesson;
-#define LESSONS ((Lesson*)lbl_80205F3C)
+extern Lesson lbl_80205F3C[];
+#define LESSONS lbl_80205F3C
+#define LESSON_BYTES ((u8*)lbl_80205F3C)
 
 typedef struct Triple {
     s32 a, b, c;
 } Triple;
-#define TRIPLES ((Triple*)(lbl_80205F3C + 0x6FC8))
+#define TRIPLES ((Triple*)(LESSON_BYTES + 0x6FC8))
 
 // The lesson part of a save profile (0x10600 bytes).
 typedef struct LessonSave {
@@ -93,19 +94,19 @@ void fn_800EDEE8(void) {
 }
 
 void fn_800EDF34(s32 p0) {
-    fn_8000E790(p0, 3100, lbl_80205F3C);
+    fn_8000E790(p0, 3100, LESSON_BYTES);
 }
 
 void fn_800EDF60(s32 p0) {
-    fn_8000E790(p0, 2604, (lbl_80205F3C + 0xC1C));
+    fn_8000E790(p0, 2604, (LESSON_BYTES + 0xC1C));
 }
 
 void fn_800EDF90(s32 p0) {
-    fn_8000E790(p0, 132, (lbl_80205F3C + 0x6FC8));
+    fn_8000E790(p0, 132, (LESSON_BYTES + 0x6FC8));
 }
 
 void fn_800EE064(void) {
-    *(s32*)(((u8*)gpGame) + 0xE0) = *(s32*)((lbl_80205F3C + ((*(s32*)((lbl_80205F3C + (*(s32*)(((u8*)(gpSaveData + 0x10000)) - 0x49C8) * 100)) + 0x4) - 1) * 84)) + 0xC1C);
+    *(s32*)(((u8*)gpGame) + 0xE0) = *(s32*)((LESSON_BYTES + ((*(s32*)((LESSON_BYTES + (*(s32*)(((u8*)(gpSaveData + 0x10000)) - 0x49C8) * 100)) + 0x4) - 1) * 84)) + 0xC1C);
 }
 
 u8 fn_800EE470(void) {
@@ -135,7 +136,7 @@ s32 fn_800EFBAC(void) {
 }
 
 s32 fn_800EFDFC(s32 p0) {
-    return (*(s32*)(lbl_80205F3C + 0x704C) + *(s32*)(lbl_80205F3C + (p0 * 100)));
+    return (*(s32*)(LESSON_BYTES + 0x704C) + *(s32*)(LESSON_BYTES + (p0 * 100)));
 }
 
 s32 fn_800EFE3C(s32 i) {
@@ -143,7 +144,7 @@ s32 fn_800EFE3C(s32 i) {
 }
 
 u8* fn_800EFE60(s32 p0) {
-    return ((lbl_80205F3C + (p0 * 100)) + 0x14);
+    return ((LESSON_BYTES + (p0 * 100)) + 0x14);
 }
 
 void fn_800F009C(void) {
@@ -215,7 +216,7 @@ u8* fn_800EFA70(s32 i) {
 // Lesson i's step count (from its entry in the second table; 1 without one).
 s32 fn_800EFA9C(s32 i) {
     if (LESSONS[i].nPlan) {
-        return *(s32*)(lbl_80205F3C + LESSONS[i].nPlan * 0x54 + 0xBC8);
+        return *(s32*)(LESSON_BYTES + LESSONS[i].nPlan * 0x54 + 0xBC8);
     }
     return 1;
 }
