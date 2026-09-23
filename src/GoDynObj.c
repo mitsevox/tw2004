@@ -1,50 +1,62 @@
-// GoDynObj.c (EA's name, from its asserts; also in EA's 2002 source tree): not yet decompiled; the
-// sweep code below is the matched small functions.
+// GoDynObj.c (EA's name, from its asserts; also in EA's 2002 source tree): the course's own objects
+// around the dynamic objects (dynobj.h): the 'TEO ' and 'BALL' stream handlers, the models of the
+// 'TEO ' objects, per-player objects, and when they are drawn (GoDynObjMgr, lbl_80281DA0). Partly
+// decompiled.
 
-#include "game_types.h"
+#include "dynobj.h"
+#include "character.h"
+#include "lighting.h"
+#include "terrain.h"
+#include "camera.h"
+#include "game.h"
+
+void fn_80045FC8(UStreamObject* pObject);   // the 'BALL' stream handler
+void fn_80046FDC(int nView);
+void fn_800470B0(int nView);
+void fn_80047208(u8* aState);
+int  fn_800F1960(void);                 // GameModeReplay.c: how many targets the target games have
+void fn_800F196C(int i, f32* pOut);     // GameModeReplay.c: target i's position
+void fn_80093DB8(Ball* pBall, int nPlayer);    // GoObjShadow.c
+void fn_80093AE0(Ball* pBall, int nPlayer);    // GoObjShadow.c
+void fn_80048584(UObject* pObj, s8 nLod);
+void fn_8000ADC0(f32 (*pMtx)[4]);                   // identity
+int  fn_800636EC(void);
+void fn_8004858C(f32* pOut, f32 fTurn, f32 fTilt);
+void fn_8000C5A4(f32 (*pMtx)[4]);
+void fn_8000A194(f32 (*pMtx)[4], f32 a, f32 b, f32 c);  // a rotation matrix from three angles
+void fn_8000A0E8(f32 (*pSrc)[4], f32 (*pDst)[4]);
+void fn_800BADF8(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
+void fn_8000A144(f32 (*pSrc)[4], f32 (*pDst)[4]);        // copies three rows
+f32  fn_8004D5F0(CourseInfo* pCourse, f32* pPos);          // GoTerrainCollision.c: the ground height
+void fn_80048680(f32* pA, f32* pB, f32* pOut);
+void fn_800486A4(f32* pA, f32* pB, f32* pOut);
+void fn_800486C8(f32* pA, f32* pB, f32* pOut);
+void fn_80047290(void);
+void fn_8004731C(u8* pState);
+void fn_80047C24(int nPlayer);
+void fn_80048184(int nPlayer);
+void fn_80035240(int n);
+u8   fn_8000B54C(u32 uType, u32 uId);     // a stream object of this type and id is loaded
+UStreamObject* fn_8000B70C(u32 uType, u32 uId);
 
 // ---- sweep code (not yet cleaned up) ----
 
-extern u8 lbl_80187D2C[];
-extern s32 lbl_80281DA0;
-s32 fn_80009B34();
-void fn_800461A8(void);
-void fn_80009E70();
-void fn_80046264(void);
-s32 fn_80012EF8();
-s32 fn_80012F18(s32);
-s32 fn_80012F50(s32, s32, s32);
-s32 fn_80035118(s32, s32);
-s32 fn_800352E4();
-s32 fn_80035308();
-s32 fn_80035338(s32);
-s32 fn_80048F68(s32, s32, s32);
-u8 fn_800E39F0();
-void fn_80046FDC(s32 arg0);
-s32 fn_800470B0(s32);
-void fn_80046828(s32 arg0);
-extern u8 lbl_80187B98[];
-u8* fn_800484E0(s32 p0);
-void fn_80048584(u8* p, u8 v);
-s32 UStream_RegisterHandler(s32, void (*)(void*), s32);
 s32 fn_8000B4B8(void*);
 u8 fn_8000B508();
 s32 fn_80045D80(s32);
-void fn_800460F8(void* arg0);
-void fn_80045F74(void* arg0);
+void fn_800460F8(UStreamObject* arg0);
+void fn_80045F74(UStreamObject* arg0);
 s32 fn_800075CC(s32);
-void UStream_UnregisterHandler();
-void fn_80046174(void);
 
-void fn_80045F74(void* arg0) {
+void fn_80045F74(UStreamObject* arg0) {
     if (fn_8000B508() == 0) {
         (*(s32*)((u8*)(arg0) + 4)) = fn_80045D80((*(s32*)((u8*)(arg0) + 0)));
-        (*(void (**)(void*))((u8*)(arg0) + 8)) = fn_800460F8;
+        (*(void (**)(UStreamObject*))((u8*)(arg0) + 8)) = fn_800460F8;
         fn_8000B4B8(arg0);
     }
 }
 
-void fn_800460F8(void* arg0) {
+void fn_800460F8(UStreamObject* arg0) {
     void* temp_r31;
 
     temp_r31 = (*(void**)((u8*)(arg0) + 4));
@@ -52,38 +64,174 @@ void fn_800460F8(void* arg0) {
     fn_80009E70(temp_r31);
 }
 
-void fn_80046174(void) {
-    UStream_UnregisterHandler(1413828384);
-    UStream_UnregisterHandler(1111575628);
+// ---- end of sweep code ----
+
+void fn_80046130(void) {
+    UStream_RegisterHandler('TEO ', fn_80045F74);
+    UStream_RegisterHandler('BALL', fn_80045FC8);
 }
 
+void fn_80046174(void) {
+    UStream_UnregisterHandler('TEO ');
+    UStream_UnregisterHandler('BALL');
+}
+
+// Allocates the state; no 'TEO ' models yet.
 void fn_800461A8(void) {
-    s32 t0;
-    t0 = fn_80009B34(2736, 2, 16, lbl_80187D2C, 283);
-    lbl_80281DA0 = t0;
-    *(s32*)(((u8*)t0) + 0xA54) = 0;
-    *(s32*)(((u8*)lbl_80281DA0) + 0xA58) = 0;
-    *(s32*)(((u8*)lbl_80281DA0) + 0xA5C) = 0;
-    *(s32*)(((u8*)lbl_80281DA0) + 0xA60) = 0;
-    *(s32*)(((u8*)lbl_80281DA0) + 0xA64) = 0;
-    *(s32*)(((u8*)lbl_80281DA0) + 0xA68) = 0;
-    *(s32*)(((u8*)lbl_80281DA0) + 0xA6C) = 0;
-    *(s32*)(((u8*)lbl_80281DA0) + 0xA70) = 0;
-    *(s32*)(((u8*)lbl_80281DA0) + 0xA74) = 0;
-    *(s32*)(((u8*)lbl_80281DA0) + 0xA78) = 0;
-    *(s32*)(((u8*)lbl_80281DA0) + 0xA7C) = 0;
-    *(s32*)(((u8*)lbl_80281DA0) + 0xA80) = 0;
-    *(s32*)(((u8*)lbl_80281DA0) + 0xA84) = 0;
-    *(s32*)(((u8*)lbl_80281DA0) + 0xA88) = 0;
-    *(s32*)(((u8*)lbl_80281DA0) + 0xA8C) = 0;
-    *(s32*)(((u8*)lbl_80281DA0) + 0xA90) = 0;
+    lbl_80281DA0 = fn_80009B34(sizeof(GoDynObjMgr), 2, 16, "GoDynObj.c", 283);
+    lbl_80281DA0->pTeo10000 = NULL;
+    lbl_80281DA0->apTeo10030[0] = NULL;
+    lbl_80281DA0->apTeo10030[1] = NULL;
+    lbl_80281DA0->apTeo10030[2] = NULL;
+    lbl_80281DA0->apTeo10030[3] = NULL;
+    lbl_80281DA0->apTeo10040[0] = NULL;
+    lbl_80281DA0->apTeo10040[1] = NULL;
+    lbl_80281DA0->apTeo10040[2] = NULL;
+    lbl_80281DA0->apTeo10040[3] = NULL;
+    lbl_80281DA0->apTeo10020[0] = NULL;
+    lbl_80281DA0->apTeo10020[1] = NULL;
+    lbl_80281DA0->apTeo10020[2] = NULL;
+    lbl_80281DA0->apTeo10006[0] = NULL;
+    lbl_80281DA0->apTeo10006[1] = NULL;
+    lbl_80281DA0->apTeo10006[2] = NULL;
+    lbl_80281DA0->apTeo10006[3] = NULL;
 }
 
 void fn_80046264(void) {
     fn_80009E70(lbl_80281DA0);
 }
 
-void fn_80046828(s32 arg0) {
+// Makes the models of the 'TEO ' objects that are loaded, puts the flag (character 100) at the
+// pin, and resets the tuning values and the per-player objects.
+void fn_80046288(void) {
+    int i;
+    int nId;
+    Character* pFlag;
+
+    if (lbl_80281DA0->pTeo10000 == NULL) {
+        lbl_80281DA0->pTeo10000 = fn_80048808(((DynObjModelRef*)fn_8000B70C('TEO ', 10000))->p4);
+        lbl_80281DA0->pTeo10000->uFlags |= 1;
+        lbl_80281DA0->pTeo10000->uFlags |= 0x10;
+    }
+    for (i = 0; i < 4; i++) {
+        if (lbl_80281DA0->apTeo10030[i] == NULL) {
+            nId = i + 10030;
+            if (fn_8000B54C('TEO ', nId)) {
+                lbl_80281DA0->apTeo10030[i] = fn_80048808(((DynObjModelRef*)fn_8000B70C('TEO ', nId))->p4);
+            }
+        }
+    }
+    for (i = 0; i < 4; i++) {
+        if (lbl_80281DA0->apTeo10040[i] == NULL) {
+            nId = i + 10040;
+            if (fn_8000B54C('TEO ', nId)) {
+                lbl_80281DA0->apTeo10040[i] = fn_80048808(((DynObjModelRef*)fn_8000B70C('TEO ', nId))->p4);
+            }
+        }
+    }
+    if (fn_800E39F0()) {
+        for (i = 0; i < 4; i++) {
+            if (lbl_80281DA0->apTeo10006[i] == NULL) {
+                nId = i + 10006;
+                if (fn_8000B54C('TEO ', nId)) {
+                    lbl_80281DA0->apTeo10006[i] =
+                        fn_80048808(((DynObjModelRef*)fn_8000B70C('TEO ', nId))->p4);
+                }
+            }
+        }
+        for (i = 0; i < 3; i++) {
+            if (lbl_80281DA0->apTeo10020[i] == NULL) {
+                nId = i + 10020;
+                if (fn_8000B54C('TEO ', nId)) {
+                    lbl_80281DA0->apTeo10020[i] =
+                        fn_80048808(((DynObjModelRef*)fn_8000B70C('TEO ', nId))->p4);
+                }
+            }
+        }
+    }
+    pFlag = fn_8001D324(100);
+    if (pFlag != NULL) {
+        Character_SetPosition(pFlag, &fn_8000C594()->pin[Game_CurrentPinSet()].x, 1);
+        if (Game_GetMode() != 6 && Game_GetMode() != 7 && Game_GetMode() != 8) {
+            pFlag->u10 |= 2;
+        }
+        if (fn_800E39F0()) {
+            pFlag->u10 |= 0x40;
+        }
+    }
+    lbl_80281DA0->fA94 = 7.0f;
+    lbl_80281DA0->fA98 = 10.5f;
+    lbl_80281DA0->fA9C = 0.3f;
+    lbl_80281DA0->fAA0 = 0.7f;
+    lbl_80281DA0->fAA4 = 1.5f;
+    lbl_80281DA0->fAA8 = 0.6f;
+    lbl_80281DA0->fAAC = -0.05169f;
+    for (i = 0; i < gSession.nNumPlayers; i++) {
+        lbl_80281DA0->aB[i].bF4 = 0;
+        lbl_80281DA0->aA[i].bF8 = 0;
+        lbl_80281DA0->apPlayer[i] = NULL;
+    }
+    lbl_80281DA0->apRing[0] = NULL;
+    lbl_80281DA0->apRing[1] = NULL;
+    lbl_80281DA0->apRing[2] = NULL;
+    lbl_80281DA0->apRing[3] = NULL;
+    lbl_80281DA0->apRing[4] = NULL;
+    lbl_80281DA0->apRing[5] = NULL;
+    lbl_80281DA0->apRing[6] = NULL;
+    lbl_80281DA0->apRing[7] = NULL;
+    lbl_80281DA0->apRing[8] = NULL;
+    lbl_80281DA0->apRing[9] = NULL;
+    lbl_80281DA0->nRing = 0;
+}
+
+// Frees the 'TEO ' models.
+void fn_80046664(void) {
+    int i;
+
+    if (lbl_80281DA0->pTeo10000 != NULL) {
+        fn_80048860(lbl_80281DA0->pTeo10000);
+    }
+    lbl_80281DA0->pTeo10000 = NULL;
+    for (i = 0; i < 4; i++) {
+        if (lbl_80281DA0->apTeo10030[i] != NULL) {
+            fn_80048860(lbl_80281DA0->apTeo10030[i]);
+        }
+        lbl_80281DA0->apTeo10030[i] = NULL;
+    }
+    for (i = 0; i < 4; i++) {
+        if (lbl_80281DA0->apTeo10040[i] != NULL) {
+            fn_80048860(lbl_80281DA0->apTeo10040[i]);
+        }
+        lbl_80281DA0->apTeo10040[i] = NULL;
+    }
+    for (i = 0; i < 3; i++) {
+        if (lbl_80281DA0->apTeo10020[i] != NULL) {
+            fn_80048860(lbl_80281DA0->apTeo10020[i]);
+        }
+        lbl_80281DA0->apTeo10020[i] = NULL;
+    }
+    for (i = 0; i < 4; i++) {
+        if (lbl_80281DA0->apTeo10006[i] != NULL) {
+            fn_80048860(lbl_80281DA0->apTeo10006[i]);
+        }
+        lbl_80281DA0->apTeo10006[i] = NULL;
+    }
+}
+
+// The per-frame update: message 6 to every object, with the frame time, then each player's.
+void fn_800467B4(void) {
+    int i;
+
+    // port: the frame time goes through the message's pointer argument as its bits
+    fn_80048F68(6, *(void**)&gSession.fFrameTime, NULL);
+    for (i = 0; i < gSession.nNumPlayers; i++) {
+        fn_80047C24(i);
+        fn_80048184(i);
+    }
+}
+
+// Draws every object (message 3), and with fn_800E39F0 the targets' 'TEO ' models.
+void fn_80046828(int nView) {
     fn_80035118(4, 5);
     fn_80012F50(1, 6, 0x80);
     fn_80012F18(3);
@@ -91,22 +239,589 @@ void fn_80046828(s32 arg0) {
     fn_80035308();
     fn_800352E4();
     fn_80012EF8();
-    fn_80048F68(3, 0, 0);
-    if (fn_800E39F0() != 0) {
-        fn_80046FDC(arg0);
-        fn_800470B0(arg0);
+    fn_80048F68(3, NULL, NULL);
+    if (fn_800E39F0()) {
+        fn_80046FDC(nView);
+        fn_800470B0(nView);
     }
 }
 
-u8* fn_800484E0(s32 p0) {
-    return (lbl_80187B98 + (p0 * 13));
+// 0 in game mode 21 while the player is in state 19 and the partner is not.
+u8 fn_800468B4(int nPlayer) {
+    if (Game_GetMode() == 21 && (s8)GOLFERSTATE_GetCurrentState(nPlayer) == 19 &&
+        (s8)GOLFERSTATE_GetCurrentState(lbl_80187D38[nPlayer]) != 19) {
+        return 0;
+    }
+    return 1;
 }
 
-void fn_80048584(u8* p, u8 v) {
-    *(u8*)(p + 0x104) = v;
+u8 fn_80046928(int nPlayer) {
+    int nLie = gPlayers[nPlayer].ball.nLie;
+    u32 nClass;
+
+    if (nLie == 16) {
+        if (gPlayers[nPlayer].ball.nSurface < 0 || gPlayers[nPlayer].ball.nSurface >= NUM_SURFACE_TYPES) {
+            return 0;
+        }
+        nClass = gSurfaceTypes[gPlayers[nPlayer].ball.nSurface].nClass;
+        if (nClass == 7 || nClass == 15 || nClass == 16) {
+            return 0;
+        }
+        if (gPlayers[nPlayer].ball.fHeight > 0.5f) {
+            return 0;
+        }
+    }
+    if ((nLie == 0 || nLie == 12 || nLie == 9) && (s8)GOLFERSTATE_GetCurrentState(nPlayer) == 19) {
+        return 0;
+    }
+    if (!fn_800468B4(nPlayer)) {
+        return 0;
+    }
+    if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) == 18 && nPlayer == fn_800636EC()) {
+        return 0;
+    }
+    return 1;
 }
 
-// ---- end of sweep code ----
+u8 fn_80046A54(int nPlayer) {
+    if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) == 1 && fn_80048574(gPlayers[nPlayer].pChar, 3)) {
+        return 0;
+    }
+    if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) == 18 && fn_80048574(gPlayers[nPlayer].pChar, 4)) {
+        return 0;
+    }
+    if (!fn_800468B4(nPlayer)) {
+        return 0;
+    }
+    return 1;
+}
+
+u8 fn_80046B1C(int nPlayer) {
+    if (gPlayers[nPlayer].ball.nLie == 9 &&(s8)GOLFERSTATE_GetCurrentState(nPlayer) == 19 &&
+        fn_800468B4(nPlayer)) {
+        return 1;
+    }
+    return 0;
+}
+
+void fn_80046B8C(int nView) {
+    u8 aState[8];
+
+    fn_80035118(4, 5);
+    fn_80012F50(1, 6, 0x80);
+    fn_80012F18(3);
+    fn_80035338(1);
+    fn_80035308();
+    fn_800352E4();
+    fn_80012EF8();
+    fn_8004731C(aState);
+    fn_80035240(0);
+    if (gSession.nSplitScreen == 0) {
+        fn_80047290();
+        if ((s8)GOLFERSTATE_GetCurrentState(fn_8001707C(nView)) != 9) {
+            fn_80047208(aState);
+        }
+    }
+}
+
+// A ball moving at 10 or more just above ground of class 3 leaves a 'TEO ' 10005 object at pPos:
+// ten are used in turn.
+void fn_80046C34(f32* pPos, int nPlayer) {
+    DynObjDef def;
+    DynObjSetup setup;
+    DynObjModel model;
+    f32 vPos[4];
+    f32 vNormal[4];
+    SurfaceType* pSurface;
+    f32 fGround;
+    s32 nId;
+
+    vPos[0] = pPos[0];
+    vPos[1] = pPos[1];
+    vPos[2] = pPos[2];
+    vPos[3] = 1.0f;
+    fGround = Ter_GetSupportingGroundData(fn_8000C594(), vPos, &pSurface, vNormal);
+    if (TER_NO_GROUND != fGround && pSurface->nClass == 3 && fGround - pPos[1] < 0.02f &&
+        (f32)fn_80009680(fn_80009744(gPlayers[nPlayer].ball.vVel)) >= 10.0f) {
+        if (lbl_80281DA0->apRing[lbl_80281DA0->nRing] == NULL) {
+            // EA bug: def.n1A is never set, and type 0's setup copies it to DynObj.n14E
+            def.n0 = 0;
+            def.n4 = 0;
+            def.aPos[0] = pPos[0];
+            def.aPos[1] = pPos[1];
+            def.aPos[2] = pPos[2];
+            def.u14 = 0x200;
+            def.n18 = 0;
+            setup.pDef = &def;
+            setup.pModel = &model;
+            model.aEntries[0].uType = 'TEO ';
+            setup.pModel->aEntries[0].u.pRef = (DynObjModelRef*)fn_8000B70C('TEO ', 10005);
+            setup.pfnHandler = fn_800499B0(setup.pDef->n4);
+            setup.pC = NULL;
+            nId = fn_800490B8(&setup);
+            if (nId != -2) {
+                lbl_80281DA0->apRing[lbl_80281DA0->nRing] = fn_80048E4C(nId);
+            }
+        } else {
+            Vec_Copy(vPos, lbl_80281DA0->apRing[lbl_80281DA0->nRing]->obj.m80[3]);
+            fn_8000C5A4(lbl_80281DA0->apRing[lbl_80281DA0->nRing]->obj.m0);
+        }
+        lbl_80281DA0->nRing = lbl_80281DA0->nRing + 1;
+        lbl_80281DA0->nRing = lbl_80281DA0->nRing % 10;
+    }
+}
+
+// Puts the player's 'TEO ' 10001 object on the ground at pPos, turned to the player's aim; the
+// first time it is made (a type 0 object, flags 0xC00).
+void fn_80046E1C(f32* pPos, int nPlayer) {
+    f32 mTurn[4][4];
+    f32 mObj[4][4];
+    DynObjDef def;
+    DynObjSetup setup;
+    DynObjModel model;
+    f32 vPos[4];
+    f32 vNormal[4];
+    SurfaceType* pSurface;
+    f32 fGround;
+    s32 nId;
+
+    vPos[0] = pPos[0];
+    vPos[1] = pPos[1];
+    vPos[2] = pPos[2];
+    vPos[3] = 1.0f;
+    fGround = Ter_GetSupportingGroundData(fn_8000C594(), vPos, &pSurface, vNormal);
+    if (lbl_80281DA0->apPlayer[nPlayer] == NULL) {
+        // EA bug: def.n1A is never set, and type 0's setup copies it to DynObj.n14E
+        vPos[1] = 0.01f + fGround;
+        def.n0 = 0;
+        def.n4 = 0;
+        def.aPos[0] = vPos[0];
+        def.aPos[1] = vPos[1];
+        def.aPos[2] = vPos[2];
+        def.u14 = 0xC00;
+        def.n18 = 0;
+        setup.pDef = &def;
+        setup.pModel = &model;
+        model.aEntries[0].uType = 'TEO ';
+        setup.pModel->aEntries[0].u.pRef = (DynObjModelRef*)fn_8000B70C('TEO ', 10001);
+        setup.pfnHandler = fn_800499B0(setup.pDef->n4);
+        setup.pC = NULL;
+        nId = fn_800490B8(&setup);
+        if (nId != -2) {
+            lbl_80281DA0->apPlayer[nPlayer] = fn_80048E4C(nId);
+        }
+    }
+    fn_8000ADC0(mTurn);
+    fn_8000ADC0(lbl_80281DA0->apPlayer[nPlayer]->obj.m0);
+    fn_8000A194(mTurn, -gPlayers[nPlayer].fAim, 0.0f, 0.0f);
+    fn_800BADF8(lbl_80281DA0->apPlayer[nPlayer]->obj.m0, mTurn, mObj, 4);
+    fn_8000A0E8(mObj, lbl_80281DA0->apPlayer[nPlayer]->obj.m0);
+    Vec_Copy(vPos, lbl_80281DA0->apPlayer[nPlayer]->obj.m80[3]);
+    fn_8000C5A4(lbl_80281DA0->apPlayer[nPlayer]->obj.m0);
+}
+
+// Draws a 'TEO ' model (10006 + the target's kind) at each target of the target games.
+void fn_80046FDC(int nView) {
+    f32 vPos[4];
+    int i;
+    int nKind;
+
+    for (i = 0; i < fn_800F1960(); i++) {
+        fn_800F196C(i, vPos);
+        nKind = gpGame->pfn26C(fn_8001707C(nView), i);
+        if (lbl_80281DA0->apTeo10006[nKind] != NULL) {
+            fn_80048584(lbl_80281DA0->apTeo10006[nKind], 0);
+            fn_8000ADC0(lbl_80281DA0->apTeo10006[nKind]->m80);
+            Vec_Copy(vPos, lbl_80281DA0->apTeo10006[nKind]->m80[3]);
+            fn_80048894(lbl_80281DA0->apTeo10006[nKind]);
+        }
+    }
+}
+
+// The same with the 'TEO ' 10020..10022 models, for the target kinds 0, 2 and 3.
+void fn_800470B0(int nView) {
+    f32 vPos[4];
+    int i;
+    int nModel;
+
+    fn_80012F50(0, 6, 0x80);
+    fn_80012F34(0);
+    fn_80012EF8();
+    for (i = 0; i < fn_800F1960(); i++) {
+        fn_800F196C(i, vPos);
+        switch (gpGame->pfn26C(fn_8001707C(nView), i)) {
+        case 0:
+            nModel = 0;
+            break;
+        case 2:
+            nModel = 1;
+            break;
+        case 3:
+            nModel = 2;
+            break;
+        default:
+            nModel = -1;
+            break;
+        }
+        if (nModel != -1 && lbl_80281DA0->apTeo10020[nModel] != NULL) {
+            fn_80048584(lbl_80281DA0->apTeo10020[nModel], 0);
+            fn_8000ADC0(lbl_80281DA0->apTeo10020[nModel]->m80);
+            Vec_Copy(vPos, lbl_80281DA0->apTeo10020[nModel]->m80[3]);
+            fn_80048894(lbl_80281DA0->apTeo10020[nModel]);
+        }
+    }
+    fn_80012F50(1, 6, 0x80);
+    fn_80012F34(1);
+    fn_80012EF8();
+}
+
+void fn_80047208(u8* aState) {
+    int i;
+
+    for (i = 0; i < gSession.nNumPlayers; i++) {
+        if (aState[i]) {
+            fn_80093DB8(&gPlayers[i].ball, i);
+        }
+    }
+}
+
+void fn_80047290(void) {
+    int i;
+
+    for (i = 0; i < gSession.nNumPlayers; i++) {
+        if (fn_80046B1C(i)) {
+            fn_80093AE0(&PLAYER(i)->ball, i);
+        }
+    }
+}
+
+// ---- 0x8004731C..0x80047A24: not yet decompiled ----
+
+// Puts the player's 'TEO ' 10002 object at pPos, facing against the aim; the first time it is made
+// (as a type 0 object, flag 0x200).
+void fn_80047A24(f32* pPos, int nPlayer) {
+    DynObjDef def;
+    DynObjSetup setup;
+    DynObjModel model;
+    GoDynObjPlayerB* pB = &lbl_80281DA0->aB[nPlayer];
+    s32 nId;
+
+    pB->v20[0] = pPos[0];
+    pB->v20[1] = pPos[1];
+    pB->v20[2] = pPos[2];
+    pB->v20[3] = 1.0f;
+    pB->fC = -gPlayers[nPlayer].fAim;
+    pB->bF5 = 1;
+    pB->b0 = 1;
+    if (!pB->bF4) {
+        // EA bug: def.n1A is never set, and type 0's setup copies it to DynObj.n14E
+        def.n0 = 0;
+        def.n4 = 0;
+        def.aPos[0] = pB->v20[0];
+        def.aPos[1] = pB->v20[1];
+        def.aPos[2] = pB->v20[2];
+        def.u14 = 0x200;
+        def.n18 = 0;
+        setup.pDef = &def;
+        setup.pModel = &model;
+        model.aEntries[0].uType = 'TEO ';
+        setup.pModel->aEntries[0].u.pRef = (DynObjModelRef*)fn_8000B70C('TEO ', 10002);
+        setup.pfnHandler = fn_800499B0(setup.pDef->n4);
+        setup.pC = NULL;
+        nId = fn_800490B8(&setup);
+        if (nId != -2) {
+            pB->pF0 = fn_80048E4C(nId);
+        }
+        pB->bF4 = 1;
+    } else {
+        fn_8000ADC0(pB->pF0->obj.m0);
+        Vec_Copy(pB->v20, pB->pF0->obj.m80[3]);
+        fn_8000C5A4(pB->pF0->obj.m0);
+    }
+}
+
+// Gives up the player's object.
+void fn_80047B6C(Ball* pBall, int nPlayer) {
+    if (lbl_80281DA0->apPlayer[nPlayer] != NULL) {
+        fn_800491C4(lbl_80281DA0->apPlayer[nPlayer]);
+        fn_800490EC();
+        lbl_80281DA0->apPlayer[nPlayer] = NULL;
+    }
+}
+
+void fn_80047BC0(Ball* pBall, int nPlayer) {
+    if (lbl_80281DA0->aB[nPlayer].bF4) {
+        fn_800491C4(lbl_80281DA0->aB[nPlayer].pF0);
+        fn_800490EC();
+        lbl_80281DA0->aB[nPlayer].pF0 = NULL;
+        lbl_80281DA0->aB[nPlayer].bF4 = 0;
+    }
+}
+
+// Flies the player's 'TEO ' 10002 object (fn_80047A24) off its spot: launched once with a random
+// speed and spin, then carried by its velocity, the wind and gravity until it lands.
+void fn_80047C24(int nPlayer) {
+    f32 mTmp[4][4];
+    f32 vMove[4];
+    f32 vWind[4];
+    GoDynObjPlayerB* pB = &lbl_80281DA0->aB[nPlayer];
+    f32 fRange;
+    f32 fGround;
+
+    if (!pB->b0 || 0.0f == gSession.fFrameTime) return;
+    if (!pB->bF4) return;
+    pB->b0 = 0;
+    if (pB->bF5) {
+        fn_8000ADC0(pB->mB0);
+        fn_8000A194(pB->mB0, pB->fC, 0.0f, 0.0f);
+        fn_800BADF8(pB->pF0->obj.m0, pB->mB0, mTmp, 4);
+        fn_8000A0E8(mTmp, pB->pF0->obj.m0);
+        fn_8000C5A4(pB->pF0->obj.m0);
+        Vec_Copy(pB->v20, pB->v30);
+        fn_8004858C(pB->v40, pB->fC, lbl_80281DA0->fAA0);
+        fn_8000AE28(pB->v40, lbl_80281DA0->fA98 * (0.5f * Rand_Float(1) + 0.5f), pB->v40);
+        pB->v40[3] = pB->v40[1];
+        pB->bF5 = 0;
+        pB->b0 = 1;
+        pB->f10 = 0.0f;
+        fRange = lbl_80281DA0->fAA8;
+        pB->v60[0] = fRange * Rand_Float(1) - 0.5f * fRange;
+        fRange = lbl_80281DA0->fAA8;
+        pB->v60[1] = fRange * Rand_Float(1) - 0.5f * fRange;
+        fRange = lbl_80281DA0->fAA8;
+        pB->v60[2] = fRange * Rand_Float(1) - 0.5f * fRange;
+        pB->v50[0] = 0.0f;
+        pB->v50[1] = 0.0f;
+        pB->v50[2] = 0.0f;
+        return;
+    }
+    pB->f10 += gSession.fFrameTime;
+    Wind_Get(vWind);
+    fn_8000AE28(vWind, 0.48888f * 0.3f, vWind);
+    fn_800486C8(vWind, pB->v40, vMove);
+    fn_8001EF34(vMove, pB->f10, vMove);
+    vMove[1] = vMove[1] + -4.9f * pB->f10 * pB->f10;
+    fn_800486C8(vMove, pB->v20, pB->v30);
+    pB->b0 = 1;
+    fGround = fn_8004D5F0(fn_8000C594(), pB->v30);
+    if (pB->v30[1] < fGround) {
+        pB->v30[1] = 0.01f + fGround;
+        pB->b0 = 0;
+    }
+    fn_800486A4(pB->v60, pB->v50, pB->v50);
+    fn_8000ADC0(pB->mB0);
+    fn_8000A194(pB->mB0, pB->fC + pB->v50[0], pB->v50[1], pB->v50[2]);
+    fn_8000A144(pB->mB0, pB->pF0->obj.m0);
+    fn_8000C5A4(pB->pF0->obj.m0);
+    Vec_Copy(pB->v30, pB->pF0->obj.m80[3]);
+    pB->pF0->obj.m80[3][3] = 1.0f;
+}
+
+
+// Puts the player's 'TEO ' 10004 object at pPos (raised by fAAC), the first time making it (a type
+// 0 object with no flags); after that its turn angles wind back to 0 (at once with bReset).
+void fn_80047EF0(f32* pPos, int nPlayer, u8 bReset) {
+    DynObjDef def;
+    DynObjSetup setup;
+    DynObjModel model;
+    GoDynObjPlayerA* pA = &lbl_80281DA0->aA[nPlayer];
+    s32 nId;
+    int i;
+
+    pA->v20[0] = pPos[0];
+    pA->v20[1] = pPos[1] + lbl_80281DA0->fAAC;
+    pA->v20[2] = pPos[2];
+    pA->v20[3] = 1.0f;
+    pA->bF9 = 1;
+    pA->b0 = 1;
+    pA->b70 = 0;
+    if (!pA->bF8) {
+        // EA bug: def.n1A is never set, and type 0's setup copies it to DynObj.n14E
+        def.n0 = 0;
+        def.n4 = 0;
+        def.aPos[0] = pA->v20[0];
+        def.aPos[1] = pA->v20[1];
+        def.aPos[2] = pA->v20[2];
+        def.u14 = 0;
+        def.n18 = 0;
+        setup.pDef = &def;
+        setup.pModel = &model;
+        model.aEntries[0].uType = 'TEO ';
+        setup.pModel->aEntries[0].u.pRef = (DynObjModelRef*)fn_8000B70C('TEO ', 10004);
+        setup.pfnHandler = fn_800499B0(setup.pDef->n4);
+        setup.pC = NULL;
+        nId = fn_800490B8(&setup);
+        if (nId != -2) {
+            pA->pF4 = fn_80048E4C(nId);
+        }
+        pA->bF8 = 1;
+        fn_8000ADC0(pA->mB4);
+        Vec_Copy(pA->v20, pA->v30);
+        Vec_Copy(pA->v20, pA->pF4->obj.m80[3]);
+        fn_8000C5A4(pA->pF4->obj.m0);
+        return;
+    }
+    if (bReset) {
+        pA->v50[0] = 0.0f;
+        pA->v50[1] = 0.0f;
+        pA->v50[2] = 0.0f;
+    } else {
+        for (i = 0; i < 3; i++) {
+            if (fabs(pA->v50[i]) > PI / 4.0f) {
+                pA->v50[i] = 0.0f;
+            }
+            if (pA->v50[i] > 0.0f) {
+                pA->v50[i] -= PI / 2.0f * gSession.fFrameTime;
+                if (pA->v50[i] < 0.0f) {
+                    pA->v50[i] = 0.0f;
+                }
+            }
+            if (pA->v50[i] < 0.0f) {
+                pA->v50[i] += PI / 2.0f * gSession.fFrameTime;
+                if (pA->v50[i] > 0.0f) {
+                    pA->v50[i] = 0.0f;
+                }
+            }
+        }
+    }
+    fn_8000ADC0(pA->mB4);
+    fn_8000A194(pA->mB4, pA->v50[0], pA->v50[1], pA->v50[2]);
+    fn_8000A144(pA->mB4, pA->pF4->obj.m0);
+    Vec_Copy(pA->v20, pA->v30);
+    Vec_Copy(pA->v20, pA->pF4->obj.m80[3]);
+    fn_8000C5A4(pA->pF4->obj.m0);
+}
+
+void fn_8004816C(int nPlayer) {
+    lbl_80281DA0->aA[nPlayer].b70 = 1;
+}
+
+// Flies the player's 'TEO ' 10004 object (fn_80047EF0) once fn_8004816C launched it: a random
+// heading, speed and spin, then its velocity, the wind and gravity until it lands. Until then it
+// stays where it was put.
+void fn_80048184(int nPlayer) {
+    f32 mTmp[4][4];
+    f32 vMove[4];
+    f32 vWind[4];
+    GoDynObjPlayerA* pA = &lbl_80281DA0->aA[nPlayer];
+    f32 fRange;
+    f32 fGround;
+
+    if (0.0f == gSession.fFrameTime) return;
+    if (!pA->bF8) return;
+    if (pA->b70 && pA->b0) {
+        pA->b0 = 0;
+        if (pA->bF9) {
+            pA->fC = -gPlayers[nPlayer].fAim + Rand_Float(1) - 0.5f;
+            fn_8000ADC0(pA->mB4);
+            fn_8000A194(pA->mB4, pA->fC, 0.0f, 0.0f);
+            fn_800BADF8(pA->pF4->obj.m0, pA->mB4, mTmp, 4);
+            fn_8000A0E8(mTmp, pA->pF4->obj.m0);
+            fn_8000C5A4(pA->pF4->obj.m0);
+            Vec_Copy(pA->v20, pA->v30);
+            fn_8004858C(pA->v40, pA->fC, lbl_80281DA0->fA9C);
+            fn_8000AE28(pA->v40, lbl_80281DA0->fA94 * Rand_Float(1), pA->v40);
+            pA->v40[3] = pA->v40[1];
+            pA->bF9 = 0;
+            pA->b0 = 1;
+            pA->f10 = 0.0f;
+            fRange = lbl_80281DA0->fAA4;
+            pA->v60[0] = fRange * Rand_Float(1) - 0.5f * fRange;
+            fRange = lbl_80281DA0->fAA4;
+            pA->v60[1] = fRange * Rand_Float(1) - 0.5f * fRange;
+            fRange = lbl_80281DA0->fAA4;
+            pA->v60[2] = fRange * Rand_Float(1) - 0.5f * fRange;
+            pA->v50[0] = 0.0f;
+            pA->v50[1] = 0.0f;
+            pA->v50[2] = 0.0f;
+            return;
+        }
+        pA->f10 += gSession.fFrameTime;
+        Wind_Get(vWind);
+        fn_8000AE28(vWind, 0.48888f, vWind);
+        fn_800486C8(vWind, pA->v40, vMove);
+        fn_8001EF34(vMove, pA->f10, vMove);
+        vMove[1] = vMove[1] + -4.9f * pA->f10 * pA->f10;
+        fn_800486C8(vMove, pA->v20, pA->v30);
+        pA->b0 = 1;
+        fGround = fn_8004D5F0(fn_8000C594(), pA->v30);
+        if (pA->v30[1] < fGround) {
+            pA->v30[1] = 0.01f + fGround;
+            pA->b0 = 0;
+        }
+        fn_800486A4(pA->v60, pA->v50, pA->v50);
+        fn_8000ADC0(pA->mB4);
+        fn_8000A194(pA->mB4, pA->fC + pA->v50[0], pA->v50[1], pA->v50[2]);
+        fn_8000A144(pA->mB4, pA->pF4->obj.m0);
+        fn_8000C5A4(pA->pF4->obj.m0);
+        Vec_Copy(pA->v30, pA->pF4->obj.m80[3]);
+        pA->pF4->obj.m80[3][3] = 1.0f;
+    } else {
+        fn_8000ADC0(pA->mB4);
+        fn_8000A194(pA->mB4, pA->v50[0], pA->v50[1], pA->v50[2]);
+        fn_8000A144(pA->mB4, pA->pF4->obj.m0);
+        fn_8000C5A4(pA->pF4->obj.m0);
+        Vec_Copy(pA->v30, pA->pF4->obj.m80[3]);
+        pA->pF4->obj.m80[3][3] = 1.0f;
+    }
+}
+
+char* fn_800484E0(int i) {
+    return lbl_80187B98[i];
+}
+
+// The index of the name in lbl_80187B98 (case ignored), or -1.
+int fn_800484F4(const char* szName) {
+    int i;
+
+    if (szName == NULL) {
+        return -1;
+    }
+    for (i = 0; i < 27; i++) {
+        if (stricmp(szName, lbl_80187B98[i]) == 0) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+int fn_80048574(Character* pChar, u64 uEvent) {
+    return pChar->events[uEvent].bSet;
+}
+
+// Sets the level of detail the object is drawn with.
+void fn_80048584(UObject* pObj, s8 nLod) {
+    pObj->n104 = nLod;
+}
+
+// A direction (x, y, z, 0): straight up tilted by fTilt, towards the heading fTurn.
+void fn_8004858C(f32* pOut, f32 fTurn, f32 fTilt) {
+    f32 fSinTilt;
+    f32 fCosTilt;
+    f32 fSinTurn;
+    f32 fCosTurn;
+
+    if (0.0f == fTilt) {
+        pOut[1] = 1.0f;
+        pOut[2] = 0.0f;
+        pOut[0] = 0.0f;
+    } else {
+        fSinTilt = fn_800095F0(fTilt);
+        fCosTilt = fn_80009638(fTilt);
+        if (0.0f == fTurn) {
+            pOut[0] = 0.0f;
+            pOut[1] = fCosTilt;
+            pOut[2] = fSinTilt;
+        } else {
+            fSinTurn = fn_800095F0(fTurn);
+            fCosTurn = fn_80009638(fTurn);
+            pOut[1] = fCosTilt;
+            pOut[0] = fSinTilt * fSinTurn;
+            pOut[2] = fSinTilt * fCosTurn;
+        }
+    }
+    pOut[3] = 0.0f;
+}
 
 // a - b into out (three floats)
 #ifdef __MWERKS__
