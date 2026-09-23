@@ -373,6 +373,15 @@ Reading compiler output
   lowest free register; a variable that is modified in place keeps its own register; a value
   used once gets folded into the instruction that uses it. A single wrong register with all else
   right can be extremely hard to fix and may need a different way of expressing the same logic.
+- **[verified] `lwzu` / `stbu` / `lbz 0(rN)` on a player field means EA repeated
+  `gPlayers[n].field`.** The compiler makes the pointer to the field itself. A local
+  `Player* p` or `s8* pField` gives `lwz 0xOFF(rN)` instead, and the add comes out in a
+  different place (GameMode10 fn_800F1ABC, fn_800F1B60, fn_800F21B4).
+- **[verified] A store whose value is forwarded, done twice, can be an inline `return a = b;`.**
+  GameMode10 fn_800F1424 stores `gReplayData.nF07` into the session in a loop and once more at
+  the end. It only matched as `static inline s8 f(void) { return gSession.x = gReplayData.y; }`,
+  called in the loop and once as a statement. The same code written inline, or as two statements
+  in the helper, keeps the wrong registers.
 - **[verified] GCC without optimization looks nothing like CodeWarrior:** frame pointer in `r31`
   (`mr r31, r1`), every variable written back to the stack after each statement, epilogue through
   `r11`. A binary can contain code from more than one compiler.
