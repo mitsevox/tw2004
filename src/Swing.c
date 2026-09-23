@@ -52,7 +52,9 @@ typedef struct SwingState {
 typedef struct ShotObj {
     u8    unk0[0x1C];
     s32   nAnim;                // 0x01C  the playing animation (6 backswing, 7 downswing)
-    u8    unk20[0x38 - 0x20];
+    u8    unk20[0x2C - 0x20];
+    s32   n2C;                  // 0x02C  tested for 0 (PreShotInit) and for 4 or 5 (ShotSetupInit)
+    u8    unk30[0x38 - 0x30];
     u8*   pView;                // 0x038  -> +0x38 -> a struct with +0x10E4
     u8    unk3C[0x164 - 0x3C];
     u8    anim[4];              // 0x164  the animation: +0x14 is its playback rate
@@ -2996,7 +2998,8 @@ void STATEFUNC_ShotSetupInit(int nPlayer) {
     if (gpGame->b276 != 0) {
         fn_800689D4(nPlayer);
     }
-    if (*(s32*)(gPlayers[nPlayer].nShotHandle + 0x2C) == 4 || *(s32*)(gPlayers[nPlayer].nShotHandle + 0x2C) == 5) {
+    if (((ShotObj*)gPlayers[nPlayer].nShotHandle)->n2C == 4 ||
+        ((ShotObj*)gPlayers[nPlayer].nShotHandle)->n2C == 5) {
         fn_800957FC(gPlayers[nPlayer].nShotHandle, 1);
         fn_800957B0(gPlayers[nPlayer].nShotHandle, 1);
     }
@@ -3488,14 +3491,11 @@ void  fn_8007326C(u8* pAnim);
 // shown, the address animation - 10 for a low-IQ golfer off the tee outside a lesson, else 1 -
 // and camera 11.
 void STATEFUNC_PreShotInit(int nPlayer) {
-    s32*  pView = &gPlayers[nPlayer].nView0;
-    s32*  pHandle;
-    s32*  pLie;
     u8*   pBall;
     int   nView, k;
 
-    fn_80062F1C(fn_80017028(*pView));
-    nView = *pView;
+    fn_80062F1C(fn_80017028(gPlayers[nPlayer].nView0));
+    nView = gPlayers[nPlayer].nView0;
     View_SetCamera(fn_80017028(nView), 0x19, nPlayer, nView);
     gpGame->pfn20C(nPlayer);
     fn_80062B64(nPlayer);
@@ -3512,7 +3512,7 @@ void STATEFUNC_PreShotInit(int nPlayer) {
     }
     gPlayers[nPlayer].fThinkTime = 0.0f;
     for (k = 0; k < 2; k++) {
-        fn_8001704C(pView[k], nPlayer);
+        fn_8001704C((&gPlayers[nPlayer].nView0)[k], nPlayer);
     }
     EVENT_Trigger(nPlayer, 0x2A, 0, -1);
     fn_8001D8DC(nPlayer);
@@ -3523,23 +3523,22 @@ void STATEFUNC_PreShotInit(int nPlayer) {
     GameEffects_ResetGameEffectSettings();
     fn_800D8D10(nPlayer);
     fn_80068AA8(nPlayer);
-    pHandle = &gPlayers[nPlayer].nShotHandle;
-    fn_800957FC(*pHandle, 1);
+    fn_800957FC(gPlayers[nPlayer].nShotHandle, 1);
     Emotion_UpdatePlayerEmotion(nPlayer);
-    if (*(s32*)(*pHandle + 0x2C) == 0) {
-        fn_800957B0(*pHandle, 1);
+    if (((ShotObj*)gPlayers[nPlayer].nShotHandle)->n2C == 0) {
+        fn_800957B0(gPlayers[nPlayer].nShotHandle, 1);
     }
     fn_80045824(nPlayer);
     Swing_ResetBoostAndSpin(nPlayer);
-    BreakLine_Start(*pView);
-    fn_8009B970(*pView);
-    pLie = &gPlayers[nPlayer].nLie;
-    if (*pLie == 0) {
+    BreakLine_Start(gPlayers[nPlayer].nView0);
+    fn_8009B970(gPlayers[nPlayer].nView0);
+    if (gPlayers[nPlayer].nLie == 0) {
         fn_80047EF0(gPlayers[nPlayer].ball, nPlayer, 1);
     }
-    fn_80016CFC(*pView)[0x275] = 1;
-    if (*pLie != 10 && *pLie != LIE_GREEN && *pLie != LIE_HOLED) {
-        fn_80016CFC(*pView)[0x275] = 0;
+    fn_80016CFC(gPlayers[nPlayer].nView0)[0x275] = 1;
+    if (gPlayers[nPlayer].nLie != 10 && gPlayers[nPlayer].nLie != LIE_GREEN &&
+        gPlayers[nPlayer].nLie != LIE_HOLED) {
+        fn_80016CFC(gPlayers[nPlayer].nView0)[0x275] = 0;
     }
     pBall = gPlayers[nPlayer].ball;
     fn_80054A6C(pBall);
@@ -3550,14 +3549,14 @@ void STATEFUNC_PreShotInit(int nPlayer) {
         fn_800E3D38(nPlayer, 1);
     }
     if (fn_800DDFB4(nPlayer) != 0) {
-        fn_8007326C((u8*)*pHandle + 0x164);
-        if (gPlayers[nPlayer].bLowIQPenalty != 0 && *pLie != 0 && !fn_80100294()) {
-            fn_80095744(*pHandle, 10);
+        fn_8007326C(((ShotObj*)gPlayers[nPlayer].nShotHandle)->anim);
+        if (gPlayers[nPlayer].bLowIQPenalty != 0 && gPlayers[nPlayer].nLie != 0 && !fn_80100294()) {
+            fn_80095744(gPlayers[nPlayer].nShotHandle, 10);
         } else {
-            fn_80095744(*pHandle, 1);
+            fn_80095744(gPlayers[nPlayer].nShotHandle, 1);
         }
-        CharacterState_UpdateSKAState(*pHandle);
-        nView = *pView;
+        CharacterState_UpdateSKAState(gPlayers[nPlayer].nShotHandle);
+        nView = gPlayers[nPlayer].nView0;
         View_SetCamera(fn_80017028(nView), 0xB, nPlayer, nView);
     }
 }
