@@ -6,8 +6,24 @@
 // again after only in that case.
 
 #include "core/memcard.h"
+#include "frontend/fe.h"
 
+s32 fn_800A13E8(s32 nPort, s32 nSlot, s32 n);
 s32 fn_800A2248(s32 nPort, s32 nSlot);
+
+// At boot: no created golfer yet; try fn_800A13E8 on each card, and at the first that succeeds mark
+// player slot 0's profile loaded and return 1.
+u8 fn_8009F850(void) {
+    int i;
+    gCurGolferRecord.bAvailable = 0;
+    for (i = 0; i < MC_NUM_PORTS; i++) {
+        if (fn_800A13E8(i, 0, 0) == 0) {
+            lbl_801D7148.aLoaded[0] = 1;
+            return 1;
+        }
+    }
+    return 0;
+}
 
 // Delete the save file from the card.
 s32 fn_800A0A7C(s32 nPort, s32 nSlot) {
