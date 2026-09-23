@@ -188,10 +188,10 @@ f32  fn_800D0478(int nPlayer);          // the ball's distance from the pin (yar
 f32  fn_800D0550(int nPlayer);          // the shot's length
 int  Hole_ScoreAfterTapIn(int nPlayer); // HoleScore.c
 void fn_800D2714(u16* pDate, s32* pMonth, s32* pDay, s32* pYear);
-void fn_800D2678(u16* pDate, s32 nMonth, s32 nDay, s32 nYear);    // make a date
+void fn_800D2678(u16* pDate, s32 nMonth, s32 nDay, u32 nYear);    // make a date
 void fn_800D27CC(u16* pDate, s32 nDays);        // move a date on by nDays
 s32  fn_800D27E0(u16* pDate);                   // its day of the week, 1..7
-s32  fn_800D2814(s32 nMonth, s32 nYear);        // the days in a month
+s32  fn_800D2814(u32 nMonth, u32 nYear);        // the days in a month (compared unsigned: cmplwi)
 void fn_800D2884(s32 nMonth, s32 nYear, s32* pMonth, s32* pYear);  // the month before
 void fn_800D28B0(s32 nMonth, s32 nYear, s32* pMonth, s32* pYear);  // the month after
 void fn_800D28DC(u16 nDate, char* szOut);       // a date as text
