@@ -6,54 +6,10 @@
 
 #include "golfer.h"
 #include "physics.h"
+#include "ball.h"
 
 #define BALL_RADIUS 0.0256667f      // 0.92 in (a real one is 0.84)
 #define CUP_DIAMETER 0.10717f       // 3.86 in (a real cup is 4.25)
-
-typedef struct Ball {
-    // Field names in the comments after "TW06:" are from Tiger Woods PGA Tour 06's PhysicsBall_t
-    // (0xCC bytes; see include/physics.h). TW06 added terrainHeight at 0x58, so from there on its
-    // offsets are 4 higher, and it folded the u8 flags at 0x98 into one bit field.
-    f32  vPos[3];               // 0x00  TW06: location
-    u8   unkC[4];
-    f32  vPrev[3];              // 0x10  position last step. TW06: lastLocation
-    u8   unk1C[4];
-    f32  vVel[3];               // 0x20  TW06: linearVelocity
-    f32  f2C;                   // 0x2C
-    f32  vSpin[3];              // 0x30  TW06: angularVelocity
-    f32  f3C;                   // 0x3C
-    f32  vStart[3];             // 0x40  where the shot started. TW06: initialShotPosition
-    u8   unk4C[4];
-    f32  fSpeed;                // 0x50  TW06: speed
-    f32  fHeight;               // 0x54  height above the ground when dropped. TW06: altitude
-    f32  fSpinX;                // 0x58  spin input x 15. TW06: sideSpinOverride
-    f32  fSpinY;                // 0x5C  TW06: forwardSpinOverride
-    f32  fClosest;              // 0x60  closest approach to the pin so far. TW06: closestToCupThisShot
-    s32  nState;                // 0x64  physicsBallState_t: 0 dead, 1 waiting, 2 flying, 3/4 rolling, 5 out (OB or water)
-    s32  nLie;                  // 0x68  Lie_t: 12 in the cup, 16 out of bounds (also water here)
-    s32  n6C;                   // 0x6C  TW06 has five lie fields here (initialLie, lie, lieAngle,
-    f32  f70;                   // 0x70  lieModifier, lieReadOffset); this game has three. f70 is added to a surface's value
-    s32  nSurface;              // 0x74  surface type under the ball (90 = the cup). TW06: surfaceID
-    s32  nStartSurface;         // 0x78  surface at the start of the shot. TW06: initialSurfaceID
-    CourseInfo* pCourse;        // 0x7C  TW06: pTerrainData (TGD_TerrainInfo*)
-    s32  nCollideCount;         // 0x80  TW06: collideCount
-    s32  nSolidCollideCount;    // 0x84  TW06: solidCollideCount
-    struct SurfaceType* pHitSurface;   // 0x88  what it last hit. TW06: pLastCollisionSurface
-    s32  n8C;                   // 0x8C  TW06: pLastCollisionObject
-    s32  n90;                   // 0x90  what the ball last hit (fn_80054040). TW06: pLastCollisionActor
-    s32  nPlayer;               // 0x94  -1 when nobody's. TW06: playerID
-    u8   bHoled;                // 0x98  TW06: PBF_InHole
-    u8   b99;                   // 0x99
-    u8   bHitTopArc;            // 0x9A  set when the ball starts coming down. TW06: PBF_HitTopArc
-    u8   b9B;                   // 0x9B
-    u8   bGotFirstSandPos;      // 0x9C  landed in sand (class 6) this shot. TW06: PBF_GotFirstSandPos
-    u8   unk9D[0xA0 - 0x9D];
-    f32  vFirstSandPos[3];      // 0xA0  where it first landed in sand. TW06: firstSandPosition
-    f32  fAC;                   // 0xAC  ticks spent with no ground under a rolling ball
-    f32  fFirstSandVMag;        // 0xB0  how hard it landed there (sqrt of Physics_HandleCollision's result). TW06: firstSandVMag
-    f32  fLastDistFromInitShotPos; // 0xB4  distance from the start at the last stall check. TW06: same name
-    f32  fTimeSinceLastCheck;   // 0xB8  time since the last stall check. TW06: same name
-} Ball;
 
 void   Vec3Copy(f32* pSrc, f32* pDst);           // 0x80008304
 f32    Vec_Distance(f32* pA, f32* pB);           // 0x800BB050
