@@ -68,7 +68,7 @@ typedef struct EarningsTable {
     u8   unk4AC[0x5E4 - 0x4AC];
     MatchPrize aLadderPrize[25];    // 0x5E4  per ladder event
     MiniPrize aMini[20];            // 0x710
-    u8   unk940[0x980 - 0x940];
+    s32  aCourseMult[16];       // 0x940  the course multiplier (x1..x4) per course, in fn_800D6EEC's order
     s32  aTeePct[3];            // 0x980  the tee multiplier, as [2 - nTeeSet] (tee set 3 pays as 1)
     s32  aPinSetPct[4];         // 0x98C  the multiplier for the hole's pin set (gpGame->nPinSet) 0..3
     s32  aTourPct[6];           // 0x99C  the TOUR card multiplier per level 1..6 (level 0 pays as 1)

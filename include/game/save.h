@@ -117,7 +117,13 @@ typedef struct SaveProfile {
     s32  n74;                   // 0x00074  stroke-play rounds counted
     s32  n78;                   // 0x00078  their strokes
     s32  n7C;                   // 0x0007C  full rounds counted
-    u8   unk80[0xA8 - 0x80];
+    u8   unk80[8];
+    s32  n88;                   // 0x00088  drives counted (the tee shot of a par 4 or 5 off class-1
+                                //          ground; fn_800D8FE4)
+    s32  n8C;                   // 0x0008C  their distance together
+    u8   unk90[0xA0 - 0x90];
+    s32  nA0;                   // 0x000A0  the longest of those drives
+    s32  nA4;                   // 0x000A4  the longest putt, in feet (fn_800D8FE4)
     s32  nA8;                   // 0x000A8  the best stroke-play round (0: none yet)
     u8   unkAC[0xC8 - 0xAC];
     TourWin aC8[31];            // 0x000C8  one per PGA TOUR tournament
