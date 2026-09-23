@@ -25,8 +25,9 @@
 typedef struct MCCardState {
     u32  uFlags;                // 0x00  MC_CARD_* below
     s32  nFreeBlocks;           // 0x04  free space, in whole sectors (CARDFreeBlocks' bytes, rounded up)
-    u8   unk8[0x84 - 0x8];
-    s32  nFreeFiles;            // 0x84  free directory entries (CARDFreeBlocks)
+    u8   unk8[0x10 - 0x8];
+    char aszName[4][0x1D];      // 0x10  four names the menus show (FE_MessageTable fn_8007C3C8)
+    s32  nFreeFiles;           // 0x84  free directory entries (CARDFreeBlocks)
     s32  nSectorSize;           // 0x88  CARDProbeEx
     s32  nXferStart;            // 0x8C  CARDGetXferredBytes when an operation starts (fn_8009CB9C)
     s32  nMemSize;              // 0x90  the card's size (CARDProbeEx)
@@ -77,6 +78,13 @@ typedef struct MCCardPos {
     s32  n8;                    // 0x8  a bit index into the save image's flags (MC.c)
 } MCCardPos;
 LAYOUT_ASSERT(MCCardPos, 0xC);
+
+// A card position and a string, as fn_800A0C6C takes them (the menus pass a name typed in).
+typedef struct MCCardPosStr {
+    MCCardPos pos;              // 0x0
+    char* szC;                  // 0xC
+} MCCardPosStr;
+LAYOUT_ASSERT(MCCardPosStr, 0x10);
 
 // The memory-card screens' operations (lbl_8018C7D8): four sets of five, one set per kind of save
 // (fn_80084FF0 picks one; set 0 is the game's save, starting with fn_8009FE90 and fn_8009FCFC; set 3
