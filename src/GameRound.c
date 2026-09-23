@@ -2,11 +2,13 @@
 // hole, the stroke limit, created-course data, hole names. TW06 has no counterpart file.
 
 #include "golfer.h"
+#include "ball.h"
+#include "physics.h"
+#include "game.h"
+#include "engine.h"
 
 int  fn_800E19A4(int nPlayer, int nHoles);
 void fn_800E25CC(u8 b);
-void fn_800E1434(void);
-void fn_800E1480(int nHole);
 int  fn_800E1CE8(int a, int b);
 u8   fn_800588F4(u8* pProfile, int a, int i);
 
@@ -15,14 +17,10 @@ void  fn_800E2470(void);
 void  fn_800E30D4(void);
 void  fn_800E2FD8(void);
 void  fn_800E3050(int nCourse);
-int   fn_800D2AD8(int nHole);               // a hole's par
-u8    fn_800EE470(void);
 int   fn_8011937C(int nPlayer, int a, u8 b);
 
 int   fn_800E8C24(int nPlayer, int nHole);
-u8    Player_IsCPU(int nPlayer);
 int   sprintf(char* pBuf, const char* pFmt, ...);
-int   Game_GetCourse(void);
 
 extern u8   gNumPlayersSetUp;               // 0x80281D48 (Golfer.c)
 extern char lbl_80282270[8];                // the hole name
@@ -72,26 +70,11 @@ void  fn_800E7980(void);
 void  fn_8010C4A0(void);
 void  fn_80125E68(void);
 extern s32 lbl_80282278;
-void  fn_800E58B4(int a);
-f32   fn_800D0478(int nPlayer);           // the ball's distance from the pin (yards)
 
-CourseInfo* fn_8000C594(void);
-void  fn_80055AA8(u8* pBall, f32* pPos, int nPlayer);
-void  Mem_cpy(void* pDst, void* pSrc, int nBytes);   // memcpy
-void  Vec_Copy(f32* pSrc, f32* pDst);
-void  GOLFERSTATE_Set(int nState, int nPlayer);
-int   GOLFERSTATE_GetCurrentState(int nPlayer);
-u8    Player_IsHoled(int nPlayer);
 u8    Ter_PointInOOBNetwork(u8* pBall);
 u8    fn_800E3AF8(void);
 void  fn_800E0A84(u8 v);
-int   Game_CurHoleIndex(void);
-u32   Rand_Next(int nStream);
-void  fn_800E1260(int nPreset);
 void  fn_800E1404(int nHole);
-u8    fn_800E39F0(void);
-int   Game_CurrentHole(void);
-double fn_80009680(double x);               // sqrt
 u8    fn_8004B580(void);
 void  fn_80057364(int a);
 int   fn_800D3118(int nRound, int nHole);    // a built round's course for a hole
@@ -957,7 +940,7 @@ void fn_800E299C(void) {
     int         i;
     for (i = 0; i < gNumPlayersSetUp; i++) {
         gPlayers[i].nLie = 0;
-        fn_80055AA8(gPlayers[i].ball, &((HoleTees*)pCourse)->tee[gSession.nTeeSet[i]].x, i);
+        fn_80055AA8((Ball*)gPlayers[i].ball, &((HoleTees*)pCourse)->tee[gSession.nTeeSet[i]].x, i);
         Mem_cpy(gPlayers[i].ballBefore, gPlayers[i].ball, 0xBC);
         Vec_Copy(&((HoleTees*)pCourse)->tee[gSession.nTeeSet[i]].x, &gPlayers[i].fBallX);
         Vec_Copy(&((HoleTees*)pCourse)->tee[gSession.nTeeSet[i]].x, gPlayers[i].vA44);
@@ -985,11 +968,11 @@ void fn_800E2A88(void) {
 }
 
 // Out of bounds: outside the in-bounds area, or the ball out (state 5) or in lie 16.
-u8 fn_800E2B40(int nPlayer, u8* pBall) {
-    if (!Ter_PointInOOBNetwork(pBall)) {
+u8 fn_800E2B40(int nPlayer, Ball* pBall) {
+    if (!Ter_PointInOOBNetwork((u8*)pBall)) {
         return 1;
     }
-    if (*(s32*)(pBall + 0x64) == 5 || *(s32*)(pBall + 0x68) == 16) {
+    if (pBall->nState == PHYSICS_BALLSTATE_BallOutOfBounds_e || pBall->nLie == LIE_OUT_OF_BOUNDS_e) {
         return 1;
     }
     return 0;

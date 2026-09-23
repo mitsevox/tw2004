@@ -59,9 +59,12 @@ Prototypes
 - **A function used by more than one file** is declared once, in the header of the system it
   belongs to (`golfer.h` for game and player functions for now).
 - **A prototype local to a file** is for functions only that file calls.
-- **An intentional mismatch** (a file must see a different parameter type to match, see
-  "Function calls and parameters" in `decomp-notes.md`) gets a comment on the prototype:
-  `// s8 here, int in golfer.h: the callers in this file sign-extend`.
+- **Headers:** `game.h` (game manager, rounds, modes, golfer states, sessions), `engine.h`
+  (memory, math, streams, views, events, sound, animation), `golfer.h` (players and golfers),
+  `ball.h` (ball and terrain).
+- **No per-file re-declaration with other types.** CodeWarrior rejects a second prototype whose
+  parameter types differ (even `int` vs `s32`) as "identifier redeclared". When one file's calls
+  need a different argument type to match, cast at the call site (`fn((u16)x)`) and say why.
 
 Matching tricks
 ---------------
