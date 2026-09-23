@@ -60,39 +60,26 @@ typedef void (*MsgHandler)(MsgArg* pArgs, MsgArg* pResult);
 // Send message nMsg with nArgs values to a front-end handler (fn_8016B09C also sends through it).
 void fn_8016B0F8(void* pHandler, int nMsg, int nArgs, MsgArg* pArgs);
 
-// A command the menu UI sends to the game (uiProcessInterface.c's fn_8008F568 passes it on): it
-// reads its values from pArgs and writes its answer to pResult. A value that is a string, or an
-// answer the command writes somewhere else, is a pointer in pArgs.
-typedef void UICommand(MsgArg* pArgs, MsgArg* pResult);
+// The menu UI's commands go to one of these, by the session's game type (uiProcessInterface.c's
+// fn_8008F568): each runs the handler for message nMsg of its table.
+void fn_80079E6C(int nMsg, MsgArg* pArgs, MsgArg* pResult);    // the menus (FE_MessageTable.c)
+void fn_800850E4(int nMsg, MsgArg* pArgs, MsgArg* pResult);    // a round (GameUICommands.c)
 
-// The commands of a round (GameUICommands.c): fn_80085120 fills the table, fn_800850E4 runs
-// command nCmd. Entries 0 and 119 stay empty.
+// The round's handlers (GameUICommands.c): fn_80085120 fills the table. Entries 0 and 119 stay
+// empty.
 #define UI_NUM_ROUND_COMMANDS 214
-extern UICommand* lbl_801D83B0[UI_NUM_ROUND_COMMANDS];
-void fn_800850E4(int nCmd, MsgArg* pArgs, MsgArg* pResult);
+extern MsgHandler lbl_801D83B0[UI_NUM_ROUND_COMMANDS];
 
-// Menu commands (FE_MessageTable.c) that the round's table also runs, or that round commands
+// Menu handlers (FE_MessageTable.c) that the round's table also runs, or that round handlers
 // pass on to.
-UICommand fn_8007E9BC;
-UICommand fn_8008299C;
-UICommand fn_80082DBC;
-UICommand fn_80082E10;
-UICommand fn_800834A8;
-UICommand fn_800834E8;
+void fn_8007E9BC(MsgArg* pArgs, MsgArg* pResult);
+void fn_8008299C(MsgArg* pArgs, MsgArg* pResult);
+void fn_80082DBC(MsgArg* pArgs, MsgArg* pResult);
+void fn_80082E10(MsgArg* pArgs, MsgArg* pResult);
+void fn_800834A8(MsgArg* pArgs, MsgArg* pResult);
+void fn_800834E8(MsgArg* pArgs, MsgArg* pResult);
 
-// A request the UI commands leave for the menu UI's update (uiProcessInterface.c, 0x8008F740):
-// nState 0 when it is set; the update steps it on.
-typedef struct UIRequest {
-    s32 nState;                 // 0x0
-    s32 nValue;                 // 0x4
-    u8  unk8[4];
-} UIRequest;
-LAYOUT_ASSERT(UIRequest, 0xC);
-
-extern UIRequest lbl_801D880C;
-extern u8        lbl_80281F18;  // set by the pause command (GameUICommands.c fn_8008633C)
-
-extern char* lbl_80191990[30];  // the courses' names, by course
+extern u8 lbl_80281F18;         // set by the pause handler (GameUICommands.c fn_8008633C)
 
 // Four words a UI element passes down its transform stack, copied as one struct (what they hold is
 // not known yet).

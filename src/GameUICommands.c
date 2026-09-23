@@ -16,217 +16,217 @@ u8  lbl_80281ED8;               // which player the alternating question answers
 s32 lbl_80281EDC;               // counts -1..10, one step per fn_800894E8
 
 // The round's commands, in address order (the table's order is fn_80085120's).
-UICommand fn_80085C78;
-UICommand fn_80085D04;
-UICommand fn_80085E20;
-UICommand fn_80085F5C;
-UICommand fn_80085FDC;
-UICommand fn_800860C8;
-UICommand fn_8008618C;
-UICommand fn_80086208;
-UICommand fn_80086238;
-UICommand fn_8008628C;
-UICommand fn_80086300;
-UICommand fn_8008633C;
-UICommand fn_80086378;
-UICommand fn_80086384;
-UICommand fn_800863A8;
-UICommand fn_800863CC;
-UICommand fn_800863EC;
-UICommand fn_8008640C;
-UICommand fn_8008642C;
-UICommand fn_80086460;
-UICommand fn_800864A0;
-UICommand fn_800864D8;
-UICommand fn_800864F8;
-UICommand fn_800865A0;
-UICommand fn_800865E0;
-UICommand fn_80086610;
-UICommand fn_80086640;
-UICommand fn_8008666C;
-UICommand fn_800866E8;
-UICommand fn_800866EC;
-UICommand fn_80086738;
-UICommand fn_8008685C;
-UICommand fn_800868E8;
-UICommand fn_80086900;
-UICommand fn_80086920;
-UICommand fn_80086940;
-UICommand fn_80086970;
-UICommand fn_800869A4;
-UICommand fn_80086C78;
-UICommand fn_80086D24;
-UICommand fn_80086D58;
-UICommand fn_80086DDC;
-UICommand fn_80086DFC;
-UICommand fn_80086E2C;
-UICommand fn_80086E5C;
-UICommand fn_80086F0C;
-UICommand fn_80086FB4;
-UICommand fn_80087038;
-UICommand fn_8008709C;
-UICommand fn_800870E4;
-UICommand fn_80087130;
-UICommand fn_8008719C;
-UICommand fn_800871E4;
-UICommand fn_80087238;
-UICommand fn_80087270;
-UICommand fn_800872AC;
-UICommand fn_800872F8;
-UICommand fn_80087338;
-UICommand fn_800873D4;
-UICommand fn_80087420;
-UICommand fn_80087460;
-UICommand fn_800874C8;
-UICommand fn_800874F0;
-UICommand fn_80087510;
-UICommand fn_80087548;
-UICommand fn_80087574;
-UICommand fn_8008759C;
-UICommand fn_80087628;
-UICommand fn_80087658;
-UICommand fn_80087684;
-UICommand fn_800876CC;
-UICommand fn_80087700;
-UICommand fn_80087734;
-UICommand fn_80087764;
-UICommand fn_80087790;
-UICommand fn_800877CC;
-UICommand fn_800879B4;
-UICommand fn_80087BE8;
-UICommand fn_80087C1C;
-UICommand fn_80087C7C;
-UICommand fn_80087CBC;
-UICommand fn_80087D14;
-UICommand fn_80087D34;
-UICommand fn_80087D54;
-UICommand fn_80087D8C;
-UICommand fn_80087DD4;
-UICommand fn_80087E1C;
-UICommand fn_80087E60;
-UICommand fn_80087E80;
-UICommand fn_80087E9C;
-UICommand fn_80087ED8;
-UICommand fn_80087F48;
-UICommand fn_80087FAC;
-UICommand fn_8008802C;
-UICommand fn_8008805C;
-UICommand fn_800880AC;
-UICommand fn_800880CC;
-UICommand fn_800880D0;
-UICommand fn_80088160;
-UICommand fn_800881A8;
-UICommand fn_800881C8;
-UICommand fn_800881E8;
-UICommand fn_80088208;
-UICommand fn_8008823C;
-UICommand fn_8008828C;
-UICommand fn_800882C0;
-UICommand fn_800882F4;
-UICommand fn_80088324;
-UICommand fn_80088354;
-UICommand fn_80088358;
-UICommand fn_8008835C;
-UICommand fn_800883FC;
-UICommand fn_80088428;
-UICommand fn_80088474;
-UICommand fn_800884F0;
-UICommand fn_80088538;
-UICommand fn_80088570;
-UICommand fn_800885A0;
-UICommand fn_800885F8;
-UICommand fn_80088634;
-UICommand fn_80088654;
-UICommand fn_80088660;
-UICommand fn_80088730;
-UICommand fn_8008879C;
-UICommand fn_800887C4;
-UICommand fn_80088804;
-UICommand fn_80088830;
-UICommand fn_80088834;
-UICommand fn_8008886C;
-UICommand fn_80088AD4;
-UICommand fn_80088CC4;
-UICommand fn_80088CF0;
-UICommand fn_80089324;
-UICommand fn_80089414;
-UICommand fn_800894B4;
-UICommand fn_800894E8;
-UICommand fn_80089584;
-UICommand fn_80089590;
-UICommand fn_80089600;
-UICommand fn_80089648;
-UICommand fn_8008967C;
-UICommand fn_80089688;
-UICommand fn_8008968C;
-UICommand fn_800896A8;
-UICommand fn_800896B4;
-UICommand fn_800896D0;
-UICommand fn_800896F0;
-UICommand fn_800897F0;
-UICommand fn_80089A50;
-UICommand fn_80089A8C;
-UICommand fn_80089AD0;
-UICommand fn_80089AD4;
-UICommand fn_80089B78;
-UICommand fn_80089B8C;
-UICommand fn_80089BBC;
-UICommand fn_80089BD0;
-UICommand fn_80089BD4;
-UICommand fn_80089BE0;
-UICommand fn_80089C00;
-UICommand fn_80089C20;
-UICommand fn_80089C4C;
-UICommand fn_80089C84;
-UICommand fn_80089CAC;
-UICommand fn_80089CCC;
-UICommand fn_80089D04;
-UICommand fn_80089D28;
-UICommand fn_80089D48;
-UICommand fn_80089D68;
-UICommand fn_80089D98;
-UICommand fn_80089DA4;
-UICommand fn_80089DB0;
-UICommand fn_80089E5C;
-UICommand fn_80089E60;
-UICommand fn_80089E64;
-UICommand fn_80089E98;
-UICommand fn_80089E9C;
-UICommand fn_80089ED0;
-UICommand fn_80089F24;
-UICommand fn_80089F6C;
-UICommand fn_8008A010;
-UICommand fn_8008A0CC;
-UICommand fn_8008A128;
-UICommand fn_8008A184;
-UICommand fn_8008A188;
-UICommand fn_8008A1C8;
-UICommand fn_8008A208;
-UICommand fn_8008A20C;
-UICommand fn_8008A240;
-UICommand fn_8008A294;
-UICommand fn_8008A2E0;
-UICommand fn_8008A468;
-UICommand fn_8008A4A8;
-UICommand fn_8008A690;
-UICommand fn_8008A758;
-UICommand fn_8008A788;
-UICommand fn_8008A7C8;
-UICommand fn_8008A7D4;
-UICommand fn_8008A800;
-UICommand fn_8008A804;
-UICommand fn_8008A838;
-UICommand fn_8008A86C;
-UICommand fn_8008A870;
-UICommand fn_8008A8B8;
-UICommand fn_8008A8E8;
-UICommand fn_8008A914;
-UICommand fn_8008A964;
-UICommand fn_8008A9A0;
-UICommand fn_8008A9E8;
-UICommand fn_8008AAAC;
-UICommand fn_8008AAB8;
-UICommand fn_8008AB04;
+void fn_80085C78(MsgArg* pArgs, MsgArg* pResult);
+void fn_80085D04(MsgArg* pArgs, MsgArg* pResult);
+void fn_80085E20(MsgArg* pArgs, MsgArg* pResult);
+void fn_80085F5C(MsgArg* pArgs, MsgArg* pResult);
+void fn_80085FDC(MsgArg* pArgs, MsgArg* pResult);
+void fn_800860C8(MsgArg* pArgs, MsgArg* pResult);
+void fn_8008618C(MsgArg* pArgs, MsgArg* pResult);
+void fn_80086208(MsgArg* pArgs, MsgArg* pResult);
+void fn_80086238(MsgArg* pArgs, MsgArg* pResult);
+void fn_8008628C(MsgArg* pArgs, MsgArg* pResult);
+void fn_80086300(MsgArg* pArgs, MsgArg* pResult);
+void fn_8008633C(MsgArg* pArgs, MsgArg* pResult);
+void fn_80086378(MsgArg* pArgs, MsgArg* pResult);
+void fn_80086384(MsgArg* pArgs, MsgArg* pResult);
+void fn_800863A8(MsgArg* pArgs, MsgArg* pResult);
+void fn_800863CC(MsgArg* pArgs, MsgArg* pResult);
+void fn_800863EC(MsgArg* pArgs, MsgArg* pResult);
+void fn_8008640C(MsgArg* pArgs, MsgArg* pResult);
+void fn_8008642C(MsgArg* pArgs, MsgArg* pResult);
+void fn_80086460(MsgArg* pArgs, MsgArg* pResult);
+void fn_800864A0(MsgArg* pArgs, MsgArg* pResult);
+void fn_800864D8(MsgArg* pArgs, MsgArg* pResult);
+void fn_800864F8(MsgArg* pArgs, MsgArg* pResult);
+void fn_800865A0(MsgArg* pArgs, MsgArg* pResult);
+void fn_800865E0(MsgArg* pArgs, MsgArg* pResult);
+void fn_80086610(MsgArg* pArgs, MsgArg* pResult);
+void fn_80086640(MsgArg* pArgs, MsgArg* pResult);
+void fn_8008666C(MsgArg* pArgs, MsgArg* pResult);
+void fn_800866E8(MsgArg* pArgs, MsgArg* pResult);
+void fn_800866EC(MsgArg* pArgs, MsgArg* pResult);
+void fn_80086738(MsgArg* pArgs, MsgArg* pResult);
+void fn_8008685C(MsgArg* pArgs, MsgArg* pResult);
+void fn_800868E8(MsgArg* pArgs, MsgArg* pResult);
+void fn_80086900(MsgArg* pArgs, MsgArg* pResult);
+void fn_80086920(MsgArg* pArgs, MsgArg* pResult);
+void fn_80086940(MsgArg* pArgs, MsgArg* pResult);
+void fn_80086970(MsgArg* pArgs, MsgArg* pResult);
+void fn_800869A4(MsgArg* pArgs, MsgArg* pResult);
+void fn_80086C78(MsgArg* pArgs, MsgArg* pResult);
+void fn_80086D24(MsgArg* pArgs, MsgArg* pResult);
+void fn_80086D58(MsgArg* pArgs, MsgArg* pResult);
+void fn_80086DDC(MsgArg* pArgs, MsgArg* pResult);
+void fn_80086DFC(MsgArg* pArgs, MsgArg* pResult);
+void fn_80086E2C(MsgArg* pArgs, MsgArg* pResult);
+void fn_80086E5C(MsgArg* pArgs, MsgArg* pResult);
+void fn_80086F0C(MsgArg* pArgs, MsgArg* pResult);
+void fn_80086FB4(MsgArg* pArgs, MsgArg* pResult);
+void fn_80087038(MsgArg* pArgs, MsgArg* pResult);
+void fn_8008709C(MsgArg* pArgs, MsgArg* pResult);
+void fn_800870E4(MsgArg* pArgs, MsgArg* pResult);
+void fn_80087130(MsgArg* pArgs, MsgArg* pResult);
+void fn_8008719C(MsgArg* pArgs, MsgArg* pResult);
+void fn_800871E4(MsgArg* pArgs, MsgArg* pResult);
+void fn_80087238(MsgArg* pArgs, MsgArg* pResult);
+void fn_80087270(MsgArg* pArgs, MsgArg* pResult);
+void fn_800872AC(MsgArg* pArgs, MsgArg* pResult);
+void fn_800872F8(MsgArg* pArgs, MsgArg* pResult);
+void fn_80087338(MsgArg* pArgs, MsgArg* pResult);
+void fn_800873D4(MsgArg* pArgs, MsgArg* pResult);
+void fn_80087420(MsgArg* pArgs, MsgArg* pResult);
+void fn_80087460(MsgArg* pArgs, MsgArg* pResult);
+void fn_800874C8(MsgArg* pArgs, MsgArg* pResult);
+void fn_800874F0(MsgArg* pArgs, MsgArg* pResult);
+void fn_80087510(MsgArg* pArgs, MsgArg* pResult);
+void fn_80087548(MsgArg* pArgs, MsgArg* pResult);
+void fn_80087574(MsgArg* pArgs, MsgArg* pResult);
+void fn_8008759C(MsgArg* pArgs, MsgArg* pResult);
+void fn_80087628(MsgArg* pArgs, MsgArg* pResult);
+void fn_80087658(MsgArg* pArgs, MsgArg* pResult);
+void fn_80087684(MsgArg* pArgs, MsgArg* pResult);
+void fn_800876CC(MsgArg* pArgs, MsgArg* pResult);
+void fn_80087700(MsgArg* pArgs, MsgArg* pResult);
+void fn_80087734(MsgArg* pArgs, MsgArg* pResult);
+void fn_80087764(MsgArg* pArgs, MsgArg* pResult);
+void fn_80087790(MsgArg* pArgs, MsgArg* pResult);
+void fn_800877CC(MsgArg* pArgs, MsgArg* pResult);
+void fn_800879B4(MsgArg* pArgs, MsgArg* pResult);
+void fn_80087BE8(MsgArg* pArgs, MsgArg* pResult);
+void fn_80087C1C(MsgArg* pArgs, MsgArg* pResult);
+void fn_80087C7C(MsgArg* pArgs, MsgArg* pResult);
+void fn_80087CBC(MsgArg* pArgs, MsgArg* pResult);
+void fn_80087D14(MsgArg* pArgs, MsgArg* pResult);
+void fn_80087D34(MsgArg* pArgs, MsgArg* pResult);
+void fn_80087D54(MsgArg* pArgs, MsgArg* pResult);
+void fn_80087D8C(MsgArg* pArgs, MsgArg* pResult);
+void fn_80087DD4(MsgArg* pArgs, MsgArg* pResult);
+void fn_80087E1C(MsgArg* pArgs, MsgArg* pResult);
+void fn_80087E60(MsgArg* pArgs, MsgArg* pResult);
+void fn_80087E80(MsgArg* pArgs, MsgArg* pResult);
+void fn_80087E9C(MsgArg* pArgs, MsgArg* pResult);
+void fn_80087ED8(MsgArg* pArgs, MsgArg* pResult);
+void fn_80087F48(MsgArg* pArgs, MsgArg* pResult);
+void fn_80087FAC(MsgArg* pArgs, MsgArg* pResult);
+void fn_8008802C(MsgArg* pArgs, MsgArg* pResult);
+void fn_8008805C(MsgArg* pArgs, MsgArg* pResult);
+void fn_800880AC(MsgArg* pArgs, MsgArg* pResult);
+void fn_800880CC(MsgArg* pArgs, MsgArg* pResult);
+void fn_800880D0(MsgArg* pArgs, MsgArg* pResult);
+void fn_80088160(MsgArg* pArgs, MsgArg* pResult);
+void fn_800881A8(MsgArg* pArgs, MsgArg* pResult);
+void fn_800881C8(MsgArg* pArgs, MsgArg* pResult);
+void fn_800881E8(MsgArg* pArgs, MsgArg* pResult);
+void fn_80088208(MsgArg* pArgs, MsgArg* pResult);
+void fn_8008823C(MsgArg* pArgs, MsgArg* pResult);
+void fn_8008828C(MsgArg* pArgs, MsgArg* pResult);
+void fn_800882C0(MsgArg* pArgs, MsgArg* pResult);
+void fn_800882F4(MsgArg* pArgs, MsgArg* pResult);
+void fn_80088324(MsgArg* pArgs, MsgArg* pResult);
+void fn_80088354(MsgArg* pArgs, MsgArg* pResult);
+void fn_80088358(MsgArg* pArgs, MsgArg* pResult);
+void fn_8008835C(MsgArg* pArgs, MsgArg* pResult);
+void fn_800883FC(MsgArg* pArgs, MsgArg* pResult);
+void fn_80088428(MsgArg* pArgs, MsgArg* pResult);
+void fn_80088474(MsgArg* pArgs, MsgArg* pResult);
+void fn_800884F0(MsgArg* pArgs, MsgArg* pResult);
+void fn_80088538(MsgArg* pArgs, MsgArg* pResult);
+void fn_80088570(MsgArg* pArgs, MsgArg* pResult);
+void fn_800885A0(MsgArg* pArgs, MsgArg* pResult);
+void fn_800885F8(MsgArg* pArgs, MsgArg* pResult);
+void fn_80088634(MsgArg* pArgs, MsgArg* pResult);
+void fn_80088654(MsgArg* pArgs, MsgArg* pResult);
+void fn_80088660(MsgArg* pArgs, MsgArg* pResult);
+void fn_80088730(MsgArg* pArgs, MsgArg* pResult);
+void fn_8008879C(MsgArg* pArgs, MsgArg* pResult);
+void fn_800887C4(MsgArg* pArgs, MsgArg* pResult);
+void fn_80088804(MsgArg* pArgs, MsgArg* pResult);
+void fn_80088830(MsgArg* pArgs, MsgArg* pResult);
+void fn_80088834(MsgArg* pArgs, MsgArg* pResult);
+void fn_8008886C(MsgArg* pArgs, MsgArg* pResult);
+void fn_80088AD4(MsgArg* pArgs, MsgArg* pResult);
+void fn_80088CC4(MsgArg* pArgs, MsgArg* pResult);
+void fn_80088CF0(MsgArg* pArgs, MsgArg* pResult);
+void fn_80089324(MsgArg* pArgs, MsgArg* pResult);
+void fn_80089414(MsgArg* pArgs, MsgArg* pResult);
+void fn_800894B4(MsgArg* pArgs, MsgArg* pResult);
+void fn_800894E8(MsgArg* pArgs, MsgArg* pResult);
+void fn_80089584(MsgArg* pArgs, MsgArg* pResult);
+void fn_80089590(MsgArg* pArgs, MsgArg* pResult);
+void fn_80089600(MsgArg* pArgs, MsgArg* pResult);
+void fn_80089648(MsgArg* pArgs, MsgArg* pResult);
+void fn_8008967C(MsgArg* pArgs, MsgArg* pResult);
+void fn_80089688(MsgArg* pArgs, MsgArg* pResult);
+void fn_8008968C(MsgArg* pArgs, MsgArg* pResult);
+void fn_800896A8(MsgArg* pArgs, MsgArg* pResult);
+void fn_800896B4(MsgArg* pArgs, MsgArg* pResult);
+void fn_800896D0(MsgArg* pArgs, MsgArg* pResult);
+void fn_800896F0(MsgArg* pArgs, MsgArg* pResult);
+void fn_800897F0(MsgArg* pArgs, MsgArg* pResult);
+void fn_80089A50(MsgArg* pArgs, MsgArg* pResult);
+void fn_80089A8C(MsgArg* pArgs, MsgArg* pResult);
+void fn_80089AD0(MsgArg* pArgs, MsgArg* pResult);
+void fn_80089AD4(MsgArg* pArgs, MsgArg* pResult);
+void fn_80089B78(MsgArg* pArgs, MsgArg* pResult);
+void fn_80089B8C(MsgArg* pArgs, MsgArg* pResult);
+void fn_80089BBC(MsgArg* pArgs, MsgArg* pResult);
+void fn_80089BD0(MsgArg* pArgs, MsgArg* pResult);
+void fn_80089BD4(MsgArg* pArgs, MsgArg* pResult);
+void fn_80089BE0(MsgArg* pArgs, MsgArg* pResult);
+void fn_80089C00(MsgArg* pArgs, MsgArg* pResult);
+void fn_80089C20(MsgArg* pArgs, MsgArg* pResult);
+void fn_80089C4C(MsgArg* pArgs, MsgArg* pResult);
+void fn_80089C84(MsgArg* pArgs, MsgArg* pResult);
+void fn_80089CAC(MsgArg* pArgs, MsgArg* pResult);
+void fn_80089CCC(MsgArg* pArgs, MsgArg* pResult);
+void fn_80089D04(MsgArg* pArgs, MsgArg* pResult);
+void fn_80089D28(MsgArg* pArgs, MsgArg* pResult);
+void fn_80089D48(MsgArg* pArgs, MsgArg* pResult);
+void fn_80089D68(MsgArg* pArgs, MsgArg* pResult);
+void fn_80089D98(MsgArg* pArgs, MsgArg* pResult);
+void fn_80089DA4(MsgArg* pArgs, MsgArg* pResult);
+void fn_80089DB0(MsgArg* pArgs, MsgArg* pResult);
+void fn_80089E5C(MsgArg* pArgs, MsgArg* pResult);
+void fn_80089E60(MsgArg* pArgs, MsgArg* pResult);
+void fn_80089E64(MsgArg* pArgs, MsgArg* pResult);
+void fn_80089E98(MsgArg* pArgs, MsgArg* pResult);
+void fn_80089E9C(MsgArg* pArgs, MsgArg* pResult);
+void fn_80089ED0(MsgArg* pArgs, MsgArg* pResult);
+void fn_80089F24(MsgArg* pArgs, MsgArg* pResult);
+void fn_80089F6C(MsgArg* pArgs, MsgArg* pResult);
+void fn_8008A010(MsgArg* pArgs, MsgArg* pResult);
+void fn_8008A0CC(MsgArg* pArgs, MsgArg* pResult);
+void fn_8008A128(MsgArg* pArgs, MsgArg* pResult);
+void fn_8008A184(MsgArg* pArgs, MsgArg* pResult);
+void fn_8008A188(MsgArg* pArgs, MsgArg* pResult);
+void fn_8008A1C8(MsgArg* pArgs, MsgArg* pResult);
+void fn_8008A208(MsgArg* pArgs, MsgArg* pResult);
+void fn_8008A20C(MsgArg* pArgs, MsgArg* pResult);
+void fn_8008A240(MsgArg* pArgs, MsgArg* pResult);
+void fn_8008A294(MsgArg* pArgs, MsgArg* pResult);
+void fn_8008A2E0(MsgArg* pArgs, MsgArg* pResult);
+void fn_8008A468(MsgArg* pArgs, MsgArg* pResult);
+void fn_8008A4A8(MsgArg* pArgs, MsgArg* pResult);
+void fn_8008A690(MsgArg* pArgs, MsgArg* pResult);
+void fn_8008A758(MsgArg* pArgs, MsgArg* pResult);
+void fn_8008A788(MsgArg* pArgs, MsgArg* pResult);
+void fn_8008A7C8(MsgArg* pArgs, MsgArg* pResult);
+void fn_8008A7D4(MsgArg* pArgs, MsgArg* pResult);
+void fn_8008A800(MsgArg* pArgs, MsgArg* pResult);
+void fn_8008A804(MsgArg* pArgs, MsgArg* pResult);
+void fn_8008A838(MsgArg* pArgs, MsgArg* pResult);
+void fn_8008A86C(MsgArg* pArgs, MsgArg* pResult);
+void fn_8008A870(MsgArg* pArgs, MsgArg* pResult);
+void fn_8008A8B8(MsgArg* pArgs, MsgArg* pResult);
+void fn_8008A8E8(MsgArg* pArgs, MsgArg* pResult);
+void fn_8008A914(MsgArg* pArgs, MsgArg* pResult);
+void fn_8008A964(MsgArg* pArgs, MsgArg* pResult);
+void fn_8008A9A0(MsgArg* pArgs, MsgArg* pResult);
+void fn_8008A9E8(MsgArg* pArgs, MsgArg* pResult);
+void fn_8008AAAC(MsgArg* pArgs, MsgArg* pResult);
+void fn_8008AAB8(MsgArg* pArgs, MsgArg* pResult);
+void fn_8008AB04(MsgArg* pArgs, MsgArg* pResult);
 
 // This file's helpers.
 u8   fn_80085BC0(int nController);
@@ -236,13 +236,13 @@ s32  fn_8008AC00(void);
 void fn_8008AC3C(int a, int b);
 u8   fn_8008AC40(void);
 void fn_8008AC48(int nPlayer, char* sz);
-void fn_8008AC4C(u16 nMsg, int a);
-void fn_8008AC78(u16 nMsg, int a);
-void fn_8008ACA4(u16 nMsg, int a);
-void fn_8008ACD0(u16 nMsg, int a);
-void fn_8008ACFC(u16 nMsg, int a);
-void fn_8008AD28(u16 nMsg, int a);
-void fn_8008AD54(u16 nMsg, int a);
+void fn_8008AC4C(int nMsg, int a);
+void fn_8008AC78(int nMsg, int a);
+void fn_8008ACA4(int nMsg, int a);
+void fn_8008ACD0(int nMsg, int a);
+void fn_8008ACFC(int nMsg, int a);
+void fn_8008AD28(int nMsg, int a);
+void fn_8008AD54(int nMsg, int a);
 
 // Other files' functions no header declares yet.
 s32   DVDGetDriveStatus(void);
@@ -266,7 +266,6 @@ u8    fn_8003DCAC(void);
 void  fn_80062B84(int a);
 void  fn_8006F4E0(void);
 s32   fn_80084FB4(CardPos* pPos);
-void  fn_80084FF0(s32 v);
 void  fn_8009CD80(s32 nPort, s32 nSlot);
 s32   fn_800A036C(MCCardPos* pPos);
 s32   fn_800A0610(s32 nPort, s32 nSlot, s32 n);
@@ -282,7 +281,6 @@ void  fn_800A7944(void);
 u8    fn_800C6E44(View* pView);
 u8    fn_800C708C(View* pView);
 void  fn_800C9038(int nView, int a, int b);
-void  fn_800D28DC(u16 nDate, char* szOut);
 s32   fn_800D2B4C(int nPlayer);
 s32   fn_800D2C30(int nHole, int nTeeSet);
 s32   fn_800D2D40(int nTeeSet);
@@ -290,7 +288,6 @@ s32   fn_800D2DA0(int nTeeSet);
 s32   fn_800D2E00(int nTeeSet);
 s32   fn_800D2E60(void);
 s32   fn_800D2EB0(void);
-s32   fn_800D2FB4(s32 nTeeSet);
 f32   fn_800D6EEC(void);
 char* fn_800DAD1C(int nPlayer);
 s32   fn_800DAD30(int nPlayer);
@@ -1056,9 +1053,10 @@ void fn_800869A4(MsgArg* pArgs, MsgArg* pResult) {
 
 // The ball's lie as a percentage: the surface's share of speed kept, plus RECOVERY's part.
 void fn_80086C78(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->f = 100.0f * (0.01f * (gPlayers[pArgs[0].i].ball.f70 *
-                                    (s8)Golfer_GetAttribute(&gPlayers[pArgs[0].i], ATTR_RECOVERY, ATTR_TOTAL)) +
-                           gSurfaceTypes[gPlayers[pArgs[0].i].ball.nSurface].f00);
+    pResult->f = 100.0f *
+                 (0.01f * (gPlayers[pArgs[0].i].ball.f70 *
+                           (s8)Golfer_GetAttribute(&gPlayers[pArgs[0].i], ATTR_RECOVERY, ATTR_TOTAL)) +
+                  gSurfaceTypes[gPlayers[pArgs[0].i].ball.nSurface].f00);
 }
 
 void fn_80086D24(MsgArg* pArgs, MsgArg* pResult) {
@@ -1131,17 +1129,23 @@ void fn_80086FB4(MsgArg* pArgs, MsgArg* pResult) {
 
 // The PGA TOUR leaderboard: the name of the golfer on row pArgs[0].
 void fn_80087038(MsgArg* pArgs, MsgArg* pResult) {
-    strcpy(((MsgString*)pArgs[1].p)->pStr,
-           fn_80118E30(0, fn_80119118(0, fn_801197CC(0, pArgs[0].i))));
+    s32 nEntrant = fn_801197CC(0, pArgs[0].i);
+    s32 nGolfer = fn_80119118(0, nEntrant);
+
+    strcpy(((MsgString*)pArgs[1].p)->pStr, fn_80118E30(0, nGolfer));
 }
 
 // The rank of the golfer on a row.
 void fn_8008709C(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_801190D8(0, fn_801197CC(0, pArgs[0].i));
+    s32 nEntrant = fn_801197CC(0, pArgs[0].i);
+
+    pResult->i = fn_801190D8(0, nEntrant);
 }
 
 void fn_800870E4(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_80119808(0, fn_801197CC(0, pArgs[0].i));
+    s32 nEntrant = fn_801197CC(0, pArgs[0].i);
+
+    pResult->i = fn_80119808(0, nEntrant);
 }
 
 // The score of the golfer on a row (the player's own counts the current round).
@@ -1153,7 +1157,9 @@ void fn_80087130(MsgArg* pArgs, MsgArg* pResult) {
 
 // The hole the golfer on a row is on.
 void fn_8008719C(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_80119A04(0, fn_801197CC(0, pArgs[0].i));
+    s32 nEntrant = fn_801197CC(0, pArgs[0].i);
+
+    pResult->i = fn_80119A04(0, nEntrant);
 }
 
 // The golfer on a row's score in round pArgs[1].
@@ -1506,8 +1512,8 @@ void fn_80087E60(MsgArg* pArgs, MsgArg* pResult) {
 
 // Leave a request for the menu UI's update.
 void fn_80087E80(MsgArg* pArgs, MsgArg* pResult) {
-    lbl_801D880C.nValue = pArgs[0].i;
-    lbl_801D880C.nState = 0;
+    lbl_801D880C.n4 = pArgs[0].i;
+    lbl_801D880C.n0 = 0;
 }
 
 void fn_80087E9C(MsgArg* pArgs, MsgArg* pResult) {
@@ -2290,7 +2296,7 @@ void fn_80089C4C(MsgArg* pArgs, MsgArg* pResult) {
     int nMsg = pArgs[0].i;
 
     fn_800A6F38();
-    fn_8008AC4C(nMsg, 0);
+    fn_8008AC4C((u16)nMsg, 0);
 }
 
 void fn_80089C84(MsgArg* pArgs, MsgArg* pResult) {
@@ -2519,29 +2525,29 @@ void fn_8008A294(MsgArg* pArgs, MsgArg* pResult) {
 // The PGA TOUR result screen: the player's name, the money won ("$1,234"), the tournament's name
 // and end date, and the place ("1st place").
 void fn_8008A2E0(MsgArg* pArgs, MsgArg* pResult) {
-    Pga80205F30* pResult2 = fn_800EE8B8();
+    Pga80205F30* pTour = fn_800EE8B8();
     int nPlace;
 
     strcpy(((MsgString*)pArgs[0].p)->pStr, gpSaveData->szName);
     ((MsgString*)pArgs[1].p)->pStr[0] = '$';
-    fn_800907AC(pResult2->n8, ((MsgString*)pArgs[1].p)->pStr + 1);
+    fn_800907AC(pTour->n8, ((MsgString*)pArgs[1].p)->pStr + 1);
     strcpy(((MsgString*)pArgs[2].p)->pStr, GameModeDriverPGATour_GetName(gpSaveData->tour.nEvent));
     fn_800D28DC(GameModeDriverPGATour_GetEndDate(gpSaveData->tour.nEvent), ((MsgString*)pArgs[3].p)->pStr);
-    nPlace = pResult2->n4;
+    nPlace = pTour->n4;
     if (nPlace > 100) {
-        nPlace = pResult2->n4 % 100;
+        nPlace = pTour->n4 % 100;
     }
     if (nPlace > 20) {
         nPlace %= 10;
     }
     if (nPlace == 1) {
-        sprintf(((MsgString*)pArgs[4].p)->pStr, "%dst", pResult2->n4);
+        sprintf(((MsgString*)pArgs[4].p)->pStr, "%dst", pTour->n4);
     } else if (nPlace == 2) {
-        sprintf(((MsgString*)pArgs[4].p)->pStr, "%dnd", pResult2->n4);
+        sprintf(((MsgString*)pArgs[4].p)->pStr, "%dnd", pTour->n4);
     } else if (nPlace == 3) {
-        sprintf(((MsgString*)pArgs[4].p)->pStr, "%drd", pResult2->n4);
+        sprintf(((MsgString*)pArgs[4].p)->pStr, "%drd", pTour->n4);
     } else {
-        sprintf(((MsgString*)pArgs[4].p)->pStr, "%dth", pResult2->n4);
+        sprintf(((MsgString*)pArgs[4].p)->pStr, "%dth", pTour->n4);
     }
     strcat(((MsgString*)pArgs[4].p)->pStr, " place");
 }
@@ -2552,7 +2558,7 @@ void fn_8008A468(MsgArg* pArgs, MsgArg* pResult) {
            GameModeDriverPGATour_GetName(GameModeDriverPGATour_GetCurrentEventID()));
 }
 
-// Play the sound for a menu move: pArgs[0] is the kind of item, pArgs[1] 0 or 2 the direction.
+// Pass on to fn_800A61C4 a number for pArgs[0] and pArgs[1] (0 or 2); nothing in modes 22 and 26.
 void fn_8008A4A8(MsgArg* pArgs, MsgArg* pResult) {
     if (Game_GetMode() == 26) return;
     if (Game_GetMode() == 22) return;
@@ -2648,30 +2654,30 @@ void fn_8008A4A8(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// Send message pArgs[1] of kind pArgs[0].
+// Play sound pArgs[1] of kind pArgs[0]. The sound numbers are 16-bit.
 void fn_8008A690(MsgArg* pArgs, MsgArg* pResult) {
     switch (pArgs[0].i) {
     case 1:
     case 2:
-        fn_8008AC4C(pArgs[1].i, 0);
+        fn_8008AC4C((u16)pArgs[1].i, 0);
         return;
     case 6:
-        fn_8008AD54(pArgs[1].i, 0);
+        fn_8008AD54((u16)pArgs[1].i, 0);
         return;
     case 7:
-        fn_8008AD28(pArgs[1].i, 0);
+        fn_8008AD28((u16)pArgs[1].i, 0);
         return;
     case 8:
-        fn_8008ACFC(pArgs[1].i, 0);
+        fn_8008ACFC((u16)pArgs[1].i, 0);
         return;
     case 9:
-        fn_8008ACD0(pArgs[1].i, 0);
+        fn_8008ACD0((u16)pArgs[1].i, 0);
         return;
     case 10:
-        fn_8008ACA4(pArgs[1].i, 0);
+        fn_8008ACA4((u16)pArgs[1].i, 0);
         return;
     case 11:
-        fn_8008AC78(pArgs[1].i, 0);
+        fn_8008AC78((u16)pArgs[1].i, 0);
         return;
     }
 }
@@ -2783,7 +2789,9 @@ void fn_8008AAAC(MsgArg* pArgs, MsgArg* pResult) {
 
 // Whether the golfer on a leaderboard row missed the cut.
 void fn_8008AAB8(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_801197A4(0, fn_801197CC(0, pArgs[0].i));
+    s32 nEntrant = fn_801197CC(0, pArgs[0].i);
+
+    pResult->i = fn_801197A4(0, nEntrant);
 }
 
 void fn_8008AB04(MsgArg* pArgs, MsgArg* pResult) {
@@ -2830,30 +2838,30 @@ u8 fn_8008AC40(void) {
 void fn_8008AC48(int nPlayer, char* sz) {
 }
 
-void fn_8008AC4C(u16 nMsg, int a) {
+void fn_8008AC4C(int nMsg, int a) {
     fn_800A7664(14, nMsg, a);
 }
 
-void fn_8008AC78(u16 nMsg, int a) {
+void fn_8008AC78(int nMsg, int a) {
     fn_800A7664(19, nMsg, a);
 }
 
-void fn_8008ACA4(u16 nMsg, int a) {
+void fn_8008ACA4(int nMsg, int a) {
     fn_800A7664(17, nMsg, a);
 }
 
-void fn_8008ACD0(u16 nMsg, int a) {
+void fn_8008ACD0(int nMsg, int a) {
     fn_800A7664(16, nMsg, a);
 }
 
-void fn_8008ACFC(u16 nMsg, int a) {
+void fn_8008ACFC(int nMsg, int a) {
     fn_800A7664(15, nMsg, a);
 }
 
-void fn_8008AD28(u16 nMsg, int a) {
+void fn_8008AD28(int nMsg, int a) {
     fn_800A7664(20, nMsg, a);
 }
 
-void fn_8008AD54(u16 nMsg, int a) {
+void fn_8008AD54(int nMsg, int a) {
     fn_800A7664(18, nMsg, a);
 }
