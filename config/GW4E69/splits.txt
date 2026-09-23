@@ -3885,7 +3885,7 @@ runtime/mem.c:
 	.text       start:0x80156C78 end:0x80156DE8
 
 src/MSL_C/PPCEABI/bare/H/mem_funcs.c:
-	.text       start:0x80156DE8 end:0x80156F54
+	.text       start:0x80156DE8 end:0x801570B8
 
 runtime/misc_io.c:
 	.text       start:0x801570B8 end:0x801570C8
