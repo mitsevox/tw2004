@@ -220,7 +220,8 @@ void     fn_8003DCE8(int nPlayer, void* pCam, void* pSub, void* pScript, CamShot
 void     fn_8003EA50(int nPlayer, void* pCam, void* pSub, void* pScript, CamShot* pShot, int a,
                      f32 fFrameTime);
 CamShot* fn_8003A7C8(int nPlayer, int nKind, CamShot* pShot);
-CamShot* fn_8003A950(CamSequence* pSequence, int nKind, int* pA, f32* pF1, f32* pF2, int* pB, f32* pF3, int nPlayer);
+CamShot* fn_8003A950(CamSequence* pSequence, int nKind, int* pA, f32* pF1, f32* pF2, int* pB, f32* pF3,
+                     int nPlayer);
 u8       fn_8003DC78(CamShot* pShot);
 void     CameraScript_InterpToNewScript(void* pScript, CamShot* pShot, int nPlayer, void* pCam, void* pSub,
                                         int nA, f32 f1, f32 f2, int nB, f32 f3);
@@ -248,13 +249,12 @@ void     fn_80038054(u8 a, int n, f32 f1, f32 f2);
 void     fn_8007326C(void* p);
 CamShot* fn_80064F7C(int nPlayer, int nKind, int a, CamShot* pShot);
 u8       fn_8003C9D0(int nPlayer, int a, CamSequence** ppSeq, CamShot** ppShot);
-u32      fn_800136DC(int nController);         // buttons: held << 16 | pressed this frame
-u32      fn_800142AC(int nButton, int a);      // a button's mask
 CamShot* fn_800C4DF8(int nFirst, int nPlayer);
 void     fn_800C5EC0(View* pView, f32* pCam, f32* pSub, int nPlayer);
 u8       fn_800C6D80(void);
 CamSequence* DynamicCam_ChoosePreFlightSequence(int nPlayer, int nLie, int nKind);
-u8       fn_800DC514(int nPlayer);   // GameEffects.c: s32 (void); this file passes the player and tests a byte
+// GameEffects.c defines it as s32 (void); the call here passes the player and tests a byte.
+u8       fn_800DC514(int nPlayer);
 u8       Ter_CheckForGroundCollision(void* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal, void* pA,
                                      void* pB);
 
@@ -360,8 +360,8 @@ void GolfCamera_InitElevatorCamera(View* pView, int nPlayer) {
         strcpy(pView->shot19C.szName, "ELEVATOR CAM");
         pView->shot19C.f24 += lbl_80282220->fElevatorHeight[Game_GetCourse()];
         pView->shot19C.bAC = 9;
-        CameraScript_InterpToNewScript(&pView->script, &pView->shot19C, nPlayer, pCam, pSub, 1, lbl_80281F78->f94,
-                                       100.0f, 0x19, 0.0f);
+        CameraScript_InterpToNewScript(&pView->script, &pView->shot19C, nPlayer, pCam, pSub, 1,
+                                       lbl_80281F78->f94, 100.0f, 0x19, 0.0f);
     }
 }
 
@@ -458,7 +458,8 @@ void fn_800C0624(View* pView, int nPlayer) {
     pSub = fn_80017314(pView);
     pShot = fn_8003A7C8(nPlayer, 0x3A, NULL);
     if (pShot != NULL) {
-        CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, 5, 0.0f, 100.0f, 0x19, 0.0f);
+        CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, 5, 0.0f, 100.0f, 0x19,
+                                       0.0f);
     }
 }
 
@@ -626,7 +627,8 @@ void fn_800C0C0C(View* pView, int nPlayer) {
         if (bStart) {
             pShot = fn_8003A950(pView->p74, pView->n148, &nA, &f1, &f2, &nB, &f3, nPlayer);
             if (pShot != NULL) {
-                CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, nA, f1, f2, nB, f3);
+                CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, nA, f1, f2, nB,
+                                               f3);
             }
         }
     }
@@ -766,7 +768,8 @@ void GolfCamera_InitShutterCamera(View* pView, int nPlayer) {
         pShot = fn_8003A7C8(nPlayer, 0xD, pView->p130);
     }
     if (pShot != NULL) {
-        CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, 5, 0.0f, 100.0f, 0x19, 0.0f);
+        CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, 5, 0.0f, 100.0f, 0x19,
+                                       0.0f);
     }
     pView->n194 = 0;
     pView->f18C = 0.0f;
@@ -868,7 +871,8 @@ void fn_800C38BC(View* pView, int nPlayer) {
     pSub[2] = pCam[2];
     pShot = fn_8003A7C8(0, 0x23, NULL);
     if (pShot != NULL) {
-        CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, 5, 0.0f, 100.0f, 0x19, 0.0f);
+        CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, 5, 0.0f, 100.0f, 0x19,
+                                       0.0f);
         pView->p80 = pShot;
         pView->n194 = -1;
         pView->n198 = 0x23;
@@ -1061,11 +1065,11 @@ void fn_800C4E80(View* pView, int nPlayer) {
                                            1000.0f, 0x19, 0.0f);
         } else if (pView->p80 != NULL && pView->p80 != pView->p130) {
             if (pView->p130 != NULL) {
-                CameraScript_InterpToNewScript(&pView->script, pView->p80, nPlayer, pCam, pSub, pView->p130->bAB,
-                                               pView->p130->f48, 1000.0f, 0x19, 0.0f);
+                CameraScript_InterpToNewScript(&pView->script, pView->p80, nPlayer, pCam, pSub,
+                                               pView->p130->bAB, pView->p130->f48, 1000.0f, 0x19, 0.0f);
             } else {
-                CameraScript_InterpToNewScript(&pView->script, pView->p80, nPlayer, pCam, pSub, 5, 0.0f, 1000.0f,
-                                               0x19, 0.0f);
+                CameraScript_InterpToNewScript(&pView->script, pView->p80, nPlayer, pCam, pSub, 5, 0.0f,
+                                               1000.0f, 0x19, 0.0f);
             }
         }
     }
@@ -1165,9 +1169,10 @@ void fn_800C5D64(View* pView, f32* pViewCam, f32* pViewSub, int nPlayer) {
             pView->fCamTime = 0.0f;
         } else {
             pShot = fn_8003A7C8(nPlayer, 0xD, pView->p130);
-            if (pShot != NULL && !CameraScript_WillGolferBeOccludedInThisView(nPlayer, pShot, &pView->script)) {
-                CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, 5, 0.0f, 100.0f, 0x19,
-                                               0.0f);
+            if (pShot != NULL
+                && !CameraScript_WillGolferBeOccludedInThisView(nPlayer, pShot, &pView->script)) {
+                CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, 5, 0.0f, 100.0f,
+                                               0x19, 0.0f);
             }
         }
     }
