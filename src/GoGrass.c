@@ -148,3 +148,26 @@ void fn_8011FDC4(s32 p0) {
 }
 
 // ---- end of sweep code ----
+
+// ---- sweep code (not yet cleaned up) ----
+
+s32 fn_8012022C(void);
+double fmod();
+f32 fn_80120244(f32 x0);
+s32 fn_8012028C(u8* p0);
+
+s32 fn_8012022C(void) {
+    return ((u32)((-*(s32*)(((u8*)lbl_80281900) + 0x370)) | *(s32*)(((u8*)lbl_80281900) + 0x370)) >> 31);
+}
+
+f32 fn_80120244(f32 x0) {
+    f32 t0;
+    t0 = fmod(x0);
+    return t0;
+}
+
+s32 fn_8012028C(u8* p0) {
+    return (*(s32*)p0 + 88);
+}
+
+// ---- end of sweep code ----

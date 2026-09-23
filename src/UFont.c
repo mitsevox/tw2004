@@ -1,7 +1,7 @@
 // UFont.c (EA's name, from its asserts; also in EA's 2002 source tree): not yet decompiled; the
 // sweep code below is the matched small functions.
 
-#include "game_types.h"
+#include "engine.h"
 
 // ---- sweep code (not yet cleaned up) ----
 
@@ -14,8 +14,7 @@ void fn_80011C90();
 void fn_80012B2C(f32 x0, f32 x1);
 void fn_80012B6C(f32 x0);
 void fn_80012B9C(f32 x0, f32 x1);
-void fn_80012BDC();
-void fn_80012C30(s32 p0);
+f32 fn_80012BDC(char* sz, int n);
 void fn_80012C54(s32 p0);
 void fn_80012C84(s32 p0);
 void fn_80012CB4(f32 farg0, f32 farg1, f32 farg2, f32 farg3, s32 arg_sp0);
@@ -67,8 +66,8 @@ void fn_80012B9C(f32 x0, f32 x1) {
     *(f32*)(((u8*)t0) + 0x80) = x1;
 }
 
-void fn_80012C30(s32 p0) {
-    fn_80012BDC(p0, 4);
+f32 fn_80012C30(char* sz) {
+    return fn_80012BDC(sz, 4);
 }
 
 void fn_80012C54(s32 p0) {

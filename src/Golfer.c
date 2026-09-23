@@ -1294,7 +1294,6 @@ void Shot_Plan(int nPlayer, u8 bNotify) {
 
 extern u8 gAITargetsLoaded;             // 0x80281D40
 
-u8   Course_RegisterLoader(int nChunk, void (*pfn)(u8*));   // 0x8000C0B4
 
 void AI_TargetsClear(void) {
     int i;
@@ -1434,7 +1433,6 @@ void Caddie_Stop(void) {
 // ---- the golfer table's arrival ---------------------------------------------------------------
 
 void Golfer_TableSetup(void);
-void fn_80076158(u8** ppSrc, u8* pDst, int nBytes, int nWidth);   // byte-swap copy, nWidth 2/4/8
 
 // The 0xA8 bytes at +0x98 of every record are 21 eight-byte values stored little-endian:
 // swap them in place.
@@ -1675,7 +1673,6 @@ void Luck_TakePerfectShot(int nPlayer) {
 #define BAG_DEFAULT  0x01FFFC7F     // a bag with no clubs 7, 8, 9 (the 3-, 4-, 5-woods?) or 25
 
 
-u8    fn_800170A0(int nView);                                   // the view exists
 void  fn_80016D18(int nView, f32 x, f32 y, f32 w, f32 h);       // open it (screen fractions)
 void  fn_80009710(f32* pQuat);                                  // identity (0, 0, 0, 1)
 void  fn_8005CE70(int nPlayer);

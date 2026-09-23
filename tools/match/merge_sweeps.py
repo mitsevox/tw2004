@@ -65,21 +65,10 @@ INCLUDE = re.compile(r'^#include\s+"([^"]+)"')
 
 
 def included(lines):
-    """Every header the lines include, directly or through other headers (include/ and the
-    build's generated include/)."""
-    seen, todo = set(), [m.group(1) for m in map(INCLUDE.match, lines) if m]
-    while todo:
-        h = todo.pop()
-        if h in seen:
-            continue
-        seen.add(h)
-        for d in (ROOT / 'include', ROOT / 'build/GW4E69/include'):
-            f = d / h
-            if f.is_file():
-                todo += [m.group(1) for m in map(INCLUDE.match,
-                         f.read_text(encoding='utf-8', errors='replace').split('\n')) if m]
-                break
-    return seen
+    """Every header the lines include, directly or through other headers (includes.py), named as
+    a unit would include it."""
+    import includes
+    return {includes.label(f) for f in includes.seen_headers('\n'.join(lines))}
 
 
 def needed_includes(lines, includes):

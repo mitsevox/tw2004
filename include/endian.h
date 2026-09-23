@@ -12,6 +12,11 @@
 
 #include "game_types.h"
 
+// Copy nBytes from *ppSrc to pDst as values nWidth bytes wide (2, 4 or 8), reversing each value's
+// bytes, and move *ppSrc past them; a negative nWidth copies without swapping (ByteSwap.c). For
+// the files that are little-endian on disc.
+void fn_80076158(u8** ppSrc, u8* pDst, int nBytes, int nWidth);
+
 #ifdef __MWERKS__
 
 #define BE16(p)  (*(u16*)(p))
