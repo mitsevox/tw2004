@@ -798,6 +798,7 @@ config.libs = [
             Object(Matching, "runtime/s_modf.c"),
             Object(Matching, "runtime/sscanf.c"),
             Object(Matching, "runtime/wchar_io.c"),
+            Object(Matching, "runtime/uart_console_io.c"),
         ],
     },
     {
@@ -988,7 +989,6 @@ config.libs = [
             Object(Matching, "unsorted/sweep_800ADF6C.c"),
             Object(Matching, "unsorted/sweep_800B6214.c"),
             Object(Matching, "unsorted/rcmp_mad_codec/sweep_800B9B48.c"),
-            Object(Matching, "unsorted/sweep_8015C128.c"),
             Object(Matching, "unsorted/sweep_80007328.c"),
             Object(Matching, "unsorted/sweep_80007368.c"),
             Object(Matching, "unsorted/sweep_80008F20.c"),
@@ -1817,7 +1817,6 @@ config.libs = [
             Object(Matching, "unsorted/sweep_8013FF30.c"),
             Object(Matching, "unsorted/sweep_80145B1C.c"),
             Object(Matching, "unsorted/sweep_8014CA80.c"),
-            Object(Matching, "unsorted/sweep_8015C120.c"),
             Object(Matching, "unsorted/sweep_801654D0.c"),
             Object(Matching, "unsorted/sweep_80165524.c"),
             Object(Matching, "unsorted/sweep_80165C6C.c"),
