@@ -242,7 +242,8 @@ typedef struct SkinTarget {
 
 // What Character.p16D8 points at; only what SkinPart.c reads.
 typedef struct CharSkinSet {
-    u8   unk0[0x24];
+    u8   unk0[0xC];
+    f32  afC[6];                // 0x0C  per club class: the club head bone's height (fn_8001C5B4)
     Skin* apSkins[6];           // 0x24
 } CharSkinSet;
 

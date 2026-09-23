@@ -413,6 +413,20 @@ u8 fn_8001C584(int nPlayer) {
     return b;
 }
 
+// Set the club class, and put the club head bone at the class's height.
+void fn_8001C5B4(Character* pChar, int n) {
+    int nBone;
+
+    if (pChar == NULL || pChar->pModel == NULL || pChar->nSlot < 0 || pChar->nSlot >= 3) {
+        return;
+    }
+    nBone = fn_8001EED8(pChar->pModel, 0x53);
+    if (pChar->p16D8 != NULL) {
+        pChar->nClubClass = n;
+        pChar->pModel->pBones[nBone].v1C[1] = pChar->p16D8->afC[pChar->nClubClass];
+    }
+}
+
 // Set the character's shot kind and the clip key that goes with it.
 void fn_8001C724(Character* pChar, int nKind) {
     if (pChar != NULL) {
