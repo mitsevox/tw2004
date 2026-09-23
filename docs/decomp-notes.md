@@ -233,9 +233,6 @@ The fixes that come up most often. Each points to its full entry below.
 
 ### Structs, arrays and pointers
 
-- **[verified] A global pointer written through, then used again, was copied to a local.**
-  `g->f68 = 0.0f; fn(..., g);` reloads `g` after the store; `p = g; p->f68 = 0.0f; fn(..., p);`
-  loads it once, like the original (GoGolfCam `fn_800C14B0`, 96.9% -> 100).
 - **[verified] A load the original does before a store to the same struct was a local.**
   `n = p->n60; p->f68 = 0.0f; fn(n, p);` keeps the load first; reading `p->n60` in the call
   moves it after the store (GoGolfCam `fn_800C0880`, 94.6% -> 100).
