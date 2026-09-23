@@ -2,11 +2,11 @@
 
 #include "game_types.h"
 
-extern s32 lbl_80282698;
-extern s32 lbl_802826A0;
+extern s32 __AXCallbackAuxA;
+extern s32 __AXContextAuxA;
 
 void fn_80136058(s32 p0, s32 p1);
 void fn_80136058(s32 p0, s32 p1) {
-    lbl_80282698 = p0;
-    lbl_802826A0 = p1;
+    __AXCallbackAuxA = p0;
+    __AXContextAuxA = p1;
 }

@@ -101,14 +101,14 @@ typedef struct Voice {
     u32           uC;           // 0x0C
     u32           u10;          // 0x10
     u32           u14;          // 0x14  the start, in 4-bit units (fn_800AFD8C halves it)
-    u32           a18[8];       // 0x18
+    u32           a18[8];       // 0x18  the ADPCM decoder's coefficients (copied word by word)
     u16           n38;          // 0x38
-    u16           n3A;          // 0x3A
+    u16           n3A;          // 0x3A  the first ADPCM frame's header (predictor and scale)
     u16           n3C;          // 0x3C
     u16           n3E;          // 0x3E
     u32           u40;          // 0x40
     u8            unk44[0x50 - 0x44];
-    u16           n50;          // 0x50
+    u16           n50;          // 0x50  the frame header to use when it loops
     u16           n52;          // 0x52
     u16           n54;          // 0x54
     s16           n56;          // 0x56  volume, 0..0x3FFF
@@ -124,6 +124,28 @@ typedef struct Voice {
 LAYOUT_ASSERT(Voice, 0x68);
 
 extern Voice* lbl_802820E8;     // NUM_VOICES entries
+
+// One 0x8000-byte chunk of a streamed sound (fn_800AB72C): the decoder's coefficients, then the
+// ADPCM data it DMAs into one half of the voice's ARAM buffer. The data's first byte is its first
+// frame's header (predictor and scale).
+typedef struct StreamChunk {
+    u32  a0[8];                 // 0x000  -> Voice.a18
+    u8   unk20[0x100 - 0x20];
+    u8   aData[0x7F00];         // 0x100
+} StreamChunk;
+LAYOUT_ASSERT(StreamChunk, 0x8000);
+
+// One block of a movie's stereo sound (fn_800A8AD4): each channel's coefficients, then each
+// channel's 0x2FC0 bytes of ADPCM data.
+typedef struct MovieSoundBlock {
+    u8   unk0[0x1A];
+    u16  a1A[16];               // 0x1A  the left channel's coefficients -> Voice.a18
+    u8   unk3A[0x3C - 0x3A];
+    u16  a3C[16];               // 0x3C  the right channel's
+    u8   unk5C[0x60 - 0x5C];
+    u8   aDataL[0x2FC0];        // 0x60
+    u8   aDataR[0x2FC0];        // 0x3020
+} MovieSoundBlock;
 
 // ---- the ARAM heap ----------------------------------------------------------------------------
 
@@ -159,6 +181,27 @@ extern BootSound lbl_8018FE98[2];
 extern u16   lbl_80282118;      // the next voice fn_800B0858 plays on
 
 // ---- the rest ---------------------------------------------------------------------------------
+
+// A memory card's state as the card code (MC_Gc.c) keeps it, one per slot and entry; fn_8009F7F4
+// copies one out. Only the fields fn_800B09C8 reads.
+typedef struct CardInfo {
+    u32  uFlags;                // 0x00  0x02, 0x08, 0x10, 0x20, 0x40, 0x80: see fn_800B09C8
+    s32  n4;                    // 0x04  compared with what the save kinds 0 and 3 need
+    u8   unk8[0x84 - 0x8];
+    s32  n84;                   // 0x84  compared with fn_8009D3DC + fn_8009D50C
+    s32  n88;                   // 0x88  the sector size (fn_800B09C8 wants 0x2000)
+    u8   unk8C[0x98 - 0x8C];
+} CardInfo;
+LAYOUT_ASSERT(CardInfo, 0x98);
+
+// A card slot and entry, as the save-kind functions (fn_80084FB4) take them. 12 bytes: the size
+// fn_800B09C8's stack frame proves; the last word is never read there.
+typedef struct CardPos {
+    s32  nSlot;                 // 0x0
+    s32  n;                     // 0x4
+    u8   unk8[4];
+} CardPos;
+LAYOUT_ASSERT(CardPos, 0xC);
 
 // The memory-card status table: for each of the two card slots, lbl_80282138[slot] entries
 // (always 1), each with the status fn_800B09C8 read (lbl_80282150), the status last reported

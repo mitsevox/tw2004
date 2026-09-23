@@ -5,7 +5,7 @@
 #ifndef GAME_MODES_PGATOUR_H
 #define GAME_MODES_PGATOUR_H
 
-#include "game_types.h"
+#include "game/save.h"
 
 // One tournament of the season (0x64 bytes). TW06: GM_PgaTour_EventSlot_t, which has the name
 // index first and the champion's name and score together further on.
@@ -56,14 +56,9 @@ typedef struct PgaData {
 } PgaData;
 extern PgaData gPgaData;
 
-// Cleared as each round of a tournament starts (fn_800EE2C8), which then sets n2 (and n0 on the
-// first round) to 1.
-typedef struct Pga80205ED8 {
-    u16  n0;                    // 0x0
-    u16  n2;                    // 0x2
-    u8   unk4[0x58 - 0x4];
-} Pga80205ED8;
-extern Pga80205ED8 lbl_80205ED8;
+// The current round's statistics: cleared as each round of a tournament starts (fn_800EE2C8),
+// added to the profile's career totals as it ends (fn_800EED0C).
+extern TourStats lbl_80205ED8;
 
 extern s32 lbl_80281670;        // the options' nC from before the tour (fn_800EE02C puts it back)
 extern s32 lbl_80281674;        // the options' n18 from before a tour round (fn_800EE0A0 keeps it)
