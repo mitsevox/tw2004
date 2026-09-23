@@ -5126,6 +5126,7 @@ unsorted/sweep_8012E8A8.c:
 
 src/vi/vi.c:
 	.text       start:0x8012E950 end:0x8013042C
+	.data       start:0x80195944 end:0x801959B0
 
 dolphin/exi/EXIBios.c:
 	.text       start:0x8013042C end:0x80131D08
@@ -5229,6 +5230,7 @@ unsorted/sweep_8013B3C4.c:
 
 src/dolphin/dvd/dvd.c:
 	.text       start:0x8013B3C8 end:0x8013DCB4
+	.data       start:0x80199C40 end:0x80199C80
 
 dolphin/dvd/dvdqueue.c:
 	.text       start:0x8013DCB4 end:0x8013DEAC
@@ -5351,6 +5353,7 @@ src/os/OSLink.c:
 
 src/dolphin/os/OSMemory.c:
 	.text       start:0x8014B034 end:0x8014B314
+	.data       start:0x8019BAC0 end:0x8019BAD0
 
 dolphin/os/OSMutex.c:
 	.text       start:0x8014B314 end:0x8014B70C
@@ -5389,6 +5392,7 @@ dolphin/pad/PadClamp.c:
 
 src/dolphin/pad/Pad.c:
 	.text       start:0x8014EB88 end:0x80150658
+	.sdata      start:0x80281AEC end:0x80281AF0
 
 dolphin/ai.c:
 	.text       start:0x80150658 end:0x80150F24
@@ -5453,6 +5457,7 @@ runtime/misc_io.c:
 
 runtime/printf.c:
 	.text       start:0x801570C8 end:0x8015929C
+	.data       start:0x8019C9C0 end:0x8019CBEC
 
 runtime/sscanf.c:
 	.text       start:0x801594CC end:0x8015955C
@@ -5704,6 +5709,7 @@ src/gba/GBA.c:
 
 src/card/CARDBios.c:
 	.text       start:0x80176A38 end:0x80177DA4
+	.data       start:0x8019D380 end:0x8019D3A0
 
 dolphin/card/CARDUnlock.c:
 	.text       start:0x80177DA4 end:0x80179004

@@ -8,3 +8,7 @@ reproduce this game's bytes for 97 of the ~150 TRK functions. Every unit is `Non
 is linked from the original code, the source only provides the comparison and the names.
 
 `include/` holds just the headers these files need, copied from the same project.
+
+`MetroTRK/__exception.s` (the exception vector table) is from the Super Smash Bros. Melee
+decompilation instead (https://github.com/doldecomp/melee, commit 430c286): Pikmin 2's newer table is
+84 bytes longer, Melee's assembles to this game's exact bytes.

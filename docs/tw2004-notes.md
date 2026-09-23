@@ -26,7 +26,8 @@ Memory map of `main.dol`
 |-------|----------|
 | `0x80003100` | `.init`: startup, `memcpy`, `memset`, TRK vector table |
 | `0x80005520` - ~`0x8012FFFF` | EA game and engine code (CodeWarrior GC/2.x, `-O4`) |
-| ~`0x80130000` - `0x8016C717` | Dolphin SDK, MSL C library, MetroTRK v2.0 |
+| `0x8012E950` - `0x801654CF` | Dolphin SDK, MSL C library, MetroTRK v2.0 |
+| `0x801654D0` - `0x8016C717` | **EA UI Studio** (`UIStudio.c`, `UISEvent.c`: menu screens, groups, "rate functions"), CodeWarrior -O4, ~29 KB, called from game code. Identified 2026-09-23 from its assert strings. |
 | `0x8016C718` - `0x80175F54` | EA shared file library, 124 functions, **GCC unoptimized** (`src/Common/...`, ProDG) |
 | `0x8017DB60` | `.rodata` (assert strings, jump tables) |
 | `0x801866E0` `.data`, `0x8019D540` `.bss`, `0x80280DA0` `.sdata`, `0x80281B80` `.sbss`, `0x80282A60` `.sdata2` (float constants) | |
@@ -89,7 +90,7 @@ none of it in Prime. Identified from callers and neighbours:
 
 | Range | Size | What | Where source exists |
 |---|---|---|---|
-| `0x8015F784`-`0x8016C718` | 53 KB, 220 fns | MetroTRK (debugger nub; `TRK_main`, `TRKNubMainLoop` named) | Prime has only `mslsupp.c`/`nubinit.c`; full source in other decomps (Pikmin 2, Twilight Princess) |
+| `0x8015F784`-`0x801654D0` | ~24 KB | MetroTRK (the rest up to `0x8016C718` turned out to be EA's UI Studio, see the memory map; debugger nub; `TRK_main`, `TRKNubMainLoop` named) | Prime has only `mslsupp.c`/`nubinit.c`; full source in other decomps (Pikmin 2, Twilight Princess) |
 | `0x80135728`-`0x801393D0` | 15.5 KB, 65 fns | AX audio library (calls `AIInitDMA`, `DSPAddTask`, `DSPInit`, `AIStartDMA`) | not in Prime (MusyX); `doldecomp/dolphin`, games using JAudio |
 | `0x80145998`-`0x80147B94` | 8.7 KB, 11 fns | MIX, the SDK voice mixer (`MIXInit`, `__MIXSetPan`, `MIXSetSoundMode` named; the two big ones are the settings update and the per-frame mix) | not in Prime; 2004 SDK objects differ |
 | `0x8015444C`-`0x8015C1F8` (pieces) | ~20 KB | MSL: `__ieee754_*`/`__kernel_*` math, `alloc.c`, `mem_funcs`, wide-char | MSL revision differs from Prime's; other games' MSL |
@@ -462,6 +463,17 @@ SDK side 58.9% -> 69.5%. Scripts in `C:\dev\scratch\tw\` (outside the repo):
   names.
 - `prune_extern.py` keeps only the files the build uses (from `ninja -t deps`). Check that it
   finds dependencies before trusting it: `.d` files are not kept on disk.
+- **The "name_ADDRESS" glitch, fixed for 5 functions (2026-09-23).** A local function that
+  a jump table or reset record points to is renamed `name_ADDRESS` by dtk when that data sits in
+  an auto unit, and objdiff then cannot pair it. Giving the owning unit just that data range
+  (`.data`/`.sdata` lines in `splits.txt`) fixes it: `getTiming` (vi), `stateBusy` (dvd), both
+  `OnReset`s (OSMemory, CARDBios), `SPEC2_MakeStatus` (Pad) now 100%. `parse_format`,
+  `long2str`, `longlong2str` now pair but are 82-98% (this game's printf revision differs).
+  `__equals_dec` is called from code outside its unit, so this does not apply to it.
+- The MetroTRK exception vector table (`.init` `0x80003534`-`0x80005468`, 8 KB, which dtk had
+  shown as `pad_00_80003534_init`) is Melee's `__exception.s` (assembly), exact. dtk keeps
+  `gTRKInterruptVectorTable` as a label, so the table is compared under a function-typed name
+  `TRK_exception_vectors`; Pikmin 2's copy (v2.6) is 0x54 bytes longer and does not match.
 - Not done yet: data sections for these units (Level 3), more flag variants for the files that
   compile but fall a few functions short, and other projects (Pikmin 2, Sunshine, Animal Crossing).
 
@@ -525,5 +537,5 @@ the repo): `sweep.py`, `sweep_m2c.py`, `smallsurvey.py`.
   arithmetic on `void*`, which CodeWarrior rejects); switch local/parameter/return types between
   `u8`/`s8`/`u16`/`s16`/`s32`/`u32`. 80 functions so far. The checker is a pre-filter only: the
   build's own comparison and `main.dol: OK` still decide.
-- The EA/SDK split in the README counts `0x8016C718`-`0x80175F54` (EA's GCC-built file library)
-  as EA, not SDK.
+- The EA/SDK split in the README counts `0x801654D0`-`0x80175F54` (EA's UI Studio and EA's
+  GCC-built file library) as EA, and everything from `0x8012E950` on, plus `.init`, as SDK.
