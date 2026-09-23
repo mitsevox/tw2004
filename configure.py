@@ -883,7 +883,7 @@ config.libs = [
             Object(NonMatching, "Earnings.c"),
             Object(Matching, "GameManager.c"),
             Object(Matching, "GameEffects.c"),
-            Object(NonMatching, "GameRound.c"),
+            Object(Matching, "GameRound.c"),
             Object(Matching, "GameUI.c"),
             Object(Matching, "GameMessages.c"),
             Object(Matching, "GameAnalysis.c"),
