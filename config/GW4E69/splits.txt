@@ -117,17 +117,8 @@ unsorted/sweep_8000B058.c:
 unsorted/sweep_8000B078.c:
 	.text       start:0x8000B078 end:0x8000B0D4
 
-unsorted/sweep_8000B244.c:
-	.text       start:0x8000B244 end:0x8000B264
-
-unsorted/sweep_8000B2B8.c:
-	.text       start:0x8000B2B8 end:0x8000B30C
-
-unsorted/sweep_8000B30C.c:
-	.text       start:0x8000B30C end:0x8000B318
-
-unsorted/sweep_8000B3E8.c:
-	.text       start:0x8000B3E8 end:0x8000B428
+urandom.c:
+	.text       start:0x8000B130 end:0x8000B46C
 
 unsorted/sweep_8000B4B0.c:
 	.text       start:0x8000B4B0 end:0x8000B4B8
@@ -2646,19 +2637,7 @@ unsorted/sweep_800BAA4C.c:
 	.text       start:0x800BAA4C end:0x800BAA50
 
 SitDevFile.c:
-	.text       start:0x800BAEB0 end:0x800BCA60
-
-unsorted/sweep_800BCB74.c:
-	.text       start:0x800BCB74 end:0x800BCB88
-
-unsorted/sweep_800BCD50.c:
-	.text       start:0x800BCD50 end:0x800BCD68
-
-unsorted/sweep_800BD7D0.c:
-	.text       start:0x800BD7D0 end:0x800BD7E8
-
-unsorted/sweep_800BD83C.c:
-	.text       start:0x800BD83C end:0x800BD894
+	.text       start:0x800BAEB0 end:0x800BD894
 
 GoGolfCam.c:
 	.text       start:0x800BD894 end:0x800C7480
@@ -2670,7 +2649,7 @@ GoGolfCam.c:
 	.sdata2     start:0x802842C0 end:0x802843B8
 
 GoBreakLine.c:
-	.text       start:0x800C808C end:0x800C9310
+	.text       start:0x800C808C end:0x800C937C
 
 AnimStream.c:
 	.text       start:0x800C937C end:0x800CC1EC
