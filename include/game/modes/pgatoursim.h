@@ -5,6 +5,7 @@
 #define GAME_MODES_PGATOURSIM_H
 
 #include "platform.h"
+#include "game/save.h"
 
 // The tour golfers: 174 pros (the table the 'PGST' stream object fills) and the player.
 #define PGA_NUM_PROS        174
@@ -160,20 +161,37 @@ extern s32 lbl_80282504;        // the player's playoff strokes (fn_8011989C)
 // PGATourSimulation.c functions other files call. The TW06 name follows where the code matches it.
 void  fn_8011763C(void);                        // TW06: PGATourSimulation_OpenONCE
 void  fn_8011766C(void);                        // TW06: PGATourSimulation_CloseONCE
+void  fn_80117860(TourSeason* pTour);
+void  fn_801178C8(s32 nPlayer, SeasonEvent* pEvent, int nRound, int n, int k);
+void  fn_80117AF8(int nPlayer);
+void  fn_80117B58(int nPlayer);
+void  fn_80117C50(int nPlayer, int nEntrant);
+void  fn_80117D80(int nPlayer);
 u8    fn_80117DE0(void);
 void  fn_80117DE8(int nPlayer, u8 b);
+void  fn_80117DF0(int nPlayer);
+void  fn_80117E98(int nPlayer);
+s32   fn_80118684(int nPlayer);
 char* fn_80118E30(int nPlayer, int nGolfer);    // TW06: GM_PgaTourSim_GetNameFromGolferID
 u8    fn_8011908C(int nPlayer, int nEntrant);   // TW06: GM_PgaTourSim_IsEntrantUser
 s32   fn_801190D8(int nPlayer, int nEntrant);   // TW06: GM_PgaTourSim_GetScoreRankFromEntrantID
 s32   fn_80119118(int nPlayer, int nEntrant);   // TW06: GM_PgaTourSim_GetGolferIDFromEntrantID
+s32   fn_801191D0(int nPlayer, int nEntrant, u8 b);
+s32   fn_80119588(int nPlayer, u8 b);
+s32   fn_80119638(int nPlayer, int nEntrant, int nRound);
 u8    fn_801197A4(int nPlayer, int nEntrant);   // TW06: GM_PgaTourSim_GetWasCutFromEntrantID
 s32   fn_801197CC(int nPlayer, int nRow);       // TW06: GM_PgaTourSim_GetEntrantIDFromScoreRow
 void  fn_8011989C(int nPlayer, int nStrokes);   // TW06: GM_PgaTourSim_SetUserEntrantHoleStrokes
 void  fn_801198F8(int nPlayer, int nHole);
+void  fn_80119934(int nPlayer);
 s32   fn_80119A04(int nPlayer, int nEntrant);   // TW06: GM_PgaTourSim_GetCurrentHoleFromEntrantID
 s32   fn_80119A2C(int nPlayer, int nEntrant);
+void  fn_8011A538(int nPlayer);
+void  fn_8011A5F8(int nPlayer);
 s32   fn_8011A684(int nPlayer);                 // TW06: GM_PgaTourSim_GetNumPlayoffEntrants
 u8    fn_8011A6F4(int nPlayer, int nEntrant);   // TW06: GM_PgaTourSim_EntrantIsInPlayoff
+void  fn_8011A720(int nPlayer, int nHole);
+s32   fn_8011A7C8(int nPlayer, int nHole);
 void  fn_8011C058(u8 bDirty);                   // TW06: GM_PgaTourSim_SetStatsDirty
 void  fn_8011C060(u8 bDirty);                   // TW06: GM_PgaTourSim_SetScoresDirty
 
