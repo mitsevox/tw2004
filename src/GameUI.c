@@ -142,6 +142,28 @@ extern UIQueueItem lbl_80202B94[10];        // queue 11 (lbl_80282288)
         (q)[i].c = c;       \
     }
 
+void  fn_800E4D94(u8 bHuman);
+void  fn_800E4C20(u8 bHuman);
+void  fn_800E58B4(int a);
+void  fn_800E5C08(int a, u8* p);
+void  fn_800E56D0(int a, int b, int c);
+void  fn_800E5698(int a, int b, int c);
+void  fn_800E5660(int a, int b, int c);
+void  fn_800E5628(int a, int b, int c);
+void  fn_800E55F0(int a, int b, int c);
+void  fn_800E55B8(int a, int b, int c);
+void  fn_800E5580(int a, int b, int c);
+void  fn_800E5548(int a, int b, int c);
+void  fn_800E5510(int a, int b, int c);
+void  fn_800E54D8(int a, int b, int c);
+void  fn_800E54A0(int a, int b, int c);
+void* fn_80017028(int nView);
+void  fn_80063B98(void* pView, f32* pVec, f32 f);
+
+typedef struct Vec4 { f32 x, y, z, w; } Vec4;
+extern Vec4 lbl_80184D90;
+extern u8   lbl_80281640[8];
+
 void fn_800E3BEC(void) {
     fn_8001437C();
 }
@@ -365,6 +387,113 @@ int fn_800E45CC(void) {
     return 0;
 }
 
+// The display pump, every frame: while a screen slot is up nothing else runs; otherwise pending
+// screens and messages go first, then the newest item of the first non-empty queue goes to that
+// queue's handler. Returns nonzero while anything is still showing.
+//
+// Two copy-and-paste slips in the original are kept: queue 4 reads its item's second and third
+// values with queue 3's count (always 0 here, so from the entry before the queue), and queue 8
+// reads its third value from one entry past the item.
+int fn_800E46B4(void) {
+    int bBusy = 0;
+    if (lbl_802822BC) {
+        return 1;
+    }
+    if (!lbl_802822DC[0] && !lbl_802822DC[1] && !lbl_802822DC[2]) {
+        if (lbl_802822B8 != 0 || lbl_802822B4 != 0 || lbl_802822B0 != 0 || lbl_802822AC != 0 ||
+            lbl_802822A8 != 0 || lbl_8028229C != 0 || lbl_80282298 != 0 || lbl_80282294 != 0 ||
+            lbl_80282290 != 0 || lbl_8028228C != 0 || lbl_80282288 != 0) {
+            if (!lbl_802822DB) {
+                fn_800E4164(16, 0, 0.0f);
+            }
+            return 1;
+        }
+        if (lbl_802822A4 != 0 && !lbl_802822DB) {
+            fn_800E4164(lbl_802822A4, 0, 0.0f);
+            lbl_802822A4 = 0;
+            return 1;
+        }
+        if (lbl_802822C3 && !lbl_802822DB) {
+            lbl_802822C3 = 0;
+            fn_800E4C20(1);
+            return 1;
+        }
+        if (lbl_802822C4 && !lbl_802822DB) {
+            lbl_802822C4 = 0;
+            fn_800E4C20(0);
+            return 1;
+        }
+        if (lbl_802822C1 && !lbl_802822DB) {
+            lbl_802822C1 = 0;
+            fn_800E4D94(1);
+            return 1;
+        }
+        if (lbl_802822C2 && !lbl_802822DB) {
+            lbl_802822C2 = 0;
+            fn_800E4D94(0);
+            return 1;
+        }
+        if (lbl_802822C0 && !lbl_802822DB) {
+            lbl_802822C0 = 0;
+            fn_800E58B4(0x50);
+            return 1;
+        }
+        if (lbl_802822BF && !lbl_802822DB) {
+            lbl_802822BF = 0;
+            fn_800E5C08(0x53, lbl_80281640);
+            return 1;
+        }
+    }
+    if (lbl_802822B4 != 0) {
+        fn_800E56D0(lbl_80203044[lbl_802822B4 - 1].a, lbl_80203044[lbl_802822B4 - 1].b, lbl_80203044[lbl_802822B4 - 1].c);
+        bBusy = 1;
+        lbl_802822B4--;
+    } else if (lbl_802822B0 != 0) {
+        fn_800E5698(lbl_80202FCC[lbl_802822B0 - 1].a, lbl_80202FCC[lbl_802822B0 - 1].b, lbl_80202FCC[lbl_802822B0 - 1].c);
+        bBusy = 1;
+        lbl_802822B0--;
+    } else if (lbl_802822B8 != 0) {
+        fn_800E5660(lbl_802030BC[lbl_802822B8 - 1].a, lbl_802030BC[lbl_802822B8 - 1].b, lbl_802030BC[lbl_802822B8 - 1].c);
+        bBusy = 1;
+        lbl_802822B8--;
+    } else if (lbl_802822AC != 0) {
+        fn_800E5628(lbl_80202F54[lbl_802822AC - 1].a, lbl_80202F54[lbl_802822AC - 1].b, lbl_80202F54[lbl_802822AC - 1].c);
+        bBusy = 1;
+        lbl_802822AC--;
+    } else if (lbl_802822A8 != 0) {
+        fn_800E55F0(lbl_80202EDC[lbl_802822A8 - 1].a, lbl_80202EDC[lbl_802822AC - 1].b, lbl_80202EDC[lbl_802822AC - 1].c);
+        bBusy = 1;
+        lbl_802822A8--;
+    } else if (lbl_8028229C != 0) {
+        fn_800E55B8(lbl_80202DEC[lbl_8028229C - 1].a, lbl_80202DEC[lbl_8028229C - 1].b, lbl_80202DEC[lbl_8028229C - 1].c);
+        bBusy = 1;
+        lbl_8028229C--;
+    } else if (lbl_80282298 != 0) {
+        fn_800E5580(lbl_80202D74[lbl_80282298 - 1].a, lbl_80202D74[lbl_80282298 - 1].b, lbl_80202D74[lbl_80282298 - 1].c);
+        bBusy = 1;
+        lbl_80282298--;
+    } else if (lbl_80282294 != 0) {
+        fn_800E5548(lbl_80202CFC[lbl_80282294 - 1].a, lbl_80202CFC[lbl_80282294 - 1].b, lbl_80202CFC[lbl_80282294].c);
+        bBusy = 1;
+        lbl_80282294--;
+    } else if (lbl_80282290 != 0) {
+        fn_800E5510(lbl_80202C84[lbl_80282290 - 1].a, lbl_80202C84[lbl_80282290 - 1].b, lbl_80202C84[lbl_80282290 - 1].c);
+        bBusy = 1;
+        lbl_80282290--;
+    } else if (lbl_8028228C != 0) {
+        fn_800E54D8(lbl_80202C0C[lbl_8028228C - 1].a, lbl_80202C0C[lbl_8028228C - 1].b, lbl_80202C0C[lbl_8028228C - 1].c);
+        bBusy = 1;
+        lbl_8028228C--;
+    } else if (lbl_80282288 != 0) {
+        fn_800E54A0(lbl_80202B94[lbl_80282288 - 1].a, lbl_80202B94[lbl_80282288 - 1].b, lbl_80202B94[lbl_80282288 - 1].c);
+        bBusy = 1;
+        lbl_80282288--;
+    } else if (lbl_80282282 || lbl_80282281) {
+        bBusy = 1;
+    }
+    return bBusy;
+}
+
 int fn_800E4BF8(void) {
     u8 b = 0;
     if (lbl_80282282 || lbl_80282281) {
@@ -402,6 +531,39 @@ void fn_800E4C20(u8 bHuman) {
 
 void fn_800E4D88(void) {
     lbl_80282281 = 1;
+}
+
+// The end-of-hole screen, as fn_800E4C20 does the end-of-round one; in the side-by-side modes
+// 22 and 26 both players' cameras are moved first.
+void fn_800E4D94(u8 bHuman) {
+    Vec4 v;
+    if (lbl_802822DC[0] || lbl_802822DC[1] || lbl_802822DC[2] || lbl_802822B8 != 0 || lbl_802822B4 != 0 ||
+        lbl_802822B0 != 0 || lbl_802822AC != 0 || lbl_802822A8 != 0 || lbl_802822A4 != 0 || lbl_8028229C != 0 ||
+        lbl_80282298 != 0 || lbl_80282294 != 0 || lbl_80282290 != 0 || lbl_8028228C != 0 || lbl_80282288 != 0) {
+        if (bHuman) {
+            lbl_802822C1 = 1;
+        }
+        if (!bHuman) {
+            lbl_802822C2 = 1;
+        }
+    } else {
+        if (Game_GetMode() != 7) {
+            fn_800A72EC(1, 0);
+        }
+        lbl_80282282 = 1;
+        GameEffects_ResetGameEffectSettings();
+        if ((Game_GetMode() == 26 || Game_GetMode() == 22) && gSession.nSplitScreen) {
+            v = lbl_80184D90;
+            fn_80063B98(fn_80017028(gPlayers[0].nView0), (f32*)&v, 0.0f);
+            fn_80063B98(fn_80017028(gPlayers[1].nView0), (f32*)&v, 0.0f);
+        }
+        if (bHuman) {
+            fn_80062D38(0xE, 2, 1);
+            EVENT_Trigger(0xFF, 0x41, 0, -1);
+            return;
+        }
+        fn_80062D38(0xE, 2, 0);
+    }
 }
 
 void fn_800E4F88(int nPlayer) {
