@@ -3,26 +3,26 @@
 #include "game_types.h"
 
 
-void fn_801338E0(void);
-void fn_801338E4(void);
-s32 fn_801338E8(void);
-s32 fn_801338F0(void);
+void EXI2_Init(void);
+void EXI2_EnableInterrupts(void);
+s32 EXI2_Poll(void);
+s32 EXI2_ReadN(void);
 s32 fn_801338F8(void);
-void fn_80133900(void);
-void fn_80133904(void);
+void EXI2_Reserve(void);
+void EXI2_Unreserve(void);
 s32 AMC_IsStub(void);
 s32 Hu_IsStub(void);
-void fn_801338E0(void) {
+void EXI2_Init(void) {
 }
 
-void fn_801338E4(void) {
+void EXI2_EnableInterrupts(void) {
 }
 
-s32 fn_801338E8(void) {
+s32 EXI2_Poll(void) {
     return 0;
 }
 
-s32 fn_801338F0(void) {
+s32 EXI2_ReadN(void) {
     return 0;
 }
 
@@ -30,10 +30,10 @@ s32 fn_801338F8(void) {
     return 0;
 }
 
-void fn_80133900(void) {
+void EXI2_Reserve(void) {
 }
 
-void fn_80133904(void) {
+void EXI2_Unreserve(void) {
 }
 
 s32 AMC_IsStub(void) {

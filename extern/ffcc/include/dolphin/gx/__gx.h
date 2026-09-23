@@ -347,7 +347,9 @@ typedef struct gx_struct {
     u32 dirtyState;
 } GXData;
 
-extern GXData* const gx;
+// this game's GX library exports the pointer as __GXData (as the other GX units here call it)
+#define gx __GXData
+extern GXData* const __GXData;
 extern void* __memReg;
 extern void* __peReg;
 extern void* __cpReg;
