@@ -70,9 +70,18 @@ void fn_800E68F0(void) {
 // TW06: GameModeAlternateShot::TeamDone. The team's ball is in the hole.
 u8 fn_800E69CC(int nTeam) {
     int nHole = Game_CurHoleIndex();
-    int a = nTeam == 0 ? 0 : 2;
-    int b = nTeam == 0 ? 1 : 3;
-    u8 bDone = 0;
+    int a;
+    int bDone;
+    int b;
+    a = 2;
+    if (nTeam == 0) {
+        a = 0;
+    }
+    b = 3;
+    if (nTeam == 0) {
+        b = 1;
+    }
+    bDone = 0;
     if (Player_IsHoled(a) || Player_IsHoled(b)) {
         bDone = 1;
     }
@@ -97,10 +106,7 @@ int fn_800E6A48(int nPlayer) {
 
 // Whether it is this player's turn to hit the team's ball.
 u8 fn_800E6A98(int nPlayer) {
-    u8 bSecond = 0;
-    if (nPlayer == 1 || nPlayer == 3) {
-        bSecond = 1;
-    }
+    int bSecond = (nPlayer == 1 || nPlayer == 3) ? 1 : 0;
     return bSecond == lbl_80281648[fn_800E6AF8(nPlayer)];
 }
 
@@ -113,8 +119,13 @@ int fn_800E6AF8(int nPlayer) {
 // next shot (at most 9), or its score once holed.
 int fn_800E6B08(int nTeam) {
     int nHole = Game_CurHoleIndex();
-    int a = nTeam == 0 ? 0 : 2;
-    int n = 9;
+    int a;
+    int n;
+    a = 2;
+    if (nTeam == 0) {
+        a = 0;
+    }
+    n = 9;
     if (gPlayers[a].nStrokes[nHole] + 1 < 9) {
         n = gPlayers[a].nStrokes[nHole] + 1;
     }
@@ -127,8 +138,16 @@ int fn_800E6B08(int nTeam) {
 // TW06: GameModeAlternateShot::TeamMatchWins.
 int fn_800E6BA4(int nTeam) {
     int nHole = Game_CurHoleIndex();
-    int a = nTeam == 0 ? 0 : 2;
-    int b = nTeam == 0 ? 1 : 3;
+    int b;
+    int a;
+    a = 2;
+    if (nTeam == 0) {
+        a = 0;
+    }
+    b = 3;
+    if (nTeam == 0) {
+        b = 1;
+    }
     return gPlayers[a].nHolesWon + gPlayers[b].nHolesWon;
 }
 
@@ -252,12 +271,12 @@ u8 fn_800E7038(int nPlayer, int a) {
         return 1;
     }
     if (fn_800E69CC(0) && (!lbl_80282240 || (nPlayer != 0 && nPlayer != 1))) {
-        if (fn_800E6B08(1) > fn_800E6B08(0)) {
+        if (fn_800E6B08(0) < fn_800E6B08(1)) {
             return 1;
         }
     }
     if (fn_800E69CC(1) && (!lbl_80282240 || (nPlayer != 2 && nPlayer != 3))) {
-        if (fn_800E6B08(0) > fn_800E6B08(1)) {
+        if (fn_800E6B08(1) < fn_800E6B08(0)) {
             return 1;
         }
     }
@@ -268,15 +287,15 @@ u8 fn_800E7038(int nPlayer, int a) {
         }
     }
     if (fn_800E69CC(0) && (!lbl_80282240 || (nPlayer != 0 && nPlayer != 1))) {
-        if (fn_800E6BA4(0) == nLeft + fn_800E6BA4(1)) {
-            if (fn_800E6B08(1) >= fn_800E6B08(0)) {
+        if (nLeft + fn_800E6BA4(0) == fn_800E6BA4(1)) {
+            if (fn_800E6B08(0) <= fn_800E6B08(1)) {
                 return 1;
             }
         }
     }
     if (fn_800E69CC(1) && (!lbl_80282240 || (nPlayer != 2 && nPlayer != 3))) {
-        if (fn_800E6BA4(1) == nLeft + fn_800E6BA4(0)) {
-            if (fn_800E6B08(0) >= fn_800E6B08(1)) {
+        if (nLeft + fn_800E6BA4(0) == fn_800E6BA4(1)) {
+            if (fn_800E6B08(1) <= fn_800E6B08(0)) {
                 return 1;
             }
         }
@@ -310,7 +329,7 @@ u8 fn_800E723C(u8 bCheck) {
     int h;
     int i;
     if (gpGame->bD4) {
-        if (fn_800E6BA4(1) != fn_800E6BA4(0)) {
+        if (fn_800E6BA4(0) != fn_800E6BA4(1)) {
             return 1;
         }
         if (!bCheck) {
@@ -329,7 +348,7 @@ u8 fn_800E723C(u8 bCheck) {
     if (nLeft == 0) {
         return !fn_800E7474(bCheck);
     }
-    if (fn_800E6BA4(1) > nLeft + fn_800E6BA4(0) || fn_800E6BA4(0) > nLeft + fn_800E6BA4(1)) {
+    if (nLeft + fn_800E6BA4(0) < fn_800E6BA4(1) || nLeft + fn_800E6BA4(0) > fn_800E6BA4(1)) {
         return 1;
     }
     return 0;
@@ -345,7 +364,7 @@ u8 fn_800E7474(u8 bCheck) {
             return 0;
         }
     }
-    if (fn_800E6BA4(1) == fn_800E6BA4(0)) {
+    if (fn_800E6BA4(0) == fn_800E6BA4(1)) {
         if (bCheck) {
             return 1;
         }
@@ -368,15 +387,15 @@ u8 fn_800E7474(u8 bCheck) {
 // (the point goes on players 0 and 2); on the next hole the other partner tees off.
 void fn_800E7740(void) {
     int nHole = Game_CurHoleIndex();
-    if (fn_800E69CC(0) && fn_800E6B08(1) > fn_800E6B08(0)) {
+    if (fn_800E69CC(0) && fn_800E6B08(0) < fn_800E6B08(1)) {
         gPlayers[0].nModePoints[nHole] = 1;
         gPlayers[0].nHolesWon++;
     }
-    if (fn_800E69CC(1) && fn_800E6B08(0) > fn_800E6B08(1)) {
+    if (fn_800E69CC(1) && fn_800E6B08(1) < fn_800E6B08(0)) {
         gPlayers[2].nModePoints[nHole] = 1;
         gPlayers[2].nHolesWon++;
     }
-    lbl_80281648[1] = lbl_80281648[0] = 1 - (nHole & 1);
+    lbl_80281648[0] = lbl_80281648[1] = 1 - (nHole & 1);
 }
 
 // TW06: GameModeAlternateShot::EndGame. The winning team's human players with a profile get the
@@ -395,7 +414,7 @@ void fn_800E7828(void) {
         if (fn_800EC550()) {
             return;
         }
-        if (fn_800E6BA4(1) < fn_800E6BA4(0)) {
+        if (fn_800E6BA4(0) > fn_800E6BA4(1)) {
             nWinner = 0;
             nLoser = 1;
             nMargin = gPlayers[0].nHolesWon - gPlayers[2].nHolesWon;
@@ -406,7 +425,10 @@ void fn_800E7828(void) {
         }
         nMoney = fn_800D37BC(nWinner, nLoser, nMargin, &nPrize);
         if (Team_IsAllHuman(nWinner)) {
-            nFirst = nWinner == 0 ? 0 : 2;
+            nFirst = 2;
+            if (nWinner == 0) {
+                nFirst = 0;
+            }
             for (k = 0, i = nFirst; k < 2; k++, i++) {
                 p = &gPlayers[i];
                 if (gpSaveData[p->nIndex * 0x10600]) {
