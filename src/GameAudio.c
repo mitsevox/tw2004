@@ -108,7 +108,7 @@ f32 lbl_80281450 = 25.0f;
 f32 lbl_80281454 = 2.0f;
 f32 lbl_80281458 = 21.0f;
 
-s32 lbl_80282048;
+u32 lbl_80282048;                       // fn_800A6070: the frame it last played
 f32 lbl_80282044;
 u8 lbl_80282042;
 u8 lbl_80282041;
@@ -843,6 +843,24 @@ void fn_800A5FE8(u8 nPlayer) {
     fn_800ADA28(nId, 0, 0x17, 0);
 }
 
+// Plays sound 3 on the view's emitters' track 1, at most once every 300 frames when bLimit is set.
+void fn_800A6070(u8 nPlayer, u8 bLimit) {
+    GameAudioView* pView;
+    u8 nIdA;
+    u8 nIdB;
+
+    pView = &lbl_801F1790[gPlayers[nPlayer].nView[0]];
+    nIdA = pView->n2;
+    nIdB = pView->n3;
+    if (!bLimit || lbl_80282048 == 0 || lbl_80282048 + 300 < gSession.nFrameCount) {
+        lbl_80282048 = gSession.nFrameCount;
+        fn_800AD9AC(nIdA, 1, 3);
+        fn_800AD9AC(nIdB, 1, 3);
+        fn_800AD698(nIdA, 1, 1);
+        fn_800AD698(nIdB, 1, 1);
+    }
+}
+
 void fn_800A6148(void) {
     u8 nIdA;
     u8 nIdB;
@@ -973,6 +991,29 @@ void fn_800A6C98(u8 nPlayer, u8 n) {
     }
 }
 
+void fn_800A6DCC(int nMusic, int a) {
+    u8 n = nMusic;
+
+    fn_800A4374();
+    fn_800A707C();
+    if (a == 1) {
+        lbl_80282033 = 0;
+    }
+    if (lbl_8028202F || lbl_80282032) {
+        lbl_80281428 = nMusic;
+        return;
+    }
+    fn_800AD9AC(lbl_8028141C, 0, n);
+    fn_800AD9AC(lbl_8028141C, 1, n);
+    fn_800AD9AC(lbl_8028141D, 0, n);
+    fn_800AD9AC(lbl_8028141D, 1, n);
+    fn_800AD698(lbl_8028141C, 0, 1);
+    fn_800AD698(lbl_8028141C, 1, 1);
+    fn_800AD698(lbl_8028141D, 0, 1);
+    fn_800AD698(lbl_8028141D, 1, 1);
+    lbl_80281424 = nMusic;
+}
+
 void fn_800A6D48(u8 nPlayer) {
     GameAudioView* pView;
 
@@ -1085,6 +1126,20 @@ void fn_800A754C(u8 a, u16 b) {
     }
 }
 
+void fn_800A7664(int nKind, int nMsg, int a) {
+    if ((s8)gSession.options.a0[4] != 0) {
+        if (lbl_80282054 != 0) {
+            lbl_80282052 = nKind;
+            lbl_80282038 = 1;
+            lbl_80282050 = nMsg;
+            lbl_8028204C = a;
+            return;
+        }
+        fn_800A7968(lbl_80281419, 0, nKind, nMsg, a);
+        fn_800AD698(lbl_80281419, 0, 1);
+    }
+}
+
 u8 fn_800A7748(void) {
     return fn_800AD618(lbl_8028141A, 0);
 }
@@ -1100,6 +1155,24 @@ u8 fn_800A7770(void) {
         bResult = 1;
     }
     return bResult;
+}
+
+// Scales the volume curves 1-6, 13 and 16-31 and emitter lbl_8028141B's tracks 0 and 1 (the
+// options menu passes 0.2 x options.a0[0]).
+void fn_800A77E0(f32 fVolume) {
+    u8 i;
+
+    for (i = 1; i < 5; i++) {
+        fn_800A3FB4(i, fVolume * lbl_8018E988[i]);
+    }
+    fn_800A3FB4(13, lbl_8018E988[13] * fVolume);
+    fn_800A3FB4(5, lbl_8018E988[5] * fVolume);
+    fn_800A3FB4(6, lbl_8018E988[6] * fVolume);
+    fn_800ADA94(lbl_8028141B, 0, fVolume);
+    fn_800ADA94(lbl_8028141B, 1, fVolume);
+    for (i = 16; i < 32; i++) {
+        fn_800A3FB4(i, fVolume * lbl_8018E988[i]);
+    }
 }
 
 void fn_800A78F0(f32 fVolume) {
