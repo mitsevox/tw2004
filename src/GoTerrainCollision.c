@@ -1115,7 +1115,7 @@ u8 fn_8004E0D4(f32* pFrom, f32* pDir, f32 fRange, f32* pCentre, f32 fRadius) {
 // TW06: bool Ter_CheckForPinCollision(TGD_TerrainInfo*, s32, f32*, f32*, f32[4]*, f32[4]*,
 // TGD_MaterialInfo**, TGD_ObjectInstanceInfo**). Whether the line from pFrom to pTo hits the
 // flagstick of the current hole: a vertical cylinder of one inch radius, 2 yards tall, at the pin.
-// Not for nobody's ball, nor when the player's view has the flagstick out (view byte 0x275). On
+// Not for nobody's ball, nor when the player's view has the flagstick out (bFlagOut). On
 // a hit: the point, the stick's outward normal and surface 90 (the cup).
 u8 Ter_CheckForPinCollision(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
                             SurfaceType** ppSurface, TerObject** ppObj) {
@@ -1134,7 +1134,7 @@ u8 Ter_CheckForPinCollision(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* p
     f32 fT;
 
     if (nPlayer < 0) return 0;
-    if (fn_80016CFC(gPlayers[nPlayer].nView0)[0x275]) return 0;
+    if (fn_80016CFC(gPlayers[nPlayer].nView0)->bFlagOut) return 0;
     // the line relative to the pin
     vFrom[0] = pFrom[0] - pCourse->pin[Game_CurrentPinSet()].x;
     vFrom[1] = pFrom[1] - pCourse->pin[Game_CurrentPinSet()].y;

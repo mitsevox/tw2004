@@ -7,6 +7,7 @@
 
 #include "game_types.h"
 #include "engine.h"
+#include "camera.h"
 #include "ball.h"
 
 // ---- attributes -----------------------------------------------------------------------------

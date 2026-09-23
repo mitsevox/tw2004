@@ -8,15 +8,12 @@
 #include "game.h"
 #include "engine.h"
 
-typedef struct View View;
-
 void  fn_800E0A84(u8 v);
 void  fn_800D29E8(void);
 void  fn_800D33F0(void);
 int   fn_800E177C(void);
 void  fn_800E2470(void);
 void  fn_8006F4B4(void);
-void  fn_800170C4(int nView, int a);
 void  fn_800E299C(void);
 void  fn_800E3B28(void);
 void  fn_800DA36C(void);
@@ -60,7 +57,6 @@ void  fn_800335F8(int a);
 void  fn_8006C4C0(int nPlayer);
 void  fn_8006C4A0(void);
 void  fn_800957FC(int nHandle, int a);
-u8*   fn_80016CFC(int nView);
 void  fn_800E0AF0(f32* pFrom, f32* pTo, f32* pOut);
 
 extern u8  gReplayData[];                   // 0x801D6030
@@ -73,7 +69,6 @@ u8    fn_800E45CC(void);
 u8    fn_800E46B4(void);
 void  fn_800E2A88(void);
 void  fn_800E1018(int nPlayer, int nHole);
-void  fn_800C6C8C(void);
 void  fn_800E41C8(void);
 
 int   fn_8006AA9C(int nPlayer);             // how the shot turned out (0..4, 8+)
@@ -83,8 +78,6 @@ typedef struct Vec4 { f32 x, y, z, w; } Vec4;
 u32   fn_800136DC(int nController);         // buttons: held << 16 | pressed this frame
 u32   fn_800142AC(int nButton, int a);      // a button's mask
 u8    fn_80014300(u32 uMask);               // any pad pressed these buttons
-u8    fn_80063C90(void* pView);             // the camera is still moving
-void  fn_80063BF4(void* pView, f32 f, f32* pVec);
 void  fn_80062D0C(int nPlayer);
 void  fn_80062B78(int nPlayer);
 void  fn_80062B74(int nPlayer);
@@ -99,7 +92,6 @@ void  Shot_Prepare(int nPlayer, u8 bNotify);
 void  BreakLine_Start(int nView);            // GoBreakLine.c
 void  fn_8009B970(int nView);
 void  fn_800689D4(int nPlayer);
-void  fn_800C4E80(void* pView, int nPlayer);
 u8    GM_bIsZoomButtonPressed(int nPlayer);
 u8    GM_bIsElevatorCamButtonPressed(int nPlayer);
 u8    fn_800E012C(int nPlayer);
@@ -108,7 +100,6 @@ u8    fn_800DFF0C(int nPlayer);
 u64   fn_800954A4(int a);                   // a time stamp
 f32   fn_8006E118(u64 tEnd, u64 tStart);    // seconds between two time stamps
 int   GameEffects_BallUpdatesThisFrame(int nPlayer);
-u8    fn_800C71A4(void* pView, int nPlayer);
 void  fn_8006B2C4(int nPlayer, int a);
 u8    fn_800BB1F8(int nPlayer);
 
@@ -657,11 +648,11 @@ u8 GM_PlayerTakeMulligan(int nPlayer) {
     fn_800957FC(gPlayers[nPlayer].nShotHandle, 1);
     GOLFERSTATE_Switch(GS_SWING, nPlayer);
     fn_800E3D38(nPlayer, 1);
-    fn_80016CFC(gPlayers[nPlayer].nView0)[0x275] = 1;
+    fn_80016CFC(gPlayers[nPlayer].nView0)->bFlagOut = 1;
     for (i = 0, q = gPlayers; i < gSession.nNumPlayers; i++, q++) {
         if (q->bPlayerCut == 0 && q->nView0 == gPlayers[nPlayer].nView0 &&
             q->ball.nLie != 10 && q->ball.nLie != LIE_GREEN && q->ball.nLie != LIE_HOLED) {
-            fn_80016CFC(gPlayers[nPlayer].nView0)[0x275] = 0;
+            fn_80016CFC(gPlayers[nPlayer].nView0)->bFlagOut = 0;
         }
     }
     return 1;
@@ -1060,7 +1051,7 @@ void GM_CheckForShotChanges(int nPlayer) {
 // was recorded, the mode allows it and the hole was not conceded) or continue (button 0); a CPU
 // continues on any pad's button 0.
 void GM_DoPostShotInHoleUI(int nPlayer) {
-    void* pView = fn_80017028(gPlayers[nPlayer].nView0);
+    View* pView = fn_80017028(gPlayers[nPlayer].nView0);
     Vec4  vOffset = lbl_80184D30;
     if ((gPlayers[nPlayer].uFlags & 8) && fn_80063C7C(pView)) {
         GM_EndOfGolferTurn(nPlayer);

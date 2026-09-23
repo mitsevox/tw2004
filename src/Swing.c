@@ -48,28 +48,6 @@ typedef struct SwingState {
     f32  fPuttFullPower;        // 0x118  0.75: a putt meter over this counts as full
 } SwingState;
 
-// A view (one per split-screen half); only what the swing states touch.
-typedef struct View {
-    u8   unk0[0x50];
-    f32  f50;                   // 0x050
-    f32  f54;                   // 0x054
-    f32  f58;                   // 0x058
-    u8   unk5C[0x70 - 0x5C];
-    s32  nCurCamera;            // 0x070
-    u8   unk74[0xC4 - 0x74];
-    f32  vC4[4];                // 0x0C4
-    u8   unkD4[0x104 - 0xD4];
-    f32  fCamTime;              // 0x104  time on this camera (state 1 moves on after 10 s)
-    u8   unk108[0x114 - 0x108];
-    f32  f114;                  // 0x114
-    f32  f118;                  // 0x118
-    f32  f11C;                  // 0x11C
-    u8   unk120[0x144 - 0x120];
-    s32  nCamera;               // 0x144
-    u8   unk148[0x25C - 0x148];
-    s32  nSavedCamera;          // 0x25C
-} View;
-
 extern SwingState* gpSwing;                  // 0x80281188
 extern f32         gForgivenessTable[3][27]; // 0x80188168  rows: value at attribute 0 / 100 / 110
 extern s32         gBoostSteps[8];           // 0x80188148  power boost per level: 1 2 4 6 9 12 16 20
@@ -965,7 +943,6 @@ void fn_8005CD94(void) {
 
 // ---- state 2: thinking ----------------------------------------------------------------------------
 
-u8    fn_800C7100(void* pView);              // its camera has settled
 
 #define CPU_TOLERANCE 0.0025f               // 0.05 yd squared: land within 1.8 in of the target
 
@@ -975,7 +952,7 @@ u8    fn_800C7100(void* pView);              // its camera has settled
 // modes 6 and 7, 3..4 s in mode 11. Out of time, the rehearsal is told to stop (best aim found,
 // or +25 and a fresh target), then the skill error goes on and it is state 10.
 void STATEFUNC_ShotSetupUpdate(int nPlayer) {
-    void*   pView;
+    View*   pView;
     u8      bDone;
     f32     fMax;
     f32     fMin;
@@ -1792,9 +1769,6 @@ void fn_8005A7A0(int nPlayer) {
 }
 
 void fn_80035138(int a);
-void fn_80016B9C(void);
-void fn_8001614C(void);
-void fn_80013EEC(void);
 void fn_80035118(int a, int b);
 void fn_80036100(u8* pMesh, void* pDesc, int n);
 void fn_800360D4(u8* pMesh);
@@ -1879,8 +1853,7 @@ void fn_8005A850(int nPlayer) {
             }
             fn_80035138(0);
             fn_80016B9C();
-            fn_8001614C();
-            fn_80013EEC();
+            fn_80013EEC(fn_8001614C());
             fn_80014118(0x50);
             fn_80035118(4, 5);
             fn_80012F50(0, 6, 0x80);
@@ -2176,20 +2149,20 @@ void fn_80062D98(void) {
     fn_80098C70();
 }
 
-void fn_80062DB8(void* pView, int a) {
-    *((u8*)pView + 0x6C) = a;
+void fn_80062DB8(View* pView, int a) {
+    pView->bFade = a;
 }
 
-void fn_80062DC0(void* pView) {
-    *(f32*)((u8*)pView + 0x68) = 0.0f;
+void fn_80062DC0(View* pView) {
+    pView->fFade = 0.0f;
 }
 
 f32 fn_80062DCC(View* pView) {
-    return *(f32*)((u8*)pView + 0x68);
+    return pView->fFade;
 }
 
 u8 fn_80062DD4(View* pView) {
-    return *((u8*)pView + 0x6C);
+    return pView->bFade;
 }
 
 // a - b over three floats (paired singles; the third is a single).
@@ -2206,13 +2179,11 @@ asm void fn_80062DDC(register f32* pA, register f32* pB, register f32* pOut) {
     blr
 }
 
-void fn_800BD894(void);
 
 void fn_80062E00(void) {
     fn_800BD894();
 }
 
-void fn_800BDA04(void);
 
 void fn_80062E20(void) {
     fn_800BDA04();
@@ -2267,7 +2238,6 @@ void STATEFUNC_FadeToRemoveBallInit(int nPlayer) {
 int   fn_8001707C(int nView);                 // the player a view belongs to
 void GOLFERSTATE_Pop(int nPlayer);
 void  fn_80067710(int nPlayer, int a, int b);
-void  fn_800C6E14(void);
 extern u8 lbl_80281E13;
 
 void STATEFUNC_ShotSetupExit(int nPlayer) {
@@ -2314,11 +2284,7 @@ void STATEFUNC_ReplaySwingExit(int nPlayer) {
 
 
 s8 GOLFERSTATE_GetPreviousState(int nPlayer);               // the state below the top of the stack
-u8    fn_80063C50(void* pView);
-void  fn_80063CBC(void* pView, f32* pVec);
 void  fn_8006C608(void);
-void  fn_800C1790(void* pView, int nPlayer);
-void fn_80062DB8(void* pView, int a);
 extern Vec4 lbl_80183670;
 extern u8   lbl_80281E11;
 
@@ -2351,7 +2317,7 @@ void STATEFUNC_KneeCamExit(int nPlayer) {
 }
 
 void STATEFUNC_SimulateExit(int nPlayer) {
-    void* pViewObj = fn_80017028(gPlayers[nPlayer].nView0);
+    View* pViewObj = fn_80017028(gPlayers[nPlayer].nView0);
     fn_80045558(0, nPlayer);
     fn_80045494(0, nPlayer);
     fn_8006C608();
@@ -2430,10 +2396,10 @@ void STATEFUNC_InTheHoleInit(int nPlayer) {
 // camera move.
 void STATEFUNC_PreShotExit(int nPlayer) {
     Vec4  vOffset = lbl_801835F0;
-    void* pView   = fn_80017028(gPlayers[nPlayer].nView0);
+    View* pView   = fn_80017028(gPlayers[nPlayer].nView0);
     int   nCamera;
     Mem_cpy(&gPlayers[nPlayer].ball, &gPlayers[nPlayer].ballBefore, sizeof(Ball));
-    nCamera = *(s32*)((u8*)pView + 0x144);
+    nCamera = pView->nCamera;
     if (nCamera == 1 || nCamera == 3 || nCamera == 4) {
         fn_80063B98(pView, 0.25f, (f32*)&vOffset);
     }
@@ -2441,16 +2407,14 @@ void STATEFUNC_PreShotExit(int nPlayer) {
 
 
 extern u8   gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
-u8    fn_800C4650(View* pView, int nPlayer);
 void  fn_80017158(int nView);
-void  fn_800C7178(View* pView, int nPlayer);
 extern Vec4 lbl_80183690;
 extern Vec4 lbl_80183610;
 
 void STATEFUNC_RemoveBallExit(int nPlayer) {
     View* pV;
     Vec4  vOffset;
-    pV      = (View*)fn_80017028(gPlayers[nPlayer].nView0);
+    pV      = fn_80017028(gPlayers[nPlayer].nView0);
     vOffset = lbl_80183690;
     Mem_cpy(&gPlayers[nPlayer].ballBefore, &gPlayers[nPlayer].ball, sizeof(Ball));
     if (pV->nCamera == 3) {
@@ -2461,7 +2425,7 @@ void STATEFUNC_RemoveBallExit(int nPlayer) {
 void STATEFUNC_ElevatorInit(int nPlayer) {
     int nView;
     if (lbl_80281F78->n1C0 != 0) {
-        if (fn_800C4650((View*)fn_80017028(gPlayers[nPlayer].nView0), nPlayer)) {
+        if (fn_800C4650(fn_80017028(gPlayers[nPlayer].nView0), nPlayer)) {
             nView = gPlayers[nPlayer].nView0;
             View_SetCamera(fn_80017028(nView), 0x13, nPlayer, nView);
             return;
@@ -2491,9 +2455,9 @@ void STATEFUNC_InitialFlyByExit(int nPlayer) {
     View* pSrc;
     View* pDst;
     fn_80017158(gPlayers[nPlayer].nView0);
-    pSrc = (View*)fn_80017028(gPlayers[nPlayer].nView0);
+    pSrc = fn_80017028(gPlayers[nPlayer].nView0);
     for (i = 0; i < gNumPlayersSetUp; i++) {
-        pDst = (View*)fn_80017028(gPlayers[i].nView0);
+        pDst = fn_80017028(gPlayers[i].nView0);
         fn_800170C4(gPlayers[i].nView0, 1);
         pDst->nCamera = pSrc->nCamera;
         pDst->f118    = pSrc->f118;
@@ -2505,7 +2469,7 @@ void STATEFUNC_InitialFlyByExit(int nPlayer) {
 
 void STATEFUNC_ConcededInit(int nPlayer) {
     Vec4  vOffset = lbl_80183610;
-    View* pV      = (View*)fn_80017028(gPlayers[nPlayer].nView0);
+    View* pV      = fn_80017028(gPlayers[nPlayer].nView0);
     fn_800C7178(pV, nPlayer);
     View_SetCamera(pV, 0x19, nPlayer, gPlayers[nPlayer].nView0);
     if (pV->nCamera == 1 || pV->nCamera == 3 || pV->nCamera == 4) {
@@ -2533,9 +2497,9 @@ void STATEFUNC_GreenWatchRollExit(int nPlayer) {
 
 void STATEFUNC_GreenMorphExit(int nPlayer) {
     int  nView;
-    ((View*)fn_80017028(gPlayers[nPlayer].nView0))->f50 = 1.0f;
-    ((View*)fn_80017028(gPlayers[nPlayer].nView0))->f54 = 1.0f;
-    ((View*)fn_80017028(gPlayers[nPlayer].nView0))->f58 = 1.0f;
+    fn_80017028(gPlayers[nPlayer].nView0)->f50 = 1.0f;
+    fn_80017028(gPlayers[nPlayer].nView0)->f54 = 1.0f;
+    fn_80017028(gPlayers[nPlayer].nView0)->f58 = 1.0f;
     fn_80039344(gPlayers[nPlayer].nView0, 0.0f);
     if (GOLFERSTATE_GetPreviousState(nPlayer) == GS_SWING) {
         nView = gPlayers[nPlayer].nView0;
@@ -2555,10 +2519,10 @@ void STATEFUNC_MidHoleFlyByExit(int nPlayer) {
     int   k, j;
     u8    bShared;
     for (k = 0; k < 2; k++) {
-        pV      = (View*)fn_80017028((&gPlayers[nPlayer].nView0)[k]);
+        pV      = fn_80017028((&gPlayers[nPlayer].nView0)[k]);
         bShared = 0;
         for (j = 0; j < k; j++) {
-            if (pV == (View*)fn_80017028((&gPlayers[nPlayer].nView0)[j])) {
+            if (pV == fn_80017028((&gPlayers[nPlayer].nView0)[j])) {
                 bShared = 1;
             }
         }
@@ -2574,7 +2538,6 @@ void STATEFUNC_MidHoleFlyByExit(int nPlayer) {
 
 void fn_80062B64(int nPlayer);
 void fn_80062B60(int nPlayer);
-void  fn_800C7140(int a);
 void  fn_80045824(int nPlayer);
 extern Vec4 lbl_80183630;
 
@@ -2622,10 +2585,10 @@ void STATEFUNC_MidHoleFlyByInit(int nPlayer) {
     u8    bShared;
     EVENT_Trigger(nPlayer, 0x4A, 0, -1);
     for (k = 0; k < 2; k++) {
-        pV      = (View*)fn_80017028((&gPlayers[nPlayer].nView0)[k]);
+        pV      = fn_80017028((&gPlayers[nPlayer].nView0)[k]);
         bShared = 0;
         for (j = 0; j < k; j++) {
-            if (pV == (View*)fn_80017028((&gPlayers[nPlayer].nView0)[j])) {
+            if (pV == fn_80017028((&gPlayers[nPlayer].nView0)[j])) {
                 bShared = 1;
             }
         }
@@ -2656,7 +2619,7 @@ void STATEFUNC_TapInInit(int nPlayer) {
     gPlayers[nPlayer].uFlags |= 8;
     gPlayers[nPlayer].fA64 = fn_800D0478(nPlayer);
     fn_800E4204();
-    fn_80016CFC(gPlayers[nPlayer].nView0)[0x275] = 1;
+    fn_80016CFC(gPlayers[nPlayer].nView0)->bFlagOut = 1;
 }
 
 // State 6: the putt preview. The caddie's solved shot is taken, the player is made a CPU for
@@ -2691,7 +2654,6 @@ void STATEFUNC_GreenWatchRollInit(int nPlayer) {
 }
 
 
-u8    fn_800172C4(void* pView);               // the camera move has finished
 u8 fn_80062B90(void);
 u8 fn_80062B88(int nPlayer);
 void fn_80062B84(int a);
@@ -2751,13 +2713,12 @@ void STATEFUNC_InitialFlyByUpdate(int nPlayer) {
 }
 
 
-void fn_80062DC0(void* pView);
 extern Vec4 lbl_80183640;
 
 // State 12: the ball is away. In a replay with the kept ball unset, a special path; otherwise
 // the ball as it lies is kept. Camera 14 unless the swing animation is 11 or the view says no.
 void STATEFUNC_SimulateInit(int nPlayer) {
-    void* pV   = fn_80017028(gPlayers[nPlayer].nView0);
+    View* pV   = fn_80017028(gPlayers[nPlayer].nView0);
     Ball* pBallBefore = &gPlayers[nPlayer].ballBefore;
     if (gSession.bReplay != 0 && pBallBefore->nState == 0) {
         fn_8006B2C4(nPlayer, 1);
@@ -2824,7 +2785,7 @@ extern Vec4 lbl_80183650;
 void STATEFUNC_TapInUpdate(int nPlayer) {
     int   nController;
     Vec4  vOffset = lbl_80183650;
-    View* pV      = (View*)fn_80017028(gPlayers[nPlayer].nView0);
+    View* pV      = fn_80017028(gPlayers[nPlayer].nView0);
     int   nHandle = gPlayers[nPlayer].nShotHandle;
 
     if (fn_80095780(nHandle) != 11) return;
@@ -2857,8 +2818,6 @@ void STATEFUNC_TapInUpdate(int nPlayer) {
 }
 
 
-void  fn_800C6010(void* pView, int nPlayer);
-void  fn_800C60E8(void* pView, int nPlayer);
 
 // State 8: a free camera while button 19 is held (release pops the state). Buttons 11/12 and
 // 13/14 play the four pan sounds; button 4 switches between two camera modes.
@@ -2968,8 +2927,6 @@ void STATEFUNC_ShotSetupInit(int nPlayer) {
 
 
 void  fn_800170F4(int nView);
-void  fn_80012EF0(void);
-void  fn_800171D8(f32 x, f32 y, f32 w, f32 h);
 void  fn_8003349C(f32 a, f32 b, f32 c);
 void  fn_800D8D10(int nPlayer);
 void  fn_800693A4(int nPlayer);
@@ -2987,9 +2944,7 @@ void STATEFUNC_InitialFlyByInit(int nPlayer) {
     fn_80063B98(fn_80017028(gPlayers[nPlayer].nView0), 0.5f, (f32*)&vOffset);
     fn_800C7140(0);
     fn_800170F4(gPlayers[nPlayer].nView0);
-    fn_80017004(gPlayers[nPlayer].nView0);
-    fn_80012EF0();
-    fn_800171D8(0.0f, 0.0f, 1.0f, 1.0f);
+    fn_800171D8(fn_80012EF0(fn_80017004(gPlayers[nPlayer].nView0)), 0.0f, 0.0f, 1.0f, 1.0f);
     for (i = 0; i < gNumPlayersSetUp; i++) {
         for (k = 0; k < 2; k++) {
             if ((&gPlayers[i].nView0)[k] != gPlayers[nPlayer].nView0) {
@@ -3010,7 +2965,7 @@ void STATEFUNC_InitialFlyByInit(int nPlayer) {
     fn_8003349C(1.0f, 12.0f, 0.1f);
     GameEffects_ResetGameEffectSettings();
     for (i = 0; i < gNumPlayersSetUp; i++) {
-        fn_80016CFC(gPlayers[i].nView0)[0x275] = 0;
+        fn_80016CFC(gPlayers[i].nView0)->bFlagOut = 0;
     }
 }
 
@@ -3047,12 +3002,12 @@ void STATEFUNC_PlaceBallInit(int nPlayer) {
     fn_800D8D10(nPlayer);
     fn_800693A4(nPlayer);
     Emotion_UpdatePlayerEmotion(nPlayer);
-    fn_80016CFC(gPlayers[nPlayer].nView0)[0x275] = 1;
+    fn_80016CFC(gPlayers[nPlayer].nView0)->bFlagOut = 1;
     for (i = 0; i < gSession.nNumPlayers; i++) {
         if (gPlayers[i].bPlayerCut == 0 && gPlayers[i].nView0 == gPlayers[nPlayer].nView0 &&
             gPlayers[i].ball.nLie != 10 && gPlayers[i].ball.nLie != LIE_GREEN &&
             gPlayers[i].ball.nLie != LIE_HOLED) {
-            fn_80016CFC(gPlayers[nPlayer].nView0)[0x275] = 0;
+            fn_80016CFC(gPlayers[nPlayer].nView0)->bFlagOut = 0;
         }
     }
     fn_80045824(nPlayer);
@@ -3072,7 +3027,7 @@ void STATEFUNC_PlaceBallInit(int nPlayer) {
 void STATEFUNC_GreenMorphUpdate(int nPlayer) {
     if (!(fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x2E, 1))) {
         if (!(fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x30, 1))) {
-            if (1.0f == ((View*)fn_80017028(gPlayers[nPlayer].nView0))->f54) {
+            if (1.0f == fn_80017028(gPlayers[nPlayer].nView0)->f54) {
                 GOLFERSTATE_Pop(nPlayer);
                 return;
             }
@@ -3151,7 +3106,6 @@ void STATEFUNC_PlaceBallUpdate(int nPlayer) {
 }
 
 
-u8    fn_800C7340(void* pView, int nPlayer);
 
 // State 3: the aiming camera, held while button 8 is down (the caddie keeps updating). Pan
 // sounds on buttons 9/10, 30 and 11..14; once the camera has arrived (flag from the enter) a
@@ -3209,7 +3163,7 @@ void STATEFUNC_GreenWatchRollUpdate(int nPlayer) {
     Player*     p;
     Ball*       pGhost;
     s32*        pGhostState;
-    s32*        pView;
+    s32*        pnView;
     f32*        pGhostMinDist;
 
     Caddie_Update(nPlayer);
@@ -3238,34 +3192,28 @@ void STATEFUNC_GreenWatchRollUpdate(int nPlayer) {
     }
     pGhost        = &p->ballBefore;
     pGhostState   = &p->ballBefore.nState;
-    pView         = &p->nView0;
+    pnView        = &p->nView0;
     pGhostMinDist = &p->ballBefore.fClosest;
     for (i = 0; i < nSteps; i++) {
         Ball_SetSimulating(1);
         Physics_Simulate(pGhost, 20);
         Ball_SetSimulating(0);
         if (*pGhostState == 1 || *pGhostState == 5) {
-            if (!fn_80063C90(fn_80017028(*pView))) {
-                fn_80063BF4(fn_80017028(*pView), 0.25f, (f32*)&vOffset);
+            if (!fn_80063C90(fn_80017028(*pnView))) {
+                fn_80063BF4(fn_80017028(*pnView), 0.25f, (f32*)&vOffset);
             }
-        } else if (!fn_80063C90(fn_80017028(*pView)) && pCourse != NULL) {
+        } else if (!fn_80063C90(fn_80017028(*pnView)) && pCourse != NULL) {
             int nPinSet = Game_CurrentPinSet();
             if (*pGhostMinDist < 0.5f ||
                 !(*pGhostMinDist < Vec_Distance(pGhost->vPos, &pCourse->pin[nPinSet].x) - 0.1f)) {
-                fn_80063BF4(fn_80017028(*pView), 0.25f, (f32*)&vOffset);
+                fn_80063BF4(fn_80017028(*pnView), 0.25f, (f32*)&vOffset);
             }
         }
     }
 }
 
 
-void  fn_800C7168(View* pView, int a);
-u8    fn_800C7170(View* pView);
-void  fn_800C7158(View* pView, int a);
-u8    fn_800C7160(View* pView);
 u8    fn_800734A0(void* pAnim);
-u8    fn_800C6604(View* pView);
-void  GolfCamera_CutToGolferDoneAnimatingCam(View* pView, int nPlayer);
 
 // State 13: the ball has come to rest and the golfer reacts. On the first frame the result is
 // handed to the view; a good result (gpGame+0x294, not on cameras 1/4) plays the reaction
@@ -3273,7 +3221,7 @@ void  GolfCamera_CutToGolferDoneAnimatingCam(View* pView, int nPlayer);
 // is set and it is state 17 (the hole-out sequence). While animation 9 plays, camera 16 is
 // taken once the animation allows, and the reaction shot lines up.
 void STATEFUNC_InTheHoleUpdate(int nPlayer) {
-    View* pV    = (View*)fn_80017028(gPlayers[nPlayer].nView0);
+    View* pV    = fn_80017028(gPlayers[nPlayer].nView0);
 
     if (lbl_80281E12 != 0) {
         lbl_80281E12 = 0;
@@ -3312,20 +3260,15 @@ void STATEFUNC_InTheHoleUpdate(int nPlayer) {
 
 
 void fn_80062D98(void);
-u8    fn_800C44A8(View* pView, int nPlayer);
-u8    fn_800C44CC(View* pView, int nPlayer);
-u8    fn_800C44E0(View* pView, int nPlayer);
-u8    fn_800C6D80(void);
 void  SKEL_SetIKSolutionWeight(u8* p, f32 f);
 void  fn_80047EF0(Ball* pBall, int nPlayer, int a);   // tee the ball up
-f32   fn_800C6B7C(View* pView);
 
 // State 11 begins: the swing animation. The camera is 12 in a replay, else one of the three
 // special swing cameras (20..22) the view offers, else 13. The animation's event hooks are
 // registered (a wider window on the special cameras), the ball is teed up on the tee, and the
 // live ball's state is cleared for the launch.
 void STATEFUNC_ReplaySwingInit(int nPlayer) {
-    View* pV    = (View*)fn_80017028(gPlayers[nPlayer].nView0);
+    View* pV    = fn_80017028(gPlayers[nPlayer].nView0);
     Ball* pBall;
 
     if (gSession.bReplay != 0) {
@@ -3377,10 +3320,6 @@ void STATEFUNC_ReplaySwingInit(int nPlayer) {
     }
 }
 
-int   fn_800C6B38(View* pView);
-int   fn_800C4518(View* pView);
-void  fn_800C5CEC(View* pView, int nPlayer);
-u8    fn_800C5FE4(View* pView, int nPlayer);
 void  fn_800A573C(u8 nPlayer);
 
 // State 11: the swing animation. Nothing more until it passes its impact event (2). Then in a
@@ -3388,9 +3327,9 @@ void  fn_800A573C(u8 nPlayer);
 // impact sound plays, the special swing camera is chosen, the ball launches and it is state 12;
 // before that the camera keeps moving and one of two follow-through blends plays.
 void STATEFUNC_ReplaySwingUpdate(int nPlayer) {
-    View* pV    = (View*)fn_80017028(gPlayers[nPlayer].nView0);
+    View* pV    = fn_80017028(gPlayers[nPlayer].nView0);
     u8    bSpecial = 0;
-    GameEffects_SetSuperSlowMo(1, nPlayer, fn_800C6B7C((View*)fn_80017028(gPlayers[nPlayer].nView0)));
+    GameEffects_SetSuperSlowMo(1, nPlayer, fn_800C6B7C(fn_80017028(gPlayers[nPlayer].nView0)));
     if (!fn_80048574(gPlayers[nPlayer].nShotHandle, 2) ||
         fn_8005CB78(gPlayers[nPlayer].nShotHandle, 2) < ((ShotObj*)gPlayers[nPlayer].nShotHandle)->fAnimTime) {
         if (gSession.bReplay) {
@@ -3482,10 +3421,10 @@ void STATEFUNC_PreShotInit(int nPlayer) {
     if (gPlayers[nPlayer].ball.nLie == 0) {
         fn_80047EF0(&gPlayers[nPlayer].ball, nPlayer, 1);
     }
-    fn_80016CFC(gPlayers[nPlayer].nView0)[0x275] = 1;
+    fn_80016CFC(gPlayers[nPlayer].nView0)->bFlagOut = 1;
     if (gPlayers[nPlayer].ball.nLie != 10 && gPlayers[nPlayer].ball.nLie != LIE_GREEN &&
         gPlayers[nPlayer].ball.nLie != LIE_HOLED) {
-        fn_80016CFC(gPlayers[nPlayer].nView0)[0x275] = 0;
+        fn_80016CFC(gPlayers[nPlayer].nView0)->bFlagOut = 0;
     }
     pBall = &gPlayers[nPlayer].ball;
     fn_80054A6C(pBall);
@@ -3513,9 +3452,6 @@ void  fn_800A3CB0(f32* pPos, int nPlayer);
 void  fn_800A3D6C(f32* pPos, int nPlayer);
 void  fn_800A3DF4(int nPlayer);
 void  fn_8001DA04(int nHandle, u8* pA, u8* pB);
-void  fn_800C7080(View* pView);
-u8    fn_800C6E88(View* pView, int nPlayer);
-u8    fn_800C6F7C(View* pView, int nPlayer, f32 f);
 extern u8*  lbl_80281DA0;                    // per player, 0x104 bytes each
 extern Vec4 lbl_801835E0;
 
@@ -3534,7 +3470,7 @@ void STATEFUNC_PreShotUpdate(int nPlayer) {
     s32*    pState;
     f32     vHand[4];
 
-    pV    = (View*)fn_80017028(gPlayers[nPlayer].nView0);
+    pV    = fn_80017028(gPlayers[nPlayer].nView0);
     pSlot = lbl_80281DA0 + nPlayer * 0x104;
     if (pV->nCurCamera != 11 && pV->nCurCamera != 0 && gpGame->pfn238(nPlayer)) {
         GOLFERSTATE_Switch(GS_SHOT_SETUP, nPlayer);
@@ -3654,8 +3590,8 @@ extern f32  gRealBallRadiusIn;               // 0x80283300  0.84: a real golf ba
 // ticks a frame and the live ball follows it. Camera 16 over the whole thing.
 void STATEFUNC_RemoveBallUpdate(int nPlayer) {
     Vec4  vOffset = lbl_80183680;
-    s32*  pView   = &gPlayers[nPlayer].nView0;
-    View* pV      = (View*)fn_80017028(*pView);
+    s32*  pnView  = &gPlayers[nPlayer].nView0;
+    View* pV      = fn_80017028(*pnView);
     s32*  pHandle = &gPlayers[nPlayer].nShotHandle;
     Ball* pBall;
     f32   vDir[4];
@@ -3663,9 +3599,9 @@ void STATEFUNC_RemoveBallUpdate(int nPlayer) {
     f32   fGround, fSpeed;
 
     if (fn_80095780(*pHandle) == 12 && pV->nCurCamera != 0x10) {
-        int nView = *pView;
+        int nView = *pnView;
         View_SetCamera(fn_80017028(nView), 0x10, nPlayer, nView);
-        fn_80063B98(fn_80017028(*pView), 0.75f, (f32*)&vOffset);
+        fn_80063B98(fn_80017028(*pnView), 0.75f, (f32*)&vOffset);
     }
     if (fn_8001DBF4(*pHandle)) {
         int   nBone = fn_8001EED8(*(u8**)(*pHandle + 0x38), 0x54);
@@ -3721,14 +3657,7 @@ void STATEFUNC_RemoveBallUpdate(int nPlayer) {
 }
 
 
-u8    fn_800C6D9C(void);
-u8 fn_80062DD4(View* pView);               // the view has faded out
-f32 fn_80062DCC(View* pView);               // and how far
 void  fn_8006BB5C(int nPlayer);
-u8    fn_800C6D28(void);
-void  fn_800C6DE4(void);
-u8    fn_800C6D64(void);
-void  fn_800C6DFC(void);
 
 // State 12: the ball is in the air. Once the view has faded past half way: holed -> state 13,
 // else state 14. Before the fade, a ball that has come to rest is marked (lie 12 with flag 8)
@@ -3741,7 +3670,7 @@ void STATEFUNC_SimulateUpdate(int nPlayer) {
     u8    bB = 0;
     View* pV;
 
-    pV = (View*)fn_80017028(gPlayers[nPlayer].nView0);
+    pV = fn_80017028(gPlayers[nPlayer].nView0);
     if (fn_800C6D9C()) return;
     GM_SimulateBallMovement(nPlayer);
     Swing_RumbleTick(nPlayer);
@@ -3819,17 +3748,13 @@ u8    fn_800DA264(void);                      // tips are on
 void  fn_800D1DAC(int nPlayer);
 void fn_80062B68(int nPlayer);
 void fn_80062B6C(int nPlayer);
-void  fn_800C6618(View* pView, int nPlayer);
-int   fn_800C7138(View* pView);
-u8    fn_800C441C(View* pView, int nPlayer);
-void  fn_800642D0(View* pView, int nPlayer);
 
 // State 10 begins: setting up the shot. The address animation and the HUD's club and shot
 // kind; camera 12; the tutorial tips (first tee, first approach, first putt) for a human when
 // tips are on; the caddie starts; on the tee every player's ball is set up; the shot flags
 // are cleared; sound 7.
 void STATEFUNC_SwingInit(int nPlayer) {
-    View* pV    = (View*)fn_80017028(gPlayers[nPlayer].nView0);
+    View* pV    = fn_80017028(gPlayers[nPlayer].nView0);
     int   nView;
     Ball* pBall;
     int   i;
@@ -3942,7 +3867,7 @@ void STATEFUNC_SwingUpdate(int nPlayer) {
         GM_BallHit(nPlayer);
         fn_80062B6C(nPlayer);
         fn_8000B1D4(1, gSession.nSeed);
-        pV = (View*)fn_80017028(gPlayers[nPlayer].nView0);
+        pV = fn_80017028(gPlayers[nPlayer].nView0);
         fn_800C6618(pV, nPlayer);
         fn_800A5980((u8)nPlayer);
         if (fn_800C7138(pV) == 0) {
@@ -3981,7 +3906,7 @@ void STATEFUNC_SwingUpdate(int nPlayer) {
                 fn_80062CB0(gPlayers[nPlayer].nC58, 1);
             }
             fn_80068AA8(nPlayer);
-            fn_800642D0((View*)fn_80017028(gPlayers[nPlayer].nView0), nPlayer);
+            fn_800642D0(fn_80017028(gPlayers[nPlayer].nView0), nPlayer);
             fn_800E3D38(nPlayer, 1);
         } else {
             fn_80068AA8(nPlayer);
@@ -4007,7 +3932,7 @@ extern Vec4 lbl_80183620;
 // take a mulligan (button 25, if allowed), watch the replay (button 24, if recorded and
 // allowed) or continue (button 0); a CPU continues on any pad's button 0.
 void STATEFUNC_ShowYardageUpdate(int nPlayer) {
-    View* pV    = (View*)fn_80017028(gPlayers[nPlayer].nView0);
+    View* pV    = fn_80017028(gPlayers[nPlayer].nView0);
     Vec4  vOffset;
 
     if (lbl_80281E13 != 0) {
