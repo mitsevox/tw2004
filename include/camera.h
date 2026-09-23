@@ -12,8 +12,9 @@
 typedef struct CamShot {
     char szName[0x24];          // 0x00
     f32  f24;                   // 0x24  height; the elevator camera adds the course's own
-    u8   unk28[0x40 - 0x28];
-    struct CamShot* p40;        // 0x40
+    u8   unk28[0x30 - 0x28];
+    f32  v30[4];                // 0x30  the zoom-to-aim camera's start position
+    struct CamShot* p40;       // 0x40
     struct CamShot* p44;        // 0x44  in View.shot19C: the shot camera 13 goes back to
     f32  f48;                   // 0x48  how long the shot lasts
     f32  f4C;                   // 0x4C
@@ -26,9 +27,13 @@ typedef struct CamShot {
     f32  f74;                   // 0x74
     f32  f78;                   // 0x78
     f32  f7C;                   // 0x7C
-    u8   unk80[4];
+    f32  f80;                   // 0x80
     f32  f84;                   // 0x84
-    u8   unk88[0xA4 - 0x88];
+    u8   unk88[0x94 - 0x88];
+    f32  f94;                   // 0x94
+    f32  f98;                   // 0x98
+    f32  f9C;                   // 0x9C
+    u8   unkA0[0xA4 - 0xA0];
     s32  nA4;                   // 0xA4
     u8   bA8;                   // 0xA8
     u8   unkA9;
@@ -79,7 +84,7 @@ typedef struct View {
     u8       unk6D[3];
     s32      nCurCamera;        // 0x070
     CamSequence* p74;           // 0x074  the camera sequence the shots are picked from
-    void*    p78;               // 0x078
+    CamSequence* p78;           // 0x078  the sequence before the post-shot cameras (p74 saved)
     u8       unk7C[4];
     CamShot* p80;               // 0x080
     CamScript script;           // 0x084  the camera script the camera functions drive
@@ -98,7 +103,7 @@ typedef struct View {
     CamShot* p130;              // 0x130  the current shot
     CamShot* p134;              // 0x134  the next one
     CamShot* p138;              // 0x138  where SwitchCrAPCamera records the current camera
-    u8       unk13C[4];
+    CamShot* p13C;              // 0x13C  the shot before (GolfCamera_CutToGolferDoneAnimatingCam)
     s32      n140;              // 0x140
     s32      nCamera;           // 0x144
     s32      n148;              // 0x148  the shot kind asked for
@@ -109,7 +114,8 @@ typedef struct View {
     s32      n154;              // 0x154
     u8       unk158[0x164 - 0x158];
     s32      n164;              // 0x164  a shot kind for fn_8003A950 (25 = none)
-    u8       unk168[0x18C - 0x168];
+    f32      f168;              // 0x168
+    u8       unk16C[0x18C - 0x16C];
     f32      f18C;              // 0x18C
     f32      f190;              // 0x190
     s32      n194;              // 0x194
@@ -201,7 +207,7 @@ typedef struct GolfCamState {
     s32     n60;                // 0x060  passed to fn_8006509C
     f32     f64;                // 0x064  camera 7's slow-motion rate while b5A is set
     f32     f68;                // 0x068
-    CamShot shot6C;             // 0x06C
+    CamShot shot6C;             // 0x06C  the tutorial wait's two hand-made shots (camera 18)
     CamShot shot12C;            // 0x12C
     s32     n1EC[5];            // 0x1EC
 } GolfCamState;

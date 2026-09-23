@@ -299,7 +299,15 @@ The fixes that come up most often. Each points to its full entry below.
   `if (gPlayers[n].nLie == 6 || ... == 7 || ... == 8)` became `subi; cmplwi 1; ble` (a 6..7 range)
   plus one compare; the same chain through `Player* p` (`p->nLie == 6 || ...`) gave the original's
   three plain `cmpwi/beq` (`Lie_AllowsFullSwing`, exact). A `switch` with the three cases was
-  wrong both ways.
+  wrong both ways. The other direction: `pShot->p40->bAB == 6 || == 8 || == 9 || == 10` on a
+  field read through a pointer gave the original's one `subi 8; clrlwi; cmplwi 2; ble` (8..10);
+  copied into a `u8` local first, the same chain gave an 8..9 range plus a compare with 10
+  (GoGolfCam `GolfCamera_InitZoomToAimCamera`). Which spelling makes the range depends on how the
+  value is read, so try the field, the local and the pointer form.
+- **[verified] An address used twice: keep the index, not a pointer.** `f32* pPin =
+  &pCourse->pin[Game_CurrentPinSet()].x;` used twice swapped two registers in every declaration
+  order; `nPinSet = Game_CurrentPinSet();` with `&pCourse->pin[nPinSet].x` written at each use
+  matched (GoGolfCam `fn_800C0414`, 98.52% -> 100).
 - **[verified] A loop over a global array: index it, don't walk a pointer.** `T* p = gTable;
   for (...; p++)` gives `addi r0, r3, gTable@l; mr r31, r0` for the pointer; `gTable[i].x` in the
   loop body (CW strength-reduces it to the same walking pointer) gives the original's direct
