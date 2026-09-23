@@ -2090,19 +2090,10 @@ GoGreenGrid.c:
 	.text       start:0x8009B630 end:0x8009C914
 
 MC_Gc.c:
-	.text       start:0x8009CC00 end:0x8009F6A0
-
-unsorted/sweep_8009F780.c:
-	.text       start:0x8009F780 end:0x8009F7E4
-
-unsorted/sweep_8009F7E4.c:
-	.text       start:0x8009F7E4 end:0x8009F7E8
-
-unsorted/sweep_8009F834.c:
-	.text       start:0x8009F834 end:0x8009F850
+	.text       start:0x8009CB9C end:0x8009F850
 
 MC.c:
-	.text       start:0x8009FAD0 end:0x800A233C
+	.text       start:0x8009F850 end:0x800A233C
 
 unsorted/sweep_800A2604.c:
 	.text       start:0x800A2604 end:0x800A2614
