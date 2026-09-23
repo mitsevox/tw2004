@@ -57,6 +57,23 @@ typedef struct TNetwork {
 
 #define AXIS3(n) ((n) == 0 ? 0 : 2)    // grid axis 0 (x) or 1 (z) as an index into a 3D vector
 #define PIN_RADIUS_SQ 0.00077160494f   // the flagstick's radius squared: (1 inch)^2 in square yards
+// The bounds of one set of 3D cup geometry (0x20 bytes).
+typedef struct TerBox {
+    f32  vMin[4];               // 0x00
+    f32  vMax[4];               // 0x10
+} TerBox;
+
+// The terrain manager (GoTerrain.c, 0x11C8 bytes); only its course is read here. TW06:
+// Ter_TerrainGameDataMgr, whose GetTGD returns this pointer.
+typedef struct TerrainMgr {
+    u8          unk0[8];
+    CourseInfo* pCourse;        // 0x008
+    u8          unkC[0x11C8 - 0xC];
+} TerrainMgr;
+
+#define NUM_CUP_POSITIONS 4
+#define TER_RELOCATE(pCourse, field) ((pCourse)->field = (void*)((u8*)(pCourse) + (u32)(pCourse)->field))
+
 #define TER_NO_GROUND -65536.125f   // the height the lookups return when nothing is under the point
 
 extern u8        lbl_80281DC0;                          // the cup is real geometry
@@ -65,6 +82,8 @@ extern s32       lbl_80281DC8;                          // out-of-bounds network
 extern TNetwork* lbl_801D5428[MAX_FREE_DROP_NETWORKS];
 extern TNetwork* lbl_801D548C[MAX_OOB_NETWORKS];
 extern u8        lbl_801D54A0[MAX_OBJECTS];        // objects near the current line
+extern TerBox    lbl_801D53A8[NUM_CUP_POSITIONS];  // the 3D cup geometry of each pin position
+extern TerrainMgr lbl_801D3CB0;
 
 u8    Course_RegisterLoader(int nChunk, void (*pfn)(u8*));   // 0x8000C0B4
 s32   fn_8000C140(f32* pPos, TNetwork* pNet, s32 nNodes);   // point in outline. TW06: wn_PnPoly
@@ -95,6 +114,8 @@ static inline int Ter_GridCell(f32 fCells) {
 
 f32   fn_8004C8E0(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** ppRef, f32 (**ppTri)[3],
                   s32* pTri);
+void  fn_80050794(CourseInfo* pCourse);
+f32   Ter_CalcLowestPlayableWorldHeight(CourseInfo* pCourse);
 f32   fn_8004CB30(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** ppRef, f32 (**ppTri)[3],
                   s32* pTri);
 f32   fn_8004D01C(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** ppRef, f32 (**ppTri)[3],
@@ -177,6 +198,95 @@ void fn_8004B1A4(void) {
     Course_RegisterLoader(4, (void (*)(u8*))fn_8004B588);
     lbl_80281DC8 = 0;
     lbl_80281DC4 = 0;
+}
+
+// TW06: void Ter_InitTGD(TGD_TerrainInfo*). Get a course's collision data ready once it is loaded:
+// its offsets become pointers; strips flagged for one of the four pin positions (flags 1, 2, 4, 8)
+// are 3D cup geometry, and each pin goes at the centre top of its geometry's bounds; then the
+// triangles' high and low corners and the course floor.
+void fn_8004B1EC(CourseInfo* pCourse) {
+    u32 i;
+    int k;
+    int j;
+    int nBit;
+    int nHole;
+    f32 (*pVert)[3];
+
+    TER_RELOCATE(pCourse, pVerts);
+    TER_RELOCATE(pCourse, pTriFlags);
+    TER_RELOCATE(pCourse, pLight);
+    TER_RELOCATE(pCourse, pGrid);
+    TER_RELOCATE(pCourse, pObjects);
+    TER_RELOCATE(pCourse, pPolyRefs);
+    TER_RELOCATE(pCourse, pObjRefs);
+    if (pCourse->p38 != NULL) {
+        TER_RELOCATE(pCourse, p38);
+    }
+    if (pCourse->p44 != NULL) {
+        TER_RELOCATE(pCourse, p44);
+    }
+    if (pCourse->p3C != NULL) {
+        TER_RELOCATE(pCourse, p3C);
+    }
+    if (pCourse->p40 != NULL) {
+        TER_RELOCATE(pCourse, p40);
+    }
+    lbl_80281DC0 = 0;
+    for (k = 0; k < NUM_CUP_POSITIONS; k++) {
+        lbl_801D53A8[k].vMin[0] = 1000000.0f;
+        lbl_801D53A8[k].vMin[1] = 1000000.0f;
+        lbl_801D53A8[k].vMin[2] = 1000000.0f;
+        lbl_801D53A8[k].vMax[0] = -1000000.0f;
+        lbl_801D53A8[k].vMax[1] = -1000000.0f;
+        lbl_801D53A8[k].vMax[2] = -1000000.0f;
+    }
+    for (i = 0; i < pCourse->nPolyRefs; i++) {
+        nBit = 1;
+        for (k = 0; k < NUM_CUP_POSITIONS; k++) {
+            if (nBit == (pCourse->pPolyRefs[i].u4 & 0xF)) {
+                lbl_80281DC0 = 1;
+                pVert = &pCourse->pVerts[TER_FIRST_VERTEX(&pCourse->pPolyRefs[i])];
+                for (j = 0; j < pCourse->pPolyRefs[i].nTris + 2; j++) {
+                    if (pVert[0][0] < lbl_801D53A8[k].vMin[0]) {
+                        lbl_801D53A8[k].vMin[0] = pVert[0][0];
+                    }
+                    if (pVert[0][1] < lbl_801D53A8[k].vMin[1]) {
+                        lbl_801D53A8[k].vMin[1] = pVert[0][1];
+                    }
+                    if (pVert[0][2] < lbl_801D53A8[k].vMin[2]) {
+                        lbl_801D53A8[k].vMin[2] = pVert[0][2];
+                    }
+                    if (pVert[0][0] > lbl_801D53A8[k].vMax[0]) {
+                        lbl_801D53A8[k].vMax[0] = pVert[0][0];
+                    }
+                    if (pVert[0][1] > lbl_801D53A8[k].vMax[1]) {
+                        lbl_801D53A8[k].vMax[1] = pVert[0][1];
+                    }
+                    if (pVert[0][2] > lbl_801D53A8[k].vMax[2]) {
+                        lbl_801D53A8[k].vMax[2] = pVert[0][2];
+                    }
+                    pVert++;
+                }
+            }
+            nBit <<= 1;
+        }
+    }
+    if (lbl_80281DC0) {
+        nHole = Game_CurrentHole();
+        for (k = 0; k < NUM_CUP_POSITIONS; k++) {
+            gpGame->holeOrder[Game_CurHoleIndex()] = k;
+            lbl_801D3CB0.pCourse->pin[k].x = (lbl_801D53A8[k].vMin[0] + lbl_801D53A8[k].vMax[0]) / 2.0f;
+            lbl_801D3CB0.pCourse->pin[k].z = (lbl_801D53A8[k].vMin[2] + lbl_801D53A8[k].vMax[2]) / 2.0f;
+            lbl_801D3CB0.pCourse->pin[k].y = lbl_801D53A8[k].vMax[1];
+            lbl_801D3CB0.pCourse->pin[k].w = 1.0f;
+        }
+        gpGame->holeOrder[Game_CurHoleIndex()] = nHole;
+    }
+    gpGame->p130 = &lbl_801D3CB0.pCourse->pin[Game_CurrentHole()].x;
+    lbl_80281DC8 = 0;
+    lbl_80281DC4 = 0;
+    fn_80050794(lbl_801D3CB0.pCourse);
+    lbl_801D3CB0.pCourse->fFloor = Ter_CalcLowestPlayableWorldHeight(lbl_801D3CB0.pCourse);
 }
 
 // TW06: bool Ter_Use3DCupGeometry(void). Whether the cup is real geometry the ball drops into;

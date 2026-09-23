@@ -613,7 +613,10 @@ typedef struct CourseInfo {
                                 //       bit 3 done (fn_80050794); bits 4-5 / 6-7 its highest / lowest corner
     u8*    pLight;              // 0x30  per vertex: the light on the ground there, 0..255 (fn_8004B78C)
     struct TerCell* pGrid;      // 0x34  nGridWidth x nGridLength cells, row by row. TW06: pTerrainGrid (0x3C)
-    u8     unk38[0x48 - 0x38];
+    u8*    p38;                 // 0x38  four optional blocks (NULL when absent); TW06 has its fog, sun,
+    u8*    p3C;                 // 0x3C    sky and lighting data in the same place
+    u8*    p40;                 // 0x40
+    u8*    p44;                 // 0x44
     struct TerObject* pObjects; // 0x48  the course objects. TW06: pObjectInstanceTable (0x54)
     struct TerPolyRef* pPolyRefs;   // 0x4C  TW06: pPolygonReferenceList (at 0x58 there)
     u16*   pObjRefs;            // 0x50  per cell, the objects in it (indices). TW06: pObjectReferenceList (0x5C)
