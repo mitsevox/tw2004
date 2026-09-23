@@ -748,8 +748,8 @@ int GM_ShowPostShotAnimation(int nPlayer) {
     SurfaceType* pSurf;
     f32          fHigh;
     f32          fLen;
-    f32          fRise;
     f32          fSlope;
+    f32          fRise;
 
     nResult = fn_8006AA9C(nPlayer);
     if (!fn_800E27A8()) {
