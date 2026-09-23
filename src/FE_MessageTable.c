@@ -14,7 +14,6 @@
 #include "game/earnings.h"
 
 // Outside this file.
-u32  fn_80013050(int nChan);            // the pad's device type (SIProbe)
 void fn_800142A4(s8 n);                 // sets lbl_80281C98
 void fn_80057438(SaveProfile* pProfile);
 void fn_8008E354(void);                 // FEgolferanim.c
@@ -58,7 +57,6 @@ s32  fn_8012411C(void);
 void fn_80124138(s32 n);
 s32  fn_80124174(void);
 s32  fn_801241CC(void);
-f32  fn_80012C30(char* sz);             // UFont.c
 
 // The other files' message handlers in the table (the Create-A-Player screens, the logo editor,
 // the PGA TOUR screens, the stats screen, the EA Sports Bio...).
