@@ -22,7 +22,8 @@ extern f32 lbl_80280638[4];
 // The callbacks the game hands the studio (uiProcessInterface.c sets them). Parameters come from
 // the studio's calls, or where noted from the game's own callback.
 typedef void (*UISCommandFn)(s32 nCmd, s32 n1, s32 n2, s32 n3, s32 n4, s32 n5);  // the game's fn_8008F568
-typedef u32 (*UISLoadFn)(void* p, u16 u);                       // the game's fn_8008F610
+// Returns the screen's UI file, still unfixed (the game's fn_8008F610, which ignores the group).
+typedef u32 (*UISLoadFn)(u16 uGroup, u16 uScreen);
 typedef void (*UISUnloadFn)(u16 uGroup, u16 uScreen, void* pData);
 typedef void (*UISTransformFn)(int nOp, void* pDesc);           // the game's fn_80093280
 typedef void (*UISScreenFn)(u16 uGroup, u16 uScreen);
@@ -37,13 +38,65 @@ typedef struct UISHandler {
     u32 u4;                         // 0x04: what a lookup returns (0: none)
 } UISHandler;
 
+// What a node's first word points at. fn_8016A830 hands the transform callback the part from
+// 0x08 on; its full size is not known.
+typedef struct UISNodeDesc {
+    u32 u0;                         // 0x00
+    s32 n4;                         // 0x04: set to 1 when the screen is loaded or brought back
+} UISNodeDesc;
+
+// An 8-byte entry of a UISNodeList.
+typedef struct UISNodeItem {
+    u16 uId;                        // 0x00: 0xFFFF for an unused entry
+    u16 u2;                         // 0x02: cleared when the file is fixed up
+    void* p4;                       // 0x04
+} UISNodeItem;
+
+// What a node's p8 array points at.
+typedef struct UISNodeList {
+    void* p0;                       // 0x00
+    u32 nItems;                     // 0x04
+    UISNodeItem* pItems;            // 0x08
+} UISNodeList;
+
 // A node of a loaded screen (0x14 bytes).
 typedef struct UISNode {
-    u8 unk0[0xC];
+    UISNodeDesc* pDesc;             // 0x00
+    u32 nLists;                     // 0x04
+    UISNodeList** ppLists;          // 0x08
     u32 nHandlers;                  // 0x0C
     UISHandler* pHandlers;          // 0x10
 } UISNode;
 LAYOUT_ASSERT(UISNode, 0x14);
+
+// A 12-byte entry of a UI file's third table.
+typedef struct UISFileEntryC {
+    u32 u0;                         // 0x00
+    u32 u4;                         // 0x04
+    void* p8;                       // 0x08
+} UISFileEntryC;
+LAYOUT_ASSERT(UISFileEntryC, 0xC);
+
+// An 8-byte entry of a UI file's last table.
+typedef struct UISFileEntry1C {
+    u32 u0;                         // 0x00
+    void* p4;                       // 0x04: 0 for none
+} UISFileEntry1C;
+LAYOUT_ASSERT(UISFileEntry1C, 0x8);
+
+// A UI file as loaded from the disc (a screen's data, or the studio's current file). Its pointer
+// fields hold offsets from the file's start until fn_80169DC4 fixes them up.
+// port: the file is laid out for a 32-bit machine; a port must read it through a loader instead.
+typedef struct UISFile {
+    u32 nNodes;                     // 0x00
+    UISNode* pNodes;                // 0x04
+    u32 nEntriesC;                  // 0x08
+    UISFileEntryC* pEntriesC;       // 0x0C
+    u32 nLinks;                     // 0x10
+    u32* pLinks;                    // 0x14: file offsets of words that name a pEntriesC entry
+    u32 nEntries1C;                 // 0x18
+    UISFileEntry1C* pEntries1C;     // 0x1C
+} UISFile;
 
 // A loaded screen (0x14 bytes, in the studio's screen table).
 typedef struct UISScreen {
@@ -53,7 +106,7 @@ typedef struct UISScreen {
     u16 uPrevGroup;                 // 0x08: with uPrevScreen, the screen made current when this
     u16 uPrevScreen;                // 0x0A: one is unloaded (fn_80168FC8)
     s32 bUnloading;                 // 0x0C: set while the screen waits to be unloaded
-    void* pData;                    // 0x10: what the load callback returned; the unload callback gets it
+    UISFile* pData;                 // 0x10: what the load callback returned; the unload callback gets it
 } UISScreen;
 LAYOUT_ASSERT(UISScreen, 0x14);
 
@@ -65,7 +118,7 @@ typedef struct UISCurrent {
     u16 u8;                         // 0x08
     u16 uA;                         // 0x0A
     s32 nC;                         // 0x0C
-    void* p10;                      // 0x10: a loaded UI file (fn_80169520)
+    UISFile* p10;                   // 0x10: a loaded UI file (fn_80169520)
 } UISCurrent;
 LAYOUT_ASSERT(UISCurrent, 0x14);
 
@@ -120,7 +173,7 @@ LAYOUT_ASSERT(UISFrame, 0x14);
 // paused script: fn_80169308 restores the frame and runs it on when the screen it names is done.
 typedef struct UISRecord60 {
     UISFrame frame;                 // 0x00: a copy of *pFrame, taken when the script paused
-    s32 n14;                        // 0x14: fn_80166098's last argument
+    UISNodeDesc* pDesc;             // 0x14: the screen's first node's; fn_80166098's last argument
     UISScreen* pScreen;             // 0x18: the screen whose script paused
     s32* p1C;                       // 0x1C: fn_80166098's second argument; also a stack top
     UISFrame* pFrame;               // 0x20: the live frame
@@ -168,7 +221,7 @@ typedef struct UIStudio {
     s32 nRateFns;                   // 0x50: rate functions in use
     UISRateFn* pRateFns;            // 0x54
     u32 nMax60;                     // 0x58
-    s32 n5C;                        // 0x5C: records in use in p60
+    u32 n5C;                        // 0x5C: records in use in p60
     UISRecord60* p60;               // 0x60
     UISWordStack stack64;           // 0x64: the event words; the event stack grows down from its end
     u8 unk74[4];
@@ -196,7 +249,7 @@ u32 fn_8016604C(UIStudio* pStudio, u32 u18, u32 uId);
 
 // UIStudio.c
 // Runs a screen's script from pFrame (a bytecode interpreter).
-s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, s32 n);
+s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, UISNodeDesc* pDesc);
 void fn_80168B80(UIStudio* pStudio, u32 uEvent);
 
 // UISApi.c
@@ -205,9 +258,13 @@ void fn_80168CD8(UIStudio* pStudio, UISWordStack* pStack, u32 uEvent, s32 n, u8 
 void fn_80168DB0(UIStudio* pStudio, u32 uEvent, s32 n, u8 b, void* p, u8 bAll);
 void fn_80168EE8(UIStudio* pStudio, u16* puGroup, u16* puScreen);
 void fn_80168F5C(UIStudio* pStudio, s16 nGroup, s16 nScreen);
-s32 fn_801694A0(UIStudio* pStudio, s16 nGroup, s16 nScreen, u8 nArgs, s32* pArgs);
-u8 fn_80169520(UIStudio* pStudio, void* pFile);
-s32 fn_80169590(UIStudio* pStudio, s16 nGroup, s16 nScreen, s32 n, u8 nArgs, s32* pArgs);
+s32 fn_80168FC8(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 n);
+u8 fn_80169308(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 n);
+s32 fn_801694A0(UIStudio* pStudio, u16 uGroup, u16 uScreen, u8 nArgs, s32* pArgs);
+u8 fn_80169520(UIStudio* pStudio, UISFile* pFile);
+s32 fn_80169590(UIStudio* pStudio, u16 uGroup, u16 uScreen, u8 bPush, u8 nArgs, s32* pArgs);
+s32 fn_80169858(UIStudio* pStudio, u16 uGroup, u16 uScreen, u16 uPrevGroup, u16 uPrevScreen, u8 nArgs,
+                s32* pArgs);
 void fn_80169B0C(UIStudio* pStudio, s32 nIndex, UISHandlerFn pfnHandler);
 void fn_80169B28(UIStudio* pStudio, UISTransformFn pfnTransform);
 void fn_80169B30(UIStudio* pStudio, UISLoadFn pfnLoad, UISUnloadFn pfnUnload);
@@ -217,7 +274,7 @@ void fn_80169B4C(UIStudio* pStudio);
 void fn_80169C0C(UIStudio* pStudio, u32 nScreens, u32 nHandlers, u32 nRateFns, u32 n60, u32 nEventWords,
                  u32 nWords2, u32 uMsPerTick);
 u32 fn_80169D90(u32 nScreens, u32 nHandlers, u32 nRateFns, u32 n60, u32 nEventWords, u32 nWords2);
-u8 fn_80169DC4(void* pFile);
+u8 fn_80169DC4(UISFile* pFile);
 void fn_8016A030(UIStudio* pStudio, u32 uMs);
 
 // UISScreen.c (0x8016A2D4-0x8016C718)

@@ -111,6 +111,96 @@ void fn_80168F5C(UIStudio* pStudio, s16 nGroup, s16 nScreen) {
     }
 }
 
+// Unloads a screen. Screens that named it as their previous screen take its previous screen
+// instead; it gets event -1, its queued events, nodes and rate functions are dropped, the unload
+// callback frees its data and the table closes up. With no current screen left, its previous
+// screen (or the last one) becomes current through event 3. Returns 0 when fn_80169308 says the
+// screen cannot go yet.
+s32 fn_80168FC8(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 n) {
+    u32 nIndex;
+    UISScreen* pScreen;
+    UISScreen* pSrc;
+    u16 uPrevScreen;
+    u16 uPrevGroup;
+    u32 i;
+    UISEventData data;
+    u8 bOut;
+
+    nIndex = fn_8016C6C4(pStudio, uGroup, uScreen);
+    if (nIndex < pStudio->nScreens) {
+        pScreen = &pStudio->pScreens[nIndex];
+        uPrevGroup = pScreen->uPrevGroup;
+        uPrevScreen = pScreen->uPrevScreen;
+        if (!fn_80169308(pStudio, uGroup, uScreen, n)) return 0;
+        if (nIndex == pStudio->nCurScreen) {
+            pStudio->nCurScreen = -1;
+        }
+        for (i = 0; i < pStudio->nScreens; i++) {
+            pSrc = &pStudio->pScreens[i];
+            if (pSrc->uPrevGroup == uGroup && pSrc->uPrevScreen == uScreen) {
+                pSrc->uPrevGroup = uPrevGroup;
+                pSrc->uPrevScreen = uPrevScreen;
+            }
+        }
+        bOut = 0;
+        pStudio->uFlags |= 2;
+        fn_8016A2D4(pStudio, pScreen, &pStudio->stack64, 0, -1, -3, 0, NULL, &bOut);
+        pStudio->uFlags &= ~2;
+        fn_80165ACC(pStudio, uGroup, uScreen);
+        fn_8016AEEC(pStudio, pScreen, 0, -3);
+        fn_8016A830(pStudio, 3, pScreen, 0);
+        i = pStudio->nRateFns;
+        while (i-- != 0) {
+            if (pStudio->pRateFns[i].pScreen == pScreen) {
+                pStudio->pRateFns[i].uState = 1;
+            }
+        }
+        fn_80165C74(pStudio);
+        pStudio->pfnUnload(pScreen->uGroup, pScreen->uScreen, pScreen->pData);
+        pScreen->pData = NULL;
+        pStudio->nScreens--;
+        for (; nIndex < pStudio->nScreens; nIndex++) {
+            pScreen = &pStudio->pScreens[nIndex];
+            pSrc = &pStudio->pScreens[nIndex + 1];
+            memmove(pScreen, pSrc, sizeof(UISScreen));
+            i = pStudio->n5C;
+            while (i-- != 0) {
+                if (pStudio->p60[i].pScreen == pSrc) {
+                    pStudio->p60[i].pScreen = pScreen;
+                }
+            }
+            i = pStudio->nMaxRateFns;
+            while (i-- != 0) {
+                if (pStudio->pRateFns[i].pScreen == pSrc) {
+                    pStudio->pRateFns[i].pScreen = pScreen;
+                }
+            }
+            if (nIndex + 1 == pStudio->nCurScreen) {
+                pStudio->nCurScreen = nIndex;
+            }
+        }
+        if (pStudio->nCurScreen == -1) {
+            if (pStudio->nScreens != 0) {
+                pStudio->nCurScreen = fn_8016C6C4(pStudio, uPrevGroup, uPrevScreen);
+                if (pStudio->nCurScreen < pStudio->nScreens) {
+                    pScreen = &pStudio->pScreens[pStudio->nCurScreen];
+                } else {
+                    pStudio->nCurScreen = pStudio->nScreens - 1;
+                    pScreen = &pStudio->pScreens[pStudio->nCurScreen];
+                }
+                if (pScreen != NULL) {
+                    data.aw[0] = pScreen->uGroup;
+                    data.aw[1] = pScreen->uScreen;
+                    fn_80165B90(data.aw[0], data.aw[1], pStudio, 3, &data, 0, NULL);
+                }
+            } else {
+                pStudio->nCurScreen = -1;
+            }
+        }
+    }
+    return 1;
+}
+
 // Called before a screen is unloaded. If the last p60 record names the screen, it is dropped:
 // the screen it holds becomes current, and its paused script runs on with n on the top of its
 // stack. Returns 0 when an older record names the screen, or holds it: it cannot go yet.
@@ -140,7 +230,7 @@ u8 fn_80169308(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 n) {
                     pFrame = pRec->pFrame;
                     *pFrame = pRec->frame;
                     pFrame->pC[-1] = n;
-                    if (fn_80166098(pStudio, pRec->p1C, pFrame, pRec->pScreen, pRec->n14) != 3) {
+                    if (fn_80166098(pStudio, pRec->p1C, pFrame, pRec->pScreen, pRec->pDesc) != 3) {
                         pFrame->pC = p1C;
                     }
                 }
@@ -158,23 +248,24 @@ u8 fn_80169308(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 n) {
 }
 
 // Goes to a screen: queued as event 0 while an event is being sent, at once otherwise.
-s32 fn_801694A0(UIStudio* pStudio, s16 nGroup, s16 nScreen, u8 nArgs, s32* pArgs) {
+s32 fn_801694A0(UIStudio* pStudio, u16 uGroup, u16 uScreen, u8 nArgs, s32* pArgs) {
     UISEventData data;
 
     if (pStudio->uFlags & 2) {
-        data.aw[0] = nGroup;
-        data.aw[1] = nScreen;
+        data.aw[0] = uGroup;
+        data.aw[1] = uScreen;
         data.aw[2] = 0xFFFF;
         data.aw[3] = 0xFFFF;
-        fn_80165B90(nGroup, nScreen, pStudio, 0, &data, nArgs, pArgs);
-        return 1;
+        fn_80165B90(uGroup, uScreen, pStudio, 0, &data, nArgs, pArgs);
+    } else {
+        return fn_80169590(pStudio, uGroup, uScreen, 0, nArgs, pArgs);
     }
-    return fn_80169590(pStudio, nGroup, nScreen, 0, nArgs, pArgs);
+    return 1;
 }
 
 // Makes pFile the studio's UI file, fixing up its offsets the first time it is seen. Returns
 // whether the file can be used; a file that cannot is dropped.
-u8 fn_80169520(UIStudio* pStudio, void* pFile) {
+u8 fn_80169520(UIStudio* pStudio, UISFile* pFile) {
     u8 bOk;
 
     bOk = 0;
@@ -190,6 +281,136 @@ u8 fn_80169520(UIStudio* pStudio, void* pFile) {
     }
     pStudio->pCurrent->p10 = pFile;
     return bOk;
+}
+
+// Brings back a screen that is already loaded: its rate functions are finished, its first node
+// is marked active again and it gets event -2 with the arguments (nArgs 0xFF: the count is in
+// pArgs[10]). Returns 0: nothing new was loaded.
+static inline s32 Screen_BringBack(UIStudio* pStudio, u16 uGroup, u16 uScreen, u8 nArgs, s32* pArgs) {
+    UISScreen* pScreen;
+    u32 i;
+    u32 n;
+    u8 bOut;
+
+    pScreen = &pStudio->pScreens[fn_8016C6C4(pStudio, uGroup, uScreen)];
+    fn_80165C74(pStudio);
+    pStudio->uFlags |= 4;
+    n = pStudio->nRateFns;
+    for (i = 0; i < n; i++) {
+        if (pStudio->pRateFns[i].pScreen == pScreen) {
+            pStudio->pRateFns[i].uState = 1;
+        }
+    }
+    pStudio->uFlags &= ~4;
+    fn_80165C74(pStudio);
+    pScreen->pData->pNodes[0].pDesc->n4 = 1;
+    bOut = 0;
+    if (nArgs == 0xFF) {
+        nArgs = pArgs[10];
+    }
+    pStudio->uFlags |= 2;
+    fn_8016A2D4(pStudio, pScreen, &pStudio->stack64, 0, -1, -2, nArgs, pArgs, &bOut);
+    pStudio->uFlags &= ~2;
+    return 0;
+}
+
+// Goes to a screen. A loaded one is brought back; otherwise it is loaded, and with bPush (forced
+// while p60 holds records) a p60 record is pushed for it that remembers the screen that was
+// current and the new screen's first node. Returns what fn_80169858 returned.
+s32 fn_80169590(UIStudio* pStudio, u16 uGroup, u16 uScreen, u8 bPush, u8 nArgs, s32* pArgs) {
+    u32 nRecord;
+    s16 nPrevGroup;
+    s16 nPrevScreen;
+    u8 bLoaded;
+    s32 nResult;
+    UISRecord60* pRec;
+    u16 uIndex;
+
+    nRecord = 0;
+    if (pStudio->nScreens == 0 || pStudio->nCurScreen == -1) {
+        nPrevGroup = -1;
+        nPrevScreen = -1;
+    } else {
+        nPrevGroup = pStudio->pScreens[pStudio->nCurScreen].uGroup;
+        nPrevScreen = pStudio->pScreens[pStudio->nCurScreen].uScreen;
+    }
+    bLoaded = fn_8016C6C4(pStudio, uGroup, uScreen) < pStudio->nScreens;
+    if (bLoaded == 1) {
+        return Screen_BringBack(pStudio, uGroup, uScreen, nArgs, pArgs);
+    }
+    if (pStudio->n5C != 0 && !bLoaded) {
+        bPush = 1;
+    }
+    if (bPush) {
+        nRecord = pStudio->n5C;
+        pRec = &pStudio->p60[nRecord];
+        memset(pRec, 0, sizeof(UISRecord60));
+        pRec->u26 = uGroup;
+        pRec->u24 = uScreen;
+        pStudio->n5C++;
+    }
+    nResult = fn_80169858(pStudio, uGroup, uScreen, nPrevGroup, nPrevScreen, nArgs, pArgs);
+    if (bPush) {
+        uIndex = fn_8016C6C4(pStudio, uGroup, uScreen);
+        if (uIndex < (s32)pStudio->nScreens) {  // fake match: this compare is signed
+            pRec = &pStudio->p60[nRecord];
+            pRec->pDesc = pStudio->pScreens[uIndex].pData->pNodes[0].pDesc;
+            uIndex = fn_8016C6C4(pStudio, nPrevGroup, nPrevScreen);
+            if (uIndex < (s32)pStudio->nScreens) {  // fake match: this compare is signed
+                pRec->pScreen = &pStudio->pScreens[uIndex];
+            }
+        } else {
+            pStudio->n5C--;
+        }
+    }
+    return nResult;
+}
+
+// Loads a screen and makes it the newest in the table, with uPrevGroup and uPrevScreen as the
+// screen to go back to. Its UI file is fixed up (event -9 when that was its first time), its
+// nodes are set up and it gets event -2 with the arguments. A loaded screen is brought back
+// instead. Returns 0 when the load callback gave nothing or the screen was already loaded.
+s32 fn_80169858(UIStudio* pStudio, u16 uGroup, u16 uScreen, u16 uPrevGroup, u16 uPrevScreen, u8 nArgs,
+                s32* pArgs) {
+    u32 nIndex;
+    u32 uFile;
+    UISScreen* pScreen;
+    u8 bFixed;
+    u8 bOut;
+
+    nIndex = fn_8016C6C4(pStudio, uGroup, uScreen);
+    if (nIndex < pStudio->nScreens) {
+        return Screen_BringBack(pStudio, uGroup, uScreen, nArgs, pArgs);
+    }
+    uFile = pStudio->pfnLoad(uGroup, uScreen);
+    if (uFile == 0) return 0;
+    pStudio->nScreens++;
+    pScreen = &pStudio->pScreens[nIndex];
+    pScreen->uGroup = uGroup;
+    pScreen->uScreen = uScreen;
+    pScreen->uPrevGroup = uPrevGroup;
+    pScreen->uPrevScreen = uPrevScreen;
+    pScreen->uMask = 0;
+    pScreen->bUnloading = 0;
+    pScreen->pData = (UISFile*)uFile;  // port: the load callback returns the file's address as a u32
+    bFixed = fn_80169DC4(pScreen->pData);
+    fn_8016AEEC(pStudio, pScreen, 0, -1);
+    pScreen->pData->pNodes[0].pDesc->n4 = 1;
+    if (bFixed) {
+        bOut = 0;
+        pStudio->uFlags |= 2;
+        fn_8016A2D4(pStudio, pScreen, &pStudio->stack64, 0, -1, -9, 0, NULL, &bOut);
+        pStudio->uFlags &= ~2;
+    }
+    fn_8016A830(pStudio, 0, pScreen, 0);
+    bOut = 0;
+    if (nArgs == 0xFF) {
+        nArgs = pArgs[10];
+    }
+    pStudio->uFlags |= 2;
+    fn_8016A2D4(pStudio, pScreen, &pStudio->stack64, 0, -1, -2, nArgs, pArgs, &bOut);
+    pStudio->uFlags &= ~2;
+    return 1;
 }
 
 void fn_80169B0C(UIStudio* pStudio, s32 nIndex, UISHandlerFn pfnHandler) {
