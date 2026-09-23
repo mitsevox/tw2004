@@ -28,6 +28,7 @@ SPLITS = ROOT / 'config/GW4E69/splits.txt'
 CONFIGURE = ROOT / 'configure.py'
 MAP = ROOT / 'config/GW4E69/filemap.json'
 NOTES = []                                           # what to look at if a new unit does not compile
+SWEEP_CODE_OF = {}                                   # sweep -> its function bodies (merge_sweeps)
 UNIT_HEAD = re.compile(r'\n(?=\S[^\n]*:\n)')
 
 
@@ -106,6 +107,52 @@ def candidates(blocks, exclude):
     return good, skipped
 
 
+TYPE_WORDS = {'void', 'char', 'short', 'int', 'long', 'float', 'double', 'signed', 'unsigned', 'const', 'volatile',
+              's8', 'u8', 's16', 'u16', 's32', 'u32', 's64', 'u64', 'f32', 'f64', 'BOOL', 'struct'}
+NARROW = re.compile(r'\b(f32|f64|float|double|s8|u8|s16|u16|char|short)\b(?!\s*\*)')
+
+
+def param_types(args):
+    """A parameter list without the parameter names: 's32 a, u8* p' -> ('s32', 'u8*')."""
+    args = args.strip()
+    if args in ('', 'void'):
+        return () if args == 'void' else None
+    out = []
+    for p in args.split(','):
+        p = re.sub(r'\s+', ' ', p.strip())
+        m = re.match(r'^(.*?[\s\*])(\w+)$', p)
+        if m and m.group(2) not in TYPE_WORDS:
+            p = m.group(1)
+        out.append(re.sub(r'\s*\*', '*', p).strip())
+    return tuple(out)
+
+
+def choose_prototype(nm, versions, code, owner):
+    """One prototype for a function the sweeps declared differently. The untyped `()` ones give way
+    to a typed one; when the typed ones disagree, the defining sweep's own wins (its callers may then
+    need a cast or the argument they left out); a function defined elsewhere whose versions take only
+    ints and pointers is declared `ret name();`, which leaves every call as it was compiled."""
+    typed = [(d, t) for d, t in versions if t is not None]
+    rets = {re.sub(r'\s+', ' ', d[:d.index(nm + '(')].replace('extern', '')).strip() for d, _ in versions}
+    if len(rets) > 1:
+        NOTES.append('%s returns %s in different sweeps' % (nm, ' / '.join(sorted(rets))))
+    if not typed:
+        return versions[0][0]
+    if len({t for _, t in typed}) == 1:
+        return typed[0][0]
+    defining = [d for d, t in typed
+                if re.search(r'^[A-Za-z_][\w \*]*\b%s\([^;]*\)\s*\{' % nm, code, re.M) and
+                re.search(r'^[A-Za-z_][\w \*]*\b%s\([^;]*\)\s*\{' % nm, SWEEP_CODE_OF[owner[d]], re.M)]
+    if defining:
+        NOTES.append("%s: sweeps disagree on its parameters; kept its definition's" % nm)
+        return defining[0]
+    if not any(NARROW.search(' '.join(t)) for _, t in typed):
+        d = typed[0][0]
+        NOTES.append('%s: sweeps disagree on its parameters; declared without them' % nm)
+        return d[:d.index(nm + '(')] + nm + '();'
+    raise ValueError('%s is declared with two parameter lists' % nm)
+
+
 def merge_sweeps(sweeps):
     """Includes, declarations (merged) and bodies of the sweep sources, in address order."""
     includes, decls, bodies, owner, sweep_code = [], [], [], {}, {}
@@ -134,24 +181,24 @@ def merge_sweeps(sweeps):
         if depth != 0 or ''.join(cur).strip():
             raise ValueError('cannot parse ' + s)
         sweep_code[s] = '\n'.join(bodies[first_body:])
-    keep, funcs, data, rets = [], {}, {}, {}
+    SWEEP_CODE_OF.clear()
+    SWEEP_CODE_OF.update(sweep_code)
+    protos = {}                                        # function -> [(declaration, parameter types)]
     for d in decls:
         m = re.match(r'^(?:extern\s+)?[A-Za-z_][\w \*]*?\b(\w+)\((.*)\);$', d)
-        if m:                                          # a function: keep the first typed prototype
-            nm, args = m.group(1), m.group(2).strip()
-            ret = re.sub(r'\s+', ' ', d[:d.index(nm + '(')].replace('extern', '')).strip()
-            if nm in funcs:
-                i, old = funcs[nm]
-                if rets[nm] != ret:
-                    NOTES.append('%s returns %s in one sweep and %s in another' % (nm, rets[nm], ret))
-                if old == '' and args != '':
-                    keep[i] = d
-                    funcs[nm] = (i, args)
-                elif args not in ('', old):
-                    raise ValueError('%s is declared with two parameter lists' % nm)
+        if m:
+            protos.setdefault(m.group(1), []).append((d, param_types(m.group(2))))
+    code = '\n'.join(bodies)
+    keep, done, data = [], set(), {}
+    for d in decls:
+        m = re.match(r'^(?:extern\s+)?[A-Za-z_][\w \*]*?\b(\w+)\((.*)\);$', d)
+        if m:                                          # a function: one prototype for the unit
+            nm = m.group(1)
+            if nm in done:
                 continue
-            funcs[nm] = (len(keep), args)
-            rets[nm] = ret
+            done.add(nm)
+            keep.append(choose_prototype(nm, protos[nm], code, owner))
+            continue
         else:
             m = re.match(r'^extern\s+(.*?)\b(\w+)\s*(\[[^\]]*\])?\s*;$', d)
             if m:                                      # data: one type per name
