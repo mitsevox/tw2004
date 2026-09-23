@@ -11,10 +11,10 @@ int fn_80007BC4(RenderObj* obj, Camera* cam, float* outDepth, int mode, float sc
     Vec4 pos;
     Sphere* bounds = fn_800082F8(obj);
 
-    Vec3Copy((Vec3*)bounds, (Vec3*)&pos);
+    Vec3Copy((f32*)bounds, (f32*)&pos);
     pos.w = 1.0f;
     fn_800BAD60(cam->viewMtx, &pos, &pos);
-    Vec3Copy((Vec3*)&pos, (Vec3*)&sphere);
+    Vec3Copy((f32*)&pos, (f32*)&sphere);
     if (outDepth != 0) {
         *outDepth = sphere.z;
     }
@@ -25,10 +25,10 @@ int fn_80007BC4(RenderObj* obj, Camera* cam, float* outDepth, int mode, float sc
 void fn_80007C80(Camera* cam, const Vec3* src, Vec3* dst) {
     Vec4 pos;
 
-    Vec3Copy(src, (Vec3*)&pos);
+    Vec3Copy((f32*)src, (f32*)&pos);
     pos.w = 1.0f;
     fn_800BAD60(cam->viewMtx, &pos, &pos);
-    Vec3Copy((Vec3*)&pos, dst);
+    Vec3Copy((f32*)&pos, (f32*)dst);
 }
 
 int fn_80007CE8(RenderObj* obj, Camera* cam, int mode, float scale) {
@@ -86,10 +86,10 @@ int fn_80007D74(Sphere* s, Camera* cam, int mode) {
         }
         return result;
     } else {
-        float top    =  fn_80008370(cam)->unkB8 / 2.0f;
-        float bottom = -fn_80008370(cam)->unkB8 / 2.0f;
-        float right  =  fn_80008370(cam)->unkB4 / 2.0f;
-        float left   = -fn_80008370(cam)->unkB4 / 2.0f;
+        float top    =  fn_80008370(cam)->fB8 / 2.0f;
+        float bottom = -fn_80008370(cam)->fB8 / 2.0f;
+        float right  =  fn_80008370(cam)->fB4 / 2.0f;
+        float left   = -fn_80008370(cam)->fB4 / 2.0f;
 
         if (s->z + s->radius > fn_80008368(cam)) return 2;
         if (s->z + s->radius < fn_80008360(cam)) return 2;
