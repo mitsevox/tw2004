@@ -606,7 +606,7 @@ config.libs = [
         "progress_category": "sdk",
         "src_dir": "extern/sdk",
         "objects": [
-            Object(NonMatching, "dolphin/ar/ar.c"),
+            Object(Matching, "dolphin/ar/ar.c"),
         ],
     },
     {
@@ -751,7 +751,7 @@ config.libs = [
             Object(Matching, "dolphin/os/OS.c"),
             Object(Matching, "dolphin/os/OSError.c"),
             Object(Matching, "dolphin/os/OSContext.c"),
-            Object(NonMatching, "dolphin/os/OSReboot.c"),
+            Object(Matching, "dolphin/os/OSReboot.c"),
             Object(Matching, "dolphin/os/OSAlarm.c"),
             Object(Matching, "dolphin/os/OSArena.c"),
             Object(Matching, "dolphin/os/OSCache.c"),

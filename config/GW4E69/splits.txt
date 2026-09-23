@@ -1256,6 +1256,9 @@ unsorted/sweep_801338E0.c:
 
 dolphin/ar/ar.c:
 	.text       start:0x80133918 end:0x8013538C
+	.data       start:0x80195DA0 end:0x80195DE8
+	.sdata      start:0x802819D8 end:0x802819E0
+	.sbss       start:0x80282640 end:0x80282660
 
 libs/dolphin/src/ar/arq.c:
 	.text       start:0x8013538C end:0x80135810
@@ -1520,6 +1523,8 @@ dolphin/os/OSMutex.c:
 
 dolphin/os/OSReboot.c:
 	.text       start:0x8014B70C end:0x8014B8F0
+	.bss        start:0x8027CA00 end:0x8027CA20
+	.sbss       start:0x80282910 end:0x80282920
 
 dolphin/os/OSReset.c:
 	.text       start:0x8014B8F0 end:0x8014BCD4
