@@ -19,7 +19,7 @@ EASBErrorE fn_8012CCD8(s32 nNeed) {
 // Frees the product buffer.
 EASBErrorE fn_8012CF00(void) {
     if (lbl_802825B8->pProductBuffer == NULL) return EASB_ERROR_PRODUCT_NOT_LOADED;
-    TibExtMemFree(lbl_802825B8->pAllocator, lbl_802825B8->pProductBuffer, EASB_PRODUCT_BUFFER_SIZE, 4);
+    TibExtMemFree(lbl_802825B8->uHeapID, lbl_802825B8->pProductBuffer, EASB_PRODUCT_BUFFER_SIZE, 4);
     lbl_802825B8->pProductBuffer = NULL;
     lbl_802825B8->b11D0 = 27;
     return EASB_ERROR_NONE;

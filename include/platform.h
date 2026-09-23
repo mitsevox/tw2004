@@ -44,15 +44,23 @@ int    memcmp(const void* pA, const void* pB, u32 uLen);
 u32    strlen(const char* p);
 char*  strcpy(char* pDst, const char* pSrc);
 char*  strncpy(char* pDst, const char* pSrc, u32 uLen);
+char*  strcat(char* pDst, const char* pSrc);
 int    strcmp(const char* a, const char* b);
+int    strncmp(const char* a, const char* b, u32 uLen);
 char*  strstr(const char* pStr, const char* pFind);
+int    atoi(const char* p);
 int    sprintf(char* pBuf, const char* pFmt, ...);
+int    snprintf(char* pBuf, u32 uLen, const char* pFmt, ...);
+int    atoi(const char* p);
 double atan(double x);
+double sin(double x);
+double cos(double x);
 double fabs(double x);                  // 0x8000AE94
 double floor(double x);
 #else
 #include <math.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #endif
 
@@ -76,5 +84,6 @@ LAYOUT_ASSERT(OSCalendarTime, 0x28);
 s64  OSGetTime(void);           // the time base, in ticks
 void OSTicksToCalendarTime(s64 nTicks, OSCalendarTime* pTime);
 u32  OSGetTick(void);           // the low 32 bits of the time base
+void OSReport(const char* pFmt, ...);   // debug print (nothing in the retail build)
 
 #endif

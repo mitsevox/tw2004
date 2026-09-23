@@ -46,8 +46,6 @@ void fn_800EF294(void);
 void GameModeDriverPGATour_EndHole(void);
 u8   GameModeDriverPGATour_GameFinished(u8 bCheck);
 u8   GameModeDriverPGATour_GoToPlayoff(u8 bCheck);
-Tournament* fn_800EFA70(s32 i);
-s32  GameModeDriverPGATour_GetRounds(s32 i);
 s32  GameModeDriverPGATour_GetEventOnOrAfter(s32 i);
 s32  fn_800F02A8(void);
 

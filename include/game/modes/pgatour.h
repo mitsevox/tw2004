@@ -79,6 +79,15 @@ char* GameModeDriverPGATour_GetName(s32 i);
 s32  fn_800EFE3C(s32 i);
 int  fn_800F009C(void);                 // the leader's score in the current tournament
 int  fn_800F018C(void);                 // the player's own score in it
+
+// GameModeDriverPGATour.c, as the calendar's event details (EventInfo.c) use it
+s32  GameModeDriverPGATour_GetCourses(Tournament* p, s32* pCourses);
+void GameModeDriverPGATour_GetWinnerEarningsString(s32 i, char* pDst);
+void GameModeDriverPGATour_GetCurrentEventLeader(char* pDst);
+void GameModeDriverPGATour_GetPurseString(s32 i, char* pDst);
+void GameModeDriverPGATour_GetUserFinishString(s32 i, char* pDst);
+void GameModeDriverPGATour_GetChamp(s32 i, char* pDst);
+s32  GameModeDriverPGATour_GetChampScore(s32 i);
 s32  fn_800F0428(s32 nPlayer);
 
 #endif

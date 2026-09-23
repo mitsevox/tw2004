@@ -237,7 +237,7 @@ s32 fn_800A2100(s32 nPort, s32 nSlot) {
     return nResult;
 }
 
-s32 fn_800A218C(void) {
+s32 fn_800A218C(s32 nPort, s32 nSlot) {
     return MC_ERR_NOFILE;
 }
 

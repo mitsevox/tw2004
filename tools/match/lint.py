@@ -3,14 +3,21 @@
     python tools/match/lint.py --summary [files]  counts per file and rule instead of each line
     python tools/match/lint.py --diff main       only lines added or changed since main (use this
                                                   on a branch: old debt in untouched lines is skipped)
+    python tools/match/lint.py --diff main --compile   also compile every unit the branch touches
+                                                  (changed .c files and units including a changed
+                                                  header) with its real command: the DOL build never
+                                                  compiles a NonMatching unit. `ninja all_source`
+                                                  compiles every unit.
 Exits 1 if anything is found. Rules and the reason for each are in docs/style.md."""
 import pathlib, re, sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]   # the checkout this script lives in
 sys.path.insert(0, str(ROOT / 'tools/match'))
 import sweepblock                                    # noqa: E402
+import includes                                      # noqa: E402
 
 SWEEP_DEBT = {}                                      # file name -> lines of uncleaned sweep code
+COMPILE_ERRORS = set()                               # (file name, line) the style pass reported
 
 CHECKS = [
     ('m2c-leftover', re.compile(r'\b(temp|var)_[rf]\d+\b|\bM2C_|\bsp[0-9A-F]{1,3}\b|^\s*\?\*? \w+;')),
@@ -83,12 +90,13 @@ EARLY_EXIT = re.compile(r'\)\s*(return\b[^;]*|break|continue);\s*(//.*)?$')
 
 
 def header_protos():
-    """name -> normalized signature, from the top-level headers."""
+    """name -> [(normalized signature, header path)], from every header under include/. lint()
+    compares a file only with the headers it includes, directly or not (includes.py)."""
     out = {}
-    for h in (ROOT / 'include').glob('*.h'):
+    for h in sorted((ROOT / 'include').rglob('*.h')):
         for m in re.finditer(r'^(?!typedef|#|\s)([\w \*]+?)\b(\w+)\s*\(([^;{}]*)\)\s*;',
                              h.read_text(encoding='utf-8', errors='replace'), re.M):
-            out[m.group(2)] = (norm(m.group(1), m.group(3)), h.name)
+            out.setdefault(m.group(2), []).append((norm(m.group(1), m.group(3)), h.resolve()))
     return out
 
 
@@ -115,6 +123,7 @@ def lint(path, protos):
     if not re.match(r'// \w+\.c\b', lines[0]):
         hits.append((1, 'header-comment', 'first line should be "// <File>.c (our name): ..."'))
     raw_sweep = sweepblock.lines_in_blocks(lines)      # style rules wait until the code is cleaned
+    seen = includes.seen_headers(path)
     SWEEP_DEBT[path.name] = len(raw_sweep)
     for i, l in enumerate(lines, 1):
         l = l.rstrip('\r')
@@ -133,13 +142,16 @@ def lint(path, protos):
         if re.search(r'\bgoto\b', l) and 'fake match' not in l and 'fake match' not in lines[i - 2]:
             hits.append((i, 'goto-unmarked', l.strip()))
         m = re.match(r'^(?!typedef|return|#|static)([A-Za-z_][\w \*]*?[\s\*])(\w+)\s*\(([^;{}]*)\)\s*;(.*)$', l)
-        if m and m.group(2) in protos:
-            sig, hname = protos[m.group(2)]
-            if norm(m.group(1), m.group(3)) == sig:
-                hits.append((i, 'dup-prototype', '%s is already declared in %s' % (m.group(2), hname)))
+        # only the headers this file includes count: one it does not see declares nothing here
+        decl = [(sig, h) for sig, h in protos.get(m.group(2), []) if h in seen] if m else []
+        if decl:
+            same = [h for sig, h in decl if sig == norm(m.group(1), m.group(3))]
+            if same:
+                hits.append((i, 'dup-prototype', '%s is already declared in %s'
+                             % (m.group(2), includes.label(same[0]))))
             elif '//' not in m.group(4):
                 hits.append((i, 'proto-mismatch', '%s differs from %s with no comment saying why'
-                             % (m.group(2), hname)))
+                             % (m.group(2), includes.label(decl[0][1]))))
     hits += [h for h in asm_fallback_hits(lines) if h[0] not in raw_sweep]
     return hits + ub_check(path, lines)
 
@@ -257,12 +269,77 @@ def changed_lines(rev):
     return res
 
 
+def touched_units(rev):
+    """The src/ units a branch touches since it left rev: .c files it changed, and every unit that
+    includes (directly or not) a header it changed. Paths relative to src/, without .c."""
+    import subprocess
+    base = subprocess.run(['git', 'merge-base', rev, 'HEAD'], cwd=ROOT,
+                          capture_output=True, text=True).stdout.strip() or rev
+    names = subprocess.run(['git', 'diff', '--name-only', base, '--', 'src', 'include'], cwd=ROOT,
+                           capture_output=True, text=True).stdout.split()
+    names += subprocess.run(['git', 'ls-files', '--others', '--exclude-standard', '--', 'src',
+                             'include'], cwd=ROOT, capture_output=True, text=True).stdout.split()
+    units = {n[4:-2] for n in names if n.startswith('src/') and n.endswith('.c')
+             and (ROOT / n).exists()}
+    headers = {(ROOT / n).resolve() for n in names if n.endswith('.h') and (ROOT / n).exists()}
+    if headers:
+        for c in (ROOT / 'src').rglob('*.c'):
+            if includes.seen_headers(c) & headers:
+                units.add(c.relative_to(ROOT / 'src').with_suffix('').as_posix())
+    return sorted(units)
+
+
+def compile_units(units):
+    """Build each unit's object with its own build.ninja command (its compiler version and flags),
+    through ninja, so a NonMatching unit, which the DOL build never compiles, is checked too.
+    -> [(file name, line, 'compile-error', message)]"""
+    import subprocess
+    ninja = (ROOT / 'build.ninja').read_text(encoding='utf-8', errors='replace')
+    targets, missing = [], []
+    for u in units:
+        t = 'build\\GW4E69\\src\\%s.o' % u.replace('/', '\\')
+        (targets if ('build %s:' % t) in ninja else missing).append((u, t))
+    out = []
+    for u, _ in missing:
+        out.append((u + '.c', 1, 'compile-error', 'not in build.ninja: not a unit in configure.py '
+                    '(or run python configure.py)'))
+    if not targets:
+        return out
+    r = subprocess.run(['ninja', '-k', '0'] + [t for _, t in targets], cwd=ROOT,
+                       capture_output=True, text=True)
+    failed, cur, msg = {}, None, []
+    for l in r.stdout.splitlines() + ['[end]']:
+        m = re.match(r'^FAILED: (?:\[code=\d+\] )?(\S+)', l)
+        if m or re.match(r'^\[\d+/\d+\]|^\[end\]|^ninja:', l):
+            if cur:
+                failed[cur] = msg
+            cur, msg = (m.group(1).replace('/', '\\') if m else None), []
+        elif cur:
+            msg.append(l)
+    for u, t in targets:
+        if t in failed:
+            text = '\n'.join(failed[t])
+            ln = re.search(r'^#\s+(\d+): ', text, re.M)
+            err = [x.lstrip('#').strip() for x in text.split('Error:', 1)[-1].splitlines()[1:]]
+            err = [x for x in err if x and not x.startswith(('Too many errors', 'User break'))]
+            msg = ' / '.join(err[:3]) or 'the unit does not compile'
+            where = re.search(r'^#\s+File: (\S+)', text, re.M)
+            at = int(ln.group(1)) if ln else 1
+            if where and pathlib.Path(where.group(1)).name != pathlib.Path(u).name + '.c':
+                msg = 'in %s:%d: %s' % (where.group(1).replace('\\', '/'), at, msg)
+                at = 1                              # the error is in a header it includes
+            out.append((u + '.c', at, 'compile-error', msg))
+    if r.returncode and not failed and not out:
+        out.append(('(ninja)', 1, 'compile-error', (r.stdout + r.stderr).strip()[-200:]))
+    return out
+
+
 def main():
     argv = sys.argv[1:]
     rev = None
     if '--diff' in argv:
         k = argv.index('--diff'); rev = argv[k + 1]; del argv[k:k + 2]
-    args = [a for a in argv if a != '--summary']
+    args = [a for a in argv if a not in ('--summary', '--compile')]
     files = [pathlib.Path(a) for a in args] or sorted((ROOT / 'src').glob('*.c'))
     protos = header_protos()
     changed = changed_lines(rev) if rev else None
@@ -276,6 +353,7 @@ def main():
         if changed is not None:     # file-level checks (line 1) count only if line 1 changed too
             hits = [h for h in hits if h[0] in changed[f.name] or h[1] == 'compile-error']
         total += len(hits)
+        COMPILE_ERRORS.update((f.name, h[0]) for h in hits if h[1] == 'compile-error')
         if '--summary' in sys.argv:
             if hits:
                 counts = {}
@@ -285,6 +363,21 @@ def main():
         else:
             for ln, n, msg in hits:
                 print('%s:%d: %s: %s' % (f.name, ln, n, msg[:100]))
+    if '--compile' in sys.argv:
+        units = touched_units(rev) if rev else None
+        hits = compile_units(units) if units else []
+        for f, ln, n, msg in list(hits):         # already reported by the style pass above
+            if (pathlib.Path(f).name, ln) in COMPILE_ERRORS:
+                hits.remove((f, ln, n, msg))
+        for f, ln, n, msg in hits:
+            print('%s:%d: %s: %s' % (f, ln, n, msg[:200]))
+        total += len(hits)
+        print('compiled %s with their own build commands, %d failed'
+              % ('%d touched units' % len(units) if units is not None else 'nothing (no --diff)',
+                 len(hits)))
+    if rev and '--compile' not in sys.argv:
+        print('(--compile also builds every unit this branch touches, NonMatching ones included; '
+              '`ninja all_source` builds all of them)')
     debt = {f: n for f, n in SWEEP_DEBT.items() if n}
     if debt and changed is None:
         print('%d lines of sweep code not yet cleaned up, in %d files (tools/match/sweepblock.py)'

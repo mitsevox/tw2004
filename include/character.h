@@ -282,7 +282,7 @@ typedef struct Character {
     u8    unk16AC[0x16D0 - 0x16AC];
     s32   nShotKind;            // 0x16D0  the player's shot kind (fn_8001C724)
     s32   n16D4;              // 0x16D4  the key for clip lookups (Char_SetClip)
-    u8    unk16D8[0x16DC - 0x16D8];
+    struct CharSkinSet* p16D8;  // 0x16D8  six more skins (SkinPart.c)
     s32   n16DC;                // 0x16DC  twice the players set up so far, in split screen 2
                                 //         (Player_SetGolfer)
     s32   nStyle;               // 0x16E0  the animation style (fn_8001C7FC); at -1
@@ -610,5 +610,21 @@ void  fn_80062BFC(Character* pChar);
 int   fn_80062C10(Character* pChar);    // uFlags bit 4
 int   fn_80062C1C(Character* pChar);    // uFlags bit 1
 f32   fn_80062C28(Character* pChar);    // how far the animation still has to run
+
+// ---- mtalib.c --------------------------------------------------------------------------------
+
+// A group of items of a 'MAL ' bank.
+typedef struct MalGroup {
+    int    nNum;                // 0x0
+    void** apItem;              // 0x4
+} MalGroup;
+
+// A bank loaded from a 'MAL ' stream object (0x1C bytes): up to three groups of items, one picked
+// at random by fn_8001F79C.
+typedef struct MalBank {
+    int      nNumGroups;        // 0x00
+    MalGroup aGroup[3];         // 0x04
+} MalBank;
+LAYOUT_ASSERT(MalBank, 0x1C);
 
 #endif

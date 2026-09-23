@@ -6,6 +6,7 @@
 #include "golfer.h"
 #include "charstate.h"
 #include "unsorted/cull.h"
+#include "game_types.h"
 
 void  fn_80014BB4(void);
 void  fn_80014C9C(void);
@@ -676,3 +677,13 @@ int fn_8001EEE4(CharModel* pModel, int nBone) {
     }
     return pModel->aBone[nBone];
 }
+
+// ---- sweep code (not yet cleaned up) ----
+
+void Anim_SetRate(u8* p, f32 v);
+
+void Anim_SetRate(u8* p, f32 v) {
+    *(f32*)(p + 0x14) = v;
+}
+
+// ---- end of sweep code ----
