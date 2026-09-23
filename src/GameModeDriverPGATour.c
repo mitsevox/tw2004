@@ -120,6 +120,10 @@ s32  fn_8008AC00(void);
 void fn_8011A720(s32 a, s32 nHole);
 void fn_8011A5F8(s32 a);
 u8   fn_800EF720(s32 nPlayer);
+s32  fn_8011A684(s32 a);
+u8   fn_8011A6F4(s32 a, s32 b);
+extern u8  gNumPlayersSetUp;
+extern s32 lbl_80282340;
 u8   fn_800EF83C(u16 nDate, s32* pId, s32* pRound);
 s32  fn_8011A7C8(s32 nPlayer, s32 nHole);
 s32  fn_80119588(s32 nPlayer, s32 a);
@@ -290,6 +294,35 @@ u8 fn_800EF64C(s32 nPlayer) {
         return fn_800EF720(nPlayer) == 0;
     }
     return 1;
+}
+
+// A tie for the lead after the last round goes to a playoff: the scores are cleared and the playoff
+// holes (16..18 of the course, looping) are set up. nPlayer is not read.
+u8 fn_800EF720(s32 nPlayer) {
+    u8 bPlayoff = 0;
+    s32 i;
+    int h;
+    if (fn_8011A684(0) > 1 && fn_8011A6F4(0, 0)) {
+        bPlayoff = 1;
+    }
+    if (bPlayoff) {
+        gpGame->bD5 = 1;
+        for (i = 0; i < gNumPlayersSetUp; i++) {
+            for (h = 0; h < 18; h++) {
+                PLAYER(i)->nStrokes[h] = 0;
+                PLAYER(i)->nModePoints[h] = 0;
+            }
+        }
+        lbl_80282340++;
+        if (lbl_80282340 > 17) {
+            lbl_80282340 = 15;
+        }
+        fn_800E1260(0);
+        fn_800E1404(lbl_80282340);
+        gpGame->bD4 = 1;
+        fn_800E45C0();
+    }
+    return bPlayoff;
 }
 
 s32 fn_800EF834(void) {
