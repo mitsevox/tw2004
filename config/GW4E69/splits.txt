@@ -3340,8 +3340,9 @@ src/axfx/reverb_hi.c:
 src/axfx/delay.c:
 	.text       start:0x80138EC8 end:0x80139374
 
-unsorted/sweep_801393C4.c:
-	.text       start:0x801393C4 end:0x801393D0
+src/axfx/axfx.c:
+	.text       start:0x80139374 end:0x801393D0
+	.sdata      start:0x802819F8 end:0x80281A00
 
 dolphin/PPCArch.c:
 	.text       start:0x801393D0 end:0x801394C0
