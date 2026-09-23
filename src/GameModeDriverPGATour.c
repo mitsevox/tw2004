@@ -208,7 +208,7 @@ void fn_800EE0A0(s32 i) {
 void fn_800EE2C8(void) {
     PlayerNumber_t nPlayer = PLR_1_e;
     s32 nEvent = gpSaveData[nPlayer].tour.nEvent;
-    Pga80205ED8* pRec = &lbl_80205ED8;
+    TourStats* pRec = &lbl_80205ED8;
     s32 nFormat;
     lbl_80281670 = gSession.options.nC;
     lbl_80282338 = gSession.options.nWind;
@@ -401,6 +401,49 @@ void fn_800EEB94(s32 nPlayer) {
     }
     gpSaveData[nPlayer].tour.nRound = 0;
     gpSaveData[nPlayer].tour.nEvent = fn_800EFBD0(gpSaveData[nPlayer].tour.nEvent + 1);
+}
+
+// The round's statistics go into the player's career totals: most are added, n4 and nC keep the
+// higher value.
+void fn_800EED0C(s32 nPlayer) {
+    TourStats* pRound = &lbl_80205ED8;
+    TourStats* pTotal = &gpSaveData[nPlayer].tourStats;
+    pTotal->n0 += pRound->n0;
+    pTotal->n2 += pRound->n2;
+    pTotal->n4 = pTotal->n4 <= pRound->n4 ? pRound->n4 : pTotal->n4;
+    pTotal->n6 += pRound->n6;
+    pTotal->n8 += pRound->n8;
+    pTotal->nC = pTotal->nC <= pRound->nC ? pRound->nC : pTotal->nC;
+    pTotal->nE += pRound->nE;
+    pTotal->n10 += pRound->n10;
+    pTotal->n12 += pRound->n12;
+    pTotal->n14 += pRound->n14;
+    pTotal->n16 += pRound->n16;
+    pTotal->n18 += pRound->n18;
+    pTotal->n1A += pRound->n1A;
+    pTotal->n1C += pRound->n1C;
+    pTotal->n1E += pRound->n1E;
+    pTotal->n20 += pRound->n20;
+    pTotal->n22 += pRound->n22;
+    pTotal->n24 += pRound->n24;
+    pTotal->n26 += pRound->n26;
+    pTotal->n28 += pRound->n28;
+    pTotal->n2A += pRound->n2A;
+    pTotal->n2C += pRound->n2C;
+    pTotal->n2E += pRound->n2E;
+    pTotal->n30 += pRound->n30;
+    pTotal->n32 += pRound->n32;
+    pTotal->n34 += pRound->n34;
+    pTotal->n36 += pRound->n36;
+    pTotal->n38 += pRound->n38;
+    pTotal->n3A += pRound->n3A;
+    pTotal->n3C += pRound->n3C;
+    pTotal->n40 += pRound->n40;
+    pTotal->n44 += pRound->n44;
+    pTotal->n48 += pRound->n48;
+    pTotal->n4A += pRound->n4A;
+    pTotal->n50 += pRound->n50;
+    pTotal->n54 += pRound->n54;
 }
 
 // A round is over. The round count goes up and a player who missed the cut is out; after the last
