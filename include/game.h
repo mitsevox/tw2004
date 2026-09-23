@@ -82,6 +82,7 @@ void fn_800DB4E8(int nPlayer);
 void fn_800DB714(int nPlayer);
 void fn_800DBDA8(int nPlayer);
 void GameEffects_SetSuperSlowMo(u8 bOn, int nPlayer, f32 fRate);
+u8   fn_800DC514(int nPlayer);          // super slow motion is on (nPlayer unused)
 void fn_800DC9D4(int a);                // pause or resume a GameBreaker
 
 // GameManager.c
@@ -102,6 +103,7 @@ void GM_PlayerTookShot(int nPlayer);
 u8   GM_PlayerTakeMulligan(int nPlayer);
 int  fn_800DDFB4(int nPlayer);
 int  GM_ShowPostShotAnimation(int nPlayer);
+u8   GM_ShowPostShotCrowdFlyby(void);
 void GM_FlyByMode_Init(void);
 void GM_ReplaceOOBBall(int nPlayer);
 void fn_800DEB5C(int nPlayer);

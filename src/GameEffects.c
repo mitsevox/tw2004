@@ -658,8 +658,8 @@ void fn_800DC498(int nPlayer) {
     lbl_80202898.bSpinWindowDone = 1;
 }
 
-// TW06: GameEffects_IsSlowDownSwingOn (by position).
-s32 fn_800DC514(void) {
+// TW06: GameEffects_IsSlowDownSwingOn (by position). Super slow motion is on; nPlayer is unused.
+u8 fn_800DC514(int nPlayer) {
     return lbl_80202898.bSlowMo;
 }
 

@@ -820,7 +820,7 @@ int GM_ShowPostShotAnimation(int nPlayer) {
 
 // TW06: GM_ShowPostShotCrowdFlyby (by position). Two measures of the shot (fn_800336E4 at least 5,
 // fn_800336F4 at least 0.5).
-int GM_ShowPostShotCrowdFlyby(void) {
+u8 GM_ShowPostShotCrowdFlyby(void) {
     if (fn_800336E4() >= 5.0f && fn_800336F4() >= 0.5f) {
         return 1;
     }

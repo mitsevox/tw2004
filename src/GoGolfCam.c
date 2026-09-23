@@ -203,8 +203,6 @@ void     fn_8003E624(int nPlayer, void* pCam, void* pSub, void* pScript, CamShot
                      f32 fFrameTime);
 u8       fn_8001EDF4(CrAPModel* pModel);
 CamShot* fn_8003A8C4(char* szName);
-// GameManager.c defines it as int; the test here is on a byte.
-u8       GM_ShowPostShotCrowdFlyby(void);
 CamSequence* fn_8003BDBC(int nPlayer, int nLie, int nClass, int nKind, int a, f32 fDist);
 void     GolfCamera_CutToGolferDoneAnimatingCam(View* pView, int nPlayer);
 int      fn_80062C10(int nHandle);
@@ -249,8 +247,6 @@ int      fn_800C6B38(View* pView);
 void     fn_800C5EC0(View* pView, f32* pCam, f32* pSub, int nPlayer);
 u8       fn_800C6D80(void);
 CamSequence* DynamicCam_ChoosePreFlightSequence(int nPlayer, int nLie, int nKind);
-// GameEffects.c defines it as s32 (void); the call here passes the player and tests a byte.
-u8       fn_800DC514(int nPlayer);
 u8       Ter_CheckForGroundCollision(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
                                      SurfaceType** ppSurface, TerObject** ppObj);
 
