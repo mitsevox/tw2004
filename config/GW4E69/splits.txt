@@ -208,19 +208,7 @@ char.c:
 	.text       start:0x80017508 end:0x8001F32C
 
 mtalib.c:
-	.text       start:0x8001F32C end:0x8001F42C
-
-unsorted/sweep_8001F558.c:
-	.text       start:0x8001F558 end:0x8001F578
-
-unsorted/sweep_8001F760.c:
-	.text       start:0x8001F760 end:0x8001F780
-
-unsorted/sweep_8001FA3C.c:
-	.text       start:0x8001FA3C end:0x8001FAA8
-
-unsorted/sweep_8001FAD8.c:
-	.text       start:0x8001FAD8 end:0x8001FB00
+	.text       start:0x8001F32C end:0x8001FB00
 
 ska_shared.c:
 	.text       start:0x8001FB00 end:0x80021ADC
