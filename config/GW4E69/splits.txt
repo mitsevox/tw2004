@@ -4020,6 +4020,8 @@ MetroTRK/usr_put.c:
 
 MetroTRK/dispatch.c:
 	.text       start:0x8016094C end:0x80160AC4
+	.rodata     start:0x80185A98 end:0x80185AD8
+	.data       start:0x8019CD48 end:0x8019CDB8
 
 MetroTRK/msghndlr.c:
 	.text       start:0x80160AC4 end:0x80161A94
