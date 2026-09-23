@@ -41,6 +41,12 @@ static inline u32 __cntlzw(u32 x) {
     }
     return n;
 }
+
+// __frsqrte estimates 1 / sqrt(x); the exact value is a valid estimate.
+#include <math.h>
+static inline double __frsqrte(double x) {
+    return 1.0 / sqrt(x);
+}
 #endif
 typedef float              f32;
 typedef double             f64;

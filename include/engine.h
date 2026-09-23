@@ -36,6 +36,8 @@ f32  fabsf(f32 x);                      // 0x8000AD9C: fabs (0x8000AE94, platfor
 u32  Rand_Next(int nStream);            // 0x8000B130  EA's lagged-Fibonacci generator
 void fn_8000B1D4(int nStream, u32 uSeed);   // seed a random stream
 f32  Rand_Float(int nStream);           // 0x8000B428  [0, 1)
+void fn_8000883C(f32* pA, f32* pB, f32 fT);   // quaternion slerp from a to b by fT, into b
+f32  fn_80029B64(f32 x);                // square root (Skeleton.c); x itself when x <= 0
 void fn_8000C5D4(f32* pA, f32* pB, f32 f, f32* pOut);   // out = a + f x b
 f32  fn_8000C5FC(f32* pA, f32* pB);     // dot product
 double fn_8015F824(double x, double y); // pow
