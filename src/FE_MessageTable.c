@@ -3234,6 +3234,51 @@ void fn_800814F0(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
+// Option n14 as the menus' choice (1..3).
+void fn_800815E0(MsgArg* pArgs, MsgArg* pResult) {
+    switch (gSession.options.n14) {
+    case 0:
+        pResult->i = 1;
+        return;
+    case 1:
+        pResult->i = 2;
+        return;
+    case 2:
+        pResult->i = 3;
+        return;
+    }
+}
+
+// Option n18 as the menus' choice (1..3).
+void fn_80081634(MsgArg* pArgs, MsgArg* pResult) {
+    switch (gSession.options.n18) {
+    case 0:
+        pResult->i = 1;
+        return;
+    case 1:
+        pResult->i = 2;
+        return;
+    case 2:
+        pResult->i = 3;
+        return;
+    }
+}
+
+// Option n20 as the menus' choice (1..3).
+void fn_80081688(MsgArg* pArgs, MsgArg* pResult) {
+    switch (gSession.options.n20) {
+    case 0:
+        pResult->i = 1;
+        return;
+    case 1:
+        pResult->i = 2;
+        return;
+    case 2:
+        pResult->i = 3;
+        return;
+    }
+}
+
 void fn_800816DC(MsgArg* pArgs, MsgArg* pResult) {
     switch (gSession.options.b84) {
     case 1:
@@ -3366,6 +3411,11 @@ void fn_800819FC(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
+// The name in slot pArgs[0]'s profile backup.
+void fn_80081B04(MsgArg* pArgs, MsgArg* pResult) {
+    strcpy(((MsgString*)pArgs[1].p)->pStr, lbl_801D7148.p658[pArgs[0].i].szName);
+}
+
 void fn_80081BD4(MsgArg* pArgs, MsgArg* pResult) {
     fn_80077780();
 }
@@ -3374,7 +3424,41 @@ void fn_80081BF4(MsgArg* pArgs, MsgArg* pResult) {
     fn_80077808(pArgs[0].i);
 }
 
+// Option n1C as the menus' choice (1..3).
+void fn_80081CA4(MsgArg* pArgs, MsgArg* pResult) {
+    switch (gSession.options.n1C) {
+    case 0:
+        pResult->i = 1;
+        return;
+    case 1:
+        pResult->i = 2;
+        return;
+    case 2:
+        pResult->i = 3;
+        return;
+    }
+}
+
 void fn_80081CF8(MsgArg* pArgs, MsgArg* pResult) {
+}
+
+// Slot pArgs[0]'s created golfer: set its ball type (pArgs[4]) and n54C2 (pArgs[5]); -1 keeps one.
+void fn_80081CFC(MsgArg* pArgs, MsgArg* pResult) {
+    if (pArgs[4].i >= 0) {
+        gpSaveData[pArgs[0].i].nGolferBallType = pArgs[4].i;
+    }
+    if (pArgs[5].i >= 0) {
+        gpSaveData[pArgs[0].i].n54C2 = pArgs[5].i;
+    }
+}
+
+// The same two, read back (read signed); pArgs[1..3] are cleared.
+void fn_80081D50(MsgArg* pArgs, MsgArg* pResult) {
+    *(s32*)pArgs[1].p = 0;
+    *(s32*)pArgs[2].p = 0;
+    *(s32*)pArgs[3].p = 0;
+    *(s32*)pArgs[4].p = (s8)gpSaveData[pArgs[0].i].nGolferBallType;
+    *(s32*)pArgs[5].p = (s8)gpSaveData[pArgs[0].i].n54C2;
 }
 
 void fn_80081F98(MsgArg* pArgs, MsgArg* pResult) {
@@ -3482,6 +3566,14 @@ void fn_80082A48(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_80082A4C(MsgArg* pArgs, MsgArg* pResult) {
+}
+
+// The free directory entries on the card in slot pArgs[0], pArgs[1].
+void fn_80082A50(MsgArg* pArgs, MsgArg* pResult) {
+    MCCardState state;
+
+    fn_8009F7F4(&state, pArgs[0].i, pArgs[1].i);
+    pResult->i = state.nFreeFiles;
 }
 
 // Empty a player slot: no profile in it, none loaded.
