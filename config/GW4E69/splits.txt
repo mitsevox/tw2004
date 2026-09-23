@@ -3983,6 +3983,7 @@ MetroTRK/mainloop.c:
 
 MetroTRK/nubevent.c:
 	.text       start:0x8015F9C8 end:0x8015FBF0
+	.bss        start:0x8027D8F8 end:0x8027D920
 
 MetroTRK/nubinit.c:
 	.text       start:0x8015FBF0 end:0x8015FD88
