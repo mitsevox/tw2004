@@ -102,7 +102,7 @@ extern s32 lbl_80282338;
 s32  fn_801190D8(s32 a, s32 n);
 s32  fn_800EFBD0(s32 i);
 u8   fn_800EF83C(u16 nDate, s32* pId, s32* pRound);
-void fn_800D2714(u16* pDate, s32* pDay, s32* pMonth, s32* pYear);
+void fn_800D2714(u16* pDate, s32* pMonth, s32* pDay, s32* pYear);
 s32  fn_8011A7C8(s32 nPlayer, s32 nHole);
 s32  fn_80119588(s32 nPlayer, s32 a);
 s32  fn_800E1904(s32 nPlayer, s32 a);
@@ -228,13 +228,9 @@ void fn_800EF094(s32 a, s32 n) {
 }
 
 // A progress bar out of 10: tournaments won x 10 / 31, at most 9.
-u16 fn_800EF0E0(void) {
-    u16 n = 9;
-    u16 t = fn_800F02A8() * 10 / 31;
-    if (t <= 9) {
-        n = t;
-    }
-    return n;
+s32 fn_800EF0E0(void) {
+    s32 n = fn_800F02A8() * 10 / 31;
+    return n > 9 ? 9 : n;
 }
 
 void fn_800EF294(void) {
@@ -249,14 +245,14 @@ s32 fn_800EF834(void) {
 // Which tournament (and which of its rounds) is played on a date: each tournament starts on a
 // date per season (aStartDate, seasons from 2004).
 u8 fn_800EF83C(u16 nDate, s32* pId, s32* pRound) {
-    s32 nDay;
     s32 nMonth;
+    s32 nDay;
     s32 i;
     s32 d;
     s32 nYear;
     s32 nSeason;
     u8 bFound;
-    fn_800D2714(&nDate, &nDay, &nMonth, &nYear);
+    fn_800D2714(&nDate, &nMonth, &nDay, &nYear);
     bFound = 0;
     nSeason = nYear - 2004;
     if (nSeason >= 0 && nSeason < 10) {
@@ -324,9 +320,7 @@ s32 fn_800EFB88(void) {
 }
 
 s32 fn_800EFBAC(void) {
-    s32 t0;
-    t0 = fn_800EFB88();
-    return (t0 + 2004);
+    return fn_800EFB88() + 2004;
 }
 
 // The tournament being played on a date.
@@ -388,21 +382,20 @@ void fn_800F0010(char* pDst) {
     s32 n = fn_80118684(0);
     if (n > 1) {
         sprintf(pDst, "Tied (%d players)", n);
-        return;
+    } else {
+        s32 nLeader = fn_801197CC(0, 0);
+        s32 nGolfer = fn_80119118(0, nLeader);
+        strcpy(pDst, fn_80118E30(0, nGolfer));
     }
-    strcpy(pDst, fn_80118E30(0, fn_80119118(0, fn_801197CC(0, 0))));
 }
 
 void fn_800F009C(void) {
-    s32 t0;
-    s32 t1;
-    t0 = fn_801197CC(0, 0);
-    t1 = fn_8011908C(0, t0);
-    fn_8011937C(0, t0, (((u32)__cntlzw((t1 & 0xFF)) >> 5) & 0xFF));
+    s32 nLeader = fn_801197CC(0, 0);
+    fn_8011937C(0, nLeader, fn_8011908C(0, nLeader) == 0);
 }
 
 void fn_800F018C(void) {
-    fn_8011937C(0, 0, (u8) (fn_8011908C(0, 0) == 0));
+    fn_8011937C(0, 0, fn_8011908C(0, 0) == 0);
 }
 
 // TW06: GameModeDriverPGATour::GetUserFinishString. A tournament's result for the season screen:

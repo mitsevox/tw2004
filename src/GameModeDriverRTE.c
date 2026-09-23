@@ -69,9 +69,9 @@ void  fn_800EAE38(s32 i);
 void  fn_800EAF7C(void);
 int   fn_800EC558(void);
 void  fn_800D7770(int nPlayer, u8* pFlag);
-void  fn_8011E020(s32* pYear, s32* pMonth, s32* pDay, s32* a, s32* b, s32* c, s32* d);
-void  fn_800D2714(u16* pDate, s32* pDay, s32* pMonth, s32* pYear);
-void  fn_800D2678(u16* pDate, s32 nYear, s32 nMonth, s32 nDay);
+void  fn_8011E020(s32* pMonth, s32* pDay, s32* pYear, s32* pHour, s32* pMinute, s32* pSecond, s32* pMsec);
+void  fn_800D2714(u16* pDate, s32* pMonth, s32* pDay, s32* pYear);
+void  fn_800D2678(u16* pDate, s32 nMonth, s32 nDay, s32 nYear);
 extern void (*lbl_8028235C)(void);
 extern void (*lbl_80282358)(void);
 extern s32 lbl_80281680;
@@ -83,7 +83,7 @@ void  fn_800F0678(void);
 void  fn_800F0BBC(void);
 s32   fn_800F0820(void);
 u8    fn_800F0CEC(u16 nDate, s32* pId, s32* pRound);
-u8    fn_800F0DB8(s32 nYear, s32 nMonth, s32 nDay, s32* pId, s32* pRound);
+u8    fn_800F0DB8(s32 nMonth, s32 nDay, s32 nYear, s32* pId, s32* pRound);
 s32   fn_800F0F54(void);
 
 // Mode 24 starts: match-play callbacks (GameModeMatch) around the event's own start and end.
@@ -290,34 +290,34 @@ void fn_800F0BBC(void) {
         fn_800D3548(0, nReward, 0);
         fn_800E4364(0, 0x6F, nReward, 0);
         fn_800F08A8();
-        fn_800D7770(0, gpSaveData + gRTEs.aEvent[lbl_80282350].nId * 4 + 0x20C);
+        fn_800D7770(0, &((RTESave*)gpSaveData)->aAward[gRTEs.aEvent[lbl_80282350].nId].bWon);
     }
 }
 
 // TW06: GameModeDriverRTE::GetCurrentDate. Today's date from the clock.
-void fn_800F0C74(s32* pYear, s32* pMonth, s32* pDay) {
-    s32 nYear;
+void fn_800F0C74(s32* pMonth, s32* pDay, s32* pYear) {
     s32 nMonth;
     s32 nDay;
-    s32 a;
-    s32 b;
-    s32 c;
-    s32 d;
-    fn_8011E020(&nYear, &nMonth, &nDay, &a, &b, &c, &d);
-    *pYear = nYear;
+    s32 nYear;
+    s32 nHour;
+    s32 nMinute;
+    s32 nSecond;
+    s32 nMsec;
+    fn_8011E020(&nMonth, &nDay, &nYear, &nHour, &nMinute, &nSecond, &nMsec);
     *pMonth = nMonth;
     *pDay = nDay;
+    *pYear = nYear;
 }
 
 // TW06: GameModeDriverRTE::GetEventByDate. The event held on a date (and which of its days).
 u8 fn_800F0CEC(u16 nDate, s32* pId, s32* pRound) {
-    s32 nDay;
     s32 nMonth;
+    s32 nDay;
     s32 nYear;
     u8 bFound;
     s32 i;
     s32 d;
-    fn_800D2714(&nDate, &nDay, &nMonth, &nYear);
+    fn_800D2714(&nDate, &nMonth, &nDay, &nYear);
     bFound = 0;
     for (i = 0; i < 118; i++) {
         if (gRTEs.aEvent[i].aDate[nYear - 2003] != 0) {
@@ -337,9 +337,9 @@ u8 fn_800F0CEC(u16 nDate, s32* pId, s32* pRound) {
     return bFound;
 }
 
-u8 fn_800F0DB8(s32 nYear, s32 nMonth, s32 nDay, s32* pId, s32* pRound) {
+u8 fn_800F0DB8(s32 nMonth, s32 nDay, s32 nYear, s32* pId, s32* pRound) {
     u16 nDate;
-    fn_800D2678(&nDate, nYear, nMonth, nDay);
+    fn_800D2678(&nDate, nMonth, nDay, nYear);
     return fn_800F0CEC(nDate, pId, pRound);
 }
 
@@ -359,13 +359,13 @@ void fn_800F0E30(s32 p0, s32 p1) {
 
 // Today's event becomes the current one.
 s32 fn_800F0E3C(void) {
-    s32 nYear;
     s32 nMonth;
     s32 nDay;
+    s32 nYear;
     s32 nId;
     s32 nRound;
-    fn_800F0C74(&nYear, &nMonth, &nDay);
-    if (fn_800F0DB8(nYear, nMonth, nDay, &nId, &nRound)) {
+    fn_800F0C74(&nMonth, &nDay, &nYear);
+    if (fn_800F0DB8(nMonth, nDay, nYear, &nId, &nRound)) {
         fn_800F0E30(nId, nRound);
         return 1;
     }
@@ -408,8 +408,8 @@ s32 fn_800F0F54(void) {
     s32 bOk;
     s32 nSeason;
     fn_8011E020(&n, &n, &nYear, &n, &n, &n, &n);
-    bOk = 0;
     nSeason = nYear - 2003;
+    bOk = 0;
     if (nSeason >= 0 && nSeason < 10) {
         bOk = 1;
     }
@@ -435,18 +435,18 @@ s32 fn_800F102C(void) {
 // TW06: GameModeDriverRTE::GetNextEvent. The next event from today (-1 if none this season).
 s32 fn_800F1034(void) {
     s32 nBest = -1;
-    s32 nYear;
     s32 nMonth;
     s32 nDay;
+    s32 nYear;
     u16 nToday;
     s32 nSeason;
     s32 nNext;
     u8 bFound;
     s32 i;
     s32 d;
-    fn_800F0C74(&nYear, &nMonth, &nDay);
-    nSeason = nDay - 2003;
-    fn_800D2678(&nToday, nYear, nMonth, nDay);
+    fn_800F0C74(&nMonth, &nDay, &nYear);
+    nSeason = nYear - 2003;
+    fn_800D2678(&nToday, nMonth, nDay, nYear);
     if (nSeason >= 0 && nSeason < 10) {
         bFound = 0;
         for (i = 0; i < 118; i++) {
@@ -495,5 +495,6 @@ s32 fn_800F120C(s32 i) {
 
 // TW06: GameModeDriverRTE::IsEventComplete. Whether a profile has done event i.
 u8 fn_800F1224(s32 nProfile, s32 i) {
-    return gpSaveData[nProfile * 0x10600 + 0x20C + gRTEs.aEvent[i].nId * 4];
+    RTESave* p = (RTESave*)(gpSaveData + nProfile * 0x10600);
+    return p->aAward[gRTEs.aEvent[i].nId].bWon;
 }
