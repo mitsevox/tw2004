@@ -286,8 +286,9 @@ u8 fn_800F8B08(u8 bCheck) {
             gpGame->bD5 = 0;
         }
     }
-    for (h = 0; h < 18; h++) {
-        gpGame->bHoleSelected[h] = 0;
+    h = 0;
+    while (h < 18) {
+        gpGame->bHoleSelected[h++] = 0;
     }
     nHole = Game_CurHoleIndex();
     while (nHole == Game_CurHoleIndex()) {
