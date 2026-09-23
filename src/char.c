@@ -120,6 +120,16 @@ void fn_8001C650(void* arg0, s32 arg1) {
 
 // ---- end of sweep code ----
 
+// Clear the character's animation events: none set, all at time 2^30 (never).
+void fn_80017508(Character* pChar) {
+    s32 i;
+
+    for (i = 0; i < 18; i++) {
+        pChar->events[i].bSet = 0;
+        pChar->events[i].fTime = 1073741824.0f;
+    }
+}
+
 // Pick the character's clip for an animation group and style from its animation library, keyed
 // also by the character's club class (class 1 looks up as 0) and n16D4. The lookup's fallback flags
 // go to bits 0x200 / 0x400 of uFlags; the clip is kept in pCurClip.
