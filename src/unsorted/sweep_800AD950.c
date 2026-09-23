@@ -3,7 +3,7 @@
 #include "game_types.h"
 
 s32 fn_800A8248();
-void** fn_800AD674();
+void* fn_800AD674();
 
 void fn_800AD950(s32 arg0, s32 arg1, s32 arg2);
 void fn_800AD950(s32 arg0, s32 arg1, s32 arg2) {
