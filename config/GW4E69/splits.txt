@@ -512,19 +512,7 @@ GoObjShadow.c:
 	.text       start:0x80093D3C end:0x8009414C
 
 GoShaderObject_Particle_Gc.c:
-	.text       start:0x8009414C end:0x80095088
-
-unsorted/sweep_800950CC.c:
-	.text       start:0x800950CC end:0x800950DC
-
-unsorted/sweep_800950DC.c:
-	.text       start:0x800950DC end:0x800950F4
-
-unsorted/sweep_800950F4.c:
-	.text       start:0x800950F4 end:0x80095108
-
-unsorted/sweep_80095364.c:
-	.text       start:0x80095364 end:0x80095368
+	.text       start:0x8009414C end:0x8009554C
 
 unsorted/sweep_8009554C.c:
 	.text       start:0x8009554C end:0x80095564

@@ -48,3 +48,33 @@ void fn_80094278(void) {
 }
 
 // ---- end of sweep code ----
+
+// ---- sweep code (not yet cleaned up) ----
+
+void fn_800950CC(f32 farg0, f32 farg1);
+void fn_800950DC(s32 p0, s32 p1, s32 p2, s32 p3);
+void fn_800950F4(f32 farg0, f32 farg1, f32 farg2);
+void fn_80095364(void);
+
+void fn_800950CC(f32 farg0, f32 farg1) {
+    *(f32* )0xCC008000 = farg0;
+    *(f32* )0xCC008000 = farg1;
+}
+
+void fn_800950DC(s32 p0, s32 p1, s32 p2, s32 p3) {
+    *(volatile u8*)0xCC008000 = p0;
+    *(volatile u8*)0xCC008000 = p1;
+    *(volatile u8*)0xCC008000 = p2;
+    *(volatile u8*)0xCC008000 = p3;
+}
+
+void fn_800950F4(f32 farg0, f32 farg1, f32 farg2) {
+    *(f32* )0xCC008000 = farg0;
+    *(f32* )0xCC008000 = farg1;
+    *(f32* )0xCC008000 = farg2;
+}
+
+void fn_80095364(void) {
+}
+
+// ---- end of sweep code ----
