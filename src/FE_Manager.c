@@ -67,7 +67,6 @@ int  fn_80077BDC(int n);
 void fn_80077C1C(int a, int b);
 u8   fn_80078008(s32 nAsset, SaveProfile* pProfile);
 int  fn_80078604(int a, int b, int c);
-void fn_80078620(int n, int* pA, int* pB, int* pC);
 void fn_80078680(SaveProfile* pProfile);
 void fn_8007873C(SaveProfile* pProfile);
 u8   FE_CrAP_IsAssetUndesirable(s16 nPart, CrAPAsset* pAsset);

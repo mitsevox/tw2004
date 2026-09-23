@@ -27,6 +27,7 @@ s32  fn_8009D390(s32 nPort, s32 nSlot); // MC_Gc.c
 s32  fn_8009EB44(s32 nPort, s32 nSlot); // MC_Gc.c
 s32  fn_800A1164(s32 nPort, s32 nSlot, char* pName, s32 n);     // MC.c
 u8   fn_800E22E4(int nSlot, int a, int b);      // GameRound.c
+int  fn_800E234C(int nSlot, int a, int b);      // GameRound.c
 int  fn_800E2520(int nMode);            // GameRound.c
 void fn_800E25E0(void);                 // GameRound.c
 void GM_SetupCustomHoleSelection(void); // GameManager.c
@@ -2978,6 +2979,24 @@ void fn_800804E4(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = fn_800E22E4(pArgs[0].i, pArgs[1].i, pArgs[2].i - 1);
 }
 
+// For the working slot's marked hole pArgs[0], pArgs[1] (from 1): its value unpacked into
+// pArgs[2..4] (fn_80078620), or zeros when the hole is not marked.
+void fn_8008052C(MsgArg* pArgs, MsgArg* pResult) {
+    s32 nA = pArgs[0].i;
+    s32 nB = pArgs[1].i - 1;
+    int* pA = pArgs[2].p;
+    int* pB = pArgs[3].p;
+    int* pC = pArgs[4].p;
+
+    if (fn_800E22E4(lbl_80281ED4->nSlot, nA, nB)) {
+        fn_80078620(fn_800E234C(lbl_80281ED4->nSlot, nA, nB), pA, pB, pC);
+        return;
+    }
+    *pA = 0;
+    *pB = 0;
+    *pC = 0;
+}
+
 void fn_800805C4(MsgArg* pArgs, MsgArg* pResult) {
     FEMovie* pMovie;
 
@@ -2989,8 +3008,45 @@ void fn_800805C4(MsgArg* pArgs, MsgArg* pResult) {
 void fn_800805F0(MsgArg* pArgs, MsgArg* pResult) {
 }
 
+// Whether slot pArgs[0]'s profile or a cheat code has unlocked course pArgs[1].
+void fn_800805F4(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = 0;
+    if (gpSaveData[pArgs[0].i].aCourseUnlocked[pArgs[1].i] != 0) {
+        pResult->i = 1;
+    }
+    if (lbl_80281DF4->aCourseUnlocked[pArgs[1].i] != 0) {
+        pResult->i = 1;
+    }
+}
+
 void fn_800807D0(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
+}
+
+// Whether slot pArgs[0] has a loaded profile with custom round pArgs[1] in use.
+void fn_800807DC(MsgArg* pArgs, MsgArg* pResult) {
+    int b = 0;
+
+    if (gpSaveData[pArgs[0].i].aSavedRound[pArgs[1].i].n0 != 0 && gpSaveData[pArgs[0].i].bActive != 0) {
+        b = 1;
+    }
+    pResult->i = b;
+}
+
+// The name of slot pArgs[0]'s custom round pArgs[1].
+void fn_80080828(MsgArg* pArgs, MsgArg* pResult) {
+    strcpy(((MsgString*)pArgs[2].p)->pStr, gpSaveData[pArgs[0].i].aSavedRound[pArgs[1].i].szName);
+}
+
+// Set hole pArgs[2] of slot pArgs[0]'s custom round pArgs[1]: course pArgs[3] (-1 empties the
+// round instead) and hole number pArgs[4].
+void fn_800809F8(MsgArg* pArgs, MsgArg* pResult) {
+    if (pArgs[3].i != -1) {
+        gpSaveData[pArgs[0].i].aSavedRound[pArgs[1].i].nCourse[pArgs[2].i] = pArgs[3].i;
+    } else {
+        gpSaveData[pArgs[0].i].aSavedRound[pArgs[1].i].n0 = 0;
+    }
+    gpSaveData[pArgs[0].i].aSavedRound[pArgs[1].i].nHoleNum[pArgs[2].i] = pArgs[4].i;
 }
 
 void fn_80080AA0(MsgArg* pArgs, MsgArg* pResult) {
@@ -3000,6 +3056,12 @@ void fn_80080AA0(MsgArg* pArgs, MsgArg* pResult) {
 // A string's first character.
 void fn_80080AD0(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = ((MsgString*)pArgs[0].p)->pStr[0];
+}
+
+// Hole pArgs[2] of slot pArgs[0]'s custom round pArgs[1]: its course and hole number.
+void fn_80080BB8(MsgArg* pArgs, MsgArg* pResult) {
+    *(s32*)pArgs[3].p = gpSaveData[pArgs[0].i].aSavedRound[pArgs[1].i].nCourse[pArgs[2].i];
+    *(s32*)pArgs[4].p = gpSaveData[pArgs[0].i].aSavedRound[pArgs[1].i].nHoleNum[pArgs[2].i];
 }
 
 void fn_80080C2C(MsgArg* pArgs, MsgArg* pResult) {
@@ -3034,6 +3096,21 @@ void fn_800810BC(MsgArg* pArgs, MsgArg* pResult) {
 
 void fn_800810D8(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = lbl_801D7148.aCPU[pArgs[0].i];
+}
+
+// Option n14: menu choices 1-3 are the values 0-2.
+void fn_800810F4(MsgArg* pArgs, MsgArg* pResult) {
+    switch (pArgs[0].i) {
+    case 1:
+        gSession.options.n14 = 0;
+        return;
+    case 2:
+        gSession.options.n14 = 1;
+        return;
+    case 3:
+        gSession.options.n14 = 2;
+        return;
+    }
 }
 
 void fn_80081270(MsgArg* pArgs, MsgArg* pResult) {
