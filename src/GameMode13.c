@@ -6,6 +6,7 @@
 #include "golfer.h"
 #include "ball.h"
 #include "game.h"
+#include "engine.h"
 
 // The prize rows at lbl_80200538 + 0x710 (see GameMode10.c).
 typedef struct MiniPrize {
@@ -34,17 +35,9 @@ extern s32 lbl_802823B8;                    // the seconds added by the last sho
 extern s32 lbl_802823BC;                    // the points of the last shot
 
 u32   Rand_Next(int nStream);
-void  Mem_cpy(void* pDst, void* pSrc, int nBytes);
 void  AI_DefaultTarget(int nPlayer);
 void  fn_800A624C(void);
-void  fn_800A6278(void);
-void  fn_800A62A4(void);
-void  fn_800A62E0(void);
-void  fn_800A6358(void);
-void  fn_800A63D0(void);
-void  fn_800A30E4(int nKind, u8* pBall, int nPlayer, int a, f32 f);
 void  fn_800ED710(s32 p0);
-void  fn_80125910(int a);
 void  fn_800F21B4(int nPlayer);
 s32   fn_800F266C(s32 n, int i);
 s32   fn_800F2810(s32 n);

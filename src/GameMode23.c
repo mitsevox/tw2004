@@ -4,14 +4,13 @@
 
 #include "golfer.h"
 #include "game.h"
+#include "engine.h"
 
 void fn_800EDE78(void);
-void UStream_UnregisterHandler();
-void fn_8000E790();
 void fn_800EDEE8(void);
-void fn_800EDF34(s32 p0);
-void fn_800EDF60(s32 p0);
-void fn_800EDF90(s32 p0);
+void fn_800EDF34(UStreamObject* pObject);
+void fn_800EDF60(UStreamObject* pObject);
+void fn_800EDF90(UStreamObject* pObject);
 extern s32 gpSaveData;
 void fn_800EE064(void);
 extern u8 lbl_8028233C;
@@ -81,18 +80,12 @@ void fn_800D2714(u16* pDate, s32* pDay, s32* pMonth, s32* pYear);
 s32  fn_8011A7C8(s32 nPlayer, s32 nHole);
 s32  fn_80119588(s32 a);
 s32  fn_800E1904(s32 nPlayer, s32 a);
-char* strcpy(char* pDst, const char* pSrc);
 int   sprintf(char* pDst, const char* pFmt, ...);
-int   UStream_RegisterHandler();
-u32   fn_8000E81C(void* pObj, void** ppData);
-void* fn_800951A0(u32 nSize, int nAlign, int a);
-void  Mem_cpy(void* pDst, void* pSrc, int nBytes);   // memcpy
-void  fn_80009E70(void* p);                 // free
 s32   fn_80118684(s32 a);
 char* fn_80118E30(s32 a, s32 b);
 s32   fn_80119118(s32 a, s32 b);
 s32   fn_801197CC(s32 a, s32 b);
-void  fn_800EDFC0(void* pObj);
+void  fn_800EDFC0(UStreamObject* pObject);
 s32  fn_800F02A8(void);
 s32  fn_800EFA9C(s32 i);
 
@@ -100,22 +93,22 @@ void fn_800EDE78(void) {
 }
 
 void fn_800EDEE8(void) {
-    UStream_UnregisterHandler(1346847075);
-    UStream_UnregisterHandler(1346847092);
-    UStream_UnregisterHandler(1346847088);
-    UStream_UnregisterHandler(1346847086);
+    UStream_UnregisterHandler('PGAc');
+    UStream_UnregisterHandler('PGAt');
+    UStream_UnregisterHandler('PGAp');
+    UStream_UnregisterHandler('PGAn');
 }
 
-void fn_800EDF34(s32 p0) {
-    fn_8000E790(p0, 3100, LESSON_BYTES);
+void fn_800EDF34(UStreamObject* pObject) {
+    fn_8000E790(pObject, 3100, LESSON_BYTES);
 }
 
-void fn_800EDF60(s32 p0) {
-    fn_8000E790(p0, 2604, (LESSON_BYTES + 0xC1C));
+void fn_800EDF60(UStreamObject* pObject) {
+    fn_8000E790(pObject, 2604, (LESSON_BYTES + 0xC1C));
 }
 
-void fn_800EDF90(s32 p0) {
-    fn_8000E790(p0, 132, (LESSON_BYTES + 0x6FC8));
+void fn_800EDF90(UStreamObject* pObject) {
+    fn_8000E790(pObject, 132, (LESSON_BYTES + 0x6FC8));
 }
 
 void fn_800EE064(void) {
@@ -310,20 +303,20 @@ s32 fn_800F0428(s32 n) {
 }
 
 void fn_800EDE7C(void) {
-    UStream_RegisterHandler('PGAc', fn_800EDF34, 'PG\0\0');
-    UStream_RegisterHandler('PGAt', fn_800EDF60, 'PG\0\0');
-    UStream_RegisterHandler('PGAp', fn_800EDF90, 'PG\0\0');
-    UStream_RegisterHandler('PGAn', fn_800EDFC0, 'PG\0\0');
+    UStream_RegisterHandler('PGAc', fn_800EDF34);
+    UStream_RegisterHandler('PGAt', fn_800EDF60);
+    UStream_RegisterHandler('PGAp', fn_800EDF90);
+    UStream_RegisterHandler('PGAn', fn_800EDFC0);
 }
 
 // The 'PGAn' object: the names block is copied out.
-void fn_800EDFC0(void* pObj) {
+void fn_800EDFC0(UStreamObject* pObject) {
     void* pData;
-    u32 nSize = fn_8000E81C(pObj, &pData);
+    u32 nSize = fn_8000E81C(pObject, &pData);
     if (nSize) {
         *(void**)(LESSON_BYTES + 0x704C) = fn_800951A0(nSize, 0x10, 1);
         Mem_cpy(*(void**)(LESSON_BYTES + 0x704C), pData, nSize);
-        fn_80009E70(pObj);
+        fn_80009E70(pObject);
     }
 }
 

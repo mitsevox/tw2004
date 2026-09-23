@@ -4,12 +4,11 @@
 
 #include "golfer.h"
 #include "game.h"
+#include "engine.h"
 
-void UStream_UnregisterHandler();
-void fn_8000E790();
 void fn_800F0570(void);
-void fn_800F05B0(s32 p0);
-void fn_800F05DC(s32 p0);
+void fn_800F05B0(UStreamObject* pObject);
+void fn_800F05DC(UStreamObject* pObject);
 extern u8 lbl_8028234C;
 s32 fn_800F0E18(void);
 extern s32 lbl_80282350;
@@ -40,11 +39,6 @@ extern RTEvent lbl_8020CF90[];
 #define EVENT_NAMES (*(char**)(EVENT_BYTES + 0x4DA0))
 
 void  GM_vCloseModuleONCE(void);
-int   UStream_RegisterHandler();
-u32   fn_8000E81C(void* pObj, void** ppData);
-void* fn_800951A0(u32 nSize, int nAlign, int a);
-void  Mem_cpy(void* pDst, void* pSrc, int nBytes);   // memcpy
-void  fn_80009E70(void* p);                 // free
 void  fn_800EAA40(void);
 void  fn_800E0B38(int nMode);
 void  fn_800EC544(void* pList, s32 n);
@@ -56,14 +50,13 @@ u32   Rand_Next(int nStream);
 void  fn_8011E020(s32* pYear, s32* pMonth, s32* pDay, s32* a, s32* b, s32* c, s32* d);
 void  fn_800D2714(u16* pDate, s32* pDay, s32* pMonth, s32* pYear);
 void  fn_800D2678(u16* pDate, s32 nYear, s32 nMonth, s32 nDay);
-char* strcpy(char* pDst, const char* pSrc);
 extern void (*lbl_8028235C)(void);
 extern void (*lbl_80282358)(void);
 extern s32 lbl_80281680;
 extern s32 lbl_80282348;
 extern u8* gpSaveData;
-void  fn_800F05DC(s32 p0);
-void  fn_800F060C(void* pObj);
+void  fn_800F05DC(UStreamObject* pObject);
+void  fn_800F060C(UStreamObject* pObject);
 void  fn_800F0678(void);
 void  fn_800F0BBC(void);
 s32   fn_800F0820(void);
@@ -72,17 +65,17 @@ u8    fn_800F0DB8(s32 nYear, s32 nMonth, s32 nDay, s32* pId, s32* pRound);
 s32   fn_800F0F54(void);
 
 void fn_800F0570(void) {
-    UStream_UnregisterHandler(1381254499);
-    UStream_UnregisterHandler(1381254515);
-    UStream_UnregisterHandler(1381254510);
+    UStream_UnregisterHandler('RTEc');
+    UStream_UnregisterHandler('RTEs');
+    UStream_UnregisterHandler('RTEn');
 }
 
-void fn_800F05B0(s32 p0) {
-    fn_8000E790(p0, 5664, EVENT_BYTES);
+void fn_800F05B0(UStreamObject* pObject) {
+    fn_8000E790(pObject, 5664, EVENT_BYTES);
 }
 
-void fn_800F05DC(s32 p0) {
-    fn_8000E790(p0, 14208, (EVENT_BYTES + 0x1620));
+void fn_800F05DC(UStreamObject* pObject) {
+    fn_8000E790(pObject, 14208, (EVENT_BYTES + 0x1620));
 }
 
 u8 fn_800F0818(void) {
@@ -147,19 +140,19 @@ void fn_800F0448(void) {
 }
 
 void fn_800F0518(void) {
-    UStream_RegisterHandler('RTEc', fn_800F05B0, 'RT\0\0');
-    UStream_RegisterHandler('RTEs', fn_800F05DC, 'RT\0\0');
-    UStream_RegisterHandler('RTEn', fn_800F060C, 'RT\0\0');
+    UStream_RegisterHandler('RTEc', fn_800F05B0);
+    UStream_RegisterHandler('RTEs', fn_800F05DC);
+    UStream_RegisterHandler('RTEn', fn_800F060C);
 }
 
 // The 'RTEn' object: the names block is copied out.
-void fn_800F060C(void* pObj) {
+void fn_800F060C(UStreamObject* pObject) {
     void* pData;
-    u32 nSize = fn_8000E81C(pObj, &pData);
+    u32 nSize = fn_8000E81C(pObject, &pData);
     if (nSize) {
         EVENT_NAMES = fn_800951A0(nSize, 0x10, 1);
         Mem_cpy(EVENT_NAMES, pData, nSize);
-        fn_80009E70(pObj);
+        fn_80009E70(pObject);
     }
 }
 

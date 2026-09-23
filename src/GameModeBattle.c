@@ -4,12 +4,12 @@
 
 #include "golfer.h"
 #include "game.h"
+#include "engine.h"
 
 u8    Bag_AddClub(int nPlayer, int nBit);
 u8    Bag_RemoveClub(int nPlayer, int nBit);
 u8    Bag_HasClub(int nPlayer, int nBit);
 int   Bag_CountClubs(int nPlayer);
-void  fn_80125910(int a);
 extern u8* gpSaveData;
 extern u32 lbl_8020315C[5];                 // the bags at the start of the round
 extern s32 lbl_80203148[5];                 // how many clubs each bag had then

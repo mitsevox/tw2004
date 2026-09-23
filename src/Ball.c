@@ -8,6 +8,7 @@
 #include "physics.h"
 #include "ball.h"
 #include "game.h"
+#include "engine.h"
 
 #define BALL_RADIUS 0.0256667f      // 0.92 in (a real one is 0.84)
 #define CUP_DIAMETER 0.10717f       // 3.86 in (a real cup is 4.25)
@@ -15,13 +16,11 @@
 void   Vec3Copy(f32* pSrc, f32* pDst);           // 0x80008304
 f32    Vec_Distance(f32* pA, f32* pB);           // 0x800BB050
 f32    fn_8000AD78(f32 y, f32 x);                // atan2f
-f32    fn_8000AD9C(f32 x);                       // fabsf
 void   Ball_Stop(Ball* pBall);                   // 0x80054340
 void   Vec_Copy(f32* pSrc, f32* pDst);           // 0x8000AD10
 f32    fn_800095F0(f32 x);                       // sinf
 f32    fn_80009638(f32 x);                       // cosf
 void   fn_8000AE28(f32* pIn, f32 f, f32* pOut);  // scale a vector
-void   EVENT_Trigger(int nPlayer, int nEvent, int a, int b);   // the game-event table
 void   Ball_SetLie(Ball* pBall, SurfaceType* pSurface);
 void   Ball_Tick(Ball* pBall, f32 fTicks);
 void   Physics_FixBallHeight(Ball* pBall, u8 bSettle, f32 fTicks);
@@ -89,11 +88,9 @@ f32    Ball_DistanceToPin(f32* pPos);
 void   Ball_Holed(Ball* pBall);
 void   Ball_SimSeconds(Ball* pBall, f32 fSeconds, f32 fTick);
 
-f32    fn_80009744(f32* pVec);                   // dot with itself
 double fn_80009680(double x);                    // sqrt
 void   Ter_GetEnclosingGroundData(CourseInfo* pCourse, Ball* pBall, f32* pHeight, SurfaceType** ppSurface, f32* pNormal,
                    f32* pHeight2, SurfaceType** ppSurface2, f32* pNormal2);
-void   Ter_GetEnclosingGroundHeight(CourseInfo* pCourse, Ball* pBall, f32* pHeight, f32* pHeight2);
 int    fn_80050BEC(SurfaceType* pSurface);       // a surface's index
 u8     fn_800B1B18(int nPlayer, f32* pTo, f32* pFrom, f32* pHit, f32* pNormal, s32* pWhat);
 u8     fn_80053E98(Ball* pBall, void* pObj, f32* pHit, f32* pNormal);
@@ -1429,7 +1426,7 @@ void Physics_FixBallHeight(Ball* pBall, u8 bSettle, f32 fTicks) {
     bRetried = 0;
 retry:
     if (!lbl_80281DE4) {
-        Ter_GetEnclosingGroundHeight(pBall->pCourse, pBall, &lbl_80281DE0, &lbl_80281DDC);
+        Ter_GetEnclosingGroundHeight(pBall->pCourse, pBall->vPos, &lbl_80281DE0, &lbl_80281DDC);
     }
     fGround = lbl_80281DE0;
     if (fGround < -60000.0f) {

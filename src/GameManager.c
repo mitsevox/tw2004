@@ -6,6 +6,7 @@
 #include "golfer.h"
 #include "ball.h"
 #include "game.h"
+#include "engine.h"
 
 typedef struct View View;
 
@@ -27,7 +28,6 @@ void  fn_800E3B28(void);
 void  fn_800DA36C(void);
 void  GM_FlyByMode_Init(void);
 void  fn_800D8D38(int nPlayer);
-void  EVENT_Trigger(int nPlayer, int nEvent, int a, int b);
 void  Caddie_Stop(void);
 void  fn_8001D7A4(int nHandle);
 u8    fn_800E0A90(int nPlayer);
@@ -35,11 +35,8 @@ u8    fn_800E3A54(void);
 u8    fn_800E1CA8(void);
 void  fn_800D439C(int nPlayer, int a);
 void  fn_800D9834(int nPlayer);
-void  fn_80125910(int a);
 u8    fn_8012591C(void);
 void  fn_80125854(int a);
-void* fn_80017028(int nView);
-void  View_SetCamera(void* pView, int nCamera, int nPlayer, int nView);
 void  fn_800E3D38(int nPlayer, int a);
 void  fn_8011989C(int nPlayer, int nStrokes);
 void  GM_GolferConcede_Hole(int nPlayer);
@@ -76,17 +73,14 @@ void  fn_800D9350(int nPlayer);
 int   fn_800D2B08(void);                    // the hole's par
 void  fn_800BB0A8(void);
 void  fn_800335F8(int a);
-void  fn_800A76E4(void);
 void  fn_8006C4C0(int nPlayer);
 void  fn_8006C4A0(void);
 void  fn_800C70F8(void* pView, int a);
-void  fn_800957D8(int nHandle);
 void  fn_800957FC(int nHandle, int a);
 u8*   fn_80016CFC(int nView);
 int   fn_80015464(void);
 CourseInfo* fn_8000C594(void);
 void  fn_800E0AF0(f32* pFrom, f32* pTo, f32* pOut);
-f32   fn_80009744(f32* pVec);               // dot with itself
 u32   Rand_Next(int nStream);
 
 extern u8  gReplayData[];                   // 0x801D6030
@@ -101,7 +95,6 @@ typedef struct HoleTees {
 f32   fn_800336E4(void);
 f32   fn_800336F4(void);
 void  GOLFERSTATE_Push(int nState, int nPlayer);
-void  fn_8001704C(int nView, int nPlayer);
 u8    fn_800E415C(void);
 u8    fn_800E45CC(void);
 u8    fn_800E46B4(void);
@@ -112,11 +105,9 @@ void  fn_800E41C8(void);
 u8    Ter_PointInOOBNetwork(u8* pBall);
 
 void  Vec3Copy(void* pSrc, void* pDst);
-void  Ter_GetEnclosingGroundHeight(CourseInfo* pCourse, f32* pPos, f32* pLow, f32* pHigh);
 u8    fn_800E27A8(void);
 int   fn_8006AA9C(int nPlayer);             // how the shot turned out (0..4, 8+)
 void  fn_8006AAB4(int nPlayer, int a);
-int   fn_80095780(int nHandle);             // the golfer's current animation
 
 typedef struct Vec4 { f32 x, y, z, w; } Vec4;
 u32   fn_800136DC(int nController);         // buttons: held << 16 | pressed this frame
@@ -138,8 +129,6 @@ extern Vec4 lbl_80184D30;
 void  Shot_Prepare(int nPlayer, u8 bNotify);
 void  BreakLine_Start(int nView);            // GoBreakLine.c
 void  fn_8009B970(int nView);
-void  fn_8001C804(int nPlayer, int a, int b);
-void  fn_80095744(int nHandle, int nAnim);   // play an animation
 void  fn_800689D4(int nPlayer);
 void  fn_800C4E80(void* pView, int nPlayer);
 u8    GM_bIsZoomButtonPressed(int nPlayer);
@@ -147,7 +136,6 @@ u8    GM_bIsElevatorCamButtonPressed(int nPlayer);
 u8    fn_800E012C(int nPlayer);
 u8    fn_800DFF0C(int nPlayer);
 u8    fn_80068AC8(int nPlayer);
-void  Emotion_UpdatePlayerEmotion(int nPlayer);
 
 u64   fn_800954A4(int a);                   // a time stamp
 f32   fn_8006E118(u64 tEnd, u64 tStart);    // seconds between two time stamps
@@ -161,7 +149,6 @@ u8    fn_800BB1F8(int nPlayer);
 void  fn_8001DB04(int nHandle, f32* pOut);  // the golfer's position
 void  Ter_GetEnclosingGroundData(CourseInfo* pCourse, f32* pPos, f32* pHighA, SurfaceType** ppSurfA, f32* pNormA,
                                  f32* pHighB, SurfaceType** ppSurfB, f32* pNormB);
-f32   fn_8000AD9C(f32 x);                   // fabsf
 void  fn_800E0B14(f32* pA, f32* pB, f32* pOut);
 u8    fn_8004560C(void);
 int   fn_80095798(int nHandle);

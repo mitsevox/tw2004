@@ -5,6 +5,7 @@
 #include "golfer.h"
 #include "ball.h"
 #include "game.h"
+#include "engine.h"
 
 // The swing module's state; only the tuning values read here. Set up in Swing_Init.
 typedef struct SwingState {
@@ -528,8 +529,6 @@ extern u8 gReplayData[];                     // 0x801D6030  saved seed at +0, sw
 
 void Ball_Launch(void* pBall, int nClub, int nKind, f32 fPower, f32 fAim, int nTrajectory, f32* pA, f32* pB);
 void Luck_TakePerfectShot(int nPlayer);      // Golfer.c
-void fn_8000B1D4(int nStream, u32 uSeed);    // seed an RNG stream
-void fn_80095744(int nHandle, int nAnim);    // play an animation
 void CharacterState_UpdateSKAState(int nHandle);
 void fn_8006BF60(int nPlayer);               // the replay recorder
 void fn_8006C300(int nPlayer);
@@ -1001,7 +1000,6 @@ void fn_8005CD94(void) {
 
 // ---- state 2: thinking ----------------------------------------------------------------------------
 
-void* fn_80017028(int nView);                // the view
 u8    fn_800C7100(void* pView);              // its camera has settled
 void  AI_ApplyError(int nPlayer);            // Golfer.c
 
@@ -1064,19 +1062,16 @@ f32 fn_8005CB78(int nHandle, unsigned long long uEvent);   // an animation event
 void Swing_ResetBoostAndSpin(int nPlayer);
 void fn_8006C5E0(void);
 void Swing_ClearFrameFlag(int nPlayer);
-void EVENT_Trigger(int nPlayer, int nSound, int a, int b);
 
 // The swing is under way: phase 1, the animation started, its three marks read, the 25-sample
 // stick history filled with the centre, the spin stick centred.
 // The backswing's top mark, a hair early.
 void fn_800360A0(void* p);
-void fn_80009E70(void* p);
 
 // Release the swing's loaded resources: two blocks in the tuning data and three pairs of handles.
 void Swing_LoadTuning(int nPlayer);
 void Swing_ResetBoostAndSpin(int nPlayer);
 void fn_80036054(void* p, int a, s32* pDesc);
-void* fn_80009B34(u32 uSize, u32 uFlags, u32 uAlign, const char* pFile, int nLine);  // alloc
 
 // Set the swing module up: player 1's ratings and the fixed tuning into gpSwing, the two resource
 // blocks, each player's tuning and swing state, and three pairs of buffers.
@@ -1965,7 +1960,6 @@ void fn_8005A850(int nPlayer) {
 }
 
 void fn_8001EEE4(u8* pSkel, int nBone);
-f32  fn_8000AD9C(f32 x);                       // fabsf
 void fn_80008BB8(f32* pOut, f32 x, f32 y, f32 z);
 void fn_80027808(u8* pSkel, f32* pRot);
 
@@ -2092,9 +2086,7 @@ void Swing_ResetBoostAndSpin(int nPlayer) {
 // sGolferStateEngineTable is a table of 27 (enter, update, exit) callbacks; the current state is the top of
 // the player's SwingStack. Most of these drive the camera, HUD and sounds around the swing.
 
-void  View_SetCamera(void* pView, int nCamera, int nPlayer, int nView);   // 0x800632E4
 void  fn_800E3D38(int nPlayer, int a);
-void  Emotion_UpdatePlayerEmotion(int nPlayer);
 void  GM_DoPostShotInHoleUI(int nPlayer);
 u8    fn_80063C90(void* pView);              // the camera is still moving
 void  fn_80063BF4(void* pView, f32 f, f32* pVec);
@@ -2446,7 +2438,6 @@ void STATEFUNC_ZoomInit(int nPlayer) {
 
 
 void  fn_8006AAB4(int nPlayer, int a);
-void  fn_80063B98(void* pView, f32 f, f32* pVec);
 extern Vec4 lbl_801835F0;
 extern u8   lbl_80281E12;
 
@@ -2719,7 +2710,6 @@ void STATEFUNC_MidHoleFlyByInit(int nPlayer) {
 void  GM_MovePlayerToBall(int nPlayer);
 void fn_80062BFC(int nHandle);
 void fn_80062BE8(int nHandle);
-void  fn_8001C804(int nPlayer, int a, int b);
 u8*   fn_80016CFC(int nView);
 void  Caddie_ApplyTip(int nPlayer);           // Golfer.c
 
@@ -2771,7 +2761,6 @@ void STATEFUNC_GreenWatchRollInit(int nPlayer) {
 
 u8    fn_800172C4(void* pView);               // the camera move has finished
 u8    fn_80014300(u32 uMask);                 // any pad pressed these buttons
-void  fn_800A76E4(void);
 u8 fn_80062B90(void);
 u8 fn_80062B88(int nPlayer);
 void fn_80062B84(int a);
@@ -2833,7 +2822,6 @@ void STATEFUNC_InitialFlyByUpdate(int nPlayer) {
 
 
 void  fn_8006B2C4(int nPlayer, int a);
-int   fn_80095780(int nHandle);               // the animation playing
 u8    fn_80101738(void);
 u8    fn_800C6CB0(void);
 void  fn_8006ACF8(int nPlayer, int a);
@@ -3063,9 +3051,7 @@ void  fn_80017004(int nView);
 void  fn_80012EF0(void);
 void  fn_800171D8(f32 x, f32 y, f32 w, f32 h);
 void  fn_8001D8DC(int nPlayer);
-void  fn_800957D8(int nHandle);
 void  fn_8003349C(f32 a, f32 b, f32 c);
-void  Ter_GetEnclosingGroundHeight(CourseInfo* pCourse, f32* pPos, f32* pOutA, f32* pOutB);
 void  fn_800D8D10(int nPlayer);
 void  fn_800693A4(int nPlayer);
 void  fn_80069330(int nPlayer, f32* pPos);
@@ -3771,7 +3757,6 @@ u8    fn_8001DBF4(int nHandle);               // the ball is in the golfer's han
 int   fn_8001EED8(void* pSkel, int nBone);    // a bone's index
 f32   fn_8004D620(CourseInfo* pCourse, f32* pPos);   // ground height, -60000 and below if none
 void fn_80062DDC(f32* pA, f32* pB, f32* pOut);       // a - b
-double fn_80009744(f32* pVec);                // dot with itself
 void  fn_800BAF04(f32* pSrc, f32* pDst);      // normalise (3)
 void  fn_80051A18(u8* pBall, f32* pDir, f32 fSpeed, u8* pFrom);   // Ball.c: launch with a velocity
 extern Vec4 lbl_80183680;

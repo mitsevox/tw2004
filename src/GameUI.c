@@ -3,6 +3,7 @@
 
 #include "golfer.h"
 #include "game.h"
+#include "engine.h"
 
 void  fn_8001437C(void);
 void  fn_800E542C(void);
@@ -12,7 +13,6 @@ void  fn_8006A8B0(void);
 void  fn_800E0AC4(int a);
 void  fn_800E0A98(int a);
 void  fn_800E5474(int a);
-void  EVENT_Trigger(int nPlayer, int nEvent, int a, int b);
 void  fn_800A72EC(int a, int b);
 
 extern u8  lbl_80282281;                    // the end-of-round screen is up
@@ -149,8 +149,6 @@ void  fn_800E5548(int a, int b, int c);
 void  fn_800E5510(int a, int b, int c);
 void  fn_800E54D8(int a, int b, int c);
 void  fn_800E54A0(int a, int b, int c);
-void* fn_80017028(int nView);
-void  fn_80063B98(void* pView, f32* pVec, f32 f);
 
 typedef struct Vec4 { f32 x, y, z, w; } Vec4;
 extern Vec4 lbl_80184D90;
@@ -159,14 +157,12 @@ extern u8   lbl_80281640[8];
 void  fn_80062CE0(int a);
 u8    fn_80095430(int a);
 void  fn_80095444(int a);
-void  fn_800953C8(int a);
 void  fn_80125814(int a);
 void  fn_800ECBE4(void);
 void  fn_80101EDC(void);
 u8    fn_800E5C84(void);
 void  fn_800A7350(int a);
 void  fn_8009EF98(void);
-void  fn_800A76E4(void);
 void  fn_800E1018(int nPlayer, int nHole);
 void  fn_8006F4B4(void);
 int   GM_GotoNextSelectedHole(void);
@@ -639,8 +635,8 @@ void fn_800E4D94(u8 bHuman) {
         GameEffects_ResetGameEffectSettings();
         if ((Game_GetMode() == 26 || Game_GetMode() == 22) && gSession.nSplitScreen) {
             v = lbl_80184D90;
-            fn_80063B98(fn_80017028(gPlayers[0].nView0), (f32*)&v, 0.0f);
-            fn_80063B98(fn_80017028(gPlayers[1].nView0), (f32*)&v, 0.0f);
+            fn_80063B98(fn_80017028(gPlayers[0].nView0), 0.0f, (f32*)&v);
+            fn_80063B98(fn_80017028(gPlayers[1].nView0), 0.0f, (f32*)&v);
         }
         if (bHuman) {
             fn_80062D38(0xE, 2, 1);

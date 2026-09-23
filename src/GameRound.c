@@ -5,6 +5,7 @@
 #include "ball.h"
 #include "physics.h"
 #include "game.h"
+#include "engine.h"
 
 int  fn_800E19A4(int nPlayer, int nHoles);
 void fn_800E25CC(u8 b);
@@ -73,7 +74,6 @@ void  fn_80125E68(void);
 extern s32 lbl_80282278;
 
 CourseInfo* fn_8000C594(void);
-void  Mem_cpy(void* pDst, void* pSrc, int nBytes);   // memcpy
 void  Vec_Copy(f32* pSrc, f32* pDst);
 u8    Ter_PointInOOBNetwork(u8* pBall);
 u8    fn_800E3AF8(void);

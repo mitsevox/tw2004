@@ -6,6 +6,7 @@
 #include "golfer.h"
 #include "ball.h"
 #include "game.h"
+#include "engine.h"
 
 // The prize rows at lbl_80200538 + 0x710 (see GameMode10.c); nMode16 is the points for a surface.
 typedef struct MiniPrize {
@@ -32,14 +33,7 @@ extern s32 lbl_80282394;                    // the points multiplier from bonuse
 extern s32 lbl_80282398;                    // the points of the last shot
 
 u32   Rand_Next(int nStream);
-void  Mem_cpy(void* pDst, void* pSrc, int nBytes);
 void  AI_DefaultTarget(int nPlayer);
-void  fn_800A62A4(void);
-void  fn_800A62E0(void);
-void  fn_800A6358(void);
-void  fn_800A63D0(void);
-void  fn_800A30E4(int nKind, u8* pBall, int nPlayer, int a, f32 f);
-void  fn_80125910(int a);
 void  fn_800F21B4(int nPlayer);
 s32   fn_800F2810(s32 n);
 

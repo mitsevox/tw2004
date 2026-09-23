@@ -5,6 +5,7 @@
 #include "golfer.h"
 #include "ball.h"
 #include "game.h"
+#include "engine.h"
 
 extern Replay gReplayData;
 
@@ -41,21 +42,16 @@ void  Wind_Set(int nDir, f32 fSpeed);
 void  fn_80055C40(int n);
 void  fn_80055CAC(int n);
 void  fn_80055CD0(int n);
-void  Mem_cpy(void* pDst, void* pSrc, int nBytes);
 void  Vec_Copy(f32* pSrc, f32* pDst);
 f32   Vec_Distance(f32* pA, f32* pB);
 void  fn_8001C774(int nHandle, int nClub);
 void  fn_8001C724(int nHandle, int nKind);
 void  fn_8006BF60(int nPlayer);
-void  fn_8000B1D4(int nStream, u32 nSeed);
 CourseInfo* fn_8000C594(void);
 int   fn_8001D324(int n);
 void  Character_SetPosition(int nHandle, f32* pPos, int a);
 void  AI_DefaultTarget(int nPlayer);
 void  Shot_Prepare(int nPlayer, u8 bNotify);
-void  fn_8001C804(int nPlayer, int a, int b);
-void  fn_800957D8(int nHandle);
-void  fn_80095744(int nHandle, int nAnim);
 u32   Rand_Next(int nStream);
 void  fn_800A631C(void);
 int   fn_80015464(void);

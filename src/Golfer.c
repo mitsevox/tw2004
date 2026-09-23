@@ -5,6 +5,7 @@
 #include "golfer.h"
 #include "ball.h"
 #include "game.h"
+#include "engine.h"
 
 // ---- small accessors ------------------------------------------------------------------------
 
@@ -636,7 +637,6 @@ void AI_DefaultTarget(int nPlayer) {
     Vec_Copy(pTarget, p->vTarget2);
 }
 
-void Mem_cpy(void* pDst, void* pSrc, int nBytes);   // memcpy
 extern s8 gLuckOdds[8];                 // 0x802810B0  "1 in n" per player: 12 12 12 12
 u8   fn_80101D4C(int nPlayer);          // a CPU in game mode 11 is always lucky
 u8   fn_800DA234(void);                 // the current hole is the flagged one
@@ -1267,7 +1267,6 @@ void Shot_Plan(int nPlayer, u8 bNotify) {
 
 extern u8 gAITargetsLoaded;             // 0x80281D40
 
-void fn_80005AE8(void* p, int c, int n);                    // memset
 u8   Course_RegisterLoader(int nChunk, void (*pfn)(u8*));   // 0x8000C0B4
 
 void AI_TargetsClear(void) {
@@ -1406,11 +1405,7 @@ void Caddie_Stop(void) {
 
 // ---- the golfer table's arrival ---------------------------------------------------------------
 
-typedef struct UStreamObject UStreamObject;     // UStream.c: pData at +0, uSize at +0x24
-int  UStream_RegisterHandler(u32 uType, void (*pfn)(UStreamObject*));
 void Golfer_TableSetup(void);
-int  UStream_UnregisterHandler(u32 uType);
-void fn_80009E70(void* p);                                        // free
 void fn_80076158(u8** ppSrc, u8* pDst, int nBytes, int nWidth);   // byte-swap copy, nWidth 2/4/8
 
 // The 0xA8 bytes at +0x98 of every record are 21 eight-byte values stored little-endian:
@@ -1635,13 +1630,9 @@ extern ViewSlot gViewSlots[];       // 0x80187124  per player
 
 u8    fn_800170A0(int nView);                                   // the view exists
 void  fn_80016D18(int nView, f32 x, f32 y, f32 w, f32 h);       // open it (screen fractions)
-void  fn_8001704C(int nView, int nPlayer);                      // attach a player
-void* fn_80017028(int nView);
-void  View_SetCamera(void* pView, int nCamera, int nPlayer, int nView);
 void  fn_80009710(f32* pQuat);                                  // identity (0, 0, 0, 1)
 void  fn_8005CE70(int nPlayer);
 void  fn_80095504(int n);
-void  fn_800953C8(int n);
 
 // Fill a player slot from the golfer table and set up its view(s). uBag overrides the record's
 // bag when non-zero (or everything, with session flag 0x200); an empty bag gets the default.
@@ -1775,7 +1766,6 @@ extern u8*  gpSaveData;             // 0x80281DF8  created-golfer profiles at +0
 extern char lbl_80187650[];         // "cl_bbsd" ... the default name at +0x1A
 
 void fn_800CB700(char* pDst, char* pSrc);       // string copy
-void fn_8000B1D4(int nStream);                  // reseed the RNG stream
 void fn_80055C40(int n);
 void fn_80055CD0(int n);
 u8   fn_80077B18(void);
@@ -1855,7 +1845,7 @@ void Session_Init(void) {
     pSession->unk28       = 0;
     Options_SetDefaults(SESSION_OPTIONS);
     gSession.nSeed = Rand_Next(0);
-    fn_8000B1D4(0);
+    fn_8000B1D4(0, gSession.nSeed);
     gSession.nNumPlayers = 1;
     gSession.unk5B38     = -1;
     gSession.unk5B39     = 1;

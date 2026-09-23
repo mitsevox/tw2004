@@ -4,6 +4,7 @@
 
 #include "golfer.h"
 #include "game.h"
+#include "engine.h"
 
 // The effects state (lbl_80202898).
 typedef struct GameEffects {
@@ -48,7 +49,6 @@ typedef struct GameEffects {
 
 extern GameEffects lbl_80202898;
 
-void  EVENT_Trigger(int nPlayer, int nEvent, int a, int b);
 void  fn_800DCAD8(void);
 u8    Controller_IsPad(int nController);
 void  fn_800131C4(int nController);
@@ -56,7 +56,6 @@ void  fn_80013130(int nController, int nStrength);
 u8    fn_800C714C(void);
 u8    fn_800DCB74(void);
 u8    fn_800DCB3C(void);
-void  Mem_cpy(void* pDst, void* pSrc, int nBytes);   // memcpy
 void  fn_8001425C(int a);
 void  fn_80012F34(int a);
 void  fn_80012F18(int a);
@@ -78,7 +77,6 @@ u8    fn_800DCB00(void);
 u8    fn_8005D2DC(void);
 void  GM_vCloseModuleONCE(void);
 u8    fn_800C6CCC(void);
-f32   fn_8000AD9C(f32 x);                  // fabsf
 u8    fn_800C6CB0(void);
 u8    fn_800B4AE0(void);
 f32   AI_MaxDistance(int nPlayer, int nKind, int nClub);
@@ -86,13 +84,11 @@ f32   fn_800510EC(u8* pBall);
 f32   fn_8005B64C(int nPlayer);
 void  fn_80045494();                      // (bOn, nPlayer); EA calls it with one argument too
 void  fn_80045558(int a, int nPlayer);
-void* fn_80017028(int nView);
 int   fn_8003BDBC(int nPlayer, int nLie, int a, int b, int c, f32 fDist);
 void  fn_800DBFAC(void);
 void  fn_800DC18C(void);
 void  fn_800DC290(f32 fHeight);
 int   fn_800E17AC(int nPlayer);           // the player's total strokes
-f32   fn_80009744(f32* pVec);               // dot with itself
 void  fn_800DCB84(u8* pA, u8* pB, f32* pOut);
 int   fn_800F354C(int nPlayer);
 int   fn_800F1D34(int nPlayer);
@@ -109,8 +105,6 @@ void  fn_800A6DCC(int nMusic, int a);
 u32   fn_8003A950(int nCam, int a, s32* pKind, f32* pTime, s32* p3, s32* p4, s32* p5, int nPlayer);
 u8    fn_800451A8(void* pList, u32 uTarget, int nPlayer);
 u8    fn_8003DC78(u32 uTarget);
-int   fn_80095780(int nHandle);             // the golfer's current animation
-void  fn_80095744(int nHandle, int nAnim);  // play an animation
 extern u8 gNumPlayersSetUp;                 // 0x80281D48 (Golfer.c)
 
 // A course's records (the 'rcrd' block at gSession + 0xF00, 0x320 bytes per course).

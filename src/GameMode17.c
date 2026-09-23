@@ -5,6 +5,7 @@
 #include "golfer.h"
 #include "ball.h"
 #include "game.h"
+#include "engine.h"
 
 // The prize rows at lbl_80200538 + 0x710 (see GameMode10.c).
 typedef struct MiniPrize {
@@ -30,13 +31,6 @@ extern s32 lbl_802816A0;                    // the options saved while the game 
 extern s32 lbl_802823A0;
 extern s32 lbl_802823A4;                    // the extra balls of the last shot
 extern s32 lbl_802823A8;                    // the points of the last shot
-
-void  Mem_cpy(void* pDst, void* pSrc, int nBytes);
-void  fn_800A62A4(void);
-void  fn_800A62E0(void);
-void  fn_800A6358(void);
-void  fn_800A30E4(int nKind, u8* pBall, int nPlayer, int a, f32 f);
-void  fn_80125910(int a);
 
 void  fn_800F5CC8(void);
 void  fn_800F5CE4(void);

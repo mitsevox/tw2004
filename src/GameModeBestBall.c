@@ -4,12 +4,12 @@
 #include "golfer.h"
 #include "ball.h"
 #include "game.h"
+#include "engine.h"
 
 u8    Team_IsAllCPU(int nTeam);
 CourseInfo* fn_8000C594(void);
 int   fn_800E1788(int nPlayer);             // the player's round total
 int   fn_800D3C7C(int nPlayer);             // the player's golfer
-void  fn_80125910(int a);
 extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
 extern u8* gpSaveData;
 extern s32 lbl_80282278;                    // the player whose turn it is

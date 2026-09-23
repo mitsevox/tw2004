@@ -4,6 +4,7 @@
 #include "golfer.h"
 #include "ball.h"
 #include "game.h"
+#include "engine.h"
 
 // One challenge (0x80 bytes).
 typedef struct Challenge {
@@ -48,10 +49,8 @@ void fn_800EAE38(s32 p0);
 void fn_800EAE44(void);
 s32 fn_800EAE6C(void);
 extern Challenge lbl_80203554[83];
-void UStream_UnregisterHandler();
-void fn_8000E790();
 void fn_800EAEB8(void);
-void fn_800EAEEC(s32 p0);
+void fn_800EAEEC(UStreamObject* pObject);
 extern Challenge* lbl_80281664;
 extern s32 lbl_80281668;
 
@@ -69,11 +68,6 @@ extern s32 lbl_802822F0;
 extern void (*lbl_8028232C)(void);
 extern void (*lbl_80282324)(void);
 extern void (*lbl_80282318)(int nPlayer);
-int   UStream_RegisterHandler();
-u32   fn_8000E81C(void* pObj, void** ppData);
-void* fn_800951A0(u32 nSize, int nAlign, int a);
-void  Mem_cpy(void* pDst, void* pSrc, int nBytes);   // memcpy
-void  fn_80009E70(void* p);                 // free
 u32   Rand_Next(int nStream);
 extern u8* gpSaveData;
 int   fn_800ED028(int i);
@@ -87,7 +81,7 @@ void  fn_800EAD6C(void);
 void  fn_800EBD28(void);
 void  fn_800EC1E0(void);
 void  fn_800ED604(int nPlayer);
-void  fn_800EAF18(void* pObj);
+void  fn_800EAF18(UStreamObject* pObject);
 extern u8  (*lbl_80282320)(void);
 extern s32 lbl_80282300;
 extern s32 lbl_80282304;
@@ -194,27 +188,27 @@ s32 fn_800EAE6C(void) {
 }
 
 void fn_800EAE74(void) {
-    UStream_RegisterHandler('PLY ', fn_800EAEEC, 'PL\0\0');
-    UStream_RegisterHandler('PLYs', fn_800EAF18, 'PL\0\0');
+    UStream_RegisterHandler('PLY ', fn_800EAEEC);
+    UStream_RegisterHandler('PLYs', fn_800EAF18);
 }
 
 void fn_800EAEB8(void) {
-    UStream_UnregisterHandler(1347180832);
-    UStream_UnregisterHandler(1347180915);
+    UStream_UnregisterHandler('PLY ');
+    UStream_UnregisterHandler('PLYs');
 }
 
-void fn_800EAEEC(s32 p0) {
-    fn_8000E790(p0, 10624, lbl_80203554);
+void fn_800EAEEC(UStreamObject* pObject) {
+    fn_8000E790(pObject, 10624, lbl_80203554);
 }
 
 // The 'PLYs' object: the challenge text block is copied out.
-void fn_800EAF18(void* pObj) {
+void fn_800EAF18(UStreamObject* pObject) {
     void* pData;
-    u32 nSize = fn_8000E81C(pObj, &pData);
+    u32 nSize = fn_8000E81C(pObject, &pData);
     if (nSize) {
         lbl_80282310 = fn_800951A0(nSize, 0x10, 1);
         Mem_cpy(lbl_80282310, pData, nSize);
-        fn_80009E70(pObj);
+        fn_80009E70(pObject);
     }
 }
 

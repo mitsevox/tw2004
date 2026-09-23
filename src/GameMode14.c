@@ -6,6 +6,7 @@
 #include "golfer.h"
 #include "ball.h"
 #include "game.h"
+#include "engine.h"
 
 // One target's claim: how close the claiming shot was (0 best .. 4, 5 = unclaimed) and who holds it
 // (5 = nobody).
@@ -28,15 +29,8 @@ extern s32 lbl_80282374;                    // the points of the last claim
 extern s32 lbl_801928F0[];                  // points per rank
 
 u32   Rand_Next(int nStream);
-void  Mem_cpy(void* pDst, void* pSrc, int nBytes);
 void  AI_DefaultTarget(int nPlayer);
-void  fn_800A6278(void);
-void  fn_800A62E0(void);
-void  fn_800A6358(void);
-void  fn_800A63D0(void);
-void  fn_800A30E4(int nKind, u8* pBall, int nPlayer, int a, f32 f);
 void  fn_800E5B0C(int nMsg, u32 uFloats, void* p0, void* p1, void* p2, void* p3, void* p4);
-void  fn_80125910(int a);
 int   fn_800F1D34(int nPlayer);
 s32   fn_800F266C(s32 n, int i);
 
