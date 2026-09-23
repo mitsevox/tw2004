@@ -887,15 +887,14 @@ void GOLFERSTATE_Push(int nState, int nPlayer) {
 
 // Pop the current state, running its exit callback.
 void GOLFERSTATE_Pop(int nPlayer) {
-    SwingStack* pStack = &gSwingStacks[nPlayer];
-    s8*         pTop   = &pStack->nTop;
-    void (*pfn)(int)   = sGolferStateEngineTable[pStack->nState[pStack->nTop]].pfnExit;
+    void (*pfn)(int);
+    pfn = sGolferStateEngineTable[gSwingStacks[nPlayer].nState[gSwingStacks[nPlayer].nTop]].pfnExit;
     if (pfn != NULL) {
         gInSwingExit = 1;
         pfn(nPlayer);
         gInSwingExit = 0;
     }
-    (*pTop)--;
+    gSwingStacks[nPlayer].nTop--;
 }
 
 // Pop everything and start again from one state.
