@@ -56,6 +56,17 @@ u32    fn_800B6564(u32 uSize);          // take ARAM, returns its address
 void*  fn_800B5C40(u32 uSize, u32 uAram, u32 uAlign, void* pInfo);   // ARAM heap: create
 void   fn_800B65C0(void* pSrc, u32 uAram, u32 uLen, int a, int b, void (*pfnDone)(void), int n,
                    int c);                                            // ARAM DMA
+void   AXSetVoiceSrc(AXVPB* pVpb, f32 fRatio);          // the playback rate
+void   AXSetVoiceAdpcm(AXVPB* pVpb, u32* pCoefs);
+void   AXSetVoiceAdpcmLoop(AXVPB* pVpb, u16* pLoop);
+void   AXSetVoiceType(AXVPB* pVpb, u32 uType);
+void   MIXSetInput(AXVPB* pVpb, int nDb);
+void   MIXSetAuxA(AXVPB* pVpb, int nDb);
+void   MIXSetPan(AXVPB* pVpb, int nPan);
+void   MIXSetSPan(AXVPB* pVpb, int nSPan);
+void   MIXMute(AXVPB* pVpb);
+void   MIXUnMute(AXVPB* pVpb);
+void   fn_80146B18(void);               // MIX: pass the settings to the hardware
 f32    fn_8000AF7C(f32 x);              // natural logarithm
 void   fn_8009527C(void* p);            // frees what fn_800951A0 allocated
 void   fn_800B1A88(f32* pA, f32* pB);   // swap two floats
@@ -78,6 +89,186 @@ s32    fn_8009EE28(s32 nSlot, s32 n);
 // The save kinds (a table of functions at lbl_8018C7D8).
 void   fn_80084FF0(s32 nKind);          // pick a save kind
 s32    fn_80084FB4(CardPos* pPos);      // the picked save kind's size on that card
+
+// The mixer callback, run after every audio frame: for each voice, ask for a lost hardware voice
+// back, pass changed settings on to the hardware, start, release, pause and resume it, and step
+// its volume envelope.
+void fn_800AF324(void) {
+    s16 i;
+    Voice* p;
+    u8 bMoved;
+    u16 nOld;
+    s32 nLevel;
+    u8 bStage;
+    AXVPB* pVpb;
+    u32* pDst;
+    u32* pSrc;
+    p = lbl_802820E8;
+    for (i = 0; i < NUM_VOICES; i++, p++) {
+        bMoved = 0;
+        if (p->flags.b.bLost) {
+            p->flags.b.n6_7F8--;
+            if (p->flags.b.n6_7F8 != 0) continue;
+            if (fn_800AF9BC(i)) {
+                fn_800AFA2C(i);
+                p->flags.b.bLost = 0;
+            } else {
+                p->flags.b.n6_7F8 = 0xFF;
+            }
+        }
+        // port: both reads are a u32 at a 2-byte boundary (see fn_800AFD8C).
+        pVpb = p->pVpb;
+        if (pVpb->n146 != 0 && *(u32*)&pVpb->n1AE - *(u32*)&pVpb->n1B2 > 0x40000 &&
+            *(u32*)&pVpb->n1B2 > 0x8800) {
+            AXSetVoiceState(pVpb, 0);
+            fn_800AFA2C(i);
+        }
+        if (p->flags.b.bSetPan) {
+            p->flags.b.bSetPan = 0;
+            MIXSetPan(p->pVpb, p->nPan);
+            bMoved = 1;
+        }
+        if (p->flags.b.bSetSPan) {
+            p->flags.b.bSetSPan = 0;
+            MIXSetSPan(p->pVpb, p->nSPan);
+            bMoved = 1;
+        }
+        if (p->flags.b.bSetSrc) {
+            p->flags.b.bSetSrc = 0;
+            AXSetVoiceSrc(p->pVpb, (1.0f / 65536.0f) * p->u40);
+        }
+        if (p->flags.b.bSetAuxA) {
+            p->flags.b.bSetAuxA = 0;
+            MIXSetAuxA(p->pVpb, p->nAuxA);
+        }
+        if (p->flags.b.bSetAdpcm) {
+            p->flags.b.bSetAdpcm = 0;
+            p->flags.b.b6_10 = 1;
+            AXSetVoiceAdpcm(p->pVpb, p->a18);
+        }
+        if (p->flags.b.bSetLoop) {
+            p->flags.b.bSetLoop = 0;
+            AXSetVoiceAdpcmLoop(p->pVpb, &p->n50);
+        }
+        if ((p->flags.b.nState == 3 || p->flags.b.nState == 4 || p->flags.b.nState == 6) &&
+            p->pVpb->n146 == 0) {
+            fn_800AFA2C(i);
+        }
+        if (p->flags.b.bStart) {
+            if (!bMoved && p->u40 != 0) {
+                pVpb = p->pVpb;
+                if (p->flags.b.b6_40 && !p->flags.b.b6_10) {
+                    fn_800AFA2C(i);
+                } else {
+                    // port: 0x4C bytes copied as words to a 2-byte boundary.
+                    pDst = (u32*)&pVpb->n1A6;
+                    pSrc = (u32*)&p->n8;
+                    pDst[0] = pSrc[0];
+                    pDst[1] = pSrc[1];
+                    pDst[2] = pSrc[2];
+                    pDst[3] = pSrc[3];
+                    pDst[4] = pSrc[4];
+                    pDst[5] = pSrc[5];
+                    pDst[6] = pSrc[6];
+                    pDst[7] = pSrc[7];
+                    pDst[8] = pSrc[8];
+                    pDst[9] = pSrc[9];
+                    pDst[10] = pSrc[10];
+                    pDst[11] = pSrc[11];
+                    pDst[12] = pSrc[12];
+                    pDst[13] = pSrc[13];
+                    pDst[14] = pSrc[14];
+                    pDst[15] = pSrc[15];
+                    pDst[16] = pSrc[16];
+                    pDst[17] = pSrc[17];
+                    pDst[18] = pSrc[18];
+                    p->pVpb->u1C |= 0x161000;
+                    p->flags.b.bStart = 0;
+                    p->flags.b.nState = 3;
+                    p->flags.b.nEnvStage = 0;
+                    p->n64 = 0;
+                    p->n66 = 0xFFFF;
+                    AXSetVoiceType(p->pVpb, p->flags.b.b6_40 != 0);
+                    AXSetVoiceState(p->pVpb, 1);
+                }
+            }
+        } else if (p->flags.b.bRelease) {
+            p->flags.b.bRelease = 0;
+            p->flags.b.nEnvStage = 3;
+            p->n66 = 0;
+        } else if (p->flags.b.n5_03 != 0) {
+            // a pause: the first pass mutes the voice, the next stops it
+            switch (p->flags.b.n5_03) {
+            case 2:
+                p->flags.b.nState = 4;
+                MIXMute(p->pVpb);
+                break;
+            case 1:
+                AXSetVoiceState(p->pVpb, 0);
+                p->flags.b.nState = 5;
+                break;
+            }
+            p->flags.b.n5_03--;
+        } else if (p->flags.b.bResume && !bMoved && p->flags.b.nState >= 3) {
+            p->flags.b.bResume = 0;
+            if (*(u32*)&p->pVpb->n1B2 > 0x8800) {
+                if (p->flags.b.nEnvStage != 3) {
+                    p->flags.b.nState = 3;
+                } else {
+                    p->flags.b.nState = 6;
+                }
+                MIXUnMute(p->pVpb);
+                AXSetVoiceState(p->pVpb, 1);
+            }
+        }
+        if (p->flags.b.nState == 3 || p->flags.b.nState == 4 || p->flags.b.nState == 6) {
+            nOld = p->n64;
+            nLevel = nOld;
+            bStage = 0;
+            if (nOld == p->n66) {
+                if (p->flags.b.nEnvStage < 2) {
+                    p->flags.b.nEnvStage++;
+                    if (p->flags.b.nEnvStage == 1) {
+                        p->n66 = (p->env.nSustain << 12) | 0xFFF;
+                    }
+                    bStage = 1;
+                } else if (p->flags.b.nEnvStage == 3) {
+                    AXSetVoiceState(p->pVpb, 0);
+                }
+            }
+            switch (p->flags.b.nEnvStage) {
+            case 0:
+                nLevel += p->env.nAttack * 16;
+                if (nLevel > 0xFFFF) {
+                    nLevel = 0xFFFF;
+                }
+                break;
+            case 1:
+                nLevel -= p->env.nDecay * 0x1000;
+                if (nLevel < p->n66) {
+                    nLevel = p->n66;
+                }
+                break;
+            case 2:
+                break;
+            case 3:
+                nLevel -= p->env.nRelease * 16;
+                if (nLevel < 0) {
+                    nLevel = 0;
+                }
+                break;
+            }
+            if (bStage || nLevel != nOld || p->flags.b.bSetInput) {
+                p->n64 = nLevel;
+                p->flags.b.bSetInput = 0;
+                // the envelope's level (0..0xFFFF) scales the voice's volume (n58, dB x 10)
+                nLevel *= p->n58 + 0x400;
+                MIXSetInput(p->pVpb, nLevel / 0x10000 - 0x3FF);
+            }
+        }
+    }
+    fn_80146B18();
+}
 
 // The hardware dropped a voice (to play one of higher priority): mark ours lost and stop it. The
 // mixer callback asks for it back after 255 passes.

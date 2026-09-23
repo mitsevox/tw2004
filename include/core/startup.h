@@ -14,7 +14,15 @@
 
 // A hardware voice (AX): only the fields this code touches.
 typedef struct AXVPB {
-    u8   unk0[0x1B2];
+    u8   unk0[0x1C];
+    u32  u1C;                   // 0x1C   which parts of the voice to send to the hardware
+    u8   unk20[0x146 - 0x20];
+    u16  n146;                  // 0x146  nonzero while the voice plays
+    u8   unk148[0x1A6 - 0x148];
+    u16  n1A6;                  // 0x1A6  Voice 0x08..0x53 is copied here when it starts
+    u8   unk1A8[0x1AE - 0x1A8];
+    u16  n1AE;                  // 0x1AE  } where the sound ends, in 4-bit units, as two halves
+    u16  n1B0;                  // 0x1B0  }
     u16  n1B2;                  // 0x1B2  } where the voice is playing, in 4-bit units, as two
     u16  n1B4;                  // 0x1B4  } halves (Voice.u14 is copied here when it starts)
 } AXVPB;
