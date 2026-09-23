@@ -522,8 +522,18 @@ Downloaded from debugging.games to `C:\dev\ext\symbols\` (reference only, never 
   of callee lists). Limits: the retail GameCube build has only 772 strings left (asserts
   stripped), so anchors are few; the Xbox build is a debug build (no inlining, assert calls), so
   call lists differ; functions under 48 bytes are too ambiguous to pair by calls.
-  Next: TPI type records (struct layouts for the paired functions' parameters), and
-  more seeds from functions we decompile by hand.
+  Next: more seeds from functions we decompile by hand.
+- **Types (2026-09-23).** `C:\dev\scratch\tw\tpiread.py` reads the PDB's type records
+  (`struct <name>`, `func <function>`, `find <text>`). TW06's `PhysicsBall_t` (0xCC bytes) is this
+  game's `Ball` (0xBC): identical up to 0x54, then TW06 inserts `terrainHeight` at 0x58, so
+  its later offsets are 4 (then 12) higher; this game keeps u8 flags at 0x98 that TW06 folded
+  into a `flags` word. Our hand-derived meanings matched TW06's names (closest-to-cup, last
+  collision surface, player, first sand position/speed, stall-check distance/time). Enums
+  `Lie_t`, `physicsBallState_t`, `Club_t`, `ShotType_t`, `PhysicsMishitType` are in
+  `include/physics.h`. Two corrections: lie 16 is `LIE_OUT_OF_BOUNDS_e` and ball state 5 is
+  `BallOutOfBounds` (this game also uses them for water, which is what our docs called
+  "hazard"). No TW06 map file was used: the PDB holds everything a map would; the only known
+  TW06 map (`MAPFILE.TXT`) is on the PS2 prototype disc.
 - **007 Agent Under Fire (GC, USA) and 007 Everything or Nothing (GC, EU)**: unstripped ELFs
   (same studio, same console). A masked byte match (`C:\dev\scratch\tw\xmatch.py`) found no
   shared EA engine code, only 27 SDK / runtime functions (names only). Agent Under Fire runs on a

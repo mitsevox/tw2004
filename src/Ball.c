@@ -5,50 +5,54 @@
 // pull below.
 
 #include "golfer.h"
+#include "physics.h"
 
 #define BALL_RADIUS 0.0256667f      // 0.92 in (a real one is 0.84)
 #define CUP_DIAMETER 0.10717f       // 3.86 in (a real cup is 4.25)
 
 typedef struct Ball {
-    f32  vPos[3];               // 0x00
+    // Field names in the comments after "TW06:" are from Tiger Woods PGA Tour 06's PhysicsBall_t
+    // (0xCC bytes; see include/physics.h). TW06 added terrainHeight at 0x58, so from there on its
+    // offsets are 4 higher, and it folded the u8 flags at 0x98 into one bit field.
+    f32  vPos[3];               // 0x00  TW06: location
     u8   unkC[4];
-    f32  vPrev[3];              // 0x10  position last step
+    f32  vPrev[3];              // 0x10  position last step. TW06: lastLocation
     u8   unk1C[4];
-    f32  vVel[3];               // 0x20
+    f32  vVel[3];               // 0x20  TW06: linearVelocity
     f32  f2C;                   // 0x2C
-    f32  vSpin[3];              // 0x30
+    f32  vSpin[3];              // 0x30  TW06: angularVelocity
     f32  f3C;                   // 0x3C
-    f32  vStart[3];             // 0x40  where the shot started
+    f32  vStart[3];             // 0x40  where the shot started. TW06: initialShotPosition
     u8   unk4C[4];
-    f32  fSpeed;                // 0x50
-    f32  fHeight;               // 0x54  height above the ground when dropped
-    f32  fSpinX;                // 0x58  spin input x 15
-    f32  fSpinY;                // 0x5C
-    f32  fClosest;              // 0x60  closest approach to the pin so far
-    s32  nState;                // 0x64  0 placed, 1 stopped, 2 in the air, 3/4 on the ground, 5 in a hazard
-    s32  nLie;                  // 0x68  12 holed, 16 hazard
-    s32  n6C;                   // 0x6C
-    f32  f70;                   // 0x70
-    s32  nSurface;              // 0x74  surface type under the ball (90 = the cup)
-    s32  nStartSurface;         // 0x78  surface at the start of the shot
-    CourseInfo* pCourse;        // 0x7C
-    s32  n80;                   // 0x80
-    s32  n84;                   // 0x84
-    struct SurfaceType* pHitSurface;   // 0x88  what it last hit
-    s32  n8C;                   // 0x8C
-    s32  n90;                   // 0x90  what the ball last hit (fn_80054040)
-    s32  nPlayer;               // 0x94  -1 when nobody's
-    u8   bHoled;                // 0x98
+    f32  fSpeed;                // 0x50  TW06: speed
+    f32  fHeight;               // 0x54  height above the ground when dropped. TW06: altitude
+    f32  fSpinX;                // 0x58  spin input x 15. TW06: sideSpinOverride
+    f32  fSpinY;                // 0x5C  TW06: forwardSpinOverride
+    f32  fClosest;              // 0x60  closest approach to the pin so far. TW06: closestToCupThisShot
+    s32  nState;                // 0x64  physicsBallState_t: 0 dead, 1 waiting, 2 flying, 3/4 rolling, 5 out (OB or water)
+    s32  nLie;                  // 0x68  Lie_t: 12 in the cup, 16 out of bounds (also water here)
+    s32  n6C;                   // 0x6C  TW06 has five lie fields here (initialLie, lie, lieAngle,
+    f32  f70;                   // 0x70  lieModifier, lieReadOffset); this game has three. f70 is added to a surface's value
+    s32  nSurface;              // 0x74  surface type under the ball (90 = the cup). TW06: surfaceID
+    s32  nStartSurface;         // 0x78  surface at the start of the shot. TW06: initialSurfaceID
+    CourseInfo* pCourse;        // 0x7C  TW06: pTerrainData (TGD_TerrainInfo*)
+    s32  nCollideCount;         // 0x80  TW06: collideCount
+    s32  nSolidCollideCount;    // 0x84  TW06: solidCollideCount
+    struct SurfaceType* pHitSurface;   // 0x88  what it last hit. TW06: pLastCollisionSurface
+    s32  n8C;                   // 0x8C  TW06: pLastCollisionObject
+    s32  n90;                   // 0x90  what the ball last hit (fn_80054040). TW06: pLastCollisionActor
+    s32  nPlayer;               // 0x94  -1 when nobody's. TW06: playerID
+    u8   bHoled;                // 0x98  TW06: PBF_InHole
     u8   b99;                   // 0x99
-    u8   b9A;                   // 0x9A
+    u8   bHitTopArc;            // 0x9A  set when the ball starts coming down. TW06: PBF_HitTopArc
     u8   b9B;                   // 0x9B
-    u8   unk9C;                 // 0x9C  landed in sand (class 6) this shot
+    u8   bGotFirstSandPos;      // 0x9C  landed in sand (class 6) this shot. TW06: PBF_GotFirstSandPos
     u8   unk9D[0xA0 - 0x9D];
-    f32  vLand[3];              // 0xA0  where it first landed in sand
+    f32  vFirstSandPos[3];      // 0xA0  where it first landed in sand. TW06: firstSandPosition
     f32  fAC;                   // 0xAC  ticks spent with no ground under a rolling ball
-    f32  fLandImpact;           // 0xB0  how hard it landed there (sqrt of Physics_HandleCollision's result)
-    f32  fB4;                   // 0xB4  distance from the start at the last stall check
-    f32  fB8;                   // 0xB8  time since the last stall check
+    f32  fFirstSandVMag;        // 0xB0  how hard it landed there (sqrt of Physics_HandleCollision's result). TW06: firstSandVMag
+    f32  fLastDistFromInitShotPos; // 0xB4  distance from the start at the last stall check. TW06: same name
+    f32  fTimeSinceLastCheck;   // 0xB8  time since the last stall check. TW06: same name
 } Ball;
 
 void   Vec3Copy(f32* pSrc, f32* pDst);           // 0x80008304
@@ -200,7 +204,7 @@ static inline f32 Ball_Clamp(f32 x, f32 fLo, f32 fHi) {
         } else {                                                                                   \
             EVENT_Trigger((pBall)->nPlayer, 0x23, (int)(pBall), !gSimulating);                       \
         }                                                                                          \
-    } else if ((pBall)->n80 == 0) {                                                                \
+    } else if ((pBall)->nCollideCount == 0) {                                                                \
         int     nOwner;                                                                            \
         Player* pP = gPlayers;                                                                     \
         nOwner = 0;                                                                                \
@@ -238,8 +242,8 @@ void Physics_OutOfBounds(Ball* pBall, u8 bSound) {
         Ball_Holed(pBall);
         return;
     }
-    pBall->nState = 5;
-    pBall->nLie   = 16;
+    pBall->nState = PHYSICS_BALLSTATE_BallOutOfBounds_e;
+    pBall->nLie   = LIE_OUT_OF_BOUNDS_e;
     if (bSound && pBall->nPlayer >= 0) {
         EVENT_Trigger(pBall->nPlayer, 0x22, (int)pBall, !gSimulating);
     }
@@ -601,7 +605,7 @@ u8 Physics_GetShotData(Ball* pBall, int nClub, int nKind, f32 fPower, f32 fAim, 
     }
     fKeep += pBall->f70;
     fKeep = 0.0125f * (1.0f - fKeep) * gClubStep[nClub] + fKeep;
-    if (nKind == 2 && (nLie == 3 || nLie == 4 || nLie == 5)) {
+    if (nKind == SHOT_TYPE_CHIP_e && (nLie == LIE_ROUGH_HIGH_e || nLie == LIE_ROUGH_e || nLie == LIE_THICK_ROUGH_e)) {
         fKeep -= 0.1f;
     }
     fn_80055E7C(vAlong, vOffPart, vAlong);
@@ -634,16 +638,16 @@ void fn_80051A18(Ball* pBall, f32* pDir, f32 fSpeed, f32* pFrom) {
     pBall->vSpin[2] = 0.0f;
     pBall->f3C      = 0.0f;
     pBall->fAC      = 0.0f;
-    pBall->fB4      = 0.0f;
-    pBall->fB8      = 0.0f;
+    pBall->fLastDistFromInitShotPos      = 0.0f;
+    pBall->fTimeSinceLastCheck      = 0.0f;
     pBall->fSpinY   = 0.0f;
     pBall->fSpinX   = 0.0f;
-    pBall->n84      = 0;
-    pBall->n80      = 0;
-    pBall->unk9C    = 0;
+    pBall->nSolidCollideCount      = 0;
+    pBall->nCollideCount      = 0;
+    pBall->bGotFirstSandPos    = 0;
     pBall->b99      = 1;
     pBall->b9B      = 1;
-    pBall->b9A      = 1;
+    pBall->bHitTopArc      = 1;
 }
 
 // Strike the ball: Physics_GetShotData turns club, kind, power, aim, trajectory and the two launch
@@ -652,13 +656,13 @@ void fn_80051A18(Ball* pBall, f32* pDir, f32 fSpeed, f32* pFrom) {
 void Ball_Launch(Ball* pBall, int nClub, int nKind, f32 fPower, f32 fAim, int nTrajectory, f32* pA, f32* pB) {
     Vec_Copy(pBall->vPos, pBall->vStart);
     pBall->fAC    = 0.0f;
-    pBall->fB4    = 0.0f;
-    pBall->fB8    = 0.0f;
+    pBall->fLastDistFromInitShotPos    = 0.0f;
+    pBall->fTimeSinceLastCheck    = 0.0f;
     pBall->fSpinY = 0.0f;
     pBall->fSpinX = 0.0f;
-    pBall->n84    = 0;
-    pBall->n80    = 0;
-    pBall->unk9C  = 0;
+    pBall->nSolidCollideCount    = 0;
+    pBall->nCollideCount    = 0;
+    pBall->bGotFirstSandPos  = 0;
     if (!Physics_GetShotData(pBall, nClub, nKind, fPower, fAim, nTrajectory, pA, pB, pBall->vVel, pBall->vSpin)) {
         Physics_OutOfBounds(pBall, 1);
         return;
@@ -666,12 +670,12 @@ void Ball_Launch(Ball* pBall, int nClub, int nKind, f32 fPower, f32 fAim, int nT
     if (nKind == SHOT_PUTT || nClub == CLUB_PUTTER) {
         pBall->b99    = 1;
         pBall->b9B    = 1;
-        pBall->b9A    = 1;
+        pBall->bHitTopArc    = 1;
         pBall->nState = 3;
     } else {
         pBall->b99    = 0;
         pBall->b9B    = 0;
-        pBall->b9A    = 0;
+        pBall->bHitTopArc    = 0;
         pBall->nState = 2;
     }
     pBall->f70 = 0.0f;
@@ -744,8 +748,8 @@ void Ball_FlightStep(Ball* pBall, f32 fTicks) {
         }
     }
     fn_8000C5D4(pBall->vVel, vAccel, fTicks, pBall->vVel);
-    if (!pBall->b9A && pBall->nPlayer >= 0 && pBall->vVel[1] < 0.0f && pBall->vVel[1] - fTicks * vAccel[1] >= 0.0f) {
-        pBall->b9A = 1;
+    if (!pBall->bHitTopArc && pBall->nPlayer >= 0 && pBall->vVel[1] < 0.0f && pBall->vVel[1] - fTicks * vAccel[1] >= 0.0f) {
+        pBall->bHitTopArc = 1;
         EVENT_Trigger(pBall->nPlayer, 0x1C, (int)pBall, !gSimulating);
     }
     fInto  = vWind[0] * pBall->vVel[0] + vWind[2] * pBall->vVel[2];
@@ -906,7 +910,7 @@ f32 Physics_HandleCollision(Ball* pBall, f32* pNormal, SurfaceType* pSurface) {
     f32 fT, fS, fLen, fBounce, fGrip, fBite, fScale;
     u8  bFlip;
 
-    pBall->n80++;
+    pBall->nCollideCount++;
     if (pSurface->nClass == 7 || pSurface->nClass == 16) {
         fn_8001EF34(pBall->vSpin, 0.25f, pBall->vSpin);
     } else {
@@ -1003,7 +1007,7 @@ f32 Physics_HandleCollision(Ball* pBall, f32* pNormal, SurfaceType* pSurface) {
             fRest = (0.75f * (1.0f + fRest)) * fD + fRest;
         }
     } else {
-        pBall->n84++;
+        pBall->nSolidCollideCount++;
     }
     if (fSpeed > 8.80000019f && fRest >= 0.0f) {
         fT = 1.0f - 1.20000005f * ((fSpeed - 8.80000019f) / pSurface->f24);
@@ -1059,7 +1063,7 @@ f32 Physics_HandleCollision(Ball* pBall, f32* pNormal, SurfaceType* pSurface) {
     }
     if (pSurface != NULL && pSurface->f0C >= 0.0f && pBall->vVel[1] < 0.674666584f &&
         (f32)fn_80009680(pBall->vVel[0] * pBall->vVel[0] + pBall->vVel[2] * pBall->vVel[2]) < 1.90666652f) {
-        if (pBall->n84 < 6 && (pSurface->nClass == 4 || pSurface->nClass == 3 || pSurface->nClass == 2) &&
+        if (pBall->nSolidCollideCount < 6 && (pSurface->nClass == 4 || pSurface->nClass == 3 || pSurface->nClass == 2) &&
             gTurfSpeedMul[gTurfSpeed] > 0.7f &&
             (f32)fn_80009680((pBall->vPos[0] - pBall->vStart[0]) * (pBall->vPos[0] - pBall->vStart[0]) +
                              (pBall->vPos[2] - pBall->vStart[2]) * (pBall->vPos[2] - pBall->vStart[2])) > 63.0f) {
@@ -1231,9 +1235,9 @@ void Ball_SetLie(Ball* pBall, SurfaceType* pSurface) {
         } else {
             r = Rand_Next(0);
         }
-        if (!pBall->unk9C || fn_8000AD9C(pBall->vPos[0] - pBall->vLand[0]) >= 0.16666667f ||
-            fn_8000AD9C(pBall->vPos[1] - pBall->vLand[1]) >= 0.16666667f ||
-            fn_8000AD9C(pBall->vPos[2] - pBall->vLand[2]) >= 0.16666667f || pBall->fLandImpact < 5.0f) {
+        if (!pBall->bGotFirstSandPos || fn_8000AD9C(pBall->vPos[0] - pBall->vFirstSandPos[0]) >= 0.16666667f ||
+            fn_8000AD9C(pBall->vPos[1] - pBall->vFirstSandPos[1]) >= 0.16666667f ||
+            fn_8000AD9C(pBall->vPos[2] - pBall->vFirstSandPos[2]) >= 0.16666667f || pBall->fFirstSandVMag < 5.0f) {
             if ((r & 127) < 16 - uLuck / 16) {
                 r >>= 8;
                 goto sandC;
@@ -1243,7 +1247,7 @@ void Ball_SetLie(Ball* pBall, SurfaceType* pSurface) {
             pBall->nSurface = 35;
             goto sandEnd;
         }
-        if (!(pBall->fLandImpact < 6.0f)) goto sandC;
+        if (!(pBall->fFirstSandVMag < 6.0f)) goto sandC;
     sandB:
         if ((r & 127) < uLuck / 4) goto sandClean;
         pBall->nLie     = 7;
@@ -1270,7 +1274,7 @@ void Ball_SetLie(Ball* pBall, SurfaceType* pSurface) {
         break;
     case 12:
         pBall->bHoled = 1;
-        if (pBall->nLie != 12) {
+        if (pBall->nLie != LIE_INCUP_e) {
             pBall->nLie = 12;
             if (pBall->nPlayer >= 0) {
                 EVENT_Trigger(pBall->nPlayer, 0x21, (int)pBall, !gSimulating);
@@ -1309,10 +1313,10 @@ void Ball_SetLie(Ball* pBall, SurfaceType* pSurface) {
 // given back for the part of the tick not flown. First bounce of a shot in flight: event 0x1D,
 // and the spin stick's input becomes the ball's spin (backspin x (1.9 - green setting), side x
 // (1.95 - green setting)), turned to the direction of travel; event 0x1F.
-// The stick spin's weight, 1 - n84 (an inline in the original: written out twice, the registers
+// The stick spin's weight, 1 - nSolidCollideCount (an inline in the original: written out twice, the registers
 // come out differently).
 static inline f32 Ball_SpinKeep(Ball* pBall) {
-    return (f32)(1 - pBall->n84);
+    return (f32)(1 - pBall->nSolidCollideCount);
 }
 
 u8 Physics_ProcessCollision(Ball* pBall, f32* pHit, f32* pNormal, SurfaceType* pSurface, s32 nWhat, f32* pFrac, f32 fTicks) {
@@ -1573,10 +1577,10 @@ u8 Ball_Collide(Ball* pBall, f32 fTicks) {
         pBall->vSpin[2] = 0.0f;
     }
     fImpact = Physics_HandleCollision(pBall, vNormal, pSurface);
-    if (pSurface->nClass == 6 && !pBall->unk9C) {
-        pBall->unk9C       = 1;
-        pBall->fLandImpact = fn_80009680(fImpact);
-        Vec3Copy(pBall->vPos, pBall->vLand);
+    if (pSurface->nClass == 6 && !pBall->bGotFirstSandPos) {
+        pBall->bGotFirstSandPos       = 1;
+        pBall->fFirstSandVMag = fn_80009680(fImpact);
+        Vec3Copy(pBall->vPos, pBall->vFirstSandPos);
     }
     if (pSurface->nClass == 12 || pSurface->nClass == 18 ||
         (nIndex == 90 && Vec_Distance(pBall->vPos, PIN(pBall)) < 2.0f)) {
@@ -1894,14 +1898,14 @@ void Ball_Tick(Ball* pBall, f32 fTicks) {
             }
             fn_80054040(pBall, fTicks);
         }
-        pBall->fB8 += 0.0166666675f * fTicks;
-        if (pBall->fB8 > 4.0f) {
+        pBall->fTimeSinceLastCheck += 0.0166666675f * fTicks;
+        if (pBall->fTimeSinceLastCheck > 4.0f) {
             fDist = Vec_Distance(pBall->vStart, pBall->vPos);
-            if (fn_8000AD9C(fDist - pBall->fB4) < 0.111111112f) {
+            if (fn_8000AD9C(fDist - pBall->fLastDistFromInitShotPos) < 0.111111112f) {
                 Ball_Stop(pBall);
             } else {
-                pBall->fB4 = fDist;
-                pBall->fB8 = 0.0f;
+                pBall->fLastDistFromInitShotPos = fDist;
+                pBall->fTimeSinceLastCheck = 0.0f;
             }
         }
     }
@@ -2010,9 +2014,9 @@ u8 fn_800559BC(Ball* pBall, f32* pPos) {
     pBall->vSpin[2] = 0.0f;
     pBall->f3C     = 0.0f;
     pBall->fSpeed  = 0.0f;
-    pBall->n84     = 0;
-    pBall->n80     = 0;
-    pBall->unk9C   = 0;
+    pBall->nSolidCollideCount     = 0;
+    pBall->nCollideCount     = 0;
+    pBall->bGotFirstSandPos   = 0;
     return 1;
 }
 
@@ -2030,12 +2034,12 @@ u8 fn_80055AA8(Ball* pBall, f32* pPos, int nPlayer) {
     pBall->nStartSurface = 45;
     pBall->nSurface      = 45;
     pBall->nPlayer       = nPlayer;
-    pBall->n84           = 0;
-    pBall->n80           = 0;
+    pBall->nSolidCollideCount           = 0;
+    pBall->nCollideCount           = 0;
     pBall->bHoled        = 0;
     pBall->b99           = 0;
     pBall->b9B           = 0;
-    pBall->b9A           = 0;
+    pBall->bHitTopArc           = 0;
     pBall->fSpeed        = 0.0f;
     pBall->vSpin[0]      = 0.0f;
     pBall->vSpin[1]      = 0.0f;
