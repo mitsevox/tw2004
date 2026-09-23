@@ -15,6 +15,17 @@ void fn_80064E74(void);
 void Vec3Copy();
 void fn_80064F54(u8* p0, s32 p1, s32 p2);
 
+// ---- sweep code (not yet cleaned up) ----
+
+void UStream_UnregisterHandler();
+void fn_800644CC(void);
+
+void fn_800644CC(void) {
+    UStream_UnregisterHandler(1128353091);
+}
+
+// ---- end of sweep code ----
+
 void fn_80064E2C(void) {
     s32 t0;
     t0 = fn_80009B34(7784, 2, 0, lbl_801885F8, 380);
