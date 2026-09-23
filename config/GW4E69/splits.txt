@@ -1846,6 +1846,9 @@ uiTransform.c:
 goballfx.c:
 	.text       start:0x80093524 end:0x80093D3C
 
+GoObjShadow.c:
+	.text       start:0x80093D3C end:0x8009414C
+
 GoShaderObject_Particle_Gc.c:
 	.text       start:0x8009414C end:0x80095088
 
@@ -1883,16 +1886,7 @@ CharAnim.c:
 	.text       start:0x800957FC end:0x80097208
 
 GoShaderObjectCommon_MorphAnimManager_Gc.c:
-	.text       start:0x80097208 end:0x800975B0
-
-unsorted/sweep_800975FC.c:
-	.text       start:0x800975FC end:0x80097624
-
-unsorted/sweep_80097624.c:
-	.text       start:0x80097624 end:0x80097688
-
-unsorted/sweep_80097688.c:
-	.text       start:0x80097688 end:0x80097694
+	.text       start:0x80097208 end:0x800977CC
 
 unsorted/sweep_800977CC.c:
 	.text       start:0x800977CC end:0x800977F8
@@ -1904,7 +1898,7 @@ unsorted/sweep_80097E98.c:
 	.text       start:0x80097E98 end:0x80097F44
 
 GoShaderObject_Glows_Gc.c:
-	.text       start:0x80097F44 end:0x80098740
+	.text       start:0x80097F44 end:0x80098844
 
 unsorted/sweep_80098844.c:
 	.text       start:0x80098844 end:0x8009884C
@@ -1922,16 +1916,10 @@ unsorted/sweep_800988D8.c:
 	.text       start:0x800988D8 end:0x80098938
 
 UFstPart.c:
-	.text       start:0x80098A98 end:0x80099C50
+	.text       start:0x80098A98 end:0x80099ED8
 
-unsorted/sweep_80099EA4.c:
-	.text       start:0x80099EA4 end:0x80099EB4
-
-unsorted/sweep_8009A16C.c:
-	.text       start:0x8009A16C end:0x8009A180
-
-unsorted/sweep_8009A1EC.c:
-	.text       start:0x8009A1EC end:0x8009A1F4
+BootCourse.c:
+	.text       start:0x80099ED8 end:0x8009A250
 
 SunFlr_Gc.c:
 	.text       start:0x8009A250 end:0x8009A844
@@ -1958,7 +1946,7 @@ unsorted/sweep_8009B604.c:
 	.text       start:0x8009B604 end:0x8009B630
 
 GoGreenGrid.c:
-	.text       start:0x8009B630 end:0x8009C914
+	.text       start:0x8009B630 end:0x8009CB9C
 
 MC_Gc.c:
 	.text       start:0x8009CB9C end:0x8009F850
@@ -1970,7 +1958,7 @@ PsMgr.c:
 	.text       start:0x800A27FC end:0x800A2C3C
 
 PsBallFx.c:
-	.text       start:0x800A2C3C end:0x800A3D6C
+	.text       start:0x800A2C3C end:0x800A3E3C
 
 unsorted/sweep_800A3E3C.c:
 	.text       start:0x800A3E3C end:0x800A3F38
