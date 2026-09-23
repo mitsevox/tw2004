@@ -64,10 +64,7 @@ unsorted/code_800082F8.c:
 	.text       start:0x800082F8 end:0x800083A4
 
 GoEntry.c:
-	.text       start:0x800083A4 end:0x80008820
-
-unsorted/sweep_80008820.c:
-	.text       start:0x80008820 end:0x8000883C
+	.text       start:0x800083A4 end:0x8000883C
 
 unsorted/sweep_80008EF0.c:
 	.text       start:0x80008EF0 end:0x80008F20
