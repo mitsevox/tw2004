@@ -11,6 +11,10 @@ void fn_800CB550(int nBytes, int nError);
 void fn_800CA2E4(int nPlayer, AnimLib* pOverlay, AnimLib* pLib);
 AnimLib* fn_80026AC0(Character* pChar);  // the overlay library loaded for the character (slots 0 and 1)
 AnimLib* fn_80026B34(Character* pChar);  // the library of the character's animation slot
+u8 fn_8001C558(int nPlayer);            // the model id of the player's golfer
+void fn_800CB668(u8 bGlobal, int bFemale, int nPlayer, char* szPath);
+
+char lbl_80281530[8] = "";              // the folder the stream files' paths start from
 
 AnimStreamGroup lbl_80191490[2] = {
     { 1, 0 },
@@ -168,6 +172,20 @@ int fn_800CB568(int nId) {
         }
     }
     return -1;
+}
+
+// The path of a stream file: the male or female animations every golfer shares, or the ones of
+// the player's own golfer model.
+void fn_800CB668(u8 bGlobal, int bFemale, int nPlayer, char* szPath) {
+    if (bGlobal) {
+        if (bFemale == 0) {
+            sprintf(szPath, "%sdata\\CharStrm\\AnimGlob\\male.sac", lbl_80281530);
+            return;
+        }
+        sprintf(szPath, "%sdata\\CharStrm\\AnimGlob\\female.sac", lbl_80281530);
+        return;
+    }
+    sprintf(szPath, "%sdata\\CharStrm\\AnimChar\\%02dchr.sac", lbl_80281530, fn_8001C558(nPlayer) + 1);
 }
 
 // Unpacks a name code (fn_800CB700) into its 12 characters.
