@@ -156,7 +156,10 @@ typedef struct View {
     u8       unk160[4];
     s32      n164;              // 0x164  a shot kind for fn_8003A950 (25 = none)
     f32      f168;              // 0x168
-    u8       unk16C[0x18C - 0x16C];
+    u8       unk16C[0x174 - 0x16C];
+    f32      f174;              // 0x174  } set together by fn_800642A4
+    f32      f178;              // 0x178  }
+    u8       unk17C[0x18C - 0x17C];
     f32      f18C;              // 0x18C
     f32      f190;              // 0x190
     s32      n194;              // 0x194
@@ -397,6 +400,7 @@ u8     fn_80063C90(View* pView);        // the camera is still moving
 void   fn_80063CBC(View* pView, f32* pVec);   // nCamera 3, the vector into vC4
 void   fn_80063CF0(View* pView, int nCamera, int nPlayer);
 void   fn_800642D0(View* pView, int nPlayer);
+void   fn_800642B0(void);
 void   fn_80063F08(f32* pA, f32* pB, f32* pOut);   // the green zoom-to-aim camera: View.v20 as pA and pOut
 
 // ---- the golf cameras (GoGolfCam.c) ---------------------------------------------------------
