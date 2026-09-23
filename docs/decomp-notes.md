@@ -566,6 +566,18 @@ The fixes that come up most often. Each points to its full entry below.
 
 ### Data, constants and symbols
 
+- **[verified] Float literals are pooled in `.sdata2` in the order they first appear in the
+  source**; compiler-made constants (the int-to-float double) follow that function's literals.
+  Folded or dead literals (`x * 1.0f`, `if (0)`, unused locals or inlines) get no slot.
+- **[verified] A file-scope `const f32` is folded at every use and still emitted, so the value
+  appears twice; a one-entry `const f32 x[1]` is loaded from the object instead.** GameMode8's lone
+  1.0 at the start of its pool (`lbl_80284708`) is reproduced only by the array (a fake match: the
+  bytes don't show what EA wrote).
+- **[verified] A constant one bit off after linking can be a folded division.** GameMode8's
+  0x3F7FBE76 is `59.94f / 60.0f`; the literal `0.999f` rounds to ...77.
+- **[verified] An inline helper moves arithmetic after a call**: `n += SG_Score(t, s)` puts the
+  multiply after the second call, where `n += s * 3 + t` computes it first (GameMode8
+  `fn_800FDC5C`, 89.9% -> 98.2%).
 - **[verified] An exact unit can still fail the link on function order.** objdiff scores each
   function by name, so a function defined out of address order reads 100% while the linked
   `.text` shifts. GameUI `fn_800E3ECC` was defined after `fn_800E3EE0`; moving it fixed the DOL.
