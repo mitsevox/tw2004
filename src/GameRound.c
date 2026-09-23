@@ -926,13 +926,14 @@ u8 Gimme_Allowed(int nPlayer) {
     return 1;
 }
 
-void fn_800E292C(void) {
-    gpGame->pfnGetHonors(5);
+// The first player to play: the one the mode says plays after nobody (5).
+s32 fn_800E292C(void) {
+    return gpGame->pfnGetHonors(5);
 }
 
-// Runs the mode's player choice twice (fn_800E292C runs it once).
-void fn_800E295C(void) {
-    gpGame->pfnGetHonors(gpGame->pfnGetHonors(5));
+// The player after the first (the mode's choice run twice).
+s32 fn_800E295C(void) {
+    return gpGame->pfnGetHonors(gpGame->pfnGetHonors(5));
 }
 
 // The start of a hole: every player's ball on their tee, the look-ahead copy and the saved

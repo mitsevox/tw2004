@@ -9,6 +9,8 @@ void fn_8006C63C(void);                 // called while waiting for a read
 void fn_800C9F14(u8 bForce);
 void fn_800CB550(int nBytes, int nError);
 void fn_800CA2E4(int nPlayer, AnimLib* pOverlay, AnimLib* pLib);
+void fn_800CA194(int nPlayer, u8 b);
+void fn_800CACD4(int nPlayer);
 AnimLib* fn_80026AC0(Character* pChar);  // the overlay library loaded for the character (slots 0 and 1)
 AnimLib* fn_80026B34(Character* pChar);  // the library of the character's animation slot
 void fn_800CB668(u8 bGlobal, int bFemale, int nPlayer, char* szPath);
@@ -119,6 +121,66 @@ void fn_800C9F14(u8 bForce) {
         lbl_80282230->p4 = NULL;
         lbl_80282230->nState = 0;
         lbl_80282230->p0 = NULL;
+    }
+}
+
+// With streaming on, finishes any read, then with three or more players makes sure the first two to
+// play have a slot each, taking one from a player who holds it.
+void fn_800C9FE0(void) {
+    int nFirst;
+    int nSecond;
+    int i;
+    int nOther;
+
+    if (lbl_80282230 == NULL) {
+        return;
+    }
+    if (lbl_80282230->bOn == 0) {
+        return;
+    }
+    if (lbl_80282230->nState == 2) {
+        fn_800C9F14(1);
+    }
+    while (lbl_80282230->nState == 1) {
+        fn_8006C63C();
+    }
+    if (lbl_80282230->nState == 2) {
+        fn_800C9F14(0);
+    }
+    if (gSession.nNumPlayers > 2) {
+        nFirst = fn_800E292C();
+        nSecond = fn_800E295C();
+        if (nFirst != 5) {
+            if (lbl_80282230->players[nFirst].nId < 0) {
+                for (i = 0; i < 2; i++) {
+                    nOther = fn_800CB568(i);
+                    if (nOther != nSecond) {
+                        fn_800CA194(nFirst, 1);
+                        lbl_80282230->players[nFirst].nId = i;
+                        if (nOther >= 0) {
+                            lbl_80282230->players[nOther].nId = -1;
+                            fn_800CA194(nOther, 1);
+                        }
+                    }
+                }
+            }
+            fn_800CACD4(nFirst);
+        }
+        if (nSecond != 5) {
+            if (lbl_80282230->players[nSecond].nId < 0) {
+                for (i = 0; i < 2; i++) {
+                    nOther = fn_800CB568(i);
+                    if (nOther != nSecond && nOther != nFirst) {
+                        fn_800CA194(nSecond, 1);
+                        lbl_80282230->players[nSecond].nId = i;
+                        if (nOther >= 0) {
+                            lbl_80282230->players[nOther].nId = -1;
+                            fn_800CA194(nOther, 1);
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
