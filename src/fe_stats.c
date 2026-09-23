@@ -6,8 +6,6 @@
 #include "frontend/fe.h"
 #include "game/modes/pgatoursim.h"
 
-void fn_800907AC(s32 nMoney, char* pDst);      // money as text, with thousands separators
-
 // Prints a statistic's value text with its units: "$1,234,567", "301.2 yds", "65.2%".
 void PrintStatsWithUnits(const char* szValue, StatsUnits eUnits, char* szOut) {
     char szMoney[128];
