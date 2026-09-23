@@ -591,17 +591,8 @@ GoDynamicCam.c:
 unsorted/sweep_8003DC78.c:
 	.text       start:0x8003DC78 end:0x8003DCAC
 
-unsorted/sweep_80043920.c:
-	.text       start:0x80043920 end:0x800439E4
-
-unsorted/sweep_80044AA8.c:
-	.text       start:0x80044AA8 end:0x80044B0C
-
-unsorted/sweep_80044E2C.c:
-	.text       start:0x80044E2C end:0x80044E74
-
-unsorted/sweep_80044E74.c:
-	.text       start:0x80044E74 end:0x80044EA8
+gocamscripts.c:
+	.text       start:0x8003DCE8 end:0x800453C8
 
 unsorted/sweep_80045470.c:
 	.text       start:0x80045470 end:0x80045494
