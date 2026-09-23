@@ -77,7 +77,6 @@ extern u8  lbl_802823F1;                    // the aim hints are showing
 extern u8  lbl_802823F2;                    // which of the two aim hints is showing
 extern s32 lbl_802823F4;
 extern u8  lbl_802823F8;
-extern s32 lbl_802823FC;                    // the current lesson, 1..12
 extern f32 lbl_80282400;                    // lessons 8 and 9 test its sign
 extern s32 lbl_80282404;                    // player 0's controller, kept while the CPU demonstrates
 extern u8  lbl_80282408;                    // the spin option, saved

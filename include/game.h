@@ -17,6 +17,15 @@ void Session_SetNumPlayers(int n);      // Golfer.c
 
 // ---- golfer states (Swing.c) -----------------------------------------------------------------
 
+// A row of sGolferStateEngineTable: a golfer state's callbacks.
+typedef struct SwingStateDef {
+    void (*pfnEnter)(int nPlayer);  // 0x00
+    void (*pfnUpdate)(int nPlayer); // 0x04
+    void (*pfnExit)(int nPlayer);   // 0x08
+} SwingStateDef;
+
+extern SwingStateDef sGolferStateEngineTable[GS_NUM];   // 0x801883D8  one row per GS_* state
+
 u8   fn_80058F5C(int nPlayer);          // the per-frame swing poll: the ball was struck
 f32  fn_8005B64C(int nPlayer);          // the swing's shot power
 void GOLFERSTATE_Push(int nState, int nPlayer);     // push a state and run its enter callback
@@ -461,6 +470,7 @@ static inline void AddIfScore(s32* aList, int* pnCount, int nPlayer, int nHole, 
 }
 
 // GameMode11.c: the lessons
+extern s32 lbl_802823FC;                // the current lesson, 1..12
 u8   fn_80100294(void);                 // in a lesson (mode 11)
 int  Scenario_RequiredShape(int nPlayer); // the lesson's shape in mode 11, else 7 (none); nPlayer unused
 u8   fn_80100AF8(void);                 // lesson 5 of mode 11

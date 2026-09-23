@@ -358,8 +358,6 @@ f32 fn_8005CC18(f32* pV) {
     return f;
 }
 
-extern int lbl_802823FC;
-
 int fn_8005CC5C(void) {
     return lbl_802823FC;
 }
@@ -725,14 +723,7 @@ typedef struct SwingStack {
     s8   nTop;                  // 0x05  index of the current state, -1 when empty
 } SwingStack;
 
-typedef struct SwingStateDef {
-    void (*pfnEnter)(int nPlayer);  // 0x00
-    void (*pfnUpdate)(int nPlayer); // 0x04
-    void (*pfnExit)(int nPlayer);   // 0x08
-} SwingStateDef;
-
 extern SwingStack    gSwingStacks[];        // 0x801D5A90
-extern SwingStateDef sGolferStateEngineTable[];        // 0x801883D8
 extern u8            gInSwingExit;          // 0x80281E00  set while a state's exit callback runs
 
 // The current swing state, or -1.

@@ -8,13 +8,6 @@
 #include "engine.h"
 #include "game/save.h"
 
-typedef struct SwingStateDef {
-    void (*pfnEnter)(int nPlayer);  // 0x00
-    void (*pfnUpdate)(int nPlayer); // 0x04
-    void (*pfnExit)(int nPlayer);   // 0x08
-} SwingStateDef;
-extern SwingStateDef sGolferStateEngineTable[];        // 0x801883D8
-
 extern u8  gNumPlayersSetUp;                // 0x80281D48 (Golfer.c)
 extern u8  lbl_8028227C;
 extern u8  lbl_802823C9;
