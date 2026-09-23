@@ -7,6 +7,7 @@
 #include "charstate.h"
 #include "unsorted/cull.h"
 #include "game_types.h"
+#include "endian.h"
 
 void  fn_80014BB4(void);
 void  fn_80014C9C(void);
@@ -657,15 +658,6 @@ f32 fn_8001EEA4(f32* pA, f32* pB) {
     return pA[0] * pB[0] + pA[1] * pB[1] + pA[2] * pB[2] + pA[3] * pB[3];
 }
 
-f32 fn_8001EFFC(CamLens* pLens) {
-    return pLens->fB0;
-}
-
-// The current render camera's lens.
-CamLens* fn_8001F004(void) {
-    return fn_80008370(*lbl_80280DF0);
-}
-
 int fn_8001EED8(CharModel* pModel, int nBone) {
     return pModel->aBone[nBone];
 }
@@ -678,6 +670,165 @@ int fn_8001EEE4(CharModel* pModel, int nBone) {
     return pModel->aBone[nBone];
 }
 
+// a - b into out (three floats)
+#ifdef __MWERKS__
+asm void fn_8001EF10(register f32* pA, register f32* pB, register f32* pOut) {
+    nofralloc
+    psq_l  f0, 0(pA), 0, 0
+    psq_l  f1, 8(pA), 1, 0
+    psq_l  f2, 0(pB), 0, 0
+    psq_l  f3, 8(pB), 1, 0
+    ps_sub f2, f0, f2
+    ps_sub f3, f1, f3
+    psq_st f2, 0(pOut), 0, 0
+    psq_st f3, 8(pOut), 1, 0
+    blr
+}
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void fn_8001EF10(f32* pA, f32* pB, f32* pOut) {
+    pOut[0] = pA[0] - pB[0];
+    pOut[1] = pA[1] - pB[1];
+    pOut[2] = pA[2] - pB[2];
+}
+#endif
+
+// in scaled by f into out (three floats)
+#ifdef __MWERKS__
+asm void fn_8001EF34(register f32* pIn, register f32 f, register f32* pOut) {
+    nofralloc
+    fmr      f2, f
+    psq_l    f0, 0(pIn), 0, 0
+    psq_l    f1, 8(pIn), 1, 0
+    ps_muls0 f0, f0, f2
+    ps_muls0 f1, f1, f2
+    psq_st   f0, 0(pOut), 0, 0
+    psq_st   f1, 8(pOut), 1, 0
+    blr
+}
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void fn_8001EF34(f32* pIn, f32 f, f32* pOut) {
+    pOut[0] = pIn[0] * f;
+    pOut[1] = pIn[1] * f;
+    pOut[2] = pIn[2] * f;
+}
+#endif
+
+// b + a into out (three floats)
+#ifdef __MWERKS__
+asm void fn_8001EF54(register f32* pA, register f32* pB, register f32* pOut) {
+    nofralloc
+    psq_l  f0, 0(pA), 0, 0
+    psq_l  f1, 8(pA), 1, 0
+    psq_l  f2, 0(pB), 0, 0
+    psq_l  f3, 8(pB), 1, 0
+    ps_add f2, f2, f0
+    ps_add f3, f3, f1
+    psq_st f2, 0(pOut), 0, 0
+    psq_st f3, 8(pOut), 1, 0
+    blr
+}
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void fn_8001EF54(f32* pA, f32* pB, f32* pOut) {
+    pOut[0] = pB[0] + pA[0];
+    pOut[1] = pB[1] + pA[1];
+    pOut[2] = pB[2] + pA[2];
+}
+#endif
+
+// a x b into out; out's fourth float is set to 0.
+#ifdef __MWERKS__
+asm void vec4flt_CrossProduct(register f32* pA, register f32* pB, register f32* pOut) {
+    nofralloc
+    psq_l      f0, 0(pA), 0, 0
+    psq_l      f1, 4(pA), 0, 0
+    psq_l      f3, 0(pB), 0, 0
+    psq_l      f5, 4(pB), 0, 0
+    ps_merge10 f2, f1, f0
+    ps_merge10 f4, f3, f3
+    ps_merge10 f3, f5, f3
+    ps_mul     f4, f0, f4
+    ps_mul     f0, f2, f5
+    ps_merge11 f2, f4, f4
+    ps_msub    f0, f1, f3, f0
+    ps_sub     f4, f4, f2
+    psq_st     f0, 0(pOut), 0, 0
+    psq_st     f4, 8(pOut), 0, 0
+    blr
+}
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void vec4flt_CrossProduct(f32* pA, f32* pB, f32* pOut) {
+    f32 fX = pA[1] * pB[2] - pA[2] * pB[1];
+    f32 fY = pA[2] * pB[0] - pA[0] * pB[2];
+    f32 fZ = pA[0] * pB[1] - pA[1] * pB[0];
+
+    pOut[0] = fX;
+    pOut[1] = fY;
+    pOut[2] = fZ;
+    pOut[3] = 0.0f;
+}
+#endif
+
+// a - b into out (four floats)
+#ifdef __MWERKS__
+asm void fn_8001EFB4(register f32* pA, register f32* pB, register f32* pOut) {
+    nofralloc
+    psq_l  f0, 0(pA), 0, 0
+    psq_l  f1, 8(pA), 0, 0
+    psq_l  f2, 0(pB), 0, 0
+    psq_l  f3, 8(pB), 0, 0
+    ps_sub f2, f0, f2
+    ps_sub f3, f1, f3
+    psq_st f2, 0(pOut), 0, 0
+    psq_st f3, 8(pOut), 0, 0
+    blr
+}
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void fn_8001EFB4(f32* pA, f32* pB, f32* pOut) {
+    pOut[0] = pA[0] - pB[0];
+    pOut[1] = pA[1] - pB[1];
+    pOut[2] = pA[2] - pB[2];
+    pOut[3] = pA[3] - pB[3];
+}
+#endif
+
+// b + a into out (four floats)
+#ifdef __MWERKS__
+asm void fn_8001EFD8(register f32* pA, register f32* pB, register f32* pOut) {
+    nofralloc
+    psq_l  f0, 0(pA), 0, 0
+    psq_l  f1, 8(pA), 0, 0
+    psq_l  f2, 0(pB), 0, 0
+    psq_l  f3, 8(pB), 0, 0
+    ps_add f2, f2, f0
+    ps_add f3, f3, f1
+    psq_st f2, 0(pOut), 0, 0
+    psq_st f3, 8(pOut), 0, 0
+    blr
+}
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void fn_8001EFD8(f32* pA, f32* pB, f32* pOut) {
+    pOut[0] = pB[0] + pA[0];
+    pOut[1] = pB[1] + pA[1];
+    pOut[2] = pB[2] + pA[2];
+    pOut[3] = pB[3] + pA[3];
+}
+#endif
+
+f32 fn_8001EFFC(CamLens* pLens) {
+    return pLens->fB0;
+}
+
+// The current render camera's lens.
+CamLens* fn_8001F004(void) {
+    return fn_80008370(*lbl_80280DF0);
+}
+
 // ---- sweep code (not yet cleaned up) ----
 
 void Anim_SetRate(u8* p, f32 v);
@@ -687,3 +838,22 @@ void Anim_SetRate(u8* p, f32 v) {
 }
 
 // ---- end of sweep code ----
+
+// Byte-swaps nCount records laid out as pFormat's nFields fields from *ppSrc to *ppDst; both
+// pointers are left after the last record.
+void fn_8001F08C(void** ppSrc, void** ppDst, SwapField* pFormat, int nFields, int nCount) {
+    SwapField* pField;
+    int i;
+
+    if (nCount > 0) {
+        do {
+            pField = pFormat;
+            for (i = 0; i < nFields; i++) {
+                // port: *ppSrc is read and advanced as a u8* (fn_80076158's parameter)
+                fn_80076158((u8**)ppSrc, *ppDst, pField->nBytes, pField->nSize);
+                *ppDst = (u8*)*ppDst + pField->nBytes;
+                pField++;
+            }
+        } while (--nCount > 0);
+    }
+}
