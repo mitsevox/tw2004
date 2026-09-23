@@ -4,6 +4,8 @@
 // (docs/tw06-names.md); each one is checked against what our code does.
 
 #include "golfer.h"
+#include "ball.h"
+#include "game.h"
 
 typedef struct View View;
 
@@ -36,8 +38,6 @@ void  fn_8001D7A4(int nHandle);
 void  fn_800E4204(void);
 u8    fn_800E0A90(int nPlayer);
 u8    fn_800E3A54(void);
-u8    Player_IsHoled(int nPlayer);
-void  GOLFERSTATE_Set(int nState, int nPlayer);
 u8    fn_800E1CA8(void);
 void  fn_800D439C(int nPlayer, int a);
 void  fn_800D9834(int nPlayer);
@@ -50,7 +50,6 @@ u8    fn_800E4BF8(void);
 void* fn_80017028(int nView);
 void  View_SetCamera(void* pView, int nCamera, int nPlayer, int nView);
 void  fn_800E3D90(void);
-void  fn_80062D6C(int a, int nPlayer);
 void  fn_800E3D38(int nPlayer, int a);
 u8    fn_800EE470(void);
 void  fn_8011989C(int nPlayer, int nStrokes);
@@ -68,8 +67,6 @@ void  fn_80063CF0(void* pView, int nCamera, int nPlayer);
 double fn_80009680(double x);               // sqrt
 u8    Ter_CheckObjectAndHazardObstruction(u8* pBall, int a, int b, int c, f32 f1, f32 f2, f32 f3);
 u8    Ter_SearchAreaForDropLocation(int nPlayer, int a, int b, f32* pOut);
-u8    Physics_DropBall(u8* pBall, f32* pPos);
-void  fn_80055AA8(u8* pBall, f32* pPos, int nPlayer);
 
 u8    fn_800E23EC(void);
 void  fn_800E0AC4(int a);
@@ -88,12 +85,9 @@ void  fn_800D4030(int nPlayer);
 void  GM_CheckBallForUIHints(int nPlayer);
 u8    fn_800E23B0(int nPlayer, int nStrokes);
 u8    fn_8008AC40(void);
-int   Game_CurHoleIndex(void);
 void  fn_800D9350(int nPlayer);
 int   fn_800D2B08(void);                    // the hole's par
 u8    fn_800E53B8(void);
-int   GOLFERSTATE_GetCurrentState(int nPlayer);
-void  GOLFERSTATE_Switch(int nState, int nPlayer);
 void  fn_800BB0A8(void);
 void  fn_800335F8(int a);
 void  fn_800A76E4(void);
@@ -165,7 +159,6 @@ void  fn_8009B970(int nView);
 void  fn_8001C804(int nPlayer, int a, int b);
 void  fn_80095744(int nHandle, int nAnim);   // play an animation
 void  fn_800689D4(int nPlayer);
-void  fn_80062C38(void);
 void  fn_800C4E80(void* pView, int nPlayer);
 u8    GM_bIsZoomButtonPressed(int nPlayer);
 u8    GM_bIsElevatorCamButtonPressed(int nPlayer);
@@ -179,7 +172,6 @@ f32   fn_8006E118(u64 tEnd, u64 tStart);    // seconds between two time stamps
 int   GameEffects_BallUpdatesThisFrame(int nPlayer);
 u8    fn_800C71A4(void* pView, int nPlayer);
 void  Physics_Simulate(u8* pBall, int nTicks);
-void  Ball_SetSimulating(int b);
 void  fn_80050D2C(int a);
 void  fn_8006B2C4(int nPlayer, int a);
 u8    fn_800BB1F8(int nPlayer);
@@ -610,12 +602,12 @@ void GM_BumpBallForObstructions(int nPlayer) {
             pBall = p->ball;
             if (Ter_CheckObjectAndHazardObstruction(pBall, 0, 1, 1, 1.5f, 2.0f, 0.577f)) {
                 if (Ter_SearchAreaForDropLocation(n, 0, 0, vDrop)) {
-                    Physics_DropBall(pBall, vDrop);
+                    Physics_DropBall((Ball*)pBall, vDrop);
                     return;
                 }
-                Physics_DropBall(pBall, gPlayers[nPlayer].vPreShot);
+                Physics_DropBall((Ball*)pBall, gPlayers[nPlayer].vPreShot);
                 if (gPlayers[n].vA44[0] == gPlayers[n].fBallX && gPlayers[n].vA44[2] == gPlayers[n].fBallZ) {
-                    fn_80055AA8(pBall, gPlayers[nPlayer].vPreShot, n);
+                    fn_80055AA8((Ball*)pBall, gPlayers[nPlayer].vPreShot, n);
                 }
             }
         }
@@ -961,15 +953,15 @@ void GM_ReplaceOOBBall(int nPlayer) {
     if ((gPlayers[nPlayer].b30E ||
          (Ter_PointInOOBNetwork(gPlayers[nPlayer].ball) && !gPlayers[nPlayer].bLowIQPenalty)) &&
         Ter_SearchAreaForDropLocation(nPlayer, 1, 1, v)) {
-        Physics_DropBall(gPlayers[nPlayer].ball, v);
+        Physics_DropBall((Ball*)gPlayers[nPlayer].ball, v);
         return;
     }
     pBall = gPlayers[nPlayer].ball;
     pPre  = gPlayers[nPlayer].vPreShot;
-    Physics_DropBall(pBall, pPre);
+    Physics_DropBall((Ball*)pBall, pPre);
     if (gPlayers[nPlayer].vA44[0] == gPlayers[nPlayer].fBallX &&
         gPlayers[nPlayer].vA44[2] == gPlayers[nPlayer].fBallZ) {
-        fn_80055AA8(pBall, pPre, nPlayer);
+        fn_80055AA8((Ball*)pBall, pPre, nPlayer);
     }
 }
 
@@ -979,15 +971,15 @@ void fn_800DEB5C(int nPlayer) {
     f32* pPre;
     u8*  pBall;
     if (Ter_SearchAreaForDropLocation(nPlayer, 1, 1, v)) {
-        Physics_DropBall(gPlayers[nPlayer].ball, v);
+        Physics_DropBall((Ball*)gPlayers[nPlayer].ball, v);
         return;
     }
     pBall = gPlayers[nPlayer].ball;
     pPre  = gPlayers[nPlayer].vPreShot;
-    Physics_DropBall(pBall, pPre);
+    Physics_DropBall((Ball*)pBall, pPre);
     if (gPlayers[nPlayer].vA44[0] == gPlayers[nPlayer].fBallX &&
         gPlayers[nPlayer].vA44[2] == gPlayers[nPlayer].fBallZ) {
-        fn_80055AA8(pBall, pPre, nPlayer);
+        fn_80055AA8((Ball*)pBall, pPre, nPlayer);
     }
 }
 

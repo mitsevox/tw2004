@@ -2,8 +2,8 @@
 // after mode 8's setup (0x800F986C on). Only the setup is here.
 
 #include "golfer.h"
+#include "game.h"
 
-void  Session_SetNumPlayers(int n);
 extern u8  lbl_8028227C;
 extern s32 lbl_802823D0;
 extern s32 lbl_802823D4;

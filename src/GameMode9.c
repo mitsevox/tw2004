@@ -3,10 +3,8 @@
 // (fn_800FF894, fn_800FFDB0).
 
 #include "golfer.h"
+#include "game.h"
 
-int   Game_CurHoleIndex(void);
-u8    Player_IsHoled(int nPlayer);
-void  GOLFERSTATE_Set(int nState, int nPlayer);
 void  GM_EndOfGolferTurn(int nPlayer);
 void  fn_800E1480(int nHole);
 void  fn_800E3C0C(int a);

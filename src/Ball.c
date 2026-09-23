@@ -7,6 +7,7 @@
 #include "golfer.h"
 #include "physics.h"
 #include "ball.h"
+#include "game.h"
 
 #define BALL_RADIUS 0.0256667f      // 0.92 in (a real one is 0.84)
 #define CUP_DIAMETER 0.10717f       // 3.86 in (a real cup is 4.25)
@@ -74,8 +75,6 @@ void   fn_80055EC4(f32* pA, f32* pB, f32* pOut);
 void   fn_80055EF8(f32* pA, f32* pOut);
 f32    fn_80051124(Ball* pBall, f32 fAim, f32* pNormal);
 f32    fn_800511F0(Ball* pBall, f32 fAim, f32* pNormal);
-int    Game_GetCourse(void);                     // 0x80008830
-int    Game_CurrentHole(void);                   // Golfer.c
 int    Hole_WindDir(void);
 f32    Hole_WindSpeed(void);
 int    fn_801021FC(void);

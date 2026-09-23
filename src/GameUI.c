@@ -2,20 +2,18 @@
 // and end-of-round screens, and the flags that say one of them is up. No TW06 counterpart found.
 
 #include "golfer.h"
+#include "game.h"
 
 void  fn_8001437C(void);
 void  fn_800E542C(void);
 void  fn_800E5450(void);
-void  fn_80062C38(void);
 void  fn_80062C5C(void);
 void  fn_8006A8B0(void);
-void  fn_80062D6C(int a, int nPlayer);
 void  fn_800E0AC4(int a);
 void  fn_800E0A98(int a);
 void  fn_800E5474(int a);
 void  fn_800E4204(void);
 u8    fn_800E4254(int nPlayer);
-int   fn_80062D38(int a, int b, int c);
 void  EVENT_Trigger(int nPlayer, int nEvent, int a, int b);
 void  fn_800A72EC(int a, int b);
 void  GameEffects_ResetGameEffectSettings(void);
@@ -181,7 +179,6 @@ void  fn_8009EF98(void);
 u8    fn_800E39F0(void);
 void  fn_800A76E4(void);
 void  fn_800E1018(int nPlayer, int nHole);
-int   Game_CurHoleIndex(void);
 void  fn_8006F4B4(void);
 int   GM_GotoNextSelectedHole(void);
 extern u8 gNumPlayersSetUp;                 // 0x80281D48 (Golfer.c)

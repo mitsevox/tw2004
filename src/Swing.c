@@ -3,6 +3,8 @@
 // and tables are written up in docs/gameplay.md.
 
 #include "golfer.h"
+#include "ball.h"
+#include "game.h"
 
 // The swing module's state; only the tuning values read here. Set up in Swing_Init.
 typedef struct SwingState {
@@ -1002,7 +1004,6 @@ void fn_8005CD94(void) {
 void* fn_80017028(int nView);                // the view
 u8    fn_800C7100(void* pView);              // its camera has settled
 u8    fn_800FA118(int a, int b);
-void GOLFERSTATE_Switch(int nState, int nPlayer);  // 0x8005D188
 void  AI_ApplyError(int nPlayer);            // Golfer.c
 
 #define CPU_TOLERANCE 0.0025f               // 0.05 yd squared: land within 1.8 in of the target
@@ -2094,7 +2095,6 @@ void Swing_ResetBoostAndSpin(int nPlayer) {
 
 void  View_SetCamera(void* pView, int nCamera, int nPlayer, int nView);   // 0x800632E4
 void  fn_800E3D38(int nPlayer, int a);
-void  Ball_SetSimulating(u8 bOn);            // Ball.c
 void  Emotion_UpdatePlayerEmotion(int nPlayer);
 void  GM_DoPostShotInHoleUI(int nPlayer);
 void  fn_800E3C0C(int a);
@@ -2211,9 +2211,6 @@ void fn_80062C38(void) {
 void fn_80062C5C(void) {
     fn_800E58B4(8);
 }
-
-void fn_80062D38(int a, int b, int nPlayer);
-void fn_80062D6C(int a, int nPlayer);
 
 void fn_80062C80(int a, u8 b) {
     fn_80062D38(0x1E, a, b);
@@ -2396,7 +2393,6 @@ void  fn_8006C608(void);
 void fn_80062CE0(u8 a);
 void  fn_800C1790(void* pView, int nPlayer);
 void fn_80062DB8(void* pView, int a);
-void fn_80062D38(int a, int b, int nPlayer);
 extern Vec4 lbl_80183670;
 extern u8   lbl_80281E11;
 
@@ -2658,7 +2654,6 @@ void STATEFUNC_MidHoleFlyByExit(int nPlayer) {
 void fn_80062B64(int nPlayer);
 void fn_80062B60(int nPlayer);
 void  Character_SetPosition(int nHandle, f32* pPos, int a);
-u8    Physics_DropBall(u8* pBall, f32* pPos);          // put the ball at a point
 void  fn_800C7140(int a);
 void  fn_80045824(int nPlayer);
 extern Vec4 lbl_80183630;
@@ -2693,7 +2688,7 @@ void STATEFUNC_RemoveBallInit(int nPlayer) {
     if (pCourse != NULL) {
         f32* pPin = (f32*)&pCourse->pin[nHole];
         Character_SetPosition(gPlayers[nPlayer].nShotHandle, pPin, 1);
-        Physics_DropBall(pBall, pPin);
+        Physics_DropBall((Ball*)pBall, pPin);
         gPlayers[nPlayer].nLie = LIE_HOLED;
         Vec3Copy(pBall, pBallBefore);
     }
@@ -2995,7 +2990,6 @@ void STATEFUNC_KneeCamUpdate(int nPlayer) {
 
 
 void  Caddie_Update(int nPlayer);             // Golfer.c
-void fn_80062C38(void);
 void  GameEffects_ResetGameEffectSettings(void);
 void fn_80058FA4(int nPlayer);
 void  fn_80068AA8(int nPlayer);
@@ -3186,7 +3180,6 @@ void STATEFUNC_PlaceBallInit(int nPlayer) {
 void  BreakLine_Start(int nView);            // GoBreakLine.c
 void fn_80062CB0(int a, u8 b);
 void  GM_CheckForShotChanges(int nPlayer);
-void  fn_80055AA8(u8* pBall, u8* pBall2, int nPlayer);
 void  fn_800EDAE0(int nPlayer);
 u8    GM_PlayerTakeMulligan(int nPlayer);
 void  PlaceBall_UpdateMomentums(int nPlayer, f32 f);
@@ -3242,9 +3235,9 @@ void STATEFUNC_PlaceBallUpdate(int nPlayer) {
         Player* p = &gPlayers[nPlayer];
         if (p->uFlagsEF0 & 1) {
             u8* pBall = p->ball;
-            if (Physics_DropBall(pBall, p->vPlacement)) {
+            if (Physics_DropBall((Ball*)pBall, p->vPlacement)) {
                 if (gSurfaceTypes[*(s32*)(gPlayers[nPlayer].ball + 0x74)].nClass == 1) {
-                    fn_80055AA8(pBall, pBall, nPlayer);
+                    fn_80055AA8((Ball*)pBall, (f32*)pBall, nPlayer);
                 }
                 Vec_Copy((f32*)pBall, &p->fBallX);
                 GOLFERSTATE_Switch(GS_PRE_SHOT, nPlayer);
@@ -3276,7 +3269,6 @@ void STATEFUNC_PlaceBallUpdate(int nPlayer) {
 
 
 u8    fn_800C7340(void* pView, int nPlayer);
-void fn_80062D6C(int a, int nPlayer);
 
 // State 3: the aiming camera, held while button 8 is down (the caddie keeps updating). Pan
 // sounds on buttons 9/10, 30 and 11..14; once the camera has arrived (flag from the enter) a
@@ -3691,7 +3683,7 @@ void STATEFUNC_PreShotUpdate(int nPlayer) {
             if (fn_80062BB0(gPlayers[nPlayer].nShotHandle, 3)) {
                 fn_80062B98(gPlayers[nPlayer].nShotHandle, 3);
                 if (!fn_800559BC(gPlayers[nPlayer].ball, gPlayers[nPlayer].ball)) {
-                    Physics_DropBall(gPlayers[nPlayer].ball, (f32*)gPlayers[nPlayer].ball);
+                    Physics_DropBall((Ball*)gPlayers[nPlayer].ball, (f32*)gPlayers[nPlayer].ball);
                 }
             } else {
                 Character_GetBallOnFingerPosition(gPlayers[nPlayer].nShotHandle, (f32*)gPlayers[nPlayer].ball);
@@ -3717,7 +3709,7 @@ void STATEFUNC_PreShotUpdate(int nPlayer) {
         if (fn_80062BB0(gPlayers[nPlayer].nShotHandle, 3)) {
             fn_80062B98(gPlayers[nPlayer].nShotHandle, 3);
             *(f32*)(gPlayers[nPlayer].ball + 4) += 2.0f;
-            fn_80055AA8(gPlayers[nPlayer].ball, gPlayers[nPlayer].ball, nPlayer);
+            fn_80055AA8((Ball*)gPlayers[nPlayer].ball, (f32*)gPlayers[nPlayer].ball, nPlayer);
             fn_80047EF0(gPlayers[nPlayer].ball, nPlayer, 0);
         } else {
             Character_GetBallOnFingerPosition(gPlayers[nPlayer].nShotHandle, (f32*)gPlayers[nPlayer].ball);
@@ -3736,7 +3728,7 @@ void STATEFUNC_PreShotUpdate(int nPlayer) {
         }
         Ball_SetSimulating(0);
     } else if (*pState != 0) {
-        Physics_DropBall(gPlayers[nPlayer].ball, (f32*)gPlayers[nPlayer].ball);
+        Physics_DropBall((Ball*)gPlayers[nPlayer].ball, (f32*)gPlayers[nPlayer].ball);
     }
     if (!Player_IsCPU(nPlayer)) {
         if ((fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0, 0)) && !fn_80100294()) {
@@ -3766,9 +3758,9 @@ void STATEFUNC_PreShotUpdate(int nPlayer) {
     if (fn_80063C7C(pV) && (fn_800C6F7C(pV, nPlayer, 0.25f) || !fn_800C6E88(pV, nPlayer))) {
         if (bInHand) {
             if (fn_80095780(gPlayers[nPlayer].nShotHandle) == 10) {
-                Physics_DropBall(gPlayers[nPlayer].ball, &gPlayers[nPlayer].fBallX);
+                Physics_DropBall((Ball*)gPlayers[nPlayer].ball, &gPlayers[nPlayer].fBallX);
             } else {
-                fn_80055AA8(gPlayers[nPlayer].ball, gPlayers[nPlayer].ball + 0x10, nPlayer);
+                fn_80055AA8((Ball*)gPlayers[nPlayer].ball, ((Ball*)gPlayers[nPlayer].ball)->vPrev, nPlayer);
             }
         }
         GOLFERSTATE_Switch(GS_SHOT_SETUP, nPlayer);
@@ -3980,7 +3972,6 @@ u8    fn_800DA174(void);
 u8    fn_800DA1D4(void);
 u8    fn_800DA234(void);
 void  fn_800E505C(int nTip);
-void fn_80062C80(int a, u8 b);
 void  fn_800D1DAC(int nPlayer);
 u8    fn_800EC550(void);
 u8    fn_800ED540(void);

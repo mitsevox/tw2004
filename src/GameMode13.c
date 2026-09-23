@@ -4,6 +4,8 @@
 // the way raise a points multiplier. The game ends when everyone's time is up.
 
 #include "golfer.h"
+#include "ball.h"
+#include "game.h"
 
 // The prize rows at lbl_80200538 + 0x710 (see GameMode10.c).
 typedef struct MiniPrize {
@@ -33,12 +35,8 @@ extern s32 lbl_802823BC;                    // the points of the last shot
 
 void  fn_800E1480(int nHole);
 u32   Rand_Next(int nStream);
-int   Game_CurHoleIndex(void);
 void  Mem_cpy(void* pDst, void* pSrc, int nBytes);
-void  fn_80055AA8(u8* pBall, f32* pPos, int nPlayer);
 f32   fn_800D0550(int nPlayer);             // the shot's length
-int   GOLFERSTATE_GetCurrentState(int nPlayer);
-void  GOLFERSTATE_Switch(int nState, int nPlayer);
 void  AI_DefaultTarget(int nPlayer);
 void  fn_800A624C(void);
 void  fn_800A6278(void);
@@ -55,7 +53,6 @@ void  fn_800E3C0C(int a);
 void  fn_800E53F0(int nMsg, int a, int b, int c);
 void  fn_800E58B4(int a);
 void  fn_800ED710(s32 p0);
-void  fn_80062D6C(int a, int b);
 void  fn_800FF7DC(void);
 void  fn_80125910(int a);
 void  fn_800F19D4(void);
@@ -206,7 +203,7 @@ void fn_800F6DFC(int nPlayer) {
     if (gReplayData.bF10) {
         Mem_cpy(gPlayers[nPlayer].ball, gReplayData.player.ball, 0xBC);
     } else {
-        fn_80055AA8(gPlayers[nPlayer].ball,
+        fn_80055AA8((Ball*)gPlayers[nPlayer].ball,
                     (f32*)((u8*)gPlayers[nPlayer].pBallCourse + gSession.nTeeSet[nPlayer] * 0x10 + 0xB0), nPlayer);
     }
     gPlayers[nPlayer].nDC0++;

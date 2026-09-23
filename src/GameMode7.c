@@ -2,8 +2,8 @@
 // GameMode6.c); it sets more of the callbacks than mode 6.
 
 #include "golfer.h"
+#include "game.h"
 
-void  Session_SetNumPlayers(int n);
 extern u8  lbl_8028227C;
 extern u8  lbl_802823C9;
 extern s32 lbl_802823D0;

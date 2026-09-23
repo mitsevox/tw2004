@@ -3,6 +3,8 @@
 // written up in docs/gameplay.md; the record layout in docs/formats/game-data.md.
 
 #include "golfer.h"
+#include "ball.h"
+#include "game.h"
 
 // ---- small accessors ------------------------------------------------------------------------
 
@@ -864,7 +866,6 @@ extern s32 gSimClub[6];             // 0x801C65A0  per player: club the rehearsa
 #define SIM_BALL_X     (*(f32*)&gSimBall[0x00])
 #define SIM_BALL_Z     (*(f32*)&gSimBall[0x08])
 
-void Ball_SetSimulating(u8 bOn);                                  // 0x80050D24: gSimulating - silences sounds, effects and the tree roll
 void Ball_Launch(void* pBall, int nClub, int nKind, f32 fPower, f32 fAim, int nTrajectory, f32* pA, f32* pB);
 void Ball_SimStep(void* pBall, f32 fDt, f32 fScale);              // 0x8005585C
 void fn_8001C774(int nHandle, int nClub);
@@ -1451,7 +1452,6 @@ void Caddie_ApplyTip(int nPlayer) {
 
 // ---- small queries ------------------------------------------------------------------------------
 
-int  GOLFERSTATE_GetCurrentState(int nPlayer);       // Swing.c
 void fn_80013200(int nPad, u8 nValue);
 
 u8 Player_OnTee(int nPlayer) {

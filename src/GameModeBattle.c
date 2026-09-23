@@ -3,9 +3,8 @@
 // club that can be taken loses as soon as the other wins a hole.
 
 #include "golfer.h"
+#include "game.h"
 
-int   Game_CurHoleIndex(void);
-u8    Player_IsHoled(int nPlayer);
 u8    Bag_AddClub(int nPlayer, int nBit);
 u8    Bag_RemoveClub(int nPlayer, int nBit);
 u8    Bag_HasClub(int nPlayer, int nBit);

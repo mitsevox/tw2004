@@ -4,6 +4,7 @@
 
 #include "golfer.h"
 #include "ball.h"
+#include "game.h"
 
 extern Replay gReplayData;
 
@@ -37,7 +38,6 @@ void  fn_800E1480(int nHole);
 void  fn_800E14E0(int nCourse);
 void  fn_800E1260(int nPreset);
 void  fn_800E1404(int nHole);
-void  Session_SetNumPlayers(int n);
 void  fn_800ED6F8(f32 x0);
 void  Wind_Set(int nDir, f32 fSpeed);
 void  fn_80055C40(int n);
@@ -46,14 +46,10 @@ void  fn_80055CD0(int n);
 void  Mem_cpy(void* pDst, void* pSrc, int nBytes);
 void  Vec_Copy(f32* pSrc, f32* pDst);
 f32   Vec_Distance(f32* pA, f32* pB);
-int   Game_CurHoleIndex(void);
-void  fn_80055AA8(Ball* pBall, f32* pPos, int nPlayer);
-u8    Physics_DropBall(Ball* pBall, f32* pPos);
 void  fn_8001C774(int nHandle, int nClub);
 void  fn_8001C724(int nHandle, int nKind);
 void  fn_8006BF60(int nPlayer);
 void  fn_8000B1D4(int nStream, u32 nSeed);
-void  GOLFERSTATE_Switch(int nState, int nPlayer);
 CourseInfo* fn_8000C594(void);
 int   fn_8001D324(int n);
 void  Character_SetPosition(int nHandle, f32* pPos, int a);
@@ -62,7 +58,6 @@ void  Shot_Prepare(int nPlayer, u8 bNotify);
 void  fn_8001C804(int nPlayer, int a, int b);
 void  fn_800957D8(int nHandle);
 void  fn_80095744(int nHandle, int nAnim);
-void  fn_80062C38(void);
 u32   Rand_Next(int nStream);
 void  fn_800A631C(void);
 int   fn_80015464(void);

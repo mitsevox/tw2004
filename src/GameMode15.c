@@ -3,6 +3,8 @@
 // makes you the leader. Five letters and you are out; the last player in wins.
 
 #include "golfer.h"
+#include "ball.h"
+#include "game.h"
 
 // The prize rows at lbl_80200538 + 0x710 (see GameMode10.c); nMode15 is the points for a surface.
 typedef struct MiniPrize {
@@ -34,12 +36,8 @@ extern s32 lbl_8028238C;                    // the leader (5 = none)
 
 void  fn_800E1480(int nHole);
 u32   Rand_Next(int nStream);
-int   Game_CurHoleIndex(void);
 void  Mem_cpy(void* pDst, void* pSrc, int nBytes);
-void  fn_80055AA8(u8* pBall, f32* pPos, int nPlayer);
 f32   fn_800D0550(int nPlayer);             // the shot's length
-int   GOLFERSTATE_GetCurrentState(int nPlayer);
-void  GOLFERSTATE_Switch(int nState, int nPlayer);
 void  AI_DefaultTarget(int nPlayer);
 void  fn_800A6278(void);
 void  fn_800A62E0(void);
@@ -52,7 +50,6 @@ int   fn_800D7220(int nReward, int a, s32* pOut);
 void  fn_800D3548(int nPlayer, int nMoney, s32* p);
 void  fn_800E3D90(void);
 void  fn_800E58B4(int a);
-void  fn_80062D6C(int a, int b);
 void* fn_80017004(int nView);
 void  fn_8006434C(void* pView, f32* pPos, f32* pX, f32* pY, int a);
 void  fn_8006A8D4(void* pView, f32* pX, f32* pY);
@@ -193,7 +190,7 @@ void fn_800F3E00(int nPlayer) {
     if (gReplayData.bF10) {
         Mem_cpy(gPlayers[nPlayer].ball, gReplayData.player.ball, 0xBC);
     } else {
-        fn_80055AA8(gPlayers[nPlayer].ball,
+        fn_80055AA8((Ball*)gPlayers[nPlayer].ball,
                     (f32*)((u8*)gPlayers[nPlayer].pBallCourse + gSession.nTeeSet[nPlayer] * 0x10 + 0xB0), nPlayer);
     }
     gPlayers[nPlayer].nDC0++;

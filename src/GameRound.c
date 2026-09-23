@@ -2,6 +2,8 @@
 // hole, the stroke limit, created-course data, hole names. TW06 has no counterpart file.
 
 #include "golfer.h"
+#include "ball.h"
+#include "game.h"
 
 int  fn_800E19A4(int nPlayer, int nHoles);
 void fn_800E25CC(u8 b);
@@ -22,7 +24,6 @@ int   fn_8011937C(int nPlayer, int a, u8 b);
 int   fn_800E8C24(int nPlayer, int nHole);
 u8    Player_IsCPU(int nPlayer);
 int   sprintf(char* pBuf, const char* pFmt, ...);
-int   Game_GetCourse(void);
 
 extern u8   gNumPlayersSetUp;               // 0x80281D48 (Golfer.c)
 extern char lbl_80282270[8];                // the hole name
@@ -76,21 +77,15 @@ void  fn_800E58B4(int a);
 f32   fn_800D0478(int nPlayer);           // the ball's distance from the pin (yards)
 
 CourseInfo* fn_8000C594(void);
-void  fn_80055AA8(u8* pBall, f32* pPos, int nPlayer);
 void  Mem_cpy(void* pDst, void* pSrc, int nBytes);   // memcpy
 void  Vec_Copy(f32* pSrc, f32* pDst);
-void  GOLFERSTATE_Set(int nState, int nPlayer);
-int   GOLFERSTATE_GetCurrentState(int nPlayer);
-u8    Player_IsHoled(int nPlayer);
 u8    Ter_PointInOOBNetwork(u8* pBall);
 u8    fn_800E3AF8(void);
 void  fn_800E0A84(u8 v);
-int   Game_CurHoleIndex(void);
 u32   Rand_Next(int nStream);
 void  fn_800E1260(int nPreset);
 void  fn_800E1404(int nHole);
 u8    fn_800E39F0(void);
-int   Game_CurrentHole(void);
 double fn_80009680(double x);               // sqrt
 u8    fn_8004B580(void);
 void  fn_80057364(int a);
@@ -958,7 +953,7 @@ void fn_800E299C(void) {
     int         i;
     for (i = 0; i < gNumPlayersSetUp; i++) {
         gPlayers[i].nLie = 0;
-        fn_80055AA8(gPlayers[i].ball, &((HoleTees*)pCourse)->tee[gSession.nTeeSet[i]].x, i);
+        fn_80055AA8((Ball*)gPlayers[i].ball, &((HoleTees*)pCourse)->tee[gSession.nTeeSet[i]].x, i);
         Mem_cpy(gPlayers[i].ballBefore, gPlayers[i].ball, 0xBC);
         Vec_Copy(&((HoleTees*)pCourse)->tee[gSession.nTeeSet[i]].x, &gPlayers[i].fBallX);
         Vec_Copy(&((HoleTees*)pCourse)->tee[gSession.nTeeSet[i]].x, gPlayers[i].vA44);

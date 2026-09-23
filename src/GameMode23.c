@@ -2,7 +2,8 @@
 // each, loaded from the 'PGAc' stream object), with the player's results kept in the save profile
 // (+0xB634..): "Did Not Play", "Cut", a finishing place, "Tied (%d players)".
 
-#include "game_types.h"
+#include "golfer.h"
+#include "game.h"
 
 void fn_800EDE78(void);
 void UStream_UnregisterHandler();
@@ -11,7 +12,6 @@ void fn_800EDEE8(void);
 void fn_800EDF34(s32 p0);
 void fn_800EDF60(s32 p0);
 void fn_800EDF90(s32 p0);
-extern s32 gpGame;
 extern s32 gpSaveData;
 void fn_800EE064(void);
 extern u8 lbl_8028233C;
@@ -74,7 +74,6 @@ typedef struct Profile {
 #define SEASON ((LessonSave*)((u8*)gpSaveData + 0xB640))   // profile 0's results
 
 extern u8  lbl_80281670[];
-extern u8  gSession[];
 extern s32 lbl_80282338;
 s32  fn_801190D8(s32 a);
 void fn_800E4364(u32 nQueue, s32 a, s32 b, s32 c);
@@ -84,8 +83,6 @@ void fn_800D2714(u16* pDate, s32* pDay, s32* pMonth, s32* pYear);
 s32  fn_8011A7C8(s32 nPlayer, s32 nHole);
 s32  fn_80119588(s32 a);
 s32  fn_800E1904(s32 nPlayer, s32 a);
-s32  Game_CurHoleIndex(void);
-extern u8 gPlayers[];
 char* strcpy(char* pDst, const char* pSrc);
 int   sprintf(char* pDst, const char* pFmt, ...);
 int   UStream_RegisterHandler();
@@ -179,10 +176,10 @@ void fn_800F018C(void) {
 
 // The mode ends: one player back, and the options it changed come back.
 void fn_800EE02C(void) {
-    ((s32*)gpGame)[0xC / 4] = 1;
-    ((s32*)gpGame)[0x10 / 4] = 1;
-    *(s32*)(gSession + 0xE84) = *(s32*)lbl_80281670;
-    *(s32*)(gSession + 0xE88) = lbl_80282338;
+    gpGame->nC = 1;
+    gpGame->n10 = 1;
+    SESSION_OPTIONS->unkC = *(s32*)lbl_80281670;
+    SESSION_OPTIONS->nWind = lbl_80282338;
     lbl_8028233C = 0;
 }
 
@@ -357,19 +354,18 @@ void fn_800F01CC(s32 i, char* pDst) {
     }
 }
 
-#define STROKES(n, h) (*(s32*)(gPlayers + (n) * 0xEF8 + (h) * 4 + 0x154))
-
 // Strokes behind the leader (in a playoff, on this hole).
 s32 fn_800EE778(s32 nPlayer) {
-    if (((u8*)gpGame)[0xD4]) {
-        return fn_8011A7C8(nPlayer, Game_CurHoleIndex()) - STROKES(nPlayer, Game_CurHoleIndex());
+    if (gpGame->bD4) {
+        return fn_8011A7C8(nPlayer, Game_CurHoleIndex()) - gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
     }
     return fn_80119588(1) - fn_800E1904(nPlayer, 0);
 }
 
 s32 fn_800EE810(s32 nPlayer) {
-    if (((u8*)gpGame)[0xD4]) {
-        return fn_8011A7C8(nPlayer, Game_CurHoleIndex()) - (STROKES(nPlayer, Game_CurHoleIndex()) + 1);
+    if (gpGame->bD4) {
+        return fn_8011A7C8(nPlayer, Game_CurHoleIndex()) -
+               (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1);
     }
     return fn_80119588(1) - (fn_800E1904(nPlayer, 1) + 1);
 }
@@ -377,8 +373,9 @@ s32 fn_800EE810(s32 nPlayer) {
 // Whether the player trails the leader by more than one stroke.
 u8 fn_800EE5B4(s32 nPlayer) {
     u8 bBehind;
-    if (((u8*)gpGame)[0xD4]) {
-        return STROKES(nPlayer, Game_CurHoleIndex()) + 1 < fn_8011A7C8(nPlayer, Game_CurHoleIndex());
+    if (gpGame->bD4) {
+        return gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1 <
+               fn_8011A7C8(nPlayer, Game_CurHoleIndex());
     }
     bBehind = 0;
     if (fn_800E1904(nPlayer, 0) >= fn_80119588(1)) {

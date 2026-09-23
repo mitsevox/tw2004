@@ -3,14 +3,9 @@
 
 #include "golfer.h"
 #include "ball.h"
+#include "game.h"
 
-int   Game_CurHoleIndex(void);
-int   Game_CurrentHole(void);
-u8    Player_IsHoled(int nPlayer);
 u8    Player_IsHoledNotState23(int nPlayer);
-u8    Player_OnTee(int nPlayer);
-u8    Team_IsAllHuman(int nTeam);
-void  GOLFERSTATE_Set(int nState, int nPlayer);
 CourseInfo* fn_8000C594(void);
 u8    fn_800E1BBC(void);
 u8    fn_800EC550(void);

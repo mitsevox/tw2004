@@ -4,12 +4,8 @@
 
 #include "golfer.h"
 #include "ball.h"
+#include "game.h"
 
-int   Game_CurHoleIndex(void);
-int   Game_CurrentHole(void);
-u8    Player_IsHoled(int nPlayer);
-u8    Player_OnTee(int nPlayer);
-void  GOLFERSTATE_Set(int nState, int nPlayer);
 void  fn_800E1480(int nHole);
 void  fn_800E45C0();
 void  fn_800E4364(u32 nQueue, int a, int b, int c);

@@ -2,6 +2,7 @@
 // each sends a message id plus up to eight int-or-float values, and the display queues' handlers.
 
 #include "golfer.h"
+#include "game.h"
 
 // One value of a message: an int or a float (the mask passed with it says which), or a pointer.
 typedef union MsgArg {
@@ -29,7 +30,6 @@ u32   strlen(const char* s);
 void  fn_800E5A4C(int nMsg, u32 uFloats, void* p0, void* p1, void* p2);
 void  fn_800E5B0C(int nMsg, u32 uFloats, void* p0, void* p1, void* p2, void* p3, void* p4);
 void  fn_800E3C0C(int a);
-void  fn_80062C80(int a, int b);
 extern s32 lbl_80282278;
 void  fn_800E3B04(void);
 u8    fn_80095430(int a);
@@ -46,11 +46,9 @@ typedef struct UIQueueItem {
     s32 c;
 } UIQueueItem;
 extern UIQueueItem lbl_802030BC[10];
-void  fn_80062D38(int a, int b, int c);
 extern u8 lbl_80203138[14];
 
 extern u8 lbl_802822BE;
-void fn_80062D6C();
 void fn_800E4FFC(int p0);
 void fn_800E502C(int p0);
 void fn_800E505C(int p0);

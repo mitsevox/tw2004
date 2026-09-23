@@ -4,6 +4,8 @@
 // (pfn268) raise a points multiplier.
 
 #include "golfer.h"
+#include "ball.h"
+#include "game.h"
 
 // The prize rows at lbl_80200538 + 0x710 (see GameMode10.c); nMode16 is the points for a surface.
 typedef struct MiniPrize {
@@ -31,11 +33,8 @@ extern s32 lbl_80282398;                    // the points of the last shot
 
 void  fn_800E1480(int nHole);
 u32   Rand_Next(int nStream);
-int   Game_CurHoleIndex(void);
 void  Mem_cpy(void* pDst, void* pSrc, int nBytes);
-void  fn_80055AA8(u8* pBall, f32* pPos, int nPlayer);
 f32   fn_800D0550(int nPlayer);             // the shot's length
-int   GOLFERSTATE_GetCurrentState(int nPlayer);
 void  AI_DefaultTarget(int nPlayer);
 void  fn_800A62A4(void);
 void  fn_800A62E0(void);
@@ -183,7 +182,7 @@ void fn_800F4F40(int nPlayer) {
     if (gReplayData.bF10) {
         Mem_cpy(gPlayers[nPlayer].ball, gReplayData.player.ball, 0xBC);
     } else {
-        fn_80055AA8(gPlayers[nPlayer].ball,
+        fn_80055AA8((Ball*)gPlayers[nPlayer].ball,
                     (f32*)((u8*)gPlayers[nPlayer].pBallCourse + gSession.nTeeSet[nPlayer] * 0x10 + 0xB0), nPlayer);
     }
     gPlayers[nPlayer].nDC0--;

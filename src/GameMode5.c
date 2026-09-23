@@ -2,6 +2,8 @@
 // 'PLY ' stream object), each an entry of 0x80 bytes; probably TW2004's Tiger Challenge.
 
 #include "golfer.h"
+#include "ball.h"
+#include "game.h"
 
 // One challenge (0x80 bytes).
 typedef struct Challenge {
@@ -101,7 +103,6 @@ void  fn_800E1260(int nPreset);
 void  fn_800E0B38(int nMode);
 void  fn_800F07C8(void);
 u8    fn_800E4BF8(void);
-int   Game_CurHoleIndex(void);
 int   fn_800D2B08(void);                    // the hole's par
 u8    fn_800E39F0(void);
 extern u8 gNumPlayersSetUp;                 // 0x80281D48 (Golfer.c)
@@ -126,8 +127,6 @@ typedef struct ChallengeSave {
 #define PROFILE_STAMP(n, i) ((ChallengeSave*)(gpSaveData + (n) * 0x10600))->aStamp[i]
 int   fn_800ECF9C(int i);
 u8    fn_800E5110(void);
-void  fn_80055AA8(u8* pBall, f32* pPos, int nPlayer);
-u8    Physics_DropBall(u8* pBall, f32* pPos);
 void  Vec_Copy(f32* pSrc, f32* pDst);
 void fn_800EC544(Challenge* p0, s32 p1);
 extern u8 lbl_802822FC;
@@ -145,7 +144,6 @@ void fn_800ED6E8(u8 v);
 u8 fn_800ED6F0(void);
 extern s32 lbl_802811F0;
 void fn_800ED6F8(f32 x0);
-void fn_80062D6C();
 void fn_800ED710(s32 p0);
 
 // Game mode 5 starts: its callbacks, one player, the challenge list.
@@ -627,8 +625,8 @@ void fn_800EBEF0(void) {
         v[1] = lbl_80203170[lbl_802822F4].f4;
         v[2] = lbl_80203170[lbl_802822F4].f8;
         v[3] = 1.0f;
-        fn_80055AA8(gPlayers[0].ball, v, 0);
-        Physics_DropBall(gPlayers[0].ball, v);
+        fn_80055AA8((Ball*)gPlayers[0].ball, v, 0);
+        Physics_DropBall((Ball*)gPlayers[0].ball, v);
         Vec_Copy(v, &gPlayers[0].fBallX);
     }
     if (lbl_80281664[lbl_802822F4].uClubs) {

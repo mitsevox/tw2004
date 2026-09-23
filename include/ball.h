@@ -49,4 +49,8 @@ typedef struct Ball {
     f32  fTimeSinceLastCheck;   // 0xB8  time since the last stall check. TW06: same name
 } Ball;
 
+void Ball_SetSimulating(u8 bOn);        // rehearsals and look-aheads: no sounds, effects or tree roll
+u8   Physics_DropBall(Ball* pBall, f32* pPos);          // put the ball on the ground at a point
+u8   fn_80055AA8(Ball* pBall, f32* pPos, int nPlayer);  // a fresh ball for a player at a point
+
 #endif

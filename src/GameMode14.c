@@ -5,6 +5,7 @@
 
 #include "golfer.h"
 #include "ball.h"
+#include "game.h"
 
 // One target's claim: how close the claiming shot was (0 best .. 4, 5 = unclaimed) and who holds it
 // (5 = nobody).
@@ -28,12 +29,8 @@ extern s32 lbl_801928F0[];                  // points per rank
 
 void  fn_800E1480(int nHole);
 u32   Rand_Next(int nStream);
-int   Game_CurHoleIndex(void);
 void  Mem_cpy(void* pDst, void* pSrc, int nBytes);
-void  fn_80055AA8(u8* pBall, f32* pPos, int nPlayer);
 f32   fn_800D0550(int nPlayer);          // the shot's length
-int   GOLFERSTATE_GetCurrentState(int nPlayer);
-void  GOLFERSTATE_Switch(int nState, int nPlayer);
 void  AI_DefaultTarget(int nPlayer);
 void  fn_800A6278(void);
 void  fn_800A62E0(void);
@@ -46,7 +43,6 @@ void  fn_800D3548(int nPlayer, int nMoney, s32* p);
 void  fn_800E3D90(void);
 void  fn_800E58B4(int a);
 void  fn_800E5B0C(int nMsg, u32 uFloats, void* p0, void* p1, void* p2, void* p3, void* p4);
-void  fn_80062D6C(int a, int nPlayer);
 void  fn_800FF7DC(void);
 void  fn_80125910(int a);
 void  fn_800F19D4(void);
@@ -186,7 +182,7 @@ void fn_800F2D4C(int nPlayer) {
     if (gReplayData.bF10) {
         Mem_cpy(gPlayers[nPlayer].ball, gReplayData.player.ball, 0xBC);
     } else {
-        fn_80055AA8(gPlayers[nPlayer].ball,
+        fn_80055AA8((Ball*)gPlayers[nPlayer].ball,
                     (f32*)((u8*)gPlayers[nPlayer].pBallCourse + gSession.nTeeSet[nPlayer] * 0x10 + 0xB0), nPlayer);
     }
     gPlayers[nPlayer].nDC0++;

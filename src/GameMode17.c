@@ -3,6 +3,8 @@
 // bonus plus 100 points per ball left.
 
 #include "golfer.h"
+#include "ball.h"
+#include "game.h"
 
 // The prize rows at lbl_80200538 + 0x710 (see GameMode10.c).
 typedef struct MiniPrize {
@@ -30,11 +32,8 @@ extern s32 lbl_802823A4;                    // the extra balls of the last shot
 extern s32 lbl_802823A8;                    // the points of the last shot
 
 void  fn_800E1480(int nHole);
-int   Game_CurHoleIndex(void);
 void  Mem_cpy(void* pDst, void* pSrc, int nBytes);
-void  fn_80055AA8(u8* pBall, f32* pPos, int nPlayer);
 f32   fn_800D0550(int nPlayer);             // the shot's length
-int   GOLFERSTATE_GetCurrentState(int nPlayer);
 void  fn_800A62A4(void);
 void  fn_800A62E0(void);
 void  fn_800A6358(void);
@@ -177,7 +176,7 @@ void fn_800F5E9C(int nPlayer) {
     if (gReplayData.bF10) {
         Mem_cpy(gPlayers[nPlayer].ball, gReplayData.player.ball, 0xBC);
     } else {
-        fn_80055AA8(gPlayers[nPlayer].ball,
+        fn_80055AA8((Ball*)gPlayers[nPlayer].ball,
                     (f32*)((u8*)gPlayers[nPlayer].pBallCourse + gSession.nTeeSet[nPlayer] * 0x10 + 0xB0),
                     nPlayer);
     }
