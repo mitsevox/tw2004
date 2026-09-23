@@ -381,7 +381,7 @@ f32 fn_800511F0(Ball* pBall, f32 fAim, f32* pNormal) {
 //   and turns pA into the spin axis;
 // - a sidehill lie (fn_80051124, +-45 degrees) turns that axis by 0.2 of the slope - not for
 //   slot 4 or a perfect shot;
-// - the lie (rough 6/7/8, sand 3/4) or the surface sets how much of the speed survives and
+// - the lie (sand 6/7/8, rough 3/4) or the surface sets how much of the speed survives and
 //   how much spin; the club step adds 1.25% of the loss back per step; a chip from lie 3..5
 //   loses another 0.1;
 // - spin = cross(the part of the direction off the axis, the axis turned by 0.9 of the side
@@ -523,23 +523,23 @@ u8 Physics_GetShotData(Ball* pBall, int nClub, int nKind, f32 fPower, f32 fAim, 
     fn_8001EF34(vOff, 0.10000002f, vOffPart);
     nLie = pBall->nLie;
     switch (nLie) {
-    case 6:
+    case LIE_SAND_HIGH_e:
         fKeep = 0.8f;
         fSpin = 0.9f;
         break;
-    case 7:
+    case LIE_SAND_MEDIUM_e:
         fKeep = 0.7f;
         fSpin = 0.8f;
         break;
-    case 8:
+    case LIE_SAND_DEEP_e:
         fKeep = 0.6f;
         fSpin = 0.7f;
         break;
-    case 3:
+    case LIE_ROUGH_HIGH_e:
         fKeep = 0.9f;
         fSpin = 0.7f;
         break;
-    case 4:
+    case LIE_ROUGH_e:
         fKeep = 0.8f;
         fSpin = 0.7f;
         break;
@@ -1177,18 +1177,18 @@ void Ball_SetLie(Ball* pBall, SurfaceType* pSurface) {
     switch (pSurface->nClass) {
     case 1:
     case 2:
-        pBall->nLie = 1;
+        pBall->nLie = LIE_FAIRWAY_e;
         break;
     case 3:
     case 18:
-        pBall->nLie = 9;
+        pBall->nLie = LIE_GREEN_e;
         break;
     case 4:
-        pBall->nLie = 10;
+        pBall->nLie = LIE_FRINGE_e;
         break;
     case 5:
         if (pBall->nSurface == 145) {
-            pBall->nLie = 4;
+            pBall->nLie = LIE_ROUGH_e;
             break;
         }
         if (gSimulating || lbl_80281DD2) {
@@ -1201,10 +1201,10 @@ void Ball_SetLie(Ball* pBall, SurfaceType* pSurface) {
             r = 0;
         }
         if (!(r & 1) && gpGame != NULL && Game_GetCourse() != 6) {
-            pBall->nLie     = 3;
+            pBall->nLie     = LIE_ROUGH_HIGH_e;
             pBall->nSurface = 27;
         } else {
-            pBall->nLie     = 4;
+            pBall->nLie     = LIE_ROUGH_e;
             pBall->nSurface = 28;
         }
         break;
@@ -1218,7 +1218,7 @@ void Ball_SetLie(Ball* pBall, SurfaceType* pSurface) {
             r >>= 8;
             goto rough;  // fake match: shared lie code, as in the original (see Ball_SetLie)
         }
-        pBall->nLie     = 5;
+        pBall->nLie     = LIE_THICK_ROUGH_e;
         pBall->nSurface = 26;
         break;
     case 6:
@@ -1238,7 +1238,7 @@ void Ball_SetLie(Ball* pBall, SurfaceType* pSurface) {
                 goto sandC;  // fake match: shared lie code, as in the original (see Ball_SetLie)
             }
         sandClean:
-            pBall->nLie     = 6;
+            pBall->nLie     = LIE_SAND_HIGH_e;
             pBall->nSurface = 35;
             goto sandEnd;  // fake match: shared lie code, as in the original (see Ball_SetLie)
         }
@@ -1249,7 +1249,7 @@ void Ball_SetLie(Ball* pBall, SurfaceType* pSurface) {
         if ((r & 127) < uLuck / 4) {
             goto sandClean;  // fake match: shared lie code, as in the original (see Ball_SetLie)
         }
-        pBall->nLie     = 7;
+        pBall->nLie     = LIE_SAND_MEDIUM_e;
         pBall->nSurface = 36;
         goto sandEnd;  // fake match: shared lie code, as in the original (see Ball_SetLie)
     sandC:
@@ -1257,7 +1257,7 @@ void Ball_SetLie(Ball* pBall, SurfaceType* pSurface) {
             r >>= 8;
             goto sandB;  // fake match: shared lie code, as in the original (see Ball_SetLie)
         }
-        pBall->nLie     = 8;
+        pBall->nLie     = LIE_SAND_DEEP_e;
         pBall->nSurface = 34;
     sandEnd:
         if (pSurface->nClass == 20) {
@@ -1266,22 +1266,22 @@ void Ball_SetLie(Ball* pBall, SurfaceType* pSurface) {
         break;
     case 7:
     case 16:
-        pBall->nLie = 13;
+        pBall->nLie = LIE_WATER_e;
         break;
     case 8:
-        pBall->nLie = 11;
+        pBall->nLie = LIE_CARTPATH_e;
         break;
     case 12:
         pBall->bHoled = 1;
         if (pBall->nLie != LIE_INCUP_e) {
-            pBall->nLie = 12;
+            pBall->nLie = LIE_INCUP_e;
             if (pBall->nPlayer >= 0) {
                 EVENT_Trigger(pBall->nPlayer, 0x21, pBall, !gSimulating);
             }
         }
         break;
     default:
-        pBall->nLie = 17;
+        pBall->nLie = LIE_MISC_e;
         break;
     }
     pBall->n6C = 0;
@@ -1529,7 +1529,7 @@ void Ball_Stop(Ball* pBall) {
     SurfaceType* pSurface;
     if (pBall->bHoled) {
         pBall->nState = 1;
-        pBall->nLie   = 12;
+        pBall->nLie   = LIE_INCUP_e;
         pBall->n6C    = 0;
         if (pBall->nPlayer >= 0) {
             EVENT_Trigger(pBall->nPlayer, 0x21, pBall, !gSimulating);
@@ -2064,7 +2064,7 @@ u8 fn_80055AA8(Ball* pBall, f32* pPos, int nPlayer) {
     f32 fGround;
     Vec_Copy(pPos, pBall->vPos);
     pBall->nState        = 0;
-    pBall->nLie          = 0;
+    pBall->nLie          = LIE_TEE_e;
     pBall->n6C           = 0;
     pBall->fHeight       = 0.0f;
     pBall->f70           = 0.0f;
