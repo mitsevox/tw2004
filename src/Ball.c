@@ -81,8 +81,6 @@ f32    Ball_DistanceToPin(f32* pPos);
 void   Ball_Holed(Ball* pBall);
 void   Ball_SimSeconds(Ball* pBall, f32 fSeconds, f32 fTick);
 
-void   Ter_GetEnclosingGroundData(CourseInfo* pCourse, Ball* pBall, f32* pHeight, SurfaceType** ppSurface, f32* pNormal,
-                   f32* pHeight2, SurfaceType** ppSurface2, f32* pNormal2);
 int    fn_80050BEC(SurfaceType* pSurface);       // a surface's index
 u8     fn_800B1B18(int nPlayer, f32* pTo, f32* pFrom, f32* pHit, f32* pNormal, s32* pWhat);
 u8     fn_80053E98(Ball* pBall, void* pObj, f32* pHit, f32* pNormal);
@@ -724,7 +722,7 @@ u8 Physics_GetSurfaceInfo(Ball* pBall, SurfaceType** ppSurface, f32* pNormal) {
     f32          vNormal2[4];
     f32          fDrop;
     int          nPlayer;
-    Ter_GetEnclosingGroundData(pBall->pCourse, pBall, &lbl_80281DE0, &pSurface, vNormal, &lbl_80281DDC, &pSurface2, vNormal2);
+    Ter_GetEnclosingGroundData(pBall->pCourse, pBall->vPos, &lbl_80281DE0, &pSurface, vNormal, &lbl_80281DDC, &pSurface2, vNormal2);
     lbl_80281DE4 = 1;
     if (lbl_80281DE0 < -60000.0f) {
         if (!Ball_NoGround(lbl_80281DDC)) {
@@ -1783,7 +1781,7 @@ f32 fn_80055324(Ball* pBall) {
     SurfaceType* pSurface;
     SurfaceType* pSurface2;
     if (pBall->nState != 2) return 0.0f;
-    Ter_GetEnclosingGroundData(pBall->pCourse, pBall, &fHeight, &pSurface, vNormal, &fHeight2, &pSurface2, vNormal2);
+    Ter_GetEnclosingGroundData(pBall->pCourse, pBall->vPos, &fHeight, &pSurface, vNormal, &fHeight2, &pSurface2, vNormal2);
     if (fHeight < -60000.0f) {
         Vec_Copy(PIN(pBall), vPin);
         vPin[1] += BALL_RADIUS;
