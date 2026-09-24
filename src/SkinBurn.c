@@ -27,7 +27,7 @@ void fn_801270F0(void) {
     fn_8000633C(hFile);
 }
 
-// Renumbers the model's p44 entries with pBurn's table and packs the kept ones to the front,
+// Renumbers the model's p44 entries with pBurn->a30 and packs the kept ones to the front,
 // dropping those whose new number is -1.
 void fn_80127140(Skin* pSkin, HwsBurn* pBurn) {
     SkinModel44* pEntries;
@@ -45,7 +45,7 @@ void fn_80127140(Skin* pSkin, HwsBurn* pBurn) {
     pSrc = pEntries;
     pDst = pEntries;
     for (; i < nCount; i++) {
-        nNew = pBurn->p30[pSrc->n0];
+        nNew = pBurn->a30[pSrc->n0];
         if (nNew != -1) {
             if (pSrc != pDst) {
                 memcpy(pDst, pSrc, sizeof(SkinModel44));

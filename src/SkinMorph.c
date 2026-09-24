@@ -27,7 +27,6 @@ void fn_8011C068(SkinMorphWork* pWork, s16* pPos, s8* pNrm, u32 nVerts) {
     }
 }
 
-SkinIter* fn_80113910(u8* pBuf, SkinIterArgs* pArgs);     // hwsRender_Gc.c: another mesh iterator
 s32  fn_8011CDE8(Skin* pSkin);
 
 // Packs the work area's nVerts vertices back: positions as four s16 each, normals as four s8.

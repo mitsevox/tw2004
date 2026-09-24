@@ -142,7 +142,8 @@ typedef struct SavedRound {
 typedef struct TourWin {
     Award award;                // 0x0  won, and the day (fn_800D7770)
     u16  nScore;                // 0x4  the player's score (fn_801191D0, as SeasonEvent.nUserScore)
-    s16  n6;                    // 0x6  the tournament's aPrize[bracket][1]
+    u16  n6;                    // 0x6  the tournament's aPrize[bracket][1] (thousands of dollars:
+                                //      fn_8010F440 reads it unsigned)
 } TourWin;
 
 // One entry of SaveProfile.a1054C: a switch and a value (our name). lbl_80281DF0 is one more,
