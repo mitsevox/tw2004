@@ -3,9 +3,11 @@
 // running (start-up, the menus or a round), and formats numbers for it.
 
 #include "golfer.h"
+#include "game.h"
 #include "game/frontend.h"
 
 u8 lbl_80281F19;
+u8 lbl_80281F1A;                // set: fn_8008FD60 passes events to the UI
 u8 lbl_80281F1B;
 
 void fn_800B1D3C(s32 nCmd, s32 a, s32 b);
@@ -16,6 +18,10 @@ s32 fn_800BA038();
 s32 fn_80090400();
 void fn_80090664(void);
 void fn_8008FE88(FrontEnd* pFE);
+void fn_8008F820(void);
+// UIStudio.c, with the front end's view of the handler (uistudio.h cannot be included with
+// game/frontend.h; it takes a UIStudio*).
+void fn_80168B80(void* pHandler, u32 uEvent);
 
 u8 fn_8008F39C(void) {
     return lbl_80281F1B;
@@ -80,6 +86,35 @@ void fn_8008F80C(s32 p0, s32 p1) {
 }
 
 // ---- end of sweep code ----
+
+// Passes an event to the UI (while lbl_80281F1A is set). With lbl_80281F19 set it then shuts the UI
+// down (fn_80090400) and sets lbl_80281F1B; otherwise fn_8008F820 runs.
+void fn_8008FD60(u32 uEvent) {
+    if (lbl_80281F1A) {
+        if (lbl_80281F1C != NULL) {
+            fn_80168B80(lbl_80281F1C->pHandler, uEvent);
+        }
+        if (lbl_80281F19) {
+            fn_80090400(lbl_80281F1C);
+            lbl_80281F19 = 0;
+            lbl_80281F1A = 0;
+            lbl_80281F1B = 1;
+        } else if (lbl_80281F1C != NULL) {
+            fn_8008F820();
+        }
+    }
+}
+
+// A UI name starting "tu": 1 in a lesson, -1 otherwise; 0 for any other name, and
+// always 0 when the game type is 1.
+int fn_8008FFF0(const char* szName) {
+    if (gSession.nGameType == 1) return 0;
+    if (szName[0] == 't' && szName[1] == 'u') {
+        if (fn_80100294()) return 1;
+        return -1;
+    }
+    return 0;
+}
 
 void fn_80090664(void) {
     if (lbl_80281F1C != NULL) {
