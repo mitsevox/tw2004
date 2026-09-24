@@ -62,34 +62,35 @@ s16 lbl_80192F2C[12 * 16] = {
     60, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 };
 
-extern s32 lbl_802816D8;                    // the options' nC, saved while the mode runs
-extern u8  lbl_802823E0;
-extern u8  lbl_802823E1;
-extern u8  lbl_802823E2;
-extern u8  lbl_802823E3;
-extern u8  lbl_802823E4;
-extern u8  lbl_802823E5;
-extern u32 lbl_802823E8;                    // picks which message of a list is shown
-extern s32 lbl_802823EC;                    // the wind option, saved while the mode runs
-extern u8  lbl_802823F0;
-extern u8  lbl_802823F1;                    // the player's try has set up its hints
-extern u8  lbl_802823F2;                    // which of the two alternating hints is showing
-extern s32 lbl_802823F4;
-extern u8  lbl_802823F8;
-extern f32 lbl_80282400;                    // lessons 8 and 9 test its sign
-extern s32 lbl_80282404;                    // player 0's controller, kept while the CPU demonstrates
-extern u8  lbl_80282408;                    // the spin option, saved
-extern u8  lbl_80282409;                    // the boost option, saved
-extern u8  lbl_8028240A;                    // options unk84, saved
-extern u8  lbl_8028240B;                    // options unk0[4], saved
-extern s32 lbl_8028240C;                    // the highlighted one of four hints (4 = none yet)
-extern s32 lbl_80282410;                    // frames until the next highlight
-extern s32 lbl_80282414;                    // frames until the two alternating hints swap
-extern s32 lbl_80282418;
-extern s32 lbl_8028241C;
-extern s32 lbl_80282420;                    // the lesson's row in lbl_80192F2C
-extern s32 lbl_80282424;
-extern s32 lbl_80282428;                    // the lesson's step
+s32 lbl_802816D8 = 4;                    // the options' nC, saved while the mode runs
+s32 lbl_80282428;                    // the lesson's step
+s32 lbl_80282424;
+s32 lbl_80282420;                    // the lesson's row in lbl_80192F2C
+s32 lbl_8028241C;
+s32 lbl_80282418;
+s32 lbl_80282414;                    // frames until the two alternating hints swap
+s32 lbl_80282410;                    // frames until the next highlight
+s32 lbl_8028240C;                    // the highlighted one of four hints (4 = none yet)
+u8  lbl_8028240B;                    // options unk0[4], saved
+u8  lbl_8028240A;                    // options unk84, saved
+u8  lbl_80282409;                    // the boost option, saved
+u8  lbl_80282408;                    // the spin option, saved
+s32 lbl_80282404;                    // player 0's controller, kept while the CPU demonstrates
+f32 lbl_80282400;                    // lessons 8 and 9 test its sign
+s32 lbl_802823FC;
+u8  lbl_802823F8;
+s32 lbl_802823F4;
+u8  lbl_802823F2;                    // which of the two alternating hints is showing
+u8  lbl_802823F1;                    // the player's try has set up its hints
+u8  lbl_802823F0;
+s32 lbl_802823EC;                    // the wind option, saved while the mode runs
+u32 lbl_802823E8;                    // picks which message of a list is shown
+u8  lbl_802823E5;
+u8  lbl_802823E4;
+u8  lbl_802823E3;
+u8  lbl_802823E2;
+u8  lbl_802823E1;
+u8  lbl_802823E0;
 
 void  fn_800A6EC8(void);
 void  fn_800E5200(int a);

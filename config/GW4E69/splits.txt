@@ -767,7 +767,10 @@ GameModeAlternateShot.c:
 
 GameModeBattle.c:
 	.text       start:0x800E7980 end:0x800E81C4
+	.data       start:0x801925B8 end:0x801925D0
 	.bss        start:0x80203148 end:0x80203170
+	.sdata      start:0x80281650 end:0x80281658
+	.sbss       start:0x802822E8 end:0x802822F0
 
 GameModeBestBall.c:
 	.text       start:0x800E81C4 end:0x800E8D58
@@ -826,6 +829,8 @@ GameMode14.c:
 
 GameMode15.c:
 	.text       start:0x800F39F4 end:0x800F4B40
+	.sdata      start:0x80281690 end:0x80281698
+	.sbss       start:0x80282378 end:0x80282390
 	.sdata2     start:0x802846C0 end:0x802846D0
 
 GameMode16.c:
@@ -878,6 +883,8 @@ GameMode11.c:
 	.text       start:0x800FFF34 end:0x80101FEC
 	.rodata     start:0x80184E00 end:0x80184E10
 	.data       start:0x80192D20 end:0x80193130
+	.sdata      start:0x802816D8 end:0x802816E0
+	.sbss       start:0x802823E0 end:0x80282430
 	.sdata2     start:0x802847E8 end:0x80284808
 
 GameMode4.c:

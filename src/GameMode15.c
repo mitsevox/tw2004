@@ -10,14 +10,14 @@
 
 // fake match: the (s8) on GOLFERSTATE_GetCurrentState (see game.h).
 
-extern s32 lbl_80281690;                    // the options saved while the game runs
-extern s32 lbl_80282378;
-extern u8  lbl_8028237C;                    // a closer shot just took the lead (not set for the first leader)
-extern u8  lbl_8028237D;                    // set by fn_800F48C4: the shot then scores nothing
-extern s32 lbl_80282380;                    // the points of the last shot
-extern s8  lbl_80282384;                    // the leader's target
-extern s32 lbl_80282388;                    // the leader's rank (0 best .. 4)
-extern s32 lbl_8028238C;                    // the leader (5 = none)
+s32 lbl_80281690 = 4;                    // the options saved while the game runs
+s32 lbl_8028238C;                    // the leader (5 = none)
+s32 lbl_80282388;                    // the leader's rank (0 best .. 4)
+s8  lbl_80282384;                    // the leader's target
+s32 lbl_80282380;                    // the points of the last shot
+u8  lbl_8028237D;                    // set by fn_800F48C4: the shot then scores nothing
+u8  lbl_8028237C;                    // a closer shot just took the lead (not set for the first leader)
+s32 lbl_80282378;
 
 void  fn_800A6394(void);
 void  fn_800A640C(void);
