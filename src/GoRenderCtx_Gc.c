@@ -12,6 +12,7 @@ void fn_80013E30(Camera* pCamera, GoFrameBuf* pBuf);
 void fn_80013E38(Camera* pCamera, CamLens* pLens);
 void fn_80013E48(Camera* pCamera);
 void fn_80013EA0(Camera* pCamera);
+void fn_800140E8(int a, int nWidth, int nHeight, int nField, int b, int c);
 
 // Makes a render camera from a lens, a frame buffer and a screen rectangle.
 void* fn_8001371C(CamLens* pLens, GoFrameBuf* pBuf, f32* pRect) {
@@ -57,6 +58,36 @@ void fn_800137D0(Camera* pCamera) {
     fn_80013EEC(pCamera);
     fn_80012EF8();
     fn_80013EA0(pCamera);
+}
+
+// Covers the screen with one colour (pColour: r, g, b; NULL: the default grey). uFlags bit 0: keep
+// fn_80012F34's setting; bit 1: pass 1 instead of 2 to the first fn_800140E8.
+void fn_80013808(f32* pColour, u32 uFlags) {
+    f32 aXY[8];
+
+    fn_8001425C(0);
+    fn_80014118(0);
+    if (!(uFlags & 1)) {
+        fn_80012F34(0);
+    }
+    if (!(uFlags & 2)) {
+        fn_800140E8(0, 512, 448, lbl_80281B88 & 1, 2, 1);
+    } else {
+        fn_800140E8(0, 512, 448, lbl_80281B88 & 1, 1, 1);
+    }
+    fn_80012F50(0, 6, 0x80);
+    fn_80012F18(7);
+    fn_80012EF8();
+    fn_800141F8(aXY, NULL, 0.0f, 0.0f, 1.0f, 1.0f);
+    aXY[2] = 0.0f;
+    aXY[6] = 0.0f;
+    fn_80014194(pColour);
+    fn_8001644C(0xA1, aXY, NULL, NULL, 2);
+    fn_80012F50(0, 6, 0x80);
+    fn_80012F18(3);
+    fn_80012F34(1);
+    fn_800140E8(0, 512, 448, lbl_80281B88 & 1, 8, 1);
+    fn_80012EF8();
 }
 
 void fn_80013CCC(void* pCamera) {
