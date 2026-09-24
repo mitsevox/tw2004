@@ -928,12 +928,11 @@ void fn_800B99BC(UStreamObject* pObject) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-s32 fn_80045D80(s32);
 void fn_800B9A50(void* arg0);
 
 void fn_800B99FC(UStreamObject* arg0) {
     if (fn_8000B508(arg0) == 0) {
-        (*(s32*)((u8*)(arg0) + 4)) = fn_80045D80((*(s32*)((u8*)(arg0) + 0)));
+        (*(UObjModel**)((u8*)(arg0) + 4)) = fn_80045D80(arg0->pData);
         (*(void (**)(void*))((u8*)(arg0) + 8)) = fn_800B9A50;
         fn_8000B4B8(arg0);
     }

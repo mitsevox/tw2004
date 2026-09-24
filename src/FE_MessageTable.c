@@ -50,7 +50,6 @@ void fn_801260C0(void);                 // GameMode22.c
 s32  fn_80124094(void);                 // gbacable.c
 void fn_8012409C(void);                 // gbacable.c
 void fn_801240A8(void);                 // gbacable.c
-void fn_800582C4(SaveProfile* pProfile, int nBit, u8 bSet);    // set or clear bit nBit of a10548
 s32  fn_801255C4(s32* pPos);            // EASportsBio.c
 u8   PasswordManager_TestPassword(char* szCode);  // PasswordManager.c
 void fn_80126F84(s32 n);                // GameMode22.c: sets lbl_80195498.n4
@@ -3168,9 +3167,9 @@ void fn_8007FA60(MsgArg* pArgs, MsgArg* pResult) {
     char szOld[0x20];           // the size is unknown (0x20 gives the original's frame)
     int  nSlot;
     int  nMoney;
-    int  i;
-    int  j;
     int  k;
+    int  j;
+    int  i;
 
     nMoney = 0;
     nSlot = pArgs[0].i;

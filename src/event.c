@@ -152,6 +152,7 @@ void fn_80065E98(int nPlayer, int nEvent, void* pData, int nArg) {
 void fn_80065E9C(int nPlayer, int nEvent, void* pData, int nArg) {
     int nOldClub;
     int nTries;
+    u8 bOk;
 
     if (fn_80101AA8(nPlayer, 13) || Game_GetMode() == 22 || Game_GetMode() == 26) return;
     nOldClub = gPlayers[nPlayer].nClub;
@@ -163,9 +164,9 @@ void fn_80065E9C(int nPlayer, int nEvent, void* pData, int nArg) {
         } else {
             gPlayers[nPlayer].nClub = CLUB_PUTTER_e;
         }
+        bOk = Club_UsableForKind(nPlayer, gPlayers[nPlayer].nClub, gPlayers[nPlayer].nShotKind);
         nTries++;
-    } while (!Club_UsableForKind(nPlayer, gPlayers[nPlayer].nClub, gPlayers[nPlayer].nShotKind) &&
-             nTries < CLUB_MAX_e);
+    } while (!bOk && nTries < CLUB_MAX_e);
     if (nTries == CLUB_MAX_e) {
         gPlayers[nPlayer].nClub = CLUB_PUTTER_e;
     }
@@ -194,6 +195,7 @@ void fn_80065E9C(int nPlayer, int nEvent, void* pData, int nArg) {
 void fn_80066058(int nPlayer, int nEvent, void* pData, int nArg) {
     int nOldClub;
     int nTries;
+    u8 bOk;
 
     if (fn_80101AA8(nPlayer, 13) || Game_GetMode() == 22 || Game_GetMode() == 26) return;
     nOldClub = gPlayers[nPlayer].nClub;
@@ -205,9 +207,9 @@ void fn_80066058(int nPlayer, int nEvent, void* pData, int nArg) {
         } else {
             gPlayers[nPlayer].nClub = 0;
         }
+        bOk = Club_UsableForKind(nPlayer, gPlayers[nPlayer].nClub, gPlayers[nPlayer].nShotKind);
         nTries++;
-    } while (!Club_UsableForKind(nPlayer, gPlayers[nPlayer].nClub, gPlayers[nPlayer].nShotKind) &&
-             nTries < CLUB_MAX_e);
+    } while (!bOk && nTries < CLUB_MAX_e);
     if (nTries == CLUB_MAX_e) {
         gPlayers[nPlayer].nClub = CLUB_PUTTER_e;
     }

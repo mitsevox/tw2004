@@ -477,7 +477,7 @@ void fn_80038A90(f32* pColour, u8 bCopy, int nView, int nField, f32 fCX, f32 fCY
     aXY[0][2] = 1.0f;
     aXY[0][3] = 1.0f;
     aUV[0][0] = fCX;
-    aUV[0][1] = 224.0f * fCY * (1.0f / 128.0f);
+    aUV[0][1] = 224.0f * fCY / 128.0f;
     aUV[0][2] = 1.0f;
     aUV[0][3] = 1.0f;
     aColour[0][0] = pColour[0];
@@ -497,7 +497,7 @@ void fn_80038A90(f32* pColour, u8 bCopy, int nView, int nField, f32 fCX, f32 fCY
     aXY[17][2] = 1.0f;
     aXY[17][3] = 1.0f;
     aUV[17][0] = fX0;
-    aUV[17][1] = 224.0f * fY0 * (1.0f / 128.0f);
+    aUV[17][1] = 224.0f * fY0 / 128.0f;
     aUV[17][2] = 1.0f;
     aUV[17][3] = 1.0f;
     fAlpha = pColour[3] * ((f32)fn_80009680(fDXSq + fDYSq) / fMaxDist);
@@ -538,7 +538,7 @@ void fn_80038E7C(f32* pXY, f32* pColour, f32* pUV, int n, f32* pSrc, f32 fCX, f3
         pXY[3] = 1.0f;
         pXY += 4;
         pUV[0] = fX;
-        pUV[1] = 224.0f * fY * (1.0f / 128.0f);
+        pUV[1] = 224.0f * fY / 128.0f;
         pUV[2] = 1.0f;
         pUV[3] = 1.0f;
         pUV += 4;
@@ -605,10 +605,11 @@ void fn_80039344(int nView, f32 f) {
 // Covers the screen in black at view nView's share (lbl_801D5010) of CamTuning.f208's alpha.
 void fn_80039358(int nView) {
     f32 aColour[4];
-    f32 aXY[8];
-    f32 f = lbl_801D5010[nView];
+    f32 aXY[16];    // only 8 are filled; the frame has room for 16
+    f32 f;
 
-    if (f != 0.0f) {
+    f = lbl_801D5010[nView];
+    if (f) {
         aColour[0] = 0.0f;
         aColour[1] = 0.0f;
         aColour[2] = 0.0f;

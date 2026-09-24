@@ -312,8 +312,8 @@ void fn_800C7E50(f32* pA, f32* pB, f32* pC, int nDir, f32* pOut, f32 fT) {
     }
     fDistFrom = fn_80009680(fn_80009744(&vFrom.x));
     fDistTo = fn_80009680(fn_80009744(&vTo.x));
-    fAngle = fT * (fAngleTo - fAngleFrom) + fAngleFrom;
     fDist = fT * (fDistTo - fDistFrom) + fDistFrom;
+    fAngle = fT * (fAngleTo - fAngleFrom) + fAngleFrom;
     pOut[0] = fDist * fn_80009638(fAngle) + pC[0];
     pOut[1] = fT * (pB[1] - pA[1]) + pA[1];
     pOut[2] = fDist * fn_800095F0(fAngle) + pC[2];

@@ -41,13 +41,12 @@ int  fn_8001005C(TexBank* pBank, u64 uHash);       // LLTex.c: the texture's ind
 
 // ---- sweep code (not yet cleaned up) ----
 
-s32 fn_80045D80(s32);
 void fn_800460F8(UStreamObject* arg0);
 void fn_80045F74(UStreamObject* arg0);
 
 void fn_80045F74(UStreamObject* arg0) {
     if (fn_8000B508(arg0) == 0) {
-        (*(s32*)((u8*)(arg0) + 4)) = fn_80045D80((*(s32*)((u8*)(arg0) + 0)));
+        (*(UObjModel**)((u8*)(arg0) + 4)) = fn_80045D80(arg0->pData);
         (*(void (**)(UStreamObject*))((u8*)(arg0) + 8)) = fn_800460F8;
         fn_8000B4B8(arg0);
     }

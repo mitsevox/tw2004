@@ -126,7 +126,7 @@ void ActAnimal_SetWorldMatrix(DynObjAnimal* pAnimal, f32 fDt) {
         pAnimal->f1A0 = pAnimal->f19C * fDt + pAnimal->f1A0;
         if (pAnimal->f19C < 0.0f) {
             if (pAnimal->f1A0 < 0.0f) {
-                pAnimal->f1A0 = pAnimal->f1A0 + 6.2831855f;
+                pAnimal->f1A0 += 6.2831855f;
             }
             pAnimal->f19C = 6.2831855f * fDt + pAnimal->f19C;
             if (pAnimal->f19C > -72.0f / 180.0f * PI) {
