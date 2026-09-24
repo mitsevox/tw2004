@@ -2641,8 +2641,8 @@ void Wind_Set(int nDir, f32 fSpeed) {
 // rolled from the wind setting (courses 6 and 15 at least 2, except in mode 4 without a
 // challenge): speed 0..6, 2..12, 5..20 or 12..31, direction one of eight.
 void Wind_Generate(void) {
-    int n      = Hole_WindDir();
-    f32 fSpeed = Hole_WindSpeed();
+    int n      = fn_800D2CB0_HoleWindDir();
+    f32 fSpeed = fn_800D2CF8_HoleWindSpeed();
     if (gpGame->bNoWind) {
         fSpeed = 0.0f;
         n      = 0;

@@ -1,6 +1,6 @@
 // fe_craputils.c (TW06's golf/ui core/frontend/fe_craputils.c): the Create-A-Player (CrAP) data in
 // a save profile. FE_CrAP_InitCrAPInfo resets it; the rest unlock golfers, courses and rewards,
-// rate the profile, and keep the created golfer's name lists.
+// count the ladder events won, and keep the created golfer's name lists.
 
 #include "golfer.h"
 #include "engine.h"

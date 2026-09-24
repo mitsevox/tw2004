@@ -1,5 +1,4 @@
-// SkinMorph.c (EA's name, from its asserts): not yet decompiled; the sweep code below is the
-// matched small functions.
+// SkinMorph.c (EA's name, from its asserts).
 
 #include "game_types.h"
 #include "platform.h"

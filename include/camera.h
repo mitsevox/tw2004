@@ -622,8 +622,8 @@ int    fn_8001707C(int nView);          // the player the view follows (as set a
 u8     fn_800170A0(int nView);          // the view is in use
 void   fn_800170C4(int nView, u8 b);    // sets ViewController.b274
 f32*   fn_8001731C(View* pView);        // the camera's position (v0)
-f32*   fn_80017314(View* pView);        // where it looks (v10)
-u8     fn_800172C4(View* pView);        // the camera move has finished
+f32*   fn_80017314(View* pView);        // where it looks (v10), or a script shot's angles
+u8     fn_800172C4(View* pView);        // 0: the script's shot aims by angles (fn_80016E90)
 f32*   fn_80012EF0(void* pCamera);      // a render camera's screen rectangle
 f32    fn_80012ED0(f32* pRect);         // the rectangle's [3]: its height
 f32    fn_80012ED8(f32* pRect);         // [2]: its width
@@ -636,7 +636,7 @@ void   fn_80016B9C(void);
 int    fn_80016D10(void);
 void   fn_800171D8(f32* pRect, f32 x, f32 y, f32 w, f32 h);   // set a screen rectangle (fractions)
 // A world position on screen (0..1 across and down; pZ, if not NULL, gets a third value). Returns
-// 1, or 0 when one of its tests fails (not decompiled yet).
+// 1 when the point is in front of the camera (clip w below 0), else 0.
 u8     fn_8006434C(void* pCamera, f32* pPos, f32* pX, f32* pY, f32* pZ);
 void   fn_8006A8D4(void* pCamera, f32* pX, f32* pY);
 
@@ -790,10 +790,10 @@ void   fn_80063B98(View* pView, f32 f, f32* pVec);
 void   fn_80063BF4(View* pView, f32 f, f32* pVec);
 u8     fn_80063C50(View* pView);
 u8     fn_80063C7C(View* pView);
-u8     fn_80063C90(View* pView);        // the camera is still moving
+u8     fn_80063C90(View* pView);        // script.nCamera 1, 2 or 4: a colour fade running or held
 void   fn_80063CBC(View* pView, f32* pVec);   // script.nCamera 3, the vector into script.v40
 void   fn_80063CF0(View* pView, int nCamera, int nPlayer);
-void   CameraController_ResetAimMarkerInSwingCamera_800642D0(View* pView, int nPlayer);
+void   fn_800642D0_ReapplyCurrentShot(View* pView, int nPlayer);
 u8     fn_800642B0(void);               // fn_800C6CB0's answer (gomainloop tests it)
 void   fn_80063F08(f32* pA, f32* pB, f32* pOut);   // the green zoom-to-aim camera: View.v20 as pA and pOut
 

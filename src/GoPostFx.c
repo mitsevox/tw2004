@@ -1,6 +1,6 @@
 // GoPostFx.c (EA's name, from its asserts; TW06): the screen effects drawn over each view: a
 // colour (lbl_801D50C0), and two effects made from a copy of the screen (lbl_801D5090,
-// lbl_801D5020). Not decompiled yet beyond the functions below.
+// lbl_801D5020).
 
 #include "game_types.h"
 #include "engine.h"
@@ -25,8 +25,9 @@ void fn_800140E8(int a, int nWidth, int nHeight, int nField, int b, int c);
 void fn_80016B54(int nWidth, int nHeight, f32 fX, f32 fY);
 void fn_80035F40(void* pCamera);            // Skin.c
 
-// Makes the screen copy (game types 4..8 only) and clears every effect.
-void PostFx_CopyScreenToBuffer(void) {
+// Allocates the screen-copy buffer lbl_80281D80 (game types 4..8 only; fn_800392D0 fills it) and
+// clears every effect.
+void fn_80037DD8(void) {
     lbl_80281D80 = NULL;
     if (gSession.nGameType >= 4 && gSession.nGameType <= 8) {
         lbl_80281D80 = fn_80009B34(GXGetTexBufferSize(256, 224, 6, 0, 0), 2, 0x20, "GoPostFx.c", 119);
@@ -391,7 +392,7 @@ void fn_800389C0(void) {
     }
 }
 
-// Turns fn_8002A024 on for the camera's screen rectangle (nField unused).
+// Clears the screen's alpha inside the camera's rectangle (fn_8002A024 with bOn 1; nField unused).
 void fn_80038A2C(int nField, RenderCamera* pCamera) {
     fn_8002A024(1, pCamera->pRect[0], pCamera->pRect[1], pCamera->pRect[0] + pCamera->pRect[2],
                 pCamera->pRect[1] + pCamera->pRect[3]);

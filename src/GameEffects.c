@@ -1,6 +1,6 @@
-// GameEffects.c (TW06's name, GameEffects_*): slow motion, the "GameBreaker" (letterbox and
-// slow-down while a shot may drop), the heartbeat rumble, the time rate. TW06's copy of the file
-// keeps the same function order, which gives the names.
+// GameEffects.c (TW06's name, GameEffects_*): slow motion, the "GameBreaker" (a letterbox, a
+// wider view and a slow-down during a shot), the heartbeat rumble, the time rate. TW06's copy of
+// the file keeps the same function order, which gives the names.
 
 #include "golfer.h"
 #include "game.h"
@@ -85,7 +85,8 @@ GameEffects* fn_800DAF74(void) {
 }
 
 // TW06: GameEffects_AdjustTimeRate (by position). The game's time step for a frame that took
-// fFrameTime: rounded to whole 60 Hz ticks, then scaled by the effects.
+// fFrameTime: rounded to whole 60 Hz ticks (at most 3; a longer frame counts as 1), then scaled
+// by the effects.
 f32 fn_800DAF98(f32 fFrameTime) {
     f32 fTicks = 1.0f;
     f32 fBest = 10000.0f;
@@ -141,8 +142,8 @@ f32 fn_800DAF98(f32 fFrameTime) {
 }
 
 // How many physics steps the ball takes this frame: one per FRAME_TIME of frame time (rounded;
-// twice that in mode 26), none while paused (no frame time), one outside the ball's flight.
-// With the slow-down on, it moves only on every n2C-th frame.
+// twice that in mode 26), none when the frame time is 0, one outside the ball's flight. With the
+// slow-down on and a frame shorter than FRAME_TIME, it moves only on every n2C-th frame.
 int GameEffects_BallUpdatesThisFrame(int nPlayer) {
     if (gSession.nGameType == 3 || fn_800C714C()) {
         return 1;
@@ -168,15 +169,17 @@ int GameEffects_BallUpdatesThisFrame(int nPlayer) {
     return 0.5f + gSession.fFrameTime / FRAME_TIME;
 }
 
-// The player's current target (an inline in EA's source; calling fn_800F1D34 directly does not match).
+// The target nearest the player's aim point (an inline in EA's source; calling fn_800F1D34
+// directly does not match).
 static inline int GE_CurrentTarget(int nPlayer) {
     return fn_800F1D34(nPlayer);
 }
 
 // TW06: GameEffects_ScriptedGameBreakerTrigger (by position; the same player and reason arguments).
-// A scripted GameBreaker for a record chance: reason 12 while the round can still beat the course
-// record, reason 15 when the drive beats the longest-drive record (the record is in feet). Only for
-// a human, one view, not in a replay, and only with the game's GameBreaker option on.
+// A scripted GameBreaker for reason nReason: reason 12 only while the round can still beat the
+// course record, reason 15 only when three times fA64 (the ball's distance from the pin, in feet)
+// beats record kind 2 (the longest putt), any other reason always. Only for a human, one view, not
+// in a replay, and only when gpGame->b285 is set.
 void fn_800DB30C(int nPlayer, int nReason) {
     if (((gSession.uFlags & 0x4000) && (gSession.uFlags & 0x8000)) || gSession.bReplay ||
         gSession.nSplitScreen || gSession.a8[0] || !gpGame->b285) {
@@ -195,8 +198,9 @@ void fn_800DB30C(int nPlayer, int nReason) {
     }
 }
 
-// The same for the challenge modes on course 7: mode 14 (reason 17), mode 15 when every other
-// player is out (22), modes 16 and 17 on the last target (23).
+// Scripted GameBreakers for the target games on course 7, for any player (not in a replay or split
+// screen): mode 14 when fn_800F354C gives 4 (reason 17), mode 15 when every other player is out
+// (22), mode 17 with 39 targets hit and mode 16 with 39 hit and the aimed-at target not yet (23).
 void fn_800DB4E8(int nPlayer) {
     u8 bStart = 0;
     int nReason;
@@ -269,9 +273,10 @@ void fn_800DB714(int nPlayer) {
 }
 
 // No TW06 name settled (by position it falls among ScriptedGameBreakerBallHitTrigger and
-// IsScriptedGameBreaker). Whether this lie is worth a GameBreaker: on the green putting for two
-// under par or better, or one of the other big-putt checks, or a birdie or eagle putt (by the score
-// after a tap-in).
+// IsScriptedGameBreaker). Whether the putt about to be played is a big one: on the green, and
+// putting for two under par or better, or its length makes record kind 2's list, or the mode's
+// pfn1F8 or fn_800BCD24 says so, or a birdie putt when fn_800D0620 gives 11, or an eagle putt when
+// fn_800D089C gives 1 (by the score after a tap-in).
 int fn_800DB86C(int nPlayer) {
     int bPossible = 0;
     int nPar;
@@ -312,10 +317,9 @@ int fn_800DB86C(int nPlayer) {
     return bPossible;
 }
 
-// TW06: GameEffects_InFlightGameBreakerTrigger (by position). The look-ahead ball says the shot
-// drops: a predicted GameBreaker starts, for a human's shot that went far enough (1 with the
-// putter, 10 for a chip, 5 otherwise), with its own camera; a golfer mid-swing may get a reaction
-// animation.
+// TW06: GameEffects_InFlightGameBreakerTrigger (by position). A predicted GameBreaker starts, for
+// a human's ball still at least 1 (the putter), 10 (a drive) or 5 (otherwise) from the look-ahead
+// ball, with its own camera; a golfer who is not putting may get animation 14.
 void fn_800DBA50(int nPlayer) {
     int nClass;
     int nLie;
@@ -393,7 +397,7 @@ void fn_800DBA50(int nPlayer) {
 }
 
 // TW06: GameEffects_EndGameBreaker (by position). The letterbox starts closing, with the end event;
-// the GameBreaker music stops, or (a scripted one that failed) the old music comes back.
+// music 3 plays (a predicted one, or a scripted one that did it), or the old music comes back.
 void fn_800DBDA8(int nPlayer) {
     if (lbl_80202898.bGameBreaker) {
         lbl_80202898.bClosing = 1;
@@ -444,9 +448,9 @@ void fn_800DBF34(void) {
     }
 }
 
-// TW06: GameEffects_RenderPredictedGB (by position). While the look-ahead ball says the shot
-// will drop: the letterbox, and the slow-down near the hole (within 2 of it for a putt, 4 otherwise)
-// for a human.
+// TW06: GameEffects_RenderPredictedGB (by position). Each frame of a predicted GameBreaker: the
+// letterbox, and for a human the slow-down while the ball is within 2 (a putt) or 4 of the
+// look-ahead ball and the letterbox is not closing.
 void fn_800DBFAC(void) {
     f32 fHeight;
     f32 fDist;
@@ -598,8 +602,8 @@ u8 fn_800DC514(int nPlayer) {
     return lbl_80202898.bSlowMo;
 }
 
-// Super slow motion on (with its rate) or off, with the sound events (0x35/0x37 on, 0x36/0x38 off,
-// by whether it slows down or speeds up).
+// Super slow motion on (with its rate) or off, with events 0x35/0x37 on and 0x36/0x38 off (by
+// whether it slows down or speeds up).
 void GameEffects_SetSuperSlowMo(u8 bOn, int nPlayer, f32 fRate) {
     if (bOn) {
         if (!lbl_80202898.bSlowMo) {
@@ -670,8 +674,9 @@ u8 fn_800DC784(void) {
 }
 
 // TW06: GameEffects_ScriptedGBDidIt (by position). Whether the shot earned its GameBreaker:
-// holed within the stroke limit, a special eagle on a par 5 (flag 0x4000; on the green in 1 or 2),
-// or one of two score checks.
+// holed within the stroke limit, on the green of a par 5 in two (with uFlags bit 0x4000), or one of
+// two record checks (fn_800D7660, fn_800D782C: a drive record; without bNext and with neither, a
+// big message waiting, fn_800E5344).
 u8 fn_800DC818(Ball* pBall, int nPlayer, u8 bNext) {
     u8  bEagle;
     int a;

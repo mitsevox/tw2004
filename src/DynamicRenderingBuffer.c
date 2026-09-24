@@ -1,7 +1,7 @@
 // DynamicRenderingBuffer.c (our name): the dynamic rendering buffer, vertices a shader object
 // rewrites every frame (engine.h's DynRenderBuffer). Its allocations name the header
 // "GoShaderObjectCommon_DynamicRenderingBuffer_Gc.h"; the .c file that holds this code is not known.
-// The file ends with three GX index writes the compiler did not inline (0x80070B50..0x80070B74).
+// Three GX index writes the compiler did not inline (0x80070B50..0x80070B74) follow its code.
 
 #include "game_types.h"
 #include "engine.h"

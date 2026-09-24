@@ -1,8 +1,8 @@
-// GameMode12.c (our name): game mode 12, stroke play with points. A shot that stops on a special
-// surface (a row of the prize table at lbl_80200538 + 0x710) scores points, times the shot's
-// multiplier; each hole's points (nD28) are then scaled by the score against par, and a human
-// player is paid the round's total. The honors, hole-finished and game-finished callbacks are
-// mode 0's.
+// GameMode12.c (our name): game mode 12, stroke play with points. Each time the ball lands on a
+// special surface (a row of the prize table at lbl_80200538 + 0x710) it scores points, times the
+// shot's multiplier; each hole's points (nD28) are then scaled by the score against par, and a
+// human player is paid the round's total. The honors, hole-finished and game-finished callbacks
+// are mode 0's.
 
 #include "golfer.h"
 #include "game.h"
@@ -10,7 +10,7 @@
 #include "game/save.h"
 #include "game/earnings.h"
 
-extern s32 lbl_802823DC;                    // the surface the ball stopped on (-1: none)
+extern s32 lbl_802823DC;                    // the surface the ball last landed on (-1: none)
 
 // The surfaces a player has scored on, for the HUD (fn_800FF634): lbl_802823D8 entries.
 extern s32 lbl_802823D8;
@@ -76,7 +76,7 @@ static inline u8 SurfaceUsedUp(s32* pPoints, s32 nHits) {
     return bUsed;
 }
 
-// The ball stopped on a surface that still scores: a higher multiplier is taken, the points are
+// The ball landed on a surface that still scores: a higher multiplier is taken, the points are
 // added (more for each earlier time on the same surface), the bonus meter fills; each shows a
 // message at the ball's place on screen.
 void fn_800FEC80(int nPlayer) {
@@ -156,7 +156,7 @@ s32 fn_800FEFF8(int nPlayer, s32 nSurface) {
     return n;
 }
 
-// Where the ball stopped (lbl_802823DC). A surface with points scores up to 5 times, one that costs
+// Where the ball landed (lbl_802823DC). A surface with points scores up to 5 times, one that costs
 // points once. Always returns 0.
 s32 fn_800FF038(int nPlayer) {
     SurfaceType* pSurface;
@@ -250,7 +250,7 @@ void fn_800FF3D4(void) {
     }
 }
 
-// Round setup: every player's surfaces scored, points and multiplier reset.
+// Next turn: every player's surfaces scored, shot points and multiplier reset.
 void fn_800FF3F8(void) {
     int i;
     int j;

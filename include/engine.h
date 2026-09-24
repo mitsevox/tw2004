@@ -929,7 +929,7 @@ s32  fn_8002F454(s32 nSurface);     // the surface's buffer size, 0 if the slot 
 void* fn_8002A624(void);            // the screen copy's pixels (lbl_80281100->pPixels)
 
 // The screen copy (our name; what lbl_80281100 points at): render surface 1, set up by gomainloop
-// fn_8006DCA8 for each game type and filled by PostFx_CopyScreenToBuffer.
+// fn_8006DCA8 for each game type; screen copies fill it (fn_8002A164, DepthField, FEgolferanim).
 typedef struct ScreenCopy {
     void* pPixels;              // 0x00  surface 1's buffer, NULL without a size
     s32   nWidth;               // 0x04
@@ -1400,7 +1400,7 @@ u8   fn_80068AC8(int nPlayer);
 void fn_80069330(int nPlayer, f32* pPos);
 u8   PlaceBall_UpdateMomentums(int nPlayer, f32 fSpeed);   // 0 when the cursor was stopped
 void fn_8006A6C4(int nPlayer);
-int  fn_8006AA9C(int nPlayer);          // how the shot turned out (0..4, 8+)
+int  fn_8006AA9C(int nPlayer);          // how the shot turned out (5: nothing to react to)
 void fn_8006AAB4(int nPlayer, int a);
 void fn_8006ACE0(int nPlayer, int nResult);
 void fn_8006ACF8(int nPlayer, int a);

@@ -154,7 +154,7 @@ extern ParticleParams lbl_8018CA98[25];     // the ball effects' emitter setting
 extern PsEmitter* lbl_80281F88;             // UFstPart.c's list head (fn_80099EA4)
 
 // UFstPart.c
-PsEmitter* fn_80099758(ParticleParams* pParams);  // start an emitter from pParams (may return NULL)
+PsEmitter* fn_80099758(ParticleParams* pParams);  // make an emitter from pParams (may return NULL)
 void fn_80099EA4(PsEmitter* pEmitter);       // push pEmitter onto the list at lbl_80281F88
 void fn_8009943C(PsEmitterRecord* pRecord, u32 uSize);  // start the emitter a stream record places
 

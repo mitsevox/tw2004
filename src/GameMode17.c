@@ -1,6 +1,6 @@
-// GameMode17.c (our name): game mode 17, around the world. Each player hits the targets in order
-// (nNextTarget) with 5 balls; some rings pay extra balls. Hitting every target wins the prize row's
-// bonus plus 100 points per ball left.
+// GameMode17.c (our name): game mode 17. Each player hits the targets in order (nNextTarget) with
+// 5 balls; the surface a ball lands on can pay extra balls. Hitting every target wins the prize
+// row's bonus plus 100 points per ball left.
 
 #include "golfer.h"
 #include "ball.h"
@@ -35,7 +35,7 @@ u8    fn_800F69C8(int nPlayer);
 s32   fn_800F6A08(int nPlayer, int i);
 void  fn_800F6A3C(void);
 
-// Mode 17 starts: one player at a time, no wind, no gimmes, no mulligans.
+// Mode 17 starts: no wind, no gimmes, no mulligans.
 void fn_800F5AAC(void) {
     gpGame->pfnInit = fn_800F5AAC;
     gpGame->pfnShutdown = fn_800F5CC8;
@@ -343,7 +343,7 @@ void fn_800F5F58(int nPlayer) {
     fn_800F2668(nPlayer);
 }
 
-// Hole start: a player not aiming at their next target is turned to it.
+// Next turn: each player in pre-shot who is not aiming at their next target is turned to it.
 void fn_800F66A0(void) {
     int i;
     fn_800F2030();

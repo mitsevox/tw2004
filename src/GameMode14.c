@@ -21,7 +21,7 @@ extern Claim lbl_80211FB8[40];
 extern s32 lbl_80281688;                    // the options saved while the game runs
 extern s32 lbl_80282368;
 extern s32 lbl_8028236C;                    // who starts: 0 or 1, at random
-extern u8  lbl_80282370;                    // the round was ended
+extern u8  lbl_80282370;                    // set by fn_800F3828: the shot then claims nothing
 extern s32 lbl_80282374;                    // the points of the last claim
 extern s32 lbl_801928F0[];                  // points per rank
 
@@ -95,7 +95,7 @@ void fn_800F2984(void) {
     gSession.nPinSet = 0;
 }
 
-// Game finished: the saved options go back.
+// The mode ends: the saved options go back.
 void fn_800F2BBC(void) {
     gSession.options.nC = lbl_80281688;
     gSession.options.nWind = lbl_80282368;
@@ -259,7 +259,8 @@ void fn_800F2E08(int nPlayer) {
     }
 }
 
-// Hole start: the players' targets reset. A player 3 or more targets behind gets a comment.
+// Next golfer: lbl_80282370 and the players' per-shot state (fn_800F2030) clear, and a golfer
+// ready to play (state 1) gets fn_800F39CC(900). A player 3 or more targets behind gets a comment.
 void fn_800F31E0(void) {
     int i;
     s32 n0;
@@ -415,7 +416,8 @@ void fn_800F3800(int nPlayer) {
     fn_800A6278();
 }
 
-// End the round now (from the pause menu).
+// The current golfer goes to state 12 and lbl_80282370 is set, so the shot claims nothing and
+// shows text 0xD1 (through fn_800F1E1C, from a UI command).
 void fn_800F3828(void) {
     GOLFERSTATE_Switch(12, lbl_80282278);   // GS_SIMULATE
     fn_800E3D90();
@@ -443,7 +445,8 @@ void fn_800F3860(void) {
     }
 }
 
-// A target's state for the HUD: 1 claimed with a hole-out, 2 player 0's, 3 player 1's, 0 free.
+// A target's state (GoDynObj picks the model drawn at it by this): 1 claimed at rank 0, 2 player
+// 0's, 3 player 1's, 0 free.
 s32 fn_800F392C(int a, int i) {
     if (lbl_80211FB8[i].nRank == 0) {
         return 1;

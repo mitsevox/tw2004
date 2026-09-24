@@ -275,8 +275,9 @@ u32 fn_8009912C(PsEmitter* pEmitter, int n, f32 fStep, f32 fLiveStep) {
     return bEmpty && pEmitter->params.n54 >= 0 && pEmitter->n50 >= pEmitter->params.n54;
 }
 
-// Move every emitter on the list on to fTime. One that fn_8009912C reports (flag 0x80000000) is
-// marked 0x40000000 on the next pass and freed and unlinked on the one after.
+// Move every emitter on the list on by fTime (one with flag 0x2000 only while it was drawn in the
+// last 119 passes). One that fn_8009912C reports (flag 0x80000000) is marked 0x40000000 on the
+// next pass and freed and unlinked on the one after.
 void fn_80099344(f32 fTime) {
     PsEmitter* pEmitter;
     PsEmitter* pPrev;
@@ -411,9 +412,9 @@ void fn_8009943C(PsEmitterRecord* pRecord, u32 uSize) {
     }
 }
 
-// Start an emitter from pParams:a new one when pParams->n54 is below 0, else the next of the six
-// fixed ones (NULL when that one is still in use). Its particle count is capped to what its
-// settings can have alive at once, but kept at 16 or more (a fixed one's is always 128).
+// Make an emitter from pParams (not yet listed): a new one when pParams->n54 is below 0, else the
+// next of the six fixed ones (NULL when that one is still in use). Its particle count is capped to
+// what its settings can have alive at once, but kept at 16 or more (a fixed one's is always 128).
 PsEmitter* fn_80099758(ParticleParams* pParams) {
     PsEmitter* pEmitter;
     ParticleCreate create;

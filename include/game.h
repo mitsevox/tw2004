@@ -161,9 +161,9 @@ typedef struct HoleData {
     s32  n0C;                   // 0x0C  tee 2
     s32  n10;                   // 0x10  tee 1
     s32  n14;                   // 0x14  tee 0
-    s32  nWindDir;              // 0x18  (Hole_WindDir)
+    s32  nWindDir;              // 0x18  (fn_800D2CB0_HoleWindDir)
     u8   unk1C[0x2C - 0x1C];
-    f32  fWindSpeed;            // 0x2C  (Hole_WindSpeed)
+    f32  fWindSpeed;            // 0x2C  (fn_800D2CF8_HoleWindSpeed)
     u8   unk30[4];
     u8   b34;                   // 0x34
     u8   b35;                   // 0x35
@@ -197,10 +197,10 @@ extern BuiltRound lbl_801FA1F8[NUM_BUILT_ROUNDS];    // 0x801FA1F8
 extern CourseData lbl_801FA2F4[NUM_COURSE_DATA];     // 0x801FA2F4
 
 void fn_800D29E8(void);
-int  Hole_WindDir(void);
-f32  Hole_WindSpeed(void);
+int  fn_800D2CB0_HoleWindDir(void);
+f32  fn_800D2CF8_HoleWindSpeed(void);
 s32  fn_800D2F00(int nCourse, int nTeeSet);    // a course's par from a tee set
-s32  fn_800D2FB4(s32 nTeeSet);          // the course's par (the tee set is not used)
+s32  fn_800D2FB4(s32 nTeeSet);          // the par of the round's 18 holes (the tee set is not used)
 u8   fn_800D3080(int nHole);
 int  fn_800D3118(int nRound, int nHole);    // a built round's course for a hole
 int  fn_800D315C(int nRound, int nHole);    // and its hole number (1-based)
@@ -333,7 +333,7 @@ LAYOUT_ASSERT(GameEffects, 0x58);
 
 extern GameEffects lbl_80202898;        // 0x80202898
 
-int  fn_800DB86C(int nPlayer);          // this lie is worth a GameBreaker (GameEffects.c)
+int  fn_800DB86C(int nPlayer);          // the putt about to be played is a big one (GameEffects.c)
 u8   fn_800DC818(Ball* pBall, int nPlayer, u8 bNext);
 u8   fn_800DC784(void);                 // TW06: GameEffects_SkipOtherCommentary
 void fn_800DB30C(int nPlayer, int nReason);
@@ -341,7 +341,7 @@ void fn_800DBA50(int nPlayer);
 GameEffects* fn_800DAF74(void);
 void GameEffects_ResetGameEffectSettings(void);
 f32  GameEffects_GetLetterboxHeight(void);
-int  GameEffects_BallUpdatesThisFrame(int nPlayer);   // preview speed: ghost steps per frame
+int  GameEffects_BallUpdatesThisFrame(int nPlayer);   // the ball's physics steps this frame
 void fn_800DB4E8(int nPlayer);
 void fn_800DB714(int nPlayer);
 void fn_800DBDA8(int nPlayer);
@@ -441,12 +441,12 @@ u8   fn_800E4254(int nPlayer);          // whether a message or screen still hol
 u8   fn_800E430C(int nPlayer);
 void fn_800E4364(u32 nQueue, int a, int b, int c);    // add an item to a display queue
 void fn_800E45C0(void);
-u8   fn_800E45CC(void);                 // whether any display timer or flag is still running
+u8   fn_800E45CC(void);                 // whether a queued item, message or deferred screen waits
 u8   fn_800E46B4(void);                 // the display pump; nonzero while anything is showing
 u8   fn_800E4BF8(void);
-void fn_800E4C20(u8 bHuman);            // the end-of-round screen
+void fn_800E4C20(u8 bHuman);            // opens the end-of-hole screen, or defers it
 void fn_800E4D88(void);
-void fn_800E4D94(u8 bHuman);            // the end-of-hole screen
+void fn_800E4D94(u8 bHuman);            // opens the end-of-round screen, or defers it
 void fn_800E4F88(int nPlayer);
 void fn_800E5240(int i);                // GameMessages.c: clears slot i of lbl_80202B88
 
@@ -477,8 +477,8 @@ extern u8          lbl_80202B88[9];             // the menu screens still open (
 extern u8          lbl_80203138[14];            // the tips already shown (GameMessages.c, GameAnalysis.c)
 
 extern u8  lbl_80282280;
-extern u8  lbl_80282281;                    // the end-of-round screen is up
-extern u8  lbl_80282282;                    // the end-of-hole screen is up
+extern u8  lbl_80282281;                    // a next hole is pending (end-of-hole screen)
+extern u8  lbl_80282282;                    // the round's end is pending (end-of-round screen)
 extern s32 lbl_80282284;
 extern s32 lbl_80282288;
 extern s32 lbl_8028228C;
@@ -679,7 +679,7 @@ u8   fn_800F2788(int nPlayer, f32 f);   // whether f is far enough for the playe
 s32  fn_800F2810(s32 n);
 void fn_800F2958(s32 nMsg, s32 a);
 // The modes' own getters behind the dispatchers fn_800F2408..fn_800F2534, which pass their
-// argument on; the getters ignore it.
+// argument on; the getters ignore it (not fn_800F354C: it is called directly, per player).
 int  fn_800F354C(int nPlayer);          // GameMode14.c
 s32  fn_800F37F8(s32 a);                // GameMode14.c
 s32  fn_800F59CC(s32 a);                // GameMode16.c
@@ -762,7 +762,7 @@ u8   fn_80100C00(void);
 u8   fn_80101738(void);
 u8   fn_80101AA8(int nPlayer, int nEvent);  // an event (event.c's numbers) in a lesson; nonzero blocks it
 u8   fn_80101D4C(int nPlayer);          // a CPU in game mode 11 is always lucky
-u8   fn_80101E34(char* szName);         // one of the lessons' demonstration animations
+u8   fn_80101E34(char* szName);         // one of the lessons' animations
 void fn_80101EDC(void);
 
 u8   fn_801025F4(void);

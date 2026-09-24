@@ -447,7 +447,7 @@ void fn_80048860(UObject* pObj);
 void fn_80048804(UObject* pObj);
 void fn_80048894(UObject* pObj);
 
-void fn_80048F68(int nMsg, void* pArg, void* pArg2);     // sends a message to every object with an id
+void fn_80048F68(int nMsg, void* pArg, void* pArg2);     // sends nMsg to every object with id > 0
 
 // GoDynObjBase.c
 int  fn_80049820(int nMsg, DynObj* pObj, void* pArg, void* pArg2);  // type 0's handler, the others' default

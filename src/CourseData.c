@@ -87,11 +87,11 @@ s32 fn_800D2C68(int nTee) {
 }
 
 // The current hole's wind: its direction and its speed.
-int Hole_WindDir(void) {
+int fn_800D2CB0_HoleWindDir(void) {
     return lbl_801FA2F4[Game_GetCourse()].aHoles[fn_80015464()].nWindDir;
 }
 
-f32 Hole_WindSpeed(void) {
+f32 fn_800D2CF8_HoleWindSpeed(void) {
     return lbl_801FA2F4[Game_GetCourse()].aHoles[fn_80015464()].fWindSpeed;
 }
 

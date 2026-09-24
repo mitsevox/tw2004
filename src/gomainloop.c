@@ -288,7 +288,7 @@ void Luck_ResetAllOdds2(void);
 void Player_SetGolfer(int nPlayer, int nGolfer, int nController, u32 uBag, int bRightSide);
 void Players_Reset(void);
 void Players_SetupAll(void);
-void PostFx_CopyScreenToBuffer(void);
+void fn_80037DD8(void);
 void PsBallFx_InitModule(void);
 void SH_vSetShadowIntensity(int n);
 void UI_Obj_InitModule(void);
@@ -559,7 +559,7 @@ void fn_8006C9EC(void) {
     GOLFERSTATE_Set(0, 0);
     fn_800A4E34();
     fn_800B9B48();
-    PostFx_CopyScreenToBuffer();
+    fn_80037DD8();
     fn_8010F748();
     fn_8006DCA0(1);
 }
@@ -751,7 +751,7 @@ void fn_8006CEFC(void) {
     fn_80014804();
     Player_SetGolfer(0, 0, 0, 0, 0);
     fn_8006DCA8(0, 0, 0, 4);
-    PostFx_CopyScreenToBuffer();
+    fn_80037DD8();
     nView = gPlayers[0].nView[0];
     View_SetCamera(fn_80017028(nView), 0x19, 0, nView);
     fn_8010F748();

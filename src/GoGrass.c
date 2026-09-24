@@ -174,7 +174,7 @@ void fn_8011E4D8(GrassChunk* pChunk) {
 }
 
 // The 'gras' stream handler: the hole's grass file is loaded. Its header gives the grid (defaults
-// for a file before version 100); the records' two offsets become addresses.
+// when its version is not 100); the records' two offsets become addresses.
 void fn_8011E584(UStreamObject* pObject) {
     u8* pCur;
     u8* pBase;
@@ -617,7 +617,7 @@ void fn_8011F544(int nX, int nZ, int nCull, f32 f) {
 
 // Builds the other list of grass buffers for this frame: every grid cell within f3E8 of the point
 // f3EC ahead of the camera (snapped to the 2.5 grid) whose bounding sphere is in view gets placed
-// (fn_8011F544), the list is sorted, and the old list's buffers not placed again are freed.
+// (fn_8011F544), the list is sorted, and the old list's unplaced buffers are queued for release.
 void fn_8011F7F8(void) {
     f32 vFlat[4];
     f32 vLook[4];
@@ -836,7 +836,7 @@ s32 fn_8012022C(void) {
     return lbl_80281900->p370 != NULL;
 }
 
-// fmod for floats: the remainder of fX / fM (both callers pass the modulus in the second argument).
+// fmod for floats: the remainder of fX / fM.
 f32 fn_80120244(f32 fX, f32 fM) {
     return fmod(fX, fM);
 }

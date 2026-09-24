@@ -1,7 +1,7 @@
 // UMemPool.c (EA's name, from its asserts; also in EA's 2002 source tree): pools of fixed-size
 // nodes carved from one allocation (the file streamer keeps its object nodes in one), and before
 // them a block of math helpers: 4x4 matrices, paired-single vector operations, atan2f, fabsf and
-// the natural logarithm with its log2 lookup table. Only part is decompiled so far.
+// the natural logarithm with its log2 lookup table.
 
 #include "engine.h"
 
@@ -150,8 +150,9 @@ void fn_8000A194(f32 (*pMtx)[4], f32 fA, f32 fB, f32 fC) {
     pMtx[0][3] = 0.0f;
 }
 
-// The three angles of a rotation matrix (the reverse of fn_8000A194): *pA from row 2, *pB from
-// m[2][1], *pC from row 0, with a quarter turn chosen by sign where an atan2 would divide by zero.
+// The three angles of a rotation matrix (the reverse of fn_8000A194): *pA = atan2(m[2][0],
+// m[2][2]), *pB = -asin(m[2][1]), *pC = atan2(m[0][1], m[1][1]), with a quarter turn chosen by
+// sign where an atan2 would divide by zero.
 void fn_8000A4E0(f32 (*pMtx)[4], f32* pA, f32* pB, f32* pC) {
     f32 fA;
     f32 fB;
@@ -378,8 +379,8 @@ void fn_8000ABE8(f32 (*pDst)[4], f32 fScale, f32 fScaleX, f32 fScaleY, f32 fNear
     pDst[3][3] = 0.0f;
 }
 
-// A perspective projection with its x and y scales given: depth from fNear to fFar maps to
-// -1..0, w = -z.
+// A perspective projection with its x and y scales given, w = -z: depth fFar maps to 0 and
+// fNear to -1 / fNear (-1 only when fNear is 1; fn_8000ABE8 maps it to -1).
 void fn_8000AC5C(f32 (*pDst)[4], f32 fScaleX, f32 fScaleY, f32 fNear, f32 fFar) {
     fn_8000ADC0(pDst);
     pDst[0][0] = fScaleX;
