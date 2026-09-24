@@ -59,6 +59,22 @@ typedef struct SkelPose {
 } SkelPose;
 LAYOUT_ASSERT(SkelPose, 0x1040);
 
+// A format 1 pose buffer (0x114C bytes; animblender.c copies it whole): three blocks from 0x4, each
+// starting with a bit per morph (20: fn_80072ACC clears them all; FE_PGATourMessages.c clears morph
+// m's in every block with fn_800736D8).
+typedef struct SkelPoseBlock {
+    u32  aBits[1];              // 0x00
+    u8   unk4[0x58 - 0x4];
+} SkelPoseBlock;
+LAYOUT_ASSERT(SkelPoseBlock, 0x58);
+
+typedef struct SkelPose1 {
+    u8   unk0[4];
+    SkelPoseBlock aBlocks[3];   // 0x004
+    u8   unk10C[0x114C - 0x10C];
+} SkelPose1;
+LAYOUT_ASSERT(SkelPose1, 0x114C);
+
 // A character's skeleton data (CharModel.pSkel; the SKEL_ functions take it): its IK chains and
 // how strongly their solution is applied (the IK weight, 0..1); only what the code reads.
 typedef struct Skeleton {

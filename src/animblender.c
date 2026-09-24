@@ -5,6 +5,7 @@
 // (AnimPlayer) functions follow. Only part is decompiled so far.
 
 #include "character.h"
+#include "charstate.h"
 #include "golfer.h"
 
 f32  fn_8001F02C(ClipBlend* pBlend, u64 uEvent);   // an event's time (by its 64-bit id)
@@ -358,4 +359,29 @@ u8 fn_80073610(SKABlendNode* pNode, void* pSrc) {
         }
     }
     return 0;
+}
+
+// Clear bit nBit in the three blocks of pNode's format 1 pose buffer, and of every source's under
+// it (a source's only when its parent is format 1).
+void fn_800736D8(SKABlendNode* pNode, s32 nBit) {
+    int j;
+    SKABlendNode* pChild;
+    int i;
+    int n = nBit;   // fake match: a copy of the parameter for the pose calls
+
+    for (i = 0; i < 3; i++) {
+        fn_8001EB6C(((SkelPose1*)pNode->pPose)->aBlocks[i].aBits, n);
+    }
+    for (i = 0; i < 2; i++) {
+        pChild = pNode->u.blend.apChild[i];
+        if (pChild != NULL) {
+            if (pChild->nType == 1) {
+                fn_800736D8(pChild, nBit);
+            } else if (pChild->nType == 0 && pNode->nFormat == 1) {
+                for (j = 0; j < 3; j++) {
+                    fn_8001EB6C(((SkelPose1*)pChild->pPose)->aBlocks[j].aBits, n);
+                }
+            }
+        }
+    }
 }
