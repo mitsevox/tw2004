@@ -8,7 +8,7 @@
 u8   fn_800C72DC(View* pView);
 u8   fn_80063608(int nPlayer, f32* pPos, f32 fMargin);
 u8   fn_800637C4(int nPlayer, int nView);
-void fn_800642A4(View* pView, f32 f174, f32 f178);
+void fn_800642A4(View* pView, f32 fF0, f32 fF4);
 
 // Sets a view up: no camera (25), no shots, the script cleared.
 void fn_80062E40(View* pView) {
@@ -32,9 +32,9 @@ void fn_80062E40(View* pView) {
     pView->script.nCamera = 0;
     pView->script.bCC = 0;
     pView->script.bCF = 0;
-    pView->b16C = 0;
+    pView->script.bE8 = 0;
     pView->script.pB4 = &pView->shot19C;
-    pView->f174 = 0.0f;
+    pView->script.fF0 = 0.0f;
     pView->p78 = NULL;
     pView->p7C = NULL;
     pView->p80 = NULL;
@@ -207,16 +207,16 @@ void fn_80063CBC(View* pView, f32* pVec) {
     Vec_Copy(pVec, pView->script.v40);
 }
 
-// Shakes the camera: moves its position by up to half of f178 each way.
+// Shakes the camera: moves its position by up to half of the script's fF4 each way.
 void fn_8006421C(View* pView) {
-    pView->v0[0] += pView->f178 * (Rand_Float(0) - 0.5f);
-    pView->v0[1] += pView->f178 * (Rand_Float(0) - 0.5f);
-    pView->v0[2] += pView->f178 * (Rand_Float(0) - 0.5f);
+    pView->v0[0] += pView->script.fF4 * (Rand_Float(0) - 0.5f);
+    pView->v0[1] += pView->script.fF4 * (Rand_Float(0) - 0.5f);
+    pView->v0[2] += pView->script.fF4 * (Rand_Float(0) - 0.5f);
 }
 
-void fn_800642A4(View* pView, f32 f174, f32 f178) {
-    pView->f174 = f174;
-    pView->f178 = f178;
+void fn_800642A4(View* pView, f32 fF0, f32 fF4) {
+    pView->script.fF0 = fF0;
+    pView->script.fF4 = fF4;
 }
 
 u8 fn_800642B0(void) {
