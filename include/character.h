@@ -127,7 +127,8 @@ typedef struct CharModel {
                                 //        position
     f32       fC;               // 0x00C  } lengths Character_UpdateTestPoints sets points 0-3 out by
     f32       f10;              // 0x010  } along the leg bones' axes when the skin has no a1048
-    u8        unk14[0x34 - 0x14];
+    u32       a14[4];           // 0x014  } bits per bone: SKEL_TransformBones turns a bone set in a14
+    u32       a24[4];           // 0x024  }   and moves one set in a24, then sets them all again
     BonePose* pPoses;           // 0x034  one per bone; freed with the model
     Skeleton* pSkel;            // 0x038
     u8        aBone[0x59];      // 0x03C  each bone id's index (fn_8001EED8), 0xFF none; fn_80029664

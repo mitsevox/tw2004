@@ -15,6 +15,16 @@ void fn_80113E60(void);                                 // DynChain.c
 void fn_80114080(void);                                 // DynChain.c
 void fn_80114398(struct DynChain* pChain);              // DynChain.c: frees a chain
 void fn_8011443C(CharModel* pModel, struct DynChain* pChain, f32 f);   // DynChain.c
+void fn_800090A0(f32* pA, f32* pB, f32* pOut);           // Quaternion.c
+void fn_800090E4(f32* pQuat, f32* pIn, f32* pOut);       // Quaternion.c: a vector turned by it
+void fn_8000914C(f32* pQ, f32 (*pMtx)[4]);               // Quaternion.c: a rotation's matrix
+void fn_8000A0E8(f32 (*pSrc)[4], f32 (*pDst)[4]);        // copies a matrix
+void fn_8000ADC0(f32 (*pMtx)[4]);                        // identity
+void fn_80021980(u32* aA, u32* aB, u32* aOut, u32 nBits);   // aOut = aA | aB, bit arrays
+void fn_80029A00(CharModel* pModel, int nA, int nB, f32* pRot);
+void fn_80029BF4(f32* pA, f32* pB, f32* pOut);
+void fn_80029C60(u32* aSrc, u32* aDst, u32 n, u32 nShift);
+void fn_80029EF4(u32* pSrc, u32* pDst, u32 nBits);
 
 // Poses the chain's links (those with f4 above 0) from their rotation vectors.
 void fn_80026B4C(Skeleton* pSkel, IKChain* pChain) {
@@ -212,6 +222,127 @@ void fn_80028A70(CharModel* pModel, int nBone, u32 uAxes, f32 f) {
     if (uAxes & 2) {
         pModel->a140[nBone][2] *= f;
     }
+}
+
+// TW06: SKEL_TransformBones. Builds each bone's pose and matrix from its parent's, walking the bones
+// in order with aCur holding the current bone's bit: bones in aBits (or whose parent was just done)
+// are redone. Bone 0x22 and 0x35 take rotations between two bones first.
+void SKEL_TransformBones(CharModel* pModel, u32* aBits) {
+    f32 mScale[4][4];
+    f32 mOut[4][4];
+    f32 vPos[4];
+    u32 aCur[4];
+    u32 aParent[4];
+    u32 aSkel[4];
+    u32 aModel[4];
+    f32 qRot[4];
+    Bone* pBone;
+    BonePose* pPose;
+    BonePose* pParentPose;
+    Skeleton* pSkel;
+    f32 (*pSkelRot)[4];
+    int i;
+
+    fn_8001E938(aCur, 0x80);
+    fn_8001EA34(aCur, 0);
+    if (pModel->pSkel != NULL) {
+        if (0.0f == pModel->pSkel->fIKWeight) {
+            fn_8001E938(aSkel, 0x80);
+        } else {
+            fn_80029EF4(pModel->pSkel->a10, aSkel, 0x80);
+        }
+        pSkelRot = pModel->pSkel->p28;
+    } else {
+        fn_8001E938(aSkel, 0x80);
+        pSkelRot = NULL;
+    }
+    fn_80021980(pModel->a14, pModel->a24, aModel, 0x80);
+    fn_8000ADC0(mScale);
+    if (fn_8001E9F4(aBits, aCur, 0x80)) {
+        fn_8001E85C(pModel->pBones[0].q0C, pModel->pPoses[0].q0);
+        fn_8001E85C(pModel->pBones[0].v1C, pModel->pPoses[0].v10);
+        fn_8000914C(pModel->pPoses[0].q0, pModel->pMatrices[0]);
+        mScale[0][0] = pModel->a140[0][0];
+        mScale[1][1] = pModel->a140[0][1];
+        mScale[2][2] = pModel->a140[0][2];
+        fn_800BADF8(pModel->pMatrices[0], mScale, mOut, 4);
+        fn_8000A0E8(mOut, pModel->pMatrices[0]);
+        fn_8001E880(pModel->pPoses[0].v10, pModel->pMatrices[0][3]);
+        fn_80029A90(pModel, pModel->pMatrices[0], 0);
+    }
+    fn_80029C60(aCur, aCur, 4, 1);
+
+    for (i = 1; i < pModel->nBones; i++) {
+        pBone = &pModel->pBones[i];
+        fn_8001E938(aParent, 0x80);
+        fn_8001EA34(aParent, pBone->nParent);
+        if (i == fn_8001EED8(pModel, 0x22)) {
+            fn_80029A00(pModel, fn_8001EED8(pModel, 0x22), fn_8001EED8(pModel, 0x11), pModel->q740);
+            if (fn_8001E9CC(aBits, fn_8001EED8(pModel, 0x11))) {
+                fn_8001EA34(aBits, fn_8001EED8(pModel, 0x22));
+            }
+            if (fn_8001E9CC(aModel, fn_8001EED8(pModel, 0x11))) {
+                fn_8001EA34(aModel, fn_8001EED8(pModel, 0x22));
+            }
+            fn_8001EA34(pModel->a24, fn_8001EED8(pModel, 0x22));
+            if (fn_8001E9CC(pModel->a14, fn_8001EED8(pModel, 0x11))) {
+                fn_8001EA34(pModel->a14, fn_8001EED8(pModel, 0x22));
+            }
+        } else if (i == fn_8001EED8(pModel, 0x35)) {
+            // EA passes bone 0x22 here too
+            fn_80029A00(pModel, fn_8001EED8(pModel, 0x22), fn_8001EED8(pModel, 0x11), pModel->q750);
+            if (fn_8001E9CC(aBits, fn_8001EED8(pModel, 0x24))) {
+                fn_8001EA34(aBits, fn_8001EED8(pModel, 0x35));
+            }
+            if (fn_8001E9CC(aModel, fn_8001EED8(pModel, 0x24))) {
+                fn_8001EA34(aModel, fn_8001EED8(pModel, 0x35));
+            }
+            fn_8001EA34(pModel->a24, fn_8001EED8(pModel, 0x35));
+            if (fn_8001E9CC(pModel->a14, fn_8001EED8(pModel, 0x24))) {
+                fn_8001EA34(pModel->a14, fn_8001EED8(pModel, 0x35));
+            }
+        }
+        if (fn_8001E9F4(aBits, aCur, 0x80) || fn_8001E9F4(aBits, aParent, 0x80)) {
+            pPose = &pModel->pPoses[i];
+            if (fn_8001E9F4(aModel, aCur, 0x80)) {
+                pParentPose = &pModel->pPoses[pBone->nParent];
+                if (fn_8001E9F4(pModel->a24, aCur, 0x80)) {
+                    fn_800090E4(pParentPose->q0, pBone->v1C, vPos);
+                    fn_800090A0(pParentPose->v10, vPos, pPose->v10);
+                    pPose->v10[3] = 0.0f;
+                    if (i == 1) {
+                        pSkel = pModel->pSkel;
+                        if (pSkel != NULL && 0.0f != pSkel->f10C4) {
+                            fn_80029BF4(pPose->v10, pSkel->v10B4, pPose->v10);
+                        }
+                    }
+                }
+                if (fn_8001E9F4(pModel->a14, aCur, 0x80)) {
+                    if (fn_8001E9F4(aSkel, aCur, 0x80)) {
+                        fn_80008FCC(pSkelRot[i], pBone->q0C, qRot);
+                        fn_80008FCC(qRot, pParentPose->q0, pPose->q0);
+                    } else {
+                        fn_80008FCC(pBone->q0C, pParentPose->q0, pPose->q0);
+                    }
+                }
+            }
+            fn_8000914C(pPose->q0, pModel->pMatrices[i]);
+            mScale[0][0] = pModel->a140[i][0];
+            mScale[1][1] = pModel->a140[i][1];
+            mScale[2][2] = pModel->a140[i][2];
+            if (pModel->bEE && i == fn_8001EED8(pModel, 0x52)) {
+                mScale[0][0] = -mScale[0][0];   // with bEE set, bone 0x52's x is flipped
+            }
+            fn_800BADF8(pModel->pMatrices[i], mScale, mOut, 4);
+            fn_8000A0E8(mOut, pModel->pMatrices[i]);
+            fn_8001E880(pPose->v10, pModel->pMatrices[i][3]);
+            fn_80029A90(pModel, pModel->pMatrices[i], i);
+            fn_80021980(aBits, aCur, aBits, 0x80);
+        }
+        fn_80029C60(aCur, aCur, 0x80, 1);
+    }
+    fn_8001E8A4(pModel->a14, 0x80);
+    fn_8001E8A4(pModel->a24, 0x80);
 }
 
 // Sets up: the identity rotation, then the dynamic chains.
