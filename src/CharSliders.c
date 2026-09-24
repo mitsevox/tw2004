@@ -382,15 +382,15 @@ void fn_8010E224(CharSliderDefs* pDefs, CharModel* pModel) {
 
 // Weight the skin's morph targets by the sliders (and mark the first 20 in the blend node).
 void fn_8010E35C(CharSliderDefs* pDefs, Skin* pSkin, SKABlendNode* pNode) {
+    int i;
+    int j;
+    int k;
     CharSliderDef* pDef;
     CharSliderValue* pValue;
     CharSliderRange* pRange;
     CharSliderMorph* pMorph;
-    f32 fWeight;
-    int i;
-    int j;
-    int k;
     int m;
+    f32 fWeight;
 
     if (pDefs == NULL || pSkin == NULL) {
         return;
@@ -400,7 +400,7 @@ void fn_8010E35C(CharSliderDefs* pDefs, Skin* pSkin, SKABlendNode* pNode) {
         pValue = &pDefs->pValues[i];
         for (j = 0; j < pDef->nMorphRanges; j++) {
             pRange = &pDef->pMorphRanges[j];
-            if (pValue->fValue >= pRange->fStart && pValue->fValue < pRange->fEnd) {
+            if (pRange->fStart <= pValue->fValue && pRange->fEnd > pValue->fValue) {
                 for (k = 0; k < pRange->nItems; k++) {
                     pMorph = &pRange->items.pMorphs[k];
                     fWeight = fn_8010E194(pRange->fStart, pRange->fEnd, pValue->fValue,
