@@ -104,11 +104,11 @@ void fn_8010E890(MsgArg* pArgs, MsgArg* pResult) {
     s32 aCourses[4];
     char szStart[8];
     char szEnd[8];
-    s32 nEvent = lbl_802824B0[pArgs[0].i];
     char* szDates = ((MsgString*)pArgs[1].p)->pStr;
     char* szName = ((MsgString*)pArgs[2].p)->pStr;
     char* szCourses = ((MsgString*)pArgs[3].p)->pStr;
     char* szChamp = ((MsgString*)pArgs[4].p)->pStr;
+    s32 nEvent = lbl_802824B0[pArgs[0].i];
     u16 nStart = fn_800EFD38(nEvent);
     u16 nEnd = GameModeDriverPGATour_GetEndDate(nEvent);
     Tournament* pTournament;
