@@ -422,7 +422,9 @@ void fn_8008B6E4(void) {
 // Abort the running state.
 void fn_8008B704(void) {
     lbl_801D8708.bAbort = 1;
-    lbl_80189AA0[lbl_801D8708.nState].pfnAbort();
+    // port: EA passes an argument the abort handlers (fn_8008B3C8, fn_8008B4A0, fn_8008B5FC,
+    // fn_8008B6E4) ignore
+    ((void (*)(int))lbl_80189AA0[lbl_801D8708.nState].pfnAbort)(0);
 }
 
 void fn_8008B754(int nNext) {
