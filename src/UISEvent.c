@@ -225,11 +225,14 @@ void fn_80165C74(UIStudio* pStudio) {
 // Marks a rate function as finished.
 void fn_80165D2C(UIStudio* pStudio, UISNodeInfo* pNodeInfo, u32 uId) {
     u32 i;
+    UISRateFn* pFn;
+    u32 n = pStudio->nRateFns;
 
-    for (i = 0; i < pStudio->nRateFns; i++) {
-        if (pStudio->pRateFns[i].uId == uId && pStudio->pRateFns[i].pNodeInfo == pNodeInfo) break;
+    for (i = 0; i < n; i++) {
+        pFn = &pStudio->pRateFns[i];
+        if (pFn->uId == uId && pFn->pNodeInfo == pNodeInfo) break;
     }
-    if (i < pStudio->nRateFns) {
+    if (i < n) {
         pStudio->pRateFns[i].uState = 1;
     }
 }
