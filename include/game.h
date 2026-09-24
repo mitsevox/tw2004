@@ -222,6 +222,7 @@ void fn_800D28DC(u16 nDate, char* szOut);       // a date as text
 u16  fn_800D2994(void);                 // today's date
 int  fn_800D2ABC(int nCourse, int nHole);   // a hole's par on a course
 int  fn_800D2AD8(int nHole);            // a hole's par
+s32  fn_800D3478(int nTotal, int n, int nRow);  // Earnings.c: the prize for a finishing row
 void fn_800D3548(int nPlayer, int nMoney, CourseMoneyTracking* pMoney);   // pMoney may be NULL
 int  fn_800D36E0(int nWinner, int nLoser, int nMargin, int* pPrize);
 int  fn_800D37BC(int nWinner, int nLoser, int nMargin, int* pPrize);

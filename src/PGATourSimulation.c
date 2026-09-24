@@ -38,6 +38,8 @@ void CalcAllStats(int nPlayer);
 void CalcAllAroundScore(int nGolfer, f32* pfValue);
 void CalcTotalDriving(int nGolfer, f32* pfValue);
 void CalcBallStriking(int nGolfer, f32* pfValue);
+void fn_8011B978(int nPlayer, s32 nTotal, s32 nFirstRow, s32 nCount);
+void fn_8011BAD4(int nPlayer, int nTotal, int n);
 void fn_80117694(UStreamObject* pObject);
 
 char* GameModeDriverPGATour_GetInitialChampName(s32 i);               // a tournament's first champion
@@ -1248,6 +1250,61 @@ void CalcTotalDriving(int nGolfer, f32* pfValue) {
 
 void CalcBallStriking(int nGolfer, f32* pfValue) {
     *pfValue = StatRank(GM_PGA_STAT_TOTALDRIVING, nGolfer) + StatRank(GM_PGA_STAT_GIR, nGolfer);
+}
+
+// Entrants tied on a place share the prizes of the rows they fill: nCount entrants from score row
+// nFirstRow each get nTotal / nCount, added to their golfer's winnings.
+void fn_8011B978(int nPlayer, s32 nTotal, s32 nFirstRow, s32 nCount) {
+    s32 nShare;
+    s32 nEntrant;
+    s32 i;
+
+    if (nCount == 0) {
+        return;
+    }
+    nShare = (f32)nTotal / (f32)nCount;
+    for (i = 0; i < nCount; i++) {
+        nEntrant = lbl_80223C70.aEntrant[nFirstRow + i];
+        GetEntrantMCPtr(nPlayer, nEntrant)->n18 = nShare;
+        gpSaveData[nPlayer].tour.aStats[fn_80119118(nPlayer, nEntrant)].n44 += nShare;
+        gpSaveData[nPlayer].tour.aStats[fn_80119118(nPlayer, nEntrant)].nSeasonWinnings += nShare;
+        gpSaveData[nPlayer].tour.aStats[fn_80119118(nPlayer, nEntrant)].nCareerWinnings += nShare;
+        if (fn_8011908C(nPlayer, nEntrant)) {
+            fn_800EF094(nPlayer, nShare);
+        }
+    }
+}
+
+// Pays the tournament's prizes (fn_800D3478 of nTotal and n per row) down the score ranking;
+// only the first 70 rows are paid and the cut entrants get nothing.
+void fn_8011BAD4(int nPlayer, int nTotal, int n) {
+    s32 nRow;
+    s32 nRank = -1;
+    s32 nPool = 0;
+    s32 nFirstRow = 0;
+    s32 nTied = 0;
+    s32 nEntrants = fn_80118664(nPlayer);
+    s32 nEntrant;
+
+    CalcScoreRankingsIfDirty(nPlayer);
+    for (nRow = 0; nRow < nEntrants; nRow++) {
+        nEntrant = lbl_80223C70.aEntrant[nRow];
+        if (lbl_80223C70.aRank[nEntrant] != nRank && nRow < 70) {
+            fn_8011B978(nPlayer, nPool, nFirstRow, nTied);
+            nRank = lbl_80223C70.aRank[nEntrant];
+            nFirstRow = nRow;
+            nTied = 0;
+            nPool = 0;
+        }
+        if (fn_801197A4(nPlayer, nEntrant)) {
+            break;
+        }
+        if (nRow < 70) {
+            nPool += fn_800D3478(nTotal, n, nRow);
+        }
+        nTied++;
+    }
+    fn_8011B978(nPlayer, nPool, nFirstRow, nTied);
 }
 
 // The statistic sort comparisons (lbl_80193FF8). Golfers whose values print differently go by
