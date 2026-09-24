@@ -5,6 +5,8 @@
 #include "llpict.h"
 #include "frontend/fe.h"
 #include "game/frontend.h"
+#include "llvideo.h"
+#include "core/startup.h"
 
 void fn_80008380(void);
 void fn_80092250(f32* pA, f32* pB, f32* pOut);
@@ -13,8 +15,6 @@ void fn_80091FC0(LLPict* pPict, int nFrames, f32 fStep);
 
 // ---- sweep code (not yet cleaned up) ----
 
-extern u8 lbl_80281370;
-void fn_80091454(void);
 void fn_80091708(void);
 void fn_80006EDC();
 void fn_80006FE8();
@@ -127,6 +127,26 @@ void fn_80091870(void) {
     fn_80010544(lbl_80281378);
 }
 
+// Set lbl_801D8858 up once, unless the session has flag 4: the clock, the number of players in
+// game type 4 (else 0) and values from it, then the 'load' object's picture (fn_800917C8).
+void fn_800918A4(void) {
+    if (!(gSession.uFlags & 4) && !lbl_801D8858.b18) {
+        lbl_801D8858.b18 = 1;
+        lbl_801D8858.n1C = -1;
+        lbl_801D8858.f10 = 0.0f;
+        lbl_801D8858.u20 = fn_80095368();
+        lbl_801D8858.n0 = 0;
+        if (gSession.nGameType == 4) {
+            lbl_801D8858.n14 = gSession.nNumPlayers;
+        } else {
+            lbl_801D8858.n14 = 0;
+        }
+        lbl_801D8858.fC = lbl_801D8858.f4 = (4.83f * lbl_801D8858.n14 + 3.1f) / 8.0f;
+        lbl_801D8858.f8 = 0.0f;
+        fn_800917C8();
+    }
+}
+
 // Decode the picture in the 'load' object, show it for nFrames frames (fading in over 30), then
 // free it.
 void fn_80091DB8(int nFrames) {
@@ -137,6 +157,30 @@ void fn_80091DB8(int nFrames) {
     fn_80008380();
     fn_8002FE70(pPict);
     fn_8002FEAC();
+}
+
+// The movies after a round in game type 1 (uiProcessInterface.c fn_80090400): "eas", then, unless
+// the session has flag 0x4000, one of the two cameo movies "tigcam01"/"tigcam02" at random
+// (skippable with any button); then the first 'LEGL' picture startUp.c kept, shown for 180
+// frames and freed.
+void fn_80091EE8(void) {
+    char szPath[0x40];          // the size is unknown: the frame leaves 0x40 bytes for it
+    char szName[0x40];          // the size is unknown: the frame leaves 0x40 bytes for it
+    LLPict* pPict;
+
+    FE_MakeMoviePath("eas", szPath);
+    fn_80075FB8(szPath, NULL, 0, 0);
+    if (!(gSession.uFlags & 0x4000)) {
+        sprintf(szName, "tigcam%02d", (s16)((Rand_Next(0) & 1) + 1));
+        FE_MakeCameoMoviePath(szName, szPath);
+        fn_80075FB8(szPath, fn_80076FDC, 0, 0);
+    }
+    pPict = fn_8002FD00(lbl_80282134, lbl_8028212C);
+    fn_80091FC0(pPict, 180, 1.0f / 30.0f);
+    fn_80008380();
+    fn_8002FE70(pPict);
+    fn_80009E70(lbl_80282134);
+    lbl_80282134 = NULL;
 }
 
 // Show pPict for nFrames frames, fading it in by fStep a frame (up to 1).

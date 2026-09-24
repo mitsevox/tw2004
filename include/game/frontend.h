@@ -30,9 +30,9 @@ typedef struct UIColorTable {
 typedef struct FrontEnd {
     UIFile* pFile;              // 0x0
     void* pHandler;             // 0x4  where GameMessages.c sends its messages (fn_8016B09C)
-    u8    unk8[4];
+    struct UILoaded* p8;        // 0x8  the texture banks fn_8008F0FC frees (fn_80090400)
     void* pC;                   // 0xC  a block uiLoadFile.c frees (fn_8008F24C)
-    u8    unk10[4];
+    u32*  p10;                  // 0x10  the fonts table fn_8008F194 frees (fn_80090400)
     UIColorTable* p14;          // 0x14  the colours UIText.n8 picks from (uiText.c), NULL: none
     f32   f18;                  // 0x18  set to 1 when a round starts (gomainloop fn_8006DC20)
 } FrontEnd;
@@ -49,6 +49,14 @@ typedef struct UILoaded {
 LAYOUT_ASSERT(UILoaded, 0x18);
 
 extern UILoaded lbl_801D87A8;
+
+// uiLoadFile.c: what the front end's shutdown (uiProcessInterface.c fn_80090400) frees.
+void fn_8008F0C8(void* p);              // free p unless it is NULL
+void fn_8008F0FC(UILoaded* pLoaded);    // free the texture banks the 'TXFS' handler kept
+void fn_8008F164(void* p);              // free p unless it is NULL
+void fn_8008F194(u32* pTable);          // free the fonts' slots and the 'FONS' data
+void fn_8008F24C(void);
+void fn_8008F294(void);
 
 // One font in the 'FONS' object (uiLoadFile.c fn_8008EFFC): the font's data starts at 0x20; once
 // it is loaded into a font slot, its first word holds the slot.

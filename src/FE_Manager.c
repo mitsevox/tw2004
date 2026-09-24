@@ -10,10 +10,9 @@
 #include "core/easb.h"
 #include "frontend/fe.h"
 #include "core/goaram.h"
+#include "llvideo.h"
 
 // Outside this file.
-// The movie player (LLVideo.c): plays a movie file until it ends or pfnSkip returns nonzero.
-void fn_80075FB8(char* pPath, int (*pfnSkip)(void), int a, int b);
 void fn_80037FB4(u8 a, f32* pColor);    // a full-screen colour (GoPostFx.c)
 void fn_80010284(void);
 void fn_8008B704(void);
@@ -42,7 +41,6 @@ void fn_80076F24(void);
 void fn_80076F54(void);
 void fn_80076F58(void);
 void fn_80076F80(UStreamObject* pObject);
-int  fn_80076FDC(void);
 void fn_8007706C(char* pName, char* pDir, char* pPath);
 void fn_800770D4(char* pName, char* pPath);
 void FE_GetBIOMovieName(void);
@@ -130,8 +128,9 @@ void fn_80076F80(UStreamObject* pObject) {
     fn_80009E70(pObject);
 }
 
-// A movie's skip test: any button on any controller.
-int fn_80076FDC(void) {
+// A movie's skip test (fn_80075FB8's pfnStop, whose arguments it ignores): any button on any
+// controller.
+u8 fn_80076FDC(Video* pVideo, int nArg) {
     int i;
     fn_80013400();
     for (i = 0; i < 4; i++) {
