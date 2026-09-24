@@ -100,6 +100,9 @@ typedef struct SkelPose1 {
 } SkelPose1;
 LAYOUT_ASSERT(SkelPose1, 0x114C);
 
+void fn_80036180(SkelPose1* pA, SkelPose1* pB, SkelPose1* pOut, f32 fWeight);  // Skin.c: blends morphs
+void fn_80021980(u32* aA, u32* aB, u32* aOut, u32 nBits);   // ska_shared.c: aOut = aA | aB, bit arrays
+
 // A character's skeleton data (CharModel.pSkel; the SKEL_ functions take it): its IK chains and
 // how strongly their solution is applied (the IK weight, 0..1); only what the code reads.
 typedef struct Skeleton {
@@ -274,14 +277,19 @@ extern u8 lbl_802810A0[6];      // Skeleton.c: the bone ids of its kind 3 dynami
 typedef struct Clip {
     u32    uFlags;              // 0x00  4: its frame data is in ARAM
     s32    n04;                 // 0x04  bytes of the second frame stream
-    u8     unk08[4];
+    u8     unk08[2];
+    s16    n0A;                 // 0x0A  non-zero: it has a first frame stream (fn_80020328)
     s16    nFrames;             // 0x0C
     u8     unk0E[0xA];
     f32    f18;                 // 0x18  fn_8001BE88 blends up to it
-    s32    n1C;                 // 0x1C
-    u8     unk20[0xC];
+    s32    n1C;                 // 0x1C  how many tracks (pD0)
+    u8     unk20[8];
+    s16    n28;                 // 0x28  bytes fn_80020328 copies out of a frame of the first stream
+    s16    n2A;                 // 0x2A  from this offset
     s32    n2C;                 // 0x2C
-    u8     unk30[8];
+    u32    u30;                 // 0x30  fn_80020DD4 hands it back
+    u8     unk34[2];
+    s16    n36;                 // 0x36  non-zero: it has a second frame stream (fn_80020328)
     s32    n38;                 // 0x38  bytes of the first frame stream
     s32    n3C;                 // 0x3C
     s32    n40;                 // 0x40
@@ -290,7 +298,10 @@ typedef struct Clip {
     u8     unk4A[2];
     s32    n4C;                 // 0x4C
     s32    n50;                 // 0x50
-    u8     unk54[0x10];
+    s32    n54;                 // 0x54  bytes from pC4 to the pF4 library (fn_80020DD4)
+    s32    n58;                 // 0x58  passed to fn_8002148C with a second-stream frame
+    s32    n5C;                 // 0x5C  passed to fn_80021134 with a first-stream frame
+    u8     unk60[4];
     s32    n64;                 // 0x64
     u8     unk68[0x80 - 0x68];
     f32    v80[3];              // 0x80  a point fn_8001DB04 puts through bone 0's matrix
@@ -298,25 +309,41 @@ typedef struct Clip {
     s16    n8E;                 // 0x8E  bytes per frame, second stream
     u64    u90;                 // 0x90  looked up in lbl_801B9638 (FEgolferanim.c fn_8008D058)
     u8     unk98[8];
-    char   name[0x2C];          // 0xA0
+    char   name[0x20];          // 0xA0  (fn_8002091C swaps 0xA0 and 0xB0 as 16 bytes each, then words)
+    void*  pC0;                 // 0xC0  where the clip was loaded: itself (fn_80020F60), or the start
+                                //       of the buffer it was aligned up in (fn_80020DD4)
+    u8*    pC4;                 // 0xC4  the end of pD0's tracks
+    u8*    pC8;                 // 0xC8  the same; fn_800206C8 lays out the streams from here
     f32    fCC;                 // 0xCC  how far along the swing is, 0..1 (Character.fBackswing copies it)
-    u8*    pD0;                 // 0xD0
+    u8*    pD0;                 // 0xD0  n1C ClipTracks
     struct ClipEvent* pEvents;  // 0xD4  its timed events (fn_8001F02C finds one by its id)
     struct BlendClip* pD8;      // 0xD8  fn_800204A0 samples it; set: FEgolferanim.c turns the
                                 //       golfer round for the clip
-    u32    uAram;               // 0xDC
-    u8     unkE0[4];
-    u8*    pE4;                 // 0xE4
-    u8     unkE8[4];
-    u8*    pEC;                 // 0xEC
-    u8*    pF0;                 // 0xF0
+    u32    uAram;               // 0xDC  the first frame stream: its ARAM address with flag 4, else its
+                                //       address in memory (fn_800206C8)
+    u8*    pE0;                 // 0xE0  n3C bytes (fn_80020BC8 swaps them as halfwords)
+    u8*    pE4;                 // 0xE4  the second frame stream (n04 bytes)
+    u8*    pE8;                 // 0xE8  n40 bytes (halfwords)
+    u8*    pEC;                 // 0xEC  the tracks' ranges, 0x18 bytes each (ClipTrack.aRange)
+    u8*    pF0;                 // 0xF0  the tracks' packed keys, nFrames * 6 bytes each (ClipTrack.pKeys)
     u8*    pF4;                 // 0xF4
     u8*    pF8;                 // 0xF8
     u8*    pFC;                 // 0xFC
 } Clip;
+LAYOUT_ASSERT(Clip, 0x100);
 
-// char.c: run on a clip just read from disc (skalib.c, AnimStream.c).
-void* fn_80020DD4(void* pClip, void* pOut, int nAlign);
+// One of a clip's tracks (Clip.pD0, n1C of them; fn_80020B2C swaps them as four words). A track with
+// flag 0x10 has its own keys: nFrames points packed as three u16s (fn_8001FC0C expands one with aRange).
+typedef struct ClipTrack {
+    u32  uFlags;                // 0x0  0x10: it has keys
+    u32  u04;                   // 0x4
+    f32* aRange;                // 0x8  min, max per axis (in Clip.pEC)
+    u16* pKeys;                 // 0xC  (in Clip.pF0)
+} ClipTrack;
+
+// ska_shared.c: run on a clip just read from disc (skalib.c, AnimStream.c): moves nothing, but
+// takes the clip at pData rounded up to nAlign, byte-swaps it and lays it out in memory.
+Clip* fn_80020DD4(u8* pData, u32* pu30, u32 nAlign);
 
 typedef struct SKABlendNode SKABlendNode;
 
@@ -345,12 +372,20 @@ void fn_80071F58(struct SKABlendNode** ppNode, u8 bFreeSources);   // animblende
 u8 fn_80073554(SKABlendNode* pNode, void* pSrc);
 u8 fn_80073610(SKABlendNode* pNode, void* pSrc);
 
-// The blend callback CharacterState_AddSKABlendData attaches (fn_80072ACC is one).
-typedef void (*SKABlendFn)(SKABlendNode* pNode, int* pn, f32 fTime);
+// The blend callback CharacterState_AddSKABlendData attaches (fn_80072ACC is one); fn_8007260C
+// passes it the character's model.
+typedef void (*SKABlendFn)(SKABlendNode* pNode, CharModel* pModel, f32 fTime);
 
 // animblender.c: set up *ppNode (taken from nType's pool when NULL) as a node of nType with pose
 // format nFormat, bC set from nC.
 void fn_80071C28(SKABlendNode** ppNode, int nType, int nFormat, SKABlendFn pfnBlend, int nC);
+// animblender.c: cut the tree at pNode off at fTime, or start it over (pPlayer plays it).
+void fn_800732F4(SKABlendNode* pNode, struct AnimPlayer* pPlayer, f32 fTime);
+// animblender.c: pose the tree at pNode at fTime into its buffers (each blend node's pfnBlend).
+void fn_8007260C(struct Character* pChar, SKABlendNode* pNode, CharModel* pModel, f32 fTime);
+void fn_8001FCF4(struct Character* pChar, Clip* pClip, SkelPose* pPose, int n, f32 fTime);
+// mtalib.c (pUnused is not read)
+int  fn_8001F494(void* pUnused, struct MtaLib* pLib, SkelPose1* pPose, f32 fTime);
 // animblender.c: make pNode a blend node that mixes its children with pfnBlend at fWeight.
 void fn_800725BC(SKABlendNode* pNode, SKABlendFn pfnBlend, f32 fWeight);
 f32  fn_80072938(SKABlendNode* pNode);  // animblender.c: the latest end time under pNode
@@ -362,8 +397,8 @@ void fn_800720C8(struct Character* pChar, SKABlendNode* pNew, SKABlendNode** ppN
 
 // A node of a character's SKA blend tree (animblender.c; the root is at Character + 0x40C). A node
 // of type 1 blends its two children into its pose with pfnBlend; a node of type 0 plays one source
-// from fFrom to fTo. fn_80071C28 takes nodes from three pools by type (0x34, 0x2C and 0x20 bytes),
-// so the blend fields end at 0x2C; nGroup follows the root in Character.
+// from fFrom to fTo. fn_80071C28 takes nodes from three pools by type: sources 0x34 bytes
+// (SKASourceNode), blend nodes 0x2C (this struct, as Character embeds two), others 0x20.
 struct SKABlendNode {
     s32  bPooled;               // 0x00  taken from a pool, so fn_80071F58 gives it back
     s32  nType;                 // 0x04  0: plays a source, 1: blends apChild
@@ -385,17 +420,33 @@ struct SKABlendNode {
             f32   fTo;                      // 0x28
         } src;                              // nType 0
     } u;
-    s32  nGroup;                // 0x2C  the clip group CharacterState_AddSKABlendData last added (the
-                                //       root only: past the end of a pooled blend node)
 };
-LAYOUT_ASSERT(SKABlendNode, 0x30);
+LAYOUT_ASSERT(SKABlendNode, 0x2C);
 
-// What Clip.pD8 points at; only what the swing reads.
+// A source node (nType 0) as its pool makes it: the node and two more fields.
+typedef struct SKASourceNode {
+    SKABlendNode node;          // 0x00
+    f32  f2C;                   // 0x2C  0 when it starts playing (fn_800724C0)
+    s32  n30;                   // 0x30  0 when set up (fn_80071C28)
+} SKASourceNode;
+LAYOUT_ASSERT(SKASourceNode, 0x34);
+
+// One of a BlendClip's keys: six values fn_800204A0 blends between neighbouring keys.
+typedef struct BlendKey {
+    f32  a[6];                  // 0x00
+} BlendKey;
+
+// What Clip.pD8 points at: 20 keys evenly spaced f04 apart from time f08 to f0C (fn_800204A0,
+// fn_800205F8). A clip file holds it right after the clip's events (fn_80020F60).
 typedef struct BlendClip {
-    u8   unk0[8];
-    f32  f08;                   // 0x08  added to the time fn_800204A0 samples the clip at
-    f32  f0C;                   // 0x0C
+    u8   unk0[4];
+    f32  f04;                   // 0x04  the time between keys
+    f32  f08;                   // 0x08  the first key's time; added to the time fn_800204A0 samples
+                                //       the clip at
+    f32  f0C;                   // 0x0C  the last key's time
+    BlendKey aKeys[20];         // 0x10
 } BlendClip;
+LAYOUT_ASSERT(BlendClip, 0x1F0);
 
 // One of a clip's timed events (Clip.pEvents; fn_8001F02C finds one by its id). Event 2's time is
 // the ball-hit time the swing measures (fn_8001C860 starts the skeleton's clip at it).
@@ -554,8 +605,9 @@ typedef struct Character {
     s32   n3D4;                 // 0x3D4  the bytes of its CHR object before the animation library
     AnimLib* pLib;              // 0x3D8  its animation library
     struct ClipRecord* pRecords;    // 0x3DC  records for its merged library (skalib)
-    u8    node3E0[0x40C - 0x3E0];   // 0x3E0  a blend node for anim29C (fn_800732F4 takes it as it takes blend)
+    SKABlendNode node3E0;       // 0x3E0  the root of anim29C's blend tree
     SKABlendNode blend;         // 0x40C  the root of its blend tree
+    s32   nGroup;               // 0x438  the clip group CharacterState_AddSKABlendData last added
     CharBuffer buffers[4];      // 0x43C
     struct { u32 bSet; f32 fTime; u8 unk8[8]; } events[18];   // 0x4AC  animation events, by 64-bit id
     s32   n5CC;                 // 0x5CC
@@ -766,7 +818,7 @@ void  fn_80029A90(CharModel* pModel, f32 (*pMtx)[4], int nBone);
 void  fn_80029AF8(CharModel* pModel);
 int   fn_80048574(Character* pChar, u64 uEvent);    // the character's animation has event uEvent
 u8    fn_8009637C(Character* pChar);    // CharAnim.c: n26 is not 1 (both callers mask the result)
-void  fn_80072ACC(SKABlendNode* pNode, int* pn, f32 fTime);
+void  fn_80072ACC(SKABlendNode* pNode, CharModel* pModel, f32 fTime);
 f32   fn_80072CB8(SKABlendNode* pNode, u64 uEvent); // an event's time in a blend tree
 void  fn_80072ED8(AnimPlayer* pPlayer, SKABlendNode* pNode, f32 fT);    // advance a player
 void  fn_80073108(Character* pChar, int nPlayer, AnimPlayer* pPlayer, SKABlendNode* pNode, f32 fT);
@@ -935,6 +987,7 @@ extern u8          lbl_801D9908[0xC8];
 extern s32         lbl_80281070;        // leaves this short are left alone by the drop pass
 extern s32         lbl_80281074;        // clips a leaf may keep this round
 extern u32         lbl_80281078;        // the current slot
+extern u8          lbl_80281CC0;        // ska_shared.c: fn_80021978 sets it; clear: fn_80021134 negates angles
 extern u8*         lbl_80281CC4;        // staging buffers (32-aligned), see Skalib_Init
 extern u8*         lbl_80281CC8;
 extern u8*         lbl_80281CCC;
@@ -1041,6 +1094,7 @@ typedef struct MtaLib {
 LAYOUT_ASSERT(MtaLib, 0x34);
 
 MtaLib* fn_8001F110(MtaLib* pLib, s32* pnSize);    // char.c: swap and link a library; *pnSize: its bytes
+void    fn_8001F578(MtaLib* pLib);                  // mtalib.c: link a library already in our byte order
 
 MalBank* fn_8001F760(int nBank);
 void*    fn_8001F79C(MalBank* pBank, int nGroup, int n);

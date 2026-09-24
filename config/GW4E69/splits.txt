@@ -136,6 +136,7 @@ ViewController.c:
 
 char_tex_manager.c:
 	.text       start:0x80017320 end:0x80017508
+	.data       start:0x801870F0 end:0x801870FC
 
 char.c:
 	.text       start:0x80017508 end:0x8001F32C
@@ -157,12 +158,16 @@ Skeleton.c:
 
 GxUtil.c:
 	.text       start:0x80029FC8 end:0x8002A630
+	.bss        start:0x801C64A8 end:0x801C64D8
+	.sbss       start:0x80281D28 end:0x80281D30
+	.sdata2     start:0x80282D60 end:0x80282D68
 
 Golfer.c:
 	.text       start:0x8002A630 end:0x8002F1D4
 
 GoRenderSurface.c:
 	.text       start:0x8002F1D4 end:0x8002F4FC
+	.data       start:0x801876B0 end:0x801876C8
 
 LLPict_Gc.c:
 	.text       start:0x8002F4FC end:0x80030254
@@ -249,9 +254,13 @@ LLPictInt.c:
 
 user.c:
 	.text       start:0x800563C4 end:0x80056480
+	.sdata      start:0x80281138 end:0x80281140
 
 PasswordManager.c:
 	.text       start:0x80056480 end:0x80057F18
+	.rodata     start:0x801834C0 end:0x80183578
+	.data       start:0x80187F88 end:0x80188138
+	.sdata      start:0x80281140 end:0x80281188
 
 fe_craputils.c:
 	.text       start:0x80057F18 end:0x800589F8
@@ -261,6 +270,9 @@ Swing.c:
 
 GoCamCont.c:
 	.text       start:0x80062E40 end:0x8006449C
+	.rodata     start:0x801836B0 end:0x80183700
+	.data       start:0x80188528 end:0x801885F8
+	.sdata2     start:0x802836E8 end:0x80283728
 
 GoStaticCam.c:
 	.text       start:0x8006449C end:0x80065B44
@@ -276,6 +288,9 @@ target.c:
 
 emotion.c:
 	.text       start:0x8006AA70 end:0x8006BED4
+	.rodata     start:0x80183848 end:0x80183858
+	.data       start:0x80188830 end:0x801888C0
+	.sdata2     start:0x80283868 end:0x802838B8
 
 Replay.c:
 	.text       start:0x8006BED4 end:0x8006C630
@@ -287,6 +302,8 @@ gomainloop.c:
 
 GoFrameBuf.c:
 	.text       start:0x8006E150 end:0x8006E2A4
+	.data       start:0x801888E0 end:0x801888F0
+	.sdata2     start:0x802838F0 end:0x80283900
 
 GoLighting.c:
 	.text       start:0x8006E2A4 end:0x8006F154
@@ -296,23 +313,10 @@ Code8006F154.c:
 	.sdata      start:0x802811E0 end:0x802811E8
 	.sdata2     start:0x80283958 end:0x80283988
 
-unsorted/sweep_8006F4B4.c:
-	.text       start:0x8006F4B4 end:0x8006F4E0
-
-unsorted/sweep_8006F4E0.c:
-	.text       start:0x8006F4E0 end:0x8006F4F0
-
-unsorted/sweep_8006F4F0.c:
-	.text       start:0x8006F4F0 end:0x8006F518
-
-unsorted/sweep_8006F518.c:
-	.text       start:0x8006F518 end:0x8006F568
-
-unsorted/sweep_8006F568.c:
-	.text       start:0x8006F568 end:0x8006F5F8
-
-unsorted/sweep_8006F5F8.c:
-	.text       start:0x8006F5F8 end:0x8006F608
+Code8006F438.c:
+	.text       start:0x8006F438 end:0x8006F608
+	.sdata      start:0x802811E8 end:0x802811F0
+	.sbss       start:0x80281E68 end:0x80281E70
 
 unsorted/sweep_8006F608.c:
 	.text       start:0x8006F608 end:0x8006F64C
@@ -366,6 +370,9 @@ GoViewport.c:
 
 GoShaderObjectCommon_TexAnimManager_Gc.c:
 	.text       start:0x80076B7C end:0x80076E48
+	.data       start:0x801894A0 end:0x801894D0
+	.sbss       start:0x80281EC0 end:0x80281EC8
+	.sdata2     start:0x80283AA8 end:0x80283AC0
 
 FE_Manager.c:
 	.text       start:0x80076E48 end:0x80079E6C
@@ -416,6 +423,9 @@ GoShaderObject_Particle_Gc.c:
 unsorted/sweep_8009554C.c:
 	.text       start:0x8009554C end:0x80095564
 
+Code80095564.c:
+	.text       start:0x80095564 end:0x80095744
+
 unsorted/sweep_80095744.c:
 	.text       start:0x80095744 end:0x80095780
 
@@ -442,6 +452,9 @@ unsorted/sweep_800977CC.c:
 
 GoCamTuningVars.c:
 	.text       start:0x800977F8 end:0x80097E98
+	.data       start:0x80189D60 end:0x80189D78
+	.sbss       start:0x80281F78 end:0x80281F80
+	.sdata2     start:0x80283D28 end:0x80283DF8
 
 unsorted/sweep_80097E98.c:
 	.text       start:0x80097E98 end:0x80097F44
@@ -461,17 +474,9 @@ SunFlr_Gc.c:
 unsorted/sweep_8009A844.c:
 	.text       start:0x8009A844 end:0x8009A928
 
-unsorted/sweep_8009A928.c:
-	.text       start:0x8009A928 end:0x8009A968
-
-unsorted/sweep_8009A968.c:
-	.text       start:0x8009A968 end:0x8009A990
-
-unsorted/sweep_8009A990.c:
-	.text       start:0x8009A990 end:0x8009A9CC
-
-unsorted/sweep_8009AA18.c:
-	.text       start:0x8009AA18 end:0x8009AA28
+Code8009A928.c:
+	.text       start:0x8009A928 end:0x8009AA28
+	.sdata2     start:0x80283E90 end:0x80283E98
 
 Code8009AA28.c:
 	.text       start:0x8009AA28 end:0x8009B314
@@ -481,6 +486,8 @@ unsorted/sweep_8009B314.c:
 
 Code8009B340.c:
 	.text       start:0x8009B340 end:0x8009B630
+	.sbss       start:0x80281FA0 end:0x80281FA8
+	.sdata2     start:0x80283EC0 end:0x80283EC8
 
 GoGreenGrid.c:
 	.text       start:0x8009B630 end:0x8009CB9C
@@ -535,50 +542,11 @@ AudReverb.c:
 	.sbss       start:0x802820D8 end:0x802820E8
 
 startUp.c:
-	.text       start:0x800AF324 end:0x800B1AA8
+	.text       start:0x800AF324 end:0x800B2314
 	.data       start:0x8018FE98 end:0x8018FF68
 	.sdata      start:0x80281498 end:0x802814A8
 	.sbss       start:0x802820E8 end:0x80282158
 	.sdata2     start:0x80284070 end:0x802840B0
-
-unsorted/sweep_800B1AA8.c:
-	.text       start:0x800B1AA8 end:0x800B1AB0
-
-unsorted/sweep_800B1AB0.c:
-	.text       start:0x800B1AB0 end:0x800B1B18
-
-unsorted/sweep_800B1F9C.c:
-	.text       start:0x800B1F9C end:0x800B1FBC
-
-unsorted/sweep_800B1FBC.c:
-	.text       start:0x800B1FBC end:0x800B203C
-
-unsorted/sweep_800B204C.c:
-	.text       start:0x800B204C end:0x800B208C
-
-unsorted/sweep_800B208C.c:
-	.text       start:0x800B208C end:0x800B20B8
-
-unsorted/sweep_800B20B8.c:
-	.text       start:0x800B20B8 end:0x800B2150
-
-unsorted/sweep_800B2150.c:
-	.text       start:0x800B2150 end:0x800B218C
-
-unsorted/sweep_800B21D0.c:
-	.text       start:0x800B21D0 end:0x800B21F0
-
-unsorted/sweep_800B21F0.c:
-	.text       start:0x800B21F0 end:0x800B223C
-
-unsorted/sweep_800B223C.c:
-	.text       start:0x800B223C end:0x800B2250
-
-unsorted/sweep_800B2250.c:
-	.text       start:0x800B2250 end:0x800B227C
-
-unsorted/sweep_800B22D4.c:
-	.text       start:0x800B22D4 end:0x800B2314
 
 shadow.c:
 	.text       start:0x800B2314 end:0x800B34F0
@@ -620,6 +588,8 @@ Trax.c:
 
 ScreenClear.c:
 	.text       start:0x800BA74C end:0x800BA940
+	.sbss       start:0x802821F0 end:0x802821F8
+	.sdata2     start:0x80284238 end:0x80284248
 
 Code800BA940.c:
 	.text       start:0x800BA940 end:0x800BAD60
@@ -892,12 +862,15 @@ SkinMorph.c:
 
 fe_stats.c:
 	.text       start:0x8011CEB0 end:0x8011D280
+	.sdata      start:0x80281888 end:0x802818A8
 
 EventInfo.c:
 	.text       start:0x8011D280 end:0x8011E020
 
 llrtclock.c:
 	.text       start:0x8011E020 end:0x8011E170
+	.data       start:0x80194580 end:0x80194598
+	.sdata      start:0x802818F8 end:0x80281900
 
 GoGrass.c:
 	.text       start:0x8011E170 end:0x80120298

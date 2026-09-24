@@ -16,7 +16,6 @@
 void fn_80036054(void* pMesh, int n, s32* pDesc);
 void fn_800360A0(void* pMesh);
 void fn_800360D4(u8* pMesh);
-void fn_80036100(u8* pMesh, void* pDesc, int n);
 void fn_80035294(void);
 void fn_800352BC(void);
 void fn_800354B4(u8* p, f32 v);         // sets the lens's f32 at 0xAC (fn_80014268 reads it)
@@ -417,7 +416,7 @@ void fn_8009C914(int nView) {
     desc.pPos = lbl_802813C0->apVert[nView];
     desc.pColour = lbl_802813C0->apColor[nView];
     desc.pUV = lbl_802813C0->apUV[nView];
-    fn_80036100(lbl_802813C0->aMesh[nView], &desc, 1);
+    fn_80036100((ShaderObject*)lbl_802813C0->aMesh[nView], &desc, 1);
     fn_800360D4(lbl_802813C0->aMesh[nView]);
     fn_80012F50(1, 6, 0x80);
     fn_80012F34(1);

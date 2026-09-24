@@ -10,7 +10,7 @@ void fn_800AFBD8(u16 nVoice, u8 bOn);   // startUp.c
 void fn_800AFDC8(u16 nVoice, SoundHeader* pHdr);        // startUp.c
 void fn_800B0114(u16 nVoice, VoiceEnvelope* pEnv);      // startUp.c
 void fn_800AFEF4(u16 nVoice, s16 nVolume, int a, int b); // startUp.c
-void fn_800B0034(u16 nVoice, u8 nPan, int nMode);       // startUp.c
+void fn_800B0034(u16 nVoice, u8 nPan, int nMode, int bPlaying);        // startUp.c
 void fn_800B00A4(u16 nVoice, u32 u, int a);             // startUp.c
 void fn_800B01B4(u16 nVoice, u8 bA, u8 bB);             // startUp.c
 u8   fn_800AFB98(u16 nVoice);                           // startUp.c
@@ -227,9 +227,8 @@ void fn_800AC91C(AudVoice* pVoice, AudVoiceParams* pParams) {
         }
         if (pParams->flags.b.bVolume) {
             fn_800AFEF4(nHwVoice, pParams->nVolume, 0, bPlaying);
-            // port: EA passes an argument fn_800B0034 ignores
-            ((void (*)(u16, u8, int, int))fn_800B0034)(nHwVoice, pParams->nPan, 2, bPlaying);
-            ((void (*)(u16, u8, int, int))fn_800B0034)(nHwVoice, pParams->n7, 3, bPlaying);
+            fn_800B0034(nHwVoice, pParams->nPan, 2, bPlaying);
+            fn_800B0034(nHwVoice, pParams->n7, 3, bPlaying);
         }
         if (pParams->flags.b.bPitch) {
             uRate = fn_800ACEC4(pVoice->uC, pParams->fPitch);

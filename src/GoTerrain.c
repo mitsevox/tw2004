@@ -64,7 +64,6 @@ void  fn_80035514(u8* pObject);
 void  fn_800332F4(void);
 u8    fn_8003505C(u8 b);
 f32*  fn_80035508(UObjMesh* pMesh);
-void  fn_80063920(int nView, f32* pBounds);     // GoCamCont: given an object the camera is inside
 u8    fn_80033308(Ter_ObjectDrawData* pDraw, u8 bForce);
 void  fn_8000ADC0(f32 (*pMtx)[4]);  // identity matrix
 void  fn_80035370(void);
