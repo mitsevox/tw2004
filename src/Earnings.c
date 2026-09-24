@@ -1267,8 +1267,8 @@ u8 fn_800D68CC(int nPlayer, u8 bCheck) {
     int n;
     u8 bAll;
 
+    if (gpSaveData[gPlayers[nPlayer].nIndex].bActive == 0) return 0;
     pProfile = &gpSaveData[gPlayers[nPlayer].nIndex];
-    if (pProfile->bActive == 0) return 0;
     if (!bCheck) {
         bAll = 1;
         for (i = 0; i < 31; i++) {
@@ -1295,8 +1295,8 @@ u8 fn_800D69B8(int nPlayer, u8 bCheck) {
     int i;
     u8 bAny;
 
+    if (gpSaveData[gPlayers[nPlayer].nIndex].bActive == 0) return 0;
     pProfile = &gpSaveData[gPlayers[nPlayer].nIndex];
-    if (pProfile->bActive == 0) return 0;
     if (!bCheck) {
         bAny = 0;
         for (i = 0; i < 31; i++) {
