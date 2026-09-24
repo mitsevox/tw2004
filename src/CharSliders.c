@@ -347,15 +347,15 @@ f32 fn_8010E194(f32 fFrom, f32 fTo, f32 fX, f32 fA, f32 fB) {
 
 // Scale the model's bones by the sliders.
 void fn_8010E224(CharSliderDefs* pDefs, CharModel* pModel) {
+    int i;
+    int j;
+    int k;
     CharSliderDef* pDef;
     CharSliderValue* pValue;
     CharSliderRange* pRange;
     CharSliderBone* pBone;
     f32 fScale;
     int nBone;
-    int i;
-    int j;
-    int k;
 
     if (pDefs == NULL || pModel == NULL) {
         return;
@@ -365,7 +365,7 @@ void fn_8010E224(CharSliderDefs* pDefs, CharModel* pModel) {
         pValue = &pDefs->pValues[i];
         for (j = 0; j < pDef->nBoneRanges; j++) {
             pRange = &pDef->pBoneRanges[j];
-            if (pValue->fValue >= pRange->fStart && pValue->fValue < pRange->fEnd) {
+            if (pRange->fStart <= pValue->fValue && pRange->fEnd > pValue->fValue) {
                 for (k = 0; k < pRange->nItems; k++) {
                     pBone = &pRange->items.pBones[k];
                     fScale = fn_8010E194(pRange->fStart, pRange->fEnd, pValue->fValue,
