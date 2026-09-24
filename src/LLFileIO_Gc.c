@@ -59,8 +59,9 @@ int fn_80006444(int hFile, void* pDst, u32 uLen, u32 uOffset,
     return fn_80006478(hFile, pDst, uLen, uOffset, pfnDone, 1, 0, 0, 1);
 }
 
-// Queues a read (EA's name, from its lock: File_ReadAsyncEx): takes a free request of the priority, puts it at the end of that priority's queue
-// and wakes the reader if it is the only read queued. Nothing is queued when none is free.
+// Queues a read (EA's name, from its lock: File_ReadAsyncEx): takes a free request of the
+// priority, puts it at the end of that priority's queue and wakes the reader if it is the only
+// read queued. Nothing is queued when none is free.
 int fn_80006478(int hFile, void* pDst, u32 uLen, u32 uOffset, void (*pfnDone)(int nBytes, int nError),
                 u8 nPrio, s32 n1C, u8 b20, u8 b21) {
     FileReqPool* pPool;
