@@ -441,6 +441,9 @@ unsorted/sweep_800977CC.c:
 
 GoCamTuningVars.c:
 	.text       start:0x800977F8 end:0x80097E98
+	.data       start:0x80189D60 end:0x80189D78
+	.sbss       start:0x80281F78 end:0x80281F80
+	.sdata2     start:0x80283D28 end:0x80283DF8
 
 unsorted/sweep_80097E98.c:
 	.text       start:0x80097E98 end:0x80097F44

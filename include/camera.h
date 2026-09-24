@@ -301,7 +301,7 @@ typedef struct ViewController {
 } ViewController;
 LAYOUT_ASSERT(ViewController, 0x288);
 
-// The camera tuning values (GoGolfCam.c); only the fields read so far.
+// The camera tuning values (GoGolfCam.c), allocated and set by GoCamTuningVars.c's fn_800977F8.
 typedef struct CamTuning {
     f32  f0;                    // 0x000  the zoom-to-aim camera's base speed
     f32  f4;                    // 0x004  the zoom-to-aim camera's distance back from the target
@@ -370,8 +370,8 @@ typedef struct CamTuning {
                                 //        lens's fB0, times the drop to it) is pushed out to it
     f32  fF4;                   // 0x0F4  fn_80043C74: a spot is taken when the dot product of its level
                                 //        direction to the ball with the camera's is below this
-    u8   unkF8[0xFC - 0xF8];
-    f32  fFC;                   // 0x0FC  CameraScript_IsDefaultSwingCam: the least dot product of the
+    f32  fF8;                   // 0x0F8
+    f32  fFC;                  // 0x0FC  CameraScript_IsDefaultSwingCam: the least dot product of the
                                 //        camera's and the aim's level directions from the ball
     f32  f100;                  // 0x100  CamScript_UpdateFairwayCam: moves on only from this level
                                 //        distance to the spot fn_80044768 picks ...
@@ -419,13 +419,17 @@ typedef struct CamTuning {
     f32  f194;                  // 0x194  fn_8003A148: how far a camera below its least height rises a frame
     f32  f198;                  // 0x198  fn_8003B534: the least ball speed it follows the flight at
     f32  f19C;                  // 0x19C  the steepest a camera direction may tilt (fn_8003D810, radians)
-    u8   unk1A0[0x1A4 - 0x1A0];
-    f32  f1A4;                  // 0x1A4  DynamicCam_ChoosePreFlightSequence: the obstruction test's slope
+    f32  f1A0;                  // 0x1A0
+    f32  f1A4;                 // 0x1A4  DynamicCam_ChoosePreFlightSequence: the obstruction test's slope
     f32  f1A8;                  // 0x1A8  fn_8003DCE8: how fast CamScript.fEC follows the ball's updates
                                 //        per frame
-    u8   unk1AC[0x1C0 - 0x1AC];
+    f32  f1AC;                  // 0x1AC
+    f32  f1B0;                  // 0x1B0
+    f32  f1B4;                  // 0x1B4
+    f32  f1B8;                  // 0x1B8
+    f32  f1BC;                  // 0x1BC
     s32  n1C0;                  // 0x1C0  nonzero enables camera 19
-    u8   unk1C4[0x1C8 - 0x1C4];
+    s32  n1C4;                  // 0x1C4
     s32  bCheckSlope;           // 0x1C8  fn_800C4650 tests the slope to the target (fn_800C4520)
     s32  bCheckTerrain;         // 0x1CC  and the ground in between (fn_800C4604)
     f32  f1D0;                  // 0x1D0  the steep-slope camera: height step per try (down going up, up going down)
@@ -440,8 +444,10 @@ typedef struct CamTuning {
     f32  f1F4;                  // 0x1F4  ... how far the aim may move per call
     f32  fMaxPitchUp;           // 0x1F8  fn_800C4AB0: the steepest camera angle above the horizontal (degrees)
     f32  fMaxPitchDown;         // 0x1FC  and below it
-    u8   unk200[0x20C - 0x200];
-    f32  f20C;                  // 0x20C  camera 4: the most View.f54 grows to
+    f32  f200;                  // 0x200
+    f32  f204;                  // 0x204
+    f32  f208;                  // 0x208
+    f32  f20C;                 // 0x20C  camera 4: the most View.f54 grows to
     f32  f210;                  // 0x210  camera 4: how fast (per second) it moves in from its start
     f32  f214;                  // 0x214  camera 4: how fast View.f54 grows and shrinks
     f32  f218;                  // 0x218  camera 4: how fast (per second) buttons 0x31/0x32 turn it round
@@ -449,7 +455,20 @@ typedef struct CamTuning {
     f32  f220;                  // 0x220  camera 4: its ground clearance, and its least height over the ball
     f32  f224;                  // 0x224  camera 4: (f20C - 1) times this raises the aim each frame ...
     s32  n228;                  // 0x228  ... unless this is set: then the aim is at the camera's height
+    f32  f22C;                  // 0x22C
+    f32  f230;                  // 0x230
+    f32  f234;                  // 0x234
+    f32  f238;                  // 0x238
+    f32  f23C;                  // 0x23C
+    f32  f240;                  // 0x240
+    f32  f244;                  // 0x244
+    f32  f248;                  // 0x248
+    s32  n24C;                  // 0x24C
+    f32  f250;                  // 0x250
+    f32  f254;                  // 0x254
+    f32  f258;                  // 0x258
 } CamTuning;
+LAYOUT_ASSERT(CamTuning, 0x25C);
 
 extern CamTuning* lbl_80281F78;         // EA's file list has GoCamTuningVars
 
