@@ -290,7 +290,7 @@ void Players_Reset(void);
 void Players_SetupAll(void);
 void fn_80037DD8(void);
 void PsBallFx_InitModule(void);
-void SH_vSetShadowIntensity(int n);
+void fn_800B251C_ShadowInit(int n);
 void UI_Obj_InitModule(void);
 void UStream_CloseAll(void);
 void UStream_Init(void);
@@ -603,7 +603,7 @@ void GO_vInitIG(void) {
     fn_8006DCA8(256, 224, 2, 4);
     fn_80029FC8();
     fn_8010A448(0x6000);
-    SH_vSetShadowIntensity(0);
+    fn_800B251C_ShadowInit(0);
     fn_800905A8();
     Session_SetupProfiles();
     fn_8001C254();

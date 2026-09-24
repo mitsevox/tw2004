@@ -106,7 +106,7 @@ void fn_800B24E0(f32 f) {
 }
 
 // Set the shadow up: its buffers, its render camera and texture, its mesh objects.
-void SH_vSetShadowIntensity(u8 bHigh) {
+void fn_800B251C_ShadowInit(u8 bHigh) {
     Shadow* p = lbl_802814A8;
     int i;
     s32 aDesc[2];

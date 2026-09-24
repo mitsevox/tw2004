@@ -1,5 +1,5 @@
 // GoShaderObject_Rain_Gc.c (EA's name, from its asserts; also in EA's 2002 source tree; TW06): the
-// rain shader object. Partly decompiled.
+// rain shader object: falling streaks drawn around the camera and splashes on the ground.
 
 #include "game_types.h"
 #include "engine.h"
