@@ -624,9 +624,9 @@ TNetwork* PlaceBall_GetPlaceBallNetwork(void) {
 u8 PlaceBall_UpdateMomentums(int nPlayer, f32 fSpeed) {
     SurfaceType* pSurface;
     f32          vPos[3];
-    f32          fGround;
     f32          fTicks;
     f32          fStep;
+    f32          fGround;
     f32          fZ;
     f32          fX;
     f32          fBaseX;
@@ -684,8 +684,11 @@ u8 PlaceBall_UpdateMomentums(int nPlayer, f32 fSpeed) {
     }
 
     // port: NTSC rate; the frame's length in ticks
-    fTicks = (59.94f / 60.0f) * (59.94f * gSession.fFrameTime);
-    fStep = -0.5f * fTicks * fSpeed;
+    fTicks = 59.94f / 60.0f;
+    fTicks *= 59.94f * gSession.fFrameTime;    // port: NTSC rate
+    fStep = -0.5f;
+    fStep *= fTicks;
+    fStep *= fSpeed;
     fStep *= fGround;
 
     if (gPlayers[nPlayer].fA80 < 0.0f) {
