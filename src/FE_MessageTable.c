@@ -2442,10 +2442,9 @@ void fn_8007E0F8(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_8007E128(MsgArg* pArgs, MsgArg* pResult) {
-    Award* pAward;
+    SaveProfile* pProfile = fn_80077ACC();
 
-    pAward = &fn_80077ACC()->aAward[pArgs[0].i];
-    pResult->i = pAward[23].bWon;
+    pResult->i = pProfile->aAward[pArgs[0].i + 23].bWon;
 }
 
 void fn_8007E174(MsgArg* pArgs, MsgArg* pResult) {
