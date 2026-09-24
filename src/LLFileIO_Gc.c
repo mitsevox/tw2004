@@ -333,8 +333,8 @@ void* fn_800065C8(const char* szPath, u32* puSize, int nAlign) {
         }
         fn_800B7490();
     }
-    uSize = info.uLength;
-    nLen = uSize;
+    nLen = info.uLength;
+    uSize = nLen;
     pData = fn_80009B34(uSize, 1, nAlign, "LLFileIO_Gc.c", 750);
     if (pData == NULL) {
         return NULL;
@@ -357,7 +357,7 @@ void* fn_800065C8(const char* szPath, u32* puSize, int nAlign) {
         }
     } while (!nStatus);
     if (puSize != NULL) {
-        *puSize = uSize;
+        *puSize = nLen;
     }
     return pData;
 }
