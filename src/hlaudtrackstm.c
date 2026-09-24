@@ -338,11 +338,10 @@ u8 Stm_Tick(AudTrack* pTrack) {
     fn_800B596C("Stm_Tick");
     pList = pTrack->pTmpl->data.pPlayList;
     if (DVDGetDriveStatus() == 0) {
-        ppVoice = pTrack->apVoices;
-        for (i = 0; i < pList->nChannels; i++, ppVoice++) {
-            if (*ppVoice != NULL && (*ppVoice)->flags.b.bB_6) {
-                (*ppVoice)->flags.b.bB_6 = 0;
-                fn_800ACA5C(*ppVoice, 0);
+        for (i = 0; i < pList->nChannels; i++) {
+            if (pTrack->apVoices[i] != NULL && pTrack->apVoices[i]->flags.b.bB_6) {
+                pTrack->apVoices[i]->flags.b.bB_6 = 0;
+                fn_800ACA5C(pTrack->apVoices[i], 0);
             }
         }
     }
