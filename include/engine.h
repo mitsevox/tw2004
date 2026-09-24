@@ -882,6 +882,24 @@ typedef struct Controllers {
 } Controllers;
 LAYOUT_ASSERT(Controllers, 0x84);
 
+// A mesh object's draw description (Skin.c's fn_80036100 loads it; Swing.c's club trail and
+// shadow.c's golfer shadow build one): nPrims strips, each a run of nCount vertices from nFirst.
+typedef struct TrailDraw {
+    s32  nPrims;                // 0x0
+    s16  nFirst;                // 0x4
+    s16  nCount;                // 0x6
+} TrailDraw;
+
+typedef struct TrailMeshDesc {
+    s16        n0;              // 0x00
+    s16        nVerts;          // 0x02
+    TrailDraw* pDraw;           // 0x04
+    s16*       pIndices;        // 0x08
+    f32*       pPos;            // 0x0C
+    u8*        pColour;         // 0x10
+    f32*       pUV;             // 0x14
+} TrailMeshDesc;
+
 int  fn_80012FA4(void);                 // controller init
 void fn_80012EF8(void);
 void fn_80012F18(int a);
