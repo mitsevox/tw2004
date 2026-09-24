@@ -80,7 +80,7 @@ void fn_800703B8(DynRenderBuffer* pBuf, u32 nStart, u16 nCount, int nPrim) {
 void fn_800704C4(DynRenderBuffer* pBuf, const void* pPos, const void* pColour, const void* pTexCoord,
                  int nVerts, u8 bFlip) {
     u8* pDst;
-    u32 uSize;
+    int uSize;
     u8 nBuffer;
 
     if (bFlip) {
