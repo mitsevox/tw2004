@@ -4,11 +4,18 @@
 
 #include "character.h"
 #include "charstate.h"
+#include "golfer.h"
+#include "unsorted/cull.h"
 
 void fn_80029BC8(f32* pVec);                            // sets a vector to lbl_80186838
-void fn_80026BF4(Skeleton* pSkel, IKChain* pChain);
-f32  fn_80026D18(Skeleton* pSkel, IKChain* pChain, f32* pTarget, int nLink, int n);   // an IK step's
-                                                                                     // remaining error
+void fn_80026BF4(CharModel* pModel, IKChain* pChain);
+f32  fn_80026D18(CharModel* pModel, IKChain* pChain, f32* pTarget, int nLink, int n);   // an IK step's
+                                                                                       // remaining error
+void fn_800271A0(CharModel* pModel, IKChain* pChain);
+void fn_80027478(CharModel* pModel, IKChain* pChain);
+void fn_80008F20(f32* pQ, f32* pOut);                   // Quaternion.c
+void fn_8001FBA4(f32* pA, f32* pB, f32* pOut, f32 fT);  // a blend of two points by fT
+void fn_800BAD60(f32 mtx[4][4], Vec4* src, Vec4* dst);  // VecMath.c: a point through a matrix
 void fn_800BADF8(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);   // pDst = pSrc's rows
                                                                                 // through pMtx
 void fn_80113E60(void);                                 // DynChain.c
@@ -86,17 +93,17 @@ void fn_80027108(Skeleton* pSkel) {
 
 // Solves the chain toward pTarget: up to nIterations steps, each followed by pfnError (when given)
 // in place of the step's own error; stops once the error is below fTolerance.
-void fn_800273BC(Skeleton* pSkel, IKChain* pChain, f32* pTarget, s32 nIterations,
-                 f32 (*pfnError)(Skeleton* pSkel, IKChain* pChain, f32* pTarget), f32 fTolerance) {
+void fn_800273BC(CharModel* pModel, IKChain* pChain, f32* pTarget, s32 nIterations,
+                 f32 (*pfnError)(CharModel* pModel, IKChain* pChain, f32* pTarget), f32 fTolerance) {
     s32 i;
     f32 fError;
 
     for (i = 0; i < nIterations; i++) {
-        fError = fn_80026D18(pSkel, pChain, pTarget, pChain->nLinks - 2, 0);
+        fError = fn_80026D18(pModel, pChain, pTarget, pChain->nLinks - 2, 0);
         if (pfnError != NULL) {
-            fError = pfnError(pSkel, pChain, pTarget);
+            fError = pfnError(pModel, pChain, pTarget);
         }
-        fn_80026BF4(pSkel, pChain);
+        fn_80026BF4(pModel, pChain);
         if (fError < fTolerance) {
             break;
         }
@@ -181,6 +188,83 @@ void SKEL_TransitionIK(Skeleton* pSkel, u8 b, f32 f) {
         pSkel->f1074 = -f;
         pSkel->f1078 = f;
     }
+}
+
+// Runs the IK transition toward its target weight, then (with any IK weight) solves the arms: the
+// first chain, then the second toward a point off the grip bone (0x52), whose pose is blended back
+// by the weight while flag 0x4000 holds it. Redoes the bones below 0x23 and the club point.
+void fn_800279C0(Character* pChar) {
+    f32 vGrip[4];
+    f32 qGrip[4];
+    f32 vTarget[4];
+    u32 aBits[4];
+    f32 qRot[4];
+    f32 qInv[4];
+    CharModel* pModel = pChar->pModel;
+    Skeleton* pSkel = pModel->pSkel;
+    IKChain* pChain;
+    BonePose* pGrip;
+    BonePose* pPose28;
+    int nGrip;
+    int n28;
+
+    if (pSkel == NULL || lbl_802810A6 == 0) return;
+    if (pSkel->f1074 > 0.0f) {
+        pSkel->f1074 -= gSession.fFrameTime;
+        if (pModel->pSkel->f1074 < 0.0f) {
+            pModel->pSkel->f1074 = 0.0f;
+        }
+        SKEL_SetIKSolutionWeight(pModel->pSkel, pModel->pSkel->f1074 / pModel->pSkel->f1078);
+    } else if (pSkel->f1074 < 0.0f) {
+        pSkel->f1074 += gSession.fFrameTime;
+        if (pModel->pSkel->f1074 > 0.0f) {
+            pModel->pSkel->f1074 = 0.0f;
+        }
+        SKEL_SetIKSolutionWeight(pModel->pSkel, 1.0f + pModel->pSkel->f1074 / pModel->pSkel->f1078);
+    }
+    if (pSkel->fIKWeight <= 0.0f) return;
+
+    pChain = &pSkel->pChains[1];
+    if (pSkel->n10E4 != 0) {
+        fn_80008F20(pSkel->q10D4, qInv);
+        fn_80008FCC(qInv, pSkel->p20[fn_8001EEE4(pModel, 0x11)], qRot);
+        fn_8001E85C(qRot, pSkel->p20[fn_8001EEE4(pModel, 0x11)]);
+        pSkel->n10E4--;
+    }
+    nGrip = fn_8001EED8(pModel, 0x52);
+    pGrip = &pModel->pPoses[nGrip];
+    if (pSkel->fIKWeight > 0.0f && pSkel->fIKWeight < 1.0f) {
+        fn_8001E85C(pGrip->q0, qGrip);
+        fn_8001E85C(pGrip->v10, vGrip);
+    }
+    fn_80027478(pModel, pSkel->pChains);
+    if (pChar->u10 & 0x4000) {
+        if (pSkel->fIKWeight > 0.0f && pSkel->fIKWeight < 1.0f) {
+            fn_8000883C(qGrip, pGrip->q0, pSkel->fIKWeight);
+            fn_8001FBA4(pGrip->v10, vGrip, pGrip->v10, 1.0f - pSkel->fIKWeight);
+            fn_8000914C(pGrip->q0, pModel->pMatrices[nGrip]);
+            fn_8001E880(pGrip->v10, pModel->pMatrices[nGrip][3]);
+        }
+    }
+    fn_800271A0(pModel, pChain);
+    fn_8001EEE4(pModel, 0x15);  // EA drops the answer
+    n28 = fn_8001EEE4(pModel, 0x28);
+    pPose28 = &pModel->pPoses[n28];
+    fn_800090E4(pGrip->q0, pSkel->v108C, vTarget);
+    fn_800090A0(vTarget, pGrip->v10, vTarget);
+    vTarget[3] = 0.0f;
+    fn_800273BC(pModel, pChain, vTarget, pChain->n18, NULL, pChain->f1C);
+    if (pSkel->fIKWeight < 1.0f) {
+        fn_8002703C(pSkel, pChain, pSkel->fIKWeight);
+    }
+    fn_80008FCC(pSkel->q107C, pGrip->q0, pPose28->q0);
+    fn_8001EB6C(pModel->a14, n28);
+    fn_8001E938(aBits, 0x80);
+    fn_8001EA34(aBits, fn_8001EEE4(pModel, 0x23));
+    SKEL_TransformBones(pModel, aBits);
+    fn_800BAD60(pModel->pMatrices[nGrip], (Vec4*)pChar->p16D8->a3C[pChar->nClubClass],
+                (Vec4*)pChar->aPoints[4]);
+    fn_80026F90(pModel->pSkel, pChain, 0);
 }
 
 // TW06: SKEL_TranslateIKChainY. Moves the chain's bones up by f, in their poses and matrices.

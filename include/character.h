@@ -94,7 +94,10 @@ typedef struct Skeleton {
     f32  fIKWeight;             // 0x1070  SKEL_SetIKSolutionWeight
     f32  f1074;                 // 0x1074  } set by fn_8002792C and SKEL_TransitionIK
     f32  f1078;                 // 0x1078  }
-    u8   unk107C[0x10A4 - 0x107C];
+    f32  q107C[4];              // 0x107C  a rotation (quaternion) fn_800279C0 turns the grip's by
+    f32  v108C[4];              // 0x108C  an offset from the grip, turned by its rotation: the IK
+                                //         target of the second chain (fn_800279C0)
+    u8   unk109C[0x10A4 - 0x109C];
     f32  v10A4[4];              // 0x10A4
     f32  v10B4[4];              // 0x10B4  v10A4 scaled by the IK weight
     f32  f10C4;                 // 0x10C4  the IK weight
