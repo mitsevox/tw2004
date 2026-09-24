@@ -43,14 +43,14 @@ void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
     f32 fProj;
     f32 fU;
     f32 fV;
-    f32 fU0;
-    f32 fV0;
-    f32 fU1;
-    f32 fV1;
-    f32 fU2;
-    f32 fV2;
-    f32 fU3;
-    f32 fV3;
+    f64 fU0;            // f64: the original keeps these in 8-byte stack slots
+    f64 fV0;
+    f64 fU1;
+    f64 fV1;
+    f64 fU2;
+    f64 fV2;
+    f64 fU3;
+    f64 fV3;
     f32 fStart;
     f32 fEnd;
     f32 fAngle;
@@ -74,7 +74,7 @@ void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
     UITransform* pAdd;
     TexBank* pBank;
     int nBank;
-    int nHi;
+    u32 nHi;
     int nLo;
     int i;
     int j;
@@ -146,8 +146,8 @@ void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
     for (i = 0; i < pArc->nSegments;) {
         if (i == 0) {
             if (pArc->uFlags & 0x20) {
-                fS = (f32)(pArc->nSegments - i) / pArc->nSegments;
                 fT = (f32)i / pArc->nSegments;
+                fS = (f32)(pArc->nSegments - i) / pArc->nSegments;
                 fA = colorB.a * fT + colorA.a * fS;
                 if (!(pArc->uFlags & 4) || (pArc->uFlags & 2)) {
                     fR = colorB.r * fT + colorA.r * fS;
@@ -193,8 +193,8 @@ void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
 
         // the colour and angle at the segment's far edge (and the next segment's near edge)
         if (pArc->uFlags & 0x20) {
-            fS = (f32)(pArc->nSegments - i) / pArc->nSegments;
             fT = (f32)i / pArc->nSegments;
+            fS = (f32)(pArc->nSegments - i) / pArc->nSegments;
             fA = colorB.a * fT + colorA.a * fS;
             if (!(pArc->uFlags & 4) || (pArc->uFlags & 2)) {
                 fR = colorB.r * fT + colorA.r * fS;
