@@ -6,24 +6,28 @@
 #include "game.h"
 #include "golfer.h"
 #include "dynobj.h"
+#include "camera.h"
+#include "terrain.h"
 
-void fn_80036054(void* pMesh, int n, s32* pDesc);  // Skin.c
-void fn_800360A0(void* pMesh);     // Skin.c
+void fn_80036054(ShaderObject* pObj, int nRow, const void* pDesc);  // Skin.c
+void fn_800360A0(ShaderObject* pObj);                               // Skin.c
+void fn_800360D4(ShaderObject* pObj);                               // Skin.c
+void fn_800352BC(void);
 void PsBallFx_TriggerTrail(Ball* pBall, int nPlayer);   // below; Ball.c declares it too
 void fn_800A34C0(int n, Ball* pBall, f32* pDir);          // not yet decompiled
 
 // Set up the mesh and its buffers (50 quads; the second buffer gets each quad's texture corners),
 // clear the emitters and find the "sandtrl" texture.
 void PsBallFx_InitModule(void) {
-    s32 desc[2];
+    DynRenderSize size;
     int i;
     f32 fZero = 0.0f;
     f32 fOne = 1.0f;
     u64 uHash;
 
-    desc[0] = 400;
-    desc[1] = 2;
-    fn_80036054(lbl_80281408->mesh, 0, desc);
+    size.nMaxVerts = 400;
+    size.nMaxDraws = 2;
+    fn_80036054(&lbl_80281408->mesh, 0, &size);
     lbl_80281408->p2C = fn_80009B34(0x640, 2, 16, "PsBallFx.c", 1435);
     lbl_80281408->p30 = fn_80009B34(0x320, 2, 16, "PsBallFx.c", 1440);
     lbl_80281408->p28 = fn_80009B34(0x960, 2, 16, "PsBallFx.c", 1445);
@@ -47,7 +51,7 @@ void PsBallFx_InitModule(void) {
 }
 
 void fn_800A2E14(void) {
-    fn_800360A0(lbl_80281408->mesh);
+    fn_800360A0(&lbl_80281408->mesh);
     fn_80009E70(lbl_80281408->p28);
     fn_80009E70(lbl_80281408->p2C);
     fn_80009E70(lbl_80281408->p30);
@@ -81,7 +85,7 @@ void fn_800A2E68(void) {
 // Start the effects of emitters 9 and 10 at nPlayer's ball (only with a club up to 8).
 void fn_800A2FFC(int nPlayer, int bOn) {
     f32 vPos[4];
-    PsEmitterDef* pDef;
+    ParticleParams* pDef;
     PsEmitter* pEmitter;
     int nView;
 
@@ -104,7 +108,7 @@ void fn_800A2FFC(int nPlayer, int bOn) {
 }
 
 void fn_800A30E4(int nKind, Ball* pBall, int nPlayer, u8 bFlight, f32 fValue) {
-    PsEmitterDef* pDef;
+    ParticleParams* pDef;
     int i;
     PsEmitter* pEmitter;
 
@@ -224,6 +228,69 @@ void PsBallFx_TriggerTrail(Ball* pBall, int nPlayer) {
     }
 }
 
+// Keep each view's emitter from fn_800A2FFC at the ball of the player that view follows, then
+// draw the sand trail: the indices from n40 up to n38 in the ring of 600 (two draws when they
+// wrap), once it has more than two vertices.
+void fn_800A3A84(void) {
+    DynRenderDrawIn aDraws[2];
+    DynRenderFill fill;
+    PsEmitter* pEmitter;
+    s32 nFirst;
+    s32 nEnd;
+
+    pEmitter = lbl_80281408->ap74[0];
+    if (pEmitter != NULL && (pEmitter->params.u58 & 0x20000)) {
+        Vec_Copy(gPlayers[fn_8001707C(0)].ball.vPos, pEmitter->params.v80);
+        Vec_Copy(gPlayers[fn_8001707C(0)].ball.vPos, lbl_80281408->ap74[0]->mtx[3]);
+    }
+    pEmitter = lbl_80281408->ap74[1];
+    if (pEmitter != NULL && (pEmitter->params.u58 & 0x20000)) {
+        Vec_Copy(gPlayers[fn_8001707C(1)].ball.vPos, pEmitter->params.v80);
+        Vec_Copy(gPlayers[fn_8001707C(1)].ball.vPos, lbl_80281408->ap74[1]->mtx[3]);
+    }
+    fn_80014118(0x70);
+    fn_800352BC();
+    fn_80013CCC(fn_8001614C());
+    fn_80013EEC(fn_8001614C());
+    fn_80035240(0);
+    fn_80016B9C();
+    fn_80035138(0);
+    fn_80012F50(0, 6, 0x80);
+    fn_80012F18(3);
+    fn_80035118(1, 1);
+    fn_80012EF8();
+    if (lbl_80281408->n44 > 2) {
+        fn_8005CC64(lbl_80281408->pBank, lbl_80281408->pTex);
+        fn_80012EF8();
+        nFirst = lbl_80281408->n40;
+        nEnd = lbl_80281408->n38;
+        if (nFirst < nEnd) {
+            fill.nCount = 1;
+            aDraws[0].nPrim = 0;
+            aDraws[0].nStart = nFirst;
+            aDraws[0].nCount = nEnd - nFirst;
+        } else {
+            aDraws[0].nPrim = 0;
+            fill.nCount = 2;
+            aDraws[0].nStart = nFirst;
+            aDraws[0].nCount = 600 - nFirst;
+            aDraws[1].nPrim = 0;
+            aDraws[1].nStart = 0;
+            aDraws[1].nCount = nEnd;
+        }
+        fill.pDraws = aDraws;
+        fill.nVerts = lbl_80281408->n44;
+        fill.pIndices = lbl_80281408->p50;
+        fill.pPos = lbl_80281408->p28;
+        fill.pColour = lbl_80281408->p30;
+        fill.pTexCoord = lbl_80281408->p2C;
+        fn_80036100(&lbl_80281408->mesh, &fill, 1);
+        fn_800360D4(&lbl_80281408->mesh);
+    }
+    fn_80012F50(1, 6, 0x80);
+    fn_80012EF8();
+}
+
 // Start emitter 15 at pPos for nPlayer's view, drifting with a tenth of the wind.
 void fn_800A3CB0(f32* pPos, int nPlayer) {
     f32 vWind[4];
@@ -242,15 +309,15 @@ void fn_800A3CB0(f32* pPos, int nPlayer) {
 // Move the emitter of nPlayer's view to pPos.
 void fn_800A3D6C(f32* pPos, int nPlayer) {
     int nView = gPlayers[nPlayer].nView[0];
-    if (lbl_80281408->apEmitter[nView] != NULL && (lbl_80281408->apEmitter[nView]->uB8 & 0x20000)) {
-        Vec_Copy(pPos, lbl_80281408->apEmitter[nView]->vE0);
-        Vec_Copy(pPos, lbl_80281408->apEmitter[nView]->v30);
+    if (lbl_80281408->apEmitter[nView] != NULL && (lbl_80281408->apEmitter[nView]->params.u58 & 0x20000)) {
+        Vec_Copy(pPos, lbl_80281408->apEmitter[nView]->params.v80);
+        Vec_Copy(pPos, lbl_80281408->apEmitter[nView]->mtx[3]);
     }
 }
 
 void fn_800A3DF4(int nPlayer) {
     PsEmitter* pEmitter = lbl_80281408->apEmitter[gPlayers[nPlayer].nView[0]];
-    if (pEmitter != NULL && (pEmitter->uB8 & 0x20000)) {
+    if (pEmitter != NULL && (pEmitter->params.u58 & 0x20000)) {
         pEmitter->n50 = 1000000;
     }
 }

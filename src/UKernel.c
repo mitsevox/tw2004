@@ -4,6 +4,7 @@
 
 #include "dynobj.h"
 #include "terrain.h"
+#include "psmgr.h"
 
 DynObj* fn_80049018(DynObjSetup* pSetup);
 int  fn_8000EA1C(const char* pName, int a, int b, void* pObj);
@@ -13,7 +14,6 @@ void fn_8000C5A4(f32 (*pMtx)[4]);
 
 void fn_800646D0(UStreamObject* pObject);
 void fn_80064A0C(UStreamObject* pObject);
-void fn_8009943C(u8* pData, u32 uSize);
 void fn_800A4CB8(UStreamObject* pObject, int n);
 void fn_800EADDC(void* pObj);
 
@@ -67,7 +67,7 @@ void fn_80048BDC(UStreamObject* pObject) {
         if (!fn_800347B4(pObject)) return;
         break;
     case 7:
-        fn_8009943C(pObject->pData, pObject->uSize);
+        fn_8009943C((PsEmitterRecord*)pObject->pData, pObject->uSize);
         fn_80009E70(pObject);
         return;
     case 8:
