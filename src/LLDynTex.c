@@ -30,6 +30,7 @@ void fn_80007254(void);                 // LLDisp_Gc.c
 int  fn_800106F0(TexBank* pBank);       // LLTexGrp.c
 int  fn_8001005C(TexBank* pBank, u64 uHash);       // LLTex.c: the texture's index, or 0x80000000
 TexEntry* fn_800107E4(TexBank* pBank, int nTex);  // LLTexGrp.c
+s32  fn_8010BC94(const void* pA, const void* pB);
 
 // Set up: the state and its nSize-byte block (gomainloop.c: 0x18000, later 0x6000).
 void fn_8010A448(int nSize) {
@@ -494,6 +495,15 @@ void fn_8010BC88(void* p) {
     lbl_80282488->p8 = p;
 }
 
+// qsort's order for DynTexUse entries: by where their textures' pixels start in the bank.
+s32 fn_8010BC94(const void* pA, const void* pB) {
+    // port: EA converts the offsets as signed
+    f32 fA = (s32)((DynTexUse*)pA)->pTex->uPixels;
+    f32 fB = (s32)((DynTexUse*)pB)->pTex->uPixels;
+
+    return (fA < fB) ? -1 : (fA >= fB);
+}
+
 // Note that a skin uses the bank's texture uId (and the one paired with it), with p and n; an
 // unknown name is only turned into text.
 void fn_8010BCFC(u64 uId, void* p, s32 n) {
@@ -526,6 +536,16 @@ void fn_8010BCFC(u64 uId, void* p, s32 n) {
 
 void fn_8010BEC4(void) {
     lbl_80282488->n96C = 0;
+}
+
+// Start over: sort the textures in use by where their pixels start (fn_8010BC94).
+void fn_8010BED4(void) {
+    lbl_80282488->b975 = 1;
+    lbl_80282488->b974 = 1;
+    lbl_80282488->n978 = 0;
+    lbl_80282488->n970 = 0;
+    lbl_80282488->n980 = 1;
+    qsort(lbl_80282488->aUses, lbl_80282488->n96C, sizeof(DynTexUse), fn_8010BC94);
 }
 
 // Whether the queue is empty and nothing is left to do.

@@ -40,7 +40,7 @@ typedef struct DynTexState {
     struct TexBank** p8;        // 0x008  set by fn_8010BC88 (char.c gives it &Character.p50)
     DynTexUse aUses[150];       // 0x00C  n96C of them (fn_8010BCFC)
     s32   n96C;                 // 0x96C
-    u8    unk970[4];
+    s32   n970;                 // 0x970  cleared by fn_8010BED4
     u8    b974;                 // 0x974  set by fn_8010BFA0
     u8    b975;                 // 0x975  set once n978 reaches n984
     u8    unk976[2];
