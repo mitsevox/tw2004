@@ -1098,7 +1098,7 @@ config.libs = [
             Object(Matching, "unsorted/sweep_8014CA80.c"),
             Object(Matching, "unsorted/sweep_801654D0.c"),
             Object(Matching, "unsorted/sweep_80165524.c"),
-            Object(NonMatching, "Code80012ED0.c"),
+            Object(Matching, "Code80012ED0.c"),
             Object(NonMatching, "Controller_Gc.c"),
             Object(Matching, "unsorted/sweep_800136F4.c"),
             Object(Matching, "unsorted/sweep_80045E3C.c"),
