@@ -172,7 +172,6 @@ void fn_80110C88(HwsBurn* pBurn, int n) {
 // What variant nVariant of part nPart uses: its chosen options (all without one), and the
 // options its links pick on other parts' chosen variants.
 void fn_80110D10(HwsBurn* pBurn, int nPart, int nVariant) {
-    SkinVariant* pVariant;
     SkinLink* pLink;
     SkinVariant* pOther;
     s32 nOption;
@@ -240,9 +239,9 @@ void* fn_80110E98(u8* pBase, s32* pOffset, void* pSrc, s32 nSize, s32 nAlign) {
 
 // List the bits of p40 that are set (a44) and give each its place in the list (a48).
 s32 fn_80110F2C(HwsBurn* pBurn) {
-    int n = 0;
-    int nBits = pBurn->pDesc->n40;
     int i;
+    int nBits = pBurn->pDesc->n40;
+    int n = 0;
 
     for (i = 0; i < nBits; i++) {
         if (fn_8001E9CC(pBurn->p40, i)) {
@@ -257,10 +256,10 @@ s32 fn_80110F2C(HwsBurn* pBurn) {
 
 // The bytes the SkinDesc.p28 blocks take, each rounded up to nAlign.
 s32 fn_80111310(HwsBurn* pBurn, s32 nAlign) {
-    s32 nBytes = 0;
     SkinDesc* pDesc = pBurn->pDesc;
-    int n = pDesc->n24;
     int i;
+    int n = pDesc->n24;
+    s32 nBytes = 0;
 
     for (i = 0; i < n; i++) {
         nBytes += fn_80110E74(pDesc->p28[i].p10, pDesc->p28[i].n14, 1, nAlign);
@@ -283,9 +282,9 @@ SkinDesc28* fn_80111384(HwsBurn* pBurn, u8* pBase, s32* pOffset, s32 nAlign) {
 
 // List the bits of p54 that are set (a58) and give each its place in the list (a5C).
 s32 fn_80111424(HwsBurn* pBurn) {
-    int n = 0;
-    int nBits = pBurn->pDesc->n38;
     int i;
+    int nBits = pBurn->pDesc->n38;
+    int n = 0;
 
     for (i = 0; i < nBits; i++) {
         if (fn_8001E9CC(pBurn->p54, i)) {
@@ -301,18 +300,20 @@ s32 fn_80111424(HwsBurn* pBurn) {
 // The SkinDesc.p3C entries of the listed bits of p54, each through a30 (-1 stays -1), at
 // pBase + *pOffset. NULL when none are listed.
 s32* fn_801114AC(HwsBurn* pBurn, u8* pBase, s32* pOffset, s32 nAlign) {
+    SkinDesc* pDesc = pBurn->pDesc;
+    int n = pBurn->n50;
     s32* aOut;
     s32 v;
     int i;
 
-    if (pBurn->n50 == 0) {
+    if (n == 0) {
         return NULL;
     }
     aOut = (s32*)(pBase + *pOffset);
-    *pOffset += pBurn->n50 * 4;
-    *pOffset = (nAlign + *pOffset - 1) & ~(nAlign - 1);
-    for (i = 0; i < pBurn->n50; i++) {
-        v = ((s32*)pBurn->pDesc->p3C)[pBurn->a58[i]];
+    *pOffset += n * 4;
+    *pOffset = (*pOffset + nAlign - 1) & ~(nAlign - 1);
+    for (i = 0; i < n; i++) {
+        v = ((s32*)pDesc->p3C)[pBurn->a58[i]];
         if (v != -1) {
             v = pBurn->a30[v];
         }
@@ -338,8 +339,8 @@ s32* fn_80111540(HwsBurn* pBurn, u8* pBase, s32* pOffset, s32 nAlign) {
 
 // Copy SkinDesc.p14 and hand each entry to the burn's callback.
 void fn_801115C4(HwsBurn* pBurn) {
-    int n = pBurn->n60;
     int i;
+    int n = pBurn->n60;
 
     memcpy(pBurn->a64, pBurn->pDesc->p14, n * sizeof(SkinDesc14));
     for (i = 0; i < n; i++) {
