@@ -632,6 +632,69 @@ void fn_80018710(Character* pChar) {
     }
 }
 
+// A golfer is dropped to 0.01 below the lowest of its four ground heights (the test points move
+// with it) and a179C set to the average ground normal; any other character stands on the ground
+// under its root bone (the ground below it, if the one found is more than 1 above).
+void Character_PlaceFeetOnGround(Character* pChar) {
+    CourseInfo* pCourse;
+    f32 fLowest;
+    f32 fY;
+    f32 fDelta;
+    f32* pPos;
+    int i;
+    f32 fLow;
+    f32 fHigh;
+    SurfaceType* pSurfLow;
+    SurfaceType* pSurfHigh;
+    f32 vNormalLow[4];
+    f32 vNormalHigh[4];
+
+    if (pChar == NULL) {
+        return;
+    }
+    pCourse = fn_8000C594();
+    if (pCourse == NULL) {
+        return;
+    }
+    fLowest = 1073741824.0f;
+    if (fn_8001EC48(pChar)) {
+        pChar->a179C[0] = 0.0f;
+        pChar->a179C[1] = 0.0f;
+        pChar->a179C[2] = 0.0f;
+        pChar->a179C[3] = 0.0f;
+        for (i = 0; i < 4; i++) {
+            fn_8001EF54(pChar->aGroundNormal[i], pChar->a179C, pChar->a179C);
+            if (pChar->afGroundHeight[i] < fLowest) {
+                fLowest = pChar->afGroundHeight[i];
+            }
+        }
+        fn_800BAF04(pChar->a179C, pChar->a179C);
+        if (fLowest < -60000.0f) {
+            return;
+        }
+        fY = fLowest - 0.01f;
+        fDelta = fY - pChar->pModel->pBones[0].v1C[1];
+        pChar->pModel->pBones[0].v1C[1] = fY;
+        pChar->aPoints[0][1] += fDelta;
+        pChar->aPoints[1][1] += fDelta;
+        pChar->aPoints[2][1] += fDelta;
+        pChar->aPoints[3][1] += fDelta;
+        pChar->aPoints[4][1] += fDelta;
+        return;
+    }
+    pPos = pChar->pModel->pBones[0].v1C;
+    Ter_GetEnclosingGroundData(pCourse, pPos, &fLow, &pSurfLow, vNormalLow, &fHigh, &pSurfHigh,
+                               vNormalHigh);
+    fY = fHigh;
+    if (fHigh < -60000.0f || fHigh > 1.0f + pPos[1]) {
+        fY = (fLow < -60000.0f) ? pPos[1] : fLow;
+    }
+    if (fY > 131072.25f || fY < -131072.25f) {
+        return;
+    }
+    pChar->pModel->pBones[0].v1C[1] = fY;
+}
+
 // Puts a golfer's legs on the ground by IK: with bLegA the leg of bones 0x36-0x3A (point 2),
 // with bLegB the leg of bones 0x44-0x48 (point 3); the bones they move are then transformed again.
 void fn_8001899C(Character* pChar, u8 bLegA, u8 bLegB) {
