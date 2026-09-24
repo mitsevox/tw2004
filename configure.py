@@ -1093,6 +1093,7 @@ config.libs = [
             Object(NonMatching, "event.c"),
             Object(NonMatching, "Code80067710.c"),
             Object(Matching, "unsorted/sweep_8009554C.c"),
+            Object(Matching, "Code80095564.c"),
             Object(Matching, "unsorted/sweep_8009B314.c"),
             Object(Matching, "Code8009B340.c"),
             Object(Matching, "unsorted/sweep_801338E0.c"),
