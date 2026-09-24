@@ -6,6 +6,7 @@
 #define CHARSTATE_H
 
 #include "character.h"
+#include "endian.h"                 // SwapField
 #include "game/save.h"              // SkinChoice, SkinChoices
 
 // ---- a skin's parts (SkinPart.c) ----------------------------------------------------------------
@@ -388,6 +389,16 @@ typedef struct CharSliderDefs {
     s32  nMorphs;               // 0x0C
     u64* aMorphIds;             // 0x10  the skin's morph targets, in fn_8011CADC's order
 } CharSliderDefs;
+
+// The byte-swap layouts CharSlider_CreateDefinitionsFromMem reads the definitions with.
+extern SwapField lbl_80193C30[10];      // CharSliderDef
+extern SwapField lbl_80193BF0[6];       // CharSliderLink
+extern SwapField lbl_80193C20[2];       // CharSliderLimit
+extern SwapField lbl_80193B98[4];       // CharSliderRange of bones
+extern SwapField lbl_80193B70[5];       // CharSliderBone
+extern SwapField lbl_80193BD0[4];       // CharSliderRange of morph targets
+extern SwapField lbl_80193BB8[3];       // CharSliderMorph
+extern SwapField lbl_80281788[1];       // a morph target id (u64)
 
 // The iterator fn_80113B34 builds in a buffer: its first word points at its next function.
 typedef struct SkinIter {
