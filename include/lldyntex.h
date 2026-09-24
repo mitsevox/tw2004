@@ -53,7 +53,7 @@ void  fn_8010BC64(u8* p);
 void  fn_8010BC88(void* p);
 void  fn_8010BEC4(void);
 void  fn_8010BED4(void);
-void  fn_8010A6A8(void* pSrc, void* pDst);   // char.c: from the model in use to the other one
+void  fn_8010A6A8(struct DynTex* pSrc, struct DynTex* pDst);   // char.c: from the model in use to the other one
 DynTexJob* fn_8010B8EC(void);           // a free job, or NULL
 void  fn_8010B930(DynTexJob* pJob);     // queue it
 
@@ -69,15 +69,15 @@ LAYOUT_ASSERT(DynTexEntry, 0x20);
 
 // Where a pixel block sits in DynTex.p18 (0xC bytes).
 typedef struct DynTexBlock {
-    u8    unk0[8];
-    s32   nOffset;              // 0x8
+    s32   nOffset;              // 0x0
+    u8    unk4[8];
 } DynTexBlock;
 LAYOUT_ASSERT(DynTexBlock, 0xC);
 
-// Per texture (0x50 bytes, DynTexHeader.p8): its blocks, then more not read yet.
+// Per texture (0x50 bytes, DynTexHeader.p8): its id, its blocks, then more not read yet.
 typedef struct DynTexObj {
-    DynTexBlock aBlocks[4];     // 0x00  DynTexEntry.n8 of them
-    u8    unk30[8];
+    u64   uId;                  // 0x00  copied to DynTexEntry.uId (fn_8010B0C0)
+    DynTexBlock aBlocks[4];     // 0x08  DynTexEntry.n8 of them
     u16   n38;                  // 0x38  } its size in pixels, halved per level (fn_8010B6AC)
     u16   n3A;                  // 0x3A  }
     s16   n3C;                  // 0x3C  set by fn_8010ADA4
@@ -88,12 +88,23 @@ typedef struct DynTexObj {
 } DynTexObj;
 LAYOUT_ASSERT(DynTexObj, 0x50);
 
-// Per texture (0xC bytes, DynTexHeader.pC): where its palette sits in DynTex.p18.
+// Per texture (0xC bytes, DynTexHeader.pC): where its palette sits in DynTex.p18, and its size.
 typedef struct DynTexPalette {
     s32   nOffset;              // 0x0
-    u8    unk4[8];
+    u8    unk4[4];
+    s16   nEntries;             // 0x8
+    s16   nFormat;              // 0xA  a pixel format, as DynTexObj.n40
 } DynTexPalette;
 LAYOUT_ASSERT(DynTexPalette, 0xC);
+
+// Per texture: DynTexHeader.p10's and p14's entries (fn_8010ADA4 only moves them).
+typedef struct DynTex40 {
+    u8    unk0[0x40];
+} DynTex40;
+
+typedef struct DynTex18 {
+    u8    unk0[0x18];
+} DynTex18;
 
 // What DynTex.p4 points at; only what the code reads so far.
 typedef struct DynTexHeader {
@@ -103,8 +114,11 @@ typedef struct DynTexHeader {
     u8    unk6[2];
     DynTexObj* p8;              // 0x08
     DynTexPalette* pC;          // 0x0C
-    u8*   p10;                  // 0x10  0x40 bytes per texture
-    u8*   p14;                  // 0x14  0x18 bytes per texture
+    struct DynTex40* p10;       // 0x10  } per texture, not read yet
+    struct DynTex18* p14;       // 0x14  }
+    u8*   p18;                  // 0x18  the textures' pixels (at their blocks' nOffset)
+    u8    unk1C[4];
+    u8*   p20;                  // 0x20  and palettes (at their DynTexPalette.nOffset)
 } DynTexHeader;
 
 // A dynamic texture (made by fn_8010A520, freed by fn_8010A668); only what the code reads so far.

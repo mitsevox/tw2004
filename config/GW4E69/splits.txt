@@ -610,6 +610,10 @@ rcmp_mad_codec.c:
 
 Trax.c:
 	.text       start:0x800B9FF0 end:0x800BA74C
+	.rodata     start:0x80184C68 end:0x80184C78
+	.bss        start:0x801F8458 end:0x801FA0F0
+	.sdata      start:0x80281508 end:0x80281510
+	.sdata2     start:0x802841E0 end:0x80284238
 
 ScreenClear.c:
 	.text       start:0x800BA74C end:0x800BA940
@@ -658,6 +662,7 @@ Calendar.c:
 
 CourseData.c:
 	.text       start:0x800D29E8 end:0x800D3244
+	.data       start:0x801917B0 end:0x801917D0
 
 Earnings.c:
 	.text       start:0x800D3244 end:0x800D9E14

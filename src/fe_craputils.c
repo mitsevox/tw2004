@@ -44,6 +44,6 @@ void fn_800588D4(s16 n) {
     lbl_80281DF0.n = n;
 }
 
-s16 fn_800588E8(void) {
+int fn_800588E8(void) {
     return lbl_80281DF0.n;
 }

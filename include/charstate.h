@@ -6,6 +6,7 @@
 #define CHARSTATE_H
 
 #include "character.h"
+#include "endian.h"                 // SwapField
 #include "game/save.h"              // SkinChoice, SkinChoices
 
 // ---- a skin's parts (SkinPart.c) ----------------------------------------------------------------
@@ -66,9 +67,16 @@ typedef struct SkinMesh {
 } SkinMesh;
 LAYOUT_ASSERT(SkinMesh, 0x10);
 
+// A pair of bytes of a SkinDesc28 (fn_80110A38 and fn_80113910 add up the n1s).
+typedef struct SkinDesc28Pair {
+    s8   n0;                    // 0x0
+    s8   n1;                    // 0x1
+} SkinDesc28Pair;
+
 typedef struct SkinDesc28 {
-    s32  n0;                    // 0x00
-    u8   unk4[0x10 - 4];
+    s32  n0;                    // 0x00  pairs in a8 (fn_80113910 reads n0 of them, not only four)
+    u8   unk4[4];
+    SkinDesc28Pair a8[4];       // 0x08
     void* p10;                  // 0x10  } a block hwsBurn.c copies (fn_80111384)
     s32  n14;                   // 0x14  } and its size
 } SkinDesc28;
@@ -302,7 +310,7 @@ typedef struct HwsRender10 {
 
 // The GameCube renderer's state (lbl_80223BB0; hwsRender_Gc.c, hwsOverride_Gc.c).
 typedef struct HwsRenderState {
-    void* p0;                   // 0x00  fn_801138CC sets it
+    SkinDesc* pDesc;            // 0x00  the description being drawn (fn_801138CC)
     s32  n4;                    // 0x04  } cleared by fn_80113844
     s32  n8;                    // 0x08  }
     HwsOverrideTable* pOverride;    // 0x0C  fn_801138D8
@@ -389,6 +397,16 @@ typedef struct CharSliderDefs {
     u64* aMorphIds;             // 0x10  the skin's morph targets, in fn_8011CADC's order
 } CharSliderDefs;
 
+// The byte-swap layouts CharSlider_CreateDefinitionsFromMem reads the definitions with.
+extern SwapField lbl_80193C30[10];      // CharSliderDef
+extern SwapField lbl_80193BF0[6];       // CharSliderLink
+extern SwapField lbl_80193C20[2];       // CharSliderLimit
+extern SwapField lbl_80193B98[4];       // CharSliderRange of bones
+extern SwapField lbl_80193B70[5];       // CharSliderBone
+extern SwapField lbl_80193BD0[4];       // CharSliderRange of morph targets
+extern SwapField lbl_80193BB8[3];       // CharSliderMorph
+extern SwapField lbl_80281788[1];       // a morph target id (u64)
+
 // The iterator fn_80113B34 builds in a buffer: its first word points at its next function.
 typedef struct SkinIter {
     void (**ppfnNext)(struct SkinIter* pIter);  // 0x0
@@ -398,21 +416,32 @@ typedef struct SkinIter {
     s32  nCur;                  // 0xC
 } SkinIter;
 
-// The whole iterator fn_80113A9C and fn_80113B34 build (our name): the meshes of one SkinDesc.p5C
-// entry.
+// The iterator fn_80113910 builds (our name): the SkinDesc.p3C entries of one SkinDesc.p44 entry.
+typedef struct SkinMeshIter {
+    SkinIter iter;              // 0x00
+    SkinDesc* pDesc;            // 0x10
+    SkinDesc44* pEntry;         // 0x14
+    s32  nCount;                // 0x18  the n1s of its SkinDesc28's pairs added up (1 without one)
+    s32  n1C;                   // 0x1C  -1 before the first step
+} SkinMeshIter;
+LAYOUT_ASSERT(SkinMeshIter, 0x20);
+
+// The whole iterator fn_80113A9C and fn_80113B34 build (our name): the SkinDesc.p6C entries of one
+// SkinDesc.p5C entry. fn_80113B34's kind walks each entry's meshes with a SkinMeshIter in sub.
 typedef struct SkinDescIter {
     SkinIter iter;              // 0x00
     SkinDesc* pDesc;            // 0x10
     SkinDesc5C* pEntry;         // 0x14
     s32  n18;                   // 0x18  -1 before the first step
-    s32  n1C;                   // 0x1C
+    SkinIter* pSub;             // 0x1C  fn_80113B34's kind: the current entry's iterator, or NULL
+    SkinMeshIter sub;           // 0x20  } (fn_80113A9C's kind does not use them)
 } SkinDescIter;
 
 // hwsBurn.c's state for one SkinDesc (our name; fn_801104AC makes it, fn_801108B0 frees it). The
 // bit arrays hold one bit per entry of the count before them.
 typedef struct HwsBurn {
     SkinDesc* pDesc;            // 0x00
-    s32  n4;                    // 0x04  fn_80110A1C
+    HwsOverrideTable* pOverride;    // 0x04  meshes used instead of the description's (fn_80110A1C)
     s32  nParts;                // 0x08  pDesc->nParts
     s32* aVariant;              // 0x0C  per part: its variant, -1 all (fn_801109FC)
     s32* aOption;               // 0x10  per part: its option, -1 all (fn_80110A0C)
@@ -437,8 +466,8 @@ typedef struct HwsBurn {
     s32* a5C;                   // 0x5C  per bit of p54: its place in a58
     s32  n60;                   // 0x60  pDesc->n10
     SkinDesc14* a64;            // 0x64  a copy of pDesc->p14 (fn_801115C4)
-    void (*pfn68)(s32 nArg, SkinDesc14* pEntry);    // 0x68  } called on each a64 entry
-    s32  n6C;                   // 0x6C  } (fn_801109F0)
+    void (*pfn68)(Skin* pSkin, SkinDesc14* pEntry); // 0x68  } called on each a64 entry with
+    Skin* pSkin;                // 0x6C  } pSkin (fn_801109F0; SkinBurn fn_80127B98)
     s32  n70;                   // 0x70  pDesc->n88
     s32  n74;                   // 0x74  the bits of p78 set (fn_80111658)
     u32* p78;                   // 0x78  n70 bits: the SkinDesc.p8C entries a64 uses
@@ -542,6 +571,7 @@ s32   fn_800CEEFC(SkinIter* pIter);
 SkinIter* fn_80113B34(u8* pBuf, SkinIterArgs* pArgs);
 void  fn_80113BAC(SkinIter* pIter);
 SkinIter* fn_80113910(u8* pBuf, SkinIterArgs* pArgs);   // hwsRender_Gc.c: another mesh iterator
+void  fn_80113A7C(SkinIter* pIter);     // and its end
 
 // SkinMorph.c: the morph targets a skin description needs.
 s32   fn_8011C850(SkinDesc* pDesc);
@@ -550,6 +580,11 @@ s32   fn_8011C850(SkinDesc* pDesc);
 HwsMemBlock* fn_801128EC(SkinDesc* pDesc, s32 nSize);
 HwsOverrideTable* fn_80112A34(SkinDesc* pDesc, s32 nMeshes);
 void* fn_80112A80(HwsMemBlock* pBlock, HwsOverrideTable* pTable, int i, u8 bKeep);
+
+// hwsBurn.c: pfn is called with pSkin on each SkinDesc.p14 entry the burn copies; fn_80111EB0
+// makes the burnt skin's description.
+void  fn_801109F0(HwsBurn* pBurn, void (*pfn)(Skin* pSkin, SkinDesc14* pEntry), Skin* pSkin);
+SkinDesc* fn_80111EB0(HwsBurn* pBurn);
 
 // SkinBurn.c: burns a skin (aParts and aList each end with -1).
 void  fn_80127B98(Skin* pSkin, s32* aParts, s32* aList);

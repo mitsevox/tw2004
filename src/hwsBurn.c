@@ -9,7 +9,7 @@ SkinIter* fn_80113A9C(u8* pBuf, SkinIterArgs* pArgs);   // hwsRender_Gc.c
 void  fn_80113B14(SkinIter* pIter);                     // hwsRender_Gc.c: ends the iterator
 s32   fn_800CF104(SkinDesc* pDesc, u64 uId);
 void  fn_80110A38(HwsBurn* pBurn, int n);
-void  fn_80111850(HwsBurn* pBurn);
+SkinDesc* fn_80111850(HwsBurn* pBurn);
 
 // A burn of pDesc: every table sized from the description and cleared (no variant or option
 // chosen yet).
@@ -129,9 +129,9 @@ void fn_801108B0(HwsBurn* pBurn) {
     fn_80009E70(pBurn);
 }
 
-void fn_801109F0(HwsBurn* pBurn, void (*pfn)(s32 nArg, SkinDesc14* pEntry), s32 nArg) {
+void fn_801109F0(HwsBurn* pBurn, void (*pfn)(Skin* pSkin, SkinDesc14* pEntry), Skin* pSkin) {
     pBurn->pfn68 = pfn;
-    pBurn->n6C = nArg;
+    pBurn->pSkin = pSkin;
 }
 
 void fn_801109FC(HwsBurn* pBurn, int nPart, s32 nVariant) {
@@ -142,12 +142,62 @@ void fn_80110A0C(HwsBurn* pBurn, int nPart, s32 nOption) {
     pBurn->aOption[nPart] = nOption;
 }
 
-void fn_80110A1C(HwsBurn* pBurn, s32 n) {
-    pBurn->n4 = n;
+void fn_80110A1C(HwsBurn* pBurn, HwsOverrideTable* pOverride) {
+    pBurn->pOverride = pOverride;
 }
 
 void fn_80110A24(HwsBurn* pBurn, int n) {
     pBurn->a1C[n] = 1;
+}
+
+// Marks SkinDesc.p44 entry n used: its bits, its meshes' bits, the morph-target entries after it
+// (those whose a1C flag is clear, each marked the same way) and its SkinDesc.p3C entries.
+void fn_80110A38(HwsBurn* pBurn, int n) {
+    SkinIterArgs args;
+    SkinMeshIter iterBuf;
+    SkinIter* pIter;
+    SkinDesc44* pEntry;
+    SkinDesc28* p28;
+    s32 nCount;
+    int nLast;
+    int i;
+
+    fn_8001EA34(pBurn->p3C, n);
+    fn_8001EA34(pBurn->p40, n);
+    args.pDesc = pBurn->pDesc;
+    args.n = n;
+    pIter = fn_80113910((u8*)&iterBuf, &args);
+    while (fn_800CEEC0(pIter)) {
+        fn_8001EA34(pBurn->p28, fn_800CEEFC(pIter));
+        fn_800CEEC8(pIter);
+    }
+    fn_80113A7C(pIter);
+
+    pEntry = &pBurn->pDesc->p44[n];
+    if (pEntry->u24 & 2) {
+        nLast = 0;
+        for (i = 0; i < pEntry->n14; i++) {
+            if (pBurn->a1C[pEntry->n18 + i] == 0) {
+                fn_80110A38(pBurn, pEntry->n10 + i);
+                nLast = i + 1;
+            }
+        }
+        for (i = 0; i < nLast; i++) {
+            fn_8001EA34(pBurn->p40, pEntry->n10 + i);
+        }
+    }
+
+    nCount = 1;
+    if (pEntry->nC >= 0) {
+        p28 = &pBurn->pDesc->p28[pEntry->nC];
+        nCount = 0;
+        for (i = 0; i < p28->n0; i++) {
+            nCount += p28->a8[i].n1;
+        }
+    }
+    for (i = 0; i < nCount; i++) {
+        fn_8001EA34(pBurn->p54, pEntry->n0 + i);
+    }
 }
 
 // Everything the meshes of SkinDesc.p5C entry n use (fn_80110A38 on each).
@@ -251,6 +301,52 @@ s32 fn_80110F2C(HwsBurn* pBurn) {
     return 0;
 }
 
+// Copies of the SkinDesc.p44 entries fn_80110F2C listed (a44) at pBase + *pOffset, renumbered
+// for the burn: an entry whose p3C bit is clear loses its meshes, and the morph targets stop at
+// the first one not kept. NULL when none are listed.
+SkinDesc44* fn_80110FB4(HwsBurn* pBurn, u8* pBase, s32* pOffset, s32 nAlign) {
+    int n = pBurn->n38;
+    SkinDesc* pDesc;
+    SkinDesc44* aOut;
+    SkinDesc44* pOut;
+    s32 nEntry;
+    int j;
+    int nMorphs;
+    int i;
+
+    if (n == 0) {
+        return NULL;
+    }
+    aOut = (SkinDesc44*)(pBase + *pOffset);
+    pDesc = pBurn->pDesc;
+    for (i = 0; i < n; i++) {
+        nEntry = pBurn->a44[i];
+        pOut = fn_80110E98(pBase, pOffset, &pDesc->p44[nEntry], sizeof(SkinDesc44), 1);
+        if (!fn_8001E9CC(pBurn->p3C, nEntry)) {
+            pOut->n8 = 0;
+            pOut->n0 = 0;
+            pOut->u24 &= ~2;
+        } else {
+            pOut->n0 = pBurn->a5C[pOut->n0];
+        }
+        if (pOut->u24 & 2) {
+            nMorphs = pOut->n14;
+            for (j = 0; j < nMorphs; j++) {
+                if (!fn_8001E9CC(pBurn->p40, pOut->n10 + j)) {
+                    break;
+                }
+            }
+            pOut->n14 = j;
+            pOut->n10 = pBurn->a48[pOut->n10];
+        }
+        if (pOut->u24 & 4) {
+            pOut->n10 = pBurn->a48[pOut->n10];
+        }
+    }
+    *pOffset = (nAlign + *pOffset - 1) & ~(nAlign - 1);
+    return aOut;
+}
+
 // The bytes the SkinDesc.p28 blocks take, each rounded up to nAlign.
 s32 fn_80111310(HwsBurn* pBurn, s32 nAlign) {
     SkinDesc* pDesc = pBurn->pDesc;
@@ -310,7 +406,7 @@ s32* fn_801114AC(HwsBurn* pBurn, u8* pBase, s32* pOffset, s32 nAlign) {
     *pOffset += n * 4;
     *pOffset = (*pOffset + nAlign - 1) & ~(nAlign - 1);
     for (i = 0; i < n; i++) {
-        v = ((s32*)pDesc->p3C)[pBurn->a58[i]];
+        v = pDesc->p3C[pBurn->a58[i]];
         if (v != -1) {
             v = pBurn->a30[v];
         }
@@ -355,6 +451,38 @@ s32 fn_80111124(HwsBurn* pBurn, s32 nAlign) {
     }
     pBurn->n24 = n;
     return nBytes;
+}
+
+// Copies of the meshes fn_80111124 listed at pBase + *pOffset, each followed by its data (from
+// the override table when it has the mesh). NULL when none are listed.
+SkinMesh* fn_801111E8(HwsBurn* pBurn, u8* pBase, s32* pOffset, s32 nAlign) {
+    SkinDesc* pDesc = pBurn->pDesc;
+    int n = pBurn->n24;
+    SkinMesh* aOut;
+    void* pSrc;
+    s32 nMesh;
+    int i;
+
+    if (n == 0) {
+        return NULL;
+    }
+    aOut = (SkinMesh*)(pBase + *pOffset);
+    *pOffset += n * sizeof(SkinMesh);
+    *pOffset = (*pOffset + nAlign - 1) & ~(nAlign - 1);
+    for (i = 0; i < n; i++) {
+        nMesh = pBurn->a2C[i];
+        memcpy(&aOut[i], &pDesc->p34[nMesh], sizeof(SkinMesh));
+        if (aOut[i].pBits != NULL) {
+            if (pBurn->pOverride != NULL && nMesh < pBurn->pOverride->nMeshes &&
+                pBurn->pOverride->apMesh[nMesh] != NULL) {
+                pSrc = pBurn->pOverride->apMesh[nMesh];
+            } else {
+                pSrc = pDesc->p34[nMesh].pBits;
+            }
+            aOut[i].pBits = fn_80110E98(pBase, pOffset, pSrc, pDesc->p34[nMesh].nSize, nAlign);
+        }
+    }
+    return aOut;
 }
 
 // Mark the SkinDesc.p8C entries the a64 entries use (p78) and list them (a7C, a80).
@@ -419,14 +547,14 @@ void fn_801115C4(HwsBurn* pBurn) {
     memcpy(pBurn->a64, pBurn->pDesc->p14, n * sizeof(SkinDesc14));
     for (i = 0; i < n; i++) {
         if (pBurn->pfn68 != NULL) {
-            pBurn->pfn68(pBurn->n6C, &pBurn->a64[i]);
+            pBurn->pfn68(pBurn->pSkin, &pBurn->a64[i]);
         }
     }
 }
 
 // Everything the chosen variants of every part use (all variants of a part without a choice),
-// then fn_80111850.
-void fn_80111EB0(HwsBurn* pBurn) {
+// then fn_80111850 makes the burnt description.
+SkinDesc* fn_80111EB0(HwsBurn* pBurn) {
     SkinDesc* pDesc = pBurn->pDesc;
     s32 nChosen;
     int i;
@@ -440,5 +568,5 @@ void fn_80111EB0(HwsBurn* pBurn) {
             }
         }
     }
-    fn_80111850(pBurn);
+    return fn_80111850(pBurn);
 }

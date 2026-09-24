@@ -90,6 +90,7 @@ void GXSetTexCopyDst(u16 nWidth, u16 nHeight, int eFormat, u8 bMipmap);
 void GXCopyTex(void* pDest, u8 bClear);
 void GXPixModeSync(void);
 void GXInvalidateTexAll(void);
+u32  GXGetTexBufferSize(u16 nWidth, u16 nHeight, int eFormat, u8 bMipmap, u8 nMaxLod);
 
 // ---- the game's own GX helpers (GxUtil.c) ----------------------------------------------------
 

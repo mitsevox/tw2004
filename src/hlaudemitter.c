@@ -10,6 +10,7 @@
 #include "unsorted/cull.h"
 
 AudInstance* fn_800AD674(u8 nId);
+void fn_800ADE54(f32* pVec);
 void fn_800AD800(u8 nId, f32* pPos, f32* pLast, u8 nView);
 void fn_800ACB98(void);                 // hlaudvoice.c
 void fn_800AF320(void);
@@ -68,10 +69,10 @@ void fn_800AD1C8(void) {
     AudInstance* pInst;
 
     for (pInst = lbl_801F2668.pActive; pInst != NULL; pInst = pInst->pNextActive) {
-        fn_800A7CA4(pInst->nId, pInst->pCmd->uOn, pInst->pCmd->uOff, pInst->pCmd->auParams,
+        fn_800A7CA4(pInst->nId, pInst->pCmd->u0, pInst->pCmd->u1, pInst->pCmd->auParams,
                     pInst->pCmd->aPos, pInst->pCmd->uChanged);
-        pInst->pCmd->uOn = 0;
-        pInst->pCmd->uOff = 0;
+        pInst->pCmd->u0 = 0;
+        pInst->pCmd->u1 = 0;
         pInst->pCmd->uChanged = 0;
         if (pInst->n24 == 1) {
             fn_800AD800(pInst->nId, pInst->vPos, NULL, 0);
@@ -82,6 +83,66 @@ void fn_800AD1C8(void) {
     fn_800AF320();
     fn_800B0434();
     lbl_80282018++;
+}
+
+// Takes a free instance for sound nSound: onto the tail of the active list and, when nEmitter is
+// not negative, the tail of that emitter's list (its first instance sets the emitter's sound). Its
+// source's commands are cleared and handed on once. Returns its id, or 0xFF when all 256 are in use.
+u8 fn_800AD280(s16 nSound, s16 nEmitter, u8 n24, int n28, void (*pfnCallback)(u8 nId, u8 nBit, s32 n)) {
+    AudInstance* pInst;
+    AudInstance* p;
+
+    if (lbl_801F2668.nActive >= 256) {
+        return 0xFF;
+    }
+    pInst = lbl_801F2668.pFree;
+    lbl_801F2668.pFree = pInst->pNextActive;
+    if (lbl_801F2668.pFree != NULL) {
+        lbl_801F2668.pFree->pPrevActive = NULL;
+    } else {
+        lbl_801F2668.pFreeTail = NULL;
+    }
+    // port: EA passes five more arguments than fn_800A7C30 takes
+    pInst->pCmd = ((AudSource* (*)(u8, s16, int, int, int, int, int))fn_800A7C30)(pInst->nId, nSound, 0, 0,
+                                                                                  0, 0, 0);
+    pInst->pCmd->u0 = 0;
+    pInst->pCmd->u1 = 0;
+    pInst->pCmd->uChanged = 0;
+    pInst->u22 = 0;
+    pInst->unk23 = 0;
+    pInst->n24 = n24;
+    pInst->n28 = n28;
+    pInst->pfnCallback = pfnCallback;
+    fn_800ADE54(pInst->vPos);
+    pInst->pPrevActive = lbl_801F2668.pActiveTail;
+    pInst->pNextActive = NULL;
+    if (pInst->pPrevActive != NULL) {
+        pInst->pPrevActive->pNextActive = pInst;
+    } else {
+        lbl_801F2668.pActive = pInst;
+    }
+    lbl_801F2668.pActiveTail = pInst;
+    lbl_801F2668.nActive++;
+    if (nEmitter >= 0) {
+        p = lbl_801F2668.apFirst[nEmitter];
+        if (p == NULL) {
+            lbl_801F2668.apFirst[nEmitter] = pInst;
+            lbl_801F2668.anSound[nEmitter] = nSound;
+        } else {
+            for (; p != NULL; p = p->pNext) {
+                if (p->pNext == NULL) {
+                    p->pNext = pInst;
+                    break;
+                }
+            }
+        }
+    }
+    pInst->nEmitter = nEmitter;
+    pInst->pNext = NULL;
+    fn_80005AE8(pInst->pCmd->auParams, 0, sizeof(pInst->pCmd->auParams));
+    fn_80005AE8(pInst->pCmd->aPos, 0, sizeof(pInst->pCmd->aPos));
+    fn_800A7CA4(pInst->nId, 0, 0, pInst->pCmd->auParams, pInst->pCmd->aPos, 0);
+    return pInst->nId;
 }
 
 // Frees instance nId: out of the active list onto the head of the free list, and out of its
@@ -168,10 +229,10 @@ void fn_800AD698(u8 nId, u8 nTrack, u8 bOn) {
     u8 uBit = 1 << nTrack;
     if (pInst != NULL) {
         if (bOn == 1) {
-            pInst->pCmd->uOn |= uBit;
+            pInst->pCmd->u0 |= uBit;
             pInst->u22 |= uBit;
         } else {
-            pInst->pCmd->uOff |= uBit;
+            pInst->pCmd->u1 |= uBit;
         }
         pInst->pCmd->uChanged |= 0x200;
     }
@@ -181,8 +242,8 @@ void fn_800AD698(u8 nId, u8 nTrack, u8 bOn) {
 void fn_800AD734(u8 nId, int n) {
     AudInstance* pInst = fn_800AD674(nId);
     if (pInst != NULL) {
-        pInst->pCmd->uOn = n;
-        pInst->pCmd->uOff = ~n;
+        pInst->pCmd->u0 = n;
+        pInst->pCmd->u1 = ~n;
         pInst->pCmd->uChanged |= 0x200;
         pInst->u22 = n;
     }
