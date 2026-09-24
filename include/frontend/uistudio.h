@@ -267,7 +267,7 @@ LAYOUT_ASSERT(UIStudio, 0xBC);
 void fn_80165528(UIStudio* pStudio, u8 b);
 s32* fn_80165670(UIStudio* pStudio, s32* pTop, s32** ppKeep);
 s32 fn_80165ACC(UIStudio* pStudio, u16 uGroup, u16 uScreen);
-void fn_80165B90(s16 nA, s16 nB, UIStudio* pStudio, s32 nType, const UISEventData* pData, s32 nArgs,
+void fn_80165B90(s16 nA, s16 nB, UIStudio* pStudio, s32 nType, UISEventData* pData, s32 nArgs,
                  const s32* pArgs);
 void fn_80165C6C(UISReportFn pfnReport);
 void fn_80165C74(UIStudio* pStudio);
@@ -287,11 +287,11 @@ void fn_80168B80(UIStudio* pStudio, u32 uEvent);
 
 // UISApi.c
 void fn_80168C24(UIStudio* pStudio, s32 nTicks);
-void fn_80168CD8(UIStudio* pStudio, UISWordStack* pStack, u32 uEvent, s32 n, u8 b, void* p, u8 bAll);
-void fn_80168DB0(UIStudio* pStudio, u32 uEvent, s32 n, u8 b, void* p, u8 bAll);
+void fn_80168CD8(UIStudio* pStudio, UISWordStack* pStack, u32 uEvent, s32 n, s32 b, void* p, u8 bAll);
+void fn_80168DB0(UIStudio* pStudio, u32 uEvent, s32 n, s32 b, void* p, u8 bAll);
 void fn_80168EE8(UIStudio* pStudio, u16* puGroup, u16* puScreen);
 void fn_80168F5C(UIStudio* pStudio, u16 uGroup, u16 uScreen);
-s32 fn_80168FC8(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 n);
+u8 fn_80168FC8(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 n);
 u8 fn_80169308(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 n);
 s32 fn_801694A0(UIStudio* pStudio, u16 uGroup, u16 uScreen, u8 nArgs, s32* pArgs);
 u8 fn_80169520(UIStudio* pStudio, UISScreenFile* pFile);
@@ -314,7 +314,7 @@ void fn_8016A030(UIStudio* pStudio, u32 uMs);
 // Sends event uEvent to node nNode of a screen and the nodes it links to; *pbOut gets the node's
 // UISNodeInfo.u4.
 s32 fn_8016A2D4(UIStudio* pStudio, UISScreen* pScreen, UISWordStack* pStack, u32 nNode, u32 uEvent, u32 n5,
-                u8 nArgs, const s32* pArgs, u8* pbOut);
+                s32 nArgs, const s32* pArgs, u8* pbOut);
 void fn_8016A510(UIStudio* pStudio, UISScreen* pScreen, u32 nNode, s32 nMsg);
 void fn_8016A830(UIStudio* pStudio, s32 nOp, UISScreen* pScreen, u32 nNode);
 void fn_8016ABBC(UIStudio* pStudio, UISScreen* pScreen, s32 n, s32 nKind, void* p, u8 bAll);
@@ -335,15 +335,16 @@ f32* fn_8016C1A4(s32 n20, UISNodeInfo* pInfo);
 s8 fn_8016C270(UIStudio* pStudio, UISScreen* pScreen, UISNodeInfo* pInfo, UISWordStack* pStack, u8* pScript,
                u32 nArgs, const s32* pArgs, u32 nArgs2, const s32* pArgs2, u8 bExtra, s32 nExtra, s32* pnSaved);
 // A node's handler scripts for an event, by kind (0x4000, plain with an ID, 0x8000); NULL for none.
-u8* fn_8016C5C4(UISNode* pNode, u32 uEvent);   // callers pass the event unmasked
-u8* fn_8016C614(UISNode* pNode, u16 uId, u16 uEvent);
-u8* fn_8016C674(UISNode* pNode, u16 uEvent);
+// The event is a u32 (callers pass it unmasked; each function masks it to 16 bits).
+u8* fn_8016C5C4(UISNode* pNode, u32 uEvent);
+u8* fn_8016C614(UISNode* pNode, u16 uId, u32 uEvent);
+u8* fn_8016C674(UISNode* pNode, u32 uEvent);
 u16 fn_8016C6C4(UIStudio* pStudio, u16 uGroup, u16 uScreen);
 
 // Sends event uEvent to the current screen, or to every screen when bAll is set; n -8 skips a
 // screen being unloaded. fn_80168CD8's body, which UIStudio.c has pasted in twice (the pasted
 // copies keep this block layout, with the loop set-up after the loop).
-static inline void UIStudio_Send(UIStudio* pStudio, UISWordStack* pStack, u32 uEvent, s32 n, u8 b, void* p,
+static inline void UIStudio_Send(UIStudio* pStudio, UISWordStack* pStack, u32 uEvent, s32 n, s32 b, void* p,
                                  u8 bAll) {
     u32 i;
     u32 nEnd;

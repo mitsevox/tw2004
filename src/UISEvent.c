@@ -6,7 +6,7 @@
 
 // Pushes an event on the event stack whose top is *ppTop: the event record, with its type on
 // the top word, then its arguments below it, the last one first.
-static inline void UISEvent_Push(s32** ppTop, s16 nA, s16 nB, s32 nType, const UISEventData* pData, s32 nArgs,
+static inline void UISEvent_Push(s32** ppTop, s16 nA, s16 nB, s32 nType, UISEventData* pData, s32 nArgs,
                                  const s32* pArgs) {
     UISEvent* pEvent;
     s32* pDst;
@@ -30,8 +30,15 @@ static inline void UISEvent_Push(s32** ppTop, s16 nA, s16 nB, s32 nType, const U
 // Whether no event from p up to the stack's top waits for the screen (uA, uB), loads and unloads
 // aside: a screen is unloaded only then.
 static inline u8 UISEvent_NoneWaiting(UIStudio* pStudio, s32* p, u16 uA, u16 uB) {
+    s32 nType;
+    u16 uThisA;
+    u16 uThisB;
+
     while (p > pStudio->pEventTop) {
-        if (p[0] != 0 && p[0] != 1 && (u16)p[-1] == uA && (u16)p[-2] == uB) return 0;
+        nType = p[0];
+        uThisA = p[-1];
+        uThisB = p[-2];
+        if (nType != 0 && nType != 1 && uThisA == uA && uThisB == uB) return 0;
         p -= 8;
         p -= *p;
         p--;
@@ -93,9 +100,9 @@ void fn_80165528(UIStudio* pStudio, u8 bScreenOnly) {
 // again on the stack at *ppKeep.
 s32* fn_80165670(UIStudio* pStudio, s32* pTop, s32** ppKeep) {
     s32 nType;
+    UISEventData* pData;
     s32 nArgs;
     s32* pArgs;
-    UISEventData* pData;
     u16 uA;
     u16 uB;
     u32 nIndex;
@@ -104,8 +111,10 @@ s32* fn_80165670(UIStudio* pStudio, s32* pTop, s32** ppKeep) {
     nArgs = pTop[-8];
     uA = pTop[-1];
     uB = pTop[-2];
-    pData = (UISEventData*)(pTop - 7);
-    pArgs = pTop - 8 - nArgs;
+    pData = (UISEventData*)(pTop -= 7);
+    pTop -= 1;
+    pTop -= nArgs;
+    pArgs = pTop;
     switch (nType) {
     case 0:
         fn_80169858(pStudio, pData->aw[0], pData->aw[1], pData->aw[2], pData->aw[3], nArgs, pArgs);
@@ -194,7 +203,7 @@ s32 fn_80165ACC(UIStudio* pStudio, u16 uGroup, u16 uScreen) {
 
 // Pushes an event on the studio's event stack: the event record, with its type on the top word,
 // then its arguments below it, the last one first.
-void fn_80165B90(s16 nA, s16 nB, UIStudio* pStudio, s32 nType, const UISEventData* pData, s32 nArgs,
+void fn_80165B90(s16 nA, s16 nB, UIStudio* pStudio, s32 nType, UISEventData* pData, s32 nArgs,
                  const s32* pArgs) {
     UISEvent_Push(&pStudio->pEventTop, nA, nB, nType, pData, nArgs, pArgs);
 }

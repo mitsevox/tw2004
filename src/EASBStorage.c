@@ -1009,7 +1009,7 @@ EASBErrorE fn_8012A2A8(EASBProcessE* peProcess) {
         return EASB_ERROR_NULL_PARAMETERS;
     }
     if (*peProcess == EASB_PROCESS_NONE) {
-        eError = fn_8012C98C(TagFile_Delete("EASB", SFIO_DEVICE_INVALID, 0));
+        eError = fn_8012C98C(TagFile_Open("EASB", SFIO_DEVICE_INVALID, 0));
         *peProcess = EASB_PROCESS_CONTINUE;
     } else if (*peProcess == EASB_PROCESS_CONTINUE) {
         eError = fn_8012CB98(peProcess);
@@ -1038,7 +1038,7 @@ EASBErrorE fn_8012A364(EASBProcessE* peProcess) {
         return EASB_ERROR_CANNOT_REOPEN;
     }
     if (*peProcess == EASB_PROCESS_NONE) {
-        eError = fn_8012C98C(TagFile_DeleteSession(&lbl_802825B0->session));
+        eError = fn_8012C98C(TagFile_Reopen(&lbl_802825B0->session));
         *peProcess = EASB_PROCESS_CONTINUE;
     } else if (*peProcess == EASB_PROCESS_CONTINUE) {
         eError = fn_8012CB98(peProcess);
@@ -1452,7 +1452,7 @@ EASBErrorE fn_8012B27C(EASBProcessE* peProcess) {
     if (*peProcess == EASB_PROCESS_NONE) {
         eError = fn_8016CFF8_SetSaveDescriptor(lbl_802825B0->args.pHeader);
         if (eError == EASB_ERROR_NONE) {
-            eError = fn_8012C98C(TagFile_BeginSave("EASB", lbl_802825B0->args.eDevice, 0));
+            eError = fn_8012C98C(TagFile_Create("EASB", lbl_802825B0->args.eDevice, 0));
         }
         *peProcess = EASB_PROCESS_CONTINUE;
     } else if (*peProcess == EASB_PROCESS_CONTINUE) {
@@ -1484,7 +1484,7 @@ EASBErrorE fn_8012B3B0(EASBProcessE* peProcess) {
         return EASB_ERROR_INTERNAL;
     }
     if (*peProcess == EASB_PROCESS_NONE) {
-        eError = fn_8012C98C(TagFile_BeginLoad("EASB", SFIO_DEVICE_INVALID, 0));
+        eError = fn_8012C98C(fn_80174DF0_Delete("EASB", SFIO_DEVICE_INVALID, 0));
         *peProcess = EASB_PROCESS_CONTINUE;
     } else if (*peProcess == EASB_PROCESS_CONTINUE) {
         eError = fn_8012CB98(peProcess);
