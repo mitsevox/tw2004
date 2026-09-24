@@ -788,6 +788,7 @@ void fn_8003B028(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32
     f32 fT;
     f32 fCurDist;
     f32 fGrow;
+    f32 fRise;
 
     fY = pOut[1];
     DynamicCam_GetLocation(0, nPlayer, aFrom, pScript, pShot, pCam, pSub);
@@ -847,9 +848,8 @@ void fn_8003B028(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32
         fTurn *= pScript->f88 / lbl_80281F78->f158;
     }
     if (pScript->f88 < lbl_80281F78->f15C) {
-        aTarget[1] = powf(pScript->f88 / lbl_80281F78->f15C, lbl_80281F78->f160) * fFrames *
-                         (aTarget[1] - pOut[1]) +
-                     pOut[1];
+        fRise = powf(pScript->f88 / lbl_80281F78->f15C, lbl_80281F78->f160) * fFrames;
+        aTarget[1] = fRise * (aTarget[1] - pOut[1]) + pOut[1];
     }
     fn_8003DC54(pOut, aFrom, aCurOff);
     fn_8003DC54(aTarget, aFrom, aTgtOff);
