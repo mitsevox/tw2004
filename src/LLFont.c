@@ -38,6 +38,15 @@ static GXColor lbl_801869C0[3][16] = {
 
 void fn_80012444(f32* pViewport);
 void fn_8001247C(s32 eDst, s32 eFunc, s32 eSrc, s32 nMtx);
+u32 fn_8001208C(UFontContext* pCtx, u8 r, u8 g, u8 b, u8 a, f32 fXScale, f32 fYScale, f32 fX,
+                f32 fY);
+void fn_800124A8(void);
+void fn_80012520(u32 ePrim, u32 eFormat, u16 nVerts);
+void fn_80012540(f32 farg0, f32 farg1);
+void fn_80012550(s32 p0);
+void fn_8001255C(f32 farg0, f32 farg1);
+
+static u8 lbl_80281C88;                 // set while fn_8001144C word-wraps (fn_80011D0C calls back in)
 
 // Byte swaps for a stream stored little-endian.
 #define LLFONT_SWAP32(x) (((u32)(x) >> 24) + (((x) & 0xFF0000) >> 8) + (((x) << 8) & 0xFF0000) + ((x) << 24))
@@ -275,6 +284,255 @@ void fn_80011310(LLFont* pFont, UFontState* pState) {
     GXLoadTlut(&pState->aTluts[pFont->nPalette], 0);
     GXLoadTexObj(&pFont->tex, 0);
     GXSetBlendMode(1, 4, 5, 15);
+}
+
+// Draws sz (NULL: pCtx->szText) in pFont with pCtx's settings, one textured quad a glyph. uA8 set:
+// word-wrap it through fn_80011D0C, which calls back here a line at a time. n9C bit 0x10000
+// draws a shadow first (colour nC4/uC8, moved by fCC, fD0). The low byte of n9C aligns the text
+// across (1: right, 2: centre, 4: by fBC), bits 8-10 down (by fC0 for 0x400); fB8 turns it.
+void fn_8001144C(LLFont* pFont, UFontContext* pCtx, char* sz) {
+    f32 fSin;
+    f32 fCos;
+    f32 fNegSin;
+    f32 fWidth;
+    f32 fAlignX;
+    f32 fAlignY;
+    f32 fX;
+    f32 fY;
+    f32 fScaleX;
+    f32 fScaleY;
+    f32 fSizeX;
+    f32 fSizeY;
+    f32 fAdvScale;
+    f32 fRun;
+    f32 fAdvance;
+    f32 fGradX;
+    f32 fGradY;
+    f32 fOffX;
+    f32 fOffY;
+    f32 fX0;
+    f32 fY0;
+    f32 fX1;
+    f32 fY1;
+    f32 fX2;
+    f32 fY2;
+    f32 fX3;
+    f32 fY3;
+    f32 fLeft;
+    f32 fTop;
+    f32 fRight;
+    f32 fBottom;
+    u32 uColor;
+    s32 nSaved;
+    s32 nSavedFont;
+    u32 uSavedColor;
+    f32 fSavedX;
+    f32 fSavedY;
+    int bMeasured;
+    char* p;
+    LLGlyph* pGlyph;
+
+    if (pCtx->uA8 != 0 && lbl_80281C88 == 0) {
+        lbl_80281C88 = 1;
+        fn_80011D0C(pFont, pCtx, 1, (sz == NULL) ? pCtx->szText : sz);
+        lbl_80281C88 = 0;
+        return;
+    }
+    if (pCtx->n9C & 0x10000) {
+        // The shadow: the same text in the shadow's colour, moved, without a shadow of its own.
+        uSavedColor = pCtx->u5C;
+        nSavedFont = pCtx->nA4;
+        fSavedX = pCtx->f70;
+        fSavedY = pCtx->f74;
+        pCtx->nA4 = pCtx->nC4;
+        pCtx->u5C = pCtx->uC8;
+        pCtx->f70 = pCtx->f70 + pCtx->fCC;
+        pCtx->f74 = pCtx->f74 + pCtx->fD0;
+        pCtx->n9C &= ~0x10000;
+        fn_8001144C(pFont, pCtx, sz);
+        pCtx->nA4 = nSavedFont;
+        pCtx->u5C = uSavedColor;
+        pCtx->f70 = fSavedX;
+        pCtx->f74 = fSavedY;
+        pCtx->n9C |= 0x10000;
+    }
+    if (sz != NULL) {
+        p = sz;
+    } else {
+        p = pCtx->szText;
+    }
+    fAlignX = 0.0f;
+    bMeasured = 0;
+    fAlignY = fAlignX;
+    fSizeY = pCtx->f80;
+    fSizeX = pCtx->f7C;
+    fScaleY = pCtx->f88 * (pCtx->n6C * fSizeY);
+    fScaleX = pCtx->n68 * fSizeX;
+    if (pCtx->n9C & 0xFF) {
+        fWidth = fn_80011C90(pFont, pCtx, p);
+        bMeasured = 1;
+        if (pCtx->n9C & 1) {
+            fAlignX = 1.0f;
+        } else if (pCtx->n9C & 2) {
+            fAlignX = 0.5f;
+        } else if (pCtx->n9C & 4) {
+            fAlignX = pCtx->fBC;
+        }
+    }
+    if (pCtx->n9C & 0xFF00) {
+        if (pCtx->n9C & 0x100) {
+            fAlignY = 1.0f;
+        } else if (pCtx->n9C & 0x200) {
+            fAlignY = 0.5f;
+        } else if (pCtx->n9C & 0x400) {
+            fAlignY = pCtx->fC0;
+        }
+    }
+    fX = pCtx->f70;
+    fY = pCtx->f74;
+    if (0.0f != pCtx->fB8) {
+        fSin = fn_800095F0(pCtx->fB8);
+        fCos = fn_80009638(pCtx->fB8);
+        if (0.0f != fAlignX) {
+            fWidth = fn_80011C90(pFont, pCtx, p);
+            bMeasured = 1;
+            fX -= fCos * (fWidth * fAlignX);
+            fY += fSin * (fWidth * fAlignX);
+        }
+        fX -= fSin * (pFont->f00 * fSizeY * fAlignY);
+        fY -= fCos * (pFont->f00 * fSizeY * fAlignY);
+    } else {
+        if (0.0f != fAlignX) {
+            fWidth = fn_80011C90(pFont, pCtx, p);
+            bMeasured = 1;
+            fX -= fWidth * fAlignX;
+        }
+        fY -= pFont->f00 * fSizeY * fAlignY;
+    }
+    fAdvScale = pCtx->f78;
+    fRun = 0.0f;
+    fLeft = fX * pCtx->n68 + pCtx->n60;
+    fTop = pCtx->n64 * pCtx->f88 + (pCtx->f88 * (fY * pCtx->n6C) + (0.5f - 0.5f * pCtx->f88));
+    if (pCtx->n10 != 0) {
+        if (!bMeasured && pCtx->n10 != 0) {
+            fWidth = fn_80011C90(pFont, pCtx, p);
+        }
+        fGradX = 1.0f / (fWidth / fSizeX);
+        fGradY = 1.0f / pFont->f00;
+    }
+    if (pCtx->nA4 == 0x12) {
+        uColor = pCtx->u5C;
+    } else {
+        uColor = lbl_80186A80[pCtx->nA4];
+    }
+    nSaved = pFont->n418;
+    fNegSin = -fSin; // EA bug: fSin is only set for turned text (and only used then)
+    for (; *p != '\0'; p++) {
+        pGlyph = pFont->apGlyphs[(u8)*p];
+        if (pGlyph == NULL) {
+            pGlyph = pFont->apGlyphs[0xAC];
+            if (pGlyph == NULL) {
+                continue;
+            }
+        }
+        fOffX = pGlyph->f1C * fScaleX;
+        fOffY = pGlyph->f20 * fScaleY;
+        if (*p != ' ') {
+            switch (pFont->n474) {
+            case 0:
+                fn_80012520(0x80, 7, 4);
+                fX0 = fLeft + fOffX;
+                fY0 = fTop + fOffY;
+                fn_8001255C(fX0, fY0);
+                fn_80012550(uColor);
+                fn_80012540(pGlyph->fU0, pGlyph->fV0);
+                fn_8001255C(pGlyph->fWidth * fScaleX + fX0, fY0);
+                fn_80012550(uColor);
+                fn_80012540(pGlyph->fU1, pGlyph->fV0);
+                fn_8001255C(pGlyph->fWidth * fScaleX + fX0, pGlyph->fHeight * fScaleY + fY0);
+                fn_80012550(uColor);
+                fn_80012540(pGlyph->fU1, pGlyph->fV1);
+                fn_8001255C(fX0, pGlyph->fHeight * fScaleY + fY0);
+                fn_80012550(uColor);
+                fn_80012540(pGlyph->fU0, pGlyph->fV1);
+                fn_800124A8();
+                break;
+            case 1:
+                if (0.0f != pCtx->fB8) {
+                    fY0 = (fCos * pGlyph->f20 - fSin * pGlyph->f1C) * fScaleY + fTop;
+                    fX0 = (fSin * pGlyph->f20 + fCos * pGlyph->f1C) * fScaleX + fLeft;
+                    fY1 = fNegSin * pGlyph->fWidth * fScaleY + fY0;
+                    fX1 = fCos * pGlyph->fWidth * fScaleX + fX0;
+                    fY2 = fY1 + fCos * pGlyph->fHeight * fScaleY;
+                    fX3 = fX0 + fSin * pGlyph->fHeight * fScaleX;
+                    fX2 = fX1 + fSin * pGlyph->fHeight * fScaleX;
+                    fY3 = fY0 + fCos * pGlyph->fHeight * fScaleY;
+                } else {
+                    fX0 = fLeft + fOffX;
+                    fY0 = fTop + fOffY;
+                    fX2 = pGlyph->fWidth * fScaleX + fX0;
+                    fX3 = fX0;
+                    fY2 = pGlyph->fHeight * fScaleY + fY0;
+                    fY1 = fY0;
+                    fX1 = fX2;
+                    fY3 = fY2;
+                }
+                if (pCtx->n10 != 0) {
+                    // port: EA calls fn_8001208C without its colour arguments and drops the
+                    // colours it returns, so the gradients change nothing here.
+                    if (pCtx->n10 & 4) {
+                        ((u32 (*)(UFontContext*, f32, f32, f32, f32))fn_8001208C)(
+                            pCtx, fGradX, fGradY, 0.5f * pGlyph->fWidth + (fRun + pGlyph->f1C),
+                            0.5f * pGlyph->fHeight + (0.0f + pGlyph->f20));
+                    } else {
+                        f32 fGX0 = fRun + pGlyph->f1C;
+                        f32 fGY0 = 0.0f + pGlyph->f20;
+                        f32 fGX1 = fGX0 + pGlyph->fWidth;
+                        f32 fGY1 = fGY0 + pGlyph->fHeight;
+
+                        ((u32 (*)(UFontContext*, f32, f32, f32, f32))fn_8001208C)(pCtx, fGradX, fGradY,
+                                                                                   fGX0, fGY0);
+                        ((u32 (*)(UFontContext*, f32, f32, f32, f32))fn_8001208C)(pCtx, fGradX, fGradY,
+                                                                                   fGX1, fGY0);
+                        ((u32 (*)(UFontContext*, f32, f32, f32, f32))fn_8001208C)(pCtx, fGradX, fGradY,
+                                                                                   fGX0, fGY1);
+                        ((u32 (*)(UFontContext*, f32, f32, f32, f32))fn_8001208C)(pCtx, fGradX, fGradY,
+                                                                                   fGX1, fGY1);
+                    }
+                }
+                fn_80012520(0x80, 7, 4);
+                fn_8001255C(fX0, fY0);
+                fn_80012550(uColor);
+                fn_80012540(pGlyph->fU0, pGlyph->fV0);
+                fn_8001255C(fX1, fY1);
+                fn_80012550(uColor);
+                fn_80012540(pGlyph->fU1, pGlyph->fV0);
+                fn_8001255C(fX2, fY2);
+                fn_80012550(uColor);
+                fn_80012540(pGlyph->fU1, pGlyph->fV1);
+                fn_8001255C(fX3, fY3);
+                fn_80012550(uColor);
+                fn_80012540(pGlyph->fU0, pGlyph->fV1);
+                fn_800124A8();
+                break;
+            }
+            pFont->n46C++;
+        }
+        if (pCtx->nAC == 0) {
+            fAdvance = pGlyph->f18;
+        } else {
+            fAdvance = pCtx->fB0;
+        }
+        fAdvance = fAdvScale * fAdvance;
+        fRun += fAdvance;
+        if (0.0f != pCtx->fB8) {
+            fLeft += fScaleX * (fCos * fAdvance);
+            fTop += fScaleY * (fNegSin * fAdvance);
+        } else {
+            fLeft += fAdvance * fScaleX;
+        }
+    }
+    pFont->n418 = nSaved;
 }
 
 // UFont.c passes the font; this build does nothing with it.
@@ -523,11 +781,6 @@ u32 fn_8001208C(UFontContext* pCtx, u8 r, u8 g, u8 b, u8 a, f32 fXScale, f32 fYS
 
 void fn_800124CC(void);
 void fn_800124A4(void);
-void fn_800124A8(void);
-void fn_80012520(u32 ePrim, u32 eFormat, u16 nVerts);
-void fn_80012540(f32 farg0, f32 farg1);
-void fn_80012550(s32 p0);
-void fn_8001255C(f32 farg0, f32 farg1);
 
 void fn_80012438(LLFont* pFont) {
     pFont->n474 = 0;

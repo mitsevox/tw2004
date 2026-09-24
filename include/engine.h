@@ -683,7 +683,7 @@ typedef struct UFontContext {
     f32   f0C;                    // 0x0C  1 / (f08 - f04), set by fn_80012E00
     s32   n10;                    // 0x10  gradients on: 1 the stops in a14[0..4], 2 a14[4] to a14[5]
     UFontStop a14[6];             // 0x14
-    u8    pad5C[0x60 - 0x5C];     // 0x5C
+    u32   u5C;                    // 0x5C  the colour (a GXColor's bytes) when nA4 is 0x12
     s32   n60;                    // 0x60
     s32   n64;                    // 0x64
     s32   n68;                    // 0x68
@@ -706,7 +706,8 @@ typedef struct UFontContext {
     f32   fB8;                    // 0xB8
     f32   fBC;                    // 0xBC
     f32   fC0;                    // 0xC0
-    u8    padC4[0xCC - 0xC4];     // 0xC4
+    s32   nC4;                    // 0xC4  the shadow's nA4 (n9C bit 0x10000: drawn first, moved by fCC, fD0)
+    u32   uC8;                    // 0xC8  the shadow's u5C
     f32   fCC;                    // 0xCC
     f32   fD0;                    // 0xD0
     char* szText;                 // 0xD4  a queued string's copy of its text
@@ -783,7 +784,8 @@ typedef struct LLFont {
     LLGlyph* apGlyphs[256];       // 0x0C  by character code; NULL: the font has no such glyph
     LLGlyphRec* pRecs;            // 0x40C
     LLGlyph* pGlyphs;             // 0x410
-    u8    pad414[0x41C - 0x414];  // 0x414
+    u8    pad414[0x418 - 0x414];  // 0x414
+    s32   n418;                   // 0x418
     LLFontBitmap bitmap;          // 0x41C
     s32   n42C;                   // 0x42C
     s32   n430;                   // 0x430
@@ -830,6 +832,7 @@ void fn_8001144C(LLFont* pFont, UFontContext* pCtx, char* sz);
 void fn_80011C8C(LLFont* pFont);
 f32  fn_80011C90(LLFont* pFont, UFontContext* pCtx, char* sz); // a string's width
 int  fn_80011D0C(LLFont* pFont, UFontContext* pCtx, u8 bDraw, char* sz); // word-wrapped text
+extern u32 lbl_80186A80[19];            // LLFont.c: the text colours (GXColor bytes) by UFontContext.nA4
 void fn_80012438(LLFont* pFont);
 
 // ---- controller input ------------------------------------------------------------------------
