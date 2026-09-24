@@ -20,6 +20,10 @@ void* fn_80009B34(int nSize, int nMode, int nAlign, const char* pFile, int nLine
 void  fn_80009E70(void* p);             // free
 void  fn_8000A0AC(s32 v);               // } a value callers pass on as fn_80009B34's uFlags
 s32   fn_8000A0B4(void);                // } (EASportsBio.c sets 0 while the Bio starts, then 2)
+void  fn_8000A0BC(void);                // start a new count of the bytes taken
+void  fn_8000A0C8(void);                // } counting on / off
+void  fn_8000A0D4(void);                // }
+s32   fn_8000A0E0(void);                // the bytes taken since fn_8000A0BC
 // The main-memory heap (GoShaderObject_Particle_Gc.c): fn_80095108 makes it from the arena.
 // fn_800951A0 returns a block aligned to nAlign (0: 16) that remembers the heap block and its
 // own padding just before and after it (every caller passes 1 as n, which it does not read).
@@ -171,10 +175,12 @@ typedef struct TexEntry {
     s16  nC;                    // 0x0C  GoDynObj.c's fn_80045FC8 copies nC * 16 bytes of its pixels
     u8   unkE[0x3C - 0xE];
     s16  nPalette;              // 0x3C  its row in the bank's pC
-    u8   unk3E[0x41 - 0x3E];
+    u8   unk3E[0x40 - 0x3E];
+    s8   b40;                   // 0x40  0: char.c fn_8001DD18 decodes the name and pairs the texture
     s8   n41;                   // 0x41  (fn_80045FC8)
     u8   unk42[0x47 - 0x42];
-    u8   b47;                   // 0x47  bit 0: the next texture goes with it (char.c fn_80019798)
+    u8   b47;                   // 0x47  bit 0: the next texture goes with it (char.c fn_80019798);
+                                //       bit 0x40: byte-swapped (fn_8001DD18)
     u8   unk48[0x50 - 0x48];
 } TexEntry;
 LAYOUT_ASSERT(TexEntry, 0x50);

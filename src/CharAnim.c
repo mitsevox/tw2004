@@ -16,7 +16,6 @@ void  fn_80095FD0(Character* pChar, void* pClip, u8 bKeep, int n, SKABlendFn pfn
 void  fn_8009622C(Character* pChar, void* pClip, u8 bKeep, f32 fOffset);
 s8    fn_80096338(void);
 s32   fn_800962F8(Character* pChar);
-s32   fn_8009637C(Character* pChar);
 s32   fn_80096508(void);
 int   fn_80096530(Character* pChar);
 f32   fn_800971B8(Character* pChar);
@@ -55,7 +54,7 @@ s8 fn_80096338(void) {
     return Rand_Next(1) % 3 + 8;
 }
 
-s32 fn_8009637C(Character* pChar) {
+u8 fn_8009637C(Character* pChar) {
     return pChar->n26 != 1;
 }
 

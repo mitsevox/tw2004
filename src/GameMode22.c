@@ -548,7 +548,7 @@ void fn_80126698(int nPlayer) {
     if (nPoints > 0) {
         if (nLength > lbl_80195498.f10) {
             if (lbl_80195498.f10 != 0.0f) {
-                if (lbl_80195498.n14 != nPlayer && lbl_80195498.n14 != 5) {
+                if (nPlayer != lbl_80195498.n14 && lbl_80195498.n14 != 5) {
                     fn_80062D38(0x4C, nLength, nPlayer);
                     ADD_MSG(0xB);
                     if (nPlayer == 0) {
@@ -589,7 +589,9 @@ void fn_80126698(int nPlayer) {
         }
     }
     pPlayer->nEBC += nPoints;
-    pPlayer->nEBC = (pPlayer->nEBC > 0) ? pPlayer->nEBC : 0;
+    if (pPlayer->nEBC < 0) {
+        pPlayer->nEBC = 0;
+    }
     fn_800E5CA4(0, gPlayers[nPlayer].nEBC, nLength, nKind, 0, 0, nPoints, 0.0f);
 
     // A track the first time the score reaches 1200, 800 and 400.
