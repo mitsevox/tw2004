@@ -498,17 +498,17 @@ void fn_80115348(CharModel* pModel, DynChain* pChain, f32 fDelta) {
     f32 qTurn[4];
     f32 qOut[4];
     u32 auBits[4];
-    f32 fFaceAmt;
-    f32 fStrength;
+    f32 fPeriod;
     f32 fPhase;
     f32 fSway;
     f32 fFacing;
-    f32 fSizeA;
-    f32 fSizeB;
     f32 fSpeedA;
+    f32 fSizeA;
     f32 fSpeedB;
+    f32 fSizeB;
+    f32 fStrength;
+    f32 fFaceAmt;
     f32 fT;
-    f32 fPeriod;
     f32 fSize;
     f32 fAngle;
     s32 nFrames;
@@ -529,7 +529,8 @@ void fn_80115348(CharModel* pModel, DynChain* pChain, f32 fDelta) {
     }
     fSway = fn_80116304(pChain->n14, fPhase, fStrength);
     pChain->n14++;
-    pChain->n18 += (s32)(nFrames * fSway);
+    nFrames = nFrames * fSway;
+    pChain->n18 += nFrames;
 
     // Where the wind blows from.
     if (lbl_802824F8->nB4 == 0) {
@@ -604,7 +605,9 @@ void fn_80115348(CharModel* pModel, DynChain* pChain, f32 fDelta) {
         } else {
             fPeriod = 100000000.0f;
         }
-        fSize = DEG(lbl_802824F8->aParams[0].a0[i]) * fSizeA * fSizeB;
+        fSize = DEG(lbl_802824F8->aParams[0].a0[i]);
+        fSize *= fSizeA;
+        fSize *= fSizeB;
         if (0.0f != fPeriod) {
             nPeriod = fPeriod;
             fT = (f32)(pChain->n18 % nPeriod) / fPeriod;
@@ -647,7 +650,9 @@ void fn_80115348(CharModel* pModel, DynChain* pChain, f32 fDelta) {
         } else {
             fPeriod = 100000000.0f;
         }
-        fSize = DEG(lbl_802824F8->aParams[1].a0[i]) * fSizeA * fSizeB;
+        fSize = DEG(lbl_802824F8->aParams[1].a0[i]);
+        fSize *= fSizeA;
+        fSize *= fSizeB;
         if (0.0f != fPeriod) {
             nPeriod = fPeriod;
             fT = (f32)(pChain->n18 % nPeriod) / fPeriod;
@@ -715,7 +720,8 @@ void fn_80115B2C(CharModel* pModel, DynChain* pChain, f32 fDelta) {
     fBend = pModel->f13C;
     fSway = fn_80116304(pChain->n14, PI * pChain->n10 * 0.125f, fStrength);
     pChain->n14++;
-    pChain->n18 += (s32)(nFrames * fSway);
+    nFrames = nFrames * fSway;
+    pChain->n18 += nFrames;
     fn_8011651C(pModel->pMatrices[pChain->pLinks->nBone][3], pModel->pMatrices[pChain->pLinks->nParent][3],
                 vBone);
     if (0.0f != vBone[0] || 0.0f != vBone[1] || 0.0f != vBone[2]) {
