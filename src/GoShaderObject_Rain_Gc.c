@@ -11,6 +11,9 @@ void fn_800B4BB4(void);
 void fn_800B4BB8(void);
 void fn_800B4BD8(void);
 void fn_800B4BFC(void);
+void fn_800B4C00(RainList* pList, int nDrops);
+void SD_vShaderObject_Rain_Dynamic_Init(RainObject* pRain, f32* pStrength);
+void fn_800B4F24(RainObject* pRain);
 
 void fn_800B4B5C(void) {
     lbl_802814B8->n0 = 0;
@@ -36,6 +39,40 @@ void fn_800B4BD8(void) {
 }
 
 void fn_800B4BFC(void) {
+}
+
+// Set up a rain object: the drops' display list and its cleared buffers, and find the "splash"
+// texture. pStrength is unused (PsMgr.c, the only caller, passes it).
+void SD_vShaderObject_Rain_Dynamic_Init(RainObject* pRain, f32* pStrength) {
+    RainData* pData = &pRain->data;
+    u64 uSplash;
+    int i;
+
+    fn_800B4C00(&pData->list, 900);
+    for (i = 0; i < 4; i++) {
+        pData->apA[i] = fn_80009B34(0x1B0, 2, 0x20, "GoShaderObject_Rain_Gc.c", 280);
+        memset(pData->apA[i], 0, 0x1B0);
+    }
+    for (i = 0; i < 2; i++) {
+        pData->apB[i] = fn_80009B34(1000, 2, 0x20, "GoShaderObject_Rain_Gc.c", 292);
+        memset(pData->apB[i], 0, 1000);
+    }
+    uSplash = fn_8000BEE4("splash");
+    fn_800102DC(uSplash, &lbl_802814B8->pBank, &lbl_802814B8->pTex);
+}
+
+// Free a rain object's list and buffers.
+void fn_800B4F24(RainObject* pRain) {
+    RainData* pData = &pRain->data;
+    int i;
+
+    fn_80009E70(pData->list.pList);
+    for (i = 0; i < 4; i++) {
+        fn_80009E70(pData->apA[i]);
+    }
+    for (i = 0; i < 2; i++) {
+        fn_80009E70(pData->apB[i]);
+    }
 }
 
 // ---- sweep code (not yet cleaned up) ----
