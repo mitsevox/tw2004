@@ -368,6 +368,9 @@ extern u32 lbl_80281DB0;
 extern UMemPool* lbl_80281DAC;
 extern UMemPool* lbl_80281DA8;
 
+// LLObj_Gc.c
+void fn_800075CC(UObjModelRoot* pRoot);    // frees a model fn_800073B4 made
+
 // GoDynObj.c
 void fn_80046C34(f32* pPos, int nPlayer);  // a fast ball low over class 3 ground leaves a 'TEO ' 10005
 void fn_80046E1C(f32* pPos, int nPlayer);  // put the player's 'TEO ' 10001 object at pPos
