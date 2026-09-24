@@ -53,6 +53,7 @@ char*  strstr(const char* pStr, const char* pFind);
 char*  strchr(const char* pStr, int c);
 char*  strtok(char* pStr, const char* pDelim);
 int    atoi(const char* p);
+int    isspace(int c);                          // 0x80155F70 (MSL)
 int    sprintf(char* pBuf, const char* pFmt, ...);
 int    snprintf(char* pBuf, u32 uLen, const char* pFmt, ...);
 int    vsprintf(char* pBuf, const char* pFmt, va_list args);

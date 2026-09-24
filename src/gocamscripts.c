@@ -2229,7 +2229,6 @@ void fn_80043C74(CamScript* pScript, f32* pOut, f32* pCam, int nPlayer, CamShot*
     f32 vDiff[4];
     u8 bFound = 0;
     CourseInfo* pCourse = fn_8000C594();
-    f32* pBall;
     f32* pPin;
     int nPin;
     f32 fBall;
@@ -2239,13 +2238,12 @@ void fn_80043C74(CamScript* pScript, f32* pOut, f32* pCam, int nPlayer, CamShot*
 
     if (pCourse == NULL) return;
     nPin = Game_CurrentPinSet();
-    pBall = gPlayers[nPlayer].ball.vPos;
-    fn_80045428(pBall, pSub, vCamDir);
+    fn_80045428(gPlayers[nPlayer].ball.vPos, pSub, vCamDir);
     vCamDir[1] = 0.0f;
     if (0.0f != vCamDir[0] || 0.0f != vCamDir[1] || 0.0f != vCamDir[2]) {
         fn_800BAF04(vCamDir, vCamDir);
     }
-    fn_80044768(pBall, vNearBall);
+    fn_80044768(gPlayers[nPlayer].ball.vPos, vNearBall);
     fn_80044768(gPlayers[nPlayer].vTarget, vNearTarget);
     pPin = &pCourse->pin[nPin].x;
     fn_80045428(pPin, gPlayers[nPlayer].vBall, vPastPin);
@@ -2256,13 +2254,13 @@ void fn_80043C74(CamScript* pScript, f32* pOut, f32* pCam, int nPlayer, CamShot*
     fn_8001EF34(vPastPin, 3.0f, vPastPin);
     fn_8004544C(pPin, vPastPin, vPastPin);
 
-    fn_80045428(pBall, vNearBall, vDiff);
+    fn_80045428(gPlayers[nPlayer].ball.vPos, vNearBall, vDiff);
     vDiff[1] = 0.0f;
     fBall = fn_80009680(fn_80009744(vDiff));
-    fn_80045428(pBall, vNearTarget, vDiff);
+    fn_80045428(gPlayers[nPlayer].ball.vPos, vNearTarget, vDiff);
     vDiff[1] = 0.0f;
     fTarget = fn_80009680(fn_80009744(vDiff));
-    fn_80045428(pBall, vPastPin, vDiff);
+    fn_80045428(gPlayers[nPlayer].ball.vPos, vPastPin, vDiff);
     vDiff[1] = 0.0f;
     fPin = fn_80009680(fn_80009744(vDiff));
     // the three spots in order of their distance from the ball
@@ -2296,7 +2294,7 @@ void fn_80043C74(CamScript* pScript, f32* pOut, f32* pCam, int nPlayer, CamShot*
     }
 
     Vec3Copy(vFirst, vSpot);
-    fn_80045428(pBall, vSpot, vDir);
+    fn_80045428(gPlayers[nPlayer].ball.vPos, vSpot, vDir);
     vDir[1] = 0.0f;
     if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
         fn_800BAF04(vDir, vDir);
@@ -2306,7 +2304,7 @@ void fn_80043C74(CamScript* pScript, f32* pOut, f32* pCam, int nPlayer, CamShot*
     }
     if (!bFound) {
         Vec3Copy(vSecond, vSpot);
-        fn_80045428(pBall, vSpot, vDir);
+        fn_80045428(gPlayers[nPlayer].ball.vPos, vSpot, vDir);
         vDir[1] = 0.0f;
         if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
             fn_800BAF04(vDir, vDir);
@@ -2317,7 +2315,7 @@ void fn_80043C74(CamScript* pScript, f32* pOut, f32* pCam, int nPlayer, CamShot*
     }
     if (!bFound) {
         Vec3Copy(vThird, vSpot);
-        fn_80045428(pBall, vSpot, vDir);
+        fn_80045428(gPlayers[nPlayer].ball.vPos, vSpot, vDir);
         vDir[1] = 0.0f;
         if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
             fn_800BAF04(vDir, vDir);
@@ -2335,7 +2333,7 @@ void fn_80043C74(CamScript* pScript, f32* pOut, f32* pCam, int nPlayer, CamShot*
     fn_80045428(pPin, vSpot, vPastPin);
     vPastPin[1] = 0.0f;
     if ((f32)fn_80009680(fn_80009744(vPastPin)) < 2.0f) {
-        fn_80045428(pPin, pBall, vNearBall);
+        fn_80045428(pPin, gPlayers[nPlayer].ball.vPos, vNearBall);
         vNearBall[1] = 0.0f;
         if (0.0f != vNearBall[0] || 0.0f != vNearBall[1] || 0.0f != vNearBall[2]) {
             fn_800BAF04(vNearBall, vNearBall);

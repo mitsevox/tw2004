@@ -58,6 +58,63 @@ u8 fn_8009637C(Character* pChar) {
     return pChar->n26 != 1;
 }
 
+// The idle update, in game type 6 with n20 at 5: count n24 down, then n25; when n25 runs out, play
+// an animation group 4 clip (state 4, n26 set) if the library has one that is not flagged, else
+// start the wait over. The result is the state to go to.
+s32 fn_80096398(Character* pChar) {
+    s32 nState;
+    u32 uFlags;
+    s32 nCount;
+    int nClub;
+
+    nState = 2;
+    if (gSession.nGameType != 6) return 2;
+    switch (pChar->n20) {
+    case 5:
+        if (pChar->n24 > 0) {
+            if (--pChar->n24 <= 0) {
+                pChar->n24 = 0;
+                pChar->n25 = fn_80096508();
+                nState = 3;
+            } else {
+                nState = 2;
+            }
+        } else if (pChar->n25 > 0) {
+            if (--pChar->n25 <= 0) {
+                uFlags = 0;
+                nCount = 0;
+                pChar->n25 = 0;
+                if (pChar->pLib->groups[4] >= 0) {
+                    nClub = pChar->nClubClass;
+                    if (nClub == 1) {
+                        nClub = 0;
+                    }
+                    AnimLib_Find(pChar->pLib, 4, pChar->nStyle, nClub, pChar->n16D4, &nCount, &uFlags,
+                                 NULL, NULL);
+                    if (!(uFlags & 1)) {
+                        pChar->n26 = 1;
+                        nState = 4;
+                        break;
+                    }
+                }
+                pChar->n26 = 0;
+                pChar->n24 = fn_80096338();
+                nState = 2;
+            } else {
+                nState = 3;
+            }
+        } else if (pChar->n26 > 0) {
+            pChar->n26 = 0;
+            pChar->n24 = fn_80096338();
+            nState = 2;
+        }
+        break;
+    default:
+        nState = fn_800962F8(pChar);
+    }
+    return nState;
+}
+
 s32 fn_80096508(void) {
     Rand_Next(1);
     return 1;

@@ -16,9 +16,9 @@ typedef struct MorphAnim {
     u8   nIndex;                // 0x09  its slot in the manager (fn_800975B0)
     u16  nFrames;               // 0x0A  0: nothing loaded
     f32  fC;                    // 0x0C
-    void* p10;                  // 0x10  } freed by fn_80097624
-    void* p14;                  // 0x14  }
-    void* p18;                  // 0x18  }
+    u16* p10;                   // 0x10  } a vertex number per morphed vertex (fn_80097330); freed
+    f32* p14;                   // 0x14  }   by fn_80097624. Its position (three floats)
+    s8*  p18;                   // 0x18  }   and its morph offset (three s8s)
     f32* p1C;                   // 0x1C  the positions (fn_80074DA8)
 } MorphAnim;
 
