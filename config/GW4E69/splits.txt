@@ -103,6 +103,9 @@ LLTex.c:
 
 LLTexGrp.c:
 	.text       start:0x8001013C end:0x800107F4
+	.data       start:0x801869A8 end:0x801869B8
+	.bss        start:0x801A3458 end:0x801A3478
+	.sdata      start:0x80280DD8 end:0x80280DE0
 
 LLFont.c:
 	.text       start:0x800107F4 end:0x8001256C
@@ -509,6 +512,8 @@ GoGreenGrid.c:
 
 MC_Gc.c:
 	.text       start:0x8009CB9C end:0x8009F850
+	.data       start:0x8018C6D8 end:0x8018C7C8
+	.sdata      start:0x802813D0 end:0x802813F0
 
 MC.c:
 	.text       start:0x8009F850 end:0x800A27FC
@@ -726,6 +731,8 @@ GameModeMatch.c:
 
 GameMode5.c:
 	.text       start:0x800EACD8 end:0x800ED738
+	.data       start:0x801925D0 end:0x801926A8
+	.sdata2     start:0x80284668 end:0x80284670
 
 GameMode9.c:
 	.text       start:0x800ED738 end:0x800EDD18

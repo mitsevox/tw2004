@@ -31,6 +31,10 @@ void fn_8012CCCC(int uHandle);          // EASBStorage.c
 u8*  Skalib_ScratchToAram(int n);       // skalib.c
 void Skalib_ScratchFromAram(int n);     // skalib.c
 
+void* lbl_802813D0 = lbl_801E7100;
+u8    lbl_802813D4 = 1;
+s32   lbl_802813D8 = -1;
+
 // Every operation starts here: note its size and how far the CARD library's transfer count has
 // got, from which its progress is measured.
 void fn_8009CB9C(s32 nPort, s32 nSlot, s32 nSize) {
@@ -356,12 +360,11 @@ s32 fn_8009D74C(s32 nPort, s32 nSlot) {
     u32 bWasMounted = 0;
     u8 b94;
     s32 nResult;
-    s32 nSize;
     if (lbl_80281FD0[nPort] != 0) return MC_ERR_IOERROR;
     nChan = nPort;
     b94 = lbl_801F1510[nPort][nSlot].b94;
     lbl_801F1510[nPort][nSlot].b94 = 0;
-    nResult = fn_8009D0D4(nPort, nSlot);
+    nResult = fn_8009D0D4(nChan, nSlot);
     if (nResult != 0) return nResult;
     if (lbl_801F1510[nPort][nSlot].uFlags & MC_CARD_MOUNTED) {
         nResult = fn_8009DBAC(nPort, nSlot);
@@ -457,8 +460,9 @@ s32 fn_8009D74C(s32 nPort, s32 nSlot) {
         lbl_801F1510[nPort][nSlot].b94 = b94;
         return MC_ERR_BROKEN;
     case CARD_RESULT_READY:
-        nSize = lbl_801F1510[nPort][nSlot].nSectorSize + nFreeBytes;
-        lbl_801F1510[nPort][nSlot].nFreeBlocks = (nSize - 1) / lbl_801F1510[nPort][nSlot].nSectorSize;
+        // the free bytes in whole sectors, rounded up
+        lbl_801F1510[nPort][nSlot].nFreeBlocks = (lbl_801F1510[nPort][nSlot].nSectorSize - 1 + nFreeBytes)
+                                               / lbl_801F1510[nPort][nSlot].nSectorSize;
         lbl_801F1510[nPort][nSlot].nFreeFiles = nFreeFiles;
         break;
     default:
@@ -837,7 +841,7 @@ s32 fn_8009E918(s32 nPort, s32 nSlot) {
     if (!(lbl_801F1510[nPort][nSlot].uFlags & MC_CARD_PRESENT)) return -4;
     if (!(lbl_801F1510[nPort][nSlot].uFlags & MC_CARD_MOUNTED)) return MC_ERR_NOTMOUNTED;
     nChan = nPort;
-    nResult = fn_8009D0D4(nPort, nSlot);
+    nResult = fn_8009D0D4(nChan, nSlot);
     if (nResult != 0) return nResult;
     lbl_801F1510[nPort][nSlot].uFlags &= ~MC_CARD_FORMATTED;
     fn_8009CB9C(nPort, nSlot, lbl_801F1510[nPort][nSlot].nMemSize + 0xA000);

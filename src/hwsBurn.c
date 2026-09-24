@@ -588,6 +588,7 @@ SkinDesc* fn_80111850(HwsBurn* pBurn) {
     SkinDesc* pOut;
     u8* pBlock;
     s32 nBytes;
+    int j;
     int nLast;
 
     pDesc = pBurn->pDesc;
@@ -676,9 +677,9 @@ SkinDesc* fn_80111850(HwsBurn* pBurn) {
         }
     }
     nLast = 0;
-    for (i = 0; i < pOut->n2C; i++) {
-        if (pOut->p34[i].uFlags & 0x100000) {
-            nLast = i + 1;
+    for (j = 0; j < pOut->n2C; j++) {
+        if (pOut->p34[j].uFlags & 0x100000) {
+            nLast = j + 1;
         }
     }
     pOut->n30 = nLast;

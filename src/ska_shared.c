@@ -50,6 +50,196 @@ void fn_8001FCD4(ARAMTransfer* pTransfer) {
 
 void fn_80021134(u16* pFrame, f32* pOut, s32 nBones, u32* pBits);
 void fn_8002148C(u8* pFrame, f32* pOut, s32 nBones, u32* pBits, u16* aBase);
+u8 fn_80020328(Clip* pClip, int nFrame, f32* pPose2, f32* pPose1, u8* pExtra);
+f32 fn_80021A98(Clip* pClip, f32 fTime);
+
+// Poses pPose from pClip at fTime: the two keys around it are decoded into two of the character's
+// buffers (kept while they still hold them) and blended by where fTime falls between them. A time
+// at or past the pending event n5CC is held there once.
+void fn_8001FCF4(Character* pChar, Clip* pClip, SkelPose* pPose, u32* aBits, f32 fTime) {
+    CharBuffer* pBuf;
+    ClipTrack* pTrack;
+    BonePose* pBone;
+    f32* pRot;
+    f32* pA10;
+    f32* pA14;
+    f32* pB10;
+    f32* pB14;
+    u8* pRange;
+    u8* pKeys;
+    u32 uFlags;
+    f32 fPos;
+    f32 fFrac;
+    int nKey;
+    int nNext;
+    int i;
+    int* pSlot;
+    int* pFrame;
+    u32 aTmp[4];
+    f32 aA[4];
+    f32 aB[4];
+    int aSlot[2];
+    int aFree[2];
+    int aFrame[2];
+
+    if (pChar != NULL && pClip->pEvents != NULL && pChar->n5CC >= 0) {
+        if (fTime >= pClip->pEvents[pChar->n5CC].fTime) {
+            fTime = pClip->pEvents[pChar->n5CC].fTime;
+            pChar->n5CC = -1;
+        }
+    }
+    if (pClip->pD8 != NULL) {
+        pClip->fCC = fn_80021A98(pClip, fTime);
+    }
+    fn_8001E938(pPose->a0, 0x80);
+    fn_8001E938(pPose->a10, 0x80);
+    if (fTime < 0.0f) {
+        fTime = 0.0f;
+    }
+    fPos = fTime / pClip->f10;
+    nKey = (int)fPos;
+    nNext = nKey + 1;
+    fFrac = fPos - nKey;
+    if (nKey > pClip->n0E) {
+        fFrac = 0.0f;
+        nNext = pClip->n0E;
+        nKey = pClip->n0E;
+    } else if (nNext > pClip->n0E) {
+        nNext = pClip->n0E;
+        fFrac = 0.0f;
+    }
+
+    // find the buffers already holding the two keys, and the ones free to take them
+    aFrame[0] = nKey;
+    aFrame[1] = nNext;
+    aFree[1] = -1;
+    aFree[0] = -1;
+    aSlot[1] = -1;
+    aSlot[0] = -1;
+    for (i = 0; i < 4; i++) {
+        if (i == 1 && nKey == nNext) {
+            aSlot[1] = aSlot[0];
+            break;
+        }
+        if (pChar->buffers[i].p04 == pClip) {
+            if (pChar->buffers[i].n00 == nKey) {
+                aSlot[0] = i;
+            }
+            if (pChar->buffers[i].n00 == nNext) {
+                aSlot[1] = i;
+            }
+            if (pChar->buffers[i].n00 != nKey && pChar->buffers[i].n00 != nNext) {
+                aFree[1] = aFree[0];
+                aFree[0] = i;
+            }
+        } else if (aFree[0] < 0) {
+            aFree[0] = i;
+        } else if (aFree[1] < 0) {
+            aFree[1] = i;
+        }
+    }
+
+    // decode the keys not held yet
+    pSlot = aSlot;
+    pFrame = aFrame;
+    for (i = 0; i < 2; i++) {
+        if (*pSlot < 0) {
+            *pSlot = aFree[0];
+            aFree[0] = aFree[1];
+            pChar->buffers[*pSlot].n00 = *pFrame;
+            if (pChar->buffers[*pSlot].p04 != pClip) {
+                pChar->buffers[*pSlot].p04 = pClip;
+                pBuf = &pChar->buffers[*pSlot];
+                pBuf->p0C = pBuf->pBuf;
+                if (i == 1) {
+                    Mem_cpy(pChar->buffers[aSlot[1]].p0C, pChar->buffers[aSlot[0]].p0C,
+                            pClip->n60 * 16);
+                    pChar->buffers[*pSlot].p10 = pChar->buffers[*pSlot].pBuf + pClip->n60 * 16;
+                } else if (pClip->pE8 != NULL) {
+                    fn_8001E938(aTmp, 0x80);
+                    fn_80021134((u16*)pClip->pE8, (f32*)pChar->buffers[*pSlot].p0C, pClip->n60, aTmp);
+                    pChar->buffers[*pSlot].p10 = pChar->buffers[*pSlot].pBuf + pClip->n60 * 16;
+                } else {
+                    pBuf->p10 = pBuf->pBuf;
+                }
+                pChar->buffers[*pSlot].p14 = pChar->buffers[*pSlot].p10 + pClip->n58 * 16;
+                pChar->buffers[*pSlot].p18 = pChar->buffers[*pSlot].p14 + pClip->n5C * 16;
+            }
+            if (fn_80020328(pClip, *pFrame, (f32*)pChar->buffers[*pSlot].p10,
+                            (f32*)pChar->buffers[*pSlot].p14, pChar->buffers[*pSlot].p18) == 0 &&
+                aBits != NULL) {
+                fn_8001E938(aBits, 0x80);
+            }
+            if (nKey == nNext) {
+                aSlot[1] = aSlot[0];
+                break;
+            }
+        }
+        pFrame++;
+        pSlot++;
+    }
+
+    pRot = (f32*)pChar->buffers[aSlot[0]].p0C;
+    pA10 = (f32*)pChar->buffers[aSlot[0]].p10;
+    pA14 = (f32*)pChar->buffers[aSlot[0]].p14;
+    pB10 = (f32*)pChar->buffers[aSlot[1]].p10;
+    pB14 = (f32*)pChar->buffers[aSlot[1]].p14;
+
+    // keys kept in ARAM: fetch the tracks' ranges and keys, and point the tracks at them
+    if (pClip->n4C != 0 && (pClip->uFlags & 4)) {
+        // port: pEC and pF0 hold ARAM addresses here
+        fn_8001FCD4(fn_8001FCA8((uptr)pClip->pEC, lbl_80281CCC, pClip->n50));
+        pRange = lbl_80281CCC;
+        fn_8001FCD4(fn_8001FCA8((uptr)pClip->pF0, lbl_80281CD0, pClip->n4C));
+        pKeys = lbl_80281CD0;
+        for (i = 0; i < pClip->n1C; i++) {
+            pTrack = &((ClipTrack*)pClip->pD0)[i];
+            if (pTrack->uFlags & 0x10) {
+                pTrack->pKeys = (u16*)pKeys;
+                pTrack->aRange = (f32*)pRange;
+                pRange += 0x18;
+                pKeys += pClip->nFrames * 6;
+            } else {
+                pTrack->pKeys = NULL;
+                pTrack->aRange = NULL;
+            }
+        }
+    }
+
+    pBone = pPose->aBones;
+    for (i = 0; i < pClip->n1C; i++) {
+        pTrack = &((ClipTrack*)pClip->pD0)[i];
+        uFlags = pTrack->uFlags;
+        if (uFlags & 4) {
+            fn_8001E85C(pRot, pBone->q0);
+            pRot += 4;
+        } else if (uFlags & 8) {
+            if (uFlags & 0x20) {
+                fn_8001FB00(pA10, pB10, pBone->q0, fFrac);
+                pA10 += 4;
+                pB10 += 4;
+            } else {
+                fn_8001FB00(pA14, pB14, pBone->q0, fFrac);
+                pA14 += 4;
+                pB14 += 4;
+            }
+        } else {
+            pBone++;
+            continue;
+        }
+        fn_8001EA34(pPose->a0, i);
+        if (pTrack->pKeys != NULL) {
+            fn_8001FC0C(pTrack->pKeys + nKey * 3, pTrack->aRange, aA);
+            fn_8001FC0C(pTrack->pKeys + nNext * 3, pTrack->aRange, aB);
+            fn_8001FBA4(aA, aB, pBone->v10, fFrac);
+            fn_8001EA34(pPose->a10, i);
+        }
+        pBone++;
+    }
+    if (aBits != NULL) {
+        fn_80021980(pPose->a0, pPose->a10, aBits, 0x80);
+    }
+}
 
 // Decodes frame nFrame of pClip: its second-stream frame into pPose2 (fn_8002148C) and its
 // first-stream frame into pPose1 (fn_80021134), fetching them from ARAM first when the clip's
