@@ -271,6 +271,132 @@ void fn_80020B2C(void* pRecords, int nCount) {
     fn_8001F08C(&pSrc, &pDst, aRecord, 4, nCount);
 }
 
+// Byte-swaps the clip read from disc at p in place and sets its pointers as it goes: header, events,
+// BlendClip and tracks, then the data blocks after them (fn_800206C8's layout, all in memory),
+// its pF4 library (fn_8001F110) and two bit arrays of 2 * n1C bits (pF8, pFC).
+void fn_80020BC8(u8* p) {
+    Clip* pClip = (Clip*)p;
+    u8* pSrc;
+    int nBytes;
+
+    fn_8002091C(pClip);
+    p += sizeof(Clip);
+    if (pClip->nEvents != 0) {
+        fn_80020984((ClipEvent*)p, pClip->nEvents);
+        p += pClip->nEvents * sizeof(ClipEvent);
+    }
+    if (pClip->uFlags & 2) {
+        fn_80020A20((BlendClip*)p);
+        p += sizeof(BlendClip);
+    }
+    fn_80020B2C(p, pClip->n1C);
+    pClip->pD0 = p;
+    p += pClip->n2C;
+    pClip->pC4 = p;
+    pClip->pC8 = p;
+    if ((uptr)p & 15) {
+        p = (u8*)(((uptr)p & ~15) + 16);
+    }
+    if (pClip->n40 != 0) {
+        pSrc = p;
+        p += pClip->n40;
+        fn_80076158(&pSrc, pSrc, pClip->n40, 2);
+    }
+    if (pClip->n3C != 0) {
+        pSrc = p;
+        p += pClip->n3C;
+        fn_80076158(&pSrc, pSrc, pClip->n3C, 2);
+    }
+    pSrc = p;
+    pClip->uAram = (uptr)p;
+    p += pClip->n38;
+    fn_80076158(&pSrc, pSrc, pClip->n38, 2);
+    if (pClip->n04 != 0) {
+        pClip->pE4 = p;
+        p += pClip->n04;
+    }
+    if (pClip->n4C != 0) {
+        pSrc = p;
+        pClip->pEC = p;
+        fn_80076158(&pSrc, pSrc, pClip->n50, 4);
+        p += pClip->n50;
+        pClip->pF0 = p;
+        pSrc = p;
+        fn_80076158(&pSrc, p, pClip->n4C, 2);
+        p += pClip->n4C;
+    }
+    if (pClip->n64 != 0) {
+        pClip->pF4 = p;
+        fn_8001F110((MtaLib*)pClip->pF4, NULL);
+        p += pClip->n64;
+    } else {
+        pClip->pF4 = NULL;
+    }
+    nBytes = (pClip->n1C * 2 + 31) / 32 * 4;
+    pClip->pF8 = p;
+    pSrc = p;
+    fn_80076158(&pSrc, p, nBytes, 4);
+    p += nBytes;
+    pClip->pFC = p;
+    pSrc = p;
+    fn_80076158(&pSrc, p, nBytes, 4);
+}
+
+// Takes the clip at pData rounded up to nAlign bytes, byte-swaps it in place and lays it out with
+// its frames in memory; *pu30 gets its u30 when pu30 is not NULL.
+Clip* fn_80020DD4(u8* p, u32* pu30, u32 nAlign) {
+    Clip* pClip;
+    u8* pSrc;
+    u32 uPad;
+    int nBytes;
+
+    uPad = nAlign - ((uptr)p & (nAlign - 1));
+    if (uPad == nAlign) {
+        uPad = 0;
+    }
+    pClip = (Clip*)(p + uPad);
+    fn_8002091C(pClip);
+    pClip->pC0 = p;
+    p = (u8*)pClip + sizeof(Clip);
+    if (pClip->nEvents != 0) {
+        pClip->pEvents = (ClipEvent*)p;
+        fn_80020984((ClipEvent*)p, pClip->nEvents);
+        p += pClip->nEvents * sizeof(ClipEvent);
+    }
+    if (pClip->uFlags & 2) {
+        pClip->pD8 = (BlendClip*)p;
+        fn_80020A20((BlendClip*)p);
+        p += sizeof(BlendClip);
+    }
+    pClip->pD0 = p;
+    fn_80020B2C(p, pClip->n1C);
+    p += pClip->n2C;
+    pClip->pC4 = p;
+    p += pClip->n54;
+    pClip->pC8 = pClip->pC4;
+    fn_800206C8(pClip, 0);
+    fn_80020858(pClip);
+    if (pClip->n64 != 0) {
+        pClip->pF4 = p;
+        fn_8001F110((MtaLib*)pClip->pF4, NULL);
+        p += pClip->n64;
+    } else {
+        pClip->pF4 = NULL;
+    }
+    nBytes = (pClip->n1C * 2 + 31) / 32 * 4;
+    pClip->pF8 = p;
+    pSrc = p;
+    fn_80076158(&pSrc, p, nBytes, 4);
+    p += nBytes;
+    pClip->pFC = p;
+    pSrc = p;
+    fn_80076158(&pSrc, p, nBytes, 4);
+    if (pu30 != NULL) {
+        *pu30 = pClip->u30;
+    }
+    return pClip;
+}
+
 // Links a clip already in our byte order in place: its events and BlendClip follow the header,
 // then its tracks; fn_800206C8 lays out the rest (the first frame stream in ARAM at uAram when it
 // is not 0). Its pF4 library (n64 bytes) is linked too.

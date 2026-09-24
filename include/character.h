@@ -281,7 +281,8 @@ typedef struct Clip {
     s32    n1C;                 // 0x1C
     u8     unk20[0xC];
     s32    n2C;                 // 0x2C
-    u8     unk30[8];
+    u32    u30;                 // 0x30  fn_80020DD4 hands it back
+    u8     unk34[4];
     s32    n38;                 // 0x38  bytes of the first frame stream
     s32    n3C;                 // 0x3C
     s32    n40;                 // 0x40
@@ -290,7 +291,8 @@ typedef struct Clip {
     u8     unk4A[2];
     s32    n4C;                 // 0x4C
     s32    n50;                 // 0x50
-    u8     unk54[0x10];
+    s32    n54;                 // 0x54  bytes from pC4 to the pF4 library (fn_80020DD4)
+    u8     unk58[0xC];
     s32    n64;                 // 0x64
     u8     unk68[0x80 - 0x68];
     f32    v80[3];              // 0x80  a point fn_8001DB04 puts through bone 0's matrix
@@ -299,7 +301,8 @@ typedef struct Clip {
     u64    u90;                 // 0x90  looked up in lbl_801B9638 (FEgolferanim.c fn_8008D058)
     u8     unk98[8];
     char   name[0x20];          // 0xA0  (fn_8002091C swaps 0xA0 and 0xB0 as 16 bytes each, then words)
-    struct Clip* pC0;           // 0xC0  the clip itself, once laid out (fn_80020F60)
+    void*  pC0;                 // 0xC0  where the clip was loaded: itself (fn_80020F60), or the start
+                                //       of the buffer it was aligned up in (fn_80020DD4)
     u8*    pC4;                 // 0xC4  the end of pD0's tracks
     u8*    pC8;                 // 0xC8  the same; fn_800206C8 lays out the streams from here
     f32    fCC;                 // 0xCC  how far along the swing is, 0..1 (Character.fBackswing copies it)
@@ -329,8 +332,9 @@ typedef struct ClipTrack {
     u16* pKeys;                 // 0xC  (in Clip.pF0)
 } ClipTrack;
 
-// char.c: run on a clip just read from disc (skalib.c, AnimStream.c).
-void* fn_80020DD4(void* pClip, void* pOut, int nAlign);
+// ska_shared.c: run on a clip just read from disc (skalib.c, AnimStream.c): moves nothing, but
+// takes the clip at pData rounded up to nAlign, byte-swaps it and lays it out in memory.
+Clip* fn_80020DD4(u8* pData, u32* pu30, u32 nAlign);
 
 typedef struct SKABlendNode SKABlendNode;
 
