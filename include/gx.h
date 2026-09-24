@@ -96,6 +96,7 @@ void GXSetZCompLoc(u8 bBeforeTex);
 void GXSetNumTevStages(u8 nStages);
 void GXSetTevOrder(int eStage, int eCoord, int eMap, int eColour);
 void GXSetTevColor(int eReg, GXColor colour);
+void GXSetTevKColor(int eReg, GXColor colour);
 void GXSetTevColorIn(int eStage, int eA, int eB, int eC, int eD);
 void GXSetTevAlphaIn(int eStage, int eA, int eB, int eC, int eD);
 void GXSetTevColorOp(int eStage, int eOp, int eBias, int eScale, u8 bClamp, int eOutReg);

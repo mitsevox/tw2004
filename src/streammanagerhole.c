@@ -688,6 +688,15 @@ void fn_80015540(void) {
     fn_80015470();
 }
 
+// Set the alpha of TEV constant colour 0.
+void fn_80016158(u8 nAlpha) {
+    GXColor colour;
+
+    // EA bug: only the alpha is set; r, g and b are whatever was on the stack
+    colour.a = nAlpha;
+    GXSetTevKColor(0, colour);
+}
+
 // Reset the view: whole-screen viewport, a 512 x 448 screen, scales of 1.
 void fn_80016198(void) {
     fn_80016B6C(1.0f, 1.0f);
@@ -769,6 +778,11 @@ void fn_80016B9C(void) {
     fn_80016C28(lbl_801B8980.m34[0], lbl_801B8980.m34[0]);
     fn_80016C28(lbl_801B8980.m34[2], lbl_801B8980.m34[2]);
     lbl_801B8980.u110 |= 0x100;
+}
+
+// Set the GX viewport from six values (GXGetViewportv's layout).
+void fn_80016C44(f32* pViewport) {
+    GXSetViewport(pViewport[0], pViewport[1], pViewport[2], pViewport[3], pViewport[4], pViewport[5]);
 }
 
 // Set the viewport's corners, as fractions of the screen.
