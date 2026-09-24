@@ -270,7 +270,6 @@ int fn_80006444(int hFile, void* pDst, u32 uLen, u32 uOffset,
 int fn_80006478(int hFile, void* pDst, u32 uLen, u32 uOffset, void (*pfnDone)(int nBytes, int nError),
                 u8 nPrio, s32 n1C, u8 b20, u8 b21) {
     FileReqPool* pPool;
-    FileQueue* pQueue;
     FileReq* pReq;
 
     fn_800B7490();
@@ -282,14 +281,14 @@ int fn_80006478(int hFile, void* pDst, u32 uLen, u32 uOffset, void (*pfnDone)(in
         pReq->pNext->pPrev = pReq->pPrev;
         pReq->pPrev = pReq;
         pReq->pNext = pReq;
-        pQueue = &lbl_8019E868[nPrio];
-        if (pQueue != NULL) {
-            pReq->pNext = (FileReq*)pQueue;
-            pReq->pPrev = pQueue->pPrev;
-            if (pQueue->pPrev != NULL) {
-                pQueue->pPrev->pNext = pReq;
+        // EA's list insert again, written out on the queue element each time
+        if (&lbl_8019E868[nPrio] != NULL) {
+            pReq->pNext = (FileReq*)&lbl_8019E868[nPrio];
+            pReq->pPrev = lbl_8019E868[nPrio].pPrev;
+            if (lbl_8019E868[nPrio].pPrev != NULL) {
+                lbl_8019E868[nPrio].pPrev->pNext = pReq;
             }
-            pQueue->pPrev = pReq;
+            lbl_8019E868[nPrio].pPrev = pReq;
         }
         lbl_8019E868[nPrio].nCount++;
         pReq->nFile = hFile;
