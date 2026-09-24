@@ -968,7 +968,8 @@ void fn_80032518(int nRenderPass) {
                         break;
                     }
                     fn_80012EF8();
-                    for (pPatch = lbl_801D3CB0.pSortedPatchList[nRenderPass][nList][(u32)nClip];
+                    for (pPatch =
+                             lbl_801D3CB0.pSortedPatchList[nRenderPass][nList][(u32)nClip];
                          pPatch != NULL; pPatch = pPatch->pNext[nList]) {
                         fn_80032B7C(pPatch->pGround, nClip, nList, pPatch->n1C, pPatch->n18, pPatch->n20,
                                     &bFirst, 0, 0, pPatch->fDistance,
