@@ -1,25 +1,21 @@
 // GoCamera.c (EA's name, from its asserts; also in EA's 2002 source tree; TW06): not yet
 // decompiled; the sweep code below is the matched small functions.
 
-#include "game_types.h"
+#include "camera.h"
 
 void fn_80076A14(f32* pA, f32* pB, f32* pOut);
 void fn_80076A38(f32* pA, f32* pOut);
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_80009E70();
-void fn_8007644C(void);
-
-void fn_8007644C(void) {
-    fn_80009E70();
+void fn_8007644C(CamLens* pLens) {
+    fn_80009E70(pLens);
 }
 
 // ---- end of sweep code ----
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_80076948(u8* p0, f32 x0, f32 x1);
 s32 fn_8000A0E8(s32, s32);
 s32 fn_8000A798(s32, s32);
 s32 fn_8000ADC0(s32);
@@ -28,11 +24,10 @@ void fn_80076954(s32 arg0, s32 arg1);
 void fn_800354B4(u8* p, f32 v);
 void fn_800769C0(u8* p0, f32 x0, f32 x1);
 void fn_80076A04(u8* p, f32 v);
-void fn_80076A0C(u8* p, s32 v);
 
-void fn_80076948(u8* p0, f32 x0, f32 x1) {
-    *(f32*)(p0 + 0xB4) = x0;
-    *(f32*)(p0 + 0xB8) = x1;
+void fn_80076948(CamLens* pLens, f32 fB4, f32 fB8) {
+    pLens->fB4 = fB4;
+    pLens->fB8 = fB8;
 }
 
 void fn_80076954(s32 arg0, s32 arg1) {
@@ -55,8 +50,8 @@ void fn_80076A04(u8* p, f32 v) {
     *(f32*)(p + 0xA8) = v;
 }
 
-void fn_80076A0C(u8* p, s32 v) {
-    *(s32*)(p + 0x0) = v;
+void fn_80076A0C(CamLens* pLens, s32 nType) {
+    pLens->nType = nType;
 }
 
 // ---- end of sweep code ----

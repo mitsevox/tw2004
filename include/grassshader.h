@@ -6,6 +6,7 @@
 #define GRASSSHADER_H
 
 #include "engine.h"
+#include "camera.h"
 #include "gx.h"
 
 // One word of the grass vertex buffer. A vertex is four words: x, y, z, then four bytes: n374 at
@@ -116,11 +117,14 @@ typedef struct GrassManager {
     s32          n1C;           // 0x1C  the chunks added (fn_8011E4D8); cleared when the grass is freed
     struct GrassChunkData* a20[10];   // 0x20  each chunk's data, byte-swapped in place
     struct GrassChunk*     a48[10];   // 0x48  the chunks
-    void*        p70;           // 0x70
-    void*        p74;           // 0x74
-    void*        p78;           // 0x78
-    void*        p7C;           // 0x7C
-    u8           unk80[0xD8 - 0x80];
+    void*        pCamera;       // 0x70  the grass's render camera, made from the three below (fn_8011E9D8)
+    CamLens*     pLens;         // 0x74  a flat lens, 20 x 20
+    GoFrameBuf*  pFrameBuf;     // 0x78  256 x 256
+    f32*         pRect;         // 0x7C  its screen rectangle
+    u8           unk80[0xB0 - 0x80];
+    f32          vB0[3];        // 0xB0  a position: the lens looks down on it from vB0[0], f3B0, vB0[2]
+                                //       (fn_8011EB04)
+    u8           unkBC[0xD8 - 0xBC];
     GrassBuffer** apD8;         // 0xD8  a stack of buffers (fn_8011FDC4 pushes, fn_8011FF58 empties)
     GrassBuffer** apDC;         // 0xDC  16 free buffers (fn_8011FD74 puts one back, fn_8011FDEC
                                 //       takes the best fit)
@@ -135,7 +139,9 @@ typedef struct GrassManager {
     void*        p370;          // 0x370  an allocation; set while the grass is on (fn_8012022C)
     u8           unk374[0x3A4 - 0x374];
     s32          n3A4;          // 0x3A4  the last chunk's GrassChunkData.n0
-    u8           unk3A8[0x3B8 - 0x3A8];
+    u8           unk3A8[0x3B0 - 0x3A8];
+    f32          f3B0;          // 0x3B0  the height the grass lens looks down from (fn_8011EB04)
+    u8           unk3B4[0x3B8 - 0x3B4];
     f32          f3B8;          // 0x3B8  the last chunk's GrassChunkData.f4
     u8           unk3BC[0x3CC - 0x3BC];
     s32          n3CC;          // 0x3CC

@@ -12,33 +12,17 @@
 void fn_8011E3B0(void);
 u8 fn_80112B80();
 void fn_8011E4A4(void);
-s32 fn_800C6CB0();
 void fn_8011EE4C(void);
 void fn_8011EF88(void);
 void fn_8011F374(void);
 s32 fn_8011F3AC();
 void fn_8011E974(void);
-void fn_800137B0();
-void fn_8006E214();
-void fn_8007644C();
-void fn_80076B18();
 void fn_8011EAB8(void);
 void fn_8011EBF8(void);
 void fn_8011EC2C(void);
-extern u8 lbl_801945E8[];
-extern u8 lbl_801945F8[];
-extern u8 lbl_80194618[];
-void fn_80012EF8();
-void fn_80012F18();
-void fn_80012F34();
-void fn_80012F50();
-void fn_80014118();
-void fn_80014194();
-void fn_8001425C();
-void fn_8001644C();
-void fn_80013CCC();
-void fn_8001614C();
-void fn_80016B9C();
+extern f32 lbl_801945E8[];
+extern f32 lbl_801945F8[];
+extern f32 lbl_80194618[];
 void fn_80035138();
 void fn_800352BC();
 void GrassRender_vBuildAndUploadOneTimeData();
@@ -49,6 +33,7 @@ void fn_8011E468(void);
 void fn_8011E4D8(GrassChunk* pChunk);
 void fn_8011EB80(void);
 void fn_8011E9D8(void);
+void fn_8011EB04(void);
 void fn_8011FFCC(void);
 void fn_8011E584(UStreamObject* pObject);
 int  fn_8011E6B0(f32** ppA, f32** ppB);
@@ -160,7 +145,9 @@ int fn_8011E6B0(f32** ppA, f32** ppB) {
 }
 
 void fn_8011E974(void) {
-    if (lbl_80281900->p370 != NULL && lbl_80281900->n3E0 != 0 && fn_800C6CB0() == 0) {
+    // port: EA's GoGrass.c saw fn_800C6CB0 as returning int (its result is not masked here); it
+    // returns u8
+    if (lbl_80281900->p370 != NULL && lbl_80281900->n3E0 != 0 && ((int (*)(void))fn_800C6CB0)() == 0) {
         fn_8011EF88();
         fn_8011F3AC();
         fn_8011F374();
@@ -170,11 +157,47 @@ void fn_8011E974(void) {
     }
 }
 
+// The grass's render camera: a flat 20 x 20 lens drawing into a 256 x 256 frame buffer.
+void fn_8011E9D8(void) {
+    lbl_80281900->pLens = fn_80076400();
+    lbl_80281900->pFrameBuf = fn_8006E1C8();
+    lbl_80281900->pRect = fn_80076ACC();
+    fn_8006E26C(lbl_80281900->pFrameBuf, 0.0f, 0.0f, 256.0f, 256.0f, 1.0f, 1.0f);
+    fn_800171D8(lbl_80281900->pRect, 0.0f, 0.0f, 1.0f, 1.0f);
+    fn_800B3438(lbl_80281900->pRect, 1.0f, 1.0f);
+    fn_800768E0(lbl_80281900->pLens);
+    fn_80076A0C(lbl_80281900->pLens, 1);
+    fn_80076948(lbl_80281900->pLens, 20.0f, 20.0f);
+    lbl_80281900->pCamera =
+        fn_8001371C(lbl_80281900->pLens, lbl_80281900->pFrameBuf, lbl_80281900->pRect);
+}
+
 void fn_8011EAB8(void) {
-    fn_8006E214(lbl_80281900->p78);
-    fn_8007644C(lbl_80281900->p74);
-    fn_80076B18(lbl_80281900->p7C);
-    fn_800137B0(lbl_80281900->p70);
+    fn_8006E214(lbl_80281900->pFrameBuf);
+    fn_8007644C(lbl_80281900->pLens);
+    fn_80076B18(lbl_80281900->pRect);
+    fn_800137B0(lbl_80281900->pCamera);
+}
+
+// Points the grass lens straight down from f3B0 over vB0, offset by half its view size.
+void fn_8011EB04(void) {
+    f32 aEye[4];
+    f32 aAt[4];
+    f32 fX;
+    f32 fZ;
+
+    fn_8001F004();
+    fX = 0.5f * lbl_80281900->pLens->fB4 + lbl_80281900->vB0[0];
+    fZ = 0.5f * lbl_80281900->pLens->fB8 + lbl_80281900->vB0[2];
+    aEye[0] = fX;
+    aEye[1] = lbl_80281900->f3B0;
+    aEye[2] = fZ;
+    aEye[3] = 1.0f;
+    aAt[0] = fX;
+    aAt[1] = lbl_80281900->f3B0 - 1.0f;
+    aAt[2] = fZ;
+    aAt[3] = 1.0f;
+    fn_8007646C(lbl_80281900->pLens, aEye, aAt);
 }
 
 // The grass's 256x256 texture: its buffer and texture object.
@@ -223,8 +246,7 @@ void fn_8011EE4C(void) {
 
 void fn_8011EF88(void) {
     fn_800352BC();
-    fn_8001614C();
-    fn_80013CCC();
+    fn_80013CCC(fn_8001614C());
     fn_80035138(0);
     fn_80016B9C();
     fn_80012F50(0, 6, 128);
