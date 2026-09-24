@@ -8,12 +8,16 @@
 void fn_80038624(f32* pColour);
 void fn_800A6AC8(u8 nPlayer, u8 n);     // GameAudio.c
 
+void fn_800B39B8(ComicPanel* pPanel, f32* pRect, int nPlayer, f32 fFrameTime);
 u8   fn_800B3C64(ComicPanel* pPanel, int nPlayer);
-void fn_800B3D64(void);
+void fn_800B3D64(ComicPanel* pPanel, View* pView, f32 fFrameTime);
+void fn_800B3D68(ComicPanel* pPanel, f32* pRect, f32 fFrameTime);
 void fn_800B3F4C(f32* pRect, f32 fTop, f32 fLeft, f32 fWidth, f32 fHeight);
 void fn_800B3F9C(void);
 void fn_800B4108(void);
+u8   fn_800B4818(f32* pRect, int nPlayer);
 u8   fn_800B4908(void);
+void fn_800B4914(View* pView, int nPlayer);
 
 void fn_800B34F0(void) {
     lbl_80282178 = fn_80009B34(sizeof(ComicCam), 2, 0, "GoComicCam.c", 91);
@@ -57,6 +61,61 @@ void fn_800B3550(int nKind, View* pView, int nPlayer) {
     }
 }
 
+// A frame of the comic camera for nPlayer's view: draw the panels, and when the current one has run
+// its course move on to the next. Returns 1 when the camera is finished.
+u8 fn_800B36F4(View* pView, int nPlayer, f32 fFrameTime) {
+    f32 aColour[4] = { 0.0f, 0.0f, 0.0f, 0.5f };
+    f32* pRect;
+    ComicPanel* pPanel = &lbl_80282178->aPanel[lbl_80282178->nPanel];
+
+    pRect = fn_80012EF0(fn_80017004(gPlayers[nPlayer].nView[0]));
+    if (gSession.nPaused != 0) {
+        lbl_80282178->n8 = -2;
+    }
+    if (lbl_80282178->n8 < 2) {
+        fn_800B3F4C(pRect, 0.0f, 0.0f, 1.0f, 1.0f);
+        fn_80038624(aColour);
+        if (gSession.nPaused == 0) {
+            fn_800B3F4C(pRect, pPanel->fTop, pPanel->fLeft, pPanel->fWidth, pPanel->fHeight);
+        }
+        lbl_80282178->n8 = lbl_80282178->n8 + 1;
+    }
+    if (lbl_80282178->bNext && gSession.nPaused == 0) {
+        lbl_80282178->n10++;
+        fn_800B3D68(pPanel, pRect, fFrameTime);
+        if (lbl_80282178->n10 > 2) {
+            lbl_80282178->bNext = 0;
+            fn_800B3F4C(pRect, pPanel->fTop, pPanel->fLeft, pPanel->fWidth, pPanel->fHeight);
+            fn_800B4914(pView, nPlayer);
+        }
+    } else if (lbl_80282178->bNext && gSession.nPaused != 0) {
+        lbl_80282178->n10 = -2;
+    }
+    if (!lbl_80282178->bNext) {
+        fn_800B39B8(pPanel, pRect, nPlayer, fFrameTime);
+        fn_800B3D64(pPanel, pView, fFrameTime);
+        fn_800B3D68(pPanel, pRect, fFrameTime);
+        lbl_80282178->fTime = lbl_80282178->fTime + fFrameTime;
+        if (fn_800B3C64(pPanel, nPlayer)) {
+            lbl_80282178->a4C[lbl_80282178->nPanel] = pPanel->fTime;
+            lbl_80282178->a24[lbl_80282178->nPanel] = pPanel->fTime;
+            if (pPanel->nNext >= 0) {
+                lbl_80282178->bNext = 1;
+                lbl_80282178->nPanel = pPanel->nNext;
+                lbl_80282178->fTime = 0.0f;
+                lbl_80282178->n10 = 0;
+                lbl_80282178->nShown = lbl_80282178->nShown + 1;
+            } else {
+                lbl_80282178->bDone = 1;
+            }
+        }
+        if (fn_800B4818(pRect, nPlayer)) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
 // Has the panel run its course? Kinds 0 and 1 wait for the golfer's animation events 1 and 2, kind
 // 2 for the panel's time.
 u8 fn_800B3C64(ComicPanel* pPanel, int nPlayer) {
@@ -76,7 +135,34 @@ u8 fn_800B3C64(ComicPanel* pPanel, int nPlayer) {
     }
 }
 
-void fn_800B3D64(void) {
+// Does nothing; its only caller, fn_800B36F4, passes these.
+void fn_800B3D64(ComicPanel* pPanel, View* pView, f32 fFrameTime) {
+}
+
+// Draw the panels still showing, each darkened as its time runs out, then put the render camera's
+// rectangle pRect back. pPanel is not used.
+void fn_800B3D68(ComicPanel* pPanel, f32* pRect, f32 fFrameTime) {
+    f32 aColour[4] = { 0.0f, 0.0f, 0.0f, 0.5f };
+    f32 fX = pRect[0];
+    f32 fY = pRect[1];
+    f32 fHeight = pRect[3];
+    f32 fWidth = pRect[2];
+    int i;
+
+    for (i = 0; i < 10; i++) {
+        if (lbl_80282178->a24[i] > 0.0f) {
+            fn_800B3F4C(pRect, lbl_80282178->aPanel[i].fTop, lbl_80282178->aPanel[i].fLeft,
+                        lbl_80282178->aPanel[i].fWidth, lbl_80282178->aPanel[i].fHeight);
+            aColour[3] = 0.5f * (1.0f - lbl_80282178->a24[i] / lbl_80282178->a4C[i]);
+            aColour[3] = aColour[3] < 0.0f ? 0.0f : (aColour[3] > 0.5f ? 0.5f : aColour[3]);
+            lbl_80282178->a24[i] = lbl_80282178->a24[i] - fFrameTime;
+            fn_80038624(aColour);
+            if (lbl_80282178->bNext && lbl_80282178->a24[i] <= 0.0f) {
+                lbl_80282178->a24[i] = lbl_80282178->a24[i] + fFrameTime;
+            }
+        }
+    }
+    fn_800B3F4C(pRect, fY, fX, fWidth, fHeight);
 }
 
 // Set the render camera's screen rectangle pRect and bring the camera up to date.
