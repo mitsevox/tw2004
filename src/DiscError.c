@@ -275,7 +275,7 @@ void fn_800B70E8(int nLine, int nLines, int nSpan, const char* szText) {
     nWidth = fn_800B6DA4(szText);
     fStep = ((nSpan - 1) * 8) / nLines;
     fn_800B6C14((0x200 - (nWidth + 3)) / 2,
-                ((fStep - 8.0f) + (224.0f - nLines * fStep)) * 0.5f + (nLine - 1) * fStep, szText);
+                ((fStep - 8.0f) + (224.0f - nLines * fStep)) / 2.0f + (nLine - 1) * fStep, szText);
     fn_800B7694(1);
     fn_800B768C(1);
 }
