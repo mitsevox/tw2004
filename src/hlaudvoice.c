@@ -15,6 +15,8 @@ void fn_800B00A4(u16 nVoice, u32 u, int a);             // startUp.c
 void fn_800B01B4(u16 nVoice, u8 bA, u8 bB);             // startUp.c
 u8   fn_800AFB98(u16 nVoice);                           // startUp.c
 void fn_800B0430(void);                                 // startUp.c
+s16  fn_800AFEDC(u16 nVoice);                           // startUp.c
+u32  fn_800B06F4(void);                                 // startUp.c
 
 void fn_800AC330(void);
 u8   fn_800AC6B0(AudVoiceRequest* pRequest, s16* pPriority);
@@ -58,6 +60,86 @@ s32 fn_800AC494(void) {
 }
 
 void fn_800AC49C(void) {
+}
+
+// Takes a voice for a request: a free one, or else (with 8 or fewer free) one on a list up to the
+// request's n4 whose playing volume the request beats, stolen from its track. A stolen voice
+// skips its first settings (bA_5). NULL when none can be had.
+AudVoice* fn_800AC4A0(AudVoiceRequest* pRequest) {
+    AudVoicePool* pPool = lbl_801F19B8;
+    AudVoice* pVoice = NULL;
+    u8 bStolen = 0;
+    UList* pList;
+    UList* pListEnd;
+    AudVoice* pCand;
+    s16 nVolume;
+
+    if (pRequest->nPriority == 0) {
+        return NULL;
+    }
+    if (pPool->free.nFree <= 8) {
+        pList = pPool->aLists;
+        pListEnd = &pPool->aLists[pRequest->n4] + 1;
+        if (pRequest->n4 == 2) {
+            pListEnd--;
+        }
+        for (; pList < pListEnd; pList++) {
+            for (pCand = (AudVoice*)pList->pHead; pCand != NULL; pCand = (AudVoice*)pCand->link.pNext) {
+                // port: EA passes an argument fn_800AFEDC ignores
+                nVolume = ((s16 (*)(u16, int))fn_800AFEDC)(pCand->nHwVoice, 0);
+                if (fn_800AC6B0(pRequest, &nVolume)) {
+                    pVoice = pCand;
+                    break;
+                }
+            }
+            if (pVoice != NULL) {
+                if (pVoice->pfnCallback != NULL) {
+                    pVoice->pfnCallback(pVoice, 1);
+                }
+                if (pPool->free.nFree != 0) {
+                    fn_800ACB28(pVoice);
+                    pVoice = NULL;
+                } else {
+                    fn_800AFBD8(pVoice->nHwVoice, 0);
+                    fn_800ADF6C(pList, &pVoice->link);
+                    bStolen = 1;
+                }
+                break;
+            }
+        }
+    }
+    if (pPool->free.nFree != 0) {
+        pVoice = fn_800AE1AC(&pPool->free);
+    }
+    if (pVoice != NULL) {
+        pVoice->n10 = pRequest->n4;
+        pVoice->uC = 0;
+        pVoice->n14 = 0;
+        pVoice->n15 = 4;
+        pVoice->pTone = NULL;
+        pVoice->pfnCallback = pRequest->pfnCallback;
+        pVoice->pUser = pRequest->pUser;
+        pVoice->nIndex = pRequest->nIndex;
+        pVoice->flags.n = pRequest->flags.n;
+        pVoice->n3E = 0;
+        pVoice->flags.b.bHalf = 0;
+        if (bStolen) {
+            pVoice->flags.b.bA_5 = 1;
+        }
+        if (pRequest->flags.b.b12) {
+            if (pVoice->uAram != 0) {
+                fn_800B0748(pVoice->uAram);
+            }
+            pVoice->uAram = fn_800B06F4();
+            if (pVoice->uAram == 0) {
+                fn_800ACB28(pVoice);
+                return NULL;
+            }
+            pVoice->uPlayPos = pVoice->uAram;
+        }
+        fn_800ADEC8(&pPool->aLists[pRequest->n4], &pVoice->link);
+    }
+    return pVoice;
 }
 
 // Can this request take a voice playing at *pPriority?

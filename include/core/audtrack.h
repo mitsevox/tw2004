@@ -39,7 +39,8 @@ typedef struct AudVoice {
     u32  uAram;                 // 0x28   its ARAM buffer (two halves of 0x7F00 bytes)
     u32  uPlayPos;              // 0x2C   where it is playing in that buffer, in bytes
     u8   unk30[0x3E - 0x30];
-    u16  n3E;                   // 0x3E   cleared when the voice is taken (fn_800AC4A0)
+    u8   n3E;                   // 0x3E   cleared when the voice is taken (fn_800AC4A0, a byte store)
+    u8   unk3F;
 } AudVoice;
 LAYOUT_ASSERT(AudVoice, 0x40);
 
