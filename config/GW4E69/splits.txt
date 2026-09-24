@@ -243,6 +243,7 @@ GoDynObjBase.c:
 
 GoAnimalActors.c:
 	.text       start:0x80049B40 end:0x8004ABBC
+	.sdata2     start:0x80283218 end:0x80283280
 
 GoDynObjTypes.c:
 	.text       start:0x8004ABBC end:0x8004AFA0
