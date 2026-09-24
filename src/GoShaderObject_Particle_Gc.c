@@ -5,6 +5,11 @@
 // (0x80281F58-0x80281F70). Where it ends between 0x8009554C and char_state.c is not proven.
 
 #include "engine.h"
+#include "gx.h"
+#include "camera.h"
+#include "terrain.h"
+#include "psmgr.h"
+#include "unsorted/cull.h"
 
 // The main-memory heap's globals (fn_80095108, fn_800951A0), defined last-address-first.
 s32 lbl_80281F68;                       // the heap's size
@@ -39,17 +44,260 @@ void fn_80094278(void) {
     lbl_802813A8->b10 = 1 - lbl_802813A8->b10;
 }
 
-void fn_80094B84(void);
-void fn_80094E34(void);
+// The create callback, called twice: first to allocate the system and give it the next run of
+// particles in the buffers, then to fill it in from its settings (the vectors kept / 256).
+void fn_8009428C(SD_SShaderObject_Static* pObject, ParticleCreate* pCreate) {
+    ParticleSystem* pSys;
 
-// A callback: what *pnWhat asks for, 0 or 1, is done by fn_80094B84 or fn_80094E34.
-void fn_80095088(void* p, s32* pnWhat) {
-    switch (*pnWhat) {
+    if (pCreate->bAlloc) {
+        pObject->pData = fn_80009B34(sizeof(ParticleSystem), 2, 32, "GoShaderObject_Particle_Gc.c", 201);
+        ((ParticleSystem*)pObject->pData)->nFirst = lbl_802813A8->n14;
+        lbl_802813A8->n14 += pCreate->pParams->nCount;
+        return;
+    }
+    pSys = pObject->pData;
+    pSys->nTexture = pCreate->pParams->nTexture;
+    fn_800102DC(fn_8000BEE4(lbl_801F1640[pSys->nTexture]), &pSys->pBank, &pSys->pTex);
+    pSys->nCount = pCreate->pParams->nCount;
+    pSys->u18 = pCreate->pParams->u58;
+    pSys->anStart[0] = 0;
+    pSys->anLive[0] = 0;
+    pSys->anStart[1] = 0;
+    pSys->anLive[1] = 0;
+    Vec_Copy(pCreate->pParams->vC0, pSys->shape.v10);
+    Vec_Copy(pCreate->pParams->vD0, pSys->shape.v20);
+    Vec_Copy(pCreate->pParams->vE0, pSys->shape.v30);
+    Vec_Copy(pCreate->pParams->vF0, pSys->shape.v0);
+    pSys->shape.f40 = pCreate->pParams->f104;
+    pSys->shape.f44 = pCreate->pParams->f108;
+    fn_8000AE28(pSys->shape.v10, 1.0f / 256.0f, pSys->shape.v10);
+    fn_8000AE28(pSys->shape.v20, 1.0f / 256.0f, pSys->shape.v20);
+    fn_8000AE28(pSys->shape.v30, 1.0f / 256.0f, pSys->shape.v30);
+    fn_8000AE28(pSys->shape.v0, 1.0f / 256.0f, pSys->shape.v0);
+    pSys->shape.f40 = pSys->shape.f40 / 256.0f;
+    pSys->shape.f44 = pSys->shape.f44 / 256.0f;
+    pSys->shape.f48 = 1.4142f * pCreate->pParams->f118;
+    pSys->shape.f4C = 1.4142f * pCreate->pParams->f114;
+    pSys->shape.f50 = 0.25f * pCreate->pParams->f110;
+    pSys->shape.f54 = 1.0f / pCreate->pParams->f110;
+    pSys->shape.f58 = 1.0f / (2.0f * PI);
+    pSys->shape.f5C = 0.5f;
+    fn_8000AE6C(pCreate->pParams->vB0, pCreate->pParams->vA0, pCreate->pParams->f110, pSys->shape.v60);
+    fn_8000AE28(pSys->shape.v60, pSys->shape.f54, pSys->shape.v60);
+    pSys->shape.v60[3] = 0.0f;
+    pSys->shape.aSin[0] = 2.0f * PI;
+    pSys->shape.aSin[1] = -(2.0f * PI) * (2.0f * PI) * (2.0f * PI) / 6.0f;
+    pSys->shape.aSin[2] = (2.0f * PI) * (2.0f * PI) * (2.0f * PI) * (2.0f * PI) * (2.0f * PI) / 120.0f;
+    pSys->shape.aSin[3] = -(2.0f * PI) * (2.0f * PI) * (2.0f * PI) * (2.0f * PI) * (2.0f * PI)
+                          * (2.0f * PI) * (2.0f * PI) / 5040.0f;
+    pSys->shape.aCos[0] = 1.0f;
+    pSys->shape.aCos[1] = -(2.0f * PI) * (2.0f * PI) / 2.0f;
+    pSys->shape.aCos[2] = (2.0f * PI) * (2.0f * PI) * (2.0f * PI) * (2.0f * PI) / 24.0f;
+    pSys->shape.aCos[3] = -(2.0f * PI) * (2.0f * PI) * (2.0f * PI) * (2.0f * PI) * (2.0f * PI)
+                          * (2.0f * PI) / 720.0f;
+}
+
+// The close callback: the system's run is handed back when it is the last one given out.
+void fn_800944F8(SD_SShaderObject_Static* pObject) {
+    ParticleSystem* pSys = pObject->pData;
+
+    if (lbl_802813A8->n14 > pSys->nFirst) {
+        lbl_802813A8->n14 = pSys->nFirst;
+    }
+    fn_80009E70(pSys);
+}
+
+void fn_80094534(f32 (*pMtx)[4], ParticleShape* pShape, ParticleVertex* pVerts, f32* pTimes, u32 n);
+
+// The draw callback: the live particles of the buffer in use, in two runs when they wrap past the
+// end of the system's run.
+void fn_800949D0(SD_SShaderObject_Static* pObject) {
+    int nBuf;
+    u16 nLive;
+    u16 nStart;
+    ParticleSystem* pSys;
+    Camera* pCamera;
+    u32 n;
+
+    pSys = pObject->pData;
+    nBuf = lbl_802813A8->b10;
+    nLive = pSys->anLive[nBuf];
+    nStart = pSys->anStart[nBuf];
+    if (nLive != 0) {
+        fn_80012F50(0, 6, 0x80);
+        fn_80012F18(3);
+        fn_80012F34(0);
+        fn_80014118(0x70);
+        fn_8005CC64(pSys->pBank, pSys->pTex);
+        if (pSys->u18 & 0x80) {
+            fn_80035118(4, 1);
+        } else if (pSys->u18 & 0x100) {
+            fn_80035118(1, 1);
+        } else {
+            fn_80035118(4, 5);
+        }
+        fn_80035138(0);
+        fn_80012EF8();
+        pCamera = fn_8001614C();
+        GXClearVtxDesc();
+        GXSetVtxDesc(9, 1);                     // position, colour, texture coordinates: direct
+        GXSetVtxDesc(11, 1);
+        GXSetVtxDesc(13, 1);
+        GXInvalidateVtxCache();
+        fn_80094534(pCamera->viewMtx, &pSys->shape,
+                    (ParticleVertex*)lbl_802813A8->apBuffers[nBuf] + pSys->nFirst + nStart,
+                    (f32*)lbl_802813A8->apBuffers[nBuf + 2] + pSys->nFirst + nStart,
+                    (nLive <= (u32)(pSys->nCount - nStart)) ? nLive : pSys->nCount - nStart);
+        n = pSys->nCount - nStart;
+        if (nLive > n) {
+            fn_80094534(pCamera->viewMtx, &pSys->shape,
+                        (ParticleVertex*)lbl_802813A8->apBuffers[nBuf] + pSys->nFirst,
+                        (f32*)lbl_802813A8->apBuffers[nBuf + 2] + pSys->nFirst, nLive - n);
+        }
+        fn_80012F34(1);
+        fn_80012F50(1, 6, 0x80);
+        fn_80012EF8();
+    }
+}
+
+// The buffer not being drawn is rebuilt from the one drawn last: its own live particles age by
+// fStep and those past the lifetime are dropped; then the particles the other buffer has beyond
+// them are carried over, aged by fCarried.
+void fn_80094B84(SD_SShaderObject_Static* pObject, ParticleMsg* pMsg) {
+    ParticleSystem* pSys;
+    int nBuf;
+    u32 nDead;
+    u32 nStart;
+    u32 nLive;
+    u32 i;
+    u32 n;
+    u32 nEnd;
+    f32 fAge;
+    ParticleVertex* pSrc;
+    ParticleVertex* pDst;
+
+    nDead = 0;
+    pSys = pObject->pData;
+    nBuf = 1 - lbl_802813A8->b10;
+    nStart = pSys->anStart[nBuf];
+    nLive = pSys->anLive[nBuf];
+    i = nStart;
+    for (n = nLive; n != 0; n--) {
+        fAge = *((f32*)lbl_802813A8->apBuffers[nBuf + 2] + pSys->nFirst + i) + pMsg->u.age.fStep;
+        if (fAge > pMsg->pParams->f4) {
+            nDead++;
+        } else {
+            *((f32*)lbl_802813A8->apBuffers[nBuf + 2] + pSys->nFirst + i) = fAge;
+        }
+        if (++i == pSys->nCount) {
+            i = 0;
+        }
+    }
+    if (nDead != 0) {
+        nStart += nDead;
+        if (nStart >= pSys->nCount) {
+            nStart -= pSys->nCount;
+        }
+        nLive -= nDead;
+    }
+    nEnd = pSys->anStart[1 - nBuf] + pSys->anLive[1 - nBuf];
+    if (nEnd >= pSys->nCount) {
+        nEnd -= pSys->nCount;
+    }
+    while (i != nEnd) {
+        *((f32*)lbl_802813A8->apBuffers[nBuf + 2] + pSys->nFirst + i) =
+            *((f32*)lbl_802813A8->apBuffers[1 - nBuf + 2] + pSys->nFirst + i) + pMsg->u.age.fCarried;
+        // EA copies four slots from each particle's on; the next three are other particles'
+        pSrc = (ParticleVertex*)lbl_802813A8->apBuffers[1 - nBuf] + pSys->nFirst + i;
+        pDst = (ParticleVertex*)lbl_802813A8->apBuffers[nBuf] + pSys->nFirst + i;
+        pDst[0] = pSrc[0];
+        pDst[1] = pSrc[1];
+        pDst[2] = pSrc[2];
+        pDst[3] = pSrc[3];
+        if (++i == pSys->nCount) {
+            i = 0;
+        }
+        nLive++;
+    }
+    pSys->anStart[nBuf] = nStart;
+    pSys->anLive[nBuf] = nLive;
+    *pMsg->u.age.pnLive = nLive;
+}
+
+void fn_800BADB4(f32 (*pMtx)[4], f32* pIn, f32* pOut);     // VecMath.c: a vector through a matrix
+
+// Emits pMsg's particles after the live ones of the buffer not being drawn (at most as many as
+// fit, less one). Their ages run from fAgeSpread down; unless the settings' flag 0x1000 keeps a
+// slot whose f18 is not 1024, each gets a new position and velocity through the matrix.
+void fn_80094E34(SD_SShaderObject_Static* pObject, ParticleMsg* pMsg) {
+    u32 i;
+    u32 nTotal;
+    ParticleSystem* pSys;
+    ParticleVertex* pVert;
+    int nBuf;
+    int nFree;
+    f32 fAge;
+    Vec4 v;
+
+    pSys = pObject->pData;
+    nBuf = 1 - lbl_802813A8->b10;
+    nFree = pSys->nCount - pSys->anLive[nBuf];
+    if (nFree > 1) {
+        if (pMsg->u.emit.nCount == 0) {
+            return;
+        }
+        if (pMsg->u.emit.nCount > nFree - 1) {
+            pMsg->u.emit.nCount = nFree - 1;
+        }
+        i = pSys->anStart[nBuf] + pSys->anLive[nBuf];
+        if (i >= pSys->nCount) {
+            i -= pSys->nCount;
+        }
+        pSys->anLive[nBuf] += (u16)pMsg->u.emit.nCount;
+        nTotal = pMsg->u.emit.nCount;
+        do {
+            if (pMsg->u.emit.fAgeSpread != 0.0f) {
+                fAge = pMsg->u.emit.fAgeSpread * ((f32)pMsg->u.emit.nCount / (f32)nTotal);
+            } else {
+                fAge = 0.0f;
+            }
+            *((f32*)lbl_802813A8->apBuffers[nBuf + 2] + pSys->nFirst + i) = fAge;
+            pVert = (ParticleVertex*)lbl_802813A8->apBuffers[nBuf] + pSys->nFirst + i;
+            if (!(pMsg->pParams->u58 & 0x1000) || pVert->f18 == 1024.0f) {
+                fn_80098CDC(pMsg->pParams, pVert->v0, pVert->vC, &pVert->f18, &pVert->f1C, &pVert->f20);
+                pVert->f20 *= 1.4142f;
+                v.x = pVert->v0[0];
+                v.y = pVert->v0[1];
+                v.z = pVert->v0[2];
+                v.w = 1.0f;
+                fn_800BAD60(pMsg->u.emit.pMtx, &v, &v);
+                Vec3Copy(&v.x, pVert->v0);
+                v.x = pVert->vC[0];
+                v.y = pVert->vC[1];
+                v.z = pVert->vC[2];
+                v.w = 1.0f;
+                fn_800BADB4(pMsg->u.emit.pMtx, &v.x, &v.x);
+                Vec3Copy(&v.x, pVert->vC);
+                // the next three slots get copies of it
+                Mem_cpy(pVert + 1, pVert, sizeof(ParticleVertex));
+                Mem_cpy(pVert + 2, pVert, 2 * sizeof(ParticleVertex));
+            }
+            if (++i == pSys->nCount) {
+                i = 0;
+            }
+            pMsg->u.emit.nCount--;
+        } while (pMsg->u.emit.nCount != 0);
+    }
+}
+
+// The message callback: pMsg->nWhat 0 ages the particles, 1 emits new ones.
+void fn_80095088(SD_SShaderObject_Static* pObject, ParticleMsg* pMsg) {
+    switch (pMsg->nWhat) {
     case 0:
-        fn_80094B84();
+        fn_80094B84(pObject, pMsg);
         break;
     case 1:
-        fn_80094E34();
+        fn_80094E34(pObject, pMsg);
         break;
     }
 }

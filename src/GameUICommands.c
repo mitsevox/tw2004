@@ -271,7 +271,6 @@ u8    fn_800C6E44(View* pView);
 u8    fn_800C708C(View* pView);
 void  fn_800C9038(int nView, int a, int b);
 s32   fn_800D2B4C(int nPlayer);
-s32   fn_800D2C30(int nHole, int nTeeSet);
 s32   fn_800D2D40(int nTeeSet);
 s32   fn_800D2DA0(int nTeeSet);
 s32   fn_800D2E00(int nTeeSet);

@@ -344,7 +344,7 @@ void fn_800AFA2C(s16 nVoice) {
 }
 
 // Start the audio hardware and the voice table.
-int fn_800AFAB0(void) {
+u8 fn_800AFAB0(void) {
     s16 i;
     AIInit(NULL);
     ARQInit();
@@ -615,7 +615,7 @@ void fn_800B0430(void) {
 void fn_800B0434(void) {
 }
 
-int fn_800B0438(void) {
+u8 fn_800B0438(void) {
     return 1;
 }
 
@@ -669,7 +669,7 @@ void fn_800B055C(u32 n) {
 }
 
 // Set up the ARAM heap: a silent block at its start, then the eight blocks of fn_800B06F4.
-int fn_800B0568(void) {
+u8 fn_800B0568(void) {
     lbl_802820FC = fn_800B6564(ARAM_HEAP_SIZE);
     lbl_8028210C = fn_800B5BD8(sizeof(ARAMHeap) + 32 * sizeof(ARAMBlock));
     lbl_802820F8 = fn_800B5C40(ARAM_HEAP_SIZE, lbl_802820FC, 32, lbl_8028210C);
@@ -733,7 +733,7 @@ int fn_800B0790(void) {
     return 0x4400;
 }
 
-int fn_800B0798(void) {
+u8 fn_800B0798(void) {
     return 1;
 }
 

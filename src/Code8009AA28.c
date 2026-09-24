@@ -8,6 +8,31 @@
 
 #include "glows.h"
 
+// SunFlr_Gc.c
+void fn_8009A340(void);
+void fn_8009A3D0(s32 nView, SunFlrView* pView);
+void fn_8009A704(s32 nView);
+
+// Frees each view's part.
+void fn_8009B0D0(void) {
+    s32 i;
+
+    fn_8009A340();
+    for (i = 0; i < lbl_802813B8->nViews; i++) {
+        fn_8009A3D0(i, &lbl_802813B8->aView[i]);
+    }
+}
+
+void fn_8009B134(void) {
+    s32 i;
+
+    if (lbl_802813B8->b1BF0) {
+        for (i = 0; i < lbl_802813B8->nViews; i++) {
+            fn_8009A704(i);
+        }
+    }
+}
+
 void fn_8009B260(f32* pPos, u32 uColorA, u32 uColorB, u8 n25, u8 n24, u8 n26, f32 f18, f32 f1C,
                  f32 f20) {
     GlowQueued* pGlow;
