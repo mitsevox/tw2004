@@ -116,7 +116,6 @@ void fn_80016978(f32 x0, f32 y0, f32 x1, f32 y1);
 void fn_80016B54(int nWidth, int nHeight, f32 fX, f32 fY);
 void fn_80035098(u8 b);
 void fn_80016E90(int nView);
-void fn_8001BE88(Character* pChar, Clip* pClip, int bNoBlend, f32 f);
 void fn_800352BC(void);
 void fn_80035754(Character* pChar);
 void fn_80035810(Character* pChar);
