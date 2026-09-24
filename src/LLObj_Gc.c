@@ -3,6 +3,96 @@
 // camera space, then cull it), written earlier as unsorted/code_80007BC4.c and not yet cleaned up.
 
 #include "unsorted/cull.h"
+#include "dynobj.h"
+
+int fn_80007BC4(RenderObj* obj, Camera* cam, float* outDepth, int mode, float scale);
+void fn_80008214(void);
+void fn_80008248(void* p);
+void fn_80007930(UObjModelRoot* pRoot, int nSet);
+
+// Frees a mesh's used parts and table, then its children's, recursively.
+void fn_80007524(UObjMesh* pMesh) {
+    UObjMesh* pChild;
+    int i;
+
+    for (i = 0; i < 4; i++) {
+        if (pMesh->a1C[i]) {
+            fn_80008248(&pMesh->p18[i]);
+        }
+    }
+    if (pMesh->p18 != NULL) {
+        fn_80009E70(pMesh->p18);
+    }
+    pChild = pMesh->p10;
+    for (i = 0; i < pMesh->pInfo->n0; i++) {
+        fn_80007524(pChild);
+        pChild = pChild->p14;
+    }
+}
+
+// Frees a model fn_800073B4 made: its array sets 1-3, its mesh tree and itself.
+void fn_800075CC(UObjModelRoot* pRoot) {
+    int i;
+
+    fn_80008214();
+    for (i = 1; i < 4; i++) {
+        if (pRoot->aSets[i].n30 != -1) {
+            fn_80007930(pRoot, i);
+        }
+    }
+    fn_80007524(pRoot->pMesh);
+    if (pRoot->pE4 != NULL) {
+        fn_80009E70(pRoot->pE4);
+    }
+    fn_80009E70(pRoot);
+}
+
+// Makes array set nSet a copy of set 0, with its own copy of each array (sizes rounded up to 32).
+void fn_80007824(UObjModelRoot* pRoot, int nSet) {
+    u32 uSize;
+    int i;
+
+    pRoot->aSets[nSet] = pRoot->aSets[0];
+    for (i = 0; i < 5; i++) {
+        if (pRoot->aSets[0].an20[i] != 0) {
+            uSize = (pRoot->aSets[0].an20[i] * 12 + 31) & ~31;
+            pRoot->aSets[nSet].ap0[i] = fn_80009B34(uSize, 2, 32, "LLObj_Gc.c", 473);
+            Mem_cpy(pRoot->aSets[nSet].ap0[i], pRoot->aSets[0].ap0[i], uSize);
+        }
+    }
+}
+
+// Frees array set nSet's arrays (those set 0 has rows for).
+void fn_80007930(UObjModelRoot* pRoot, int nSet) {
+    int i;
+
+    for (i = 0; i < 5; i++) {
+        if (pRoot->aSets[0].an20[i] != 0) {
+            fn_80009E70(pRoot->aSets[nSet].ap0[i]);
+        }
+    }
+}
+
+// Culls a mesh by its bounding sphere scaled by fScale: 3 when it is out of view, 2 when it is
+// wholly in view (mode 0, then mode 1), else 0. fDist and fHalfFovTan are not used.
+int fn_80007B2C(UObjMesh* pMesh, void* pCamera, f32 fDist, f32 fHalfFovTan, f32 fScale) {
+    int nClip;
+    int nRet;
+
+    nClip = fn_80007BC4((RenderObj*)pMesh, pCamera, NULL, 0, fScale);
+    if (nClip == 2) {
+        return 3;
+    }
+    if (nClip == 1) {
+        return 2;
+    }
+    nClip = fn_80007BC4((RenderObj*)pMesh, pCamera, NULL, 1, fScale);
+    nRet = 0;
+    if (nClip == 1) {
+        nRet = 2;
+    }
+    return nRet;
+}
 
 // ---- sweep code (not yet cleaned up) ----
 

@@ -782,6 +782,28 @@ void fn_80016B9C(void) {
     lbl_801B8980.u110 |= 0x100;
 }
 
+// Negates four floats from pSrc into pDst (paired singles).
+#ifdef __MWERKS__
+asm void fn_80016C28(register f32* pSrc, register f32* pDst) {
+    nofralloc
+    psq_l  f0, 0(pSrc), 0, 0
+    psq_l  f1, 8(pSrc), 0, 0
+    ps_neg f0, f0
+    ps_neg f1, f1
+    psq_st f0, 0(pDst), 0, 0
+    psq_st f1, 8(pDst), 0, 0
+    blr
+}
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void fn_80016C28(f32* pSrc, f32* pDst) {
+    pDst[0] = -pSrc[0];
+    pDst[1] = -pSrc[1];
+    pDst[2] = -pSrc[2];
+    pDst[3] = -pSrc[3];
+}
+#endif
+
 // Set the GX viewport from six values (GXGetViewportv's layout).
 void fn_80016C44(f32* pViewport) {
     GXSetViewport(pViewport[0], pViewport[1], pViewport[2], pViewport[3], pViewport[4], pViewport[5]);
