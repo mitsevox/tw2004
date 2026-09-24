@@ -231,12 +231,110 @@ void fn_8003DCE8(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot*
             }
             if (fStep > 0.0f) {
                 fn_80045428(vPrev, pCam, vMove);
-                pScript->fD4 = fn_80009680(fn_80009744(vMove)) / fStep;
+                pScript->fD4 = (f32)fn_80009680(fn_80009744(vMove)) / fStep;
             }
         }
     }
     if (pScript->pShot->bA8 == 1) {
         CamScript_CheckOutOfBounds(pScript, pCam, pSub, nPlayer, pShot, vPrev, b);
+    }
+}
+
+// A plainer script frame than fn_8003DCE8 (a is not read): no pause test, no ball-rate easing, no
+// ground or fairway checks; the look-at point goes straight to pSub and fD8 is cleared.
+void fn_8003E624(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot* pShot, int a, f32 fTime) {
+    f32 vPrev[4];
+    f32 vMove[4];
+    f32 fFov;
+
+    if (pScript->pShot == NULL) return;
+    pScript->fD8 = 0.0f;
+    Vec_Copy(pCam, vPrev);
+    if (pScript->pShot->bA8 == 1) {
+        fn_8003A148(pScript->pShot, nPlayer, pScript, pScript->v0, pSub, vPrev, fTime);
+    } else {
+        fn_80064F54(pScript->pShot, nPlayer, pScript->v0);
+    }
+    if (pScript->pNextShot != NULL) {
+        if (pScript->pNextShot->bA8 == 1) {
+            fn_8003A148(pScript->pNextShot, nPlayer, pScript, pScript->v10, pSub, vPrev, fTime);
+        } else {
+            fn_80064F54(pScript->pNextShot, nPlayer, pScript->v10);
+        }
+    }
+    if (pScript->pNextShot == NULL || pScript->nBC == 5 || pScript->nBC == 4) {
+        Vec3Copy(pScript->v0, pCam);
+        CamScript_GetLookAtPoint(pScript->pShot, nPlayer, pSub, pCam, pScript, vPrev, fTime);
+        if (pScript->pShot->f78 == pScript->pShot->f7C) {
+            fFov = pScript->pShot->f78;
+        } else if (pScript->fCamTime < pScript->pShot->f48) {
+            fFov = pScript->fCamTime / pScript->pShot->f48 * (pScript->pShot->f7C - pScript->pShot->f78)
+                   + pScript->pShot->f78;
+        } else {
+            fFov = pScript->pShot->f7C;
+        }
+        fFov += fn_800DC3A4();
+        if (fn_80044E74(pScript->pShot)) {
+            fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[1])), fFov);
+        } else {
+            fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[0])), fFov);
+        }
+        pScript->fA8 = pScript->pShot->f9C;
+    } else {
+        switch (pScript->nBC) {
+        case 0:
+            fn_8003F518(nPlayer, pCam, pSub, pScript, vPrev, fTime);
+            break;
+        case 13:
+            fn_8003F7EC(nPlayer, pCam, pSub, pScript, vPrev, fTime);
+            break;
+        case 15:
+            fn_8003FAA0(nPlayer, pCam, pSub, pScript, vPrev, fTime);
+            break;
+        case 1:
+            fn_8003FD54(nPlayer, pCam, pSub, pScript, vPrev, fTime);
+            break;
+        case 14:
+            fn_8004017C(nPlayer, pCam, pSub, pScript, vPrev, fTime);
+            break;
+        case 2:
+        case 11:
+        case 12:
+            fn_800407D4(nPlayer, pCam, pSub, pScript, vPrev, fTime);
+            break;
+        case 7:
+            fn_80040A58(nPlayer, pCam, pSub, pScript, vPrev, fTime);
+            break;
+        case 3:
+            CamScript_SplineCameras(nPlayer, pCam, pSub, pScript, vPrev, fTime);
+            break;
+        }
+    }
+    fn_80043388(pScript, pScript->pShot);   // its answer is not used
+    pScript->f84 = pScript->fCamTime;
+    pScript->fCamTime += fTime;
+    pScript->f90 += fTime;
+    pScript->f88 += fTime;
+    pScript->f9C = pScript->f98;
+    pScript->f98 += fTime;
+    if (pScript->nE0 != 25 && pScript->f98 > pScript->fE4) {
+        pScript->nC4 = pScript->nE0;
+    }
+    if (0.0f != fTime) {
+        pScript->bCC = 0;
+    }
+    if (pScript->pNextShot != NULL && pScript->fCamTime > pScript->f8C) {
+        if (pScript->nBC == 7) {
+            pScript->pNextShot = NULL;
+            pScript->nBC = 5;
+        } else {
+            CameraScript_GoToNewScript(pScript, pScript->pNextShot, nPlayer, pCam, pSub, pShot);
+            fn_80043388(pScript, pScript->pShot);   // its answer is not used
+        }
+        if (fTime > 0.0f) {
+            fn_80045428(vPrev, pCam, vMove);
+            pScript->fD4 = (f32)fn_80009680(fn_80009744(vMove)) / fTime;
+        }
     }
 }
 
