@@ -204,12 +204,13 @@ void Mov_Start(void) {
 }
 
 // A chunk of the movie's sound came in: each channel goes into the next block of its voice's ring.
-void fn_800A8AD4(MovieSoundBlock* pBlock) {
-    u32 uRight;
+void fn_800A8AD4(void* pChunk) {
+    MovieSoundBlock* pBlock = pChunk;
     int nMode;
     u8* pDataL;
     u8* pDataR;
     u32 uLeft;
+    u32 uRight;
 
     if (lbl_801F1850.nState == 0) return;
     if (lbl_801F1850.nSendBlock == 0) {
