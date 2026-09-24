@@ -265,6 +265,74 @@ u8 fn_800CF848(int nPlayer) {
     return 0;
 }
 
+// For a human player, the course records (gSession.aCourseRecord, kind k's best) this shot
+// keeps in reach, as bits, each only while goals of its kind count (fn_800D8DB4) and, but for
+// kinds 1 and 2, outside a playoff: 0x1 on the last hole, the round would beat kind 0's with the
+// tap-in; 0x2 the ball is on the tee; 0x4 on the green or fringe, a drive of 3 x fA64 beats kind
+// 2's; 0x8 off the green two under par or better, one more of fn_800D1170 beats kind 3's; 0x10
+// on the last hole, the round's putts (one more on the green or fringe) beat kind 4's; 0x20 on
+// the tee of a par 4 or 5, one more of fn_800D0FBC beats kind 5's; 0x40 and 0x80 two under / one
+// under par or better, one more eagle (fn_800D06FC) / birdie (fn_800D0620) beats kinds 6 / 7.
+u32 fn_800CF904(int nPlayer) {
+    Player* pPlayer = &gPlayers[nPlayer];
+    u32 uFlags = 0;
+    int nPutts;
+    int i;
+    Ball* pBall = &pPlayer->ball;
+
+    if (Player_IsCPU(nPlayer)) {
+        return 0;
+    }
+    if (fn_800D8DB4(0) && !gpGame->bD4 && Game_CurHoleIndex() == 17) {
+        if (fn_800E17AC(nPlayer) + 1 < gSession.aCourseRecord[Game_GetCourse()].aRecord[0][0].nValue) {
+            uFlags |= 0x1;
+        }
+    }
+    if (fn_800D8DB4(1) && pBall->nLie == LIE_TEE_e) {
+        uFlags |= 0x2;
+    }
+    if (fn_800D8DB4(2) && (pBall->nLie == LIE_GREEN_e || pBall->nLie == LIE_FRINGE_e) &&
+        3.0f * gPlayers[nPlayer].fA64 > gSession.aCourseRecord[Game_GetCourse()].aRecord[2][0].nValue) {
+        uFlags |= 0x4;
+    }
+    if (fn_800D8DB4(3) && !gpGame->bD4 && pBall->nLie != LIE_GREEN_e && pBall->nLie != LIE_FRINGE_e &&
+        gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1 <= fn_800D2B08() - 2) {
+        if (fn_800D1170(nPlayer, 0) + 1 > gSession.aCourseRecord[Game_GetCourse()].aRecord[3][0].nValue) {
+            uFlags |= 0x8;
+        }
+    }
+    if (fn_800D8DB4(4) && !gpGame->bD4 && Game_CurHoleIndex() == 17) {
+        nPutts = 0;
+        for (i = 0; i < 18; i++) {
+            nPutts += pPlayer->nPutts[i];
+        }
+        if (pBall->nLie == LIE_GREEN_e || pBall->nLie == LIE_FRINGE_e) {
+            nPutts++;
+        }
+        if (nPutts < gSession.aCourseRecord[Game_GetCourse()].aRecord[4][0].nValue) {
+            uFlags |= 0x10;
+        }
+    }
+    if (fn_800D8DB4(5) && !gpGame->bD4 && pBall->nLie == LIE_TEE_e && fn_800D2B08() >= 4) {
+        if (fn_800D0FBC(nPlayer) + 1 > gSession.aCourseRecord[Game_GetCourse()].aRecord[5][0].nValue) {
+            uFlags |= 0x20;
+        }
+    }
+    if (fn_800D8DB4(6) && !gpGame->bD4 &&
+        gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1 <= fn_800D2B08() - 2) {
+        if (fn_800D06FC(nPlayer, 0, 0) + 1 > gSession.aCourseRecord[Game_GetCourse()].aRecord[6][0].nValue) {
+            uFlags |= 0x40;
+        }
+    }
+    if (fn_800D8DB4(7) && !gpGame->bD4 &&
+        gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1 <= fn_800D2B08() - 1) {
+        if (fn_800D0620(nPlayer, 0, 0) + 1 > gSession.aCourseRecord[Game_GetCourse()].aRecord[7][0].nValue) {
+            uFlags |= 0x80;
+        }
+    }
+    return uFlags;
+}
+
 // Runs the shot, putt and (outside a playoff) hole checks of Earnings.c for the player as if
 // counting (b 1) and returns the ids 0..22 they list, as a bit set.
 u32 fn_800CFD58(int nPlayer) {

@@ -64,7 +64,6 @@ u8    fn_800D4010(int nId);
 f32   fn_800D6EEC(void);
 u8    fn_800D76AC(int nPlayer, int nAward);
 int   fn_800D7DA0(int nPlayer, u8 a, u8 b, u8 c);
-u8    fn_800D8DB4(int nKind);
 s32   fn_800D9E00(s32 i);
 
 // Put the working tables back to their saved copies.
