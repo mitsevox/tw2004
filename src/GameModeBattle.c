@@ -7,8 +7,8 @@
 #include "engine.h"
 #include "game/save.h"
 
-extern u32 lbl_8020315C[5];                 // the bags at the start of the round
-extern s32 lbl_80203148[5];                 // how many clubs each bag had then
+u32 lbl_8020315C[5];                        // the bags at the start of the round
+s32 lbl_80203148[5];                        // how many clubs each bag had then
 extern s32 lbl_801925B8[5];                 // per player: the club taken from them this hole (26 = none)
 extern s32 lbl_80281650;                    // the winner of the last hole (5 = nobody)
 extern u8  lbl_802822E8;                    // a club is to be taken
