@@ -731,8 +731,8 @@ s32 fn_8009E47C(s32 nPort, s32 nSlot, CARDFileInfo* pFile) {
     if (nResult != 0) return nResult;
     stat.commentAddr = 0;
     stat.iconAddr = 0x40;
-    stat.bannerFormat = (stat.bannerFormat & ~3) | 2;
     stat.iconFormat = (stat.iconFormat & ~3) | 2;
+    stat.bannerFormat = (stat.bannerFormat & ~3) | 2;
     stat.iconSpeed = (stat.iconSpeed & ~3) | 3;
     stat.bannerFormat &= ~4;
     nResult = fn_8009E360(nPort, nSlot, nFile, &stat);
