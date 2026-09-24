@@ -2,9 +2,9 @@
 
 #include "game_types.h"
 
-void fn_80098910();
-void fn_8009B0D0();
-void fn_8009B610();
+void fn_80098910(void);
+void fn_8009B0D0(void);
+void fn_8009B610(void);
 
 void fn_8009A968(void);
 void fn_8009A968(void) {
