@@ -170,7 +170,7 @@ UObjModel* fn_80045D80(u8* pData);
 int        fn_80045F50(UObjMesh* pMesh);            // how many meshes pMesh->p8 holds
 UObjMesh*  fn_80045F5C(UObjMesh* pMesh, int i);     // pMesh->p8[i]
 UObjMesh*  fn_80045F6C(UObjModelRoot* pRoot);       // pRoot->pMesh
-void*      fn_800073B4(u8* pData, int n);           // builds a mesh tree from stream data
+UObjModelRoot* fn_800073B4(u8* pData, int n);       // builds a model's mesh tree from stream data
 
 // UObject.c's object (0x118 bytes, fn_80048808 allocates one; a DynObj holds one at +0x10): three
 // matrices and a model drawn with them.
