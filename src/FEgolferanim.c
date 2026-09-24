@@ -258,12 +258,15 @@ void fn_8008B044(int nGolfer, int a, int b) {
 // With b90 set, wait until no golfer slot holds a character.
 u8 fn_8008B1AC(void) {
     u8 bReady;
+    int i;
 
     if (lbl_80281EE0->b90) {
         bReady = 1;
-        if (lbl_80281EE0->aGolfer[0].pChar != NULL) {
-            lbl_80281EE0->aGolfer[0].b19 = 1;
-            bReady = 0;
+        for (i = 0; i < CRAP_NUM_GOLFERS; i++) {
+            if (lbl_80281EE0->aGolfer[i].pChar != NULL) {
+                lbl_80281EE0->aGolfer[i].b19 = 1;
+                bReady = 0;
+            }
         }
         if (bReady) {
             lbl_80281EE0->b90 = 0;
