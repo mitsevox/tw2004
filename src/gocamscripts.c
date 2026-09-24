@@ -50,7 +50,6 @@ f32  fn_8003F790(CamScript* pScript);   // the blend's share (0..1) so far
 f32  fn_80044F58(int nPlayer, CamScript* pScript);
 CamLens* fn_8001F004(void);             // the current camera's lens
 f32  fn_8001EFFC(u8* pLens);            // the lens's fB0 (char.c: its parameter is u8*)
-f32  fn_80014278(u8* pLens);            // the lens's field of view (GoRenderCtx_Gc.c: u8*)
 u8   fn_8004561C(void);
 u8   fn_80044E2C(int n);
 u8   fn_80044AA8(SurfaceType* pSurface);
@@ -1627,9 +1626,9 @@ void CameraScript_RecordCurrentCam(CamShot* pShot, f32* pCam, f32* pSub, int nPl
     pShot->f74 = 0.0f;
     pShot->bAA = 1;
     if (bView1) {
-        pShot->f78 = fn_80014278((u8*)fn_80008370(fn_80016CFC(gPlayers[nPlayer].nView[1])->pCamera));
+        pShot->f78 = fn_80014278(fn_80008370(fn_80016CFC(gPlayers[nPlayer].nView[1])->pCamera));
     } else {
-        pShot->f78 = fn_80014278((u8*)fn_80008370(fn_80016CFC(gPlayers[nPlayer].nView[0])->pCamera));
+        pShot->f78 = fn_80014278(fn_80008370(fn_80016CFC(gPlayers[nPlayer].nView[0])->pCamera));
         pShot->f78 -= fn_800DC3A4();
     }
     pShot->f7C = pShot->f78;

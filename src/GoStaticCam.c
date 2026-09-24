@@ -12,7 +12,6 @@
 #include "camera.h"
 
 CamLens* fn_80008370(void* pCamera);                        // the render camera's lens
-f32  fn_80014278(CamLens* pLens);                           // the lens's field of view
 void fn_8000A194(f32 (*pMtx)[4], f32 a, f32 b, f32 c);      // a rotation matrix from three angles
 void fn_800BADB4(f32 (*pMtx)[4], f32* pIn, f32* pOut);     // a vector through a matrix
 f32  fn_800C79BC(f32* pPos0, f32* pPos1, f32* pPos2, f32* pPos3);

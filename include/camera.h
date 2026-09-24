@@ -27,6 +27,8 @@ typedef struct CamLens {
     f32  fB8;                   // 0xB8  its view height (guess)
 } CamLens;
 
+f32 fn_80014278(CamLens* pLens);        // GoRenderCtx_Gc.c: the lens's field of view
+
 // A camera shot (0xC0 bytes): a named script position the camera script moves to. The shots of a
 // sequence are chained through p40.
 typedef struct CamShot {
