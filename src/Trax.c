@@ -26,9 +26,7 @@ f32 fn_800BA6CC(void);
 f32 fn_800BA700(void);
 void fn_80012898(s32 v);
 void fn_80012B9C(f32 fX, f32 fY);
-void fn_8006A9AC(f32* pColor);
 void fn_80012868(s32 nFont);
-void fn_800128F8(char* sz, f32 x, f32 y);                           // draw a string
 void fn_80076128(s32 n);
 
 void fn_800B9FF0(void) {
