@@ -54,13 +54,13 @@ u8 fn_800BA080(void) {
 }
 
 void UI_vEATraxRegisterStreamClients(void) {
-    UStream_RegisterHandler('TRAX', fn_800BA118);
-    UStream_RegisterHandler('TRXT', fn_800BA15C);
+    Stream_RegisterLoadChunkCallback('TRAX', fn_800BA118);
+    Stream_RegisterLoadChunkCallback('TRXT', fn_800BA15C);
 }
 
 void UI_vEATraxUnRegisterStreamClients(void) {
-    UStream_UnregisterHandler('TRAX');
-    UStream_UnregisterHandler('TRXT');
+    Stream_UnregisterLoadChunkCallback('TRAX');
+    Stream_UnregisterLoadChunkCallback('TRXT');
 }
 
 // The song list.

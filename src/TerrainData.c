@@ -14,7 +14,7 @@ void fn_800BAE5C(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);   /
 int lbl_80281C10;                       // how many networks lbl_801A2A40 holds
 TNetwork* lbl_801A2A40[32];             // the hole's networks, in the order they came
 CourseLoader lbl_801A2A00[8];
-int lbl_80280DB0 = -1;                  // how many loaders registered; -1: none may
+int lbl_80280DB0 = -1;                  // loaders registered; -1: the 'Cnet' handler calls none
 
 void fn_8000BF8C(UStreamObject* pObject);
 void fn_8000BF9C(UStreamObject* pObject);
@@ -91,7 +91,7 @@ void fn_8000C0F0(void) {
 }
 
 void fn_8000C104(void) {
-    UStream_RegisterHandler(TAG('C', 'n', 'e', 't'), fn_8000BF9C);
+    Stream_RegisterLoadChunkCallback(TAG('C', 'n', 'e', 't'), fn_8000BF9C);
     lbl_80281C10 = 0;
     lbl_80280DB0 = 0;
 }

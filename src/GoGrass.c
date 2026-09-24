@@ -151,13 +151,13 @@ void fn_8011E3B4(void) {
 // The grass's stream handler ('gras') is registered when fn_80112B80 allows it.
 void fn_8011E468(void) {
     if (fn_80112B80() != 0) {
-        UStream_RegisterHandler('gras', fn_8011E584);
+        Stream_RegisterLoadChunkCallback('gras', fn_8011E584);
     }
 }
 
 void fn_8011E4A4(void) {
     if (fn_80112B80() != 0) {
-        UStream_UnregisterHandler(0x67726173);
+        Stream_UnregisterLoadChunkCallback(0x67726173);
     }
 }
 

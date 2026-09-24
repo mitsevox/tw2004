@@ -158,19 +158,19 @@ void fn_80102308(s32 n) {
 }
 
 void GameMode4_RegisterStreamClients(void) {
-    UStream_RegisterHandler('TCM ', GameMode4_LoadTCMFromStream);
-    UStream_RegisterHandler('TCMS', GameMode4_LoadTCMSFromStream);
+    Stream_RegisterLoadChunkCallback('TCM ', GameMode4_LoadTCMFromStream);
+    Stream_RegisterLoadChunkCallback('TCMS', GameMode4_LoadTCMSFromStream);
 }
 
 void GameMode4_UnregisterStreamClients(void) {
-    UStream_UnregisterHandler('TCM ');
+    Stream_UnregisterLoadChunkCallback('TCM ');
 }
 
 void GameMode4_LoadTCMFromStream(UStreamObject* pObject) {
     // port: the 'TCM ' object is copied straight into the ladder events (LadderEvent[25]); it is
     // big-endian on disc, so a little-endian port converts it field by field here
     // (docs/format-byteorder.md)
-    fn_8000E790(pObject, sizeof(lbl_802124B8), lbl_802124B8);
+    Stream_StreamLoadFixedSize(pObject, sizeof(lbl_802124B8), lbl_802124B8);
 }
 
 void GameMode4_LoadTCMSFromStream(UStreamObject* pObject) {

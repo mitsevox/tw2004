@@ -1203,11 +1203,11 @@ void fn_800B1608(void) {
 
 void fn_800B160C(void) {
     lbl_80282124 = 0;
-    UStream_RegisterHandler('LEGL', fn_800B166C);
+    Stream_RegisterLoadChunkCallback('LEGL', fn_800B166C);
 }
 
 void fn_800B1644(void) {
-    UStream_UnregisterHandler('LEGL');
+    Stream_UnregisterLoadChunkCallback('LEGL');
 }
 
 // The 'LEGL' handler: keep a copy of the first two objects, free each. A copy's size is rounded up

@@ -107,19 +107,19 @@ void fn_800D33F0(void) {
 
 // The prize table comes from the stream. TW06: EarningsInfo_RegisterStreamClients (by position).
 void fn_800D33F4(void) {
-    UStream_RegisterHandler('ERN ', fn_800D344C);
+    Stream_RegisterLoadChunkCallback('ERN ', fn_800D344C);
 }
 
 // TW06: EarningsInfo_UnRegisterStreamClients (by position).
 void fn_800D3424(void) {
-    UStream_UnregisterHandler('ERN ');
+    Stream_UnregisterLoadChunkCallback('ERN ');
 }
 
 void fn_800D344C(UStreamObject* pObject) {
     // port: the 'ERN ' object is copied straight into the prize table (EarningsTable); it is
     // big-endian on disc, so a little-endian port converts it field by field here
     // (docs/format-byteorder.md)
-    fn_8000E790(pObject, sizeof(lbl_80200538), &lbl_80200538);
+    Stream_StreamLoadFixedSize(pObject, sizeof(lbl_80200538), &lbl_80200538);
 }
 
 // With a row of lbl_80191AA4, n scaled down by how far it is

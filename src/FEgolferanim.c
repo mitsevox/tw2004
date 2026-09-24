@@ -1190,7 +1190,7 @@ void fn_8008D8F4(void) {
 
 // Register the 'LITE' stream handler.
 void fn_8008D9AC(void) {
-    UStream_RegisterHandler('LITE', fn_8008D9DC);
+    Stream_RegisterLoadChunkCallback('LITE', fn_8008D9DC);
 }
 
 // A 'LITE' object: copy its lights (little-endian) into lbl_80281EE4, swapping each value's
@@ -1706,11 +1706,11 @@ void fn_8008EB70(void) {
 // ---- sweep code (not yet cleaned up) ----
 
 void UStream_Close();
-s32 UStream_Open();
+s32 Stream_OpenStreamFiles();
 
 void fn_8008EBB4(void) {
     s32 t0;
-    t0 = UStream_Open(&lbl_80280DF8->aParams[3]);
+    t0 = Stream_OpenStreamFiles(&lbl_80280DF8->aParams[3]);
     lbl_80280DF8->nStream = t0;
 }
 

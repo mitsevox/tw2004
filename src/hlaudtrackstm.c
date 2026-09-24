@@ -8,7 +8,7 @@
 #include "core/audtrack.h"
 #include "core/startup.h"
 
-int  fn_80006478(s32 hFile, u8* pDst, u32 uLen, u32 uOffset,
+int  File_ReadAsyncEx(s32 hFile, u8* pDst, u32 uLen, u32 uOffset,
                  void (*pfnDone)(void* pDst, int nBytes, AudTrack* pTrack, u8 nId), int n,
                  AudTrack* pTrack, u8 nId, int n19);                 // read from disc, not waiting
 
@@ -120,7 +120,7 @@ void ProcessAudStreamReadQueue(void) {
             if (pRead->bRestart) {
                 fn_800AB860(pRead->pTrack);
             } else {
-                fn_80006478(pRead->hFile, pRead->pDst, pRead->uLen, pRead->uOffset, pRead->pfnDone, 0,
+                File_ReadAsyncEx(pRead->hFile, pRead->pDst, pRead->uLen, pRead->uOffset, pRead->pfnDone, 0,
                             pRead->pTrack, pRead->nId, pRead->n19);
             }
         } else {

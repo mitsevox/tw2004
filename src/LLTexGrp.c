@@ -69,11 +69,11 @@ void fn_80010180(UStreamObject* pObject) {
 }
 
 void fn_80010284(void) {
-    UStream_RegisterHandler('txf ', fn_80010180);
+    Stream_RegisterLoadChunkCallback('txf ', fn_80010180);
 }
 
 void fn_800102B4(void) {
-    UStream_UnregisterHandler('txf ');
+    Stream_UnregisterLoadChunkCallback('txf ');
 }
 
 int fn_800102DC(u64 uHash, TexBank** ppBank, TexEntry** ppTex) {

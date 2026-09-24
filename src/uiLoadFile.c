@@ -62,19 +62,19 @@ void fn_8008EC68(void) {
     } else {
         lbl_80281F10 = "frontend";
     }
-    UStream_RegisterHandler('DATS', fn_8008ED80);
-    UStream_RegisterHandler('TXFS', fn_8008EE1C);
-    UStream_RegisterHandler('FONS', fn_8008EFFC);
-    UStream_RegisterHandler('GRPS', fn_8008EEB8);
-    UStream_RegisterHandler('MPCS', fn_8008EEB8);
+    Stream_RegisterLoadChunkCallback('DATS', fn_8008ED80);
+    Stream_RegisterLoadChunkCallback('TXFS', fn_8008EE1C);
+    Stream_RegisterLoadChunkCallback('FONS', fn_8008EFFC);
+    Stream_RegisterLoadChunkCallback('GRPS', fn_8008EEB8);
+    Stream_RegisterLoadChunkCallback('MPCS', fn_8008EEB8);
 }
 
 void fn_8008ED28(void) {
-    UStream_UnregisterHandler('DATS');
-    UStream_UnregisterHandler('TXFS');
-    UStream_UnregisterHandler('FONS');
-    UStream_UnregisterHandler('GRPS');
-    UStream_UnregisterHandler('MPCS');
+    Stream_UnregisterLoadChunkCallback('DATS');
+    Stream_UnregisterLoadChunkCallback('TXFS');
+    Stream_UnregisterLoadChunkCallback('FONS');
+    Stream_UnregisterLoadChunkCallback('GRPS');
+    Stream_UnregisterLoadChunkCallback('MPCS');
 }
 
 // 'DATS': keep a copy of the UI file. With game type 10 its size is noted for parking it in ARAM.

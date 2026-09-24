@@ -138,7 +138,7 @@ int  Skalib_HasOverlays(int nSlot); // skalib.c
 void fn_80014E90(void* pArg);
 void fn_80014E94(void* pArg);
 void UStream_Close();
-s32 UStream_Open();
+s32 Stream_OpenStreamFiles();
 void fn_800150B8(void);
 void fn_800150E0(void);
 void fn_8001510C(void);
@@ -385,7 +385,7 @@ void fn_800150B8(void) {
 
 void fn_800150E0(void) {
     s32 t0;
-    t0 = UStream_Open(&lbl_80280DF8->aParams[0]);
+    t0 = Stream_OpenStreamFiles(&lbl_80280DF8->aParams[0]);
     lbl_80280DF8->nStream = t0;
 }
 
@@ -395,7 +395,7 @@ void fn_8001510C(void) {
 
 void fn_80015134(void) {
     s32 t0;
-    t0 = UStream_Open(&lbl_80280DF8->aParams[1]);
+    t0 = Stream_OpenStreamFiles(&lbl_80280DF8->aParams[1]);
     lbl_80280DF8->nStream = t0;
 }
 
@@ -405,7 +405,7 @@ void fn_80015164(void) {
 
 void fn_8001518C(void) {
     s32 t0;
-    t0 = UStream_Open(&lbl_80280DF8->aParams[2]);
+    t0 = Stream_OpenStreamFiles(&lbl_80280DF8->aParams[2]);
     lbl_80280DF8->nStream = t0;
 }
 
@@ -415,13 +415,13 @@ void fn_800151BC(void) {
 
 void fn_800151E4(void) {
     s32 t0;
-    t0 = UStream_Open(&lbl_80280DF8->aParams[5]);
+    t0 = Stream_OpenStreamFiles(&lbl_80280DF8->aParams[5]);
     lbl_80280DF8->nStream = t0;
 }
 
 void fn_80015214(void) {
     s32 t0;
-    t0 = UStream_Open(&lbl_80280DF8->aParams[4]);
+    t0 = Stream_OpenStreamFiles(&lbl_80280DF8->aParams[4]);
     lbl_80280DF8->nStream = t0;
 }
 
@@ -431,7 +431,7 @@ void fn_80015244(void) {
 
 void fn_8001526C(void) {
     s32 t0;
-    t0 = UStream_Open(&lbl_80280DF8->aParams[6]);
+    t0 = Stream_OpenStreamFiles(&lbl_80280DF8->aParams[6]);
     lbl_80280DF8->nStream = t0;
 }
 

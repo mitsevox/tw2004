@@ -1,15 +1,16 @@
 // UStream.c: EA's streaming asset loader (the CTRL / SHOC / SONO chunk files: .hog, .gcb,
-// .ngc). The file name comes from the assert string at 0x801868A0; function and field names
-// are ours. CodeWarrior GC/2.5, -O4,p. See docs/formats/ctrl-container.md.
+// .ngc). The file name comes from the assert string at 0x801868A0; the field names and the
+// UStream_ function names are ours, the Stream_ ones EA's (TW07). CodeWarrior GC/2.5, -O4,p.
+// See docs/formats/ctrl-container.md.
 //
 // Shape of the system:
 //   - a stream is one of the .hog/.gcb files (up to 8 file names per stream, played in order);
 //   - the DVD is read asynchronously into 18 fixed 24 KiB buffers that move through rings:
 //     free -> in flight -> ready -> current (being parsed) -> free again;
-//   - UStream_ParseChunks walks the chunks of the current buffers and builds objects: an SHDR
+//   - Stream_ParseBufs walks the chunks of the current buffers and builds objects: an SHDR
 //     chunk allocates the object, SDAT / Rdat chunks fill it (Rdat through UStream_Decompress);
 //   - finished objects are queued and handed to the handler registered for their type
-//     (UStream_RegisterHandler), e.g. the texture manager for 'txf '.
+//     (Stream_RegisterLoadChunkCallback), e.g. the texture manager for 'txf '.
 
 #include "game_types.h"
 #include "engine.h"
@@ -184,7 +185,7 @@ void UStream_SetAutoRead(u8 bAuto) {
     gbAutoRead = bAuto;
 }
 
-// Object allocation from an SHDR chunk: header + name + 0x80-aligned data.
+// Object allocation from an SHDR chunk: header + a 'Csac' chunk's extra bytes + 0x80-aligned data.
 static int UStream_BeginObject(UStreamFill* pFill, UStreamChunk* pChunk) {
     u32 uExtra;
     int nWanted;
@@ -235,7 +236,8 @@ static int UStream_BeginObject(UStreamFill* pFill, UStreamChunk* pChunk) {
     return 0;
 }
 
-// Finished parsing the current list head: move it to the used list (its data is still referenced).
+// Finished parsing the current list head: move it to the used list while objects still reference
+// it, else release it.
 static void UStream_RetireCurrentBuffer(void) {
     UStreamBuffer* pBuffer;
     UStreamBuffer* p;
@@ -476,7 +478,7 @@ static void UStream_NullCallback(u32 n) {
 
 // Walk the chunks of the current buffers. SHOC chunks build objects, SONO chunks build sound
 // objects (through the audio module), the stream / movie tags go to their players.
-static void UStream_ParseChunks(void) {
+static void Stream_ParseBufs(void) {
     UStreamChunk* pChunk;
     UStreamBuffer* pBuffer;
     u32 uLen;
@@ -624,7 +626,7 @@ static void UStream_ParseChunks(void) {
 
 // ---- files ------------------------------------------------------------------------------
 
-static void UStream_Idle(void) {
+static void fn_8000D9A4(void) {
 }
 
 // Open the stream's current file and tell the owner.
@@ -659,12 +661,12 @@ static UStreamObject* UStream_NextObject(u8 bParse) {
     UStreamNode* pNode;
     UStreamObject* pObject;
     if (bParse) {
-        UStream_ParseChunks();
+        Stream_ParseBufs();
     }
     if (gnCurStream == -1) return NULL;
     pStream = &gStreams[gnCurStream];
     if (gpCurList == NULL && bParse) {
-        UStream_ParseChunks();
+        Stream_ParseBufs();
     }
     if (gpCurList == NULL) {
         if (UStream_PumpBuffers(1) == NULL && pStream->bEOF) {
@@ -805,7 +807,8 @@ int UStream_Stop(void) {
     return gbReadPending ? 1 : 0;
 }
 
-// Close everything: the open file, the streams, the node pool.
+// Shut the loader down: no handlers, the current stream closed once no read is pending, the node
+// pool deleted.
 void UStream_CloseAll(void) {
     UStream* pStream;
     int hFile;
@@ -815,7 +818,7 @@ void UStream_CloseAll(void) {
         pStream = &gStreams[gnCurStream];
         hFile = pStream->hFile;
         pStream->hFile = -1;
-        UStream_Idle();
+        fn_8000D9A4();
         pStream->nFileSize = 0;
         pStream->nFilePos = 0;
         while (gbReadPending) {
@@ -856,7 +859,7 @@ int UStream_Close(int nStream) {
 }
 
 // Open a stream from a parameter block. Returns the stream index or a negative error.
-int UStream_Open(const UStreamParams* pParams) {
+int Stream_OpenStreamFiles(const UStreamParams* pParams) {
     int nStream;
     UStream* pStream;
     if (gbReadPending) return -0x68;
@@ -881,17 +884,17 @@ int UStream_Open(const UStreamParams* pParams) {
 }
 
 // Open a single file by name.
-int UStream_OpenFileByName(const char* pName) {
+int Stream_OpenStreamFile(const char* pName) {
     UStreamParams params;
     memset(&params, 0, sizeof(params));
     fn_8000E708(&params);
     params.nNumFiles = 1;
     fn_8015A7FC(params.aszName[0], pName);
-    return UStream_Open(&params);
+    return Stream_OpenStreamFiles(&params);
 }
 
 // Register (or reference again) the handler for an object type.
-int UStream_RegisterHandler(int nType, void (*pfnHandler)(UStreamObject*)) {
+int Stream_RegisterLoadChunkCallback(int nType, void (*pfnHandler)(UStreamObject*)) {
     int i;
     int n = gnNumHandlers;
     if (n >= USTREAM_MAX_HANDLERS) return 0;
@@ -909,7 +912,7 @@ int UStream_RegisterHandler(int nType, void (*pfnHandler)(UStreamObject*)) {
 }
 
 // Drop one reference to a type's handler; remove it when the count reaches zero.
-int UStream_UnregisterHandler(int nType) {
+int Stream_UnregisterLoadChunkCallback(int nType) {
     int n = gnNumHandlers;
     int i;
     for (i = 0; i < n; i++) {
@@ -999,7 +1002,7 @@ void fn_8000E708(UStreamParams* p) {
 
 // Copies a delivered object's data into pDst (at most uMax bytes) and frees the object. Returns
 // the number of bytes copied.
-u32 fn_8000E790(UStreamObject* pObject, u32 uMax, void* pDst) {
+u32 Stream_StreamLoadFixedSize(UStreamObject* pObject, u32 uMax, void* pDst) {
     void* pData;
     u32 uSize;
 

@@ -63,25 +63,25 @@ f32  fn_80044F58(int nPlayer, CamScript* pScript);     // gocamscripts.c
 
 // Registers the handlers of the camera files ('CAMS', 'CAMV', 'CAMA').
 void fn_80039454(void) {
-    UStream_RegisterHandler('CAMS', fn_80039554);
-    UStream_RegisterHandler('CAMV', fn_80039690);
-    UStream_RegisterHandler('CAMA', fn_800397EC);
+    Stream_RegisterLoadChunkCallback('CAMS', fn_80039554);
+    Stream_RegisterLoadChunkCallback('CAMV', fn_80039690);
+    Stream_RegisterLoadChunkCallback('CAMA', fn_800397EC);
 }
 
 void fn_800394AC(void) {
-    UStream_UnregisterHandler('CAMS');
-    UStream_UnregisterHandler('CAMV');
-    UStream_UnregisterHandler('CAMA');
+    Stream_UnregisterLoadChunkCallback('CAMS');
+    Stream_UnregisterLoadChunkCallback('CAMV');
+    Stream_UnregisterLoadChunkCallback('CAMA');
     fn_8003954C();
 }
 
 // The same for the other 'CAMV' handler alone.
 void fn_800394F0(void) {
-    UStream_RegisterHandler('CAMV', fn_80039754);
+    Stream_RegisterLoadChunkCallback('CAMV', fn_80039754);
 }
 
 void fn_80039520(void) {
-    UStream_UnregisterHandler('CAMV');
+    Stream_UnregisterLoadChunkCallback('CAMV');
     fn_80039550();
 }
 

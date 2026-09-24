@@ -82,38 +82,38 @@ void fn_800EDE78(void) {
 }
 
 void GameModeDriverPGATour_RegisterStreamClients(void) {
-    UStream_RegisterHandler('PGAc', GameModeDriverPGATour_LoadPGAcFromStream);
-    UStream_RegisterHandler('PGAt', GameModeDriverPGATour_LoadPGAtFromStream);
-    UStream_RegisterHandler('PGAp', GameModeDriverPGATour_LoadPGApFromStream);
-    UStream_RegisterHandler('PGAn', GameModeDriverPGATour_Locale_PgaTourMode_LoadPGAnFromStream);
+    Stream_RegisterLoadChunkCallback('PGAc', GameModeDriverPGATour_LoadPGAcFromStream);
+    Stream_RegisterLoadChunkCallback('PGAt', GameModeDriverPGATour_LoadPGAtFromStream);
+    Stream_RegisterLoadChunkCallback('PGAp', GameModeDriverPGATour_LoadPGApFromStream);
+    Stream_RegisterLoadChunkCallback('PGAn', GameModeDriverPGATour_Locale_PgaTourMode_LoadPGAnFromStream);
 }
 
 void GameModeDriverPGATour_UnregisterStreamClients(void) {
-    UStream_UnregisterHandler('PGAc');
-    UStream_UnregisterHandler('PGAt');
-    UStream_UnregisterHandler('PGAp');
-    UStream_UnregisterHandler('PGAn');
+    Stream_UnregisterLoadChunkCallback('PGAc');
+    Stream_UnregisterLoadChunkCallback('PGAt');
+    Stream_UnregisterLoadChunkCallback('PGAp');
+    Stream_UnregisterLoadChunkCallback('PGAn');
 }
 
 void GameModeDriverPGATour_LoadPGAcFromStream(UStreamObject* pObject) {
     // port: the 'PGAc' object is copied straight into gPgaData.aTournament (Tournament[31]); it is
     // big-endian on disc, so a little-endian port converts it field by field here
     // (docs/format-byteorder.md)
-    fn_8000E790(pObject, sizeof(gPgaData.aTournament), gPgaData.aTournament);
+    Stream_StreamLoadFixedSize(pObject, sizeof(gPgaData.aTournament), gPgaData.aTournament);
 }
 
 void GameModeDriverPGATour_LoadPGAtFromStream(UStreamObject* pObject) {
     // port: the 'PGAt' object is copied straight into gPgaData.aTourEvent (TourEvent[31]); it is
     // big-endian on disc, so a little-endian port converts it field by field here
     // (docs/format-byteorder.md)
-    fn_8000E790(pObject, sizeof(gPgaData.aTourEvent), gPgaData.aTourEvent);
+    Stream_StreamLoadFixedSize(pObject, sizeof(gPgaData.aTourEvent), gPgaData.aTourEvent);
 }
 
 void GameModeDriverPGATour_LoadPGApFromStream(UStreamObject* pObject) {
     // port: the 'PGAp' object is copied straight into gPgaData.aTriple (PgaTriple[11]); it is
     // big-endian on disc, so a little-endian port converts it field by field here
     // (docs/format-byteorder.md)
-    fn_8000E790(pObject, sizeof(gPgaData.aTriple), gPgaData.aTriple);
+    Stream_StreamLoadFixedSize(pObject, sizeof(gPgaData.aTriple), gPgaData.aTriple);
 }
 
 // The 'PGAn' object: the names

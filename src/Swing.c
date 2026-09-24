@@ -2608,8 +2608,8 @@ void STATEFUNC_TapInInit(int nPlayer) {
     fn_80095744(gPlayers[nPlayer].pChar, 11);
     fn_80062BFC(gPlayers[nPlayer].pChar);
     fn_80062BE8(gPlayers[nPlayer].pChar);
-    fn_8001C774(gPlayers[nPlayer].pChar, gPlayers[nPlayer].nClub);
-    fn_8001C724(gPlayers[nPlayer].pChar, gPlayers[nPlayer].nShotKind);
+    Character_SelectGameClub(gPlayers[nPlayer].pChar, gPlayers[nPlayer].nClub);
+    Character_SelectGameShotType(gPlayers[nPlayer].pChar, gPlayers[nPlayer].nShotKind);
     fn_8001C804(nPlayer, 1, 1);
     gPlayers[nPlayer].uFlags |= 8;
     gPlayers[nPlayer].fA64 = fn_800D0478(nPlayer);
@@ -3704,8 +3704,8 @@ void STATEFUNC_SwingInit(int nPlayer) {
         fn_800957D8(gPlayers[nPlayer].pChar);
     }
     fn_80095744(gPlayers[nPlayer].pChar, 5);
-    fn_8001C774(gPlayers[nPlayer].pChar, gPlayers[nPlayer].nClub);
-    fn_8001C724(gPlayers[nPlayer].pChar, gPlayers[nPlayer].nShotKind);
+    Character_SelectGameClub(gPlayers[nPlayer].pChar, gPlayers[nPlayer].nClub);
+    Character_SelectGameShotType(gPlayers[nPlayer].pChar, gPlayers[nPlayer].nShotKind);
     fn_80062BFC(gPlayers[nPlayer].pChar);
     fn_80062BE8(gPlayers[nPlayer].pChar);
     SKATime_UnPause(gPlayers[nPlayer].pChar->anim);

@@ -103,7 +103,7 @@ void fn_80048BDC(UStreamObject* pObject) {
 
 // Sets the kernel up: the 'Cact' stream handler, the two node pools and an empty list.
 void fn_80048DD0(void) {
-    UStream_RegisterHandler('Cact', fn_80048BDC);
+    Stream_RegisterLoadChunkCallback('Cact', fn_80048BDC);
     lbl_80281DAC = UMemPool_Create(256, 400, 2, 16);
     lbl_80281DA8 = UMemPool_Create(256, 528, 2, 16);
     lbl_80281DBC = NULL;

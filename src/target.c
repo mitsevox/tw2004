@@ -496,8 +496,8 @@ u8 TARGET_UpdateMomentums(int nPlayer) {
                 }
             }
             gPlayers[nPlayer].fPower = AI_PowerForTarget(nPlayer);
-            fn_8001C774(gPlayers[nPlayer].pChar, gPlayers[nPlayer].nClub);
-            fn_8001C724(gPlayers[nPlayer].pChar, gPlayers[nPlayer].nShotKind);
+            Character_SelectGameClub(gPlayers[nPlayer].pChar, gPlayers[nPlayer].nClub);
+            Character_SelectGameShotType(gPlayers[nPlayer].pChar, gPlayers[nPlayer].nShotKind);
             fn_8001C804(nPlayer, 0, 1);
             fn_80062C38();
             fn_8006A8B0();

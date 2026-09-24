@@ -45,11 +45,11 @@ void EASBio_InitOnce(void) {
 
 // The 'EASI' stream object is the Bio icon.
 void fn_80124A40(void) {
-    UStream_RegisterHandler('EASI', fn_80124B10);
+    Stream_RegisterLoadChunkCallback('EASI', fn_80124B10);
 }
 
 void fn_80124A70(void) {
-    UStream_UnregisterHandler('EASI');
+    Stream_UnregisterLoadChunkCallback('EASI');
 }
 
 // The memory-card screens' error code for a library error.

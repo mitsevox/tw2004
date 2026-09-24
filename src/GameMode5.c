@@ -109,20 +109,20 @@ s32 fn_800EAE6C(void) {
 }
 
 void fn_800EAE74(void) {
-    UStream_RegisterHandler('PLY ', fn_800EAEEC);
-    UStream_RegisterHandler('PLYs', fn_800EAF18);
+    Stream_RegisterLoadChunkCallback('PLY ', fn_800EAEEC);
+    Stream_RegisterLoadChunkCallback('PLYs', fn_800EAF18);
 }
 
 void fn_800EAEB8(void) {
-    UStream_UnregisterHandler('PLY ');
-    UStream_UnregisterHandler('PLYs');
+    Stream_UnregisterLoadChunkCallback('PLY ');
+    Stream_UnregisterLoadChunkCallback('PLYs');
 }
 
 void fn_800EAEEC(UStreamObject* pObject) {
     // port: the 'PLY ' object is copied straight into the challenges (Challenge[83]); it is
     // big-endian on disc, so a little-endian port converts it field by field here
     // (docs/format-byteorder.md)
-    fn_8000E790(pObject, sizeof(lbl_80203554), lbl_80203554);
+    Stream_StreamLoadFixedSize(pObject, sizeof(lbl_80203554), lbl_80203554);
 }
 
 // The 'PLYs' object: the challenge text block is copied out.

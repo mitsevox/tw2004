@@ -873,15 +873,15 @@ s32 fn_8009E918(s32 nPort, s32 nSlot) {
 
 // Take the stream objects: the save file's icon ('MCI ') and banner ('MCB '), and MC.c's 'eagm'.
 void fn_8009EA98(void) {
-    UStream_RegisterHandler('MCI ', fn_8009EB30);
-    UStream_RegisterHandler('MCB ', fn_8009EB38);
-    UStream_RegisterHandler('eagm', fn_800A1D4C);
+    Stream_RegisterLoadChunkCallback('MCI ', fn_8009EB30);
+    Stream_RegisterLoadChunkCallback('MCB ', fn_8009EB38);
+    Stream_RegisterLoadChunkCallback('eagm', fn_800A1D4C);
 }
 
 void fn_8009EAF0(void) {
-    UStream_UnregisterHandler('MCI ');
-    UStream_UnregisterHandler('MCB ');
-    UStream_UnregisterHandler('eagm');
+    Stream_UnregisterLoadChunkCallback('MCI ');
+    Stream_UnregisterLoadChunkCallback('MCB ');
+    Stream_UnregisterLoadChunkCallback('eagm');
 }
 
 void fn_8009EB30(UStreamObject* pObject) {

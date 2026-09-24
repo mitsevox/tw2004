@@ -53,11 +53,11 @@ void fn_800A2958(void) {
 }
 
 void fn_800A295C(void) {
-    UStream_RegisterHandler('sfxd', fn_800A29B4);
+    Stream_RegisterLoadChunkCallback('sfxd', fn_800A29B4);
 }
 
 void fn_800A298C(void) {
-    UStream_UnregisterHandler('sfxd');
+    Stream_UnregisterLoadChunkCallback('sfxd');
 }
 
 // The 'sfxd' stream handler: each word (sscanf %s) after an '=' before the first '}' of its text

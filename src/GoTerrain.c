@@ -212,14 +212,14 @@ void fn_800306B8(void) {
 
 // The terrain's chunk loaders.
 void fn_800307C0(void) {
-    UStream_RegisterHandler('ter ', fn_800342B4);
-    UStream_RegisterHandler('tgd ', fn_800342F0);
-    UStream_RegisterHandler('tLOD', fn_800341A4);
+    Stream_RegisterLoadChunkCallback('ter ', fn_800342B4);
+    Stream_RegisterLoadChunkCallback('tgd ', fn_800342F0);
+    Stream_RegisterLoadChunkCallback('tLOD', fn_800341A4);
 }
 
 void fn_80030818(void) {
-    UStream_UnregisterHandler('ter ');
-    UStream_UnregisterHandler('tgd ');
+    Stream_UnregisterLoadChunkCallback('ter ');
+    Stream_UnregisterLoadChunkCallback('tgd ');
 }
 
 void fn_8003084C(void) {

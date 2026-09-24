@@ -51,19 +51,19 @@ void fn_8000B984(void) {
 }
 
 void fn_8000B9E4(void) {
-    UStream_RegisterHandler(TAG('t', 'x', 'f', '2'), fn_8000BCA0);
+    Stream_RegisterLoadChunkCallback(TAG('t', 'x', 'f', '2'), fn_8000BCA0);
 }
 
 void fn_8000BA14(void) {
-    UStream_UnregisterHandler(TAG('t', 'x', 'f', '2'));
+    Stream_UnregisterLoadChunkCallback(TAG('t', 'x', 'f', '2'));
 }
 
 void fn_8000BA3C(void) {
-    UStream_RegisterHandler(TAG('l', 'o', 'a', 'd'), fn_8000BA94);
+    Stream_RegisterLoadChunkCallback(TAG('l', 'o', 'a', 'd'), fn_8000BA94);
 }
 
 void fn_8000BA6C(void) {
-    UStream_UnregisterHandler(TAG('l', 'o', 'a', 'd'));
+    Stream_UnregisterLoadChunkCallback(TAG('l', 'o', 'a', 'd'));
 }
 
 void fn_8000BA94(UStreamObject* pObject) {

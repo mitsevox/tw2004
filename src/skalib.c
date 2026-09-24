@@ -2087,13 +2087,13 @@ void ClipBank_FreeAram(void) {
 // Hooks the loaders up to the file streamer: 'SAL ' animation libraries and 'BNK ' clip banks.
 // A stream object's uId says which of the three animation slots it is for.
 void Skalib_Register(void) {
-    UStream_RegisterHandler('SAL ', AnimLib_OnLoaded);
-    UStream_RegisterHandler('BNK ', ClipBank_OnLoaded);
+    Stream_RegisterLoadChunkCallback('SAL ', AnimLib_OnLoaded);
+    Stream_RegisterLoadChunkCallback('BNK ', ClipBank_OnLoaded);
 }
 
 void Skalib_Unregister(void) {
-    UStream_UnregisterHandler('SAL ');
-    UStream_UnregisterHandler('BNK ');
+    Stream_UnregisterLoadChunkCallback('SAL ');
+    Stream_UnregisterLoadChunkCallback('BNK ');
 }
 
 // Points each clip of one leaf of the overlay's tree (group nGroup, style nStyle, club nClub, key

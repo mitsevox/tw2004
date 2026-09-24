@@ -162,7 +162,7 @@ u8   fn_80007258(void);
 void fn_80007260(void);
 void VIWaitForRetrace(void);
 // the stream loader (UStream.c) and the music (fn_800BA734)
-int  UStream_OpenFileByName(const char* pName);
+int  Stream_OpenStreamFile(const char* pName);
 void UStream_SetAutoRead(u8 bAuto);
 int  UStream_Stop(void);
 int  UStream_Close(int nStream);
@@ -486,7 +486,7 @@ void LLVideo_PlayFile(const char* pName, u8 (*pfnStop)(Video* pVideo, int nArg),
     }
     fn_800BA734(0, 0);
     fn_800755F0(nFlags | 1);
-    nStream = UStream_OpenFileByName(pName);
+    nStream = Stream_OpenStreamFile(pName);
     if (nStream != -1) {
         UStream_SetAutoRead(1);
         pVideo = fn_80075800();

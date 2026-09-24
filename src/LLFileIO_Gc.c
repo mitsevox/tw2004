@@ -19,7 +19,7 @@ s32 lbl_80281B80;                       // how many files are open
 void fn_80005BE8(const char* szSrc, char* szDst);
 void fn_80005C48(s32 nResult, DVDFileInfo* pInfo);
 void fn_800060DC(void);
-int  fn_80006478(int hFile, void* pDst, u32 uLen, u32 uOffset, void (*pfnDone)(int nBytes, int nError),
+int  File_ReadAsyncEx(int hFile, void* pDst, u32 uLen, u32 uOffset, void (*pfnDone)(int nBytes, int nError),
                  u8 nPrio, s32 n1C, u8 b20, u8 b21);
 
 // Copies a file path in the disc's form: letters upper case, backslashes as slashes.
@@ -262,13 +262,13 @@ int fn_8000633C(int hFile) {
 
 int fn_80006444(int hFile, void* pDst, u32 uLen, u32 uOffset,
                 void (*pfnDone)(int nBytes, int nError)) {
-    return fn_80006478(hFile, pDst, uLen, uOffset, pfnDone, 1, 0, 0, 1);
+    return File_ReadAsyncEx(hFile, pDst, uLen, uOffset, pfnDone, 1, 0, 0, 1);
 }
 
 // Queues a read (EA's name, from its lock: File_ReadAsyncEx): takes a free request of the
 // priority, puts it at the end of that priority's queue and wakes the reader if it is the only
 // read queued. Nothing is queued when none is free.
-int fn_80006478(int hFile, void* pDst, u32 uLen, u32 uOffset, void (*pfnDone)(int nBytes, int nError),
+int File_ReadAsyncEx(int hFile, void* pDst, u32 uLen, u32 uOffset, void (*pfnDone)(int nBytes, int nError),
                 u8 nPrio, s32 n1C, u8 b20, u8 b21) {
     FileReqPool* pPool;
     FileReq* pReq;

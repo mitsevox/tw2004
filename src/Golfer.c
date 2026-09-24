@@ -946,8 +946,8 @@ void Shot_Prepare(int nPlayer, u8 bNotify) {
     fn_8002D544_StraightDir(nPlayer, p->vLaunchA);
     fn_8002D680_CpuShapeDir(nPlayer, p->vLaunchB);
     if (bNotify) {
-        fn_8001C774(gPlayers[nPlayer].pChar, gPlayers[nPlayer].nClub);
-        fn_8001C724(gPlayers[nPlayer].pChar, gPlayers[nPlayer].nShotKind);
+        Character_SelectGameClub(gPlayers[nPlayer].pChar, gPlayers[nPlayer].nClub);
+        Character_SelectGameShotType(gPlayers[nPlayer].pChar, gPlayers[nPlayer].nShotKind);
     }
 }
 
@@ -1458,11 +1458,11 @@ void Golfer_OnStatsLoaded(UStreamObject* pObject) {
 }
 
 void Golfer_RegisterStatsHandler(void) {
-    UStream_RegisterHandler('stat', Golfer_OnStatsLoaded);
+    Stream_RegisterLoadChunkCallback('stat', Golfer_OnStatsLoaded);
 }
 
 void Golfer_UnregisterStatsHandler(void) {
-    UStream_UnregisterHandler('stat');
+    Stream_UnregisterLoadChunkCallback('stat');
 }
 
 // Take the caddie's solved shot (slot 4) as the player's own.
@@ -1606,11 +1606,11 @@ void Session_OnRecordsLoaded(UStreamObject* pObject) {
 }
 
 void Session_RegisterRecordsHandler(void) {
-    UStream_RegisterHandler('rcrd', Session_OnRecordsLoaded);
+    Stream_RegisterLoadChunkCallback('rcrd', Session_OnRecordsLoaded);
 }
 
 void Session_UnregisterRecordsHandler(void) {
-    UStream_UnregisterHandler('rcrd');
+    Stream_UnregisterLoadChunkCallback('rcrd');
 }
 
 void fn_8002EBA4(u8* pObj, u8 nValue) {

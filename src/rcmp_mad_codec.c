@@ -914,13 +914,13 @@ void fn_800140E8(int a, int nWidth, int nHeight, int nField, int b, int c);
 int  fn_8001005C(TexBank* pBank, u64 uHash);       // LLTex.c: the texture's index, or 0x80000000
 
 void fn_800B9944(void) {
-    UStream_RegisterHandler('TEO ', fn_800B99FC);
-    UStream_RegisterHandler('BALF', fn_800B99BC);
+    Stream_RegisterLoadChunkCallback('TEO ', fn_800B99FC);
+    Stream_RegisterLoadChunkCallback('BALF', fn_800B99BC);
 }
 
 void fn_800B9988(void) {
-    UStream_UnregisterHandler('TEO ');
-    UStream_UnregisterHandler('BALF');
+    Stream_UnregisterLoadChunkCallback('TEO ');
+    Stream_UnregisterLoadChunkCallback('BALF');
 }
 
 // A 'BALF' object is a texture bank.

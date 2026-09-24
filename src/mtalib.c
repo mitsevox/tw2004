@@ -243,9 +243,9 @@ void fn_8001FA3C(UStreamObject* pObject) {
 }
 
 void fn_8001FAA8(void) {
-    UStream_RegisterHandler('MAL ', fn_8001FA3C);
+    Stream_RegisterLoadChunkCallback('MAL ', fn_8001FA3C);
 }
 
 void fn_8001FAD8(void) {
-    UStream_UnregisterHandler('MAL ');
+    Stream_UnregisterLoadChunkCallback('MAL ');
 }

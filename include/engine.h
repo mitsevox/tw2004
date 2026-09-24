@@ -1037,9 +1037,9 @@ typedef struct UStreamObject {
 } UStreamObject;
 LAYOUT_ASSERT(UStreamObject, 0x34);
 
-int  UStream_RegisterHandler(int nType, void (*pfnHandler)(UStreamObject*));
-int  UStream_UnregisterHandler(int nType);
-u32  fn_8000E790(UStreamObject* pObject, u32 uMax, void* pDst);   // copy the data out, free the object
+int  Stream_RegisterLoadChunkCallback(int nType, void (*pfnHandler)(UStreamObject*));
+int  Stream_UnregisterLoadChunkCallback(int nType);
+u32  Stream_StreamLoadFixedSize(UStreamObject* pObject, u32 uMax, void* pDst);   // copy the data out, free the object
 u32  fn_8000E81C(UStreamObject* pObject, void** ppData);          // the data and its size
 
 // The list of kept stream objects (ObjList.c). Objects are added at the head or the tail
@@ -1074,8 +1074,8 @@ int  fn_8000633C(int hFile);            // file close
 // Returns 0, even when no request was free and the read was dropped.
 int  fn_80006444(int hFile, void* pDst, u32 uLen, u32 uOffset, void (*pfnDone)(int nBytes, int nError));
 u32  fn_800065B0(int hFile);            // file size
-// LLFileIO_Gc.c: read a whole file into a new block aligned to nAlign; its size goes to *puSize.
-// NULL if the file is missing or cannot be read.
+// LLFileIO_Gc.c: read a whole file into a new block aligned to nAlign, waiting (and retrying)
+// until the disc gives it; its size goes to *puSize. NULL if no memory is free.
 void* fn_800065C8(const char* pName, u32* puSize, int nAlign);
 
 // ---- fonts -----------------------------------------------------------------------------------

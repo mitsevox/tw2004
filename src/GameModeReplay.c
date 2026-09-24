@@ -122,8 +122,8 @@ void GameModeReplay_SetupNextGolfer(void) {
     gPlayers[0].ball.pCourse = ball.pCourse;
     gPlayers[0].ball.nPlayer = 0;
     Physics_DropBall(&ball, gReplayData.player.ball.vPos);
-    fn_8001C774(gPlayers[0].pChar, gPlayers[0].nClub);
-    fn_8001C724(gPlayers[0].pChar, gPlayers[0].nShotKind);
+    Character_SelectGameClub(gPlayers[0].pChar, gPlayers[0].nClub);
+    Character_SelectGameShotType(gPlayers[0].pChar, gPlayers[0].nShotKind);
     gPlayers[0].swing.bUIInit = 0;
     fF08 = gReplayData.fF08;
     gSession.bReplay = 0;

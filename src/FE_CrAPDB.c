@@ -706,8 +706,8 @@ int fn_80104FA8(s16 nPart, int b, int i) {
 
 // Take the database's stream objects as they load.
 void fn_8010508C(void) {
-    UStream_RegisterHandler('CR_A', fn_80105188);
-    UStream_RegisterHandler('CR_S', fn_801051F4);
+    Stream_RegisterLoadChunkCallback('CR_A', fn_80105188);
+    Stream_RegisterLoadChunkCallback('CR_S', fn_801051F4);
 }
 
 // Find each part's first asset (the assets are sorted by part; 0 when a part has none).
@@ -730,8 +730,8 @@ int fn_80105140(s16 nPart) {
 }
 
 void fn_80105154(void) {
-    UStream_UnregisterHandler('CR_A');
-    UStream_UnregisterHandler('CR_S');
+    Stream_UnregisterLoadChunkCallback('CR_A');
+    Stream_UnregisterLoadChunkCallback('CR_S');
 }
 
 // The 'CR_A' handler: the assets.

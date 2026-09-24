@@ -1,7 +1,8 @@
-// char.c (EA's name, from its asserts; also in EA's 2002 source tree; TW06): the golfer's character
-// object (character.h). So far: choosing the clip a character plays (Char_SetClip), its bones and
-// matrices, and small setters; the sweep code in the marked block is the other matched small
-// functions, not yet cleaned up.
+// char.c (EA's name, from its asserts; also in EA's 2002 source tree; TW06): the character object
+// (character.h): the golfers and the other skinned characters ('SKLO', player 1000). Building one
+// from its 'CHR ' object, its animation, bones, ground placement and leg IK, the set-up for a
+// shot, its streamed textures and clothes, and the stream handlers that make them. Not all of it
+// matches yet; the code in the two marked sweep blocks is matched but not yet cleaned up.
 
 #include "game.h"
 #include "charstate.h"
@@ -66,7 +67,7 @@ void  fn_8001899C(Character* pChar, u8 bLegA, u8 bLegB);
 void  Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, int nBoneA, int nBoneB,
                               int nBoneC, int nBoneD, int nPoint, int b);
 void  fn_8001B644(Character* pChar);
-void  fn_8001C860(Character* pChar);
+void  Character_SetupForShot(Character* pChar);
 void  fn_80021978(u8 v);                                        // ska_shared.c
 void  fn_8002787C(CharModel* pModel);                           // Skeleton.c
 void  fn_800279C0(Character* pChar);                            // Skeleton.c
@@ -473,7 +474,7 @@ void Character_UpdateAnimation(Character* pChar, int bForce, f32 fTime) {
     }
     pChar->f14 = 1073741824.0f;
     if (pChar->u10 & 4) {
-        fn_8001C860(pChar);
+        Character_SetupForShot(pChar);
         bC860 = 1;
     }
     if (pChar->n20 == 8 && pChar->nAnim == 8) {
@@ -1066,7 +1067,7 @@ void fn_80019648(void) {
     fn_8001A4BC();
 }
 
-// Replays the character's blend at its current time: fAnimTime from f180, the blend's time
+// Replays the character's blend at its event 2: fAnimTime from f180, event 2's time in the blend
 // (fn_8001F02C) and v1638[1], then one animation update of no length.
 void fn_8001966C(Character* pChar) {
     if (pChar != NULL && pChar->pBlend != NULL) {
@@ -1345,8 +1346,8 @@ void fn_8001A0FC(Character* pChar) {
 }
 
 // Sets up the dynamic textures for the character's model in use (fn_8010B098), dresses it
-// (fn_8001D4A4) and puts its skins on the model, the "Glove" set first; the last marked player
-// (lbl_80281CAC) is dressed again.
+// (fn_8001D4A4) and puts its skins on the model; the last marked player (lbl_80281CAC) is
+// dressed again.
 void fn_8001A14C(Character* pChar) {
     u64 uGlove;
     void* pModel;
@@ -1392,7 +1393,7 @@ void fn_8001A288(void) {
     }
 }
 
-// Reset every pool entry and mark it free.
+// Free every pool entry's dynamic texture (fn_8010A668) and mark the entry free.
 void fn_8001A33C(void) {
     int i;
     for (i = 0; i < lbl_801B95E8.nEntries; i++) {
@@ -1526,11 +1527,11 @@ void fn_8001A75C(UStreamObject* pObject) {
 }
 
 void fn_8001A798(void) {
-    UStream_RegisterHandler('SAC ', fn_8001A75C);
+    Stream_RegisterLoadChunkCallback('SAC ', fn_8001A75C);
 }
 
 void fn_8001A7C8(void) {
-    UStream_UnregisterHandler('SAC ');
+    Stream_UnregisterLoadChunkCallback('SAC ');
 }
 
 // Handle the 'SAC ' overlays while fn_80014BB4 and fn_80014DC0 run.
@@ -1604,8 +1605,7 @@ void fn_8001A920(void) {
 
 // Builds a character from its CHR object: a header (its animation slot and a few values), its
 // skin, the p44 entries, its model (SKEL_LoadFromMem), its own animation library, and its slider
-// definitions; then a golfer's club skins and, with bLook, its look from pChoices. Every value read
-// is followed by 12 bytes it skips.
+// definitions; then a golfer's club skins and, with bLook, its look from pChoices.
 // port: the object is little-endian on disc and BYTESWAP_SWAPDATA swaps each value as it reads it: a
 //       little-endian port does not swap there.
 Character* fn_8001A9F4(u8* pData, int nUnused, int nSet, int nId, u8 bLook, SkinChoices* pChoices) {
@@ -2319,9 +2319,9 @@ void fn_8001C680(int nPlayer) {
     int nKind = pChar->nShotKind;
     int nClub;
 
-    fn_8001C724(pChar, pPlayer->nShotKind);
+    Character_SelectGameShotType(pChar, pPlayer->nShotKind);
     nClub = pChar->nClub;
-    fn_8001C774(pChar, pPlayer->nClub);
+    Character_SelectGameClub(pChar, pPlayer->nClub);
     if (nClub != pPlayer->nClub || nKind != pPlayer->nShotKind) {
         pChar->nAnim = 0;
         pChar->u10 |= 0x80;
@@ -2331,14 +2331,14 @@ void fn_8001C680(int nPlayer) {
 }
 
 // Set the character's shot kind and the clip key that goes with it.
-void fn_8001C724(Character* pChar, int nKind) {
+void Character_SelectGameShotType(Character* pChar, int nKind) {
     if (pChar != NULL) {
         fn_8001C650(pChar, lbl_80187164[nKind]);
         pChar->nShotKind = nKind;
     }
 }
 
-void fn_8001C774(Character* pChar, int nClub) {
+void Character_SelectGameClub(Character* pChar, int nClub) {
     // per club: what fn_8001C5B4 gets
     int aKind[26] = {0, 0, 0, 0, 0, 0, 1, 1, 1, 3, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 2};
 
@@ -2369,11 +2369,12 @@ void fn_8001C804(int nPlayer, u8 a, u8 b) {
 
 // Puts the golfer at its player's ball, facing the target (level), and resets its root bone's pose
 // and matrix. With u10 bit 8 and a skeleton, it then takes the stance of its clip for the style:
-// the clip is started on the skeleton when it changed (at pD4's f24 with bit 0x10000), the root is
-// moved by the club class's offset (mirrored when the model is), the pose updated, the feet placed
-// and both leg chains moved with the root, and the IK weight set (1 in the swing's states 5 and 7).
-// Bits 4, 8, 0x200 and 0x10000 of u10 are cleared; 0x200 also places the feet on the terrain.
-void fn_8001C860(Character* pChar) {
+// the clip is started on the skeleton when it changed (at its event 2's time with bit 0x10000), the
+// root is moved by the club class's offset (mirrored when the model is), the pose updated, the
+// feet placed and both leg chains moved with the root, and the IK weight set (1 in the swing's
+// states 5 and 7). Bits 4, 8, 0x200 and 0x10000 of u10 are cleared; with 0x200 the ground under
+// the feet is sampled again first.
+void Character_SetupForShot(Character* pChar) {
     f32 vDir[4];
     f32 vOffsetX[4];
     f32 vOffsetZ[4];
@@ -2499,15 +2500,15 @@ void fn_8001CD80(UStreamObject* pObject) {
 
 // The 'CLB ' stream objects: two handlers for the same type.
 void fn_8001CDD4(void) {
-    UStream_RegisterHandler('CLB ', fn_8001CCF8);
+    Stream_RegisterLoadChunkCallback('CLB ', fn_8001CCF8);
 }
 
 void fn_8001CE04(void) {
-    UStream_RegisterHandler('CLB ', fn_8001CD80);
+    Stream_RegisterLoadChunkCallback('CLB ', fn_8001CD80);
 }
 
 void fn_8001CE34(void) {
-    UStream_UnregisterHandler('CLB ');
+    Stream_UnregisterLoadChunkCallback('CLB ');
 }
 
 // A 'CHR ' object: a character for every player whose golfer has this model and who has none yet
@@ -2551,7 +2552,7 @@ void fn_8001CE5C(UStreamObject* pObject) {
 
 // The 'CHR ' stream objects: two handlers for the same type.
 void fn_8001CFF0(void) {
-    UStream_RegisterHandler('CHR ', fn_8001CE5C);
+    Stream_RegisterLoadChunkCallback('CHR ', fn_8001CE5C);
 }
 
 // A 'CHR ' object for the golfer the menu is loading (lbl_80281EE0->pB8): the UI file is parked in
@@ -2604,11 +2605,11 @@ void fn_8001D020(UStreamObject* pObject) {
 }
 
 void fn_8001D238(void) {
-    UStream_RegisterHandler('CHR ', fn_8001D020);
+    Stream_RegisterLoadChunkCallback('CHR ', fn_8001D020);
 }
 
 void fn_8001D268(void) {
-    UStream_UnregisterHandler('CHR ');
+    Stream_UnregisterLoadChunkCallback('CHR ');
 }
 
 // Runs fn_800B28D4 and fn_800B2FB0 on each character found by id (nPlayer 1000) whose n1658 is not
@@ -2658,11 +2659,11 @@ void fn_8001D3EC(UStreamObject* pObject) {
 }
 
 void fn_8001D44C(void) {
-    UStream_RegisterHandler('SKLO', fn_8001D3EC);
+    Stream_RegisterLoadChunkCallback('SKLO', fn_8001D3EC);
 }
 
 void fn_8001D47C(void) {
-    UStream_UnregisterHandler('SKLO');
+    Stream_UnregisterLoadChunkCallback('SKLO');
 }
 
 // Dresses the character of player slot nSlot: its club skins (in game type 3 golfers 7 and 29 get
@@ -2797,8 +2798,8 @@ void Character_GetBallOnFingerPosition(Character* pChar, f32* pPos) {
     }
 }
 
-// Where the hand holds the ball, for the swing: bone 0x1A's position moved 0.000625 along the
-// bone's x axis (the other way while the model's bEE is set), and bone 0x15's pose as three angles
+// A point at the hand and three angles: bone 0x1A's position moved 0.000625 along the bone's x
+// axis (the other way while the model's bEE is set), and bone 0x15's pose as three angles
 // (Quat_ExtractEulerAngles), the second 30 degrees more.
 void fn_8001DA04(Character* pChar, f32* pPos, f32* pAngles) {
     f32 (*pMtx)[4];
@@ -2820,7 +2821,6 @@ void fn_8001DA04(Character* pChar, f32* pPos, f32* pAngles) {
     }
 }
 
-// Empty the character's four data buffers (their memory is kept).
 // The clip's point v80 through bone 0's matrix (fn_8001ED08) into pOut; without a clip, bone 0's
 // position (fn_8001EB8C).
 void fn_8001DB04(Character* pChar, f32* pOut) {
@@ -2849,8 +2849,8 @@ void fn_8001DB98(Character* pChar) {
     }
 }
 
-// The ball is in the golfer's hand: the current clip has more than bone 0x54's index of something
-// (its n1C), and the model has that bone.
+// 1 when there is a current clip, the model has bone 0x54 and the clip's n1C is above that bone's
+// index (Swing.c then puts the ball on bone 0x54).
 u8 fn_8001DBF4(Character* pChar) {
     if (pChar->pCurClip != NULL && fn_8001EED8(pChar->pModel, 0x54) != 0xFF &&
         pChar->pCurClip->n1C > fn_8001EED8(pChar->pModel, 0x54)) {

@@ -62,16 +62,16 @@ PgaEntrant* GetEntrantNonMCPtr(int nEntrant) {
 }
 
 void fn_8011763C(void) {
-    UStream_RegisterHandler('PGST', fn_80117694);
+    Stream_RegisterLoadChunkCallback('PGST', fn_80117694);
 }
 
 void fn_8011766C(void) {
-    UStream_UnregisterHandler('PGST');
+    Stream_UnregisterLoadChunkCallback('PGST');
 }
 
 // The 'PGST' stream object: the tour pros.
 void fn_80117694(UStreamObject* pObject) {
-    fn_8000E790(pObject, sizeof(lbl_8024B9CC), lbl_8024B9CC);
+    Stream_StreamLoadFixedSize(pObject, sizeof(lbl_8024B9CC), lbl_8024B9CC);
 }
 
 // A new PGA TOUR in the profile: everything cleared, the tournaments' champions from the tour data,

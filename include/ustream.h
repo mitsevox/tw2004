@@ -56,7 +56,7 @@ typedef struct UStreamBuffer {
     u8   data[USTREAM_BUFFER_SIZE];
 } UStreamBuffer;
 
-// What the caller passes to UStream_Open (0x284 bytes) - the file list and per-file callbacks.
+// What the caller passes to Stream_OpenStreamFiles (0x284 bytes) - the file list and per-file callbacks.
 typedef struct {
     int   nNumFiles;                                 // 0x000
     char  aszName[USTREAM_MAX_FILES][0x40];          // 0x004
@@ -67,11 +67,11 @@ typedef struct {
 } UStreamParams;
 
 // The stream manager's file lists (lbl_80280DF8): streammanagerhole.c and FEgolferanim.c open
-// one of them with UStream_Open and keep the stream; LoadData.c empties list 2. Only the part
+// one of them with Stream_OpenStreamFiles and keep the stream; LoadData.c empties list 2. Only the part
 // the code reaches is known.
 typedef struct StreamLists {
     UStreamParams aParams[7];   // 0x000
-    int  nStream;               // 0x119C  the open stream (UStream_Open)
+    int  nStream;               // 0x119C  the open stream (Stream_OpenStreamFiles)
 } StreamLists;
 extern StreamLists* lbl_80280DF8;
 extern char lbl_80186C14[];   // "data/Load/Load%d.gcb" (streammanagerhole.c fn_80014544)

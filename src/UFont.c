@@ -50,7 +50,7 @@ void UFont_LoadFontFromStream(UStreamObject* pObject) {
 }
 
 void FO_vInitModule(void) {
-    UStream_RegisterHandler('sfn ', UFont_LoadFontFromStream);
+    Stream_RegisterLoadChunkCallback('sfn ', UFont_LoadFontFromStream);
     fn_80011034(lbl_80280DE0);
     lbl_80280DE0->pQueuePool = fn_80009B34(50 * sizeof(UFontContext), 2, 0x10, "UFont.c", 0x125);
     lbl_80280DE0->pStrings = fn_80009B34(0x1F4, 2, 0x10, "UFont.c", 0x12F);

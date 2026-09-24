@@ -110,14 +110,14 @@ void fn_80076F20(void) {
 }
 
 void fn_80076F24(void) {
-    UStream_RegisterHandler(TAG('B', 'I', 'O', ' '), fn_80076F80);
+    Stream_RegisterLoadChunkCallback(TAG('B', 'I', 'O', ' '), fn_80076F80);
 }
 
 void fn_80076F54(void) {
 }
 
 void fn_80076F58(void) {
-    UStream_UnregisterHandler(TAG('B', 'I', 'O', ' '));
+    Stream_UnregisterLoadChunkCallback(TAG('B', 'I', 'O', ' '));
 }
 
 // The 'BIO ' stream object's handler: keep a copy of its data.

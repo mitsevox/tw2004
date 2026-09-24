@@ -282,7 +282,7 @@ LAYOUT_ASSERT(CourseLoader, 0x8);
 
 CourseInfo* fn_8000C594(void);          // the current hole's terrain data
 u8   Course_RegisterLoader(int nChunk, void (*pfn)(u8*));   // 0x8000C0B4: pfn gets the hole's chunk nChunk
-void fn_8000C0F0(void);                 // no more loaders may register
+void fn_8000C0F0(void);                 // network count 0, loader count -1
 void fn_8000C104(void);                 // register the 'Cnet' handler, clear the loaders
 s32  fn_8000C140(f32* pPos, TNetwork* pNet, s32 nNodes);   // point in outline. TW06: wn_PnPoly
 // The segment from pFrom to pTo crosses the outline (in x and z); pHit gets the nearest crossing.

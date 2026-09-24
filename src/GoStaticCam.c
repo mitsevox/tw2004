@@ -25,11 +25,11 @@ void fn_80065B20(f32* pA, f32* pB, f32* pOut);
 
 // Register the 'CAMC' stream handler.
 void fn_8006449C(void) {
-    UStream_RegisterHandler('CAMC', fn_800644F4);
+    Stream_RegisterLoadChunkCallback('CAMC', fn_800644F4);
 }
 
 void fn_800644CC(void) {
-    UStream_UnregisterHandler('CAMC');
+    Stream_UnregisterLoadChunkCallback('CAMC');
 }
 
 // The 'CAMC' handler: the fly-by paths' timing curves, byte-swapped into a new table.

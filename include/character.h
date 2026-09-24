@@ -114,9 +114,9 @@ typedef struct Skeleton {
     f32  (*p20)[4];             // 0x0020  a quaternion per bone
     f32  (*p24)[4];             // 0x0024  a quaternion per bone
     f32  (*p28)[4];             // 0x0028  p20 at an IK weight of 0 or 1, otherwise p24
-    struct Clip* pClip;         // 0x002C  its clip (fn_8001C860); cleared before and after
+    struct Clip* pClip;         // 0x002C  its clip (Character_SetupForShot); cleared before and after
                                 //         fn_8001966C's animation update
-    SkelPose pose;              // 0x0030  (fn_8001C860 passes it to SKEL_UpdateState)
+    SkelPose pose;              // 0x0030  (Character_SetupForShot passes it to SKEL_UpdateState)
     f32  fIKWeight;             // 0x1070  SKEL_SetIKSolutionWeight
     f32  f1074;                 // 0x1074  } set by SKEL_RelaxIK and SKEL_TransitionIK
     f32  f1078;                 // 0x1078  }
@@ -137,7 +137,7 @@ typedef struct Skeleton {
                                 //         legs 0 and 1)
     u8   a1108[4];              // 0x1108  the indexes of bones 0x24, 0x25, 0x11 and 0x12 (SKEL_CreateIKSkeleton)
     u8   unk110C[0x112C - 0x110C];
-    s32  n112C;                 // 0x112C  } the character's club class and n16D4 (fn_8001C860)
+    s32  n112C;                 // 0x112C  } the character's club class and n16D4 (Character_SetupForShot)
     s32  n1130;                 // 0x1130  }
 } Skeleton;
 
@@ -448,7 +448,7 @@ typedef struct BlendClip {
 LAYOUT_ASSERT(BlendClip, 0x1F0);
 
 // One of a clip's timed events (Clip.pEvents; fn_8001F02C finds one by its id). Event 2's time is
-// the ball-hit time the swing measures (fn_8001C860 starts the skeleton's clip at it).
+// the ball-hit time the swing measures (Character_SetupForShot starts the skeleton's clip at it).
 typedef struct ClipEvent {
     u32  uId;                   // 0x0
     f32  fTime;                 // 0x4
@@ -525,7 +525,7 @@ typedef struct CharModelDefs {
 extern CharModelDefs lbl_80280E10;
 extern CharModelDefs lbl_80280E18;
 
-// Per club class, an offset (x, y, z) fn_8001C860 places the golfer by (0x4C bytes: one more
+// Per club class, an offset (x, y, z) Character_SetupForShot places the golfer by (0x4C bytes: one more
 // float follows the six).
 extern f32 lbl_80187184[6][3];
 
@@ -639,8 +639,8 @@ typedef struct Character {
     s32   n16A8;                // 0x16A8  fn_8001EEE4's answer for bone 0x15
     f32   q16AC[4];             // 0x16AC  } the grip bone's rotation and offset from the root while
     f32   v16BC[4];             // 0x16BC  } flag 0x4000 holds it (fn_8001BD18)
-    s32   nClub;                // 0x16CC  the club (fn_8001C774)
-    s32   nShotKind;            // 0x16D0  the player's shot kind (fn_8001C724)
+    s32   nClub;                // 0x16CC  the club (Character_SelectGameClub)
+    s32   nShotKind;            // 0x16D0  the player's shot kind (Character_SelectGameShotType)
     s32   n16D4;              // 0x16D4  the key for clip lookups (Char_SetClip)
     struct CharSkinSet* p16D8;  // 0x16D8  six more skins (SkinPart.c)
     s32   n16DC;                // 0x16DC  twice the players set up so far, in split screen 2
@@ -659,7 +659,7 @@ typedef struct Character {
                                 //         groups 5, 6 and 10
     void* p1794;                // 0x1794  cleared by fn_80062BE8; the same for group 9
     Clip* p1798;                // 0x1798  cleared by fn_8001942C; with n2C 6, fn_8001C650 and
-                                //         fn_8001C860 set n16D4 to 4 when it is 0
+                                //         Character_SetupForShot set n16D4 to 4 when it is 0
     f32   a179C[4];             // 0x179C  cleared by Character_PlaceFeetOnGround; fn_80017DDC acts only
                                 //         while a179C[1] is above 0.9
     void* p17AC;                // 0x17AC  its slider definitions (CharSlider_CreateDefinitionsFromMem,
@@ -775,16 +775,16 @@ void  fn_8001DC64(Character* pChar, struct SkinChoices* pChoices);  // applies a
 void  fn_8001EE98(Character* pChar, u8 b);    // sets the model's bEE
 void  Character_SetPosition(Character* pChar, f32* pPos, u8 bPlace);
 int   fn_8001C558(int nPlayer);          // the model id of the player's golfer
-void  fn_8001C724(Character* pChar, int nKind);
-void  fn_8001C774(Character* pChar, int nClub);
+void  Character_SelectGameShotType(Character* pChar, int nKind);
+void  Character_SelectGameClub(Character* pChar, int nClub);
 void  fn_8001C7FC(Character* pChar, int nStyle);   // the animation style (nStyle)
 Character* fn_8001D324(int nId);        // the character with this id (100: the flag, by its clips), or NULL
 void  fn_8001D624(int n);               // set gSession.aD2D[n]
 void  fn_8001D7A4(Character* pChar);
-void  fn_8001DA04(Character* pChar, f32* pPos, f32* pAngles);   // where the hand holds the ball
-void  fn_8001DB04(Character* pChar, f32* pOut);    // the golfer's position
+void  fn_8001DA04(Character* pChar, f32* pPos, f32* pAngles);   // hand point, bone 0x15's angles
+void  fn_8001DB04(Character* pChar, f32* pOut);    // the clip's point v80 placed by bone 0
 void  fn_8001DB98(Character* pChar);    // empty the character's four data buffers
-u8    fn_8001DBF4(Character* pChar);    // the ball is in the golfer's hand
+u8    fn_8001DBF4(Character* pChar);    // the clip's n1C is above bone 0x54's index
 void  Character_GetBallOnFingerPosition(Character* pChar, f32* pPos);
 f32 (*fn_8001ED08(Character* pChar, int nBone))[4];  // a bone's matrix
 u8    fn_8001EDF4(Character* pChar);    // the model's bEE

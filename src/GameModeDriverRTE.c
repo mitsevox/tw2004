@@ -52,28 +52,28 @@ void fn_800F0448(void) {
 }
 
 void GameModeDriverRTE_RegisterStreamClients(void) {
-    UStream_RegisterHandler('RTEc', GameModeDriverRTE_Locale_LoadRTEcFromStream);
-    UStream_RegisterHandler('RTEs', GameModeDriverRTE_LoadRTEsFromStream);
-    UStream_RegisterHandler('RTEn', GameModeDriverRTE_Locale_LoadRTEnFromStream);
+    Stream_RegisterLoadChunkCallback('RTEc', GameModeDriverRTE_Locale_LoadRTEcFromStream);
+    Stream_RegisterLoadChunkCallback('RTEs', GameModeDriverRTE_LoadRTEsFromStream);
+    Stream_RegisterLoadChunkCallback('RTEn', GameModeDriverRTE_Locale_LoadRTEnFromStream);
 }
 
 void GameModeDriverRTE_UnregisterStreamClients(void) {
-    UStream_UnregisterHandler('RTEc');
-    UStream_UnregisterHandler('RTEs');
-    UStream_UnregisterHandler('RTEn');
+    Stream_UnregisterLoadChunkCallback('RTEc');
+    Stream_UnregisterLoadChunkCallback('RTEs');
+    Stream_UnregisterLoadChunkCallback('RTEn');
 }
 
 void GameModeDriverRTE_Locale_LoadRTEcFromStream(UStreamObject* pObject) {
     // port: the 'RTEc' object is copied straight into gRTEs.aEvent (RTEvent[118]); it is big-endian
     // on disc, so a little-endian port converts it field by field here (docs/format-byteorder.md)
-    fn_8000E790(pObject, sizeof(gRTEs.aEvent), gRTEs.aEvent);
+    Stream_StreamLoadFixedSize(pObject, sizeof(gRTEs.aEvent), gRTEs.aEvent);
 }
 
 void GameModeDriverRTE_LoadRTEsFromStream(UStreamObject* pObject) {
     // port: the 'RTEs' object is copied straight into gRTEs.aChallenge (Challenge[111]); it is
     // big-endian on disc, so a little-endian port converts it field by field here
     // (docs/format-byteorder.md)
-    fn_8000E790(pObject, sizeof(gRTEs.aChallenge), gRTEs.aChallenge);
+    Stream_StreamLoadFixedSize(pObject, sizeof(gRTEs.aChallenge), gRTEs.aChallenge);
 }
 
 // The 'RTEn' object: the names block is copied out.

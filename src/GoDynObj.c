@@ -100,13 +100,13 @@ void fn_800460F8(UStreamObject* arg0) {
 // ---- end of sweep code ----
 
 void fn_80046130(void) {
-    UStream_RegisterHandler('TEO ', fn_80045F74);
-    UStream_RegisterHandler('BALL', fn_80045FC8);
+    Stream_RegisterLoadChunkCallback('TEO ', fn_80045F74);
+    Stream_RegisterLoadChunkCallback('BALL', fn_80045FC8);
 }
 
 void fn_80046174(void) {
-    UStream_UnregisterHandler('TEO ');
-    UStream_UnregisterHandler('BALL');
+    Stream_UnregisterLoadChunkCallback('TEO ');
+    Stream_UnregisterLoadChunkCallback('BALL');
 }
 
 // Allocates the state; no 'TEO ' models yet.
