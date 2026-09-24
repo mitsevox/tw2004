@@ -549,8 +549,10 @@ void sFE_AdjustAndSetGolferPosition(void) {
     pView = fn_80017028(fn_80016D10());
     fn_8008F24C();
     fn_800364A0();
-    if (lbl_80281EE0->aGolfer[0].b19 || lbl_80281EE0->b8A) {
-        lbl_80281EE0->aGolfer[0].b18 = 0;
+    for (i = 0; i < CRAP_NUM_GOLFERS; i++) {
+        if (lbl_80281EE0->aGolfer[i].b19 || lbl_80281EE0->b8A) {
+            lbl_80281EE0->aGolfer[i].b18 = 0;
+        }
     }
     if (lbl_80281EE0->b8A || (lbl_80281EE0->pB4 != NULL && lbl_80281EE0->pB4->b19)) {
         lbl_80281EE0->pB4->b18 = 0;
