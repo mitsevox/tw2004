@@ -404,5 +404,8 @@ extern s32 lbl_80282574;
 extern s32 lbl_80282578;
 extern u8 lbl_8028257C;
 extern u8 lbl_8028257D;
+extern s32 lbl_8028198C;            // frames until fn_80124C10 resends the Bio's summary (15)
+extern s32 lbl_80281990;            // frames until fn_80124C10 resends a game's details (15)
+extern char lbl_80281994[4];        // "": fills the unused lines of the Bio screens' lists
 
 #endif
