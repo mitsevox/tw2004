@@ -47,6 +47,9 @@ void fn_800441E4(CamScript* pScript, f32* pCam, f32* pSub, int nPlayer, CamShot*
 u8   fn_800439E4(f32* pCam, int nPlayer);
 u8   fn_80043920(CamScript* pScript, int nPlayer);
 void fn_80044768(f32* pPos, f32* pOut);
+u8   fn_800DC464(int nPlayer);          // GameEffects.c: the ball is simulated from its position
+u8   Ter_CheckForGroundCollision(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
+                                 SurfaceType** ppSurface, TerObject** ppObj);
 
 // The camera script's frame (a view's &View.script; pShot is the view's hand-built shot19C). Unless
 // paused (or b), it eases the ball-update rate fEC, places the camera for the current and next
@@ -544,6 +547,96 @@ void fn_8004255C(f32* pPos, f32* pTarget, f32 fUp, f32 fSide) {
     }
     pPos[0] += fSide * -vDir[2];
     pPos[2] += fSide * vDir[0];
+}
+
+// Where the ball-flight camera expects the ball to land, into the script's v50: the ball as it lay
+// before the shot while it has not been hit (single view), the target without a club (25); in
+// flight, where the line of its velocity (lifted while rising, bent down by its height) meets the
+// ground, pulled back to the club's reach; at rest, 5 x fn_800510EC along its velocity, on the ground.
+void CameraScript_UpdateLandingEstimate(CamScript* pScript, int nPlayer) {
+    f32 vHit[4];
+    f32 vNormal[4];
+    f32 vVel[4];
+    f32 vStep[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+    f32 vPos[4];
+    f32 vLand[4];
+    f32 vUp[4];
+    f32 vTarget[4];
+    SurfaceType* pSurface;
+    TerObject* pObj;
+    Ball* pBall;
+    CourseInfo* pCourse;
+    f32 fRise;
+    f32 fDist;
+    f32 fReach;
+    f32 fHeight;
+
+    Vec3Copy(gPlayers[nPlayer].vTargetCopy, vTarget);
+    if (gSession.nSplitScreen == 0
+        && (gPlayers[nPlayer].ballBefore.nState == 0 || gPlayers[nPlayer].ballBefore.nState == 1
+            || gPlayers[nPlayer].ballBefore.nState == 5)) {
+        Vec3Copy(gPlayers[nPlayer].ballBefore.vPos, pScript->v50);
+        return;
+    }
+    if (gPlayers[nPlayer].nClub == 25) {
+        Vec3Copy(vTarget, pScript->v50);
+        return;
+    }
+    if (gSession.nSplitScreen != 0) {
+        pBall = &gPlayers[nPlayer].ball;
+    } else if (fn_800DC464(nPlayer)) {
+        pBall = &gPlayers[nPlayer].ballBefore;
+    } else {
+        pBall = &gPlayers[nPlayer].ball;
+    }
+    Vec3Copy(pBall->vPos, vPos);
+    if (pBall->nState == 2) {
+        Vec3Copy(pBall->vVel, vVel);
+        if (0.0f != vVel[0] || 0.0f != vVel[1] || 0.0f != vVel[2]) {
+            if (vVel[1] >= 0.0f) {
+                fRise = pBall->vVel[1] / 0.10717f;
+                fn_800BAF04(vVel, vStep);
+                fn_8001EF34(vStep, fRise, vUp);
+                fn_8004544C(vPos, vUp, vPos);
+                vVel[1] = 0.0f;
+            }
+            vVel[1] -= powf(pBall->fHeight, 0.7f) / 1.4f;
+            fn_800BAF04(vVel, vVel);
+            fn_8001EF34(vVel, 200.0f, vVel);
+            fn_8004544C(vPos, vVel, vStep);
+            pCourse = fn_8000C594();
+            if (Ter_CheckForGroundCollision(pCourse, vPos, vStep, vHit, vNormal, &pSurface, &pObj)) {
+                fn_80045428(vHit, pBall->vStart, vLand);
+                fDist = fn_80009680(fn_80009744(vLand));
+                fReach = AI_MaxDistance(nPlayer, gPlayers[nPlayer].nShotKind, gPlayers[nPlayer].nClub);
+                fReach *= fn_800510EC(&gPlayers[nPlayer].ball);
+                fReach *= fn_8005B64C(nPlayer);
+                if (fReach < fDist - 50.0f) {
+                    fn_800BAF04(vLand, vLand);
+                    fn_8001EF34(vLand, fReach, vLand);
+                    fn_8004544C(pBall->vStart, vLand, vLand);
+                    fHeight = Terrain_HeightAt(vLand, NULL);
+                    if (!(fHeight < -60000.0f)) {
+                        vLand[1] = fHeight;
+                        Vec3Copy(vLand, pScript->v50);
+                        return;
+                    }
+                    Vec3Copy(vHit, pScript->v50);
+                    return;
+                }
+                Vec3Copy(vHit, pScript->v50);
+            }
+        }
+    } else {
+        Vec3Copy(pBall->vVel, vStep);
+        fn_8001EF34(vStep, 5.0f * fn_800510EC(&gPlayers[nPlayer].ball), vStep);
+        fn_8004544C(vPos, vStep, vStep);
+        fHeight = Terrain_HeightAt(vStep, NULL);
+        if (!(fHeight < -60000.0f)) {
+            vStep[1] = fHeight;
+            Vec3Copy(vStep, pScript->v50);
+        }
+    }
 }
 
 // Moves the script on to pShot (its next shot): the next shot's positions become the current
