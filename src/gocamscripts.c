@@ -576,7 +576,10 @@ void fn_8003F2E0(CamScript* pScript, f32 fTime) {
         break;
     case 2:
         v[3] = pScript->f94 > 0.0f ? pScript->v40[3] - pScript->v40[3] * (pScript->f90 / pScript->f94) : 0.0f;
-        v[3] = v[3] < 0.0f ? 0.0f : (v[3] > pScript->v40[3] ? pScript->v40[3] : v[3]);
+        {
+            f32 f = v[3];
+            v[3] = f < 0.0f ? 0.0f : (f > pScript->v40[3] ? pScript->v40[3] : f);
+        }
         fn_80038010(1, fn_80016D10(), v);
         break;
     case 3:
@@ -586,7 +589,10 @@ void fn_8003F2E0(CamScript* pScript, f32 fTime) {
         break;
     case 4:
         fn_800386F0(fn_80016D10(), v);
-        v[3] = v[3] < 0.0f ? 0.0f : (v[3] > pScript->v40[3] ? pScript->v40[3] : v[3]);
+        {
+            f32 f = v[3];
+            v[3] = f < 0.0f ? 0.0f : (f > pScript->v40[3] ? pScript->v40[3] : f);
+        }
         fn_80038010(1, fn_80016D10(), v);
         break;
     case 5:
