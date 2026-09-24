@@ -9,6 +9,9 @@
 #include "charstate.h"
 #include "endian.h"
 #include "platform.h"
+#include "ball.h"
+#include "terrain.h"
+#include "game.h"
 
 void  fn_80008380(void);
 void  fn_80016978(f32 fLeft, f32 fTop, f32 fWidth, f32 fHeight);
@@ -34,9 +37,32 @@ u8    fn_8001EC48(Character* pChar);           // char.c
 void  fn_80035810(Character* pChar);
 void  fn_80035D10(Character* pChar, int nView);
 void  fn_80035F40(void* pCamera);
-void  fn_80036054(void* pMesh, int n, s32* pDesc);
-void  fn_800360A0(void* pMesh);
+void  fn_80036054(ShaderObject* pObj, int nRow, const void* pDesc);
+void  fn_800360A0(ShaderObject* pObj);
+void  fn_800360D4(ShaderObject* pObj);
+void  fn_80036100(ShaderObject* pObj, const void* pData, int n);
 void  fn_8003612C(LightGroup* pGroup);
+void  fn_8003614C(Character* pChar, f32* pOut);
+void  fn_80036180(SkelPose1* pA, SkelPose1* pB, SkelPose1* pOut, f32 fWeight);
+int   fn_80035A9C(void);
+void  fn_80035FBC(void);
+void  fn_80035FDC(UObject* pObj);
+void  fn_80035FFC(void);
+void  fn_80036024(f32 f);
+void  fn_80093824(void);                                     // goballfx.c
+f32   fn_8004B78C(CourseInfo* pCourse, f32* pPos);           // GoTerrainCollision.c: the ground's light
+void  fn_8003519C(int nRow, void* pData);                    // GoTerrain.c: calls row nRow's pfn8
+void  fn_8011CB5C(Skin* pSkin, int nView);                   // SkinMorph.c
+void  fn_800CE16C(void);                                     // SkinPart.c
+void  fn_8003662C(Skin* pSkin, CharModel* pCharModel, int nSkip, int nFirst, int nView);
+void  fn_80036790(Skin* pSkin, int n);
+void  fn_80037AB8(Skin* pSkin, CharModel* pCharModel, int nSkip, int nFirst);
+void  fn_800090A0(f32* pA, f32* pB, f32* pOut);                // Quaternion.c
+void  fn_800090E4(f32* pQuat, f32* pIn, f32* pOut);            // Quaternion.c: pIn turned by pQuat
+void  fn_8000914C(f32* pQ, f32 (*pMtx)[4]);                   // Quaternion.c: to a matrix
+void  fn_8000A798(f32 (*pSrc)[4], f32 (*pDst)[4]);            // UMemPool.c: inverts a matrix
+void  fn_80021980(u32* aA, u32* aB, u32* aOut, u32 nBits);   // Skeleton.c: aOut = aA | aB
+void  fn_80029EF4(u32* pSrc, u32* pDst, u32 nBits);          // Skeleton.c
 void  fn_80036278(SkinModel44* pEntries, s32 nEntries);
 void  fn_80036344(SkinModel44* pEntries, s32 nEntries);
 void  fn_800363B4(SkinModel54* pEntries, s32 nEntries);
@@ -133,15 +159,155 @@ void fn_80035810(Character* pChar) {
     }
 }
 
+// Draws the character's skin: without flag 2, lit by the current course's light set (flag 4: set 3
+// instead, without the character's own light settings) and the ground's light under it; with flag
+// 2, only its "shadow" parts, through row 10 of lbl_80188E88.
+void fn_800358E0(Character* pChar, u32 uFlags) {
+    static f32 aRow10[4] = { 128.0f, 128.0f, 128.0f, 128.0f };
+    f32 aRoot[3];
+    f32 aData[4];
+    CharEntry44* pEntry;
+    u32 uSet3;
+    int nMode;
+    u32 uShadow;
+
+    if (pChar->p44 != NULL) {
+        pEntry = &pChar->p44[fn_80035A9C()];
+    } else {
+        pEntry = NULL;
+    }
+    uShadow = uFlags & 2;
+    if (!uShadow) {
+        uSet3 = uFlags & 4;
+        if (uSet3) {
+            fn_80035338(3);
+        } else {
+            fn_80035338(0);
+            if (pEntry != NULL) {
+                // port: Character.p44's entries are what lighting.h calls LightParams
+                fn_80093854((LightParams*)pEntry);
+            }
+        }
+        if (!uSet3) {
+            fn_80093824();
+        }
+        fn_8003614C(pChar, aRoot);
+        fn_80036024(0.5f * fn_8004B78C(fn_8000C594(), aRoot) + 0.5f);
+        fn_80035FFC();
+        fn_80035308();
+    }
+    fn_800352E4();
+    fn_80035FDC(NULL);
+    if (uShadow) {
+        nMode = 2;
+    } else if (pChar->n1654 != 1) {
+        nMode = 1;
+    } else {
+        nMode = 2;
+    }
+    if (uShadow) {
+        Vec_Copy(aRow10, aData);
+        switch (nMode) {
+        case 2:
+            fn_80035138(1);
+            break;
+        case 1:
+            fn_80035138(1);
+            break;
+        default:
+            fn_80035138(0);
+            break;
+        }
+        fn_80012EF8();
+        fn_8003519C(10, aData);
+        fn_80035640(pChar);
+    } else {
+        switch (nMode) {
+        case 2:
+            fn_80035138(1);
+            break;
+        case 1:
+            fn_80035138(1);
+            break;
+        default:
+            fn_80035138(0);
+            break;
+        }
+        fn_80012EF8();
+        fn_80035754(pChar);
+    }
+    fn_80035FBC();
+}
+
+// The current course, except on course 7, where fn_80015464's value picks another.
+int fn_80035A9C(void) {
+    int nCourse;
+
+    nCourse = Game_GetCourse();
+    if (nCourse == 7) {
+        switch (fn_80015464()) {
+        case 0:
+            return nCourse;
+        case 1:
+            return 0x16;
+        case 2:
+            return 0x17;
+        case 3:
+            return 0xD;
+        case 4:
+            return 9;
+        case 5:
+            return 0x10;
+        case 6:
+            return 0x14;
+        case 7:
+            return 8;
+        case 15:
+        case 16:
+        case 17:
+            return 0x18;
+        default:
+            return 0xD;
+        }
+    }
+    return nCourse;
+}
+
+// Poses the character's skin and its club's skin on its model for view n17B4 (the club's from bone
+// 0x52 on). n: every caller passes 0; unused.
+void fn_80035B40(Character* pChar, int n) {
+    Skin* pClub;
+
+    if (gSession.nSplitScreen == 0 || gSession.nGameType == 3) {
+        fn_8011CB5C(pChar->pSkin, pChar->n17B4);
+    }
+    fn_8003662C(pChar->pSkin, pChar->pModel, 0, 0, pChar->n17B4);
+    fn_80036790(pChar->pSkin, pChar->n17B4);
+    // port: EA passes arguments fn_800CE16C ignores
+    ((void (*)(Skin*, int))fn_800CE16C)(pChar->pSkin, pChar->n17B4);
+    if (pChar->p16D8 != NULL) {
+        pClub = pChar->p16D8->apSkins[pChar->nClubClass];
+        if (pClub != NULL) {
+            fn_8003662C(pClub, pChar->pModel, fn_8001EED8(pChar->pModel, 0x52) - 0x52, 0x52,
+                        pChar->n17B4);
+            fn_80036790(pClub, pChar->n17B4);
+        }
+    }
+    pChar->n1698 = 1;
+    if (pChar->nPlayer == 1000) {
+        pChar->n1698 = 0;
+    }
+}
+
 // Sets up the triangles' mesh objects, one per view.
 void fn_80035C58(void) {
-    s32 aDesc[2];
+    DynRenderSize size;
     int i;
 
-    aDesc[0] = 3;
-    aDesc[1] = 1;
+    size.nMaxVerts = 3;
+    size.nMaxDraws = 1;
     for (i = 0; i < 2; i++) {
-        fn_80036054(lbl_801D4E78.aMesh[i], 0x13, aDesc);
+        fn_80036054(&lbl_801D4E78.aMesh[i], 0x13, &size);
     }
 }
 
@@ -150,8 +316,52 @@ void fn_80035CC0(void) {
     int i;
 
     for (i = 0; i < 2; i++) {
-        fn_800360A0(lbl_801D4E78.aMesh[i]);
+        fn_800360A0(&lbl_801D4E78.aMesh[i]);
     }
+}
+
+// Draws one grey triangle for view nView through the positions of the character's bones 1 and 7
+// (bone 7 twice), when its model has them.
+void fn_80035D10(Character* pChar, int nView) {
+    f32* apPos[3];
+    DynRenderFill fill;
+    CharModel* pModel;
+    int i;
+
+    if (nView < 0 || nView >= 2) {
+        return;
+    }
+    pModel = pChar->pModel;
+    if (pModel->nBones <= 1 || pModel->nBones <= 7) {
+        return;
+    }
+    apPos[0] = pModel->pMatrices[1][3];
+    apPos[1] = pModel->pMatrices[7][3];
+    apPos[2] = pModel->pMatrices[7][3];
+    for (i = 0; i < 3; i++) {
+        lbl_801D4E78.aPos[nView][i][0] = apPos[i][0];
+        lbl_801D4E78.aPos[nView][i][1] = apPos[i][1];
+        lbl_801D4E78.aPos[nView][i][2] = apPos[i][2];
+        lbl_801D4E78.aUV[nView][i][0] = 0.0f;
+        lbl_801D4E78.aUV[nView][i][1] = 0.0f;
+        lbl_801D4E78.aColor[nView][i][0] = 0x80;
+        lbl_801D4E78.aColor[nView][i][1] = 0x80;
+        lbl_801D4E78.aColor[nView][i][2] = 0x80;
+        lbl_801D4E78.aColor[nView][i][3] = 0x80;
+        lbl_801D4E78.aIndex[nView][i] = i;
+    }
+    fill.nCount = 3;
+    fill.nVerts = 3;
+    fill.pDraws = NULL;
+    fill.pIndices = lbl_801D4E78.aIndex[nView];
+    fill.pPos = lbl_801D4E78.aPos[nView];
+    fill.pColour = lbl_801D4E78.aColor[nView];
+    fill.pTexCoord = lbl_801D4E78.aUV[nView];
+    fn_80014118(0);
+    fn_80035138(0);
+    fn_80012EF8();
+    fn_80036100(&lbl_801D4E78.aMesh[nView], &fill, 1);
+    fn_800360D4(&lbl_801D4E78.aMesh[nView]);
 }
 
 // Runs fn_80035D10 for view nView on every character made so far, except those fn_8001EC48 picks
@@ -183,23 +393,64 @@ void fn_80036024(f32 f) {
     fn_8003532C()->group.v18[0] = f;
 }
 
-void fn_800360A0(void* arg0) {
-    s32 (*temp_r12)();
+// Sets up a shader object for row nRow of lbl_80188E88, handing its hooks pDesc.
+void fn_80036054(ShaderObject* pObj, int nRow, const void* pDesc) {
+    pObj->nRow = nRow;
+    pObj->pHooks = &lbl_80188E88[nRow].shader;
+    pObj->pHooks->pfnInit(pObj, pDesc);
+}
 
-    temp_r12 = (*(s32 (**)())((u8*)((*(void**)((u8*)(arg0) + 0x24))) + 4));
-    if (temp_r12 != NULL) {
-        temp_r12(arg0);
+// Frees it, if its row has a free hook.
+void fn_800360A0(ShaderObject* pObj) {
+    if (pObj->pHooks->pfnFree != NULL) {
+        pObj->pHooks->pfnFree(pObj);
     }
+}
+
+// Draws it.
+void fn_800360D4(ShaderObject* pObj) {
+    pObj->pHooks->pfnDraw(pObj);
+}
+
+// Hands it a frame's data.
+void fn_80036100(ShaderObject* pObj, const void* pData, int n) {
+    pObj->pHooks->pfnFill(pObj, pData, n);
 }
 
 void fn_8003612C(LightGroup* pGroup) {
     fn_8006E7A4(pGroup);
 }
 
-// pObj's type is not known yet: the one fn_800358E0 is handed.
-void fn_8003614C(void* pObj, f32* pOut) {
-    if (pObj != NULL) {
-        Vec_Copy((f32*)(*(u8**)(*(u8**)((u8*)pObj + 0x38) + 4) + 0x1C), pOut);
+// Copies the character's root bone position to pOut.
+void fn_8003614C(Character* pChar, f32* pOut) {
+    if (pChar != NULL) {
+        Vec_Copy(pChar->pModel->pBones[0].v1C, pOut);
+    }
+}
+
+// Blends the morph weights of two format 1 poses into pOut, fWeight of the way from pA to pB, for
+// each morph either sets; the morphs pOut gets are those of both, and pA's and pB's are cleared.
+void fn_80036180(SkelPose1* pA, SkelPose1* pB, SkelPose1* pOut, f32 fWeight) {
+    u32 aBits[4];   // only 20 bits are used; the size is not known
+    SkelPoseBlock* pBlockA;
+    SkelPoseBlock* pBlockB;
+    SkelPoseBlock* pBlockOut;
+    int i;
+    int j;
+
+    for (i = 0; i < 3; i++) {
+        pBlockA = &pA->aBlocks[i];
+        pBlockB = &pB->aBlocks[i];
+        pBlockOut = &pOut->aBlocks[i];
+        fn_80021980(pBlockA->aBits, pBlockB->aBits, aBits, 20);
+        fn_80029EF4(aBits, pBlockOut->aBits, 20);
+        for (j = 0; j < 20; j++) {
+            if (fn_8001E9CC(aBits, j)) {
+                pBlockOut->af8[j] = fWeight * (pBlockB->af8[j] - pBlockA->af8[j]) + pBlockA->af8[j];
+            }
+        }
+        fn_8001E938(pBlockA->aBits, 20);
+        fn_8001E938(pBlockB->aBits, 20);
     }
 }
 
@@ -280,7 +531,7 @@ void fn_800364AC(SkinModel* pModel) {
         return;
     }
     if (pModel->p34 != NULL) {
-        pModel->p34 = (u8*)pModel + (uptr)pModel->p34;
+        pModel->p34 = (BonePose*)((u8*)pModel + (uptr)pModel->p34);
     }
     if (pModel->p38 != NULL) {
         pModel->p38 = (u8*)pModel + (uptr)pModel->p38;
@@ -312,8 +563,9 @@ void fn_800364AC(SkinModel* pModel) {
 
 // Builds the skin's matrices (p108C): those of the model's bones come from the character model's
 // p768 (from bone nFirst on, nSkip further along there); each one after that whose bit is set in
-// p10CC is a weighted sum of up to three of them (SkinModel.p54).
-void fn_8003662C(Skin* pSkin, CharModel* pCharModel, int nSkip, int nFirst) {
+// p10CC is a weighted sum of up to three of them (SkinModel.p54). nView: both callers pass the
+// character's n17B4; unused.
+void fn_8003662C(Skin* pSkin, CharModel* pCharModel, int nSkip, int nFirst, int nView) {
     SkinModel54* pEntry;
     f32 (*aMtx)[4][4];
     f32 (*pDst)[4];
@@ -813,6 +1065,39 @@ Skin* fn_800377FC(u8* pData, u8 b) {
     fn_800CEE88(bOld);
     fn_800375AC(pSkin, 0);
     return pSkin;
+}
+
+// Once per skin model (flag 0x8000): turns its bone poses from relative to their parent (the
+// character model's bone parents, from bone nFirst on nSkip further along) into model space, then
+// stores each bone's inverse matrix in p1088.
+void fn_80037AB8(Skin* pSkin, CharModel* pCharModel, int nSkip, int nFirst) {
+    f32 aQuat[4];
+    f32 aTurned[4];
+    f32 aMtx[4][4];
+    BonePose* pParent;
+    int nBone;
+    int i;
+
+    if (pSkin->pModel != NULL && !(pSkin->pModel->u30 & 0x8000)) {
+        pSkin->pModel->u30 |= 0x8000;
+        for (i = 1; i < pSkin->pModel->n14; i++) {
+            nBone = i;
+            if (i >= nFirst) {
+                nBone = i + nSkip;
+            }
+            pParent = &pSkin->pModel->p34[pCharModel->pBones[nBone].nParent];
+            fn_800090E4(pParent->q0, pSkin->pModel->p34[i].v10, aTurned);
+            fn_800090A0(pParent->v10, aTurned, pSkin->pModel->p34[i].v10);
+            pSkin->pModel->p34[i].v10[3] = 0.0f;
+            fn_80008FCC(pSkin->pModel->p34[i].q0, pParent->q0, aQuat);
+            fn_8001E85C(aQuat, pSkin->pModel->p34[i].q0);
+        }
+        for (i = 0; i < pSkin->pModel->n14; i++) {
+            fn_8000914C(pSkin->pModel->p34[i].q0, aMtx);
+            fn_8001E880(pSkin->pModel->p34[i].v10, aMtx[3]);
+            fn_8000A798(aMtx, pSkin->p1088[i]);
+        }
+    }
 }
 
 // Hands the skin the morph weights a format 1 pose buffer changed (bits 5..19 of its first block),
