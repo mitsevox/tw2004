@@ -164,6 +164,7 @@ GoRenderSurface.c:
 
 LLPict_Gc.c:
 	.text       start:0x8002F4FC end:0x80030254
+	.sdata2     start:0x80282F30 end:0x80282F48
 
 GoTerrain.c:
 	.text       start:0x80030254 end:0x80035640

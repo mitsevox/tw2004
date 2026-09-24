@@ -875,7 +875,7 @@ config.libs = [
             Object(Matching, "Skeleton.c"),
             Object(NonMatching, "Golfer.c"),
             Object(Matching, "GoRenderSurface.c"),
-            Object(NonMatching, "LLPict_Gc.c"),
+            Object(Matching, "LLPict_Gc.c"),
             Object(NonMatching, "GoTerrain.c"),
             Object(NonMatching, "Skin.c"),
             Object(Matching, "GoPostFx.c"),
