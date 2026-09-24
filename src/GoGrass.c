@@ -8,6 +8,8 @@
 #include "endian.h"
 #include "gx.h"
 
+GrassManager* lbl_80281900 = &lbl_802603B0;
+
 // ---- sweep code (not yet cleaned up) ----
 
 void fn_8011E170(void);

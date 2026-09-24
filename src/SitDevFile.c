@@ -11,6 +11,19 @@
 #include "game/modes/pgatoursim.h"
 #include "game/modes/pgatour.h"
 
+SwapField lbl_80191168[9] = {
+    {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4},
+};
+SwapField lbl_801911B0[7] = {
+    {1, 1}, {1, 1}, {2, 2}, {12, 4}, {8, 1}, {16, 2}, {8, 2},
+};
+SwapField lbl_801911E8[5] = {
+    {1, 1}, {1, 1}, {1, 1}, {1, 1}, {100, 2},
+};
+SwapField lbl_80191210[4] = {
+    {1, 1}, {1, 1}, {2, 2}, {4, 4},
+};
+
 SitDevScripts* lbl_80282208;
 
 void fn_800BB4B0(void);
