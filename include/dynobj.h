@@ -140,12 +140,22 @@ typedef struct UObjModelRoot {
 typedef struct UObjModel {
     u8   unk0[0x10];
     UObjModelRoot* p10;         // 0x10  (GoAnimalActors.c fn_8004A24C)
-    UObjMesh* apLod[4];         // 0x14  its levels of detail (all four the same: it has none)
-    u8   unk24[0x2C - 0x24];
+    UObjMesh* apLod[6];         // 0x14  its levels of detail (the first four all the same: it has
+                                //       none); UObject3D.c fn_80045D80 fills the first three from
+                                //       its mesh group and clears the last three
     f32  v2C[3];                // 0x2C
     u8   unk38[0x5C - 0x38];
     f32  f5C;                   // 0x5C  a size: the level-of-detail scale is 0.5 / f5C
+    u8   unk60[0x7C - 0x60];
 } UObjModel;
+LAYOUT_ASSERT(UObjModel, 0x7C);     // UObject3D.c fn_80045D80 allocates 0x7C bytes
+
+// UObject3D.c: a model made from its stream data, and the mesh-tree readers it uses.
+UObjModel* fn_80045D80(u8* pData);
+int        fn_80045F50(UObjMesh* pMesh);            // how many meshes pMesh->p8 holds
+UObjMesh*  fn_80045F5C(UObjMesh* pMesh, int i);     // pMesh->p8[i]
+UObjMesh*  fn_80045F6C(UObjModelRoot* pRoot);       // pRoot->pMesh
+void*      fn_800073B4(u8* pData, int n);           // builds a mesh tree from stream data
 
 // UObject.c's object (0x118 bytes, fn_80048808 allocates one; a DynObj holds one at +0x10): three
 // matrices and a model drawn with them.
