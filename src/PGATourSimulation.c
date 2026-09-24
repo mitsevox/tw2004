@@ -9,6 +9,7 @@
 #include "game.h"
 #include "game/save.h"
 #include "game/modes/pgatoursim.h"
+#include "game/modes/pgatour.h"
 
 PgaEntrantMC* GetEntrantMCPtr(int nPlayer, int nEntrant);
 void fn_80117BF4(int nPlayer, int nEntrant);
@@ -503,7 +504,8 @@ int fn_8011937C(int nPlayer, int nEntrant, u8 b) {
                 } else if (aCourses[gpSaveData[nPlayer].tour.nRound] >= 24
                            && aCourses[gpSaveData[nPlayer].tour.nRound] < 30) {
                     nCourse = fn_800D3118(aCourses[gpSaveData[nPlayer].tour.nRound], i);
-                    nPar = fn_800D2ABC(nCourse, fn_800D315C(aCourses[gpSaveData[nPlayer].tour.nRound], i) - 1);
+                    nPar = fn_800D2ABC(nCourse,
+                                       fn_800D315C(aCourses[gpSaveData[nPlayer].tour.nRound], i) - 1);
                 } else {
                     nPar = fn_800D2ABC(aCourses[gpSaveData[nPlayer].tour.nRound], i);
                 }
