@@ -20,6 +20,7 @@ typedef struct GameMode22State {
 LAYOUT_ASSERT(GameMode22State, 0x1C);
 
 extern GameMode22State lbl_80195498;
+extern char* lbl_8019543C[4];   // the trophies' titles ("Rookie of the Year", "Player of the Year", ...)
 // The text fn_80127034 prints (starts as "D"; 0xE zero bytes follow it, so likely 16 bytes).
 extern char lbl_80195488[];
 

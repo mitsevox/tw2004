@@ -1,7 +1,7 @@
 // GameMode22.c (our name): game mode 22 (GameRound.c starts it with fn_80125E68), and before it the
 // trophy case's text (Rookie of the Year, Player of the Year, the money and scoring leaders; "Earned
-// on %s"). One file: both halves share its .data, .sdata and .sbss blocks. Not yet decompiled; the
-// sweep code below is the matched small functions.
+// on %s"). One file: both halves share its .data, .sdata and .sbss blocks. Partly decompiled; the
+// trophy case's handlers and the mode's small hooks are in C.
 
 #include "golfer.h"
 #include "ball.h"
@@ -42,6 +42,26 @@ u8   fn_80127004(void);
 void fn_80127034(int nPlayer);
 s32 fn_80127098(s32 arg0);
 
+// Message handler (FE_MessageTable.c): a trophy's text, by column: 0 its title, 1 and 2
+// placeholders.
+void fn_80125A24(MsgArg* pArgs, MsgArg* pResult) {
+    s32 nTrophy = pArgs[0].i;
+    s32 nColumn = pArgs[1].i;
+    char* szOut = ((MsgString*)pArgs[2].p)->pStr;
+
+    switch (nColumn) {
+    case 0:
+        strcpy(szOut, lbl_8019543C[nTrophy]);
+        break;
+    case 1:
+        strcpy(szOut, "some year");
+        break;
+    case 2:
+        strcpy(szOut, "amount");
+        break;
+    }
+}
+
 // Message handler (FE_MessageTable.c): placeholder texts for a trophy's name and date.
 void fn_80125B38(MsgArg* pArgs, MsgArg* pResult) {
     s32 nA = pArgs[0].i;
@@ -75,6 +95,22 @@ void fn_80125BD8(MsgArg* pArgs, MsgArg* pResult) {
     szOut[0] = '\0';
 }
 
+// Message handler (FE_MessageTable.c): a ladder event's course name, and the day it was won
+// (empty while not).
+void fn_80125C5C(MsgArg* pArgs, MsgArg* pResult) {
+    s32 nEvent = pArgs[0].i;
+    char* szCourse = ((MsgString*)pArgs[1].p)->pStr;
+    char* szDate = ((MsgString*)pArgs[2].p)->pStr;
+    SaveProfile* pProfile = fn_80077ACC();
+
+    strcpy(szCourse, lbl_80191990[fn_80102104(nEvent)]);
+    if (pProfile->aLadderAward[nEvent].bWon) {
+        fn_800D28DC(fn_80077ACC()->aLadderAward[nEvent].nDate, szDate);
+        return;
+    }
+    szDate[0] = '\0';
+}
+
 // Message handler (FE_MessageTable.c): a ladder event's course, and whether it is won.
 void fn_80125D08(MsgArg* pArgs, MsgArg* pResult) {
     s32 nEvent = pArgs[0].i;
@@ -94,6 +130,20 @@ void fn_80125D78(MsgArg* pArgs, MsgArg* pResult) {
         return;
     }
     pResult->i = -1;
+}
+
+// Message handler (FE_MessageTable.c): "Earned on <day>" for a won award, else empty.
+void fn_80125DE0(MsgArg* pArgs, MsgArg* pResult) {
+    s32 nAward = pArgs[0].i;
+    char* szOut = ((MsgString*)pArgs[1].p)->pStr;
+    char szDate[12];    // the size is not known (the frame leaves room for 12 bytes)
+
+    if (fn_80077ACC()->aAward[nAward].bWon == 1) {
+        fn_800D28DC(fn_80077ACC()->aAward[nAward].nDate, szDate);
+        sprintf(szOut, "Earned on %s", szDate);
+        return;
+    }
+    szOut[0] = '\0';
 }
 
 void fn_801260B8(void) {
