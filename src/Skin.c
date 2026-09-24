@@ -55,9 +55,9 @@ void  fn_800CE16C(void);                                     // SkinPart.c
 void  fn_8003662C(Skin* pSkin, CharModel* pCharModel, int nSkip, int nFirst, int nView);
 void  fn_80036790(Skin* pSkin, int n);
 void  fn_80037AB8(Skin* pSkin, CharModel* pCharModel, int nSkip, int nFirst);
-void  fn_800090A0(f32* pA, f32* pB, f32* pOut);                // Quaternion.c
-void  fn_800090E4(f32* pQuat, f32* pIn, f32* pOut);            // Quaternion.c: pIn turned by pQuat
-void  fn_8000914C(f32* pQ, f32 (*pMtx)[4]);                   // Quaternion.c: to a matrix
+void  Quat_Add(f32* pA, f32* pB, f32* pOut);                // Quaternion.c
+void  Quat_RotateVector(f32* pQuat, f32* pIn, f32* pOut);            // Quaternion.c: pIn turned by pQuat
+void  Quat_QuatToMatrix(f32* pQ, f32 (*pMtx)[4]);                   // Quaternion.c: to a matrix
 void  fn_8000A798(f32 (*pSrc)[4], f32 (*pDst)[4]);            // UMemPool.c: inverts a matrix
 void  fn_80029EF4(u32* pSrc, u32* pDst, u32 nBits);          // Skeleton.c
 void  fn_80036278(SkinModel44* pEntries, s32 nEntries);
@@ -1085,14 +1085,14 @@ void fn_80037AB8(Skin* pSkin, CharModel* pCharModel, int nSkip, int nFirst) {
                 nBone = i + nSkip;
             }
             pParent = &pSkin->pModel->p34[pCharModel->pBones[nBone].nParent];
-            fn_800090E4(pParent->q0, pSkin->pModel->p34[i].v10, aTurned);
-            fn_800090A0(pParent->v10, aTurned, pSkin->pModel->p34[i].v10);
+            Quat_RotateVector(pParent->q0, pSkin->pModel->p34[i].v10, aTurned);
+            Quat_Add(pParent->v10, aTurned, pSkin->pModel->p34[i].v10);
             pSkin->pModel->p34[i].v10[3] = 0.0f;
-            fn_80008FCC(pSkin->pModel->p34[i].q0, pParent->q0, aQuat);
+            Quat_Multiply(pSkin->pModel->p34[i].q0, pParent->q0, aQuat);
             fn_8001E85C(aQuat, pSkin->pModel->p34[i].q0);
         }
         for (i = 0; i < pSkin->pModel->n14; i++) {
-            fn_8000914C(pSkin->pModel->p34[i].q0, aMtx);
+            Quat_QuatToMatrix(pSkin->pModel->p34[i].q0, aMtx);
             fn_8001E880(pSkin->pModel->p34[i].v10, aMtx[3]);
             fn_8000A798(aMtx, pSkin->p1088[i]);
         }

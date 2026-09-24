@@ -14,12 +14,12 @@ f32  fn_80026D18(CharModel* pModel, IKChain* pChain, f32* pTarget, int nLink, in
 void fn_800271A0(CharModel* pModel, IKChain* pChain);
 void fn_80027478(CharModel* pModel, IKChain* pChain);
 f32  fn_800275F4(CharModel* pModel, IKChain* pChain, f32* pTarget);   // an IK error (fn_800273BC)
-void fn_80008F20(f32* pQ, f32* pOut);                   // Quaternion.c
+void Quat_Invert(f32* pQ, f32* pOut);                   // Quaternion.c
 void fn_8001FBA4(f32* pA, f32* pB, f32* pOut, f32 fT);  // a blend of two points by fT
 void fn_8001FB00(f32* pA, f32* pB, f32* pOut, f32 fT);  // a blend of two rotations by fT
 void fn_800BAD60(f32 mtx[4][4], Vec4* src, Vec4* dst);  // VecMath.c: a point through a matrix
 void fn_8000A798(f32 (*pSrc)[4], f32 (*pDst)[4]);       // UMemPool.c: inverts a rotation+translation
-void fn_800089D4(f32 (*m)[4], f32* pQ);                 // Quaternion.c: a rotation matrix's quaternion
+void Quat_BuildFromMatrix(f32 (*m)[4], f32* pQ);                 // Quaternion.c: a rotation matrix's quaternion
 void Character_UpdateFeetTerrainInfo(Character* pChar, int bNormals);   // char.c
 void Character_PlaceFeetOnGround(Character* pChar);                     // char.c
 void fn_800BADF8(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);   // pDst = pSrc's rows
@@ -28,10 +28,10 @@ void fn_80113E60(void);                                 // DynChain.c
 void fn_80114080(void);                                 // DynChain.c
 void fn_80114398(struct DynChain* pChain);              // DynChain.c: frees a chain
 void fn_8011443C(CharModel* pModel, struct DynChain* pChain, f32 f);   // DynChain.c
-void fn_800090A0(f32* pA, f32* pB, f32* pOut);           // Quaternion.c
-void fn_800090E4(f32* pQuat, f32* pIn, f32* pOut);       // Quaternion.c: a vector turned by it
-void fn_800092F8(f32* pAxis, f32* pOut, f32 fAngle);     // Quaternion.c: an axis-angle rotation
-void fn_8000914C(f32* pQ, f32 (*pMtx)[4]);               // Quaternion.c: a rotation's matrix
+void Quat_Add(f32* pA, f32* pB, f32* pOut);           // Quaternion.c
+void Quat_RotateVector(f32* pQuat, f32* pIn, f32* pOut);       // Quaternion.c: a vector turned by it
+void Quat_BuildFromVectorAndScale(f32* pAxis, f32* pOut, f32 fAngle);     // Quaternion.c: an axis-angle rotation
+void Quat_QuatToMatrix(f32* pQ, f32 (*pMtx)[4]);               // Quaternion.c: a rotation's matrix
 void fn_8000A0E8(f32 (*pSrc)[4], f32 (*pDst)[4]);        // copies a matrix
 void fn_8000ADC0(f32 (*pMtx)[4]);                        // identity
 void fn_80029A00(CharModel* pModel, int nA, int nB, f32* pRot);
@@ -68,7 +68,7 @@ void fn_80026B4C(Skeleton* pSkel, IKChain* pChain) {
     for (i = 0; i < pChain->nLinks; i++) {
         IKLink* pLink = &pChain->pLinks[i];
         if (pLink->f4 > 0.0f) {
-            fn_8000923C(pLink->v58, pSkel->p20[pLink->nBone]);
+            Quat_BuildFromVector(pLink->v58, pSkel->p20[pLink->nBone]);
         }
     }
 }
@@ -92,11 +92,11 @@ void fn_80026BF4(CharModel* pModel, IKChain* pChain) {
         nBone = pLink->nBone;
         pPose = &pModel->pPoses[nBone];
         pPrev = &pModel->pPoses[pChain->pLinks[pLink->nPrev].nBone];
-        fn_800090E4(pPrev->q0, pLink->v28, vOffset);
-        fn_800090A0(pPrev->v10, vOffset, pPose->v10);
+        Quat_RotateVector(pPrev->q0, pLink->v28, vOffset);
+        Quat_Add(pPrev->v10, vOffset, pPose->v10);
         pPose->v10[3] = 0.0f;
-        fn_80008FCC(pSkel->p20[nBone], pLink->q18, qRot);
-        fn_80008FCC(qRot, pPrev->q0, pPose->q0);
+        Quat_Multiply(pSkel->p20[nBone], pLink->q18, qRot);
+        Quat_Multiply(qRot, pPrev->q0, pPose->q0);
     }
 }
 
@@ -142,8 +142,8 @@ f32 fn_80026D18(CharModel* pModel, IKChain* pChain, f32* pTarget, int nLink, int
             if (fabsf(fAngle) > PI / 5000.0f) {
                 // the turn's axis in the bone's own frame, without its locked component
                 vec4flt_CrossProduct(vToEnd, vToTarget, vAxis);
-                fn_80008F20(pModel->pPoses[nBone].q0, qInv);
-                fn_800090E4(qInv, vAxis, vLocal);
+                Quat_Invert(pModel->pPoses[nBone].q0, qInv);
+                Quat_RotateVector(qInv, vAxis, vLocal);
                 vLocal[3] = 0.0f;
                 vLocal[1] = 0.0f;
                 if (pLink->n8 >= 0) {
@@ -152,9 +152,9 @@ f32 fn_80026D18(CharModel* pModel, IKChain* pChain, f32* pTarget, int nLink, int
                 fn_800BAF04(vLocal, vLocal);
                 fn_8001EF34(vLocal, fAngle, vLocal);
                 fn_80029BF4(vLocal, pLink->v58, pLink->v58);
-                fn_800092F8(vLocal, qTurn, fAngle);
-                fn_800090E4(pModel->pPoses[nBone].q0, qTurn, qRot);
-                fn_800090E4(qRot, vToEnd, vTurned);
+                Quat_BuildFromVectorAndScale(vLocal, qTurn, fAngle);
+                Quat_RotateVector(pModel->pPoses[nBone].q0, qTurn, qRot);
+                Quat_RotateVector(qRot, vToEnd, vTurned);
                 fn_80029BF4(pModel->pPoses[nBone].v10, vTurned, vEnd);
             }
         }
@@ -192,7 +192,7 @@ void fn_8002703C(Skeleton* pSkel, IKChain* pChain, f32 fWeight) {
         int nBone = pChain->pLinks[i].nBone;
         fn_8001E85C(pSkel->p20[nBone], pSkel->p24[nBone]);
         if (fWeight < 1.0f) {
-            fn_8000883C(lbl_801C6498, pSkel->p24[nBone], fWeight);
+            Quat_Slerp(lbl_801C6498, pSkel->p24[nBone], fWeight);
             Vec_Normalize(pSkel->p24[nBone], pSkel->p24[nBone]);
         }
     }
@@ -250,11 +250,11 @@ void fn_800271A0(CharModel* pModel, IKChain* pChain) {
             fn_8001E85C(pBone->q0C, pLink->q18);
         }
         if (pPrevLink != NULL && pPrevLink->nBone != pBone->nParent) {
-            fn_80008F20(pModel->pPoses[nPrevBone].q0, qInv);
-            fn_80008FCC(pModel->pPoses[nBone].q0, qInv, pLink->q18);
+            Quat_Invert(pModel->pPoses[nPrevBone].q0, qInv);
+            Quat_Multiply(pModel->pPoses[nBone].q0, qInv, pLink->q18);
             fn_80029C3C(pModel->pPoses[nBone].v10, pModel->pPoses[nPrevBone].v10, vDelta);
             vDelta[3] = 0.0f;
-            fn_800090E4(qInv, vDelta, pLink->v28);
+            Quat_RotateVector(qInv, vDelta, pLink->v28);
             pLink->v28[3] = 0.0f;
             if (pBone->nParent < pChain->pLinks[0].nBone) {
                 fn_8001E85C(pLink->q18, pLink->q38);
@@ -318,15 +318,15 @@ void fn_80027478(CharModel* pModel, IKChain* pChain) {
             pPose = &pModel->pPoses[nBone];
             pPrev = &pModel->pPoses[nPrevBone];
             if (bKept) {
-                fn_800090E4(pPrev->q0, pLink->v48, vOffset);
-                fn_80008FCC(pLink->q38, pPrev->q0, pPose->q0);
+                Quat_RotateVector(pPrev->q0, pLink->v48, vOffset);
+                Quat_Multiply(pLink->q38, pPrev->q0, pPose->q0);
             } else {
-                fn_800090E4(pPrev->q0, pBone->v1C, vOffset);
-                fn_80008FCC(pBone->q0C, pPrev->q0, pPose->q0);
+                Quat_RotateVector(pPrev->q0, pBone->v1C, vOffset);
+                Quat_Multiply(pBone->q0C, pPrev->q0, pPose->q0);
             }
-            fn_800090A0(pPrev->v10, vOffset, pPose->v10);
+            Quat_Add(pPrev->v10, vOffset, pPose->v10);
             pPose->v10[3] = 0.0f;
-            fn_8000914C(pPose->q0, pModel->pMatrices[nBone]);
+            Quat_QuatToMatrix(pPose->q0, pModel->pMatrices[nBone]);
             fn_8001E880(pPose->v10, pModel->pMatrices[nBone][3]);
             uDone |= (u64)1 << nBone;
         }
@@ -392,7 +392,7 @@ void fn_80027808(CharModel* pModel, f32* pRot) {
     if (pModel->pSkel != NULL) {
         fn_8001E85C(pRot, pModel->pSkel->q10D4);
         if (pModel->pSkel->fIKWeight < 1.0f) {
-            fn_8000883C(lbl_801C6498, pModel->pSkel->q10D4, pModel->pSkel->fIKWeight);
+            Quat_Slerp(lbl_801C6498, pModel->pSkel->q10D4, pModel->pSkel->fIKWeight);
             Vec_Normalize(pModel->pSkel->q10D4, pModel->pSkel->q10D4);
         }
     }
@@ -407,7 +407,7 @@ void fn_8002787C(CharModel* pModel) {
     if (pSkel == NULL) return;
     if (lbl_802810A6 == 0 || pSkel->fIKWeight <= 0.0f) return;
     if (pSkel->n10E4 != 0) {
-        fn_80008FCC(pSkel->q10D4, pSkel->p20[fn_8001EEE4(pModel, 0x11)], qRot);
+        Quat_Multiply(pSkel->q10D4, pSkel->p20[fn_8001EEE4(pModel, 0x11)], qRot);
         fn_8001E85C(qRot, pModel->pSkel->p20[fn_8001EEE4(pModel, 0x11)]);
     }
 }
@@ -472,8 +472,8 @@ void fn_800279C0(Character* pChar) {
 
     pChain = &pSkel->pChains[1];
     if (pSkel->n10E4 != 0) {
-        fn_80008F20(pSkel->q10D4, qInv);
-        fn_80008FCC(qInv, pSkel->p20[fn_8001EEE4(pModel, 0x11)], qRot);
+        Quat_Invert(pSkel->q10D4, qInv);
+        Quat_Multiply(qInv, pSkel->p20[fn_8001EEE4(pModel, 0x11)], qRot);
         fn_8001E85C(qRot, pSkel->p20[fn_8001EEE4(pModel, 0x11)]);
         pSkel->n10E4--;
     }
@@ -486,9 +486,9 @@ void fn_800279C0(Character* pChar) {
     fn_80027478(pModel, pSkel->pChains);
     if (pChar->u10 & 0x4000) {
         if (pSkel->fIKWeight > 0.0f && pSkel->fIKWeight < 1.0f) {
-            fn_8000883C(qGrip, pGrip->q0, pSkel->fIKWeight);
+            Quat_Slerp(qGrip, pGrip->q0, pSkel->fIKWeight);
             fn_8001FBA4(pGrip->v10, vGrip, pGrip->v10, 1.0f - pSkel->fIKWeight);
-            fn_8000914C(pGrip->q0, pModel->pMatrices[nGrip]);
+            Quat_QuatToMatrix(pGrip->q0, pModel->pMatrices[nGrip]);
             fn_8001E880(pGrip->v10, pModel->pMatrices[nGrip][3]);
         }
     }
@@ -496,14 +496,14 @@ void fn_800279C0(Character* pChar) {
     fn_8001EEE4(pModel, 0x15);  // EA drops the answer
     n28 = fn_8001EEE4(pModel, 0x28);
     pPose28 = &pModel->pPoses[n28];
-    fn_800090E4(pGrip->q0, pSkel->v108C, vTarget);
-    fn_800090A0(vTarget, pGrip->v10, vTarget);
+    Quat_RotateVector(pGrip->q0, pSkel->v108C, vTarget);
+    Quat_Add(vTarget, pGrip->v10, vTarget);
     vTarget[3] = 0.0f;
     fn_800273BC(pModel, pChain, vTarget, pChain->n18, NULL, pChain->f1C);
     if (pSkel->fIKWeight < 1.0f) {
         fn_8002703C(pSkel, pChain, pSkel->fIKWeight);
     }
-    fn_80008FCC(pSkel->q107C, pGrip->q0, pPose28->q0);
+    Quat_Multiply(pSkel->q107C, pGrip->q0, pPose28->q0);
     fn_8001EB6C(pModel->a14, n28);
     fn_8001E938(aBits, 0x80);
     fn_8001EA34(aBits, fn_8001EEE4(pModel, 0x23));
@@ -536,7 +536,7 @@ void fn_80027D14(Character* pChar) {
     }
     fn_8000A798(mGrip, mInv);
     fn_800BADF8(mInv, pMtx28, mRel, 4);
-    fn_800089D4(mRel, pModel->pSkel->q107C);
+    Quat_BuildFromMatrix(mRel, pModel->pSkel->q107C);
     fn_800BAD60(mInv, (Vec4*)pMtx28[3], (Vec4*)pModel->pSkel->v108C);
     pModel->pSkel->v108C[3] = 0.0f;
 }
@@ -841,7 +841,7 @@ void SKEL_TransformBones(CharModel* pModel, u32* aBits) {
     if (fn_8001E9F4(aBits, aCur, 0x80)) {
         fn_8001E85C(pModel->pBones[0].q0C, pModel->pPoses[0].q0);
         fn_8001E85C(pModel->pBones[0].v1C, pModel->pPoses[0].v10);
-        fn_8000914C(pModel->pPoses[0].q0, pModel->pMatrices[0]);
+        Quat_QuatToMatrix(pModel->pPoses[0].q0, pModel->pMatrices[0]);
         mScale[0][0] = pModel->a140[0][0];
         mScale[1][1] = pModel->a140[0][1];
         mScale[2][2] = pModel->a140[0][2];
@@ -887,8 +887,8 @@ void SKEL_TransformBones(CharModel* pModel, u32* aBits) {
             if (fn_8001E9F4(aModel, aCur, 0x80)) {
                 pParentPose = &pModel->pPoses[pBone->nParent];
                 if (fn_8001E9F4(pModel->a24, aCur, 0x80)) {
-                    fn_800090E4(pParentPose->q0, pBone->v1C, vPos);
-                    fn_800090A0(pParentPose->v10, vPos, pPose->v10);
+                    Quat_RotateVector(pParentPose->q0, pBone->v1C, vPos);
+                    Quat_Add(pParentPose->v10, vPos, pPose->v10);
                     pPose->v10[3] = 0.0f;
                     if (i == 1) {
                         pSkel = pModel->pSkel;
@@ -899,14 +899,14 @@ void SKEL_TransformBones(CharModel* pModel, u32* aBits) {
                 }
                 if (fn_8001E9F4(pModel->a14, aCur, 0x80)) {
                     if (fn_8001E9F4(aSkel, aCur, 0x80)) {
-                        fn_80008FCC(pSkelRot[i], pBone->q0C, qRot);
-                        fn_80008FCC(qRot, pParentPose->q0, pPose->q0);
+                        Quat_Multiply(pSkelRot[i], pBone->q0C, qRot);
+                        Quat_Multiply(qRot, pParentPose->q0, pPose->q0);
                     } else {
-                        fn_80008FCC(pBone->q0C, pParentPose->q0, pPose->q0);
+                        Quat_Multiply(pBone->q0C, pParentPose->q0, pPose->q0);
                     }
                 }
             }
-            fn_8000914C(pPose->q0, pModel->pMatrices[i]);
+            Quat_QuatToMatrix(pPose->q0, pModel->pMatrices[i]);
             mScale[0][0] = pModel->a140[i][0];
             mScale[1][1] = pModel->a140[i][1];
             mScale[2][2] = pModel->a140[i][2];
@@ -941,13 +941,13 @@ void SKEL_UpdateState(CharModel* pModel, SkelPose* pPose, u8 bTransform) {
         if (fn_8001E9CC(aRot, i)) {
             if (pModel->bEE) {
                 if (i == fn_8001EED8(pModel, 1)) {
-                    fn_80009410(PI, qTurn);
-                    fn_80008FCC(pPose->aBones[i].q0, qTurn, pModel->pBones[pModel->aBone2[i]].q0C);
+                    Legacy_Quat_BuildFromPitch(PI, qTurn);
+                    Quat_Multiply(pPose->aBones[i].q0, qTurn, pModel->pBones[pModel->aBone2[i]].q0C);
                     fn_8001EA34(pPose->a0, pModel->aBone2[i]);
                 } else if (i == fn_8001EED8(pModel, 0x52)) {
                     if (pModel->pBones[i].nParent == 0) {
-                        fn_80009410(PI, qTurn);
-                        fn_80008FCC(pPose->aBones[i].q0, qTurn, pModel->pBones[pModel->aBone2[i]].q0C);
+                        Legacy_Quat_BuildFromPitch(PI, qTurn);
+                        Quat_Multiply(pPose->aBones[i].q0, qTurn, pModel->pBones[pModel->aBone2[i]].q0C);
                         fn_8001EA34(pPose->a0, pModel->aBone2[i]);
                     } else {
                         fn_8001E85C(pPose->aBones[i].q0, pModel->pBones[pModel->aBone2[i]].q0C);
@@ -1151,7 +1151,7 @@ void fn_80029968(CharModel* pModel, SkelPose* pPose) {
 // Gives bone nA the rotation pRot, then sets it halfway between that and bone nB's.
 void fn_80029A00(CharModel* pModel, int nA, int nB, f32* pRot) {
     fn_8001E85C(pRot, pModel->pBones[nA].q0C);
-    fn_8000883C(pModel->pBones[nB].q0C, pModel->pBones[nA].q0C, 0.5f);
+    Quat_Slerp(pModel->pBones[nB].q0C, pModel->pBones[nA].q0C, 0.5f);
 }
 
 void fn_80029A74(CharModel* pModel, void* p) {
