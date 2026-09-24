@@ -3,11 +3,44 @@
 // (0x34 bytes each, lbl_801F2740) found by id (fn_800AD674). Most calls check the instance exists,
 // then pass on to the functions at 0x800A8200-0x800A8524. Its extent is its data: it is the first
 // to use the .bss at 0x801F2668 and the .sdata2 block 0x80284008-0x80284018.
-// Not yet decompiled: the functions below are the sweep's.
+// An instance's pCmd is its AudTable.c entry (fn_800A7C30's AudSource, the same number).
 
 #include "core/audtrack.h"
+#include "golfer.h"
+#include "unsorted/cull.h"
 
 AudInstance* fn_800AD674(u8 nId);
+void fn_800AD800(u8 nId, f32* pPos, f32* pLast, u8 nView);
+void fn_800ACB98(void);                 // hlaudvoice.c
+void fn_800AF320(void);
+void fn_800B0434(void);                 // startUp.c
+
+// Sets up the instances, all on the free list, and empties every emitter. Always 1.
+int fn_800ACECC(void) {
+    AudInstance* pInst;
+    int i;
+
+    pInst = lbl_801F2740;
+    fn_80005AE8(lbl_801F2740, 0, sizeof(lbl_801F2740));
+    for (i = 0; i < 256; i++, pInst++) {
+        pInst->nId = i;
+        pInst->pPrevActive = pInst - 1;
+        pInst->pNextActive = pInst + 1;
+    }
+    lbl_801F2668.pFree = &lbl_801F2740[0];
+    lbl_801F2740[0].pPrevActive = NULL;
+    lbl_801F2668.pFreeTail = &lbl_801F2740[255];
+    lbl_801F2740[255].pNextActive = NULL;
+    lbl_801F2668.pActive = NULL;
+    lbl_801F2668.pActiveTail = NULL;
+    lbl_801F2668.nActive = 0;
+    for (i = 0; i < 32; i++) {
+        lbl_801F2668.apFirst[i] = NULL;
+        lbl_801F2668.anSound[i] = 0;
+    }
+    lbl_801F2668.uFlags |= 1;
+    return 1;
+}
 
 // Runs fn_800AD450 on every instance in use, then empties every emitter. Always 1.
 int fn_800AD0C4(void) {
@@ -27,6 +60,88 @@ int fn_800AD0C4(void) {
 }
 
 void fn_800AD1C4(void) {
+}
+
+// Once a frame: hands every instance's commands to its entry and clears them (an instance with
+// n24 1 sends its position again), then runs the rest of the sound engine.
+void fn_800AD1C8(void) {
+    AudInstance* pInst;
+
+    for (pInst = lbl_801F2668.pActive; pInst != NULL; pInst = pInst->pNextActive) {
+        fn_800A7CA4(pInst->nId, pInst->pCmd->uOn, pInst->pCmd->uOff, pInst->pCmd->auParams,
+                    pInst->pCmd->aPos, pInst->pCmd->uChanged);
+        pInst->pCmd->uOn = 0;
+        pInst->pCmd->uOff = 0;
+        pInst->pCmd->uChanged = 0;
+        if (pInst->n24 == 1) {
+            fn_800AD800(pInst->nId, pInst->vPos, NULL, 0);
+        }
+    }
+    fn_800A9AC8();
+    fn_800ACB98();
+    fn_800AF320();
+    fn_800B0434();
+    lbl_80282018++;
+}
+
+// Frees instance nId: out of the active list onto the head of the free list, and out of its
+// emitter's list (the emitter's sound is cleared with its last instance).
+void fn_800AD450(u8 nId) {
+    AudInstance* pInst = &lbl_801F2740[nId];
+    AudInstance* p;
+    AudInstance* pPrev;
+
+    if (nId != 0xFF && (lbl_801F2668.uFlags & 1)) {
+        fn_800A8200(nId);
+        if (pInst == lbl_801F2668.pActiveTail) {
+            if (pInst->pPrevActive != NULL) {
+                lbl_801F2668.pActiveTail = pInst->pPrevActive;
+                pInst->pPrevActive->pNextActive = NULL;
+            } else {
+                lbl_801F2668.pActive = NULL;
+                lbl_801F2668.pActiveTail = NULL;
+            }
+        } else if (pInst == lbl_801F2668.pActive) {
+            if (pInst->pNextActive != NULL) {
+                lbl_801F2668.pActive = pInst->pNextActive;
+                pInst->pNextActive->pPrevActive = NULL;
+            } else {
+                lbl_801F2668.pActive = NULL;
+                lbl_801F2668.pActiveTail = NULL;
+            }
+        } else {
+            pInst->pPrevActive->pNextActive = pInst->pNextActive;
+            pInst->pNextActive->pPrevActive = pInst->pPrevActive;
+        }
+        if (lbl_801F2668.pFree != NULL) {
+            lbl_801F2668.pFree->pPrevActive = pInst;
+        } else {
+            lbl_801F2668.pFreeTail = pInst;
+        }
+        pInst->pNextActive = lbl_801F2668.pFree;
+        pInst->pPrevActive = NULL;
+        lbl_801F2668.pFree = pInst;
+        lbl_801F2668.nActive--;
+        if (pInst->nEmitter >= 0) {
+            pPrev = NULL;
+            for (p = lbl_801F2668.apFirst[pInst->nEmitter]; p != NULL; p = p->pNext) {
+                if (p == pInst) {
+                    if (pPrev != NULL) {
+                        pPrev->pNext = pInst->pNext;
+                    } else {
+                        lbl_801F2668.apFirst[pInst->nEmitter] = pInst->pNext;
+                    }
+                    break;
+                }
+                pPrev = p;
+            }
+            if (lbl_801F2668.apFirst[pInst->nEmitter] == NULL) {
+                lbl_801F2668.anSound[pInst->nEmitter] = 0;
+            }
+        }
+        pInst->nEmitter = -1;
+        pInst->pNext = NULL;
+    }
 }
 
 // Whether bit nTrack of an instance's u22 is set; 0 for no instance.
@@ -82,6 +197,49 @@ void fn_800AD790(u8 nId, u8 nTrack, u32 uParams) {
     }
 }
 
+// Moves instance nId to pPos (NULL: where it is), its old position into pLast (when not NULL),
+// and works out where each view in use hears it: with n28 0 in the view's camera space, else as
+// it is for view nView and far above (0, 10000, 0) for the other.
+// EA bug: with pPos NULL and no view in use, pPos is still NULL at the last Vec3Copy.
+void fn_800AD800(u8 nId, f32* pPos, f32* pLast, u8 nView) {
+    int i;
+    AudInstance* pInst;
+    CamLens* pLens;
+    f32* pRel;
+    Vec4 vRel;
+
+    pInst = fn_800AD674(nId);
+    if (pInst != NULL) {
+        for (i = 0; i < 2; i++) {
+            if ((gSession.nGameType == 3 || fn_800170A0(i)) && fn_80017004(i) != NULL) {
+                pLens = ((Camera*)fn_80017004(i))->unk10;
+                if (pPos == NULL) {
+                    pPos = pInst->vPos;
+                }
+                if (pInst->n28 == 0) {
+                    fn_800BAD60(pLens->m44, (Vec4*)pPos, &vRel);
+                    pRel = &vRel.x;
+                } else if (i == nView) {
+                    pRel = pPos;
+                } else {
+                    pRel = &vRel.x;
+                    vRel.x = 0.0f;
+                    vRel.y = 10000.0f;
+                    vRel.z = 0.0f;
+                }
+                pInst->pCmd->aPos[i][0] = pRel[0];
+                pInst->pCmd->aPos[i][1] = pRel[1];
+                pInst->pCmd->aPos[i][2] = pRel[2];
+            }
+        }
+        if (pLast != NULL) {
+            Vec3Copy(pInst->vPos, pLast);
+        }
+        Vec3Copy(pPos, pInst->vPos);
+        pInst->pCmd->uChanged |= 0x400;
+    }
+}
+
 // The calls below pass on to AudTable.c's entry nId (the same number as the instance).
 void fn_800AD950(u8 nId, u8 nTrack, u8 n) {
     if (fn_800AD674(nId) != NULL) {
@@ -122,6 +280,13 @@ void fn_800ADB4C(s16 nEmitter, u8 nTrack, u8 bOn) {
     AudInstance* pInst;
     for (pInst = lbl_801F2668.apFirst[nEmitter]; pInst != NULL; pInst = pInst->pNext) {
         fn_800AD698(pInst->nId, nTrack, bOn);
+    }
+}
+
+void fn_800ADBC0(s16 nEmitter, f32* pPos, f32* pLast, u8 nView) {
+    AudInstance* pInst;
+    for (pInst = lbl_801F2668.apFirst[nEmitter]; pInst != NULL; pInst = pInst->pNext) {
+        fn_800AD800(pInst->nId, pPos, pLast, nView);
     }
 }
 
