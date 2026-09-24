@@ -317,9 +317,11 @@ void fn_80165E9C(UIStudio* pStudio, UISScreen* pScreen, UISNodeInfo* pNodeInfo, 
 // Returns the index of a rate function, or the count when there is none.
 u32 fn_8016604C(UIStudio* pStudio, UISNodeInfo* pNodeInfo, u32 uId) {
     u32 i;
+    UISRateFn* pFn;
 
     for (i = 0; i < pStudio->nRateFns; i++) {
-        if (pStudio->pRateFns[i].uId == uId && pStudio->pRateFns[i].pNodeInfo == pNodeInfo) break;
+        pFn = &pStudio->pRateFns[i];
+        if (pFn->uId == uId && pFn->pNodeInfo == pNodeInfo) break;
     }
     return i;
 }
