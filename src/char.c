@@ -83,6 +83,14 @@ void  fn_8001BD18(Character* pChar, Clip* pClip);
 void  fn_8001FCF4(Character* pChar, Clip* pClip, SkelPose* pPose, int n, f32 fTime);
 void  fn_800280E8(Character* pChar, f32* pPos, int bPlace);     // Skeleton.c
 void  fn_8001EFB4(f32* pA, f32* pB, f32* pOut);
+void  fn_8001A14C(Character* pChar);
+void  fn_8001D6D8(int n);
+void  fn_80095558(void);
+void  AnimLib_ApplyOverlays(int nSlot);                         // skalib.c
+void  fn_80025478(void);                                        // skalib.c
+void  fn_800CA7E0(void);                                        // AnimStream.c
+void  fn_800CABA0(void);                                        // AnimStream.c
+void  fn_800CB078(void);                                        // AnimStream.c
 void  fn_8001DD18(u8* pData, int nBytes);
 void  fn_8001DEC8(u8* pData, int nBytes);
 s32   fn_800CE8C0(Skin** apSkins, int nSkins, SkinListEntry** ppList);   // SkinPart.c
@@ -788,6 +796,26 @@ void fn_8001A488(void) {
     }
 }
 
+// With more than two players, only the player with the honor keeps pool entries: every player's
+// character gives its back, then that player's takes them and queues its dynamic textures.
+void fn_8001A4BC(void) {
+    Character* pChar;
+    int i;
+
+    lbl_80281CAC = -1;
+    if (gSession.nNumPlayers > 2) {
+        for (i = 0; i < gSession.nNumPlayers; i++) {
+            fn_8001A484(gPlayers[i].pChar);
+            fn_8001A3B0(gPlayers[i].pChar);
+        }
+        i = gpGame->pfnGetHonors(5);
+        pChar = gPlayers[i].pChar;
+        fn_8001A418(pChar);
+        fn_80019D64(pChar, fn_8001A14C, fn_8001A20C);
+        fn_8010BF68();
+    }
+}
+
 void fn_8001A73C(void) {
     fn_8010BF68();
 }
@@ -845,6 +873,36 @@ void fn_8001A870(void) {
         sprintf(pChar->szE1, "%sdata\\CharStrm\\CharTex\\%02dalltex.fxg", "", pChar->nC + 1);
         pChar->hFile = fn_800060E0(pChar->szE1);
     }
+}
+
+// With two players or fewer, every player's character takes its pool entries and queues its
+// dynamic textures (in split screen it is flagged for fn_8001D6D8 too); then the animation slots
+// take their overlays and the work copies are freed.
+void fn_8001A920(void) {
+    int i;
+    Character* pChar;
+
+    fn_80095558();
+    if (gSession.nNumPlayers <= 2) {
+        for (i = 0; i < gSession.nNumPlayers; i++) {
+            pChar = gPlayers[i].pChar;
+            fn_8001A418(pChar);
+            fn_80019D64(pChar, fn_8001A14C, fn_8001A20C);
+            fn_8010BF68();
+            if (gSession.nSplitScreen) {
+                fn_8001D6D8(i);
+            }
+        }
+    }
+    AnimLib_ApplyOverlays(0);
+    AnimLib_ApplyOverlays(1);
+    fn_800CA9DC(-1);
+    fn_800CA7E0();
+    fn_80025478();
+    fn_8001A7F0();
+    AnimLib_FreeWorkCopies();
+    fn_800CABA0();
+    fn_800CB078();
 }
 
 // Builds a character from its CHR object: a header (its animation slot and a few values), its
