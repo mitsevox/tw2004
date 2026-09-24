@@ -15,6 +15,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[2]   # the checkout this script 
 sys.path.insert(0, str(ROOT / 'tools/match'))
 import sweepblock                                    # noqa: E402
 import includes                                      # noqa: E402
+from hosttools import mwcc, reported_name            # noqa: E402
 
 SWEEP_DEBT = {}                                      # file name -> lines of uncleaned sweep code
 COMPILE_ERRORS = set()                               # (file name, line) the style pass reported
@@ -183,9 +184,9 @@ def is_definition(lines, i):
 
 def ub_check(path, lines):
     import subprocess, tempfile
-    cc = ROOT / 'build/compilers/GC/2.5/mwcceppc.exe'
+    cc = mwcc()
     with tempfile.TemporaryDirectory() as tmp:
-        out = subprocess.run([str(cc)] + CFLAGS + ['-maxerrors', '1000', '-c', str(path.resolve()),
+        out = subprocess.run(cc + CFLAGS + ['-maxerrors', '1000', '-c', str(path.resolve()),
                              '-o', tmp + '/x.o'], cwd=ROOT, capture_output=True, text=True)
     hits = []
     # With -w all, a call to a function with no declaration in scope (an implicit declaration: the
@@ -197,7 +198,7 @@ def ub_check(path, lines):
         m = re.match(r'(.*?):(\d+): (?!warning:)(.*)', l)
         if not m:
             continue
-        if m.group(3).startswith('function has no prototype') and pathlib.Path(m.group(1)).name == path.name:
+        if m.group(3).startswith('function has no prototype') and reported_name(m.group(1)) == path.name:
             i = int(m.group(2))
             src = lines[i - 1] if i <= len(lines) else ''
             implicit.add(i)
@@ -209,18 +210,18 @@ def ub_check(path, lines):
         # The checks below read compiler warnings; a file that does not compile here gives none,
         # so a failure must be a finding, not a silent pass.
         m = err[0] if err else None
-        hits.append((int(m.group(2)) if m and pathlib.Path(m.group(1)).name == path.name else 1,
+        hits.append((int(m.group(2)) if m and reported_name(m.group(1)) == path.name else 1,
                      'compile-error', m.group(3) if m else 'the compiler failed on this file'))
         return hits
     # Calls with no prototype in scope: the compiler assumes `int` (a float result is then read as
     # an int). -requireprotos also flags definitions without an earlier declaration; skip those.
     with tempfile.TemporaryDirectory() as tmp:
-        rp = subprocess.run([str(cc)] + CFLAGS + ['-requireprotos', '-maxerrors', '1000', '-c',
+        rp = subprocess.run(cc + CFLAGS + ['-requireprotos', '-maxerrors', '1000', '-c',
                             str(path.resolve()), '-o', tmp + '/x.o'], cwd=ROOT, capture_output=True, text=True)
     seen = set(implicit)
     for l in (rp.stdout + rp.stderr).splitlines():
         m = re.match(r'(.*?):(\d+):(?: warning:)? function has no prototype', l)
-        if not m or pathlib.Path(m.group(1)).name != path.name:
+        if not m or reported_name(m.group(1)) != path.name:
             continue
         i = int(m.group(2))
         src = lines[i - 1] if i <= len(lines) else ''
@@ -231,7 +232,7 @@ def ub_check(path, lines):
             hits.append((i, 'ub-no-prototype', src.strip()))
     for l in (out.stdout + out.stderr).splitlines():
         m = re.match(r'(.*?):(\d+): warning: (.*)', l)
-        if not m or pathlib.Path(m.group(1)).name != path.name:
+        if not m or reported_name(m.group(1)) != path.name:
             continue
         for name, text in UB:
             if text in m.group(3):

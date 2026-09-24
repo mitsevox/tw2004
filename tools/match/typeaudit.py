@@ -45,7 +45,8 @@ def audit():
 
 PAD = re.compile(r'^(unk|pad|_)', re.I)              # filler: says nothing about the layout
 MIN_SAME, MIN_SAME_IDENTICAL = 8, 5                  # fields in common before a pair is reported
-CC = ROOT / 'build/compilers/GC/2.5/mwcceppc.exe'
+from hosttools import mwcc                           # noqa: E402
+CC = mwcc()
 
 
 def struct_defs(text):
@@ -125,7 +126,7 @@ def measure(prefix, structs, workdir):
             rows.append('const unsigned int LAYOUT_%d[] = {%s};' % (k, ', '.join(items)))
         src, obj = workdir / 'layout.c', workdir / 'layout.o'
         src.write_text(prefix + '\n' + '\n'.join(rows) + '\n', encoding='utf-8')
-        r = subprocess.run([str(CC)] + flags + ['-c', str(src), '-o', str(obj)], cwd=ROOT,
+        r = subprocess.run(CC + flags + ['-c', str(src), '-o', str(obj)], cwd=ROOT,
                            capture_output=True, text=True)
         if r.returncode == 0:
             break

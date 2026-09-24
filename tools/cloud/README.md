@@ -30,6 +30,7 @@ downloaded tools stay.
   symlinks to the main checkout's compilers. Scratch folders are `../scratch/tw/agents/<lane>/`:
   they vanish with the session, so the orchestrator copies lane notes into `agents/notes/` before
   the session ends.
-- Some `tools/match/` scripts still call Windows `.exe` paths directly; making them Linux-clean is
-  the first task in `agents/state.md`.
+- `tools/match/hosttools.py` holds everything that differs between Windows and Linux (tool paths,
+  wibo/wine, how the compiler reports paths, stopping a process tree); the tools run unchanged on
+  both.
 - Commits: plain messages, never a Co-Authored-By line or AI footer (CLAUDE.md).

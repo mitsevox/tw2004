@@ -14,6 +14,7 @@ import pathlib, re, subprocess, sys, tempfile
 ROOT = pathlib.Path(__file__).resolve().parents[2]   # the checkout this script lives in
 sys.path.insert(0, str(ROOT / 'tools/match'))
 from merge_sweeps import defined                     # noqa: E402
+from hosttools import run_ninja_command              # noqa: E402
 
 
 def top_decls(text):
@@ -47,8 +48,8 @@ def unit_command(name):
     own = cmds(f'build/GW4E69/src/{name}.o')
     if own:
         return own[-1]
-    other = [l for l in cmds('all_source') if '\\GC\\2.5\\' in l and '-O4,p' in l
-             and ' -c src\\unsorted\\' in l] or [l for l in cmds('all_source') if '-O4,p' in l]
+    other = [l for l in cmds('all_source') if re.search(r'[\\/]GC[\\/]2\.5[\\/]', l) and '-O4,p' in l
+             and re.search(r' -c src[\\/]unsorted[\\/]', l)] or [l for l in cmds('all_source') if '-O4,p' in l]
     if not other:
         sys.exit(f'declcheck: no compile command for {name}.o in build.ninja (run configure.py)')
     return other[0]
@@ -59,7 +60,8 @@ def compile_probe(cmd, text, tmp):
     probe.write_text(text, encoding='utf-8', newline='\n')
     cmd = re.sub(r' -c \S+ -o \S+', lambda _: f' -c "{probe}" -o "{tmp}"', cmd)
     cmd = re.sub(r'-maxerrors \d+', '-maxerrors 1', cmd)
-    r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
+    cmd = cmd.split(' && ')[0]        # the compile only: the rest post-processes the build's .d file
+    r = run_ninja_command(cmd)
     return r.returncode, r.stdout + r.stderr
 
 

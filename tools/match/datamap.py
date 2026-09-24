@@ -4,7 +4,8 @@ constant the original symbol at the same relocation, its address and size, and w
 See docs/workflow.md, "Finishing a unit"."""
 import glob, os, pathlib, re, subprocess, sys
 ROOT = pathlib.Path(__file__).resolve().parents[2].as_posix()   # the checkout this script lives in
-RE = ROOT + '/build/binutils/powerpc-eabi-readelf.exe'
+from hosttools import binutil                        # noqa: E402
+RE = binutil('readelf')
 syms = {}
 for l in open(ROOT + '/config/GW4E69/symbols.txt'):
     m = re.match(r'(\S+) = (\.\w+):0x([0-9A-F]+);.*?size:0x([0-9A-F]+)', l)

@@ -1,7 +1,12 @@
 # State (keep this short: current facts only; history goes to docs/journal.md)
 
-Updated 2026-09-24 ~15:15 CDT, at the move to cloud sessions. QUIET: no lanes running, everything
-merged to main, `main.dol: OK`.
+Updated 2026-09-24 ~16:00 CDT. RUNNING (cloud, checkpoint 17:00 CDT), quickest wins first:
+- cam-01: GoGolfCam, GoBreakLine, UStream, Skin, gbacable
+- money-01: Earnings, SunFlr_Gc, uiLoadFile, Ball, DepthField, PsMgr
+
+Held by the owner's PC until ~16:45 CDT (permuters + a closer lane on agent/map-09; hands wins to the
+cloud to apply, never pushes): GoStaticCam, GoShaderObjectCommon_ShaderObjectsData_Gc, UObject,
+TerrainData, GoShaderObject_Rain_Gc, startUp, LLFileIO_Gc, GameMode26, GoDynObj, uiText.
 
 ## Numbers (report.json)
 
@@ -24,10 +29,12 @@ headers 69 (phase 3, not started).
    min (fn_800D477C). permute.py fixed on Linux (it left its pool workers running and hid the
    iteration count). Lane budget here: CPU, not builds, is the limit: 2 lanes with at most one
    permuter each, 3 if only one permutes at a time.
-2. **Make tools/match Linux-clean**: several tools call Windows `.exe` paths directly (datamap,
-   declcheck, lint `--compile`, quicktrial, sbs2, symaudit, typeaudit; perm_setup, perm_objdump and
-   permute are already portable). Use the build's own wrapper logic (wibo/wine for the compiler, no
-   `.exe` for binutils/objdiff-cli on Linux). merge.py's gates depend on typeaudit/symaudit.
+2. DONE 2026-09-24: tools/match is Linux-clean. Everything platform-specific is in
+   `tools/match/hosttools.py` (one Windows block, one Linux block); no tool tests os.name itself.
+   Checked on Linux against main: typeaudit `0 0 80 11` (layout 11), symaudit `1 0 18`, lint 141
+   (136 long-line + 5 proto-mismatch, all text checks), declcheck finds a planted clash, perm_setup
+   output byte-identical to before. Not yet run on Windows: the first local session should run
+   `typeaudit.py --count`, `symaudit.py --count` and `lint.py` and compare with these numbers.
 3. **Docs staleness audit (phase 2 of the move; the owner approved the plan):** every doc section
    gets a verdict (current / stale-fix / dead-remove / history-move), checked against the code and
    tools; the verdict table goes to the owner BEFORE anything is removed. Then: fold

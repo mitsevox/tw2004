@@ -27,9 +27,10 @@ ROOT = pathlib.Path(__file__).resolve().parents[2]   # the checkout this script 
 sys.path.insert(0, str(ROOT / 'tools/match'))
 from lint import CFLAGS                              # noqa: E402  (same flags as lint's compiles)
 import sweepblock                                    # noqa: E402
+from hosttools import mwcc, binutil, include_path, reported_name  # noqa: E402
 
-CC = ROOT / 'build/compilers/GC/2.5/mwcceppc.exe'
-NM = ROOT / 'build/binutils/powerpc-eabi-nm.exe'
+CC = mwcc()
+NM = binutil('nm')
 SMALL = ('.sdata', '.sbss', '.sdata2', '.sbss2')
 SYM = re.compile(r'^(\S+) = (\.\w+):0x([0-9A-Fa-f]+); // type:(\w+)(?: size:0x([0-9A-Fa-f]+))?(.*)$')
 
@@ -74,13 +75,13 @@ def declared_sizes(src, names):
             if not names:
                 return {n: None for n in unsized}
             wrap.write_text('#include "%s"\nunsigned long symaudit_sizes[] = {\n%s};\n' % (
-                src.resolve().as_posix(), ''.join('    sizeof(%s),\n' % n for n in names)))
-            r = subprocess.run([str(CC)] + CFLAGS + ['-maxerrors', '1000', '-c', str(wrap), '-o', str(obj)],
+                include_path(src), ''.join('    sizeof(%s),\n' % n for n in names)))
+            r = subprocess.run(CC + CFLAGS + ['-maxerrors', '1000', '-c', str(wrap), '-o', str(obj)],
                                cwd=ROOT, capture_output=True, text=True)
             bad = {}
             for l in (r.stdout + r.stderr).splitlines():
                 m = re.match(r'(.*?):(\d+): (?!warning:)(.*)', l)
-                if m and pathlib.Path(m.group(1)).name == wrap.name and 3 <= int(m.group(2)) < 3 + len(names):
+                if m and reported_name(m.group(1)) == wrap.name and 3 <= int(m.group(2)) < 3 + len(names):
                     bad[names[int(m.group(2)) - 3]] = m.group(3)
             if r.returncode == 0:
                 return dict(zip(names, elf_array(obj, 'symaudit_sizes')), **{n: None for n in unsized})
@@ -141,7 +142,7 @@ def scope_findings(syms):
             continue                        # left over from a unit no longer in configure.py
         if 'unsorted' in o.parts:
             continue                        # sweeps are placeholders, not our declarations
-        out = subprocess.run([str(NM), str(o)], capture_output=True, text=True).stdout
+        out = subprocess.run([NM, str(o)], capture_output=True, text=True).stdout
         for l in out.splitlines():
             m = re.match(r'^[0-9a-f]{8} ([A-Za-z]) (\S+)$', l)
             if not m or m.group(1) in 'Uu' or re.search(r'[@$.]', m.group(2)):
