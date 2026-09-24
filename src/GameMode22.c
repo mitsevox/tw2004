@@ -62,6 +62,30 @@ void fn_80125A24(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
+// Message handler (FE_MessageTable.c): how many real-time events of a month (0-based) have their
+// profile flag set.
+void fn_80125AA4(MsgArg* pArgs, MsgArg* pResult) {
+    SaveProfile* pProfile;
+    s32 nMonth;
+    s32 i;
+    s32 nCount;
+    u16 nDate;
+    s32 nEventMonth;
+    s32 nDay;
+
+    nCount = 0;
+    nMonth = pArgs[0].i + 1;
+    pProfile = fn_80077ACC();
+    for (i = 0; i < 118; i++) {
+        nDate = fn_800F0FBC(i);
+        fn_800D2714(&nDate, &nEventMonth, &nDay, &nDay);
+        if (nEventMonth == nMonth && pProfile->a104D0[i]) {
+            nCount++;
+        }
+    }
+    pResult->i = nCount;
+}
+
 // Message handler (FE_MessageTable.c): placeholder texts for a trophy's name and date.
 void fn_80125B38(MsgArg* pArgs, MsgArg* pResult) {
     s32 nA = pArgs[0].i;
