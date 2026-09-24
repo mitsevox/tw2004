@@ -13,6 +13,7 @@
 #include "camera.h"
 #include "glows.h"
 #include "dynobj.h"
+#include "unsorted/cull.h"
 
 void* fn_800073B4(u8* pData, int n);
 void  fn_800075CC(void* p);         // frees what fn_800073B4 made
@@ -30,6 +31,10 @@ s32   fn_800318AC(const void* pA, const void* pB);
 void  fn_8003272C(int n);
 void  fn_80035154(u8 b);
 void  fn_80035170(u32 uClear, u32 uSet);
+void  fn_80035294(void);
+void  fn_800352BC(void);
+void  fn_800354B4(u8* p, f32 v);        // sets the lens's f32 at 0xAC (fn_80014268 reads it)
+f32   fn_80014268(u8* p);
 void  fn_80031938(Ter_LODPlane* pPlanes, f32 fStep, s32 a, s32 b, s32 c, s32 d);
 void  fn_80032B7C(void* pGround, s32 eClipMethod, s32 nPass, s32 n1C, s32 n18, s32 n20, u8* pbFirst, u8 b1,
                   u8 b2, f32 fNear, f32 fFar);
@@ -323,6 +328,69 @@ void fn_8003272C(int n) {
     if (lbl_801D3CB0.boManageZUpdate) {
         fn_80012F34(n);
         lbl_802810CC = n;
+    }
+}
+
+// Draws render pass 0's fourth patch lists (pSortedPatchList[0][3]), if it has any, without z
+// writes; the lens's value at 0xAC is raised by 25 while the renderer is set up, then put back. In
+// split screen, patches with bit 0x8 of n1C are left out.
+void fn_80032770(void) {
+    u8 bFirst = 1;
+    u8 bAny;
+    int nClip;
+    Ter_PatchReference** ppHead;
+    Ter_PatchReference* pPatch;
+    CamLens* pLens;
+    f32 fAC;
+
+    bAny = 0;
+    if (lbl_801D3CB0.pSortedPatchList[0][3][0] != NULL) {
+        bAny = 1;
+    } else if (lbl_801D3CB0.pSortedPatchList[0][3][1] != NULL) {
+        bAny = 1;
+    } else if (lbl_801D3CB0.pSortedPatchList[0][3][2] != NULL) {
+        bAny = 1;
+    }
+    if (bAny) {
+        fn_8003272C(0);
+        pLens = ((Camera*)*lbl_80280DF0)->unk10;
+        fAC = fn_80014268((u8*)pLens);
+        fn_800354B4((u8*)pLens, 25.0f + fAC);
+        fn_800352BC();
+        fn_80035294();
+        fn_80016B9C();
+        fn_80016B9C();
+        fn_80016B9C();
+        fn_800354B4((u8*)pLens, fAC);
+        fn_80012EF8();
+        fn_80014118(0x70);
+        for (nClip = 0; nClip <= 2; nClip++) {
+            ppHead = &lbl_801D3CB0.pSortedPatchList[0][3][nClip];
+            if (*ppHead != NULL) {
+                switch (nClip) {
+                case 2:
+                    fn_80035138(1);
+                    break;
+                case 1:
+                    fn_80035138(1);
+                    break;
+                default:
+                    fn_80035138(0);
+                    break;
+                }
+                fn_80012EF8();
+                for (pPatch = *ppHead; pPatch != NULL; pPatch = pPatch->pNext[3]) {
+                    if (!gSession.nSplitScreen || !(pPatch->n1C & 8)) {
+                        fn_80032B7C(pPatch->pGround, nClip, 3, pPatch->n1C, pPatch->n18, pPatch->n20, &bFirst,
+                                    0, 0, pPatch->fDistance, pPatch->fDistance + 2.0f * pPatch->fBoundingRadius);
+                    }
+                }
+            }
+        }
+        fn_80012F50(1, 6, 1);
+        fn_80012EF8();
+        fn_8003272C(1);
+        fn_80012EF8();
     }
 }
 
@@ -921,8 +989,6 @@ f32 fn_800351D8(u32 n, f32 fPeriod) {
 
 void fn_80013D68();
 void fn_80013D9C();
-void fn_80035294(void);
-void fn_800352BC(void);
 void fn_80035398(void);
 void fn_8003541C();
 void fn_80035440(TerSettings* pSettings);
@@ -983,7 +1049,6 @@ void fn_80035398(void) {
 
 void fn_8006F154();
 void fn_800082CC(void* p);
-void fn_800354B4(u8* p, f32 v);
 s32 fn_80035508(u8* p0);
 f32 fn_80035560(u8* p0);
 void fn_80035584(s32 v);
