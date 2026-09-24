@@ -9,6 +9,7 @@
 
 void fn_800360A0(void* pMesh);     // Skin.c
 void PsBallFx_TriggerTrail(Ball* pBall, int nPlayer);   // below; Ball.c declares it too
+void fn_800A34C0(int n, Ball* pBall, f32* pDir);          // not yet decompiled
 
 void fn_800A2E14(void) {
     fn_800360A0(lbl_80281408->mesh);
@@ -159,6 +160,33 @@ void fn_800A3348(Ball* pBall, int nPlayer) {
         PsBallFx_TriggerTrail(pBall, nPlayer);
     }
     fn_80046C34(pBall->vPos, nPlayer);
+}
+
+// A trail behind a ball moving over sand (surface class 6), along its flat direction; not in
+// split screen.
+void PsBallFx_TriggerTrail(Ball* pBall, int nPlayer) {
+    f32 vPos[4];
+    f32 vNormal[4];
+    f32 vDir[4];
+    SurfaceType* pSurface;
+
+    if (gSession.nSplitScreen) {
+        return;
+    }
+    vPos[0] = pBall->vPos[0];
+    vPos[1] = pBall->vPos[1];
+    vPos[2] = pBall->vPos[2];
+    vPos[3] = 1.0f;
+    if (TER_NO_GROUND == Ter_GetSupportingGroundData(fn_8000C594(), vPos, &pSurface, vNormal) ||
+        0.375f != pSurface->f1C || (int)pSurface->nClass != 6) {    // EA compares the class signed here
+        return;
+    }
+    Vec_Copy(gPlayers[nPlayer].ball.vVel, vDir);
+    vDir[1] = 0.0f;
+    if (vDir[0] != 0.0f || vDir[2] != 0.0f) {
+        fn_800BAF04(vDir, vDir);
+        fn_800A34C0(0, pBall, vDir);
+    }
 }
 
 // Start emitter 15 at pPos for nPlayer's view, drifting with a tenth of the wind.
