@@ -354,6 +354,11 @@ void fn_80071C28(SKABlendNode** ppNode, int nType, int nFormat, SKABlendFn pfnBl
 // animblender.c: make pNode a blend node that mixes its children with pfnBlend at fWeight.
 void fn_800725BC(SKABlendNode* pNode, SKABlendFn pfnBlend, f32 fWeight);
 f32  fn_80072938(SKABlendNode* pNode);  // animblender.c: the latest end time under pNode
+// animblender.c: pNew plays pClip (a Clip, or an MtaLib from a MAL bank for a format 1 node).
+void fn_800724C0(SKABlendNode* pNode, SKABlendNode* pNew, void* pClip, f32 fWeight);
+// animblender.c: blend pNew into *ppNode over the window pBlend (six floats, fn_800958F8).
+void fn_800720C8(struct Character* pChar, SKABlendNode* pNew, SKABlendNode** ppNode, f32* pBlend,
+                 SKABlendFn pfnBlend, int b);
 
 // A node of a character's SKA blend tree (animblender.c; the root is at Character + 0x40C). A node
 // of type 1 blends its two children into its pose with pfnBlend; a node of type 0 plays one source
@@ -571,7 +576,8 @@ typedef struct Character {
     f32   afGroundHeight[4];    // 0x1774  }
     s32   n1784;                // 0x1784  set to -1 by Character_SetPosition
     Clip* pCurClip;             // 0x1788  the clip Char_SetClip picked
-    s32   n178C;                // 0x178C  cleared by fn_8001BE88
+    struct MtaLib* p178C;       // 0x178C  the MAL library the second player plays (fn_80095FD0);
+                                //         cleared by fn_8001BE88
     Clip* p1790;                // 0x1790  cleared by fn_80062BFC; CharacterState_AddSKABlendData plays it for
                                 //         groups 5, 6 and 10
     void* p1794;                // 0x1794  cleared by fn_80062BE8; the same for group 9
@@ -998,7 +1004,8 @@ LAYOUT_ASSERT(MtaRecord, 0x2C);
 typedef struct MtaLib {
     u8     unk00[0x14];
     s32    nBytes;              // 0x14  the library's size (fn_8001F804 allocates it)
-    u8     unk18[0x20 - 0x18];
+    u8     unk18[4];
+    f32    f1C;                 // 0x1C  its end time (fn_80095FD0 plays it up to this)
     s32    nRecords;            // 0x20
     u8     unk24[0x30 - 0x24];
     MtaRecord* pRecords;        // 0x30

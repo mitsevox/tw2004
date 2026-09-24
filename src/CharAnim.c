@@ -14,8 +14,8 @@ f32   fn_8001F02C(Clip* pBlend, u64 uEvent);   // an event's time (by its 64-bit
 void  fn_800732F4(void* pNode, void* pAnim, f32 fTime);   // set a blend node's time (blend or node3E0)
 
 void  fn_800958EC(AnimPlayer* pAnim, s32 n, f32 f);
-void  fn_80095FD0(Character* pChar, void* pClip, u8 bKeep, int n, SKABlendFn pfnBlend, int c, int d, f32 f1,
-                  f32 f2, f32 f3, f32 f4, f32 f5);
+void  fn_80095FD0(Character* pChar, MtaLib* pLib, u8 bReset, int nGroup, SKABlendFn pfnBlend, int nC,
+                  int nAnim, f32 fStart, f32 fFrom, f32 fTo, f32 fOffset, f32 fTime);
 void  fn_8009622C(Character* pChar, void* pClip, u8 bKeep, f32 fOffset);
 s8    fn_80096338(void);
 s32   fn_800962F8(Character* pChar);
@@ -105,6 +105,65 @@ f32 fn_800958F8(Character* pChar, f32* aPrev, Clip* pClip, f32* aBlend, f32 fFro
         aBlend[4] = aBlend[3] + (aBlend[1] - aBlend[0]);
     }
     return aBlend[4] - aBlend[3];
+}
+
+// Play pLib (a MAL bank's library) on the second player from fFrom to fTo, starting at fStart on
+// the player's clock; with bReset its blend node is rebuilt first. fStart -20000 means the
+// player's time; negative fFrom and fTo mean 0 and the library's end. fTime (-20000 the player's
+// time, -10000 the node's end, -30000 its start) plus a negative fOffset is where the player
+// starts, running animation nAnim. In game type 3 the created golfer's sliders are applied again.
+// nGroup is not used; every caller passes it (fn_80096F0C: the MAL group pLib came from).
+void fn_80095FD0(Character* pChar, MtaLib* pLib, u8 bReset, int nGroup, SKABlendFn pfnBlend, int nC,
+                 int nAnim, f32 fStart, f32 fFrom, f32 fTo, f32 fOffset, f32 fTime) {
+    SKABlendNode* pNode = (SKABlendNode*)pChar->node3E0;
+    SKABlendNode* pNew = NULL;
+    f32 aBlend[6];
+
+    if (pLib == NULL) return;
+    pChar->anim29C.uFlags = 0;
+    if (bReset) {
+        pChar->anim29C.fTime = 0.0f;
+        fn_80071F58(&pNode, 0);
+        fn_80071C28(&pNode, 1, pNode->nFormat, pfnBlend, nC);
+    }
+    if (-20000.0f == fStart) {
+        fStart = pChar->anim29C.fTime;
+    }
+    if (fFrom < 0.0f) {
+        fFrom = 0.0f;
+    }
+    if (fTo < 0.0f) {
+        fTo = pLib->f1C;
+    }
+    pNew = NULL;
+    fn_80071C28(&pNew, 0, pNode->nFormat, pfnBlend, nC);
+    fn_800724C0((SKABlendNode*)pChar->node3E0, pNew, pLib, 1.0f);
+    aBlend[3] = fStart;
+    aBlend[5] = fOffset;
+    aBlend[0] = fFrom;
+    aBlend[1] = fTo;
+    aBlend[4] = fStart + (fTo - fFrom);
+    fn_800720C8(pChar, pNew, &pNode, aBlend, pfnBlend, nC);
+    pChar->anim29C.n00 = 0;
+    pChar->anim29C.n08 = 1;
+    pChar->anim29C.fStart = pNode->fStart;
+    pChar->anim29C.fEnd = pNode->fEnd;
+    if (-20000.0f == fTime) {
+        fTime = pChar->anim29C.fTime;
+    } else if (-10000.0f == fTime) {
+        fTime = pNode->fEnd;
+    } else if (-30000.0f == fTime) {
+        fTime = pNode->fStart;
+    }
+    if (fOffset < 0.0f) {
+        fTime += fOffset;
+    }
+    fn_800958EC(&pChar->anim29C, nAnim, fTime);
+    pChar->p178C = pLib;
+    if (gSession.nGameType == 3 && pChar->p17AC != NULL) {
+        fn_8010E4DC(pChar->p17AC, pChar->pModel, pChar->pSkin, 26, fn_80077ACC()->choices.a9B4,
+                    (SKABlendNode*)pChar->node3E0);
+    }
 }
 
 // Start pClip on the second player (fn_80095FD0) and queue state 4; unless bKeep, its blend node
@@ -229,6 +288,59 @@ void CharAnim_StartTapIn(Character* pChar) {
     }
     CharacterState_AddSKABlendData(pChar, 1, 9, fn_80072ACC, 1, 8, -10000.0f, -30000.0f, -10000.0f, 0.0f,
                                    -10000.0f);
+}
+
+// The second player's state change: once its time reaches f10, the state nC queued runs. State 5
+// stops the player (in game type 6 it signals event 0x2A and stays waiting); states 1 to 3 play a
+// clip from MAL group 0 to 2 on it when n30 is not 4 and n20 is 6 or 7.
+void fn_80096F0C(Character* pChar) {
+    MtaLib* pLib;
+
+    if (pChar->anim29C.nC != 0 && pChar->anim29C.fTime >= pChar->anim29C.f10) {
+        pChar->n2C = pChar->anim29C.nC;
+        pChar->u28 |= 1;
+    }
+    if (!(pChar->u28 & 1)) return;
+    switch (pChar->n2C) {
+    case 5:
+        fn_800958EC(&pChar->anim29C, 0, 0.0f);
+        if (gSession.nGameType == 6) {
+            EVENT_Trigger(pChar->nPlayer, 0x2A, NULL, -1);
+            pChar->n30 = 5;
+            return;
+        }
+        break;
+    case 2:
+        if (pChar->n30 == 4 || (pChar->n20 != 6 && pChar->n20 != 7)) {
+            goto skip;  // fake match: past the n30 update to the shared clear (a copy here: 90.3%)
+        }
+        pLib = fn_80017678(pChar, 1, -1);
+        fn_800732F4(pChar->node3E0, &pChar->anim29C, 0.5f + pChar->anim29C.fTime);
+        fn_80095FD0(pChar, pLib, 0, 1, fn_80072ACC, 1, 2, -20000.0f, -30000.0f, -10000.0f, 0.0f, -10000.0f);
+        pChar->anim29C.f10 -= 0.5f;
+        break;
+    case 3:
+        if (pChar->n30 == 4 || (pChar->n20 != 6 && pChar->n20 != 7)) {
+            goto skip;  // fake match: as in case 2
+        }
+        fn_800732F4(pChar->node3E0, &pChar->anim29C, 0.5f + pChar->anim29C.fTime);
+        pLib = fn_80017678(pChar, 2, -1);
+        fn_80095FD0(pChar, pLib, 0, 2, fn_80072ACC, 1, 3, -20000.0f, -30000.0f, -10000.0f, 0.0f, -10000.0f);
+        pChar->anim29C.f10 -= 0.5f;
+        break;
+    case 1:
+        if (pChar->n30 == 4 || (pChar->n20 != 6 && pChar->n20 != 7)) {
+            goto skip;  // fake match: as in case 2
+        }
+        fn_800732F4(pChar->node3E0, &pChar->anim29C, 0.5f + pChar->anim29C.fTime);
+        pLib = fn_80017678(pChar, 0, -1);
+        fn_80095FD0(pChar, pLib, 0, 0, fn_80072ACC, 1, 1, -20000.0f, -30000.0f, -10000.0f, 0.0f, -10000.0f);
+        pChar->anim29C.f10 -= 0.5f;
+        break;
+    }
+    pChar->n30 = pChar->n2C;
+skip:
+    pChar->u28 &= ~1;
 }
 
 // Halfway between the blend's second clip's f0C and the time of the blend's event 2.

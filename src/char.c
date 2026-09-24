@@ -146,9 +146,6 @@ void  fn_800106B8(u8 b);                // LLTexGrp.c
 void  fn_8008F310(void);                // uiLoadFile.c: park the UI file's data in ARAM
 void* fn_8008F354(void);                // uiLoadFile.c: the UI file's buffer
 void  fn_8008F35C(void);                // uiLoadFile.c: bring the UI file's data back
-void  fn_800720C8(Character* pChar, SKABlendNode* pNew, SKABlendNode** ppNode, f32* pBlend,
-                  SKABlendFn pfnBlend, int b);                                         // animblender.c
-void  fn_800724C0(SKABlendNode* pNode, SKABlendNode* pNew, Clip* pClip, f32 fWeight);  // animblender.c
 void  fn_800732F4(void* pNode, void* pAnim, f32 fTime);                                // CharAnim.c
 void  fn_801141F8(struct DynChain* pChain, CharModel* pModel);                         // DynChain.c
 void  fn_80035600(void);                // GoTerrain.c
@@ -1051,7 +1048,7 @@ Character* fn_8001942C(void) {
     pChar->n16DC = 0;
     pChar->f165C = pChar->f1660 = 1073741824.0f;
     pChar->pCurClip = NULL;
-    pChar->n178C = 0;
+    pChar->p178C = NULL;
     pChar->a6C[0] = -1;
     pChar->a64[0] = NULL;
     pChar->a6C[1] = -1;
@@ -2086,7 +2083,7 @@ void fn_8001BE88(Character* pChar, Clip* pClip, int bNoBlend, f32 fTime) {
     if (fn_8001EC48(pChar)) {
         fn_8001BD18(pChar, pClip);
     }
-    pChar->n178C = 0;
+    pChar->p178C = NULL;
     if (bNoBlend) {
         fn_80071F58(&pNode, 0);
         fn_80071C28(&pNode, 1, 0, fn_80072ACC, 0);
