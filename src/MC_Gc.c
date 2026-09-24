@@ -18,7 +18,9 @@ void fn_8009EB38(UStreamObject* pObject);
 void fn_8009EB40(s32 nPort, s32 nSlot);
 s32  fn_8009ED34(s32 nPort, s32 nSlot, const char* pName, const char* pBackupName);
 s32  fn_8009EECC(s32 nPort, s32 nSlot, const char* pName);
+s32  fn_8009EF68(s32 nPort, s32 nSlot);
 s32  fn_80125194(s32 a, s32 b);         // EA Sports Bio (0x80125194)
+s32  fn_801255C4(s32* pPos);            // EASportsBio.c
 void GXSetVtxAttrFmt(int nFmt, int nAttr, int nCnt, int nType, u8 uFrac);   // port: GameCube only
 u8*  Skalib_ScratchToAram(int n);       // skalib.c
 void Skalib_ScratchFromAram(int n);     // skalib.c
@@ -203,6 +205,17 @@ s32 fn_8009D0D4(s32 nPort, s32 nSlot) {
         lbl_801F1510[nPort][nSlot].nMemSize = nMemSize;
         return 0;
     }
+}
+
+// fn_8009D1D8's count for the game's save, plus the EA Sports Bio's (fn_801255C4).
+s32 fn_8009D390(s32 nPort, s32 nSlot) {
+    s32 aPos[2];
+    s32 nCount = 0;
+    aPos[0] = nPort;
+    aPos[1] = nSlot;
+    nCount += fn_8009D1D8(nPort, nSlot, 0, 0);
+    nCount += fn_801255C4(aPos);
+    return nCount;
 }
 
 // How many new files a save of the EA Sports Bio needs on the card: 1 when there is no "EASB" file
@@ -493,6 +506,50 @@ void fn_8009EB38(UStreamObject* pObject) {
 void fn_8009EB40(s32 nPort, s32 nSlot) {
 }
 
+// Make the backup the save file: when both are on the card, delete pName first; then load the
+// backup, and if it is good rename it to pName. A bad backup is deleted (-38). No backup: -37.
+s32 fn_8009EC30(s32 nPort, s32 nSlot, const char* pName, const char* pBackupName) {
+    s32 nResult = fn_8009D614(nPort, nSlot, pBackupName);
+    if (nResult == 0) {
+        if (fn_8009D614(nPort, nSlot, pName) == 0) {
+            nResult = fn_8009E758(nPort, nSlot, pName);
+            if (nResult != 0) return nResult;
+        }
+        nResult = fn_8009EF68(nPort, nSlot);
+        if (nResult == 0) return fn_8009CDA0(nPort, nSlot, pBackupName, pName);
+        if (nResult == MC_ERR_BADDATA) {
+            nResult = fn_8009E758(nPort, nSlot, pBackupName);
+            return (nResult != 0) ? nResult : -38;
+        }
+        return nResult;
+    }
+    return (nResult != MC_ERR_NOFILE) ? nResult : -37;
+}
+
+// Load the save file into the first image, falling back on its backup: a good save file makes the
+// backup redundant (deleted), a good backup alone becomes the save file (fn_8009EC30). Both bad, or
+// one bad and the other missing: MC_ERR_BADDATA. pName and pBackupName are not used; the names are
+// always MC_FILE_NAME and MC_BACKUP_NAME.
+s32 fn_8009ED34(s32 nPort, s32 nSlot, const char* pName, const char* pBackupName) {
+    s32 nMain = fn_8009EECC(nPort, nSlot, MC_FILE_NAME);
+    s32 nBackup = fn_8009EECC(nPort, nSlot, MC_BACKUP_NAME);
+    if ((nMain == MC_ERR_BADDATA && nBackup == MC_ERR_BADDATA) ||
+        (nMain == MC_ERR_NOFILE && nBackup == MC_ERR_BADDATA) ||
+        (nMain == MC_ERR_BADDATA && nBackup == MC_ERR_NOFILE)) {
+        return MC_ERR_BADDATA;
+    }
+    if (nMain == 0) {
+        if (nBackup != MC_ERR_NOFILE) {
+            fn_8009E758(nPort, nSlot, MC_BACKUP_NAME);
+        }
+        return 0;
+    }
+    if (nBackup == 0) {
+        nMain = fn_8009EC30(nPort, nSlot, MC_FILE_NAME, MC_BACKUP_NAME);
+    }
+    return nMain;
+}
+
 // Load the save file (or its backup) into the first image. When the card's state is bad the card
 // is left mounted.
 s32 fn_8009EE28(s32 nPort, s32 nSlot) {
@@ -505,6 +562,20 @@ s32 fn_8009EE28(s32 nPort, s32 nSlot) {
     nResult = fn_8009ED34(nPort, nSlot, MC_FILE_NAME, MC_BACKUP_NAME);
     if (nMount == 0) {
         fn_8009DBAC(nPort, nSlot);
+    }
+    return nResult;
+}
+
+// Load the save file pName into the first image and check it (fn_800A233C): MC_ERR_BADDATA when it
+// is not a good save.
+s32 fn_8009EECC(s32 nPort, s32 nSlot, const char* pName) {
+    s32 nResult = fn_8009DD44(nPort, nSlot, MC_DIR_NAME);
+    if (nResult == 0) {
+        nResult = fn_8009DD94(nPort, nSlot, pName, lbl_80281FE8, MC_BUFFER_SIZE);
+        if (nResult == 0) {
+            if (fn_800A233C(lbl_80281FE8, &lbl_80281FE8->trailer)) return 0;
+            return MC_ERR_BADDATA;
+        }
     }
     return nResult;
 }
@@ -565,11 +636,58 @@ s32 fn_8009F208(s32 nFile, void* pBuf, s32 nLen, s32 arg3) {
     return 0;
 }
 
+// Write nLen bytes from pBuf to open file nFile, from where the last access stopped. An I/O error
+// marks the card in port 0 damaged; any other result clears that.
+s32 fn_8009F258(s32 nFile, void* pBuf, s32 nLen) {
+    s32 nResult = fn_8009E130(0, 0, &lbl_801E3180[nFile], pBuf, nLen, lbl_80281FC8);
+    lbl_80281FC8 += nLen;
+    if (nResult == MC_ERR_IOERROR) {
+        lbl_80281FD0[0] = 1;
+        return MC_ERR_IOERROR;
+    }
+    lbl_80281FD0[0] = 0;
+    return 0;
+}
+
+// Move open file nFile's position to nOffset, from the start or from where it is. A position
+// outside the file's 0x76000 bytes gives MC_ERR_BADDATA and goes back to the start.
+s32 fn_8009F2D8(s32 nFile, s32 nOffset, u8 bFromStart) {
+    if (bFromStart) {
+        if (nOffset < 0) {
+            lbl_80281FC8 = 0;
+            return MC_ERR_BADDATA;
+        }
+        if (nOffset > 0x76000) {
+            lbl_80281FC8 = 0;
+            return MC_ERR_BADDATA;
+        }
+    } else if (nOffset > 0x76000) {
+        lbl_80281FC8 = 0;
+        return MC_ERR_BADDATA;
+    }
+    lbl_80281FC8 = bFromStart ? nOffset : lbl_80281FC8 + nOffset;
+    lbl_802813D4 = bFromStart;
+    return 0;
+}
+
 s32 fn_8009F35C(void) {
     return 0;
 }
 
 s32 fn_8009F364(void) {
+    return 0;
+}
+
+// The card's free space in bytes.
+s32 fn_8009F36C(s32 nPort, s32 nSlot, s32* pnFreeBytes) {
+    s32 nFreeFiles = 0;
+    CARDFreeBlocks(nPort, pnFreeBytes, &nFreeFiles);
+    return 0;
+}
+
+s32 fn_8009F3A0(s32 nPort, s32 nSlot, const char* pName, s32* pnFreeFiles) {
+    s32 nFreeBytes = 0;
+    CARDFreeBlocks(nPort, &nFreeBytes, pnFreeFiles);
     return 0;
 }
 

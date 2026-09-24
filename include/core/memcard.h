@@ -280,6 +280,7 @@ void  fn_800A27BC(const char* szSrc, u16* szDst, s32 nMax);
 // ---- MC_Gc.c's CARD state (the CARD library itself is in core/card.h) ----------------------------
 
 extern CARDFileInfo lbl_801E3180[127];  // the open files, by file number
+extern u8    lbl_802813D4;      // the last position move (fn_8009F2D8) was from the start
 extern s32   lbl_802813D8;      // the file open through fn_8009F3D4 (-1: none)
 extern s32   lbl_80281FC8;      // where the next fn_8009F208 read starts
 extern s32   lbl_80281FB4;      // the size of the operation in progress (fn_8009CB9C)
