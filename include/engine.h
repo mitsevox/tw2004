@@ -1400,7 +1400,7 @@ u8   fn_80068AC8(int nPlayer);
 void fn_80069330(int nPlayer, f32* pPos);
 u8   PlaceBall_UpdateMomentums(int nPlayer, f32 fSpeed);   // 0 when the cursor was stopped
 void fn_8006A6C4(int nPlayer);
-int  fn_8006AA9C(int nPlayer);          // how the shot turned out (0..4, 8+)
+int  fn_8006AA9C(int nPlayer);          // how the shot turned out (5: nothing to react to)
 void fn_8006AAB4(int nPlayer, int a);
 void fn_8006ACE0(int nPlayer, int nResult);
 void fn_8006ACF8(int nPlayer, int a);

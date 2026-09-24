@@ -90,8 +90,8 @@ void fn_8006ACE0(int nPlayer, int nResult) {
     lbl_801D5F78[nPlayer].n14 = nResult;
 }
 
-// Sets the reaction to play. Reaction 1 does not replace reaction 2; a change to anything but
-// 4 or 5 updates the golfer's emotion at once.
+// Sets the ball event n18 (which reaction fn_8006B250 works out). Event 1 does not replace
+// event 2; a change to anything but 4 or 5 updates the golfer's emotion at once.
 void fn_8006ACF8(int nPlayer, int a) {
     int nOld = lbl_801D5F78[nPlayer].n18;
 
@@ -289,8 +289,8 @@ void fn_8006B250(int nPlayer) {
 }
 
 // The shot's outcome from where the ball ended (bBefore: from the look-ahead ball, and only the
-// kept copy nC, n10, n14 is set): out of bounds or a mode's special case 4, a GameBreaker 2,
-// anything else 5.
+// kept copy nC, n10, n14 is set): out of bounds or the stroke limit 4, a GameBreaker 2 (a
+// scripted one only when fn_800DC818 passes it), anything else 5.
 void fn_8006B2C4(int nPlayer, u8 bBefore) {
     Ball* pBall;
 
@@ -430,8 +430,8 @@ void fn_8006B6F0(int nPlayer) {
     }
 }
 
-// Reaction 3: from how straight the ball went, the cosine between the aim and where it ended
-// (both flat): straighter moves n4 up, wider moves it down and may flip n0 between 0 and 1.
+// Reaction 3: from how straight the ball is going, the cosine between the aim and where the ball
+// is now (both flat): straighter moves n4 up, wider moves it down and may flip n0 between 0 and 1.
 void fn_8006B87C(int nPlayer) {
     f32 vAim[4];
     f32 vShot[4];
@@ -599,8 +599,8 @@ void fn_8006BB5C(int nPlayer) {
     }
 }
 
-// With bBefore, whether the shot about to be taken would count for the mode (fn_800E23B0 with one
-// more stroke), unless the ball is already in the cup; without it, the player's bC2D.
+// With bBefore, whether one more stroke reaches the hole's stroke limit (fn_800E23B0), unless the
+// ball is already in the cup; without it, the player's bC2D.
 u8 fn_8006BDC8(int nPlayer, u8 bBefore) {
     if (bBefore) {
         if (gPlayers[nPlayer].ballBefore.nLie != LIE_INCUP_e) {

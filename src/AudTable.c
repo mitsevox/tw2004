@@ -41,7 +41,7 @@ u8 fn_800A7C24(void) {
 void fn_800A7C2C(void) {
 }
 
-// Starts entry nEntry on sound nSound.
+// Clears entry nEntry and binds it to sound nSound.
 AudSource* fn_800A7C30(u8 nEntry, s16 nSound) {
     AudSound* pSound;
     AudSource* pSource;
