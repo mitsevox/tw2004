@@ -2102,6 +2102,50 @@ void fn_8001DC64(Character* pChar, SkinChoices* pChoices) {
     fn_80018484(pChar, pChar->pModel);
 }
 
+// Byte-swaps nBytes of 0x50-byte texture entries in place, once (bit 0x40 of b47 marks it done):
+// from 0x08 four 12-byte records (a 4-byte field, four 2-byte ones), then four 2-byte fields,
+// nine bytes and seven bytes. An entry with b40 0 has its name decoded (not used) and goes with
+// the entry before when that one has the same name and goes with its next.
+void fn_8001DD18(u8* pData, int nBytes) {
+    SwapField aRecord[5] = { { 4, 4 }, { 2, 2 }, { 2, 2 }, { 2, 2 }, { 2, 2 } };
+    SwapField aTail[14] = { { 2, 2 }, { 2, 2 }, { 2, 2 }, { 2, 2 }, { 1, 1 }, { 1, 1 }, { 1, 1 },
+                            { 1, 1 }, { 1, 1 }, { 1, 1 }, { 1, 1 }, { 1, 1 }, { 1, 1 }, { 7, 7 } };
+    char szName[64];            // the size is not known
+    void* pSrc;
+    void* pDst;
+    TexEntry* pEntry;
+    int nEntries;
+    int i;
+    int j;
+
+    if (!(((TexEntry*)pData)->b47 & 0x40)) {
+        pEntry = (TexEntry*)pData;
+        nEntries = nBytes / (int)sizeof(TexEntry);
+        for (i = 0; i < nEntries; i++) {
+            pDst = pEntry;
+            pSrc = pEntry;
+            pData = (u8*)&pEntry->uPixels;
+            for (j = 0; j < 4; j++) {
+                pDst = pData;
+                pSrc = pData;
+                fn_8001F08C(&pSrc, &pDst, aRecord, 5, 1);
+                pData += 12;
+            }
+            pDst = pData;
+            pSrc = pData;
+            fn_8001F08C(&pSrc, &pDst, aTail, 14, 1);
+            if (pEntry->b40 == 0) {
+                fn_800CB868(&pEntry->u0, szName);
+                if (i != 0 && pEntry->u0 == pEntry[-1].u0 && (pEntry[-1].b47 & 1)) {
+                    pEntry->b47 |= 1;
+                }
+            }
+            pEntry->b47 |= 0x40;
+            pEntry++;
+        }
+    }
+}
+
 // Byte-swaps nBytes of 12-byte records in place: a 4-byte field, then four 2-byte ones.
 void fn_8001DEC8(u8* pData, int nBytes) {
     SwapField aFormat[5] = { { 4, 4 }, { 2, 2 }, { 2, 2 }, { 2, 2 }, { 2, 2 } };
