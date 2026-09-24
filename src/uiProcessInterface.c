@@ -6,6 +6,8 @@
 #include "game.h"
 #include "game/frontend.h"
 #include "frontend/fe.h"
+#include "camera.h"
+#include "frontend/uistudio.h"
 
 u8 lbl_80281F19;
 u8 lbl_80281F1A;                // set: fn_8008FD60 passes events to the UI
@@ -20,7 +22,6 @@ void fn_80090400(FrontEnd* pFE);
 void fn_80090664(void);
 void fn_8008FE88(FrontEnd* pFE);
 TexEntry* fn_80090904(TexBank* pBank, u64 uHash);
-void fn_8008F820(void);
 void fn_800E573C(void);         // GameMessages.c
 void fn_800E5798(void);         // GameMessages.c
 void fn_800E5708(void);         // GameMessages.c
@@ -32,17 +33,19 @@ void fn_80099ED8(void);                 // BootCourse.c
 void fn_80077340(void);                 // FE_Manager.c
 void fn_80077344(void);                 // FE_Manager.c
 void fn_80077348(void);                 // FE_Manager.c
-// UIStudio.c, with the front end's view of the handler (uistudio.h cannot be included with
-// game/frontend.h; it takes a UIStudio*).
-void fn_80168B80(void* pHandler, u32 uEvent);
-void fn_80169B4C(void* pHandler);      // UISApi.c: unload every screen
-void fn_80168C24(void* pHandler, s32 nTicks);     // UIStudio.c: run the UI
-void fn_8016B09C(void* pHandler, u32 uEvent, s32 nArgs, const s32* pArgs);
 void fn_80016B6C(f32 x, f32 y);
 void fn_80012898(s32 nMode);
 void fn_80012C54(s32 v);
 void fn_8001273C(void);
 void fn_800908D4(f32 x0);
+void fn_80090890(s32 nLevel, const char* szFile, s32 nLine, const char* szMsg);
+void fn_80090894(u16 uGroup, u16 uScreen, s32 n);
+void fn_800908BC(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4);
+void fn_800908C0(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4);
+void fn_800908C4(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4);
+void fn_800908C8(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4);
+void fn_800908CC(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4);
+void fn_800908D0(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4);
 
 u8 fn_8008F39C(void) {
     return lbl_80281F1B;
@@ -90,14 +93,15 @@ void fn_8008F568(s32 nCmd, s32 unused1, s32 unused2, s32 unused3, s32 a, s32 b) 
 
 // The studio's UISLoadFn: screen uScreen's data from the UI file's pairs (0 past the end). The
 // group is ignored.
-u32 fn_8008F610(u16 uGroup, u16 uScreen) {
+void* fn_8008F610(u16 uGroup, u16 uScreen) {
     UIFilePairs* pPairs = lbl_80281F1C->pFile->p4;
 
-    if (uScreen >= pPairs->nCount) return 0;
-    return (u32)pPairs->aPairs[uScreen].p4;
+    if (uScreen >= pPairs->nCount) return NULL;
+    return pPairs->aPairs[uScreen].p4;
 }
 
-void fn_8008F644(void) {
+// The studio's UISUnloadFn: nothing to do, the screens' data stays in the UI file.
+void fn_8008F644(u16 uGroup, u16 uScreen, void* pData) {
 }
 
 // Run and draw the UI for nTicks (while lbl_80281F1A is set), then step lbl_801D880C: counting
@@ -150,6 +154,131 @@ void fn_8008F80C(s32 n, s32 b) {
     lbl_801D87C0.a30[n] = b;
 }
 
+// Read the controllers for the UI. The main stick works the D-pad in start-up, the menus and (when
+// fn_800E415C says so) game type 6. In a round, nothing happens while a camera is still moving.
+// Each plugged-in controller's buttons (the stick's directions folded into the D-pad bits) are
+// compared with last frame's; each newly pressed button sends its lbl_80189B58 event to the UI.
+// In the menus the UI switches between its lone-player and many-player forms (0x34, 0x2D) by
+// how many controllers are plugged in.
+void fn_8008F820(void) {
+    f32 fOne;
+    s32 aArgs[1];
+    u32 aPressed[8];            // fake match: 4 are used; the stack frame holds 8
+    u32 aButtons[8];            // fake match: likewise
+    View* pView;
+    u32 uMask;
+    int i;
+    int j;
+
+    fOne = 1.0f;
+    if (gSession.nGameType == 3 || gSession.nGameType == 1 ||
+        (gSession.nGameType == 6 && fn_800E415C())) {
+        fn_800130EC(1);
+    } else {
+        fn_800130EC(0);
+    }
+    if (gSession.nGameType >= 4 && gSession.nGameType <= 8 && gSession.nPaused == 0) {
+        for (i = 0; i < gSession.nNumPlayers; i++) {
+            pView = fn_80017028(gPlayers[i].nView[0]);
+            if ((fn_80063C90(pView) || pView->script.nCamera == 3) && pView->nCurCamera != 0x15) {
+                return;
+            }
+        }
+    }
+    lbl_801D87C0.n38 = 0;
+    fn_80005AE8(aArgs, 0, sizeof(aArgs));
+    for (i = 0; i < 4; i++) {
+        if (fn_80013070(i)) {
+            lbl_801D87C0.a1[i] = 1;
+            lbl_801D87C0.n34 = 0;
+            lbl_801D87C0.n38++;
+        } else {
+            lbl_801D87C0.a1[i] = 0;
+        }
+        if (lbl_801D87C0.a1[i]) {
+            aButtons[i] = fn_800136DC(i);
+            if (aButtons[i] & 0x40000) {
+                aButtons[i] |= 4;
+            }
+            if (aButtons[i] & 0x80000) {
+                aButtons[i] |= 8;
+            }
+            if (aButtons[i] & 0x20000) {
+                aButtons[i] |= 2;
+            }
+            if (aButtons[i] & 0x10000) {
+                aButtons[i] |= 1;
+            }
+            if (lbl_801D87C0.a8[i] != aButtons[i]) {
+                lbl_801D87C0.a18[i] = 0;
+            } else if (lbl_801D87C0.a18[i] > 8) {
+                lbl_801D87C0.a18[i] = 0;
+                lbl_801D87C0.a8[i] = 0;
+            }
+            lbl_801D87C0.a18[i]++;
+            aPressed[i] = aButtons[i] & ~lbl_801D87C0.a8[i];
+            lbl_801D87C0.a8[i] = aButtons[i];
+        }
+        lbl_801D87C0.a28[i] = lbl_801D87C0.a1[i];
+    }
+    if (lbl_801D87C0.n38 == 0) {
+        lbl_801D87C0.n34++;
+    }
+    if (lbl_801D87C0.n38 > 0 && gSession.nGameType == 3 &&
+        ((Game_GetMode() != 7 && Game_GetMode() != 0x1A) || lbl_801D87C0.n38 >= 2 ||
+         lbl_801D7148.aCPU[0] || lbl_801D7148.aCPU[1])) {
+        if (lbl_80281368 != -1) {
+            lbl_80281EE0->b86 = lbl_80281368;
+            lbl_80281368 = -1;
+        }
+        lbl_801D87C0.b49 = 0;
+        fn_8016B09C(lbl_80281F1C->pHandler, 0x2D, 1, aArgs);
+        lbl_801D87C0.b40 = 0;
+    }
+    if (((Game_GetMode() == 7 && !lbl_801D7148.aCPU[0] && !lbl_801D7148.aCPU[1]) ||
+         Game_GetMode() == 0x1A) &&
+        lbl_801D87C0.n38 < 2 && gSession.nGameType == 3) {
+        if (lbl_80281368 == -1) {
+            lbl_80281368 = lbl_80281EE0->b86;
+        }
+        fn_8016B09C(lbl_80281F1C->pHandler, 0x34, 1, aArgs);
+        lbl_801D87C0.b40 = 1;
+        lbl_801D87C0.b49 = 1;
+    }
+    aArgs[0] = 0;
+    if (lbl_801D87C0.b0 == 0 && fn_80077148() && lbl_801D87C0.b40 == 0) {
+        for (i = 0; i < 4; i++) {
+            if (lbl_801D87C0.a1[i] && lbl_801D87C0.a30[i]) {
+                if (gSession.nGameType != 6 || (gSession.nPaused != 2 && gSession.nPaused != 3)) {
+                    for (j = 0; j < UI_NUM_BUTTON_EVENTS; j++) {
+                        if (lbl_80189B58[j].uMask & aPressed[i]) {
+                            fn_80168DB0(lbl_80281F1C->pHandler, i, lbl_80189B58[j].nEvent, 1, &fOne, 0);
+                        }
+                    }
+                    if (aButtons[i] != 0 && gSession.nGameType == 3) {
+                        fn_8016B09C(lbl_80281F1C->pHandler, 0x22, 1, aArgs);
+                    }
+                }
+                if (gSession.nGameType == 6) {
+                    fn_800E5240(i);
+                }
+                if (gSession.nGameType == 6) {
+                    uMask = fn_800142AC(0x20, 1);
+                    if (fn_800136DC(i) & uMask) {
+                        lbl_80189B38[i]++;
+                    } else {
+                        lbl_80189B38[i] = 0;
+                    }
+                }
+                if (lbl_80189B38[i] > 10) {
+                    fn_800E4F88(i);
+                    lbl_80189B38[i] = 0;
+                }
+            }
+        }
+    }
+}
+
 // Passes an event to the UI (while lbl_80281F1A is set). With lbl_80281F19 set it then shuts the UI
 // down (fn_80090400) and sets lbl_80281F1B; otherwise fn_8008F820 runs.
 void fn_8008FD60(u32 uEvent) {
@@ -200,7 +329,7 @@ void fn_8008FDDC(FrontEnd* pFE) {
 // table noted in lbl_801D87C0.n3C).
 void fn_8008FE88(FrontEnd* pFE) {
     UIColorTable* pTable;
-    UIColorEntry* pEntry;
+    UIFileEntry* pEntry;
     u64 uHash;
     char* szName;
     int nBank;
@@ -244,6 +373,73 @@ int fn_8008FFF0(const char* szName) {
         return -1;
     }
     return 0;
+}
+
+// Start the front end with the UI set szSet: take what uiLoadFile.c loaded, resolve the UI file,
+// set up the studio (the handlers for its nine element kinds and the game's callbacks), load the
+// file's "GlobalScript" screen and show the first screen (start-up passes it two zero words).
+FrontEnd* fn_8009005C(char* szSet) {
+    s32 aArgs[2];
+    int i;
+
+    lbl_80281F19 = 0;
+    lbl_80281F1A = 1;
+    lbl_80281F1B = 0;
+    fn_8008EC60(szSet);
+    lbl_80281F1C = fn_80009B34(sizeof(FrontEnd), 2, 16, "uiProcessInterface.c", 904);
+    lbl_80281F1C->f18 = 0.0f;
+    lbl_80281F1C->pFile = fn_8008F0C0(szSet);
+    lbl_80281F1C->p8 = fn_8008F0F0(szSet);
+    lbl_80281F1C->pC = fn_8008F15C(szSet);
+    lbl_80281F1C->p10 = fn_8008F18C(szSet);
+    fn_8009349C();
+    lbl_801D87C0.a2C[0] = 0;
+    lbl_801D87C0.a2C[1] = 0;
+    lbl_801D87C0.a2C[2] = 0;
+    lbl_801D87C0.a2C[3] = 0;
+    lbl_801D87C0.b0 = 0;
+    lbl_801D87C0.fFade = 0.0f;
+    lbl_801D880C.n4 = 0;
+    lbl_801D880C.n0 = -1;
+    fn_8008F488(lbl_80281F1C);
+    fn_8008FE88(lbl_80281F1C);
+    fn_8008FDDC(lbl_80281F1C);
+    lbl_80281F1C->pHandler = fn_80009B34(fn_80169D90(10, 9, 256, 2, 2048, 128), 2, 16,
+                                         "uiProcessInterface.c", 943);
+    fn_80169C0C(lbl_80281F1C->pHandler, 10, 9, 256, 2, 2048, 128, 16);
+    fn_80169B0C(lbl_80281F1C->pHandler, 0, (UISHandlerFn)fn_800914DC);
+    fn_80169B0C(lbl_80281F1C->pHandler, 1, fn_800908BC);
+    fn_80169B0C(lbl_80281F1C->pHandler, 2, fn_800908C0);
+    fn_80169B0C(lbl_80281F1C->pHandler, 3, fn_800908C4);
+    fn_80169B0C(lbl_80281F1C->pHandler, 4, fn_800908C8);
+    fn_80169B0C(lbl_80281F1C->pHandler, 5, fn_800908CC);
+    fn_80169B0C(lbl_80281F1C->pHandler, 6, fn_800908D0);
+    fn_80169B0C(lbl_80281F1C->pHandler, 7, (UISHandlerFn)fn_800929E4);
+    fn_80169B0C(lbl_80281F1C->pHandler, 8, (UISHandlerFn)fn_80103684);
+    fn_80169B30(lbl_80281F1C->pHandler, fn_8008F610, fn_8008F644);
+    fn_80169B28(lbl_80281F1C->pHandler, (UISTransformFn)fn_80093280);
+    fn_80169B44(lbl_80281F1C->pHandler, fn_8008F568);
+    // fake match: the original compares the count signed here (cmpw), unsigned in fn_8008F610
+    for (i = 0; i < (s32)lbl_80281F1C->pFile->p4->nCount; i++) {
+        if (strcmp(lbl_80281F1C->pFile->p4->aPairs[i].p0, "GlobalScript") == 0) {
+            fn_80169520(lbl_80281F1C->pHandler, lbl_80281F1C->pFile->p4->aPairs[i].p4);
+            break;
+        }
+    }
+    if (gSession.nGameType != 1) {
+        fn_801694A0(lbl_80281F1C->pHandler, 0, 0, 0, NULL);
+    } else {
+        aArgs[0] = 0;
+        aArgs[1] = 0;
+        fn_801694A0(lbl_80281F1C->pHandler, 0, 0, 2, aArgs);
+    }
+    if (gSession.nGameType == 3) {
+        fn_8008D8F4();
+    }
+    fn_80168F5C(lbl_80281F1C->pHandler, 0, 0);
+    fn_80169B3C(lbl_80281F1C->pHandler, fn_80090894);
+    fn_80165C6C(fn_80090890);
+    return lbl_80281F1C;
 }
 
 // Shut the front end down: in game type 1 with no nC, fe_movies.c's fn_80091EE8; in game type 3,
@@ -379,32 +575,35 @@ void fn_800907AC(int nValue, char* szOut) {
     sprintf(szOut, aBuf);       // EA: the result is used as a format; it holds only digits, '-' and ','
 }
 
-void fn_80090890(void) {
+// The studio's report callback (UISReportFn): the retail game prints nothing.
+void fn_80090890(s32 nLevel, const char* szFile, s32 nLine, const char* szMsg) {
 }
 
-void fn_80090894(void) {
+// The studio's UISScreenDataFn: nothing to do.
+void fn_80090894(u16 uGroup, u16 uScreen, s32 n) {
 }
 
 void fn_80090898(void) {
     fn_8008FE88(lbl_80281F1C);
 }
 
-void fn_800908BC(void) {
+// The studio's handlers 1 to 6 (fn_8009005C): those element kinds take no messages.
+void fn_800908BC(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4) {
 }
 
-void fn_800908C0(void) {
+void fn_800908C0(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4) {
 }
 
-void fn_800908C4(void) {
+void fn_800908C4(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4) {
 }
 
-void fn_800908C8(void) {
+void fn_800908C8(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4) {
 }
 
-void fn_800908CC(void) {
+void fn_800908CC(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4) {
 }
 
-void fn_800908D0(void) {
+void fn_800908D0(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4) {
 }
 
 // ---- sweep code (not yet cleaned up) ----

@@ -41,4 +41,10 @@ typedef struct GameAudioSource {
     u32  nKind;                 // 0x24   passed on to fn_800AD280; 0, 3 and 5 play as a stereo pair
 } GameAudioSource;
 
+// GameAudio.c's music calls the menus make too (FE_MessageTable.c fn_80084BE8).
+void fn_800A44A0(void);                 // start what lbl_8028203C says to play
+void fn_800A754C(u8 a, u16 b);
+u8   fn_800A75F4(void);
+void fn_800A7944(void);
+
 #endif

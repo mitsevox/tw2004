@@ -25,7 +25,7 @@
 typedef struct MCCardState {
     u32  uFlags;                // 0x00  MC_CARD_* below
     s32  nFreeBlocks;           // 0x04  free space, in whole sectors (CARDFreeBlocks' bytes, rounded up)
-    u8   unk8[0x10 - 0x8];
+    u32  a8[2];                 // 0x08  a bit array (FE_MessageTable fn_8007EA14 tests a bit)
     char aszName[4][0x1D];      // 0x10  four names the menus show (FE_MessageTable fn_8007C3C8)
     s32  nFreeFiles;           // 0x84  free directory entries (CARDFreeBlocks)
     s32  nSectorSize;           // 0x88  CARDProbeEx

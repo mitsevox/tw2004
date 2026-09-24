@@ -44,13 +44,29 @@ LAYOUT_ASSERT(SkinLink, 0x10);
 typedef struct SkinDesc14 {
     u64  uId;                   // 0x00
     u32  u08;                   // 0x08  bit 2: take a4 from SkinDesc.pB8
-    u8   unkC[0x16 - 0xC];
+    u32  u0C;                   // 0x0C
+    u32  u10;                   // 0x10
+    s16  n14;                   // 0x14
     s16  n16;                   // 0x16  entries of pB8 from n1C
     s32  n18;                   // 0x18  an entry of SkinDesc.p8C, -1 none
     s32  n1C;                   // 0x1C
     u32  a20[4];                // 0x20
 } SkinDesc14;
 LAYOUT_ASSERT(SkinDesc14, 0x30);
+
+// A SkinDesc14 as version 8 descriptions with n04 == 0 store it (our name): fn_800368FC moves
+// u14 to SkinDesc14.u10 and narrows n10 and n18 into n14 and n16.
+typedef struct SkinDesc14Old {
+    u64  uId;                   // 0x00
+    u32  u08;                   // 0x08
+    u32  u0C;                   // 0x0C
+    s32  n10;                   // 0x10  -> SkinDesc14.n14
+    u32  u14;                   // 0x14  -> SkinDesc14.u10
+    s32  n18;                   // 0x18  -> SkinDesc14.n16
+    s32  n1C;                   // 0x1C
+    u32  a20[4];                // 0x20
+} SkinDesc14Old;
+LAYOUT_ASSERT(SkinDesc14Old, 0x30);
 
 typedef struct SkinMeshBit {
     u8   unk0[6];
@@ -208,19 +224,31 @@ LAYOUT_ASSERT(SkinModel44, 0x10);
 
 // An entry of SkinModel.p54, one per bit of Skin.p10CC; SkinBurn.c moves them (fn_801272B4).
 typedef struct SkinModel54 {
-    u8   unk0[0x14];
+    s16  nBones;                // 0x00  entries used in aBones and afWeights (fn_8003662C)
+    s16  aBones[3];             // 0x02  matrices of Skin.p108C its matrix is blended from
+    f32  afWeights[3];          // 0x08  and their weights
 } SkinModel54;
 LAYOUT_ASSERT(SkinModel54, 0x14);
 
 // What Skin.pModel points at; only what SkinPart.c and SkinBurn.c read.
 typedef struct SkinModel {
-    u8   unk0[8];
+    s32  n00;                   // 0x00  4: the file carries a SkinDesc at pDesc (fn_800377FC)
+    s32  n04;                   // 0x04
     s32  n08;                   // 0x08  its size with all its arrays once burnt (fn_801276E4)
     s32  n0C;                   // 0x0C  entries in p3C
     u8   unk10[4];
     s32  n14;                   // 0x14  how many matrices Skin.p108C holds (fn_80018710); also
                                 //       the 0x20-byte entries in p34
-    u8   unk18[0x34 - 0x18];
+    s16  n18;                   // 0x18  } -1 in a model fn_800364AC makes up
+    s16  n1A;                   // 0x1A  }
+    s16  n1C;                   // 0x1C  }
+    s16  n1E;                   // 0x1E  }
+    s32  n20;                   // 0x20  }
+    s32  n24;                   // 0x24  }
+    s32  n28;                   // 0x28  }
+    s32  n2C;                   // 0x2C  }
+    u32  u30;                   // 0x30  0x40000002 both set: already byte-swapped (fn_800377FC);
+                                //       0x80000000: offsets made pointers (fn_800364AC)
     void* p34;                  // 0x34  handed to the character's model (fn_80029A74)
     void* p38;                  // 0x38  one 0x50-byte block
     void* p3C;                  // 0x3C  n0C 0x50-byte blocks
@@ -279,9 +307,10 @@ typedef struct Skin {
                                 //         matrix (fn_800184E4: bones 0x3A, 0x48, 0x39, 0x47)
     f32  (*p1088)[4][4];        // 0x1088  } matrices fn_80018710 hands the model (fn_80029A88,
     f32  (*p108C)[4][4];        // 0x108C  } fn_80029A7C)
-    u8   unk1090[0x1098 - 0x1090];
+    struct HwsMemBlock* p1090;  // 0x1090  freed by fn_80037708
+    u8   unk1094[0x1098 - 0x1094];
     struct HwsMemBlock* a1098[2];   // 0x1098  indexed like a10A0 (fn_8011CB5C)
-    void* a10A0[2];             // 0x10A0  indexed by fn_800CE02C's argument; Skin.c sets [0]
+    struct HwsOverrideTable* a10A0[2];  // 0x10A0  indexed by fn_800CE02C's argument; Skin.c sets [0]
     SkinChoice* aParts[4];      // 0x10A8  a choice per part, four copies (fn_800CEE04 copies one
                                 //         over another); [3] is set while lbl_80282238 is clear
     SkinChoice* aSets[4];       // 0x10B8  the same per SkinDesc.p74 set
@@ -292,7 +321,9 @@ typedef struct Skin {
                                 //         tested by fn_80037708
     f32  f10D8;                 // 0x10D8  from the CHR object's header (fn_8001A9F4)
     f32  f10DC;                 // 0x10DC  1 when loaded
+    u8   unk10E0[4];
 } Skin;
+LAYOUT_ASSERT(Skin, 0x10E4);    // fn_800377FC allocates and clears one
 
 // hwsOverride_Gc.c (our names): a block of memory handed out in pieces (fn_80112938), sized for
 // a SkinDesc's meshes of flag 0x100000 (fn_80112848).
@@ -570,7 +601,26 @@ extern s32        lbl_80280E20;         // set to 6 (4 in split screen) by fn_80
 extern CharSkinSet* lbl_80280E24[2];   // what fn_8001B208 makes of the 'CLB ' object: one, or one per
                                         // view in split screen (Character.p16D8; fn_8001B58C frees them)
 
-void  fn_80037CD8(void* pSkin);         // Skin.c: frees a skin
+void  fn_80037CD8(Skin* pSkin);         // Skin.c: frees a skin
+s32   fn_80037708(Skin* pSkin);         // Skin.c: frees what loading it allocated
+s32   fn_800375AC(Skin* pSkin, u8 b);   // Skin.c: allocates it
+Skin* fn_800377FC(u8* pData, u8 b);     // Skin.c: makes a skin from its file
+// Skin.c's triangles (lbl_801D4E78, 0xF0 bytes; our name, layout from fn_80035D10): per view a
+// mesh object and three vertices' positions, texture coordinates, colours and indexes.
+typedef struct SkinTris {
+    u8   aMesh[2][0x28];        // 0x00  (fn_80035C58 sets them up with fn_80036054, fn_80035CC0 frees them)
+    f32  aPos[2][3][3];         // 0x50
+    f32  aUV[2][3][2];          // 0x98
+    u8   aColor[2][3][4];       // 0xC8
+    u16  aIndex[2][3];          // 0xE0
+    u8   unkEC[4];
+} SkinTris;
+LAYOUT_ASSERT(SkinTris, 0xF0);
+extern SkinTris lbl_801D4E78;
+
+extern void* lbl_80281D70;              // } Skin.c; fn_80036464 frees lbl_80281D70 and clears all
+extern s32   lbl_80281D74;              // } three
+extern s32   lbl_80281D78;              // }
 
 // SkinPart.c, as FE_CrAPDB.c uses it: find a part (or set) by id, a variant by id or name, and
 // pick a part's (or set's) variant.
@@ -601,7 +651,11 @@ void  fn_800CEBE8(Skin** apSkins, int nSkins, struct DynTex* pTex, u64* aIds, in
 void  fn_800CECE0(Skin* pSkin, int nSet, int nVariant, int nOption, struct DynTex* pTex);
 u8    fn_800CEE90(void);
 
-// SkinPart.c, as SkinBurn.c uses it: the mesh iterator and an entry's copy.
+// SkinPart.c, as SkinBurn.c uses it: the part count, a part's variant and option, the mesh
+// iterator and an entry's copy.
+s32   fn_800CCA40(Skin* pSkin);
+s32   fn_800CCD30(Skin* pSkin, int nPart, int nCopy);
+s32   fn_800CCD84(Skin* pSkin, int nPart, int nCopy);
 void  fn_800CD9EC(Skin* pSkin);
 s32   fn_800CE224(Skin* pSkin, SkinDesc14* pEntry, u8** ppOut, s32* pnOut, int nCopy);
 u8    fn_800CEEC0(SkinIter* pIter);
@@ -613,8 +667,20 @@ void  fn_80113BAC(SkinIter* pIter);
 SkinIter* fn_80113910(u8* pBuf, SkinIterArgs* pArgs);   // hwsRender_Gc.c: another mesh iterator
 void  fn_80113A7C(SkinIter* pIter);     // and its end
 
+// SkinPart.c, as Skin.c uses it.
+u64   fn_800CCDDC(Skin* pSkin, int nPart);
+void  fn_800CD56C(Skin* pSkin);
+s32   fn_800CDB70(Skin* pSkin, const char* pName);
+void  fn_800CE02C(Skin* pSkin, int n);
+void  fn_800CE0B0(Skin* pSkin, int nPart);
+void  fn_800CE128(Skin* pSkin);
+void  fn_800CE168(void);
+
 // SkinMorph.c: the morph targets a skin description needs.
 s32   fn_8011C850(SkinDesc* pDesc);
+void  fn_8011CADC(Skin* pSkin, int nMorph, f32 fWeight);
+void  fn_8011CC40(Skin* pSkin, HwsMemBlock** ppBlock, HwsOverrideTable** ppTable);
+void  fn_8011CD84(Skin* pSkin);
 void  fn_8011CD3C(Skin* pSkin, HwsMemBlock* pBlock, HwsOverrideTable* pTable);
 
 // hwsOverride_Gc.c: a mesh table and a memory block for a skin description's morphed meshes.
@@ -626,7 +692,13 @@ void* fn_80112A80(HwsMemBlock* pBlock, HwsOverrideTable* pTable, int i, u8 bKeep
 
 // hwsBurn.c: pfn is called with pSkin on each SkinDesc.p14 entry the burn copies; fn_80111EB0
 // makes the burnt skin's description.
+HwsBurn* fn_801104AC(SkinDesc* pDesc);
+void  fn_801108B0(HwsBurn* pBurn);
 void  fn_801109F0(HwsBurn* pBurn, void (*pfn)(Skin* pSkin, SkinDesc14* pEntry), Skin* pSkin);
+void  fn_801109FC(HwsBurn* pBurn, int nPart, s32 nVariant);
+void  fn_80110A0C(HwsBurn* pBurn, int nPart, s32 nOption);
+void  fn_80110A1C(HwsBurn* pBurn, HwsOverrideTable* pOverride);
+void  fn_80110A24(HwsBurn* pBurn, int n);
 SkinDesc* fn_80111EB0(HwsBurn* pBurn);
 
 // SkinBurn.c: burns a skin (aParts and aList each end with -1).

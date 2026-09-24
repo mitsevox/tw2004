@@ -28,8 +28,6 @@ void fn_80092F00(UITransform* p, f32 fAngle);
 
 void         fn_80092F8C(UITransformDesc* p);
 f32*         fn_80093268(void);
-void         fn_80093280(int nOp, UITransformDesc* p);
-void         fn_8009349C(void);
 void         fn_800934F8(void);
 
 // fake match: stands in for a function the original linker stripped. The file's pool starts with

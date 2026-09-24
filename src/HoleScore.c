@@ -612,8 +612,10 @@ f32 fn_800D0550(int nPlayer) {
 f32 fn_800D05A4(f32* pPos) {
     f32 vDiff[3];
     CourseInfo* pCourse = fn_8000C594();
+    int nPin;
     if (pCourse == NULL) return 0.0f;
-    fn_800D1674(pPos, &pCourse->pin[Game_CurrentPinSet()].x, vDiff);
+    nPin = Game_CurrentPinSet();
+    fn_800D1674(pPos, &pCourse->pin[nPin].x, vDiff);
     vDiff[1] = 0.0f;
     return fn_80009680(fn_80009744(vDiff));
 }

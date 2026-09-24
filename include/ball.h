@@ -223,9 +223,20 @@ typedef struct TNetNode {
     u8   unkC[4];
     s16  nLink10;               // 0x10  } the two neighbouring nodes
     s16  nLink12;               // 0x12  }
-    u8   unk14[0x30 - 0x14];
+    s16  a14[8];                // 0x14  more node indexes (-1: none); fn_8006A7A8 clears those
+                                //       naming the node itself
+    u8   unk24[0x30 - 0x24];
 } TNetNode;
 LAYOUT_ASSERT(TNetNode, 0x30);
+
+// The placement outline's nodes (target.c fn_8006A7A8 fills pNode; lbl_80281E44 counts them).
+// Only what the cleaned code reads; the table's full size (0x2AC) is not a whole number of these.
+typedef struct TPlaceNode {
+    TNetNode* pNode;            // 0x0
+    u8   unk4[4];
+} TPlaceNode;
+extern TPlaceNode lbl_801D5CCC[85];
+extern s32 lbl_80281E44;
 
 // A closed outline on the course (TW06: TNetwork, 0x14 bytes there): the free-drop areas and the
 // in-bounds outlines, from the hole's 'Cnet' stream objects (TerrainData.c). The nodes follow
@@ -315,6 +326,8 @@ f32  fn_8004D620(CourseInfo* pCourse, f32* pPos);   // ground height, -60000 and
 f32  fn_8004D650(CourseInfo* pCourse, f32* pPos, f32* pNormal);   // covering ground height and normal
 SurfaceType* Ter_GetSupportingWorldMaterial(CourseInfo* pCourse, f32* pPos);   // the surface under a point
 f32  Ter_GetSupportingGroundData(CourseInfo* pCourse, f32* pPos, SurfaceType** ppSurface, f32* pNormal);
+// The same with objects included (TW06: Ter_GetSupportingWorldData); GoTerrainCollision.c.
+f32  fn_8004DBB0(CourseInfo* pCourse, f32* pPos, SurfaceType** ppSurface, f32* pNormal);
 void Ter_GetEnclosingGroundHeight(CourseInfo* pCourse, f32* pPos, f32* pLow, f32* pHigh);
 void Ter_GetEnclosingGroundData(CourseInfo* pCourse, f32* pPos, f32* pLow, SurfaceType** ppSurfaceLow,
                                 f32* pNormalLow, f32* pHigh, SurfaceType** ppSurfaceHigh, f32* pNormalHigh);
@@ -361,6 +374,8 @@ void fn_80055D70(f32* pA, f32* pB, f32 fSin, f32 fCos);   // turns the pair (*pA
 
 void fn_80047B6C(Ball* pBall, int nPlayer);
 void fn_80047BC0(Ball* pBall, int nPlayer);
-void fn_800A30E4(int nKind, Ball* pBall, int nPlayer, int a, f32 f);   // an effect at the ball (the target games)
+// An effect at the ball (the target games): PsBallFx.c starts effect nKind's emitters whose
+// threshold fValue reaches, pointing along the ball's flight (bFlight) or the player's aim.
+void fn_800A30E4(int nKind, Ball* pBall, int nPlayer, u8 bFlight, f32 fValue);
 
 #endif
