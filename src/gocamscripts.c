@@ -52,6 +52,7 @@ f32  fn_80044F58(int nPlayer, CamScript* pScript);
 CamLens* fn_8001F004(void);             // the current camera's lens
 f32  fn_8001EFFC(u8* pLens);            // the lens's fB0 (char.c: its parameter is u8*)
 f32  fn_80014278(u8* pLens);            // the lens's field of view (GoRenderCtx_Gc.c: u8*)
+u8   fn_8004561C(void);
 void fn_80038010(u8 a, int n, f32* pVec);
 void fn_800386F0(int n, f32* pVec);
 f32  fn_8003F194(CamShot* pShot, f32 fA, f32 fB, f32 fTime);
@@ -2050,6 +2051,33 @@ u8 CameraScript_WillGolferBeOccludedInThisView(int nPlayer, CamShot* pShot, CamS
     return Ter_CheckForGroundCollision(pCourse, vCam, vGolfer, vHit, vNormal, &pSurface, &pObj) != 0;
 }
 
+// Whether a pShot of fn_8003DC78's kinds must be passed over (1) for the player: always for a CPU
+// player, a current shot outside fn_8004562C's kinds, b10, a ball coming down below 5, one that
+// has bounced or is within 40 yards of the pin; a tee shot unless it is a full (0.9) kind-1 shot at
+// a par 4 or 5 with a club below 9 aimed at surface 14; otherwise unless GameBreaker is on or the
+// aim is at water (16). Never without a club (25).
+u8 fn_800451A8(CamScript* pScript, CamShot* pShot, int nPlayer) {
+    if (!fn_8003DC78(pShot)) return 0;
+    if (gPlayers[nPlayer].nClub == 25) return 0;
+    if (Player_IsCPU(nPlayer)) return 1;
+    if (pScript->pShot != NULL && !fn_8004562C(pScript->pShot)) return 1;
+    if (fn_8004561C()) return 1;
+    if (gPlayers[nPlayer].ball.fHeight < 5.0f && gPlayers[nPlayer].ball.vVel[1] < 0.0f) return 1;
+    if (gPlayers[nPlayer].ball.b99) return 1;
+    if (gPlayers[nPlayer].ball.nCollideCount > 0) return 1;
+    if (fn_800D0478(nPlayer) < 40.0f) return 1;
+    if (gPlayers[nPlayer].ball.nLie == 0) {
+        if (fn_800D2AD8(fn_80015464()) != 4 && fn_800D2AD8(fn_80015464()) != 5) return 1;
+        if (gPlayers[nPlayer].nShotKind != 1) return 1;
+        if (gPlayers[nPlayer].nSurface != 14) return 1;
+        if (gPlayers[nPlayer].nClub >= 9) return 1;
+        if (gPlayers[nPlayer].fPower < 0.9f) return 1;
+    } else if (!fn_8004560C() && gPlayers[nPlayer].nSurface != 16) {
+        return 1;
+    }
+    return 0;
+}
+
 u8 fn_800453C8(int nPlayer, CamShot* pShot) {
     if (gSession.nGameType == 3) {
         return 0;
@@ -2138,8 +2166,6 @@ void fn_80045558(u8 bOn, int nPlayer) {
 }
 
 // ---- sweep code (not yet cleaned up) ----
-
-u8 fn_8004561C(void);
 
 u8 fn_8004560C(void) {
     return lbl_80202898.bGameBreaker;
