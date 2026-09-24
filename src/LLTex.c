@@ -339,8 +339,8 @@ int fn_8000EA1C(u8* pCode, int nArg, int nPush, DynObj* pObj) {
     return lbl_801A3438[--nSp];
 }
 
-// Resets the constant-alpha flag and texture coordinates 0-2 for a frame: each stage's constant
-// alpha selector 0x1C and each coordinate from texture coordinate 0 through matrix 0x3C.
+// Resets the constant-alpha flag, TEV stages 0-2's constant alpha selector (0x1C) and texture
+// coordinates 0-2 (from texture coordinate 0 through matrix 0x3C).
 void fn_8000F060(void) {
     *lbl_80280DC8 = 0;
     GXSetTevKAlphaSel(0, 0x1C);

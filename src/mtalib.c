@@ -1,6 +1,6 @@
 // mtalib.c (EA's name, from its asserts; also in EA's 2002 source tree): animation helpers, and
 // the 'MAL ' banks loaded from the stream files (two slots, lbl_80281CB4): groups of items that the
-// animation code picks from at random. Only part of it is decompiled.
+// animation code picks from at random.
 
 #include "charstate.h"
 

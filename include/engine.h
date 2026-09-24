@@ -16,10 +16,10 @@ void* Mem_cpy(void* pDst, const void* pSrc, u32 uLen);    // returns pDst
 void* fn_80005884(void* pDst, const void* pSrc, u32 uLen); // a copy the ranges may overlap in
 void* fn_80005AE8(void* pDst, int nValue, u32 uLen);      // memset; returns pDst
 int   fn_80005BC8(const void* pA, const void* pB, u32 uLen);   // memcmp
-// Allocates from the static heap (StaticMemory.c); nMode picks where (see there).
+// Allocates (StaticMemory.c): nMode picks the system heap or a part of the static heap (see there).
 void* fn_80009B34(int nSize, int nMode, int nAlign, const char* pFile, int nLine);
 void  fn_80009E70(void* p);             // free
-void  fn_8000A0AC(s32 v);               // } a value callers pass on as fn_80009B34's uFlags
+void  fn_8000A0AC(s32 v);               // } a value TibExtMemAlloc passes on as fn_80009B34's nMode
 s32   fn_8000A0B4(void);                // } (EASportsBio.c sets 0 while the Bio starts, then 2)
 void  fn_8000A0BC(void);                // start a new count of the bytes taken
 void  fn_8000A0C8(void);                // } counting on / off
@@ -332,7 +332,7 @@ extern LoadObjInfo lbl_801A25F0;
 extern u8* lbl_80281C04;                // the 'load' object's data (147700 bytes)
 extern struct UStreamObject* lbl_80281C0C;   // LoadData.c: a copy of the 'txf2' object with id 10000
 
-void fn_80014544(int n);                // load the numbered stream file (sprintf'd name)
+void fn_80014544(int n);                // add loading file n to stream list 2 (sprintf'd name)
 void fn_800147A4(void);                 // streammanagerhole.c
 void fn_80014DFC(s32 nChar, s32 nUnused);   // streammanagerhole.c: stream list 3 = one FEChars file
 // streammanagerhole.c: a flag byte fn_8001618C sets; while it is set, the shader objects' untextured
@@ -1070,8 +1070,8 @@ void fn_8000B830(UStreamObject* pObject);   // free an object
 // Files on disc: a handle from open, -1 for none.
 int  fn_800060E0(const char* pName);    // file open
 int  fn_8000633C(int hFile);            // file close
-// Reads uLen bytes at uOffset into pDst without waiting; pfnDone is called when it is done. Below
-// 0: the read could not be queued.
+// Reads uLen bytes at uOffset into pDst without waiting; pfnDone is called when it is done.
+// Returns 0, even when no request was free and the read was dropped.
 int  fn_80006444(int hFile, void* pDst, u32 uLen, u32 uOffset, void (*pfnDone)(int nBytes, int nError));
 u32  fn_800065B0(int hFile);            // file size
 // LLFileIO_Gc.c: read a whole file into a new block aligned to nAlign; its size goes to *puSize.

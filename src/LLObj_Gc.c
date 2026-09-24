@@ -264,7 +264,8 @@ int fn_80007CE8(RenderObj* obj, Camera* cam, int mode, float scale) {
 }
 
 // Sphere vs view frustum test. The sphere is already in camera space.
-// Returns 1 = fully visible, 2 = not visible, 4 = touching a side edge, 8 = touching the near limit.
+// Returns 1 = fully visible, 2 = not visible, 4 = touching a side edge, 8 = touching the near limit;
+// an orthographic camera gives only 2 or 4 (in view).
 int fn_80007D74(Sphere* s, Camera* cam, int mode) {
     float a, b, c, d;
     float px, pz, dist;
