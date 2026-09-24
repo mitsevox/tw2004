@@ -977,13 +977,12 @@ void Ball_FlightStep(Ball* pBall, f32 fTicks) {
     fSpeed2 = fn_80009744(vRel);
     fSpeed  = fn_80009680(fSpeed2);
     fSpin   = fn_80009680(fn_80009744(pBall->vSpin));
+    fDrag = 0.0f;
     if (fSpeed != 0.0f) {
         fDrag = 0.000780952396f * fSpeed;
         fDrag = -(fSpeed2 * (0.000474568689f
                              * (0.225790471f + (fSpin * (-0.000348685688f * fSpeed + 0.0168940704f) + fDrag)))
                   / fSpeed);
-    } else {
-        fDrag = 0.0f;
     }
     fn_8001EF34(vRel, fDrag, vDrag);
     fLift = -0.000201047602f * fSpeed;
