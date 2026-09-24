@@ -934,6 +934,7 @@ config.libs = [
             Object(Matching, "Code80090940.c"),
             Object(Matching, "fe_movies.c"),
             Object(Matching, "uiTransform.c"),
+            Object(Matching, "GoLightFogEnv.c"),
             Object(NonMatching, "goballfx.c"),
             Object(Matching, "GoObjShadow.c"),
             Object(NonMatching, "GoShaderObject_Particle_Gc.c"),
