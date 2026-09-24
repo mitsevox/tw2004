@@ -1015,7 +1015,7 @@ config.libs = [
             Object(Matching, "hwsMaterial_Gc.c"),
             Object(Matching, "hwsOverride_Gc.c"),
             Object(NonMatching, "hwsRender_Gc.c"),
-            Object(NonMatching, "DynChain.c"),
+            Object(Matching, "DynChain.c"),
             Object(Matching, "GameModeDriver.c"),
             Object(NonMatching, "PGATourSimulation.c"),
             Object(Matching, "SkinMorph.c"),

@@ -904,6 +904,9 @@ hwsRender_Gc.c:
 
 DynChain.c:
 	.text       start:0x80113E60 end:0x80116540
+	.data       start:0x80193DE8 end:0x80193E70
+	.sbss       start:0x802824F8 end:0x80282500
+	.sdata2     start:0x802848E8 end:0x802849C0
 
 GameModeDriver.c:
 	.text       start:0x80116540 end:0x80117600

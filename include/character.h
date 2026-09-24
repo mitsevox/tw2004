@@ -257,10 +257,6 @@ typedef struct DynChainSettings {
 } DynChainSettings;
 LAYOUT_ASSERT(DynChainSettings, 0xC0);
 
-extern DynChainSettings* lbl_802824F8;
-extern f32 lbl_80193DE8[6][4];  // DynChain.c: a direction per chain kind, in the model's root space
-extern f32 lbl_80193E48[6];     // DynChain.c: an angle per chain kind, in degrees (fn_80115B2C)
-
 // Skeleton.c: a short string per bone id (the first is empty); the model loader (fn_80028564)
 // copies bone 0x54's first 8 bytes into each bone it adds as the bone's uId.
 extern char* lbl_80187278[90];
