@@ -28,6 +28,91 @@ u8 fn_800564AC(int n) {
     return fn_8001E9CC(lbl_801D5908, n);
 }
 
+// Resets the unlocks that hold for every profile: a new profile's, with every cheat bit cleared,
+// and no money, stats, awards or medals.
+void fn_80056B8C(void) {
+    int i;
+
+    fn_80057438(lbl_80281DF4);
+    fn_8001E938(lbl_801D5948, 7);
+    fn_8001E938(lbl_801D5908, 16);
+    lbl_80281DF4->bActive = 0;
+    for (i = 0; i < 16; i++) {
+        lbl_80281DF4->aGolferUnlocked[lbl_801894E8[i]] = 1;
+    }
+    for (i = 0; i < 21; i++) {
+        lbl_80281DF4->aCourseUnlocked[i] = 1;
+    }
+    lbl_80281DF4->aCourseUnlocked[21] = 1;
+    lbl_80281DF4->aCourseUnlocked[22] = 1;
+    for (i = 0; i < 6; i++) {
+        lbl_80281DF4->aCourseUnlocked[lbl_801894D0[i]] = 0;
+    }
+    lbl_80281DF4->aCourseUnlocked[21] = 1;
+    lbl_80281DF4->aCourseUnlocked[22] = 1;
+    for (i = 0; i < 18; i++) {
+        lbl_80281DF4->aRewardUnlocked[i] = 0;
+    }
+    lbl_80281DF4->aRewardUnlocked[0] = 1;
+
+    lbl_80281DF4->n64 = 0;
+    lbl_80281DF4->n6C = 0;
+    lbl_80281DF4->n74 = 0;
+    lbl_80281DF4->n78 = 0;
+    lbl_80281DF4->n7C = 0;
+    lbl_80281DF4->n80 = 0;
+    lbl_80281DF4->n84 = 0;
+    lbl_80281DF4->n88 = 0;
+    lbl_80281DF4->n8C = 0;
+    lbl_80281DF4->n90 = 0;
+    lbl_80281DF4->n94 = 0;
+    lbl_80281DF4->n98 = 0;
+    lbl_80281DF4->n9C = 0;
+    lbl_80281DF4->nA0 = 0;
+    lbl_80281DF4->nA4 = 0;
+    lbl_80281DF4->nA8 = 0;
+    lbl_80281DF4->b70 = 0;
+    for (i = 0; i < 25; i++) {
+        lbl_80281DF4->aLadderAward[i].bWon = 0;
+    }
+    for (i = 0; i < 31; i++) {
+        lbl_80281DF4->aC8[i].award.bWon = 0;
+    }
+    for (i = 0; i < 16; i++) {
+        lbl_80281DF4->a1C0[i].bWon = 0;
+    }
+    for (i = 0; i < 3; i++) {
+        lbl_80281DF4->a200[i].bWon = 0;
+    }
+    // EA bug: runs past the 75 awards, as in fn_80057438.
+    for (i = 0; i < 118; i++) {
+        lbl_80281DF4->aRTEAward[i].bWon = 0;
+    }
+    for (i = 0; i < 75; i++) {
+        fn_8005897C(lbl_80281DF4, 0, i, 0);
+    }
+    for (i = 0; i < 29; i++) {
+        lbl_80281DF4->aMedal[i] = 3;
+    }
+    lbl_80281DF4->n5168 = 3;
+
+    lbl_80281DF4->nAC = 0;
+    lbl_80281DF4->nB0 = 0;
+    lbl_80281DF4->nB4 = 0;
+    lbl_80281DF4->nB8 = 0;
+    lbl_80281DF4->nBC = 0;
+    lbl_80281DF4->nC0 = 0;
+    lbl_80281DF4->nC4 = 0;
+    for (i = 0; i < 39; i++) {
+        lbl_80281DF4->aAward[i].bWon = 0;
+    }
+    for (i = 0; i < 15; i++) {
+        lbl_80281DF4->aTipSeen[i] = 0;
+    }
+    lbl_80281DF4->b522F = 0;
+    lbl_80281DF4->nTourCardLevel = 0;
+}
+
 // Tests a typed code; if it is a cheat, sets what it unlocks and returns 1.
 u8 PasswordManager_TestPassword(char* szCode) {
     s32 aBit[5] = {1, 2, 3, 4, 5};
