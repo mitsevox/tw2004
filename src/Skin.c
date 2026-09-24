@@ -40,10 +40,8 @@ void  fn_80035F40(void* pCamera);
 void  fn_80036054(ShaderObject* pObj, int nRow, const void* pDesc);
 void  fn_800360A0(ShaderObject* pObj);
 void  fn_800360D4(ShaderObject* pObj);
-void  fn_80036100(ShaderObject* pObj, const void* pData, int n);
 void  fn_8003612C(LightGroup* pGroup);
 void  fn_8003614C(Character* pChar, f32* pOut);
-void  fn_80036180(SkelPose1* pA, SkelPose1* pB, SkelPose1* pOut, f32 fWeight);
 int   fn_80035A9C(void);
 void  fn_80035FBC(void);
 void  fn_80035FDC(UObject* pObj);
@@ -61,7 +59,6 @@ void  fn_800090A0(f32* pA, f32* pB, f32* pOut);                // Quaternion.c
 void  fn_800090E4(f32* pQuat, f32* pIn, f32* pOut);            // Quaternion.c: pIn turned by pQuat
 void  fn_8000914C(f32* pQ, f32 (*pMtx)[4]);                   // Quaternion.c: to a matrix
 void  fn_8000A798(f32 (*pSrc)[4], f32 (*pDst)[4]);            // UMemPool.c: inverts a matrix
-void  fn_80021980(u32* aA, u32* aB, u32* aOut, u32 nBits);   // Skeleton.c: aOut = aA | aB
 void  fn_80029EF4(u32* pSrc, u32* pDst, u32 nBits);          // Skeleton.c
 void  fn_80036278(SkinModel44* pEntries, s32 nEntries);
 void  fn_80036344(SkinModel44* pEntries, s32 nEntries);
