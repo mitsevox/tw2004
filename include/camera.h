@@ -153,8 +153,12 @@ typedef struct CamScript {
     u8   unkFC[0x100 - 0xFC];
     f32  f100;                  // 0x100
     f32  f104;                  // 0x104
+    f32  f108;                  // 0x108
+    f32  f10C;                  // 0x10C
+    s32  n110;                  // 0x110
+    s32  n114;                  // 0x114
 } CamScript;
-LAYOUT_ASSERT(CamScript, 0x108);
+LAYOUT_ASSERT(CamScript, 0x118);    // CameraScript_WillGolferBeOccludedInThisView copies 0x118 bytes
 
 // A view's camera controller (View_SetCamera is TW06's CameraController_SetCameraMode): the
 // camera mode, its shots and script. It sits at +4 in a ViewController; only the fields read so far.
@@ -179,10 +183,6 @@ typedef struct View {
     CamSequence* p7C;           // 0x07C  the swing camera's sequence, kept for the replay
     CamShot* p80;               // 0x080
     CamScript script;           // 0x084  the camera script the camera functions drive
-    f32      f18C;              // 0x18C
-    f32      f190;              // 0x190
-    s32      n194;              // 0x194
-    s32      n198;              // 0x198
     CamShot  shot19C;           // 0x19C  a shot built by hand (the knee, steep-slope and elevator cameras)
     s32      nSavedCamera;      // 0x25C
     s32      n260;              // 0x260  set by the swing camera and the game modes
