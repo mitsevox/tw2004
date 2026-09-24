@@ -65,7 +65,6 @@ extern void*       lbl_80281E54;        // the render camera made from the three
 extern void*       lbl_80281E58;        // } made by fn_80076ACC,
 extern GoFrameBuf* lbl_80281E5C;        // }   fn_8006E1C8
 extern void*       lbl_80281E60;        // }   and fn_80076400 when a game type starts
-extern s32   lbl_801888D0[4];           // the order the views are drawn in (0, 1, 2, 3)
 extern u8*   lbl_802811E8;              // [1]: the round is over (fn_8006DC34)
 
 // Replay.c

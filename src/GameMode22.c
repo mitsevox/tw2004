@@ -451,13 +451,14 @@ s32 fn_80126640(int n) {
 // how far it went), the longest shot kept, the score's tracks, the winner's message, or else a
 // comment picked at random from the ones the shot earned.
 void fn_80126698(int nPlayer) {
-    Player* pPlayer = &gPlayers[nPlayer];
     s32 nPoints;
     s32 nKind;
+    Player* pPlayer = &gPlayers[nPlayer];
     s32 nLength;
     u8 bCounts = 0;
     s32 nMsgs;
     u16 aMsgs[20];
+    s32 nScore;
 
     nMsgs = 0;
     pPlayer->nEA0++;
@@ -591,9 +592,10 @@ void fn_80126698(int nPlayer) {
         }
     }
     pPlayer->nEBC += nPoints;
-    if (pPlayer->nEBC < 0) {
-        pPlayer->nEBC = 0;
-    }
+    // The score never drops below 0.
+    nScore = pPlayer->nEBC;
+    nScore = (nScore <= 0) ? 0 : nScore;
+    pPlayer->nEBC = nScore;
     fn_800E5CA4(0, gPlayers[nPlayer].nEBC, nLength, nKind, 0, 0, nPoints, 0.0f);
 
     // A track the first time the score reaches 1200, 800 and 400.

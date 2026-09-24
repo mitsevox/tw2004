@@ -99,9 +99,9 @@ void fn_80117860(TourSeason* pTour) {
 // needs this prototype's s32 to match; only saved registers differ here.
 void fn_801178C8(s32 nPlayer, SeasonEvent* pEvent, int nRound, int n, int uFlags) {
     s32 nEntrants;
-    s32 nHole;
     int i;
     PgaEntrant* pEntrant;
+    s32 nHole;
 
     fn_80005AE8(&lbl_80223C70, 0, sizeof(lbl_80223C70));
     gbScoresDirty = 1;
@@ -1696,12 +1696,12 @@ s32 fn_8011BCFC(const void* pA, const void* pB) {
 // All entrants: a cut entrant sorts last, the winner first. 97.4%: only nPlayer and nEntrantA/nScoreB
 // swap saved registers (declaration orders, int/s32, an inline score helper and the permuter tried).
 s32 fn_8011BDF8(const void* pA, const void* pB) {
-    s32 nEntrantA = *(const s32*)pA;
+    s32 nScoreA;
     s32 nEntrantB = *(const s32*)pB;
     s32 nPlayer = lbl_80281848;
+    s32 nEntrantA = *(const s32*)pA;
     PgaEntrantMC* pEntrantA = GetEntrantMCPtr(nPlayer, nEntrantA);
     PgaEntrantMC* pEntrantB = GetEntrantMCPtr(nPlayer, nEntrantB);
-    s32 nScoreA;
     s32 nScoreB;
 
     nScoreA = fn_8011937C(nPlayer, nEntrantA, !fn_8011908C(nPlayer, nEntrantA));
