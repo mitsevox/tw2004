@@ -22,6 +22,8 @@ void fn_8011EF88(void);
 void fn_8011F374(void);
 void fn_8011F3AC(void);
 void fn_800082CC(void* p);
+void fn_8000827C(void* pObject, int n24, int nType, void* pArg);
+void fn_8011F544(int nX, int nZ, f32 f);
 void fn_8003519C(int nRow, void* pData);   // GoTerrain.c: calls row nRow's function with pData
 void fn_8011E974(void);
 void fn_8011EAB8(void);
@@ -303,7 +305,8 @@ void fn_8011EAB8(void) {
     fn_800137B0(lbl_80281900->pCamera);
 }
 
-// Points the grass lens straight down from f3B0 over vB0, offset by half its view size.
+// Points the grass lens straight down from f3B0 over the bounds' corner, offset by half its view
+// size.
 void fn_8011EB04(void) {
     f32 aEye[4];
     f32 aAt[4];
@@ -311,8 +314,8 @@ void fn_8011EB04(void) {
     f32 fZ;
 
     fn_8001F004();
-    fX = 0.5f * lbl_80281900->pLens->fB4 + lbl_80281900->vB0[0];
-    fZ = 0.5f * lbl_80281900->pLens->fB8 + lbl_80281900->vB0[2];
+    fX = 0.5f * lbl_80281900->pLens->fB4 + lbl_80281900->fMinX;
+    fZ = 0.5f * lbl_80281900->pLens->fB8 + lbl_80281900->fMinZ;
     aEye[0] = fX;
     aEye[1] = lbl_80281900->f3B0;
     aEye[2] = fZ;
@@ -473,6 +476,72 @@ void fn_8011F3AC(void) {
             fn_8003519C(17, &lbl_80281900->f348);
             fn_800082CC(pBuffer->a14);
         }
+    }
+}
+
+// Places the grass of grid cell (nX, nZ) in the list being built: the buffer already made for that
+// spot in the other list is reused, else a free one is built from the cell's file record. The
+// placed buffers' bounds grow to take it in.
+void fn_8011F544(int nX, int nZ, f32 f) {
+    GrassBufferDesc desc;
+    int i;
+    u8 bFound;
+    GrassBuffer* pOld;
+    f32 fX;
+    f32 fZ;
+    GrassBuffer* pBuffer;
+    s32 nCur;
+    int nTile;
+
+    fX = 2.5f * (f32)nX + (f32)lbl_80281900->n14;
+    fZ = 2.5f * (f32)nZ + (f32)lbl_80281900->n16;
+    nTile = lbl_80281900->p8[nX + nZ * lbl_80281900->n18];
+    nCur = lbl_80281900->n100;
+    bFound = 0;
+    for (i = 0; i < lbl_80281900->anF8[1 - nCur] && !bFound; i++) {
+        pOld = lbl_80281900->apF0[1 - nCur][i];
+        if (fX == pOld->f0 && fZ == pOld->f4) {
+            pBuffer = pOld;
+            bFound = 1;
+        }
+    }
+    if (!bFound) {
+        pBuffer = fn_8011FDEC((lbl_80281900->pC[nTile].n0 * 32 + 0x580) / 16);
+        if (pBuffer == NULL) {
+            return;
+        }
+        pBuffer->f0 = fX;
+        pBuffer->f4 = fZ;
+        pBuffer->p48 = &lbl_80281900->pC[nTile];
+        desc.pTile = pBuffer->p48;
+        desc.pVerts = pBuffer->p40;
+        desc.nVerts = pBuffer->n44;
+        desc.fX = pBuffer->f0;
+        desc.fZ = pBuffer->f4;
+        desc.f14 = lbl_80281900->f3B8;
+        fn_8000827C(pBuffer->a14, 0, 17, &desc);
+    }
+    pBuffer->b10 = 1;
+    pBuffer->f8 = f;
+    pBuffer->nC = 1;
+    if (pBuffer->nC == 1) {
+        lbl_80281900->n404++;
+    } else {
+        lbl_80281900->n408++;
+    }
+    lbl_80281900->apF0[nCur][lbl_80281900->anF8[nCur]] = pBuffer;
+    lbl_80281900->anF8[nCur]++;
+    if (pBuffer->f0 < lbl_80281900->fMinX) {
+        lbl_80281900->fMinX = pBuffer->f0;
+    }
+    if (pBuffer->f0 > lbl_80281900->fMaxX) {
+        lbl_80281900->fMaxX = pBuffer->f0;
+    }
+    if (pBuffer->f4 < lbl_80281900->fMinZ) {
+        lbl_80281900->fMinZ = pBuffer->f4;
+    }
+    if (pBuffer->f4 > lbl_80281900->fMaxZ) {
+        lbl_80281900->fMaxZ = pBuffer->f4;
     }
 }
 

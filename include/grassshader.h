@@ -85,7 +85,8 @@ typedef struct GrassFileHeader {
 } GrassFileHeader;
 
 typedef struct GrassTile {
-    u8  unk0[0x10];
+    s32 n0;                     // 0x0  its buffer needs (n0 * 32 + 0x580) / 16 vertices (fn_8011F544)
+    u8  unk4[0x10 - 0x4];
     u32 u10;                    // 0x10  } offsets from the file's start (after its first 16 bytes),
     u32 u14;                    // 0x14  } made into addresses on load
 } GrassTile;
@@ -93,14 +94,28 @@ typedef struct GrassTile {
 // One of GoGrass.c's 16 buffers (0x4C bytes): the array at GrassManager.pEC, which fn_8011FFCC
 // makes and puts in the apDC slots; apD8 and apF0 hold pointers into it too.
 typedef struct GrassBuffer {
-    f32   f0;                   // 0x00  } handed on by fn_8011F3AC
-    f32   f4;                   // 0x04  }
-    u8    unk8[0x14 - 0x8];
-    u8    a14[0x40 - 0x14];     // 0x14  handed to fn_80008248 when the buffer is put back
+    f32   f0;                   // 0x00  } the x, z it was placed at (fn_8011F544); handed on by
+    f32   f4;                   // 0x04  } fn_8011F3AC
+    f32   f8;                   // 0x08  fn_8011F544's third argument
+    s32   nC;                   // 0x0C  1 (fn_8011F544)
+    u8    b10;                  // 0x10  1 when placed
+    u8    unk11[0x14 - 0x11];
+    u8    a14[0x40 - 0x14];     // 0x14  a render object: fn_8000827C sets it up (type 17),
+                                //       fn_80008248 when the buffer is put back
     void* p40;                  // 0x40  n44 16-byte vertices (fn_8011FFCC); freed with the buffers
     s32   n44;                  // 0x44  its vertex count: fn_8011FDEC picks the smallest big enough
-    u8    unk48[0x4C - 0x48];
+    struct GrassTile* p48;      // 0x48  the file record it was built from
 } GrassBuffer;
+
+// What fn_8011F544 hands to a buffer's render object when it builds it (our name).
+typedef struct GrassBufferDesc {
+    struct GrassTile* pTile;    // 0x00
+    void*             pVerts;   // 0x04  GrassBuffer.p40
+    s32               nVerts;   // 0x08  GrassBuffer.n44
+    f32               fX;       // 0x0C
+    f32               fZ;       // 0x10
+    f32               f14;      // 0x14  GrassManager.f3B8
+} GrassBufferDesc;
 LAYOUT_ASSERT(GrassBuffer, 0x4C);
 
 // GoGrass.c's state (*lbl_80281900). Only the fields the decompiled code uses; its size is not known.
@@ -121,9 +136,10 @@ typedef struct GrassManager {
     GoFrameBuf*  pFrameBuf;     // 0x78  256 x 256
     f32*         pRect;         // 0x7C  its screen rectangle
     GxTexture    tex80;         // 0x80  the 256 x 256 screen copy (fn_8011E170)
-    f32          vB0[3];        // 0xB0  a position: the lens looks down on it from vB0[0], f3B0, vB0[2]
-                                //       (fn_8011EB04)
-    u8           unkBC[0xC0 - 0xBC];
+    f32          fMinX;         // 0xB0  } the placed buffers' bounds (fn_8011F544); the lens looks
+    f32          fMaxX;         // 0xB4  } down on the corner fMinX, fMinZ (fn_8011EB04)
+    f32          fMinZ;         // 0xB8  }
+    f32          fMaxZ;         // 0xBC  }
     s32          nC0;           // 0xC0  10 at start
     u8           unkC4[0xD8 - 0xC4];
     GrassBuffer** apD8;         // 0xD8  a stack of buffers (fn_8011FDC4 pushes, fn_8011FF58 empties)
@@ -181,7 +197,8 @@ typedef struct GrassManager {
     u8           unk3F4[0x3FC - 0x3F4];
     f32          f3FC;          // 0x3FC  0
     f32          f400;          // 0x400  -0.36
-    u8           unk404[0x40C - 0x404];
+    s32          n404;          // 0x404  } buffers placed with nC 1 / otherwise (fn_8011F544)
+    s32          n408;          // 0x408  }
     f32          f40C;          // 0x40C  0.78
     f32          f410;          // 0x410  0.16
     f32          f414;          // 0x414  0
