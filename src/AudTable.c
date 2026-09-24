@@ -303,7 +303,7 @@ void fn_800A84A4(u8 nEntry, u8 nTrack, f32 fPitch) {
     pTrack->f4C = fPitch;
 }
 
-void fn_800A8524(AudSound* pSound, int n) {
+void fn_800A8524(AudSound* pSound, u16 n) {
     u8 i;
 
     for (i = 0; i < pSound->nTracks; i++) {
