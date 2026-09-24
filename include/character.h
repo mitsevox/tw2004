@@ -193,7 +193,8 @@ extern UMemPool* lbl_80281E94;
 extern UMemPool* lbl_80281E90;
 extern UMemPool* lbl_80281E8C;
 extern UMemPool* lbl_80281E88;
-void fn_80071F58(struct SKABlendNode** ppNode, int n);   // animblender.c: gives a blend tree back
+void fn_80071F58(struct SKABlendNode** ppNode, u8 bFreeSources);   // animblender.c: gives a blend
+                                        // tree back (bFreeSources: the sources' clips too)
 
 // animblender.c: whether a source under pNode plays pSrc (format 0, format 1).
 u8 fn_80073554(SKABlendNode* pNode, void* pSrc);

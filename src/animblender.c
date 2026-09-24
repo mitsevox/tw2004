@@ -8,6 +8,8 @@
 #include "golfer.h"
 
 f32  fn_8001F02C(ClipBlend* pBlend, u64 uEvent);   // an event's time (by its 64-bit id)
+void fn_8001F558(void* pItem);          // mtalib.c
+void fn_800977CC(void* p);
 
 int  fn_800723E8(SKABlendNode* pNode, SKABlendNode*** pppOldest);
 void fn_800725BC(SKABlendNode* pNode, SKABlendFn pfnBlend, f32 fWeight);
@@ -55,6 +57,55 @@ void fn_80071B94(void) {
     if (lbl_80281E88 != NULL) {
         fn_8000B058(lbl_80281E88);
         lbl_80281E88 = NULL;
+    }
+}
+
+// Give the tree at *ppNode back: each node's pose buffer to its pool, then its children (or, with
+// bFreeSources, a source node's clip), then the node itself if it came from a pool (*ppNode is
+// then NULL).
+void fn_80071F58(SKABlendNode** ppNode, u8 bFreeSources) {
+    int i;
+
+    if (ppNode == NULL) return;
+    if (*ppNode == NULL) return;
+    if ((*ppNode)->nFormat == 0) {
+        if ((*ppNode)->pPose != NULL) {
+            fn_8000B0D4(lbl_80281E8C, (*ppNode)->pPose);
+        }
+    } else if ((*ppNode)->nFormat == 1) {
+        if ((*ppNode)->pPose != NULL) {
+            fn_8000B0D4(lbl_80281E88, (*ppNode)->pPose);
+        }
+    }
+    (*ppNode)->pPose = NULL;
+    if ((*ppNode)->nType == 1) {
+        for (i = 0; i < 2; i++) {
+            fn_80071F58(&(*ppNode)->u.blend.apChild[i], bFreeSources);
+        }
+    } else if ((*ppNode)->nType == 0) {
+        if ((*ppNode)->nFormat == 0) {
+            if (bFreeSources) {
+                fn_800977CC((*ppNode)->u.src.pSrc);
+            }
+        } else if ((*ppNode)->nFormat == 1) {
+            if (bFreeSources) {
+                fn_8001F558((*ppNode)->u.src.pSrc);
+            }
+        }
+    }
+    if ((*ppNode)->bPooled == 1) {
+        switch ((*ppNode)->nType) {
+        case 0:
+            fn_8000B0D4(lbl_80281E98, *ppNode);
+            break;
+        case 1:
+            fn_8000B0D4(lbl_80281E94, *ppNode);
+            break;
+        default:
+            fn_8000B0D4(lbl_80281E90, *ppNode);
+            break;
+        }
+        *ppNode = NULL;
     }
 }
 
