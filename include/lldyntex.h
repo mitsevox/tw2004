@@ -35,8 +35,8 @@ LAYOUT_ASSERT(DynTexUse, 0x10);
 
 // Its state (0xA9C bytes, allocated by fn_8010A448); only what the code reads so far.
 typedef struct DynTexState {
-    void* p0;                   // 0x000  a 0x40-byte block allocated with it
-    u8    unk4[4];
+    u8*   p0;                   // 0x000  the read buffer (fn_8010A448's nSize bytes)
+    u8*   p4;                   // 0x004  where fn_8010BFE0 copies the next piece read
     struct TexBank** p8;        // 0x008  set by fn_8010BC88 (char.c gives it &Character.p50)
     DynTexUse aUses[150];       // 0x00C  n96C of them (fn_8010BCFC)
     s32   n96C;                 // 0x96C
@@ -47,13 +47,17 @@ typedef struct DynTexState {
     s32   n978;                 // 0x978  fn_8010BFA0 adds its argument
     s32   n97C;                 // 0x97C  and keeps the last one here
     s32   n980;                 // 0x980
-    s32   n984;                 // 0x984
-    u8    unk988[0x994 - 0x988];
+    s32   n984;                 // 0x984  the bytes to read for this texture (2 KB rounded)
+    s32   n988;                 // 0x988  the bytes of its pixels and palette
+    u32   u98C;                 // 0x98C  where the read starts in the file (2 KB aligned)
+    u8    unk990[4];
     DynTexJob  aJobs[10];       // 0x994
     DynTexJob* apQueue[10];     // 0xA5C  the jobs fn_8010B930 queued
     s32   nA84;                 // 0xA84  how many are queued
     DynTexJob* pA88;            // 0xA88  freed with the queue (fn_8010B9BC)
-    u8    unkA8C[0xA98 - 0xA8C];
+    s32   nA8C;                 // 0xA8C  bytes copied so far
+    s32   nA90;                 // 0xA90  bytes of the last piece to copy
+    s32   nA94;                 // 0xA94  where they start in p0
     s32   nA98;                 // 0xA98  fn_8010A448's argument
 } DynTexState;
 LAYOUT_ASSERT(DynTexState, 0xA9C);

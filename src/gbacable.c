@@ -250,6 +250,7 @@ s32 fn_80122FD8(s32 nChan) {
 // context is ours keeps it; any other is sent ours back. The GBA must echo the tick sent.
 void fn_8012311C(s32 nChan) {
     GbaChannel* pCh;
+    u32* pSentTick;
     u32 uOld;
     int bSame = 0;
     int bOther = 0;
@@ -257,8 +258,9 @@ void fn_8012311C(s32 nChan) {
     u32 uReply;
 
     pCh = &lbl_80260E18[nChan];
+    pSentTick = &pCh->sent.uTick;
     uOld = pCh->got.uTick;
-    pCh->got.uTick = pCh->sent.uTick;
+    pCh->got.uTick = *pSentTick;
     if (pCh->got.b0 == 0) {
         if (pCh->got.b3 == 0) {
             memset(&pCh->sent, 0, sizeof(GbaContext));
@@ -268,12 +270,12 @@ void fn_8012311C(s32 nChan) {
             lbl_80260E18[nChan].sent.b2 = lbl_80260E18[nChan].got.b2;
             lbl_80260E18[nChan].sent.nC = lbl_80260E18[nChan].got.nC;
             lbl_80260E18[nChan].u48 = OSGetTick();
-            pCh->sent.uTick = lbl_80260E18[nChan].u48;
+            *pSentTick = lbl_80260E18[nChan].u48;
             pCh->n0 = 3;
         } else {
             if (memcmp(&pCh->got, &pCh->sent, sizeof(GbaContext)) == 0 &&
-                (uOld == pCh->sent.uTick || uOld == lbl_80260E18[nChan].u48)) {
-                pCh->sent.uTick = uOld;
+                (uOld == *pSentTick || uOld == lbl_80260E18[nChan].u48)) {
+                *pSentTick = uOld;
                 bSame = 1;
                 lbl_80260E18[nChan].u48 = uOld;
             }
@@ -288,7 +290,7 @@ void fn_8012311C(s32 nChan) {
             uCmd = uOld;
         } else {
             uCmd = OSGetTick();
-            pCh->sent.uTick = uCmd;
+            *pSentTick = uCmd;
         }
         if (fn_80122CFC(nChan, &uCmd) == 0) {
             OSReport("GbaOpen: An error occurred in writing (chan=%d).\n", nChan);
@@ -533,8 +535,7 @@ void fn_80123ABC(s32 nChan) {
         }
         pWord++;
     }
-    pWord = (u32*)&pCh->got;
-    for (i = 0; i < sizeof(GbaContext); i += 4) {
+    for (i = 0, pWord = (u32*)&pCh->got; i < sizeof(GbaContext); i += 4) {
         if (fn_80122E68(nChan, pWord) == 0) {
             OSReport("GbaSetport: An error occurred in reading (chan=%d).\n", nChan);
             pCh->n0 = 0;

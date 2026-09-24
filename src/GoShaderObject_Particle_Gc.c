@@ -225,9 +225,11 @@ void fn_80094534(f32 (*pMtx)[4], ParticleShape* pShape, ParticleVertex* pVerts, 
 void fn_800949D0(SD_SShaderObject_Static* pObject) {
     int nBuf;
     u16 nLive;
-    u16 nStart;
+    u32 nStart;
     ParticleSystem* pSys;
     Camera* pCamera;
+    ParticleVertex* pVerts;
+    f32* pAges;
     u32 n;
 
     pSys = pObject->pData;
@@ -255,10 +257,13 @@ void fn_800949D0(SD_SShaderObject_Static* pObject) {
         GXSetVtxDesc(11, 1);
         GXSetVtxDesc(13, 1);
         GXInvalidateVtxCache();
-        fn_80094534(pCamera->viewMtx, &pSys->shape,
-                    (ParticleVertex*)lbl_802813A8->apBuffers[nBuf] + pSys->nFirst + nStart,
-                    (f32*)lbl_802813A8->apBuffers[nBuf + 2] + pSys->nFirst + nStart,
-                    (nLive <= (u32)(pSys->nCount - nStart)) ? nLive : pSys->nCount - nStart);
+        pVerts = (ParticleVertex*)lbl_802813A8->apBuffers[nBuf] + pSys->nFirst + nStart;
+        pAges = (f32*)lbl_802813A8->apBuffers[nBuf + 2] + pSys->nFirst + nStart;
+        n = pSys->nCount - nStart;
+        if (nLive <= n) {
+            n = nLive;
+        }
+        fn_80094534(pCamera->viewMtx, &pSys->shape, pVerts, pAges, n);
         n = pSys->nCount - nStart;
         if (nLive > n) {
             fn_80094534(pCamera->viewMtx, &pSys->shape,
