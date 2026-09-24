@@ -141,7 +141,7 @@ void fn_8010FA00(void) {
             fn_8000BDF8(pName, &pBank, &pTex);
         }
         if (pTex != NULL) {
-            pPixels = pBank->p18 + pTex->uPixels;
+            pPixels = pBank->p18 + pTex->aMips[0].uPixels;
             if (lbl_802824B8->nShape == LOGO_SQUARE) {
                 nWidth = 64;
                 nHeight = 64;
