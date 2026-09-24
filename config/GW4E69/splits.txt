@@ -704,8 +704,31 @@ VecMath.c:
 	.text       start:0x800BAD60 end:0x800BB0A8
 	.sdata2     start:0x80284280 end:0x80284290
 
+SitDevMisc.c:
+	.text       start:0x800BB0A8 end:0x800BB42C
+	.bss        start:0x801FA198 end:0x801FA1C0
+	.sbss       start:0x802821F8 end:0x80282208
+	.sdata2     start:0x80284290 end:0x802842A0
+
 SitDevFile.c:
-	.text       start:0x800BB0A8 end:0x800BD894
+	.text       start:0x800BB42C end:0x800BB6DC
+	.data       start:0x80191230 end:0x80191240
+	.sbss       start:0x80282208 end:0x80282210
+
+SitDevCommentaryZones.c:
+	.text       start:0x800BB6DC end:0x800BB7AC
+	.bss        start:0x801FA1C0 end:0x801FA1E8
+	.sbss       start:0x80282210 end:0x80282218
+
+SitDevStateVector.c:
+	.text       start:0x800BB7AC end:0x800BCD68
+	.data       start:0x80191240 end:0x801912D0
+	.sbss       start:0x80282218 end:0x80282220
+	.sdata2     start:0x802842A0 end:0x802842C0
+
+SitDevTrigger.c:
+	.text       start:0x800BCD68 end:0x800BD894
+	.data       start:0x801912D0 end:0x80191308
 
 GoGolfCam.c:
 	.text       start:0x800BD894 end:0x800C7480
