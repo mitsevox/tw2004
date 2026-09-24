@@ -287,7 +287,9 @@ typedef struct SaveProfile {
     u32  aB344[94];             // 0x0B344
     u32  aB4BC[94];             // 0x0B4BC
     TourSeason tour;            // 0x0B634
-    u8   unk104D0[0x10548 - 0x104D0];
+    u8   a104D0[118];           // 0x104D0  per real-time event (fn_800F0FBC's ids); GameMode22 fn_80125AA4
+                                //          counts the nonzero ones in a month
+    u8   unk10546[0x10548 - 0x10546];
     u32  a10548[1];             // 0x10548  a bit array: FE_CrAPMessages.c's fn_80108E4C tests bit n; fn_80058304 tests one (bit 1 for FE_Manager)
     SaveLockEntry a1054C[11];   // 0x1054C  cleared by the profile setup; fn_80078008's lock kinds
                                 //          10 and 11 read them
