@@ -565,6 +565,7 @@ void fn_80123CBC(s32 a, s32 b) {
     s32 nChan = 0;
     u32 uStart;
     s32 nErr;
+    u8* pStatus;
 
     do {
         if (pCh->n5C != 0x40000 || (lbl_80281984 != -1 && lbl_80281984 != nChan)) {
@@ -574,10 +575,11 @@ void fn_80123CBC(s32 a, s32 b) {
             switch (pCh->n0) {
             case 0:
                 uStart = OSGetTick();
+                pStatus = &pCh->uStatus;
                 do {
                     fn_800A4BDC();
                     fn_800B7490();
-                    nErr = GBAGetStatus(nChan, &pCh->uStatus);
+                    nErr = GBAGetStatus(nChan, pStatus);
                 } while (nErr != 0 && OSGetTick() - uStart < GBA_TICKS_PER_MS * 800);
                 if (nErr == 0) {
                     pCh->n0 = 1;
