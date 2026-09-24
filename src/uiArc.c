@@ -69,6 +69,7 @@ void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
     f32 fA;
     UIFileEntry* pEntry;
     LLPict* pPict;
+    char* pName;
     UITransform* pMtx;
     UITransform* pColour;
     UITransform* pAdd;
@@ -88,12 +89,13 @@ void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
     lbl_8028245C = fn_8016C18C()->a;
     if (pArc->n2 != -1) {
         pEntry = lbl_80281F1C->pFile->p8->apTables[pArc->n2]->apEntries[pArc->n0];
+        pName = pEntry->szC;    // fake match: EA takes the name's address before the flag tests
         if (pEntry->u0 & 1) {
             if (gSession.nGameType == 3) {
                 pBank = lbl_801A26DC[pArc->n0 + pArc->u8];
                 fn_8005CC64(pBank, fn_800922A0(pBank));
             } else {
-                nBank = fn_8008FFF0(pEntry->szC);
+                nBank = fn_8008FFF0(pName);
                 fn_8005CC64(lbl_80281F1C->p8->ap4[nBank], pEntry->p4);
             }
         } else if (pEntry->u0 & 2) {
