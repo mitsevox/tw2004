@@ -458,7 +458,8 @@ typedef struct Character {
     f32   f1634;                // 0x1634
     f32   v1638[3];             // 0x1638
     f32   f1644;                // 0x1644
-    u8    unk1648[0x1654 - 0x1648];
+    u8    unk1648[0x1650 - 0x1648];
+    s32   n1650;                // 0x1650  cleared by fn_8001942C
     s32   n1654;                // 0x1654  (fn_8001EE90)
     s32   n1658;                // 0x1658
     f32   f165C;                // 0x165C  } scaled by the view's lens (fn_8001EE00, fn_8001ED44)
@@ -500,7 +501,8 @@ typedef struct Character {
                                 //         fn_8001A9F4); fn_8001DC64 applies them
     void (*pfn17B0)(void);      // 0x17B0  called by Character_UpdateAnimation before the bones are
                                 //         transformed; cleared by fn_8001942C
-    u8    unk17B4[0x17B8 - 0x17B4];
+    u8    b17B4;                // 0x17B4  cleared by fn_8001942C
+    u8    unk17B5[0x17B8 - 0x17B5];
     struct SkinChoices* pChoices;   // 0x17B8  its look (fn_8001D4A4 dresses it from this); fn_8001A20C
                                     //         puts its logos on the model (fn_8001744C)
 } Character;

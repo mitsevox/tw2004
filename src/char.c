@@ -26,6 +26,8 @@ void  fn_8001A7C8(void);
 Character* fn_8001A9F4(u8* pData, int nUnused, int nSet, int nId, u8 bLook, SkinChoices* pChoices);
 void* fn_8001B208(u8* pData);
 Character* fn_8001942C(void);
+void  fn_80072D90(void* pAnim);                                 // animblender.c: reset a player
+s32   fn_800962F8(Character* pChar);                            // CharAnim.c
 void  fn_800184E4(Character* pChar, Skin* pSkin);
 void  fn_80018710(Character* pChar);
 void  fn_8001DC64(Character* pChar, SkinChoices* pChoices);
@@ -785,6 +787,83 @@ void fn_80019358(Character* pChar, f32* pDir, f32 fAngle) {
         fn_8000A4E0(mtx, &fYaw, &fB, &fC);
         fn_800192D4(pChar, fYaw + fAngle);
     }
+}
+
+// Makes a character: its four data buffers, both blend trees and animation players, and every
+// field that starts at a value.
+Character* fn_8001942C(void) {
+    Character* pChar;
+    SKABlendNode* pNode;
+    int i;
+
+    pNode = NULL;
+    pChar = fn_80009B34(sizeof(Character), 2, 0x40, "char.c", 0x8A4);
+    pChar->pfn17B0 = NULL;
+    for (i = 0; i < 4; i++) {
+        pChar->buffers[i].n00 = -1;
+        pChar->buffers[i].p04 = NULL;
+        pChar->buffers[i].p0C = NULL;
+        pChar->buffers[i].p10 = NULL;
+        pChar->buffers[i].p14 = NULL;
+        pChar->buffers[i].pBuf = fn_80009B34(0x890, 2, 0x40, "char.c", 0x8AF);
+    }
+    pNode = &pChar->blend;
+    fn_80072D90(pChar->anim);
+    fn_80071C28(&pNode, 1, 0, fn_80072ACC, 1);
+    pNode = (SKABlendNode*)pChar->node3E0;
+    fn_80072D90(&pChar->anim29C);
+    fn_80071C28(&pNode, 1, 1, fn_80072ACC, 1);
+    pChar->pLib = NULL;
+    pChar->n3D4 = 0;
+    pChar->p44 = NULL;
+    pChar->f14 = 0.0f;
+    pChar->nAnim = 0;
+    pChar->n20 = 0;
+    pChar->n18 = 0;
+    pChar->u10 = 0x4000;
+    pChar->f162C = 1.0f;
+    pChar->f1630 = 0.5f;
+    pChar->f1634 = 0.2f;
+    pChar->n1650 = 0;
+    pChar->n1654 = 2;
+    pChar->n1658 = 2;
+    pChar->n1698 = 0;
+    pChar->p16D8 = NULL;
+    pChar->nClubClass = 0;
+    pChar->n16D4 = 0;
+    pChar->nSlot = 0;
+    pChar->n48 = -1;
+    pChar->f1664 = 1.0f;
+    pChar->nStyle = 0;
+    pChar->nPlayer = -1;
+    pChar->uId = 0;
+    pChar->pBlend = NULL;
+    pChar->fBackswing = 0.0f;
+    pChar->blend.nGroup = -1;
+    pChar->n5CC = -1;
+    pChar->p1790 = NULL;
+    pChar->n1784 = -1;
+    pChar->b17B4 = 0;
+    pChar->pRecords = NULL;
+    fn_800962F8(pChar);
+    pChar->n16DC = 0;
+    pChar->f165C = pChar->f1660 = 1073741824.0f;
+    pChar->pCurClip = NULL;
+    pChar->n178C = 0;
+    pChar->a6C[0] = -1;
+    pChar->a64[0] = NULL;
+    pChar->a6C[1] = -1;
+    pChar->a64[1] = NULL;
+    if (gSession.nGameType == 10 || gSession.nGameType == 3) {
+        pChar->n70 = 2;
+    } else {
+        pChar->n70 = 1;
+    }
+    pChar->n74 = 0;
+    pChar->bE0 = 0;
+    fn_80017508(pChar);
+    pChar->p1798 = NULL;
+    return pChar;
 }
 
 void fn_80019648(void) {
