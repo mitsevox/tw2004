@@ -2372,6 +2372,38 @@ void fn_8007DF0C(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gpSaveData[pArgs[0].i].nC4;
 }
 
+// Step the profile's player's n0 on (0..3, wrapping) to the next one that no player up to and
+// including it with the same golfer model has (fn_8007D810), stopping if it comes round to where
+// it started; then fn_8001D624 for the golfer shown.
+void fn_8007DF30(MsgArg* pArgs, MsgArg* pResult) {
+    u8 abFree[4] = {1, 1, 1, 1};
+    int i;
+    s8 nStart;
+    GolferRecord* pMine;
+    GolferRecord* pOther;
+
+    for (i = 0; i <= lbl_80281ED4->nSlot; i++) {
+        pMine = fn_80077A80(gSession.nGolfer[lbl_80281ED4->nSlot]);
+        pOther = fn_80077A80(gSession.nGolfer[i]);
+        if (pMine->nModelID == pOther->nModelID) {
+            abFree[gSession.aProfile[i].n0] = 0;
+        }
+    }
+    nStart = gSession.aProfile[lbl_80281ED4->nSlot].n0;
+    gSession.aProfile[lbl_80281ED4->nSlot].n0++;
+    if (gSession.aProfile[lbl_80281ED4->nSlot].n0 > 3) {
+        gSession.aProfile[lbl_80281ED4->nSlot].n0 = 0;
+    }
+    while (!abFree[gSession.aProfile[lbl_80281ED4->nSlot].n0]) {
+        gSession.aProfile[lbl_80281ED4->nSlot].n0++;
+        if (gSession.aProfile[lbl_80281ED4->nSlot].n0 > 3) {
+            gSession.aProfile[lbl_80281ED4->nSlot].n0 = 0;
+        }
+        if (gSession.aProfile[lbl_80281ED4->nSlot].n0 == nStart) break;
+    }
+    fn_8001D624(lbl_80281EE0->pB4->n10);
+}
+
 void fn_8007E0BC(MsgArg* pArgs, MsgArg* pResult) {
     gSession.nPinSet = pArgs[0].i;
 }
