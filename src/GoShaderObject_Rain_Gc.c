@@ -134,18 +134,18 @@ void fn_800B4F24(RainObject* pRain) {
 // Draw a rain object: the drops' display list once at each lit point of the current buffer, then
 // the splash triangles, textured with "splash".
 void fn_800B4FA4(RainObject* pRain) {
+    int i;
     Vec4 v;
     f32 mPos[4][4];
     f32 mView[4][4];
     Camera* pCamera;
-    RainData* pData;
-    RainPoint* pPoint;
-    RainSplash* pSplash;
     int nBuf;
-    int nHalf;
-    int i;
+    RainData* pData;
     int j;
     int k;
+    int nHalf;
+    RainPoint* pPoint;
+    RainSplash* pSplash;
     int nAlpha;
 
     pCamera = fn_8001614C();

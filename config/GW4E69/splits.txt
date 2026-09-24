@@ -520,6 +520,8 @@ GameAudio.c:
 
 AudTable.c:
 	.text       start:0x800A7AF0 end:0x800A85CC
+	.sbss       start:0x80282058 end:0x80282060
+	.sdata2     start:0x80283F88 end:0x80283FB0
 
 hlaudmovie.c:
 	.text       start:0x800A85CC end:0x800A9808
