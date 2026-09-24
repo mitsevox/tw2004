@@ -521,7 +521,7 @@ u16* fn_80074BE0(u16* p, u16* pEnd) {
     }
     fScale = (s16)p[2];
     pNext = p + 3;
-    if (fScale != 0.0f) {
+    if (fScale) {
         fInv = 1.0f / fScale;
     }
     if (fScale < 0.0f) {
