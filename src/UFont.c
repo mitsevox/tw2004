@@ -20,6 +20,9 @@ void fn_80012E1C(LLFont* pFont, s32 v);
 void fn_80012E24(LLFont* pFont, UFontContext* pCtx);
 s32  fn_80012E4C(LLFont* pFont);
 
+UFontState lbl_801A34C0;
+UFontState* lbl_80280DE0 = &lbl_801A34C0;
+
 // Empties every font's queue and both pools.
 void fn_8001256C(void) {
     lbl_80280DE0->apQueue[0] = NULL;
@@ -147,10 +150,10 @@ char* fn_800128B0(char* sz) {
 
 // Draws a string with the current settings: at once in mode 1, queued in mode 0.
 void fn_800128F8(char* sz, f32 fX, f32 fY) {
-    LLFont* pFont;
     s32 nOld;
     UFontContext* pCtx;
     UFontContext* pRec;
+    LLFont* pFont;
 
     switch (lbl_80280DE0->n1B8) {
     case 1:
@@ -169,8 +172,7 @@ void fn_800128F8(char* sz, f32 fX, f32 fY) {
         break;
     case 0:
         pCtx = fn_80012EC4();
-        pRec = lbl_80280DE0->pQueueNext;
-        lbl_80280DE0->pQueueNext = pRec + 1;
+        pRec = lbl_80280DE0->pQueueNext++;
         Mem_cpy(pRec, pCtx, sizeof(UFontContext));
         pRec->pNext = lbl_80280DE0->apQueue[pCtx->nFont];
         lbl_80280DE0->apQueue[pCtx->nFont] = pRec;
