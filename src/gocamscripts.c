@@ -53,6 +53,9 @@ CamLens* fn_8001F004(void);             // the current camera's lens
 f32  fn_8001EFFC(u8* pLens);            // the lens's fB0 (char.c: its parameter is u8*)
 void fn_80038010(u8 a, int n, f32* pVec);
 void fn_800386F0(int n, f32* pVec);
+f32  fn_8003F194(CamShot* pShot, f32 fA, f32 fB, f32 fTime);
+void fn_800C7898(f32* p0, f32* p1, f32* p2, f32* p3, f32* pOut, f32 fT);    // a point on the spline
+f32  fn_800C7970(CamShot* pShot, f32 f1, f32 f2, f32 f3, f32 f4, f32 f5, f32 f6);
 void fn_80040CF0(CamScript* pScript, f32* pSub, int nPlayer, f32* pPrev, f32 fTime);
 void fn_800090E4(f32* pTurn, f32* pVec, f32* pOut);     // the vector turned by it
 u8   fn_800DC464(int nPlayer);          // GameEffects.c: the ball is simulated from its position
@@ -347,6 +350,57 @@ void fn_8003E624(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot*
             pScript->fD4 = (f32)fn_80009680(fn_80009744(vMove)) / fTime;
         }
     }
+}
+
+// The script's time step for a kind-0 (bAD) shot on a chain: fTime, unless the camera's speed fD4
+// lies outside the spline speeds at the blend's start and now; then fn_800C7970 works out a step
+// that eases between them.
+f32 fn_8003F064(CamScript* pScript, f32 fTime) {
+    f32 fSpeed;
+    f32 fNow;
+    f32 fStart;
+
+    if (pScript == NULL || pScript->pShot == NULL || pScript->pShot->bAD != 0) return fTime;
+    if (pScript->pShot->p44 == NULL || pScript->pShot->p40 == NULL) return fTime;
+    fSpeed = pScript->fD4;
+    fNow = fn_8003F194(pScript->pShot, pScript->fCamTime / pScript->f8C,
+                       (pScript->fCamTime + fTime) / pScript->f8C, fTime);
+    fStart = fn_8003F194(pScript->pShot, 0.0f, fTime / pScript->f8C, fTime);
+    if (fSpeed < fStart && fSpeed > fNow) return fTime;
+    if (fSpeed > fStart && fSpeed < fNow) return fTime;
+    return fn_800C7970(pScript->pShot, fSpeed, fNow, pScript->pShot->f48, pScript->pShot->f4C, pScript->fCamTime,
+                       fTime);
+}
+
+// The camera's speed on the spline through the shot's chain (p44, the shot, its p40 and that one's
+// p40; a missing end repeats its neighbour) between shares fA and fB, over fTime; 0 without p40.
+f32 fn_8003F194(CamShot* pShot, f32 fA, f32 fB, f32 fTime) {
+    f32 vPrev[4];
+    f32 vFrom[4];
+    f32 vTo[4];
+    f32 vNext[4];
+    f32 vA[4];
+    f32 vB[4];
+    f32 vDiff[4];
+    CamShot* pNext = pShot->p40;
+
+    if (pNext == NULL) return 0.0f;
+    Vec3Copy(pShot->v20, vFrom);
+    Vec3Copy(pShot->p40->v20, vTo);
+    if (pShot->p44 == NULL) {
+        Vec3Copy(pShot->v20, vPrev);
+    } else {
+        Vec3Copy(pShot->p44->v20, vPrev);
+    }
+    if (pNext->p40 == NULL) {
+        Vec3Copy(pShot->p40->v20, vNext);
+    } else {
+        Vec3Copy(pNext->p40->v20, vNext);
+    }
+    fn_800C7898(vPrev, vFrom, vTo, vNext, vA, fA);
+    fn_800C7898(vPrev, vFrom, vTo, vNext, vB, fB);
+    fn_80045428(vB, vA, vDiff);
+    return (f32)fn_80009680(fn_80009744(vDiff)) / fTime;
 }
 
 // The script's slow-motion move (nCamera, set by fn_80063B98 and its kin): hands fn_80038010 the
