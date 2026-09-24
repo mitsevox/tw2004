@@ -623,13 +623,13 @@ void fn_8003F518(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPr
     f32 f90;
 
     fn_80045428(pScript->v10, pScript->v0, vMove);
-    fn_8001EF34(vMove, fT, vPos);
+    fn_8001EF34(fT, vMove, vPos);
     fn_8004544C(vPos, pScript->v0, vPos);
     Vec3Copy(vPos, pCam);
     CamScript_GetLookAtPoint(pShot, nPlayer, pScript->a20, pScript->v0, pScript, pPrev, fTime);
     CamScript_GetLookAtPoint(pNext, nPlayer, &pScript->a20[4], pScript->v10, pScript, pPrev, fTime);
     fn_80045428(&pScript->a20[4], pScript->a20, vMove);
-    fn_8001EF34(vMove, fT, vPos);
+    fn_8001EF34(fT, vMove, vPos);
     fn_8004544C(vPos, pScript->a20, vPos);
     Vec3Copy(vPos, pSub);
     f = fT * (pNext->f78 - pShot->f78) + pShot->f78;
@@ -686,13 +686,13 @@ void fn_8003F7EC(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPr
     }
     pScript->fF8 = fT;
     fn_80045428(pScript->v10, pScript->v0, vMove);
-    fn_8001EF34(vMove, fT, vPos);
+    fn_8001EF34(fT, vMove, vPos);
     fn_8004544C(vPos, pScript->v0, vPos);
     Vec3Copy(vPos, pCam);
     CamScript_GetLookAtPoint(pShot, nPlayer, pScript->a20, pScript->v0, pScript, pPrev, fTime);
     CamScript_GetLookAtPoint(pNext, nPlayer, &pScript->a20[4], pScript->v10, pScript, pPrev, fTime);
     fn_80045428(&pScript->a20[4], pScript->a20, vMove);
-    fn_8001EF34(vMove, fT, vPos);
+    fn_8001EF34(fT, vMove, vPos);
     fn_8004544C(vPos, pScript->a20, vPos);
     Vec3Copy(vPos, pSub);
     f = fT * (pNext->f78 - pShot->f78) + pShot->f78;
@@ -737,13 +737,13 @@ void fn_8003FAA0(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPr
     }
     pScript->fF8 = fT;
     fn_80045428(pScript->v10, pScript->v0, vMove);
-    fn_8001EF34(vMove, fT, vPos);
+    fn_8001EF34(fT, vMove, vPos);
     fn_8004544C(vPos, pScript->v0, vPos);
     Vec3Copy(vPos, pCam);
     CamScript_GetLookAtPoint(pShot, nPlayer, pScript->a20, pScript->v0, pScript, pPrev, fTime);
     CamScript_GetLookAtPoint(pNext, nPlayer, &pScript->a20[4], pScript->v10, pScript, pPrev, fTime);
     fn_80045428(&pScript->a20[4], pScript->a20, vMove);
-    fn_8001EF34(vMove, fT, vPos);
+    fn_8001EF34(fT, vMove, vPos);
     fn_8004544C(vPos, pScript->a20, vPos);
     Vec3Copy(vPos, pSub);
     f = fT * (pNext->f78 - pShot->f78) + pShot->f78;
@@ -791,7 +791,7 @@ void fn_8003FD54(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPr
     f32 f90;
 
     fn_80045428(pScript->v10, pScript->v0, vMove);
-    fn_8001EF34(vMove, fT, vPos);
+    fn_8001EF34(fT, vMove, vPos);
     fn_8004544C(vPos, pScript->v0, vPos);
     Vec3Copy(vPos, pCam);
     fn_80045428(pScript->v0, pScript->a20, vFromAim);
@@ -815,7 +815,7 @@ void fn_8003FD54(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPr
     if (0.0f != vAxis[0] || 0.0f != vAxis[1] || 0.0f != vAxis[2]) {
         fn_800BAF04(vAxis, vAxis);
     }
-    fn_8001EF34(vAxis, fAngle, vAxis);
+    fn_8001EF34(fAngle, vAxis, vAxis);
     Quat_BuildFromVector(vAxis, qTurn);
     vDir0[3] = 0.0f;
     Quat_RotateVector(qTurn, vDir0, pSub);
@@ -823,7 +823,7 @@ void fn_8003FD54(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPr
         fn_800BAF04(pSub, pSub);
     }
     fDist = fn_80009680(fn_80009744(vFromAim));
-    fn_8001EF34(pSub, fT * ((f32)fn_80009680(fn_80009744(vToAim)) - fDist) + fDist, pSub);
+    fn_8001EF34(fT * ((f32)fn_80009680(fn_80009744(vToAim)) - fDist) + fDist, pSub, pSub);
     fn_8004544C(pCam, pSub, pSub);
     f = fT * (pNext->f78 - pShot->f78) + pShot->f78;
     f += GameEffects_FieldOfViewChange();
@@ -934,7 +934,7 @@ void CamScript_ArcCameras(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript,
     CamScript_GetLookAtPoint(pShot, nPlayer, pScript->a20, pScript->v0, pScript, pPrev, fTime);
     CamScript_GetLookAtPoint(pNext, nPlayer, &pScript->a20[4], pScript->v10, pScript, pPrev, fTime);
     fn_80045428(&pScript->a20[4], pScript->a20, vMove);
-    fn_8001EF34(vMove, fT, vPos);
+    fn_8001EF34(fT, vMove, vPos);
     fn_8004544C(vPos, pScript->a20, vPos);
     Vec3Copy(vPos, pSub);
     if (0.0f == pScript->fCamTime) {
@@ -985,7 +985,7 @@ void CamScript_CircleCameras(int nPlayer, f32* pCam, f32* pSub, CamScript* pScri
     CamScript_GetLookAtPoint(pShot, nPlayer, pScript->a20, pScript->v0, pScript, pPrev, fTime);
     CamScript_GetLookAtPoint(pNext, nPlayer, &pScript->a20[4], pScript->v10, pScript, pPrev, fTime);
     fn_80045428(&pScript->a20[4], pScript->a20, vMove);
-    fn_8001EF34(vMove, fShare, vPos);
+    fn_8001EF34(fShare, vMove, vPos);
     fn_8004544C(vPos, pScript->a20, vPos);
     Vec3Copy(vPos, pSub);
     if (fT < 1.0f) {
@@ -1033,7 +1033,7 @@ void CamScript_LerpSwingToBallFlightCameras(int nPlayer, f32* pCam, f32* pSub, C
     f32 f90;
 
     fn_80045428(pScript->v10, pScript->v0, vMove);
-    fn_8001EF34(vMove, fT, vPos);
+    fn_8001EF34(fT, vMove, vPos);
     fn_8004544C(vPos, pScript->v0, vPos);
     Vec3Copy(vPos, pCam);
     fn_80045428(pScript->v0, pScript->a20, vFromAim);
@@ -1044,11 +1044,11 @@ void CamScript_LerpSwingToBallFlightCameras(int nPlayer, f32* pCam, f32* pSub, C
     }
     fn_80045428(gPlayers[nPlayer].ball.vPos, pScript->v0, vBall);
     vBall[1] = 0.0f;
-    fn_8001EF34(vDir, fn_80009680(fn_80009744(vBall)), vDir);
+    fn_8001EF34(fn_80009680(fn_80009744(vBall)), vDir, vDir);
     fn_8004544C(vDir, pScript->v0, vDir);
     CamScript_GetLookAtPoint(pNext, nPlayer, &pScript->a20[4], pScript->v10, pScript, pPrev, fTime);
     fn_80045428(&pScript->a20[4], vDir, vMove);
-    fn_8001EF34(vMove, fT, vPos);
+    fn_8001EF34(fT, vMove, vPos);
     fn_8004544C(vPos, pScript->a20, vPos);
     Vec3Copy(vPos, pSub);
     f = fT * (pNext->f78 - pShot->f78) + pShot->f78;
@@ -1106,7 +1106,7 @@ void CamScript_PickArcDirection(CamScript* pScript, f32* pSub, int nPlayer, f32*
         Vec3Copy(pSub, vNextLook);
         CamScript_GetLookAtPoint(pScript->pNextShot, nPlayer, vNextLook, pScript->v10, pScript, pPrev, fTime);
         fn_80045428(vNextLook, vLook, vHalf);
-        fn_8001EF34(vHalf, 0.5f, vPoint);
+        fn_8001EF34(0.5f, vHalf, vPoint);
         fn_8004544C(vPoint, vLook, vPoint);
         Vec3Copy(vPoint, vMid);
         pScript->nD0 = 1;
@@ -1185,7 +1185,7 @@ void CamScript_GetLookAtPoint(CamShot* pShot, int nPlayer, f32* pOut, f32* pCam,
     case 23:
         Vec3Copy(gPlayers[nPlayer].ball.vVel, vVel);
         vVel[1] = 0.0f;
-        fn_8001EF34(vVel, pShot->f70, vVel);
+        fn_8001EF34(pShot->f70, vVel, vVel);
         vVel[1] = pShot->f74 * gPlayers[nPlayer].ball.vVel[1];
         fn_8004544C(gPlayers[nPlayer].ball.vPos, vVel, vAim);
         if (CameraScript_SnapToScript(pScript, pShot)) {
@@ -1227,7 +1227,7 @@ void CamScript_GetLookAtPoint(CamShot* pShot, int nPlayer, f32* pOut, f32* pCam,
         fn_8001EB8C(gPlayers[nPlayer].pChar, 0x39, vBone39);
         fn_8001EB8C(gPlayers[nPlayer].pChar, 0x47, vBone47);
         fn_8004544C(vBone39, vBone47, vMid);
-        fn_8001EF34(vMid, 0.5f, vMid);
+        fn_8001EF34(0.5f, vMid, vMid);
         Vec3Copy(vMid, pOut);
         if (fn_800453C8(nPlayer, pShot)) {
             CameraScript_OffsetLookVector(pOut, pCam, pShot->f74, -pShot->f70);
@@ -1239,7 +1239,7 @@ void CamScript_GetLookAtPoint(CamShot* pShot, int nPlayer, f32* pOut, f32* pCam,
         fn_8001EB8C(gPlayers[nPlayer].pChar, 0x39, vBone39);
         fn_8001EB8C(gPlayers[nPlayer].pChar, 0x47, vBone47);
         fn_8004544C(vBone39, vBone47, vMid);
-        fn_8001EF34(vMid, 0.5f, vMid);
+        fn_8001EF34(0.5f, vMid, vMid);
         if (CameraScript_SnapToScript(pScript, pShot)) {
             Vec3Copy(vMid, pOut);
             if (fn_800453C8(nPlayer, pShot)) {
@@ -1411,7 +1411,7 @@ void CameraScript_LagAimMarker(int nPlayer, f32* pSub, f32* pCam, CamShot* pShot
             if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
                 fn_800BAF04(vDir, vDir);
             }
-            fn_8001EF34(vDir, fMin, vDir);
+            fn_8001EF34(fMin, vDir, vDir);
             fAimY = vAim[1];
             vDir[1] = (vGoal[1] - fAimY) * ((f32)fn_80009680(fn_80009744(vDir)) / fMin) + fAimY - pCam[1];
             fn_8004544C(vDir, pCam, vGoal);
@@ -1444,14 +1444,14 @@ void CameraScript_LagAimMarker(int nPlayer, f32* pSub, f32* pCam, CamShot* pShot
         if (0.0f != vAxis[0] || 0.0f != vAxis[1] || 0.0f != vAxis[2]) {
             fn_800BAF04(vAxis, vAxis);
         }
-        fn_8001EF34(vAxis, fAngle, vAxis);
+        fn_8001EF34(fAngle, vAxis, vAxis);
         Quat_BuildFromVector(vAxis, qTurn);
         vCur[3] = 0.0f;
         Quat_RotateVector(qTurn, vCur, vDir);
         if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
             fn_800BAF04(vDir, vDir);
         }
-        fn_8001EF34(vDir, fDist, vDir);
+        fn_8001EF34(fDist, vDir, vDir);
         fn_8004544C(pCam, vDir, pSub);
         pSub[1] = fYShare * (vGoal[1] - fOldY) + fOldY;
     }
@@ -1487,7 +1487,7 @@ void CameraScript_LagBallFlight(int nPlayer, f32* pOut, f32* pCam, CamShot* pSho
     DynamicCam_GetSmoothBallLocation(pScript, pShot, nPlayer, vBall, 0);
     for (i = 0; i < nUpdates; i++) {
         fn_80045428(vBall, pScript->v70, vStep);
-        fn_8001EF34(vStep, (f32)(i + 1) / (f32)nUpdates, vStep);
+        fn_8001EF34((f32)(i + 1) / (f32)nUpdates, vStep, vStep);
         fn_8004544C(pScript->v70, vStep, vAim);
         vAim[1] = CameraScript_GetBallHeightWithMaxHeight(nPlayer, pScript, vAim, pCam, pShot);
         CameraScript_OffsetLookVector(vAim, pCam, pShot->f74, pShot->f70);
@@ -1537,7 +1537,7 @@ void CameraScript_LagBallFlight(int nPlayer, f32* pOut, f32* pCam, CamShot* pSho
                             + lbl_80281F78->f140;
             }
         }
-        fn_8001EF34(vMove, fRate, vMove);
+        fn_8001EF34(fRate, vMove, vMove);
         fn_8004544C(vMove, pOut, pOut);
         Vec3Copy(pOut, vLast);
     }
@@ -1588,7 +1588,7 @@ void CameraScript_LagTargetPoint(int nPlayer, f32* pOut, f32* pCam, f32* pTarget
             && 0.0f == pScript->fCamTime) {
             fRate = 1.0f;
         }
-        fn_8001EF34(vMove, fRate, vMove);
+        fn_8001EF34(fRate, vMove, vMove);
         fn_8004544C(vMove, pOut, pOut);
         fn_80045428(vAim, pOut, vMove);
         fDy = vAim[1] - pOut[1];
@@ -1718,13 +1718,13 @@ void CameraScript_UpdateLandingEstimate(CamScript* pScript, int nPlayer) {
             if (vVel[1] >= 0.0f) {
                 fRise = pBall->vVel[1] / 0.10717f;
                 fn_800BAF04(vVel, vStep);
-                fn_8001EF34(vStep, fRise, vUp);
+                fn_8001EF34(fRise, vStep, vUp);
                 fn_8004544C(vPos, vUp, vPos);
                 vVel[1] = 0.0f;
             }
             vVel[1] -= powf(pBall->fHeight, 0.7f) / 1.4f;
             fn_800BAF04(vVel, vVel);
-            fn_8001EF34(vVel, 200.0f, vVel);
+            fn_8001EF34(200.0f, vVel, vVel);
             fn_8004544C(vPos, vVel, vStep);
             pCourse = fn_8000C594();
             if (Ter_CheckForGroundCollision(pCourse, vPos, vStep, vHit, vNormal, &pSurface, &pObj)) {
@@ -1735,7 +1735,7 @@ void CameraScript_UpdateLandingEstimate(CamScript* pScript, int nPlayer) {
                 fReach *= SW_vGetShotPower(nPlayer);
                 if (fReach < fDist - 50.0f) {
                     fn_800BAF04(vLand, vLand);
-                    fn_8001EF34(vLand, fReach, vLand);
+                    fn_8001EF34(fReach, vLand, vLand);
                     fn_8004544C(pBall->vStart, vLand, vLand);
                     fHeight = CamScript_GuessBestPlayableHeight(vLand, NULL);
                     if (!(fHeight < -60000.0f)) {
@@ -1751,7 +1751,7 @@ void CameraScript_UpdateLandingEstimate(CamScript* pScript, int nPlayer) {
         }
     } else {
         Vec3Copy(pBall->vVel, vStep);
-        fn_8001EF34(vStep, 5.0f * Physics_GetLiePowerPercentage(&gPlayers[nPlayer].ball), vStep);
+        fn_8001EF34(5.0f * Physics_GetLiePowerPercentage(&gPlayers[nPlayer].ball), vStep, vStep);
         fn_8004544C(vPos, vStep, vStep);
         fHeight = CamScript_GuessBestPlayableHeight(vStep, NULL);
         if (!(fHeight < -60000.0f)) {
@@ -2273,7 +2273,7 @@ void CamScript_GetCameraOnFairwayPos(CamScript* pScript, f32* pOut, f32* pCam, i
     if (0.0f != vPastPin[0] || 0.0f != vPastPin[1] || 0.0f != vPastPin[2]) {
         fn_800BAF04(vPastPin, vPastPin);
     }
-    fn_8001EF34(vPastPin, 3.0f, vPastPin);
+    fn_8001EF34(3.0f, vPastPin, vPastPin);
     fn_8004544C(pPin, vPastPin, vPastPin);
 
     fn_80045428(gPlayers[nPlayer].ball.vPos, vNearBall, vDiff);
@@ -2348,7 +2348,7 @@ void CamScript_GetCameraOnFairwayPos(CamScript* pScript, f32* pOut, f32* pCam, i
     }
     if (!bFound) {
         fn_80045428(pPin, &pCourse->tee[0].x, vHalf);
-        fn_8001EF34(vHalf, 0.5f, vHalf);
+        fn_8001EF34(0.5f, vHalf, vHalf);
         fn_8004544C(&pCourse->tee[0].x, vHalf, vHalf);
         fn_80044768(vHalf, vSpot);
     }
@@ -2360,7 +2360,7 @@ void CamScript_GetCameraOnFairwayPos(CamScript* pScript, f32* pOut, f32* pCam, i
         if (0.0f != vNearBall[0] || 0.0f != vNearBall[1] || 0.0f != vNearBall[2]) {
             fn_800BAF04(vNearBall, vNearBall);
         }
-        fn_8001EF34(vNearBall, 2.0f, vNearBall);
+        fn_8001EF34(2.0f, vNearBall, vNearBall);
         fn_8004544C(pPin, vNearBall, vSpot);
     }
     fHeight = CamScript_GuessBestPlayableHeight(vSpot, NULL);

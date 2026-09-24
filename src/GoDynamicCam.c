@@ -564,7 +564,7 @@ void fn_8003A148(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32
             fStep = fDist * (1.0f - (fLimit - fDist) / fLimit);
             fStep = fStep * fStep;
         }
-        fn_8001EF34(aDir, fStep, aStep);
+        fn_8001EF34(fStep, aDir, aStep);
         fn_8003DC30(aOld, aStep, pOut);
     }
 }
@@ -755,7 +755,7 @@ void fn_8003ADF8(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32
                     fScale = (fFar - lbl_80281F78->f23C) / (lbl_80281F78->f244 - lbl_80281F78->f23C);
                     fScale = lbl_80281F78->f240 - fScale * (lbl_80281F78->f240 - lbl_80281F78->f248);
                 }
-                fn_8001EF34(vOff, fScale, vOff);
+                fn_8001EF34(fScale, vOff, vOff);
                 fn_8003DC30(vOff, pSub, pOut);
             }
         } else {
@@ -888,7 +888,7 @@ void fn_8003B028(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32
     if (aAxis[0] != 0.0f || aAxis[1] != 0.0f || aAxis[2] != 0.0f) {
         fn_800BAF04(aAxis, aAxis);
     }
-    fn_8001EF34(aAxis, fTurn, aAxis);
+    fn_8001EF34(fTurn, aAxis, aAxis);
     Quat_BuildFromVector(aAxis, aTurn);
     aCurDir[3] = 0.0f;
     Quat_RotateVector(aTurn, aCurDir, aNew);
@@ -899,7 +899,7 @@ void fn_8003B028(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32
         aNewDir[1] = 0.0f;
         aNewDir[2] = 0.0f;
     }
-    fn_8001EF34(aNewDir, fCurDist + fStep, aNew);
+    fn_8001EF34(fCurDist + fStep, aNewDir, aNew);
     fn_8003DC30(aFrom, aNew, pOut);
 }
 
@@ -991,7 +991,7 @@ void DynamicCam_GetLocation(int nKind, int nPlayer, f32* pOut, CamScript* pScrip
         fn_8001EB8C(gPlayers[nPlayer].pChar, 0x39, vBone39);
         fn_8001EB8C(gPlayers[nPlayer].pChar, 0x47, vBone47);
         fn_8003DC30(vBone39, vBone47, vMid);
-        fn_8001EF34(vMid, 0.5f, vMid);
+        fn_8001EF34(0.5f, vMid, vMid);
         Vec3Copy(vMid, pOut);
         break;
     case 6:
@@ -1667,7 +1667,7 @@ void DynamicCam_AddHeightOffset(f32* pPos, CamScript* pScript, CamShot* pShot, i
         fn_8001EB8C(gPlayers[nPlayer].pChar, 0x39, vBone39);
         fn_8001EB8C(gPlayers[nPlayer].pChar, 0x47, vBone47);
         fn_8003DC30(vBone39, vBone47, vMid);
-        fn_8001EF34(vMid, 0.5f, vMid);
+        fn_8001EF34(0.5f, vMid, vMid);
         pPos[1] = vMid[1];
         break;
     case 2:
@@ -1708,7 +1708,7 @@ void DynamicCam_AddHeightOffset(f32* pPos, CamScript* pScript, CamShot* pShot, i
     }
     for (i = 0; i < nSteps; i++) {
         fn_8003DC54(vPoint, pScript->v70, vOff);
-        fn_8001EF34(vOff, (f32)(i + 1) / (f32)nSteps, vOff);
+        fn_8001EF34((f32)(i + 1) / (f32)nSteps, vOff, vOff);
         fn_8003DC30(pScript->v70, vOff, vStep);
         pPos[1] = vStep[1];
         pPos[1] += pShot->f80;
@@ -1773,7 +1773,7 @@ void fn_8003D810(f32* pDir, f32* pA, f32* pB) {
         if (0.0f != vAxis[0] || 0.0f != vAxis[1] || 0.0f != vAxis[2]) {
             fn_800BAF04(vAxis, vAxis);
         }
-        fn_8001EF34(vAxis, lbl_80281F78->f19C, vAxis);
+        fn_8001EF34(lbl_80281F78->f19C, vAxis, vAxis);
         Quat_BuildFromVector(vAxis, qTurn);
         vLevel[3] = 0.0f;
         Quat_RotateVector(qTurn, vLevel, pDir);

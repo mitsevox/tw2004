@@ -1860,7 +1860,7 @@ void fn_800342F0(UStreamObject* pObject) {
     // port: f5B3C..f5B48 are read as one vector
     fLength = fn_80009680(fn_80009744(&gSession.f5B3C));
     if (fLength < 2000.0f && fLength > 0.0f) {
-        fn_8001EF34(&gSession.f5B3C, 2000.0f / fLength, &gSession.f5B3C);
+        fn_8001EF34(2000.0f / fLength, &gSession.f5B3C, &gSession.f5B3C);
     }
     i = Game_GetCourse();
     if (i >= 21) {

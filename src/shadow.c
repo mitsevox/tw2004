@@ -248,7 +248,7 @@ void fn_800B28D4(Character* pChar, int nView, u8 bFlat) {
         fn_8001EB8C(pChar, 0x47, vA);
         fn_8001EB8C(pChar, 0x39, vB);
         fn_800B3460(vA, vB, vPos);
-        fn_8000AE28(vPos, 0.5f, vPos);
+        fn_8000AE28(0.5f, vPos, vPos);
     } else {
         fn_8001EB8C(pChar, 0, vPos);
     }
@@ -296,7 +296,7 @@ void fn_800B28D4(Character* pChar, int nView, u8 bFlat) {
                 vCorner[2] = fZ;
                 vCorner[3] = 1.0f;
                 fn_800BAD60(aLight, (Vec4*)vCorner, (Vec4*)vOut);
-                fn_8000AE28(vOut, 1.0f / vOut[3], vOut);
+                fn_8000AE28(1.0f / vOut[3], vOut, vOut);
                 if (vOut[0] > fMaxX) {
                     fMaxX = vOut[0];
                 }

@@ -69,7 +69,7 @@ void fn_8006F154(void) {
         fT = (fAngle - 1.5f * PI) * (2.0f / PI);
     }
     fn_8006F3D0(pFrom, pTo, &pSettings->f44, fT);
-    fn_8001EF34(&pSettings->f44, 255.0f, &pSettings->f44);
+    fn_8001EF34(255.0f, &pSettings->f44, &pSettings->f44);
 }
 
 // The default colours: all four the same grey-blue, no turn.

@@ -206,7 +206,7 @@ void GolfCamera_InitZoomToAimCamera(View* pView, int nPlayer) {
             fn_800BAF04(vDir, vDir);
         }
         fn_800C73DC(vAim, pCam, v);
-        fn_8001EF34(vDir, fn_80009680(fn_80009744(v)), vDir);
+        fn_8001EF34(fn_80009680(fn_80009744(v)), vDir, vDir);
         fn_800C73B8(pCam, vDir, pSub);
     }
     EVENT_Trigger(nPlayer, 0x30, NULL, -1);
@@ -271,7 +271,7 @@ void GolfCamera_ProcessZoomToAimCamera(View* pView, int nPlayer) {
             fn_800BAF04(vCreep, vCreep);
         }
         fSlow /= lbl_80281F78->f18;
-        fn_8001EF34(vCreep, fSlow, vCreep);
+        fn_8001EF34(fSlow, vCreep, vCreep);
         fn_800C73B8(pCam, vCreep, pCam);
         fDist = 0.0f;
     } else if (fDist > lbl_80281F78->f24 && fn_8000C5FC(vMove, vAimMove) > 0.0f
@@ -299,7 +299,7 @@ void GolfCamera_ProcessZoomToAimCamera(View* pView, int nPlayer) {
         if (vMove[0] != 0.0f || vMove[1] != 0.0f || vMove[2] != 0.0f) {
             fn_800BAF04(vMove, vMove);
         }
-        fn_8001EF34(vMove, fSlow, vMove);
+        fn_8001EF34(fSlow, vMove, vMove);
         fn_800C73B8(vMove, pCam, pCam);
         fSpeed = lbl_80281F78->f1C * (1.0f - fBase / fSpeed);
         if (fSpeed < 0.0f) {
@@ -461,7 +461,7 @@ void GolfCamera_InitGreenZoomToAimCamera(View* pView, int nPlayer) {
                 fn_800BAF04(vDir, vDir);
             }
             fn_800C73DC(vAim, pCam, v);
-            fn_8001EF34(vDir, fn_80009680(fn_80009744(v)), vDir);
+            fn_8001EF34(fn_80009680(fn_80009744(v)), vDir, vDir);
             fn_800C73B8(pCam, vDir, pSub);
         }
         EVENT_Trigger(nPlayer, 0x30, NULL, -1);
@@ -544,7 +544,7 @@ void GolfCamera_ProcessGreenZoomToAimCamera(View* pView, int nPlayer) {
                 fn_800BAF04(vCreep, vCreep);
             }
             fSlow /= lbl_80281F78->f48;
-            fn_8001EF34(vCreep, fSlow, vCreep);
+            fn_8001EF34(fSlow, vCreep, vCreep);
             fn_800C73B8(pCam, vCreep, pCam);
             if (pCam[1] < pView->shot19C.f68 + fHeight) {
                 pCam[1] += lbl_80281F78->f40;
@@ -590,7 +590,7 @@ void GolfCamera_ProcessGreenZoomToAimCamera(View* pView, int nPlayer) {
             if (vMove[0] != 0.0f || vMove[1] != 0.0f || vMove[2] != 0.0f) {
                 fn_800BAF04(vMove, vMove);
             }
-            fn_8001EF34(vMove, fSlow, vMove);
+            fn_8001EF34(fSlow, vMove, vMove);
             fn_800C73B8(vMove, pCam, pCam);
             fSlow = lbl_80281F78->f1C * (1.0f - fBase / fSpeed);
             if (fSlow < 0.0f) {
@@ -1185,7 +1185,7 @@ void fn_800C0414(View* pView, int nPlayer) {
                 fn_800BAF04(vDir, vDir);
             }
             t = 1.0f - pView->script.fCamTime / fTime;
-            fn_8001EF34(vDir, fOut * (t * t), vDir);
+            fn_8001EF34(fOut * (t * t), vDir, vDir);
             fn_800C73B8(vDir, gPlayers[nPlayer].ballBefore.vPos, pCam);
         } else {
             Vec3Copy(gPlayers[nPlayer].ballBefore.vPos, pCam);
@@ -1865,7 +1865,7 @@ void GolfCamera_InitBallFlightCamera(View* pView, int nPlayer) {
         nClass = 2;
         fn_800C73DC(gPlayers[nPlayer].vTarget, gPlayers[nPlayer].vBall, vAim);
         fn_800BAF04(vAim, vAim);
-        fn_8001EF34(vAim, fDist, vAim);
+        fn_8001EF34(fDist, vAim, vAim);
         fn_800C73B8(vAim, gPlayers[nPlayer].vBall, pView->script.v50);
     }
     if (pView->p74 != NULL && pView->p74->b44 == 3 && pView->p74->p20 != pView->p74 && pView->p74->p20 != NULL
@@ -2548,7 +2548,7 @@ void fn_800C3EDC(View* pView, int nPlayer) {
     m = fn_8001ED08(gPlayers[nPlayer].pChar, 10);
     Vec_Copy(m[3], pSub);
     fn_8000C5D4(pSub, m[1], 0.1f, pSub);
-    fn_8001EF34(m[2], 0.5f, pCam);
+    fn_8001EF34(0.5f, m[2], pCam);
     fn_800C73B8(m[3], pCam, pCam);
     fn_8000C5D4(pCam, m[1], 0.1f, pCam);
     pCam[3] = 1.0f;
@@ -2583,7 +2583,7 @@ u8 fn_800C3FC0(View* pView, int nPlayer, f32* pSub, f32* pAim, f32* pCam) {
     if (vDir[0] != 0.0f || vDir[1] != 0.0f || vDir[2] != 0.0f) {
         fn_800BAF04(vDir, vDir);
     }
-    fn_8001EF34(vDir, pView->shot19C.f60, vOff);
+    fn_8001EF34(pView->shot19C.f60, vDir, vOff);
     fn_800C73B8(pBall, vOff, pAim);
     pAim[0] += pView->shot19C.f64 * -fn_8000C5FC(vDir, lbl_801913A8);
     pAim[2] += pView->shot19C.f64 * fn_8000C5FC(vDir, lbl_80191398);
@@ -2909,7 +2909,7 @@ void GolfCamera_ClampLookAngle(f32* pFrom, f32* pTo, f32* pOut) {
         if (vAxis[0] != 0.0f || vAxis[1] != 0.0f || vAxis[2] != 0.0f) {
             fn_800BAF04(vAxis, vAxis);
         }
-        fn_8000AE28(vAxis, fOver, vAxis);
+        fn_8000AE28(fOver, vAxis, vAxis);
         Quat_BuildFromVector(vAxis, vQuat);
         v[3] = 0.0f;
         Quat_RotateVector(vQuat, v, vOut);
@@ -2926,7 +2926,7 @@ int fn_800C4D2C(f32* pFrom, f32* pTo, f32* pOut, f32 fMax) {
     fn_800C73DC(pTo, pFrom, v);
     fDist = fn_80009680(fn_80009744(v));
     if (fDist > fMax && fDist > 1e-6f) {
-        fn_8001EF34(v, fMax / fDist, vStep);
+        fn_8001EF34(fMax / fDist, v, vStep);
         fn_800C73B8(pFrom, vStep, pOut);
         bClamped = 1;
     } else {

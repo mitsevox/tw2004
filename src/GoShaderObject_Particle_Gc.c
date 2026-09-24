@@ -71,10 +71,10 @@ void fn_8009428C(SD_SShaderObject_Static* pObject, ParticleCreate* pCreate) {
     Vec_Copy(pCreate->pParams->vF0, pSys->shape.v0);
     pSys->shape.f40 = pCreate->pParams->f104;
     pSys->shape.f44 = pCreate->pParams->f108;
-    fn_8000AE28(pSys->shape.v10, 1.0f / 256.0f, pSys->shape.v10);
-    fn_8000AE28(pSys->shape.v20, 1.0f / 256.0f, pSys->shape.v20);
-    fn_8000AE28(pSys->shape.v30, 1.0f / 256.0f, pSys->shape.v30);
-    fn_8000AE28(pSys->shape.v0, 1.0f / 256.0f, pSys->shape.v0);
+    fn_8000AE28(1.0f / 256.0f, pSys->shape.v10, pSys->shape.v10);
+    fn_8000AE28(1.0f / 256.0f, pSys->shape.v20, pSys->shape.v20);
+    fn_8000AE28(1.0f / 256.0f, pSys->shape.v30, pSys->shape.v30);
+    fn_8000AE28(1.0f / 256.0f, pSys->shape.v0, pSys->shape.v0);
     pSys->shape.f40 = pSys->shape.f40 / 256.0f;
     pSys->shape.f44 = pSys->shape.f44 / 256.0f;
     pSys->shape.f48 = 1.4142f * pCreate->pParams->f118;
@@ -84,7 +84,7 @@ void fn_8009428C(SD_SShaderObject_Static* pObject, ParticleCreate* pCreate) {
     pSys->shape.f58 = 1.0f / (2.0f * PI);
     pSys->shape.f5C = 0.5f;
     fn_8000AE6C(pCreate->pParams->vB0, pCreate->pParams->vA0, pCreate->pParams->f110, pSys->shape.v60);
-    fn_8000AE28(pSys->shape.v60, pSys->shape.f54, pSys->shape.v60);
+    fn_8000AE28(pSys->shape.f54, pSys->shape.v60, pSys->shape.v60);
     pSys->shape.v60[3] = 0.0f;
     pSys->shape.aSin[0] = 2.0f * PI;
     pSys->shape.aSin[1] = -(2.0f * PI) * (2.0f * PI) * (2.0f * PI) / 6.0f;

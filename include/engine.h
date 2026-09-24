@@ -165,7 +165,7 @@ f32  fn_80029B64(f32 x);                // square root (Skeleton.c); x itself wh
 void fn_8000C5D4(f32* pA, f32* pB, f32 f, f32* pOut);   // out = a + f x b
 f32  fn_8000C5FC(f32* pA, f32* pB);     // dot product
 f32  fn_80009614(f32 x);                // arc cosine
-void fn_8000AE28(f32* pIn, f32 f, f32* pOut);   // scale a vector (four floats)
+void fn_8000AE28(f32 f, f32* pIn, f32* pOut);   // scale a vector (four floats)
 void fn_8000AE6C(f32* pA, f32* pB, f32 fScale, f32* pOut);   // out = a + fScale x b (four floats)
 double pow(double x, double y);         // 0x8015F824 (MSL)
 f32  powf(f32 x, f32 y);                // 0x8002C8D0 (Golfer.c): pow rounded to a float
@@ -1387,7 +1387,7 @@ extern FadeNode* lbl_80281FA0;
 
 void fn_8001C804(int nPlayer, u8 a, u8 b);  // char.c: sets bits of the player's character's u10
 void fn_8001D8DC(int nPlayer);
-void fn_8001EF34(f32* pIn, f32 f, f32* pOut);   // scale a vector (paired singles)
+void fn_8001EF34(f32 f, f32* pIn, f32* pOut);   // scale a vector (paired singles)
 
 void fn_80045494(u8 bOn, int nPlayer);
 void fn_80045558(u8 bOn, int nPlayer);
