@@ -41,11 +41,11 @@ void  fn_800CC4EC(Character* pChar);                // SkinPart.c
 void* CharSlider_CreateDefinitionsFromMem(u8** ppData);
 void  fn_8001B58C(CharSkinSet* pSet);
 void  fn_8001B878(Character* pChar, int n);
-void  fn_8001C0E0(Character* pChar);
 Character* fn_8001C21C(Character* pChar);
 void  Character_UpdateAnimation(Character* pChar, int a, f32 f);
 void  Character_UpdateTestPoints(Character* pChar);
-void  Character_UpdateFeetTerrainInfo(Character* pChar, int a);
+void  Character_UpdateFeetTerrainInfo(Character* pChar, int bNormals);
+f32   Character_GetTerrainHeightAndNormal(Character* pChar, f32* pPos, f32** ppNormal);
 void  Character_PlaceFeetOnGround(Character* pChar);
 void  SKEL_TransformBones(CharModel* pModel, u32* auBits);
 void  fn_800B28D4(Character* pChar, int a, int b);
@@ -58,7 +58,6 @@ void  fn_8001CE5C(UStreamObject* pObject);
 void  fn_8001D020(UStreamObject* pObject);
 void  fn_8001D3EC(UStreamObject* pObject);
 void  fn_8001D7EC(Character* pChar);
-void  fn_8001C5B4(Character* pChar, int n);
 void  fn_800BBADC(int nValue);         // SitDevFile.c
 void  fn_8001EBD8(Character* pChar, int nBone, f32* pPos);
 u8    fn_8001EC48(Character* pChar);
@@ -77,7 +76,6 @@ void  fn_80072ED8(void* pAnim, SKABlendNode* pNode, f32 fTime);                 
 void  fn_80073108(Character* pChar, int nPlayer, void* pAnim, SKABlendNode* pNode, f32 fTime);
 void  fn_8009622C(Character* pChar, void* pClip, u8 bKeep, f32 fOffset);                  // CharAnim.c
 void  fn_80096F0C(Character* pChar);                            // CharAnim.c
-s32   fn_8009637C(Character* pChar);                            // CharAnim.c
 void  fn_8000914C(f32* pQ, f32 (*m)[4]);                        // Quaternion.c: a rotation matrix
 void  fn_8001BD18(Character* pChar, Clip* pClip);
 void  fn_8001FCF4(Character* pChar, Clip* pClip, SkelPose* pPose, int n, f32 fTime);
@@ -140,8 +138,17 @@ void  fn_800CEE88(u8 b);
 u8    fn_800FCC38(int nPlayer);
 void  fn_8010A668(void* p);
 void  fn_80008380(void);
+void  fn_800106AC(int n);               // LLTexGrp.c
+void  fn_800106B8(u8 b);                // LLTexGrp.c
+void  fn_8008F310(void);                // uiLoadFile.c: park the UI file's data in ARAM
+void* fn_8008F354(void);                // uiLoadFile.c: the UI file's buffer
+void  fn_8008F35C(void);                // uiLoadFile.c: bring the UI file's data back
+void  fn_8001BE88(Character* pChar, Clip* pClip, int bNoBlend, f32 f);
+void  fn_80035600(void);                // GoTerrain.c
 void  fn_80035604(void);                // GoTerrain.c
 void  fn_800358E0(Character* pChar, u32 uFlags);
+void  fn_80035B40(Character* pChar, int n);
+void  fn_800364A0(void);                // Skin.c
 int   fn_800636EC(void);                // GoCamCont.c
 void  fn_8010BF68(void);
 void  fn_8010BFE0(void);
@@ -151,19 +158,9 @@ void  fn_80112CEC(void);
 // ---- sweep code (not yet cleaned up) ----
 void fn_8001E8A4(u32* aBits, u32 nBits);
 void fn_8001E938(u32* aBits, u32 nBits);
-void fn_80017864(void* arg0, u32 (*arg1)[4]);
 void fn_8001B1DC(s32 p0, u8* p1, s32 p2);
 void fn_8001B1E8(void* p);
 void fn_8001C650(void* arg0, s32 arg1);
-
-void fn_80017864(void* arg0, u32 (*arg1)[4]) {
-    if ((u32) (*(u32*)((u8*)(arg0) + 0x3C)) != 0U) {
-        fn_8001E8A4(arg1[2], 0x80);
-        fn_8001E8A4(arg1[3], 0x80);
-        fn_8001E938(arg1[0], 0x80);
-        fn_8001E938(arg1[1], 0x80);
-    }
-}
 
 void fn_8001B1DC(s32 p0, u8* p1, s32 p2) {
     *(s32*)p1 = p2;
@@ -251,6 +248,155 @@ void* Char_SetClip(Character* pChar, int nGroup, int nStyle, const char* pName) 
     }
     pChar->pCurClip = pClip;
     return pClip;
+}
+
+// Fill a blend node's pose from the character's body skin (none: the pose is left alone): the
+// first two bit arrays cleared, the next two set, and every bone's rotation and position copied.
+void fn_800177A0(Character* pChar, SkelPose* pPose) {
+    int i;
+    Skin* pSkin = pChar->pSkin;
+
+    if (pSkin != NULL) {
+        fn_8001E938(pPose->a0, 0x80);
+        fn_8001E938(pPose->a10, 0x80);
+        fn_8001E8A4(pPose->a20, 0x80);
+        fn_8001E8A4(pPose->a30, 0x80);
+        for (i = 0; i < pChar->pModel->nBones; i++) {
+            fn_8001E85C(pSkin->pose.aBones[i].q0, pPose->aBones[i].q0);
+            fn_8001E85C(pSkin->pose.aBones[i].v10, pPose->aBones[i].v10);
+        }
+    }
+}
+
+// Only the bit arrays of fn_800177A0 (with a body skin): the last two set, the first two cleared.
+void fn_80017864(Character* pChar, SkelPose* pPose) {
+    if (pChar->pSkin != NULL) {
+        fn_8001E8A4(pPose->a20, 0x80);
+        fn_8001E8A4(pPose->a30, 0x80);
+        fn_8001E938(pPose->a0, 0x80);
+        fn_8001E938(pPose->a10, 0x80);
+    }
+}
+
+// The ground height (and with bNormals its normal; straight up without ground) under points 0-3.
+// n1784 would pick a half of them per call (points 0 and 2, or 1 and 3), but it is set to -1
+// first, so every call does all four.
+void Character_UpdateFeetTerrainInfo(Character* pChar, int bNormals) {
+    f32* pNormal;
+    f32 fHeight;
+    int i;
+    int nLast;
+    int nStep;
+
+    if (fn_8000C594() != NULL) {
+        pChar->n1784 = -1;
+        if (pChar->n1784 < 0) {
+            pChar->n1784 = 0;
+            nLast = 3;
+            nStep = 1;
+        } else {
+            nLast = 2;
+            nStep = 2;
+        }
+        for (i = 0; i <= nLast; i += nStep) {
+            fHeight = Character_GetTerrainHeightAndNormal(pChar, pChar->aPoints[i + pChar->n1784], &pNormal);
+            if (!(fHeight < -60000.0f)) {
+                pChar->afGroundHeight[i + pChar->n1784] = fHeight;
+            }
+            if (bNormals) {
+                if (fHeight < -60000.0f) {
+                    pChar->aGroundNormal[i + pChar->n1784][0] = 0.0f;
+                    pChar->aGroundNormal[i + pChar->n1784][1] = 1.0f;
+                    pChar->aGroundNormal[i + pChar->n1784][2] = 0.0f;
+                    pChar->aGroundNormal[i + pChar->n1784][3] = 0.0f;
+                } else {
+                    Vec_Copy(pNormal, pChar->aGroundNormal[i + pChar->n1784]);
+                }
+            }
+        }
+        pChar->n1784++;
+        if (pChar->n1784 >= 2) {
+            pChar->n1784 = 0;
+        }
+    }
+}
+
+// The ground height at pPos (looked for from 0.055 above it), with *ppNormal pointed at that
+// ground's normal; -65536.125 for none, and for surface classes 0xC and 0x12. Of the two heights
+// around the point the high one is taken when it is the only one, or the low one is on class 7 or
+// 0x13, or the two are less than 0.05 apart, or it is below 1 over the point.
+f32 Character_GetTerrainHeightAndNormal(Character* pChar, f32* pPos, f32** ppNormal) {
+    f32 vPos[4];
+    f32 fLow;
+    f32 fHigh;
+    SurfaceType* pLowSurface;
+    SurfaceType* pHighSurface;
+    CourseInfo* pCourse;
+
+    if (pChar != NULL) {
+        if ((pCourse = fn_8000C594()) != NULL) {
+            Vec_Copy(pPos, vPos);
+            vPos[1] += 0.055f;
+            Ter_GetEnclosingGroundData(pCourse, vPos, &fLow, &pLowSurface, lbl_801B95D8, &fHigh,
+                                       &pHighSurface, lbl_801B95C8);
+            if (!(fHigh < -60000.0f)) {
+                if (fLow < -60000.0f || pLowSurface->nClass == 7 || pLowSurface->nClass == 0x13 ||
+                    fHigh - fLow < 0.05f || fHigh < 1.0f + pPos[1]) {
+                    if (pHighSurface->nClass == 0xC || pHighSurface->nClass == 0x12) {
+                        return -65536.125f;
+                    }
+                    *ppNormal = lbl_801B95C8;
+                    return fHigh;
+                }
+            } else if (fLow < -60000.0f) {
+                return -65536.125f;
+            }
+            if (pLowSurface->nClass == 0xC || pLowSurface->nClass == 0x12) {
+                return -65536.125f;
+            }
+            *ppNormal = lbl_801B95D8;
+            return fLow;
+        }
+        return -65536.125f;
+    }
+    return -65536.125f;
+}
+
+// Keeps the club out of the ground: when point 4 is below the terrain and bone 0x52's y axis
+// points into the slope, that axis is shortened by how far the point is under, measured against
+// the club class's head height (not below 3/4 of it).
+void fn_80017DDC(Character* pChar) {
+    f32 vNormal[4];
+    f32 (*pMtx)[4];
+    CourseInfo* pCourse;
+    f32 fHeight;
+    f32 fUnder;
+    f32 fDot;
+    f32 fLength;
+    f32 fHead;
+
+    if (pChar->p16D8 != NULL && pChar->a179C[1] > 0.9f) {
+        pMtx = fn_8001ED08(pChar, 0x52);
+        if (pMtx != NULL && (pCourse = fn_8000C594()) != NULL) {
+            fHeight = fn_8004D650(pCourse, pChar->aPoints[4], vNormal);
+            if (fHeight < -60000.0f) {
+                return;
+            }
+            fUnder = fHeight - pChar->aPoints[4][1];
+            if (fUnder < 0.0f) {
+                return;
+            }
+            fDot = -fn_8001EEA4(pMtx[1], vNormal);
+            if (fDot > 0.707f) {
+                fHead = pChar->p16D8->afC[pChar->nClubClass];
+                fLength = (fHead - fUnder * vNormal[1] / fDot) / fHead;
+                if (fLength > 0.75f) {
+                    fn_8001EF34(pMtx[1], fLength, pMtx[1]);
+                    fn_80029A90(pChar->pModel, pMtx, 0x52);
+                }
+            }
+        }
+    }
 }
 
 // Advances the character's animation by fTime: both animation players and their blend trees, the
@@ -931,6 +1077,58 @@ void fn_8001A4BC(void) {
     }
 }
 
+// With more than two players, the pool entries go to player nPlayer and the next player
+// (fn_800E295C): every other character holding entries (except the one queued last) gives them
+// back and gets bit 0x40 of u10; nPlayer's character loses that bit, and unless it has its entries
+// already it takes them (the queued character giving its back first) and queues its dynamic
+// textures. The next player's character is then queued the same way.
+void fn_8001A58C(int nPlayer) {
+    int i;
+    Character* pChar;
+    Character* pQueued;
+
+    if (gSession.nNumPlayers > 2) {
+        gPlayers[nPlayer].pChar->u10 &= ~0x40;
+        fn_80008380();
+        pChar = gPlayers[nPlayer].pChar;
+        for (i = 0; i < gSession.nNumPlayers; i++) {
+            if (i != nPlayer && gPlayers[i].pChar->a64[gPlayers[i].pChar->n74] != NULL &&
+                gPlayers[i].pChar != lbl_801B95E8.a[6].p) {
+                fn_8001A484(gPlayers[i].pChar);
+                fn_8001A3B0(gPlayers[i].pChar);
+                gPlayers[i].pChar->bE0 = 0;
+                gPlayers[i].pChar->u10 |= 0x40;
+            }
+        }
+        if (!pChar->bE0) {
+            pQueued = lbl_801B95E8.a[6].p;
+            if (pChar != pQueued) {
+                fn_8010BF68();
+                if (pQueued != NULL) {
+                    fn_8001A484(pQueued);
+                    fn_8001A3B0(pQueued);
+                    pQueued->bE0 = 0;
+                    pQueued->u10 |= 0x40;
+                }
+                fn_8001A418(pChar);
+                fn_80019D64(pChar, fn_8001A14C, fn_8001A20C);
+                fn_8010BF68();
+            } else {
+                fn_8010BF68();
+            }
+        }
+        i = fn_800E295C();
+        if (i < gSession.nNumPlayers) {
+            pChar = gPlayers[i].pChar;
+            if (!pChar->bE0 && pChar != lbl_801B95E8.a[6].p) {
+                fn_8010BF68();
+                fn_8001A418(pChar);
+                fn_80019D64(pChar, fn_8001A14C, fn_8001A20C);
+            }
+        }
+    }
+}
+
 void fn_8001A73C(void) {
     fn_8010BF68();
 }
@@ -1224,6 +1422,38 @@ void fn_8001B58C(CharSkinSet* pSet) {
     }
 }
 
+// For every character made: bit 0x1000 of u10 cleared; with bit 2, bit 1 follows whether the
+// flagstick is out on the current view. Then fn_80035B40 for every character that is not in state
+// 2 (fn_8001EE90) or whose n1658 is 2, is not the camera's player (fn_800636EC), has none of bits
+// 0x1000, 0x40 and 1 of u10 set, and has n1698 0.
+void fn_8001BA74(void) {
+    int i;
+    int nPlayer;
+    u8 bDo;
+    int bState;
+
+    fn_80035600();
+    fn_800364A0();
+    for (i = 0; i < lbl_80281CA8; i++) {
+        nPlayer = fn_800636EC();
+        lbl_801B9624[i]->u10 &= ~0x1000;
+        if (lbl_801B9624[i]->u10 & 2) {
+            if (fn_80016CF4()->bFlagOut) {
+                lbl_801B9624[i]->u10 |= 1;
+            } else {
+                lbl_801B9624[i]->u10 &= ~1;
+            }
+        }
+        bState = fn_8001EE90(lbl_801B9624[i]) != 2;
+        bDo = bState || fn_8001EE88(lbl_801B9624[i]) == 2;
+        bDo = bDo && nPlayer != lbl_801B9624[i]->nPlayer;
+        bDo = bDo && !(lbl_801B9624[i]->u10 & 0x1041);
+        if (bDo && lbl_801B9624[i]->n1698 == 0) {
+            fn_80035B40(lbl_801B9624[i], 0);
+        }
+    }
+}
+
 // With characters made: fn_80035604, then fn_800358E0 for every character that is not in state 2
 // (fn_8001EE90), not the camera's player (fn_800636EC), has neither bit 0x40 nor 1 of u10 set and,
 // when uFlags has bit 4, passes fn_8001EC48.
@@ -1355,6 +1585,35 @@ void fn_8001C350(void) {
     fn_800CCA3C();
     fn_80036464();
     fn_80112CEC();
+}
+
+// Starts the character system (called once from the main loop): the animation libraries up, no
+// club skin sets, the club names read as 64-bit ids, no characters in the menu or player slots,
+// and no player marked.
+// port: the names are read as big-endian 64-bit words from their strings (FEgolferanim compares
+//       them with ids read the same way)
+void fn_8001C37C(void) {
+    int i;
+
+    Skalib_Init();
+    fn_8001F64C();
+    fn_80029530();
+    fn_80071AD0();
+    for (i = 0; i < 2; i++) {
+        lbl_80280E24[i] = NULL;
+    }
+    lbl_801B9638[0] = *(u64*)"IGdriver";
+    lbl_801B9638[2] = *(u64*)"IGputter";
+    lbl_801B9638[3] = *(u64*)"IGiron3";
+    lbl_801B9638[4] = *(u64*)"IGiron7";
+    lbl_801B9638[5] = *(u64*)"IGwedge";
+    for (i = 0; i < CRAP_NUM_GOLFERS; i++) {
+        lbl_80281EE8[i] = NULL;
+    }
+    for (i = 0; i < 5; i++) {
+        gViewSlots[i].pChar = NULL;
+    }
+    lbl_80281CAC = -1;
 }
 
 // Frees the club skin sets and every character made, then shuts down the animation libraries.
@@ -1615,9 +1874,97 @@ void fn_8001CE34(void) {
     UStream_UnregisterHandler('CLB ');
 }
 
+// A 'CHR ' object: a character for every player whose golfer has this model and who has none yet
+// (in split screen with the player's own set), dressed from the player's profile, with its body
+// skin and the club skin set's six skins put on the model.
+void fn_8001CE5C(UStreamObject* pObject) {
+    u32 uModel = pObject->uId;
+    int i;
+    int nSet;
+    int nGolferModel;
+    Character* pChar;
+
+    fn_800106B8(1);
+    for (i = 0; i < gSession.nNumPlayers; i++) {
+        nGolferModel = fn_8001C558(i);
+        if (nGolferModel == uModel && gViewSlots[i].pChar == NULL) {
+            fn_800106AC(i);
+            nSet = gSession.nSplitScreen ? i : 0;
+            gViewSlots[i].pChar = fn_8001C21C(fn_8001A9F4(pObject->pData, 0, nSet, uModel,
+                                                          fn_8001C584(i), &gpSaveData[i].choices));
+            if (gViewSlots[i].pChar->pSkin != NULL && fn_8001EC48(gViewSlots[i].pChar)) {
+                fn_8001D4A4(gViewSlots[i].pChar, i);
+            }
+            if (gViewSlots[i].pChar->pSkin != NULL && fn_8001EC48(gViewSlots[i].pChar)) {
+                pChar = gViewSlots[i].pChar;
+                pChar->apSkins[0] = pChar->pSkin;
+                pChar->apSkins[1] = pChar->p16D8->apSkins[0];
+                pChar->apSkins[2] = pChar->p16D8->apSkins[1];
+                pChar->apSkins[3] = pChar->p16D8->apSkins[2];
+                pChar->apSkins[4] = pChar->p16D8->apSkins[3];
+                pChar->apSkins[5] = pChar->p16D8->apSkins[4];
+                pChar->apSkins[6] = pChar->p16D8->apSkins[5];
+                pChar->nSkins = 7;
+                fn_80019798(pChar, pChar->apSkins, pChar->nSkins);
+            }
+        }
+    }
+    fn_800106B8(0);
+    fn_80009E70(pObject);
+}
+
 // The 'CHR ' stream objects: two handlers for the same type.
 void fn_8001CFF0(void) {
     UStream_RegisterHandler('CHR ', fn_8001CE5C);
+}
+
+// A 'CHR ' object for the golfer the menu is loading (lbl_80281EE0->pB8): the UI file is parked in
+// ARAM and its buffer takes a copy of the object (header and data), from which the character is
+// made while the static heap counts what it takes. The character is placed at the origin facing
+// f19C, dressed as the profile's created golfer for golfers 7 and 29, set to club class 5 and its
+// first clip. When it is still the golfer the menu wants, its body and club skins go on the model
+// (created golfers with one pool entry take two) and it takes its pool entries.
+void fn_8001D020(UStreamObject* pObject) {
+    UStreamObject* pCopy;
+    Character* pChar;
+    Clip* pClip;
+
+    fn_8000A0BC();
+    fn_8000A0C8();
+    fn_8008F310();
+    pCopy = fn_8008F354();
+    Mem_cpy(pCopy, pObject, pObject->uSize + 0x80);
+    fn_80009E70(pObject);
+    pCopy->pData = (u8*)pCopy + 0x80;
+    lbl_80281EE0->pB8->pChar = fn_8001A9F4(pCopy->pData, 0, 0, pCopy->uId, 0, NULL);
+    fn_8000A0D4();
+    fn_8000A0E0();
+    fn_80019798(lbl_80281EE0->pB8->pChar, NULL, 0);
+    fn_8008F35C();
+    lbl_80281EE0->pB8->pChar->n16C = -1;
+    Character_SetPosition(lbl_80281EE0->pB8->pChar, lbl_80189A30, 1);
+    fn_800192D4(lbl_80281EE0->pB8->pChar, lbl_80281EE0->f19C);
+    if (lbl_80281EE0->pB8->pChar->nC == 7 || lbl_80281EE0->pB8->pChar->nC == 29) {
+        fn_8001DC64(lbl_80281EE0->pB8->pChar, &fn_80077ACC()->choices);
+    }
+    fn_8001C5B4(lbl_80281EE0->pB8->pChar, 5);
+    pClip = Char_SetClip(lbl_80281EE0->pB8->pChar, 0, 0, NULL);
+    fn_8001BE88(lbl_80281EE0->pB8->pChar, pClip, 1, 0.0f);
+    if (lbl_80281EE0->pB8->nC == lbl_80281EE0->n8C) {
+        pChar = lbl_80281EE0->pB8->pChar;
+        pChar->nSkins = 7;
+        pChar->apSkins[0] = pChar->pSkin;
+        pChar->apSkins[1] = pChar->p16D8->apSkins[0];
+        pChar->apSkins[2] = pChar->p16D8->apSkins[1];
+        pChar->apSkins[3] = pChar->p16D8->apSkins[2];
+        pChar->apSkins[4] = pChar->p16D8->apSkins[3];
+        pChar->apSkins[5] = pChar->p16D8->apSkins[4];
+        pChar->apSkins[6] = pChar->p16D8->apSkins[5];
+        if ((pChar->nC == 7 || pChar->nC == 29) && pChar->n70 == 1) {
+            pChar->n70 = 2;
+        }
+        fn_8001A418(pChar);
+    }
 }
 
 void fn_8001D238(void) {
@@ -1890,6 +2237,50 @@ void fn_8001DC64(Character* pChar, SkinChoices* pChoices) {
         }
     }
     fn_80018484(pChar, pChar->pModel);
+}
+
+// Byte-swaps nBytes of 0x50-byte texture entries in place, once (bit 0x40 of b47 marks it done):
+// from 0x08 four 12-byte records (a 4-byte field, four 2-byte ones), then four 2-byte fields,
+// nine bytes and seven bytes. An entry with b40 0 has its name decoded (not used) and goes with
+// the entry before when that one has the same name and goes with its next.
+void fn_8001DD18(u8* pData, int nBytes) {
+    SwapField aRecord[5] = { { 4, 4 }, { 2, 2 }, { 2, 2 }, { 2, 2 }, { 2, 2 } };
+    SwapField aTail[14] = { { 2, 2 }, { 2, 2 }, { 2, 2 }, { 2, 2 }, { 1, 1 }, { 1, 1 }, { 1, 1 },
+                            { 1, 1 }, { 1, 1 }, { 1, 1 }, { 1, 1 }, { 1, 1 }, { 1, 1 }, { 7, 7 } };
+    char szName[64];            // the size is not known
+    void* pSrc;
+    void* pDst;
+    TexEntry* pEntry;
+    int nEntries;
+    int i;
+    int j;
+
+    if (!(((TexEntry*)pData)->b47 & 0x40)) {
+        pEntry = (TexEntry*)pData;
+        nEntries = nBytes / (int)sizeof(TexEntry);
+        for (i = 0; i < nEntries; i++) {
+            pDst = pEntry;
+            pSrc = pEntry;
+            pData = (u8*)&pEntry->uPixels;
+            for (j = 0; j < 4; j++) {
+                pDst = pData;
+                pSrc = pData;
+                fn_8001F08C(&pSrc, &pDst, aRecord, 5, 1);
+                pData += 12;
+            }
+            pDst = pData;
+            pSrc = pData;
+            fn_8001F08C(&pSrc, &pDst, aTail, 14, 1);
+            if (pEntry->b40 == 0) {
+                fn_800CB868(&pEntry->u0, szName);
+                if (i != 0 && pEntry->u0 == pEntry[-1].u0 && (pEntry[-1].b47 & 1)) {
+                    pEntry->b47 |= 1;
+                }
+            }
+            pEntry->b47 |= 0x40;
+            pEntry++;
+        }
+    }
 }
 
 // Byte-swaps nBytes of 12-byte records in place: a 4-byte field, then four 2-byte ones.

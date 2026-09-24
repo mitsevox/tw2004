@@ -996,9 +996,9 @@ u8 fn_8003D294(CamShot* pShot) {
         n = pGolfer->nC;
         if (n <= 32) {
             // EA bug: n == 32 shifts by 32 (undefined in C; the PowerPC gives 0)
-            return (pShot->u50 & (1 << n)) != 0;
+            return (pShot->u.bits.u50 & (1 << n)) != 0;
         }
-        return (pShot->u54 & (1 << (n - 32))) != 0;
+        return (pShot->u.bits.u54 & (1 << (n - 32))) != 0;
     }
     return 0;
 }
