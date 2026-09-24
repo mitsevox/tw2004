@@ -22,6 +22,7 @@ void  fn_800CEF04(SkinDesc* pDesc);            // SkinPart.c: offsets to pointer
 void  fn_800CD404(Skin* pSkin);                // SkinPart.c
 s32   fn_800CD700(Skin* pSkin);                // SkinPart.c
 void  fn_800CE164(void);                       // SkinPart.c
+void  fn_800CDA68(Skin* pSkin);                // SkinPart.c
 void  fn_8011C9B0(Skin* pSkin);                // SkinMorph.c
 void  fn_8011CADC(Skin* pSkin, int nMorph, f32 fWeight);     // SkinMorph.c
 s32   fn_8011CDE8(Skin* pSkin);                // SkinMorph.c
@@ -309,6 +310,50 @@ void fn_800364AC(SkinModel* pModel) {
         fn_80036344(pModel->p44, pModel->n40);
     }
     pModel->u30 = pModel->u30 | 0x80000000;
+}
+
+// Builds the skin's matrices (p108C): those of the model's bones come from the character model's
+// p768 (from bone nFirst on, nSkip further along there); each one after that whose bit is set in
+// p10CC is a weighted sum of up to three of them (SkinModel.p54).
+void fn_8003662C(Skin* pSkin, CharModel* pCharModel, int nSkip, int nFirst) {
+    SkinModel54* pEntry;
+    f32 (*aMtx)[4][4];
+    f32 (*pDst)[4];
+    f32 (*pSrc)[4];
+    s32 nMatrices;
+    f32 fWeight;
+    int nBones;
+    int i;
+    int j;
+    int k;
+
+    if (pSkin->pModel == NULL) {
+        return;
+    }
+    nMatrices = pSkin->pModel->n50;
+    if (!(pSkin->u10D4 & 2)) {
+        return;
+    }
+    fn_800CDA68(pSkin);
+    if (pSkin->p108C != pCharModel->p768) {
+        Mem_cpy(pSkin->p108C[nFirst], pCharModel->p768[nFirst + nSkip],
+                (pSkin->pModel->n14 - nFirst) * sizeof(*pSkin->p108C));
+    }
+    aMtx = pSkin->p108C;
+    for (i = pSkin->pModel->n14; i < nMatrices; i++) {
+        if (fn_8001E9CC(pSkin->p10CC, i)) {
+            pEntry = &pSkin->pModel->p54[i];
+            nBones = pEntry->nBones;
+            memset(aMtx[i], 0, sizeof(aMtx[i]));
+            for (j = 0; j < nBones; j++) {
+                pDst = aMtx[i];
+                fWeight = pEntry->afWeights[j];
+                for (k = 0, pSrc = aMtx[pEntry->aBones[j]]; k < 4; k++) {
+                    fn_8000AE6C(pDst[k], pSrc[k], fWeight, pDst[k]);
+                }
+            }
+        }
+    }
 }
 
 // Hands table n (Skin.a10A0) every p44 entry whose bit is set in p10D0, with the matrices.

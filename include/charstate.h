@@ -224,7 +224,9 @@ LAYOUT_ASSERT(SkinModel44, 0x10);
 
 // An entry of SkinModel.p54, one per bit of Skin.p10CC; SkinBurn.c moves them (fn_801272B4).
 typedef struct SkinModel54 {
-    u8   unk0[0x14];
+    s16  nBones;                // 0x00  entries used in aBones and afWeights (fn_8003662C)
+    s16  aBones[3];             // 0x02  matrices of Skin.p108C its matrix is blended from
+    f32  afWeights[3];          // 0x08  and their weights
 } SkinModel54;
 LAYOUT_ASSERT(SkinModel54, 0x14);
 
