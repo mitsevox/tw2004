@@ -2,6 +2,8 @@
 // matched small functions.
 
 #include "game_types.h"
+#include "platform.h"
+#include "engine.h"
 #include "charstate.h"
 
 // ---- sweep code (not yet cleaned up) ----
@@ -67,6 +69,70 @@ s32 fn_8011C850(SkinDesc* pDesc) {
     return nMax;
 }
 
+// Whether a morph target of p44 entry n that changed for view nView has a mesh to draw.
+u8 fn_8011C8B0(Skin* pSkin, int nView, int n) {
+    SkinDesc* pDesc;
+    SkinDesc44* pEntry;
+    SkinMorphState* pMorph;
+    s32 i;
+    s32 nFirst;
+    s32 nCount;
+    SkinDesc44* pTarget;
+    s32 j;
+    s32 nMesh;
+
+    pMorph = pSkin->pMorph;
+    pDesc = pSkin->pModel->pDesc;
+    pEntry = &pDesc->p44[n];
+    if (!(pEntry->u24 & 2)) {
+        return 0;
+    }
+    nFirst = pEntry->n18;
+    nCount = pEntry->n14;
+    for (i = 0; i < nCount; i++) {
+        if (fn_8001E9CC(pMorph->aChanged[nView], nFirst + i)) {
+            pTarget = &pDesc->p44[pEntry->n10 + i];
+            for (j = 0; j < pTarget->n8; j++) {
+                nMesh = pDesc->p3C[pTarget->n0 + j];
+                if (nMesh >= 0 && pDesc->p34[nMesh].n8 > 0) {
+                    break;
+                }
+            }
+            if (j != pTarget->n8) {
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
+
+// Makes the skin's morph state: every weight 0, nothing changed.
+void fn_8011C9B0(Skin* pSkin) {
+    SkinMorphState* pMorph;
+    s32 nMorphs;
+    s32 nBytes;
+
+    if (pSkin->pModel->pDesc == NULL) {
+        return;
+    }
+    nMorphs = fn_8011C850(pSkin->pModel->pDesc);
+    if (nMorphs == 0) {
+        return;
+    }
+    pMorph = fn_80009B34(sizeof(SkinMorphState), 2, 16, "SkinMorph.c", 91);
+    memset(pMorph, 0, sizeof(SkinMorphState));
+    pMorph->nMorphs = nMorphs;
+    nBytes = (nMorphs + 31) / 32 * sizeof(u32);
+    pMorph->aChanged[0] = fn_80009B34(nBytes, 2, 16, "SkinMorph.c", 95);
+    pMorph->aChanged[1] = fn_80009B34(nBytes, 2, 16, "SkinMorph.c", 96);
+    fn_8001E938(pMorph->aChanged[0], nMorphs);
+    fn_8001E938(pMorph->aChanged[1], nMorphs);
+    nBytes = nMorphs * sizeof(f32);
+    pMorph->afWeights = fn_80009B34(nBytes, 2, 16, "SkinMorph.c", 100);
+    memset(pMorph->afWeights, 0, nBytes);
+    pSkin->pMorph = pMorph;
+}
+
 // Sets the weight of morph target nMorph and marks it changed.
 void fn_8011CADC(Skin* pSkin, int nMorph, f32 fWeight) {
     SkinMorphState* pMorph = pSkin->pMorph;
@@ -76,8 +142,8 @@ void fn_8011CADC(Skin* pSkin, int nMorph, f32 fWeight) {
     }
     if (fWeight != pMorph->afWeights[nMorph]) {
         pMorph->afWeights[nMorph] = fWeight;
-        fn_8001EA34(pMorph->p8, nMorph);
-        fn_8001EA34(pMorph->pC, nMorph);
+        fn_8001EA34(pMorph->aChanged[0], nMorph);
+        fn_8001EA34(pMorph->aChanged[1], nMorph);
     }
 }
 
@@ -85,8 +151,8 @@ void fn_8011CADC(Skin* pSkin, int nMorph, f32 fWeight) {
 void fn_8011CD84(Skin* pSkin) {
     if (pSkin->pMorph != NULL) {
         fn_80009E70(pSkin->pMorph->afWeights);
-        fn_80009E70(pSkin->pMorph->p8);
-        fn_80009E70(pSkin->pMorph->pC);
+        fn_80009E70(pSkin->pMorph->aChanged[0]);
+        fn_80009E70(pSkin->pMorph->aChanged[1]);
         fn_80009E70(pSkin->pMorph);
         pSkin->pMorph = NULL;
     }
@@ -117,6 +183,6 @@ void fn_8011CE58(Skin* pSkin) {
     if (pSkin == NULL || pSkin->pMorph == NULL) {
         return;
     }
-    fn_8001E8A4(pSkin->pMorph->p8, pSkin->pMorph->nMorphs);
-    fn_8001E8A4(pSkin->pMorph->pC, pSkin->pMorph->nMorphs);
+    fn_8001E8A4(pSkin->pMorph->aChanged[0], pSkin->pMorph->nMorphs);
+    fn_8001E8A4(pSkin->pMorph->aChanged[1], pSkin->pMorph->nMorphs);
 }

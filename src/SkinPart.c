@@ -1284,7 +1284,7 @@ void fn_800CEF04(SkinDesc* pDesc) {
         pDesc->p34 = (SkinMesh*)((u8*)pDesc + (uptr)pDesc->p34);
     }
     if (pDesc->p3C != NULL) {
-        pDesc->p3C = (u8*)pDesc + (uptr)pDesc->p3C;
+        pDesc->p3C = (s32*)((u8*)pDesc + (uptr)pDesc->p3C);
     }
     if (pDesc->p44 != NULL) {
         pDesc->p44 = (SkinDesc44*)((u8*)pDesc + (uptr)pDesc->p44);

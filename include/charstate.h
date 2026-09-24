@@ -73,13 +73,13 @@ typedef struct SkinDesc28 {
 LAYOUT_ASSERT(SkinDesc28, 0x18);
 
 typedef struct SkinDesc44 {
-    u8   unk0[4];
+    s32  n0;                    // 0x00  its first entry in SkinDesc.p3C
     s32  n4;                    // 0x04  the first entry in SkinDesc.p20
-    s32  n8;                    // 0x08  0: skipped
+    s32  n8;                    // 0x08  entries in SkinDesc.p3C from n0; 0: skipped
     s32  nC;                    // 0x0C  its SkinDesc.p28 entry
-    u8   unk10[4];
-    s32  n14;                   // 0x14  } n14 + n18: the morph targets it needs (fn_8011C850)
-    s32  n18;                   // 0x18  }
+    s32  n10;                   // 0x10  the p44 entries of its morph targets start here
+    s32  n14;                   // 0x14  its morph targets
+    s32  n18;                   // 0x18  the first one's number (fn_8011C850: n14 + n18 needed)
     u8   unk1C[0x24 - 0x1C];
     u32  u24;                   // 0x24  bit 1: has morph targets
     u8   unk28[0x30 - 0x28];
@@ -140,7 +140,7 @@ typedef struct SkinDesc {
     s32  n30;                   // 0x030  entries in p34
     SkinMesh* p34;              // 0x034
     u8   unk38[4];
-    u8*  p3C;                   // 0x03C
+    s32* p3C;                   // 0x03C  SkinDesc.p34 entries, -1 none
     s32  n40;                   // 0x040  entries in p44
     SkinDesc44* p44;            // 0x044
     s32  nParts;                // 0x048
@@ -214,8 +214,9 @@ LAYOUT_ASSERT(SkinModel, 0x140);  // fn_801276E4 copies it whole
 typedef struct SkinMorphState {
     s32  nMorphs;               // 0x0
     f32* afWeights;             // 0x4  one per morph target (fn_8011CADC)
-    u32* p8;                    // 0x8  } bit arrays of nMorphs bits: fn_8011CADC sets a changed
-    u32* pC;                    // 0xC  } target's bit in both, fn_8011CE58 sets every bit
+    u32* aChanged[2];           // 0x8  bit arrays of nMorphs bits, indexed like Skin.a10A0:
+                                //      fn_8011CADC sets a changed target's bit in both,
+                                //      fn_8011CE58 sets every bit, fn_8011CB5C clears one
 } SkinMorphState;
 
 // A skin (Skin.c): a character's body or one of its attachments; only what the code reads.
