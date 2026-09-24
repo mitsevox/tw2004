@@ -645,8 +645,7 @@ void fn_80015470(void) {
     }
 }
 
-// Move the pool's nNext past the blocks in use and return the first free block (the original
-// leaves it in r3 on every path; its one caller ignores it).
+// Move the pool's nNext past the blocks in use and return the first free block.
 BufferPoolBlock* fn_800154F4(void) {
     BufferPoolBlock* pBlock;
 
@@ -655,8 +654,8 @@ BufferPoolBlock* fn_800154F4(void) {
         if (pBlock->u1000 == 0) {
             break;
         }
-        lbl_80280E00->nNext++;
         pBlock++;
+        lbl_80280E00->nNext++;
     }
     lbl_80280E00->n4++;
     return pBlock;

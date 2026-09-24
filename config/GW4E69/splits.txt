@@ -203,33 +203,10 @@ gocamscripts.c:
 DepthField.c:
 	.text       start:0x80045660 end:0x80045D18
 
-unsorted/sweep_80045D18.c:
-	.text       start:0x80045D18 end:0x80045D5C
-
-unsorted/sweep_80045D5C.c:
-	.text       start:0x80045D5C end:0x80045D80
-
 UObject3D.c:
-	.text       start:0x80045D80 end:0x80045E3C
+	.text       start:0x80045D18 end:0x80045F74
 	.data       start:0x80187B88 end:0x80187B98
-
-unsorted/sweep_80045E3C.c:
-	.text       start:0x80045E3C end:0x80045EC0
-
-unsorted/sweep_80045EC0.c:
-	.text       start:0x80045EC0 end:0x80045F14
-
-unsorted/sweep_80045F14.c:
-	.text       start:0x80045F14 end:0x80045F38
-
-unsorted/sweep_80045F38.c:
-	.text       start:0x80045F38 end:0x80045F50
-
-unsorted/sweep_80045F50.c:
-	.text       start:0x80045F50 end:0x80045F6C
-
-unsorted/sweep_80045F6C.c:
-	.text       start:0x80045F6C end:0x80045F74
+	.sbss       start:0x80281D98 end:0x80281DA0
 
 GoDynObj.c:
 	.text       start:0x80045F74 end:0x800486F4
@@ -316,6 +293,9 @@ Replay.c:
 
 gomainloop.c:
 	.text       start:0x8006C630 end:0x8006E150
+	.data       start:0x801888D0 end:0x801888E0
+	.sdata      start:0x802811D0 end:0x802811D8
+	.sdata2     start:0x802838C0 end:0x802838F0
 
 GoFrameBuf.c:
 	.text       start:0x8006E150 end:0x8006E2A4

@@ -38,7 +38,6 @@ u8    GM_bIsElevatorCamButtonPressed(int nPlayer);
 u8    fn_800E012C(int nPlayer);
 u8    fn_800DFF0C(int nPlayer);
 
-f32   fn_8006E118(u64 tEnd, u64 tStart);    // seconds between two time stamps
 u8    fn_800BB1F8(int nPlayer);
 
 int   GM_vGetAllTimeRecordsHeld(SaveProfile* pProfile);
