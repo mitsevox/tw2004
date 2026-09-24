@@ -196,12 +196,13 @@ void fn_800BB4E8(void) {
 
 // Byte-swap the tables in place, then put the bit-fields of the p14 and p1C entries in order.
 void fn_800BB52C(void) {
-    u32 i;
     void* pSrc;
     void* pDst;
     SitDevEntry* pEntry;
+    u32 i;
     SitDevEntry8* pEntry8;
     u16 uRaw;
+    u32 j;
     if (lbl_80282208->nEntries != 0) {
         pSrc = lbl_80282208->p14;
         pDst = lbl_80282208->p14;
@@ -227,14 +228,14 @@ void fn_800BB52C(void) {
     for (i = 0; i < lbl_80282208->nEntries; i++) {
         pEntry = &lbl_80282208->p14[i];
         uRaw = pEntry->b2.uRaw;
-        pEntry->b2.s.n11 = uRaw;
-        lbl_80282208->p14[i].b2.s.n5 = uRaw >> 11;
+        pEntry->b2.s.n11 = uRaw & 0x7FF;
+        lbl_80282208->p14[i].b2.s.n5 = (uRaw >> 11) & 0x1F;
     }
-    for (i = 0; i < lbl_80282208->n08; i++) {
-        pEntry8 = &lbl_80282208->p1C[i];
+    for (j = 0; j < lbl_80282208->n08; j++) {
+        pEntry8 = &lbl_80282208->p1C[j];
         uRaw = pEntry8->b2.uRaw;
-        pEntry8->b2.s.n11 = uRaw;
-        lbl_80282208->p1C[i].b2.s.n5 = uRaw >> 11;
+        pEntry8->b2.s.n11 = uRaw & 0x7FF;
+        lbl_80282208->p1C[j].b2.s.n5 = (uRaw >> 11) & 0x1F;
     }
 }
 
@@ -366,24 +367,14 @@ void SitDev_SetupStateVector(int nPlayer, u8 nKind) {
     u16 nHole;
     int nDeg;
     f32 fAngle;
+    int i;
 
-    lbl_802811B8->aSetBits[0] = 0;
-    lbl_802811B8->aSetBits[1] = 0;
-    lbl_802811B8->aSetBits[2] = 0;
-    lbl_802811B8->abPlayed[0] = 0;
-    lbl_802811B8->abPlayed[1] = 0;
-    lbl_802811B8->abPlayed[2] = 0;
-    lbl_802811B8->abPlayed[3] = 0;
-    lbl_802811B8->abPlayed[4] = 0;
-    lbl_802811B8->abPlayed[5] = 0;
-    lbl_802811B8->abPlayed[6] = 0;
-    lbl_802811B8->abPlayed[7] = 0;
-    lbl_802811B8->abPlayed[8] = 0;
-    lbl_802811B8->abPlayed[9] = 0;
-    lbl_802811B8->abPlayed[10] = 0;
-    lbl_802811B8->abPlayed[11] = 0;
-    lbl_802811B8->abPlayed[12] = 0;
-    lbl_802811B8->abPlayed[13] = 0;
+    for (i = 0; i < 3; i++) {
+        lbl_802811B8->aSetBits[i] = 0;
+    }
+    for (i = 0; i < 14; i++) {
+        lbl_802811B8->abPlayed[i] = 0;
+    }
     if (nKind == 25) {
         fn_80067B1C(pValues, 5, pPlayer->nClub, pSetBits);
     }
@@ -398,8 +389,8 @@ void SitDev_SetupStateVector(int nPlayer, u8 nKind) {
     case 26:
     case 30:
         nMode = Game_GetMode();
-        fn_80067B1C(pValues, 1, nMode, pSetBits);
-        fn_80067B1C(pValues, 54, fn_800BB3F8(nMode), pSetBits);
+        fn_80067B1C(pValues, 1, (int)nMode, pSetBits);                  // fake match: (int) re-masks
+        fn_80067B1C(pValues, 54, (int)fn_800BB3F8(nMode), pSetBits);    // fake match: (int) re-masks
         fn_80067B1C(pValues, 60, fn_800E1734(), pSetBits);
         fn_80067B1C(pValues, 0, fn_80015464() + 1, pSetBits);
         fn_80067B1C(pValues, 30, Game_GetCourse(), pSetBits);
@@ -511,15 +502,17 @@ void SitDev_SetupStateVector(int nPlayer, u8 nKind) {
         fn_80067B1C(pValues, 12, (s32)Wind_Get(NULL), pSetBits);
 
         // the class of where the shot started
+        // fake match: the original reloads the surface for the index (volatile at that one use)
         nValue = SurfaceType_IsValid(pBall->nStartSurface) ?
-                 gSurfaceTypes[pBall->nStartSurface].nClass : -1;
+                 gSurfaceTypes[*(volatile s32*)&pBall->nStartSurface].nClass : -1;
         fn_800BCB74(&nValue, pBall->nStartSurface);
         fn_80067B1C(pValues, 2, nValue, pSetBits);
         nValue = 36.0f * pPlayer->fA64;
         fn_80067B1C(pValues, 3, nValue, pSetBits);
         fn_80067B1C(pValues, 4, nValue, pSetBits);
         // the class of the ground aimed at
-        nValue = SurfaceType_IsValid(pPlayer->nSurface) ? gSurfaceTypes[pPlayer->nSurface].nClass : -1;
+        nValue = SurfaceType_IsValid(pPlayer->nSurface) ?
+                 gSurfaceTypes[*(volatile s32*)&pPlayer->nSurface].nClass : -1;   // fake match: reload
         fn_80067B1C(pValues, 15, nValue, pSetBits);
         nValue = 36.0f * fn_800D0550(nPlayer);
         fn_80067B1C(pValues, 18, nValue, pSetBits);
@@ -539,7 +532,8 @@ void SitDev_SetupStateVector(int nPlayer, u8 nKind) {
         fn_80067B1C(pValues, 27, nValue, pSetBits);
         // the lie, in percent (Physics_GetLiePowerPercentage inlined)
         nValue = SurfaceType_IsValid(pBall->nStartSurface) ?
-                 (u32)(100.0f * (pBall->f70 + gSurfaceTypes[pBall->nStartSurface].f00)) : 100;
+                 (u32)(100.0f * (pBall->f70 + gSurfaceTypes[*(volatile s32*)&pBall->nStartSurface].f00)) :
+                 100;   // fake match: reload
         fn_80067B1C(pValues, 58, nValue, pSetBits);
         fn_80067B1C(pValues, 59, nValue, pSetBits);
         nValue = pBall->pHitSurface == NULL ? 0 : pBall->pHitSurface->nClass;
@@ -721,6 +715,7 @@ u8 fn_800BCF84(SitDevAction* pAction, int nPlayer, u8 nEvent) {
     int nStart;
     int nEntry;
     int i;
+    s32 j;
     u8 bPlayed = 0;
 
     if (pAction->aList[1] == 0xFFF0) {
@@ -740,7 +735,7 @@ u8 fn_800BCF84(SitDevAction* pAction, int nPlayer, u8 nEvent) {
             nKind = lbl_80282208->p1C[pAction->aList[i] & 0x7FFF].nKind;
             if (!lbl_802811B8->abPlayed[nKind]) {
                 aaIndex[nKind][anCount[nKind]] = i;
-                anCount[nKind]++;
+                anCount[(u32)nKind]++;      // fake match: a second spelling of the index, not CSE'd
             }
         }
     }
@@ -763,8 +758,8 @@ u8 fn_800BCF84(SitDevAction* pAction, int nPlayer, u8 nEvent) {
                 nEntry = aaIndex[nKind][nPick];
                 if (nPick == nStart) {
                     // Every entry has been drawn: start the deck over.
-                    for (i = 0; i < anCount[nKind]; i++) {
-                        pAction->aList[aaIndex[nKind][i]] &= 0x7FFF;
+                    for (j = 0; j < anCount[nKind]; j++) {
+                        pAction->aList[aaIndex[nKind][j]] &= 0x7FFF;
                     }
                     nPick = nStart;
                     break;
@@ -826,11 +821,12 @@ void fn_800BD580(SitDevEntry8* pDo, int nPlayer, u8 nEvent) {
         break;
     case 11:
         if (gSession.options.a0[4] && !fn_800DC784()) {
+            u16 uSound = pDo->n4;
             nArg = 2;
             if (nPlayer == 0) {
                 nArg = 0;
             }
-            fn_800BD868((u16)pDo->n4, nArg);
+            fn_800BD868(uSound, nArg);
         }
         break;
     case 10:
