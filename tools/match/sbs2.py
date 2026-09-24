@@ -3,8 +3,9 @@ as offsets from the function start (+0x..), so only real differences show, inclu
 goes somewhere else.   python tools/match/sbs2.py main/<Unit> <fn> [sbs]   (sbs = side-by-side)"""
 import json, pathlib, subprocess, sys, difflib, re
 ROOT = pathlib.Path(__file__).resolve().parents[2]   # the checkout this script lives in
+from hosttools import OBJDIFF_CLI                    # noqa: E402
 unit, fn = sys.argv[1], sys.argv[2]; mode = sys.argv[3] if len(sys.argv) > 3 else 'diff'
-d = json.loads(subprocess.run([str(ROOT / 'build/tools/objdiff-cli.exe'), 'diff', '-p', str(ROOT), '-u', unit, fn, '-o', '-', '--format', 'json'],
+d = json.loads(subprocess.run([OBJDIFF_CLI, 'diff', '-p', str(ROOT), '-u', unit, fn, '-o', '-', '--format', 'json'],
                               capture_output=True, text=True).stdout)
 def norm(ins, start):
     s = ins.get('formatted', '?')
