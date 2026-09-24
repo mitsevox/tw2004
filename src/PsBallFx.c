@@ -344,8 +344,9 @@ void fn_800A3A84(void) {
     DynRenderDrawIn aDraws[2];
     DynRenderFill fill;
     PsEmitter* pEmitter;
-    s32 nFirst;
     s32 nEnd;
+    s32 nFirst;
+    DynRenderDrawIn* pDraw;
 
     pEmitter = lbl_80281408->ap74[0];
     if (pEmitter != NULL && (pEmitter->params.u58 & 0x20000)) {
@@ -373,19 +374,20 @@ void fn_800A3A84(void) {
         fn_80012EF8();
         nFirst = lbl_80281408->an40[0];
         nEnd = lbl_80281408->an38[0];
+        pDraw = aDraws;
         if (nFirst < nEnd) {
             fill.nCount = 1;
-            aDraws[0].nPrim = 0;
-            aDraws[0].nStart = nFirst;
-            aDraws[0].nCount = nEnd - nFirst;
+            pDraw[0].nPrim = 0;
+            pDraw[0].nStart = nFirst;
+            pDraw[0].nCount = nEnd - nFirst;
         } else {
-            aDraws[0].nPrim = 0;
             fill.nCount = 2;
-            aDraws[0].nStart = nFirst;
-            aDraws[0].nCount = 600 - nFirst;
-            aDraws[1].nPrim = 0;
-            aDraws[1].nStart = 0;
-            aDraws[1].nCount = nEnd;
+            pDraw[0].nPrim = 0;
+            pDraw[0].nStart = nFirst;
+            pDraw[0].nCount = 600 - nFirst;
+            pDraw[1].nPrim = 0;
+            pDraw[1].nStart = 0;
+            pDraw[1].nCount = nEnd;
         }
         fill.pDraws = aDraws;
         fill.nVerts = lbl_80281408->an44[0];
