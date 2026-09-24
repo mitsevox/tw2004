@@ -20,26 +20,29 @@ void fn_800A34C0(int nTrail, Ball* pBall, f32* pDir);     // below
 void PsBallFx_InitModule(void) {
     DynRenderSize size;
     int i;
-    f32 fZero = 0.0f;
-    f32 fOne = 1.0f;
+    int j;
     u64 uHash;
 
     size.nMaxVerts = 400;
     size.nMaxDraws = 2;
-    fn_80036054(&lbl_80281408->mesh, 0, &size);
-    lbl_80281408->ap2C[0] = fn_80009B34(0x640, 2, 16, "PsBallFx.c", 1435);
-    lbl_80281408->ap30[0] = fn_80009B34(0x320, 2, 16, "PsBallFx.c", 1440);
-    lbl_80281408->ap28[0] = fn_80009B34(0x960, 2, 16, "PsBallFx.c", 1445);
-    lbl_80281408->ap50[0] = fn_80009B34(0x4B0, 2, 16, "PsBallFx.c", 1450);
-    for (i = 0; i < 50; i++) {
-        lbl_80281408->ap2C[0][i * 8 + 0] = fZero;
-        lbl_80281408->ap2C[0][i * 8 + 1] = fZero;
-        lbl_80281408->ap2C[0][i * 8 + 2] = fOne;
-        lbl_80281408->ap2C[0][i * 8 + 3] = fZero;
-        lbl_80281408->ap2C[0][i * 8 + 4] = fZero;
-        lbl_80281408->ap2C[0][i * 8 + 5] = fOne;
-        lbl_80281408->ap2C[0][i * 8 + 6] = fOne;
-        lbl_80281408->ap2C[0][i * 8 + 7] = fOne;
+    // The loop over the one-entry arrays is EA's: it moves the file name and the two constants
+    // into saved registers ahead of every call.
+    for (j = 0; j < 1; j++) {
+        fn_80036054(&lbl_80281408->mesh[j], 0, &size);
+        lbl_80281408->ap2C[j] = fn_80009B34(0x640, 2, 16, "PsBallFx.c", 1435);
+        lbl_80281408->ap30[j] = fn_80009B34(0x320, 2, 16, "PsBallFx.c", 1440);
+        lbl_80281408->ap28[j] = fn_80009B34(0x960, 2, 16, "PsBallFx.c", 1445);
+        lbl_80281408->ap50[j] = fn_80009B34(0x4B0, 2, 16, "PsBallFx.c", 1450);
+        for (i = 0; i < 50; i++) {
+            lbl_80281408->ap2C[j][i * 8 + 0] = 0.0f;
+            lbl_80281408->ap2C[j][i * 8 + 1] = 0.0f;
+            lbl_80281408->ap2C[j][i * 8 + 2] = 1.0f;
+            lbl_80281408->ap2C[j][i * 8 + 3] = 0.0f;
+            lbl_80281408->ap2C[j][i * 8 + 4] = 0.0f;
+            lbl_80281408->ap2C[j][i * 8 + 5] = 1.0f;
+            lbl_80281408->ap2C[j][i * 8 + 6] = 1.0f;
+            lbl_80281408->ap2C[j][i * 8 + 7] = 1.0f;
+        }
     }
     lbl_80281408->ap74[0] = NULL;
     lbl_80281408->ap74[1] = NULL;
@@ -50,7 +53,7 @@ void PsBallFx_InitModule(void) {
 }
 
 void fn_800A2E14(void) {
-    fn_800360A0(&lbl_80281408->mesh);
+    fn_800360A0(&lbl_80281408->mesh[0]);
     fn_80009E70(lbl_80281408->ap28[0]);
     fn_80009E70(lbl_80281408->ap2C[0]);
     fn_80009E70(lbl_80281408->ap30[0]);
@@ -390,8 +393,8 @@ void fn_800A3A84(void) {
         fill.pPos = lbl_80281408->ap28[0];
         fill.pColour = lbl_80281408->ap30[0];
         fill.pTexCoord = lbl_80281408->ap2C[0];
-        fn_80036100(&lbl_80281408->mesh, &fill, 1);
-        fn_800360D4(&lbl_80281408->mesh);
+        fn_80036100(&lbl_80281408->mesh[0], &fill, 1);
+        fn_800360D4(&lbl_80281408->mesh[0]);
     }
     fn_80012F50(1, 6, 0x80);
     fn_80012EF8();
