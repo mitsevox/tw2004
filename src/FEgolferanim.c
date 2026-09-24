@@ -438,7 +438,7 @@ void fn_8008B760(void) {
 // Start in state 1.
 void fn_8008B790(void) {
     lbl_801D8708.nState = 1;
-    lbl_801D8708.nNext = lbl_80189AA0[1].nNext;
+    lbl_801D8708.nNext = lbl_80189AA0[lbl_801D8708.nState].nNext;
     lbl_801D8708.bDone = 0;
     lbl_801D8708.bEnter = 1;
     lbl_801D8708.bAbort = 0;
