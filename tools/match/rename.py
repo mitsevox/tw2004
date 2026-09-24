@@ -67,7 +67,9 @@ def main():
     files = {p: read(p) for p in source_files()}
     words = set()
     for t in files.values():
-        words.update(re.findall(r'\b[A-Za-z_][A-Za-z0-9_]*\b', t))
+        # code only: a comment that already calls the function by the new name is no clash
+        code = re.sub(r'//[^\n]*|/\*.*?\*/', ' ', t, flags=re.S)
+        words.update(re.findall(r'\b[A-Za-z_][A-Za-z0-9_]*\b', code))
 
     errors, olds, news = [], {}, {}
     for n, addr, old, new in rows:

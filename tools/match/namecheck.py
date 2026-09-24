@@ -124,7 +124,10 @@ def main():
         if p != u.split('/')[-1] and p not in near and p not in established[u] and not ok:
             flags.append('%s: prefix %s is not the unit (%s) nor used by its unit, callers or callees (%s)'
                          % (tag, p, u, ', '.join(sorted(near)) or 'none named'))
-        w = words(r['new'])
+            w = words(r['new'])
+        else:
+            # an established prefix is not a claim of its own (CameraController_ is the camera's)
+            w = words(HEX_SUFFIX.sub('', r['new'])[len(p):])
         for dom, (vocab, marker) in DOMAINS.items():
             if w & vocab and not ok:
                 hits = [x for x in reach(r['cur']) | {u.split('/')[-1]} if re.search(marker, x)]
