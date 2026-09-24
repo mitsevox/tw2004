@@ -493,6 +493,7 @@ void fn_80118B0C(int nPlayer, int n) {
     s32 aTarget[PGA_MAX_ENTRANTS];
     PgaEntrantMC* pEntrantMC;
     s32 nEntrants;
+    s32 nRoundPar;
     s32 nPar;
     s32 nTarget;
     s32 nEntrant;
@@ -516,7 +517,8 @@ void fn_80118B0C(int nPlayer, int n) {
             aOrder[i] = nEntrant;
         }
     }
-    nPar = n + fn_800D2FB4(gSession.nTeeSet[0]) * 4;
+    nRoundPar = fn_800D2FB4(gSession.nTeeSet[0]) * 4;
+    nPar = nRoundPar + n;
     for (i = 0; i < nEntrants; i++) {
         nTarget = 8.0f * fn_8000B318(0) + (18.0f + nPar);
         nTarget = (nTarget <= nPar) ? nPar : nTarget;
