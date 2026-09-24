@@ -1856,7 +1856,8 @@ AnimLib* AnimLib_Load(u8* pData, ClipBank* pBank) {
     }
     pLib        = (AnimLib*)(pData + uPad);
     pLib->pFile = pData;
-    pData       = (u8*)pLib + sizeof(AnimLib);   // from here on, where the next part of the file is
+    pData       = (u8*)pLib;
+    pData       = pData + sizeof(AnimLib);   // from here on, where the next part of the file is
     pDst = pSrc = pLib;
     // port: an animation library's header ('SAL ', and 'SAC ' overlays), little-endian on disc; a
     //       little-endian port does not swap here.
