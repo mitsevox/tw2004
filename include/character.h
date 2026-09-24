@@ -331,6 +331,8 @@ extern UMemPool* lbl_80281E94;
 extern UMemPool* lbl_80281E90;
 extern UMemPool* lbl_80281E8C;
 extern UMemPool* lbl_80281E88;
+// animblender.c: clear bit nBit in the three blocks of pNode's format 1 pose buffer, and its sources'.
+void fn_800736D8(SKABlendNode* pNode, s32 nBit);
 void fn_80071F58(struct SKABlendNode** ppNode, u8 bFreeSources);   // animblender.c: gives a blend
                                         // tree back (bFreeSources: the sources' clips too)
 

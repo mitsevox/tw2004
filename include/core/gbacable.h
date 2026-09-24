@@ -37,10 +37,10 @@ typedef struct GbaChannel {
     s32  n5C;                   // 0x5C  what SIProbe finds on the port (0x40000: a GBA); 0x40 at start
     u8   unk60[0x64 - 0x60];
     s32  n64;                   // 0x64  set when u58 is new
-    s32  n68;                   // 0x68
-    s32  n6C;                   // 0x6C
-    s32  n70;                   // 0x70
-    u8   unk74[0x78 - 0x74];
+    u32  u68;                   // 0x68  the cash the GBA holds (fn_80123398, "FROMGBA_CASHDATA")
+    s32  n6C;                   // 0x6C  cash to move between GBA and GameCube (fn_80123398)
+    s32  n70;                   // 0x70  the GBA's answer to a stats request (fn_80123398)
+    s32  n74;                   // 0x74  the GBA's unlock mask (fn_80123398, "FROMGBA_UNLOCKMASK")
 } GbaChannel;
 LAYOUT_ASSERT(GbaChannel, 0x78);
 
@@ -55,5 +55,7 @@ extern const u32 lbl_80184E30[GBA_NUM_CHANNELS];   // each port's PADReset bit (
 #define GBA_TICKS_PER_MS  (*(u32*)0x800000F8 / 4 / 1000)
 #define GBA_TIMEOUT_TICKS (GBA_TICKS_PER_MS * 100)
 extern s32 lbl_80281984;        // the port being worked on (-1: none, fn_8012422C)
+extern u32 lbl_80282544;        // frames left before the link is first polled (fn_801242D0)
+extern u32 lbl_80282548;        // the tick the link was started at (fn_801242D0)
 
 #endif

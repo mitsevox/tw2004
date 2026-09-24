@@ -9,7 +9,6 @@ void fn_80016978(f32 x0, f32 y0, f32 x1, f32 y1);
 void fn_80008380(void);
 void fn_800162A8(void);
 void fn_800760B0(int x, int y, int nWidth, int nHeight);
-void fn_800A4BDC(void);
 void fn_80007254(void);
 void fn_800083A0(void);
 void fn_80007260(void);

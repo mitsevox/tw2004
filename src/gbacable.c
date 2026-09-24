@@ -7,6 +7,7 @@
 #include "engine.h"
 #include "pad.h"
 #include "core/gbacable.h"
+#include "frontend/fe.h"
 
 s32  fn_80176200(s32 nChan, u8* pStatus);  // the GBA library: read a port's status
 s32  fn_8017610C(s32 nChan, u8* pStatus);  // the GBA library: a port's status
@@ -16,11 +17,10 @@ s32  fn_80122AF0(s32 nChan);
 s32  fn_80122BCC(s32 nChan);
 s32  fn_80122E68(s32 nChan, u32* pWord);
 s32  fn_80122CFC(s32 nChan, u32* pCmd);
-void fn_80123398(s32 nChan, s32 a, s32 b);
+void fn_80123398(s32 nChan, s32 nCmd, s32 nStat);
 void fn_80123ABC(s32 nChan);
 void fn_80123C2C(s32 nChan);
 void fn_80123CBC(s32 a, s32 b);
-void fn_800A4BDC(void);
 void fn_80123E34(void);
 s32  fn_80176280(s32 nChan, u8* pOut);  // the GBA library: 2 while the port is busy
 s32  fn_80122FD8(s32 nChan);
@@ -317,6 +317,196 @@ void fn_8012332C(s32 nChan) {
     }
 }
 
+// Talks to a linked GBA ("GbaCommunication"): reads its d-pad word (u58), sends it every port's key,
+// then runs one request: 0x70 reads the cash the GBA holds, 0x90 also moves n6C of it to the
+// GameCube, 0xD0 sends n6C of cash to the GBA, 0xB0 sends stat nStat (0-3), 0x71 and 0xD3 ask the
+// GBA to save its cash and stats, and 0xD1 reads its unlock mask. Any failed command unlinks the port.
+void fn_80123398(s32 nChan, s32 nCmd, s32 nStat) {
+    u32 uCmd = 0x10000000;
+    u32 uWord;
+    s32 nValue;
+    s32 i;
+
+    if (fn_80122CFC(nChan, &uCmd) == 0) {
+        OSReport("GbaCommunication: An error occurred to command 'FROMGC_REQUEST_PADDATA' (chan=%d).\n",
+                 nChan);
+        lbl_80260E18[nChan].n0 = 0;
+        fn_8012408C(0x12);
+        return;
+    }
+    if (fn_80122E68(nChan, &uWord) == 0 || uWord >> 24 != 0x20) {
+        OSReport("GbaCommunication: An error occurred in reading 'FROMGBA_PADDATA' (chan=%d).\n", nChan);
+        lbl_80260E18[nChan].n0 = 0;
+        fn_8012408C(0x12);
+        return;
+    }
+    lbl_80260E18[nChan].n64 = 0;
+    lbl_80260E18[nChan].u58 = uWord;
+    lbl_80260E18[nChan].n64 = 1;
+    for (i = 0; i < GBA_NUM_CHANNELS; i++) {
+        if (fn_80122CFC(nChan, &lbl_80260E18[i].uKey) == 0) {
+            OSReport("GbaCommunication: POSITION DATA: An error occurred in writing the %d(th) part of %d "
+                     "(chan=%d).\n",
+                     i + 1, GBA_NUM_CHANNELS, nChan);
+            lbl_80260E18[nChan].n0 = 0;
+            fn_8012408C(0x12);
+            return;
+        }
+    }
+
+    switch (nCmd) {
+    case 0:
+        break;
+    case 0x70:
+    case 0x90:
+        uCmd = 0x70000000;
+        if (fn_80122CFC(nChan, &uCmd) == 0) {
+            OSReport("GbaCommunication: An error occurred to command 'FROMGC_REQUEST_CASHDATA' (chan=%d).\n",
+                     nChan);
+            lbl_80260E18[nChan].n0 = 0;
+            fn_8012408C(0x12);
+            return;
+        }
+        if (fn_80122E68(nChan, &uWord) == 0 || uWord >> 24 != 0x80) {
+            OSReport("GbaCommunication: An error occurred in reading 'FROMGBA_CASHDATA' (chan=%d).\n", nChan);
+            lbl_80260E18[nChan].n0 = 0;
+            fn_8012408C(0x12);
+            return;
+        }
+        lbl_80260E18[nChan].u68 = uWord & 0xFFFFFF;
+        if (nCmd == 0x70) {
+            break;
+        }
+        if (lbl_80260E18[nChan].u68 == 0) {
+            OSReport("No cash available for transfer from GBA.\n");
+            break;
+        }
+        uCmd = lbl_80260E18[nChan].n6C | 0x90000000;
+        if (fn_80122CFC(nChan, &uCmd) == 0) {
+            OSReport("GbaCommunication: An error occurred to command 'FROMGC_REQUEST_CASHXFER' (chan=%d).\n",
+                     nChan);
+            lbl_80260E18[nChan].n0 = 0;
+            fn_8012408C(0x12);
+            return;
+        }
+        if (fn_80122E68(nChan, &uWord) == 0 || uWord >> 24 != 0xA0) {
+            OSReport("GbaCommunication: An error occurred in reading 'FROMGBA_CASHXFER_CONFIRM' (chan=%d).\n",
+                     nChan);
+            lbl_80260E18[nChan].n0 = 0;
+            fn_8012408C(0x12);
+            return;
+        }
+        lbl_80260E18[nChan].n6C = uWord & 0xFFFFFF;
+        break;
+    case 0xD0:
+        uCmd = lbl_80260E18[nChan].n6C | 0xD0000000;
+        if (fn_80122CFC(nChan, &uCmd) == 0) {
+            OSReport("GbaCommunication: An error occurred to command 'FROMGC_REQUEST_CASH2GBA' (chan=%d).\n",
+                     nChan);
+            lbl_80260E18[nChan].n0 = 0;
+            fn_8012408C(0x12);
+            return;
+        }
+        if (fn_80122E68(nChan, &uWord) == 0 || uWord >> 24 != 0xE0) {
+            OSReport("GbaCommunication: An error occurred in reading 'FROMGBA_CASH2GBA_CONFIRM' (chan=%d).\n",
+                     nChan);
+            lbl_80260E18[nChan].n0 = 0;
+            fn_8012408C(0x12);
+            return;
+        }
+        lbl_80260E18[nChan].n6C = uWord & 0xFFFFFF;
+        break;
+    case 0xB0:
+        switch (nStat) {
+        case 0:
+            nValue = fn_80077ACC()->nA8;
+            break;
+        case 1:
+            nValue = fn_80077ACC()->nAC;
+            break;
+        case 2:
+            nValue = fn_80077ACC()->nA0;
+            break;
+        case 3:
+            nValue = fn_80077ACC()->nA4;
+            break;
+        default:
+            nValue = 0;
+            break;
+        }
+        uCmd = ((nStat + 0xB0) << 24) | nValue;
+        if (fn_80122CFC(nChan, &uCmd) == 0) {
+            OSReport("GbaCommunication: An error occurred to command 'FROMGC_REQUEST_STATS' (chan=%d).\n",
+                     nChan);
+            lbl_80260E18[nChan].n0 = 0;
+            fn_8012408C(0x12);
+            return;
+        }
+        if (fn_80122E68(nChan, &uWord) == 0 || uWord >> 24 != nStat + 0xC0) {
+            OSReport("GbaCommunication: An error occurred in reading 'FROMGBA_STAT_TRANSFER' (chan=%d).\n",
+                     nChan);
+            lbl_80260E18[nChan].n0 = 0;
+            fn_8012408C(0x12);
+            return;
+        }
+        lbl_80260E18[nChan].n70 = uWord & 0xFFFFFF;
+        break;
+    case 0x71:
+        uCmd = 0x71000000;
+        if (fn_80122CFC(nChan, &uCmd) == 0) {
+            OSReport("GbaCommunication: An error occurred to command 'FROMGC_REQUEST_SAVE_CASH' (chan=%d).\n",
+                     nChan);
+            lbl_80260E18[nChan].n0 = 0;
+            fn_8012408C(0x12);
+            return;
+        }
+        if (fn_80122E68(nChan, &uWord) == 0 || uWord >> 24 != 0x81) {
+            OSReport("GbaCommunication: An error occurred in reading 'FROMGBA_CASH_SAVED' (chan=%d).\n",
+                     nChan);
+            lbl_80260E18[nChan].n0 = 0;
+            fn_8012408C(0x12);
+            return;
+        }
+        break;
+    case 0xD3:
+        uCmd = 0xD3000000;
+        if (fn_80122CFC(nChan, &uCmd) == 0) {
+            OSReport("GbaCommunication: An error occurred to command 'FROMGC_REQUEST_SAVE_STAT' (chan=%d).\n",
+                     nChan);
+            lbl_80260E18[nChan].n0 = 0;
+            fn_8012408C(0x12);
+            return;
+        }
+        if (fn_80122E68(nChan, &uWord) == 0 || uWord >> 24 != 0xD4) {
+            OSReport("GbaCommunication: An error occurred in reading 'FROMGBA_STAT_SAVED' (chan=%d).\n",
+                     nChan);
+            lbl_80260E18[nChan].n0 = 0;
+            fn_8012408C(0x12);
+            return;
+        }
+        break;
+    case 0xD1:
+        uCmd = 0xD1ABCDEF;
+        if (fn_80122CFC(nChan, &uCmd) == 0) {
+            OSReport(
+                "GbaCommunication: An error occurred to command 'FROMGC_REQUEST_UNLOCKMASK' (chan=%d).\n",
+                nChan);
+            lbl_80260E18[nChan].n0 = 0;
+            fn_8012408C(0x12);
+            return;
+        }
+        if (fn_80122E68(nChan, &uWord) == 0 || uWord >> 24 != 0xD2) {
+            OSReport("GbaCommunication: An error occurred in reading 'FROMGBA_UNLOCKMASK' (chan=%d).\n",
+                     nChan);
+            lbl_80260E18[nChan].n0 = 0;
+            fn_8012408C(0x12);
+            return;
+        }
+        lbl_80260E18[nChan].n74 = uWord & 0xFFFFFF;
+        break;
+    }
+}
+
 // Sends the GBA the "set port" command and our context in eight words, then reads its context
 // back: the port is linked ("GbaSetport").
 void fn_80123ABC(s32 nChan) {
@@ -493,7 +683,6 @@ void fn_8012408C(s32 v);
 s32 fn_80124094(void);
 void fn_8012409C(void);
 extern s32 lbl_8028251C;
-s32 fn_80077ACC();
 void fn_801240A8(void);
 extern s32 lbl_80282520;
 extern s32 lbl_80282524;
@@ -559,27 +748,28 @@ void fn_8012409C(void) {
 }
 
 void fn_801240A8(void) {
-    s32 t0;
-    t0 = fn_80077ACC();
-    *(u8*)(((u8*)t0) + 0x50) = 1;
-    *(u8*)(((u8*)t0) + 0x51) = 1;
-    *(u8*)(((u8*)t0) + 0x52) = 1;
-    *(u8*)(((u8*)t0) + 0x53) = 1;
-    *(u8*)(((u8*)t0) + 0x54) = 1;
-    *(u8*)(((u8*)t0) + 0x55) = 1;
-    *(u8*)(((u8*)t0) + 0x56) = 1;
-    *(u8*)(((u8*)t0) + 0x57) = 1;
-    *(u8*)(((u8*)t0) + 0x58) = 1;
-    *(u8*)(((u8*)t0) + 0x59) = 1;
-    *(u8*)(((u8*)t0) + 0x5A) = 1;
-    *(u8*)(((u8*)t0) + 0x5B) = 1;
-    *(u8*)(((u8*)t0) + 0x5C) = 1;
-    *(u8*)(((u8*)t0) + 0x5D) = 1;
-    *(u8*)(((u8*)t0) + 0x5E) = 1;
-    *(u8*)(((u8*)t0) + 0x5F) = 1;
-    *(u8*)(((u8*)t0) + 0x60) = 1;
-    *(u8*)(((u8*)t0) + 0x61) = 1;
-    *(u8*)(((u8*)t0) + 0x62) = 1;
+    SaveProfile* pProfile = fn_80077ACC();
+
+    // the last course and the first 18 rewards
+    pProfile->aCourseUnlocked[22] = 1;
+    pProfile->aRewardUnlocked[0] = 1;
+    pProfile->aRewardUnlocked[1] = 1;
+    pProfile->aRewardUnlocked[2] = 1;
+    pProfile->aRewardUnlocked[3] = 1;
+    pProfile->aRewardUnlocked[4] = 1;
+    pProfile->aRewardUnlocked[5] = 1;
+    pProfile->aRewardUnlocked[6] = 1;
+    pProfile->aRewardUnlocked[7] = 1;
+    pProfile->aRewardUnlocked[8] = 1;
+    pProfile->aRewardUnlocked[9] = 1;
+    pProfile->aRewardUnlocked[10] = 1;
+    pProfile->aRewardUnlocked[11] = 1;
+    pProfile->aRewardUnlocked[12] = 1;
+    pProfile->aRewardUnlocked[13] = 1;
+    pProfile->aRewardUnlocked[14] = 1;
+    pProfile->aRewardUnlocked[15] = 1;
+    pProfile->aRewardUnlocked[16] = 1;
+    pProfile->aRewardUnlocked[17] = 1;
     lbl_8028251C = 1;
 }
 
@@ -596,7 +786,7 @@ void fn_80124154(void) {
 }
 
 s32 fn_80124174(void) {
-    return lbl_80260E18[lbl_80281984].n68;
+    return lbl_80260E18[lbl_80281984].u68;
 }
 
 s32 fn_80124190(void) {
@@ -704,3 +894,154 @@ s32 fn_80124280(s32 arg0) {
 }
 
 // ---- end of sweep code ----
+
+// Runs the link for the front end once a frame, by the state fn_8012408C sets. 0 starts it (15
+// frames' grace, the port free); 1 polls until a GBA links, giving up (0x11) after 4 seconds; 4 and
+// 5 poll the linked GBA, and in 5 a pending request is sent (cash to the GBA, the stats copied into
+// the profile, the save-cash and save-stats requests); 0x12 (a failed command) undoes what the
+// pending request did to the profile; 6 takes cash from the GBA; 8 swaps stats with it, keeping the
+// best of each, and asks it to save them. 0xC to 0xF raise a request and go back to 5.
+void fn_801242D0(void) {
+    SaveProfile* pProfile;
+    s32 bFailed;
+    s32 nOld;
+    s32 nGot;
+
+    if (fn_80124094() == 0) {
+        lbl_80282548 = OSGetTick();
+        fn_8012422C();
+        lbl_80282544 = 15;
+        fn_8012408C(1);
+    } else if (fn_80124094() == 1) {
+        if (lbl_80282544 == 0) {
+            fn_8012402C();
+        } else {
+            lbl_80282544--;
+        }
+        if (OSGetTick() - lbl_80282548 > GBA_TICKS_PER_MS * 4000) {
+            fn_8012408C(0x11);
+        }
+    } else if (fn_80124094() == 2) {
+        fn_8012402C();
+    } else if (fn_80124094() == 4) {
+        fn_8012402C();
+        fn_80124138(0);
+        fn_8012408C(5);
+    } else if (fn_80124094() == 5) {
+        fn_8012402C();
+        if (fn_801241B4()) {
+            fn_80123CBC(0xD0, 0);
+            pProfile = fn_80077ACC();
+            pProfile->n6C -= fn_8012411C();
+            fn_80124154();
+            fn_801241AC(0);
+        } else if (fn_801241C4()) {
+            pProfile = fn_80077ACC();
+            pProfile->nA8 = fn_80124280(0);
+            pProfile->nAC = fn_80124280(1);
+            pProfile->nA0 = fn_80124280(2);
+            pProfile->nA4 = fn_80124280(3);
+            fn_801241BC(0);
+        } else if (fn_801241E4()) {
+            fn_80123CBC(0x71, 0);
+            fn_801241FC(0);
+            fn_801241DC(0);
+        } else if (fn_801241F4()) {
+            fn_80123CBC(0xD3, 0);
+            fn_8012420C(0);
+            fn_801241EC(0);
+        }
+    } else if (fn_80124094() == 0x12) {
+        if (fn_80124204()) {
+            pProfile = fn_80077ACC();
+            pProfile->n6C -= fn_8012411C();
+            fn_80124154();
+            fn_801241FC(0);
+        }
+        if (fn_80124214()) {
+            pProfile = fn_80077ACC();
+            pProfile->nA8 = fn_80124280(0);
+            pProfile->nAC = fn_80124280(1);
+            pProfile->nA0 = fn_80124280(2);
+            pProfile->nA4 = fn_80124280(3);
+            fn_8012420C(0);
+        }
+    } else if (fn_80124094() == 6) {
+        fn_80123CBC(0x90, 0);
+        if (fn_80124094() != 0x12) {
+            pProfile = fn_80077ACC();
+            pProfile->n6C += fn_8012411C();
+            fn_80123CBC(0x71, 0);
+            fn_80124138(0);
+            fn_8012408C(7);
+        }
+    } else if (fn_80124094() == 8) {
+        bFailed = 0;
+        pProfile = fn_80077ACC();
+        fn_80124238(0, pProfile->nA8);
+        fn_80124238(1, pProfile->nAC);
+        fn_80124238(2, pProfile->nA0);
+        fn_80124238(3, pProfile->nA4);
+
+        // the best round: the lower, where the GBA's is set (0 and 0xFF: none)
+        fn_80123CBC(0xB0, 0);
+        if (fn_80124094() == 0x12) {
+            bFailed = 1;
+        }
+        nOld = fn_80124280(0);
+        nGot = fn_80124190();
+        if (nOld <= 0) {
+            if (nGot != 0 && nGot != 0xFF) {
+                pProfile->nA8 = nGot;
+            }
+        } else if (nOld > nGot) {
+            pProfile->nA8 = nGot;
+        }
+
+        // the GBA's count is added
+        fn_80123CBC(0xB0, 1);
+        if (fn_80124094() == 0x12) {
+            bFailed = 1;
+        }
+        pProfile->nAC += fn_80124190();
+
+        // the longest drive and the longest putt: the higher
+        fn_80123CBC(0xB0, 2);
+        if (fn_80124094() == 0x12) {
+            bFailed = 1;
+        }
+        if (fn_80124280(2) < fn_80124190()) {
+            pProfile->nA0 = fn_80124190();
+        }
+        fn_80123CBC(0xB0, 3);
+        if (fn_80124094() == 0x12) {
+            bFailed = 1;
+        }
+        if (fn_80124280(3) < fn_80124190()) {
+            pProfile->nA4 = fn_80124190();
+        }
+        if (bFailed == 0) {
+            fn_80123CBC(0xD3, 0);
+            fn_8012408C(9);
+        }
+    } else if (fn_80124094() == 7) {
+        fn_8012402C();
+    } else if (fn_80124094() == 9) {
+        fn_8012402C();
+    } else if (fn_80124094() == 0xC) {
+        fn_801241AC(1);
+        fn_8012408C(5);
+    } else if (fn_80124094() == 0xD) {
+        fn_801241BC(1);
+        fn_8012408C(5);
+    } else if (fn_80124094() == 0xE) {
+        fn_801241DC(1);
+        fn_8012408C(5);
+    } else if (fn_80124094() == 0xF) {
+        fn_801241EC(1);
+        fn_8012408C(5);
+    } else {
+        // the state is read once more with nothing done (an empty test in the original)
+        fn_80124094();
+    }
+}

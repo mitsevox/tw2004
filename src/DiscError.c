@@ -96,6 +96,17 @@ void fn_800B6C0C(void* pFrameBuffer) {
     lbl_80282194 = pFrameBuffer;
 }
 
+// printf onto the screen at (nX, nY).
+void fn_800B6C14(s16 nX, s16 nY, const char* pFmt, ...) {
+    char szText[256];           // size not proven by the frame (0x100..0x110 bytes)
+    va_list args;
+
+    va_start(args, pFmt);
+    vsprintf(szText, pFmt, args);
+    va_end(args);
+    fn_800B6CD8(nX, nY, szText);
+}
+
 void fn_800B6CD0(u16 nColor) {
     lbl_80282190 = nColor;
 }
@@ -106,10 +117,10 @@ void fn_800B6CD8(int nX, int nY, const char* szText) {
     int n;
     u8 c;
 
-    c = *szText;
     if (lbl_802814D2) {
         nX *= 8;
     }
+    c = *szText;
     while (c != 0) {
         if (c < 0x20) {
             c = 0x20;
@@ -134,6 +145,7 @@ void fn_800B6CD8(int nX, int nY, const char* szText) {
 // A string's width in pixels.
 int fn_800B6DA4(const char* szText) {
     int nWidth;
+    int n;
     u8 c;
 
     nWidth = 0;
@@ -146,7 +158,8 @@ int fn_800B6DA4(const char* szText) {
             } else if (c >= 0x8B) {
                 c = 0x20;
             }
-            nWidth += lbl_801F66A8[c - 0x20].nWidth;
+            n = c - 0x20;
+            nWidth += lbl_801F66A8[n].nWidth;
         }
     }
     return nWidth;

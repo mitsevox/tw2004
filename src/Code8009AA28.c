@@ -18,7 +18,6 @@ void fn_8009A3F4(s32 nView);
 f32  fn_8009A754(s32 nView, SunFlrView* pView);
 
 s32  fn_800171B0(void);                 // ViewController.c
-CamLens* fn_8001F004(void);
 f32  fn_8001415C(u8* p);                // GoRenderCtx_Gc.c
 f32  fn_8001416C(u8* p);
 void fn_8009A250(void);                 // SunFlr_Gc.c

@@ -118,7 +118,6 @@ void  fn_8001EFD8(f32* pA, f32* pB, f32* pOut);
 f32 (*fn_8001EC6C(Character* pChar, int nBone))[4];
 f32 (*fn_8001ECA8(Character* pChar, int nBone))[4];
 f32   fn_8001EFFC(CamLens* pLens);
-CamLens* fn_8001F004(void);
 void  fn_80027738(u8 bOn);
 void  fn_80035C58(void);
 void  fn_80035CC0(void);
@@ -2885,7 +2884,8 @@ u8 fn_8001DBF4(Character* pChar) {
 // model's bEE.
 void fn_8001DC64(Character* pChar, SkinChoices* pChoices) {
     fn_800CC1EC(pChar, pChoices);
-    fn_8010E4DC(pChar->p17AC, pChar->pModel, pChar->pSkin, 26, pChoices->a9B4, pChar->node3E0);
+    fn_8010E4DC(pChar->p17AC, pChar->pModel, pChar->pSkin, 26, pChoices->a9B4,
+                (SKABlendNode*)pChar->node3E0);
     if (gSession.nGameType != 3 || lbl_80281EE0->n0 == 1 || lbl_80281EE0->n0 == 4) {
         if (pChoices->n113 == 0) {
             fn_8001EE98(pChar, 0);

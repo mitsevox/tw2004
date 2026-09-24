@@ -177,7 +177,7 @@ typedef struct TexEntry {
     s16  nC;                    // 0x0C  GoDynObj.c's fn_80045FC8 copies nC * 16 bytes of its pixels
     u8   unkE[0x3C - 0xE];
     s16  nPalette;              // 0x3C  its row in the bank's pC
-    u8   unk3E[0x40 - 0x3E];
+    u16  n3E;                   // 0x3E  its row in the bank's p10 (ShaderObjectsData fn_800740F4)
     s8   b40;                   // 0x40  0: char.c fn_8001DD18 decodes the name and pairs the texture
     s8   n41;                   // 0x41  (fn_80045FC8)
     u8   unk42[0x47 - 0x42];
@@ -194,6 +194,18 @@ typedef struct TexPalette {
 } TexPalette;
 LAYOUT_ASSERT(TexPalette, 0xC);
 
+// A row of a bank's p10 (0x40 bytes): a texture's GX texture object, loaded with GXLoadTexObj
+// (ShaderObjectsData fn_800740F4); a texture whose b47 bit 0 is set uses the next row too.
+typedef struct TexGXObj {
+    u8   unk0[0x40];
+} TexGXObj;
+
+// A row of a bank's p14 (0x18 bytes): a texture's GX palette object, loaded with GXLoadTlut when
+// its nPalette is not -1 (ShaderObjectsData fn_800738DC).
+typedef struct TexGXTlut {
+    u8   unk0[0x18];
+} TexGXTlut;
+
 // A loaded texture bank (0x30 bytes, followed by its tables; up to 200, listed at lbl_801A26DC).
 typedef struct TexBank {
     u8   unk0[2];
@@ -202,8 +214,8 @@ typedef struct TexBank {
     u8   unk6[2];
     TexEntry*   p8;             // 0x08  its textures
     TexPalette* pC;             // 0x0C  its palettes
-    void* p10;                  // 0x10
-    void* p14;                  // 0x14
+    TexGXObj* p10;              // 0x10  the textures' GX objects, by TexEntry.n3E
+    TexGXTlut* p14;             // 0x14  the textures' GX palette objects, by TexEntry.n3E
     u8*  p18;                   // 0x18  the pixel data
     u8   unk1C[0x20 - 0x1C];
     u8*  p20;                   // 0x20  the palette data
@@ -251,6 +263,11 @@ extern struct UStreamObject* lbl_80281C0C;   // LoadData.c: a copy of the 'txf2'
 
 void fn_80014544(int n);                // load the numbered stream file (sprintf'd name)
 void fn_800147A4(void);                 // streammanagerhole.c
+// streammanagerhole.c: a flag byte fn_8001618C sets; while it is set, the shader objects' untextured
+// stage takes its alpha from the constant colour, not the vertex colour
+// (GoShaderObjectCommon_ShaderObjectsData_Gc.c fn_800740F4).
+extern u8* lbl_80280DC8;
+void fn_8001618C(u8 v);
 
 // The texture bank list (LLTexGrp.c): the banks loaded from 'txf ' stream objects, searched by
 // fn_800102DC.
@@ -650,15 +667,23 @@ void* fn_800065C8(const char* pName, u32* puSize, int nAlign);
 
 f32  fn_80012C30(char* sz);             // UFont.c: a string's width
 
+// A stop of a text colour gradient (fn_8001208C; UFontStop is our name).
+typedef struct UFontStop {
+    f32     fPos;                 // 0x00  where along the gradient (0..1) this colour is reached
+    GXColor color;                // 0x04
+    f32     fInvSpan;             // 0x08  1 / the distance to the next stop
+} UFontStop;                      // 0x0C
+
 // UFont.c's text settings: how the next string is drawn. Each queued string keeps its own copy
 // (fn_800128F8 copies all 0xD8 bytes), linked through pNext.
 typedef struct UFontContext {
     struct UFontContext* pNext;   // 0x00  the next string queued on the same font
-    f32   f04;                    // 0x04
-    f32   f08;                    // 0x08
+    f32   f04;                    // 0x04  where the first gradient starts
+    f32   f08;                    // 0x08  where it ends
     f32   f0C;                    // 0x0C  1 / (f08 - f04), set by fn_80012E00
-    s32   n10;                    // 0x10
-    u8    pad14[0x60 - 0x14];     // 0x14
+    s32   n10;                    // 0x10  gradients on: 1 the stops in a14[0..4], 2 a14[4] to a14[5]
+    UFontStop a14[6];             // 0x14
+    u32   u5C;                    // 0x5C  the colour (a GXColor's bytes) when nA4 is 0x12
     s32   n60;                    // 0x60
     s32   n64;                    // 0x64
     s32   n68;                    // 0x68
@@ -681,7 +706,8 @@ typedef struct UFontContext {
     f32   fB8;                    // 0xB8
     f32   fBC;                    // 0xBC
     f32   fC0;                    // 0xC0
-    u8    padC4[0xCC - 0xC4];     // 0xC4
+    s32   nC4;                    // 0xC4  the shadow's nA4 (n9C bit 0x10000: drawn first, moved by fCC, fD0)
+    u32   uC8;                    // 0xC8  the shadow's u5C
     f32   fCC;                    // 0xCC
     f32   fD0;                    // 0xD0
     char* szText;                 // 0xD4  a queued string's copy of its text
@@ -689,29 +715,95 @@ typedef struct UFontContext {
 
 UFontContext* fn_80012EC4(void);        // UFont.c: the current text settings
 
-// A glyph of a loaded font (0x28 bytes each, LLFont.p410; LLGlyph is our name).
+// The header of an 'sfn ' font stream object. Stored little-endian when n0C reads above 100;
+// FO_spLoadFontFromStream swaps it in place. LLFontFile is our name.
+typedef struct LLFontFile {
+    s32   n00;                    // 0x00
+    u32   u04;                    // 0x04
+    u16   uVersion;               // 0x08  200 and up: 12-byte glyph records, else 11
+    u16   nGlyphs;                // 0x0A
+    s32   n0C;                    // 0x0C  flags; bits 1-2 pick the palette
+    u8    pad10[3];               // 0x10
+    s8    n13;                    // 0x13  the line height in 1/448ths
+    u32   uGlyphs;                // 0x14  offset of the glyph records
+    u32   u18;                    // 0x18
+    u32   uBitmap;                // 0x1C  offset of the bitmap (an LLFontBitmap, then 4-bit texels)
+} LLFontFile;
+
+// A glyph record as the stream stores it, copied 0x10 bytes at a time (LLGlyphRec is our name).
+// Multi-byte values are little-endian bytes.
+typedef struct LLGlyphRec {
+    u8    aCode[2];               // 0x00  the character code
+    u8    uWidth;                 // 0x02  in texels
+    u8    uHeight;                // 0x03
+    u8    aX[2];                  // 0x04  where it sits in the bitmap
+    u8    aY[2];                  // 0x06
+    s8    n08;                    // 0x08  (1/512ths)
+    s8    n09;                    // 0x09  (1/512ths)
+    s8    n0A;                    // 0x0A  (1/448ths)
+    u8    pad0B[0x10 - 0xB];      // 0x0B
+} LLGlyphRec;
+
+// The bitmap's header in the stream (0x10 bytes; LLFontBitmap is our name). Little-endian.
+typedef struct LLFontBitmap {
+    u8    pad00[4];               // 0x00
+    s16   nWidth;                 // 0x04  in texels
+    s16   nHeight;                // 0x06
+    s16   n08;                    // 0x08
+    s16   n0A;                    // 0x0A
+    s16   n0C;                    // 0x0C
+    s16   n0E;                    // 0x0E
+} LLFontBitmap;
+
+// Two 4-bit texels of a C4 texture (LLTexelPair is our name).
+typedef struct LLTexelPair {
+    u8    uFirst : 4;
+    u8    uSecond : 4;
+} LLTexelPair;
+
+// A glyph of a loaded font (0x28 bytes each, LLFont.pGlyphs; LLGlyph is our name).
 typedef struct LLGlyph {
-    u8    pad00[0x18];            // 0x00
+    f32   fWidth;                 // 0x00  uWidth / 512
+    f32   fHeight;                // 0x04  uHeight / 448
+    f32   fU0;                    // 0x08  its texture coordinates in the font's bitmap
+    f32   fU1;                    // 0x0C
+    f32   fV0;                    // 0x10
+    f32   fV1;                    // 0x14
     f32   f18;                    // 0x18  its advance (fn_80011C90 adds them up for a string's width)
-    u8    pad1C[0x28 - 0x1C];     // 0x1C
+    f32   f1C;                    // 0x1C
+    f32   f20;                    // 0x20
+    LLGlyphRec* pRec;             // 0x24  its record
 } LLGlyph;
 
 // A loaded font, from an 'sfn ' stream object (FO_spLoadFontFromStream). LLFont is our name.
+// Its glyph records and glyphs follow it in the same block.
 typedef struct LLFont {
-    u8    pad00[0xC];             // 0x00
+    f32   f00;                    // 0x00  its line height (fn_80011D0C steps down a line by it)
+    s32   n04;                    // 0x04
+    u8    pad08[0xC - 0x8];       // 0x08
     LLGlyph* apGlyphs[256];       // 0x0C  by character code; NULL: the font has no such glyph
-    u8    pad40C[0x440 - 0x40C];  // 0x40C
+    LLGlyphRec* pRecs;            // 0x40C
+    LLGlyph* pGlyphs;             // 0x410
+    u8    pad414[0x418 - 0x414];  // 0x414
+    s32   n418;                   // 0x418
+    LLFontBitmap bitmap;          // 0x41C
+    s32   n42C;                   // 0x42C
+    s32   n430;                   // 0x430
+    s32   n434;                   // 0x434
+    s32   n438;                   // 0x438
+    s32   n43C;                   // 0x43C
     GXTexObj tex;                 // 0x440
     s32   nPalette;               // 0x460  its palette in UFontState.aTluts (0..2)
-    u8    pad464[0x46C - 0x464];  // 0x464
+    u32   u464;                   // 0x464  UFontState.a00[nPalette]
+    u8    pad468[0x46C - 0x468];  // 0x468
     s32   n46C;                   // 0x46C
-    void* p470;                   // 0x470  freed with the font
+    void* p470;                   // 0x470  the texture (4-bit texels), freed with the font
     s32   n474;                   // 0x474
-} LLFont;
+} LLFont;                         // 0x478
 
 // UFont.c's state (lbl_80280DE0 points at the 0x1E0-byte block lbl_801A34C0).
 typedef struct UFontState {
-    u8    pad00[0xC];             // 0x00  LLFont.c's state from here to 0xA0 (fn_80011034 sets it up)
+    u32   a00[3];                 // 0x00  LLFont.c's state from here to 0xA0; one per palette (LLFont.u464)
     GXTlutObj aTluts[3];          // 0x0C  the three glyph palettes
     u8    pad30[0x40 - 0x30];     // 0x30
     u16   aaPalettes[3][16];      // 0x40  IA8 (alpha << 8 | intensity), what aTluts point at
@@ -739,6 +831,8 @@ void fn_80011310(LLFont* pFont, UFontState* pState);
 void fn_8001144C(LLFont* pFont, UFontContext* pCtx, char* sz);
 void fn_80011C8C(LLFont* pFont);
 f32  fn_80011C90(LLFont* pFont, UFontContext* pCtx, char* sz); // a string's width
+int  fn_80011D0C(LLFont* pFont, UFontContext* pCtx, u8 bDraw, char* sz); // word-wrapped text
+extern u32 lbl_80186A80[19];            // LLFont.c: the text colours (GXColor bytes) by UFontContext.nA4
 void fn_80012438(LLFont* pFont);
 
 // ---- controller input ------------------------------------------------------------------------
@@ -817,6 +911,7 @@ u8   fn_80014300(u32 uMask);            // any pad pressed these buttons
 // ---- events, sound, effects ------------------------------------------------------------------
 
 void fn_800A7A98(s32 n);                // GameAudio.c
+void fn_800A4BDC(void);                 // GameAudio.c: once a frame, the emitters and the queued sound
 u8   fn_800B7490(void);                 // DiscError.c: show the disc-error screen while the drive
                                         // reports a problem; 1: it was shown (UStream.c, DiscCheck.c)
 
@@ -890,6 +985,7 @@ void fn_800A78F0(f32 f);                // } and a0[1] (FE_MessageTable.c, GameU
 void fn_800A7924(f32 f);                // }
 void Vec_Normalize(f32* pSrc, f32* pDst);
 void fn_800BAF04(f32* pSrc, f32* pDst);   // normalise
+void fn_800B5918(f32* pSrc, f32* pDst);   // copy three floats (not decompiled yet)
 f32  fn_800BAFC0(f32* pSrc, f32* pDst);   // VecMath.c: normalises pSrc into pDst, gives its length
 f32  Vec_Distance(f32* pA, f32* pB);
 void fn_800BD83C(int nSound, int a);      // SitDevFile.c: fn_800A7664(0, nSound, a)

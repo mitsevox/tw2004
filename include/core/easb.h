@@ -361,6 +361,7 @@ void EASBio_SetAccomplishment(const char* szName, s32 arg1);
 // these do not use them (the Bio always goes to card 0).
 f32  fn_80124BDC(void);
 s32  fn_80125194(s32 nPort, s32 nSlot);
+s32  fn_801251EC(s32* pArgs);           // pArgs: the port and slot
 s32  fn_80125280(s32 nPort, s32 nSlot);
 s32  fn_801252D0(s32 nPort, s32 nSlot);
 s32  fn_80125354(s32 nPort, s32 nSlot);

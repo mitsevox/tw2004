@@ -216,6 +216,12 @@ typedef struct CardPos {
 } CardPos;
 LAYOUT_ASSERT(CardPos, 0xC);
 
+// ---- the 'LEGL' pictures fn_800B166C keeps ----------------------------------------------------
+
+extern void* lbl_80282134;              // the first one's copy (fe_movies.c fn_80091EE8 shows and
+                                        // frees it)
+extern u32   lbl_8028212C;              // its size
+
 // ---- the hardware voices, as the sound engine (hlaudvoice.c) uses them -----------------------------
 
 void fn_800AFCBC(u16 nVoice, u8 bPause);

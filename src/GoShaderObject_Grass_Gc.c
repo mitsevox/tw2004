@@ -2,15 +2,18 @@
 // siblings): the grass shader object, one row of the shader object table. Builds the shells of
 // grass over the hole's terrain into a vertex buffer (the GrassPacket calls) and draws them through
 // GX. GoGrass.c hands it the grass parameters once per hole (SD_vSetGrassParamsOnce).
-// Partly decompiled: the builder (SD_vShaderObject_Grass_Static_Init) is still asm.
+// Partly decompiled: the builder (SD_vShaderObject_Grass_Static_Init) is a draft.
 
 #include "grassshader.h"
 #include "camera.h"
 #include "gx.h"
+#include "ball.h"
+#include "charstate.h"
 
 void SD_vShaderObject_Grass_Type_Init(void);
 void SD_vShaderObject_Grass_Type_Close(void);
 void SD_vShaderObject_Grass_Type_SetParameters(void* pParams);
+void SD_vShaderObject_Grass_Static_Init(SD_SShaderObject_Static* pObject, GrassBufferDesc* pDesc);
 void GrassPacket_vAddVerts(GrassWord* pVerts, int nVerts);
 s32 GrassPacket_iEndPacket(void);
 void fn_80120AB4(f32* pA, f32* pB, f32* pOut, int bAlongZ, f32 fAt);
@@ -19,11 +22,7 @@ void GrassPacket_vAddVert(f32* pPos, int nInRow);
 void fn_80120C2C(f32 (*aPoints)[3], u8* aFlags, f32* pOut, u16 nIndex, u8 nStep, u8* pFlag, int bAlongX,
                  f32 fAt);
 void GrassPacket_vBeginPacket(GrassWord** ppStart);
-void SD_vSetGrassParamsOnce(f32* pUnused0, f32* pUnused1, f32 (*a2)[4], f32* p8, f32 (*b2)[4],
-                            f32 (*a16)[4], f32 fA, f32 fB);
 void SD_vShaderObject_Grass_Static_Render(SD_SShaderObject_Static* pObject);
-CamLens* fn_8001F004(void);
-void fn_800B5918(f32* pSrc, f32* pDst);
 GrassWord* GrassPacket_pGetNextAvailableVertSlot(void);
 void GrassPacket_vSetNewRow(void);
 void GrassPacket_vSetBuffer(GrassWord* pBuffer, int nVerts);
@@ -44,6 +43,214 @@ void SD_vShaderObject_Grass_Type_Close(void) {
 
 void SD_vShaderObject_Grass_Type_SetParameters(void* pParams) {
     SD_gpGrassTypeData->pParams = pParams;
+}
+
+// Builds a grass object's shells from its tile (pDesc) into the vertex buffer: for each of the two
+// shell sets (along x, then along z) ten rows of vertices, each row merging the row before with the
+// tile's new points in order along the axis. A set's two vertex runs are its rows in order and in
+// reverse. The first and last vertex of a row are clipped to the tile's edges.
+void SD_vShaderObject_Grass_Static_Init(SD_SShaderObject_Static* pObject, GrassBufferDesc* pDesc) {
+    f32 (*pVerts)[3] = fn_8000C594()->pVerts;
+    u8* pTriFlags = fn_8000C594()->pTriFlags;
+    GrassRenderData* pRender = fn_8000B078(SD_gpGrassTypeData->pPool);
+    s32 nSet;
+    s32 nRow;
+    s32 i;
+    u32* pBits;
+    u16 nBits;
+    u16* pRows;
+    u16 uHead;
+    u16* pCur;
+    u16* pEnd;
+    u16* pOld;
+    u16* pNewEnd;
+    u16* pNext;
+    u16* pNew;
+    u8* pOldStep;
+    u8* pNewStep;
+    u32 nCount;
+    s32 nPrev;
+    s32 nBit;
+    s32 nNewBit;
+    s32 nBitBase;
+    s32 nNewRows;
+    s32 nOldRows;
+    s32 nCur;
+    s32 nOther;
+    s32 nAxis;
+    u8 uStep;
+    u8 uNewStep;
+    u8 bFirst;
+    u8 bStart;
+    u8 bFlag;
+    u8 bNewFlag;
+    f32 fLo;
+    f32 fHi;
+    f32 fAt;
+    f32 afPoint[3];
+    f32 afNew[3];
+    f32 afClip[3];
+    GrassWord* pFirst;
+    GrassWord* pLast;
+
+    pObject->pData = pRender;
+    SD_gpGrassTypeData->f370 = pDesc->f14;
+    GrassPacket_vSetBuffer(pDesc->pVerts, pDesc->nVerts);
+    for (nSet = 0; nSet < 2; nSet++) {
+        // port: the tile's offsets were made into 32-bit addresses on load
+        // the tile's data: a bit count, then (word-aligned) the bits, then the rows
+        pRows = (u16*)pDesc->pTile->au10[nSet];
+        nBits = *pRows++;
+        while ((uptr)pRows & 3) {
+            pRows++;
+        }
+        pBits = (u32*)pRows;
+        pRows = (u16*)((u32*)pRows + (nBits % 32 ? nBits / 32 + 1 : nBits / 32));
+        nCount = 0;
+        nCur = 0;
+        nOther = 1;
+        nBitBase = 0;
+        if (nSet == 0) {
+            nAxis = 0;
+            fLo = pDesc->fX;
+            fHi = 2.5f + fLo;
+        } else {
+            nAxis = 2;
+            fLo = pDesc->fZ;
+            fHi = 2.5f + fLo;
+        }
+        GrassPacket_vBeginPacket(&pRender->apVerts[nSet][0]);
+        for (nRow = 0; nRow < 10; nRow++) {
+            SD_gpGrassTypeData->n374 = nRow % 8;
+            GrassPacket_vSetNewRow();
+            SD_gpGrassTypeData->aShells[nRow].pStart = GrassPacket_pGetNextAvailableVertSlot();
+            if (nSet == 0) {
+                fAt = 2.5f * ((f32)nRow / 10.0f) + pDesc->fZ;
+            } else {
+                fAt = 2.5f * ((f32)nRow / 10.0f) + pDesc->fX;
+            }
+
+            // the row: a count word (points kept, points new), then both lists of point indexes
+            pCur = pRows + 1;
+            uHead = *pRows;
+            nCur = 1 - nCur;
+            nPrev = nCount;
+            nCount = 0;
+            pEnd = pCur + (u8)(uHead >> 8);
+            nOther = 1 - nOther;
+            nOldRows = (u8)(uHead >> 8);
+            pNew = SD_gpGrassTypeData->a000[nOther];
+            pNewStep = SD_gpGrassTypeData->a200[nOther];
+            pOld = SD_gpGrassTypeData->a000[nCur];
+            pOldStep = SD_gpGrassTypeData->a200[nCur];
+            nBit = nBitBase;
+            nNewBit = nBitBase + nOldRows;
+            nNewRows = (u8)uHead;
+            pNewEnd = pEnd;
+            pNext = pEnd + (u8)uHead;
+            uStep = fn_8001E9CC(pBits, nBit);
+            uNewStep = fn_8001E9CC(pBits, nNewBit);
+            bFirst = 1;
+            bStart = 1;
+            if (pCur != pEnd) {
+                fn_80120C2C(pVerts, pTriFlags, afPoint, *pCur, uStep, &bFlag, nSet, fAt);
+            }
+            for (i = 0; i < nPrev; i++) {
+                if (pNewEnd != pNext && *pOld == *pNewEnd && *pOldStep == uNewStep) {
+                    // the point is dropped from this row
+                    nNewBit++;
+                    pNewEnd++;
+                    uNewStep = fn_8001E9CC(pBits, nNewBit);
+                } else {
+                    fn_80120C2C(pVerts, pTriFlags, afNew, *pOld, *pOldStep, &bNewFlag, nSet, fAt);
+                    while (pCur != pEnd &&
+                           afPoint[nAxis] <= afNew[nAxis] &&
+                           (afPoint[nAxis] != afNew[nAxis] ||
+                            (*pCur <= *pOld && (*pCur != *pOld || uStep <= *pOldStep)))) {
+                        *pNew++ = *pCur;
+                        *pNewStep++ = uStep;
+                        GrassPacket_vAddVert(afPoint, bFirst);
+                        if (bFlag && !bStart) {
+                            bFirst = !bFirst;
+                        }
+                        if (bStart) {
+                            bStart = 0;
+                        }
+                        pCur++;
+                        nBit++;
+                        nCount++;
+                        if (pCur != pEnd) {
+                            uStep = fn_8001E9CC(pBits, nBit);
+                            fn_80120C2C(pVerts, pTriFlags, afPoint, *pCur, uStep, &bFlag, nSet, fAt);
+                        }
+                    }
+                    GrassPacket_vAddVert(afNew, bFirst);
+                    if (bNewFlag && !bStart) {
+                        bFirst = !bFirst;
+                    }
+                    if (bStart) {
+                        bStart = 0;
+                    }
+                    nCount++;
+                    *pNew++ = *pOld;
+                    *pNewStep++ = *pOldStep;
+                }
+                pOld++;
+                pOldStep++;
+            }
+            while (pCur != pEnd) {
+                *pNew++ = *pCur;
+                *pNewStep++ = uStep;
+                GrassPacket_vAddVert(afPoint, bFirst);
+                if (bFlag && !bStart) {
+                    bFirst = !bFirst;
+                }
+                if (bStart) {
+                    bStart = 0;
+                }
+                pCur++;
+                nBit++;
+                nCount++;
+                if (pCur != pEnd) {
+                    uStep = fn_8001E9CC(pBits, nBit);
+                    fn_80120C2C(pVerts, pTriFlags, afPoint, *pCur, uStep, &bFlag, nSet, fAt);
+                }
+            }
+            pRows = pNext;
+            nBitBase += nNewRows;
+            nBitBase += nOldRows;
+            GrassPacket_vFlushRow();
+            SD_gpGrassTypeData->aShells[nRow].nVerts = ((uptr)GrassPacket_pGetNextAvailableVertSlot() -
+                                                        (uptr)SD_gpGrassTypeData->aShells[nRow].pStart) / 16;
+
+            // the row's ends are clipped to the tile
+            if (nCount >= 2) {
+                pFirst = SD_gpGrassTypeData->aShells[nRow].pStart;
+                pLast = GrassPacket_pGetNextAvailableVertSlot();
+                if (pFirst[nAxis].f < fLo) {
+                    fn_80120AB4(&pFirst[0].f, &pFirst[4].f, afClip, nSet, fLo);
+                    fn_800B5918(afClip, &pFirst[0].f);
+                }
+                if (pLast[nAxis - 4].f > fHi) {
+                    fn_80120AB4(&pLast[-8].f, &pLast[-4].f, afClip, nSet, fHi);
+                    fn_800B5918(afClip, &pLast[-4].f);
+                    if (pLast[-5].b[3] != 0 && pLast[-1].b[3] == 0) {
+                        pLast[-5].b[2] = 1;
+                        pLast[-1].b[2] = 1;
+                    }
+                }
+            }
+        }
+        pRender->anVerts[nSet][0] = GrassPacket_iEndPacket();
+
+        // the second run: the rows in reverse
+        GrassPacket_vBeginPacket(&pRender->apVerts[nSet][1]);
+        for (i = 0; i < 10; i++) {
+            GrassPacket_vAddVerts(SD_gpGrassTypeData->aShells[9 - i].pStart,
+                                  SD_gpGrassTypeData->aShells[9 - i].nVerts);
+        }
+        pRender->anVerts[nSet][1] = GrassPacket_iEndPacket();
+    }
 }
 
 // Copies nVerts ready-made vertices into the packet.

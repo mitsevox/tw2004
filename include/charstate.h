@@ -433,7 +433,7 @@ LAYOUT_ASSERT(SkinMeshIter, 0x20);
 // decompiled yet).
 typedef struct SkinMeshRefs {
     u16  n0;                    // 0x00  } flag 2: the two numbers fn_801136C4 is given, and the data
-    s16  n2;                    // 0x02  }
+    u16  n2;                    // 0x02  }   (fn_801132C4 draws n2 of p4's u16 indices from n0 on)
     void* p4;                   // 0x04  }
     s32  n8;                    // 0x08  } flag 0x200000: the mesh's count and data
     void* pC;                   // 0x0C  }
@@ -441,8 +441,8 @@ typedef struct SkinMeshRefs {
     void* p14;                  // 0x14  }
     s32  n18;                   // 0x18  } flags 1 and 0x40: the mesh's count and its data's third
     void* p1C;                  // 0x1C  }   part (after n10 bits and n10 words when 0x10 is set)
-    // The size is not known: fn_801132C4 (not decompiled) seems to draw from one and reads a float
-    // at 0x20.
+    f32  f20;                   // 0x20  fn_801132C4 scales the positions by it
+    // The size is not known past 0x24.
 } SkinMeshRefs;
 
 // The whole iterator fn_80113A9C and fn_80113B34 build (our name): the SkinDesc.p6C entries of one
@@ -575,7 +575,7 @@ s32   fn_800CDCE0(Skin* pSkin, int nSet, u64 uId);
 s32   fn_800CDD5C(Skin* pSkin, int nSet, const char* pName);
 s32   fn_800CDDB0(Skin* pSkin, int nSet, int nVariant, u64 uId);
 void  fn_8010E4DC(CharSliderDefs* pDefs, CharModel* pModel, Skin* pSkin, int nSliders, u8* aValues,
-                  u8* pNode);
+                  struct SKABlendNode* pNode);
                                         // applies slider values (Character.p17AC's definitions)
 void  fn_8010D454(CharSliderDefs* pDefs);   // CharSliders.c: frees slider definitions
 void  fn_800CE170(Skin* pSkin, SkinTarget* pTarget);

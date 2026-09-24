@@ -61,6 +61,11 @@ static inline double __fabs(double x) {
     return v.d;
 }
 
+// __abs is an int's absolute value (CW computes it inline: srawi, add, xor).
+static inline int __abs(int x) {
+    return x < 0 ? -x : x;
+}
+
 // __stwbrx stores the word x byte-reversed at p + n.
 static inline void __stwbrx(u32 x, void* p, int n) {
     u8* pOut = (u8*)p + n;
