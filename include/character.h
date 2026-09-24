@@ -416,10 +416,13 @@ typedef struct AnimPlayer {
     s32   n08;                  // 0x08  }
     s32   nC;                   // 0x0C  } set together by fn_800958EC
     f32   f10;                  // 0x10  }
-    u8    unk14[4];
+    f32   f14;                  // 0x14  1 after fn_80072D90; fn_800737B4 scales its time step by it
     f32   fTime;                // 0x18
     f32   fStart;               // 0x1C  } Anim_SetTime's -30000 and -10000 stand for these
     f32   fEnd;                 // 0x20  }
+    f32   f24;                  // 0x24  } fn_800737B4: with uFlags bit 3, f28 climbs to f24; with
+    f32   f28;                  // 0x28  } bit 4, it falls to f2C (at 0 bit 4 gives way to bit 0),
+    f32   f2C;                  // 0x2C  } and the step is scaled by f28 / f24 on the way
 } AnimPlayer;
 
 // An entry of Character.p44 (0x30 bytes), read from the CHR object by fn_8001A9F4.
@@ -512,7 +515,7 @@ typedef struct Character {
     f32   fAnimEnd;             // 0x184  the animation's end time
     u8    unk188[0x29C - 0x188];
     AnimPlayer anim29C;         // 0x29C  a second animation player
-    u8    unk2C0[0x3D4 - 0x2C0];
+    u8    unk2CC[0x3D4 - 0x2CC];
     s32   n3D4;                 // 0x3D4  the bytes of its CHR object before the animation library
     AnimLib* pLib;              // 0x3D8  its animation library
     struct ClipRecord* pRecords;    // 0x3DC  records for its merged library (skalib)

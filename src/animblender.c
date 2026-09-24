@@ -431,3 +431,33 @@ void fn_800736D8(SKABlendNode* pNode, s32 nBit) {
         }
     }
 }
+
+// The player's time step fT scaled by f14, while a blend in (uFlags bit 3) or out (bit 4) runs
+// also by f28 / f24; a finished blend in clears bit 3, a finished blend out swaps bit 4 for bit 0.
+f32 fn_800737B4(AnimPlayer* pPlayer, f32 fT) {
+    f32 fStep = fT * pPlayer->f14;
+
+    if (pPlayer->uFlags & 8) {
+        pPlayer->f28 += fStep;
+        if (pPlayer->f28 >= pPlayer->f24) {
+            pPlayer->uFlags &= ~8;
+            pPlayer->f28 = 0.0f;
+            return fStep;
+        }
+        return fStep * (pPlayer->f28 / pPlayer->f24);
+    }
+    if (pPlayer->uFlags & 0x10) {
+        pPlayer->f28 -= fStep;
+        if (pPlayer->f28 < pPlayer->f2C) {
+            pPlayer->f28 = pPlayer->f2C;
+        }
+        if (pPlayer->f28 <= 0.0f) {
+            pPlayer->uFlags &= ~0x10;
+            pPlayer->uFlags |= 1;
+            pPlayer->f28 = 0.0f;
+            return fStep;
+        }
+        return fStep * (pPlayer->f28 / pPlayer->f24);
+    }
+    return fStep;
+}
