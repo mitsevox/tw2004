@@ -708,6 +708,34 @@ FlyByPath* fn_80065424(u32 uPath);      // a fly-by path's spline (NULL: none)
 void     fn_80065488(CamScript* pScript, int nPath, f32* pCam, f32* pSub, f32* pFov, int nPlayer,
                      f32 fShare);
 
+// ---- the camera modes' setups (GoGolfCam.c), one per View_SetCamera mode --------------------
+
+void   fn_800BDA30(View* pView, int nPlayer);                       // camera 0
+void   GolfCamera_InitZoomToAimCamera(View* pView, int nPlayer);    // 1
+void   GolfCamera_InitGreenZoomToAimCamera(View* pView, int nPlayer); // 2
+void   GolfCamera_InitElevatorCamera(View* pView, int nPlayer);     // 3
+void   fn_800BFC80(View* pView, int nPlayer);                       // 4
+void   fn_800C0364(View* pView, int nPlayer);                       // 5
+void   fn_800C0624(View* pView, int nPlayer);                       // 6
+void   fn_800C0744(View* pView, int nPlayer);                       // 7
+void   fn_800BF110(View* pView, int nPlayer);                       // 8
+void   fn_800BF5E4(View* pView, int nPlayer);                       // 9
+void   fn_800C0880(View* pView, int nPlayer);                       // 10
+void   GolfCamera_InitPreShotCamera(View* pView, int nPlayer);      // 11
+void   GolfCamera_InitSwingCamera(View* pView, int nPlayer);        // 12
+void   fn_800C14B0(View* pView, int nPlayer);                       // 13
+void   GolfCamera_InitBallFlightCamera(View* pView, int nPlayer);   // 14
+void   GolfCamera_InitPostShotCamera(View* pView, int nPlayer);     // 15
+void   GolfCamera_InitInHoleCamera(View* pView, int nPlayer);       // 16
+void   fn_800C3478(View* pView, int nPlayer);                       // 17
+void   GolfCamera_InitTutorialWaitCamera(View* pView, int nPlayer); // 18
+void   GolfCamera_InitSteepSlopeCamera(View* pView, int nPlayer);   // 19
+void   fn_800C1670(View* pView, int nPlayer);                       // 20
+void   GolfCamera_InitHeartBeatCamera(View* pView, int nPlayer);    // 21
+void   GolfCamera_InitShutterCamera(View* pView, int nPlayer);      // 22
+void   fn_800C38BC(View* pView, int nPlayer);                       // 23
+void   fn_800C3EB8(View* pView, int nPlayer);                       // 24
+
 // ---- the camera controller (0x80062F38..) ---------------------------------------------------
 
 void   View_SetCamera(View* pView, int nCamera, int nPlayer, int nView);

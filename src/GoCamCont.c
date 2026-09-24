@@ -13,6 +13,8 @@ u8   fn_800637C4(int nPlayer, int nView);
 void fn_800642A4(View* pView, f32 fF0, f32 fF4);
 void fn_80064478(f32* pA, f32* pB, f32* pOut);
 void fn_800090E4(f32* pQuat, f32* pIn, f32* pOut);      // Quaternion.c: a vector turned by it
+void fn_80016CD8(int nView);                            // ViewController.c: sets the current view
+void fn_80045824(int n);                                // DepthField.c: turns depth-of-field layer n off
 
 // Sets a view up: no camera (25), no shots, the script cleared.
 void fn_80062E40(View* pView) {
@@ -67,6 +69,100 @@ void fn_80062F1C(View* pView) {
     pView->p80 = NULL;
     pView->p74 = NULL;
     pView->b268 = 0;
+}
+
+// Switches the view to camera mode nCamera for the player (TW06's CameraController_SetCameraMode):
+// the mode's setup runs with nView as the current view.
+void View_SetCamera(View* pView, int nCamera, int nPlayer, int nView) {
+    int nPrevView;
+
+    fn_8001731C(pView);
+    fn_80017314(pView);
+    if (pView->nCurCamera == nCamera) {
+        return;
+    }
+    nPrevView = fn_80016D10();
+    fn_80016CD8(nView);
+    switch (nCamera) {
+    case 10:
+        fn_800C0880(pView, nPlayer);
+        break;
+    case 0:
+        fn_800BDA30(pView, nPlayer);
+        break;
+    case 11:
+        GolfCamera_InitPreShotCamera(pView, nPlayer);
+        break;
+    case 1:
+        GolfCamera_InitZoomToAimCamera(pView, nPlayer);
+        break;
+    case 2:
+        GolfCamera_InitGreenZoomToAimCamera(pView, nPlayer);
+        break;
+    case 3:
+        GolfCamera_InitElevatorCamera(pView, nPlayer);
+        break;
+    case 8:
+        fn_800BF110(pView, nPlayer);
+        break;
+    case 9:
+        fn_800BF5E4(pView, nPlayer);
+        break;
+    case 4:
+        fn_800BFC80(pView, nPlayer);
+        break;
+    case 5:
+        fn_800C0364(pView, nPlayer);
+        break;
+    case 6:
+        fn_800C0624(pView, nPlayer);
+        break;
+    case 7:
+        fn_800C0744(pView, nPlayer);
+        break;
+    case 12:
+        GolfCamera_InitSwingCamera(pView, nPlayer);
+        break;
+    case 13:
+        fn_800C14B0(pView, nPlayer);
+        break;
+    case 14:
+        GolfCamera_InitBallFlightCamera(pView, nPlayer);
+        break;
+    case 15:
+        GolfCamera_InitPostShotCamera(pView, nPlayer);
+        break;
+    case 16:
+        GolfCamera_InitInHoleCamera(pView, nPlayer);
+        break;
+    case 17:
+        fn_800C3478(pView, nPlayer);
+        break;
+    case 18:
+        GolfCamera_InitTutorialWaitCamera(pView, nPlayer);
+        break;
+    case 23:
+        fn_800C38BC(pView, nPlayer);
+        break;
+    case 24:
+        fn_800C3EB8(pView, nPlayer);
+        break;
+    case 19:
+        GolfCamera_InitSteepSlopeCamera(pView, nPlayer);
+        break;
+    case 20:
+        fn_800C1670(pView, nPlayer);
+        break;
+    case 21:
+        GolfCamera_InitHeartBeatCamera(pView, nPlayer);
+        break;
+    case 22:
+        GolfCamera_InitShutterCamera(pView, nPlayer);
+        break;
+    }
+    pView->nCurCamera = nCamera;
+    fn_80045824(nPlayer);
+    fn_80016CD8(nPrevView);
 }
 
 // Starts the player's shot of kind nKind on the view and runs its script from the start.
