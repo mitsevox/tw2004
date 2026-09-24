@@ -1453,6 +1453,31 @@ u8 fn_800439E4(f32* pCam, int nPlayer) {
     return bBlocked;
 }
 
+// With the flagstick in and no fairway fix running (bCF), a camera close to the pin (level
+// distance times the lens's fB0 under CamTuning.f120) is raised towards f124 above it, more the
+// closer it is.
+void fn_800441E4(CamScript* pScript, f32* pCam, f32* pSub, int nPlayer, CamShot* pSaved, f32* pPrev) {
+    f32 vDiff[4];
+    int nPin = Game_CurrentPinSet();
+    CourseInfo* pCourse = fn_8000C594();
+    f32 fDist;
+    f32 fAbove;
+
+    if (pCourse == NULL) return;
+    if (pScript->bCF) return;
+    if (fn_80016CFC(gPlayers[nPlayer].nView[0])->bFlagOut) return;
+    fn_80045428(pCam, &pCourse->pin[nPin].x, vDiff);
+    vDiff[1] = 0.0f;
+    fDist = fn_80009680(fn_80009744(vDiff));
+    fDist *= fn_8001EFFC((u8*)fn_8001F004());
+    if (fDist < lbl_80281F78->f120) {
+        fAbove = pCam[1] - pCourse->pin[nPin].y;
+        if (fAbove < lbl_80281F78->f124) {
+            pCam[1] += (lbl_80281F78->f124 - fAbove) * (1.0f - fDist / lbl_80281F78->f120);
+        }
+    }
+}
+
 // A spot for the camera by the green: of the AI targets nearest the ball, nearest the player's
 // target and 3 past the pin (as seen from Player.vBall), taken nearest the ball first, the first
 // whose level direction to the ball is far enough from the camera's (pSub to the ball); else the
