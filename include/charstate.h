@@ -355,7 +355,7 @@ typedef struct HwsBurn {
     s32  n18;                   // 0x18  fn_8011C850(pDesc)
     s32* a1C;                   // 0x1C  n18 flags (fn_80110A24)
     s32  n20;                   // 0x20  pDesc->n2C
-    u8   unk24[4];
+    s32  n24;                   // 0x24  the bits of p28 set (fn_80111124)
     u32* p28;                   // 0x28  n20 bits
     s32* a2C;                   // 0x2C  } n20 each
     s32* a30;                   // 0x30  }
@@ -375,10 +375,10 @@ typedef struct HwsBurn {
     void (*pfn68)(s32 nArg, SkinDesc14* pEntry);    // 0x68  } called on each a64 entry
     s32  n6C;                   // 0x6C  } (fn_801109F0)
     s32  n70;                   // 0x70  pDesc->n88
-    u8   unk74[4];
-    u32* p78;                   // 0x78  n70 bits
-    s32* a7C;                   // 0x7C  } n70 each
-    s32* a80;                   // 0x80  }
+    s32  n74;                   // 0x74  the bits of p78 set (fn_80111658)
+    u32* p78;                   // 0x78  n70 bits: the SkinDesc.p8C entries a64 uses
+    s32* a7C;                   // 0x7C  the n74 set bits of p78, in order
+    s32* a80;                   // 0x80  per bit of p78: its place in a7C
 } HwsBurn;
 LAYOUT_ASSERT(HwsBurn, 0x84);
 

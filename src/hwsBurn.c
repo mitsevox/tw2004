@@ -339,6 +339,83 @@ s32* fn_80111540(HwsBurn* pBurn, u8* pBase, s32* pOffset, s32 nAlign) {
     return aCopy;
 }
 
+// List the bits of p28 that are set (a2C, a30) and give the bytes the meshes they stand for take
+// (each rounded up to nAlign; meshes with flag 0x400000 left out).
+s32 fn_80111124(HwsBurn* pBurn, s32 nAlign) {
+    SkinDesc* pDesc = pBurn->pDesc;
+    int i;
+    int nBits = pDesc->n2C;
+    int n = 0;
+    s32 nBytes = 0;
+
+    for (i = 0; i < nBits; i++) {
+        if (fn_8001E9CC(pBurn->p28, i)) {
+            pBurn->a2C[n] = i;
+            pBurn->a30[i] = n;
+            n++;
+            if (!(pDesc->p34[i].uFlags & 0x400000)) {
+                nBytes += fn_80110E74(pDesc->p34[i].pBits, pDesc->p34[i].nSize, 1, nAlign);
+            }
+        }
+    }
+    pBurn->n24 = n;
+    return nBytes;
+}
+
+// Mark the SkinDesc.p8C entries the a64 entries use (p78) and list them (a7C, a80).
+s32 fn_80111658(HwsBurn* pBurn) {
+    int i;
+    int nEntries = pBurn->n60;
+    int nBits = pBurn->n70;
+    int n;
+
+    fn_8001E938(pBurn->p78, nBits);
+    for (i = 0; i < nEntries; i++) {
+        if (pBurn->a64[i].n18 >= 0 && pBurn->a64[i].n18 < nBits) {
+            fn_8001EA34(pBurn->p78, pBurn->a64[i].n18);
+        }
+    }
+    n = 0;
+    for (i = 0; i < nBits; i++) {
+        if (fn_8001E9CC(pBurn->p78, i)) {
+            pBurn->a7C[n] = i;
+            pBurn->a80[i] = n;
+            n++;
+        }
+    }
+    pBurn->n74 = n;
+    return 0;
+}
+
+// Copy the listed SkinDesc.p8C entries to pBase + *pOffset.
+SkinDesc8C* fn_8011172C(HwsBurn* pBurn, u8* pBase, s32* pOffset, s32 nAlign) {
+    int n = pBurn->n74;
+    SkinDesc* pDesc = pBurn->pDesc;
+    SkinDesc8C* aOut;
+    int i;
+
+    aOut = (SkinDesc8C*)(pBase + *pOffset);
+    *pOffset += n * sizeof(SkinDesc8C);
+    *pOffset = (nAlign + *pOffset - 1) & ~(nAlign - 1);
+    for (i = 0; i < n; i++) {
+        memcpy(&aOut[i], &pDesc->p8C[pBurn->a7C[i]], sizeof(SkinDesc8C));
+    }
+    return aOut;
+}
+
+// Point the a64 entries at their place in the a7C list, then copy a64 to pBase + *pOffset.
+SkinDesc14* fn_801117D0(HwsBurn* pBurn, u8* pBase, s32* pOffset, s32 nAlign) {
+    int i;
+    int n = pBurn->n60;
+
+    for (i = 0; i < n; i++) {
+        if (pBurn->a64[i].n18 >= 0) {
+            pBurn->a64[i].n18 = pBurn->a80[pBurn->a64[i].n18];
+        }
+    }
+    return fn_80110E98(pBase, pOffset, pBurn->a64, pBurn->n60 * sizeof(SkinDesc14), nAlign);
+}
+
 // Copy SkinDesc.p14 and hand each entry to the burn's callback.
 void fn_801115C4(HwsBurn* pBurn) {
     int i;
