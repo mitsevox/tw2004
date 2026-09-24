@@ -220,6 +220,31 @@ void fn_800192D4(Character* pChar, f32 fAngle) {
     }
 }
 
+// Turns the character to face along pDir (level: up is y), plus fAngle; a direction shorter than
+// 0.01 is ignored.
+void fn_80019358(Character* pChar, f32* pDir, f32 fAngle) {
+    f32 fLen;
+    f32 mtx[4][4];              // row 3 is left unset (fn_8000A4E0 reads rows 0..2)
+    f32 fYaw;
+    f32 fB;
+    f32 fC;
+
+    if (pChar != NULL) {
+        fLen = fn_80009680(fn_80009744(pDir));
+        if (fLen < 0.01f) return;
+        fn_8001EF34(pDir, 1.0f / fLen, mtx[0]);
+        mtx[0][3] = 0.0f;
+        mtx[1][0] = 0.0f;
+        mtx[1][1] = 1.0f;
+        mtx[1][2] = 0.0f;
+        mtx[1][3] = 0.0f;
+        vec4flt_CrossProduct(mtx[0], mtx[1], mtx[2]);
+        mtx[2][3] = 0.0f;
+        fn_8000A4E0(mtx, &fYaw, &fB, &fC);
+        fn_800192D4(pChar, fYaw + fAngle);
+    }
+}
+
 void fn_80019648(void) {
     fn_80095554();
     fn_8001A4BC();
