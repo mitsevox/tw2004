@@ -920,7 +920,7 @@ config.libs = [
             Object(NonMatching, "uiLoadFile.c"),
             Object(NonMatching, "uiProcessInterface.c"),
             Object(Matching, "Code80090940.c"),
-            Object(NonMatching, "fe_movies.c"),
+            Object(Matching, "fe_movies.c"),
             Object(Matching, "uiTransform.c"),
             Object(NonMatching, "goballfx.c"),
             Object(Matching, "GoObjShadow.c"),
