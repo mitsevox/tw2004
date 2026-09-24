@@ -99,7 +99,7 @@ typedef struct CamSequence {
 } CamSequence;
 LAYOUT_ASSERT(CamSequence, 0x50);
 
-// A view's camera script (0xD0 bytes at View + 0x84): the shot the camera plays, the one after it,
+// A view's camera script (0x108 bytes at View + 0x84): the shot the camera plays, the one after it,
 // and the move it makes between them. The camera script functions (gocamscripts.c) and
 // DynamicCam_GetLocation take it as pScript; every caller passes &pView->script.
 typedef struct CamScript {
@@ -130,10 +130,27 @@ typedef struct CamScript {
     s32  nC4;                   // 0xC4  the shot kind asked for
     s32  nC8;                   // 0xC8  the shot kind last started
     u8   bCC;                   // 0xCC
-    u8   unkCD[0xCF - 0xCD];
+    u8   bCD;                   // 0xCD
+    u8   bCE;                   // 0xCE
     u8   bCF;                   // 0xCF
+    s32  nD0;                   // 0xD0
+    u8   unkD4[0xD8 - 0xD4];
+    f32  fD8;                   // 0xD8  camera 8: the ground height it follows (fn_8003B534 measures
+                                //       the ball's height over it)
+    f32  fDC;                   // 0xDC
+    s32  nE0;                   // 0xE0  a shot kind for fn_8003A950 (25 = none)
+    f32  fE4;                   // 0xE4
+    u8   bE8;                   // 0xE8
+    u8   unkE9[0xEC - 0xE9];
+    f32  fEC;                   // 0xEC
+    f32  fF0;                   // 0xF0  } set together by fn_800642A4
+    f32  fF4;                   // 0xF4  }
+    f32  fF8;                   // 0xF8
+    u8   unkFC[0x100 - 0xFC];
+    f32  f100;                  // 0x100
+    f32  f104;                  // 0x104
 } CamScript;
-LAYOUT_ASSERT(CamScript, 0xD0);
+LAYOUT_ASSERT(CamScript, 0x108);
 
 // A view's camera controller (View_SetCamera is TW06's CameraController_SetCameraMode): the
 // camera mode, its shots and script. It sits at +4 in a ViewController; only the fields read so far.
@@ -158,17 +175,6 @@ typedef struct View {
     CamSequence* p7C;           // 0x07C  the swing camera's sequence, kept for the replay
     CamShot* p80;               // 0x080
     CamScript script;           // 0x084  the camera script the camera functions drive
-    s32      n154;              // 0x154
-    u8       unk158[4];
-    f32      f15C;              // 0x15C  camera 8: the ground height it follows
-    u8       unk160[4];
-    s32      n164;              // 0x164  a shot kind for fn_8003A950 (25 = none)
-    f32      f168;              // 0x168
-    u8       b16C;              // 0x16C
-    u8       unk16D[0x174 - 0x16D];
-    f32      f174;              // 0x174  } set together by fn_800642A4
-    f32      f178;              // 0x178  }
-    u8       unk17C[0x18C - 0x17C];
     f32      f18C;              // 0x18C
     f32      f190;              // 0x190
     s32      n194;              // 0x194
@@ -209,7 +215,7 @@ typedef struct CamTuning {
     f32  f8;                    // 0x008  the zoom-to-aim camera slows down over this last distance
     f32  fC;                    // 0x00C  ... closer in when the ball is within this of it plus f4
     f32  f10;                   // 0x010  ... as a share of the ball's distance
-    f32  f14;                   // 0x014  the zoom-to-aim camera's height over View.f15C
+    f32  f14;                   // 0x014  the zoom-to-aim camera's height over View.script.fD8
     f32  f18;                   // 0x018  the zoom-to-aim camera's creep and aim-marker lag
     f32  f1C;                   // 0x01C  both zoom-to-aim cameras' slow motion at full speed
     f32  f20;                   // 0x020  the zoom-to-aim camera's slow motion before it sets off
@@ -265,7 +271,11 @@ typedef struct CamTuning {
     u8   unk174[0x178 - 0x174];
     f32  f178;                  // 0x178
     f32  v17C[4];               // 0x17C
-    u8   unk18C[0x19C - 0x18C];
+    f32  f18C;                  // 0x18C  fn_8003B534: the ball-flight camera closes in by this share of
+                                //        the height above the shot's f6C ...
+    f32  f190;                  // 0x190  ... and backs off by this share of the height below its f68
+    u8   unk194[0x198 - 0x194];
+    f32  f198;                  // 0x198  fn_8003B534: the least ball speed it follows the flight at
     f32  f19C;                  // 0x19C  the steepest a camera direction may tilt (fn_8003D810, radians)
     u8   unk1A0[0x1C0 - 0x1A0];
     s32  n1C0;                  // 0x1C0  nonzero enables camera 19
