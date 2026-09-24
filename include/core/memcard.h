@@ -197,8 +197,9 @@ void fn_8009CC00(void);
 void fn_8009CC88(void);
 void fn_8009CD10(void);
 void fn_8009CD7C(void);
-// The space a save needs: compared with MCCardState.nFreeBlocks (EASportsBio.c passes 0, 3).
-s32  fn_8009D1D8(s32 nPort, s32 nSlot, s32 arg2, s32 arg3);
+// The space a save of kind nKind needs (0-2 the game's save, 3 the EA Sports Bio): compared with
+// MCCardState.nFreeBlocks. arg2 is not used.
+s32  fn_8009D1D8(s32 nPort, s32 nSlot, s32 arg2, s32 nKind);
 s32  fn_8009D3DC(s32 nPort, s32 nSlot);
 s32  fn_8009D50C(s32 nPort, s32 nSlot);     // new files an EA Sports Bio save needs (0 or 1)
 s32  fn_8009D614(s32 nPort, s32 nSlot, const char* pName);

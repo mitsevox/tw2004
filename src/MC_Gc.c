@@ -21,6 +21,7 @@ s32  fn_8009EECC(s32 nPort, s32 nSlot, const char* pName);
 s32  fn_8009EF68(s32 nPort, s32 nSlot);
 s32  fn_80125194(s32 a, s32 b);         // EA Sports Bio (0x80125194)
 s32  fn_801255C4(s32* pPos);            // EASportsBio.c
+s32  fn_801255F8(void);                 // EASportsBio.c: the EA Sports Bio file's size
 void fn_8012CCCC(int uHandle);          // EASBStorage.c
 void GXSetVtxAttrFmt(int nFmt, int nAttr, int nCnt, int nType, u8 uFrac);   // port: GameCube only
 u8*  Skalib_ScratchToAram(int n);       // skalib.c
@@ -208,6 +209,55 @@ s32 fn_8009D0D4(s32 nPort, s32 nSlot) {
     }
 }
 
+// The space a save of kind nKind needs: 40 when its file is not on the card yet (the EA Sports
+// Bio's own size for kind 3), else 0; 40 also when there is no card. Mounts the card for the look
+// if needed. The EA bug of fn_8009D50C is here too.
+s32 fn_8009D1D8(s32 nPort, s32 nSlot, s32 arg2, s32 nKind) {
+    u32 uFlags = lbl_801F1510[nPort][nSlot].uFlags;
+    u32 bMounted = (uFlags >> 2) & 1;   // MC_CARD_MOUNTED
+    s32 nResult;
+    if (nPort == -1 && nSlot == -1) return 40;
+    if (!(uFlags & MC_CARD_PRESENT)) return 40;
+    if (fn_8009D0D4(nPort, nSlot) != 0) return 0;
+    if (!bMounted && fn_8009D74C(nPort, nSlot) != 0) return 0;
+    switch (nKind) {
+    case 0:
+    case 1:
+    case 2:
+        nResult = fn_8009D614(nPort, nSlot, MC_FILE_NAME);
+        break;
+    case 3:
+        nResult = fn_8009D614(nPort, nSlot, "EASB");
+        break;
+    default:
+        nResult = MC_ERR_NOFILE;
+        break;
+    }
+    if (nResult != 0) {
+        switch (nKind) {
+        case 0:
+        case 1:
+        case 2:
+            return 40;
+        case 3:
+            return fn_801255F8();
+        default:
+            return 0;
+        }
+    }
+    switch (nKind) {
+    case 0:
+    case 1:
+    case 2:
+        if (fn_8009D614(nPort, nSlot, MC_BACKUP_NAME) != 0) return 0;
+        break;
+    case 3:
+        return 0;
+    }
+    if (!bMounted && fn_8009DBAC(nPort, nSlot) != 0) return 0;
+    return 0;
+}
+
 // fn_8009D1D8's count for the game's save, plus the EA Sports Bio's (fn_801255C4).
 s32 fn_8009D390(s32 nPort, s32 nSlot) {
     s32 aPos[2];
@@ -217,6 +267,22 @@ s32 fn_8009D390(s32 nPort, s32 nSlot) {
     nCount += fn_8009D1D8(nPort, nSlot, 0, 0);
     nCount += fn_801255C4(aPos);
     return nCount;
+}
+
+// How many new files a save of the game needs: 1 when the save file or its backup is not on the
+// card yet, else 0 (also 0 when the card cannot be read). Mounts the card for the look if needed.
+// The EA bug of fn_8009D50C is here too.
+s32 fn_8009D3DC(s32 nPort, s32 nSlot) {
+    u32 uFlags = lbl_801F1510[nPort][nSlot].uFlags;
+    u32 bMounted = (uFlags >> 2) & 1;   // MC_CARD_MOUNTED
+    if (nPort == -1 && nSlot == -1) return 1;
+    if (!(uFlags & MC_CARD_PRESENT)) return 1;
+    if (fn_8009D0D4(nPort, nSlot) != 0) return 0;
+    if (!bMounted && fn_8009D74C(nPort, nSlot) != 0) return 0;
+    if (fn_8009D614(nPort, nSlot, MC_FILE_NAME) != 0) return 1;
+    if (fn_8009D614(nPort, nSlot, MC_BACKUP_NAME) != 0) return 1;
+    if (!bMounted && fn_8009DBAC(nPort, nSlot) != 0) return 0;
+    return 0;
 }
 
 // How many new files a save of the EA Sports Bio needs on the card: 1 when there is no "EASB" file
