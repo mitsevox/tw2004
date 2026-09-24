@@ -745,9 +745,7 @@ void fn_800D4F14(int nPlayer, u8 bPreview) {
     s32 aPrizeIds[10];
     s32 aAwardIds[10];
     int i;
-    int nSlot;
     u8 bReplace;
-    u8 bLost;
     int j;
     s32 nValue;
     u8 bHole;
@@ -819,6 +817,9 @@ void fn_800D4F14(int nPlayer, u8 bPreview) {
             GM_GetGameProgress(&gpSaveData[nPlayer]) < 100.0f) continue;
 
         if (lbl_80200538.aPuttGoal[i].nAward != 39) {
+            u8 bLost;
+            int nSlot;
+
             if (!fn_800D76AC(nPlayer, lbl_80200538.aPuttGoal[i].nAward)) continue;
             bReplace = 0;
             bLost = 0;
@@ -847,6 +848,9 @@ void fn_800D4F14(int nPlayer, u8 bPreview) {
                                          lbl_80200538.aBio[lbl_80200538.aPuttGoal[i].nBio].nValue);
             }
         } else {
+            u8 bLost;
+            int nSlot;
+
             nValue = lbl_80200538.aPuttGoal[i].nValue;
             if (nValue == 0) continue;
             bReplace = 0;
@@ -903,10 +907,6 @@ void fn_800D588C(int nPlayer, u8 bPreview, u8 bRoundOver) {
     s32 aPrizeIds[10];
     s32 aAwardIds[10];
     int i;
-    int nSlot;
-    u8 bReplace;
-    u8 bLost;
-    int j;
     s32 nValue;
     u8 bHole;
     u8 bTee;
@@ -994,6 +994,11 @@ void fn_800D588C(int nPlayer, u8 bPreview, u8 bRoundOver) {
             GM_GetGameProgress(&gpSaveData[nPlayer]) < 100.0f) continue;
 
         if (lbl_80200538.aHoleGoal[i].nAward != 39) {
+            u8 bReplace;
+            u8 bLost;
+            int j;
+            int nSlot;
+
             if (!fn_800D76AC(nPlayer, lbl_80200538.aHoleGoal[i].nAward)) continue;
             bReplace = 0;
             bLost = 0;
@@ -1022,6 +1027,11 @@ void fn_800D588C(int nPlayer, u8 bPreview, u8 bRoundOver) {
                                          lbl_80200538.aBio[lbl_80200538.aHoleGoal[i].nBio].nValue);
             }
         } else {
+            u8 bReplace;
+            u8 bLost;
+            int j;
+            int nSlot;
+
             nValue = lbl_80200538.aHoleGoal[i].nValue;
             if (nValue == 0) continue;
             bReplace = 0;
