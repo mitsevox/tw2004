@@ -1,5 +1,5 @@
-// GameRound.c (our name): the round and hole setup that follows GameManager.c - setting up a
-// hole, the stroke limit, created-course data, hole names. TW06 has no counterpart file.
+// GameRound.c (our name): the round setup that follows GameManager.c - setting up a game mode, a
+// hole, the stroke limit, mixed-course rounds, hole names. TW06 has no counterpart file.
 
 #include "golfer.h"
 #include "ball.h"
@@ -70,7 +70,7 @@ void fn_800E0AF0(f32* pA, f32* pB, f32* pOut) {
 }
 #endif
 
-// The 20 course ids the mixed rounds pick from (lbl_80184D40).
+// The 20 course ids the random mixed round picks from (lbl_80184D40).
 typedef struct CourseList {
     u32 a[20];
 } CourseList;
@@ -102,8 +102,8 @@ void fn_800E0B14(f32* pA, f32* pB, f32* pOut) {
 }
 #endif
 
-// Sets up a game mode: every rule flag and callback to its default (the callbacks are mostly
-// empty stubs), then the mode's own setup (27 modes), then the round as holes 1..18.
+// Sets up a game mode: the rule flags and callbacks to their defaults (the callbacks are mostly
+// empty stubs), then the mode's own setup (26 modes; 3 has none), then the round as holes 1..18.
 void fn_800E0B38(int nMode) {
     int i;
     gpGame->nMode = nMode;
@@ -291,7 +291,7 @@ void fn_800E1018(int nPlayer, int nHole) {
 }
 
 // A new round: every player's holes and round totals cleared, the pin for every hole set from
-// the session's pin option (-1 = the first pin), and the first hole chosen.
+// the session's pin option (-1 = the first pin), and every player's mulligan given back.
 void fn_800E1074(void) {
     int     j;
     int     i;
@@ -417,7 +417,8 @@ void fn_800E1480(int nHole) {
 }
 
 // Sets the round's course. 23, 22 and 24..29 are the mixed rounds (built by fn_800E30D4,
-// fn_800E2FD8 and fn_800E3050); any other value is one course's holes 1..18.
+// fn_800E2FD8 and fn_800E3050); any other value is one course's holes 1..18 (while b136 is
+// set, only the current course changes).
 void fn_800E14E0(int nCourse) {
     int i;
     if (nCourse == 23) {
@@ -473,7 +474,7 @@ u8 fn_800E1734(void) {
     return 0;
 }
 
-// The mode's mulligan rule: 0 none, 1 any number, 2 one per player per round.
+// The mode's mulligan rule: 0 none, 1 any number, 2 one per player per nine.
 int fn_800E177C(void) {
     return gpGame->nMulligans;
 }
@@ -513,7 +514,8 @@ int fn_800E184C(int nPlayer, u8 bCurrent) {
     return nStrokes - nPar;
 }
 
-// The score shown for a player: the online game's, the mode's own total, or strokes against par.
+// The score shown for a player: the PGA TOUR simulation's while the tour runs, n2D8 in a playoff
+// (gpGame->bD4), else strokes against par while gpGame->nDC < nE0, and 0 after that.
 int fn_800E1904(int nPlayer, u8 bCurrent) {
     if (fn_800EE470()) {
         return fn_8011937C(nPlayer, 0, bCurrent);
@@ -527,8 +529,8 @@ int fn_800E1904(int nPlayer, u8 bCurrent) {
     return 0;
 }
 
-// A player's total for the first nHoles holes: the mode's points in mode 18 (match play),
-// fn_800E8C24's count in mode 19, strokes otherwise.
+// A player's total for the first nHoles holes: the mode's points in mode 18 (Stableford), the
+// team's better score per hole (fn_800E8C24) in mode 19 (best ball), strokes otherwise.
 int fn_800E19A4(int nPlayer, int nHoles) {
     int n;
     int i;
@@ -551,7 +553,8 @@ int fn_800E19A4(int nPlayer, int nHoles) {
     return n;
 }
 
-// Whether the round plays every hole (or the mode's own answer, 0xD5, when it keeps one).
+// Whether the round plays every hole (in a playoff, gpGame->bD4, the answer bD5 kept from
+// before the playoff narrowed the selection).
 u8 fn_800E1BBC(void) {
     int i;
     if (gpGame->bD4) {
@@ -577,8 +580,8 @@ u8 fn_800E1CA8(void) {
     return b;
 }
 
-// The 75 marked holes (three to five per course; the items GM_GetGameProgress counts with
-// fn_800588F4): a course and hole to the item index, or -1. EA wrote the cases as 1-based hole
+// The 75 marked holes (two to five per course, none on course 7; the items GM_GetGameProgress
+// counts with fn_800588F4): a course and hole to the item index, or -1. EA wrote the cases as 1-based hole
 // numbers; the courses are in the original's order, which numbers the items.
 int fn_800E1CE8(int nCourse, int nHole) {
     switch (nCourse) {
@@ -769,7 +772,7 @@ u8 fn_800E23B0(int nPlayer, int nStrokes) {
 }
 
 // Whether a player may take a mulligan: humans only, the mode allows them, and in the
-// one-per-round rule not already used.
+// one-per-nine rule not already used.
 u8 fn_800E23EC(int nPlayer) {
     if (Player_IsCPU(nPlayer)) {
         return 0;
@@ -791,7 +794,8 @@ void fn_800E2470(void) {
     }
 }
 
-// A number per game mode (1, 2 or 4; 0 for most): modes 6-8 give 1 or 2 by gpGame->n4.
+// A number per game mode (1, 2 or 4; 0 for modes 3, 10-17, 22, 25 and any other): modes 6-8
+// give 1 or 2 by gpGame->n4.
 int fn_800E2520(int nMode) {
     switch (nMode) {
     case 0:
@@ -858,7 +862,7 @@ void fn_800E25E0(void) {
     }
 }
 
-// The course's folder name ("01_Peb" = Pebble Beach ...). Course 5's is "22_Ant".
+// The course's folder name ("01_Peb" = Pebble Beach ...). Course 4's is "22_Ant".
 char* fn_800E2680(void) {
     switch (Game_GetCourse()) {
     case 0:  return "01_Peb";
@@ -896,8 +900,8 @@ u8 fn_800E27A8(void) {
     return gpGame->n294 != 0;
 }
 
-// Seconds since the round's clock was last reset (gpGame->n12C holds the session's frame count
-// then).
+// Seconds since the session's frame count was stored in gpGame->n12C (by GM_Update in game type
+// 6, and by GM_RestartHole).
 int fn_800E27C0(void) {
     return (1.0f / FRAME_RATE) * (f32)(u32)(gSession.nFrameCount - gpGame->n12C);
 }
@@ -946,7 +950,7 @@ void fn_800E299C(void) {
 }
 
 // When every player is waiting (in split screen, those not holed yet are sent back to their
-// pre-shot state instead), the mode's "everyone done" callback.
+// pre-shot state instead), the mode's pfnSetupNextGolfer callback.
 void fn_800E2A88(void) {
     int i;
     u8  bBusy = 0;
@@ -1005,8 +1009,8 @@ void fn_800E2BA4(void) {
     fn_800E1404(nCur);
 }
 
-// Whether the ball is in the hole: it is (lie "holed") when Ter_Use3DCupGeometry says so and the lie is
-// already holed, or, when it says no, when the ball is within half a yard of the pin.
+// Whether the ball is in the hole (never in modes 13-17), setting its lie to holed: with
+// Ter_Use3DCupGeometry on, when the lie already is; with it off, within half a yard of the pin.
 u8 fn_800E2DB4(int nPlayer) {
     CourseInfo* pCourse;
     int         nPinSet;
@@ -1083,10 +1087,11 @@ void fn_800E3050(int nCourse) {
     }
 }
 
-// Builds a random mixed round from the unlocked courses: two par 3s on the front nine and two on
-// the back (never on neighbouring holes), then four par 5s the same way, then par 4s everywhere
-// else. Each hole comes from a random course, no hole twice, and every course is used once
-// before any is used again.
+// Builds a random mixed round: two par 3s on the front nine and two on the back (not on
+// neighbouring holes), then four par 5s on free holes the same way (kept apart from each other
+// only), then par 4s everywhere else. Each hole comes from a random course among the first
+// nAvail (the unlocked count) of the list that fn_80110180 passes; no hole twice, and no course
+// again while another is unused.
 // fake match: nCourse starts at 0 though every path sets it before use; without the initializer
 // the par-4 loop's registers come out differently (found by the permuter).
 void fn_800E30D4(void) {

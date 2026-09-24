@@ -105,7 +105,7 @@ f32 fn_80124BDC(void) {
 
 // Sends the Bio screens what they asked for (fn_80125600, fn_80125648, fn_8012566C, fn_80125680):
 // the list of games (each marked when the Bio's level has reached it), a game's accomplishments,
-// and every 15 frames the Bio's summary and one game's details.
+// and every 16 frames the Bio's summary and one game's details.
 void fn_80124C10(void) {
     u16 szWide[EASB_ACCOMPLISHMENT_NAME_SIZE];
     char szName[EASB_PRODUCT_NAME_SIZE];
@@ -241,7 +241,7 @@ void fn_801250C0(void) {
     }
 }
 
-// TRUE when the card could be opened (or reported -18).
+// TRUE when the Bio opened (then closed again) or failed with -18, the code of most library errors.
 int fn_80125118(s32* pArgs) {
     s32 nPort;
     s32 nSlot;
@@ -447,8 +447,8 @@ s32 EASBio_GetCurrentRewardMessage(void) {
     return lbl_80281988->eCurrentRewardMessage;
 }
 
-// What to tell the player after a round: a new accomplishment, a level-up, or a level-up that
-// unlocked something (TW06's EASBio_eReward values).
+// Which reward message to show: a new accomplishment, a level-up (which replaces it), or a
+// level-up that unlocked something (TW06's EASBio_eReward values).
 EASBio_eReward fn_801256B8(void) {
     EASBio_eReward eReward;
     u16 uLevel;

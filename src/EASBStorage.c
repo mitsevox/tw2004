@@ -1,6 +1,6 @@
 // EASBStorage.c (our name): the storage half of the EA Sports Bio library (the player profile
 // shared across EA games), under EASB.c's public calls: checking, sorting and packing the product
-// records, the level table, and the memory-card steps through the tag-file library (state at
+// records, the level formula, and the memory-card steps through the tag-file library (state at
 // lbl_802825B0). It spans SkinBurn.c's end to EASB.c; EA may have split it into several files.
 
 #include "core/easb.h"
@@ -576,7 +576,7 @@ u32 fn_80128F58(u32 uValue, u32 uScaleB, u32 uDivisor, u32 uScaleA) {
 
 // The Bio's level from its totals: points for the games in it, the hours played and the two
 // counters, then level n needs 20 * n + 1000 points more than level n - 1. *pfProgress is how
-// far into the next level the points go (0 to 1).
+// far the points have got towards the next level (0 to 1).
 EASBErrorE fn_80128FD4(const EASBTotals* pTotals, u16* puLevel, f32* pfProgress) {
     u32 nHours0;
     u32 nHours4;
@@ -948,9 +948,9 @@ void fn_8012A050(EASBProduct* pInto, const EASBProduct* pFrom) {
 }
 
 // ---- The memory-card steps, through the tag-file library ----
-// The Bio file holds a HEAD record (the totals), a PROD record per product and an IMAG record
-// per picture. Each operation (EASBStorageOp) runs as a list of steps; a step is called with
-// the process state until it reports EASB_PROCESS_COMPLETE.
+// The Bio file holds a HEAD record (the totals) and a PROD record per product; no operation
+// writes an IMAG (picture) record. Each operation (EASBStorageOp) runs as a list of steps; a
+// step is called with the process state until it reports EASB_PROCESS_COMPLETE.
 
 #define EASB_TAG_HEAD 0x48454144    // 'HEAD'
 #define EASB_TAG_PROD 0x50524F44    // 'PROD'
@@ -999,8 +999,8 @@ u8 fn_8012A20C(s32 nState) {
     return 0;
 }
 
-// Step: runs TagFile_Delete on the Bio file; when it completes, keeps its session and marks the
-// file open.
+// Step: opens the Bio file and reads its record map; when that completes, keeps its session and
+// marks the file open.
 EASBErrorE fn_8012A2A8(EASBProcessE* peProcess) {
     EASBErrorE eError;
 
@@ -1009,7 +1009,7 @@ EASBErrorE fn_8012A2A8(EASBProcessE* peProcess) {
         return EASB_ERROR_NULL_PARAMETERS;
     }
     if (*peProcess == EASB_PROCESS_NONE) {
-        eError = fn_8012C98C(TagFile_Delete("EASB", SFIO_DEVICE_INVALID, 0));
+        eError = fn_8012C98C(TagFile_Open("EASB", SFIO_DEVICE_INVALID, 0));
         *peProcess = EASB_PROCESS_CONTINUE;
     } else if (*peProcess == EASB_PROCESS_CONTINUE) {
         eError = fn_8012CB98(peProcess);
@@ -1023,7 +1023,7 @@ EASBErrorE fn_8012A2A8(EASBProcessE* peProcess) {
     return eError;
 }
 
-// Step: deletes the open Bio file; when that completes, keeps the session and marks it open.
+// Step: reopens the Bio file of the kept session; when that completes, keeps it and marks it open.
 EASBErrorE fn_8012A364(EASBProcessE* peProcess) {
     EASBErrorE eError;
 
@@ -1038,7 +1038,7 @@ EASBErrorE fn_8012A364(EASBProcessE* peProcess) {
         return EASB_ERROR_CANNOT_REOPEN;
     }
     if (*peProcess == EASB_PROCESS_NONE) {
-        eError = fn_8012C98C(TagFile_DeleteSession(&lbl_802825B0->session));
+        eError = fn_8012C98C(TagFile_Reopen(&lbl_802825B0->session));
         *peProcess = EASB_PROCESS_CONTINUE;
     } else if (*peProcess == EASB_PROCESS_CONTINUE) {
         eError = fn_8012CB98(peProcess);
@@ -1175,7 +1175,7 @@ EASBErrorE fn_8012A848(EASBProcessE* peProcess) {
     return eError;
 }
 
-// Step: raises the totals with the product's.
+// Step: sets the totals from the game's record alone (fn_80128528).
 EASBErrorE fn_8012A900(EASBProcessE* peProcess) {
     if (peProcess == NULL) {
         return EASB_ERROR_NULL_PARAMETERS;
@@ -1219,8 +1219,8 @@ EASBErrorE fn_8012A95C(EASBProcessE* peProcess) {
 }
 
 // Step: reads the game's PROD record from its slot and merges it into the game's record, with
-// the totals; a record with another name is refused. When the file is new (n94 not 3) there
-// is nothing to read: the game's record only takes its slot and level.
+// the totals; a record with another name is refused. If the slot is not the game's own (n94 not
+// 3), only the totals merge and the record takes the slot and, in u1160, the file's level.
 EASBErrorE fn_8012AA7C(EASBProcessE* peProcess) {
     EASBProduct product;
     f32 fProgress;
@@ -1317,8 +1317,8 @@ EASBErrorE fn_8012AC40(EASBProcessE* peProcess) {
     return eError;
 }
 
-// Step: reads all 25 IMAG records into the picture slots; a missing or bad one comes back
-// cleared.
+// Step: reads all 25 IMAG records into the picture slots; one that reads back corrupt comes back
+// cleared; a missing record, no file or no device ends the step with the error.
 EASBErrorE fn_8012AE40(EASBProcessE* peProcess) {
     EASBErrorE eError;
 
@@ -1452,7 +1452,7 @@ EASBErrorE fn_8012B27C(EASBProcessE* peProcess) {
     if (*peProcess == EASB_PROCESS_NONE) {
         eError = fn_8016CFF8_SetSaveDescriptor(lbl_802825B0->args.pHeader);
         if (eError == EASB_ERROR_NONE) {
-            eError = fn_8012C98C(TagFile_BeginSave("EASB", lbl_802825B0->args.eDevice, 0));
+            eError = fn_8012C98C(TagFile_Create("EASB", lbl_802825B0->args.eDevice, 0));
         }
         *peProcess = EASB_PROCESS_CONTINUE;
     } else if (*peProcess == EASB_PROCESS_CONTINUE) {
@@ -1471,8 +1471,8 @@ EASBErrorE fn_8012B27C(EASBProcessE* peProcess) {
     return eError;
 }
 
-// Step: looks for the Bio file on the cards; when that completes, forgets the session and every
-// record read.
+// Step: deletes the Bio file; when that completes, forgets the session, every record read and
+// the game's slot.
 EASBErrorE fn_8012B3B0(EASBProcessE* peProcess) {
     EASBErrorE eError;
 
@@ -1484,7 +1484,7 @@ EASBErrorE fn_8012B3B0(EASBProcessE* peProcess) {
         return EASB_ERROR_INTERNAL;
     }
     if (*peProcess == EASB_PROCESS_NONE) {
-        eError = fn_8012C98C(TagFile_BeginLoad("EASB", SFIO_DEVICE_INVALID, 0));
+        eError = fn_8012C98C(fn_80174DF0_Delete("EASB", SFIO_DEVICE_INVALID, 0));
         *peProcess = EASB_PROCESS_CONTINUE;
     } else if (*peProcess == EASB_PROCESS_CONTINUE) {
         eError = fn_8012CB98(peProcess);
@@ -1703,8 +1703,8 @@ EASBErrorE fn_8012BA58(EASBProcessE* peProcess) {
     return eError;
 }
 
-// Step: writes the 25 IMAG records of a new file: the game's picture in slot 0, the others
-// empty.
+// Step: writes 25 IMAG records: the game's picture in slot 0, the others empty. No operation
+// lists this step.
 EASBErrorE fn_8012BBD8(EASBProcessE* peProcess) {
     EASBErrorE eError;
 
@@ -1821,7 +1821,7 @@ EASBErrorE fn_8012BF18(s32 nOperation, EASBStorageArgs* pArgs) {
     return eError;
 }
 
-// Ends operation nOperation, shutting the tag-file library down if it started it. After the
+// Ends operation nOperation, shutting the tag-file library down if the table says so. After the
 // clean-up operation (EASB_OPERATION_ERROR) the result is the failed operation's error.
 EASBErrorE fn_8012C03C(s32 nOperation) {
     EASBErrorE eError;
@@ -2017,7 +2017,7 @@ EASBErrorE fn_8012C388(EASBProcessE* peProcess, s32* pnOperation) {
     return eError;
 }
 
-// Operations 4 and 5 (fn_8012D394's): 4 when no file has been opened yet, else 5, which needs
+// Operations 4 and 5 (fn_8012D560's): 4 when no file has been opened yet, else 5, which needs
 // b92.
 EASBErrorE fn_8012C5F8(EASBTotals* pTotals, EASBProduct* pProduct, char* szName) {
     EASBStorageArgs args;

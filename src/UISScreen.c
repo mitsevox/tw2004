@@ -16,7 +16,7 @@ char* fn_8016BEDC(char* pOut, char* pEnd, s32 nWidth, s32 nPrec, f32 f);
 // A linked node that answers with 1 gets the handler this node has for it. Returns 2 as soon as a
 // handler returns 2.
 s32 fn_8016A2D4(UIStudio* pStudio, UISScreen* pScreen, UISWordStack* pStack, u32 nNode, u32 uEvent, u32 n5,
-                u8 nArgs, const s32* pArgs, u8* pbOut) {
+                s32 nArgs, const s32* pArgs, u8* pbOut) {
     s32 nResult;
     UISNode* pNode;
     u32 i;
@@ -392,13 +392,15 @@ void fn_8016B4D4(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 nMove) {
 
 // Whether one of pNode's groups links to the node pInfo belongs to.
 static inline u8 UIS_NodeLinks(UISScreenFile* pData, UISNode* pNode, UISNodeInfo* pInfo) {
+    UISGroup* pGroup;
+    UISEntry* pEntry;
     u32 i;
     u32 j;
 
     for (i = 0; i < pNode->nGroups; i++) {
-        UISGroup* pGroup = pNode->ppGroups[i];
+        pGroup = pNode->ppGroups[i];
         for (j = 0; j < pGroup->nEntries; j++) {
-            UISEntry* pEntry = &pGroup->pEntries[j];
+            pEntry = &pGroup->pEntries[j];
             if (pEntry->uHandler == 0xFFFF && pData->pNodes[pEntry->u4.nNode].pInfo == pInfo) return 1;
         }
     }
@@ -407,15 +409,18 @@ static inline u8 UIS_NodeLinks(UISScreenFile* pData, UISNode* pNode, UISNodeInfo
 
 // The info of the first node pNode links to whose u4 is set, or NULL.
 static inline UISNodeInfo* UIS_LinkedOn(UISScreenFile* pData, UISNode* pNode) {
+    UISGroup* pGroup;
+    UISEntry* pEntry;
+    UISNodeInfo* pLinked;
     u32 i;
     u32 j;
 
     for (i = 0; i < pNode->nGroups; i++) {
-        UISGroup* pGroup = pNode->ppGroups[i];
+        pGroup = pNode->ppGroups[i];
         for (j = 0; j < pGroup->nEntries; j++) {
-            UISEntry* pEntry = &pGroup->pEntries[j];
+            pEntry = &pGroup->pEntries[j];
             if (pEntry->uHandler == 0xFFFF) {
-                UISNodeInfo* pLinked = pData->pNodes[pEntry->u4.nNode].pInfo;
+                pLinked = pData->pNodes[pEntry->u4.nNode].pInfo;
                 if (pLinked->u4 != 0) return pLinked;
             }
         }
@@ -800,11 +805,11 @@ u8* fn_8016C5C4(UISNode* pNode, u32 uEvent) {
 }
 
 // A node's plain handler (neither kind bit) with the given ID for an event.
-u8* fn_8016C614(UISNode* pNode, u16 uId, u16 uEvent) {
+u8* fn_8016C614(UISNode* pNode, u16 uId, u32 uEvent) {
     u32 i;
     for (i = 0; i < pNode->nHandlers; i++) {
         UISHandler* pHandler = &pNode->pHandlers[i];
-        if (!(pHandler->uFlags & 0xC000) && pHandler->uEvent == uEvent &&
+        if (!(pHandler->uFlags & 0xC000) && pHandler->uEvent == (u16)uEvent &&
             (pHandler->uFlags & 0x2FFF) == uId) {
             return pHandler->u4.pScript;
         }
@@ -813,11 +818,11 @@ u8* fn_8016C614(UISNode* pNode, u16 uId, u16 uEvent) {
 }
 
 // A node's handler of the kind marked 0x8000 for an event.
-u8* fn_8016C674(UISNode* pNode, u16 uEvent) {
+u8* fn_8016C674(UISNode* pNode, u32 uEvent) {
     u32 i;
     for (i = 0; i < pNode->nHandlers; i++) {
         UISHandler* pHandler = &pNode->pHandlers[i];
-        if ((pHandler->uFlags & 0x8000) && pHandler->uEvent == uEvent) {
+        if ((pHandler->uFlags & 0x8000) && pHandler->uEvent == (u16)uEvent) {
             return pHandler->u4.pScript;
         }
     }

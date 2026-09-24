@@ -12,7 +12,7 @@
 #include "game/modes/pgatoursim.h"
 #include "frontend/fe.h"
 
-// The front end's day-details panels (0x8011D280..), and the clock's date text.
+// The front end's day-details panels (0x8011D280..).
 void fn_8011D280(int nKind, char* szTitle, char* szText);
 void fn_8011D4DC(int nKind, char* szTitle, char* szText);
 void fn_8011D658(int nKind, char* szTitle, char* szText);
@@ -158,7 +158,7 @@ u8 (*lbl_80193F00[3])(void) = { fn_801165A4, fn_80116D78, fn_80117180 };
 // The calendar grid.
 CareerCalendar lbl_80223C48;
 
-// The calendar's header lines: 1 the current event (or "Season Complete"), 2 nothing.
+// The calendar's text lines (lbl_80193E94): 1 today's event (or "Season Complete"), 2 nothing.
 void fn_80116678(int nLine, char* sz) {
     switch (nLine) {
     case 1:
@@ -174,7 +174,7 @@ void fn_80116678(int nLine, char* sz) {
     }
 }
 
-// The event on a day and its round, for the day's cell.
+// The event on a day and its round (line 2 under "Selected Day:"), or "No Event Scheduled".
 void fn_801166E8(u16 nDate, int n, char* sz) {
     char* szName = lbl_80193EDC[lbl_80223C48.nDriver](nDate);
     s32 nId;
@@ -210,9 +210,10 @@ void fn_80116798(int nPlace, char* sz) {
     }
 }
 
-// A day's cell: the button text (START on today's event, CONTINUE on a round in progress, the
-// finishing place on the day after a finished event), how the cell looks (*pLook) and the button's
-// state (*pButton). Returns the event's field size on its last round, else -1.
+// A day's cell: the button text (on today: START on the tour's first round, CONTINUE on a later
+// one, none once the season is over; on the day before today in the tour's event, the place
+// fn_801190D8 gives, as an ordinal), how the cell looks (*pLook) and the button (*pButton).
+// Returns the tournament's n10 (fn_800EFE3C) on its last round's day, else -1.
 s32 fn_80116858(char* sz, u16 nDate, s32* pLook, s32* pButton) {
     s32 nId;
     s32 nRound;
@@ -267,8 +268,9 @@ s32 fn_80116858(char* sz, u16 nDate, s32* pLook, s32* pButton) {
     return -1;
 }
 
-// Whether a day may be picked: 1 an earlier event (or no season), 3 today's event on its first
-// round, 0 on a later round, 2 a later event.
+// The day-details panel for a day's event (CalendarScreen stores it in n1C): 1 an earlier event
+// (or profile 0 on no tournament, fn_800F0428(0) == -1), 3 today's event on its first round, 0 on
+// a later round, 2 a later event.
 s32 fn_80116AA0(u16 nDate) {
     s32 nId;
     s32 nTodayId;
@@ -419,7 +421,7 @@ u8 fn_80116E3C(void) {
     return b;
 }
 
-// A day's cell: no button text; the event's award id, or -1.
+// A day's cell: no button text; the event's n14 (fn_800F1008), or -1.
 s32 fn_80116EA4(char* sz, u16 nDate, s32* pLook, s32* pButton) {
     s32 nId;
     s32 nRound;
@@ -433,7 +435,7 @@ s32 fn_80116EA4(char* sz, u16 nDate, s32* pLook, s32* pButton) {
     return -1;
 }
 
-// The calendar's header lines: 1 "Today: <date and time>", 2 the event on the current day.
+// The calendar's text lines (lbl_80193E94): 1 "Today: <date and time>", 2 today's event.
 void fn_80116F0C(int nLine, char* sz) {
     char szDate[32];
 
@@ -452,7 +454,7 @@ void fn_80116F80(u16 nDate, int n, char* sz) {
     fn_80117264(nDate, sz);
 }
 
-// How a day's cell looks: 5 past, 4 or 5 today (5 when fn_800F102C), 6 to come.
+// The day-details panel for a day: 5 past, 4 or 5 today (5 when fn_800F102C), 6 to come.
 s32 fn_80116FA4(u16 nDate) {
     if (nDate < lbl_80223C48.nToday) {
         return 5;
@@ -508,7 +510,7 @@ char* fn_8011710C(u16 nDate) {
     return "";
 }
 
-// Start the selected day's event: golfer 30 in slot 0, game mode 24.
+// Start today's event by the clock's date (fn_800F0E3C): golfer 30 in slot 0, game mode 24.
 void fn_8011714C(void) {
     Session_SetGolfer(30, 0);
     fn_800E0B38(24);
@@ -522,7 +524,7 @@ u8 fn_80117180(void) {
 // ---- the calendar -----------------------------------------------------------------------------
 
 // Opens the calendar on the career's current day (the season's last day once it is over), on the
-// month it falls in; a day in the last row but one moves the view on a month.
+// month it falls in; a day past the 35 cells moves the view on a month (not from December).
 void fn_80117188(void) {
     u16 nDate;
     s32 nMonth;
@@ -546,7 +548,8 @@ void fn_80117188(void) {
     }
 }
 
-// The header's event line: the current event and round, or "No Event Scheduled".
+// A day's event as text: "No Event Scheduled", on the PGA TOUR "Active Event: <name>, Round <n>"
+// (the round of the event on nToday, not nDate), else "Event: <name>".
 void fn_80117264(u16 nDate, char* sz) {
     char* szName = lbl_80193EDC[lbl_80223C48.nDriver](nDate);
     s32 nId;
@@ -605,7 +608,7 @@ u16 fn_801173F0(u32 nCell) {
     return nDate;
 }
 
-// Month b follows month a (December to January included).
+// nOther is the month after nMonth (December to January included).
 u8 fn_801174B8(u32 nMonth, u32 nOther) {
     int b = 0;
     if (nMonth + 1 == nOther || (nMonth == 12 && nOther == 1)) {
@@ -614,7 +617,7 @@ u8 fn_801174B8(u32 nMonth, u32 nOther) {
     return b;
 }
 
-// Month b comes before month a.
+// nOther is the month before nMonth (January to December included).
 u8 fn_801174E4(u32 nMonth, u32 nOther) {
     int b = 0;
     if (nMonth - 1 == nOther || (nMonth == 1 && nOther == 12)) {

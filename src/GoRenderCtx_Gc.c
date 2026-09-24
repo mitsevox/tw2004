@@ -79,8 +79,9 @@ void fn_800137D0(Camera* pCamera) {
     fn_80013EA0(pCamera);
 }
 
-// Covers the screen with one colour (pColour: r, g, b; NULL: the default grey). uFlags bit 0: keep
-// fn_80012F34's setting; bit 1: pass 1 instead of 2 to the first fn_800140E8.
+// Draws a rectangle over the whole screen in pColour (r, g, b, a; NULL: the default grey), depth
+// test off. uFlags bit 0: keep fn_80012F34's setting; bit 1: pass 1 instead of 2 to the first
+// fn_800140E8 (colour and alpha written instead of neither).
 void fn_80013808(f32* pColour, u32 uFlags) {
     f32 aXY[8];
 
@@ -203,7 +204,7 @@ void fn_80013D68(Camera* pCamera) {
     fn_80013D58(pCamera);
 }
 
-// Gives the camera the view matrix pMtx (NULL: the identity).
+// Gives the camera the model matrix pMtx (NULL: the identity).
 void fn_80013D9C(void* pCamera, f32 (*pMtx)[4]) {
     fn_80013DD0(pCamera, pMtx);
     fn_80013CCC(pCamera);
@@ -235,7 +236,7 @@ GoFrameBuf* fn_80013E40(Camera* pCamera) {
     return pCamera->pBuf;
 }
 
-// Starts a new camera: the identity view matrix and its first values.
+// Starts a new camera: the identity model matrix and its first values.
 void fn_80013E48(Camera* pCamera) {
     fn_80013D9C(pCamera, NULL);
     pCamera->a0[0] = 0.0f;
@@ -339,7 +340,7 @@ f32 fn_8001418C(u8* p) {
 
 // ---- end of sweep code ----
 
-// Set the colour of the view's vertices (r, g, b; alpha is kept); NULL: the default grey.
+// Set the colour of the view's vertices (r, g, b, a); NULL: the default grey.
 void fn_80014194(f32* pColour) {
     if (pColour == NULL) {
         fn_800141CC();

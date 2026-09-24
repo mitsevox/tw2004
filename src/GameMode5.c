@@ -1,5 +1,5 @@
-// GameMode5.c (our name): game mode 5, a run of 83 challenges (lbl_80203554, loaded from the
-// 'PLY ' stream object), each an entry of 0x80 bytes; probably TW2004's Tiger Challenge.
+// GameMode5.c (our name): game mode 5, a list of 83 challenges (lbl_80203554, loaded from the
+// 'PLY ' stream object), each an entry of 0x80 bytes.
 
 #include "golfer.h"
 #include "ball.h"
@@ -48,7 +48,7 @@ extern u8 (*lbl_8028231C)(int nPlayer, u8 bCheck);   // and HoleFinished
 u8 fn_800ED5C8(int nPlayer, u8 bCheck);
 extern u8 lbl_802822FD;
 
-// Game mode 5 starts: its callbacks, one player, the challenge list.
+// Game mode 5 starts: its callbacks, gpGame->nC and n10 set to 1, and mode 5's own challenge list.
 void fn_800EACD8(void) {
     gpGame->pfnInit = fn_800EACD8;
     gpGame->pfnShutdown = fn_800EAD6C;
@@ -79,7 +79,7 @@ void fn_800EAD6C(void) {
 void fn_800EADD8(void) {
 }
 
-// A course object of type 10 (from the course loader at 0x80048BDC): one challenge's ball spot.
+// A 'Cact' object of type 10 (from the 'Cact' handler at 0x80048BDC): one challenge's ball spot.
 void fn_800EADDC(void* pObj) {
     // port: the course object is big-endian and read in place through ChallengeSpotRecord; a
     // little-endian port converts v[] (three floats) here
@@ -636,9 +636,10 @@ u8 fn_800EC550(void) {
     return lbl_802822FC;
 }
 
-// The medal earned (0 best, 3 none): for each medal its rule against the round's totals (strokes
-// plus a number, against par, birdie or par or bogey golf, penalties below a mark, a match margin,
-// the best of the n274 counts, n DD8) or against this hole.
+// The medal earned (0 best, 3 none): for each medal its rule against the group's totals (strokes
+// plus a number, against par, birdie or par or bogey golf, the n290 total below a mark, a match
+// margin or strokes against player 1's, the best n274 with nD8 within the mark, nDD8) or against
+// this hole.
 int fn_800EC558(void) {
     int m;
     int nRule;
@@ -814,13 +815,14 @@ int fn_800EC558(void) {
     return 3;
 }
 
-// Whether this is speed golf (mode 8).
+// Whether the game mode is 8.
 u8 fn_800ECA08(void) {
     return Game_GetMode() == 8;
 }
 
 // The score for a medal over the current group, counted from the lowest (k 0 is aMedal[2]): the
-// group's last challenge's mark minus the target so far (-1 when the challenge gives no such medal).
+// group's last challenge's mark minus the whole group's target (0 for target kind 1, and kind 7 in
+// mode 0; -1 when the current challenge gives no such medal).
 s32 fn_800ECA34(int k) {
     int i;
     int nLast = lbl_802822F4;
@@ -865,8 +867,8 @@ void fn_800ECBE4(void) {
     }
 }
 
-// The number shown against the target: the match margin (mode 1), a count (mode 8), nD8 (mode 2),
-// nDD8, or the group's strokes so far minus its target.
+// The number shown against the target: the match margin (mode 1), the n290 total (mode 8), nD8
+// (mode 2), nDD8, or the group's strokes so far minus its target so far.
 int fn_800ECC14(void) {
     int nTarget;
     int nScore;
@@ -1113,7 +1115,7 @@ void fn_800ED548(void) {
     lbl_80282314 = 0;
 }
 
-// Restart the challenge from the pause menu.
+// Restart: back to the challenge it was started on (a UI command, after GM_RestartHole).
 void fn_800ED554(void) {
     lbl_802822FE = 1;
     gpGame->b134 = 1;
@@ -1130,7 +1132,7 @@ void fn_800ED554(void) {
     fn_80019648();
 }
 
-// Hole finished: always after a restart; otherwise the challenge's own test.
+// Hole finished: always after a restart; otherwise the mode's own test.
 u8 fn_800ED5C8(int nPlayer, u8 bCheck) {
     if (lbl_802822FE) {
         return 1;
@@ -1138,8 +1140,8 @@ u8 fn_800ED5C8(int nPlayer, u8 bCheck) {
     return lbl_8028231C(nPlayer, bCheck);
 }
 
-// The hole is over, the game is not: after a restart the pending screen closes; otherwise the
-// challenge's own callback runs.
+// The hole is over, the game is not: after a restart fn_800E4D88 runs and the restart flag and b275
+// are cleared; otherwise the mode's own callback runs.
 void fn_800ED604(int nPlayer) {
     if (lbl_802822FE) {
         fn_800E4D88();

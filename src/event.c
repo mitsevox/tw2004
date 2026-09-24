@@ -8,7 +8,7 @@
 #include "sitdev.h"
 #include "core/easb.h"
 
-u32 lbl_80281E20;               // frames counted by event 26
+u32 lbl_80281E20;               // seconds counted by event 26
 
 void fn_8001C680(int nPlayer);
 void fn_80033704(u16 nPatch, u16 nObject);
@@ -148,7 +148,7 @@ void fn_80065E98(int nPlayer, int nEvent, void* pData, int nArg) {
 }
 
 // Event 13: the next club down (from the longest, round to the putter) that suits the shot kind.
-// The putter is kept only on the green or when the ball is close to the pin.
+// The putter is kept only on the green or when the green starts within 1.5 yards toward the pin.
 void fn_80065E9C(int nPlayer, int nEvent, void* pData, int nArg) {
     int nOldClub;
     int nTries;
@@ -306,7 +306,7 @@ void fn_80066538(int nPlayer, int nEvent, void* pData, int nArg) {
     fn_80069AFC(nPlayer);
 }
 
-// Event 26, each frame: every 60th frame one call, every 10th another.
+// Event 26, once a second: every 60th second one call, every other 10th second another.
 void fn_80066558(int nPlayer, int nEvent, void* pData, int nArg) {
     lbl_80281E20++;
     if (lbl_80281E20 % 60 == 0) {
@@ -631,7 +631,8 @@ void EVENT_Trigger(int nPlayer, int nEvent, void* pData, int b) {
     lbl_80188628[nEvent](nPlayer, nEvent, pData, b);
 }
 
-// Events 35..38 (the ball at rest, in the hole, ...): with nArg 1, the camera and commentary.
+// Events 35..38, the ball lands (35 ground, 36 an object, 37 a flagged surface, 38 surface 90):
+// nArg 1: the camera, sounds, effects and commentary; otherwise event 36 aborts the simulation.
 void fn_800670A8(int nPlayer, int nEvent, void* pData, int nArg) {
     if (nArg == 1) {
         fn_80063CF0(fn_80017028(gPlayers[nPlayer].nView[0]), 7, nPlayer);

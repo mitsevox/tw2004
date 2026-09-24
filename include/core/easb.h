@@ -193,7 +193,7 @@ typedef struct EASBStorageArgs {
     EASBImageSlot* pImageSlots;     // 0x0C: EASB_MAX_PRODUCTS pictures (fn_8012AE40)
     EASBImage* pImage;              // 0x10
     void* pHeader;                  // 0x14: the save's banner and icon block (fn_8016CFF8_SetSaveDescriptor)
-    int eDevice;                    // 0x18: where to create the file (TagFile_BeginSave)
+    int eDevice;                    // 0x18: where to create the file (TagFile_Create)
 } EASBStorageArgs;                  // size 0x1C
 
 // One of the storage operations (lbl_80195520, by operation number): whether it starts the
@@ -370,11 +370,11 @@ EASBio_eReward fn_801256B8(void);
 void EASBio_IncrementGamesPlayed(u32 uCount);
 void EASBio_SetAccomplishment(const char* szName, s32 arg1);
 
-// The memory-card screens' Bio requests. nPort and nSlot are the card the menus picked; most of
-// these do not use them (the Bio always goes to card 0).
+// The front end's Bio requests (FE_MessageTable.c; fn_80125194 also MC_Gc.c). nPort and nSlot are
+// the card the menus picked; none of these use them (fn_80125354 and fn_801252D0 probe card 0, 0).
 f32  fn_80124BDC(void);
 s32  fn_80125194(s32 nPort, s32 nSlot);
-int  fn_80125118(s32* pArgs);           // pArgs: the port and slot; TRUE when the card opened
+int  fn_80125118(s32* pArgs);           // pArgs: the port and slot; TRUE when the Bio opened or gave -18
 s32  fn_801251EC(s32* pArgs);           // pArgs: the port and slot
 s32  fn_80125280(s32 nPort, s32 nSlot);
 s32  fn_801252D0(s32 nPort, s32 nSlot);
@@ -401,8 +401,8 @@ extern s32 lbl_80282574;
 extern s32 lbl_80282578;
 extern u8 lbl_8028257C;
 extern u8 lbl_8028257D;
-extern s32 lbl_8028198C;            // frames until fn_80124C10 resends the Bio's summary (15)
-extern s32 lbl_80281990;            // frames until fn_80124C10 resends a game's details (15)
+extern s32 lbl_8028198C;            // fn_80124C10's summary countdown (reset to 15: every 16 frames)
+extern s32 lbl_80281990;            // fn_80124C10's game-details countdown (reset to 15: every 16 frames)
 extern char lbl_80281994[4];        // "": fills the unused lines of the Bio screens' lists
 
 #endif

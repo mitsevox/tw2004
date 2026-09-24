@@ -88,15 +88,18 @@ void fn_80009918(void) {
 // The first free span of at least nSize bytes, from the cursor up, then from the bottom up to the
 // cursor; -1 when none is big enough.
 int fn_8000991C(int nSize) {
+    s32* pSpan;
     int i;
 
-    for (i = lbl_80281BCC; i < lbl_80281BD0; i += 2) {
-        if (lbl_80281BD4[i + 1] - lbl_80281BD4[i] >= nSize) {
+    pSpan = &lbl_80281BD4[lbl_80281BCC];
+    for (i = lbl_80281BCC; i < lbl_80281BD0; pSpan += 2, i += 2) {
+        if (pSpan[1] - pSpan[0] >= nSize) {
             return i;
         }
     }
-    for (i = 1; i < lbl_80281BCC; i += 2) {
-        if (lbl_80281BD4[i + 1] - lbl_80281BD4[i] >= nSize) {
+    pSpan = &lbl_80281BD4[1];
+    for (i = 1; i < lbl_80281BCC; pSpan += 2, i += 2) {
+        if (pSpan[1] - pSpan[0] >= nSize) {
             return i;
         }
     }
@@ -105,15 +108,18 @@ int fn_8000991C(int nSize) {
 
 // The same search downwards: from below the cursor to the bottom, then from the top down to it.
 int fn_800099BC(int nSize) {
+    s32* pSpan;
     int i;
 
-    for (i = lbl_80281BCC - 2; i > 0; i -= 2) {
-        if (lbl_80281BD4[i + 1] - lbl_80281BD4[i] >= nSize) {
+    pSpan = &lbl_80281BD4[lbl_80281BCC - 2];
+    for (i = lbl_80281BCC - 2; i > 0; pSpan -= 2, i -= 2) {
+        if (pSpan[1] - pSpan[0] >= nSize) {
             return i;
         }
     }
-    for (i = lbl_80281BD0 - 2; i >= lbl_80281BCC; i -= 2) {
-        if (lbl_80281BD4[i + 1] - lbl_80281BD4[i] >= nSize) {
+    pSpan = &lbl_80281BD4[lbl_80281BD0 - 2];
+    for (i = lbl_80281BD0 - 2; i >= lbl_80281BCC; pSpan -= 2, i -= 2) {
+        if (pSpan[1] - pSpan[0] >= nSize) {
             return i;
         }
     }
@@ -123,6 +129,7 @@ int fn_800099BC(int nSize) {
 // The smallest free span of at least nSize bytes (an exact fit at once), searched in the order of
 // fn_800099BC; -1 when none is big enough.
 int fn_80009A60(int nSize) {
+    s32* pSpan;
     int i;
     int nBestSpan;
     int nBest;
@@ -130,8 +137,9 @@ int fn_80009A60(int nSize) {
 
     nBestSpan = 0x40000000;
     nBest = -1;
-    for (i = lbl_80281BCC - 2; i > 0; i -= 2) {
-        nSpan = lbl_80281BD4[i + 1] - lbl_80281BD4[i];
+    pSpan = &lbl_80281BD4[lbl_80281BCC - 2];
+    for (i = lbl_80281BCC - 2; i > 0; pSpan -= 2, i -= 2) {
+        nSpan = pSpan[1] - pSpan[0];
         if (nSpan == nSize) {
             return i;
         }
@@ -140,8 +148,9 @@ int fn_80009A60(int nSize) {
             nBestSpan = nSpan;
         }
     }
-    for (i = lbl_80281BD0 - 2; i >= lbl_80281BCC; i -= 2) {
-        nSpan = lbl_80281BD4[i + 1] - lbl_80281BD4[i];
+    pSpan = &lbl_80281BD4[lbl_80281BD0 - 2];
+    for (i = lbl_80281BD0 - 2; i >= lbl_80281BCC; pSpan -= 2, i -= 2) {
+        nSpan = pSpan[1] - pSpan[0];
         if (nSpan == nSize) {
             return i;
         }
