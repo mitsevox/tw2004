@@ -350,7 +350,6 @@ void fn_8006E0B8(void);
 void fn_8006E0BC(void);
 u8   fn_8006E0C0(void);
 void fn_8006E0F8(void);
-f64  fn_8006E118(u64 uNow, u64 uLast);
 
 f32 fn_8006C630(void) {
     return lbl_802811F0->f18;
@@ -1026,6 +1025,7 @@ void fn_8006D8E8(void) {
     u64 uLast = fn_800954A4(1);
     u64 uNow;
     f32 fTime;
+    f64 dTime;
 
     fn_800954A4(0);
     while (!fn_8006D01C()) {
@@ -1037,7 +1037,9 @@ void fn_8006D8E8(void) {
         fn_8006C69C();
         fn_80006EDC();
         uNow = fn_800954A4(1);
-        fTime = gSession.fFrameTime = fn_8006E118(uNow, uLast);
+        // fake match: the double step gives the original's frsp (EA's gomainloop.c saw a double
+        // return; every other file saw the float fn_8006E118 returns).
+        fTime = dTime = gSession.fFrameTime = fn_8006E118(uNow, uLast);
         if (fTime > 4.0f * FRAME_TIME || fTime < 0.0f) {
             gSession.fFrameTime = 4.0f * FRAME_TIME;
         }
@@ -1339,6 +1341,6 @@ void fn_8006E0F8(void) {
 }
 
 // Seconds between two time-base readings (40.5 million ticks a second).
-f64 fn_8006E118(u64 uNow, u64 uLast) {
+f32 fn_8006E118(u64 uNow, u64 uLast) {
     return (1.0f / 40500000.0f) * (s32)(uNow - uLast);
 }
