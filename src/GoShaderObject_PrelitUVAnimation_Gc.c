@@ -1,6 +1,6 @@
 // GoShaderObject_PrelitUVAnimation_Gc.c (EA's name, from its asserts): the shader object of row 5
-// of lbl_80188E88, prelit course geometry whose texture scrolls (engine.h's PrelitUVObject), and
-// the code that inits and closes every shader type (ModuleHooks.pfn0 / pfn4).
+// of lbl_80188E88, prelit geometry whose texture scrolls (engine.h's PrelitUVObject), the static
+// hooks of rows 6 and 10, and the code that inits and closes every shader type (pfn0 / pfn4).
 
 #include "game_types.h"
 #include "engine.h"
@@ -268,7 +268,7 @@ void fn_800717E8(int nRow) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-// Clear the video field copy.
+// Zero the copy of lbl_80281B88 (fn_800718E4).
 void fn_80071828(void) {
     s32* pnField = fn_80071854();
 
@@ -278,7 +278,7 @@ void fn_80071828(void) {
 void fn_80071850(void) {
 }
 
-// Where the video field copy is kept.
+// Where the copy of lbl_80281B88 is kept.
 s32* fn_80071854(void) {
     return lbl_802811F8;
 }
@@ -305,7 +305,7 @@ void fn_800718C4(void) {
     fn_800718E4();
 }
 
-// Copy the video field being drawn.
+// Copy lbl_80281B88 (displayed-frame count; bit 0 is the video field) into fn_80071854's slot.
 void fn_800718E4(void) {
     s32* pnField = fn_80071854();
 
