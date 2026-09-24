@@ -312,6 +312,131 @@ s32 fn_800A0230(MCCardPos* pPos) {
     return nResult;
 }
 
+// Save gReplayData as replay pPos->n8 of the save on the card (-1: the first free one; -17 when none
+// is). With no save file on the card, one is made first (fn_8009FE90).
+s32 fn_800A036C(MCCardPos* pPos) {
+    s32 nMount;
+    s32 nResult;
+    u8 bNewFile;
+    s32 nPort;
+    s32 nSlot;
+    s32 nReplay;
+    int i;
+    u8 bFree;
+
+    nSlot = pPos->nSlot;
+    nPort = pPos->nPort;
+    nReplay = pPos->n8;
+    nMount = fn_8009D74C(nPort, nSlot);
+    if (nMount != 0 && nMount != MC_ERR_MOUNTED) return nMount;
+    // EA bug: this return and the ones below leave a card it mounted mounted
+    nResult = fn_8009F734(nPort, nSlot);
+    if (nResult != 0) return nResult;
+    bNewFile = 0;
+    if (fn_8009DD44(nPort, nSlot, MC_DIR_NAME) != 0) {
+        bNewFile = 1;
+        if (lbl_801F1510[nPort][nSlot].nFreeBlocks < fn_8009D1D8(nPort, nSlot, 0, 0)) {
+            return MC_ERR_INSSPACE;
+        }
+        nResult = fn_8009FE90(pPos);
+        if (nResult != 0) return nResult;
+    }
+    if (fn_8009DD94(nPort, nSlot, MC_FILE_NAME, lbl_80281FEC, MC_BUFFER_SIZE) != 0) {
+        lbl_80281FEC->uFlags = 0;
+        return MC_ERR_BADDATA;
+    }
+    if (!fn_800A233C(lbl_80281FEC, &lbl_80281FEC->trailer)) {
+        lbl_80281FEC->uFlags = 0;
+        return MC_ERR_BADDATA;
+    }
+    Mem_cpy(lbl_80281FE0, lbl_80281FEC, MC_BUFFER_SIZE);
+    if (nReplay == -1) {
+        i = 0;
+        bFree = 0;
+        while (i < NUM_SAVE_REPLAYS && !bFree) {
+            if (!(lbl_80281FE0->uFlags & MC_SAVE_REPLAY(i))) {
+                bFree = 1;
+            } else {
+                i++;
+            }
+        }
+        if (i == NUM_SAVE_REPLAYS) return -17;
+        nReplay = i;
+    }
+    Mem_cpy(&lbl_80281FE0->aReplay[nReplay], &gReplayData, sizeof(Replay));
+    lbl_80281FE0->uFlags |= MC_SAVE_REPLAY(nReplay);
+    lbl_80281FE0->trailer.aMagic[0] = '@';
+    lbl_80281FE0->trailer.aMagic[1] = 'B';
+    lbl_80281FE0->trailer.aMagic[2] = 'E';
+    lbl_80281FE0->trailer.uChecksum = fn_800A23BC(lbl_80281FE0, &lbl_80281FE0->trailer);
+    if (bNewFile) {
+        nResult = fn_8009E604(nPort, nSlot, MC_FILE_NAME, lbl_80281FE0, MC_BUFFER_SIZE, NULL);
+    } else {
+        nResult = fn_8009E604(nPort, nSlot, MC_FILE_NAME, lbl_80281FE0, MC_BUFFER_SIZE,
+                              MC_BACKUP_NAME);
+    }
+    if (nMount == 0) {
+        fn_8009DBAC(nPort, nSlot);
+    }
+    return nResult;
+}
+
+// Save gReplayData over replay nReplay of the save on the card (-1: into the first free one; -17
+// when none is). -16 when the card has no save file.
+s32 fn_800A0610(s32 nPort, s32 nSlot, s32 nReplay) {
+    s32 nMount;
+    s32 nResult;
+    int i;
+    u8 bFree;
+
+    nMount = fn_8009D74C(nPort, nSlot);
+    if (nMount != 0 && nMount != MC_ERR_MOUNTED) return nMount;
+    // EA bug: this return and the ones below leave a card it mounted mounted
+    nResult = fn_8009F734(nPort, nSlot);
+    if (nResult != 0) return nResult;
+    if (fn_8009DD44(nPort, nSlot, MC_DIR_NAME) != 0) {
+        if (nMount == 0) {
+            fn_8009DBAC(nPort, nSlot);
+        }
+        return -16;
+    }
+    if (fn_8009DD94(nPort, nSlot, MC_FILE_NAME, lbl_80281FEC, MC_BUFFER_SIZE) != 0) {
+        lbl_80281FEC->uFlags = 0;
+        return MC_ERR_BADDATA;
+    }
+    if (!fn_800A233C(lbl_80281FEC, &lbl_80281FEC->trailer)) {
+        lbl_80281FEC->uFlags = 0;
+        return MC_ERR_BADDATA;
+    }
+    Mem_cpy(lbl_80281FE0, lbl_80281FEC, MC_BUFFER_SIZE);
+    // EA bug: with nReplay -1 this shifts by -1 (undefined in C; the GameCube clears no bit)
+    lbl_80281FE0->uFlags &= ~MC_SAVE_REPLAY(nReplay);
+    if (nReplay == -1) {
+        i = 0;
+        bFree = 0;
+        while (i < NUM_SAVE_REPLAYS && !bFree) {
+            if (!(lbl_80281FEC->uFlags & MC_SAVE_REPLAY(i))) {
+                bFree = 1;
+            } else {
+                i++;
+            }
+        }
+        if (i == NUM_SAVE_REPLAYS) return -17;
+        nReplay = i;
+    }
+    Mem_cpy(&lbl_80281FE0->aReplay[nReplay], &gReplayData, sizeof(Replay));
+    lbl_80281FE0->uFlags |= MC_SAVE_REPLAY(nReplay);
+    lbl_80281FE0->trailer.aMagic[0] = '@';
+    lbl_80281FE0->trailer.aMagic[1] = 'B';
+    lbl_80281FE0->trailer.aMagic[2] = 'E';
+    lbl_80281FE0->trailer.uChecksum = fn_800A23BC(lbl_80281FE0, &lbl_80281FE0->trailer);
+    nResult = fn_8009E604(nPort, nSlot, MC_FILE_NAME, lbl_80281FE0, MC_BUFFER_SIZE, MC_BACKUP_NAME);
+    if (nMount == 0) {
+        fn_8009DBAC(nPort, nSlot);
+    }
+    return nResult;
+}
+
 // Note in the card's MCCardState which replays the save on it holds.
 void fn_800A0868(s32 nPort, s32 nSlot) {
     MCCardState* pState;
