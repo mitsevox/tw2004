@@ -1322,7 +1322,7 @@ void fn_8008DD50(u8 bNoBlend) {
     } else {
         pClip = fn_8008E02C();
     }
-    if (pClip->uD8 != 0) {
+    if (pClip->pD8 != NULL) {
         if (!fn_8001EDF4(lbl_80281EE0->pB4->pChar) && fn_80077ACC()->choices.n113 != 0) {
             fn_8008E2F8(0, PI);
         }
@@ -1488,7 +1488,7 @@ u8 fn_8008E468(char* szAnim, char* szShot, u8 bNoBlend) {
         if (pClip == NULL) {
             return 0;
         }
-        if (pClip->uD8 != 0) {
+        if (pClip->pD8 != NULL) {
             if (!fn_8001EDF4(lbl_80281EE0->pB4->pChar) && fn_80077ACC()->choices.n113 != 0) {
                 fn_8008E2F8(0, PI);
             }
