@@ -101,7 +101,7 @@ f32 fn_800DAF98(f32 fFrameTime) {
         if (0.0f != fFrameTime) {
             fFrameTime = FRAME_TIME;
         }
-        GM_vCloseModuleONCE();
+        fn_800DCAFC();
     }
     if (fn_800C6CCC()) {
         return 0.0f;

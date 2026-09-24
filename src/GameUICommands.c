@@ -249,7 +249,7 @@ void  GM_RestartHole(void);                                   // GameManager.c
 void  GameModeBattle_AddClub(int nPlayer, int nClub);         // GameModeBattle.c
 int   GameModeBattle_CanAddClub(int nPlayer, int nClub);
 s32   GameModeBattle_GetWinner(void);
-u8    GameModeBattle_IsClubStealingFinished(void);
+u8    fn_800E81B4(void);
 int   GameModeBattle_NumRemovableClubsLeft(int nPlayer);
 u8    GameModeBattle_RemoveClub(int nPlayer, int nClub);
 void  fn_8001A870(void);
@@ -2686,7 +2686,7 @@ void fn_8008A86C(MsgArg* pArgs, MsgArg* pResult) {
 
 // Battle mode: whether the club stealing is over.
 void fn_8008A870(MsgArg* pArgs, MsgArg* pResult) {
-    if (GameModeBattle_IsClubStealingFinished() != 0) {
+    if (fn_800E81B4() != 0) {
         pResult->i = 1;
         return;
     }

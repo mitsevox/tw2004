@@ -353,7 +353,7 @@ u8   fn_8003DCAC(void);                 // GoDynamicCam.c: the letterbox is up (
 
 // GameManager.c
 void fn_800DCAD8(void);
-void GM_vCloseModuleONCE(void);
+void fn_800DCAFC(void);
 u8   fn_800DCB00(void);
 u8   fn_800DCB08(void);
 u8   fn_800DCB10(int nPlayer);          // the mode's pfn1F8 answer for the player

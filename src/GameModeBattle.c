@@ -216,8 +216,8 @@ s32 fn_800E81A0(int nPlayer) {
     return lbl_801925B8[nPlayer];
 }
 
-// Inverted: nonzero while a club is to be taken.
-u8 GameModeBattle_IsClubStealingFinished(void) {
+// Nonzero while a club is to be taken.
+u8 fn_800E81B4(void) {
     return lbl_802822E8;
 }
 
