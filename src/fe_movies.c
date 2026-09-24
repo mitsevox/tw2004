@@ -15,6 +15,7 @@ void fn_80091FC0(LLPict* pPict, int nFrames, f32 fStep);
 s32  fn_800171B0(void);                 // ViewController.c
 void fn_800760D8(LLPict* pPict);        // LLVideo.c
 void fn_800760F4(f32* pUV, LLPict* pPict);  // LLVideo.c
+void fn_80016978(f32 x0, f32 y0, f32 x1, f32 y1);
 
 // ---- sweep code (not yet cleaned up) ----
 
@@ -23,7 +24,7 @@ void fn_80006EDC();
 void fn_80006FE8();
 void fn_80007254();
 void fn_800083A0();
-void fn_80091BDC();
+void fn_80091BDC(int nPoint);
 void fn_80091B98(s32 p0);
 void fn_80012EF8();
 void fn_8005CC64();
@@ -148,6 +149,53 @@ void fn_800918A4(void) {
         lbl_801D8858.f8 = 0.0f;
         fn_800917C8();
     }
+}
+
+// Draw tile nPoint of the texture bank fn_80091778 loaded at point nPoint of lbl_801D8818, an
+// eighth of the screen wide: tiles 0-3 come from the top half of the texture, 4-7 from the bottom
+// (their u runs past 1 and wraps).
+void fn_80091BDC(int nPoint) {
+    f32 afColour[4];
+    f32 afXY[8];
+    f32 afUV[8];
+
+    fn_80016978(0.0f, 0.0f, 1.0f, 1.0f);
+    fn_80035118(4, 5);
+    fn_80012F50(0, 6, 0x80);
+    fn_80012F18(7);
+    fn_8001425C(0);
+    fn_80012F34(0);
+    fn_8005CC64(lbl_80281F20, lbl_80281F24);
+    fn_80014118(0x50);
+    fn_80012EF8();
+    afColour[3] = 0.25f;        // EA code: overwritten at once
+    afColour[0] = 0.5f;
+    afColour[1] = 0.5f;
+    afColour[2] = 0.5f;
+    afColour[3] = 0.5f;
+    fn_80014194(afColour);
+    fn_800141F8(afXY, NULL, lbl_801D8818[nPoint][0], lbl_801D8818[nPoint][1],
+                lbl_801D8818[nPoint][0] + 0.125f, lbl_801D8818[nPoint][1] + 0.142f);
+    if (nPoint < 4) {
+        afUV[0] = 0.25f * nPoint;
+        afUV[1] = 0.0f;
+        afUV[2] = 0.0f;
+        afUV[3] = 0.0f;
+        afUV[4] = 0.25f + 0.25f * nPoint;
+        afUV[5] = 0.5f;
+        afUV[6] = 0.0f;
+        afUV[7] = 0.0f;
+    } else {
+        afUV[0] = 0.25f * nPoint;
+        afUV[1] = 0.5f;
+        afUV[2] = 0.0f;
+        afUV[3] = 0.0f;
+        afUV[4] = 0.25f + 0.25f * nPoint;
+        afUV[5] = 1.0f;
+        afUV[6] = 0.0f;
+        afUV[7] = 0.0f;
+    }
+    fn_8001644C(0xA1, afXY, 0, afUV, 2);
 }
 
 // Decode the picture in the 'load' object, show it for nFrames frames (fading in over 30), then
