@@ -1058,8 +1058,8 @@ void fn_80168644(UIStudio* pStudio, UISScreen* pScreen, s32 nKind, void* p, s32 
 // unloaded is refused with a warning.
 void fn_801686F8(UIStudio* pStudio, u8 bOn, u16 uGroup, u16 uScreen) {
     char szMsg[512];
-    u32 nIndex;
     UISScreen* pScreen;
+    u32 nIndex;
 
     if (pStudio->n5C == 0) {
         pStudio->uFlags |= 2;
@@ -1086,6 +1086,7 @@ void fn_801686F8(UIStudio* pStudio, u8 bOn, u16 uGroup, u16 uScreen) {
                         "unloaded.\n",
                         uGroup, uScreen);
                 lbl_80282A28(0, "UIStudio.c", 2942, szMsg);
+                return;
             }
         }
     }
