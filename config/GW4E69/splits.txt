@@ -184,6 +184,10 @@ unsorted/sweep_8003944C.c:
 
 GoDynamicCam.c:
 	.text       start:0x80039454 end:0x8003DCE8
+	.rodata     start:0x8017E690 end:0x8017E938
+	.data       start:0x80187910 end:0x80187AA0
+	.sdata      start:0x80281108 end:0x80281110
+	.sdata2     start:0x80283068 end:0x802830A8
 
 gocamscripts.c:
 	.text       start:0x8003DCE8 end:0x80045660

@@ -221,6 +221,12 @@ void fn_80039A48(u8* pSrc, DynCamSet* pDst, u32 nCount) {
     fn_8001F08C((void**)&pSrc, (void**)&pDst, aFormat, sizeof(aFormat) / sizeof(aFormat[0]), nCount);
 }
 
+// fake match: stands in for a function the original linker stripped. The file's pool starts with
+// 1.0f (0x80283068), before the 0.0f fn_80039B14 uses first; its body is unknown.
+static f32 GoDynamicCam_StrippedFn(f32 x) {
+    return x + 1.0f;
+}
+
 // Sets up nSize bytes of freshly loaded shots, as fn_80039C5C does, and first keeps f68 at least
 // the ground clearance, f6C at least f68 and f8C within 0..0.49. Once the sequences are loaded
 // too, their choices are checked (fn_80039D0C).
@@ -1375,6 +1381,9 @@ u8 fn_8003CAFC(CamSequence* pSequence, int nKind) {
     return 1;
 }
 
+s32 lbl_80187988[20] = {0, 1, 2, 6, 2, 3, 4, 5, 3, 3, 3, 3, 6, 3, 3, 3, 5, 3, 6, 7};
+s32 lbl_801879D8[17] = {1, 2, 2, 3, 3, 3, 4, 4, 4, 6, 2, 3, 6, 5, 5, 5, 7};
+
 // Maps n (0..19) through lbl_80187988; 1 depends on the ball's lie (1 on lie 0, else 2).
 s32 fn_8003CB80(u32 n, int nPlayer) {
     s32 nRet;
@@ -1644,6 +1653,7 @@ void fn_8003D414(f32* pPos, CamScript* pScript, CamShot* pShot, int nPlayer, f32
     f32 fLow;
     f32 fHeight;
     f32 fEase;
+    f64 dSmooth;
 
     nSteps = GameEffects_BallUpdatesThisFrame(nPlayer);
     if (pShot->bB2 == 0) {
@@ -1718,8 +1728,8 @@ void fn_8003D414(f32* pPos, CamScript* pScript, CamShot* pShot, int nPlayer, f32
             }
         }
         if (pScript->f98 < lbl_80281F78->fD4) {
-            fEase = 1.0f -
-                    (f32)fn_80009680((f32)fn_80009680(pScript->f98 / lbl_80281F78->fD4)) * (1.0f - fEase);
+            dSmooth = fn_80009680((f32)fn_80009680(pScript->f98 / lbl_80281F78->fD4));
+            fEase = 1.0f - (f32)dSmooth * (1.0f - fEase);
         }
         pPos[1] = fEase * (pPos[1] - fY) + fY;
         fY = pPos[1];

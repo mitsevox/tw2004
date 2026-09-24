@@ -879,7 +879,7 @@ config.libs = [
             Object(NonMatching, "GoTerrain.c"),
             Object(NonMatching, "Skin.c"),
             Object(Matching, "GoPostFx.c"),
-            Object(NonMatching, "GoDynamicCam.c"),
+            Object(Matching, "GoDynamicCam.c"),
             Object(NonMatching, "gocamscripts.c"),
             Object(NonMatching, "DepthField.c"),
             Object(Matching, "UObject3D.c"),
