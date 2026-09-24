@@ -168,6 +168,76 @@ f32 fn_800C79BC(f32* p0, f32* p1, f32* p2, f32* p3) {
     return fLength;
 }
 
+// The value of a fly-by path's curve at time fT (0..1; -1 when out of range): each key holds a
+// Hermite segment from (af[0], af[1]) to (af[2], af[3]) with tangents af[4..5] and af[6..7]. The
+// segment holding fT is walked in 128 steps and the value read off the straight step around fT.
+f32 fn_800C7A9C(FlyByPath* pPath, f32 fT) {
+    FlyByKey* pKey;
+    f32 fT1;
+    f32 fT2;
+    f32 fT3;
+    f32 f2T2;
+    f32 f3T2;
+    f32 f2T3;
+    f32 fH00;
+    f32 fH01;
+    f32 fH10;
+    f32 fH11;
+    f32 fX;
+    f32 fY;
+    f32 fLastX;
+    f32 fLastY;
+    f32 fStep;
+    u32 i;
+    u32 nStep;
+
+    if (pPath == NULL) {
+        return -1.0f;
+    }
+    if (fT < 0.0f || fT > 1.0f) {
+        return -1.0f;
+    }
+    if (0.0f == fT) {
+        return pPath->aKeys[0].af[1];
+    }
+    if (1.0f == fT) {
+        return pPath->aKeys[pPath->nKeys - 1].af[3];
+    }
+    for (i = 0; i < pPath->nKeys; i++) {
+        if (fT > pPath->aKeys[i].af[0] && fT <= pPath->aKeys[i].af[2]) {
+            break;
+        }
+    }
+    pKey = &pPath->aKeys[i];
+    fLastX = pKey->af[0];
+    fLastY = pKey->af[1];
+    for (nStep = 0; nStep < 128.0f; nStep++) {
+        fT1 = nStep / 128.0f;
+        fT2 = fT1 * fT1;
+        f2T2 = 2.0f * fT1 * fT1;
+        f3T2 = 3.0f * fT1 * fT1;
+        fT3 = fT1 * fT2;
+        f2T3 = fT1 * f2T2;
+        fH10 = fT1 + (fT3 - f2T2);
+        fH01 = -f2T3 + f3T2;
+        fH00 = 1.0f + (f2T3 - f3T2);
+        fH11 = fT3 - fT2;
+        fX = fH11 * pKey->af[6] + (fH10 * pKey->af[4] + (fH00 * pKey->af[0] + fH01 * pKey->af[2]));
+        fY = fH11 * pKey->af[7] + (fH10 * pKey->af[5] + (fH00 * pKey->af[1] + fH01 * pKey->af[3]));
+        if (fX > fT) {
+            break;
+        }
+        fLastX = fX;
+        fLastY = fY;
+    }
+    if (nStep == 128.0f) {
+        fX = pPath->aKeys[i].af[2];
+        fY = pPath->aKeys[i].af[3];
+    }
+    fStep = fX - fLastX;
+    return fLastY * (1.0f - (fT - fLastX) / fStep) + fY * (1.0f - (fX - fT) / fStep);
+}
+
 // A point fDist along the direction from pA to pB (flattened unless bKeepY, normalised unless
 // bRaw), then moved fSide sideways (across the flat direction).
 void fn_800C7D14(f32* pA, f32* pB, u8 bKeepY, u8 bRaw, f32* pOut, f32 fDist, f32 fSide) {
