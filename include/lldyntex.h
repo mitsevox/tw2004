@@ -48,4 +48,6 @@ typedef struct DynTex {
     s16   n1C;                  // 0x1C  from fn_800106F0; fn_8001052C takes it back
 } DynTex;
 
+DynTex* fn_8010A520(int nC, int nSize, int n2, int n3, int n4);
+
 #endif

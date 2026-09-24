@@ -303,7 +303,8 @@ typedef struct Character {
     struct Skin* apSkins[7];    // 0x0C0  its skins: the body's, then its attachments' (fn_8001CE5C)
     s32   nSkins;               // 0x0DC
     u8    bE0;                  // 0x0E0  cleared by fn_8001A3B0, set by fn_8001A20C
-    u8    unkE1[0x164 - 0xE1];
+    char  szE1[0x164 - 0xE1];   // 0x0E1  its texture file's name, hFile (fn_8001A870); the size is
+                                //        unknown (up to the next known field)
     u8    anim[4];              // 0x164  the animation player (+0x14 is its playback rate)
     s32   uFlags;               // 0x168  bit 0x40: the backswing is being backed down; 0x200 / 0x400: the
                                 //        clip lookup fell back (Char_SetClip). Signed: the original tests

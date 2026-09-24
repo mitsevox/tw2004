@@ -302,6 +302,21 @@ void fn_8001A20C(Character* pChar) {
     lbl_801B95E8.a[6].p = NULL;
 }
 
+// Fills the pool with dynamic textures (LLDynTex.c), all free. Every game type gets two.
+void fn_8001A288(void) {
+    int i;
+
+    if (gSession.nGameType == 10 || gSession.nGameType == 3) {
+        lbl_801B95E8.nEntries = 2;
+    } else {
+        lbl_801B95E8.nEntries = 2;
+    }
+    for (i = 0; i < lbl_801B95E8.nEntries; i++) {
+        lbl_801B95E8.a[i].p = fn_8010A520(0x46, 0x87000, 0, 0x870, 4);
+        lbl_801B95E8.a[i].bUsed = 0;
+    }
+}
+
 // Reset every pool entry and mark it free.
 void fn_8001A33C(void) {
     int i;
@@ -392,6 +407,22 @@ void fn_8001A81C(void) {
         AnimLib_FreeWorkCopies();
     }
     fn_800C9FE0();
+}
+
+// Reopens every player's character texture file: closes them all, then opens
+// "data\CharStrm\CharTex\NNalltex.fxg" for each golfer (NN is its id + 1).
+void fn_8001A870(void) {
+    int i;
+    Character* pChar;
+
+    for (i = 0; i < gSession.nNumPlayers; i++) {
+        fn_8000633C(gPlayers[i].pChar->hFile);
+    }
+    for (i = 0; i < gSession.nNumPlayers; i++) {
+        pChar = gPlayers[i].pChar;
+        sprintf(pChar->szE1, "%sdata\\CharStrm\\CharTex\\%02dalltex.fxg", "", pChar->nC + 1);
+        pChar->hFile = fn_800060E0(pChar->szE1);
+    }
 }
 
 // Frees the club skin sets (lbl_80280E24): each one's skins and a9C blocks, then the set. pSet is
