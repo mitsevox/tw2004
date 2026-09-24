@@ -426,18 +426,17 @@ int fn_8007286C(SKABlendNode* pNode, f32 fTime) {
 f32 fn_800728D8(SKABlendNode* pNode) {
     f32 fStart = 1073741824.0f;
     int bFound = 0;
+    SKABlendNode* pChild;
+    int i;
 
     if (pNode != NULL) {
-        if (pNode->u.blend.apChild[0] != NULL) {
-            bFound = 1;
-            if (pNode->u.blend.apChild[0]->fStart < fStart) {
-                fStart = pNode->u.blend.apChild[0]->fStart;
-            }
-        }
-        if (pNode->u.blend.apChild[1] != NULL) {
-            bFound = 1;
-            if (pNode->u.blend.apChild[1]->fStart < fStart) {
-                fStart = pNode->u.blend.apChild[1]->fStart;
+        for (i = 0; i < 2; i++) {
+            pChild = pNode->u.blend.apChild[i];
+            if (pChild != NULL) {
+                bFound = 1;
+                if (pChild->fStart < fStart) {
+                    fStart = pChild->fStart;
+                }
             }
         }
     }
@@ -448,13 +447,15 @@ f32 fn_800728D8(SKABlendNode* pNode) {
 // The latest end of pNode's children (0 without children).
 f32 fn_80072938(SKABlendNode* pNode) {
     f32 fEnd = 0.0f;
+    SKABlendNode* pChild;
+    int i;
 
     if (pNode == NULL) return fEnd;
-    if (pNode->u.blend.apChild[0] != NULL && pNode->u.blend.apChild[0]->fEnd > fEnd) {
-        fEnd = pNode->u.blend.apChild[0]->fEnd;
-    }
-    if (pNode->u.blend.apChild[1] != NULL && pNode->u.blend.apChild[1]->fEnd > fEnd) {
-        fEnd = pNode->u.blend.apChild[1]->fEnd;
+    for (i = 0; i < 2; i++) {
+        pChild = pNode->u.blend.apChild[i];
+        if (pChild != NULL && pChild->fEnd > fEnd) {
+            fEnd = pChild->fEnd;
+        }
     }
     return fEnd;
 }
