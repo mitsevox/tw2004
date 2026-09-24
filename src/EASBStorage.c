@@ -1642,7 +1642,7 @@ EASBErrorE fn_8012B8E4(EASBProcessE* peProcess) {
             nNext = 0;
         } else {
             nNext = lbl_802825B0->nRecord;
-            lbl_802825B0->anProductState[nNext] = 1;
+            lbl_802825B0->anProductState[lbl_802825B0->nRecord] = 1;
             nNext++;
         }
         lbl_802825B0->nRecord = nNext;
