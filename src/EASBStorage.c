@@ -282,7 +282,7 @@ void fn_80128528(EASBTotals* pTotals, EASBProduct* pProduct) {
 }
 
 // Adds one product record into the totals (fn_8012B4C0 passes 1 as n2, which is not used).
-void fn_80128580(EASBTotals* pTotals, EASBProduct* pProduct, s32 n2) {
+void fn_80128580(EASBTotals* pTotals, const EASBProduct* pProduct, s32 n2) {
     if (pProduct->bValid) {
         pTotals->u0 = fn_80128468(pTotals->u0, pProduct->u50);
         pTotals->u4 = fn_80128468(pTotals->u4, pProduct->u54);
