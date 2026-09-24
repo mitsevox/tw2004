@@ -471,17 +471,8 @@ SunFlr_Gc.c:
 unsorted/sweep_8009A844.c:
 	.text       start:0x8009A844 end:0x8009A928
 
-unsorted/sweep_8009A928.c:
-	.text       start:0x8009A928 end:0x8009A968
-
-unsorted/sweep_8009A968.c:
-	.text       start:0x8009A968 end:0x8009A990
-
-unsorted/sweep_8009A990.c:
-	.text       start:0x8009A990 end:0x8009A9CC
-
-unsorted/sweep_8009AA18.c:
-	.text       start:0x8009AA18 end:0x8009AA28
+Code8009A928.c:
+	.text       start:0x8009A928 end:0x8009AA28
 
 Code8009AA28.c:
 	.text       start:0x8009AA28 end:0x8009B314
