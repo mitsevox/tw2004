@@ -609,7 +609,7 @@ extern void** lbl_80280DF0;
 // GoTerrain.c: gives the current render camera the view matrix pMtx (NULL: the identity), through
 // fn_80013D9C.
 void   fn_80035240(f32 (*pMtx)[4]);
-// GoRenderCtx_Gc.c: gives the camera the view matrix pMtx (NULL: the identity).
+// GoRenderCtx_Gc.c: gives the camera the model matrix pMtx (NULL: the identity).
 void   fn_80013D9C(void* pCamera, f32 (*pMtx)[4]);
 f32*   fn_8003526C(void);               // GoTerrain.c: the current render camera's screen rectangle
 
