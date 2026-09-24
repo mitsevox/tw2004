@@ -779,6 +779,27 @@ void fn_8001D6D8(int n) {
     gSession.aD28[n] = 1;
 }
 
+// Every player flagged by fn_8001D6D8 has its character dressed again (fn_8001D4A4) and its
+// skins put on its model in use; the flag is cleared.
+void fn_8001D6F0(void) {
+    int j;
+    Character* pChar;
+    int i;
+
+    for (i = 0; i < 5; i++) {
+        if (gSession.aD28[i]) {
+            fn_80008380();
+            pChar = gPlayers[i].pChar;
+            fn_8001D4A4(pChar, i);
+            fn_80019CEC(pChar);
+            for (j = 0; j < pChar->nSkins; j++) {
+                fn_800CE170(pChar->apSkins[j], pChar->a64[pChar->n74]);
+            }
+            gSession.aD28[i] = 0;
+        }
+    }
+}
+
 void fn_8001D7A4(Character* pChar) {
     fn_8001D7EC();
     pChar->u10 = pChar->u10 & ~0x20C;
