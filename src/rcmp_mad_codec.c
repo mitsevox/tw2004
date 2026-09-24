@@ -11,6 +11,7 @@
 #include "dynobj.h"
 #include "character.h"
 #include "camera.h"
+#include "terrain.h"
 #include "llpict.h"
 
 s32 lbl_802821A8;               // the decoder's tables are built
