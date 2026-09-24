@@ -385,18 +385,20 @@ void fn_801264B8(void) {
     s32 nBest = -0x7FFFFFFF - 1;
     u8 bTie = 0;
     s32 i;
+    s32* pScore;
 
     for (i = 0; i < gSession.nNumPlayers; i++) {
         if (PLAYER(i)->nEA0 < lbl_80195498.n4 || gPlayers[0].nEA0 != PLAYER(i)->nEA0) {
             return;
         }
-        if (PLAYER(i)->nEBC >= nBest) {
+        pScore = &gPlayers[i].nEBC;
+        if (*pScore >= nBest) {
             bTie = 0;
-            if (nBest == PLAYER(i)->nEBC && nWinner != 5) {
+            if (nBest == *pScore && nWinner != 5) {
                 bTie = 1;
             }
             nWinner = i;
-            nBest = PLAYER(i)->nEBC;
+            nBest = *pScore;
         }
     }
     lbl_80195498.n8 = nWinner;
