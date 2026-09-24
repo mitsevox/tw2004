@@ -411,13 +411,13 @@ void fn_8010B1D4(DynTex* pTex, int nTex, u8* pPixels, void* p, s32 n) {
 
 // A new palette for texture nTex.
 void fn_8010B2A8(DynTex* pTex, int nTex, s16* pPalette) {
-    DynTexPalette* aPalettes = pTex->p4->pC;
     DynTexEntry* pEntry = &pTex->p0[nTex];
+    DynTexPalette* pPal = &pTex->p4->pC[nTex];
 
     if (pPalette != NULL) {
-        memcpy(pTex->p18 + aPalettes[nTex].nOffset, pPalette, pEntry->n1C);
+        memcpy(pTex->p18 + pPal->nOffset, pPalette, pEntry->n1C);
     }
-    DCFlushRange(pTex->p18 + aPalettes[nTex].nOffset, pEntry->n1C);
+    DCFlushRange(pTex->p18 + pPal->nOffset, pEntry->n1C);
     GXInvalidateTexAll();
 }
 
