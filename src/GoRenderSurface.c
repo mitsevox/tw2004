@@ -6,6 +6,10 @@
 #include "engine.h"
 #include "gx.h"
 
+RenderSurface lbl_801D3950[5];
+
+s32 lbl_80281D50;
+
 void fn_8002F32C(s32 nSurface);
 s32  fn_8002F480(s32 nSurface);
 

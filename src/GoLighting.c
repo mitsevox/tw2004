@@ -8,6 +8,9 @@
 #include "dynobj.h"
 #include "unsorted/cull.h"
 
+GoLighting lbl_801D6F58;
+GoLighting* lbl_802811D8 = &lbl_801D6F58;
+
 void    fn_8006E2A4(void);
 void    fn_8006E424(void);
 void    fn_8006E460(LightGroup* pGroup);

@@ -168,6 +168,8 @@ Golfer.c:
 GoRenderSurface.c:
 	.text       start:0x8002F1D4 end:0x8002F4FC
 	.data       start:0x801876B0 end:0x801876C8
+	.bss        start:0x801D3950 end:0x801D3A30
+	.sbss       start:0x80281D50 end:0x80281D58
 
 LLPict_Gc.c:
 	.text       start:0x8002F4FC end:0x80030254
@@ -285,6 +287,7 @@ emotion.c:
 	.text       start:0x8006AA70 end:0x8006BED4
 	.rodata     start:0x80183848 end:0x80183858
 	.data       start:0x80188830 end:0x801888C0
+	.bss        start:0x801D5F78 end:0x801D6030
 	.sdata2     start:0x80283868 end:0x802838B8
 
 Replay.c:
@@ -308,6 +311,8 @@ GoFrameBuf.c:
 GoLighting.c:
 	.text       start:0x8006E2A4 end:0x8006F154
 	.data       start:0x801888F0 end:0x80188900
+	.bss        start:0x801D6F58 end:0x801D70A8
+	.sdata      start:0x802811D8 end:0x802811E0
 	.sdata2     start:0x80283900 end:0x80283958
 
 Code8006F154.c:
@@ -591,7 +596,9 @@ UAudContainers.c:
 uiobject.c:
 	.text       start:0x800AE1F8 end:0x800AF114
 	.rodata     start:0x80183B08 end:0x80183BC8
+	.bss        start:0x801F5B40 end:0x801F5C08
 	.sdata      start:0x80281470 end:0x80281490
+	.sbss       start:0x802820B8 end:0x802820D8
 	.sdata2     start:0x80284018 end:0x80284070
 
 AudReverb.c:
@@ -653,6 +660,8 @@ ScreenClear.c:
 
 Code800BA940.c:
 	.text       start:0x800BA940 end:0x800BAD60
+	.bss        start:0x801FA0F0 end:0x801FA198
+	.sdata      start:0x80281518 end:0x80281520
 	.sdata2     start:0x80284248 end:0x80284280
 
 VecMath.c:
@@ -856,6 +865,8 @@ GameModeStableford.c:
 GameMode12.c:
 	.text       start:0x800FEAFC end:0x800FF700
 	.data       start:0x80192D00 end:0x80192D1C
+	.bss        start:0x80212418 end:0x802124B8
+	.sbss       start:0x802823D8 end:0x802823E0
 	.sdata2     start:0x802847A8 end:0x802847E0
 
 GameModeStroke.c:

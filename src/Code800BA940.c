@@ -10,6 +10,9 @@
 #include "golfer.h"
 #include "glows.h"
 
+BallGlowState lbl_801FA0F0;
+BallGlowState* lbl_80281518 = &lbl_801FA0F0;
+
 void fn_800BA940(void);
 void fn_800BAA4C(void);
 void fn_800BAA50(int nPlayer);

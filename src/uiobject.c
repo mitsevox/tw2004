@@ -11,6 +11,18 @@
 #include "game.h"
 #include "golfer.h"
 
+UIObjSettings lbl_801F5B98[2];
+f32        lbl_801F5B78[8];
+LightGroup lbl_801F5B40;
+
+UObject*   lbl_802820D0;
+CamLens*   lbl_802820CC;
+TexEntry*  lbl_802820C8;
+TexEntry*  lbl_802820C4;
+TexEntry*  lbl_802820C0;
+TexBank*   lbl_802820BC;
+f32        lbl_802820B8;
+
 void fn_80013E38(u8* p, s32 v);  // GoRenderCtx_Gc.c
 void UI_Obj_InitModule(void);
 void fn_800AE338(void);
