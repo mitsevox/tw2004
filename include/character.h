@@ -62,16 +62,18 @@ LAYOUT_ASSERT(SkelPose, 0x1040);
 // A format 1 pose buffer (0x114C bytes; animblender.c copies it whole): three blocks from 0x4, each
 // starting with a bit per morph (20: fn_80072ACC clears them all; FE_PGATourMessages.c clears morph
 // m's in every block with fn_800736D8).
+// fn_80071C28 sets each block's bits and its 20 floats, and clears the SkelPose's first bit arrays.
 typedef struct SkelPoseBlock {
     u32  aBits[1];              // 0x00
-    u8   unk4[0x58 - 0x4];
+    u8   unk4[4];
+    f32  af8[20];               // 0x08  one per morph, 0 when the buffer is taken (fn_80071C28)
 } SkelPoseBlock;
 LAYOUT_ASSERT(SkelPoseBlock, 0x58);
 
 typedef struct SkelPose1 {
     u8   unk0[4];
     SkelPoseBlock aBlocks[3];   // 0x004
-    u8   unk10C[0x114C - 0x10C];
+    SkelPose pose;              // 0x10C  as a format 0 buffer
 } SkelPose1;
 LAYOUT_ASSERT(SkelPose1, 0x114C);
 
