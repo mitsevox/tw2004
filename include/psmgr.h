@@ -56,6 +56,7 @@ typedef struct PsEmitter {
 
 // UFstPart.c's six fixed emitters.
 extern PsEmitter* lbl_801DB888[6];
+extern f32 lbl_801DB878[4];     // UFstPart.c: the point fn_80099E34 orders emitters by distance from
 
 // PsBallFx.c's state (lbl_801F1708, 0x88 bytes), reached through lbl_80281408.
 typedef struct PsBallFxState {

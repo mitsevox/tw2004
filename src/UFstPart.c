@@ -3,12 +3,19 @@
 
 #include "game_types.h"
 #include "psmgr.h"
+#include "camera.h"
 
 // Skin.c
 void fn_800360A0(void* pMesh);
 void fn_800360D4(u8* pMesh);
 
+CamLens* fn_80008370(void* pCamera);   // the render camera's lens
+
 void fn_80098BDC(PsEmitter* pEmitter);
+u32  fn_80099AE4(PsEmitter* pEmitter, void* pCamera);  // not yet decompiled
+// Sort the list (next pointer in word n of each emitter?) by pfnCompare; not yet decompiled.
+PsEmitter* fn_80099C50(PsEmitter* pList, int n, int (*pfnCompare)(PsEmitter*, PsEmitter*));
+int  fn_80099E34(PsEmitter* pA, PsEmitter* pB);
 
 // Free every emitter on the list, then the six fixed ones.
 void fn_80098B5C(void) {
@@ -63,6 +70,30 @@ void fn_80098C70(void) {
 void fn_80099B74(PsEmitter* pEmitter) {
     pEmitter->n58 = 0;
     fn_800360D4(pEmitter->mesh);
+}
+
+// Sort the emitters by their distance from pCamera's lens (fn_80099E34), then fn_80099B74 each
+// one fn_80099AE4 passes (skipping those with flag 0x80000000).
+void fn_80099BA0(void* pCamera) {
+    CamLens* pLens = fn_80008370(pCamera);
+    PsEmitter* pEmitter;
+
+    lbl_801DB878[0] = pLens->v34[0];
+    lbl_801DB878[1] = pLens->v34[1];
+    lbl_801DB878[2] = pLens->v34[2];
+    lbl_801DB878[3] = 1.0f;
+    lbl_80281F88 = fn_80099C50(lbl_80281F88, 16, fn_80099E34);
+    for (pEmitter = lbl_80281F88; pEmitter != NULL; pEmitter = pEmitter->p40) {
+        if (!(pEmitter->uB8 & 0x80000000) && fn_80099AE4(pEmitter, pCamera)) {
+            fn_80099B74(pEmitter);
+        }
+    }
+}
+
+// fn_80099BA0's sort order: pB's squared distance from lbl_801DB878 minus pA's.
+int fn_80099E34(PsEmitter* pA, PsEmitter* pB) {
+    f32 fA = fn_800BB028(lbl_801DB878, pA->vE0);
+    return fn_800BB028(lbl_801DB878, pB->vE0) - fA;
 }
 
 void fn_80099EA4(PsEmitter* pEmitter) {
