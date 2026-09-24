@@ -233,14 +233,14 @@ int fn_8000633C(int hFile) {
     FileQueue* pQueue;
     FileReq* pReq;
     int bClosed;
+    int i;
 
     fn_800B596C("File_Close");
-    // what walked the queues here was compiled out (asserts, likely)
-    pQueue = lbl_8019E868;
-    for (pReq = pQueue->pNext; pReq != (FileReq*)pQueue; pReq = pReq->pNext) {
-    }
-    pQueue++;
-    for (pReq = pQueue->pNext; pReq != (FileReq*)pQueue; pReq = pReq->pNext) {
+    // what walked the two queues here was compiled out (asserts, likely)
+    for (i = 0; i < 2; i++) {
+        pQueue = &lbl_8019E868[i];
+        for (pReq = pQueue->pNext; pReq != (FileReq*)pQueue; pReq = pReq->pNext) {
+        }
     }
     lbl_8019EAD0[hFile].nOpens--;
     if (lbl_8019EAD0[hFile].nOpens <= 0) {
