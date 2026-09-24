@@ -73,9 +73,11 @@ LAYOUT_ASSERT(Ter_ObjectDrawData, 0x20);
 // The state of one course object (0x40 bytes; TW06: Ter_ObjectState, 0x2C, laid out differently).
 // Found by patch: iPatchFirstObjectInstanceIndex[patch] + the object's number in it.
 typedef struct Ter_ObjectState {
-    u8   unk0[4];
-    f32  f4;                    // 0x04  handed to row 2 or 3 of fn_8003519C (fn_80032F88), 0.5 the rest
-    u8   unk8[0x10 - 0x8];
+    f32  f0;                    // 0x00  fn_80030254: fTreeMinPeriod plus a random share of fTreeDiffPeriod
+    f32  f4;                    // 0x04  handed to row 2 or 3 of fn_8003519C (fn_80032F88), 0.5 the rest;
+                                //       fTreeOverdrive at first
+    f32  f8;                    // 0x08
+    s32  nC;                    // 0x0C
     f32  f10;                   // 0x10  } fn_800335F8 resets f14 to f10, or to 0 with n18
     f32  f14;                   // 0x14  }
     s32  n18;                   // 0x18
@@ -210,8 +212,9 @@ LAYOUT_ASSERT(TerSettings, 0x54);
 extern Ter_TerrainRendererMgr lbl_801D3CB0;
 extern TerSettings* lbl_802811E0;    // Code8006F154.c: points at lbl_801D70A8
 extern TerSettings lbl_801D70A8;
-extern s32 lbl_801D3A30[5][32];     // fn_80030254 fills it; fn_80032B7C picks a ground's mesh from
-                                    // row nPass by the bits of the patch's n1C and n18
+extern f32 lbl_80281D60;            // fn_80030254's random number, 0..1, stepped once per object
+extern s32 lbl_801D3A30[5][32];     // [n][k]: how many of k's lowest n bits are set (fn_80030254);
+                                    // fn_80032B7C picks a ground's mesh by it
 
 void fn_8006F334(TerSettings* pSettings);   // Code8006F154.c: the default colours
 extern f32 lbl_801876D8[21][3];     // rows fn_80034648 copies into fDefaultObjectMipmapBias

@@ -65,6 +65,7 @@ void  fn_800355B8(f32* p0);
 void  fn_80034648(int n);
 void  fn_80035514(u8* pObject);
 void  fn_800332F4(void);
+u8    fn_8003505C(u8 b);
 u8    fn_80033308(Ter_ObjectDrawData* pDraw, u8 bForce);
 void  fn_8000ADC0(f32 (*pMtx)[4]);  // identity matrix
 void  fn_80035370(void);
@@ -103,6 +104,94 @@ void fn_80031084(UObjMesh* pNode, s32 eClipMethod, s32 iRenderPass, Ter_PatchRef
         return;
     }
     pPatch->pObjects = NULL;
+}
+
+// Sets up the terrain renderer: allocates its lists, gives every object state its starting values
+// (each tree its own period from a stepped random number), sets the renderer's defaults and fills
+// the bit-count table lbl_801D3A30.
+void fn_80030254(void) {
+    s32 i;
+    s32 n;
+    s32 k;
+    s32 j;
+    s32 nBits;
+
+    lbl_801D3CB0.pPatchList = fn_80009B34(1024 * sizeof(Ter_PatchReference), 2, 16, "GoTerrain.c", 567);
+    lbl_801D3CB0.pPostDrawTerrainList =
+        fn_80009B34(20 * sizeof(Ter_PatchReference), 2, 16, "GoTerrain.c", 572);
+    lbl_801D3CB0.pObjectSortList = fn_80009B34(650 * sizeof(Ter_ObjectReference), 2, 16, "GoTerrain.c", 577);
+    lbl_801D3CB0.pOpaqueObjectList = fn_80009B34(650 * sizeof(Ter_ObjectDrawData), 2, 16, "GoTerrain.c", 582);
+    lbl_801D3CB0.pTranslucentObjectList =
+        fn_80009B34(200 * sizeof(Ter_ObjectDrawData), 2, 16, "GoTerrain.c", 587);
+    lbl_801D3CB0.pNearbyObjectList = fn_80009B34(70 * sizeof(Ter_ObjectDrawData), 2, 16, "GoTerrain.c", 592);
+    lbl_801D3CB0.pDeferredItemsList = fn_80009B34(50 * sizeof(Ter_ObjectDrawData), 2, 16, "GoTerrain.c", 597);
+    lbl_801D3CB0.pPanoramaItemsList =
+        fn_80009B34(300 * sizeof(Ter_ObjectDrawData), 2, 16, "GoTerrain.c", 602);
+    lbl_801D3CB0.pPostDrawItemsList =
+        fn_80009B34(400 * sizeof(Ter_ObjectDrawData), 2, 16, "GoTerrain.c", 607);
+    lbl_801D3CB0.pObjectStateList =
+        fn_80009B34(TER_NUM_OBJECTS * sizeof(Ter_ObjectState), 2, 16, "GoTerrain.c", 612);
+    lbl_801D3CB0.xpGrassPatchList = fn_80009B34(128 * sizeof(Ter_PatchReference), 2, 16, "GoTerrain.c", 633);
+    lbl_801D3CB0.fTreeMinPeriod = 3.7f;
+    lbl_801D3CB0.fTreeDiffPeriod = 1.6f;
+    lbl_801D3CB0.fTreeOverdrive = 1.0f;
+    lbl_801D3CB0.fTreeNoisePeriodScale = 1.0f;
+    lbl_801D3CB0.fTreeNoiseAmplitudeScale = 0.0f;
+    for (i = 0; i < TER_NUM_OBJECTS; i++) {
+        lbl_801D3CB0.pObjectStateList[i].a20[0] = 0;
+        lbl_801D3CB0.pObjectStateList[i].a20[1] = 0;
+        lbl_801D3CB0.pObjectStateList[i].a20[2] = 0;
+        lbl_801D3CB0.pObjectStateList[i].a20[3] = 0;
+        lbl_801D3CB0.pObjectStateList[i].f0 =
+            lbl_80281D60 * lbl_801D3CB0.fTreeDiffPeriod + lbl_801D3CB0.fTreeMinPeriod;
+        lbl_80281D60 *= 131.2934f;
+        lbl_80281D60 += 82.459f;
+        lbl_80281D60 -= fn_80035074(lbl_80281D60);
+        lbl_801D3CB0.pObjectStateList[i].f4 = lbl_801D3CB0.fTreeOverdrive;
+        lbl_801D3CB0.pObjectStateList[i].f8 = 0.0f;
+        lbl_801D3CB0.pObjectStateList[i].nC = 0;
+        lbl_801D3CB0.pObjectStateList[i].n18 = 0;
+        lbl_801D3CB0.pObjectStateList[i].n1C = 0;
+        lbl_801D3CB0.pObjectStateList[i].f10 = lbl_80281D60;
+        lbl_801D3CB0.pObjectStateList[i].aView[0].n4 = 3;
+        lbl_801D3CB0.pObjectStateList[i].aView[0].f0 = 1.0f;
+        lbl_801D3CB0.pObjectStateList[i].aView[1].n4 = 3;
+        lbl_801D3CB0.pObjectStateList[i].aView[1].f0 = 1.0f;
+    }
+    lbl_801D3CB0.pCurrentHoleData = NULL;
+    lbl_801D3CB0.pCourse = NULL;
+    lbl_801D3CB0.fDetailMipmapBias = 0.0f;
+    lbl_801D3CB0.fLakeSurfaceMipmapBias = 0.0f;
+    lbl_801D3CB0.iLowLODListOffset = -1;
+    lbl_801D3CB0.fCrowdAnimationDelayedStartTimer = -1.0f;
+    lbl_801D3CB0.fCrowdAnimationDelayedStartPercentage = 0.0f;
+    lbl_801D3CB0.fCrowdAnimationDelayedStartDuration = 0.0f;
+    lbl_801D3CB0.fCrowdAnimationCountdown = -1.0f;
+    lbl_801D3CB0.fCrowdFadeDistanceMin = 4.0f;
+    lbl_801D3CB0.fCrowdFadeDistanceMax = 5.0f;
+    lbl_801D3CB0.iCrowdPose = 0;
+    lbl_801D3CB0.fCrowdInterpValue = 0.5f;
+    lbl_801D3CB0.fTreeDampingDistance = 5625.0f;
+    lbl_801D3CB0.fTreeDampingMaxForce = 0.5f;
+    lbl_801D3CB0.fDistanceCullYardsBase = 150.0f;
+    lbl_801D3CB0.eObjectFilterMin = 4;
+    lbl_801D3CB0.eObjectFilterMag = 1;
+    lbl_801D3CB0.eTerrainFilterMin = 5;
+    lbl_801D3CB0.eTerrainFilterMag = 1;
+    lbl_801D3CB0.fCrowdFullMaxDistanceFromGolfer = 60.0f;
+    lbl_801D3CB0.fCrowdHalfMaxDistanceFromGolfer = 350.0f;
+    fn_8003505C(1);
+    for (n = 0; n < 5; n++) {
+        for (k = 0; k < 32; k++) {
+            nBits = 0;
+            for (j = 0; j < n; j++) {
+                if (k & (1 << j)) {
+                    nBits++;
+                }
+            }
+            lbl_801D3A30[n][k] = nBits;
+        }
+    }
 }
 
 void fn_800306B8(void) {
