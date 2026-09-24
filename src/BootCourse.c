@@ -1,7 +1,8 @@
-// BootCourse.c (our name): picks a course and hole at random when the game starts (fn_80099ED8,
-// called from GoEntry.c), and a 120-second timer that runs while fn_8008AC40 is false and raises a
-// flag when it runs out (fn_8009A180; GoEntry.c tests the flag with fn_8009A1EC). Its .bss starts on
-// its own 8-byte boundary (0x801DB8A0, shared by fn_80099ED8 and fn_8009A1F4).
+// BootCourse.c (our name): sets up a round on the next of four fixed course/hole/golfer set-ups
+// (fn_80099ED8, called from GoEntry.c and uiProcessInterface.c; fn_8009A1F4 puts the session
+// back), and a 120-second timer that runs while fn_8008AC40 is false and raises a flag when it runs
+// out (fn_8009A180; GoEntry.c tests the flag with fn_8009A1EC). Its .bss starts on its own 8-byte
+// boundary (0x801DB8A0, shared by fn_80099ED8 and fn_8009A1F4).
 
 #include "golfer.h"
 #include "game.h"

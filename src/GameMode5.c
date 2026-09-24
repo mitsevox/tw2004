@@ -565,7 +565,7 @@ void fn_800EC1E0(void) {
         if (!fn_801025F4() && nMedal != 3) {
             if (nMedal < gpSaveData[gPlayers[0].nIndex].aMedal[fn_800EAC7C()]) {
                 gpSaveData[gPlayers[0].nIndex].aMedal[fn_800EAC7C()] = nMedal;
-                gpSaveData[gPlayers[0].nIndex].aMedalDate[fn_800EAC7C()] = fn_800D2994();
+                gpSaveData[gPlayers[0].nIndex].aMedalDate[fn_800EAC7C()] = CalDate_GetToday();
             }
             switch (nMedal) {
             case 0:

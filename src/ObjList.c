@@ -1,6 +1,6 @@
 // ObjList.c (our name): the list of stream objects the game keeps after UStream.c delivered them
-// (course data, animations, sounds), found by type and id. New objects go at the head or the
-// tail; a fixed mark object between the two sides lets the loader release one side at once.
+// (the hole's networks, models, 'RPNS' objects), found by type and id. New objects go at the head
+// or the tail; a fixed mark object between the two sides lets the loader release one side at once.
 // Also a search through a block of tagged records. Its data ends at 0x801A25EC, padded to the
 // next file's 0x801A25F0.
 

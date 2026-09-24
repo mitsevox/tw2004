@@ -19,10 +19,10 @@ void fn_80111F58(MsgArg* pArgs, MsgArg* pResult) {
     s32* pButton = (s32*)pArgs[5].p;
     u16 nDate = fn_801173F0(pArgs[0].i);
 
-    sprintf(szDay, "%d", fn_800D2608(nDate));
+    sprintf(szDay, "%d", CalDate_GetDay(nDate));
     *pLook = 0;
     *pCell = lbl_80193E88[lbl_80223C48.nDriver](szText, nDate, pLook, pButton);
-    if (lbl_80223C48.nMonth != fn_800D2640(nDate)) {
+    if (lbl_80223C48.nMonth != CalDate_GetMonth(nDate)) {
         *pLook = 1;
     }
 }
@@ -41,7 +41,7 @@ void fn_8011206C(MsgArg* pArgs, MsgArg* pResult) {
     char* sz = ((MsgString*)pArgs[2].p)->pStr;
 
     nDate = fn_801173F0(pArgs[0].i);
-    fn_800D2714(&nDate, &nMonth, &nDay, &nYear);
+    CalDate_GetMDY(&nDate, &nMonth, &nDay, &nYear);
     switch (nLine) {
     case 1:
         sprintf(sz, "Selected Day: %d/%d/%d", nMonth, nDay, nYear);

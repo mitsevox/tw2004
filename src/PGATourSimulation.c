@@ -355,15 +355,15 @@ void fn_801180C4(int nPlayer, u8 bUser, u8 bFirst) {
     }
 
     if (nNext == -1
-        || fn_800D2640(GameModeDriverPGATour_GetEndDate(nNext))
-               != fn_800D2640(GameModeDriverPGATour_GetEndDate(gpSaveData[nPlayer].tour.nEvent))) {
+        || CalDate_GetMonth(GameModeDriverPGATour_GetEndDate(nNext))
+               != CalDate_GetMonth(GameModeDriverPGATour_GetEndDate(gpSaveData[nPlayer].tour.nEvent))) {
         for (i = 0; i < PGA_NUM_PROS; i++) {
             if (pProfile->tour.aStats[PGA_USER_GOLFER].n44 < gpSaveData[nPlayer].tour.aStats[i].n44) {
                 break;
             }
         }
         if (i == PGA_NUM_PROS
-            && fn_800D7770(nPlayer, &gpSaveData[nPlayer].a1C0[fn_800D2640(GameModeDriverPGATour_GetEndDate(
+            && fn_800D7770(nPlayer, &gpSaveData[nPlayer].a1C0[CalDate_GetMonth(GameModeDriverPGATour_GetEndDate(
                                         gpSaveData[nPlayer].tour.nEvent)) - 1])) {
             fn_8011C054(14, 6);
         }

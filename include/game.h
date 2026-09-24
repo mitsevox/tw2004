@@ -62,7 +62,7 @@ extern ReplayBuffer* lbl_80281E48;      // 0x80281E48
 extern u8    lbl_80281B8E;              // the reset button was pressed (OSGetResetButtonState)
 extern u8    lbl_80281E50;              // set after a create-a-player frame, cleared otherwise
 extern void*       lbl_80281E54;        // the render camera made from the three below (fn_8001371C)
-extern void*       lbl_80281E58;        // } made by fn_80076ACC,
+extern void*       lbl_80281E58;        // } made by VM_spCreateViewport,
 extern GoFrameBuf* lbl_80281E5C;        // }   fn_8006E1C8
 extern void*       lbl_80281E60;        // }   and CA_spCreateCamera when a game type starts
 extern u8*   lbl_802811E8;              // [1]: the round is over (fn_8006DC34)
@@ -241,18 +241,18 @@ s32  fn_800E81A0(int nPlayer);          // GameModeBattle.c
 s32  fn_800BCCCC(int nPlayer);          // SitDevFile.c: gpGame->pfn208
 s32  fn_800BCCF8(int nPlayer);          // SitDevFile.c: strokes behind the leader (gpGame->pfn200)
 u8   fn_800BCD50(void);                 // SitDevFile.c: gpGame->bD4
-void fn_800D2714(u16* pDate, s32* pMonth, s32* pDay, s32* pYear);
-void fn_800D2678(u16* pDate, s32 nMonth, s32 nDay, u32 nYear);    // make a date
-void fn_800D27CC(u16* pDate, s32 nDays);        // move a date on by nDays
-s32  fn_800D27E0(u16* pDate);                   // its day of the week, 1..7
-s32  fn_800D2814(u32 nMonth, u32 nYear);        // the days in a month (compared unsigned: cmplwi)
-void fn_800D2884(s32 nMonth, s32 nYear, s32* pMonth, s32* pYear);  // the month before
-void fn_800D28B0(s32 nMonth, s32 nYear, s32* pMonth, s32* pYear);  // the month after
-void fn_800D28DC(u16 nDate, char* szOut);       // a date as text
-void fn_800D293C(u16 nDate, char* szOut);       // a date as month/day
-s32  fn_800D2608(u16 nDate);            // Calendar.c
-u32  fn_800D2640(u16 nDate);            // Calendar.c (unsigned: callers compare it with cmplw)
-u16  fn_800D2994(void);                 // today's date
+void CalDate_GetMDY(u16* pDate, s32* pMonth, s32* pDay, s32* pYear);
+void CalDate_SetMDY(u16* pDate, s32 nMonth, s32 nDay, u32 nYear);    // make a date
+void CalDate_AddDays(u16* pDate, s32 nDays);        // move a date on by nDays
+s32  CalDate_GetDayOfWeek(u16* pDate);                   // its day of the week, 1..7
+s32  DaysInMonth(u32 nMonth, u32 nYear);        // the days in a month (compared unsigned: cmplwi)
+void CalDate_GetPrevMonth(s32 nMonth, s32 nYear, s32* pMonth, s32* pYear);  // the month before
+void CalDate_GetNextMonth(s32 nMonth, s32 nYear, s32* pMonth, s32* pYear);  // the month after
+void CalDate_ToString(u16 nDate, char* szOut);       // a date as text
+void CalDate_ToStringMD(u16 nDate, char* szOut);       // a date as month/day
+s32  CalDate_GetDay(u16 nDate);            // Calendar.c
+u32  CalDate_GetMonth(u16 nDate);            // Calendar.c (unsigned: callers compare it with cmplw)
+u16  CalDate_GetToday(void);                 // today's date
 int  fn_800D2ABC(int nCourse, int nHole);   // a hole's par on a course
 int  fn_800D2AD8(int nHole);            // a hole's par
 s32  fn_800D2C30(int nHole, int nTee);  // CourseData.c: a round hole's length from tee set nTee

@@ -52,6 +52,8 @@ GoEntry.c:
 
 Quaternion.c:
 	.text       start:0x8000883C end:0x8000977C
+	.rodata     start:0x8017DB70 end:0x8017DB80
+	.sdata2     start:0x80282A88 end:0x80282AC0
 
 StaticMemory.c:
 	.text       start:0x8000977C end:0x8000A0E8
@@ -401,6 +403,9 @@ Code80090940.c:
 
 fe_movies.c:
 	.text       start:0x80090B80 end:0x800922A8
+	.data       start:0x80189C00 end:0x80189C38
+	.sdata      start:0x80281378 end:0x80281380
+	.sdata2     start:0x80283B90 end:0x80283BF0
 
 uiText.c:
 	.text       start:0x800922A8 end:0x80092CE8

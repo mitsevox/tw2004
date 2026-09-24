@@ -1,5 +1,5 @@
-// fe_movies.c (TW06's file name, a guess from the filemap): the front end's movies. Not yet
-// decompiled; the sweep code below is the matched small functions.
+// fe_movies.c (TW06's file name, a guess from the filemap): the front end's movies, the loading
+// screen's tiles and the quads the front end draws.
 
 #include "game_types.h"
 #include "llpict.h"
@@ -20,13 +20,11 @@ void fn_800760F4(f32* pUV, LLPict* pPict);  // LLVideo.c
 void fn_80016978(f32 x0, f32 y0, f32 x1, f32 y1);
 void fn_8000AE48(f32* pA, f32* pB, f32* pOut);     // pOut = pA * pB, element by element
 void fn_80090D28(FEQuad* pQuad);
+void fn_800912F4(FEVertex* pVtx, f32* pPos, f32* pUV, f32* pColour, f32* pScale, f32* pAdd);
 void fn_800913EC(s16 nTable, s16 nEntry);
 void fn_80091460(s16 nTable, s16 nEntry);
 f32* fn_80093268(void);             // uiTransform.c
 void fn_8009222C(f32* pOut, LLPict* pPict);
-
-// ---- sweep code (not yet cleaned up) ----
-
 void fn_80091708(void);
 void fn_80006EDC();
 void fn_80006FE8();
@@ -44,119 +42,13 @@ f32 fn_80092210(void);
 void fn_80013E30();
 void fn_80092274(s32 p0);
 
-void fn_80091454(void) {
-    lbl_80281370 = 0;
-}
+int lbl_80281378 = -1;
 
-void fn_80091708(void) {
-}
-
-void fn_80091B98(s32 p0) {
-    fn_80006EDC();
-    fn_80091BDC(p0);
-    fn_80006FE8();
-    fn_80007254();
-    fn_800083A0();
-    fn_800A4BDC();
-}
-
-void fn_80091D84(void) {
-    fn_80091DB8(30);
-    fn_8005CC64(0, 0);
-    fn_80012EF8();
-}
-
-void fn_80091EE4(void) {
-}
-
-void fn_8009220C(void) {
-}
-
-f32 fn_80092210(void) {
-    if (lbl_80281F1C != NULL) {
-        return lbl_80281F1C->f18;
-    }
-    return 0.0f;
-}
-
-void fn_80092274(s32 p0) {
-    fn_80013E30(*(s32*)((u8*)lbl_80280DF0), p0, lbl_80280DF0);
-}
-
-TexEntry* fn_800922A0(TexBank* pBank) {
-    return pBank->p8;
-}
-
-// ---- end of sweep code ----
-
-// Eight points across the screen, an eighth apart, all at height 0.839 (fn_80091BDC draws at them).
-void fn_8009170C(void) {
-    lbl_801D8818[0][0] = 0.0f;
-    lbl_801D8818[0][1] = 0.839f;
-    lbl_801D8818[1][0] = 0.125f;
-    lbl_801D8818[1][1] = 0.839f;
-    lbl_801D8818[2][0] = 0.25f;
-    lbl_801D8818[2][1] = 0.839f;
-    lbl_801D8818[3][0] = 0.375f;
-    lbl_801D8818[3][1] = 0.839f;
-    lbl_801D8818[4][0] = 0.5f;
-    lbl_801D8818[4][1] = 0.839f;
-    lbl_801D8818[5][0] = 0.625f;
-    lbl_801D8818[5][1] = 0.839f;
-    lbl_801D8818[6][0] = 0.75f;
-    lbl_801D8818[6][1] = 0.839f;
-    lbl_801D8818[7][0] = 0.875f;
-    lbl_801D8818[7][1] = 0.839f;
-}
-
-// Load the texture bank from LoadData.c's 'txf2' copy, unless the session has flag 4.
-void fn_80091778(void) {
-    if (gSession.uFlags & 4) return;
-    lbl_80281378 = fn_800107C0(lbl_80281C0C, NULL, 0);
-    lbl_80281F20 = fn_800106C4(lbl_80281378);
-    lbl_80281F24 = fn_800922A0(lbl_80281F20);
-}
-
-// Decodes the picture in the 'load' object, once.
-void fn_800917C8(void) {
-    if (lbl_801D8858.p30 == NULL) {
-        lbl_801D8858.p30 = fn_8002FD00(lbl_80281C04, lbl_801A25F0.uSize);
-    }
-}
-
-// Free the picture fn_800917C8 decoded, unless the session has flag 4.
-void fn_80091818(void) {
-    if (!(gSession.uFlags & 4) && lbl_801D8858.p30 != NULL) {
-        fn_8002FE70(lbl_801D8858.p30);
-        fn_8002FEAC();
-        lbl_801D8858.p30 = NULL;
-    }
-}
-
-// Free the bank fn_80091778 loaded.
-void fn_80091870(void) {
-    if (gSession.uFlags & 4) return;
-    fn_80010544(lbl_80281378);
-}
-
-// Set lbl_801D8858 up once, unless the session has flag 4: the clock, the number of players in
-// game type 4 (else 0) and values from it, then the 'load' object's picture (fn_800917C8).
-void fn_800918A4(void) {
-    if (!(gSession.uFlags & 4) && !lbl_801D8858.b18) {
-        lbl_801D8858.b18 = 1;
-        lbl_801D8858.n1C = -1;
-        lbl_801D8858.f10 = 0.0f;
-        lbl_801D8858.u20 = fn_80095368();
-        lbl_801D8858.n0 = 0;
-        if (gSession.nGameType == 4) {
-            lbl_801D8858.n14 = gSession.nNumPlayers;
-        } else {
-            lbl_801D8858.n14 = 0;
-        }
-        lbl_801D8858.fC = lbl_801D8858.f4 = (4.83f * lbl_801D8858.n14 + 3.1f) / 8.0f;
-        lbl_801D8858.f8 = 0.0f;
-        fn_800917C8();
-    }
+// fake match: stands in for a function the original linker stripped. The file's pool starts with
+// 1.0f (0x80283B90), before the unsigned conversion constant fn_80090B80 uses first; its body is
+// unknown.
+static f32 fe_movies_StrippedFn(f32 x) {
+    return x + 1.0f;
 }
 
 // Copy pSrc to pDst with its colour tinted by lbl_80281F28/lbl_80281F2C; without bTint the colour
@@ -174,104 +66,6 @@ void fn_80090B80(FEVertex* pSrc, FEVertex* pDst, u8 bTint) {
         pDst->au14[2] = 0xFF;
         pDst->au14[3] = lbl_80281F28[3] * (pSrc->au14[3] + lbl_80281F2C[3]);
     }
-}
-
-// pQuad's message handler: -3/-1 act on its UI file entry, -2 draws it, 0 and 1 set a corner's
-// position and texture coordinates, 2 and 3 its colour and alpha (corner -1: all four), 5 sets the
-// index pair (by bSplit, from one packed number or two).
-void fn_800914DC(FEQuad* pQuad, int nMsg, u32 bSplit, FEMsgArg* pArgs) {
-    s16 nOld;
-
-    switch (nMsg) {
-    case -1:
-        // port: EA passes arguments fn_800913EC ignores
-        ((void (*)(s16, s16, s16, int, int))fn_800913EC)(pQuad->n2, pQuad->n0, pQuad->nA, 0, 0);
-        break;
-    case -2:
-        // port: EA passes arguments fn_80090D28 ignores
-        ((void (*)(FEQuad*, int, int))fn_80090D28)(pQuad, 0, 0);
-        break;
-    case -3:
-        // port: EA passes arguments fn_80091460 ignores
-        ((void (*)(s16, s16, s16, int, int))fn_80091460)(pQuad->n2, pQuad->n0, pQuad->nA, 0, 0);
-        break;
-    case 0:
-        pQuad->aVtx[pArgs[0].n].f8 = pArgs[1].f;
-        pQuad->aVtx[pArgs[0].n].fC = pArgs[2].f;
-        pQuad->aVtx[pArgs[0].n].f10 = pArgs[3].f;
-        break;
-    case 1:
-        pQuad->aVtx[pArgs[0].n].f0 = pArgs[1].f;
-        pQuad->aVtx[pArgs[0].n].f4 = pArgs[2].f;
-        break;
-    case 3:
-        if (pArgs[0].n == -1) {
-            pQuad->aVtx[0].au14[3] = pArgs[1].n;
-            pQuad->aVtx[1].au14[3] = pArgs[1].n;
-            pQuad->aVtx[2].au14[3] = pArgs[1].n;
-            pQuad->aVtx[3].au14[3] = pArgs[1].n;
-        } else {
-            pQuad->aVtx[pArgs[0].n].au14[3] = pArgs[1].n;
-        }
-        break;
-    case 2:
-        if (pArgs[0].n == -1) {
-            pQuad->aVtx[0].au14[0] = pArgs[1].n;
-            pQuad->aVtx[0].au14[1] = pArgs[2].n;
-            pQuad->aVtx[0].au14[2] = pArgs[3].n;
-            pQuad->aVtx[1].au14[0] = pArgs[1].n;
-            pQuad->aVtx[1].au14[1] = pArgs[2].n;
-            pQuad->aVtx[1].au14[2] = pArgs[3].n;
-            pQuad->aVtx[2].au14[0] = pArgs[1].n;
-            pQuad->aVtx[2].au14[1] = pArgs[2].n;
-            pQuad->aVtx[2].au14[2] = pArgs[3].n;
-            pQuad->aVtx[3].au14[0] = pArgs[1].n;
-            pQuad->aVtx[3].au14[1] = pArgs[2].n;
-            pQuad->aVtx[3].au14[2] = pArgs[3].n;
-        } else {
-            pQuad->aVtx[pArgs[0].n].au14[0] = pArgs[1].n;
-            pQuad->aVtx[pArgs[0].n].au14[1] = pArgs[2].n;
-            pQuad->aVtx[pArgs[0].n].au14[2] = pArgs[3].n;
-        }
-        break;
-    case 5:
-        if (pArgs[0].n != -1) {
-            nOld = pQuad->n0;
-            if (bSplit == 1) {
-                pQuad->n0 = pArgs[0].n;
-                pQuad->n2 = (u32)pArgs[0].n >> 16;
-            } else {
-                pQuad->n0 = pArgs[1].n;
-                pQuad->n2 = pArgs[0].n;
-            }
-            // fake match: a no-op; the original compares the old n0 with the new one here
-            if (nOld == pQuad->n0) {
-                return;
-            }
-        }
-        break;
-    case 6:
-        break;
-    }
-}
-
-// Unpack pVtx into four-float arrays: its position (w 1), its texture coordinates (0, 1) and its
-// colour, which is then scaled by pScale and offset by pAdd.
-void fn_800912F4(FEVertex* pVtx, f32* pPos, f32* pUV, f32* pColour, f32* pScale, f32* pAdd) {
-    pPos[0] = pVtx->f8;
-    pPos[1] = pVtx->fC;
-    pPos[2] = pVtx->f10;
-    pPos[3] = 1.0f;
-    pUV[0] = pVtx->f0;
-    pUV[1] = pVtx->f4;
-    pUV[2] = 0.0f;
-    pUV[3] = 1.0f;
-    pColour[0] = pVtx->au14[0];
-    pColour[1] = pVtx->au14[1];
-    pColour[2] = pVtx->au14[2];
-    pColour[3] = pVtx->au14[3];
-    fn_8000AE48(pColour, pScale, pColour);
-    fn_80092250(pColour, pAdd, pColour);
 }
 
 // Draw pQuad: with a UI file entry, textured by it (flag 1: a texture, flag 2: a movie's current
@@ -403,6 +197,25 @@ void fn_80090D28(FEQuad* pQuad) {
     }
 }
 
+// Unpack pVtx into four-float arrays: its position (w 1), its texture coordinates (0, 1) and its
+// colour, which is then scaled by pScale and offset by pAdd.
+void fn_800912F4(FEVertex* pVtx, f32* pPos, f32* pUV, f32* pColour, f32* pScale, f32* pAdd) {
+    pPos[0] = pVtx->f8;
+    pPos[1] = pVtx->fC;
+    pPos[2] = pVtx->f10;
+    pPos[3] = 1.0f;
+    pUV[0] = pVtx->f0;
+    pUV[1] = pVtx->f4;
+    pUV[2] = 0.0f;
+    pUV[3] = 1.0f;
+    pColour[0] = pVtx->au14[0];
+    pColour[1] = pVtx->au14[1];
+    pColour[2] = pVtx->au14[2];
+    pColour[3] = pVtx->au14[3];
+    fn_8000AE48(pColour, pScale, pColour);
+    fn_80092250(pColour, pAdd, pColour);
+}
+
 // Make the picture of UI file entry (nTable, nEntry) when its flags have 2 set and 1 clear.
 void fn_800913EC(s16 nTable, s16 nEntry) {
     u32 uFlags;
@@ -414,6 +227,10 @@ void fn_800913EC(s16 nTable, s16 nEntry) {
     }
 }
 
+void fn_80091454(void) {
+    lbl_80281370 = 0;
+}
+
 // For UI file entry (nTable, nEntry) with flags 2 set and 1 clear: fn_80008380, then flag 0x10.
 void fn_80091460(s16 nTable, s16 nEntry) {
     u32 uFlags;
@@ -423,6 +240,165 @@ void fn_80091460(s16 nTable, s16 nEntry) {
     if (!(uFlags & 1) && (uFlags & 2)) {
         fn_80008380();
         fn_800909B4(nEntry);
+    }
+}
+
+// pQuad's message handler: -3/-1 act on its UI file entry, -2 draws it, 0 and 1 set a corner's
+// position and texture coordinates, 2 and 3 its colour and alpha (corner -1: all four), 5 sets the
+// index pair (by bSplit, from one packed number or two).
+void fn_800914DC(FEQuad* pQuad, int nMsg, u32 bSplit, FEMsgArg* pArgs) {
+    s16 nOld;
+
+    switch (nMsg) {
+    case -1:
+        // port: EA passes arguments fn_800913EC ignores
+        ((void (*)(s16, s16, s16, int, int))fn_800913EC)(pQuad->n2, pQuad->n0, pQuad->nA, 0, 0);
+        break;
+    case -2:
+        // port: EA passes arguments fn_80090D28 ignores
+        ((void (*)(FEQuad*, int, int))fn_80090D28)(pQuad, 0, 0);
+        break;
+    case -3:
+        // port: EA passes arguments fn_80091460 ignores
+        ((void (*)(s16, s16, s16, int, int))fn_80091460)(pQuad->n2, pQuad->n0, pQuad->nA, 0, 0);
+        break;
+    case 0:
+        pQuad->aVtx[pArgs[0].n].f8 = pArgs[1].f;
+        pQuad->aVtx[pArgs[0].n].fC = pArgs[2].f;
+        pQuad->aVtx[pArgs[0].n].f10 = pArgs[3].f;
+        break;
+    case 1:
+        pQuad->aVtx[pArgs[0].n].f0 = pArgs[1].f;
+        pQuad->aVtx[pArgs[0].n].f4 = pArgs[2].f;
+        break;
+    case 3:
+        if (pArgs[0].n == -1) {
+            pQuad->aVtx[0].au14[3] = pArgs[1].n;
+            pQuad->aVtx[1].au14[3] = pArgs[1].n;
+            pQuad->aVtx[2].au14[3] = pArgs[1].n;
+            pQuad->aVtx[3].au14[3] = pArgs[1].n;
+        } else {
+            pQuad->aVtx[pArgs[0].n].au14[3] = pArgs[1].n;
+        }
+        break;
+    case 2:
+        if (pArgs[0].n == -1) {
+            pQuad->aVtx[0].au14[0] = pArgs[1].n;
+            pQuad->aVtx[0].au14[1] = pArgs[2].n;
+            pQuad->aVtx[0].au14[2] = pArgs[3].n;
+            pQuad->aVtx[1].au14[0] = pArgs[1].n;
+            pQuad->aVtx[1].au14[1] = pArgs[2].n;
+            pQuad->aVtx[1].au14[2] = pArgs[3].n;
+            pQuad->aVtx[2].au14[0] = pArgs[1].n;
+            pQuad->aVtx[2].au14[1] = pArgs[2].n;
+            pQuad->aVtx[2].au14[2] = pArgs[3].n;
+            pQuad->aVtx[3].au14[0] = pArgs[1].n;
+            pQuad->aVtx[3].au14[1] = pArgs[2].n;
+            pQuad->aVtx[3].au14[2] = pArgs[3].n;
+        } else {
+            pQuad->aVtx[pArgs[0].n].au14[0] = pArgs[1].n;
+            pQuad->aVtx[pArgs[0].n].au14[1] = pArgs[2].n;
+            pQuad->aVtx[pArgs[0].n].au14[2] = pArgs[3].n;
+        }
+        break;
+    case 5:
+        if (pArgs[0].n != -1) {
+            nOld = pQuad->n0;
+            if (bSplit == 1) {
+                pQuad->n0 = pArgs[0].n;
+                pQuad->n2 = (u32)pArgs[0].n >> 16;
+            } else {
+                pQuad->n0 = pArgs[1].n;
+                pQuad->n2 = pArgs[0].n;
+            }
+            // fake match: a no-op; the original compares the old n0 with the new one here
+            if (nOld == pQuad->n0) {
+                return;
+            }
+        }
+        break;
+    case 6:
+        break;
+    }
+}
+
+void fn_80091708(void) {
+}
+
+// fake match: stands in for a function the original linker stripped. The pool has 512.0f and
+// 448.0f (0x80283BA8, the screen size fn_80092080 uses) before fn_8009170C's constants; its body is
+// unknown.
+static f32 fe_movies_StrippedFn2(f32 x) {
+    return x + 448.0f + 512.0f;
+}
+
+// Eight points across the screen, an eighth apart, all at height 0.839 (fn_80091BDC draws at them).
+void fn_8009170C(void) {
+    lbl_801D8818[0][0] = 0.0f;
+    lbl_801D8818[0][1] = 0.839f;
+    lbl_801D8818[1][0] = 0.125f;
+    lbl_801D8818[1][1] = 0.839f;
+    lbl_801D8818[2][0] = 0.25f;
+    lbl_801D8818[2][1] = 0.839f;
+    lbl_801D8818[3][0] = 0.375f;
+    lbl_801D8818[3][1] = 0.839f;
+    lbl_801D8818[4][0] = 0.5f;
+    lbl_801D8818[4][1] = 0.839f;
+    lbl_801D8818[5][0] = 0.625f;
+    lbl_801D8818[5][1] = 0.839f;
+    lbl_801D8818[6][0] = 0.75f;
+    lbl_801D8818[6][1] = 0.839f;
+    lbl_801D8818[7][0] = 0.875f;
+    lbl_801D8818[7][1] = 0.839f;
+}
+
+// Load the texture bank from LoadData.c's 'txf2' copy, unless the session has flag 4.
+void fn_80091778(void) {
+    if (gSession.uFlags & 4) return;
+    lbl_80281378 = fn_800107C0(lbl_80281C0C, NULL, 0);
+    lbl_80281F20 = fn_800106C4(lbl_80281378);
+    lbl_80281F24 = fn_800922A0(lbl_80281F20);
+}
+
+// Decodes the picture in the 'load' object, once.
+void fn_800917C8(void) {
+    if (lbl_801D8858.p30 == NULL) {
+        lbl_801D8858.p30 = fn_8002FD00(lbl_80281C04, lbl_801A25F0.uSize);
+    }
+}
+
+// Free the picture fn_800917C8 decoded, unless the session has flag 4.
+void fn_80091818(void) {
+    if (!(gSession.uFlags & 4) && lbl_801D8858.p30 != NULL) {
+        fn_8002FE70(lbl_801D8858.p30);
+        fn_8002FEAC();
+        lbl_801D8858.p30 = NULL;
+    }
+}
+
+// Free the bank fn_80091778 loaded.
+void fn_80091870(void) {
+    if (gSession.uFlags & 4) return;
+    fn_80010544(lbl_80281378);
+}
+
+// Set lbl_801D8858 up once, unless the session has flag 4: the clock, the number of players in
+// game type 4 (else 0) and values from it, then the 'load' object's picture (fn_800917C8).
+void fn_800918A4(void) {
+    if (!(gSession.uFlags & 4) && !lbl_801D8858.b18) {
+        lbl_801D8858.b18 = 1;
+        lbl_801D8858.n1C = -1;
+        lbl_801D8858.f10 = 0.0f;
+        lbl_801D8858.u20 = fn_80095368();
+        lbl_801D8858.n0 = 0;
+        if (gSession.nGameType == 4) {
+            lbl_801D8858.n14 = gSession.nNumPlayers;
+        } else {
+            lbl_801D8858.n14 = 0;
+        }
+        lbl_801D8858.fC = lbl_801D8858.f4 = (4.83f * lbl_801D8858.n14 + 3.1f) / 8.0f;
+        lbl_801D8858.f8 = 0.0f;
+        fn_800917C8();
     }
 }
 
@@ -483,6 +459,15 @@ void fn_8009198C(int nMode) {
     }
 }
 
+void fn_80091B98(s32 p0) {
+    fn_80006EDC();
+    fn_80091BDC(p0);
+    fn_80006FE8();
+    fn_80007254();
+    fn_800083A0();
+    fn_800A4BDC();
+}
+
 // Draw tile nPoint of the texture bank fn_80091778 loaded at point nPoint of lbl_801D8818, an
 // eighth of the screen wide: tiles 0-3 come from the top half of the texture, 4-7 from the bottom
 // (their u runs past 1 and wraps).
@@ -530,6 +515,12 @@ void fn_80091BDC(int nPoint) {
     fn_8001644C(0xA1, afXY, 0, afUV, 2);
 }
 
+void fn_80091D84(void) {
+    fn_80091DB8(30);
+    fn_8005CC64(0, 0);
+    fn_80012EF8();
+}
+
 // Decode the picture in the 'load' object, show it for nFrames frames (fading in over 30), then
 // free it.
 void fn_80091DB8(int nFrames) {
@@ -565,6 +556,9 @@ void fn_80091E1C(void) {
     }
     fn_8005CC64(0, 0);
     fn_80012EF8();
+}
+
+void fn_80091EE4(void) {
 }
 
 // The movies after a round in game type 1 (uiProcessInterface.c fn_80090400): "eas", then, unless
@@ -654,6 +648,16 @@ void fn_80092198(void) {
     }
 }
 
+void fn_8009220C(void) {
+}
+
+f32 fn_80092210(void) {
+    if (lbl_80281F1C != NULL) {
+        return lbl_80281F1C->f18;
+    }
+    return 0.0f;
+}
+
 // The picture's f6C and f70, then 0 and 1.
 void fn_8009222C(f32* pOut, LLPict* pPict) {
     pOut[0] = pPict->f6C;
@@ -685,3 +689,11 @@ void fn_80092250(f32* pA, f32* pB, f32* pOut) {
     pOut[3] = pB[3] + pA[3];
 }
 #endif
+
+void fn_80092274(s32 p0) {
+    fn_80013E30(*(s32*)((u8*)lbl_80280DF0), p0, lbl_80280DF0);
+}
+
+TexEntry* fn_800922A0(TexBank* pBank) {
+    return pBank->p8;
+}

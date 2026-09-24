@@ -302,7 +302,7 @@ typedef struct ViewController {
 } ViewController;
 LAYOUT_ASSERT(ViewController, 0x288);
 
-// The camera tuning values (GoGolfCam.c), allocated and set by GoCamTuningVars.c's fn_800977F8.
+// The camera tuning values (GoGolfCam.c), allocated and set by GoCamTuningVars.c's CameraTuning_Init.
 typedef struct CamTuning {
     f32  f0;                    // 0x000  the zoom-to-aim camera's base speed
     f32  f4;                    // 0x004  the zoom-to-aim camera's distance back from the target
@@ -886,8 +886,8 @@ void     CA_vSetLookAt(CamLens* pLens, f32* pPos, f32* pTarget);   // aims the l
 void     CA_vInitCamera(CamLens* pLens);
 void     fn_80076948(CamLens* pLens, f32 fB4, f32 fB8);   // sets fB4 and fB8
 void     fn_80076A0C_SetType(CamLens* pLens, s32 nType);          // sets nType
-f32*     fn_80076ACC(void);                     // a new screen rectangle
-void     fn_80076B18(f32* pRect);               // free it
+f32*     VM_spCreateViewport(void);                     // a new screen rectangle
+void     VM_vReleaseViewport(f32* pRect);               // free it
 void     fn_800B3438(f32* pRect, f32 x, f32 y); // shadow.c
 CamLens* fn_8001F004(void);                     // char.c
 
