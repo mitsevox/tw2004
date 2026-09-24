@@ -57,7 +57,6 @@ int gnNumHandlers = -1;           // 0x80280DB8 (.sdata): -1 until UStream_Init
 
 // ---- other files' functions -----------------------------------------------------------
 
-int   fn_8000EA1C(const char* pName, int a, int b, int c);
 void  fn_8007593C(void* pChunk);                             // MPG2
 void  fn_800A8AD4(void* pChunk);                             // DSPM / VAGM / XADP
 void* fn_800A8FB4(u32 uSize, int nMemory);
@@ -193,17 +192,17 @@ static int UStream_BeginObject(UStreamFill* pFill, UStreamChunk* pChunk) {
     UStreamObject* pObject;
     if (pChunk->uType == TAG('C', 's', 'a', 'c')) {
         nWanted = 1;
-        uExtra = ((pChunk->nNameLen + pChunk->n38 + 3) & ~3) + 8;
+        uExtra = ((pChunk->nScriptLen + pChunk->n38 + 3) & ~3) + 8;
     } else {
-        // Two LLTex scripts sit at szName: the first (nNameLen bytes) says whether the object is
-        // wanted, the one after it runs only when it is.
-        const char* pCode = pChunk->szName;
-        const char* pNext = pCode + pChunk->nNameLen;
+        // The first of the two scripts says whether the object is wanted; the second runs only
+        // when it is.
+        u8* pCode = pChunk->aScripts;
+        u8* pNext = pCode + pChunk->nScriptLen;
 
         uExtra = 0;
-        nWanted = fn_8000EA1C(pCode, 0, -1, 0);
+        nWanted = fn_8000EA1C(pCode, 0, -1, NULL);
         if (nWanted) {
-            fn_8000EA1C(pNext, 0, -1, 0);
+            fn_8000EA1C(pNext, 0, -1, NULL);
         }
     }
     if (nWanted) {

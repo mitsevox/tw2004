@@ -65,12 +65,12 @@ typedef struct DynObjModel {
     DynObjModelEntry aEntries[1]; // 0x4  nEntries of them (as many as the chunk holds)
 } DynObjModel;
 
-// The names an object passes to fn_8000EA1C (DynObjSetup.pC).
+// The byte-code scripts an object runs with fn_8000EA1C (DynObjSetup.pC).
 typedef struct DynObjNames {
     u8   unk0[0x28];
-    const char* p28;            // 0x28  -> DynObj.p15C
-    const char* p2C;            // 0x2C  -> DynObj.p160
-    const char* p30;            // 0x30  -> DynObj.p164
+    u8*  p28;                   // 0x28  -> DynObj.p15C
+    u8*  p2C;                   // 0x2C  -> DynObj.p160
+    u8*  p30;                   // 0x30  -> DynObj.p164
 } DynObjNames;
 
 // What a type's message 2 gets (fn_80049018 asks its handler for the object's size first).
@@ -260,9 +260,9 @@ typedef struct DynObj {
     s32  n150;                  // 0x150
     u32  uFlags;                // 0x154
     f32  f158;                  // 0x158
-    const char* p15C;           // 0x15C  } names given to fn_8000EA1C (p15C when n144 drops,
-    const char* p160;           // 0x160  }  p160 by fn_800491C4)
-    const char* p164;           // 0x164  }
+    u8*  p15C;                  // 0x15C  } scripts run by fn_8000EA1C (p15C when n144 drops,
+    u8*  p160;                  // 0x160  }  p160 by fn_800491C4)
+    u8*  p164;                  // 0x164  }
     s32  n168;                  // 0x168
 } DynObj;
 LAYOUT_ASSERT(DynObj, 0x16C);
