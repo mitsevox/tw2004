@@ -27,6 +27,8 @@ typedef struct CamLens {
     f32  fB8;                   // 0xB8  its view height (guess)
 } CamLens;
 
+f32 fn_80014278(CamLens* pLens);        // GoRenderCtx_Gc.c: the lens's field of view
+
 // A camera shot (0xC0 bytes): a named script position the camera script moves to. The shots of a
 // sequence are chained through p40.
 typedef struct CamShot {
@@ -38,9 +40,15 @@ typedef struct CamShot {
     struct CamShot* p44;        // 0x44  in View.shot19C: the shot camera 13 goes back to
     f32  f48;                   // 0x48  how long the shot lasts
     f32  f4C;                   // 0x4C
-    u32  u50;                   // 0x50  on the CrAP screen: bit n for CrAPGolfer.nC = n up to 32
-    u32  u54;                   // 0x54  ... bit n - 32 above that (fn_8003D294)
-    u8   unk58[0x60 - 0x58];
+    union {
+        struct {
+            u32 u50;            // 0x50  on the CrAP screen: bit n for CrAPGolfer.nC = n up to 32
+            u32 u54;            // 0x54  ... bit n - 32 above that (fn_8003D294)
+        } bits;
+        f32 aArea[4];           // 0x50  a static camera (GoStaticCam.c): it is picked while the
+                                //       golfer or the ball is inside x aArea[0]..aArea[2],
+                                //       z aArea[1]..aArea[3] (fn_800659F4)
+    } u;
     f32  f60;                   // 0x60
     f32  f64;                   // 0x64
     f32  f68;                   // 0x68
@@ -66,14 +74,92 @@ typedef struct CamShot {
     u8   bAB;                   // 0xAB
     u8   bAC;                   // 0xAC
     u8   bAD;                   // 0xAD
-    u8   unkAE;
-    u8   bAF;                   // 0xAF
+    s8   nAE;                   // 0xAE  a static camera's record byte 0x1C (fn_80064A0C)
+    u8   bAF;                  // 0xAF
     u8   bB0;                   // 0xB0
     u8   bB1;                   // 0xB1
     u8   bB2;                   // 0xB2
     u8   unkB3[0xC0 - 0xB3];
 } CamShot;
 LAYOUT_ASSERT(CamShot, 0xC0);
+
+// ---- the course's static and fly-by cameras (GoStaticCam.c) ----------------------------------
+// A course's 'Cact' objects of type 201 are static cameras, those of type 200 fly-by cameras
+// (UKernel.c's fn_80048BDC hands them over); each becomes a CamShot. The fly-by cameras are
+// chained into up to 10 paths, and a 'CAMC' stream object brings a spline table per path.
+// The type names below are ours, from the shots' names ("Static Cam: %d", "FlyBy Cam: %d").
+
+// A type 201 object's data (UStreamObject.pData; the same 'Cact' data as DynObjDef, 8 bytes in).
+typedef struct StaticCamDef {
+    u8   unk0[0x10];
+    f32  aPos[3];               // 0x10  -> CamShot.v20
+    s32  n1C;                   // 0x1C  -> CamShot.nAE
+    s32  n20;                   // 0x20  -> CamShot.bAC (5: skipped when fn_80064F7C is asked to)
+    s32  nKinds;                // 0x24  -> CamShot.nA4: the shot kinds it serves, a bit each
+    f32  fFov;                  // 0x28  in degrees -> CamShot.f78
+    f32  f2C;                   // 0x2C  in degrees -> CamShot.f7C
+    f32  f30;                   // 0x30  -> CamShot.f48
+    f32  f34;                   // 0x34  -> CamShot.f4C
+    f32  aArea[4];              // 0x38  -> CamShot.u.aArea
+    f32  aAngle[3];             // 0x48  in degrees: which way it looks (-> CamShot.v30, turned into
+                                //       the point it looks at)
+    f32  f54;                   // 0x54  -> CamShot.f88
+    s32  n58;                   // 0x58  -> CamShot.nA0
+} StaticCamDef;
+
+// A type 200 object's data.
+typedef struct FlyByCamDef {
+    u8   unk0[0x10];
+    f32  aPos[3];               // 0x10  -> CamShot.v20
+    f32  fFov;                  // 0x1C  in degrees -> CamShot.f78
+    f32  f20;                   // 0x20  -> CamShot.f48
+    s8   nId;                   // 0x24  its number on the path
+    s8   nNext;                 // 0x25  the next camera's nId (-99: the path ends here)
+    u8   unk26[2];
+    f32  aLook[3];              // 0x28  in degrees -> CamShot.v30
+    f32  f34;                   // 0x34  0..1 (clamped on load) -> CamShot.f4C
+    s8   nPath;                 // 0x38  its path (0..9) -> CamShot.nA4
+} FlyByCamDef;
+
+// One key of a fly-by path's spline (0x24 bytes; a 'CAMC' object holds them byte-swapped, 0x22
+// bytes each).
+typedef struct FlyByKey {
+    f32  af[8];                 // 0x00
+    u8   b20;                   // 0x20
+    u8   b21;                   // 0x21
+    u8   unk22[2];
+} FlyByKey;
+
+// A fly-by path's spline (0x2E0 bytes), from the 'CAMC' object.
+typedef struct FlyByPath {
+    u32  u0;                    // 0x00
+    u32  uPath;                 // 0x04  the path it belongs to (CamShot.nA4; fn_80065424)
+    f32  fLength;               // 0x08
+    u32  nKeys;                 // 0x0C
+    FlyByKey aKeys[20];         // 0x10
+} FlyByPath;
+LAYOUT_ASSERT(FlyByPath, 0x2E0);
+
+#define NUM_STATIC_CAMS 10
+#define NUM_FLYBY_CAMS  30
+#define NUM_FLYBY_PATHS 10
+
+// GoStaticCam.c's state (0x1E68 bytes, allocated by fn_80064E2C).
+typedef struct StaticCams {
+    CamShot aStatic[NUM_STATIC_CAMS];      // 0x0000  "Static Cam: n"
+    CamShot aFlyBy[NUM_FLYBY_CAMS];        // 0x0780  "FlyBy Cam: n"
+    s32  nFlyBy;                // 0x1E00  how many of aFlyBy are loaded
+    s32  nStatic;               // 0x1E04  how many of aStatic are loaded
+    u8   bLinked;               // 0x1E08  the fly-by paths are chained (fn_8006509C)
+    f32  afPathLength[NUM_FLYBY_PATHS];    // 0x1E0C  each path's length, its shots' f4C added up
+    CamShot* apPath[NUM_FLYBY_PATHS];      // 0x1E34  each path's first shot
+    u32  u1E5C;                 // 0x1E5C  } the 'CAMC' object's header
+    u32  nPaths;                // 0x1E60  } the number of splines in pPaths
+    FlyByPath* pPaths;          // 0x1E64
+} StaticCams;
+LAYOUT_ASSERT(StaticCams, 0x1E68);
+
+extern StaticCams* lbl_80281E18;
 
 // A camera sequence (DynamicCam's, 0x50 bytes): the shots a camera plan steps through, and the
 // conditions it is picked on. Its shot choices (CamChoice) are in dyncam.h.
@@ -547,7 +633,7 @@ void     fn_8003DCE8(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamS
                      f32 fFrameTime);
 void     fn_8003E624(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot* pShot, int a,
                      f32 fFrameTime);
-void     fn_8003EA50(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot* pShot, int a,
+void     fn_8003EA50(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot* pShot, u8 b,
                      f32 fFrameTime);
 void     fn_8003F2E0(CamScript* pScript, f32 fTime);
 void     CameraScript_RecordCurrentCam(CamShot* pShot, f32* pCam, f32* pSub, int nPlayer, CamScript* pScript,
@@ -588,6 +674,17 @@ void   fn_800C7E50(f32* pA, f32* pB, f32* pC, int n, f32* pOut, f32 fT);
 // at share fT between the middle two.
 void   fn_800C7480(f32* pPos0, f32* pPos1, f32* pPos2, f32* pPos3, f32* pLook0, f32* pLook1, f32* pLook2,
                    f32* pLook3, f32* pCam, f32* pSub, f32* pFov, f32 fFov1, f32 fFov2, f32 fT);
+// Not decompiled yet: a share of a fly-by path's spline (fn_8003EA50).
+f32    fn_800C7A9C(FlyByPath* pPath, f32 fT);
+
+// ---- the static and fly-by cameras (GoStaticCam.c, 0x8006449C..) ----------------------------
+
+void     fn_80064F54(CamShot* pShot, int nPlayer, f32* pOut);   // the shot's position
+CamShot* fn_80064F7C(int nPlayer, int nKind, u8 bNotKind5, CamShot* pNot);
+CamShot* fn_8006509C(int nPath);        // a fly-by path's first shot (NULL past the 10th)
+FlyByPath* fn_80065424(u32 uPath);      // a fly-by path's spline (NULL: none)
+void     fn_80065488(CamScript* pScript, int nPath, f32* pCam, f32* pSub, f32* pFov, int nPlayer,
+                     f32 fShare);
 
 // ---- the camera controller (0x80062F38..) ---------------------------------------------------
 
