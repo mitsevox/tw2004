@@ -349,7 +349,7 @@ f32 Character_GetTerrainHeightAndNormal(Character* pChar, f32* pPos, f32** ppNor
     if (pChar != NULL) {
         if ((pCourse = fn_8000C594()) != NULL) {
             Vec_Copy(pPos, vPos);
-            vPos[1] += 0.055f;
+            vPos[1] += 0.66f / 12.0f;
             Ter_GetEnclosingGroundData(pCourse, vPos, &fLow, &pLowSurface, lbl_801B95D8, &fHigh,
                                        &pHighSurface, lbl_801B95C8);
             if (!(fHigh < -60000.0f)) {
@@ -362,13 +362,15 @@ f32 Character_GetTerrainHeightAndNormal(Character* pChar, f32* pPos, f32** ppNor
                     return fHigh;
                 }
             } else if (fLow < -60000.0f) {
-                return -65536.125f;
+                goto none;      // fake match: the original puts this return after the low height
             }
             if (pLowSurface->nClass == 0xC || pLowSurface->nClass == 0x12) {
                 return -65536.125f;
             }
             *ppNormal = lbl_801B95D8;
             return fLow;
+        none:
+            return -65536.125f;
         }
         return -65536.125f;
     }
@@ -436,11 +438,7 @@ void fn_80017DDC(Character* pChar) {
         pMtx = fn_8001ED08(pChar, 0x52);
         if (pMtx != NULL && (pCourse = fn_8000C594()) != NULL) {
             fHeight = fn_8004D650(pCourse, pChar->aPoints[4], vNormal);
-            if (fHeight < -60000.0f) {
-                return;
-            }
-            fUnder = fHeight - pChar->aPoints[4][1];
-            if (fUnder < 0.0f) {
+            if (fHeight < -60000.0f || (fUnder = fHeight - pChar->aPoints[4][1]) < 0.0f) {
                 return;
             }
             fDot = -fn_8001EEA4(pMtx[1], vNormal);
@@ -835,10 +833,7 @@ void Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, in
     // how far each test point sits below the ground (0.165 in, in feet)
     fDropA = 0.165f / 12.0f + (pChar->afGroundHeight[nPoint] - vPoint[1]);
     fDropB = 0.165f / 12.0f + (pChar->afGroundHeight[nOther] - pChar->aPoints[nOther][1]);
-    if (fDropA < 0.0f && fDropB < 0.0f) {
-        return;
-    }
-    if (fDropA > 1.0f) {
+    if ((fDropA < 0.0f && fDropB < 0.0f) || fDropA > 1.0f) {
         return;
     }
     fDrop = (fDropA <= fDropB) ? fDropB : fDropA;
@@ -1157,10 +1152,7 @@ void fn_80019798(Character* pChar, Skin** apSkins, int nSkins) {
     } else {
         pChar->n5C = 0;
     }
-    bAll = 0;
-    if (gSession.nGameType == 10 || gSession.nGameType == 3) {
-        bAll = 1;
-    }
+    bAll = gSession.nGameType == 10 || gSession.nGameType == 3;
     nTex = nTexBytes / (int)sizeof(TexEntry);
     nPal = nPalBytes / (int)sizeof(TexPalette);
     if (bAll) {
@@ -1306,10 +1298,10 @@ void fn_80019E80(Character* pChar) {
 // Sets up the dynamic textures on the character's other model: the model in use is copied to it
 // (fn_8010A6A8) and each skin choice that differs from the skin's current one is put on it.
 void fn_80019EF4(Character* pChar) {
-    void* pModel;
-    Skin* pSkin;
     int i;
     int j;
+    Skin* pSkin;
+    void* pModel;
 
     fn_8008E918(1);
     pModel = pChar->a64[1 - pChar->n74];
@@ -1981,7 +1973,7 @@ void fn_8001B878(Character* pChar, int nPlayer) {
 
 // For every character made: bit 0x1000 of u10 cleared; with bit 2, bit 1 follows whether the
 // flagstick is out on the current view. Then fn_80035B40 for every character that is not in state
-// 2 (fn_8001EE90) or whose n1658 is 2, is not the camera's player (fn_800636EC), has none of bits
+// 2 (fn_8001EE90) or whose n1658 is not 2, is not the camera's player (fn_800636EC), has none of bits
 // 0x1000, 0x40 and 1 of u10 set, and has n1698 0.
 void fn_8001BA74(void) {
     int i;
@@ -2002,9 +1994,10 @@ void fn_8001BA74(void) {
             }
         }
         bState = fn_8001EE90(lbl_801B9624[i]) != 2;
-        bDo = bState || fn_8001EE88(lbl_801B9624[i]) == 2;
+        bDo = bState || fn_8001EE88(lbl_801B9624[i]) != 2;
         bDo = bDo && nPlayer != lbl_801B9624[i]->nPlayer;
         bDo = bDo && !(lbl_801B9624[i]->u10 & 0x1041);
+        bDo = bDo != 0;     // fake match: the original turns bDo into 0/1 again (neg; or; srwi)
         if (bDo && lbl_801B9624[i]->n1698 == 0) {
             fn_80035B40(lbl_801B9624[i], 0);
         }
@@ -3448,6 +3441,8 @@ MtaLib* fn_8001F110(MtaLib* pLib, s32* pnSize) {
     int i;
     MtaRecord* pRecord;
     int j;
+    MtaEntry* pEntry;
+    int nPad;
 
     pSrc = pDst = pLib;
     fn_8001F08C(&pSrc, &pDst, aHeader, 10, 1);
@@ -3466,10 +3461,12 @@ MtaLib* fn_8001F110(MtaLib* pLib, s32* pnSize) {
     for (i = 0; i < pLib->nRecords; i++) {
         pRecord = &pLib->pRecords[i];
         for (j = 0; j < pRecord->nEntries; j++) {
-            pRecord->pEntries[j].pData = (u8*)pLib + nOffset;
-            nOffset += pRecord->pEntries[j].nBytes;
-            if (nOffset % 4 != 0) {
-                nOffset += 4 - nOffset % 4;
+            pEntry = &pRecord->pEntries[j];
+            pEntry->pData = (u8*)pLib + nOffset;
+            nOffset += pEntry->nBytes;
+            nPad = nOffset % 4;
+            if (nPad != 0) {
+                nOffset += 4 - nPad;
             }
         }
     }
