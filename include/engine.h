@@ -235,6 +235,35 @@ typedef struct TexBank {
 } TexBank;
 LAYOUT_ASSERT(TexBank, 0x30);
 
+// LLTex.c: the items lbl_80281C60 lists (a count, then that many item pointers), which
+// fn_8000E884 steps by message. The type names are ours.
+typedef struct LLTexItemDef {
+    s32  n0;                    // 0x00  its id: a DynObj's n140 (fn_8000E830), fn_8000E948's id
+    u8   unk4[0x18 - 0x4];
+    u8   n18;                   // 0x18  fn_8000E9A8's id
+} LLTexItemDef;
+
+typedef struct LLTexItemState {
+    u8   unk0[0x10];
+    u32  u10;                   // 0x10  cleared when message 0x46 clears n16 bit 0
+    s16  n14;                   // 0x14  message 0x47 steps only while n1A is below it
+    s16  n16;                   // 0x16  bit 0 and two 4-bit counters (bits 8-11, 12-15)
+    s16  n18;                   // 0x18  message 0x47 steps only while it is not 0
+    s16  n1A;                   // 0x1A  one less when a DynObj with the def's id goes (fn_8000E830)
+    u8   unk1C[0x2C - 0x1C];
+    LLTexItemDef* p2C;          // 0x2C
+} LLTexItemState;
+
+typedef struct LLTexItem {
+    u8   unk0[4];
+    LLTexItemState* p4;         // 0x04
+} LLTexItem;
+
+typedef struct LLTexItemList {
+    s32  nItems;                // 0x00  followed by nItems LLTexItem pointers
+} LLTexItemList;
+extern LLTexItemList* lbl_80281C60;
+
 u64  fn_8000BEE4(char* pName);          // a name's 64-bit hash
 // Find a loaded texture by its name's hash: its bank and entry (both NULL if none).
 int  fn_800102DC(u64 uHash, TexBank** ppBank, TexEntry** ppTex);
