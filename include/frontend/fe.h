@@ -78,7 +78,7 @@ typedef struct FE801D8858 {
     u8  unk0[0x18];
     u8  b18;                    // 0x18
     u8  unk19[0x30 - 0x19];
-    s32 n30;                    // 0x30  from fn_8002FD00 (0x8009170C's code)
+    struct LLPict* p30;         // 0x30  a picture decoded from the 'load' object (fn_800917C8)
     u8  unk34[0x38 - 0x34];
 } FE801D8858;
 LAYOUT_ASSERT(FE801D8858, 0x38);

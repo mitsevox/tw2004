@@ -62,6 +62,9 @@ u8   fn_80030040(LLPict* pPict, PictStream* pStream);
 void fn_8003009C(LLPict* pPict, PictStream* pStream, int n2);             // empty
 void fn_800300A0(LLPict* pPict, PictStream* pStream);
 
+// A picture from a "MADk" file in memory (LLPict_Gc.c).
+LLPict* fn_8002FD00(u8* pData, u32 uSize);
+
 // LLPictInt.c
 LLPict* PictInt_Decode(PictFile* pFile);
 
