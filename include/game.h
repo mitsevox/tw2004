@@ -197,6 +197,11 @@ int  fn_800D31A4(int nPar);             // the number of the 18 holes with that 
 f32  fn_800D0478(int nPlayer);          // the ball's distance from the pin (yards)
 f32  fn_800D0550(int nPlayer);          // the shot's length
 int  Hole_ScoreAfterTapIn(int nPlayer); // HoleScore.c
+int  fn_800D0620(int nPlayer, u8 bCurrent, u8 bOnlyFlagged);   // holes under par so far
+int  fn_800D06FC(int nPlayer, u8 bCurrent, u8 bOnlyFlagged);   // two under par or better so far
+int  fn_800D07D8(int nPlayer, u8 bCurrent);   // the current run of holes under par
+int  fn_800D089C(int nPlayer, u8 bCurrent);   // the current run of holes two under par or better
+u8   fn_800D0AF4(void);                 // nobody took anything on the last hole played
 void fn_800D2714(u16* pDate, s32* pMonth, s32* pDay, s32* pYear);
 void fn_800D2678(u16* pDate, s32 nMonth, s32 nDay, u32 nYear);    // make a date
 void fn_800D27CC(u16* pDate, s32 nDays);        // move a date on by nDays

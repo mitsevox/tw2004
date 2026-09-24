@@ -63,9 +63,110 @@ f32 fn_800D05A4(f32* pPos) {
     return fn_80009680(fn_80009744(vDiff));
 }
 
+// The round's holes the player finished under par, counting back from the current hole (with
+// bCurrent) or the one before; with bOnlyFlagged, only those whose gpGame->b16C entry is 1.
+int fn_800D0620(int nPlayer, u8 bCurrent, u8 bOnlyFlagged) {
+    int nCount = 0;
+    int i;
+    if (bCurrent) {
+        i = Game_CurHoleIndex();
+    } else {
+        i = Game_CurHoleIndex() - 1;
+    }
+    for (; i >= 0; i--) {
+        if (gpGame->bHoleSelected[i] && gPlayers[nPlayer].nStrokes[i] > 0 &&
+            gPlayers[nPlayer].nStrokes[i] <= fn_800D2AD8(i) - 1 &&
+            (gpGame->b16C[nPlayer][i] == 1 || !bOnlyFlagged)) {
+            nCount++;
+        }
+    }
+    return nCount;
+}
+
+// As fn_800D0620, two under par or better.
+int fn_800D06FC(int nPlayer, u8 bCurrent, u8 bOnlyFlagged) {
+    int nCount = 0;
+    int i;
+    if (bCurrent) {
+        i = Game_CurHoleIndex();
+    } else {
+        i = Game_CurHoleIndex() - 1;
+    }
+    for (; i >= 0; i--) {
+        if (gpGame->bHoleSelected[i] && gPlayers[nPlayer].nStrokes[i] > 0 &&
+            gPlayers[nPlayer].nStrokes[i] <= fn_800D2AD8(i) - 2 &&
+            (gpGame->b16C[nPlayer][i] == 1 || !bOnlyFlagged)) {
+            nCount++;
+        }
+    }
+    return nCount;
+}
+
+// The player's current run of holes under par: counting back from the current hole (with
+// bCurrent) or the one before, until a hole that is not.
+int fn_800D07D8(int nPlayer, u8 bCurrent) {
+    int i;
+    int nRun = 0;
+    if (bCurrent) {
+        i = Game_CurHoleIndex();
+    } else {
+        i = Game_CurHoleIndex() - 1;
+    }
+    for (; i >= 0; i--) {
+        if (gpGame->bHoleSelected[i]) {
+            if (gPlayers[nPlayer].nStrokes[i] <= 0 || gPlayers[nPlayer].nStrokes[i] > fn_800D2AD8(i) - 1) {
+                break;
+            }
+            nRun++;
+        }
+    }
+    return nRun;
+}
+
+// As fn_800D07D8, two under par or better.
+int fn_800D089C(int nPlayer, u8 bCurrent) {
+    int i;
+    int nRun = 0;
+    if (bCurrent) {
+        i = Game_CurHoleIndex();
+    } else {
+        i = Game_CurHoleIndex() - 1;
+    }
+    for (; i >= 0; i--) {
+        if (gpGame->bHoleSelected[i]) {
+            if (gPlayers[nPlayer].nStrokes[i] <= 0 || gPlayers[nPlayer].nStrokes[i] > fn_800D2AD8(i) - 2) {
+                break;
+            }
+            nRun++;
+        }
+    }
+    return nRun;
+}
+
 // The score the hole will finish on once the tap-in drops: strokes so far plus one, minus par.
 int Hole_ScoreAfterTapIn(int nPlayer) {
     return gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1 - fn_800D2B08();
+}
+
+// Whether nobody took anything (mode points or n22C) on the last hole played before this one; 0
+// on the round's first hole.
+u8 fn_800D0AF4(void) {
+    int i;
+    int j;
+    if (fn_800E1734()) {
+        return 0;
+    }
+    for (i = Game_CurHoleIndex() - 1; i >= 0; i--) {
+        if (gpGame->bHoleSelected[i]) {
+            for (j = 0; j < gNumPlayersSetUp; j++) {
+                if (gPlayers[j].nModePoints[i] != 0 || gPlayers[j].n22C[i] != 0) {
+                    return 0;
+                }
+            }
+            return 1;
+        }
+    }
+    return 0;
 }
 
 // The class of the surface the shot started from, 0 for none.
