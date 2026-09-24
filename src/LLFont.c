@@ -328,7 +328,7 @@ void fn_8001144C(LLFont* pFont, UFontContext* pCtx, char* sz) {
     u32 uSavedColor;
     f32 fSavedX;
     f32 fSavedY;
-    int bMeasured;
+    u8 bMeasured;
     char* p;
     LLGlyph* pGlyph;
 
