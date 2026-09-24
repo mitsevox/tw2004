@@ -96,7 +96,7 @@ void fn_800A7CA4(u8 nEntry, u8 uMaskA, u8 uMaskB, u32* auStreams, f32 (*aPos)[3]
             if (pSource->pSound->n3 & 1) {
                 fVolume = fn_800A7EA4(fDist, pTmpl->f10);
             }
-            fn_800A9E7C(pSource, pTrack, pTmpl, i, bOn, bOff, fVolume);
+            Trk_UpdatePerf(pSource, pTrack, pTmpl, i, bOn, bOff, fVolume);
         }
         return;
     }
@@ -108,7 +108,7 @@ void fn_800A7E44(AudSource* pSource) {
     u8 i;
 
     for (i = 0; i < pSource->pSound->nTracks; i++) {
-        fn_800A9D7C(pSource->apTracks[i]);
+        Trk_FreePerf(pSource->apTracks[i]);
     }
 }
 

@@ -403,7 +403,7 @@ u8 Stm_Tick(AudTrack* pTrack) {
         } else if (pTrack->u.stm.flags.b.b3) {
             pTrack->u.stm.flags.b.b3 = 0;
             if (pTrack->u.stm.pStream->uLoop == 0xFFFFFFFF) {
-                fn_800AA1B8(pTrack, 1);
+                Trk_StopAllVoices(pTrack, 1);
             } else {
                 pTrack->u.stm.uFilled = 0;
             }
@@ -473,7 +473,7 @@ void Stm_SetStream(AudTrack* pTrack, u16 nStream, int nMode) {
     if (pTrack->nState > 2) {
         if (nMode != 1) {
             if (nMode == 2) {
-                fn_800AA1B8(pTrack, 0);
+                Trk_StopAllVoices(pTrack, 0);
             }
             pTrack->u.stm.nNextStream = nStream;
         } else {

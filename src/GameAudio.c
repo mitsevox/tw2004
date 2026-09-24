@@ -207,7 +207,7 @@ u8 fn_800A3E3C(u8 nRate) {
     fn_800B5B80();
     if ((bOk = fn_800AFAB0()) && (bOk = fn_800B0438()) && (bOk = fn_800B0568())
         && (bOk = fn_800AF224()) && (bOk = fn_800B0798()) && (bOk = fn_800A8604())
-        && (bOk = fn_800A8D2C()) && (bOk = fn_800A7AF0()) && (bOk = fn_800A98B4())
+        && (bOk = fn_800A8D2C()) && (bOk = fn_800A7AF0()) && (bOk = Trk_InitModule())
         && (bOk = fn_800AAD18()) && (bOk = fn_800ABBC8()) && (bOk = fn_800A8754())
         && (bOk = Voc_InitModule()) && (bOk = fn_800A8824()) && (bOk = fn_800ACECC())
         && (bOk = fn_800A3FF4())) {
