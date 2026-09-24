@@ -862,7 +862,7 @@ config.libs = [
             Object(NonMatching, "TerrainData.c"),
             Object(NonMatching, "UStream.c"),
             Object(NonMatching, "LLTex.c"),
-            Object(NonMatching, "LLTexGrp.c"),
+            Object(Matching, "LLTexGrp.c"),
             Object(NonMatching, "LLFont.c"),
             Object(NonMatching, "UFont.c"),
             Object(Matching, "GoRenderCtx_Gc.c"),
