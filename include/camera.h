@@ -665,10 +665,11 @@ void     fn_800763BC(CamLens* pLens);
 
 // ---- camera script helpers (gocamscripts, 0x800C7480..) -------------------------------------
 
-// Not decompiled yet. Both write a point into pOut: fn_800C7D14 from the direction between pA and
-// pB (its y cleared unless b1, normalised unless b2), a distance f and an angle; fn_800C7E50 from
-// three points and fT.
-void   fn_800C7D14(f32* pA, f32* pB, u8 b1, u8 b2, f32* pOut, f32 f, f32 fAngle);
+// Both write a point into pOut: fn_800C7D14 goes fDist along the direction from pA to pB (its y
+// cleared unless bKeepY, normalised unless bRaw), then fSide across the flattened direction;
+// fn_800C7E50 swings around pC from pA towards pB at share fT (n: 0 the short way round, 1 angle
+// decreasing, else increasing).
+void   fn_800C7D14(f32* pA, f32* pB, u8 bKeepY, u8 bRaw, f32* pOut, f32 fDist, f32 fSide);
 void   fn_800C7E50(f32* pA, f32* pB, f32* pC, int n, f32* pOut, f32 fT);
 // The splined camera (CamScript_SplineCameras): the camera position on the spline through pPos0..3,
 // the look-at point on the one through pLook0..3, and the field of view between fFov1 and fFov2,
@@ -677,6 +678,8 @@ void   fn_800C7480(f32* pPos0, f32* pPos1, f32* pPos2, f32* pPos3, f32* pLook0, 
                    f32* pLook3, f32* pCam, f32* pSub, f32* pFov, f32 fFov1, f32 fFov2, f32 fT);
 // Not decompiled yet: a share of a fly-by path's spline (fn_8003EA50).
 f32    fn_800C7A9C(FlyByPath* pPath, f32 fT);
+// CamSpline.c: the Catmull-Rom basis matrix.
+extern f32 lbl_80191440[4][4];
 
 // ---- the static and fly-by cameras (GoStaticCam.c, 0x8006449C..) ----------------------------
 

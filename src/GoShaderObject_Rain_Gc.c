@@ -1,16 +1,35 @@
-// GoShaderObject_Rain_Gc.c (EA's name, from its asserts; also in EA's 2002 source tree; TW06): not
-// yet decompiled; the sweep code below is the matched small functions.
+// GoShaderObject_Rain_Gc.c (EA's name, from its asserts; also in EA's 2002 source tree; TW06): the
+// rain shader object. Partly decompiled.
 
 #include "game_types.h"
+#include "engine.h"
+#include "rain.h"
+#include "gx.h"
+#include "core/startup.h"
 
-// ---- sweep code (not yet cleaned up) ----
+void fn_80012520(u32 ePrim, u32 eFormat, u16 nVerts);  // LLFont.c: GXBegin
+void fn_800124A8(void);                                // LLFont.c: end the primitive
+void fn_800B58B4(s32 p0);
+void fn_800B58C0(f32 farg0, f32 farg1, f32 farg2);
+void fn_800B58FC(f32* pA, f32* pOut);
 
+void fn_800B4B5C(void);
 void fn_800B4BB0(void);
 void fn_800B4BB4(void);
-extern s32 lbl_802814B8;
 void fn_800B4BB8(void);
 void fn_800B4BD8(void);
 void fn_800B4BFC(void);
+void fn_800B4C00(RainList* pList, int nDrops);
+void SD_vShaderObject_Rain_Dynamic_Init(RainObject* pRain, f32* pStrength);
+void fn_800B4F24(RainObject* pRain);
+
+void fn_800B4B5C(void) {
+    lbl_802814B8->n0 = 0;
+    lbl_802814B8->n4 = 0;
+    lbl_802814B8->f8 = fn_80029B64(3075.0f);
+    lbl_802814B8->pBank = NULL;
+    lbl_802814B8->pTex = NULL;
+}
 
 void fn_800B4BB0(void) {
 }
@@ -19,23 +38,91 @@ void fn_800B4BB4(void) {
 }
 
 void fn_800B4BB8(void) {
-    *(s32*)((u8*)lbl_802814B8) = 0;
-    *(s32*)(((u8*)lbl_802814B8) + 0x4) = (1 - *(s32*)(((u8*)lbl_802814B8) + 0x4));
+    lbl_802814B8->n0 = 0;
+    lbl_802814B8->n4 = 1 - lbl_802814B8->n4;
 }
 
 void fn_800B4BD8(void) {
-    *(s32*)((u8*)lbl_802814B8) = ((((*(s32*)((u8*)lbl_802814B8) + 1) & 0x1) ^ ((u32)(*(s32*)((u8*)lbl_802814B8) + 1) >> 31)) - ((u32)(*(s32*)((u8*)lbl_802814B8) + 1) >> 31));
+    lbl_802814B8->n0 = (lbl_802814B8->n0 + 1) % 2;
 }
 
 void fn_800B4BFC(void) {
 }
 
-// ---- end of sweep code ----
+// Build the display list of nDrops raindrops: each a line from a random point in a 35 x 25 x 35
+// box to 0.2 to 0.3 below it, coloured from palette entries 0 and 1.
+void fn_800B4C00(RainList* pList, int nDrops) {
+    u32 uSize;
+    void* pBuf;
+    f32 fX;
+    f32 fY;
+    f32 fZ;
+    int i;
+
+    uSize = ((nDrops * 32 + 31) & ~31) + 0x400;
+    pBuf = fn_80009B34(uSize, 1, 0x20, "GoShaderObject_Rain_Gc.c", 218);
+    DCInvalidateRange(pBuf, uSize);
+    GXBeginDisplayList(pBuf, uSize);
+    GXResetWriteGatherPipe();
+    GXClearVtxDesc();
+    GXSetVtxDesc(9, 1);         // position, direct
+    GXSetVtxDesc(11, 2);        // colour 0, an 8-bit index
+    GXInvalidateVtxCache();
+    fn_80012520(0xA8, 4, nDrops * 2);   // lines
+    for (i = 0; i < nDrops; i++) {
+        fX = 35.0f * Rand_Float(1) - 17.5f;
+        fY = 25.0f * Rand_Float(1) - 12.5f;
+        fZ = 35.0f * Rand_Float(1) - 17.5f;
+        fn_800B58C0(fX, fY, fZ);
+        fn_800B58B4(0);
+        fn_800B58C0(fX, (fY - 0.2f) - 0.1f * Rand_Float(1), fZ);
+        fn_800B58B4(1);
+    }
+    fn_800124A8();
+    uSize = GXEndDisplayList();
+    pList->pList = fn_80009B34(uSize, 2, 0x20, "GoShaderObject_Rain_Gc.c", 251);
+    Mem_cpy(pList->pList, pBuf, uSize);
+    DCFlushRange(pBuf, uSize);
+    fn_80009E70(pBuf);
+    pList->uSize = uSize;
+}
+
+// Set up a rain object: the drops' display list and its cleared buffers, and find the "splash"
+// texture. pStrength is unused (PsMgr.c, the only caller, passes it).
+void SD_vShaderObject_Rain_Dynamic_Init(RainObject* pRain, f32* pStrength) {
+    RainData* pData = &pRain->data;
+    u64 uSplash;
+    int i;
+
+    fn_800B4C00(&pData->list, 900);
+    for (i = 0; i < 4; i++) {
+        pData->apA[i] = fn_80009B34(RAIN_BUF_A_SIZE, 2, 0x20, "GoShaderObject_Rain_Gc.c", 280);
+        memset(pData->apA[i], 0, RAIN_BUF_A_SIZE);
+    }
+    for (i = 0; i < 2; i++) {
+        pData->apB[i] = fn_80009B34(RAIN_BUF_B_SIZE, 2, 0x20, "GoShaderObject_Rain_Gc.c", 292);
+        memset(pData->apB[i], 0, RAIN_BUF_B_SIZE);
+    }
+    uSplash = fn_8000BEE4("splash");
+    fn_800102DC(uSplash, &lbl_802814B8->pBank, &lbl_802814B8->pTex);
+}
+
+// Free a rain object's list and buffers.
+void fn_800B4F24(RainObject* pRain) {
+    RainData* pData = &pRain->data;
+    int i;
+
+    fn_80009E70(pData->list.pList);
+    for (i = 0; i < 4; i++) {
+        fn_80009E70(pData->apA[i]);
+    }
+    for (i = 0; i < 2; i++) {
+        fn_80009E70(pData->apB[i]);
+    }
+}
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_800B58B4(s32 p0);
-void fn_800B58C0(f32 farg0, f32 farg1, f32 farg2);
 void fn_800B58D4(f32 farg0, f32 farg1);
 void fn_800B58E4(s32 p0, s32 p1, s32 p2, s32 p3);
 
@@ -62,3 +149,25 @@ void fn_800B58E4(s32 p0, s32 p1, s32 p2, s32 p3) {
 }
 
 // ---- end of sweep code ----
+
+// -a into out (four floats)
+#ifdef __MWERKS__
+asm void fn_800B58FC(register f32* pA, register f32* pOut) {
+    nofralloc
+    psq_l  f0, 0(pA), 0, 0
+    psq_l  f1, 8(pA), 0, 0
+    ps_neg f0, f0
+    ps_neg f1, f1
+    psq_st f0, 0(pOut), 0, 0
+    psq_st f1, 8(pOut), 0, 0
+    blr
+}
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void fn_800B58FC(f32* pA, f32* pOut) {
+    pOut[0] = -pA[0];
+    pOut[1] = -pA[1];
+    pOut[2] = -pA[2];
+    pOut[3] = -pA[3];
+}
+#endif
