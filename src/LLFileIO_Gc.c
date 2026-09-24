@@ -138,9 +138,9 @@ int fn_80005EC0(void) {
         lbl_801A0350[j][0] = 0;
     }
     lbl_80281B80 = i = 0;
-    pQueue = lbl_8019E868;
-    pPool = lbl_8019E880;
-    for (; i < 2; i++, pQueue++, pPool++) {
+    for (; i < 2; i++) {
+        pQueue = &lbl_8019E868[i];
+        pPool = &lbl_8019E880[i];
         fn_80005AE8(pQueue, 0, sizeof(FileQueue));
         fn_80005AE8(pPool, 0, sizeof(FileReqPool));
         pQueue->pNext = (FileReq*)pQueue;
@@ -185,12 +185,10 @@ int fn_800060E0(const char* szName) {
     int hFile;
     int i;
     s32 nEntry;
-    DiscFile* pFile;
 
     hFile = -1;
     fn_80005BE8(szName, szPath);
     fn_800B596C("File_Open");
-    pFile = lbl_8019EAD0;
     for (i = 0; i < 32; i++) {
         if (lbl_8019EAD0[i].nEntry == -1) {
             hFile = i;
@@ -204,8 +202,8 @@ int fn_800060E0(const char* szName) {
                 fn_800B7490();
             }
         } while (nEntry < 0);
-        for (i = 0; i < 32; i++, pFile++) {
-            if (nEntry == pFile->nEntry && strcmp(szPath, pFile->szPath) == 0) {
+        for (i = 0; i < 32; i++) {
+            if (nEntry == lbl_8019EAD0[i].nEntry && strcmp(szPath, lbl_8019EAD0[i].szPath) == 0) {
                 hFile = i;
                 lbl_8019EAD0[i].nOpens++;
                 break;
@@ -235,14 +233,14 @@ int fn_8000633C(int hFile) {
     FileQueue* pQueue;
     FileReq* pReq;
     int bClosed;
+    int i;
 
     fn_800B596C("File_Close");
-    // what walked the queues here was compiled out (asserts, likely)
-    pQueue = lbl_8019E868;
-    for (pReq = pQueue->pNext; pReq != (FileReq*)pQueue; pReq = pReq->pNext) {
-    }
-    pQueue++;
-    for (pReq = pQueue->pNext; pReq != (FileReq*)pQueue; pReq = pReq->pNext) {
+    // what walked the two queues here was compiled out (asserts, likely)
+    for (i = 0; i < 2; i++) {
+        pQueue = &lbl_8019E868[i];
+        for (pReq = pQueue->pNext; pReq != (FileReq*)pQueue; pReq = pReq->pNext) {
+        }
     }
     lbl_8019EAD0[hFile].nOpens--;
     if (lbl_8019EAD0[hFile].nOpens <= 0) {
@@ -272,7 +270,6 @@ int fn_80006444(int hFile, void* pDst, u32 uLen, u32 uOffset,
 int fn_80006478(int hFile, void* pDst, u32 uLen, u32 uOffset, void (*pfnDone)(int nBytes, int nError),
                 u8 nPrio, s32 n1C, u8 b20, u8 b21) {
     FileReqPool* pPool;
-    FileQueue* pQueue;
     FileReq* pReq;
 
     fn_800B7490();
@@ -284,14 +281,14 @@ int fn_80006478(int hFile, void* pDst, u32 uLen, u32 uOffset, void (*pfnDone)(in
         pReq->pNext->pPrev = pReq->pPrev;
         pReq->pPrev = pReq;
         pReq->pNext = pReq;
-        pQueue = &lbl_8019E868[nPrio];
-        if (pQueue != NULL) {
-            pReq->pNext = (FileReq*)pQueue;
-            pReq->pPrev = pQueue->pPrev;
-            if (pQueue->pPrev != NULL) {
-                pQueue->pPrev->pNext = pReq;
+        // EA's list insert again, written out on the queue element each time
+        if (&lbl_8019E868[nPrio] != NULL) {
+            pReq->pNext = (FileReq*)&lbl_8019E868[nPrio];
+            pReq->pPrev = lbl_8019E868[nPrio].pPrev;
+            if (lbl_8019E868[nPrio].pPrev != NULL) {
+                lbl_8019E868[nPrio].pPrev->pNext = pReq;
             }
-            pQueue->pPrev = pReq;
+            lbl_8019E868[nPrio].pPrev = pReq;
         }
         lbl_8019E868[nPrio].nCount++;
         pReq->nFile = hFile;
@@ -336,8 +333,8 @@ void* fn_800065C8(const char* szPath, u32* puSize, int nAlign) {
         }
         fn_800B7490();
     }
-    uSize = info.uLength;
-    nLen = uSize;
+    nLen = info.uLength;
+    uSize = nLen;
     pData = fn_80009B34(uSize, 1, nAlign, "LLFileIO_Gc.c", 750);
     if (pData == NULL) {
         return NULL;
@@ -360,7 +357,7 @@ void* fn_800065C8(const char* szPath, u32* puSize, int nAlign) {
         }
     } while (!nStatus);
     if (puSize != NULL) {
-        *puSize = uSize;
+        *puSize = nLen;
     }
     return pData;
 }

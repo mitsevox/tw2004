@@ -50,7 +50,7 @@ extern f32 lbl_80191AA4[70];
 
 
 void  fn_800D344C(UStreamObject* pObject);
-int   fn_801020C0(void);
+int   GameMode4_GetNumEventsWon(void);
 int   fn_801021FC(void);                                // GameMode4: the current ladder event
 f32   fn_800D04AC(int nPlayer);                         // HoleScore.c
 u32   fn_800D0BAC(int nPlayer);                         // the class of the ground the shot left
@@ -357,7 +357,7 @@ int fn_800D3CF8(int nRating) {
 int fn_800D3D10(int nGolfer) {
     int nRating;
 
-    nRating = fn_801020C0();
+    nRating = GameMode4_GetNumEventsWon();
     if (nGolfer >= FIRST_CREATED_GOLFER) {
         return fn_800D3CF8(nRating);
     }

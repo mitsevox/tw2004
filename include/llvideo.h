@@ -11,7 +11,7 @@
 
 #define VIDEO_QUEUE_SIZE 1024
 
-// An MPG2 chunk as UStream.c hands it to the movie player (fn_8007593C): the chunk's header in
+// An MPG2 chunk as UStream.c hands it to the movie player (LLVideo_HandleChunk): the chunk's header in
 // the stream buffer, its tag word replaced by that buffer. A piece of the movie spans nMore + 1
 // chunks in a row.
 typedef struct VideoChunk {
@@ -36,7 +36,7 @@ typedef struct VideoQueue {
 } VideoQueue;
 LAYOUT_ASSERT(VideoQueue, 0x100C);
 
-// A movie being played (0x10B0 bytes; fn_8007593C finds it by the chunk's stream number). Its
+// A movie being played (0x10B0 bytes; LLVideo_HandleChunk finds it by the chunk's stream number). Its
 // decoder reads the queued chunks through fn_800754C0 and decodes into pict.
 typedef struct Video {
     PictStream stream;                  // 0x000  the decoder and its current frame (LLPict_Gc.c)
@@ -45,8 +45,8 @@ typedef struct Video {
     VideoChunk* p1018;                 // 0x1018 a chunk, given back when the movie stops
     int        nSlot;                   // 0x101C its slot in lbl_80281200, -1 when it has none
     u8         b1020;                   // 0x1020 set while the movie runs: chunks are queued
-    u8         b1021;                   // 0x1021 set: fn_80075AD0 skips the movie
-    u8         bEnded;                  // 0x1022 the decoder ran out (fn_800760A8)
+    u8         b1021;                   // 0x1021 set: LLVideo_UpdateAll_80075AD0 skips the movie
+    u8         bEnded;                  // 0x1022 the decoder ran out (LLVideo_HasEnded_800760A8)
     u8         bStarved;                // 0x1023 the queue ran dry while reading
     LLPict     pict;                    // 0x1024 the picture the frames are copied into
     u64        tLast;                   // 0x1098 when the last frame was due (fn_800954A4(0))
@@ -61,7 +61,7 @@ LAYOUT_ASSERT(Video, 0x10B0);
 #define NUM_VIDEO_SLOTS 8
 typedef struct VideoSlots {
     Video* apVideo[NUM_VIDEO_SLOTS];    // 0x00  fn_80075904 puts a movie in a slot
-    int    n20;                         // 0x20  fn_800128A4()'s value while a movie shows
+    int    n20;                         // 0x20  UFont_GetMode_800128A4()'s value while a movie shows
                                         //       (fn_80075C88 saves it, fn_80075D58 puts it back)
     u8     pad24[4];
 } VideoSlots;
@@ -70,6 +70,6 @@ extern VideoSlots* lbl_80281200;
 extern u8 lbl_80281EB8;                 // fn_80007258()'s value when the last movie started
 
 // Play the movie file pName; pfnStop(pVideo, nArg) nonzero stops it early.
-void fn_80075FB8(const char* pName, u8 (*pfnStop)(Video* pVideo, int nArg), int nArg, int nFlags);
+void LLVideo_PlayFile(const char* pName, u8 (*pfnStop)(Video* pVideo, int nArg), int nArg, int nFlags);
 
 #endif

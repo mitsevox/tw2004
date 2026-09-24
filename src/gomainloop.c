@@ -27,9 +27,9 @@ void fn_8000F0E8(void);
 void fn_800103C0(void);
 void fn_8001049C(void);
 void fn_8001058C(void);
-void fn_8001260C(void);
-void fn_800126C0(void);
-void fn_80012A78(void);
+void UFont_Init(void);
+void UFont_Shutdown(void);
+void UFont_DrawQueue(void);
 void fn_800136F4(void);
 void fn_80013718(void);
 void fn_800137D0(void* pCamera);
@@ -432,7 +432,7 @@ void fn_8006C7A8(void) {
     fn_8000F060();
     fn_8006DC44();
     fn_80016198();
-    fn_8001260C();
+    UFont_Init();
     fn_80015540();
     fn_8006E1C0();
     fn_8007185C();
@@ -478,7 +478,7 @@ void fn_8006C854(void) {
     fn_80076AC8();
     fn_8006E1C4();
     fn_80015620();
-    fn_800126C0();
+    UFont_Shutdown();
     fn_800162A0();
     fn_8006DC48();
     fn_8000F0E8();
@@ -531,7 +531,7 @@ void fn_8006C9EC(void) {
     fn_800905A8();
     fn_801037F8();
     fn_8010A448(0x18000);
-    lbl_80281E60 = fn_80076400();
+    lbl_80281E60 = CA_spCreateCamera();
     fn_800977F8();
     fn_80062E00();
     fn_80039FF8();
@@ -571,7 +571,7 @@ void fn_8006CB2C(void) {
     fn_80077428();
     fn_80076B18(lbl_80281E58);
     fn_8006E214(lbl_80281E5C);
-    fn_8007644C(lbl_80281E60);
+    CA_vDestroyCamera(lbl_80281E60);
     fn_80062E20();
     fn_8003A074();
     fn_80097E98();
@@ -606,7 +606,7 @@ void GO_vInitIG(void) {
     Session_SetupProfiles();
     fn_8001C254();
     fn_80055D54();
-    lbl_80281E60 = fn_80076400();
+    lbl_80281E60 = CA_spCreateCamera();
     lbl_80281E5C = fn_8006E1C8();
     lbl_80281E58 = fn_80076ACC();
     lbl_80281E54 = fn_8001371C(lbl_80281E60, lbl_80281E5C, lbl_80281E58);
@@ -679,7 +679,7 @@ void fn_8006CDC4(void) {
     fn_800137B0(lbl_80281E54);
     fn_80076B18(lbl_80281E58);
     fn_8006E214(lbl_80281E5C);
-    fn_8007644C(lbl_80281E60);
+    CA_vDestroyCamera(lbl_80281E60);
     fn_80091870();
     fn_8011E3B0();
     fn_800A2E14();
@@ -738,7 +738,7 @@ void fn_8006CEFC(void) {
     fn_8006C7A8();
     fn_8009CC00();
     fn_800905A8();
-    lbl_80281E60 = fn_80076400();
+    lbl_80281E60 = CA_spCreateCamera();
     lbl_80281E5C = fn_8006E1C8();
     lbl_80281E58 = fn_80076ACC();
     lbl_80281E54 = fn_8001371C(lbl_80281E60, lbl_80281E5C, lbl_80281E58);
@@ -969,7 +969,7 @@ void fn_8006D27C(void) {
         fn_80038128();
     }
     fn_8008F648(1);
-    fn_80012A78();
+    UFont_DrawQueue();
     fn_800DC664(fn_8001707C(0));
     fn_800DBF34();
     fn_800389C0();
@@ -986,7 +986,7 @@ void fn_8006D7E8(void) {
         fn_8006C8EC(0);
         fn_8008F648(1);
     }
-    fn_80012A78();
+    UFont_DrawQueue();
     fn_8008FD60(1);
     fn_8009069C();
     fn_800382E0();
@@ -1015,7 +1015,7 @@ void fn_8006D838(void) {
             fn_8008C8C4();
         }
     }
-    fn_80012A78();
+    UFont_DrawQueue();
     fn_800BA1A4();
     fn_8009069C();
     fn_8008FD60(1);

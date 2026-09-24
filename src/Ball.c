@@ -637,7 +637,7 @@ f32 fn_80051124(Ball* pBall, f32 fAim, f32* pNormal) {
             fAngle = 1.5707964f;
         }
     } else {
-        fAngle = -fn_8000AD78(vN[0], vN[1]);
+        fAngle = -atan2f(vN[0], vN[1]);
     }
     if (fAngle < -0.76794487f) return -0.76794487f;
     if (fAngle > 0.76794487f) return 0.76794487f;
@@ -661,7 +661,7 @@ f32 fn_800511F0(Ball* pBall, f32 fAim, f32* pNormal) {
             fAngle = 1.5707964f;
         }
     } else {
-        fAngle = -fn_8000AD78(vN[2], vN[1]);
+        fAngle = -atan2f(vN[2], vN[1]);
     }
     if (fAngle < -0.76794487f) return -0.76794487f;
     if (fAngle > 0.76794487f) return 0.76794487f;
@@ -1248,7 +1248,7 @@ f32 Physics_HandleCollision(Ball* pBall, f32* pNormal, SurfaceType* pSurface) {
     } else {
         Vec3Copy(pNormal, vDir);
     }
-    fA  = fn_8000AD78(pNormal[0], pNormal[1]);
+    fA  = atan2f(pNormal[0], pNormal[1]);
     fB  = fn_800095F0(fA);
     fCo = fn_80009638(fA);
     vBent[0] = fn_80055E1C(pNormal[0], pNormal[1], fB, fCo);
@@ -1259,14 +1259,14 @@ f32 Physics_HandleCollision(Ball* pBall, f32* pNormal, SurfaceType* pSurface) {
     fRest = vDir[2];
     fn_80055D70(&pBall->vVel[0], &pBall->vVel[1], fB, fCo);
     fn_80055D70(&pBall->vSpin[0], &pBall->vSpin[1], fB, fCo);
-    fB  = -fn_8000AD78(vBent[2], vBent[1]);
+    fB  = -atan2f(vBent[2], vBent[1]);
     fCo = fn_800095F0(fB);
     fSi = fn_80009638(fB);
     fT  = fn_80055E1C(fC, fRest, fCo, fSi);
     fC  = fn_80055E10(fRest, fT, fCo, fSi);
     fn_80055D70(&pBall->vVel[1], &pBall->vVel[2], fCo, fSi);
     fn_80055D70(&pBall->vSpin[1], &pBall->vSpin[2], fCo, fSi);
-    fC  = fn_8000AD78(fD, fC);
+    fC  = atan2f(fD, fC);
     fSi = fn_800095F0(fC);
     fCo = fn_80009638(fC);
     fn_80055D70(&pBall->vVel[0], &pBall->vVel[2], fSi, fCo);
@@ -1705,7 +1705,7 @@ u8 Physics_ProcessCollision(Ball* pBall, f32* pHit, f32* pNormal, SurfaceType* p
             fPrev = pBall->fSpinX;
             fPrev *= 1.95f - gGreenSpeedMul[gGreenSpeedSetting];
             vSpin[2] = fPrev * Ball_SpinKeep(pBall);
-            fAngle = -fn_8000AD78(pBall->vVel[0], pBall->vVel[2]);
+            fAngle = -atan2f(pBall->vVel[0], pBall->vVel[2]);
             fS = fn_800095F0(fAngle);
             fC = fn_80009638(fAngle);
             fn_80055D70(&vSpin[0], &vSpin[2], fS, fC);
@@ -1989,8 +1989,8 @@ void Ball_CupPull(Ball* pBall, f32 fDt) {
         if (fStartDist < INCHES(6.0f)) return;
         if (Vec_Distance(pBall->vStart, (f32*)pBall) > fStartDist - INCHES(1.5f)) return;
 
-        fAngle = fn_8000AD78(pBall->vPos[0] - pBall->vPrev[0], pBall->vPos[2] - pBall->vPrev[2]);
-        fAngle = fabsf(fAngle - fn_8000AD78(vPin[0] - pBall->vPos[0], vPin[2] - pBall->vPos[2]));
+        fAngle = atan2f(pBall->vPos[0] - pBall->vPrev[0], pBall->vPos[2] - pBall->vPrev[2]);
+        fAngle = fabsf(fAngle - atan2f(vPin[0] - pBall->vPos[0], vPin[2] - pBall->vPos[2]));
         while (fAngle > 3.14159265f) {
             fAngle -= 3.14159265f;
         }
@@ -2088,14 +2088,14 @@ void Ball_GroundContact(Ball* pBall, f32 fTicks) {
         } else {
             bFlip = 0;
         }
-        fX = fn_8000AD78(vAxis[0], vAxis[1]);
+        fX = atan2f(vAxis[0], vAxis[1]);
         fn_80055E28(fX, &fSin, &fCos);
         fA   = vAxis[0];
         fAngle = vAxis[2];
         fB   = vAxis[1];
         fn_80055D70(&fA, &fB, fSin, fCos);
         fn_80055D70(&pBall->vVel[0], &pBall->vVel[1], fSin, fCos);
-        fAngle = -fn_8000AD78(fAngle, fB);
+        fAngle = -atan2f(fAngle, fB);
         fn_80055E28(fAngle, &fSin, &fCos);
         fn_80055D70(&pBall->vVel[1], &pBall->vVel[2], fSin, fCos);
         if (!bFlip) {

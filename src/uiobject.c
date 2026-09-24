@@ -43,8 +43,8 @@ void UI_Obj_InitModule(void) {
     lbl_801F5B98[0].a28[2] = 0.03f;
     lbl_801F5B98[0].a28[3] = 0.0f;
     fn_800AE380();
-    lbl_802820CC = fn_80076400();
-    fn_800768E0(lbl_802820CC);
+    lbl_802820CC = CA_spCreateCamera();
+    CA_vInitCamera(lbl_802820CC);
     lbl_801F5B98[0].a0[0] = -0.345f;
     lbl_801F5B98[0].a0[1] = -0.23f;
     lbl_801F5B98[0].a0[2] = -3.13f;
@@ -83,7 +83,7 @@ void fn_800AE338(void) {
         fn_80048860(lbl_802820D0);
     }
     lbl_802820D0 = NULL;
-    fn_8007644C(lbl_802820CC);
+    CA_vDestroyCamera(lbl_802820CC);
     fn_8006E62C(&lbl_801F5B40);
 }
 
@@ -192,8 +192,8 @@ void fn_800AE3F8(int nObj) {
 
     // the object's own lens
     pLens = fn_8001F004();
-    fn_800768E0(lbl_802820CC);
-    fn_8007646C(lbl_802820CC, aEye, lbl_8018EC10);
+    CA_vInitCamera(lbl_802820CC);
+    CA_vSetLookAt(lbl_802820CC, aEye, lbl_8018EC10);
     fn_80045470(lbl_802820CC, 0.00879646f);
     fn_800AF0A8(lbl_802820CC);
     fn_800352BC();

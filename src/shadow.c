@@ -117,7 +117,7 @@ void SH_vSetShadowIntensity(u8 bHigh) {
     lbl_80282168 = fn_80009B34(0x4000, 2, 16, "shadow.c", 182);
     lbl_80282164 = fn_80009B34(0x1000, 2, 16, "shadow.c", 183);
     lbl_80282160 = fn_80009B34(0x1000, 2, 16, "shadow.c", 184);
-    p->pLens = fn_80076400();
+    p->pLens = CA_spCreateCamera();
     p->pRect = fn_80076ACC();
     p->pFrameBuf = fn_8006E1C8();
     fn_8006E26C(p->pFrameBuf, 0.0f, 0.0f, 256.0f, 256.0f, 1.0f, 1.0f);
@@ -170,7 +170,7 @@ void fn_800B2734(void) {
         p->pRect = NULL;
     }
     if (p->pLens != NULL) {
-        fn_8007644C(p->pLens);
+        CA_vDestroyCamera(p->pLens);
         p->pLens = NULL;
     }
     fn_800B246C();

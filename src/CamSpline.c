@@ -281,7 +281,7 @@ void fn_800C7E50(f32* pA, f32* pB, f32* pC, int nDir, f32* pOut, f32 fT) {
             fAngleFrom = 3.0f * PI / 2.0f;
         }
     } else {
-        fAngleFrom = fn_8000AD78(vFrom.z, vFrom.x);
+        fAngleFrom = atan2f(vFrom.z, vFrom.x);
     }
     if (0.0f == vTo.x) {
         if (vTo.z > 0.0f) {
@@ -290,7 +290,7 @@ void fn_800C7E50(f32* pA, f32* pB, f32* pC, int nDir, f32* pOut, f32 fT) {
             fAngleTo = 3.0f * PI / 2.0f;
         }
     } else {
-        fAngleTo = fn_8000AD78(vTo.z, vTo.x);
+        fAngleTo = atan2f(vTo.z, vTo.x);
     }
     if (fAngleFrom < -PI / 2.0f && fAngleTo > PI / 2.0f) {
         fAngleFrom += 2.0f * PI;

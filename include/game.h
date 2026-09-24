@@ -64,7 +64,7 @@ extern u8    lbl_80281E50;              // set after a create-a-player frame, cl
 extern void*       lbl_80281E54;        // the render camera made from the three below (fn_8001371C)
 extern void*       lbl_80281E58;        // } made by fn_80076ACC,
 extern GoFrameBuf* lbl_80281E5C;        // }   fn_8006E1C8
-extern void*       lbl_80281E60;        // }   and fn_80076400 when a game type starts
+extern void*       lbl_80281E60;        // }   and CA_spCreateCamera when a game type starts
 extern u8*   lbl_802811E8;              // [1]: the round is over (fn_8006DC34)
 
 // Replay.c
@@ -579,7 +579,7 @@ void GameModeStableford_Init(void);                 // mode 18 (GameModeStablefo
 void fn_800FEAFC(void);                 // mode 12 (GameMode12.c)
 void GameModeStroke_Init(void);                 // mode 0 (GameModeStroke.c)
 void fn_800FFF34(void);                 // mode 11 (GameMode11.c)
-void fn_80101FEC(void);                 // mode 4 (GameMode4.c)
+void GameMode4_Init(void);                 // mode 4 (GameMode4.c)
 
 int  fn_800E8C24(int nPlayer, int nHole);   // GameModeBestBall.c
 

@@ -44,29 +44,29 @@ extern void (*lbl_80282450)(void);          // the challenge's own end-of-mode c
 
 void  fn_800D39B4(int nPlayer, int nMoney);
 
-void fn_80102404(void);
-u8   fn_80102204(int nProfile, int nEvent);
-int  fn_8010211C(int nEvent);
-int  fn_8010217C(int nEvent);
+void GameMode4_Shutdown(void);
+u8   GameMode4_HasWonEvent(int nProfile, int nEvent);
+int  GameMode4_GetEventHoles_8010211C(int nEvent);
+int  GameMode4_GetEventKind_8010217C(int nEvent);
 int  fn_801021FC(void);
-u8   fn_80102228(int nProfile, int nEvent);
-void fn_8010237C(UStreamObject* pObject);
-void fn_801023A8(UStreamObject* pObject);
-void fn_801025FC(void);
+u8   GameMode4_IsEventOpen(int nProfile, int nEvent);
+void GameMode4_LoadTCMFromStream(UStreamObject* pObject);
+void GameMode4_LoadTCMSFromStream(UStreamObject* pObject);
+void GameMode4_EndGame(void);
 void fn_801027A4(void);
-void fn_80102874(void);
+void GameMode4_WinEvent(void);
 
 // Mode 4 starts: a match against the event's pro, with GameModeMatch's rules.
-void fn_80101FEC(void) {
-    gpGame->pfnInit = fn_80101FEC;
-    gpGame->pfnShutdown = fn_80102404;
+void GameMode4_Init(void) {
+    gpGame->pfnInit = GameMode4_Init;
+    gpGame->pfnShutdown = GameMode4_Shutdown;
     gpGame->pfnSetupNextGolfer = fn_800E9F14;
     gpGame->pfnGetHonors = GameModeMatch_GetHonors;
     gpGame->pfnHoleFinished = GameModeMatch_HoleFinished;
     gpGame->pfnGameFinished = GameModeMatch_GameFinished;
     gpGame->pfnGoToPlayoff = GameModeMatch_GoToPlayoff;
     gpGame->pfnEndHole = GameModeMatch_EndHole;
-    gpGame->pfnEndGame = fn_801025FC;
+    gpGame->pfnEndGame = GameMode4_EndGame;
     gpGame->n4 = 1;
     gpGame->nMulligans = 0;
     gpGame->nC = 1;
@@ -79,33 +79,33 @@ void fn_801020BC(void) {
 }
 
 // The earnings rating of player 0's profile.
-int fn_801020C0(void) {
+int GameMode4_GetNumEventsWon(void) {
     return fn_800584DC(gPlayers[0].nIndex);
 }
 
-int fn_801020EC(int nEvent) {
+int GameMode4_GetEventOpponent(int nEvent) {
     return lbl_802124B8[nEvent].nGolfer;
 }
 
-int fn_80102104(int nEvent) {
+int GameMode4_GetEventCourse_80102104(int nEvent) {
     return lbl_802124B8[nEvent].nCourse;
 }
 
-int fn_8010211C(int nEvent) {
+int GameMode4_GetEventHoles_8010211C(int nEvent) {
     return lbl_802124B8[nEvent].nHoles;
 }
 
 int fn_80102134(void) {
-    return fn_8010211C(fn_801021FC());
+    return GameMode4_GetEventHoles_8010211C(fn_801021FC());
 }
 
 int fn_80102158(void) {
-    return fn_8010217C(fn_801021FC());
+    return GameMode4_GetEventKind_8010217C(fn_801021FC());
 }
 
 // The kind of event: 0 not played here, 1 a challenge, 2 a milestone match (every fourth, and the
 // last two), 3 a match.
-int fn_8010217C(int nEvent) {
+int GameMode4_GetEventKind_8010217C(int nEvent) {
     if (lbl_802124B8[nEvent].n1C != 0) {
         return 0;
     }
@@ -124,17 +124,17 @@ int fn_801021FC(void) {
 }
 
 // Has the profile won the event?
-u8 fn_80102204(int nProfile, int nEvent) {
+u8 GameMode4_HasWonEvent(int nProfile, int nEvent) {
     return gpSaveData[nProfile].aLadderAward[nEvent].bWon;
 }
 
 // Has the profile won every event this one needs?
-u8 fn_80102228(int nProfile, int nEvent) {
+u8 GameMode4_IsEventOpen(int nProfile, int nEvent) {
     int i;
     u8 bOpen = 1;
     for (i = 0; i < 6; i++) {
         if (lbl_802124B8[nEvent].aNeeded[i] != 0 &&
-            !fn_80102204(nProfile, lbl_802124B8[nEvent].aNeeded[i] - 1)) {
+            !GameMode4_HasWonEvent(nProfile, lbl_802124B8[nEvent].aNeeded[i] - 1)) {
             bOpen = 0;
             break;
         }
@@ -143,9 +143,9 @@ u8 fn_80102228(int nProfile, int nEvent) {
 }
 
 // Makes the event current if the profile may play it.
-u8 fn_801022BC(int nProfile, int nEvent) {
+u8 GameMode4_SelectEvent(int nProfile, int nEvent) {
     u8 bOk = 0;
-    if (fn_80102228(nProfile, nEvent)) {
+    if (GameMode4_IsEventOpen(nProfile, nEvent)) {
         lbl_80282438 = nEvent;
         bOk = 1;
     }
@@ -156,23 +156,23 @@ void fn_80102308(s32 n) {
     lbl_8028244C = n;
 }
 
-void fn_80102310(void) {
-    UStream_RegisterHandler('TCM ', fn_8010237C);
-    UStream_RegisterHandler('TCMS', fn_801023A8);
+void GameMode4_RegisterStreamClients(void) {
+    UStream_RegisterHandler('TCM ', GameMode4_LoadTCMFromStream);
+    UStream_RegisterHandler('TCMS', GameMode4_LoadTCMSFromStream);
 }
 
-void fn_80102354(void) {
+void GameMode4_UnregisterStreamClients(void) {
     UStream_UnregisterHandler('TCM ');
 }
 
-void fn_8010237C(UStreamObject* pObject) {
+void GameMode4_LoadTCMFromStream(UStreamObject* pObject) {
     // port: the 'TCM ' object is copied straight into the ladder events (LadderEvent[25]); it is
     // big-endian on disc, so a little-endian port converts it field by field here
     // (docs/format-byteorder.md)
     fn_8000E790(pObject, sizeof(lbl_802124B8), lbl_802124B8);
 }
 
-void fn_801023A8(UStreamObject* pObject) {
+void GameMode4_LoadTCMSFromStream(UStreamObject* pObject) {
     if (pObject) {
         lbl_8028243C.uSize = pObject->uSize;
         lbl_8028243C.pText = fn_800951A0(lbl_8028243C.uSize, 0x10, 1);
@@ -181,7 +181,7 @@ void fn_801023A8(UStreamObject* pObject) {
 }
 
 // The mode ends: the challenge's own callback first, then the saved options go back.
-void fn_80102404(void) {
+void GameMode4_Shutdown(void) {
     if (lbl_80282450) {
         lbl_80282450();
     }
@@ -193,7 +193,7 @@ void fn_80102404(void) {
 }
 
 // Starts the current event: a challenge through mode 5, or a two-player match against its pro.
-void fn_80102468(void) {
+void GameMode4_StartEvent(void) {
     int nEvent;
     int nPins;
     lbl_802816E0 = gSession.options.nC;
@@ -211,7 +211,7 @@ void fn_80102468(void) {
             fn_800EAE38(lbl_802124B8[nEvent].nChallenge - 1);
             fn_800EAF7C();
             lbl_80282450 = gpGame->pfnShutdown;
-            gpGame->pfnShutdown = fn_80102404;
+            gpGame->pfnShutdown = GameMode4_Shutdown;
         } else {
             lbl_80282450 = NULL;
             gpGame->nC = 2;
@@ -237,7 +237,7 @@ u8 fn_801025F4(void) {
 }
 
 // EndGame: a win pays the match prize plus the event's own prize, then the event is scored.
-void fn_801025FC(void) {
+void GameMode4_EndGame(void) {
     int nMargin;
     int nMoney;
     int nProfile;
@@ -257,13 +257,13 @@ void fn_801025FC(void) {
             nEvent = fn_801021FC();
             gPlayers[0].money.nC += lbl_80200538.aLadderPrize[nEvent].nBase;
             gPlayers[0].money.n10 += lbl_80200538.aLadderPrize[nEvent].nPerHole * nMargin;
-            fn_80102874();
+            GameMode4_WinEvent();
         }
     }
 }
 
 // A challenge event ended: its money, then the event is scored.
-void fn_80102704(void) {
+void GameMode4_WinSkinsEvent_80102704(void) {
     s32 nPrize;
     int nMoney = fn_800D38F0(0, 1, 0, &nPrize);
     if (nMoney != 0) {
@@ -274,7 +274,7 @@ void fn_80102704(void) {
             gPlayers[0].money.nC += nMoney;
         }
     }
-    fn_80102874();
+    GameMode4_WinEvent();
 }
 
 // The message for a milestone event.
@@ -303,7 +303,7 @@ void fn_801027A4(void) {
 
 // The event is won: its flag, the pro and the reward unlocked, and a message every fourth event
 // (the last one also pays the ladder's prize).
-void fn_80102874(void) {
+void GameMode4_WinEvent(void) {
     int nProfile = gPlayers[0].nIndex;
     int nEvent;
     u8 bLast;
@@ -348,7 +348,7 @@ int fn_80102A44(int nEvent) {
 }
 
 // Copies the event's name.
-void fn_80102A58(int nEvent, char* szOut) {
+void GameMode4_GetEventName(int nEvent, char* szOut) {
     if (nEvent < 0 || nEvent >= 25) return;
     strcpy(szOut, lbl_8028243C.pText + lbl_802124B8[nEvent].nName);
 }

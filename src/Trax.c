@@ -24,9 +24,9 @@ f32 fn_800BA504(f32 fAlpha);
 void fn_800BA550(void);
 f32 fn_800BA6CC(void);
 f32 fn_800BA700(void);
-void fn_80012898(s32 v);
+void UFont_SetMode_80012898(s32 v);
 void fn_80012B9C(f32 fX, f32 fY);
-void fn_80012868(s32 nFont);
+void UFont_SetFont(s32 nFont);
 void fn_80076128(s32 n);
 
 void fn_800B9FF0(void) {
@@ -181,18 +181,18 @@ void fn_800BA550(void) {
     char szSong[0xA0];          // size unknown: the frame leaves room for this much
 
     vColour[3] = fn_800BA504(0.5f);
-    fn_80012898(1);
+    UFont_SetMode_80012898(1);
     fn_80012B9C(0.8f, 0.8f);
     fn_8006A9AC(vColour);
-    fn_80012868(lbl_801F8458.nFont);
-    fn_800128F8(lbl_801F846C[nTrack].sz0, fn_800BA440() + fn_800BA700(),
+    UFont_SetFont(lbl_801F8458.nFont);
+    UFont_DrawString(lbl_801F846C[nTrack].sz0, fn_800BA440() + fn_800BA700(),
                 fn_800BA40C() + fn_800BA6CC());
     sprintf(szSong, "\"%s\"", lbl_801F846C[nTrack].szSong);
-    fn_800128F8(szSong, fn_800BA440() + fn_800BA700(),
+    UFont_DrawString(szSong, fn_800BA440() + fn_800BA700(),
                 0.029f + (fn_800BA40C() + fn_800BA6CC()));
-    fn_800128F8(lbl_801F846C[nTrack].sz100, fn_800BA440() + fn_800BA700(),
+    UFont_DrawString(lbl_801F846C[nTrack].sz100, fn_800BA440() + fn_800BA700(),
                 0.058f + (fn_800BA40C() + fn_800BA6CC()));
-    fn_80012898(0);
+    UFont_SetMode_80012898(0);
     fn_80076128(11);
 }
 
