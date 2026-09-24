@@ -275,9 +275,9 @@ void fn_80117E98(int nPlayer) {
     if (fn_800EFA70(gpSaveData[nPlayer].tour.nEvent)->nC != 0) {
         gpSaveData[nPlayer].tour.aStats[pWinner->nGolfer].nPlayerOfYearPoints += 3;
     }
-    nFirstPrize = GameModeDriverPGATour_ComputeFirstPrizeForBracket(gpSaveData[nPlayer].tour.nEvent,
+    nFirstPrize = fn_800EFCC0(gpSaveData[nPlayer].tour.nEvent,
                                                                     fn_800EF0E0(nPlayer));
-    nPurse = GameModeDriverPGATour_ComputePurseForBracket(gpSaveData[nPlayer].tour.nEvent,
+    nPurse = fn_800EFCFC(gpSaveData[nPlayer].tour.nEvent,
                                                           fn_800EF0E0(nPlayer));
     fn_8011BAD4(nPlayer, nFirstPrize, nPurse);
     fn_801180C4(nPlayer, bUser, bFirst);

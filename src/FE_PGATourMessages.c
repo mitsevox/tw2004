@@ -469,7 +469,7 @@ void fn_8010F440(MsgArg* pArgs, MsgArg* pResult) {
 
     fn_800D28DC(fn_80077ACC()->aC8[nEvent].award.nDate, ((MsgString*)pArgs[1].p)->pStr);
     strcpy(szName, fn_80077ACC()->szName);
-    GameModeDriverPGATour_GetWinnerEarningsString(nEvent, szEarnings);
+    fn_800EFF7C(nEvent, szEarnings);
     fn_800907AC(fn_80077ACC()->aC8[nEvent].n6 * 1000, szMoney);
     *pScore = fn_80077ACC()->aC8[nEvent].nScore;
 }

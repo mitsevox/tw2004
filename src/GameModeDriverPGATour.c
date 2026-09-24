@@ -1,6 +1,6 @@
 // GameModeDriverPGATour.c (TW06's GameModeDriverPGATour): game mode 23, a PGA Tour season of 31
 // tournaments (gPgaData, loaded from the 'PGA' stream objects), with the player's results kept in
-// the save profile (TourSeason): "Did Not Play", "Cut", a finishing place, "Tied (%d players)".
+// the save profile (TourSeason): "Did Not Play", "Cut" or a finishing place.
 
 #include "golfer.h"
 #include "game.h"
@@ -49,7 +49,7 @@ s32  GameModeDriverPGATour_GetEventOnOrAfter(s32 i);
 s32  fn_800F02A8(void);
 
 // Stroke play's hole and honors rules, the tour's own round and
-// playoff handling; no mulligans, one player.
+// playoff handling; no mulligans, no split screen.
 void GameModeDriverPGATour_Init(void) {
     gpGame->pfnInit = GameModeDriverPGATour_Init;
     gpGame->pfnShutdown = fn_800EE02C;
@@ -128,7 +128,8 @@ void GameModeDriverPGATour_Locale_PgaTourMode_LoadPGAnFromStream(UStreamObject* 
     }
 }
 
-// The mode ends: one player back, and the options it changed come back.
+// The mode ends: gpGame's nC and n10 go back to 1 and the options nC and nWind come back;
+// n18, which fn_800EE0A0 replaced, is not put back.
 void fn_800EE02C(void) {
     gpGame->nC = 1;
     gpGame->n10 = 1;
@@ -254,7 +255,7 @@ u8 GameModeDriverPGATour_IsPuttForLead(int nPlayer) {
 }
 
 // In a playoff, a putt for the lead; otherwise on the
-// last round, a putt that would put the player ahead.
+// last hole of the last round, a putt that would put the player ahead.
 u8 GameModeDriverPGATour_IsPuttForWin(s32 nPlayer) {
     s32 nRounds;
     if (gpGame->bD4) {
@@ -265,7 +266,7 @@ u8 GameModeDriverPGATour_IsPuttForWin(s32 nPlayer) {
            fn_800E1904(nPlayer, 1) + 1 < fn_80119588(nPlayer, 1);
 }
 
-// Strokes behind the leader (in a playoff, on this hole).
+// Strokes ahead of the best other player, negative when behind (in a playoff, on this hole).
 s32 GameModeDriverPGATour_GetCurrentLead(int nPlayer) {
     if (gpGame->bD4) {
         return fn_8011A7C8(nPlayer, Game_CurHoleIndex()) - gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
@@ -590,7 +591,7 @@ void GameModeDriverPGATour_EndHole(void) {
 }
 
 // Called by its slot. Whether the round is over: no selected
-// hole is left and it was the last round, and no playoff follows (in a playoff, after every hole).
+// hole is left and, after the last round, no playoff follows (in a playoff, after every hole).
 u8 GameModeDriverPGATour_GameFinished(u8 bCheck) {
     s32 i;
     if (gpGame->bD4) {
@@ -609,9 +610,9 @@ u8 GameModeDriverPGATour_GameFinished(u8 bCheck) {
     return 1;
 }
 
-// Called by its slot. A tie for the lead after the last round
-// goes to a playoff: the scores are cleared and the playoff holes (16..18 of the course, looping)
-// are set up. bCheck is not read.
+// Called by its slot. A tie for the lead with the player in it (after the last round, or after a
+// playoff hole) goes to a playoff: the scores are cleared and the next playoff hole (16..18 of the
+// course, looping) is the only one selected. bCheck is not read.
 u8 GameModeDriverPGATour_GoToPlayoff(u8 bCheck) {
     u8 bPlayoff = 0;
     s32 i;
@@ -687,7 +688,7 @@ s32 GameModeDriverPGATour_GetNextEvent(void) {
     return GameModeDriverPGATour_GetEventOnOrAfter(gpSaveData[nPlayer].tour.nEvent + 1);
 }
 
-// The last tournament there is.
+// The last tournament held this season (searched from tournament 1 on; 0 if none).
 s32 GameModeDriverPGATour_GetFinalEventOfSeason(void) {
     s32 nLast = 0;
     s32 i = GameModeDriverPGATour_GetEventOnOrAfter(1);
@@ -783,14 +784,14 @@ Tournament* fn_800EFC80(u16 nDate) {
     return 0;
 }
 
-// Tournament i's first prize in bracket k (by shape).
-s32 GameModeDriverPGATour_ComputeFirstPrizeForBracket(s32 i, s32 k) {
+// Tournament i's total purse in bracket k, in dollars.
+s32 fn_800EFCC0(s32 i, s32 k) {
     Tournament* p = fn_800EFA70(i);
     return p->aPrize[k][0] * 1000;
 }
 
-// Tournament i's purse in bracket k (by shape).
-s32 GameModeDriverPGATour_ComputePurseForBracket(s32 i, s32 k) {
+// Tournament i's first prize (the winner's share) in bracket k, in dollars.
+s32 fn_800EFCFC(s32 i, s32 k) {
     Tournament* p = fn_800EFA70(i);
     return p->aPrize[k][1] * 1000;
 }
@@ -855,9 +856,9 @@ s32 GameModeDriverPGATour_GetCourses(Tournament* p, s32* pCourses) {
     return 0;
 }
 
-// Tournament i's first prize as text: in the
+// Tournament i's total purse as text: in the
 // player's bracket when it was played, else in the current one.
-void GameModeDriverPGATour_GetWinnerEarningsString(s32 i, char* pDst) {
+void fn_800EFF7C(s32 i, char* pDst) {
     PlayerNumber_t nPlayer = PLR_1_e;
     SeasonEvent* p = &gpSaveData[nPlayer].tour.aEvent[i];
     s32 nBracket;
@@ -866,7 +867,7 @@ void GameModeDriverPGATour_GetWinnerEarningsString(s32 i, char* pDst) {
     } else {
         nBracket = fn_800EF0E0(nPlayer);
     }
-    fn_800907AC(GameModeDriverPGATour_ComputeFirstPrizeForBracket(i, nBracket), pDst);
+    fn_800907AC(fn_800EFCC0(i, nBracket), pDst);
 }
 
 // The leader's name, or "Tied (%d players)".
@@ -887,8 +888,8 @@ int fn_800F009C(void) {
     return fn_8011937C(0, nLeader, fn_8011908C(0, nLeader) == 0);
 }
 
-// The same for the purse.
-void GameModeDriverPGATour_GetPurseString(s32 i, char* pDst) {
+// The same for the first prize (the winner's share).
+void fn_800F00F8(s32 i, char* pDst) {
     PlayerNumber_t nPlayer = PLR_1_e;
     SeasonEvent* p = &gpSaveData[nPlayer].tour.aEvent[i];
     s32 nBracket;
@@ -897,7 +898,7 @@ void GameModeDriverPGATour_GetPurseString(s32 i, char* pDst) {
     } else {
         nBracket = fn_800EF0E0(nPlayer);
     }
-    fn_800907AC(GameModeDriverPGATour_ComputePurseForBracket(i, nBracket), pDst);
+    fn_800907AC(fn_800EFCFC(i, nBracket), pDst);
 }
 
 // The player's own score in the current tournament. The event (EventInfo.c passes it) is not used.
@@ -905,7 +906,7 @@ int fn_800F018C(s32 nEvent) {
     return fn_8011937C(0, 0, fn_8011908C(0, 0) == 0);
 }
 
-// A tournament's result for the season screen:
+// Profile 0's result in tournament i:
 // "Did Not Play", "Cut", or the place.
 void GameModeDriverPGATour_GetUserFinishString(s32 i, char* pDst) {
     switch (gpSaveData->tour.aEvent[i].nUserRankType) {
