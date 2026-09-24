@@ -6,6 +6,7 @@
 #define SHADOW_H
 
 #include "camera.h"
+#include "engine.h"
 #include "gx.h"
 
 typedef struct Shadow {
@@ -36,10 +37,14 @@ typedef struct Shadow {
 LAYOUT_ASSERT(Shadow, 0x500);
 
 extern Shadow* lbl_802814A8;
-extern void* lbl_80282160;      // } buffers SH_vSetShadowIntensity allocates
-extern void* lbl_80282164;      // }   (0x1000, 0x1000, 0x4000, 0x2000 and 0x6000 bytes)
-extern void* lbl_80282168;      // }
-extern void* lbl_8028216C;      // }
-extern void* lbl_80282170;      // }
+extern f32   lbl_802814AC;      // how far the shadow's ground mesh is lifted (fn_800B2FB0)
+extern s32   lbl_80282158;      // the most strips and vertices a shadow mesh has used
+extern s32   lbl_8028215C;      //   (fn_800B2FB0)
+// The shadow's ground mesh, made by SH_vSetShadowIntensity (0x200 strips, 0x800 vertices):
+extern TrailDraw* lbl_80282160; // the strips
+extern s16*  lbl_80282164;      // the vertex indices
+extern f32*  lbl_80282168;      // the texture coordinates, two a vertex
+extern u8*   lbl_8028216C;      // the colours, four bytes a vertex
+extern f32*  lbl_80282170;      // the positions, three a vertex
 
 #endif

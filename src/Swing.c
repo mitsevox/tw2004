@@ -61,22 +61,6 @@ typedef struct ModeStateDef {
     void (*pfnExit)(void);
 } ModeStateDef;
 
-typedef struct TrailDraw {
-    s32  nPrims;                // 0x0
-    s16  nFirst;                // 0x4
-    s16  nCount;                // 0x6
-} TrailDraw;
-
-typedef struct TrailMeshDesc {
-    s16        n0;              // 0x00
-    s16        nVerts;          // 0x02
-    TrailDraw* pDraw;           // 0x04
-    s16*       pIndices;        // 0x08
-    f32*       pPos;            // 0x0C
-    u8*        pColour;         // 0x10
-    f32*       pUV;             // 0x14
-} TrailMeshDesc;
-
 typedef struct Vec4 { f32 x, y, z, w; } Vec4;
 
 // Rows of gForgivenessTable, in pairs (threshold, scale) unless noted.
