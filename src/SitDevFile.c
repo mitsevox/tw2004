@@ -734,7 +734,7 @@ u8 fn_800BCF84(SitDevAction* pAction, int nPlayer, u8 nEvent) {
             nKind = lbl_80282208->p1C[pAction->aList[i] & 0x7FFF].nKind;
             if (!lbl_802811B8->abPlayed[nKind]) {
                 aaIndex[nKind][anCount[nKind]] = i;
-                anCount[nKind]++;
+                anCount[(u32)nKind]++;      // fake match: a second spelling of the index, not CSE'd
             }
         }
     }
