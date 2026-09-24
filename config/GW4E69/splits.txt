@@ -492,6 +492,8 @@ unsorted/sweep_8009B314.c:
 
 Code8009B340.c:
 	.text       start:0x8009B340 end:0x8009B630
+	.sbss       start:0x80281FA0 end:0x80281FA8
+	.sdata2     start:0x80283EC0 end:0x80283EC8
 
 GoGreenGrid.c:
 	.text       start:0x8009B630 end:0x8009CB9C
@@ -592,6 +594,8 @@ Trax.c:
 
 ScreenClear.c:
 	.text       start:0x800BA74C end:0x800BA940
+	.sbss       start:0x802821F0 end:0x802821F8
+	.sdata2     start:0x80284238 end:0x80284248
 
 Code800BA940.c:
 	.text       start:0x800BA940 end:0x800BAD60
