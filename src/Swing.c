@@ -515,10 +515,11 @@ f32 fn_8005CC84(f32 fTan) {
 // threshold, all of it above. Putts, chips and pitches skip the error; a putt over 75% on the
 // meter counts as full power.
 f32 SW_vCalculateShotPower(int nPlayer) {
-    f32*    pPower;
+    int     nAttr;
     f32     fPower, fError;
     int     nRowScale, nRowThresh;
-    int     nAttr;
+    f32*    pPower;
+    int     nKind;
     f32     fThresh, fScale;
 
     if (Player_IsCPU(nPlayer) || gPlayers[nPlayer].bPerfect) {
@@ -537,7 +538,8 @@ f32 SW_vCalculateShotPower(int nPlayer) {
     pPower = &PLAYER(nPlayer)->fPower;
     fError = fabs(gPlayers[nPlayer].swing.fMishitAngle);
     gPlayers[nPlayer].swing.fNonPowerShotPower = Swing_ApplyPowerBoost(nPlayer, fPower) - fError;
-    switch (gPlayers[nPlayer].nShotKind) {
+    nKind = gPlayers[nPlayer].nShotKind;
+    switch (nKind) {
     case SHOT_TYPE_PUTT_e: {
         f32 fDist = gPlayers[nPlayer].fDistance < 1.0f ? 1.0f : gPlayers[nPlayer].fDistance;
         if (*pPower > gpSwing->fPuttFullPower) {
@@ -553,7 +555,7 @@ f32 SW_vCalculateShotPower(int nPlayer) {
     case SHOT_TYPE_CHIP_e:
     case SHOT_TYPE_PITCH_e: {
         f32 f;
-        if (gPlayers[nPlayer].nShotKind == SHOT_TYPE_CHIP_e) {
+        if (nKind == SHOT_TYPE_CHIP_e) {
             f = *pPower * Physics_EstimateShotPower(gPlayers[nPlayer].fDistance, &gPlayers[nPlayer].ball,
                                                     SHOT_TYPE_CHIP_e, gPlayers[nPlayer].nClub);
         } else {
@@ -586,7 +588,8 @@ f32 SW_vCalculateShotPower(int nPlayer) {
             nRowThresh = ROW_DRIVING_PWR;
             nAttr      = (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_DRIVING_ACCURACY, ATTR_TOTAL);
         }
-        fPower = *pPower * AI_PowerScale(nPlayer);
+        fPower = *pPower;
+        fPower *= AI_PowerScale(nPlayer);
         fPower = Swing_ApplyPowerBoost(nPlayer, fPower);
         fPower = Swing_TeeSweetSpot(nPlayer, fPower);
         break;
