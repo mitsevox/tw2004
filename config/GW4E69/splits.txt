@@ -296,6 +296,8 @@ Code8006F154.c:
 
 Code8006F438.c:
 	.text       start:0x8006F438 end:0x8006F608
+	.sdata      start:0x802811E8 end:0x802811F0
+	.sbss       start:0x80281E68 end:0x80281E70
 
 unsorted/sweep_8006F608.c:
 	.text       start:0x8006F608 end:0x8006F64C
