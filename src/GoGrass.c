@@ -15,7 +15,9 @@ void fn_8011E4A4(void);
 void fn_8011EE4C(void);
 void fn_8011EF88(void);
 void fn_8011F374(void);
-s32 fn_8011F3AC();
+void fn_8011F3AC(void);
+void fn_800082CC(void* p);
+void fn_8003519C(int nRow, void* pData);   // GoTerrain.c: calls row nRow's function with pData
 void fn_8011E974(void);
 void fn_8011EAB8(void);
 void fn_8011EBF8(void);
@@ -262,6 +264,49 @@ void fn_8011F374(void) {
     fn_80012EF8();
 }
 
+// Draws the buffers in use in two passes: the camera's direction, flattened and normalised, picks
+// the quadrant; each buffer's position goes to fn_8003519C row 17, then the buffer is drawn.
+void fn_8011F3AC(void) {
+    f32 vDir[4];
+    s32 nPass;
+    int i;
+    GrassBuffer* pBuffer;
+    s32 nBuffers;
+    CamLens* pLens = fn_8001F004();
+
+    nBuffers = lbl_80281900->anF8[lbl_80281900->n100];
+    Vec_Copy(pLens->v24, vDir);
+    vDir[1] = 0.0f;
+    if (vDir[0] != 0.0f || vDir[1] != 0.0f || vDir[2] != 0.0f) {
+        fn_800BAF04(vDir, vDir);
+    }
+    if (vDir[2] < 0.0f) {
+        lbl_80281900->n360 = 0;
+    } else {
+        lbl_80281900->n360 = 1;
+    }
+    if (vDir[0] < 0.0f) {
+        lbl_80281900->n364 = 0;
+    } else {
+        lbl_80281900->n364 = 1;
+    }
+    lbl_80281900->f358 = fabs(vDir[2]);
+    lbl_80281900->f35C = fabs(vDir[0]);
+    lbl_80281900->f354 = lbl_80281900->f3B4;
+    lbl_80281900->f348 = lbl_80281900->f3D0;
+    lbl_80281900->f368 = lbl_80281900->f3B8;
+    for (nPass = 0; nPass < 2; nPass++) {
+        for (i = 0; i < nBuffers; i++) {
+            pBuffer = lbl_80281900->apF0[lbl_80281900->n100][i];
+            lbl_80281900->f34C = pBuffer->f0;
+            lbl_80281900->f350 = pBuffer->f4;
+            lbl_80281900->n36C = nPass;
+            fn_8003519C(17, &lbl_80281900->f348);
+            fn_800082CC(pBuffer->a14);
+        }
+    }
+}
+
 // Puts pBuffer in the first free one of the 16 apDC slots.
 void fn_8011FD74(GrassBuffer* pBuffer) {
     int i;
@@ -333,6 +378,7 @@ void fn_80120194(void) {
 
 s32 fn_8012022C(void);
 f32 fn_80120244(f32 fX, f32 fM);
+void fn_80120268(f32* pA, f32* pB, f32* pOut);
 s32 fn_8012028C(u8* p0);
 
 s32 fn_8012022C(void) {
@@ -343,6 +389,29 @@ s32 fn_8012022C(void) {
 f32 fn_80120244(f32 fX, f32 fM) {
     return fmod(fX, fM);
 }
+
+// b + a into out (three floats)
+#ifdef __MWERKS__
+asm void fn_80120268(register f32* pA, register f32* pB, register f32* pOut) {
+    nofralloc
+    psq_l  f0, 0(pA), 0, 0
+    psq_l  f1, 8(pA), 1, 0
+    psq_l  f2, 0(pB), 0, 0
+    psq_l  f3, 8(pB), 1, 0
+    ps_add f2, f2, f0
+    ps_add f3, f3, f1
+    psq_st f2, 0(pOut), 0, 0
+    psq_st f3, 8(pOut), 1, 0
+    blr
+}
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void fn_80120268(f32* pA, f32* pB, f32* pOut) {
+    pOut[0] = pB[0] + pA[0];
+    pOut[1] = pB[1] + pA[1];
+    pOut[2] = pB[2] + pA[2];
+}
+#endif
 
 s32 fn_8012028C(u8* p0) {
     return (*(s32*)p0 + 88);

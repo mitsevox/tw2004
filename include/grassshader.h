@@ -99,7 +99,9 @@ typedef struct GrassTile {
 
 // One of GoGrass.c's buffers, kept in GrassManager.apD8 / apDC.
 typedef struct GrassBuffer {
-    u8  unk0[0x14];
+    f32 f0;                     // 0x00  } handed on by fn_8011F3AC
+    f32 f4;                     // 0x04  }
+    u8  unk8[0x14 - 0x8];
     u8  a14[0x44 - 0x14];       // 0x14  handed to fn_80008248 when the buffer is put back
     s32 n44;                    // 0x44  its size: fn_8011FDEC picks the smallest big enough
 } GrassBuffer;
@@ -135,17 +137,29 @@ typedef struct GrassManager {
     GrassBuffer** apF0[2];      // 0xF0  two buffer lists; n100 picks the one in use
     s32          anF8[2];       // 0xF8  their lengths
     s32          n100;          // 0x100
-    u8           unk104[0x370 - 0x104];
+    u8           unk104[0x348 - 0x104];
+    // 0x348..0x370: the block fn_8011F3AC hands to fn_8003519C (row 17) once per buffer and pass.
+    f32          f348;          // 0x348  f3D0
+    f32          f34C;          // 0x34C  the buffer's f0
+    f32          f350;          // 0x350  the buffer's f4
+    f32          f354;          // 0x354  f3B4
+    f32          f358;          // 0x358  |z| of the camera's flattened direction
+    f32          f35C;          // 0x35C  |x| of it
+    s32          n360;          // 0x360  0 when its z is below 0, else 1
+    s32          n364;          // 0x364  0 when its x is below 0, else 1
+    f32          f368;          // 0x368  f3B8
+    s32          n36C;          // 0x36C  the pass (0 or 1)
     void*        p370;          // 0x370  an allocation; set while the grass is on (fn_8012022C)
     u8           unk374[0x3A4 - 0x374];
     s32          n3A4;          // 0x3A4  the last chunk's GrassChunkData.n0
     u8           unk3A8[0x3B0 - 0x3A8];
     f32          f3B0;          // 0x3B0  the height the grass lens looks down from (fn_8011EB04)
-    u8           unk3B4[0x3B8 - 0x3B4];
+    f32          f3B4;          // 0x3B4
     f32          f3B8;          // 0x3B8  the last chunk's GrassChunkData.f4
     u8           unk3BC[0x3CC - 0x3BC];
     s32          n3CC;          // 0x3CC
-    u8           unk3D0[0x3E0 - 0x3D0];
+    f32          f3D0;          // 0x3D0
+    u8           unk3D4[0x3E0 - 0x3D4];
     s32          n3E0;          // 0x3E0
 } GrassManager;
 
