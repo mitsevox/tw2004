@@ -23,6 +23,25 @@ int  fn_800D1330(int nPlayer);
 void fn_800D1674(f32* pA, f32* pB, f32* pOut);
 void fn_800C8C3C(int nView, f32* pOut);   // GoBreakLine: a point kept per view
 
+// Whether holing the ball now would finish the hole: puts the ball in the cup with one more
+// stroke, asks the mode (pfnHoleFinished, only asking), then puts both back.
+u8 fn_800D024C(int nPlayer) {
+    int nLie;
+    int nStrokes;
+    int bFinished;
+
+    nLie = gPlayers[nPlayer].ball.nLie;
+    gPlayers[nPlayer].ball.nLie = LIE_INCUP_e;
+    nStrokes = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
+    gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()]++;
+    lbl_80282240 = 1;
+    bFinished = gpGame->pfnHoleFinished(nPlayer, 1) != 0;
+    lbl_80282240 = 0;
+    gPlayers[nPlayer].ball.nLie = nLie;
+    gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] = nStrokes;
+    return bFinished;
+}
+
 // The ball's distance from the pin: where it lies, where the shot started, and where it lay before
 // the shot.
 f32 fn_800D0478(int nPlayer) {
@@ -238,7 +257,8 @@ u8 fn_800D0BF8(int nPlayer, u8 bUnder, u8 bAnyLie) {
             nLie = gPlayers[nPlayer].ball.nLie;
             nStrokes = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
             if (bUnder) {
-                if (pSurface->nClass != 3 && (nLie == LIE_GREEN_e || nLie == LIE_INCUP_e) && nStrokes < nPar - 2) {
+                if (pSurface->nClass != 3 && (nLie == LIE_GREEN_e || nLie == LIE_INCUP_e) &&
+                    nStrokes < nPar - 2) {
                     return 1;
                 }
             } else if (pSurface->nClass != 3 && (nLie == LIE_GREEN_e || nLie == LIE_INCUP_e) &&
@@ -397,6 +417,73 @@ int fn_800D1330(int nPlayer) {
         }
     }
     return nPutts;
+}
+
+// Where the wind blows from the player's aim, by quarter: 2 within 45 degrees of the aim, 4 the
+// next quarter round, 1 the opposite quarter, 3 the last; 0 when the wind is 6 or less.
+int fn_800D13F4(int nPlayer) {
+    f32 vWind[4];
+    f32 fAim = gPlayers[nPlayer].fAim;
+    f32 fAngle;
+
+    if (Wind_Get(vWind) > 6.0f) {
+        fAngle = fn_8000AD78(-vWind[0], vWind[2]) - fAim;
+        while (fAngle < 0.0f) {
+            fAngle += 2.0f * PI;
+        }
+        while (fAngle > 2.0f * PI) {
+            fAngle -= 2.0f * PI;
+        }
+        if (fAngle >= 7.0f * PI / 4.0f || fAngle <= PI / 4.0f) {
+            return 2;
+        }
+        if (fAngle >= PI / 4.0f && fAngle <= 3.0f * PI / 4.0f) {
+            return 4;
+        }
+        if (fAngle >= 3.0f * PI / 4.0f && fAngle <= 5.0f * PI / 4.0f) {
+            return 1;
+        }
+        if (fAngle >= 5.0f * PI / 4.0f && fAngle <= 7.0f * PI / 4.0f) {
+            return 3;
+        }
+        return 0;
+    }
+    return 0;
+}
+
+// The slope of the ground under the ball across the player's aim, in whole degrees (+-90 when the
+// ground's normal has no part along the aim); 0 with no ground or a normal not of length 1.
+int fn_800D1530(int nPlayer) {
+    f32 vNormal[4];
+    f32 vTurned[4];
+    f32 fLength;
+    f32 fAim;
+    f32 fSin;
+    f32 fCos;
+    f32 fDegrees;
+
+    if (!Ter_GetSupportingGroundNormal(fn_8000C594(), gPlayers[nPlayer].ball.vPos, vNormal)) {
+        return 0;
+    }
+    fLength = fn_80009744(vNormal);
+    if (fLength > 1.01f || fLength < 0.99f) {
+        return 0;
+    }
+    fAim = gPlayers[nPlayer].fAim;
+    fSin = fn_800095F0(fAim);
+    fCos = fn_80009638(fAim);
+    Vec3Copy(vNormal, vTurned);
+    fn_80055D70(&vTurned[2], &vTurned[0], fSin, fCos);
+    if (vTurned[1] < 0.000001f && vTurned[1] > -0.000001f) {
+        if (vTurned[0] < 0.0f) {
+            fDegrees = -90.0f;
+        } else {
+            fDegrees = 90.0f;
+        }
+    } else {
+        fDegrees = fn_8000AD78(vTurned[0], vTurned[1]) * (180.0f / PI);
+    }
+    return (int)fDegrees;
 }
 
 // a - b into out (three floats)

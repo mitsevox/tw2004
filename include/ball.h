@@ -294,6 +294,7 @@ u8   Ter_SearchForDropLocation(int nPlayer, u8 bPreferred, u8 bCheck, f32* pOut)
 f32  Ter_CheckForDropLocation(CourseInfo* pCourse, f32* pPos, u8 bOnDropSurface, u8* pbDrop, u8* pbPreferred,
                               SurfaceType** ppSurface);   // whether a ball could be dropped at a point
 u8   Ter_IsValidDropSurface(s32 nSurface);
+u8   Ter_GetSupportingGroundNormal(CourseInfo* pCourse, f32* pPos, f32* pNormal);   // 0 with no ground
 u8   fn_80050A9C(f32* pA, f32* pB, f32* pC, f32 fX, f32 fZ);   // (x, z) lies inside the triangle
 void fn_800509D8(f32 (*pTri)[3], f32* pPos, f32* pA, f32* pB, f32* pC);   // a point's weights in a triangle
 f32  fn_8004D5C0(CourseInfo* pCourse, f32* pPos);   // ground height, -65536.1 if none
@@ -342,6 +343,7 @@ void fn_80055CD0(int n);
 void Wind_Set(int nDir, f32 fSpeed);
 f32  Wind_Get(f32* pOut);               // the wind's speed; its vector (direction x speed) into pOut
 void Wind_Generate(void);
+void fn_80055D70(f32* pA, f32* pB, f32 fSin, f32 fCos);   // turns the pair (*pA, *pB) by an angle
 
 void fn_80047B6C(Ball* pBall, int nPlayer);
 void fn_80047BC0(Ball* pBall, int nPlayer);
