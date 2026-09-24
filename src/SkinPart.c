@@ -96,8 +96,8 @@ void fn_800CC1EC(Character* pChar, SkinChoices* pChoices) {
 
 // Gives the six skins of p16D8 their choices from pChoices, in all four copies.
 void fn_800CC408(Character* pChar, SkinChoices* pChoices) {
-    int i;
     int j;
+    int i;
 
     if (pChar == NULL || pChoices == NULL || pChar->p16D8 == NULL) return;
     for (i = 0; i < 6; i++) {
@@ -208,8 +208,8 @@ void fn_800CC7DC(Character* pChar, int nSkin, u64 uSet, u64 uVariant, u64 uOptio
 // Sets every set of the six skins that has a "DefaultL" variant to it (bOn) or to its first
 // variant, keeping the option.
 void fn_800CC8BC(Character* pChar, u8 bOn) {
-    int i;
     int j;
+    int i;
     int nSets;
     int nVariant;
     int nOption;
@@ -650,8 +650,8 @@ void fn_800CD7D4(Skin* pSkin, SkinMesh* pMesh) {
 void fn_800CD844(Skin* pSkin, int n) {
     u8 aBuf[0x48];
     SkinIterArgs args;
-    SkinIter* pIter;
     SkinMesh* pMesh;
+    SkinIter* pIter;
     SkinDesc* pDesc;
 
     pDesc = pSkin->pModel->pDesc;
@@ -1171,10 +1171,10 @@ void fn_800CEB1C(Skin** apSkins, int nSkins, DynTex* pTex) {
 void fn_800CEBE8(Skin** apSkins, int nSkins, DynTex* pTex, u64* aIds, int nIds) {
     SkinListEntry* pList;
     s32 nList;
-    TexBank* pBank;
-    s32 nC;
     int i;
+    s32 nC;
     u64 uId;
+    TexBank* pBank;
 
     pList = NULL;
     if (pTex == NULL) return;
