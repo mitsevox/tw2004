@@ -209,7 +209,8 @@ typedef struct Clip {
     f32    v80[3];              // 0x80  a point fn_8001DB04 puts through bone 0's matrix
     s16    n8C;                 // 0x8C  halfwords per frame, first stream
     s16    n8E;                 // 0x8E  bytes per frame, second stream
-    u8     unk90[0x10];
+    u64    u90;                 // 0x90  looked up in lbl_801B9638 (FEgolferanim.c fn_8008D058)
+    u8     unk98[8];
     char   name[0x30];          // 0xA0
     u8*    pD0;                 // 0xD0
     struct ClipD4* pD4;         // 0xD4
@@ -835,8 +836,7 @@ void* Char_SetClip(Character* pChar, int nGroup, int nStyle, const char* pName);
 void* fn_80017678(Character* pChar, int nGroup, int n);   // char.c: a random item of its 'MAL ' bank
 
 // char.c: turning the character, and its dynamic textures (the menu golfer, FEgolferanim.c).
-void  fn_800192D4(Character* pChar, f32 fAngle);
-void  fn_80019D64(Character* pChar, void (*pfnA)(Character* pChar), void (*pfnB)(Character* pChar));
+void  fn_800192D4(Character* pChar, f32 fAngle);void  fn_80019D64(Character* pChar, void (*pfnA)(Character* pChar), void (*pfnB)(Character* pChar));
 void  fn_80019DE8(Character* pChar);
 void  fn_80019E80(Character* pChar);
 void  fn_80019EF4(Character* pChar);
