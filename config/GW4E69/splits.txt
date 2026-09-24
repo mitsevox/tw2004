@@ -907,6 +907,8 @@ ShaderRow19.c:
 
 EASportsBio.c:
 	.text       start:0x801249A8 end:0x8012597C
+	.data       start:0x80195308 end:0x801953E0
+	.sdata2     start:0x80284B10 end:0x80284B28
 
 GameMode22.c:
 	.text       start:0x8012597C end:0x801270F0

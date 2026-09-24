@@ -392,9 +392,6 @@ s32  fn_80125928(void);             // the Bio's level (0: none loaded)
 
 extern EASBioMgr* lbl_80281988;
 extern EASBInitParams lbl_80261040;
-extern char lbl_80195308[28];       // "Tiger Woods PGA TOUR(R) 2004"
-extern u16 lbl_80195324[14];        // "Rounds Played", 16-bit characters
-extern s32 EASB_gErrorMap[35];      // the memory-card error code for each EASBErrorE
 extern u8 lbl_80282568;
 extern u8 lbl_80282569;
 extern u8 lbl_8028256A;

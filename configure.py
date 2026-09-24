@@ -1010,7 +1010,7 @@ config.libs = [
             Object(NonMatching, "TibExt.c"),
             Object(NonMatching, "gbacable.c"),
             Object(NonMatching, "ShaderRow19.c"),
-            Object(NonMatching, "EASportsBio.c"),
+            Object(Matching, "EASportsBio.c"),
             Object(NonMatching, "GameMode22.c"),
             Object(NonMatching, "SkinBurn.c"),
             Object(Matching, "EASBStorage.c"),
