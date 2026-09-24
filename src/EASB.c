@@ -1,6 +1,6 @@
 // EASB.c (our name, after the library's "EASB" file tag): the public calls of the EA Sports Bio
-// library, the ones EASportsBio.c makes. Each checks the library's state (lbl_802825B8) and the
-// memory-card session first, then hands the work to the storage code before it.
+// library (the ones EASportsBio.c makes) and their helpers. Most first check the library's state
+// (lbl_802825B8) and the card session (fn_8012CCD8); file operations go to the storage code before it.
 
 #include "core/easb.h"
 #include "platform.h"
@@ -90,7 +90,7 @@ EASBErrorE fn_8012D030(void) {
     return EASB_ERROR_NONE;
 }
 
-// Copies this game's record and picture into the buffers that get saved.
+// After operation 0 (create): the product buffer holds only this game's record, image slot 0 its picture.
 EASBErrorE fn_8012D0D4(void) {
     lbl_802825B8->product.b1167 = 0;
     if (lbl_802825B8->pProductBuffer != NULL) {
@@ -639,7 +639,7 @@ EASBErrorE fn_8012E1E0(u8 nProduct, u16* puLevel) {
     return eError;
 }
 
-// A game's play time while b11E0 is set, brought up to date first.
+// A game's play time while b11E0 is set (the tick first brings this game's own up to date).
 EASBErrorE fn_8012E25C(u8 nProduct, u32* pOut) {
     EASBProduct* pProduct;
     EASBErrorE eError;
@@ -655,7 +655,7 @@ EASBErrorE fn_8012E25C(u8 nProduct, u32* pOut) {
     return eError;
 }
 
-// A game's play time while b11E0 is clear, brought up to date first.
+// A game's play time while b11E0 is clear (the tick first brings this game's own up to date).
 EASBErrorE fn_8012E2D4(u8 nProduct, u32* pOut) {
     EASBProduct* pProduct;
     EASBErrorE eError;

@@ -193,7 +193,7 @@ typedef struct EASBStorageArgs {
     EASBImageSlot* pImageSlots;     // 0x0C: EASB_MAX_PRODUCTS pictures (fn_8012AE40)
     EASBImage* pImage;              // 0x10
     void* pHeader;                  // 0x14: the save's banner and icon block (fn_8016CFF8_SetSaveDescriptor)
-    int eDevice;                    // 0x18: where to create the file (TagFile_BeginSave)
+    int eDevice;                    // 0x18: where to create the file (TagFile_Create)
 } EASBStorageArgs;                  // size 0x1C
 
 // One of the storage operations (lbl_80195520, by operation number): whether it starts the

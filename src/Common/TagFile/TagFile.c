@@ -56,7 +56,7 @@ typedef struct {
     u32                      uKeyLen;       // 0x50
     const CipherInterface*   pCipher;       // 0x54
     const ChecksumInterface* pChecksum;     // 0x58
-    int                      eOperation;    // 0x5C  1 save, 2 load, 3 end, 4/5 delete, 6 write, 8 read
+    int                      eOperation;    // 0x5C  1 create, 2 delete, 3 end, 4/5 open, 6 write, 8 read
     int                      eStep;         // 0x60  step within the operation
     void*                    pBuffer;       // 0x64  current record payload
     u8*                      pHeader;       // 0x68  scratch header buffer
@@ -251,7 +251,7 @@ static void TagFile_UpdateEntryChecksum(u32 uTag, u32 uIndex, const void* pCheck
     }
 }
 
-// Append a record to the map. Returns its file offset; records are placed on 8 KiB boundaries.
+// Append a record to the map and return its file offset (8 KiB steps); a full map returns uNextOffset.
 static u32 TagFile_AddEntry(u32 uTag, u32 uSize, const void* pChecksum) {
     TagMapEntry* pEntry;
     TagMapEntry* pFirst;
@@ -361,9 +361,9 @@ static int TagFile_Decode(void* pData, u32 uSize) {
     return TagFile_CipherError(eError);
 }
 
-// Operation steps (each starts one asynchronous SFIO call) -----------------------------------
+// Operation steps (most start one asynchronous SFIO call) ------------------------------------
 
-static int TagFile_StartDelete(const char* pName, int eDevice, int uSearchDirection, int eOperation) {
+static int TagFile_StartOpen(const char* pName, int eDevice, int uSearchDirection, int eOperation) {
     int eError = 0;
     eError = fn_8017009C_OpenStart(pName, eDevice, uSearchDirection);
     _TagFile_pData->eOperation = eOperation;
@@ -581,7 +581,7 @@ int TagFile_Shutdown(void) {
     return 0;
 }
 
-int TagFile_BeginSave(const char* pName, int eDevice, int uSearchDirection) {
+int TagFile_Create(const char* pName, int eDevice, int uSearchDirection) {
     int eError = 0;
     _TagFile_pData->eOperation = 1;
     _TagFile_pData->eStep = 1;
@@ -589,7 +589,7 @@ int TagFile_BeginSave(const char* pName, int eDevice, int uSearchDirection) {
     return TagFile_SFIOError(eError);
 }
 
-int TagFile_BeginLoad(const char* pName, int eDevice, int uSearchDirection) {
+int fn_80174DF0_Delete(const char* pName, int eDevice, int uSearchDirection) {
     int eError = 0;
     _TagFile_pData->eOperation = 2;
     _TagFile_pData->eStep = 2;
@@ -597,14 +597,14 @@ int TagFile_BeginLoad(const char* pName, int eDevice, int uSearchDirection) {
     return TagFile_SFIOError(eError);
 }
 
-// Delete the file an existing session refers to.
-int TagFile_DeleteSession(TagSession* pSession) {
+// Re-open the file a saved session refers to; the map read back must match its checksum.
+int TagFile_Reopen(TagSession* pSession) {
     memcpy(&_TagFile_pData->Session, pSession, sizeof(TagSession));
-    return TagFile_StartDelete(pSession->Sfio.szName, pSession->Sfio.eDevice, -1, 5);
+    return TagFile_StartOpen(pSession->Sfio.szName, pSession->Sfio.eDevice, -1, 5);
 }
 
-int TagFile_Delete(const char* pName, int eDevice, int uSearchDirection) {
-    return TagFile_StartDelete(pName, eDevice, uSearchDirection, 4);
+int TagFile_Open(const char* pName, int eDevice, int uSearchDirection) {
+    return TagFile_StartOpen(pName, eDevice, uSearchDirection, 4);
 }
 
 int TagFile_End(TagSession* pSession) {
@@ -731,7 +731,7 @@ int TagFile_GetSession(TagSession* pSession) {
 }
 
 // Drive the current operation. *pProcess: 1 while running, 2 when complete. Returns 0 or an
-// error; *pResult receives the record size after a read.
+// error; *pResult receives the payload size after a write or a read.
 int TagFile_Update(int* pProcess, int* pResult) {
     int eError = 0;
     int eSFIOError = 0;

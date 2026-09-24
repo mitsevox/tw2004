@@ -2,7 +2,7 @@
 #define COMMON_TAGFILE_H
 
 // EA shared file library: the tag file, the save-data container on top of SharedFileIO
-// (TagFile.c). Names with the TagFile prefix come from assert strings in the binary.
+// (TagFile.c, EA's file name). The asserts give _TagFile_pData; the TagFile_ function names are ours.
 
 #include "Common/SharedFileIO.h"
 
@@ -55,10 +55,10 @@ void* const* Cipher_GetInterface(void);
 int TagFile_IsInitialised(void);
 int TagFile_Init(const TagFileInitParams* pParams);
 int TagFile_Shutdown(void);
-int TagFile_BeginSave(const char* pName, int eDevice, int uSearchDirection);
-int TagFile_BeginLoad(const char* pName, int eDevice, int uSearchDirection);
-int TagFile_DeleteSession(TagSession* pSession);
-int TagFile_Delete(const char* pName, int eDevice, int uSearchDirection);
+int TagFile_Create(const char* pName, int eDevice, int uSearchDirection);
+int fn_80174DF0_Delete(const char* pName, int eDevice, int uSearchDirection);
+int TagFile_Reopen(TagSession* pSession);
+int TagFile_Open(const char* pName, int eDevice, int uSearchDirection);
 int TagFile_End(TagSession* pSession);
 int TagFile_Write(TagSession* pSession, u32 uTag, u32 uIndex, void* pBuffer, u32 uSize);
 int TagFile_Read(TagSession* pSession, u32 uTag, u32 uIndex, void* pBuffer, u32 uSize);
