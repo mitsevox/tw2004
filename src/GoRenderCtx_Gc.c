@@ -3,30 +3,38 @@
 
 #include "game_types.h"
 #include "engine.h"
+#include "unsorted/cull.h"
+
+void fn_80013D58(Camera* pCamera);
+void fn_80013D68(Camera* pCamera);
+void fn_80013E28(Camera* pCamera, f32* pRect);
+void fn_80013E30(Camera* pCamera, GoFrameBuf* pBuf);
+void fn_80013E38(Camera* pCamera, CamLens* pLens);
+void fn_80013E48(Camera* pCamera);
+void fn_80013EA0(Camera* pCamera);
+
+// Makes a render camera from a lens, a frame buffer and a screen rectangle.
+void* fn_8001371C(CamLens* pLens, GoFrameBuf* pBuf, f32* pRect) {
+    Camera* pCamera;
+
+    pCamera = fn_80009B34(0x234, 2, 16, "GoRenderCtx_Gc.c", 96);
+    fn_80013E38(pCamera, pLens);
+    fn_80013E30(pCamera, pBuf);
+    fn_80013E28(pCamera, pRect);
+    fn_80013E48(pCamera);
+    fn_80013D68(pCamera);
+    return pCamera;
+}
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_80009E70();
-void fn_800137B0(void* pCamera);    // camera.h
-void fn_80012EF8();
-void fn_80013EA0();
-void fn_80013EEC();
-void fn_800137D0(s32 p0);
 s32 fn_8000A0E8();
 s32 fn_8000A714();
 s32 fn_800BADF8();
-void fn_80013CCC(u8* arg0);
-extern u8* lbl_80280DF0;
-void fn_80013D58(s32 p0);
 void fn_80013D5C(s32 v);
 void RC_vUpdateRenderCtxScreenMatricesAndInfo();
 void fn_80013DD0(u8* arg0, f32 (*arg1)[4]);
-void fn_80013D68(s32 p0);
-void fn_80013D9C(void* pCamera, f32 (*pMtx)[4]);
 s32 fn_8000ADC0();
-void fn_80013E28(u8* p, s32 v);
-void fn_80013E30(u8* p, s32 v);
-void fn_80013E38(u8* p, s32 v);
 s32 fn_80013E40(u8* p);
 f32 fn_80014134(u8* p);
 f32 fn_8001413C(u8* p);
@@ -45,13 +53,15 @@ void fn_800137B0(void* pCamera) {
     fn_80009E70(pCamera);
 }
 
-void fn_800137D0(s32 p0) {
-    fn_80013EEC();
+void fn_800137D0(Camera* pCamera) {
+    fn_80013EEC(pCamera);
     fn_80012EF8();
-    fn_80013EA0(p0);
+    fn_80013EA0(pCamera);
 }
 
-void fn_80013CCC(u8* arg0) {
+void fn_80013CCC(void* pCamera) {
+    u8* arg0 = pCamera;
+
     if ((u8) (*(u8*)((u8*)(arg0) + 0x1DC)) != 0) {
         fn_8000A0E8((*(s32*)((u8*)(arg0) + 0x10)) + 0x44, arg0 + 0x11C);
         fn_8000A0E8(arg0 + 0xDC, arg0 + 0x19C);
@@ -62,16 +72,16 @@ void fn_80013CCC(u8* arg0) {
     fn_8000A714(arg0 + 0x11C, arg0 + 0x15C);
 }
 
-void fn_80013D58(s32 p0) {
+void fn_80013D58(Camera* pCamera) {
 }
 
 void fn_80013D5C(s32 v) {
     *(s32*)(lbl_80280DF0 + 0x0) = v;
 }
 
-void fn_80013D68(s32 p0) {
+void fn_80013D68(Camera* pCamera) {
     RC_vUpdateRenderCtxScreenMatricesAndInfo();
-    fn_80013D58(p0);
+    fn_80013D58(pCamera);
 }
 
 // Gives the camera the view matrix pMtx (NULL: the identity).
@@ -90,20 +100,37 @@ void fn_80013DD0(u8* arg0, f32 (*arg1)[4]) {
     (*(s8*)((u8*)(arg0) + 0x1DC)) = 0;
 }
 
-void fn_80013E28(u8* p, s32 v) {
-    *(s32*)(p + 0x14) = v;
+void fn_80013E28(Camera* pCamera, f32* pRect) {
+    pCamera->pRect = pRect;
 }
 
-void fn_80013E30(u8* p, s32 v) {
-    *(s32*)(p + 0x18) = v;
+void fn_80013E30(Camera* pCamera, GoFrameBuf* pBuf) {
+    pCamera->pBuf = pBuf;
 }
 
-void fn_80013E38(u8* p, s32 v) {
-    *(s32*)(p + 0x10) = v;
+void fn_80013E38(Camera* pCamera, CamLens* pLens) {
+    pCamera->unk10 = pLens;
 }
 
 s32 fn_80013E40(u8* p) {
     return *(s32*)(p + 0x18);
+}
+
+// Starts a new camera: the identity view matrix and its first values.
+void fn_80013E48(Camera* pCamera) {
+    fn_80013D9C(pCamera, NULL);
+    pCamera->a0[0] = 0.0f;
+    pCamera->a0[1] = 0.0f;
+    pCamera->a0[2] = 0.5f;
+    pCamera->a0[3] = 0.0f;
+    pCamera->f1EC = 1.0f;
+    pCamera->f1F0 = 16773216.0f;
+}
+
+// Hands the camera's two values fn_80008360 and fn_80008368 to the renderer.
+void fn_80013EA0(Camera* pCamera) {
+    lbl_801B8980.fB4 = fn_80008360(pCamera);
+    lbl_801B8980.fB8 = fn_80008368(pCamera);
 }
 
 f32 fn_80014134(u8* p) {
@@ -160,7 +187,6 @@ f32 fn_8001418C(u8* p) {
 
 f32 fn_80014268(u8* p);
 f32 fn_80014270(u8* p);
-f32 fn_80014278(u8* p);
 double tan();
 f32 fn_80014280(f32 x0);
 void fn_800142A4(s8 v);
@@ -179,8 +205,8 @@ f32 fn_80014270(u8* p) {
     return *(f32*)(p + 0xA8);
 }
 
-f32 fn_80014278(u8* p) {
-    return *(f32*)(p + 0xA4);
+f32 fn_80014278(CamLens* pLens) {
+    return pLens->fFov;
 }
 
 f32 fn_80014280(f32 x0) {

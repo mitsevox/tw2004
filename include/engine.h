@@ -452,7 +452,8 @@ typedef struct RenderState {
                                 //        all 0xFF at reset
     f32  m34[4][4];             // 0x034  } set to identity at reset
     f32  m74[4][4];             // 0x074  }
-    u8   unkB4[0xBC - 0xB4];
+    f32  fB4;                   // 0x0B4  } a render camera's fn_80008360 and fn_80008368
+    f32  fB8;                   // 0x0B8  } (GoRenderCtx_Gc.c fn_80013EA0)
     s32  nBC;                   // 0x0BC  } a rectangle, bit 0x200 (LLVideo.c fn_800760B0: x,
     s32  nC0;                   // 0x0C0  } width, y, height; the movies give 0, 512, 0, 448)
     s32  nC4;                   // 0x0C4  }
