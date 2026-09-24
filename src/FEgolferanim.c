@@ -10,6 +10,7 @@
 #include "game/frontend.h"
 #include "gx.h"
 #include "lighting.h"
+#include "terrain.h"
 #include "ustream.h"
 
 // The golfers the menus show in turn when none is picked: four rows of five golfer ids, the row
@@ -61,6 +62,7 @@ s32 lbl_80281330 = 1;           // draw the golfer into the menu's texture (fn_8
 u8  lbl_8028133C = 1;
 s32 lbl_80281340 = -1;          // } the golfer and profile slot last drawn (fn_8008CE88)
 s32 lbl_80281344 = -1;          // }
+f32 lbl_80281348 = 0.918f;      // the share of the 448-line frame fn_8008CE88 sets for screen kind 3
 
 CrAPState* lbl_80281EE0;
 CourseLights* lbl_80281EE4;     // the lights of the golfer display ('LITE' stream object)
@@ -79,7 +81,7 @@ void fn_8008C93C(void);
 void fn_8008CA88(void);
 void fn_8008CC30(void);
 void fn_8008CE2C(void);
-void fn_8008CE88(u8 b);
+void fn_8008CE88(u8 bFull);
 void fn_8008D8F4(void);
 void fn_8008D9DC(UStreamObject* pObject);
 void fn_8008DBE8(void);
@@ -91,6 +93,7 @@ void fn_8008E254(u8 b);
 void fn_8008EA44(u8 b);
 void fn_8008EBB4(void);
 void fn_8008EBE4(void);
+void fn_8008EC0C(f32* pA, f32* pB, f32* pOut);
 void fn_8008AD80(void);
 
 void fn_80007254(void);
@@ -109,6 +112,12 @@ void fn_8001C5B4(Character* pChar, int n);
 void fn_8001D238(void);
 void fn_8001D4A4(Character* pChar, int nSlot);
 void fn_8001EE98(Character* pChar, u8 b);
+void fn_800352BC(void);
+void fn_80035754(Character* pChar);
+void fn_80035810(Character* pChar);
+void fn_80035FBC(void);
+void fn_80035FDC(void);
+void fn_800760B0(int nX, int nY, int nWidth, int nHeight);
 void Session_SetupProfiles(void);
 void fn_80079974(void);
 void fn_800B9CF0(int n);
@@ -621,6 +630,104 @@ void fn_8008CE2C(void) {
     GXCopyTex(fn_8002A624(), 0);
     GXPixModeSync();
     GXInvalidateTexAll();
+}
+
+// Draw the golfer shown (bFull: in a 384 x 528 frame instead of the usual 512 x 448), then note
+// which golfer and profile slot were drawn.
+void fn_8008CE88(u8 bFull) {
+    if (lbl_8028133C == 0) {
+        return;
+    }
+    if (lbl_80281EE0->pB4->b18 && lbl_80281EE0->b86 == 0) {
+        ((void (*)(int))fn_80035FDC)(0);   // port: EA passes an argument fn_80035FDC ignores
+        fn_80035240(lbl_80281EE0->mC0);
+        fn_800352BC();
+        fn_80013CCC(fn_8001614C());
+        fn_80016B9C();
+        fn_80035138(1);
+        fn_80012F50(1, 6, 1);
+        if (bFull) {
+            fn_800140E8(1, 384, 528, 0, 1, 1);
+        } else {
+            fn_800140E8(0, 512, 448, lbl_80281B88 & 1, 1, 1);
+        }
+        fn_80013EEC(fn_8001614C());
+        fn_80012EF8();
+        fn_80012F34(1);
+        fn_80012F18(3);
+        fn_80012EF8();
+        if (lbl_80281EE0->n0 == 3) {
+            fn_800760B0(0, 0, 512, 448.0f * lbl_80281348);
+        }
+        fn_80012EF8();
+        if (lbl_80281EE0->n8 == 0) {
+            fn_80035754(lbl_80281EE0->pB4->pChar);
+        } else if (lbl_80281EE0->n8 == 1) {
+            fn_80035810(lbl_80281EE0->pB4->pChar);
+        }
+        fn_80035FBC();
+        fn_800140E8(0, 512, 448, lbl_80281B88 & 1, 8, 1);
+        fn_80013EEC(fn_8001614C());
+        fn_80012EF8();
+    }
+    if (lbl_80281EE0->pB4->b18 && lbl_80281EE0->b86 == 0) {
+        lbl_80281340 = lbl_80281EE0->pB4->nC;
+        lbl_80281344 = lbl_80281ED4->nSlot;
+    }
+}
+
+// With b85 set, move bones 0x52 (when the character's bit 0x4000 is set) and 0x54 (when the ball
+// is in the golfer's hand) to their offset from bone 1, and bone 1 to 0, in x, z and w.
+void fn_8008D6CC(void) {
+    f32 v52[4];
+    f32 v54[4];
+    CharModel* pModel;
+    Bone* pBone1;
+    Bone* pBone52;
+    Bone* pBone54;
+    u8 bBall;
+
+    pModel = lbl_80281EE0->pB4->pChar->pModel;
+    pBone1 = &pModel->pBones[fn_8001EED8(pModel, 1)];
+    pBone52 = &pModel->pBones[fn_8001EED8(pModel, 0x52)];
+    fn_8001EED8(pModel, 0x54);              // EA looks bone 0x54 up here without using it
+    bBall = fn_8001DBF4(lbl_80281EE0->pB4->pChar);
+    if (lbl_80281EE0->b85 == 0) {
+        return;
+    }
+    if (bBall) {
+        pBone54 = &pModel->pBones[fn_8001EED8(pModel, 0x54)];
+    }
+    if (lbl_80281EE0->pB4->pChar->u10 & 0x4000) {
+        fn_8008EC0C(pBone52->v1C, pBone1->v1C, v52);
+    }
+    if (bBall) {
+        fn_8008EC0C(pBone54->v1C, pBone1->v1C, v54);
+    }
+    // EA's code subtracts each value from itself, which zeroes it.
+    if (lbl_80281EE0->pB4->pChar->u10 & 0x4000) {
+        pBone52->v1C[0] -= pBone52->v1C[0];
+        pBone52->v1C[2] -= pBone52->v1C[2];
+        pBone52->v1C[3] -= pBone52->v1C[3];
+    }
+    if (bBall) {
+        pBone54->v1C[0] -= pBone54->v1C[0];
+        pBone54->v1C[2] -= pBone54->v1C[2];
+        pBone54->v1C[3] -= pBone54->v1C[3];
+    }
+    pBone1->v1C[0] -= pBone1->v1C[0];
+    pBone1->v1C[2] -= pBone1->v1C[2];
+    pBone1->v1C[3] -= pBone1->v1C[3];
+    if (lbl_80281EE0->pB4->pChar->u10 & 0x4000) {
+        pBone52->v1C[0] += v52[0];
+        pBone52->v1C[2] += v52[2];
+        pBone52->v1C[3] += v52[3];
+    }
+    if (bBall) {
+        pBone54->v1C[0] += v54[0];
+        pBone54->v1C[2] += v54[2];
+        pBone54->v1C[3] += v54[3];
+    }
 }
 
 void fn_8008D8CC(void) {
@@ -1159,3 +1266,27 @@ void fn_8008EBE4(void) {
 }
 
 // ---- end of sweep code ----
+
+// Four floats: pOut gets pA minus pB.
+#ifdef __MWERKS__
+asm void fn_8008EC0C(register f32* pA, register f32* pB, register f32* pOut) {
+    nofralloc
+    psq_l  f0, 0(pA), 0, 0
+    psq_l  f1, 8(pA), 0, 0
+    psq_l  f2, 0(pB), 0, 0
+    psq_l  f3, 8(pB), 0, 0
+    ps_sub f2, f0, f2
+    ps_sub f3, f1, f3
+    psq_st f2, 0(pOut), 0, 0
+    psq_st f3, 8(pOut), 0, 0
+    blr
+}
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void fn_8008EC0C(f32* pA, f32* pB, f32* pOut) {
+    pOut[0] = pA[0] - pB[0];
+    pOut[1] = pA[1] - pB[1];
+    pOut[2] = pA[2] - pB[2];
+    pOut[3] = pA[3] - pB[3];
+}
+#endif
