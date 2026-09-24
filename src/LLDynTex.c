@@ -14,7 +14,6 @@ void fn_8010B098(void* arg0);
 s32 fn_8010C458(s16);
 s32 fn_8010B664(void* arg0);
 void fn_8000FBAC();
-void fn_8010BC64(u8* p);
 
 // ---- end of sweep code ----
 
@@ -24,7 +23,7 @@ void fn_8010B7C0(void);
 void fn_8010A448(int nSize) {
     lbl_80282488 = fn_80009B34(sizeof(DynTexState), 2, 16, "LLDynTex.c", 105);
     lbl_80282488->p0 = fn_80009B34(nSize, 2, 64, "LLDynTex.c", 108);
-    lbl_80282488->n8 = 0;
+    lbl_80282488->p8 = NULL;
     lbl_80282488->b975 = 1;
     lbl_80282488->b974 = 1;
     lbl_80282488->n980 = 0;
@@ -84,8 +83,8 @@ void fn_8010BC64(u8* p) {
     fn_8000FBAC(*(s32*)(p + 0x4));
 }
 
-void fn_8010BC88(s32 n) {
-    lbl_80282488->n8 = n;
+void fn_8010BC88(void* p) {
+    lbl_80282488->p8 = p;
 }
 
 void fn_8010BEC4(void) {

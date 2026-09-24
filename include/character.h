@@ -160,6 +160,13 @@ void* fn_80020DD4(void* pClip, void* pOut, int nAlign);
 
 typedef struct SKABlendNode SKABlendNode;
 
+void Skalib_Shutdown(void);             // skalib.c
+void AnimLib_Free(AnimLib* pLib);       // skalib.c
+void ClipBank_Release(int nSlot);       // skalib.c
+void fn_8001F66C(void);                 // mtalib.c
+void fn_80071B94(void);                 // animblender.c
+void fn_80071F58(struct SKABlendNode** ppNode, int n);   // animblender.c: gives a blend tree back
+
 // animblender.c: whether a source under pNode plays pSrc (format 0, format 1).
 u8 fn_80073554(SKABlendNode* pNode, void* pSrc);
 u8 fn_80073610(SKABlendNode* pNode, void* pSrc);
@@ -202,17 +209,26 @@ typedef struct BlendClip {
     u8   unk0[8];
     f32  f08;                   // 0x08  added to the time fn_800204A0 samples the clip at
     f32  f0C;                   // 0x0C
-    u8   unk10[0x24 - 0x10];
-    f32  f24;                   // 0x24  the swing measures the ball-hit time from it
 } BlendClip;
+
+// One of a ClipBlend's timed events (fn_8001F02C finds one by its id). Event 2's time is the
+// ball-hit time the swing measures.
+typedef struct ClipEvent {
+    u32  uId;                   // 0x0
+    f32  fTime;                 // 0x4
+    u8   unk8[8];
+} ClipEvent;
+LAYOUT_ASSERT(ClipEvent, 0x10);
 
 // What Character.pBlend points at: two clips and how far along the blend is; only what the swing
 // reads.
 typedef struct ClipBlend {
-    u8   unk0[0xCC];
+    u8   unk0[0x48];
+    s16  nEvents;               // 0x48  how many pEvents holds
+    u8   unk4A[0xCC - 0x4A];
     f32  fCC;                   // 0xCC  how far along it is, 0..1 (Character.fBackswing copies it)
     u8   unkD0[4];
-    BlendClip* pD4;             // 0xD4
+    ClipEvent* pEvents;         // 0xD4
     BlendClip* pD8;             // 0xD8  fn_800204A0 samples it
 } ClipBlend;
 
@@ -270,9 +286,14 @@ typedef struct Character {
                                 //        get an 'f' in front when it is 1
     CharModel* pModel;          // 0x038
     struct Skin* pSkin;         // 0x03C  its body's skin (Skin.c), the first of apSkins
-    u8    unk40[0x54 - 0x40];
+    s32   n40;                  // 0x040  how many 0x30-byte entries p44 holds (fn_8001A9F4)
+    void* p44;                  // 0x044  } freed with the character (fn_8001C0E0)
+    s32   n48;                  // 0x048  a texture bank slot (LLTexGrp.c), freed with it when >= 0
+    u8    unk4C[0x50 - 0x4C];
+    u8    a50[4];               // 0x050  LLDynTex.c is given its address (fn_80019DE8)
     s32   hFile;                // 0x054  a file closed with it (fn_8001971C), -1 none
-    u8    unk58[0x64 - 0x58];
+    u8    unk58[0x60 - 0x58];
+    void* p60;                  // 0x060  the entry of a64 fn_80019DE8 set up
     void* a64[2];               // 0x064  } entries taken from lbl_801B95E8 (fn_8001A418), and their
     s8    a6C[2];               // 0x06C  } indices there (-1 once given back)
     u8    unk6E[2];
@@ -288,7 +309,8 @@ typedef struct Character {
     struct Skin* apSkins[7];    // 0x0C0  its skins: the body's, then its attachments' (fn_8001CE5C)
     s32   nSkins;               // 0x0DC
     u8    bE0;                  // 0x0E0  cleared by fn_8001A3B0, set by fn_8001A20C
-    u8    unkE1[0x164 - 0xE1];
+    char  szE1[0x164 - 0xE1];   // 0x0E1  its texture file's name, hFile (fn_8001A870); the size is
+                                //        unknown (up to the next known field)
     u8    anim[4];              // 0x164  the animation player (+0x14 is its playback rate)
     s32   uFlags;               // 0x168  bit 0x40: the backswing is being backed down; 0x200 / 0x400: the
                                 //        clip lookup fell back (Char_SetClip). Signed: the original tests
@@ -344,8 +366,12 @@ typedef struct Character {
     Clip* p1790;                // 0x1790  cleared by fn_80062BFC; CharacterState_AddSKABlendData plays it for
                                 //         groups 5, 6 and 10
     void* p1794;                // 0x1794  cleared by fn_80062BE8; the same for group 9
-    u8    unk1798[0x17B8 - 0x1798];
-    struct ProfileLogos* pLogos;    // 0x17B8  the logos fn_8001A20C puts on its model (fn_8001744C)
+    u8    unk1798[0x17AC - 0x1798];
+    void* p17AC;                // 0x17AC  its slider definitions (CharSlider_CreateDefinitionsFromMem,
+                                //         fn_8001A9F4); fn_8001DC64 applies them
+    u8    unk17B0[0x17B8 - 0x17B0];
+    struct SkinChoices* pChoices;   // 0x17B8  its look (fn_8001D4A4 dresses it from this); fn_8001A20C
+                                    //         puts its logos on the model (fn_8001744C)
 } Character;
 
 // The players' characters (gViewSlots, 0x80187124): Player_SetGolfer takes the player's from here.
@@ -355,6 +381,18 @@ typedef struct ViewSlot {
 } ViewSlot;
 
 extern ViewSlot gViewSlots[5];          // 0x80187124  per player
+
+// char.c: the club skins' part and set names, one per club kind (0 drivers, 1 fairway woods,
+// 2 putters, 3 and 4 the 3 and 7 irons, 5 wedges), for Character_SetClubStatesForCharacter
+extern char lbl_80186EC0[6][13];        // the parts: "Drivers" ...
+extern char lbl_80186F10[6][13];        // "fwd_shaft", "pwi_shaft" sets
+extern char lbl_80186F60[6][13];        // "Defaults", their variants
+extern char lbl_80186FB0[6][13];        // "EA_Driver" ... sets
+extern char lbl_80187000[6][13];        // "Defaults"
+extern char lbl_80187050[6][13];        // "fwd_grip", "pwi_grip" sets
+extern char lbl_801870A0[6][13];        // "Defaults"
+
+void  Character_SetClubStatesForCharacter(Character* pChar, int nSlot, struct SkinChoices* pChoices);
 
 // Skeleton.c
 extern f32 lbl_801C6498[4];             // the identity rotation (quaternion), set by fn_80029530

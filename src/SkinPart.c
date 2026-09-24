@@ -1176,8 +1176,9 @@ void fn_800CEB1C(Skin** apSkins, int nSkins, u8* p) {
     }
 }
 
-// Hands fn_8010BCFC each name code the skins' chosen options use that p has no entry for.
-void fn_800CEBE8(Skin** apSkins, int nSkins, u8* p) {
+// Hands fn_8010BCFC each name code the skins' chosen options use that p has no entry for. aIds and
+// nIds go on to fn_800CE660.
+void fn_800CEBE8(Skin** apSkins, int nSkins, u8* p, u64* aIds, int nIds) {
     SkinListEntry* pList;
     s32 nList;
     s32 n;
@@ -1187,7 +1188,7 @@ void fn_800CEBE8(Skin** apSkins, int nSkins, u8* p) {
 
     pList = NULL;
     if (p == NULL) return;
-    nList = fn_800CE660(apSkins, nSkins, &pList, NULL, 0, 2);
+    nList = fn_800CE660(apSkins, nSkins, &pList, aIds, nIds, 2);
     i = 0;
     n = fn_8010A780(p);
     for (; i < nList; i++) {

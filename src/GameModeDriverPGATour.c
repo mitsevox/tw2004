@@ -24,7 +24,6 @@ u8  lbl_8028233C;               // 1 while the tour runs
 s32 lbl_80282338;               // the options' nWind from before the tour (fn_800EE02C puts it back)
 
 // Not in a C unit yet
-s32  fn_8008AC00(void);
 void fn_800907AC(s32 nMoney, char* pDst);               // money as text
 
 void GameModeDriverPGATour_LoadPGAcFromStream(UStreamObject* pObject);

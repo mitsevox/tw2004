@@ -634,7 +634,10 @@ GoBreakLine.c:
 	.text       start:0x800C808C end:0x800C937C
 
 AnimStream.c:
-	.text       start:0x800C937C end:0x800CC1EC
+	.text       start:0x800C937C end:0x800CB950
+
+TerrainGround.c:
+	.text       start:0x800CB950 end:0x800CC1EC
 
 SkinPart.c:
 	.text       start:0x800CC1EC end:0x800CF158

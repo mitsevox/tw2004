@@ -166,6 +166,36 @@ typedef struct LogoRecord {
 } LogoRecord;
 LAYOUT_ASSERT(LogoRecord, 0x1022);
 
+// A part's (or a set's) choice: its variant and that variant's option. For a set, the variant is
+// an entry of its p7C run and the option one of that entry's p8C run.
+typedef struct SkinChoice {
+    s32  nVariant;              // 0x0  -1 none
+    s32  nOption;               // 0x4  -1 none
+} SkinChoice;
+LAYOUT_ASSERT(SkinChoice, 8);
+
+// A golfer's look as kept outside the skins: SaveProfile.choices from 0x5500 (the created golfer),
+// or what Character.pChoices points at. fn_800CC1EC fills it from the body's skin or the skin from
+// it; fn_800CC408 gives the other six skins theirs; char_tex_manager.c puts its logos on the model.
+typedef struct SkinChoices {
+    u8   unk0[0x113];
+    s8   n113;                  // 0x113  set by fn_8008DD34; FEgolferanim.c passes it to the
+                                //        character (fn_8008EA44)
+    SkinChoice aParts[40];      // 0x114  the body's, per part (-1 -1 throughout: not set yet)
+    SkinChoice aSets[116];      // 0x254  the body's, per set
+    SkinChoice aSkinParts[6][10];   // 0x5F4  the six skins' of CharSkinSet
+    SkinChoice aSkinSets[6][10];    // 0x7D4
+    u8   a9B4[26];              // 0x9B4  the 26 sliders (fn_8010E4DC; a menu message reads slider n
+                                //        signed); set to 50 each when FE_CrAP_InitCrAPInfo clears
+                                //        the profile's 0x5500..0xB634 (fn_80058208)
+    u8   unk9CE[2];
+    LogoRecord aLogo[5];        // 0x9D0  the user logos ("_usrtextr0".."_usrtextr4")
+    u8   n5A7A;                 // 0x5A7A  (the profile's 0xAF7A) set by a menu message, which passes
+                                //         it to fn_80103B8C (s8); read back signed
+    u8   unk5A7B;
+} SkinChoices;
+LAYOUT_ASSERT(SkinChoices, 0x5A7C);
+
 // One save profile (0x10600 bytes).
 typedef struct SaveProfile {
     u8   bActive;               // 0x00000  1: the slot holds a profile; payouts are scaled and awards given only then
@@ -237,23 +267,11 @@ typedef struct SaveProfile {
     s8   nGolferOutfit;         // 0x054F8  -> PlayerProfile.nOutfit; fn_801069AC stores a ball's
                                 //          index there (fn_800484F4, -1: none)
     u8   nGolferBallType;       // 0x054F9  -> PlayerProfile.nBallType
-    u8   unk54FA[0x5613 - 0x54FA];
-    s8   n5613;                 // 0x05613  set by fn_8008DD34; FEgolferanim.c passes it to the
-                                //          character (fn_8008EA44)
-    // The created golfer's skin choices (SkinChoice, 8 bytes each; charstate.h's SkinChoices from
-    // 0x5500 on): the body's parts and sets (fn_80103D6C), and its six other skins' (fn_80103DE0).
-    u8   a5614[0x5754 - 0x5614];    // 0x05614
-    u8   a5754[0x5AF4 - 0x5754];    // 0x05754
-    u8   a5AF4[6][0x50];            // 0x05AF4
-    u8   a5CD4[6][0x50];            // 0x05CD4
-    u8   a5EB4[26];             // 0x05EB4  set to 50 each when FE_CrAP_InitCrAPInfo clears
-                                //          0x5500..0xB634 (fn_80058208)
-    u8   unk5ECE[0x5ED0 - 0x5ECE];
-    LogoRecord aLogos[5];       // 0x05ED0  the user logos ("_usrtextr0".."_usrtextr4"; fe.h's
-                                //          ProfileLogos reaches them from 0x5500)
-    u8   nAF7A;                 // 0x0AF7A  set by a menu message, which passes it to fn_80103B8C
-                                //          (s8); read back signed
-    u8   unkAF7B;
+    u8   unk54FA[0x5500 - 0x54FA];
+    // The created golfer's look: the body's parts and sets (fn_80103D6C), its six other skins'
+    // (fn_80103DE0), its sliders and its logos. char.c hands it to the character (fn_8001D4A4
+    // passes fn_80077ACC() + 0x5500 as a SkinChoices*).
+    SkinChoices choices;        // 0x05500
     s8   nDateMonth;            // 0x0AF7C  } a date, set and read by menu messages packed as
     s8   nDateDay;              // 0x0AF7D  } fn_80078604 packs it (FE_CrAPMessages.c
     s16  nDateYear;             // 0x0AF7E  } fn_80108178, fn_80108244)

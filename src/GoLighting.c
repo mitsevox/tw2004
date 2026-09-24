@@ -17,6 +17,9 @@ void    fn_8006F080(GoLight* pLight);
 
 void fn_8000AE48(f32* pA, f32* pB, f32* pOut);     // pOut = pA * pB, element by element
 void fn_80029BC8(f32* pVec);                        // sets a vector to lbl_80186838
+void fn_8000ADC0(f32 (*pMtx)[4]);                   // identity
+void fn_800BAE5C(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);   // VecMath.c
+void fn_800BADB4(f32 (*pMtx)[4], f32* pIn, f32* pOut);     // a vector through a matrix
 
 // Makes the pool (every light free), loads no lights, and sets channel 4's ambient and material
 // colours to white.
@@ -142,6 +145,31 @@ void fn_8006E62C(LightGroup* pGroup) {
     }
 }
 
+// Builds pMtx from three rotations: by fA (in the x-z plane) times fB (y-z), then fC (x-y).
+void fn_8006E67C(f32 (*pMtx)[4], f32 fA, f32 fB, f32 fC) {
+    f32 mA[4][4];
+    f32 mB[4][4];
+    f32 mC[4][4];
+
+    fn_8000ADC0(mA);
+    fn_8000ADC0(mB);
+    fn_8000ADC0(mC);
+    mA[2][0] = fn_800095F0(fA);
+    mA[2][2] = fn_80009638(fA);
+    mB[1][2] = fn_800095F0(fB);
+    mB[1][1] = fn_80009638(fB);
+    mC[0][1] = fn_800095F0(fC);
+    mC[0][0] = fn_80009638(fC);
+    mA[0][2] = -mA[2][0];
+    mA[0][0] = mA[2][2];
+    mB[2][1] = -mB[1][2];
+    mB[2][2] = mB[1][1];
+    mC[1][0] = -mC[0][1];
+    mC[1][1] = mC[0][0];
+    fn_800BAE5C(mA, mB, pMtx, 3);
+    fn_800BAE5C(mC, pMtx, pMtx, 3);
+}
+
 // Loads a group (or none): the directional light becomes the ambient colour (63.75 grey without
 // one), the point lights fill the point slots in order; the slots left over are cleared.
 void fn_8006E7A4(LightGroup* pGroup) {
@@ -205,6 +233,93 @@ void fn_8006ED70(void) {
 
     GXSetChanAmbColor(4, grey);
     GXSetChanCtrl(4, 0, 0, 1, 0, 2, 2);
+}
+
+// The default lights of a group: a dim directional light and four point lights placed by turning
+// (0, 0, 1) through fn_8006E67C's rotations.
+void fn_8006EDC0(LightGroup* pGroup) {
+    f32 m0[4][4];
+    f32 m1[4][4];
+    f32 m2[4][4];
+    f32 m3[4][4];
+    f32 v0[4];
+    f32 v1[4];
+    f32 v2[4];
+    f32 v3[4];
+    GoLight* pLight;
+
+    pGroup->v28[0] = 1.0f;
+    pGroup->v28[1] = 1.0f;
+    pGroup->v28[2] = 1.0f;
+
+    pLight = pGroup->apLight[4];
+    pLight->nType = 1;
+    pLight->u.dir.vColor[0] = 0.075f;
+    pLight->u.dir.vColor[1] = 0.075f;
+    pLight->u.dir.vColor[2] = 0.075f;
+    pLight->u.dir.f10 = 0.8f;
+    pLight->u.dir.fC = 1.0f;
+
+    pLight = pGroup->apLight[0];
+    pLight->nType = 2;
+    pLight->u.point.vColor[0] = 0.5f;
+    pLight->u.point.vColor[1] = 0.49f;
+    pLight->u.point.vColor[2] = 0.4f;
+    v0[0] = 0.0f;
+    v0[1] = 0.0f;
+    v0[2] = 1.0f;
+    // the angles are degrees / 180 * PI: DEG(x) rounds 175, -17 and -5 one bit differently
+    fn_8006E67C(m0, 175.0f / 180.0f * PI, -17.0f / 180.0f * PI, 0.0f);
+    fn_800BADB4(m0, v0, pLight->u.point.vPos);
+    pLight->u.point.fC = 1.0f;
+    pLight->u.point.f10 = 1.0f;
+    pLight->u.point.f14 = 1.0f;
+    pLight->u.point.f18 = 1.0f;
+
+    pLight = pGroup->apLight[1];
+    pLight->nType = 2;
+    pLight->u.point.vColor[0] = 0.5f;
+    pLight->u.point.vColor[1] = 0.5f;
+    pLight->u.point.vColor[2] = 0.5f;
+    v1[0] = 0.0f;
+    v1[1] = 0.0f;
+    v1[2] = 1.0f;
+    fn_8006E67C(m1, 63.0f / 180.0f * PI, -5.0f / 180.0f * PI, 0.0f);
+    fn_800BADB4(m1, v1, pLight->u.point.vPos);
+    pLight->u.point.fC = 0.5f;
+    pLight->u.point.f10 = 1.0f;
+    pLight->u.point.f14 = 1.0f;
+    pLight->u.point.f18 = 1.0f;
+
+    pLight = pGroup->apLight[2];
+    pLight->nType = 2;
+    pLight->u.point.vColor[0] = 0.5f;
+    pLight->u.point.vColor[1] = 0.5f;
+    pLight->u.point.vColor[2] = 0.5f;
+    v2[0] = 0.0f;
+    v2[1] = 0.0f;
+    v2[2] = 1.0f;
+    fn_8006E67C(m2, -71.0f / 180.0f * PI, -30.0f / 180.0f * PI, 0.0f);
+    fn_800BADB4(m2, v2, pLight->u.point.vPos);
+    pLight->u.point.fC = 0.58f;
+    pLight->u.point.f10 = 1.0f;
+    pLight->u.point.f14 = 1.0f;
+    pLight->u.point.f18 = 1.0f;
+
+    pLight = pGroup->apLight[3];
+    pLight->nType = 2;
+    pLight->u.point.vColor[0] = 0.5f;
+    pLight->u.point.vColor[1] = 0.5f;
+    pLight->u.point.vColor[2] = 0.5f;
+    v3[0] = 0.0f;
+    v3[1] = 0.0f;
+    v3[2] = 1.0f;
+    fn_8006E67C(m3, -5.0f / 180.0f * PI, 90.0f / 180.0f * PI, 0.0f);
+    fn_800BADB4(m3, v3, pLight->u.point.vPos);
+    pLight->u.point.fC = 0.4f;
+    pLight->u.point.f10 = 1.0f;
+    pLight->u.point.f14 = 1.0f;
+    pLight->u.point.f18 = 1.0f;
 }
 
 // Takes a light from the pool (its type 0).

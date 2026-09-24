@@ -9,6 +9,7 @@
 #include "game.h"
 #include "engine.h"
 #include "game_types.h"
+#include "lighting.h"
 
 void* fn_800073B4(u8* pData, int n);
 void  fn_800075CC(void* p);         // frees what fn_800073B4 made
@@ -20,9 +21,6 @@ void  fn_80030A40(void* p, int n);
 f32   fn_800351D8(u32 n, f32 fPeriod);
 void  fn_8003519C(int nRow, void* pData);   // calls row nRow's function of lbl_80188E88 with pData
 void  fn_80035240(s32 p0);
-void  fn_800352E4(void);
-void  fn_80035308(void);
-void  fn_80035338(s32 p0);
 s32   fn_800318AC(const void* pA, const void* pB);
 void  fn_8003272C(int n);
 void  fn_80031938(Ter_LODPlane* pPlanes, f32 fStep, s32 a, s32 b, s32 c, s32 d);
@@ -714,15 +712,9 @@ void fn_80013D9C();
 void fn_8003526C(void);
 void fn_80035294(void);
 void fn_800352BC(void);
-extern u8* lbl_80281380;
 void fn_80035398(void);
 void fn_8003541C();
-void fn_80035440();
-s32 fn_8003532C(void);
-void fn_8006F334();
-void fn_8003534C(void);
-void fn_8006EDC0();
-void fn_80035370(void);
+void fn_80035440(TerSettings* pSettings);
 
 void fn_80035240(s32 p0) {
     fn_80013D9C(*(s32*)((u8*)lbl_80280DF0), p0, lbl_80280DF0);
@@ -745,31 +737,29 @@ void fn_800352E4(void) {
     fn_80035398();
 }
 
+// ---- end of sweep code ----
+
+// Hands the current light set's terrain colours to the renderer.
 void fn_80035308(void) {
-    fn_8003532C();
-    fn_80035440();
+    fn_80035440(&fn_8003532C()->settings);
 }
 
-s32 fn_8003532C(void) {
-    return *(s32*)(lbl_80281380 + 0x230);
+LightSet* fn_8003532C(void) {
+    return lbl_80281380->pCur;
 }
 
-void fn_80035338(s32 p0) {
-    *(s32*)(((u8*)lbl_80281380) + 0x230) = (s32)(lbl_80281380 + (p0 * 140));
+void fn_80035338(s32 nSet) {
+    lbl_80281380->pCur = &lbl_80281380->aSet[nSet];
 }
 
+// Resets the current light set's terrain colours to the defaults.
 void fn_8003534C(void) {
-    fn_8003532C();
-    fn_8006F334();
+    fn_8006F334(&fn_8003532C()->settings);
 }
 
 void fn_80035370(void) {
-    s32 t0;
-    t0 = fn_8003532C();
-    fn_8006EDC0((t0 + 84));
+    fn_8006EDC0(&fn_8003532C()->group);
 }
-
-// ---- end of sweep code ----
 
 // Hands the renderer the colour and the two distances made from the current settings.
 void fn_80035398(void) {

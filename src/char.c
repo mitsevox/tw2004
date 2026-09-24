@@ -5,6 +5,8 @@
 
 #include "game.h"
 #include "charstate.h"
+#include "lldyntex.h"
+#include "frontend/fe.h"
 #include "unsorted/cull.h"
 #include "game_types.h"
 #include "endian.h"
@@ -23,6 +25,7 @@ void  fn_8001A798(void);
 void  fn_8001A7C8(void);
 Character* fn_8001A9F4(u8* pData, int a, int nPlayer, u32 uId, u8 b, void* p);
 void* fn_8001B208(u8* pData);
+void  fn_8001B58C(CharSkinSet* pSet);
 void  fn_8001B878(Character* pChar, int n);
 void  fn_8001C0E0(Character* pChar);
 Character* fn_8001C21C(Character* pChar);
@@ -59,11 +62,10 @@ void  fn_8009555C(void);
 void  fn_80095560(void);
 void  fn_80095564(void);
 void  fn_800955F0(int nPlayer);
-void  fn_8001744C(void* pChar, void* pModel, struct ProfileLogos* pLogos);   // char_tex_manager.c
+void  fn_8001744C(void* pChar, void* pModel, SkinChoices* pChoices);   // char_tex_manager.c
 void  fn_8010BA2C(void* p);
 void  fn_8008B704(void);               // FEgolferanim.c
 void  fn_8008B754(int nNext);           // FEgolferanim.c
-int   fn_8008B990(void);
 u8    fn_8008E924(void);                // FEgolferanim.c
 void  fn_8008E918(s32 v);
 u8    fn_8008E938(void);
@@ -77,6 +79,10 @@ void  fn_800CEE04(Skin* pSkin, int a, int b);
 void  fn_800CEE88(u8 b);
 u8    fn_800FCC38(int nPlayer);
 void  fn_8010A668(void* p);
+void  fn_80008380(void);
+void  fn_80035604(void);                // GoTerrain.c
+void  fn_800358E0(Character* pChar, u32 uFlags);
+int   fn_800636EC(void);                // GoCamCont.c
 void  fn_8010BF68(void);
 void  fn_8010BFE0(void);
 void  fn_80112C64(int n);
@@ -127,6 +133,24 @@ void fn_80017508(Character* pChar) {
     for (i = 0; i < 18; i++) {
         pChar->events[i].bSet = 0;
         pChar->events[i].fTime = 1073741824.0f;
+    }
+}
+
+// Sets the character's animation events from the blend's, fStart later. Events 5..14 are only
+// taken when their time is past 0.
+void fn_800175B0(Character* pChar, ClipBlend* pBlend, f32 fStart) {
+    u32 uId;
+    int i;
+
+    fn_80017508(pChar);
+    if (pBlend->pEvents != NULL) {
+        for (i = 0; i < pBlend->nEvents; i++) {
+            uId = pBlend->pEvents[i].uId;
+            if (uId < 5 || uId > 14 || pBlend->pEvents[i].fTime > 0.0f) {
+                pChar->events[uId].bSet = 1;
+                pChar->events[uId].fTime = fStart + pBlend->pEvents[i].fTime;
+            }
+        }
     }
 }
 
@@ -195,6 +219,31 @@ void fn_800192D4(Character* pChar, f32 fAngle) {
     }
 }
 
+// Turns the character to face along pDir (level: up is y), plus fAngle; a direction shorter than
+// 0.01 is ignored.
+void fn_80019358(Character* pChar, f32* pDir, f32 fAngle) {
+    f32 fLen;
+    f32 mtx[4][4];              // row 3 is left unset (fn_8000A4E0 reads rows 0..2)
+    f32 fYaw;
+    f32 fB;
+    f32 fC;
+
+    if (pChar != NULL) {
+        fLen = fn_80009680(fn_80009744(pDir));
+        if (fLen < 0.01f) return;
+        fn_8001EF34(pDir, 1.0f / fLen, mtx[0]);
+        mtx[0][3] = 0.0f;
+        mtx[1][0] = 0.0f;
+        mtx[1][1] = 1.0f;
+        mtx[1][2] = 0.0f;
+        mtx[1][3] = 0.0f;
+        vec4flt_CrossProduct(mtx[0], mtx[1], mtx[2]);
+        mtx[2][3] = 0.0f;
+        fn_8000A4E0(mtx, &fYaw, &fB, &fC);
+        fn_800192D4(pChar, fYaw + fAngle);
+    }
+}
+
 void fn_80019648(void) {
     fn_80095554();
     fn_8001A4BC();
@@ -256,6 +305,54 @@ void fn_80019CEC(Character* pChar) {
     }
 }
 
+// Sets up the dynamic textures (LLDynTex.c) for the character's model in use.
+void fn_80019DE8(Character* pChar) {
+    void* pModel = pChar->a64[pChar->n74];
+
+    fn_8008EAC8(0);
+    pChar->p60 = pModel;
+    fn_8010BC88(pChar->a50);
+    // not exact: the original passes pModel here and to fn_8010BED4, whose definitions take
+    // nothing (FEgolferanim.c calls fn_8010BEC4 with no argument)
+    fn_8010BEC4();
+    fn_80019C1C(pChar);
+    fn_800CEB1C(pChar->apSkins, pChar->nSkins, pModel);
+    fn_800CEBE8(pChar->apSkins, pChar->nSkins, pModel, NULL, 0);
+    fn_8010BED4();
+}
+
+// Puts the profile's created golfer's logos on the character's model in use.
+void fn_80019E80(Character* pChar) {
+    fn_80019C84(pChar);
+    fn_80019CEC(pChar);
+    fn_8001744C(pChar, pChar->a64[pChar->n74], &fn_80077ACC()->choices);
+    fn_8010BA2C(pChar->a64[pChar->n74]);
+    fn_8008EA38(1);
+}
+
+// Once the menu golfer is flagged (fn_8008EAD4): switches the character to its other model and
+// puts the profile's logos and the skins on it.
+void fn_8001A024(Character* pChar) {
+    SaveProfile* pProfile = fn_80077ACC();
+    int i;
+    void* pModel;
+
+    if (fn_8008EAD4()) {
+        fn_8008EAC8(0);
+        fn_8008E918(0);
+        pChar->n74 = 1 - pChar->n74;
+        pModel = pChar->a64[pChar->n74];
+        fn_80019CEC(pChar);
+        fn_8001744C(pChar, pModel, &pProfile->choices);
+        fn_8010BA2C(pModel);
+        fn_80008380();
+        for (i = 0; i < pChar->nSkins; i++) {
+            fn_800CE170(pChar->apSkins[i], pModel);
+        }
+        fn_8010BC64(pModel);
+    }
+}
+
 void fn_8001A0FC(Character* pChar) {
     fn_80019C84(pChar);
     fn_8008E918(2);
@@ -268,10 +365,25 @@ void fn_8001A0FC(Character* pChar) {
 void fn_8001A20C(Character* pChar) {
     fn_80019C84(pChar);
     fn_80019CEC(pChar);
-    fn_8001744C(pChar, pChar->a64[pChar->n74], pChar->pLogos);
+    fn_8001744C(pChar, pChar->a64[pChar->n74], pChar->pChoices);
     fn_8010BA2C(pChar->a64[pChar->n74]);
     pChar->bE0 = 1;
     lbl_801B95E8.a[6].p = NULL;
+}
+
+// Fills the pool with dynamic textures (LLDynTex.c), all free. Every game type gets two.
+void fn_8001A288(void) {
+    int i;
+
+    if (gSession.nGameType == 10 || gSession.nGameType == 3) {
+        lbl_801B95E8.nEntries = 2;
+    } else {
+        lbl_801B95E8.nEntries = 2;
+    }
+    for (i = 0; i < lbl_801B95E8.nEntries; i++) {
+        lbl_801B95E8.a[i].p = fn_8010A520(0x46, 0x87000, 0, 0x870, 4);
+        lbl_801B95E8.a[i].bUsed = 0;
+    }
 }
 
 // Reset every pool entry and mark it free.
@@ -366,6 +478,64 @@ void fn_8001A81C(void) {
     fn_800C9FE0();
 }
 
+// Reopens every player's character texture file: closes them all, then opens
+// "data\CharStrm\CharTex\NNalltex.fxg" for each golfer (NN is its id + 1).
+void fn_8001A870(void) {
+    int i;
+    Character* pChar;
+
+    for (i = 0; i < gSession.nNumPlayers; i++) {
+        fn_8000633C(gPlayers[i].pChar->hFile);
+    }
+    for (i = 0; i < gSession.nNumPlayers; i++) {
+        pChar = gPlayers[i].pChar;
+        sprintf(pChar->szE1, "%sdata\\CharStrm\\CharTex\\%02dalltex.fxg", "", pChar->nC + 1);
+        pChar->hFile = fn_800060E0(pChar->szE1);
+    }
+}
+
+// Frees the club skin sets (lbl_80280E24): each one's skins and a9C blocks, then the set. pSet is
+// not used: fn_8001C468 passes the set it found, but both are freed here.
+void fn_8001B58C(CharSkinSet* pSet) {
+    int j;
+    int i;
+
+    for (i = 0; i < 2; i++) {
+        if (lbl_80280E24[i] != NULL) {
+            for (j = 0; j < 6; j++) {
+                if (lbl_80280E24[i]->apSkins[j] != NULL) {
+                    fn_80037CD8(lbl_80280E24[i]->apSkins[j]);
+                }
+                if (lbl_80280E24[i]->a9C[j] != NULL) {
+                    fn_8001B1E8(lbl_80280E24[i]->a9C[j]);
+                }
+            }
+            fn_80009E70(lbl_80280E24[i]);
+            lbl_80280E24[i] = NULL;
+        }
+    }
+}
+
+// With characters made: fn_80035604, then fn_800358E0 for every character that is not in state 2
+// (fn_8001EE90), not the camera's player (fn_800636EC), has neither bit 0x40 nor 1 of u10 set and,
+// when uFlags has bit 4, passes fn_8001EC48.
+void fn_8001BBD8(u32 uFlags) {
+    int i;
+    int nPlayer;
+
+    if (lbl_80281CA8 != 0) {
+        fn_80035604();
+        for (i = 0; i < lbl_80281CA8; i++) {
+            nPlayer = fn_800636EC();
+            if (fn_8001EE90(lbl_801B9624[i]) != 2 && nPlayer != lbl_801B9624[i]->nPlayer &&
+                !(lbl_801B9624[i]->u10 & 0x41) &&
+                (fn_8001EC48(lbl_801B9624[i]) || (uFlags & 4) == 0)) {
+                fn_800358E0(lbl_801B9624[i], uFlags);
+            }
+        }
+    }
+}
+
 // Advances every character's animation by fTime, except in game type 6 while fn_800E415C holds.
 void fn_8001BC8C(f32 fTime) {
     int i;
@@ -373,6 +543,52 @@ void fn_8001BC8C(f32 fTime) {
     if (gSession.nGameType != 6 || !fn_800E415C()) {
         for (i = 0; i < lbl_80281CA8; i++) {
             Character_UpdateAnimation(lbl_801B9624[i], 0, fTime);
+        }
+    }
+}
+
+// Frees a character: its texture bank slot, both blend trees, its skin, library, model, buffers
+// and the rest; in game type 3 its slot's clip bank is released too.
+void fn_8001C0E0(Character* pChar) {
+    SKABlendNode* pNode;
+    int i;
+    int nSlot;
+
+    if (pChar != NULL) {
+        nSlot = pChar->nSlot;
+        if (pChar->n48 >= 0) {
+            fn_80010544(pChar->n48);
+        }
+        pNode = &pChar->blend;
+        fn_80071F58(&pNode, 0);
+        pNode = (SKABlendNode*)pChar->node3E0;  // a node without the root's nGroup
+        fn_80071F58(&pNode, 0);
+        if (pChar->pSkin != NULL) {
+            fn_80037CD8(pChar->pSkin);
+        }
+        if (pChar->pLib != NULL) {
+            AnimLib_Free(pChar->pLib);
+        }
+        fn_8002957C(pChar->pModel);
+        pChar->pModel = NULL;
+        for (i = 0; i < 4; i++) {
+            fn_80009E70(pChar->buffers[i].pBuf);
+        }
+        if (pChar->p44 != NULL) {
+            fn_80009E70(pChar->p44);
+        }
+        if (pChar->pRecords != NULL) {
+            fn_80009E70(pChar->pRecords);
+        }
+        if (fn_8001EC48(pChar)) {
+            fn_8001971C(pChar);
+        }
+        if (pChar->p17AC != NULL) {
+            fn_8010D454(pChar->p17AC);
+        }
+        fn_80009E70(pChar);
+        if (gSession.nGameType == 3) {
+            ClipBank_Release(nSlot);
         }
     }
 }
@@ -433,9 +649,35 @@ void fn_8001C350(void) {
     fn_80112CEC();
 }
 
+// Frees the club skin sets and every character made, then shuts down the animation libraries.
+void fn_8001C468(void) {
+    int i;
+
+    for (i = 0; i < 2; i++) {
+        if (lbl_80280E24[i] != NULL) {
+            fn_8001B58C(lbl_80280E24[i]);
+        }
+        lbl_80280E24[i] = NULL;
+    }
+    for (i = 0; i < lbl_80281CA8; i++) {
+        fn_8001C0E0(lbl_801B9624[i]);
+        lbl_801B9624[i] = NULL;
+    }
+    lbl_80281CA8 = 0;
+    Skalib_Shutdown();
+    fn_8001F66C();
+    fn_8002955C();
+    fn_80071B94();
+}
+
+// Frees every character of the menu's golfer slots (lbl_80281EE8).
 void fn_8001C518(void) {
-    fn_8001C0E0(lbl_80281EE8);
-    lbl_80281EE8 = NULL;
+    int i;
+
+    for (i = 0; i < CRAP_NUM_GOLFERS; i++) {
+        fn_8001C0E0(lbl_80281EE8[i]);
+        lbl_80281EE8[i] = NULL;
+    }
 }
 
 // The model id of the player's golfer.
@@ -444,8 +686,8 @@ int fn_8001C558(int nPlayer) {
 }
 
 // The player's golfer is one of records 30 to 33.
-u8 fn_8001C584(int nPlayer) {
-    u8 b = 0;
+int fn_8001C584(int nPlayer) {
+    int b = 0;
     if (gSession.nGolfer[nPlayer] >= 30 && gSession.nGolfer[nPlayer] <= 33) {
         b = 1;
     }
@@ -625,6 +867,38 @@ void fn_8001D47C(void) {
     UStream_UnregisterHandler('SKLO');
 }
 
+// Dresses the character of player slot nSlot: its club skins (in game type 3 golfers 7 and 29 get
+// the profile's created golfer's look; otherwise its own look when fn_8001C584 says so), then the
+// "shirt" set (only when fn_8001C584 says no) and the "glove" set, as "shirt<n>" / "glove<n>" with
+// n from the slot's profile (no number when it is 0 or less).
+void fn_8001D4A4(Character* pChar, int nSlot) {
+    char szName[32];            // the size is not known
+
+    if (gSession.nGameType == 3) {
+        if (pChar->nC == 7 || pChar->nC == 29) {
+            Character_SetClubStatesForCharacter(pChar, nSlot, &fn_80077ACC()->choices);
+        } else {
+            Character_SetClubStatesForCharacter(pChar, nSlot, NULL);
+        }
+    } else if (fn_8001C584(nSlot)) {
+        Character_SetClubStatesForCharacter(pChar, nSlot, pChar->pChoices);
+    } else {
+        Character_SetClubStatesForCharacter(pChar, nSlot, NULL);
+    }
+    if (!fn_8001C584(nSlot)) {
+        sprintf(szName, "%s", "shirt");
+        if (gSession.aProfile[nSlot].n0 > 0) {
+            sprintf(szName, "%s%d", szName, gSession.aProfile[nSlot].n0);
+        }
+        fn_800CC658(pChar, "shirt", szName, NULL);
+    }
+    sprintf(szName, "%s", "glove");
+    if (gSession.aProfile[nSlot].n2 > 0) {
+        sprintf(szName, "%s%d", szName, gSession.aProfile[nSlot].n2);
+    }
+    fn_800CC658(pChar, "glove", szName, NULL);
+}
+
 void fn_8001D624(int n) {
     gSession.aD2D[n] = 1;
 }
@@ -646,6 +920,27 @@ void fn_8001D63C(void) {
 
 void fn_8001D6D8(int n) {
     gSession.aD28[n] = 1;
+}
+
+// Every player flagged by fn_8001D6D8 has its character dressed again (fn_8001D4A4) and its
+// skins put on its model in use; the flag is cleared.
+void fn_8001D6F0(void) {
+    int j;
+    Character* pChar;
+    int i;
+
+    for (i = 0; i < 5; i++) {
+        if (gSession.aD28[i]) {
+            fn_80008380();
+            pChar = gPlayers[i].pChar;
+            fn_8001D4A4(pChar, i);
+            fn_80019CEC(pChar);
+            for (j = 0; j < pChar->nSkins; j++) {
+                fn_800CE170(pChar->apSkins[j], pChar->a64[pChar->n74]);
+            }
+            gSession.aD28[i] = 0;
+        }
+    }
 }
 
 void fn_8001D7A4(Character* pChar) {
@@ -719,6 +1014,134 @@ u8 fn_8001DBF4(Character* pChar) {
     return 0;
 }
 
+// Gives the character the look in pChoices: its skins' choices, then its sliders (the 26 values
+// at a9B4). Outside the menu golfer's game type 3 (or on its screens 1 and 4) n113 sets the
+// model's bEE.
+void fn_8001DC64(Character* pChar, SkinChoices* pChoices) {
+    fn_800CC1EC(pChar, pChoices);
+    fn_8010E4DC(pChar->p17AC, pChar->pModel, pChar->pSkin, 26, pChoices->a9B4, pChar->node3E0);
+    if (gSession.nGameType != 3 || lbl_80281EE0->n0 == 1 || lbl_80281EE0->n0 == 4) {
+        if (pChoices->n113 == 0) {
+            fn_8001EE98(pChar, 0);
+        } else {
+            fn_8001EE98(pChar, 1);
+        }
+    }
+    fn_80018484(pChar, pChar->pModel);
+}
+
+// Byte-swaps nBytes of 12-byte records in place: a 4-byte field, then four 2-byte ones.
+void fn_8001DEC8(u8* pData, int nBytes) {
+    SwapField aFormat[5] = { { 4, 4 }, { 2, 2 }, { 2, 2 }, { 2, 2 }, { 2, 2 } };
+    void* pSrc;
+    void* pDst;
+    int i;
+
+    for (i = 0; i < nBytes / 12; i++) {
+        pDst = pData;
+        pSrc = pData;
+        fn_8001F08C(&pSrc, &pDst, aFormat, 5, 1);
+        pData += 12;
+    }
+}
+
+// Dresses the character's six club skins: from pChoices when it is given, else from the golfer's
+// gGolferTable row (golfer 7's own row in the 0x4000 session mode). The front end's golfer is
+// left until fn_8008EAB0 allows it.
+void Character_SetClubStatesForCharacter(Character* pChar, int nSlot, SkinChoices* pChoices) {
+    int nGolfer;
+    u64 uName;
+    u64 uVariant;
+
+    if (pChar == NULL || pChar->p16D8 == NULL) return;
+    if (gSession.nGameType == 3 && !fn_8008EAB0()) {
+        fn_8008EABC(1);
+        return;
+    }
+    if (pChoices == NULL) {
+        nGolfer = Golfer_FindById(pChar->nC);
+        if ((gSession.uFlags & 0x4000) && pChar->nC == 7) {
+            nGolfer = 7;
+        }
+        if (nGolfer >= 0) {
+            fn_800CB700(&uName, lbl_80186EC0[0]);
+            fn_800CC710(pChar, 0, uName, gGolferTable[nGolfer].aClubs[0].uPart);
+            fn_800CB700(&uName, lbl_80186FB0[0]);
+            fn_800CB700(&uVariant, lbl_80187000[0]);
+            fn_800CC7DC(pChar, 0, uName, uVariant, gGolferTable[nGolfer].aClubs[0].uModel);
+            fn_800CB700(&uName, lbl_80186F10[0]);
+            fn_800CB700(&uVariant, lbl_80186F60[0]);
+            fn_800CC7DC(pChar, 0, uName, uVariant, gGolferTable[nGolfer].aClubs[0].uShaft);
+            fn_800CB700(&uName, lbl_80187050[0]);
+            fn_800CB700(&uVariant, lbl_801870A0[0]);
+            fn_800CC7DC(pChar, 0, uName, uVariant, gGolferTable[nGolfer].aClubs[0].uGrip);
+
+            fn_800CB700(&uName, lbl_80186EC0[1]);
+            fn_800CC710(pChar, 1, uName, gGolferTable[nGolfer].aClubs[1].uPart);
+            fn_800CB700(&uName, lbl_80186FB0[1]);
+            fn_800CB700(&uVariant, lbl_80187000[1]);
+            fn_800CC7DC(pChar, 1, uName, uVariant, gGolferTable[nGolfer].aClubs[1].uModel);
+            fn_800CB700(&uName, lbl_80186F10[1]);
+            fn_800CB700(&uVariant, lbl_80186F60[1]);
+            fn_800CC7DC(pChar, 1, uName, uVariant, gGolferTable[nGolfer].aClubs[1].uShaft);
+            fn_800CB700(&uName, lbl_80187050[1]);
+            fn_800CB700(&uVariant, lbl_801870A0[1]);
+            fn_800CC7DC(pChar, 1, uName, uVariant, gGolferTable[nGolfer].aClubs[1].uGrip);
+
+            fn_800CB700(&uName, lbl_80186EC0[3]);
+            fn_800CC710(pChar, 3, uName, gGolferTable[nGolfer].aIronPart[0]);
+            fn_800CB700(&uName, lbl_80186FB0[3]);
+            fn_800CB700(&uVariant, lbl_80187000[3]);
+            fn_800CC7DC(pChar, 3, uName, uVariant, gGolferTable[nGolfer].uIronModel);
+            fn_800CB700(&uName, lbl_80186F10[3]);
+            fn_800CB700(&uVariant, lbl_80186F60[3]);
+            fn_800CC7DC(pChar, 3, uName, uVariant, gGolferTable[nGolfer].uIronShaft);
+            fn_800CB700(&uName, lbl_80187050[3]);
+            fn_800CB700(&uVariant, lbl_801870A0[3]);
+            fn_800CC7DC(pChar, 3, uName, uVariant, gGolferTable[nGolfer].uIronGrip);
+
+            fn_800CB700(&uName, lbl_80186EC0[4]);
+            fn_800CC710(pChar, 4, uName, gGolferTable[nGolfer].aIronPart[1]);
+            fn_800CB700(&uName, lbl_80186FB0[4]);
+            fn_800CB700(&uVariant, lbl_80187000[4]);
+            fn_800CC7DC(pChar, 4, uName, uVariant, gGolferTable[nGolfer].uIronModel);
+            fn_800CB700(&uName, lbl_80186F10[4]);
+            fn_800CB700(&uVariant, lbl_80186F60[4]);
+            fn_800CC7DC(pChar, 4, uName, uVariant, gGolferTable[nGolfer].uIronShaft);
+            fn_800CB700(&uName, lbl_80187050[4]);
+            fn_800CB700(&uVariant, lbl_801870A0[4]);
+            fn_800CC7DC(pChar, 4, uName, uVariant, gGolferTable[nGolfer].uIronGrip);
+
+            fn_800CB700(&uName, lbl_80186EC0[5]);
+            fn_800CC710(pChar, 5, uName, gGolferTable[nGolfer].wedges.uPart);
+            fn_800CB700(&uName, lbl_80186FB0[5]);
+            fn_800CB700(&uVariant, lbl_80187000[5]);
+            fn_800CC7DC(pChar, 5, uName, uVariant, gGolferTable[nGolfer].wedges.uModel);
+            fn_800CB700(&uName, lbl_80186F10[5]);
+            fn_800CB700(&uVariant, lbl_80186F60[5]);
+            fn_800CC7DC(pChar, 5, uName, uVariant, gGolferTable[nGolfer].wedges.uShaft);
+            fn_800CB700(&uName, lbl_80187050[5]);
+            fn_800CB700(&uVariant, lbl_801870A0[5]);
+            fn_800CC7DC(pChar, 5, uName, uVariant, gGolferTable[nGolfer].wedges.uGrip);
+
+            fn_800CB700(&uName, lbl_80186EC0[2]);
+            fn_800CC710(pChar, 2, uName, gGolferTable[nGolfer].aClubs[2].uPart);
+            fn_800CB700(&uName, lbl_80186FB0[2]);
+            fn_800CB700(&uVariant, lbl_80187000[2]);
+            fn_800CC7DC(pChar, 2, uName, uVariant, gGolferTable[nGolfer].aClubs[2].uModel);
+            fn_800CB700(&uName, lbl_80186F10[2]);
+            fn_800CB700(&uVariant, lbl_80186F60[2]);
+            fn_800CC7DC(pChar, 2, uName, uVariant, gGolferTable[nGolfer].aClubs[2].uShaft);
+            fn_800CB700(&uName, lbl_80187050[2]);
+            fn_800CB700(&uVariant, lbl_801870A0[2]);
+            fn_800CC7DC(pChar, 2, uName, uVariant, gGolferTable[nGolfer].aClubs[2].uGrip);
+        }
+    } else {
+        fn_800CC408(pChar, pChoices);
+    }
+    fn_800CC8BC(pChar, fn_8001EDF4(pChar));
+}
+
 // Every player for whom fn_800FCC38 says so has its animation played at normal speed.
 void fn_8001E7DC(void) {
     int i;
@@ -778,6 +1201,15 @@ u8 fn_8001E9F4(u32* aA, u32* aB, u32 nBits) {
 
 void fn_8001EA34(u32* aBits, u32 n) {
     aBits[n >> 5] |= 1 << (n & 31);
+}
+
+// Each bit of aOut is set where both aA and aB have it (bit arrays of nBits bits).
+void fn_8001EA54(u32* aA, u32* aB, u32* aOut, u32 nBits) {
+    u32 i;
+
+    for (i = 0; i < (nBits + 31) >> 5; i++) {
+        aOut[i] = aA[i] & aB[i];
+    }
 }
 
 void fn_8001EB6C(u32* aBits, u32 n) {
@@ -1041,6 +1473,18 @@ f32 fn_8001EFFC(CamLens* pLens) {
 // The current render camera's lens.
 CamLens* fn_8001F004(void) {
     return fn_80008370(*lbl_80280DF0);
+}
+
+// The time of the blend's event uEvent, 0 when it has none.
+f32 fn_8001F02C(ClipBlend* pBlend, u64 uEvent) {
+    int i;
+
+    for (i = 0; i < pBlend->nEvents; i++) {
+        if (pBlend->pEvents[i].uId == uEvent) {
+            return pBlend->pEvents[i].fTime;
+        }
+    }
+    return 0.0f;
 }
 
 // ---- sweep code (not yet cleaned up) ----

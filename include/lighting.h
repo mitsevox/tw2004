@@ -6,6 +6,7 @@
 #define LIGHTING_H
 
 #include "engine.h"
+#include "terrain.h"
 
 #define NUM_LIGHT_SETS      4
 #define NUM_SET_LIGHTS      5   // four point lights, then one directional light
@@ -46,7 +47,8 @@ LAYOUT_ASSERT(LightGroup, 0x38);
 
 // One set of lights (0x8C bytes).
 typedef struct LightSet {
-    u8   unk0[0x54];
+    TerSettings settings;       // 0x00  the terrain colours: fn_80035308 copies them to the renderer's
+                                //       (fn_80035440), fn_8003534C resets them (fn_8006F334)
     LightGroup group;           // 0x54
 } LightSet;
 LAYOUT_ASSERT(LightSet, 0x8C);
@@ -107,11 +109,12 @@ extern GoLighting* lbl_802811D8;
 // GoLighting.c
 void fn_8006E5A8(LightGroup* pGroup, s32 nLights);  // take the group's lights from the pool
 void fn_8006E62C(LightGroup* pGroup);               // and give them back
+void fn_8006EDC0(LightGroup* pGroup);               // the default lights
 
 LightSet* fn_8003532C(void);    // lbl_80281380->pCur
 void fn_80035338(s32 nSet);     // make aSet[nSet] the current set
 void fn_80035308(void);
-s32  fn_800352E4(void);
+void fn_800352E4(void);
 
 void fn_80093524(void);         // create the lights of every set, and use set 0
 void fn_80093580(void);         // and free them
