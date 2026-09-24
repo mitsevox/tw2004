@@ -5,6 +5,7 @@
 #include "platform.h"
 #include "grassshader.h"
 #include "endian.h"
+#include "gx.h"
 
 // ---- sweep code (not yet cleaned up) ----
 
@@ -22,26 +23,11 @@ void fn_8006E214();
 void fn_8007644C();
 void fn_80076B18();
 void fn_8011EAB8(void);
-extern void* lbl_80282510;
 void fn_8011EBF8(void);
-void GXCopyTex();
-void GXInvalidateTexAll();
-void GXPixModeSync();
-void GXSetTexCopyDst();
-void GXSetTexCopySrc();
 void fn_8011EC2C(void);
 extern u8 lbl_801945E8[];
 extern u8 lbl_801945F8[];
 extern u8 lbl_80194618[];
-extern u8 lbl_8026038C[];
-void GXLoadTexObj();
-void GXSetNumTevStages();
-void GXSetNumTexGens();
-void GXSetTevAlphaIn();
-void GXSetTevAlphaOp();
-void GXSetTevColorIn();
-void GXSetTevColorOp();
-void GXSetTevOrder();
 void fn_80012EF8();
 void fn_80012F18();
 void fn_80012F34();
@@ -61,6 +47,7 @@ void fn_8011E3B4(void);
 void fn_80008380(void);
 void fn_8011E468(void);
 void fn_8011E4D8(GrassChunk* pChunk);
+void fn_8011EB80(void);
 void fn_8011E584(UStreamObject* pObject);
 int  fn_8011E6B0(f32** ppA, f32** ppB);
 void fn_8011FD74(void* pObject);
@@ -147,6 +134,12 @@ void fn_8011EAB8(void) {
     fn_800137B0(lbl_80281900->p70);
 }
 
+// The grass's 256x256 texture: its buffer and texture object.
+void fn_8011EB80(void) {
+    lbl_80282510 = fn_80009B34(GXGetTexBufferSize(256, 256, 4, 0, 0), 2, 32, "GoGrass.c", 1311);
+    GXInitTexObj(&lbl_8026038C, lbl_80282510, 256, 256, 4, 0, 0, 0);
+}
+
 void fn_8011EBF8(void) {
     if (lbl_80282510 != NULL) {
         fn_80009E70(lbl_80282510);
@@ -168,7 +161,7 @@ void fn_8011EE4C(void) {
     fn_80014194(lbl_801945E8);
     fn_80012F34(0);
     fn_80012F50(0, 6, 128);
-    GXLoadTexObj(lbl_8026038C, 0);
+    GXLoadTexObj(&lbl_8026038C, 0);
     GXSetNumTexGens(1);
     GXSetTevOrder(0, 0, 0, 4);
     GXSetNumTevStages(1);

@@ -42,6 +42,9 @@ void GXInitTexObj(GXTexObj* pObj, void* pImage, u16 nWidth, u16 nHeight, int eFo
 void GXInitTexObjCI(GXTexObj* pObj, void* pImage, u16 nWidth, u16 nHeight, int eFormat, int eWrapS,
                     int eWrapT, u8 bMipmap, u32 nTlut);
 void GXInitTlutObj(GXTlutObj* pObj, void* pLut, int eFormat, u16 nEntries);
+u32  GXGetTexBufferSize(u16 nWidth, u16 nHeight, u32 eFormat, u8 bMipmap, u8 nMaxLod);
+void GXLoadTexObj(GXTexObj* pObj, int eMap);
+void GXSetNumTexGens(u8 nGens);
 
 // ---- the texture environment (TEV) ------------------------------------------------------------
 

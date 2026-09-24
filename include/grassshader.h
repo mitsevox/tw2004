@@ -6,6 +6,7 @@
 #define GRASSSHADER_H
 
 #include "engine.h"
+#include "gx.h"
 
 // One word of the grass vertex buffer. A vertex is four words: x, y, z, then four bytes: n374 at
 // the time, 1, the row's vertex count (on a row's first vertex) and 1 on a row's first vertex.
@@ -112,6 +113,8 @@ typedef struct GrassManager {
 
 extern GrassManager* lbl_80281900;
 extern s32 lbl_80282514;        // cleared when the grass is freed (fn_8011E3B4)
+extern void* lbl_80282510;      // the grass's 256x256 texture buffer (fn_8011EB80)
+extern GXTexObj lbl_8026038C;   // its texture
 
 // The grass parameters GoGrass.c hands over once per hole (SD_vSetGrassParamsOnce).
 extern f32 lbl_802607D0[16][4];
