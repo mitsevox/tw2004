@@ -518,11 +518,16 @@ typedef struct Character {
                                 //        clip lookup fell back (Char_SetClip). Signed: the original tests
                                 //        it with cmpwi
     s32   n16C;                 // 0x16C  set to -1 by fn_8001D020
-    u8    unk170[0x17C - 0x170];
+    s32   n170;                 // 0x170  } the state queued for when fAnimTime reaches f174
+    f32   f174;                 // 0x174  }   (CharacterState_UpdateSKAState; fn_800958EC sets both)
+    u8    unk178[0x17C - 0x178];
     f32   fAnimTime;            // 0x17C
     f32   f180;                 // 0x180  fn_8001966C: fAnimTime = f180 + the blend's time - v1638[1]
     f32   fAnimEnd;             // 0x184  the animation's end time
-    u8    unk188[0x29C - 0x188];
+    u8    unk188[0x198 - 0x188];
+    f32   f198;                 // 0x198  } set to 0 and the animation time when state 8 starts
+    f32   f19C;                 // 0x19C  }   (CharacterState_UpdateSKAState)
+    u8    unk1A0[0x29C - 0x1A0];
     AnimPlayer anim29C;         // 0x29C  a second animation player
     u8    unk2C0[0x3D4 - 0x2C0];
     s32   n3D4;                 // 0x3D4  the bytes of its CHR object before the animation library

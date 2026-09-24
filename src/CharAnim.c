@@ -23,6 +23,7 @@ s32   fn_80096508(void);
 int   fn_80096530(Character* pChar);
 f32   fn_800971B8(Character* pChar);
 u8    fn_8001EC48(Character* pChar);                        // char.c
+void  Character_PlaceFeetOnGround(Character* pChar);        // char.c
 int   fn_8001BD18(Character* pChar, Clip* pClip);           // char.c
 void  fn_800175B0(Character* pChar, Clip* pBlend, f32 fStart);   // char.c
 void  fn_801141F8(struct DynChain* pChain, CharModel* pModel);   // DynChain.c
@@ -403,6 +404,256 @@ void CharAnim_StartTapIn(Character* pChar) {
     }
     CharacterState_AddSKABlendData(pChar, 1, 9, fn_80072ACC, 1, 8, -10000.0f, -30000.0f, -10000.0f, 0.0f,
                                    -10000.0f);
+}
+
+// The first player's state change: once its time reaches f10, the state nC queued becomes nAnim
+// and its clip group is added. Afterwards the skeleton's IK is blended in or out.
+void CharacterState_UpdateSKAState(Character* pChar) {
+    f32 fIK = 0.25f;
+    u8 bNoIK = 0;
+    u8 bTransition = 0;
+    u8 bReset;
+    int nSaved;
+    u8 bOther;
+    int nGroup;
+    int nResult;
+    int i;
+    f32 fOffset;
+    f32 fLag;
+
+    if (pChar->n170 != 0 && pChar->fAnimTime >= pChar->f174) {
+        pChar->nAnim = pChar->n170;
+        pChar->n18 |= 1;
+    }
+    if (!(pChar->n18 & 1)) return;
+    switch (pChar->nAnim) {
+    case 1:
+        nGroup = 1;
+        if (gPlayers[pChar->nPlayer].ball.nLie == 0 && gSession.options.a24[6] == 0 &&
+            gSession.options.nWind >= 1 && pChar->nSlot == 0) {
+            nGroup = 16;
+        } else if (gPlayers[pChar->nPlayer].ball.nLie == 0 && gPlayers[pChar->nPlayer].nClub >= 0 &&
+                   gPlayers[pChar->nPlayer].nClub <= 5 && Rand_Next(1) % 100 < 10 && pChar->nSlot == 0) {
+            nGroup = 16;
+        }
+        CharacterState_AddSKABlendData(pChar, 1, nGroup, fn_80072ACC, 1, 2, -10000.0f, -30000.0f, -10000.0f,
+                                       0.0f, -10000.0f);
+        break;
+    case 10:
+        CharacterState_AddSKABlendData(pChar, 1, 14, fn_80072ACC, 1, 0, -10000.0f, -30000.0f, -10000.0f, 0.0f,
+                                       -10000.0f);
+        Character_PlaceFeetOnGround(pChar);
+        break;
+    case 2:
+        switch (pChar->n20) {
+        case 4:
+        case 1:
+            Anim_SetTime(pChar->anim, -10000.0f);
+            fn_800958EC((AnimPlayer*)pChar->anim, 0, -10000.0f);
+            break;
+        case 3:
+            Anim_SetTime(pChar->anim, -30000.0f);
+            fn_800958EC((AnimPlayer*)pChar->anim, 0, -10000.0f);
+            break;
+        default:
+            CharacterState_AddSKABlendData(pChar, 1, 1, fn_80072ACC, 1, 0, -10000.0f, -30000.0f, -10000.0f,
+                                           0.0f, -10000.0f);
+            Anim_SetTime(pChar->anim, -10000.0f);
+            break;
+        }
+        break;
+    case 3:
+        bReset = 0;
+        if (pChar->n20 != 2) {
+            bReset = 1;
+        }
+        CharacterState_AddSKABlendData(pChar, bReset, 8, fn_80072ACC, 1, 5, -10000.0f, -30000.0f, -10000.0f,
+                                       0.0f, -10000.0f);
+        break;
+    case 4:
+        bReset = 0;
+        if (pChar->n20 != 5) {
+            bReset = 1;
+        }
+        CharacterState_AddSKABlendData(pChar, bReset, 7, fn_80072ACC, 1, 2, -20000.0f, -30000.0f, -10000.0f,
+                                       0.0f, -10000.0f);
+        break;
+    case 5:
+        bReset = 0;
+        fOffset = 0.0f;
+        if (pChar->u10 & 0x80) {
+            pChar->u10 &= ~0x80;
+            switch (pChar->n20) {
+            case 6:
+                fn_800732F4(&pChar->blend, pChar->anim, pChar->fAnimTime);
+                fOffset = 0.35f;
+                break;
+            case 5:
+                fn_800732F4(&pChar->blend, pChar->anim, 0.25f + pChar->fAnimTime);
+                fOffset = 0.0f;
+                break;
+            default:
+                bReset = 1;
+                break;
+            }
+            nGroup = fn_800962F8(pChar);
+        } else {
+            switch (pChar->n20) {
+            case 6:
+                fn_800732F4(&pChar->blend, pChar->anim, pChar->fAnimTime);
+                fOffset = 0.35f;
+                break;
+            case 1:
+            case 3:
+            case 5:
+                break;
+            case 2:
+            case 4:
+            default:
+                bReset = 1;
+                break;
+            }
+            nGroup = fn_80096398(pChar);
+        }
+        CharacterState_AddSKABlendData(pChar, bReset, nGroup, fn_80072ACC, 1, 5, -20000.0f, -30000.0f,
+                                       -10000.0f, fOffset, -10000.0f);
+        bNoIK = fn_8009637C(pChar);
+        bTransition = 1;
+        pChar->f174 -= 1.0f;
+        break;
+    case 6:
+        bReset = 0;
+        switch (pChar->n20) {
+        case 5:
+            fn_800732F4(&pChar->blend, pChar->anim, 0.25f + pChar->fAnimTime);
+            break;
+        default:
+            bReset = 1;
+            break;
+        }
+        CharacterState_AddSKABlendData(pChar, bReset, 0, fn_80072ACC, 1, 0, -20000.0f, -50000.0f, -40000.0f,
+                                       0.0f, -10000.0f);
+        bNoIK = 1;
+        bTransition = 1;
+        fn_800958EC(&pChar->anim29C, 0, 0.0f);
+        if (gSession.nGameType == 6) {
+            pChar->n30 = 0;
+            pChar->n2C = 0;
+            fn_800957B0(pChar, 1);
+        }
+        break;
+    case 7:
+        bReset = 0;
+        switch (pChar->n20) {
+        case 6:
+            fLag = pChar->f1644;
+            break;
+        default:
+            bReset = 1;
+            fLag = 0.0f;
+            break;
+        }
+        pChar->uFlags &= ~0x40;
+        fn_800732F4(&pChar->blend, pChar->anim, pChar->fAnimTime);
+        CharacterState_AddSKABlendData(pChar, bReset, 0, fn_80072ACC, 1, 8, -20000.0f, -70000.0f, -10000.0f,
+                                       fLag, -10000.0f);
+        bNoIK = 1;
+        break;
+    case 14:
+        nSaved = pChar->n16D4;
+        if (gPlayers[pChar->nPlayer].ball.nLie == 0) {
+            pChar->n16D4 = 6;
+        } else {
+            pChar->n16D4 = 0;
+        }
+        // EA's code resets the blend tree either way
+        switch (pChar->n20) {
+        case 7:
+            bReset = 1;
+            break;
+        default:
+            bReset = 1;
+            break;
+        }
+        CharacterState_AddSKABlendData(pChar, bReset, 11, fn_80072ACC, 1, 8, -20000.0f, -30000.0f, -10000.0f,
+                                       0.0f, -10000.0f);
+        pChar->n16D4 = nSaved;
+        bNoIK = 0;
+        break;
+    case 8:
+        pChar->uFlags &= ~1;
+        pChar->uFlags |= 0x40;
+        pChar->f198 = 0.0f;
+        pChar->f19C = pChar->fAnimTime;
+        fn_800958EC((AnimPlayer*)pChar->anim, 0, -10000.0f);
+        if (pChar->nClubClass == 2) {
+            bTransition = 1;
+            fIK = 0.5f;
+        }
+        for (i = 0; i < 5; i++) {
+            if (gPlayers[i].pChar == pChar) {
+                EVENT_Trigger(i, 0xB, NULL, 0);
+                break;
+            }
+        }
+        break;
+    case 9:
+        bOther = 0;
+        nResult = fn_80096530(pChar);
+        switch (nResult) {
+        case 8:
+        case 9:
+            nGroup = 10;
+            break;
+        default:
+            nGroup = 5;
+            break;
+        }
+        switch (pChar->n20) {
+        case 7:
+        case 8:
+        case 14:
+            break;
+        default:
+            bOther = 1;
+            break;
+        }
+        pChar->uFlags &= ~0x40;
+        if (bOther || pChar->nClubClass != 2) {
+            CharacterState_AddSKABlendData(pChar, 1, 5, fn_80072ACC, 1, 0, -20000.0f, -30000.0f, -10000.0f,
+                                           0.0f, -10000.0f);
+        } else {
+            fn_800732F4(&pChar->blend, pChar->anim, pChar->fAnimTime);
+            CharacterState_AddSKABlendData(pChar, bOther, nGroup, fn_80072ACC, 1, 0, -20000.0f, -30000.0f,
+                                           -10000.0f, 0.5f, -10000.0f);
+            bTransition = 1;
+            fIK = 0.1f;
+            pChar->fAnimTime += 0.0001f;
+        }
+        break;
+    case 11:
+        CharAnim_StartTapIn(pChar);
+        bTransition = 1;
+        break;
+    case 12:
+        fn_80096530(pChar);
+        CharacterState_AddSKABlendData(pChar, 1, 6, fn_80072ACC, 1, 0, -10000.0f, -30000.0f, -10000.0f, 0.0f,
+                                       -10000.0f);
+        break;
+    }
+    if (bTransition) {
+        SKEL_TransitionIK(pChar->pModel->pSkel, !bNoIK, fIK);
+    } else if (bNoIK) {
+        SKEL_SetIKSolutionWeight(pChar->pModel->pSkel, 1.0f);
+    } else {
+        SKEL_SetIKSolutionWeight(pChar->pModel->pSkel, 0.0f);
+    }
+    pChar->n20 = pChar->nAnim;
+    pChar->n18 &= ~1;
+    if (pChar->blend.nGroup != 4) {
+        pChar->n26 = 0;
+        pChar->u10 &= ~0x100;
+    }
 }
 
 // The second player's state change: once its time reaches f10, the state nC queued runs. State 5
