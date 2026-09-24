@@ -688,7 +688,14 @@ DiscError.c:
 	.text       start:0x800B6924 end:0x800B769C
 
 rcmp_mad_codec.c:
-	.text       start:0x800B769C end:0x800B9FF0
+	.text       start:0x800B769C end:0x800B90F4
+
+Code800B90F4.c:
+	.text       start:0x800B90F4 end:0x800B9FF0
+	.data       start:0x801910E0 end:0x801910F8
+	.sdata      start:0x802814E8 end:0x80281508
+	.sbss       start:0x802821C0 end:0x802821E8
+	.sdata2     start:0x802841C8 end:0x802841E0
 
 Trax.c:
 	.text       start:0x800B9FF0 end:0x800BA74C
