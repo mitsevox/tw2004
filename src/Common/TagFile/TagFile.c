@@ -8,7 +8,7 @@
 // interfaces exposed by ChecksumCRC32.c and CipherXOR.c. A map of the records (tag, offset,
 // size, checksum) is kept in memory and its checksum is written into the session at TagFile_End.
 
-#include "Common/SharedFileIO.h"
+#include "Common/TagFile.h"
 
 #define TAG_BUFFERSIZE 12
 #define TAG_ERROR_NONE 0
@@ -33,36 +33,6 @@ enum {
     TAG_ERROR_SIZE_MISMATCH = 0x6E
 };
 
-typedef struct {
-    u32   uSize;   // 4 for CRC32
-    void* pData;   // points at the value
-} ChecksumResult;
-
-typedef struct {
-    int (*pfnInit)(void* pAllocator);
-    int (*pfnShutdown)(void);
-    int (*pfnIsInitialised)(void);
-    int (*pfnReset)(void);
-    int (*pfnUpdate)(const void* pData, u32 uSize);
-    int (*pfnFinalise)(ChecksumResult** ppResult);
-    int (*pfnGetResultSize)(u32* pSize);
-} ChecksumInterface;
-
-typedef struct {
-    int (*pfnInit)(void* pAllocator);
-    int (*pfnShutdown)(void);
-    int (*pfnIsInitialised)(void);
-    int (*pfnSetKey)(const u8* pKey, u32 uLen);
-    int (*pfnEncode)(void* pData, u32 uSize);
-    int (*pfnDecode)(void* pData, u32 uSize);
-    int (*pfnReset)(void);
-} CipherInterface;
-
-// The caller's session block (0x48 bytes): the SFIO session plus the map's checksum.
-typedef struct {
-    SFIOSession Sfio;     // 0x00
-    u32  uChecksum;       // 0x44  checksum of the map, written by TagFile_End
-} TagSession;
 
 typedef struct {
     u32 uTag;
@@ -99,16 +69,6 @@ typedef struct {
     u8                       bBusy;         // 0x90
 } TagFileData;
 
-typedef struct {
-    u32                      uMaxEntries;   // 0x00
-    int*                     pDevices;      // 0x04
-    const SFIOFuncTable*     pFuncs;        // 0x08
-    const u8*                pKey;          // 0x0C
-    u32                      uKeyLen;       // 0x10
-    const CipherInterface*   pCipher;       // 0x14
-    void*                    pAllocator;    // 0x18
-} TagFileInitParams;
-
 static TagFileData* _TagFile_pData;
 // The file's .sbss is 8 bytes: a second, never-referenced static follows the state pointer.
 // GCC 2.95 emits unused statics even at -O0. Name and type unknown; only its size matters.
@@ -117,9 +77,6 @@ static u32 _TagFile_uUnused;
 // Host memory functions (CodeWarrior side).
 extern void* TibExtMemAlloc(void* pAllocator, u32 uSize, u32 uAlign, const char* pFile, int uLine);
 extern void  TibExtMemFree(void* pAllocator, void* p, u32 uSize, u32 uAlign);
-
-int TagFile_AllocBuffer(void** ppBuffer, void* pAllocator, u32 uSize, int eType);
-int TagFile_FreeBuffer(void* pBuffer, void* pAllocator, u32 uSize, int eType);
 
 // Error re-basing --------------------------------------------------------------------------
 

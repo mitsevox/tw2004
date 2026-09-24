@@ -838,6 +838,10 @@ unsorted/sweep_8010FF5C.c:
 
 DiscCheck.c:
 	.text       start:0x8010FF9C end:0x801104AC
+	.data       start:0x80193D58 end:0x80193D80
+	.bss        start:0x80213B60 end:0x80223BB0
+	.sdata      start:0x802817C8 end:0x802817D8
+	.sbss       start:0x802824C8 end:0x802824E0
 
 hwsBurn.c:
 	.text       start:0x801104AC end:0x80111F58

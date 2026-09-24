@@ -401,7 +401,7 @@ void* fn_800B5BD8(u32 uSize);
 void  fn_800B5C04(void* p);
 
 // AudTable.c
-int            fn_800A7AF0(void);
+u8             fn_800A7AF0(void);
 s32            fn_800A7C24(void);
 void           fn_800A7C2C(void);
 AudSource*     fn_800A7C30(u8 nEntry, s16 nSound);

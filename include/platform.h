@@ -115,6 +115,18 @@ LAYOUT_ASSERT(DVDDiskID, 0x20);
 DVDDiskID* DVDGetCurrentDiskID(void);
 s32  DVDGetDriveStatus(void);
 
+// A DVD request (0x30 bytes); the game only passes one to the library.
+typedef struct DVDCommandBlock {
+    u8   unk0[0x30];
+} DVDCommandBlock;
+LAYOUT_ASSERT(DVDCommandBlock, 0x30);
+
+typedef void (*DVDCBCallback)(s32 nResult, DVDCommandBlock* pBlock);
+
+// Ask for the disc pId; cb is called once it is in.
+int  DVDChangeDiskAsync(DVDCommandBlock* pBlock, DVDDiskID* pId, DVDCBCallback cb);
+s32  DVDGetCommandBlockStatus(DVDCommandBlock* pBlock);
+
 // The OS arena and heaps.
 void* OSGetArenaLo(void);
 void* OSGetArenaHi(void);

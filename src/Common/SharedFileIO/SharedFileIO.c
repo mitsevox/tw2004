@@ -16,7 +16,6 @@ enum { SFIO_STATE_BUSY_A = 0xB, SFIO_STATE_BUSY_B = 0xC, SFIO_STATE_BUSY_C = 0xD
 // Host (CodeWarrior side) functions. Signatures inferred from the calls.
 extern void  fn_8012C8D0(u32* pSize, int unused);   // adds up the save's record sizes
 extern int   fn_8012C98C(int eError);
-void fn_8017124C(SFIODescriptor* pDescriptor, u32* pSize, u32* pEntries);
 u32 SFIOGetHeaderSize(void);
 int SFIONumDevicesInMask(u16 uDeviceMask);
 int SFIOFirstDeviceFromMask(u16 uDeviceMask);

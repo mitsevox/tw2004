@@ -115,7 +115,6 @@ void fn_8010B9BC(void);
 void fn_8010BEC4(void);
 u8   fn_8010BFE0(void);
 void UStream_Stop(void);
-void* AnimLib_FindByName(AnimLib* pLib, const char* pName);
 
 // Make the golfer display's state and start the loader.
 void fn_8008AD80(void) {

@@ -16,6 +16,24 @@ s32 fn_8010B664(void* arg0);
 void fn_8000FBAC();
 void fn_8010BC64(u8* p);
 
+// ---- end of sweep code ----
+
+void fn_8010B7C0(void);
+
+// Set up: the state and its nSize-byte block (gomainloop.c: 0x18000, later 0x6000).
+void fn_8010A448(int nSize) {
+    lbl_80282488 = fn_80009B34(sizeof(DynTexState), 2, 16, "LLDynTex.c", 105);
+    lbl_80282488->p0 = fn_80009B34(nSize, 2, 64, "LLDynTex.c", 108);
+    lbl_80282488->n8 = 0;
+    lbl_80282488->b975 = 1;
+    lbl_80282488->b974 = 1;
+    lbl_80282488->n980 = 0;
+    lbl_80282488->nA98 = nSize;
+    fn_8010B7C0();
+}
+
+// ---- sweep code (not yet cleaned up) ----
+
 void fn_8010A4E8(void) {
     if (lbl_80282488->p0 != NULL) {
         fn_80009E70(lbl_80282488->p0);
