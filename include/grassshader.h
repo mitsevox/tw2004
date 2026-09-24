@@ -90,8 +90,8 @@ typedef struct GrassTile {
     f32 f4;                     // 0x4  } heights: the cell's bounding sphere spans f4 to f8 + f3B8
     f32 f8;                     // 0x8  } (fn_8011F7F8)
     u8  unkC[0x10 - 0xC];
-    u32 u10;                    // 0x10  } offsets from the file's start (after its first 16 bytes),
-    u32 u14;                    // 0x14  } made into addresses on load
+    u32 au10[2];                // 0x10  per shell set: offsets from the file's start (after its first
+                                //       16 bytes), made into addresses on load
 } GrassTile;
 
 // One of GoGrass.c's 16 buffers (0x4C bytes): the array at GrassManager.pEC, which fn_8011FFCC

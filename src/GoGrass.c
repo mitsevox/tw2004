@@ -197,8 +197,8 @@ void fn_8011E584(UStreamObject* pObject) {
     lbl_80281900->pC = (GrassTile*)(pCur + 0x10);
     // port: the file's offsets are made into 32-bit addresses in place
     for (i = 0; i < lbl_80281900->n10; i++) {
-        lbl_80281900->pC[i].u10 += (u32)pBase;
-        lbl_80281900->pC[i].u14 += (u32)pBase;
+        lbl_80281900->pC[i].au10[0] += (u32)pBase;
+        lbl_80281900->pC[i].au10[1] += (u32)pBase;
     }
 }
 
