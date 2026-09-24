@@ -23,6 +23,46 @@ typedef struct GXFifoObj {
     u8 unk0[0x80];
 } GXFifoObj;                    // the command FIFO (0x80 bytes)
 
+// The video mode GX and VI render with (the SDK's layout, 0x3C bytes).
+typedef struct GXRenderModeObj {
+    u32 viTVmode;               // 0x00
+    u16 fbWidth;                // 0x04  the frame's width in pixels
+    u16 efbHeight;              // 0x06  its height
+    u16 xfbHeight;              // 0x08
+    u16 viXOrigin;              // 0x0A
+    u16 viYOrigin;              // 0x0C
+    u16 viWidth;                // 0x0E
+    u16 viHeight;               // 0x10
+    u8  unk12[2];
+    u32 xFBmode;                // 0x14
+    u8  field_rendering;        // 0x18  one field per frame: the viewport jitters by a line
+    u8  aa;                     // 0x19
+    u8  sample_pattern[12][2];  // 0x1A
+    u8  vfilter[7];             // 0x32
+    u8  unk39[3];
+} GXRenderModeObj;
+extern GXRenderModeObj GXNtsc480IntDf;  // the SDK's video modes
+extern GXRenderModeObj GXPal528IntDf;
+extern GXRenderModeObj GXMpal480IntDf;
+void GXAdjustForOverscan(GXRenderModeObj* pIn, GXRenderModeObj* pOut, u16 nHor, u16 nVer);
+typedef struct GXTexRegion {
+    u32 unk0[4];
+} GXTexRegion;                  // a texture cache region (0x10 bytes)
+
+// ---- setting GX up and copying the frame out ------------------------------------------------------
+
+GXFifoObj* GXInit(void* pBase, u32 uSize);
+void GXInitTexCacheRegion(GXTexRegion* pRegion, u8 b32Bit, u32 uEvenAddr, int eEvenSize, u32 uOddAddr,
+                          int eOddSize);
+void GXSetScissor(u32 nLeft, u32 nTop, u32 nWidth, u32 nHeight);
+void GXSetDispCopySrc(u16 nLeft, u16 nTop, u16 nWidth, u16 nHeight);
+void GXSetDispCopyDst(u16 nWidth, u16 nHeight);
+u32  GXSetDispCopyYScale(f32 fScale);
+void GXSetCopyFilter(u8 bAA, u8 aSamples[12][2], u8 bVFilter, u8 aVFilter[7]);
+void GXSetCopyClear(GXColor cClear, u32 uZ);
+void GXSetDither(u8 bDither);
+void GXSetPixelFmt(int ePixelFmt, int eZFmt);
+
 // ---- the matrix library (MTX), for the matrices GX takes -------------------------------------
 
 void PSMTXIdentity(f32 (*pMtx)[4]);
@@ -33,6 +73,15 @@ void C_MTXOrtho(f32 (*pMtx)[4], f32 fTop, f32 fBottom, f32 fLeft, f32 fRight, f3
 
 // ---- the command FIFO -------------------------------------------------------------------------
 
+GXFifoObj* GXGetCPUFifo(void);
+void GXGetFifoPtrs(GXFifoObj* pFifo, void** ppRead, void** ppWrite);
+void GXEnableBreakPt(void* pBreak);
+void GXDisableBreakPt(void);
+void GXSetDrawDone(void);
+void GXDrawDone(void);
+void GXFlush(void);
+void GXCopyDisp(void* pDest, u8 bClear);
+void GXSetViewportJitter(f32 fLeft, f32 fTop, f32 fWidth, f32 fHeight, f32 fNear, f32 fFar, u32 uField);
 void GXGetFifoStatus(GXFifoObj* pFifo, u8* pbOverHigh, u8* pbUnderLow, u32* puCount, u8* pbCpuWrite,
                      u8* pbGpRead, u8* pbWrapped);
 
