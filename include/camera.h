@@ -573,6 +573,12 @@ extern struct Character* lbl_80281EE8[CRAP_NUM_GOLFERS];   // per golfer slot: t
 
 // ---- the views ------------------------------------------------------------------------------
 
+// A render camera (our name); only what the cleaned code reads.
+typedef struct RenderCamera {
+    u8   unk0[0x14];
+    f32* pRect;                 // 0x14  its screen rectangle: left, top, width, height (fn_80012EF0)
+} RenderCamera;
+
 // Points at the slot holding the current render camera (lbl_80281C90): fn_8001614C reads it,
 // fn_80013D5C sets it.
 extern void** lbl_80280DF0;

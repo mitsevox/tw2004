@@ -710,6 +710,13 @@ extern DFLayer lbl_801D5110[5];
 extern DFBuffer* lbl_80281110;
 extern f32 lbl_80281D90;
 extern f32 lbl_80281D94;        // cleared by fn_80045660
+// DF_vDrawBufferToScreen's pass n (0..4) is shifted by lbl_80281114 * (5 - n) /
+// (lbl_8028111C * (n + 1)), drawn at depth 1 - (lbl_80281118 * n^3 + lbl_80281D90) and faded by
+// 1 / (lbl_80281120[0] * (n + 1)).
+extern f32 lbl_80281114;        // 0.011
+extern f32 lbl_80281118;        // 0.00315
+extern f32 lbl_8028111C;        // 3.13
+extern f32 lbl_80281120[2];     // 1, 0
 
 // ---- the file streamer (UStream.c) -----------------------------------------------------------
 
