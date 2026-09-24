@@ -134,7 +134,7 @@ s32 fn_8009CDA0(s32 nPort, s32 nSlot, const char* pOldName, const char* pNewName
 }
 
 // Open file pName on the card into pFile.
-s32 fn_8009CEF8(s32 nPort, s32 nSlot, const char* pName, CARDFileInfo* pFile) {
+s32 fn_8009CEF8(int nPort, s32 nSlot, const char* pName, CARDFileInfo* pFile) {
     s32 nResult;
     int nChan = nPort;
     do {
