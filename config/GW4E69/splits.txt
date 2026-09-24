@@ -476,7 +476,10 @@ GoObjShadow.c:
 	.sdata2     start:0x80283C68 end:0x80283C80
 
 GoShaderObject_Particle_Gc.c:
-	.text       start:0x8009414C end:0x8009554C
+	.text       start:0x8009414C end:0x800952D8
+
+LLTime.c:
+	.text       start:0x800952D8 end:0x8009554C
 
 unsorted/sweep_8009554C.c:
 	.text       start:0x8009554C end:0x80095564
