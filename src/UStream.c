@@ -194,13 +194,17 @@ static int UStream_BeginObject(UStreamObject** ppObject, UStreamChunk* pChunk) {
     UStreamObject* pObject;
     if (pChunk->uType == TAG('C', 's', 'a', 'c')) {
         nWanted = 1;
-        uExtra = ((pChunk->n38 + 3 + pChunk->nNameLen) & ~3) + 8;
+        uExtra = ((pChunk->nNameLen + pChunk->n38 + 3) & ~3) + 8;
     } else {
-        const char* pName = (const char*)pChunk->szName + pChunk->nNameLen;
+        // Two LLTex scripts sit at szName: the first (nNameLen bytes) says whether the object is
+        // wanted, the one after it runs only when it is.
+        const char* pCode = pChunk->szName;
+        const char* pNext = pCode + pChunk->nNameLen;
+
         uExtra = 0;
-        nWanted = fn_8000EA1C(pName, 0, -1, 0);
+        nWanted = fn_8000EA1C(pCode, 0, -1, 0);
         if (nWanted) {
-            fn_8000EA1C(pName, 0, -1, 0);
+            fn_8000EA1C(pNext, 0, -1, 0);
         }
     }
     if (nWanted) {
@@ -218,16 +222,13 @@ static int UStream_BeginObject(UStreamObject** ppObject, UStreamChunk* pChunk) {
         }
         uPad = (uExtra + sizeof(UStreamObject)) & 0x7F;
         uPad = uPad ? 0x80 - uPad : 0;
-        {
-            u32 uDataSize = pChunk->uSize;
-            pObject = fn_80009B34((uExtra + uPad) + uDataSize + sizeof(UStreamObject), pChunk->uFlags,
-                                  0x80, "UStream.c", 732);
-        }
+        pObject = fn_80009B34(sizeof(UStreamObject) + uExtra + uPad + pChunk->uSize, pChunk->uFlags,
+                              0x80, "UStream.c", 732);
         *ppObject = pObject;
         pObject->nUnk14 = 0;
         ppObject[1] = NULL;
         Mem_cpy(&pObject->uFlags, &pChunk->uFlags, uExtra + 0x1C);
-        pObject->pData = (u8*)pObject + uExtra + uPad + sizeof(UStreamObject);
+        pObject->pData = (u8*)(pObject + 1) + uExtra + uPad;
         pObject->uUnk4 = 0;
         pObject->pfn8 = NULL;
         pObject->pPrev = NULL;
