@@ -964,7 +964,7 @@ config.libs = [
             Object(NonMatching, "TerrainGround.c"),
             Object(NonMatching, "SkinPart.c"),
             Object(Matching, "HoleScore.c"),
-            Object(NonMatching, "SwingTips.c"),
+            Object(Matching, "SwingTips.c"),
             Object(NonMatching, "Calendar.c"),
             Object(Matching, "CourseData.c"),
             Object(NonMatching, "Earnings.c"),
