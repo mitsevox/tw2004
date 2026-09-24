@@ -236,6 +236,7 @@ typedef struct LoadObjInfo {
 LAYOUT_ASSERT(LoadObjInfo, 0x24);
 extern LoadObjInfo lbl_801A25F0;
 extern u8* lbl_80281C04;                // the 'load' object's data (147700 bytes)
+extern struct UStreamObject* lbl_80281C0C;   // LoadData.c: a copy of the 'txf2' object with id 10000
 
 void fn_80014544(int n);                // load the numbered stream file (sprintf'd name)
 void fn_800147A4(void);                 // streammanagerhole.c
@@ -277,6 +278,8 @@ typedef struct TexGrpList {
 LAYOUT_ASSERT(TexGrpList, 0x20);
 
 void fn_80010544(int nSlot);            // frees the bank in slot nSlot and empties the slot
+TexBank* fn_800106C4(int nSlot);        // the bank in slot nSlot
+int  fn_800107C0(struct UStreamObject* pObject, TexBank* pBank, int n);   // loads a bank: its slot
 
 // ---- the renderer ----------------------------------------------------------------------------
 

@@ -26,6 +26,11 @@ void fn_800E5708(void);         // GameMessages.c
 void fn_80092BA0(void);         // uiText.c
 void fn_8008EC30(void);         // uiLoadFile.c
 void fn_800B9FF0(void);
+void fn_80037FB4(u8 a, f32* pColor);    // a full-screen colour (GoPostFx.c)
+void fn_80099ED8(void);                 // BootCourse.c
+void fn_80077340(void);                 // FE_Manager.c
+void fn_80077344(void);                 // FE_Manager.c
+void fn_80077348(void);                 // FE_Manager.c
 // UIStudio.c, with the front end's view of the handler (uistudio.h cannot be included with
 // game/frontend.h; it takes a UIStudio*).
 void fn_80168B80(void* pHandler, u32 uEvent);
@@ -153,6 +158,43 @@ void fn_80090664(void) {
     fn_800934F8();
     fn_80092BC4();
     fn_800BA038();
+}
+
+// The fade to black before a movie: draw it, 0.05 darker each frame. Once it is black, unpause,
+// and in start-up (1) or the menus (3) shut the UI down (fn_8008FD60 sees lbl_80281F19); the menus
+// then leave for the mode's next step.
+void fn_8009069C(void) {
+    f32 aColor[4];
+
+    if (lbl_801D87C0.b0 == 0) return;
+    aColor[0] = 0.0f;
+    aColor[1] = 0.0f;
+    aColor[2] = 0.0f;
+    aColor[3] = lbl_801D87C0.fFade;
+    fn_80037FB4(1, aColor);
+    lbl_801D87C0.fFade += 0.05f;
+    if (lbl_801D87C0.fFade >= 1.0f) {
+        lbl_801D87C0.fFade = 1.0f;
+        gSession.nPaused = 0;
+        if (gSession.nGameType == 1) {
+            lbl_80281F19 = 1;
+            gSession.b12 = 1;
+        } else if (gSession.nGameType == 3) {
+            lbl_80281F19 = 1;
+            if (gSession.a8[0] != 0) {
+                fn_80099ED8();
+            }
+            if (Game_GetMode() == 0x17) {
+                fn_80077340();
+            } else if (Game_GetMode() == 0x18) {
+                fn_80077344();
+            } else if (Game_GetMode() == 4) {
+                fn_80077348();
+            }
+        } else {
+            gSession.b12 = 1;
+        }
+    }
 }
 
 void fn_800907AC(int nValue, char* szOut) {

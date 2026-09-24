@@ -351,6 +351,14 @@ int  fn_801062C8(s16 nPart, int n);     // the asset in the first slot of aAF80 
 
 void FE_MakeMoviePath(char* pName, char* pPath);        // "data/movies/<name>.NGC"
 void FE_MakeCameoMoviePath(char* pName, char* pPath);   // "data/movies/cameos/<name>.NGC"
+
+// fe_movies.c: the texture bank loaded from LoadData.c's 'txf2' copy (fn_80091778), its slot and its
+// first texture.
+struct TexEntry* fn_800922A0(struct TexBank* pBank);   // a bank's first texture
+extern int lbl_80281378;                // the bank's slot
+extern struct TexBank*  lbl_80281F20;
+extern struct TexEntry* lbl_80281F24;
+extern f32 lbl_801D8818[8][2];          // eight x, y points fn_8009170C sets, fn_80091BDC reads
 void FE_CrAP_TurnOnPart(s16 nPart, int b, int c);      // FE_CrAPDB.c
 int  fn_80106E48(s16 n);                // FE_CrAPDB.c: the profile's assets whose n2C is n
 s32  fn_801070F4(void);                 // FE_CrAPDB.c: fill lbl_80282470; how many records
