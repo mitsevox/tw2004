@@ -269,6 +269,7 @@ s32 GrassPacket_iEndPacket(void) {
 void fn_80120AB4(f32* pA, f32* pB, f32* pOut, int bAlongZ, f32 fAt) {
     f32 fFrom;
     f32 fTo;
+    f32 fT;
     if (!bAlongZ) {
         fFrom = pA[0];
         fTo = pB[0];
@@ -277,7 +278,8 @@ void fn_80120AB4(f32* pA, f32* pB, f32* pOut, int bAlongZ, f32 fAt) {
             return;
         }
         pOut[0] = fAt;
-        pOut[1] = (fAt - fFrom) / (fTo - fFrom) * (pB[1] - pA[1]) + pA[1];
+        fT = (fAt - fFrom) / (fTo - fFrom);
+        pOut[1] = fT * (pB[1] - pA[1]) + pA[1];
         pOut[2] = pA[2];
     } else {
         fFrom = pA[2];
@@ -287,7 +289,8 @@ void fn_80120AB4(f32* pA, f32* pB, f32* pOut, int bAlongZ, f32 fAt) {
             return;
         }
         pOut[0] = pA[0];
-        pOut[1] = (fAt - fFrom) / (fTo - fFrom) * (pB[1] - pA[1]) + pA[1];
+        fT = (fAt - fFrom) / (fTo - fFrom);
+        pOut[1] = fT * (pB[1] - pA[1]) + pA[1];
         pOut[2] = fAt;
     }
 }
