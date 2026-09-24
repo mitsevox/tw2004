@@ -267,7 +267,7 @@ typedef struct CamTuning {
     f32  fC8;                   // 0x0C8
     f32  fCC;                   // 0x0CC
     f32  fD0;                   // 0x0D0  fn_80043420: how fast the aim comes down to a shot's f6C height
-    u8   unkD4[0xD8 - 0xD4];
+    f32  fD4;                   // 0x0D4  fn_80041EA8: the aim eases in over this much of a move's time
     f32  fD8;                   // 0x0D8  CamScript_GetLookAtPoint: CameraScript_LagAimMarker's first lag
     f32  fDC;                   // 0x0DC  the green zoom-to-aim camera's aim marker (CameraScript_LagAimMarker)
     f32  fE0;                   // 0x0E0  fn_8003EE68: CamScript.fD8's share of the way to the ground
@@ -303,13 +303,16 @@ typedef struct CamTuning {
     f32  f130;                  // 0x130  Terrain_HeightAt: the headroom a camera needs over a ground layer
     f32  f134;                  // 0x134  fn_800422C4: the look-at point eases in slower within this share
                                 //        of the (field-of-view scaled) camera distance
-    u8   unk138[0x144 - 0x138];
+    f32  f138;                  // 0x138  fn_80041EA8: the aim's most share of the way a step ...
+    f32  f13C;                  // 0x13C  ... reached at this distance from it
+    f32  f140;                  // 0x140  fn_80041EA8: its height share for a falling ball near the ground
     f32  f144;                  // 0x144  fn_800422C4: the look-at point's level share of the way a frame
     f32  f148;                  // 0x148  ... and its height's
-    u8   unk14C[0x15C - 0x14C];
+    u8   unk14C[0x158 - 0x14C];
+    f32  f158;                  // 0x158  fn_80041EA8: the aim eases in over this much of CamScript.f88
     f32  f15C;                  // 0x15C  CameraScript_InterpToNewScript puts it in CamScript.f88 (0 for
                                 //        the default swing camera)
-    u8   unk160[0x164 - 0x160];
+    f32  f160;                  // 0x160  fn_80041EA8: the power of its height ease-in
     f32  f164;                  // 0x164  CamScript_GetLookAtPoint: kind 13's share of the height change
                                 //        a frame
     f32  f168;                  // 0x168  the ground clearance for CamScript_KeepAboveGround

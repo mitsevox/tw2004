@@ -1249,6 +1249,93 @@ void fn_800418B0(CamShot* pShot, f32* pOut, f32 fTime, f32 fSpeed) {
     }
 }
 
+// The look-at point following the ball, one step per ball update this frame: the aim moves from
+// the script's v70 towards the ball (fn_8003D9AC) at its fn_80043420 height, moved by the shot's
+// f74 and f70; during a fairway fix (bCF) a steep look down is limited (as in
+// CamScript_GetLookAtPoint). pOut eases towards it by a share that grows with the distance
+// (CamTuning.f138, f13C) and eases in over the move (fD4, f158); its height eases in by f15C/f160
+// and slows near the ground once the ball comes down. Then the aim lags by fE4 (fn_8004349C). pVec
+// is not read.
+void fn_80041EA8(int nPlayer, f32* pOut, f32* pCam, CamShot* pShot, CamScript* pScript, f32* pVec,
+                 f32 fTime) {
+    f32 vMove[4];
+    f32 vAim[4];
+    f32 vBall[4];
+    f32 vLast[4];
+    f32 vDir[4];
+    f32 vStep[4];
+    int nUpdates;
+    int i;
+    f32 fBase;
+    f32 fDrop;
+    f32 fLen;
+    f32 fLimit;
+    f32 fShare;
+    f32 fRate;
+
+    Vec3Copy(pOut, vLast);  // vLast is not read
+    nUpdates = GameEffects_BallUpdatesThisFrame(nPlayer);
+    if (nUpdates == 0) return;
+    fn_8003D9AC(pScript, pShot, nPlayer, vBall, 0);
+    for (i = 0; i < nUpdates; i++) {
+        fn_80045428(vBall, pScript->v70, vStep);
+        fn_8001EF34(vStep, (f32)(i + 1) / (f32)nUpdates, vStep);
+        fn_8004544C(pScript->v70, vStep, vAim);
+        vAim[1] = fn_80043420(nPlayer, pScript, vAim, pCam, pShot);
+        fn_8004255C(vAim, pCam, pShot->f74, pShot->f70);
+        if (pScript->bCF) {
+            fn_80045428(vAim, pCam, vDir);
+            fBase = pCam[1];
+            if (pScript->pShot != NULL) {
+                fBase = pCam[1] - pScript->pShot->f68;
+                fDrop = vDir[1] + pScript->pShot->f68;
+            }
+            vDir[1] = 0.0f;
+            fLen = fn_80009680(fn_80009744(vDir));
+            // EA bug: fDrop is not set when the script has no current shot
+            if (0.0f != fLen && fDrop / fLen < -0.2f) {
+                fLimit = fBase - 0.2f * fLen;
+                if (fLen > lbl_80281F78->f128) {
+                    vAim[1] = fLimit;
+                } else {
+                    vAim[1] = vAim[1] + fLen * (fLimit - vAim[1]) / lbl_80281F78->f128;
+                }
+            }
+        }
+        fn_80045428(vAim, pOut, vMove);
+        fRate = fn_80009680(fn_80009744(vMove));
+        fRate = lbl_80281F78->f138 * (fRate / lbl_80281F78->f13C);
+        fShare = fRate < 0.0f ? 0.0f : (fRate > 1.0f ? 1.0f : fRate);
+        if (pScript->f98 < lbl_80281F78->fD4) {
+            fRate = 1.0f - (f32)fn_80009680(pScript->f98 / lbl_80281F78->fD4) * (1.0f - fShare);
+        } else {
+            fRate = fShare < 0.0f ? 0.0f : (fShare > lbl_80281F78->f138 ? lbl_80281F78->f138 : fShare);
+        }
+        if (pScript->f88 < lbl_80281F78->f158) {
+            fRate *= pScript->f88 / lbl_80281F78->f158;
+        }
+        if (pScript->f88 < lbl_80281F78->f15C) {
+            vMove[1] *= powf(pScript->f88 / lbl_80281F78->f15C, lbl_80281F78->f160) * (fTime / (1.0f / FRAME_RATE));
+        }
+        if (gPlayers[nPlayer].ball.bHitTopArc) {
+            if (gPlayers[nPlayer].ball.fHeight <= 0.15f) {
+                vMove[1] *= lbl_80281F78->f140;
+            } else if (!(gPlayers[nPlayer].ball.fHeight > 10.0f)) {
+                vMove[1] *= (1.0f - lbl_80281F78->f140) * ((gPlayers[nPlayer].ball.fHeight - 0.15f) / 10.0f)
+                            + lbl_80281F78->f140;
+            }
+        }
+        fn_8001EF34(vMove, fRate, vMove);
+        fn_8004544C(vMove, pOut, pOut);
+        Vec3Copy(pOut, vLast);
+    }
+    if (pScript->bCF) {
+        fn_8004349C(nPlayer, pCam, pOut, vAim, pScript, lbl_80281F78->fE4);
+    } else {
+        fn_8004349C(nPlayer, pCam, pOut, gPlayers[nPlayer].ball.vPos, pScript, lbl_80281F78->fE4);
+    }
+}
+
 // Eases the look-at point pOut towards pTarget (moved by the shot's f74 up and f70 sideways, the
 // other way round for fn_800453C8), level and in height separately, by CamTuning.f144 and f148 a
 // frame; slower when it is close. Right after a cut to the next shot it jumps there. Without a
