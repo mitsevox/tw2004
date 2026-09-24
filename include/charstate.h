@@ -170,7 +170,11 @@ LAYOUT_ASSERT(SkinDesc, 0x120);
 
 // What Skin.pModel points at; only what SkinPart.c reads.
 typedef struct SkinModel {
-    u8   unk0[0x40];
+    u8   unk0[0x14];
+    s32  n14;                   // 0x14  how many matrices Skin.p108C holds (fn_80018710)
+    u8   unk18[0x34 - 0x18];
+    void* p34;                  // 0x34  handed to the character's model (fn_80029A74)
+    u8   unk38[0x40 - 0x38];
     s32  n40;                   // 0x40  bits in Skin.p10D0
     u8   unk44[4];
     SkinDesc* pDesc;            // 0x48
@@ -181,7 +185,11 @@ typedef struct SkinModel {
 // A skin (Skin.c): a character's body or one of its attachments; only what the code reads.
 typedef struct Skin {
     SkinModel* pModel;          // 0x0000
-    u8   unk4[0x10A0 - 4];
+    SkelPose pose;              // 0x0004  (fn_80018710 hands it to SKEL_UpdateState)
+    u8   unk1044[0x1088 - 0x1044];
+    f32  (*p1088)[4][4];        // 0x1088  } matrices fn_80018710 hands the model (fn_80029A88,
+    f32  (*p108C)[4][4];        // 0x108C  } fn_80029A7C)
+    u8   unk1090[0x10A0 - 0x1090];
     void* a10A0[2];             // 0x10A0  indexed by fn_800CE02C's argument; Skin.c sets [0]
     SkinChoice* aParts[4];      // 0x10A8  a choice per part, four copies (fn_800CEE04 copies one
                                 //         over another); [3] is set while lbl_80282238 is clear

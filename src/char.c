@@ -90,6 +90,7 @@ void  fn_80071C28(SKABlendNode** ppNode, int a, int b, SKABlendFn pfnBlend, int 
 void  fn_800725BC(SKABlendNode* pNode, SKABlendFn pfnBlend, f32 f);                  // animblender.c
 void  fn_800958EC(AnimPlayer* pAnim, s32 n, f32 f);            // CharAnim.c
 void  fn_800094D8(f32* pQ, f32* pA, f32* pB, f32* pC);          // Quaternion.c: a rotation as angles
+void  fn_80029968(CharModel* pModel, SkelPose* pPose);          // Skeleton.c
 void  fn_80095558(void);
 void  AnimLib_ApplyOverlays(int nSlot);                         // skalib.c
 void  fn_80025478(void);                                        // skalib.c
@@ -385,6 +386,21 @@ void fn_80018484(Character* pChar, CharModel* pModel) {
         pChar->nClubHeadBone = fn_8001EED8(pChar->pModel, 0x53);
         pChar->nGripBone     = fn_8001EED8(pChar->pModel, 0x52);
         pChar->n16A8         = fn_8001EEE4(pChar->pModel, 0x15);
+    }
+}
+
+// Poses the character's model from its body's skin: the skin's pose (SKEL_UpdateState,
+// fn_80029968) and, when the skin has a model, the skin's matrices.
+void fn_80018710(Character* pChar) {
+    if (pChar != NULL && pChar->pSkin != NULL && pChar->pModel != NULL) {
+        SKEL_UpdateState(pChar->pModel, &pChar->pSkin->pose, 1);
+        fn_80029968(pChar->pModel, &pChar->pSkin->pose);
+        if (pChar->pSkin->pModel != NULL) {
+            fn_80037AB8(pChar->pSkin, pChar->pModel, 0, 0);
+            fn_80029A74(pChar->pModel, pChar->pSkin->pModel->p34);
+            fn_80029A88(pChar->pModel, pChar->pSkin->p1088);
+            fn_80029A7C(pChar->pModel, pChar->pSkin->p108C, pChar->pSkin->pModel->n14);
+        }
     }
 }
 
