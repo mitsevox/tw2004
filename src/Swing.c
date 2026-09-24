@@ -1566,9 +1566,9 @@ int Swing_PhaseIdle6(int nPlayer) {
 
 // Stop the pad rumble.
 void Swing_RumbleOff(int nPlayer) {
-    Player* p;
     s32*    pFrames;
     s32*    pController;
+    Player* p;
     if (Player_HasPad(nPlayer)) {
         p           = &gPlayers[nPlayer];
         pFrames     = &p->swing.nVibrateCount;
@@ -2685,8 +2685,12 @@ void STATEFUNC_InitialFlyByUpdate(int nPlayer) {
 // State 12: the ball is away. In a replay with the kept ball unset, a special path; otherwise
 // the ball as it lies is kept. Camera 14 unless the swing animation is 11 or the view says no.
 void STATEFUNC_SimulateInit(int nPlayer) {
-    View*   pV = fn_80017028(gPlayers[nPlayer].nView[0]);
-    Player* p  = &gPlayers[nPlayer];
+    int     nView;
+    Player* p;
+    View*   pV;
+
+    pV = fn_80017028(gPlayers[nPlayer].nView[0]);
+    p  = &gPlayers[nPlayer];
     if (gSession.bReplay != 0 && p->ballBefore.nState == 0) {
         fn_8006B2C4(nPlayer, 1);
     } else {
@@ -2694,7 +2698,7 @@ void STATEFUNC_SimulateInit(int nPlayer) {
     }
     p->ballBefore.nPlayer = -1;
     if (fn_80095780(gPlayers[nPlayer].pChar) != 11 && fn_80101738() && !fn_800C6CB0()) {
-        int nView = gPlayers[nPlayer].nView[0];
+        nView = gPlayers[nPlayer].nView[0];
         View_SetCamera(fn_80017028(nView), 0xE, nPlayer, nView);
     }
     fn_8006ACF8(nPlayer, 0);

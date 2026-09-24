@@ -655,7 +655,8 @@ void fn_8004731C(u8* pState) {
             fSize = 0.01f;
         }
         if (fSize < 1.5f) {
-            fGrow = 0.7f * (1.0f / (fSize / 1.5f) - 1.0f) + 1.0f;
+            fGrow = 1.0f / (fSize / 1.5f);
+            fGrow = 0.7f * (fGrow - 1.0f) + 1.0f;
             fn_8000AE28(pBall->m40[0], fGrow, pBall->m40[0]);
             fn_8000AE28(pBall->m40[1], fGrow, pBall->m40[1]);
             fn_8000AE28(pBall->m40[2], fGrow, pBall->m40[2]);
