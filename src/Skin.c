@@ -320,6 +320,50 @@ void fn_80035CC0(void) {
     }
 }
 
+// Draws one grey triangle for view nView through the positions of the character's bones 1 and 7
+// (bone 7 twice), when its model has them.
+void fn_80035D10(Character* pChar, int nView) {
+    f32* apPos[3];
+    DynRenderFill fill;
+    CharModel* pModel;
+    int i;
+
+    if (nView < 0 || nView >= 2) {
+        return;
+    }
+    pModel = pChar->pModel;
+    if (pModel->nBones <= 1 || pModel->nBones <= 7) {
+        return;
+    }
+    apPos[0] = pModel->pMatrices[1][3];
+    apPos[1] = pModel->pMatrices[7][3];
+    apPos[2] = pModel->pMatrices[7][3];
+    for (i = 0; i < 3; i++) {
+        lbl_801D4E78.aPos[nView][i][0] = apPos[i][0];
+        lbl_801D4E78.aPos[nView][i][1] = apPos[i][1];
+        lbl_801D4E78.aPos[nView][i][2] = apPos[i][2];
+        lbl_801D4E78.aUV[nView][i][0] = 0.0f;
+        lbl_801D4E78.aUV[nView][i][1] = 0.0f;
+        lbl_801D4E78.aColor[nView][i][0] = 0x80;
+        lbl_801D4E78.aColor[nView][i][1] = 0x80;
+        lbl_801D4E78.aColor[nView][i][2] = 0x80;
+        lbl_801D4E78.aColor[nView][i][3] = 0x80;
+        lbl_801D4E78.aIndex[nView][i] = i;
+    }
+    fill.nCount = 3;
+    fill.nVerts = 3;
+    fill.pDraws = NULL;
+    fill.pIndices = lbl_801D4E78.aIndex[nView];
+    fill.pPos = lbl_801D4E78.aPos[nView];
+    fill.pColour = lbl_801D4E78.aColor[nView];
+    fill.pTexCoord = lbl_801D4E78.aUV[nView];
+    fn_80014118(0);
+    fn_80035138(0);
+    fn_80012EF8();
+    fn_80036100(&lbl_801D4E78.aMesh[nView], &fill, 1);
+    fn_800360D4(&lbl_801D4E78.aMesh[nView]);
+}
+
 // Runs fn_80035D10 for view nView on every character made so far, except those fn_8001EC48 picks
 // and those with flag 0x40 or 1.
 void fn_80035E98(int nView) {
