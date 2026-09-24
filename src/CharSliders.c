@@ -266,6 +266,8 @@ void fn_8010DE60(CharSliderDefs* pDefs) {
 // Let each slider move the ranges of the sliders it links to, keeping their values at the same
 // place in their ranges.
 void fn_8010DF8C(CharSliderDefs* pDefs) {
+    int i;
+    int j;
     CharSliderDef* pDef;
     CharSliderValue* pValue;
     CharSliderLink* pLink;
@@ -274,8 +276,6 @@ void fn_8010DF8C(CharSliderDefs* pDefs) {
     f32 fSpan;
     f32 fPlace;
     u8 bMove;
-    int i;
-    int j;
     int n;
 
     if (pDefs != NULL) {
