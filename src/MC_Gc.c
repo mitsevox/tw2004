@@ -13,7 +13,7 @@
 #include "frontend/fe.h"
 #include "core/goaram.h"
 
-void fn_8006C63C(void);         // } called around every CARD library call (not yet known)
+void fn_8006C63C(void);         // called in every wait for a CARD library result (not yet known)
 void fn_8009DC80(s32 nPort, s32 nSlot, s32 nResult);
 void fn_8009DCE8(void);
 void fn_8009EB30(UStreamObject* pObject);
@@ -35,15 +35,15 @@ void* lbl_802813D0 = lbl_801E7100;
 u8    lbl_802813D4 = 1;
 s32   lbl_802813D8 = -1;
 
-// Every operation starts here: note its size and how far the CARD library's transfer count has
-// got, from which its progress is measured.
+// Before a mount, read, write, delete or format: note the operation's size (lbl_80281FB4) and the
+// CARD library's transfer count so far (nXferStart).
 void fn_8009CB9C(s32 nPort, s32 nSlot, s32 nSize) {
     lbl_801F1510[nPort][nSlot].nXferStart = CARDGetXferredBytes(nPort);
     lbl_80281FB4 = nSize;
 }
 
-// Park the save file images: take the ARAM for them once, allocate both, then let fn_8009EF98 copy
-// them to ARAM and free them.
+// Park the save file images: take the ARAM once, allocate both images, then let fn_8009EF98 copy
+// the first to ARAM and free both.
 void fn_8009CC00(void) {
     lbl_80281FC0 = MC_BUFFER_SIZE + 0x20;
     if (lbl_80281FC4 == 0) {
@@ -58,7 +58,8 @@ void fn_8009CC00(void) {
     fn_8009EF98();
 }
 
-// Free everything: the icon and banner objects, MC.c's data, the first image and the ARAM.
+// Free the icon and banner objects, MC.c's 'eagm' list (fn_800A1BE0), the first image and the
+// ARAM. The second image is not freed.
 void fn_8009CC88(void) {
     if (lbl_80281FB8 != NULL) {
         fn_80009E70(lbl_80281FB8);
@@ -81,8 +82,8 @@ void fn_8009CC88(void) {
     }
 }
 
-// Start up: no multitaps, one slot per port, no card damaged yet; then mount each card once and
-// unmount it again, which notes what is in each port.
+// Reset: lbl_80282008 0 and lbl_80282000 1 for both ports, no I/O error noted (lbl_80281FD0); then
+// mount slot 0 of each port once and unmount it again, which notes what is in it.
 void fn_8009CD10(void) {
     int i;
     lbl_80282008[0] = 0;
@@ -946,10 +947,11 @@ s32 fn_8009EC30(s32 nPort, s32 nSlot, const char* pName, const char* pBackupName
     return (nResult != MC_ERR_NOFILE) ? nResult : -37;
 }
 
-// Load the save file into the first image, falling back on its backup: a good save file makes the
-// backup redundant (deleted), a good backup alone becomes the save file (fn_8009EC30). Both bad, or
-// one bad and the other missing: MC_ERR_BADDATA. pName and pBackupName are not used; the names are
-// always MC_FILE_NAME and MC_BACKUP_NAME.
+// Load and check the save file, then its backup, each into the first image (a backup on the card is
+// read last, so the image holds it after). A good save file makes the backup redundant (deleted), a
+// good backup alone becomes the save file (fn_8009EC30). Both bad, or one bad and the other
+// missing: MC_ERR_BADDATA. pName and pBackupName are not used; the names are always MC_FILE_NAME
+// and MC_BACKUP_NAME.
 s32 fn_8009ED34(s32 nPort, s32 nSlot, const char* pName, const char* pBackupName) {
     s32 nMain = fn_8009EECC(nPort, nSlot, MC_FILE_NAME);
     s32 nBackup = fn_8009EECC(nPort, nSlot, MC_BACKUP_NAME);
@@ -970,8 +972,8 @@ s32 fn_8009ED34(s32 nPort, s32 nSlot, const char* pName, const char* pBackupName
     return nMain;
 }
 
-// Load the save file (or its backup) into the first image. When the card's state is bad the card
-// is left mounted.
+// Mount the card, load and check the save file and its backup (fn_8009ED34), and unmount it again
+// if this mounted it. When the card's state is bad (fn_8009F734) the card is left mounted.
 s32 fn_8009EE28(s32 nPort, s32 nSlot) {
     s32 nMount;
     s32 nResult;
@@ -1074,16 +1076,17 @@ s32 fn_8009F0F0(s32 nPort, s32 nSlot, const char* pPattern, char** apName, s32 n
     return 0;
 }
 
-// Read nLen bytes of open file nFile into pBuf, from where the last read stopped. arg3 is not
-// used (TibExt's fn_80122744 passes 0).
+// Read nLen bytes of open file nFile into pBuf at the file position (lbl_80281FC8) and move the
+// position on; CARDRead's result is ignored. arg3 is not used (TibExt's fn_80122744 passes 0).
 s32 fn_8009F208(s32 nFile, void* pBuf, s32 nLen, s32 arg3) {
     CARDRead(&lbl_801E3180[nFile], pBuf, nLen, lbl_80281FC8);
     lbl_80281FC8 += nLen;
     return 0;
 }
 
-// Write nLen bytes from pBuf to open file nFile, from where the last access stopped. An I/O error
-// marks the card in port 0 damaged; any other result clears that.
+// Write nLen bytes from pBuf to open file nFile on port 0 at the file position (lbl_80281FC8) and
+// move the position on. An I/O error marks the card in port 0 damaged; any other result clears that
+// and gives 0.
 s32 fn_8009F258(s32 nFile, void* pBuf, s32 nLen) {
     s32 nResult = fn_8009E130(0, 0, &lbl_801E3180[nFile], pBuf, nLen, lbl_80281FC8);
     lbl_80281FC8 += nLen;
@@ -1095,8 +1098,9 @@ s32 fn_8009F258(s32 nFile, void* pBuf, s32 nLen) {
     return 0;
 }
 
-// Move open file nFile's position to nOffset, from the start or from where it is. A position
-// outside the file's 0x76000 bytes gives MC_ERR_BADDATA and goes back to the start.
+// Move the file position (lbl_80281FC8) to nOffset, from the start or from where it is. An nOffset
+// above 0x76000, or below 0 from the start, gives MC_ERR_BADDATA and puts the position back at the
+// start. nFile is not used.
 s32 fn_8009F2D8(s32 nFile, s32 nOffset, u8 bFromStart) {
     if (bFromStart) {
         if (nOffset < 0) {
@@ -1137,8 +1141,8 @@ s32 fn_8009F3A0(s32 nPort, s32 nSlot, const char* pName, s32* pnFreeFiles) {
     return 0;
 }
 
-// Open the file fn_8009F514 created (lbl_802813D8) and start at its beginning. pName "EASB" also
-// hands it to the EA Sports Bio's code (fn_8012CCCC). uFlags is not used.
+// Open the file fn_8009F0F0 or fn_8009F514 noted last (lbl_802813D8) and start at its beginning.
+// pName "EASB" also hands it to the EA Sports Bio's code (fn_8012CCCC). uFlags is not used.
 s32 fn_8009F3D4(s32 nPort, s32 nSlot, const char* pName, u32 uFlags, s32* pnFile) {
     CARDFileInfo file;
     s32 nResult;
@@ -1163,7 +1167,7 @@ s32 fn_8009F488(s32 nFile) {
     return 0;
 }
 
-// fn_8009F0F0's qsort order: newest first, by the entries' time stamps.
+// fn_8009F0F0's qsort order, meant as newest first by the entries' time stamps (see the EA bug).
 s32 fn_8009F4D8(const void* pA, const void* pB) {
     // EA bug: the time stamps are read through the addresses of the two parameters, not through
     // the entries they point to, so this compares whatever is on the stack there and the order is
