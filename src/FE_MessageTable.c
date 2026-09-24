@@ -2708,13 +2708,13 @@ void fn_8007E9BC(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-// Bit pArgs[2] of the card state's a8 (the card in port pArgs[0], slot pArgs[1]).
+// Whether the save on the card in port pArgs[0], slot pArgs[1] holds replay pArgs[2].
 void fn_8007EA14(MsgArg* pArgs, MsgArg* pResult) {
     MCCardState state;
     u32 uBit = pArgs[2].i;
 
     fn_8009F7F4(&state, pArgs[0].i, pArgs[1].i);
-    pResult->i = fn_8001E9CC(state.a8, uBit);
+    pResult->i = fn_8001E9CC(state.aReplayUsed, uBit);
 }
 
 // Option a0[1]: the menus' choices 1..6 are the values 5, 0, 1, 2, 3, 4; it is passed on times 0.2.

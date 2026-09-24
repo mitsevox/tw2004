@@ -69,6 +69,7 @@ s32  CARDFreeBlocks(s32 nChan, s32* pnFreeBytes, s32* pnFreeFiles);
 s32  CARDGetAttributes(s32 nChan, s32 nFileNo, u8* puAttr);
 s32  CARDGetEncoding(s32 nChan, u16* puEncoding);
 s32  CARDGetResultCode(s32 nChan);
+void CARDInit(void);
 s32  CARDSetAttributes(s32 nChan, s32 nFileNo, u8 uAttr);
 s32  CARDMountAsync(s32 nChan, void* pWorkArea, CARDCallback pfnDetach, CARDCallback pfnAttach);
 s32  CARDReadAsync(CARDFileInfo* pFile, void* pBuf, s32 nLen, s32 nOffset, CARDCallback pfnCallback);
