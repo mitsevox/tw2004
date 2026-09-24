@@ -44,7 +44,6 @@ f32   fn_800351D8(u32 n, f32 fPeriod);
 void  fn_8003519C(int nRow, void* pData);   // calls row nRow's function of lbl_80188E88 with pData
 s32   fn_800318AC(const void* pA, const void* pB);
 void  fn_8003272C(int n);
-void  fn_80035154(u8 b);
 void  fn_80035170(u32 uClear, u32 uSet);
 void  fn_80035294(void);
 void  fn_800352BC(void);
@@ -69,7 +68,6 @@ void  fn_80063920(int nView, f32* pBounds);     // GoCamCont: given an object th
 u8    fn_80033308(Ter_ObjectDrawData* pDraw, u8 bForce);
 void  fn_8000ADC0(f32 (*pMtx)[4]);  // identity matrix
 void  fn_80035370(void);
-void  fn_80035098(u8 b);
 void  fn_80034CAC(int nRenderPass);
 void  fn_80034DE4(void);
 void  fn_80034F28(void* pUnused);

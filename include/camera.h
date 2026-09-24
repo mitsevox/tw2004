@@ -440,8 +440,10 @@ typedef struct CamTuning {
     f32  f1F4;                  // 0x1F4  ... how far the aim may move per call
     f32  fMaxPitchUp;           // 0x1F8  fn_800C4AB0: the steepest camera angle above the horizontal (degrees)
     f32  fMaxPitchDown;         // 0x1FC  and below it
-    u8   unk200[0x20C - 0x200];
-    f32  f20C;                  // 0x20C  camera 4: the most View.f54 grows to
+    u8   unk200[0x208 - 0x200];
+    f32  f208;                  // 0x208  times lbl_801D5010[view]: the alpha of GoPostFx fn_80039358's
+                                //        black cover
+    f32  f20C;                 // 0x20C  camera 4: the most View.f54 grows to
     f32  f210;                  // 0x210  camera 4: how fast (per second) it moves in from its start
     f32  f214;                  // 0x214  camera 4: how fast View.f54 grows and shrinks
     f32  f218;                  // 0x218  camera 4: how fast (per second) buttons 0x31/0x32 turn it round
@@ -572,6 +574,12 @@ extern struct Character* lbl_80281EE8[CRAP_NUM_GOLFERS];   // per golfer slot: t
                                         // with (none); char.c's fn_8001C518 frees them
 
 // ---- the views ------------------------------------------------------------------------------
+
+// A render camera (our name); only what the cleaned code reads.
+typedef struct RenderCamera {
+    u8   unk0[0x14];
+    f32* pRect;                 // 0x14  its screen rectangle: left, top, width, height (fn_80012EF0)
+} RenderCamera;
 
 // Points at the slot holding the current render camera (lbl_80281C90): fn_8001614C reads it,
 // fn_80013D5C sets it.

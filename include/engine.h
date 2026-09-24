@@ -752,6 +752,75 @@ typedef struct ScreenCopy {
 extern ScreenCopy* lbl_80281100;
 extern s32 lbl_80281B88;        // bit 0: the video field being drawn
 
+// ---- the depth-of-field blur (DepthField.c) -------------------------------------------------
+
+// One blur layer (0x18 bytes; our name). lbl_801D5110 holds five, set up by fn_80045660.
+typedef struct DFLayer {
+    u8   b0;                    // 0x00  set: the layer is drawn (fn_80045848)
+    u8   unk1[3];
+    f32  f4;                    // 0x04  times f14: the draw's alpha
+    f32  aColour[3];            // 0x08  the draw's red, green and blue
+    f32  f14;                   // 0x14  0..1 (fn_800457B8); 0 turns the layer off
+} DFLayer;
+LAYOUT_ASSERT(DFLayer, 0x18);
+
+// What lbl_80281110 points at (lbl_801D5188, 0x10 bytes; our name).
+typedef struct DFBuffer {
+    u8    unk0[8];
+    void* p8;                   // 0x08  the screen copy's pixels (fn_8002A624)
+    u8    unkC[4];
+} DFBuffer;
+
+extern DFLayer lbl_801D5110[5];
+extern DFBuffer* lbl_80281110;
+extern f32 lbl_80281D90;
+extern f32 lbl_80281D94;        // cleared by fn_80045660
+// DF_vDrawBufferToScreen's pass n (0..4) is shifted by lbl_80281114 * (5 - n) /
+// (lbl_8028111C * (n + 1)), drawn at depth 1 - (lbl_80281118 * n^3 + lbl_80281D90) and faded by
+// 1 / (lbl_80281120[0] * (n + 1)).
+extern f32 lbl_80281114;        // 0.011
+extern f32 lbl_80281118;        // 0.00315
+extern f32 lbl_8028111C;        // 3.13
+extern f32 lbl_80281120[2];     // 1, 0
+
+// ---- the screen effects (GoPostFx.c) ---------------------------------------------------------
+
+// Three effects per view (four views each; our names), each drawn once when set, then cleared.
+// A colour drawn over the view (fn_80038010 sets it, fn_80038438 draws it).
+typedef struct PostFxTint {
+    u8   b0;                    // 0x00  set: draw it this frame
+    u8   unk1[3];
+    f32  aColour[4];            // 0x04  fn_80014194's colour
+} PostFxTint;
+LAYOUT_ASSERT(PostFxTint, 0x14);
+
+// Set by fn_80038054, drawn by fn_80038724.
+typedef struct PostFx5090 {
+    u8   b0;                    // 0x00  set: draw it this frame
+    u8   unk1[3];
+    f32  f4;                    // 0x04  0.035 or more also calls fn_800A6070(0, 1)
+    f32  f8;                    // 0x08
+} PostFx5090;
+LAYOUT_ASSERT(PostFx5090, 0xC);
+
+// A colour fading in from a centre point towards the view's edges (fn_800380A8 sets it,
+// fn_80038A90 draws it).
+typedef struct PostFx5020 {
+    u8   b0;                    // 0x00  set: draw it this frame
+    u8   b1;                    // 0x01  set: draw the effect's screen copy under it first
+    u8   unk2[2];
+    f32  aColour[4];            // 0x04  fn_800380A8 sets the first three; [3] scales the alpha
+    f32  fX;                    // 0x14  } the centre, as fractions of the view's width and height
+    f32  fY;                    // 0x18  }
+} PostFx5020;
+LAYOUT_ASSERT(PostFx5020, 0x1C);
+
+extern f32 lbl_801D5010[4];     // per view: fn_80039358 darkens the screen by this share
+extern PostFx5020 lbl_801D5020[4];
+extern PostFx5090 lbl_801D5090[4];
+extern PostFxTint lbl_801D50C0[4];
+extern void* lbl_80281D80;      // a 256 x 224 screen copy, only in game types 4..8
+
 // ---- the file streamer (UStream.c) -----------------------------------------------------------
 
 // An object built from SHOC chunks. The header is 0x34 bytes (LoadData.c copies one with
