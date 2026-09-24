@@ -476,17 +476,17 @@ void* fn_800951A0(u32 uSize, u16 nAlign, int n) {
     }
     uPad = nAlign - 1;
     uTotal = sizeof(HeapBlockHead) + 1 + uPad + uSize;
-    pBlock = OSAllocFromHeap(__OSCurrHeap, uTotal);
-    if (pBlock == NULL) return NULL;
+    pData = OSAllocFromHeap(__OSCurrHeap, uTotal);
+    if (pData == NULL) return NULL;
+    pBlock = pData;
     // port: aligned by the address
     uOff = (uptr)(pBlock + sizeof(HeapBlockHead)) % nAlign;
     if (uOff != 0) {
-        uOff = nAlign - uOff;
+        pData += nAlign - uOff;
     }
-    pData = pBlock + uOff;
     ((HeapBlockHead*)pData)->pBlock = pBlock;
     ((HeapBlockHead*)pData)->uSize = uSize;
-    pData += sizeof(HeapBlockHead);
+    pData = (u8*)((HeapBlockHead*)pData + 1);
     *(pData + uSize) = uPad;
     uPeak = lbl_80281F5C;
     lbl_80281F58 += uTotal;

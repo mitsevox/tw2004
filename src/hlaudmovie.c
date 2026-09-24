@@ -469,12 +469,12 @@ AudStreamFile* fn_800A9374(u32 uSize) {
 // The stream file's header is loaded: open the stream file and fix the play lists' offsets up.
 void fn_800A93AC(void) {
     s32 hFile;
-    u32 i;
     u8* pLists;
+    u32 i;
 
     if (lbl_80281468 == -1) {
         hFile = fn_800060E0("/AudioStm_GC.sab");
-        pLists = (u8*)&lbl_80282070->apLists[lbl_80282070->nPlayLists];
+        pLists = (u8*)lbl_80282070->apLists + lbl_80282070->nPlayLists * sizeof(AudPlayList*);
         for (i = 0; i < lbl_80282070->nPlayLists; i++) {
             // port: the offsets are stored in the pointer fields
             lbl_80282070->apLists[i] = (AudPlayList*)(pLists + (uptr)lbl_80282070->apLists[i]);

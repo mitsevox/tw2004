@@ -191,7 +191,7 @@ void fn_80110A38(HwsBurn* pBurn, int n) {
     if (pEntry->nC >= 0) {
         p28 = &pBurn->pDesc->p28[pEntry->nC];
         nCount = 0;
-        for (i = 0; i < p28->n0; i++) {
+        for (i = 0; p28->n0 > i; i++) {
             nCount += p28->a8[i].n1;
         }
     }
@@ -219,15 +219,16 @@ void fn_80110C88(HwsBurn* pBurn, int n) {
 // What variant nVariant of part nPart uses: its chosen options (all without one), and the
 // options its links pick on other parts' chosen variants.
 void fn_80110D10(HwsBurn* pBurn, int nPart, int nVariant) {
+    int i;
     SkinLink* pLink;
     SkinVariant* pOther;
     s32 nOption;
     s32 nFirst;
     s32 nChosen;
-    s32 nFirstLink;
     int nLinked;
-    int i;
     int j;
+    s32 nFirstLink;
+    s32 nFirstVariant;
 
     nOption = pBurn->aOption[nPart];
     nFirst = pBurn->pDesc->pVariants[nVariant].nFirstOption;
@@ -243,10 +244,10 @@ void fn_80110D10(HwsBurn* pBurn, int nPart, int nVariant) {
         if (nLinked != -1) {
             nOption = pLink->nOption;
             nChosen = pBurn->aVariant[nLinked];
-            nFirst = pBurn->pDesc->pParts[nLinked].nFirst;
+            nFirstVariant = pBurn->pDesc->pParts[nLinked].nFirst;
             for (j = 0; j < pBurn->pDesc->pParts[nLinked].nVariants; j++) {
                 if ((nChosen == -1 || nChosen == j) && nOption >= 0) {
-                    pOther = &pBurn->pDesc->pVariants[nFirst + j];
+                    pOther = &pBurn->pDesc->pVariants[nFirstVariant + j];
                     if (nOption < pOther->nOptions) {
                         fn_80110C88(pBurn, pOther->nFirstOption + nOption);
                     }
@@ -504,9 +505,10 @@ SkinMesh* fn_801111E8(HwsBurn* pBurn, u8* pBase, s32* pOffset, s32 nAlign) {
 // Mark the SkinDesc.p8C entries the a64 entries use (p78) and list them (a7C, a80). nAlign is
 // unused (see fn_80110F2C).
 s32 fn_80111658(HwsBurn* pBurn, s32 nAlign) {
-    int i;
     int nEntries = pBurn->n60;
     int nBits = pBurn->n70;
+    int i;
+    int j;
     int n;
 
     fn_8001E938(pBurn->p78, nBits);
@@ -516,10 +518,10 @@ s32 fn_80111658(HwsBurn* pBurn, s32 nAlign) {
         }
     }
     n = 0;
-    for (i = 0; i < nBits; i++) {
-        if (fn_8001E9CC(pBurn->p78, i)) {
-            pBurn->a7C[n] = i;
-            pBurn->a80[i] = n;
+    for (j = 0; j < nBits; j++) {
+        if (fn_8001E9CC(pBurn->p78, j)) {
+            pBurn->a7C[n] = j;
+            pBurn->a80[j] = n;
             n++;
         }
     }

@@ -691,13 +691,13 @@ void fn_80020FF8(f32* pOut, f32 fX, f32 fY, f32 fZ) {
 // x (2) or about y (3), or three angles (0). While lbl_80281CC0 is clear the z and y angles and the
 // last two of three angles are negated (fn_80021978 sets it).
 void fn_80021134(u16* p, f32* pOut, s32 nBones, u32* pBits) {
-    int nBit;   // fake match: 2 * i kept in its own counter for the second bit (i + i gives the first)
+    int nBit;   // fake match: 2 * i kept in its own counter for the second bit (the first is (u32)i * 2)
     int i;
     u64 uKind;  // fake match: a 64-bit switch value (the asm compares register pairs)
 
     for (i = 0, nBit = 0; i < nBones; pOut += 4, nBit += 2, i++) {
         uKind = 0;
-        if (fn_8001E9CC(pBits, i + i)) {
+        if (fn_8001E9CC(pBits, (u32)i * 2)) {
             uKind = 1;
         }
         if (fn_8001E9CC(pBits, nBit + 1)) {
@@ -747,7 +747,7 @@ void fn_8002148C(u8* p, f32* pOut, s32 nBones, u32* pBits, u16* aBase) {
 
     for (i = 0, nBit = 0; i < nBones; aBase += 3, pOut += 4, nBit += 2, i++) {
         uKind = 0;
-        if (fn_8001E9CC(pBits, i + i)) {
+        if (fn_8001E9CC(pBits, (u32)i * 2)) {
             uKind = 1;
         }
         if (fn_8001E9CC(pBits, nBit + 1)) {

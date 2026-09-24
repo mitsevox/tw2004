@@ -856,7 +856,7 @@ config.libs = [
             Object(NonMatching, "Quaternion.c"),
             Object(NonMatching, "StaticMemory.c"),
             Object(Matching, "UMemPool.c"),
-            Object(NonMatching, "urandom.c"),
+            Object(Matching, "urandom.c"),
             Object(Matching, "ObjList.c"),
             Object(Matching, "LoadData.c"),
             Object(NonMatching, "TerrainData.c"),
