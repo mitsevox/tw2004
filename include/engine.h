@@ -1093,7 +1093,7 @@ typedef struct UFontContext {
     struct UFontContext* pNext;   // 0x00  the next string queued on the same font
     f32   f04;                    // 0x04  where the first gradient starts
     f32   f08;                    // 0x08  where it ends
-    f32   f0C;                    // 0x0C  1 / (f08 - f04), set by UFont_CalcGradientScale_80012E00
+    f32   f0C;                    // 0x0C  1 / (f08 - f04), set by fn_80012E00_CalcGradientScale
     s32   n10;                    // 0x10  gradients on: 1 the stops in a14[0..4], 2 a14[4] to a14[5]
     UFontStop a14[6];             // 0x14
     u32   u5C;                    // 0x5C  the colour (a GXColor's bytes) when nA4 is 0x12

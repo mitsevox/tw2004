@@ -11,8 +11,8 @@
 
 // GameMode4.c
 int  GameMode4_GetEventOpponent(int nEvent);                   // the event's opponent (a golfer id)
-int  GameMode4_GetEventCourse_80102104(int nEvent);                   // its course
-int  GameMode4_GetEventHoles_8010211C(int nEvent);                   // its hole-selection preset
+int  GameMode4_GetEventCourse(int nEvent);                   // its course
+int  GameMode4_GetEventHoles(int nEvent);                   // its hole-selection preset
 u8   GameMode4_HasWonEvent(int nProfile, int nEvent);     // the profile has won it
 u8   GameMode4_IsEventOpen(int nProfile, int nEvent);     // the profile has won every event it needs
 u8   GameMode4_SelectEvent(int nProfile, int nEvent);     // makes it the current event if it may be played

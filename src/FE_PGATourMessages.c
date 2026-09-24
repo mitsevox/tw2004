@@ -14,11 +14,9 @@
 #include "game/modes/pgatoursim.h"
 
 
+// .sbss is laid out last-defined-first, so these are in reverse address order.
+s32 lbl_802824B4;                       // how many tournaments lbl_802824B0 holds
 s32* lbl_802824B0;                      // the tournaments on the schedule (fn_8010EA24)
-s32 lbl_802824B4;                       // and how many there are
-
-// The sponsor offers' asset kinds (11), picked at random.
-s16 lbl_80193CFC[11] = { 0, 1, 2, 5, 6, 9, 10, 11, 13, 14, 15 };
 
 // One leaderboard row: the place ("CUT", "T3" for a tie, "3"), the name, the score, the round
 // scores and the money won (empty when none).
@@ -243,10 +241,9 @@ void fn_8010EBDC(MsgArg* pArgs, MsgArg* pResult) {
         nCount = 0;
         pEvent = gpSaveData[nPlayer].tour.aEvent;
         for (i = 0; i < 31; i++) {
-            if (pEvent->nUserRankType == 2 && pEvent->nUserRank == 1 && fn_800EFA70(i)->nC != 0) {
+            if (pEvent[i].nUserRankType == 2 && pEvent[i].nUserRank == 1 && fn_800EFA70(i)->nC != 0) {
                 nCount++;
             }
-            pEvent++;
         }
         sprintf(szOut, "%d", nCount);
         return;
@@ -254,10 +251,9 @@ void fn_8010EBDC(MsgArg* pArgs, MsgArg* pResult) {
         nCount = 0;
         pEvent = gpSaveData[nPlayer].tour.aEvent;
         for (i = 0; i < 31; i++) {
-            if (pEvent->nUserRankType == 2 && pEvent->nUserRank <= 10) {
+            if (pEvent[i].nUserRankType == 2 && pEvent[i].nUserRank <= 10) {
                 nCount++;
             }
-            pEvent++;
         }
         sprintf(szOut, "%d", nCount);
         return;
@@ -295,6 +291,9 @@ void fn_8010EEE4(MsgArg* pArgs, MsgArg* pResult) {
     sprintf(szC, "$ %d00,000", n);
     *pOut = n;
 }
+
+// The sponsor offers' asset kinds (11), picked at random.
+s16 lbl_80193CFC[11] = { 0, 1, 2, 5, 6, 9, 10, 11, 13, 14, 15 };
 
 // ---- sweep code (not yet cleaned up) ----
 
@@ -470,7 +469,7 @@ void fn_8010F440(MsgArg* pArgs, MsgArg* pResult) {
 
     fn_800D28DC(fn_80077ACC()->aC8[nEvent].award.nDate, ((MsgString*)pArgs[1].p)->pStr);
     strcpy(szName, fn_80077ACC()->szName);
-    GameModeDriverPGATour_GetWinnerEarningsString(nEvent, szEarnings);
+    fn_800EFF7C(nEvent, szEarnings);
     fn_800907AC(fn_80077ACC()->aC8[nEvent].n6 * 1000, szMoney);
     *pScore = fn_80077ACC()->aC8[nEvent].nScore;
 }

@@ -54,7 +54,7 @@ void fn_800DCAD8(void) {
     fn_800E58B4(50);
 }
 
-void GM_vCloseModuleONCE(void) {
+void fn_800DCAFC(void) {
 }
 
 u8 fn_800DCB00(void) {
@@ -181,9 +181,9 @@ void GM_InitForHole(void) {
     }
 }
 
-// The end of a golfer's turn: the caddie stops, the mode is told, then either the hole is over
-// (for everyone, or this player gave up) or, when the mode lets CPUs concede, a CPU far enough
-// behind concedes; otherwise the golfer waits (state 19).
+// The end of a golfer's turn: the mode is told, then either the mode says the hole is finished,
+// or the golfer waits (state 19) - in modes 6-8 only once holed, and when the mode lets CPUs
+// concede, a CPU that GM_CheckForAIConcede picks concedes the hole instead.
 void GM_EndOfGolferTurn(int nPlayer) {
     u8 bWait;
     Caddie_Stop();
@@ -283,9 +283,9 @@ void GM_HoleFinished_GameNotFinished(int nPlayer) {
     fn_800E3D90();
 }
 
-// TW06: GM_CheckForAIConcede. A CPU concedes the hole when it is not holed and either its level
-// is above 2, or (checking the players before it) another player is on the green while it is
-// not and it has already taken more than 3 strokes more than them.
+// TW06: GM_CheckForAIConcede. A CPU concedes the hole when it is not holed and either nLevel (its
+// penalties in a row) is above 2, or (checking the players before it) another player is on the
+// green while it is not and it has already taken more than 3 strokes more than them.
 u8 GM_CheckForAIConcede(int nPlayer) {
     u8  bConcede = 0;
     int i;
@@ -329,12 +329,13 @@ void GM_PlayerAddStroke(int nPlayer) {
     }
 }
 
-// TW06: GM_CheckForBallOOB. After a shot: out of bounds (or no ground under the ball), or on a
-// surface that needs a drop outside the free-drop area, stops the ball. A real penalty (out of
-// bounds, or a surface flagged 2 - water) marks the shot, counts one more penalty in a row
-// (nLevel: each gives a CPU +25 on its attributes, three make it concede), adds the penalty
-// stroke, and shows "water" or "out of bounds" - unless the mode caps the hole at 10 strokes and
-// that is reached. Any other shot resets the run of penalties.
+// TW06: GM_CheckForBallOOB. After a shot: out of bounds (fn_800E2B40, or no surface under the
+// ball), or a drop (a surface without u34 bit 0, or any inside the free-drop network), stops the
+// ball. Out of bounds, or a drop on a surface with u34 bit 1, is a penalty: the shot is marked,
+// nLevel counts one more (each gives a CPU +25 on its attributes, three make it concede), a
+// penalty stroke is added and message 0xD (water, class 7/16) or 2 is shown; returns 1, or 0 once
+// the mode's 10-stroke limit is reached (modes 7 and 8 return 1 before that, with no message).
+// A shot with neither resets nLevel.
 u8 GM_CheckForBallOOB(int nPlayer) {
     Ball*        pBall = &gPlayers[nPlayer].ball;
     u8           bOut  = fn_800E2B40(nPlayer, pBall);
@@ -446,10 +447,10 @@ void GM_BumpBallForObstructions(int nPlayer) {
     }
 }
 
-// TW06: GM_PlayerTookShot. After every shot: replay bookkeeping, the stroke, the out-of-bounds
-// check, then - if the ball is in play - holed (score message, the mode's hook), or the hole's
-// stroke limit reached (the ball is picked up: lie "holed", 10 or 11 strokes, putts 999), or a
-// mode message, or the yardage. Out of bounds goes to the mode's hook instead.
+// TW06: GM_PlayerTookShot. After every shot: the mulligan and replay prompts (messages 29, 46),
+// the stroke, the penalty check, then - with no penalty - holed (score message, the mode's hook),
+// or the hole's stroke limit reached (the ball is picked up: lie "holed", 10 or 11 strokes, putts
+// 999), or messages 0x11-0x13 (dead: fn_8008AC40 is 0), or the yardage. A penalty goes to pfn250.
 void GM_PlayerTookShot(int nPlayer) {
     u8   bOut;
     if (fn_800E23EC(nPlayer) && !(gPlayers[nPlayer].uFlags & 8)) {
@@ -521,9 +522,9 @@ void GM_PlayerTookShot(int nPlayer) {
 }
 
 // Taking a mulligan. Not allowed when mulligans are off, the hole was conceded, or fn_800E53B8
-// says no; in mulligan mode 2 each player gets one (bMulliganUsed), mode 1 allows any number. The
-// shot is undone: effects stopped, the mode told, the golfer back in the Swing state, and the views
-// of other players sharing this screen (and still playing the hole) updated.
+// says no; in mulligan mode 2 each player gets one (bMulliganUsed), mode 1 allows any number. Then
+// the HUD and effects are reset, the mode is told, the golfer goes back to the Swing state, and the
+// view's flag comes out unless another player on that view is still off the green.
 u8 GM_PlayerTakeMulligan(int nPlayer) {
     int i;
     if (fn_800E177C() == 0) {
@@ -570,7 +571,7 @@ u8 GM_PlayerTakeMulligan(int nPlayer) {
 
 // Whether to play the pre-shot routine (our reading; TW06's name for this one is not certain).
 // The mode's setting 0x290: 0 never, 1 always; otherwise always off the tee, never with clubs 0-8
-// (woods and long irons) from elsewhere, never with an obstruction nearby, else 85% of the time.
+// (the drivers and woods) from elsewhere, never with an obstruction nearby, else 85% of the time.
 // On course 18, hole 10, not within 40 yards of the tee.
 int fn_800DDFB4(int nPlayer) {
     f32 v[4];
@@ -603,11 +604,13 @@ int fn_800DDFB4(int nPlayer) {
     return (Rand_Next(1) % 100) < 85;
 }
 
-// TW06: GM_ShowPostShotAnimation. Whether the golfer plays a reaction after the shot. Never on
-// course 18's 10th within 40 yards of the tee, in one special stance on surface 45, or when the
-// golfer stands out of bounds, in water, or on a slope steeper than 0.1 with the ball 0.2 above.
-// Then by how the shot turned out (0..4): after a putt 80%, always, always, 70%, 90%, else 50%;
-// after other shots 35%, always, always, 70%, 90%, else 50%.
+// TW06: GM_ShowPostShotAnimation. Whether the golfer plays a reaction after the shot. Never when
+// fn_800E27A8 says no, on course 18's 10th within 40 yards of the tee, for character group 11 on
+// start surface 45, or when the golfer stands out of bounds, on a surface without u34 bit 0, in
+// water (class 7/16), or on a slope steeper than 0.1 with the ball 0.2 above. After the debug,
+// plan-ready, fn_8004560C, animation 9 and uFlags bit 0 cases, by how the shot turned out (0..4):
+// after a putt 80%, always, always, 70%, 90%, else 50%; after other shots 35%, always, always,
+// 70%, 90%, else 50%.
 int GM_ShowPostShotAnimation(int nPlayer) {
     f32          vPos[4];
     f32          vNormA[4];
@@ -717,8 +720,8 @@ int GM_ShowPostShotAnimation(int nPlayer) {
     }
 }
 
-// TW06: GM_ShowPostShotCrowdFlyby (by position). Two measures of the shot (fn_800336E4 at least 5,
-// fn_800336F4 at least 0.5).
+// TW06: GM_ShowPostShotCrowdFlyby (by position). The crowd animation's countdown at least 5
+// (fn_800336E4) and its delayed-start percentage at least 0.5 (fn_800336F4).
 u8 GM_ShowPostShotCrowdFlyby(void) {
     if (fn_800336E4() >= 5.0f && fn_800336F4() >= 0.5f) {
         return 1;
@@ -777,8 +780,9 @@ f32 GM_GetGolferDistanceToPin(int nPlayer) {
     return fn_800D0478(nPlayer);
 }
 
-// TW06: GM_ReplaceOOBBall. A ball out of bounds (or flagged at 0x30E) is dropped at a legal point
-// nearby when there is one; otherwise it goes back where it was before the shot.
+// TW06: GM_ReplaceOOBBall. A ball flagged at 0x30E, or in bounds (Ter_PointInOOBNetwork) after a
+// shot with no penalty, is dropped at a legal point nearby when there is one; otherwise (out of
+// bounds, or after a penalty) it goes back where it was before the shot.
 void GM_ReplaceOOBBall(int nPlayer) {
     f32   v[4];
     f32*  pPre;
@@ -877,10 +881,10 @@ void GM_MovePlayerToBall(int nPlayer) {
     }
 }
 
-// TW06: GM_CheckForShotChanges. A human's buttons while setting up: three camera/aim buttons
-// (9, 10, 30; not in modes 22 and 26), then the aiming cameras - zoom, elevator - or the mode's
-// re-plan button 47 (a fresh default target and shot), the green camera, or the mid-hole flyover
-// (unless cameras are skipped). Buttons 11-14 are taunts/reactions (events 0x12-0x15); any of it
+// TW06: GM_CheckForShotChanges. A human's buttons while setting up: buttons 9, 10 and 30 (events
+// 0xD-0xF; not in modes 22 and 26), then the aiming cameras - zoom, elevator - or the mode's
+// re-plan button 47 (a fresh default target and shot), the next camera shot, or the mid-hole
+// flyover (unless cameras are skipped). Held buttons 11-14 fire events 0x12-0x15; any of it
 // updates the golfer's emotion.
 void GM_CheckForShotChanges(int nPlayer) {
     u8 bChanged = 0;
@@ -952,10 +956,10 @@ void GM_CheckForShotChanges(int nPlayer) {
 }
 
 // TW06: GM_DoPostShotInHoleUI. Every frame after a holed ball, until the golfer's turn ends: with
-// the score display (flag 8) the turn ends as soon as the camera is done; otherwise the camera
-// is moved on, and a human may take a mulligan (button 25), watch the replay (button 24, if one
-// was recorded, the mode allows it and the hole was not conceded) or continue (button 0); a CPU
-// continues on any pad's button 0.
+// uFlags 8 the turn ends once the view is on camera 4. With no message holding the player, camera
+// 4 ends the turn and other cameras (not 1/2) are moved on; with one, a human may take a mulligan
+// (button 25), watch the replay (button 24, if one was recorded, the mode allows it and the hole
+// was not conceded) or continue (button 0); a CPU continues on any pad's button 0.
 void GM_DoPostShotInHoleUI(int nPlayer) {
     View* pView = fn_80017028(gPlayers[nPlayer].nView[0]);
     f32   vOffset[4] = {0.0f, 0.0f, 0.0f, 0.5f};
@@ -1064,11 +1068,11 @@ int GM_ChooseRemoveBallState(int nPlayer) {
 
 // TW06: GM_SimulateBallMovement. Each frame of a shot: the ball's physics steps for this frame
 // (none while the view holds it), then the look-ahead copy (ballBefore) is run on ahead within a
-// time budget of 0.83 ms minus what the real ball took, until it comes to rest. When it has, the
-// golfer's reaction can start early: for a shot of kind 8 or 9 that will stop 2 to 5.5 yards out
-// (close to the nearest it got), a holed ball at par or better starts it half the time, and a
-// miss that came within 0.2 of the hole always does (animation 9). A scripted reaction (uFlags
-// bit 0) plays when the ball passes the saved distance instead.
+// time budget of 0.83 ms minus what the real ball took, until it comes to rest (event 0x3C). Then
+// the golfer's reaction can start early: for a shot of kind 8 or 9 with the ball now 2 to 5.5
+// yards out (close to the nearest it got), a look-ahead holed at par or better starts it half the
+// time, and a look-ahead miss that came within 0.2 of the hole always does (animation 9). A
+// scripted reaction (uFlags bit 0) plays when the ball passes the saved distance instead.
 void GM_SimulateBallMovement(int nPlayer) {
     int nSteps = 0;
     u64 t0;
@@ -1156,9 +1160,9 @@ void GM_SimulateBallMovement(int nPlayer) {
     }
 }
 
-// TW06: GM_CheckControllerPulled (by position). When the mode says a controller was pulled and
-// player 1's camera is at rest, the pause for it (fn_800E5228).
-void GM_CheckControllerPulled(void) {
+// TW06: GM_CheckControllerPulled (by position). When the mode's pfn234 says yes and player
+// 0's view is not on camera 1, 2 or 4, calls fn_800E5228 (an empty function).
+void fn_800DFC18(void) {
     if (gpGame->pfn234()) {
         if (!fn_80063C90(fn_80017028(gPlayers[0].nView[0]))) {
             fn_800E5228();
@@ -1218,7 +1222,7 @@ u8 GM_bIsZoomButtonPressed(int nPlayer) {
     return 0;
 }
 
-// Button 47 tapped (2 to 19 frames): the green camera.
+// Button 47 tapped (2 to 19 frames): the next camera shot.
 u8 fn_800E012C(int nPlayer) {
     if ((fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x2F, 0)) ||
         (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x2F, 1))) {

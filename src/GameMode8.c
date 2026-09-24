@@ -1706,7 +1706,7 @@ u8 fn_800FDF58(int nPlayer) {
     return 0;
 }
 
-// The mode's pfn234, which GM_CheckControllerPulled asks (TW06's CheckControllerPulled, by
+// The mode's pfn234, which fn_800DFC18 asks (TW06's CheckControllerPulled, by
 // position): during the countdown (nC3C bit 1) once it is below 71; otherwise once player 0's
 // camera has stopped moving.
 u8 fn_800FDF60(void) {

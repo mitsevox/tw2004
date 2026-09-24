@@ -77,13 +77,13 @@ DynTex* fn_8010A520(int nC, int nSize, int n2, int n3, int n4) {
     pHeader = &pTex->header;
     pTex->p4 = pHeader;
     pTex->p0 = (DynTexEntry*)(pHeader + 1);
-    pTex->header.p8 = (DynTexObj*)(pTex->p0 + nC);
-    pTex->header.pC = (DynTexPalette*)(pTex->header.p8 + nC);
-    pTex->header.p10 = (DynTex40*)(pTex->header.pC + nC);
-    pTex->header.p14 = (DynTex18*)(pTex->header.p10 + nC);
-    pTex->header.p18 = pTex->p18;
-    pTex->header.p20 = pTex->p18;
-    pTex->header.b2C = 0;
+    pHeader->p8 = (DynTexObj*)(pTex->p0 + nC);
+    pHeader->pC = (DynTexPalette*)(pHeader->p8 + nC);
+    pHeader->p10 = (DynTex40*)(pHeader->pC + nC);
+    pHeader->p14 = (DynTex18*)(pHeader->p10 + nC);
+    pHeader->p18 = pTex->p18;
+    pHeader->p20 = pTex->p18;
+    pHeader->b2C = 0;
     // port: the header has TexBank's layout (see lldyntex.h)
     pTex->n1C = fn_800106F0((TexBank*)pTex->p4);
     pTex->p4->n7 = n4;

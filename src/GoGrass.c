@@ -303,7 +303,7 @@ void fn_8011E9D8(void) {
     fn_800171D8(lbl_80281900->pRect, 0.0f, 0.0f, 1.0f, 1.0f);
     fn_800B3438(lbl_80281900->pRect, 1.0f, 1.0f);
     CA_vInitCamera(lbl_80281900->pLens);
-    CA_vSetType_80076A0C(lbl_80281900->pLens, 1);
+    fn_80076A0C_SetType(lbl_80281900->pLens, 1);
     fn_80076948(lbl_80281900->pLens, 20.0f, 20.0f);
     lbl_80281900->pCamera =
         fn_8001371C(lbl_80281900->pLens, lbl_80281900->pFrameBuf, lbl_80281900->pRect);

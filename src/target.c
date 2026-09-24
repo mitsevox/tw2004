@@ -72,7 +72,7 @@ void fn_80067CD4(int nPlayer) {
     }
 }
 
-void UFont_SetFlags_80012C84(int a);
+void fn_80012C84_SetFlags(int a);
 void fn_800E5118(int a, int b, int nPlayer);                       // GameMessages.c
 void fn_800E5178(int nPlayer, f32 a, f32 b, f32 c, f32 d);          // GameMessages.c
 
@@ -179,7 +179,7 @@ void fn_80067DAC(int nPlayer) {
 
     // the HUD: where the target is on screen, how far above or below the ball, and the share of
     // the club's range (1..100)
-    UFont_SetFlags_80012C84(0);
+    fn_80012C84_SetFlags(0);
     fn_8006A9AC(aText);
     fn_8006434C(pCamera, vPos, &fX, &fY, NULL);
     fn_8006A8D4(pCamera, &fX, &fY);
@@ -1065,7 +1065,7 @@ void fn_80069CDC(int nPlayer) {
 
     if (!bBall) {
         // the distances, under the marker and kept on screen
-        UFont_SetFlags_80012C84(0);
+        fn_80012C84_SetFlags(0);
         if (bInBounds && (gPlayers[nPlayer].uFlagsEF0 & 1)) {
             fn_8006A9AC(lbl_801887CC);
         } else {

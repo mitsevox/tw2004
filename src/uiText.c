@@ -17,8 +17,8 @@ UISVec4* lbl_80281F30;
 void UFont_SetFont(s32 nFont);
 void fn_80012B6C(f32 f);
 void fn_80012B9C(f32 fX, f32 fY);
-void UFont_SetFlags_80012C84(s32 uFlags);                           // 1/2: the alignment
-void UFont_SetWordWrapBox_80012CB4(f32 fX, f32 fY, f32 fW, f32 fH);
+void fn_80012C84_SetFlags(s32 uFlags);                           // 1/2: the alignment
+void fn_80012CB4_SetWordWrapBox(f32 fX, f32 fY, f32 fW, f32 fH);
 
 void fn_800760B0(s32 nX, s32 nY, s32 nW, s32 nH);
 
@@ -153,13 +153,13 @@ void fn_800922A8(UIText* pText) {
     }
     fn_80013EEC(fn_8001614C());
     fn_8006A9AC(aColor);
-    UFont_SetWordWrapBox_80012CB4(fX, fY, fW, fH);
+    fn_80012CB4_SetWordWrapBox(fX, fY, fW, fH);
     if (pText->nFlags & 1) {
         uFlags |= 2;
     } else if (pText->nFlags & 2) {
         uFlags |= 1;
     }
-    UFont_SetFlags_80012C84(uFlags);
+    fn_80012C84_SetFlags(uFlags);
     if (0.0f != aColor[3]) {
         UFont_DrawString(szText, 0.0f, 0.0f);
         fn_800760B0(0, 0, 0x200, 0x1C0);
@@ -243,15 +243,15 @@ void fn_800929E4(UIText* pText, int nMsg, s32 n, MsgArg* pArgs, MsgArg* pResult)
 
 // ---- sweep code (not yet cleaned up) ----
 
-void UFont_SetMode_80012898();
+void UFont_SetMode();
 void fn_80092BA0(void);
 void fn_80092BC4(void);
 void fn_80092BA0(void) {
-    UFont_SetMode_80012898(1);
+    UFont_SetMode(1);
 }
 
 void fn_80092BC4(void) {
-    UFont_SetMode_80012898(0);
+    UFont_SetMode(0);
 }
 
 // ---- end of sweep code ----

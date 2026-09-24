@@ -10,12 +10,12 @@ void UFont_LoadFontFromStream(UStreamObject* pObject);
 void UFont_ResetContext(void);
 void UFont_LoadFont(u32 uSlot, void* pData, s32 bFlag);
 void UFont_SetFont(s32 nFont);
-void UFont_SetMode_80012898(s32 nMode);
+void UFont_SetMode(s32 nMode);
 char* UFont_CopyString(char* sz);
 f32  UFont_GetStringWidth(char* sz, int nFont);
 void UFont_BeginDraw(void);
 void UFont_EndDraw(void);
-void UFont_CalcGradientScale_80012E00(UFontContext* pCtx);
+void fn_80012E00_CalcGradientScale(UFontContext* pCtx);
 void fn_80012E1C(LLFont* pFont, s32 v);
 void fn_80012E24(LLFont* pFont, UFontContext* pCtx);
 s32  fn_80012E4C(LLFont* pFont);
@@ -77,11 +77,12 @@ void UFont_Shutdown(void) {
     fn_80009E70(lbl_80280DE0->pStrings);
 }
 
-// Resets the text settings.
+// Sets mode 0 (queued) and resets most text settings (u5C, a14, f70/f74, a8C and nC4 to fD0
+// keep theirs).
 void UFont_ResetContext(void) {
     UFontContext* pCtx;
 
-    UFont_SetMode_80012898(0);
+    UFont_SetMode(0);
     pCtx = UFont_GetContext();
     pCtx->f78 = 1.0f;
     pCtx->f7C = 1.0f;
@@ -105,7 +106,7 @@ void UFont_ResetContext(void) {
     pCtx->n10 = 0;
     pCtx->f04 = 0.0f;
     pCtx->f08 = 1.0f;
-    UFont_CalcGradientScale_80012E00(pCtx);
+    fn_80012E00_CalcGradientScale(pCtx);
 }
 
 // bFlag is read from the stream id but not used.
@@ -125,11 +126,11 @@ void UFont_SetFont(s32 nFont) {
     pCtx->nFont = nFont;
 }
 
-void UFont_SetMode_80012898(s32 nMode) {
+void UFont_SetMode(s32 nMode) {
     lbl_80280DE0->n1B8 = nMode;
 }
 
-s32 UFont_GetMode_800128A4(void) {
+s32 UFont_GetMode(void) {
     return lbl_80280DE0->n1B8;
 }
 
@@ -179,7 +180,7 @@ void UFont_DrawString(char* sz, f32 fX, f32 fY) {
         pRec->szText = UFont_CopyString(sz);
         pRec->f70 = fX;
         pRec->f74 = fY;
-        UFont_CalcGradientScale_80012E00(pRec);
+        fn_80012E00_CalcGradientScale(pRec);
         fn_80012E24(lbl_80280DE0->apFonts[pCtx->nFont], pCtx);
         break;
     }
@@ -247,21 +248,21 @@ f32 fn_80012C30(char* sz) {
     return UFont_GetStringWidth(sz, 4);
 }
 
-void UFont_SetWordWrap_80012C54(s32 v) {
+void fn_80012C54_SetWordWrap(s32 v) {
     UFontContext* pCtx;
 
     pCtx = UFont_GetContext();
     pCtx->uA8 = v;
 }
 
-void UFont_SetFlags_80012C84(s32 v) {
+void fn_80012C84_SetFlags(s32 v) {
     UFontContext* pCtx;
 
     pCtx = UFont_GetContext();
     pCtx->n9C = v;
 }
 
-void UFont_SetWordWrapBox_80012CB4(f32 f0, f32 f1, f32 f2, f32 f3, s32 n) {
+void fn_80012CB4_SetWordWrapBox(f32 f0, f32 f1, f32 f2, f32 f3, s32 n) {
     UFontContext* pCtx;
 
     pCtx = UFont_GetContext();
@@ -298,7 +299,7 @@ void UFont_EndDraw(void) {
     fn_80012EF8();
 }
 
-void UFont_CalcGradientScale_80012E00(UFontContext* pCtx) {
+void fn_80012E00_CalcGradientScale(UFontContext* pCtx) {
     pCtx->f0C = 1.0f / (pCtx->f08 - pCtx->f04);
 }
 

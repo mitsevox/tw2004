@@ -24,7 +24,7 @@ f32 fn_800BA504(f32 fAlpha);
 void fn_800BA550(void);
 f32 fn_800BA6CC(void);
 f32 fn_800BA700(void);
-void UFont_SetMode_80012898(s32 v);
+void UFont_SetMode(s32 v);
 void fn_80012B9C(f32 fX, f32 fY);
 void UFont_SetFont(s32 nFont);
 void fn_80076128(s32 n);
@@ -181,7 +181,7 @@ void fn_800BA550(void) {
     char szSong[0xA0];          // size unknown: the frame leaves room for this much
 
     vColour[3] = fn_800BA504(0.5f);
-    UFont_SetMode_80012898(1);
+    UFont_SetMode(1);
     fn_80012B9C(0.8f, 0.8f);
     fn_8006A9AC(vColour);
     UFont_SetFont(lbl_801F8458.nFont);
@@ -192,7 +192,7 @@ void fn_800BA550(void) {
                 0.029f + (fn_800BA40C() + fn_800BA6CC()));
     UFont_DrawString(lbl_801F846C[nTrack].sz100, fn_800BA440() + fn_800BA700(),
                 0.058f + (fn_800BA40C() + fn_800BA6CC()));
-    UFont_SetMode_80012898(0);
+    UFont_SetMode(0);
     fn_80076128(11);
 }
 

@@ -199,7 +199,7 @@ int fn_80171E94(int eError, int* pProcess, int* pResult) {
             }
         } else {
             SFIOSetLastError(eError);
-            return SFIOStartSelectDevice(_SFIO_pData->Session.eDevice, pProcess);
+            return fn_8016DA84_StartUnmount(_SFIO_pData->Session.eDevice, pProcess);
         }
         break;
     case 3:
@@ -217,7 +217,7 @@ int fn_80171E94(int eError, int* pProcess, int* pResult) {
             }
         } else {
             SFIOSetLastError(eError);
-            return SFIOStartSelectDevice(_SFIO_pData->Session.eDevice, pProcess);
+            return fn_8016DA84_StartUnmount(_SFIO_pData->Session.eDevice, pProcess);
         }
         break;
     case 4:
@@ -237,7 +237,7 @@ int fn_80171E94(int eError, int* pProcess, int* pResult) {
             }
         } else {
             SFIOSetLastError(eError);
-            return SFIOStartSelectDevice(_SFIO_pData->Session.eDevice, pProcess);
+            return fn_8016DA84_StartUnmount(_SFIO_pData->Session.eDevice, pProcess);
         }
         break;
     case 5:
@@ -246,7 +246,7 @@ int fn_80171E94(int eError, int* pProcess, int* pResult) {
             _SFIO_pDevice->fn.pfnMount("", _SFIO_pData->Session.szFileName, _SFIO_pData->Session.eDevice, 4);
         } else {
             SFIOSetLastError(eError);
-            return SFIOStartSelectDevice(_SFIO_pData->Session.eDevice, pProcess);
+            return fn_8016DA84_StartUnmount(_SFIO_pData->Session.eDevice, pProcess);
         }
         break;
     case 6:
@@ -257,7 +257,7 @@ int fn_80171E94(int eError, int* pProcess, int* pResult) {
                                        _SFIO_pDevice->desc.uSize04 + _SFIO_pDevice->desc.uSize08);
         } else {
             SFIOSetLastError(eError);
-            return SFIOStartSelectDevice(_SFIO_pData->Session.eDevice, pProcess);
+            return fn_8016DA84_StartUnmount(_SFIO_pData->Session.eDevice, pProcess);
         }
         break;
     case 7:
@@ -294,7 +294,7 @@ int fn_80171E94(int eError, int* pProcess, int* pResult) {
             _SFIO_pDevice->fn.pfnSelectDevice(_SFIO_pData->Session.eDevice);
         } else {
             SFIOSetLastError(eError);
-            return SFIOStartSelectDevice(_SFIO_pData->Session.eDevice, pProcess);
+            return fn_8016DA84_StartUnmount(_SFIO_pData->Session.eDevice, pProcess);
         }
         break;
     case 0x1A:
@@ -373,20 +373,20 @@ int fn_801727C8(int eError, int* pProcess, int* pResult) {
                 _SFIO_pDevice->fn.pfn24(_SFIO_pData->Session.szDirName, _SFIO_pData->Session.szFileName, _SFIO_pData->Session.eDevice);
             } else if (*pResult == 0) {
                 SFIOSetLastError(4);    // no such save
-                return SFIOStartSelectDevice(_SFIO_pData->Session.eDevice, pProcess);
+                return fn_8016DA84_StartUnmount(_SFIO_pData->Session.eDevice, pProcess);
             } else {
                 *pProcess = 2;
                 return 0xA;
             }
         } else {
             SFIOSetLastError(eError);
-            return SFIOStartSelectDevice(_SFIO_pData->Session.eDevice, pProcess);
+            return fn_8016DA84_StartUnmount(_SFIO_pData->Session.eDevice, pProcess);
         }
         break;
     case 0x15:
         if (eError == 3) {
             if (SFIOGetLastError() == 0) SFIOSetLastError(eError);
-            return SFIOStartSelectDevice(_SFIO_pData->Session.eDevice, pProcess);
+            return fn_8016DA84_StartUnmount(_SFIO_pData->Session.eDevice, pProcess);
         } else {
             if (eError != 4 && SFIOGetLastError() == 0) SFIOSetLastError(eError);
             _SFIO_pData->eOperation = 0x12;
@@ -400,7 +400,7 @@ int fn_801727C8(int eError, int* pProcess, int* pResult) {
             _SFIO_pDevice->fn.pfnSelectDevice(_SFIO_pData->Session.eDevice);
         } else {
             if (SFIOGetLastError() == 0) SFIOSetLastError(eError);
-            return SFIOStartSelectDevice(_SFIO_pData->Session.eDevice, pProcess);
+            return fn_8016DA84_StartUnmount(_SFIO_pData->Session.eDevice, pProcess);
         }
         break;
     case 0x1A:

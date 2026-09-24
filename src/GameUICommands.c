@@ -13,8 +13,9 @@
 #include "core/startup.h"
 #include "frontend/fe.h"
 
-u8  lbl_80281ED8;               // which player the alternating question answers next (mode 26)
+// in reverse address order: CodeWarrior lays .sbss out last-defined-first
 s32 lbl_80281EDC;               // counts -1..10, one step per fn_800894E8
+u8  lbl_80281ED8;               // which player the alternating question answers next (mode 26)
 
 // The round's commands, in address order (the table's order is fn_80085120's).
 void fn_80085C78(MsgArg* pArgs, MsgArg* pResult);
@@ -249,7 +250,7 @@ void  GM_RestartHole(void);                                   // GameManager.c
 void  GameModeBattle_AddClub(int nPlayer, int nClub);         // GameModeBattle.c
 int   GameModeBattle_CanAddClub(int nPlayer, int nClub);
 s32   GameModeBattle_GetWinner(void);
-u8    GameModeBattle_IsClubStealingFinished(void);
+u8    fn_800E81B4(void);
 int   GameModeBattle_NumRemovableClubsLeft(int nPlayer);
 u8    GameModeBattle_RemoveClub(int nPlayer, int nClub);
 void  fn_8001A870(void);
@@ -519,9 +520,9 @@ void fn_80085120(void) {
     lbl_801D83B0[159] = fn_80089C84;
     lbl_801D83B0[160] = fn_80089CAC;
     lbl_801D83B0[161] = fn_80089CCC;
-    lbl_801D83B0[162] = fn_800834A8;
-    lbl_801D83B0[163] = fn_80089D04;
-    lbl_801D83B0[164] = fn_80089D28;
+    lbl_801D83B0[162] = fn_80089D04;
+    lbl_801D83B0[163] = fn_80089D28;
+    lbl_801D83B0[164] = fn_800834A8;
     lbl_801D83B0[165] = fn_80088160;
     lbl_801D83B0[166] = fn_80089D48;
     lbl_801D83B0[167] = fn_80089D68;
@@ -795,6 +796,12 @@ void fn_800864A0(MsgArg* pArgs, MsgArg* pResult) {
 
 void fn_800864D8(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gPlayers[pArgs[0].i].ball.n6C;
+}
+
+// fake match: stands in for a function the original linker stripped. The file's pool starts with
+// 1.0f (0x80283B10), before the 2 pi fn_800864F8 uses first; its body is unknown.
+static f32 GameUICommands_StrippedFn(f32 x) {
+    return x + 1.0f;
 }
 
 // Where the wind blows from, against the player's aim: 0..8, eighths of a turn.
@@ -1168,8 +1175,17 @@ void fn_80087420(MsgArg* pArgs, MsgArg* pResult) {
     fn_800C9038(gPlayers[pArgs[0].i].nView[0], (f32*)pArgs[1].i, (f32*)pArgs[2].i);
 }
 
+// A tournament entrant in a profile: GetEntrantMCPtr's body (PGATourSimulation.c), pasted in.
+// Written out as gpSaveData[nPlayer].tour.field.aEntrant[n] it adds the entrant's offset last.
+static inline PgaEntrantMC* Tour_EntrantMC(PlayerNumber_t nPlayer, int nEntrant) {
+    return &gpSaveData[nPlayer].tour.field.aEntrant[nEntrant];
+}
+
+// The n18 of the PGA TOUR entrant on leaderboard row pArgs[0], in profile 0.
 void fn_80087460(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = gpSaveData->tour.field.aEntrant[fn_801197CC(0, pArgs[0].i)].n18;
+    PlayerNumber_t nPlayer = PLR_1_e;
+
+    pResult->i = Tour_EntrantMC(nPlayer, fn_801197CC(0, pArgs[0].i))->n18;
 }
 
 void fn_800874C8(MsgArg* pArgs, MsgArg* pResult) {
@@ -2686,7 +2702,7 @@ void fn_8008A86C(MsgArg* pArgs, MsgArg* pResult) {
 
 // Battle mode: whether the club stealing is over.
 void fn_8008A870(MsgArg* pArgs, MsgArg* pResult) {
-    if (GameModeBattle_IsClubStealingFinished() != 0) {
+    if (fn_800E81B4() != 0) {
         pResult->i = 1;
         return;
     }

@@ -2872,7 +2872,7 @@ void fn_8004544C(f32* pA, f32* pB, f32* pOut) {
 
 void fn_80045470(CamLens* pLens, f32 fFov) {
     pLens->fFov = fFov;
-    CA_vCalcFovScale_800763BC(pLens);
+    CA_vUpdateInternalFieldOfViewData(pLens);
 }
 
 // The quarter-speed slow motion (GameEffects.b11) on or off, with its sound events (0x35 on,

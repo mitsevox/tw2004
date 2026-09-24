@@ -33,8 +33,8 @@ void fn_80077340(void);                 // FE_Manager.c
 void fn_80077344(void);                 // FE_Manager.c
 void fn_80077348(void);                 // FE_Manager.c
 void fn_80016B6C(f32 x, f32 y);
-void UFont_SetMode_80012898(s32 nMode);
-void UFont_SetWordWrap_80012C54(s32 v);
+void UFont_SetMode(s32 nMode);
+void fn_80012C54_SetWordWrap(s32 v);
 void UFont_ResetContext(void);
 void fn_800908D4(f32 x0);
 void fn_80090890(s32 nLevel, const char* szFile, s32 nLine, const char* szMsg);
@@ -122,14 +122,14 @@ void fn_8008F648(s32 nTicks) {
         }
         fn_80014194(NULL);
         fn_80016B6C(1.0f / 512.0f, 1.0f / 448.0f);
-        UFont_SetMode_80012898(1);
-        UFont_SetWordWrap_80012C54(1);
+        UFont_SetMode(1);
+        fn_80012C54_SetWordWrap(1);
         fn_800908D4(0.85f);
         if (lbl_80281F1C != NULL) {
             fn_80168C24(lbl_80281F1C->pHandler, nTicks);
         }
         fn_800908D4(1.0f);
-        UFont_SetWordWrap_80012C54(0);
+        fn_80012C54_SetWordWrap(0);
         fn_80016B6C(1.0f, 1.0f);
         fn_80012F34(1);
         fn_80012F50(1, 6, 0x80);
