@@ -76,8 +76,8 @@ DynChain* fn_80114270(CharModel* pModel, int nBone, s32 nType, s32 n10) {
     DynChain* pChain;
     int nLinks;
     int nNext;
-    int bFound;
     int i;
+    u8 bFound;
 
     nNext = nBone;
     if (nBone == 0xFF || nBone == -1) {
