@@ -1,6 +1,6 @@
 // uiobject.c (our name, after TW06's golf/ui core/istudio runtime/uiobject.c; UI_Obj_InitModule is
 // a TW06 pair): the 3D objects the in-game UI draws (TW06: the confidence-boost rings and the
-// "tappa spinna" UI). Not yet decompiled; the code below is the sweep's matched small functions.
+// "tappa spinna" UI): here the power boost and spin display (fn_800AE3F8).
 
 #include "game_types.h"
 #include "engine.h"
@@ -157,7 +157,7 @@ void fn_800AE3F8(int nObj) {
 
     nPlayer = fn_8001707C(nObj);
     // the object rises with the GameBreaker letterbox
-    if (!lbl_80202898.bGameBreaker) {
+    if (lbl_80202898.bGameBreaker == 0) {
         fY = -0.23f;
     } else {
         fY = (0.23f - 0.17f) * (GameEffects_GetLetterboxHeight() / 0.15f) + -0.23f;
