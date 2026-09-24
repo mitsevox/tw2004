@@ -919,6 +919,8 @@ ShaderRow19.c:
 
 EASportsBio.c:
 	.text       start:0x801249A8 end:0x8012597C
+	.data       start:0x80195308 end:0x801953E0
+	.sdata2     start:0x80284B10 end:0x80284B28
 
 GameMode22.c:
 	.text       start:0x8012597C end:0x801270F0
@@ -928,9 +930,14 @@ SkinBurn.c:
 
 EASBStorage.c:
 	.text       start:0x80127D84 end:0x8012CCD8
+	.rodata     start:0x80184E40 end:0x80184FC0
+	.data       start:0x80195700 end:0x80195750
+	.sdata      start:0x802819B0 end:0x802819B8
+	.sdata2     start:0x80284B40 end:0x80284B58
 
 EASB.c:
 	.text       start:0x8012CCD8 end:0x8012E950
+	.sdata2     start:0x80284B58 end:0x80284B60
 
 src/vi/vi.c:
 	.text       start:0x8012E950 end:0x8013042C
