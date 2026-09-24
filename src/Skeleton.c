@@ -138,6 +138,50 @@ void fn_800273BC(CharModel* pModel, IKChain* pChain, f32* pTarget, s32 nIteratio
     }
 }
 
+// Re-poses the chain's bones from the links before them: links with b0 bit 1 from their kept q38
+// and v48, the others (once the link before was redone) from their bones' rotation and position.
+void fn_80027478(CharModel* pModel, IKChain* pChain) {
+    f32 vOffset[4];
+    u64 uDone;
+    u64 uPrevBit;
+    int i;
+    IKLink* pLink;
+    int nBone;
+    int nPrevBone;
+    int bKept;
+    Bone* pBone;
+    BonePose* pPose;
+    BonePose* pPrev;
+
+    fn_8001EED8(pModel, 0x52);  // EA drops the answer
+    uDone = 0;
+    for (i = 0; i < pChain->nLinks; i++) {
+        pLink = &pChain->pLinks[i];
+        nBone = pLink->nBone;
+        nPrevBone = pChain->pLinks[pLink->nPrev].nBone;
+        // EA bug: a bone past 63 shifts out of the 64-bit mask (the compiler's helper gives 0)
+        uPrevBit = (u64)1 << nPrevBone;
+        bKept = pLink->b0 & 1;
+        if (bKept || (uDone & uPrevBit)) {
+            pBone = &pModel->pBones[nBone];
+            pPose = &pModel->pPoses[nBone];
+            pPrev = &pModel->pPoses[nPrevBone];
+            if (bKept) {
+                fn_800090E4(pPrev->q0, pLink->v48, vOffset);
+                fn_80008FCC(pLink->q38, pPrev->q0, pPose->q0);
+            } else {
+                fn_800090E4(pPrev->q0, pBone->v1C, vOffset);
+                fn_80008FCC(pBone->q0C, pPrev->q0, pPose->q0);
+            }
+            fn_800090A0(pPrev->v10, vOffset, pPose->v10);
+            pPose->v10[3] = 0.0f;
+            fn_8000914C(pPose->q0, pModel->pMatrices[nBone]);
+            fn_8001E880(pPose->v10, pModel->pMatrices[nBone][3]);
+            uDone |= (u64)1 << nBone;
+        }
+    }
+}
+
 // Turns the IK on or off.
 void fn_80027738(u8 bOn) {
     lbl_802810A6 = bOn;

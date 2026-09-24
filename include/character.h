@@ -26,7 +26,8 @@ typedef struct IKLink {
     u8   pad15[3];              //       access is a byte: fn_80026BF4, fn_80028208)
     f32  q18[4];                // 0x18  its rotation (quaternion) from the link before it
     f32  v28[4];                // 0x28  its offset from the link before it
-    u8   unk38[0x58 - 0x38];
+    f32  q38[4];                // 0x38  } q18 and v28 kept for a link whose b0 bit 1 is set:
+    f32  v48[4];                // 0x48  }   fn_80027478 poses it from these
     f32  v58[3];                // 0x58  its rotation as a vector (axis * angle)
     u8   unk64[0x78 - 0x64];
 } IKLink;
