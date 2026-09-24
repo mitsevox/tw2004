@@ -224,9 +224,6 @@ void fn_80114540(CharModel* pModel, DynChain* pChain, f32 fDelta) {
     f32 fSpeed;
     f32 fDrag;
     f32 fAngle;
-    f32 fX;
-    f32 fY;
-    f32 fZ;
 
     if (gSession.nGameType == 3) {
         return;
@@ -297,13 +294,9 @@ void fn_80114540(CharModel* pModel, DynChain* pChain, f32 fDelta) {
     pChain->pLinks->f8C = fLag;
 
     // Turn the bone from its z axis to the link.
-    fX = vWas[0] - vTo[0];
-    fY = vWas[1] - vTo[1];
-    fZ = vWas[2] - vTo[2];
-    fX *= fX;
-    fY *= fY;
-    fZ *= fZ;
-    if (fX + fY + fZ > 0.00001f) {
+    if ((vWas[0] - vTo[0]) * (vWas[0] - vTo[0]) + (vWas[1] - vTo[1]) * (vWas[1] - vTo[1]) +
+            (vWas[2] - vTo[2]) * (vWas[2] - vTo[2]) >
+        0.00001f) {
         fn_800BAF04(vTo, vTo);
         fn_800BAF04(vWas, vWas);
         vec4flt_CrossProduct(vTo, vWas, vAxis);
@@ -359,9 +352,6 @@ void fn_80114A84(CharModel* pModel, DynChain* pChain, f32 fDelta) {
     f32 fStep;
     f32 fDot;
     f32 fAngle;
-    f32 fX;
-    f32 fY;
-    f32 fZ;
     int i;
 
     fStiff = pModel->f130;
@@ -397,13 +387,15 @@ void fn_80114A84(CharModel* pModel, DynChain* pChain, f32 fDelta) {
         vPos[3] = 1.0f;
         vDiff[0] = vPos[0] - pChain->pLinks[i].v64[0];
         vDiff[1] = vPos[1] - pChain->pLinks[i].v64[1];
-        vDiff[3] = 0.0f;
         vDiff[2] = vPos[2] - pChain->pLinks[i].v64[2];
+        vDiff[3] = 0.0f;
         fDist = fn_800BAF58(vDiff, vDiff);
         if (fDist < 0.4f) {
             // Close to where it was: stay back, the more so the further down the chain.
             fFall = 1.0f - fDown;
-            fStep = fDist / 0.4f * (fFall * fPull) + fFall * fDrag * fLoose;
+            fStep = fFall * fDrag;
+            fStep *= fLoose;
+            fStep = fDist / 0.4f * (fFall * fPull) + fStep;
             if (fStep > fDist) {
                 fStep = fDist;
             }
@@ -454,13 +446,9 @@ void fn_80114A84(CharModel* pModel, DynChain* pChain, f32 fDelta) {
             if (0.0f != vWas[0] || 0.0f != vWas[1] || 0.0f != vWas[2]) {
                 fn_800BAF04(vWas, vWas);
             }
-            fX = vWas[0] - vBone[0];
-            fY = vWas[1] - vBone[1];
-            fZ = vWas[2] - vBone[2];
-            fX *= fX;
-            fY *= fY;
-            fZ *= fZ;
-            if ((f32)fn_80009680(fX + fY + fZ) > 0.001f) {
+            if ((f32)fn_80009680((vWas[0] - vBone[0]) * (vWas[0] - vBone[0]) +
+                                 (vWas[1] - vBone[1]) * (vWas[1] - vBone[1]) +
+                                 (vWas[2] - vBone[2]) * (vWas[2] - vBone[2])) > 0.001f) {
                 vec4flt_CrossProduct(vWas, vBone, vAxis);
                 fAngle = fn_80009614(fn_8000C5FC(vBone, vWas));
                 if (fabs(fAngle) > 0.01f) {
