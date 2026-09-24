@@ -521,12 +521,12 @@ void fn_8010F5AC(MsgArg* pArgs, MsgArg* pResult) {
 
 // The n4 of every record of lbl_80282470 together.
 void fn_8010F63C(MsgArg* pArgs, MsgArg* pResult) {
-    char sz[0x24];                      // a CrAPRecord's name
+    char sz[0x34];                      // a CrAPRecord's name (0x24); size unknown, the frame fits 0x34
     s32 n4;
     s16 n0;
     s32 nRecords = fn_801070F4();
-    s32 nTotal;
     int i;
+    s32 nTotal;
 
     n0 = 0;
     nTotal = 0;
