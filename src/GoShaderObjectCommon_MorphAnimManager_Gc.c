@@ -5,6 +5,7 @@
 #include "morphanim.h"
 
 void fn_800975FC(MorphAnim* pAnim);
+int  fn_80112C04(void);     // hwsRender_Gc.c: 0 on course 14's hole 11 with four players
 
 void fn_80097208(void) {
     lbl_80281F70 = fn_80009B34(sizeof(MorphAnimMgr), 2, 32, "GoShaderObjectCommon_MorphAnimManager_Gc.c",
@@ -15,6 +16,21 @@ void fn_80097208(void) {
 void fn_80097250(void) {
     fn_80009E70(lbl_80281F70);
     lbl_80281F70 = NULL;
+}
+
+// Set up an animation's buffers, unless fn_80112C04 rules the morphs out.
+void fn_8009727C(MorphAnim* pAnim) {
+    if (fn_80112C04()) {
+        pAnim->fC = 0.0f;
+        pAnim->nFrames = 0;
+        pAnim->p10 = NULL;
+        pAnim->p14 = NULL;
+        pAnim->p18 = NULL;
+        pAnim->p1C = NULL;
+        pAnim->p10 = fn_80009B34(2000, 1, 32, "GoShaderObjectCommon_MorphAnimManager_Gc.c", 127);
+        pAnim->p14 = fn_80009B34(12000, 1, 32, "GoShaderObjectCommon_MorphAnimManager_Gc.c", 129);
+        pAnim->p18 = fn_80009B34(3000, 1, 32, "GoShaderObjectCommon_MorphAnimManager_Gc.c", 131);
+    }
 }
 
 // Add an animation: it takes the next slot, which starts empty.
