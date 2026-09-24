@@ -11,6 +11,7 @@
 #include "frontend/fe.h"
 #include "core/memcard.h"
 #include "charstate.h"
+#include "trax.h"
 #include "core/easb.h"
 #include "game/earnings.h"
 #include "game/modes/ladder.h"
@@ -4156,6 +4157,13 @@ void fn_80082CDC(MsgArg* pArgs, MsgArg* pResult) {
 
 void fn_80082D14(MsgArg* pArgs, MsgArg* pResult) {
     gSession.options.rows[pArgs[0].i][pArgs[1].i] = pArgs[2].i;
+}
+
+// Music row pArgs[0]'s flag for track pArgs[1], and the track's two lines of text.
+void fn_80082D3C(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = gSession.options.rows[pArgs[0].i][pArgs[1].i];
+    ((MsgString*)pArgs[2].p)->pStr = lbl_801F846C[pArgs[1].i].sz0;
+    ((MsgString*)pArgs[3].p)->pStr = lbl_801F846C[pArgs[1].i].szSong;
 }
 
 void fn_80082D98(MsgArg* pArgs, MsgArg* pResult) {
