@@ -11,10 +11,13 @@
 // An entry of the front end's colour table: p8 points at four bytes, alpha first (uiText.c).
 // Every table in the UI file's second list holds entries of this shape; u0 is the entry's kind,
 // 0x10 in the colour table (fn_8008FDDC).
+// Movie entries (fe_movies.c) use the same shape: flags 1 a texture (p4 its data), 2 a movie
+// (p8 its LLPict).
 typedef struct UIColorEntry {
     u32  u0;                    // 0x0
-    u8   unk4[0x4];
+    void* p4;                   // 0x4
     u8*  p8;                    // 0x8
+    char szC[4];                // 0xC  its name (fn_8008FFF0 reads it); the length is not known
 } UIColorEntry;
 
 typedef struct UIColorTable {
@@ -176,10 +179,10 @@ void fn_800834E8(MsgArg* pArgs, MsgArg* pResult);
 extern u8 lbl_80281F18;         // set by the pause handler (GameUICommands.c fn_8008633C)
 extern u8 lbl_80281F19;         // (uiProcessInterface.c) FEgolferanim.c's fn_8008EB10 tests it
 
-// Four words a UI element passes down its transform stack, copied as one struct (what they hold is
-// not known yet).
+// Four floats a UI element passes down its transform stack, copied as one struct; fe_movies.c's
+// fn_80090D28 scales its quad's colours by them / 511.
 typedef struct UIWords4 {
-    u32 a[4];
+    f32 a[4];
 } UIWords4;
 
 // One level of the menu UI's transform stack (uiTransform.c). A pushed element's transform is
@@ -219,5 +222,8 @@ typedef struct UITransformDesc {
 } UITransformDesc;
 
 UITransform* fn_80093274(void);         // the current level (uiTransform.c)
+
+// uiProcessInterface.c: for a UI name starting "tu", 1 in a lesson and -1 otherwise; else 0.
+int fn_8008FFF0(const char* szName);
 
 #endif

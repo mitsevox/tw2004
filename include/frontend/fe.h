@@ -110,7 +110,9 @@ LAYOUT_ASSERT(FEVertex, 0x18);
 typedef struct FEQuad {
     s16 n0;                     // 0x00  } with n2, an index pair into the UI file (fn_800913EC)
     s16 n2;                     // 0x02  }
-    u8  unk4[0xA - 0x4];
+    s16 n4;                     // 0x04  its colour in the front end's colour table (-1: none)
+    u8  unk6[0x8 - 0x6];
+    s16 n8;                     // 0x08  bit 0: a texture keeps its tint (fn_80090D28)
     s16 nA;                     // 0x0A
     FEVertex aVtx[4];           // 0x0C  the corners (fn_80090D28 draws them)
 } FEQuad;
