@@ -1053,11 +1053,13 @@ config.libs = [
             # function worse.
             Object(NonMatching, "UISApi.c", extra_cflags=["-inline auto"]),
             # Built with automatic inlining: fn_8016A830 and fn_8016B188 have their own recursion
-            # inlined three deep (-inline smart 55.8%, -inline auto 64.7%, nothing worse). Not
-            # deferred: -inline auto,deferred emits the functions in reverse order and pastes
-            # fn_8016C614/fn_8016C674 and the fn_8016C15C accessors into fn_8016A2D4/fn_8016A510,
-            # which the original calls (87 -> 62%, 93 -> 69%).
-            Object(NonMatching, "UISScreen.c", extra_cflags=["-inline auto"]),
+            # inlined three deep (-inline smart 55.8%, -inline auto 64.7%, nothing worse). Deferred:
+            # -inline auto,deferred emits the functions in reverse order (so the source is written
+            # last address first) and would paste fn_8016C614/fn_8016C674 and the fn_8016C15C
+            # accessors into their callers, which the original calls: those six sit in
+            # `#pragma auto_inline off`. fn_8016B188 77.50 -> 93.27, nothing worse. The flag alone
+            # on UISApi/UISEvent/UIStudio changes no score (their sources are still in address order).
+            Object(NonMatching, "UISScreen.c", extra_cflags=["-inline auto,deferred"]),
             Object(Matching, "GoDynObjTypes.c"),
             Object(Matching, "unsorted/sweep_800977CC.c"),
             Object(Matching, "GoDynObjBase.c"),
