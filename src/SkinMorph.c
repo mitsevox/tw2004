@@ -53,8 +53,11 @@ void fn_8011C1FC(SkinMorphWork* pWork, s16* pPos, s8* pNrm, u32 nVerts) {
 // offsets (four s8 each) and vertex numbers (s16), each offset times fScale.
 void fn_8011C27C(SkinMorphWork* pWork, void* pTarget, u32 nVerts, f32 fScale) {
     s16* pPos = pTarget;
+    uptr uNrmSize = nVerts * 4;
     s8* pNrm = (s8*)(pPos + nVerts * 4);
-    s16* pIndex = (s16*)(pNrm + nVerts * 4);
+    // fake match: the vertex numbers' address added as integers, size first (EA's add order;
+    // pNrm + nVerts * 4 puts the pointer first)
+    s16* pIndex = (s16*)(uNrmSize + (uptr)pNrm);
     SkinMorphVert* pVert;
     u32 i;
 
@@ -120,6 +123,23 @@ SkinMorphWork* fn_8011C564(void) {
     return pWork;
 }
 
+void fn_8011C580(SkinMorphWork* pWork, SkinDesc* pDesc) {
+    pWork->pDesc = pDesc;
+}
+
+void fn_8011C58C(SkinMorphWork* pWork, f32* afWeights, s32 nMorphs) {
+    pWork->afWeights = afWeights;
+    pWork->nMorphs = nMorphs;
+}
+
+void fn_8011C59C(SkinMorphWork* pWork, HwsOverrideTable* pTable) {
+    pWork->pTable = pTable;
+}
+
+void fn_8011C5A8(SkinMorphWork* pWork, HwsMemBlock* pBlock) {
+    pWork->pBlock = pBlock;
+}
+
 // Picks the meshes to blend for vertex set nSet of p44 entry pEntry: each morph target with a
 // weight other than 0 that has that set. Gives how many (in apTargets and afTargets).
 s32 fn_8011C5B4(SkinMorphWork* pWork, SkinDesc44* pEntry, int nSet) {
@@ -159,23 +179,6 @@ s32 fn_8011C5B4(SkinMorphWork* pWork, SkinDesc44* pEntry, int nSet) {
         }
     }
     return nPicked;
-}
-
-void fn_8011C580(SkinMorphWork* pWork, SkinDesc* pDesc) {
-    pWork->pDesc = pDesc;
-}
-
-void fn_8011C58C(SkinMorphWork* pWork, f32* afWeights, s32 nMorphs) {
-    pWork->afWeights = afWeights;
-    pWork->nMorphs = nMorphs;
-}
-
-void fn_8011C59C(SkinMorphWork* pWork, HwsOverrideTable* pTable) {
-    pWork->pTable = pTable;
-}
-
-void fn_8011C5A8(SkinMorphWork* pWork, HwsMemBlock* pBlock) {
-    pWork->pBlock = pBlock;
 }
 
 // Blends the morph targets of p44 entry n into its meshes' overrides: each mesh with flags

@@ -1018,7 +1018,7 @@ config.libs = [
             Object(NonMatching, "DynChain.c"),
             Object(Matching, "GameModeDriver.c"),
             Object(NonMatching, "PGATourSimulation.c"),
-            Object(NonMatching, "SkinMorph.c"),
+            Object(Matching, "SkinMorph.c"),
             Object(Matching, "fe_stats.c"),
             Object(Matching, "EventInfo.c"),
             Object(Matching, "llrtclock.c"),

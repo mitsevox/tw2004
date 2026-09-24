@@ -913,6 +913,8 @@ PGATourSimulation.c:
 
 SkinMorph.c:
 	.text       start:0x8011C068 end:0x8011CEB0
+	.data       start:0x80194170 end:0x80194180
+	.sdata2     start:0x80284A18 end:0x80284A30
 
 fe_stats.c:
 	.text       start:0x8011CEB0 end:0x8011D280
