@@ -515,7 +515,9 @@ s16 fn_800AFF9C(s16 nVolume) {
     nVolume >>= 1;
     if (nVolume <= 0) return VOLUME_MIN;
     if (nVolume >= 0x3FFF) return 0;
-    fDb = logf(16383.0f / nVolume);
+    fDb = 16383.0f;
+    fDb /= nVolume;
+    fDb = logf(fDb);
     fDb *= -86.5617f;
     nDb = fDb;
     if (nDb < VOLUME_MIN) {
