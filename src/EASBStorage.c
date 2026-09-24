@@ -189,11 +189,9 @@ EASBErrorE fn_80128200(void* pIcon, u32 uHeapID) {
         }
         if (!bRunning) {
             eCrcError = pCrc->pfnShutdown();
-            if (eCrcError != 0) {
-                eError = EASB_ERROR_UNKNOWN;
-            }
         }
-    } else {
+    }
+    if (eCrcError != 0) {
         eError = EASB_ERROR_UNKNOWN;
     }
     return eError;
@@ -1877,16 +1875,18 @@ void fn_8012C1AC(EASBErrorE* peError, EASBProcessE* peProcess) {
     if (nOperation == EASB_OPERATION_NONE) {
         return;
     }
-    if (nOperation == EASB_OPERATION_ERROR || nOperation == 6) {
-        bCleanUp = 0;
-    } else if (nOperation == 0 || nOperation == 4 || nOperation == 5) {
-        if (lbl_802825B0->nLastError < 100 || lbl_802825B0->nLastError > 118) {
-            bCleanUp = 1;
+    if (nOperation != EASB_OPERATION_ERROR && nOperation != 6) {
+        if (nOperation == 0 || nOperation == 4 || nOperation == 5) {
+            if (lbl_802825B0->nLastError < 100 || lbl_802825B0->nLastError > 118) {
+                bCleanUp = 1;
+            } else {
+                bCleanUp = 0;
+            }
         } else {
-            bCleanUp = 0;
+            bCleanUp = 1;
         }
     } else {
-        bCleanUp = 1;
+        bCleanUp = 0;
     }
     if (bCleanUp == 1) {
         lbl_802825B0->nOperation = EASB_OPERATION_NONE;

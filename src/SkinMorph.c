@@ -312,9 +312,8 @@ void fn_8011C9B0(Skin* pSkin) {
     pMorph->aChanged[1] = fn_80009B34(nBytes, 2, 16, "SkinMorph.c", 96);
     fn_8001E938(pMorph->aChanged[0], nMorphs);
     fn_8001E938(pMorph->aChanged[1], nMorphs);
-    nBytes = nMorphs * sizeof(f32);
-    pMorph->afWeights = fn_80009B34(nBytes, 2, 16, "SkinMorph.c", 100);
-    memset(pMorph->afWeights, 0, nBytes);
+    pMorph->afWeights = fn_80009B34(nMorphs * sizeof(f32), 2, 16, "SkinMorph.c", 100);
+    memset(pMorph->afWeights, 0, nMorphs * sizeof(f32));
     pSkin->pMorph = pMorph;
 }
 

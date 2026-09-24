@@ -946,7 +946,7 @@ config.libs = [
             Object(NonMatching, "AnimStream.c"),
             Object(NonMatching, "TerrainGround.c"),
             Object(NonMatching, "SkinPart.c"),
-            Object(NonMatching, "HoleScore.c"),
+            Object(Matching, "HoleScore.c"),
             Object(NonMatching, "SwingTips.c"),
             Object(NonMatching, "Calendar.c"),
             Object(Matching, "CourseData.c"),
