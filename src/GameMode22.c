@@ -145,7 +145,7 @@ void fn_80125C5C(MsgArg* pArgs, MsgArg* pResult) {
     char* szDate = ((MsgString*)pArgs[2].p)->pStr;
     SaveProfile* pProfile = fn_80077ACC();
 
-    strcpy(szCourse, lbl_80191990[GameMode4_GetEventCourse_80102104(nEvent)]);
+    strcpy(szCourse, lbl_80191990[GameMode4_GetEventCourse(nEvent)]);
     if (pProfile->aLadderAward[nEvent].bWon) {
         fn_800D28DC(fn_80077ACC()->aLadderAward[nEvent].nDate, szDate);
         return;
@@ -158,7 +158,7 @@ void fn_80125D08(MsgArg* pArgs, MsgArg* pResult) {
     s32 nEvent = pArgs[0].i;
     SaveProfile* pProfile = fn_80077ACC();
 
-    *(s32*)pArgs[1].p = GameMode4_GetEventCourse_80102104(nEvent);
+    *(s32*)pArgs[1].p = GameMode4_GetEventCourse(nEvent);
     pResult->i = pProfile->aLadderAward[nEvent].bWon;
 }
 

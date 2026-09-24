@@ -61,7 +61,7 @@ LAYOUT_ASSERT(Video, 0x10B0);
 #define NUM_VIDEO_SLOTS 8
 typedef struct VideoSlots {
     Video* apVideo[NUM_VIDEO_SLOTS];    // 0x00  fn_80075904 puts a movie in a slot
-    int    n20;                         // 0x20  UFont_GetMode_800128A4()'s value while a movie shows
+    int    n20;                         // 0x20  UFont_GetMode()'s value while a movie shows
                                         //       (fn_80075C88 saves it, fn_80075D58 puts it back)
     u8     pad24[4];
 } VideoSlots;

@@ -63,14 +63,14 @@ void fn_8012153C(MsgArg* pArgs, MsgArg* pResult) {
     if (nGolfer <= 29) {
         fn_80121488(nGolfer, szOpponent);
     }
-    nCourse = GameMode4_GetEventCourse_80102104(lbl_80260CB8.nEvent);
+    nCourse = GameMode4_GetEventCourse(lbl_80260CB8.nEvent);
     if (nCourse <= NUM_COURSES - 1) {
         strcpy(szCourse, lbl_80191990[nCourse]);
     }
     GameMode4_GetEventName(lbl_80260CB8.nEvent, szName);
     strcpy(szPart, lbl_80194730[fn_80121C44(lbl_80260CB8.nEvent)]);
     strcpy(szEmpty, "");
-    nHoles = GameMode4_GetEventHoles_8010211C(lbl_80260CB8.nEvent);
+    nHoles = GameMode4_GetEventHoles(lbl_80260CB8.nEvent);
     if (nHoles <= 3) {
         strcpy(szHoles, lbl_80194714[nHoles]);
     }

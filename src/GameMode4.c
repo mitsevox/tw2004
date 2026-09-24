@@ -1,7 +1,8 @@
 // GameMode4.c (our name): game mode 4, the matches of the 25-event ladder loaded from the 'TCM '
 // stream (lbl_802124B8, 0x44 bytes an event; names from 'TCMS'). An event is a one-on-one match
-// against a pro (mode 4, match play with GameModeMatch's callbacks) or a mode 5 challenge. Winning
-// one sets its flag in the save profile, pays its prize and unlocks the pro and a reward.
+// against a pro (mode 4, match play with GameModeMatch's callbacks) or a mode 5 challenge (neither
+// is set up for an event with n1C set; GameModeSkins_EndGame also scores the current event).
+// Winning one sets its flag in the save profile, pays its prize and unlocks the pro and a reward.
 
 #include "golfer.h"
 #include "game.h"
@@ -46,8 +47,8 @@ void  fn_800D39B4(int nPlayer, int nMoney);
 
 void GameMode4_Shutdown(void);
 u8   GameMode4_HasWonEvent(int nProfile, int nEvent);
-int  GameMode4_GetEventHoles_8010211C(int nEvent);
-int  GameMode4_GetEventKind_8010217C(int nEvent);
+int  GameMode4_GetEventHoles(int nEvent);
+int  fn_8010217C_GetEventKind(int nEvent);
 int  fn_801021FC(void);
 u8   GameMode4_IsEventOpen(int nProfile, int nEvent);
 void GameMode4_LoadTCMFromStream(UStreamObject* pObject);
@@ -78,7 +79,7 @@ void GameMode4_Init(void) {
 void fn_801020BC(void) {
 }
 
-// The earnings rating of player 0's profile.
+// How many ladder events player 0's profile has won.
 int GameMode4_GetNumEventsWon(void) {
     return fn_800584DC(gPlayers[0].nIndex);
 }
@@ -87,25 +88,25 @@ int GameMode4_GetEventOpponent(int nEvent) {
     return lbl_802124B8[nEvent].nGolfer;
 }
 
-int GameMode4_GetEventCourse_80102104(int nEvent) {
+int GameMode4_GetEventCourse(int nEvent) {
     return lbl_802124B8[nEvent].nCourse;
 }
 
-int GameMode4_GetEventHoles_8010211C(int nEvent) {
+int GameMode4_GetEventHoles(int nEvent) {
     return lbl_802124B8[nEvent].nHoles;
 }
 
 int fn_80102134(void) {
-    return GameMode4_GetEventHoles_8010211C(fn_801021FC());
+    return GameMode4_GetEventHoles(fn_801021FC());
 }
 
 int fn_80102158(void) {
-    return GameMode4_GetEventKind_8010217C(fn_801021FC());
+    return fn_8010217C_GetEventKind(fn_801021FC());
 }
 
 // The kind of event: 0 not played here, 1 a challenge, 2 a milestone match (every fourth, and the
 // last two), 3 a match.
-int GameMode4_GetEventKind_8010217C(int nEvent) {
+int fn_8010217C_GetEventKind(int nEvent) {
     if (lbl_802124B8[nEvent].n1C != 0) {
         return 0;
     }
@@ -192,7 +193,8 @@ void GameMode4_Shutdown(void) {
     lbl_80282434 = 0;
 }
 
-// Starts the current event: a challenge through mode 5, or a two-player match against its pro.
+// Starts the current event: a challenge through mode 5, or a two-player match against its pro
+// (neither for an event with n1C set).
 void GameMode4_StartEvent(void) {
     int nEvent;
     int nPins;
@@ -236,7 +238,8 @@ u8 fn_801025F4(void) {
     return lbl_80282434;
 }
 
-// EndGame: a win pays the match prize plus the event's own prize, then the event is scored.
+// EndGame: a win pays the event's prize (its base plus so much a hole of the margin, at most 5),
+// then the event is scored.
 void GameMode4_EndGame(void) {
     int nMargin;
     int nMoney;
@@ -262,8 +265,9 @@ void GameMode4_EndGame(void) {
     }
 }
 
-// A challenge event ended: its money, then the event is scored.
-void GameMode4_WinSkinsEvent_80102704(void) {
+// Player 0 won a ladder event played as skins (GameModeSkins_EndGame): the event's base prize,
+// then the event is scored.
+void fn_80102704_WinSkinsEvent(void) {
     s32 nPrize;
     int nMoney = fn_800D38F0(0, 1, 0, &nPrize);
     if (nMoney != 0) {
