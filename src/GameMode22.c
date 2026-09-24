@@ -44,6 +44,22 @@ u8   fn_80127004(void);
 void fn_80127034(int nPlayer);
 s32 fn_80127098(s32 arg0);
 
+// Message handler (FE_MessageTable.c): one of the four trophies: whether it is won, its title,
+// and the day it was won (empty while not).
+void fn_8012597C(MsgArg* pArgs, MsgArg* pResult) {
+    s32 nTrophy = pArgs[0].i;
+    char* szName = ((MsgString*)pArgs[1].p)->pStr;
+    char* szDate = ((MsgString*)pArgs[2].p)->pStr;
+
+    pResult->i = fn_80077ACC()->a1C0[nTrophy + 12].bWon;
+    strcpy(szName, lbl_8019543C[nTrophy]);
+    if (pResult->i) {
+        fn_800D28DC(fn_80077ACC()->a1C0[nTrophy + 12].nDate, szDate);
+        return;
+    }
+    szDate[0] = '\0';
+}
+
 // Message handler (FE_MessageTable.c): a trophy's text, by column: 0 its title, 1 and 2
 // placeholders.
 void fn_80125A24(MsgArg* pArgs, MsgArg* pResult) {
@@ -170,6 +186,59 @@ void fn_80125DE0(MsgArg* pArgs, MsgArg* pResult) {
         return;
     }
     szOut[0] = '\0';
+}
+
+// The mode's setup: its callbacks and options, split screen as chosen, the per-player values
+// cleared, and its messages to show.
+void fn_80125E68(void) {
+    s32 i;
+
+    gpGame->pfnInit = fn_80125E68;
+    gpGame->pfnShutdown = fn_801260B8;
+    gpGame->pfn1F0 = fn_801260BC;
+    gpGame->pfnSetupNextGolfer = fn_80126130;
+    gpGame->pfnGetHonors = fn_80126334;
+    gpGame->pfn250 = (void (*)(int))fn_8012643C;      // port: EA passes an argument fn_8012643C ignores
+    gpGame->pfnHoleFinished = (u8 (*)(int, u8))fn_801263C4;
+    gpGame->pfnGameFinished = (u8 (*)(u8))fn_80126418;
+    gpGame->pfnGoToPlayoff = (u8 (*)(u8))fn_8012632C;  // port: EA passes an argument fn_8012632C ignores
+    gpGame->pfnEndGolferTurn = fn_8012645C;
+    gpGame->pfnEndGame = fn_80126150;
+    gpGame->pfn220 = fn_80126184;
+    gpGame->pfn20C = fn_801262C4;
+    gpGame->pfn244 = fn_80126698;
+    gpGame->pfn1E4 = fn_80126E68;
+    gpGame->pfn224 = fn_80126E88;
+    gpGame->bGimmesAllowed = 0;
+    gpGame->b279 = 1;
+    gpGame->b27F = 0;
+    gpGame->b280 = 0;
+    gpGame->b271 = 0;
+    gpGame->b281 = 0;
+    gpGame->bStrokeLimit = 0;
+    gpGame->b285 = 0;
+    gpGame->b274 = 0;
+    gpGame->b286 = 1;
+    gpGame->b287 = 1;
+    gpGame->b288 = 0;
+    gpGame->b289 = 0;
+    gpGame->b28A = 0;
+    gpGame->bBumpObstructions = 0;
+    gpGame->bShowYardage = 0;
+    gpGame->n290 = 0;
+    gpGame->n294 = 0;
+    gpGame->nMulligans = 0;
+    gpGame->n10 = 2;
+    gpGame->nC = 4;
+    gpGame->nDC = 0;
+    gpGame->n4 = 0;
+    gSession.nSplitScreen = lbl_8028227C;
+    for (i = 0; i < 5; i++) {
+        lbl_8028259C[i] = 0;
+        lbl_80282594[i] = 0;
+        lbl_8028258C[i] = 0;
+    }
+    lbl_80282580 = 1;
 }
 
 void fn_801260B8(void) {

@@ -234,10 +234,9 @@ typedef struct SaveProfile {
     s32  nC0;                   // 0x000C0  }
     s32  nC4;                   // 0x000C4  }
     TourWin aC8[31];           // 0x000C8  one per PGA TOUR tournament
-    struct {
-        u8 b;
-        u8 unk1[3];
-    } a1C0[16];                 // 0x001C0  flags GM_GetBonusProgress counts
+    Award a1C0[16];             // 0x001C0  the won ones count for GM_GetBonusProgress; 12..15 are
+                                //          the four trophies (PGATourSimulation fn_80117E98 awards
+                                //          them, GameMode22 fn_8012597C reads their days)
     u8   unk200[0x20C - 0x200];
     Award aRTEAward[75];        // 0x0020C  per real-time event id. TW06: rteEventAwardInfo
     Award aLadderAward[25];     // 0x00338  per ladder event (GameMode4.c); fn_800584DC's earnings

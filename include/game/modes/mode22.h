@@ -24,7 +24,10 @@ extern s32 lbl_802819A0;        // frames to the next shot-length check (fn_8012
 extern s32 lbl_80282580;        // set: fn_80126184 shows the mode's messages once
 extern s32 lbl_80282584;        // the shot length at the last check
 extern s32 lbl_80282588;        // the track fn_80126184 starts is playing
-extern char* lbl_8019543C[4];   // the trophies' titles ("Rookie of the Year", "Player of the Year", ...)
+extern u8 lbl_8028258C[5];     // } per player, cleared by the mode's setup (fn_80125E68)
+extern u8 lbl_80282594[5];     // }
+extern u8 lbl_8028259C[5];     // }
+extern char* lbl_8019543C[4];  // the trophies' titles ("Rookie of the Year", "Player of the Year", ...)
 // The text fn_80127034 prints (starts as "D"; 0xE zero bytes follow it, so likely 16 bytes).
 extern char lbl_80195488[];
 

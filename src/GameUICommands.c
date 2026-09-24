@@ -350,7 +350,6 @@ void  fn_80100B38(void);
 void  fn_80101CFC(void);
 void  fn_80101D24(void);
 s32   fn_80118664(int nPlayer);
-u8    fn_80119808(int nPlayer, int nEntrant);
 s32   fn_80126FA0(void);
 s32   fn_80127098(s32 n);
 

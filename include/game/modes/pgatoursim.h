@@ -140,10 +140,12 @@ u8    fn_8011908C(int nPlayer, int nEntrant);   // TW06: GM_PgaTourSim_IsEntrant
 s32   fn_801190D8(int nPlayer, int nEntrant);   // TW06: GM_PgaTourSim_GetScoreRankFromEntrantID
 s32   fn_80119118(int nPlayer, int nEntrant);   // TW06: GM_PgaTourSim_GetGolferIDFromEntrantID
 s32   fn_801191D0(int nPlayer, int nEntrant, u8 b);
+int   fn_8011937C(int nPlayer, int nEntrant, u8 b);  // the entrant's score to par so far
 s32   fn_80119588(int nPlayer, u8 b);
 s32   fn_80119638(int nPlayer, int nEntrant, int nRound);
 u8    fn_801197A4(int nPlayer, int nEntrant);   // TW06: GM_PgaTourSim_GetWasCutFromEntrantID
 s32   fn_801197CC(int nPlayer, int nRow);       // TW06: GM_PgaTourSim_GetEntrantIDFromScoreRow
+u8    fn_80119808(int nPlayer, int nEntrant);   // another entrant holds the same place (a tie)
 void  fn_8011989C(int nPlayer, int nStrokes);   // TW06: GM_PgaTourSim_SetUserEntrantHoleStrokes
 void  fn_801198F8(int nPlayer, int nHole);
 void  fn_80119934(int nPlayer);
