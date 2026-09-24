@@ -9,18 +9,37 @@
 #include "game/modes/challenge.h"
 #include "game/earnings.h"
 
-extern s32 lbl_802822F8;
+s32 lbl_80281660 = 4;
+Challenge* lbl_80281664 = lbl_80203554;
+s32 lbl_80281668 = 83;
+
+Challenge  lbl_80203554[83];
+ChallengeSpot lbl_80203170[83];
+
+void (*lbl_8028232C)(void);
+void (*lbl_80282328)(void);
+void (*lbl_80282324)(void);
+u8  (*lbl_80282320)(u8 bCheck);        // the mode's own GameFinished
+u8 (*lbl_8028231C)(int nPlayer, u8 bCheck);   // and HoleFinished
+void (*lbl_80282318)(int nPlayer);
+u8 lbl_80282314;
+char* lbl_80282310;                  // the challenge text block
+s32 lbl_8028230C;
+s32 lbl_80282308;
+s32 lbl_80282304;
+s32 lbl_80282300;
+u8 lbl_802822FE;
+u8 lbl_802822FD;
+u8 lbl_802822FC;
+s32 lbl_802822F8;
+s32 lbl_802822F4;
+s32 lbl_802822F0;
+
 void fn_800EAE44(int nId);
 s32 fn_800EAE6C(void);
 void fn_800EAEB8(void);
 void fn_800EAEEC(UStreamObject* pObject);
 
-extern char* lbl_80282310;                  // the challenge text block
-extern s32 lbl_80281660;
-extern s32 lbl_802822F0;
-extern void (*lbl_8028232C)(void);
-extern void (*lbl_80282324)(void);
-extern void (*lbl_80282318)(int nPlayer);
 int   fn_800ED028(int i);
 void  fn_80019648(void);
 void  fn_800EBEF0(void);
@@ -29,24 +48,13 @@ void  fn_800EBD28(void);
 void  fn_800EC1E0(void);
 void  fn_800ED604(int nPlayer);
 void  fn_800EAF18(UStreamObject* pObject);
-extern u8  (*lbl_80282320)(u8 bCheck);        // the mode's own GameFinished
-extern s32 lbl_80282300;
-extern s32 lbl_80282304;
-extern s32 lbl_80282308;
-extern s32 lbl_8028230C;
-extern void (*lbl_80282328)(void);
 int   fn_800ECF9C(int i);
 void  fn_800EC170(int n);
 u8    fn_800EC4F0(int n);
 u8    fn_800EBD60(u8 bCheck);
 int   fn_800ED508(int nGroup);
-extern u8 lbl_802822FC;
 u8 fn_800ECA08(void);
-extern u8 lbl_80282314;
-extern u8 lbl_802822FE;
-extern u8 (*lbl_8028231C)(int nPlayer, u8 bCheck);   // and HoleFinished
 u8 fn_800ED5C8(int nPlayer, u8 bCheck);
-extern u8 lbl_802822FD;
 
 // Game mode 5 starts: its callbacks, gpGame->nC and n10 set to 1, and mode 5's own challenge list.
 void fn_800EACD8(void) {
