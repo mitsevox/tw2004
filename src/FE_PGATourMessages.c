@@ -13,7 +13,6 @@
 #include "game/modes/pgatour.h"
 #include "game/modes/pgatoursim.h"
 
-u8   fn_80118F60(int nPlayer, int nGolfer, GM_Pga_StatTypes_t nStat);   // PGATourSimulation.c
 
 s32* lbl_802824B0;                      // the tournaments on the schedule (fn_8010EA24)
 s32 lbl_802824B4;                       // and how many there are

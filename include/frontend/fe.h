@@ -526,8 +526,8 @@ LogoRecord* fn_8010FB70(void);          // the logo being edited
 s16* fn_8010FBC4(void);                 // the palette
 int  fn_8010FBCC(int nX, int nY, u32* pR, u32* pG, u32* pB, u32* pA);  // a pixel's colour index,
                                         // and its colour as fn_8010F7FC gives it
-void fn_8010FC3C(u8* pDst, u8* pSrc, int a, int nWidth, int nHeight);   // copy pixels: a = 0
-                                        // from a texture into the logo, 1 from the logo into one
+void fn_8010FC3C(u8* pDst, u8* pSrc, int bToTexture, int nWidth, int nHeight);  // copy pixels:
+                                        // 0 from a texture into the logo, 1 from the logo into one
 u8*  fn_8010FF5C(u8* pLogo, int nWidth, int nHeight);   // the logo's pixels as a texture (in
                                         // lbl_80212B60)
 

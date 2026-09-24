@@ -169,3 +169,25 @@ void fn_8010FAF4(void) {
         }
     }
 }
+
+// The logo being edited: the menus' own copy while b10640 is set, else the profile's user logo
+// that LogoEdit.n0 names.
+LogoRecord* fn_8010FB70(void) {
+    if (lbl_80281ED4->b10640) {
+        return &lbl_80281ED4->logo106E0;
+    }
+    return &fn_80077ACC()->choices.aLogo[lbl_802824B8->n0];
+}
+
+// The palette.
+s16* fn_8010FBC4(void) {
+    return lbl_802824BC;
+}
+
+// A pixel's colour index, and its colour as fn_8010F7FC gives it.
+int fn_8010FBCC(int nX, int nY, u32* pR, u32* pG, u32* pB, u32* pA) {
+    u8* pLogo = fn_8010FB70()->aPixels;
+    int nColor = pLogo[fn_8010F978(nX, nY)];
+    fn_8010F7FC(nColor, pR, pG, pB, pA);
+    return nColor;
+}
