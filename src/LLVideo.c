@@ -149,8 +149,8 @@ void fn_800A79F4(void);
 // the renderer
 void fn_80008380(void);
 void fn_800083A0(void);
-void fn_80012898(s32 v);
-s32  fn_800128A4(void);
+void UFont_SetMode_80012898(s32 v);
+s32  UFont_GetMode_800128A4(void);
 void fn_80012B2C(f32 x0, f32 x1);
 void fn_800140E8(int a, int nWidth, int nHeight, int nField, int b, int c);
 void fn_80016978(f32 x0, f32 y0, f32 x1, f32 y1);
@@ -389,8 +389,8 @@ void fn_80075C88(void) {
     fn_80016B54(512, 448, 1.0f, 1.0f);
     fn_80016978(0.0f, 0.0f, 1.0f, 1.0f);
     fn_80014194(NULL);
-    lbl_80281200->n20 = fn_800128A4();
-    fn_80012898(1);
+    lbl_80281200->n20 = UFont_GetMode_800128A4();
+    UFont_SetMode_80012898(1);
     fn_80012B2C(1.0f, 1.0f);
     fn_80076128(10);
 }
@@ -400,7 +400,7 @@ void fn_80075D58(void) {
     fn_80008380();
     fn_80006EDC();
     fn_80012B2C(1.0f, 1.0f);
-    fn_80012898(lbl_80281200->n20);
+    UFont_SetMode_80012898(lbl_80281200->n20);
     fn_80012F34(1);
     fn_80012F50(0, 6, 0x80);
     fn_80012F18(3);
@@ -547,7 +547,7 @@ void fn_800760F4(f32* pUV, LLPict* pPict) {
 
 void fn_80076128(s32 p0) {
     UFontContext* pCtx;
-    pCtx = fn_80012EC4();
+    pCtx = UFont_GetContext();
     pCtx->nA4 = p0;
 }
 

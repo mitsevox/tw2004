@@ -59,18 +59,18 @@ void fn_8012153C(MsgArg* pArgs, MsgArg* pResult) {
     int nHoles;
 
     sprintf(szStop, "%s / Tour Stop %d", lbl_80194694[nRegion], nStop);
-    nGolfer = fn_801020EC(lbl_80260CB8.nEvent);
+    nGolfer = GameMode4_GetEventOpponent(lbl_80260CB8.nEvent);
     if (nGolfer <= 29) {
         fn_80121488(nGolfer, szOpponent);
     }
-    nCourse = fn_80102104(lbl_80260CB8.nEvent);
+    nCourse = GameMode4_GetEventCourse_80102104(lbl_80260CB8.nEvent);
     if (nCourse <= NUM_COURSES - 1) {
         strcpy(szCourse, lbl_80191990[nCourse]);
     }
-    fn_80102A58(lbl_80260CB8.nEvent, szName);
+    GameMode4_GetEventName(lbl_80260CB8.nEvent, szName);
     strcpy(szPart, lbl_80194730[fn_80121C44(lbl_80260CB8.nEvent)]);
     strcpy(szEmpty, "");
-    nHoles = fn_8010211C(lbl_80260CB8.nEvent);
+    nHoles = GameMode4_GetEventHoles_8010211C(lbl_80260CB8.nEvent);
     if (nHoles <= 3) {
         strcpy(szHoles, lbl_80194714[nHoles]);
     }
@@ -117,9 +117,9 @@ void fn_80121770(MsgArg* pArgs, MsgArg* pResult) {
 
 // Starts the event under the cursor, with the player on the created golfer.
 void fn_801217C4(MsgArg* pArgs, MsgArg* pResult) {
-    fn_801022BC(fn_80077B08(), lbl_80260CB8.nEvent);
+    GameMode4_SelectEvent(fn_80077B08(), lbl_80260CB8.nEvent);
     gSession.nGolfer[0] = FIRST_CREATED_GOLFER;
-    fn_80102468();
+    GameMode4_StartEvent();
 }
 
 // The angle, in degrees, from one point to another (x0, y0, x1, y1; y grows downwards).
@@ -132,5 +132,5 @@ void fn_8012185C(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_80121890(MsgArg* pArgs, MsgArg* pResult) {
-    fn_80102A58(pArgs[0].i, ((MsgString*)pArgs[1].p)->pStr);
+    GameMode4_GetEventName(pArgs[0].i, ((MsgString*)pArgs[1].p)->pStr);
 }

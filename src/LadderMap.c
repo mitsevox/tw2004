@@ -44,11 +44,11 @@ u8 fn_801218FC(int nRegion) {
     int nProfile = fn_80077B08();
 
     if (fn_801218EC(nRegion)) {
-        return fn_80102204(nProfile, 24);
+        return GameMode4_HasWonEvent(nProfile, 24);
     }
-    return fn_80102204(nProfile, lbl_801946B0[nRegion * 3]) &&
-           fn_80102204(nProfile, lbl_801946B0[nRegion * 3 + 1]) &&
-           fn_80102204(nProfile, lbl_801946B0[nRegion * 3 + 2]);
+    return GameMode4_HasWonEvent(nProfile, lbl_801946B0[nRegion * 3]) &&
+           GameMode4_HasWonEvent(nProfile, lbl_801946B0[nRegion * 3 + 1]) &&
+           GameMode4_HasWonEvent(nProfile, lbl_801946B0[nRegion * 3 + 2]);
 }
 
 // Has the player won every event but the final?
@@ -59,7 +59,7 @@ u8 fn_801219CC(void) {
 
     nProfile = fn_80077B08();
     for (i = 0; i < 24; i++) {
-        if (!fn_80102204(nProfile, i)) {
+        if (!GameMode4_HasWonEvent(nProfile, i)) {
             bWon = 0;
         }
     }
@@ -74,15 +74,15 @@ int fn_80121A38(int nNode) {
     nProfile = fn_80077B08();
     if (!fn_80121B8C(nNode)) return -1;
     if (fn_801218DC(nNode)) {
-        if (fn_80102204(nProfile, nEvent)) return 1;
-        return fn_80102228(nProfile, nEvent) ? 0 : 2;
+        if (GameMode4_HasWonEvent(nProfile, nEvent)) return 1;
+        return GameMode4_IsEventOpen(nProfile, nEvent) ? 0 : 2;
     }
     if (fn_801218BC(nNode)) {
-        if (fn_80102204(nProfile, nEvent)) return 1;
-        return fn_80102228(nProfile, nEvent) ? 0 : 2;
+        if (GameMode4_HasWonEvent(nProfile, nEvent)) return 1;
+        return GameMode4_IsEventOpen(nProfile, nEvent) ? 0 : 2;
     }
-    if (fn_80102204(nProfile, nEvent)) return 1;
-    return fn_80102228(nProfile, nEvent) ? 0 : 2;
+    if (GameMode4_HasWonEvent(nProfile, nEvent)) return 1;
+    return GameMode4_IsEventOpen(nProfile, nEvent) ? 0 : 2;
 }
 
 // Is the node shown? The final once every other event is won, the single nodes once their region
@@ -194,7 +194,7 @@ u8 fn_80121F0C(int nEvent) {
     int nProfile = fn_80077B08();
 
     b = 0;
-    if (!fn_80102204(nProfile, nEvent) && fn_80102228(nProfile, nEvent)) {
+    if (!GameMode4_HasWonEvent(nProfile, nEvent) && GameMode4_IsEventOpen(nProfile, nEvent)) {
         b = 1;
     }
     return b;

@@ -30,9 +30,9 @@ void fn_8008EFFC(UStreamObject* pObject);
 u8 fn_8008F204(int nKind);
 void fn_80090898(void);                                 // uiProcessInterface.c
 void fn_80010028(void* pBank);                          // LLTex.c: free a texture bank
-int  fn_80012D04(void);                                 // UFont.c: a free font slot
-void fn_800127D8(int nSlot, void* pFont, int n);        // UFont.c: load a font into a slot
-void fn_80012820(int nSlot);                            // UFont.c: free a font slot
+int  UFont_FindFreeSlot(void);                                 // UFont.c: a free font slot
+void UFont_LoadFont(int nSlot, void* pFont, int n);        // UFont.c: load a font into a slot
+void UFont_FreeFont(int nSlot);                            // UFont.c: free a font slot
 
 // Start with nothing loaded.
 void fn_8008EC30(void) {
@@ -149,8 +149,8 @@ void fn_8008EFFC(UStreamObject* pObject) {
     lbl_80281F08 = pData;
     for (i = 0; i < lbl_80281F08[0]; i++) {
         lbl_80281F08[1 + i] = (uptr)((u8*)lbl_80281F08[1 + i] + (uptr)pData);
-        nSlot = fn_80012D04();
-        fn_800127D8(nSlot, &((UIFont*)lbl_80281F08[1 + i])->nSlot, 0);
+        nSlot = UFont_FindFreeSlot();
+        UFont_LoadFont(nSlot, &((UIFont*)lbl_80281F08[1 + i])->nSlot, 0);
         ((UIFont*)lbl_80281F08[1 + i])->nSlot = nSlot;
     }
     fn_80009E70(pObject);
@@ -203,7 +203,7 @@ void fn_8008F194(u32* pTable) {
 
     if (pTable != NULL) {
         for (i = 0; i < pTable[0]; i++) {
-            fn_80012820(((UIFont*)pTable[1 + i])->nSlot);
+            UFont_FreeFont(((UIFont*)pTable[1 + i])->nSlot);
         }
         fn_80009E70(pTable);
     }

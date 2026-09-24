@@ -14,11 +14,11 @@ UISVec4* lbl_80281F34;
 UISVec4* lbl_80281F30;
 
 // UFont.c's text state setters.
-void fn_80012868(s32 nFont);
+void UFont_SetFont(s32 nFont);
 void fn_80012B6C(f32 f);
 void fn_80012B9C(f32 fX, f32 fY);
-void fn_80012C84(s32 uFlags);                           // 1/2: the alignment
-void fn_80012CB4(f32 fX, f32 fY, f32 fW, f32 fH);
+void UFont_SetFlags_80012C84(s32 uFlags);                           // 1/2: the alignment
+void UFont_SetWordWrapBox_80012CB4(f32 fX, f32 fY, f32 fW, f32 fH);
 
 void fn_800760B0(s32 nX, s32 nY, s32 nW, s32 nH);
 
@@ -76,7 +76,7 @@ void fn_800922A8(UIText* pText) {
     }
     fn_800BAD60(m, &vPos, &vOut);
     fn_800BAD60(m, &vPos, &vOut);
-    fn_80012868(pText->n4);
+    UFont_SetFont(pText->n4);
     fW = 1.0f;
     vEnd.x = 0.0f;
     fH = fW;
@@ -153,15 +153,15 @@ void fn_800922A8(UIText* pText) {
     }
     fn_80013EEC(fn_8001614C());
     fn_8006A9AC(aColor);
-    fn_80012CB4(fX, fY, fW, fH);
+    UFont_SetWordWrapBox_80012CB4(fX, fY, fW, fH);
     if (pText->nFlags & 1) {
         uFlags |= 2;
     } else if (pText->nFlags & 2) {
         uFlags |= 1;
     }
-    fn_80012C84(uFlags);
+    UFont_SetFlags_80012C84(uFlags);
     if (0.0f != aColor[3]) {
-        fn_800128F8(szText, 0.0f, 0.0f);
+        UFont_DrawString(szText, 0.0f, 0.0f);
         fn_800760B0(0, 0, 0x200, 0x1C0);
         fn_80012EF8();
     }
@@ -243,44 +243,44 @@ void fn_800929E4(UIText* pText, int nMsg, s32 n, MsgArg* pArgs, MsgArg* pResult)
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_80012898();
+void UFont_SetMode_80012898();
 void fn_80092BA0(void);
 void fn_80092BC4(void);
 void fn_80092BA0(void) {
-    fn_80012898(1);
+    UFont_SetMode_80012898(1);
 }
 
 void fn_80092BC4(void) {
-    fn_80012898(0);
+    UFont_SetMode_80012898(0);
 }
 
 // ---- end of sweep code ----
 
 // Sets up the text shadow: nC4 0x12, and uC8 packed from the colour pColor.
 void fn_80092BE8(f32* pColor) {
-    fn_80012EC4()->nC4 = 0x12;
-    fn_80012E54(pColor, (u8*)&fn_80012EC4()->uC8);
+    UFont_GetContext()->nC4 = 0x12;
+    UFont_PackColor(pColor, (u8*)&UFont_GetContext()->uC8);
 }
 
 // ---- sweep code (not yet cleaned up) ----
 
 void fn_80092C38(f32 x0, f32 x1) {
     UFontContext* pCtx;
-    pCtx = fn_80012EC4();
+    pCtx = UFont_GetContext();
     pCtx->fCC = x0;
     pCtx->fD0 = x1;
 }
 
 void fn_80092C78(f32 x0, f32 x1) {
     UFontContext* pCtx;
-    pCtx = fn_80012EC4();
+    pCtx = UFont_GetContext();
     pCtx->fBC = x0;
     pCtx->fC0 = x1;
 }
 
 void fn_80092CB8(f32 x0) {
     UFontContext* pCtx;
-    pCtx = fn_80012EC4();
+    pCtx = UFont_GetContext();
     pCtx->fB8 = x0;
 }
 

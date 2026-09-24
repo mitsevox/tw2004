@@ -1088,12 +1088,12 @@ typedef struct UFontStop {
 } UFontStop;                      // 0x0C
 
 // UFont.c's text settings: how the next string is drawn. Each queued string keeps its own copy
-// (fn_800128F8 copies all 0xD8 bytes), linked through pNext.
+// (UFont_DrawString copies all 0xD8 bytes), linked through pNext.
 typedef struct UFontContext {
     struct UFontContext* pNext;   // 0x00  the next string queued on the same font
     f32   f04;                    // 0x04  where the first gradient starts
     f32   f08;                    // 0x08  where it ends
-    f32   f0C;                    // 0x0C  1 / (f08 - f04), set by fn_80012E00
+    f32   f0C;                    // 0x0C  1 / (f08 - f04), set by UFont_CalcGradientScale_80012E00
     s32   n10;                    // 0x10  gradients on: 1 the stops in a14[0..4], 2 a14[4] to a14[5]
     UFontStop a14[6];             // 0x14
     u32   u5C;                    // 0x5C  the colour (a GXColor's bytes) when nA4 is 0x12
@@ -1101,7 +1101,7 @@ typedef struct UFontContext {
     s32   n64;                    // 0x64
     s32   n68;                    // 0x68
     s32   n6C;                    // 0x6C
-    f32   f70;                    // 0x70  where fn_800128F8 draws the string
+    f32   f70;                    // 0x70  where UFont_DrawString draws the string
     f32   f74;                    // 0x74
     f32   f78;                    // 0x78
     f32   f7C;                    // 0x7C
@@ -1126,9 +1126,9 @@ typedef struct UFontContext {
     char* szText;                 // 0xD4  a queued string's copy of its text
 } UFontContext;                   // 0xD8
 
-UFontContext* fn_80012EC4(void);        // UFont.c: the current text settings
-void fn_800128F8(char* sz, f32 x, f32 y);       // UFont.c: draw a string
-void fn_80012E54(const f32* pColor, u8* pOut);       // UFont.c: pack an RGBA colour into pOut
+UFontContext* UFont_GetContext(void);        // UFont.c: the current text settings
+void UFont_DrawString(char* sz, f32 x, f32 y);       // UFont.c: draw a string
+void UFont_PackColor(const f32* pColor, u8* pOut);       // UFont.c: pack an RGBA colour into pOut
 void fn_8006A9AC(f32* pColor);                  // target.c: draw text in this colour
 
 // The header of an 'sfn ' font stream object. Stored little-endian when n0C reads above 100;
@@ -1229,7 +1229,7 @@ typedef struct UFontState {
     UFontContext* pQueueNext;     // 0xD4  the pool's next free entry
     u8    padD8[0xE0 - 0xD8];     // 0xD8
     UFontContext ctx;             // 0xE0  the current settings
-    s32   n1B8;                   // 0x1B8  0: fn_800128F8 queues strings, 1: draws them at once
+    s32   n1B8;                   // 0x1B8  0: UFont_DrawString queues strings, 1: draws them at once
     char* pStrings;               // 0x1BC  0x1F4 bytes of queued text
     char* pStringNext;            // 0x1C0
     u8    pad1C4[0x1E0 - 0x1C4];  // 0x1C4

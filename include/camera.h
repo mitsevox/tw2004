@@ -18,11 +18,11 @@ typedef struct CamLens {
                                 //       zoom-to-aim camera copies m4[0] to View.v20
     f32  m44[4][4];             // 0x44  world to camera space (hlaudemitter.c fn_800AD800 moves a
                                 //       sound's position with it)
-    f32  m84[2][4];             // 0x84  [1] the scale fn_80076664 puts on the world around a point,
+    f32  m84[2][4];             // 0x84  [1] the scale CA_vSetScaledLookAt_80076664 puts on the world around a point,
                                 //       [0] its inverse; ViewController.c fn_8001728C sets all to 1.0
     f32  fFov;                  // 0xA4  the field of view (GoGolfCam.c sets DEG(60.0f) or DEG(30.0f))
-    f32  fA8;                   // 0xA8  fn_800768E0 starts it at 0.1
-    f32  fAC;                   // 0xAC  fn_800768E0 starts it at 4096 (GoTerrain.c fn_800354B4 sets it)
+    f32  fA8;                   // 0xA8  CA_vInitCamera starts it at 0.1
+    f32  fAC;                   // 0xAC  CA_vInitCamera starts it at 4096 (GoTerrain.c fn_800354B4 sets it)
     f32  fB0;                   // 0xB0  fn_8001EFFC; the zoom-to-aim camera divides its distance by it
     f32  fB4;                  // 0xB4  a flat camera's view width (guess)
     f32  fB8;                   // 0xB8  its view height (guess)
@@ -695,7 +695,7 @@ void     fn_80045470(CamLens* pLens, f32 fFov);   // sets the lens's field of vi
 u8       fn_8004562C(CamShot* pShot);             // the shot's bAC is 0, 13..15 or 23
 
 // GoCamera.c: works out the lens's fB0 from its field of view.
-void     fn_800763BC(CamLens* pLens);
+void     CA_vCalcFovScale_800763BC(CamLens* pLens);
 
 // ---- camera script helpers (gocamscripts, 0x800C7480..) -------------------------------------
 
@@ -880,12 +880,12 @@ f32         fn_80014174(GoFrameBuf* pBuf);   // f0
 
 // ---- the parts of a render camera: lens (GoCamera.c), screen rectangle (GoViewport.c) ---------
 
-CamLens* fn_80076400(void);                     // a new lens
-void     fn_8007644C(CamLens* pLens);           // free it
-void     fn_8007646C(CamLens* pLens, f32* pPos, f32* pTarget);   // aims the lens from pPos at pTarget
-void     fn_800768E0(CamLens* pLens);
+CamLens* CA_spCreateCamera(void);                     // a new lens
+void     CA_vDestroyCamera(CamLens* pLens);           // free it
+void     CA_vSetLookAt(CamLens* pLens, f32* pPos, f32* pTarget);   // aims the lens from pPos at pTarget
+void     CA_vInitCamera(CamLens* pLens);
 void     fn_80076948(CamLens* pLens, f32 fB4, f32 fB8);   // sets fB4 and fB8
-void     fn_80076A0C(CamLens* pLens, s32 nType);          // sets nType
+void     CA_vSetType_80076A0C(CamLens* pLens, s32 nType);          // sets nType
 f32*     fn_80076ACC(void);                     // a new screen rectangle
 void     fn_80076B18(f32* pRect);               // free it
 void     fn_800B3438(f32* pRect, f32 x, f32 y); // shadow.c
