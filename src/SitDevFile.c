@@ -533,7 +533,9 @@ u8 fn_800BCF84(SitDevAction* pAction, int nPlayer, u8 nEvent) {
             nStart = nPick;
             while (pAction->aList[nEntry] & 0x8000) {
                 nPick++;
-                if (nPick == anCount[nKind]) nPick = 0;
+                if (nPick == anCount[nKind]) {
+                    nPick = 0;
+                }
                 nEntry = aaIndex[nKind][nPick];
                 if (nPick == nStart) {
                     // Every entry has been drawn: start the deck over.
@@ -547,9 +549,11 @@ u8 fn_800BCF84(SitDevAction* pAction, int nPlayer, u8 nEvent) {
             pDo = &lbl_80282208->p1C[pAction->aList[nEntry]];
             if (pDo == lbl_802811B8->pE8) {
                 nPick++;
-                if (nPick == anCount[nKind]) nPick = 0;
+                if (nPick == anCount[nKind]) {
+                    nPick = 0;
+                }
                 nEntry = aaIndex[nKind][nPick];
-                pDo = &lbl_80282208->p1C[pAction->aList[nEntry] & 0x7FFF];
+                pDo =&lbl_80282208->p1C[pAction->aList[nEntry] & 0x7FFF];
             }
             fn_800BD580(pDo, nPlayer, nEvent);
             lbl_802811B8->abPlayed[nKind] = 1;
