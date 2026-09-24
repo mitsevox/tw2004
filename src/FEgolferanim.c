@@ -1232,10 +1232,15 @@ void fn_8008DAEC(void) {
     }
 }
 
+// Flag every golfer slot's character to be freed (b19) and clear the shown golfer's b18.
 void fn_8008DBE8(void) {
-    lbl_80281EE0->aGolfer[0].b19 = 1;
-    if (lbl_80281EE0->pB4 != NULL) {
-        lbl_80281EE0->pB4->b18 = 0;
+    int i;
+
+    for (i = 0; i < CRAP_NUM_GOLFERS; i++) {
+        lbl_80281EE0->aGolfer[i].b19 = 1;
+        if (lbl_80281EE0->pB4 != NULL) {
+            lbl_80281EE0->pB4->b18 = 0;
+        }
     }
 }
 
