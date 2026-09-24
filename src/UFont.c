@@ -147,10 +147,10 @@ char* fn_800128B0(char* sz) {
 
 // Draws a string with the current settings: at once in mode 1, queued in mode 0.
 void fn_800128F8(char* sz, f32 fX, f32 fY) {
-    UFontContext* pCtx;
-    UFontContext* pRec;
     LLFont* pFont;
     s32 nOld;
+    UFontContext* pCtx;
+    UFontContext* pRec;
 
     switch (lbl_80280DE0->n1B8) {
     case 1:
