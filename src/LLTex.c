@@ -6,8 +6,6 @@
 #include "gx.h"
 #include "dynobj.h"
 
-u8   fn_8002A3A4(void);                 // GxUtil.c
-void fn_8002A3AC(u8 b);                 // GxUtil.c
 void fn_80010114(int nDst, int nFunc, int nSrc, int nMtx);
 
 // Builds a bank from a 'txf ' object's data, into pInto or, when it is NULL, a new allocation.
