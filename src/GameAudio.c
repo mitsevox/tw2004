@@ -11,7 +11,7 @@
 
 // hlaudmovie.c
 void fn_800A874C(s32 n);
-void fn_800A87B4(s32 a, s32 n);
+void fn_800A87B4(u8 a, u8 n);
 void fn_800A8F68(u8 b);
 void fn_800A8700(u8 n);
 void fn_800A8708(u8 nCurve, f32 fVolume);
