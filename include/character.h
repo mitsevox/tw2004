@@ -160,17 +160,17 @@ typedef struct CharModel {
 // down through its children (fn_80114270).
 typedef struct DynChainLink {
     f32  fLength;               // 0x00  to its parent bone in the rest pose (0.5 unless type 0)
-    f32  v04[4];                // 0x04  its matrix's position when set up
-    u8   unk14[0x24 - 0x14];
-    f32  v24[4];                // 0x24  set by fn_80029BC8
-    u8   unk34[0x44 - 0x34];
+    f32  v04[4];                // 0x04  its matrix's position when set up; the updates move it
+    f32  v14[4];                // 0x14  v04 as the last update left it (fn_80114540)
+    f32  v24[4];                // 0x24  set by fn_80029BC8; the updates keep a velocity in it
+    f32  v34[4];                // 0x34  from its bone to the next one's position (fn_80114A84)
     f32  q44[4];                // 0x44  } its rest pose's rotation, twice
     f32  q54[4];                // 0x54  }
     f32  v64[4];                // 0x64  } and position, twice
     f32  v74[4];                // 0x74  }
     s32  nBone;                 // 0x84
     s32  nParent;               // 0x88  its bone's parent
-    f32  f8C;                   // 0x8C
+    f32  f8C;                   // 0x8C  fn_80114540 keeps the link's stretch in it
 } DynChainLink;
 LAYOUT_ASSERT(DynChainLink, 0x90);
 
@@ -179,7 +179,7 @@ typedef struct DynChain {
     s32  nLinks;                // 0x04
     DynChainLink* pLinks;       // 0x08
     s32  nType;                 // 0x0C  0..3: which update runs (fn_8011443C)
-    s32  n10;                   // 0x10
+    s32  n10;                   // 0x10  its kind, 0..5 (fn_80115348 indexes the settings by it)
     s32  n14;                   // 0x14  } counters the updates advance
     s32  n18;                   // 0x18  }
     u8   bReset;                // 0x1C  set up the links again on the next update
@@ -188,19 +188,13 @@ typedef struct DynChain {
 LAYOUT_ASSERT(DynChain, 0x20);
 
 // Twelve values of DynChainSettings, twice (fn_80113E60 sets both the same way).
+// Each is per link (fn_80115348 indexes them by the link; a chain of more than three links reads
+// on into the next array).
 typedef struct DynChainParams {
-    f32  f0;                    // 0x00
-    f32  f4;                    // 0x04
-    f32  f8;                    // 0x08
-    f32  fC;                    // 0x0C
-    f32  f10;                   // 0x10
-    f32  f14;                   // 0x14
-    f32  f18;                   // 0x18
-    f32  f1C;                   // 0x1C
-    f32  f20;                   // 0x20
-    f32  f24;                   // 0x24
-    f32  f28;                   // 0x28
-    f32  f2C;                   // 0x2C
+    f32  a0[3];                 // 0x00  the sway's size, in degrees
+    f32  aC[3];                 // 0x0C  the sway's period, in minutes (60 * FRAME_RATE frames)
+    f32  a18[3];                // 0x18  the sway's phase, in turns
+    f32  a24[3];                // 0x24  an angle added to the sway, in degrees
 } DynChainParams;
 
 // The chains' settings (lbl_802824F8, made by fn_80113E60; DynChain.c's updates read them).
@@ -221,19 +215,16 @@ typedef struct DynChainSettings {
     f32  f90;                   // 0x90  how much fn_80116304's sway takes off 1
     f32  f94;                   // 0x94  } the base fn_80116304 adds, from f94 to f98 as its
     f32  f98;                   // 0x98  } fStrength goes from 0 to 35
-    s32  n9C;                   // 0x9C
-    s32  nA0;                   // 0xA0
-    s32  nA4;                   // 0xA4
-    s32  nA8;                   // 0xA8
-    s32  nAC;                   // 0xAC
-    s32  nB0;                   // 0xB0
-    s32  nB4;                   // 0xB4
+    s32  an9C[6];               // 0x9C  per chain kind (DynChain.n10): fn_80115348 sways it
+    s32  nB4;                   // 0xB4  fn_80115348's wind direction: 0 the wind's, else a fixed one
     s32  nB8;                   // 0xB8  the strength fn_80116468 gives; -1: fn_80055F80's
     s32  nBC;                   // 0xBC
 } DynChainSettings;
 LAYOUT_ASSERT(DynChainSettings, 0xC0);
 
 extern DynChainSettings* lbl_802824F8;
+extern f32 lbl_80193DE8[6][4];  // DynChain.c: a direction per chain kind, in the model's root space
+extern f32 lbl_80193E48[6];     // DynChain.c: an angle per chain kind, in degrees (fn_80115B2C)
 
 // A clip's header (the fields used here). In a file, pD0 marks the end of the header and
 // uAram points at the end of the key data; once a clip's frames are streamed out, uAram is
