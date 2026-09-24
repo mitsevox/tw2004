@@ -895,8 +895,6 @@ void fn_80069CDC(int nPlayer) {
     f32   fHigh;
     f32   fHeight;
     f32   fOld;
-    f32   fSize;
-    f32   fShadow;
     View* pView;
     f32*  pCamPos;
     f32*  pLook;
@@ -907,32 +905,30 @@ void fn_80069CDC(int nPlayer) {
 
     bBall = 0;
     pCamera = fn_80017004(gPlayers[nPlayer].nView[0]);
-    fSize = lbl_801D5BF0[nPlayer].f24;
-    fShadow = lbl_801D5BF0[nPlayer].f1C;
     aMarkerQuad[0][0] = 0.0f;
-    aMarkerQuad[0][1] = fSize;
-    aMarkerQuad[0][2] = -fSize;
+    aMarkerQuad[0][1] = lbl_801D5BF0[nPlayer].f24;
+    aMarkerQuad[0][2] = -lbl_801D5BF0[nPlayer].f24;
     aMarkerQuad[1][0] = 0.0f;
-    aMarkerQuad[1][1] = fSize;
-    aMarkerQuad[1][2] = fSize;
+    aMarkerQuad[1][1] = lbl_801D5BF0[nPlayer].f24;
+    aMarkerQuad[1][2] = lbl_801D5BF0[nPlayer].f24;
     aMarkerQuad[2][0] = 0.0f;
-    aMarkerQuad[2][1] = -fSize;
-    aMarkerQuad[2][2] = -fSize;
+    aMarkerQuad[2][1] = -lbl_801D5BF0[nPlayer].f24;
+    aMarkerQuad[2][2] = -lbl_801D5BF0[nPlayer].f24;
     aMarkerQuad[3][0] = 0.0f;
-    aMarkerQuad[3][1] = -fSize;
-    aMarkerQuad[3][2] = fSize;
-    aShadowQuad[0][0] = fShadow;
+    aMarkerQuad[3][1] = -lbl_801D5BF0[nPlayer].f24;
+    aMarkerQuad[3][2] = lbl_801D5BF0[nPlayer].f24;
+    aShadowQuad[0][0] = lbl_801D5BF0[nPlayer].f1C;
     aShadowQuad[0][1] = 0.0f;
-    aShadowQuad[0][2] = -fShadow;
-    aShadowQuad[1][0] = fShadow;
+    aShadowQuad[0][2] = -lbl_801D5BF0[nPlayer].f1C;
+    aShadowQuad[1][0] = lbl_801D5BF0[nPlayer].f1C;
     aShadowQuad[1][1] = 0.0f;
-    aShadowQuad[1][2] = fShadow;
-    aShadowQuad[2][0] = -fShadow;
+    aShadowQuad[1][2] = lbl_801D5BF0[nPlayer].f1C;
+    aShadowQuad[2][0] = -lbl_801D5BF0[nPlayer].f1C;
     aShadowQuad[2][1] = 0.0f;
-    aShadowQuad[2][2] = -fShadow;
-    aShadowQuad[3][0] = -fShadow;
+    aShadowQuad[2][2] = -lbl_801D5BF0[nPlayer].f1C;
+    aShadowQuad[3][0] = -lbl_801D5BF0[nPlayer].f1C;
     aShadowQuad[3][1] = 0.0f;
-    aShadowQuad[3][2] = fShadow;
+    aShadowQuad[3][2] = lbl_801D5BF0[nPlayer].f1C;
     if (gSession.nPaused != 0) {
         return;
     }
