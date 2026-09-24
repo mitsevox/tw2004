@@ -419,7 +419,8 @@ typedef struct CamTuning {
     f32  f194;                  // 0x194  fn_8003A148: how far a camera below its least height rises a frame
     f32  f198;                  // 0x198  fn_8003B534: the least ball speed it follows the flight at
     f32  f19C;                  // 0x19C  the steepest a camera direction may tilt (fn_8003D810, radians)
-    u8   unk1A0[0x1A8 - 0x1A0];
+    u8   unk1A0[0x1A4 - 0x1A0];
+    f32  f1A4;                  // 0x1A4  DynamicCam_ChoosePreFlightSequence: the obstruction test's slope
     f32  f1A8;                  // 0x1A8  fn_8003DCE8: how fast CamScript.fEC follows the ball's updates
                                 //        per frame
     u8   unk1AC[0x1C0 - 0x1AC];

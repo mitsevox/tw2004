@@ -55,6 +55,7 @@ u8   fn_8003D00C(CamSequence* pSequence);
 u8   fn_8003D054(CamSequence* pSequence);
 u8   fn_8003D0A0(int nMask, int nBit);
 u8   fn_8003D140(CamSequence* pSequence);
+u8   fn_8003D0BC(CamSequence* pSequence, f32 f);
 
 // Registers the handlers of the camera files ('CAMS', 'CAMV', 'CAMA').
 void fn_80039454(void) {
@@ -1065,6 +1066,96 @@ CamSequence* fn_8003BDBC(int nPlayer, int nLie, int nClass, int nKind, u8 a, f32
     if (nPicked == 0) {
         if (nDefault >= 0) {
             return &lbl_80281D88->pSequences[nDefault];
+        }
+        for (i = 0; i < lbl_80281D88->nSequences; i++) {
+            if (fn_8003CAFC(&lbl_80281D88->pSequences[i], nKind) &&
+                lbl_80281D88->pSequences[i].nChoices > 0) {
+                return &lbl_80281D88->pSequences[i];
+            }
+        }
+        return NULL;
+    }
+    uRand = Rand_Next(1);
+    fTotal = 0.0f;
+    for (i = 0; i < nPicked; i++) {
+        fTotal += lbl_80281D88->pSequences[anPicked[i]].f34;
+    }
+    for (i = 0; i < nPicked; i++) {
+        fWeight = 1000.0f * lbl_80281D88->pSequences[anPicked[i]].f34;
+        if ((f32)(int)(uRand % (int)(1000.0f * fTotal) - nSum) < fWeight) {
+            return &lbl_80281D88->pSequences[anPicked[i]];
+        }
+        nSum += (int)fWeight;
+    }
+    return &lbl_80281D88->pSequences[anPicked[0]];
+}
+
+// The same pick for the pre-flight cameras: kind nKind (3 becomes 28 while something stands
+// around the ball), by the ball's distance from the pin (fn_8003D0BC) instead of fDist and without
+// the nClass bits.
+CamSequence* DynamicCam_ChoosePreFlightSequence(int nPlayer, int nLie, int nKind) {
+    int anPicked[50];
+    CourseInfo* pCourse;
+    int i;
+    int nPicked;
+    int nSum;
+    int nDefault;
+    int nTee;
+    int nPinSet;
+    u32 uRand;
+    f32 fPinDist;
+    f32 fHeight;
+    f32 fTotal;
+    f32 fWeight;
+
+    nPicked = 0;
+    nSum = 0;
+    nDefault = -1;
+    if (Player_OnTee(nPlayer)) {
+        nTee = 1;
+    } else {
+        nTee = fn_8003CBD4(nLie, nPlayer);
+    }
+    fPinDist = fn_800D0478(nPlayer);
+    nPinSet = Game_CurrentPinSet();
+    pCourse = fn_8000C594();
+    if (pCourse == NULL) {
+        return NULL;
+    }
+    fHeight = pCourse->pin[nPinSet].y - gPlayers[nPlayer].vBall[1];
+    if (nKind == 3 && Ter_CheckObjectAndHazardObstruction(gPlayers[nPlayer].ball.vPos, lbl_80281F78->f16C, 1,
+                                                          0, 0.0f, 1, lbl_80281F78->f1A4)) {
+        nKind = 28;
+    }
+    for (i = 0; i < lbl_80281D88->nSequences; i++) {
+        if (nPicked >= 50) {
+            break;
+        }
+        if (lbl_80281D88->pSequences[i].nChoices > 0) {
+            if (fn_8003CAFC(&lbl_80281D88->pSequences[i], nKind) &&
+                fn_8003D00C(&lbl_80281D88->pSequences[i])) {
+                nDefault = i;
+            } else if (fn_8003D0EC(&lbl_80281D88->pSequences[i], nKind) &&
+                       fn_8003CBE8(&lbl_80281D88->pSequences[i], nPlayer) &&
+                       fn_8003CD9C(&lbl_80281D88->pSequences[i], nPlayer, 1) &&
+                       fn_8003CEEC(&lbl_80281D88->pSequences[i], nPlayer) &&
+                       fn_8003D0BC(&lbl_80281D88->pSequences[i], fPinDist) &&
+                       fn_8003D00C(&lbl_80281D88->pSequences[i]) &&
+                       fn_8003D054(&lbl_80281D88->pSequences[i]) &&
+                       fn_8003CD6C(&lbl_80281D88->pSequences[i], fHeight) &&
+                       fn_8003D140(&lbl_80281D88->pSequences[i]) &&
+                       fn_8003D0A0(lbl_80281D88->pSequences[i].b49, nTee)) {
+                anPicked[nPicked] = i;
+                nPicked++;
+            }
+        }
+    }
+    if (nPicked == 0) {
+        if (nDefault >= 0) {
+            return &lbl_80281D88->pSequences[nDefault];
+        }
+        if (nKind == 28) {
+            nKind = 3;
         }
         for (i = 0; i < lbl_80281D88->nSequences; i++) {
             if (fn_8003CAFC(&lbl_80281D88->pSequences[i], nKind) &&
