@@ -82,8 +82,8 @@ void fn_800B9864(MadDecoder* p, PictFrame* pFrame);
 
 // Drop nBits bits from the buffer, refilling 16 at a time.
 void fn_800B7D80(int nBits) {
-    lbl_802821B0 -= nBits;
     lbl_802821B4 <<= nBits;
+    lbl_802821B0 -= nBits;
     if (lbl_802821B0 < 16) {
         lbl_802821B4 |= fn_800B8984(lbl_802821B8, 2) << (16 - lbl_802821B0);
         lbl_802821B0 += 16;
@@ -328,8 +328,8 @@ s32 fn_800B8A04(s32 a, s32 b) {
 
 // The same as fn_800B7D80.
 void fn_800B8A2C(int nBits) {
-    lbl_802821B0 -= nBits;
     lbl_802821B4 <<= nBits;
+    lbl_802821B0 -= nBits;
     if (lbl_802821B0 < 16) {
         lbl_802821B4 |= fn_800B8984(lbl_802821B8, 2) << (16 - lbl_802821B0);
         lbl_802821B0 += 16;
