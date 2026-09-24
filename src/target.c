@@ -251,27 +251,24 @@ void fn_80067DAC(int nPlayer) {
         }
         nFrame = lbl_801D5BF0[nPlayer].n10;
         if (nFrame == 0) {
-            fBob = 0.5f * (fScale * lbl_801D5BF0[nPlayer].f18);
             for (i = 0; i < 4; i++) {
                 aY2[i] = aMarker[i][1];
-                aY1[i] = aY2[i] - fBob;
-                aY0[i] = aY1[i] - fBob;
+                aY1[i] = aY2[i] - 0.5f * (fScale * lbl_801D5BF0[nPlayer].f18);
+                aY0[i] = aY1[i] - 0.5f * (fScale * lbl_801D5BF0[nPlayer].f18);
             }
         }
         if (nFrame == 1) {
-            fBob = 0.5f * (fScale * lbl_801D5BF0[nPlayer].f18);
             for (i = 0; i < 4; i++) {
                 aY1[i] = aMarker[i][1];
-                aY2[i] = aY1[i] - fBob;
-                aY0[i] = aY2[i] - fBob;
+                aY2[i] = aY1[i] - 0.5f * (fScale * lbl_801D5BF0[nPlayer].f18);
+                aY0[i] = aY2[i] - 0.5f * (fScale * lbl_801D5BF0[nPlayer].f18);
             }
         }
         if (nFrame == 2) {
-            fBob = 0.5f * (fScale * lbl_801D5BF0[nPlayer].f18);
             for (i = 0; i < 4; i++) {
                 aY1[i] = aMarker[i][1];
-                aY0[i] = aY1[i] - fBob;
-                aY2[i] = aY0[i] - fBob;
+                aY0[i] = aY1[i] - 0.5f * (fScale * lbl_801D5BF0[nPlayer].f18);
+                aY2[i] = aY0[i] - 0.5f * (fScale * lbl_801D5BF0[nPlayer].f18);
             }
         }
         for (i = 0; i < 4; i++) {
