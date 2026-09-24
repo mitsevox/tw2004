@@ -364,6 +364,7 @@ void fn_80068AA8(int nPlayer) {
 // than 180 feet on a putt, 30 on shot kind 2, else the longest usable club) is undone and fA60
 // parked at -1000 or 1000 until the stick is let go. Returns whether the aim point moved.
 u8 fn_80068AC8(int nPlayer) {
+    f32* pTarget;
     f32  vToCamera[4];
     f32  vSaved[4];
     f32  vDir[4];
@@ -379,7 +380,6 @@ u8 fn_80068AC8(int nPlayer) {
     int  nClub;
     u8   bInRange;
     u8   bMoved;
-    f32* pTarget;
 
     fStep = 0.5f;
     bInRange = 0;
