@@ -163,8 +163,8 @@ void fn_800718C4(void);
 void fn_800757B8(void);
 void fn_800763B4(void);
 void fn_800763B8(void);
-void fn_80076AC4(void);
-void fn_80076AC8(void);
+void VM_vInitModule(void);
+void VM_vCloseModule(void);
 void fn_80076E48(void);
 void fn_800773F8(void);
 void fn_80077428(void);
@@ -192,7 +192,7 @@ void fn_80093D3C(void);
 void fn_800940FC(void);
 void fn_80095364(void);
 void fn_80095550(void);
-void fn_800977F8(void);
+void CameraTuning_Init(void);
 void fn_80097E98(void);
 void fn_80098A98(void);
 void fn_80098B5C(void);
@@ -438,7 +438,7 @@ void fn_8006C7A8(void) {
     fn_80015540();
     fn_8006E1C0();
     fn_8007185C();
-    fn_80076AC4();
+    VM_vInitModule();
     fn_800136F4();
     fn_800103C0();
     fn_800952D8();
@@ -477,7 +477,7 @@ void fn_8006C854(void) {
     fn_80095364();
     fn_8001049C();
     fn_80013718();
-    fn_80076AC8();
+    VM_vCloseModule();
     fn_8006E1C4();
     fn_80015620();
     UFont_Shutdown();
@@ -534,11 +534,11 @@ void fn_8006C9EC(void) {
     fn_801037F8();
     fn_8010A448(0x18000);
     lbl_80281E60 = CA_spCreateCamera();
-    fn_800977F8();
+    CameraTuning_Init();
     fn_80062E00();
     fn_80039FF8();
     lbl_80281E5C = fn_8006E1C8();
-    lbl_80281E58 = fn_80076ACC();
+    lbl_80281E58 = VM_spCreateViewport();
     lbl_80281E54 = fn_8001371C(lbl_80281E60, lbl_80281E5C, lbl_80281E58);
     fn_80013D5C(lbl_80281E54);
     fn_80095504(2);
@@ -571,7 +571,7 @@ void fn_8006CB2C(void) {
     fn_8010F794();
     fn_8008B00C();
     fn_80077428();
-    fn_80076B18(lbl_80281E58);
+    VM_vReleaseViewport(lbl_80281E58);
     fn_8006E214(lbl_80281E5C);
     CA_vDestroyCamera(lbl_80281E60);
     fn_80062E20();
@@ -610,7 +610,7 @@ void GO_vInitIG(void) {
     fn_80055D54();
     lbl_80281E60 = CA_spCreateCamera();
     lbl_80281E5C = fn_8006E1C8();
-    lbl_80281E58 = fn_80076ACC();
+    lbl_80281E58 = VM_spCreateViewport();
     lbl_80281E54 = fn_8001371C(lbl_80281E60, lbl_80281E5C, lbl_80281E58);
     fn_80013D5C(lbl_80281E54);
     fn_80030254();
@@ -622,7 +622,7 @@ void GO_vInitIG(void) {
     fn_8005D3A8(1);
     fn_800DCBBC();
     fn_80067608();
-    fn_800977F8();
+    CameraTuning_Init();
     fn_80062E00();
     fn_80039FF8();
     fn_80064E2C();
@@ -679,7 +679,7 @@ void GO_vInitIG(void) {
 // Shuts a round down.
 void fn_8006CDC4(void) {
     fn_800137B0(lbl_80281E54);
-    fn_80076B18(lbl_80281E58);
+    VM_vReleaseViewport(lbl_80281E58);
     fn_8006E214(lbl_80281E5C);
     CA_vDestroyCamera(lbl_80281E60);
     fn_80091870();
@@ -742,7 +742,7 @@ void fn_8006CEFC(void) {
     fn_800905A8();
     lbl_80281E60 = CA_spCreateCamera();
     lbl_80281E5C = fn_8006E1C8();
-    lbl_80281E58 = fn_80076ACC();
+    lbl_80281E58 = VM_spCreateViewport();
     lbl_80281E54 = fn_8001371C(lbl_80281E60, lbl_80281E5C, lbl_80281E58);
     fn_80013D5C(lbl_80281E54);
     fn_800B1D78();
@@ -763,7 +763,7 @@ void fn_8006CFC8(void) {
     fn_80090664();
     fn_8010F794();
     fn_800137B0(lbl_80281E54);
-    fn_80076B18(lbl_80281E58);
+    VM_vReleaseViewport(lbl_80281E58);
     fn_8006E214(lbl_80281E5C);
     fn_80016E3C(0);
     fn_8009CC88();

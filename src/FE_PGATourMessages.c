@@ -114,8 +114,8 @@ void fn_8010E890(MsgArg* pArgs, MsgArg* pResult) {
     u8 bOneCourse;
     int i;
 
-    fn_800D293C(nStart, szStart);
-    fn_800D293C(nEnd, szEnd);
+    CalDate_ToStringMD(nStart, szStart);
+    CalDate_ToStringMD(nEnd, szEnd);
     sprintf(szDates, "%s\nthru\n%s", szStart, szEnd);
     pTournament = fn_800EFA70(nEvent);
     sprintf(szName, "%s", GameModeDriverPGATour_GetName(nEvent));
@@ -432,7 +432,7 @@ void fn_8010F2FC(MsgArg* pArgs, MsgArg* pResult) {
     *pOut = fn_800EFE3C(nEvent);
     bWon = gpSaveData[nPlayer].aC8[nEvent].award.bWon;
     if (bWon) {
-        fn_800D28DC(gpSaveData[nPlayer].aC8[nEvent].award.nDate, szDate);
+        CalDate_ToString(gpSaveData[nPlayer].aC8[nEvent].award.nDate, szDate);
     } else {
         szDate[0] = '\0';
     }
@@ -451,7 +451,7 @@ void fn_8010F3A4(MsgArg* pArgs, MsgArg* pResult) {
     *pOut = 0;
     bWon = gpSaveData[nPlayer].a1C0[n].bWon;
     if (bWon) {
-        fn_800D28DC(gpSaveData[nPlayer].a1C0[n].nDate, szDate);
+        CalDate_ToString(gpSaveData[nPlayer].a1C0[n].nDate, szDate);
     } else {
         szDate[0] = '\0';
     }
@@ -467,7 +467,7 @@ void fn_8010F440(MsgArg* pArgs, MsgArg* pResult) {
     char* szMoney = ((MsgString*)pArgs[4].p)->pStr;
     s32* pScore = (s32*)pArgs[5].p;
 
-    fn_800D28DC(fn_80077ACC()->aC8[nEvent].award.nDate, ((MsgString*)pArgs[1].p)->pStr);
+    CalDate_ToString(fn_80077ACC()->aC8[nEvent].award.nDate, ((MsgString*)pArgs[1].p)->pStr);
     strcpy(szName, fn_80077ACC()->szName);
     GameModeDriverPGATour_GetPurseString(nEvent, szEarnings);
     fn_800907AC(fn_80077ACC()->aC8[nEvent].n6 * 1000, szMoney);

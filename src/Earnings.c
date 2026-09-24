@@ -1560,7 +1560,7 @@ u8 fn_800D7770(int nPlayer, Award* pAward) {
     if (gpSaveData[gPlayers[nPlayer].nIndex].bActive != 1) return 0;
     if (pAward->bWon) return 0;
     pAward->bWon = 1;
-    pAward->nDate = fn_800D2994();
+    pAward->nDate = CalDate_GetToday();
     return 1;
 }
 

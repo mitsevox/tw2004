@@ -61,7 +61,7 @@ void fn_80116574(int nKind, char* szTitle, char* szText) {
 }
 
 u16 fn_80116578(void) {
-    return fn_800D2994();
+    return CalDate_GetToday();
 }
 
 char* fn_80116598(u16 nDate) {
@@ -87,7 +87,7 @@ u8 fn_801165B0(void) {
     s32 nYear;
     int b;
 
-    fn_800D2714(&lbl_80223C48.nToday, &nMonth, &nDay, &nYear);
+    CalDate_GetMDY(&lbl_80223C48.nToday, &nMonth, &nDay, &nYear);
     b = 0;
     if (lbl_80223C48.nMonth == 1 && lbl_80223C48.nYear == nYear) {
         b = 1;
@@ -102,7 +102,7 @@ u8 fn_80116614(void) {
     s32 nYear;
     int b;
 
-    fn_800D2714(&lbl_80223C48.nToday, &nMonth, &nDay, &nYear);
+    CalDate_GetMDY(&lbl_80223C48.nToday, &nMonth, &nDay, &nYear);
     b = 0;
     if (lbl_80223C48.nMonth == 12 && lbl_80223C48.nYear == nYear) {
         b = 1;
@@ -319,8 +319,8 @@ void fn_80116B60(int nKind, char* szTitle, char* szText) {
         GameModeDriverPGATour_GetEventByDate(lbl_80223C48.nSelected, &nId, &nRound);
         nStart = fn_800EFD38(nId);
         nEnd = GameModeDriverPGATour_GetEndDate(nId);
-        fn_800D28DC(nStart, szStart);
-        fn_800D28DC(nEnd, szEnd);
+        CalDate_ToString(nStart, szStart);
+        CalDate_ToString(nEnd, szEnd);
         strcpy(szTitle, "Dates:");
         sprintf(szText, "%s - %s", szStart, szEnd);
         return;
@@ -349,7 +349,7 @@ u16 fn_80116CAC(void) {
     u16 nDate;
 
     nDate = fn_800EFD38(GameModeDriverPGATour_GetSelectedEvent(&nRound));
-    fn_800D27CC(&nDate, nRound);
+    CalDate_AddDays(&nDate, nRound);
     return nDate;
 }
 
@@ -398,7 +398,7 @@ u8 fn_80116DD8(void) {
     s32 nYear;
     int b;
 
-    fn_800D2714(&lbl_80223C48.nToday, &nMonth, &nDay, &nYear);
+    CalDate_GetMDY(&lbl_80223C48.nToday, &nMonth, &nDay, &nYear);
     b = 0;
     if (lbl_80223C48.nMonth == 1 && lbl_80223C48.nYear == nYear) {
         b = 1;
@@ -413,7 +413,7 @@ u8 fn_80116E3C(void) {
     s32 nYear;
     int b;
 
-    fn_800D2714(&lbl_80223C48.nToday, &nMonth, &nDay, &nYear);
+    CalDate_GetMDY(&lbl_80223C48.nToday, &nMonth, &nDay, &nYear);
     b = 0;
     if (lbl_80223C48.nMonth == 1 && lbl_80223C48.nYear == nYear + 1) {
         b = 1;
@@ -471,7 +471,7 @@ void fn_80117004(int nKind, char* szTitle, char* szText) {
 
     switch (nKind) {
     case 1:
-        fn_800D28DC(lbl_80223C48.nSelected, szDate);
+        CalDate_ToString(lbl_80223C48.nSelected, szDate);
         strcpy(szTitle, "Date:");
         strcpy(szText, szDate);
         return;
@@ -496,7 +496,7 @@ void fn_80117004(int nKind, char* szTitle, char* szText) {
 }
 
 u16 fn_801170EC(void) {
-    return fn_800D2994();
+    return CalDate_GetToday();
 }
 
 // The name of the event on a day.
@@ -538,7 +538,7 @@ void fn_80117188(void) {
         lbl_80223C48.bSeasonOver = 1;
     }
     lbl_80223C48.nToday = nDate;
-    fn_800D2714(&lbl_80223C48.nToday, &nMonth, &nDay, &nYear);
+    CalDate_GetMDY(&lbl_80223C48.nToday, &nMonth, &nDay, &nYear);
     lbl_80223C48.nMonth = nMonth;
     lbl_80223C48.nYear = nYear;
     fn_80117348();
@@ -574,13 +574,13 @@ void fn_80117348(void) {
     s32 nMonth;
     s32 nYear;
 
-    nDays = fn_800D2814(lbl_80223C48.nMonth, lbl_80223C48.nYear);
-    fn_800D2678(&nDate, lbl_80223C48.nMonth, 1, lbl_80223C48.nYear);
-    lbl_80223C48.nFirstCell = fn_800D27E0(&nDate);
+    nDays = DaysInMonth(lbl_80223C48.nMonth, lbl_80223C48.nYear);
+    CalDate_SetMDY(&nDate, lbl_80223C48.nMonth, 1, lbl_80223C48.nYear);
+    lbl_80223C48.nFirstCell = CalDate_GetDayOfWeek(&nDate);
     lbl_80223C48.nFirstCell = lbl_80223C48.nFirstCell - 1;
     lbl_80223C48.nEndCell = lbl_80223C48.nFirstCell + nDays;
-    fn_800D2884(lbl_80223C48.nMonth, lbl_80223C48.nYear, &nMonth, &nYear);
-    lbl_80223C48.nPrevMonthDays = fn_800D2814(nMonth, nYear);
+    CalDate_GetPrevMonth(lbl_80223C48.nMonth, lbl_80223C48.nYear, &nMonth, &nYear);
+    lbl_80223C48.nPrevMonthDays = DaysInMonth(nMonth, nYear);
 }
 
 // The date in a cell of the grid (cells before day 1 belong to the month before, those after the
@@ -595,16 +595,16 @@ u16 fn_801173F0(u32 nCell) {
     nYear = 0;
     if (nCell < lbl_80223C48.nFirstCell) {
         nDay = 1 + (lbl_80223C48.nPrevMonthDays - lbl_80223C48.nFirstCell) + nCell;
-        fn_800D2884(lbl_80223C48.nMonth, lbl_80223C48.nYear, &nMonth, &nYear);
+        CalDate_GetPrevMonth(lbl_80223C48.nMonth, lbl_80223C48.nYear, &nMonth, &nYear);
     } else if (nCell >= lbl_80223C48.nEndCell) {
         nDay = nCell - (lbl_80223C48.nEndCell - 1);
-        fn_800D28B0(lbl_80223C48.nMonth, lbl_80223C48.nYear, &nMonth, &nYear);
+        CalDate_GetNextMonth(lbl_80223C48.nMonth, lbl_80223C48.nYear, &nMonth, &nYear);
     } else {
         nDay = (nCell - lbl_80223C48.nFirstCell) + 1;
         nMonth = lbl_80223C48.nMonth;
         nYear = lbl_80223C48.nYear;
     }
-    fn_800D2678(&nDate, nMonth, nDay, nYear);
+    CalDate_SetMDY(&nDate, nMonth, nDay, nYear);
     return nDate;
 }
 
@@ -636,7 +636,7 @@ s32 fn_80117510(u16 nDate) {
 
     nCopy = nDate;
     nPrevShown = lbl_80223C48.nPrevMonthDays - lbl_80223C48.nFirstCell;
-    fn_800D2714(&nCopy, &nMonth, &nDay, &nYear);
+    CalDate_GetMDY(&nCopy, &nMonth, &nDay, &nYear);
     // fake match: the original compares the months unsigned (cmplw); both are 1..12.
     if ((u32)lbl_80223C48.nMonth == nMonth) {
         return nDay + (s32)lbl_80223C48.nFirstCell - 1;

@@ -375,9 +375,9 @@ void fn_8011DDFC(MsgArg* pArgs, MsgArg* pResult) {
     strcpy(szName, GameModeDriverRTE_GetName(nEvent));
     strcpy(szStatus, "Status (?)");
     strcpy(szDate, "Start Date");
-    fn_800D28DC(nDate, szDate);
+    CalDate_ToString(nDate, szDate);
     bNear = 0;
-    if (nDate - fn_800D2994() < 2 && lbl_801D7148.aLoaded[0]) {
+    if (nDate - CalDate_GetToday() < 2 && lbl_801D7148.aLoaded[0]) {
         bNear = 1;
     }
     // fake match: worked out as an int and kept as a u8 (one clrlwi for the test and the result);
@@ -424,7 +424,7 @@ void fn_8011DF90(MsgArg* pArgs, MsgArg* pResult) {
     *pPrize = fn_800F1154(nId);
     bWon = pProfile->aRTEAward[nId].bWon;
     if (bWon) {
-        fn_800D28DC(pProfile->aRTEAward[nId].nDate, szDate);
+        CalDate_ToString(pProfile->aRTEAward[nId].nDate, szDate);
     } else {
         szDate[0] = '\0';
     }

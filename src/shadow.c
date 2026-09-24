@@ -7,7 +7,7 @@
 #include "shadow.h"
 #include "unsorted/cull.h"
 
-void  fn_80076A54(f32* pRect);
+void  VM_vUpdateInternalViewportRectData(f32* pRect);
 void  fn_80036054(void* pMesh, int n, s32* pDesc);   // Skin.c: set up a mesh object
 void  fn_800360A0(void* pMesh);                      // Skin.c: free it
 void  fn_80016B54(int nWidth, int nHeight, f32 fX, f32 fY);
@@ -118,7 +118,7 @@ void SH_vSetShadowIntensity(u8 bHigh) {
     lbl_80282164 = fn_80009B34(0x1000, 2, 16, "shadow.c", 183);
     lbl_80282160 = fn_80009B34(0x1000, 2, 16, "shadow.c", 184);
     p->pLens = CA_spCreateCamera();
-    p->pRect = fn_80076ACC();
+    p->pRect = VM_spCreateViewport();
     p->pFrameBuf = fn_8006E1C8();
     fn_8006E26C(p->pFrameBuf, 0.0f, 0.0f, 256.0f, 256.0f, 1.0f, 1.0f);
     fn_800171D8(p->pRect, 0.0f, 0.0f, 1.0f, 1.0f);
@@ -166,7 +166,7 @@ void fn_800B2734(void) {
         p->pCamera = NULL;
     }
     if (p->pRect != NULL) {
-        fn_80076B18(p->pRect);
+        VM_vReleaseViewport(p->pRect);
         p->pRect = NULL;
     }
     if (p->pLens != NULL) {
@@ -561,7 +561,7 @@ void fn_800B2FB0(Character* pChar, int nView, u8 bFlat) {
 void fn_800B3438(f32* pRect, f32 x, f32 y) {
     pRect[4] = x;
     pRect[5] = y;
-    fn_80076A54(pRect);
+    VM_vUpdateInternalViewportRectData(pRect);
 }
 
 // Four floats: pOut gets pA plus pB.
