@@ -8,18 +8,16 @@
 #include "game_types.h"
 #include "platform.h"
 
-// The menu UI's file (the 'DATS' object uiLoadFile.c keeps). Its tables hold offsets from the
-// file's start until fn_8008F488 adds the file's address to them.
-typedef struct UIFile {
-    u32  u0;                    // 0x0
-    u32* p4;                    // 0x4  a count, then that many pairs of words
-    u32* p8;                    // 0x8  a count, then that many tables (each a count and its words)
-} UIFile;
-
 // An entry of the front end's colour table: p8 points at four bytes, alpha first (uiText.c).
+// Every table in the UI file's second list holds entries of this shape; u0 is the entry's kind,
+// 0x10 in the colour table (fn_8008FDDC).
+// Movie entries (fe_movies.c) use the same shape: flags 1 a texture (p4 its data), 2 a movie
+// (p8 its LLPict).
 typedef struct UIColorEntry {
-    u8   unk0[0x8];
+    u32  u0;                    // 0x0
+    void* p4;                   // 0x4
     u8*  p8;                    // 0x8
+    char szC[4];                // 0xC  its name (fn_8008FFF0 reads it); the length is not known
 } UIColorEntry;
 
 typedef struct UIColorTable {
@@ -27,11 +25,45 @@ typedef struct UIColorTable {
     UIColorEntry* apEntries[1]; // 0x4  nCount of them
 } UIColorTable;
 
+// A pair in the UI file's first list. fn_8008F610 hands p4 to the studio as a screen's data.
+typedef struct UIFilePair {
+    void* p0;                   // 0x0
+    void* p4;                   // 0x4
+} UIFilePair;
+
+typedef struct UIFilePairs {
+    u32  nCount;                // 0x0
+    UIFilePair aPairs[1];      // 0x4  nCount of them
+} UIFilePairs;
+
+// The UI file's second list: its tables, one of them the colour table (fn_8008FDDC).
+typedef struct UIFileTables {
+    s32  nCount;                // 0x0
+    UIColorTable* apTables[1];  // 0x4  nCount of them
+} UIFileTables;
+
+// The menu UI's file (the 'DATS' object uiLoadFile.c keeps). Its lists hold offsets from the
+// file's start until fn_8008F488 adds the file's address to them.
+// port: the file stores 32-bit offsets in these pointer fields and in the lists' pointers, and
+// fn_8008F488 turns them into pointers in place; a 64-bit port must load the file into structs.
+typedef struct UIFile {
+    u32  u0;                    // 0x0
+    UIFilePairs*  p4;           // 0x4  its pairs
+    UIFileTables* p8;           // 0x8  its tables
+} UIFile;
+
+// The block at FrontEnd.pC: a count, then pointers to records that each start with a name;
+// fn_8008FE88 gives a UI file entry of kind 2 the record of its name.
+typedef struct UINamedList {
+    u32   nCount;               // 0x0
+    char* apNames[1];           // 0x4  nCount of them
+} UINamedList;
+
 typedef struct FrontEnd {
     UIFile* pFile;              // 0x0
     void* pHandler;             // 0x4  where GameMessages.c sends its messages (fn_8016B09C)
     struct UILoaded* p8;        // 0x8  the texture banks fn_8008F0FC frees (fn_80090400)
-    void* pC;                   // 0xC  a block uiLoadFile.c frees (fn_8008F24C)
+    UINamedList* pC;            // 0xC  a block uiLoadFile.c frees (fn_8008F24C)
     u32*  p10;                  // 0x10  the fonts table fn_8008F194 frees (fn_80090400)
     UIColorTable* p14;          // 0x14  the colours UIText.n8 picks from (uiText.c), NULL: none
     f32   f18;                  // 0x18  set to 1 when a round starts (gomainloop fn_8006DC20)
@@ -154,10 +186,10 @@ void fn_800834E8(MsgArg* pArgs, MsgArg* pResult);
 extern u8 lbl_80281F18;         // set by the pause handler (GameUICommands.c fn_8008633C)
 extern u8 lbl_80281F19;         // (uiProcessInterface.c) FEgolferanim.c's fn_8008EB10 tests it
 
-// Four words a UI element passes down its transform stack, copied as one struct (what they hold is
-// not known yet).
+// Four floats a UI element passes down its transform stack, copied as one struct; fe_movies.c's
+// fn_80090D28 scales its quad's colours by them / 511.
 typedef struct UIWords4 {
-    u32 a[4];
+    f32 a[4];
 } UIWords4;
 
 // One level of the menu UI's transform stack (uiTransform.c). A pushed element's transform is
@@ -197,5 +229,8 @@ typedef struct UITransformDesc {
 } UITransformDesc;
 
 UITransform* fn_80093274(void);         // the current level (uiTransform.c)
+
+// uiProcessInterface.c: for a UI name starting "tu", 1 in a lesson and -1 otherwise; else 0.
+int fn_8008FFF0(const char* szName);
 
 #endif

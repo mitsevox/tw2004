@@ -61,7 +61,7 @@ typedef struct FEScreen {
     u8  a30[4];                 // 0x30  set to 1 by fn_800905A8; fn_8008F80C sets one
     s32 n34;                    // 0x34  cleared by fn_800905A8
     s32 n38;                    // 0x38  a menu message reads it (fn_8007DAD4)
-    u8  unk3C[0x40 - 0x3C];
+    s32 n3C;                    // 0x3C  the UI file table holding the movie entries (fn_8008FE88)
     u8  b40;                    // 0x40  cleared by fn_800905A8
     u8  unk41[0x44 - 0x41];
     f32 fFade;                  // 0x44  the fade to black before a movie, 0 to 1
@@ -110,7 +110,9 @@ LAYOUT_ASSERT(FEVertex, 0x18);
 typedef struct FEQuad {
     s16 n0;                     // 0x00  } with n2, an index pair into the UI file (fn_800913EC)
     s16 n2;                     // 0x02  }
-    u8  unk4[0xA - 0x4];
+    s16 n4;                     // 0x04  its colour in the front end's colour table (-1: none)
+    u8  unk6[0x8 - 0x6];
+    s16 n8;                     // 0x08  bit 0: a texture keeps its tint (fn_80090D28)
     s16 nA;                     // 0x0A
     FEVertex aVtx[4];           // 0x0C  the corners (fn_80090D28 draws them)
 } FEQuad;
@@ -164,7 +166,7 @@ typedef struct FEProfile {
     SaveProfile profile;        // 0x00010  a working copy
     u8  unk10610[0x10620 - 0x10610];
     s8  n10620;                 // 0x10620  read and cleared by menu messages
-    u8  unk10621[0x1063F - 0x10621];
+    s8  a10621[15][2];          // 0x10621  pairs a menu message reads (fn_80082620)
     u8  bCopy;                  // 0x1063F  the working copy is the profile, not the slot's own
     u8  b10640;                 // 0x10640
     u8  unk10641[3];
