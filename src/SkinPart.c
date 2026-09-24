@@ -169,9 +169,9 @@ void fn_800CC658(Character* pChar, char* pSet, char* pVariant, char* pOption) {
 
 // Picks a variant of a part of one of the six skins by their name codes.
 void fn_800CC710(Character* pChar, int nSkin, u64 uPart, u64 uVariant) {
-    Skin* pSkin;
     int nPart;
     int nVariant;
+    Skin* pSkin;
 
     if (pChar == NULL || pChar->p16D8 == NULL || pChar->p16D8->apSkins == NULL || nSkin < 0 || nSkin >= 6) {
         return;
