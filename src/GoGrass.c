@@ -620,10 +620,10 @@ void fn_8011FDC4(GrassBuffer* pBuffer) {
 
 // Takes the smallest free buffer of at least nSize out of apDC (NULL if there is none).
 GrassBuffer* fn_8011FDEC(s32 nSize) {
+    int i;
     int nBest = -1;
     GrassBuffer* pBest = NULL;
     GrassBuffer* pBuffer;
-    int i;
 
     if (lbl_80281900->nE8 == 0) {
         return NULL;
@@ -636,7 +636,7 @@ GrassBuffer* fn_8011FDEC(s32 nSize) {
         }
     }
     if (pBest != NULL) {
-        lbl_80281900->nE8 = lbl_80281900->nE8 - 1;
+        lbl_80281900->nE8--;
         lbl_80281900->apDC[nBest] = NULL;
         return pBest;
     }
