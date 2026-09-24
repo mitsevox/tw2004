@@ -664,26 +664,30 @@ BufferPoolBlock* fn_800154F4(void) {
 
 // Reset the renderer's state and free the buffer pool.
 void fn_80015540(void) {
-    lbl_801B8980.n0 = 3;
-    lbl_801B8980.b4 = 1;
-    lbl_801B8980.n8 = 6;
-    lbl_801B8980.bC = 100;
-    lbl_801B8980.bD = 0;
-    lbl_801B8980.n10 = 4;
-    lbl_801B8980.n14 = 5;
-    lbl_801B8980.n18 = 1;
-    lbl_801B8980.b1C = 0xFF;
-    lbl_801B8980.b1D = 0;
-    lbl_801B8980.u20 = 0x70;
-    lbl_801B8980.nFC = 0;
-    lbl_801B8980.n24 = 2;
-    lbl_801B8980.f28 = 100.0f;
-    lbl_801B8980.f2C = 2048.0f;
-    *(u32*)&lbl_801B8980.c30 = 0xFFFFFFFF; // port: all four GXColor bytes 0xFF, stored as one word
-    fn_8000ADC0(lbl_801B8980.m34);
+    RenderState* const p = &lbl_801B8980;
+
+    // fake match: m74, u110 and uFlags through the global, the rest through p (only this mix gives
+    // the original's base registers)
+    p->n0 = 3;
+    p->b4 = 1;
+    p->n8 = 6;
+    p->bC = 100;
+    p->bD = 0;
+    p->n10 = 4;
+    p->n14 = 5;
+    p->n18 = 1;
+    p->b1C = 0xFF;
+    p->b1D = 0;
+    p->u20 = 0x70;
+    p->nFC = 0;
+    p->n24 = 2;
+    p->f28 = 100.0f;
+    p->f2C = 2048.0f;
+    *(u32*)&p->c30 = 0xFFFFFFFF; // port: all four GXColor bytes 0xFF, stored as one word
+    fn_8000ADC0(p->m34);
     fn_8000ADC0(lbl_801B8980.m74);
-    lbl_801B8980.p100 = NULL;
-    lbl_801B8980.p104 = NULL;
+    p->p100 = NULL;
+    p->p104 = NULL;
     lbl_801B8980.u110 = 0;
     lbl_801B8980.uFlags = 0;
     GXSetCurrentMtx(0);
