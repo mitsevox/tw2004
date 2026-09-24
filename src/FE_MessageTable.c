@@ -1369,8 +1369,8 @@ void fn_8007BCA4(MsgArg* pArgs, MsgArg* pResult) {
 void fn_8007BCC4(MsgArg* pArgs, MsgArg* pResult) {
     lbl_801D7148.b11 = 1;
     fn_800E0B38((u8)pArgs[0].i);
-    lbl_801D87C0.b0 = 1;
     gSession.a8[0] = 1;
+    lbl_801D87C0.b0 = 1;
     fn_800A4FD8();
 }
 
