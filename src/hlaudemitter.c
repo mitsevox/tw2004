@@ -100,6 +100,39 @@ void fn_800ADAF0(u8 nId, u8 nTrack, f32 fPitch) {
     }
 }
 
+// The calls below do the same for every instance of an emitter.
+void fn_800ADB4C(s16 nEmitter, u8 nTrack, u8 bOn) {
+    AudInstance* pInst;
+    for (pInst = lbl_801F2668.apFirst[nEmitter]; pInst != NULL; pInst = pInst->pNext) {
+        fn_800AD698(pInst->nId, nTrack, bOn);
+    }
+}
+
+// The emitter's own sound first (fn_800ADA08), when it has instances.
+void fn_800ADC44(s16 nEmitter, u8 nTrack, u8 n) {
+    AudInstance* pInst = lbl_801F2668.apFirst[nEmitter];
+    if (pInst != NULL) {
+        fn_800ADA08(lbl_801F2668.anSound[nEmitter], nTrack, n);
+    }
+    for (; pInst != NULL; pInst = pInst->pNext) {
+        fn_800AD9AC(pInst->nId, nTrack, n);
+    }
+}
+
+void fn_800ADCD0(s16 nEmitter, u8 nTrack, u8 n, int bCheck) {
+    AudInstance* pInst;
+    for (pInst = lbl_801F2668.apFirst[nEmitter]; pInst != NULL; pInst = pInst->pNext) {
+        fn_800ADA28(pInst->nId, nTrack, n, bCheck);
+    }
+}
+
+void fn_800ADD54(s16 nEmitter, u8 nTrack, f32 fVolume) {
+    AudInstance* pInst;
+    for (pInst = lbl_801F2668.apFirst[nEmitter]; pInst != NULL; pInst = pInst->pNext) {
+        fn_800ADA94(pInst->nId, nTrack, fVolume);
+    }
+}
+
 // Clears bit nBit of an instance's u22 and tells its callback.
 void fn_800ADDC8(u8 nId, u8 nBit, s32 n) {
     AudInstance* pInst;

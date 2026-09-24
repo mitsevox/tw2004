@@ -317,7 +317,6 @@ LAYOUT_ASSERT(AudSource, 0x7C);
 typedef void (*AudSeqHandler)(AudSeqEvent* pEvent, AudTrack* pTrack);
 extern AudSeqHandler lbl_801F1880[13];
 
-// One of hlaudemitter.c's 256 emitter instances (lbl_801F2740); only the fields read so far.
 // What an instance asks of its eight tracks (AudInstance.pCmd), written by fn_800AD698,
 // fn_800AD734 and fn_800AD790; only those fields are known.
 typedef struct AudInstanceCmd {
@@ -327,9 +326,14 @@ typedef struct AudInstanceCmd {
     u32  auParams[8];           // 0x4    per track
 } AudInstanceCmd;
 
+// One of hlaudemitter.c's 256 emitter instances (lbl_801F2740); only the fields read so far.
 typedef struct AudInstance {
     AudInstanceCmd* pCmd;       // 0x0
-    u8   unk4[0x22 - 0x4];
+    u8   unk4[0xC - 0x4];
+    struct AudInstance* pNext;  // 0xC    the next instance of the same emitter (AudEmitters)
+    u8   unk10[0x20 - 0x10];
+    u8   nId;                   // 0x20   its number (its index in lbl_801F2740)
+    u8   unk21;
     u8   u22;                   // 0x22   bits cleared by fn_800ADDC8
     u8   unk23[0x30 - 0x23];
     void (*pfnCallback)(u8 nId, u8 nBit, s32 n);  // 0x30
@@ -337,6 +341,18 @@ typedef struct AudInstance {
 LAYOUT_ASSERT(AudInstance, 0x34);
 
 extern AudInstance lbl_801F2740[256];   // the instances, by id (0xFF: none)
+
+// hlaudemitter.c's emitters (lbl_801F2668, 0xD8 bytes): per emitter, its list of instances and
+// a sound number. 32 fit the layout: the list heads end where the sound numbers begin.
+typedef struct AudEmitters {
+    u8   unk0[0x10];
+    AudInstance* apFirst[32];   // 0x10   linked through AudInstance.pNext
+    s16  anSound[32];           // 0x90   fn_800ADC44 hands it to fn_800ADA08
+    u8   unkD0[0xD8 - 0xD0];
+} AudEmitters;
+LAYOUT_ASSERT(AudEmitters, 0xD8);
+
+extern AudEmitters lbl_801F2668;
 
 // The two track lists: [0] in start order, [1] sorted on f48, highest first.
 extern UList lbl_801F1868[2];
@@ -514,5 +530,9 @@ u8   fn_800ACE38(AudVoice* pVoice, u32* puPos);
 
 // hlaudemitter.c
 void fn_800ADDC8(u8 nId, u8 nBit, s32 n);
+void fn_800ADB4C(s16 nEmitter, u8 nTrack, u8 bOn);   // for every instance of an emitter: fn_800AD698
+void fn_800ADC44(s16 nEmitter, u8 nTrack, u8 n);     // fn_800AD9AC
+void fn_800ADCD0(s16 nEmitter, u8 nTrack, u8 n, int bCheck);   // fn_800ADA28
+void fn_800ADD54(s16 nEmitter, u8 nTrack, f32 fVolume);        // fn_800ADA94
 
 #endif
