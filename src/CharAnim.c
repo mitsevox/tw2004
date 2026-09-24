@@ -29,6 +29,12 @@ char* fn_801008A8(void);                                    // GameMode11.c
 void  fn_8000A144(f32 (*pSrc)[4], f32 (*pDst)[4]);          // UMemPool.c: copies three rows
 void  fn_800089D4(f32 (*m)[4], f32* pQ);                    // Quaternion.c: a rotation matrix's quaternion
 
+// fake match: stands in for a function the original linker stripped. The file's pool starts with
+// 1.0f (0x80283CD8), before the 0.0f fn_800957FC uses first; its body is unknown.
+static f32 CharAnim_StrippedFn(f32 x) {
+    return x + 1.0f;
+}
+
 // Clear the queued state change and stop the second player; with bReset, rebuild its blend node as
 // a half-and-half blend. In game type 3 the created golfer's sliders are applied again.
 void fn_800957FC(Character* pChar, u8 bReset) {
@@ -122,7 +128,7 @@ void CharacterState_AddSKABlendData(Character* pChar, u8 bReset, int nGroup, SKA
                                     int nAnim, f32 fStart, f32 fFrom, f32 fTo, f32 fOffset, f32 fTime) {
     SKABlendNode* pNode;
     SKABlendNode* pNew;
-    f32 aBlend[6];
+    f32 aBlend[18];             // only [0]-[5] are used; EA's frame has room for 18 (true size unknown)
     f32 m[4][4];
     f32 vNormal[4];
     Clip* pClip;

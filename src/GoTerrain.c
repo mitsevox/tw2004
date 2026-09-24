@@ -15,7 +15,6 @@
 #include "dynobj.h"
 #include "unsorted/cull.h"
 
-void  fn_800075CC(void* p);         // frees what fn_800073B4 made
 void  fn_80019358(Character* pChar, f32* pDir, f32 f);
 void  fn_800F199C(f32 x, f32 y, f32 z);
 f32   fn_8001414C(u8* p);

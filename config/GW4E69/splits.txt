@@ -418,6 +418,10 @@ goballfx.c:
 
 GoObjShadow.c:
 	.text       start:0x80093D3C end:0x8009414C
+	.bss        start:0x801D96B8 end:0x801D97E0
+	.sdata      start:0x80281390 end:0x802813A8
+	.sbss       start:0x80281F50 end:0x80281F58
+	.sdata2     start:0x80283C68 end:0x80283C80
 
 GoShaderObject_Particle_Gc.c:
 	.text       start:0x8009414C end:0x8009554C
@@ -445,6 +449,9 @@ unsorted/sweep_800957D8.c:
 
 CharAnim.c:
 	.text       start:0x800957FC end:0x80097208
+	.rodata     start:0x80183A70 end:0x80183A98
+	.data       start:0x80189CE8 end:0x80189D30
+	.sdata2     start:0x80283CD8 end:0x80283D18
 
 GoShaderObjectCommon_MorphAnimManager_Gc.c:
 	.text       start:0x80097208 end:0x800977CC
@@ -466,6 +473,8 @@ GoShaderObject_Glows_Gc.c:
 
 UFstPart.c:
 	.text       start:0x80098A98 end:0x80099ED8
+	.data       start:0x80189D98 end:0x80189DA8
+	.sdata2     start:0x80283E20 end:0x80283E70
 
 BootCourse.c:
 	.text       start:0x80099ED8 end:0x8009A250
@@ -595,6 +604,7 @@ ScreenClear.c:
 
 Code800BA940.c:
 	.text       start:0x800BA940 end:0x800BAD60
+	.sdata2     start:0x80284248 end:0x80284280
 
 VecMath.c:
 	.text       start:0x800BAD60 end:0x800BB0A8
