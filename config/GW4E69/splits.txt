@@ -118,6 +118,7 @@ Code80012ED0.c:
 
 Controller_Gc.c:
 	.text       start:0x80012FA4 end:0x800136F4
+	.bss        start:0x801A36A0 end:0x801A3728
 
 unsorted/sweep_800136F4.c:
 	.text       start:0x800136F4 end:0x8001371C
