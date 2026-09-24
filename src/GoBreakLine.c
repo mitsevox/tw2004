@@ -232,6 +232,11 @@ void BreakLine_Render(int nView) {
     }
 }
 
+// fake match: EA reads the player through an inline; written in place, pPlayer is allocated r29, not r31
+static inline Player* BreakLine_ViewPlayer(int nView) {
+    return &gPlayers[fn_8001707C(nView)];
+}
+
 // Starts view nView's line when its player stands over a putt within 75 of the hole: lays out the
 // line's vertices, colours and texture coordinates, and launches a copy of the ball with the
 // putt's power for the distance, with sounds and effects off.
@@ -241,7 +246,7 @@ void BreakLine_Reset(int nView) {
     int i;
     int nTex = 0;
 
-    pPlayer = &gPlayers[fn_8001707C(nView)];
+    pPlayer = BreakLine_ViewPlayer(nView);
     if (pPlayer->nShotKind == 0 && pPlayer->fDistance < 75.0f && pPlayer->fDistance > 0.0f) {
         lbl_80282228->abA91C[nView] = 1;
         lbl_80282228->abSkip[nView] = 1;

@@ -653,6 +653,11 @@ void fn_80036894(SkinDesc* pDesc) {
     fn_8001F08C(&pSrc, &pDst, aFormat, 48, 1);
 }
 
+// fake match: EA takes the mesh through an inline; &pDesc->p34[j] in place allocates pMesh r19, not r18
+static inline SkinMesh* Skin_DescMesh(SkinDesc* pDesc, int j) {
+    return &pDesc->p34[j];
+}
+
 // Byte-swaps a skin description read from its little-endian file, in place, and turns its mesh
 // bit offsets into pointers. Version 8 descriptions with n04 == 0 have the old p14 layout
 // (SkinDesc14Old) and are converted to the new one.
@@ -678,6 +683,7 @@ void fn_800368FC(SkinDesc* pDesc) {
     SkinDesc14* pEntry;
     SkinMesh* pMesh;
     u8* pData;
+    int j;
     int i;
     u8* p;
     void* pSrc;                 // port: BYTESWAP_SWAPDATA takes it as a u8** too (one stack slot in EA's code)
@@ -755,19 +761,20 @@ void fn_800368FC(SkinDesc* pDesc) {
     }
 
     // Each mesh's bit data: its layout depends on the mesh's flags.
-    for (i = 0; i < pDesc->n2C; i++) {
-        if (pDesc->p34[i].pBits != NULL) {
-            pDesc->p34[i].pBits = (SkinMeshBit*)((u8*)pDesc + (uptr)pDesc->p34[i].pBits);
+    for (j = 0; j < pDesc->n2C; j++) {
+        if (pDesc->p34[j].pBits != NULL) {
+            pDesc->p34[j].pBits = (SkinMeshBit*)((u8*)pDesc + (uptr)pDesc->p34[j].pBits);
         }
-        pMesh = &pDesc->p34[i];
+        pMesh = Skin_DescMesh(pDesc, j);
         pData = (u8*)pMesh->pBits;
         n = pMesh->n8;
         if (pData == NULL) {
             pMesh->pBits = NULL;
         } else if (pMesh->uFlags & 0x30) {
             pSrc = pDst = pData;
-            BYTESWAP_SWAPDATA((u8**)&pSrc, pData, n * 8, 2);
-            pData += n * 8;
+            // fake match: n * 8 as (n * 4) << 1 computes n * 4 once, before the first swap, as EA does
+            BYTESWAP_SWAPDATA((u8**)&pSrc, pData, (n * 4) << 1, 2);
+            pData += (n * 4) << 1;
             pSrc = pData;
             BYTESWAP_SWAPDATA((u8**)&pSrc, pData, n * 4, 1);
             pData += n * 4;
@@ -776,7 +783,8 @@ void fn_800368FC(SkinDesc* pDesc) {
                 BYTESWAP_SWAPDATA((u8**)&pSrc, pData, n * 2, 2);
             } else if (pMesh->uFlags & 0x40) {
                 pSrc = pData;
-                BYTESWAP_SWAPDATA((u8**)&pSrc, pData, n * 4, 2);
+                // fake match: written n * sizeof(u32), the reused n * 4 is passed after &pSrc, as EA does
+                BYTESWAP_SWAPDATA((u8**)&pSrc, pData, n * sizeof(u32), 2);
             }
         } else if (pMesh->uFlags & 0x40) {
             pSrc = pDst = pData;

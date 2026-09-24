@@ -1037,7 +1037,7 @@ config.libs = [
             Object(Matching, "GameMode4Menu.c"),
             Object(Matching, "LadderMap.c"),
             Object(Matching, "TibExt.c"),
-            Object(NonMatching, "gbacable.c"),
+            Object(Matching, "gbacable.c"),
             Object(Matching, "ShaderRow19.c"),
             Object(Matching, "EASportsBio.c"),
             Object(NonMatching, "GameMode22.c"),
