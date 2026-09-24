@@ -10,6 +10,7 @@
 #include "engine.h"
 #include "game_types.h"
 #include "lighting.h"
+#include "camera.h"
 
 void* fn_800073B4(u8* pData, int n);
 void  fn_800075CC(void* p);         // frees what fn_800073B4 made
@@ -20,7 +21,6 @@ void  fn_80030894(void);
 void  fn_80030A40(void* p, int n);
 f32   fn_800351D8(u32 n, f32 fPeriod);
 void  fn_8003519C(int nRow, void* pData);   // calls row nRow's function of lbl_80188E88 with pData
-void  fn_80035240(s32 p0);
 s32   fn_800318AC(const void* pA, const void* pB);
 void  fn_8003272C(int n);
 void  fn_80031938(Ter_LODPlane* pPlanes, f32 fStep, s32 a, s32 b, s32 c, s32 d);
@@ -109,7 +109,7 @@ void fn_80030894(void) {
     u32 nFrame;
     int i;
 
-    fn_80035240(0);
+    fn_80035240(NULL);
     fn_80016B9C();
     fn_80016B9C();
     fn_80016B9C();
@@ -717,8 +717,8 @@ void fn_8003541C();
 void fn_80035440(TerSettings* pSettings);
 void fn_8006EDC0(GoLight** apLight);    // GoLighting.c, not decompiled yet
 
-void fn_80035240(s32 p0) {
-    fn_80013D9C(*(s32*)((u8*)lbl_80280DF0), p0, lbl_80280DF0);
+void fn_80035240(f32 (*pMtx)[4]) {
+    fn_80013D9C(*(s32*)((u8*)lbl_80280DF0), pMtx, lbl_80280DF0);
 }
 
 void fn_8003526C(void) {
@@ -935,7 +935,7 @@ void fn_80035600(void) {
 }
 
 void fn_80035604(void) {
-    fn_80035240(0);
+    fn_80035240(NULL);
     fn_80035294();
     fn_80016B9C();
     fn_80035118(4, 5);

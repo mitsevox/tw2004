@@ -34,7 +34,6 @@ void fn_80047290(void);
 void fn_8004731C(u8* pState);
 void fn_80047C24(int nPlayer);
 void fn_80048184(int nPlayer);
-void fn_80035240(int n);
 
 // ---- sweep code (not yet cleaned up) ----
 
@@ -310,7 +309,7 @@ void fn_80046B8C(int nView) {
     fn_800352E4();
     fn_80012EF8();
     fn_8004731C(aState);
-    fn_80035240(0);
+    fn_80035240(NULL);
     if (gSession.nSplitScreen == 0) {
         fn_80047290();
         if ((s8)GOLFERSTATE_GetCurrentState(fn_8001707C(nView)) != 9) {

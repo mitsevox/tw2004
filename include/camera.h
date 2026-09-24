@@ -479,6 +479,10 @@ extern CrAPState* lbl_80281EE0;
 // fn_80013D5C sets it.
 extern void** lbl_80280DF0;
 
+// GoTerrain.c: gives the current render camera the view matrix pMtx (NULL: the identity), through
+// fn_80013D9C.
+void   fn_80035240(f32 (*pMtx)[4]);
+
 ViewController* fn_80016CF4(void);     // the current view (lbl_80281CA4)
 ViewController* fn_80016CFC(int nView);
 void*  fn_80017004(int nView);          // the view's render camera
