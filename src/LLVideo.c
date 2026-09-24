@@ -542,12 +542,10 @@ void fn_800760F4(f32* pUV, LLPict* pPict) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-s32 fn_80012EC4();
-
 void fn_80076128(s32 p0) {
-    s32 t0;
-    t0 = fn_80012EC4();
-    *(s32*)(((u8*)t0) + 0xA4) = p0;
+    UFontContext* pCtx;
+    pCtx = fn_80012EC4();
+    pCtx->nA4 = p0;
 }
 
 // ---- end of sweep code ----
