@@ -483,11 +483,12 @@ static void Stream_ParseBufs(void) {
     UStreamBuffer* pBuffer;
     u32 uLen;
     u32 uTag;
+    UStreamFill* pFill;
     if (UStream_PumpBuffers(1) == NULL) return;
     if (gnCurStream == -1) return;
     while ((pBuffer = gpCurList) != NULL) {
-        while (pBuffer->uPos < USTREAM_BUFFER_SIZE) {
-            pChunk = (UStreamChunk*)(pBuffer->data + pBuffer->uPos);
+        while ((int)pBuffer->uPos < USTREAM_BUFFER_SIZE) {
+            pChunk = (UStreamChunk*)&pBuffer->data[pBuffer->uPos];
             // port: the chunk header is big-endian and read through UStreamChunk (and copied into the
             // object by UStream_BeginObject): a little-endian port converts its 0x40 bytes here
             uTag = pChunk->uTag;
@@ -510,13 +511,12 @@ static void Stream_ParseBufs(void) {
                 if (pChunk->uSubTag == TAG('S', 'H', 'D', 'R')) {
                     if (UStream_BeginObject(&gFill, pChunk) != 0) return;
                 } else if (pChunk->uSubTag == TAG('S', 'D', 'A', 'T')) {
-                    UStreamFill* pFill = &gFill;
-
+                    uLen = pChunk->uLength - 0x40;
                     pBuffer->uPos += 0x40;
-                    uLen -= 0x40;
+                    pFill = &gFill;
                     if (pFill->pObject != NULL) {
                         u32 uCopy = uLen;
-                        if (pFill->uPos + uLen > pFill->pObject->uSize) {
+                        if ((int)(pFill->uPos + uLen) > (int)pFill->pObject->uSize) {
                             uCopy = pFill->pObject->uSize - pFill->uPos;
                         }
                         Mem_cpy(pFill->pObject->pData + pFill->uPos, (u8*)(pChunk + 1), uCopy);
@@ -527,10 +527,9 @@ static void Stream_ParseBufs(void) {
                         }
                     }
                 } else if (pChunk->uSubTag == TAG('R', 'd', 'a', 't')) {
-                    UStreamFill* pFill = &gFill;
-
+                    uLen = pChunk->uLength - 0x40;
                     pBuffer->uPos += 0x40;
-                    uLen -= 0x40;
+                    pFill = &gFill;
                     if (pFill->pObject != NULL) {
                         // the piece's unpacked size, then the packed bytes
                         u32 uUnpacked = BE32(pChunk + 1);
@@ -574,30 +573,36 @@ static void Stream_ParseBufs(void) {
                     gSoundHeader.uKind = pChunk->uType;
                     gSoundHeader.uMemory = pChunk->uId;
                 } else if (pChunk->uSubTag == TAG('S', 'D', 'A', 'T')) {
-                    u32 uCopy = uLen - 0x40;
+                    u32 uCopy = pChunk->uLength - 0x40;
                     if (gSoundHeader.pDst != NULL) {
+                        u8* pSrc = (u8*)(pChunk + 1);
                         u8* pDst = gSoundHeader.pDst + gSoundHeader.uPos;
                         if (gSoundHeader.uPos + uCopy > gSoundHeader.uSize) {
                             uCopy = gSoundHeader.uSize - gSoundHeader.uPos;
                         }
-                        if (gSoundHeader.uKind == TAG('s', 'h', 'd', 'r')) {
-                            Mem_cpy(pDst, (u8*)(pChunk + 1), uCopy);
-                        } else if (gSoundHeader.uKind == TAG('s', 'a', 'm', 'p')) {
+                        switch (gSoundHeader.uKind) {
+                        case TAG('s', 'h', 'd', 'r'):
+                            Mem_cpy(pDst, pSrc, uCopy);
+                            break;
+                        case TAG('s', 'a', 'm', 'p'):
                             // port: for sample data pDst holds an ARAM address, not a pointer
-                            fn_800B044C((u32)(uptr)pDst, (u8*)(pChunk + 1), uCopy, UStream_NullCallback,
-                                        0);
+                            fn_800B044C((u32)(uptr)pDst, pSrc, uCopy, UStream_NullCallback, 0);
+                            break;
                         }
                     }
                     gSoundHeader.uPos += uCopy;
                     if (gSoundHeader.uPos >= gSoundHeader.uSize) {
-                        if (gSoundHeader.uKind == TAG('s', 'h', 'd', 'r')) {
+                        switch (gSoundHeader.uKind) {
+                        case TAG('s', 'h', 'd', 'r'):
                             if (gSoundHeader.uMemory == 2) {
                                 fn_800A93AC();
                             } else {
                                 fn_800A8FFC(gSoundHeader.uMemory);
                             }
-                        } else if (gSoundHeader.uKind == TAG('s', 'a', 'm', 'p')) {
+                            break;
+                        case TAG('s', 'a', 'm', 'p'):
                             fn_800A929C(gSoundHeader.uMemory);
+                            break;
                         }
                         gSoundHeader.uSize = 0;
                         gSoundHeader.uPos = 0;
