@@ -273,8 +273,16 @@ s32  Ter_iNumOOBNetworksLoaded(void);
 u8   fn_80069218(f32* pPos);            // a ball may be placed here. TW06: PlaceBall_IsValidDropLocation?
 u8   fn_80069428(f32* pPos);            // the point is in bounds. TW06: PlaceBall_CheckInBounds?
 TNetwork* fn_80069498(void);            // the hole's placement outline (lbl_80281E30), if any
-SurfaceType* fn_800CC190(CourseInfo* pCourse, f32* pPos);   // surface type under a point
 f32  Terrain_HeightAt(f32* pPos, SurfaceType** ppSurface);   // 0x800447DC
+
+// TerrainGround.c (our name): the ground under a point or a quad
+int  fn_800CB950(CourseInfo* pCourse, f32* pA, f32* pB, f32* pC, f32* pD, TerPolyRef* pList, int nMax,
+                 u32 uSkip);   // the ground strips under a quad, as runs of triangles
+// The ground triangle under a point: its height there, the grid cell, the strip, the triangle's
+// first vertex and its number in the strip. Probably TW06's Ter_GetSupportingGroundTriangle.
+f32  fn_800CBEE0(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** ppRef, f32 (**ppTri)[3],
+                 s32* pTri);
+SurfaceType* fn_800CC190(CourseInfo* pCourse, f32* pPos);   // surface type under a point
 
 // GoTerrainCollision (TW06's goterraincollision.c; types from its definitions)
 u8   Ter_Use3DCupGeometry(void);               // the cup is real geometry the ball drops into
@@ -286,6 +294,9 @@ u8   Ter_SearchForDropLocation(int nPlayer, u8 bPreferred, u8 bCheck, f32* pOut)
 f32  Ter_CheckForDropLocation(CourseInfo* pCourse, f32* pPos, u8 bOnDropSurface, u8* pbDrop, u8* pbPreferred,
                               SurfaceType** ppSurface);   // whether a ball could be dropped at a point
 u8   Ter_IsValidDropSurface(s32 nSurface);
+u8   Ter_GetSupportingGroundNormal(CourseInfo* pCourse, f32* pPos, f32* pNormal);   // 0 with no ground
+u8   fn_80050A9C(f32* pA, f32* pB, f32* pC, f32 fX, f32 fZ);   // (x, z) lies inside the triangle
+void fn_800509D8(f32 (*pTri)[3], f32* pPos, f32* pA, f32* pB, f32* pC);   // a point's weights in a triangle
 f32  fn_8004D5C0(CourseInfo* pCourse, f32* pPos);   // ground height, -65536.1 if none
 f32  fn_8004D620(CourseInfo* pCourse, f32* pPos);   // ground height, -60000 and below if none
 SurfaceType* Ter_GetSupportingWorldMaterial(CourseInfo* pCourse, f32* pPos);   // the surface under a point
@@ -332,6 +343,7 @@ void fn_80055CD0(int n);
 void Wind_Set(int nDir, f32 fSpeed);
 f32  Wind_Get(f32* pOut);               // the wind's speed; its vector (direction x speed) into pOut
 void Wind_Generate(void);
+void fn_80055D70(f32* pA, f32* pB, f32 fSin, f32 fCos);   // turns the pair (*pA, *pB) by an angle
 
 void fn_80047B6C(Ball* pBall, int nPlayer);
 void fn_80047BC0(Ball* pBall, int nPlayer);

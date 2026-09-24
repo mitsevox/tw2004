@@ -25,15 +25,11 @@ void fn_800AD9AC(u8 nId, u8 nTrack, u8 n);
 void fn_800AD800(u8 nId, f32* pPos, f32* pLast, u8 b);
 void fn_800ADAF0(u8 nId, u8 nTrack, f32 fPitch);
 void fn_800ADBC0(s16 nKind, f32* pPos, f32* pLast, u8 b);  // types unproven
-void fn_800ADD54(s16 nKind, u8 nTrack, f32 fVolume);        // types unproven
 
 f32  fn_8006E118(u64 tEnd, u64 tStart);    // GameManager.c: seconds between two time stamps
 void fn_8010D3D8(int nPlayer);
 u8   fn_8006BEA4(void);                    // GoGolfCam.c: the GameBreaker letterbox is up
 void fn_800ADA94(u8 nId, u8 nTrack, f32 fVolume);
-void fn_800ADB4C(s16 nKind, u8 nTrack, u8 bOn);
-void fn_800ADC44(s16 nKind, u8 nTrack, u8 n);
-void fn_800ADCD0(s16 nKind, u8 nTrack, u8 n, u8 b);
 
 void fn_800DC6E8(int nPlayer);
 u8   fn_8006BAD8(int nPlayer, s32* pOut);
@@ -43,7 +39,6 @@ f32  fn_8006C630(void);
 u8   fn_800AD280(s16 nSound, s16 nKind, u8 a, int b, void (*pfnCallback)(u8 nId, u8 nTrack, s32 n));
 void fn_800ADA08(s16 nSound, u8 nTrack, u8 n);
 void fn_800AD734(u8 nId, int n);
-void fn_800AD450(u8 nId);
 void fn_8001EB8C(Character* pChar, int nBone, f32* pPos);
 void fn_800A6BA8(u8 nPlayer);
 void fn_800A6854(u8 nPlayer);
@@ -241,7 +236,6 @@ void fn_800A79F4(void);
 void fn_800A7A14(void);
 void fn_800A8D88();
 void fn_800A8DC8();
-void fn_800AD0C4();
 void fn_800AD1C4();
 s32 fn_800A7A34(s32 p0, s32 p1, s32 p2);
 void fn_800A7A98(s32 p0);

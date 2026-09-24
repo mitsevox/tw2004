@@ -22,7 +22,6 @@ u8   GameModeSkins_GameFinished(u8 bCheck);
 u8   GameModeSkins_GoToPlayoff(u8 bCheck);
 void GameModeSkins_EndHole(void);
 void GameModeSkins_EndGame(void);
-s32  fn_800F9254(void);
 s32  fn_800F9308(void);
 
 // Mode 2 starts: up to four players, CPUs may concede.
