@@ -490,7 +490,8 @@ static void Stream_ParseBufs(void) {
     while ((pBuffer = gpCurList) != NULL) {
         // fake match: a volatile signed read of uPos makes the loop top load it again, as the original does
         while (*(volatile s32*)&pBuffer->uPos < USTREAM_BUFFER_SIZE) {
-            pChunk = (UStreamChunk*)&pBuffer->data[pBuffer->uPos];
+            // fake match: indexing data through a u8* (not the array) adds uPos to pBuffer before the 0x40
+            pChunk = (UStreamChunk*)&((u8*)pBuffer->data)[pBuffer->uPos];
             // port: the chunk header is big-endian and read through UStreamChunk (and copied into the
             // object by UStream_BeginObject): a little-endian port converts its 0x40 bytes here
             uTag = pChunk->uTag;
