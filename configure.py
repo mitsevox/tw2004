@@ -897,6 +897,7 @@ config.libs = [
             Object(Matching, "GoAnimalActors.c"),
             Object(NonMatching, "GoTerrainCollision.c"),
             Object(NonMatching, "Ball.c"),
+            Object(Matching, "Wind.c"),
             Object(NonMatching, "LLPictInt.c"),
             Object(Matching, "user.c"),
             Object(Matching, "PasswordManager.c"),

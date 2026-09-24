@@ -6,6 +6,12 @@
 void fn_800B8528(u8* pData, int a, int n);
 void fn_800B8618(int a, int b, int c, u8* pY, u8* pU, u8* pV);
 
+void fn_80056204(void) {
+}
+
+void fn_80056208(void) {
+}
+
 // The picture in pFile, or NULL when it is not a MADk file or there is no memory. The file's
 // header is little-endian: it is swapped for the decode and swapped back after.
 // port: the swaps assume a big-endian machine; a little-endian port reads the header as it is.

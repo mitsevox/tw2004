@@ -262,10 +262,16 @@ GoTerrainCollision.c:
 	.text       start:0x8004AFA0 end:0x80050C2C
 
 Ball.c:
-	.text       start:0x80050C2C end:0x8005620C
+	.text       start:0x80050C2C end:0x80055F14
+
+Wind.c:
+	.text       start:0x80055F14 end:0x80056204
+	.data       start:0x80187EF8 end:0x80187F78
+	.sbss       start:0x80281DE8 end:0x80281DF0
+	.sdata2     start:0x80283588 end:0x802835A8
 
 LLPictInt.c:
-	.text       start:0x8005620C end:0x800563C4
+	.text       start:0x80056204 end:0x800563C4
 
 user.c:
 	.text       start:0x800563C4 end:0x80056480
