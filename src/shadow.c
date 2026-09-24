@@ -205,6 +205,8 @@ void fn_800B2FB0(Character* pChar, int nView, u8 bFlat) {
     f32           fScaleZ;
     f32           fRight;
     f32           fFar;
+    f32           fU;
+    f32           fV;
     int           nList;
     int           nCount;
     int           nVerts;
@@ -281,16 +283,18 @@ void fn_800B2FB0(Character* pChar, int nView, u8 bFlat) {
         }
         for (j = 0; j < nCount; j++) {
             n = nVerts + j;
-            pVert = pCourse->pVerts[(pRef->nVertexHi << 16) + pRef->nVertex + j];
+            pVert = pCourse->pVerts[(pRef->nVertexHi << 16) + pRef->nVertex] + j * 3;
             lbl_80282170[n * 3 + 0] = pVert[0];
             lbl_80282170[n * 3 + 1] = pVert[1] + lbl_802814AC;
             lbl_80282170[n * 3 + 2] = pVert[2];
+            fU = fRight - pVert[0];
+            fV = fFar - pVert[2];
             lbl_8028216C[n * 4 + 0] = 0;
             lbl_8028216C[n * 4 + 1] = 0;
             lbl_8028216C[n * 4 + 2] = 0;
             lbl_8028216C[n * 4 + 3] = 0x80;
-            lbl_80282168[n * 2 + 0] = (fRight - pVert[0]) * fScaleX;
-            lbl_80282168[n * 2 + 1] = (fFar - pVert[2]) * fScaleZ;
+            lbl_80282168[n * 2 + 0] = fU * fScaleX;
+            lbl_80282168[n * 2 + 1] = fV * fScaleZ;
             lbl_80282164[n] = n;
         }
         lbl_80282160[nStrips].nPrims = 0;
