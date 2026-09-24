@@ -31,12 +31,15 @@ LLFont* fn_8006AA3C(void);
 // Set up when play starts (GO_vInitIG): the hole's chunk 3 loader, the marker textures ("tball"
 // and "shadow") and the five players' marker settings.
 void TARGET_Init(void) {
+    u64 textureID;
     int i;
 
     Course_RegisterLoader(3, fn_8006A7A8);
     lbl_80281E30 = NULL;
-    fn_800102DC(fn_8000BEE4("tball"), &lbl_80281E3C, &lbl_80281E40);
-    fn_800102DC(fn_8000BEE4("shadow"), &lbl_80281E34, &lbl_80281E38);
+    textureID = fn_8000BEE4("tball");
+    fn_800102DC(textureID, &lbl_80281E3C, &lbl_80281E40);
+    textureID = fn_8000BEE4("shadow");
+    fn_800102DC(textureID, &lbl_80281E34, &lbl_80281E38);
     for (i = 0; i < 5; i++) {
         lbl_801D5BF0[i].f0 = 0.01f;
         lbl_801D5BF0[i].f4 = 0.0f;
