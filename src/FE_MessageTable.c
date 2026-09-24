@@ -4228,6 +4228,33 @@ void fn_80082A50(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = state.nFreeFiles;
 }
 
+// Record pArgs[2] of table pArgs[0] in the record list pArgs[1] (0, 1: recC; 16, 17, 13: recB):
+// its value, and its holder's name into the string pArgs[3].
+void fn_80082A94(MsgArg* pArgs, MsgArg* pResult) {
+    switch (pArgs[1].i) {
+    case 13:
+        pResult->i = gSession.recB[pArgs[0].i][2][pArgs[2].i].nValue;
+        strcpy(((MsgString*)pArgs[3].p)->pStr, gSession.recB[pArgs[0].i][2][pArgs[2].i].szName);
+        break;
+    case 16:
+        pResult->i = gSession.recB[pArgs[0].i][0][pArgs[2].i].nValue;
+        strcpy(((MsgString*)pArgs[3].p)->pStr, gSession.recB[pArgs[0].i][0][pArgs[2].i].szName);
+        break;
+    case 17:
+        pResult->i = gSession.recB[pArgs[0].i][1][pArgs[2].i].nValue;
+        strcpy(((MsgString*)pArgs[3].p)->pStr, gSession.recB[pArgs[0].i][1][pArgs[2].i].szName);
+        break;
+    case 0:
+        pResult->i = gSession.recC[pArgs[0].i][0][pArgs[2].i].nValue;
+        strcpy(((MsgString*)pArgs[3].p)->pStr, gSession.recC[pArgs[0].i][0][pArgs[2].i].szName);
+        break;
+    case 1:
+        pResult->i = gSession.recC[pArgs[0].i][1][pArgs[2].i].nValue;
+        strcpy(((MsgString*)pArgs[3].p)->pStr, gSession.recC[pArgs[0].i][1][pArgs[2].i].szName);
+        break;
+    }
+}
+
 // Empty a player slot: no profile in it, none loaded.
 void fn_80082C74(MsgArg* pArgs, MsgArg* pResult) {
     gpSaveData[pArgs[0].i].bActive = 0;
