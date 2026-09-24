@@ -265,7 +265,7 @@ char* fn_80128BF8(char* szDest, char* szSrc, u32 uSize);        // bounded strin
 u16* fn_80128C4C(u16* szDest, const u16* szSrc, u32 uLength);         // the same for wide text
 void fn_80128EC0(char* sz);
 void fn_80128F04(u16* sz, u16 uLanguage);
-EASBErrorE fn_80128FD4(EASBTotals* pTotals, u16* puLevel, f32* pfProgress);
+EASBErrorE fn_80128FD4(const EASBTotals* pTotals, u16* puLevel, f32* pfProgress);
 EASBErrorE fn_801291A8(u16 uLevel, u16 u1160, u16* puLevel);
 EASBErrorE fn_80129218(u16 uLevel, u16 u1160, u16* puLevel);
 u32 fn_80128BC4(u32 uTime);         // clamps a time to 2003-01-01..2023-01-01

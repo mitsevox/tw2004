@@ -577,7 +577,7 @@ u32 fn_80128F58(u32 uValue, u32 uScaleB, u32 uDivisor, u32 uScaleA) {
 // The Bio's level from its totals: points for the games in it, the hours played and the two
 // counters, then level n needs 20 * n + 1000 points more than level n - 1. *pfProgress is how
 // far into the next level the points go (0 to 1).
-EASBErrorE fn_80128FD4(EASBTotals* pTotals, u16* puLevel, f32* pfProgress) {
+EASBErrorE fn_80128FD4(const EASBTotals* pTotals, u16* puLevel, f32* pfProgress) {
     u32 nHours0;
     u32 nHours4;
     u32 uProducts;
@@ -604,8 +604,8 @@ EASBErrorE fn_80128FD4(EASBTotals* pTotals, u16* puLevel, f32* pfProgress) {
     uPoints = fn_80128468(uPoints, uHours4);
     uPoints = fn_80128468(uPoints, u8Points);
     uPoints = fn_80128468(uPoints, uCPoints);
-    uLevelEnd = 0;
     uLevelStart = 0;
+    uLevelEnd = 0;
     for (nLevel = 1; nLevel <= EASB_MAX_LEVEL; nLevel++) {
         if (uPoints < uLevelEnd) break;
         uLevelStart = uLevelEnd;
