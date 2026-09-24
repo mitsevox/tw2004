@@ -269,6 +269,7 @@ extern struct UStreamObject* lbl_80281C0C;   // LoadData.c: a copy of the 'txf2'
 
 void fn_80014544(int n);                // load the numbered stream file (sprintf'd name)
 void fn_800147A4(void);                 // streammanagerhole.c
+void fn_80014DFC(s32 nChar, s32 nUnused);   // streammanagerhole.c: stream list 3 = one FEChars file
 // streammanagerhole.c: a flag byte fn_8001618C sets; while it is set, the shader objects' untextured
 // stage takes its alpha from the constant colour, not the vertex colour
 // (GoShaderObjectCommon_ShaderObjectsData_Gc.c fn_800740F4).
@@ -327,24 +328,39 @@ extern void* lbl_80281BA4[2];           // LLDisp_Gc.c: two image buffers (Depth
 // The renderer's state (lbl_801B8980, 0x118 bytes); only what the game code writes.
 // GoTerrain.c's setters write one group of fields each and set that group's bit in u110.
 typedef struct RenderState {
-    u8   unk0[0x10];
+    s32  n0;                    // 0x000  3 at reset (fn_80015540)
+    u8   b4;                    // 0x004  1 at reset
+    u8   unk5[0x8 - 0x5];
+    s32  n8;                    // 0x008  6 at reset
+    u8   bC;                    // 0x00C  100 at reset
+    u8   bD;                    // 0x00D  0 at reset
+    u8   unkE[0x10 - 0xE];
     s32  n10;                   // 0x010  } set together, bit 0x10
     s32  n14;                   // 0x014  }
-    u8   unk18[0x1C - 0x18];
+    s32  n18;                   // 0x018  1 at reset
     u8   b1C;                   // 0x01C  bit 0x80
     u8   b1D;                   // 0x01D  bit 0x80
     u8   unk1E[0x20 - 0x1E];
     u32  u20;                   // 0x020  bits cleared and set by fn_80035170, bit 0x20
-    u8   unk24[0x28 - 0x24];
+    s32  n24;                   // 0x024  2 at reset
     f32  f28;                   // 0x028  } bit 0x8, with a30. fn_80035398 sets all three from
     f32  f2C;                   // 0x02C  } lbl_802811E0
-    u8   a30[4];                // 0x030  a colour: three bytes given, the fourth always 0x80
-    u8   unk34[0xBC - 0x34];
+    u8   a30[4];                // 0x030  a colour: three bytes given, the fourth always 0x80;
+                                //        all 0xFF at reset
+    f32  m34[4][4];             // 0x034  } set to identity at reset
+    f32  m74[4][4];             // 0x074  }
+    u8   unkB4[0xBC - 0xB4];
     s32  nBC;                   // 0x0BC  } a rectangle, bit 0x200 (LLVideo.c fn_800760B0: x,
     s32  nC0;                   // 0x0C0  } width, y, height; the movies give 0, 512, 0, 448)
     s32  nC4;                   // 0x0C4  }
     s32  nC8;                   // 0x0C8  }
-    u8   unkCC[0xFC - 0xCC];
+    u8   unkCC[0xE4 - 0xCC];
+    s32  nE4;                   // 0x0E4  } fn_800140E8's six arguments, bit 0x1000
+    s32  nE8;                   // 0x0E8  }
+    s32  nEC;                   // 0x0EC  }
+    s32  nF0;                   // 0x0F0  }
+    s32  nF4;                   // 0x0F4  }
+    s32  nF8;                   // 0x0F8  }
     s32  nFC;                   // 0x0FC  bit 0x400
     TexBank*  p100;             // 0x100  } the texture of the next draw (fn_8005CC64: the swing
     TexEntry* p104;             // 0x104  } trail's, the logo editor's)
@@ -357,6 +373,55 @@ typedef struct RenderState {
 LAYOUT_ASSERT(RenderState, 0x118);
 
 extern RenderState lbl_801B8980;
+
+// A pool of 20 blocks of 0x1000 bytes (our names; lbl_801A4900, 0x14080 bytes, reached through
+// the pointer lbl_80280E00). fn_80015470 frees them all; fn_800154F4 moves nNext past the used ones.
+typedef struct BufferPoolBlock {
+    u8   unk0[0x1000];
+    u32  u1000;                 // 0x1000  nonzero: in use
+} BufferPoolBlock;
+LAYOUT_ASSERT(BufferPoolBlock, 0x1004);
+
+typedef struct BufferPool {
+    s32  nNext;                 // 0x00  the first block that may be free
+    s32  n4;                    // 0x04  counted up by fn_800154F4
+    u8   unk8[0x20 - 0x8];
+    BufferPoolBlock aBlocks[20];    // 0x20
+    u8   unk14070[0x14080 - 0x14070];
+} BufferPool;
+LAYOUT_ASSERT(BufferPool, 0x14080);
+
+extern BufferPool* lbl_80280E00;
+
+// The view being drawn to (our name; lbl_801B8A98, 0x110 bytes, reached through the pointer
+// lbl_80280E08; the renderer state lbl_801B8980 sits just before it). Only what the code reads.
+typedef struct ViewState {
+    f32  m0[4][4];              // 0x000  the projection (fn_80016208: orthographic 0..1)
+    f32  m40[3][4];             // 0x040  fn_80016208: identity; fn_800169AC sets its scale
+    s32  n70;                   // 0x070  } the viewport in pixels: the corners fD4..fE0 times
+    s32  n74;                   // 0x074  } the screen size nE4/nE8
+    s32  n78;                   // 0x078  }
+    s32  n7C;                   // 0x07C  }
+    f32  m80[4][4];             // 0x080  the viewport's scale and offset (fn_800169AC)
+    u8   unkC0[0xD0 - 0xC0];
+    s32  nD0;                   // 0x0D0  set by GoRenderCtx_Gc.c
+    f32  fD4;                   // 0x0D4  } the viewport's corners as fractions of the screen
+    f32  fD8;                   // 0x0D8  } (fn_80016978; fn_80016948 gives the whole screen:
+    f32  fDC;                   // 0x0DC  } 0, 0, 1, 1)
+    f32  fE0;                   // 0x0E0  }
+    s32  nE4;                   // 0x0E4  } the screen's size in pixels and two scales
+    s32  nE8;                   // 0x0E8  } (fn_80016B54: 512, 448, 1, 1 at reset)
+    f32  fEC;                   // 0x0EC  }
+    f32  fF0;                   // 0x0F0  }
+    f32  fF4;                   // 0x0F4  } fn_80016B6C
+    f32  fF8;                   // 0x0F8  }
+    f32  aColour[4];            // 0x0FC  the colour fn_800166E8 and fn_80016800 give a vertex
+                                //        (0..1 per channel)
+    u8   unk10C[0x110 - 0x10C];
+} ViewState;
+LAYOUT_ASSERT(ViewState, 0x110);
+
+extern ViewState* lbl_80280E08;
 
 void fn_8005CC64(TexBank* pBank, TexEntry* pTex);  // set the texture of the next draw
 
@@ -948,6 +1013,7 @@ void fn_80014118(int a);
 // A screen quad (GameEffects' letter boxes, GxUtil.c's alpha clear): fn_800141F8 fills its corners
 // (x0, y0)-(x1, y1), fn_80014194 sets its colour (four floats), fn_8001644C draws it.
 void fn_80014194(f32* pColour);
+void fn_800141CC(void);                 // GoRenderCtx_Gc.c: the default vertex colour
 void fn_800141F8(f32* pXY, f32* pUV, f32 x0, f32 y0, f32 x1, f32 y1);
 void fn_8001425C(int a);
 void fn_8001644C(int a, f32* pXY, f32* pColour, f32* pUV, int c);

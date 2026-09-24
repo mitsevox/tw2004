@@ -72,6 +72,21 @@ typedef struct StreamLists {
     int  nStream;               // 0x119C  the open stream (UStream_Open)
 } StreamLists;
 extern StreamLists* lbl_80280DF8;
+extern char lbl_80186C14[];   // "data/Load/Load%d.gcb" (streammanagerhole.c fn_80014544)
+extern char lbl_80186CA8[];   // "data/FEChars/%02dcharfe.gcb" (streammanagerhole.c fn_80014DFC)
+extern char lbl_80186BD8[];   // "data/FEnd/FEnd.gcb" (streammanagerhole.c fn_800143B8)
+extern char lbl_80186BEC[];   // "FEChar.gcb" (fn_800143B8)
+extern char lbl_80186BF8[];   // "LoadOnce.gcb" (fn_800143B8)
+extern char lbl_80186C08[];   // "startup.gcb" (fn_800143B8)
+extern char lbl_80186C44[];   // "GlbData.gcb" (fn_80014A64)
+extern char lbl_80186C50[];   // "GlbChar.gcb" (fn_80014A64)
+extern char lbl_80186C5C[];   // "data/Chars/%02dchar.gcb" (fn_80014A64)
+extern u8   lbl_801A48C8[0x38];   // streammanagerhole.c: 30 flag bytes its list setups clear
+extern char lbl_80186C2C[];   // "data/%s/" (StreamManagerHole_StreamFiles)
+extern char lbl_80186C38[];   // "/hole.hog" (StreamManagerHole_StreamFiles)
+extern char lbl_80186C74[];   // "malesac.gcb" (streammanagerhole.c)
+extern char lbl_80186C80[];   // "femsac.gcb" (streammanagerhole.c)
+extern char lbl_80186C8C[];   // "data/CharSac/%02dchrsac.gcb" (streammanagerhole.c)
 
 // A stream (0x2E0 bytes).
 typedef struct {

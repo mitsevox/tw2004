@@ -110,7 +110,6 @@ void fn_80007254(void);
 void fn_80008380(void);
 void fn_8000ADC0(f32 (*m)[4]);          // identity matrix
 void fn_800140E8(int a, int nWidth, int nHeight, int nField, int b, int c);
-void fn_80014DFC(s32 a, s32 b);
 void fn_80016978(f32 x0, f32 y0, f32 x1, f32 y1);
 void fn_80016B54(int nWidth, int nHeight, f32 fX, f32 fY);
 void fn_80035098(u8 b);
