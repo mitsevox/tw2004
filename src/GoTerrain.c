@@ -1495,7 +1495,6 @@ void fn_80033744(void) {
     f32 fNoise;
     f32 fSum;
     f32 fScale;
-    f32 fWave;
 
     fTime = gSession.fFrameTime;
     if (fTime > 1.0f / 30.0f) {
@@ -1675,25 +1674,23 @@ void fn_80033744(void) {
                 lbl_801D3CB0.pObjectStateList[i].f4 = 0.0f;
             }
         } else {
-            fNoise = lbl_801D3CB0.fTreeNoiseAmplitudeScale;
-            fSum = 1.0f + fNoise;
+            fSum = 1.0f + lbl_801D3CB0.fTreeNoiseAmplitudeScale;
             fScale = 1.0f / fSum;
-            fWave = 0.5f * (fScale * fNoise)
-                    * fn_800095F0(6.2831855f
-                                  * fn_800351D8(gSession.nFrameCount,
-                                                lbl_801D3CB0.fTreeNoisePeriodScale
-                                                    * lbl_801D3CB0.pObjectStateList[i].f0)
-                                  / (lbl_801D3CB0.fTreeNoisePeriodScale
-                                     * lbl_801D3CB0.pObjectStateList[i].f0));
+            fNoise = lbl_801D3CB0.fTreeNoiseAmplitudeScale;
             lbl_801D3CB0.pObjectStateList[i].f4 =
                 0.5f * fScale
                     * fn_800095F0(6.2831855f
                                   * fn_800351D8(gSession.nFrameCount, lbl_801D3CB0.pObjectStateList[i].f0)
                                   / lbl_801D3CB0.pObjectStateList[i].f0)
-                + fWave;
-            lbl_801D3CB0.pObjectStateList[i].f4 =
-                lbl_801D3CB0.pObjectStateList[i].f4 * lbl_801D3CB0.fTreeOverdrive;
-            lbl_801D3CB0.pObjectStateList[i].f4 = lbl_801D3CB0.pObjectStateList[i].f4 + 0.5f;
+                + 0.5f * (fScale * fNoise)
+                      * fn_800095F0(6.2831855f
+                                    * fn_800351D8(gSession.nFrameCount,
+                                                  lbl_801D3CB0.fTreeNoisePeriodScale
+                                                      * lbl_801D3CB0.pObjectStateList[i].f0)
+                                    / (lbl_801D3CB0.fTreeNoisePeriodScale
+                                       * lbl_801D3CB0.pObjectStateList[i].f0));
+            lbl_801D3CB0.pObjectStateList[i].f4 *= lbl_801D3CB0.fTreeOverdrive;
+            lbl_801D3CB0.pObjectStateList[i].f4 += 0.5f;
         }
     }
 }
