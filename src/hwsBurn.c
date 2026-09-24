@@ -301,6 +301,52 @@ s32 fn_80110F2C(HwsBurn* pBurn) {
     return 0;
 }
 
+// Copies of the SkinDesc.p44 entries fn_80110F2C listed (a44) at pBase + *pOffset, renumbered
+// for the burn: an entry whose p3C bit is clear loses its meshes, and the morph targets stop at
+// the first one not kept. NULL when none are listed.
+SkinDesc44* fn_80110FB4(HwsBurn* pBurn, u8* pBase, s32* pOffset, s32 nAlign) {
+    int n = pBurn->n38;
+    SkinDesc* pDesc;
+    SkinDesc44* aOut;
+    SkinDesc44* pOut;
+    s32 nEntry;
+    int j;
+    int nMorphs;
+    int i;
+
+    if (n == 0) {
+        return NULL;
+    }
+    aOut = (SkinDesc44*)(pBase + *pOffset);
+    pDesc = pBurn->pDesc;
+    for (i = 0; i < n; i++) {
+        nEntry = pBurn->a44[i];
+        pOut = fn_80110E98(pBase, pOffset, &pDesc->p44[nEntry], sizeof(SkinDesc44), 1);
+        if (!fn_8001E9CC(pBurn->p3C, nEntry)) {
+            pOut->n8 = 0;
+            pOut->n0 = 0;
+            pOut->u24 &= ~2;
+        } else {
+            pOut->n0 = pBurn->a5C[pOut->n0];
+        }
+        if (pOut->u24 & 2) {
+            nMorphs = pOut->n14;
+            for (j = 0; j < nMorphs; j++) {
+                if (!fn_8001E9CC(pBurn->p40, pOut->n10 + j)) {
+                    break;
+                }
+            }
+            pOut->n14 = j;
+            pOut->n10 = pBurn->a48[pOut->n10];
+        }
+        if (pOut->u24 & 4) {
+            pOut->n10 = pBurn->a48[pOut->n10];
+        }
+    }
+    *pOffset = (nAlign + *pOffset - 1) & ~(nAlign - 1);
+    return aOut;
+}
+
 // The bytes the SkinDesc.p28 blocks take, each rounded up to nAlign.
 s32 fn_80111310(HwsBurn* pBurn, s32 nAlign) {
     SkinDesc* pDesc = pBurn->pDesc;
