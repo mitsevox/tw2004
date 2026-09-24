@@ -91,7 +91,9 @@ typedef struct DynObjPair {
 // The header of a UObjMesh's data (UObjMesh.pInfo).
 typedef struct UObjMeshInfo {
     s16  n0;                    // 0x00  how many meshes UObjMesh.p8 holds (GoTerrain.c fn_800354F4)
-    u8   unk2[0x24 - 0x2];
+    u8   unk2[0x4 - 0x2];
+    s32  n4;                    // 0x04  not 0: a chunk follows; fn_8000799C passes n4 * 2 to fn_80007658
+    u8   unk8[0x24 - 0x8];
     s8   a24[0x54 - 0x24];      // 0x24  fn_80048AD4, GoTerrain.c fn_800354D0 (length unknown, at most this)
     f32  f54;                   // 0x54  scales a terrain object's mipmap bias (GoTerrain.c fn_80035560)
     f32  v58[3];                // 0x58  copied to UObjModel.v2C by type 0's setup; with f64 the
@@ -127,7 +129,7 @@ typedef struct UObjMesh {
     u8   a1C[0x20 - 0x1C];      // 0x1C  nonzero: entry i of p18 is used
     u32  n20;                   // 0x20  a word: GoTerrain.c fn_80032B7C draws a ground's extra meshes
                                 //       only when it is not 0
-    u8   unk24[0x28 - 0x24];
+    s32  n24;                   // 0x24  0 when built (LLObj_Gc.c fn_8000799C)
     s32  n28;                   // 0x28
 } UObjMesh;
 
@@ -377,6 +379,9 @@ extern s32 lbl_80281DB4;
 extern u32 lbl_80281DB0;
 extern UMemPool* lbl_80281DAC;
 extern UMemPool* lbl_80281DA8;
+
+// LLObj_Gc.c
+void fn_800075CC(UObjModelRoot* pRoot);    // frees a model fn_800073B4 made
 
 // GoDynObj.c
 void fn_80046C34(f32* pPos, int nPlayer);  // a fast ball low over class 3 ground leaves a 'TEO ' 10005

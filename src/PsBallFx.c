@@ -1,6 +1,5 @@
 // PsBallFx.c (EA's name, from its asserts; also in EA's 2002 source tree; TW06): the ball's
-// particle effects, one emitter per view (PsBallFxState in include/psmgr.h). Mostly not yet
-// decompiled.
+// particle effects, one emitter per view, and the sand trail (PsBallFxState in include/psmgr.h).
 
 #include "psmgr.h"
 #include "game.h"
@@ -14,7 +13,7 @@ void fn_800360A0(ShaderObject* pObj);                               // Skin.c
 void fn_800360D4(ShaderObject* pObj);                               // Skin.c
 void fn_800352BC(void);
 void PsBallFx_TriggerTrail(Ball* pBall, int nPlayer);   // below; Ball.c declares it too
-void fn_800A34C0(int n, Ball* pBall, f32* pDir);          // not yet decompiled
+void fn_800A34C0(int nTrail, Ball* pBall, f32* pDir);     // below
 
 // Set up the mesh and its buffers (50 quads; the second buffer gets each quad's texture corners),
 // clear the emitters and find the "sandtrl" texture.
@@ -28,19 +27,19 @@ void PsBallFx_InitModule(void) {
     size.nMaxVerts = 400;
     size.nMaxDraws = 2;
     fn_80036054(&lbl_80281408->mesh, 0, &size);
-    lbl_80281408->p2C = fn_80009B34(0x640, 2, 16, "PsBallFx.c", 1435);
-    lbl_80281408->p30 = fn_80009B34(0x320, 2, 16, "PsBallFx.c", 1440);
-    lbl_80281408->p28 = fn_80009B34(0x960, 2, 16, "PsBallFx.c", 1445);
-    lbl_80281408->p50 = fn_80009B34(0x4B0, 2, 16, "PsBallFx.c", 1450);
+    lbl_80281408->ap2C[0] = fn_80009B34(0x640, 2, 16, "PsBallFx.c", 1435);
+    lbl_80281408->ap30[0] = fn_80009B34(0x320, 2, 16, "PsBallFx.c", 1440);
+    lbl_80281408->ap28[0] = fn_80009B34(0x960, 2, 16, "PsBallFx.c", 1445);
+    lbl_80281408->ap50[0] = fn_80009B34(0x4B0, 2, 16, "PsBallFx.c", 1450);
     for (i = 0; i < 50; i++) {
-        lbl_80281408->p2C[i * 8 + 0] = fZero;
-        lbl_80281408->p2C[i * 8 + 1] = fZero;
-        lbl_80281408->p2C[i * 8 + 2] = fOne;
-        lbl_80281408->p2C[i * 8 + 3] = fZero;
-        lbl_80281408->p2C[i * 8 + 4] = fZero;
-        lbl_80281408->p2C[i * 8 + 5] = fOne;
-        lbl_80281408->p2C[i * 8 + 6] = fOne;
-        lbl_80281408->p2C[i * 8 + 7] = fOne;
+        lbl_80281408->ap2C[0][i * 8 + 0] = fZero;
+        lbl_80281408->ap2C[0][i * 8 + 1] = fZero;
+        lbl_80281408->ap2C[0][i * 8 + 2] = fOne;
+        lbl_80281408->ap2C[0][i * 8 + 3] = fZero;
+        lbl_80281408->ap2C[0][i * 8 + 4] = fZero;
+        lbl_80281408->ap2C[0][i * 8 + 5] = fOne;
+        lbl_80281408->ap2C[0][i * 8 + 6] = fOne;
+        lbl_80281408->ap2C[0][i * 8 + 7] = fOne;
     }
     lbl_80281408->ap74[0] = NULL;
     lbl_80281408->ap74[1] = NULL;
@@ -52,23 +51,26 @@ void PsBallFx_InitModule(void) {
 
 void fn_800A2E14(void) {
     fn_800360A0(&lbl_80281408->mesh);
-    fn_80009E70(lbl_80281408->p28);
-    fn_80009E70(lbl_80281408->p2C);
-    fn_80009E70(lbl_80281408->p30);
-    fn_80009E70(lbl_80281408->p50);
+    fn_80009E70(lbl_80281408->ap28[0]);
+    fn_80009E70(lbl_80281408->ap2C[0]);
+    fn_80009E70(lbl_80281408->ap30[0]);
+    fn_80009E70(lbl_80281408->ap50[0]);
 }
 
 // Clear the effects' state and give emitters 0, 6 and 14 the current course's vectors.
 void fn_800A2E68(void) {
     int i;
 
-    lbl_80281408->n3C = 0;
-    lbl_80281408->n40 = 0;
-    lbl_80281408->n34 = 0;
-    lbl_80281408->n38 = 0;
-    lbl_80281408->n44 = 0;
-    for (i = 0; i < 8; i++) {
-        lbl_80281408->a54[i] = 0.0f;
+    lbl_80281408->an3C[0] = 0;
+    lbl_80281408->an40[0] = 0;
+    lbl_80281408->an34[0] = 0;
+    lbl_80281408->an38[0] = 0;
+    lbl_80281408->an44[0] = 0;
+    for (i = 0; i < 4; i++) {
+        lbl_80281408->a54[0][i] = 0.0f;
+    }
+    for (i = 0; i < 4; i++) {
+        lbl_80281408->a64[0][i] = 0.0f;
     }
     if (Game_GetCourse() == 18 && (fn_80015464() == 0 || fn_80015464() == 1 || fn_80015464() == 2 ||
                                    fn_80015464() == 17)) {
@@ -228,6 +230,108 @@ void PsBallFx_TriggerTrail(Ball* pBall, int nPlayer) {
     }
 }
 
+// Extend sand trail nTrail to the ball once it has moved on (squared distance 0.001): a pair of
+// vertices 0.01 either side of the ball across pDir, in a ring of 200, and a strip of indices to them
+// in a ring of 600. A pair far from the last one (squared 0.1) or a turn of more than 90 degrees first
+// gets two indices that break the strip. Once the ring is full, the indices that used the pair being
+// overwritten are dropped from the front.
+void fn_800A34C0(int nTrail, Ball* pBall, f32* pDir) {
+    s32 nVert;
+    s32 nIndex;
+    s32 nCur;
+    s32 nPrev;
+    s32 nUsed;
+    s32 nOldest;
+    f32 fGap;
+    f32 fDot;
+
+    nVert = lbl_80281408->an34[nTrail];
+    nIndex = lbl_80281408->an38[nTrail];
+    nUsed = lbl_80281408->an44[nTrail];
+    if (fn_800BB028(pBall->vPos, lbl_80281408->a54[nTrail]) < 0.001f) {
+        return;
+    }
+    Vec3Copy(pBall->vPos, lbl_80281408->a54[nTrail]);
+    if (nVert + 2 <= 200) {
+        nCur = nVert;
+        nPrev = (nVert != 0) ? nVert - 2 : 198;
+        nVert += 2;
+    } else {
+        nCur = 0;
+        nPrev = 198;
+        nVert = 2;
+    }
+    lbl_80281408->ap28[nTrail][nCur * 3 + 0] = pBall->vPos[0] - 0.01f * pDir[2];
+    lbl_80281408->ap28[nTrail][nCur * 3 + 1] = pBall->vPos[1];
+    lbl_80281408->ap28[nTrail][nCur * 3 + 2] = pBall->vPos[2] + 0.01f * pDir[0];
+    lbl_80281408->ap28[nTrail][nCur * 3 + 3] = pBall->vPos[0] + 0.01f * pDir[2];
+    lbl_80281408->ap28[nTrail][nCur * 3 + 4] = pBall->vPos[1];
+    lbl_80281408->ap28[nTrail][nCur * 3 + 5] = pBall->vPos[2] - 0.01f * pDir[0];
+    lbl_80281408->ap30[nTrail][nCur * 4 + 0] = 5;
+    lbl_80281408->ap30[nTrail][nCur * 4 + 1] = 5;
+    lbl_80281408->ap30[nTrail][nCur * 4 + 2] = 5;
+    lbl_80281408->ap30[nTrail][nCur * 4 + 3] = 0;
+    lbl_80281408->ap30[nTrail][nCur * 4 + 4] = 5;
+    lbl_80281408->ap30[nTrail][nCur * 4 + 5] = 5;
+    lbl_80281408->ap30[nTrail][nCur * 4 + 6] = 5;
+    lbl_80281408->ap30[nTrail][nCur * 4 + 7] = 0;
+    if (nUsed >= 2) {
+        fGap = fn_800BB028(&lbl_80281408->ap28[nTrail][nCur * 3], &lbl_80281408->ap28[nTrail][nPrev * 3]);
+    } else {
+        fGap = 0.0f;
+    }
+    if (fGap <= 0.1f) {
+        fDot = fn_8000C5FC(pDir, lbl_80281408->a64[nTrail]);
+    } else {
+        fDot = 1.0f;
+    }
+    Vec3Copy(pDir, lbl_80281408->a64[nTrail]);
+    if (fGap > 0.1f || fDot < 0.0f) {
+        if (nIndex + 2 <= 600) {
+            lbl_80281408->ap50[nTrail][nIndex] = nPrev + 1;
+            lbl_80281408->ap50[nTrail][nIndex + 1] = nCur;
+            nIndex += 2;
+        } else {
+            nIndex = 4;
+            lbl_80281408->ap50[nTrail][0] = lbl_80281408->ap50[nTrail][598];
+            lbl_80281408->ap50[nTrail][1] = lbl_80281408->ap50[nTrail][599];
+            lbl_80281408->ap50[nTrail][2] = lbl_80281408->ap50[nTrail][599];
+            lbl_80281408->ap50[nTrail][3] = nCur;
+        }
+    }
+    if (nIndex + 2 <= 600) {
+        lbl_80281408->ap50[nTrail][nIndex] = nCur;
+        lbl_80281408->ap50[nTrail][nIndex + 1] = nCur + 1;
+        nIndex += 2;
+    } else {
+        nIndex = 2;     // EA's count: four indices were written
+        lbl_80281408->ap50[nTrail][0] = lbl_80281408->ap50[nTrail][598];
+        lbl_80281408->ap50[nTrail][1] = lbl_80281408->ap50[nTrail][599];
+        lbl_80281408->ap50[nTrail][2] = nCur;
+        lbl_80281408->ap50[nTrail][3] = nCur + 1;
+    }
+    lbl_80281408->an38[nTrail] = nIndex;
+    lbl_80281408->an34[nTrail] = nVert;
+    lbl_80281408->an44[nTrail] += 2;
+    if (lbl_80281408->an44[nTrail] > 200) {
+        lbl_80281408->an44[nTrail] = 200;
+        nOldest = lbl_80281408->an3C[nTrail];
+        lbl_80281408->an3C[nTrail] = nOldest + 2;
+        if (lbl_80281408->an3C[nTrail] >= 200) {
+            lbl_80281408->an3C[nTrail] = 0;
+        }
+        while (nOldest == lbl_80281408->ap50[nTrail][lbl_80281408->an40[nTrail]] ||
+               nOldest == lbl_80281408->ap50[nTrail][lbl_80281408->an40[nTrail] + 1] ||
+               nOldest + 1 == lbl_80281408->ap50[nTrail][lbl_80281408->an40[nTrail]] ||
+               nOldest + 1 == lbl_80281408->ap50[nTrail][lbl_80281408->an40[nTrail] + 1]) {
+            lbl_80281408->an40[nTrail] += 2;
+            if (lbl_80281408->an40[nTrail] >= 600) {
+                lbl_80281408->an40[nTrail] = 0;
+            }
+        }
+    }
+}
+
 // Keep each view's emitter from fn_800A2FFC at the ball of the player that view follows, then
 // draw the sand trail: the indices from n40 up to n38 in the ring of 600 (two draws when they
 // wrap), once it has more than two vertices.
@@ -259,11 +363,11 @@ void fn_800A3A84(void) {
     fn_80012F18(3);
     fn_80035118(1, 1);
     fn_80012EF8();
-    if (lbl_80281408->n44 > 2) {
+    if (lbl_80281408->an44[0] > 2) {
         fn_8005CC64(lbl_80281408->pBank, lbl_80281408->pTex);
         fn_80012EF8();
-        nFirst = lbl_80281408->n40;
-        nEnd = lbl_80281408->n38;
+        nFirst = lbl_80281408->an40[0];
+        nEnd = lbl_80281408->an38[0];
         if (nFirst < nEnd) {
             fill.nCount = 1;
             aDraws[0].nPrim = 0;
@@ -279,11 +383,11 @@ void fn_800A3A84(void) {
             aDraws[1].nCount = nEnd;
         }
         fill.pDraws = aDraws;
-        fill.nVerts = lbl_80281408->n44;
-        fill.pIndices = lbl_80281408->p50;
-        fill.pPos = lbl_80281408->p28;
-        fill.pColour = lbl_80281408->p30;
-        fill.pTexCoord = lbl_80281408->p2C;
+        fill.nVerts = lbl_80281408->an44[0];
+        fill.pIndices = lbl_80281408->ap50[0];
+        fill.pPos = lbl_80281408->ap28[0];
+        fill.pColour = lbl_80281408->ap30[0];
+        fill.pTexCoord = lbl_80281408->ap2C[0];
         fn_80036100(&lbl_80281408->mesh, &fill, 1);
         fn_800360D4(&lbl_80281408->mesh);
     }

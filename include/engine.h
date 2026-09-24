@@ -452,12 +452,18 @@ typedef struct RenderState {
                                 //        all 0xFF at reset
     f32  m34[4][4];             // 0x034  } set to identity at reset
     f32  m74[4][4];             // 0x074  }
-    u8   unkB4[0xBC - 0xB4];
+    f32  fB4;                   // 0x0B4  } a render camera's fn_80008360 and fn_80008368
+    f32  fB8;                   // 0x0B8  } (GoRenderCtx_Gc.c fn_80013EA0)
     s32  nBC;                   // 0x0BC  } a rectangle, bit 0x200 (LLVideo.c fn_800760B0: x,
     s32  nC0;                   // 0x0C0  } width, y, height; the movies give 0, 512, 0, 448)
     s32  nC4;                   // 0x0C4  }
     s32  nC8;                   // 0x0C8  }
-    u8   unkCC[0xE4 - 0xCC];
+    f32  fCC;                   // 0x0CC  } a render camera's screen rectangle in frame buffer units:
+    f32  fD0;                   // 0x0D0  } left, top, width, height, then 0 and 1; bit 0x800
+    f32  fD4;                   // 0x0D4  } (GoRenderCtx_Gc.c fn_80013EEC)
+    f32  fD8;                   // 0x0D8  }
+    f32  fDC;                   // 0x0DC  }
+    f32  fE0;                   // 0x0E0  }
     s32  nE4;                   // 0x0E4  } fn_800140E8's six arguments, bit 0x1000
     s32  nE8;                   // 0x0E8  }
     s32  nEC;                   // 0x0EC  }
@@ -1286,7 +1292,9 @@ void fn_800141F8(f32* pXY, f32* pUV, f32 x0, f32 y0, f32 x1, f32 y1);
 void fn_8001425C(int a);
 void fn_8001644C(int a, f32* pXY, f32* pColour, f32* pUV, int c);
 void fn_800BA74C(u8 bFade);             // ScreenClear.c: a black screen for 1, 2 or 30 frames
-u32  fn_800142AC(int nButton, int a);   // a button's mask
+u32  fn_800142AC(int nButton, u8 bShift);   // a button's mask (bShift: moved up 16 bits)
+extern s8   lbl_80281C98;               // GoRenderCtx_Gc.c: the row of lbl_80186AF0 in use (fn_800142A4)
+extern u32  lbl_80186AF0[][0xE8 / 4];   // GoRenderCtx_Gc.c: rows of button masks, by button
 u8   fn_80014300(u32 uMask);            // any pad pressed these buttons
 
 // ---- events, sound, effects ------------------------------------------------------------------
@@ -1332,7 +1340,7 @@ void EVENT_Trigger(int nPlayer, int nEvent, void* pData, int b);   // through th
 void fn_800689D4(int nPlayer);
 u8   fn_80068AC8(int nPlayer);
 void fn_80069330(int nPlayer, f32* pPos);
-void PlaceBall_UpdateMomentums(int nPlayer, f32 f);
+u8   PlaceBall_UpdateMomentums(int nPlayer, f32 fSpeed);   // 0 when the cursor was stopped
 void fn_8006A6C4(int nPlayer);
 int  fn_8006AA9C(int nPlayer);          // how the shot turned out (0..4, 8+)
 void fn_8006AAB4(int nPlayer, int a);

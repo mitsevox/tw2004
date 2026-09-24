@@ -3167,9 +3167,9 @@ void fn_8007FA60(MsgArg* pArgs, MsgArg* pResult) {
     char szOld[0x20];           // the size is unknown (0x20 gives the original's frame)
     int  nSlot;
     int  nMoney;
-    int  i;
-    int  j;
     int  k;
+    int  j;
+    int  i;
 
     nMoney = 0;
     nSlot = pArgs[0].i;

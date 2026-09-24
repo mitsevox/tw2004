@@ -662,7 +662,8 @@ typedef struct TargetMarker {
     f32  f1C;                   // 0x1C
     f32  f20;                   // 0x20
     f32  f24;                   // 0x24  twice this is a size (fn_80067DAC)
-    u8   unk28[4];
+    u8   b28;                   // 0x28  the marker was on screen last frame (fn_80067DAC)
+    u8   unk29[3];
 } TargetMarker;
 LAYOUT_ASSERT(TargetMarker, 0x2C);
 
@@ -673,6 +674,9 @@ extern TexBank*     lbl_80281E34;       // } the "shadow" texture
 extern TexEntry*    lbl_80281E38;       // }
 extern TexBank*     lbl_80281E3C;       // } the "tball" texture (the aim marker)
 extern TexEntry*    lbl_80281E40;       // }
+extern f32          lbl_801887CC[4];    // RGBA: the placement text where the ball can go (fn_80069CDC)
+extern f32          lbl_801887DC[4];    // RGBA: the placement text where it can't
+extern f32          lbl_801887EC[4];    // RGBA: the placement marker
 
 // A player's emotion state (our name; 0x24 bytes, one per player at lbl_801D5F78): what the golfer
 // feels about the last shot, which picks his reaction (TW06's emotion.c, golf/ai/emotion.c).

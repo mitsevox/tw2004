@@ -33,6 +33,15 @@ void fn_8007644C(CamLens* pLens) {
     fn_80009E70(pLens);
 }
 
+// fake match: stands in for a function the original linker stripped. The file's pool has 0.1,
+// 4096, 60 degrees and 20 (fn_800768E0's settings) right after fn_800763BC's constants, before
+// the 1.0 and 0.0 fn_8007646C uses first; its body is unknown, this one only reproduces the order.
+static void GoCamera_StrippedFn(CamLens* pLens) {
+    fn_800769C0(pLens, 0.1f, 4096.0f);
+    fn_80045470(pLens, DEG(60.0f));
+    fn_80076948(pLens, 20.0f, 20.0f);
+}
+
 // Stands the lens at pPos looking at pTarget, level (its x axis flat) unless it looks almost
 // straight up or down, where it keeps the old x axis. A target closer than 0.1 keeps the old aim.
 void fn_8007646C(CamLens* pLens, f32* pPos, f32* pTarget) {

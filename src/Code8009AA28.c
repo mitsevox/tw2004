@@ -18,8 +18,6 @@ void fn_8009A3F4(s32 nView);
 f32  fn_8009A754(s32 nView, SunFlrView* pView);
 
 s32  fn_800171B0(void);                 // ViewController.c
-f32  fn_8001415C(u8* p);                // GoRenderCtx_Gc.c
-f32  fn_8001416C(u8* p);
 void fn_8009A250(void);                 // SunFlr_Gc.c
 void fn_8009B314(u8 v);
 void fn_80035584(s32 v);                // GoTerrain.c
@@ -163,9 +161,9 @@ void fn_8009B18C(s32 nView) {
     nCtx = fn_800171B0();
     fn_8001F004();
     // port: fn_800171B0 is typed s32 in ViewController.c, but its value is a render context pointer
-    fn_8001416C((u8*)nCtx);
+    fn_8001416C((GoFrameBuf*)nCtx);
     fn_80012ED8(pRect);
-    fn_8001415C((u8*)nCtx);
+    fn_8001415C((GoFrameBuf*)nCtx);
     fn_80012ED0(pRect);
     pState = lbl_802813B8;
     if (pState->b1BF0) {

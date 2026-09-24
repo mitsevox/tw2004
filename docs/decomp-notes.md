@@ -287,6 +287,39 @@ They will be sorted into the sections below.
   offsets after it (char fn_8001B878).
 - **[verified] A counted skip loop written counting down** gives CW's ctr loop with no index register
   (Grass_Gc Static_Render 92.5 -> 96.5).
+- **[verified] Float tests: `if (f)` / `!f` put the value first in `fcmpu`**; `f != 0.0f` and `0.0f != f`
+  both put the zero first (GoTerrain fn_800342F0, TerrainData fn_8000BF9C, GoPostFx fn_80039358). A float
+  `!(x < c)` gives a plain `blt` where `x >= c` gives `cror` (GoCamCont fn_80063CF0).
+- **[verified] Pointer plus integer always puts the pointer first in `add`**; adding as integers
+  (`(u8*)(n + (uptr)p)`) flips it (UMemPool fn_8000AFA0, marked fake match).
+- **[verified] Early exits:** `if (A || B) return;` compiles B as `bcond; b exit` while separate ifs
+  branch straight out (GoCamCont fn_80063920); a `blt` to a return block placed after the fall-through
+  code is a `goto` to a label after that code (char GetTerrainHeightAndNormal); a duplicated tail is
+  written twice (`if (n < 30) { if (x) return 1; return t; } return t;`, fe_craputils fn_8005832C).
+- **[verified] `b = b != 0;`** before a test reproduces `clrlwi; neg; or; srwi.` (char fn_8001BA74).
+- **[verified] Two calls multiplied: the right-hand one runs first** (`f(a) * f(b)`; Skeleton fn_80026D18,
+  GoRenderCtx fn_80013EEC). `f = call(); f *= c;` puts the call result first in `fmuls`; `call() * c` puts
+  the constant first (GoCamCont fn_80063F08, TexAnimManager fn_80076C20).
+- **[verified] A switch's compare tree shows its empty cases**: add `case 0: case 3: break;` to get it
+  (GoAnimalActors fn_8004A578, GoLighting fn_8006E7A4); a one-case switch with default gives `beq A; b B`
+  where if/else gives `bne` (CharAnim UpdateSKAState).
+- **[verified] A field reloaded at every use of a small formula** means EA used a macro, not an inline
+  (GoAnimalActors ANIMAL_WAVE 94.4 -> 98.3).
+- **[verified] Keep call results in named locals** before passing them on (uiProcessInterface
+  fn_80090904 93 -> 100), before using them as a base pointer (DynamicCam_GetLocation), and put a loop
+  bound read through a pointer in a local to get the ctr loop (uiProcessInterface fn_8008FDDC 58 -> 97).
+- **[verified] `&a[i]` indexing matches where hand-walked pointers don't** (fe_movies fn_80090D28,
+  ActAnimal_SetWorldMatrix, SitDevFile fn_800BCF84 74.7 -> 98.8).
+- **[verified] `const` on read-only pointer parameters changes argument-load order** (EASBStorage
+  fn_80129F98 94.4 -> 100, fn_8012A050 90.2 -> 100, fn_80128580 83.8 -> 100).
+- **[verified] A constant left in r5..r8 at a call is not always an argument**: it can be left over from a
+  store just before (fe_craputils fn_80058278, fn_8012B4C0, Code800BA940 fn_800BAA50). Check before
+  adding parameters.
+- **[verified] `volatile` on a global that interrupt callbacks write** (LLDisp_Gc's DispSync) fixed five
+  functions at once; this is real volatile, not a fake match.
+- **[verified] A caller's `extsb` on a result means the callee returns `s8`** (Caddie_GetTip); a `u16`
+  parameter fed `(s16)(s8)f()` gives `extsb; clrlwi 16`.
+- **[verified] `UISEvent.c` was built with `-pragma "pool_data on"`** (strings through one base register).
 - **Linking (tools):**
   - A unit's `.data` range ends at its own 8-byte alignment, not the next object's 32-byte alignment
     (GoARAM). The last object in `.sdata`/`.sbss` ends at the true section end, not rounded to 8 (CARD).
@@ -301,6 +334,15 @@ They will be sorted into the sections below.
     order, and `.bss`/`.sdata` ranges end at the last symbol's padded size (Trax).
   - lint reports `ub-no-prototype` when a trailing `// comment` sits on a function-definition line: put the
     comment on the line above (SkinBurn fn_801271E0).
+  - **A unit whose `.sdata2` constants come out in the wrong order** (every function exact, DOL fails) had a
+    function EA's linker stripped. Put an unused `static <Unit>_StrippedFn` that uses the out-of-order
+    constants, in EA's order, just before their first user; check with `objdump -s -j .sdata2`. `x * 1.0f`
+    is folded away and emits nothing; `x + 1.0f` works. Linked this way: Code8009B340, ScreenClear,
+    GoCamCont, GoCamera, GoLighting, CharAnim. Inlining the callee is not the cause.
+  - A string literal lands in `.sdata` where its function is compiled: data defined before that function
+    comes first (GoObjShadow). `.sbss` definitions go in reverse address order.
+  - A redundant `(T*)a - (T*)b` size in a `memset` is not folded to a constant and breaks the link; use a
+    sum of `sizeof`s (`offsetof` is not on the game include path).
 - **Shell:** the Bash tool strips backslashes even inside quoted heredocs (`<<'EOF'`). Write scripts with
   the Write tool.
 

@@ -18,15 +18,14 @@ f32 fn_8004D80C(CourseInfo* pCourse, f32* pPos);
 
 #define NUM_SHADOW_MESHES 5
 
-u8 lbl_801D96B8[NUM_SHADOW_MESHES][0x28];  // mesh objects, as Swing.c keeps its trail meshes
-f32 lbl_801D9780[8];            // the shadow quad's texture coordinates
+// The uninitialised globals are defined last-first: CodeWarrior lays them out in reverse.
+f32 lbl_801D97B0[12];           // the shadow quad's four corners
 u8  lbl_801D97A0[4][4];         // its vertex colours
-f32 lbl_801D97B0[12];           // its four corners
+f32 lbl_801D9780[8];            // its texture coordinates
+u8 lbl_801D96B8[NUM_SHADOW_MESHES][0x28];  // mesh objects, as Swing.c keeps its trail meshes
 s32 lbl_80281390 = 4;           // vertices to colour
-f32 lbl_8028139C = 0.07f;       // half the quad's size
-f32 lbl_802813A0 = 0.01f;       // how far the shadow is pushed from the light point
-TexBank*  lbl_80281F50;         // the "shadow" texture's bank
-TexEntry* lbl_80281F54;         // and the texture
+TexEntry* lbl_80281F54;         // the "shadow" texture
+TexBank*  lbl_80281F50;         // and its bank
 
 void fn_80093D3C(void) {
     s32 desc[2];
@@ -39,6 +38,10 @@ void fn_80093D3C(void) {
     }
 }
 
+// Defined after fn_80093D3C: its "shadow" string sits before them in .sdata.
+f32 lbl_8028139C = 0.07f;       // half the quad's size
+f32 lbl_802813A0 = 0.01f;       // how far the shadow is pushed from the light point
+
 // Draws the player's ball shadow: a grey quad 0.14 across on the ground under the ball, pushed
 // 0.01 away from the session's light point (f5B3C, f5B44); nothing where there is no ground.
 void fn_80093DB8(Ball* pBall, int nPlayer) {
@@ -46,7 +49,6 @@ void fn_80093DB8(Ball* pBall, int nPlayer) {
     f32 vAway[4];
     TrailMeshDesc desc;
     f32 fGround;
-    f32 fY;
     int i;
     fGround = fn_8004D80C(fn_8000C594(), pBall->vPos);
     if (-65536.125f != fGround) {
@@ -59,26 +61,25 @@ void fn_80093DB8(Ball* pBall, int nPlayer) {
         fn_80014118(0x70);
         fn_80035138(0);
         fn_80012EF8();
-        vAway[1] = 0.0f;
         vAway[0] = pBall->vPos[0] - gSession.f5B3C;
+        vAway[1] = 0.0f;
         vAway[2] = pBall->vPos[2] - gSession.f5B44;
         vAway[3] = 1.0f;
         fn_800BAF04(vAway, vAway);
         fn_8001EF34(vAway, lbl_802813A0, vAway);
-        fY = 0.005f + fGround;
         lbl_801D97B0[0] = vAway[0] + (pBall->vPos[0] - lbl_8028139C);
-        lbl_801D97B0[1] = fY;
+        lbl_801D97B0[1] = 0.005f + fGround;
         lbl_801D97B0[2] = vAway[2] + (pBall->vPos[2] - lbl_8028139C);
         lbl_801D97B0[3] = vAway[0] + (pBall->vPos[0] - lbl_8028139C);
-        lbl_801D97B0[4] = fY;
+        lbl_801D97B0[4] = 0.005f + fGround;
         lbl_801D97B0[5] = vAway[2] + (pBall->vPos[2] + lbl_8028139C);
         lbl_801D97B0[6] = vAway[0] + (pBall->vPos[0] + lbl_8028139C);
-        lbl_801D97B0[7] = fY;
+        lbl_801D97B0[7] = 0.005f + fGround;
         lbl_801D97B0[8] = vAway[2] + (pBall->vPos[2] - lbl_8028139C);
         lbl_801D97B0[9] = vAway[0] + (pBall->vPos[0] + lbl_8028139C);
-        lbl_801D97B0[10] = fY;
+        lbl_801D97B0[10] = 0.005f + fGround;
         lbl_801D97B0[11] = vAway[2] + (pBall->vPos[2] + lbl_8028139C);
-        for (i = 0; i < lbl_80281390; i++) {
+        for (i = 0; lbl_80281390 > i; i++) {
             lbl_801D97A0[i][0] = 0x80;
             lbl_801D97A0[i][1] = 0x80;
             lbl_801D97A0[i][2] = 0x80;
