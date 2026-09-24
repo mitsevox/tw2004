@@ -237,6 +237,17 @@ EASBErrorE fn_801283B0(EASBInitParams* pParams) {
     return EASB_ERROR_NONE;
 }
 
+// Adds x and y, saturating at 0xFFFFFFFF.
+u32 fn_80128468(u32 x, u32 y) {
+    u32 uSum;
+
+    uSum = x + y;
+    if (uSum < x || uSum < y) {
+        uSum = 0xFFFFFFFF;
+    }
+    return uSum;
+}
+
 // Starts a product record: the game's names, level 1, nothing played, updated now.
 void fn_80128488(EASBProduct* pProduct, u8 bValid, char* szName, u16* szGamesPlayedType, u16 uLanguage) {
     fn_80128C4C(pProduct->szGamesPlayedType, szGamesPlayedType, EASB_GAMES_PLAYED_TYPE_SIZE - 1);
@@ -250,17 +261,6 @@ void fn_80128488(EASBProduct* pProduct, u8 bValid, char* szName, u16* szGamesPla
     pProduct->u50 = 0;
     pProduct->u54 = 0;
     pProduct->uTime = fn_80128BC4(TibExtCurrentTimeGet());
-}
-
-// Adds x and y, saturating at 0xFFFFFFFF.
-u32 fn_80128468(u32 x, u32 y) {
-    u32 uSum;
-
-    uSum = x + y;
-    if (uSum < x || uSum < y) {
-        uSum = 0xFFFFFFFF;
-    }
-    return uSum;
 }
 
 // Starts the totals from one product record (all zero when it is not in use).
