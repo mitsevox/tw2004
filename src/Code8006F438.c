@@ -1,17 +1,47 @@
-// Code8006F438.c (our name): made by fold.py from 6 sweep files; not yet described.
+// Code8006F438.c (our name): the hole loader. Its extent is where its .sdata starts and ends
+// (lbl_802811E8 alone, padded to 8): a hole load is asked for with lbl_802811E8[1] and done here,
+// the hole's files streamed in and the game's systems set up for it.
 
 #include "game_types.h"
+#include "engine.h"
+#include "game.h"
+
+void fn_8006F438(void);
+void fn_800106A0(int n);                    // LLTexGrp.c
+void fn_8001491C(void);                     // streammanagerhole.c
+void fn_8001494C(void);                     // streammanagerhole.c
+void StreamManagerHole_StreamFiles(void);   // streammanagerhole.c
+void fn_8006F4F0(void);
+void fn_8006F518(void);
+void fn_8006F5F8(void);
+
+// Load the hole if one is asked for: stream its files in (with fn_800106A0 and fn_8000B4B0 set to 1
+// around it), mark it loaded (lbl_802811E8[0]) and set everything up for it.
+void fn_8006F438(void) {
+    fn_8006F5F8();
+    if (lbl_802811E8[1] != 0) {
+        fn_8006F4F0();
+        fn_800106A0(1);
+        fn_8000B4B0(1);
+        fn_8001491C();
+        StreamManagerHole_StreamFiles();
+        fn_8001494C();
+        fn_800106A0(0);
+        fn_8000B4B0(0);
+        lbl_802811E8[0] = 1;
+        fn_8006F518();
+        lbl_802811E8[1] = 0;
+    }
+}
 
 // ---- sweep code (not yet cleaned up) ----
 
-extern u8* lbl_802811E8;
 void fn_8006F5FC(void);
 void fn_8006F4B4(void);
 void fn_8006F4E0(void);
 void fn_800676AC();
 void fn_8006A89C();
 void fn_8006F600(void);
-void fn_8006F4F0(void);
 void AI_TargetsHook();
 void fn_80019648();
 void fn_80037E50();
@@ -25,8 +55,6 @@ void fn_800B26DC();
 void fn_800C72F0();
 void fn_800C8134();
 void GM_InitForHole();
-void fn_8006F518(void);
-s32 fn_8000B68C(s32);
 s32 fn_80010608(s32);
 s32 fn_8003467C();
 s32 fn_80046664();
@@ -40,7 +68,6 @@ s32 fn_800C830C();
 s32 fn_800C9CA0();
 s32 fn_8011E3B4();
 void fn_8006F568(void);
-void fn_8006F5F8(void);
 
 void fn_8006F4B4(void) {
     fn_8006F5FC();
