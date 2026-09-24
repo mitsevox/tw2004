@@ -676,11 +676,11 @@ void fn_800368FC(SkinDesc* pDesc) {
     SkinDesc14* pEntry;
     SkinMesh* pMesh;
     u8* pData;
+    int i;
     u8* p;
     void* pSrc;                 // port: fn_80076158 takes it as a u8** too (one stack slot in EA's code)
     void* pDst;
     s32 n;
-    int i;
 
     if (pDesc->nVersion > 8 || (pDesc->nVersion == 8 && pDesc->n04 == 1)) {
         p = (u8*)pDesc->p14;
