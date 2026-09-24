@@ -26,6 +26,7 @@ f32   fn_80014280(f32 x);           // tan
 void  fn_80030894(void);
 void  fn_80030A40(void* pHoleData, int nView);
 void  fn_80030CC8(void* pHoleData);
+void  fn_80031154(Ter_PatchReference* pPatch, s32 nFirstObject);
 void  fn_8003185C(void);
 void  fn_800318D8(void);
 void  fn_80031AB4(void);
@@ -226,6 +227,109 @@ void fn_80030A40(void* pHoleData, int nView) {
     fn_80012F50(1, 6, 0x80);
     fn_80014118(0x70);
     fn_80012EF8();
+}
+
+// Builds the patch lists: clears the counts and pSortedPatchList, then takes each patch of the hole
+// data that is used with the current pin position (or with any) and is not off screen, fills its
+// Ter_PatchReference (fn_80031084) and objects (fn_80031154) and chains it into the lists its n1C
+// bits ask for. In object test mode the whole object tree goes in as one patch.
+void fn_80030CC8(void* pHoleData) {
+    Ter_PatchReference* pPatch;
+    s32 n;
+    s32 nCount;
+    s32 iRenderPass;
+    UObjMesh* pMesh;
+    UObjMesh* pRoot;
+    UObjMesh* pList;
+    s32 eClipMethod;
+    s32 nFirstObject = 0;
+    u32 uPinBit = 1 << Game_CurrentPinSet();
+    void* pCamera = fn_8001614C();
+    s32 uFlags;
+    f32 fRadius;
+    f32 fDist;
+    int i;
+    int j;
+    int k;
+
+    lbl_801D3CB0.iTotalPatches = 0;
+    lbl_801D3CB0.iTotalPostDrawTerrainPatches = 0;
+    lbl_801D3CB0.iTotalSortObjects = 0;
+    lbl_801D3CB0.iOpaqueObjects = 0;
+    lbl_801D3CB0.iTranslucentObjects = 0;
+    lbl_801D3CB0.iNearbyObjects = 0;
+    lbl_801D3CB0.iDeferredItems = 0;
+    lbl_801D3CB0.iPostDrawItems = 0;
+    for (i = 0; i < 3; i++) {
+        for (j = 0; j < 4; j++) {
+            for (k = 0; k < 3; k++) {
+                lbl_801D3CB0.pSortedPatchList[i][j][k] = NULL;
+            }
+        }
+    }
+    pRoot = fn_80035500(pHoleData);
+    if (lbl_801D3CB0.bObjectTestMode) {
+        pPatch = &lbl_801D3CB0.pPatchList[lbl_801D3CB0.iTotalPatches++];
+        pPatch->fDistance = 0.0f;
+        pPatch->fBoundingRadius = 0.0f;
+        pPatch->eClipMethod = 1;
+        pPatch->pGround = NULL;
+        pPatch->pObjects = pRoot;
+        fn_80031154(pPatch, 0);
+        return;
+    }
+    if (fn_800354F4(pRoot) >= 1) {
+        pList = fn_800354E4(pRoot, 1);
+        nCount = fn_800354F4(pList);
+        pMesh = fn_800354E4(pList, 0);
+        for (n = nCount; n > 0; n--) {
+            lbl_801D3CB0.iPatchFirstObjectInstanceIndex[nCount - n] = nFirstObject;
+            uFlags = fn_800354D0(pMesh, 1);
+            if ((uFlags & uPinBit) || !(uFlags & 0xF)) {
+                if (uFlags & 0x40) {
+                    iRenderPass = 1;
+                } else if (uFlags & 0x80) {
+                    iRenderPass = 2;
+                } else {
+                    iRenderPass = 0;
+                }
+                fRadius = fn_800354C4(pMesh)[3];
+                fDist = Vec_Distance(lbl_801D3CB0.xCameraReferencePos, fn_800354C4(pMesh)) - fRadius;
+                if (fDist < 0.0f) {
+                    fDist = 0.0f;
+                }
+                eClipMethod = fn_80007B2C(pMesh, pCamera, fDist, lbl_801D3CB0.fCameraMinHalfFieldOfViewTan,
+                                          fn_80017028(lbl_801D3CB0.iCurrentViewContext)->f54);
+                if (eClipMethod != 3) {
+                    pPatch = &lbl_801D3CB0.pPatchList[lbl_801D3CB0.iTotalPatches++];
+                    fn_80031084(pMesh, eClipMethod, iRenderPass, pPatch, fDist);
+                    if (pPatch->pObjects != NULL) {
+                        fn_80031154(pPatch, nFirstObject);
+                    }
+                    if (pPatch->n1C & 1) {
+                        pPatch->pNext[0] = lbl_801D3CB0.pSortedPatchList[iRenderPass][0][eClipMethod];
+                        lbl_801D3CB0.pSortedPatchList[iRenderPass][0][eClipMethod] = pPatch;
+                    }
+                    if (pPatch->n1C & 2) {
+                        pPatch->pNext[1] = lbl_801D3CB0.pSortedPatchList[iRenderPass][1][eClipMethod];
+                        lbl_801D3CB0.pSortedPatchList[iRenderPass][1][eClipMethod] = pPatch;
+                    }
+                    if (pPatch->n1C & 4) {
+                        pPatch->pNext[2] = lbl_801D3CB0.pSortedPatchList[iRenderPass][2][eClipMethod];
+                        lbl_801D3CB0.pSortedPatchList[iRenderPass][2][eClipMethod] = pPatch;
+                    }
+                    if (pPatch->n1C & 0x80) {
+                        pPatch->pNext[3] = lbl_801D3CB0.pSortedPatchList[0][3][eClipMethod];
+                        lbl_801D3CB0.pSortedPatchList[0][3][eClipMethod] = pPatch;
+                    }
+                }
+            }
+            if (fn_800354F4(pMesh) >= 2) {
+                nFirstObject += fn_800354F4(fn_800354E4(fn_800354E4(pMesh, 1), 0));
+            }
+            pMesh = fn_800354BC(pMesh);
+        }
+    }
 }
 
 // Sorts pObjectSortList by distance, except when gSession.b11 is set.
