@@ -85,6 +85,7 @@ void  fn_800280E8(Character* pChar, f32* pPos, int bPlace);     // Skeleton.c
 void  fn_8001EFB4(f32* pA, f32* pB, f32* pOut);
 void  fn_8001A14C(Character* pChar);
 void  fn_8001D6D8(int n);
+void  fn_8010B098(void* pModel);                                // LLDynTex.c
 void  fn_80095558(void);
 void  AnimLib_ApplyOverlays(int nSlot);                         // skalib.c
 void  fn_80025478(void);                                        // skalib.c
@@ -721,6 +722,30 @@ void fn_8001A0FC(Character* pChar) {
     if (fn_8008E938() == 0) {
         fn_8001A024(pChar);
     }
+}
+
+// Sets up the dynamic textures for the character's model in use (fn_8010B098), dresses it
+// (fn_8001D4A4) and puts its skins on the model, the "Glove" set first; the last marked player
+// (lbl_80281CAC) is dressed again.
+void fn_8001A14C(Character* pChar) {
+    u64 uGlove;
+    void* pModel;
+
+    pModel = pChar->a64[pChar->n74];
+    pChar->p60 = pModel;
+    fn_8010BC88(&pChar->p50);
+    fn_8010B098(pModel);
+    // port: EA passes an argument fn_8010BEC4 ignores
+    ((void (*)(void*))fn_8010BEC4)(pModel);
+    fn_8001D4A4(pChar, pChar->nPlayer);
+    fn_80019C1C(pChar);
+    fn_800CB700(&uGlove, "Glove");
+    fn_800CEBE8(pChar->apSkins, pChar->nSkins, pModel, &uGlove, 1);
+    if (lbl_80281CAC >= 0) {
+        fn_8001D4A4(gPlayers[lbl_80281CAC].pChar, lbl_80281CAC);
+    }
+    // port: EA passes an argument fn_8010BED4 ignores
+    ((void (*)(void*))fn_8010BED4)(pModel);
 }
 
 void fn_8001A20C(Character* pChar) {
