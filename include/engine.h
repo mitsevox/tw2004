@@ -359,6 +359,25 @@ LAYOUT_ASSERT(RenderState, 0x118);
 
 extern RenderState lbl_801B8980;
 
+// A pool of 20 blocks of 0x1000 bytes (our names; lbl_801A4900, 0x14080 bytes, reached through
+// the pointer lbl_80280E00). fn_80015470 frees them all; fn_800154F4 moves nNext past the used ones.
+typedef struct BufferPoolBlock {
+    u8   unk0[0x1000];
+    u32  u1000;                 // 0x1000  nonzero: in use
+} BufferPoolBlock;
+LAYOUT_ASSERT(BufferPoolBlock, 0x1004);
+
+typedef struct BufferPool {
+    s32  nNext;                 // 0x00  the first block that may be free
+    s32  n4;                    // 0x04  counted up by fn_800154F4
+    u8   unk8[0x20 - 0x8];
+    BufferPoolBlock aBlocks[20];    // 0x20
+    u8   unk14070[0x14080 - 0x14070];
+} BufferPool;
+LAYOUT_ASSERT(BufferPool, 0x14080);
+
+extern BufferPool* lbl_80280E00;
+
 void fn_8005CC64(TexBank* pBank, TexEntry* pTex);  // set the texture of the next draw
 
 // ---- shader objects ----------------------------------------------------------------------------

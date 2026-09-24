@@ -7,6 +7,7 @@
 #include "game.h"
 #include "golfer.h"
 #include "character.h"
+#include "frontend/fe.h"
 
 // ---- sweep code (not yet cleaned up) ----
 
@@ -42,6 +43,7 @@ void fn_800145E0(void);
 void fn_800918A4(void);     // fe_movies.c: set up the loading screen
 void fn_8009198C(int nMode);    // fe_movies.c: update the loading screen
 void fn_80091818(void);     // fe_movies.c
+void fn_80091778(void);     // fe_movies.c
 void fn_8001529C(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*));
 void fn_8001462C(void);
 void fn_8000B9E4();
@@ -590,6 +592,56 @@ void fn_800143B8(void) {
     }
     fn_80014DF8();
     fn_80014A60();
+}
+
+// Stream list 1 (the front end's files), with the loading screen unless the front end's b0F is set.
+void fn_80014718(void) {
+    if (lbl_801D7148.b0F == 0) {
+        fn_80091778();
+        fn_800918A4();
+    }
+    fn_80015134();
+    do {
+        if (lbl_801D7148.b0F == 0) {
+            fn_8009198C(0);
+        }
+    } while (UStream_Update() != 0);
+    if (lbl_801D7148.b0F == 0) {
+        fn_8009198C(1);
+    }
+    fn_8001510C();
+    if (lbl_801D7148.b0F == 0) {
+        fn_80091818();
+    }
+}
+
+// Free every block of the pool.
+void fn_80015470(void) {
+    BufferPoolBlock* pBlock;
+    int i;
+
+    lbl_80280E00->nNext = 0;
+    lbl_80280E00->n4 = 0;
+    pBlock = lbl_80280E00->aBlocks;
+    for (i = 0; i < 20; i++) {
+        pBlock->u1000 = 0;
+        pBlock++;
+    }
+}
+
+// Move the pool's nNext past the blocks in use.
+void fn_800154F4(void) {
+    BufferPoolBlock* pBlock;
+
+    pBlock = &lbl_80280E00->aBlocks[lbl_80280E00->nNext];
+    for (;;) {
+        if (pBlock->u1000 == 0) {
+            break;
+        }
+        pBlock++;
+        lbl_80280E00->nNext++;
+    }
+    lbl_80280E00->n4++;
 }
 
 // Refill stream list 0 with the global data and character files and every player's golfer's
