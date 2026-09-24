@@ -785,13 +785,13 @@ Tournament* fn_800EFC80(u16 nDate) {
 }
 
 // Tournament i's total purse in bracket k, in dollars.
-s32 fn_800EFCC0(s32 i, s32 k) {
+s32 GameModeDriverPGATour_ComputePurseForBracket(s32 i, s32 k) {
     Tournament* p = fn_800EFA70(i);
     return p->aPrize[k][0] * 1000;
 }
 
 // Tournament i's first prize (the winner's share) in bracket k, in dollars.
-s32 fn_800EFCFC(s32 i, s32 k) {
+s32 GameModeDriverPGATour_ComputeFirstPrizeForBracket(s32 i, s32 k) {
     Tournament* p = fn_800EFA70(i);
     return p->aPrize[k][1] * 1000;
 }
@@ -858,7 +858,7 @@ s32 GameModeDriverPGATour_GetCourses(Tournament* p, s32* pCourses) {
 
 // Tournament i's total purse as text: in the
 // player's bracket when it was played, else in the current one.
-void fn_800EFF7C(s32 i, char* pDst) {
+void GameModeDriverPGATour_GetPurseString(s32 i, char* pDst) {
     PlayerNumber_t nPlayer = PLR_1_e;
     SeasonEvent* p = &gpSaveData[nPlayer].tour.aEvent[i];
     s32 nBracket;
@@ -867,7 +867,7 @@ void fn_800EFF7C(s32 i, char* pDst) {
     } else {
         nBracket = fn_800EF0E0(nPlayer);
     }
-    fn_800907AC(fn_800EFCC0(i, nBracket), pDst);
+    fn_800907AC(GameModeDriverPGATour_ComputePurseForBracket(i, nBracket), pDst);
 }
 
 // The leader's name, or "Tied (%d players)".
@@ -889,7 +889,7 @@ int fn_800F009C(void) {
 }
 
 // The same for the first prize (the winner's share).
-void fn_800F00F8(s32 i, char* pDst) {
+void GameModeDriverPGATour_GetWinnerEarningsString(s32 i, char* pDst) {
     PlayerNumber_t nPlayer = PLR_1_e;
     SeasonEvent* p = &gpSaveData[nPlayer].tour.aEvent[i];
     s32 nBracket;
@@ -898,7 +898,7 @@ void fn_800F00F8(s32 i, char* pDst) {
     } else {
         nBracket = fn_800EF0E0(nPlayer);
     }
-    fn_800907AC(fn_800EFCFC(i, nBracket), pDst);
+    fn_800907AC(GameModeDriverPGATour_ComputeFirstPrizeForBracket(i, nBracket), pDst);
 }
 
 // The player's own score in the current tournament. The event (EventInfo.c passes it) is not used.

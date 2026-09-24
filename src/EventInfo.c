@@ -39,7 +39,7 @@ void fn_8011D280(int nLine, char* szLabel, char* szValue) {
     switch (nLine) {
     case 3:
         strcpy(szLabel, "Purse:");
-        fn_800EFF7C(nId, sz);
+        GameModeDriverPGATour_GetPurseString(nId, sz);
         sprintf(szValue, "$%s", sz);
         break;
     case 4:
@@ -114,7 +114,7 @@ void fn_8011D4DC(int nLine, char* szLabel, char* szValue) {
         break;
     case 6:
         strcpy(szLabel, "Earnings:");
-        fn_800F00F8(nId, sz);
+        GameModeDriverPGATour_GetWinnerEarningsString(nId, sz);
         sprintf(szValue, "$%s", sz);
         break;
     case 7:
@@ -163,7 +163,7 @@ void fn_8011D658(int nLine, char* szLabel, char* szValue) {
         break;
     case 7:
         strcpy(szLabel, "Purse:");
-        fn_800EFF7C(nId, sz);
+        GameModeDriverPGATour_GetPurseString(nId, sz);
         sprintf(szValue, "$%s", sz);
         break;
     case 8:
