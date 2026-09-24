@@ -18,6 +18,12 @@ VideoChunk* fn_80075470(VideoQueue* pQueue);
 int  fn_80076088(VideoQueue* pQueue);
 u8   fn_80076090(VideoQueue* pQueue);
 
+// fake match: stands in for a function the original linker stripped. The file's pool starts with
+// 1.0f (0x80283A50), before the 0.0f, 0.1f and 0.5f fn_800755F0 uses first; its body is unknown.
+static f32 LLVideo_StrippedFn(f32 x) {
+    return x + 1.0f;
+}
+
 // Runs the stream loader once; pnQueued, if given, gets how many chunks are now queued.
 u8 fn_80075280(Video* pVideo, int* pnQueued) {
     u8 bRet = UStream_Update();
@@ -178,10 +184,10 @@ void fn_80076128(s32 p0);
 void fn_800755F0(int nFlags) {
     f32 xy[8];
     f32 colour[4];
-    int nFrames;
+    int bFade;
     int bBit0;
     int i;
-    int bFade;
+    int nFrames;
 
     bFade = nFlags & 2;
     colour[0] = 0.0f;
@@ -195,7 +201,7 @@ void fn_800755F0(int nFlags) {
     if (bFade) {
         nFrames = 30;
     } else {
-        nFrames = (nFlags & 1) + 1;
+        nFrames = (nFlags & 1) ? 2 : 1;
     }
     bBit0 = nFlags & 1;
     for (i = 0; i < nFrames; i++) {
