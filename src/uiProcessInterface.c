@@ -94,9 +94,11 @@ void fn_8008F568(s32 nCmd, s32 unused1, s32 unused2, s32 unused3, s32 a, s32 b) 
 // group is ignored.
 void* fn_8008F610(u16 uGroup, u16 uScreen) {
     UIFilePairs* pPairs = lbl_80281F1C->pFile->p4;
+    UIFilePair* pPair;
 
-    if (uScreen >= pPairs->nCount) return NULL;
-    return pPairs->aPairs[uScreen].p4;
+    if (pPairs->nCount <= uScreen) return NULL;
+    pPair = &pPairs->aPairs[uScreen];
+    return pPair->p4;
 }
 
 // The studio's UISUnloadFn: nothing to do, the screens' data stays in the UI file.
