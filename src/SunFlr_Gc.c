@@ -3,6 +3,21 @@
 
 #include "glows.h"
 
+// Sets lbl_802813B8->f0 so that all of lbl_80189DA8's weights together make 1.
+void fn_8009A250(void) {
+    int y;
+    int x;
+    f32 fSum;
+
+    fSum = 0.0f;
+    for (y = 0; y < 6; y++) {
+        for (x = 0; x < 8; x++) {
+            fSum += lbl_80189DA8[y][x];
+        }
+    }
+    lbl_802813B8->f0 = 1.0f / fSum;
+}
+
 // ---- sweep code (not yet cleaned up) ----
 
 void fn_8009A340(void);
