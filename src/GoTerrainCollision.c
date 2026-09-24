@@ -22,10 +22,6 @@ void  fn_8004B63C(TNetwork* pNet);
 void  fn_8005097C(f32* pA, f32* pB, f32* pOut);           // a - b (paired-single assembly)
 void  fn_800509A0(f32* pSrc, f32* pDst);                  // negate (paired-single assembly)
 void  fn_800509BC(f32* pSrc, f32* pDst);                  // negate, four floats (paired-single assembly)
-// The ground triangle under a point: its height there, the grid cell, the strip, the triangle's
-// first vertex and its number in the strip. Probably TW06's Ter_GetSupportingGroundTriangle.
-f32   fn_800CBEE0(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** ppRef, f32 (**ppTri)[3],
-                  s32* pTri);
 
 // Every floor in this file goes through an inline (probably EA's wrapper around floorf):
 // fn_8004DCC4 matches only that way, and every other function matches either way.
@@ -60,8 +56,6 @@ u8    fn_8004FCB4(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32
 u8    fn_800504F4(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32* pDir, f32 fMax, f32* pHit,
                   f32* pNormal, SurfaceType** ppSurface, TerObject** ppObj);
 u8    fn_8004E0D4(f32* pFrom, f32* pDir, f32 fRange, f32* pCentre, f32 fRadius);
-u8    fn_80050A9C(f32* pA, f32* pB, f32* pC, f32 fX, f32 fZ);
-void  fn_800509D8(f32 (*pTri)[3], f32* pPos, f32* pA, f32* pB, f32* pC);
 s8**  fn_80034A20(u16 nPatch, u16 nObjList);               // a course object's model (GoTerrain.c)
 int   fn_80050BD8(s8** ppData, int n);
 
