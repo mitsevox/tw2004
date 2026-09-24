@@ -972,7 +972,7 @@ config.libs = [
             Object(Matching, "Calendar.c"),
             Object(Matching, "CourseData.c"),
             Object(NonMatching, "Earnings.c"),
-            Object(NonMatching, "GameHoleContests.c"),
+            Object(Matching, "GameHoleContests.c"),
             Object(Matching, "GameManager.c"),
             Object(Matching, "GameEffects.c"),
             Object(Matching, "GameRound.c"),

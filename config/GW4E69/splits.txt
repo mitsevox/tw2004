@@ -784,6 +784,10 @@ Earnings.c:
 
 GameHoleContests.c:
 	.text       start:0x800D9E14 end:0x800DAE44
+	.bss        start:0x80202828 end:0x80202898
+	.sdata      start:0x80281568 end:0x80281588
+	.sbss       start:0x80282260 end:0x80282270
+	.sdata2     start:0x80284560 end:0x80284578
 
 GameEffects.c:
 	.text       start:0x800DAE44 end:0x800DCAD8
