@@ -588,13 +588,12 @@ void fn_800D477C(int nPlayer, Ball* pBall, u8 bPreview) {
     s32 aAwardIds[10];
     Ball saved;
     int i;
-    int nSlot;
     u8 bReplace;
     u8 bLost;
     int j;
     s32 nValue;
     u8 bNoBall;
-    int nAdj;
+    s32 nAdj;
     int nHoles;
 
     lbl_80282254 = 0;
@@ -657,6 +656,8 @@ void fn_800D477C(int nPlayer, Ball* pBall, u8 bPreview) {
             GM_GetGameProgress(&gpSaveData[nPlayer]) < 100.0f) continue;
 
         if (lbl_80200538.aShotGoal[i].nAward != 39) {
+            int nSlot;
+
             if (!fn_800D76AC(nPlayer, lbl_80200538.aShotGoal[i].nAward)) continue;
             bReplace = 0;
             bLost = 0;
@@ -685,6 +686,8 @@ void fn_800D477C(int nPlayer, Ball* pBall, u8 bPreview) {
                                          lbl_80200538.aBio[lbl_80200538.aShotGoal[i].nBio].nValue);
             }
         } else {
+            int nSlot;
+
             nValue = lbl_80200538.aShotGoal[i].nValue;
             if (nValue == 0) continue;
             bReplace = 0;
@@ -703,8 +706,8 @@ void fn_800D477C(int nPlayer, Ball* pBall, u8 bPreview) {
                 }
             }
             if (bLost) continue;
-            aPrizeIds[nSlot] = lbl_80200538.aShotGoal[i].nId;
             lbl_80200330[nSlot] = nValue;
+            aPrizeIds[nSlot] = lbl_80200538.aShotGoal[i].nId;
             lbl_802003A8[nSlot] = fn_800D6A70(lbl_80200330[nSlot], nPlayer,
                                               fn_800D4EF8(lbl_80200538.aShotGoal[i].uMults, 0),
                                               fn_800D4EF8(lbl_80200538.aShotGoal[i].uMults, 1),
