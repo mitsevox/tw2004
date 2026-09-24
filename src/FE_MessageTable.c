@@ -42,7 +42,7 @@ int  fn_800E234C(int nSlot, int a, int b);      // GameRound.c
 int  fn_800D3D10(int nGolfer);          // Earnings.c: the golfer's rating
 int  fn_800E2520(int nMode);            // GameRound.c
 void fn_800E25E0(void);                 // GameRound.c
-void fn_800E30D4(void);                 // GameRound.c: builds the mixed rounds
+void fn_800E30D4(void);                 // GameRound.c: builds the random mixed round
 void fn_80101EE8(void);                 // GameMode11.c
 void fn_800EE2C8(void);                 // GameModeDriverPGATour.c
 u8*  fn_8010C718(void);                 // CharSliders.c
