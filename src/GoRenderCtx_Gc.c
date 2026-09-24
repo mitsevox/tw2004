@@ -14,6 +14,12 @@ GoFrameBuf* fn_80013E40(Camera* pCamera);
 void fn_80013E48(Camera* pCamera);
 void fn_80013EA0(Camera* pCamera);
 void fn_800140E8(int a, int nWidth, int nHeight, int nField, int b, int c);
+void fn_8000AB80(f32 (*pMtx)[4], f32 f1, f32 f2);   // matrix builders, not decompiled yet
+void fn_8000ABE8(f32 (*pMtx)[4], f32 f1, f32 f2, f32 f3, f32 f4, f32 f5);
+void fn_8000AC5C(f32 (*pMtx)[4], f32 f1, f32 f2, f32 f3, f32 f4);
+f32 fn_80014268(u8* p);
+f32 fn_80014270(u8* p);
+f32 fn_80014280(f32 x0);
 
 // Makes a render camera from a lens, a frame buffer and a screen rectangle.
 void* fn_8001371C(CamLens* pLens, GoFrameBuf* pBuf, f32* pRect) {
@@ -34,7 +40,7 @@ s32 fn_8000A0E8();
 s32 fn_8000A714();
 s32 fn_800BADF8();
 void fn_80013D5C(s32 v);
-void RC_vUpdateRenderCtxScreenMatricesAndInfo();
+void RC_vUpdateRenderCtxScreenMatricesAndInfo(Camera* pCamera);   // not decompiled yet
 void fn_80013DD0(u8* arg0, f32 (*arg1)[4]);
 s32 fn_8000ADC0();
 f32 fn_80014134(u8* p);
@@ -86,6 +92,75 @@ void fn_80013808(f32* pColour, u32 uFlags) {
     fn_80012EF8();
 }
 
+// Works out the camera's screen values from its lens, screen rectangle and frame buffer, then its
+// projection (perspective, or flat when fn_80008378 says so) and the matrices made from it.
+void RC_vUpdateRenderCtxScreenMatricesAndInfo(Camera* pCamera) {
+    CamLens* pLens;
+    f32* pRect;
+    GoFrameBuf* pBuf;
+    f32 f;
+    f32 mFlat[4][4];
+    f32 mProj[4][4];
+    f32 aSrc[4];    // fake match: three are used; [4] gives the original's stack layout
+    f32 aDst[4];    // fake match: as aSrc
+
+    pLens = pCamera->unk10;
+    pRect = pCamera->pRect;
+    pBuf = pCamera->pBuf;
+    pCamera->f224 = fn_80014280(fn_80014278(pLens) * 0.5f);
+    pCamera->f228 = 1.0f / pCamera->f224;
+    fn_8001415C(pBuf);
+    fn_8001416C(pBuf);
+    pCamera->f1E0 = pCamera->f228 * (fn_80012ED8(pRect) * fn_8001416C(pBuf) * 0.5f);
+    pCamera->n22C = 0;
+    pCamera->f230 = -(fn_8000AF7C(pCamera->f1E0 * (1.0f / 554.256f)) * 1.442695f);
+    pCamera->f1E4 = fn_80012EE8(pRect) + fn_80012ED8(pRect) * 0.5f;
+    pCamera->f1E8 = 1.0f - (fn_80012EE0(pRect) + fn_80012ED0(pRect) * 0.5f);
+    pCamera->unk1F4 = pCamera->f1E0 * (fn_80014270((u8*)pLens) / 554.256f);
+    pCamera->unk1F8 = fn_80014268((u8*)pLens);
+    pCamera->f1FC = pCamera->f224 * fn_80014154((u8*)pRect) * fn_8001418C((u8*)pBuf);
+    pCamera->f200 = fn_80014184((u8*)pBuf) * (fn_8001414C((u8*)pRect) *
+                    (pCamera->f224 * fn_80014144((u8*)pRect) * fn_8001417C((u8*)pBuf)));
+
+    aSrc[0] = 1.0f;
+    aSrc[1] = pCamera->f1FC;
+    aSrc[2] = 0.0f;
+    fn_800BAF04(aSrc, aDst);
+    pCamera->unk204 = aDst[1];
+    pCamera->unk20C = aDst[0];
+    aSrc[0] = 1.0f;
+    aSrc[1] = pCamera->f200;
+    aSrc[2] = 0.0f;
+    fn_800BAF04(aSrc, aDst);
+    pCamera->unk208 = aDst[1];
+    pCamera->unk210 = aDst[0];
+    aSrc[0] = 1.0f;
+    aSrc[1] = pCamera->f1FC * 2.0f;
+    aSrc[2] = 0.0f;
+    fn_800BAF04(aSrc, aDst);
+    pCamera->unk214 = aDst[1];
+    pCamera->unk218 = aDst[0];
+    aSrc[0] = 1.0f;
+    aSrc[1] = pCamera->f200 * 2.0f;
+    aSrc[2] = 0.0f;
+    fn_800BAF04(aSrc, aDst);
+    pCamera->unk21C = aDst[1];
+    pCamera->unk220 = aDst[0];
+
+    if (fn_80008378(pLens) == 0) {
+        f = pRect[2] * (1.0f / fn_80014134((u8*)pRect)) / pRect[3];
+        fn_8000ABE8(pCamera->m5C, pCamera->f228, 1.0f / fn_8001413C((u8*)pRect), f,
+                    pCamera->unk1F4, pCamera->unk1F8);
+    } else {
+        fn_8000AB80(mFlat, pLens->fB4, pLens->fB8);
+        f = pRect[2] * (1.0f / fn_80014134((u8*)pRect)) / pRect[3];
+        fn_8000AC5C(mProj, 1.0f / fn_8001413C((u8*)pRect), f, pCamera->unk1F4, pCamera->unk1F8);
+        fn_800BADF8(mProj, mFlat, pCamera->m5C, 4);
+    }
+    fn_8000A714(pCamera->m5C, pCamera->m9C);
+    fn_800BADF8(pCamera->m5C, pLens->m44, pCamera->mDC, 4);
+}
+
 void fn_80013CCC(void* pCamera) {
     u8* arg0 = pCamera;
 
@@ -107,7 +182,7 @@ void fn_80013D5C(s32 v) {
 }
 
 void fn_80013D68(Camera* pCamera) {
-    RC_vUpdateRenderCtxScreenMatricesAndInfo();
+    RC_vUpdateRenderCtxScreenMatricesAndInfo(pCamera);
     fn_80013D58(pCamera);
 }
 
@@ -234,10 +309,7 @@ f32 fn_8001418C(u8* p) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-f32 fn_80014268(u8* p);
-f32 fn_80014270(u8* p);
 double tan();
-f32 fn_80014280(f32 x0);
 void fn_800142A4(s8 v);
 void fn_800131C4(int nController);
 void fn_8001437C(void);
