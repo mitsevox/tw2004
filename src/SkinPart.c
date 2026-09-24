@@ -1196,20 +1196,17 @@ void fn_800CEBE8(Skin** apSkins, int nSkins, DynTex* pTex, u64* aIds, int nIds) 
 
 // Hands fn_800CEDE0 the name codes a set's variant uses.
 void fn_800CECE0(Skin* pSkin, int nSet, int nVariant, int nOption, DynTex* pTex) {
-    SkinDesc* pDesc;
-    SkinDesc74* pSet;
     int i;
+    SkinDesc74* pSet;
+    SkinDesc* pDesc;
 
-    if (pSkin == NULL || pSkin->pModel == NULL || nSet < 0) return;
-    if (nSet >= fn_800CCEA0(pSkin)) return;
-    if (nVariant < 0) return;
-    if (nVariant >= fn_800CCED0(pSkin, nSet)) return;
-    if (nOption < 0) return;
-    if (nOption >= fn_800CCF10(pSkin, nSet, nVariant)) return;
+    if (pSkin == NULL || pSkin->pModel == NULL || nSet < 0 || nSet >= fn_800CCEA0(pSkin)) return;
+    if (nVariant < 0 || nVariant >= fn_800CCED0(pSkin, nSet)) return;
+    if (nOption < 0 || nOption >= fn_800CCF10(pSkin, nSet, nVariant)) return;
     pDesc = pSkin->pModel->pDesc;
     pSet = &pDesc->p74[nSet];
     for (i = 0; i < pSet->n0C; i++) {
-        fn_800CEDE0(pSkin, pTex, pDesc->p84[i + (nVariant * pSet->n0C + pSet->n14)]);
+        fn_800CEDE0(pSkin, pTex, pDesc->p84[i + nVariant * pSet->n0C + pSet->n14]);
     }
 }
 
