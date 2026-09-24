@@ -38,6 +38,7 @@ LAYOUT_ASSERT(Shadow, 0x500);
 
 extern Shadow* lbl_802814A8;
 extern f32   lbl_802814AC;      // how far the shadow's ground mesh is lifted (fn_800B2FB0)
+extern f32   lbl_802814B0;      // how far the flat shadow is lifted (fn_800B2DB0)
 extern s32   lbl_80282158;      // the most strips and vertices a shadow mesh has used
 extern s32   lbl_8028215C;      //   (fn_800B2FB0)
 // The shadow's ground mesh, made by SH_vSetShadowIntensity (0x200 strips, 0x800 vertices):
