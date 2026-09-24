@@ -44,11 +44,14 @@ typedef struct PsEmitter {
     u8   unk54[0x58 - 0x54];
     s32  n58;                   // 0x58  cleared by fn_80099B74
     s8   b5C;                   // 0x5C  cleared by fn_80098BDC
-    u8   unk5D[0xB4 - 0x5D];
+    u8   unk5D[0x84 - 0x5D];
+    f32  f84;                   // 0x84  the radius fn_80099AE4 tests it with (over 1000: always)
+    u8   unk88[0xB4 - 0x88];
     s32  nB4;                   // 0xB4  below 0: fn_80098BDC frees the emitter
     u32  uB8;                   // 0xB8  flags; the functions below only act with 0x20000 set;
                                 //       fn_80098C70 sets 0x80000000 on the six fixed emitters
-    u8   unkBC[0xE0 - 0xBC];
+    u8   unkBC[0xD0 - 0xBC];
+    f32  vD0[4];                // 0xD0  a point fn_80099AE4 puts through the camera's view matrix
     f32  vE0[4];                // 0xE0  a position (fn_800A3D6C)
     u8   unkF0[0x180 - 0xF0];
     u8   mesh[0x28];            // 0x180 a mesh object (Skin.c)

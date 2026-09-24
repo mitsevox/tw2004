@@ -4,15 +4,13 @@
 #include "game_types.h"
 #include "psmgr.h"
 #include "camera.h"
+#include "unsorted/cull.h"
 
 // Skin.c
 void fn_800360A0(void* pMesh);
 void fn_800360D4(u8* pMesh);
 
-CamLens* fn_80008370(void* pCamera);   // the render camera's lens
-
 void fn_80098BDC(PsEmitter* pEmitter);
-u32  fn_80099AE4(PsEmitter* pEmitter, void* pCamera);  // not yet decompiled
 // Sort the list (next pointer in word n of each emitter?) by pfnCompare; not yet decompiled.
 PsEmitter* fn_80099C50(PsEmitter* pList, int n, int (*pfnCompare)(PsEmitter*, PsEmitter*));
 int  fn_80099E34(PsEmitter* pA, PsEmitter* pB);
@@ -67,6 +65,21 @@ void fn_80098C70(void) {
     lbl_801DB888[5]->uB8 |= 0x80000000;
 }
 
+// Whether fn_80099BA0 passes the emitter: always with a radius over 1000, else unless
+// fn_80007D74 gives 2 for its sphere (vD0 in view space, radius f84).
+u32 fn_80099AE4(PsEmitter* pEmitter, Camera* pCamera) {
+    Vec4 vView;
+    Sphere sphere;
+
+    if (pEmitter->f84 > 1000.0f) {
+        return 1;
+    }
+    fn_800BAD60(pCamera->viewMtx, (Vec4*)pEmitter->vD0, &vView);
+    Vec3Copy(&vView.x, &sphere.x);
+    sphere.radius = pEmitter->f84;
+    return fn_80007D74(&sphere, pCamera, 0) != 2;
+}
+
 void fn_80099B74(PsEmitter* pEmitter) {
     pEmitter->n58 = 0;
     fn_800360D4(pEmitter->mesh);
@@ -74,7 +87,7 @@ void fn_80099B74(PsEmitter* pEmitter) {
 
 // Sort the emitters by their distance from pCamera's lens (fn_80099E34), then fn_80099B74 each
 // one fn_80099AE4 passes (skipping those with flag 0x80000000).
-void fn_80099BA0(void* pCamera) {
+void fn_80099BA0(Camera* pCamera) {
     CamLens* pLens = fn_80008370(pCamera);
     PsEmitter* pEmitter;
 
