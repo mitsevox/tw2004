@@ -1981,7 +1981,7 @@ void fn_8001B878(Character* pChar, int nPlayer) {
 
 // For every character made: bit 0x1000 of u10 cleared; with bit 2, bit 1 follows whether the
 // flagstick is out on the current view. Then fn_80035B40 for every character that is not in state
-// 2 (fn_8001EE90) or whose n1658 is 2, is not the camera's player (fn_800636EC), has none of bits
+// 2 (fn_8001EE90) or whose n1658 is not 2, is not the camera's player (fn_800636EC), has none of bits
 // 0x1000, 0x40 and 1 of u10 set, and has n1698 0.
 void fn_8001BA74(void) {
     int i;
@@ -2002,9 +2002,10 @@ void fn_8001BA74(void) {
             }
         }
         bState = fn_8001EE90(lbl_801B9624[i]) != 2;
-        bDo = bState || fn_8001EE88(lbl_801B9624[i]) == 2;
+        bDo = bState || fn_8001EE88(lbl_801B9624[i]) != 2;
         bDo = bDo && nPlayer != lbl_801B9624[i]->nPlayer;
         bDo = bDo && !(lbl_801B9624[i]->u10 & 0x1041);
+        bDo = bDo != 0;     // fake match: the original turns bDo into 0/1 again (neg; or; srwi)
         if (bDo && lbl_801B9624[i]->n1698 == 0) {
             fn_80035B40(lbl_801B9624[i], 0);
         }
