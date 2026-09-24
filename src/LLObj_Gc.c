@@ -6,6 +6,57 @@
 #include "dynobj.h"
 
 int fn_80007BC4(RenderObj* obj, Camera* cam, float* outDepth, int mode, float scale);
+void fn_80008214(void);
+void fn_80008248(void* p);
+void fn_80007930(UObjModelRoot* pRoot, int nSet);
+
+// Frees a mesh's used parts and table, then its children's, recursively.
+void fn_80007524(UObjMesh* pMesh) {
+    UObjMesh* pChild;
+    int i;
+
+    for (i = 0; i < 4; i++) {
+        if (pMesh->a1C[i]) {
+            fn_80008248(&pMesh->p18[i]);
+        }
+    }
+    if (pMesh->p18 != NULL) {
+        fn_80009E70(pMesh->p18);
+    }
+    pChild = pMesh->p10;
+    for (i = 0; i < pMesh->pInfo->n0; i++) {
+        fn_80007524(pChild);
+        pChild = pChild->p14;
+    }
+}
+
+// Frees a model fn_800073B4 made: its array sets 1-3, its mesh tree and itself.
+void fn_800075CC(UObjModelRoot* pRoot) {
+    int i;
+
+    fn_80008214();
+    for (i = 1; i < 4; i++) {
+        if (pRoot->aSets[i].n30 != -1) {
+            fn_80007930(pRoot, i);
+        }
+    }
+    fn_80007524(pRoot->pMesh);
+    if (pRoot->pE4 != NULL) {
+        fn_80009E70(pRoot->pE4);
+    }
+    fn_80009E70(pRoot);
+}
+
+// Frees array set nSet's arrays (those set 0 has rows for).
+void fn_80007930(UObjModelRoot* pRoot, int nSet) {
+    int i;
+
+    for (i = 0; i < 5; i++) {
+        if (pRoot->aSets[0].an20[i] != 0) {
+            fn_80009E70(pRoot->aSets[nSet].ap0[i]);
+        }
+    }
+}
 
 // Culls a mesh by its bounding sphere scaled by fScale: 3 when it is out of view, 2 when it is
 // wholly in view (mode 0, then mode 1), else 0. fDist and fHalfFovTan are not used.
