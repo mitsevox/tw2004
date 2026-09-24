@@ -593,8 +593,6 @@ void fn_800D477C(int nPlayer, Ball* pBall, u8 bPreview) {
     u8 bLost;
     int j;
     s32 nValue;
-    u8 bHole;
-    u8 bTee;
     u8 bNoBall;
     int nAdj;
     int nHoles;
@@ -707,10 +705,10 @@ void fn_800D477C(int nPlayer, Ball* pBall, u8 bPreview) {
             if (bLost) continue;
             aPrizeIds[nSlot] = lbl_80200538.aShotGoal[i].nId;
             lbl_80200330[nSlot] = nValue;
-            bHole = fn_800D4EF8(lbl_80200538.aShotGoal[i].uMults, 2);
-            bTee = fn_800D4EF8(lbl_80200538.aShotGoal[i].uMults, 1);
             lbl_802003A8[nSlot] = fn_800D6A70(lbl_80200330[nSlot], nPlayer,
-                                              fn_800D4EF8(lbl_80200538.aShotGoal[i].uMults, 0), bTee, bHole,
+                                              fn_800D4EF8(lbl_80200538.aShotGoal[i].uMults, 0),
+                                              fn_800D4EF8(lbl_80200538.aShotGoal[i].uMults, 1),
+                                              fn_800D4EF8(lbl_80200538.aShotGoal[i].uMults, 2),
                                               &lbl_801FFAE8[nSlot]);
             if (fn_800D4EF8(lbl_80200538.aShotGoal[i].uMults, 3)) {
                 lbl_802003A8[nSlot] = fn_800D7220(lbl_802003A8[nSlot], nPlayer, &lbl_801FFAE8[nSlot]);
@@ -748,8 +746,6 @@ void fn_800D4F14(int nPlayer, u8 bPreview) {
     u8 bReplace;
     int j;
     s32 nValue;
-    u8 bHole;
-    u8 bTee;
 
     lbl_80282254 = 0;
     lbl_80282250 = 0;
@@ -871,10 +867,10 @@ void fn_800D4F14(int nPlayer, u8 bPreview) {
             if (bLost) continue;
             aPrizeIds[nSlot] = lbl_80200538.aPuttGoal[i].nId;
             lbl_80200308[nSlot] = nValue;
-            bHole = fn_800D4EF8(lbl_80200538.aPuttGoal[i].uMults, 2);
-            bTee = fn_800D4EF8(lbl_80200538.aPuttGoal[i].uMults, 1);
             lbl_80200380[nSlot] = fn_800D6A70(lbl_80200308[nSlot], nPlayer,
-                                              fn_800D4EF8(lbl_80200538.aPuttGoal[i].uMults, 0), bTee, bHole,
+                                              fn_800D4EF8(lbl_80200538.aPuttGoal[i].uMults, 0),
+                                              fn_800D4EF8(lbl_80200538.aPuttGoal[i].uMults, 1),
+                                              fn_800D4EF8(lbl_80200538.aPuttGoal[i].uMults, 2),
                                               &lbl_801FFAE8[nSlot]);
             if (fn_800D4EF8(lbl_80200538.aPuttGoal[i].uMults, 3)) {
                 lbl_80200380[nSlot] = fn_800D7220(lbl_80200380[nSlot], nPlayer, &lbl_801FFAE8[nSlot]);
@@ -908,8 +904,6 @@ void fn_800D588C(int nPlayer, u8 bPreview, u8 bRoundOver) {
     s32 aAwardIds[10];
     int i;
     s32 nValue;
-    u8 bHole;
-    u8 bTee;
     int nHoles;
     int nNeed;
     u8 bMore;
@@ -1052,10 +1046,10 @@ void fn_800D588C(int nPlayer, u8 bPreview, u8 bRoundOver) {
             if (bLost) continue;
             aPrizeIds[nSlot] = lbl_80200538.aHoleGoal[i].nId;
             lbl_802002E0[nSlot] = nValue;
-            bHole = fn_800D4EF8(lbl_80200538.aHoleGoal[i].uMults, 2);
-            bTee = fn_800D4EF8(lbl_80200538.aHoleGoal[i].uMults, 1);
             lbl_80200358[nSlot] = fn_800D6A70(lbl_802002E0[nSlot], nPlayer,
-                                              fn_800D4EF8(lbl_80200538.aHoleGoal[i].uMults, 0), bTee, bHole,
+                                              fn_800D4EF8(lbl_80200538.aHoleGoal[i].uMults, 0),
+                                              fn_800D4EF8(lbl_80200538.aHoleGoal[i].uMults, 1),
+                                              fn_800D4EF8(lbl_80200538.aHoleGoal[i].uMults, 2),
                                               &lbl_801FFAE8[nSlot]);
             if (fn_800D4EF8(lbl_80200538.aHoleGoal[i].uMults, 3)) {
                 lbl_80200358[nSlot] = fn_800D7220(lbl_80200358[nSlot], nPlayer, &lbl_801FFAE8[nSlot]);
