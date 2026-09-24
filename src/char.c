@@ -102,6 +102,7 @@ void  fn_80029968(CharModel* pModel, SkelPose* pPose);          // Skeleton.c
 void  fn_8000AB40(f32 (*pSrc)[4], f32 (*pDst)[4]);              // UMemPool.c
 void  fn_8001EDA8(Character* pChar, int nBone, f32* pPos);
 void  fn_8001EF54(f32* pA, f32* pB, f32* pOut);
+void  fn_8001EF10(f32* pA, f32* pB, f32* pOut);
 void  fn_80095558(void);
 void  AnimLib_ApplyOverlays(int nSlot);                         // skalib.c
 void  fn_80025478(void);                                        // skalib.c
@@ -1612,6 +1613,43 @@ void fn_8001B58C(CharSkinSet* pSet) {
             lbl_80280E24[i] = NULL;
         }
     }
+}
+
+#define MIN(a, b) ((a) <= (b) ? (a) : (b))
+#define MAX(a, b) ((a) <= (b) ? (b) : (a))
+
+// The character's bounding box and sphere, from its bones' positions (bone 1 on).
+void fn_8001B644(Character* pChar) {
+    f32 vCentre[4];
+    f32 vDiff[4];
+    int i;
+
+    if (pChar->pModel->nBones < 2) {
+        return;
+    }
+    Vec3Copy(pChar->pModel->pMatrices[1][3], pChar->vMin);
+    Vec3Copy(pChar->pModel->pMatrices[1][3], pChar->vMax);
+    for (i = 2; i < pChar->pModel->nBones; i++) {
+        pChar->vMin[0] = MIN(pChar->pModel->pMatrices[i][3][0], pChar->vMin[0]);
+        pChar->vMin[1] = MIN(pChar->pModel->pMatrices[i][3][1], pChar->vMin[1]);
+        pChar->vMin[2] = MIN(pChar->pModel->pMatrices[i][3][2], pChar->vMin[2]);
+        pChar->vMax[0] = MAX(pChar->pModel->pMatrices[i][3][0], pChar->vMax[0]);
+        pChar->vMax[1] = MAX(pChar->pModel->pMatrices[i][3][1], pChar->vMax[1]);
+        pChar->vMax[2] = MAX(pChar->pModel->pMatrices[i][3][2], pChar->vMax[2]);
+    }
+    pChar->vMin[0] -= 0.33f;
+    pChar->vMin[1] -= 0.33f;
+    pChar->vMin[2] -= 0.33f;
+    pChar->vMax[0] += 0.33f;
+    pChar->vMax[1] += 0.33f;
+    pChar->vMax[2] += 0.33f;
+    fn_8001EF54(pChar->vMin, pChar->vMax, vCentre);
+    fn_8001EF34(vCentre, 0.5f, vCentre);
+    pChar->v1668[0] = vCentre[0];
+    pChar->v1668[1] = vCentre[1];
+    pChar->v1668[2] = vCentre[2];
+    fn_8001EF10(pChar->vMax, pChar->vMin, vDiff);
+    pChar->f1674 = (f32)fn_80009680(fn_80009744(vDiff)) / 2.0f;
 }
 
 // How the camera sees the character: n1654 and n1658 are fn_80007D74's answers for its bounding

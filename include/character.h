@@ -467,7 +467,9 @@ typedef struct Character {
     f32   f1664;                // 0x1664  } fn_8001B878: 1 near the camera, fading to 0 from 6 to 15
     f32   v1668[3];             // 0x1668  } its bounding sphere, tested against the camera
     f32   f1674;                // 0x1674  } (fn_8001B878)
-    u8    unk1678[0x1698 - 0x1678];
+    f32   vMin[4];              // 0x1678  } the box around its bones (fn_8001B644), grown by 0.33;
+    f32   vMax[3];              // 0x1688  } v1668 and f1674 are its centre and half its diagonal
+    u8    unk1694[0x1698 - 0x1694];
     s32   n1698;                // 0x1698
     s32   nClubClass;           // 0x169C  the club class for clip lookups (Char_SetClip; 1 looks up as 0)
     s32   nClubHeadBone;        // 0x16A0  bone 0x53's index: the club head (the swing trail's end)
