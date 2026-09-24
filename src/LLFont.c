@@ -166,6 +166,84 @@ f32 fn_80011C90(LLFont* pFont, UFontContext* pCtx, char* sz) {
 
 // ---- end of sweep code ----
 
+// The colour of a text vertex under pCtx's colour gradients, as the four bytes of a GXColor.
+// Unless a gradient is on, it is the colour passed in. Across (n10 bit 1) the position runs
+// fX * fXScale from f04 to f08 and wraps, and the colour blends between the two stops around it;
+// down (bit 2) fY * fYScale wraps the same way and blends a14[4] into a14[5].
+u32 fn_8001208C(UFontContext* pCtx, u8 r, u8 g, u8 b, u8 a, f32 fX, f32 fY, f32 fXScale,
+                f32 fYScale) {
+    GXColor color;
+    UFontStop* pStop;
+    UFontStop* pNext;
+    f32 fU;
+    f32 fV;
+    f32 fT;
+    s32 i;
+
+    fU = fXScale * fX;
+    fV = fYScale * fY;
+    pStop = pCtx->a14;
+    pNext = pStop + 1;
+    fU = pCtx->f0C * (fU - pCtx->f04);
+    fU -= (s32)fU;
+    if (fU < 0.0f) {
+        fU = 1.0f + fU;
+    }
+    fV -= (s32)fV;
+    if (fV < 0.0f) {
+        fV = 1.0f + fV;
+    }
+    if (pCtx->n10 & 1) {
+        for (i = 0; i < 4; i++) {
+            if (fU <= pNext->fPos) {
+                fT = pStop->fInvSpan * (fU - pStop->fPos);
+                if (1.0f == fT) {
+                    r = pNext->color.r;
+                    g = pNext->color.g;
+                    b = pNext->color.b;
+                    a = pNext->color.a;
+                } else if (0.0f == fT) {
+                    r = pStop->color.r;
+                    g = pStop->color.g;
+                    b = pStop->color.b;
+                    a = pStop->color.a;
+                } else {
+                    r = fT * (pNext->color.r - pStop->color.r) + pStop->color.r;
+                    g = fT * (pNext->color.g - pStop->color.g) + pStop->color.g;
+                    b = fT * (pNext->color.b - pStop->color.b) + pStop->color.b;
+                    a = fT * (pNext->color.a - pStop->color.a) + pStop->color.a;
+                }
+                break;
+            }
+            pStop++;
+            pNext++;
+        }
+    }
+    if (pCtx->n10 & 2) {
+        if (1.0f == fV) {
+            r = pCtx->a14[5].color.r;
+            g = pCtx->a14[5].color.g;
+            b = pCtx->a14[5].color.b;
+            a = pCtx->a14[5].color.a;
+        } else if (0.0f == fV) {
+            r = pCtx->a14[4].color.r;
+            g = pCtx->a14[4].color.g;
+            b = pCtx->a14[4].color.b;
+            a = pCtx->a14[4].color.a;
+        } else {
+            r = fV * (pCtx->a14[5].color.r - pCtx->a14[4].color.r) + pCtx->a14[4].color.r;
+            g = fV * (pCtx->a14[5].color.g - pCtx->a14[4].color.g) + pCtx->a14[4].color.g;
+            b = fV * (pCtx->a14[5].color.b - pCtx->a14[4].color.b) + pCtx->a14[4].color.b;
+            a = fV * (pCtx->a14[5].color.a - pCtx->a14[4].color.a) + pCtx->a14[4].color.a;
+        }
+    }
+    color.r = r;
+    color.g = g;
+    color.b = b;
+    color.a = a;
+    return *(u32*)&color; // port: the GXColor's bytes in the PowerPC's (big-endian) order
+}
+
 // ---- sweep code (not yet cleaned up) ----
 
 void GXSetTexCoordGen2();

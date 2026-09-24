@@ -650,15 +650,23 @@ void* fn_800065C8(const char* pName, u32* puSize, int nAlign);
 
 f32  fn_80012C30(char* sz);             // UFont.c: a string's width
 
+// A stop of a text colour gradient (fn_8001208C; UFontStop is our name).
+typedef struct UFontStop {
+    f32     fPos;                 // 0x00  where along the gradient (0..1) this colour is reached
+    GXColor color;                // 0x04
+    f32     fInvSpan;             // 0x08  1 / the distance to the next stop
+} UFontStop;                      // 0x0C
+
 // UFont.c's text settings: how the next string is drawn. Each queued string keeps its own copy
 // (fn_800128F8 copies all 0xD8 bytes), linked through pNext.
 typedef struct UFontContext {
     struct UFontContext* pNext;   // 0x00  the next string queued on the same font
-    f32   f04;                    // 0x04
-    f32   f08;                    // 0x08
+    f32   f04;                    // 0x04  where the first gradient starts
+    f32   f08;                    // 0x08  where it ends
     f32   f0C;                    // 0x0C  1 / (f08 - f04), set by fn_80012E00
-    s32   n10;                    // 0x10
-    u8    pad14[0x60 - 0x14];     // 0x14
+    s32   n10;                    // 0x10  gradients on: 1 the stops in a14[0..4], 2 a14[4] to a14[5]
+    UFontStop a14[6];             // 0x14
+    u8    pad5C[0x60 - 0x5C];     // 0x5C
     s32   n60;                    // 0x60
     s32   n64;                    // 0x64
     s32   n68;                    // 0x68
