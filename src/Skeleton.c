@@ -17,6 +17,8 @@ void fn_80008F20(f32* pQ, f32* pOut);                   // Quaternion.c
 void fn_8001FBA4(f32* pA, f32* pB, f32* pOut, f32 fT);  // a blend of two points by fT
 void fn_800BAD60(f32 mtx[4][4], Vec4* src, Vec4* dst);  // VecMath.c: a point through a matrix
 void fn_80009410(f32 fAngle, f32* pOut);                // Quaternion.c
+void fn_8000A798(f32 (*pSrc)[4], f32 (*pDst)[4]);       // UMemPool.c: inverts a rotation+translation
+void fn_800089D4(f32 (*m)[4], f32* pQ);                 // Quaternion.c: a rotation matrix's quaternion
 void Character_UpdateFeetTerrainInfo(Character* pChar, int bNormals);   // char.c
 void Character_PlaceFeetOnGround(Character* pChar);                     // char.c
 void fn_800BADF8(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);   // pDst = pSrc's rows
@@ -397,6 +399,36 @@ void fn_800279C0(Character* pChar) {
     fn_800BAD60(pModel->pMatrices[nGrip], (Vec4*)pChar->p16D8->a3C[pChar->nClubClass],
                 (Vec4*)pChar->aPoints[4]);
     fn_80026F90(pModel->pSkel, pChain, 0);
+}
+
+// Keeps bone 0x28's place relative to the grip bone (0x52; mirrored in x while bEE is set): its
+// rotation into the skeleton's q107C and its position into v108C.
+void fn_80027D14(Character* pChar) {
+    f32 mInv[4][4];
+    f32 mRel[4][4];
+    f32 mGrip[4][4];
+    f32 mFlip[4][4];
+    CharModel* pModel = pChar->pModel;
+    f32 (*pMtx28)[4];
+    f32 (*pGripMtx)[4];
+
+    if (pModel->pSkel != NULL) {
+        if (lbl_802810A6 == 0) return;
+        pMtx28 = pModel->pMatrices[fn_8001EEE4(pModel, 0x28)];
+        pGripMtx = pModel->pMatrices[fn_8001EED8(pModel, 0x52)];
+        if (pModel->bEE) {
+            fn_8000ADC0(mFlip);
+            mFlip[0][0] = -1.0f;
+            fn_800BADF8(pGripMtx, mFlip, mGrip, 4);
+        } else {
+            fn_8000A0E8(pGripMtx, mGrip);
+        }
+        fn_8000A798(mGrip, mInv);
+        fn_800BADF8(mInv, pMtx28, mRel, 4);
+        fn_800089D4(mRel, pModel->pSkel->q107C);
+        fn_800BAD60(mInv, (Vec4*)pMtx28[3], (Vec4*)pModel->pSkel->v108C);
+        pModel->pSkel->v108C[3] = 0.0f;
+    }
 }
 
 // TW06: SKEL_TranslateIKChainY. Moves the chain's bones up by f, in their poses and matrices.
