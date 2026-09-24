@@ -22,8 +22,6 @@ void GrassPacket_vBeginPacket(GrassWord** ppStart);
 void SD_vSetGrassParamsOnce(f32* pUnused0, f32* pUnused1, f32 (*a2)[4], f32* p8, f32 (*b2)[4],
                             f32 (*a16)[4], f32 fA, f32 fB);
 void SD_vShaderObject_Grass_Static_Render(SD_SShaderObject_Static* pObject);
-CamLens* fn_8001F004(void);
-void fn_800B5918(f32* pSrc, f32* pDst);
 GrassWord* GrassPacket_pGetNextAvailableVertSlot(void);
 void GrassPacket_vSetNewRow(void);
 void GrassPacket_vSetBuffer(GrassWord* pBuffer, int nVerts);

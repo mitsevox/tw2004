@@ -213,7 +213,6 @@ void fn_8009C914(int nView);
 void fn_800A2064(void);
 void fn_800A2E14(void);
 void fn_800A3A84(void);
-void fn_800A4BDC(void);
 void fn_800A4C54(void);
 void fn_800A4E34(void);
 void fn_800A4FD8(void);

@@ -119,7 +119,6 @@ void  fn_8001EFD8(f32* pA, f32* pB, f32* pOut);
 f32 (*fn_8001EC6C(Character* pChar, int nBone))[4];
 f32 (*fn_8001ECA8(Character* pChar, int nBone))[4];
 f32   fn_8001EFFC(CamLens* pLens);
-CamLens* fn_8001F004(void);
 void  fn_80027738(u8 bOn);
 void  fn_80035C58(void);
 void  fn_80035CC0(void);
