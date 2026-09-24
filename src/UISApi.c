@@ -357,7 +357,7 @@ s32 fn_80169858(UIStudio* pStudio, u16 uGroup, u16 uScreen, u16 uPrevGroup, u16 
     u32 nIndex;
     void* pFile;
     UISScreen* pScreen;
-    u8 bFixed;
+    s32 bFixed;
     u8 bOut;
 
     nIndex = fn_8016C6C4(pStudio, uGroup, uScreen);
