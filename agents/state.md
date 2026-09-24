@@ -10,7 +10,10 @@ Stream_ParseBufs, Glows fn_800981D0; closer Skin (1 instruction), hwsRender, AI_
 Held by the owner's PC (closer lanes on local/<name> branches, wins handed over, never pushed to main):
 to ~17:15 CDT hlaudmovie, streammanagerhole, uiProcessInterface; to ~17:45 LLDisp_Gc, LogoTexture,
 GameMode22, GameHoleContests, GoShaderObjectCommon_MorphAnimManager_Gc, UISApi, UISScreen, GoTerrain.
-Branch local/target-link is merged; the session cannot delete remote branches (owner deletes it).
+local/target-link and local/streaming-link (streammanagerhole split in 3, all linked, +8 % data)
+are merged; the owner deletes those branches (the session cannot). The PC's split finder
+(agent/map-05, to ~18:00) surveys unlinked units for EA file boundaries: no cloud splits until it
+reports. Plan: keep 2 cloud lanes (~$35-40/h); size the next round from the survey.
 
 ## Numbers (report.json)
 
