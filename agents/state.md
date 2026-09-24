@@ -6,7 +6,8 @@ Updated 2026-09-24 ~16:00 CDT. RUNNING (cloud, checkpoint 17:00 CDT), quickest w
 
 Held by the owner's PC until ~16:45 CDT (permuters + a closer lane on agent/map-09; hands wins to the
 cloud to apply, never pushes): GoStaticCam, GoShaderObjectCommon_ShaderObjectsData_Gc, UObject,
-TerrainData, GoShaderObject_Rain_Gc, startUp, LLFileIO_Gc, GameMode26, GoDynObj, uiText.
+TerrainData, GoShaderObject_Rain_Gc, startUp, LLFileIO_Gc, GameMode26, GoDynObj, uiText; plus
+(closer agents, from ~16:15) hlaudmovie, streammanagerhole, target, uiProcessInterface.
 
 ## Numbers (report.json)
 

@@ -149,9 +149,15 @@ if Path(".git").is_file():
         capture_output=True, text=True,
     ).stdout.strip()
     _main_build = Path(_common).parent / "build"
-    for _attr, _rel in (("dtk", "tools/dtk.exe"), ("objdiff", "tools/objdiff-cli.exe"),
-                        ("sjiswrap", "tools/sjiswrap.exe"), ("compilers", "compilers"),
-                        ("binutils", "binutils")):
+    if is_windows():
+        _tools = (("dtk", "tools/dtk.exe"), ("objdiff", "tools/objdiff-cli.exe"))
+    else:
+        # Linux/macOS: native dtk and objdiff-cli, and wibo to run the Windows compiler (without
+        # it the worktree downloads wibo into the shared folder while other builds run it)
+        _tools = (("dtk", "tools/dtk"), ("objdiff", "tools/objdiff-cli"), ("wrapper", "tools/wibo"))
+    _tools += (("sjiswrap", "tools/sjiswrap.exe"), ("compilers", "compilers"),
+               ("binutils", "binutils"))
+    for _attr, _rel in _tools:
         if getattr(args, _attr) is None and (_main_build / _rel).exists():
             setattr(args, _attr, _main_build / _rel)
 
