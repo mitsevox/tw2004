@@ -1479,12 +1479,14 @@ void fn_80087E9C(MsgArg* pArgs, MsgArg* pResult) {
 
 void fn_80087ED8(MsgArg* pArgs, MsgArg* pResult) {
     MCCardPos pos;
+    s32 nPlayer;
 
     pos.nPort = pArgs[0].i;
     pos.nSlot = pArgs[1].i;
     pos.n8 = pArgs[2].i;
-    if (lbl_80282278 < 5) {
-        gPlayers[lbl_80282278].swing.bCanSpin = 0;
+    nPlayer = lbl_80282278;
+    if (nPlayer < 5) {
+        gPlayers[nPlayer].swing.bCanSpin = 0;
     }
     pResult->i = fn_800A036C(&pos);
 }
