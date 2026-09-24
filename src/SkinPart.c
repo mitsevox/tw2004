@@ -670,8 +670,7 @@ void fn_800CD944(Skin* pSkin, int nPart) {
     nVariant = fn_800CCD30(pSkin, nPart, 0);
     nOption = fn_800CCD84(pSkin, nPart, 0);
     pDesc = pSkin->pModel->pDesc;
-    if (nVariant < 0) return;
-    if (nOption < 0) return;
+    if (nVariant < 0 || nOption < 0) return;
     fn_800CD844(pSkin, nOption + pDesc->pVariants[nVariant + pDesc->pParts[nPart].nFirst].nFirstOption);
 }
 
@@ -885,8 +884,7 @@ void fn_800CE170(Skin* pSkin, SkinTarget* pTarget) {
     SkinDesc14 entry;
     int i;
 
-    if (pSkin == NULL) return;
-    if (pSkin->pModel == NULL) return;
+    if (pSkin == NULL || pSkin->pModel == NULL) return;
     pDesc = pSkin->pModel->pDesc;
     if (pDesc != NULL) {
         for (i = 0; i < pDesc->n10; i++) {
