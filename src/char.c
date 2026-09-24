@@ -137,6 +137,8 @@ void  fn_800CEE88(u8 b);
 u8    fn_800FCC38(int nPlayer);
 void  fn_8010A668(void* p);
 void  fn_80008380(void);
+void  fn_800106AC(int n);               // LLTexGrp.c
+void  fn_800106B8(u8 b);                // LLTexGrp.c
 void  fn_80035600(void);                // GoTerrain.c
 void  fn_80035604(void);                // GoTerrain.c
 void  fn_800358E0(Character* pChar, u32 uFlags);
@@ -1729,6 +1731,45 @@ void fn_8001CE04(void) {
 
 void fn_8001CE34(void) {
     UStream_UnregisterHandler('CLB ');
+}
+
+// A 'CHR ' object: a character for every player whose golfer has this model and who has none yet
+// (in split screen with the player's own set), dressed from the player's profile, with its body
+// skin and the club skin set's six skins put on the model.
+void fn_8001CE5C(UStreamObject* pObject) {
+    u32 uModel = pObject->uId;
+    int i;
+    int nSet;
+    int nGolferModel;
+    Character* pChar;
+
+    fn_800106B8(1);
+    for (i = 0; i < gSession.nNumPlayers; i++) {
+        nGolferModel = fn_8001C558(i);
+        if (nGolferModel == uModel && gViewSlots[i].pChar == NULL) {
+            fn_800106AC(i);
+            nSet = gSession.nSplitScreen ? i : 0;
+            gViewSlots[i].pChar = fn_8001C21C(fn_8001A9F4(pObject->pData, 0, nSet, uModel,
+                                                          fn_8001C584(i), &gpSaveData[i].choices));
+            if (gViewSlots[i].pChar->pSkin != NULL && fn_8001EC48(gViewSlots[i].pChar)) {
+                fn_8001D4A4(gViewSlots[i].pChar, i);
+            }
+            if (gViewSlots[i].pChar->pSkin != NULL && fn_8001EC48(gViewSlots[i].pChar)) {
+                pChar = gViewSlots[i].pChar;
+                pChar->apSkins[0] = pChar->pSkin;
+                pChar->apSkins[1] = pChar->p16D8->apSkins[0];
+                pChar->apSkins[2] = pChar->p16D8->apSkins[1];
+                pChar->apSkins[3] = pChar->p16D8->apSkins[2];
+                pChar->apSkins[4] = pChar->p16D8->apSkins[3];
+                pChar->apSkins[5] = pChar->p16D8->apSkins[4];
+                pChar->apSkins[6] = pChar->p16D8->apSkins[5];
+                pChar->nSkins = 7;
+                fn_80019798(pChar, pChar->apSkins, pChar->nSkins);
+            }
+        }
+    }
+    fn_800106B8(0);
+    fn_80009E70(pObject);
 }
 
 // The 'CHR ' stream objects: two handlers for the same type.
