@@ -47,6 +47,7 @@ void fn_80091818(void);     // fe_movies.c
 void fn_80091778(void);     // fe_movies.c
 void fn_8000ADC0(f32 (*m)[4]);          // identity matrix
 void fn_800141CC(void);
+s32  fn_800072E0(void);
 void fn_800169AC(void);     // apply lbl_80280E08's viewport
 void fn_80016208(void);
 void fn_80016978(f32 x0, f32 y0, f32 x1, f32 y1);
@@ -696,9 +697,38 @@ void fn_80016198(void) {
     fn_80016208();
 }
 
+// Reset the view's matrices: an orthographic 0..1 projection and an identity view, whose depth
+// scale depends on fn_800072E0.
+void fn_80016208(void) {
+    int n;
+
+    C_MTXOrtho(lbl_80280E08->m0, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f);
+    PSMTXIdentity(lbl_80280E08->m40);
+    n = 1 << fn_800072E0();
+    lbl_80280E08->m40[2][2] = -((f32)n - 1.0f) / (f32)n;
+}
+
 // Draw to the whole screen.
 void fn_80016948(void) {
     fn_80016978(0.0f, 0.0f, 1.0f, 1.0f);
+}
+
+// Work out the viewport in pixels from its corners and the screen size, and its matrix.
+void fn_800169AC(void) {
+    ViewState* pView = lbl_80280E08;
+
+    pView->n70 = pView->fD4 * pView->nE4;
+    pView->n74 = pView->fD8 * pView->nE8;
+    pView->n78 = pView->fDC * pView->nE4;
+    pView->n7C = pView->fE0 * pView->nE8;
+    pView->m40[0][0] = pView->fF4;
+    pView->m40[1][1] = pView->fF8;
+    fn_8000ADC0(pView->m80);
+    pView->m80[3][0] += pView->n70;
+    pView->m80[3][1] += pView->n74;
+    pView->m80[0][0] = pView->n78 * pView->fF4;
+    pView->m80[1][1] = pView->n7C * pView->fF8;
+    pView->m80[2][2] = 0.0f;
 }
 
 // Set the viewport's corners, as fractions of the screen.

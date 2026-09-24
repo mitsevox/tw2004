@@ -390,7 +390,14 @@ extern BufferPool* lbl_80280E00;
 // The view being drawn to (our name; lbl_801B8A98, 0x110 bytes, reached through the pointer
 // lbl_80280E08; the renderer state lbl_801B8980 sits just before it). Only what the code reads.
 typedef struct ViewState {
-    u8   unk0[0xD0];
+    f32  m0[4][4];              // 0x000  the projection (fn_80016208: orthographic 0..1)
+    f32  m40[3][4];             // 0x040  fn_80016208: identity; fn_800169AC sets its scale
+    s32  n70;                   // 0x070  } the viewport in pixels: the corners fD4..fE0 times
+    s32  n74;                   // 0x074  } the screen size nE4/nE8
+    s32  n78;                   // 0x078  }
+    s32  n7C;                   // 0x07C  }
+    f32  m80[4][4];             // 0x080  the viewport's scale and offset (fn_800169AC)
+    u8   unkC0[0xD0 - 0xC0];
     s32  nD0;                   // 0x0D0  set by GoRenderCtx_Gc.c
     f32  fD4;                   // 0x0D4  } the viewport's corners as fractions of the screen
     f32  fD8;                   // 0x0D8  } (fn_80016978; fn_80016948 gives the whole screen:
