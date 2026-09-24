@@ -200,6 +200,71 @@ s32 fn_8009FCFC(MCCardPos* pPos) {
     return nResult;
 }
 
+// Note in the card's MCCardState which replays the save on it holds.
+void fn_800A0868(s32 nPort, s32 nSlot) {
+    MCCardState* pState;
+    s32 nMount;
+    int i;
+
+    pState = fn_8009F834(nPort, nSlot);
+    // EA bug: clears 4 bits, but there are NUM_SAVE_REPLAYS (5) replays
+    fn_8001E938(pState->aReplayUsed, 4);
+    if (nPort >= MC_NUM_PORTS || nSlot >= MC_NUM_SLOTS) return;
+    nMount = fn_8009D74C(nPort, nSlot);
+    if (nMount != 0 && nMount != MC_ERR_MOUNTED) return;
+    if (fn_8009F734(nPort, nSlot) != 0) {
+        if (nMount == 0) {
+            fn_8009DBAC(nPort, nSlot);
+        }
+        return;
+    }
+    if (fn_8009DD44(nPort, nSlot, MC_DIR_NAME) != 0) {
+        if (nMount == 0) {
+            fn_8009DBAC(nPort, nSlot);
+        }
+        return;
+    }
+    if (fn_8009DD94(nPort, nSlot, MC_FILE_NAME, lbl_80281FEC, MC_BUFFER_SIZE) != 0) {
+        if (nMount == 0) {
+            fn_8009DBAC(nPort, nSlot);
+        }
+        return;
+    }
+    if (!fn_800A233C(lbl_80281FEC, &lbl_80281FEC->trailer)) {
+        if (nMount == 0) {
+            fn_8009DBAC(nPort, nSlot);
+        }
+        return;
+    }
+    for (i = 0; i < NUM_SAVE_REPLAYS; i++) {
+        if (lbl_80281FEC->uFlags & MC_SAVE_REPLAY(i)) {
+            fn_8001EA34(pState->aReplayUsed, i);
+        }
+    }
+    if (nMount == 0) {
+        fn_8009DBAC(nPort, nSlot);
+    }
+}
+
+// How many replays the save on the card at pPos holds.
+s32 fn_800A09EC(MCCardPos* pPos) {
+    MCCardState* pState;
+    s32 nPort;
+    s32 nSlot;
+    int i;
+    s32 nCount = 0;
+    nSlot = pPos->nSlot;
+    nPort = pPos->nPort;
+    pState = fn_8009F834(nPort, nSlot);
+    fn_800A0868(nPort, nSlot);
+    for (i = 0; i < NUM_SAVE_REPLAYS; i++) {
+        if (fn_8001E9CC(pState->aReplayUsed, i)) {
+            nCount++;
+        }
+    }
+    return nCount;
+}
+
 // Delete the save file from the card.
 s32 fn_800A0A7C(s32 nPort, s32 nSlot) {
     s32 nMount;
@@ -213,6 +278,37 @@ s32 fn_800A0A7C(s32 nPort, s32 nSlot) {
         fn_8009DBAC(nPort, nSlot);
     }
     return nResult;
+}
+
+// The profile in pImage named szName (any case), or -15. nPort and nSlot are not used.
+s32 fn_800A0B18(s32 nPort, s32 nSlot, const char* szName, SaveImage* pImage) {
+    int i;
+    int bFound;
+    if (szName == NULL) return -15;
+    i = 0;
+    bFound = 0;
+    while (i < NUM_SAVE_PROFILES && !bFound) {
+        if ((pImage->uFlags & MC_SAVE_PROFILE(i)) && stricmp(pImage->aProfile[i].szName, szName) == 0) {
+            bFound = 1;
+        }
+        if (!bFound) {
+            i++;
+        }
+    }
+    if (!bFound) return -15;
+    return i;
+}
+
+// Where to save the profile named szName in pImage: its own slot, else the first free one, else -36.
+s32 fn_800A0BC8(s32 nPort, s32 nSlot, const char* szName, SaveImage* pImage) {
+    s32 nProfile;
+    int i;
+    nProfile = fn_800A0B18(nPort, nSlot, szName, pImage);
+    if (nProfile >= 0) return nProfile;
+    for (i = 0; i < NUM_SAVE_PROFILES; i++) {
+        if (!(pImage->uFlags & MC_SAVE_PROFILE(i))) return i;
+    }
+    return -36;
 }
 
 // Whether the card at pPos holds the save file (one of the file functions in lbl_8018C7D8).
