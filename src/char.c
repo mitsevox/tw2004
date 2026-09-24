@@ -40,7 +40,8 @@ void  fn_80037AB8(Skin* pSkin, CharModel* pModel, int nBone, int nId);   // Skin
 void  fn_800CC4EC(Character* pChar);                // SkinPart.c
 void* CharSlider_CreateDefinitionsFromMem(u8** ppData);
 void  fn_8001B58C(CharSkinSet* pSet);
-void  fn_8001B878(Character* pChar, int n);
+void  fn_8001B878(Character* pChar, int nPlayer);
+f32 (*fn_8001EE64(Character* pChar))[4];                        // bone 1's matrix
 Character* fn_8001C21C(Character* pChar);
 void  Character_UpdateAnimation(Character* pChar, int a, f32 f);
 void  Character_UpdateTestPoints(Character* pChar);
@@ -62,6 +63,7 @@ void  fn_800BBADC(int nValue);         // SitDevFile.c
 void  fn_8001EBD8(Character* pChar, int nBone, f32* pPos);
 u8    fn_8001EC48(Character* pChar);
 f32   fn_8001ED44(Character* pChar, int b);
+f32   fn_8001EE00(Character* pChar, int b);
 void  fn_80017DDC(Character* pChar);
 void  fn_8001899C(Character* pChar, int a, int b);
 void  fn_8001B644(Character* pChar);
@@ -1430,6 +1432,56 @@ void fn_8001B58C(CharSkinSet* pSet) {
     }
 }
 
+// How the camera sees the character: n1654 and n1658 are fn_80007D74's answers for its bounding
+// sphere and for a 3-unit one (2 when it is not the view's player or is too far away), f14 the
+// nearest it has been, f1664 1 up close fading to 0 between 6 and 15 units deep.
+void fn_8001B878(Character* pChar, int nPlayer) {
+    f32 (*pMtx)[4];
+    f32 fDepth;
+    f32 fDist;
+    f32 fLen;
+    Sphere sphere;
+    Vec4 vPos;
+    f32 vDir[4];
+
+    pMtx = fn_8001EE64(pChar);
+    if (nPlayer != 1000 && nPlayer != fn_8001707C(fn_80016D10())) {
+        pChar->n1654 = pChar->n1658 = 2;
+        return;
+    }
+    Vec3Copy(pChar->v1668, &vPos.x);
+    vPos.w = 1.0f;
+    fn_800BAD60(((Camera*)fn_8001614C())->viewMtx, &vPos, &vPos);
+    Vec3Copy(&vPos.x, &sphere.x);
+    sphere.radius = pChar->f1674;
+    fDepth = sphere.z;
+    pChar->n1654 = fn_80007D74(&sphere, fn_8001614C(), 0);
+    sphere.radius = 3.0f;
+    pChar->n1658 = fn_80007D74(&sphere, fn_8001614C(), 0);
+    fn_8001EFB4(pMtx[3], fn_8001F004()->v34, vDir);
+    fDist = fn_8000C5FC(fn_8001F004()->v24, vDir);
+    fLen = (f32)fn_80009680(fn_80009744(vDir));
+    if (fLen < pChar->f14) {
+        pChar->f14 = fLen;
+    }
+    if (fDist > fn_8001ED44(pChar, gSession.nSplitScreen)) {
+        pChar->n1654 = 2;
+    }
+    if (fDist > fn_8001EE00(pChar, gSession.nSplitScreen)) {
+        pChar->n1658 = 2;
+    }
+    fDepth *= fn_8001EFFC(fn_8001F004());
+    if (pChar->n1654 == 2) {
+        pChar->f1664 = 0.0f;
+    } else if (fDepth > 15.0f) {
+        pChar->f1664 = 0.0f;
+    } else if (fDepth < 6.0f) {
+        pChar->f1664 = 1.0f;
+    } else {
+        pChar->f1664 = 1.0f - (fDepth - 6.0f) / 9.0f;
+    }
+}
+
 // For every character made: bit 0x1000 of u10 cleared; with bit 2, bit 1 follows whether the
 // flagstick is out on the current view. Then fn_80035B40 for every character that is not in state
 // 2 (fn_8001EE90) or whose n1658 is 2, is not the camera's player (fn_800636EC), has none of bits
@@ -2644,8 +2696,8 @@ f32 fn_8001EE00(Character* pChar, int b) {
     return pChar->f165C * (1.0f / fn_8001EFFC(fn_8001F004()));
 }
 
-void fn_8001EE64(Character* pChar) {
-    fn_8001ED08(pChar, 1);
+f32 (*fn_8001EE64(Character* pChar))[4] {
+    return fn_8001ED08(pChar, 1);
 }
 
 int fn_8001EE88(Character* pChar) {
