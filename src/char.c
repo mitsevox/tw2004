@@ -3148,3 +3148,56 @@ void fn_8001F08C(void** ppSrc, void** ppDst, SwapField* pFormat, int nFields, in
         } while (--nCount > 0);
     }
 }
+
+// Byte-swaps an animation library in place and links it: the header, the records after it, each
+// record's entries after those, then each entry's data (each start rounded up to 4 bytes).
+// *pnSize gets the library's size.
+MtaLib* fn_8001F110(MtaLib* pLib, s32* pnSize) {
+    SwapField aHeader[10] = {
+        { 16, 1 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 2, 2 }, { 6, 1 },
+        { 4, 4 },
+    };
+    SwapField aRecord[5] = {
+        { 16, 1 }, { 16, 1 }, { 4, 4 }, { 4, 4 }, { 4, 4 },
+    };
+    SwapField aEntry[11] = {
+        { 16, 1 }, { 16, 1 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 },
+        { 4, 4 }, { 8, 4 },
+    };
+    void* pSrc;
+    void* pDst;
+    s32 nOffset;
+    MtaRecord* pRecords;
+    int i;
+    MtaRecord* pRecord;
+    int j;
+
+    pSrc = pDst = pLib;
+    fn_8001F08C(&pSrc, &pDst, aHeader, 10, 1);
+    pRecords = (MtaRecord*)(pLib + 1);
+    pSrc = pDst = pRecords;
+    fn_8001F08C(&pSrc, &pDst, aRecord, 5, pLib->nRecords);
+    pLib->pRecords = pRecords;
+    nOffset = sizeof(MtaLib) + pLib->nRecords * sizeof(MtaRecord);
+    for (i = 0; i < pLib->nRecords; i++) {
+        pRecord = &pLib->pRecords[i];
+        pSrc = pDst = (u8*)pLib + nOffset;
+        fn_8001F08C(&pSrc, &pDst, aEntry, 11, pRecord->nEntries);
+        pRecord->pEntries = (MtaEntry*)((u8*)pLib + nOffset);
+        nOffset += pRecord->nEntries * sizeof(MtaEntry);
+    }
+    for (i = 0; i < pLib->nRecords; i++) {
+        pRecord = &pLib->pRecords[i];
+        for (j = 0; j < pRecord->nEntries; j++) {
+            pRecord->pEntries[j].pData = (u8*)pLib + nOffset;
+            nOffset += pRecord->pEntries[j].nBytes;
+            if (nOffset % 4 != 0) {
+                nOffset += 4 - nOffset % 4;
+            }
+        }
+    }
+    if (pnSize != NULL) {
+        *pnSize = nOffset;
+    }
+    return pLib;
+}

@@ -887,6 +887,35 @@ typedef struct MalBank {
 } MalBank;
 LAYOUT_ASSERT(MalBank, 0x1C);
 
+// An animation library as fn_8001F110 byte-swaps and links it in place (MtaLib, MtaRecord and
+// MtaEntry are our names): a 0x34-byte header, its records, each record's entries, then each
+// entry's data (4-byte aligned).
+typedef struct MtaEntry {
+    u8     unk00[0x24];
+    s32    nBytes;              // 0x24  the bytes of its data
+    u8     unk28[0x3C - 0x28];
+    u8*    pData;               // 0x3C
+    u8     unk40[0x48 - 0x40];
+} MtaEntry;
+LAYOUT_ASSERT(MtaEntry, 0x48);
+
+typedef struct MtaRecord {
+    u8     unk00[0x24];
+    s32    nEntries;            // 0x24
+    MtaEntry* pEntries;         // 0x28
+} MtaRecord;
+LAYOUT_ASSERT(MtaRecord, 0x2C);
+
+typedef struct MtaLib {
+    u8     unk00[0x20];
+    s32    nRecords;            // 0x20
+    u8     unk24[0x30 - 0x24];
+    MtaRecord* pRecords;        // 0x30
+} MtaLib;
+LAYOUT_ASSERT(MtaLib, 0x34);
+
+MtaLib* fn_8001F110(MtaLib* pLib, s32* pnSize);    // char.c: swap and link a library; *pnSize: its bytes
+
 MalBank* fn_8001F760(int nBank);
 void*    fn_8001F79C(MalBank* pBank, int nGroup, int n);
 
