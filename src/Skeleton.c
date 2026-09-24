@@ -586,7 +586,7 @@ f32 fn_80027E8C(CharModel* pModel, IKChain* pChain, f32* pTarget, int bNormals) 
 f32 fn_800280E8(Character* pChar, f32* pTarget, int bNormals) {
     CharModel* pModel = pChar->pModel;
     Skeleton* pSkel = pModel->pSkel;
-    IKChain* pChain = pSkel->pChains;   // EA bug: read before the NULL test below
+    IKChain* pChain = pModel->pSkel->pChains;   // EA bug: read before the NULL test below
     f32 fDrop;
 
     if (pSkel == NULL || lbl_802810A6 == 0) return 0.0f;
@@ -1278,13 +1278,9 @@ void fn_80029EF4(u32* pSrc, u32* pDst, u32 nBits) {
     u32 nWords;
     u32 i;
 
-    if (pDst != NULL) {
-        if (pSrc == NULL) {
-            return;
-        }
-        nWords = (nBits + 31) >> 5;
-        for (i = 0; i < nWords; i++) {
-            pDst[i] = pSrc[i];
-        }
+    if (pDst == NULL || pSrc == NULL) return;
+    nWords = (nBits + 31) >> 5;
+    for (i = 0; i < nWords; i++) {
+        pDst[i] = pSrc[i];
     }
 }
