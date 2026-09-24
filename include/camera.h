@@ -488,6 +488,10 @@ void     CameraScript_RecordCurrentCam(CamShot* pShot, f32* pCam, f32* pSub, int
                                        int a);
 void     CameraScript_InterpToNewScript(CamScript* pScript, CamShot* pShot, int nPlayer, f32* pCam, f32* pSub,
                                         int nA, f32 f1, f32 f2, int nB, f32 f3);
+u8       fn_80043388(CamScript* pScript, CamShot* pShot);
+void     fn_80043C74(CamScript* pScript, f32* pOut, f32* pCam, int nPlayer, CamShot* pShot, f32* pSub, int a);
+void     CamScript_PutBackOnFairway(CamScript* pScript, f32* pOut, f32* pCam, int nPlayer, CamShot* pShot,
+                                    f32* pSub);
 f32      fn_80044EA8(int nPlayer, CamScript* pScript);   // how far the ball's flight has run
 u8       fn_800451A8(CamScript* pScript, CamShot* pShot, int nPlayer);
 void     CameraScript_UpdateLandingEstimate(CamScript* pScript, int nPlayer);
