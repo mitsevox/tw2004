@@ -55,11 +55,13 @@ u32 TibExtCurrentTimeGet(void) {
     s32 nMsec;
     u16 uEpoch;
     u16 uToday;
+    s32 nDays;
 
     fn_8011E020(&nMonth, &nDay, &nYear, &nHour, &nMinute, &nSecond, &nMsec);
     fn_800D2678(&uEpoch, 0, 0, 1970);
     fn_800D2678(&uToday, nMonth, nDay, nYear);
-    return nMinute * 60 + nHour * 3600 + nSecond + (uToday - uEpoch - 1) * 86400;
+    nDays = uToday - uEpoch - 1;
+    return nMinute * 60 + nHour * 3600 + nSecond + 86400 * nDays;
 }
 
 SFIOFuncTable* fn_801221F0(void) {

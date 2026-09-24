@@ -507,7 +507,6 @@ void fn_80123398(s32 nChan, s32 nCmd, s32 nStat) {
 void fn_80123ABC(s32 nChan) {
     u32 uCmd = 0x30000000;
     u32 i;
-    u32* pWord;
 
     if (fn_80122CFC(nChan, &uCmd) == 0) {
         OSReport("GbaSetport: An error occurred to command 'FROMGC_SETPORT' (chan=%d).\n", nChan);
@@ -515,25 +514,22 @@ void fn_80123ABC(s32 nChan) {
         fn_8012408C(0x12);
         return;
     }
-    pWord = (u32*)&lbl_80260E18[nChan].sent;
     for (i = 0; i < sizeof(GbaContext); i += 4) {
-        if (fn_80122CFC(nChan, pWord) == 0) {
+        if (fn_80122CFC(nChan, (u32*)((u8*)&lbl_80260E18[nChan].sent + i)) == 0) {
             OSReport("GbaSetport: An error occurred in writing  the %d(th) part of %d (chan=%d).\n", i + 1,
                      sizeof(GbaContext), nChan);
             lbl_80260E18[nChan].n0 = 0;
             fn_8012408C(0x12);
             return;
         }
-        pWord++;
     }
-    for (i = 0, pWord = (u32*)&lbl_80260E18[nChan].got; i < sizeof(GbaContext); i += 4) {
-        if (fn_80122E68(nChan, pWord) == 0) {
+    for (i = 0; i < sizeof(GbaContext); i += 4) {
+        if (fn_80122E68(nChan, (u32*)((u8*)&lbl_80260E18[nChan].got + i)) == 0) {
             OSReport("GbaSetport: An error occurred in reading (chan=%d).\n", nChan);
             lbl_80260E18[nChan].n0 = 0;
             fn_8012408C(0x12);
             return;
         }
-        pWord++;
     }
     lbl_80260E18[nChan].n0 = 2;
     OSReport("GbaSetPort: Channel %d is connected!\n", nChan);
