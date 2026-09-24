@@ -243,6 +243,7 @@ void fn_80117E98(int nPlayer) {
     u8 bFirst;
     s32 nPlayoff;
     s32 nPick;
+    s32 nRand;
     s32 i;
     PgaEntrantMC* pWinner;
     s32 nFirstPrize;
@@ -255,7 +256,9 @@ void fn_80117E98(int nPlayer) {
     if (fn_8011A6F4(nPlayer, 0)) {
         nWinner = 0;
     } else {
-        nPick = Misc_RandFunc(0) % nPlayoff;
+        // fake match: the pick goes through its own local (orig computes it in r0, then copies it)
+        nRand = Misc_RandFunc(0) % nPlayoff;
+        nPick = nRand;
         for (i = 0; i < nEntrants; i++) {
             if (fn_8011A6F4(nPlayer, i)) {
                 nWinner = i;
