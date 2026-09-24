@@ -448,7 +448,7 @@ void fn_800CA2E4(int nPlayer, AnimLib* pOverlay, AnimLib* pLib) {
                         pRec = &pOverlay->pRecords[*pIndex];
                         pRec->n12 |= 4;
                         nSize = pRec->n18;
-                        if (nSize > lbl_80282230->players[nPlayer].clips[i][nStyle][nClub].nMaxSize) {
+                        if (pRec->n18 > lbl_80282230->players[nPlayer].clips[i][nStyle][nClub].nMaxSize) {
                             if (nSize % 0x800 != 0) {
                                 nSize += 0x800 - nSize % 0x800;
                             }
@@ -501,7 +501,7 @@ void fn_800CA610(int nPlayer, AnimLib* pLib, int nFirst, int nLast, int nStyleFi
                     pRec = &pLib->pRecords[*pIndex];
                     pRec->n12 |= 4;
                     nSize = pRec->n18;
-                    if (nSize > lbl_80282230->players[nPlayer].clips[i][nStyle][nClub].nMaxSize) {
+                    if (pRec->n18 > lbl_80282230->players[nPlayer].clips[i][nStyle][nClub].nMaxSize) {
                         if (nSize % 0x800 != 0) {
                             nSize += 0x800 - nSize % 0x800;
                         }
