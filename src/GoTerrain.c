@@ -1003,7 +1003,6 @@ void fn_80032770(void) {
     u8 bFirst = 1;
     u8 bAny;
     int nClip;
-    Ter_PatchReference** ppHead;
     Ter_PatchReference* pPatch;
     CamLens* pLens;
     f32 fAC;
@@ -1029,8 +1028,7 @@ void fn_80032770(void) {
         fn_80012EF8();
         fn_80014118(0x70);
         for (nClip = 0; nClip <= 2; nClip++) {
-            ppHead = &lbl_801D3CB0.pSortedPatchList[0][3][(u32)nClip];
-            if (*ppHead != NULL) {
+            if (lbl_801D3CB0.pSortedPatchList[0][3][(u32)nClip] != NULL) {
                 switch (nClip) {
                 case 2:
                     fn_80035138(1);
@@ -1043,7 +1041,9 @@ void fn_80032770(void) {
                     break;
                 }
                 fn_80012EF8();
-                for (pPatch = *ppHead; pPatch != NULL; pPatch = pPatch->pNext[3]) {
+                for (pPatch =
+                         lbl_801D3CB0.pSortedPatchList[0][3][(u32)nClip];
+                     pPatch != NULL; pPatch = pPatch->pNext[3]) {
                     if (!gSession.nSplitScreen || !(pPatch->n1C & 8)) {
                         fn_80032B7C(pPatch->pGround, nClip, 3, pPatch->n1C, pPatch->n18, pPatch->n20, &bFirst,
                                     0, 0, pPatch->fDistance,
