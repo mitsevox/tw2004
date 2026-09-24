@@ -125,13 +125,19 @@ GoRenderCtx_Gc.c:
 
 streammanagerhole.c:
 	.text       start:0x800143B8 end:0x80015470
+	.bss        start:0x801A3728 end:0x801A4900
+	.sdata      start:0x80280DF8 end:0x80280E00
 
 Code80015470.c:
 	.text       start:0x80015470 end:0x80016198
+	.bss        start:0x801A4900 end:0x801B8A98
+	.sdata      start:0x80280E00 end:0x80280E08
 	.sdata2     start:0x80282B80 end:0x80282BA0
 
 Code80016198.c:
 	.text       start:0x80016198 end:0x80016CB8
+	.bss        start:0x801B8A98 end:0x801B8BA8
+	.sdata      start:0x80280E08 end:0x80280E10
 	.sdata2     start:0x80282BA0 end:0x80282BB8
 
 ViewController.c:

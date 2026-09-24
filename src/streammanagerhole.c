@@ -13,6 +13,12 @@
 #include "llpict.h"
 #include "unsorted/cull.h"
 
+// Defined here, last address first (CodeWarrior lays out .bss in reverse).
+u8          lbl_801A48C8[0x38];
+StreamLists lbl_801A3728;
+
+StreamLists* lbl_80280DF8 = &lbl_801A3728;
+
 // ---- sweep code (not yet cleaned up) ----
 
 void fn_800143B8();

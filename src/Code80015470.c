@@ -11,6 +11,12 @@
 #include "llpict.h"
 #include "unsorted/cull.h"
 
+// Defined here, last address first (CodeWarrior lays out .bss in reverse).
+RenderState lbl_801B8980;
+BufferPool  lbl_801A4900;
+
+BufferPool* lbl_80280E00 = &lbl_801A4900;
+
 // ---- sweep code (not yet cleaned up) ----
 
 void fn_8000ADC0(f32 (*m)[4]);          // identity matrix

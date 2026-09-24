@@ -11,6 +11,10 @@
 #include "llpict.h"
 #include "unsorted/cull.h"
 
+ViewState lbl_801B8A98;
+
+ViewState* lbl_80280E08 = &lbl_801B8A98;
+
 // ---- sweep code (not yet cleaned up) ----
 
 void fn_8000ADC0(f32 (*m)[4]);          // identity matrix
