@@ -362,11 +362,11 @@ void fn_80065488(CamScript* pScript, int nPath, f32* pCam, f32* pSub, f32* pFov,
     CamShot* pNext;
     CamShot* pAfter;
     CamShot* pShot;
-    f32 fDist;
     f32 fT;
-    f32 fLastT;
-    f32 fLastDist;
     f32 fTarget;
+    f32 fDist;
+    f32 fLastDist;
+    f32 fLastT;
     f32 fFrom;
     f32 fStep;
     f32 fLoT;
