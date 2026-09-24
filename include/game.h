@@ -97,7 +97,7 @@ u8   fn_80058F5C(int nPlayer);          // the per-frame swing poll: the ball wa
 void fn_80058FA4(int nPlayer);          // reset the player's swing
 f32  fn_8005B64C(int nPlayer);          // the swing's shot power
 void GOLFERSTATE_Push(int nState, int nPlayer);     // push a state and run its enter callback
-void GOLFERSTATE_Set(int nState, int nPlayer);      // pop everything and start again from one state
+void GOLFERSTATE_Set(s8 nState, int nPlayer);       // pop everything and start again from one state
 void GOLFERSTATE_Switch(int nState, int nPlayer);   // replace the current state
 // GS_*, or -1. The definition returns the state byte zero-extended (lbzx, Swing.c) and -1 as a full
 // int, so its return type is int. Many callers sign-extend the result, as if their own prototype

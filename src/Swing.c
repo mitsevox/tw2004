@@ -925,7 +925,7 @@ void GOLFERSTATE_Pop(int nPlayer) {
 }
 
 // Pop everything and start again from one state.
-void GOLFERSTATE_Set(int nState, int nPlayer) {
+void GOLFERSTATE_Set(s8 nState, int nPlayer) {
     void (*pfn)(int);
     while (gSwingStacks[nPlayer].nTop > -1) {
         if (sGolferStateEngineTable[(s8)gSwingStacks[nPlayer].nState[gSwingStacks[nPlayer].nTop]].pfnExit !=
