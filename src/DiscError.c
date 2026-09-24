@@ -37,20 +37,20 @@ void fn_800B6924(void) {
 void fn_800B694C(s32 nWidth, s32 nHeight, u32 uSize) {
     int nLeft;
     int nRight;
-    int nRow;
     int n;
     int i;
     u32 uBits;
     u32 u;
     int bDrop;
+    int j;
 
     lbl_8028218C = nWidth;
     lbl_80282188 = nHeight;
     lbl_80282198 = uSize;
-    for (nRow = n = 0; n < 107; nRow += 8, n++) {
+    for (n = 0; n < 107; n++) {
         uBits = 0;
         for (i = 0; i < 8; i++) {
-            uBits |= lbl_8018FFE0[nRow + i];
+            uBits |= lbl_8018FFE0[n * 8 + i];
         }
         if (uBits != 0) {
             u = uBits;
@@ -62,9 +62,9 @@ void fn_800B694C(s32 nWidth, s32 nHeight, u32 uSize) {
                 u >>= 4;
             }
             u = uBits;
-            for (i = 7; i >= 0; i--) {
+            for (j = 7; j >= 0; j--) {
                 if (u & 0xF0000000) {
-                    nLeft = 7 - i;
+                    nLeft = 7 - j;
                     break;
                 }
                 u <<= 4;
