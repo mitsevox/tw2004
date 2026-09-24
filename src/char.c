@@ -362,13 +362,15 @@ f32 Character_GetTerrainHeightAndNormal(Character* pChar, f32* pPos, f32** ppNor
                     return fHigh;
                 }
             } else if (fLow < -60000.0f) {
-                return -65536.125f;
+                goto none;      // fake match: the original puts this return after the low height
             }
             if (pLowSurface->nClass == 0xC || pLowSurface->nClass == 0x12) {
                 return -65536.125f;
             }
             *ppNormal = lbl_801B95D8;
             return fLow;
+        none:
+            return -65536.125f;
         }
         return -65536.125f;
     }
