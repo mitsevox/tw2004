@@ -100,8 +100,8 @@ void  fn_8001DD18(u8* pData, int nBytes);
 void  fn_8001DEC8(u8* pData, int nBytes);
 s32   fn_800CE8C0(Skin** apSkins, int nSkins, SkinListEntry** ppList);   // SkinPart.c
 void  fn_800CEEBC(void);                                        // SkinPart.c: empty
-void  fn_800100B0(TexBank* pBank, TexEntry* p8, TexPalette* pC, void* p10, void* p14, s16 nNumTex,
-                  s16 nNumPalettes);                            // LLTex.c
+void  fn_800100B0(TexBank* pBank, TexEntry* p8, TexPalette* pC, void* p10, void* p14, int nNumTex,
+                  int nNumPalettes);                            // LLTex.c
 void  fn_8001EFD8(f32* pA, f32* pB, f32* pOut);
 f32 (*fn_8001EC6C(Character* pChar, int nBone))[4];
 f32 (*fn_8001ECA8(Character* pChar, int nBone))[4];
@@ -799,15 +799,16 @@ void Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, in
     f32 fThigh;
     f32 fShin;
     f32 fDrop;
-    f32 fDen;
     f32 fSq;
     f32 fCos;
     f32 fAngleA;
     f32 fAngleB;
     f32 fTurn;
+    f32 fTurn2;
+    f32 fTurn3;
+    f32 fDen;
     f32 fDropA;
     f32 fLen;
-    f32 fScale;
     Skeleton* pSkel;
     Bone* pBone;
 
@@ -885,10 +886,10 @@ void Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, in
     }
 
     // the hip: turned by the change in the angle between the thigh and the hip-to-foot line
-    fTurn = fn_8000965C(fShin * fn_800095F0(fAngleA) / fReach) -
-            fn_8000965C(fShin * fn_800095F0(fAngleB) / fLeg);
-    if (fabsf(fTurn) > 0.0001f) {
-        fn_8001EF34(vNormal, fTurn, vAxis);
+    fTurn2 = fn_8000965C(fShin * fn_800095F0(fAngleA) / fReach);
+    fTurn2 -= fn_8000965C(fShin * fn_800095F0(fAngleB) / fLeg);
+    if (fabsf(fTurn2) > 0.0001f) {
+        fn_8001EF34(vNormal, fTurn2, vAxis);
         vAxis[3] = 0.0f;
         Quat_BuildFromVector(vAxis, qTurn);
         Quat_Invert(pChar->pModel->pPoses[nBoneA].q0, qA8);
@@ -912,13 +913,13 @@ void Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, in
     if (fLen < 0.01f) {
         return;
     }
-    fScale = 1.0f / fLen;
-    vAxis[0] *= fScale;
-    vAxis[2] *= fScale;
+    vAxis[0] *= 1.0f / fLen;
+    vAxis[2] *= 1.0f / fLen;
     fCos = vSlope[1];
-    fTurn = fn_80009614((fCos < -1.0f) ? -1.0f : ((fCos > 1.0f) ? 1.0f : fCos)) * fDrop;
-    if (fabsf(fTurn) > 0.0001f) {
-        fn_8001EF34(vAxis, fTurn, vAxis);
+    fTurn3 = fn_80009614((fCos < -1.0f) ? -1.0f : ((fCos > 1.0f) ? 1.0f : fCos));
+    fTurn3 *= fDrop;
+    if (fabsf(fTurn3) > 0.0001f) {
+        fn_8001EF34(vAxis, fTurn3, vAxis);
         Quat_Multiply(q48, q68, q38);
         Quat_Invert(q38, q28);
         vAxis[3] = 0.0f;
