@@ -4582,15 +4582,16 @@ void fn_80083068(MsgArg* pArgs, MsgArg* pResult) {
 // and each opponent playing the player's own golfer gets the next of its four looks.
 void fn_8008311C(MsgArg* pArgs, MsgArg* pResult) {
     int  nChallenge = fn_801021FC() - 1;
-    int  nOpponents = fn_800ED688(nChallenge);
-    int  nMax = 0;
-    int  nHoles = fn_80102134();
-    int  nGolfer;
-    int  nSum;
-    int  nLook;
-    int  i;
-    int  h;
+    s32  nOpponents = fn_800ED688(nChallenge);
+    s32  nMax = 0;
+    s32  nHoles = fn_80102134();
+    s32  nGolfer;
+    s32  nSum;
+    s32  nLook;
+    s32  i;
+    s32  h;
     GolferRecord* pRecord;
+    GolferRecord* pOther;
 
     for (i = 0; i < nOpponents; i++) {
         nGolfer = fn_800ED69C(nChallenge, i);
@@ -4626,7 +4627,8 @@ void fn_8008311C(MsgArg* pArgs, MsgArg* pResult) {
 
     pRecord = fn_80077A80(gSession.nGolfer[lbl_80281ED4->nSlot]);
     for (i = 0; i < nOpponents; i++) {
-        if (pRecord->nModelID == fn_80077A80(fn_800ED69C(nChallenge, i))->nModelID) {
+        pOther = fn_80077A80(fn_800ED69C(nChallenge, i));
+        if (pRecord->nModelID == pOther->nModelID) {
             nLook = gSession.aProfile[lbl_80281ED4->nSlot].n0 + 1;
             if (nLook == 4) {
                 nLook = 0;
