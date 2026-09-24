@@ -47,7 +47,6 @@ void fn_8009198C(int nMode);    // fe_movies.c: update the loading screen
 void fn_80091818(void);     // fe_movies.c
 void fn_80091778(void);     // fe_movies.c
 void fn_8000ADC0(f32 (*m)[4]);          // identity matrix
-void fn_800141CC(void);
 s32  fn_800072E0(void);
 void fn_8000A0E8(f32 (*pSrc)[4], f32 (*pDst)[4]);  // UMemPool.c: copy a 4x4 matrix
 void fn_80016C28(f32* pSrc, f32* pDst);             // negate four floats

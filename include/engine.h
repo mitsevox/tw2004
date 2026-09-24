@@ -354,7 +354,13 @@ typedef struct RenderState {
     s32  nC0;                   // 0x0C0  } width, y, height; the movies give 0, 512, 0, 448)
     s32  nC4;                   // 0x0C4  }
     s32  nC8;                   // 0x0C8  }
-    u8   unkCC[0xFC - 0xCC];
+    u8   unkCC[0xE4 - 0xCC];
+    s32  nE4;                   // 0x0E4  } fn_800140E8's six arguments, bit 0x1000
+    s32  nE8;                   // 0x0E8  }
+    s32  nEC;                   // 0x0EC  }
+    s32  nF0;                   // 0x0F0  }
+    s32  nF4;                   // 0x0F4  }
+    s32  nF8;                   // 0x0F8  }
     s32  nFC;                   // 0x0FC  bit 0x400
     TexBank*  p100;             // 0x100  } the texture of the next draw (fn_8005CC64: the swing
     TexEntry* p104;             // 0x104  } trail's, the logo editor's)
@@ -984,6 +990,7 @@ void fn_80014118(int a);
 // A screen quad (GameEffects' letter boxes, GxUtil.c's alpha clear): fn_800141F8 fills its corners
 // (x0, y0)-(x1, y1), fn_80014194 sets its colour (four floats), fn_8001644C draws it.
 void fn_80014194(f32* pColour);
+void fn_800141CC(void);                 // GoRenderCtx_Gc.c: the default vertex colour
 void fn_800141F8(f32* pXY, f32* pUV, f32 x0, f32 y0, f32 x1, f32 y1);
 void fn_8001425C(int a);
 void fn_8001644C(int a, f32* pXY, f32* pColour, f32* pUV, int c);
