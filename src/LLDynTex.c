@@ -438,6 +438,54 @@ s32 fn_8010B664(DynTexPalette* pPal) {
     return 4;
 }
 
+// Set up GX's texture (and palette) objects of each of pTex's textures in use, first moving
+// their blocks' n8 by the header's n28. Always 1.
+s32 fn_8010BA2C(DynTex* pTex) {
+    int i;
+    DynTexObj* pObj;
+    DynTexPalette* pPal;
+    DynTex40* pTexObj;
+    DynTex18* pTlut;
+    int j;
+
+    if (pTex == NULL) {
+        return 1;
+    }
+    for (i = 0; i < pTex->n8; i++) {
+        DynTexEntry* pEntry = &pTex->p0[i];
+
+        pObj = &pTex->p4->p8[i];
+        pPal = &pTex->p4->pC[i];
+        pTexObj = &pTex->p4->p10[i];
+        pTlut = &pTex->p4->p14[i];
+        if (pEntry->uId == 0) {
+            continue;
+        }
+        for (j = 0; j < pObj->n41; j++) {
+            pObj->aBlocks[j].n8 += (s16)pTex->p4->n28;
+        }
+        if (pObj->n3C == -1) {
+            // fake match: the same wrap tests as below, written another way (82.7% -> 86.6%)
+            GXInitTexObj(&pTexObj->tex, pTex->p4->p18 + pObj->aBlocks[0].nOffset, pObj->n38,
+                         pObj->n3A, pObj->n40, !(pObj->b46 & 1), !((pObj->b46 >> 1) & 1),
+                         pObj->n41 > 1);
+        } else {
+            GXInitTexObjCI(&pTexObj->tex, pTex->p4->p18 + pObj->aBlocks[0].nOffset, pObj->n38,
+                           pObj->n3A, pObj->n40, (pObj->b46 & 1) == 0, (pObj->b46 & 2) == 0, 0,
+                           0);
+            if (pPal != NULL) {
+                GXInitTlutObj(&pTlut->tlut, pTex->p4->p20 + pPal->nOffset, pPal->nFormat,
+                              pPal->nEntries);
+            }
+        }
+        if (pObj->n41 > 1) {
+            GXInitTexObjLOD(&pTexObj->tex, 5, 1, 0.0f, pObj->n41 - 1.0f, -2.0f, 0, 0, 0);
+        }
+        pObj->n3E = i;
+    }
+    return 1;
+}
+
 void fn_8010BC64(u8* p) {
     fn_8000FBAC(*(s32*)(p + 0x4));
 }

@@ -7,6 +7,7 @@
 
 #include "game_types.h"
 #include "platform.h"
+#include "gx.h"
 
 struct Character;
 
@@ -80,7 +81,9 @@ LAYOUT_ASSERT(DynTexEntry, 0x20);
 // Where a pixel block sits in DynTex.p18 (0xC bytes).
 typedef struct DynTexBlock {
     s32   nOffset;              // 0x0
-    u8    unk4[8];
+    u8    unk4[4];
+    s16   n8;                   // 0x8  fn_8010BA2C adds DynTexHeader.n28
+    u8    unkA[2];
 } DynTexBlock;
 LAYOUT_ASSERT(DynTexBlock, 0xC);
 
@@ -90,11 +93,13 @@ typedef struct DynTexObj {
     DynTexBlock aBlocks[4];     // 0x08  DynTexEntry.n8 of them
     u16   n38;                  // 0x38  } its size in pixels, halved per level (fn_8010B6AC)
     u16   n3A;                  // 0x3A  }
-    s16   n3C;                  // 0x3C  set by fn_8010ADA4
-    u8    unk3E[2];
+    s16   n3C;                  // 0x3C  set by fn_8010ADA4; its palette's index, -1 none (fn_8010BA2C)
+    s16   n3E;                  // 0x3E  its own index (fn_8010BA2C)
     s8    n40;                  // 0x40  its pixel format (fn_8010C458)
     s8    n41;                  // 0x41  its levels (fn_8010B754)
-    u8    unk42[0x50 - 0x42];
+    u8    unk42[4];
+    s8    b46;                  // 0x46  bit 0: clamp in S, bit 1: clamp in T (else repeat)
+    u8    unk47[0x50 - 0x47];
 } DynTexObj;
 LAYOUT_ASSERT(DynTexObj, 0x50);
 
@@ -109,11 +114,13 @@ LAYOUT_ASSERT(DynTexPalette, 0xC);
 
 // Per texture: DynTexHeader.p10's and p14's entries (fn_8010ADA4 only moves them).
 typedef struct DynTex40 {
-    u8    unk0[0x40];
+    GXTexObj tex;               // 0x00  fn_8010BA2C sets it up
+    u8    unk20[0x20];
 } DynTex40;
 
 typedef struct DynTex18 {
-    u8    unk0[0x18];
+    GXTlutObj tlut;             // 0x00  fn_8010BA2C sets it up for a palette texture
+    u8    unkC[0xC];
 } DynTex18;
 
 // What DynTex.p4 points at; only what the code reads so far.
