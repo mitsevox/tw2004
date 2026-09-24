@@ -22,12 +22,6 @@ void fn_8006FCD8(void);
 // (mode 1, and mode 2, which keeps a choice for a rolled number of calls while f18 rises then
 // falls by 0.3), bit 1 (mode 3) or bit 0 (modes 0 and 4). Not on course 4's hole 18.
 void fn_8006F650(void) {
-    f32 fSum;
-    f32 fRoll;
-    f32 fMin;
-    f32 fRange;
-    s32 nMax;
-    int i;
     u32 uSeed;
 
     if (gSession.nSplitScreen || (gSession.uFlags & 0x4000)) {
@@ -47,7 +41,14 @@ void fn_8006F650(void) {
             case 4:
                 lbl_802811F0->uFlags |= 1;
                 break;
-            case 2:
+            case 2: {
+                f32 fSum;
+                f32 fRoll;
+                f32 fMin;
+                f32 fRange;
+                s32 nMax;
+                int i;
+
                 if (lbl_802811F0->n10 >= lbl_802811F0->n0C || lbl_802811F0->b14) {
                     fSum = 0.0f;
                     fRoll = Rand_Float(1);
@@ -83,7 +84,12 @@ void fn_8006F650(void) {
                     }
                 }
                 break;
-            case 1:
+            }
+            case 1: {
+                f32 fSum;
+                f32 fRoll;
+                int i;
+
                 fSum = 0.0f;
                 fRoll = Rand_Float(1);
                 for (i = 0; fRoll > fSum; i++) {
@@ -96,6 +102,7 @@ void fn_8006F650(void) {
                 }
                 lbl_802811F0->f18 = 0.75f * Rand_Float(1) + 0.25f;
                 break;
+            }
             case 3:
                 lbl_802811F0->uFlags |= 2;
                 lbl_802811F0->f18 = 0.75f * Rand_Float(1) + 0.25f;

@@ -1096,7 +1096,7 @@ void fn_801686F8(UIStudio* pStudio, u8 bOn, u16 uGroup, u16 uScreen) {
 // -6 (on) or -7 (off), and those of the node that links to it by index. Switching one on first
 // switches off the one fn_8016B6BC finds set. The scripts get nId and pInfo's place in the
 // list p (a count, a word, then file offsets; -1 when not there).
-void fn_80168918(UIStudio* pStudio, u8 bOn, s16 nId, UISNodeInfo* pInfo, s32* p, u16 uScreen, u16 uGroup) {
+void fn_80168918(UIStudio* pStudio, u8 bOn, s32 nId, UISNodeInfo* pInfo, s32* p, u16 uScreen, u16 uGroup) {
     s32 aArgs[2];
     UISScreen* pScreen;
     UISScreenFile* pFile;
@@ -1110,7 +1110,7 @@ void fn_80168918(UIStudio* pStudio, u8 bOn, s16 nId, UISNodeInfo* pInfo, s32* p,
     u32 n;
     s32 i;
     s32 nSlot;
-    s32 nEvent;
+    u16 nEvent;
 
     nSlot = -1;
     nIndex = fn_8016C6C4(pStudio, uGroup, uScreen);

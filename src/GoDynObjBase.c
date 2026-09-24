@@ -10,7 +10,6 @@ void fn_8000ADC0(f32 (*pMtx)[4]);                                           // i
 void fn_8000A194(f32 (*pMtx)[4], f32 a, f32 b, f32 c);  // a rotation matrix from three angles
 void fn_800BADF8(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
 void fn_8000C5A4(f32 (*pMtx)[4]);
-int  fn_8000EA1C(const char* pName, int a, int b, void* pObj);
 int  fn_80049ACC(int nMsg, DynObj* pObj, void* pArg, void* pArg2);
 
 // Set flag 0x04000000 once; the first time, with bNotify, also run fn_800491C4. 1: it was set now.

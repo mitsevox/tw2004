@@ -124,24 +124,24 @@ void fn_80112DA0(void) {
 // with the next one (TexEntry.b47 bit 0) or kind 9, blended over the first and with its material's
 // texture scale and offset. A mesh the override table replaces is drawn from the table's data.
 void fn_80112DD8(s32 nEntry) {
+    int nDraw;
     SkinDesc* pDesc;
     SkinDesc44* pEntry;
-    SkinDesc28* pPasses;
     s32* pMaterials;
-    s32* pMaterial;
+    SkinDesc28* pPasses;
     s16* pFirst;
+    SkinMeshRefs* pRefs;
     s16* pCount;
-    s32* pMesh;
     TexEntry* pTex;
     f32* pUV;
-    SkinMeshRefs* pRefs;
+    s32* pMesh;
     s32 nOverrides;
     void** apOverride;
     int nPasses;
     int nMeshes;
+    s32* pMaterial;
     int nDraws;
     int nPass;
-    int nDraw;
     int nMesh;
     int i;
     s16 anFirst[16];            // the size is not known
@@ -154,15 +154,15 @@ void fn_80112DD8(s32 nEntry) {
     }
     pDesc = pState->pDesc;
     pEntry = &pDesc->p44[nEntry];
-    pPasses = &pDesc->p28[pEntry->nC];
     pMaterials = &pDesc->p20[pEntry->n4];
+    pPasses = &pDesc->p28[pEntry->nC];
     pFirst = &pDesc->pA4[pEntry->n28];
     nDraws = pEntry->n8;
     nPasses = pPasses->n0;
     nOverrides = (pState->pOverride != NULL) ? pState->pOverride->nMeshes : 0;
     apOverride = (pState->pOverride != NULL) ? pState->pOverride->apMesh : NULL;
 
-    for (nPass = 0, pMaterial = pMaterials; nPass < nPasses; nPass++, pMaterial++) {
+    for (nPass = 0, pMaterial = pMaterials; nPass < nPasses; pMaterial++, nPass++) {
         nMeshes = pPasses->a8[0].n1;
         for (i = 0; i < nMeshes; i++) {
             anFirst[i] = pFirst[i];
@@ -223,7 +223,8 @@ void fn_80112DD8(s32 nEntry) {
                         fn_8011368C(&pDesc->p34[nMesh], pRefs, anFirst[i], *pCount);
                     }
                 }
-                anFirst[i] += *pCount++;
+                anFirst[i] += *pCount;
+                pCount++;
             }
             fn_801132C4(pRefs);
         }
@@ -265,9 +266,9 @@ void fn_801132C4(SkinMeshRefs* pRefs) {
     f32* pPosBuf;
     s8* pNormalBuf;
     int n;
-    void* pBuf;
     s32 n10;
     s16* pVerts;
+    void* pBuf;
     void* pTexCoords;
     u16* pIndices;
     u16 nIndex;
@@ -387,22 +388,17 @@ SkinMeshRefs* fn_80113764(void) {
 // the description being drawn (nothing when the part or variant does not exist).
 void fn_80113774(int nPart, int nVariant, int nOption) {
     SkinDesc* pDesc = lbl_80223BB0.pDesc;
-    SkinPartDef* pPart;
-    SkinDesc5C* pOption;
+    int i;
+    int nIndex;
     s32 nCount;
     s32 nFirst;
-    int i;
 
-    if (nPart >= pDesc->nParts) {
+    if (nPart >= pDesc->nParts || nVariant >= pDesc->pParts[nPart].nVariants) {
         return;
     }
-    pPart = &pDesc->pParts[nPart];
-    if (nVariant >= pPart->nVariants) {
-        return;
-    }
-    pOption = &pDesc->p5C[nOption + pDesc->pVariants[nVariant + pPart->nFirst].nFirstOption];
-    nCount = pOption->n0;
-    nFirst = pOption->n4;
+    nIndex = nOption + pDesc->pVariants[nVariant + pDesc->pParts[nPart].nFirst].nFirstOption;
+    nCount = pDesc->p5C[nIndex].n0;
+    nFirst = pDesc->p5C[nIndex].n4;
     for (i = 0; i < nCount; i++) {
         fn_80112DD8(lbl_80223BB0.pDesc->p6C[nFirst + i]);
     }
