@@ -521,7 +521,9 @@ s16 fn_800AFF9C(s16 nVolume) {
     return nDb;
 }
 
-void fn_800B0034(u16 nVoice, u8 nPan, int nMode) {
+// Set a voice's pan (mode 2; hlaudvoice.c also sends mode 3, which does nothing here). bPlaying is
+// not used: the caller passes it to every voice setter.
+void fn_800B0034(u16 nVoice, u8 nPan, int nMode, int bPlaying) {
     Voice* p = &lbl_802820E8[nVoice];
     int bEnabled = OSDisableInterrupts();
     if (nMode == 2) {
