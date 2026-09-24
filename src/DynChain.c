@@ -27,6 +27,21 @@ void fn_80114A84(CharModel* pModel, DynChain* pChain, f32 f);
 void fn_80115348(CharModel* pModel, DynChain* pChain, f32 f);
 void fn_80115B2C(CharModel* pModel, DynChain* pChain, f32 f);
 
+// A direction per chain kind (DynChain.n10), in the model's root space.
+f32 lbl_80193DE8[6][4] = {
+    { 0.0f, 0.0f, -1.0f, 0.0f },
+    { 0.0f, 0.0f, 1.0f, 0.0f },
+    { -1.0f, 0.0f, 0.0f, 0.0f },
+    { 0.0f, 0.0f, -1.0f, 0.0f },
+    { 0.0f, 0.0f, 1.0f, 0.0f },
+    { 1.0f, 0.0f, 0.0f, 0.0f },
+};
+
+// An angle per chain kind, in degrees (fn_80115B2C).
+f32 lbl_80193E48[6] = { 0.0f, 260.0f, 130.0f, 0.0f, 260.0f, 130.0f };
+
+DynChainSettings* lbl_802824F8;
+
 // Make the chains' settings, with their starting values.
 void fn_80113E60(void) {
     lbl_802824F8 = fn_80009B34(sizeof(DynChainSettings), 2, 0, "DynChain.c", 173);
@@ -185,6 +200,31 @@ void fn_801143D0(const f32 (*pMtx)[4], const f32* pIn, f32* pOut) {
     pOut[1] = pIn[2] * pMtx[2][1] + (pIn[0] * pMtx[0][1] + pIn[1] * pMtx[1][1]);
     pOut[2] = pIn[2] * pMtx[2][2] + (pIn[0] * pMtx[0][2] + pIn[1] * pMtx[1][2]);
     pOut[3] = pIn[3];
+}
+
+// Update a chain by fDelta: set it up again first if asked, then the update of its type.
+void fn_8011443C(CharModel* pModel, DynChain* pChain, f32 fDelta) {
+    if (fDelta && pChain != NULL) {
+        if (pChain->bReset) {
+            fn_801141F8(pChain, pModel);
+            pChain->bReset = 0;
+        }
+        if (pChain->nBone == 0xFF || pChain->nBone == -1) {
+            return;
+        }
+        if (pChain->nType == 0) {
+            fn_80114A84(pModel, pChain, fDelta);
+        }
+        if (pChain->nType == 1) {
+            fn_80114540(pModel, pChain, fDelta);
+        }
+        if (pChain->nType == 2) {
+            fn_80115348(pModel, pChain, fDelta);
+        }
+        if (pChain->nType == 3) {
+            fn_80115B2C(pModel, pChain, fDelta);
+        }
+    }
 }
 
 // The type 1 update: the chain's first link hangs from its bone's matrix fLength along the matrix's
@@ -563,8 +603,9 @@ void fn_80115348(CharModel* pModel, DynChain* pChain, f32 fDelta) {
     fn_800BAD60(pModel->pMatrices[0], (Vec4*)lbl_80193DE8[pChain->n10], (Vec4*)vFace);
     vFace[1] = 0.0f;
     vWind[1] = 0.0f;
-    fFacing = 1.0f + fn_8000C5FC(vFace, vWind);
-    fFacing = fFacing / 2.0f * fFaceAmt;
+    fFacing = fn_8000C5FC(vFace, vWind);
+    fFacing = (1.0f + fFacing) / 2.0f;
+    fFacing *= fFaceAmt;
     fSpeedA = (1.0f - lbl_802824F8->f7C) * fFacing + lbl_802824F8->f7C;
     fSizeA = (1.0f - lbl_802824F8->f78) * fFacing + lbl_802824F8->f78;
     if (fStrength < lbl_802824F8->nBC) {
@@ -827,31 +868,6 @@ void fn_80115B2C(CharModel* pModel, DynChain* pChain, f32 fDelta) {
                     }
                 }
             }
-        }
-    }
-}
-
-// Update a chain by fDelta: set it up again first if asked, then the update of its type.
-void fn_8011443C(CharModel* pModel, DynChain* pChain, f32 fDelta) {
-    if (fDelta && pChain != NULL) {
-        if (pChain->bReset) {
-            fn_801141F8(pChain, pModel);
-            pChain->bReset = 0;
-        }
-        if (pChain->nBone == 0xFF || pChain->nBone == -1) {
-            return;
-        }
-        if (pChain->nType == 0) {
-            fn_80114A84(pModel, pChain, fDelta);
-        }
-        if (pChain->nType == 1) {
-            fn_80114540(pModel, pChain, fDelta);
-        }
-        if (pChain->nType == 2) {
-            fn_80115348(pModel, pChain, fDelta);
-        }
-        if (pChain->nType == 3) {
-            fn_80115B2C(pModel, pChain, fDelta);
         }
     }
 }

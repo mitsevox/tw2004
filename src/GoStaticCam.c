@@ -370,8 +370,8 @@ void fn_80065488(CamScript* pScript, int nPath, f32* pCam, f32* pSub, f32* pFov,
     f32 fFrom;
     f32 fStep;
     f32 fLoT;
-    f32 fHiT;
     f32 fHiDist;
+    f32 fHiT;
     int i;
 
     fDist = pScript->fA4;
@@ -436,8 +436,8 @@ void fn_80065488(CamScript* pScript, int nPath, f32* pCam, f32* pSub, f32* pFov,
             fn_800C7480(pPrev->v20, pShot->v20, pNext->v20, pAfter->v20, pPrev->v30, pShot->v30, pNext->v30,
                         pAfter->v30, pCam, pSub, pFov, pShot->f78, pNext->f78, fT);
             fn_80065B20(pCam, vLast, vDiff);
-            i++;
             fDist = fLastDist + (f32)fn_80009680(fn_80009744(vDiff));
+            i++;
         } while (i < 4);
         if (fDist > fTarget) {
             fT = (fT - fLoT) * (1.0f - (fDist - fTarget) / (fDist - fLoDist)) + fLoT;

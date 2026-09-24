@@ -84,14 +84,14 @@ int  fn_800F018C(s32 nEvent);           // the player's own score in it (nEvent 
 // GameModeDriverPGATour.c, as the tour simulation (PGATourSimulation.c) uses it
 void fn_800EF094(int a, s32 n);       // the player's prize: n, at the player's place
 s32  GameModeDriverPGATour_GetNextEvent(void);  // -1 when the season is over
-s32  GameModeDriverPGATour_ComputeFirstPrizeForBracket(s32 i, s32 k);
-s32  GameModeDriverPGATour_ComputePurseForBracket(s32 i, s32 k);
+s32  fn_800EFCC0(s32 i, s32 k);
+s32  fn_800EFCFC(s32 i, s32 k);
 
 // GameModeDriverPGATour.c, as the calendar's event details (EventInfo.c) use it
 s32  GameModeDriverPGATour_GetCourses(Tournament* p, s32* pCourses);
-void GameModeDriverPGATour_GetWinnerEarningsString(s32 i, char* pDst);
+void fn_800EFF7C(s32 i, char* pDst);
 void GameModeDriverPGATour_GetCurrentEventLeader(char* pDst);
-void GameModeDriverPGATour_GetPurseString(s32 i, char* pDst);
+void fn_800F00F8(s32 i, char* pDst);
 void GameModeDriverPGATour_GetUserFinishString(s32 i, char* pDst);
 void GameModeDriverPGATour_GetChamp(s32 i, char* pDst);
 s32  GameModeDriverPGATour_GetChampScore(s32 i);

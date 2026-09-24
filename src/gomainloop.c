@@ -281,7 +281,7 @@ void fn_80124C10(void);
 void AI_TargetsInit(void);
 void BreakLine_Update(int nView);
 void FE_GetBIOMovieName(void);
-void GM_CheckControllerPulled(void);
+void fn_800DFC18(void);
 void GM_Update(void);
 void GR_vInit(void);
 void Luck_ResetAllOdds2(void);
@@ -1054,7 +1054,7 @@ void fn_8006D8E8(void) {
         fn_800954A4(0);
         fn_80013400();
         if (gSession.nGameType == 6) {
-            GM_CheckControllerPulled();
+            fn_800DFC18();
         }
         fn_80090628();
         gSession.fFrameTime = fn_800DAF98(gSession.fFrameTime);
