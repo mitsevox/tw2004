@@ -28,7 +28,6 @@ extern f32 lbl_80283BA4;
 f32 fn_80092210(void);
 void fn_80013E30();
 void fn_80092274(s32 p0);
-s32 fn_800922A0(u8* p);
 
 void fn_80091454(void) {
     lbl_80281370 = 0;
@@ -69,17 +68,31 @@ void fn_80092274(s32 p0) {
     fn_80013E30(*(s32*)((u8*)lbl_80280DF0), p0, lbl_80280DF0);
 }
 
-s32 fn_800922A0(u8* p) {
-    return *(s32*)(p + 0x8);
+TexEntry* fn_800922A0(TexBank* pBank) {
+    return pBank->p8;
 }
 
 // ---- end of sweep code ----
+
+// Load the texture bank from LoadData.c's 'txf2' copy, unless the session has flag 4.
+void fn_80091778(void) {
+    if (gSession.uFlags & 4) return;
+    lbl_80281378 = fn_800107C0(lbl_80281C0C, NULL, 0);
+    lbl_80281F20 = fn_800106C4(lbl_80281378);
+    lbl_80281F24 = fn_800922A0(lbl_80281F20);
+}
 
 // Decodes the picture in the 'load' object, once.
 void fn_800917C8(void) {
     if (lbl_801D8858.p30 == NULL) {
         lbl_801D8858.p30 = fn_8002FD00(lbl_80281C04, lbl_801A25F0.uSize);
     }
+}
+
+// Free the bank fn_80091778 loaded.
+void fn_80091870(void) {
+    if (gSession.uFlags & 4) return;
+    fn_80010544(lbl_80281378);
 }
 
 // The picture's f6C and f70, then 0 and 1.
