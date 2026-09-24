@@ -267,7 +267,7 @@ LAYOUT_ASSERT(UIStudio, 0xBC);
 void fn_80165528(UIStudio* pStudio, u8 b);
 s32* fn_80165670(UIStudio* pStudio, s32* pTop, s32** ppKeep);
 s32 fn_80165ACC(UIStudio* pStudio, u16 uGroup, u16 uScreen);
-void fn_80165B90(s16 nA, s16 nB, UIStudio* pStudio, s32 nType, const UISEventData* pData, s32 nArgs,
+void fn_80165B90(s16 nA, s16 nB, UIStudio* pStudio, s32 nType, UISEventData* pData, s32 nArgs,
                  const s32* pArgs);
 void fn_80165C6C(UISReportFn pfnReport);
 void fn_80165C74(UIStudio* pStudio);
