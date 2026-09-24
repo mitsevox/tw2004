@@ -662,7 +662,9 @@ void fn_80036100(ShaderObject* pObj, const void* pData, int n);    // Skin.c: ha
 // neighbours), skipping NULL ones; fn_8003519C calls a row's pfn8 with data. Rows 0 and 1 hold
 // functions of 0x8006FED4-0x80070FB0 from +0x24 on.
 typedef struct ModuleHooks {
-    u8    unk0[8];
+    void  (*pfn0)(void);          // 0x00  the type's init (row 17: SD_vShaderObject_Grass_Type_Init),
+                                  //       run by fn_80071A54 for rows in use (lbl_801893D8)
+    void  (*pfn4)(void);          // 0x04  its close (..._Grass_Type_Close), fn_80071A90
     void  (*pfn8)(void* pData);   // 0x08
     void  (*pfnC)(void);          // 0x0C  fn_8006E068
     void  (*pfn10)(void);         // 0x10  fn_8006DDE8
@@ -676,6 +678,18 @@ typedef struct ModuleHooks {
 LAYOUT_ASSERT(ModuleHooks, 0x44);
 
 extern ModuleHooks lbl_80188E88[20];
+extern u8 lbl_801893D8[20];         // per row: its pfn0/pfn4 run outside game types 4..8 too
+
+// lbl_80188E78 (our name): one more set of four hooks, run before the rows' (fn_800717AC,
+// fn_800717E8).
+typedef struct HookRow {
+    void  (*pfn0)(void);          // 0x00
+    void  (*pfn4)(void);          // 0x04
+    void  (*pfn8)(void);          // 0x08
+    void  (*pfnC)(void);          // 0x0C
+} HookRow;
+
+extern HookRow lbl_80188E78[1];
 
 // A dynamic rendering buffer (DynamicRenderingBuffer.c; our name, after the header its allocations
 // name, "GoShaderObjectCommon_DynamicRenderingBuffer_Gc.h"): vertices a shader object rewrites every
@@ -747,6 +761,47 @@ typedef struct DynRenderFill {
     const void* pColour;            // 0x10
     const void* pTexCoord;          // 0x14
 } DynRenderFill;
+
+// A scrolling texture animation (GoShaderObjectCommon_TexAnimManager_Gc.c; our names, after
+// fn_80074BE0's). Each frame its texture matrix is moved by the fraction of fU and fV times the
+// clock, snapped to fScale steps of fInv.
+typedef struct TexAnim {
+    f32   fU;                       // 0x00  scroll rate across
+    f32   fV;                       // 0x04  scroll rate down
+    f32   fScale;                   // 0x08  steps per repeat
+    f32   fInv;                     // 0x0C  1 / fScale
+} TexAnim;
+
+// The texture animation manager (lbl_80281EC0; 0x610 bytes, one allocation): up to 32 animations
+// and their 2x4 texture matrices, which GX reads as array 23 (the texture matrix array).
+typedef struct TexAnimManager {
+    TexAnim aAnims[32];             // 0x000
+    f32   aMtx[32][2][4];           // 0x200  the matrix of each animation
+    s32   nAnims;                   // 0x600
+    f32   fTime;                    // 0x604  the clock the matrices were made for
+    u8    unk608[8];
+} TexAnimManager;
+LAYOUT_ASSERT(TexAnimManager, 0x610);
+
+void fn_80076B7C(void);             // make the manager
+void fn_80076BC4(void);             // free it
+void fn_80076C20(f32 fFrame);       // set the clock and move every matrix
+f32  fn_80076E18(void);             // the clock
+void fn_80076E24(void);             // forget every animation
+
+// A shader object that scrolls its texture (GoShaderObject_PrelitUVAnimation_Gc.c, row 5 of
+// lbl_80188E88): a DynRenderObject with its own texture matrix, loaded as matrix 0x39.
+typedef struct PrelitUVObject {
+    u8    unk0[4];
+    DynRenderBuffer* pBuf;          // 0x04
+    f32   (*pMtx)[4];               // 0x08  2x4
+} PrelitUVObject;
+
+// One frame's geometry for a PrelitUVObject, with its scroll.
+typedef struct PrelitUVFill {
+    DynRenderFill fill;             // 0x00
+    TexAnim anim;                   // 0x18
+} PrelitUVFill;
 
 // A render surface (GoRenderSurface.c; our name, after the file): one of five 0x2C-byte slots at
 // lbl_801D3950. A slot whose n0 is not 1 owns a buffer of nSize bytes. Only what the code reads.
