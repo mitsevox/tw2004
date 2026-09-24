@@ -5,12 +5,19 @@
 #include "engine.h"
 #include "rain.h"
 #include "gx.h"
+#include "camera.h"
+#include "terrain.h"
+#include "unsorted/cull.h"
 #include "core/startup.h"
 
+void fn_8000A0E8(f32 (*pSrc)[4], f32 (*pDst)[4]);      // UMemPool.c: copy a 4x4 matrix
+void fn_80070168(void);                                 // calls a display list (see fn_800B4FA4)
 void fn_80012520(u32 ePrim, u32 eFormat, u16 nVerts);  // LLFont.c: GXBegin
 void fn_800124A8(void);                                // LLFont.c: end the primitive
 void fn_800B58B4(s32 p0);
 void fn_800B58C0(f32 farg0, f32 farg1, f32 farg2);
+void fn_800B58D4(f32 farg0, f32 farg1);
+void fn_800B58E4(s32 p0, s32 p1, s32 p2, s32 p3);
 void fn_800B58FC(f32* pA, f32* pOut);
 
 void fn_800B4B5C(void);
@@ -22,6 +29,7 @@ void fn_800B4BFC(void);
 void fn_800B4C00(RainList* pList, int nDrops);
 void SD_vShaderObject_Rain_Dynamic_Init(RainObject* pRain, f32* pStrength);
 void fn_800B4F24(RainObject* pRain);
+void fn_800B4FA4(RainObject* pRain);
 
 void fn_800B4B5C(void) {
     lbl_802814B8->n0 = 0;
@@ -121,10 +129,90 @@ void fn_800B4F24(RainObject* pRain) {
     }
 }
 
-// ---- sweep code (not yet cleaned up) ----
+// Draw a rain object: the drops' display list once at each lit point of the current buffer, then
+// the splash triangles, textured with "splash".
+void fn_800B4FA4(RainObject* pRain) {
+    Vec4 v;
+    f32 mPos[4][4];
+    f32 mView[4][4];
+    Camera* pCamera;
+    RainData* pData;
+    RainPoint* pPoint;
+    RainSplash* pSplash;
+    int nBuf;
+    int nHalf;
+    int i;
+    int j;
+    int k;
+    int nAlpha;
 
-void fn_800B58D4(f32 farg0, f32 farg1);
-void fn_800B58E4(s32 p0, s32 p1, s32 p2, s32 p3);
+    pCamera = fn_8001614C();
+    pData = &pRain->data;
+    nBuf = lbl_802814B8->n0;
+    nHalf = lbl_802814B8->n4;
+    fn_80035118(4, 5);
+    fn_80014118(0x40);
+    fn_80012F50(0, 7, 0);
+    fn_80012F18(3);
+    fn_8005CC64(NULL, NULL);
+    fn_80012EF8();
+    fn_8000A0E8(pCamera->viewMtx, mView);
+    mView[3][0] = mView[3][1] = mView[3][2] = 0.0f;
+    fn_8000A0E8(((Camera*)fn_8001614C())->m15C, mPos);
+    fn_800B58FC(mPos[0], mPos[0]);
+    fn_800B58FC(mPos[2], mPos[2]);
+    for (i = 0; i < 3; i++) {
+        for (j = 0; j < 2; j++) {
+            for (k = 0; k < 3; k++) {
+                pPoint = &pData->apA[nBuf * 2 + nHalf][i * 6 + j * 3 + k];
+                if (pPoint->aColor[3] != 0 || pPoint->a10[3] != 0) {
+                    GXSetArray(11, pPoint->aColor, 4);      // colour 0
+                    v.x = pPoint->vPos[0];
+                    v.y = pPoint->vPos[1];
+                    v.z = pPoint->vPos[2];
+                    v.w = 1.0f;
+                    fn_800BAD60(mView, &v, &v);
+                    mPos[0][3] = -v.x;
+                    mPos[1][3] = v.y;
+                    mPos[2][3] = -v.z;
+                    GXLoadPosMtxImm(mPos, 0);
+                    // port: EA passes the list and its size, which fn_80070168 hands on unread
+                    ((void (*)(void*, u32))fn_80070168)(pData->list.pList, pData->list.uSize);
+                }
+            }
+        }
+    }
+
+    fn_80014118(0x50);
+    fn_8005CC64(lbl_802814B8->pBank, lbl_802814B8->pTex);
+    fn_80012EF8();
+    fn_8000A0E8(((Camera*)fn_8001614C())->m15C, mPos);
+    fn_800B58FC(mPos[0], mPos[0]);
+    fn_800B58FC(mPos[2], mPos[2]);
+    GXLoadPosMtxImm(mPos, 0);
+    GXClearVtxDesc();
+    GXSetVtxDesc(9, 1);         // position, colour, texture coordinates: direct
+    GXSetVtxDesc(11, 1);
+    GXSetVtxDesc(13, 1);
+    GXInvalidateVtxCache();
+    fn_80012520(0x90, 4, RAIN_NUM_SPLASHES * 3);    // triangles
+    for (i = 0; i < RAIN_NUM_SPLASHES; i++) {
+        pSplash = &pData->apB[nBuf][i];
+        nAlpha = 128.0f * pSplash->fAlpha;
+        fn_800B58C0(pSplash->av[0][0], pSplash->av[0][1], pSplash->av[0][2]);
+        fn_800B58E4(0x80, 0x80, 0x80, (u8)nAlpha);
+        fn_800B58D4(0.0f, 0.0f);
+        fn_800B58C0(pSplash->av[1][0], pSplash->av[1][1], pSplash->av[1][2]);
+        fn_800B58E4(0x80, 0x80, 0x80, (u8)nAlpha);
+        fn_800B58D4(0.0f, 1.0f);
+        fn_800B58C0(pSplash->av[2][0], pSplash->av[2][1], pSplash->av[2][2]);
+        fn_800B58E4(0x80, 0x80, 0x80, (u8)nAlpha);
+        fn_800B58D4(1.0f, 0.0f);
+    }
+    fn_800124A8();
+}
+
+// ---- sweep code (not yet cleaned up) ----
 
 void fn_800B58B4(s32 p0) {
     *(volatile u8*)0xCC008000 = p0;
