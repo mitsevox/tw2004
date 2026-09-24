@@ -350,6 +350,8 @@ GoShaderObjectCommon_ShaderObjectsData_Gc.c:
 
 LLVideo.c:
 	.text       start:0x80075280 end:0x80076158
+	.data       start:0x80189470 end:0x80189480
+	.sdata2     start:0x80283A50 end:0x80283A70
 
 ByteSwap.c:
 	.text       start:0x80076158 end:0x800763BC
