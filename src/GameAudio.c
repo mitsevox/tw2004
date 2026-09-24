@@ -1740,7 +1740,8 @@ void fn_800A7664(int nKind, int nMsg, int a) {
             lbl_8028204C = a;
             return;
         }
-        fn_800A7968(lbl_80281419, 0, nKind, nMsg, a);
+        // port: EA passes nKind and nMsg as ints, unmasked, to fn_800A7968's u8 and u16 parameters
+        ((void (*)(u8, u8, int, int, s32))fn_800A7968)(lbl_80281419, 0, nKind, nMsg, a);
         fn_800AD698(lbl_80281419, 0, 1);
     }
 }
