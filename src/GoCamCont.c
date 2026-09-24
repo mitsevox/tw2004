@@ -12,7 +12,7 @@ u8   fn_80063608(int nPlayer, f32* pPos, f32 fMargin);
 u8   fn_800637C4(int nPlayer, int nView);
 void fn_800642A4(View* pView, f32 fF0, f32 fF4);
 void fn_80064478(f32* pA, f32* pB, f32* pOut);
-void fn_800090E4(f32* pQuat, f32* pIn, f32* pOut);      // Quaternion.c: a vector turned by it
+void Quat_RotateVector(f32* pQuat, f32* pIn, f32* pOut);      // Quaternion.c: a vector turned by it
 void fn_80016CD8(int nView);                            // ViewController.c: sets the current view
 void fn_80045824(int n);                                // DepthField.c: turns depth-of-field layer n off
 void fn_800A6070(u8 nPlayer, u8 bLimit);                // GameAudio.c
@@ -621,9 +621,9 @@ void fn_80063F08(f32* pA, f32* pB, f32* pOut) {
         fn_800BAF04(vAxis, vAxis);
     }
     fn_8001EF34(vAxis, fAngle, vAxis);
-    fn_8000923C(vAxis, qTurn);
+    Quat_BuildFromVector(vAxis, qTurn);
     vA[3] = 0.0f;
-    fn_800090E4(qTurn, vA, pOut);
+    Quat_RotateVector(qTurn, vA, pOut);
 }
 
 // The view's v20: the side vector of its flat look direction, turned about that direction by the
@@ -647,9 +647,9 @@ void fn_80064108(View* pView) {
         pView->script.fA8 = 0.0f;
     }
     fn_8001EF34(vDir, pView->script.fA8, vDir);
-    fn_8000923C(vDir, qTurn);
+    Quat_BuildFromVector(vDir, qTurn);
     vSide[3] = 0.0f;
-    fn_800090E4(qTurn, vSide, pView->v20);
+    Quat_RotateVector(qTurn, vSide, pView->v20);
 }
 
 // Shakes the camera: moves its position by up to half of the script's fF4 each way.

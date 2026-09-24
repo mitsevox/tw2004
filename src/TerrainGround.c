@@ -26,9 +26,10 @@
     }
 
 // The ground strips under a quad (four points, x and z), for the shadows: fills pList with runs
-// of their triangles, at most nMax, and returns how many. The same strips as the lookups below
-// count, less those whose surface has a flag in uSkip; each triangle goes in once even when it
-// lies in several cells (its done bit is set while collecting and cleared again at the end).
+// of their triangles and returns how many, at most nMax - 1 (once full, the last entry is
+// overwritten). The same strips as the lookups below count, less those whose surface has a flag
+// in uSkip; each triangle goes in once even when it lies in several cells (its done bit is set
+// while collecting and cleared again at the end).
 int fn_800CB950(CourseInfo* pCourse, f32* pA, f32* pB, f32* pC, f32* pD, TerPolyRef* pList, int nMax,
                 u32 uSkip) {
     f32 fMinZ = 10000.0f;

@@ -34,7 +34,7 @@ void fn_800486C8(f32* pA, f32* pB, f32* pOut);
 void fn_80047290(void);
 void fn_8004731C(u8* pState);
 f32  fn_8004787C(int nPlayer);
-void fn_8000914C(f32* pQ, f32 (*pMtx)[4]);         // Quaternion.c: to a matrix
+void Quat_QuatToMatrix(f32* pQ, f32 (*pMtx)[4]);         // Quaternion.c: to a matrix
 void fn_80047C24(int nPlayer);
 void fn_80048184(int nPlayer);
 int  fn_8001005C(TexBank* pBank, u64 uHash);       // LLTex.c: the texture's index, or 0x80000000
@@ -565,23 +565,23 @@ void fn_8004731C(u8* pState) {
                         60.0f * ((59.94f / 60.0f) * (59.94f * gSession.fFrameTime) * lbl_80283304 /
                                  36.0f),
                         aSpin);
-            fn_8000923C(aSpin, aTurn);
-            fn_80008FCC(gPlayers[i].vOrient, aTurn, aRot);
+            Quat_BuildFromVector(aSpin, aTurn);
+            Quat_Multiply(gPlayers[i].vOrient, aTurn, aRot);
             fn_8001E85C(aRot, gPlayers[i].vOrient);
-            fn_8000914C(aRot, pBall->m0);
+            Quat_QuatToMatrix(aRot, pBall->m0);
             if (pLogoA != NULL) {
-                fn_8000914C(aRot, pLogoA->m0);
+                Quat_QuatToMatrix(aRot, pLogoA->m0);
             }
             if (pLogoB != NULL) {
-                fn_8000914C(aRot, pLogoB->m0);
+                Quat_QuatToMatrix(aRot, pLogoB->m0);
             }
         } else {
-            fn_8000914C(gPlayers[i].vOrient, pBall->m0);
+            Quat_QuatToMatrix(gPlayers[i].vOrient, pBall->m0);
             if (pLogoA != NULL) {
-                fn_8000914C(gPlayers[i].vOrient, pLogoA->m0);
+                Quat_QuatToMatrix(gPlayers[i].vOrient, pLogoA->m0);
             }
             if (pLogoB != NULL) {
-                fn_8000914C(gPlayers[i].vOrient, pLogoB->m0);
+                Quat_QuatToMatrix(gPlayers[i].vOrient, pLogoB->m0);
             }
         }
         fDist = fn_800BB028(fn_8001F004()->m4[3], gPlayers[i].ball.vPos);

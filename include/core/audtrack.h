@@ -294,7 +294,7 @@ typedef struct AudTrackSeq {
     AudSeqEvent* apEvents[8];   // 0x6C   the note playing on each channel
 } AudTrackSeq;
 
-// A playing track (0x8C bytes, from a pool of 32 made by fn_800A98B4).
+// A playing track (0x8C bytes, from a pool of 32 made by Trk_InitModule).
 typedef struct AudTrack {
     UListNode link;             // 0x0    in one of the two track lists (lbl_801F1868)
     AudTrackTmpl* pTmpl;        // 0x8
@@ -494,18 +494,18 @@ extern AudTrack* lbl_802820AC;          // the track whose block is being DMA'd 
 
 // hlaudtrack.c
 void fn_800A9808(AudTrack* pTrack);
-u8   fn_800A98B4(void);
+u8   Trk_InitModule(void);
 u8   fn_800A9A50(u8 a, u8 b);          // fn_800A8DC8's a and b, unused
-void fn_800A9AC4(void);
-void fn_800A9AC8(void);
+void Trk_ExitSession(void);
+void Trk_Cycle(void);
 AudTrack* fn_800A9BC8(AudSource* pSource, AudTrackTmpl* pTmpl, u8 nChannel, f32 fPriority);
-s32  fn_800A9D7C(AudTrack* pTrack);
-void fn_800A9E7C(AudSource* pSource, AudTrack* pTrack, AudTrackTmpl* pTmpl, u8 nChannel, u8 bOn,
+s32  Trk_FreePerf(AudTrack* pTrack);
+void Trk_UpdatePerf(AudSource* pSource, AudTrack* pTrack, AudTrackTmpl* pTmpl, u8 nChannel, u8 bOn,
                  u8 bOff, f32 fPriority);
-void fn_800AA0D8(AudTrack* pTrack);
-void fn_800AA118(AudTrack* pTrack);
-void fn_800AA1B8(AudTrack* pTrack, int bNow);
-u8   fn_800AA2A4(AudTrack* pTrack);
+void Trk_Start(AudTrack* pTrack);
+void Trk_Stop(AudTrack* pTrack);
+void Trk_StopAllVoices(AudTrack* pTrack, int bNow);
+u8   Trk_Tick(AudTrack* pTrack);
 void fn_800AA2EC(AudTrack* pTrack, u8 n, u8 bCheck);
 void fn_800AA30C(AudTrack* pTrack, u8 n);
 void fn_800AA32C(AudTrack* pTrack, u8 n);

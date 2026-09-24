@@ -11,14 +11,14 @@ void fn_80029BC8(f32* pVec);                // GoLighting.c
 void fn_801164D4(f32* pA, f32* pB, f32* pOut);
 void fn_801164F8(f32* pA, f32* pB, f32* pOut);
 void fn_8011651C(f32* pA, f32* pB, f32* pOut);
-void fn_800090E4(f32* pQuat, f32* pIn, f32* pOut);           // Quaternion.c: a vector turned by it
-void fn_800094D8(f32* pQ, f32* pA, f32* pB, f32* pC);        // Quaternion.c: a rotation as angles
+void Quat_RotateVector(f32* pQuat, f32* pIn, f32* pOut);           // Quaternion.c: a vector turned by it
+void Quat_ExtractEulerAngles(f32* pQ, f32* pA, f32* pB, f32* pC);        // Quaternion.c: a rotation as angles
 f32  fn_80055F80(void);                     // Ball.c
 void fn_800561CC(f32* pOut);                // Ball.c: the wind's direction
 void SKEL_TransformBones(CharModel* pModel, u32* auBits);
 f32  fn_80116304(u32 nFrame, f32 fPhase, f32 fStrength);
 f32  fn_80116468(void);
-void fn_8000914C(f32* pQ, f32 (*pMtx)[4]);                                    // Quaternion.c
+void Quat_QuatToMatrix(f32* pQ, f32 (*pMtx)[4]);                                    // Quaternion.c
 void fn_8000ADC0(f32 (*pMtx)[4]);                                             // identity
 void fn_800BAE5C(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);  // VecMath.c
 void fn_80114540(CharModel* pModel, DynChain* pChain, f32 f);
@@ -338,10 +338,10 @@ void fn_80114540(CharModel* pModel, DynChain* pChain, f32 fDelta) {
             vAxis[0] *= fAngle;
             vAxis[1] *= fAngle;
             vAxis[2] *= fAngle;
-            fn_8000923C(vAxis, qTurn);
-            fn_80008FCC(pModel->pPoses[pChain->nBone].q0, qTurn, pModel->pPoses[pChain->nBone].q0);
+            Quat_BuildFromVector(vAxis, qTurn);
+            Quat_Multiply(pModel->pPoses[pChain->nBone].q0, qTurn, pModel->pPoses[pChain->nBone].q0);
         }
-        fn_8000914C(pModel->pPoses[pChain->nBone].q0, mRot);
+        Quat_QuatToMatrix(pModel->pPoses[pChain->nBone].q0, mRot);
         fn_8000ADC0(mScale);
         mScale[0][0] = pModel->a140[pChain->nBone][0];
         mScale[1][1] = pModel->a140[pChain->nBone][1];
@@ -490,12 +490,12 @@ void fn_80114A84(CharModel* pModel, DynChain* pChain, f32 fDelta) {
                     vAxis[0] *= fAngle;
                     vAxis[1] *= fAngle;
                     vAxis[2] *= fAngle;
-                    fn_8000923C(vAxis, qTurn);
-                    fn_80008FCC(pModel->pPoses[pChain->nBone + i].q0, qTurn,
+                    Quat_BuildFromVector(vAxis, qTurn);
+                    Quat_Multiply(pModel->pPoses[pChain->nBone + i].q0, qTurn,
                                 pModel->pPoses[pChain->nBone + i].q0);
                 }
             }
-            fn_8000914C(pModel->pPoses[pChain->nBone + i].q0, mRot);
+            Quat_QuatToMatrix(pModel->pPoses[pChain->nBone + i].q0, mRot);
             fn_8000ADC0(mScale);
             mScale[0][0] = pModel->a140[pChain->nBone + i][0];
             mScale[1][1] = pModel->a140[pChain->nBone + i][1];
@@ -509,7 +509,7 @@ void fn_80114A84(CharModel* pModel, DynChain* pChain, f32 fDelta) {
             if (pChain->nLinks != 4) {
                 fn_8001E85C(pModel->pPoses[pChain->nBone + i - 1].q0, pModel->pPoses[pChain->nBone + i].q0);
             }
-            fn_8000914C(pModel->pPoses[pChain->nBone + i].q0, mRot);
+            Quat_QuatToMatrix(pModel->pPoses[pChain->nBone + i].q0, mRot);
             fn_8000ADC0(mScale);
             mScale[0][0] = pModel->a140[pChain->nBone + i][0];
             mScale[1][1] = pModel->a140[pChain->nBone + i][1];
@@ -657,10 +657,10 @@ void fn_80115348(CharModel* pModel, DynChain* pChain, f32 fDelta) {
             fAngle = 0.0f;
         }
         fn_8000AE28(vAxis1, fAngle, vAxis1);
-        fn_8000923C(vAxis1, qTurn);
+        Quat_BuildFromVector(vAxis1, qTurn);
         fn_8001E85C(pModel->pBones[pChain->pLinks[i].nBone].q0C, pChain->pLinks[i].q44);
         if (lbl_802824F8->an9C[pChain->n10] != 0) {
-            fn_80008FCC(pModel->pBones[pChain->pLinks[i].nBone].q0C, qTurn, qOut);
+            Quat_Multiply(pModel->pBones[pChain->pLinks[i].nBone].q0C, qTurn, qOut);
             fn_8001E85C(qOut, pModel->pBones[pChain->pLinks[i].nBone].q0C);
             fn_8001EA34(auBits, pChain->pLinks[i].nBone);
         }
@@ -702,9 +702,9 @@ void fn_80115348(CharModel* pModel, DynChain* pChain, f32 fDelta) {
             fAngle = 0.0f;
         }
         fn_8000AE28(vAxis2, fAngle, vAxis2);
-        fn_8000923C(vAxis2, qTurn);
+        Quat_BuildFromVector(vAxis2, qTurn);
         if (lbl_802824F8->an9C[pChain->n10] != 0) {
-            fn_80008FCC(pModel->pBones[pChain->pLinks[i].nBone].q0C, qTurn, qOut);
+            Quat_Multiply(pModel->pBones[pChain->pLinks[i].nBone].q0C, qTurn, qOut);
             fn_8001E85C(qOut, pModel->pBones[pChain->pLinks[i].nBone].q0C);
             fn_8001EA34(auBits, pChain->pLinks[i].nBone);
         }
@@ -771,7 +771,7 @@ void fn_80115B2C(CharModel* pModel, DynChain* pChain, f32 fDelta) {
         // Bend down, by how level the link is and how near it points to the kind's direction.
         fn_800BAF04(vBone, vBoneN);
         fLevel = 1.0f - fabsf(vBoneN[1]);
-        fn_800094D8(pModel->pPoses[pChain->pLinks->nParent].q0, &fX, &fY, &fZ);
+        Quat_ExtractEulerAngles(pModel->pPoses[pChain->pLinks->nParent].q0, &fX, &fY, &fZ);
         fOff = fabsf(180.0f / PI * fY - lbl_80193E48[pChain->n10]);
         if (fOff > 360.0f) {
             fOff = (s32)fOff % 360;
@@ -788,8 +788,8 @@ void fn_80115B2C(CharModel* pModel, DynChain* pChain, f32 fDelta) {
         if (0.0f != vAxis[0] || 0.0f != vAxis[1] || 0.0f != vAxis[2]) {
             fn_800BAF04(vAxis, vAxisN);
             fn_8000AE28(vAxisN, DEG(lbl_802824F8->f68) * fLevel, vTurn);
-            fn_8000923C(vTurn, qTurn);
-            fn_800090E4(qTurn, vBone, vNew);
+            Quat_BuildFromVector(vTurn, qTurn);
+            Quat_RotateVector(qTurn, vBone, vNew);
             fn_801164F8(vNew, pModel->pMatrices[pChain->pLinks->nParent][3],
                         pModel->pMatrices[pChain->pLinks->nBone][3]);
 
@@ -852,8 +852,8 @@ void fn_80115B2C(CharModel* pModel, DynChain* pChain, f32 fDelta) {
                                 !(fabsf(vAxis[2]) < 0.001f)) {
                                 fn_800BAF04(vAxis, vAxis);
                                 fn_8000AE28(vAxis, fAngle, vAxis);
-                                fn_8000923C(vAxis, qTurn);
-                                fn_800090E4(qTurn, vDir, vSwung);
+                                Quat_BuildFromVector(vAxis, qTurn);
+                                Quat_RotateVector(qTurn, vDir, vSwung);
                                 fn_801164F8(vSwung, pModel->pMatrices[pChain->pLinks->nParent][3],
                                             pModel->pMatrices[pChain->pLinks->nBone][3]);
                                 fn_80029A90(pModel, pModel->pMatrices[pChain->pLinks->nBone],

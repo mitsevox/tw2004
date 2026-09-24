@@ -84,7 +84,7 @@ void fn_800AD1C8(void) {
             fn_800AD800(pInst->nId, pInst->vPos, NULL, 0);
         }
     }
-    fn_800A9AC8();
+    Trk_Cycle();
     Voc_Cycle();
     fn_800AF320();
     fn_800B0434();

@@ -1,5 +1,5 @@
-// LLPict_Gc.c (EA's name, from its asserts; also in EA's 2002 source tree): not yet decompiled; the
-// sweep code below is the matched small functions.
+// LLPict_Gc.c (EA's name, from its asserts; also in EA's 2002 source tree): all of it is in C; the
+// sweep code below is the matched small functions not yet cleaned up.
 
 #include "llpict.h"
 #include "core/startup.h"
