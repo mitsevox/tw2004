@@ -589,7 +589,7 @@ Clip* fn_80020DD4(u8* p, u32* pu30, u32 nAlign) {
         uPad = 0;
     }
     pClip = (Clip*)(p + uPad);
-    fn_8002091C(pClip);
+    fn_8002091C((Clip*)(p + uPad));  // fake match: the sum passed again, not pClip (register order)
     pClip->pC0 = p;
     p = (u8*)pClip + sizeof(Clip);
     if (pClip->nEvents != 0) {
