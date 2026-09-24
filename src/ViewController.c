@@ -5,9 +5,10 @@
 
 #include "unsorted/cull.h"
 
-static ViewController lbl_801B8BA8[4];
-static int lbl_80281CA0;                    // the current view
-static ViewController* lbl_80281CA4;        // and its controller
+// .bss/.sbss in reverse address order (CodeWarrior lays them out last-defined-first)
+ViewController lbl_801B8BA8[4];
+ViewController* lbl_80281CA4;               // the current view's controller
+int lbl_80281CA0;                           // the current view
 
 s32   fn_80013E40(u8* p);                           // GoRenderCtx_Gc.c
 void  fn_80062E40(View* pView);                     // set up a camera controller

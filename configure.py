@@ -852,7 +852,7 @@ config.libs = [
             Object(NonMatching, "UFont.c"),
             Object(NonMatching, "GoRenderCtx_Gc.c"),
             Object(NonMatching, "streammanagerhole.c"),
-            Object(NonMatching, "ViewController.c"),
+            Object(Matching, "ViewController.c"),
             Object(NonMatching, "char_tex_manager.c"),
             Object(NonMatching, "char.c"),
             Object(NonMatching, "mtalib.c"),
