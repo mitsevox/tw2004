@@ -47,6 +47,21 @@ void fn_800075CC(UObjModelRoot* pRoot) {
     fn_80009E70(pRoot);
 }
 
+// Makes array set nSet a copy of set 0, with its own copy of each array (sizes rounded up to 32).
+void fn_80007824(UObjModelRoot* pRoot, int nSet) {
+    u32 uSize;
+    int i;
+
+    pRoot->aSets[nSet] = pRoot->aSets[0];
+    for (i = 0; i < 5; i++) {
+        if (pRoot->aSets[0].an20[i] != 0) {
+            uSize = (pRoot->aSets[0].an20[i] * 12 + 31) & ~31;
+            pRoot->aSets[nSet].ap0[i] = fn_80009B34(uSize, 2, 32, "LLObj_Gc.c", 473);
+            Mem_cpy(pRoot->aSets[nSet].ap0[i], pRoot->aSets[0].ap0[i], uSize);
+        }
+    }
+}
+
 // Frees array set nSet's arrays (those set 0 has rows for).
 void fn_80007930(UObjModelRoot* pRoot, int nSet) {
     int i;
