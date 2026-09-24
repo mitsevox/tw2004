@@ -253,9 +253,9 @@ void fn_8004A24C(DynObjAnimal* pAnimal, DynObjSetup* pSetup) {
         pCourse = fn_8000C594();
         for (i = 0; i < pAnimal->pRoute->nNodes; i++) {
             vPos[0] = pAnimal->pRoute->aNodes[i].vPos[0];
-            fY = pAnimal->pRoute->aNodes[i].vPos[1];
-            vPos[1] = 10.0f + fY;
+            vPos[1] = 10.0f + pAnimal->pRoute->aNodes[i].vPos[1];
             vPos[2] = pAnimal->pRoute->aNodes[i].vPos[2];
+            fY = pAnimal->pRoute->aNodes[i].vPos[1];
             vPos[3] = 1.0f;
             if (pCourse != NULL) {
                 fGround = fn_8004D620(pCourse, vPos);
