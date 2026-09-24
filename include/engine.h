@@ -1059,6 +1059,13 @@ typedef struct TrailMeshDesc {
     f32*       pUV;             // 0x14
 } TrailMeshDesc;
 
+// A TrailMeshDesc with four more values after it (GoBreakLine.c's line: BreakLine.fAB10, fAB14,
+// fAB18 and 1 / fAB18).
+typedef struct TrailMeshDescEx {
+    TrailMeshDesc desc;         // 0x00
+    f32        af18[4];         // 0x18
+} TrailMeshDescEx;
+
 int  fn_80012FA4(void);                 // controller init
 void fn_80012EF8(void);
 void fn_80012F18(int a);
