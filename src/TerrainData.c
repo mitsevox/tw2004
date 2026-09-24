@@ -178,33 +178,35 @@ u8 fn_8000C278(f32* pA, f32* pB, f32* pC, f32* pD, f32* pOut) {
 
 // The ray from a through b crosses the segment c-d (x and z).
 u8 fn_8000C328(f32* pA, f32* pB, f32* pC, f32* pD) {
-    f32 fDz1;
-    f32 fDx2;
-    f32 fAx;
-    f32 fDx1;
-    f32 fCx;
-    f32 fAz;
-    f32 fCz;
-    f32 fDen;
-    f32 fDz2;
     f32 fT1;
     f32 fT2;
+    f32 fAx;
+    f32 fBx;
+    f32 fCx;
+    f32 fDx;
+    f32 fAz;
+    f32 fBz;
+    f32 fCz;
+    f32 fDz;
+    f32 fDen;
+    f32 fNum;
 
-    fCx = pC[0];
-    fDx2 = pD[0] - fCx;
-    fAz = pA[2];
-    fDz1 = pB[2] - fAz;
     fAx = pA[0];
-    fDx1 = pB[0] - fAx;
+    fBx = pB[0];
+    fBz = pB[2];
+    fCx = pC[0];
+    fAz = pA[2];
     fCz = pC[2];
-    fDz2 = pD[2] - fCz;
-    fDen = fDz2 * fDx1 - fDx2 * fDz1;
-
+    fDx = pD[0];
+    fDz = pD[2];
+    fDen = (fDz - fCz) * (fBx - fAx) - (fDx - fCx) * (fBz - fAz);
     if (0.0f == fDen) {
         return 0;
     }
-    fT1 = (fDx2 * (fAz - fCz) - fDz2 * (fAx - fCx)) / fDen;
-    fT2 = (fDx1 * (fAz - fCz) - fDz1 * (fAx - fCx)) / fDen;
+    fNum = (fDx - fCx) * (fAz - fCz) - (fDz - fCz) * (fAx - fCx);
+    fT1 = fNum / fDen;
+    fNum = (fBx - fAx) * (fAz - fCz) - (fBz - fAz) * (fAx - fCx);
+    fT2 = fNum / fDen;
     if (fT1 < 0.0f) {
         return 0;
     }
