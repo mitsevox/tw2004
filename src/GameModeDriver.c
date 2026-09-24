@@ -588,10 +588,10 @@ s32 fn_80117510(u16 nDate) {
     fn_800D2714(&nCopy, &nMonth, &nDay, &nYear);
     // fake match: the original compares the months unsigned (cmplw); both are 1..12.
     if ((u32)lbl_80223C48.nMonth == nMonth) {
-        return nDay + (lbl_80223C48.nFirstCell - 1);
+        return nDay + (s32)lbl_80223C48.nFirstCell - 1;
     }
     if (fn_801174B8(lbl_80223C48.nMonth, nMonth) && nDay < 35 - lbl_80223C48.nEndCell) {
-        return nDay + (lbl_80223C48.nEndCell - 1);
+        return nDay + (s32)lbl_80223C48.nEndCell - 1;
     }
     if (fn_801174E4(lbl_80223C48.nMonth, nMonth) && nDay > nPrevShown) {
         return (nDay - nPrevShown) - 1;
