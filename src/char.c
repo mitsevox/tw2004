@@ -24,7 +24,7 @@ void  fn_8001A75C(UStreamObject* pObject);
 void  fn_8001A798(void);
 void  fn_8001A7C8(void);
 Character* fn_8001A9F4(u8* pData, int nUnused, int nSet, int nId, u8 bLook, SkinChoices* pChoices);
-void* fn_8001B208(u8* pData);
+CharSkinSet* fn_8001B208(u8* pData);
 Character* fn_8001942C(void);
 void  fn_80072D90(void* pAnim);                                 // animblender.c: reset a player
 s32   fn_800962F8(Character* pChar);                            // CharAnim.c
@@ -173,13 +173,13 @@ void  fn_80112CEC(void);
 // ---- sweep code (not yet cleaned up) ----
 void fn_8001E8A4(u32* aBits, u32 nBits);
 void fn_8001E938(u32* aBits, u32 nBits);
-void fn_8001B1DC(s32 p0, u8* p1, s32 p2);
+void fn_8001B1DC(Skin* pSkin, CharSkinRef* pRef, s32 n);
 void fn_8001B1E8(void* p);
 void fn_8001C650(void* arg0, s32 arg1);
 
-void fn_8001B1DC(s32 p0, u8* p1, s32 p2) {
-    *(s32*)p1 = p2;
-    *(s32*)(p1 + 0x4) = p0;
+void fn_8001B1DC(Skin* pSkin, CharSkinRef* pRef, s32 n) {
+    pRef->n0 = n;
+    pRef->pSkin = pSkin;
 }
 
 void fn_8001B1E8(void* p) {
@@ -1635,6 +1635,71 @@ Character* fn_8001A9F4(u8* pData, int nUnused, int nSet, int nId, u8 bLook, Skin
         fn_80018710(pChar);
     }
     return pChar;
+}
+
+// Makes a club skin set from a 'CLB ' object: per entry its club class, that class's afC, the
+// entry's size and, 4 bytes on, its skin (fn_800377FC); a3C gets the class's club point.
+CharSkinSet* fn_8001B208(u8* pData) {
+    CharSkinSet* pSet;
+    s32 nSize;
+    s32 nClass;
+    int i;
+
+    pSet = fn_80009B34(sizeof(CharSkinSet), 2, 0x40, "char.c", 0xF15);
+    if (pSet == NULL) {
+        return NULL;
+    }
+    pSet->apSkins[0] = NULL;
+    pSet->apSkins[1] = NULL;
+    pSet->apSkins[2] = NULL;
+    pSet->apSkins[3] = NULL;
+    pSet->apSkins[4] = NULL;
+    pSet->apSkins[5] = NULL;
+    fn_80076158(&pData, (u8*)&pSet->nCount, 4, 4);
+    pData += 0xC;
+    for (i = 0; i < pSet->nCount; i++) {
+        fn_80076158(&pData, (u8*)&nClass, 4, 4);
+        fn_80076158(&pData, (u8*)&pSet->afC[nClass], 4, 4);
+        fn_80076158(&pData, (u8*)&nSize, 4, 4);
+        pData += 4;
+        pSet->apSkins[nClass] = fn_800377FC(pData, 0);
+        pSet->a9C[nClass] = fn_80009B34(sizeof(CharSkinRef), 2, 0x40, "char.c", 0xF25);
+        fn_8001B1DC(pSet->apSkins[nClass], pSet->a9C[nClass], sizeof(CharSkinRef));
+        if (nClass == 0 || nClass == 1) {
+            pSet->a3C[nClass][0] = 0.065f;
+            pSet->a3C[nClass][1] = 1.117f;
+            pSet->a3C[nClass][2] = -0.013f;
+            pSet->a3C[nClass][3] = 1.0f;
+        } else if (nClass == 3) {
+            pSet->a3C[nClass][0] = 0.087f;
+            pSet->a3C[nClass][1] = 0.986f;
+            pSet->a3C[nClass][2] = 0.02f;
+            pSet->a3C[nClass][3] = 1.0f;
+        } else if (nClass == 4) {
+            pSet->a3C[nClass][0] = 0.089f;
+            pSet->a3C[nClass][1] = 0.926f;
+            pSet->a3C[nClass][2] = 0.017f;
+            pSet->a3C[nClass][3] = 1.0f;
+        } else if (nClass == 2) {
+            pSet->a3C[nClass][0] = 0.115f;
+            pSet->a3C[nClass][1] = 0.852f;
+            pSet->a3C[nClass][2] = -0.015f;
+            pSet->a3C[nClass][3] = 1.0f;
+        } else if (nClass == 5) {
+            pSet->a3C[nClass][0] = 0.099f;
+            pSet->a3C[nClass][1] = 0.94f;
+            pSet->a3C[nClass][2] = 0.031f;
+            pSet->a3C[nClass][3] = 1.0f;
+        } else {
+            pSet->a3C[nClass][0] = 0.0f;
+            pSet->a3C[nClass][1] = 0.0f;
+            pSet->a3C[nClass][2] = 0.0f;
+            pSet->a3C[nClass][3] = 1.0f;
+        }
+        pData += nSize;
+    }
+    pSet->n0 = 0;
+    return pSet;
 }
 
 // Frees the club skin sets (lbl_80280E24): each one's skins and a9C blocks, then the set. pSet is
