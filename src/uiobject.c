@@ -11,6 +11,10 @@
 #include "game.h"
 #include "golfer.h"
 
+#pragma explicit_zero_data on
+f32        lbl_8018EC10[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+#pragma explicit_zero_data reset
+
 UIObjSettings lbl_801F5B98[2];
 f32        lbl_801F5B78[8];
 LightGroup lbl_801F5B40;

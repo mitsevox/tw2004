@@ -614,6 +614,7 @@ UAudContainers.c:
 uiobject.c:
 	.text       start:0x800AE1F8 end:0x800AF114
 	.rodata     start:0x80183B08 end:0x80183BC8
+	.data       start:0x8018EC10 end:0x8018EC20
 	.bss        start:0x801F5B40 end:0x801F5C08
 	.sdata      start:0x80281470 end:0x80281490
 	.sbss       start:0x802820B8 end:0x802820D8
