@@ -448,7 +448,7 @@ void fn_800E4C20(u8 bHuman);            // the end-of-round screen
 void fn_800E4D88(void);
 void fn_800E4D94(u8 bHuman);            // the end-of-hole screen
 void fn_800E4F88(int nPlayer);
-void fn_800E5240(int i);                // GameMessages.c: a menu screen closes
+void fn_800E5240(int i);                // GameMessages.c: clears slot i of lbl_80202B88
 
 // The display state (GameUI.c's data; GameMessages.c and GameAnalysis.c use some of it). Twelve
 // queues of display items, each with its count; the pump shows the newest item of the first
