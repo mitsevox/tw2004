@@ -1620,6 +1620,7 @@ Character* fn_8001A9F4(u8* pData, int nUnused, int nSet, int nId, u8 bLook, Skin
     u32 uLibFlags;
     u8* pPeek;
     Character* pChar;
+    int i;
     CharModelDefs* pDefs = NULL;
     u8* pStart;
     u8* pCopy;
@@ -1627,7 +1628,6 @@ Character* fn_8001A9F4(u8* pData, int nUnused, int nSet, int nId, u8 bLook, Skin
     Skin* pSkin;
     u8 bGolfer;
     u8 bModel;
-    int i;
 
     pChar = fn_8001942C();
     if (pChar == NULL) {
