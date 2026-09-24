@@ -3030,6 +3030,37 @@ void fn_8007FCE8(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gpSaveData[pArgs[0].i].b70;
 }
 
+// The most rewards any one profile has unlocked, or the cheat codes have, if that is more.
+void fn_8007FD0C(MsgArg* pArgs, MsgArg* pResult) {
+    int i;
+    int j;
+    int nCount;
+    int nMax;
+
+    nMax = 0;
+    for (i = 0; i < 5; i++) {
+        nCount = 0;
+        for (j = 0; j < 18; j++) {
+            if (gpSaveData[i].aRewardUnlocked[j] != 0) {
+                nCount++;
+            }
+        }
+        if (nCount > nMax) {
+            nMax = nCount;
+        }
+    }
+    nCount = 0;
+    for (j = 0; j < 18; j++) {
+        if (lbl_80281DF4->aRewardUnlocked[j] != 0) {
+            nCount++;
+        }
+    }
+    if (nCount > nMax) {
+        nMax = nCount;
+    }
+    pResult->i = nMax;
+}
+
 void fn_8007FEAC(MsgArg* pArgs, MsgArg* pResult) {
     fn_800907AC(pArgs[0].i, ((MsgString*)pArgs[1].p)->pStr);
 }
