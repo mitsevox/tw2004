@@ -8,6 +8,20 @@
 #include "game_types.h"
 #include "platform.h"
 
+struct Character;
+
+// A job for the dynamic textures (0x14 bytes, ten in DynTexState): char.c's fn_80019D64 fills one
+// with a character and two of its functions.
+typedef struct DynTexJob {
+    void* p0;                   // 0x00  the character's a50
+    void (*pfnA)(struct Character* pChar);   // 0x04
+    struct Character* pChar;    // 0x08
+    void (*pfnB)(struct Character* pChar);   // 0x0C
+    u8    bUsed;                // 0x10  set by fn_8010B930; fn_8010B8EC takes a job without it
+    u8    pad11[3];
+} DynTexJob;
+LAYOUT_ASSERT(DynTexJob, 0x14);
+
 // Its state (0xA9C bytes, allocated by fn_8010A448); only what the code reads so far.
 typedef struct DynTexState {
     void* p0;                   // 0x000  a 0x40-byte block allocated with it
@@ -23,8 +37,10 @@ typedef struct DynTexState {
     s32   n97C;                 // 0x97C  and keeps the last one here
     s32   n980;                 // 0x980
     s32   n984;                 // 0x984
-    u8    unk988[0xA84 - 0x988];
-    s32   nA84;                 // 0xA84
+    u8    unk988[0x994 - 0x988];
+    DynTexJob  aJobs[10];       // 0x994
+    DynTexJob* apQueue[10];     // 0xA5C  the jobs fn_8010B930 queued
+    s32   nA84;                 // 0xA84  how many are queued
     u8    unkA88[0xA98 - 0xA88];
     s32   nA98;                 // 0xA98  fn_8010A448's argument
 } DynTexState;
@@ -36,6 +52,9 @@ void  fn_8010BC64(u8* p);
 void  fn_8010BC88(void* p);
 void  fn_8010BEC4(void);
 void  fn_8010BED4(void);
+void  fn_8010A6A8(void* pSrc, void* pDst);   // char.c: from the model in use to the other one
+DynTexJob* fn_8010B8EC(void);           // a free job, or NULL
+void  fn_8010B930(DynTexJob* pJob);     // queue it
 
 // A dynamic texture (made by fn_8010A520, freed by fn_8010A668); only what the code reads so far.
 typedef struct DynTex {

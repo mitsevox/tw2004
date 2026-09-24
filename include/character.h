@@ -688,7 +688,16 @@ extern f32         lbl_80281D1C;
 void* AnimLib_Pick(int nPlayer, AnimLib* pLib, int nGroup, int nStyle, int nClub, int nKey, u32* pFlags,
                    const char* pName);
 void* Char_SetClip(Character* pChar, int nGroup, int nStyle, const char* pName);
-s32   AnimLib_MergeOverlay(u8* pData, int nSlot);   // skalib.c; char.c's 'SAC ' handler
+void* fn_80017678(Character* pChar, int nGroup, int n);   // char.c: a random item of its 'MAL ' bank
+
+// char.c: turning the character, and its dynamic textures (the menu golfer, FEgolferanim.c).
+void  fn_800192D4(Character* pChar, f32 fAngle);
+void  fn_80019D64(Character* pChar, void (*pfnA)(Character* pChar), void (*pfnB)(Character* pChar));
+void  fn_80019DE8(Character* pChar);
+void  fn_80019E80(Character* pChar);
+void  fn_80019EF4(Character* pChar);
+void  fn_8001A0FC(Character* pChar);
+s32  AnimLib_MergeOverlay(u8* pData, int nSlot);   // skalib.c; char.c's 'SAC ' handler
 void  AnimLib_FreeWorkCopies(void);
 void  AnimLib_ReloadSlot(void);
 void* AnimLib_FindByName(AnimLib* pLib, const char* pName);   // a clip by name (NULL: none)
@@ -722,5 +731,8 @@ typedef struct MalBank {
     MalGroup aGroup[3];         // 0x04
 } MalBank;
 LAYOUT_ASSERT(MalBank, 0x1C);
+
+MalBank* fn_8001F760(int nBank);
+void*    fn_8001F79C(MalBank* pBank, int nGroup, int n);
 
 #endif

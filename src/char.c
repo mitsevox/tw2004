@@ -76,6 +76,7 @@ void  fn_800C9FE0(void);
 void  fn_800CCA1C(void);
 void  fn_800CCA3C(void);
 void  fn_800CEE04(Skin* pSkin, int a, int b);
+s32   fn_800CCEA0(Skin* pSkin);         // SkinPart.c: how many choices aSets[3] holds
 void  fn_800CEE88(u8 b);
 u8    fn_800FCC38(int nPlayer);
 void  fn_8010A668(void* p);
@@ -152,6 +153,20 @@ void fn_800175B0(Character* pChar, ClipBlend* pBlend, f32 fStart) {
             }
         }
     }
+}
+
+// A random item of group nGroup of the 'MAL ' bank of the character's slot, or NULL without one.
+void* fn_80017678(Character* pChar, int nGroup, int n) {
+    void* pItem = NULL;
+    int nNum = 0;
+    MalBank* pBank;
+
+    if ((pBank = fn_8001F760(pChar->nSlot)) != NULL) {
+        // port: EA passes fn_8001F780's arguments (with the count's address) to fn_8001F79C, which
+        // takes three: the count's address arrives as its unused n, and n is ignored
+        pItem = ((void* (*)(MalBank*, int, int*, int))fn_8001F79C)(pBank, nGroup, &nNum, n);
+    }
+    return pItem;
 }
 
 // Pick the character's clip for an animation group and style from its animation library, keyed
@@ -305,6 +320,23 @@ void fn_80019CEC(Character* pChar) {
     }
 }
 
+// Queues a dynamic texture job (LLDynTex.c) for the character with its two functions; the pool's
+// last entry points at the character, or at nothing when no job is free.
+void fn_80019D64(Character* pChar, void (*pfnA)(Character* pChar), void (*pfnB)(Character* pChar)) {
+    DynTexJob* pJob = fn_8010B8EC();
+
+    if (pJob != NULL) {
+        lbl_801B95E8.a[6].p = pChar;
+        pJob->pfnA = pfnA;
+        pJob->pChar = pChar;
+        pJob->pfnB = pfnB;
+        pJob->p0 = pChar->a50;
+        fn_8010B930(pJob);
+    } else {
+        lbl_801B95E8.a[6].p = NULL;
+    }
+}
+
 // Sets up the dynamic textures (LLDynTex.c) for the character's model in use.
 void fn_80019DE8(Character* pChar) {
     void* pModel = pChar->a64[pChar->n74];
@@ -312,13 +344,13 @@ void fn_80019DE8(Character* pChar) {
     fn_8008EAC8(0);
     pChar->p60 = pModel;
     fn_8010BC88(pChar->a50);
-    // not exact: the original passes pModel here and to fn_8010BED4, whose definitions take
-    // nothing (FEgolferanim.c calls fn_8010BEC4 with no argument)
-    fn_8010BEC4();
+    // port: EA passes an argument fn_8010BEC4 ignores
+    ((void (*)(void*))fn_8010BEC4)(pModel);
     fn_80019C1C(pChar);
     fn_800CEB1C(pChar->apSkins, pChar->nSkins, pModel);
     fn_800CEBE8(pChar->apSkins, pChar->nSkins, pModel, NULL, 0);
-    fn_8010BED4();
+    // port: EA passes an argument fn_8010BED4 ignores
+    ((void (*)(void*))fn_8010BED4)(pModel);
 }
 
 // Puts the profile's created golfer's logos on the character's model in use.
@@ -328,6 +360,36 @@ void fn_80019E80(Character* pChar) {
     fn_8001744C(pChar, pChar->a64[pChar->n74], &fn_80077ACC()->choices);
     fn_8010BA2C(pChar->a64[pChar->n74]);
     fn_8008EA38(1);
+}
+
+// Sets up the dynamic textures on the character's other model: the model in use is copied to it
+// (fn_8010A6A8) and each skin choice that differs from the skin's current one is put on it.
+void fn_80019EF4(Character* pChar) {
+    void* pModel;
+    Skin* pSkin;
+    int i;
+    int j;
+
+    fn_8008E918(1);
+    pModel = pChar->a64[1 - pChar->n74];
+    fn_8010A6A8(pChar->a64[pChar->n74], pModel);
+    pChar->p60 = pModel;
+    fn_8010BC88(pChar->a50);
+    // port: EA passes an argument fn_8010BEC4 ignores
+    ((void (*)(void*))fn_8010BEC4)(pModel);
+    for (i = 0; i < pChar->nSkins; i++) {
+        pSkin = pChar->apSkins[i];
+        for (j = 0; j < fn_800CCEA0(pSkin); j++) {
+            if (memcmp(&pSkin->aSets[2][j], &pSkin->aSets[3][j], sizeof(SkinChoice)) != 0) {
+                fn_800CECE0(pSkin, j, pSkin->aSets[3][j].nVariant, pSkin->aSets[3][j].nOption, pModel);
+            }
+        }
+    }
+    fn_80019C1C(pChar);
+    fn_800CEB1C(pChar->apSkins, pChar->nSkins, pModel);
+    fn_800CEBE8(pChar->apSkins, pChar->nSkins, pModel, NULL, 0);
+    // port: EA passes an argument fn_8010BED4 ignores
+    ((void (*)(void*))fn_8010BED4)(pModel);
 }
 
 // Once the menu golfer is flagged (fn_8008EAD4): switches the character to its other model and
