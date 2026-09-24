@@ -116,11 +116,11 @@ void fn_801138E8(void);
 void fn_801138EC(s32 p0);
 void fn_801138F8(s32 p0);
 void fn_80113904(s32 p0);
-void fn_80113A7C(void);
-void fn_80113B14(void);
-void fn_80113BAC(void);
+void fn_80113A7C(SkinIter* pIter);
+void fn_80113B14(SkinIter* pIter);
+void fn_80113BAC(SkinIter* pIter);
 void fn_80113E54(SkinIter* pIter, void (**ppfnNext)(SkinIter* pIter));
-void fn_80113E5C(void);
+void fn_80113E5C(SkinIter* pIter);
 
 void fn_8011368C(u8* p0, s32 p1, s32 p2, s32 p3) {
     fn_801136C4(p0, *(s32*)(p0 + 0x0), p1, p2, p3, p1);
@@ -183,8 +183,8 @@ void fn_80113904(s32 p0) {
     *(volatile u16*)0xCC008000 = p0;
 }
 
-void fn_80113A7C(void) {
-    fn_80113E5C();
+void fn_80113A7C(SkinIter* pIter) {
+    fn_80113E5C(pIter);
 }
 
 // ---- end of sweep code ----
@@ -204,8 +204,8 @@ SkinIter* fn_80113A9C(u8* pBuf, SkinIterArgs* pArgs) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_80113B14(void) {
-    fn_80113E5C();
+void fn_80113B14(SkinIter* pIter) {
+    fn_80113E5C(pIter);
 }
 
 // ---- end of sweep code ----
@@ -225,15 +225,15 @@ SkinIter* fn_80113B34(u8* pBuf, SkinIterArgs* pArgs) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_80113BAC(void) {
-    fn_80113E5C();
+void fn_80113BAC(SkinIter* pIter) {
+    fn_80113E5C(pIter);
 }
 
 void fn_80113E54(SkinIter* pIter, void (**ppfnNext)(SkinIter* pIter)) {
     pIter->ppfnNext = ppfnNext;
 }
 
-void fn_80113E5C(void) {
+void fn_80113E5C(SkinIter* pIter) {
 }
 
 // ---- end of sweep code ----

@@ -172,11 +172,13 @@ void vec4flt_CrossProduct(f32* pA, f32* pB, f32* pOut);   // cross product
 typedef struct TexEntry {
     u64  u0;                    // 0x00  its name's hash (fn_8000BEE4; fn_8001005C finds a texture by it)
     u32  uPixels;               // 0x08  where its pixels start in the bank's p18
-    u8   unkC[0x3C - 0xC];
+    s16  nC;                    // 0x0C  GoDynObj.c's fn_80045FC8 copies nC * 16 bytes of its pixels
+    u8   unkE[0x3C - 0xE];
     s16  nPalette;              // 0x3C  its row in the bank's pC
     u8   unk3E[0x40 - 0x3E];
     s8   b40;                   // 0x40  0: char.c fn_8001DD18 decodes the name and pairs the texture
-    u8   unk41[0x47 - 0x41];
+    s8   n41;                   // 0x41  (fn_80045FC8)
+    u8   unk42[0x47 - 0x42];
     u8   b47;                   // 0x47  bit 0: the next texture goes with it (char.c fn_80019798);
                                 //       bit 0x40: byte-swapped (fn_8001DD18)
     u8   unk48[0x50 - 0x48];
@@ -243,6 +245,7 @@ typedef struct LoadObjInfo {
 LAYOUT_ASSERT(LoadObjInfo, 0x24);
 extern LoadObjInfo lbl_801A25F0;
 extern u8* lbl_80281C04;                // the 'load' object's data (147700 bytes)
+extern struct UStreamObject* lbl_80281C0C;   // LoadData.c: a copy of the 'txf2' object with id 10000
 
 void fn_80014544(int n);                // load the numbered stream file (sprintf'd name)
 void fn_800147A4(void);                 // streammanagerhole.c
@@ -284,6 +287,8 @@ typedef struct TexGrpList {
 LAYOUT_ASSERT(TexGrpList, 0x20);
 
 void fn_80010544(int nSlot);            // frees the bank in slot nSlot and empties the slot
+TexBank* fn_800106C4(int nSlot);        // the bank in slot nSlot
+int  fn_800107C0(struct UStreamObject* pObject, TexBank* pBank, int n);   // loads a bank: its slot
 
 // ---- the renderer ----------------------------------------------------------------------------
 

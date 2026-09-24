@@ -59,6 +59,24 @@ typedef struct SkelPose {
 } SkelPose;
 LAYOUT_ASSERT(SkelPose, 0x1040);
 
+// A format 1 pose buffer (0x114C bytes; animblender.c copies it whole): three blocks from 0x4, each
+// starting with a bit per morph (20: fn_80072ACC clears them all; CharSliders.c clears morph
+// m's in every block with fn_800736D8).
+// fn_80071C28 sets each block's bits and its 20 floats, and clears the SkelPose's first bit arrays.
+typedef struct SkelPoseBlock {
+    u32  aBits[1];              // 0x00
+    u8   unk4[4];
+    f32  af8[20];               // 0x08  one per morph, 0 when the buffer is taken (fn_80071C28)
+} SkelPoseBlock;
+LAYOUT_ASSERT(SkelPoseBlock, 0x58);
+
+typedef struct SkelPose1 {
+    u8   unk0[4];
+    SkelPoseBlock aBlocks[3];   // 0x004
+    SkelPose pose;              // 0x10C  as a format 0 buffer
+} SkelPose1;
+LAYOUT_ASSERT(SkelPose1, 0x114C);
+
 // A character's skeleton data (CharModel.pSkel; the SKEL_ functions take it): its IK chains and
 // how strongly their solution is applied (the IK weight, 0..1); only what the code reads.
 typedef struct Skeleton {
@@ -91,7 +109,8 @@ typedef struct Skeleton {
 // A bone of a character's model (CharModel.pBones).
 typedef struct Bone {
     u64  uId;                   // 0x00  fn_800298F4 finds a bone by it
-    u8   unk8[4];
+    s8   nParent;               // 0x08  its parent bone (fn_80114270 walks a chain down by it)
+    u8   unk9[3];
     f32  q0C[4];                // 0x0C  a rotation (quaternion)
     f32  v1C[4];                // 0x1C  a position (the root bone's is the character's,
                                 //       Character_SetPosition)
@@ -133,6 +152,37 @@ typedef struct CharModel {
     f32     (*p768)[4][4];      // 0x768  }
     s32       n76C;             // 0x76C  matrices in p768
 } CharModel;
+
+// DynChain.c (EA's name; our type names): a chain of bones that swings on its own, from a bone
+// down through its children (fn_80114270).
+typedef struct DynChainLink {
+    f32  fLength;               // 0x00  to its parent bone in the rest pose (0.5 unless type 0)
+    f32  v04[4];                // 0x04  its matrix's position when set up
+    u8   unk14[0x24 - 0x14];
+    f32  v24[4];                // 0x24  set by fn_80029BC8
+    u8   unk34[0x44 - 0x34];
+    f32  q44[4];                // 0x44  } its rest pose's rotation, twice
+    f32  q54[4];                // 0x54  }
+    f32  v64[4];                // 0x64  } and position, twice
+    f32  v74[4];                // 0x74  }
+    s32  nBone;                 // 0x84
+    s32  nParent;               // 0x88  its bone's parent
+    f32  f8C;                   // 0x8C
+} DynChainLink;
+LAYOUT_ASSERT(DynChainLink, 0x90);
+
+typedef struct DynChain {
+    s32  nBone;                 // 0x00  the top bone; -1 or 0xFF: none
+    s32  nLinks;                // 0x04
+    DynChainLink* pLinks;       // 0x08
+    s32  nType;                 // 0x0C  0..3: which update runs (fn_8011443C)
+    s32  n10;                   // 0x10
+    s32  n14;                   // 0x14  } counters the updates advance
+    s32  n18;                   // 0x18  }
+    u8   bReset;                // 0x1C  set up the links again on the next update
+    u8   pad1D[3];
+} DynChain;
+LAYOUT_ASSERT(DynChain, 0x20);
 
 // A clip's header (the fields used here). In a file, pD0 marks the end of the header and
 // uAram points at the end of the key data; once a clip's frames are streamed out, uAram is
@@ -188,7 +238,16 @@ void AnimLib_Free(AnimLib* pLib);       // skalib.c
 void ClipBank_Release(int nSlot);       // skalib.c
 void fn_8001F66C(void);                 // mtalib.c
 void fn_80071B94(void);                 // animblender.c
-void fn_80071F58(struct SKABlendNode** ppNode, int n);   // animblender.c: gives a blend tree back
+
+// animblender.c's pools (fn_80071AD0 creates them, fn_80071B94 destroys them): blend tree nodes by
+// type (0x34, 0x2C and 0x20 bytes), then pose buffers of format 0 (0x1040) and format 1 (0x114C).
+extern UMemPool* lbl_80281E98;
+extern UMemPool* lbl_80281E94;
+extern UMemPool* lbl_80281E90;
+extern UMemPool* lbl_80281E8C;
+extern UMemPool* lbl_80281E88;
+void fn_80071F58(struct SKABlendNode** ppNode, u8 bFreeSources);   // animblender.c: gives a blend
+                                        // tree back (bFreeSources: the sources' clips too)
 
 // animblender.c: whether a source under pNode plays pSrc (format 0, format 1).
 u8 fn_80073554(SKABlendNode* pNode, void* pSrc);
