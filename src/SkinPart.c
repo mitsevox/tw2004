@@ -275,7 +275,9 @@ s32 fn_800CCAC0(Skin* pSkin, int nPart, int nVariant) {
 
     if (pSkin == NULL || pSkin->pModel == NULL) return 0;
     pDesc = pSkin->pModel->pDesc;
-    return pDesc->pVariants[nVariant + pDesc->pParts[nPart].nFirst].nOptions;
+    // fake match: the cast to the field's own type gives EA's (i * 0x18 + 8) lwzx; perhaps EA's field
+    // was untyped (fn_800CEF04 turns the file's offsets into pointers)
+    return ((SkinVariant*)pDesc->pVariants)[nVariant + pDesc->pParts[nPart].nFirst].nOptions;
 }
 
 // Picks a part's variant (-1 when out of range), then applies the variant's links.
@@ -403,7 +405,8 @@ s32 fn_800CCF10(Skin* pSkin, int nSet, int nVariant) {
         if (pDesc != NULL && nSet < pDesc->n70 && nSet >= 0) {
             nFirst = pDesc->p74[nSet].n10;
             if (nFirst >= 0 && nFirst < pDesc->n78) {
-                return pDesc->p7C[nFirst + nVariant].n08;
+                // fake match: the cast, as in fn_800CCAC0
+                return ((SkinDesc7C*)pDesc->p7C)[nFirst + nVariant].n08;
             }
             return 0;
         }
@@ -834,7 +837,9 @@ void fn_800CDF80(Skin* pSkin, int nPart, int nVariant, int nLink) {
 
     if (pSkin == NULL) return;
     pDesc = pSkin->pModel->pDesc;
-    pLink = &pDesc->pLinks[pDesc->pVariants[nVariant + pDesc->pParts[nPart].nFirst].nFirstLink + nLink];
+    // fake match: the cast, as in fn_800CCAC0
+    pLink = &pDesc->pLinks[((SkinVariant*)pDesc->pVariants)[nVariant + pDesc->pParts[nPart].nFirst].nFirstLink
+                           + nLink];
     nOther = fn_800CDAFC(pSkin, pLink->uPart);
     if (nOther >= 0 && nOther < fn_800CCA40(pSkin)) {
         fn_800CCC1C(pSkin, nOther, pLink->nOption);

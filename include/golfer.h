@@ -410,7 +410,7 @@ typedef struct RecordEntry {
 // The round / session state at gSession (0x5BD0 bytes); only what this file reads.
 // The game options (Session.options, 0x88 bytes).
 typedef struct GameOptions {
-    u8   a0[5];                 // 0x00  [4] (0xE7C): 4 while the lessons run, tested by GameUI
+    s8   a0[5];                 // 0x00  [4] (0xE7C): 4 while the lessons run, tested by GameUI
     u8   bGimmes;               // 0x05  (gSession + 0xE7D) the Gimmes option, default on
     u8   bSkipCameras;          // 0x06  (gSession + 0xE7E) camera states end at once (inferred)
     u8   a7[5];                 // 0x07  [1] and [2] default to 1

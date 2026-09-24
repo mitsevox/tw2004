@@ -417,14 +417,17 @@ u8 fn_800AAEFC(AudTrack* pTrack) {
 // The track's next event and the end of its variation.
 void fn_800AB0CC(AudTrack* pTrack, AudSeqEvent** ppEvent, AudSeqEvent** ppEnd) {
     AudSeqEvent* pVariation;
+    AudSeqEvent* pEnd;
     u8 nEvents;
     AudTrackTmpl* pTmpl;
 
     pTmpl = pTrack->pTmpl;
     nEvents = pTmpl->n3;
     pVariation = &pTmpl->pEvents[nEvents * (pTrack->u.seq.n64 + pTrack->u.seq.n68 * pTmpl->n7)];
-    *ppEvent = &pVariation[pTrack->u.seq.n66];
-    *ppEnd = &pVariation[nEvents];
+    pEnd = pVariation + nEvents;
+    pVariation += pTrack->u.seq.n66;
+    *ppEvent = pVariation;
+    *ppEnd = pEnd;
 }
 
 // Asks for event n next (templates with n0 & 1); with bCheck, not if it is the current one.
