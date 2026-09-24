@@ -641,8 +641,8 @@ int fn_8001C558(int nPlayer) {
 }
 
 // The player's golfer is one of records 30 to 33.
-u8 fn_8001C584(int nPlayer) {
-    u8 b = 0;
+int fn_8001C584(int nPlayer) {
+    int b = 0;
     if (gSession.nGolfer[nPlayer] >= 30 && gSession.nGolfer[nPlayer] <= 33) {
         b = 1;
     }
@@ -820,6 +820,38 @@ void fn_8001D44C(void) {
 
 void fn_8001D47C(void) {
     UStream_UnregisterHandler('SKLO');
+}
+
+// Dresses the character of player slot nSlot: its club skins (in game type 3 golfers 7 and 29 get
+// the profile's created golfer's look; otherwise its own look when fn_8001C584 says so), then the
+// "shirt" set (only when fn_8001C584 says no) and the "glove" set, as "shirt<n>" / "glove<n>" with
+// n from the slot's profile (no number when it is 0 or less).
+void fn_8001D4A4(Character* pChar, int nSlot) {
+    char szName[32];            // the size is not known
+
+    if (gSession.nGameType == 3) {
+        if (pChar->nC == 7 || pChar->nC == 29) {
+            Character_SetClubStatesForCharacter(pChar, nSlot, &fn_80077ACC()->choices);
+        } else {
+            Character_SetClubStatesForCharacter(pChar, nSlot, NULL);
+        }
+    } else if (fn_8001C584(nSlot)) {
+        Character_SetClubStatesForCharacter(pChar, nSlot, pChar->pChoices);
+    } else {
+        Character_SetClubStatesForCharacter(pChar, nSlot, NULL);
+    }
+    if (!fn_8001C584(nSlot)) {
+        sprintf(szName, "%s", "shirt");
+        if (gSession.aProfile[nSlot].n0 > 0) {
+            sprintf(szName, "%s%d", szName, gSession.aProfile[nSlot].n0);
+        }
+        fn_800CC658(pChar, "shirt", szName, NULL);
+    }
+    sprintf(szName, "%s", "glove");
+    if (gSession.aProfile[nSlot].n2 > 0) {
+        sprintf(szName, "%s%d", szName, gSession.aProfile[nSlot].n2);
+    }
+    fn_800CC658(pChar, "glove", szName, NULL);
 }
 
 void fn_8001D624(int n) {

@@ -275,6 +275,7 @@ void  fn_8010E4DC(void* pDefs, CharModel* pModel, Skin* pSkin, int nSliders, u8*
                                         // applies slider values (Character.p17AC's definitions)
 void  fn_800CE170(Skin* pSkin, SkinTarget* pTarget);
 void  fn_800CC1EC(Character* pChar, SkinChoices* pChoices);
+void  fn_800CC658(Character* pChar, char* pSet, char* pVariant, char* pOption);
 void  fn_800CC408(Character* pChar, SkinChoices* pChoices);
 void  fn_800CC710(Character* pChar, int nSkin, u64 uPart, u64 uVariant);
 void  fn_800CC7DC(Character* pChar, int nSkin, u64 uSet, u64 uVariant, u64 uOption);
