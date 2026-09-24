@@ -93,7 +93,6 @@ void fn_8008CE88(u8 bFull);
 void fn_8008D058(void);
 void fn_8008D6CC(void);
 void fn_8008E0B0(f32 fTurn);
-void fn_8008D8F4(void);
 void fn_8008D9DC(UStreamObject* pObject);
 void fn_8008DBE8(void);
 void fn_8008DC10(void);

@@ -30,7 +30,6 @@ void  fn_80072D90(void* pAnim);                                 // animblender.c
 s32   fn_800962F8(Character* pChar);                            // CharAnim.c
 void  fn_800184E4(Character* pChar, Skin* pSkin);
 void  fn_80018710(Character* pChar);
-void  fn_8001DC64(Character* pChar, SkinChoices* pChoices);
 void  ClipBank_Restore(int nSlot);                  // skalib.c
 ClipBank* ClipBank_Get(u32 nSlot);                  // skalib.c
 AnimLib* AnimLib_Load(u8* pData, ClipBank* pBank);  // skalib.c

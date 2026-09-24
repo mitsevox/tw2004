@@ -720,6 +720,9 @@ typedef struct UFontContext {
 } UFontContext;                   // 0xD8
 
 UFontContext* fn_80012EC4(void);        // UFont.c: the current text settings
+void fn_800128F8(char* sz, f32 x, f32 y);       // UFont.c: draw a string
+void fn_80012E54(f32* pColor, u8* pOut);        // UFont.c: pack an RGBA colour into pOut
+void fn_8006A9AC(f32* pColor);                  // target.c: draw text in this colour
 
 // The header of an 'sfn ' font stream object. Stored little-endian when n0C reads above 100;
 // FO_spLoadFontFromStream swaps it in place. LLFontFile is our name.
