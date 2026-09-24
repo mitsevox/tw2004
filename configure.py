@@ -913,7 +913,7 @@ config.libs = [
             Object(NonMatching, "GoShaderObjectContainer_OBFData_Gc.c"),
             Object(Matching, "GoShaderObject_PrelitUVAnimation_Gc.c"),
             Object(Matching, "animblender.c"),
-            Object(NonMatching, "GoShaderObjectCommon_ShaderObjectsData_Gc.c"),
+            Object(Matching, "GoShaderObjectCommon_ShaderObjectsData_Gc.c"),
             Object(Matching, "LLVideo.c"),
             Object(Matching, "ByteSwap.c"),
             Object(Matching, "GoCamera.c"),
