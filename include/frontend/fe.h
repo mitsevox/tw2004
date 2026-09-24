@@ -84,14 +84,47 @@ typedef struct FE801D8858 {
     u8  b18;                    // 0x18  set once fn_800918A4 has set it up
     u8  unk19[0x1C - 0x19];
     s32 n1C;                    // 0x1C
-    u64 u20;                    // 0x20  fn_80095368's clock when it was set up
-    u8  unk28[0x30 - 0x28];
+    u64 u20;                    // 0x20  fn_80095368's clock when it was set up, then at the last update
+    u64 u28;                    // 0x28  fn_80095368's clock at this update (fn_8009198C)
     struct LLPict* p30;         // 0x30  a picture decoded from the 'load' object (fn_800917C8)
     u8  unk34[0x38 - 0x34];
 } FE801D8858;
 LAYOUT_ASSERT(FE801D8858, 0x38);
 
 extern FE801D8858 lbl_801D8858;
+
+// A corner of a quad fe_movies.c fn_800912F4 turns into draw arrays (uiArc.c builds them too). Our
+// name: f8..f10 go out as a position, f0/f4 as texture coordinates, au14 as a colour.
+typedef struct FEVertex {
+    f32 f0;                     // 0x00
+    f32 f4;                     // 0x04
+    f32 f8;                     // 0x08
+    f32 fC;                     // 0x0C
+    f32 f10;                    // 0x10
+    u8  au14[4];                // 0x14  red, green, blue, alpha
+} FEVertex;
+LAYOUT_ASSERT(FEVertex, 0x18);
+
+// A textured quad of the front end that fe_movies.c fn_800914DC takes messages for. Our name; only
+// what the cleaned code reads (its size is not known).
+typedef struct FEQuad {
+    s16 n0;                     // 0x00  } with n2, an index pair into the UI file (fn_800913EC)
+    s16 n2;                     // 0x02  }
+    u8  unk4[0xA - 0x4];
+    s16 nA;                     // 0x0A
+    FEVertex aVtx[4];           // 0x0C  the corners (fn_80090D28 draws them)
+} FEQuad;
+
+// A message argument of fn_800914DC: a number or a float, by message. Our name.
+typedef union FEMsgArg {
+    s32 n;
+    f32 f;
+} FEMsgArg;
+
+// Four floats each, set by fe_movies.c fn_80090D28: fn_80090B80 tints a vertex colour to
+// lbl_80281F28 * (colour + lbl_80281F2C).
+extern f32* lbl_80281F28;
+extern f32* lbl_80281F2C;
 
 // lbl_801D880C (0xC bytes), also read by uiProcessInterface.c. A menu message sets n4 and clears n0.
 typedef struct FE801D880C {
