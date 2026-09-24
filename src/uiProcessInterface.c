@@ -6,6 +6,7 @@
 #include "game.h"
 #include "game/frontend.h"
 #include "frontend/fe.h"
+#include "camera.h"
 
 u8 lbl_80281F19;
 u8 lbl_80281F1A;                // set: fn_8008FD60 passes events to the UI
@@ -20,7 +21,6 @@ void fn_80090400(FrontEnd* pFE);
 void fn_80090664(void);
 void fn_8008FE88(FrontEnd* pFE);
 TexEntry* fn_80090904(TexBank* pBank, u64 uHash);
-void fn_8008F820(void);
 void fn_800E573C(void);         // GameMessages.c
 void fn_800E5798(void);         // GameMessages.c
 void fn_800E5708(void);         // GameMessages.c
@@ -38,6 +38,7 @@ void fn_80168B80(void* pHandler, u32 uEvent);
 void fn_80169B4C(void* pHandler);      // UISApi.c: unload every screen
 void fn_80168C24(void* pHandler, s32 nTicks);     // UIStudio.c: run the UI
 void fn_8016B09C(void* pHandler, u32 uEvent, s32 nArgs, const s32* pArgs);
+void fn_80168DB0(void* pHandler, u32 uEvent, s32 n, u8 b, void* p, u8 bAll);
 void fn_80016B6C(f32 x, f32 y);
 void fn_80012898(s32 nMode);
 void fn_80012C54(s32 v);
@@ -148,6 +149,131 @@ void fn_8008F648(s32 nTicks) {
 
 void fn_8008F80C(s32 n, s32 b) {
     lbl_801D87C0.a30[n] = b;
+}
+
+// Read the controllers for the UI. The main stick works the D-pad in start-up, the menus and (when
+// fn_800E415C says so) game type 6. In a round, nothing happens while a camera is still moving.
+// Each plugged-in controller's buttons (the stick's directions folded into the D-pad bits) are
+// compared with last frame's; each newly pressed button sends its lbl_80189B58 event to the UI.
+// In the menus the UI switches between its lone-player and many-player forms (0x34, 0x2D) by
+// how many controllers are plugged in.
+void fn_8008F820(void) {
+    f32 fOne;
+    s32 aArgs[1];
+    u32 aPressed[8];            // fake match: 4 are used; the stack frame holds 8
+    u32 aButtons[8];            // fake match: likewise
+    View* pView;
+    u32 uMask;
+    int i;
+    int j;
+
+    fOne = 1.0f;
+    if (gSession.nGameType == 3 || gSession.nGameType == 1 ||
+        (gSession.nGameType == 6 && fn_800E415C())) {
+        fn_800130EC(1);
+    } else {
+        fn_800130EC(0);
+    }
+    if (gSession.nGameType >= 4 && gSession.nGameType <= 8 && gSession.nPaused == 0) {
+        for (i = 0; i < gSession.nNumPlayers; i++) {
+            pView = fn_80017028(gPlayers[i].nView[0]);
+            if ((fn_80063C90(pView) || pView->script.nCamera == 3) && pView->nCurCamera != 0x15) {
+                return;
+            }
+        }
+    }
+    lbl_801D87C0.n38 = 0;
+    fn_80005AE8(aArgs, 0, sizeof(aArgs));
+    for (i = 0; i < 4; i++) {
+        if (fn_80013070(i)) {
+            lbl_801D87C0.a1[i] = 1;
+            lbl_801D87C0.n34 = 0;
+            lbl_801D87C0.n38++;
+        } else {
+            lbl_801D87C0.a1[i] = 0;
+        }
+        if (lbl_801D87C0.a1[i]) {
+            aButtons[i] = fn_800136DC(i);
+            if (aButtons[i] & 0x40000) {
+                aButtons[i] |= 4;
+            }
+            if (aButtons[i] & 0x80000) {
+                aButtons[i] |= 8;
+            }
+            if (aButtons[i] & 0x20000) {
+                aButtons[i] |= 2;
+            }
+            if (aButtons[i] & 0x10000) {
+                aButtons[i] |= 1;
+            }
+            if (lbl_801D87C0.a8[i] != aButtons[i]) {
+                lbl_801D87C0.a18[i] = 0;
+            } else if (lbl_801D87C0.a18[i] > 8) {
+                lbl_801D87C0.a18[i] = 0;
+                lbl_801D87C0.a8[i] = 0;
+            }
+            lbl_801D87C0.a18[i]++;
+            aPressed[i] = aButtons[i] & ~lbl_801D87C0.a8[i];
+            lbl_801D87C0.a8[i] = aButtons[i];
+        }
+        lbl_801D87C0.a28[i] = lbl_801D87C0.a1[i];
+    }
+    if (lbl_801D87C0.n38 == 0) {
+        lbl_801D87C0.n34++;
+    }
+    if (lbl_801D87C0.n38 > 0 && gSession.nGameType == 3 &&
+        ((Game_GetMode() != 7 && Game_GetMode() != 0x1A) || lbl_801D87C0.n38 >= 2 ||
+         lbl_801D7148.aCPU[0] || lbl_801D7148.aCPU[1])) {
+        if (lbl_80281368 != -1) {
+            lbl_80281EE0->b86 = lbl_80281368;
+            lbl_80281368 = -1;
+        }
+        lbl_801D87C0.b49 = 0;
+        fn_8016B09C(lbl_80281F1C->pHandler, 0x2D, 1, aArgs);
+        lbl_801D87C0.b40 = 0;
+    }
+    if (((Game_GetMode() == 7 && !lbl_801D7148.aCPU[0] && !lbl_801D7148.aCPU[1]) ||
+         Game_GetMode() == 0x1A) &&
+        lbl_801D87C0.n38 < 2 && gSession.nGameType == 3) {
+        if (lbl_80281368 == -1) {
+            lbl_80281368 = lbl_80281EE0->b86;
+        }
+        fn_8016B09C(lbl_80281F1C->pHandler, 0x34, 1, aArgs);
+        lbl_801D87C0.b40 = 1;
+        lbl_801D87C0.b49 = 1;
+    }
+    aArgs[0] = 0;
+    if (lbl_801D87C0.b0 == 0 && fn_80077148() && lbl_801D87C0.b40 == 0) {
+        for (i = 0; i < 4; i++) {
+            if (lbl_801D87C0.a1[i] && lbl_801D87C0.a30[i]) {
+                if (gSession.nGameType != 6 || (gSession.nPaused != 2 && gSession.nPaused != 3)) {
+                    for (j = 0; j < UI_NUM_BUTTON_EVENTS; j++) {
+                        if (lbl_80189B58[j].uMask & aPressed[i]) {
+                            fn_80168DB0(lbl_80281F1C->pHandler, i, lbl_80189B58[j].nEvent, 1, &fOne, 0);
+                        }
+                    }
+                    if (aButtons[i] != 0 && gSession.nGameType == 3) {
+                        fn_8016B09C(lbl_80281F1C->pHandler, 0x22, 1, aArgs);
+                    }
+                }
+                if (gSession.nGameType == 6) {
+                    fn_800E5240(i);
+                }
+                if (gSession.nGameType == 6) {
+                    uMask = fn_800142AC(0x20, 1);
+                    if (fn_800136DC(i) & uMask) {
+                        lbl_80189B38[i]++;
+                    } else {
+                        lbl_80189B38[i] = 0;
+                    }
+                }
+                if (lbl_80189B38[i] > 10) {
+                    fn_800E4F88(i);
+                    lbl_80189B38[i] = 0;
+                }
+            }
+        }
+    }
 }
 
 // Passes an event to the UI (while lbl_80281F1A is set). With lbl_80281F19 set it then shuts the UI

@@ -53,10 +53,13 @@ extern FEState lbl_801D7148;
 // The front end's screen state (lbl_801D87C0, 0x4C bytes). Only what the cleaned code reads.
 typedef struct FEScreen {
     u8  b0;                     // 0x00  set by fn_80079AD4
-    u8  a1[9];                  // 0x01  read by a menu message (fn_8007C7EC: 1 for index 9)
-    u8  unkA[0x18 - 0xA];
-    s32 a18[4];                 // 0x18  cleared by fn_800905A8
-    u8  unk28[0x2C - 0x28];
+    u8  a1[4];                  // 0x01  per controller: plugged in (fn_8008F820); read by a menu
+                                //       message (fn_8007C7EC: 1 for index 9)
+    u8  unk5[3];
+    u32 a8[4];                  // 0x08  per controller: the buttons held last frame (fn_8008F820)
+    u32 a18[4];                 // 0x18  per controller: frames the same buttons have been held,
+                                //       restarted past 8; cleared by fn_800905A8
+    u8  a28[4];                 // 0x28  per controller: a1 as of the last frame
     u8  a2C[4];                 // 0x2C  read and cleared by menu messages
     u8  a30[4];                 // 0x30  set to 1 by fn_800905A8; fn_8008F80C sets one
     s32 n34;                    // 0x34  cleared by fn_800905A8

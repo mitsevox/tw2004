@@ -71,6 +71,17 @@ typedef struct FrontEnd {
 
 extern FrontEnd* lbl_80281F1C;
 
+// uiProcessInterface.c's controller input (fn_8008F820): which UI event each button sends.
+typedef struct UIButtonEvent {
+    u32 uMask;                  // 0x0  the button's bit in fn_800136DC's pressed-this-frame half
+    s32 nEvent;                 // 0x4  the event fn_80168DB0 sends the UI
+} UIButtonEvent;
+#define UI_NUM_BUTTON_EVENTS 16
+extern UIButtonEvent lbl_80189B58[UI_NUM_BUTTON_EVENTS];
+extern s32 lbl_80189B38[8];     // per controller (0..3): frames fn_800142AC(0x20, 1)'s button is held
+                                // in game type 6; past 10 fn_800E4F88 runs
+extern s8 lbl_80281368;         // CrAPState.b86 put aside while fn_8008F820's lone-player UI is up (-1: none)
+
 // What uiLoadFile.c's stream handlers loaded (lbl_801D87A8): up to five objects, freed together
 // by fn_8008F0FC.
 #define UI_NUM_LOADED 5
