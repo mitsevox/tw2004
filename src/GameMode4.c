@@ -42,11 +42,7 @@ extern s32 lbl_80282448;                    // the event's opponent
 extern s32 lbl_8028244C;                    // money to add to the course tracking when the event ends
 extern void (*lbl_80282450)(void);          // the challenge's own end-of-mode callback
 
-int   fn_800584DC(int nProfile);            // the profile's earnings rating
 void  fn_800D39B4(int nPlayer, int nMoney);
-void  fn_80058278(int nProfile, int nGolfer);
-u8    fn_8005832C(int nProfile, int nGolfer);  // the golfer is unlocked for the profile
-void  fn_80058428(int nProfile, int nReward);
 
 void fn_80102404(void);
 u8   fn_80102204(int nProfile, int nEvent);

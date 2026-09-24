@@ -9,6 +9,12 @@ void fn_8009B320(FadeNode* pNode);
 
 FadeNode* lbl_80281FA0;
 
+// fake match: stands in for a function the original linker stripped. The file's pool starts with
+// 255.0f (0x80283EC0), before the 0.0f fn_8009B340 uses first; its body is unknown.
+static f32 Code8009B340_StrippedFn(f32 x) {
+    return x * 255.0f;
+}
+
 // Advances a node by fTime seconds; one that has faded out is marked for freeing.
 void fn_8009B340(FadeNode* pNode, f32 fTime) {
     pNode->f18 = pNode->f30 * fTime + pNode->f18;

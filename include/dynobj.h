@@ -119,7 +119,8 @@ typedef struct UObjMesh {
     struct UObjMesh** p8;       // 0x08  alternatives, by UObject.n108 (fn_80048AC4); a terrain
                                 //       mesh's children (fn_800354E4)
     struct UObjMesh* pC;        // 0x0C  in a terrain patch's ground: the mesh drawn for it (fn_8003556C)
-    u8   unk10[0x14 - 0x10];
+    struct UObjMesh* p10;       // 0x10  its first child, the rest by p14 (pInfo->n0 of them; LLObj_Gc.c
+                                //       fn_80007524)
     struct UObjMesh* p14;       // 0x14  the next terrain mesh of a list (fn_800354BC); a patch's
                                 //       ground's is its objects (Ter_PatchReference.pObjects)
     struct UObjMeshPart* p18;   // 0x18  fn_80048A84 passes entry n28 to fn_800082CC
@@ -131,8 +132,22 @@ typedef struct UObjMesh {
 } UObjMesh;
 
 // What UObjModel.p10 points to (our view): a mesh tree at 0xEC (GoAnimalActors.c fn_8004ABB4).
+// One of its four array sets (0x38 bytes; LLObj_Gc.c): set 0 is the model's own, sets 1-3 copies of
+// set 0's arrays that fn_80007824 makes.
+typedef struct UObjArraySet {
+    void* ap0[5];               // 0x00  arrays of an20 rows of 12 bytes (set 0's counts)
+    u8   unk14[0x20 - 0x14];
+    u16  an20[5];               // 0x20  how many rows each array holds
+    u8   unk2A[0x30 - 0x2A];
+    s32  n30;                   // 0x30  -1: the set is not made
+    u8   unk34[0x38 - 0x34];
+} UObjArraySet;
+
 typedef struct UObjModelRoot {
-    u8   unk0[0xEC];
+    UObjArraySet aSets[4];      // 0x000
+    void* pE0;                  // 0x0E0  the data it was made from (fn_800073B4)
+    void* pE4;                  // 0x0E4  freed with it when not NULL (fn_800075CC)
+    void* pE8;                  // 0x0E8
     UObjMesh* pMesh;            // 0x0EC
 } UObjModelRoot;
 
@@ -140,12 +155,22 @@ typedef struct UObjModelRoot {
 typedef struct UObjModel {
     u8   unk0[0x10];
     UObjModelRoot* p10;         // 0x10  (GoAnimalActors.c fn_8004A24C)
-    UObjMesh* apLod[4];         // 0x14  its levels of detail (all four the same: it has none)
-    u8   unk24[0x2C - 0x24];
+    UObjMesh* apLod[6];         // 0x14  its levels of detail (the first four all the same: it has
+                                //       none); UObject3D.c fn_80045D80 fills the first three from
+                                //       its mesh group and clears the last three
     f32  v2C[3];                // 0x2C
     u8   unk38[0x5C - 0x38];
     f32  f5C;                   // 0x5C  a size: the level-of-detail scale is 0.5 / f5C
+    u8   unk60[0x7C - 0x60];
 } UObjModel;
+LAYOUT_ASSERT(UObjModel, 0x7C);     // UObject3D.c fn_80045D80 allocates 0x7C bytes
+
+// UObject3D.c: a model made from its stream data, and the mesh-tree readers it uses.
+UObjModel* fn_80045D80(u8* pData);
+int        fn_80045F50(UObjMesh* pMesh);            // how many meshes pMesh->p8 holds
+UObjMesh*  fn_80045F5C(UObjMesh* pMesh, int i);     // pMesh->p8[i]
+UObjMesh*  fn_80045F6C(UObjModelRoot* pRoot);       // pRoot->pMesh
+UObjModelRoot* fn_800073B4(u8* pData, int n);       // builds a model's mesh tree from stream data
 
 // UObject.c's object (0x118 bytes, fn_80048808 allocates one; a DynObj holds one at +0x10): three
 // matrices and a model drawn with them.
