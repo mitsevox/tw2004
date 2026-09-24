@@ -589,6 +589,7 @@ GoShaderObject_Rain_Gc.c:
 
 AudLock.c:
 	.text       start:0x800B5934 end:0x800B5A14
+	.bss        start:0x801F6338 end:0x801F6360
 
 UAudMemStack.c:
 	.text       start:0x800B5A14 end:0x800B5C40

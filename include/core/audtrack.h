@@ -448,7 +448,8 @@ extern u32 lbl_8028207C;                // what is loaded (hlaudmovie.c): 0x01 s
                                         // the tracks tick when 0xD is set, only some when 0x40 is
 extern u32 lbl_80282018;                // the sequencer re-triggers notes when its low 4 bits are 0
 
-// The audio locks (0x800B5934): the name is EA's label for who holds them.
+// The audio locks (AudLock.c): the name is EA's label for who holds them.
+void fn_800B5934(void);                 // set both locks up
 void fn_800B596C(const char* szWho);    // take the stream lock
 void fn_800B5994(const char* szWho);    // give it back
 void fn_800B59BC(const char* szWho);    // take the read-queue lock
