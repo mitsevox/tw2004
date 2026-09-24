@@ -1048,8 +1048,11 @@ config.libs = [
             Object(Matching, "SkinBurn.c"),
             Object(Matching, "EASBStorage.c"),
             Object(Matching, "EASB.c"),
-            # Built with pool_data on: fn_80165E9C 82.1 -> 94.2%, no function worse.
-            Object(NonMatching, "UISEvent.c", extra_cflags=['-pragma "pool_data on"']),
+            # Built with pool_data on: fn_80165E9C 82.1 -> 94.2%, no function worse. Deferred like
+            # UISScreen.c (source last address first): .text and data byte-identical to the old
+            # build, and fn_8016604C's callers call it (inlined) instead of a written-out copy.
+            # UISApi.c and UIStudio.c give byte-identical code under deferred too; left as they are.
+            Object(NonMatching, "UISEvent.c", extra_cflags=['-pragma "pool_data on"', "-inline auto,deferred"]),
             Object(NonMatching, "UIStudio.c"),
             # Built with automatic inlining like UISScreen.c below: fn_80168DB0 88.9 -> 98.7%, no
             # function worse.
