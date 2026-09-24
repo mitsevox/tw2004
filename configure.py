@@ -987,6 +987,7 @@ config.libs = [
             Object(NonMatching, "FE_CrAPDB.c"),
             Object(NonMatching, "FE_CrAPMessages.c"),
             Object(NonMatching, "LLDynTex.c"),
+            Object(NonMatching, "GameMode26.c"),
             Object(NonMatching, "CharSliders.c"),
             Object(NonMatching, "FE_PGATourMessages.c"),
             Object(Matching, "FE_LogoDesign.c"),

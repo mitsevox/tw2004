@@ -3,11 +3,7 @@
 // replaced by the profile's logo n (0..4) and its palette.
 
 #include "frontend/fe.h"
-
-int  fn_8010AD10(void* pModel);                     // how many textures the model has
-u64  fn_8010AD18(void* pModel, int nTex);           // a texture's name hash
-void fn_8010B1D4(void* pModel, int nTex, u8* pPixels, int a, int b);
-void fn_8010B2A8(void* pModel, int nTex, s16* pPalette, int a, int b);
+#include "lldyntex.h"
 
 // The user logo a texture stands for (the n of "_usrtextr<n>"), or -1.
 int sGetUserTextureIdx(u64 uHash) {
@@ -61,10 +57,11 @@ void fn_8001744C(void* pChar, void* pModel, SkinChoices* pChoices) {
             uHash = fn_8010AD18(pModel, i);
             pPixels = fn_80017398(uHash, pChoices);
             if (pPixels != NULL) {
-                fn_8010B1D4(pModel, i, pPixels, 0, -1);
+                fn_8010B1D4(pModel, i, pPixels, NULL, -1);
                 pPalette = fn_80017410(uHash, pChoices);
                 if (pPalette != NULL) {
-                    fn_8010B2A8(pModel, i, pPalette, 0, -1);
+                    // port: EA passes two arguments fn_8010B2A8 ignores
+                    ((void (*)(DynTex*, int, s16*, void*, s32))fn_8010B2A8)(pModel, i, pPalette, NULL, -1);
                 }
             }
         }

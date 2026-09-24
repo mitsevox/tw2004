@@ -68,7 +68,9 @@ LAYOUT_ASSERT(SkinMesh, 0x10);
 
 typedef struct SkinDesc28 {
     s32  n0;                    // 0x00
-    u8   unk4[0x18 - 4];
+    u8   unk4[0x10 - 4];
+    void* p10;                  // 0x10  } a block hwsBurn.c copies (fn_80111384)
+    s32  n14;                   // 0x14  } and its size
 } SkinDesc28;
 LAYOUT_ASSERT(SkinDesc28, 0x18);
 
@@ -129,14 +131,14 @@ typedef struct SkinDesc {
     u8*  p18;                   // 0x018  0x1C bytes each
     u8   unk1C[4];
     s32* p20;                   // 0x020
-    u8   unk24[4];
+    s32  n24;                   // 0x024  entries in p28
     SkinDesc28* p28;            // 0x028
-    u8   unk2C[4];
+    s32  n2C;                   // 0x02C  bits an HwsBurn keeps (fn_801104AC)
     s32  n30;                   // 0x030  entries in p34
     SkinMesh* p34;              // 0x034
-    u8   unk38[4];
+    s32  n38;                   // 0x038  entries in p3C
     u8*  p3C;                   // 0x03C
-    u8   unk40[4];
+    s32  n40;                   // 0x040  bits an HwsBurn keeps (fn_801104AC)
     SkinDesc44* p44;            // 0x044
     s32  nParts;                // 0x048
     SkinPartDef* pParts;        // 0x04C
@@ -146,8 +148,8 @@ typedef struct SkinDesc {
     SkinDesc5C* p5C;            // 0x05C
     u8   unk60[4];
     SkinLink* pLinks;           // 0x064
-    u8   unk68[4];
-    s32* p6C;                   // 0x06C  entries of p44, -1 none
+    s32  n68;                   // 0x068  entries in p6C
+    s32* p6C;                  // 0x06C  entries of p44, -1 none
     s32  n70;                   // 0x070  entries in p74
     SkinDesc74* p74;            // 0x074
     s32  n78;                   // 0x078  entries in p7C
@@ -340,6 +342,45 @@ typedef struct SkinDescIter {
     s32  n18;                   // 0x18  -1 before the first step
     s32  n1C;                   // 0x1C
 } SkinDescIter;
+
+// hwsBurn.c's state for one SkinDesc (our name; fn_801104AC makes it, fn_801108B0 frees it). The
+// bit arrays hold one bit per entry of the count before them.
+typedef struct HwsBurn {
+    SkinDesc* pDesc;            // 0x00
+    s32  n4;                    // 0x04  fn_80110A1C
+    s32  nParts;                // 0x08  pDesc->nParts
+    s32* aVariant;              // 0x0C  per part: its variant, -1 all (fn_801109FC)
+    s32* aOption;               // 0x10  per part: its option, -1 all (fn_80110A0C)
+    u8   unk14[4];
+    s32  n18;                   // 0x18  fn_8011C850(pDesc)
+    s32* a1C;                   // 0x1C  n18 flags (fn_80110A24)
+    s32  n20;                   // 0x20  pDesc->n2C
+    s32  n24;                   // 0x24  the bits of p28 set (fn_80111124)
+    u32* p28;                   // 0x28  n20 bits
+    s32* a2C;                   // 0x2C  } n20 each
+    s32* a30;                   // 0x30  }
+    s32  n34;                   // 0x34  pDesc->n40
+    s32  n38;                   // 0x38  the bits of p40 set (fn_80110F2C)
+    u32* p3C;                   // 0x3C  } n34 bits
+    u32* p40;                   // 0x40  }
+    s32* a44;                   // 0x44  the n38 set bits of p40, in order
+    s32* a48;                   // 0x48  per bit of p40: its place in a44
+    s32  n4C;                   // 0x4C  pDesc->n38
+    s32  n50;                   // 0x50  the bits of p54 set (fn_80111424)
+    u32* p54;                   // 0x54  n4C bits
+    s32* a58;                   // 0x58  the n50 set bits of p54, in order
+    s32* a5C;                   // 0x5C  per bit of p54: its place in a58
+    s32  n60;                   // 0x60  pDesc->n10
+    SkinDesc14* a64;            // 0x64  a copy of pDesc->p14 (fn_801115C4)
+    void (*pfn68)(s32 nArg, SkinDesc14* pEntry);    // 0x68  } called on each a64 entry
+    s32  n6C;                   // 0x6C  } (fn_801109F0)
+    s32  n70;                   // 0x70  pDesc->n88
+    s32  n74;                   // 0x74  the bits of p78 set (fn_80111658)
+    u32* p78;                   // 0x78  n70 bits: the SkinDesc.p8C entries a64 uses
+    s32* a7C;                   // 0x7C  the n74 set bits of p78, in order
+    s32* a80;                   // 0x80  per bit of p78: its place in a7C
+} HwsBurn;
+LAYOUT_ASSERT(HwsBurn, 0x84);
 
 // What fn_80113B34 walks: a description and a SkinDesc.p5C entry (or, from fn_800CD5D0, a
 // SkinVariant.nC index).
