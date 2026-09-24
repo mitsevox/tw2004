@@ -195,7 +195,7 @@ void fn_80067DAC(int nPlayer) {
     if (gPlayers[nPlayer].nShotKind != 0) {
         if (fDist < 1.0f) {
             fDist = 1.0f;
-        } else if (3.0f * fDist < 1.0f) {
+        } else if (3.0f * fDist < 1.0f) {   // never true after the test above
             fDist = 1.0f / 3.0f;
         }
     }
@@ -839,8 +839,8 @@ void fn_80069BEC(int nPlayer) {
 
 // Draw sz centred on (fX, fY).
 void fn_80069C64(char* sz, f32 fX, f32 fY) {
-    fX -= 0.5f * fn_80012C30(sz);
-    fY -= 0.5f * fn_8006A9FC();
+    fX -= fn_80012C30(sz) / 2.0f;
+    fY -= fn_8006A9FC() / 2.0f;
     fn_800128F8(sz, fX, fY);
 }
 
