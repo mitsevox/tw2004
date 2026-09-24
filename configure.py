@@ -938,7 +938,7 @@ config.libs = [
             Object(NonMatching, "rcmp_mad_codec.c"),
             Object(Matching, "Trax.c"),
             Object(Matching, "ScreenClear.c"),
-            Object(NonMatching, "Code800BA940.c"),
+            Object(Matching, "Code800BA940.c"),
             Object(Matching, "VecMath.c"),
             Object(NonMatching, "SitDevFile.c"),
             Object(NonMatching, "GoGolfCam.c"),
