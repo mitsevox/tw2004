@@ -11,6 +11,7 @@
 #include "game_types.h"
 #include "lighting.h"
 #include "camera.h"
+#include "glows.h"
 
 void* fn_800073B4(u8* pData, int n);
 void  fn_800075CC(void* p);         // frees what fn_800073B4 made
@@ -778,7 +779,6 @@ s32 fn_80035508(u8* p0);
 s32 fn_80035554(u8* p0);
 f32 fn_80035560(u8* p0);
 s32 fn_8003556C(u8* p);
-extern u8* lbl_802813B8;
 void fn_80035584(s32 v);
 void fn_80035590(f32* p0);
 void fn_800355B8(f32* p0);
@@ -909,15 +909,15 @@ u8 fn_80035574(void) {
 }
 
 void fn_80035584(s32 v) {
-    *(s32*)(lbl_802813B8 + 0x1930) = v;
+    lbl_802813B8->n1930 = v;
 }
 
 void fn_80035590(f32* p0) {
-    Vec_Copy(p0, (f32*)(lbl_802813B8 + 4));
+    Vec_Copy(p0, lbl_802813B8->v4);
 }
 
 void fn_800355B8(f32* p0) {
-    Vec_Copy(p0, (f32*)(lbl_802813B8 + 20));
+    Vec_Copy(p0, lbl_802813B8->v14);
 }
 
 void fn_800355E0(s32 arg0) {

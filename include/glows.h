@@ -46,6 +46,35 @@ typedef struct GlowQueue {
 
 extern GlowQueue* lbl_80281F80;
 
+// A view's part of lbl_802813B8 (0xA8 bytes), which SunFlr_Gc.c's functions work on.
+typedef struct SunFlrView {
+    u8*  pBuffer;               // 0x00  2304 bytes, four parts of 576 (fn_8009A344); freed by fn_8009A3D0
+    u8   unk4[0xC - 0x4];
+    s32  nC;                    // 0x0C  576
+    struct {
+        u8   unk0[0x1C];
+        u8*  p1C;               // +0x1C  its part of pBuffer
+    } aPart[4];                 // 0x10  the first two are cleared at set-up
+    u8   unk90[0xA8 - 0x90];
+} SunFlrView;
+LAYOUT_ASSERT(SunFlrView, 0xA8);
+
+// Code8009AA28.c's state (our name), reached through lbl_802813B8. Only the fields read are named.
+typedef struct SunFlrState {
+    u8   unk0[4];
+    f32  v4[3];                 // 0x0004  set by GoTerrain.c's fn_80035590
+    u8   unk10[4];
+    f32  v14[3];                // 0x0014  set by GoTerrain.c's fn_800355B8
+    u8   unk20[0x1930 - 0x20];
+    s32  n1930;                 // 0x1930  set by GoTerrain.c's fn_80035584
+    u8   unk1934[0x194C - 0x1934];
+    s32  nViews;                // 0x194C  how many of aView are in use
+    SunFlrView aView[4];        // 0x1950
+    u8   b1BF0;                 // 0x1BF0  set by fn_8009B314; fn_8009B134 does nothing without it
+} SunFlrState;
+
+extern SunFlrState* lbl_802813B8;
+
 // Queues a glow at pPos (Code8009AA28.c); nothing when the queue is full.
 void fn_8009B260(f32* pPos, u32 uColorA, u32 uColorB, u8 n25, u8 n24, u8 n26, f32 f18, f32 f1C,
                  f32 f20);

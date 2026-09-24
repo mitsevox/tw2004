@@ -58,7 +58,7 @@ f32 fn_800A85FC(f32 fVolume, f32 fCurve) {
     return fVolume * fCurve;
 }
 
-int fn_800A8604(void) {
+u8 fn_800A8604(void) {
     s32 i;
 
     lbl_80282064 = 2;
@@ -96,8 +96,8 @@ void fn_800A874C(s32 n) {
     lbl_80282060 = n;
 }
 
-int fn_800A8754(void) {
-    int bOk;
+u8 fn_800A8754(void) {
+    u8 bOk;
 
     bOk = 0;
     lbl_8028206C = fn_800B5BD8(sizeof(AudBlock48));
@@ -130,7 +130,7 @@ void fn_800A87D8(u32 n) {
     }
 }
 
-int fn_800A8824(void) {
+u8 fn_800A8824(void) {
     return 1;
 }
 
@@ -266,7 +266,7 @@ void fn_800A8D00(void) {
     lbl_80282088 = fn_800B5BD8(fn_800A955C(0));
 }
 
-int fn_800A8D2C(void) {
+u8 fn_800A8D2C(void) {
     fn_800A8D54();
     fn_800A8D00();
     return 1;

@@ -1847,10 +1847,10 @@ void Options_SetDefaults(GameOptions* pOpt) {
             pOpt->rows[i][j] = 1;
         }
     }
-    pOpt->b7A = 1;
-    pOpt->b7B = 0;
-    pOpt->b7C = 1;
-    pOpt->b7D = 0;
+    pOpt->abRowOn[0] = 1;
+    pOpt->abRowOn[1] = 0;
+    pOpt->abRowOn[2] = 1;
+    pOpt->abRowOn[3] = 0;
     pOpt->b84 = 0;
     fn_8002EBA4((u8*)pOpt, 1);
     if (gSession.uFlags & 0x4000) {
@@ -1859,7 +1859,7 @@ void Options_SetDefaults(GameOptions* pOpt) {
                 pOpt->rows[i][j] = 0;
             }
         }
-        pOpt->b7A      = 1;
+        pOpt->abRowOn[0]  = 1;
         pOpt->rows[0][13] = 1;
         pOpt->rows[0][15] = 1;
         pOpt->rows[0][17] = 1;

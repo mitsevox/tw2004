@@ -134,172 +134,86 @@ f32 lbl_80281450 = 25.0f;
 f32 lbl_80281454 = 2.0f;
 f32 lbl_80281458 = 21.0f;
 
+u32 lbl_80282054;                       // frames left before the queued sound starts (fn_800A4BDC)
+u8 lbl_80282052;                        // } the queued sound: fn_800A7968's arguments
+u16 lbl_80282050;                       // }
+s32 lbl_8028204C;                       // }
 u32 lbl_80282048;                       // fn_800A6070: the frame it last played
 f32 lbl_80282044;
 u8 lbl_80282042;
 u8 lbl_80282041;
+u8 lbl_80282040;
+s32 lbl_8028203C;                       // what fn_800A44A0 plays: 0 nothing, 1 music, 2 ambience
+u8 lbl_80282038;                        // a sound is queued
 s32 lbl_80282034;
 u8 lbl_80282033;
 u8 lbl_80282032;
 u8 lbl_80282031;
 u8 lbl_80282030;
 u8 lbl_8028202F;
+u8 lbl_8028202E;
+u8 lbl_8028202D;
+u8 lbl_8028202C;
 u8 lbl_8028202B;
+u8 lbl_8028202A;
+u8 lbl_80282029;
 u8 lbl_80282028;
 u8 lbl_80282024[2];
 u8 lbl_80282020;
 
-// ---- sweep code (not yet cleaned up) ----
+// startUp.c: the sound engine's start-up steps, each nonzero when it worked
+u8   fn_800AFAB0(void);
+u8   fn_800B0438(void);
+u8   fn_800B0568(void);
+u8   fn_800B0798(void);
+void fn_800B07A0(void);
+void fn_800B0858(u8 nSound);
 
-u8 fn_800A3FF4(void);
-u8 fn_800A8604();
-s32 fn_800A86BC(s32);
-u8 fn_800A8754();
-u8 fn_800A8824();
-u8 fn_800A8D2C();
-u8 fn_800A98B4();
-u8 fn_800AAD18();
-u8 fn_800ABBC8();
-u8 fn_800AC470();
-u8 fn_800ACECC();
-u8 fn_800AF224();
-u8 fn_800AFAB0();
-u8 fn_800B0438();
-u8 fn_800B0568();
-u8 fn_800B0798();
-s32 fn_800B07A0();
-s32 fn_800B5B80();
-u8 fn_800A3E3C(s32 arg0);
-s32 fn_800A402C(s32 p0);
-void fn_800A4038(void);
-void fn_800A4080(void);
-extern u8 lbl_8028141C;
-extern u8 lbl_8028141D;
-extern u8 lbl_80282040;
-void fn_800A4374(void);
-extern u8 lbl_8028141A;
-extern s32 lbl_8028203C;
-void fn_800A49A4(u8 arg0);
-s32 fn_800A4BAC(void);
-s32 fn_800AD1C8();
-extern u8 lbl_80281419;
-extern u8 lbl_80282038;
-extern s32 lbl_8028204C;
-extern u16 lbl_80282050;
-extern u8 lbl_80282052;
-extern u32 lbl_80282054;
-void fn_800A4BDC(void);
-extern u8 lbl_80282029;
-extern u8 lbl_8028202A;
-extern u8 lbl_8028202C;
-void fn_800A4C54(void);
-extern u8 lbl_80281418;
-extern u8 lbl_8028141B;
-void fn_800A75B4(void);
-void fn_800A4FD8(void);
-extern u8 lbl_8028202D;
-void fn_800A5620(void);
-void fn_8006BAA8();
-void fn_800A707C(void);
-void fn_800A5E94(s32 p0);
-void fn_800A624C(void);
-void fn_800A6278(void);
-void fn_800A62A4(void);
-void fn_800A62E0(void);
-void fn_800A631C(void);
-void fn_800A6358(void);
-void fn_800A6394(void);
-void fn_800A63D0(void);
-void fn_800A640C(void);
-void fn_800A6448(void);
-void fn_800A644C(void);
-void fn_800A6EC8(void);
-void fn_800A6F38(void);
-extern u8 lbl_8028202E;
-void fn_800A72EC(u8 arg0, u8 arg1);
+// hlaudmovie.c
+u8   fn_800A8604(void);
+void fn_800A86BC(u8 nRate);
+u8   fn_800A8754(void);
+u8   fn_800A8824(void);
+u8   fn_800A8D2C(void);
+void fn_800A8D88(void);
+u8   fn_800A8DC8(u8 a, u8 b, u8 nListeners);
+void Mov_Init(void);
+void Mov_Exit(void);
+void Mov_Start(void);
+void Mov_Tick(void);
+
+u8   fn_800AC470(void);                   // hlaudvoice.c
+u8   fn_800ACECC(void);                   // no C yet; returns 1
+u8   fn_800AF224(void);                   // no C yet; returns 1
+void fn_800AD1C8(void);                   // hlaudemitter.c, no C yet
+void fn_800AD1C4(void);                   // hlaudemitter.c
+void fn_800B5B80(void);                   // UAudMemStack.c
 void fn_800ADA28(u8 nId, u8 nTrack, u8 n, int bCheck);
-void fn_800A73C0(s32 p0, s32 p1);
-void fn_800A73F0(s32 arg0);
-s32 fn_800A7528(void);
-void fn_800A7644(void);
-void fn_800A76E4(void);
-void fn_800A7944(void);
-void Mov_Init();
-void Mov_Exit();
-void Mov_Start();
-void Mov_Tick();
-void fn_800B0858();
-void fn_800A7994(void);
-void fn_800A79B4(void);
-void fn_800A79D4(void);
-void fn_800A79F4(void);
-void fn_800A7A14(void);
-void fn_800A8D88();
-void fn_800A8DC8();
-void fn_800AD1C4();
-s32 fn_800A7A34(s32 p0, s32 p1, s32 p2);
-void fn_800A7A98(s32 p0);
 
-u8 fn_800A3E3C(s32 arg0) {
-    u8 var_r3;
+u8   fn_800A3FF4(void);
+void fn_800A75B4(void);
+
+// Starts the sound engine one step after another; stops at the first step that fails and
+// returns 0, else 1.
+u8 fn_800A3E3C(u8 nRate) {
+    u8 bOk;
 
     fn_800B5B80();
-    var_r3 = fn_800AFAB0();
-    if (var_r3 != 0) {
-        var_r3 = fn_800B0438();
-        if (var_r3 != 0) {
-            var_r3 = fn_800B0568();
-            if (var_r3 != 0) {
-                var_r3 = fn_800AF224();
-                if (var_r3 != 0) {
-                    var_r3 = fn_800B0798();
-                    if (var_r3 != 0) {
-                        var_r3 = fn_800A8604();
-                        if (var_r3 != 0) {
-                            var_r3 = fn_800A8D2C();
-                            if (var_r3 != 0) {
-                                var_r3 = fn_800A7AF0();
-                                if (var_r3 != 0) {
-                                    var_r3 = fn_800A98B4();
-                                    if (var_r3 != 0) {
-                                        var_r3 = fn_800AAD18();
-                                        if (var_r3 != 0) {
-                                            var_r3 = fn_800ABBC8();
-                                            if (var_r3 != 0) {
-                                                var_r3 = fn_800A8754();
-                                                if (var_r3 != 0) {
-                                                    var_r3 = fn_800AC470();
-                                                    if (var_r3 != 0) {
-                                                        var_r3 = fn_800A8824();
-                                                        if (var_r3 != 0) {
-                                                            var_r3 = fn_800ACECC();
-                                                            if (var_r3 != 0) {
-                                                                var_r3 = fn_800A3FF4();
-                                                                if (var_r3 != 0) {
-                                                                    fn_800B07A0();
-                                                                    fn_800A86BC(arg0);
-                                                                    var_r3 = 1;
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
+    if ((bOk = fn_800AFAB0()) && (bOk = fn_800B0438()) && (bOk = fn_800B0568())
+        && (bOk = fn_800AF224()) && (bOk = fn_800B0798()) && (bOk = fn_800A8604())
+        && (bOk = fn_800A8D2C()) && (bOk = fn_800A7AF0()) && (bOk = fn_800A98B4())
+        && (bOk = fn_800AAD18()) && (bOk = fn_800ABBC8()) && (bOk = fn_800A8754())
+        && (bOk = fn_800AC470()) && (bOk = fn_800A8824()) && (bOk = fn_800ACECC())
+        && (bOk = fn_800A3FF4())) {
+        fn_800B07A0();
+        fn_800A86BC(nRate);
+        bOk = 1;
     }
-    return var_r3;
+    return bOk;
 }
 
-s32 fn_800A402C(s32 p0) {
-    lbl_80282020 = p0;
+s32 fn_800A402C(u8 n) {
+    lbl_80282020 = n;
     return 1;
 }
 
@@ -311,7 +225,7 @@ void fn_800A4080(void) {
 }
 
 void fn_800A4374(void) {
-    if ((u8) lbl_80282040 != 0) {
+    if (lbl_80282040) {
         fn_800AD698(lbl_8028141C, 2, 0);
         fn_800AD698(lbl_8028141D, 2, 0);
         fn_800AD698(lbl_8028141C, 3, 0);
@@ -319,9 +233,10 @@ void fn_800A4374(void) {
     }
 }
 
-void fn_800A49A4(u8 arg0) {
-    if ((s32) lbl_8028203C == 2) {
-        if (arg0 == 0) {
+// Stops the ambience's tracks; track 0 too unless bKeepFirst.
+void fn_800A49A4(u8 bKeepFirst) {
+    if (lbl_8028203C == 2) {
+        if (!bKeepFirst) {
             fn_800AD698(lbl_8028141A, 0, 0);
         }
         fn_800AD698(lbl_8028141A, 1, 0);
@@ -331,21 +246,16 @@ void fn_800A49A4(u8 arg0) {
     }
 }
 
-s32 fn_800A4BAC(void) {
-    s32 t0;
-    t0 = fn_800A4A88();
-    return ((u32)((-(t0 & 0xFF)) | (t0 & 0xFF)) >> 31);
+int fn_800A4BAC(void) {
+    return fn_800A4A88() != 0;
 }
 
+// Once a frame: the emitters, then the queued sound once its wait runs out.
 void fn_800A4BDC(void) {
-    u32 temp_r0;
-
     fn_800AD1C8();
     fn_800A4080();
-    if ((u32) lbl_80282054 != 0U) {
-        temp_r0 = lbl_80282054 - 1;
-        lbl_80282054 = temp_r0;
-        if ((temp_r0 == 0U) && ((u8) lbl_80282038 != 0)) {
+    if (lbl_80282054 != 0) {
+        if (--lbl_80282054 == 0 && lbl_80282038) {
             fn_800A7968(lbl_80281419, 0, lbl_80282052, lbl_80282050, lbl_8028204C);
             fn_800AD698(lbl_80281419, 0, 1);
             lbl_80282038 = 0;
@@ -354,12 +264,12 @@ void fn_800A4BDC(void) {
 }
 
 void fn_800A4C54(void) {
-    if ((u8) lbl_8028202A != 0) {
+    if (lbl_8028202A) {
         lbl_8028202A = 0;
         fn_800A4084();
     }
-    if ((u8) lbl_80282029 != 0) {
-        if ((u8) lbl_8028202C != 0) {
+    if (lbl_80282029) {
+        if (lbl_8028202C) {
             fn_800A44A0();
             lbl_8028202C = 0;
         }
@@ -371,8 +281,8 @@ void fn_800A4C54(void) {
 
 void fn_800A4FD8(void) {
     fn_800A75B4();
-    lbl_8028141B = 255;
-    lbl_80281418 = 255;
+    lbl_8028141B = 0xFF;
+    lbl_80281418 = 0xFF;
     lbl_80282029 = 0;
 }
 
@@ -380,8 +290,8 @@ void fn_800A5620(void) {
     lbl_8028202D = 1;
 }
 
-void fn_800A5E94(s32 p0) {
-    fn_8006BAA8((p0 & 0xFF));
+void fn_800A5E94(u8 nPlayer) {
+    fn_8006BAA8(nPlayer);
     fn_800A4374();
     fn_800A707C();
 }
@@ -436,7 +346,7 @@ void fn_800A644C(void) {
 }
 
 void fn_800A6EC8(void) {
-    if ((u8) lbl_80282040 != 0) {
+    if (lbl_80282040) {
         fn_800A4374();
         fn_800A707C();
         fn_800AD698(lbl_8028141C, 0, 0);
@@ -447,7 +357,7 @@ void fn_800A6EC8(void) {
 }
 
 void fn_800A6F38(void) {
-    if ((u8) lbl_80282040 != 0) {
+    if (lbl_80282040) {
         fn_800AD9AC(lbl_8028141C, 0, 2);
         fn_800AD9AC(lbl_8028141C, 1, 2);
         fn_800AD9AC(lbl_8028141D, 0, 2);
@@ -460,7 +370,7 @@ void fn_800A6F38(void) {
 }
 
 void fn_800A707C(void) {
-    if ((u8) lbl_80282040 != 0) {
+    if (lbl_80282040) {
         fn_800AD698(lbl_8028141C, 4, 0);
         fn_800AD698(lbl_8028141D, 4, 0);
         fn_800AD698(lbl_8028141C, 5, 0);
@@ -468,49 +378,49 @@ void fn_800A707C(void) {
     }
 }
 
-void fn_800A72EC(u8 arg0, u8 arg1) {
-    if ((lbl_8028202E ^ arg0) != 0) {
-        lbl_8028202E = arg0;
-        if (arg0 != 0) {
+// Switches the game's sounds off (bOff) or back on; bMusic restarts the music too.
+void fn_800A72EC(u8 bOff, u8 bMusic) {
+    if (lbl_8028202E ^ bOff) {
+        lbl_8028202E = bOff;
+        if (bOff) {
             fn_800A49A4(0);
             fn_800A75B4();
             fn_800A6EC8();
             fn_800A6660(0);
             return;
         }
-        if (arg1 != 0) {
+        if (bMusic) {
             fn_800A44A0();
             fn_800A47A0();
         }
     }
 }
 
-void fn_800A73C0(s32 p0, s32 p1) {
-    fn_800ADA28(lbl_8028141B, 0, (p1 & 0xFF), 0);
+// a is unused.
+void fn_800A73C0(u8 a, int n) {
+    fn_800ADA28(lbl_8028141B, 0, n, 0);
 }
 
-void fn_800A73F0(s32 arg0) {
-    switch (arg0) {
+void fn_800A73F0(s32 n) {
+    switch (n) {
     case 1:
-        fn_800ADA28(lbl_8028141B, 1, 0U, 0);
-        return;
+        fn_800ADA28(lbl_8028141B, 1, 0, 0);
+        break;
     case 6:
-        fn_800ADA28(lbl_8028141B, 1, 1U, 0);
-        return;
+        fn_800ADA28(lbl_8028141B, 1, 1, 0);
+        break;
     default:
-        fn_800ADA28(lbl_8028141B, 0, (u8) arg0, 0);
-        return;
+        fn_800ADA28(lbl_8028141B, 0, n, 0);
+        break;
     }
 }
 
 s32 fn_800A7528(void) {
-    s32 t0;
-    t0 = fn_800A7720();
-    return (t0 & 0xFF);
+    return fn_800A7720();
 }
 
 void fn_800A75B4(void) {
-    if ((s32) lbl_8028203C == 1) {
+    if (lbl_8028203C == 1) {
         fn_800AD698(lbl_80281418, 0, 0);
         lbl_8028203C = 0;
     }
@@ -565,25 +475,26 @@ void fn_800A79F4(void) {
     Mov_Tick();
 }
 
-void fn_800A7A14(void) {
-    fn_800B0858();
+void fn_800A7A14(u8 nSound) {
+    fn_800B0858(nSound);
 }
 
-s32 fn_800A7A34(s32 p0, s32 p1, s32 p2) {
+// Every caller passes a fourth argument; nothing here reads it.
+s32 fn_800A7A34(u8 a, u8 b, u8 nListeners, int nUnused) {
     fn_800AD0C4();
-    fn_800A402C(p2);
-    fn_800A8DC8(p0, p1, p2, 0);
+    fn_800A402C(nListeners);
+    // port: EA passes an argument fn_800A8DC8 ignores
+    ((u8 (*)(u8, u8, u8, int))fn_800A8DC8)(a, b, nListeners, 0);
     return 1;
 }
 
-void fn_800A7A98(s32 p0) {
+void fn_800A7A98(s32 n) {
     fn_800AD1C4();
     fn_800A4038();
-    fn_800A8D88(p0);
+    // port: EA passes an argument fn_800A8D88 ignores
+    ((void (*)(s32))fn_800A8D88)(n);
 }
 
-
-// ---- end of sweep code ----
 
 // Every caller passes a second flag (DiscError.c 1, this file 0); nothing here reads it.
 void fn_800A3F38(u8 b, u8 b2) {
@@ -729,6 +640,104 @@ void fn_800A43DC(void) {
             fn_800A42B0(n);
         }
     }
+}
+
+// Applies the sound options: the volumes, then the music. Game types 3 and 10 play music 2 on
+// row 0; otherwise music 6 plays (two players at most, not in a replay) on the row the game mode
+// picks, if that row is switched on. Without music the ambience (sound 8) plays instead.
+void fn_800A44A0(void) {
+    int nMode;
+    f32 fVolume;
+    u8 bFixed;
+    u8 bNoBreaker;
+    s32 nState;
+    s16 nSound;
+    u8 bOn;
+    u8 bMusic;
+    u8 nRow;
+    f32 vPos[3];
+
+    nMode = Game_GetMode();
+    fVolume = 0.2f * (s8)gSession.options.a0[1];
+    bFixed = gSession.nGameType == 3 || gSession.nGameType == 10;
+    bNoBreaker = !bFixed && gSession.a8[0];
+    nState = 0;
+    bOn = fVolume > 0.0f;
+    fn_800A3FB4(15, fVolume * lbl_8018E988[15]);
+    fn_800A77E0(0.2f * (s8)gSession.options.a0[0]);
+    if (bFixed) {
+        nSound = 2;
+        bMusic = 1;
+        nRow = 0;
+    } else {
+        nSound = 6;
+        bMusic = gSession.nNumPlayers <= 2 && !gSession.bReplay;
+        bOn = bOn && bMusic;
+        switch (nMode) {
+        case 0:
+        case 1:
+        case 2:
+        case 9:
+        case 18:
+        case 19:
+        case 20:
+        case 21:
+            nRow = 1;
+            break;
+        case 6:
+        case 7:
+        case 8:
+        case 12:
+        case 13:
+        case 14:
+        case 15:
+        case 16:
+        case 17:
+        case 22:
+        case 25:
+        case 26:
+            nRow = 2;
+            break;
+        default:
+            nRow = 3;
+            break;
+        }
+    }
+    if (!bNoBreaker || (gSession.uFlags & 0x4000)) {
+        bOn = bOn && gSession.options.abRowOn[nRow];
+    }
+    if (bOn) {
+        if (lbl_8028203C == 2) {
+            fn_800AD450(lbl_8028141A);
+            lbl_8028141A = 0xFF;
+        }
+        if (bMusic) {
+            nState = 1;
+            if (lbl_80281418 == 0xFF) {
+                lbl_80281418 = fn_800AD280(nSound, -1, 1, 1, NULL);
+            }
+            lbl_8028142C = nRow;
+        }
+    } else {
+        if (lbl_8028203C == 1) {
+            fn_800AD450(lbl_80281418);
+            lbl_80281418 = 0xFF;
+        }
+        if (bMusic && !bFixed && gpGame->b288 && (s8)gSession.options.a0[0] > 0) {
+            nState = 2;
+            if (lbl_8028141A == 0xFF) {
+                vPos[0] = 0.0f;
+                vPos[1] = 0.0f;
+                vPos[2] = 12.0f;
+                lbl_8028141A = fn_800AD280(8, -1, 1, 1, NULL);
+                fn_800AD800(lbl_8028141A, vPos, NULL, 0);
+            }
+            if (lbl_8028203C != 2) {
+                lbl_80282041 = 1;
+            }
+        }
+    }
+    lbl_8028203C = nState;
 }
 
 void fn_800A484C(void) {
@@ -879,8 +888,8 @@ void fn_800A4CB8(GameAudioSource** ppSource, int n) {
 void fn_800A4E34(void) {
     f32 vPos[3];
 
-    lbl_80281419 = 0xFF;
     lbl_8028203C = 0;
+    lbl_80281419 = 0xFF;
     lbl_8028141A = 0xFF;
     lbl_80281418 = 0xFF;
     if (lbl_80282028 == 0) {
@@ -1091,7 +1100,7 @@ void fn_800A573C(u8 nPlayer) {
     Player* pPlayer;
     GameAudioView* pView;
     u8 nId;
-    s32 nState;
+    int nState;
     f32 fSpeed;
     f32 fPitch;
     f32 fVolume;
