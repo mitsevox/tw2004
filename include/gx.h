@@ -35,6 +35,10 @@ void GXInvalidateVtxCache(void);
 void GXBeginDisplayList(void* pList, u32 uSize);
 u32  GXEndDisplayList(void);            // the list's size
 void GXResetWriteGatherPipe(void);
+
+// ---- matrices --------------------------------------------------------------------------------
+
+void GXLoadPosMtxImm(f32 (*pMtx)[4], int nId);
 void GXSetArray(int eAttr, void* pBase, u8 nStride);
 void GXClearVtxDesc(void);
 void GXSetVtxDesc(int eAttr, int eType);

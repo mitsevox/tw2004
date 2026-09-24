@@ -8,6 +8,7 @@
 void fn_80097EC4(f32* pPos);
 void fn_800124A8(void);                                 // LLFont.c: end the primitive
 void fn_80012520(u32 ePrim, u32 eFormat, u16 nVerts);  // LLFont.c: GXBegin
+void fn_80070168(void);                                 // calls a display list (see fn_80098408)
 
 // Starts glow nGlow's display list, with room for nVerts vertices of 32 bytes and 1 KB more.
 GlowList* fn_80097F44(int nGlow, int nVerts) {
@@ -127,6 +128,81 @@ void fn_80098350(void) {
 }
 
 // ---- end of sweep code ----
+
+// Draws a queued glow at pPos (in view space) unless its n25 has bit 0x80: glow n25's display list
+// through two matrices, the ring's inner edge scaled by f18 and its outer by f1C, both turned by
+// f20, in the colours uColorA and uColorB; n24 draws it over everything.
+void fn_80098408(GlowQueued* pGlow, f32* pPos) {
+    f32 fSin;
+    f32 fCos;
+    f32 fOuter;
+    f32 fInner;
+    f32 x;
+    f32 y;
+    f32 z;
+    f32 mInner[3][4];
+    f32 mOuter[3][4];
+    GXColor colour;
+
+    if (!(pGlow->n25 & 0x80)) {
+        if (0.0f != pGlow->f20) {
+            fSin = fn_800095F0(pGlow->f20);
+            fCos = fn_80009638(pGlow->f20);
+        } else {
+            fSin = 0.0f;
+            fCos = 1.0f;
+        }
+        fInner = pGlow->f18;
+        fOuter = pGlow->f1C;
+        x = -pPos[0];
+        y = pPos[1];
+        z = -pPos[2];
+        mInner[0][0] = -fInner * fCos;
+        mInner[0][1] = fInner * fSin;
+        mInner[0][2] = 0.0f;
+        mInner[0][3] = x;
+        mInner[1][0] = fInner * fSin;
+        mInner[1][1] = fInner * fCos;
+        mInner[1][2] = 0.0f;
+        mInner[1][3] = y;
+        mInner[2][0] = 0.0f;
+        mInner[2][1] = 0.0f;
+        mInner[2][2] = -1.0f;
+        mInner[2][3] = z;
+        mOuter[0][0] = -fOuter * fCos;
+        mOuter[0][1] = fOuter * fSin;
+        mOuter[0][2] = 0.0f;
+        mOuter[0][3] = x;
+        mOuter[1][0] = fOuter * fSin;
+        mOuter[1][1] = fOuter * fCos;
+        mOuter[1][2] = 0.0f;
+        mOuter[1][3] = y;
+        mOuter[2][0] = 0.0f;
+        mOuter[2][1] = 0.0f;
+        mOuter[2][2] = -1.0f;
+        mOuter[2][3] = z;
+        GXLoadPosMtxImm(mInner, 0);
+        GXLoadPosMtxImm(mOuter, 3);
+        colour.r = pGlow->uColorA;
+        colour.g = pGlow->uColorA >> 8;
+        colour.b = pGlow->uColorA >> 16;
+        colour.a = pGlow->uColorA >> 24;
+        GXSetTevColor(1, colour);
+        colour.r = pGlow->uColorB;
+        colour.g = pGlow->uColorB >> 8;
+        colour.b = pGlow->uColorB >> 16;
+        colour.a = pGlow->uColorB >> 24;
+        GXSetTevColor(2, colour);
+        if (pGlow->n24) {
+            GXSetZMode(0, 7, 0);                // no depth test, no depth write
+        } else {
+            GXSetZMode(1, 3, 1);                // less or equal, with depth write
+        }
+        // port: fn_80070168 (sweep_80070168.c) is defined without parameters but hands r3 and r4
+        // on to GXCallDisplayList: the list and its size
+        ((void (*)(void*, u32))fn_80070168)(lbl_801D99D0.a[pGlow->n25].p4, lbl_801D99D0.a[pGlow->n25].n0);
+    }
+}
 
 void fn_80098740(void) {
     s32 i;

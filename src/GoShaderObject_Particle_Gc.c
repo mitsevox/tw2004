@@ -112,7 +112,6 @@ void fn_800950DC(int r, int g, int b, int a);
 void fn_800950F4(f32 x, f32 y, f32 z);
 void fn_800124A8(void);                                 // LLFont.c: end the primitive
 void GXBegin(int ePrim, int eFormat, u16 nVerts);
-void GXLoadPosMtxImm(f32 (*pMtx)[4], int nId);
 
 // Draws n particles as camera-facing quads. Each one's position runs from v0 along v60 with time,
 // plus its own velocity's difference from v60 eased out by 1 / (1 + f50 t)^4; it is skipped when
