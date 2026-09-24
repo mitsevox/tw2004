@@ -65,7 +65,9 @@ u8    fn_8001EC48(Character* pChar);
 f32   fn_8001ED44(Character* pChar, int b);
 f32   fn_8001EE00(Character* pChar, int b);
 void  fn_80017DDC(Character* pChar);
-void  fn_8001899C(Character* pChar, int a, int b);
+void  fn_8001899C(Character* pChar, u8 bLegA, u8 bLegB);
+void  Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, int nBoneA, int nBoneB,
+                              int nBoneC, int nBoneD, int nPoint, int b);
 void  fn_8001B644(Character* pChar);
 void  fn_8001C860(Character* pChar);
 void  fn_80021978(u8 v);                                        // ska_shared.c
@@ -416,8 +418,8 @@ void fn_80017DDC(Character* pChar) {
 void Character_UpdateAnimation(Character* pChar, int bForce, f32 fTime) {
     u32 auBits[4];
     int bC860 = 0;
-    int bLegA = 0;
-    int bLegB = 0;
+    u8 bLegA = 0;
+    u8 bLegB = 0;
     int i;
 
     if (pChar == NULL) {
@@ -627,6 +629,44 @@ void fn_80018710(Character* pChar) {
             fn_80029A88(pChar->pModel, pChar->pSkin->p1088);
             fn_80029A7C(pChar->pModel, pChar->pSkin->p108C, pChar->pSkin->pModel->n14);
         }
+    }
+}
+
+// Puts a golfer's legs on the ground by IK: with bLegA the leg of bones 0x36-0x3A (point 2),
+// with bLegB the leg of bones 0x44-0x48 (point 3); the bones they move are then transformed again.
+void fn_8001899C(Character* pChar, u8 bLegA, u8 bLegB) {
+    CourseInfo* pCourse;
+    u32 auBits[4];
+
+    if (pChar == NULL) {
+        return;
+    }
+    fn_8001E938(auBits, 0x80);
+    if (!fn_8001EC48(pChar)) {
+        return;
+    }
+    pCourse = fn_8000C594();
+    if (pCourse == NULL) {
+        return;
+    }
+    if (bLegA) {
+        Character_IKLegToGround(pChar, pCourse, 0, fn_8001EEE4(pChar->pModel, 0x36),
+                                fn_8001EEE4(pChar->pModel, 0x38), fn_8001EEE4(pChar->pModel, 0x39),
+                                fn_8001EEE4(pChar->pModel, 0x3A), 2, 0);
+        fn_8001EA34(auBits, fn_8001EEE4(pChar->pModel, 0x38));
+        fn_8001EA34(auBits, fn_8001EEE4(pChar->pModel, 0x36));
+        fn_8001EA34(auBits, fn_8001EEE4(pChar->pModel, 0x39));
+    }
+    if (bLegB) {
+        Character_IKLegToGround(pChar, pCourse, 1, fn_8001EEE4(pChar->pModel, 0x44),
+                                fn_8001EEE4(pChar->pModel, 0x46), fn_8001EEE4(pChar->pModel, 0x47),
+                                fn_8001EEE4(pChar->pModel, 0x48), 3, 1);
+        fn_8001EA34(auBits, fn_8001EEE4(pChar->pModel, 0x46));
+        fn_8001EA34(auBits, fn_8001EEE4(pChar->pModel, 0x44));
+        fn_8001EA34(auBits, fn_8001EEE4(pChar->pModel, 0x47));
+    }
+    if (fn_8001E9F4(auBits, auBits, 0x80)) {
+        SKEL_TransformBones(pChar->pModel, auBits);
     }
 }
 
