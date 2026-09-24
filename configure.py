@@ -949,7 +949,7 @@ config.libs = [
             Object(NonMatching, "HoleScore.c"),
             Object(NonMatching, "SwingTips.c"),
             Object(NonMatching, "Calendar.c"),
-            Object(NonMatching, "CourseData.c"),
+            Object(Matching, "CourseData.c"),
             Object(NonMatching, "Earnings.c"),
             Object(NonMatching, "GameHoleContests.c"),
             Object(Matching, "GameManager.c"),
