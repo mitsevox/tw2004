@@ -110,31 +110,30 @@ s32 fn_80122AF0(s32 nChan) {
 // status (0x30).
 s32 fn_80122BCC(s32 nChan) {
     u32 uStart = OSGetTick();
-    u8* pStatus = &lbl_80260E18[nChan].uStatus;
 
     for (;;) {
-        if (GBAGetStatus(nChan, pStatus) != 0) {
+        if (GBAGetStatus(nChan, &lbl_80260E18[nChan].uStatus) != 0) {
             return 0;
         }
         if (OSGetTick() - uStart > GBA_TIMEOUT_TICKS) {
             return 0;
         }
-        if (*pStatus == 0x20) {
+        if (lbl_80260E18[nChan].uStatus == 0x20) {
             break;
         }
     }
-    if (GBAWrite(nChan, (u8*)lbl_8028255C, pStatus) != 0) {
+    if (GBAWrite(nChan, (u8*)lbl_8028255C, &lbl_80260E18[nChan].uStatus) != 0) {
         return 0;
     }
     uStart = OSGetTick();
     for (;;) {
-        if (GBAGetStatus(nChan, pStatus) != 0) {
+        if (GBAGetStatus(nChan, &lbl_80260E18[nChan].uStatus) != 0) {
             return 0;
         }
         if (OSGetTick() - uStart > GBA_TIMEOUT_TICKS) {
             return 0;
         }
-        if (*pStatus == 0x30) {
+        if (lbl_80260E18[nChan].uStatus == 0x30) {
             return 1;
         }
     }
@@ -143,14 +142,13 @@ s32 fn_80122BCC(s32 nChan) {
 // Sends the GBA one word once it can take one ("GbaWriteOnline").
 s32 fn_80122CFC(s32 nChan, u32* pCmd) {
     u32 uStart = OSGetTick();
-    u8* pStatus = &lbl_80260E18[nChan].uStatus;
 
     for (;;) {
-        if (GBAGetStatus(nChan, pStatus) != 0) {
+        if (GBAGetStatus(nChan, &lbl_80260E18[nChan].uStatus) != 0) {
             OSReport("GbaWriteOnline: Failed to get status from GBA (chan=%d).\n", nChan);
             return 0;
         }
-        if ((*pStatus & 0x30) != 0x30) {
+        if ((lbl_80260E18[nChan].uStatus & 0x30) != 0x30) {
             OSReport("GbaWriteOnline: Lost connection with GBA while waiting to write (chan=%d).\n", nChan);
             return 0;
         }
@@ -158,11 +156,11 @@ s32 fn_80122CFC(s32 nChan, u32* pCmd) {
             OSReport("GbaWriteOnline: Timeout to wait to change GBA status (chan=%d).\n", nChan);
             return 0;
         }
-        if (!(*pStatus & 2)) {
+        if (!(lbl_80260E18[nChan].uStatus & 2)) {
             break;
         }
     }
-    if (GBAWrite(nChan, (u8*)pCmd, pStatus) != 0) {
+    if (GBAWrite(nChan, (u8*)pCmd, &lbl_80260E18[nChan].uStatus) != 0) {
         OSReport("GbaWriteOnline: Failed to write data to GBA (chan=%d).\n", nChan);
         return 0;
     }
@@ -176,14 +174,13 @@ s32 fn_80122CFC(s32 nChan, u32* pCmd) {
 // Reads one word from the GBA once it has one ("GbaReadOnline").
 s32 fn_80122E68(s32 nChan, u32* pWord) {
     u32 uStart = OSGetTick();
-    u8* pStatus = &lbl_80260E18[nChan].uStatus;
 
     for (;;) {
-        if (GBAGetStatus(nChan, pStatus) != 0) {
+        if (GBAGetStatus(nChan, &lbl_80260E18[nChan].uStatus) != 0) {
             OSReport("GbaReadOnline: Failed to get status from GBA (chan=%d).\n", nChan);
             return 0;
         }
-        if ((*pStatus & 0x30) != 0x30) {
+        if ((lbl_80260E18[nChan].uStatus & 0x30) != 0x30) {
             OSReport("GbaReadOnline: Lost connection with GBA while waiting to read (chan=%d).\n", nChan);
             return 0;
         }
@@ -191,11 +188,11 @@ s32 fn_80122E68(s32 nChan, u32* pWord) {
             OSReport("GbaReadOnline: Timeout to wait to change GBA status (chan=%d).\n", nChan);
             return 0;
         }
-        if ((*pStatus & 8) == 8) {
+        if ((lbl_80260E18[nChan].uStatus & 8) == 8) {
             break;
         }
     }
-    if (GBARead(nChan, (u8*)pWord, pStatus) != 0) {
+    if (GBARead(nChan, (u8*)pWord, &lbl_80260E18[nChan].uStatus) != 0) {
         OSReport("GbaReadOnline: Failed to read data to GBA (chan=%d).\n", nChan);
         return 0;
     }
