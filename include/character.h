@@ -230,7 +230,10 @@ void* fn_80020DD4(void* pClip, void* pOut, int nAlign);
 
 typedef struct SKABlendNode SKABlendNode;
 
+void Skalib_Init(void);                 // skalib.c
 void Skalib_Shutdown(void);             // skalib.c
+void fn_8001F64C(void);                 // mtalib.c
+void fn_80071AD0(void);                 // animblender.c
 void AnimLib_Free(AnimLib* pLib);       // skalib.c
 void ClipBank_Release(int nSlot);       // skalib.c
 void fn_8001F66C(void);                 // mtalib.c
@@ -428,7 +431,8 @@ typedef struct Character {
     s32   uFlags;               // 0x168  bit 0x40: the backswing is being backed down; 0x200 / 0x400: the
                                 //        clip lookup fell back (Char_SetClip). Signed: the original tests
                                 //        it with cmpwi
-    u8    unk16C[0x17C - 0x16C];
+    s32   n16C;                 // 0x16C  set to -1 by fn_8001D020
+    u8    unk170[0x17C - 0x170];
     f32   fAnimTime;            // 0x17C
     f32   f180;                 // 0x180  fn_8001966C: fAnimTime = f180 + the blend's time - v1638[1]
     f32   fAnimEnd;             // 0x184  the animation's end time
@@ -473,7 +477,10 @@ typedef struct Character {
                                 //         (Player_SetGolfer)
     s32   nStyle;               // 0x16E0  the animation style (fn_8001C7FC); at -1
                                 //         CharacterState_AddSKABlendData does nothing
-    u8    unk16E4[0x1784 - 0x16E4];
+    f32   aPoints[5][4];        // 0x16E4  points Character_PlaceFeetOnGround sets the heights of; the
+                                //         skeleton code (0x80027FF8) moves them in x and z
+    f32   aGroundNormal[4][4];  // 0x1734  } the ground under points 0-3 (Character_UpdateFeetTerrainInfo)
+    f32   afGroundHeight[4];    // 0x1774  }
     s32   n1784;                // 0x1784  set to -1 by Character_SetPosition
     Clip* pCurClip;             // 0x1788  the clip Char_SetClip picked
     u8    unk178C[0x1790 - 0x178C];
@@ -482,7 +489,8 @@ typedef struct Character {
     void* p1794;                // 0x1794  cleared by fn_80062BE8; the same for group 9
     Clip* p1798;                // 0x1798  cleared by fn_8001942C; with n2C 6, fn_8001C650 and
                                 //         fn_8001C860 set n16D4 to 4 when it is 0
-    u8    unk179C[0x17AC - 0x179C];
+    f32   a179C[4];             // 0x179C  cleared by Character_PlaceFeetOnGround; fn_80017DDC acts only
+                                //         while a179C[1] is above 0.9
     void* p17AC;                // 0x17AC  its slider definitions (CharSlider_CreateDefinitionsFromMem,
                                 //         fn_8001A9F4); fn_8001DC64 applies them
     void (*pfn17B0)(void);      // 0x17B0  called by Character_UpdateAnimation before the bones are
@@ -499,6 +507,12 @@ typedef struct ViewSlot {
 } ViewSlot;
 
 extern ViewSlot gViewSlots[5];          // 0x80187124  per player
+
+// Club names as 64-bit ids ("IGdriver", [1] unset, "IGputter", "IGiron3", "IGiron7", "IGwedge"),
+// set by fn_8001C37C; FEgolferanim compares ids against them.
+extern u64 lbl_801B9638[6];
+
+extern f32 lbl_80189A30[4];             // (0, 0, 0, 0): where fn_8001D020 places the menu's golfer
 
 // char.c: the club skins' part and set names, one per club kind (0 drivers, 1 fairway woods,
 // 2 putters, 3 and 4 the 3 and 7 irons, 5 wedges), for Character_SetClubStatesForCharacter
@@ -576,6 +590,14 @@ extern AnimStream* lbl_80282230;
 u8    fn_800C9828(int nGroup, int nStyle, int nClub, int nKey);   // the clips are streamed
 void  fn_800CA9DC(int nSlot);
 
+void  fn_800177A0(Character* pChar, SkelPose* pPose);   // a blend node's pose from the body skin
+void  fn_80017864(Character* pChar, SkelPose* pPose);   // only its bit arrays
+void  fn_80018484(Character* pChar, CharModel* pModel);
+void  fn_8001C0E0(Character* pChar);    // frees the character
+void  fn_8001C5B4(Character* pChar, int n);
+void  fn_8001D238(void);
+void  fn_8001D4A4(Character* pChar, int nSlot);   // dresses the character (its skins and clubs)
+void  fn_8001EE98(Character* pChar, u8 b);    // sets the model's bEE
 void  Character_SetPosition(Character* pChar, f32* pPos, u8 bPlace);
 int   fn_8001C558(int nPlayer);          // the model id of the player's golfer
 void  fn_8001C724(Character* pChar, int nKind);
@@ -591,6 +613,7 @@ u8    fn_8001DBF4(Character* pChar);    // the ball is in the golfer's hand
 void  Character_GetBallOnFingerPosition(Character* pChar, f32* pPos);
 f32 (*fn_8001ED08(Character* pChar, int nBone))[4];  // a bone's matrix
 u8    fn_8001EDF4(Character* pChar);    // the model's bEE
+int   fn_8001EE88(Character* pChar);    // n1658
 int   fn_8001EE90(Character* pChar);
 int   fn_8001EED8(CharModel* pModel, int nBone);    // a bone's index
 int   fn_8001EEE4(CharModel* pModel, int nBone);
@@ -616,6 +639,7 @@ void  fn_80029A88(CharModel* pModel, f32 (*pMatrices)[4][4]);
 void  fn_80029A90(CharModel* pModel, f32 (*pMtx)[4], int nBone);
 void  fn_80029AF8(CharModel* pModel);
 int   fn_80048574(Character* pChar, u64 uEvent);    // the character's animation has event uEvent
+u8    fn_8009637C(Character* pChar);    // CharAnim.c: n26 is not 1 (both callers mask the result)
 void  fn_80072ACC(SKABlendNode* pNode, int* pn, f32 fTime);
 f32   fn_80072CB8(SKABlendNode* pNode, u64 uEvent); // an event's time in a blend tree
 void  fn_8007326C(u8* pAnim);

@@ -425,6 +425,8 @@ typedef struct CharPool {
 } CharPool;
 LAYOUT_ASSERT(CharPool, 0x3C);
 
+extern f32        lbl_801B95C8[4];      // } the two ground normals Character_GetTerrainHeightAndNormal
+extern f32        lbl_801B95D8[4];      // } reads (the pNormalHigh / pNormalLow of Ter_GetEnclosingGroundData)
 extern CharPool   lbl_801B95E8;
 extern Character* lbl_801B9624[5];     // the characters made so far (fn_8001C21C)
 extern s32        lbl_80281CA8;         // how many
@@ -449,8 +451,6 @@ s32   fn_800CDCA0(Skin* pSkin, const char* pName);
 s32   fn_800CDCE0(Skin* pSkin, int nSet, u64 uId);
 s32   fn_800CDD5C(Skin* pSkin, int nSet, const char* pName);
 s32   fn_800CDDB0(Skin* pSkin, int nSet, int nVariant, u64 uId);
-void  fn_8001D4A4(Character* pChar, int nSlot);   // dresses the character (its skins and clubs)
-void  fn_8001EE98(Character* pChar, u8 b);    // sets the model's bEE
 void  fn_8010E4DC(CharSliderDefs* pDefs, CharModel* pModel, Skin* pSkin, int nSliders, u8* aValues,
                   u8* pNode);
                                         // applies slider values (Character.p17AC's definitions)
