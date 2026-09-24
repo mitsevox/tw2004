@@ -631,7 +631,7 @@ void     fn_8003DCE8(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamS
                      f32 fFrameTime);
 void     fn_8003E624(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot* pShot, int a,
                      f32 fFrameTime);
-void     fn_8003EA50(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot* pShot, int a,
+void     fn_8003EA50(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot* pShot, u8 b,
                      f32 fFrameTime);
 void     fn_8003F2E0(CamScript* pScript, f32 fTime);
 void     CameraScript_RecordCurrentCam(CamShot* pShot, f32* pCam, f32* pSub, int nPlayer, CamScript* pScript,

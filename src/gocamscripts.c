@@ -360,6 +360,104 @@ void fn_8003E624(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot*
     }
 }
 
+// The script frame of a fly-by path (GoStaticCam.c). When the path has a spline, the camera flies
+// along it (fn_80065488) by the share of the spline's length the time has reached, and at the end
+// goes on to the next path's shots; without one, the camera moves between the shots like
+// fn_8003E624 does.
+void fn_8003EA50(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot* pShot, u8 b, f32 fTime) {
+    f32 vPrev[4];
+    f32 vMove[4];
+    f32 vMoveTo[4];
+    f32 fFov;
+    FlyByPath* pPath;
+    f32 fShare;
+    f32 fStep;
+    f32 fMoveTime = lbl_80281F78->f178;
+
+    if (pScript->pShot == NULL) return;
+    Vec_Copy(lbl_80281F78->v17C, vMoveTo);
+    if (!b && !fn_80043388(pScript, pScript->pShot)
+        && (gSession.nPaused != 0 || (0.0f == gSession.fFrameTime && 0.0f == fTime))) {
+        if (pScript->nCamera != 0) {
+            fn_8003F2E0(pScript, fTime);
+        }
+        return;
+    }
+    pPath = fn_80065424(pScript->pShot->nA4);
+    if (pPath != NULL) {
+        fShare = pScript->fCamTime / pPath->fLength;
+        if (fShare > 1.0f) {
+            fShare = 1.0f;
+        }
+        fn_80065488(pScript, pScript->pShot->nA4, pCam, pSub, &fFov, nPlayer, fn_800C7A9C(pPath, fShare));
+        fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[0])), fFov);
+        if (pScript->nCamera != 0) {
+            fn_8003F2E0(pScript, fTime);
+        }
+        if (fShare >= 1.0f) {
+            if (pScript->pNextShot != NULL && pScript->pNextShot->p40 != NULL) {
+                pScript->pShot = pScript->pNextShot;
+                pScript->pNextShot = pScript->pNextShot->p40;
+                pScript->fCamTime = 0.0f;
+                pScript->nCamera = 2;
+                Vec_Copy(vMoveTo, pScript->v40);
+                pScript->f90 = 0.0f;
+                pScript->f94 = fMoveTime;
+                pScript->fA0 = 0.0f;
+                pScript->fA4 = 0.0f;
+                return;
+            }
+            pScript->pShot = NULL;
+            pScript->pNextShot = NULL;
+            return;
+        }
+        pScript->f84 = pScript->fCamTime;
+        pScript->fCamTime += fTime;
+        pScript->f90 += fTime;
+        pScript->f8C = pPath->fLength;
+        return;
+    }
+    Vec_Copy(pCam, vPrev);
+    fn_80064F54(pScript->pShot, nPlayer, pScript->v0);
+    if (pScript->pNextShot != NULL) {
+        fn_80064F54(pScript->pNextShot, nPlayer, pScript->v10);
+    }
+    if (pScript->pNextShot == NULL || pScript->nBC == 5 || pScript->nBC == 4) {
+        Vec3Copy(pScript->v0, pCam);
+        CamScript_GetLookAtPoint(pScript->pShot, nPlayer, pSub, pCam, pScript, vPrev, fTime);
+        fFov = pScript->pShot->f78;
+        fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[0])), fFov);
+    } else {
+        CamScript_SplineCameras(nPlayer, pCam, pSub, pScript, vPrev, fTime);
+    }
+    if (pScript->nCamera != 0) {
+        fn_8003F2E0(pScript, fTime);
+    }
+    if (fn_80043388(pScript, pScript->pShot)) {
+        pScript->v60[0] = 0.0f;
+        pScript->v60[1] = 0.0f;
+        pScript->v60[2] = 0.0f;
+    } else {
+        fn_80045428(pCam, vPrev, pScript->v60);
+    }
+    fn_80043388(pScript, pScript->pShot);   // its answer is not used
+    fStep = fn_8003F064(pScript, fTime);
+    pScript->f84 = pScript->fCamTime;
+    pScript->fCamTime += fStep;
+    pScript->f90 += fStep;
+    if (0.0f != fStep) {
+        pScript->bCC = 0;
+    }
+    if (pScript->pNextShot != NULL && pScript->fCamTime > pScript->f8C) {
+        CameraScript_GoToNewScript(pScript, pScript->pNextShot, nPlayer, pCam, pSub, pShot);
+        fn_80043388(pScript, pScript->pShot);   // its answer is not used
+        if (fStep > 0.0f) {
+            fn_80045428(vPrev, pCam, vMove);
+            pScript->fD4 = (f32)fn_80009680(fn_80009744(vMove)) / fStep;
+        }
+    }
+}
+
 // Eases the script's ground height fD8 towards the ground under pCam (by CamTuning.fE0 a frame; with
 // no ground found, fD8 stays and bE8 asks for the fairway fix). With fMaxStep 0 or more, fD8 is
 // kept within it of the ground; never below the course's floor. Not while a held shot of bA8 1
