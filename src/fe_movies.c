@@ -17,6 +17,7 @@ void fn_800760D8(LLPict* pPict);        // LLVideo.c
 void fn_800760F4(f32* pUV, LLPict* pPict);  // LLVideo.c
 void fn_80016978(f32 x0, f32 y0, f32 x1, f32 y1);
 f32  fn_8006E118(u64 tEnd, u64 tStart);    // GameManager.c: seconds between two time stamps
+void fn_8000AE48(f32* pA, f32* pB, f32* pOut);     // pOut = pA * pB, element by element
 
 // ---- sweep code (not yet cleaned up) ----
 
@@ -150,6 +151,25 @@ void fn_800918A4(void) {
         lbl_801D8858.f8 = 0.0f;
         fn_800917C8();
     }
+}
+
+// Unpack pVtx into four-float arrays: its position (w 1), its texture coordinates (0, 1) and its
+// colour, which is then scaled by pScale and offset by pAdd.
+void fn_800912F4(FEVertex* pVtx, f32* pPos, f32* pUV, f32* pColour, f32* pScale, f32* pAdd) {
+    pPos[0] = pVtx->f8;
+    pPos[1] = pVtx->fC;
+    pPos[2] = pVtx->f10;
+    pPos[3] = 1.0f;
+    pUV[0] = pVtx->f0;
+    pUV[1] = pVtx->f4;
+    pUV[2] = 0.0f;
+    pUV[3] = 1.0f;
+    pColour[0] = pVtx->au14[0];
+    pColour[1] = pVtx->au14[1];
+    pColour[2] = pVtx->au14[2];
+    pColour[3] = pVtx->au14[3];
+    fn_8000AE48(pColour, pScale, pColour);
+    fn_80092250(pColour, pAdd, pColour);
 }
 
 // Update the loading screen set up by fn_800918A4, unless the session has flag 4: add the time since

@@ -93,6 +93,18 @@ LAYOUT_ASSERT(FE801D8858, 0x38);
 
 extern FE801D8858 lbl_801D8858;
 
+// A corner of a quad fe_movies.c fn_800912F4 turns into draw arrays (uiArc.c builds them too). Our
+// name: f8..f10 go out as a position, f0/f4 as texture coordinates, au14 as a colour.
+typedef struct FEVertex {
+    f32 f0;                     // 0x00
+    f32 f4;                     // 0x04
+    f32 f8;                     // 0x08
+    f32 fC;                     // 0x0C
+    f32 f10;                    // 0x10
+    u8  au14[4];                // 0x14  red, green, blue, alpha
+} FEVertex;
+LAYOUT_ASSERT(FEVertex, 0x18);
+
 // lbl_801D880C (0xC bytes), also read by uiProcessInterface.c. A menu message sets n4 and clears n0.
 typedef struct FE801D880C {
     s32 n0;                     // 0x0  0..2; uiProcessInterface.c sets it to -1
