@@ -453,9 +453,9 @@ s32 fn_800CD124(Skin* pSkin, int nSet, int nVariant) {
     SkinDesc74* pSet;
 
     if (pSkin->pModel->pDesc == NULL || nSet < 0 || nSet >= fn_800CCEA0(pSkin)) return -1;
-    pDesc = pSkin->pModel->pDesc;
-    if (nVariant < 0 || nVariant >= (pSet = &pDesc->p74[nSet])->n08) return -1;
-    return pDesc->p7C[nVariant + pSet->n10].n10;
+    if (nVariant < 0 || nVariant >= (pSet = &(pDesc = pSkin->pModel->pDesc)->p74[nSet])->n08) return -1;
+    nVariant += pSet->n10;
+    return pDesc->p7C[nVariant].n10;
 }
 
 // A set's option in one copy of the choices.
