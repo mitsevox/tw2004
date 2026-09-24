@@ -153,6 +153,23 @@ void fn_800918A4(void) {
     }
 }
 
+// Copy pSrc to pDst with its colour tinted by lbl_80281F28/lbl_80281F2C; without bTint the colour
+// is white and only the alpha is tinted.
+void fn_80090B80(FEVertex* pSrc, FEVertex* pDst, u8 bTint) {
+    memcpy(pDst, pSrc, sizeof(FEVertex));
+    if (bTint) {
+        pDst->au14[0] = lbl_80281F28[0] * (pSrc->au14[0] + lbl_80281F2C[0]);
+        pDst->au14[1] = lbl_80281F28[1] * (pSrc->au14[1] + lbl_80281F2C[1]);
+        pDst->au14[2] = lbl_80281F28[2] * (pSrc->au14[2] + lbl_80281F2C[2]);
+        pDst->au14[3] = lbl_80281F28[3] * (pSrc->au14[3] + lbl_80281F2C[3]);
+    } else {
+        pDst->au14[0] = 0xFF;
+        pDst->au14[1] = 0xFF;
+        pDst->au14[2] = 0xFF;
+        pDst->au14[3] = lbl_80281F28[3] * (pSrc->au14[3] + lbl_80281F2C[3]);
+    }
+}
+
 // Unpack pVtx into four-float arrays: its position (w 1), its texture coordinates (0, 1) and its
 // colour, which is then scaled by pScale and offset by pAdd.
 void fn_800912F4(FEVertex* pVtx, f32* pPos, f32* pUV, f32* pColour, f32* pScale, f32* pAdd) {

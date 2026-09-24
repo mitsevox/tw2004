@@ -105,6 +105,11 @@ typedef struct FEVertex {
 } FEVertex;
 LAYOUT_ASSERT(FEVertex, 0x18);
 
+// Four floats each, set by fe_movies.c fn_80090D28: fn_80090B80 tints a vertex colour to
+// lbl_80281F28 * (colour + lbl_80281F2C).
+extern f32* lbl_80281F28;
+extern f32* lbl_80281F2C;
+
 // lbl_801D880C (0xC bytes), also read by uiProcessInterface.c. A menu message sets n4 and clears n0.
 typedef struct FE801D880C {
     s32 n0;                     // 0x0  0..2; uiProcessInterface.c sets it to -1
