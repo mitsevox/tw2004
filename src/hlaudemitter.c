@@ -9,6 +9,23 @@
 
 AudInstance* fn_800AD674(u8 nId);
 
+// Runs fn_800AD450 on every instance in use, then empties every emitter. Always 1.
+int fn_800AD0C4(void) {
+    AudInstance* pInst;
+    AudInstance* pNext;
+    s32 i;
+
+    for (pInst = lbl_801F2668.pActive; pInst != NULL; pInst = pNext) {
+        pNext = pInst->pNextActive;
+        fn_800AD450(pInst->nId);
+    }
+    for (i = 0; i < 32; i++) {
+        lbl_801F2668.apFirst[i] = NULL;
+        lbl_801F2668.anSound[i] = 0;
+    }
+    return 1;
+}
+
 void fn_800AD1C4(void) {
 }
 

@@ -329,7 +329,8 @@ typedef struct AudInstanceCmd {
 // One of hlaudemitter.c's 256 emitter instances (lbl_801F2740); only the fields read so far.
 typedef struct AudInstance {
     AudInstanceCmd* pCmd;       // 0x0
-    u8   unk4[0xC - 0x4];
+    u8   unk4[0x8 - 0x4];
+    struct AudInstance* pNextActive;   // 0x8    the next in AudEmitters.pActive's list
     struct AudInstance* pNext;  // 0xC    the next instance of the same emitter (AudEmitters)
     u8   unk10[0x20 - 0x10];
     u8   nId;                   // 0x20   its number (its index in lbl_801F2740)
@@ -345,7 +346,9 @@ extern AudInstance lbl_801F2740[256];   // the instances, by id (0xFF: none)
 // hlaudemitter.c's emitters (lbl_801F2668, 0xD8 bytes): per emitter, its list of instances and
 // a sound number. 32 fit the layout: the list heads end where the sound numbers begin.
 typedef struct AudEmitters {
-    u8   unk0[0x10];
+    u8   unk0[0x8];
+    AudInstance* pActive;       // 0x8    the instances in use, linked through pNextActive
+    u8   unkC[0x10 - 0xC];
     AudInstance* apFirst[32];   // 0x10   linked through AudInstance.pNext
     s16  anSound[32];           // 0x90   fn_800ADC44 hands it to fn_800ADA08
     u8   unkD0[0xD8 - 0xD0];
@@ -530,6 +533,8 @@ u8   fn_800ACE38(AudVoice* pVoice, u32* puPos);
 
 // hlaudemitter.c
 void fn_800ADDC8(u8 nId, u8 nBit, s32 n);
+int  fn_800AD0C4(void);                 // fn_800AD450 on every instance in use, emitters emptied
+void fn_800AD450(u8 nId);
 void fn_800ADB4C(s16 nEmitter, u8 nTrack, u8 bOn);   // for every instance of an emitter: fn_800AD698
 void fn_800ADC44(s16 nEmitter, u8 nTrack, u8 n);     // fn_800AD9AC
 void fn_800ADCD0(s16 nEmitter, u8 nTrack, u8 n, int bCheck);   // fn_800ADA28
