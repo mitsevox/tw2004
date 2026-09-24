@@ -914,16 +914,16 @@ void fn_800CE170(Skin* pSkin, SkinTarget* pTarget) {
 // anything changed.
 s32 fn_800CE224(Skin* pSkin, SkinDesc14* pEntry, u8** ppOut, s32* pnOut, int nCopy) {
     SkinDesc* pDesc;
+    int j;
+    int i;
     SkinDesc74* pSet;
+    s32 bChanged;
+    s32 nB8;
     SkinDesc7C* pVariant;
     SkinDescB8* pB8;
-    int i;
-    int j;
     s32 nVariant;
     s32 nOption;
     s32 n;
-    s32 nB8;
-    s32 bChanged;
 
     bChanged = 0;
     if (pSkin == NULL || pSkin->pModel == NULL || (pDesc = pSkin->pModel->pDesc) == NULL || pEntry == NULL) {
