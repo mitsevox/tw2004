@@ -127,6 +127,23 @@ void fn_80027808(CharModel* pModel, f32* pRot) {
     }
 }
 
+// Turns bone 0x11's rotation by the skeleton's q10D4 while n10E4 is set, unless the IK is off or at
+// no weight.
+void fn_8002787C(CharModel* pModel) {
+    Skeleton* pSkel = pModel->pSkel;
+    f32 qRot[4];
+
+    if (pSkel != NULL && lbl_802810A6 != 0) {
+        if (pSkel->fIKWeight <= 0.0f) {
+            return;
+        }
+        if (pSkel->n10E4 != 0) {
+            fn_80008FCC(pSkel->q10D4, pSkel->p20[fn_8001EEE4(pModel, 0x11)], qRot);
+            fn_8001E85C(qRot, pModel->pSkel->p20[fn_8001EEE4(pModel, 0x11)]);
+        }
+    }
+}
+
 // With any IK weight, sets f1074 and f1078 to 0.25.
 void fn_8002792C(Skeleton* pSkel) {
     if (pSkel == NULL || lbl_802810A6 == 0) return;
