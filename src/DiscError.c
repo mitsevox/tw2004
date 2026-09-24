@@ -117,10 +117,10 @@ void fn_800B6CD8(int nX, int nY, const char* szText) {
     int n;
     u8 c;
 
-    c = *szText;
     if (lbl_802814D2) {
         nX *= 8;
     }
+    c = *szText;
     while (c != 0) {
         if (c < 0x20) {
             c = 0x20;
@@ -145,6 +145,7 @@ void fn_800B6CD8(int nX, int nY, const char* szText) {
 // A string's width in pixels.
 int fn_800B6DA4(const char* szText) {
     int nWidth;
+    int n;
     u8 c;
 
     nWidth = 0;
@@ -157,7 +158,8 @@ int fn_800B6DA4(const char* szText) {
             } else if (c >= 0x8B) {
                 c = 0x20;
             }
-            nWidth += lbl_801F66A8[c - 0x20].nWidth;
+            n = c - 0x20;
+            nWidth += lbl_801F66A8[n].nWidth;
         }
     }
     return nWidth;
