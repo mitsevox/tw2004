@@ -10,7 +10,6 @@ ViewController lbl_801B8BA8[4];
 ViewController* lbl_80281CA4;               // the current view's controller
 int lbl_80281CA0;                           // the current view
 
-s32   fn_80013E40(u8* p);                           // GoRenderCtx_Gc.c
 void  fn_80062E40(View* pView);                     // set up a camera controller
 void  fn_80038010(u8 a, int n, f32* pVec);
 void  fn_80038054(u8 a, int n, f32 f1, f32 f2);
@@ -157,7 +156,8 @@ void fn_80017158(int nView) {
 }
 
 s32 fn_800171B0(void) {
-    return fn_80013E40(*lbl_80280DF0);
+    // port: fn_800171B0 (and fn_80092274's slot) are typed s32, but the value is the frame buffer
+    return (s32)fn_80013E40(*lbl_80280DF0);
 }
 
 void fn_800171D8(f32* pRect, f32 x, f32 y, f32 w, f32 h) {

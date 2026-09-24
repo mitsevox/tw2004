@@ -101,16 +101,34 @@ typedef struct UObjMeshInfo {
     f32  f64;                   // 0x64  copied to UObjModel.f5C by type 0's setup
     f32  a68[8];                // 0x68  a terrain object's bounds (GoTerrain.c fn_80035508, fn_80031154):
                                 //       its centre [0..2], a radius [3] and a height [7]
-    u8   unk88[0x8B - 0x88];
+    s16  n88;                   // 0x88  the type of the mesh's parts (LLObj_Gc.c fn_80007658)
+    u8   unk8A[0x8B - 0x8A];
     u8   b8B;                   // 0x8B  bit 1: a terrain object drawn without z writes (GoTerrain.c
-                                //       fn_80035554, fn_80033308)
+                                //       fn_80035554, fn_80033308); passed on in UObjPartDesc.u0A
+    s16  n8C;                   // 0x8C  how many parts UObjMesh.p18 holds (fn_80007658)
+    u16  u8E;                   // 0x8E  (fn_80007658)
 } UObjMeshInfo;
 
 // An entry of UObjMesh.p18 (0x2C bytes; what fn_800082CC takes).
 typedef struct UObjMeshPart {
-    s32  n0;                    // 0x00  copied to Ter_ObjectDrawData.eShaderObjectType (fn_8003241C)
-    u8   unk4[0x2C - 0x4];
+    s32  n0;                    // 0x00  its type (fn_8000827C); copied to
+                                //       Ter_ObjectDrawData.eShaderObjectType (fn_8003241C)
+    s32  n4;                    // 0x04  copied to UObjMesh.n24 (LLObj_Gc.c fn_80007658)
+    u32  u8;                    // 0x08  not 0: the part is used; copied to UObjMesh.n20 (fn_80007658)
+    u8   unkC[0x24 - 0xC];
+    struct UObjArraySet* pSet;  // 0x24  its model's array set (part i: set i; fn_80007658)
+    UObjPartFuncs* pFuncs;      // 0x28  its type's functions (fn_8000827C)
 } UObjMeshPart;
+
+// What fn_80007658 hands a mesh's first part's type function (our name; 0x10 bytes on the stack).
+typedef struct UObjPartDesc {
+    s16  n0;                    // 0x00  how many parts (UObjMeshInfo.n8C)
+    u8   unk2[0x4 - 0x2];
+    s32  n4;                    // 0x04  fn_80007658's nCount
+    u16  u8;                    // 0x08  UObjMeshInfo.u8E
+    u16  u0A;                   // 0x0A  bit 0: UObjMeshInfo.b8B's bit 0
+    u8*  pC;                    // 0x0C  the model data after the mesh's chunk header
+} UObjPartDesc;
 
 // One level of detail of a UObjModel. The terrain's hole data is a tree of them (GoTerrain.c,
 // fn_800354BC..fn_80035500): the root holds a mesh per patch in its p8[1], a patch's p8[0] is its
@@ -141,17 +159,31 @@ typedef struct UObjArraySet {
     u8   unk14[0x20 - 0x14];
     u16  an20[5];               // 0x20  how many rows each array holds
     u8   unk2A[0x30 - 0x2A];
-    s32  n30;                   // 0x30  -1: the set is not made
-    u8   unk34[0x38 - 0x34];
+    s32  n30;                   // 0x30  its mode (fn_800081C8); -1: the set is not made
+    UObjSetFuncs* pFuncs;       // 0x34  its mode's functions (fn_800081C8)
 } UObjArraySet;
+
+// The 'ARRA' chunks fn_800073B4 finds before a model's 'HEAD' chunk (our name). Its size is from
+// fn_800073B4's stack frame: at most 15 chunks fit.
+typedef struct UObjArrayList {
+    s32  n;                     // 0x00  how many
+    u8*  ap[15];                // 0x04  each chunk's data
+} UObjArrayList;
+
+// A model's 'HEAD' chunk (our name; 0x70 bytes, the mesh chunks follow it).
+typedef struct UObjModelHead {
+    s16  nMeshes;               // 0x00  how many meshes the tree has (fn_800073B4 makes room for them)
+    u8   unk2[0x70 - 0x2];
+} UObjModelHead;
 
 typedef struct UObjModelRoot {
     UObjArraySet aSets[4];      // 0x000
     void* pE0;                  // 0x0E0  the data it was made from (fn_800073B4)
     void* pE4;                  // 0x0E4  freed with it when not NULL (fn_800075CC)
-    void* pE8;                  // 0x0E8
-    UObjMesh* pMesh;            // 0x0EC
+    UObjModelHead* pE8;         // 0x0E8  its 'HEAD' chunk (fn_800073B4)
+    UObjMesh* pMesh;            // 0x0EC  the mesh tree, right after the root (fn_800073B4)
 } UObjModelRoot;
+LAYOUT_ASSERT(UObjModelRoot, 0xF0); // fn_800073B4 puts the meshes at 0xF0
 
 // A UObject's model (UObject.pModel).
 typedef struct UObjModel {
@@ -173,6 +205,13 @@ int        fn_80045F50(UObjMesh* pMesh);            // how many meshes pMesh->p8
 UObjMesh*  fn_80045F5C(UObjMesh* pMesh, int i);     // pMesh->p8[i]
 UObjMesh*  fn_80045F6C(UObjModelRoot* pRoot);       // pRoot->pMesh
 UObjModelRoot* fn_800073B4(u8* pData, int n);       // builds a model's mesh tree from stream data
+
+// code_800080D0.c: the parts' type functions and the array sets' mode functions.
+void fn_800081C8(UObjArraySet* pSet, int nMode, void* pArg);
+void fn_80008214(UObjArraySet* pSet);
+void fn_80008248(UObjMeshPart* pPart);
+void fn_8000827C(UObjMeshPart* pPart, UObjArraySet* pSet, int nType, void* pArg);
+void fn_800082CC(UObjMeshPart* pPart);
 
 // UObject.c's object (0x118 bytes, fn_80048808 allocates one; a DynObj holds one at +0x10): three
 // matrices and a model drawn with them.

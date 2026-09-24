@@ -2283,7 +2283,6 @@ void fn_80035398(void) {
 // ---- sweep code (not yet cleaned up) ----
 
 void fn_8006F154();
-void fn_800082CC(void* p);
 extern s32 lbl_80281B88;
 extern s32 lbl_80281D68;
 void fn_800355E0(s32 arg0);
@@ -2398,7 +2397,7 @@ void fn_80035514(u8* pObject) {
     s32 n = *(s32*)(pObject + 0x28);
 
     if (pObject[n + 0x1C] != 0) {
-        fn_800082CC(*(u8**)(pObject + 0x18) + n * 0x2C);
+        fn_800082CC((UObjMeshPart*)(*(u8**)(pObject + 0x18) + n * 0x2C));
     }
 }
 
