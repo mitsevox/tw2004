@@ -241,12 +241,12 @@ void fn_800EAF7C(void) {
             nHoles = 0;
             nStrokes = lbl_80281664[lbl_802822F4].nTargetBase;
         } else {
-            nSum = 0;
+            nSum0 = 0;
             for (h = 0; h < Game_CurHoleIndex(); h++) {
                 gPlayers[0].nStrokes[h] = fn_800D2AD8(h);
-                nSum += gPlayers[0].nStrokes[h];
+                nSum0 += gPlayers[0].nStrokes[h];
             }
-            nDiff = lbl_80281664[lbl_802822F4].nTargetBase - nSum;
+            nDiff = lbl_80281664[lbl_802822F4].nTargetBase - nSum0;
             while (nDiff != 0) {
                 h = Rand_Next(0) % (Game_CurHoleIndex() + 1);
                 if (nDiff < 0) {
@@ -340,13 +340,13 @@ void fn_800EAF7C(void) {
             }
             nDiff = lbl_80281664[lbl_802822F4].nTargetBase;
             while (nDiff != 0) {
-                h = Rand_Next(0) % (Game_CurHoleIndex() + 1);
+                i = Rand_Next(0) % (Game_CurHoleIndex() + 1);
                 if (nDiff < 0) {
-                    if (gPlayers[0].nStrokes[h] > fn_800D2AD8(h) - 1) {
-                        gPlayers[0].nStrokes[h]--;
+                    if (gPlayers[0].nStrokes[i] > fn_800D2AD8(i) - 1) {
+                        gPlayers[0].nStrokes[i]--;
                     }
-                } else if (gPlayers[0].nStrokes[h] < fn_800D2AD8(h) + 1) {
-                    gPlayers[0].nStrokes[h]++;
+                } else if (gPlayers[0].nStrokes[i] < fn_800D2AD8(i) + 1) {
+                    gPlayers[0].nStrokes[i]++;
                 }
                 nSum = 0;
                 for (h = 0; h < Game_CurHoleIndex(); h++) {
