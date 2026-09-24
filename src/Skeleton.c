@@ -37,6 +37,7 @@ void fn_80021980(u32* aA, u32* aB, u32* aOut, u32 nBits);   // aOut = aA | aB, b
 void fn_80029A00(CharModel* pModel, int nA, int nB, f32* pRot);
 void fn_80029BF4(f32* pA, f32* pB, f32* pOut);
 void fn_80029C3C(f32* pA, f32* pB, f32* pOut);
+void fn_80029C18(f32* pA, f32* pB, f32* pOut);
 void fn_80029C60(u32* aSrc, u32* aDst, u32 nBits, u32 nShift);
 void fn_80029EF4(u32* pSrc, u32* pDst, u32 nBits);
 void fn_80029664(CharModel* pModel);
@@ -243,6 +244,32 @@ void fn_80027478(CharModel* pModel, IKChain* pChain) {
             uDone |= (u64)1 << nBone;
         }
     }
+}
+
+// fn_800280E8's IK error: moves the chain's end (v8) up toward pTarget, the move building up in
+// the skeleton's v10A4[1] (by f10CC, held between -f10A0 and f109C) and lifting the first link;
+// returns how far the chain's end is from pTarget.
+f32 fn_800275F4(CharModel* pModel, IKChain* pChain, f32* pTarget) {
+    f32 vDiff[4];
+    Skeleton* pSkel = pModel->pSkel;
+    f32 fDy;
+
+    fn_8001EED8(pModel, 1);  // EA drops the answer
+    fDy = pTarget[1] - pChain->v8[1];
+    pSkel->v10A4[1] = fDy * pSkel->f10CC + pSkel->v10A4[1];
+    if (pSkel->v10A4[1] > pSkel->f109C) {
+        pChain->v8[1] += fDy - (pSkel->v10A4[1] - pSkel->f109C);
+        pSkel->v10A4[1] = pSkel->f109C;
+    } else if (pSkel->v10A4[1] < -pSkel->f10A0) {
+        pChain->v8[1] += fDy - (pSkel->v10A4[1] + pSkel->f10A0);
+        pSkel->v10A4[1] = -pSkel->f10A0;
+    } else {
+        pChain->v8[1] += fDy;
+    }
+    pChain->pLinks[0].v28[1] = pSkel->f10C8 + pSkel->v10A4[1];
+    fn_80029C18(pTarget, pChain->v8, vDiff);
+    fn_8001E880(pChain->v8, pModel->pPoses[pChain->pLinks[pChain->nLinks - 1].nBone].v10);
+    return (f32)fn_80009680(fn_80009744(vDiff));
 }
 
 // Turns the IK on or off.
