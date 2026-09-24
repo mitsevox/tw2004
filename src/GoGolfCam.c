@@ -354,7 +354,8 @@ void GolfCamera_ProcessZoomToAimCamera(View* pView, int nPlayer) {
     if (pView->script.f108 < 0.0f || fDist / fTotal > 0.5f) {
         f = fAimY;
     } else {
-        f = fDist / fTotal * 2.0f;
+        f = fDist / fTotal;
+        f *= 2.0f;
         f = fAimY + (1.0f - f) * (fCamY - fAimY);
     }
     if (pView->script.f108 >= 1.0f) {
