@@ -1104,6 +1104,8 @@ void fn_8001971C(Character* pChar) {
 // use (fn_800CE8C0), the texture of that name (and the one after it when it goes with it) with its
 // palette, or an empty one. Then it opens the golfer's texture file.
 void fn_80019798(Character* pChar, Skin** apSkins, int nSkins) {
+    int nExtra;
+    int nTex;
     int nTexBytes;
     int nPalBytes;
     u8* pData;
@@ -1112,9 +1114,7 @@ void fn_80019798(Character* pChar, Skin** apSkins, int nSkins) {
     TexPalette* pPalData;
     u8 bAll;
     u8 bFound;
-    int nTex;
     int nPal;
-    int nExtra;
     int nNames;
     int nOut;
     int i;
