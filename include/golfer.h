@@ -378,7 +378,8 @@ typedef struct Player {
     s32  nEA0;                  // 0xEA0  } values of the modes' own the menus ask for
     s32  nEA4;                  // 0xEA4  } (GameUICommands.c fn_80089DB0)
     s32  nEA8;                  // 0xEA8  }
-    u8   unkEAC[0xEBC - 0xEAC];
+    f32  vEAC[3];               // 0xEAC  where the ball lay at nEA8's shot (GameMode22 fn_80126698)
+    u8   unkEB8[0xEBC - 0xEB8];
     s32  nEBC;                  // 0xEBC  }
     s32  nEC0;                  // 0xEC0  }
     s32  nEC4;                  // 0xEC4  } (GameMode22 fn_80126EC0 clears 0xEA0..0xEDC)
