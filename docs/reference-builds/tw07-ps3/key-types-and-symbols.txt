@@ -1,0 +1,413 @@
+Dev_Golf_Release_PS3.elf:	file format elf64-powerpc
+
+0x0000b1df: DW_TAG_structure_type
+              DW_AT_sibling	(0x0000b6bb)
+              DW_AT_name	("GolferData_t")
+              DW_AT_byte_size	(0x01f8)
+              DW_AT_decl_file	("c:\dev\Tiger\DL_Default\TigerCode\Code\Project\dotNET\Golf/../../../../../TIGERCODE/Code/Golf\GamePlayer\Headers\GolferStats.h")
+              DW_AT_decl_line	(23)
+
+0x00015e4b: DW_TAG_structure_type
+              DW_AT_sibling	(0x00016170)
+              DW_AT_name	("PhysicsBall_t")
+              DW_AT_byte_size	(0x0160)
+              DW_AT_decl_file	("c:\dev\Tiger\DL_Default\TigerCode\Code\Project\dotNET\Golf/../../../../../TIGERCODE/Code/Golf\Physics\Headers\PhysicsTypes.h")
+              DW_AT_decl_line	(146)
+
+0x00016540: DW_TAG_structure_type
+              DW_AT_sibling	(0x00016952)
+              DW_AT_name	("SW_sSwingData")
+              DW_AT_byte_size	(0x3370)
+              DW_AT_decl_file	("c:\dev\Tiger\DL_Default\TigerCode\Code\Project\dotNET\Golf/../../../../../TIGERCODE/Code/Golf\AI\Headers\SwingCommon.h")
+              DW_AT_decl_line	(280)
+
+0x0001698e: DW_TAG_typedef
+              DW_AT_name	("SW_sSwingData")
+              DW_AT_decl_file	("c:\dev\Tiger\DL_Default\TigerCode\Code\Project\dotNET\Golf/../../../../../TIGERCODE/Code/Golf\AI\Headers\SwingCommon.h")
+              DW_AT_decl_line	(416)
+              DW_AT_type	(0x00016540 "SW_sSwingData")
+
+0x00017a48: DW_TAG_structure_type
+              DW_AT_sibling	(0x00018af2)
+              DW_AT_name	("GamePlayer")
+              DW_AT_byte_size	(0x3ee0)
+              DW_AT_decl_file	("c:\dev\Tiger\DL_Default\TigerCode\Code\Project\dotNET\Golf/../../../../../TIGERCODE/Code/Golf\GamePlayer\Headers\GamePlayer.h")
+              DW_AT_decl_line	(287)
+
+0x0001ec76: DW_TAG_structure_type
+              DW_AT_sibling	(0x0001ee34)
+              DW_AT_name	("FE_CrAP_Asset_t")
+              DW_AT_byte_size	(0x44)
+              DW_AT_decl_file	("c:\dev\Tiger\DL_Default\TigerCode\Code\Project\dotNET\Golf/../../../../../TIGERCODE/Code/Golf\UI_Core\FrontEnd\Headers\FE_CrAPDB.h")
+              DW_AT_decl_line	(151)
+
+0x000b0d43: DW_TAG_structure_type
+              DW_AT_sibling	(0x000b0d82)
+              DW_AT_name	("GameModeDriverPGATour")
+              DW_AT_declaration	(0x01)
+
+0x0013cf59: DW_TAG_structure_type
+              DW_AT_sibling	(0x0013d0e0)
+              DW_AT_name	("FE_CrAP_Asset_t")
+              DW_AT_byte_size	(0x44)
+              DW_AT_decl_file	("c:/dev/Tiger/DL_Default/TigerCode/Code/Golf\Misc\/..\UI_Core\FrontEnd\Headers\FE_CrAPDB.h")
+              DW_AT_decl_line	(151)
+
+0x0013df7a: DW_TAG_structure_type
+              DW_AT_sibling	(0x0013e457)
+              DW_AT_name	("GolferData_t")
+              DW_AT_byte_size	(0x01f8)
+              DW_AT_decl_file	("c:\dev\Tiger\DL_Default\TigerCode\Code\Project\dotNET\Golf/../../../../../TIGERCODE/Code/Golf\GamePlayer\Headers\GolferStats.h")
+              DW_AT_decl_line	(23)
+
+0x00144255: DW_TAG_structure_type
+              DW_AT_sibling	(0x00144559)
+              DW_AT_name	("PhysicsBall_t")
+              DW_AT_byte_size	(0x0160)
+              DW_AT_decl_file	("c:\dev\Tiger\DL_Default\TigerCode\Code\Project\dotNET\Golf/../../../../../TIGERCODE/Code/Golf\Physics\Headers\PhysicsTypes.h")
+              DW_AT_decl_line	(146)
+
+0x00144904: DW_TAG_structure_type
+              DW_AT_sibling	(0x00144d16)
+              DW_AT_name	("SW_sSwingData")
+              DW_AT_byte_size	(0x3370)
+              DW_AT_decl_file	("c:\dev\Tiger\DL_Default\TigerCode\Code\Project\dotNET\Golf/../../../../../TIGERCODE/Code/Golf\AI\Headers\SwingCommon.h")
+              DW_AT_decl_line	(280)
+
+0x00144d52: DW_TAG_typedef
+              DW_AT_name	("SW_sSwingData")
+              DW_AT_decl_file	("c:\dev\Tiger\DL_Default\TigerCode\Code\Project\dotNET\Golf/../../../../../TIGERCODE/Code/Golf\AI\Headers\SwingCommon.h")
+              DW_AT_decl_line	(416)
+              DW_AT_type	(0x00144904 "SW_sSwingData")
+
+0x00145c59: DW_TAG_structure_type
+              DW_AT_sibling	(0x00146d35)
+              DW_AT_name	("GamePlayer")
+              DW_AT_byte_size	(0x3ee0)
+              DW_AT_decl_file	("c:\dev\Tiger\DL_Default\TigerCode\Code\Project\dotNET\Golf/../../../../../TIGERCODE/Code/Golf\GamePlayer\Headers\GamePlayer.h")
+              DW_AT_decl_line	(287)
+
+0x001ca983: DW_TAG_subprogram
+              DW_AT_sibling	(0x001ca99c)
+              DW_AT_external	(0x01)
+              DW_AT_name	("GolferData_t")
+              DW_AT_artificial	(0x01)
+              DW_AT_inline	(DW_INL_declared_not_inlined)
+
+0x001cacb4: DW_TAG_inlined_subroutine
+              DW_AT_abstract_origin	(0x001ca983 "GolferData_t")
+              DW_AT_low_pc	(0x00199e54)
+              DW_AT_high_pc	(0x00199e58)
+
+0x00216407: DW_TAG_structure_type
+              DW_AT_sibling	(0x002168e4)
+              DW_AT_name	("GolferData_t")
+              DW_AT_byte_size	(0x01f8)
+              DW_AT_decl_file	("c:\dev\Tiger\DL_Default\TigerCode\Code\Project\dotNET\Golf/../../../../../TIGERCODE/Code/Golf\GamePlayer\Headers\GolferStats.h")
+              DW_AT_decl_line	(23)
+
+0x00222e34: DW_TAG_structure_type
+              DW_AT_sibling	(0x0022313c)
+              DW_AT_name	("PhysicsBall_t")
+              DW_AT_byte_size	(0x0160)
+              DW_AT_decl_file	("c:\dev\Tiger\DL_Default\TigerCode\Code\Project\dotNET\Golf/../../../../../TIGERCODE/Code/Golf\Physics\Headers\PhysicsTypes.h")
+              DW_AT_decl_line	(146)
+
+0x002234e3: DW_TAG_structure_type
+              DW_AT_sibling	(0x002238f5)
+              DW_AT_name	("SW_sSwingData")
+              DW_AT_byte_size	(0x3370)
+              DW_AT_decl_file	("c:\dev\Tiger\DL_Default\TigerCode\Code\Project\dotNET\Golf/../../../../../TIGERCODE/Code/Golf\AI\Headers\SwingCommon.h")
+              DW_AT_decl_line	(280)
+
+0x00223931: DW_TAG_typedef
+              DW_AT_name	("SW_sSwingData")
+              DW_AT_decl_file	("c:\dev\Tiger\DL_Default\TigerCode\Code\Project\dotNET\Golf/../../../../../TIGERCODE/Code/Golf\AI\Headers\SwingCommon.h")
+              DW_AT_decl_line	(416)
+              DW_AT_type	(0x002234e3 "SW_sSwingData")
+
+0x00224cc1: DW_TAG_structure_type
+              DW_AT_sibling	(0x00225d9d)
+              DW_AT_name	("GamePlayer")
+              DW_AT_byte_size	(0x3ee0)
+              DW_AT_decl_file	("c:\dev\Tiger\DL_Default\TigerCode\Code\Project\dotNET\Golf/../../../../../TIGERCODE/Code/Golf\GamePlayer\Headers\GamePlayer.h")
+              DW_AT_decl_line	(287)
+
+0x0027728b: DW_TAG_structure_type
+              DW_AT_sibling	(0x00278cab)
+              DW_AT_name	("GameModeDriverPGATour")
+              DW_AT_byte_size	(0x01f0)
+              DW_AT_decl_file	("c:\dev\Tiger\DL_Default\TigerCode\Code\Project\dotNET\Golf/../../../../../TIGERCODE/Code/Golf\GameMode\Headers\GameModeDriver_PGATour.h")
+              DW_AT_decl_line	(107)
+              DW_AT_containing_type	(0x00274a79 "GameModeDriver")
+
+0x0027739a: DW_TAG_subprogram
+              DW_AT_sibling	(0x002773b3)
+              DW_AT_external	(0x01)
+              DW_AT_name	("GameModeDriverPGATour")
+              DW_AT_artificial	(0x01)
+              DW_AT_declaration	(0x01)
+
+0x002773b3: DW_TAG_subprogram
+              DW_AT_sibling	(0x002773c8)
+              DW_AT_external	(0x01)
+              DW_AT_name	("GameModeDriverPGATour")
+              DW_AT_decl_file	("c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/GameModeDriver_PGATour.cpp")
+              DW_AT_decl_line	(98)
+              DW_AT_declaration	(0x01)
+
+0x002d9343: DW_TAG_subprogram
+              DW_AT_sibling	(0x002d935a)
+              DW_AT_specification	(0x002773b3 "GameModeDriverPGATour")
+              DW_AT_inline	(DW_INL_not_inlined)
+
+0x002d935a: DW_TAG_subprogram
+              DW_AT_sibling	(0x002d937b)
+              DW_AT_abstract_origin	(0x002d9343 "GameModeDriverPGATour")
+              DW_AT_low_pc	(0x00256744)
+              DW_AT_high_pc	(0x00256784)
+              DW_AT_frame_base	(0x00163dfe:
+                 [0x00256744, 0x00256748): DW_OP_breg1 -144
+                 [0x00256748, 0x00256780): DW_OP_breg1 +0
+                 [0x00256780, 0x00256784): DW_OP_breg1 -144)
+
+0x002d937b: DW_TAG_subprogram
+              DW_AT_sibling	(0x002d939c)
+              DW_AT_abstract_origin	(0x002d9343 "GameModeDriverPGATour")
+              DW_AT_low_pc	(0x00256784)
+              DW_AT_high_pc	(0x002567c4)
+              DW_AT_frame_base	(0x00163e4a:
+                 [0x00256784, 0x00256788): DW_OP_breg1 -144
+                 [0x00256788, 0x002567c0): DW_OP_breg1 +0
+                 [0x002567c0, 0x002567c4): DW_OP_breg1 -144)
+
+0x0034effb: DW_TAG_subprogram
+              DW_AT_sibling	(0x0034f014)
+              DW_AT_external	(0x01)
+              DW_AT_name	("GolferData_t")
+              DW_AT_artificial	(0x01)
+              DW_AT_inline	(DW_INL_declared_not_inlined)
+
+0x0034f13f: DW_TAG_inlined_subroutine
+              DW_AT_abstract_origin	(0x0034effb "GolferData_t")
+              DW_AT_low_pc	(0x002f25a0)
+              DW_AT_high_pc	(0x002f25a4)
+
+0x0039adfe: DW_TAG_structure_type
+              DW_AT_sibling	(0x0039b381)
+              DW_AT_name	("GolferData_t")
+              DW_AT_byte_size	(0x01f8)
+              DW_AT_decl_file	("c:\dev\Tiger\DL_Default\TigerCode\Code\Project\dotNET\Golf/../../../../../TIGERCODE/Code/Golf\GamePlayer\Headers\GolferStats.h")
+              DW_AT_decl_line	(23)
+
+0x003a1faf: DW_TAG_structure_type
+              DW_AT_sibling	(0x003a22da)
+              DW_AT_name	("PhysicsBall_t")
+              DW_AT_byte_size	(0x0160)
+              DW_AT_decl_file	("c:\dev\Tiger\DL_Default\TigerCode\Code\Project\dotNET\Golf/../../../../../TIGERCODE/Code/Golf\Physics\Headers\PhysicsTypes.h")
+              DW_AT_decl_line	(146)
+
+0x003a26aa: DW_TAG_structure_type
+              DW_AT_sibling	(0x003a2abc)
+              DW_AT_name	("SW_sSwingData")
+              DW_AT_byte_size	(0x3370)
+              DW_AT_decl_file	("c:\dev\Tiger\DL_Default\TigerCode\Code\Project\dotNET\Golf/../../../../../TIGERCODE/Code/Golf\AI\Headers\SwingCommon.h")
+              DW_AT_decl_line	(280)
+
+0x003a2af8: DW_TAG_typedef
+              DW_AT_name	("SW_sSwingData")
+              DW_AT_decl_file	("c:\dev\Tiger\DL_Default\TigerCode\Code\Project\dotNET\Golf/../../../../../TIGERCODE/Code/Golf\AI\Headers\SwingCommon.h")
+              DW_AT_decl_line	(416)
+              DW_AT_type	(0x003a26aa "SW_sSwingData")
+
+0x003a3739: DW_TAG_structure_type
+              DW_AT_sibling	(0x003a4815)
+              DW_AT_name	("GamePlayer")
+              DW_AT_byte_size	(0x3ee0)
+              DW_AT_decl_file	("c:\dev\Tiger\DL_Default\TigerCode\Code\Project\dotNET\Golf/../../../../../TIGERCODE/Code/Golf\GamePlayer\Headers\GamePlayer.h")
+              DW_AT_decl_line	(287)
+
+0x00404d33: DW_TAG_structure_type
+              DW_AT_sibling	(0x004052b6)
+              DW_AT_name	("GolferData_t")
+              DW_AT_byte_size	(0x01f8)
+              DW_AT_decl_file	("c:\dev\Tiger\DL_Default\TigerCode\Code\Project\dotNET\Golf/../../../../../TIGERCODE/Code/Golf\GamePlayer\Headers\GolferStats.h")
+              DW_AT_decl_line	(23)
+
+0x0040db55: DW_TAG_structure_type
+              DW_AT_sibling	(0x0040de7e)
+              DW_AT_name	("PhysicsBall_t")
+              DW_AT_byte_size	(0x0160)
+              DW_AT_decl_file	("c:\dev\Tiger\DL_Default\TigerCode\Code\Project\dotNET\Golf/../../../../../TIGERCODE/Code/Golf\Physics\Headers\PhysicsTypes.h")
+              DW_AT_decl_line	(146)
+
+0x0040e24a: DW_TAG_structure_type
+              DW_AT_sibling	(0x0040e65c)
+              DW_AT_name	("SW_sSwingData")
+              DW_AT_byte_size	(0x3370)
+              DW_AT_decl_file	("c:\dev\Tiger\DL_Default\TigerCode\Code\Project\dotNET\Golf/../../../../../TIGERCODE/Code/Golf\AI\Headers\SwingCommon.h")
+              DW_AT_decl_line	(280)
+
+0x0040e688: DW_TAG_typedef
+              DW_AT_name	("SW_sSwingData")
+              DW_AT_decl_file	("c:\dev\Tiger\DL_Default\TigerCode\Code\Project\dotNET\Golf/../../../../../TIGERCODE/Code/Golf\AI\Headers\SwingCommon.h")
+              DW_AT_decl_line	(416)
+              DW_AT_type	(0x0040e24a "SW_sSwingData")
+
+0x0040f634: DW_TAG_structure_type
+              DW_AT_sibling	(0x00410710)
+              DW_AT_name	("GamePlayer")
+              DW_AT_byte_size	(0x3ee0)
+              DW_AT_decl_file	("c:\dev\Tiger\DL_Default\TigerCode\Code\Project\dotNET\Golf/../../../../../TIGERCODE/Code/Golf\GamePlayer\Headers\GamePlayer.h")
+              DW_AT_decl_line	(287)
+
+0x0047c1d5: DW_TAG_structure_type
+              DW_AT_sibling	(0x0047c6b1)
+              DW_AT_name	("GolferData_t")
+              DW_AT_byte_size	(0x01f8)
+              DW_AT_decl_file	("c:\dev\Tiger\DL_Default\TigerCode\Code\Project\dotNET\Golf/../../../../../TIGERCODE/Code/Golf\GamePlayer\Headers\GolferStats.h")
+              DW_AT_decl_line	(23)
+
+0x00487ba4: DW_TAG_structure_type
+              DW_AT_sibling	(0x00487eae)
+              DW_AT_name	("PhysicsBall_t")
+              DW_AT_byte_size	(0x0160)
+              DW_AT_decl_file	("c:\dev\Tiger\DL_Default\TigerCode\Code\Project\dotNET\Golf/../../../../../TIGERCODE/Code/Golf\Physics\Headers\PhysicsTypes.h")
+              DW_AT_decl_line	(146)
+
+0x00488253: DW_TAG_structure_type
+              DW_AT_sibling	(0x0048862b)
+              DW_AT_name	("SW_sSwingData")
+              DW_AT_byte_size	(0x3370)
+              DW_AT_decl_file	("c:\dev\Tiger\DL_Default\TigerCode\Code\Project\dotNET\Golf/../../../../../TIGERCODE/Code/Golf\AI\Headers\SwingCommon.h")
+              DW_AT_decl_line	(280)
+
+0x00488667: DW_TAG_typedef
+              DW_AT_name	("SW_sSwingData")
+              DW_AT_decl_file	("c:\dev\Tiger\DL_Default\TigerCode\Code\Project\dotNET\Golf/../../../../../TIGERCODE/Code/Golf\AI\Headers\SwingCommon.h")
+              DW_AT_decl_line	(416)
+              DW_AT_type	(0x00488253 "SW_sSwingData")
+
+0x004896c6: DW_TAG_structure_type
+              DW_AT_sibling	(0x0048a7a2)
+              DW_AT_name	("GamePlayer")
+              DW_AT_byte_size	(0x3ee0)
+              DW_AT_decl_file	("c:\dev\Tiger\DL_Default\TigerCode\Code\Project\dotNET\Golf/../../../../../TIGERCODE/Code/Golf\GamePlayer\Headers\GamePlayer.h")
+              DW_AT_decl_line	(287)
+
+0x0048fea4: DW_TAG_structure_type
+              DW_AT_sibling	(0x00490047)
+              DW_AT_name	("FE_CrAP_Asset_t")
+              DW_AT_byte_size	(0x44)
+              DW_AT_decl_file	("c:\dev\Tiger\DL_Default\TigerCode\Code\Project\dotNET\Golf/../../../../../TIGERCODE/Code/Golf\UI_Core\FrontEnd\Headers\FE_CrAPDB.h")
+              DW_AT_decl_line	(151)
+
+0x0052375b: DW_TAG_structure_type
+              DW_AT_sibling	(0x0052377b)
+              DW_AT_name	("GameModeDriverPGATour")
+              DW_AT_declaration	(0x01)
+
+0x0055c970: DW_TAG_subprogram
+              DW_AT_sibling	(0x0055c989)
+              DW_AT_external	(0x01)
+              DW_AT_name	("GolferData_t")
+              DW_AT_artificial	(0x01)
+              DW_AT_inline	(DW_INL_declared_not_inlined)
+
+0x0055ca69: DW_TAG_inlined_subroutine
+              DW_AT_abstract_origin	(0x0055c970 "GolferData_t")
+              DW_AT_low_pc	(0x00474be4)
+              DW_AT_high_pc	(0x00474cb0)
+
+0x0055cc42: DW_TAG_inlined_subroutine
+              DW_AT_sibling	(0x0055ce04)
+              DW_AT_abstract_origin	(0x0055c970 "GolferData_t")
+              DW_AT_low_pc	(0x00474ce0)
+              DW_AT_high_pc	(0x00474dac)
+
+0x0055ced5: DW_TAG_inlined_subroutine
+              DW_AT_abstract_origin	(0x0055c970 "GolferData_t")
+              DW_AT_low_pc	(0x00474eac)
+              DW_AT_high_pc	(0x00474f78)
+
+0x0055d0ae: DW_TAG_inlined_subroutine
+              DW_AT_sibling	(0x0055d270)
+              DW_AT_abstract_origin	(0x0055c970 "GolferData_t")
+              DW_AT_low_pc	(0x00474fa8)
+              DW_AT_high_pc	(0x00475074)
+
+0x0055d3cc: DW_TAG_inlined_subroutine
+              DW_AT_abstract_origin	(0x0055c970 "GolferData_t")
+              DW_AT_low_pc	(0x0047536c)
+              DW_AT_high_pc	(0x00475438)
+
+0x0055d5a5: DW_TAG_inlined_subroutine
+              DW_AT_sibling	(0x0055d767)
+              DW_AT_abstract_origin	(0x0055c970 "GolferData_t")
+              DW_AT_low_pc	(0x00475468)
+              DW_AT_high_pc	(0x00475534)
+
+0x0055d7a8: DW_TAG_subprogram
+              DW_AT_sibling	(0x0055d7c1)
+              DW_AT_external	(0x01)
+              DW_AT_name	("GamePlayer")
+              DW_AT_artificial	(0x01)
+              DW_AT_inline	(DW_INL_declared_not_inlined)
+
+0x0055d81e: DW_TAG_inlined_subroutine
+              DW_AT_abstract_origin	(0x0055d7a8 "GamePlayer")
+              DW_AT_low_pc	(0x00475610)
+              DW_AT_high_pc	(0x004756e4)
+
+0x0055d836: DW_TAG_inlined_subroutine
+              DW_AT_abstract_origin	(0x0055c970 "GolferData_t")
+              DW_AT_low_pc	(0x00475618)
+              DW_AT_high_pc	(0x004756e4)
+
+0x0055da86: DW_TAG_inlined_subroutine
+              DW_AT_abstract_origin	(0x0055c970 "GolferData_t")
+              DW_AT_low_pc	(0x00475788)
+              DW_AT_high_pc	(0x00475854)
+
+0x0055dc5f: DW_TAG_inlined_subroutine
+              DW_AT_sibling	(0x0055de21)
+              DW_AT_abstract_origin	(0x0055c970 "GolferData_t")
+              DW_AT_low_pc	(0x00475884)
+              DW_AT_high_pc	(0x00475950)
+
+0x0055de81: DW_TAG_inlined_subroutine
+              DW_AT_abstract_origin	(0x0055d7a8 "GamePlayer")
+              DW_AT_low_pc	(0x00475a70)
+              DW_AT_high_pc	(0x00475b44)
+
+0x0055de99: DW_TAG_inlined_subroutine
+              DW_AT_abstract_origin	(0x0055c970 "GolferData_t")
+              DW_AT_low_pc	(0x00475a78)
+              DW_AT_high_pc	(0x00475b44)
+
+0x0055e9f2: DW_TAG_inlined_subroutine
+              DW_AT_sibling	(0x0055ebb4)
+              DW_AT_abstract_origin	(0x0055c970 "GolferData_t")
+              DW_AT_low_pc	(0x0047620c)
+              DW_AT_high_pc	(0x004762d8)
+
+0x005cfe6d: DW_TAG_structure_type
+              DW_AT_sibling	(0x005d03f0)
+              DW_AT_name	("GolferData_t")
+              DW_AT_byte_size	(0x01f8)
+              DW_AT_decl_file	("c:\dev\Tiger\DL_Default\TigerCode\Code\Project\dotNET\Golf/../../../../../TIGERCODE/Code/Golf\GamePlayer\Headers\GolferStats.h")
+              DW_AT_decl_line	(23)
+
+0x005d0d61: DW_TAG_structure_type
+              DW_AT_sibling	(0x005d108a)
+              DW_AT_name	("PhysicsBall_t")
+              DW_AT_byte_size	(0x0160)
+              DW_AT_decl_file	("c:\dev\Tiger\DL_Default\TigerCode\Code\Project\dotNET\Golf/../../../../../TIGERCODE/Code/Golf\Physics\Headers\PhysicsTypes.h")
+              DW_AT_decl_line	(146)
+
+0x0062b55f: DW_TAG_structure_type
+              DW_AT_sibling	(0x0062ba3b)
+              DW_AT_name	("GolferData_t")
+              DW_AT_byte_size	(0x01f8)
+              DW_AT_decl_file	("c:\dev\Tiger\DL_Default\TigerCode\Code\Project\dotNET\Golf/../../../../../TIGERCODE/Code/Golf\GamePlayer\Headers\GolferStats.h")
+              DW_AT_decl_line	(23)

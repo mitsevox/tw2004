@@ -1,0 +1,52 @@
+
+Dev_Golf_Release_PS3.elf:	file format elf64-powerpc
+
+Sections:
+Idx Name                Size     VMA              Type
+  0                     00000000 0000000000000000
+  1 .init               0000002c 0000000000010200 TEXT
+  2 .text               008e0a54 000000000001022c TEXT
+  3 .fini               00000024 00000000008f0c80 TEXT
+  4 .sceStub.text       00001510 00000000008f0ca4 TEXT
+  5 .eh_frame           00000004 00000000008f21b4 DATA
+  6 .rodata.sceResident 000000c0 00000000008f21b8 DATA
+  7 .rodata.sceFNID     000002ac 00000000008f2278 DATA
+  8 .lib.ent.top        00000004 00000000008f2524 DATA
+  9 .lib.ent.btm        00000004 00000000008f2528 DATA
+ 10 .lib.stub.top       00000004 00000000008f252c DATA
+ 11 .lib.stub           0000023c 00000000008f2530 DATA
+ 12 .lib.stub.btm       00000004 00000000008f276c DATA
+ 13 .sys_proc_param     00000020 00000000008f2770 DATA
+ 14 .sys_proc_prx_param 00000028 00000000008f2790 DATA
+ 15 .ctors              0000023c 0000000000900000 DATA
+ 16 .dtors              00000204 000000000090023c DATA
+ 17 .jcr                00000004 0000000000900440 DATA
+ 18 .data.rel.ro        00007330 0000000000900444 DATA
+ 19 .data.sceFStub      00000284 0000000000907774 DATA
+ 20 .toc1               00018fbc 00000000009079f8 DATA
+ 21 .opd                00044830 00000000009209b8 DATA
+ 22 .got                0000a5d8 00000000009651e8 DATA
+ 23 .toc.sceStub        00000028 000000000096f7c0 DATA
+ 24 .tdata              0000000c 000000000096f7e8 DATA
+ 25 .tbss               00000184 000000000096f7f8 BSS
+ 26 .rodata             001a9e27 0000000010000000 DATA
+ 27 .data               000826d0 00000000101b0000 DATA
+ 28 .branch_lt          00000000 00000000102326d0 DATA
+ 29 .sbss               00000000 00000000102326d0
+ 30 .bss                00368738 0000000010232700 BSS
+ 31 .comment            000086a9 0000000000000000
+ 32 .debug_aranges      0000c898 0000000000000000 DEBUG
+ 33 .debug_pubnames     00129a01 0000000000000000 DEBUG
+ 34 .debug_info         011609df 0000000000000000 DEBUG
+ 35 .debug_abbrev       000b533e 0000000000000000 DEBUG
+ 36 .debug_line         0071742f 0000000000000000 DEBUG
+ 37 .debug_frame        000f3544 0000000000000000 DEBUG
+ 38 .debug_str          002f8ca3 0000000000000000 DEBUG
+ 39 .debug_loc          004a1c6f 0000000000000000 DEBUG
+ 40 .debug_macinfo      0139cee8 0000000000000000 DEBUG
+ 41 .sceversion         00001786 0000000000000000
+ 42 .debug_ranges       000c9db8 0000000000000000 DEBUG
+ 43 .debug_libgenfunc   00000d5c 0000000000000000 DEBUG
+ 44 .shstrtab           000001f3 0000000000000000
+ 45 .symtab             001df8c8 0000000000000000
+ 46 .strtab             00348b95 0000000000000000

@@ -1,0 +1,1598 @@
+c:\dev\tiger06\tigercode\code\aptinterface\aptpackage\_apt.h
+c:\dev\tiger06\tigercode\code\aptinterface\aptpackage\_aptactions.h
+c:\dev\tiger06\tigercode\code\aptinterface\aptpackage\_aptload.h
+c:\dev\tiger06\tigercode\code\aptinterface\aptpackage\_aptset.h
+c:\dev\tiger06\tigercode\code\aptinterface\aptpackage\_aptstack.h
+c:\dev\tiger06\tigercode\code\aptinterface\aptpackage\_aptstring.h
+c:\dev\tiger06\tigercode\code\aptinterface\aptpackage\_aptvalue.h
+c:\dev\tiger06\tigercode\code\aptinterface\aptpackage\_aptvector.h
+c:\dev\tiger06\tigercode\code\aptinterface\aptpackage\apt.cpp
+c:\dev\tiger06\tigercode\code\aptinterface\aptpackage\aptactioninterpreter.cpp
+c:\dev\tiger06\tigercode\code\aptinterface\aptpackage\aptanimation.cpp
+c:\dev\tiger06\tigercode\code\aptinterface\aptpackage\aptarray.cpp
+c:\dev\tiger06\tigercode\code\aptinterface\aptpackage\aptcharacter.cpp
+c:\dev\tiger06\tigercode\code\aptinterface\aptpackage\aptcharacterinstsprite.cpp
+c:\dev\tiger06\tigercode\code\aptinterface\aptpackage\aptcontext.cpp
+c:\dev\tiger06\tigercode\code\aptinterface\aptpackage\aptdisplaylist.cpp
+c:\dev\tiger06\tigercode\code\aptinterface\aptpackage\aptff\core\cachemanager\cachemgr.cpp
+c:\dev\tiger06\tigercode\code\aptinterface\aptpackage\aptff\core\ffstub.c
+c:\dev\tiger06\tigercode\code\aptinterface\aptpackage\aptff\core\fontmanager\ff_fm.cpp
+c:\dev\tiger06\tigercode\code\aptinterface\aptpackage\aptff\core\glyph.cpp
+c:\dev\tiger06\tigercode\code\aptinterface\aptpackage\aptff\core\pfrread.cpp
+c:\dev\tiger06\tigercode\code\aptinterface\aptpackage\aptff\core\sniffer.cpp
+c:\dev\tiger06\tigercode\code\aptinterface\aptpackage\aptff\core\t2k.cpp
+c:\dev\tiger06\tigercode\code\aptinterface\aptpackage\aptff\core\t2ksc.cpp
+c:\dev\tiger06\tigercode\code\aptinterface\aptpackage\aptff\core\t2kstrm.cpp
+c:\dev\tiger06\tigercode\code\aptinterface\aptpackage\aptff\core\truetype.cpp
+c:\dev\tiger06\tigercode\code\aptinterface\aptpackage\aptff\core\tsimem.cpp
+c:\dev\tiger06\tigercode\code\aptinterface\aptpackage\aptff\core\util.cpp
+c:\dev\tiger06\tigercode\code\aptinterface\aptpackage\aptff\ffapt.cpp
+c:\dev\tiger06\tigercode\code\aptinterface\aptpackage\aptff\ffapt.h
+c:\dev\tiger06\tigercode\code\aptinterface\aptpackage\aptinput.cpp
+c:\dev\tiger06\tigercode\code\aptinterface\aptpackage\aptload.cpp
+c:\dev\tiger06\tigercode\code\aptinterface\aptpackage\aptmiscobjects.cpp
+c:\dev\tiger06\tigercode\code\aptinterface\aptpackage\aptmovie.cpp
+c:\dev\tiger06\tigercode\code\aptinterface\aptpackage\aptnativehash.cpp
+c:\dev\tiger06\tigercode\code\aptinterface\aptpackage\aptobjects.h
+c:\dev\tiger06\tigercode\code\aptinterface\aptpackage\aptrand.cpp
+c:\dev\tiger06\tigercode\code\aptinterface\aptpackage\aptrenderingcontext.cpp
+c:\dev\tiger06\tigercode\code\aptinterface\aptpackage\aptsharedptr.h
+c:\dev\tiger06\tigercode\code\aptinterface\aptpackage\aptspritemembers.h
+c:\dev\tiger06\tigercode\code\aptinterface\aptpackage\aptstring.cpp
+c:\dev\tiger06\tigercode\code\aptinterface\aptpackage\apttextmembers.h
+c:\dev\tiger06\tigercode\code\aptinterface\aptpackage\aptvalue.cpp
+c:\dev\tiger06\tigercode\code\aptinterface\aptpackage\aptversion.cpp
+c:\dev\tiger06\tigercode\code\aptinterface\aptpackage\checked_delete.h
+c:\dev\tiger06\tigercode\code\aptinterface\aptpackage\commonsense\singlelist\singlelist.h
+c:\dev\tiger06\tigercode\code\aptinterface\aptpackage\ea\string\basic_string.h
+c:\dev\tiger06\tigercode\code\aptinterface\aptpackage\ea\string\default_policy.h
+c:\dev\tiger06\tigercode\code\aptinterface\aptpackage\ea\string\ucs2.h
+c:\dev\tiger06\tigercode\code\aptinterface\aptpackage\ea\string\utf8.h
+c:\dev\tiger06\tigercode\code\aptinterface\arraytemplate.h
+c:\dev\tiger06\tigercode\code\aptinterface\uiaptalloc.cpp
+c:\dev\tiger06\tigercode\code\aptinterface\uiaptanimations.cpp
+c:\dev\tiger06\tigercode\code\aptinterface\uiaptanimations.h
+c:\dev\tiger06\tigercode\code\aptinterface\uiaptcontrollerlistener.cpp
+c:\dev\tiger06\tigercode\code\aptinterface\uiaptcontrollerlistener.h
+c:\dev\tiger06\tigercode\code\aptinterface\uiaptdrawtext.cpp
+c:\dev\tiger06\tigercode\code\aptinterface\uiaptdrawtext.h
+c:\dev\tiger06\tigercode\code\aptinterface\uiaptdrawtext_ff.cpp
+c:\dev\tiger06\tigercode\code\aptinterface\uiaptdrawtext_ff.h
+c:\dev\tiger06\tigercode\code\aptinterface\uiaptdrawtext_xbox.cpp
+c:\dev\tiger06\tigercode\code\aptinterface\uiaptdrawtext_xbox.h
+c:\dev\tiger06\tigercode\code\aptinterface\uiaptinterface.cpp
+c:\dev\tiger06\tigercode\code\aptinterface\uiaptloadapx.cpp
+c:\dev\tiger06\tigercode\code\aptinterface\uiaptloadapx.h
+c:\dev\tiger06\tigercode\code\aptinterface\uiaptsfxsubscriber.cpp
+c:\dev\tiger06\tigercode\code\aptinterface\uiaptsfxsubscriber.h
+c:\dev\tiger06\tigercode\code\aptinterface\uiaptstreamsupport.cpp
+c:\dev\tiger06\tigercode\code\aptinterface\uiaptstreamsupport.h
+c:\dev\tiger06\tigercode\code\aptinterface\uiaptsubscriber.cpp
+c:\dev\tiger06\tigercode\code\aptinterface\uiaptsubscriber.h
+c:\dev\tiger06\tigercode\code\aptinterface\uirender.cpp
+c:\dev\tiger06\tigercode\code\aptinterface\uirender_xbox.cpp
+c:\dev\tiger06\tigercode\code\golf\actors\visualentity.c
+c:\dev\tiger06\tigercode\code\golf\ai\ai_brain.cpp
+c:\dev\tiger06\tigercode\code\golf\ai\ai_core.cpp
+c:\dev\tiger06\tigercode\code\golf\ai\ai_featurenetworks.cpp
+c:\dev\tiger06\tigercode\code\golf\ai\cras.c
+c:\dev\tiger06\tigercode\code\golf\ai\emotion.c
+c:\dev\tiger06\tigercode\code\golf\ai\expert.c
+c:\dev\tiger06\tigercode\code\golf\ai\headers\ai_brain.h
+c:\dev\tiger06\tigercode\code\golf\ai\headers\ai_core.h
+c:\dev\tiger06\tigercode\code\golf\ai\headers\ai_featurenetworks.h
+c:\dev\tiger06\tigercode\code\golf\ai\swing.c
+c:\dev\tiger06\tigercode\code\golf\ai\target.c
+c:\dev\tiger06\tigercode\code\golf\animation\animblender.c
+c:\dev\tiger06\tigercode\code\golf\animation\char.c
+c:\dev\tiger06\tigercode\code\golf\animation\char_lighting.cpp
+c:\dev\tiger06\tigercode\code\golf\animation\char_skin.c
+c:\dev\tiger06\tigercode\code\golf\animation\char_state.c
+c:\dev\tiger06\tigercode\code\golf\animation\char_tex_manager.c
+c:\dev\tiger06\tigercode\code\golf\animation\char_util.c
+c:\dev\tiger06\tigercode\code\golf\animation\char_util_shared.c
+c:\dev\tiger06\tigercode\code\golf\animation\charpart.c
+c:\dev\tiger06\tigercode\code\golf\animation\charrend.c
+c:\dev\tiger06\tigercode\code\golf\animation\charskyconditiontable.cpp
+c:\dev\tiger06\tigercode\code\golf\animation\charsliders.c
+c:\dev\tiger06\tigercode\code\golf\animation\charsliders_shared.c
+c:\dev\tiger06\tigercode\code\golf\animation\chartimeofdaytable.cpp
+c:\dev\tiger06\tigercode\code\golf\animation\cutscenenisdb.cpp
+c:\dev\tiger06\tigercode\code\golf\animation\decompress.c
+c:\dev\tiger06\tigercode\code\golf\animation\dynchain.c
+c:\dev\tiger06\tigercode\code\golf\animation\faceblend.cpp
+c:\dev\tiger06\tigercode\code\golf\animation\headers\animblender.h
+c:\dev\tiger06\tigercode\code\golf\animation\headers\char.h
+c:\dev\tiger06\tigercode\code\golf\animation\headers\cutscenenisdb.h
+c:\dev\tiger06\tigercode\code\golf\animation\headers\dcmputil.h
+c:\dev\tiger06\tigercode\code\golf\animation\headers\decompress.h
+c:\dev\tiger06\tigercode\code\golf\animation\headers\faceblend.h
+c:\dev\tiger06\tigercode\code\golf\animation\headers\ska.h
+c:\dev\tiger06\tigercode\code\golf\animation\headers\skalib.h
+c:\dev\tiger06\tigercode\code\golf\animation\headers\skeleton.h
+c:\dev\tiger06\tigercode\code\golf\animation\headers\skin.h
+c:\dev\tiger06\tigercode\code\golf\animation\memparser.c
+c:\dev\tiger06\tigercode\code\golf\animation\mta.c
+c:\dev\tiger06\tigercode\code\golf\animation\mta_shared.c
+c:\dev\tiger06\tigercode\code\golf\animation\salload.c
+c:\dev\tiger06\tigercode\code\golf\animation\ska.c
+c:\dev\tiger06\tigercode\code\golf\animation\ska_shared.c
+c:\dev\tiger06\tigercode\code\golf\animation\ska_util.c
+c:\dev\tiger06\tigercode\code\golf\animation\ska_util_shared.c
+c:\dev\tiger06\tigercode\code\golf\animation\skalib.c
+c:\dev\tiger06\tigercode\code\golf\animation\skalib_shared.c
+c:\dev\tiger06\tigercode\code\golf\animation\skeleton.c
+c:\dev\tiger06\tigercode\code\golf\animation\skeleton_shared.c
+c:\dev\tiger06\tigercode\code\golf\animation\skin.c
+c:\dev\tiger06\tigercode\code\golf\animation\skinburn.c
+c:\dev\tiger06\tigercode\code\golf\animation\skinmorph.c
+c:\dev\tiger06\tigercode\code\golf\animation\skinpart.c
+c:\dev\tiger06\tigercode\code\golf\audio\audstrtoguid.cpp
+c:\dev\tiger06\tigercode\code\golf\audio\engine\hl\headers\hlaudmaster.h
+c:\dev\tiger06\tigercode\code\golf\audio\engine\hl\headers\hlaudsession.h
+c:\dev\tiger06\tigercode\code\golf\audio\engine\hl\headers\hlaudtrackseq.h
+c:\dev\tiger06\tigercode\code\golf\audio\engine\hl\hlaudemitter.c
+c:\dev\tiger06\tigercode\code\golf\audio\engine\hl\hlaudmaster.c
+c:\dev\tiger06\tigercode\code\golf\audio\engine\hl\hlaudmic.c
+c:\dev\tiger06\tigercode\code\golf\audio\engine\hl\hlaudmovie.c
+c:\dev\tiger06\tigercode\code\golf\audio\engine\hl\hlaudsession.c
+c:\dev\tiger06\tigercode\code\golf\audio\engine\hl\hlaudtrack.c
+c:\dev\tiger06\tigercode\code\golf\audio\engine\hl\hlaudtrackseq.c
+c:\dev\tiger06\tigercode\code\golf\audio\engine\hl\hlaudtrackstm.c
+c:\dev\tiger06\tigercode\code\golf\audio\engine\hl\hlaudvoice.c
+c:\dev\tiger06\tigercode\code\golf\audio\engine\special\hlaudemitterpool.c
+c:\dev\tiger06\tigercode\code\golf\audio\engine\utils\headers\uaudfrac.h
+c:\dev\tiger06\tigercode\code\golf\audio\engine\utils\headers\uaudvector.h
+c:\dev\tiger06\tigercode\code\golf\audio\engine\utils\uaudcontainers.c
+c:\dev\tiger06\tigercode\code\golf\audio\engine\utils\uaudfrac.c
+c:\dev\tiger06\tigercode\code\golf\audio\engine\utils\uaudmem.c
+c:\dev\tiger06\tigercode\code\golf\audio\engine\utils\uaudmemstack.c
+c:\dev\tiger06\tigercode\code\golf\audio\engine\utils\uaudvector.c
+c:\dev\tiger06\tigercode\code\golf\audio\gameaudio.c
+c:\dev\tiger06\tigercode\code\golf\audio\headers\gameaudio.h
+c:\dev\tiger06\tigercode\code\golf\audio\snd_wrapper.cpp
+c:\dev\tiger06\tigercode\code\golf\cameras\gocamcont.c
+c:\dev\tiger06\tigercode\code\golf\cameras\gocamscripts.c
+c:\dev\tiger06\tigercode\code\golf\cameras\gocamtuningvars.c
+c:\dev\tiger06\tigercode\code\golf\cameras\gocomiccam.c
+c:\dev\tiger06\tigercode\code\golf\cameras\godebugcam.c
+c:\dev\tiger06\tigercode\code\golf\cameras\godynamiccam.c
+c:\dev\tiger06\tigercode\code\golf\cameras\gogolfcam.c
+c:\dev\tiger06\tigercode\code\golf\cameras\gostaticcam.c
+c:\dev\tiger06\tigercode\code\golf\cameras\headers\gocamcont.h
+c:\dev\tiger06\tigercode\code\golf\cameras\headers\gocamscripts.h
+c:\dev\tiger06\tigercode\code\golf\cameras\headers\godynamiccam.h
+c:\dev\tiger06\tigercode\code\golf\confidence meter\confidencemeter.cpp
+c:\dev\tiger06\tigercode\code\golf\confidence meter\confidencemetermanager.cpp
+c:\dev\tiger06\tigercode\code\golf\confidence meter\headers\confidencemeter.h
+c:\dev\tiger06\tigercode\code\golf\confidence meter\headers\confidencemetermanager.h
+c:\dev\tiger06\tigercode\code\golf\crac\craccore.cpp
+c:\dev\tiger06\tigercode\code\golf\crac\cracdb.cpp
+c:\dev\tiger06\tigercode\code\golf\crac\cracsliders.cpp
+c:\dev\tiger06\tigercode\code\golf\crac\cracstreamer.cpp
+c:\dev\tiger06\tigercode\code\golf\crac\envfx_cloudlayers.cpp
+c:\dev\tiger06\tigercode\code\golf\crac\environmenteffectmanager.cpp
+c:\dev\tiger06\tigercode\code\golf\crac\headers\craccore.h
+c:\dev\tiger06\tigercode\code\golf\crac\tigerproofdb.cpp
+c:\dev\tiger06\tigercode\code\golf\earnings\earningsinfo.cpp
+c:\dev\tiger06\tigercode\code\golf\earnings\earningsmanager.cpp
+c:\dev\tiger06\tigercode\code\golf\earnings\headers\earningsinfo.h
+c:\dev\tiger06\tigercode\code\golf\earnings\headers\earningsmanager.h
+c:\dev\tiger06\tigercode\code\golf\earnings\headers\passwordmanager.h
+c:\dev\tiger06\tigercode\code\golf\earnings\headers\unlockinfo.h
+c:\dev\tiger06\tigercode\code\golf\earnings\highscorerecords.cpp
+c:\dev\tiger06\tigercode\code\golf\earnings\passwordmanager.cpp
+c:\dev\tiger06\tigercode\code\golf\earnings\sponsorshipinfo.cpp
+c:\dev\tiger06\tigercode\code\golf\earnings\unlockinfo.cpp
+c:\dev\tiger06\tigercode\code\golf\easportsshared\easportsbio.c
+c:\dev\tiger06\tigercode\code\golf\easportsshared\easportslogin.c
+c:\dev\tiger06\tigercode\code\golf\easportsshared\headers\easportslogin.h
+c:\dev\tiger06\tigercode\code\golf\entry\goentry.c
+c:\dev\tiger06\tigercode\code\golf\entry\headers\goentry.h
+c:\dev\tiger06\tigercode\code\golf\eventmanager\event.c
+c:\dev\tiger06\tigercode\code\golf\filecom\parse.cpp
+c:\dev\tiger06\tigercode\code\golf\gamemode\analysisutilities.c
+c:\dev\tiger06\tigercode\code\golf\gamemode\boastchallenges.cpp
+c:\dev\tiger06\tigercode\code\golf\gamemode\caddietips.c
+c:\dev\tiger06\tigercode\code\golf\gamemode\calendar.c
+c:\dev\tiger06\tigercode\code\golf\gamemode\courseinfo.c
+c:\dev\tiger06\tigercode\code\golf\gamemode\coursetable.cpp
+c:\dev\tiger06\tigercode\code\golf\gamemode\earnings.c
+c:\dev\tiger06\tigercode\code\golf\gamemode\endofholevideo.c
+c:\dev\tiger06\tigercode\code\golf\gamemode\gameeffects.c
+c:\dev\tiger06\tigercode\code\golf\gamemode\gamemode.c
+c:\dev\tiger06\tigercode\code\golf\gamemode\gamemode_alternateshot.cpp
+c:\dev\tiger06\tigercode\code\golf\gamemode\gamemode_battle.cpp
+c:\dev\tiger06\tigercode\code\golf\gamemode\gamemode_bestball.cpp
+c:\dev\tiger06\tigercode\code\golf\gamemode\gamemode_clubhouse.cpp
+c:\dev\tiger06\tigercode\code\golf\gamemode\gamemode_fourball.cpp
+c:\dev\tiger06\tigercode\code\golf\gamemode\gamemode_match.cpp
+c:\dev\tiger06\tigercode\code\golf\gamemode\gamemode_onlinetour.cpp
+c:\dev\tiger06\tigercode\code\golf\gamemode\gamemode_practice.cpp
+c:\dev\tiger06\tigercode\code\golf\gamemode\gamemode_replay.cpp
+c:\dev\tiger06\tigercode\code\golf\gamemode\gamemode_skillschallenge.cpp
+c:\dev\tiger06\tigercode\code\golf\gamemode\gamemode_skillz18.cpp
+c:\dev\tiger06\tigercode\code\golf\gamemode\gamemode_skins.cpp
+c:\dev\tiger06\tigercode\code\golf\gamemode\gamemode_stableford.cpp
+c:\dev\tiger06\tigercode\code\golf\gamemode\gamemode_stroke.cpp
+c:\dev\tiger06\tigercode\code\golf\gamemode\gamemode_threeholestroke.cpp
+c:\dev\tiger06\tigercode\code\golf\gamemode\gamemodebase.cpp
+c:\dev\tiger06\tigercode\code\golf\gamemode\gamemodeconsole.c
+c:\dev\tiger06\tigercode\code\golf\gamemode\gamemodecore.c
+c:\dev\tiger06\tigercode\code\golf\gamemode\gamemodedriver.cpp
+c:\dev\tiger06\tigercode\code\golf\gamemode\gamemodedriver_era.cpp
+c:\dev\tiger06\tigercode\code\golf\gamemode\gamemodedriver_pgagrudgematch.cpp
+c:\dev\tiger06\tigercode\code\golf\gamemode\gamemodedriver_pgatour.cpp
+c:\dev\tiger06\tigercode\code\golf\gamemode\gamemodedriver_realtimeevents.cpp
+c:\dev\tiger06\tigercode\code\golf\gamemode\gamemodedriver_traditional.cpp
+c:\dev\tiger06\tigercode\code\golf\gamemode\gamemodedrivermanager.cpp
+c:\dev\tiger06\tigercode\code\golf\gamemode\gameui.c
+c:\dev\tiger06\tigercode\code\golf\gamemode\gameui_istudio.c
+c:\dev\tiger06\tigercode\code\golf\gamemode\headers\boastchallenges.h
+c:\dev\tiger06\tigercode\code\golf\gamemode\headers\gameeffects.h
+c:\dev\tiger06\tigercode\code\golf\gamemode\headers\gamemode_alternateshot.h
+c:\dev\tiger06\tigercode\code\golf\gamemode\headers\gamemode_battle.h
+c:\dev\tiger06\tigercode\code\golf\gamemode\headers\gamemode_bestball.h
+c:\dev\tiger06\tigercode\code\golf\gamemode\headers\gamemode_clubhouse.h
+c:\dev\tiger06\tigercode\code\golf\gamemode\headers\gamemode_fourball.h
+c:\dev\tiger06\tigercode\code\golf\gamemode\headers\gamemode_match.h
+c:\dev\tiger06\tigercode\code\golf\gamemode\headers\gamemode_practice.h
+c:\dev\tiger06\tigercode\code\golf\gamemode\headers\gamemode_skillschallenge.h
+c:\dev\tiger06\tigercode\code\golf\gamemode\headers\gamemode_skillz18.h
+c:\dev\tiger06\tigercode\code\golf\gamemode\headers\gamemode_skins.h
+c:\dev\tiger06\tigercode\code\golf\gamemode\headers\gamemode_stableford.h
+c:\dev\tiger06\tigercode\code\golf\gamemode\headers\gamemode_stroke.h
+c:\dev\tiger06\tigercode\code\golf\gamemode\headers\gamemodebase.h
+c:\dev\tiger06\tigercode\code\golf\gamemode\headers\gamemodecore.h
+c:\dev\tiger06\tigercode\code\golf\gamemode\headers\gamemodedriver.h
+c:\dev\tiger06\tigercode\code\golf\gamemode\headers\gamemodedriver_era.h
+c:\dev\tiger06\tigercode\code\golf\gamemode\headers\gamemodedriver_pgagrudgematch.h
+c:\dev\tiger06\tigercode\code\golf\gamemode\headers\gamemodedriver_pgatour.h
+c:\dev\tiger06\tigercode\code\golf\gamemode\headers\gamemodedriver_realtimeevents.h
+c:\dev\tiger06\tigercode\code\golf\gamemode\headers\gameui.h
+c:\dev\tiger06\tigercode\code\golf\gamemode\headers\gameui_apt.h
+c:\dev\tiger06\tigercode\code\golf\gamemode\headers\igamedata.h
+c:\dev\tiger06\tigercode\code\golf\gamemode\igamedata.cpp
+c:\dev\tiger06\tigercode\code\golf\gamemode\onlinegolf.c
+c:\dev\tiger06\tigercode\code\golf\gamemode\pgatoursimulation.c
+c:\dev\tiger06\tigercode\code\golf\gamemode\playnowmode.c
+c:\dev\tiger06\tigercode\code\golf\gamemode\shotcaller.cpp
+c:\dev\tiger06\tigercode\code\golf\gamemode\shotclock.c
+c:\dev\tiger06\tigercode\code\golf\gamemode\spudui.c
+c:\dev\tiger06\tigercode\code\golf\gameplayer\gameplayer.cpp
+c:\dev\tiger06\tigercode\code\golf\gameplayer\gameplayermanager.cpp
+c:\dev\tiger06\tigercode\code\golf\gameplayer\golferstats.cpp
+c:\dev\tiger06\tigercode\code\golf\gameplayer\headers\gameplayer.h
+c:\dev\tiger06\tigercode\code\golf\gameplayer\headers\gameplayermanager.h
+c:\dev\tiger06\tigercode\code\golf\gameplayer\headers\golferstats.h
+c:\dev\tiger06\tigercode\code\golf\globals\globals.c
+c:\dev\tiger06\tigercode\code\golf\hi-rendering\goactorcollision.c
+c:\dev\tiger06\tigercode\code\golf\hi-rendering\goactsimpleground.c
+c:\dev\tiger06\tigercode\code\golf\hi-rendering\goanimalactors.c
+c:\dev\tiger06\tigercode\code\golf\hi-rendering\goballfx.c
+c:\dev\tiger06\tigercode\code\golf\hi-rendering\goballshadow.c
+c:\dev\tiger06\tigercode\code\golf\hi-rendering\gobreakline.c
+c:\dev\tiger06\tigercode\code\golf\hi-rendering\gocamera.c
+c:\dev\tiger06\tigercode\code\golf\hi-rendering\godynobj.c
+c:\dev\tiger06\tigercode\code\golf\hi-rendering\gofog.c
+c:\dev\tiger06\tigercode\code\golf\hi-rendering\goframebuf.c
+c:\dev\tiger06\tigercode\code\golf\hi-rendering\gograss.c
+c:\dev\tiger06\tigercode\code\golf\hi-rendering\gogreengrid.c
+c:\dev\tiger06\tigercode\code\golf\hi-rendering\golightfogenv.c
+c:\dev\tiger06\tigercode\code\golf\hi-rendering\golighting.c
+c:\dev\tiger06\tigercode\code\golf\hi-rendering\gomiscactors.c
+c:\dev\tiger06\tigercode\code\golf\hi-rendering\gopostfx.c
+c:\dev\tiger06\tigercode\code\golf\hi-rendering\gosafezone.c
+c:\dev\tiger06\tigercode\code\golf\hi-rendering\goterrain_olobj.c
+c:\dev\tiger06\tigercode\code\golf\hi-rendering\goterrain_tgd.c
+c:\dev\tiger06\tigercode\code\golf\hi-rendering\goterraincollision.c
+c:\dev\tiger06\tigercode\code\golf\hi-rendering\goterraintexcomp.cpp
+c:\dev\tiger06\tigercode\code\golf\hi-rendering\goterrainutils.c
+c:\dev\tiger06\tigercode\code\golf\hi-rendering\goviewcont.c
+c:\dev\tiger06\tigercode\code\golf\hi-rendering\goviewport.c
+c:\dev\tiger06\tigercode\code\golf\hi-rendering\gowisp.cpp
+c:\dev\tiger06\tigercode\code\golf\hi-rendering\gowispmgr.cpp
+c:\dev\tiger06\tigercode\code\golf\hi-rendering\headers\goauxframebuf.h
+c:\dev\tiger06\tigercode\code\golf\hi-rendering\headers\gocamera.h
+c:\dev\tiger06\tigercode\code\golf\hi-rendering\headers\gofog.h
+c:\dev\tiger06\tigercode\code\golf\hi-rendering\headers\goframebuf.h
+c:\dev\tiger06\tigercode\code\golf\hi-rendering\headers\golightfogenv.h
+c:\dev\tiger06\tigercode\code\golf\hi-rendering\headers\golighting.h
+c:\dev\tiger06\tigercode\code\golf\hi-rendering\headers\gorenderctx.h
+c:\dev\tiger06\tigercode\code\golf\hi-rendering\headers\goterrain_olobj.h
+c:\dev\tiger06\tigercode\code\golf\hi-rendering\headers\goterraintexcomp.h
+c:\dev\tiger06\tigercode\code\golf\hi-rendering\headers\goterrainutils.h
+c:\dev\tiger06\tigercode\code\golf\hi-rendering\headers\goviewport.h
+c:\dev\tiger06\tigercode\code\golf\hi-rendering\headers\gowisp.h
+c:\dev\tiger06\tigercode\code\golf\hi-rendering\xbox\gorenderctx_xbox.c
+c:\dev\tiger06\tigercode\code\golf\hi-rendering\xbox\headers\gorenderctx_xbox.h
+c:\dev\tiger06\tigercode\code\golf\holeloader\goholeloader.c
+c:\dev\tiger06\tigercode\code\golf\holeloader\headers\goholeloader.h
+c:\dev\tiger06\tigercode\code\golf\lo-rendering\gorendersurface.c
+c:\dev\tiger06\tigercode\code\golf\lo-rendering\shader\hardware\hwsburn.c
+c:\dev\tiger06\tigercode\code\golf\lo-rendering\shader\hardware\xbox\hwsmaterial_xbox.c
+c:\dev\tiger06\tigercode\code\golf\lo-rendering\shader\hardware\xbox\hwsmorph_xbox.c
+c:\dev\tiger06\tigercode\code\golf\lo-rendering\shader\hardware\xbox\hwsoverride_xbox.c
+c:\dev\tiger06\tigercode\code\golf\lo-rendering\shader\hardware\xbox\hwsrender_xbox.c
+c:\dev\tiger06\tigercode\code\golf\lo-rendering\shader\shaderhub\goshaderhub_container.c
+c:\dev\tiger06\tigercode\code\golf\lo-rendering\shader\shaderhub\goshaderhub_containerinterface.c
+c:\dev\tiger06\tigercode\code\golf\lo-rendering\shader\shaderhub\goshaderhub_globalparameters.c
+c:\dev\tiger06\tigercode\code\golf\lo-rendering\shader\shaderhub\goshaderhub_main.c
+c:\dev\tiger06\tigercode\code\golf\lo-rendering\shader\shaderhub\goshaderhub_shaderobject.c
+c:\dev\tiger06\tigercode\code\golf\lo-rendering\shader\shaderhub\goshaderhub_shaderobjectinterface.c
+c:\dev\tiger06\tigercode\code\golf\lo-rendering\shader\shaderhub\headers\goshaderhub_containerinterface.h
+c:\dev\tiger06\tigercode\code\golf\lo-rendering\shader\shaderhub\headers\goshaderhub_globalparameters.h
+c:\dev\tiger06\tigercode\code\golf\lo-rendering\shader\shaderhub\headers\goshaderhub_shaderobjectinterface.h
+c:\dev\tiger06\tigercode\code\golf\lo-rendering\shader\shaderiterators\shadertextureiterator.cpp
+c:\dev\tiger06\tigercode\code\golf\lo-rendering\shader\shaderobject\shaderobjectcommon\xbox\goshaderobjectcommon_dynamicrenderingbuffer_xbox.c
+c:\dev\tiger06\tigercode\code\golf\lo-rendering\shader\shaderobject\shaderobjectcommon\xbox\goshaderobjectcommon_interface_xbox.c
+c:\dev\tiger06\tigercode\code\golf\lo-rendering\shader\shaderobject\shaderobjectcommon\xbox\goshaderobjectcommon_main_xbox.c
+c:\dev\tiger06\tigercode\code\golf\lo-rendering\shader\shaderobject\shaderobjectcommon\xbox\goshaderobjectcommon_renderingmethod_xbox.c
+c:\dev\tiger06\tigercode\code\golf\lo-rendering\shader\shaderobject\shaderobjectcommon\xbox\goshaderobjectcommon_shaderobjectdata_xbox.c
+c:\dev\tiger06\tigercode\code\golf\lo-rendering\shader\shaderobject\shaderobjectcommon\xbox\headers\goshaderobjectcommon_datarendering_xbox.h
+c:\dev\tiger06\tigercode\code\golf\lo-rendering\shader\shaderobject\shaderobjectcommon\xbox\headers\goshaderobjectcommon_dynamicrenderingbuffer_xbox.h
+c:\dev\tiger06\tigercode\code\golf\lo-rendering\shader\shaderobject\shaderobjectcommon\xbox\headers\goshaderobjectcommon_renderingmethod_xbox.h
+c:\dev\tiger06\tigercode\code\golf\lo-rendering\shader\shaderobject\xbox\goshaderobject_bumpmapping_xbox.c
+c:\dev\tiger06\tigercode\code\golf\lo-rendering\shader\shaderobject\xbox\goshaderobject_glows_xbox.c
+c:\dev\tiger06\tigercode\code\golf\lo-rendering\shader\shaderobject\xbox\goshaderobject_grass_xbox.c
+c:\dev\tiger06\tigercode\code\golf\lo-rendering\shader\shaderobject\xbox\goshaderobject_lamberttextured_xbox.c
+c:\dev\tiger06\tigercode\code\golf\lo-rendering\shader\shaderobject\xbox\goshaderobject_particle2_xbox.c
+c:\dev\tiger06\tigercode\code\golf\lo-rendering\shader\shaderobject\xbox\goshaderobject_prelitnontextured_xbox.c
+c:\dev\tiger06\tigercode\code\golf\lo-rendering\shader\shaderobject\xbox\goshaderobject_prelitnontexturedmorph_xbox.c
+c:\dev\tiger06\tigercode\code\golf\lo-rendering\shader\shaderobject\xbox\goshaderobject_prelitrgbauvanimation_xbox.c
+c:\dev\tiger06\tigercode\code\golf\lo-rendering\shader\shaderobject\xbox\goshaderobject_prelittextured_xbox.c
+c:\dev\tiger06\tigercode\code\golf\lo-rendering\shader\shaderobject\xbox\goshaderobject_prelittexturedinstance_xbox.c
+c:\dev\tiger06\tigercode\code\golf\lo-rendering\shader\shaderobject\xbox\goshaderobject_prelittexturedline_xbox.c
+c:\dev\tiger06\tigercode\code\golf\lo-rendering\shader\shaderobject\xbox\goshaderobject_prelittexturedmorph_xbox.c
+c:\dev\tiger06\tigercode\code\golf\lo-rendering\shader\shaderobject\xbox\goshaderobject_prelituvanimation_xbox.c
+c:\dev\tiger06\tigercode\code\golf\lo-rendering\shader\shaderobject\xbox\goshaderobject_rain_xbox.c
+c:\dev\tiger06\tigercode\code\golf\lo-rendering\shader\shaderobject\xbox\goshaderobject_shadowmask_xbox.c
+c:\dev\tiger06\tigercode\code\golf\lo-rendering\shader\shaderobject\xbox\goshaderobject_specularmapping_xbox.c
+c:\dev\tiger06\tigercode\code\golf\lo-rendering\shader\shaderobjectcontainer\shaderobjectcontainercommon\xbox\goshaderobjectcontainercommon_main_xbox.c
+c:\dev\tiger06\tigercode\code\golf\lo-rendering\shader\shaderobjectcontainer\xbox\goshaderobjectcontainer_obfdata_xbox.c
+c:\dev\tiger06\tigercode\code\golf\lo-rendering\shader\shaderobjectcontainer\xbox\headers\goshaderobjectcontainer_obfdata_xbox.h
+c:\dev\tiger06\tigercode\code\golf\lo-rendering\xbox\govramheaps_xbox.c
+c:\dev\tiger06\tigercode\code\golf\localization\localization.c
+c:\dev\tiger06\tigercode\code\golf\mainloop\demo.c
+c:\dev\tiger06\tigercode\code\golf\mainloop\gamemanager.cpp
+c:\dev\tiger06\tigercode\code\golf\mainloop\gomainloop.c
+c:\dev\tiger06\tigercode\code\golf\memory card\headers\mc.h
+c:\dev\tiger06\tigercode\code\golf\memory card\mc.c
+c:\dev\tiger06\tigercode\code\golf\memory card\sjisascii.c
+c:\dev\tiger06\tigercode\code\golf\memory card\xbox\mc_xbox.c
+c:\dev\tiger06\tigercode\code\golf\misc\debughook.cpp
+c:\dev\tiger06\tigercode\code\golf\noninteractivesequence\golftrinitynis.cpp
+c:\dev\tiger06\tigercode\code\golf\online\buddy.c
+c:\dev\tiger06\tigercode\code\golf\online\chat.c
+c:\dev\tiger06\tigercode\code\golf\online\gameadvert.cpp
+c:\dev\tiger06\tigercode\code\golf\online\golfvoip.c
+c:\dev\tiger06\tigercode\code\golf\online\http.c
+c:\dev\tiger06\tigercode\code\golf\online\lobby.c
+c:\dev\tiger06\tigercode\code\golf\online\lobbymatch.c
+c:\dev\tiger06\tigercode\code\golf\online\login.c
+c:\dev\tiger06\tigercode\code\golf\online\netgame.c
+c:\dev\tiger06\tigercode\code\golf\online\netgameconn.c
+c:\dev\tiger06\tigercode\code\golf\online\online.c
+c:\dev\tiger06\tigercode\code\golf\online\onlinetourn.c
+c:\dev\tiger06\tigercode\code\golf\online\xblive.c
+c:\dev\tiger06\tigercode\code\golf\performance\budgetinfo.cpp
+c:\dev\tiger06\tigercode\code\golf\physics\headers\physicsdefinitions.h
+c:\dev\tiger06\tigercode\code\golf\physics\headers\physicstypes.h
+c:\dev\tiger06\tigercode\code\golf\physics\materialtypes.c
+c:\dev\tiger06\tigercode\code\golf\physics\physics.c
+c:\dev\tiger06\tigercode\code\golf\physics\wind.c
+c:\dev\tiger06\tigercode\code\golf\rcmp\headers\maddec.h
+c:\dev\tiger06\tigercode\code\golf\rcmp\maddec.c
+c:\dev\tiger06\tigercode\code\golf\rcmp\maddeca.c
+c:\dev\tiger06\tigercode\code\golf\rcmp\madidct.c
+c:\dev\tiger06\tigercode\code\golf\rcmp\rcmp_vp6_codec.c
+c:\dev\tiger06\tigercode\code\golf\replay\replay.c
+c:\dev\tiger06\tigercode\code\golf\sfx\ballglow.c
+c:\dev\tiger06\tigercode\code\golf\sfx\colglow.c
+c:\dev\tiger06\tigercode\code\golf\sfx\depthfield.c
+c:\dev\tiger06\tigercode\code\golf\sfx\effect_motion.c
+c:\dev\tiger06\tigercode\code\golf\sfx\effect_object.c
+c:\dev\tiger06\tigercode\code\golf\sfx\effect_particlesystem.c
+c:\dev\tiger06\tigercode\code\golf\sfx\effect_template.c
+c:\dev\tiger06\tigercode\code\golf\sfx\glowmgr.c
+c:\dev\tiger06\tigercode\code\golf\sfx\headers\colglow.h
+c:\dev\tiger06\tigercode\code\golf\sfx\headers\effect_particlesystem.h
+c:\dev\tiger06\tigercode\code\golf\sfx\headers\glowmgr.h
+c:\dev\tiger06\tigercode\code\golf\sfx\headers\psballfx.h
+c:\dev\tiger06\tigercode\code\golf\sfx\headers\sfx_gameinterface.h
+c:\dev\tiger06\tigercode\code\golf\sfx\headers\sfx_renderinterface.h
+c:\dev\tiger06\tigercode\code\golf\sfx\headers\sfxhub.h
+c:\dev\tiger06\tigercode\code\golf\sfx\headers\sunflr.h
+c:\dev\tiger06\tigercode\code\golf\sfx\headers\weather.h
+c:\dev\tiger06\tigercode\code\golf\sfx\psballfx.c
+c:\dev\tiger06\tigercode\code\golf\sfx\psmgr.c
+c:\dev\tiger06\tigercode\code\golf\sfx\sfx.c
+c:\dev\tiger06\tigercode\code\golf\sfx\sfx_gameinterface.c
+c:\dev\tiger06\tigercode\code\golf\sfx\sfx_renderinterface.c
+c:\dev\tiger06\tigercode\code\golf\sfx\sfxglow.c
+c:\dev\tiger06\tigercode\code\golf\sfx\sfxhub.c
+c:\dev\tiger06\tigercode\code\golf\sfx\shadow.c
+c:\dev\tiger06\tigercode\code\golf\sfx\sunflr.c
+c:\dev\tiger06\tigercode\code\golf\sfx\weather.c
+c:\dev\tiger06\tigercode\code\golf\sfx\xbox\shadow_xbox.c
+c:\dev\tiger06\tigercode\code\golf\sfx\xbox\sunflr_xbox.c
+c:\dev\tiger06\tigercode\code\golf\sitdev\headers\shared\sitdevaction.h
+c:\dev\tiger06\tigercode\code\golf\sitdev\headers\shared\sitdevsituation.h
+c:\dev\tiger06\tigercode\code\golf\sitdev\headers\sitdevstatevector.h
+c:\dev\tiger06\tigercode\code\golf\sitdev\sitdev.c
+c:\dev\tiger06\tigercode\code\golf\sitdev\sitdevcommentaryzones.c
+c:\dev\tiger06\tigercode\code\golf\sitdev\sitdevfile.c
+c:\dev\tiger06\tigercode\code\golf\sitdev\sitdevmisc.c
+c:\dev\tiger06\tigercode\code\golf\sitdev\sitdevstatevector.c
+c:\dev\tiger06\tigercode\code\golf\sitdev\sitdevtrigger.c
+c:\dev\tiger06\tigercode\code\golf\state engine\statefunc.c
+c:\dev\tiger06\tigercode\code\golf\state engine\stategolfer.c
+c:\dev\tiger06\tigercode\code\golf\state engine\statemain.c
+c:\dev\tiger06\tigercode\code\golf\streaming\headers\streammanager.h
+c:\dev\tiger06\tigercode\code\golf\streaming\streammanager.cpp
+c:\dev\tiger06\tigercode\code\golf\streaming\streammanagerbase.cpp
+c:\dev\tiger06\tigercode\code\golf\streaming\streammanagercrac.cpp
+c:\dev\tiger06\tigercode\code\golf\streaming\streammanagerdnas.cpp
+c:\dev\tiger06\tigercode\code\golf\streaming\streammanagerfechar.cpp
+c:\dev\tiger06\tigercode\code\golf\streaming\streammanagerfrontend.cpp
+c:\dev\tiger06\tigercode\code\golf\streaming\streammanagerglobals.cpp
+c:\dev\tiger06\tigercode\code\golf\streaming\streammanagerhole.cpp
+c:\dev\tiger06\tigercode\code\golf\streaming\streammanageringame.cpp
+c:\dev\tiger06\tigercode\code\golf\streaming\streammanagerstartup.cpp
+c:\dev\tiger06\tigercode\code\golf\talky\headers\talkymanager.h
+c:\dev\tiger06\tigercode\code\golf\talky\talkymanager.cpp
+c:\dev\tiger06\tigercode\code\golf\texturefx\addativetinter.cpp
+c:\dev\tiger06\tigercode\code\golf\texturefx\clutgenfuplus.cpp
+c:\dev\tiger06\tigercode\code\golf\texturefx\clutgenopaqfuplus.cpp
+c:\dev\tiger06\tigercode\code\golf\texturefx\dxtngen.cpp
+c:\dev\tiger06\tigercode\code\golf\texturefx\dxtnpixelcache.cpp
+c:\dev\tiger06\tigercode\code\golf\texturefx\headers\rawtexture.h
+c:\dev\tiger06\tigercode\code\golf\texturefx\headers\texblendadd.h
+c:\dev\tiger06\tigercode\code\golf\texturefx\headers\texblendmultiply.h
+c:\dev\tiger06\tigercode\code\golf\texturefx\headers\texblendoverlay.h
+c:\dev\tiger06\tigercode\code\golf\texturefx\headers\texcomp.h
+c:\dev\tiger06\tigercode\code\golf\texturefx\headers\texture32b.h
+c:\dev\tiger06\tigercode\code\golf\texturefx\headers\texture4p.h
+c:\dev\tiger06\tigercode\code\golf\texturefx\headers\texture8p.h
+c:\dev\tiger06\tigercode\code\golf\texturefx\headers\texturedxtn.h
+c:\dev\tiger06\tigercode\code\golf\texturefx\headers\texturergb5a3.h
+c:\dev\tiger06\tigercode\code\golf\texturefx\headers\tinter.h
+c:\dev\tiger06\tigercode\code\golf\texturefx\headers\txrblendrule.h
+c:\dev\tiger06\tigercode\code\golf\texturefx\headers\txrfile.h
+c:\dev\tiger06\tigercode\code\golf\texturefx\headers\txrrule.h
+c:\dev\tiger06\tigercode\code\golf\texturefx\headers\txrsliderrule.h
+c:\dev\tiger06\tigercode\code\golf\texturefx\headers\txrtexrule.h
+c:\dev\tiger06\tigercode\code\golf\texturefx\headers\txrtintrule.h
+c:\dev\tiger06\tigercode\code\golf\texturefx\headers\txufile.h
+c:\dev\tiger06\tigercode\code\golf\texturefx\multiplytinter.cpp
+c:\dev\tiger06\tigercode\code\golf\texturefx\rawtexture.cpp
+c:\dev\tiger06\tigercode\code\golf\texturefx\screentinter.cpp
+c:\dev\tiger06\tigercode\code\golf\texturefx\softlighttinter.cpp
+c:\dev\tiger06\tigercode\code\golf\texturefx\texblendadd.cpp
+c:\dev\tiger06\tigercode\code\golf\texturefx\texblender.cpp
+c:\dev\tiger06\tigercode\code\golf\texturefx\texblendlerp.cpp
+c:\dev\tiger06\tigercode\code\golf\texturefx\texblendmultiply.cpp
+c:\dev\tiger06\tigercode\code\golf\texturefx\texblendoverlay.cpp
+c:\dev\tiger06\tigercode\code\golf\texturefx\texblendsoftlight.cpp
+c:\dev\tiger06\tigercode\code\golf\texturefx\texcomp.cpp
+c:\dev\tiger06\tigercode\code\golf\texturefx\texture32b.cpp
+c:\dev\tiger06\tigercode\code\golf\texturefx\texture4p.cpp
+c:\dev\tiger06\tigercode\code\golf\texturefx\texture8p.cpp
+c:\dev\tiger06\tigercode\code\golf\texturefx\texturedxt1i4.cpp
+c:\dev\tiger06\tigercode\code\golf\texturefx\texturedxtn.cpp
+c:\dev\tiger06\tigercode\code\golf\texturefx\texturergb5a3.cpp
+c:\dev\tiger06\tigercode\code\golf\texturefx\tinter.cpp
+c:\dev\tiger06\tigercode\code\golf\texturefx\txrblendrule.cpp
+c:\dev\tiger06\tigercode\code\golf\texturefx\txrfile.cpp
+c:\dev\tiger06\tigercode\code\golf\texturefx\txrrule.cpp
+c:\dev\tiger06\tigercode\code\golf\texturefx\txrsliderrule.cpp
+c:\dev\tiger06\tigercode\code\golf\texturefx\txrtexrule.cpp
+c:\dev\tiger06\tigercode\code\golf\texturefx\txrtintrule.cpp
+c:\dev\tiger06\tigercode\code\golf\texturefx\txufile.cpp
+c:\dev\tiger06\tigercode\code\golf\thumbnails\headers\thumbnails.h
+c:\dev\tiger06\tigercode\code\golf\thumbnails\thumbnails.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_battlegolf_chooseaddremove.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_battlegolf_chooseclub.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_boastchallenges.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_calendar.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_charactersel.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_charbio.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_commentarypopup.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_componentmanager.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_confidencemeter.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_courseselect.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_createacourse.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_credits.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_easportstrax.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_endgame.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_flashutilities.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_gameface.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_gamefaceuber.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_gfloading.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_helpers.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_highimpactmessages.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_hud.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_hudcomponentmanager.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_inthebag.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_loadprofile.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_logoeditor.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_lowimpactmessages.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_mainmenu.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_mc_memcardpopup.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_menubase.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_menucirc.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_menutoggle.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_menuvert.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_mytour_alltimerecords.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_mytour_resume.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_mytour_sponsorshipitems.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_mytour_sponsorships.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_mytour_userrecords.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_online_resume.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_onlinechatbox.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_onlinecreateaccountmoreinfo.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_onlineeamessenger.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_onlinefaq.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_onlinegameadvertisement.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_onlinegamemodes_gotw.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_onlinegamemodes_leaderboards.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_onlinegamesetup.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_onlinelegalagreement.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_onlinelobby.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_onlinelobbyroom.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_onlinelobbyroommatches.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_onlinemyquickmessages.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_onlinenews.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_onlinepopupdisconnect.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_onlineselectnetworkconfiguration.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_onlinestats_category.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_onlinestats_player.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_onlinetermsconditions.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_onlinetournament_gotw.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_onlinetournament_leaderboard.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_onlinetournament_tourwins.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_onlinetournament_wml.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_onlinewaitingroom.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_options.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_pgatourleaderboard.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_pgatournament_tourwins.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_pgatourstats_category.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_pgatourstats_player.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_playerdev.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_popupdef.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_popupmenuvert.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_proshopmenu.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_proshopmenubehaviorbase.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_proshoppopup.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_psmbehaviorheadstart.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_psmbehaviormyskills.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_psmbehaviorproshop.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_rivals.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_rivalschallenge.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_rivalschallengeboard.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_rivalsmessenger.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_rivalstrophies.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_scorecard.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_secondanalogstick.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_shotcalleraccept.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_shotcallerhelper.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_shotcallerresult.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_shotcallersetup.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_skills.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_sponsorpopup.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_spudhud.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_virtualkeyboard.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\headers\ui_weatherinfo.h
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_battlegolf_chooseaddremove.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_battlegolf_chooseclub.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_boastchallenges.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_calendar.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_charactersel.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_charbio.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_commentarypopup.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_componentmanager.c
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_confidencemeter.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_courseselect.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_createacourse.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_credits.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_easportstrax.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_endgame.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_flashutilities.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_gameface.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_gamefaceuber.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_gfloading.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_helpers.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_highimpactmessages.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_hud.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_hudcomponentmanager.c
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_inthebag.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_loadprofile.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_logoeditor.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_lowimpactmessages.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_mainmenu.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_mc_memcardpopup.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_menubase.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_menucirc.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_menutoggle.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_menuvert.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_mytour_alltimerecords.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_mytour_resume.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_mytour_sponsorshipitems.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_mytour_sponsorships.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_mytour_userrecords.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_online_resume.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_onlinechatbox.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_onlinecreateaccountmoreinfo.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_onlineeamessenger.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_onlinefaq.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_onlinegameadvertisement.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_onlinegamemodes_gotw.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_onlinegamemodes_leaderboards.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_onlinegamesetup.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_onlinelegalagreement.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_onlinelobby.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_onlinelobbyroom.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_onlinelobbyroommatches.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_onlinemyquickmessages.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_onlinenews.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_onlinepopupdisconnect.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_onlineselectnetworkconfiguration.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_onlinestats_category.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_onlinestats_player.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_onlinetermsconditions.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_onlinetournament_gotw.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_onlinetournament_leaderboard.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_onlinetournament_tourwins.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_onlinetournament_wml.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_onlinewaitingroom.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_options.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_pgatourleaderboard.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_pgatournament_tourwins.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_pgatourstats_category.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_pgatourstats_player.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_playerdev.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_popupdef.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_popupmenuvert.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_proshopmenu.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_proshoppopup.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_rivals.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_rivalschallenge.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_rivalschallengeboard.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_rivalsmessenger.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_rivalstrophies.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_scorecard.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_secondanalogstick.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_shotcalleraccept.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_shotcallerhelper.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_shotcallerresult.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_shotcallersetup.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_skills.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_sponsorpopup.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_spudhud.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_virtualkeyboard.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\ui_weatherinfo.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\aptruntime\uiaptprocessinterface.c
+c:\dev\tiger06\tigercode\code\golf\ui core\common\headers\savegamesm.h
+c:\dev\tiger06\tigercode\code\golf\ui core\common\headers\ui_memorycarddefs.h
+c:\dev\tiger06\tigercode\code\golf\ui core\common\savegamesm.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\common\savegamesm_tw.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\common\savegamesm_ui.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\common\ui_apt_memorycardui.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\common\ui_apthinthelper.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\common\ui_memorycard.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\common\xbox\ui_memcard_xbox.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\frontend\fe_calendar.c
+c:\dev\tiger06\tigercode\code\golf\ui core\frontend\fe_calendarpopups.c
+c:\dev\tiger06\tigercode\code\golf\ui core\frontend\fe_crapdb.c
+c:\dev\tiger06\tigercode\code\golf\ui core\frontend\fe_craploader.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\frontend\fe_craputils.c
+c:\dev\tiger06\tigercode\code\golf\ui core\frontend\fe_eramodeball.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\frontend\fe_geostreamer.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\frontend\fe_golferthumbnail.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\frontend\fe_hints.c
+c:\dev\tiger06\tigercode\code\golf\ui core\frontend\fe_loadingscreen.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\frontend\fe_logodesign.c
+c:\dev\tiger06\tigercode\code\golf\ui core\frontend\fe_manager.c
+c:\dev\tiger06\tigercode\code\golf\ui core\frontend\fe_movies.c
+c:\dev\tiger06\tigercode\code\golf\ui core\frontend\fe_online.c
+c:\dev\tiger06\tigercode\code\golf\ui core\frontend\fe_onlinehints.c
+c:\dev\tiger06\tigercode\code\golf\ui core\frontend\fe_onlineutils.c
+c:\dev\tiger06\tigercode\code\golf\ui core\frontend\fe_playnow.c
+c:\dev\tiger06\tigercode\code\golf\ui core\frontend\fe_stats.c
+c:\dev\tiger06\tigercode\code\golf\ui core\frontend\fe_usermgr.c
+c:\dev\tiger06\tigercode\code\golf\ui core\frontend\gamemessages\apt_fe_gamemessages.c
+c:\dev\tiger06\tigercode\code\golf\ui core\frontend\gamemessages\fe_crapmessages.c
+c:\dev\tiger06\tigercode\code\golf\ui core\frontend\headers\fe_crapdb.h
+c:\dev\tiger06\tigercode\code\golf\ui core\frontend\headers\fe_craploader.h
+c:\dev\tiger06\tigercode\code\golf\ui core\frontend\headers\fe_geostreamer.h
+c:\dev\tiger06\tigercode\code\golf\ui core\frontend\headers\fe_loadingscreen.h
+c:\dev\tiger06\tigercode\code\golf\ui core\ingame\apt_ig_gamemessages.c
+c:\dev\tiger06\tigercode\code\golf\ui core\istudio runtime\fegolferanim.c
+c:\dev\tiger06\tigercode\code\golf\ui core\istudio runtime\feobject.c
+c:\dev\tiger06\tigercode\code\golf\ui core\istudio runtime\fetexturemgr.c
+c:\dev\tiger06\tigercode\code\golf\ui core\istudio runtime\headers\fegolferanim.h
+c:\dev\tiger06\tigercode\code\golf\ui core\istudio runtime\ui_loader.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\istudio runtime\ui_screenresource.cpp
+c:\dev\tiger06\tigercode\code\golf\ui core\istudio runtime\uieatrax.c
+c:\dev\tiger06\tigercode\code\golf\ui core\istudio runtime\uikeyboard.c
+c:\dev\tiger06\tigercode\code\golf\ui core\istudio runtime\uiloadfile.c
+c:\dev\tiger06\tigercode\code\golf\ui core\istudio runtime\uiobject.c
+c:\dev\tiger06\tigercode\code\golf\ui core\istudio runtime\uiprocesspolygon.c
+c:\dev\tiger06\tigercode\code\golf\ui core\startup\startup.c
+c:\dev\tiger06\tigercode\code\golf\user\headers\userinfo.h
+c:\dev\tiger06\tigercode\code\golf\user\headers\usermanager.h
+c:\dev\tiger06\tigercode\code\golf\user\userinfo.cpp
+c:\dev\tiger06\tigercode\code\golf\user\usermanager.cpp
+c:\dev\tiger06\tigercode\code\golf\version\gosignature.c
+c:\dev\tiger06\tigercode\code\golf\version\goversion.c
+c:\dev\tiger06\tigercode\code\legacy\lib\headers\mathquat.h
+c:\dev\tiger06\tigercode\code\legacy\lib\headers\uallocator.h
+c:\dev\tiger06\tigercode\code\legacy\lib\headers\ubitarray.h
+c:\dev\tiger06\tigercode\code\legacy\lib\headers\ubyteswap.h
+c:\dev\tiger06\tigercode\code\legacy\lib\headers\ucirc.h
+c:\dev\tiger06\tigercode\code\legacy\lib\headers\uheap.h
+c:\dev\tiger06\tigercode\code\legacy\lib\headers\uinterrupt.h
+c:\dev\tiger06\tigercode\code\legacy\lib\headers\uiterator.h
+c:\dev\tiger06\tigercode\code\legacy\lib\headers\umatflt.h
+c:\dev\tiger06\tigercode\code\legacy\lib\headers\umath.h
+c:\dev\tiger06\tigercode\code\legacy\lib\headers\umempoolresizeable.h
+c:\dev\tiger06\tigercode\code\legacy\lib\headers\uobject.h
+c:\dev\tiger06\tigercode\code\legacy\lib\headers\uobject3d.h
+c:\dev\tiger06\tigercode\code\legacy\lib\headers\urandom.h
+c:\dev\tiger06\tigercode\code\legacy\lib\headers\usingleton.h
+c:\dev\tiger06\tigercode\code\legacy\lib\headers\uuberparserutils.h
+c:\dev\tiger06\tigercode\code\legacy\lib\headers\uvecflt.h
+c:\dev\tiger06\tigercode\code\legacy\lib\mathquat.c
+c:\dev\tiger06\tigercode\code\legacy\lib\uallocator.c
+c:\dev\tiger06\tigercode\code\legacy\lib\ubytestream.c
+c:\dev\tiger06\tigercode\code\legacy\lib\ubyteswap.c
+c:\dev\tiger06\tigercode\code\legacy\lib\ucirc.c
+c:\dev\tiger06\tigercode\code\legacy\lib\udynmempool.c
+c:\dev\tiger06\tigercode\code\legacy\lib\ufailure.c
+c:\dev\tiger06\tigercode\code\legacy\lib\uheap.c
+c:\dev\tiger06\tigercode\code\legacy\lib\uidmgr.c
+c:\dev\tiger06\tigercode\code\legacy\lib\umatflt.c
+c:\dev\tiger06\tigercode\code\legacy\lib\umath.c
+c:\dev\tiger06\tigercode\code\legacy\lib\umemmanager.c
+c:\dev\tiger06\tigercode\code\legacy\lib\umemnew.cpp
+c:\dev\tiger06\tigercode\code\legacy\lib\umempool.c
+c:\dev\tiger06\tigercode\code\legacy\lib\umempoolresizeable.cpp
+c:\dev\tiger06\tigercode\code\legacy\lib\uobject.c
+c:\dev\tiger06\tigercode\code\legacy\lib\uobject3d.c
+c:\dev\tiger06\tigercode\code\legacy\lib\urandom.c
+c:\dev\tiger06\tigercode\code\legacy\lib\ures.c
+c:\dev\tiger06\tigercode\code\legacy\lib\utiming.c
+c:\dev\tiger06\tigercode\code\legacy\lib\uuberparserutils.cpp
+c:\dev\tiger06\tigercode\code\legacy\lib\uvecflt.c
+c:\dev\tiger06\tigercode\code\legacy\ll\headers\llconcmd.h
+c:\dev\tiger06\tigercode\code\legacy\ll\headers\lldyntex.h
+c:\dev\tiger06\tigercode\code\legacy\ll\headers\llfileio.h
+c:\dev\tiger06\tigercode\code\legacy\ll\headers\llfont.h
+c:\dev\tiger06\tigercode\code\legacy\ll\headers\llprims.h
+c:\dev\tiger06\tigercode\code\legacy\ll\headers\lltex.h
+c:\dev\tiger06\tigercode\code\legacy\ll\headers\lltime.h
+c:\dev\tiger06\tigercode\code\legacy\ll\headers\lluiwidget.h
+c:\dev\tiger06\tigercode\code\legacy\ll\headers\llvideo.h
+c:\dev\tiger06\tigercode\code\legacy\ll\headers\llvmem.h
+c:\dev\tiger06\tigercode\code\legacy\ll\llcon.c
+c:\dev\tiger06\tigercode\code\legacy\ll\llconcmd.c
+c:\dev\tiger06\tigercode\code\legacy\ll\lldyntex.c
+c:\dev\tiger06\tigercode\code\legacy\ll\llfont.c
+c:\dev\tiger06\tigercode\code\legacy\ll\llinput.c
+c:\dev\tiger06\tigercode\code\legacy\ll\lljrnl.c
+c:\dev\tiger06\tigercode\code\legacy\ll\llkey.c
+c:\dev\tiger06\tigercode\code\legacy\ll\lllistman.c
+c:\dev\tiger06\tigercode\code\legacy\ll\llmem.c
+c:\dev\tiger06\tigercode\code\legacy\ll\llpictint.c
+c:\dev\tiger06\tigercode\code\legacy\ll\llprint.c
+c:\dev\tiger06\tigercode\code\legacy\ll\llrealfileio.cpp
+c:\dev\tiger06\tigercode\code\legacy\ll\llres.c
+c:\dev\tiger06\tigercode\code\legacy\ll\llrtclock.c
+c:\dev\tiger06\tigercode\code\legacy\ll\lltex.c
+c:\dev\tiger06\tigercode\code\legacy\ll\lltexgrp.c
+c:\dev\tiger06\tigercode\code\legacy\ll\lltime.c
+c:\dev\tiger06\tigercode\code\legacy\ll\lluiwidget.c
+c:\dev\tiger06\tigercode\code\legacy\ll\llvideo.c
+c:\dev\tiger06\tigercode\code\legacy\ll\llvmem.c
+c:\dev\tiger06\tigercode\code\legacy\ll\xbox\headers\llbatchlist_xbox.h
+c:\dev\tiger06\tigercode\code\legacy\ll\xbox\headers\lldisst_xbox.h
+c:\dev\tiger06\tigercode\code\legacy\ll\xbox\headers\lldisstint_xbox.h
+c:\dev\tiger06\tigercode\code\legacy\ll\xbox\headers\llgraph_xbox.h
+c:\dev\tiger06\tigercode\code\legacy\ll\xbox\headers\llobj_xbox.h
+c:\dev\tiger06\tigercode\code\legacy\ll\xbox\headers\llpict_xbox.h
+c:\dev\tiger06\tigercode\code\legacy\ll\xbox\llbatchlist_xbox.c
+c:\dev\tiger06\tigercode\code\legacy\ll\xbox\lldisp_xbox.c
+c:\dev\tiger06\tigercode\code\legacy\ll\xbox\lldisst_xbox.c
+c:\dev\tiger06\tigercode\code\legacy\ll\xbox\llgraph_xbox.c
+c:\dev\tiger06\tigercode\code\legacy\ll\xbox\llinput_xbox.c
+c:\dev\tiger06\tigercode\code\legacy\ll\xbox\lllist_xbox.c
+c:\dev\tiger06\tigercode\code\legacy\ll\xbox\llmask_xbox.c
+c:\dev\tiger06\tigercode\code\legacy\ll\xbox\llmem_xbox.c
+c:\dev\tiger06\tigercode\code\legacy\ll\xbox\llobj_xbox.c
+c:\dev\tiger06\tigercode\code\legacy\ll\xbox\llpict_xbox.c
+c:\dev\tiger06\tigercode\code\legacy\ll\xbox\llprims_xbox.c
+c:\dev\tiger06\tigercode\code\legacy\ll\xbox\llprint_xbox.c
+c:\dev\tiger06\tigercode\code\legacy\ll\xbox\llrtclock_xbox.c
+c:\dev\tiger06\tigercode\code\legacy\ll\xbox\llsynch_xbox.c
+c:\dev\tiger06\tigercode\code\legacy\main\main.c
+c:\dev\tiger06\tigercode\code\legacy\specif\headers\ufont.h
+c:\dev\tiger06\tigercode\code\legacy\specif\headers\unetwork.h
+c:\dev\tiger06\tigercode\code\legacy\specif\uactbase.c
+c:\dev\tiger06\tigercode\code\legacy\specif\uctrlfct.c
+c:\dev\tiger06\tigercode\code\legacy\specif\ufont.c
+c:\dev\tiger06\tigercode\code\legacy\specif\ukernel.c
+c:\dev\tiger06\tigercode\code\legacy\specif\unetwork.c
+c:\dev\tiger06\tigercode\code\legacy\specif\ustream.c
+c:\dev\tiger06\tigercode\code\legacy\specif\usupact.c
+c:\dev\tiger06\tigercode\code\shared\cameras\camutils.c
+c:\dev\tiger06\tigercode\code\shared\crap\crapsharedutils.cpp
+c:\dev\tiger06\tigercode\code\shared\grassstructs.h
+c:\dev\tiger06\tigercode\code\shared\headers\camutils.h
+c:\dev\tiger06\tigercode\code\shared\headers\sfxsys.h
+c:\dev\tiger06\tigercode\code\shared\headers\uhashstring.h
+c:\dev\tiger06\tigercode\code\shared\refpack\refabout.cpp
+c:\dev\tiger06\tigercode\code\shared\refpack\refdecode.cpp
+c:\dev\tiger06\tigercode\code\shared\refpack\refencode.cpp
+c:\dev\tiger06\tigercode\code\shared\safestring.cpp
+c:\dev\tiger06\tigercode\code\shared\shader\hardware\hwsiterator.c
+c:\dev\tiger06\tigercode\code\shared\shader\hardware\hwsrelocate.c
+c:\dev\tiger06\tigercode\code\shared\stringhash\stringhash.c
+c:\dev\tiger06\tigercode\code\shared\stringhash\stringhash.h
+c:\dev\tiger06\tigercode\code\shared\uhashstring.cpp
+c:\dev\tiger06\tigercode\code\shared\xceedzip_zlib64\adler32.c
+c:\dev\tiger06\tigercode\code\shared\xceedzip_zlib64\infblock.c
+c:\dev\tiger06\tigercode\code\shared\xceedzip_zlib64\infcodes.c
+c:\dev\tiger06\tigercode\code\shared\xceedzip_zlib64\inffast.c
+c:\dev\tiger06\tigercode\code\shared\xceedzip_zlib64\inflate.c
+c:\dev\tiger06\tigercode\code\shared\xceedzip_zlib64\inftrees.c
+c:\dev\tiger06\tigercode\code\shared\xceedzip_zlib64\infutil.c
+c:\dev\tiger06\tigercode\code\shared\xceedzip_zlib64\zutil.c
+c:\dev\tiger06\tigercode\code\tiburon\eassdk\sharedfileiocallbacks.c
+c:\dev\tiger06\tigercode\code\tiburon\eassdk\tibext.c
+c:\dev\tiger06\tigercode\packages\allocator\1.5.0\include\allocator\iallocator.h
+c:\dev\tiger06\tigercode\packages\ears_trinity\1.0\include\ears_trinity\renderwarejunk.h
+c:\dev\tiger06\tigercode\packages\ears_trinity\1.0\include\ears_trinity\trinity.h
+c:\dev\tiger06\tigercode\packages\ears_trinity\1.0\include\ears_trinity\trinitymath.h
+c:\dev\tiger06\tigercode\packages\ears_trinity\1.0\src\interpolator.cpp
+c:\dev\tiger06\tigercode\packages\ears_trinity\1.0\src\interpolator.h
+c:\dev\tiger06\tigercode\packages\ears_trinity\1.0\src\sequence.cpp
+c:\dev\tiger06\tigercode\packages\ears_trinity\1.0\src\sequence.h
+c:\dev\tiger06\tigercode\packages\ears_trinity\1.0\src\sequencebin.cpp
+c:\dev\tiger06\tigercode\packages\ears_trinity\1.0\src\trinity.cpp
+c:\dev\tiger06\tigercode\packages\ears_trinity\1.0\src\trinityactor.cpp
+c:\dev\tiger06\tigercode\packages\ears_trinity\1.0\src\trinityactor.h
+c:\dev\tiger06\tigercode\packages\ears_trinity\1.0\src\trinitycamera.cpp
+c:\dev\tiger06\tigercode\packages\ears_trinity\1.0\src\trinitycamera.h
+c:\dev\tiger06\tigercode\packages\ears_trinity\1.0\src\trinitymathtest.cpp
+c:\dev\tiger06\tigercode\packages\ears_trinity\1.0\src\trinityscreeneffects.cpp
+c:\dev\tiger06\tigercode\packages\ears_trinity\1.0\src\trinitytransformbase.cpp
+c:\dev\tiger06\tigercode\packages\ears_trinity\1.0\src\trinityvfx.cpp
+c:\dev\tiger06\tigercode\packages\eathread\1.04.00\include\eathread\x86\eathread_atomic_x86.h
+c:\dev\tiger06\tigercode\packages\eathread\1.04.00\source\eathread_mutex.cpp
+c:\dev\tiger06\tigercode\packages\eathread\1.04.00\source\eathread_thread.cpp
+c:\dev\tiger06\tigercode\packages\eathread\1.04.00\source\pc\eathread_mutex_pc.cpp
+c:\dev\tiger06\tigercode\packages\eathread\1.04.00\source\pc\eathread_pc.cpp
+c:\dev\tiger06\tigercode\packages\eathread\1.04.00\source\pc\eathread_thread_pc.cpp
+c:\dirty3\sdk\online\dirtysdk\contrib\lobbyglue\source\xbox\connapixbox.c
+c:\dirty3\sdk\online\dirtysdk\contrib\voip\source\xbox\voip.cpp
+c:\dirty3\sdk\online\dirtysdk\contrib\voip\source\xbox\voipconnection.cpp
+c:\dirty3\sdk\online\dirtysdk\contrib\voip\source\xbox\voippriv.cpp
+c:\dirty3\sdk\online\dirtysdk\contrib\voip\source\xbox\voipsocket.cpp
+c:\dirty3\sdk\online\dirtysdk\contrib\xboxisp\source\xbox\xboxisp.c
+c:\mywork\packages\snd\9\source\library\cmn\s3dlow.c
+c:\mywork\packages\snd\9\source\library\cmn\salloc.c
+c:\mywork\packages\snd\9\source\library\cmn\satospkr.c
+c:\mywork\packages\snd\9\source\library\cmn\sattrdef.c
+c:\mywork\packages\snd\9\source\library\cmn\sbadd.c
+c:\mywork\packages\snd\9\source\library\cmn\sballoc.c
+c:\mywork\packages\snd\9\source\library\cmn\sbplay.c
+c:\mywork\packages\snd\9\source\library\cmn\sbremove.c
+c:\mywork\packages\snd\9\source\library\cmn\sbvalid.c
+c:\mywork\packages\snd\9\source\library\cmn\scheckpo.c
+c:\mywork\packages\snd\9\source\library\cmn\sclcptch.c
+c:\mywork\packages\snd\9\source\library\cmn\sctlfilt.c
+c:\mywork\packages\snd\9\source\library\cmn\sdownmix.cpp
+c:\mywork\packages\snd\9\source\library\cmn\sexithndl.c
+c:\mywork\packages\snd\9\source\library\cmn\sformat.c
+c:\mywork\packages\snd\9\source\library\cmn\sgetdata.c
+c:\mywork\packages\snd\9\source\library\cmn\sgetpvol.c
+c:\mywork\packages\snd\9\source\library\cmn\sgettag.c
+c:\mywork\packages\snd\9\source\library\cmn\sgparse.cpp
+c:\mywork\packages\snd\9\source\library\cmn\slib.c
+c:\mywork\packages\snd\9\source\library\cmn\slinklist.h
+c:\mywork\packages\snd\9\source\library\cmn\slinklst.c
+c:\mywork\packages\snd\9\source\library\cmn\smemdis.c
+c:\mywork\packages\snd\9\source\library\cmn\smemhigh.cpp
+c:\mywork\packages\snd\9\source\library\cmn\smemman.c
+c:\mywork\packages\snd\9\source\library\cmn\sndcmn.h
+c:\mywork\packages\snd\9\source\library\cmn\sndfxbus.cpp
+c:\mywork\packages\snd\9\source\library\cmn\sndi_cos.c
+c:\mywork\packages\snd\9\source\library\cmn\sndi_findprime.c
+c:\mywork\packages\snd\9\source\library\cmn\sndi_mult16.c
+c:\mywork\packages\snd\9\source\library\cmn\sndi_root1x.c
+c:\mywork\packages\snd\9\source\library\cmn\sndi_sin.c
+c:\mywork\packages\snd\9\source\library\cmn\soutputmap.cpp
+c:\mywork\packages\snd\9\source\library\cmn\sover.c
+c:\mywork\packages\snd\9\source\library\cmn\spantoaz.c
+c:\mywork\packages\snd\9\source\library\cmn\spat2hdr.c
+c:\mywork\packages\snd\9\source\library\cmn\spatkey.c
+c:\mywork\packages\snd\9\source\library\cmn\spitch.c
+c:\mywork\packages\snd\9\source\library\cmn\spktctoh.c
+c:\mywork\packages\snd\9\source\library\cmn\spktplay.c
+c:\mywork\packages\snd\9\source\library\cmn\splysdef.c
+c:\mywork\packages\snd\9\source\library\cmn\sprofvoc.c
+c:\mywork\packages\snd\9\source\library\cmn\srandom.c
+c:\mywork\packages\snd\9\source\library\cmn\sreallocbuf.cpp
+c:\mywork\packages\snd\9\source\library\cmn\srelease.c
+c:\mywork\packages\snd\9\source\library\cmn\srender.c
+c:\mywork\packages\snd\9\source\library\cmn\srrange.c
+c:\mywork\packages\snd\9\source\library\cmn\sserver.c
+c:\mywork\packages\snd\9\source\library\cmn\sst.c
+c:\mywork\packages\snd\9\source\library\cmn\sstautov.c
+c:\mywork\packages\snd\9\source\library\cmn\sstcrtap.c
+c:\mywork\packages\snd\9\source\library\cmn\sstgetpv.c
+c:\mywork\packages\snd\9\source\library\cmn\sstgetrp.c
+c:\mywork\packages\snd\9\source\library\cmn\sstop.c
+c:\mywork\packages\snd\9\source\library\cmn\sstovrhd.c
+c:\mywork\packages\snd\9\source\library\cmn\sstpmult.c
+c:\mywork\packages\snd\9\source\library\cmn\sstqreqi.c
+c:\mywork\packages\snd\9\source\library\cmn\sstrstat.c
+c:\mywork\packages\snd\9\source\library\cmn\sstsetgl.c
+c:\mywork\packages\snd\9\source\library\cmn\sststat.c
+c:\mywork\packages\snd\9\source\library\cmn\ssttmul.c
+c:\mywork\packages\snd\9\source\library\cmn\sstvol.c
+c:\mywork\packages\snd\9\source\library\cmn\ssys.cpp
+c:\mywork\packages\snd\9\source\library\cmn\ssysinit.c
+c:\mywork\packages\snd\9\source\library\cmn\ssysserv.c
+c:\mywork\packages\snd\9\source\library\cmn\stagpat.c
+c:\mywork\packages\snd\9\source\library\cmn\stimemul.c
+c:\mywork\packages\snd\9\source\library\cmn\stpparse.c
+c:\mywork\packages\snd\9\source\library\cmn\svecreal6.cpp
+c:\mywork\packages\snd\9\source\library\cmn\svol.c
+c:\mywork\packages\snd\9\source\library\extern\coda\cmn\coda.cpp
+c:\mywork\packages\snd\9\source\library\extern\coda\cmn\eaxadecf.cpp
+c:\mywork\packages\snd\9\source\library\extern\coda\cmn\mtdecf.cpp
+c:\mywork\packages\snd\9\source\library\extern\coda\cmn\setmemcpy.cpp
+c:\mywork\packages\snd\9\source\library\extern\coda\extern\endian.h
+c:\mywork\packages\snd\9\source\library\extern\coda\include\coda.h
+c:\mywork\packages\snd\9\source\library\extern\endian.h
+c:\mywork\packages\snd\9\source\library\mix\sfamplf.c
+c:\mywork\packages\snd\9\source\library\mix\sfbpffir8.c
+c:\mywork\packages\snd\9\source\library\mix\sfecho.c
+c:\mywork\packages\snd\9\source\library\mix\sfft16.c
+c:\mywork\packages\snd\9\source\library\mix\sfhpffir8.c
+c:\mywork\packages\snd\9\source\library\mix\sfilter.c
+c:\mywork\packages\snd\9\source\library\mix\sfir.c
+c:\mywork\packages\snd\9\source\library\mix\sfir8.c
+c:\mywork\packages\snd\9\source\library\mix\sflpf.c
+c:\mywork\packages\snd\9\source\library\mix\sflpffir8.c
+c:\mywork\packages\snd\9\source\library\mix\sfmixer.c
+c:\mywork\packages\snd\9\source\library\mix\sfreson.c
+c:\mywork\packages\snd\9\source\library\mix\sfrsf.c
+c:\mywork\packages\snd\9\source\library\mix\sfsplit.c
+c:\mywork\packages\snd\9\source\library\mix\sfsrc.c
+c:\mywork\packages\snd\9\source\library\mix\sfxrevc.c
+c:\mywork\packages\snd\9\source\library\mix\sinit16.c
+c:\mywork\packages\snd\9\source\library\mix\sinitut.c
+c:\mywork\packages\snd\9\source\library\mix\sinitxa.c
+c:\mywork\packages\snd\9\source\library\mix\sinterl.c
+c:\mywork\packages\snd\9\source\library\mix\smixer.c
+c:\mywork\packages\snd\9\source\library\mix\smixfilt.c
+c:\mywork\packages\snd\9\source\library\mix\smixhip.c
+c:\mywork\packages\snd\9\source\library\mix\smixlowp.c
+c:\mywork\packages\snd\9\source\library\mix\smixptch.c
+c:\mywork\packages\snd\9\source\library\mix\smixtmul.c
+c:\mywork\packages\snd\9\source\library\mix\stretch.c
+c:\mywork\packages\snd\9\source\library\mix\supf.c
+c:\mywork\packages\snd\9\source\library\mix\suplf.c
+c:\mywork\packages\snd\9\source\library\mix\supmutf.c
+c:\mywork\packages\snd\9\source\library\mix\supmutlf.c
+c:\mywork\packages\snd\9\source\library\mix\supmutpf.c
+c:\mywork\packages\snd\9\source\library\mix\suppf.c
+c:\mywork\packages\snd\9\source\library\mix\supxaf.cpp
+c:\mywork\packages\snd\9\source\library\mix\supxalf.cpp
+c:\mywork\packages\snd\9\source\library\mix\supxapf.cpp
+c:\mywork\packages\snd\9\source\library\xbox\sdfilter.c
+c:\mywork\packages\snd\9\source\library\xbox\sdfxinit.c
+c:\mywork\packages\snd\9\source\library\xbox\sdfxlev.c
+c:\mywork\packages\snd\9\source\library\xbox\sdhipass.c
+c:\mywork\packages\snd\9\source\library\xbox\sdlowpas.c
+c:\mywork\packages\snd\9\source\library\xbox\sdpktply.c
+c:\mywork\packages\snd\9\source\library\xbox\sdplay.c
+c:\mywork\packages\snd\9\source\library\xbox\sdriver.c
+c:\mywork\packages\snd\9\source\library\xbox\sdtimmul.c
+c:\mywork\packages\snd\9\source\library\xbox\smutex.c
+c:\packages\endian\0.5.2\include\endian\little\endian.h
+c:\packages\realcore\6.27.01\include\common\realcore\file\driver.h
+c:\packages\realcore\6.27.01\include\common\realcore\impl\std\list.inl
+c:\packages\realcore\6.27.01\include\common\realcore\std.h
+c:\packages\realcore\6.27.01\include\common\realcore\std\list.h
+c:\packages\realcore\6.27.01\include\common\realcore\system.h
+c:\packages\realcore\6.27.01\source\debug\cmn\debugger.cpp
+c:\packages\realcore\6.27.01\source\debug\cmn\printstr.cpp
+c:\packages\realcore\6.27.01\source\debug\xbox\printdrv.cpp
+c:\packages\realcore\6.27.01\source\file\cmn\bigfile.cpp
+c:\packages\realcore\6.27.01\source\file\cmn\filesys.cpp
+c:\packages\realcore\6.27.01\source\file\cmn\filesys_c.cpp
+c:\packages\realcore\6.27.01\source\file\cmn\filesys_cc.cpp
+c:\packages\realcore\6.27.01\source\file\cmn\filesysopts.cpp
+c:\packages\realcore\6.27.01\source\file\cmn\hlafile.cpp
+c:\packages\realcore\6.27.01\source\file\cmn\hlsfile.cpp
+c:\packages\realcore\6.27.01\source\file\cmn\stream.cpp
+c:\packages\realcore\6.27.01\source\file\cmn\syncfile.cpp
+c:\packages\realcore\6.27.01\source\file\xbox\device.cpp
+c:\packages\realcore\6.27.01\source\std\xbox\memclear.cpp
+c:\packages\realcore\6.27.01\source\std\xbox\memcopy.cpp
+c:\packages\realcore\6.27.01\source\system\cmn\exit.cpp
+c:\packages\realcore\6.27.01\source\system\cmn\mutex.cpp
+c:\packages\realcore\6.27.01\source\system\cmn\systask.cpp
+c:\packages\realcore\6.27.01\source\system\cmn\timer.cpp
+c:\packages\realcore\6.27.01\source\system\xbox\inittmr.cpp
+c:\packages\realcore\6.27.01\source\system\xbox\signals.cpp
+c:\packages\realcore\6.27.01\source\system\xbox\threads.cpp
+c:\program files\microsoft xbox sdk\xbox\include\d3d8.h
+c:\program files\microsoft xbox sdk\xbox\include\d3dx8math.inl
+c:\program files\microsoft xbox sdk\xbox\include\dsound.h
+c:\program files\microsoft xbox sdk\xbox\include\math.h
+c:\program files\microsoft xbox sdk\xbox\include\new
+c:\program files\microsoft xbox sdk\xbox\include\xhv.h
+d:\packages\vp6\1.0.6\source\decode\cmn\allocator.cpp
+d:\packages\vp6\1.0.6\source\decode\cmn\boolhuff.c
+d:\packages\vp6\1.0.6\source\decode\cmn\boolhuff.inl
+d:\packages\vp6\1.0.6\source\decode\cmn\borders.c
+d:\packages\vp6\1.0.6\source\decode\cmn\clamp.c
+d:\packages\vp6\1.0.6\source\decode\cmn\deblock.c
+d:\packages\vp6\1.0.6\source\decode\cmn\decodembs.c
+d:\packages\vp6\1.0.6\source\decode\cmn\decodembs.inl
+d:\packages\vp6\1.0.6\source\decode\cmn\decodemode.c
+d:\packages\vp6\1.0.6\source\decode\cmn\decodemode.inl
+d:\packages\vp6\1.0.6\source\decode\cmn\decodemv.c
+d:\packages\vp6\1.0.6\source\decode\cmn\decodemv.inl
+d:\packages\vp6\1.0.6\source\decode\cmn\deinterlace.c
+d:\packages\vp6\1.0.6\source\decode\cmn\dering.c
+d:\packages\vp6\1.0.6\source\decode\cmn\dframer.c
+d:\packages\vp6\1.0.6\source\decode\cmn\duck_mem.cpp
+d:\packages\vp6\1.0.6\source\decode\cmn\frameini.c
+d:\packages\vp6\1.0.6\source\decode\cmn\huffman.c
+d:\packages\vp6\1.0.6\source\decode\cmn\loopfilter.c
+d:\packages\vp6\1.0.6\source\decode\cmn\pb_globals.c
+d:\packages\vp6\1.0.6\source\decode\cmn\postproc.c
+d:\packages\vp6\1.0.6\source\decode\cmn\quantize.c
+d:\packages\vp6\1.0.6\source\decode\cmn\recon.c
+d:\packages\vp6\1.0.6\source\decode\cmn\recon.inl
+d:\packages\vp6\1.0.6\source\decode\cmn\scale.c
+d:\packages\vp6\1.0.6\source\decode\cmn\simpledeblocker.c
+d:\packages\vp6\1.0.6\source\decode\cmn\tokenentropy.c
+d:\packages\vp6\1.0.6\source\decode\cmn\vfwpbdll_if.c
+d:\packages\vp6\1.0.6\source\decode\cmn\vputil.c
+d:\packages\vp6\1.0.6\source\decode\xbox\doptsystemdependant.c
+d:\packages\vp6\1.0.6\source\decode\xbox\dsystemdependant.c
+d:\packages\vp6\1.0.6\source\decode\xbox\filtmmx.c
+d:\packages\vp6\1.0.6\source\decode\xbox\mmxidct.c
+d:\packages\vp6\1.0.6\source\decode\xbox\mmxrecon.c
+d:\packages\vp6\1.0.6\source\decode\xbox\quantindexmmx.c
+d:\packages\vp6\1.0.6\source\decode\xbox\uoptsystemdependant.c
+d:\packages\vp6\1.0.6\source\decode\xbox\vputilasm.c
+d:\xboxfre-dec03\private\inc\cryptkeys.h
+d:\xboxfre-dec03\private\inc\dsoundp.h
+d:\xboxfre-dec03\private\inc\waveldr.h
+d:\xboxfre-dec03\private\inc\winsockp.h
+d:\xboxfre-dec03\private\ntos\dd\usb\hawk\hawk2.cpp
+d:\xboxfre-dec03\private\ntos\dd\usb\hawk\hawk2.h
+d:\xboxfre-dec03\private\ntos\dd\usb\mu\disk.cpp
+d:\xboxfre-dec03\private\ntos\dd\usb\mu\mrb.cpp
+d:\xboxfre-dec03\private\ntos\dd\usb\mu\mu.cpp
+d:\xboxfre-dec03\private\ntos\dd\usb\mu\mu.h
+d:\xboxfre-dec03\private\ntos\dd\usb\ohcd\devsys.c
+d:\xboxfre-dec03\private\ntos\dd\usb\ohcd\isoch.c
+d:\xboxfre-dec03\private\ntos\dd\usb\ohcd\isr.c
+d:\xboxfre-dec03\private\ntos\dd\usb\ohcd\ohcd.c
+d:\xboxfre-dec03\private\ntos\dd\usb\ohcd\ohcd.h
+d:\xboxfre-dec03\private\ntos\dd\usb\ohcd\pool.c
+d:\xboxfre-dec03\private\ntos\dd\usb\ohcd\roothub.c
+d:\xboxfre-dec03\private\ntos\dd\usb\ohcd\schedule.c
+d:\xboxfre-dec03\private\ntos\dd\usb\ohcd\transfer.c
+d:\xboxfre-dec03\private\ntos\dd\usb\usbd\tree.cpp
+d:\xboxfre-dec03\private\ntos\dd\usb\usbd\usbd.cpp
+d:\xboxfre-dec03\private\ntos\dd\usb\usbd\usbd.h
+d:\xboxfre-dec03\private\ntos\dd\usb\usbd\usbdev.cpp
+d:\xboxfre-dec03\private\ntos\dd\usb\usbd\usbinit.cpp
+d:\xboxfre-dec03\private\ntos\dd\usb\usbd\usbmem.cpp
+d:\xboxfre-dec03\private\ntos\dd\usb\usbhub\hub.cpp
+d:\xboxfre-dec03\private\ntos\dd\usb\xidex\typeinfo.cpp
+d:\xboxfre-dec03\private\ntos\dd\usb\xidex\xid.cpp
+d:\xboxfre-dec03\private\ntos\dd\usb\xidex\xid.h
+d:\xboxfre-dec03\private\ntos\dd\usb\xidex\xidinp.cpp
+d:\xboxfre-dec03\private\ntos\inc\dm.h
+d:\xboxfre-dec03\private\ntos\inc\i386.h
+d:\xboxfre-dec03\private\ntos\inc\xconfig.h
+d:\xboxfre-dec03\private\ntos\net\base.cpp
+d:\xboxfre-dec03\private\ntos\net\enet.cpp
+d:\xboxfre-dec03\private\ntos\net\halx.cpp
+d:\xboxfre-dec03\private\ntos\net\halx.h
+d:\xboxfre-dec03\private\ntos\net\ip.cpp
+d:\xboxfre-dec03\private\ntos\net\ipcfg.cpp
+d:\xboxfre-dec03\private\ntos\net\ipdns.cpp
+d:\xboxfre-dec03\private\ntos\net\ipicmp.cpp
+d:\xboxfre-dec03\private\ntos\net\ipqos.cpp
+d:\xboxfre-dec03\private\ntos\net\md5.cpp
+d:\xboxfre-dec03\private\ntos\net\nicx.cpp
+d:\xboxfre-dec03\private\ntos\net\nicx.h
+d:\xboxfre-dec03\private\ntos\net\sock.cpp
+d:\xboxfre-dec03\private\ntos\net\socktcp.cpp
+d:\xboxfre-dec03\private\ntos\net\sockudp.cpp
+d:\xboxfre-dec03\private\ntos\net\xn.h
+d:\xboxfre-dec03\private\ntos\net\xnet.cpp
+d:\xboxfre-dec03\private\ntos\net\xnetp.cpp
+d:\xboxfre-dec03\private\ntos\net\xnp.h
+d:\xboxfre-dec03\private\ntos\rtl\heap.c
+d:\xboxfre-dec03\private\ntos\xapi\dll\krnlptch.c
+d:\xboxfre-dec03\private\ntos\xapi\dll\xapi0.c
+d:\xboxfre-dec03\private\ntos\xapi\dll\xapi0dat.c
+d:\xboxfre-dec03\private\ntos\xapi\dll\xapiinit.c
+d:\xboxfre-dec03\private\ntos\xapi\dll\xapiterm.c
+d:\xboxfre-dec03\private\ntos\xapi\inc\xapip.h
+d:\xboxfre-dec03\private\ntos\xapi\k32\bootutil.c
+d:\xboxfre-dec03\private\ntos\xapi\k32\cancelio.c
+d:\xboxfre-dec03\private\ntos\xapi\k32\compstr.c
+d:\xboxfre-dec03\private\ntos\xapi\k32\contsig.c
+d:\xboxfre-dec03\private\ntos\xapi\k32\datetime.c
+d:\xboxfre-dec03\private\ntos\xapi\k32\dir.c
+d:\xboxfre-dec03\private\ntos\xapi\k32\error.c
+d:\xboxfre-dec03\private\ntos\xapi\k32\filefind.c
+d:\xboxfre-dec03\private\ntos\xapi\k32\filehops.c
+d:\xboxfre-dec03\private\ntos\xapi\k32\filemisc.c
+d:\xboxfre-dec03\private\ntos\xapi\k32\fileopcr.c
+d:\xboxfre-dec03\private\ntos\xapi\k32\format.c
+d:\xboxfre-dec03\private\ntos\xapi\k32\handle.c
+d:\xboxfre-dec03\private\ntos\xapi\k32\kthunks.c
+d:\xboxfre-dec03\private\ntos\xapi\k32\launch.c
+d:\xboxfre-dec03\private\ntos\xapi\k32\lcompat.c
+d:\xboxfre-dec03\private\ntos\xapi\k32\mountmu.c
+d:\xboxfre-dec03\private\ntos\xapi\k32\outputdebugstringa.c
+d:\xboxfre-dec03\private\ntos\xapi\k32\pathmisc.c
+d:\xboxfre-dec03\private\ntos\xapi\k32\perfctr.c
+d:\xboxfre-dec03\private\ntos\xapi\k32\physical.c
+d:\xboxfre-dec03\private\ntos\xapi\k32\powerdwn.c
+d:\xboxfre-dec03\private\ntos\xapi\k32\process.c
+d:\xboxfre-dec03\private\ntos\xapi\k32\support.c
+d:\xboxfre-dec03\private\ntos\xapi\k32\synch.c
+d:\xboxfre-dec03\private\ntos\xapi\k32\thread.c
+d:\xboxfre-dec03\private\ntos\xapi\k32\tls.c
+d:\xboxfre-dec03\private\ntos\xapi\k32\widechar.c
+d:\xboxfre-dec03\private\ntos\xapi\k32\xapiheap.c
+d:\xboxfre-dec03\private\ntos\xapi\k32\xcalcsig.c
+d:\xboxfre-dec03\private\ntos\xapi\k32\xclndrv.c
+d:\xboxfre-dec03\private\ntos\xapi\k32\xemodule.c
+d:\xboxfre-dec03\private\ntos\xapi\k32\xgetaudioflags.c
+d:\xboxfre-dec03\private\ntos\xapi\k32\xgetautologon.c
+d:\xboxfre-dec03\private\ntos\xapi\k32\xgetavpack.c
+d:\xboxfre-dec03\private\ntos\xapi\k32\xgetgameregion.c
+d:\xboxfre-dec03\private\ntos\xapi\k32\xgetlanguage.c
+d:\xboxfre-dec03\private\ntos\xapi\k32\xgetparentalcontrolsetting.c
+d:\xboxfre-dec03\private\ntos\xapi\k32\xgetvideostandard.c
+d:\xboxfre-dec03\private\ntos\xapi\k32\xmem.c
+d:\xboxfre-dec03\private\ntos\xapi\k32\xpp.c
+d:\xboxfre-dec03\private\ntos\xapi\k32\xqueryvalue.c
+d:\xboxfre-dec03\private\ntos\xapi\k32\xsaveapi.c
+d:\xboxfre-dec03\private\online\accounts.cpp
+d:\xboxfre-dec03\private\online\advnotif.cpp
+d:\xboxfre-dec03\private\online\baseio.cpp
+d:\xboxfre-dec03\private\online\billing.cpp
+d:\xboxfre-dec03\private\online\cfcache.cpp
+d:\xboxfre-dec03\private\online\contdl.cpp
+d:\xboxfre-dec03\private\online\contenum.cpp
+d:\xboxfre-dec03\private\online\contutil.cpp
+d:\xboxfre-dec03\private\online\decalvb.cpp
+d:\xboxfre-dec03\private\online\decblk.cpp
+d:\xboxfre-dec03\private\online\decin.cpp
+d:\xboxfre-dec03\private\online\decout.cpp
+d:\xboxfre-dec03\private\online\dectree.cpp
+d:\xboxfre-dec03\private\online\decuncmp.cpp
+d:\xboxfre-dec03\private\online\decxlat.cpp
+d:\xboxfre-dec03\private\online\dirops.cpp
+d:\xboxfre-dec03\private\online\download.cpp
+d:\xboxfre-dec03\private\online\dvdload.cpp
+d:\xboxfre-dec03\private\online\feedback.cpp
+d:\xboxfre-dec03\private\online\kerberos.cpp
+d:\xboxfre-dec03\private\online\krb5.cpp
+d:\xboxfre-dec03\private\online\livesign.cpp
+d:\xboxfre-dec03\private\online\localcache.cpp
+d:\xboxfre-dec03\private\online\logon.cpp
+d:\xboxfre-dec03\private\online\maketbl.cpp
+d:\xboxfre-dec03\private\online\match.cpp
+d:\xboxfre-dec03\private\online\memutil.cpp
+d:\xboxfre-dec03\private\online\messaging.cpp
+d:\xboxfre-dec03\private\online\msasn1.cpp
+d:\xboxfre-dec03\private\online\msasn1.h
+d:\xboxfre-dec03\private\online\pathname.cpp
+d:\xboxfre-dec03\private\online\presence.cpp
+d:\xboxfre-dec03\private\online\presmsg.cpp
+d:\xboxfre-dec03\private\online\reboot.cpp
+d:\xboxfre-dec03\private\online\service.cpp
+d:\xboxfre-dec03\private\online\stats.cpp
+d:\xboxfre-dec03\private\online\stordl.cpp
+d:\xboxfre-dec03\private\online\storul.cpp
+d:\xboxfre-dec03\private\online\storutil.cpp
+d:\xboxfre-dec03\private\online\string.cpp
+d:\xboxfre-dec03\private\online\symmdec.cpp
+d:\xboxfre-dec03\private\online\teams.cpp
+d:\xboxfre-dec03\private\online\titlecache.cpp
+d:\xboxfre-dec03\private\online\troubleshoot.cpp
+d:\xboxfre-dec03\private\online\upload.cpp
+d:\xboxfre-dec03\private\online\upnpnat.cpp
+d:\xboxfre-dec03\private\online\users.cpp
+d:\xboxfre-dec03\private\online\voice\memutils.cpp
+d:\xboxfre-dec03\private\online\xbosutil.cpp
+d:\xboxfre-dec03\private\online\xhv\utils\networkqueue.cpp
+d:\xboxfre-dec03\private\online\xhv\utils\networkqueue.h
+d:\xboxfre-dec03\private\online\xhv\utils\xhvutils.cpp
+d:\xboxfre-dec03\private\online\xhv\utils\xhvutils.h
+d:\xboxfre-dec03\private\online\xhv\voicecodecs\voicecodecsutils.cpp
+d:\xboxfre-dec03\private\online\xhv\voicecodecs\voicedecoder.cpp
+d:\xboxfre-dec03\private\online\xhv\voicecodecs\voicedecoder.h
+d:\xboxfre-dec03\private\online\xhv\voicecodecs\voiceencoder.cpp
+d:\xboxfre-dec03\private\online\xhv\voicecodecs\voiceencoder.h
+d:\xboxfre-dec03\private\online\xhv\wmavoice\wmavoicedec.cpp
+d:\xboxfre-dec03\private\online\xhv\wmavoice\wmavoicedec.h
+d:\xboxfre-dec03\private\online\xhv\wmavoice\wmavoiceenc.cpp
+d:\xboxfre-dec03\private\online\xhv\wmavoice\wmavoiceenc.h
+d:\xboxfre-dec03\private\online\xhv\xhvengine\inactivemode.cpp
+d:\xboxfre-dec03\private\online\xhv\xhvengine\inactivemode.h
+d:\xboxfre-dec03\private\online\xhv\xhvengine\localtalker.cpp
+d:\xboxfre-dec03\private\online\xhv\xhvengine\localtalker.h
+d:\xboxfre-dec03\private\online\xhv\xhvengine\remotetalker.cpp
+d:\xboxfre-dec03\private\online\xhv\xhvengine\remotetalker.h
+d:\xboxfre-dec03\private\online\xhv\xhvengine\srmode.cpp
+d:\xboxfre-dec03\private\online\xhv\xhvengine\srmode.h
+d:\xboxfre-dec03\private\online\xhv\xhvengine\voicechatmode.cpp
+d:\xboxfre-dec03\private\online\xhv\xhvengine\voicechatmode.h
+d:\xboxfre-dec03\private\online\xhv\xhvengine\xhvengine.cpp
+d:\xboxfre-dec03\private\online\xhv\xhvengine\xhvengine.h
+d:\xboxfre-dec03\private\online\xonline.cpp
+d:\xboxfre-dec03\private\online\xonlzx.cpp
+d:\xboxfre-dec03\private\online\xonp.h
+d:\xboxfre-dec03\private\online\xontask.cpp
+d:\xboxfre-dec03\private\online\xrltask.cpp
+d:\xboxfre-dec03\private\online\xrlutil.cpp
+d:\xboxfre-dec03\private\online\zipcode.cpp
+d:\xboxfre-dec03\private\sdktools\content\xcontent\xcontent.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\convert\_ctype.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\convert\_fptostr.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\convert\atof.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\convert\atox.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\convert\isctype.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\convert\iswctype.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\convert\mbtowc.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\convert\strtod.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\convert\strtol.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\convert\tolower.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\convert\toupper.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\convert\towlower.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\convert\wcstombs.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\convert\wctomb.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\dos\dosmap.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\eh\ehvecdtr.cpp
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\eh\frame.cpp
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\eh\hooks.cpp
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\eh\i386\trnsctrl.cpp
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\eh\unhandld.cpp
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\eh\validate.cpp
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\heap\align.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\heap\calloc.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\heap\expand.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\heap\free.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\heap\handler.cpp
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\heap\heapinit.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\heap\malloc.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\heap\msize.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\heap\realloc.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\lowio\chsize.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\lowio\close.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\lowio\commit.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\lowio\ioinit.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\lowio\isatty.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\lowio\lseek.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\lowio\lseeki64.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\lowio\open.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\lowio\osfinfo.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\lowio\read.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\lowio\setmode.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\lowio\write.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\mbstring\ismbspc.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\mbstring\mbctype.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\misc\bsearch.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\misc\ctype.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\misc\initcrit.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\misc\onexit.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\misc\purevirt.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\misc\qsort.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\misc\rand.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\misc\secchk.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\misc\seccinit.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\misc\secfail.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\misc\winsig.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\misc\winxfltr.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\startup\crt0.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\startup\crt0dat.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\startup\crt0fp.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\startup\crt0msg.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\startup\i386\fp8.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\startup\mlock.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\startup\thread.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\startup\threadex.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\startup\tidtable.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\stdio\_filbuf.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\stdio\_file.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\stdio\_flsbuf.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\stdio\_freebuf.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\stdio\_getbuf.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\stdio\_open.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\stdio\_sftbuf.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\stdio\closeall.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\stdio\fclose.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\stdio\fflush.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\stdio\fopen.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\stdio\fprintf.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\stdio\fputwc.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\stdio\fread.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\stdio\fseek.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\stdio\ftell.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\stdio\fwrite.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\stdio\input.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\stdio\output.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\stdio\printf.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\stdio\sprintf.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\stdio\sscanf.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\stdio\stream.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\stdio\swprintf.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\stdio\ungetc.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\stdio\vsprintf.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\stdio\vswprint.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\string\stricmp.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\string\strlwr.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\string\strnicmp.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\string\strtok.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\string\wcscat.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\string\wcschr.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\string\wcscmp.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\string\wcsicmp.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\string\wcslen.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\string\wcsncpy.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\string\wcsnicmp.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\string\wcsstr.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\time\gmtime.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\time\localtim.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\time\mktime.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\time\time.c
+d:\xboxfre-dec03\private\sdktools\crt\crtw32\time\tzset.c
+d:\xboxfre-dec03\private\sdktools\crt\fpw32\conv\cfin.c
+d:\xboxfre-dec03\private\sdktools\crt\fpw32\conv\cfout.c
+d:\xboxfre-dec03\private\sdktools\crt\fpw32\conv\cvt.c
+d:\xboxfre-dec03\private\sdktools\crt\fpw32\conv\fpinit.c
+d:\xboxfre-dec03\private\sdktools\crt\fpw32\conv\intrncvt.c
+d:\xboxfre-dec03\private\sdktools\crt\fpw32\conv\mantold.c
+d:\xboxfre-dec03\private\sdktools\crt\fpw32\conv\strgtold.c
+d:\xboxfre-dec03\private\sdktools\crt\fpw32\conv\tenpow.c
+d:\xboxfre-dec03\private\sdktools\crt\fpw32\conv\x10fout.c
+d:\xboxfre-dec03\private\sdktools\crt\fpw32\tran\ceil.c
+d:\xboxfre-dec03\private\sdktools\crt\fpw32\tran\fabs.c
+d:\xboxfre-dec03\private\sdktools\crt\fpw32\tran\floor.c
+d:\xboxfre-dec03\private\sdktools\crt\fpw32\tran\fpexcept.c
+d:\xboxfre-dec03\private\sdktools\crt\fpw32\tran\i386\87except.c
+d:\xboxfre-dec03\private\sdktools\crt\fpw32\tran\i386\fpctrl.c
+d:\xboxfre-dec03\private\sdktools\crt\fpw32\tran\i386\frnd.c
+d:\xboxfre-dec03\private\sdktools\crt\fpw32\tran\i386\ieee87.c
+d:\xboxfre-dec03\private\sdktools\crt\fpw32\tran\ieeemisc.c
+d:\xboxfre-dec03\private\sdktools\crt\fpw32\tran\ldexp.c
+d:\xboxfre-dec03\private\sdktools\crt\fpw32\tran\matherr.c
+d:\xboxfre-dec03\private\sdktools\crt\fpw32\tran\powhlp.c
+d:\xboxfre-dec03\private\sdktools\crt\fpw32\tran\util.c
+d:\xboxfre-dec03\private\windows\directx\dsound\ac97\ac97.cpp
+d:\xboxfre-dec03\private\windows\directx\dsound\ac97\ac97.h
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\asktoenv.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\astocs.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\bandexpd.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\bitpackc.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\calccost.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\cbufutil.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\codegain.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\codepv.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\coder.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\comppow.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\compress.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\corrfunc.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\cstoenv.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\decplssc.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\decsc.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\decvcfry.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\demltplx.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\encsc.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\envtoas.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\estonset.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\exphase.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\fadesc.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\fft_cent.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\fftsmcos.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\fhtkrnl.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\hfregen.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\hwin.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\ippnelly.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\jitter.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\k2ask.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\klpitch.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\kstoas.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\ldpda.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\lineintp.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\log2.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\magsq.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\midframe.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\midpitch.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\msvqpred.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\nciplssc.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\ncisase3200.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\nciscmr3200.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\nelllydurb.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\nellymem.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\nellyqr.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\nurand.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\oladd.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\outbufsc.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\overadd.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\packsc.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\peakpick.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\polyintp.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\postfilt.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\preproc.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\ptchcand.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\qp0sc3.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\quadpeak.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\rate.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\refinec0.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\rsmsvq.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\scalevec.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\seevoc.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\selepeak.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\setamps.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\spcbm.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\sq.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\sqlawpks.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\stftpks.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\subfmsyn.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\swsynth.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\symwinsp.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\uvphase.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\vfntcreatefont.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\vfntinterface.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\vfntutility.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\voicing.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\voicld.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\vq2.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\warp.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\sase3200\window.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\voicemail\common\com_wmsapf.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\voicemail\common\com_wmsauxcode.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\voicemail\common\com_wmsfft.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\voicemail\common\com_wmsfuncs.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\voicemail\common\com_wmsmath.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\voicemail\common\cpudetect.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\voicemail\decoder\wmsdecfuncs.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\voicemail\decoder\wmsparsebits.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\voicemail\decoder\wmssynth_spch.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\voicemail\encoder\wmsacbsearch.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\voicemail\encoder\wmsasearch.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\voicemail\encoder\wmsauxcode.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\voicemail\encoder\wmsexe.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\voicemail\encoder\wmsfcbsrch.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\voicemail\encoder\wmsfilcode.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\voicemail\encoder\wmshypprocess.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\voicemail\encoder\wmslpc.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\voicemail\encoder\wmslsp.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\voicemail\encoder\wmslspqnt.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\voicemail\encoder\wmsmdfyres.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\voicemail\encoder\wmspacket.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\voicemail\encoder\wmspitchclass.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\voicemail\encoder\wmsquantize_g.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\voicemail\encoder\wmswintool.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\voicemail\stvoicedec\wmsdec.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\voicemail\stvoicedec\wmsdecstream.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\voicemail\stvoiceenc\wmsbitratecontrol.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\voicemail\stvoiceenc\wmsclc.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\voicemail\stvoiceenc\wmsconfig.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\voicemail\stvoiceenc\wmsenc.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\voicemail\stvoiceenc\wmsencode.c
+d:\xboxfre-dec03\private\windows\directx\dsound\codecs\voicemail\stvoiceenc\wmsencstream.c
+d:\xboxfre-dec03\private\windows\directx\dsound\common\drvhlp.h
+d:\xboxfre-dec03\private\windows\directx\dsound\common\format.cpp
+d:\xboxfre-dec03\private\windows\directx\dsound\common\imaadpcm.cpp
+d:\xboxfre-dec03\private\windows\directx\dsound\common\imaadpcm.h
+d:\xboxfre-dec03\private\windows\directx\dsound\common\memmgr.cpp
+d:\xboxfre-dec03\private\windows\directx\dsound\common\memmgr.h
+d:\xboxfre-dec03\private\windows\directx\dsound\common\ntlist.h
+d:\xboxfre-dec03\private\windows\directx\dsound\common\refcount.h
+d:\xboxfre-dec03\private\windows\directx\dsound\common\waveldr.cpp
+d:\xboxfre-dec03\private\windows\directx\dsound\dsound\ac97xmo.cpp
+d:\xboxfre-dec03\private\windows\directx\dsound\dsound\ac97xmo.h
+d:\xboxfre-dec03\private\windows\directx\dsound\dsound\dsapi.cpp
+d:\xboxfre-dec03\private\windows\directx\dsound\dsound\dsapi.h
+d:\xboxfre-dec03\private\windows\directx\dsound\dsound\dsmath.cpp
+d:\xboxfre-dec03\private\windows\directx\dsound\dsound\dsmath.h
+d:\xboxfre-dec03\private\windows\directx\dsound\dsound\dspdma.cpp
+d:\xboxfre-dec03\private\windows\directx\dsound\dsound\dspdma.h
+d:\xboxfre-dec03\private\windows\directx\dsound\dsound\dsperf.h
+d:\xboxfre-dec03\private\windows\directx\dsound\dsound\epdsp.cpp
+d:\xboxfre-dec03\private\windows\directx\dsound\dsound\epdsp.h
+d:\xboxfre-dec03\private\windows\directx\dsound\dsound\gpdsp.cpp
+d:\xboxfre-dec03\private\windows\directx\dsound\dsound\gpdsp.h
+d:\xboxfre-dec03\private\windows\directx\dsound\dsound\heap.cpp
+d:\xboxfre-dec03\private\windows\directx\dsound\dsound\heap.h
+d:\xboxfre-dec03\private\windows\directx\dsound\dsound\hrtf.cpp
+d:\xboxfre-dec03\private\windows\directx\dsound\dsound\hrtf.h
+d:\xboxfre-dec03\private\windows\directx\dsound\dsound\i3dl2.cpp
+d:\xboxfre-dec03\private\windows\directx\dsound\dsound\mcpapu.cpp
+d:\xboxfre-dec03\private\windows\directx\dsound\dsound\mcpapu.h
+d:\xboxfre-dec03\private\windows\directx\dsound\dsound\mcpbuf.cpp
+d:\xboxfre-dec03\private\windows\directx\dsound\dsound\mcpbuf.h
+d:\xboxfre-dec03\private\windows\directx\dsound\dsound\mcpstrm.cpp
+d:\xboxfre-dec03\private\windows\directx\dsound\dsound\mcpstrm.h
+d:\xboxfre-dec03\private\windows\directx\dsound\dsound\mcpvoice.cpp
+d:\xboxfre-dec03\private\windows\directx\dsound\dsound\mcpvoice.h
+d:\xboxfre-dec03\private\windows\directx\dsound\dsound\mcpxcore.cpp
+d:\xboxfre-dec03\private\windows\directx\dsound\dsound\mcpxcore.h
+d:\xboxfre-dec03\private\windows\directx\dsound\dsound\wavexmo.cpp
+d:\xboxfre-dec03\private\windows\directx\dsound\dsound\wavexmo.h
+d:\xboxfre-dec03\private\windows\directx\dsound\tools\xcodescr\cipher.cpp
+d:\xboxfre-dec03\private\windows\directx\dxg\d3d8\inc\hw.h
+d:\xboxfre-dec03\private\windows\directx\dxg\d3d8\se\buffer.cpp
+d:\xboxfre-dec03\private\windows\directx\dxg\d3d8\se\clear.cpp
+d:\xboxfre-dec03\private\windows\directx\dxg\d3d8\se\combiner.cpp
+d:\xboxfre-dec03\private\windows\directx\dxg\d3d8\se\d3dbase.cpp
+d:\xboxfre-dec03\private\windows\directx\dxg\d3d8\se\d3ddev.cpp
+d:\xboxfre-dec03\private\windows\directx\dxg\d3d8\se\debug.cpp
+d:\xboxfre-dec03\private\windows\directx\dxg\d3d8\se\device.hpp
+d:\xboxfre-dec03\private\windows\directx\dxg\d3d8\se\drawprim.cpp
+d:\xboxfre-dec03\private\windows\directx\dxg\d3d8\se\dxgcreate.cpp
+d:\xboxfre-dec03\private\windows\directx\dxg\d3d8\se\enum.cpp
+d:\xboxfre-dec03\private\windows\directx\dxg\d3d8\se\floatmath.cpp
+d:\xboxfre-dec03\private\windows\directx\dxg\d3d8\se\lazy.cpp
+d:\xboxfre-dec03\private\windows\directx\dxg\d3d8\se\math.cpp
+d:\xboxfre-dec03\private\windows\directx\dxg\d3d8\se\math.hpp
+d:\xboxfre-dec03\private\windows\directx\dxg\d3d8\se\memory.hpp
+d:\xboxfre-dec03\private\windows\directx\dxg\d3d8\se\misc.hpp
+d:\xboxfre-dec03\private\windows\directx\dxg\d3d8\se\mp.hpp
+d:\xboxfre-dec03\private\windows\directx\dxg\d3d8\se\mpcore.cpp
+d:\xboxfre-dec03\private\windows\directx\dxg\d3d8\se\mpdac.cpp
+d:\xboxfre-dec03\private\windows\directx\dxg\d3d8\se\mphal.cpp
+d:\xboxfre-dec03\private\windows\directx\dxg\d3d8\se\mpintr.cpp
+d:\xboxfre-dec03\private\windows\directx\dxg\d3d8\se\mpmode.cpp
+d:\xboxfre-dec03\private\windows\directx\dxg\d3d8\se\pixeljar.cpp
+d:\xboxfre-dec03\private\windows\directx\dxg\d3d8\se\pixeljar.hpp
+d:\xboxfre-dec03\private\windows\directx\dxg\d3d8\se\present.cpp
+d:\xboxfre-dec03\private\windows\directx\dxg\d3d8\se\pshader.cpp
+d:\xboxfre-dec03\private\windows\directx\dxg\d3d8\se\pusher.cpp
+d:\xboxfre-dec03\private\windows\directx\dxg\d3d8\se\pusher.hpp
+d:\xboxfre-dec03\private\windows\directx\dxg\d3d8\se\pushres.cpp
+d:\xboxfre-dec03\private\windows\directx\dxg\d3d8\se\resource.cpp
+d:\xboxfre-dec03\private\windows\directx\dxg\d3d8\se\resource.hpp
+d:\xboxfre-dec03\private\windows\directx\dxg\d3d8\se\shadersnapshot.cpp
+d:\xboxfre-dec03\private\windows\directx\dxg\d3d8\se\state.cpp
+d:\xboxfre-dec03\private\windows\directx\dxg\d3d8\se\state.hpp
+d:\xboxfre-dec03\private\windows\directx\dxg\d3d8\se\stats.hpp
+d:\xboxfre-dec03\private\windows\directx\dxg\d3d8\se\surface.cpp
+d:\xboxfre-dec03\private\windows\directx\dxg\d3d8\se\texture.cpp
+d:\xboxfre-dec03\private\windows\directx\dxg\d3d8\se\vshader.cpp
+d:\xboxfre-dec03\private\windows\directx\dxg\xfont\library\bitmap.cpp
+d:\xboxfre-dec03\private\windows\directx\dxg\xfont\library\painttext.cpp
+d:\xboxfre-dec03\private\windows\directx\dxg\xfont\library\xfont.c
+d:\xboxfre-dec03\private\windows\directx\dxg\xgraphics\dxtc\s3_intrf.cpp
+d:\xboxfre-dec03\private\windows\directx\dxg\xgraphics\dxtc\s3_quant.cpp
+d:\xboxfre-dec03\private\windows\directx\dxg\xgraphics\misc\header.cpp
+d:\xboxfre-dec03\private\windows\directx\dxg\xgraphics\misc\header.h
+d:\xboxfre-dec03\private\windows\directx\dxg\xgraphics\swizzler\swizzler.cpp
+d:\xboxfre-dec03\public\sdk\inc\crt\math.h
+d:\xboxfre-dec03\public\sdk\inc\d3d8.h
+d:\xboxfre-dec03\public\sdk\inc\d3dx8math.h
+d:\xboxfre-dec03\public\sdk\inc\dsound.h
+d:\xboxfre-dec03\public\sdk\inc\guiddef.h
+d:\xboxfre-dec03\public\sdk\inc\ntdef.h
+d:\xboxfre-dec03\public\sdk\inc\xgraphics.h
