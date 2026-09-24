@@ -236,7 +236,8 @@ typedef struct SaveProfile {
     TourWin aC8[31];           // 0x000C8  one per PGA TOUR tournament
     struct {
         u8 b;
-        u8 unk1[3];
+        u8 unk1;
+        u16 nDate;              // 0x2  the day it was set (FE_PGATourMessages.c fn_8010F3A4 shows it)
     } a1C0[16];                 // 0x001C0  flags GM_GetBonusProgress counts
     u8   unk200[0x20C - 0x200];
     Award aRTEAward[75];        // 0x0020C  per real-time event id. TW06: rteEventAwardInfo
