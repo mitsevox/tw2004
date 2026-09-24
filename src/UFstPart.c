@@ -1,5 +1,5 @@
 // UFstPart.c (EA's name, from its asserts; also in EA's 2002 source tree): the particle emitters
-// (PsEmitter in include/psmgr.h). Mostly not yet decompiled.
+// (PsEmitter in include/psmgr.h), which PsBallFx.c and the course's type 7 actors start.
 
 #include "game_types.h"
 #include "psmgr.h"
