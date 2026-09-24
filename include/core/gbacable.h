@@ -47,9 +47,10 @@ extern GbaChannel lbl_80260E18[GBA_NUM_CHANNELS];
 extern DVDDiskID* lbl_8028255C;  // the disc's ID: its game code goes to the GBA in the handshake
 extern u32 lbl_80282560;        // the tick the link code started at (fn_80123FF8)
 
-// How long a GBA command waits for the GBA: 100 ms in time-base ticks (a quarter of the bus clock,
-// which the OS keeps at 0x800000F8).
-#define GBA_TIMEOUT_TICKS (*(u32*)0x800000F8 / 4 / 1000 * 100)
+// Time-base ticks in a millisecond (the time base runs at a quarter of the bus clock, which the OS
+// keeps at 0x800000F8). A GBA command waits 100 ms for the GBA.
+#define GBA_TICKS_PER_MS  (*(u32*)0x800000F8 / 4 / 1000)
+#define GBA_TIMEOUT_TICKS (GBA_TICKS_PER_MS * 100)
 extern s32 lbl_80281984;        // the port being worked on (-1: none, fn_8012422C)
 
 #endif

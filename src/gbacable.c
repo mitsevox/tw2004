@@ -4,6 +4,7 @@
 
 #include "game_types.h"
 #include "platform.h"
+#include "engine.h"
 #include "core/gbacable.h"
 
 s32  fn_80176200(s32 nChan, u8* pStatus);  // the GBA library: read a port's status
@@ -14,6 +15,11 @@ s32  fn_80122AF0(s32 nChan);
 s32  fn_80122BCC(s32 nChan);
 s32  fn_80122E68(s32 nChan, u32* pWord);
 s32  fn_80122CFC(s32 nChan, u32* pCmd);
+void fn_80123398(s32 nChan, s32 a, s32 b);
+void fn_80123ABC(s32 nChan);
+void fn_80123C2C(s32 nChan);
+void fn_80123CBC(s32 a, s32 b);
+void fn_800A4BDC(void);
 s32  fn_80122FD8(s32 nChan);
 void fn_8012311C(s32 nChan);
 void fn_8012408C(s32 v);
@@ -308,6 +314,47 @@ void fn_8012332C(s32 nChan) {
     }
 }
 
+// Sends the GBA the "set port" command and our context in eight words, then reads its context
+// back: the port is linked ("GbaSetport").
+void fn_80123ABC(s32 nChan) {
+    u32 uCmd = 0x30000000;
+    u32 i;
+    GbaChannel* pCh;
+    u32* pWord;
+
+    if (fn_80122CFC(nChan, &uCmd) == 0) {
+        OSReport("GbaSetport: An error occurred to command 'FROMGC_SETPORT' (chan=%d).\n", nChan);
+        lbl_80260E18[nChan].n0 = 0;
+        fn_8012408C(0x12);
+        return;
+    }
+    pCh = &lbl_80260E18[nChan];
+    pWord = (u32*)&pCh->sent;
+    for (i = 0; i < sizeof(GbaContext); i += 4) {
+        if (fn_80122CFC(nChan, pWord) == 0) {
+            OSReport("GbaSetport: An error occurred in writing  the %d(th) part of %d (chan=%d).\n", i + 1,
+                     sizeof(GbaContext), nChan);
+            pCh->n0 = 0;
+            fn_8012408C(0x12);
+            return;
+        }
+        pWord++;
+    }
+    pWord = (u32*)&pCh->got;
+    for (i = 0; i < sizeof(GbaContext); i += 4) {
+        if (fn_80122E68(nChan, pWord) == 0) {
+            OSReport("GbaSetport: An error occurred in reading (chan=%d).\n", nChan);
+            pCh->n0 = 0;
+            fn_8012408C(0x12);
+            return;
+        }
+        pWord++;
+    }
+    pCh->n0 = 2;
+    OSReport("GbaSetPort: Channel %d is connected!\n", nChan);
+    fn_8012408C(4);
+}
+
 // Sends the port the "context differs" command and unlinks it.
 void fn_80123C2C(s32 nChan) {
     u32 uCmd = 0x50000000;
@@ -322,6 +369,57 @@ void fn_80123C2C(s32 nChan) {
     }
 }
 
+// Moves every port's link on by one step. A port without a GBA (SIProbe type 0x40000), or other
+// than the port already being worked on, is unlinked. An unlinked port waits up to 800 ms for the
+// GBA to answer, then the port is opened (fn_8012332C), run (fn_80123398), given our context
+// (fn_80123ABC) or told the contexts differ (fn_80123C2C).
+void fn_80123CBC(s32 a, s32 b) {
+    GbaChannel* pCh = lbl_80260E18;
+    s32 nChan = 0;
+    u32 uStart;
+    s32 nErr;
+
+    do {
+        if (pCh->n5C != 0x40000 || (lbl_80281984 != -1 && lbl_80281984 != nChan)) {
+            pCh->n4C = 0;
+            pCh->n0 = 0;
+        } else {
+            switch (pCh->n0) {
+            case 0:
+                uStart = OSGetTick();
+                do {
+                    fn_800A4BDC();
+                    fn_800B7490();
+                    nErr = fn_8017610C(nChan, &pCh->uStatus);
+                } while (nErr != 0 && OSGetTick() - uStart < GBA_TICKS_PER_MS * 800);
+                if (nErr == 0) {
+                    pCh->n0 = 1;
+                    fn_8012408C(2);
+                    lbl_80281984 = nChan;
+                }
+                break;
+            case 1:
+                fn_8012332C(nChan);
+                break;
+            case 2:
+                fn_80123398(nChan, a, b);
+                break;
+            case 3:
+                fn_80123ABC(nChan);
+                break;
+            case 4:
+                fn_80123C2C(nChan);
+                break;
+            default:
+                OSPanic("gbacable.c", 903, "Unkonwn status.\n");
+                break;
+            }
+        }
+        nChan++;
+        pCh++;
+    } while (nChan < GBA_NUM_CHANNELS);
+}
+
 // ---- sweep code (not yet cleaned up) ----
 
 void fn_801229F8();
@@ -329,7 +427,6 @@ void fn_80175FB8();
 void fn_80123FF8(void);
 s32 OSGetResetButtonState();
 s32 OSResetSystem(s32, s32, s32);
-s32 fn_80123CBC(s32, s32);
 s32 fn_80123E34();
 extern s32 lbl_80282540;
 void fn_8012402C(void);
