@@ -5,8 +5,10 @@
 
 #include "game_types.h"
 #include "engine.h"
+#include "golfer.h"
 #include "gx.h"
 #include "core/startup.h"
+#include "shaderdata.h"
 
 // The header's __FILE__, which the allocations name.
 #define DRB_FILE "GoShaderObjectCommon_DynamicRenderingBuffer_Gc.h"
@@ -212,7 +214,6 @@ void fn_80070C7C(void* arg0);
 void fn_80070CD0(u8* p0, s32 p1);
 void fn_80070D04(u8* p0);
 void fn_80070D28(void* arg0);
-extern f32 lbl_80281E70;
 void fn_80070D7C(u8* p0);
 void fn_80070D88(u8* p0, s32 p1);
 void fn_80097624();
@@ -280,3 +281,23 @@ void fn_80070DBC(u8* p0) {
 }
 
 // ---- end of sweep code ----
+
+s32 fn_80097688(void);      // GoShaderObjectCommon_MorphAnimManager_Gc.c: how many animations
+void fn_80070DF4(StaticShaderObject* pObj);
+
+// Row 3's static render: the display list, with the morph animation brought up to date first once
+// in every three frames, each animation on its own frame of the cycle.
+void fn_80070DF4(StaticShaderObject* pObj) {
+    MorphAnim* pAnim = &pObj->anim;
+
+    if (pObj->anim.b8 != 0) {
+        GXSetArray(9, pObj->pArrays->apPos[0], 12);
+    }
+    if (fn_80097688() != 0 && (u32)gSession.nFrameCount % 3 == pAnim->nIndex % 3 &&
+        (u32)gSession.nFrameCount > fn_80097694(pAnim->nIndex)) {
+        fn_800976A8(pAnim, lbl_80281E70);
+    }
+    // port: fn_80070168 (sweep_80070168.c) is defined without parameters but hands r3 and r4
+    // on to GXCallDisplayList
+    ((void (*)(void*, u32))fn_80070168)(pAnim->p4, pAnim->n0);
+}

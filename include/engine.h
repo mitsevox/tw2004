@@ -625,8 +625,9 @@ LAYOUT_ASSERT(ShaderObject, 0x28);
 // neighbours), skipping NULL ones; fn_8003519C calls a row's pfn8 with data. Rows 0 and 1 hold
 // functions of 0x8006FED4-0x80070FB0 from +0x24 on.
 typedef struct ModuleHooks {
-    void  (*pfn0)(void);          // 0x00  fn_80071A54, for rows the game uses now (lbl_801893D8)
-    void  (*pfn4)(void);          // 0x04  fn_80071A90, the same rows
+    void  (*pfn0)(void);          // 0x00  the type's init (row 17: SD_vShaderObject_Grass_Type_Init),
+                                  //       run by fn_80071A54 for rows in use (lbl_801893D8)
+    void  (*pfn4)(void);          // 0x04  its close (..._Grass_Type_Close), fn_80071A90
     void  (*pfn8)(void* pData);   // 0x08
     void  (*pfnC)(void);          // 0x0C  fn_8006E068
     void  (*pfn10)(void);         // 0x10  fn_8006DDE8
