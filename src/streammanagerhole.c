@@ -131,8 +131,6 @@ void GXSetTexCoordGen2();
 void fn_80016124(s32 p0, s32 p1, s32 p2, s32 p3);
 extern u8* lbl_80280DF0;
 s32 fn_8001614C(void);
-extern u8* lbl_80280DC8;
-void fn_8001618C(u8 v);
 void fn_800162A0(void);
 void fn_800162A4(void);
 void fn_800162A8(void);

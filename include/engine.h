@@ -175,7 +175,7 @@ typedef struct TexEntry {
     s16  nC;                    // 0x0C  GoDynObj.c's fn_80045FC8 copies nC * 16 bytes of its pixels
     u8   unkE[0x3C - 0xE];
     s16  nPalette;              // 0x3C  its row in the bank's pC
-    u8   unk3E[0x40 - 0x3E];
+    u16  n3E;                   // 0x3E  its row in the bank's p10 (ShaderObjectsData fn_800740F4)
     s8   b40;                   // 0x40  0: char.c fn_8001DD18 decodes the name and pairs the texture
     s8   n41;                   // 0x41  (fn_80045FC8)
     u8   unk42[0x47 - 0x42];
@@ -192,6 +192,18 @@ typedef struct TexPalette {
 } TexPalette;
 LAYOUT_ASSERT(TexPalette, 0xC);
 
+// A row of a bank's p10 (0x40 bytes): a texture's GX texture object, loaded with GXLoadTexObj
+// (ShaderObjectsData fn_800740F4); a texture whose b47 bit 0 is set uses the next row too.
+typedef struct TexGXObj {
+    u8   unk0[0x40];
+} TexGXObj;
+
+// A row of a bank's p14 (0x18 bytes): a texture's GX palette object, loaded with GXLoadTlut when
+// its nPalette is not -1 (ShaderObjectsData fn_800738DC).
+typedef struct TexGXTlut {
+    u8   unk0[0x18];
+} TexGXTlut;
+
 // A loaded texture bank (0x30 bytes, followed by its tables; up to 200, listed at lbl_801A26DC).
 typedef struct TexBank {
     u8   unk0[2];
@@ -200,8 +212,8 @@ typedef struct TexBank {
     u8   unk6[2];
     TexEntry*   p8;             // 0x08  its textures
     TexPalette* pC;             // 0x0C  its palettes
-    void* p10;                  // 0x10
-    void* p14;                  // 0x14
+    TexGXObj* p10;              // 0x10  the textures' GX objects, by TexEntry.n3E
+    TexGXTlut* p14;             // 0x14  the textures' GX palette objects, by TexEntry.n3E
     u8*  p18;                   // 0x18  the pixel data
     u8   unk1C[0x20 - 0x1C];
     u8*  p20;                   // 0x20  the palette data
@@ -249,6 +261,11 @@ extern struct UStreamObject* lbl_80281C0C;   // LoadData.c: a copy of the 'txf2'
 
 void fn_80014544(int n);                // load the numbered stream file (sprintf'd name)
 void fn_800147A4(void);                 // streammanagerhole.c
+// streammanagerhole.c: a flag byte fn_8001618C sets; while it is set, the shader objects' untextured
+// stage takes its alpha from the constant colour, not the vertex colour
+// (GoShaderObjectCommon_ShaderObjectsData_Gc.c fn_800740F4).
+extern u8* lbl_80280DC8;
+void fn_8001618C(u8 v);
 
 // The texture bank list (LLTexGrp.c): the banks loaded from 'txf ' stream objects, searched by
 // fn_800102DC.

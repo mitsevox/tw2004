@@ -10,6 +10,15 @@
 // The morph the list being built records its vertices for (a command 6 sets it), and which
 // vertex arrays the list has: texture coordinates, normals, colours.
 MorphAnim* lbl_80281EA0;
+// fn_800738DC's state: the texture map a palettized texture loads into (always 0), the texture
+// last set up, and which stage setup is loaded (EB2 two-texture or palettized, EB1 one texture,
+// EB0 with it the one for formats 0 and 1).
+int lbl_80281EA4;
+TexEntry* lbl_80281EA8;
+TexBank* lbl_80281EAC;
+u8 lbl_80281EB0;
+u8 lbl_80281EB1;
+u8 lbl_80281EB2;
 u8 lbl_80281EB3;
 u8 lbl_80281EB4;
 u8 lbl_80281EB5;
@@ -30,7 +39,6 @@ u16 fn_80076D68(f32 fU, f32 fV, f32 fScale, f32 fInv);    // GoShaderObjectCommo
 void fn_80076BF0(void);                                 // GoShaderObjectCommon_TexAnimManager_Gc.c
 void fn_80012520(u32 ePrim, u32 eFormat, u16 nVerts);   // LLFont.c: GXBegin
 void fn_800124A8(void);                                 // LLFont.c: end the primitive
-void fn_8001618C(u8 v);                                 // streammanagerhole.c
 
 // Another texture in pTex's bank with the same u0 as pTex: its index, or -1.
 int fn_80073878(TexBank* pBank, TexEntry* pTex) {
@@ -39,6 +47,234 @@ int fn_80073878(TexBank* pBank, TexEntry* pTex) {
         if (pBank->p8[i].u0 == pTex->u0 && pTex != &pBank->p8[i]) return i;
     }
     return -1;
+}
+
+// Set up the texture stages for one texture (NULL pBank: none), skipped when it is the texture
+// already set up. bFirst forgets what was set up. A texture with a pair (b47 bit 0) loads both,
+// in the order its b40 says; b40 9 is palettized (its palette loaded, alpha-tested and blended),
+// 0 and 1 and the others each have their own stage setup. A texture outside its bank decodes its
+// name (for a message the retail build left out) and draws untextured.
+void fn_800738DC(TexBank* pBank, TexEntry* pTex, u8 bFirst) {
+    char szName[20];            // the size is unknown: the frame leaves 20 bytes for it
+    TexGXObj* pObj;
+    int nPair;
+
+    if (bFirst) {
+        lbl_80281EB2 = lbl_80281EB1 = lbl_80281EB0 = 0;
+        // port: an address no bank or texture has, so the test below fails; only compared
+        lbl_80281EAC = (TexBank*)&bFirst;
+        lbl_80281EA8 = (TexEntry*)&bFirst;
+        lbl_80281EA4 = 0;
+    }
+    if (pBank != lbl_80281EAC || pTex != lbl_80281EA8) {
+        lbl_80281EAC = pBank;
+        lbl_80281EA8 = pTex;
+        if (pBank != NULL) {
+            if (pTex->n3E >= pBank->n2) {
+                fn_800CB8F0(&pTex->u0, szName);
+            } else {
+                pObj = &pBank->p10[pTex->n3E];
+                if (pTex->b47 & 1) {
+                    nPair = fn_80073878(pBank, pTex);
+                    if (nPair != -1) {
+                        if (pTex->b40 == 0) {
+                            GXLoadTexObj((GXTexObj*)pObj, 1);
+                            GXLoadTexObj((GXTexObj*)&pBank->p10[nPair], 0);
+                        } else {
+                            GXLoadTexObj((GXTexObj*)pObj, 0);
+                            GXLoadTexObj((GXTexObj*)&pBank->p10[nPair], 1);
+                        }
+                        if (!lbl_80281EB2) {
+                            lbl_80281EB2 = 1;
+                            lbl_80281EB1 = 0;
+                            lbl_80281EB0 = 0;
+                            GXSetNumTexGens(1);
+                            GXSetNumTevStages(2);
+                            GXSetTevOrder(0, 0, 0, 4);
+                            GXSetTevOrder(1, 0, 1, 4);
+                            if (*lbl_80280DC8) {
+                                GXSetTevColorIn(0, 0xF, 8, 0xA, 0xF);
+                                GXSetTevColorOp(0, 0, 0, 1, 1, 0);
+                                GXSetTevAlphaIn(0, 7, 6, 6, 7);
+                                GXSetTevAlphaOp(0, 0, 0, 1, 1, 0);
+                                GXSetTevColorIn(1, 0xF, 0, 0xC, 0xF);
+                                GXSetTevColorOp(1, 0, 0, 0, 1, 0);
+                                GXSetTevAlphaIn(1, 4, 7, 6, 7);
+                                GXSetTevAlphaOp(1, 0xE, 0, 1, 1, 0);
+                            } else {
+                                GXSetTevColorIn(0, 0xF, 8, 0xA, 0xF);
+                                GXSetTevColorOp(0, 0, 0, 1, 1, 0);
+                                GXSetTevAlphaIn(0, 7, 6, 6, 7);
+                                GXSetTevAlphaOp(0, 0, 0, 1, 1, 0);
+                                GXSetTevColorIn(1, 0xF, 0, 0xC, 0xF);
+                                GXSetTevColorOp(1, 0, 0, 0, 1, 0);
+                                GXSetTevAlphaIn(1, 7, 4, 5, 7);
+                                GXSetTevAlphaOp(1, 0, 0, 1, 1, 0);
+                            }
+                        }
+                    }
+                } else {
+                    if (pTex->b40 == 0 || pTex->b40 == 1) {
+                        GXLoadTexObj((GXTexObj*)pObj, 0);
+                        if (!lbl_80281EB1 || !lbl_80281EB0) {
+                            lbl_80281EB2 = 0;
+                            lbl_80281EB1 = 1;
+                            lbl_80281EB0 = 1;
+                            GXSetNumTexGens(1);
+                            GXSetTevOrder(0, 0, 0, 4);
+                            GXSetNumTevStages(1);
+                            if (*lbl_80280DC8) {
+                                GXSetTevColorIn(0, 0xF, 0xA, 0xC, 0xF);
+                                GXSetTevColorOp(0, 0, 0, 1, 1, 0);
+                                GXSetTevAlphaIn(0, 7, 4, 6, 7);
+                                GXSetTevAlphaOp(0, 0, 0, 1, 1, 0);
+                            } else {
+                                GXSetTevColorIn(0, 0xF, 0xA, 0xC, 0xF);
+                                GXSetTevColorOp(0, 0, 0, 1, 1, 0);
+                                GXSetTevAlphaIn(0, 7, 4, 5, 7);
+                                GXSetTevAlphaOp(0, 0, 0, 1, 1, 0);
+                            }
+                        }
+                    } else if (pTex->b40 == 9) {
+                        if (pTex->nPalette != -1) {
+                            GXLoadTlut((GXTlutObj*)&pBank->p14[pTex->n3E], 0);
+                        }
+                        GXLoadTexObj((GXTexObj*)pObj, lbl_80281EA4);
+                        if (!lbl_80281EB2) {
+                            lbl_80281EB2 = 1;
+                            lbl_80281EB1 = 0;
+                            lbl_80281EB0 = 0;
+                            GXSetNumTexGens(1);
+                            GXSetNumTevStages(1);
+                            GXSetTevOrder(0, 0, 0, 4);
+                            GXSetTevColorIn(1, 0xF, 0xF, 0xF, 8);
+                            GXSetTevColorOp(1, 0, 0, 0, 1, 0);
+                            GXSetTevAlphaIn(1, 7, 7, 7, 4);
+                            GXSetTevAlphaOp(1, 0, 0, 1, 1, 0);
+                            GXSetBlendMode(1, 4, 5, 0);
+                            GXSetAlphaCompare(7, 0, 0, 7, 0x7F);
+                            GXSetZCompLoc(1);
+                        }
+                    } else {
+                        GXLoadTexObj((GXTexObj*)pObj, 0);
+                        if (!lbl_80281EB1 || lbl_80281EB0) {
+                            lbl_80281EB2 = 0;
+                            lbl_80281EB1 = 1;
+                            lbl_80281EB0 = 0;
+                            GXSetNumTexGens(1);
+                            GXSetTevOrder(0, 0, 0, 4);
+                            GXSetNumTevStages(1);
+                            if (*lbl_80280DC8) {
+                                GXSetTevColorIn(0, 0xF, 8, 0xA, 0xF);
+                                GXSetTevColorOp(0, 0, 0, 1, 1, 0);
+                                GXSetTevAlphaIn(0, 7, 4, 6, 7);
+                                GXSetTevAlphaOp(0, 0, 0, 1, 1, 0);
+                            } else {
+                                GXSetTevColorIn(0, 0xF, 8, 0xA, 0xF);
+                                GXSetTevColorOp(0, 0, 0, 1, 1, 0);
+                                GXSetTevAlphaIn(0, 7, 4, 5, 7);
+                                GXSetTevAlphaOp(0, 0, 0, 1, 1, 0);
+                            }
+                        }
+                    }
+                }
+                return;
+            }
+        }
+            GXSetNumTexGens(0);
+            GXSetNumTevStages(1);
+            GXSetTevOrder(0, 0xFF, 0xFF, 4);
+            if (*lbl_80280DC8) {
+                GXSetTevColorIn(0, 0xF, 0xF, 0xF, 0xA);
+                GXSetTevColorOp(0, 0, 0, 0, 1, 0);
+                GXSetTevAlphaIn(0, 7, 7, 7, 6);
+                GXSetTevAlphaOp(0, 0, 0, 1, 1, 0);
+            } else {
+                GXSetTevColorIn(0, 0xF, 0xF, 0xF, 0xA);
+                GXSetTevColorOp(0, 0, 0, 0, 1, 0);
+                GXSetTevAlphaIn(0, 7, 7, 7, 5);
+                GXSetTevAlphaOp(0, 0, 0, 1, 1, 0);
+            }
+            lbl_80281EB2 = 0;
+            lbl_80281EB1 = 0;
+            lbl_80281EB0 = 0;
+    }
+}
+
+// Set up the texture stages for two textures: three stages, or four when pTex2 has a second GX
+// object (b47 bit 0), loaded as texture map 2. With no textures, or a first texture that has a
+// second object, one untextured stage draws the vertex colour, its alpha from the vertex colour
+// or, while *lbl_80280DC8 is set, from the constant colour.
+void fn_800740F4(TexBank* pBank, TexEntry* pTex, TexBank* pBank2, TexEntry* pTex2) {
+    TexGXObj* pObj;
+    TexGXObj* pObj2;
+
+    if (pBank != NULL && pBank2 != NULL && !(pTex->b47 & 1)) {
+        pObj = &pBank->p10[pTex->n3E];
+        pObj2 = &pBank2->p10[pTex2->n3E];
+        if (!(pTex2->b47 & 1)) {
+            GXLoadTexObj((GXTexObj*)pObj, 0);
+            GXLoadTexObj((GXTexObj*)pObj2, 1);
+            GXSetNumTexGens(2);
+            GXSetNumTevStages(3);
+            GXSetTevOrder(0, 0, 0, 4);
+            GXSetTevOrder(1, 1, 1, 4);
+            GXSetTevOrder(2, 0xFF, 0xFF, 4);
+            GXSetTevColorIn(0, 0xF, 8, 0xA, 0xF);
+            GXSetTevColorOp(0, 0, 0, 1, 1, 1);
+            GXSetTevAlphaIn(0, 7, 4, 5, 7);
+            GXSetTevAlphaOp(0, 0, 0, 1, 1, 1);
+            GXSetTevColorIn(1, 0xF, 8, 0xA, 0xF);
+            GXSetTevColorOp(1, 0, 0, 1, 1, 2);
+            GXSetTevAlphaIn(1, 7, 4, 5, 7);
+            GXSetTevAlphaOp(1, 0, 0, 1, 1, 2);
+            GXSetTevColorIn(2, 2, 4, 5, 0xF);
+            GXSetTevColorOp(2, 0, 0, 0, 1, 0);
+            GXSetTevAlphaIn(2, 7, 6, 1, 7);
+            GXSetTevAlphaOp(2, 0, 0, 0, 1, 0);
+        } else {
+            GXLoadTexObj((GXTexObj*)pObj, 0);
+            GXLoadTexObj((GXTexObj*)pObj2, 1);
+            GXLoadTexObj((GXTexObj*)(pObj2 + 1), 2);
+            GXSetNumTexGens(2);
+            GXSetNumTevStages(4);
+            GXSetTevOrder(0, 1, 2, 4);
+            GXSetTevOrder(1, 1, 1, 4);
+            GXSetTevOrder(2, 0, 0, 4);
+            GXSetTevOrder(3, 0xFF, 0xFF, 4);
+            GXSetTevColorIn(0, 0xF, 0xF, 0xF, 0xF);
+            GXSetTevColorOp(0, 0, 0, 0, 1, 1);
+            GXSetTevAlphaIn(0, 7, 4, 5, 7);
+            GXSetTevAlphaOp(0, 0, 0, 1, 1, 1);
+            GXSetTevColorIn(1, 0xF, 8, 0xA, 0xF);
+            GXSetTevColorOp(1, 0, 0, 1, 1, 2);
+            GXSetTevAlphaIn(1, 7, 6, 6, 7);
+            GXSetTevAlphaOp(1, 0, 0, 0, 1, 2);
+            GXSetTevColorIn(2, 0xF, 8, 0xA, 0xF);
+            GXSetTevColorOp(2, 0, 0, 1, 1, 3);
+            GXSetTevAlphaIn(2, 7, 4, 5, 7);
+            GXSetTevAlphaOp(2, 0, 0, 1, 1, 3);
+            GXSetTevColorIn(3, 6, 4, 3, 0xF);
+            GXSetTevColorOp(3, 0, 0, 0, 1, 0);
+            GXSetTevAlphaIn(3, 7, 6, 3, 7);
+            GXSetTevAlphaOp(3, 0, 0, 0, 1, 0);
+        }
+    } else {
+        GXSetNumTexGens(0);
+        GXSetNumTevStages(1);
+        GXSetTevOrder(0, 0xFF, 0xFF, 4);
+        if (*lbl_80280DC8) {
+            GXSetTevColorIn(0, 0xF, 0xF, 0xF, 0xA);
+            GXSetTevColorOp(0, 0, 0, 0, 1, 0);
+            GXSetTevAlphaIn(0, 7, 7, 7, 6);
+            GXSetTevAlphaOp(0, 0, 0, 1, 1, 0);
+        } else {
+            GXSetTevColorIn(0, 0xF, 0xF, 0xF, 0xA);
+            GXSetTevColorOp(0, 0, 0, 0, 1, 0);
+            GXSetTevAlphaIn(0, 7, 7, 7, 5);
+            GXSetTevAlphaOp(0, 0, 0, 1, 1, 0);
+        }
+    }
 }
 
 // A command of the display list: a primitive (0 points, 1 a line strip, 2 triangles, 3 a triangle
