@@ -48,6 +48,7 @@ u8   fn_800439E4(f32* pCam, int nPlayer);
 u8   fn_80043920(CamScript* pScript, int nPlayer);
 void fn_80044768(f32* pPos, f32* pOut);
 f32  fn_8003F790(CamScript* pScript);   // the blend's share (0..1) so far
+void fn_80040CF0(CamScript* pScript, f32* pSub, int nPlayer, f32* pPrev, f32 fTime);
 void fn_800090E4(f32* pTurn, f32* pVec, f32* pOut);     // the vector turned by it
 u8   fn_800DC464(int nPlayer);          // GameEffects.c: the ball is simulated from its position
 u8   Ter_CheckForGroundCollision(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
@@ -455,6 +456,103 @@ void fn_8003FD54(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPr
     fn_800457B8(nPlayer, f);
     f = fT * (pNext->f8C - pShot->f8C) + pShot->f8C;
     f90 = fT * (pNext->f90 - pShot->f90) + pShot->f90;
+    if (f > 0.0f || f90 > 0.0f) {
+        if (fn_80044E74(pShot)) {
+            fn_80038054(1, gPlayers[nPlayer].nView[1], f90, f);
+        } else {
+            fn_80038054(1, gPlayers[nPlayer].nView[0], f90, f);
+        }
+    }
+    pScript->fA8 = fT * (pNext->f9C - pShot->f9C) + pShot->f9C;
+}
+
+// Blend kinds 2, 11 and 12: the point looked at moves on the straight line between the two shots'
+// look-at points; the camera follows the curve fn_800C7E50 makes through the two positions (kind
+// nD0), set up by fn_80040CF0 on the blend's first frame.
+void fn_800407D4(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPrev, f32 fTime) {
+    f32 vMove[4];
+    f32 vPos[4];
+    CamShot* pShot = pScript->pShot;
+    CamShot* pNext = pScript->pNextShot;
+    f32 fT = fn_8003F790(pScript);
+    f32 f;
+    f32 f90;
+
+    CamScript_GetLookAtPoint(pShot, nPlayer, pScript->a20, pScript->v0, pScript, pPrev, fTime);
+    CamScript_GetLookAtPoint(pNext, nPlayer, &pScript->a20[4], pScript->v10, pScript, pPrev, fTime);
+    fn_80045428(&pScript->a20[4], pScript->a20, vMove);
+    fn_8001EF34(vMove, fT, vPos);
+    fn_8004544C(vPos, pScript->a20, vPos);
+    Vec3Copy(vPos, pSub);
+    if (0.0f == pScript->fCamTime) {
+        fn_80040CF0(pScript, pSub, nPlayer, pPrev, fTime);
+    }
+    fn_800C7E50(pScript->v0, pScript->v10, pSub, pScript->nD0, pCam, fT);
+    f = fT * (pNext->f78 - pShot->f78) + pShot->f78;
+    f += fn_800DC3A4();
+    if (fn_80044E74(pScript->pShot)) {
+        fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[1])), f);
+    } else {
+        fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[0])), f);
+    }
+    f = fT * (pNext->f88 - pShot->f88) + pShot->f88;
+    f += fn_800DC45C(f);
+    fn_800457B8(nPlayer, f);
+    f = fT * (pNext->f8C - pShot->f8C) + pShot->f8C;
+    f90 = fT * (pNext->f90 - pShot->f90) + pShot->f90;
+    if (f > 0.0f || f90 > 0.0f) {
+        if (fn_80044E74(pShot)) {
+            fn_80038054(1, gPlayers[nPlayer].nView[1], f90, f);
+        } else {
+            fn_80038054(1, gPlayers[nPlayer].nView[0], f90, f);
+        }
+    }
+    pScript->fA8 = fT * (pNext->f9C - pShot->f9C) + pShot->f9C;
+}
+
+// Blend kind 7: there and back. The share runs to 1 at the blend's middle and back to 0; the
+// point looked at and the camera's curve (fn_800C7E50, kind nD0: 1 going, 2 coming back) follow
+// it. fA8 blends by the doubled share itself.
+void fn_80040A58(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPrev, f32 fTime) {
+    f32 vMove[4];
+    f32 vPos[4];
+    CamShot* pShot = pScript->pShot;
+    CamShot* pNext = pScript->pNextShot;
+    f32 fT = fn_8003F790(pScript);
+    f32 f;
+    f32 fShare;
+    f32 f90;
+
+    fT *= 2.0f;
+    if (fT > 1.0f) {
+        fShare = 1.0f - (fT - 1.0f);
+    } else {
+        fShare = fT;
+    }
+    CamScript_GetLookAtPoint(pShot, nPlayer, pScript->a20, pScript->v0, pScript, pPrev, fTime);
+    CamScript_GetLookAtPoint(pNext, nPlayer, &pScript->a20[4], pScript->v10, pScript, pPrev, fTime);
+    fn_80045428(&pScript->a20[4], pScript->a20, vMove);
+    fn_8001EF34(vMove, fShare, vPos);
+    fn_8004544C(vPos, pScript->a20, vPos);
+    Vec3Copy(vPos, pSub);
+    if (fT < 1.0f) {
+        pScript->nD0 = 1;
+    } else {
+        pScript->nD0 = 2;
+    }
+    fn_800C7E50(pScript->v0, pScript->v10, pSub, pScript->nD0, pCam, fShare);
+    f = fShare * (pNext->f78 - pShot->f78) + pShot->f78;
+    f += fn_800DC3A4();
+    if (fn_80044E74(pScript->pShot)) {
+        fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[1])), f);
+    } else {
+        fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[0])), f);
+    }
+    f = fShare * (pNext->f88 - pShot->f88) + pShot->f88;
+    f += fn_800DC45C(f);
+    fn_800457B8(nPlayer, f);
+    f = fShare * (pNext->f8C - pShot->f8C) + pShot->f8C;
+    f90 = fShare * (pNext->f90 - pShot->f90) + pShot->f90;
     if (f > 0.0f || f90 > 0.0f) {
         if (fn_80044E74(pShot)) {
             fn_80038054(1, gPlayers[nPlayer].nView[1], f90, f);
