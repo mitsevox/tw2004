@@ -39,6 +39,155 @@ static GXColor lbl_801869C0[3][16] = {
 void fn_80012444(f32* pViewport);
 void fn_8001247C(s32 eDst, s32 eFunc, s32 eSrc, s32 nMtx);
 
+// Byte swaps for a stream stored little-endian.
+#define LLFONT_SWAP32(x) (((u32)(x) >> 24) + (((x) & 0xFF0000) >> 8) + (((x) << 8) & 0xFF0000) + ((x) << 24))
+#define LLFONT_SWAP16(x) ((((x) & 0xFF00) >> 8) + (((x) << 8) & 0xFF00))
+
+// Makes a font from an 'sfn ' stream object: swaps a little-endian stream, allocates the font with
+// its glyph records and glyphs, builds each glyph's texture coordinates and sizes, and reorders the
+// bitmap's rows of 4-bit texels into the 8x8 tiles of a C4 texture.
+LLFont* FO_spLoadFontFromStream(void* pData, UFontState* pState) {
+    LLFontFile* pFile;
+    u8* pBytes;
+    LLFont* pFont;
+    u8* pRec;
+    int i;
+    int nPalette;
+    int nRowBytes;
+    int nTexHeight;
+    int nTileRow;
+    int nTileCol;
+    int nRow;
+    int nByte;
+    int nX;
+    int nY;
+    int k;
+    f32 fX;
+    f32 fY;
+    u8* pSrc;
+    LLTexelPair* pDst;
+    LLGlyphRec* pGlyphRec;
+
+    pFile = pData;
+    pBytes = pData;
+    if (pFile->n0C > 100) {
+        pFile->n00 = LLFONT_SWAP32(pFile->n00);
+        pFile->u04 = LLFONT_SWAP32(pFile->u04);
+        pFile->uVersion = LLFONT_SWAP16(pFile->uVersion);
+        pFile->nGlyphs = LLFONT_SWAP16(pFile->nGlyphs);
+        pFile->n0C = LLFONT_SWAP32(pFile->n0C);
+        pFile->uGlyphs = LLFONT_SWAP32(pFile->uGlyphs);
+        pFile->u18 = LLFONT_SWAP32(pFile->u18);
+        pFile->uBitmap = LLFONT_SWAP32(pFile->uBitmap);
+    }
+    pFont = fn_80009B34(pFile->nGlyphs * sizeof(LLGlyphRec) + pFile->nGlyphs * sizeof(LLGlyph) +
+                            sizeof(LLFont),
+                        2, 16, "LLFont.c", 630);
+    pFont->pRecs = (LLGlyphRec*)(pFont + 1);
+    pFont->pGlyphs = (LLGlyph*)((LLGlyphRec*)(pFont + 1) + pFile->nGlyphs);
+    fn_80012438(pFont);
+    for (i = 0; i < 256; i++) {
+        pFont->apGlyphs[i] = NULL;
+    }
+    nPalette = 0;
+    switch (pFile->n0C & 6) {
+    case 2:
+        nPalette = 2;
+        break;
+    case 4:
+        nPalette = 1;
+        break;
+    }
+    pFont->nPalette = nPalette;
+    pFont->u464 = pState->a00[nPalette];
+
+    // The glyph records: 12 bytes each from version 200, 11 before.
+    pRec = pBytes + pFile->uGlyphs;
+    for (i = 0; i < pFile->nGlyphs; i++) {
+        pFont->pRecs[i] = *(LLGlyphRec*)pRec;
+        if (pFile->uVersion >= 200) {
+            pRec += 12;
+        } else {
+            pRec += 11;
+        }
+        pGlyphRec = &pFont->pRecs[i];
+        pFont->apGlyphs[pGlyphRec->aCode[0] + (pGlyphRec->aCode[1] << 8)] = &pFont->pGlyphs[i];
+    }
+
+    pBytes += pFile->uBitmap;
+    Mem_cpy(&pFont->bitmap, pBytes, sizeof(LLFontBitmap));
+    pFont->bitmap.nWidth = LLFONT_SWAP16(pFont->bitmap.nWidth);
+    pFont->bitmap.nHeight = LLFONT_SWAP16(pFont->bitmap.nHeight);
+    pFont->bitmap.n08 = LLFONT_SWAP16(pFont->bitmap.n08);
+    pFont->bitmap.n0A = LLFONT_SWAP16(pFont->bitmap.n0A);
+    pFont->bitmap.n0C = LLFONT_SWAP16(pFont->bitmap.n0C);
+    pFont->bitmap.n0E = LLFONT_SWAP16(pFont->bitmap.n0E);
+    nRowBytes = (pFont->bitmap.nWidth + 7) / 8 * 8 / 2;
+    nTexHeight = (pFont->bitmap.nHeight + 7) / 8 * 8;
+    pFont->p470 = fn_80009B34(nRowBytes * nTexHeight, 2, 32, "LLFont.c", 795);
+
+    // Rows of texels (two per byte, first in the high nibble) become 8x8 tiles, first texel low.
+    pDst = pFont->p470;
+    nY = 0;
+    for (nTileRow = 0; nTileRow < nTexHeight / 8; nTileRow++) {
+        nByte = 0;
+        for (nTileCol = 0; nTileCol < nRowBytes / 4; nTileCol++) {
+            pSrc = pBytes + sizeof(LLFontBitmap) + pFont->bitmap.nWidth / 2 * nY + nByte;
+            for (nRow = 0; nRow < 8; nRow++) {
+                // EA compares the byte position with the width in texels.
+                nX = nByte;
+                for (k = 0; k < 2; k++) {
+                    if (nX >= pFont->bitmap.nWidth) {
+                        pDst[0].uFirst = 0;
+                        pDst[0].uSecond = 0;
+                    } else {
+                        pDst[0].uSecond = *pSrc >> 4;
+                        pDst[0].uFirst = *pSrc++;
+                    }
+                    nX++;
+                    if (nX >= pFont->bitmap.nWidth) {
+                        pDst[1].uFirst = 0;
+                        pDst[1].uSecond = 0;
+                    } else {
+                        pDst[1].uSecond = *pSrc >> 4;
+                        pDst[1].uFirst = *pSrc++;
+                    }
+                    pDst += 2;
+                    nX++;
+                }
+                pSrc += pFont->bitmap.nWidth / 2 - 4;
+            }
+            nByte += 4;
+        }
+        nY += 8;
+    }
+
+    pFont->n42C = 0;
+    pFont->n430 = 0;
+    pFont->n434 = pFont->bitmap.nWidth;
+    pFont->n438 = pFont->bitmap.nWidth;
+    pFont->n43C = pFont->bitmap.nHeight;
+    for (i = 0; i < pFile->nGlyphs; i++) {
+        pFont->pGlyphs[i].pRec = &pFont->pRecs[i];
+        pGlyphRec = &pFont->pRecs[i];
+        fX = (u16)(pGlyphRec->aX[0] + (pGlyphRec->aX[1] << 8));
+        fY = (u16)(pGlyphRec->aY[0] + (pGlyphRec->aY[1] << 8));
+        pFont->pGlyphs[i].fU0 = fX / (nRowBytes * 2);
+        pFont->pGlyphs[i].fU1 = (fX + pGlyphRec->uWidth) / (nRowBytes * 2);
+        pFont->pGlyphs[i].fV0 = fY / nTexHeight;
+        pFont->pGlyphs[i].fV1 = (fY + pGlyphRec->uHeight) / nTexHeight;
+        pFont->pGlyphs[i].f18 = pFont->pRecs[i].n08 * (1.0f / 512.0f);
+        pFont->pGlyphs[i].f1C = pFont->pRecs[i].n09 * (1.0f / 512.0f);
+        pFont->pGlyphs[i].f20 = pFont->pRecs[i].n0A / 448.0f;
+        pFont->pGlyphs[i].fWidth = pFont->pRecs[i].uWidth * (1.0f / 512.0f);
+        pFont->pGlyphs[i].fHeight = pFont->pRecs[i].uHeight / 448.0f;
+    }
+    pFont->f00 = pFile->n13 / 448.0f;
+    pFont->n04 = 0;
+    GXInitTexObjCI(&pFont->tex, pFont->p470, nRowBytes * 2, nTexHeight, 8, 0, 0, 0, 0);
+    return pFont;
+}
+
 // Builds the three glyph palettes as IA8 (alpha doubled from the table's 0x80 scale, the grey level
 // from its red) and their TLUT objects.
 void fn_80011034(UFontState* pState) {
