@@ -33,34 +33,33 @@ void  fn_800342B4(UStreamObject* pObject);
 void  fn_800342F0(UStreamObject* pObject);
 void  fn_80035098(u8 b);
 
-// ---- sweep code (not yet cleaned up) ----
+void*    fn_800354BC(TerNode* pNode);
+f32*     fn_800354C4(TerNode* pNode);
+s32      fn_800354D0(TerNode* pNode, s32 n);
+TerNode* fn_800354E4(TerNode* pNode, s32 n);
+s32      fn_800354F4(TerNode* pNode);
+TerNode* fn_80035500(u8* pHoleData);
 
-s32 fn_800354BC(s32);
-void* fn_800354C4();
-s32 fn_800354D0(s32, s32);
-s32 fn_800354E4(s32, s32);
-s32 fn_800354F4(s32);
+// Fills pPatch from a patch's node: its ground is node 0, its objects come with a second node.
+void fn_80031084(TerNode* pNode, s32 eClipMethod, s32 iRenderPass, Ter_PatchReference* pPatch,
+                 f32 fDistance) {
+    s32 nNodes;
 
-void fn_80031084(s32 arg0, s32 arg1, s32 arg2, void* arg3, f32 farg0) {
-    s32 temp_r31;
-
-    (*(f32*)((u8*)(arg3) + 8)) = farg0;
-    (*(f32*)((u8*)(arg3) + 0xC)) = (f32) (*(f32*)((u8*)(fn_800354C4()) + 0xC));
-    (*(s32*)((u8*)(arg3) + 0x10)) = arg1;
-    (*(s32*)((u8*)(arg3) + 0x14)) = arg2;
-    temp_r31 = fn_800354F4(arg0);
-    (*(s32*)((u8*)(arg3) + 0)) = fn_800354E4(arg0, 0);
-    (*(s32*)((u8*)(arg3) + 0x18)) = fn_800354D0((*(s32*)((u8*)(arg3) + 0)), 3);
-    (*(s32*)((u8*)(arg3) + 0x1C)) = fn_800354D0((*(s32*)((u8*)(arg3) + 0)), 2);
-    (*(s32*)((u8*)(arg3) + 0x20)) = fn_800354D0(arg0, 1);
-    if (temp_r31 >= 2) {
-        (*(s32*)((u8*)(arg3) + 4)) = fn_800354BC((*(s32*)((u8*)(arg3) + 0)));
+    pPatch->fDistance = fDistance;
+    pPatch->fBoundingRadius = fn_800354C4(pNode)[3];
+    pPatch->eClipMethod = eClipMethod;
+    pPatch->iRenderPass = iRenderPass;
+    nNodes = fn_800354F4(pNode);
+    pPatch->pGround = fn_800354E4(pNode, 0);
+    pPatch->n18 = fn_800354D0(pPatch->pGround, 3);
+    pPatch->n1C = fn_800354D0(pPatch->pGround, 2);
+    pPatch->n20 = fn_800354D0(pNode, 1);
+    if (nNodes >= 2) {
+        pPatch->pObjects = fn_800354BC(pPatch->pGround);
         return;
     }
-    (*(s32*)((u8*)(arg3) + 4)) = 0;
+    pPatch->pObjects = NULL;
 }
-
-// ---- end of sweep code ----
 
 void fn_800306B8(void) {
     fn_80009E70(lbl_801D3CB0.pPatchList);
@@ -189,6 +188,57 @@ void fn_80031A08(s32* pA, s32* pB, s32 a, s32 b) {
 // Whether the 'tLOD' chunk has been loaded.
 u8 fn_80031E40(void) {
     return lbl_802810E4 != -1;
+}
+
+// Whether a ball has settled inside pModel's bounding sphere: a ball that has left where its shot
+// started, has hit something (nCollideCount) and moves slower than 10.
+u8 fn_80032330(TerNode* pModel) {
+    f32* pSphere = fn_800354C4(pModel);
+    f32 fRadiusSq = pSphere[3] * pSphere[3];
+    int i;
+
+    for (i = 0; i < gNumPlayersSetUp; i++) {
+        if (fn_800BB028(gPlayers[i].ball.vPos, gPlayers[i].ball.vStart) > 0.0f
+            && fn_800BB028(pSphere, gPlayers[i].ball.vPos) < fRadiusSq
+            && gPlayers[i].ball.nCollideCount != 0 && gPlayers[i].ball.fSpeed < 10.0f) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+// Adds a draw of pModel to a draw list: fills pDraw and counts it in *pCount. A model whose flags
+// (bytes 0 and 3) ask for it is skipped in modes 6-8 (fn_800E3A54); one with bits 0 and 1 of byte 0
+// is otherwise drawn as its node chosen by the object's state (n18).
+void fn_8003241C(Ter_ObjectDrawData* pDraw, s32* pCount, s32 nUnused, TerNode* pModel, s32 iObject,
+                 s32 eClipMethod, u8 bUseFog, u8 bSetsPrimField, f32 fAlpha, f32 fMipmapBias,
+                 f32 fDistanceSquared) {
+    s32 uFlags0;
+    s32 uFlags3;
+
+    // nUnused: every caller passes a number (0x28A, 0xC8, 0x46) this function does not read
+    pDraw->pObject = pModel;
+    pDraw->fAlpha = fAlpha;
+    pDraw->fMipmapBias = fMipmapBias;
+    pDraw->fDistanceSquared = fDistanceSquared;
+    pDraw->iGlobalObjectIndex = iObject;
+    pDraw->eClipMethod = eClipMethod;
+    pDraw->bUseFog = bUseFog;
+    pDraw->bSetsPrimField = bSetsPrimField;
+    uFlags0 = fn_800354D0(pModel, 0);
+    uFlags3 = fn_800354D0(pModel, 3);
+    if (uFlags0 & 1) {
+        if (uFlags0 & 2) {
+            if (fn_800E3A54()) return;
+            pDraw->pObject = fn_800354E4(pModel, lbl_801D3CB0.pObjectStateList[iObject].n18);
+        }
+    } else if ((uFlags3 & 4) || (uFlags3 & 0x10) || (uFlags3 & 0x20)) {
+        if (fn_800E3A54()) return;
+    }
+    if (pDraw->pObject->p18 != NULL) {
+        pDraw->eShaderObjectType = *pDraw->pObject->p18;
+    }
+    (*pCount)++;
 }
 
 // Draws render pass nRenderPass's sorted patches, if it has any: each list (the pass a patch is
@@ -559,6 +609,25 @@ void fn_800349CC(int n) {
     }
 }
 
+// The model of object list nObjList of patch nPatch: node 1 of the hole data's tree holds one node
+// per patch, and a patch's node 1 holds, in its node 0, its object lists. NULL when out of range.
+TerNode* fn_80034A20(u16 nPatch, u16 nObjList) {
+    TerNode* pModel = NULL;
+    TerNode* pNode;
+
+    pNode = fn_800354E4(fn_80035500(lbl_801D3CB0.pCurrentHoleData), 1);
+    if (nPatch < fn_800354F4(pNode)) {
+        pNode = fn_800354E4(pNode, nPatch);
+        if (fn_800354F4(pNode) >= 2) {
+            pNode = fn_800354E4(fn_800354E4(pNode, 1), 0);
+            if (nObjList < fn_800354F4(pNode)) {
+                pModel = fn_800354E4(pNode, nObjList);
+            }
+        }
+    }
+    return pModel;
+}
+
 // Draws the grass patches of render pass nRenderPass that take part in the first pass (bit 0 of
 // n1C), farthest first, one clip method at a time.
 // Not exact (97.1%): the original tests bit 0 with `and.` against a register holding 1 (one more
@@ -701,6 +770,10 @@ void fn_80035170(u32 uClear, u32 uSet) {
     lbl_801B8980.u110 |= 0x20;
 }
 
+void fn_8003519C(int nRow, void* pData) {
+    lbl_80188E88[nRow].pfn8(pData);
+}
+
 // Where n frames falls in a cycle of fPeriod seconds, in seconds.
 f32 fn_800351D8(u32 n, f32 fPeriod) {
     return FRAME_TIME * (f32)(n % (u32)(FRAME_RATE * (0.5f / FRAME_RATE + fPeriod)));
@@ -774,7 +847,6 @@ void fn_80035398(void) {
 void fn_8006F154();
 void fn_800082CC(void* p);
 void fn_800354B4(u8* p, f32 v);
-s32 fn_80035500(u8* p);
 s32 fn_80035508(u8* p0);
 s32 fn_80035554(u8* p0);
 f32 fn_80035560(u8* p0);
@@ -852,31 +924,39 @@ void fn_800354B4(u8* p, f32 v) {
     *(f32*)(p + 0xAC) = v;
 }
 
-s32 fn_800354BC(s32 p) {
-    return *(s32*)((u8*)p + 0x14);
+// ---- end of sweep code ----
+
+void* fn_800354BC(TerNode* pNode) {
+    return pNode->p14;
 }
 
-void* fn_800354C4(u8** p0) {
-    return *p0 + 88;
+// The node's bounding sphere: centre, then radius. The data block's layout is not known yet, so
+// the offset stays raw.
+f32* fn_800354C4(TerNode* pNode) {
+    return (f32*)(pNode->pData + 0x58);
 }
 
-// A byte of the object's model (from 0x24 on); the patch code reads bytes 1-3. The object's type
-// is not described yet, so this keeps the handle-style prototype its callers above use.
-s32 fn_800354D0(s32 pObject, s32 n) {
-    return (*(s8**)pObject)[n + 0x24];
+// A flag byte of the node's data (from 0x24 on); the patch code reads bytes 1-3.
+s32 fn_800354D0(TerNode* pNode, s32 n) {
+    return pNode->pData[n + 0x24];
 }
 
-s32 fn_800354E4(s32 p0, s32 p1) {
-    return (*(s32**)((u8*)p0 + 0x8))[p1];
+TerNode* fn_800354E4(TerNode* pNode, s32 n) {
+    return pNode->ppNodes[n];
 }
 
-s32 fn_800354F4(s32 p0) {
-    return **(s16**)p0;
+// How many nodes the node holds.
+s32 fn_800354F4(TerNode* pNode) {
+    return *(s16*)pNode->pData;
 }
 
-s32 fn_80035500(u8* p) {
-    return *(s32*)(p + 0xEC);
+// The root of the hole data's model tree. The hole data's layout is not known yet, so the offset
+// stays raw.
+TerNode* fn_80035500(u8* pHoleData) {
+    return *(TerNode**)(pHoleData + 0xEC);
 }
+
+// ---- sweep code (not yet cleaned up) ----
 
 s32 fn_80035508(u8* p0) {
     return (*(s32*)p0 + 104);

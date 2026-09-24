@@ -13,6 +13,20 @@
 struct CourseInfo;
 struct UStreamObject;
 
+// A node of the hole data's model tree (our name; read by fn_800354BC..fn_80035500): the root
+// (fn_80035500) holds a node per patch in its node 1, a patch's node 0 is its ground and its node 1
+// holds its object lists, and a list's nodes are the objects' models (fn_80034A20). Only what
+// those readers use; the size is not known.
+typedef struct TerNode {
+    s8*    pData;               // 0x00  starts with the node count (s16); flag bytes from 0x24
+                                //       (fn_800354D0), a bounding sphere at 0x58 (fn_800354C4)
+    u8     unk4[4];
+    struct TerNode** ppNodes;   // 0x08  (fn_800354E4)
+    u8     unkC[0x14 - 0xC];
+    void*  p14;                 // 0x14  a patch's Ter_PatchReference.pObjects (fn_800354BC)
+    s32*   p18;                 // 0x18  its first word is a draw's eShaderObjectType (fn_8003241C)
+} TerNode;
+
 // A patch of ground to draw (0x34 bytes; TW06: Ter_PatchReference, 0x2C, the same up to 0x10).
 // fn_80030CC8 fills Ter_TerrainRendererMgr.pPatchList with them and chains each into
 // pSortedPatchList by the bits of n1C.
@@ -43,7 +57,7 @@ LAYOUT_ASSERT(Ter_ObjectReference, 0x30);
 // An object in a draw list (0x20 bytes; TW06: Ter_ObjectDrawData, the same size); fn_80032F88 draws a
 // list of them.
 typedef struct Ter_ObjectDrawData {
-    void*  pObject;             // 0x00  TW06: pObject
+    TerNode* pObject;           // 0x00  its model (fn_8003241C). TW06: pObject
     f32    fAlpha;              // 0x04  TW06: fAlpha
     f32    fMipmapBias;         // 0x08  TW06: fMipmapBias
     f32    fDistanceSquared;    // 0x0C  TW06: fDistanceSquared
@@ -216,5 +230,6 @@ void fn_80034720(struct UStreamObject* pObject);   // a tee's position (TerPosDa
 u8   fn_800347B4(struct UStreamObject* pObject);   // a pin's position (TerPosData)
 void fn_80035118(int a, int b);     // renderer state: n10 and n14
 void fn_80035138(int a);            // renderer state: uFC
+TerNode* fn_80034A20(u16 nPatch, u16 nObjList);    // a course object's model
 
 #endif
