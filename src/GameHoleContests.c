@@ -398,7 +398,8 @@ s32 fn_800DADC0(void) {
         if (gPlayers[lbl_80282264].ball.nLie == LIE_INCUP_e && gPlayers[lbl_80282264].bPlanReady == 0) {
             return 1;
         }
-        if (3.0f * fn_800D0478(lbl_80282264) < 1.0f) {
+        // fake match: the original loads lbl_80282264 again for the call; the volatile read does that
+        if (3.0f * fn_800D0478(*(volatile s32*)&lbl_80282264) < 1.0f) {
             return 2;
         }
     }
