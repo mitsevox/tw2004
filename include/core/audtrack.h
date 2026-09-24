@@ -9,7 +9,7 @@
 
 // A voice of the sound engine (hlaudvoice.c's), wrapping one of startUp.c's hardware voices.
 typedef struct AudVoice {
-    u8   unk0[0x8];
+    UListNode link;             // 0x0    in one of its pool's lists (AudVoicePool.aLists)
     u16  nHwVoice;              // 0x8    the startUp.c voice it plays on
     u8   bHalf : 1;             // 0xA    which half of its ARAM buffer the next stream block fills
     u8   unkA_6 : 2;
@@ -17,20 +17,38 @@ typedef struct AudVoice {
     u8   unkA_3 : 2;
     u8   bA_1 : 1;              //        fn_800AA5A0 keeps the channel's event when it is set
     u8   unkA_0 : 1;
-    u8   unkB_7 : 1;            // 0xB
+    u8   bStopped : 1;          // 0xB    fn_800ACA94 has stopped it and taken it off its list
     u8   bB_6 : 1;              //        paused; Stm_Tick resumes it once the drive is fine
     u8   unkB : 6;
-    u8   unkC[0x10 - 0xC];
-    s32  n10;                   // 0x10   the request's n4: a voice with a lower one can be stolen
+    u32  uC;                    // 0xC
+    s32  n10;                   // 0x10   the request's n4, and the pool list it is on: a voice with
+                                //        a lower one can be stolen
     u8   n14;                   // 0x14   its own volume (0-127; fn_800A9590 scales it by 128)
-    u8   unk15[0x18 - 0x15];
+    s8   n15;                   // 0x15   frames left before fn_800ACB98 checks whether it has ended
+    u8   unk16[0x18 - 0x16];
     struct AudSeqTone* pTone;   // 0x18   the tone a sequenced track plays on it
     void (*pfnCallback)(struct AudVoice* pVoice, int nReason);  // 0x1C   the request's
     void* pUser;                // 0x20   the request's (the track)
     s32  nIndex;                // 0x24   the request's (the track's channel)
     u32  uAram;                 // 0x28   its ARAM buffer (two halves of 0x7F00 bytes)
     u32  uPlayPos;              // 0x2C   where it is playing in that buffer, in bytes
+    u8   unk30[0x3E - 0x30];
+    u16  n3E;                   // 0x3E   cleared when the voice is taken (fn_800AC4A0)
 } AudVoice;
+LAYOUT_ASSERT(AudVoice, 0x40);
+
+#define AUD_NUM_VOICES 50
+
+// The sound engine's voices (lbl_801F19B8, a single pool).
+typedef struct AudVoicePool {
+    AudVoice aVoices[AUD_NUM_VOICES];   // 0x000
+    UList    aLists[3];         // 0xC80  the voices in use, by their n10
+    UPool    free;              // 0xCA4  the free voices
+} AudVoicePool;
+LAYOUT_ASSERT(AudVoicePool, 0xCAC);
+
+extern AudVoicePool lbl_801F19B8[1];
+extern s32 lbl_802820B4;                // flipped by each pause: the order fn_800ACCF4 goes through
 
 // Settings for a voice; the flags say which fields are set. fn_800AC91C sets them on a voice;
 // a sequenced track's events change its own copy (AudTrack 0x30), handed to fn_800AC6D0 with each
@@ -297,9 +315,11 @@ LAYOUT_ASSERT(AudTrack, 0x8C);
 // A sound source: a playing sound (AudTable.c's table of 256, lbl_80282058), one track per
 // channel of its sound, and where it is heard.
 typedef struct AudSource {
-    u8   u0;                    // 0x0    bits set by the sequencer's event fn_800AAB48
-    u8   u1;                    // 0x1    the same, for events whose n4 is 0
-    u8   unk2[0x24 - 0x2];
+    u8   u0;                    // 0x0    tracks switched on, a bit each (hlaudemitter.c; the
+                                //        sequencer's event fn_800AAB48 sets bits too)
+    u8   u1;                    // 0x1    tracks switched off (and fn_800AAB48, for events whose n4 is 0)
+    u16  uChanged;              // 0x2    bits 0-7: that track's auParams was set; 0x200: u0 / u1
+    u32  auParams[8];           // 0x4    per track (hlaudemitter.c's fn_800AD790)
     f32  aPos[2][3];            // 0x24   where it is from each listener (fn_800B1A40 measures it)
     AudSound* pSound;           // 0x3C
     s16  nSound;                // 0x40   its number (fn_800A85CC)
@@ -317,19 +337,9 @@ LAYOUT_ASSERT(AudSource, 0x7C);
 typedef void (*AudSeqHandler)(AudSeqEvent* pEvent, AudTrack* pTrack);
 extern AudSeqHandler lbl_801F1880[13];
 
-// What an instance asks of its eight tracks (AudInstance.pCmd), written by fn_800AD698,
-// fn_800AD734 and fn_800AD790; only those fields are known.
-typedef struct AudInstanceCmd {
-    u8   uOn;                   // 0x0    tracks switched on, a bit each
-    u8   uOff;                  // 0x1    tracks switched off
-    u16  uChanged;              // 0x2    bits 0-7: that track's auParams was set; 0x200: uOn / uOff
-    u32  auParams[8];           // 0x4    per track
-    f32  aPos[2][3];            // 0x24   the instance's position as each view hears it (fn_800AD800)
-} AudInstanceCmd;
-
 // One of hlaudemitter.c's 256 emitter instances (lbl_801F2740); only the fields read so far.
 typedef struct AudInstance {
-    AudInstanceCmd* pCmd;       // 0x0
+    AudSource* pCmd;            // 0x0    its sound source (fn_800A7C30, the same number)
     struct AudInstance* pPrevActive;   // 0x4    the previous in AudEmitters.pActive's list
     struct AudInstance* pNextActive;   // 0x8    the next in AudEmitters.pActive's list (or pFree's)
     struct AudInstance* pNext;  // 0xC    the next instance of the same emitter (AudEmitters)
