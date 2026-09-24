@@ -916,7 +916,7 @@ config.libs = [
             Object(Matching, "FE_Manager.c"),
             Object(NonMatching, "FE_MessageTable.c"),
             Object(NonMatching, "GameUICommands.c"),
-            Object(NonMatching, "FEgolferanim.c"),
+            Object(Matching, "FEgolferanim.c"),
             Object(NonMatching, "uiLoadFile.c"),
             Object(NonMatching, "uiProcessInterface.c"),
             Object(Matching, "Code80090940.c"),
