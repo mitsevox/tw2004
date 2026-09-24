@@ -985,6 +985,21 @@ void fn_8001DC64(Character* pChar, SkinChoices* pChoices) {
     fn_80018484(pChar, pChar->pModel);
 }
 
+// Byte-swaps nBytes of 12-byte records in place: a 4-byte field, then four 2-byte ones.
+void fn_8001DEC8(u8* pData, int nBytes) {
+    SwapField aFormat[5] = { { 4, 4 }, { 2, 2 }, { 2, 2 }, { 2, 2 }, { 2, 2 } };
+    void* pSrc;
+    void* pDst;
+    int i;
+
+    for (i = 0; i < nBytes / 12; i++) {
+        pDst = pData;
+        pSrc = pData;
+        fn_8001F08C(&pSrc, &pDst, aFormat, 5, 1);
+        pData += 12;
+    }
+}
+
 // Dresses the character's six club skins: from pChoices when it is given, else from the golfer's
 // gGolferTable row (golfer 7's own row in the 0x4000 session mode). The front end's golfer is
 // left until fn_8008EAB0 allows it.
