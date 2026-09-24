@@ -858,6 +858,7 @@ CalendarScreen.c:
 
 hwsMaterial_Gc.c:
 	.text       start:0x80112614 end:0x80112804
+	.data       start:0x80193DA8 end:0x80193DC0
 
 hwsOverride_Gc.c:
 	.text       start:0x80112804 end:0x80112B80

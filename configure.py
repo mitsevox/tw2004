@@ -994,7 +994,7 @@ config.libs = [
             Object(Matching, "DiscCheck.c"),
             Object(NonMatching, "hwsBurn.c"),
             Object(NonMatching, "CalendarScreen.c"),
-            Object(NonMatching, "hwsMaterial_Gc.c"),
+            Object(Matching, "hwsMaterial_Gc.c"),
             Object(Matching, "hwsOverride_Gc.c"),
             Object(NonMatching, "hwsRender_Gc.c"),
             Object(NonMatching, "DynChain.c"),
