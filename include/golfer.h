@@ -422,11 +422,9 @@ typedef struct GameOptions {
     u8   bBoostEnabled;         // 0x2C  (gSession + 0xEA4)
     u8   bSpinEnabled;          // 0x2D  (gSession + 0xEA5)
     u8   rows[4][19];           // 0x2E  four rows of 19 flags
-    u8   b7A;                   // 0x7A
-    u8   b7B;                   // 0x7B
-    u8   b7C;                   // 0x7C
-    u8   b7D;                   // 0x7D
-    u8   b7E;                   // 0x7E
+    u8   abRowOn[4];            // 0x7A  per row of rows: that music row is on (fn_800A44A0 picks the
+                                //       row by game mode)
+    u8   b7E;                  // 0x7E
     u8   unk7F;
     s32  n80;                   // 0x80
     u8   b84;                   // 0x84  cleared while the lessons run (GameMode11)

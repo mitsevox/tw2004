@@ -3910,77 +3910,38 @@ void fn_80082E10(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = n;
 }
 
-// Options b7A..b7E as the menus' choices (1 on, 2 off), and n80.
+// The four music rows' switches and option b7E as the menus' choices (1 on, 2 off), and n80.
 void fn_80082E5C(MsgArg* pArgs, MsgArg* pResult) {
-    switch (gSession.options.b7A) {
-    case 1:
-        *(s32*)pArgs[0].p = 1;
-        break;
-    case 0:
-        *(s32*)pArgs[0].p = 2;
-        break;
-    }
-    switch (gSession.options.b7B) {
-    case 1:
-        *(s32*)pArgs[1].p = 1;
-        break;
-    case 0:
-        *(s32*)pArgs[1].p = 2;
-        break;
-    }
-    switch (gSession.options.b7C) {
-    case 1:
-        *(s32*)pArgs[2].p = 1;
-        break;
-    case 0:
-        *(s32*)pArgs[2].p = 2;
-        break;
-    }
-    switch (gSession.options.b7D) {
-    case 1:
-        *(s32*)pArgs[3].p = 1;
-        break;
-    case 0:
-        *(s32*)pArgs[3].p = 2;
-        break;
+    int i;
+
+    for (i = 0; i < 4; i++) {
+        switch (gSession.options.abRowOn[i]) {
+        case 1:
+            *(s32*)pArgs[i].p = 1;
+            break;
+        case 0:
+            *(s32*)pArgs[i].p = 2;
+            break;
+        }
     }
     *(s32*)pArgs[4].p = gSession.options.b7E ? 1 : 2;
     *(s32*)pArgs[5].p = gSession.options.n80;
 }
 
-// Set options b7A..b7E from the menus' choices (1 on, 2 off) and n80, then apply them.
+// Set the four music rows' switches and option b7E from the menus' choices (1 on, 2 off) and n80,
+// then apply them.
 void fn_80082F68(MsgArg* pArgs, MsgArg* pResult) {
-    switch (pArgs[0].i) {
-    case 1:
-        gSession.options.b7A = 1;
-        break;
-    case 2:
-        gSession.options.b7A = 0;
-        break;
-    }
-    switch (pArgs[1].i) {
-    case 1:
-        gSession.options.b7B = 1;
-        break;
-    case 2:
-        gSession.options.b7B = 0;
-        break;
-    }
-    switch (pArgs[2].i) {
-    case 1:
-        gSession.options.b7C = 1;
-        break;
-    case 2:
-        gSession.options.b7C = 0;
-        break;
-    }
-    switch (pArgs[3].i) {
-    case 1:
-        gSession.options.b7D = 1;
-        break;
-    case 2:
-        gSession.options.b7D = 0;
-        break;
+    int i;
+
+    for (i = 0; i < 4; i++) {
+        switch (pArgs[i].i) {
+        case 1:
+            gSession.options.abRowOn[i] = 1;
+            break;
+        case 2:
+            gSession.options.abRowOn[i] = 0;
+            break;
+        }
     }
     gSession.options.b7E = pArgs[4].i == 1;
     gSession.options.n80 = pArgs[5].i;

@@ -731,6 +731,104 @@ void fn_800A43DC(void) {
     }
 }
 
+// Applies the sound options: the volumes, then the music. Game types 3 and 10 play music 2 on
+// row 0; otherwise music 6 plays (two players at most, not in a replay) on the row the game mode
+// picks, if that row is switched on. Without music the ambience (sound 8) plays instead.
+void fn_800A44A0(void) {
+    int nMode;
+    f32 fVolume;
+    u8 bFixed;
+    u8 bNoBreaker;
+    s32 nState;
+    s16 nSound;
+    u8 bOn;
+    u8 bMusic;
+    u8 nRow;
+    f32 vPos[3];
+
+    nMode = Game_GetMode();
+    fVolume = 0.2f * (s8)gSession.options.a0[1];
+    bFixed = gSession.nGameType == 3 || gSession.nGameType == 10;
+    bNoBreaker = !bFixed && gSession.a8[0];
+    nState = 0;
+    bOn = fVolume > 0.0f;
+    fn_800A3FB4(15, fVolume * lbl_8018E988[15]);
+    fn_800A77E0(0.2f * (s8)gSession.options.a0[0]);
+    if (bFixed) {
+        nSound = 2;
+        bMusic = 1;
+        nRow = 0;
+    } else {
+        nSound = 6;
+        bMusic = gSession.nNumPlayers <= 2 && !gSession.bReplay;
+        bOn = bOn && bMusic;
+        switch (nMode) {
+        case 0:
+        case 1:
+        case 2:
+        case 9:
+        case 18:
+        case 19:
+        case 20:
+        case 21:
+            nRow = 1;
+            break;
+        case 6:
+        case 7:
+        case 8:
+        case 12:
+        case 13:
+        case 14:
+        case 15:
+        case 16:
+        case 17:
+        case 22:
+        case 25:
+        case 26:
+            nRow = 2;
+            break;
+        default:
+            nRow = 3;
+            break;
+        }
+    }
+    if (!bNoBreaker || (gSession.uFlags & 0x4000)) {
+        bOn = bOn && gSession.options.abRowOn[nRow];
+    }
+    if (bOn) {
+        if (lbl_8028203C == 2) {
+            fn_800AD450(lbl_8028141A);
+            lbl_8028141A = 0xFF;
+        }
+        if (bMusic) {
+            nState = 1;
+            if (lbl_80281418 == 0xFF) {
+                lbl_80281418 = fn_800AD280(nSound, -1, 1, 1, NULL);
+            }
+            lbl_8028142C = nRow;
+        }
+    } else {
+        if (lbl_8028203C == 1) {
+            fn_800AD450(lbl_80281418);
+            lbl_80281418 = 0xFF;
+        }
+        if (bMusic && !bFixed && gpGame->b288 && (s8)gSession.options.a0[0] > 0) {
+            nState = 2;
+            if (lbl_8028141A == 0xFF) {
+                vPos[0] = 0.0f;
+                vPos[1] = 0.0f;
+                vPos[2] = 12.0f;
+                lbl_8028141A = fn_800AD280(8, -1, 1, 1, NULL);
+                fn_800AD800(lbl_8028141A, vPos, NULL, 0);
+            }
+            if (lbl_8028203C != 2) {
+                lbl_80282041 = 1;
+            }
+        }
+    }
+    lbl_8028203C = nState;
+}
+
 void fn_800A484C(void) {
     int nCourse;
     u8 n;
