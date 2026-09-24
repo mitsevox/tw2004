@@ -127,7 +127,6 @@ void fn_80015454(void);
 extern u8* gpGame;
 s32 fn_80015464(void);
 void fn_80015620(void);
-void GXSetTexCoordGen2();
 void fn_80016124(s32 p0, s32 p1, s32 p2, s32 p3);
 extern u8* lbl_80280DF0;
 s32 fn_8001614C(void);

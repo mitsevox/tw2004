@@ -168,7 +168,6 @@ f32 fn_80011C90(LLFont* pFont, UFontContext* pCtx, char* sz) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-void GXSetTexCoordGen2();
 void fn_800124CC(void);
 void fn_800124A4(void);
 void fn_800124A8(void);
