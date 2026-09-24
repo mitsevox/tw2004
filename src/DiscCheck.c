@@ -9,6 +9,20 @@
 #include "game/frontend.h"
 #include "frontend/fe.h"
 
+// The file's globals, defined last address first (CodeWarrior lays them out in reverse).
+char lbl_8021BBB0[256][0x80];
+char lbl_80213BB0[256][0x80];
+DVDCommandBlock lbl_80213B80;
+DVDDiskID lbl_80213B60;
+u8 lbl_802824D9;
+u8 lbl_802824D8;
+s32 lbl_802824D4;
+u8 lbl_802824D2;
+u8 lbl_802824D1;
+u8 lbl_802824D0;
+s32 lbl_802824CC;
+s32 lbl_802824C8;
+
 // Note which disc is in the drive and read the list of each disc's files from
 // "data/fend/d_layout.bin": the two counts (the first byte of each of two words), then disc 1's
 // names and disc 2's, 0x80 bytes each. Each name's last character is cut off.
