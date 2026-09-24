@@ -3,6 +3,10 @@
 
 #include "game.h"
 #include "ball.h"
+#include "psmgr.h"
+
+void fn_80055C24(int n);        // Ball.c
+void fn_800B24E0(f32 f);        // shadow.c
 
 void fn_8006FB10(void);
 void fn_8006FCC4(u32 uSeed);
@@ -109,6 +113,54 @@ void fn_8006F650(void) {
         fn_8006FCC4(uSeed);
     }
     fn_8006FB10();
+}
+
+// Applies lbl_802811F0's flags: bit 0 calls fn_800B24E0 with 1; bit 1 starts effects 0 (with f18
+// kept to 0.1..1), 2 and 1 and calls fn_80055C24 with whether f18 is under 0.5; bit 4 starts
+// effect 3.
+void fn_8006FB10(void) {
+    f32 fAmount;
+
+    if (lbl_802811F0->uFlags & 1) {
+        fn_800B24E0(1.0f);
+    }
+    if (lbl_802811F0->uFlags & 2) {
+        fAmount = lbl_802811F0->f18 < 0.1f ? 0.1f : (lbl_802811F0->f18 > 1.0f ? 1.0f : lbl_802811F0->f18);
+        fn_800A2A80(0, &fAmount, 2);
+        fn_800A2A80(2, NULL, 2);
+        fn_800A2A80(1, NULL, 2);
+        if (lbl_802811F0->f18 < 0.5f) {
+            fn_80055C24(1);
+        } else {
+            fn_80055C24(0);
+        }
+    }
+    if (lbl_802811F0->uFlags & 0x10) {
+        fn_800A2A80(3, NULL, 2);
+    }
+}
+
+// Undoes fn_8006FB10: keeps the flags in u04, stops the effects and clears bits 0, 1, 2 and 4.
+void fn_8006FBF8(void) {
+    lbl_802811F0->b1C = 0;
+    lbl_802811F0->u04 = lbl_802811F0->uFlags;
+    if (lbl_802811F0->uFlags & 1) {
+        lbl_802811F0->uFlags &= ~1;
+    }
+    if (lbl_802811F0->uFlags & 2) {
+        fn_800A2B34(0);
+        fn_800A2B34(2);
+        fn_800A2B34(1);
+        fn_80055C24(2);
+        lbl_802811F0->uFlags &= ~2;
+    }
+    if (lbl_802811F0->uFlags & 4) {
+        lbl_802811F0->uFlags &= ~4;
+    }
+    if (lbl_802811F0->uFlags & 0x10) {
+        fn_800A2B34(3);
+        lbl_802811F0->uFlags &= ~0x10;
+    }
 }
 
 // ---- sweep code (not yet cleaned up) ----
