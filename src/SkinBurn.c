@@ -150,12 +150,10 @@ void fn_801272B4(Skin* pSkin) {
         pNew++;
     }
 
-    pOld = aOld;
     for (j = 0; j < nKept; j++) {
-        if (j != *pOld) {
-            memcpy(&pModel->p54[j], &pModel->p54[*pOld], sizeof(SkinModel54));
+        if (j != aOld[j]) {
+            memcpy(&pModel->p54[j], &pModel->p54[aOld[j]], sizeof(SkinModel54));
         }
-        pOld++;
     }
 
     for (i = 0; i < pModel->pDesc->n58; i++) {

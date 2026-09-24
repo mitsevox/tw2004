@@ -6,8 +6,11 @@
 #define GRASSSHADER_H
 
 #include "engine.h"
+#include "gx.h"
 
-// One word of the grass vertex buffer. A vertex is four words: x, y, z, then four bytes.
+// One word of the grass vertex buffer. A vertex is four words: x, y, z, then four bytes: n374 at
+// the time, 1, the row's vertex count (on a row's first vertex) and 1 on a row's first vertex.
+// The buffer is walked in words (GrassPacket_iEndPacket divides the word count by 4).
 typedef union GrassWord {
     f32 f;
     u8  b[4];
@@ -18,6 +21,23 @@ typedef struct GrassShell {
     GrassWord* pStart;          // 0x0
     u32        nVerts;          // 0x4
 } GrassShell;
+
+// The grass parameters SD_vShaderObject_Grass_Type_SetParameters is given (what the drawing reads).
+typedef struct GrassParams {
+    u32 unk0;
+    f32 a04[3];                 // 0x04  [0] and [1]: the x and z the fade is measured from; [nAxis]
+                                //       also the base of the grass texture's s
+    f32 a10[2];                 // 0x10  per shell set: the opacity
+    s32 a18[2];                 // 0x18  per shell set: which of its two vertex runs to draw
+    f32 f20;                    // 0x20  the height of the upper vertices
+    s32 n24;                    // 0x24  which shell set to draw
+} GrassParams;
+
+// A grass object's render record (one 32-byte node of the type's pool): two sets of two vertex runs.
+typedef struct GrassRenderData {
+    GrassWord* apVerts[2][2];   // 0x00
+    s32        anVerts[2][2];   // 0x10
+} GrassRenderData;
 
 // The grass type's data (TW06: SD_SShaderTypeData_Grass_Static, SD_gGrassTypeData).
 typedef struct SD_SShaderTypeData_Grass_Static {
@@ -31,7 +51,7 @@ typedef struct SD_SShaderTypeData_Grass_Static {
     GrassWord* pRow;            // 0x360  the first vertex of the current row
     u32        unk364;
     UMemPool*  pPool;           // 0x368  32 render records
-    void*      pParams;         // 0x36C  set by SD_vShaderObject_Grass_Type_SetParameters
+    GrassParams* pParams;       // 0x36C  set by SD_vShaderObject_Grass_Type_SetParameters
     f32        f370;            // 0x370
     s8         n374;            // 0x374
     u8         unk375[3];
@@ -39,5 +59,100 @@ typedef struct SD_SShaderTypeData_Grass_Static {
 LAYOUT_ASSERT(SD_SShaderTypeData_Grass_Static, 0x378);
 
 extern SD_SShaderTypeData_Grass_Static* SD_gpGrassTypeData;
+
+// One of GoGrass.c's 0x4C-byte records (GrassManager.pEC).
+typedef struct GrassRecord {
+    u8    unk0[0x40];
+    void* p40;                  // 0x40  freed with the records (fn_80120194)
+    u8    unk44[0x4C - 0x44];
+} GrassRecord;
+
+// A grass data chunk as fn_8011E4D8 is given it: n2 0x30-byte entries follow the header, then the
+// data (GrassChunkData).
+typedef struct GrassChunk {
+    s16 unk0;
+    s16 n2;                     // 0x2
+} GrassChunk;
+
+typedef struct GrassChunkData {
+    s32 n0;                     // 0x0
+    f32 f4;                     // 0x4
+} GrassChunkData;
+
+// The grass file ('gras' stream object, fn_8011E584): a word giving the size of the part after its
+// 16-byte header, then this header, n0 halfwords, a word count and 16 bytes on, the records.
+typedef struct GrassFileHeader {
+    s32 n0;                     // 0x0
+    u16 uVersion;               // 0x4  100: n6/n8/nA are given
+    s16 n6;                     // 0x6
+    s16 n8;                     // 0x8
+    s16 nA;                     // 0xA
+    u8  unkC[4];
+} GrassFileHeader;
+
+typedef struct GrassTile {
+    u8  unk0[0x10];
+    u32 u10;                    // 0x10  } offsets from the file's start (after its first 16 bytes),
+    u32 u14;                    // 0x14  } made into addresses on load
+} GrassTile;
+
+// One of GoGrass.c's buffers, kept in GrassManager.apD8 / apDC.
+typedef struct GrassBuffer {
+    u8  unk0[0x14];
+    u8  a14[0x44 - 0x14];       // 0x14  handed to fn_80008248 when the buffer is put back
+    s32 n44;                    // 0x44  its size: fn_8011FDEC picks the smallest big enough
+} GrassBuffer;
+
+// GoGrass.c's state (*lbl_80281900). Only the fields the decompiled code uses; its size is not known.
+typedef struct GrassManager {
+    u8           unk0[0x8];
+    s16*         p8;            // 0x08  the grass file's n0 halfwords (fn_8011E584)
+    struct GrassTile* pC;       // 0x0C  the grass file's n10 records
+    s32          n10;           // 0x10
+    s16          n14;           // 0x14  from a version-100 file's header, else -500
+    s16          n16;           // 0x16  from a version-100 file's header, else -500
+    s16          n18;           // 0x18  from a version-100 file's header, else 400
+    s16          n1A;           // 0x1A  the header's n0 / n18
+    s32          n1C;           // 0x1C  the chunks added (fn_8011E4D8); cleared when the grass is freed
+    struct GrassChunkData* a20[10];   // 0x20  each chunk's data, byte-swapped in place
+    struct GrassChunk*     a48[10];   // 0x48  the chunks
+    void*        p70;           // 0x70
+    void*        p74;           // 0x74
+    void*        p78;           // 0x78
+    void*        p7C;           // 0x7C
+    u8           unk80[0xD8 - 0x80];
+    GrassBuffer** apD8;         // 0xD8  a stack of buffers (fn_8011FDC4 pushes, fn_8011FF58 empties)
+    GrassBuffer** apDC;         // 0xDC  16 free buffers (fn_8011FD74 puts one back, fn_8011FDEC
+                                //       takes the best fit)
+    s32          nE0;           // 0xE0  the records at pEC
+    u32          nE4;           // 0xE4  apD8's depth
+    u32          nE8;           // 0xE8  apDC's used slots
+    GrassRecord* pEC;           // 0xEC
+    GrassBuffer** apF0[2];      // 0xF0  two buffer lists; n100 picks the one in use
+    s32          anF8[2];       // 0xF8  their lengths
+    s32          n100;          // 0x100
+    u8           unk104[0x370 - 0x104];
+    void*        p370;          // 0x370  an allocation; set while the grass is on (fn_8012022C)
+    u8           unk374[0x3A4 - 0x374];
+    s32          n3A4;          // 0x3A4  the last chunk's GrassChunkData.n0
+    u8           unk3A8[0x3B8 - 0x3A8];
+    f32          f3B8;          // 0x3B8  the last chunk's GrassChunkData.f4
+    u8           unk3BC[0x3CC - 0x3BC];
+    s32          n3CC;          // 0x3CC
+    u8           unk3D0[0x3E0 - 0x3D0];
+    s32          n3E0;          // 0x3E0
+} GrassManager;
+
+extern GrassManager* lbl_80281900;
+extern s32 lbl_80282514;        // cleared when the grass is freed (fn_8011E3B4)
+extern void* lbl_80282510;      // the grass's 256x256 texture buffer (fn_8011EB80)
+extern GXTexObj lbl_8026038C;   // its texture
+
+// The grass parameters GoGrass.c hands over once per hole (SD_vSetGrassParamsOnce).
+extern f32 lbl_802607D0[16][4];
+extern f32 lbl_802608D0[4];
+extern f32 lbl_802608E0[8];
+extern f32 lbl_80260900[2][4];
+extern f32 lbl_80260920[2][4];
 
 #endif

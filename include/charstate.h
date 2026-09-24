@@ -517,12 +517,22 @@ typedef struct SkinTarget {
 } SkinTarget;
 
 // What Character.p16D8 points at; only what SkinPart.c reads.
+// An 8-byte record fn_8001B208 makes for each skin of a CharSkinSet (fn_8001B1DC fills it;
+// CharSkinRef is our name).
+typedef struct CharSkinRef {
+    s32  n0;                    // 0x0  8
+    Skin* pSkin;                // 0x4
+} CharSkinRef;
+
 typedef struct CharSkinSet {
-    u8   unk0[0xC];
+    s32  n0;                    // 0x00  cleared by fn_8001B208
+    u8   unk4[4];
+    s32  nCount;                // 0x08  how many club classes the 'CLB ' object holds
     f32  afC[6];                // 0x0C  per club class: the club head bone's height (fn_8001C5B4)
     Skin* apSkins[6];           // 0x24
-    u8   unk3C[0x9C - 0x3C];
-    void* a9C[6];               // 0x9C  freed with fn_8001B1E8 (fn_8001B58C)
+    f32  a3C[6][4];             // 0x3C  per club class: a point on the club, through bone 0x52's matrix
+                                //       (Character_UpdateTestPoints: aPoints[4])
+    CharSkinRef* a9C[6];        // 0x9C  freed with fn_8001B1E8 (fn_8001B58C)
 } CharSkinSet;
 
 // A pool of seven entries characters take (fn_8001A418) and give back (fn_8001A3B0).

@@ -124,7 +124,9 @@ typedef struct CharModel {
     Bone*     pBones;           // 0x004
     f32     (*pMatrices)[4][4]; // 0x008  one per bone (fn_8001EED8 gives a bone's index); row 3 is its
                                 //        position
-    u8        unkC[0x34 - 0xC];
+    f32       fC;               // 0x00C  } lengths Character_UpdateTestPoints sets points 0-3 out by
+    f32       f10;              // 0x010  } along the leg bones' axes when the skin has no a1048
+    u8        unk14[0x34 - 0x14];
     BonePose* pPoses;           // 0x034  one per bone; freed with the model
     Skeleton* pSkel;            // 0x038
     u8        aBone[0x59];      // 0x03C  each bone id's index (fn_8001EED8), 0xFF none; fn_80029664
@@ -231,7 +233,8 @@ typedef struct Clip {
     s32    n04;                 // 0x04  bytes of the second frame stream
     u8     unk08[4];
     s16    nFrames;             // 0x0C
-    u8     unk0E[0xE];
+    u8     unk0E[0xA];
+    f32    f18;                 // 0x18  fn_8001BE88 blends up to it
     s32    n1C;                 // 0x1C
     u8     unk20[0xC];
     s32    n2C;                 // 0x2C
@@ -371,9 +374,9 @@ LAYOUT_ASSERT(CharBuffer, 0x1C);
 // An animation player; only what is read. Character has two: the one at 0x164, whose fields are
 // named in Character directly, and anim29C.
 typedef struct AnimPlayer {
-    u8    unk0[4];
+    s32   n00;                  // 0x00  } reset to 0 and -1 by fn_8001BE88
     s32   uFlags;               // 0x04  fn_8007325C sets bit 2, fn_8007326C clears bits 1 and 2
-    u8    unk8[4];
+    s32   n08;                  // 0x08  }
     s32   nC;                   // 0x0C  } set together by fn_800958EC
     f32   f10;                  // 0x10  }
     u8    unk14[4];
@@ -497,18 +500,25 @@ typedef struct Character {
     f32   f1634;                // 0x1634
     f32   v1638[3];             // 0x1638
     f32   f1644;                // 0x1644
-    u8    unk1648[0x1654 - 0x1648];
+    u8    unk1648[0x1650 - 0x1648];
+    s32   n1650;                // 0x1650  cleared by fn_8001942C
     s32   n1654;                // 0x1654  (fn_8001EE90)
     s32   n1658;                // 0x1658
     f32   f165C;                // 0x165C  } scaled by the view's lens (fn_8001EE00, fn_8001ED44)
     f32   f1660;                // 0x1660  }
-    u8    unk1664[0x1698 - 0x1664];
+    f32   f1664;                // 0x1664  } fn_8001B878: 1 near the camera, fading to 0 from 6 to 15
+    f32   v1668[3];             // 0x1668  } its bounding sphere, tested against the camera
+    f32   f1674;                // 0x1674  } (fn_8001B878)
+    f32   vMin[4];              // 0x1678  } the box around its bones (fn_8001B644), grown by 0.33;
+    f32   vMax[3];              // 0x1688  } v1668 and f1674 are its centre and half its diagonal
+    u8    unk1694[0x1698 - 0x1694];
     s32   n1698;                // 0x1698
     s32   nClubClass;           // 0x169C  the club class for clip lookups (Char_SetClip; 1 looks up as 0)
     s32   nClubHeadBone;        // 0x16A0  bone 0x53's index: the club head (the swing trail's end)
     s32   nGripBone;            // 0x16A4  bone 0x52's index: the grip (the trail's other end)
     s32   n16A8;                // 0x16A8  fn_8001EEE4's answer for bone 0x15
-    u8    unk16AC[0x16CC - 0x16AC];
+    f32   q16AC[4];             // 0x16AC  } the grip bone's rotation and offset from the root while
+    f32   v16BC[4];             // 0x16BC  } flag 0x4000 holds it (fn_8001BD18)
     s32   nClub;                // 0x16CC  the club (fn_8001C774)
     s32   nShotKind;            // 0x16D0  the player's shot kind (fn_8001C724)
     s32   n16D4;              // 0x16D4  the key for clip lookups (Char_SetClip)
@@ -523,7 +533,7 @@ typedef struct Character {
     f32   afGroundHeight[4];    // 0x1774  }
     s32   n1784;                // 0x1784  set to -1 by Character_SetPosition
     Clip* pCurClip;             // 0x1788  the clip Char_SetClip picked
-    u8    unk178C[0x1790 - 0x178C];
+    s32   n178C;                // 0x178C  cleared by fn_8001BE88
     Clip* p1790;                // 0x1790  cleared by fn_80062BFC; CharacterState_AddSKABlendData plays it for
                                 //         groups 5, 6 and 10
     void* p1794;                // 0x1794  cleared by fn_80062BE8; the same for group 9
@@ -535,7 +545,8 @@ typedef struct Character {
                                 //         fn_8001A9F4); fn_8001DC64 applies them
     void (*pfn17B0)(void);      // 0x17B0  called by Character_UpdateAnimation before the bones are
                                 //         transformed; cleared by fn_8001942C
-    u8    unk17B4[0x17B8 - 0x17B4];
+    u8    b17B4;                // 0x17B4  cleared by fn_8001942C
+    u8    unk17B5[0x17B8 - 0x17B5];
     struct SkinChoices* pChoices;   // 0x17B8  its look (fn_8001D4A4 dresses it from this); fn_8001A20C
                                     //         puts its logos on the model (fn_8001744C)
 } Character;
@@ -659,6 +670,8 @@ int   fn_8001EED8(CharModel* pModel, int nBone);    // a bone's index
 int   fn_8001EEE4(CharModel* pModel, int nBone);
 f32   fn_8001F02C(struct ClipBlend* pBlend, u64 uEvent);   // an event's time (by its 64-bit id)
 void  Anim_SetRate(u8* pAnim, f32 fRate);           // 0x8001F084
+// Plays a clip on the character: blended in from the current one, or (bNoBlend) from scratch.
+void  fn_8001BE88(Character* pChar, Clip* pClip, int bNoBlend, f32 fTime);
 void  fn_8001E85C(f32* pSrc, f32* pDst);            // copy a quaternion
 void  SKEL_SetIKSolutionWeight(Skeleton* pSkel, f32 f);
 void  fn_80027108(Skeleton* pSkel);                                         // Skeleton.c
@@ -914,6 +927,35 @@ typedef struct MalBank {
     MalGroup aGroup[3];         // 0x04
 } MalBank;
 LAYOUT_ASSERT(MalBank, 0x1C);
+
+// An animation library as fn_8001F110 byte-swaps and links it in place (MtaLib, MtaRecord and
+// MtaEntry are our names): a 0x34-byte header, its records, each record's entries, then each
+// entry's data (4-byte aligned).
+typedef struct MtaEntry {
+    u8     unk00[0x24];
+    s32    nBytes;              // 0x24  the bytes of its data
+    u8     unk28[0x3C - 0x28];
+    u8*    pData;               // 0x3C
+    u8     unk40[0x48 - 0x40];
+} MtaEntry;
+LAYOUT_ASSERT(MtaEntry, 0x48);
+
+typedef struct MtaRecord {
+    u8     unk00[0x24];
+    s32    nEntries;            // 0x24
+    MtaEntry* pEntries;         // 0x28
+} MtaRecord;
+LAYOUT_ASSERT(MtaRecord, 0x2C);
+
+typedef struct MtaLib {
+    u8     unk00[0x20];
+    s32    nRecords;            // 0x20
+    u8     unk24[0x30 - 0x24];
+    MtaRecord* pRecords;        // 0x30
+} MtaLib;
+LAYOUT_ASSERT(MtaLib, 0x34);
+
+MtaLib* fn_8001F110(MtaLib* pLib, s32* pnSize);    // char.c: swap and link a library; *pnSize: its bytes
 
 MalBank* fn_8001F760(int nBank);
 void*    fn_8001F79C(MalBank* pBank, int nGroup, int n);
