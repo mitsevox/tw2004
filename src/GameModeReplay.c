@@ -118,7 +118,7 @@ void GameModeReplay_SetupNextGolfer(void) {
     gPlayers[0].fDistance = gReplayData.player.fDistance;
     gPlayers[0].fDistance2 = gReplayData.player.fDistance2;
     Mem_cpy(&gPlayers[0].ball, &gReplayData.player.ball, sizeof(Ball));
-    fn_80055AA8(&ball, gReplayData.player.ball.vPos, 0);
+    Physics_InitBall(&ball, gReplayData.player.ball.vPos, 0);
     gPlayers[0].ball.pCourse = ball.pCourse;
     gPlayers[0].ball.nPlayer = 0;
     Physics_DropBall(&ball, gReplayData.player.ball.vPos);

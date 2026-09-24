@@ -577,7 +577,7 @@ void PlaceBall_Set(int nPlayer, f32* pPos) {
 
     gPlayers[nPlayer].vPlacement[0] = pPos[0];
     gPlayers[nPlayer].vPlacement[2] = pPos[2];
-    fHeight = Terrain_HeightAt(gPlayers[nPlayer].vPlacement, NULL);
+    fHeight = CamScript_GuessBestPlayableHeight(gPlayers[nPlayer].vPlacement, NULL);
     if (TER_NO_GROUND != fHeight) {
         gPlayers[nPlayer].vPlacement[1] = 0.001f + fHeight;
     }

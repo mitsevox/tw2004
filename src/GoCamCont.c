@@ -316,7 +316,7 @@ void fn_8006351C(View* pView, int nPlayer, int nKind) {
     }
     pView->script.fCamTime = 0.0f;
     pView->script.pShot = pShot;
-    fn_8003DCE8(nPlayer, pPos, pAt, &pView->script, &pView->shot19C, 0, 0.0f);
+    CamScript_RunScript(nPlayer, pPos, pAt, &pView->script, &pView->shot19C, 0, 0.0f);
 }
 
 // The player's target is on screen, 0.1 in from the edges.

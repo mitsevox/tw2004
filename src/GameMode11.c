@@ -321,7 +321,7 @@ void fn_80100508(void) {
         pCourse = fn_8000C594();
         Vec_Copy(&pCourse->tee[gSession.nTeeSet[0]].x, gPlayers[0].vBall);
     } else {
-        fHeight = Terrain_HeightAt(lbl_80192DF8[n].vPos, NULL);
+        fHeight = CamScript_GuessBestPlayableHeight(lbl_80192DF8[n].vPos, NULL);
         if (-65536.125f != fHeight) {
             lbl_80192DF8[n].vPos[1] = fHeight;
         }
@@ -329,7 +329,7 @@ void fn_80100508(void) {
     }
     Vec_Copy(gPlayers[0].vBall, gPlayers[0].vPreShot);
     Vec_Copy(gPlayers[0].vBall, gPlayers[0].ball.vPos);
-    fn_80055AA8(&gPlayers[0].ball, gPlayers[0].vBall, 0);
+    Physics_InitBall(&gPlayers[0].ball, gPlayers[0].vBall, 0);
     // EA bug: always true (|| where && was meant), so the ball is always dropped.
     if (lbl_802823FC != 1 || lbl_802823FC != 8 || lbl_802823FC != 9 || lbl_802823FC != 11) {
         Physics_DropBall(&gPlayers[0].ball, gPlayers[0].vBall);

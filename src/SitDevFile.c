@@ -536,7 +536,7 @@ void FE_GolferAttributes(int nPlayer, u8 nKind) {
         nValue = fn_800D0514(nPlayer);
         fn_800BCA60(&nValue, nBeforeSurface, pBefore, pPlayer);
         fn_80067B1C(pValues, 27, nValue, pSetBits);
-        // the lie, in percent (fn_800510EC inlined)
+        // the lie, in percent (Physics_GetLiePowerPercentage inlined)
         nValue = SurfaceType_IsValid(pBall->nStartSurface) ?
                  (u32)(100.0f * (pBall->f70 + gSurfaceTypes[pBall->nStartSurface].f00)) : 100;
         fn_80067B1C(pValues, 58, nValue, pSetBits);

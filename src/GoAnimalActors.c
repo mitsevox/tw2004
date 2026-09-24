@@ -100,7 +100,7 @@ void ActAnimal_SetWorldMatrix(DynObjAnimal* pAnimal, f32 fDt) {
         vGround[1] = 10.0f + pAnimal->base.obj.m80[3][1];
         vGround[2] = pAnimal->base.obj.m80[3][2];
         vGround[3] = 1.0f;
-        fGround = fn_8004D620(pCourse, vGround);
+        fGround = Ter_GetSupportingGroundHeight(pCourse, vGround);
         if (-65536.125f != fGround) {
             pAnimal->base.obj.m80[3][1] = fGround;
         }
@@ -258,7 +258,7 @@ void fn_8004A24C(DynObjAnimal* pAnimal, DynObjSetup* pSetup) {
             fY = pAnimal->pRoute->aNodes[i].vPos[1];
             vPos[3] = 1.0f;
             if (pCourse != NULL) {
-                fGround = fn_8004D620(pCourse, vPos);
+                fGround = Ter_GetSupportingGroundHeight(pCourse, vPos);
                 if (fGround != -65536.125f) {
                     if (fY - fGround < 0.5f && pAnimal->f198 != -999.0f) {
                         pAnimal->b1BD = 1;

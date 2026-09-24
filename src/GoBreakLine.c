@@ -128,9 +128,9 @@ void BreakLine_Step(int nView) {
         if (lbl_80282228->abA91C[nView]) {
             if ((lbl_80282228->aBall[nView].nState == 2 || lbl_80282228->aBall[nView].nState == 3 ||
                  lbl_80282228->aBall[nView].nState == 4) && fDist > 0.001f) {
-                Ball_SetSimulating(1);
-                Ball_SimStep(&lbl_80282228->aBall[nView], lbl_80282228->fAAE0, lbl_80282228->fAAE4);
-                Ball_SetSimulating(0);
+                fn_80050D24_SetSimulating(1);
+                fn_8005585C_SimForTime(&lbl_80282228->aBall[nView], lbl_80282228->fAAE0, lbl_80282228->fAAE4);
+                fn_80050D24_SetSimulating(0);
                 fDist = fn_800BB028(lbl_80282228->aBall[nView].vPos,
                                     &lbl_80282228->aBall[nView].pCourse->pin[Game_CurrentPinSet()].x);
                 if (fDist < lbl_80282228->afAAD4[nView]) {
@@ -275,11 +275,11 @@ void BreakLine_Start(int nView) {
                 nTex = 0;
             }
         }
-        Ball_SetSimulating(1);
+        fn_80050D24_SetSimulating(1);
         lbl_80282228->aBall[nView].nState = 0;
-        Ball_Launch(&lbl_80282228->aBall[nView], pPlayer->nClub, pPlayer->nShotKind, fPower,
+        Physics_ShotImpact(&lbl_80282228->aBall[nView], pPlayer->nClub, pPlayer->nShotKind, fPower,
                     pPlayer->fAim, 1, pPlayer->vLaunchA, pPlayer->vLaunchB);
-        Ball_SetSimulating(0);
+        fn_80050D24_SetSimulating(0);
     }
 }
 

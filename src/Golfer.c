@@ -470,7 +470,7 @@ int AI_ShotKindForDistance(int nPlayer, f32 fDist) {
     case 8: {
         int     nKind = SHOT_TYPE_DRIVE_e;
         Player* p     = &gPlayers[nPlayer];
-        fDist /= fn_800510EC(&p->ball);
+        fDist /= Physics_GetLiePowerPercentage(&p->ball);
         if (p->ball.nLie == LIE_GREEN_e || AI_GreenTowardPin(nPlayer, 1.5f)) {
             nKind = SHOT_TYPE_PUTT_e;
         } else if ((p->golfer.uBagMask & (1 << 21)) && fDist < 15.0f && AI_GreenTowardPin(nPlayer, 5.0f) &&
@@ -519,7 +519,7 @@ int AI_ClubForShot(int nPlayer, int nKind, u8 bUnderOnly, f32 fDist) {
         nClub = AI_FirstUsableClub(nPlayer, nKind);
         if (Game_GetMode() == 6 || Game_GetMode() == 7 || Game_GetMode() == 8 ||
             Controller_IsCPU(p->nController)) {
-            fDist /= fn_800510EC(&p->ball);
+            fDist /= Physics_GetLiePowerPercentage(&p->ball);
         }
         for (c = 0; c < CLUB_MAX_e; c++) {
             if (c == CLUB_PUTTER_e) continue;
@@ -563,7 +563,7 @@ f32 AI_PowerForTarget(int nPlayer) {
         return fn_80050D34(p->fDistance);
     }
     if (p->nShotKind == SHOT_TYPE_CHIP_e) {
-        return fn_80050F88(p->fDistance, &p->ball, SHOT_TYPE_CHIP_e, p->nClub);
+        return Physics_EstimateShotPower(p->fDistance, &p->ball, SHOT_TYPE_CHIP_e, p->nClub);
     }
     return p->fDistance / AI_MaxDistance(nPlayer, p->nShotKind, p->nClub);
 }
@@ -613,7 +613,7 @@ void AI_PlanShot(int nPlayer, f32* pTarget) {
     int          nType;
 
     Vec_Copy(pTarget, gPlayers[nPlayer].vTarget);
-    fHeight = Terrain_HeightAt(gPlayers[nPlayer].vTarget, &pSurface);
+    fHeight = CamScript_GuessBestPlayableHeight(gPlayers[nPlayer].vTarget, &pSurface);
     gPlayers[nPlayer].uFlagsEF0 &= ~2;
     if (pSurface != NULL) {
         nType = pSurface - gSurfaceTypes;
@@ -1043,22 +1043,22 @@ u8 AI_RehearseShot(int nPlayer, f32* pOutDist2, u8 bFast, f32 fTolerance) {
         if (fPower > 1.5f) {
             fPower = 1.5f;
         }
-        Ball_SetSimulating(1);
+        fn_80050D24_SetSimulating(1);
         // Always the normal trajectory.
-        Ball_Launch(&gSimBall, p->nClub, p->nShotKind, fPower, p->fAim, 1, p->vLaunchA, p->vLaunchB);
-        Ball_SetSimulating(0);
+        Physics_ShotImpact(&gSimBall, p->nClub, p->nShotKind, fPower, p->fAim, 1, p->vLaunchA, p->vLaunchB);
+        fn_80050D24_SetSimulating(0);
         p->nRehearseState = 1;
         break;
 
     case 1:     // step
         gSimAborted = 0;
-        Ball_SetSimulating(1);
+        fn_80050D24_SetSimulating(1);
         if (bFast) {
-            Ball_SimStep(&gSimBall, 0.1f, 1.0f);
+            fn_8005585C_SimForTime(&gSimBall, 0.1f, 1.0f);
         } else {
-            Ball_SimStep(&gSimBall, 0.2f, 1.0f);
+            fn_8005585C_SimForTime(&gSimBall, 0.2f, 1.0f);
         }
-        Ball_SetSimulating(0);
+        fn_80050D24_SetSimulating(0);
         if (gSimAborted) {
             if (gSimHaveResult) {
                 p->vTarget[0]       = gSimBestAim[0];
@@ -1414,7 +1414,7 @@ u8 AI_GreenTowardPin(int nPlayer, f32 fDist) {
     Vec_Normalize(vDir, vDir);
     vDir[0] = gPlayers[nPlayer].ball.vPos[0] + vDir[0] * fDist;
     vDir[2] = gPlayers[nPlayer].ball.vPos[2] + vDir[2] * fDist;
-    fHeight = fn_8004D5C0(pCourse, vDir);
+    fHeight = Ter_GetHighestGroundHeight(pCourse, vDir);
     if (fHeight != TER_NO_GROUND) {
         vDir[1]  = 10.0f + fHeight;
         pSurface = fn_800CC190(pCourse, vDir);

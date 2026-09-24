@@ -175,7 +175,7 @@ void  fn_8003349C(f32 a, f32 b, f32 c);
 void  fn_800D8D10(int nPlayer);
 void  PlaceBall_ResetMomentums(int nPlayer);
 void  fn_80062D98(void);
-void  fn_80047EF0(Ball* pBall, int nPlayer, int a);  // tee the ball up
+void  DynObj_TeeAdd(Ball* pBall, int nPlayer, int a);  // tee the ball up
 void  fn_800A573C(u8 nPlayer);
 void  fn_800A3CB0(f32* pPos, int nPlayer);
 void  fn_800A3D6C(f32* pPos, int nPlayer);
@@ -544,7 +544,7 @@ f32 Swing_ComputePower(int nPlayer) {
     case SHOT_TYPE_PITCH_e: {
         f32 f = *pPower;
         if (p->nShotKind == SHOT_TYPE_CHIP_e) {
-            f = *pPower * fn_80050F88(p->fDistance, &p->ball, SHOT_TYPE_CHIP_e, p->nClub);
+            f = *pPower * Physics_EstimateShotPower(p->fDistance, &p->ball, SHOT_TYPE_CHIP_e, p->nClub);
         }
         fPower = Swing_ApplyPowerBoost(nPlayer, f);
         Golfer_GetAttribute(p, ATTR_APPROACH, ATTR_TOTAL);
@@ -603,7 +603,7 @@ f32 fn_8005B64C(int nPlayer) {
 // The ball is struck. A replay (mode 10) reseeds the RNG and restores player 0's swing state;
 // otherwise the lucky-shot swap runs first. Then the meter's miss (zero for a CPU or a perfect
 // shot), the power, forgiveness, the launch blocks, and the aim - the player's aim plus the
-// face vector's angle plus the miss - go to Ball_Launch.
+// face vector's angle plus the miss - go to Physics_ShotImpact.
 void Swing_Launch(int nPlayer) {
     f32*    pLaunchB;
     f32*    pLaunchA;
@@ -663,7 +663,7 @@ void Swing_Launch(int nPlayer) {
     while (fAim > PI) {
         fAim -= 2 * PI;
     }
-    Ball_Launch(pBall, nClub, nKind, gPlayers[nPlayer].swing.fShotPower, fAim, nTrajectory, pLaunchA,
+    Physics_ShotImpact(pBall, nClub, nKind, gPlayers[nPlayer].swing.fShotPower, fAim, nTrajectory, pLaunchA,
                 pLaunchB);
 }
 
@@ -2877,7 +2877,7 @@ void STATEFUNC_ShotSetupInit(int nPlayer) {
         fn_800957FC(gPlayers[nPlayer].pChar, 1);
         fn_800957B0(gPlayers[nPlayer].pChar, 1);
     }
-    fn_80054A6C(pBall);
+    Physics_InitShotData(pBall);
     gPlayers[nPlayer].fA64 = fn_800D04AC(nPlayer);
     EVENT_Trigger(nPlayer, 6, 0, -1);
 }
@@ -3022,7 +3022,7 @@ void STATEFUNC_PlaceBallUpdate(int nPlayer) {
             pBall = &p->ball;
             if (Physics_DropBall(pBall, p->vPlacement)) {
                 if (gSurfaceTypes[gPlayers[nPlayer].ball.nSurface].nClass == 1) {
-                    fn_80055AA8(pBall, pBall->vPos, nPlayer);
+                    Physics_InitBall(pBall, pBall->vPos, nPlayer);
                 }
                 Vec_Copy(pBall->vPos, p->vBall);
                 GOLFERSTATE_Switch(GS_PRE_SHOT, nPlayer);
@@ -3130,9 +3130,9 @@ void STATEFUNC_GreenWatchRollUpdate(int nPlayer) {
         return;
     }
     for (i = 0; i < nSteps; i++) {
-        Ball_SetSimulating(1);
+        fn_80050D24_SetSimulating(1);
         Physics_Simulate(&gPlayers[nPlayer].ballBefore, 20);
-        Ball_SetSimulating(0);
+        fn_80050D24_SetSimulating(0);
         if (gPlayers[nPlayer].ballBefore.nState == 1 || gPlayers[nPlayer].ballBefore.nState == 5) {
             if (!fn_80063C90(fn_80017028(gPlayers[nPlayer].nView[0]))) {
                 CameraController_FadeOut(fn_80017028(gPlayers[nPlayer].nView[0]), 0.25f, (f32*)&vOffset);
@@ -3234,7 +3234,7 @@ void STATEFUNC_ReplaySwingInit(int nPlayer) {
     }
     Swing_ClearFrameFlag(nPlayer);
     if (gPlayers[nPlayer].ball.nLie == 0) {
-        fn_80047EF0(&gPlayers[nPlayer].ball, nPlayer, 1);
+        DynObj_TeeAdd(&gPlayers[nPlayer].ball, nPlayer, 1);
     }
     pBall = &gPlayers[nPlayer].ball;
     fn_80047B6C(pBall, nPlayer);
@@ -3344,7 +3344,7 @@ void STATEFUNC_PreShotInit(int nPlayer) {
     BreakLine_Start(gPlayers[nPlayer].nView[0]);
     fn_8009B970(gPlayers[nPlayer].nView[0]);
     if (gPlayers[nPlayer].ball.nLie == 0) {
-        fn_80047EF0(&gPlayers[nPlayer].ball, nPlayer, 1);
+        DynObj_TeeAdd(&gPlayers[nPlayer].ball, nPlayer, 1);
     }
     fn_80016CFC(gPlayers[nPlayer].nView[0])->bFlagOut = 1;
     if (gPlayers[nPlayer].ball.nLie != 10 && gPlayers[nPlayer].ball.nLie != LIE_GREEN_e &&
@@ -3352,7 +3352,7 @@ void STATEFUNC_PreShotInit(int nPlayer) {
         fn_80016CFC(gPlayers[nPlayer].nView[0])->bFlagOut = 0;
     }
     pBall = &gPlayers[nPlayer].ball;
-    fn_80054A6C(pBall);
+    Physics_InitShotData(pBall);
     Mem_cpy(&gPlayers[nPlayer].ballBefore, pBall, sizeof(Ball));
     gPlayers[nPlayer].fA64 = fn_800D04AC(nPlayer);
     EVENT_Trigger(nPlayer, 3, 0, -1);
@@ -3396,7 +3396,7 @@ void STATEFUNC_PreShotUpdate(int nPlayer) {
         if (fn_80048574(gPlayers[nPlayer].pChar, 3)) {
             if (fn_80062BB0(gPlayers[nPlayer].pChar, 3)) {
                 fn_80062B98(gPlayers[nPlayer].pChar, 3);
-                if (!fn_800559BC(&gPlayers[nPlayer].ball, gPlayers[nPlayer].ball.vPos)) {
+                if (!Physics_SetBallPosition(&gPlayers[nPlayer].ball, gPlayers[nPlayer].ball.vPos)) {
                     Physics_DropBall(&gPlayers[nPlayer].ball, gPlayers[nPlayer].ball.vPos);
                 }
             } else {
@@ -3423,23 +3423,23 @@ void STATEFUNC_PreShotUpdate(int nPlayer) {
         if (fn_80062BB0(gPlayers[nPlayer].pChar, 3)) {
             fn_80062B98(gPlayers[nPlayer].pChar, 3);
             gPlayers[nPlayer].ball.vPos[1] += 2.0f;
-            fn_80055AA8(&gPlayers[nPlayer].ball, gPlayers[nPlayer].ball.vPos, nPlayer);
-            fn_80047EF0(&gPlayers[nPlayer].ball, nPlayer, 0);
+            Physics_InitBall(&gPlayers[nPlayer].ball, gPlayers[nPlayer].ball.vPos, nPlayer);
+            DynObj_TeeAdd(&gPlayers[nPlayer].ball, nPlayer, 0);
         } else {
             Character_GetBallOnFingerPosition(gPlayers[nPlayer].pChar, gPlayers[nPlayer].ball.vPos);
             fn_8001DA04(gPlayers[nPlayer].pChar, pSlot->v30, pSlot->v50);
             bInHand = 1;
         }
     } else if (gPlayers[nPlayer].ball.nLie == 0) {
-        fn_80047EF0(&gPlayers[nPlayer].ball, nPlayer, 0);
+        DynObj_TeeAdd(&gPlayers[nPlayer].ball, nPlayer, 0);
     }
     if (gPlayers[nPlayer].ball.nState != 0 && gPlayers[nPlayer].ball.nCollideCount == 0) {
         nSteps = GameEffects_BallUpdatesThisFrame(nPlayer);
-        Ball_SetSimulating(1);
+        fn_80050D24_SetSimulating(1);
         for (i = 0; i < nSteps; i++) {
             Physics_Simulate(&gPlayers[nPlayer].ball, 20);
         }
-        Ball_SetSimulating(0);
+        fn_80050D24_SetSimulating(0);
     } else if (gPlayers[nPlayer].ball.nState != 0) {
         Physics_DropBall(&gPlayers[nPlayer].ball, gPlayers[nPlayer].ball.vPos);
     }
@@ -3474,7 +3474,7 @@ void STATEFUNC_PreShotUpdate(int nPlayer) {
             if (fn_80095780(gPlayers[nPlayer].pChar) == 10) {
                 Physics_DropBall(&gPlayers[nPlayer].ball, gPlayers[nPlayer].vBall);
             } else {
-                fn_80055AA8(&gPlayers[nPlayer].ball, gPlayers[nPlayer].ball.vPrev, nPlayer);
+                Physics_InitBall(&gPlayers[nPlayer].ball, gPlayers[nPlayer].ball.vPrev, nPlayer);
             }
         }
         GOLFERSTATE_Switch(GS_SHOT_SETUP, nPlayer);
@@ -3519,7 +3519,7 @@ void STATEFUNC_RemoveBallUpdate(int nPlayer) {
                  gPlayers[nPlayer].ball.vPos);
         Vec3Copy(pBall->vPos, vPos);
         vPos[1] += 30.0f;
-        fGround = fn_8004D620(fn_8000C594(), vPos);
+        fGround = Ter_GetSupportingGroundHeight(fn_8000C594(), vPos);
         if (!(fGround < -60000.0f)) {
             if (gPlayers[nPlayer].ball.vPos[1] - gRealBallRadiusIn / 36.0f < fGround) {
                 gPlayers[nPlayer].ball.vPos[1] = fGround + gRealBallRadiusIn / 36.0f;
@@ -3544,7 +3544,7 @@ void STATEFUNC_RemoveBallUpdate(int nPlayer) {
                     fSpeed = fSpeed / 2.0f;
                     fn_80062B98(gPlayers[nPlayer].pChar, 4);
                     gPlayers[nPlayer].ballBefore.bHoled = 0;
-                    fn_80051A18(&p->ballBefore, vDir, fSpeed, pB->vPos);
+                    Physics_ThrowBall(&p->ballBefore, vDir, fSpeed, pB->vPos);
                 }
             }
         }
@@ -3555,12 +3555,12 @@ void STATEFUNC_RemoveBallUpdate(int nPlayer) {
                 if (nState != 1 && nState != 5 && nState != 0) {
                     Player* p;
                     Ball*   pKept;
-                    Ball_SetSimulating(1);
+                    fn_80050D24_SetSimulating(1);
                     p     = &gPlayers[nPlayer];
                     pKept = &p->ballBefore;
                     Physics_Simulate(pKept, 20);
                     Vec3Copy(pKept->vPos, p->ball.vPos);
-                    Ball_SetSimulating(0);
+                    fn_80050D24_SetSimulating(0);
                 }
             }
         }
@@ -3731,7 +3731,7 @@ void STATEFUNC_SwingInit(int nPlayer) {
     Caddie_Start(nPlayer);
     fn_80062C5C();
     if (gPlayers[nPlayer].ball.nLie == 0) {
-        fn_80047EF0(&gPlayers[nPlayer].ball, nPlayer, 1);
+        DynObj_TeeAdd(&gPlayers[nPlayer].ball, nPlayer, 1);
         for (i = 0; i < gSession.nNumPlayers; i++) {
             pBall = &PLAYER(i)->ball;
             fn_80047B6C(pBall, i);

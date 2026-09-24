@@ -60,8 +60,8 @@ typedef struct CamShot {
     f32  f7C;                   // 0x7C
     f32  f80;                   // 0x80
     f32  f84;                   // 0x84
-    f32  f88;                   // 0x88  fn_8003DCE8 hands it (plus fn_800DC45C of it) to fn_800457B8
-    f32  f8C;                   // 0x8C  } fn_8003DCE8 passes both to fn_80038054 (slow motion) when
+    f32  f88;                   // 0x88  CamScript_RunScript hands it (plus fn_800DC45C of it) to fn_800457B8
+    f32  f8C;                   // 0x8C  } CamScript_RunScript passes both to fn_80038054 (slow motion) when
     f32  f90;                   // 0x90  } either is above 0
     f32  f94;                   // 0x94
     f32  f98;                   // 0x98
@@ -200,20 +200,20 @@ typedef struct CamScript {
     f32  v40[4];                // 0x40  the move's vector (CameraController_FadeIn, CameraController_FadeOut, fn_80063CBC)
     f32  v50[4];                // 0x50  the ball-flight camera: where the shot should land (the aim, at
                                 //       the club's full distance)
-    f32  v60[4];                // 0x60  fn_8003DCE8: how far the camera moved this frame (0 when
-                                //       fn_80043388 holds)
+    f32  v60[4];                // 0x60  CamScript_RunScript: how far the camera moved this frame (0 when
+                                //       CameraScript_SnapToScript holds)
     f32  v70[4];                // 0x70  (0, 0, 0, 1) when the view is set up (fn_80062E40)
     f32  fCamTime;              // 0x80  time on this camera
-    f32  f84;                   // 0x84  fCamTime before this frame's step (fn_8003DCE8)
+    f32  f84;                   // 0x84  fCamTime before this frame's step (CamScript_RunScript)
     f32  f88;                   // 0x88  a second clock, stepped with fCamTime
     f32  f8C;                   // 0x8C  how long the next shot lasts (its f48; fn_8006351C)
     f32  f90;                   // 0x90  } the move's time so far and its length: CameraController_FadeIn sets
     f32  f94;                   // 0x94  } 0 and its time
     f32  f98;                   // 0x98
-    f32  f9C;                   // 0x9C  CamScript_GetLookAtPoint hands it to fn_800418B0 (f98 at its end)
+    f32  f9C;                   // 0x9C  CamScript_GetLookAtPoint hands it to CameraScript_CalculateShoulderShake (f98 at its end)
     f32  fA0;                   // 0xA0
     f32  fA4;                   // 0xA4
-    f32  fA8;                   // 0xA8  the current shot's f9C (fn_8003DCE8)
+    f32  fA8;                   // 0xA8  the current shot's f9C (CamScript_RunScript)
     CamShot* pShot;             // 0xAC  the current shot
     CamShot* pNextShot;         // 0xB0  the next one (the current shot's p40; fn_8006351C)
     CamShot* pB4;               // 0xB4  where SwitchCrAPCamera records the current camera
@@ -228,7 +228,7 @@ typedef struct CamScript {
     u8   bCF;                   // 0xCF
     s32  nD0;                   // 0xD0
     f32  fD4;                   // 0xD4  the camera's speed when the script moves to the next shot
-                                //       (fn_8003DCE8)
+                                //       (CamScript_RunScript)
     f32  fD8;                   // 0xD8  camera 8: the ground height it follows (fn_8003B534 measures
                                 //       the ball's height over it)
     f32  fDC;                   // 0xDC
@@ -356,20 +356,20 @@ typedef struct CamTuning {
     f32  fC4;                   // 0x0C4
     f32  fC8;                   // 0x0C8
     f32  fCC;                   // 0x0CC
-    f32  fD0;                   // 0x0D0  fn_80043420: how fast the aim comes down to a shot's f6C height
-    f32  fD4;                   // 0x0D4  fn_80041EA8: the aim eases in over this much of a move's time
+    f32  fD0;                   // 0x0D0  CameraScript_GetBallHeightWithMaxHeight: how fast the aim comes down to a shot's f6C height
+    f32  fD4;                   // 0x0D4  CameraScript_LagBallFlight: the aim eases in over this much of a move's time
     f32  fD8;                   // 0x0D8  CamScript_GetLookAtPoint: CameraScript_LagAimMarker's first lag
     f32  fDC;                   // 0x0DC  the green zoom-to-aim camera's aim marker (CameraScript_LagAimMarker)
-    f32  fE0;                   // 0x0E0  fn_8003EE68: CamScript.fD8's share of the way to the ground
+    f32  fE0;                   // 0x0E0  CamScript_SmoothTerrainHeight: CamScript.fD8's share of the way to the ground
                                 //        height a frame
-    f32  fE4;                   // 0x0E4  CamScript_GetLookAtPoint: the aim's lag on the ball (fn_800422C4,
-                                //        fn_8004349C); also put in CamScript.fDC
-    f32  fE8;                   // 0x0E8  ... its lag on a bone of the golfer (fn_800422C4)
+    f32  fE4;                   // 0x0E4  CamScript_GetLookAtPoint: the aim's lag on the ball (CameraScript_LagTargetPoint,
+                                //        CameraScript_KeepPointInView); also put in CamScript.fDC
+    f32  fE8;                   // 0x0E8  ... its lag on a bone of the golfer (CameraScript_LagTargetPoint)
     f32  fEC;                   // 0x0EC  CamScript_CheckOutOfBounds: the camera time before it checks
                                 //        the hole's outline
     f32  fF0;                   // 0x0F0  CameraScript_LagAimMarker: the aim closer than this (over the
                                 //        lens's fB0, times the drop to it) is pushed out to it
-    f32  fF4;                   // 0x0F4  fn_80043C74: a spot is taken when the dot product of its level
+    f32  fF4;                   // 0x0F4  CamScript_GetCameraOnFairwayPos: a spot is taken when the dot product of its level
                                 //        direction to the ball with the camera's is below this
     f32  fF8;                   // 0x0F8
     f32  fFC;                  // 0x0FC  CameraScript_IsDefaultSwingCam: the least dot product of the
@@ -379,33 +379,33 @@ typedef struct CamTuning {
     f32  f104;                  // 0x104  ... after this long on the camera ...
     f32  f108;                  // 0x108  ... and while the ball heads away from the camera (a dot
                                 //        product at most this)
-    f32  f10C;                  // 0x10C  fn_80043C74: the camera's height over the ground at the spot
+    f32  f10C;                  // 0x10C  CamScript_GetCameraOnFairwayPos: the camera's height over the ground at the spot
     f32  f110;                  // 0x110  CamScript_UpdateFairwayCam: the shot's field of view narrows
                                 //        down to this ...
     f32  f114;                  // 0x114  CamScript_PutBackOnFairway: its shot's field of view
     f32  f118;                  // 0x118  ... by this a frame (CamScript_UpdateFairwayCam)
-    f32  f11C;                  // 0x11C  fn_800418B0: a shot's f94 over this is its wobble's size
-    f32  f120;                  // 0x120  fn_800439E4: a camera closer to the pin than this (level, times
+    f32  f11C;                  // 0x11C  CameraScript_CalculateShoulderShake: a shot's f94 over this is its wobble's size
+    f32  f120;                  // 0x120  CamScript_CheckObstructedCamera: a camera closer to the pin than this (level, times
                                 //        the lens's fB0) ...
     f32  f124;                  // 0x124  ... and less than this above it counts as in the way
     f32  f128;                  // 0x128  CamScript_GetLookAtPoint: the least level distance for the
                                 //        steep-aim limit
     f32  f12C;                  // 0x12C  CameraScript_LagAimMarker: the most the aim may sit below the camera
-    f32  f130;                  // 0x130  Terrain_HeightAt: the headroom a camera needs over a ground layer
-    f32  f134;                  // 0x134  fn_800422C4: the look-at point eases in slower within this share
+    f32  f130;                  // 0x130  CamScript_GuessBestPlayableHeight: the headroom a camera needs over a ground layer
+    f32  f134;                  // 0x134  CameraScript_LagTargetPoint: the look-at point eases in slower within this share
                                 //        of the (field-of-view scaled) camera distance
-    f32  f138;                  // 0x138  fn_80041EA8: the aim's most share of the way a step ...
+    f32  f138;                  // 0x138  CameraScript_LagBallFlight: the aim's most share of the way a step ...
     f32  f13C;                  // 0x13C  ... reached at this distance from it
-    f32  f140;                  // 0x140  fn_80041EA8: its height share for a falling ball near the ground
-    f32  f144;                  // 0x144  fn_800422C4: the look-at point's level share of the way a frame
+    f32  f140;                  // 0x140  CameraScript_LagBallFlight: its height share for a falling ball near the ground
+    f32  f144;                  // 0x144  CameraScript_LagTargetPoint: the look-at point's level share of the way a frame
     f32  f148;                  // 0x148  ... and its height's
     f32  f14C;                  // 0x14C  } fn_8003B028: how fast a following camera closes the
     f32  f150;                  // 0x150  } distance and the angle to its target, per 60th
     f32  f154;                  // 0x154  fn_8003B028: they ease in over this much of CamScript.fCamTime
-    f32  f158;                  // 0x158  fn_80041EA8: the aim eases in over this much of CamScript.f88
+    f32  f158;                  // 0x158  CameraScript_LagBallFlight: the aim eases in over this much of CamScript.f88
     f32  f15C;                  // 0x15C  CameraScript_InterpToNewScript puts it in CamScript.f88 (0 for
                                 //        the default swing camera)
-    f32  f160;                  // 0x160  fn_80041EA8: the power of its height ease-in
+    f32  f160;                  // 0x160  CameraScript_LagBallFlight: the power of its height ease-in
     f32  f164;                  // 0x164  CamScript_GetLookAtPoint: kind 13's share of the height change
                                 //        a frame
     f32  f168;                  // 0x168  the ground clearance for CamScript_KeepAboveGround
@@ -422,7 +422,7 @@ typedef struct CamTuning {
     f32  f19C;                  // 0x19C  the steepest a camera direction may tilt (fn_8003D810, radians)
     f32  f1A0;                  // 0x1A0
     f32  f1A4;                 // 0x1A4  DynamicCam_ChoosePreFlightSequence: the obstruction test's slope
-    f32  f1A8;                  // 0x1A8  fn_8003DCE8: how fast CamScript.fEC follows the ball's updates
+    f32  f1A8;                  // 0x1A8  CamScript_RunScript: how fast CamScript.fEC follows the ball's updates
                                 //        per frame
     f32  f1AC;                  // 0x1AC
     f32  f1B0;                  // 0x1B0
@@ -664,21 +664,21 @@ u8     fn_800453C8(int nPlayer, CamShot* pShot);
 // ---- the camera scripts (gocamscripts.c, 0x8003DCE8..) ----------------------------------------
 
 // pCam and pSub are the view's camera position and where it looks (fn_8001731C, fn_80017314).
-void     fn_8003DCE8(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot* pShot, u8 b,
+void     CamScript_RunScript(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot* pShot, u8 b,
                      f32 fFrameTime);
-void     fn_8003E624(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot* pShot, int a,
+void     CamScript_RunFEScript(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot* pShot, int a,
                      f32 fFrameTime);
-void     fn_8003EA50(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot* pShot, u8 b,
+void     CamScript_RunFlybyCamera(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot* pShot, u8 b,
                      f32 fFrameTime);
 void     fn_8003F2E0(CamScript* pScript, f32 fTime);
 void     CameraScript_RecordCurrentCam(CamShot* pShot, f32* pCam, f32* pSub, int nPlayer, CamScript* pScript,
                                        u8 bView1);
 void     CameraScript_InterpToNewScript(CamScript* pScript, CamShot* pShot, int nPlayer, f32* pCam, f32* pSub,
                                         int nA, f32 f1, f32 f2, int nB, f32 f3);
-u8       fn_80043388(CamScript* pScript, CamShot* pShot);
+u8       CameraScript_SnapToScript(CamScript* pScript, CamShot* pShot);
 void     CameraScript_LagAimMarker(int nPlayer, f32* pSub, f32* pCam, CamShot* pShot, u8 bClose, u8 bLimit,
                                    f32 fRate, f32 fMinDist, f32 fYShare);
-void     fn_80043C74(CamScript* pScript, f32* pOut, f32* pCam, int nPlayer, CamShot* pShot, f32* pSub,
+void     CamScript_GetCameraOnFairwayPos(CamScript* pScript, f32* pOut, f32* pCam, int nPlayer, CamShot* pShot, f32* pSub,
                      f32* pHeight);
 void     CamScript_PutBackOnFairway(CamScript* pScript, f32* pCam, f32* pSub, int nPlayer, CamShot* pShot,
                                     f32* pPrev);
@@ -712,7 +712,7 @@ void   fn_800C7480(f32* pPos0, f32* pPos1, f32* pPos2, f32* pPos3, f32* pLook0, 
                    f32* pLook3, f32* pCam, f32* pSub, f32* pFov, f32 fFov1, f32 fFov2, f32 fT);
 void   fn_800C7898(f32* p0, f32* p1, f32* p2, f32* p3, f32* pOut, f32 fT);   // a point on the spline
 f32    fn_800C7970(f32 fA, f32 fB, f32 fC, f32 fD, f32 fE, f32 fF);
-// Not decompiled yet: a share of a fly-by path's spline (fn_8003EA50).
+// Not decompiled yet: a share of a fly-by path's spline (CamScript_RunFlybyCamera).
 f32    fn_800C7A9C(FlyByPath* pPath, f32 fT);
 // CamSpline.c: the Catmull-Rom basis matrix.
 extern f32 lbl_80191440[4][4];

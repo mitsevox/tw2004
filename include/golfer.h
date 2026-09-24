@@ -288,7 +288,7 @@ typedef struct Player {
     f32  fPower;                // 0x37C  0..1 (up to 1.5). TW06: strength
     s32  nShotKind;             // 0x380  0 putt, 2/3 approach, 5..7 recovery. TW06: type (ShotType_t)
     s32  nTrajectory;           // 0x384  from Shot_Trajectory: 0 low, 1 normal, 2 high. TW06 has a float stance here
-    f32  vLaunchA[4];           // 0x388  launch parameter blocks handed to Ball_Launch. TW06: clubDirection (the face)
+    f32  vLaunchA[4];           // 0x388  launch parameter blocks handed to Physics_ShotImpact. TW06: clubDirection (the face)
     f32  vLaunchB[4];           // 0x398  TW06: strokeDirection (the swing path, which carries the shape)
     s32  nShotShape;            // 0x3A8  SHAPE_*: what the aim point (or a lesson) asks the CPU to play. TW06: shape
     u8   bPerfect;              // 0x3AC  no error / no forgiveness when set. TW06: perfect

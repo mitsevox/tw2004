@@ -178,7 +178,7 @@ void fn_8010C958(int nPlayer) {
 
 // A fresh ball for the player on the tee set the session gives it.
 void fn_8010C978(int nPlayer) {
-    fn_80055AA8(&gPlayers[nPlayer].ball,
+    Physics_InitBall(&gPlayers[nPlayer].ball,
                 &gPlayers[nPlayer].ball.pCourse->tee[gSession.nTeeSet[nPlayer]].x, nPlayer);
 }
 

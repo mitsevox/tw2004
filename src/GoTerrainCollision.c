@@ -956,7 +956,7 @@ void fn_8004D2E0(CourseInfo* pCourse, f32* pPos, TerPolyRef** ppRefLow, f32* pLo
 }
 
 // The height of the highest ground under a point. Probably TW06's Ter_GetHighestGroundHeight.
-f32 fn_8004D5C0(CourseInfo* pCourse, f32* pPos) {
+f32 Ter_GetHighestGroundHeight(CourseInfo* pCourse, f32* pPos) {
     TerCell* pCell;
     TerPolyRef* pRef;
     f32 (*pTri)[3];
@@ -976,7 +976,7 @@ f32 fn_8004D5F0(CourseInfo* pCourse, f32* pPos) {
 }
 
 // The height of the ground that supports a point. Probably TW06's Ter_GetSupportingGroundHeight.
-f32 fn_8004D620(CourseInfo* pCourse, f32* pPos) {
+f32 Ter_GetSupportingGroundHeight(CourseInfo* pCourse, f32* pPos) {
     TerCell* pCell;
     TerPolyRef* pRef;
     f32 (*pTri)[3];

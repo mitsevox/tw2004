@@ -373,7 +373,7 @@ void fn_8012643C(int nPlayer) {
 
 // The ball back on the player's tee.
 void fn_8012645C(int nPlayer) {
-    fn_80055AA8(&gPlayers[nPlayer].ball,
+    Physics_InitBall(&gPlayers[nPlayer].ball,
                 &gPlayers[nPlayer].ball.pCourse->tee[gSession.nTeeSet[nPlayer]].x, nPlayer);
 }
 

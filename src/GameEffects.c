@@ -259,7 +259,7 @@ void fn_800DB714(int nPlayer) {
         }
         nLie = gPlayers[nPlayer].ball.nLie;
         fDist = AI_MaxDistance(nPlayer, gPlayers[nPlayer].nShotKind, gPlayers[nPlayer].nClub);
-        fDist *= fn_800510EC(&gPlayers[nPlayer].ball);
+        fDist *= Physics_GetLiePowerPercentage(&gPlayers[nPlayer].ball);
         fDist *= fn_8005B64C(nPlayer);
         fn_80045494(0, nPlayer);
         fn_80045558(0, nPlayer);

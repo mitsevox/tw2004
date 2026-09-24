@@ -1033,7 +1033,7 @@ void fn_800FBD2C(int nPlayer) {
                     fn_800FAAB8(nPlayer, 2);
                 }
                 pHole = fn_8000C594();
-                fn_80055AA8(&p->ball, &pHole->tee[gSession.nTeeSet[nPlayer]].x, nPlayer);
+                Physics_InitBall(&p->ball, &pHole->tee[gSession.nTeeSet[nPlayer]].x, nPlayer);
                 Vec_Copy(&pHole->tee[gSession.nTeeSet[nPlayer]].x, p->vBall);
                 Vec_Copy(&pHole->tee[gSession.nTeeSet[nPlayer]].x, p->vA44);
                 gPlayers[nPlayer].nC3C &= ~1;
@@ -1341,7 +1341,7 @@ void fn_800FCCF0(void) {
                           (s8)GOLFERSTATE_GetCurrentState(nPlayer) != 10))) {
                         fn_800FAAB8(nPlayer, 0x27);
                         pHole = fn_8000C594();
-                        fn_80055AA8(&gPlayers[nPlayer].ball,
+                        Physics_InitBall(&gPlayers[nPlayer].ball,
                                     &pHole->tee[gSession.nTeeSet[nPlayer]].x, nPlayer);
                         Vec_Copy(&pHole->tee[gSession.nTeeSet[nPlayer]].x,
                                  gPlayers[nPlayer].vBall);
@@ -1365,7 +1365,7 @@ void fn_800FCCF0(void) {
                  (gPlayers[i].ball.nLie != 0 && gPlayers[i].ball.nLie != LIE_INCUP_e &&
                   gPlayers[i].ball.nLie != 16))) {
                 pHole = fn_8000C594();
-                fn_80055AA8(&gPlayers[i].ball, &pHole->tee[gSession.nTeeSet[i]].x, i);
+                Physics_InitBall(&gPlayers[i].ball, &pHole->tee[gSession.nTeeSet[i]].x, i);
                 Vec_Copy(&pHole->tee[gSession.nTeeSet[i]].x, gPlayers[i].vBall);
                 Vec_Copy(&pHole->tee[gSession.nTeeSet[i]].x, gPlayers[i].vA44);
                 gPlayers[i].nC3C &= ~1;

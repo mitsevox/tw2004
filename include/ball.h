@@ -14,7 +14,7 @@
 // TGD_MaterialInfo, the same size; its field names (after "TW06:") agree with what the code here
 // does with each field.
 typedef struct SurfaceType {
-    f32  f00;                   // 0x00  launch: share of the speed kept; + the ball's f70 (fn_800510EC).
+    f32  f00;                   // 0x00  launch: share of the speed kept; + the ball's f70 (Physics_GetLiePowerPercentage).
                                 //       TW06: impactV
     f32  f04;                   // 0x04  lie: size of the random lie quality (Ball_SetLie).
                                 //       TW06: impactV_Modifier
@@ -294,7 +294,7 @@ s32  Ter_iNumOOBNetworksLoaded(void);
 u8   PlaceBall_IsValidDropLocation(f32* pPos);            // a ball may be placed here. TW06: PlaceBall_IsValidDropLocation?
 u8   PlaceBall_CheckInBounds(f32* pPos);            // the point is in bounds. TW06: PlaceBall_CheckInBounds?
 TNetwork* PlaceBall_GetPlaceBallNetwork(void);            // the hole's placement outline (lbl_80281E30), if any
-f32  Terrain_HeightAt(f32* pPos, SurfaceType** ppSurface);   // 0x800447DC
+f32  CamScript_GuessBestPlayableHeight(f32* pPos, SurfaceType** ppSurface);   // 0x800447DC
 
 // TerrainGround.c (our name): the ground under a point or a quad
 int  fn_800CB950(CourseInfo* pCourse, f32* pA, f32* pB, f32* pC, f32* pD, TerPolyRef* pList, int nMax,
@@ -319,11 +319,11 @@ u8   Ter_IsValidDropSurface(s32 nSurface);
 u8   Ter_GetSupportingGroundNormal(CourseInfo* pCourse, f32* pPos, f32* pNormal);   // 0 with no ground
 u8   fn_80050A9C(f32* pA, f32* pB, f32* pC, f32 fX, f32 fZ);   // (x, z) lies inside the triangle
 void fn_800509D8(f32 (*pTri)[3], f32* pPos, f32* pA, f32* pB, f32* pC);   // a point's weights in a triangle
-f32  fn_8004D5C0(CourseInfo* pCourse, f32* pPos);   // ground height, -65536.1 if none
+f32  Ter_GetHighestGroundHeight(CourseInfo* pCourse, f32* pPos);   // ground height, -65536.1 if none
 f32  fn_8004D5F0(CourseInfo* pCourse, f32* pPos);   // ground height (GoTerrainCollision.c)
 // Every ground height under and over pPos (up to nMax), with its surface; returns how many.
 u32  fn_8004DCC4(CourseInfo* pCourse, f32* pPos, SurfaceType** ppSurfaces, f32* pHeights, u32 nMax);
-f32  fn_8004D620(CourseInfo* pCourse, f32* pPos);   // ground height, -60000 and below if none
+f32  Ter_GetSupportingGroundHeight(CourseInfo* pCourse, f32* pPos);   // ground height, -60000 and below if none
 f32  fn_8004D650(CourseInfo* pCourse, f32* pPos, f32* pNormal);   // covering ground height and normal
 SurfaceType* Ter_GetSupportingWorldMaterial(CourseInfo* pCourse, f32* pPos);   // the surface under a point
 f32  Ter_GetSupportingGroundData(CourseInfo* pCourse, f32* pPos, SurfaceType** ppSurface, f32* pNormal);
@@ -350,20 +350,20 @@ typedef struct ClubRow {
     f32 fDist[11];
 } ClubRow;
 
-void Ball_SetSimulating(u8 bOn);        // rehearsals and look-aheads: no sounds, effects or tree roll
+void fn_80050D24_SetSimulating(u8 bOn);        // rehearsals and look-aheads: no sounds, effects or tree roll
 void fn_80050D2C(u8 b);
 f32  fn_80050D34(f32 fDist);            // putt power for a distance
 f32  fn_80050F44(int nKind, int nClub); // a club's table reach for a shot kind
-f32  fn_80050F88(f32 fDist, Ball* pBall, int nKind, int nClub);   // chip power from the ball's lie
-f32  fn_800510EC(Ball* pBall);          // the ball's f70 + its surface's f00; 1 without either
-void fn_80051A18(Ball* pBall, f32* pDir, f32 fSpeed, f32* pFrom);
-void Ball_Launch(Ball* pBall, int nClub, int nKind, f32 fPower, f32 fAim, int nTrajectory, f32* pA, f32* pB);
-void fn_80054A6C(Ball* pBall);
+f32  Physics_EstimateShotPower(f32 fDist, Ball* pBall, int nKind, int nClub);   // chip power from the ball's lie
+f32  Physics_GetLiePowerPercentage(Ball* pBall);          // the ball's f70 + its surface's f00; 1 without either
+void Physics_ThrowBall(Ball* pBall, f32* pDir, f32 fSpeed, f32* pFrom);
+void Physics_ShotImpact(Ball* pBall, int nClub, int nKind, f32 fPower, f32 fAim, int nTrajectory, f32* pA, f32* pB);
+void Physics_InitShotData(Ball* pBall);
 int  Physics_Simulate(Ball* pBall, int nMs);
 u8   Physics_DropBall(Ball* pBall, f32* pPos);          // put the ball on the ground at a point
-void Ball_SimStep(Ball* pBall, f32 fSeconds, f32 fTick);
-u8   fn_800559BC(Ball* pBall, f32* pPos);
-u8   fn_80055AA8(Ball* pBall, f32* pPos, int nPlayer);  // a fresh ball for a player at a point
+void fn_8005585C_SimForTime(Ball* pBall, f32 fSeconds, f32 fTick);
+u8   Physics_SetBallPosition(Ball* pBall, f32* pPos);
+u8   Physics_InitBall(Ball* pBall, f32* pPos, int nPlayer);  // a fresh ball for a player at a point
 void fn_80055C1C(u8 b);
 void fn_80055C40(int n);
 void fn_80055CAC(int n);
