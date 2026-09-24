@@ -840,7 +840,7 @@ config.libs = [
             Object(NonMatching, "GoEntry.c"),
             Object(NonMatching, "Quaternion.c"),
             Object(NonMatching, "StaticMemory.c"),
-            Object(NonMatching, "UMemPool.c"),
+            Object(Matching, "UMemPool.c"),
             Object(NonMatching, "urandom.c"),
             Object(Matching, "ObjList.c"),
             Object(Matching, "LoadData.c"),
