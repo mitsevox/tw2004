@@ -676,6 +676,118 @@ void fn_8008CE88(u8 bFull) {
     }
 }
 
+// Set the golfer shown up for the screen kind (n0): his clip, the kind of clip it is (its place
+// in lbl_801B9638, 0 when it is not there) and his facing.
+void fn_8008D058(void) {
+    Clip* pClip;
+    int i;
+
+    lbl_80281EE0->pB4->n1C = lbl_80281EE0->n0;
+    lbl_80281EE0->n8 = 0;
+    lbl_80281EE0->b80 = 0;
+    lbl_80281EE0->n74 = 0;
+    lbl_80281EE0->b78 = 0;
+    lbl_80281EE0->b81 = 0;
+    lbl_80281EE0->b1D1 = 1;
+    switch (lbl_80281EE0->n0) {
+    case 0:
+        lbl_80281EE0->f19C = 0.0f;
+        lbl_80281EE0->f1A0 = 0.0f;
+        fn_800957FC(lbl_80281EE0->pB4->pChar, 1);
+        fn_800957B0(lbl_80281EE0->pB4->pChar, 1);
+        fn_8001C5B4(lbl_80281EE0->pB4->pChar, 5);
+        pClip = Char_SetClip(lbl_80281EE0->pB4->pChar, 0, 0, NULL);
+        fn_8001BE88(lbl_80281EE0->pB4->pChar, pClip, 1, 0.0f);
+        for (i = 0; i < 6; i++) {
+            if (pClip->u90 == lbl_801B9638[i]) {
+                break;
+            }
+        }
+        if (i == 6) {
+            i = 0;
+        }
+        fn_8001C5B4(lbl_80281EE0->pB4->pChar, i);
+        fn_800192D4(lbl_80281EE0->pB4->pChar, lbl_80281EE0->f19C);
+        lbl_80281EE0->b85 = 1;
+        lbl_80281EE0->b91 = 1;
+        lbl_80281EE0->b84 = 1;
+        lbl_80281EE0->b83 = 0;
+        break;
+    case 1:
+    case 4:
+        lbl_80281EE0->f19C = 0.0f;
+        lbl_80281EE0->f1A0 = 0.0f;
+        fn_8008EA44(fn_80077ACC()->choices.n113);
+        fn_800957FC(lbl_80281EE0->pB4->pChar, 1);
+        fn_800957B0(lbl_80281EE0->pB4->pChar, 1);
+        fn_8001C5B4(lbl_80281EE0->pB4->pChar, 3);
+        pClip = Char_SetClip(lbl_80281EE0->pB4->pChar, 0, 0, NULL);
+        fn_8001BE88(lbl_80281EE0->pB4->pChar, pClip, 1, 0.0f);
+        for (i = 0; i < 6; i++) {
+            if (pClip->u90 == lbl_801B9638[i]) {
+                break;
+            }
+        }
+        if (i == 6) {
+            i = 0;
+        }
+        fn_8001C5B4(lbl_80281EE0->pB4->pChar, i);
+        fn_800192D4(lbl_80281EE0->pB4->pChar, lbl_80281EE0->f19C);
+        lbl_80281EE0->b85 = 0;
+        lbl_80281EE0->b91 = 0;
+        lbl_80281EE0->b84 = 0;
+        break;
+    case 3:
+        lbl_80281EE0->b78 = 1;
+        lbl_80281EE0->f7C = 0.0f;
+        lbl_80281EE0->b85 = 0;
+        lbl_80281EE0->b91 = 0;
+        lbl_80281EE0->b84 = 0;
+        lbl_80281EE0->n1B4 = 0;
+        lbl_80281EE0->n1B8 = 0;
+        lbl_80281EE0->n1BC = -1;
+        lbl_80281EE0->sz20[0] = '\0';
+        lbl_80281EE0->sz30[0] = '\0';
+        lbl_80281EE0->n1D0 = 0;
+        lbl_80281EE0->n1C0 = 4;
+        lbl_80281EE0->b1C8 = 0;
+        lbl_80281EE0->n50 = 0;
+        lbl_80281EE0->b1DC = 0;
+        fn_8008EAE0(-1);
+        fn_8008EAF8(-1);
+        fn_8008EA44(0);
+        lbl_80281EE0->f19C = 0.0f;
+        lbl_80281EE0->f1A0 = 0.0f;
+        fn_8008DD50(0);
+        fn_800192D4(lbl_80281EE0->pB4->pChar, lbl_80281EE0->f19C);
+        break;
+    case 2:
+        lbl_80281EE0->f19C = 0.0f;
+        lbl_80281EE0->f1A0 = 0.0f;
+        fn_800957FC(lbl_80281EE0->pB4->pChar, 1);
+        fn_800957B0(lbl_80281EE0->pB4->pChar, 1);
+        fn_8001C5B4(lbl_80281EE0->pB4->pChar, 3);
+        pClip = Char_SetClip(lbl_80281EE0->pB4->pChar, 0, 0, NULL);
+        fn_8001BE88(lbl_80281EE0->pB4->pChar, pClip, 1, 0.0f);
+        for (i = 0; i < 6; i++) {
+            if (pClip->u90 == lbl_801B9638[i]) {
+                break;
+            }
+        }
+        if (i == 6) {
+            i = 0;
+        }
+        fn_8001C5B4(lbl_80281EE0->pB4->pChar, i);
+        fn_800192D4(lbl_80281EE0->pB4->pChar, lbl_80281EE0->f19C);
+        lbl_80281EE0->b85 = 0;
+        lbl_80281EE0->b91 = 0;
+        lbl_80281EE0->b84 = 0;
+        lbl_80281EE0->b83 = 0;
+        break;
+    }
+    lbl_80281EE0->f14C = 0.0f;
+}
+
 // With b85 set, move bones 0x52 (when the character's bit 0x4000 is set) and 0x54 (when the ball
 // is in the golfer's hand) to their offset from bone 1, and bone 1 to 0, in x, z and w.
 void fn_8008D6CC(void) {
