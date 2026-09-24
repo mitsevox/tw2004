@@ -783,7 +783,8 @@ void fn_800368FC(SkinDesc* pDesc) {
                 BYTESWAP_SWAPDATA((u8**)&pSrc, pData, n * 2, 2);
             } else if (pMesh->uFlags & 0x40) {
                 pSrc = pData;
-                BYTESWAP_SWAPDATA((u8**)&pSrc, pData, n * 4, 2);
+                // fake match: written n * sizeof(u32), the reused n * 4 is passed after &pSrc, as EA does
+                BYTESWAP_SWAPDATA((u8**)&pSrc, pData, n * sizeof(u32), 2);
             }
         } else if (pMesh->uFlags & 0x40) {
             pSrc = pDst = pData;
