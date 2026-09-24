@@ -1,6 +1,6 @@
 // UKernel.c (EA's name, from its asserts; also in EA's 2002 source tree; TW06): the kernel's list
 // of the course's dynamic objects (dynobj.h), chained through DynObj.pNext from lbl_80281DBC to
-// lbl_80281DB8. Only part is decompiled so far.
+// lbl_80281DB8.
 
 #include "dynobj.h"
 #include "terrain.h"
@@ -21,7 +21,7 @@ void fn_80048BDC(UStreamObject* pObject);
 
 // Memory for an object of nSize bytes: a node of the small or the large pool while one is free,
 // else from the heap.
-void* Kernel_InitModule(int nSize) {
+void* fn_80048AF4_DynObjAlloc(int nSize) {
     if (nSize < 400 && lbl_80281DAC->nFree != 0) {
         return UMemPool_Alloc(lbl_80281DAC);
     }
@@ -43,8 +43,8 @@ void fn_80048B70(void* p) {
 }
 
 // The 'Cact' stream handler: an object's definition arrived. Some types are handed to their own
-// systems (the tee and pin positions, types 7 to 10, 200 and 201); the others get their stream
-// objects looked up and become a dynamic object, whose id is kept in the stream object.
+// systems (the tee and pin positions, types 7, 9, 10, 200 and 201; type 8 is dropped); the others
+// get their stream objects looked up and become a dynamic object, and the stream object is freed.
 void fn_80048BDC(UStreamObject* pObject) {
     DynObjSetup setup;
     TagRecord* pChunk;
@@ -187,7 +187,7 @@ void fn_80048FEC(DynObj* pObj) {
 // A new object: its handler gives its size (message 1), then sets it up (message 2), and it gets
 // the next id and goes at the end of the list. NULL when there was no memory.
 DynObj* fn_80049018(DynObjSetup* pSetup) {
-    DynObj* pObj = Kernel_InitModule(pSetup->pfnHandler(1, NULL, NULL, NULL));
+    DynObj* pObj = fn_80048AF4_DynObjAlloc(pSetup->pfnHandler(1, NULL, NULL, NULL));
 
     if (pObj == NULL) {
         return NULL;
@@ -245,8 +245,8 @@ void fn_800490EC(void) {
     }
 }
 
-// Takes the object's id away (n134 = 0), first passing its p160 name to fn_8000EA1C unless flag
-// 0x20000000 is set.
+// Takes the object's id away (n134 = 0), first passing its p160 to fn_8000EA1C unless p160 is
+// NULL or flag 0x20000000 is set.
 void fn_800491C4(DynObj* pObj) {
     if (pObj->n134 != 0) {
         if (!(pObj->uFlags & 0x20000000) && pObj->p160 != NULL) {
@@ -313,7 +313,7 @@ void fn_80049304(int nKey, int a, int b) {
     }
 }
 
-// The same for every object whose n147 is nKey.
+// The same, without the 126 test, for every object whose n147 is nKey.
 void fn_8004939C(int nKey, int a, int b) {
     DynObj* pObj;
 
