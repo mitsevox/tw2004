@@ -143,11 +143,11 @@ int fn_8000EA1C(u8* pCode, int nArg, int nPush, DynObj* pObj) {
                 a = *pCode++ + 0x80;
                 break;
             case 3:
-                a = ((s8)pCode[0] << 8) | pCode[1];
+                a = pCode[1] | ((s8)pCode[0] << 8);
                 pCode += 2;
                 break;
             case 4:
-                a = ((((((s8)pCode[0] << 8) | pCode[1]) << 8) | pCode[2]) << 8) | pCode[3];
+                a = pCode[3] | ((pCode[2] | ((pCode[1] | ((s8)pCode[0] << 8)) << 8)) << 8);
                 pCode += 4;
                 break;
             case 5:
