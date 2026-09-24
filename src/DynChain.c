@@ -5,6 +5,7 @@
 #include "engine.h"
 #include "character.h"
 #include "charstate.h"
+#include "unsorted/cull.h"
 
 f32  fn_800BAFC0(f32* pSrc, f32* pDst);     // VecMath.c: normalises pSrc into pDst, gives its length
 f32  fn_800BAF58(f32* pSrc, f32* pDst);     // VecMath.c: normalises, gives the length (0 if near zero)
@@ -12,6 +13,10 @@ void fn_80029BC8(f32* pVec);                // GoLighting.c
 void fn_801164D4(f32* pA, f32* pB, f32* pOut);
 void fn_801164F8(f32* pA, f32* pB, f32* pOut);
 f32  fn_80055F80(void);                     // Ball.c
+void fn_800561CC(f32* pOut);                // Ball.c: the wind's direction
+void SKEL_TransformBones(CharModel* pModel, u32* auBits);
+f32  fn_80116304(u32 nFrame, f32 fPhase, f32 fStrength);
+f32  fn_80116468(void);
 void fn_80008FCC(f32* pA, f32* pB, f32* pOut);                                // Quaternion.c
 void fn_8000914C(f32* pQ, f32 (*pMtx)[4]);                                    // Quaternion.c
 void fn_8000ADC0(f32 (*pMtx)[4]);                                             // identity
@@ -24,36 +29,36 @@ void fn_80115B2C(CharModel* pModel, DynChain* pChain, f32 f);
 // Make the chains' settings, with their starting values.
 void fn_80113E60(void) {
     lbl_802824F8 = fn_80009B34(sizeof(DynChainSettings), 2, 0, "DynChain.c", 173);
-    lbl_802824F8->aParams[1].f0 = 3.6f;
-    lbl_802824F8->aParams[1].f4 = 6.0f;
-    lbl_802824F8->aParams[1].f8 = 9.9f;
-    lbl_802824F8->aParams[1].fC = 0.5f;
-    lbl_802824F8->aParams[1].f10 = 0.5f;
-    lbl_802824F8->aParams[1].f14 = 0.5f;
-    lbl_802824F8->aParams[1].f18 = 0.0f;
-    lbl_802824F8->aParams[1].f1C = 0.9f;
-    lbl_802824F8->aParams[1].f20 = 0.7f;
-    lbl_802824F8->aParams[1].f24 = 0.0f;
-    lbl_802824F8->aParams[1].f28 = 0.0f;
-    lbl_802824F8->aParams[1].f2C = 0.0f;
-    lbl_802824F8->aParams[0].f0 = 2.0f;
-    lbl_802824F8->aParams[0].f4 = 4.0f;
-    lbl_802824F8->aParams[0].f8 = 8.0f;
-    lbl_802824F8->aParams[0].fC = 0.25f;
-    lbl_802824F8->aParams[0].f10 = 0.25f;
-    lbl_802824F8->aParams[0].f14 = 0.25f;
-    lbl_802824F8->aParams[0].f18 = 0.0f;
-    lbl_802824F8->aParams[0].f1C = 0.9f;
-    lbl_802824F8->aParams[0].f20 = 0.7f;
-    lbl_802824F8->aParams[0].f24 = -2.0f;
-    lbl_802824F8->aParams[0].f28 = 0.0f;
-    lbl_802824F8->aParams[0].f2C = 3.0f;
-    lbl_802824F8->n9C = 1;
-    lbl_802824F8->nA0 = 1;
-    lbl_802824F8->nA4 = 1;
-    lbl_802824F8->nA8 = 1;
-    lbl_802824F8->nAC = 1;
-    lbl_802824F8->nB0 = 1;
+    lbl_802824F8->aParams[1].a0[0] = 3.6f;
+    lbl_802824F8->aParams[1].a0[1] = 6.0f;
+    lbl_802824F8->aParams[1].a0[2] = 9.9f;
+    lbl_802824F8->aParams[1].aC[0] = 0.5f;
+    lbl_802824F8->aParams[1].aC[1] = 0.5f;
+    lbl_802824F8->aParams[1].aC[2] = 0.5f;
+    lbl_802824F8->aParams[1].a18[0] = 0.0f;
+    lbl_802824F8->aParams[1].a18[1] = 0.9f;
+    lbl_802824F8->aParams[1].a18[2] = 0.7f;
+    lbl_802824F8->aParams[1].a24[0] = 0.0f;
+    lbl_802824F8->aParams[1].a24[1] = 0.0f;
+    lbl_802824F8->aParams[1].a24[2] = 0.0f;
+    lbl_802824F8->aParams[0].a0[0] = 2.0f;
+    lbl_802824F8->aParams[0].a0[1] = 4.0f;
+    lbl_802824F8->aParams[0].a0[2] = 8.0f;
+    lbl_802824F8->aParams[0].aC[0] = 0.25f;
+    lbl_802824F8->aParams[0].aC[1] = 0.25f;
+    lbl_802824F8->aParams[0].aC[2] = 0.25f;
+    lbl_802824F8->aParams[0].a18[0] = 0.0f;
+    lbl_802824F8->aParams[0].a18[1] = 0.9f;
+    lbl_802824F8->aParams[0].a18[2] = 0.7f;
+    lbl_802824F8->aParams[0].a24[0] = -2.0f;
+    lbl_802824F8->aParams[0].a24[1] = 0.0f;
+    lbl_802824F8->aParams[0].a24[2] = 3.0f;
+    lbl_802824F8->an9C[0] = 1;
+    lbl_802824F8->an9C[1] = 1;
+    lbl_802824F8->an9C[2] = 1;
+    lbl_802824F8->an9C[3] = 1;
+    lbl_802824F8->an9C[4] = 1;
+    lbl_802824F8->an9C[5] = 1;
     lbl_802824F8->nB4 = 0;
     lbl_802824F8->nB8 = -1;
     lbl_802824F8->nBC = 10;
@@ -495,6 +500,188 @@ void fn_80114A84(CharModel* pModel, DynChain* pChain, f32 fDelta) {
         }
         fn_8001E85C(pChain->pLinks[i].q44, pChain->pLinks[i].q54);
         fn_8001E85C(pChain->pLinks[i].v64, pChain->pLinks[i].v74);
+    }
+}
+
+// The type 2 update: the chain sways in the wind. Each link turns about two axes by sine waves
+// (the two DynChainParams), bigger when the chain faces the wind (the model's f134) and the stronger
+// the wind is (fn_80116468). The bones are posed with the sway and then set back to their rest
+// rotations. Not on game type 3.
+void fn_80115348(CharModel* pModel, DynChain* pChain, f32 fDelta) {
+    f32 vAxis1[4];
+    f32 vAxis2[4];
+    f32 vDir[4];
+    f32 vWind[4];
+    f32 vFace[4];
+    f32 qTurn[4];
+    f32 qOut[4];
+    u32 auBits[4];
+    f32 fFaceAmt;
+    f32 fStrength;
+    f32 fPhase;
+    f32 fSway;
+    f32 fFacing;
+    f32 fSizeA;
+    f32 fSizeB;
+    f32 fSpeedA;
+    f32 fSpeedB;
+    f32 fT;
+    f32 fPeriod;
+    f32 fSize;
+    f32 fAngle;
+    s32 nFrames;
+    u32 nPeriod;
+    int i;
+
+    fFaceAmt = pModel->f134;
+    if (gSession.nGameType == 3) {
+        return;
+    }
+    fn_8001E938(auBits, 128);
+    fStrength = fn_80116468();
+    nFrames = 60.0f * (FRAME_RATE * fDelta);
+    if (pChain->n10 < 3) {
+        fPhase = 0.72f / 180.0f * PI * pChain->n10;
+    } else {
+        fPhase = 0.72f / 180.0f * PI * (pChain->n10 - 3) + PI / 4.0f;
+    }
+    fSway = fn_80116304(pChain->n14, fPhase, fStrength);
+    pChain->n14++;
+    pChain->n18 += (s32)(nFrames * fSway);
+
+    // Where the wind blows from.
+    if (lbl_802824F8->nB4 == 0) {
+        fn_800561CC(vWind);
+    } else {
+        // A fixed direction in the model's root space (1 is the same as 5).
+        if (lbl_802824F8->nB4 == 2) {
+            vDir[0] = 1.0f;
+            vDir[1] = 0.0f;
+            vDir[2] = 0.0f;
+            vDir[3] = 0.0f;
+        } else if (lbl_802824F8->nB4 == 3) {
+            vDir[0] = 0.0f;
+            vDir[1] = 0.0f;
+            vDir[2] = 1.0f;
+            vDir[3] = 0.0f;
+        } else if (lbl_802824F8->nB4 == 4) {
+            vDir[0] = -1.0f;
+            vDir[1] = 0.0f;
+            vDir[2] = 0.0f;
+            vDir[3] = 0.0f;
+        } else {
+            vDir[0] = 0.0f;
+            vDir[1] = 0.0f;
+            vDir[2] = -1.0f;
+            vDir[3] = 0.0f;
+        }
+        fn_800BAD60(pModel->pMatrices[0], (Vec4*)vDir, (Vec4*)vWind);
+    }
+    fn_800BAD60(pModel->pMatrices[0], (Vec4*)lbl_80193DE8[pChain->n10], (Vec4*)vFace);
+    vFace[1] = 0.0f;
+    vWind[1] = 0.0f;
+    fFacing = (1.0f + fn_8000C5FC(vFace, vWind)) * 0.5f * fFaceAmt;
+    fSpeedA = (1.0f - lbl_802824F8->f7C) * fFacing + lbl_802824F8->f7C;
+    fSizeA = (1.0f - lbl_802824F8->f78) * fFacing + lbl_802824F8->f78;
+    if (fStrength < lbl_802824F8->nBC) {
+        fT = fStrength / lbl_802824F8->nBC;
+        fSpeedB = (1.0f - lbl_802824F8->f88) * fT + lbl_802824F8->f88;
+        fSizeB = (1.0f - lbl_802824F8->f80) * fT + lbl_802824F8->f80;
+    } else {
+        if (35.0f == lbl_802824F8->nBC) {
+            fT = 1.0f;
+        } else {
+            fT = (fStrength - lbl_802824F8->nBC) / (35.0f - lbl_802824F8->nBC);
+        }
+        fSpeedB = (lbl_802824F8->f8C - 1.0f) * fT + 1.0f;
+        fSizeB = (lbl_802824F8->f84 - 1.0f) * fT + 1.0f;
+    }
+
+    // The first sway, keeping each bone's rest rotation.
+    for (i = 0; i < pChain->nLinks; i++) {
+        if (pChain->n10 == 2 || pChain->n10 == 5) {
+            vAxis1[0] = 0.0f;
+            vAxis1[1] = 0.0f;
+            vAxis1[2] = 1.0f;
+            vAxis1[3] = 0.0f;
+        } else {
+            vAxis1[0] = 1.0f;
+            vAxis1[1] = 0.0f;
+            vAxis1[2] = 0.0f;
+            vAxis1[3] = 0.0f;
+        }
+        if (0.0f != fSpeedA) {
+            fPeriod = 60.0f * FRAME_RATE * lbl_802824F8->aParams[0].aC[i] * (1.0f / fSpeedA);
+        } else {
+            fPeriod = 100000000.0f;
+        }
+        if (0.0f != fSpeedB) {
+            fPeriod = fPeriod * (1.0f / fSpeedB);
+        } else {
+            fPeriod = 100000000.0f;
+        }
+        fSize = DEG(lbl_802824F8->aParams[0].a0[i]) * fSizeA * fSizeB;
+        if (0.0f != fPeriod) {
+            nPeriod = fPeriod;
+            fT = (f32)(pChain->n18 % nPeriod) / fPeriod;
+            fAngle = fSize * fn_800095F0(2.0f * PI * fT + PI * (2.0f * lbl_802824F8->aParams[0].a18[i])) +
+                     PI * lbl_802824F8->aParams[0].a24[i] / 180.0f;
+        } else {
+            fAngle = 0.0f;
+        }
+        fn_8000AE28(vAxis1, fAngle, vAxis1);
+        fn_8000923C(vAxis1, qTurn);
+        fn_8001E85C(pModel->pBones[pChain->pLinks[i].nBone].q0C, pChain->pLinks[i].q44);
+        if (lbl_802824F8->an9C[pChain->n10] != 0) {
+            fn_80008FCC(pModel->pBones[pChain->pLinks[i].nBone].q0C, qTurn, qOut);
+            fn_8001E85C(qOut, pModel->pBones[pChain->pLinks[i].nBone].q0C);
+            fn_8001EA34(auBits, pChain->pLinks[i].nBone);
+        }
+    }
+
+    // The second sway, about the other axis.
+    for (i = 0; i < pChain->nLinks; i++) {
+        if (pChain->n10 == 2 || pChain->n10 == 5) {
+            vAxis2[0] = 1.0f;
+            vAxis2[1] = 0.0f;
+            vAxis2[2] = 0.0f;
+            vAxis2[3] = 0.0f;
+        } else {
+            vAxis2[0] = 0.0f;
+            vAxis2[1] = 0.0f;
+            vAxis2[2] = 1.0f;
+            vAxis2[3] = 0.0f;
+        }
+        if (0.0f != fSpeedA) {
+            fPeriod = 60.0f * FRAME_RATE * lbl_802824F8->aParams[1].aC[i] * (1.0f / fSpeedA);
+        } else {
+            fPeriod = 100000000.0f;
+        }
+        if (0.0f != fSpeedB) {
+            fPeriod = fPeriod * (1.0f / fSpeedB);
+        } else {
+            fPeriod = 100000000.0f;
+        }
+        fSize = DEG(lbl_802824F8->aParams[1].a0[i]) * fSizeA * fSizeB;
+        if (0.0f != fPeriod) {
+            nPeriod = fPeriod;
+            fT = (f32)(pChain->n18 % nPeriod) / fPeriod;
+            fAngle = fSize * fn_800095F0(2.0f * PI * fT + PI * (2.0f * lbl_802824F8->aParams[1].a18[i])) +
+                     PI * lbl_802824F8->aParams[1].a24[i] / 180.0f;
+        } else {
+            fAngle = 0.0f;
+        }
+        fn_8000AE28(vAxis2, fAngle, vAxis2);
+        fn_8000923C(vAxis2, qTurn);
+        if (lbl_802824F8->an9C[pChain->n10] != 0) {
+            fn_80008FCC(pModel->pBones[pChain->pLinks[i].nBone].q0C, qTurn, qOut);
+            fn_8001E85C(qOut, pModel->pBones[pChain->pLinks[i].nBone].q0C);
+            fn_8001EA34(auBits, pChain->pLinks[i].nBone);
+        }
+    }
+    SKEL_TransformBones(pModel, auBits);
+    for (i = 0; i < pChain->nLinks; i++) {
+        fn_8001E85C(pChain->pLinks[i].q44, pModel->pBones[pChain->pLinks[i].nBone].q0C);
     }
 }
 
