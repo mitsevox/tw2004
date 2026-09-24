@@ -1,11 +1,10 @@
 // Small functions found by the sweep (sweep.py). Original file and meanings unknown.
 
-#include "game_types.h"
+#include "engine.h"
 
-
-void fn_80045F38(void* arg0);
-void fn_80045F38(void* arg0) {
-    if ((u32) (*(u32*)((u8*)(arg0) + 0x1000)) != 0U) {
-        (*(u32*)((u8*)(arg0) + 0x1000)) = 0U;
+void fn_80045F38(BufferPoolBlock* pBlock);
+void fn_80045F38(BufferPoolBlock* pBlock) {
+    if (pBlock->u1000 != 0) {
+        pBlock->u1000 = 0;
     }
 }

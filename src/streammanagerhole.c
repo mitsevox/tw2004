@@ -645,8 +645,8 @@ void fn_80015470(void) {
     }
 }
 
-// Move the pool's nNext past the blocks in use.
-void fn_800154F4(void) {
+// Move the pool's nNext past the blocks in use and return the first free block.
+BufferPoolBlock* fn_800154F4(void) {
     BufferPoolBlock* pBlock;
 
     pBlock = &lbl_80280E00->aBlocks[lbl_80280E00->nNext];
@@ -658,6 +658,7 @@ void fn_800154F4(void) {
         lbl_80280E00->nNext++;
     }
     lbl_80280E00->n4++;
+    return pBlock;
 }
 
 // Reset the renderer's state and free the buffer pool.
