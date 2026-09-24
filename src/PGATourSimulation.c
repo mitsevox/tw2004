@@ -99,9 +99,9 @@ void fn_80117860(TourSeason* pTour) {
 // needs this prototype's s32 to match; only saved registers differ here.
 void fn_801178C8(s32 nPlayer, SeasonEvent* pEvent, int nRound, int n, int uFlags) {
     s32 nEntrants;
-    s32 nHole;
     int i;
     PgaEntrant* pEntrant;
+    s32 nHole;
 
     fn_80005AE8(&lbl_80223C70, 0, sizeof(lbl_80223C70));
     gbScoresDirty = 1;
