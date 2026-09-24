@@ -180,6 +180,7 @@ void fn_8010A930(DynTexObj* pObj, u8* pBuf, f32 (*pMtx)[3], s32 nMode) {
     int nShift;
     u8 uIndices;
     u8 uIndex;
+    u8* pIndices;
 
     if (pObj->n40 != 14) {      // GX_TF_CMPR
         return;
@@ -187,17 +188,17 @@ void fn_8010A930(DynTexObj* pObj, u8* pBuf, f32 (*pMtx)[3], s32 nMode) {
     for (y = 0; y < pObj->n3A / 4; y++) {
         for (x = 0; x < pObj->n38 / 4; x++, pBlock += 4) {
             uOld0 = pBlock[0];
-            aIn[0] = (f32)((uOld0 >> 8) & 0xF8) / 255.0f;
-            aIn[1] = (f32)((uOld0 >> 3) & 0xFC) / 255.0f;
-            aIn[2] = (f32)((uOld0 << 3) & 0xF8) / 255.0f;
+            aIn[0] = (f32)(u32)((uOld0 >> 8) & 0xF8) / 255.0f;
+            aIn[1] = (f32)(u32)((uOld0 >> 3) & 0xFC) / 255.0f;
+            aIn[2] = (f32)(u32)((uOld0 << 3) & 0xF8) / 255.0f;
             fn_8010A788(aIn, aOut, pMtx, nMode);
             uNew0 = (u16)((((u8)(int)(aOut[0] * 255.0f + 0.5f) >> 3) << 11) |
                           (((u8)(int)(aOut[1] * 255.0f + 0.5f) >> 2) << 5) |
                           ((u8)(int)(aOut[2] * 255.0f + 0.5f) >> 3));
             uOld1 = pBlock[1];
-            aIn[0] = (f32)((uOld1 >> 8) & 0xF8) / 255.0f;
-            aIn[1] = (f32)((uOld1 >> 3) & 0xFC) / 255.0f;
-            aIn[2] = (f32)((uOld1 << 3) & 0xF8) / 255.0f;
+            aIn[0] = (f32)(u32)((uOld1 >> 8) & 0xF8) / 255.0f;
+            aIn[1] = (f32)(u32)((uOld1 >> 3) & 0xFC) / 255.0f;
+            aIn[2] = (f32)(u32)((uOld1 << 3) & 0xF8) / 255.0f;
             fn_8010A788(aIn, aOut, pMtx, nMode);
             uNew1 = (u16)((((u8)(int)(aOut[0] * 255.0f + 0.5f) >> 3) << 11) |
                           (((u8)(int)(aOut[1] * 255.0f + 0.5f) >> 2) << 5) |
@@ -228,18 +229,19 @@ void fn_8010A930(DynTexObj* pObj, u8* pBuf, f32 (*pMtx)[3], s32 nMode) {
             if (!bSwap) {
                 continue;
             }
-            for (i = 0; i < 4; i++) {
+            pIndices = (u8*)&pBlock[2];
+            for (i = 0; i < 4; i++, pIndices++) {
                 uIndices = 0;
                 for (nShift = 0; nShift < 8; nShift += 2) {
                     // EA bug: the mask keeps every bit from nShift up, not just the index's two,
                     // and the indices are compared as if 0x10 and 0x11 were binary 10 and 11;
                     // only the top index of a row is read right.
-                    uIndex = (((u8*)pBlock)[4 + i] & (0xFF << nShift)) >> nShift;
+                    uIndex = (*pIndices & (0xFF << nShift)) >> nShift;
                     if (bThree) {
                         if (uIndex == 0) {
                             uIndices |= 1 << nShift;
                         } else if (uIndex == 1) {
-                            // becomes 0
+                            uIndices |= 0 << nShift;
                         } else if (uIndex == 0x10) {
                             uIndices |= 0x10 << nShift;
                         } else if (uIndex == 0x11) {
@@ -249,7 +251,7 @@ void fn_8010A930(DynTexObj* pObj, u8* pBuf, f32 (*pMtx)[3], s32 nMode) {
                         if (uIndex == 0) {
                             uIndices |= 1 << nShift;
                         } else if (uIndex == 1) {
-                            // becomes 0
+                            uIndices |= 0 << nShift;
                         } else if (uIndex == 0x10) {
                             uIndices |= 0x11 << nShift;
                         } else if (uIndex == 0x11) {
@@ -257,7 +259,7 @@ void fn_8010A930(DynTexObj* pObj, u8* pBuf, f32 (*pMtx)[3], s32 nMode) {
                         }
                     }
                 }
-                ((u8*)pBlock)[4 + i] = uIndices;
+                *pIndices = uIndices;
             }
         }
     }
