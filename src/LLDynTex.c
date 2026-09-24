@@ -706,15 +706,16 @@ u8 fn_8010BFE0(void) {
         return 1;
     }
     if (lbl_80282488->n980 == 0) {
-        if (lbl_80282488->nA84 == 0) {
-            return 0;
-        }
-        lbl_80282488->pA88 = fn_8010B960();
-        lbl_80282488->pA88->pfnA(lbl_80282488->pA88->pChar);
-        if (DYNTEX_CHAR(lbl_80282488->p8)->hFile < 0) {
-            lbl_80282488->pA88->pfnB(lbl_80282488->pA88->pChar);
-            lbl_80282488->n980 = 0;
-            lbl_80282488->pA88->bUsed = 0;
+        if (lbl_80282488->nA84 != 0) {
+            lbl_80282488->pA88 = fn_8010B960();
+            lbl_80282488->pA88->pfnA(lbl_80282488->pA88->pChar);
+            if (DYNTEX_CHAR(lbl_80282488->p8)->hFile < 0) {
+                lbl_80282488->pA88->pfnB(lbl_80282488->pA88->pChar);
+                lbl_80282488->n980 = 0;
+                lbl_80282488->pA88->bUsed = 0;
+                return 0;
+            }
+        } else {
             return 0;
         }
     }
@@ -736,8 +737,9 @@ u8 fn_8010BFE0(void) {
         if (lbl_80282488->n980 == 1) {
             // The last texture is all in: flush it (and its palette) to the GPU.
             if (lbl_80282488->n978 != 0 && lbl_80282488->n970 > 0) {
-                pUse = &lbl_80282488->aUses[lbl_80282488->n970 - 1];
-                fn_8010B1D4(pTex, pUse->nC, NULL, pUse->p4, pUse->n8);
+                fn_8010B1D4(pTex, lbl_80282488->aUses[lbl_80282488->n970 - 1].nC, NULL,
+                            lbl_80282488->aUses[lbl_80282488->n970 - 1].p4,
+                            lbl_80282488->aUses[lbl_80282488->n970 - 1].n8);
                 pUse = &lbl_80282488->aUses[lbl_80282488->n970 - 1];
                 if (pTex->p0[pUse->nC].n1C != 0) {
                     // port: EA passes two arguments fn_8010B2A8 ignores
@@ -759,9 +761,11 @@ u8 fn_8010BFE0(void) {
             if (pEntry->nPalette != -1) {
                 pPal = &(*lbl_80282488->p8)->pC[pEntry->nPalette];
             }
-            pUse = &lbl_80282488->aUses[lbl_80282488->n970];
-            pUse->nC = fn_8010B338(DYNTEX_CHAR(lbl_80282488->pA88->p0)->p60, (DynTexObj*)pEntry,
-                                   (DynTexPalette*)pPal, NULL, NULL, pUse->p4, pUse->n8);
+            lbl_80282488->aUses[lbl_80282488->n970].nC =
+                fn_8010B338(DYNTEX_CHAR(lbl_80282488->pA88->p0)->p60, (DynTexObj*)pEntry,
+                            (DynTexPalette*)pPal, NULL, NULL,
+                            lbl_80282488->aUses[lbl_80282488->n970].p4,
+                            lbl_80282488->aUses[lbl_80282488->n970].n8);
             lbl_80282488->p4 = pTex->p18 +
                 pTex->p4->p8[lbl_80282488->aUses[lbl_80282488->n970].nC].aBlocks[0].nOffset;
             lbl_80282488->u98C = DYNTEX_CHAR(lbl_80282488->p8)->n58 + pEntry->uPixels;
