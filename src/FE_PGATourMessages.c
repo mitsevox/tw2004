@@ -15,7 +15,6 @@
 
 void fn_8011CADC(Skin* pSkin, int nMorph, f32 fWeight);    // SkinMorph.c
 void fn_800736D8(u8* pNode, int n);     // animblender.c
-void fn_80117188(void);                 // GameModeDriver.c
 u8   fn_80118F60(int nPlayer, int nGolfer, GM_Pga_StatTypes_t nStat);   // PGATourSimulation.c
 
 s32* lbl_802824B0;                      // the tournaments on the schedule (fn_8010EA24)

@@ -34,6 +34,7 @@ u8   GameModeDriverRTE_GetEventByDate(u16 nDate, s32* pId, s32* pRound);
 s32  fn_800F0E3C(void);
 RTEvent* GameModeDriverRTE_GetCalData(s32 i);
 char* GameModeDriverRTE_GetName(s32 i);
+char* GameModeDriverRTE_GetDescription(s32 i);
 s32  fn_800F1008(s32 i);
 u8   fn_800F102C(void);                 // always 0 (the calendar's cell look for today)
 
