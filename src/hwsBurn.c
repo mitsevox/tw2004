@@ -529,10 +529,10 @@ s32 fn_80111658(HwsBurn* pBurn, s32 nAlign) {
 
 // Copy the listed SkinDesc.p8C entries to pBase + *pOffset.
 SkinDesc8C* fn_8011172C(HwsBurn* pBurn, u8* pBase, s32* pOffset, s32 nAlign) {
-    int n = pBurn->n74;
-    SkinDesc* pDesc = pBurn->pDesc;
     SkinDesc8C* aOut;
     int i;
+    int n = pBurn->n74;
+    SkinDesc* pDesc = pBurn->pDesc;
     s32 nEnd;
 
     aOut = (SkinDesc8C*)(pBase + *pOffset);
