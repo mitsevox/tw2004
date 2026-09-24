@@ -124,7 +124,7 @@ void GolfCamera_InitShotSetupCamera(View* pView, int nPlayer) {
     } else {
         pView->p74 = DynamicCam_ChoosePreFlightSequence(nPlayer, nLie, 2);
     }
-    pShot = fn_8003A950(pView->p74, 2, &nA, &f1, &f2, &nB, &f3, nPlayer);
+    pShot = DynamicCam_ChooseScriptInSequence(pView->p74, 2, &nA, &f1, &f2, &nB, &f3, nPlayer);
     if (pShot != NULL) {
         if (pView->script.pShot == NULL || pView->script.pShot->bAD != 1 || pView->script.pNextShot != NULL) {
             nA = 5;
@@ -1204,7 +1204,7 @@ void fn_800C0624(View* pView, int nPlayer) {
     CamShot* pShot;
     pCam = fn_8001731C(pView);
     pSub = fn_80017314(pView);
-    pShot = fn_8003A7C8(nPlayer, 0x3A, NULL);
+    pShot = DynamicCam_ChooseScript(nPlayer, 0x3A, NULL);
     if (pShot != NULL) {
         CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, 5, 0.0f, 100.0f, 0x19,
                                        0.0f);
@@ -1305,7 +1305,7 @@ void GolfCamera_ProcessFlyByCamera(View* pView, int nPlayer) {
 }
 
 // Camera 11, the pre-shot camera: a static camera of kind 0x20, or 49 times in 100 (or without one)
-// shot 13 of fn_8003C9D0's sequence or of a new pre-flight sequence.
+// shot 13 of DynamicCam_ChoosePairedSequenceOrCamera's sequence or of a new pre-flight sequence.
 void GolfCamera_InitPreShotCamera(View* pView, int nPlayer) {
     int nLie;
     CamShot* pShot = NULL;
@@ -1322,12 +1322,12 @@ void GolfCamera_InitPreShotCamera(View* pView, int nPlayer) {
     pView->p74 = NULL;
     pShot = StaticCam_ChooseScript(nPlayer, 0x20, 0, pView->script.pShot);
     if (pShot == NULL || Misc_RandFunc(1) % 100 > 50) {
-        if (fn_8003C9D0(nPlayer, 0, &pView->p74, &pShot) && pView->p74 != NULL) {
-            pShot = fn_8003A950(pView->p74, 13, &nA, &f1, &f2, &nB, &f3, nPlayer);
+        if (DynamicCam_ChoosePairedSequenceOrCamera(nPlayer, 0, &pView->p74, &pShot) && pView->p74 != NULL) {
+            pShot = DynamicCam_ChooseScriptInSequence(pView->p74, 13, &nA, &f1, &f2, &nB, &f3, nPlayer);
         }
         if (pShot == NULL) {
             pView->p74 = DynamicCam_ChoosePreFlightSequence(nPlayer, nLie, 1);
-            pShot = fn_8003A950(pView->p74, 13, &nA, &f1, &f2, &nB, &f3, nPlayer);
+            pShot = DynamicCam_ChooseScriptInSequence(pView->p74, 13, &nA, &f1, &f2, &nB, &f3, nPlayer);
         }
         pView->script.nC8 = 13;
         pView->script.nC4 = 13;
@@ -1377,7 +1377,7 @@ void GolfCamera_ProcessPreShotCamera(View* pView, int nPlayer) {
         }
         pView->script.nC8 = pView->script.nC4;
         if (bStart) {
-            pShot = fn_8003A950(pView->p74, pView->script.nC4, &nA, &f1, &f2, &nB, &f3, nPlayer);
+            pShot = DynamicCam_ChooseScriptInSequence(pView->p74, pView->script.nC4, &nA, &f1, &f2, &nB, &f3, nPlayer);
             if (pShot != NULL) {
                 CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, nA, f1, f2, nB,
                                                f3);
@@ -1449,7 +1449,7 @@ void GolfCamera_InitSwingCamera(View* pView, int nPlayer) {
         f2 = 100.0f;
         f1 = 0.0f;
     } else {
-        pShot = fn_8003A950(pView->p74, 9, &nA, &f1, &f2, &nB, &f3, nPlayer);
+        pShot = DynamicCam_ChooseScriptInSequence(pView->p74, 9, &nA, &f1, &f2, &nB, &f3, nPlayer);
         if (!gSession.bReplay) {
             pView->n264 = 0;
             pView->p80 = pShot;
@@ -1500,7 +1500,7 @@ void GolfCamera_InitSwingCamera(View* pView, int nPlayer) {
         if (CameraScript_WillGolferBeOccludedInThisView(nPlayer, pShot, &pView->script)) {
             pSeq = DynamicCam_ChoosePreFlightSequence(nPlayer, nLie, 0x1C);
             if (pSeq != NULL) {
-                pClear = fn_8003A950(pSeq, 9, &nA, &f1, &f2, &nB, &f3, nPlayer);
+                pClear = DynamicCam_ChooseScriptInSequence(pSeq, 9, &nA, &f1, &f2, &nB, &f3, nPlayer);
             }
             if (pClear != NULL) {
                 pView->p74 = pSeq;
@@ -1532,10 +1532,10 @@ void GolfCamera_InitSwingCamera(View* pView, int nPlayer) {
             nA = 5;
             f1 = 0.0f;
         }
-        if (fn_80095780(gPlayers[nPlayer].pChar) == 11 && fn_8003C9D0(nPlayer, 0, &pAltSeq, &pAltShot)) {
+        if (fn_80095780(gPlayers[nPlayer].pChar) == 11 && DynamicCam_ChoosePairedSequenceOrCamera(nPlayer, 0, &pAltSeq, &pAltShot)) {
             if (pAltSeq != NULL) {
                 pView->p74 = pAltSeq;
-                pShot = fn_8003A950(pAltSeq, 9, &nA, &f1, &f2, &nB, &f3, nPlayer);
+                pShot = DynamicCam_ChooseScriptInSequence(pAltSeq, 9, &nA, &f1, &f2, &nB, &f3, nPlayer);
             } else if (pAltShot != NULL) {
                 nA = 5;
                 pShot = pAltShot;
@@ -1690,9 +1690,9 @@ void GolfCamera_InitHeartBeatCamera(View* pView, int nPlayer) {
     CamShot* pShot;
     f32 fRate;
     f32 fStart = 0.0f;      // fake match: a variable, not the literal (x - 0.0f folds away)
-    pShot = fn_8003A7C8(nPlayer, 0x2E, pView->script.pShot);
+    pShot = DynamicCam_ChooseScript(nPlayer, 0x2E, pView->script.pShot);
     if (pShot == NULL) {
-        pShot = fn_8003A7C8(nPlayer, 0xD, pView->script.pShot);
+        pShot = DynamicCam_ChooseScript(nPlayer, 0xD, pView->script.pShot);
     }
     if (pShot != NULL && !CameraScript_WillGolferBeOccludedInThisView(nPlayer, pShot, &pView->script)) {
         CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, 5, 0.0f, 100.0f, 0x19,
@@ -1734,10 +1734,10 @@ void GolfCamera_ProcessHeartBeatCamera(View* pView, int nPlayer) {
                     pShot = pView->p80;
                 }
                 if (pShot == NULL) {
-                    pShot = fn_8003A7C8(nPlayer, 0x2E, pView->script.pShot);
+                    pShot = DynamicCam_ChooseScript(nPlayer, 0x2E, pView->script.pShot);
                 }
                 if (pShot == NULL) {
-                    pShot = fn_8003A7C8(nPlayer, 0xD, pView->script.pShot);
+                    pShot = DynamicCam_ChooseScript(nPlayer, 0xD, pView->script.pShot);
                 }
                 if (pShot != NULL
                     && !CameraScript_WillGolferBeOccludedInThisView(nPlayer, pShot, &pView->script)) {
@@ -1765,9 +1765,9 @@ void GolfCamera_InitShutterCamera(View* pView, int nPlayer) {
     CamShot* pShot;
     pCam = fn_8001731C(pView);
     pSub = fn_80017314(pView);
-    pShot = fn_8003A7C8(nPlayer, 0x3E, pView->script.pShot);
+    pShot = DynamicCam_ChooseScript(nPlayer, 0x3E, pView->script.pShot);
     if (pShot == NULL) {
-        pShot = fn_8003A7C8(nPlayer, 0xD, pView->script.pShot);
+        pShot = DynamicCam_ChooseScript(nPlayer, 0xD, pView->script.pShot);
     }
     if (pShot != NULL) {
         CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, 5, 0.0f, 100.0f, 0x19,
@@ -1823,7 +1823,7 @@ void GolfCamera_ProcessShutterCamera(View* pView, int nPlayer) {
             pView->script.n110++;
         }
         if (fTime < 0.0f && gSession.fFrameTime + fTime >= 0.0f) {
-            pShot = fn_8003A7C8(nPlayer, pView->script.n110 + 0x3E, pView->script.pShot);
+            pShot = DynamicCam_ChooseScript(nPlayer, pView->script.n110 + 0x3E, pView->script.pShot);
             if (pShot != NULL) {
                 CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, 5, 0.0f, 100.0f,
                                                0x19, 0.0f);
@@ -2019,10 +2019,10 @@ void GolfCamera_ProcessBallFlightCamera(View* pView, int nPlayer) {
                 nB = pView->p74->p4C[nBest].b16;
                 f3 = pView->p74->p4C[nBest].f8;
             } else {
-                pShot = fn_8003A950(pSeq, pView->script.nC4, &nA, &f1, &f2, &nB, &f3, nPlayer);
+                pShot = DynamicCam_ChooseScriptInSequence(pSeq, pView->script.nC4, &nA, &f1, &f2, &nB, &f3, nPlayer);
             }
             if (pShot == NULL && pView->script.nC8 == 9) {
-                pShot = fn_8003A950(pView->p74, 0, &nA, &f1, &f2, &nB, &f3, nPlayer);
+                pShot = DynamicCam_ChooseScriptInSequence(pView->p74, 0, &nA, &f1, &f2, &nB, &f3, nPlayer);
             }
         }
         if (pShot != NULL
@@ -2061,7 +2061,7 @@ void GolfCamera_ProcessBallFlightCamera(View* pView, int nPlayer) {
                         if (f3 > fn_80062C28(gPlayers[nPlayer].pChar)) {
                             f3 = fn_80062C28(gPlayers[nPlayer].pChar);
                         }
-                        if (fn_8003C9D0(nPlayer, 0, &pAltSeq, &pAltShot)) {
+                        if (DynamicCam_ChoosePairedSequenceOrCamera(nPlayer, 0, &pAltSeq, &pAltShot)) {
                             if (pAltShot == NULL) {
                                 CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, nA,
                                                                f1, f2, nB, f3);
@@ -2152,7 +2152,7 @@ void GolfCamera_InitPostShotCamera(View* pView, int nPlayer) {
                     pView->script.n114 = 1;
                 }
                 if (pShot == NULL || pShot->bAC == 5) {
-                    pShot = fn_8003A950(pView->p74, 5, &nA, &f1, &f2, &nB, &f3, nPlayer);
+                    pShot = DynamicCam_ChooseScriptInSequence(pView->p74, 5, &nA, &f1, &f2, &nB, &f3, nPlayer);
                     if (pShot != NULL && pShot->bAA == 0) {
                         pView->script.n114 = 1;
                     }
@@ -2396,7 +2396,7 @@ void GolfCamera_InitFECamera(View* pView, int nPlayer) {
     pSub[0] = pCam[0] - 1.0f;
     pSub[1] = pCam[1];
     pSub[2] = pCam[2];
-    pShot = fn_8003A7C8(0, 0x23, NULL);
+    pShot = DynamicCam_ChooseScript(0, 0x23, NULL);
     if (pShot != NULL) {
         CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, 5, 0.0f, 100.0f, 0x19,
                                        0.0f);
@@ -2420,40 +2420,40 @@ void GolfCamera_ProcessFECamera(View* pView, int nPlayer) {
         && (pView->script.n110 != lbl_80281EE0->pB4->nC || (f32)pView->script.n114 != lbl_80281EE0->n0)) {
         switch (lbl_80281EE0->n0) {
         case 0:
-            pShot = fn_8003A7C8(0, 0x23, pView->p80);
+            pShot = DynamicCam_ChooseScript(0, 0x23, pView->p80);
             if (pShot == NULL) {
-                pShot = fn_8003A7C8(0, 0x23, NULL);
+                pShot = DynamicCam_ChooseScript(0, 0x23, NULL);
             }
             break;
         case 1:
             if (fn_8001EDF4(lbl_80281EE0->pB4->pChar)) {
-                pShot = fn_8003A7C8(0, 0x38, pView->p80);
+                pShot = DynamicCam_ChooseScript(0, 0x38, pView->p80);
                 if (pShot == NULL) {
-                    pShot = fn_8003A7C8(0, 0x38, NULL);
+                    pShot = DynamicCam_ChooseScript(0, 0x38, NULL);
                 }
             } else {
-                pShot = fn_8003A7C8(0, 0x24, pView->p80);
+                pShot = DynamicCam_ChooseScript(0, 0x24, pView->p80);
                 if (pShot == NULL) {
-                    pShot = fn_8003A7C8(0, 0x24, NULL);
+                    pShot = DynamicCam_ChooseScript(0, 0x24, NULL);
                 }
             }
             break;
         case 2:
-            pShot = fn_8003A7C8(0, 0x25, pView->p80);
+            pShot = DynamicCam_ChooseScript(0, 0x25, pView->p80);
             if (pShot == NULL) {
-                pShot = fn_8003A7C8(0, 0x25, NULL);
+                pShot = DynamicCam_ChooseScript(0, 0x25, NULL);
             }
             break;
         case 3:
-            pShot = fn_8003A7C8(0, 0x2F, pView->p80);
+            pShot = DynamicCam_ChooseScript(0, 0x2F, pView->p80);
             if (pShot == NULL) {
-                pShot = fn_8003A7C8(0, 0x2F, NULL);
+                pShot = DynamicCam_ChooseScript(0, 0x2F, NULL);
             }
             break;
         case 4:
-            pShot = fn_8003A7C8(0, 0x3D, pView->p80);
+            pShot = DynamicCam_ChooseScript(0, 0x3D, pView->p80);
             if (pShot == NULL) {
-                pShot = fn_8003A7C8(0, 0x3D, NULL);
+                pShot = DynamicCam_ChooseScript(0, 0x3D, NULL);
             }
             break;
         }
@@ -2487,26 +2487,26 @@ void GolfCamera_SwitchCrAPCamera(View* pView, char* szName, int nShot, u8 bBlend
     }
     pShot = NULL;
     if (szName != NULL) {
-        pShot = fn_8003A8C4(szName);
+        pShot = DynamicCam_ChooseScriptByName(szName);
         if (pShot == NULL && lbl_80281EE0->pB4 != NULL && lbl_80281EE0->pB4->pChar != NULL
             && lbl_80281EE0->pB4->pChar->nSlot == 1) {
             c = szName[0];
             szName[0] = 'f';
-            pShot = fn_8003A8C4(szName);
+            pShot = DynamicCam_ChooseScriptByName(szName);
             szName[0] = c;
         }
     }
     if (pShot == NULL) {
         if (nShot == 0) {
-            pShot = fn_8003A7C8(0, 0x2F, NULL);
+            pShot = DynamicCam_ChooseScript(0, 0x2F, NULL);
         } else if (nShot == 1) {
-            pShot = fn_8003A7C8(0, 0x37, NULL);
+            pShot = DynamicCam_ChooseScript(0, 0x37, NULL);
         } else if (nShot == 2) {
-            pShot = fn_8003A7C8(0, 0x39, NULL);
+            pShot = DynamicCam_ChooseScript(0, 0x39, NULL);
         } else if (nShot == 3) {
-            pShot = fn_8003A7C8(0, 0x3B, NULL);
+            pShot = DynamicCam_ChooseScript(0, 0x3B, NULL);
         } else if (nShot == 4) {
-            pShot = fn_8003A7C8(0, 0x3C, NULL);
+            pShot = DynamicCam_ChooseScript(0, 0x3C, NULL);
         } else {
             pShot = NULL;
         }
@@ -2940,7 +2940,7 @@ CamShot* GolfCamera_GetAlternateSwingCamera(int nFirst, int nPlayer) {
     CamShot* pShot;
     if (Game_GetMode() != 6 && Game_GetMode() != 7 && Game_GetMode() != 8) {
         for (i = nFirst; i <= 5; i++) {
-            pShot = fn_8003A7C8(nPlayer, i + 0x1C, NULL);
+            pShot = DynamicCam_ChooseScript(nPlayer, i + 0x1C, NULL);
             if (pShot != NULL) {
                 return pShot;
             }
@@ -3025,7 +3025,7 @@ void fn_800C4FF0(View* pView, f32* pFrom, f32* pTo, int nPlayer) {
     lbl_80282220->shot6C.bAD = 3;
     lbl_80282220->shot6C.p44 = pView->script.pShot;
     lbl_80282220->shot6C.f8C = 0.0f;
-    pShot = fn_8003A7C8(nPlayer, 0x22, NULL);
+    pShot = DynamicCam_ChooseScript(nPlayer, 0x22, NULL);
     if (pShot != NULL) {
         Mem_cpy(&lbl_80282220->shot12C, pShot, sizeof(CamShot));
         lbl_80282220->shot12C.p40 = NULL;
@@ -3328,7 +3328,7 @@ void fn_800C5D64(View* pView, f32* pViewCam, f32* pViewSub, int nPlayer) {
     pCam = fn_8001731C(pView);
     pSub = fn_80017314(pView);
     if (pView->n260 == 15 || pView->n260 == 16) {
-        pShot = fn_8003A7C8(nPlayer, 0x22, NULL);
+        pShot = DynamicCam_ChooseScript(nPlayer, 0x22, NULL);
         if (pShot != NULL) {
             CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, 5, 0.0f, 100.0f, 0x19,
                                            0.0f);
@@ -3345,7 +3345,7 @@ void fn_800C5D64(View* pView, f32* pViewCam, f32* pViewSub, int nPlayer) {
             pView->script.pNextShot = NULL;
             pView->script.fCamTime = 0.0f;
         } else {
-            pShot = fn_8003A7C8(nPlayer, 0xD, pView->script.pShot);
+            pShot = DynamicCam_ChooseScript(nPlayer, 0xD, pView->script.pShot);
             if (pShot != NULL
                 && !CameraScript_WillGolferBeOccludedInThisView(nPlayer, pShot, &pView->script)) {
                 CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, 5, 0.0f, 100.0f,
@@ -3437,20 +3437,20 @@ void GolfCamera_ChooseReactionCam(View* pView, int nPlayer, int a) {
     fn_800C73DC(gPlayers[nPlayer].ballBefore.vPos, gPlayers[nPlayer].ball.vStart, v);
     v[1] = 0.0f;
     fDist = fn_80009680(fn_80009744(v));
-    if (!fn_8003C9D0(nPlayer, 1, &pSeq, &pShot) && pShot == NULL) {
+    if (!DynamicCam_ChoosePairedSequenceOrCamera(nPlayer, 1, &pSeq, &pShot) && pShot == NULL) {
         pSeq = fn_8003BDBC(nPlayer, nLie, nClass, 15, 1, fDist);
     }
     if (pSeq != NULL && pShot == NULL) {
-        pShot = fn_8003A950(pSeq, 9, &nA, &f1, &f2, &nB, &f3, nPlayer);
+        pShot = DynamicCam_ChooseScriptInSequence(pSeq, 9, &nA, &f1, &f2, &nB, &f3, nPlayer);
         if (pShot != NULL) {
             pView->p74 = pSeq;
         }
     }
     if (pShot == NULL && pSeq != NULL) {
         pView->p74 = pSeq;
-        pShot = fn_8003A950(pView->p74, pView->script.nC4, &nA, &f1, &f2, &nB, &f3, nPlayer);
+        pShot = DynamicCam_ChooseScriptInSequence(pView->p74, pView->script.nC4, &nA, &f1, &f2, &nB, &f3, nPlayer);
         if (pShot == NULL && pView->script.nC4 != 5) {
-            pShot = fn_8003A950(pView->p74, 5, &nA, &f1, &f2, &nB, &f3, nPlayer);
+            pShot = DynamicCam_ChooseScriptInSequence(pView->p74, 5, &nA, &f1, &f2, &nB, &f3, nPlayer);
         }
     }
     if (pShot != NULL) {
@@ -3478,7 +3478,7 @@ void GolfCamera_CutToGolferDoneAnimatingCam(View* pView, int nPlayer) {
     }
     pShot = StaticCam_ChooseScript(nPlayer, 0x40, 1, pView->script.pShot);
     if (pShot == NULL || pShot == pView->script.pShot || pShot == pView->script.pB8) {
-        pShot = fn_8003A950(pView->p78, 5, &nA, &f1, &f2, &nB, &f3, nPlayer);
+        pShot = DynamicCam_ChooseScriptInSequence(pView->p78, 5, &nA, &f1, &f2, &nB, &f3, nPlayer);
     }
     if (pShot != NULL) {
         if (pView->script.pShot != NULL && pView->script.pShot->bAA == 0) {
@@ -3488,7 +3488,7 @@ void GolfCamera_CutToGolferDoneAnimatingCam(View* pView, int nPlayer) {
         }
         pView->script.bCF = 0;
     } else {
-        pShot = fn_8003A7C8(nPlayer, 5, NULL);
+        pShot = DynamicCam_ChooseScript(nPlayer, 5, NULL);
         if (pShot != NULL) {
             if (pView->script.pShot != NULL && pView->script.pShot->bAA == 0) {
                 CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, 5, 1.0f, 50.0f,
@@ -3775,7 +3775,7 @@ u8 fn_800C6E88(View* pView, int nPlayer) {
     if (pView->b268 == 1) {
         return 0;
     }
-    if (fn_8003A950(pView->p74, 0x17, NULL, NULL, NULL, NULL, NULL, nPlayer) != NULL) {
+    if (DynamicCam_ChooseScriptInSequence(pView->p74, 0x17, NULL, NULL, NULL, NULL, NULL, nPlayer) != NULL) {
         return pView->script.n110 < 1;
     }
     return 0;
@@ -3783,7 +3783,7 @@ u8 fn_800C6E88(View* pView, int nPlayer) {
 
 u8 GolfCamera_IsThereAPostPreShotCamera(View* pView, int nPlayer) {
     if (pView->script.nE0 != 0x19 && pView->p74 != NULL
-        && fn_8003A950(pView->p74, pView->script.nE0, NULL, NULL, NULL, NULL, NULL, nPlayer) != NULL) {
+        && DynamicCam_ChooseScriptInSequence(pView->p74, pView->script.nE0, NULL, NULL, NULL, NULL, NULL, nPlayer) != NULL) {
         return 1;
     }
     return 0;

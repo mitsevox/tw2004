@@ -953,8 +953,9 @@ done:
 
 // Plans the clip bank for a slot: merges the slot's library with its overlays (clips with the
 // same name are shared, later copies pointing at the first), and, unless it is slot 2, trims
-// the result to the slot's share of the 920 KB clip budget (random picks first; if that cannot
-// fit, the best-ranked picks from a fresh copy). Allocates the bank and returns its size.
+// the result to the slot's budget (lbl_80281CDC, or its share of 920 KB when lbl_80281CD8 is
+// set): random picks first; if that cannot fit, the best-ranked picks from a fresh copy.
+// Allocates the bank (slots 0 and 1 reuse one they have) and returns its size.
 u32 AnimLib_PlanBank(u32 nSlot) {
     LibSlot*    pSlot = &lbl_801C6068[nSlot];
     u32         nRet  = 0;
@@ -1249,10 +1250,11 @@ void Skalib_ScratchFromAram(int n) {
     }
 }
 
-// Copies the clips an overlay library adds into its slot's clip bank (header, keys and curves in
-// main memory, the per-frame data streamed out to ARAM), then, for a golfer's own overlay
-// (nSlot >= 3: the id the overlay was loaded under), builds the merged library into the
-// golfer's character object. Returns 0x2800 for a golfer's overlay, else 0.
+// Copies the clips in use of a library into its slot's clip bank (header, keys and curves in main
+// memory, the per-frame data streamed out to ARAM), when the slot has overlays: nSlot 0..2 is the
+// slot's own library, nSlot >= 3 a golfer's own overlay (the id it was loaded under). For a
+// golfer's overlay it then builds the merged library into the golfer's character object. Returns
+// 0x2800 for a golfer's overlay, else 0.
 s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
     u8*         pClipSrc;
     LibSlot*    pSlot;

@@ -375,7 +375,7 @@ void fn_800DBA50(int nPlayer) {
             fn_80045558(0, nPlayer);
             pView = fn_80017028(gPlayers[nPlayer].nView[0]);
             pSeq = fn_8003BDBC(nPlayer, nLie, nClass, 0xB, 1, fDist);
-            pShot = fn_8003A950(pSeq, 0, &nKind, &fTime, &f2, &nB, &f3, nPlayer);
+            pShot = DynamicCam_ChooseScriptInSequence(pSeq, 0, &nKind, &fTime, &f2, &nB, &f3, nPlayer);
             if (pShot != NULL && pView->script.pShot != pShot && pView->script.pNextShot != pShot &&
                 !fn_800451A8(&pView->script, pShot, nPlayer)) {
                 if (nKind == 5 && fn_8003DC78(pShot)) {

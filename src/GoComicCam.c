@@ -55,7 +55,7 @@ void fn_800B3550(int nKind, View* pView, int nPlayer) {
     lbl_80282178->nKind = nKind;
     lbl_80282178->bDone = 0;
     lbl_80282178->nPlayer = nPlayer;
-    pShot = fn_8003A7C8(nPlayer, nShot, pView->script.pShot);
+    pShot = DynamicCam_ChooseScript(nPlayer, nShot, pView->script.pShot);
     if (pShot != NULL && !CameraScript_WillGolferBeOccludedInThisView(nPlayer, pShot, &pView->script)) {
         CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, 5, 0.0f, 100.0f, 0x19,
                                        0.0f);
@@ -435,7 +435,7 @@ void fn_800B4914(View* pView, int nPlayer) {
 
     switch (lbl_80282178->nKind) {
     case 0:
-        pShot = fn_8003A7C8(nPlayer, nPanel + 0x28, pView->script.pShot);
+        pShot = DynamicCam_ChooseScript(nPlayer, nPanel + 0x28, pView->script.pShot);
         if (pShot != NULL && !CameraScript_WillGolferBeOccludedInThisView(nPlayer, pShot, &pView->script)) {
             CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, 5, 0.0f, 100.0f,
                                            0x19, 0.0f);
@@ -450,7 +450,7 @@ void fn_800B4914(View* pView, int nPlayer) {
                 if (nShot > 0x2D) {
                     nShot = 0x2B;
                 }
-                pShot = fn_8003A7C8(nPlayer, nShot, pShot);
+                pShot = DynamicCam_ChooseScript(nPlayer, nShot, pShot);
                 if (pShot != NULL &&
                     !CameraScript_WillGolferBeOccludedInThisView(nPlayer, pShot, &pView->script)) {
                     CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, 5, 0.0f,

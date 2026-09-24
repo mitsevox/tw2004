@@ -232,7 +232,7 @@ void CamScript_RunScript(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, 
     pScript->f88 += fStep;
     pScript->f9C = pScript->f98;
     pScript->f98 += fStep;
-    fn_8003D9AC(pScript, pScript->pShot, nPlayer, vBall, 1);
+    DynamicCam_GetSmoothBallLocation(pScript, pScript->pShot, nPlayer, vBall, 1);
     if (pScript->nE0 != 25 && pScript->f98 > pScript->fE4) {
         pScript->nC4 = pScript->nE0;
     }
@@ -561,10 +561,10 @@ f32 fn_8003F194(CamShot* pShot, f32 fA, f32 fB, f32 fTime) {
     return (f32)fn_80009680(fn_80009744(vDiff)) / fTime;
 }
 
-// The script's slow-motion move (nCamera, set by CameraController_FadeIn and its kin): hands fn_80038010 the
-// vector v40 with its [3] eased in (1), out (2), held (3) or kept from the current value (4),
-// within 0..v40[3]. Once the move's time f90 passes its length f94, 1 turns into 4 and 2 into 5;
-// 4 and 5 end (0) on the next frame that has time in it.
+// The script's screen fade (nCamera, set by CameraController_FadeIn and its kin): hands
+// fn_80038010 the colour v40 with its alpha [3] rising (1), falling (2), held (3) or kept from the
+// view's current colour (4), within 0..v40[3]. Once the fade's time f90 passes its length f94, 1
+// turns into 4 and 2 into 5; 4 and 5 end (0) on the next frame that has time in it.
 void fn_8003F2E0(CamScript* pScript, f32 fTime) {
     f32 v[4];
 
@@ -1163,7 +1163,7 @@ void CamScript_GetLookAtPoint(CamShot* pShot, int nPlayer, f32* pOut, f32* pCam,
             nPin = Game_CurrentPinSet();
             Vec3Copy(&pCourse->pin[nPin].x, pOut);
         } else if (CameraScript_SnapToScript(pScript, pShot)) {
-            fn_8003D9AC(pScript, pShot, nPlayer, vPos, 0);
+            DynamicCam_GetSmoothBallLocation(pScript, pShot, nPlayer, vPos, 0);
             if (pScript->bCF) {
                 // not steeper than 1 in 5 down to the camera, once it is far enough out
                 fn_80045428(vPos, pCam, vDiff);
@@ -1317,7 +1317,7 @@ void CamScript_GetLookAtPoint(CamShot* pShot, int nPlayer, f32* pOut, f32* pCam,
         }
         break;
     case 14:
-        fn_8003D9AC(pScript, pShot, nPlayer, pOut, 0);
+        DynamicCam_GetSmoothBallLocation(pScript, pShot, nPlayer, pOut, 0);
         pOut[1] = pCam[1];
         CameraScript_OffsetLookVector(pOut, pCam, pShot->f74, pShot->f70);
         break;
@@ -1458,7 +1458,7 @@ void CameraScript_LagAimMarker(int nPlayer, f32* pSub, f32* pCam, CamShot* pShot
 }
 
 // The look-at point following the ball, one step per ball update this frame: the aim moves from
-// the script's v70 towards the ball (fn_8003D9AC) at its CameraScript_GetBallHeightWithMaxHeight height, moved by the shot's
+// the script's v70 towards the ball (DynamicCam_GetSmoothBallLocation) at its CameraScript_GetBallHeightWithMaxHeight height, moved by the shot's
 // f74 and f70; during a fairway fix (bCF) a steep look down is limited (as in
 // CamScript_GetLookAtPoint). pOut eases towards it by a share that grows with the distance
 // (CamTuning.f138, f13C) and eases in over the move (fD4, f158); its height eases in by f15C/f160
@@ -1484,7 +1484,7 @@ void CameraScript_LagBallFlight(int nPlayer, f32* pOut, f32* pCam, CamShot* pSho
     Vec3Copy(pOut, vLast);  // vLast is not read
     nUpdates = GameEffects_BallUpdatesThisFrame(nPlayer);
     if (nUpdates == 0) return;
-    fn_8003D9AC(pScript, pShot, nPlayer, vBall, 0);
+    DynamicCam_GetSmoothBallLocation(pScript, pShot, nPlayer, vBall, 0);
     for (i = 0; i < nUpdates; i++) {
         fn_80045428(vBall, pScript->v70, vStep);
         fn_8001EF34(vStep, (f32)(i + 1) / (f32)nUpdates, vStep);

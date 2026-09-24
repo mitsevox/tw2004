@@ -38,7 +38,7 @@ typedef struct DynCamSet {
 } DynCamSet;
 LAYOUT_ASSERT(DynCamSet, 0x28);
 
-// The dynamic cameras' tables (0x28 bytes, allocated by fn_80039FF8): the shots and sequences
+// The dynamic cameras' tables (0x28 bytes, allocated by DynamicCam_Init): the shots and sequences
 // loaded so far, and the block the sequences' choices are handed out from.
 typedef struct DynCamTables {
     CamShot*     pShots;        // 0x00

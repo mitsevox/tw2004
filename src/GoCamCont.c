@@ -305,7 +305,7 @@ void CameraController_SetCameraMode(View* pView, int nCamera, int nPlayer, int n
 void fn_8006351C(View* pView, int nPlayer, int nKind) {
     f32* pPos = fn_8001731C(pView);
     f32* pAt = fn_80017314(pView);
-    CamShot* pShot = fn_8003A7C8(nPlayer, nKind, NULL);
+    CamShot* pShot = DynamicCam_ChooseScript(nPlayer, nKind, NULL);
 
     if (pShot != NULL) {
         pView->script.pNextShot = pShot->p40;
@@ -548,7 +548,7 @@ void fn_80063CF0(View* pView, int nKind, int nPlayer) {
         return;
     }
     if (nKind == 12 && pView->script.nC4 != 12) {
-        pShot = fn_8003A7C8(nPlayer, 12, NULL);
+        pShot = DynamicCam_ChooseScript(nPlayer, 12, NULL);
         if (pShot != NULL) {
             CameraScript_RecordCurrentCam(&pView->shot19C, pPos, pAt, nPlayer, &pView->script, 0);
             pView->shot19C.p40 = pShot;

@@ -469,7 +469,7 @@ u8 Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 bModels, u8 bH
 // further away. If the spot is over 3 yards off, or (not preferred) on another class of surface
 // than the ball, search rings of 1 to 4 yards around the ball, every 45 degrees starting towards
 // the pin, for a drop on the same class, else the nearest. Returns 0 when the spot is where the
-// shot started, or (with bCheck) within 50 yards of vA44.
+// shot started, or (with bCheck, while vBall is still at vA44) within 50 yards of vA44.
 // Not exact yet (99.86%): only two float registers are swapped, the ring search's fDist (the
 // original's f22) and fLift (f25). Tried: every order of the float declarations, a separate
 // variable for the ring search's distance (declared anywhere), fLift written inline.
@@ -2126,9 +2126,9 @@ u8 fn_800504F4(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32* p
     }
     return 0;
 }
-// Mark every ground triangle's highest and lowest corner in its flags (bits 4-5 and 6-7), using
-// bit 3 to do each triangle once, then clear bit 3 again. TW06 has the two halves as
-// Ter_ComputeHighestPointInEveryTriangle and Ter_ClearVertexProcessedBit.
+// Mark the highest and lowest corner of every ground triangle whose flags are not 0 in those
+// flags (bits 4-5 and 6-7), using bit 3 to do each triangle once, then clear bit 3 again. TW06 has
+// the two halves as Ter_ComputeHighestPointInEveryTriangle and Ter_ClearVertexProcessedBit.
 // Not exact yet (94.5%): only the second pass's registers differ (it adds the strip's base to
 // the vertex index last; ours adds the low half first). Tried: its own block locals and
 // orders, a static inline helper, a named index (int, s32, u32), for/while forms.

@@ -255,7 +255,7 @@ u8   fn_800347B4(struct UStreamObject* pObject);   // a pin's position (TerPosDa
 void fn_80035118(int a, int b);     // renderer state: n10 and n14
 void fn_80035098(u8 b);             // renderer state
 void fn_80035154(u8 b);             // renderer state
-void fn_80035138(int a);            // renderer state: uFC
+void fn_80035138(int a);            // renderer state: nFC
 struct UObjMesh* fn_80034A20(u16 nPatch, u16 nObjList);    // a course object's model
 
 #endif

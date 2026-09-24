@@ -101,8 +101,8 @@ void fn_800382E0(void);
 void fn_80038968(void);
 void fn_800389C0(void);
 void fn_80039358(int nView);
-void fn_80039FF8(void);
-void fn_8003A074(void);
+void DynamicCam_Init(void);
+void DynamicCam_DeInit(void);
 void fn_80045660(void);
 void fn_80045848(int nPlayer);
 void fn_80045D18(void);
@@ -536,7 +536,7 @@ void GO_vInitFE(void) {
     lbl_80281E60 = CA_spCreateCamera();
     CameraTuning_Init();
     fn_80062E00();
-    fn_80039FF8();
+    DynamicCam_Init();
     lbl_80281E5C = FB_spCreateFrameBuffer();
     lbl_80281E58 = VM_spCreateViewport();
     lbl_80281E54 = fn_8001371C(lbl_80281E60, lbl_80281E5C, lbl_80281E58);
@@ -575,7 +575,7 @@ void fn_8006CB2C(void) {
     FB_vReleaseFrameBuffer(lbl_80281E5C);
     CA_vReleaseCamera(lbl_80281E60);
     fn_80062E20();
-    fn_8003A074();
+    DynamicCam_DeInit();
     fn_80097E98();
     fn_8001C350();
     fn_8001C518();
@@ -624,7 +624,7 @@ void GO_vInitIG(void) {
     fn_80067608();
     CameraTuning_Init();
     fn_80062E00();
-    fn_80039FF8();
+    DynamicCam_Init();
     StaticCam_Init();
     fn_800B34F0();
     fn_80048DD0();
@@ -719,7 +719,7 @@ void fn_8006CDC4(void) {
     fn_80048E7C();
     fn_800B352C();
     fn_80062E20();
-    fn_8003A074();
+    DynamicCam_DeInit();
     StaticCam_DeInit();
     fn_80097E98();
     fn_800DCC30();

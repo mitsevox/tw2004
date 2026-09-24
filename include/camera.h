@@ -232,7 +232,7 @@ typedef struct CamScript {
     f32  fD8;                   // 0xD8  camera 8: the ground height it follows (fn_8003B534 measures
                                 //       the ball's height over it)
     f32  fDC;                   // 0xDC
-    s32  nE0;                   // 0xE0  a shot kind for fn_8003A950 (25 = none)
+    s32  nE0;                   // 0xE0  a shot kind for DynamicCam_ChooseScriptInSequence (25 = none)
     f32  fE4;                   // 0xE4
     u8   bE8;                   // 0xE8
     u8   unkE9[0xEC - 0xE9];
@@ -457,7 +457,7 @@ typedef struct CamTuning {
     f32  f220;                  // 0x220  camera 4: its ground clearance, and its least height over the ball
     f32  f224;                  // 0x224  camera 4: (f20C - 1) times this raises the aim each frame ...
     s32  n228;                  // 0x228  ... unless this is set: then the aim is at the camera's height
-    f32  f22C;                  // 0x22C  placement height kind 7 (GoDynamicCam.c fn_8003D414): the share of
+    f32  f22C;                  // 0x22C  placement height kind 7 (GoDynamicCam.c DynamicCam_AddHeightOffset): the share of
                                 //        the way to the new height taken per ball step, rising ...
     f32  f230;                  // 0x230  ... and falling towards the shot's f68
     f32  f234;                  // 0x234
@@ -606,7 +606,7 @@ typedef struct RenderCamera {
 // fn_80013D5C sets it.
 extern void** lbl_80280DF0;
 
-// GoTerrain.c: gives the current render camera the view matrix pMtx (NULL: the identity), through
+// GoTerrain.c: gives the current render camera the model matrix pMtx (NULL: the identity), through
 // fn_80013D9C.
 void   fn_80035240(f32 (*pMtx)[4]);
 // GoRenderCtx_Gc.c: gives the camera the model matrix pMtx (NULL: the identity).
@@ -642,21 +642,21 @@ void   fn_8006A8D4(void* pCamera, f32* pX, f32* pY);
 
 // ---- camera shots and sequences (0x8003A7C8..) ----------------------------------------------
 
-CamShot* fn_8003A7C8(int nPlayer, int nKind, CamShot* pShot);
+CamShot* DynamicCam_ChooseScript(int nPlayer, int nKind, CamShot* pShot);
 u8       fn_8003A76C(CamShot* pShot);    // the shot is one of kinds 1, 3, 13, 28..34 or 40..45
-CamShot* fn_8003A8C4(char* szName);     // the shot with this name (case ignored), or NULL
+CamShot* DynamicCam_ChooseScriptByName(char* szName);     // the shot with this name (case ignored), or NULL
 // A shot of kind nKind from the sequence, picked at random, and its blend values (each out
 // pointer may be NULL).
-CamShot* fn_8003A950(CamSequence* pSequence, int nKind, int* pA, f32* pF1, f32* pF2, int* pB, f32* pF3,
+CamShot* DynamicCam_ChooseScriptInSequence(CamSequence* pSequence, int nKind, int* pA, f32* pF1, f32* pF2, int* pB, f32* pF3,
                      int nPlayer);
 CamSequence* fn_8003BDBC(int nPlayer, int nLie, int nClass, int nKind, u8 a, f32 fDist);
 CamSequence* DynamicCam_ChoosePreFlightSequence(int nPlayer, int nLie, int nKind);
 // The sequence and shot named after the golfer's clip (with b, Character.p1790 first).
-u8       fn_8003C9D0(int nPlayer, u8 b, CamSequence** ppSeq, CamShot** ppShot);
+u8       DynamicCam_ChoosePairedSequenceOrCamera(int nPlayer, u8 b, CamSequence** ppSeq, CamShot** ppShot);
 u8       fn_8003D7A0(CamSequence* pSequence, int nPlayer);   // it suits the player's club and shot
 u8     fn_8003DC78(CamShot* pShot);     // the shot's bAC is 1..6 or 7
 // The ball's position, or the script's v70 when the ball is by the pin (with bKeep v70 follows it).
-void   fn_8003D9AC(CamScript* pScript, CamShot* pShot, int nPlayer, f32* pOut, u8 bKeep);
+void   DynamicCam_GetSmoothBallLocation(CamScript* pScript, CamShot* pShot, int nPlayer, f32* pOut, u8 bKeep);
 // 0 when gSession.nGameType is 3, else fn_8001EDF4 of the player's golfer (Player.pChar) as a flag;
 // the shot is not read.
 u8     fn_800453C8(int nPlayer, CamShot* pShot);

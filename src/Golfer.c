@@ -1917,7 +1917,8 @@ void Session_Init(void) {
 }
 
 // Fill each player's profile from their golfer: a created golfer's from the save, the two
-// default golfers' from a fixed name, a pro's ball type from their SPIN rating.
+// default golfers' from a fixed name, a pro's ball type from their SPIN rating (0 for the golfers
+// fn_80077B18 picks).
 void Session_SetupProfiles(void) {
     Session* pSession = &gSession;
     int      i, j;

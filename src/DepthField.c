@@ -104,7 +104,7 @@ static inline f32 DF_Clamp(f64 f, f32 fLo, f32 fHi) {
 }
 
 // Draws the screen copy back over the camera's rectangle five times in layer n's colour, each
-// pass shifted a little further (alternately left and right), deeper and fainter.
+// pass shifted less than the one before (alternately left and right) and fainter.
 void DF_vDrawBufferToScreen(int n) {
     int i;
     int bOdd;

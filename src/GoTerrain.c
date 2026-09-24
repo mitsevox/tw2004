@@ -441,11 +441,11 @@ void fn_8003185C(void) {
 // levels of detail (in object test mode the first list's; else lists 0, and 1 and 2 past
 // iLowLODListOffset), its distance from the camera and a clip method, or is left out (clip method 3).
 // Split screen leaves out objects with bit 0x8 of word 2. Hidden are: far objects with bit 0x80;
-// tee markers (word 1 bits 0x1, 0x2, 0x4: tee sets 0-2) not of the player's tee set, and all of them
-// once the ball is off the tee (Ball.nLie); crowd objects (word 3 bits 0x4, 0x10, 0x20) while the
-// camera moves, beyond fCrowdHalfMaxDistanceFromGolfer from the ball, or beyond
-// fCrowdFullMaxDistanceFromGolfer and farther from the pin than the ball is (every other one when
-// nearer).
+// crowd objects (word 3 bits 0x4, 0x10, 0x20) when fn_800172C4 is 0 for the view, beyond
+// fCrowdHalfMaxDistanceFromGolfer from the ball, or beyond fCrowdFullMaxDistanceFromGolfer and
+// farther from the pin than the ball is (every other one when nearer); and of those, tee markers
+// (word 1 bits 0x1, 0x2, 0x4: tee sets 0-2) not of the player's tee set, and all of them once the
+// ball is off the tee (Ball.nLie).
 void fn_80031154(Ter_PatchReference* pPatch, s32 nFirstObject) {
     s32 iObject;
     f32 v48[4];
@@ -648,7 +648,8 @@ void fn_80031A08(s32* pA, s32* pB, s32 a, s32 b) {
 
 // Picks each sorted object's level of detail by its distance: the first LOD plane whose end it is
 // inside. Once the 'tLOD' chunk is loaded, objects whose flags (bits 0x4, 0x10, 0x20 of the model's
-// word 3) ask for it always get level 0, and the others never get level 0 while the camera moves.
+// word 3) ask for it always get level 0, and the others never get level 0 when fn_800172C4 is 0
+// for the view.
 // Unless gSession.b11 is set, an object between two planes fades from one level into the next.
 void fn_80031AB4(void) {
     Ter_LODPlane* pPlanes = lbl_801D3CB0.LODPlanes;
@@ -751,8 +752,8 @@ u8 fn_80031E40(void) {
 // Sorts the objects (farthest first) into the draw lists: post-draw objects (bit 0x80 of the
 // model's word 2) straight to pPostDrawItemsList; the others opaque when far or when they must
 // stay solid, faded in over the near range (pNearbyObjectList), and their fading level into
-// pTranslucentObjectList. Crowd objects (bit 0x20 of word 0, only while the camera is still) use
-// the crowd's fade distances.
+// pTranslucentObjectList. Crowd objects (bit 0x20 of word 0, or 0x10 or 0x20 of word 3; not when
+// fn_800172C4 is 0 for the view) use the crowd's fade distances.
 void fn_80031E58(void) {
     s32 i;
     UObjMesh* pModel;
@@ -887,7 +888,7 @@ void fn_8003241C(Ter_ObjectDrawData* pDraw, s32* pCount, s32 nUnused, UObjMesh* 
     s32 uFlags0;
     s32 uFlags3;
 
-    // nUnused: every caller passes a number (0x28A, 0xC8, 0x46) this function does not read
+    // nUnused: every caller passes its list's size (650, 400, 300, 200, 70 or 50); it is not read
     pDraw->pObject = pModel;
     pDraw->fAlpha = fAlpha;
     pDraw->fMipmapBias = fMipmapBias;
@@ -1116,9 +1117,10 @@ void fn_80032AEC(void) {
 // bits 0-2 and 0x80, n18 bit 1), then the extra meshes its word 2 asks for: bit 0x8 drawn at once,
 // bits 0x10 and 0x20 as deferred items, bit 0x40 (near enough, not in split screen) raised by
 // 0.005 without z writes. Passes 1 and 2 leave out patches beyond 100 x fFOVScale unless the
-// ground's bit 0x80 is set. A lake surface (n20 bit 0x80) uses fLakeSurfaceMipmapBias; while the
-// camera moves, one with ground bit 0x80 is left out. *pbFirst tracks a renderer state switched
-// by fFar; b2 keeps it and the deferred and raised meshes out. b1 is not read.
+// ground's bit 0x80 is set. A lake surface (n20 bit 0x80) uses fLakeSurfaceMipmapBias; when
+// fn_800172C4 is 0 for the view, one with ground bit 0x80 is left out. *pbFirst tracks a renderer
+// state switched by fFar; b2 keeps it, the bit 0x10 deferred mesh and the raised mesh out. b1 is
+// not read.
 void fn_80032B7C(void* pGround, s32 eClipMethod, s32 nPass, s32 n1C, s32 n18, s32 n20, u8* pbFirst, u8 b1,
                  u8 b2, f32 fNear, f32 fFar) {
     f32 mRaise[4][4];
@@ -1223,9 +1225,9 @@ void fn_80032B7C(void* pGround, s32 eClipMethod, s32 nPass, s32 n1C, s32 n18, s3
 // Draws nCount objects of a draw list, switching the renderer state only when it changes from one
 // object to the next: the clip method, the mipmap bias, and the flags (0x40, fog 0x20, and 0x10 for
 // shader types other than 1 and 3) unless the object sets its own. Objects whose state word 0 has
-// bit 0x1 hand their f4 to row 2 or 3 of fn_8003519C (by shader type); without bit 0x2 it is
-// damped toward 0.5 with distance (fTreeDampingMaxForce, fTreeDampingDistance). The filters are
-// not read.
+// bit 0x1 hand their f4 to row 2 or 3 of fn_8003519C (by shader type); without bit 0x2 its swing
+// about 0.5 is cut by up to fTreeDampingMaxForce up close, less with distance (not at all from the
+// squared distance fTreeDampingDistance on). The filters are not read.
 void fn_80032F88(Ter_ObjectDrawData* pList, s32 nCount, s32 eFilterMin, s32 eFilterMag) {
     f32 fWave2;
     f32 fWave3;
@@ -1985,9 +1987,10 @@ UObjMesh* fn_80034A20(u16 nPatch, u16 nObjList) {
     return pModel;
 }
 
-// Draws the terrain: sets the renderer up, takes the camera's position and look direction, the
-// flat distance to the nearest ball and the smaller half field of view's tangent, then draws the
-// objects (fn_80034F28) and the grass (fn_80034CAC, fn_80034DE4).
+// Draws the grass patches (GoGrass.c calls it): sets the renderer up, takes the camera's position
+// and look direction, the flat distance to the nearest ball and the smaller half field of view's
+// tangent (view 0's), then builds the grass list (fn_80034F28) and draws it (fn_80034CAC,
+// fn_80034DE4).
 void fn_80034AE4(void) {
     int i;
     void* pHoleData = lbl_801D3CB0.pCurrentHoleData;
@@ -2033,7 +2036,7 @@ void fn_80034AE4(void) {
 }
 
 // Draws the grass patches of render pass nRenderPass that take part in the first pass (bit 0 of
-// n1C), farthest first, one clip method at a time.
+// n1C), from the end of the list, one clip method at a time.
 // Not exact (97.2%): the original tests bit 0 with `and.` against a register holding 1 (one more
 // saved register); every spelling tried folds the 1 into `clrlwi.` (a local mask of int, s32, u32 or
 // u8, s32/int counters).
@@ -2072,7 +2075,8 @@ void fn_80034CAC(int nRenderPass) {
     fn_80012EF8();
 }
 
-// Draws the grass patches in list 0x80 of n1C (pass 3), farthest first, one clip method at a time.
+// Draws the grass patches in list 0x80 of n1C (pass 3), from the end of the list, one clip method
+// at a time.
 void fn_80034DE4(void) {
     u8 bFirst = 1;
     int i;
@@ -2109,9 +2113,10 @@ void fn_80034DE4(void) {
     fn_80012EF8();
 }
 
-// Builds the grass list: every patch in the first pass's lists (bit 0x80 of n1C) or whose ground has
-// flag 8 of byte 3, and that is not off screen, is copied to xpGrassPatchList with its clip method
-// and its distance from the camera (less its radius, at least 0).
+// Builds the grass list: every patch of this frame in render pass 0's fourth list (bit 0x80 of
+// n1C) or whose ground's pC node (fn_8003556C) has flag 8 of byte 3, and whose pC node is not off
+// screen, is copied to xpGrassPatchList with that clip method and its distance from the camera
+// (less its radius, at least 0).
 void fn_80034F28(void* pUnused) {
     Ter_PatchReference* pPatch;
     void* pCamera;
@@ -2247,7 +2252,7 @@ void fn_800352E4(void) {
 
 // ---- end of sweep code ----
 
-// Hands the current light set's terrain colours to the renderer.
+// Takes the current light set's terrain colours as the current settings (fn_80035440).
 void fn_80035308(void) {
     fn_80035440(&fn_8003532C()->settings);
 }
@@ -2360,7 +2365,7 @@ f32* fn_800354C4(UObjMesh* pNode) {
     return pNode->pInfo->v58;
 }
 
-// A flag byte of the node (a24); the patch code reads bytes 1-3.
+// A flag byte of the node (a24); this file reads bytes 0-3.
 s32 fn_800354D0(UObjMesh* pNode, s32 n) {
     return pNode->pInfo->a24[n];
 }
@@ -2405,7 +2410,7 @@ f32 fn_80035560(UObjMesh* pMesh) {
     return pMesh->pInfo->f54;
 }
 
-// The mesh drawn for a patch's ground.
+// The ground's pC node: fn_80034F28 tests its flags and bounds for the grass list.
 UObjMesh* fn_8003556C(UObjMesh* pGround) {
     return pGround->pC;
 }
