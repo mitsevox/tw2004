@@ -423,7 +423,10 @@ typedef struct CamTuning {
     f32  f1A4;                  // 0x1A4  DynamicCam_ChoosePreFlightSequence: the obstruction test's slope
     f32  f1A8;                  // 0x1A8  fn_8003DCE8: how fast CamScript.fEC follows the ball's updates
                                 //        per frame
-    u8   unk1AC[0x1C0 - 0x1AC];
+    u8   unk1AC[0x1B4 - 0x1AC];
+    f32  f1B4;                  // 0x1B4  } fn_80063920 (GoCamCont.c), flat directions: the least cosine
+    f32  f1B8;                  // 0x1B8  } from the camera's motion (f1B4) and from its look (f1B8) to the
+    f32  f1BC;                  // 0x1BC  } object; the most the camera may move in a frame (f1BC)
     s32  n1C0;                  // 0x1C0  nonzero enables camera 19
     u8   unk1C4[0x1C8 - 0x1C4];
     s32  bCheckSlope;           // 0x1C8  fn_800C4650 tests the slope to the target (fn_800C4520)
@@ -709,6 +712,7 @@ void     fn_80065488(CamScript* pScript, int nPath, f32* pCam, f32* pSub, f32* p
 
 void   View_SetCamera(View* pView, int nCamera, int nPlayer, int nView);
 void   fn_80062F1C(View* pView);
+void   fn_80063920(int nView, f32* pBounds);    // the view's camera is inside an object's bounds
 void   fn_80063B98(View* pView, f32 f, f32* pVec);
 void   fn_80063BF4(View* pView, f32 f, f32* pVec);
 u8     fn_80063C50(View* pView);

@@ -3,6 +3,7 @@
 // small setters and tests the camera code uses. Not decompiled yet beyond the functions below.
 
 #include "golfer.h"
+#include "game.h"
 #include "camera.h"
 #include "unsorted/cull.h"
 
@@ -169,6 +170,77 @@ void fn_800638B8(View* pView, int nPlayer) {
         && gPlayers[nPlayer].ball.nCollideCount < 1) {
         fn_80063CF0(pView, 2, nPlayer);
     }
+}
+
+// The view's camera is inside the object at pBounds: while the ball is in flight, with a current
+// shot whose bAD is not 3 (or none) and no next shot, 0.5 or more into its shot, a camera that moves
+// toward the object, not too fast, while looking toward it goes back on the fairway. Directions
+// are taken flat.
+void fn_80063920(int nView, f32* pBounds) {
+    View* pView = fn_80017028(nView);
+    int nPlayer = fn_8001707C(nView);
+    f32 vObj[4];
+    f32 vToObj[4];
+    f32 vLook[4];
+    f32 vMove[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+    f32* pPos;
+    f32* pAt;
+    f32 fSpeed;
+    f32 fMoveCos;
+    f32 fLookCos;
+
+    if (pView == NULL) {
+        return;
+    }
+    if (!gpGame->b289) {
+        return;
+    }
+    pPos = fn_8001731C(pView);
+    pAt = fn_80017314(pView);
+    if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_SIMULATE) {   // fake match: (s8), see game.h
+        return;
+    }
+    if (pView->script.pShot != NULL && pView->script.pShot->bAD == 3) {
+        return;
+    }
+    if (pView->script.pNextShot != NULL) {
+        return;
+    }
+    if (pView->script.fCamTime < 0.5f) {
+        return;
+    }
+    vObj[0] = pBounds[0];
+    vObj[1] = 0.0f;
+    vObj[2] = pBounds[2];
+    vMove[0] = pView->script.v60[0];
+    vMove[1] = 0.0f;
+    vMove[2] = pView->script.v60[2];
+    fSpeed = fn_80009680(fn_80009744(vMove));
+    fn_80064478(vObj, pPos, vToObj);
+    vToObj[1] = 0.0f;
+    if (vToObj[0] != 0.0f || vToObj[1] != 0.0f || vToObj[2] != 0.0f) {
+        fn_800BAF04(vToObj, vToObj);
+    }
+    if (vMove[0] != 0.0f || vMove[1] != 0.0f || vMove[2] != 0.0f) {
+        fn_800BAF04(vMove, vMove);
+    }
+    fMoveCos = fn_8000C5FC(vMove, vToObj);
+    fn_80064478(pAt, pPos, vLook);
+    vLook[1] = 0.0f;
+    if (vLook[0] != 0.0f || vLook[1] != 0.0f || vLook[2] != 0.0f) {
+        fn_800BAF04(vLook, vLook);
+    }
+    fLookCos = fn_8000C5FC(vLook, vToObj);
+    if (fSpeed <= 0.0f) {
+        return;
+    }
+    if (fSpeed > lbl_80281F78->f1BC) {
+        return;
+    }
+    if (fMoveCos < lbl_80281F78->f1B4 || fLookCos < lbl_80281F78->f1B8) {
+        return;
+    }
+    CamScript_PutBackOnFairway(&pView->script, pPos, pAt, nPlayer, &pView->shot19C, pPos);
 }
 
 // Camera 2 on the point pVec, over fTime.
