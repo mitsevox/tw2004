@@ -795,7 +795,8 @@ u8   fn_80014300(u32 uMask);            // any pad pressed these buttons
 // ---- events, sound, effects ------------------------------------------------------------------
 
 void fn_800A7A98(s32 n);                // GameAudio.c
-void fn_800B7490(void);                 // DiscError.c: yield / pump (UStream.c, DiscCheck.c)
+u8   fn_800B7490(void);                 // DiscError.c: show the disc-error screen while the drive
+                                        // reports a problem; 1: it was shown (UStream.c, DiscCheck.c)
 
 // A node of Code8009B340.c's list (lbl_80281FA0): glows queued by fn_8009B260 that fade out
 // (fAlpha falls by fAlphaSpeed a second) and is freed once it has faded.
