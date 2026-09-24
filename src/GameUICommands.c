@@ -1,7 +1,8 @@
 // GameUICommands.c (our name): the commands the menu UI can send while a round is on (session game
 // types 4 to 8; uiProcessInterface.c's fn_8008F568 routes them here). fn_80085120 fills a table of
-// 214 command functions and fn_800850E4 runs one: most answer a question about the round (a
-// player's state, the score, the wind, Battle mode's clubs, the PGA Tour event) or act on it.
+// 214 slots with 212 command functions (0 and 119 stay NULL) and fn_800850E4 runs one: most
+// answer a question about the round (a player's state, the score, the wind, Battle mode's clubs,
+// the PGA Tour event) or act on it.
 
 #include "game.h"
 #include "game/frontend.h"
@@ -591,7 +592,7 @@ u8 fn_80085BC0(int nController) {
     return 0;
 }
 
-// Which screen layout the menus use: 3 in mode 8, 2 in modes 6 and 7, 1 split screen, else 0.
+// A number for the menus: 3 in mode 8, 2 in modes 6 and 7, 1 in split screen, else 0.
 void fn_80085C78(MsgArg* pArgs, MsgArg* pResult) {
     if (Game_GetMode() == 8) {
         pResult->i = 3;
@@ -628,7 +629,7 @@ void fn_80085D04(MsgArg* pArgs, MsgArg* pResult) {
     strcpy(((MsgString*)pArgs[1].p)->pStr, gPlayers[pArgs[0].i].golfer.szLast);
 }
 
-// The same, but a last name longer than 10 letters is cut to its first four.
+// The same without the "CEDRIC" case; a last name longer than 10 letters is cut to its first four.
 void fn_80085E20(MsgArg* pArgs, MsgArg* pResult) {
     int nGolfer = gSession.nGolfer[pArgs[0].i];
     char szName[32];
@@ -676,7 +677,7 @@ void fn_80085FDC(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// The same for the mode's points.
+// The same, but a hole's own value is the mode's points (the 18/19/20 totals are as above).
 void fn_800860C8(MsgArg* pArgs, MsgArg* pResult) {
     if (pArgs[1].i == 18) {
         pResult->i = fn_800E19A4(pArgs[0].i, 9);
@@ -804,7 +805,7 @@ static f32 GameUICommands_StrippedFn(f32 x) {
     return x + 1.0f;
 }
 
-// Where the wind blows from, against the player's aim: 0..8, eighths of a turn.
+// The wind's direction against the player's aim: 0..8, eighths of a turn.
 void fn_800864F8(MsgArg* pArgs, MsgArg* pResult) {
     f32 fAim = gPlayers[pArgs[0].i].fAim;
     f32 vWind[3];
@@ -889,7 +890,7 @@ void fn_80086738(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-// A hole's par; "hole" 18 is the front nine, 19 the back nine, 20 the course.
+// A hole's par; "hole" 18 is the front nine, 19 the back nine, 20 the round.
 void fn_8008685C(MsgArg* pArgs, MsgArg* pResult) {
     if (pArgs[0].i == 18) {
         pResult->i = fn_800D2E60();
@@ -1028,7 +1029,7 @@ void fn_80086D24(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = fn_800D2B4C(pArgs[0].i);
 }
 
-// A hole's length from a tee set; "hole" 18 is the front nine, 19 the back nine, 20 the course.
+// A hole's length from a tee set; "hole" 18 is the front nine, 19 the back nine, 20 the round.
 void fn_80086D58(MsgArg* pArgs, MsgArg* pResult) {
     if (pArgs[0].i == 18) {
         pResult->i = fn_800D2DA0(pArgs[1].i);
@@ -1109,7 +1110,7 @@ void fn_800870E4(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = fn_80119808(0, nEntrant);
 }
 
-// The score of the golfer on a row (the player's own counts the current round).
+// The score to par of the golfer on a row, over the holes before its current one.
 void fn_80087130(MsgArg* pArgs, MsgArg* pResult) {
     int nEntrant = fn_801197CC(0, pArgs[0].i);
 
@@ -1198,12 +1199,12 @@ void fn_800874F0(MsgArg* pArgs, MsgArg* pResult) {
     fn_801002C0();
 }
 
-// Set the time a player has left (GameMode13).
+// Call the mode's pfn25C with a player and a time (modes 6, 7, 8 and 13 store it for the hole).
 void fn_80087510(MsgArg* pArgs, MsgArg* pResult) {
     gpGame->pfn25C(pArgs[0].i, pArgs[1].i);
 }
 
-// Whether GameBreaker is off.
+// Whether gSession.a8[0] is set (with it, among other things, no GameBreaker starts).
 void fn_80087548(MsgArg* pArgs, MsgArg* pResult) {
     if (gSession.a8[0] != 0) {
         pResult->i = 1;
@@ -1432,7 +1433,7 @@ void fn_80087C7C(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// The size of the save kind picked (fn_80084FF0(2)) on the card in port pArgs[0], slot pArgs[1].
+// The space save kind 2 (fn_80084FF0(2)) still needs on the card in port pArgs[0], slot pArgs[1].
 void fn_80087CBC(MsgArg* pArgs, MsgArg* pResult) {
     CardPos pos;
 
@@ -1643,7 +1644,8 @@ void fn_80088428(MsgArg* pArgs, MsgArg* pResult) {
                              ((MsgString*)pArgs[2].p)->pStr, (s32*)pArgs[3].p);
 }
 
-// The contest hole: its number (-1: none), and into pArgs its par and length.
+// The round's next hole after the current one: its number (-1: none), and into pArgs its par and
+// its length from player 0's tees.
 void fn_80088474(MsgArg* pArgs, MsgArg* pResult) {
     int nHole;
     s32 nPar = 0;
@@ -2223,8 +2225,8 @@ void fn_80089A8C(MsgArg* pArgs, MsgArg* pResult) {
 void fn_80089AD0(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-// Whether the player whose turn it is may concede: nothing holds him, the hole is not over and
-// his ball is not in the cup.
+// Whether the player whose turn it is may still play: nothing holds him, the hole is not over for
+// him and his ball is not in the cup.
 void fn_80089AD4(MsgArg* pArgs, MsgArg* pResult) {
     if (fn_800E4254(lbl_80282278)) {
         pResult->i = 0;
@@ -2700,7 +2702,7 @@ void fn_8008A838(MsgArg* pArgs, MsgArg* pResult) {
 void fn_8008A86C(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-// Battle mode: whether the club stealing is over.
+// Battle mode: whether a club is to be taken: the last hole had a winner and the game goes on.
 void fn_8008A870(MsgArg* pArgs, MsgArg* pResult) {
     if (fn_800E81B4() != 0) {
         pResult->i = 1;

@@ -229,30 +229,32 @@ void fn_8009EA98(void);
 void fn_8009EAF0(void);
 s32  fn_8009EE28(s32 nPort, s32 nSlot);
 u32  fn_8009EF90(void);
-void fn_8009F02C(void);             // bring the images back from ARAM (fn_8009EF98 parks them)
+void fn_8009F02C(void);             // bring the images back, the first one from ARAM (fn_8009EF98)
 // Up to nMax names of the card's files whose name holds pPattern, into apName; how many in pnFound.
 s32  fn_8009F0F0(s32 nPort, s32 nSlot, const char* pPattern, char** apName, s32 nMax, s32* pnFound);
-// Read from open file nFile, on from the last read. arg3 is not used (TibExt passes 0).
+// Read from open file nFile at the file position, moving it on. arg3 is not used (TibExt passes 0).
 s32  fn_8009F208(s32 nFile, void* pBuf, s32 nLen, s32 arg3);
 s32  fn_8009F258(s32 nFile, void* pBuf, s32 nLen);          // write to open file nFile
-s32  fn_8009F2D8(s32 nFile, s32 nOffset, u8 bFromStart);    // move open file nFile's position
+s32  fn_8009F2D8(s32 nFile, s32 nOffset, u8 bFromStart);    // move the open file's position
 s32  fn_8009F35C(void);             // always 0
 s32  fn_8009F364(void);             // always 0
 s32  fn_8009F36C(s32 nPort, s32 nSlot, s32* pnFreeBytes);   // the card's free space
 // The card's free directory entries. pName is not used.
 s32  fn_8009F3A0(s32 nPort, s32 nSlot, const char* pName, s32* pnFreeFiles);
-// Open pName, its file number into pnFile.
+// Open the file noted in lbl_802813D8 (pName only picks the "EASB" extra); its number into pnFile.
 s32  fn_8009F3D4(s32 nPort, s32 nSlot, const char* pName, u32 uFlags, s32* pnFile);
 s32  fn_8009F488(s32 nFile);        // close open file nFile
-// Create pName with nLen bytes, but only when it is the save directory's name (the PS2's mkdir).
+// Create pName with nLen bytes, but only when it is "EASB" (the EA Sports Bio's file); any other
+// name does nothing and gives 0.
 s32  fn_8009F514(s32 nPort, s32 nSlot, const char* pName, s32 nLen);
 s32  fn_8009F5E4(s32 nPort, s32 nSlot, const char* pName);    // delete the save file
 
 // Look through the card's files for one whose name holds "BASLUS-20572": 0 if there is one, else
 // MC_ERR_NOFILE. nSlot is not used.
 s32  fn_8009F6A0(s32 nPort, s32 nSlot);
-// The card's state as an error code: -4 no card, -1 when uFlags bit 0x08 is clear (a mount sets it,
-// a format in progress or an encoding error clears it), -35 not mounted, else 0.
+// The card's state as an error code: -4 no card, -1 when uFlags bit 0x08 is clear (a mount sets it;
+// a format clears it until it succeeds, and so do a card check that finds the card broken and an
+// encoding error from CARDMountAsync), -35 not mounted, else 0.
 s32  fn_8009F734(s32 nPort, s32 nSlot);
 s32  fn_8009F728(int nPort);        // lbl_80281FD0[nPort] (the menus read it as a whole word)
 u8   fn_8009F7E8(int nPort);        // lbl_80282008[nPort]

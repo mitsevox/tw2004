@@ -535,8 +535,8 @@ void fn_8008B9A0(void) {
 }
 
 // Each frame: fade the golfer display (f14C, 0..0.5) with his animation, run screen kind 3's
-// shot sequence (n1C0), place him, turn to the next golfer when his animation ends, and animate
-// and light him.
+// queued animation (n1C0), place him, turn to the next golfer when his animation ends (b91), and
+// animate and light him.
 void sFE_AdjustAndSetGolferPosition(void) {
     f32 vSaved[4];
     LightParams params;
@@ -1120,8 +1120,8 @@ void fn_8008D058(void) {
     lbl_80281EE0->f14C = 0.0f;
 }
 
-// With b85 set, move bones 0x52 (when the character's bit 0x4000 is set) and 0x54 (when the ball
-// is in the golfer's hand) to their offset from bone 1, and bone 1 to 0, in x, z and w.
+// With b85 set, move bones 0x52 (when the character's bit 0x4000 is set) and 0x54 (when the clip
+// has it, fn_8001DBF4) to their offset from bone 1, and bone 1 to 0, in x, z and w.
 void fn_8008D6CC(void) {
     f32 v52[4];
     f32 v54[4];
@@ -1469,8 +1469,8 @@ int fn_8008E44C(void) {
     return lbl_80281EE0->pB4->b18 != 0;
 }
 
-// Play the animation szAnim on the golfer (for golfer 29, with an 'f' in front if it has no
-// such animation) and point the camera with szShot.
+// Play the animation szAnim on the golfer (for golfer 29, with its first letter changed to 'f'
+// if he has no such animation) and point the camera with szShot.
 u8 fn_8008E468(char* szAnim, char* szShot, u8 bNoBlend) {
     char szName[0x20];
     View* pView;
@@ -1686,7 +1686,7 @@ int fn_8008EB04(void) {
     return lbl_80281EE0->n1D8;
 }
 
-// The golfer is shown and nothing covers him.
+// The golfer shown is ready and b86, b88, lbl_80281F19, lbl_801D87C0.b0 and .b49 are all 0.
 u8 fn_8008EB10(void) {
     u8 bResult = 0;
 

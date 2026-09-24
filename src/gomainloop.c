@@ -1,7 +1,7 @@
 // gomainloop.c (TW06's gomainloop.c, golf/mainloop/gomainloop.c; GO_vInitIG): the game's main
 // loop: starting up and shutting down every system, the frame update and the render passes.
-// gSession.nGameType picks the loop's work: 1 the front end, 3 the create-a-player screens, 6 a
-// round, 13 leaving the game.
+// gSession.nGameType picks the loop's work: 1 the start-up screens, 3 the front end, 6 a round,
+// 13 leaving the game.
 
 #include "game.h"
 #include "psmgr.h"
@@ -363,7 +363,8 @@ f32 fn_8006C630(void) {
     return lbl_802811F0->f18;
 }
 
-// Polled every frame: the disc and the reset button.
+// Run inside wait loops (memory card, AnimStream): the sound (fn_800A4BDC), the GBA cable
+// (fn_8012402C, unless fn_80124094 is -1, 0x11 or 0x12) and the reset button (latched).
 void fn_8006C63C(void) {
     fn_800A4BDC();
     if (fn_80124094() != -1 && fn_80124094() != 0x12 && fn_80124094() != 0x11) {
@@ -375,7 +376,8 @@ void fn_8006C63C(void) {
     fn_80007254();
 }
 
-// The video field (lbl_80281B88 & 1) goes to the systems that alternate by field.
+// Hands the frame parity (lbl_80281B88 & 1) to fn_8006DC40 and fn_800162A4 (both empty) and,
+// outside start-up (game type 1), to fn_800355E0.
 void fn_8006C69C(void) {
     fn_8006DC40(lbl_80281B88 & 1);
     fn_800162A4(lbl_80281B88 & 1);
@@ -492,8 +494,8 @@ void fn_8006C854(void) {
     fn_80009918();
 }
 
-// Makes view nView's camera the current render camera; in a round, a view of the first two that
-// fn_800642B0 does not stop gets render pass 3, anything else pass 1.
+// Makes view nView's camera the current render camera and applies it, then draws the full-screen
+// quad (fn_8006DC4C) with flags 3 in a round for views 0 and 1 while fn_800642B0 is 0, else 1.
 void fn_8006C8EC(int nView) {
     fn_80016CD8();
     fn_80013D5C(fn_80017004(nView));
@@ -506,7 +508,7 @@ void fn_8006C8EC(int nView) {
     fn_8006DC4C(1);
 }
 
-// The front end's render set-up: a 512 x 448 screen.
+// Each frame's render set-up, in every game type, before its frame is drawn: a 512 x 448 screen.
 void fn_8006C968(void) {
     // fake match: the colour goes through float locals; the original converts them at run time
     f32 fRG = 100.0f;
@@ -520,7 +522,7 @@ void fn_8006C968(void) {
     fn_80012EF8();
 }
 
-// Starts the front end (game type 1).
+// Starts the front end (game type 3).
 void fn_8006C9EC(void) {
     int nView;
 
@@ -731,7 +733,7 @@ void fn_8006CDC4(void) {
     fn_8009A1F4();
 }
 
-// Starts the create-a-player screens (game type 3).
+// Starts the start-up screens (game type 1).
 void fn_8006CEFC(void) {
     int nView;
 
@@ -756,7 +758,7 @@ void fn_8006CEFC(void) {
     fn_8010FF9C();
 }
 
-// Shuts the create-a-player screens down.
+// Shuts the start-up screens down.
 void fn_8006CFC8(void) {
     fn_80090664();
     fn_8010F794();
@@ -770,7 +772,8 @@ void fn_8006CFC8(void) {
     fn_8006C854();
 }
 
-// Whether the main loop should end this frame: the round is over or quit, or the screens say so.
+// Whether the main loop should end this frame, by the game type's own tests: gSession's b12 and
+// nC, lbl_802811E8[1], the pads, fn_8009A180 and fn_8008F39C.
 u8 fn_8006D01C(void) {
     u8 bDone = 0;
 
@@ -980,7 +983,7 @@ void fn_8006D27C(void) {
     fn_8006DDA8();
 }
 
-// The front end's frame.
+// The start-up screens' frame.
 void fn_8006D7E8(void) {
     if (fn_800170A0(0)) {
         fn_8006C8EC(0);
@@ -992,7 +995,7 @@ void fn_8006D7E8(void) {
     fn_800382E0();
 }
 
-// The create-a-player screens' frame.
+// The front end's frame.
 void fn_8006D838(void) {
     u8 b;
 
@@ -1026,9 +1029,9 @@ void fn_8006D838(void) {
     fn_801242D0();
 }
 
-// The main loop, until fn_8006D01C says stop. Each frame measures its time (at most four frames,
-// a bad reading counts as four), counts the frames, sends event 0x1A once a second, then runs the
-// game type's frame.
+// The main loop, until fn_8006D01C says stop. Each frame's time is taken from watch 1
+// (fn_800954A4), at most four frames (a bad reading counts as four); outside start-up it counts
+// the frames and sends event 0x1A once a second; then it runs the game type's frame.
 void fn_8006D8E8(void) {
     u64 uLast = fn_800954A4(1);
     u64 uNow;
@@ -1334,7 +1337,7 @@ void fn_8006E0B8(void) {
 void fn_8006E0BC(void) {
 }
 
-// With options nC 2, whether lbl_802811F0's n10 has caught up with its n0C.
+// 1 when gSession.options.nC is 2 and lbl_802811F0's n10 equals its n0C, else 0.
 u8 fn_8006E0C0(void) {
     int b = 0;
 

@@ -88,8 +88,10 @@ class Blinder:
             before = code[max(0, m.start() - 2):m.start()]
             if before.endswith('.') or before.endswith('->'):
                 return w                              # a struct member that shares the spelling
-            if w == own or self.hide(w):
+            if (w == own or self.hide(w)) and w in self.game:
                 return 'fn_%08X' % self.game[w]
+            if w == own:
+                return 'fn_TARGET'                    # a function outside the game units' list
             return w
         return IDENT.sub(sub, code)
 

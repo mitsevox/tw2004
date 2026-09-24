@@ -46,7 +46,8 @@ void fn_800E508C(void) {
     lbl_802822BE = 1;
 }
 
-// A pending end-of-hole score screen goes up: the HUD comes back and the player's screen is shown.
+// Nonzero holds shot input (lbl_802822BE). The first poll after fn_800E50FC instead calls
+// fn_800E3C0C(1), sends message 0x1E with 1, clears the request and returns 1.
 u8 fn_800E5098(void) {
     if (lbl_802822BD) {
         fn_800E3C0C(1);
@@ -107,8 +108,8 @@ void fn_800E522C(int n) {
     lbl_80202B88[n] = 1;
 }
 
-// A menu screen closes: the next one still open comes up; with none left, the game unpauses
-// (state 2) or stays paused (state 1).
+// If slot i of lbl_80202B88 is set: clears it and, with no slot left set, calls fn_800E3B04,
+// then sets nPaused to 0 if it was 2 (after the resume calls), else to 1.
 void fn_800E5240(int i) {
     int k;
     u8* p;
@@ -149,7 +150,7 @@ void fn_800E5314(void) {
     lbl_80202B88[8] = 0;
 }
 
-// Whether a big message is waiting: queue 2 or 6, or a queue-1 item below 10.
+// Whether display queue 2 or 6 has items, or queue 1 has one whose n0 is below 10.
 u8 fn_800E5344(void) {
     int i;
     if (lbl_802822B0 > 0 || lbl_8028229C > 0) {
@@ -275,7 +276,7 @@ void fn_800E573C(void) {
     }
 }
 
-// The other pending-message flags, sent once each.
+// Sends each pending-message flag that is set, once, and clears it.
 void fn_800E5798(void) {
     MsgArg args[3];
     if ((s8)lbl_802822E4 != 0) {
@@ -474,7 +475,8 @@ void fn_800E5DA0(void) {
     lbl_80203138[13] = 0;
 }
 
-// A tutorial tip (below 15; tip 12 can repeat, the others show once), not when bD4 is set.
+// Queues message 0x21 with n. Below 15 (a tip): dropped while bD4 is set, and marked shown
+// (except tip 12) so fn_800E5E54 does not pick it again. 15 and up: always queued.
 void fn_800E5DE4(int n) {
     if (!gpGame->bD4 || n >= 15) {
         if (n < 15 && n != 12) {
