@@ -346,6 +346,132 @@ void fn_8009D728(s32 nPort, s32 nResult) {
     }
 }
 
+// Mount the card (unmounting it first if it was mounted: the answer is then MC_ERR_MOUNTED), check
+// it and note what it holds: its encoding, free space and free directory entries. The flags start
+// again from present and formatted; b94 is cleared, but put back when the card is broken. A card
+// with an I/O error is not touched. Brings the save file images back (fn_8009F02C).
+s32 fn_8009D74C(s32 nPort, s32 nSlot) {
+    int nChan;
+    s32 nFreeBytes;
+    s32 nFreeFiles;
+    u16 uEncoding;
+    u32 bWasMounted = 0;
+    u8 b94;
+    s32 nResult;
+    s32 nSize;
+    if (lbl_80281FD0[nPort] != 0) return MC_ERR_IOERROR;
+    nChan = nPort;
+    b94 = lbl_801F1510[nPort][nSlot].b94;
+    lbl_801F1510[nPort][nSlot].b94 = 0;
+    nResult = fn_8009D0D4(nPort, nSlot);
+    if (nResult != 0) return nResult;
+    if (lbl_801F1510[nPort][nSlot].uFlags & MC_CARD_MOUNTED) {
+        nResult = fn_8009DBAC(nPort, nSlot);
+        if (nResult != 0) return nResult;
+        bWasMounted = 1;
+    }
+    fn_8009CB9C(nPort, nSlot, 0xA000);
+    lbl_801F1510[nPort][nSlot].nFreeBlocks = 0;
+    lbl_801F1510[nPort][nSlot].uFlags = 0;
+    lbl_801F1510[nPort][nSlot].uFlags |= MC_CARD_PRESENT | MC_CARD_FORMATTED;
+    CARDMountAsync(nChan, lbl_802813D0, fn_8009D728, NULL);
+    while ((nResult = CARDGetResultCode(nChan)) == CARD_RESULT_BUSY) {
+        fn_800A4BDC();
+        fn_8009EB40(nPort, nSlot);
+        fn_8006C63C();
+    }
+    switch (nResult) {
+    case CARD_RESULT_FATAL_ERROR:
+        return MC_ERR_FATAL;
+    case CARD_RESULT_WRONGDEVICE:
+        lbl_801F1510[nPort][nSlot].uFlags |= MC_CARD_WRONGDEVICE;
+        return MC_ERR_WRONGDEVICE;
+    case CARD_RESULT_NOCARD:
+        lbl_801F1510[nPort][nSlot].uFlags &= ~MC_CARD_PRESENT;
+        return MC_ERR_NOCARD;
+    case CARD_RESULT_IOERROR:
+        lbl_801F1510[nPort][nSlot].uFlags |= MC_CARD_IOERROR;
+        return MC_ERR_IOERROR;
+    case CARD_RESULT_ENCODING:
+        lbl_801F1510[nPort][nSlot].uFlags |= MC_CARD_MOUNTED;
+        lbl_801F1510[nPort][nSlot].uFlags |= MC_CARD_ENCODING;
+        lbl_801F1510[nPort][nSlot].uFlags &= ~MC_CARD_FORMATTED;
+        return MC_ERR_ENCODING;
+    default:
+        return MC_ERR_UNKNOWN;
+    case CARD_RESULT_READY:
+    case CARD_RESULT_BROKEN:        // the check below finds out
+        break;
+    }
+    CARDCheckAsync(nChan, NULL);
+    while ((nResult = CARDGetResultCode(nChan)) == CARD_RESULT_BUSY) {
+        fn_800A4BDC();
+        fn_8009EB40(nPort, nSlot);
+        fn_8006C63C();
+    }
+    switch (nResult) {
+    case CARD_RESULT_FATAL_ERROR:
+        return MC_ERR_FATAL;
+    case CARD_RESULT_NOCARD:
+        lbl_801F1510[nPort][nSlot].uFlags &= ~MC_CARD_PRESENT;
+        return MC_ERR_NOCARD;
+    case CARD_RESULT_IOERROR:
+        lbl_801F1510[nPort][nSlot].uFlags |= MC_CARD_IOERROR;
+        return MC_ERR_IOERROR;
+    case CARD_RESULT_ENCODING:
+        lbl_801F1510[nPort][nSlot].uFlags |= MC_CARD_MOUNTED;
+        lbl_801F1510[nPort][nSlot].uFlags |= MC_CARD_ENCODING;
+        return MC_ERR_ENCODING;
+    case CARD_RESULT_BROKEN:
+        lbl_801F1510[nPort][nSlot].uFlags |= MC_CARD_MOUNTED;
+        lbl_801F1510[nPort][nSlot].uFlags &= ~MC_CARD_FORMATTED;
+        lbl_801F1510[nPort][nSlot].uFlags |= MC_CARD_BROKEN;
+        lbl_801F1510[nPort][nSlot].b94 = b94;
+        return MC_ERR_BROKEN;
+    default:
+        return MC_ERR_UNKNOWN;
+    case CARD_RESULT_READY:
+        break;
+    }
+    switch (CARDGetEncoding(nChan, &uEncoding)) {
+    case CARD_RESULT_FATAL_ERROR:
+        return MC_ERR_FATAL;
+    case CARD_RESULT_NOCARD:
+        lbl_801F1510[nPort][nSlot].uFlags &= ~MC_CARD_PRESENT;
+        return MC_ERR_NOCARD;
+    case CARD_RESULT_READY:
+        if (uEncoding != 0) {
+            lbl_801F1510[nPort][nSlot].uFlags |= MC_CARD_ENCODING;
+        }
+        break;
+    case CARD_RESULT_WRONGDEVICE:
+    default:
+        return MC_ERR_UNKNOWN;
+    }
+    switch (CARDFreeBlocks(nChan, &nFreeBytes, &nFreeFiles)) {
+    case CARD_RESULT_FATAL_ERROR:
+        return MC_ERR_FATAL;
+    case CARD_RESULT_NOCARD:
+        lbl_801F1510[nPort][nSlot].uFlags &= ~MC_CARD_PRESENT;
+        return MC_ERR_NOCARD;
+    case CARD_RESULT_BROKEN:
+        lbl_801F1510[nPort][nSlot].uFlags |= MC_CARD_BROKEN;
+        lbl_801F1510[nPort][nSlot].b94 = b94;
+        return MC_ERR_BROKEN;
+    case CARD_RESULT_READY:
+        nSize = lbl_801F1510[nPort][nSlot].nSectorSize + nFreeBytes;
+        lbl_801F1510[nPort][nSlot].nFreeBlocks = (nSize - 1) / lbl_801F1510[nPort][nSlot].nSectorSize;
+        lbl_801F1510[nPort][nSlot].nFreeFiles = nFreeFiles;
+        break;
+    default:
+        return MC_ERR_UNKNOWN;
+    }
+    fn_8009EB40(nPort, nSlot);
+    lbl_801F1510[nPort][nSlot].uFlags |= MC_CARD_MOUNTED;
+    fn_8009F02C();
+    return bWasMounted ? MC_ERR_MOUNTED : 0;
+}
+
 // Unmount the card if it is mounted, then park the save file images in ARAM (fn_8009EF98).
 s32 fn_8009DBAC(s32 nPort, s32 nSlot) {
     s32 nResult;
