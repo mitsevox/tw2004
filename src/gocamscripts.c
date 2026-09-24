@@ -51,6 +51,8 @@ f32  fn_8003F790(CamScript* pScript);   // the blend's share (0..1) so far
 f32  fn_80044F58(int nPlayer, CamScript* pScript);
 CamLens* fn_8001F004(void);             // the current camera's lens
 f32  fn_8001EFFC(u8* pLens);            // the lens's fB0 (char.c: its parameter is u8*)
+void fn_80038010(u8 a, int n, f32* pVec);
+void fn_800386F0(int n, f32* pVec);
 void fn_80040CF0(CamScript* pScript, f32* pSub, int nPlayer, f32* pPrev, f32 fTime);
 void fn_800090E4(f32* pTurn, f32* pVec, f32* pOut);     // the vector turned by it
 u8   fn_800DC464(int nPlayer);          // GameEffects.c: the ball is simulated from its position
@@ -343,6 +345,49 @@ void fn_8003E624(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot*
         if (fTime > 0.0f) {
             fn_80045428(vPrev, pCam, vMove);
             pScript->fD4 = (f32)fn_80009680(fn_80009744(vMove)) / fTime;
+        }
+    }
+}
+
+// The script's slow-motion move (nCamera, set by fn_80063B98 and its kin): hands fn_80038010 the
+// vector v40 with its [3] eased in (1), out (2), held (3) or kept from the current value (4),
+// within 0..v40[3]. Once the move's time f90 passes its length f94, 1 turns into 4 and 2 into 5;
+// 4 and 5 end (0) on the next frame that has time in it.
+void fn_8003F2E0(CamScript* pScript, f32 fTime) {
+    f32 v[4];
+
+    Vec3Copy(pScript->v40, v);
+    switch (pScript->nCamera) {
+    case 1:
+        v[3] = pScript->v40[3] * (pScript->f90 / pScript->f94);
+        v[3] = v[3] < 0.0f ? 0.0f : (v[3] > pScript->v40[3] ? pScript->v40[3] : v[3]);
+        fn_80038010(1, fn_80016D10(), v);
+        break;
+    case 2:
+        v[3] = pScript->f94 > 0.0f ? pScript->v40[3] - pScript->v40[3] * (pScript->f90 / pScript->f94) : 0.0f;
+        v[3] = v[3] < 0.0f ? 0.0f : (v[3] > pScript->v40[3] ? pScript->v40[3] : v[3]);
+        fn_80038010(1, fn_80016D10(), v);
+        break;
+    case 3:
+        v[3] = pScript->v40[3];
+        v[3] = v[3] < 0.0f ? 0.0f : (v[3] > pScript->v40[3] ? pScript->v40[3] : v[3]);
+        fn_80038010(1, fn_80016D10(), v);
+        break;
+    case 4:
+        fn_800386F0(fn_80016D10(), v);
+        v[3] = v[3] < 0.0f ? 0.0f : (v[3] > pScript->v40[3] ? pScript->v40[3] : v[3]);
+        fn_80038010(1, fn_80016D10(), v);
+        break;
+    case 5:
+        break;
+    }
+    if (fTime > 0.0f) {
+        if (pScript->nCamera == 4 || pScript->nCamera == 5) {
+            pScript->nCamera = 0;
+        } else if (pScript->nCamera == 2 && pScript->f90 > pScript->f94) {
+            pScript->nCamera = 5;
+        } else if (pScript->nCamera == 1 && pScript->f90 > pScript->f94) {
+            pScript->nCamera = 4;
         }
     }
 }
@@ -1250,6 +1295,22 @@ void CameraScript_InterpToNewScript(CamScript* pScript, CamShot* pShot, int nPla
         }
     }
     pScript->fF8 = 0.0f;
+}
+
+// The script is on its first frame (fCamTime 0, no blend running) for pShot: not for the current
+// shot while a next shot waits that is not its follow-on, nor for that next shot when it shares
+// the current shot's bB1.
+u8 fn_80043388(CamScript* pScript, CamShot* pShot) {
+    if (0.0f != pScript->fCamTime) return 0;
+    if (pScript->bCC) return 0;
+    if (pScript->pNextShot != NULL && pScript->pShot->p40 != pScript->pNextShot && pScript->pShot == pShot) {
+        return 0;
+    }
+    if (pScript->pNextShot != NULL && pScript->pNextShot == pShot && pScript->pShot->p40 != pScript->pNextShot
+        && pScript->pShot->bB1 == pScript->pNextShot->bB1) {
+        return 0;
+    }
+    return 1;
 }
 
 // pPos's height, brought down by CamTuning.fD0 times how far it is above the shot's f6C over the
