@@ -1313,9 +1313,7 @@ f32 Physics_HandleCollision(Ball* pBall, f32* pNormal, SurfaceType* pSurface) {
     }
     vSlip[1] = 1.62f * (fBounce * pBall->vVel[1]);
     vSlip[2] = 0.462857157f * (pBall->vVel[2] - 0.839999974f * pBall->vSpin[0]);
-    fT = vSlip[0] * vSlip[0];
-    fS = vSlip[2] * vSlip[2];
-    fD = fn_80009680(fT + fS);
+    fD = fn_80009680(vSlip[0] * vSlip[0] + vSlip[2] * vSlip[2]);
     fGrip = pSurface->f10 * fabsf(vSlip[1]) * 0.3f;
     if (pSurface->nClass == 4 || pSurface->nClass == 3 || pSurface->nClass == 2) {
         fGrip *= gTurfSpeedMul[gTurfSpeed];
@@ -1354,7 +1352,7 @@ f32 Physics_HandleCollision(Ball* pBall, f32* pNormal, SurfaceType* pSurface) {
                              (pBall->vPos[2] - pBall->vStart[2]) * (pBall->vPos[2] - pBall->vStart[2]))
                 > 63.0f) {
             fBite = 13.333333f * (0.3f * pSurface->f10);
-            if (pBall->fSpinX != 0.0f || pBall->fSpinY != 0.0f) {
+            if (pBall->fSpinX || pBall->fSpinY) {
                 fBite *= 0.1f;
             } else if (-0.839999974f * (pBall->vVel[0] * pBall->vSpin[2])
                            + -0.839999974f * (pBall->vVel[2] * -pBall->vSpin[0]) >= 0.0f) {
