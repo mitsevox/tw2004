@@ -157,8 +157,9 @@ void fn_80064A0C(UStreamObject* pObject) {
     pShot = &lbl_80281E18->aStatic[lbl_80281E18->nStatic];
     fn_8000A194(m, pShot->v30[1], pShot->v30[0], pShot->v30[2]);
     fn_800BADB4(m, vAhead, lbl_80281E18->aStatic[lbl_80281E18->nStatic].v30);
-    pShot = &lbl_80281E18->aStatic[lbl_80281E18->nStatic];
-    fn_80065AFC(pShot->v30, pShot->v20, pShot->v30);
+    fn_80065AFC(lbl_80281E18->aStatic[lbl_80281E18->nStatic].v30,
+                lbl_80281E18->aStatic[lbl_80281E18->nStatic].v20,
+                lbl_80281E18->aStatic[lbl_80281E18->nStatic].v30);
     lbl_80281E18->nStatic++;
     fn_80009E70(pObject);
 }
@@ -225,7 +226,8 @@ CamShot* fn_80064F7C(int nPlayer, int nKind, u8 bNotKind5, CamShot* pNot) {
     if (nFound == 0) {
         return NULL;
     }
-    return &lbl_80281E18->aStatic[aFound[Rand_Next(1) % nFound]];
+    i = Rand_Next(1) % nFound;
+    return &lbl_80281E18->aStatic[aFound[i]];
 }
 
 // Fly-by path nPath's first shot. The first call after loading chains the fly-by cameras into their
@@ -492,19 +494,21 @@ void fn_8006596C(CamShot* pShot, CamShot** ppPrev, CamShot** ppNext, CamShot** p
 
 // nPlayer's golfer or ball is inside the shot's area.
 u8 fn_800659F4(CamShot* pShot, int nPlayer) {
-    f32 v[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-    Player* pPlayer;
+    f32* pBallPos;
+    f32* pVBall;
     int i;
+    f32 v[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
     i = 0;
-    pPlayer = &gPlayers[nPlayer];
+    pBallPos = gPlayers[nPlayer].ball.vPos;
+    pVBall = gPlayers[nPlayer].vBall;
     do {
         switch (i) {
-        case 0:
-            Vec3Copy(pPlayer->vBall, v);
-            break;
         case 1:
-            Vec3Copy(pPlayer->ball.vPos, v);
+            Vec3Copy(pBallPos, v);
+            break;
+        case 0:
+            Vec3Copy(pVBall, v);
             break;
         }
         if (v[0] > pShot->u.aArea[0] && v[0] < pShot->u.aArea[2] && v[2] > pShot->u.aArea[1]
