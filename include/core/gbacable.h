@@ -34,7 +34,7 @@ typedef struct GbaChannel {
     s32  n50;                   // 0x50
     u32  uKey;                  // 0x54  0x40 + port, two port bits and their check byte (fn_801228E0)
     u32  u58;                   // 0x58  from the GBA: four d-pad bits (20-23) and a check byte
-    s32  n5C;                   // 0x5C  what SIProbe finds on the port (0x40000: a GBA); 0x40 at start
+    u32  u5C;                   // 0x5C  what SIProbe finds on the port (0x40000: a GBA); 0x40 at start
     u8   unk60[0x64 - 0x60];
     s32  n64;                   // 0x64  set when u58 is new
     u32  u68;                   // 0x68  the cash the GBA holds (fn_80123398, "FROMGBA_CASHDATA")

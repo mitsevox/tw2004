@@ -18,7 +18,6 @@ s32  fn_800171B0(void);                 // ViewController.c
 void fn_800760D8(LLPict* pPict);        // LLVideo.c
 void fn_800760F4(f32* pUV, LLPict* pPict);  // LLVideo.c
 void fn_80016978(f32 x0, f32 y0, f32 x1, f32 y1);
-f32  fn_8006E118(u64 tEnd, u64 tStart);    // GameManager.c: seconds between two time stamps
 void fn_8000AE48(f32* pA, f32* pB, f32* pOut);     // pOut = pA * pB, element by element
 void fn_80090D28(FEQuad* pQuad);
 void fn_800913EC(s16 nTable, s16 nEntry);
