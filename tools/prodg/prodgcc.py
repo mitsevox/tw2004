@@ -26,7 +26,9 @@ d = os.path.join(compilers, version)
 stem = os.path.splitext(os.path.basename(src))[0]
 os.makedirs(out_dir, exist_ok=True)
 i_file = os.path.join(out_dir, stem + '.i'); s_file = os.path.join(out_dir, stem + '.s'); o_file = os.path.join(out_dir, stem + '.o')
-cpp_flags = [f for f in flags if f.startswith(('-I', '-D', '-U', '-nostdinc'))]
+# cpp.exe predefines nothing on its own (the driver passes its version through the specs), so
+# give it the compiler's version the way ngccc would.
+cpp_flags = ['-D__GNUC__=2', '-D__GNUC_MINOR__=95'] + [f for f in flags if f.startswith(('-I', '-D', '-U', '-nostdinc'))]
 cc1_flags = [f for f in flags if not f.startswith(('-I', '-D', '-U', '-nostdinc'))]
 def strip_empty_sections(path):
     """NgcAs emits empty .data/.bss/.sbss/.sdata sections. The CodeWarrior linker still rounds the
@@ -72,7 +74,23 @@ def run(cmd):
     r = subprocess.run(cmd, capture_output=True, text=True)
     if r.returncode:
         sys.stderr.write(' '.join(cmd) + '\n' + r.stdout + r.stderr); sys.exit(r.returncode)
+def write_depfile(path):
+    """<stem>.d for ninja (deps = gcc), built from the preprocessor's line markers, so that an edited
+    header rebuilds this unit. GCC 2.95's cpp has no -MD of the form ninja needs."""
+    import re
+    seen = []
+    for l in open(i_file, errors='replace'):
+        m = re.match(r'# \d+ "([^"<>]+)"', l)
+        if m:
+            p = m.group(1).replace('\\', '/')
+            if p not in seen and os.path.isfile(p):
+                seen.append(p)
+    with open(path, 'w') as f:
+        f.write('%s: %s\n' % (o_file.replace('\\', '/'), ' '.join(p.replace(' ', '\\ ') for p in seen)))
+
+
 run([os.path.join(d, 'cpp.exe' if os.path.exists(os.path.join(d, 'cpp.exe')) else 'CPP.exe'), *cpp_flags, src, i_file])
+write_depfile(os.path.join(out_dir, stem + '.d'))
 run([os.path.join(d, 'cc1.exe'), *cc1_flags, '-quiet', i_file, '-o', s_file])
 run([os.path.join(d, 'NgcAs.exe'), s_file, '-o', o_file])
 strip_empty_sections(o_file)

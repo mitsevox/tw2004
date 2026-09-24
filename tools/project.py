@@ -744,6 +744,8 @@ def generate_build_ninja(
         + (f"--wrapper {wrapper} " if wrapper else "")
         + f"{compilers} $mw_version $cflags -c $in -o $basedir",
         description="PRODG $out",
+        depfile="$basefile.d",
+        deps="gcc",
     )
     n.newline()
 
