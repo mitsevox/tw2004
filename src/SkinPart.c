@@ -682,12 +682,10 @@ void fn_800CD944(Skin* pSkin, int nPart) {
 // Marks the bits of every option.
 void fn_800CD9EC(Skin* pSkin) {
     SkinDesc* pDesc;
-    s32 n;
     int i;
+    s32 n;
 
-    if (pSkin == NULL || pSkin->pModel == NULL) return;
-    pDesc = pSkin->pModel->pDesc;
-    if (pDesc == NULL) return;
+    if (pSkin == NULL || pSkin->pModel == NULL || (pDesc = pSkin->pModel->pDesc) == NULL) return;
     n = pDesc->n58;
     for (i = 0; i < n; i++) {
         fn_800CD844(pSkin, i);
