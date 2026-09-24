@@ -15,9 +15,8 @@ UObjMesh* fn_80048AC4(UObjMesh* pMesh, int i);
 int  fn_80048AD4(UObjMesh* pMesh, int i);
 int  fn_80048AE8(UObject* pObj);
 CamLens* fn_8001F004(void);                 // the current camera's lens (its fFov is read)
-f32  fn_8001414C(void);
+f32  fn_8001414C(u8* p);
 f32  fn_80014280(f32 f);
-int  fn_80007B2C(UObjMesh* pMesh, void* pCamera, f32 a, f32 fSize, f32 c);   // 3: not drawn
 void fn_8004B78C(CourseInfo* pCourse, f32* pPos);  // the ground's light at pPos
 void fn_80036024(f32 f);
 void fn_80035FFC(void);
@@ -96,8 +95,7 @@ void fn_800488B4(UObject* pObj) {
 
     pMesh = pObj->pModel->apLod[fn_80048AE8(pObj)];
     fFov = fn_8001F004()->fFov;
-    fn_8003526C();
-    fMax = 0.75f * fFov * fn_8001414C();
+    fMax = 0.75f * fFov * fn_8001414C((u8*)fn_8003526C());
     fn_80035240(pObj->m80);
     fSize = fn_80014280(0.5f * (fFov > fMax ? fMax : fFov));
     nClip = fn_80007B2C(pMesh, fn_8001614C(), 0.0f, fSize, 1.0f);

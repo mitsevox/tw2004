@@ -12,6 +12,7 @@
 
 struct CourseInfo;
 struct UStreamObject;
+struct UObjMesh;                    // dynobj.h: the hole data is a tree of them (fn_800354BC..fn_80035500)
 
 // A patch of ground to draw (0x34 bytes; TW06: Ter_PatchReference, 0x2C, the same up to 0x10).
 // fn_80030CC8 fills Ter_TerrainRendererMgr.pPatchList with them and chains each into
@@ -43,7 +44,7 @@ LAYOUT_ASSERT(Ter_ObjectReference, 0x30);
 // An object in a draw list (0x20 bytes; TW06: Ter_ObjectDrawData, the same size); fn_80032F88 draws a
 // list of them.
 typedef struct Ter_ObjectDrawData {
-    void*  pObject;             // 0x00  TW06: pObject
+    struct UObjMesh* pObject;   // 0x00  its model (fn_8003241C). TW06: pObject
     f32    fAlpha;              // 0x04  TW06: fAlpha
     f32    fMipmapBias;         // 0x08  TW06: fMipmapBias
     f32    fDistanceSquared;    // 0x0C  TW06: fDistanceSquared
@@ -198,6 +199,9 @@ void fn_8006F334(TerSettings* pSettings);   // Code8006F154.c: the default colou
 extern f32 lbl_801876D8[21][3];     // rows fn_80034648 copies into fDefaultObjectMipmapBias
 extern f32 lbl_802810C8;
 extern s8  lbl_802810CC;
+extern u8  lbl_802810EC;            // } 1: fn_80033F94 draws object list 0, list 2
+extern u8  lbl_802810ED;            // }
+extern s32 lbl_80281D64;            // how many of list 2's last objects fn_80033F94 leaves out
 extern s32 lbl_802810D0;            // } fn_80031938's arguments (the LOD planes); 26 and 16 once
 extern s32 lbl_802810D4;            // } unloaded, else set by fn_80031A08 from the 'tLOD' chunk
 extern f32 lbl_802810D8;            // }
@@ -216,5 +220,7 @@ void fn_80034720(struct UStreamObject* pObject);   // a tee's position (TerPosDa
 u8   fn_800347B4(struct UStreamObject* pObject);   // a pin's position (TerPosData)
 void fn_80035118(int a, int b);     // renderer state: n10 and n14
 void fn_80035138(int a);            // renderer state: uFC
+struct UObjMesh* fn_80034A20(u16 nPatch, u16 nObjList);    // a course object's model
+f32* fn_8003526C(void);             // the renderer camera's screen rectangle (fn_80012EF0)
 
 #endif

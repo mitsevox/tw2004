@@ -6,6 +6,7 @@
 #include "golfer.h"
 #include "game.h"
 #include "camera.h"
+#include "unsorted/cull.h"
 
 void fn_80045428(f32* pA, f32* pB, f32* pOut);  // pOut = pA - pB (paired singles)
 void fn_8004544C(f32* pA, f32* pB, f32* pOut);  // pOut = pA + pB (paired singles)
@@ -18,7 +19,6 @@ f32  fn_80043420(int nPlayer, CamScript* pScript, f32* pPos, f32* pCam, CamShot*
 void fn_8004349C(int nPlayer, f32* pCam, f32* pOut, f32* pTarget, CamScript* pScript, f32 fLag);
 void fn_8004255C(f32* pPos, f32* pTarget, f32 fUp, f32 fSide);
 void fn_8001EB8C(Character* pChar, int nBone, f32* pPos);   // char.c: a bone's position
-CamLens* fn_80008370(void* pCamera);                        // the render camera's lens
 void fn_80038054(u8 a, int n, f32 f1, f32 f2);
 void fn_800457B8(int nPlayer, f32 f);
 f32  fn_800DC45C(f32 f);

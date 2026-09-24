@@ -25,6 +25,7 @@ typedef struct GXColor {
 void GXSetAlphaUpdate(u8 bUpdate);
 void GXSetColorUpdate(u8 bUpdate);
 void GXSetZMode(u8 bCompare, int eCompare, u8 bUpdate);
+void GXSetBlendMode(int eType, int eSrcFactor, int eDstFactor, int eLogicOp);
 
 // ---- vertex arrays ----------------------------------------------------------------------------
 
@@ -51,6 +52,7 @@ void GXInitTexObj(GXTexObj* pObj, void* pImage, u16 nWidth, u16 nHeight, int eFo
 void GXInitTexObjCI(GXTexObj* pObj, void* pImage, u16 nWidth, u16 nHeight, int eFormat, int eWrapS,
                     int eWrapT, u8 bMipmap, u32 nTlut);
 void GXInitTlutObj(GXTlutObj* pObj, void* pLut, int eFormat, u16 nEntries);
+void GXLoadTexMtxIndx(u16 nIndex, u32 nId, int eType);
 
 // ---- the texture environment (TEV) ------------------------------------------------------------
 
@@ -83,6 +85,7 @@ void GXSetTexCopyDst(u16 nWidth, u16 nHeight, int eFormat, u8 bMipmap);
 void GXCopyTex(void* pDest, u8 bClear);
 void GXPixModeSync(void);
 void GXInvalidateTexAll(void);
+u32  GXGetTexBufferSize(u16 nWidth, u16 nHeight, int eFormat, u8 bMipmap, u8 nMaxLod);
 
 // ---- the game's own GX helpers (GxUtil.c) ----------------------------------------------------
 

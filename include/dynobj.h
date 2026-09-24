@@ -79,23 +79,36 @@ typedef struct DynObjPair {
 
 // The header of a UObjMesh's data (UObjMesh.pInfo).
 typedef struct UObjMeshInfo {
-    u8   unk0[0x24];
-    s8   a24[0x58 - 0x24];      // 0x24  fn_80048AD4 (length unknown, at most this)
-    f32  v58[3];                // 0x58  copied to UObjModel.v2C by type 0's setup
+    s16  n0;                    // 0x00  how many meshes UObjMesh.p8 holds (GoTerrain.c fn_800354F4)
+    u8   unk2[0x24 - 0x2];
+    s8   a24[0x54 - 0x24];      // 0x24  fn_80048AD4, GoTerrain.c fn_800354D0 (length unknown, at most this)
+    f32  f54;                   // 0x54  scales a terrain object's mipmap bias (GoTerrain.c fn_80035560)
+    f32  v58[3];                // 0x58  copied to UObjModel.v2C by type 0's setup; with f64 the
+                                //       bounding sphere GoTerrain.c's fn_800354C4 returns
     f32  f64;                   // 0x64  copied to UObjModel.f5C by type 0's setup
+    u8   unk68[0x8B - 0x68];
+    u8   b8B;                   // 0x8B  bit 1: a terrain object drawn without z writes (GoTerrain.c
+                                //       fn_80035554, fn_80033308)
 } UObjMeshInfo;
 
 // An entry of UObjMesh.p18 (0x2C bytes; what fn_800082CC takes).
 typedef struct UObjMeshPart {
-    u8   unk0[0x2C];
+    s32  n0;                    // 0x00  copied to Ter_ObjectDrawData.eShaderObjectType (fn_8003241C)
+    u8   unk4[0x2C - 0x4];
 } UObjMeshPart;
 
-// One level of detail of a UObjModel.
+// One level of detail of a UObjModel. The terrain's hole data is a tree of them (GoTerrain.c,
+// fn_800354BC..fn_80035500): the root holds a mesh per patch in its p8[1], a patch's p8[0] is its
+// ground and its p8[1] holds its object lists, whose meshes are the objects' (fn_80034A20).
 typedef struct UObjMesh {
     UObjMeshInfo* pInfo;        // 0x00
     u8   unk4[4];
-    struct UObjMesh** p8;       // 0x08  alternatives, by UObject.n108 (fn_80048AC4)
-    u8   unkC[0x18 - 0xC];
+    struct UObjMesh** p8;       // 0x08  alternatives, by UObject.n108 (fn_80048AC4); a terrain
+                                //       mesh's children (fn_800354E4)
+    struct UObjMesh* pC;        // 0x0C  in a terrain patch's ground: the mesh drawn for it (fn_8003556C)
+    u8   unk10[0x14 - 0x10];
+    struct UObjMesh* p14;       // 0x14  the next terrain mesh of a list (fn_800354BC); a patch's
+                                //       ground's is its objects (Ter_PatchReference.pObjects)
     struct UObjMeshPart* p18;   // 0x18  fn_80048A84 passes entry n28 to fn_800082CC
     u8   a1C[0x28 - 0x1C];      // 0x1C  nonzero: entry i of p18 is used
     s32  n28;                   // 0x28
@@ -324,5 +337,8 @@ int  fn_8004AF2C(int nMsg, DynObj* pObj, void* pArg, void* pArg2);
 
 // GoAnimalActors.c: type 11's handler (the animals).
 int  fn_8004AAEC(int nMsg, DynObj* pObj, void* pArg, void* pArg2);
+
+// LLObj_Gc.c: how a mesh is clipped against the camera (3: off screen, not drawn).
+int  fn_80007B2C(UObjMesh* pMesh, void* pCamera, f32 a, f32 fSize, f32 c);
 
 #endif
