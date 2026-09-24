@@ -316,6 +316,36 @@ void fn_80010544(int nSlot);            // frees the bank in slot nSlot and empt
 TexBank* fn_800106C4(int nSlot);        // the bank in slot nSlot
 int  fn_800107C0(struct UStreamObject* pObject, TexBank* pBank, int n);   // loads a bank: its slot
 
+// ---- disc reads (LLFileIO_Gc.c) ------------------------------------------------------------------
+
+// The SDK's open disc file (0x3C bytes); only what the game reads.
+typedef struct DVDFileInfo {
+    u8    unk0[0x18];
+    void* pAddr;                // 0x18  the running read's buffer
+    u8    unk1C[0x34 - 0x1C];
+    u32   uLength;              // 0x34  the file's size in bytes
+    void* pCallback;            // 0x38
+} DVDFileInfo;
+typedef void (*DVDCallback)(s32 nResult, DVDFileInfo* pInfo);
+s32 DVDReadAsyncPrio(DVDFileInfo* pInfo, void* pBuf, s32 nLen, s32 nOffset, DVDCallback pCallback,
+                     s32 nPrio);
+
+// An open file (lbl_8019EAD0, 32 of them, 0xC4 bytes each).
+typedef struct DiscFile {
+    DVDFileInfo info;           // 0x00
+    u8   unk3C[0xC4 - 0x3C];
+} DiscFile;
+
+// A queued read (lbl_8019E880's lists); only the fields read so far.
+typedef struct FileReq {
+    struct FileReq* pNext;      // 0x00
+    struct FileReq* pPrev;      // 0x04
+    s32   nFile;                // 0x08  the DiscFile to read from
+    void* pBuf;                 // 0x0C
+    s32   nLen;                 // 0x10
+    s32   nOffset;              // 0x14
+} FileReq;
+
 // ---- the renderer ----------------------------------------------------------------------------
 
 void fn_800066E4(u8 bOnRelease, s32 nReset, s32 nCode, u8 bMenu);  // LLDisp_Gc.c: reset the console
