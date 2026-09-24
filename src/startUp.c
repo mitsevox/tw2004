@@ -754,8 +754,8 @@ u32 fn_800B06F4(void) {
 
 void fn_800B0748(u32 uAddr) {
     u32 uBit = 1;
-    lbl_802820F4--;
     lbl_802820F0 &= ~(uBit << ((uAddr - lbl_80282108) / 0xFE00));
+    lbl_802820F4--;
 }
 
 int fn_800B0790(void) {

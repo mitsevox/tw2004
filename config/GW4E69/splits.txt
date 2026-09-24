@@ -524,6 +524,8 @@ GameAudio.c:
 
 AudTable.c:
 	.text       start:0x800A7AF0 end:0x800A85CC
+	.sbss       start:0x80282058 end:0x80282060
+	.sdata2     start:0x80283F88 end:0x80283FB0
 
 hlaudmovie.c:
 	.text       start:0x800A85CC end:0x800A9808
@@ -542,6 +544,7 @@ hlaudvoice.c:
 
 hlaudemitter.c:
 	.text       start:0x800ACECC end:0x800ADE70
+	.sdata2     start:0x80284008 end:0x80284018
 
 UAudContainers.c:
 	.text       start:0x800ADE70 end:0x800AE1F8
@@ -570,7 +573,7 @@ GoComicCam.c:
 	.text       start:0x800B34F0 end:0x800B4B5C
 
 GoShaderObject_Rain_Gc.c:
-	.text       start:0x800B4B5C end:0x800B5918
+	.text       start:0x800B4B5C end:0x800B5934
 
 AudLock.c:
 	.text       start:0x800B5934 end:0x800B5A14

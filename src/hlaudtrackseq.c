@@ -416,9 +416,9 @@ u8 fn_800AAEFC(AudTrack* pTrack) {
 
 // The track's next event and the end of its variation.
 void fn_800AB0CC(AudTrack* pTrack, AudSeqEvent** ppEvent, AudSeqEvent** ppEnd) {
-    AudTrackTmpl* pTmpl;
     AudSeqEvent* pVariation;
     u8 nEvents;
+    AudTrackTmpl* pTmpl;
 
     pTmpl = pTrack->pTmpl;
     nEvents = pTmpl->n3;
