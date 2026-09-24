@@ -141,8 +141,8 @@ f32 fn_8000C244(f32* pA, f32* pB, f32* pP) {
 
 // Where the segments a-b and c-d cross, in x and z (pOut's x and z); 0 if they do not.
 u8 fn_8000C278(f32* pA, f32* pB, f32* pC, f32* pD, f32* pOut) {
-    f32 fDx2;
     f32 fDz1;
+    f32 fDx2;
     f32 fCx;
     f32 fDx1;
     f32 fAz;
@@ -178,8 +178,8 @@ u8 fn_8000C278(f32* pA, f32* pB, f32* pC, f32* pD, f32* pOut) {
 
 // The ray from a through b crosses the segment c-d (x and z).
 u8 fn_8000C328(f32* pA, f32* pB, f32* pC, f32* pD) {
-    f32 fDx2;
     f32 fDz1;
+    f32 fDx2;
     f32 fAx;
     f32 fDx1;
     f32 fCx;
