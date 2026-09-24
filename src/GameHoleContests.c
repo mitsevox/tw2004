@@ -180,6 +180,7 @@ void fn_800DA36C(void) {
 // green), and a hole in one on the prize hole wins $100,000. A mulligan's shot does not count.
 void fn_800DA48C(int nPlayer) {
     CourseMoneyTracking money;
+    s32 nIndex;
 
     if (fn_800DA174()) {
         if (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] == 1 && fn_800D0D54(nPlayer) &&
@@ -209,8 +210,9 @@ void fn_800DA48C(int nPlayer) {
             money.n0 = 100000;
             money.n38 = 100000;
             fn_800D3548(nPlayer, 100000, &money);
-            if (gpSaveData[gPlayers[nPlayer].nIndex].bActive) {
-                fn_800E4364(0, 0x74, 100000, gPlayers[nPlayer].nIndex);
+            nIndex = gPlayers[nPlayer].nIndex;
+            if (gpSaveData[nIndex].bActive) {
+                fn_800E4364(0, 0x74, 100000, nIndex);
             }
         }
     }
