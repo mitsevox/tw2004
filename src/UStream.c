@@ -938,6 +938,7 @@ void UStream_Init(void) {
     s32 i;
     UStreamBuffer* p;
     UStreamBuffer* pPrev;
+    s32 n;
     gbReadPending = 0;
     gpReadBuffer = NULL;
     gReadyRingTail = 0;
@@ -955,13 +956,14 @@ void UStream_Init(void) {
     gpNodePool = NULL;
     pPrev = NULL;
     p = (UStreamBuffer*)gpBufferMemory;
-    for (i = USTREAM_NUM_BUFFERS; i > 0; i--) {
+    n = USTREAM_NUM_BUFFERS;
+    do {
         p->pNext = pPrev;
         p->uPos = 0;
         p->nRefs = 0;
         pPrev = p;
         p++;
-    }
+    } while (--n);
     gpFreeList = pPrev;
     gpCurList = NULL;
     gpUsedList = NULL;
