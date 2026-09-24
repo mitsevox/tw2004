@@ -27,6 +27,15 @@ s32 EASB_gErrorMap[35] = {
     -43, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18,
 };
 
+// Defined here, last address first (CodeWarrior lays out .bss in reverse).
+EASBInitParams lbl_80261040;
+EASBioMgr lbl_80261028;
+
+EASBioMgr* lbl_80281988 = &lbl_80261028;
+s32 lbl_8028198C = 15;
+s32 lbl_80281990 = 15;
+char lbl_80281994[4] = "";
+
 // Starts the Bio library once, under this game's name, with the memory-card glue from TibExt.c.
 void EASBio_InitOnce(void) {
     lbl_80261040.szProductName = lbl_80195308;
