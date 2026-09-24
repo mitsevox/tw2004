@@ -925,8 +925,8 @@ void fn_800A5428(void) {
     int nViews;
     int i;
 
+    nViews = gSession.nSplitScreen ? 2 : 1;
     lbl_80282042 = 0;
-    nViews = (gSession.nSplitScreen != 0) + 1;
     if (lbl_8028203C == 2) {
         fn_800AD450(lbl_8028141A);
         lbl_8028141A = 0xFF;
