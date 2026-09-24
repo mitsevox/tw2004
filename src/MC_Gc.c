@@ -31,6 +31,10 @@ void fn_8012CCCC(int uHandle);          // EASBStorage.c
 u8*  Skalib_ScratchToAram(int n);       // skalib.c
 void Skalib_ScratchFromAram(int n);     // skalib.c
 
+void* lbl_802813D0 = lbl_801E7100;
+u8    lbl_802813D4 = 1;
+s32   lbl_802813D8 = -1;
+
 // Every operation starts here: note its size and how far the CARD library's transfer count has
 // got, from which its progress is measured.
 void fn_8009CB9C(s32 nPort, s32 nSlot, s32 nSize) {

@@ -934,7 +934,7 @@ config.libs = [
             Object(NonMatching, "SunFlr_Gc.c"),
             Object(NonMatching, "Code8009AA28.c"),
             Object(NonMatching, "GoGreenGrid.c"),
-            Object(NonMatching, "MC_Gc.c"),
+            Object(Matching, "MC_Gc.c"),
             Object(NonMatching, "MC.c"),
             Object(NonMatching, "PsMgr.c"),
             Object(NonMatching, "PsBallFx.c"),
