@@ -121,12 +121,20 @@ def find_definition(name):
             semi = t.find(';', m.end())
             if k < 0 or (0 <= semi < k):
                 continue                                  # a prototype, not the definition
-            depth, j = 0, k
+            depth, j = 0, 0
             s = strip_comments(t[k:])
-            for j, ch in enumerate(s):
+            while j < len(s):
+                ch = s[j]
+                if ch in '"\'':                            # a '}' in a string or char constant
+                    q = j + 1
+                    while q < len(s) and s[q] != ch:
+                        q += 2 if s[q] == '\\' else 1
+                    j = q + 1
+                    continue
                 depth += (ch == '{') - (ch == '}')
                 if depth == 0:
                     break
+                j += 1
             return p, t[:m.start()].count('\n') + 1, t[m.start():m.start()] + s[:0] + strip_comments(t[m.start():k]) + s[:j + 1]
     return None, 0, None
 

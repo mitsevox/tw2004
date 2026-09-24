@@ -651,20 +651,20 @@ void fn_80031A08(s32* pA, s32* pB, s32 a, s32 b) {
 // word 3) ask for it always get level 0, and the others never get level 0 while the camera moves.
 // Unless gSession.b11 is set, an object between two planes fades from one level into the next.
 void fn_80031AB4(void) {
+    Ter_LODPlane* pPlanes = lbl_801D3CB0.LODPlanes;
     f32 fT;
     f32 fAlpha;
     f32 fDistanceSquared;
     s32 uFlags;
-    s32 iObject;
     s32 nLast;
     s32 nTranslucent;
     s32 nLOD;
     s32 i;
-    Ter_LODPlane* pPlanes = lbl_801D3CB0.LODPlanes;
 
     if (gSession.b11 != 0) {
         fAlpha = 0.0f;
         for (i = lbl_801D3CB0.iTotalSortObjects - 1; i >= 0; i--) {
+            s32 iObject;
             iObject = lbl_801D3CB0.pObjectSortList[i].iGlobalObjectIndex;
             fDistanceSquared = lbl_801D3CB0.pObjectSortList[i].fDistanceSquared;
             nLast = lbl_801D3CB0.pObjectSortList[i].nLODs - 1;
@@ -689,6 +689,7 @@ void fn_80031AB4(void) {
         return;
     }
     for (i = lbl_801D3CB0.iTotalSortObjects - 1; i >= 0; i--) {
+        s32 iObject;
         fDistanceSquared = lbl_801D3CB0.pObjectSortList[i].fDistanceSquared;
         iObject = lbl_801D3CB0.pObjectSortList[i].iGlobalObjectIndex;
         nLast = lbl_801D3CB0.pObjectSortList[i].nLODs - 1;
@@ -704,8 +705,8 @@ void fn_80031AB4(void) {
         if (nLOD < nLast
             && fDistanceSquared > pPlanes[nLOD + 1].fBegin * pPlanes[nLOD + 1].fBegin) {
             // between this plane's end and the next one's start: fade over to the next level
-            fT = ((f32)fn_80009680(fDistanceSquared) - pPlanes[nLOD + 1].fBegin)
-               / (pPlanes[nLOD].fEnd - pPlanes[nLOD + 1].fBegin);
+            fT = (f32)fn_80009680(fDistanceSquared);
+            fT = (fT - pPlanes[nLOD + 1].fBegin) / (pPlanes[nLOD].fEnd - pPlanes[nLOD + 1].fBegin);
             if (fT < 0.5f) {
                 nTranslucent = nLOD + 1;
                 fAlpha = 2.0f * fT;
