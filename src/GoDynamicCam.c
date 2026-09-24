@@ -961,6 +961,7 @@ void DynamicCam_GetLocation(int nKind, int nPlayer, f32* pOut, CamScript* pScrip
     int nOther;
     int nPin;
     int nTee;
+    CourseInfo* pCourse;
 
     if (nKind == pShot->bAF) {
         nOther = pShot->bB0;
@@ -1001,11 +1002,13 @@ void DynamicCam_GetLocation(int nKind, int nPlayer, f32* pOut, CamScript* pScrip
         break;
     case 10:
         nPin = Game_CurrentPinSet();
-        Vec3Copy(&fn_8000C594()->pin[nPin].x, pOut);
+        pCourse = fn_8000C594();
+        Vec3Copy(&pCourse->pin[nPin].x, pOut);
         break;
     case 11:
         nTee = gSession.nTeeSet[nPlayer];
-        Vec3Copy(&fn_8000C594()->tee[nTee].x, pOut);
+        pCourse = fn_8000C594();
+        Vec3Copy(&pCourse->tee[nTee].x, pOut);
         break;
     case 24:
         Vec3Copy(pShot->v20, pOut);
