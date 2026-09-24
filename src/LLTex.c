@@ -37,9 +37,11 @@ void fn_80010028(TexBank* pBank) {
 // The index of the bank's texture with this name hash, or 0x80000000.
 int fn_8001005C(TexBank* pBank, u64 uHash) {
     u32 i;
+    u64 uEntryHash;
 
     for (i = 0; i < pBank->n2; i++) {
-        if (uHash == pBank->p8[i].u0) return i;
+        uEntryHash = pBank->p8[i].u0;
+        if (uEntryHash == uHash) return i;
     }
     return 0x80000000;
 }
