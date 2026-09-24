@@ -7,12 +7,6 @@
 
 #include "engine.h"
 
-// A shader object as the shader object table's callbacks get it (TW06: SD_SShaderObject_Static).
-typedef struct SD_SShaderObject_Static {
-    u32   unk0;
-    void* pData;                // 0x4  the object's render data (for the grass, a node of the pool)
-} SD_SShaderObject_Static;
-
 // One word of the grass vertex buffer. A vertex is four words: x, y, z, then four bytes.
 typedef union GrassWord {
     f32 f;

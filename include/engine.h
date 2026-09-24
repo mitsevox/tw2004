@@ -61,7 +61,7 @@ extern ProfClock* lbl_802813B0;
 typedef struct ParticleBuffers {
     void* apBuffers[4];         // 0x00  two of 90000 bytes, two of 10000 (fn_8009414C)
     u8    b10;                  // 0x10  flipped by fn_80094278
-    s32   n14;                  // 0x14
+    u32   n14;                  // 0x14  the first particle no system holds yet (fn_8009428C)
 } ParticleBuffers;
 
 extern ParticleBuffers* lbl_802813A8;
@@ -156,6 +156,7 @@ void fn_8000C5D4(f32* pA, f32* pB, f32 f, f32* pOut);   // out = a + f x b
 f32  fn_8000C5FC(f32* pA, f32* pB);     // dot product
 f32  fn_80009614(f32 x);                // arc cosine
 void fn_8000AE28(f32* pIn, f32 f, f32* pOut);   // scale a vector (four floats)
+void fn_8000AE6C(f32* pA, f32* pB, f32 fScale, f32* pOut);   // out = a + fScale x b (four floats)
 double pow(double x, double y);         // 0x8015F824 (MSL)
 f32  powf(f32 x, f32 y);                // 0x8002C8D0 (Golfer.c): pow rounded to a float
 f32  fn_800BB028(f32* pA, f32* pB);     // squared distance
@@ -315,6 +316,92 @@ LAYOUT_ASSERT(RenderState, 0x118);
 extern RenderState lbl_801B8980;
 
 void fn_8005CC64(TexBank* pBank, TexEntry* pTex);  // set the texture of the next draw
+
+// ---- shader objects ----------------------------------------------------------------------------
+
+// A shader object as the shader object table's callbacks get it (TW06: SD_SShaderObject_Static).
+typedef struct SD_SShaderObject_Static {
+    u32   unk0;
+    void* pData;                // 0x4  the object's render data (for the grass, a node of the pool)
+} SD_SShaderObject_Static;
+
+// A particle system's settings, as the particle shader's create callback (fn_8009428C) reads
+// them. Only the fields read there are named.
+typedef struct ParticleParams {
+    u8   unk0[0x58];
+    u32  u58;                   // 0x58  flags; 0x80 and 0x100 pick the blend (fn_800949D0)
+    u8   unk5C[2];
+    s16  nCount;                // 0x5E  how many particles
+    u8   unk60[0x6C - 0x60];
+    s16  nTexture;              // 0x6C  the texture: its name in lbl_801F1640
+    u8   unk6E[0xA0 - 0x6E];
+    f32  vA0[4];                // 0xA0  } ParticleShape.v60 = vB0 + vA0 x f110
+    f32  vB0[4];                // 0xB0  }
+    f32  vC0[4];                // 0xC0  -> ParticleShape.v10 (each of these / 256)
+    f32  vD0[4];                // 0xD0  -> ParticleShape.v20
+    f32  vE0[4];                // 0xE0  -> ParticleShape.v30
+    f32  vF0[4];                // 0xF0  -> ParticleShape.v0
+    u8   unk100[4];
+    f32  f104;                  // 0x104
+    f32  f108;                  // 0x108
+    u8   unk10C[4];
+    f32  f110;                  // 0x110  a time: ParticleShape.f50 is a quarter of it, f54 its inverse
+    f32  f114;                  // 0x114
+    f32  f118;                  // 0x118
+} ParticleParams;
+
+// What the particle shader's create callback is handed. It is called twice: with bAlloc set to
+// allocate the system, then clear to fill it in.
+typedef struct ParticleCreate {
+    u8   bAlloc;                // 0x0
+    u8   unk1[3];
+    ParticleParams* pParams;    // 0x4
+} ParticleCreate;
+
+// The part of a particle system fn_80094534 draws from (ParticleSystem.shape).
+typedef struct ParticleShape {
+    f32  v0[4];                 // 0x00
+    f32  v10[4];                // 0x10
+    f32  v20[4];                // 0x20
+    f32  v30[4];                // 0x30
+    f32  f40;                   // 0x40
+    f32  f44;                   // 0x44
+    f32  f48;                   // 0x48
+    f32  f4C;                   // 0x4C
+    f32  f50;                   // 0x50
+    f32  f54;                   // 0x54
+    f32  f58;                   // 0x58  1 / (2 pi)
+    f32  f5C;                   // 0x5C  0.5
+    f32  v60[4];                // 0x60
+    f32  aSin[4];               // 0x70  sin(2 pi t)'s series: the factors of t, t^3, t^5, t^7
+    f32  aCos[4];               // 0x80  cos(2 pi t)'s series: the factors of 1, t^2, t^4, t^6
+} ParticleShape;
+
+// A particle in the particle buffers' vertex halves (apBuffers[0] and [1], 0x24 bytes each); the
+// other halves hold an f32 per particle. Only the fields fn_80094534 reads are named.
+typedef struct ParticleVertex {
+    f32  v0[3];                 // 0x00
+    f32  vC[3];                 // 0x0C
+    u8   unk18[0x20 - 0x18];
+    f32  f20;                   // 0x20
+} ParticleVertex;
+LAYOUT_ASSERT(ParticleVertex, 0x24);
+
+// A particle system (0xAC bytes, the shader object's pData): its run of particles in the particle
+// buffers (lbl_802813A8), and what it draws with.
+typedef struct ParticleSystem {
+    TexBank*  pBank;            // 0x00  } its texture (fn_800102DC)
+    TexEntry* pTex;             // 0x04  }
+    u16  nFirst;                // 0x08  its first particle in the buffers
+    u16  nCount;                // 0x0A  how many
+    u16  anStart[2];            // 0x0C  per buffer (ParticleBuffers.b10): where the live ones start
+    u16  anLive[2];             // 0x10  per buffer: how many are live
+    s16  nTexture;              // 0x14  ParticleParams.nTexture
+    u8   unk16[2];
+    u32  u18;                   // 0x18  ParticleParams.u58
+    ParticleShape shape;        // 0x1C
+} ParticleSystem;
+LAYOUT_ASSERT(ParticleSystem, 0xAC);
 
 // One row of lbl_80188E88 (our name; 20 rows of 0x44 bytes): a module's hooks. The main loop
 // (gomainloop.c) calls each row's pfnC..pfn20 at six points of a frame (fn_8006DDA8 and its

@@ -5,6 +5,11 @@
 // (0x80281F58-0x80281F70). Where it ends between 0x8009554C and char_state.c is not proven.
 
 #include "engine.h"
+#include "gx.h"
+#include "camera.h"
+#include "terrain.h"
+#include "psmgr.h"
+#include "unsorted/cull.h"
 
 // The main-memory heap's globals (fn_80095108, fn_800951A0), defined last-address-first.
 s32 lbl_80281F68;                       // the heap's size
@@ -37,6 +42,122 @@ void fn_80094274(void) {
 
 void fn_80094278(void) {
     lbl_802813A8->b10 = 1 - lbl_802813A8->b10;
+}
+
+// The create callback, called twice: first to allocate the system and give it the next run of
+// particles in the buffers, then to fill it in from its settings (the vectors kept / 256).
+void fn_8009428C(SD_SShaderObject_Static* pObject, ParticleCreate* pCreate) {
+    ParticleSystem* pSys;
+
+    if (pCreate->bAlloc) {
+        pObject->pData = fn_80009B34(sizeof(ParticleSystem), 2, 32, "GoShaderObject_Particle_Gc.c", 201);
+        ((ParticleSystem*)pObject->pData)->nFirst = lbl_802813A8->n14;
+        lbl_802813A8->n14 += pCreate->pParams->nCount;
+        return;
+    }
+    pSys = pObject->pData;
+    pSys->nTexture = pCreate->pParams->nTexture;
+    fn_800102DC(fn_8000BEE4(lbl_801F1640[pSys->nTexture]), &pSys->pBank, &pSys->pTex);
+    pSys->nCount = pCreate->pParams->nCount;
+    pSys->u18 = pCreate->pParams->u58;
+    pSys->anStart[0] = 0;
+    pSys->anLive[0] = 0;
+    pSys->anStart[1] = 0;
+    pSys->anLive[1] = 0;
+    Vec_Copy(pCreate->pParams->vC0, pSys->shape.v10);
+    Vec_Copy(pCreate->pParams->vD0, pSys->shape.v20);
+    Vec_Copy(pCreate->pParams->vE0, pSys->shape.v30);
+    Vec_Copy(pCreate->pParams->vF0, pSys->shape.v0);
+    pSys->shape.f40 = pCreate->pParams->f104;
+    pSys->shape.f44 = pCreate->pParams->f108;
+    fn_8000AE28(pSys->shape.v10, 1.0f / 256.0f, pSys->shape.v10);
+    fn_8000AE28(pSys->shape.v20, 1.0f / 256.0f, pSys->shape.v20);
+    fn_8000AE28(pSys->shape.v30, 1.0f / 256.0f, pSys->shape.v30);
+    fn_8000AE28(pSys->shape.v0, 1.0f / 256.0f, pSys->shape.v0);
+    pSys->shape.f40 = pSys->shape.f40 / 256.0f;
+    pSys->shape.f44 = pSys->shape.f44 / 256.0f;
+    pSys->shape.f48 = 1.4142f * pCreate->pParams->f118;
+    pSys->shape.f4C = 1.4142f * pCreate->pParams->f114;
+    pSys->shape.f50 = 0.25f * pCreate->pParams->f110;
+    pSys->shape.f54 = 1.0f / pCreate->pParams->f110;
+    pSys->shape.f58 = 1.0f / (2.0f * PI);
+    pSys->shape.f5C = 0.5f;
+    fn_8000AE6C(pCreate->pParams->vB0, pCreate->pParams->vA0, pCreate->pParams->f110, pSys->shape.v60);
+    fn_8000AE28(pSys->shape.v60, pSys->shape.f54, pSys->shape.v60);
+    pSys->shape.v60[3] = 0.0f;
+    pSys->shape.aSin[0] = 2.0f * PI;
+    pSys->shape.aSin[1] = -(2.0f * PI) * (2.0f * PI) * (2.0f * PI) / 6.0f;
+    pSys->shape.aSin[2] = (2.0f * PI) * (2.0f * PI) * (2.0f * PI) * (2.0f * PI) * (2.0f * PI) / 120.0f;
+    pSys->shape.aSin[3] = -(2.0f * PI) * (2.0f * PI) * (2.0f * PI) * (2.0f * PI) * (2.0f * PI)
+                          * (2.0f * PI) * (2.0f * PI) / 5040.0f;
+    pSys->shape.aCos[0] = 1.0f;
+    pSys->shape.aCos[1] = -(2.0f * PI) * (2.0f * PI) / 2.0f;
+    pSys->shape.aCos[2] = (2.0f * PI) * (2.0f * PI) * (2.0f * PI) * (2.0f * PI) / 24.0f;
+    pSys->shape.aCos[3] = -(2.0f * PI) * (2.0f * PI) * (2.0f * PI) * (2.0f * PI) * (2.0f * PI)
+                          * (2.0f * PI) / 720.0f;
+}
+
+// The close callback: the system's run is handed back when it is the last one given out.
+void fn_800944F8(SD_SShaderObject_Static* pObject) {
+    ParticleSystem* pSys = pObject->pData;
+
+    if (lbl_802813A8->n14 > pSys->nFirst) {
+        lbl_802813A8->n14 = pSys->nFirst;
+    }
+    fn_80009E70(pSys);
+}
+
+void fn_80094534(f32 (*pMtx)[4], ParticleShape* pShape, ParticleVertex* pVerts, f32* pTimes, u32 n);
+
+// The draw callback: the live particles of the buffer in use, in two runs when they wrap past the
+// end of the system's run.
+void fn_800949D0(SD_SShaderObject_Static* pObject) {
+    int nBuf;
+    u16 nLive;
+    u16 nStart;
+    ParticleSystem* pSys;
+    Camera* pCamera;
+    u32 n;
+
+    pSys = pObject->pData;
+    nBuf = lbl_802813A8->b10;
+    nLive = pSys->anLive[nBuf];
+    nStart = pSys->anStart[nBuf];
+    if (nLive != 0) {
+        fn_80012F50(0, 6, 0x80);
+        fn_80012F18(3);
+        fn_80012F34(0);
+        fn_80014118(0x70);
+        fn_8005CC64(pSys->pBank, pSys->pTex);
+        if (pSys->u18 & 0x80) {
+            fn_80035118(4, 1);
+        } else if (pSys->u18 & 0x100) {
+            fn_80035118(1, 1);
+        } else {
+            fn_80035118(4, 5);
+        }
+        fn_80035138(0);
+        fn_80012EF8();
+        pCamera = fn_8001614C();
+        GXClearVtxDesc();
+        GXSetVtxDesc(9, 1);                     // position, colour, texture coordinates: direct
+        GXSetVtxDesc(11, 1);
+        GXSetVtxDesc(13, 1);
+        GXInvalidateVtxCache();
+        fn_80094534(pCamera->viewMtx, &pSys->shape,
+                    (ParticleVertex*)lbl_802813A8->apBuffers[nBuf] + pSys->nFirst + nStart,
+                    (f32*)lbl_802813A8->apBuffers[nBuf + 2] + pSys->nFirst + nStart,
+                    (nLive <= (u32)(pSys->nCount - nStart)) ? nLive : pSys->nCount - nStart);
+        n = pSys->nCount - nStart;
+        if (nLive > n) {
+            fn_80094534(pCamera->viewMtx, &pSys->shape,
+                        (ParticleVertex*)lbl_802813A8->apBuffers[nBuf] + pSys->nFirst,
+                        (f32*)lbl_802813A8->apBuffers[nBuf + 2] + pSys->nFirst, nLive - n);
+        }
+        fn_80012F34(1);
+        fn_80012F50(1, 6, 0x80);
+        fn_80012EF8();
+    }
 }
 
 void fn_80094B84(void);
