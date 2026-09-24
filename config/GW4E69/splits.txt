@@ -576,6 +576,10 @@ PsMgr.c:
 
 PsBallFx.c:
 	.text       start:0x800A2C3C end:0x800A3E3C
+	.data       start:0x8018E978 end:0x8018E988
+	.bss        start:0x801F1708 end:0x801F1790
+	.sdata      start:0x80281408 end:0x80281418
+	.sdata2     start:0x80283F28 end:0x80283F48
 
 GameAudio.c:
 	.text       start:0x800A3E3C end:0x800A7AF0
