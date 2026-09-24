@@ -4,13 +4,16 @@
 #include "game_types.h"
 #include "platform.h"
 #include "grassshader.h"
-#include "ball.h"
+#include "golfer.h"
 #include "endian.h"
 #include "gx.h"
 
 // ---- sweep code (not yet cleaned up) ----
 
 void fn_8011E170(void);
+void fn_8011E6E8(void);
+void fn_8011EC84(void);
+void fn_8011F7F8(void);
 void fn_8011E3B0(void);
 u8 fn_80112B80();
 void fn_8011E4A4(void);
@@ -194,6 +197,60 @@ void fn_8011E584(UStreamObject* pObject) {
     for (i = 0; i < lbl_80281900->n10; i++) {
         lbl_80281900->pC[i].u10 += (u32)pBase;
         lbl_80281900->pC[i].u14 += (u32)pBase;
+    }
+}
+
+// The grass's frame update (after one skipped frame): new random tuning values when f3D4 changed,
+// the buffers and the grass camera, the texture pass, then the 16 sway points around the circle
+// and the phase moved on by f418 per 60th of a second.
+void fn_8011E6E8(void) {
+    f32 vPoint[4];
+    int i;
+    f32 fSin;
+    f32 fCos;
+
+    if (lbl_80281900->p370 == NULL) {
+        return;
+    }
+    if (lbl_80281900->n3DC == 0) {
+        return;
+    }
+    if (lbl_80282514 == 0) {
+        lbl_80282514 = 1;
+        return;
+    }
+    // port: as in fn_8011E974, EA's GoGrass.c saw fn_800C6CB0 as returning int
+    if (((int (*)(void))fn_800C6CB0)() != 0) {
+        return;
+    }
+    if (lbl_80281900->f3D4 != lbl_80281900->f3D8) {
+        for (i = 0; i < 8; i++) {
+            lbl_80281900->af168[i] = lbl_80281900->f3D4 * Rand_Float(1);
+        }
+        lbl_80281900->f3D8 = lbl_80281900->f3D4;
+    }
+    fn_8011FF58();
+    fn_8011F7F8();
+    fn_8011EB04();
+    if (lbl_80281900->n3E4 != 0) {
+        fn_8011EC84();
+    }
+    fSin = fn_800095F0(lbl_80281900->f40C);
+    fCos = fn_80009638(lbl_80281900->f40C);
+    for (i = 0; i < 16; i++) {
+        vPoint[0] = fCos * lbl_80281900->f41C *
+                    fn_800095F0(lbl_80281900->f414 + 2.0f * PI * ((f32)i / 16.0f));
+        vPoint[1] = 0.0f;
+        vPoint[2] = fSin * lbl_80281900->f41C *
+                    fn_800095F0(lbl_80281900->f414 + 2.0f * PI * ((f32)i / 16.0f));
+        vPoint[3] = 0.0f;
+        Vec_Copy(vPoint, lbl_80281900->av230[i]);
+    }
+    lbl_80281900->f228 = 16.0f * lbl_80281900->f410 * fCos;
+    lbl_80281900->f22C = 16.0f * lbl_80281900->f410 * fSin;
+    lbl_80281900->f414 = lbl_80281900->f414 + 60.0f * (lbl_80281900->f418 * gSession.fFrameTime);
+    if (lbl_80281900->f414 > 2.0f * PI) {
+        lbl_80281900->f414 = lbl_80281900->f414 - 2.0f * PI;
     }
 }
 

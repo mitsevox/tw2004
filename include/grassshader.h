@@ -139,7 +139,11 @@ typedef struct GrassManager {
     s32          n104;          // 0x104
     u8           unk108[0x168 - 0x108];
     f32          af168[8];      // 0x168  eight tuning values set at start (fn_8011E170)
-    u8           unk188[0x348 - 0x188];
+    u8           unk188[0x228 - 0x188];
+    f32          f228;          // 0x228  16 * f410 * cos(f40C) (fn_8011E6E8)
+    f32          f22C;          // 0x22C  16 * f410 * sin(f40C)
+    f32          av230[16][4];  // 0x230  16 points around a circle of radius f41C, phase f414
+    u8           unk330[0x348 - 0x330];
     // 0x348..0x370: the block fn_8011F3AC hands to fn_8003519C (row 17) once per buffer and pass.
     f32          f348;          // 0x348  f3D0
     f32          f34C;          // 0x34C  the buffer's f0
