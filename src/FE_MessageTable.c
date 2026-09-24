@@ -245,7 +245,11 @@ void fn_80125DE0(MsgArg* pArgs, MsgArg* pResult);
 // This file.
 void GetGolferName(int nGolfer, char* szName);
 void fn_8007E458(int n, MsgArg* pArgs, MsgArg* pResult);
-s32  fn_80084FB4(MCCardPos* pPos);
+s32  fn_80084FB4(void* pArg);
+s32  fn_80084FF8(void* pArg);
+s32  fn_80085034(void* pArg);
+s32  fn_80085070(void* pArg);
+s32  fn_800850AC(void* pArg);
 
 // This file's message handlers, in address order.
 void fn_8007BBA0(MsgArg* pArgs, MsgArg* pResult);
@@ -5017,6 +5021,55 @@ void fn_800847BC(MsgArg* pArgs, MsgArg* pResult) {
     fn_80084FF0(pArgs[0].i);
 }
 
+// Runs memory-card operation pArgs[0] of the picked set on the card pArgs[1], pArgs[2]. Each
+// operation takes its own payload (core/memcard.h): ops 0 and 1 answer whether they succeeded
+// (0 is success), ops 2..4 answer their result.
+void fn_800847E0(MsgArg* pArgs, MsgArg* pResult) {
+    MCCardPos    pos0;
+    MCCardPosStr posStr;
+    MCCardPos    pos3;
+    MCOpCardName cardName;
+    MCOpCard     card;
+    int   nOp = pArgs[0].i;
+    s32   nPort = pArgs[1].i;
+    s32   nSlot = pArgs[2].i;
+    s32   n8 = pArgs[3].i;
+    char* szName = ((MsgString*)pArgs[4].p)->pStr;
+
+    switch (nOp) {
+    case 0:
+        pos0.nPort = nPort;
+        pos0.nSlot = nSlot;
+        pos0.n8 = n8;
+        pResult->i = fn_800850AC(&pos0) == 0;
+        break;
+    case 1:
+        posStr.pos.nPort = nPort;
+        posStr.pos.nSlot = nSlot;
+        posStr.pos.n8 = n8;
+        posStr.szC = szName;
+        pResult->i = fn_80085070(&posStr) == 0;
+        break;
+    case 3:
+        pos3.nPort = nPort;
+        pos3.nSlot = nSlot;
+        pos3.n8 = n8;
+        pResult->i = fn_80085034(&pos3);
+        break;
+    case 2:
+        card.nPort = nPort;
+        card.nSlot = nSlot;
+        pResult->i = fn_80084FF8(&card);
+        break;
+    case 4:
+        cardName.nPort = nPort;
+        cardName.nSlot = nSlot;
+        cardName.szName = szName;
+        pResult->i = fn_80084FB4(&cardName);
+        break;
+    }
+}
+
 void fn_800848E4(MsgArg* pArgs, MsgArg* pResult) {
 }
 
@@ -5222,27 +5275,28 @@ void fn_80084F84(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = EASBio_GetCurrentRewardMessage();
 }
 
-// The memory-card operations of the set picked (lbl_80281FFC), run on the card at pPos.
-s32 fn_80084FB4(MCCardPos* pPos) {
-    return lbl_8018C7D8[lbl_80281FFC].apfn[4](pPos);
+// The memory-card operations of the set picked (lbl_80281FFC), given each operation's own payload
+// (core/memcard.h, MCOpCard).
+s32 fn_80084FB4(void* pArg) {
+    return lbl_8018C7D8[lbl_80281FFC].apfn[4](pArg);
 }
 
 void fn_80084FF0(int n) {
     lbl_80281FFC = n;
 }
 
-s32 fn_80084FF8(MCCardPos* pPos) {
-    return lbl_8018C7D8[lbl_80281FFC].apfn[2](pPos);
+s32 fn_80084FF8(void* pArg) {
+    return lbl_8018C7D8[lbl_80281FFC].apfn[2](pArg);
 }
 
-s32 fn_80085034(MCCardPos* pPos) {
-    return lbl_8018C7D8[lbl_80281FFC].apfn[3](pPos);
+s32 fn_80085034(void* pArg) {
+    return lbl_8018C7D8[lbl_80281FFC].apfn[3](pArg);
 }
 
-s32 fn_80085070(MCCardPos* pPos) {
-    return lbl_8018C7D8[lbl_80281FFC].apfn[1](pPos);
+s32 fn_80085070(void* pArg) {
+    return lbl_8018C7D8[lbl_80281FFC].apfn[1](pArg);
 }
 
-s32 fn_800850AC(MCCardPos* pPos) {
-    return lbl_8018C7D8[lbl_80281FFC].apfn[0](pPos);
+s32 fn_800850AC(void* pArg) {
+    return lbl_8018C7D8[lbl_80281FFC].apfn[0](pArg);
 }
