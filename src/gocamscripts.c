@@ -54,6 +54,8 @@ f32  fn_8001EFFC(u8* pLens);            // the lens's fB0 (char.c: its parameter
 void fn_80038010(u8 a, int n, f32* pVec);
 void fn_800386F0(int n, f32* pVec);
 f32  fn_8003F194(CamShot* pShot, f32 fA, f32 fB, f32 fTime);
+u8   Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 bModels, u8 bHazards, f32 fStep,
+                                         u8 bSlope, f32 fMaxSlope);   // GoTerrainCollision.c
 void fn_800C7898(f32* p0, f32* p1, f32* p2, f32* p3, f32* pOut, f32 fT);    // a point on the spline
 f32  fn_800C7970(CamShot* pShot, f32 f1, f32 f2, f32 f3, f32 f4, f32 f5, f32 f6);
 void fn_80040CF0(CamScript* pScript, f32* pSub, int nPlayer, f32* pPrev, f32 fTime);
@@ -368,8 +370,8 @@ f32 fn_8003F064(CamScript* pScript, f32 fTime) {
     fStart = fn_8003F194(pScript->pShot, 0.0f, fTime / pScript->f8C, fTime);
     if (fSpeed < fStart && fSpeed > fNow) return fTime;
     if (fSpeed > fStart && fSpeed < fNow) return fTime;
-    return fn_800C7970(pScript->pShot, fSpeed, fNow, pScript->pShot->f48, pScript->pShot->f4C, pScript->fCamTime,
-                       fTime);
+    return fn_800C7970(pScript->pShot, fSpeed, fNow, pScript->pShot->f48, pScript->pShot->f4C,
+                       pScript->fCamTime, fTime);
 }
 
 // The camera's speed on the spline through the shot's chain (p44, the shot, its p40 and that one's
@@ -1382,6 +1384,31 @@ f32 fn_80043420(int nPlayer, CamScript* pScript, f32* pPos, f32* pCam, CamShot* 
     return fY;
 }
 
+// The shot is the default swing camera: kind (bAD) 3 or 29..33, and the camera looks along the aim
+// (the level directions from Player.vBall to the aim and from the camera to the ball agree past
+// CamTuning.fFC).
+u8 CameraScript_IsDefaultSwingCam(CamShot* pShot, int nPlayer, f32* pCam) {
+    f32 vAim[4];
+    f32 vCam[4];
+    f32* pBall;
+
+    if (pShot == NULL) return 0;
+    if (pShot->bAD != 3 && (pShot->bAD < 29 || pShot->bAD > 33)) return 0;
+    pBall = gPlayers[nPlayer].vBall;
+    fn_80045428(gPlayers[nPlayer].vTargetCopy, pBall, vAim);
+    vAim[1] = 0.0f;
+    if (0.0f != vAim[0] || 0.0f != vAim[1] || 0.0f != vAim[2]) {
+        fn_800BAF04(vAim, vAim);
+    }
+    fn_80045428(pBall, pCam, vCam);
+    vCam[1] = 0.0f;
+    if (0.0f != vCam[0] || 0.0f != vCam[1] || 0.0f != vCam[2]) {
+        fn_800BAF04(vCam, vCam);
+    }
+    if (fn_8000C5FC(vCam, vAim) > lbl_80281F78->fFC) return 1;
+    return 0;
+}
+
 // The script's shot, or else its next one (unless the next kind is 5), has bAC 0 or 13 while the
 // ball makes no update this frame.
 u8 fn_80043920(CamScript* pScript, int nPlayer) {
@@ -1400,6 +1427,30 @@ u8 fn_80043920(CamScript* pScript, int nPlayer) {
         return 1;
     }
     return 0;
+}
+
+// The camera at pCam is in the way: inside an object, or (with the flagstick in) close to the pin
+// and not far above it (CamTuning.f120, f124).
+u8 fn_800439E4(f32* pCam, int nPlayer) {
+    f32 vDiff[4];
+    int nPin = Game_CurrentPinSet();
+    CourseInfo* pCourse = fn_8000C594();
+    u8 bBlocked;
+    f32 fDist;
+
+    if (pCourse == NULL) return 0;
+    bBlocked = Ter_CheckObjectAndHazardObstruction(pCam, 0.0f, 1, 0, 0.0f, 0, 0.0f);
+    if (!bBlocked && !fn_80016CFC(gPlayers[nPlayer].nView[0])->bFlagOut) {
+        fn_80045428(pCam, &pCourse->pin[nPin].x, vDiff);
+        vDiff[1] = 0.0f;
+        fDist = fn_80009680(fn_80009744(vDiff));
+        fDist *= fn_8001EFFC((u8*)fn_8001F004());
+        if (fDist < lbl_80281F78->f120
+            && pCam[1] - pCourse->pin[nPin].y < lbl_80281F78->f124) {
+            bBlocked = 1;
+        }
+    }
+    return bBlocked;
 }
 
 // A spot for the camera by the green: of the AI targets nearest the ball, nearest the player's

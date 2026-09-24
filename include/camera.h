@@ -277,9 +277,15 @@ typedef struct CamTuning {
     u8   unkEC[0xF4 - 0xEC];
     f32  fF4;                   // 0x0F4  fn_80043C74: a spot is taken when the dot product of its level
                                 //        direction to the ball with the camera's is below this
-    u8   unkF8[0x10C - 0xF8];
+    u8   unkF8[0xFC - 0xF8];
+    f32  fFC;                   // 0x0FC  CameraScript_IsDefaultSwingCam: the least dot product of the
+                                //        camera's and the aim's level directions from the ball
+    u8   unk100[0x10C - 0x100];
     f32  f10C;                  // 0x10C  fn_80043C74: the camera's height over the ground at the spot
-    u8   unk110[0x128 - 0x110];
+    u8   unk110[0x120 - 0x110];
+    f32  f120;                  // 0x120  fn_800439E4: a camera closer to the pin than this (level, times
+                                //        the lens's fB0) ...
+    f32  f124;                  // 0x124  ... and less than this above it counts as in the way
     f32  f128;                  // 0x128  CamScript_GetLookAtPoint: the least level distance for the
                                 //        steep-aim limit
     u8   unk12C[0x15C - 0x12C];
