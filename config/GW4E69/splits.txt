@@ -80,9 +80,14 @@ urandom.c:
 
 ObjList.c:
 	.text       start:0x8000B46C end:0x8000B884
+	.bss        start:0x801A25B8 end:0x801A25F0
+	.sbss       start:0x80281BF0 end:0x80281C00
 
 LoadData.c:
 	.text       start:0x8000B884 end:0x8000BF20
+	.data       start:0x80186848 end:0x801868A0
+	.bss        start:0x801A25F0 end:0x801A2A00
+	.sbss       start:0x80281C00 end:0x80281C10
 
 TerrainData.c:
 	.text       start:0x8000BF20 end:0x8000C624
