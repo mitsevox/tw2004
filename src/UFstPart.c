@@ -12,6 +12,7 @@ void fn_800360D4(u8* pMesh);
 void fn_80036100(u8* pMesh, void* pDesc, int n);
 
 void fn_80098BDC(PsEmitter* pEmitter);
+u32  fn_8009912C(PsEmitter* pEmitter, int n, f32 fTime, f32 f);  // not yet decompiled
 // Sort the list (next pointer in word n of each emitter?) by pfnCompare; not yet decompiled.
 PsEmitter* fn_80099C50(PsEmitter* pList, int n, int (*pfnCompare)(PsEmitter*, PsEmitter*));
 int  fn_80099E34(PsEmitter* pA, PsEmitter* pB);
@@ -78,6 +79,44 @@ void fn_800990BC(PsEmitter* pEmitter, int n, f32 fA, f32 fB) {
     draw.f14 = fB;
     fn_80036100(pEmitter->mesh, &draw, 1);
     pEmitter->n50 += n;
+}
+
+// Move every emitter on the list on to fTime. One that fn_8009912C reports (flag 0x80000000) is
+// marked 0x40000000 on the next pass and freed and unlinked on the one after.
+void fn_80099344(f32 fTime) {
+    PsEmitter* pEmitter;
+    PsEmitter* pPrev;
+    PsEmitter* pNext;
+    u32 uFlags;
+
+    pEmitter = lbl_80281F88;
+    pPrev = NULL;
+    while (pEmitter != NULL) {
+        uFlags = pEmitter->uB8;
+        pNext = pEmitter->p40;
+        if (uFlags & 0x80000000) {
+            if (uFlags & 0x40000000) {
+                fn_80098BDC(pEmitter);
+                if (pPrev != NULL) {
+                    pPrev->p40 = pNext;
+                } else {
+                    lbl_80281F88 = pNext;
+                }
+            } else {
+                pPrev = pEmitter;
+                pEmitter->uB8 = uFlags | 0x40000000;
+            }
+        } else {
+            if (!(uFlags & 0x2000) || pEmitter->n58 < 119) {
+                if (fn_8009912C(pEmitter, pEmitter->n58++, fTime, fTime + pEmitter->f4C)) {
+                    pEmitter->uB8 |= 0x80000000;
+                }
+                pEmitter->f4C = fTime;
+            }
+            pPrev = pEmitter;
+        }
+        pEmitter = pNext;
+    }
 }
 
 // Whether fn_80099BA0 passes the emitter: always with a radius over 1000, else unless

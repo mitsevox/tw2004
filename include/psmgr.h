@@ -34,15 +34,16 @@ void fn_800A2C08(int nView);    // draw it (the view is not used)
 // ---- PsBallFx.c (EA's name, from its asserts): the ball's particle effects ----------------------
 
 // One of UFstPart.c's particle emitters (PsBallFx.c starts them); only the fields read so far.
-// Its size is not known.
+// 0x1A8 bytes: fn_80098A98 allocates the six fixed ones at that size.
 typedef struct PsEmitter {
     u8   unk0[0x30];
     f32  v30[4];                // 0x30  a position (fn_800A3D6C)
     struct PsEmitter* p40;      // 0x40  the next in the list fn_80099EA4 pushes onto
-    u8   unk44[0x50 - 0x44];
+    u8   unk44[0x4C - 0x44];
+    f32  f4C;                   // 0x4C  the last time fn_80099344 moved it on
     s32  n50;                   // 0x50  fn_800A3DF4 sets 1000000
     u8   unk54[0x58 - 0x54];
-    s32  n58;                   // 0x58  cleared by fn_80099B74
+    s32  n58;                   // 0x58  cleared by fn_80099B74; counted up by fn_80099344
     s8   b5C;                   // 0x5C  cleared by fn_80098BDC
     u8   unk5D[0x60 - 0x5D];
     u8   a60[0x84 - 0x60];      // 0x60  handed to the mesh draw (fn_800990BC); its layout is not known
@@ -57,6 +58,7 @@ typedef struct PsEmitter {
     u8   unkF0[0x180 - 0xF0];
     u8   mesh[0x28];            // 0x180 a mesh object (Skin.c)
 } PsEmitter;
+LAYOUT_ASSERT(PsEmitter, 0x1A8);
 
 // What fn_800990BC hands an emitter's mesh (our name): Skin.c's fn_80036100 passes it on.
 typedef struct PsEmitterDraw {
