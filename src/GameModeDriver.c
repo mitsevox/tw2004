@@ -543,7 +543,7 @@ u16 fn_801173F0(u32 nCell) {
     nMonth = 0;
     nYear = 0;
     if (nCell < lbl_80223C48.nFirstCell) {
-        nDay = (lbl_80223C48.nPrevMonthDays - lbl_80223C48.nFirstCell) + (nCell + 1);
+        nDay = 1 + (lbl_80223C48.nPrevMonthDays - lbl_80223C48.nFirstCell) + nCell;
         fn_800D2884(lbl_80223C48.nMonth, lbl_80223C48.nYear, &nMonth, &nYear);
     } else if (nCell >= lbl_80223C48.nEndCell) {
         nDay = nCell - (lbl_80223C48.nEndCell - 1);
