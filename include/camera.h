@@ -622,8 +622,8 @@ int    fn_8001707C(int nView);          // the player the view follows (as set a
 u8     fn_800170A0(int nView);          // the view is in use
 void   fn_800170C4(int nView, u8 b);    // sets ViewController.b274
 f32*   fn_8001731C(View* pView);        // the camera's position (v0)
-f32*   fn_80017314(View* pView);        // where it looks (v10)
-u8     fn_800172C4(View* pView);        // the camera move has finished
+f32*   fn_80017314(View* pView);        // where it looks (v10), or a script shot's angles
+u8     fn_800172C4(View* pView);        // 0: the script's shot aims by angles (fn_80016E90)
 f32*   fn_80012EF0(void* pCamera);      // a render camera's screen rectangle
 f32    fn_80012ED0(f32* pRect);         // the rectangle's [3]: its height
 f32    fn_80012ED8(f32* pRect);         // [2]: its width

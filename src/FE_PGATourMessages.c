@@ -1,7 +1,7 @@
 // FE_PGATourMessages.c (EA's name, from its asserts): the PGA TOUR mode's menu message handlers:
-// the tournament leaderboard, the season schedule, the season wrap-up, the sponsor offers and
-// the player's wins. The file starts at fn_8010E58C; the slider blending before it is
-// CharSliders.c's.
+// the tournament leaderboard, the season schedule, the season wrap-up, the lock entries
+// (SaveProfile.a1054C) and the player's wins. The file starts at fn_8010E58C; the slider
+// blending before it is CharSliders.c's.
 
 #include "golfer.h"
 #include "game.h"
@@ -191,8 +191,8 @@ void fn_8010EB9C(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Season wrap-up line pArgs[0]: the title, the player of the year, the money leader, the scoring
-// leader (the player only after 15 events), the player, the player's wins, top-10 finishes,
-// money and all-around rank.
+// leader (the player only after 15 events), the player, the player's wins, first places in
+// tournaments whose nC is set, top-10 finishes, season money and career-money rank.
 void fn_8010EBDC(MsgArg* pArgs, MsgArg* pResult) {
     int nLine = pArgs[0].i;
     char* szOut = ((MsgString*)pArgs[1].p)->pStr;
@@ -279,7 +279,7 @@ void fn_8010EEA8(void) {
 
 // ---- end of sweep code ----
 
-// A sponsor offer's lines for pArgs[0].
+// Test text for n = pArgs[0]: "S n", "I n" and "$ n00,000", and n itself.
 void fn_8010EEE4(MsgArg* pArgs, MsgArg* pResult) {
     s32 n = pArgs[0].i;
     char* szB = ((MsgString*)pArgs[2].p)->pStr;
@@ -292,7 +292,7 @@ void fn_8010EEE4(MsgArg* pArgs, MsgArg* pResult) {
     *pOut = n;
 }
 
-// The sponsor offers' asset kinds (11), picked at random.
+// The 11 asset kinds fn_8010EF8C and fn_8010F1B4 pick from at random.
 s16 lbl_80193CFC[11] = { 0, 1, 2, 5, 6, 9, 10, 11, 13, 14, 15 };
 
 // ---- sweep code (not yet cleaned up) ----
@@ -303,9 +303,9 @@ void fn_8010EF80(MsgArg* pArgs, MsgArg* pResult) {
 
 // ---- end of sweep code ----
 
-// A new sponsor offer: the first of the 11 lock entries not set whose progress the profile has
-// reached gets a kind picked at random (not one an earlier entry holds), and pays its n4.
-// Gives whether there was one.
+// The first of the 11 lock entries not set whose progress the profile has reached is set, with a
+// kind picked at random (not one an earlier entry holds), and pays its n4. Gives whether there
+// was one.
 void fn_8010EF8C(MsgArg* pArgs, MsgArg* pResult) {
     s32 n8;
     s32 n4;
@@ -355,7 +355,7 @@ void fn_8010EF8C(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-// Lock entry pArgs[0]'s payout: its n8 for each of the profile's assets of its kind. Gives
+// Lock entry pArgs[0]'s value: its n8 for each of the profile's assets of its kind. Gives
 // whether there is one.
 void fn_8010F10C(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = fn_80077ACC();
@@ -458,7 +458,7 @@ void fn_8010F3A4(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = bWon;
 }
 
-// A tournament the player won: the day, the player's name, the winner's earnings, the money won
+// A tournament the player won: the day, the player's name, the tournament's purse, the money won
 // and the score.
 void fn_8010F440(MsgArg* pArgs, MsgArg* pResult) {
     s32 nEvent = pArgs[0].i;
