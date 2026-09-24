@@ -138,7 +138,7 @@ u8 fn_800ACE38(AudVoice* pVoice, u32* puPos) {
     u32 uPos = fn_800AFD8C(pVoice->nHwVoice);
     u32 uAram = pVoice->uAram;
     u32 uHalf;
-    int bCrossed = 0;
+    u8 bCrossed = 0;
 
     uHalf = uAram + 0x7F00;
 
