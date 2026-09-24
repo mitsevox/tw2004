@@ -22,6 +22,16 @@ void fn_8011E974(void);
 void fn_8011EAB8(void);
 void fn_8011EBF8(void);
 void fn_8011EC2C(void);
+extern f32 lbl_801945B8[];     // a colour: 0.21, 0.31, 0.1, 1
+extern f32 lbl_801945C8[];     // the unit square's corners
+void fn_80013D5C(void* pCamera);   // makes it the current render camera
+void fn_800140E8(int a, int nWidth, int nHeight, int nField, int b, int c);
+void fn_800760B0(int nX, int nY, int nWidth, int nHeight);
+void fn_80016B54(int nWidth, int nHeight, f32 fX, f32 fY);
+void fn_80035F1C(void);
+void fn_80016948(void);
+s32  fn_8003505C(s32 n);           // sets a value, returns the old one
+void fn_80034AE4(void);
 extern f32 lbl_801945E8[];
 extern f32 lbl_801945F8[];
 extern f32 lbl_80194618[];
@@ -221,6 +231,53 @@ void fn_8011EC2C(void) {
     GXCopyTex(lbl_80282510, 0);
     GXPixModeSync();
     GXInvalidateTexAll();
+}
+
+// Renders the grass texture: with the grass camera current, a 256 x 256 viewport is drawn and
+// copied out (fn_8011EC2C), then the previous camera and the full 512 x 448 screen come back.
+void fn_8011EC84(void) {
+    s32 nOld;
+    void* pCamera;
+
+    pCamera = fn_8001614C();
+    fn_80013D5C(lbl_80281900->pCamera);
+    fn_80012F34(0);
+    fn_80012F18(7);
+    fn_80012F50(0, 6, 128);
+    fn_800140E8(1, 256, 256, 0, 1, 1);
+    fn_800760B0(0, 0, 256, 256);
+    fn_80016B54(256, 256, 1.0f, 1.0f);
+    fn_80035F1C();
+    fn_80016948();
+    fn_800352BC();
+    fn_80013CCC(fn_8001614C());
+    fn_80013EEC(fn_8001614C());
+    fn_80016B9C();
+    fn_80012EF8();
+    fn_8001425C(0);
+    fn_80014118(0);
+    fn_80014194(lbl_801945B8);
+    fn_80012F34(0);
+    fn_80012F50(0, 6, 128);
+    fn_80012EF8();
+    fn_8001644C(161, lbl_801945C8, 0, lbl_801945C8, 2);
+    nOld = fn_8003505C(0);
+    fn_80034AE4();
+    fn_8003505C(nOld);
+    fn_8011EC2C();
+    fn_80013D5C(pCamera);
+    fn_80013EEC(fn_8001614C());
+    fn_800352BC();
+    fn_80013CCC(fn_8001614C());
+    fn_80016B9C();
+    fn_800140E8(0, 512, 448, lbl_80281B88 & 1, 8, 1);
+    fn_800760B0(0, 0, 512, 448);
+    fn_80016B54(512, 448, 1.0f, 1.0f);
+    fn_80035F1C();
+    fn_80012F50(1, 6, 128);
+    fn_80012F34(1);
+    fn_80012F18(3);
+    fn_80012EF8();
 }
 
 void fn_8011EE4C(void) {
