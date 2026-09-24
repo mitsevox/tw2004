@@ -47,6 +47,18 @@ typedef struct BonePose {
 } BonePose;
 LAYOUT_ASSERT(BonePose, 0x20);
 
+// A blend node's pose buffer (SKABlendNode.pPose; our name): bit arrays over the 128 bones
+// (fn_800177A0 clears the first two with fn_8001E938 and the next two with fn_8001E8A4), then a pose
+// per bone. Format 0 is exactly this (0x1040 bytes); format 1 has 0x10C bytes more.
+typedef struct SkelPose {
+    u32      a0[4];             // 0x000  bones the pose sets (fn_8001E9CC tests them)
+    u32      a10[4];            // 0x010
+    u32      a20[4];            // 0x020
+    u32      a30[4];            // 0x030
+    BonePose aBones[128];       // 0x040
+} SkelPose;
+LAYOUT_ASSERT(SkelPose, 0x1040);
+
 // A character's skeleton data (CharModel.pSkel; the SKEL_ functions take it): its IK chains and
 // how strongly their solution is applied (the IK weight, 0..1); only what the code reads.
 typedef struct Skeleton {
@@ -191,7 +203,7 @@ struct SKABlendNode {
     f32  fStart;                // 0x10  a blend's is its children's earliest (fn_800728D8)
     f32  fEnd;                  // 0x14  a blend's is its children's latest (fn_80072938)
     f32  fWeight;               // 0x18  its share of its parent's blend (fn_80072ACC)
-    void* pPose;                // 0x1C  its pose buffer, taken from the pool for nFormat
+    struct SkelPose* pPose;     // 0x1C  its pose buffer, taken from the pool for nFormat
     union {
         struct {
             SKABlendFn pfnBlend;            // 0x20
@@ -295,8 +307,11 @@ typedef struct Character {
     s32   nC;                   // 0x00C  the golfer's id (FEgolferanim.c: 7 and 29 are special)
     u32   u10;                 // 0x010  bit 0x40 tested by the game manager and the swing; bit 0x8000
                                 //        cleared by CharacterState_AddSKABlendData
-    u8    unk14[0x1C - 0x14];
-    s32   nAnim;                // 0x01C  the playing animation (6 backswing, 7 downswing)
+    f32   f14;                  // 0x014  set to 2^30 (never) by Character_UpdateAnimation; for a
+                                //        character that is not a golfer it is tested against
+                                //        fn_8001ED44 first
+    u8    unk18[0x1C - 0x18];
+    s32   nAnim;              // 0x01C  the playing animation (6 backswing, 7 downswing)
     s32   n20;                  // 0x020
     s8    n24;                  // 0x024  } counters CharacterState's idle update (fn_80096398) runs down
     s8    n25;                  // 0x025  }
@@ -393,7 +408,9 @@ typedef struct Character {
     u8    unk1798[0x17AC - 0x1798];
     void* p17AC;                // 0x17AC  its slider definitions (CharSlider_CreateDefinitionsFromMem,
                                 //         fn_8001A9F4); fn_8001DC64 applies them
-    u8    unk17B0[0x17B8 - 0x17B0];
+    void (*pfn17B0)(void);      // 0x17B0  called by Character_UpdateAnimation before the bones are
+                                //         transformed; cleared by fn_8001942C
+    u8    unk17B4[0x17B8 - 0x17B4];
     struct SkinChoices* pChoices;   // 0x17B8  its look (fn_8001D4A4 dresses it from this); fn_8001A20C
                                     //         puts its logos on the model (fn_8001744C)
 } Character;

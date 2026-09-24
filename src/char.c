@@ -62,6 +62,21 @@ void  fn_8001C5B4(Character* pChar, int n);
 void  fn_800BBADC(int nValue);         // SitDevFile.c
 void  fn_8001EBD8(Character* pChar, int nBone, f32* pPos);
 u8    fn_8001EC48(Character* pChar);
+f32   fn_8001ED44(Character* pChar, int b);
+void  fn_80017DDC(Character* pChar);
+void  fn_8001899C(Character* pChar, int a, int b);
+void  fn_8001B644(Character* pChar);
+void  fn_8001C860(Character* pChar);
+void  fn_80021978(u8 v);                                        // ska_shared.c
+void  fn_8002787C(CharModel* pModel);                           // Skeleton.c
+void  fn_800279C0(Character* pChar);                            // Skeleton.c
+void  SKEL_UpdateState(CharModel* pModel, SkelPose* pPose, int n);   // Skeleton.c
+void  fn_80037C48(Skin* pSkin, SkelPose* pPose);                // Skin.c
+void  fn_8007260C(Character* pChar, SKABlendNode* pNode, CharModel* pModel, f32 fTime);  // animblender.c
+void  fn_80072ED8(void* pAnim, SKABlendNode* pNode, f32 fTime);                          // animblender.c
+void  fn_80073108(Character* pChar, int nPlayer, void* pAnim, SKABlendNode* pNode, f32 fTime);
+void  fn_8009622C(Character* pChar, void* pClip, u8 bKeep, f32 fOffset);                  // CharAnim.c
+void  fn_80096F0C(Character* pChar);                            // CharAnim.c
 f32 (*fn_8001EC6C(Character* pChar, int nBone))[4];
 f32 (*fn_8001ECA8(Character* pChar, int nBone))[4];
 f32   fn_8001EFFC(CamLens* pLens);
@@ -206,6 +221,134 @@ void* Char_SetClip(Character* pChar, int nGroup, int nStyle, const char* pName) 
     }
     pChar->pCurClip = pClip;
     return pClip;
+}
+
+// Advances the character's animation by fTime: both animation players and their blend trees, the
+// pose (the club head at the club class's height), the bones, the feet on the ground and the
+// model's dynamic chains. Unless bForce, it waits while a golfer's state is 0x13 and while f14 of
+// any other character is above fn_8001ED44.
+void Character_UpdateAnimation(Character* pChar, int bForce, f32 fTime) {
+    u32 auBits[4];
+    int bC860 = 0;
+    int bLegA = 0;
+    int bLegB = 0;
+    int i;
+
+    if (pChar == NULL) {
+        return;
+    }
+    if (pChar->uFlags & 1) {
+        pChar->n1698 = 0;
+        return;
+    }
+    if (pChar->u10 & 1) {
+        return;
+    }
+    if (!bForce) {
+        if (fn_8001EC48(pChar)) {
+            // fake match: the state is compared as an s8 (see GOLFERSTATE_GetCurrentState)
+            if ((s8)GOLFERSTATE_GetCurrentState(pChar->nPlayer) == 0x13) {
+                return;
+            }
+        } else if (pChar->f14 > fn_8001ED44(pChar, gSession.nSplitScreen)) {
+            pChar->f14 = 1073741824.0f;
+            pChar->n1698 = 0;
+            return;
+        }
+    }
+    pChar->f14 = 1073741824.0f;
+    if (pChar->u10 & 4) {
+        fn_8001C860(pChar);
+        bC860 = 1;
+    }
+    if (pChar->n20 == 8 && pChar->nAnim == 8) {
+        fn_80073108(pChar, pChar->nPlayer, pChar->anim, &pChar->blend, fTime);
+    } else if (pChar->u10 & 0x100) {
+        fn_80072ED8(pChar->anim, &pChar->blend, 5.0f * fTime);
+    } else {
+        fn_80072ED8(pChar->anim, &pChar->blend, fTime);
+        if (pChar->uFlags & 0x1000) {
+            pChar->uFlags &= ~0x1000;
+            if (pChar->pCurClip != NULL && pChar->pCurClip->pF4 != NULL) {
+                fn_8009622C(pChar, pChar->pCurClip->pF4, 0, 0.5f);
+            }
+        }
+    }
+    fn_80021978(pChar->pModel->bEE);
+    if (!gSession.b11) {
+        fn_80072ED8(&pChar->anim29C, (SKABlendNode*)pChar->node3E0, fTime);
+    }
+    if (fn_8001EC48(pChar)) {
+        CharacterState_UpdateSKAState(pChar);
+        if (!gSession.b11) {
+            fn_80096F0C(pChar);
+        }
+    }
+    if (pChar->pModel->pSkel != NULL) {
+        fn_8002787C(pChar->pModel);
+    }
+    if (pChar->blend.pPose != NULL) {
+        fn_8007260C(pChar, &pChar->blend, pChar->pModel, pChar->fAnimTime);
+        if (fn_8001EC48(pChar) && pChar->p16D8 != NULL) {
+            pChar->blend.pPose->aBones[pChar->nClubHeadBone].v10[1] = pChar->p16D8->afC[pChar->nClubClass];
+        }
+        SKEL_UpdateState(pChar->pModel, pChar->blend.pPose, 0);
+        if (fn_8001EC48(pChar)) {
+            if (fn_8001E9CC(pChar->blend.pPose->a0, fn_8001EEE4(pChar->pModel, 0x36)) ||
+                fn_8001E9CC(pChar->blend.pPose->a0, fn_8001EEE4(pChar->pModel, 0x38)) ||
+                fn_8001E9CC(pChar->blend.pPose->a0, fn_8001EEE4(pChar->pModel, 0x39)) ||
+                fn_8001E9CC(pChar->blend.pPose->a0, fn_8001EEE4(pChar->pModel, 0x3A))) {
+                bLegA = 1;
+            }
+            if (fn_8001E9CC(pChar->blend.pPose->a0, fn_8001EEE4(pChar->pModel, 0x44)) ||
+                fn_8001E9CC(pChar->blend.pPose->a0, fn_8001EEE4(pChar->pModel, 0x46)) ||
+                fn_8001E9CC(pChar->blend.pPose->a0, fn_8001EEE4(pChar->pModel, 0x47)) ||
+                fn_8001E9CC(pChar->blend.pPose->a0, fn_8001EEE4(pChar->pModel, 0x48))) {
+                bLegB = 1;
+            }
+        }
+    }
+    if (!gSession.b11 && fn_8001EC48(pChar) && ((SKABlendNode*)pChar->node3E0)->pPose != NULL) {
+        fn_8007260C(pChar, (SKABlendNode*)pChar->node3E0, pChar->pModel, pChar->anim29C.fTime);
+        fn_80037C48(pChar->pSkin, ((SKABlendNode*)pChar->node3E0)->pPose);
+    }
+    if (pChar->uFlags & 2) {
+        pChar->uFlags |= 1;
+        return;
+    }
+    if (pChar->pfn17B0 != NULL) {
+        pChar->pfn17B0();
+    }
+    fn_8001E8A4(auBits, 0x80);
+    SKEL_TransformBones(pChar->pModel, auBits);
+    if (fn_8001EC48(pChar)) {
+        Character_UpdateTestPoints(pChar);
+        Character_UpdateFeetTerrainInfo(pChar, bC860 || pChar->n20 != 5 || pChar->n26 == 1);
+        if (pChar->n20 == 1 || pChar->n20 == 0 || pChar->n20 == 9 ||
+            (pChar->n20 == 11 && !(pChar->u10 & 0x8000)) || pChar->n20 == 5 || pChar->n20 == 12) {
+            Character_PlaceFeetOnGround(pChar);
+        }
+        fn_8001899C(pChar, bLegA, bLegB);
+    }
+    if (fn_8001EC48(pChar)) {
+        if (pChar->pModel->pSkel != NULL) {
+            fn_800279C0(pChar);
+        }
+        fn_80017DDC(pChar);
+    }
+    pChar->n1698 = 0;
+    fn_8001B644(pChar);
+    if (fn_8001EC48(pChar)) {
+        fn_80029948(pChar->pModel, pChar->pModel->pF0, fTime);
+        fn_80029948(pChar->pModel, pChar->pModel->pF4, fTime);
+        fn_80029948(pChar->pModel, pChar->pModel->pF8, fTime);
+        for (i = 0; i < 6; i++) {
+            fn_80029948(pChar->pModel, pChar->pModel->apFC[i], fTime);
+        }
+        for (i = 0; i < 6; i++) {
+            fn_80029948(pChar->pModel, pChar->pModel->ap114[i], fTime);
+        }
+    }
 }
 
 // Give the character its model and look up the bones the swing needs: the club head (0x53), the
