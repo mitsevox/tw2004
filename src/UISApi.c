@@ -500,14 +500,8 @@ void fn_80169C0C(UIStudio* pStudio, u32 nScreens, u32 nHandlers, u32 nRateFns, u
 // The size of the block fn_80169C0C builds, for the given table sizes. The screen table has one
 // more entry's worth of room: the current record (UISCurrent, the same size).
 u32 fn_80169D90(u32 nScreens, u32 nHandlers, u32 nRateFns, u32 n60, u32 nEventWords, u32 nWords2) {
-    u32 uSize;
-
-    uSize = (nScreens + 1) * sizeof(UISScreen);
-    uSize += nHandlers * sizeof(UISHandlerFn);
-    uSize += nRateFns * sizeof(UISRateFn);
-    uSize += n60 * sizeof(UISRecord60);
-    uSize += (nWords2 + nEventWords) * sizeof(s32);
-    return uSize + sizeof(UIStudio);
+    return sizeof(UIStudio) + (nScreens + 1) * sizeof(UISScreen) + nHandlers * sizeof(UISHandlerFn) +
+           nRateFns * sizeof(UISRateFn) + n60 * sizeof(UISRecord60) + (nWords2 + nEventWords) * sizeof(s32);
 }
 
 // Turns a file offset stored in a pointer field into the pointer.

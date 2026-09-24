@@ -229,7 +229,7 @@ void fn_8010CA2C(int nPlayer) {
     s32 nLength;
     s32 nPoints;
     s32 nTotal;
-    u32 nPick;
+    s32 nPick;
     u16 aMsgs[20];
 
     if (fn_8010D33C(NULL)) {

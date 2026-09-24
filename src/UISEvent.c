@@ -179,8 +179,7 @@ s32 fn_80165ACC(UIStudio* pStudio, u16 uGroup, u16 uScreen) {
         nType = p[0];
         uA = p[-1];
         uB = p[-2];
-        p -= 7;
-        pData = p;
+        pData = p -= 7;
         p -= 1;
         p -= nArgs;
         pArgs = p;
