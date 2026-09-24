@@ -2,6 +2,7 @@
 // decompiled; the sweep code below is the matched small functions.
 
 #include "game_types.h"
+#include "engine.h"
 
 // ---- sweep code (not yet cleaned up) ----
 
@@ -157,8 +158,6 @@ f32 fn_8001418C(u8* p) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-extern u8* lbl_80280E08;
-void fn_8001425C(s32 v);
 f32 fn_80014268(u8* p);
 f32 fn_80014270(u8* p);
 f32 fn_80014278(u8* p);
@@ -169,8 +168,8 @@ void fn_800142A4(s8 v);
 void fn_800131C4(int nController);
 void fn_8001437C(void);
 
-void fn_8001425C(s32 v) {
-    *(s32*)(lbl_80280E08 + 0xD0) = v;
+void fn_8001425C(int a) {
+    lbl_80280E08->nD0 = a;
 }
 
 f32 fn_80014268(u8* p) {
@@ -206,3 +205,74 @@ void fn_8001437C(void) {
 }
 
 // ---- end of sweep code ----
+
+void fn_800140E8(int a, int nWidth, int nHeight, int nField, int b, int c) {
+    lbl_801B8980.nE4 = a;
+    lbl_801B8980.nE8 = nWidth;
+    lbl_801B8980.nEC = nHeight;
+    lbl_801B8980.nF0 = nField;
+    lbl_801B8980.nF4 = b;
+    lbl_801B8980.nF8 = c;
+    lbl_801B8980.u110 |= 0x1000;
+}
+
+void fn_80014118(int a) {
+    lbl_801B8980.u20 = a;
+    lbl_801B8980.u110 |= 0x20;
+}
+
+// Set the colour of the view's vertices (r, g, b; alpha is kept); NULL: the default grey.
+void fn_80014194(f32* pColour) {
+    if (pColour == NULL) {
+        fn_800141CC();
+        return;
+    }
+    Vec_Copy(pColour, lbl_80280E08->aColour);
+}
+
+// The default vertex colour: half grey, opaque.
+void fn_800141CC(void) {
+    lbl_80280E08->aColour[0] = 0.5f;
+    lbl_80280E08->aColour[1] = 0.5f;
+    lbl_80280E08->aColour[2] = 0.5f;
+    lbl_80280E08->aColour[3] = 1.0f;
+}
+
+// Whether any of the four pads has any of the buttons in uMask (0: any button at all).
+u8 fn_80014300(u32 uMask) {
+    u8 bPressed = 0;
+    int nController = 0;
+
+    do {
+        if ((uMask == 0 && fn_800136DC(nController) != 0) || (uMask & fn_800136DC(nController))) {
+            bPressed = 1;
+        }
+        nController++;
+    } while (nController < 4);
+    return bPressed;
+}
+
+// Fill a screen quad's two corners (x0, y0)-(x1, y1) and its texture coordinates (0,0)-(1,1),
+// four floats per vertex.
+void fn_800141F8(f32* pXY, f32* pUV, f32 x0, f32 y0, f32 x1, f32 y1) {
+    if (pXY != NULL) {
+        pXY[0] = x0;
+        pXY[1] = y0;
+        pXY[2] = 0.0f;
+        pXY[3] = 1.0f;
+        pXY[4] = x1;
+        pXY[5] = y1;
+        pXY[6] = 0.0f;
+        pXY[7] = 1.0f;
+    }
+    if (pUV != NULL) {
+        pUV[0] = 0.0f;
+        pUV[1] = 0.0f;
+        pUV[2] = 0.0f;
+        pUV[3] = 1.0f;
+        pUV[4] = 1.0f;
+        pUV[5] = 1.0f;
+        pUV[6] = 0.0f;
+        pUV[7] = 1.0f;
+    }
+}
