@@ -292,24 +292,24 @@ void fn_80117E98(int nPlayer) {
 // winnings or, with 15 tournaments, the scoring average). When a month ends, leading every pro's
 // winnings for the month wins that month's award, and the month's winnings start again.
 void fn_801180C4(int nPlayer, u8 bUser, u8 bFirst) {
-    SaveProfile* pProfile = &gpSaveData[nPlayer];
+    int i;
     s32 nAhead;
-    s32 i;
     s32 nNext;
+    TourSeason* pTour = &gpSaveData[nPlayer].tour;
+    PgaStatCounts* pStats = &gpSaveData[nPlayer].tour.aStats[PGA_USER_GOLFER];
 
     if (bFirst && fn_800EFA70(gpSaveData[nPlayer].tour.nEvent)->nC != 0) {
-        pProfile->tour.n4E9A++;
+        pTour->n4E9A++;
     }
     if (bUser && bFirst) {
-        pProfile->tour.n4E96++;
+        pTour->n4E96++;
     } else if (bUser && !bFirst) {
-        pProfile->tour.n4E96 = 0;
+        pTour->n4E96 = 0;
     }
 
     nAhead = 0;
     for (i = 0; i < PGA_NUM_PROS; i++) {
-        if (gpSaveData[nPlayer].tour.aStats[i].nCareerWinnings >
-            gpSaveData[nPlayer].tour.aStats[PGA_USER_GOLFER].nCareerWinnings) {
+        if (gpSaveData[nPlayer].tour.aStats[i].nCareerWinnings > pStats->nCareerWinnings) {
             nAhead++;
         }
     }
@@ -333,7 +333,7 @@ void fn_801180C4(int nPlayer, u8 bUser, u8 bFirst) {
     nNext = GameModeDriverPGATour_GetNextEvent();
     if (nNext == -1) {
         if (gpSaveData[nPlayer].tour.nSeason == 0
-            && gpSaveData[nPlayer].tour.aStats[PGA_USER_GOLFER].nSeasonWins > 1
+            && pStats->nSeasonWins > 1
             && fn_800D7770(nPlayer, &gpSaveData[nPlayer].a1C0[12])) {
             fn_8011C054(12, 2);
         }
@@ -349,7 +349,7 @@ void fn_801180C4(int nPlayer, u8 bUser, u8 bFirst) {
                 fn_8011C054(2, 1);
             }
         }
-        if (pProfile->tour.aStats[PGA_USER_GOLFER].nEvents >= 15
+        if (pStats->nEvents >= 15
             && fn_80118F60(nPlayer, PGA_USER_GOLFER, GM_PGA_STAT_SCORING)
             && fn_800D7770(nPlayer, &gpSaveData[nPlayer].a1C0[15])) {
             fn_8011C054(6, 2);
@@ -360,7 +360,7 @@ void fn_801180C4(int nPlayer, u8 bUser, u8 bFirst) {
         || CalDate_GetMonth(GameModeDriverPGATour_GetEndDate(nNext))
                != CalDate_GetMonth(GameModeDriverPGATour_GetEndDate(gpSaveData[nPlayer].tour.nEvent))) {
         for (i = 0; i < PGA_NUM_PROS; i++) {
-            if (pProfile->tour.aStats[PGA_USER_GOLFER].n44 < gpSaveData[nPlayer].tour.aStats[i].n44) {
+            if (pStats->n44 < gpSaveData[nPlayer].tour.aStats[i].n44) {
                 break;
             }
         }
