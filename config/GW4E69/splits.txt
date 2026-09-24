@@ -182,6 +182,8 @@ Skin.c:
 GoPostFx.c:
 	.text       start:0x80037DD8 end:0x8003944C
 	.data       start:0x80187900 end:0x80187910
+	.bss        start:0x801D4F80 end:0x801D5110
+	.sbss       start:0x80281D80 end:0x80281D88
 	.sdata2     start:0x80283028 end:0x80283068
 
 unsorted/sweep_8003944C.c:
@@ -214,6 +216,8 @@ UObject.c:
 UKernel.c:
 	.text       start:0x80048AF4 end:0x800496E0
 	.data       start:0x80187D58 end:0x80187D68
+	.bss        start:0x801D5228 end:0x801D53A8
+	.sbss       start:0x80281DA8 end:0x80281DC0
 	.sdata2     start:0x80283200 end:0x80283208
 
 GoDynObjBase.c:
