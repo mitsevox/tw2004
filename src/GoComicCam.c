@@ -220,14 +220,18 @@ void fn_800B3D64(ComicPanel* pPanel, View* pView, f32 fFrameTime) {
 // rectangle pRect back. pPanel is not used.
 void fn_800B3D68(ComicPanel* pPanel, f32* pRect, f32 fFrameTime) {
     f32 aColour[4] = { 0.0f, 0.0f, 0.0f, 0.5f };
-    f32 fX = pRect[0];
-    f32 fY = pRect[1];
-    f32 fHeight = pRect[3];
-    f32 fWidth = pRect[2];
+    f32 fY;
+    f32 fX;
+    f32 fHeight;
+    f32 fWidth;
     int i;
 
+    fX = pRect[0];
+    fY = pRect[1];
+    fHeight = pRect[3];
+    fWidth = pRect[2];
     for (i = 0; i < 10; i++) {
-        if (lbl_80282178->a24[i] > 0.0f) {
+        if (0.0f < lbl_80282178->a24[i]) {
             fn_800B3F4C(pRect, lbl_80282178->aPanel[i].fTop, lbl_80282178->aPanel[i].fLeft,
                         lbl_80282178->aPanel[i].fWidth, lbl_80282178->aPanel[i].fHeight);
             aColour[3] = 0.5f * (1.0f - lbl_80282178->a24[i] / lbl_80282178->a4C[i]);
