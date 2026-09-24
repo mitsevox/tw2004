@@ -130,11 +130,11 @@ void fn_80112DD8(s32 nEntry) {
     s32* pMaterials;
     SkinDesc28* pPasses;
     s16* pFirst;
-    s32* pMesh;
+    SkinMeshRefs* pRefs;
     s16* pCount;
     TexEntry* pTex;
     f32* pUV;
-    SkinMeshRefs* pRefs;
+    s32* pMesh;
     s32 nOverrides;
     void** apOverride;
     int nPasses;

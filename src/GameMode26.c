@@ -221,9 +221,9 @@ s32 fn_8010C9D4(int nLie) {
 // the tracks for new records and point totals, and say one of the collected messages. The first
 // player to lbl_80281760 points wins.
 void fn_8010CA2C(int nPlayer) {
-    Player* pPlayer = &gPlayers[nPlayer];
-    s32 nKind;
     s32 nLead;
+    s32 nKind;
+    Player* pPlayer = &gPlayers[nPlayer];
     u8 bCounts = 0;
     s32 nMsgs = 0;
     s32 nLength;
