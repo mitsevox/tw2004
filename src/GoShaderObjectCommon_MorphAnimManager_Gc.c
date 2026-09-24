@@ -21,7 +21,7 @@ void fn_80097250(void) {
 void fn_800975B0(MorphAnim* pAnim) {
     pAnim->nIndex = lbl_80281F70->nCount;
     lbl_80281F70->nFrames += pAnim->nFrames;
-    lbl_80281F70->ap8[lbl_80281F70->nCount] = NULL;
+    lbl_80281F70->au8[lbl_80281F70->nCount] = 0;
     lbl_80281F70->nCount++;
 }
 
@@ -48,6 +48,7 @@ s32 fn_80097688(void) {
     return lbl_80281F70->nCount;
 }
 
-void* fn_80097694(u8 nIndex) {
-    return lbl_80281F70->ap8[nIndex];
+// The frame slot nIndex's animation was last brought up to date in.
+u32 fn_80097694(u8 nIndex) {
+    return lbl_80281F70->au8[nIndex];
 }

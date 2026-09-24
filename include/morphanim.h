@@ -21,10 +21,13 @@ typedef struct MorphAnim {
 typedef struct MorphAnimMgr {
     s32  nCount;                // 0x000
     s32  nFrames;               // 0x004  the sum of the animations' nFrames
-    void* ap8[(0x968 - 0x8) / 4];   // 0x008
+    u32  au8[(0x968 - 0x8) / 4];    // 0x008  per slot: the frame (gSession.nFrameCount) the
+                                    //        animation was last brought up to date in (fn_800976A8)
 } MorphAnimMgr;
 LAYOUT_ASSERT(MorphAnimMgr, 0x968);
 
 extern MorphAnimMgr* lbl_80281F70;
+
+u32  fn_80097694(u8 nIndex);        // lbl_80281F70->au8[nIndex]
 
 #endif
