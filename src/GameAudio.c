@@ -39,7 +39,7 @@ u8   fn_8006BAD8(int nPlayer, s32* pOut);
 f32  fn_8006C630(void);
 // hlaudemitter.c: makes an emitter for sound nSound; the callback is told when a track stops
 // (fn_800ADDC8). The other types are unproven.
-u8   fn_800AD280(s16 nSound, s32 n, int a, int b, void (*pfnCallback)(u8 nId, u8 nTrack, s32 n));
+u8   fn_800AD280(s16 nSound, s16 nKind, u8 a, int b, void (*pfnCallback)(u8 nId, u8 nTrack, s32 n));
 void fn_800ADA08(s16 nSound, u8 nTrack, u8 n);
 void fn_800AD734(u8 nId, int n);
 void fn_800AD450(u8 nId);
@@ -822,6 +822,55 @@ u8 fn_800A4A88(void) {
     fn_800A3E3C(60);
     fn_800A3FD4(32, lbl_8018E988);
     return 1;
+}
+
+// Starts a world object's sound. Kinds 0, 3 and 5 play as a pair of emitters lbl_80281450 either
+// side of the listener (kind 0 only once, lbl_80282042); the others play at the object. Kinds
+// below 3 need gpGame->b288.
+void fn_800A4CB8(GameAudioSource** ppSource, int n) {
+    GameAudioSource* pSource;
+    u32 nKind;
+    u8 bPlay;
+    u8 nParam;
+    u8 nId;
+    f32 vPos[3];
+
+    pSource = *ppSource;
+    nKind = pSource->nKind;
+    if ((nKind >= 3 || gpGame->b288) && pSource->nSound != 0) {
+        nParam = n;
+        switch (nKind) {
+        case 0:
+        case 3:
+        case 5:
+            bPlay = 1;
+            if (nKind == 0) {
+                if (lbl_80282042) {
+                    bPlay = 0;
+                } else {
+                    lbl_80282042 = 1;
+                }
+            }
+            if (bPlay) {
+                nId = fn_800AD280(pSource->nSound, pSource->nKind, nParam, 1, NULL);
+                vPos[0] = -lbl_80281450;
+                vPos[1] = 0.0f;
+                vPos[2] = 0.0f;
+                fn_800AD800(nId, vPos, NULL, 0);
+                vPos[0] = lbl_80281450;
+                nId = fn_800AD280(pSource->nSound, pSource->nKind, nParam, 1, NULL);
+                fn_800AD800(nId, vPos, NULL, gSession.nSplitScreen != 0);
+            }
+            break;
+        default:
+            nId = fn_800AD280(pSource->nSound, nKind, nParam, 0, NULL);
+            vPos[0] = pSource->vPos[0];
+            vPos[1] = pSource->vPos[1];
+            vPos[2] = pSource->vPos[2];
+            fn_800AD800(nId, vPos, NULL, 0);
+            break;
+        }
+    }
 }
 
 void fn_800A4E34(void) {

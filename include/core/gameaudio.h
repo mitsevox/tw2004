@@ -32,4 +32,13 @@ typedef struct GameAudioCourseSound {
 } GameAudioCourseSound;
 LAYOUT_ASSERT(GameAudioCourseSound, 0x8);
 
+// A world object's sound as fn_800A4CB8 is handed it (through a pointer to a pointer to it).
+typedef struct GameAudioSource {
+    u8   unk0[0x10];
+    f32  vPos[3];               // 0x10   where it plays (kinds other than 0, 3 and 5)
+    u8   unk1C[0x22 - 0x1C];
+    s16  nSound;                // 0x22   the sound, 0 for none
+    u32  nKind;                 // 0x24   passed on to fn_800AD280; 0, 3 and 5 play as a stereo pair
+} GameAudioSource;
+
 #endif
