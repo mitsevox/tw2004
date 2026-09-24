@@ -1566,9 +1566,9 @@ int Swing_PhaseIdle6(int nPlayer) {
 
 // Stop the pad rumble.
 void Swing_RumbleOff(int nPlayer) {
-    Player* p;
     s32*    pFrames;
     s32*    pController;
+    Player* p;
     if (Player_HasPad(nPlayer)) {
         p           = &gPlayers[nPlayer];
         pFrames     = &p->swing.nVibrateCount;
