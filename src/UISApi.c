@@ -32,8 +32,8 @@ void fn_80168CD8(UIStudio* pStudio, UISWordStack* pStack, u32 uEvent, s32 n, u8 
 // already; with n < 0 it is sent again.
 void fn_80168DB0(UIStudio* pStudio, u32 uEvent, s32 n, u8 b, void* p, u8 bAll) {
     s32 nLast;
-    u32 i;
     u32 nEnd;
+    u32 i;
     UISScreen* pScreen;
     s32 nTaken;
     u8 bOut;
