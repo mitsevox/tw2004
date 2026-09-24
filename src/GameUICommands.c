@@ -231,7 +231,6 @@ void fn_8008AB04(MsgArg* pArgs, MsgArg* pResult);
 
 // This file's helpers.
 u8   fn_80085BC0(int nController);
-s32  fn_8008AB40(void);
 s32  fn_8008AB4C(void);
 s32  fn_8008AC00(void);
 void fn_8008AC3C(int a, int b);

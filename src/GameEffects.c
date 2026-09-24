@@ -9,7 +9,6 @@
 
 // fake match: the (s8) on GOLFERSTATE_GetCurrentState (see game.h).
 
-int   fn_800D782C(int nPlayer, Ball* pBall, int a, u8 b, int c);
 u8    fn_800B4AE0(void);
 void  fn_800DBFAC(void);
 void  fn_800DC18C(void);

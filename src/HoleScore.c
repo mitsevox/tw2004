@@ -23,6 +23,53 @@ int  fn_800D1330(int nPlayer);
 void fn_800D1674(f32* pA, f32* pB, f32* pOut);
 void fn_800C8C3C(int nView, f32* pOut);   // GoBreakLine: a point kept per view
 
+// For a human player: whether Player.ballBefore passes the fn_800D782C check or, when that ball
+// is in the cup, the fn_800D7B1C putt check.
+u8 fn_800CF77C(int nPlayer) {
+    if (Player_IsCPU(nPlayer)) {
+        return 0;
+    }
+    if (fn_800D782C(nPlayer, &gPlayers[nPlayer].ballBefore, 0, 1, 1) != 0) {
+        return 1;
+    }
+    if (gPlayers[nPlayer].ballBefore.nLie == LIE_INCUP_e &&
+        fn_800D7B1C(nPlayer, &gPlayers[nPlayer].ballBefore, 0, 1, 1) != 0) {
+        return 1;
+    }
+    return 0;
+}
+
+// As fn_800CF77C, with the checks fn_800D7660 and fn_800D7684.
+u8 fn_800CF848(int nPlayer) {
+    if (Player_IsCPU(nPlayer)) {
+        return 0;
+    }
+    if (fn_800D7660(nPlayer, &gPlayers[nPlayer].ballBefore, 1) != 0) {
+        return 1;
+    }
+    if (gPlayers[nPlayer].ballBefore.nLie == LIE_INCUP_e &&
+        fn_800D7684(nPlayer, &gPlayers[nPlayer].ballBefore, 1) != 0) {
+        return 1;
+    }
+    return 0;
+}
+
+// The player's score against par for the round once the tap-in on this hole drops; 0 when
+// fn_8008AB40 is set.
+int fn_800CFFE4(int nPlayer) {
+    int nPar = 0;
+    int nStrokes = 0;
+    int i;
+    if (fn_8008AB40()) {
+        return 0;
+    }
+    for (i = 0; i < Game_CurHoleIndex(); i++) {
+        nPar += fn_800D2AD8(i);
+        nStrokes += gPlayers[nPlayer].nStrokes[i];
+    }
+    return (nStrokes - nPar) + gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1 - fn_800D2B08();
+}
+
 // Whether holing the ball now would finish the hole: puts the ball in the cup with one more
 // stroke, asks the mode (pfnHoleFinished, only asking), then puts both back.
 u8 fn_800D024C(int nPlayer) {

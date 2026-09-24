@@ -220,6 +220,10 @@ int  fn_800D3C7C(int nPlayer);          // the player's earnings rating, 0..25
 s32  fn_800D6A70(s32 nPoints, int nPlayer, u8 bCourse, u8 bTee, u8 bHole, CourseMoneyTracking* pMoney);
 int  fn_800D7220(int nReward, int nPlayer, CourseMoneyTracking* pMoney);
 s32  fn_800D7660(int nPlayer, Ball* pBall, u8 b);   // one of GameEffects' GameBreaker checks
+s32  fn_800D7684(int nPlayer, Ball* pBall, u8 b);   // the same through fn_800D4F14 (pBall unused)
+int  fn_800D782C(int nPlayer, Ball* pBall, int a, u8 bCountStroke, u8 bAll);
+int  fn_800D7B1C(int nPlayer, Ball* pBall, int a, u8 bCountStroke, u8 bAll);   // the putt record check
+s32  fn_8008AB40(void);                 // GameUICommands.c
 
 // GameHoleContests.c: the longest-drive, closest-to-the-pin and hole-in-one contests
 u8   fn_800DA174(void);                 // the longest drive is played on this hole
