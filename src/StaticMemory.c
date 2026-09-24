@@ -187,8 +187,7 @@ void* fn_80009B34(int nSize, int nMode, int nAlign, const char* pFile, int nLine
             }
             break;
         case 2:
-            nSize = nAlign + nSize;
-            nSize += 7;
+            nSize += nAlign + 7;
             if (nSize % 4 != 0) {
                 nSize += 4 - nSize % 4;
             }
@@ -200,15 +199,20 @@ void* fn_80009B34(int nSize, int nMode, int nAlign, const char* pFile, int nLine
                 continue;
             }
             lbl_80281BCC = i;
-            nBlock = lbl_80281BD4[i] + 8;
-            nMisalign = nBlock & (nAlign - 1);
-            if (nMisalign != 0) {
-                nBlock += nAlign - nMisalign;
+            {
+                // fake match: the block address in its own local, copied to nBlock after the header
+                s32 nAddr = lbl_80281BD4[i] + 8;
+
+                nMisalign = nAddr & (nAlign - 1);
+                if (nMisalign != 0) {
+                    nAddr += nAlign - nMisalign;
+                }
+                // port: as above.
+                ((s32*)nAddr)[-1] = nSize;
+                // port: as above.
+                ((s32*)nAddr)[-2] = lbl_80281BD4[i];
+                nBlock = nAddr;
             }
-            // port: as above.
-            ((s32*)nBlock)[-1] = nSize;
-            // port: as above.
-            ((s32*)nBlock)[-2] = lbl_80281BD4[i];
             // port: as above.
             fn_80005AE8((void*)nBlock, 0x33, nWanted);
             lbl_80281BD4[i] += nSize;
@@ -220,12 +224,11 @@ void* fn_80009B34(int nSize, int nMode, int nAlign, const char* pFile, int nLine
             break;
         case 1:
         case 4:
-            nSize = nAlign + nSize;
-            nSize += 7;
+            nSize += nAlign + 7;
             if (nSize % 4 != 0) {
                 nSize += 4 - nSize % 4;
             }
-            if (nMode == 1) {
+            if ((u32)nMode == 1) {  // fake match: the original compares unsigned here (cmplwi)
                 i = fn_800099BC(nSize);
             } else {
                 i = fn_80009A60(nSize);
