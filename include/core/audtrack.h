@@ -140,7 +140,10 @@ typedef union AudTrackStmFlags {
 
 // A tone of a sequencer bank (0x14 bytes).
 typedef struct AudSeqTone {
-    u8   unk0[0x10];
+    struct SoundHeader* pHeader;    // 0x0    the sound it plays (startup.h)
+    u32  u4;                    // 0x4    fn_800AC6D0 picks the voice's uC at random from u4 up to u8
+    u32  u8;                    // 0x8
+    struct VoiceEnvelope* pEnv; // 0xC    its volume envelope (startup.h)
     s32  n10;                   // 0x10   bit 0: it loops
 } AudSeqTone;
 LAYOUT_ASSERT(AudSeqTone, 0x14);
@@ -539,7 +542,7 @@ void Stm_SetStream(AudTrack* pTrack, u16 nStream, int nMode);
 s32  fn_800AC494(void);
 void fn_800AC49C(void);
 AudVoice* fn_800AC4A0(AudVoiceRequest* pRequest);
-void fn_800AC6D0(AudVoice* pVoice, AudVoiceParams* pParams, u8 n, f32 f);
+void fn_800AC6D0(AudVoice* pVoice, AudVoiceParams* pParams, u8 nVolume, f32 fPitch);
 void fn_800AC7DC(AudVoice* pVoice, u32 uLen, u32 nRate, u8 bLoud);
 void fn_800AC91C(AudVoice* pVoice, AudVoiceParams* pParams);
 void fn_800ACA5C(AudVoice* pVoice, u8 bPause);

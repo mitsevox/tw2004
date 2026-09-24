@@ -12,6 +12,7 @@ void fn_800B0114(u16 nVoice, VoiceEnvelope* pEnv);      // startUp.c
 
 void fn_800AC330(void);
 u8   fn_800AC6B0(AudVoiceRequest* pRequest, s16* pPriority);
+f32  fn_800ACEC4(f32 fA, f32 fB);
 
 // Set the voice pool up: every voice free, numbered after its hardware voice.
 void fn_800AC330(void) {
@@ -56,6 +57,32 @@ void fn_800AC49C(void) {
 // Can this request take a voice playing at *pPriority?
 u8 fn_800AC6B0(AudVoiceRequest* pRequest, s16* pPriority) {
     return pRequest->nPriority > *pPriority;
+}
+
+// Sets a sequenced voice up to play its tone at pitch fPitch and volume nVolume; the params' a8
+// (when flagged) change the tone's attack and decay.
+void fn_800AC6D0(AudVoice* pVoice, AudVoiceParams* pParams, u8 nVolume, f32 fPitch) {
+    u16 nHwVoice = pVoice->nHwVoice;
+    AudSeqTone* pTone = pVoice->pTone;
+    VoiceEnvelope* pEnv = pTone->pEnv;
+    VoiceEnvelope** ppEnv = &pEnv;  // fake match: the original keeps &pEnv in a register
+    u32 uRate = pTone->u4 + fn_800AB32C(pTone->u8 - pTone->u4);
+
+    if (pParams->flags.n != 0) {
+        if (pParams->flags.b.b5) {
+            (*ppEnv)->nAttack = pParams->a8[0];
+        }
+        if (pParams->flags.b.b4) {
+            (*ppEnv)->nDecay = pParams->a8[1];
+        }
+    }
+    pVoice->uC = fn_800ACEC4(uRate, fPitch);
+    pVoice->n14 = nVolume;
+    pVoice->unkA_0 = 1;
+    fn_800AFDC8(nHwVoice, pTone->pHeader);
+    // EA bug: hands over the address of the pointer, so the voice's envelope is the pointer's bits;
+    // the tone's own envelope (changed above, for every voice that plays it) is never used.
+    fn_800B0114(nHwVoice, (VoiceEnvelope*)ppEnv);
 }
 
 // Sets a streamed voice up to play uLen bytes of its ARAM buffer at nRate, looping: a slow attack,
