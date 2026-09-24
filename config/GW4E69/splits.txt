@@ -283,7 +283,24 @@ fe_craputils.c:
 	.data       start:0x80188138 end:0x80188148
 
 Swing.c:
-	.text       start:0x800589F8 end:0x80062E40
+	.text       start:0x800589F8 end:0x8005CCAC
+
+StateGolfer.c:
+	.text       start:0x8005CCAC end:0x8005D2E4
+	.bss        start:0x801D5A90 end:0x801D5AB0
+	.sbss       start:0x80281E00 end:0x80281E08
+
+Code8005D2E4.c:
+	.text       start:0x8005D2E4 end:0x8005D44C
+	.sbss       start:0x80281E08 end:0x80281E10
+
+stateFunc.c:
+	.text       start:0x8005D44C end:0x80062E40
+	.rodata     start:0x801835E0 end:0x801836B0
+	.data       start:0x801883C0 end:0x80188528
+	.sdata      start:0x802811A8 end:0x802811B8
+	.sbss       start:0x80281E10 end:0x80281E18
+	.sdata2     start:0x80283680 end:0x802836E8
 
 GoCamCont.c:
 	.text       start:0x80062E40 end:0x8006449C
