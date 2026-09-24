@@ -5,6 +5,7 @@
 // Each operation here mounts the card if it is not mounted yet (fn_8009D74C) and unmounts it
 // again after only in that case.
 
+#include "charstate.h"
 #include "core/memcard.h"
 #include "frontend/fe.h"
 #include "game/earnings.h"
@@ -220,6 +221,152 @@ int fn_800A1758(MCCardPos* pPos) {
 }
 
 void fn_800A19F4(void) {
+}
+
+// ---- reading the 'eagm' text: lines end in '\r\n', the buffer ends in 0xFF (-1 as a char) ----
+
+// The length of the line at p.
+s32 fn_800A19F8(const char* p) {
+    s32 nLen = 0;
+    while (*p != '\r' && *p != -1) {
+        nLen++;
+        p++;
+    }
+    return nLen;
+}
+
+// Skip white space; NULL at the end of the buffer.
+char* fn_800A1A28(char* p) {
+    while (*p != -1 && isspace(*p)) {
+        p++;
+    }
+    if (*p == -1) {
+        return NULL;
+    }
+    return p;
+}
+
+// The next line's text, past its white space; NULL at the end of the buffer or at the line
+// "END_OF_FILE".
+char* fn_800A1A90(char* p) {
+    char* pLine;
+    while (*p != '\n' && *p != -1) {
+        p++;
+    }
+    if (*p == -1) {
+        return NULL;
+    }
+    pLine = fn_800A1A28(p);
+    if (strncmp("END_OF_FILE", pLine, strlen("END_OF_FILE")) != 0) {
+        return pLine;
+    }
+    return NULL;
+}
+
+// How many lines follow p before the next one that starts with a quote.
+s32 fn_800A1B28(char* p) {
+    s32 nLines = 0;
+    u8 bFound;
+    p = fn_800A1A90(p);
+    bFound = 0;
+    while (!bFound && p != NULL) {
+        if (*p != '"') {
+            nLines++;
+            p = fn_800A1A90(p);
+        } else {
+            bFound = 1;
+        }
+    }
+    return nLines;
+}
+
+// How many lines from p on start with a quote.
+s32 fn_800A1B94(char* p) {
+    s32 nQuoted = 0;
+    while (p != NULL) {
+        if (*p == '"') {
+            nQuoted++;
+        }
+        p = fn_800A1A90(p);
+    }
+    return nQuoted;
+}
+
+// Free the 'eagm' list.
+void fn_800A1BE0(void) {
+    int i;
+    if (lbl_80281FF0 != NULL) {
+        for (i = 0; i < lbl_80281FF4; i++) {
+            fn_80009E70(lbl_80281FF0[i].p4);
+        }
+        fn_80009E70(lbl_80281FF0);
+        lbl_80281FF0 = NULL;
+    }
+}
+
+// Trim szText in place: the white space at both ends, a final 0xFF, and every quote.
+void fn_800A1C58(char* szText) {
+    char aBuf[0x40]; // size unknown: the frame leaves room for 0x40 to 0x4C bytes
+    s32 nLen;
+    char* pStart;
+    char* pEnd;
+    char* pDst;
+    s32 n;
+
+    nLen = strlen(szText);
+    pStart = szText;
+    while (isspace(*pStart)) {
+        pStart++;
+    }
+    pEnd = &szText[nLen];
+    if (*--pEnd == -1) {
+        pEnd--;
+    }
+    while (isspace(*pEnd)) {
+        pEnd--;
+    }
+    pDst = aBuf;
+    n = 0;
+    for (; *pStart != 0 && pStart != pEnd + 1 && *pStart != -1; pStart++) {
+        if (*pStart != '"') {
+            *pDst = *pStart;
+            n++;
+            pDst++;
+        }
+    }
+    aBuf[n] = 0;
+    strcpy(szText, aBuf);
+}
+
+// Find the first 'eagm' entry holding a name that szGameCode starts with: mark it and set its bit
+// in lbl_801F1100.
+void fn_800A1F6C(const char* szGameCode) {
+    int i;
+    int j;
+    for (i = 0; i < lbl_80281FF4; i++) {
+        for (j = 0; j < lbl_80281FF0[i].n8; j++) {
+            if (strncmp(lbl_80281FF0[i].p4 + j * 16, szGameCode,
+                        strlen(lbl_80281FF0[i].p4 + j * 16)) == 0) {
+                lbl_80281FF0[i].b0 = 1;
+                fn_8001EA34(lbl_801F1100, i);
+                return;
+            }
+        }
+    }
+}
+
+// How many 'eagm' entries are marked.
+s32 fn_800A2030(void) {
+    s32 nMarked = 0;
+    MCEagmEntry* pEntry = lbl_80281FF0;
+    int i;
+    for (i = 0; i < lbl_80281FF4; i++) {
+        if (pEntry->b0) {
+            nMarked++;
+        }
+        pEntry++;
+    }
+    return nMarked;
 }
 
 // Format the card. A card that is broken or has the wrong encoding can still be formatted.

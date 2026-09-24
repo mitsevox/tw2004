@@ -183,6 +183,7 @@ typedef struct MCEagmEntry {
 } MCEagmEntry;
 LAYOUT_ASSERT(MCEagmEntry, 0x4C);
 
+extern u32   lbl_801F1100[4];   // a bit per 'eagm' entry, set when fn_800A1F6C marks it
 extern u32   lbl_801F1110[256]; // the save checksum's CRC table (fn_800A253C)
 extern MCEagmEntry* lbl_80281FF0;   // the 'eagm' list (fn_800A1BE0 frees it)
 extern s32   lbl_80281FF4;      // its number of entries
