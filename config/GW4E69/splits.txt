@@ -136,6 +136,7 @@ ViewController.c:
 
 char_tex_manager.c:
 	.text       start:0x80017320 end:0x80017508
+	.data       start:0x801870F0 end:0x801870FC
 
 char.c:
 	.text       start:0x80017508 end:0x8001F32C
@@ -157,12 +158,16 @@ Skeleton.c:
 
 GxUtil.c:
 	.text       start:0x80029FC8 end:0x8002A630
+	.bss        start:0x801C64A8 end:0x801C64D8
+	.sbss       start:0x80281D28 end:0x80281D30
+	.sdata2     start:0x80282D60 end:0x80282D68
 
 Golfer.c:
 	.text       start:0x8002A630 end:0x8002F1D4
 
 GoRenderSurface.c:
 	.text       start:0x8002F1D4 end:0x8002F4FC
+	.data       start:0x801876B0 end:0x801876C8
 
 LLPict_Gc.c:
 	.text       start:0x8002F4FC end:0x80030254
@@ -249,6 +254,7 @@ LLPictInt.c:
 
 user.c:
 	.text       start:0x800563C4 end:0x80056480
+	.sdata      start:0x80281138 end:0x80281140
 
 PasswordManager.c:
 	.text       start:0x80056480 end:0x80057F18
@@ -276,6 +282,9 @@ target.c:
 
 emotion.c:
 	.text       start:0x8006AA70 end:0x8006BED4
+	.rodata     start:0x80183848 end:0x80183858
+	.data       start:0x80188830 end:0x801888C0
+	.sdata2     start:0x80283868 end:0x802838B8
 
 Replay.c:
 	.text       start:0x8006BED4 end:0x8006C630
@@ -287,6 +296,8 @@ gomainloop.c:
 
 GoFrameBuf.c:
 	.text       start:0x8006E150 end:0x8006E2A4
+	.data       start:0x801888E0 end:0x801888F0
+	.sdata2     start:0x802838F0 end:0x80283900
 
 GoLighting.c:
 	.text       start:0x8006E2A4 end:0x8006F154
@@ -853,12 +864,15 @@ SkinMorph.c:
 
 fe_stats.c:
 	.text       start:0x8011CEB0 end:0x8011D280
+	.sdata      start:0x80281888 end:0x802818A8
 
 EventInfo.c:
 	.text       start:0x8011D280 end:0x8011E020
 
 llrtclock.c:
 	.text       start:0x8011E020 end:0x8011E170
+	.data       start:0x80194580 end:0x80194598
+	.sdata      start:0x802818F8 end:0x80281900
 
 GoGrass.c:
 	.text       start:0x8011E170 end:0x80120298
