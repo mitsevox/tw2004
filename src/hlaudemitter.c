@@ -13,6 +13,33 @@ void fn_800ACB98(void);                 // hlaudvoice.c
 void fn_800AF320(void);
 void fn_800B0434(void);                 // startUp.c
 
+// Sets up the instances, all on the free list, and empties every emitter. Always 1.
+int fn_800ACECC(void) {
+    AudInstance* pInst;
+    int i;
+
+    pInst = lbl_801F2740;
+    fn_80005AE8(lbl_801F2740, 0, sizeof(lbl_801F2740));
+    for (i = 0; i < 256; i++, pInst++) {
+        pInst->nId = i;
+        pInst->pPrevActive = pInst - 1;
+        pInst->pNextActive = pInst + 1;
+    }
+    lbl_801F2668.pFree = &lbl_801F2740[0];
+    lbl_801F2740[0].pPrevActive = NULL;
+    lbl_801F2668.pFreeTail = &lbl_801F2740[255];
+    lbl_801F2740[255].pNextActive = NULL;
+    lbl_801F2668.pActive = NULL;
+    lbl_801F2668.pActiveTail = NULL;
+    lbl_801F2668.nActive = 0;
+    for (i = 0; i < 32; i++) {
+        lbl_801F2668.apFirst[i] = NULL;
+        lbl_801F2668.anSound[i] = 0;
+    }
+    lbl_801F2668.uFlags |= 1;
+    return 1;
+}
+
 // Runs fn_800AD450 on every instance in use, then empties every emitter. Always 1.
 int fn_800AD0C4(void) {
     AudInstance* pInst;
@@ -53,6 +80,66 @@ void fn_800AD1C8(void) {
     fn_800AF320();
     fn_800B0434();
     lbl_80282018++;
+}
+
+// Frees instance nId: out of the active list onto the head of the free list, and out of its
+// emitter's list (the emitter's sound is cleared with its last instance).
+void fn_800AD450(u8 nId) {
+    AudInstance* pInst = &lbl_801F2740[nId];
+    AudInstance* p;
+    AudInstance* pPrev;
+
+    if (nId != 0xFF && (lbl_801F2668.uFlags & 1)) {
+        fn_800A8200(nId);
+        if (pInst == lbl_801F2668.pActiveTail) {
+            if (pInst->pPrevActive != NULL) {
+                lbl_801F2668.pActiveTail = pInst->pPrevActive;
+                pInst->pPrevActive->pNextActive = NULL;
+            } else {
+                lbl_801F2668.pActive = NULL;
+                lbl_801F2668.pActiveTail = NULL;
+            }
+        } else if (pInst == lbl_801F2668.pActive) {
+            if (pInst->pNextActive != NULL) {
+                lbl_801F2668.pActive = pInst->pNextActive;
+                pInst->pNextActive->pPrevActive = NULL;
+            } else {
+                lbl_801F2668.pActive = NULL;
+                lbl_801F2668.pActiveTail = NULL;
+            }
+        } else {
+            pInst->pPrevActive->pNextActive = pInst->pNextActive;
+            pInst->pNextActive->pPrevActive = pInst->pPrevActive;
+        }
+        if (lbl_801F2668.pFree != NULL) {
+            lbl_801F2668.pFree->pPrevActive = pInst;
+        } else {
+            lbl_801F2668.pFreeTail = pInst;
+        }
+        pInst->pNextActive = lbl_801F2668.pFree;
+        pInst->pPrevActive = NULL;
+        lbl_801F2668.pFree = pInst;
+        lbl_801F2668.nActive--;
+        if (pInst->nEmitter >= 0) {
+            pPrev = NULL;
+            for (p = lbl_801F2668.apFirst[pInst->nEmitter]; p != NULL; p = p->pNext) {
+                if (p == pInst) {
+                    if (pPrev != NULL) {
+                        pPrev->pNext = pInst->pNext;
+                    } else {
+                        lbl_801F2668.apFirst[pInst->nEmitter] = pInst->pNext;
+                    }
+                    break;
+                }
+                pPrev = p;
+            }
+            if (lbl_801F2668.apFirst[pInst->nEmitter] == NULL) {
+                lbl_801F2668.anSound[pInst->nEmitter] = 0;
+            }
+        }
+        pInst->nEmitter = -1;
+        pInst->pNext = NULL;
+    }
 }
 
 // Whether bit nTrack of an instance's u22 is set; 0 for no instance.
