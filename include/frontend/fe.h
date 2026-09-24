@@ -50,6 +50,11 @@ LAYOUT_ASSERT(FEState, 0x660);
 
 extern FEState lbl_801D7148;
 
+// fn_8007D428 and fn_80080388 set it to 0.2 for a locked golfer, else 0 (also for one that is not
+// available).
+extern f32 lbl_80281374;        // .sdata 0x80281374 = 0.25f: past FE_MessageTable's .sdata, in a
+                                // later file's (not placed yet)
+
 // The front end's screen state (lbl_801D87C0, 0x4C bytes). Only what the cleaned code reads.
 typedef struct FEScreen {
     u8  b0;                     // 0x00  set by fn_80079AD4

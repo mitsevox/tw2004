@@ -1539,7 +1539,7 @@ u8 GM_Earnings_AwardTrophyBall(int nPlayer, int nAward) {
             nSlot = 4;
         }
         if (nSlot != 5 && gReplayData.bF10) {
-            Mem_cpy(gpSaveData[nProfile].aReplay[nSlot], &gReplayData, sizeof(gpSaveData->aReplay[0]));
+            Mem_cpy(&gpSaveData[nProfile].aReplay[nSlot], &gReplayData, sizeof(gpSaveData->aReplay[0]));
         }
         return 1;
     }

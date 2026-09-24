@@ -1098,7 +1098,6 @@ void fn_801686F8(UIStudio* pStudio, u8 bOn, u16 uGroup, u16 uScreen) {
 // list p (a count, a word, then file offsets; -1 when not there).
 void fn_80168918(UIStudio* pStudio, u8 bOn, s32 nId, UISNodeInfo* pInfo, s32* p, u16 uScreen, u16 uGroup) {
     s32 aArgs[2];
-    UISScreen* pScreen;
     UISScreenFile* pFile;
     UISNode* pNode;
     UISNode* pLinkNode;
@@ -1110,6 +1109,7 @@ void fn_80168918(UIStudio* pStudio, u8 bOn, s32 nId, UISNodeInfo* pInfo, s32* p,
     u32 n;
     s32 i;
     s32 nSlot;
+    UISScreen* pScreen;
     u16 nEvent;
 
     nSlot = -1;

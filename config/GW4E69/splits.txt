@@ -414,6 +414,11 @@ FE_Manager.c:
 
 FE_MessageTable.c:
 	.text       start:0x80079E6C end:0x800850E4
+	.rodata     start:0x80183870 end:0x80183950
+	.data       start:0x801896F0 end:0x801897E8
+	.bss        start:0x801D77A8 end:0x801D83B0
+	.sdata      start:0x802812A0 end:0x802812D0
+	.sdata2     start:0x80283AD8 end:0x80283B10
 
 GameUICommands.c:
 	.text       start:0x800850E4 end:0x8008AD80
@@ -943,6 +948,10 @@ uiArc.c:
 
 FE_CrAPDB.c:
 	.text       start:0x801037F8 end:0x801077EC
+	.data       start:0x80193228 end:0x801939D0
+	.sdata      start:0x802816E8 end:0x80281758
+	.sbss       start:0x80282460 end:0x80282488
+	.sdata2     start:0x80284838 end:0x80284848
 
 FE_CrAPMessages.c:
 	.text       start:0x801077EC end:0x8010A448

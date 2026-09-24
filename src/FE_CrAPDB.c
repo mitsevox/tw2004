@@ -13,6 +13,102 @@
 
 s32  fn_800CCEA0(Skin* pSkin);          // SkinPart.c: how many choices aSets[3] holds
 
+// .data, in address order (0x80193228..)
+SwapField lbl_80193228[20] = {
+    { 4, 4 },
+    { 36, 1 },
+    { 2, 2 },
+    { 2, 2 },
+    { 2, 2 },
+    { 2, 2 },
+    { 4, 4 },
+    { 4, 4 },
+    { 4, 4 },
+    { 1, 1 },
+    { 1, 1 },
+    { 1, 1 },
+    { 1, 1 },
+    { 1, 1 },
+    { 1, 1 },
+    { 2, 2 },
+    { 2, 2 },
+    { 2, 2 },
+    { 2, 2 },
+    { 6, 1 },
+};
+char lbl_801932C8[CRAP_NUM_PARTS][32] = {
+    "All Headwear",
+    "All Shirts",
+    "All Pants/Shorts",
+    "",
+    "",
+    "",
+    "",
+    "All Shoes",
+    "All Eyewear",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "All Watches and Jewelry",
+    "All Miscellaneous",
+    "",
+    "",
+    "",
+};
+char lbl_801935C8[16][32] = {
+    "adidas\xAE",
+    "Callaway Golf\xAE",
+    "Cleveland Golf\xAE",
+    "EA SPORTS\xA6",
+    "GENERIC",
+    "Maxfli\xAE",
+    "Nike",
+    "Nike TW Collection",
+    "None",
+    "Odyssey Golf\xAE",
+    "PING\xAE",
+    "Precept\xAE",
+    "Rossa\xAE",
+    "TAG Heuer\xA6",
+    "TaylorMade\xAE",
+    "TourStage\xAE",
+};
+char lbl_801937C8[11][32] = {
+    "ushirtlogof",
+    "ushirtlogoh",
+    "ushirtlogoa",
+    "uhatlogof",
+    "uhatlogoh",
+    "uglovelogol",
+    "uglovelogor",
+    "uarmtattool",
+    "uarmtattoor",
+    "ulegtattool",
+    "ulegtattoor",
+};
+
+// .sdata
+s32 lbl_802816E8 = -1;
+s32 lbl_802816EC = -1;
+
+// .sbss, defined in reverse address order (CodeWarrior lays it out last-defined-first)
+s32* lbl_80282480;
+s32* lbl_8028247C;
+s32* lbl_80282478;
+s32* lbl_80282474;
+CrAPRecord* lbl_80282470;
+s32 lbl_8028246C;
+UStreamObject* lbl_80282468;
+UStreamObject* lbl_80282464;
+CrAPDB* lbl_80282460;
+
 // This file, in address order.
 void fn_80103920(void);
 void fn_80103EFC(CrAPAsset* pAsset);
@@ -1586,21 +1682,19 @@ s32 FE_CrAP_GetNextUnlockVal(s32 nKind, s32 nAfter) {
 // profile's slots whose n2C is that entry's n (with fn_800F0304 of the entry and the asset's name).
 // How many records there are.
 s32 fn_801070F4(void) {
-    SaveProfile* pProfile = fn_80077ACC();
     s32 aAssets[64];
-    s32* pBase = aAssets;
     s16 nSlot;
+    SaveProfile* pProfile = fn_80077ACC();
+    s32* pBase = aAssets;
     int nAsset;
-    s32* p;
     int i;
     int j;
     int nAssets = 0;
 
-    p = pBase;
     for (nSlot = 0; nSlot < 53; nSlot++) {
         nAsset = fn_80103D14(nSlot);
         if (nAsset >= 0 && nAssets < 64) {
-            *p++ = nAsset;
+            pBase[nAssets] = nAsset;
             nAssets++;
         }
     }
