@@ -148,8 +148,8 @@ void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
     for (i = 0; i < pArc->nSegments;) {
         if (i == 0) {
             if (pArc->uFlags & 0x20) {
-                fT = (f32)i / pArc->nSegments;
                 fS = (f32)(pArc->nSegments - i) / pArc->nSegments;
+                fT = (f32)i / pArc->nSegments;
                 fA = colorB.a * fT + colorA.a * fS;
                 if (!(pArc->uFlags & 4) || (pArc->uFlags & 2)) {
                     fR = colorB.r * fT + colorA.r * fS;
@@ -195,8 +195,8 @@ void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
 
         // the colour and angle at the segment's far edge (and the next segment's near edge)
         if (pArc->uFlags & 0x20) {
-            fT = (f32)i / pArc->nSegments;
             fS = (f32)(pArc->nSegments - i) / pArc->nSegments;
+            fT = (f32)i / pArc->nSegments;
             fA = colorB.a * fT + colorA.a * fS;
             if (!(pArc->uFlags & 4) || (pArc->uFlags & 2)) {
                 fR = colorB.r * fT + colorA.r * fS;
