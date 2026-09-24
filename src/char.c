@@ -1303,10 +1303,10 @@ void fn_80019E80(Character* pChar) {
 // Sets up the dynamic textures on the character's other model: the model in use is copied to it
 // (fn_8010A6A8) and each skin choice that differs from the skin's current one is put on it.
 void fn_80019EF4(Character* pChar) {
-    void* pModel;
-    Skin* pSkin;
     int i;
     int j;
+    Skin* pSkin;
+    void* pModel;
 
     fn_8008E918(1);
     pModel = pChar->a64[1 - pChar->n74];
