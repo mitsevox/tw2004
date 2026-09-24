@@ -17,7 +17,6 @@ void fn_80036180(SkelPose1* pA, SkelPose1* pB, SkelPose1* pOut);             // 
 int  fn_800723E8(SKABlendNode* pNode, SKABlendNode*** pppOldest);
 int  fn_8007286C(SKABlendNode* pNode, f32 fTime);
 f32  fn_800728D8(SKABlendNode* pNode);
-f32  fn_80072938(SKABlendNode* pNode);
 void fn_8007325C(u8* pAnim);
 f32  fn_800732B8(f32 fTime, f32 fNow, f32 fStart, f32 fEnd);
 int  fn_800734D0(SKABlendNode* pNode);

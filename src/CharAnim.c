@@ -5,6 +5,9 @@
 #include "golfer.h"
 #include "game.h"
 #include "engine.h"
+#include "charstate.h"
+#include "frontend/fe.h"
+#include "game/save.h"
 
 f32   fn_8001F02C(Clip* pBlend, u64 uEvent);   // an event's time (by its 64-bit id)
 
@@ -20,9 +23,88 @@ s32   fn_80096508(void);
 int   fn_80096530(Character* pChar);
 f32   fn_800971B8(Character* pChar);
 
+// Clear the queued state change and stop the second player; with bReset, rebuild its blend node as
+// a half-and-half blend. In game type 3 the created golfer's sliders are applied again.
+void fn_800957FC(Character* pChar, u8 bReset) {
+    SKABlendNode* pNode;
+
+    if (pChar == NULL) return;
+    pChar->n30 = 0;
+    pChar->n2C = 0;
+    pChar->u28 &= ~1;
+    fn_800958EC(&pChar->anim29C, 0, 0.0f);
+    if (bReset) {
+        pNode = (SKABlendNode*)pChar->node3E0;
+        fn_80071F58(&pNode, 0);
+        fn_80071C28(&pNode, 1, 1, fn_80072ACC, 1);
+        fn_800725BC(pNode, fn_80072ACC, 0.5f);
+    }
+    if (gSession.nGameType == 3 && pChar->p17AC != NULL) {
+        fn_8010E4DC(pChar->p17AC, pChar->pModel, pChar->pSkin, 26, fn_80077ACC()->choices.a9B4,
+                    (SKABlendNode*)pChar->node3E0);
+    }
+}
+
 void fn_800958EC(AnimPlayer* pAnim, s32 n, f32 f) {
     pAnim->nC  = n;
     pAnim->f10 = f;
+}
+
+// Work out a clip's blend window aBlend: [0] its start and [1] its end in the clip, [2] the ball-hit
+// time (-1 if none), [3] and [4] the start and end on the player's clock, [5] fOffset. fFrom and
+// fTo may be markers: -40000 and -50000 take the clip's pD8 times, -90000 (fFrom) fn_800971B8,
+// -70000 (fFrom) where the golfer stands in the swing; other negatives take 0 and the clip's
+// length. fStart -10000 starts the window at the blend tree's end. With aPrev, the window lines up
+// with the previous one's. The result is the window's length on the player's clock.
+f32 fn_800958F8(Character* pChar, f32* aPrev, Clip* pClip, f32* aBlend, f32 fFrom, f32 fTo, f32 fStart,
+                f32 fOffset) {
+    aBlend[2] = -1.0f;
+    if (pClip->pD8 != NULL) {
+        if (-40000.0f == fFrom) {
+            aBlend[0] = pClip->pD8->f0C;
+        } else if (-50000.0f == fFrom) {
+            aBlend[0] = pClip->pD8->f08;
+        } else if (-90000.0f == fFrom) {
+            aBlend[0] = fn_800971B8(pChar);
+        } else if (-70000.0f == fFrom) {
+            aBlend[0] = pChar->v1638[1];
+            aBlend[2] = fn_8001F02C(pClip, 2);
+            fn_800732F4(&pChar->blend, pChar->anim, pChar->fAnimTime);
+        } else if (fFrom < 0.0f) {
+            aBlend[0] = 0.0f;
+        }
+        if (-40000.0f == fTo) {
+            aBlend[1] = pClip->pD8->f0C;
+        } else if (-50000.0f == fTo) {
+            aBlend[1] = pClip->pD8->f08;
+        } else if (fTo < 0.0f) {
+            aBlend[1] = pClip->f18;
+        }
+    } else {
+        if (fFrom < 0.0f) {
+            aBlend[0] = 0.0f;
+        }
+        if (fTo < 0.0f) {
+            aBlend[1] = pClip->f18;
+        }
+    }
+    if (aBlend[2] < 0.0f) {
+        aBlend[2] = aBlend[1];
+    }
+    if (-10000.0f == fStart) {
+        aBlend[3] = fOffset + fn_80072938(&pChar->blend);
+    } else {
+        aBlend[3] = fStart + fOffset;
+    }
+    aBlend[5] = fOffset;
+    if (aPrev != NULL) {
+        f32 fRatio = (aPrev[2] - aPrev[0]) / (aBlend[2] - aBlend[0]);
+        aBlend[3] = aPrev[3];
+        aBlend[4] = fRatio * (aBlend[1] - aBlend[0]) + aBlend[3];
+    } else {
+        aBlend[4] = aBlend[3] + (aBlend[1] - aBlend[0]);
+    }
+    return aBlend[4] - aBlend[3];
 }
 
 // Start pClip on the second player (fn_80095FD0) and queue state 4; unless bKeep, its blend node

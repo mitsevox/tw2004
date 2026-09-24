@@ -353,6 +353,7 @@ typedef void (*SKABlendFn)(SKABlendNode* pNode, int* pn, f32 fTime);
 void fn_80071C28(SKABlendNode** ppNode, int nType, int nFormat, SKABlendFn pfnBlend, int nC);
 // animblender.c: make pNode a blend node that mixes its children with pfnBlend at fWeight.
 void fn_800725BC(SKABlendNode* pNode, SKABlendFn pfnBlend, f32 fWeight);
+f32  fn_80072938(SKABlendNode* pNode);  // animblender.c: the latest end time under pNode
 
 // A node of a character's SKA blend tree (animblender.c; the root is at Character + 0x40C). A node
 // of type 1 blends its two children into its pose with pfnBlend; a node of type 0 plays one source
@@ -743,7 +744,7 @@ int   fn_80095780(Character* pChar);    // the animation playing
 int   fn_80095798(Character* pChar);
 void  fn_800957B0(Character* pChar, int a);
 void  fn_800957D8(Character* pChar);
-void  fn_800957FC(Character* pChar, int a);
+void  fn_800957FC(Character* pChar, u8 bReset);   // CharAnim.c: stop the second player
 void  CharacterState_AddSKABlendData(Character* pChar, int a, int nGroup, SKABlendFn pfnBlend, int c, int d,
                                      f32 f1, f32 f2, f32 f3, f32 f4, f32 f5);
 void  CharAnim_StartTapIn(Character* pChar);
