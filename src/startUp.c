@@ -511,10 +511,13 @@ void fn_800AFEF4(u16 nVoice, s16 nVolume, int a, int b) {
 // A volume (0..0x3FFF) in dB x 10, for the mixer: each halving takes 6 dB off, down to VOLUME_MIN.
 s16 fn_800AFF9C(s16 nVolume) {
     s16 nDb;
+    f32 fDb;
     nVolume >>= 1;
     if (nVolume <= 0) return VOLUME_MIN;
     if (nVolume >= 0x3FFF) return 0;
-    nDb = fn_8000AF7C(16383.0f / nVolume) * -86.5617f;
+    fDb = fn_8000AF7C(16383.0f / nVolume);
+    fDb *= -86.5617f;
+    nDb = fDb;
     if (nDb < VOLUME_MIN) {
         nDb = VOLUME_MIN;
     }
@@ -754,7 +757,9 @@ u32 fn_800B06F4(void) {
 
 void fn_800B0748(u32 uAddr) {
     u32 uBit = 1;
-    lbl_802820F0 &= ~(uBit << ((uAddr - lbl_80282108) / 0xFE00));
+    uAddr -= lbl_80282108;
+    uBit <<= uAddr / 0xFE00;
+    lbl_802820F0 &= ~uBit;
     lbl_802820F4--;
 }
 

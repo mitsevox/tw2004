@@ -180,61 +180,6 @@ void fn_801272B4(Skin* pSkin) {
     fn_80009E70(aNew);
 }
 
-// Packs the skin's model and its arrays into one allocation and frees the old one. Each
-// SkinModel44's p4 array goes into one shared block of indexes at the end.
-void fn_801276E4(Skin* pSkin) {
-    SkinModel* pOld;
-    s32 nOffset;
-    s32 nSize;
-    s32 nIndexes;
-    s32 i;
-    u8* pBase;
-    SkinModel* pNew;
-    s32* aIndexes;
-    s32 nFirst;
-    SkinModel44* pEntry;
-    s32 j;
-    s32 n;
-
-    pOld = pSkin->pModel;
-    // EA passes &pOld where an array is expected: never NULL, so the model always counts
-    nSize = fn_801275F0(&pOld, 1, sizeof(SkinModel), 16);
-    nSize += fn_801275F0(pOld->p34, pOld->n14, 0x20, 16);
-    nSize += fn_801275F0(pOld->p38, 1, 0x50, 16);
-    nSize += fn_801275F0(pOld->p3C, pOld->n0C, 0x50, 16);
-    nSize += fn_801275F0(pOld->p54, pOld->n50, sizeof(SkinModel54), 16);
-    nSize += fn_801275F0(pOld->p44, pOld->n40, sizeof(SkinModel44), 16);
-    nIndexes = 0;
-    for (i = 0; i < pOld->n40; i++) {
-        nIndexes += pOld->p44[i].n8;
-    }
-    nSize += fn_801275F0(&pOld, nIndexes, sizeof(s32), 16);
-
-    pBase = fn_80009B34(nSize, 2, 16, "SkinBurn.c", 434);
-    nOffset = 0;
-    pNew = fn_80127614(pBase, &nOffset, pOld, sizeof(SkinModel), 16);
-    pNew->n08 = nSize;
-    pNew->p34 = fn_80127614(pBase, &nOffset, pOld->p34, pOld->n14 * 0x20, 16);
-    pNew->p38 = fn_80127614(pBase, &nOffset, pOld->p38, 0x50, 16);
-    pNew->p3C = fn_80127614(pBase, &nOffset, pOld->p3C, pOld->n0C * 0x50, 16);
-    pNew->p54 = fn_80127614(pBase, &nOffset, pOld->p54, pOld->n50 * sizeof(SkinModel54), 16);
-    pNew->p44 = fn_80127614(pBase, &nOffset, pOld->p44, pOld->n40 * sizeof(SkinModel44), 16);
-    aIndexes = fn_801276A8(pBase, &nOffset, nIndexes * sizeof(s32), 16);
-
-    nFirst = 0;
-    for (i = 0; i < pNew->n40; i++) {
-        pEntry = &pNew->p44[i];
-        n = pEntry->n8;
-        for (j = 0; j < n; j++) {
-            aIndexes[nFirst + j] = pEntry->p4[j];
-        }
-        pEntry->p4 = &aIndexes[nFirst];
-        nFirst += pEntry->n8;
-    }
-    pSkin->pModel = pNew;
-    fn_80009E70(pOld);
-}
-
 // The bytes nCount items of nSize take, rounded up to nAlign (a power of two); 0 when there is no
 // array (p is NULL).
 s32 fn_801275F0(const void* p, s32 nCount, s32 nSize, s32 nAlign) {
@@ -270,6 +215,64 @@ void* fn_801276A8(u8* pBase, s32* pOffset, s32 nSize, s32 nAlign) {
         *pOffset = (*pOffset + (nAlign - 1)) & ~(nAlign - 1);
     }
     return p;
+}
+
+// Packs the skin's model and its arrays into one allocation and frees the old one. Each
+// SkinModel44's p4 array goes into one shared block of indexes at the end.
+void fn_801276E4(Skin* pSkin) {
+    SkinModel* pOld;
+    s32 nOffset;
+    s32 nSize;
+    s32 nIndexes;
+    s32 i;
+    u8* pBase;
+    SkinModel* pNew;
+    s32* aIndexes;
+    SkinModel44* pEntry;
+    s32 j;
+    s32 n;
+    s32 nEntries;
+    s32 nFirst;
+
+    pOld = pSkin->pModel;
+    // EA passes &pOld where an array is expected: never NULL, so the model always counts
+    nSize = fn_801275F0(&pOld, 1, sizeof(SkinModel), 16);
+    nSize += fn_801275F0(pOld->p34, pOld->n14, 0x20, 16);
+    nSize += fn_801275F0(pOld->p38, 1, 0x50, 16);
+    nSize += fn_801275F0(pOld->p3C, pOld->n0C, 0x50, 16);
+    nSize += fn_801275F0(pOld->p54, pOld->n50, sizeof(SkinModel54), 16);
+    nSize += fn_801275F0(pOld->p44, pOld->n40, sizeof(SkinModel44), 16);
+    nIndexes = 0;
+    nEntries = pOld->n40;
+    for (i = 0; i < nEntries; i++) {
+        nIndexes += pOld->p44[i].n8;
+    }
+    nSize += fn_801275F0(&pOld, nIndexes, sizeof(s32), 16);
+
+    pBase = fn_80009B34(nSize, 2, 16, "SkinBurn.c", 434);
+    nOffset = 0;
+    pNew = fn_80127614(pBase, &nOffset, pOld, sizeof(SkinModel), 16);
+    pNew->n08 = nSize;
+    pNew->p34 = fn_80127614(pBase, &nOffset, pOld->p34, pOld->n14 * 0x20, 16);
+    pNew->p38 = fn_80127614(pBase, &nOffset, pOld->p38, 0x50, 16);
+    pNew->p3C = fn_80127614(pBase, &nOffset, pOld->p3C, pOld->n0C * 0x50, 16);
+    pNew->p54 = fn_80127614(pBase, &nOffset, pOld->p54, pOld->n50 * sizeof(SkinModel54), 16);
+    pNew->p44 = fn_80127614(pBase, &nOffset, pOld->p44, pOld->n40 * sizeof(SkinModel44), 16);
+    aIndexes = fn_801276A8(pBase, &nOffset, nIndexes * sizeof(s32), 16);
+
+    nFirst = 0;
+    nEntries = pNew->n40;
+    for (i = 0; i < nEntries; i++) {
+        pEntry = &pNew->p44[i];
+        n = pEntry->n8;
+        for (j = 0; j < n; j++) {
+            aIndexes[j + nFirst] = pEntry->p4[j];
+        }
+        pEntry->p4 = &aIndexes[nFirst];
+        nFirst += pEntry->n8;
+    }
+    pSkin->pModel = pNew;
+    fn_80009E70(pOld);
 }
 
 void fn_80127B10(Skin* pSkin, HwsBurn* pBurn) {

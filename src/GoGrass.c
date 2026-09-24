@@ -21,9 +21,7 @@ void fn_8011EE4C(void);
 void fn_8011EF88(void);
 void fn_8011F374(void);
 void fn_8011F3AC(void);
-void fn_800082CC(void* p);
-void fn_8000827C(void* pObject, int n24, int nType, void* pArg);
-void fn_8011F544(int nX, int nZ, f32 f);
+void fn_8011F544(int nX, int nZ, int nCull, f32 f);
 f32 fn_80120244(f32 fX, f32 fM);
 void fn_80120268(f32* pA, f32* pB, f32* pOut);
 Sphere* fn_8012028C(RenderObj* pObj);
@@ -60,7 +58,6 @@ void fn_8011FD74(GrassBuffer* pBuffer);
 GrassBuffer* fn_8011FDEC(s32 nSize);
 void fn_8011FF58(void);
 void fn_80120194(void);
-void fn_80008248(void* p);
 
 // The grass's start: its chunk loader (chunk 6) is registered and its settings get their defaults.
 void fn_8011E170(void) {
@@ -202,6 +199,20 @@ void fn_8011E584(UStreamObject* pObject) {
     }
 }
 
+// A sort order: by the float at +8 of the objects the two entries point to, the larger first
+// (equal gives -1).
+int fn_8011E6B0(f32** ppA, f32** ppB) {
+    f32 fA = (*ppA)[2];
+    f32 fB = (*ppB)[2];
+    if (fA < fB) {
+        return 1;
+    }
+    if (fA >= fB) {
+        return -1;
+    }
+    return 0;
+}
+
 // The grass's frame update (after one skipped frame): new random tuning values when f3D4 changed,
 // the buffers and the grass camera, the texture pass, then the 16 sway points around the circle
 // and the phase moved on by f418 per 60th of a second.
@@ -254,20 +265,6 @@ void fn_8011E6E8(void) {
     if (lbl_80281900->f414 > 2.0f * PI) {
         lbl_80281900->f414 = lbl_80281900->f414 - 2.0f * PI;
     }
-}
-
-// A sort order: by the float at +8 of the objects the two entries point to, the larger first
-// (equal gives -1).
-int fn_8011E6B0(f32** ppA, f32** ppB) {
-    f32 fA = (*ppA)[2];
-    f32 fB = (*ppB)[2];
-    if (fA < fB) {
-        return 1;
-    }
-    if (fA >= fB) {
-        return -1;
-    }
-    return 0;
 }
 
 void fn_8011E974(void) {
@@ -533,15 +530,15 @@ void fn_8011F3AC(void) {
             lbl_80281900->f350 = pBuffer->f4;
             lbl_80281900->n36C = nPass;
             fn_8003519C(17, &lbl_80281900->f348);
-            fn_800082CC(pBuffer->a14);
+            fn_800082CC((UObjMeshPart*)pBuffer->a14);
         }
     }
 }
 
 // Places the grass of grid cell (nX, nZ) in the list being built: the buffer already made for that
 // spot in the other list is reused, else a free one is built from the cell's file record. The
-// placed buffers' bounds grow to take it in.
-void fn_8011F544(int nX, int nZ, f32 f) {
+// placed buffers' bounds grow to take it in. nCull (the cell's fn_80007CE8 result) is not used.
+void fn_8011F544(int nX, int nZ, int nCull, f32 f) {
     GrassBufferDesc desc;
     int i;
     u8 bFound;
@@ -578,7 +575,7 @@ void fn_8011F544(int nX, int nZ, f32 f) {
         desc.fX = pBuffer->f0;
         desc.fZ = pBuffer->f4;
         desc.f14 = lbl_80281900->f3B8;
-        fn_8000827C(pBuffer->a14, 0, 17, &desc);
+        fn_8000827C((UObjMeshPart*)pBuffer->a14, NULL, 17, &desc);
     }
     pBuffer->b10 = 1;
     pBuffer->f8 = f;
@@ -614,17 +611,17 @@ void fn_8011F7F8(void) {
     f32 vPos[4];
     f32 vCentre[4];
     f32 vSphere[4];
-    CamLens* pLens;
+    int nX;
+    int nZ;
     Sphere* pSphere;
+    int nCull;
+    CamLens* pLens;
     GrassTile* pTile;
     s32 nOther;
     int nRadius;
     int nCellX;
     int nCellZ;
-    int nX;
-    int nZ;
     int i;
-    int nCull;
     f32 fX;
     f32 fZ;
     f32 fCellX;
@@ -675,11 +672,11 @@ void fn_8011F7F8(void) {
     }
     nCellX = (fX - (f32)lbl_80281900->n14) / 2.5f;
     nCellZ = (fZ - (f32)lbl_80281900->n16) / 2.5f;
-    lbl_80260360.data = &lbl_802602C0;
-    pSphere = fn_8012028C(&lbl_80260360);
-    for (nX = nCellX - nRadius; nX < nCellX + nRadius; nX++) {
+    lbl_80260360.pInfo = &lbl_802602C0;
+    pSphere = fn_8012028C((RenderObj*)&lbl_80260360);
+    for (nX = nCellX - nRadius; nX <= nCellX + nRadius; nX++) {
         fCellX = 2.5f * (f32)nX;
-        for (nZ = nCellZ - nRadius; nZ < nCellZ + nRadius; nZ++) {
+        for (nZ = nCellZ - nRadius; nZ <= nCellZ + nRadius; nZ++) {
             if (nX < 0 || nX >= lbl_80281900->n18 || nZ < 0 || nZ >= lbl_80281900->n1A) {
                 continue;
             }
@@ -695,13 +692,13 @@ void fn_8011F7F8(void) {
             pSphere->x = 1.25f + ((f32)lbl_80281900->n14 + fCellX);
             pSphere->y = 0.5f * (lbl_80281900->f3B8 + (pTile->f4 + pTile->f8));
             pSphere->z = 1.25f + (2.5f * (f32)nZ + (f32)lbl_80281900->n16);
-            nCull = fn_80007CE8(&lbl_80260360, fn_8001614C(),
+            nCull = fn_80007CE8((RenderObj*)&lbl_80260360, fn_8001614C(),
                                 0, fn_80017028(lbl_801D3CB0.iCurrentViewContext)->f54);
             if (nCull == 2) {
                 continue;
             }
             Vec3Copy(&pSphere->x, vSphere);
-            fn_8011F544(nX, nZ, fn_800BB028(vSphere, vPos));
+            fn_8011F544(nX, nZ, nCull, fn_800BB028(vSphere, vPos));
         }
     }
     // port: fn_8011E6B0 compares two GrassBuffer pointers' f8 (the larger first)
@@ -760,7 +757,7 @@ GrassBuffer* fn_8011FDEC(s32 nSize) {
 // Empties the apD8 stack: each buffer gets fn_80008248 on its a14 and goes to a free apDC slot.
 void fn_8011FF58(void) {
     while (lbl_80281900->nE4 != 0) {
-        fn_80008248(lbl_80281900->apD8[lbl_80281900->nE4 - 1]->a14);
+        fn_80008248((UObjMeshPart*)lbl_80281900->apD8[lbl_80281900->nE4 - 1]->a14);
         fn_8011FD74(lbl_80281900->apD8[lbl_80281900->nE4 - 1]);
         lbl_80281900->nE4 = lbl_80281900->nE4 - 1;
     }

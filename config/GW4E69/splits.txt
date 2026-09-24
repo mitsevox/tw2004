@@ -950,6 +950,9 @@ GameMode22.c:
 
 SkinBurn.c:
 	.text       start:0x801270F0 end:0x80127D84
+	.data       start:0x80195500 end:0x80195520
+	.sdata      start:0x802819A8 end:0x802819B0
+	.sdata2     start:0x80284B38 end:0x80284B40
 
 EASBStorage.c:
 	.text       start:0x80127D84 end:0x8012CCD8

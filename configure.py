@@ -1029,7 +1029,7 @@ config.libs = [
             Object(Matching, "ShaderRow19.c"),
             Object(Matching, "EASportsBio.c"),
             Object(NonMatching, "GameMode22.c"),
-            Object(NonMatching, "SkinBurn.c"),
+            Object(Matching, "SkinBurn.c"),
             Object(Matching, "EASBStorage.c"),
             Object(Matching, "EASB.c"),
             # Built with pool_data on: fn_80165E9C 82.1 -> 94.2%, no function worse.

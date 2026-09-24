@@ -289,6 +289,12 @@ extern int* lbl_80281C70;
 extern int* lbl_80281C74;
 extern int* lbl_80281C78;
 
+struct DynObj;
+// Runs a byte-code script and returns the value left on top of the stack (1 for an empty script).
+// An opcode reads nArg; nPush, when not negative, starts on the stack; pObj is the DynObj the
+// script asks for values or sends messages (NULL for a stream object's scripts).
+int  fn_8000EA1C(u8* pCode, int nArg, int nPush, struct DynObj* pObj);
+
 u64  fn_8000BEE4(char* pName);          // a name's 64-bit hash
 // Find a loaded texture by its name's hash: its bank and entry (both NULL if none).
 int  fn_800102DC(u64 uHash, TexBank** ppBank, TexEntry** ppTex);

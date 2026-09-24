@@ -452,11 +452,11 @@ s32 fn_80126640(int n) {
 // comment picked at random from the ones the shot earned.
 void fn_80126698(int nPlayer) {
     Player* pPlayer = &gPlayers[nPlayer];
-    u8 bCounts = 0;
-    s32 nMsgs;
+    s32 nPoints;
     s32 nKind;
     s32 nLength;
-    s32 nPoints;
+    u8 bCounts = 0;
+    s32 nMsgs;
     u16 aMsgs[20];
 
     nMsgs = 0;
