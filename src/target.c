@@ -28,6 +28,12 @@ void fn_8006A988(f32* pA, f32* pB, f32* pOut);
 f32  fn_8006A9FC(void);
 LLFont* fn_8006AA3C(void);
 
+// fake match: stands in for a function the original linker stripped. The file's pool starts with
+// 1.0f (0x80283778), before the 0.01f TARGET_Init uses first; its body is unknown.
+static f32 target_StrippedFn(f32 x) {
+    return x + 1.0f;
+}
+
 // Set up when play starts (GO_vInitIG): the hole's chunk 3 loader, the marker textures ("tball"
 // and "shadow") and the five players' marker settings.
 void TARGET_Init(void) {
@@ -862,6 +868,10 @@ void fn_80069C64(char* sz, f32 fX, f32 fY) {
 
 f32  fn_8001414C(u8* p);    // GoRenderCtx_Gc.c: of the screen rectangle
 
+f32 lbl_801887CC[4] = { 0.5f, 0.5f, 0.5f, 0.5f };
+f32 lbl_801887DC[4] = { 0.5f, 0.15f, 0.15f, 0.5f };
+f32 lbl_801887EC[4] = { 0.4f, 0.4f, 0.4f, 0.5f };
+
 // Each frame while the ball is being placed (not while paused): the bobbing marker ball and its
 // shadow at the placement point, the marker kept inside the camera's view, and below it the
 // distances to the tee and the hole, in another colour when the spot is out of bounds or not a
@@ -1145,8 +1155,26 @@ void fn_8006A89C(void) {
     lbl_80281E30 = NULL;
 }
 
+// ---- sweep code (not yet cleaned up) ----
+
+f32 fn_8006A8A8(u8* p);
+
+f32 fn_8006A8A8(u8* p) {
+    return *(f32*)(p + 0x0);
+}
+
+// ---- end of sweep code ----
+
 void fn_8006A8B0(void) {
     fn_800E58B4(32);
+}
+
+// A point given as fractions of the camera's view (0..1) into the view's screen rectangle.
+void fn_8006A8D4(void* pCamera, f32* pX, f32* pY) {
+    f32* pRect = fn_80012EF0(pCamera);
+
+    *pX = fn_80012EE8(pRect) + *pX * fn_80012ED8(pRect);
+    *pY = fn_80012EE0(pRect) + *pY * fn_80012ED0(pRect);
 }
 
 // a - b into out (three floats)
@@ -1195,24 +1223,6 @@ void fn_8006A988(f32* pA, f32* pB, f32* pOut) {
     pOut[3] = pA[3] - pB[3];
 }
 #endif
-
-// ---- sweep code (not yet cleaned up) ----
-
-f32 fn_8006A8A8(u8* p);
-
-f32 fn_8006A8A8(u8* p) {
-    return *(f32*)(p + 0x0);
-}
-
-// ---- end of sweep code ----
-
-// A point given as fractions of the camera's view (0..1) into the view's screen rectangle.
-void fn_8006A8D4(void* pCamera, f32* pX, f32* pY) {
-    f32* pRect = fn_80012EF0(pCamera);
-
-    *pX = fn_80012EE8(pRect) + *pX * fn_80012ED8(pRect);
-    *pY = fn_80012EE0(pRect) + *pY * fn_80012ED0(pRect);
-}
 
 // Draw text in one colour (pColor: RGBA).
 void fn_8006A9AC(f32* pColor) {

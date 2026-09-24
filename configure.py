@@ -896,7 +896,7 @@ config.libs = [
             Object(Matching, "GoCamCont.c"),
             Object(NonMatching, "skalib.c"),
             Object(NonMatching, "GoStaticCam.c"),
-            Object(NonMatching, "target.c"),
+            Object(Matching, "target.c"),
             Object(Matching, "emotion.c"),
             Object(Matching, "Replay.c"),
             Object(Matching, "gomainloop.c"),
