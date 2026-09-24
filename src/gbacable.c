@@ -238,7 +238,7 @@ s32 GbaReadContext(s32 nChan) {
 }
 
 // Opens the link on a port from the GBA's context: a GBA with none gets a new one (sent in state 3,
-// fn_80123ABC); one whose context is ours is sent a new tick and is linked once it echoes it; any
+// GbaSetport); one whose context is ours is sent a new tick and is linked once it echoes it; any
 // other is sent its own tick back and the port goes to state 4 (the contexts differ).
 void GbaOpen(s32 nChan) {
     GbaChannel* pCh;
