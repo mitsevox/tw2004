@@ -137,8 +137,11 @@ void  fn_800CEE88(u8 b);
 u8    fn_800FCC38(int nPlayer);
 void  fn_8010A668(void* p);
 void  fn_80008380(void);
+void  fn_80035600(void);                // GoTerrain.c
 void  fn_80035604(void);                // GoTerrain.c
 void  fn_800358E0(Character* pChar, u32 uFlags);
+void  fn_80035B40(Character* pChar, int n);
+void  fn_800364A0(void);                // Skin.c
 int   fn_800636EC(void);                // GoCamCont.c
 void  fn_8010BF68(void);
 void  fn_8010BFE0(void);
@@ -1272,6 +1275,38 @@ void fn_8001B58C(CharSkinSet* pSet) {
             }
             fn_80009E70(lbl_80280E24[i]);
             lbl_80280E24[i] = NULL;
+        }
+    }
+}
+
+// For every character made: bit 0x1000 of u10 cleared; with bit 2, bit 1 follows whether the
+// flagstick is out on the current view. Then fn_80035B40 for every character that is not in state
+// 2 (fn_8001EE90) or whose n1658 is 2, is not the camera's player (fn_800636EC), has none of bits
+// 0x1000, 0x40 and 1 of u10 set, and has n1698 0.
+void fn_8001BA74(void) {
+    int i;
+    int nPlayer;
+    u8 bDo;
+    int bState;
+
+    fn_80035600();
+    fn_800364A0();
+    for (i = 0; i < lbl_80281CA8; i++) {
+        nPlayer = fn_800636EC();
+        lbl_801B9624[i]->u10 &= ~0x1000;
+        if (lbl_801B9624[i]->u10 & 2) {
+            if (fn_80016CF4()->bFlagOut) {
+                lbl_801B9624[i]->u10 |= 1;
+            } else {
+                lbl_801B9624[i]->u10 &= ~1;
+            }
+        }
+        bState = fn_8001EE90(lbl_801B9624[i]) != 2;
+        bDo = bState || fn_8001EE88(lbl_801B9624[i]) == 2;
+        bDo = bDo && nPlayer != lbl_801B9624[i]->nPlayer;
+        bDo = bDo && !(lbl_801B9624[i]->u10 & 0x1041);
+        if (bDo && lbl_801B9624[i]->n1698 == 0) {
+            fn_80035B40(lbl_801B9624[i], 0);
         }
     }
 }

@@ -550,6 +550,7 @@ u8    fn_8001DBF4(Character* pChar);    // the ball is in the golfer's hand
 void  Character_GetBallOnFingerPosition(Character* pChar, f32* pPos);
 f32 (*fn_8001ED08(Character* pChar, int nBone))[4];  // a bone's matrix
 u8    fn_8001EDF4(Character* pChar);    // the model's bEE
+int   fn_8001EE88(Character* pChar);    // n1658
 int   fn_8001EE90(Character* pChar);
 int   fn_8001EED8(CharModel* pModel, int nBone);    // a bone's index
 int   fn_8001EEE4(CharModel* pModel, int nBone);
