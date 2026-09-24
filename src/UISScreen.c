@@ -16,7 +16,7 @@ char* fn_8016BEDC(char* pOut, char* pEnd, s32 nWidth, s32 nPrec, f32 f);
 // A linked node that answers with 1 gets the handler this node has for it. Returns 2 as soon as a
 // handler returns 2.
 s32 fn_8016A2D4(UIStudio* pStudio, UISScreen* pScreen, UISWordStack* pStack, u32 nNode, u32 uEvent, u32 n5,
-                u8 nArgs, const s32* pArgs, u8* pbOut) {
+                s32 nArgs, const s32* pArgs, u8* pbOut) {
     s32 nResult;
     UISNode* pNode;
     u32 i;

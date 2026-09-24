@@ -23,14 +23,14 @@ void fn_80168C24(UIStudio* pStudio, s32 nTicks) {
 
 // Sends event uEvent to the current screen, or to every screen when bAll is set. Event -8 skips
 // a screen that is being unloaded.
-void fn_80168CD8(UIStudio* pStudio, UISWordStack* pStack, u32 uEvent, s32 n, u8 b, void* p, u8 bAll) {
+void fn_80168CD8(UIStudio* pStudio, UISWordStack* pStack, u32 uEvent, s32 n, s32 b, void* p, u8 bAll) {
     UIStudio_Send(pStudio, pStack, uEvent, n, b, p, bAll);
 }
 
 // Runs the queued events, makes the screen named by the last p60 record current, then sends
 // event uEvent to it (or to every screen when bAll is set) unless the screen has taken it
 // already; with n < 0 it is sent again.
-void fn_80168DB0(UIStudio* pStudio, u32 uEvent, s32 n, u8 b, void* p, u8 bAll) {
+void fn_80168DB0(UIStudio* pStudio, u32 uEvent, s32 n, s32 b, void* p, u8 bAll) {
     s32 nLast;
     u32 nEnd;
     u32 i;
@@ -97,7 +97,7 @@ void fn_80168F5C(UIStudio* pStudio, u16 uGroup, u16 uScreen) {
 // callback frees its data and the table closes up. With no current screen left, its previous
 // screen (or the last one) becomes current through event 3. Returns 0 when fn_80169308 says the
 // screen cannot go yet.
-s32 fn_80168FC8(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 n) {
+u8 fn_80168FC8(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 n) {
     u32 nIndex;
     UISScreen* pScreen;
     UISScreen* pSrc;
