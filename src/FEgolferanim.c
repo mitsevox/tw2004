@@ -1218,8 +1218,7 @@ void fn_8008DAEC(void) {
     fn_8008B754(1);
     lbl_80281EE0->n190 = 0;
     lbl_80281EE0->pB4->b18 = 0;
-    switch (lbl_80281EE0->n0) {
-    case 0:
+    if (lbl_80281EE0->n0 == 0) {
         lbl_80281EE0->aGolfer[0].nC = lbl_801899E0[lbl_80281EE0->n198][lbl_80281EE0->n194 % 5];
         lbl_80281EE0->n194++;
         if (lbl_80281EE0->n194 >= 5) {
@@ -1229,10 +1228,8 @@ void fn_8008DAEC(void) {
                 lbl_80281EE0->n198 = 0;
             }
         }
-        break;
-    case 4:
+    } else if (lbl_80281EE0->n0 == 4) {
         lbl_80281EE0->aGolfer[0].nC = -1;
-        break;
     }
 }
 
