@@ -118,13 +118,14 @@ void fn_800A9AC8(void) {
 // steals the lowest-priority sorted track below fPriority that is not streamed or unstarted; an
 // unsorted source takes the last sorted track.
 AudTrack* fn_800A9BC8(AudSource* pSource, AudTrackTmpl* pTmpl, u8 nChannel, f32 fPriority) {
+    UPool* const pPool = &lbl_80282098;
     s32 bSorted;
     UList* pList;
     AudTrack* pTrack;
 
     bSorted = pSource->pSound->n3 & 1;
     pList = &lbl_801F1868[bSorted];
-    if (lbl_80282098.nFree == 0) {
+    if (pPool->nFree == 0) {
         pTrack = (AudTrack*)lbl_801F1868[1].pTail;
         if (lbl_801F1868[1].nCount == 0) return NULL;
         if (bSorted == 1) {
@@ -139,7 +140,7 @@ AudTrack* fn_800A9BC8(AudSource* pSource, AudTrackTmpl* pTmpl, u8 nChannel, f32 
             return NULL;
         }
     }
-    pTrack = fn_800AE1AC(&lbl_80282098);
+    pTrack = fn_800AE1AC(pPool);
     pTrack->pTmpl = pTmpl;
     pTrack->pSource = pSource;
     pSource->apTracks[nChannel] = pTrack;
@@ -207,16 +208,16 @@ s32 fn_800A9D7C(AudTrack* pTrack) {
 // caller's requests, which only count for the templates flagged 0x04 (and not 0x01).
 void fn_800A9E7C(AudSource* pSource, AudTrack* pTrack, AudTrackTmpl* pTmpl, u8 nChannel, u8 bOn,
                  u8 bOff, f32 fPriority) {
-    u8 bResort;
-    u8 bStart;
-    u8 bKeep;
-    u8 n64;
-    u8 n68;
     u8 bPlaying;
     u8 bSwitch;
     u8 bRetrigger;
+    u8 bResort;
     u8 bAudible;
+    u8 bStart;
     u8 bStop;
+    u8 bKeep;
+    u8 n64;
+    u8 n68;
 
     bKeep = 0;
     if (pTrack != NULL && pTrack->nState == 2) return;
@@ -226,8 +227,8 @@ void fn_800A9E7C(AudSource* pSource, AudTrack* pTrack, AudTrackTmpl* pTmpl, u8 n
     bResort = bPlaying;
     bAudible = fPriority > 0.0f;
     bStart = bAudible &&
-             ((!bPlaying && ((!bRetrigger && (!bSwitch || (bOn && !bOff))) ||
-                             (bRetrigger && (!bSwitch || bOn)))) ||
+             ((!bPlaying && ((!bRetrigger && (!bSwitch || (bSwitch && bOn && !bOff))) ||
+                             (bRetrigger && (!bSwitch || (bSwitch && bOn))))) ||
               (bPlaying && bRetrigger && bSwitch && bOn));
     bStop = (!bAudible && bPlaying) ||
             (bAudible && bPlaying && bSwitch &&

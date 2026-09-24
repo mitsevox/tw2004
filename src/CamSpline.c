@@ -170,7 +170,6 @@ f32 fn_800C79BC(f32* p0, f32* p1, f32* p2, f32* p3) {
 // Hermite segment from (af[0], af[1]) to (af[2], af[3]) with tangents af[4..5] and af[6..7]. The
 // segment holding fT is walked in 128 steps and the value read off the straight step around fT.
 f32 fn_800C7A9C(FlyByPath* pPath, f32 fT) {
-    FlyByKey* pKey;
     f32 fT1;
     f32 fT2;
     f32 fT3;
@@ -206,9 +205,8 @@ f32 fn_800C7A9C(FlyByPath* pPath, f32 fT) {
             break;
         }
     }
-    pKey = &pPath->aKeys[i];
-    fLastX = pKey->af[0];
-    fLastY = pKey->af[1];
+    fLastX = pPath->aKeys[i].af[0];
+    fLastY = pPath->aKeys[i].af[1];
     for (nStep = 0; nStep < 128.0f; nStep++) {
         fT1 = nStep / 128.0f;
         fT2 = fT1 * fT1;
@@ -220,8 +218,10 @@ f32 fn_800C7A9C(FlyByPath* pPath, f32 fT) {
         fH01 = -f2T3 + f3T2;
         fH00 = 1.0f + (f2T3 - f3T2);
         fH11 = fT3 - fT2;
-        fX = fH11 * pKey->af[6] + (fH10 * pKey->af[4] + (fH00 * pKey->af[0] + fH01 * pKey->af[2]));
-        fY = fH11 * pKey->af[7] + (fH10 * pKey->af[5] + (fH00 * pKey->af[1] + fH01 * pKey->af[3]));
+        fX = fH11 * pPath->aKeys[i].af[6] +
+             (fH10 * pPath->aKeys[i].af[4] + (fH00 * pPath->aKeys[i].af[0] + fH01 * pPath->aKeys[i].af[2]));
+        fY = fH11 * pPath->aKeys[i].af[7] +
+             (fH10 * pPath->aKeys[i].af[5] + (fH00 * pPath->aKeys[i].af[1] + fH01 * pPath->aKeys[i].af[3]));
         if (fX > fT) {
             break;
         }

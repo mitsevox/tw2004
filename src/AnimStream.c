@@ -33,6 +33,7 @@ AnimStreamGroup lbl_80191490[2] = {
 // and in the end it is turned off in every case.
 void fn_800C937C(void) {
     int i;
+    int nPlayer;
     int j;
     int k;
     int m;
@@ -53,14 +54,14 @@ void fn_800C937C(void) {
             }
         }
     }
-    for (i = 0; i < 5; i++) {
-        lbl_80282230->players[i].nId = -1;
+    for (nPlayer = 0; nPlayer < 5; nPlayer++) {
+        lbl_80282230->players[nPlayer].nId = -1;
         for (j = 0; j < 2; j++) {
             for (k = 0; k < 8; k++) {
                 for (m = 0; m < 6; m++) {
-                    lbl_80282230->players[i].clips[j][k][m].nNext = -1;
-                    lbl_80282230->players[i].clips[j][k][m].nMaxSize = -1;
-                    lbl_80282230->players[i].clips[j][k][m].b8 = 0;
+                    lbl_80282230->players[nPlayer].clips[j][k][m].nNext = -1;
+                    lbl_80282230->players[nPlayer].clips[j][k][m].nMaxSize = -1;
+                    lbl_80282230->players[nPlayer].clips[j][k][m].b8 = 0;
                 }
             }
         }
@@ -156,10 +157,10 @@ int fn_800C9928(int nIndex) {
 void fn_800C9970(void) {
     int nStart;
     int nSlot;
-    int nPlayer;
     int i;
     int nStyle;
     int nClub;
+    int nPlayer;
     int nFirst;
 
     if (gSession.nGameType != 6) return;
@@ -171,11 +172,11 @@ void fn_800C9970(void) {
     if (lbl_80282230->p0 != NULL) return;
     nFirst = fn_800E292C();
     if (nFirst == 5) return;
-    nStart = lbl_80282230->players[nFirst].nId;
-    if (nStart < 0) {
+    if ((nStart = lbl_80282230->players[nFirst].nId) < 0) {
         nStart = 0;
     }
-    nStart = (nStart + 1) % 2;
+    nStart++;
+    nStart %= 2;
     for (nSlot = nStart; nSlot < 2; nSlot++) {
         nPlayer = fn_800CB568(nSlot);
         if (nPlayer < 0 || lbl_80282230->p0 != NULL) break;
@@ -199,7 +200,8 @@ void fn_800C9970(void) {
     if (lbl_80282230->p0 != NULL) return;
     for (nSlot = 0; nSlot < nStart; nSlot++) {
         nPlayer = fn_800CB568(nSlot);
-        if (nPlayer < 0 || lbl_80282230->p0 != NULL) return;
+        if (nPlayer < 0) return;
+        if (lbl_80282230->p0 != NULL) return;
         for (i = 0; i < 2; i++) {
             for (nStyle = 0; nStyle < 8; nStyle++) {
                 for (nClub = 0; nClub < 6; nClub++) {
@@ -649,11 +651,11 @@ void fn_800CACD4(int nPlayer) {
     AnimLib* pLib;
     ClipRecord* pRecords;
     int nSlot;
-    int nAnimSlot;
-    u32 uFileSize;
     int i;
     int nStyle;
     int nClub;
+    int nAnimSlot;
+    u32 uFileSize;
     s32 nCount;
     u32 uFlags;
     s32 nFirst;

@@ -544,6 +544,7 @@ hlaudmovie.c:
 
 hlaudtrack.c:
 	.text       start:0x800A9808 end:0x800AA4BC
+	.sdata2     start:0x80283FD0 end:0x80283FD8
 
 hlaudtrackseq.c:
 	.text       start:0x800AA4BC end:0x800AB3A4
@@ -653,6 +654,7 @@ AnimStream.c:
 
 TerrainGround.c:
 	.text       start:0x800CB950 end:0x800CC1EC
+	.sdata2     start:0x80284460 end:0x80284478
 
 SkinPart.c:
 	.text       start:0x800CC1EC end:0x800CF158

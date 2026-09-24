@@ -31,18 +31,18 @@
 // lies in several cells (its done bit is set while collecting and cleared again at the end).
 int fn_800CB950(CourseInfo* pCourse, f32* pA, f32* pB, f32* pC, f32* pD, TerPolyRef* pList, int nMax,
                 u32 uSkip) {
-    u32 uPinSet;
     f32 fMinZ = 10000.0f;
     f32 fMaxZ = -10000.0f;
     f32 fMinX = fMinZ;
     f32 fMaxX = fMaxZ;
+    int nCount = 0;
     int nX0;
     int nZ0;
     int nX1;
     int nZ1;
-    int nCount = 0;
     int nX;
     int nZ;
+    u32 uPinSet;
     TerPolyRef* pRef;
     f32 (*pVert)[3];
     u8* pFlags;
