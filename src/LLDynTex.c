@@ -691,6 +691,7 @@ void fn_8010BFA0(int nBytes, int nError) {
 // copies them into the character's DynTex. Returns whether it is still busy.
 u8 fn_8010BFE0(void) {
     TexEntry* pEntry;
+    DynTexObj* pObj;
     TexPalette* pPal;
     DynTex* pTex;
     u32 bReady;
@@ -763,8 +764,8 @@ u8 fn_8010BFE0(void) {
                                 (DynTexPalette*)pPal, NULL, NULL,
                                 lbl_80282488->aUses[lbl_80282488->n970].p4,
                                 lbl_80282488->aUses[lbl_80282488->n970].n8);
-                lbl_80282488->p4 = pTex->p18 +
-                    pTex->p4->p8[lbl_80282488->aUses[lbl_80282488->n970].nC].aBlocks[0].nOffset;
+                pObj = &pTex->p4->p8[lbl_80282488->aUses[lbl_80282488->n970].nC];
+                lbl_80282488->p4 = pTex->p18 + pObj->aBlocks[0].nOffset;
                 lbl_80282488->u98C = DYNTEX_CHAR(lbl_80282488->p8)->n58 + pEntry->aMips[0].uPixels;
                 lbl_80282488->u98C &= ~0x7FF;
                 lbl_80282488->nA94 =
