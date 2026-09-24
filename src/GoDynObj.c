@@ -545,6 +545,8 @@ void fn_8004731C(u8* pState) {
     f32 fSink;
     f32 fSize;
     f32 fGrow;
+    f32 fTurn;
+    f32 fT;
 
     pBall = lbl_80281DA0->pTeo10000;
     for (i = 0; i < gSession.nNumPlayers; i++) {
@@ -560,10 +562,13 @@ void fn_8004731C(u8* pState) {
             pLogoB = NULL;
         }
         if (gPlayers[i].ball.nState != 0 && gPlayers[i].ball.nState != 1) {
-            fn_8001EF34(// port: NTSC rate; the frame's spin turn, scaled by the ball's radius squared
-                        60.0f * ((59.94f / 60.0f) * (59.94f * gSession.fFrameTime) * lbl_80283304 /
-                                 36.0f),
-                        gPlayers[i].ball.vSpin, aSpin);
+            // port: NTSC rate; the frame's spin turn, scaled by the ball's radius squared
+            fT = 59.94f / 60.0f;
+            fT *= 59.94f * gSession.fFrameTime;    // port: NTSC rate
+            fT *= lbl_80283304;
+            fTurn = 60.0f;
+            fTurn *= fT / 36.0f;
+            fn_8001EF34(fTurn, gPlayers[i].ball.vSpin, aSpin);
             Quat_BuildFromVector(aSpin, aTurn);
             Quat_Multiply(gPlayers[i].vOrient, aTurn, aRot);
             fn_8001E85C(aRot, gPlayers[i].vOrient);
