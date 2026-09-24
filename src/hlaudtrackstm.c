@@ -433,6 +433,7 @@ void Stm_SetPlayList(AudTrack* pTrack, u8 nPlayList) {
     AudPlayList* pList;
     AudPlayList* pOld;
     u32 uSize;
+    u8* pBuffer;
 
     nOld = 0;
     pTmpl = pTrack->pTmpl;
@@ -452,8 +453,9 @@ void Stm_SetPlayList(AudTrack* pTrack, u8 nPlayList) {
             if (pTrack->u.stm.pBuffer != NULL) {
                 fn_800A9434(pTrack->u.stm.pBuffer, pTrack->u.stm.uBufferSize, nOld);
             }
+            pBuffer = fn_800A942C(uSize, pList->nId);
             pTmpl->data.pPlayList = pList;
-            pTrack->u.stm.pBuffer = fn_800A942C(uSize, pList->nId);
+            pTrack->u.stm.pBuffer = pBuffer;
             pTrack->u.stm.uBufferSize = uSize;
             pTmpl->n2 = pList->nChannels;
         }
