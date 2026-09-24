@@ -8,7 +8,7 @@
 #include "core/startup.h"
 
 int  fn_80006478(s32 hFile, u8* pDst, u32 uLen, u32 uOffset,
-                 void (*pfnDone)(int nBytes, int nError, AudTrack* pTrack, u8 nId), int n,
+                 void (*pfnDone)(void* pDst, int nBytes, AudTrack* pTrack, u8 nId), int n,
                  AudTrack* pTrack, u8 nId, int n19);                 // read from disc, not waiting
 
 void fn_800AB860(AudTrack* pTrack);
@@ -16,7 +16,7 @@ void fn_800ABC54(AudTrack* pTrack);
 void fn_800AC310(AudTrack* pTrack);
 s32  fn_800AC328(void);
 void RemoveFromAudStreamQueue(AudTrack* pTrack);
-void fn_800AB99C(int nBytes, int nError, AudTrack* pTrack, u8 nId);
+void fn_800AB99C(void* pDst, int nBytes, AudTrack* pTrack, u8 nId);
 
 // Applies a play list or stream change that came in while the track was busy.
 u8 fn_800AB3A4(AudTrack* pTrack) {
@@ -55,7 +55,7 @@ void fn_800AB428(AudTrack* pTrack) {
 
 // Queues a disc read; returns 0 when the queue is full.
 u8 fn_800AB4C0(s32 hFile, u8* pDst, u32 uLen, u32 uOffset,
-               void (*pfnDone)(int nBytes, int nError, AudTrack* pTrack, u8 nId), AudTrack* pTrack,
+               void (*pfnDone)(void* pDst, int nBytes, AudTrack* pTrack, u8 nId), AudTrack* pTrack,
                u8 nId, u8 n19) {
     u8 bQueued;
     AudStreamRead* pRead;
@@ -210,8 +210,9 @@ void fn_800AB958(AudTrack* pTrack, u32 uLen) {
     pTrack->u.stm.uReadPos = uLoop;
 }
 
-// A disc read is done: DMA it to the voices, unless the track moved on meanwhile.
-void fn_800AB99C(int nBytes, int nError, AudTrack* pTrack, u8 nId) {
+// A disc read of nBytes into pDst is done: DMA it to the voices, unless the track moved on
+// meanwhile. The file reader calls it with the request's buffer, length, track and id.
+void fn_800AB99C(void* pDst, int nBytes, AudTrack* pTrack, u8 nId) {
     if (pTrack->u.stm.nReadId != nId || pTrack->pTmpl == NULL || pTrack->pTmpl->data.pPlayList == NULL ||
         pTrack->u.stm.pStream == NULL) {
         RemoveFromAudStreamQueue(pTrack);

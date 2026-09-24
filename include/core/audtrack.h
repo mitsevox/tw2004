@@ -396,7 +396,7 @@ typedef struct AudStreamRead {
     u8*  pDst;                  // 0x4
     u32  uLen;                  // 0x8
     u32  uOffset;               // 0xC
-    void (*pfnDone)(int nBytes, int nError, AudTrack* pTrack, u8 nId);  // 0x10
+    void (*pfnDone)(void* pDst, int nBytes, AudTrack* pTrack, u8 nId);  // 0x10
     AudTrack* pTrack;           // 0x14
     u8   nId;                   // 0x18
     u8   n19;                   // 0x19
