@@ -63,7 +63,7 @@ typedef struct DynTexEntry {
     u64   uId;                  // 0x00  its name hash (char_tex_manager.c; 0: dropped, fn_8010AD50)
     s32   n8;                   // 0x08  pixel blocks in aC
     s32   aC[4];                // 0x0C  each block's bytes (fn_8010B1D4 copies them)
-    s32   n1C;                  // 0x1C  the palette's bytes (fn_8010B2A8)
+    u32   n1C;                  // 0x1C  the palette's bytes (fn_8010B2A8)
 } DynTexEntry;
 LAYOUT_ASSERT(DynTexEntry, 0x20);
 

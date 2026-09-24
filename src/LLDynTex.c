@@ -306,6 +306,64 @@ void fn_8010B2A8(DynTex* pTex, int nTex, s16* pPalette) {
     GXInvalidateTexAll();
 }
 
+// Add a copy of texture pObj (and its palette pPal, if any) to pTex: its pixel blocks and palette
+// get room at the end of pTex's buffer, filled from pPixels and pPalette when given, the pixels
+// then recoloured by fn_8010A930 when p is set. Returns the new texture's index, or 0 when the
+// buffer is full.
+s32 fn_8010B338(DynTex* pTex, DynTexObj* pObj, DynTexPalette* pPal, u8* pPixels, u8* pPalette,
+                void* p, s32 n) {
+    char szName[16];            // the size is not known (fn_800CB8F0 writes the name)
+    s32 nTex;
+    DynTexObj* pNew;
+    DynTexPalette* pNewPal;
+    s32 nBytes;
+    int i;
+    DynTexEntry* pEntry;
+    s32 nFirst;
+
+    pNewPal = NULL;
+    nTex = pTex->n8;
+    memcpy(&pTex->p4->p8[nTex], pObj, sizeof(DynTexObj));
+    pNew = &pTex->p4->p8[nTex];
+    pEntry = &pTex->p0[nTex];
+    if (pPal != NULL) {
+        pNew->n3C = (s8)nTex;
+        memcpy(&pTex->p4->pC[nTex], pPal, sizeof(DynTexPalette));
+        pNewPal = &pTex->p4->pC[nTex];
+    } else {
+        memset(&pTex->p4->pC[nTex], 0, sizeof(DynTexPalette));
+    }
+    if ((u32)(pTex->n14 + fn_8010B0C0(pNew, pNewPal, pEntry)) > (u32)pTex->n10) {
+        fn_800CB8F0(&pObj->uId, szName);
+        return 0;
+    }
+    nFirst = pNew->aBlocks[0].nOffset;
+    for (i = 0; i < pEntry->n8; i++) {
+        nBytes = pEntry->aC[i];
+        if (pPixels != NULL) {
+            memcpy(pTex->p18 + pTex->n14, pPixels + (pNew->aBlocks[i].nOffset - nFirst), nBytes);
+        }
+        pNew->aBlocks[i].nOffset = pTex->n14;
+        if (pPixels != NULL && p != NULL) {
+            fn_8010A930(pNew, pTex->p18, p, n);
+        }
+        pTex->n14 += nBytes;
+    }
+    if (pEntry->n1C != 0) {
+        if (pPalette != NULL) {
+            memcpy(pTex->p18 + pTex->n14, pPalette, pEntry->n1C);
+        }
+        pNewPal->nOffset = pTex->n14;
+        pTex->n14 += pEntry->n1C;
+    }
+    pTex->n8++;
+    pTex->p4->n2++;
+    if (pNewPal != NULL) {
+        pTex->p4->n4++;
+    }
+    return pTex->n8 - 1;
+}
+
 // A free job, or NULL.
 DynTexJob* fn_8010B8EC(void) {
     int i;
