@@ -3124,7 +3124,7 @@ void fn_8007F87C(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Shows the replay profile pArgs[0] saved with award pArgs[1] (awards 0, 6, 9, 3 and 13 have one).
-// SaveProfile.aReplay is bytes (save.h cannot see game.h's Replay), so each is copied as a Replay.
+// SaveProfile.aReplay is Replay[5]: copying the struct member gives the original's copy order.
 void fn_8007F8A0(MsgArg* pArgs, MsgArg* pResult) {
     Replay replay0;
     Replay replay6;
