@@ -416,16 +416,6 @@ typedef struct SkinIter {
     s32  nCur;                  // 0xC
 } SkinIter;
 
-// The whole iterator fn_80113A9C and fn_80113B34 build (our name): the meshes of one SkinDesc.p5C
-// entry.
-typedef struct SkinDescIter {
-    SkinIter iter;              // 0x00
-    SkinDesc* pDesc;            // 0x10
-    SkinDesc5C* pEntry;         // 0x14
-    s32  n18;                   // 0x18  -1 before the first step
-    s32  n1C;                   // 0x1C
-} SkinDescIter;
-
 // The iterator fn_80113910 builds (our name): the SkinDesc.p3C entries of one SkinDesc.p44 entry.
 typedef struct SkinMeshIter {
     SkinIter iter;              // 0x00
@@ -434,6 +424,18 @@ typedef struct SkinMeshIter {
     s32  nCount;                // 0x18  the n1s of its SkinDesc28's pairs added up (1 without one)
     s32  n1C;                   // 0x1C  -1 before the first step
 } SkinMeshIter;
+LAYOUT_ASSERT(SkinMeshIter, 0x20);
+
+// The whole iterator fn_80113A9C and fn_80113B34 build (our name): the SkinDesc.p6C entries of one
+// SkinDesc.p5C entry. fn_80113B34's kind walks each entry's meshes with a SkinMeshIter in sub.
+typedef struct SkinDescIter {
+    SkinIter iter;              // 0x00
+    SkinDesc* pDesc;            // 0x10
+    SkinDesc5C* pEntry;         // 0x14
+    s32  n18;                   // 0x18  -1 before the first step
+    SkinIter* pSub;             // 0x1C  fn_80113B34's kind: the current entry's iterator, or NULL
+    SkinMeshIter sub;           // 0x20  } (fn_80113A9C's kind does not use them)
+} SkinDescIter;
 
 // hwsBurn.c's state for one SkinDesc (our name; fn_801104AC makes it, fn_801108B0 frees it). The
 // bit arrays hold one bit per entry of the count before them.

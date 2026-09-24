@@ -225,7 +225,7 @@ SkinIter* fn_80113A9C(u8* pBuf, SkinIterArgs* pArgs) {
     fn_80113E54(&pIter->iter, lbl_802817EC);
     pIter->pDesc = pArgs->pDesc;
     pIter->pEntry = &pArgs->pDesc->p5C[pArgs->n];
-    pIter->n1C = 0;
+    pIter->pSub = NULL;
     pIter->n18 = -1;
     fn_800CEEC8(&pIter->iter);
     return &pIter->iter;
@@ -246,7 +246,7 @@ SkinIter* fn_80113B34(u8* pBuf, SkinIterArgs* pArgs) {
     fn_80113E54(&pIter->iter, lbl_802817F0);
     pIter->pDesc = pArgs->pDesc;
     pIter->pEntry = &pArgs->pDesc->p5C[pArgs->n];
-    pIter->n1C = 0;
+    pIter->pSub = NULL;
     pIter->n18 = -1;
     fn_800CEEC8(&pIter->iter);
     return &pIter->iter;
@@ -293,6 +293,41 @@ void fn_80113C70(SkinIter* pIter) {
             }
         }
     } while (p->iter.bValid && p->iter.nCur < 0);
+}
+
+// fn_80113B34's step: the next mesh of the current entry's iterator, else of the next entry's
+// SkinDesc.p44 entry that has any.
+void fn_80113D28(SkinIter* pIter) {
+    SkinDescIter* p = (pIter->ppfnNext == lbl_802817F0) ? (SkinDescIter*)pIter : NULL;
+    SkinIterArgs args;
+
+    if (p->pSub != NULL) {
+        fn_800CEEC8(p->pSub);
+        if (!fn_800CEEC0(p->pSub)) {
+            fn_80113A7C(p->pSub);
+            p->pSub = NULL;
+        }
+    }
+    while (p->pSub == NULL) {
+        p->n18++;
+        if (p->n18 >= p->pEntry->n0) {
+            break;
+        }
+        args.pDesc = p->pDesc;
+        args.n = p->pDesc->p6C[p->pEntry->n4 + p->n18];
+        if (args.n >= 0) {
+            p->pSub = fn_80113910((u8*)&p->sub, &args);
+            if (!fn_800CEEC0(p->pSub)) {
+                fn_80113A7C(p->pSub);
+                p->pSub = NULL;
+            }
+        }
+    }
+    p->iter.bValid = p->pSub != NULL;
+    if (p->pSub != NULL) {
+        p->iter.pCur = fn_800CEEF4(p->pSub);
+        p->iter.nCur = fn_800CEEFC(p->pSub);
+    }
 }
 
 // ---- sweep code (not yet cleaned up) ----
