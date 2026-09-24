@@ -169,3 +169,20 @@ void fn_8010FAF4(void) {
         }
     }
 }
+
+// The logo being edited: the menus' own copy while b10640 is set, else the profile's user logo
+// that LogoEdit.n0 names.
+LogoRecord* fn_8010FB70(void) {
+    if (lbl_80281ED4->b10640) {
+        return &lbl_80281ED4->logo106E0;
+    }
+    return &fn_80077ACC()->choices.aLogo[lbl_802824B8->n0];
+}
+
+// ---- sweep code (not yet cleaned up) ----
+
+s16* fn_8010FBC4(void) {
+    return lbl_802824BC;
+}
+
+// ---- end of sweep code ----
