@@ -166,7 +166,7 @@ typedef struct FEProfile {
     SaveProfile profile;        // 0x00010  a working copy
     u8  unk10610[0x10620 - 0x10610];
     s8  n10620;                 // 0x10620  read and cleared by menu messages
-    u8  unk10621[0x1063F - 0x10621];
+    s8  a10621[15][2];          // 0x10621  pairs a menu message reads (fn_80082620)
     u8  bCopy;                  // 0x1063F  the working copy is the profile, not the slot's own
     u8  b10640;                 // 0x10640
     u8  unk10641[3];

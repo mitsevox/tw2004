@@ -42,6 +42,7 @@ void fn_8012409C(void);                 // gbacable.c
 void fn_801240A8(void);                 // gbacable.c
 void fn_800582C4(SaveProfile* pProfile, int nBit, u8 bSet);    // set or clear bit nBit of a10548
 s32  fn_801255C4(s32* pPos);            // EASportsBio.c
+u8   PasswordManager_TestPassword(char* szCode);  // PasswordManager.c
 void fn_80126F84(s32 n);                // GameMode22.c: sets lbl_80195498.n4
 void fn_80126F94(s32 n);                // GameMode22.c: sets lbl_80195498.n0
 void GM_SetupCustomHoleSelection(void); // GameManager.c
@@ -2660,6 +2661,16 @@ void fn_8007E92C(MsgArg* pArgs, MsgArg* pResult) {
     lbl_80281EE0->b83 = pArgs[0].i;
 }
 
+// Test the password typed in (the string pArgs[0], pArgs[1] characters of it): TRUE when it
+// unlocked something.
+void fn_8007E93C(MsgArg* pArgs, MsgArg* pResult) {
+    char szCode[0x20];          // the size is unknown: the frame leaves 0x20 bytes for it
+
+    strncpy(szCode, ((MsgString*)pArgs[0].p)->pStr, pArgs[1].i);
+    szCode[pArgs[1].i] = '\0';
+    pResult->i = PasswordManager_TestPassword(szCode);
+}
+
 void fn_8007E9A0(MsgArg* pArgs, MsgArg* pResult) {
 }
 
@@ -3819,6 +3830,12 @@ void fn_80082608(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = lbl_80281ED4->n10620;
 }
 
+// The two values of pair pArgs[0] into the words pArgs[1] and pArgs[2] point at.
+void fn_80082620(MsgArg* pArgs, MsgArg* pResult) {
+    *(s32*)pArgs[1].p = lbl_80281ED4->a10621[pArgs[0].i][0];
+    *(s32*)pArgs[2].p = lbl_80281ED4->a10621[pArgs[0].i][1];
+}
+
 void fn_8008266C(MsgArg* pArgs, MsgArg* pResult) {
     lbl_80281ED4->n10620 = 0;
 }
@@ -4566,6 +4583,15 @@ void fn_80084354(MsgArg* pArgs, MsgArg* pResult) {
     nError = fn_801251EC(aPos);
     pResult->i = (nError != 0) ? nError : 1;
     lbl_80281ED4->n11704 = nError;
+}
+
+// For the card in port pArgs[0], slot pArgs[1]: TRUE when it could be opened (fn_80125118).
+void fn_80084458(MsgArg* pArgs, MsgArg* pResult) {
+    s32 aPos[2];
+
+    aPos[0] = pArgs[0].i;
+    aPos[1] = pArgs[1].i;
+    pResult->i = fn_80125118(aPos);
 }
 
 // For the card in slot pArgs[0], pArgs[1]: fn_801255C4's answer.
