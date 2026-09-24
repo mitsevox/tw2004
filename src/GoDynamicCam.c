@@ -1128,9 +1128,9 @@ CamSequence* fn_8003BDBC(int nPlayer, int nLie, int nClass, int nKind, u8 a, f32
     int nClassBit;
     int nPinSet;
     u32 uRand;
+    int nRoll;
     f32 fHeight;
     f32 fTotal;
-    f32 fWeight;
 
     nPicked = 0;
     nSum = 0;
@@ -1190,12 +1190,12 @@ CamSequence* fn_8003BDBC(int nPlayer, int nLie, int nClass, int nKind, u8 a, f32
     for (i = 0; i < nPicked; i++) {
         fTotal += lbl_80281D88->pSequences[anPicked[i]].f34;
     }
+    nRoll = uRand % (int)(1000.0f * fTotal);
     for (i = 0; i < nPicked; i++) {
-        fWeight = 1000.0f * lbl_80281D88->pSequences[anPicked[i]].f34;
-        if ((f32)(int)(uRand % (int)(1000.0f * fTotal) - nSum) < fWeight) {
+        if ((f32)(nRoll - nSum) < 1000.0f * lbl_80281D88->pSequences[anPicked[i]].f34) {
             return &lbl_80281D88->pSequences[anPicked[i]];
         }
-        nSum += (int)fWeight;
+        nSum += (int)(1000.0f * lbl_80281D88->pSequences[anPicked[i]].f34);
     }
     return &lbl_80281D88->pSequences[anPicked[0]];
 }
@@ -1213,10 +1213,10 @@ CamSequence* DynamicCam_ChoosePreFlightSequence(int nPlayer, int nLie, int nKind
     int nTee;
     int nPinSet;
     u32 uRand;
+    int nRoll;
     f32 fPinDist;
     f32 fHeight;
     f32 fTotal;
-    f32 fWeight;
 
     nPicked = 0;
     nSum = 0;
@@ -1280,12 +1280,12 @@ CamSequence* DynamicCam_ChoosePreFlightSequence(int nPlayer, int nLie, int nKind
     for (i = 0; i < nPicked; i++) {
         fTotal += lbl_80281D88->pSequences[anPicked[i]].f34;
     }
+    nRoll = uRand % (int)(1000.0f * fTotal);
     for (i = 0; i < nPicked; i++) {
-        fWeight = 1000.0f * lbl_80281D88->pSequences[anPicked[i]].f34;
-        if ((f32)(int)(uRand % (int)(1000.0f * fTotal) - nSum) < fWeight) {
+        if ((f32)(nRoll - nSum) < 1000.0f * lbl_80281D88->pSequences[anPicked[i]].f34) {
             return &lbl_80281D88->pSequences[anPicked[i]];
         }
-        nSum += (int)fWeight;
+        nSum += (int)(1000.0f * lbl_80281D88->pSequences[anPicked[i]].f34);
     }
     return &lbl_80281D88->pSequences[anPicked[0]];
 }
