@@ -52,6 +52,8 @@ GoEntry.c:
 
 Quaternion.c:
 	.text       start:0x8000883C end:0x8000977C
+	.rodata     start:0x8017DB70 end:0x8017DB80
+	.sdata2     start:0x80282A88 end:0x80282AC0
 
 StaticMemory.c:
 	.text       start:0x8000977C end:0x8000A0E8

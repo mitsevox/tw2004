@@ -89,6 +89,17 @@ void fn_800089D4(f32 (*m)[4], f32* pQ) {
     pQ[2] = -aQ[2];
 }
 
+// fake match: puts fn_80009680's double constants (0.0, 0.5, 3.0) in the pool where the original
+// has them, right after fn_800089D4's (0x80282A98); why EA's pool has them there is unknown.
+static double Quaternion_StrippedFn(double x) {
+    double g = 0.0;
+
+    if (x > g) {
+        g = 0.5 * x * (3.0 - x);
+    }
+    return g;
+}
+
 // The quaternion of three angles (each negated), into pOut. An angle of exactly 0 skips its sin
 // and cos.
 void fn_80008BB8(f32* pOut, f32 fA, f32 fB, f32 fC) {
@@ -248,31 +259,31 @@ void fn_800090E4(f32* pA, f32* pB, f32* pOut) {
 
 // The rotation matrix (3 rows of 4, no translation) of a unit quaternion.
 void fn_8000914C(f32* pQ, f32 (*m)[4]) {
-    f32 fY2;
-    f32 fYY;
-    f32 fZZ;
-    f32 fXX;
-    f32 fZ2;
-    f32 fXY;
-    f32 fWZ;
-    f32 fXZ;
-    f32 fX2;
-    f32 fWY;
-    f32 fYZ;
     f32 fWX;
+    f32 fWY;
+    f32 fWZ;
+    f32 fXX;
+    f32 fYY;
+    f32 fYZ;
+    f32 fXY;
+    f32 fXZ;
+    f32 fZZ;
+    f32 fX2;
+    f32 fY2;
+    f32 fZ2;
 
+    fX2 = pQ[0] + pQ[0];
     fY2 = pQ[1] + pQ[1];
     fZ2 = pQ[2] + pQ[2];
-    fX2 = pQ[0] + pQ[0];
-    fYY = pQ[1] * fY2;
-    fZZ = pQ[2] * fZ2;
     fXX = pQ[0] * fX2;
     fXY = pQ[0] * fY2;
-    fWZ = pQ[3] * fZ2;
     fXZ = pQ[0] * fZ2;
-    fWY = pQ[3] * fY2;
+    fYY = pQ[1] * fY2;
     fYZ = pQ[1] * fZ2;
+    fZZ = pQ[2] * fZ2;
     fWX = pQ[3] * fX2;
+    fWY = pQ[3] * fY2;
+    fWZ = pQ[3] * fZ2;
     m[0][0] = 1.0f - (fYY + fZZ);
     m[0][1] = fXY - fWZ;
     m[0][2] = fXZ + fWY;
@@ -357,18 +368,17 @@ void fn_80009474(f32 fAngle, f32* pOut) {
 // its sine clamped to -1..1).
 void fn_800094D8(f32* pQ, f32* pA, f32* pB, f32* pC) {
     f32 fTanA;
-    f32 fTanC;
     f32 fSinB;
-    f32 fClamped;
+    f32 fTanC;
 
     fTanA = 2.0f * (pQ[0] * pQ[1] + pQ[3] * pQ[2]) /
             (pQ[3] * pQ[3] + pQ[0] * pQ[0] - pQ[1] * pQ[1] - pQ[2] * pQ[2]);
+    fSinB = -2.0f * (pQ[0] * pQ[2] - pQ[3] * pQ[1]);
     fTanC = 2.0f * (pQ[3] * pQ[0] + pQ[1] * pQ[2]) /
             (pQ[2] * pQ[2] + (pQ[3] * pQ[3] - pQ[0] * pQ[0] - pQ[1] * pQ[1]));
-    fSinB = -2.0f * (pQ[0] * pQ[2] - pQ[3] * pQ[1]);
-    fClamped = (fSinB < -1.0f) ? -1.0f : ((fSinB > 1.0f) ? 1.0f : fSinB);
+    fSinB = (fSinB < -1.0f) ? -1.0f : ((fSinB > 1.0f) ? 1.0f : fSinB);
     *pA = atan(fTanA);
-    *pB = fn_8000965C(fClamped);
+    *pB = fn_8000965C(fSinB);
     *pC = atan(fTanC);
 }
 
