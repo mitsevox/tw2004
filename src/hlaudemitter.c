@@ -30,6 +30,41 @@ AudInstance* fn_800AD674(u8 nId) {
     return pInst;
 }
 
+// Switches an instance's track on (bOn 1: also marked in u22) or off.
+void fn_800AD698(u8 nId, u8 nTrack, u8 bOn) {
+    AudInstance* pInst = fn_800AD674(nId);
+    u8 uBit = 1 << nTrack;
+    if (pInst != NULL) {
+        if (bOn == 1) {
+            pInst->pCmd->uOn |= uBit;
+            pInst->u22 |= uBit;
+        } else {
+            pInst->pCmd->uOff |= uBit;
+        }
+        pInst->pCmd->uChanged |= 0x200;
+    }
+}
+
+// Sets which of an instance's tracks are on (the rest off), in u22 too.
+void fn_800AD734(u8 nId, int n) {
+    AudInstance* pInst = fn_800AD674(nId);
+    if (pInst != NULL) {
+        pInst->pCmd->uOn = n;
+        pInst->pCmd->uOff = ~n;
+        pInst->pCmd->uChanged |= 0x200;
+        pInst->u22 = n;
+    }
+}
+
+// Sets the parameters of one of an instance's tracks.
+void fn_800AD790(u8 nId, u8 nTrack, u32 uParams) {
+    AudInstance* pInst = fn_800AD674(nId);
+    if (pInst != NULL) {
+        pInst->pCmd->auParams[nTrack] = uParams;
+        pInst->pCmd->uChanged |= (u8)(1 << nTrack);
+    }
+}
+
 // The calls below pass on to AudTable.c's entry nId (the same number as the instance).
 void fn_800AD950(u8 nId, u8 nTrack, u8 n) {
     if (fn_800AD674(nId) != NULL) {

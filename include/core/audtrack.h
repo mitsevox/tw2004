@@ -318,8 +318,18 @@ typedef void (*AudSeqHandler)(AudSeqEvent* pEvent, AudTrack* pTrack);
 extern AudSeqHandler lbl_801F1880[13];
 
 // One of hlaudemitter.c's 256 emitter instances (lbl_801F2740); only the fields read so far.
+// What an instance asks of its eight tracks (AudInstance.pCmd), written by fn_800AD698,
+// fn_800AD734 and fn_800AD790; only those fields are known.
+typedef struct AudInstanceCmd {
+    u8   uOn;                   // 0x0    tracks switched on, a bit each
+    u8   uOff;                  // 0x1    tracks switched off
+    u16  uChanged;              // 0x2    bits 0-7: that track's auParams was set; 0x200: uOn / uOff
+    u32  auParams[8];           // 0x4    per track
+} AudInstanceCmd;
+
 typedef struct AudInstance {
-    u8   unk0[0x22];
+    AudInstanceCmd* pCmd;       // 0x0
+    u8   unk4[0x22 - 0x4];
     u8   u22;                   // 0x22   bits cleared by fn_800ADDC8
     u8   unk23[0x30 - 0x23];
     void (*pfnCallback)(u8 nId, u8 nBit, s32 n);  // 0x30
