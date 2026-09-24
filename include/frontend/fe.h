@@ -105,6 +105,22 @@ typedef struct FEVertex {
 } FEVertex;
 LAYOUT_ASSERT(FEVertex, 0x18);
 
+// A textured quad of the front end that fe_movies.c fn_800914DC takes messages for. Our name; only
+// what the cleaned code reads (its size is not known).
+typedef struct FEQuad {
+    s16 n0;                     // 0x00  } with n2, an index pair into the UI file (fn_800913EC)
+    s16 n2;                     // 0x02  }
+    u8  unk4[0xA - 0x4];
+    s16 nA;                     // 0x0A
+    FEVertex aVtx[4];           // 0x0C  the corners (fn_80090D28 draws them)
+} FEQuad;
+
+// A message argument of fn_800914DC: a number or a float, by message. Our name.
+typedef union FEMsgArg {
+    s32 n;
+    f32 f;
+} FEMsgArg;
+
 // Four floats each, set by fe_movies.c fn_80090D28: fn_80090B80 tints a vertex colour to
 // lbl_80281F28 * (colour + lbl_80281F2C).
 extern f32* lbl_80281F28;

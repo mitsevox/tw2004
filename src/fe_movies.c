@@ -18,6 +18,9 @@ void fn_800760F4(f32* pUV, LLPict* pPict);  // LLVideo.c
 void fn_80016978(f32 x0, f32 y0, f32 x1, f32 y1);
 f32  fn_8006E118(u64 tEnd, u64 tStart);    // GameManager.c: seconds between two time stamps
 void fn_8000AE48(f32* pA, f32* pB, f32* pOut);     // pOut = pA * pB, element by element
+void fn_80090D28(FEQuad* pQuad);
+void fn_800913EC(s16 n0, s16 n1);
+void fn_80091460(s16 n0, s16 n1);
 
 // ---- sweep code (not yet cleaned up) ----
 
@@ -167,6 +170,85 @@ void fn_80090B80(FEVertex* pSrc, FEVertex* pDst, u8 bTint) {
         pDst->au14[1] = 0xFF;
         pDst->au14[2] = 0xFF;
         pDst->au14[3] = lbl_80281F28[3] * (pSrc->au14[3] + lbl_80281F2C[3]);
+    }
+}
+
+// pQuad's message handler: -3/-1 act on its UI file entry, -2 draws it, 0 and 1 set a corner's
+// position and texture coordinates, 2 and 3 its colour and alpha (corner -1: all four), 5 sets the
+// index pair (by bSplit, from one packed number or two).
+void fn_800914DC(FEQuad* pQuad, int nMsg, u32 bSplit, FEMsgArg* pArgs) {
+    s16 nOld;
+
+    switch (nMsg) {
+    case -1:
+        // port: EA passes arguments fn_800913EC ignores
+        ((void (*)(s16, s16, s16, int, int))fn_800913EC)(pQuad->n2, pQuad->n0, pQuad->nA, 0, 0);
+        break;
+    case -2:
+        // port: EA passes arguments fn_80090D28 ignores
+        ((void (*)(FEQuad*, int, int))fn_80090D28)(pQuad, 0, 0);
+        break;
+    case -3:
+        // port: EA passes arguments fn_80091460 ignores
+        ((void (*)(s16, s16, s16, int, int))fn_80091460)(pQuad->n2, pQuad->n0, pQuad->nA, 0, 0);
+        break;
+    case 0:
+        pQuad->aVtx[pArgs[0].n].f8 = pArgs[1].f;
+        pQuad->aVtx[pArgs[0].n].fC = pArgs[2].f;
+        pQuad->aVtx[pArgs[0].n].f10 = pArgs[3].f;
+        break;
+    case 1:
+        pQuad->aVtx[pArgs[0].n].f0 = pArgs[1].f;
+        pQuad->aVtx[pArgs[0].n].f4 = pArgs[2].f;
+        break;
+    case 3:
+        if (pArgs[0].n == -1) {
+            pQuad->aVtx[0].au14[3] = pArgs[1].n;
+            pQuad->aVtx[1].au14[3] = pArgs[1].n;
+            pQuad->aVtx[2].au14[3] = pArgs[1].n;
+            pQuad->aVtx[3].au14[3] = pArgs[1].n;
+        } else {
+            pQuad->aVtx[pArgs[0].n].au14[3] = pArgs[1].n;
+        }
+        break;
+    case 2:
+        if (pArgs[0].n == -1) {
+            pQuad->aVtx[0].au14[0] = pArgs[1].n;
+            pQuad->aVtx[0].au14[1] = pArgs[2].n;
+            pQuad->aVtx[0].au14[2] = pArgs[3].n;
+            pQuad->aVtx[1].au14[0] = pArgs[1].n;
+            pQuad->aVtx[1].au14[1] = pArgs[2].n;
+            pQuad->aVtx[1].au14[2] = pArgs[3].n;
+            pQuad->aVtx[2].au14[0] = pArgs[1].n;
+            pQuad->aVtx[2].au14[1] = pArgs[2].n;
+            pQuad->aVtx[2].au14[2] = pArgs[3].n;
+            pQuad->aVtx[3].au14[0] = pArgs[1].n;
+            pQuad->aVtx[3].au14[1] = pArgs[2].n;
+            pQuad->aVtx[3].au14[2] = pArgs[3].n;
+        } else {
+            pQuad->aVtx[pArgs[0].n].au14[0] = pArgs[1].n;
+            pQuad->aVtx[pArgs[0].n].au14[1] = pArgs[2].n;
+            pQuad->aVtx[pArgs[0].n].au14[2] = pArgs[3].n;
+        }
+        break;
+    case 5:
+        if (pArgs[0].n != -1) {
+            nOld = pQuad->n0;
+            if (bSplit == 1) {
+                pQuad->n0 = pArgs[0].n;
+                pQuad->n2 = (u32)pArgs[0].n >> 16;
+            } else {
+                pQuad->n0 = pArgs[1].n;
+                pQuad->n2 = pArgs[0].n;
+            }
+            // fake match: a no-op; the original compares the old n0 with the new one here
+            if (nOld == pQuad->n0) {
+                return;
+            }
+        }
+        break;
+    case 6:
+        break;
     }
 }
 
