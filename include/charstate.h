@@ -441,8 +441,9 @@ typedef struct SkinMeshRefs {
     void* p14;                  // 0x14  }
     s32  n18;                   // 0x18  } flags 1 and 0x40: the mesh's count and its data's third
     void* p1C;                  // 0x1C  }   part (after n10 bits and n10 words when 0x10 is set)
+    // The size is not known: fn_801132C4 (not decompiled) seems to draw from one and reads a float
+    // at 0x20.
 } SkinMeshRefs;
-LAYOUT_ASSERT(SkinMeshRefs, 0x20);
 
 // The whole iterator fn_80113A9C and fn_80113B34 build (our name): the SkinDesc.p6C entries of one
 // SkinDesc.p5C entry. fn_80113B34's kind walks each entry's meshes with a SkinMeshIter in sub.
