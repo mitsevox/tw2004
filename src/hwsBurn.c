@@ -470,11 +470,11 @@ s32 fn_80111124(HwsBurn* pBurn, s32 nAlign) {
 // the override table when it has the mesh). NULL when none are listed.
 SkinMesh* fn_801111E8(HwsBurn* pBurn, u8* pBase, s32* pOffset, s32 nAlign) {
     SkinDesc* pDesc = pBurn->pDesc;
-    int n = pBurn->n24;
     SkinMesh* aOut;
     void* pSrc;
     s32 nMesh;
     int i;
+    int n = pBurn->n24;
     s32 nEnd;
 
     if (n == 0) {
