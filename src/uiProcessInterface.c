@@ -556,6 +556,7 @@ void fn_800907AC(int nValue, char* szOut) {
     int nDigit = 1;
     u32 nLen;
     u32 nCommas;
+    u32 nTotal;
     int i;
 
     sprintf(szOut, "%d", nValue);
@@ -564,8 +565,9 @@ void fn_800907AC(int nValue, char* szOut) {
     if (nLen % 3 == 0) {
         nCommas--;
     }
-    aBuf[nLen + nCommas] = '\0';
-    for (i = nLen + nCommas - 1; i >= 0; i--) {
+    nTotal = nLen + nCommas;
+    aBuf[nTotal] = '\0';
+    for (i = nTotal - 1; i >= 0; i--) {
         if (nDigit % 4 == 0) {
             aBuf[i] = ',';
         } else {
