@@ -72,9 +72,42 @@ void fn_8009809C(int nGlow, int nSides) {
     fn_80098004(pList);
 }
 
+// Glow nGlow as nPoints four-pointed stars, each turned a further pi / nPoints: a strip per star
+// through five points a quarter turn apart, alternately on the unit circle and at 1/32 of it.
+void fn_800981D0(int nGlow, int nPoints) {
+    GlowList* pList;
+    int i;
+    int j;
+    f32 fRadius;
+    f32 fAngle;
+    f32 fBase;
+    f32 v[4];                                   // the fourth is not used
+
+    pList = fn_80097F44(nGlow, nPoints * 14);
+    for (i = 0; i < nPoints; i++) {
+        fBase = PI / (f32)nPoints * (f32)i + PI / 2.0f;
+        fn_80012520(0x98, 4, 10);
+        j = 0;
+        do {
+            fAngle = PI / 2.0f * (f32)j + fBase;
+            if (j & 1) {
+                fRadius = 0.03125f;
+            } else {
+                fRadius = 1.0f;
+            }
+            v[0] = fRadius * fn_80009638(fAngle);
+            v[1] = fRadius * fn_800095F0(fAngle);
+            v[2] = 0.0f;
+            fn_80097EC4(v);
+            j++;
+        } while (j <= 4);
+        fn_800124A8();
+    }
+    fn_80098004(pList);
+}
+
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_800981D0();
 void fn_80098350(void);
 
 void fn_80098350(void) {
