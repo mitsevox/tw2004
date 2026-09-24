@@ -15,7 +15,7 @@ void** AnimLib_Find(AnimLib* pLib, int nGroup, int nStyle, int nClub, int nKey, 
 
 // A link of an IK chain: one bone.
 typedef struct IKLink {
-    u8   b0;                    // 0x00  cleared by fn_80028208
+    u8   b0;                    // 0x00  cleared by SKEL_CreateIKChain
     u8   nBone;                 // 0x01  the model's bone index (fn_8001EEE4)
     u8   pad2[2];
     f32  f4;                    // 0x04  only links above 0 are posed (fn_80026B4C, fn_80026F90)
@@ -23,7 +23,7 @@ typedef struct IKLink {
     f32  fC;                    // 0x0C
     f32  f10;                   // 0x10
     s8   nPrev;                 // 0x14  the link before it in the chain, -1 for the first (every
-    u8   pad15[3];              //       access is a byte: fn_80026BF4, fn_80028208)
+    u8   pad15[3];              //       access is a byte: fn_80026BF4, SKEL_CreateIKChain)
     f32  q18[4];                // 0x18  its rotation (quaternion) from the link before it
     f32  v28[4];                // 0x28  its offset from the link before it
     f32  q38[4];                // 0x38  } q18 and v28 kept for a link whose b0 bit 1 is set:
@@ -44,7 +44,7 @@ typedef struct IKChain {
 } IKChain;
 LAYOUT_ASSERT(IKChain, 0x20);
 
-// An IK link's setup (our name): what fn_80028208 copies into an IKLink.
+// An IK link's setup (our name): what SKEL_CreateIKChain copies into an IKLink.
 typedef struct IKLinkDef {
     s32  nBone;                 // 0x00  a bone id (fn_8001EEE4 gives its index)
     f32  f4;                    // 0x04  } IKLink's f4, n8, fC and f10
@@ -54,7 +54,7 @@ typedef struct IKLinkDef {
 } IKLinkDef;
 LAYOUT_ASSERT(IKLinkDef, 0x14);
 
-// An IK chain's setup (our name): what fn_80028208 builds an IKChain from.
+// An IK chain's setup (our name): what SKEL_CreateIKChain builds an IKChain from.
 typedef struct IKChainDef {
     IKLinkDef* pLinks;          // 0x00
     s32  nLinks;                // 0x04
@@ -106,7 +106,7 @@ void fn_80021980(u32* aA, u32* aB, u32* aOut, u32 nBits);   // ska_shared.c: aOu
 // A character's skeleton data (CharModel.pSkel; the SKEL_ functions take it): its IK chains and
 // how strongly their solution is applied (the IK weight, 0..1); only what the code reads.
 typedef struct Skeleton {
-    s32  n0;                    // 0x0000  cleared by fn_80028314
+    s32  n0;                    // 0x0000  cleared by SKEL_CreateIKSkeleton
     s32  nChains;               // 0x0004
     IKChainDef* pDefs;          // 0x0008  the chains' setups (CharModelDefs.pDefs)
     IKChain* pChains;           // 0x000C
@@ -135,7 +135,7 @@ typedef struct Skeleton {
     s32  n10E4;                 // 0x10E4  set to 4 as a swing starts
     f32  a10E8[2][4];           // 0x10E8  per leg, the last good bend axis (Character_IKLegToGround,
                                 //         legs 0 and 1)
-    u8   a1108[4];              // 0x1108  the indexes of bones 0x24, 0x25, 0x11 and 0x12 (fn_80028314)
+    u8   a1108[4];              // 0x1108  the indexes of bones 0x24, 0x25, 0x11 and 0x12 (SKEL_CreateIKSkeleton)
     u8   unk110C[0x112C - 0x110C];
     s32  n112C;                 // 0x112C  } the character's club class and n16D4 (fn_8001C860)
     s32  n1130;                 // 0x1130  }
@@ -257,7 +257,7 @@ typedef struct DynChainSettings {
 } DynChainSettings;
 LAYOUT_ASSERT(DynChainSettings, 0xC0);
 
-// Skeleton.c: a short string per bone id (the first is empty); the model loader (fn_80028564)
+// Skeleton.c: a short string per bone id (the first is empty); the model loader (SKEL_LoadFromMem)
 // copies bone 0x54's first 8 bytes into each bone it adds as the bone's uId.
 extern char* lbl_80187278[90];
 // Skeleton.c: the names of the club models' bones ("IGDriver", "IGputter", "IGiron3", "IGiron7",
@@ -515,10 +515,10 @@ typedef struct CharEntry44 {
 } CharEntry44;
 LAYOUT_ASSERT(CharEntry44, 0x30);
 
-// What fn_8001A9F4 hands the skeleton loader (fn_80028564) for a golfer's model (our name):
+// What fn_8001A9F4 hands the skeleton loader (SKEL_LoadFromMem) for a golfer's model (our name):
 // lbl_80280E10, or lbl_80280E18 in split screen; a table of 0x10-byte entries and their count.
 typedef struct CharModelDefs {
-    IKChainDef* pDefs;          // 0x0  (fn_80028314 builds a chain from each)
+    IKChainDef* pDefs;          // 0x0  (SKEL_CreateIKSkeleton builds a chain from each)
     s32   nDefs;                // 0x4
 } CharModelDefs;
 
@@ -807,7 +807,7 @@ void  fn_80028A3C(CharModel* pModel);
 void  fn_80028A70(CharModel* pModel, int nBone, u32 uAxes, f32 f);
 void  fn_80029530(void);
 void  fn_8002955C(void);
-void  fn_8002957C(CharModel* pModel);
+void  SKEL_Free(CharModel* pModel);
 int   fn_800298F4(CharModel* pModel, u64 uId);
 void  fn_80029948(CharModel* pModel, struct DynChain* pChain, f32 f);
 void  fn_80029A74(CharModel* pModel, void* p);

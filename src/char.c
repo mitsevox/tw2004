@@ -32,7 +32,7 @@ void  fn_80018710(Character* pChar);
 void  ClipBank_Restore(int nSlot);                  // skalib.c
 ClipBank* ClipBank_Get(u32 nSlot);                  // skalib.c
 AnimLib* AnimLib_Load(u8* pData, ClipBank* pBank);  // skalib.c
-CharModel* fn_80028564(u8* pData, s8 n, CharModelDefs* pDefs, int b);   // Skeleton.c
+CharModel* SKEL_LoadFromMem(u8* pData, s8 n, CharModelDefs* pDefs, int b);   // Skeleton.c
 void  fn_80037AB8(Skin* pSkin, CharModel* pModel, int nBone, int nId);   // Skin.c
 void  fn_800CC4EC(Character* pChar);                // SkinPart.c
 void* CharSlider_CreateDefinitionsFromMem(u8** ppData);
@@ -1602,7 +1602,7 @@ void fn_8001A920(void) {
 }
 
 // Builds a character from its CHR object: a header (its animation slot and a few values), its
-// skin, the p44 entries, its model (fn_80028564), its own animation library, and its slider
+// skin, the p44 entries, its model (SKEL_LoadFromMem), its own animation library, and its slider
 // definitions; then a golfer's club skins and, with bLook, its look from pChoices. Every value read
 // is followed by 12 bytes it skips.
 // port: the object is little-endian on disc and fn_80076158 swaps each value as it reads it: a
@@ -1700,7 +1700,7 @@ Character* fn_8001A9F4(u8* pData, int nUnused, int nSet, int nId, u8 bLook, Skin
     if (bLook && pChoices != NULL) {
         bModel = (u8)pChoices->n113;
     }
-    fn_80018484(pChar, fn_80028564(pData, 1, pDefs, bModel));
+    fn_80018484(pChar, SKEL_LoadFromMem(pData, 1, pDefs, bModel));
     if (pChar->pSkin != NULL) {
         fn_800184E4(pChar, pChar->pSkin);
     }
@@ -2142,7 +2142,7 @@ void fn_8001C0E0(Character* pChar) {
         if (pChar->pLib != NULL) {
             AnimLib_Free(pChar->pLib);
         }
-        fn_8002957C(pChar->pModel);
+        SKEL_Free(pChar->pModel);
         pChar->pModel = NULL;
         for (i = 0; i < 4; i++) {
             fn_80009E70(pChar->buffers[i].pBuf);

@@ -31,7 +31,7 @@ void fn_800A9808(AudTrack* pTrack) {
 }
 
 // Sets up the track pool and the two lists, then the sequencer and the streamer.
-u8 fn_800A98B4(void) {
+u8 Trk_InitModule(void) {
     u8 bOk;
     u8 i;
 
@@ -65,7 +65,7 @@ u8 fn_800A9A50(u8 a, u8 b) {
     do {
         pTrack = (AudTrack*)pList->pHead;
         while (pTrack != NULL) {
-            fn_800A9D7C(pTrack);
+            Trk_FreePerf(pTrack);
             // the free only reuses the link's first word, so pNext is still there
             pTrack = (AudTrack*)pTrack->link.pNext;
         }
@@ -75,12 +75,12 @@ u8 fn_800A9A50(u8 a, u8 b) {
     return 1;
 }
 
-void fn_800A9AC4(void) {
+void Trk_ExitSession(void) {
 }
 
 // Ticks every track: one that was allocated but never started is freed on its second tick, one
 // whose tick says it has ended is freed, the others are rendered.
-void fn_800A9AC8(void) {
+void Trk_Cycle(void) {
     s32 i;
     UList* pList;
     AudTrack* pTrack;
@@ -95,16 +95,16 @@ void fn_800A9AC8(void) {
             pTmpl = pTrack->pTmpl;
             if (pTrack->nState == 1) {
                 if (pTrack->bits.b.bTicked) {
-                    fn_800A9D7C(pTrack);
+                    Trk_FreePerf(pTrack);
                 } else {
                     pTrack->bits.b.bTicked = 1;
                 }
             } else if (!(lbl_8028207C & 0x40) ||
                        (pTmpl->data.pPlayList->n3 == 0 && pTrack->pSource->nSound != 8)) {
-                if (fn_800AA2A4(pTrack)) {
+                if (Trk_Tick(pTrack)) {
                     fn_800AA34C(pTrack);
                 } else {
-                    fn_800A9D7C(pTrack);
+                    Trk_FreePerf(pTrack);
                 }
             }
             pTrack = (AudTrack*)pTrack->link.pNext;
@@ -135,7 +135,7 @@ AudTrack* fn_800A9BC8(AudSource* pSource, AudTrackTmpl* pTmpl, u8 nChannel, f32 
             }
         }
         if (pTrack != NULL) {
-            fn_800A9D7C(pTrack);
+            Trk_FreePerf(pTrack);
         } else {
             return NULL;
         }
@@ -171,7 +171,7 @@ AudTrack* fn_800A9BC8(AudSource* pSource, AudTrackTmpl* pTmpl, u8 nChannel, f32 
 }
 
 // Frees a track: stops its voices at once and gives it back to the pool.
-s32 fn_800A9D7C(AudTrack* pTrack) {
+s32 Trk_FreePerf(AudTrack* pTrack) {
     UPool* pPool;
     UList* pList;
     AudTrackTmpl* pTmpl;
@@ -186,7 +186,7 @@ s32 fn_800A9D7C(AudTrack* pTrack) {
         pTrack->pSource->apTracks[pTrack->nChannel] = NULL;
         pTrack->bits.b.bDetached = 1;
     }
-    fn_800AA1B8(pTrack, 1);
+    Trk_StopAllVoices(pTrack, 1);
     if (!(pTrack->pTmpl->n0 & 8)) {
         fn_800AAE70(pTrack);
     } else {
@@ -206,7 +206,7 @@ s32 fn_800A9D7C(AudTrack* pTrack) {
 // Starts, stops or restarts channel nChannel of a source as its priority changes. A track at
 // priority 0 or less is stopped; one that becomes audible is started. bOn and bOff are the
 // caller's requests, which only count for the templates flagged 0x04 (and not 0x01).
-void fn_800A9E7C(AudSource* pSource, AudTrack* pTrack, AudTrackTmpl* pTmpl, u8 nChannel, u8 bOn,
+void Trk_UpdatePerf(AudSource* pSource, AudTrack* pTrack, AudTrackTmpl* pTmpl, u8 nChannel, u8 bOn,
                  u8 bOff, f32 fPriority) {
     u8 bPlaying;
     u8 bSwitch;
@@ -239,7 +239,7 @@ void fn_800A9E7C(AudSource* pSource, AudTrack* pTrack, AudTrackTmpl* pTmpl, u8 n
         n68 = pTrack->u.seq.n68;
     }
     if (bStop) {
-        fn_800AA118(pTrack);
+        Trk_Stop(pTrack);
         pTrack = NULL;
         bResort = 0;
     }
@@ -249,7 +249,7 @@ void fn_800A9E7C(AudSource* pSource, AudTrack* pTrack, AudTrackTmpl* pTmpl, u8 n
             pTrack = fn_800A9BC8(pSource, pTmpl, nChannel, fPriority);
         }
         if (pTrack != NULL) {
-            fn_800AA0D8(pTrack);
+            Trk_Start(pTrack);
         }
     }
     if (bKeep && pTrack != NULL) {
@@ -264,7 +264,7 @@ void fn_800A9E7C(AudSource* pSource, AudTrack* pTrack, AudTrackTmpl* pTmpl, u8 n
 }
 
 // Starts a track.
-void fn_800AA0D8(AudTrack* pTrack) {
+void Trk_Start(AudTrack* pTrack) {
     pTrack->params.flags.n = 0;
     if (!(pTrack->pTmpl->n0 & 8)) {
         fn_800AAE90(pTrack);
@@ -274,9 +274,9 @@ void fn_800AA0D8(AudTrack* pTrack) {
 }
 
 // Stops a track: its voices end on their own, and it leaves its source.
-void fn_800AA118(AudTrack* pTrack) {
+void Trk_Stop(AudTrack* pTrack) {
     if (pTrack->nState > 3) {
-        fn_800AA1B8(pTrack, 0);
+        Trk_StopAllVoices(pTrack, 0);
     } else {
         pTrack->nState = 2;
     }
@@ -293,7 +293,7 @@ void fn_800AA118(AudTrack* pTrack) {
 
 // Stops a track's voices: at once (bNow == 1), or by letting them end, in which case the track
 // stays in state 3 until the last one calls back (fn_800AA400).
-void fn_800AA1B8(AudTrack* pTrack, int bNow) {
+void Trk_StopAllVoices(AudTrack* pTrack, int bNow) {
     AudVoice** ppVoice;
     AudVoice** ppEnd;
     u8 bNone;
@@ -328,7 +328,7 @@ void fn_800AA1B8(AudTrack* pTrack, int bNow) {
 }
 
 // Advances a track by one tick; returns 0 once it has ended.
-u8 fn_800AA2A4(AudTrack* pTrack) {
+u8 Trk_Tick(AudTrack* pTrack) {
     pTrack->f4C += pTrack->f50;
     return !(pTrack->pTmpl->n0 & 8) ? fn_800AAEFC(pTrack) : Stm_Tick(pTrack);
 }
@@ -385,7 +385,7 @@ void fn_800AA444(AudTrack* pTrack, u8 n) {
     pTrack->u.seq.n64 = n;
 }
 
-// The volume curve nCurve's value: 0 for a flat curve.
+// Curve nCurve's volume (lbl_801F17D0), 0 while its bit in lbl_80282060 is set (muted).
 f32 fn_800AA44C(u8 nCurve) {
     if (fn_800AA498(nCurve)) {
         return 0.0f;

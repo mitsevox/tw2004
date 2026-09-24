@@ -289,7 +289,7 @@ void fn_800A8D54(void) {
 void fn_800A8D88(void) {
     fn_800A86B8();
     fn_800AC49C();
-    fn_800A9AC4();
+    Trk_ExitSession();
     fn_800A7C2C();
     fn_800A87B0();
     fn_800AF2D8();
