@@ -3320,6 +3320,49 @@ void fn_80080CA8(MsgArg* pArgs, MsgArg* pResult) {
     *(s32*)pArgs[4].p = 0;
 }
 
+// Fill entry pArgs[2] of slot pArgs[0]'s saved round pArgs[1] with a random hole: a random course
+// that this profile or the cheat codes have unlocked, and a random hole number 0..17, drawn again
+// while the round already holds that course and hole.
+void fn_80080CC8(MsgArg* pArgs, MsgArg* pResult) {
+    int nSlot = pArgs[0].i;
+    int nRound = pArgs[1].i;
+    int nEntry = pArgs[2].i;
+    s32 aCourses[20] = {0, 1, 2, 3, 0, 5, 6, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20};
+    int nCourse = 0;
+    int nUnlocked = 0;
+    u32 nPick;
+    u32 nFound;
+    s8 nHoleNum;
+    int i;
+
+    for (i = 0; i < 20; i++) {
+        if (gpSaveData[nSlot].aCourseUnlocked[aCourses[i]] ||
+            lbl_80281DF4->aCourseUnlocked[aCourses[i]]) {
+            nUnlocked++;
+        }
+    }
+retry:
+    nPick = Rand_Next(1) % nUnlocked + 1;
+    nFound = 0;
+    for (i = 0; i < 20; i++) {
+        if ((gpSaveData[nSlot].aCourseUnlocked[aCourses[i]] ||
+             lbl_80281DF4->aCourseUnlocked[aCourses[i]]) &&
+            ++nFound == nPick) {
+            nCourse = aCourses[i];
+            break;
+        }
+    }
+    nHoleNum = Rand_Next(1) % 18;
+    for (i = 0; i < 18; i++) {
+        if (nCourse == gpSaveData[nSlot].aSavedRound[nRound].nCourse[i] &&
+            nHoleNum == gpSaveData[nSlot].aSavedRound[nRound].nHoleNum[i]) {
+            goto retry;  // fake match: the original jumps back to the draw (a do-while: 97.0%)
+        }
+    }
+    gpSaveData[nSlot].aSavedRound[nRound].nCourse[nEntry] = nCourse;
+    gpSaveData[nSlot].aSavedRound[nRound].nHoleNum[nEntry] = nHoleNum;
+}
+
 void fn_800810BC(MsgArg* pArgs, MsgArg* pResult) {
     lbl_801D7148.aCPU[pArgs[0].i] = pArgs[1].i;
 }
