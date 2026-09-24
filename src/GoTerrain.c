@@ -767,6 +767,7 @@ void fn_80031E58(void) {
     f32 fDistance;
     f32 fT;
     Ter_ObjectReference* pRef;
+    s32 iObject;
 
     for (i = lbl_801D3CB0.iTotalSortObjects - 1; i >= 0; i--) {
         pRef = &lbl_801D3CB0.pObjectSortList[i];
@@ -810,15 +811,14 @@ void fn_80031E58(void) {
                         lbl_801D3CB0.fDefaultObjectMipmapBias[pRef->iOpaqueLOD], pRef->fDistanceSquared);
         } else if (lbl_801D3CB0.pObjectSortList[i].fDistanceSquared < fFarSquared) {
             fDistance = fn_80009680(lbl_801D3CB0.pObjectSortList[i].fDistanceSquared);
-            pRef = &lbl_801D3CB0.pObjectSortList[i];
             if (fDistance > fFar || (uFlags0 & 0x40)
                 || (uCrowd == 0
-                    && ((pRef->f14 > lbl_801D3CB0.fXZDistanceToClosestBallSquared && pRef->f18 > 0.0f)
-                        || fn_80032330(pRef->apObject[0])))) {
-                lbl_801D3CB0.pObjectStateList[pRef->iGlobalObjectIndex]
-                    .aView[lbl_801D3CB0.iCurrentViewContext].n4 = 3;
-                lbl_801D3CB0.pObjectStateList[pRef->iGlobalObjectIndex]
-                    .aView[lbl_801D3CB0.iCurrentViewContext].f0 = 1.0f;
+                    && ((lbl_801D3CB0.pObjectSortList[i].f14 > lbl_801D3CB0.fXZDistanceToClosestBallSquared
+                         && lbl_801D3CB0.pObjectSortList[i].f18 > 0.0f)
+                        || fn_80032330(lbl_801D3CB0.pObjectSortList[i].apObject[0])))) {
+                iObject = lbl_801D3CB0.pObjectSortList[i].iGlobalObjectIndex;
+                lbl_801D3CB0.pObjectStateList[iObject].aView[lbl_801D3CB0.iCurrentViewContext].n4 = 3;
+                lbl_801D3CB0.pObjectStateList[iObject].aView[lbl_801D3CB0.iCurrentViewContext].f0 = 1.0f;
                 pRef = &lbl_801D3CB0.pObjectSortList[i];
                 fn_8003241C(&lbl_801D3CB0.pOpaqueObjectList[lbl_801D3CB0.iOpaqueObjects],
                             &lbl_801D3CB0.iOpaqueObjects, 650, pRef->apObject[pRef->iOpaqueLOD],
