@@ -344,6 +344,59 @@ s32 fn_80118A5C(const void* pA, const void* pB) {
     return fA > fB;
 }
 
+// Gives each entrant the four-round total the simulation aims at. The entrants are ordered by
+// their pro's form (fn_80118A5C) and shuffled a little (each may swap with one a few rows down;
+// the player is never swapped in); the targets are random around the course's par for four
+// rounds plus n + 18 (within par + n .. par + n + 25), sorted, the best one at most par + n + 3,
+// and handed out in that order. The player gets the best target.
+void fn_80118B0C(int nPlayer, int n) {
+    s32 aOrder[PGA_MAX_ENTRANTS];
+    s32 aTarget[PGA_MAX_ENTRANTS];
+    PgaEntrantMC* pEntrantMC;
+    s32 nEntrants;
+    s32 nPar;
+    s32 nTarget;
+    s32 nEntrant;
+    s32 i;
+    s32 j;
+
+    nEntrants = fn_80118664(nPlayer);
+    for (i = 0; i < nEntrants; i++) {
+        aOrder[i] = i;
+    }
+    for (i = nEntrants; i < PGA_MAX_ENTRANTS; i++) {
+        aOrder[i] = -1;
+    }
+    qsort(aOrder, nEntrants, sizeof(aOrder[0]), fn_80118A5C);
+    for (i = 0; i < nEntrants - 1; i++) {
+        j = i + (s32)fabsf(3.0f * fn_8000B318(0));
+        j = (j <= nEntrants - 1) ? j : nEntrants - 1;
+        if (j != i && !fn_8011908C(nPlayer, aOrder[j])) {
+            nEntrant = aOrder[j];
+            aOrder[j] = aOrder[i];
+            aOrder[i] = nEntrant;
+        }
+    }
+    nPar = n + fn_800D2FB4(gSession.nTeeSet[0]) * 4;
+    for (i = 0; i < nEntrants; i++) {
+        nTarget = 8.0f * fn_8000B318(0) + (18.0f + nPar);
+        nTarget = (nTarget <= nPar) ? nPar : nTarget;
+        aTarget[i] = (nTarget <= nPar + 25) ? nTarget : nPar + 25;
+    }
+    qsort(aTarget, nEntrants, sizeof(aTarget[0]), IntCompareIncreasing);
+    if (aTarget[0] > nPar + 3) {
+        aTarget[0] = nPar + 3;
+    }
+    for (i = 0; i < nEntrants; i++) {
+        pEntrantMC = GetEntrantMCPtr(nPlayer, aOrder[i]);
+        pEntrantMC->nTargetScore = aTarget[i];
+    }
+    if (fn_8011908C(nPlayer, 0)) {
+        pEntrantMC = GetEntrantMCPtr(nPlayer, 0);
+        pEntrantMC->nTargetScore = aTarget[0];
+    }
+}
+
 // The golfer's name: a tour pro's, or the player's profile name.
 char* fn_80118E30(int nPlayer, int nGolfer) {
     if (nGolfer == PGA_USER_GOLFER) {
