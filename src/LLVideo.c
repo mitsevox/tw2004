@@ -178,10 +178,10 @@ void fn_80076128(s32 p0);
 void fn_800755F0(int nFlags) {
     f32 xy[8];
     f32 colour[4];
-    int nFrames;
+    int bFade;
     int bBit0;
     int i;
-    int bFade;
+    int nFrames;
 
     bFade = nFlags & 2;
     colour[0] = 0.0f;
@@ -195,7 +195,7 @@ void fn_800755F0(int nFlags) {
     if (bFade) {
         nFrames = 30;
     } else {
-        nFrames = (nFlags & 1) + 1;
+        nFrames = (nFlags & 1) ? 2 : 1;
     }
     bBit0 = nFlags & 1;
     for (i = 0; i < nFrames; i++) {
