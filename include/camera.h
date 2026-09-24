@@ -452,7 +452,10 @@ typedef struct CamTuning {
     f32  f220;                  // 0x220  camera 4: its ground clearance, and its least height over the ball
     f32  f224;                  // 0x224  camera 4: (f20C - 1) times this raises the aim each frame ...
     s32  n228;                  // 0x228  ... unless this is set: then the aim is at the camera's height
-    u8   unk22C[0x23C - 0x22C];
+    f32  f22C;                  // 0x22C  placement height kind 7 (GoDynamicCam.c fn_8003D414): the share of
+                                //        the way to the new height taken per ball step, rising ...
+    f32  f230;                  // 0x230  ... and falling towards the shot's f68
+    u8   unk234[0x23C - 0x234];
     f32  f23C;                  // 0x23C  placement kind 8 (GoDynamicCam.c fn_8003ADF8): past this
                                 //        distance the camera's offset is scaled from f240 ...
     f32  f240;                  // 0x240

@@ -1613,6 +1613,110 @@ void fn_8003D324(f32* pPos, f32* pDir, CamScript* pScript, CamShot* pShot, int n
     fn_8003D414(pPos, pScript, pShot, nPlayer, fY);
 }
 
+// Sets the camera's height pPos[1] by the shot's bB2 (0: left alone): 1 halfway between bones 0x39
+// and 0x47 of the golfer, 2 bone 1, 3 bone 0xA, 4 fY (the height before), 5 and 7 fn_8003D9AC's
+// point, 6 the pin; then the shot's f80 above it. Kind 7 moves on to that height from the script's
+// v70 step by step, once per ball update this frame, easing by CamTuning.f22C while the ball rises
+// and by f230 to f22C (between the shot's f68, at least 0.15, and the height kept in the script's
+// f104) as it comes down; slower early in the script's move (f98 under CamTuning.fD4).
+void fn_8003D414(f32* pPos, CamScript* pScript, CamShot* pShot, int nPlayer, f32 fY) {
+    f32 vBone47[4];
+    f32 vBone39[4];
+    f32 vMid[4];
+    f32 vBone1[4];
+    f32 vBoneA[4];
+    f32 vPoint[4];
+    f32 vStep[4];
+    f32 vOff[4];
+    int nSteps;
+    int nPin;
+    CourseInfo* pCourse;
+    int i;
+    f32 fLow;
+    f32 fHeight;
+    f32 fEase;
+
+    nSteps = GameEffects_BallUpdatesThisFrame(nPlayer);
+    if (pShot->bB2 == 0) {
+        return;
+    }
+    switch (pShot->bB2) {
+    case 1:
+        fn_8001EB8C(gPlayers[nPlayer].pChar, 0x39, vBone39);
+        fn_8001EB8C(gPlayers[nPlayer].pChar, 0x47, vBone47);
+        fn_8003DC30(vBone39, vBone47, vMid);
+        fn_8001EF34(vMid, 0.5f, vMid);
+        pPos[1] = vMid[1];
+        break;
+    case 2:
+        fn_8001EB8C(gPlayers[nPlayer].pChar, 1, vBone1);
+        pPos[1] = vBone1[1];
+        break;
+    case 3:
+        fn_8001EB8C(gPlayers[nPlayer].pChar, 0xA, vBoneA);
+        pPos[1] = vBoneA[1];
+        break;
+    case 4:
+        pPos[1] = fY;
+        break;
+    case 5:
+    case 7:
+        fn_8003D9AC(pScript, pShot, nPlayer, vPoint, 0);
+        pPos[1] = vPoint[1];
+        break;
+    case 6:
+        nPin = Game_CurrentPinSet();
+        pCourse = fn_8000C594();
+        if (pCourse != NULL) {
+            pPos[1] = pCourse->pin[nPin].y;
+        }
+        break;
+    }
+    pPos[1] += pShot->f80;
+    if (pShot->bB2 != 7) {
+        return;
+    }
+    if (fn_80043388(pScript, pShot)) {
+        pScript->f104 = pShot->f68;
+        return;
+    }
+    if (nSteps == 0) {
+        pPos[1] = fY;
+        return;
+    }
+    for (i = 0; i < nSteps; i++) {
+        fn_8003DC54(vPoint, pScript->v70, vOff);
+        fn_8001EF34(vOff, (f32)(i + 1) / (f32)nSteps, vOff);
+        fn_8003DC30(pScript->v70, vOff, vStep);
+        pPos[1] = vStep[1];
+        pPos[1] += pShot->f80;
+        fLow = pShot->f68;
+        if (fLow <= 0.15f) {
+            fLow = 0.15f;
+        }
+        if (!gPlayers[nPlayer].ball.bHitTopArc) {
+            fEase = lbl_80281F78->f22C;
+            pScript->f104 = pPos[1] - pScript->fD8;
+        } else {
+            fHeight = pPos[1] - pScript->fD8;
+            if (fHeight <= fLow || pScript->f104 < fLow) {
+                fEase = lbl_80281F78->f230;
+            } else if (fHeight > pScript->f104) {
+                fEase = lbl_80281F78->f22C;
+            } else {
+                fEase = (lbl_80281F78->f22C - lbl_80281F78->f230) * ((fHeight - fLow) / pScript->f104) +
+                        lbl_80281F78->f230;
+            }
+        }
+        if (pScript->f98 < lbl_80281F78->fD4) {
+            fEase = 1.0f -
+                    (f32)fn_80009680((f32)fn_80009680(pScript->f98 / lbl_80281F78->fD4)) * (1.0f - fEase);
+        }
+        pPos[1] = fEase * (pPos[1] - fY) + fY;
+        fY = pPos[1];
+    }
+}
+
 // The sequence suits the player's club and shot kind.
 u8 fn_8003D7A0(CamSequence* pSequence, int nPlayer) {
     if (pSequence == NULL) return 0;
