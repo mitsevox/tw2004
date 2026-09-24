@@ -36,6 +36,26 @@ void DynamicCam_GetLocation(int nKind, int nPlayer, f32* pOut, CamScript* pScrip
 void fn_8001EB8C(Character* pChar, int nBone, f32* pPos);   // char.c: a bone's position
 void fn_8003D324(f32* pPos, f32* pDir, CamScript* pScript, CamShot* pShot, int nPlayer, f32 fSide, f32 fY);
 void fn_8003D414(f32* pPos, CamScript* pScript, CamShot* pShot, int nPlayer, f32 fY);
+void fn_8003AC50(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32* pCam, f32* pSub);
+void fn_8003ADF8(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32* pCam, f32* pSub);
+void fn_8003B028(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32* pCam, f32* pSub,
+                 f32 f);
+void fn_8003B534(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32* pCam, f32* pSub);
+void fn_8003B6D0(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32* pCam, f32* pSub);
+f32  fn_8003DBA8(f32 f);
+void fn_8003D810(f32* pDir, f32* pA, f32* pB);
+u8   fn_8003CAFC(CamSequence* pSequence, int nKind);
+s32  fn_8003CB80(u32 n, int nPlayer);
+s32  fn_8003CBD4(int n, int nPlayer);
+u8   fn_8003CBE8(CamSequence* pSequence, int nPlayer);
+u8   fn_8003CD6C(CamSequence* pSequence, f32 f);
+u8   fn_8003CD9C(CamSequence* pSequence, int nPlayer, u8 b);
+u8   fn_8003CEEC(CamSequence* pSequence, int nPlayer);
+u8   fn_8003D00C(CamSequence* pSequence);
+u8   fn_8003D054(CamSequence* pSequence);
+u8   fn_8003D0A0(int nMask, int nBit);
+u8   fn_8003D140(CamSequence* pSequence);
+u8   fn_8003D0BC(CamSequence* pSequence, f32 f);
 
 // Registers the handlers of the camera files ('CAMS', 'CAMV', 'CAMA').
 void fn_80039454(void) {
@@ -376,6 +396,165 @@ void fn_8003A074(void) {
     fn_80009E70(lbl_80281D88);
 }
 
+// Places a shot's camera at pOut by its placement kind (bB1), then keeps it above the ground under
+// it (on course 12 when fn_80015464 is 10, within 40 of the tee, fn_8004D5F0's height): at least
+// f68 above it, eased in under f6C. A kind 3 camera then moves a limited step from where it was.
+void fn_8003A148(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32* pCam, f32* pSub,
+                 f32 f) {
+    f32 aOld[4];
+    f32 aStep[4];
+    f32 aOff[4];
+    f32 aDir[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+    CourseInfo* pCourse;
+    int nPinSet;
+    f32 fGround;
+    f32 fLow;
+    f32 fLo;
+    f32 fHi;
+    f32 fDiff;
+    f32 fTop;
+    f32 fEase;
+    f32 fAbove;
+    f32 fFollow;
+    f32 fDist;
+    f32 fLimit;
+    f32 fStep;
+
+    nPinSet = Game_CurrentPinSet();
+    Vec3Copy(pOut, aOld);
+    switch (pShot->bB1) {
+    case 0:
+    case 1:
+        fn_8003AC50(pShot, nPlayer, pScript, pOut, pCam, pSub);
+        break;
+    case 2:
+    case 3:
+    case 4:
+    case 8:
+        fn_8003ADF8(pShot, nPlayer, pScript, pOut, pCam, pSub);
+        break;
+    case 5:
+    case 6:
+        fn_8003B028(pShot, nPlayer, pScript, pOut, pCam, pSub, f);
+        break;
+    case 7:
+        fn_8003B534(pShot, nPlayer, pScript, pOut, pCam, pSub);
+        break;
+    case 9:
+        fn_8003B6D0(pShot, nPlayer, pScript, pOut, pCam, pSub);
+        break;
+    }
+    pCourse = fn_8000C594();
+    if (pCourse != NULL) {
+        if (fn_80043388(pScript, pShot) && pShot != pScript->pNextShot) {
+            if (Game_GetCourse() == 12 && fn_80015464() == 10) {
+                fn_8003DC54(&pCourse->tee[gSession.nTeeSet[nPlayer]].x, pOut, aOff);
+                aOff[1] = 0.0f;
+                if ((f32)fn_80009680(fn_80009744(aOff)) < 40.0f) {
+                    fGround = fn_8004D5F0(pCourse, pOut);
+                } else {
+                    fGround = Terrain_HeightAt(pOut, NULL);
+                    if (pShot->bAD == 4 && !fn_8003A76C(pShot) && !fn_8003DC78(pShot)) {
+                        fLow = (pCourse->pin[nPinSet].y <= pCourse->tee[gSession.nTeeSet[nPlayer]].y)
+                                   ? pCourse->pin[nPinSet].y
+                                   : pCourse->tee[gSession.nTeeSet[nPlayer]].y;
+                        fGround = (fLow <= fGround) ? fGround : fLow;
+                    }
+                }
+                pScript->fD8 = fGround;
+                if (pScript->fD8 < -60000.0f) {
+                    pScript->fD8 = fn_8000C594()->fFloor;
+                }
+            } else {
+                fGround = Terrain_HeightAt(pOut, NULL);
+                if (pShot->bAD == 4 && !fn_8003A76C(pShot) && !fn_8003DC78(pShot)) {
+                    fLow = (pCourse->pin[nPinSet].y <= pCourse->tee[gSession.nTeeSet[nPlayer]].y)
+                               ? pCourse->pin[nPinSet].y
+                               : pCourse->tee[gSession.nTeeSet[nPlayer]].y;
+                    fGround = (fLow <= fGround) ? fGround : fLow;
+                }
+                pScript->fD8 = fGround;
+                if (pScript->fD8 < -60000.0f) {
+                    pScript->fD8 = fn_8000C594()->fFloor;
+                }
+            }
+        } else {
+            fGround = pScript->fD8;
+        }
+    } else if (gSession.nGameType == 3) {
+        fGround = pShot->f68;
+        pOut[1] = fGround;
+    } else {
+        fGround = 0.0f;
+    }
+    if (fGround < -60000.0f) {
+        fGround = fn_8004D5F0(pCourse, pOut);
+    }
+    if (fn_8003A76C(pShot) || fn_8003DC78(pShot)) {
+        fDiff = gPlayers[nPlayer].vBall[1] - fGround;
+        fLo = pShot->f68 + fDiff;
+        fHi = pShot->f6C + fDiff;
+        if (fLo < lbl_80281F78->f168) {
+            fLo = lbl_80281F78->f168;
+        }
+        if (fHi < lbl_80281F78->f168) {
+            fHi = lbl_80281F78->f168;
+        }
+    } else {
+        fLo = pShot->f68;
+        fHi = fn_8003DBA8(pShot->f6C);
+    }
+    if (pOut[1] - fGround < fLo) {
+        if (pShot->bB1 == 5 || pShot->bB1 == 6 || pShot->bB1 == 7) {
+            // fake match: a negated >=, where < gives a plain bge
+            if (!(aOld[1] - fGround >= fLo)) {
+                pOut[1] += lbl_80281F78->f194;
+                if (pOut[1] - fGround > fLo) {
+                    pOut[1] = fGround + fLo;
+                }
+            }
+            if (pOut[1] - fGround < lbl_80281F78->f168) {
+                pOut[1] = fGround + lbl_80281F78->f168;
+            }
+        } else {
+            pOut[1] = fGround + fLo;
+        }
+    } else {
+        fFollow = pScript->fD8;
+        fEase = lbl_80281F78->f174;
+        fAbove = pOut[1] - fFollow;
+        fTop = fHi - fEase;
+        if (fAbove > fTop) {
+            fEase = fEase * (1.0f - fEase / (fAbove - fTop + fEase));
+            pOut[1] = fEase + (fFollow + fTop);
+            if (pOut[1] - fGround < fLo) {
+                pOut[1] = fGround + fLo;
+            }
+        }
+    }
+    if (pShot->bB1 == 3 && !fn_80043388(pScript, pShot) &&
+        (pScript->pNextShot != pShot || pScript->fCamTime > 0.0f)) {
+        fn_8003DC54(pOut, aOld, aStep);
+        fDist = (f32)fn_80009680(fn_80009744(aStep));
+        if (aStep[0] != 0.0f || aStep[1] != 0.0f || aStep[2] != 0.0f) {
+            fn_800BAF04(aStep, aDir);
+        } else {
+            aDir[0] = 0.0f;
+            aDir[1] = 0.0f;
+            aDir[2] = 0.0f;
+        }
+        fLimit = 0.5f * fabsf(pShot->f60);
+        if (fDist > fLimit) {
+            fStep = fDist - fLimit;
+        } else {
+            fStep = fDist * (1.0f - (fLimit - fDist) / fLimit);
+            fStep = fStep * fStep;
+        }
+        fn_8001EF34(aDir, fStep, aStep);
+        fn_8003DC30(aOld, aStep, pOut);
+    }
+}
+
 // The shot is one of kinds 1, 3, 13, 28..34 or 40..45.
 u8 fn_8003A76C(CamShot* pShot) {
     u8 nKind = pShot->bAD;
@@ -468,6 +647,139 @@ void fn_8003AC50(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32
         fn_800C7D14(vFrom, vTo, 1, 1, pOut, pShot->f60, pShot->f64);
     }
     fn_8003D414(pOut, pScript, pShot, nPlayer, fY);
+}
+
+// A camera that follows the ball (placement kinds 5 and 6; 6 stays level): its target is along the
+// ball's direction from DynamicCam_GetLocation's kind 0 point, by the shot's f60 (changed as in
+// fn_8003B534), moved sideways by f64. Unless fn_80043388 holds, pOut moves towards it by a share
+// of the distance and the angle between them per frame, scaled while f98 is under CamTuning.f154,
+// by f8C when nBC is 4, for a ball slower than f198 and early on the second clock (f88).
+void fn_8003B028(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32* pCam, f32* pSub,
+                 f32 f) {
+    f32 aFrom[4];
+    f32 aBallDir[4];
+    f32 aTarget[4];
+    f32 aCurOff[4];
+    f32 aCurDir[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+    f32 aTgtOff[4];
+    f32 aTgtDir[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+    f32 aNew[4];
+    f32 aNewDir[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+    f32 aAxis[4];
+    f32 aTurn[4];
+    CamShot* pCur;
+    f32 fY;
+    f32 fHi;
+    f32 fLo;
+    f32 fHeight;
+    f32 fDist;
+    f32 fFrames;
+    f32 fMove;
+    f32 fTurn;
+    f32 fEase;
+    f32 fT;
+    f32 fCurDist;
+    f32 fStep;
+    f32 fGrow;
+
+    fY = pOut[1];
+    DynamicCam_GetLocation(0, nPlayer, aFrom, pScript, pShot, pCam, pSub);
+    Vec3Copy(gPlayers[nPlayer].ball.vVel, aBallDir);
+    if (pShot->bB1 == 6) {
+        aBallDir[1] = 0.0f;
+    }
+    if (aBallDir[0] != 0.0f || aBallDir[1] != 0.0f || aBallDir[2] != 0.0f) {
+        fn_800BAF04(aBallDir, aBallDir);
+    }
+    fn_8003D810(aBallDir, pOut, aFrom);
+    if (pScript->pNextShot != NULL && pScript->pShot->bB1 == pScript->pNextShot->bB1) {
+        pCur = pScript->pShot;
+        fHi = pCur->f6C;
+        fLo = pCur->f68;
+    } else {
+        fHi = pShot->f6C;
+        fLo = pShot->f68;
+    }
+    fHeight = gPlayers[nPlayer].ball.vPos[1] - pScript->fD8;
+    if (fHeight > fHi) {
+        fDist = lbl_80281F78->f18C * (fHi - fHeight) + pShot->f60;
+    } else if (fHeight < fLo) {
+        fDist = lbl_80281F78->f190 * (fHeight - fLo) + pShot->f60;
+    } else {
+        fDist = pShot->f60;
+    }
+    fn_8000C5D4(aFrom, aBallDir, fDist, aTarget);
+    fn_8003D324(aTarget, aBallDir, pScript, pShot, nPlayer, pShot->f64, fY);
+    if (fn_80043388(pScript, pShot)) {
+        Vec3Copy(aTarget, pOut);
+        return;
+    }
+    // port: NTSC rate
+    fFrames = f / (1.0f / 59.94f);
+    fMove = lbl_80281F78->f14C * fFrames;
+    fTurn = lbl_80281F78->f150 * fFrames;
+    if (pScript->f98 < lbl_80281F78->f154) {
+        fT = (lbl_80281F78->f154 - pScript->fCamTime) / lbl_80281F78->f154;
+        fEase = (1.0f / lbl_80281F78->f14C) * (fT * fT);
+        fMove *= fEase;
+        fTurn *= fEase;
+    }
+    if (pScript->nBC == 4) {
+        fMove *= pScript->f8C;
+        fTurn *= pScript->f8C;
+    }
+    if (gPlayers[nPlayer].ball.fSpeed < lbl_80281F78->f198) {
+        fGrow = gPlayers[nPlayer].ball.fSpeed / lbl_80281F78->f198;
+        fGrow = fGrow * fGrow;
+        fGrow = fGrow * fGrow;
+        fMove *= fGrow;
+        fTurn *= fGrow;
+    }
+    if (pScript->f88 < lbl_80281F78->f158) {
+        fMove *= pScript->f88 / lbl_80281F78->f158;
+        fTurn *= pScript->f88 / lbl_80281F78->f158;
+    }
+    if (pScript->f88 < lbl_80281F78->f15C) {
+        aTarget[1] = powf(pScript->f88 / lbl_80281F78->f15C, lbl_80281F78->f160) * fFrames *
+                         (aTarget[1] - pOut[1]) +
+                     pOut[1];
+    }
+    fn_8003DC54(pOut, aFrom, aCurOff);
+    fn_8003DC54(aTarget, aFrom, aTgtOff);
+    fCurDist = (f32)fn_80009680(fn_80009744(aCurOff));
+    fStep = ((f32)fn_80009680(fn_80009744(aTgtOff)) - fCurDist) * fMove;
+    if (aCurOff[0] != 0.0f || aCurOff[1] != 0.0f || aCurOff[2] != 0.0f) {
+        fn_800BAF04(aCurOff, aCurDir);
+    } else {
+        aCurDir[0] = 0.0f;
+        aCurDir[1] = 0.0f;
+        aCurDir[2] = 0.0f;
+    }
+    if (aTgtOff[0] != 0.0f || aTgtOff[1] != 0.0f || aTgtOff[2] != 0.0f) {
+        fn_800BAF04(aTgtOff, aTgtDir);
+    } else {
+        aTgtDir[0] = 0.0f;
+        aTgtDir[1] = 0.0f;
+        aTgtDir[2] = 0.0f;
+    }
+    fTurn = fn_80009614(fn_8000C5FC(aCurDir, aTgtDir)) * fTurn;
+    vec4flt_CrossProduct(aCurDir, aTgtDir, aAxis);
+    if (aAxis[0] != 0.0f || aAxis[1] != 0.0f || aAxis[2] != 0.0f) {
+        fn_800BAF04(aAxis, aAxis);
+    }
+    fn_8001EF34(aAxis, fTurn, aAxis);
+    fn_8000923C(aAxis, aTurn);
+    aCurDir[3] = 0.0f;
+    fn_800090E4(aTurn, aCurDir, aNew);
+    if (aNew[0] != 0.0f || aNew[1] != 0.0f || aNew[2] != 0.0f) {
+        fn_800BAF04(aNew, aNewDir);
+    } else {
+        aNewDir[0] = 0.0f;
+        aNewDir[1] = 0.0f;
+        aNewDir[2] = 0.0f;
+    }
+    fn_8001EF34(aNewDir, fCurDist + fStep, aNew);
+    fn_8003DC30(aFrom, aNew, pOut);
 }
 
 // The ball-flight camera's position for the shot: from the point DynamicCam_GetLocation gives for
@@ -688,6 +1000,184 @@ void DynamicCam_GetLocation(int nKind, int nPlayer, f32* pOut, CamScript* pScrip
         pOut[2] = 100.0f;
         break;
     }
+}
+
+// Picks a camera sequence of kind nKind for nPlayer's shot: one of those (up to 50) that fit the
+// player, the club, the lie (nLie) and nClass bits, the pin's height over the ball and fDist
+// (f24..f28), at random by their weights (f34). With none, the default sequence that fits, or the
+// first default one with shot choices; NULL without a course.
+CamSequence* fn_8003BDBC(int nPlayer, int nLie, int nClass, int nKind, u8 a, f32 fDist) {
+    int anPicked[50];
+    CourseInfo* pCourse;
+    CamSequence* pSeq;
+    int i;
+    int nPicked;
+    int nSum;
+    int nDefault;
+    int nTee;
+    int nClassBit;
+    int nPinSet;
+    u32 uRand;
+    f32 fHeight;
+    f32 fTotal;
+    f32 fWeight;
+
+    nPicked = 0;
+    nSum = 0;
+    nDefault = -1;
+    if (Player_OnTee(nPlayer)) {
+        nTee = 1;
+    } else {
+        nTee = fn_8003CBD4(nLie, nPlayer);
+    }
+    nClassBit = fn_8003CB80(nClass, nPlayer);
+    nPinSet = Game_CurrentPinSet();
+    pCourse = fn_8000C594();
+    if (pCourse == NULL) {
+        return NULL;
+    }
+    fHeight = pCourse->pin[nPinSet].y - gPlayers[nPlayer].vBall[1];
+    for (i = 0; i < lbl_80281D88->nSequences; i++) {
+        if (nPicked >= 50) {
+            break;
+        }
+        if (lbl_80281D88->pSequences[i].nChoices > 0) {
+            if (fn_8003CAFC(&lbl_80281D88->pSequences[i], nKind) &&
+                fn_8003D00C(&lbl_80281D88->pSequences[i])) {
+                nDefault = i;
+            } else if (fn_8003D0EC(&lbl_80281D88->pSequences[i], nKind) &&
+                       fn_8003CBE8(&lbl_80281D88->pSequences[i], nPlayer) &&
+                       fn_8003CD9C(&lbl_80281D88->pSequences[i], nPlayer, a) &&
+                       fn_8003CEEC(&lbl_80281D88->pSequences[i], nPlayer) &&
+                       fn_8003D00C(&lbl_80281D88->pSequences[i]) &&
+                       fn_8003D054(&lbl_80281D88->pSequences[i]) &&
+                       fn_8003D0A0(lbl_80281D88->pSequences[i].b49, nTee) &&
+                       fn_8003D0A0(lbl_80281D88->pSequences[i].b4A, nClassBit) &&
+                       fn_8003CD6C(&lbl_80281D88->pSequences[i], fHeight) &&
+                       fn_8003D140(&lbl_80281D88->pSequences[i])) {
+                pSeq = &lbl_80281D88->pSequences[i];
+                if (fDist >= pSeq->f24 && fDist <= pSeq->f28 && pSeq->nChoices > 0) {
+                    anPicked[nPicked] = i;
+                    nPicked++;
+                }
+            }
+        }
+    }
+    if (nPicked == 0) {
+        if (nDefault >= 0) {
+            return &lbl_80281D88->pSequences[nDefault];
+        }
+        for (i = 0; i < lbl_80281D88->nSequences; i++) {
+            if (fn_8003CAFC(&lbl_80281D88->pSequences[i], nKind) &&
+                lbl_80281D88->pSequences[i].nChoices > 0) {
+                return &lbl_80281D88->pSequences[i];
+            }
+        }
+        return NULL;
+    }
+    uRand = Rand_Next(1);
+    fTotal = 0.0f;
+    for (i = 0; i < nPicked; i++) {
+        fTotal += lbl_80281D88->pSequences[anPicked[i]].f34;
+    }
+    for (i = 0; i < nPicked; i++) {
+        fWeight = 1000.0f * lbl_80281D88->pSequences[anPicked[i]].f34;
+        if ((f32)(int)(uRand % (int)(1000.0f * fTotal) - nSum) < fWeight) {
+            return &lbl_80281D88->pSequences[anPicked[i]];
+        }
+        nSum += (int)fWeight;
+    }
+    return &lbl_80281D88->pSequences[anPicked[0]];
+}
+
+// The same pick for the pre-flight cameras: kind nKind (3 becomes 28 while something stands
+// around the ball), by the ball's distance from the pin (fn_8003D0BC) instead of fDist and without
+// the nClass bits.
+CamSequence* DynamicCam_ChoosePreFlightSequence(int nPlayer, int nLie, int nKind) {
+    int anPicked[50];
+    CourseInfo* pCourse;
+    int i;
+    int nPicked;
+    int nSum;
+    int nDefault;
+    int nTee;
+    int nPinSet;
+    u32 uRand;
+    f32 fPinDist;
+    f32 fHeight;
+    f32 fTotal;
+    f32 fWeight;
+
+    nPicked = 0;
+    nSum = 0;
+    nDefault = -1;
+    if (Player_OnTee(nPlayer)) {
+        nTee = 1;
+    } else {
+        nTee = fn_8003CBD4(nLie, nPlayer);
+    }
+    fPinDist = fn_800D0478(nPlayer);
+    nPinSet = Game_CurrentPinSet();
+    pCourse = fn_8000C594();
+    if (pCourse == NULL) {
+        return NULL;
+    }
+    fHeight = pCourse->pin[nPinSet].y - gPlayers[nPlayer].vBall[1];
+    if (nKind == 3 && Ter_CheckObjectAndHazardObstruction(gPlayers[nPlayer].ball.vPos, lbl_80281F78->f16C, 1,
+                                                          0, 0.0f, 1, lbl_80281F78->f1A4)) {
+        nKind = 28;
+    }
+    for (i = 0; i < lbl_80281D88->nSequences; i++) {
+        if (nPicked >= 50) {
+            break;
+        }
+        if (lbl_80281D88->pSequences[i].nChoices > 0) {
+            if (fn_8003CAFC(&lbl_80281D88->pSequences[i], nKind) &&
+                fn_8003D00C(&lbl_80281D88->pSequences[i])) {
+                nDefault = i;
+            } else if (fn_8003D0EC(&lbl_80281D88->pSequences[i], nKind) &&
+                       fn_8003CBE8(&lbl_80281D88->pSequences[i], nPlayer) &&
+                       fn_8003CD9C(&lbl_80281D88->pSequences[i], nPlayer, 1) &&
+                       fn_8003CEEC(&lbl_80281D88->pSequences[i], nPlayer) &&
+                       fn_8003D0BC(&lbl_80281D88->pSequences[i], fPinDist) &&
+                       fn_8003D00C(&lbl_80281D88->pSequences[i]) &&
+                       fn_8003D054(&lbl_80281D88->pSequences[i]) &&
+                       fn_8003CD6C(&lbl_80281D88->pSequences[i], fHeight) &&
+                       fn_8003D140(&lbl_80281D88->pSequences[i]) &&
+                       fn_8003D0A0(lbl_80281D88->pSequences[i].b49, nTee)) {
+                anPicked[nPicked] = i;
+                nPicked++;
+            }
+        }
+    }
+    if (nPicked == 0) {
+        if (nDefault >= 0) {
+            return &lbl_80281D88->pSequences[nDefault];
+        }
+        if (nKind == 28) {
+            nKind = 3;
+        }
+        for (i = 0; i < lbl_80281D88->nSequences; i++) {
+            if (fn_8003CAFC(&lbl_80281D88->pSequences[i], nKind) &&
+                lbl_80281D88->pSequences[i].nChoices > 0) {
+                return &lbl_80281D88->pSequences[i];
+            }
+        }
+        return NULL;
+    }
+    uRand = Rand_Next(1);
+    fTotal = 0.0f;
+    for (i = 0; i < nPicked; i++) {
+        fTotal += lbl_80281D88->pSequences[anPicked[i]].f34;
+    }
+    for (i = 0; i < nPicked; i++) {
+        fWeight = 1000.0f * lbl_80281D88->pSequences[anPicked[i]].f34;
+        if ((f32)(int)(uRand % (int)(1000.0f * fTotal) - nSum) < fWeight) {
+            return &lbl_80281D88->pSequences[anPicked[i]];
+        }
+        nSum += (int)fWeight;
+    }
+    return &lbl_80281D88->pSequences[anPicked[0]];
 }
 
 // The set named szName (case ignored) gives a sequence (*ppSeq) or a shot (*ppShot): its p20
