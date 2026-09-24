@@ -23,8 +23,10 @@ LLPict* PictInt_Decode(PictFile* pFile) {
     }
     __stwbrx(pFile->uC, &pFile->uC, 0);
     pFile->nWidth = (pFile->nWidth << 8) | ((pFile->nWidth >> 8) & 0xFF);
+    // fake match: the height's swap spelled high byte first with u16 casts gives EA's clrlslwi and
+    // rlwimi; the width's spelling does not (the width is not matched yet)
     pFile->nHeight = (((u16)pFile->nHeight >> 8) & 0xFF) | (((u16)pFile->nHeight & 0xFF) << 8);
-    pPict = fn_80009B34(sizeof(LLPict), 1, 32, "LLPictInt.c", 142);
+    pPict =fn_80009B34(sizeof(LLPict), 1, 32, "LLPictInt.c", 142);
     if (pPict == NULL) {
         return NULL;
     }
