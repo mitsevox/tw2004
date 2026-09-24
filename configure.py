@@ -872,7 +872,7 @@ config.libs = [
             Object(NonMatching, "char.c"),
             Object(NonMatching, "mtalib.c"),
             Object(NonMatching, "ska_shared.c"),
-            Object(NonMatching, "Skeleton.c"),
+            Object(Matching, "Skeleton.c"),
             Object(NonMatching, "Golfer.c"),
             Object(Matching, "GoRenderSurface.c"),
             Object(NonMatching, "LLPict_Gc.c"),

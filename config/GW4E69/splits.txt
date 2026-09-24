@@ -145,6 +145,9 @@ skalib.c:
 
 Skeleton.c:
 	.text       start:0x80026B4C end:0x80029FC8
+	.data       start:0x80187400 end:0x80187490
+	.sdata      start:0x80281080 end:0x802810A8
+	.sdata2     start:0x80282D10 end:0x80282D60
 
 GxUtil.c:
 	.text       start:0x80029FC8 end:0x8002A630
