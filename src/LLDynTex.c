@@ -820,12 +820,14 @@ u32 fn_8010B6AC(DynTexObj* pObj, int nLevel) {
     u32 nA = pObj->n3A;
     u32 nB = pObj->n38;
     int i;
+    u32 nSize;
 
     for (i = 0; i < nLevel; i++) {
         nA >>= 1;
         nB >>= 1;
     }
-    return (nA * nB * fn_8010C458(pObj->n40) + 7) >> 3;
+    nSize = (nA * nB * fn_8010C458(pObj->n40) + 7) >> 3;
+    return nSize;
 }
 
 // The bytes of all of a texture's levels.
@@ -844,12 +846,15 @@ u32 fn_8010B548(DynTexObj* pObj, int nLevel) {
     u32 nA = pObj->n3A;
     u32 nB = pObj->n38;
     int i;
+    u32 nSize;
 
     for (i = 0; i < nLevel; i++) {
         nA >>= 1;
         nB >>= 1;
     }
-    return (((nA * nB * fn_8010C458(pObj->n40) + 7) >> 3) + 15) >> 4;
+    nSize = (nA * nB * fn_8010C458(pObj->n40) + 7) >> 3;
+    nSize = (nSize + 15) >> 4;
+    return nSize;
 }
 
 // The 16-byte units of all of a texture's levels.
