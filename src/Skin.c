@@ -52,6 +52,15 @@ void  fn_80036024(f32 f);
 void  fn_80093824(void);                                     // goballfx.c
 f32   fn_8004B78C(CourseInfo* pCourse, f32* pPos);           // GoTerrainCollision.c: the ground's light
 void  fn_8003519C(int nRow, void* pData);                    // GoTerrain.c: calls row nRow's pfn8
+void  fn_8011CB5C(Skin* pSkin, int nView);                   // SkinMorph.c
+void  fn_800CE16C(void);                                     // SkinPart.c
+void  fn_8003662C(Skin* pSkin, CharModel* pCharModel, int nSkip, int nFirst, int nView);
+void  fn_80036790(Skin* pSkin, int n);
+void  fn_80037AB8(Skin* pSkin, CharModel* pCharModel, int nSkip, int nFirst);
+void  fn_800090A0(f32* pA, f32* pB, f32* pOut);                // Quaternion.c
+void  fn_800090E4(f32* pQuat, f32* pIn, f32* pOut);            // Quaternion.c: pIn turned by pQuat
+void  fn_8000914C(f32* pQ, f32 (*pMtx)[4]);                   // Quaternion.c: to a matrix
+void  fn_8000A798(f32 (*pSrc)[4], f32 (*pDst)[4]);            // UMemPool.c: inverts a matrix
 void  fn_80021980(u32* aA, u32* aB, u32* aOut, u32 nBits);   // Skeleton.c: aOut = aA | aB
 void  fn_80029EF4(u32* pSrc, u32* pDst, u32 nBits);          // Skeleton.c
 void  fn_80036278(SkinModel44* pEntries, s32 nEntries);
@@ -264,6 +273,32 @@ int fn_80035A9C(void) {
     return nCourse;
 }
 
+// Poses the character's skin and its club's skin on its model for view n17B4 (the club's from bone
+// 0x52 on). n: every caller passes 0; unused.
+void fn_80035B40(Character* pChar, int n) {
+    Skin* pClub;
+
+    if (gSession.nSplitScreen == 0 || gSession.nGameType == 3) {
+        fn_8011CB5C(pChar->pSkin, pChar->n17B4);
+    }
+    fn_8003662C(pChar->pSkin, pChar->pModel, 0, 0, pChar->n17B4);
+    fn_80036790(pChar->pSkin, pChar->n17B4);
+    // port: EA passes arguments fn_800CE16C ignores
+    ((void (*)(Skin*, int))fn_800CE16C)(pChar->pSkin, pChar->n17B4);
+    if (pChar->p16D8 != NULL) {
+        pClub = pChar->p16D8->apSkins[pChar->nClubClass];
+        if (pClub != NULL) {
+            fn_8003662C(pClub, pChar->pModel, fn_8001EED8(pChar->pModel, 0x52) - 0x52, 0x52,
+                        pChar->n17B4);
+            fn_80036790(pClub, pChar->n17B4);
+        }
+    }
+    pChar->n1698 = 1;
+    if (pChar->nPlayer == 1000) {
+        pChar->n1698 = 0;
+    }
+}
+
 // Sets up the triangles' mesh objects, one per view.
 void fn_80035C58(void) {
     DynRenderSize size;
@@ -452,7 +487,7 @@ void fn_800364AC(SkinModel* pModel) {
         return;
     }
     if (pModel->p34 != NULL) {
-        pModel->p34 = (u8*)pModel + (uptr)pModel->p34;
+        pModel->p34 = (BonePose*)((u8*)pModel + (uptr)pModel->p34);
     }
     if (pModel->p38 != NULL) {
         pModel->p38 = (u8*)pModel + (uptr)pModel->p38;
@@ -484,8 +519,9 @@ void fn_800364AC(SkinModel* pModel) {
 
 // Builds the skin's matrices (p108C): those of the model's bones come from the character model's
 // p768 (from bone nFirst on, nSkip further along there); each one after that whose bit is set in
-// p10CC is a weighted sum of up to three of them (SkinModel.p54).
-void fn_8003662C(Skin* pSkin, CharModel* pCharModel, int nSkip, int nFirst) {
+// p10CC is a weighted sum of up to three of them (SkinModel.p54). nView: both callers pass the
+// character's n17B4; unused.
+void fn_8003662C(Skin* pSkin, CharModel* pCharModel, int nSkip, int nFirst, int nView) {
     SkinModel54* pEntry;
     f32 (*aMtx)[4][4];
     f32 (*pDst)[4];
@@ -988,6 +1024,39 @@ Skin* fn_800377FC(u8* pData, u8 b) {
     fn_800CEE88(bOld);
     fn_800375AC(pSkin, 0);
     return pSkin;
+}
+
+// Once per skin model (flag 0x8000): turns its bone poses from relative to their parent (the
+// character model's bone parents, from bone nFirst on nSkip further along) into model space, then
+// stores each bone's inverse matrix in p1088.
+void fn_80037AB8(Skin* pSkin, CharModel* pCharModel, int nSkip, int nFirst) {
+    f32 aQuat[4];
+    f32 aTurned[4];
+    f32 aMtx[4][4];
+    BonePose* pParent;
+    int nBone;
+    int i;
+
+    if (pSkin->pModel != NULL && !(pSkin->pModel->u30 & 0x8000)) {
+        pSkin->pModel->u30 |= 0x8000;
+        for (i = 1; i < pSkin->pModel->n14; i++) {
+            nBone = i;
+            if (i >= nFirst) {
+                nBone = i + nSkip;
+            }
+            pParent = &pSkin->pModel->p34[pCharModel->pBones[nBone].nParent];
+            fn_800090E4(pParent->q0, pSkin->pModel->p34[i].v10, aTurned);
+            fn_800090A0(pParent->v10, aTurned, pSkin->pModel->p34[i].v10);
+            pSkin->pModel->p34[i].v10[3] = 0.0f;
+            fn_80008FCC(pSkin->pModel->p34[i].q0, pParent->q0, aQuat);
+            fn_8001E85C(aQuat, pSkin->pModel->p34[i].q0);
+        }
+        for (i = 0; i < pSkin->pModel->n14; i++) {
+            fn_8000914C(pSkin->pModel->p34[i].q0, aMtx);
+            fn_8001E880(pSkin->pModel->p34[i].v10, aMtx[3]);
+            fn_8000A798(aMtx, pSkin->p1088[i]);
+        }
+    }
 }
 
 // Hands the skin the morph weights a format 1 pose buffer changed (bits 5..19 of its first block),
