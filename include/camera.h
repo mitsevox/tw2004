@@ -11,17 +11,18 @@
 // the pointer at the render camera's +0x10. Only the fields read so far; its size is unknown.
 typedef struct CamLens {
     s32  nType;                 // 0x00  0: a perspective camera, else flat (LLObj_Gc.c)
-    f32  v4[3];                 // 0x04  a position: the green zoom-to-aim camera copies it to View.v20
-    u8   unk10[0x24 - 0x10];
-    f32  v24[3];                // 0x24  a direction: goballfx.c's fn_80093A50 takes its angle to a light
-    u8   unk30[0x34 - 0x30];
-    f32  v34[3];                // 0x34  a position: GameMode8 measures the ball's distance to it
-    u8   unk40[0x44 - 0x40];
+    f32  m4[4][4];              // 0x04  camera to world space (shadow.c fn_800B3484 hands it on as a
+                                //       matrix): m4[2] is the view direction (goballfx.c fn_80093A50
+                                //       takes its angle to a light), m4[3] the camera's position
+                                //       (GameMode8 measures the ball's distance to it); the green
+                                //       zoom-to-aim camera copies m4[0] to View.v20
     f32  m44[4][4];             // 0x44  world to camera space (hlaudemitter.c fn_800AD800 moves a
                                 //       sound's position with it)
-    u8   unk84[0xA4 - 0x84];
+    f32  m84[2][4];             // 0x84  [1] the scale fn_80076664 puts on the world around a point,
+                                //       [0] its inverse; ViewController.c fn_8001728C sets all to 1.0
     f32  fFov;                  // 0xA4  the field of view (GoGolfCam.c sets DEG(60.0f) or DEG(30.0f))
-    u8   unkA8[0xB0 - 0xA8];
+    f32  fA8;                   // 0xA8  fn_800768E0 starts it at 0.1
+    f32  fAC;                   // 0xAC  fn_800768E0 starts it at 4096 (GoTerrain.c fn_800354B4 sets it)
     f32  fB0;                   // 0xB0  fn_8001EFFC; the zoom-to-aim camera divides its distance by it
     f32  fB4;                  // 0xB4  a flat camera's view width (guess)
     f32  fB8;                   // 0xB8  its view height (guess)
@@ -170,7 +171,7 @@ typedef struct CamSequence {
     f32  f28;                   // 0x28  ... to this
     f32  f2C;                   // 0x2C  fn_8003CD6C: picked for values from this ...
     f32  f30;                   // 0x30  ... to this
-    u8   unk34[0x38 - 0x34];
+    f32  f34;                   // 0x34  its weight when several fit (fn_8003BDBC)
     f32  f38;                   // 0x38  its length
     s32  nChoices;              // 0x3C  how many shot choices p4C holds
     u32  uCourses;              // 0x40  one bit per course it is used on
@@ -398,7 +399,9 @@ typedef struct CamTuning {
     f32  f140;                  // 0x140  fn_80041EA8: its height share for a falling ball near the ground
     f32  f144;                  // 0x144  fn_800422C4: the look-at point's level share of the way a frame
     f32  f148;                  // 0x148  ... and its height's
-    u8   unk14C[0x158 - 0x14C];
+    f32  f14C;                  // 0x14C  } fn_8003B028: how fast a following camera closes the
+    f32  f150;                  // 0x150  } distance and the angle to its target, per 60th
+    f32  f154;                  // 0x154  fn_8003B028: they ease in over this much of CamScript.fCamTime
     f32  f158;                  // 0x158  fn_80041EA8: the aim eases in over this much of CamScript.f88
     f32  f15C;                  // 0x15C  CameraScript_InterpToNewScript puts it in CamScript.f88 (0 for
                                 //        the default swing camera)
@@ -408,16 +411,17 @@ typedef struct CamTuning {
     f32  f168;                  // 0x168  the ground clearance for CamScript_KeepAboveGround
     f32  f16C;                  // 0x16C  the obstruction radius around the ball for the pre-shot routine
     f32  f170;                  // 0x170  a blend for fn_80063B98 / fn_80063BF4
-    u8   unk174[0x178 - 0x174];
+    f32  f174;                  // 0x174  fn_8003A148: how softly a camera eases in under its height limit
     f32  f178;                  // 0x178
     f32  v17C[4];               // 0x17C
     f32  f18C;                  // 0x18C  fn_8003B534: the ball-flight camera closes in by this share of
                                 //        the height above the shot's f6C ...
     f32  f190;                  // 0x190  ... and backs off by this share of the height below its f68
-    u8   unk194[0x198 - 0x194];
+    f32  f194;                  // 0x194  fn_8003A148: how far a camera below its least height rises a frame
     f32  f198;                  // 0x198  fn_8003B534: the least ball speed it follows the flight at
     f32  f19C;                  // 0x19C  the steepest a camera direction may tilt (fn_8003D810, radians)
-    u8   unk1A0[0x1A8 - 0x1A0];
+    u8   unk1A0[0x1A4 - 0x1A0];
+    f32  f1A4;                  // 0x1A4  DynamicCam_ChoosePreFlightSequence: the obstruction test's slope
     f32  f1A8;                  // 0x1A8  fn_8003DCE8: how fast CamScript.fEC follows the ball's updates
                                 //        per frame
     u8   unk1AC[0x1C0 - 0x1AC];
@@ -437,8 +441,10 @@ typedef struct CamTuning {
     f32  f1F4;                  // 0x1F4  ... how far the aim may move per call
     f32  fMaxPitchUp;           // 0x1F8  fn_800C4AB0: the steepest camera angle above the horizontal (degrees)
     f32  fMaxPitchDown;         // 0x1FC  and below it
-    u8   unk200[0x20C - 0x200];
-    f32  f20C;                  // 0x20C  camera 4: the most View.f54 grows to
+    u8   unk200[0x208 - 0x200];
+    f32  f208;                  // 0x208  times lbl_801D5010[view]: the alpha of GoPostFx fn_80039358's
+                                //        black cover
+    f32  f20C;                 // 0x20C  camera 4: the most View.f54 grows to
     f32  f210;                  // 0x210  camera 4: how fast (per second) it moves in from its start
     f32  f214;                  // 0x214  camera 4: how fast View.f54 grows and shrinks
     f32  f218;                  // 0x218  camera 4: how fast (per second) buttons 0x31/0x32 turn it round
@@ -570,6 +576,12 @@ extern struct Character* lbl_80281EE8[CRAP_NUM_GOLFERS];   // per golfer slot: t
 
 // ---- the views ------------------------------------------------------------------------------
 
+// A render camera (our name); only what the cleaned code reads.
+typedef struct RenderCamera {
+    u8   unk0[0x14];
+    f32* pRect;                 // 0x14  its screen rectangle: left, top, width, height (fn_80012EF0)
+} RenderCamera;
+
 // Points at the slot holding the current render camera (lbl_80281C90): fn_8001614C reads it,
 // fn_80013D5C sets it.
 extern void** lbl_80280DF0;
@@ -617,7 +629,7 @@ CamShot* fn_8003A8C4(char* szName);     // the shot with this name (case ignored
 // pointer may be NULL).
 CamShot* fn_8003A950(CamSequence* pSequence, int nKind, int* pA, f32* pF1, f32* pF2, int* pB, f32* pF3,
                      int nPlayer);
-CamSequence* fn_8003BDBC(int nPlayer, int nLie, int nClass, int nKind, int a, f32 fDist);
+CamSequence* fn_8003BDBC(int nPlayer, int nLie, int nClass, int nKind, u8 a, f32 fDist);
 CamSequence* DynamicCam_ChoosePreFlightSequence(int nPlayer, int nLie, int nKind);
 // The sequence and shot named after the golfer's clip (with b, Character.p1790 first).
 u8       fn_8003C9D0(int nPlayer, u8 b, CamSequence** ppSeq, CamShot** ppShot);
@@ -790,7 +802,7 @@ void        fn_8006E26C(GoFrameBuf* pBuf, f32 f0, f32 f4, f32 fWidth, f32 fHeigh
 
 CamLens* fn_80076400(void);                     // a new lens
 void     fn_8007644C(CamLens* pLens);           // free it
-void     fn_8007646C(CamLens* pLens, f32* pA, f32* pB);   // not decompiled yet: two 4-float points
+void     fn_8007646C(CamLens* pLens, f32* pPos, f32* pTarget);   // aims the lens from pPos at pTarget
 void     fn_800768E0(CamLens* pLens);
 void     fn_80076948(CamLens* pLens, f32 fB4, f32 fB8);   // sets fB4 and fB8
 void     fn_80076A0C(CamLens* pLens, s32 nType);          // sets nType

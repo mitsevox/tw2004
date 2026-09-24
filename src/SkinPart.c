@@ -8,7 +8,7 @@
 #include "camera.h"
 #include "lldyntex.h"
 
-void  fn_80112614(SkinDesc14* pEntry, SkinDesc18* pMaterial, s32 n);
+void  fn_80112614(SkinDesc14* pEntry, SkinDesc18* pMaterial, TexBank* pBank);
 void  fn_80113774(int nPart, int nVariant, int nOption);
 void  fn_8011387C(int n);
 void  fn_8011389C(void);
@@ -892,7 +892,7 @@ void fn_800CE170(Skin* pSkin, SkinTarget* pTarget) {
         for (i = 0; i < pDesc->n10; i++) {
             Mem_cpy(&entry, &pDesc->p14[i], sizeof(SkinDesc14));
             fn_800CE224(pSkin, &entry, NULL, NULL, 0);
-            fn_80112614(&entry, &pDesc->p18[i], pTarget->n4);
+            fn_80112614(&entry, &pDesc->p18[i], pTarget->pBank);
         }
     }
 }
@@ -950,10 +950,7 @@ s32 fn_800CE224(Skin* pSkin, SkinDesc14* pEntry, u8** ppOut, s32* pnOut, int nCo
                 nB8 = 0;
             }
             pB8 = &pDesc->pB8[pEntry->n1C + nB8];
-            pEntry->a20[0] = pB8->a[0];
-            pEntry->a20[1] = pB8->a[1];
-            pEntry->a20[2] = pB8->a[2];
-            pEntry->a20[3] = pB8->a[3];
+            pEntry->a20 = *pB8;
         }
     }
     if (ppOut != NULL && pnOut != NULL) {

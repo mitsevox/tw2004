@@ -1,60 +1,192 @@
-// GoCamera.c (EA's name, from its asserts; also in EA's 2002 source tree; TW06): not yet
-// decompiled; the sweep code below is the matched small functions.
+// GoCamera.c (EA's name, from its asserts; also in EA's 2002 source tree; TW06): a render camera's
+// lens (CamLens): its field of view, where it stands and what it looks at, as a camera-to-world
+// matrix (m4) and its inverse (m44).
 
 #include "camera.h"
 
+void fn_8000A0E8(f32 (*pSrc)[4], f32 (*pDst)[4]);     // UMemPool.c: copy a 4x4 matrix
+void fn_8000A798(f32 (*pSrc)[4], f32 (*pDst)[4]);     // UMemPool.c: inverts a rotation+translation
+void fn_8000ADC0(f32 (*pMtx)[4]);                     // identity
+void fn_8001728C(CamLens* pLens);
+f32  fn_80014280(f32 x);                              // tan, as a float
+void fn_800354B4(u8* p, f32 v);                       // GoTerrain.c: sets the lens's fAC
+void fn_800BADF8(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
+void fn_80076954(CamLens* pLens, f32 (*pMtx)[4]);
+void fn_800769C0(CamLens* pLens, f32 fA8, f32 fAC);
+void fn_80076A04(CamLens* pLens, f32 fA8);
 void fn_80076A14(f32* pA, f32* pB, f32* pOut);
 void fn_80076A38(f32* pA, f32* pOut);
 
-// ---- sweep code (not yet cleaned up) ----
+// fB0 is 1 at the default 60-degree field of view: tan(fov / 2) over tan(30 degrees).
+void fn_800763BC(CamLens* pLens) {
+    pLens->fB0 = fn_80014280(0.5f * pLens->fFov) / 0.57735026f;
+}
+
+CamLens* fn_80076400(void) {
+    CamLens* pLens = fn_80009B34(sizeof(CamLens), 2, 16, "GoCamera.c", 152);
+
+    fn_800768E0(pLens);
+    return pLens;
+}
 
 void fn_8007644C(CamLens* pLens) {
     fn_80009E70(pLens);
 }
 
-// ---- end of sweep code ----
+// Stands the lens at pPos looking at pTarget, level (its x axis flat) unless it looks almost
+// straight up or down, where it keeps the old x axis. A target closer than 0.1 keeps the old aim.
+void fn_8007646C(CamLens* pLens, f32* pPos, f32* pTarget) {
+    f32 vDir[4];
 
-// ---- sweep code (not yet cleaned up) ----
+    fn_8001728C(pLens);
+    pLens->m4[3][0] = pPos[0];
+    pLens->m4[3][1] = pPos[1];
+    pLens->m4[3][2] = pPos[2];
+    pLens->m4[3][3] = 1.0f;
+    vDir[3] = 0.0f;
+    fn_80076A14(pTarget, pPos, vDir);
+    if ((f32)fn_80009680(fn_80009744(vDir)) > 0.1f) {
+        fn_800BAF04(vDir, pLens->m4[2]);
+        if (fabsf(pLens->m4[2][1]) < 0.99f) {
+            pLens->m4[0][0] = pLens->m4[2][2];
+            pLens->m4[0][1] = 0.0f;
+            pLens->m4[0][2] = -pLens->m4[2][0];
+            pLens->m4[0][3] = 0.0f;
+            fn_800BAF04(pLens->m4[0], pLens->m4[0]);
+        }
+        vec4flt_CrossProduct(pLens->m4[2], pLens->m4[0], pLens->m4[1]);
+    }
+    fn_8000A798(pLens->m4, pLens->m44);
+}
 
-s32 fn_8000A0E8(s32, s32);
-s32 fn_8000A798(s32, s32);
-s32 fn_8000ADC0(s32);
-s32 fn_8001728C(s32);
-void fn_80076954(s32 arg0, s32 arg1);
-void fn_800354B4(u8* p, f32 v);
-void fn_800769C0(u8* p0, f32 x0, f32 x1);
-void fn_80076A04(u8* p, f32 v);
+// The same with the lens's x axis given (pSide, normalised here).
+void fn_8007656C(CamLens* pLens, f32* pPos, f32* pTarget, f32* pSide) {
+    f32 vDir[4];
+
+    fn_8001728C(pLens);
+    pLens->m4[3][0] = pPos[0];
+    pLens->m4[3][1] = pPos[1];
+    pLens->m4[3][2] = pPos[2];
+    pLens->m4[3][3] = 1.0f;
+    vDir[3] = 0.0f;
+    fn_80076A14(pTarget, pPos, vDir);
+    if ((f32)fn_80009680(fn_80009744(vDir)) > 0.1f) {
+        fn_800BAF04(vDir, pLens->m4[2]);
+        pLens->m4[0][0] = pSide[0];
+        pLens->m4[0][1] = pSide[1];
+        pLens->m4[0][2] = pSide[2];
+        pLens->m4[0][3] = 0.0f;
+        fn_800BAF04(pLens->m4[0], pLens->m4[0]);
+        vec4flt_CrossProduct(pLens->m4[2], pLens->m4[0], pLens->m4[1]);
+    }
+    fn_8000A798(pLens->m4, pLens->m44);
+}
+
+// Aims the lens like fn_8007646C, then scales the world by pScale around pCenter: m44 gets the
+// scale, m4 its inverse (1 / pScale, kept in m84[0]).
+void fn_80076664(CamLens* pLens, f32* pPos, f32* pTarget, f32* pCenter, f32* pScale) {
+    f32 vDir[4];
+    f32 mB[4][4];
+    f32 mA[4][4];
+    f32 mTmp[4][4];
+
+    Vec_Copy(pScale, pLens->m84[1]);
+    fn_80076A38(pLens->m84[1], pLens->m84[0]);
+    pLens->m4[3][0] = pPos[0];
+    pLens->m4[3][1] = pPos[1];
+    pLens->m4[3][2] = pPos[2];
+    pLens->m4[3][3] = 1.0f;
+    vDir[3] = 0.0f;
+    fn_80076A14(pTarget, pPos, vDir);
+    if ((f32)fn_80009680(fn_80009744(vDir)) > 0.1f) {
+        fn_800BAF04(vDir, pLens->m4[2]);
+        if (fabsf(pLens->m4[2][1]) < 0.99f) {
+            pLens->m4[0][0] = pLens->m4[2][2];
+            pLens->m4[0][1] = 0.0f;
+            pLens->m4[0][2] = -pLens->m4[2][0];
+            pLens->m4[0][3] = 0.0f;
+            fn_800BAF04(pLens->m4[0], pLens->m4[0]);
+        }
+        vec4flt_CrossProduct(pLens->m4[2], pLens->m4[0], pLens->m4[1]);
+    }
+    fn_8000A798(pLens->m4, pLens->m44);
+
+    // world to camera: move pCenter to the origin, scale, move it back
+    fn_8000ADC0(mTmp);
+    mTmp[3][0] = pCenter[0];
+    mTmp[3][1] = pCenter[1];
+    mTmp[3][2] = pCenter[2];
+    fn_800BADF8(mTmp, pLens->m44, mB, 4);
+    fn_8000ADC0(mTmp);
+    mTmp[0][0] = pScale[0];
+    mTmp[1][1] = pScale[1];
+    mTmp[2][2] = pScale[2];
+    fn_800BADF8(mTmp, mB, mA, 4);
+    fn_8000ADC0(mTmp);
+    mTmp[3][0] = -pCenter[0];
+    mTmp[3][1] = -pCenter[1];
+    mTmp[3][2] = -pCenter[2];
+    fn_800BADF8(mTmp, mA, pLens->m44, 4);
+
+    // camera to world: the same with the inverse scale
+    fn_8000ADC0(mTmp);
+    mTmp[3][0] = pCenter[0];
+    mTmp[3][1] = pCenter[1];
+    mTmp[3][2] = pCenter[2];
+    fn_8000ADC0(mB);
+    mB[0][0] = pLens->m84[0][0];
+    mB[1][1] = pLens->m84[0][1];
+    mB[2][2] = pLens->m84[0][2];
+    fn_800BADF8(mB, mTmp, mA, 4);
+    fn_8000ADC0(mTmp);
+    mTmp[3][0] = -pCenter[0];
+    mTmp[3][1] = -pCenter[1];
+    mTmp[3][2] = -pCenter[2];
+    fn_800BADF8(mTmp, mA, mB, 4);
+    fn_800BADF8(pLens->m4, mB, mA, 4);
+    fn_8000A0E8(mA, pLens->m4);
+    fn_800BADF8(pLens->m4, pLens->m44, mB, 4);   // the result is never used
+}
+
+// A new lens's settings: a perspective camera, fA8 0.1, fAC 4096, a 60-degree field of view,
+// no matrix, a 20 x 20 flat view.
+void fn_800768E0(CamLens* pLens) {
+    fn_80076A0C(pLens, 0);
+    fn_800769C0(pLens, 0.1f, 4096.0f);
+    fn_80045470(pLens, DEG(60.0f));
+    fn_80076954(pLens, NULL);
+    fn_80076948(pLens, 20.0f, 20.0f);
+}
 
 void fn_80076948(CamLens* pLens, f32 fB4, f32 fB8) {
     pLens->fB4 = fB4;
     pLens->fB8 = fB8;
 }
 
-void fn_80076954(s32 arg0, s32 arg1) {
-    if (arg1 == 0) {
-        fn_8000ADC0(arg0 + 4);
-        fn_8000ADC0(arg0 + 0x44);
+// Sets the lens's camera-to-world matrix (pMtx, or the identity when NULL) and its inverse.
+void fn_80076954(CamLens* pLens, f32 (*pMtx)[4]) {
+    if (pMtx == NULL) {
+        fn_8000ADC0(pLens->m4);
+        fn_8000ADC0(pLens->m44);
     } else {
-        fn_8000A0E8(arg1, arg0 + 4);
-        fn_8000A798(arg1, arg0 + 0x44);
+        fn_8000A0E8(pMtx, pLens->m4);
+        fn_8000A798(pMtx, pLens->m44);
     }
-    fn_8001728C(arg0);
+    fn_8001728C(pLens);
 }
 
-void fn_800769C0(u8* p0, f32 x0, f32 x1) {
-    fn_80076A04(p0, x0);
-    fn_800354B4(p0, x1);
+void fn_800769C0(CamLens* pLens, f32 fA8, f32 fAC) {
+    fn_80076A04(pLens, fA8);
+    fn_800354B4((u8*)pLens, fAC);
 }
 
-void fn_80076A04(u8* p, f32 v) {
-    *(f32*)(p + 0xA8) = v;
+void fn_80076A04(CamLens* pLens, f32 fA8) {
+    pLens->fA8 = fA8;
 }
 
 void fn_80076A0C(CamLens* pLens, s32 nType) {
     pLens->nType = nType;
 }
-
-// ---- end of sweep code ----
 
 // a - b into out (three floats)
 #ifdef __MWERKS__

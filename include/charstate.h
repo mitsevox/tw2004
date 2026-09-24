@@ -40,6 +40,14 @@ typedef struct SkinLink {
 } SkinLink;
 LAYOUT_ASSERT(SkinLink, 0x10);
 
+// A texture's scale (x, y) and offset (x, y): an entry of SkinDesc.pB8, SkinDesc14.a20 (taken from
+// pB8 by fn_800CE224) and a material's copy of it (SkinDesc18.uvC, hwsMaterial_Gc.c fn_80112614
+// copies it whole; hwsRender_Gc.c fn_80112DD8 reads it).
+typedef struct SkinDescB8 {
+    f32  a[4];                  // 0x0
+} SkinDescB8;
+LAYOUT_ASSERT(SkinDescB8, 0x10);
+
 // An entry of SkinDesc.p14, copied and patched by fn_800CE224.
 typedef struct SkinDesc14 {
     u64  uId;                   // 0x00
@@ -50,7 +58,7 @@ typedef struct SkinDesc14 {
     s16  n16;                   // 0x16  entries of pB8 from n1C
     s32  n18;                   // 0x18  an entry of SkinDesc.p8C, -1 none
     s32  n1C;                   // 0x1C
-    u32  a20[4];                // 0x20
+    SkinDescB8 a20;             // 0x20
 } SkinDesc14;
 LAYOUT_ASSERT(SkinDesc14, 0x30);
 
@@ -64,7 +72,7 @@ typedef struct SkinDesc14Old {
     u32  u14;                   // 0x14  -> SkinDesc14.u10
     s32  n18;                   // 0x18  -> SkinDesc14.n16
     s32  n1C;                   // 0x1C
-    u32  a20[4];                // 0x20
+    SkinDescB8 a20;             // 0x20
 } SkinDesc14Old;
 LAYOUT_ASSERT(SkinDesc14Old, 0x30);
 
@@ -145,18 +153,13 @@ typedef struct SkinDesc8C {
 } SkinDesc8C;
 LAYOUT_ASSERT(SkinDesc8C, 0x30);
 
-typedef struct SkinDescB8 {
-    u32  a[4];                  // 0x0
-} SkinDescB8;
-LAYOUT_ASSERT(SkinDescB8, 0x10);
-
 // A skin's description (SkinModel.pDesc), as loaded from its file.
 // A material of SkinDesc.p18 (fn_80112DD8 sets up GX from it); SkinDesc.p20 holds indexes of them.
 typedef struct SkinDesc18 {
     TexEntry* pTex;             // 0x00  NULL: drawn untextured
     u8   unk4[4];
     TexBank* pBank;             // 0x08  pTex's bank
-    f32  afC[4];                // 0x0C  the later passes' texture scale (x, y) and offset (x, y)
+    SkinDescB8 uvC;             // 0x0C  the later passes' texture scale (x, y) and offset (x, y)
 } SkinDesc18;
 LAYOUT_ASSERT(SkinDesc18, 0x1C);
 
@@ -249,7 +252,7 @@ typedef struct SkinModel {
     s32  n2C;                   // 0x2C  }
     u32  u30;                   // 0x30  0x40000002 both set: already byte-swapped (fn_800377FC);
                                 //       0x80000000: offsets made pointers (fn_800364AC)
-    void* p34;                  // 0x34  handed to the character's model (fn_80029A74)
+    BonePose* p34;              // 0x34  n14 of them; handed to the character's model (fn_80029A74)
     void* p38;                  // 0x38  one 0x50-byte block
     void* p3C;                  // 0x3C  n0C 0x50-byte blocks
     s32  n40;                   // 0x40  bits in Skin.p10D0; also the entries in p44
@@ -555,7 +558,7 @@ LAYOUT_ASSERT(SkinListEntry, 0x10);
 // What fn_800CE170 is given (by char.c and FEgolferanim.c); only what it reads.
 typedef struct SkinTarget {
     u8   unk0[4];
-    s32  n4;                    // 0x4  passed on to fn_80112614
+    TexBank* pBank;             // 0x4  passed on to fn_80112614: its materials' textures come from it
 } SkinTarget;
 
 // What Character.p16D8 points at; only what SkinPart.c reads.
@@ -608,7 +611,7 @@ Skin* fn_800377FC(u8* pData, u8 b);     // Skin.c: makes a skin from its file
 // Skin.c's triangles (lbl_801D4E78, 0xF0 bytes; our name, layout from fn_80035D10): per view a
 // mesh object and three vertices' positions, texture coordinates, colours and indexes.
 typedef struct SkinTris {
-    u8   aMesh[2][0x28];        // 0x00  (fn_80035C58 sets them up with fn_80036054, fn_80035CC0 frees them)
+    ShaderObject aMesh[2];      // 0x00  (fn_80035C58 sets them up with fn_80036054, fn_80035CC0 frees them)
     f32  aPos[2][3][3];         // 0x50
     f32  aUV[2][3][2];          // 0x98
     u8   aColor[2][3][4];       // 0xC8
@@ -666,6 +669,7 @@ SkinIter* fn_80113B34(u8* pBuf, SkinIterArgs* pArgs);
 void  fn_80113BAC(SkinIter* pIter);
 SkinIter* fn_80113910(u8* pBuf, SkinIterArgs* pArgs);   // hwsRender_Gc.c: another mesh iterator
 void  fn_80113A7C(SkinIter* pIter);     // and its end
+u8    fn_80112C04(void);                // hwsRender_Gc.c: 0 on course 14's hole 11 with four players
 
 // SkinPart.c, as Skin.c uses it.
 u64   fn_800CCDDC(Skin* pSkin, int nPart);

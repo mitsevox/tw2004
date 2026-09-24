@@ -33,6 +33,8 @@ void fn_800486A4(f32* pA, f32* pB, f32* pOut);
 void fn_800486C8(f32* pA, f32* pB, f32* pOut);
 void fn_80047290(void);
 void fn_8004731C(u8* pState);
+f32  fn_8004787C(int nPlayer);
+void fn_8000914C(f32* pQ, f32 (*pMtx)[4]);         // Quaternion.c: to a matrix
 void fn_80047C24(int nPlayer);
 void fn_80048184(int nPlayer);
 int  fn_8001005C(TexBank* pBank, u64 uHash);       // LLTex.c: the texture's index, or 0x80000000
@@ -528,7 +530,175 @@ void fn_80047290(void) {
     }
 }
 
-// ---- 0x8004731C..0x8004787C: not yet decompiled ----
+// Places and draws each shown player's ball: the 'TEO ' 10000 model, plus its logo models 10030+i
+// and 10040+i when the player has a logo. A flying or rolling ball turns by its spin; the level of
+// detail follows the camera's distance (over 50: 2, over 10: 1); the ball is flattened to the
+// view's aspect and sunk into the ground by the surface's lie, and grown when it looks small on
+// screen. pState[i] is set when fn_80046A54 picks player i.
+void fn_8004731C(u8* pState) {
+    f32 aSpin[4];
+    f32 aTurn[4];
+    f32 aRot[4];
+    int i;
+    UObject* pBall;
+    UObject* pLogoA;
+    UObject* pLogoB;
+    f32 fDist;
+    f32 fSink;
+    f32 fSize;
+    f32 fGrow;
+
+    pBall = lbl_80281DA0->pTeo10000;
+    for (i = 0; i < gSession.nNumPlayers; i++) {
+        pState[i] = 0;
+        if (!fn_80046928(i)) {
+            continue;
+        }
+        if ((s8)gSession.aProfile[i].nOutfit >= 0) {
+            pLogoA = lbl_80281DA0->apTeo10030[i];
+            pLogoB = lbl_80281DA0->apTeo10040[i];
+        } else {
+            pLogoA = NULL;
+            pLogoB = NULL;
+        }
+        if (gPlayers[i].ball.nState != 0 && gPlayers[i].ball.nState != 1) {
+            fn_8001EF34(gPlayers[i].ball.vSpin,
+                        // port: NTSC rate; the frame's spin turn, scaled by the ball's radius squared
+                        60.0f * ((59.94f / 60.0f) * (59.94f * gSession.fFrameTime) * lbl_80283304 /
+                                 36.0f),
+                        aSpin);
+            fn_8000923C(aSpin, aTurn);
+            fn_80008FCC(gPlayers[i].vOrient, aTurn, aRot);
+            fn_8001E85C(aRot, gPlayers[i].vOrient);
+            fn_8000914C(aRot, pBall->m0);
+            if (pLogoA != NULL) {
+                fn_8000914C(aRot, pLogoA->m0);
+            }
+            if (pLogoB != NULL) {
+                fn_8000914C(aRot, pLogoB->m0);
+            }
+        } else {
+            fn_8000914C(gPlayers[i].vOrient, pBall->m0);
+            if (pLogoA != NULL) {
+                fn_8000914C(gPlayers[i].vOrient, pLogoA->m0);
+            }
+            if (pLogoB != NULL) {
+                fn_8000914C(gPlayers[i].vOrient, pLogoB->m0);
+            }
+        }
+        fDist = fn_800BB028(fn_8001F004()->m4[3], gPlayers[i].ball.vPos);
+        if (fDist > 2500.0f) {
+            fn_80048584(pBall, 2);
+            if (pLogoA != NULL) {
+                fn_80048584(pLogoA, 2);
+            }
+            if (pLogoB != NULL) {
+                fn_80048584(pLogoB, 2);
+            }
+        } else if (fDist > 100.0f) {
+            fn_80048584(pBall, 1);
+            if (pLogoA != NULL) {
+                fn_80048584(pLogoA, 1);
+            }
+            if (pLogoB != NULL) {
+                fn_80048584(pLogoB, 1);
+            }
+        } else {
+            fn_80048584(pBall, 0);
+            if (pLogoA != NULL) {
+                fn_80048584(pLogoA, 0);
+            }
+            if (pLogoB != NULL) {
+                fn_80048584(pLogoB, 0);
+            }
+        }
+        fn_8000ADC0(pBall->m40);
+        if (pLogoA != NULL) {
+            fn_8000ADC0(pLogoA->m40);
+        }
+        if (pLogoB != NULL) {
+            fn_8000ADC0(pLogoB->m40);
+        }
+        pBall->m40[0][0] = lbl_80281128;
+        pBall->m40[1][1] = lbl_80281128 / fn_80017028(gPlayers[i].nView[0])->f54;
+        pBall->m40[2][2] = lbl_80281128;
+        if (pLogoA != NULL) {
+            pLogoA->m40[0][0] = lbl_80281128;
+            pLogoA->m40[1][1] = lbl_80281128 / fn_80017028(gPlayers[i].nView[0])->f54;
+            pLogoA->m40[2][2] = lbl_80281128;
+        }
+        if (pLogoB != NULL) {
+            pLogoB->m40[0][0] = lbl_80281128;
+            pLogoB->m40[1][1] = lbl_80281128 / fn_80017028(gPlayers[i].nView[0])->f54;
+            pLogoB->m40[2][2] = lbl_80281128;
+        }
+        Vec_Copy(gPlayers[i].ball.vPos, pBall->m80[3]);
+        pBall->m80[3][3] = 1.0f;
+        if (pLogoA != NULL) {
+            Vec_Copy(gPlayers[i].ball.vPos, pLogoA->m80[3]);
+            pLogoA->m80[3][3] = 1.0f;
+        }
+        if (pLogoB != NULL) {
+            Vec_Copy(gPlayers[i].ball.vPos, pLogoB->m80[3]);
+            pLogoB->m80[3][3] = 1.0f;
+        }
+        if (gPlayers[i].ball.nState != 2 && gPlayers[i].ball.nSurface >= 0) {
+            fSink = 1.0f - (gPlayers[i].ball.f70 + gSurfaceTypes[gPlayers[i].ball.nSurface].f00);
+            pBall->m80[3][1] -= 2.0f * (fSink * gRealBallRadiusIn / 36.0f);
+            if (pLogoA != NULL) {
+                pLogoA->m80[3][1] -= 2.0f * (fSink * gRealBallRadiusIn / 36.0f);
+            }
+            if (pLogoB != NULL) {
+                pLogoB->m80[3][1] -= 2.0f * (fSink * gRealBallRadiusIn / 36.0f);
+            }
+        }
+        fSize = fn_8004787C(i);
+        if (fSize < 0.01f) {
+            fSize = 0.01f;
+        }
+        if (fSize < 1.5f) {
+            fGrow = 0.7f * (1.0f / (fSize / 1.5f) - 1.0f) + 1.0f;
+            fn_8000AE28(pBall->m40[0], fGrow, pBall->m40[0]);
+            fn_8000AE28(pBall->m40[1], fGrow, pBall->m40[1]);
+            fn_8000AE28(pBall->m40[2], fGrow, pBall->m40[2]);
+            if (pLogoA != NULL) {
+                fn_8000AE28(pLogoA->m40[0], fGrow, pLogoA->m40[0]);
+            }
+            if (pLogoA != NULL) {
+                fn_8000AE28(pLogoA->m40[1], fGrow, pLogoA->m40[1]);
+            }
+            if (pLogoA != NULL) {
+                fn_8000AE28(pLogoA->m40[2], fGrow, pLogoA->m40[2]);
+            }
+            if (pLogoB != NULL) {
+                fn_8000AE28(pLogoB->m40[0], fGrow, pLogoB->m40[0]);
+            }
+            if (pLogoB != NULL) {
+                fn_8000AE28(pLogoB->m40[1], fGrow, pLogoB->m40[1]);
+            }
+            if (pLogoB != NULL) {
+                fn_8000AE28(pLogoB->m40[2], fGrow, pLogoB->m40[2]);
+            }
+        }
+        fn_8000C5A4(pBall->m0);
+        if (pLogoA != NULL) {
+            fn_8000C5A4(pLogoA->m0);
+        }
+        if (pLogoB != NULL) {
+            fn_8000C5A4(pLogoB->m0);
+        }
+        if (fn_80046A54(i)) {
+            pState[i] = 1;
+        }
+        fn_80048894(pBall);
+        if (pLogoA != NULL) {
+            fn_80048894(pLogoA);
+        }
+        if (pLogoB != NULL) {
+            fn_80048894(pLogoB);
+        }
+    }
+}
 
 // How big nPlayer's ball looks on screen: the distance between the points its radius above and
 // below its centre land on, on a 512 x 448 screen.

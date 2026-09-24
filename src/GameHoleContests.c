@@ -2,19 +2,19 @@
 // round up to three holes are drawn: a par 4 or 5 for the longest drive (lbl_80281568), a par 3 for
 // closest to the pin (lbl_8028156C) and, one round in five, another par 3 with a $100,000 prize for
 // a hole in one (lbl_80281570). Each player's result on the contest hole is kept by player
-// (lbl_80202828 names, lbl_80202884 distances) and the winner (lbl_80282264) is paid $2,500.
-// fn_800DA6D0 (0x800DA6D0, 1612 bytes: decides the contest and fills in the names) is not
-// decompiled yet.
+// (lbl_80202884 distances), ranked into a result table (lbl_80202828 names, lbl_80202870
+// distances), and the winner (lbl_80282264) is paid $2,500.
 
 #include "golfer.h"
 #include "game.h"
 #include "game/save.h"
+#include "frontend/fe.h"
 
 s32  lbl_80281568 = -1;         // the longest-drive hole, -1 none
 s32  lbl_8028156C = -1;         // the closest-to-the-pin hole, -1 none
 s32  lbl_80281570 = -1;         // the hole-in-one prize hole, -1 none
-char lbl_80202828[5][14];       // per player: the name shown with the result
-s32  lbl_80202870[5];           // per player
+char lbl_80202828[5][14];       // by place: the name shown with the result
+s32  lbl_80202870[5];           // by place: the distance, -1 no result
 f32  lbl_80202884[5];           // per player: the drive's length or the distance from the pin
 u8   lbl_80282260;              // a contest has a winner (fn_800DA6D0), or the hole in one was made
 u8   lbl_80282261;              // the contest on this hole is decided
@@ -215,6 +215,151 @@ void fn_800DA48C(int nPlayer) {
                 fn_800E4364(0, 0x74, 100000, nIndex);
             }
         }
+    }
+}
+
+// Ranks the players on the contest hole and fills in the result table: the longest drives first
+// (or the shots closest to the pin), then the players with no result (distance -1). Each is named by
+// a CPU golfer's nickname ("NA": none, then the last name) or the player's profile name ("User n"
+// while no profile is loaded). The first is the winner. Not on the hole-in-one prize hole.
+void fn_800DA6D0(void) {
+    s32 aRank[5];               // per player: the place in the table, -1 not placed yet
+    char szName[32];            // the stack frame gives 32 bytes; the real size is not known
+    int nRank;
+    int nBest;
+    f32 fBest;
+    int i;
+    int j;
+    s32 nIndex;
+
+    if (fn_800DA234()) return;
+    lbl_80282264 = 5;
+    nRank = 0;
+    aRank[0] = -1;
+    aRank[1] = -1;
+    aRank[2] = -1;
+    aRank[3] = -1;
+    aRank[4] = -1;
+    for (i = 0; i < 5; i++) {
+        strcpy(lbl_80202828[i], "");
+        lbl_80202870[i] = 0;
+    }
+    if (fn_800DA174()) {
+        for (j = 0; j < gNumPlayersSetUp; j++) {
+            fBest = 0.0f;
+            nBest = 5;
+            for (i = 0; i < gNumPlayersSetUp; i++) {
+                if (aRank[i] == -1 && lbl_80202884[i] != -1.0f && lbl_80202884[i] > fBest) {
+                    nBest = i;
+                    fBest = lbl_80202884[i];
+                }
+            }
+            if (nBest != 5) {
+                if (Player_IsCPU(nBest)) {
+                    if (strcmp(gPlayers[nBest].golfer.szNick, "NA") != 0) {
+                        strcpy(lbl_80202828[nRank], gPlayers[nBest].golfer.szNick);
+                    } else {
+                        strcpy(lbl_80202828[nRank], gPlayers[nBest].golfer.szLast);
+                    }
+                } else {
+                    nIndex = gPlayers[nBest].nIndex;
+                    if (lbl_801D7148.aLoaded[nIndex] == 0) {
+                        sprintf(szName, "User %d", nBest + 1);
+                        strcpy(lbl_80202828[nRank], szName);
+                    } else {
+                        strcpy(lbl_80202828[nRank], gpSaveData[nIndex].szName);
+                    }
+                }
+                aRank[nBest] = nRank;
+                lbl_80202870[nRank] = fBest;
+                if (nRank == 0) {
+                    lbl_80282264 = nBest;
+                }
+                nRank++;
+            }
+        }
+        for (i = 0; i < gNumPlayersSetUp; i++) {
+            if (lbl_80202884[i] == -1.0f) {
+                if (Player_IsCPU(i)) {
+                    if (strcmp(gPlayers[i].golfer.szNick, "NA") != 0) {
+                        strcpy(lbl_80202828[nRank], gPlayers[i].golfer.szNick);
+                    } else {
+                        strcpy(lbl_80202828[nRank], gPlayers[i].golfer.szLast);
+                    }
+                } else {
+                    nIndex = gPlayers[i].nIndex;
+                    if (lbl_801D7148.aLoaded[nIndex] == 0) {
+                        sprintf(szName, "User %d", i + 1);
+                        strcpy(lbl_80202828[nRank], szName);
+                    } else {
+                        strcpy(lbl_80202828[nRank], gpSaveData[nIndex].szName);
+                    }
+                }
+                lbl_80202870[nRank] = -1;
+                aRank[i] = nRank;
+                nRank++;
+            }
+        }
+    }
+    if (fn_800DA1D4()) {
+        for (j = 0; j < gNumPlayersSetUp; j++) {
+            fBest = 9999.0f;
+            nBest = 5;
+            for (i = 0; i < gNumPlayersSetUp; i++) {
+                if (aRank[i] == -1 && lbl_80202884[i] != -1.0f && lbl_80202884[i] < fBest) {
+                    nBest = i;
+                    fBest = lbl_80202884[i];
+                }
+            }
+            if (nBest != 5) {
+                if (Player_IsCPU(nBest)) {
+                    if (strcmp(gPlayers[nBest].golfer.szNick, "NA") != 0) {
+                        strcpy(lbl_80202828[nRank], gPlayers[nBest].golfer.szNick);
+                    } else {
+                        strcpy(lbl_80202828[nRank], gPlayers[nBest].golfer.szLast);
+                    }
+                } else {
+                    nIndex = gPlayers[nBest].nIndex;
+                    if (lbl_801D7148.aLoaded[nIndex] == 0) {
+                        sprintf(szName, "User %d", nBest + 1);
+                        strcpy(lbl_80202828[nRank], szName);
+                    } else {
+                        strcpy(lbl_80202828[nRank], gpSaveData[nIndex].szName);
+                    }
+                }
+                aRank[nBest] = nRank;
+                lbl_80202870[nRank] = fBest;
+                if (nRank == 0) {
+                    lbl_80282264 = nBest;
+                }
+                nRank++;
+            }
+        }
+        for (i = 0; i < gNumPlayersSetUp; i++) {
+            if (lbl_80202884[i] == -1.0f) {
+                if (Player_IsCPU(i)) {
+                    if (strcmp(gPlayers[i].golfer.szNick, "NA") != 0) {
+                        strcpy(lbl_80202828[nRank], gPlayers[i].golfer.szNick);
+                    } else {
+                        strcpy(lbl_80202828[nRank], gPlayers[i].golfer.szLast);
+                    }
+                } else {
+                    nIndex = gPlayers[i].nIndex;
+                    if (lbl_801D7148.aLoaded[nIndex] == 0) {
+                        sprintf(szName, "User %d", i + 1);
+                        strcpy(lbl_80202828[nRank], szName);
+                    } else {
+                        strcpy(lbl_80202828[nRank], gpSaveData[nIndex].szName);
+                    }
+                }
+                lbl_80202870[nRank] = -1;
+                nRank++;
+            }
+        }
+    }
+    if (lbl_80282264 != 5) {
+        lbl_80282260 = 1;
+        lbl_80282268 = 1;
     }
 }
 

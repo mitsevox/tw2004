@@ -5,10 +5,35 @@
 #include "engine.h"
 #include "charstate.h"
 
-// Set up a material from its entry: its texture, found in pBank or (pBank NULL) in every bank, and
-// its texture scale and offset. Not written yet: it copies SkinDesc14.a20 into SkinDesc18.afC as
-// one 16-byte struct, which the headers cannot express yet.
-void fn_80112614(SkinDesc14* pEntry, SkinDesc18* pMaterial, TexBank* pBank);
+int  fn_8001005C(TexBank* pBank, u64 uHash);       // LLTex.c: the texture's index, or 0x80000000
+TexEntry* fn_800107E4(TexBank* pBank, int nTex);  // LLTexGrp.c
+
+// Set up a material from its entry: its texture (none with flag 1), found by the entry's name in
+// pBank or (pBank NULL) in every bank, and its texture scale and offset.
+void fn_80112614(SkinDesc14* pEntry, SkinDesc18* pMaterial, TexBank* pBank) {
+    TexEntry* pTex;
+    int nTex;
+
+    pTex = NULL;
+    if (!(pEntry->u08 & 1)) {
+        if (pBank == NULL) {
+            fn_800102DC(pEntry->uId, &pBank, &pTex);
+        } else {
+            nTex = fn_8001005C(pBank, pEntry->uId);
+            if (nTex != 0x80000000) {
+                pTex = fn_800107E4(pBank, nTex);
+            }
+        }
+    }
+    if (pTex != NULL) {
+        pMaterial->pTex = pTex;
+        pMaterial->pBank = pBank;
+    } else {
+        pMaterial->pTex = NULL;
+        pMaterial->pBank = NULL;
+    }
+    pMaterial->uvC = pEntry->a20;
+}
 
 // Make the skin's materials (allocated on first use), textures from any bank. nUnused: the one
 // caller, fn_801127A0, passes 0; it is not read.

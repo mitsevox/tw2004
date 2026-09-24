@@ -145,9 +145,9 @@ void fn_80099BA0(Camera* pCamera) {
     CamLens* pLens = fn_80008370(pCamera);
     PsEmitter* pEmitter;
 
-    lbl_801DB878[0] = pLens->v34[0];
-    lbl_801DB878[1] = pLens->v34[1];
-    lbl_801DB878[2] = pLens->v34[2];
+    lbl_801DB878[0] = pLens->m4[3][0];
+    lbl_801DB878[1] = pLens->m4[3][1];
+    lbl_801DB878[2] = pLens->m4[3][2];
     lbl_801DB878[3] = 1.0f;
     lbl_80281F88 = fn_80099C50(lbl_80281F88, 16, fn_80099E34);
     for (pEmitter = lbl_80281F88; pEmitter != NULL; pEmitter = pEmitter->p40) {
