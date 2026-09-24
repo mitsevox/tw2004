@@ -6,9 +6,14 @@
 #include "engine.h"
 #include "golfer.h"
 #include "gx.h"
+#include "shaderdata.h"
 
 void fn_8007110C(u32* pnFrame);
+void fn_80071148(StaticShaderObject* pObj, ShaderCmds* pCmds);
+void fn_8007117C(StaticShaderObject* pObj);
+void fn_800711A4(StaticShaderObject* pObj);
 void fn_800711F8(PrelitUVObject* pObj, const DynRenderSize* pSize);
+void fn_800712B4(PrelitUVObject* pObj);
 void fn_800712EC(PrelitUVObject* pObj);
 void fn_800713B4(PrelitUVObject* pObj, PrelitUVFill* pFill, u8 bRestart);
 void fn_800717AC(int nRow);
@@ -17,39 +22,35 @@ void fn_80071914(void);
 void fn_80071994(void);
 void fn_80071A54(int nRow);
 void fn_80071A90(int nRow);
+void fn_80070168(void);     // sweep_80070168.c: calls a display list
+void fn_8007524C(void);     // GoShaderObjectCommon_ShaderObjectsData_Gc.c: empty
 
 // Row 5's data hook: set the texture animation clock from the frame count.
 void fn_8007110C(u32* pnFrame) {
     fn_80076C20(*pnFrame);
 }
 
-// ---- sweep code (not yet cleaned up) ----
-
-void fn_80074DA8();
-void fn_80071148(u8* p0, s32 p1);
-void fn_8007524C();
-void fn_8007117C(u8* p0);
-s32 fn_80070168(s32, s32);
-void fn_800711A4(void* arg0);
-void fn_800712B4(u8* p0);
-
-void fn_80071148(u8* p0, s32 p1) {
-    fn_80074DA8(*(s32*)(p0 + 0x24), *(s32*)(p0 + 0x0), (p0 + 0x4), p1);
+// Row 5's static init: build the object's display list from pCmds.
+void fn_80071148(StaticShaderObject* pObj, ShaderCmds* pCmds) {
+    fn_80074DA8(pObj->pArrays, pObj->eType, &pObj->anim, pCmds);
 }
 
-void fn_8007117C(u8* p0) {
-    fn_8007524C((p0 + 0x4));
+// Row 5's static close; it also forgets every texture animation.
+void fn_8007117C(StaticShaderObject* pObj) {
+    // port: EA passes an argument fn_8007524C ignores
+    ((void (*)(MorphAnim*))fn_8007524C)(&pObj->anim);
     fn_80076E24();
 }
 
-void fn_800711A4(void* arg0) {
-    if ((u8) (*(u8*)((u8*)(arg0) + 0xC)) != 0) {
-        GXSetArray(9, *(*(void***)((u8*)(arg0) + 0x24)), 0xC);
+// Row 5's static render: the display list (with the object's positions when the list sets none).
+void fn_800711A4(StaticShaderObject* pObj) {
+    if (pObj->anim.b8 != 0) {
+        GXSetArray(9, pObj->pArrays->apPos[0], 12);
     }
-    fn_80070168((*(s32*)((u8*)(arg0) + 8)), (*(s32*)((u8*)(arg0) + 4)));
+    // port: fn_80070168 (sweep_80070168.c) is defined without parameters but hands r3 and r4
+    // on to GXCallDisplayList
+    ((void (*)(void*, u32))fn_80070168)(pObj->anim.p4, pObj->anim.n0);
 }
-
-// ---- end of sweep code ----
 
 // Make the object's buffer (at the given sizes, or 50 vertices and one draw) and its texture
 // matrix, unmoved.
@@ -70,14 +71,11 @@ void fn_800711F8(PrelitUVObject* pObj, const DynRenderSize* pSize) {
     pObj->pMtx[1][3] = 0.0f;
 }
 
-// ---- sweep code (not yet cleaned up) ----
-
-void fn_800712B4(u8* p0) {
-    fn_80009E70(*(void**)(p0 + 0x8));
-    fn_80070348(*(DynRenderBuffer**)(p0 + 0x4));
+// Free the object's texture matrix and buffer.
+void fn_800712B4(PrelitUVObject* pObj) {
+    fn_80009E70(pObj->pMtx);
+    fn_80070348(pObj->pBuf);
 }
-
-// ---- end of sweep code ----
 
 // Draw every draw in the object's buffer, texture coordinates through its matrix.
 void fn_800712EC(PrelitUVObject* pObj) {
@@ -143,13 +141,13 @@ void fn_800713B4(PrelitUVObject* pObj, PrelitUVFill* pFill, u8 bRestart) {
 // ---- sweep code (not yet cleaned up) ----
 
 void fn_80071574(void);
-void fn_80071578(u8* p0, s32 p1);
-void fn_800715AC(u8* p0);
-void fn_800715D0(void* arg0);
+void fn_80071578(StaticShaderObject* pObj, ShaderCmds* pCmds);
+void fn_800715AC(StaticShaderObject* pObj);
+void fn_800715D0(StaticShaderObject* pObj);
 void fn_80071624(void);
-void fn_80071628(u8* p0, s32 p1);
-void fn_8007165C(u8* p0);
-void fn_80071680(void* arg0);
+void fn_80071628(StaticShaderObject* pObj, ShaderCmds* pCmds);
+void fn_8007165C(StaticShaderObject* pObj);
+void fn_80071680(StaticShaderObject* pObj);
 void fn_80097208();
 void fn_80097250();
 void fn_8009F780();
@@ -176,40 +174,54 @@ void fn_80071910(void);
 void fn_80071A14(void);
 void fn_80071A34(void);
 
+// Row 10's data hook: nothing.
 void fn_80071574(void) {
 }
 
-void fn_80071578(u8* p0, s32 p1) {
-    fn_80074DA8(*(s32*)(p0 + 0x24), *(s32*)(p0 + 0x0), (p0 + 0x4), p1);
+// Row 10's static init: build the object's display list from pCmds.
+void fn_80071578(StaticShaderObject* pObj, ShaderCmds* pCmds) {
+    fn_80074DA8(pObj->pArrays, pObj->eType, &pObj->anim, pCmds);
 }
 
-void fn_800715AC(u8* p0) {
-    fn_8007524C((p0 + 0x4));
+// Row 10's static close.
+void fn_800715AC(StaticShaderObject* pObj) {
+    // port: EA passes an argument fn_8007524C ignores
+    ((void (*)(MorphAnim*))fn_8007524C)(&pObj->anim);
 }
 
-void fn_800715D0(void* arg0) {
-    if ((u8) (*(u8*)((u8*)(arg0) + 0xC)) != 0) {
-        GXSetArray(9, *(*(void***)((u8*)(arg0) + 0x24)), 0xC);
+// Row 10's static render: the display list (with the object's positions when the list sets none).
+void fn_800715D0(StaticShaderObject* pObj) {
+    if (pObj->anim.b8 != 0) {
+        GXSetArray(9, pObj->pArrays->apPos[0], 12);
     }
-    fn_80070168((*(s32*)((u8*)(arg0) + 8)), (*(s32*)((u8*)(arg0) + 4)));
+    // port: fn_80070168 (sweep_80070168.c) is defined without parameters but hands r3 and r4
+    // on to GXCallDisplayList
+    ((void (*)(void*, u32))fn_80070168)(pObj->anim.p4, pObj->anim.n0);
 }
 
+// Row 6's data hook: nothing.
 void fn_80071624(void) {
 }
 
-void fn_80071628(u8* p0, s32 p1) {
-    fn_80074DA8(*(s32*)(p0 + 0x24), *(s32*)(p0 + 0x0), (p0 + 0x4), p1);
+// Row 6's static init: build the object's display list from pCmds.
+void fn_80071628(StaticShaderObject* pObj, ShaderCmds* pCmds) {
+    fn_80074DA8(pObj->pArrays, pObj->eType, &pObj->anim, pCmds);
 }
 
-void fn_8007165C(u8* p0) {
-    fn_8007524C((p0 + 0x4));
+// Row 6's static close.
+void fn_8007165C(StaticShaderObject* pObj) {
+    // port: EA passes an argument fn_8007524C ignores
+    ((void (*)(MorphAnim*))fn_8007524C)(&pObj->anim);
 }
 
-void fn_80071680(void* arg0) {
-    if ((u8) (*(u8*)((u8*)(arg0) + 0xC)) != 0) {
-        GXSetArray(9, *(*(void***)((u8*)(arg0) + 0x24)), 0xC);
+// Row 6's static render: the display list (with the object's positions when the list sets none).
+void fn_80071680(StaticShaderObject* pObj) {
+    if (pObj->anim.b8 != 0) {
+        GXSetArray(9, pObj->pArrays->apPos[0], 12);
     }
-    fn_80070168((*(s32*)((u8*)(arg0) + 8)), (*(s32*)((u8*)(arg0) + 4)));
+    // port: fn_80070168 (sweep_80070168.c) is defined without parameters but hands r3 and r4
+    // on to GXCallDisplayList
+    ((void (*)(void*, u32))fn_80070168)(pObj->anim.p4, pObj->anim.n0);
 }
 
 void fn_800716D4(void) {
