@@ -379,7 +379,8 @@ s32 fn_8010B0C0(DynTexObj* pObj, DynTexPalette* pPal, DynTexEntry* pEntry) {
         nTotal += pEntry->aC[i];
     }
     if (pPal != NULL) {
-        pEntry->n1C = (pPal->nEntries * (u32)fn_8010C458(pPal->nFormat) + 7) >> 3;
+        nBits = fn_8010C458(pPal->nFormat);
+        pEntry->n1C = ((u32)nBits * pPal->nEntries + 7) >> 3;
     } else {
         pEntry->n1C = 0;
     }

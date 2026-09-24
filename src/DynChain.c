@@ -834,27 +834,25 @@ void fn_80115B2C(CharModel* pModel, DynChain* pChain, f32 fDelta) {
 
 // Update a chain by fDelta: set it up again first if asked, then the update of its type.
 void fn_8011443C(CharModel* pModel, DynChain* pChain, f32 fDelta) {
-    if (fDelta != 0.0f && pChain != NULL) {
+    if (fDelta && pChain != NULL) {
         if (pChain->bReset) {
             fn_801141F8(pChain, pModel);
             pChain->bReset = 0;
         }
-        if (pChain->nBone != 0xFF) {
-            if (pChain->nBone == -1) {
-                return;
-            }
-            if (pChain->nType == 0) {
-                fn_80114A84(pModel, pChain, fDelta);
-            }
-            if (pChain->nType == 1) {
-                fn_80114540(pModel, pChain, fDelta);
-            }
-            if (pChain->nType == 2) {
-                fn_80115348(pModel, pChain, fDelta);
-            }
-            if (pChain->nType == 3) {
-                fn_80115B2C(pModel, pChain, fDelta);
-            }
+        if (pChain->nBone == 0xFF || pChain->nBone == -1) {
+            return;
+        }
+        if (pChain->nType == 0) {
+            fn_80114A84(pModel, pChain, fDelta);
+        }
+        if (pChain->nType == 1) {
+            fn_80114540(pModel, pChain, fDelta);
+        }
+        if (pChain->nType == 2) {
+            fn_80115348(pModel, pChain, fDelta);
+        }
+        if (pChain->nType == 3) {
+            fn_80115B2C(pModel, pChain, fDelta);
         }
     }
 }

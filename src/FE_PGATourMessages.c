@@ -25,11 +25,11 @@ s16 lbl_80193CFC[11] = { 0, 1, 2, 5, 6, 9, 10, 11, 13, 14, 15 };
 void fn_8010E58C(char* szPlace, char* szName, char* szScore, char* szRounds, char* szMoney,
                  int nEntrant) {
     int i;
+    s32 nRoundScore;
     char szAmount[128];                 // sizes unknown
     char szRound[4];
     int nPlayer = fn_80077B08();
     s32 nGolfer = fn_80119118(nPlayer, nEntrant);
-    s32 nRoundScore;
     s32 nMoney;
 
     if (fn_801197A4(nPlayer, nEntrant)) {
@@ -79,8 +79,8 @@ void fn_8010E748(MsgArg* pArgs, MsgArg* pResult) {
             bShow = 1;
         }
     } else if (nRow < fn_80118664(nPlayer)) {
-        bShow = 1;
         nEntrant = fn_801197CC(nPlayer, nRow);
+        bShow = 1;
     }
     if (bShow) {
         fn_8010E58C(szPlace, szName, szScore, szRounds, szMoney, nEntrant);
@@ -104,11 +104,11 @@ void fn_8010E890(MsgArg* pArgs, MsgArg* pResult) {
     s32 aCourses[4];
     char szStart[8];
     char szEnd[8];
-    s32 nEvent = lbl_802824B0[pArgs[0].i];
     char* szDates = ((MsgString*)pArgs[1].p)->pStr;
     char* szName = ((MsgString*)pArgs[2].p)->pStr;
     char* szCourses = ((MsgString*)pArgs[3].p)->pStr;
     char* szChamp = ((MsgString*)pArgs[4].p)->pStr;
+    s32 nEvent = lbl_802824B0[pArgs[0].i];
     u16 nStart = fn_800EFD38(nEvent);
     u16 nEnd = GameModeDriverPGATour_GetEndDate(nEvent);
     Tournament* pTournament;
@@ -201,9 +201,9 @@ void fn_8010EBDC(MsgArg* pArgs, MsgArg* pResult) {
     int nPlayer = fn_80077B08();
     PgaStatCounts* pStats = &gpSaveData[nPlayer].tour.aStats[PGA_USER_GOLFER];
     s32 nGolfer;
-    SeasonEvent* pEvent;
-    s32 nCount;
     int i;
+    s32 nCount;
+    SeasonEvent* pEvent;
 
     sprintf(szOut, "", nLine);
     switch (nLine) {
