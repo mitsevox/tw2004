@@ -185,6 +185,14 @@ void AnimLib_Free(AnimLib* pLib);       // skalib.c
 void ClipBank_Release(int nSlot);       // skalib.c
 void fn_8001F66C(void);                 // mtalib.c
 void fn_80071B94(void);                 // animblender.c
+
+// animblender.c's pools (fn_80071AD0 creates them, fn_80071B94 destroys them): blend tree nodes by
+// type (0x34, 0x2C and 0x20 bytes), then pose buffers of format 0 (0x1040) and format 1 (0x114C).
+extern UMemPool* lbl_80281E98;
+extern UMemPool* lbl_80281E94;
+extern UMemPool* lbl_80281E90;
+extern UMemPool* lbl_80281E8C;
+extern UMemPool* lbl_80281E88;
 void fn_80071F58(struct SKABlendNode** ppNode, int n);   // animblender.c: gives a blend tree back
 
 // animblender.c: whether a source under pNode plays pSrc (format 0, format 1).

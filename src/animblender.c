@@ -5,6 +5,7 @@
 // (AnimPlayer) functions follow. Only part is decompiled so far.
 
 #include "character.h"
+#include "golfer.h"
 
 f32  fn_8001F02C(ClipBlend* pBlend, u64 uEvent);   // an event's time (by its 64-bit id)
 
@@ -16,6 +17,46 @@ f32  fn_80072938(SKABlendNode* pNode);
 void fn_8007325C(u8* pAnim);
 f32  fn_800732B8(f32 fTime, f32 fNow, f32 fStart, f32 fEnd);
 int  fn_800734D0(SKABlendNode* pNode);
+
+// Create the blend tree pools: 10 of each in game types 3 and 10, else 50.
+void fn_80071AD0(void) {
+    int nCount;
+
+    if (gSession.nGameType == 3 || gSession.nGameType == 10) {
+        nCount = 10;
+    } else {
+        nCount = 50;
+    }
+    lbl_80281E98 = fn_8000AFA0(nCount, 0x34, 2, 16);
+    lbl_80281E94 = fn_8000AFA0(nCount, 0x2C, 2, 16);
+    lbl_80281E90 = fn_8000AFA0(nCount, 0x20, 2, 16);
+    lbl_80281E8C = fn_8000AFA0(nCount, sizeof(SkelPose), 2, 16);
+    lbl_80281E88 = fn_8000AFA0(nCount, 0x114C, 2, 16);
+}
+
+// Destroy the pools fn_80071AD0 made.
+void fn_80071B94(void) {
+    if (lbl_80281E98 != NULL) {
+        fn_8000B058(lbl_80281E98);
+        lbl_80281E98 = NULL;
+    }
+    if (lbl_80281E94 != NULL) {
+        fn_8000B058(lbl_80281E94);
+        lbl_80281E94 = NULL;
+    }
+    if (lbl_80281E90 != NULL) {
+        fn_8000B058(lbl_80281E90);
+        lbl_80281E90 = NULL;
+    }
+    if (lbl_80281E8C != NULL) {
+        fn_8000B058(lbl_80281E8C);
+        lbl_80281E8C = NULL;
+    }
+    if (lbl_80281E88 != NULL) {
+        fn_8000B058(lbl_80281E88);
+        lbl_80281E88 = NULL;
+    }
+}
 
 // How many source nodes the tree under pNode has; *pppOldest gets the slot of the one that ends
 // first (left alone when it already holds an earlier one).
