@@ -3311,24 +3311,26 @@ void fn_8007FF8C(MsgArg* pArgs, MsgArg* pResult) {
 // round n4); 22 and 24..29 are built rounds, whose holes come from other courses.
 void fn_80080054(MsgArg* pArgs, MsgArg* pResult) {
     int nCourse;
+    int nCourseArg = pArgs[0].i;
 
-    if (pArgs[0].i <= -1) {
+    if (nCourseArg <= -1) {
+        nCourse = gpSaveData[lbl_80281ED4->n3].aSavedRound[lbl_80281ED4->n4].nCourse[pArgs[1].i];
         pResult->i = fn_800D2ABC(
-            gpSaveData[lbl_80281ED4->n3].aSavedRound[lbl_80281ED4->n4].nCourse[pArgs[1].i],
-            gpSaveData[lbl_80281ED4->n3].aSavedRound[lbl_80281ED4->n4].nHoleNum[pArgs[1].i]);
+            nCourse, gpSaveData[lbl_80281ED4->n3].aSavedRound[lbl_80281ED4->n4].nHoleNum[pArgs[1].i]);
         return;
     }
-    if (pArgs[0].i == 22) {
+    if (nCourseArg == 22) {
         nCourse = fn_800D3118(22, pArgs[1].i);
         pResult->i = fn_800D2ABC(nCourse, fn_800D315C(22, pArgs[1].i) - 1);
         return;
     }
-    if (pArgs[0].i >= 24 && pArgs[0].i < 30) {
+    if (nCourseArg >= 24 && nCourseArg < 30) {
+        // the argument is read again here (the original reloads it after the call)
         nCourse = fn_800D3118(pArgs[0].i, pArgs[1].i);
         pResult->i = fn_800D2ABC(nCourse, fn_800D315C(pArgs[0].i, pArgs[1].i) - 1);
         return;
     }
-    pResult->i = fn_800D2ABC(pArgs[0].i, pArgs[1].i);
+    pResult->i = fn_800D2ABC(nCourseArg, pArgs[1].i);
 }
 
 // The saved replay's course, hole and golfer.
