@@ -66,11 +66,24 @@ typedef struct GrassRecord {
     u8    unk44[0x4C - 0x44];
 } GrassRecord;
 
+// A grass data chunk as fn_8011E4D8 is given it: n2 0x30-byte entries follow the header, then the
+// data (GrassChunkData).
+typedef struct GrassChunk {
+    s16 unk0;
+    s16 n2;                     // 0x2
+} GrassChunk;
+
+typedef struct GrassChunkData {
+    s32 n0;                     // 0x0
+    f32 f4;                     // 0x4
+} GrassChunkData;
+
 // GoGrass.c's state (*lbl_80281900). Only the fields the decompiled code uses; its size is not known.
 typedef struct GrassManager {
     u8           unk0[0x1C];
-    s32          n1C;           // 0x1C  cleared when the grass is freed (fn_8011E3B4)
-    u8           unk20[0x70 - 0x20];
+    s32          n1C;           // 0x1C  the chunks added (fn_8011E4D8); cleared when the grass is freed
+    struct GrassChunkData* a20[10];   // 0x20  each chunk's data, byte-swapped in place
+    struct GrassChunk*     a48[10];   // 0x48  the chunks
     void*        p70;           // 0x70
     void*        p74;           // 0x74
     void*        p78;           // 0x78
@@ -87,7 +100,11 @@ typedef struct GrassManager {
     s32          n100;          // 0x100
     u8           unk104[0x370 - 0x104];
     void*        p370;          // 0x370  an allocation; set while the grass is on (fn_8012022C)
-    u8           unk374[0x3CC - 0x374];
+    u8           unk374[0x3A4 - 0x374];
+    s32          n3A4;          // 0x3A4  the last chunk's GrassChunkData.n0
+    u8           unk3A8[0x3B8 - 0x3A8];
+    f32          f3B8;          // 0x3B8  the last chunk's GrassChunkData.f4
+    u8           unk3BC[0x3CC - 0x3BC];
     s32          n3CC;          // 0x3CC
     u8           unk3D0[0x3E0 - 0x3D0];
     s32          n3E0;          // 0x3E0

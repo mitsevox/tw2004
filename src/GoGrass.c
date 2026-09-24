@@ -4,6 +4,7 @@
 #include "game_types.h"
 #include "platform.h"
 #include "grassshader.h"
+#include "endian.h"
 
 // ---- sweep code (not yet cleaned up) ----
 
@@ -59,6 +60,7 @@ void fn_8011FDC4(void* pObject);
 void fn_8011E3B4(void);
 void fn_80008380(void);
 void fn_8011E468(void);
+void fn_8011E4D8(GrassChunk* pChunk);
 void fn_8011E584(UStreamObject* pObject);
 int  fn_8011E6B0(f32** ppA, f32** ppB);
 void fn_8011FD74(void* pObject);
@@ -99,6 +101,18 @@ void fn_8011E4A4(void) {
     if (fn_80112B80() != 0) {
         UStream_UnregisterHandler(0x67726173);
     }
+}
+
+// Adds a grass data chunk: its data (after its n2 0x30-byte entries) is byte-swapped in place.
+void fn_8011E4D8(GrassChunk* pChunk) {
+    u8* pData;
+    lbl_80281900->a48[lbl_80281900->n1C] = pChunk;
+    lbl_80281900->a20[lbl_80281900->n1C] = (GrassChunkData*)((u8*)(pChunk + 1) + pChunk->n2 * 0x30);
+    pData = (u8*)lbl_80281900->a20[lbl_80281900->n1C];
+    fn_80076158(&pData, pData, 8, 4);
+    lbl_80281900->f3B8 = lbl_80281900->a20[0]->f4;
+    lbl_80281900->n3A4 = lbl_80281900->a20[0]->n0;
+    lbl_80281900->n1C = lbl_80281900->n1C + 1;
 }
 
 // A sort order: by the float at +8 of the objects the two entries point to, the larger first
