@@ -570,6 +570,11 @@ void     fn_800763BC(CamLens* pLens);
 // three points and fT.
 void   fn_800C7D14(f32* pA, f32* pB, u8 b1, u8 b2, f32* pOut, f32 f, f32 fAngle);
 void   fn_800C7E50(f32* pA, f32* pB, f32* pC, int n, f32* pOut, f32 fT);
+// The splined camera (CamScript_SplineCameras): the camera position on the spline through pPos0..3,
+// the look-at point on the one through pLook0..3, and the field of view between fFov1 and fFov2,
+// at share fT between the middle two.
+void   fn_800C7480(f32* pPos0, f32* pPos1, f32* pPos2, f32* pPos3, f32* pLook0, f32* pLook1, f32* pLook2,
+                   f32* pLook3, f32* pCam, f32* pSub, f32* pFov, f32 fFov1, f32 fFov2, f32 fT);
 
 // ---- the camera controller (0x80062F38..) ---------------------------------------------------
 

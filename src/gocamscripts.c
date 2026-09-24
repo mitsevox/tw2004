@@ -741,6 +741,77 @@ void fn_8003FD54(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPr
     pScript->fA8 = fT * (pNext->f9C - pShot->f9C) + pShot->f9C;
 }
 
+// Blend kind 3: the camera and the point it looks at follow splines (fn_800C7480) through the
+// current and next shots, with the shot before the current one (p44) and the one after the next
+// (p40) as the outer points (or the shots' own when there are none); field of view, fn_800457B8's
+// value, slow motion and fA8 are blended by the camera's time over the blend's length f8C.
+void CamScript_SplineCameras(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPrev, f32 fTime) {
+    f32 vPrevPos[4];
+    f32 vPos0[4];
+    f32 vPos1[4];
+    f32 vNextPos[4];
+    f32 vPrevLook[4];
+    f32 vLook0[4];
+    f32 vLook1[4];
+    f32 vNextLook[4];
+    f32 fFov;
+    f32 f;
+    f32 f90;
+    f32 fT = pScript->fCamTime / pScript->f8C;
+    CamShot* pShot = pScript->pShot;
+    CamShot* pNext = pScript->pNextShot;
+
+    Vec3Copy(pScript->v0, vPos0);
+    Vec3Copy(pScript->v10, vPos1);
+    if (pShot->p44 == NULL) {
+        Vec3Copy(pScript->v0, vPrevPos);
+    } else {
+        Vec3Copy(pShot->p44->v20, vPrevPos);
+    }
+    if (pNext->p40 == NULL) {
+        Vec3Copy(pScript->v10, vNextPos);
+    } else {
+        Vec3Copy(pNext->p40->v20, vNextPos);
+    }
+    Vec3Copy(pSub, vLook0);
+    CamScript_GetLookAtPoint(pShot, nPlayer, vLook0, pScript->v0, pScript, pPrev, fTime);
+    Vec3Copy(pSub, vLook1);
+    CamScript_GetLookAtPoint(pNext, nPlayer, vLook1, pScript->v10, pScript, pPrev, fTime);
+    if (pShot->p44 == NULL) {
+        Vec3Copy(vLook0, vPrevLook);
+    } else {
+        Vec3Copy(pSub, vPrevLook);
+        CamScript_GetLookAtPoint(pShot->p44, nPlayer, vPrevLook, pCam, pScript, pPrev, fTime);
+    }
+    if (pNext->p40 == NULL) {
+        Vec3Copy(vLook1, vNextLook);
+    } else {
+        Vec3Copy(pSub, vNextLook);
+        CamScript_GetLookAtPoint(pNext->p40, nPlayer, vNextLook, pCam, pScript, pPrev, fTime);
+    }
+    fn_800C7480(vPrevPos, vPos0, vPos1, vNextPos, vPrevLook, vLook0, vLook1, vNextLook, pCam, pSub, &fFov,
+                pShot->f78, pNext->f78, fT);
+    fFov += fn_800DC3A4();
+    if (fn_80044E74(pScript->pShot)) {
+        fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[1])), fFov);
+    } else {
+        fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[0])), fFov);
+    }
+    f = fT * (pNext->f88 - pShot->f88) + pShot->f88;
+    f += fn_800DC45C(f);
+    fn_800457B8(nPlayer, f);
+    f = fT * (pNext->f8C - pShot->f8C) + pShot->f8C;
+    f90 = fT * (pNext->f90 - pShot->f90) + pShot->f90;
+    if (f > 0.0f || f90 > 0.0f) {
+        if (fn_80044E74(pShot)) {
+            fn_80038054(1, gPlayers[nPlayer].nView[1], f90, f);
+        } else {
+            fn_80038054(1, gPlayers[nPlayer].nView[0], f90, f);
+        }
+    }
+    pScript->fA8 = fT * (pNext->f9C - pShot->f9C) + pShot->f9C;
+}
+
 // Blend kinds 2, 11 and 12: the point looked at moves on the straight line between the two shots'
 // look-at points; the camera follows the curve fn_800C7E50 makes through the two positions (kind
 // nD0), set up by fn_80040CF0 on the blend's first frame.
