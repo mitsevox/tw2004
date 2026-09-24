@@ -394,6 +394,7 @@ GameUICommands.c:
 	.text       start:0x800850E4 end:0x8008AD80
 	.rodata     start:0x80183950 end:0x80183960
 	.data       start:0x801897E8 end:0x801899E0
+	.bss        start:0x801D83B0 end:0x801D8708
 	.sdata      start:0x802812D0 end:0x80281330
 	.sbss       start:0x80281ED8 end:0x80281EE0
 	.sdata2     start:0x80283B10 end:0x80283B38
@@ -835,6 +836,7 @@ GameMode7.c:
 GameMode8.c:
 	.text       start:0x800F986C end:0x800FE1B4
 	.data       start:0x80192908 end:0x80192D00
+	.bss        start:0x802120F8 end:0x80212418
 	.sdata      start:0x802816B0 end:0x802816D0
 	.sdata2     start:0x80284708 end:0x802847A0
 

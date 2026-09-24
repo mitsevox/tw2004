@@ -14,6 +14,8 @@
 #include "core/startup.h"
 #include "frontend/fe.h"
 
+MsgHandler lbl_801D83B0[UI_NUM_ROUND_COMMANDS];
+
 // in reverse address order: CodeWarrior lays .sbss out last-defined-first
 s32 lbl_80281EDC;               // counts -1..10, one step per fn_800894E8
 u8  lbl_80281ED8;               // which player the alternating question answers next (mode 26)

@@ -69,6 +69,8 @@ f32 lbl_802816B8 = 0.65f;
 f32 lbl_802816BC = 1.85f;
 f32 lbl_802816C0 = 0.065f;
 f32 lbl_802816C4 = 0.25f;
+
+SGLog lbl_802120F8[100];
 // fake match: a one-entry array, so the compiler loads it where fn_800FBD2C compares with it
 // instead of folding in its own 1.0f (the original has this constant first in the file's .sdata2)
 const f32 lbl_80284708[1] = {1.0f};
