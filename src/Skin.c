@@ -709,10 +709,7 @@ void fn_800368FC(SkinDesc* pDesc) {
                 pEntry->n16 = old.n18;
                 pEntry->n18 = -1;
                 pEntry->n1C = old.n1C;
-                pEntry->a20[0] = old.a20[0];
-                pEntry->a20[1] = old.a20[1];
-                pEntry->a20[2] = old.a20[2];
-                pEntry->a20[3] = old.a20[3];
+                pEntry->a20 = old.a20;
             }
             pDesc->n04 = 1;
         }

@@ -7,6 +7,7 @@
 
 #include "game_types.h"
 #include "platform.h"
+#include "gx.h"
 
 // An entry of a table in the UI file's second list; u0 is the entry's kind. In the colour table
 // (kind 0x10, fn_8008FDDC) p8 points at four bytes, alpha first (uiText.c). fn_8008FE88 resolves
@@ -142,17 +143,17 @@ void fn_8007BCA4(MsgArg* pArgs, MsgArg* pResult);  // FE_MessageTable.c: fn_8007
 // prototype is in frontend/uistudio.h). The values are passed as an s32 array.
 
 // A menu UI arc (uiArc.c): nSegments pieces from fStart to fEnd degrees, shaded from colour
-// aColorA to aColorB. Only what the code reads so far.
+// colorA to colorB. Only what the code reads so far.
 typedef struct UIArc {
     s16  n0;                    // 0x00  } passed to fe_movies.c's fn_800913EC and fn_80091460
     s16  n2;                    // 0x02  } (-1: none)
     u8   unk4[4];
     u16  u8;                    // 0x08
     u16  uFlags;                // 0x0A
-    s16  nSegments;             // 0x0C  message 8
-    s16  nQuarterTurns;         // 0x0E  message 11: a rotation in degrees, as quarter turns 0..3
-    u8   aColorA[4];            // 0x10  message 6: red, green, blue, alpha
-    u8   aColorB[4];            // 0x14  message 7
+    u16  nSegments;             // 0x0C  message 8
+    u16  nQuarterTurns;         // 0x0E  message 11: a rotation in degrees, as quarter turns 0..3
+    GXColor colorA;             // 0x10  message 6 (fn_80102AC8 copies it whole)
+    GXColor colorB;             // 0x14  message 7
     f32  v18[2];                // 0x18  message 5
     f32  v20[2];                // 0x20  message 1
     f32  v28[2];                // 0x28  message 2
