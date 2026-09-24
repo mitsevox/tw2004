@@ -9,8 +9,6 @@
 #include "golfer.h"
 #include "ball.h"
 
-void fn_800A746C(int a, int b, int c, int d, int e);
-
 u8 lbl_80282491;                        // set when the session is split screen (fn_8010D3B8)
 
 // ---- sweep code (not yet cleaned up) ----
@@ -138,7 +136,8 @@ void fn_8010D3D8(int nPlayer) {
     Player* pPlayer = &gPlayers[nPlayer];
 
     if (pPlayer->ball.nSurface == 155) {
-        fn_800A746C(1, 0, 0, 0, 0);
+        // port: EA passes two arguments fn_800A746C ignores
+        ((void (*)(s32, int, int, int, int))fn_800A746C)(1, 0, 0, 0, 0);
     }
 }
 
