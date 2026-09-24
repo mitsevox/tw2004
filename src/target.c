@@ -592,6 +592,253 @@ void fn_80069C64(char* sz, f32 fX, f32 fY) {
     fn_800128F8(sz, fX, fY);
 }
 
+f32  fn_8001414C(u8* p);    // GoRenderCtx_Gc.c: of the screen rectangle
+void fn_80012C84(int a);
+
+// Each frame while the ball is being placed: the bobbing marker ball and its shadow at the
+// placement point, kept inside the camera's view, and the distances to the tee, the ball and the
+// hole below it (the text red when the ball can't go there). A mode whose pfn230 says so, with
+// nC3C's bit 0 set, is placing its ball rather than a tee: no text then.
+void fn_80069CDC(int nPlayer) {
+    char  szText[128];          // size unknown
+    f32   aMarker[4][4];
+    f32   aShadow[4][4];
+    f32   aMarkerQuad[4][3];
+    f32   aUV[16] = {0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f,
+                     0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f};
+    f32   aShadowQuad[4][3];
+    f32   vDir[4];
+    f32   vRel[4];
+    f32   vUp[4] = {0.0f, 0.0f, 1.0f, 0.0f};
+    f32   vCross[4];
+    f32   vPos[4];
+    f32   vTeeDir[4];
+    f32   vHoleDir[4];
+    f32   vBallDir[4];
+    f32   fX;
+    f32   fY;
+    f32   fCos;
+    f32   fSin;
+    f32   fTeeDist;
+    f32   fHoleDist;
+    f32   fBallDist;
+    f32   fHalfFov;
+    f32   fCos2;
+    f32   fDotX;
+    f32   fDotZ;
+    f32   fA;
+    f32   fB;
+    f32   fC;
+    f32   fDisc;
+    f32   fDenom;
+    f32   fLow;
+    f32   fHigh;
+    f32   fHeight;
+    f32   fOld;
+    f32   fSize;
+    f32   fShadow;
+    View* pView;
+    f32*  pCamPos;
+    f32*  pLook;
+    void* pCamera;
+    int   i;
+    u8    bInBounds;
+    u8    bBall;
+
+    bBall = 0;
+    pCamera = fn_80017004(gPlayers[nPlayer].nView[0]);
+    fSize = lbl_801D5BF0[nPlayer].f24;
+    fShadow = lbl_801D5BF0[nPlayer].f1C;
+    aMarkerQuad[0][0] = 0.0f;
+    aMarkerQuad[0][1] = fSize;
+    aMarkerQuad[0][2] = -fSize;
+    aMarkerQuad[1][0] = 0.0f;
+    aMarkerQuad[1][1] = fSize;
+    aMarkerQuad[1][2] = fSize;
+    aMarkerQuad[2][0] = 0.0f;
+    aMarkerQuad[2][1] = -fSize;
+    aMarkerQuad[2][2] = -fSize;
+    aMarkerQuad[3][0] = 0.0f;
+    aMarkerQuad[3][1] = -fSize;
+    aMarkerQuad[3][2] = fSize;
+    aShadowQuad[0][0] = fShadow;
+    aShadowQuad[0][1] = 0.0f;
+    aShadowQuad[0][2] = -fShadow;
+    aShadowQuad[1][0] = fShadow;
+    aShadowQuad[1][1] = 0.0f;
+    aShadowQuad[1][2] = fShadow;
+    aShadowQuad[2][0] = -fShadow;
+    aShadowQuad[2][1] = 0.0f;
+    aShadowQuad[2][2] = -fShadow;
+    aShadowQuad[3][0] = -fShadow;
+    aShadowQuad[3][1] = 0.0f;
+    aShadowQuad[3][2] = fShadow;
+    if (gSession.nPaused != 0) {
+        return;
+    }
+    if (gpGame->pfn230(nPlayer)) {
+        if (!(gPlayers[nPlayer].nC3C & 1) || gSession.nPaused != 0) {
+            return;
+        }
+        bBall = 1;
+    }
+
+    Vec_Copy(gPlayers[nPlayer].vPlacement, vPos);
+    if (bBall) {
+        fn_8006A988(vPos, gPlayers[nPlayer].ball.vPos, vBallDir);
+        fBallDist = fn_80009680(vBallDir[0] * vBallDir[0] + vBallDir[2] * vBallDir[2]);
+    } else {
+        fn_8006A988(vPos, gPlayers[nPlayer].vA44, vTeeDir);
+        fTeeDist = fn_80009680(vTeeDir[0] * vTeeDir[0] + vTeeDir[2] * vTeeDir[2]);
+    }
+    fn_8006A988(vPos, gpGame->p130, vHoleDir);
+    fHoleDist = fn_80009680(vHoleDir[0] * vHoleDir[0] + vHoleDir[2] * vHoleDir[2]);
+    bInBounds = Ter_PointInOOBNetwork(vPos);
+
+    // the marker faces the camera: turned about y by the camera's heading
+    pView = fn_80017028(gPlayers[nPlayer].nView[0]);
+    pCamPos = fn_8001731C(pView);
+    pLook = fn_80017314(pView);
+    Vec_Distance(pCamPos, vPos);
+    fn_8006A964(pLook, pCamPos, vDir);
+    vDir[1] = 0.0f;
+    if (0.0f == vDir[0] && 0.0f == vDir[2]) {
+        return;
+    }
+    fn_800BAF04(vDir, vDir);
+    fCos = fn_8000C5FC(vUp, vDir);
+    vec4flt_CrossProduct(vDir, vUp, vCross);
+    if (fCos < -1.0f) {
+        fCos = -1.0f;
+    } else if (fCos > 1.0f) {
+        fCos = 1.0f;
+    }
+    fSin = fn_80009680(1.0f - fCos * fCos);
+    if (vCross[1] < 0.0f) {
+        fSin = -fSin;
+    }
+    fn_80012F50(0, 6, 0x7F);
+    fn_80012F18(3);
+    fn_80035118(4, 5);
+    fn_8005CC64(lbl_80281E3C, lbl_80281E40);
+    fn_80014118(0x50);
+    fn_80012F34(0);
+    fn_80012EF8();
+    fn_8001425C(1);
+    for (i = 0; i < 4; i++) {
+        aMarker[i][2] = fCos * aMarkerQuad[i][0] + fSin * aMarkerQuad[i][2];
+        aMarker[i][0] = -fSin * aMarkerQuad[i][0] + fCos * aMarkerQuad[i][2];
+        aMarker[i][1] = aMarkerQuad[i][1];
+    }
+
+    // the marker's height: kept where the camera can see it (within 3/4 of its field of view)
+    fHalfFov = fn_80014278(fn_8001F004());
+    fHalfFov = 0.75f * fHalfFov * fn_8001414C((u8*)fn_8003526C());
+    fn_8006A964(pView->v10, pView->v0, vDir);
+    if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
+        fn_800BAF04(vDir, vDir);
+    }
+    fn_8006A964(vPos, pView->v0, vRel);
+    fDotX = vDir[0] * vRel[0];
+    fDotZ = vDir[2] * vRel[2];
+    fCos2 = fn_80009638(fHalfFov / 2.0f - PI / 180.0f);
+    fCos2 *= fCos2;
+    fA = fCos2 - vDir[1] * vDir[1];
+    fB = -(2.0f * fDotX * vDir[1]) - 2.0f * fDotZ * vDir[1];
+    fC = vRel[0] * (vRel[0] * fCos2) + vRel[2] * (vRel[2] * fCos2) - fDotX * fDotX - fDotZ * fDotZ
+       - 2.0f * fDotX * fDotZ;
+    fDisc = fB * fB - 4.0f * fA * fC;
+    if (fDisc < 0.0f) {
+        fDenom = 0.0f;
+    } else {
+        fDisc = fn_80009680(fDisc);
+        fDenom = 2.0f * fA;
+    }
+    if (0.0f != fDenom) {
+        fHigh = (-fB + fDisc) / fDenom;
+        fOld = (-fB - fDisc) / fDenom;
+        if (fHigh < fOld) {
+            fLow = fHigh;
+            fHigh = fOld;
+        } else {
+            fLow = fOld;
+        }
+    } else {
+        fLow = -1000000.0f;
+        fHigh = 1000000.0f;
+    }
+    fLow += pCamPos[1];
+    fHigh += pCamPos[1];
+    if (vPos[1] < fLow) {
+        fHeight = fLow;
+    } else if (vPos[1] > fHigh - lbl_801D5BF0[nPlayer].f18) {
+        fHeight = fHigh - lbl_801D5BF0[nPlayer].f18;
+    } else {
+        fHeight = vPos[1];
+    }
+    for (i = 0; i < 4; i++) {
+        aMarker[i][0] = vPos[0] + aMarker[i][0];
+        aMarker[i][1] = fHeight + aMarker[i][1] - lbl_801D5BF0[nPlayer].f14;
+        aMarker[i][2] = vPos[2] + aMarker[i][2];
+        aMarker[i][3] = 1.0f;
+        aShadow[i][0] = vPos[0] + aShadowQuad[i][0];
+        aShadow[i][1] = vPos[1] + aShadowQuad[i][1] + lbl_801D5BF0[nPlayer].f20;
+        aShadow[i][2] = vPos[2] + aShadowQuad[i][2];
+        aShadow[i][3] = 1.0f;
+    }
+
+    // the bob: f4 runs between 0 and f18 at f0 a frame, and the shadow shrinks as it rises
+    if (0.0f != lbl_801D5BF0[nPlayer].f0) {
+        fOld = lbl_801D5BF0[nPlayer].f4;
+        lbl_801D5BF0[nPlayer].f4 = fOld + lbl_801D5BF0[nPlayer].f0;
+        aMarker[0][1] -= fOld;
+        aMarker[1][1] -= fOld;
+        aMarker[2][1] -= fOld;
+        aMarker[3][1] -= fOld;
+        if (lbl_801D5BF0[nPlayer].f4 > lbl_801D5BF0[nPlayer].f18 || lbl_801D5BF0[nPlayer].f4 < 0.0f) {
+            lbl_801D5BF0[nPlayer].f0 = -lbl_801D5BF0[nPlayer].f0;
+        }
+        lbl_801D5BF0[nPlayer].f1C = 0.07f * -lbl_801D5BF0[nPlayer].f0 + lbl_801D5BF0[nPlayer].f1C;
+    }
+    fn_80014194(lbl_801887EC);
+    fn_8001644C(0x98, aMarker[0], NULL, aUV, 4);
+    fn_8005CC64(lbl_80281E34, lbl_80281E38);
+    fn_80012EF8();
+    fn_8001644C(0x98, aShadow[0], NULL, aUV, 4);
+    fn_80012F50(1, 6, 0x80);
+    fn_80012F18(3);
+    fn_80012F34(1);
+    fn_80014194(lbl_801887CC);
+    fn_80012EF8();
+
+    if (!bBall) {
+        // the distances, under the marker and kept on screen
+        fn_80012C84(0);
+        if (bInBounds && (gPlayers[nPlayer].uFlagsEF0 & 1)) {
+            fn_8006A9AC(lbl_801887CC);
+        } else {
+            fn_8006A9AC(lbl_801887DC);
+        }
+        fn_8006434C(pCamera, vPos, &fX, &fY, NULL);
+        fn_8006A8D4(pCamera, &fX, &fY);
+        fY -= 3.0f * fn_8006A9FC();
+        if (fY < 3.0f * fn_8006A9FC()) {
+            fY = 3.0f * fn_8006A9FC();
+        } else if (fY > 1.0f - 3.0f * fn_8006A9FC()) {
+            fY = 1.0f - 3.0f * fn_8006A9FC();
+        }
+        if (bBall) {
+            sprintf(szText, "Ball %0.0fyds", fBallDist);
+        } else {
+            sprintf(szText, "Tee %0.0fyds", fTeeDist);
+        }
+        fn_80069C64(szText, fX, fY);
+        fY += fn_8006A9FC();
+        sprintf(szText, "Hole %0.0fyds", fHoleDist);
+        fn_80069C64(szText, fX, fY);
+    }
+}
+
 // fA88: the heading from the game's point (gpGame->p130) to the placement point, less a quarter
 // turn; and the aim marker's usual settings.
 void fn_8006A6C4(int nPlayer) {
