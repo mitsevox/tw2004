@@ -9,6 +9,7 @@
 
 int  PADInit(void);
 u32  PADRead(PadStatus* pStatus);       // all four pads; returns the pads that answered
+void PADClamp(PadStatus* pStatus);      // all four pads' sticks and triggers into range
 int  PADReset(u32 uMask);               // uMask: 0x80000000 >> n for pad n
 void PADControlMotor(int nChan, u32 uCommand);   // 0: stop, 1: rumble
 u32  SIProbe(int nChan);                // the device type on a port
