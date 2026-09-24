@@ -3,9 +3,11 @@
 // (0x34 bytes each, lbl_801F2740) found by id (fn_800AD674). Most calls check the instance exists,
 // then pass on to the functions at 0x800A8200-0x800A8524. Its extent is its data: it is the first
 // to use the .bss at 0x801F2668 and the .sdata2 block 0x80284008-0x80284018.
-// Not yet decompiled: the functions below are the sweep's.
+// An instance's pCmd is its AudTable.c entry (fn_800A7C30's AudSource, the same number).
 
 #include "core/audtrack.h"
+#include "golfer.h"
+#include "unsorted/cull.h"
 
 AudInstance* fn_800AD674(u8 nId);
 void fn_800AD800(u8 nId, f32* pPos, f32* pLast, u8 nView);
@@ -192,6 +194,49 @@ void fn_800AD790(u8 nId, u8 nTrack, u32 uParams) {
     if (pInst != NULL) {
         pInst->pCmd->auParams[nTrack] = uParams;
         pInst->pCmd->uChanged |= (u8)(1 << nTrack);
+    }
+}
+
+// Moves instance nId to pPos (NULL: where it is), its old position into pLast (when not NULL),
+// and works out where each view in use hears it: with n28 0 in the view's camera space, else as
+// it is for view nView and far above (0, 10000, 0) for the other.
+// EA bug: with pPos NULL and no view in use, pPos is still NULL at the last Vec3Copy.
+void fn_800AD800(u8 nId, f32* pPos, f32* pLast, u8 nView) {
+    int i;
+    AudInstance* pInst;
+    CamLens* pLens;
+    f32* pRel;
+    Vec4 vRel;
+
+    pInst = fn_800AD674(nId);
+    if (pInst != NULL) {
+        for (i = 0; i < 2; i++) {
+            if ((gSession.nGameType == 3 || fn_800170A0(i)) && fn_80017004(i) != NULL) {
+                pLens = ((Camera*)fn_80017004(i))->unk10;
+                if (pPos == NULL) {
+                    pPos = pInst->vPos;
+                }
+                if (pInst->n28 == 0) {
+                    fn_800BAD60(pLens->m44, (Vec4*)pPos, &vRel);
+                    pRel = &vRel.x;
+                } else if (i == nView) {
+                    pRel = pPos;
+                } else {
+                    pRel = &vRel.x;
+                    vRel.x = 0.0f;
+                    vRel.y = 10000.0f;
+                    vRel.z = 0.0f;
+                }
+                pInst->pCmd->aPos[i][0] = pRel[0];
+                pInst->pCmd->aPos[i][1] = pRel[1];
+                pInst->pCmd->aPos[i][2] = pRel[2];
+            }
+        }
+        if (pLast != NULL) {
+            Vec3Copy(pInst->vPos, pLast);
+        }
+        Vec3Copy(pPos, pInst->vPos);
+        pInst->pCmd->uChanged |= 0x400;
     }
 }
 
