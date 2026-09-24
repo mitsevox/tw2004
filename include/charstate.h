@@ -137,12 +137,12 @@ LAYOUT_ASSERT(SkinDescB8, 0x10);
 typedef struct SkinDesc {
     s32  nVersion;              // 0x000  8
     s32  n04;                   // 0x004
-    u8   unk08[4];
+    s32  n08;                   // 0x008  a burnt one's size, in bytes (fn_80111850)
     u32  uFlags;                // 0x00C  bit 1: its offsets are pointers now
     s32  n10;                   // 0x010  entries in p14 and p18
     SkinDesc14* p14;            // 0x014
     u8*  p18;                   // 0x018  0x1C bytes each
-    u8   unk1C[4];
+    s32  n1C;                   // 0x01C  entries in p20
     s32* p20;                   // 0x020
     s32  n24;                   // 0x024  entries in p28
     SkinDesc28* p28;            // 0x028
@@ -156,11 +156,11 @@ typedef struct SkinDesc {
     SkinDesc44* p44;            // 0x044
     s32  nParts;                // 0x048
     SkinPartDef* pParts;        // 0x04C
-    u8   unk50[4];
+    s32  nVariants;             // 0x050
     SkinVariant* pVariants;     // 0x054
     s32  n58;                   // 0x058  entries in p5C
     SkinDesc5C* p5C;            // 0x05C
-    u8   unk60[4];
+    s32  nLinks;                // 0x060
     SkinLink* pLinks;           // 0x064
     s32  n68;                   // 0x068  entries in p6C
     s32* p6C;                  // 0x06C  entries of p44, -1 none
@@ -168,17 +168,20 @@ typedef struct SkinDesc {
     SkinDesc74* p74;            // 0x074
     s32  n78;                   // 0x078  entries in p7C
     SkinDesc7C* p7C;            // 0x07C
-    u8   unk80[4];
+    s32  n80;                   // 0x080  entries in p84 (fn_80111850 clears both)
     u64* p84;                   // 0x084  name codes
     s32  n88;                   // 0x088  entries in p8C
     SkinDesc8C* p8C;            // 0x08C
-    u8   unk90[0x9C - 0x90];
+    s32  n90;                   // 0x090  entries in p94
+    u8*  p94;                   // 0x094  0x50 bytes each
+    u8   unk98[4];
     u8*  p9C;                   // 0x09C
-    u8   unkA0[4];
-    u8*  pA4;                   // 0x0A4
-    u8   unkA8[4];
-    u8*  pAC;                   // 0x0AC
-    u8   unkB0[0xB8 - 0xB0];
+    s32  nA0;                   // 0x0A0  entries in pA4
+    u8*  pA4;                   // 0x0A4  2 bytes each
+    s32  nA8;                   // 0x0A8  entries in pAC
+    u8*  pAC;                   // 0x0AC  2 bytes each
+    u8   unkB0[4];
+    s32  nB4;                   // 0x0B4  entries in pB8
     SkinDescB8* pB8;            // 0x0B8
     u8   unkBC[0x120 - 0xBC];
 } SkinDesc;
