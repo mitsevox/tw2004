@@ -868,8 +868,7 @@ int fn_800CB568(int nId) {
 u8 fn_800CB5B0(int nPlayer, Clip* pClip) {
     if (lbl_80282278 != nPlayer) return 1;
     if (fn_80073554(&gPlayers[nPlayer].pChar->blend, pClip)) return 0;
-    // node3E0 is still bytes in Character (its type is not known yet); it holds a blend node
-    if (fn_80073610((SKABlendNode*)gPlayers[nPlayer].pChar->node3E0, pClip->pF4)) return 0;
+    if (fn_80073610(&gPlayers[nPlayer].pChar->node3E0, pClip->pF4)) return 0;
     if (gPlayers[nPlayer].pChar->p1790 == pClip || gPlayers[nPlayer].pChar->p1794 == pClip) return 0;
     return 1;
 }
