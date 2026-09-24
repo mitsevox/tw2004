@@ -1,7 +1,10 @@
 // LLDynTex.c (EA's name, from its asserts): textures whose pixels the game rewrites while they are
-// shown; the menu golfer (FEgolferanim.c) drives them. Not yet decompiled beyond the sweep code.
+// shown; the menu golfer (FEgolferanim.c) drives them, and char_tex_manager.c puts the user logos
+// in them. Partly decompiled.
 
 #include "engine.h"
+#include "gx.h"
+#include "core/startup.h"
 #include "lldyntex.h"
 
 // ---- sweep code (not yet cleaned up) ----
@@ -9,7 +12,6 @@
 void fn_8001052C(s16 n);
 void fn_8010A668(DynTex* pTex);
 void* fn_8010A780(DynTex* pTex);
-s32 fn_8010AD10(DynTex* pTex);
 void fn_8010B098(void* arg0);
 s32 fn_8010C458(s16);
 s32 fn_8010B664(void* arg0);
@@ -18,6 +20,8 @@ void fn_8000FBAC();
 // ---- end of sweep code ----
 
 void fn_8010B7C0(void);
+void fn_8010A930(DynTexObj* pObj, u8* pBuf, void* p, s32 n);
+DynTexJob* fn_8010B960(void);
 
 // Set up: the state and its nSize-byte block (gomainloop.c: 0x18000, later 0x6000).
 void fn_8010A448(int nSize) {
@@ -54,6 +58,108 @@ void* fn_8010A780(DynTex* pTex) {
 s32 fn_8010AD10(DynTex* pTex) {
     return pTex->n8;
 }
+
+// ---- end of sweep code ----
+
+u64 fn_8010AD18(DynTex* pTex, int nTex) {
+    if (nTex >= 0 && nTex < pTex->n8) {
+        return pTex->p0[nTex].uId;
+    }
+    return 0;
+}
+
+void fn_8010AD50(DynTex* pTex, u64 uId) {
+    int i;
+
+    for (i = 0; i < pTex->n8; i++) {
+        if (pTex->p0[i].uId == uId) {
+            pTex->p0[i].uId = 0;
+        }
+    }
+}
+
+// New pixels for texture nTex (pPixels holds its blocks back to back), each block flushed to the
+// GPU; p and n are handed to fn_8010A930 when p is set.
+void fn_8010B1D4(DynTex* pTex, int nTex, u8* pPixels, void* p, s32 n) {
+    DynTexEntry* pEntry = &pTex->p0[nTex];
+    DynTexObj* pObj = &pTex->p4->p8[nTex];
+    s32 nBase = pObj->aBlocks[0].nOffset;
+    int i;
+
+    for (i = 0; i < pEntry->n8; i++) {
+        if (pPixels != NULL) {
+            memcpy(pTex->p18 + pObj->aBlocks[i].nOffset,
+                   pPixels + (pObj->aBlocks[i].nOffset - nBase), pEntry->aC[i]);
+        }
+        if (p != NULL) {
+            fn_8010A930(pObj, pTex->p18, p, n);
+        }
+        DCFlushRange(pTex->p18 + pObj->aBlocks[i].nOffset, pEntry->aC[i]);
+        GXInvalidateTexAll();
+    }
+}
+
+// A new palette for texture nTex.
+void fn_8010B2A8(DynTex* pTex, int nTex, s16* pPalette) {
+    DynTexPalette* aPalettes = pTex->p4->pC;
+    DynTexEntry* pEntry = &pTex->p0[nTex];
+
+    if (pPalette != NULL) {
+        memcpy(pTex->p18 + aPalettes[nTex].nOffset, pPalette, pEntry->n1C);
+    }
+    DCFlushRange(pTex->p18 + aPalettes[nTex].nOffset, pEntry->n1C);
+    GXInvalidateTexAll();
+}
+
+// A free job, or NULL.
+DynTexJob* fn_8010B8EC(void) {
+    int i;
+
+    for (i = 0; i < 10; i++) {
+        if (!lbl_80282488->aJobs[i].bUsed) {
+            return &lbl_80282488->aJobs[i];
+        }
+    }
+    return NULL;
+}
+
+// Queue a job.
+void fn_8010B930(DynTexJob* pJob) {
+    lbl_80282488->apQueue[lbl_80282488->nA84] = pJob;
+    pJob->bUsed = 1;
+    lbl_80282488->nA84++;
+}
+
+// Take the first queued job off the queue.
+DynTexJob* fn_8010B960(void) {
+    int i;
+    DynTexJob* pJob = lbl_80282488->apQueue[0];
+
+    for (i = 0; i < lbl_80282488->nA84; i++) {
+        if (i == 9) {
+            lbl_80282488->apQueue[i] = NULL;
+        } else {
+            lbl_80282488->apQueue[i] = lbl_80282488->apQueue[i + 1];
+        }
+    }
+    lbl_80282488->nA84--;
+    return pJob;
+}
+
+// Free every job: the one in pA88 and all queued ones.
+void fn_8010B9BC(void) {
+    if (lbl_80282488->pA88 != NULL) {
+        lbl_80282488->pA88->bUsed = 0;
+    }
+    while (lbl_80282488->nA84 != 0) {
+        fn_8010B960()->bUsed = 0;
+    }
+    if (lbl_80282488->n980 != 0) {
+        lbl_80282488->n980 = 3;
+    }
+}
+
+// ---- sweep code (not yet cleaned up) ----
 
 void fn_8010B098(void* arg0) {
     if (arg0 != NULL) {
