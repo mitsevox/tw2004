@@ -1,5 +1,5 @@
 // GameMode11.c (our name): game mode 11, the lessons. One player on hole 14 of course 10; eleven
-// lessons (lbl_802823FC, 1..11; 12 when all are done), each a shot from a set spot with a required
+// lessons (lbl_802823FC, 1..11; 12 when all are done), each a shot from a set spot with its own
 // shot kind, club and shape (lbl_80192DF8). The mode saves some of the player's options when it
 // starts and puts them back when it ends. Golfer.c, Swing.c and skalib.c ask it what the lesson
 // allows.
@@ -11,7 +11,8 @@
 
 // fake match: the (s8) on GOLFERSTATE_GetCurrentState (see game.h).
 
-// One lesson: where the ball is placed and what the shot must be (lessons 1..11; 12 is the end).
+// One lesson: where the ball is placed and the shot kind, club and shape it sets (lessons 1..11;
+// 12 is the end).
 typedef struct Lesson {
     f32 vPos[4];                // 0x00  (-1, -1, -1): the ball stays on the tee
     s32 nShotKind;              // 0x10  8 = any
@@ -71,8 +72,8 @@ extern u8  lbl_802823E5;
 extern u32 lbl_802823E8;                    // picks which message of a list is shown
 extern s32 lbl_802823EC;                    // the wind option, saved while the mode runs
 extern u8  lbl_802823F0;
-extern u8  lbl_802823F1;                    // the aim hints are showing
-extern u8  lbl_802823F2;                    // which of the two aim hints is showing
+extern u8  lbl_802823F1;                    // the player's try has set up its hints
+extern u8  lbl_802823F2;                    // which of the two alternating hints is showing
 extern s32 lbl_802823F4;
 extern u8  lbl_802823F8;
 extern f32 lbl_80282400;                    // lessons 8 and 9 test its sign
@@ -83,7 +84,7 @@ extern u8  lbl_8028240A;                    // options unk84, saved
 extern u8  lbl_8028240B;                    // options unk0[4], saved
 extern s32 lbl_8028240C;                    // the highlighted one of four hints (4 = none yet)
 extern s32 lbl_80282410;                    // frames until the next highlight
-extern s32 lbl_80282414;                    // frames until the aim hints swap
+extern s32 lbl_80282414;                    // frames until the two alternating hints swap
 extern s32 lbl_80282418;
 extern s32 lbl_8028241C;
 extern s32 lbl_80282420;                    // the lesson's row in lbl_80192F2C
@@ -115,8 +116,9 @@ void fn_801008F8(void);
 void fn_80101F70(void);
 void fn_80101F94(int a, int b);
 
-// Mode 11 starts: one player, most of the round's rules off, a fixed random seed. The player's
-// options that the lessons override are saved first.
+// Mode 11 starts: its callbacks, the yardage, stroke-limit, gimme and other round flags off, n290,
+// nC, n10 and b276 set to 1, a fixed random seed. The player's options that the lessons override
+// are saved first.
 void fn_800FFF34(void) {
     gpGame->pfnInit = fn_800FFF34;
     gpGame->pfnShutdown = fn_80100230;
@@ -178,7 +180,7 @@ void fn_80100128(void) {
 }
 
 // Round setup: course 10, hole 14 only, one CPU-controlled player (golfer 1), no mulligans, and
-// the options' unkC and wind saved and replaced.
+// the options' nC and wind saved and replaced.
 void fn_80100160(void) {
     fn_800E14E0(10);
     fn_800E1260(0);
@@ -236,7 +238,7 @@ void fn_80100308(void) {
     }
 }
 
-// On to the next lesson: its row of messages and two counts.
+// On to the next lesson: its row of messages and the two values fn_80101F40 later sends.
 void fn_80100328(void) {
     switch (++lbl_802823FC) {
     case 1:
@@ -347,7 +349,7 @@ void fn_80100508(void) {
     gPlayers[0].nController = CONTROLLER_CPU;
 }
 
-// The shape the lesson requires, 7 (any) outside mode 11.
+// The shape the lesson sets, 7 (any) outside mode 11.
 int fn_8010069C(int nPlayer) {
     int n = lbl_802823FC - 1;
     if (Game_GetMode() != 11) {
@@ -356,7 +358,7 @@ int fn_8010069C(int nPlayer) {
     return lbl_80192DF8[n].nShape;
 }
 
-// The club the lesson requires, 26 (any) outside mode 11.
+// The club the lesson sets, 26 (any) outside mode 11.
 int fn_801006F0(int nPlayer) {
     int n = lbl_802823FC - 1;
     if (Game_GetMode() != 11) {
@@ -365,7 +367,7 @@ int fn_801006F0(int nPlayer) {
     return lbl_80192DF8[n].nClub;
 }
 
-// The shot kind the lesson requires, 8 (any) outside mode 11.
+// The shot kind the lesson sets, 8 (any) outside mode 11.
 int fn_80100744(void) {
     int n = lbl_802823FC - 1;
     if (Game_GetMode() != 11) {
@@ -374,8 +376,8 @@ int fn_80100744(void) {
     return lbl_80192DF8[n].nShotKind;
 }
 
-// Shows the next message of one of the lesson's lists, skipping empty entries; nonzero if there
-// was one.
+// Plays the next message of one of the lesson's lists (fn_80101FC0), skipping empty entries;
+// nonzero if there was one.
 int fn_80100798(int nList, int nCount) {
     s16* pList = &lbl_80192F2C[lbl_80282420] + nList;
     u32 i = lbl_802823E8 % nCount;
@@ -399,7 +401,7 @@ int fn_80100798(int nList, int nCount) {
     return !(pList[i] == -1);
 }
 
-// The lesson's demonstration animation (none outside lessons 1..11).
+// The lesson's animation, the demonstration's before step 6 (none outside lessons 1..11).
 char* fn_801008A8(void) {
     if (lbl_802823FC > 0 && lbl_802823FC < 12) {
         if (lbl_80282428 >= 6) {
@@ -410,8 +412,8 @@ char* fn_801008A8(void) {
     return 0;
 }
 
-// The player tries the lesson again: the ball back at its spot and the golfer reset, at step 7 (the
-// player's try; the demonstration is steps 2..5).
+// The player's try starts: the ball back at the lesson's spot, the golfer back to pre-shot with
+// player 0's controller, step 7 (the player's try; the demonstration is steps 2..5).
 void fn_801008F8(void) {
     fn_80101F40(0, 0);
     fn_800E5200(-1);
@@ -511,8 +513,9 @@ static inline int Hint(void) {
 }
 
 // Every frame: the lesson's steps (lbl_80282428). 2..5 set up a lesson and its demonstration, 6 and
-// 7 the player's tries with their hints, 8..11 a failed try, 12 a passed one, 13..19 the screens
-// between lessons.
+// 7 the player's tries with their hints, 8..11 a failed try, 12 a passed one; 0, 1 and 18 wait (a
+// button, the message, the camera), 14..16 end the turn, 13 quits, 19 follows lesson 7 (then 17:
+// continue or quit) and the last lesson.
 void fn_80100C08(void) {
     f32 v[4] = {0.0f, 0.0f, 0.0f, 0.5f};
     int nView;
@@ -845,7 +848,8 @@ u8 fn_80101738(void) {
 }
 
 // Judges the lesson's shot: too short (step 9), off target (step 8), a lesson-specific fault
-// (step 10), several faults (step 11), or passed (step 12). Each fault counts one more try.
+// (step 10), several faults (step 11), or passed (step 12). A failed shot adds one to lbl_802823E8;
+// the demonstration's shot (step 5) only moves on to step 16.
 void fn_8010179C(void) {
     u8 bShort = 0;
     u8 bMissed = 0;
@@ -955,8 +959,8 @@ void fn_8010179C(void) {
     }
 }
 
-// A swing event during a lesson; nonzero blocks it. Event 10 changes the music, 32 and 34 end the
-// shot (it is judged), 45 and 46 are what lessons 10 and 11 wait for.
+// An event (event.c's numbers) during a lesson; nonzero blocks it. Event 10 changes the music, 32
+// and 34 end the shot (it is judged), 45 and 46 are what lessons 10 and 11 wait for.
 u8 fn_80101AA8(int nPlayer, int nEvent) {
     if (!fn_80100294()) {
         return 0;
@@ -1009,7 +1013,7 @@ u8 fn_80101AA8(int nPlayer, int nEvent) {
     return 0;
 }
 
-// HoleFinished: lesson 12 is over unless its step is 19.
+// HoleFinished: once the lessons are done (lesson 12), unless the step is 19.
 u8 fn_80101C9C(int nPlayer, u8 bCheck) {
     if (lbl_802823FC == 12 && lbl_80282428 != 19) {
         return 1;
@@ -1017,7 +1021,7 @@ u8 fn_80101C9C(int nPlayer, u8 bCheck) {
     return 0;
 }
 
-// GameFinished: after lesson 12.
+// GameFinished: once the lessons are done (lesson 12).
 u8 fn_80101CC4(u8 bCheck) {
     return lbl_802823FC == 12;
 }
@@ -1057,7 +1061,7 @@ u8 fn_80101DF4(void) {
     return 1;
 }
 
-// Is this one of the lessons' demonstration animations?
+// Is this one of the lessons' animations?
 u8 fn_80101E34(char* szName) {
     int i;
     if (szName == 0) {
@@ -1075,7 +1079,7 @@ void fn_80101EDC(void) {
     lbl_802823F8 = 1;
 }
 
-// Round setup again, then player 0 is handed to the first controller.
+// Round setup (fn_80100160), then player 0 is handed to the first controller.
 void fn_80101EE8(void) {
     fn_80100160();
     gPlayers[0].nController = 0;

@@ -1,6 +1,6 @@
 // HoleScore.c (our name; TW06's golf/gamemode/analysisutilities.c, medium evidence: TW06 names
 // Hole_ScoreAfterTapIn GameAnalysis_IsPuttFor): per-player round analysis for the situation
-// scripts, the earnings and the game modes: distances to the pin, the lie the shot started from,
+// scripts, the earnings and the game modes: distances to the pin, the ground the shot started from,
 // and counts and streaks of holes by score against par.
 
 #include "golfer.h"
@@ -262,7 +262,7 @@ u8 fn_800CF848(int nPlayer) {
 // For a human player, the course records (gSession.aCourseRecord, kind k's best) this shot
 // keeps in reach, as bits, each only while goals of its kind count (fn_800D8DB4) and, but for
 // kinds 1 and 2, outside a playoff: 0x1 on the last hole, the round would beat kind 0's with the
-// tap-in; 0x2 the ball is on the tee; 0x4 on the green or fringe, a drive of 3 x fA64 beats kind
+// tap-in; 0x2 the ball is on the tee; 0x4 on the green or fringe, a putt of 3 x fA64 beats kind
 // 2's; 0x8 off the green two under par or better, one more of fn_800D1170 beats kind 3's; 0x10
 // on the last hole, the round's putts (one more on the green or fringe) beat kind 4's; 0x20 on
 // the tee of a par 4 or 5, one more of fn_800D0FBC beats kind 5's; 0x40 and 0x80 two under / one
@@ -327,8 +327,8 @@ u32 fn_800CF904(int nPlayer) {
     return uFlags;
 }
 
-// Runs the shot, putt and (outside a playoff) hole checks of Earnings.c for the player as if
-// counting (b 1) and returns the ids 0..22 they list, as a bit set.
+// Runs the shot, putt and (outside a playoff) hole checks of Earnings.c for the player as a
+// preview (bPreview 1) and returns the ids 0..22 they list, as a bit set.
 u32 fn_800CFD58(int nPlayer) {
     u32 uIds = 0;
     u32 nId;
@@ -950,7 +950,7 @@ int fn_800D1330(int nPlayer) {
     return nPutts;
 }
 
-// Where the wind blows from the player's aim, by quarter: 2 within 45 degrees of the aim, 4 the
+// The wind's heading against the player's aim, by quarter: 2 within 45 degrees of the aim, 4 the
 // next quarter round, 1 the opposite quarter, 3 the last; 0 when the wind is 6 or less.
 int fn_800D13F4(int nPlayer) {
     f32 vWind[4];
@@ -983,7 +983,7 @@ int fn_800D13F4(int nPlayer) {
 }
 
 // The slope of the ground under the ball across the player's aim, in whole degrees (+-90 when the
-// ground's normal has no part along the aim); 0 with no ground or a normal not of length 1.
+// ground's normal has no upward part); 0 with no ground or a normal not of length 1.
 int fn_800D1530(int nPlayer) {
     f32 vNormal[4];
     f32 vTurned[4];

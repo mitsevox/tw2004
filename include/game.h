@@ -762,7 +762,7 @@ u8   fn_80100C00(void);
 u8   fn_80101738(void);
 u8   fn_80101AA8(int nPlayer, int nEvent);  // an event (event.c's numbers) in a lesson; nonzero blocks it
 u8   fn_80101D4C(int nPlayer);          // a CPU in game mode 11 is always lucky
-u8   fn_80101E34(char* szName);         // one of the lessons' demonstration animations
+u8   fn_80101E34(char* szName);         // one of the lessons' animations
 void fn_80101EDC(void);
 
 u8   fn_801025F4(void);
