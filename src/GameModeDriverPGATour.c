@@ -39,8 +39,8 @@ s32  GameModeDriverPGATour_GetCurrentLead(int nPlayer);
 s32  GameModeDriverPGATour_GetPotentialLead(int nPlayer);
 s32  fn_800EE8B0(int nPlayer);
 void fn_800EEA3C(int nPlayer);
-s32  fn_800EF0E0(s32 nPlayer);
-void fn_800EF130(s32 nPlayer, u8 bQuick);
+s32  fn_800EF0E0(int nPlayer);
+void fn_800EF130(int nPlayer, u8 bQuick);
 void fn_800EF294(void);
 void GameModeDriverPGATour_EndHole(void);
 u8   GameModeDriverPGATour_GameFinished(u8 bCheck);
@@ -447,14 +447,14 @@ void fn_800EF094(int a, s32 n) {
 }
 
 // The player's bracket, 0..9: tournaments won x 10 / 31 (profile 0's awards; nPlayer is not read).
-s32 fn_800EF0E0(s32 nPlayer) {
+s32 fn_800EF0E0(int nPlayer) {
     s32 n = fn_800F02A8() * 10 / 31;
     return n > 9 ? 9 : n;
 }
 
 // The rounds of the current tournament not played yet are played out for the player: each round's
 // course is loaded and the round simulated (k 3 when bQuick is set). fn_800EF9D0 skips ahead with it.
-void fn_800EF130(s32 nPlayer, u8 bQuick) {
+void fn_800EF130(int nPlayer, u8 bQuick) {
     s32 nRounds = GameModeDriverPGATour_GetRounds(gpSaveData[nPlayer].tour.nEvent);
     Tournament* p = fn_800EFA70(gpSaveData[nPlayer].tour.nEvent);
     s32 k;

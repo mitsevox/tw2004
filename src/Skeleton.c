@@ -14,12 +14,12 @@ f32  fn_80026D18(CharModel* pModel, IKChain* pChain, f32* pTarget, int nLink, in
 void fn_800271A0(CharModel* pModel, IKChain* pChain);
 void fn_80027478(CharModel* pModel, IKChain* pChain);
 f32  fn_800275F4(CharModel* pModel, IKChain* pChain, f32* pTarget);   // an IK error (fn_800273BC)
-void fn_80008F20(f32* pQ, f32* pOut);                   // Quaternion.c
+void Quat_Invert(f32* pQ, f32* pOut);                   // Quaternion.c
 void fn_8001FBA4(f32* pA, f32* pB, f32* pOut, f32 fT);  // a blend of two points by fT
 void fn_8001FB00(f32* pA, f32* pB, f32* pOut, f32 fT);  // a blend of two rotations by fT
 void fn_800BAD60(f32 mtx[4][4], Vec4* src, Vec4* dst);  // VecMath.c: a point through a matrix
 void fn_8000A798(f32 (*pSrc)[4], f32 (*pDst)[4]);       // UMemPool.c: inverts a rotation+translation
-void fn_800089D4(f32 (*m)[4], f32* pQ);                 // Quaternion.c: a rotation matrix's quaternion
+void Quat_BuildFromMatrix(f32 (*m)[4], f32* pQ);                 // Quaternion.c: a rotation matrix's quaternion
 void Character_UpdateFeetTerrainInfo(Character* pChar, int bNormals);   // char.c
 void Character_PlaceFeetOnGround(Character* pChar);                     // char.c
 void fn_800BADF8(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);   // pDst = pSrc's rows
@@ -28,10 +28,10 @@ void fn_80113E60(void);                                 // DynChain.c
 void fn_80114080(void);                                 // DynChain.c
 void fn_80114398(struct DynChain* pChain);              // DynChain.c: frees a chain
 void fn_8011443C(CharModel* pModel, struct DynChain* pChain, f32 f);   // DynChain.c
-void fn_800090A0(f32* pA, f32* pB, f32* pOut);           // Quaternion.c
-void fn_800090E4(f32* pQuat, f32* pIn, f32* pOut);       // Quaternion.c: a vector turned by it
-void fn_800092F8(f32* pAxis, f32* pOut, f32 fAngle);     // Quaternion.c: an axis-angle rotation
-void fn_8000914C(f32* pQ, f32 (*pMtx)[4]);               // Quaternion.c: a rotation's matrix
+void Quat_Add(f32* pA, f32* pB, f32* pOut);           // Quaternion.c
+void Quat_RotateVector(f32* pQuat, f32* pIn, f32* pOut);       // Quaternion.c: a vector turned by it
+void Quat_BuildFromVectorAndScale(f32* pAxis, f32* pOut, f32 fAngle);     // Quaternion.c: an axis-angle rotation
+void Quat_QuatToMatrix(f32* pQ, f32 (*pMtx)[4]);               // Quaternion.c: a rotation's matrix
 void fn_8000A0E8(f32 (*pSrc)[4], f32 (*pDst)[4]);        // copies a matrix
 void fn_8000ADC0(f32 (*pMtx)[4]);                        // identity
 void fn_80029A00(CharModel* pModel, int nA, int nB, f32* pRot);
@@ -43,7 +43,7 @@ void fn_80029EF4(u32* pSrc, u32* pDst, u32 nBits);
 void fn_80029664(CharModel* pModel);
 void fn_80029804(CharModel* pModel);
 void SKEL_TransformBones(CharModel* pModel, u32* aBits);
-Skeleton* fn_80028314(CharModel* pModel, CharModelDefs* pDefs);
+Skeleton* SKEL_CreateIKSkeleton(CharModel* pModel, CharModelDefs* pDefs);
 struct DynChain* fn_80114270(CharModel* pModel, int nBone, s32 nType, s32 n10);   // DynChain.c
 
 char* lbl_80187418[5] = { "IGDriver", "IGputter", "IGiron3", "IGiron7", "IGwedge" };
@@ -62,13 +62,13 @@ u8 lbl_80281098[6] = { 0x3E, 0x41, 0x3B, 0x4C, 0x4F, 0x49 };
 u8 lbl_802810A0[6] = { 0x1F, 0x20, 0x21, 0x32, 0x33, 0x34 };
 u8 lbl_802810A6 = 1;
 
-// Poses the chain's links (those with f4 above 0) from their rotation vectors.
+// Turns the rotation vector v58 of each link with f4 above 0 into its bone's rotation in p20.
 void fn_80026B4C(Skeleton* pSkel, IKChain* pChain) {
     int i;
     for (i = 0; i < pChain->nLinks; i++) {
         IKLink* pLink = &pChain->pLinks[i];
         if (pLink->f4 > 0.0f) {
-            fn_8000923C(pLink->v58, pSkel->p20[pLink->nBone]);
+            Quat_BuildFromVector(pLink->v58, pSkel->p20[pLink->nBone]);
         }
     }
 }
@@ -92,18 +92,18 @@ void fn_80026BF4(CharModel* pModel, IKChain* pChain) {
         nBone = pLink->nBone;
         pPose = &pModel->pPoses[nBone];
         pPrev = &pModel->pPoses[pChain->pLinks[pLink->nPrev].nBone];
-        fn_800090E4(pPrev->q0, pLink->v28, vOffset);
-        fn_800090A0(pPrev->v10, vOffset, pPose->v10);
+        Quat_RotateVector(pPrev->q0, pLink->v28, vOffset);
+        Quat_Add(pPrev->v10, vOffset, pPose->v10);
         pPose->v10[3] = 0.0f;
-        fn_80008FCC(pSkel->p20[nBone], pLink->q18, qRot);
-        fn_80008FCC(qRot, pPrev->q0, pPose->q0);
+        Quat_Multiply(pSkel->p20[nBone], pLink->q18, qRot);
+        Quat_Multiply(qRot, pPrev->q0, pPose->q0);
     }
 }
 
 // One IK step (cyclic coordinate descent): from link nLink back to link n, turns each posed link
 // (f4 above 0) so the chain's end swings toward pTarget, by f4 of the angle between them and never
-// about the link's locked axis n8; the turn adds up in the link's rotation vector v58. Returns how
-// far the chain's end then is from pTarget.
+// about the bone's own y axis or the link's locked axis n8; the turn adds up in the link's rotation
+// vector v58. Returns how far the chain's end then is from pTarget.
 f32 fn_80026D18(CharModel* pModel, IKChain* pChain, f32* pTarget, int nLink, int n) {
     f32 vEnd[4];
     f32 vDiff[4];
@@ -140,10 +140,10 @@ f32 fn_80026D18(CharModel* pModel, IKChain* pChain, f32* pTarget, int nLink, int
                 fAngle = pLink->f4 * fn_80009614(fCos);
             }
             if (fabsf(fAngle) > PI / 5000.0f) {
-                // the turn's axis in the bone's own frame, without its locked component
+                // the turn's axis in the bone's own frame, without its y and locked (n8) components
                 vec4flt_CrossProduct(vToEnd, vToTarget, vAxis);
-                fn_80008F20(pModel->pPoses[nBone].q0, qInv);
-                fn_800090E4(qInv, vAxis, vLocal);
+                Quat_Invert(pModel->pPoses[nBone].q0, qInv);
+                Quat_RotateVector(qInv, vAxis, vLocal);
                 vLocal[3] = 0.0f;
                 vLocal[1] = 0.0f;
                 if (pLink->n8 >= 0) {
@@ -152,9 +152,9 @@ f32 fn_80026D18(CharModel* pModel, IKChain* pChain, f32* pTarget, int nLink, int
                 fn_800BAF04(vLocal, vLocal);
                 fn_8001EF34(vLocal, fAngle, vLocal);
                 fn_80029BF4(vLocal, pLink->v58, pLink->v58);
-                fn_800092F8(vLocal, qTurn, fAngle);
-                fn_800090E4(pModel->pPoses[nBone].q0, qTurn, qRot);
-                fn_800090E4(qRot, vToEnd, vTurned);
+                Quat_BuildFromVectorAndScale(vLocal, qTurn, fAngle);
+                Quat_RotateVector(pModel->pPoses[nBone].q0, qTurn, qRot);
+                Quat_RotateVector(qRot, vToEnd, vTurned);
                 fn_80029BF4(pModel->pPoses[nBone].v10, vTurned, vEnd);
             }
         }
@@ -192,7 +192,7 @@ void fn_8002703C(Skeleton* pSkel, IKChain* pChain, f32 fWeight) {
         int nBone = pChain->pLinks[i].nBone;
         fn_8001E85C(pSkel->p20[nBone], pSkel->p24[nBone]);
         if (fWeight < 1.0f) {
-            fn_8000883C(lbl_801C6498, pSkel->p24[nBone], fWeight);
+            Quat_Slerp(lbl_801C6498, pSkel->p24[nBone], fWeight);
             Vec_Normalize(pSkel->p24[nBone], pSkel->p24[nBone]);
         }
     }
@@ -250,11 +250,11 @@ void fn_800271A0(CharModel* pModel, IKChain* pChain) {
             fn_8001E85C(pBone->q0C, pLink->q18);
         }
         if (pPrevLink != NULL && pPrevLink->nBone != pBone->nParent) {
-            fn_80008F20(pModel->pPoses[nPrevBone].q0, qInv);
-            fn_80008FCC(pModel->pPoses[nBone].q0, qInv, pLink->q18);
+            Quat_Invert(pModel->pPoses[nPrevBone].q0, qInv);
+            Quat_Multiply(pModel->pPoses[nBone].q0, qInv, pLink->q18);
             fn_80029C3C(pModel->pPoses[nBone].v10, pModel->pPoses[nPrevBone].v10, vDelta);
             vDelta[3] = 0.0f;
-            fn_800090E4(qInv, vDelta, pLink->v28);
+            Quat_RotateVector(qInv, vDelta, pLink->v28);
             pLink->v28[3] = 0.0f;
             if (pBone->nParent < pChain->pLinks[0].nBone) {
                 fn_8001E85C(pLink->q18, pLink->q38);
@@ -318,24 +318,24 @@ void fn_80027478(CharModel* pModel, IKChain* pChain) {
             pPose = &pModel->pPoses[nBone];
             pPrev = &pModel->pPoses[nPrevBone];
             if (bKept) {
-                fn_800090E4(pPrev->q0, pLink->v48, vOffset);
-                fn_80008FCC(pLink->q38, pPrev->q0, pPose->q0);
+                Quat_RotateVector(pPrev->q0, pLink->v48, vOffset);
+                Quat_Multiply(pLink->q38, pPrev->q0, pPose->q0);
             } else {
-                fn_800090E4(pPrev->q0, pBone->v1C, vOffset);
-                fn_80008FCC(pBone->q0C, pPrev->q0, pPose->q0);
+                Quat_RotateVector(pPrev->q0, pBone->v1C, vOffset);
+                Quat_Multiply(pBone->q0C, pPrev->q0, pPose->q0);
             }
-            fn_800090A0(pPrev->v10, vOffset, pPose->v10);
+            Quat_Add(pPrev->v10, vOffset, pPose->v10);
             pPose->v10[3] = 0.0f;
-            fn_8000914C(pPose->q0, pModel->pMatrices[nBone]);
+            Quat_QuatToMatrix(pPose->q0, pModel->pMatrices[nBone]);
             fn_8001E880(pPose->v10, pModel->pMatrices[nBone][3]);
             uDone |= (u64)1 << nBone;
         }
     }
 }
 
-// fn_800280E8's IK error: moves the chain's end (v8) up toward pTarget, the move building up in
-// the skeleton's v10A4[1] (by f10CC, held between -f10A0 and f109C) and lifting the first link;
-// returns how far the chain's end is from pTarget.
+// fn_800280E8's IK error: moves the chain's end (v8) to pTarget's height, less what the clamp cuts:
+// the move builds up in the skeleton's v10A4[1] (by f10CC, held between -f10A0 and f109C), which
+// sets the first link's height over f10C8; returns how far the chain's end is from pTarget.
 f32 fn_800275F4(CharModel* pModel, IKChain* pChain, f32* pTarget) {
     f32 vDiff[4];
     Skeleton* pSkel = pModel->pSkel;
@@ -392,7 +392,7 @@ void fn_80027808(CharModel* pModel, f32* pRot) {
     if (pModel->pSkel != NULL) {
         fn_8001E85C(pRot, pModel->pSkel->q10D4);
         if (pModel->pSkel->fIKWeight < 1.0f) {
-            fn_8000883C(lbl_801C6498, pModel->pSkel->q10D4, pModel->pSkel->fIKWeight);
+            Quat_Slerp(lbl_801C6498, pModel->pSkel->q10D4, pModel->pSkel->fIKWeight);
             Vec_Normalize(pModel->pSkel->q10D4, pModel->pSkel->q10D4);
         }
     }
@@ -407,7 +407,7 @@ void fn_8002787C(CharModel* pModel) {
     if (pSkel == NULL) return;
     if (lbl_802810A6 == 0 || pSkel->fIKWeight <= 0.0f) return;
     if (pSkel->n10E4 != 0) {
-        fn_80008FCC(pSkel->q10D4, pSkel->p20[fn_8001EEE4(pModel, 0x11)], qRot);
+        Quat_Multiply(pSkel->q10D4, pSkel->p20[fn_8001EEE4(pModel, 0x11)], qRot);
         fn_8001E85C(qRot, pModel->pSkel->p20[fn_8001EEE4(pModel, 0x11)]);
     }
 }
@@ -436,9 +436,10 @@ void SKEL_TransitionIK(Skeleton* pSkel, u8 b, f32 f) {
     }
 }
 
-// Runs the IK transition toward its target weight, then (with any IK weight) solves the arms: the
-// first chain, then the second toward a point off the grip bone (0x52), whose pose is blended back
-// by the weight while flag 0x4000 holds it. Redoes the bones below 0x23 and the club point.
+// Runs the IK transition toward its target weight. With any IK weight: takes q10D4 back off bone
+// 0x11 while n10E4 counts down, re-poses the first chain (fn_80027478), blends the grip bone (0x52)
+// back by the weight while flag 0x4000 holds it, solves the second chain toward a point off the
+// grip, turns bone 0x28 by q107C off the grip, then redoes the bones below 0x23 and the club point.
 void fn_800279C0(Character* pChar) {
     f32 vGrip[4];
     f32 qGrip[4];
@@ -472,8 +473,8 @@ void fn_800279C0(Character* pChar) {
 
     pChain = &pSkel->pChains[1];
     if (pSkel->n10E4 != 0) {
-        fn_80008F20(pSkel->q10D4, qInv);
-        fn_80008FCC(qInv, pSkel->p20[fn_8001EEE4(pModel, 0x11)], qRot);
+        Quat_Invert(pSkel->q10D4, qInv);
+        Quat_Multiply(qInv, pSkel->p20[fn_8001EEE4(pModel, 0x11)], qRot);
         fn_8001E85C(qRot, pSkel->p20[fn_8001EEE4(pModel, 0x11)]);
         pSkel->n10E4--;
     }
@@ -486,9 +487,9 @@ void fn_800279C0(Character* pChar) {
     fn_80027478(pModel, pSkel->pChains);
     if (pChar->u10 & 0x4000) {
         if (pSkel->fIKWeight > 0.0f && pSkel->fIKWeight < 1.0f) {
-            fn_8000883C(qGrip, pGrip->q0, pSkel->fIKWeight);
+            Quat_Slerp(qGrip, pGrip->q0, pSkel->fIKWeight);
             fn_8001FBA4(pGrip->v10, vGrip, pGrip->v10, 1.0f - pSkel->fIKWeight);
-            fn_8000914C(pGrip->q0, pModel->pMatrices[nGrip]);
+            Quat_QuatToMatrix(pGrip->q0, pModel->pMatrices[nGrip]);
             fn_8001E880(pGrip->v10, pModel->pMatrices[nGrip][3]);
         }
     }
@@ -496,14 +497,14 @@ void fn_800279C0(Character* pChar) {
     fn_8001EEE4(pModel, 0x15);  // EA drops the answer
     n28 = fn_8001EEE4(pModel, 0x28);
     pPose28 = &pModel->pPoses[n28];
-    fn_800090E4(pGrip->q0, pSkel->v108C, vTarget);
-    fn_800090A0(vTarget, pGrip->v10, vTarget);
+    Quat_RotateVector(pGrip->q0, pSkel->v108C, vTarget);
+    Quat_Add(vTarget, pGrip->v10, vTarget);
     vTarget[3] = 0.0f;
     fn_800273BC(pModel, pChain, vTarget, pChain->n18, NULL, pChain->f1C);
     if (pSkel->fIKWeight < 1.0f) {
         fn_8002703C(pSkel, pChain, pSkel->fIKWeight);
     }
-    fn_80008FCC(pSkel->q107C, pGrip->q0, pPose28->q0);
+    Quat_Multiply(pSkel->q107C, pGrip->q0, pPose28->q0);
     fn_8001EB6C(pModel->a14, n28);
     fn_8001E938(aBits, 0x80);
     fn_8001EA34(aBits, fn_8001EEE4(pModel, 0x23));
@@ -536,7 +537,7 @@ void fn_80027D14(Character* pChar) {
     }
     fn_8000A798(mGrip, mInv);
     fn_800BADF8(mInv, pMtx28, mRel, 4);
-    fn_800089D4(mRel, pModel->pSkel->q107C);
+    Quat_BuildFromMatrix(mRel, pModel->pSkel->q107C);
     fn_800BAD60(mInv, (Vec4*)pMtx28[3], (Vec4*)pModel->pSkel->v108C);
     pModel->pSkel->v108C[3] = 0.0f;
 }
@@ -551,10 +552,11 @@ void SKEL_TranslateIKChainY(CharModel* pModel, IKChain* pChain, f32 f) {
     }
 }
 
-// When the chain's end is more than 0.1 above pTarget, lowers the root toward it: the drop (eased in
-// from 0.1 to 0.2, at most 0.65, then times 0.75) becomes a sideways move of the chain's root, the
-// model's root bone and lbl_80281D20's points; the feet are put back on the ground (with bNormals,
-// their terrain first) and the chain re-posed. Returns the drop, 0 when nothing moved.
+// When the chain's end is more than 0.1 below pTarget: the shortfall (eased in from 0.1 to 0.2, at
+// most 0.65, then times 0.75) becomes a sideways move, away from the chain's end, of the chain's
+// root, the model's root bone and lbl_80281D20's points; the feet are put back on the ground (with
+// bNormals, their terrain first), the chain takes the root bone's height change and is re-posed.
+// Returns the move (negative), 0 when nothing moved.
 f32 fn_80027E8C(CharModel* pModel, IKChain* pChain, f32* pTarget, int bNormals) {
     f32 fDx;
     f32 fDz;
@@ -603,8 +605,8 @@ f32 fn_80027E8C(CharModel* pModel, IKChain* pChain, f32* pTarget, int bNormals) 
 }
 
 // Sets the character's IK up toward pTarget: keeps bone 0x28's place off the grip, sets the first
-// chain up and lowers the root toward the target (fn_80027E8C), resets the skeleton's IK state,
-// solves the first chain (fn_800275F4 as its error) and applies it at full weight. Returns the drop.
+// chain up and moves its root (fn_80027E8C), resets the skeleton's IK state, solves the first
+// chain (fn_800275F4 as its error) and applies it at full weight. Returns fn_80027E8C's move.
 f32 fn_800280E8(Character* pChar, f32* pTarget, int bNormals) {
     CharModel* pModel = pChar->pModel;
     Skeleton* pSkel = pModel->pSkel;
@@ -633,7 +635,7 @@ f32 fn_800280E8(Character* pChar, f32* pTarget, int bNormals) {
 }
 
 // Builds an IK chain from its setup: a link per bone, each after the one before it.
-void fn_80028208(CharModel* pModel, IKChain* pChain, IKChainDef* pDef) {
+void SKEL_CreateIKChain(CharModel* pModel, IKChain* pChain, IKChainDef* pDef) {
     int i;
     s8 nPrev = -1;
     IKLink* pLink;
@@ -657,7 +659,7 @@ void fn_80028208(CharModel* pModel, IKChain* pChain, IKChainDef* pDef) {
 
 // Makes a model's skeleton: an IK chain per setup in pDefs, a rotation per bone in each set, and
 // the IK state at rest (weight 0, no swing started).
-Skeleton* fn_80028314(CharModel* pModel, CharModelDefs* pDefs) {
+Skeleton* SKEL_CreateIKSkeleton(CharModel* pModel, CharModelDefs* pDefs) {
     int i;
     Skeleton* pSkel;
     IKChainDef* pChainDefs = pDefs->pDefs;
@@ -667,7 +669,7 @@ Skeleton* fn_80028314(CharModel* pModel, CharModelDefs* pDefs) {
     pSkel->nChains = nChains;
     pSkel->pChains = fn_80009B34(nChains * sizeof(IKChain), 2, 64, "Skeleton.c", 1151);
     for (i = 0; i < pSkel->nChains; i++) {
-        fn_80028208(pModel, &pSkel->pChains[i], &pChainDefs[i]);
+        SKEL_CreateIKChain(pModel, &pSkel->pChains[i], &pChainDefs[i]);
     }
     pSkel->pDefs = pChainDefs;
     pSkel->p20 = fn_80009B34(pModel->nBones * sizeof(f32[4]), 2, 64, "Skeleton.c", 1159);
@@ -711,7 +713,7 @@ void fn_800284DC(Skeleton* pSkel) {
 // Loads a model from pData: its bone count, two floats, then per bone its id, parent and position.
 // A negative nExtra asks for that many bones in all: the missing ones are added at the root, with
 // bone 0x54's id. Then builds its matrices, skeleton (with pDefs) and dynamic chains.
-CharModel* fn_80028564(u8* pData, s8 nExtra, CharModelDefs* pDefs, int b) {
+CharModel* SKEL_LoadFromMem(u8* pData, s8 nExtra, CharModelDefs* pDefs, int b) {
     u32 aAll[4];
     s8 nTotal;
     CharModel* pModel;
@@ -755,7 +757,7 @@ CharModel* fn_80028564(u8* pData, s8 nExtra, CharModelDefs* pDefs, int b) {
     fn_80029664(pModel);
     fn_80029804(pModel);
     if (pDefs != NULL) {
-        pModel->pSkel = fn_80028314(pModel, pDefs);
+        pModel->pSkel = SKEL_CreateIKSkeleton(pModel, pDefs);
     } else {
         pModel->pSkel = NULL;
     }
@@ -806,7 +808,7 @@ void fn_80028A70(CharModel* pModel, int nBone, u32 uAxes, f32 f) {
 
 // TW06: SKEL_TransformBones. Builds each bone's pose and matrix from its parent's, walking the bones
 // in order with aCur holding the current bone's bit: bones in aBits (or whose parent was just done)
-// are redone. Bone 0x22 and 0x35 take rotations between two bones first.
+// are redone. At bones 0x22 and 0x35, bone 0x22 first takes q740 (then q750) halfway to 0x11's.
 void SKEL_TransformBones(CharModel* pModel, u32* aBits) {
     f32 mScale[4][4];
     f32 mOut[4][4];
@@ -841,7 +843,7 @@ void SKEL_TransformBones(CharModel* pModel, u32* aBits) {
     if (fn_8001E9F4(aBits, aCur, 0x80)) {
         fn_8001E85C(pModel->pBones[0].q0C, pModel->pPoses[0].q0);
         fn_8001E85C(pModel->pBones[0].v1C, pModel->pPoses[0].v10);
-        fn_8000914C(pModel->pPoses[0].q0, pModel->pMatrices[0]);
+        Quat_QuatToMatrix(pModel->pPoses[0].q0, pModel->pMatrices[0]);
         mScale[0][0] = pModel->a140[0][0];
         mScale[1][1] = pModel->a140[0][1];
         mScale[2][2] = pModel->a140[0][2];
@@ -887,8 +889,8 @@ void SKEL_TransformBones(CharModel* pModel, u32* aBits) {
             if (fn_8001E9F4(aModel, aCur, 0x80)) {
                 pParentPose = &pModel->pPoses[pBone->nParent];
                 if (fn_8001E9F4(pModel->a24, aCur, 0x80)) {
-                    fn_800090E4(pParentPose->q0, pBone->v1C, vPos);
-                    fn_800090A0(pParentPose->v10, vPos, pPose->v10);
+                    Quat_RotateVector(pParentPose->q0, pBone->v1C, vPos);
+                    Quat_Add(pParentPose->v10, vPos, pPose->v10);
                     pPose->v10[3] = 0.0f;
                     if (i == 1) {
                         pSkel = pModel->pSkel;
@@ -899,14 +901,14 @@ void SKEL_TransformBones(CharModel* pModel, u32* aBits) {
                 }
                 if (fn_8001E9F4(pModel->a14, aCur, 0x80)) {
                     if (fn_8001E9F4(aSkel, aCur, 0x80)) {
-                        fn_80008FCC(pSkelRot[i], pBone->q0C, qRot);
-                        fn_80008FCC(qRot, pParentPose->q0, pPose->q0);
+                        Quat_Multiply(pSkelRot[i], pBone->q0C, qRot);
+                        Quat_Multiply(qRot, pParentPose->q0, pPose->q0);
                     } else {
-                        fn_80008FCC(pBone->q0C, pParentPose->q0, pPose->q0);
+                        Quat_Multiply(pBone->q0C, pParentPose->q0, pPose->q0);
                     }
                 }
             }
-            fn_8000914C(pPose->q0, pModel->pMatrices[i]);
+            Quat_QuatToMatrix(pPose->q0, pModel->pMatrices[i]);
             mScale[0][0] = pModel->a140[i][0];
             mScale[1][1] = pModel->a140[i][1];
             mScale[2][2] = pModel->a140[i][2];
@@ -941,13 +943,13 @@ void SKEL_UpdateState(CharModel* pModel, SkelPose* pPose, u8 bTransform) {
         if (fn_8001E9CC(aRot, i)) {
             if (pModel->bEE) {
                 if (i == fn_8001EED8(pModel, 1)) {
-                    fn_80009410(PI, qTurn);
-                    fn_80008FCC(pPose->aBones[i].q0, qTurn, pModel->pBones[pModel->aBone2[i]].q0C);
+                    Legacy_Quat_BuildFromPitch(PI, qTurn);
+                    Quat_Multiply(pPose->aBones[i].q0, qTurn, pModel->pBones[pModel->aBone2[i]].q0C);
                     fn_8001EA34(pPose->a0, pModel->aBone2[i]);
                 } else if (i == fn_8001EED8(pModel, 0x52)) {
                     if (pModel->pBones[i].nParent == 0) {
-                        fn_80009410(PI, qTurn);
-                        fn_80008FCC(pPose->aBones[i].q0, qTurn, pModel->pBones[pModel->aBone2[i]].q0C);
+                        Legacy_Quat_BuildFromPitch(PI, qTurn);
+                        Quat_Multiply(pPose->aBones[i].q0, qTurn, pModel->pBones[pModel->aBone2[i]].q0C);
                         fn_8001EA34(pPose->a0, pModel->aBone2[i]);
                     } else {
                         fn_8001E85C(pPose->aBones[i].q0, pModel->pBones[pModel->aBone2[i]].q0C);
@@ -1025,7 +1027,7 @@ void fn_8002955C(void) {
 }
 
 // Frees a model: its bones, matrices, dynamic chains and skeleton.
-void fn_8002957C(CharModel* pModel) {
+void SKEL_Free(CharModel* pModel) {
     int i;
 
     fn_80009E70(pModel->pBones);
@@ -1151,7 +1153,7 @@ void fn_80029968(CharModel* pModel, SkelPose* pPose) {
 // Gives bone nA the rotation pRot, then sets it halfway between that and bone nB's.
 void fn_80029A00(CharModel* pModel, int nA, int nB, f32* pRot) {
     fn_8001E85C(pRot, pModel->pBones[nA].q0C);
-    fn_8000883C(pModel->pBones[nB].q0C, pModel->pBones[nA].q0C, 0.5f);
+    Quat_Slerp(pModel->pBones[nB].q0C, pModel->pBones[nA].q0C, 0.5f);
 }
 
 void fn_80029A74(CharModel* pModel, void* p) {

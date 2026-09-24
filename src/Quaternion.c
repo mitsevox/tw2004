@@ -1,15 +1,15 @@
 // Quaternion.c (our name): rotations as quaternions (x, y, z, w in f32[4]) for the skeleton,
-// the cameras and the ball, and the float math helpers they use. It may be the tail of GoEntry.c:
-// no assert or data block separates the two.
+// animation and the cameras, and float math helpers (the ball uses those too). It may be the tail
+// of GoEntry.c: no assert or data block separates the two.
 
 #include "engine.h"
 
-f32 fn_80008EF0(f32* pQ);
+f32 Quat_GetNorm(f32* pQ);
 void fn_8000972C(f32* pQ);
 
 // Spherical interpolation from a to b by fT, into b. b is flipped when the two are more than a
 // half turn apart, and a straight blend is used when they are almost the same.
-void fn_8000883C(f32* pA, f32* pB, f32 fT) {
+void Quat_Slerp(f32* pA, f32* pB, f32 fT) {
     f32 fX;
     f32 fY;
     f32 fZ;
@@ -47,7 +47,7 @@ void fn_8000883C(f32* pA, f32* pB, f32 fT) {
 
 // The unit quaternion of a rotation matrix, into pQ: from the trace when it is positive,
 // otherwise from the largest diagonal element.
-void fn_800089D4(f32 (*m)[4], f32* pQ) {
+void Quat_BuildFromMatrix(f32 (*m)[4], f32* pQ) {
     int anNext[3] = {1, 2, 0};
     f32 aQ[4];
     f32 fTrace;
@@ -90,7 +90,7 @@ void fn_800089D4(f32 (*m)[4], f32* pQ) {
 }
 
 // fake match: puts fn_80009680's double constants (0.0, 0.5, 3.0) in the pool where the original
-// has them, right after fn_800089D4's (0x80282A98); why EA's pool has them there is unknown.
+// has them, right after Quat_BuildFromMatrix's (0x80282A98); why EA's pool has them there is unknown.
 static double Quaternion_StrippedFn(double x) {
     double g = 0.0;
 
@@ -102,7 +102,7 @@ static double Quaternion_StrippedFn(double x) {
 
 // The quaternion of three angles (each negated), into pOut. An angle of exactly 0 skips its sin
 // and cos.
-void fn_80008BB8(f32 fA, f32 fB, f32 fC, f32* pOut) {
+void Quat_EulerAngles(f32 fA, f32 fB, f32 fC, f32* pOut) {
     f32 fHalf;
     f32 fSinA;
     f32 fCosA;
@@ -208,15 +208,15 @@ void fn_80008BB8(f32 fA, f32 fB, f32 fC, f32* pOut) {
 }
 
 // The quaternion's squared length.
-f32 fn_80008EF0(f32* pQ) {
+f32 Quat_GetNorm(f32* pQ) {
     return pQ[2] * pQ[2] + (pQ[1] * pQ[1] + (pQ[3] * pQ[3] + pQ[0] * pQ[0]));
 }
 
 // The inverse rotation, into pOut.
-void fn_80008F20(f32* pQ, f32* pOut) {
+void Quat_Invert(f32* pQ, f32* pOut) {
     f32 fScale;
 
-    fScale = 1.0f / fn_80008EF0(pQ);
+    fScale = 1.0f / Quat_GetNorm(pQ);
     pOut[3] = pQ[3] * fScale;
     pOut[0] = -pQ[0] * fScale;
     pOut[1] = -pQ[1] * fScale;
@@ -224,7 +224,7 @@ void fn_80008F20(f32* pQ, f32* pOut) {
 }
 
 // The conjugate (the inverse of a unit quaternion), into pOut.
-void fn_80008F9C(f32* pQ, f32* pOut) {
+void Quat_Conjugate(f32* pQ, f32* pOut) {
     pOut[3] = pQ[3];
     pOut[0] = -pQ[0];
     pOut[1] = -pQ[1];
@@ -232,7 +232,7 @@ void fn_80008F9C(f32* pQ, f32* pOut) {
 }
 
 // The product a x b, into pOut.
-void fn_80008FCC(f32* pA, f32* pB, f32* pOut) {
+void Quat_Multiply(f32* pA, f32* pB, f32* pOut) {
     pOut[3] = pA[3] * pB[3] - (pA[2] * pB[2] + (pA[0] * pB[0] + pA[1] * pB[1]));
     pOut[0] = pB[3] * pA[0] + (pA[3] * pB[0] + (pA[1] * pB[2] - pA[2] * pB[1]));
     pOut[1] = pB[3] * pA[1] + (pA[3] * pB[1] + (pA[2] * pB[0] - pA[0] * pB[2]));
@@ -240,7 +240,7 @@ void fn_80008FCC(f32* pA, f32* pB, f32* pOut) {
 }
 
 // The sum a + b, into pOut.
-void fn_800090A0(f32* pA, f32* pB, f32* pOut) {
+void Quat_Add(f32* pA, f32* pB, f32* pOut) {
     pOut[3] = pA[3] + pB[3];
     pOut[0] = pA[0] + pB[0];
     pOut[1] = pA[1] + pB[1];
@@ -248,17 +248,17 @@ void fn_800090A0(f32* pA, f32* pB, f32* pOut) {
 }
 
 // b turned by the inverse of the unit quaternion a (conj(a) x b x a), into pOut.
-void fn_800090E4(f32* pA, f32* pB, f32* pOut) {
+void Quat_RotateVector(f32* pA, f32* pB, f32* pOut) {
     f32 aTmp[4];
     f32 aConj[4];
 
-    fn_80008F9C(pA, aConj);
-    fn_80008FCC(aConj, pB, aTmp);
-    fn_80008FCC(aTmp, pA, pOut);
+    Quat_Conjugate(pA, aConj);
+    Quat_Multiply(aConj, pB, aTmp);
+    Quat_Multiply(aTmp, pA, pOut);
 }
 
 // The rotation matrix (3 rows of 4, no translation) of a unit quaternion.
-void fn_8000914C(f32* pQ, f32 (*m)[4]) {
+void Quat_QuatToMatrix(f32* pQ, f32 (*m)[4]) {
     f32 fWX;
     f32 fWY;
     f32 fWZ;
@@ -303,7 +303,7 @@ void fn_8000914C(f32* pQ, f32 (*m)[4]) {
 
 // A rotation vector (axis * angle) as a quaternion, into pOut; the identity when the angle is
 // below 0.001.
-void fn_8000923C(f32* pRot, f32* pOut) {
+void Quat_BuildFromVector(f32* pRot, f32* pOut) {
     f32 fAngle;
     f32 fScale;
 
@@ -319,9 +319,9 @@ void fn_8000923C(f32* pRot, f32* pOut) {
     pOut[2] = pRot[2] * fScale;
 }
 
-// A rotation by fAngle about the unit axis pAxis as a quaternion, into pOut; the identity when
-// the angle is below 0.001.
-void fn_800092F8(f32* pAxis, f32* pOut, f32 fAngle) {
+// A rotation vector pAxis (axis * angle) whose length fAngle is passed in, as a quaternion into
+// pOut; the identity when fAngle is below 0.001.
+void Quat_BuildFromVectorAndScale(f32* pAxis, f32* pOut, f32 fAngle) {
     if (fAngle < 0.001f) {
         fn_80009710(pOut);
         return;
@@ -335,7 +335,7 @@ void fn_800092F8(f32* pAxis, f32* pOut, f32 fAngle) {
 }
 
 // A rotation by -fAngle about z, as a quaternion into pOut.
-void fn_800093AC(f32 fAngle, f32* pOut) {
+void Legacy_Quat_BuildFromYaw(f32 fAngle, f32* pOut) {
     f32 fHalf;
 
     fn_8000972C(pOut);
@@ -345,7 +345,7 @@ void fn_800093AC(f32 fAngle, f32* pOut) {
 }
 
 // A rotation by -fAngle about y, as a quaternion into pOut.
-void fn_80009410(f32 fAngle, f32* pOut) {
+void Legacy_Quat_BuildFromPitch(f32 fAngle, f32* pOut) {
     f32 fHalf;
 
     fn_8000972C(pOut);
@@ -355,7 +355,7 @@ void fn_80009410(f32 fAngle, f32* pOut) {
 }
 
 // A rotation by -fAngle about x, as a quaternion into pOut.
-void fn_80009474(f32 fAngle, f32* pOut) {
+void Legacy_Quat_BuildFromRoll(f32 fAngle, f32* pOut) {
     f32 fHalf;
 
     fn_8000972C(pOut);
@@ -366,7 +366,7 @@ void fn_80009474(f32 fAngle, f32* pOut) {
 
 // The three angles of a unit quaternion, into *pA, *pB and *pC (the middle one from an asin,
 // its sine clamped to -1..1).
-void fn_800094D8(f32* pQ, f32* pA, f32* pB, f32* pC) {
+void Quat_ExtractEulerAngles(f32* pQ, f32* pA, f32* pB, f32* pC) {
     f32 fTanA;
     f32 fSinB;
     f32 fTanC;

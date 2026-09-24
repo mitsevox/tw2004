@@ -40,7 +40,7 @@ void     fn_80038054(u8 a, int n, f32 f1, f32 f2);
 CamShot* fn_800C4DF8(int nFirst, int nPlayer);
 void     fn_800C5EC0(View* pView, f32* pCam, f32* pSub, int nPlayer);
 f32      fn_800C7394(View* pView);
-void     fn_800090E4(f32* pQuat, f32* pIn, f32* pOut);  // rotate a vector by a quaternion
+void     Quat_RotateVector(f32* pQuat, f32* pIn, f32* pOut);  // rotate a vector by a quaternion
 u8       fn_8006BEA4(void);                             // the GameBreaker letterbox is up, scripted
 void     fn_800A68C0(u8 nPlayer);
 void     fn_80039344(int nView, f32 f);                 // a per-view float (Swing.c's declaration)
@@ -2896,9 +2896,9 @@ void fn_800C4AB0(f32* pFrom, f32* pTo, f32* pOut) {
             fn_800BAF04(vAxis, vAxis);
         }
         fn_8000AE28(vAxis, fOver, vAxis);
-        fn_8000923C(vAxis, vQuat);
+        Quat_BuildFromVector(vAxis, vQuat);
         v[3] = 0.0f;
-        fn_800090E4(vQuat, v, vOut);
+        Quat_RotateVector(vQuat, v, vOut);
         fn_800C73B8(pFrom, vOut, pOut);
     }
 }

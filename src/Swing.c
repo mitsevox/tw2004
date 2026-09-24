@@ -925,18 +925,17 @@ void GOLFERSTATE_Pop(int nPlayer) {
 }
 
 // Pop everything and start again from one state.
-void GOLFERSTATE_Set(int nState, int nPlayer) {
-    s8*         pTop;
-    SwingStack* pStack = &gSwingStacks[nPlayer];
+void GOLFERSTATE_Set(s8 nState, int nPlayer) {
     void (*pfn)(int);
-    pTop = &pStack->nTop;
-    while (*pTop > -1) {
-        if (sGolferStateEngineTable[(s8)pStack->nState[*pTop]].pfnExit != NULL) {
+    while (gSwingStacks[nPlayer].nTop > -1) {
+        if (sGolferStateEngineTable[(s8)gSwingStacks[nPlayer].nState[gSwingStacks[nPlayer].nTop]].pfnExit !=
+            NULL) {
             gInSwingExit = 1;
-            sGolferStateEngineTable[(s8)pStack->nState[*pTop]].pfnExit(nPlayer);
+            sGolferStateEngineTable[(s8)gSwingStacks[nPlayer].nState[gSwingStacks[nPlayer].nTop]].pfnExit(
+                nPlayer);
             gInSwingExit = 0;
         }
-        (*pTop)--;
+        gSwingStacks[nPlayer].nTop--;
     }
     gSwingStacks[nPlayer].nTop = 0;
     gSwingStacks[nPlayer].nState[gSwingStacks[nPlayer].nTop] = nState;
@@ -1380,11 +1379,15 @@ int Swing_UpdateBackswing(int nPlayer) {
         fRate   = 1.0f + (f32)fabs(fDelta) / fRange;
         fRate   = fRate * fRate - 1.0f;
         fRate   = (fRate < 1.0f) ? fRate : 1.0f;
-        if (gPlayers[nPlayer].nShotKind == 1 || gPlayers[nPlayer].nShotKind == 2 ||
-            gPlayers[nPlayer].nShotKind == 3) {
-            fRange = fRange / gSwingRange[gPlayers[nPlayer].nShotKind];
-        } else {
-            fRange = 1.0f;
+        {
+            int nKind = gPlayers[nPlayer].nShotKind;
+            // fake match: written as == 1 || == 2 || == 3, CW merges the first two tests into one
+            // range compare; the negated form keeps three compares on the loaded kind
+            if (!(nKind != 1 && nKind != 2 && nKind != 3)) {
+                fRange = fRange / gSwingRange[nKind];
+            } else {
+                fRange = 1.0f;
+            }
         }
         Anim_SetRate(pObj->anim, fRate * fRange);
         if (fMag > 93.0f) {
@@ -1931,7 +1934,7 @@ void fn_8005AD20(Character* pObj, SwingData* pSw, int nStickX) {
     if (fn_8001EDF4(pObj)) {
         fAmount = -fAmount;
     }
-    fn_80008BB8(0.0f, 0.0f, fAmount, vRot);
+    Quat_EulerAngles(0.0f, 0.0f, fAmount, vRot);
     fn_80027808(pObj->pModel, vRot);
 }
 
@@ -3101,10 +3104,6 @@ void STATEFUNC_GreenWatchRollUpdate(int nPlayer) {
     Vec4        vOffset = {0.45f, 0.45f, 0.45f, 0.5f};
     CourseInfo* pCourse = fn_8000C594();
     int         nSteps;
-    s32*        pGhostState;
-    Ball*       pGhost;
-    s32*        pnView;
-    f32*        pGhostMinDist;
     int         i;
 
     Caddie_Update(nPlayer);
@@ -3130,23 +3129,20 @@ void STATEFUNC_GreenWatchRollUpdate(int nPlayer) {
         GOLFERSTATE_Pop(nPlayer);
         return;
     }
-    pGhost        = &gPlayers[nPlayer].ballBefore;
-    pGhostState   = &gPlayers[nPlayer].ballBefore.nState;
-    pnView        = gPlayers[nPlayer].nView;
-    pGhostMinDist = &gPlayers[nPlayer].ballBefore.fClosest;
     for (i = 0; i < nSteps; i++) {
         Ball_SetSimulating(1);
-        Physics_Simulate(pGhost, 20);
+        Physics_Simulate(&gPlayers[nPlayer].ballBefore, 20);
         Ball_SetSimulating(0);
-        if (*pGhostState == 1 || *pGhostState == 5) {
-            if (!fn_80063C90(fn_80017028(*pnView))) {
-                CameraController_FadeOut(fn_80017028(*pnView), 0.25f, (f32*)&vOffset);
+        if (gPlayers[nPlayer].ballBefore.nState == 1 || gPlayers[nPlayer].ballBefore.nState == 5) {
+            if (!fn_80063C90(fn_80017028(gPlayers[nPlayer].nView[0]))) {
+                CameraController_FadeOut(fn_80017028(gPlayers[nPlayer].nView[0]), 0.25f, (f32*)&vOffset);
             }
-        } else if (!fn_80063C90(fn_80017028(*pnView)) && pCourse != NULL) {
+        } else if (!fn_80063C90(fn_80017028(gPlayers[nPlayer].nView[0])) && pCourse != NULL) {
             int nPinSet = Game_CurrentPinSet();
-            if (*pGhostMinDist < 0.5f ||
-                *pGhostMinDist < Vec_Distance(pGhost->vPos, &pCourse->pin[nPinSet].x) - 0.1f) {
-                CameraController_FadeOut(fn_80017028(*pnView), 0.25f, (f32*)&vOffset);
+            if (gPlayers[nPlayer].ballBefore.fClosest < 0.5f ||
+                gPlayers[nPlayer].ballBefore.fClosest <
+                    Vec_Distance(gPlayers[nPlayer].ballBefore.vPos, &pCourse->pin[nPinSet].x) - 0.1f) {
+                CameraController_FadeOut(fn_80017028(gPlayers[nPlayer].nView[0]), 0.25f, (f32*)&vOffset);
             }
         }
     }

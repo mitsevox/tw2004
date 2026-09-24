@@ -3517,8 +3517,8 @@ void fn_80080878(MsgArg* pArgs, MsgArg* pResult) {
     gpSaveData[pArgs[0].i].aSavedRound[pArgs[1].i].szName[i] = '\0';
 }
 
-// Set hole pArgs[2] of slot pArgs[0]'s custom round pArgs[1]: course pArgs[3] (-1 empties the
-// round instead) and hole number pArgs[4].
+// Set hole pArgs[2] of slot pArgs[0]'s custom round pArgs[1]: course pArgs[3] (-1 instead clears
+// the round's n0, its in-use flag) and hole number pArgs[4].
 void fn_800809F8(MsgArg* pArgs, MsgArg* pResult) {
     if (pArgs[3].i != -1) {
         gpSaveData[pArgs[0].i].aSavedRound[pArgs[1].i].nCourse[pArgs[2].i] = pArgs[3].i;
@@ -3594,8 +3594,8 @@ void fn_80080CA8(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Fill entry pArgs[2] of slot pArgs[0]'s saved round pArgs[1] with a random hole: a random course
-// that this profile or the cheat codes have unlocked, and a random hole number 0..17, drawn again
-// while the round already holds that course and hole.
+// from a list of 20 (course 0 twice, no 4 or 7) that this profile or the cheat codes have unlocked,
+// and a random hole number 0..17, drawn again while the round already holds that course and hole.
 void fn_80080CC8(MsgArg* pArgs, MsgArg* pResult) {
     int i;
     int nSlot = pArgs[0].i;
@@ -4054,7 +4054,7 @@ void fn_80081A54(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = lbl_801D7148.p658[pArgs[0].i].bActive;
 }
 
-// The name in slot pArgs[0]'s profile backup.
+// The name in backup row pArgs[0]'s profile.
 void fn_80081B04(MsgArg* pArgs, MsgArg* pResult) {
     strcpy(((MsgString*)pArgs[1].p)->pStr, lbl_801D7148.p658[pArgs[0].i].szName);
 }
@@ -4643,7 +4643,8 @@ void fn_8008311C(MsgArg* pArgs, MsgArg* pResult) {
 void fn_80083354(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-// Play a golfer's bio movie, or the credits for -1.
+// Queue a bio movie (which bio is not set here: nBio keeps what the queue entry held), or the
+// credits for pArgs[0] -1; then fn_800A75B4.
 void fn_80083358(MsgArg* pArgs, MsgArg* pResult) {
     FEMovie* pMovie;
 
@@ -4846,8 +4847,8 @@ void fn_80083964(MsgArg* pArgs, MsgArg* pResult) {
 void fn_80083970(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-// Three values out: 50, 50 and a level of 25..250 (the tenth of pArgs[3] plus one, times 25), the
-// level going to the one of the three pArgs[2] picks.
+// Three values out: 50, 50 and a level of 25..250 (pArgs[3] mod 10, plus one, times 25), the
+// level going to the one of the three pArgs[2] mod 3 picks.
 void fn_80083974(MsgArg* pArgs, MsgArg* pResult) {
     s32 nWhich;
     s32 nLevel;
@@ -4905,7 +4906,8 @@ void fn_80083BC8(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Start the current game mode's event (modes 11, 5, 23, 26, 22, 24) and answer fn_80110180. In
-// modes 5 and 11 player 0 gets the created golfer (a loaded profile) or golfer 0 first.
+// modes 5 and 11 player 0 first gets golfer 0, or with profile 0 loaded the created golfer (not
+// when b11703 is set).
 void fn_80083BFC(MsgArg* pArgs, MsgArg* pResult) {
     if (Game_GetMode() == 11) {
         if (Game_GetMode() == 5 || Game_GetMode() == 11) {
@@ -5176,7 +5178,8 @@ void fn_80084354(MsgArg* pArgs, MsgArg* pResult) {
     lbl_80281ED4->n11704 = nError;
 }
 
-// For the card in port pArgs[0], slot pArgs[1]: TRUE when it could be opened (fn_80125118).
+// For the card in port pArgs[0], slot pArgs[1]: TRUE when the EA Sports Bio on it opened, or
+// failed with -18 (fn_80125118).
 void fn_80084458(MsgArg* pArgs, MsgArg* pResult) {
     s32 aPos[2];
 

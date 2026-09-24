@@ -1501,12 +1501,18 @@ void Ball_SetLie(Ball* pBall, SurfaceType* pSurface) {
         if ((r & 127) < uLuck / 2) {
             r = 0;
         }
-        if (!(r & 1) && gpGame != NULL && Game_GetCourse() != 6) {
-            pBall->nLie     = LIE_ROUGH_HIGH_e;
-            pBall->nSurface = 27;
-        } else {
+        // fake match: a one-case switch gives the original's beq/b pair on the low bit
+        switch (r & 1) {
+        case 0:
+            if (gpGame != NULL && Game_GetCourse() != 6) {
+                pBall->nLie     = LIE_ROUGH_HIGH_e;
+                pBall->nSurface = 27;
+                break;
+            }
+        default:
             pBall->nLie     = LIE_ROUGH_e;
             pBall->nSurface = 28;
+            break;
         }
         break;
     case 11:

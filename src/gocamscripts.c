@@ -61,7 +61,7 @@ f32  fn_8003F194(CamShot* pShot, f32 fA, f32 fB, f32 fTime);
 u8   Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 bModels, u8 bHazards, f32 fStep,
                                          u8 bSlope, f32 fMaxSlope);   // GoTerrainCollision.c
 void fn_80040CF0(CamScript* pScript, f32* pSub, int nPlayer, f32* pPrev, f32 fTime);
-void fn_800090E4(f32* pTurn, f32* pVec, f32* pOut);     // the vector turned by it
+void Quat_RotateVector(f32* pTurn, f32* pVec, f32* pOut);     // the vector turned by it
 u8   fn_800DC464(int nPlayer);          // GameEffects.c: the ball is simulated from its position
 u8   Ter_CheckForGroundCollision(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
                                  SurfaceType** ppSurface, TerObject** ppObj);
@@ -814,9 +814,9 @@ void fn_8003FD54(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPr
         fn_800BAF04(vAxis, vAxis);
     }
     fn_8001EF34(vAxis, fAngle, vAxis);
-    fn_8000923C(vAxis, qTurn);
+    Quat_BuildFromVector(vAxis, qTurn);
     vDir0[3] = 0.0f;
-    fn_800090E4(qTurn, vDir0, pSub);
+    Quat_RotateVector(qTurn, vDir0, pSub);
     if (0.0f != pSub[0] || 0.0f != pSub[1] || 0.0f != pSub[2]) {
         fn_800BAF04(pSub, pSub);
     }
@@ -1442,9 +1442,9 @@ void CameraScript_LagAimMarker(int nPlayer, f32* pSub, f32* pCam, CamShot* pShot
             fn_800BAF04(vAxis, vAxis);
         }
         fn_8001EF34(vAxis, fAngle, vAxis);
-        fn_8000923C(vAxis, qTurn);
+        Quat_BuildFromVector(vAxis, qTurn);
         vCur[3] = 0.0f;
-        fn_800090E4(qTurn, vCur, vDir);
+        Quat_RotateVector(qTurn, vCur, vDir);
         if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
             fn_800BAF04(vDir, vDir);
         }

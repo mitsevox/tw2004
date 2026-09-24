@@ -1266,9 +1266,11 @@ u8 fn_800D68CC(int nPlayer, u8 bCheck) {
     int i;
     int n;
     u8 bAll;
+    PlayerNumber_t nProfile;
 
-    if (gpSaveData[gPlayers[nPlayer].nIndex].bActive == 0) return 0;
-    pProfile = &gpSaveData[gPlayers[nPlayer].nIndex];
+    nProfile = gPlayers[nPlayer].nIndex;
+    if (gpSaveData[nProfile].bActive == 0) return 0;
+    pProfile = &gpSaveData[nProfile];
     if (!bCheck) {
         bAll = 1;
         for (i = 0; i < 31; i++) {
@@ -1294,9 +1296,11 @@ u8 fn_800D69B8(int nPlayer, u8 bCheck) {
     SaveProfile* pProfile;
     int i;
     u8 bAny;
+    PlayerNumber_t nProfile;
 
-    if (gpSaveData[gPlayers[nPlayer].nIndex].bActive == 0) return 0;
-    pProfile = &gpSaveData[gPlayers[nPlayer].nIndex];
+    nProfile = gPlayers[nPlayer].nIndex;
+    if (gpSaveData[nProfile].bActive == 0) return 0;
+    pProfile = &gpSaveData[nProfile];
     if (!bCheck) {
         bAny = 0;
         for (i = 0; i < 31; i++) {
@@ -1505,7 +1509,7 @@ u8 fn_800D748C(int nPlayer) {
 
 // Give a player award nAward if they do not have it yet. Five awards also keep the shot's replay.
 u8 fn_800D750C(int nPlayer, int nAward) {
-    int nProfile;
+    PlayerNumber_t nProfile;
     int nSlot;
 
     if (fn_800E177C() != 0) return 0;
@@ -2272,7 +2276,7 @@ void fn_800D9458(int nPlayer) {
 // At the end of a round: count it in the profile (a full round; in stroke play also its strokes and
 // the best score).
 void fn_800D9834(int nPlayer) {
-    int nProfile;
+    PlayerNumber_t nProfile;
     int nStrokes;
 
     if (gpGame->b27D) {
