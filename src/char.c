@@ -44,7 +44,8 @@ void  fn_8001B878(Character* pChar, int n);
 Character* fn_8001C21C(Character* pChar);
 void  Character_UpdateAnimation(Character* pChar, int a, f32 f);
 void  Character_UpdateTestPoints(Character* pChar);
-void  Character_UpdateFeetTerrainInfo(Character* pChar, int a);
+void  Character_UpdateFeetTerrainInfo(Character* pChar, int bNormals);
+f32   Character_GetTerrainHeightAndNormal(Character* pChar, f32* pPos, f32** ppNormal);
 void  Character_PlaceFeetOnGround(Character* pChar);
 void  SKEL_TransformBones(CharModel* pModel, u32* auBits);
 void  fn_800B28D4(Character* pChar, int a, int b);
@@ -274,6 +275,49 @@ void fn_80017864(Character* pChar, SkelPose* pPose) {
         fn_8001E8A4(pPose->a30, 0x80);
         fn_8001E938(pPose->a0, 0x80);
         fn_8001E938(pPose->a10, 0x80);
+    }
+}
+
+// The ground height (and with bNormals its normal; straight up without ground) under points 0-3.
+// n1784 would pick a half of them per call (points 0 and 2, or 1 and 3), but it is set to -1
+// first, so every call does all four.
+void Character_UpdateFeetTerrainInfo(Character* pChar, int bNormals) {
+    f32* pNormal;
+    f32 fHeight;
+    int i;
+    int nLast;
+    int nStep;
+
+    if (fn_8000C594() != NULL) {
+        pChar->n1784 = -1;
+        if (pChar->n1784 < 0) {
+            pChar->n1784 = 0;
+            nLast = 3;
+            nStep = 1;
+        } else {
+            nLast = 2;
+            nStep = 2;
+        }
+        for (i = 0; i <= nLast; i += nStep) {
+            fHeight = Character_GetTerrainHeightAndNormal(pChar, pChar->aPoints[i + pChar->n1784], &pNormal);
+            if (!(fHeight < -60000.0f)) {
+                pChar->afGroundHeight[i + pChar->n1784] = fHeight;
+            }
+            if (bNormals) {
+                if (fHeight < -60000.0f) {
+                    pChar->aGroundNormal[i + pChar->n1784][0] = 0.0f;
+                    pChar->aGroundNormal[i + pChar->n1784][1] = 1.0f;
+                    pChar->aGroundNormal[i + pChar->n1784][2] = 0.0f;
+                    pChar->aGroundNormal[i + pChar->n1784][3] = 0.0f;
+                } else {
+                    Vec_Copy(pNormal, pChar->aGroundNormal[i + pChar->n1784]);
+                }
+            }
+        }
+        pChar->n1784++;
+        if (pChar->n1784 >= 2) {
+            pChar->n1784 = 0;
+        }
     }
 }
 

@@ -420,7 +420,8 @@ typedef struct Character {
                                 //         CharacterState_AddSKABlendData does nothing
     f32   aPoints[5][4];        // 0x16E4  points Character_PlaceFeetOnGround sets the heights of; the
                                 //         skeleton code (0x80027FF8) moves them in x and z
-    u8    unk1734[0x1784 - 0x1734];
+    f32   aGroundNormal[4][4];  // 0x1734  } the ground under points 0-3 (Character_UpdateFeetTerrainInfo)
+    f32   afGroundHeight[4];    // 0x1774  }
     s32   n1784;                // 0x1784  set to -1 by Character_SetPosition
     Clip* pCurClip;             // 0x1788  the clip Char_SetClip picked
     u8    unk178C[0x1790 - 0x178C];
