@@ -14,7 +14,6 @@ void fn_8010B098(void* arg0);
 s32 fn_8010C458(s16);
 s32 fn_8010B664(void* arg0);
 void fn_8000FBAC();
-void fn_8010BC64(u8* p);
 
 void fn_8010A4E8(void) {
     if (lbl_80282488->p0 != NULL) {

@@ -368,6 +368,7 @@ int  fn_8008E9A8(void);
 void fn_8008E9B4(void);
 void fn_8008EA38(u8 b);
 u8   fn_8008EAB0(void);
+u8   fn_8008EAD4(void);
 void fn_8008EABC(u8 b);
 void fn_8008EAE0(int n);
 int  fn_8008EAEC(void);

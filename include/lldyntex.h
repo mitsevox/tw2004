@@ -32,6 +32,7 @@ LAYOUT_ASSERT(DynTexState, 0xA9C);
 
 extern DynTexState* lbl_80282488;
 
+void  fn_8010BC64(u8* p);
 void  fn_8010BC88(void* p);
 void  fn_8010BEC4(void);
 void  fn_8010BED4(void);

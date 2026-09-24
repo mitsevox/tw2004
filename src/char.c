@@ -80,6 +80,7 @@ void  fn_800CEE04(Skin* pSkin, int a, int b);
 void  fn_800CEE88(u8 b);
 u8    fn_800FCC38(int nPlayer);
 void  fn_8010A668(void* p);
+void  fn_80008380(void);
 void  fn_8010BF68(void);
 void  fn_8010BFE0(void);
 void  fn_80112C64(int n);
@@ -282,6 +283,29 @@ void fn_80019E80(Character* pChar) {
     fn_8001744C(pChar, pChar->a64[pChar->n74], &fn_80077ACC()->choices);
     fn_8010BA2C(pChar->a64[pChar->n74]);
     fn_8008EA38(1);
+}
+
+// Once the menu golfer is flagged (fn_8008EAD4): switches the character to its other model and
+// puts the profile's logos and the skins on it.
+void fn_8001A024(Character* pChar) {
+    SaveProfile* pProfile = fn_80077ACC();
+    int i;
+    void* pModel;
+
+    if (fn_8008EAD4()) {
+        fn_8008EAC8(0);
+        fn_8008E918(0);
+        pChar->n74 = 1 - pChar->n74;
+        pModel = pChar->a64[pChar->n74];
+        fn_80019CEC(pChar);
+        fn_8001744C(pChar, pModel, &pProfile->choices);
+        fn_8010BA2C(pModel);
+        fn_80008380();
+        for (i = 0; i < pChar->nSkins; i++) {
+            fn_800CE170(pChar->apSkins[i], pModel);
+        }
+        fn_8010BC64(pModel);
+    }
 }
 
 void fn_8001A0FC(Character* pChar) {
@@ -824,6 +848,22 @@ u8 fn_8001DBF4(Character* pChar) {
         return 1;
     }
     return 0;
+}
+
+// Gives the character the look in pChoices: its skins' choices, then its sliders (the 26 values
+// at a9B4). Outside the menu golfer's game type 3 (or on its screens 1 and 4) n113 sets the
+// model's bEE.
+void fn_8001DC64(Character* pChar, SkinChoices* pChoices) {
+    fn_800CC1EC(pChar, pChoices);
+    fn_8010E4DC(pChar->p17AC, pChar->pModel, pChar->pSkin, 26, pChoices->a9B4, pChar->node3E0);
+    if (gSession.nGameType != 3 || lbl_80281EE0->n0 == 1 || lbl_80281EE0->n0 == 4) {
+        if (pChoices->n113 == 0) {
+            fn_8001EE98(pChar, 0);
+        } else {
+            fn_8001EE98(pChar, 1);
+        }
+    }
+    fn_80018484(pChar, pChar->pModel);
 }
 
 // Dresses the character's six club skins: from pChoices when it is given, else from the golfer's

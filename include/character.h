@@ -360,7 +360,10 @@ typedef struct Character {
     Clip* p1790;                // 0x1790  cleared by fn_80062BFC; CharacterState_AddSKABlendData plays it for
                                 //         groups 5, 6 and 10
     void* p1794;                // 0x1794  cleared by fn_80062BE8; the same for group 9
-    u8    unk1798[0x17B8 - 0x1798];
+    u8    unk1798[0x17AC - 0x1798];
+    void* p17AC;                // 0x17AC  its slider definitions (CharSlider_CreateDefinitionsFromMem,
+                                //         fn_8001A9F4); fn_8001DC64 applies them
+    u8    unk17B0[0x17B8 - 0x17B0];
     struct SkinChoices* pChoices;   // 0x17B8  its look (fn_8001D4A4 dresses it from this); fn_8001A20C
                                     //         puts its logos on the model (fn_8001744C)
 } Character;
