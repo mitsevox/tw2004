@@ -274,15 +274,19 @@ extern u8 lbl_802810A0[6];      // Skeleton.c: the bone ids of its kind 3 dynami
 typedef struct Clip {
     u32    uFlags;              // 0x00  4: its frame data is in ARAM
     s32    n04;                 // 0x04  bytes of the second frame stream
-    u8     unk08[4];
+    u8     unk08[2];
+    s16    n0A;                 // 0x0A  non-zero: it has a first frame stream (fn_80020328)
     s16    nFrames;             // 0x0C
     u8     unk0E[0xA];
     f32    f18;                 // 0x18  fn_8001BE88 blends up to it
-    s32    n1C;                 // 0x1C
-    u8     unk20[0xC];
+    s32    n1C;                 // 0x1C  how many tracks (pD0)
+    u8     unk20[8];
+    s16    n28;                 // 0x28  bytes fn_80020328 copies out of a frame of the first stream
+    s16    n2A;                 // 0x2A  from this offset
     s32    n2C;                 // 0x2C
     u32    u30;                 // 0x30  fn_80020DD4 hands it back
-    u8     unk34[4];
+    u8     unk34[2];
+    s16    n36;                 // 0x36  non-zero: it has a second frame stream (fn_80020328)
     s32    n38;                 // 0x38  bytes of the first frame stream
     s32    n3C;                 // 0x3C
     s32    n40;                 // 0x40
@@ -292,7 +296,9 @@ typedef struct Clip {
     s32    n4C;                 // 0x4C
     s32    n50;                 // 0x50
     s32    n54;                 // 0x54  bytes from pC4 to the pF4 library (fn_80020DD4)
-    u8     unk58[0xC];
+    s32    n58;                 // 0x58  passed to fn_8002148C with a second-stream frame
+    s32    n5C;                 // 0x5C  passed to fn_80021134 with a first-stream frame
+    u8     unk60[4];
     s32    n64;                 // 0x64
     u8     unk68[0x80 - 0x68];
     f32    v80[3];              // 0x80  a point fn_8001DB04 puts through bone 0's matrix

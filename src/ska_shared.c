@@ -47,6 +47,49 @@ void fn_8001FCD4(ARAMTransfer* pTransfer) {
     fn_800B67EC(pTransfer);
 }
 
+void fn_80021134(u8* pFrame, void* pPose, s32 n, u8* pBits);
+void fn_8002148C(u8* pFrame, void* pPose, s32 n, u8* pBits, u8* pData);
+
+// Decodes frame nFrame of pClip: its second-stream frame into pPose2 (fn_8002148C) and its
+// first-stream frame into pPose1 (fn_80021134), fetching them from ARAM first when the clip's
+// frames live there (then n28 bytes of the first-stream frame are also copied to pExtra).
+// Always returns 1.
+u8 fn_80020328(Clip* pClip, int nFrame, void* pPose2, void* pPose1, u8* pExtra) {
+    ARAMTransfer* pTransfer = NULL;
+    u8* pFrame;
+
+    if (pClip->n36 != 0) {
+        if (pClip->uFlags & 4) {
+            // port: pE4 holds an ARAM address here
+            fn_8001FCD4(fn_8001FCA8((uptr)pClip->pE4 + pClip->n8E * nFrame, lbl_80281CC4, pClip->n8E));
+            pTransfer = NULL;
+            pFrame = lbl_80281CC4;
+            if (pClip->n0A != 0) {
+                pTransfer = fn_8001FCA8(pClip->uAram + pClip->n8C * nFrame * 2, lbl_80281CC8, pClip->n8C * 2);
+            }
+        } else {
+            pFrame = pClip->pE4 + pClip->n8E * nFrame;
+        }
+        fn_8002148C(pFrame, pPose2, pClip->n58, pClip->pF8, pClip->pE0);
+    }
+    if (pClip->n0A != 0) {
+        if (pClip->uFlags & 4) {
+            if (pTransfer == NULL) {
+                pTransfer = fn_8001FCA8(pClip->uAram + pClip->n8C * nFrame * 2, lbl_80281CC8, pClip->n8C * 2);
+            }
+            fn_8001FCD4(pTransfer);
+            pFrame = lbl_80281CC8;
+            if (pClip->pF0 != NULL) {
+                Mem_cpy(pExtra, pFrame + pClip->n2A, pClip->n28);
+            }
+        } else {
+            pFrame = (u8*)pClip->uAram + pClip->n8C * nFrame * 2;
+        }
+        fn_80021134(pFrame, pPose1, pClip->n5C, pClip->pFC);
+    }
+    return 1;
+}
+
 // Samples pClip's BlendClip at fTime (held to its key range) into pOut's six values, blending the
 // two keys around it. Returns 0 when the clip has none.
 int fn_800204A0(Clip* pClip, f32* pOut, f32 fTime) {
