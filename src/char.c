@@ -77,6 +77,13 @@ void  fn_80072ED8(void* pAnim, SKABlendNode* pNode, f32 fTime);                 
 void  fn_80073108(Character* pChar, int nPlayer, void* pAnim, SKABlendNode* pNode, f32 fTime);
 void  fn_8009622C(Character* pChar, void* pClip, u8 bKeep, f32 fOffset);                  // CharAnim.c
 void  fn_80096F0C(Character* pChar);                            // CharAnim.c
+s32   fn_8009637C(Character* pChar);                            // CharAnim.c
+void  fn_8000914C(f32* pQ, f32 (*m)[4]);                        // Quaternion.c: a rotation matrix
+void  fn_8001BD18(Character* pChar, Clip* pClip);
+void  fn_8001FCF4(Character* pChar, Clip* pClip, SkelPose* pPose, int n, f32 fTime);
+void  fn_800280E8(Character* pChar, f32* pPos, int bPlace);     // Skeleton.c
+void  fn_8001EFB4(f32* pA, f32* pB, f32* pOut);
+void  fn_8001EFD8(f32* pA, f32* pB, f32* pOut);
 f32 (*fn_8001EC6C(Character* pChar, int nBone))[4];
 f32 (*fn_8001ECA8(Character* pChar, int nBone))[4];
 f32   fn_8001EFFC(CamLens* pLens);
@@ -428,10 +435,10 @@ void fn_8001966C(Character* pChar) {
         pChar->u10 |= 0x10000;
         pChar->u10 |= 8;
         pChar->u10 |= 4;
-        pChar->pModel->pSkel->n2C = 0;
+        pChar->pModel->pSkel->pClip = NULL;
         pChar->fAnimTime = pChar->f180 + fn_8001F02C(pChar->pBlend, 2) - pChar->v1638[1];
         Character_UpdateAnimation(pChar, 0, 0.0f);
-        pChar->pModel->pSkel->n2C = 0;
+        pChar->pModel->pSkel->pClip = NULL;
     }
 }
 
@@ -1162,6 +1169,113 @@ void fn_8001C804(int nPlayer, u8 a, u8 b) {
     }
     if (a) {
         pChar->u10 |= 0x200;
+    }
+}
+
+// Puts the golfer at its player's ball, facing the target (level), and resets its root bone's pose
+// and matrix. With u10 bit 8 and a skeleton, it then takes the stance of its clip for the style:
+// the clip is started on the skeleton when it changed (at pD4's f24 with bit 0x10000), the root is
+// moved by the club class's offset (mirrored when the model is), the pose updated, the feet placed
+// and both leg chains moved with the root, and the IK weight set (1 in the swing's states 5 and 7).
+// Bits 4, 8, 0x200 and 0x10000 of u10 are cleared; 0x200 also places the feet on the terrain.
+void fn_8001C860(Character* pChar) {
+    f32 vDir[4];
+    f32 vOffsetX[4];
+    f32 vOffsetZ[4];
+    f32 vPos[4];
+    int bStance;
+    int bPlace;
+    int bClipTime;
+    CharModel* pModel;
+    f32* pBallPos;
+    Player* pPlayer;
+    Skeleton* pSkel;
+    Clip* pOldClip;
+    Clip* pClip;
+    f32 fY;
+
+    pPlayer = &gPlayers[pChar->nPlayer];
+    pModel = pChar->pModel;
+    bPlace = pChar->u10 & 0x200;
+    bStance = pChar->u10 & 8;
+    bClipTime = pChar->u10 & 0x10000;
+    pBallPos = pPlayer->ball.vPos;
+    Character_SetPosition(pChar, pBallPos, 0);
+    pChar->u10 &= ~(0x10000 | 0x200 | 8 | 4);
+    // fake match: n2C is compared unsigned here
+    if (pChar->p1798 != NULL && (u32)pChar->p1798->n2C == 6 && pChar->n16D4 == 0) {
+        pChar->n16D4 = 4;
+    }
+    fn_8001EFB4(pPlayer->vTarget, pBallPos, vDir);
+    vDir[1] = 0.0f;
+    fn_80019358(pChar, vDir, 0.0f);
+    fn_8001E85C(pModel->pBones[0].q0C, pModel->pPoses[0].q0);
+    fn_8001E85C(pModel->pBones[0].v1C, pModel->pPoses[0].v10);
+    fn_8000914C(pModel->pPoses[0].q0, pModel->pMatrices[0]);
+    fn_8001E880(pModel->pPoses[0].v10, pModel->pMatrices[0][3]);
+    if (bStance && (pSkel = pChar->pModel->pSkel) != NULL) {
+        pOldClip = pChar->pCurClip;
+        fn_8001EED8(pChar->pModel, 1);      // the results are not used
+        fn_8001EED8(pChar->pModel, 0x52);
+        pClip = Char_SetClip(pChar, 0, pChar->nStyle, NULL);
+        if (pClip->uD8 == 0) {
+            fn_80027108(pSkel);
+            SKEL_SetIKSolutionWeight(pChar->pModel->pSkel, 0.0f);
+            pChar->pModel->pSkel->f1074 = 0.0f;
+            return;
+        }
+        if (pSkel->pClip != pClip) {
+            pSkel->pClip = pClip;
+            fn_80021978(pChar->pModel->bEE);
+            if (bClipTime) {
+                fn_8001FCF4(pChar, pClip, &pSkel->pose, 0, pClip->pD4->f24);
+            } else {
+                fn_8001FCF4(pChar, pClip, &pSkel->pose, 0, 0.0f);
+            }
+        }
+        fn_8001BD18(pChar, pSkel->pClip);
+        fn_8000AE28(pChar->pModel->pMatrices[0][0], -lbl_80187184[pChar->nClubClass][0], vOffsetX);
+        fn_8000AE28(pChar->pModel->pMatrices[0][2], -lbl_80187184[pChar->nClubClass][2], vOffsetZ);
+        if (pChar->pModel->bEE) {
+            vOffsetZ[0] = -vOffsetZ[0];
+            vOffsetZ[2] = -vOffsetZ[2];
+        }
+        fn_8001EFD8(vOffsetX, pChar->pModel->pBones[0].v1C, pChar->pModel->pBones[0].v1C);
+        fn_8001EFD8(vOffsetZ, pChar->pModel->pBones[0].v1C, pChar->pModel->pBones[0].v1C);
+        fn_8001E85C(pModel->pBones[0].v1C, pModel->pPoses[0].v10);
+        fn_8001E880(pModel->pPoses[0].v10, pModel->pMatrices[0][3]);
+        fn_80027108(pSkel);
+        if (pChar->p16D8 != NULL) {
+            pSkel->pose.aBones[pChar->nClubHeadBone].v10[1] = pChar->p16D8->afC[pChar->nClubClass];
+        }
+        SKEL_UpdateState(pChar->pModel, &pSkel->pose, 1);
+        Character_UpdateTestPoints(pChar);
+        if (bPlace) {
+            pChar->n1784 = -1;
+            Character_UpdateFeetTerrainInfo(pChar, 1);
+        }
+        fY = pChar->pModel->pBones[0].v1C[1];
+        Character_PlaceFeetOnGround(pChar);
+        fY = pChar->pModel->pBones[0].v1C[1] - fY;
+        SKEL_TranslateIKChainY(pChar->pModel, &pChar->pModel->pSkel->pChains[0], fY);
+        SKEL_TranslateIKChainY(pChar->pModel, &pChar->pModel->pSkel->pChains[1], fY);
+        fn_8001EFD8(gPlayers[pChar->nPlayer].ball.vPos, vOffsetX, vPos);
+        fn_8001EFD8(vPos, vOffsetZ, vPos);
+        vPos[1] += lbl_80187184[pChar->nClubClass][1];
+        fn_800280E8(pChar, vPos, bPlace);
+        pChar->pModel->pSkel->n1130 = pChar->n16D4;
+        pChar->pModel->pSkel->n112C = pChar->nClubClass;
+        if (((pChar->n20 == 5 || pChar->nAnim == 5) && fn_8009637C(pChar)) || pChar->n20 == 7) {
+            SKEL_SetIKSolutionWeight(pChar->pModel->pSkel, 1.0f);
+        } else {
+            SKEL_SetIKSolutionWeight(pChar->pModel->pSkel, 0.0f);
+        }
+        if (pOldClip != NULL) {
+            fn_8001BD18(pChar, pOldClip);
+        }
+    }
+    if (pChar->pModel->pSkel != NULL) {
+        pChar->pModel->pSkel->f1074 = 0.0f;
     }
 }
 

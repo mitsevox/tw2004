@@ -70,8 +70,9 @@ typedef struct Skeleton {
     f32  (*p20)[4];             // 0x0020  a quaternion per bone
     f32  (*p24)[4];             // 0x0024  a quaternion per bone
     f32  (*p28)[4];             // 0x0028  p20 at an IK weight of 0 or 1, otherwise p24
-    s32  n2C;                   // 0x002C  cleared before and after fn_8001966C's animation update
-    u8   unk30[0x1070 - 0x30];
+    struct Clip* pClip;         // 0x002C  its clip (fn_8001C860); cleared before and after
+                                //         fn_8001966C's animation update
+    SkelPose pose;              // 0x0030  (fn_8001C860 passes it to SKEL_UpdateState)
     f32  fIKWeight;             // 0x1070  SKEL_SetIKSolutionWeight
     f32  f1074;                 // 0x1074  } set by fn_8002792C and SKEL_TransitionIK
     f32  f1078;                 // 0x1078  }
@@ -82,6 +83,9 @@ typedef struct Skeleton {
     u8   unk10C8[0x10D4 - 0x10C8];
     f32  q10D4[4];              // 0x10D4  a rotation (quaternion) given by fn_80027808
     s32  n10E4;                 // 0x10E4  set to 4 as a swing starts
+    u8   unk10E8[0x112C - 0x10E8];
+    s32  n112C;                 // 0x112C  } the character's club class and n16D4 (fn_8001C860)
+    s32  n1130;                 // 0x1130  }
 } Skeleton;
 
 // A bone of a character's model (CharModel.pBones).
@@ -158,7 +162,7 @@ typedef struct Clip {
     u8     unk90[0x10];
     char   name[0x30];          // 0xA0
     u8*    pD0;                 // 0xD0
-    u8     unkD4[4];
+    struct ClipD4* pD4;         // 0xD4
     u32    uD8;                 // 0xD8  nonzero: FEgolferanim.c turns the golfer round for it
     u32    uAram;               // 0xDC
     u8     unkE0[4];
@@ -295,6 +299,16 @@ typedef struct CharModelDefs {
 extern CharModelDefs lbl_80280E10;
 extern CharModelDefs lbl_80280E18;
 
+// Per club class, an offset (x, y, z) fn_8001C860 places the golfer by (0x4C bytes: one more
+// float follows the six).
+extern f32 lbl_80187184[6][3];
+
+// What Clip.pD4 points at; only what the code reads.
+typedef struct ClipD4 {
+    u8    unk0[0x24];
+    f32   f24;                  // 0x24  fn_8001C860 starts the skeleton's clip at it
+} ClipD4;
+
 // The golfer's character object (0x1798 bytes or more); only the fields read so far. Anim_SetRate,
 // Anim_SetTime and fn_8007326C take the address of its animation player at 0x164, whose fields
 // from 0x168 on are named here directly.
@@ -405,7 +419,9 @@ typedef struct Character {
     Clip* p1790;                // 0x1790  cleared by fn_80062BFC; CharacterState_AddSKABlendData plays it for
                                 //         groups 5, 6 and 10
     void* p1794;                // 0x1794  cleared by fn_80062BE8; the same for group 9
-    u8    unk1798[0x17AC - 0x1798];
+    Clip* p1798;                // 0x1798  cleared by fn_8001942C; with n2C 6, fn_8001C650 and
+                                //         fn_8001C860 set n16D4 to 4 when it is 0
+    u8    unk179C[0x17AC - 0x179C];
     void* p17AC;                // 0x17AC  its slider definitions (CharSlider_CreateDefinitionsFromMem,
                                 //         fn_8001A9F4); fn_8001DC64 applies them
     void (*pfn17B0)(void);      // 0x17B0  called by Character_UpdateAnimation before the bones are
@@ -521,6 +537,8 @@ f32   fn_8001F02C(struct ClipBlend* pBlend, u64 uEvent);   // an event's time (b
 void  Anim_SetRate(u8* pAnim, f32 fRate);           // 0x8001F084
 void  fn_8001E85C(f32* pSrc, f32* pDst);            // copy a quaternion
 void  SKEL_SetIKSolutionWeight(Skeleton* pSkel, f32 f);
+void  fn_80027108(Skeleton* pSkel);                                         // Skeleton.c
+void  SKEL_TranslateIKChainY(CharModel* pModel, IKChain* pChain, f32 f);   // Skeleton.c
 void  fn_80027808(CharModel* pModel, f32* pRot);
 void  fn_8002792C(Skeleton* pSkel);
 void  SKEL_TransitionIK(Skeleton* pSkel, u8 b, f32 f);
