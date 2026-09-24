@@ -46,6 +46,13 @@ char* GameModeDriverPGATour_GetInitialChampName(s32 i);               // a tourn
 s32  GameModeDriverPGATour_GetInitialChampScore(s32 i);                // and the champion's score
 s32  fn_800EF0E0(int nPlayer);          // GameModeDriverPGATour.c: the player's bracket
 
+PgaStatSort lbl_80281840 = { -1, 0 };
+#pragma explicit_zero_data on
+int lbl_80281848 = 0;
+#pragma explicit_zero_data reset
+u8 gbStatsDirty = 1;
+u8 gbScoresDirty = 1;
+
 PgaEntrantMC* GetEntrantMCPtr(int nPlayer, int nEntrant) {
     return &gpSaveData[nPlayer].tour.field.aEntrant[nEntrant];
 }
@@ -848,6 +855,14 @@ s32 fn_80119AE0(int nPlayer) {
         }
     }
     return nRow;
+}
+
+// fake match: stands in for a function the original linker stripped. The file's pool has 0.0
+// right after the int-to-float constant, before fn_80119B54's 0.25; its body is unknown, this
+// one only reproduces the order.
+static f32 PGATourSimulation_StrippedFn(f32 x) {
+    if (x > 0.0f) return x;
+    return 0.0f;
 }
 
 // Simulates an entrant's strokes on a hole: the pro's scoring average for the hole's par (the
