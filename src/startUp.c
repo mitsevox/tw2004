@@ -1305,3 +1305,137 @@ void fn_800B1A9C(f32* v, f32 x, f32 y) {
     v[0] = x;
     v[1] = y;
 }
+
+// ---- sweep code (not yet cleaned up) ----
+
+s32 fn_800B1AA8(void);
+s32 fn_800B1CF4();
+void fn_800B1AB0(u8* arg0, u32 arg1, f32* arg2);
+void fn_800B0B1C();
+void fn_800B1F9C(void);
+int fn_800B14E4(s32* pnPort, s32* pnSlot);
+void fn_800B1FBC(MsgArg* pArgs, MsgArg* pResult);
+void fn_800B1FFC(MsgArg* pArgs, MsgArg* pResult);
+void fn_800B0954();
+void fn_800B0960();
+void fn_800B204C(void);
+void fn_800B206C(void);
+void fn_800B1510(s32 a, s32 b);
+void fn_800B208C(MsgArg* pArgs);
+s32 fn_800B120C(s32* pnPort, s32* pnSlot);
+void fn_800B20B8(MsgArg* pArgs, MsgArg* pResult);
+void fn_800B2104(MsgArg* pArgs, MsgArg* pResult);
+s32 fn_800A7A14(s32);
+void fn_800B2150(MsgArg* pArgs);
+void fn_800B21D0(MsgArg* pArgs, MsgArg* pResult);
+void fn_800B21DC(void);
+void fn_800B21E0(void);
+void fn_800B21E4(MsgArg* pArgs, MsgArg* pResult);
+void fn_800B21F0(MsgArg* pArgs, MsgArg* pResult);
+Session* fn_800B223C(void);
+void fn_800B158C(s32 a, s32 b);
+void fn_800B2250(MsgArg* pArgs);
+void fn_80083D88(MsgArg* pArgs, MsgArg* pResult);
+void fn_800B22D4(void);
+void fn_800B22F4(MsgArg* pArgs, MsgArg* pResult);
+
+s32 fn_800B1AA8(void) {
+    return 1;
+}
+
+void fn_800B1AB0(u8* arg0, u32 arg1, f32* arg2) {
+    u8* temp_r6;
+    u8** temp_r31;
+
+    temp_r31 = (*(u8***)((u8*)((*(u8**)((u8*)(arg0) + 0x100))) + 0x14));
+    if (arg1 != 0U) {
+        temp_r6 = *temp_r31;
+        fn_800B1CF4(arg0 + 0xC0, temp_r6 + 0x58, arg1, temp_r6);
+    }
+    if (arg2 != NULL) {
+        *arg2 = (*(f32*)((u8*)(*temp_r31) + 0x64));
+    }
+}
+
+void fn_800B1F9C(void) {
+    fn_800B0B1C();
+}
+
+void fn_800B1FBC(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = (u8)fn_800B14E4(pArgs[0].p, pArgs[1].p);
+}
+
+void fn_800B1FFC(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = (u8)fn_800B13FC(pArgs[0].p, pArgs[1].p);
+}
+
+void fn_800B204C(void) {
+    fn_800B0960();
+}
+
+void fn_800B206C(void) {
+    fn_800B0954();
+}
+
+void fn_800B208C(MsgArg* pArgs) {
+    fn_800B1510(pArgs[0].i, pArgs[1].i);
+}
+
+void fn_800B20B8(MsgArg* pArgs, MsgArg* pResult) {
+    fn_8009CD10();
+    pResult->i = fn_800B12FC(pArgs[0].p, pArgs[1].p);
+    fn_8009CD7C();
+}
+
+void fn_800B2104(MsgArg* pArgs, MsgArg* pResult) {
+    fn_8009CD10();
+    pResult->i = fn_800B120C(pArgs[0].p, pArgs[1].p);
+    fn_8009CD7C();
+}
+
+void fn_800B2150(MsgArg* pArgs) {
+    if (pArgs[0].i == 2) {
+        fn_800A7A14(0);
+        return;
+    }
+    fn_800A7A14(1);
+}
+
+void fn_800B21D0(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = 0;
+}
+
+void fn_800B21DC(void) {
+}
+
+void fn_800B21E0(void) {
+}
+
+void fn_800B21E4(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = 1;
+}
+
+void fn_800B21F0(MsgArg* pArgs, MsgArg* pResult) {
+    fn_8009CD10();
+    pResult->i = fn_8009D3DC(pArgs[0].i, pArgs[1].i);
+    fn_8009CD7C();
+}
+
+Session* fn_800B223C(void) {
+    gSession.nC = 2;
+    return &gSession;
+}
+
+void fn_800B2250(MsgArg* pArgs) {
+    fn_800B158C(pArgs[0].i, pArgs[1].i);
+}
+
+void fn_800B22D4(void) {
+    fn_801102AC();
+}
+
+void fn_800B22F4(MsgArg* pArgs, MsgArg* pResult) {
+    fn_80083D88(pArgs, pResult);
+}
+
+// ---- end of sweep code ----
