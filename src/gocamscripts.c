@@ -1253,6 +1253,99 @@ void fn_800418B0(CamShot* pShot, f32* pOut, f32 fTime, f32 fSpeed) {
     }
 }
 
+// Turns the look-at point pSub (level, about the camera pCam) towards the aim marker
+// (Player.vTargetCopy, moved by pShot's f74 and f70 when there is one) by the angle between them
+// over fRate frames' worth (at least 1), keeping the goal's level distance; its height moves by
+// fYShare of the way. With bClose an aim nearer than CamTuning.fF0 is pushed out; with bLimit, one
+// farther than fMinDist sits at most f12C below the camera. Nothing while paused.
+void CameraScript_LagAimMarker(int nPlayer, f32* pSub, f32* pCam, CamShot* pShot, u8 bClose, u8 bLimit,
+                               f32 fRate, f32 fMinDist, f32 fYShare) {
+    f32 vGoal[4];
+    f32 vCur[4];
+    f32 vDir[4];
+    f32 vToGoal[4];
+    f32 vFlat[4];
+    f32 qTurn[4];
+    f32 vAxis[4];
+    f32 vAim[4];
+    f32 fFrames;
+    f32 fDiv;
+    f32 fMin;
+    f32 fOldY;
+    f32 fDist;
+    f32 fAngle;
+    f32 fAimY;
+
+    fFrames = 0.0f;
+    if (0.0f != gSession.fFrameTime) {
+        fFrames = fRate * (1.0f / (FRAME_RATE * gSession.fFrameTime));
+    }
+    fDiv = 1.0f;
+    if (fDiv <= fFrames) {
+        fDiv = fFrames;
+    }
+    if (0.0f != fDiv && gSession.nPaused == 0) {
+        Vec3Copy(gPlayers[nPlayer].vTargetCopy, vAim);
+        fOldY = pSub[1];
+        Vec3Copy(vAim, vGoal);
+        if (pShot != NULL) {
+            fn_8004255C(vGoal, pCam, pShot->f74, pShot->f70);
+        }
+        fn_80045428(vGoal, pCam, vDir);
+        fMin = lbl_80281F78->fF0;
+        fMin *= 1.0f / fn_8001EFFC((u8*)fn_80008370(fn_80017004(gPlayers[nPlayer].nView[0])));
+        fMin *= -vDir[1];
+        vDir[1] = 0.0f;
+        if ((f32)fn_80009680(fn_80009744(vDir)) < fMin && bClose) {
+            if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
+                fn_800BAF04(vDir, vDir);
+            }
+            fn_8001EF34(vDir, fMin, vDir);
+            fAimY = vAim[1];
+            vDir[1] = (vGoal[1] - fAimY) * ((f32)fn_80009680(fn_80009744(vDir)) / fMin) + fAimY - pCam[1];
+            fn_8004544C(vDir, pCam, vGoal);
+        }
+        if (bLimit) {
+            fn_80045428(vGoal, pCam, vFlat);
+            vFlat[1] = 0.0f;
+            if ((f32)fn_80009680(fn_80009744(vFlat)) > fMinDist
+                && pCam[1] - vGoal[1] > lbl_80281F78->f12C) {
+                vGoal[1] = pCam[1] - lbl_80281F78->f12C;
+            }
+        }
+        fn_80045428(pSub, pCam, vCur);
+        vCur[1] = 0.0f;
+        fn_80045428(vGoal, pCam, vDir);
+        vDir[1] = 0.0f;
+        fDist = fn_80009680(fn_80009744(vDir));
+        fn_80045428(vGoal, pSub, vToGoal);  // vToGoal is not read
+        if (0.0f != vCur[0] || 0.0f != vCur[1] || 0.0f != vCur[2]) {
+            fn_800BAF04(vCur, vCur);
+        }
+        if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
+            fn_800BAF04(vDir, vDir);
+        }
+        // the dot product is taken up to three times, as a clamp macro would
+        fAngle = fn_80009614(fn_8000C5FC(vCur, vDir) < -1.0f ? -1.0f
+                             : (fn_8000C5FC(vCur, vDir) > 1.0f ? 1.0f : fn_8000C5FC(vCur, vDir)))
+                 / fDiv;
+        vec4flt_CrossProduct(vCur, vDir, vAxis);
+        if (0.0f != vAxis[0] || 0.0f != vAxis[1] || 0.0f != vAxis[2]) {
+            fn_800BAF04(vAxis, vAxis);
+        }
+        fn_8001EF34(vAxis, fAngle, vAxis);
+        fn_8000923C(vAxis, qTurn);
+        vCur[3] = 0.0f;
+        fn_800090E4(qTurn, vCur, vDir);
+        if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
+            fn_800BAF04(vDir, vDir);
+        }
+        fn_8001EF34(vDir, fDist, vDir);
+        fn_8004544C(pCam, vDir, pSub);
+        pSub[1] = fYShare * (vGoal[1] - fOldY) + fOldY;
+    }
+}
+
 // The look-at point following the ball, one step per ball update this frame: the aim moves from
 // the script's v70 towards the ball (fn_8003D9AC) at its fn_80043420 height, moved by the shot's
 // f74 and f70; during a fairway fix (bCF) a steep look down is limited (as in

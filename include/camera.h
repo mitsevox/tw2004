@@ -277,7 +277,8 @@ typedef struct CamTuning {
     f32  fE8;                   // 0x0E8  ... its lag on a bone of the golfer (fn_800422C4)
     f32  fEC;                   // 0x0EC  CamScript_CheckOutOfBounds: the camera time before it checks
                                 //        the hole's outline
-    u8   unkF0[0xF4 - 0xF0];
+    f32  fF0;                   // 0x0F0  CameraScript_LagAimMarker: the aim closer than this (over the
+                                //        lens's fB0, times the drop to it) is pushed out to it
     f32  fF4;                   // 0x0F4  fn_80043C74: a spot is taken when the dot product of its level
                                 //        direction to the ball with the camera's is below this
     u8   unkF8[0xFC - 0xF8];
@@ -299,7 +300,7 @@ typedef struct CamTuning {
     f32  f124;                  // 0x124  ... and less than this above it counts as in the way
     f32  f128;                  // 0x128  CamScript_GetLookAtPoint: the least level distance for the
                                 //        steep-aim limit
-    u8   unk12C[0x130 - 0x12C];
+    f32  f12C;                  // 0x12C  CameraScript_LagAimMarker: the most the aim may sit below the camera
     f32  f130;                  // 0x130  Terrain_HeightAt: the headroom a camera needs over a ground layer
     f32  f134;                  // 0x134  fn_800422C4: the look-at point eases in slower within this share
                                 //        of the (field-of-view scaled) camera distance
@@ -551,8 +552,8 @@ void     CameraScript_RecordCurrentCam(CamShot* pShot, f32* pCam, f32* pSub, int
 void     CameraScript_InterpToNewScript(CamScript* pScript, CamShot* pShot, int nPlayer, f32* pCam, f32* pSub,
                                         int nA, f32 f1, f32 f2, int nB, f32 f3);
 u8       fn_80043388(CamScript* pScript, CamShot* pShot);
-void     CameraScript_LagAimMarker(int nPlayer, f32* pSub, f32* pCam, CamShot* pShot, int a, int b, f32 f1,
-                                   f32 f2, f32 f3);
+void     CameraScript_LagAimMarker(int nPlayer, f32* pSub, f32* pCam, CamShot* pShot, u8 bClose, u8 bLimit,
+                                   f32 fRate, f32 fMinDist, f32 fYShare);
 void     fn_80043C74(CamScript* pScript, f32* pOut, f32* pCam, int nPlayer, CamShot* pShot, f32* pSub,
                      f32* pHeight);
 void     CamScript_PutBackOnFairway(CamScript* pScript, f32* pCam, f32* pSub, int nPlayer, CamShot* pShot,
