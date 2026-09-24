@@ -8,7 +8,7 @@
 #include "engine.h"
 
 typedef struct LLPict {
-    u8   unk0[0x60];
+    GXTexObj aTex[3];           // 0x00  the Y, U and V planes as I8 textures (fn_8002FB98)
     u8*  pPixels;               // 0x60  Y (nWidth * nHeight), then U and V (a quarter of that each)
     s32  nWidth;                // 0x64
     s32  nHeight;               // 0x68
@@ -93,6 +93,9 @@ u8   fn_8003001C(LLPict* pPict, PictStream* pStream);
 u8   fn_80030040(LLPict* pPict, PictStream* pStream);
 void fn_8003009C(LLPict* pPict, PictStream* pStream, int n2);             // empty
 void fn_800300A0(LLPict* pPict, PictStream* pStream);
+
+// LLPict_Gc.c's work buffer for copying planes: points at a pointer fn_8002F4FC fills (2048 bytes).
+extern void** lbl_802810C0;
 
 // A picture from a "MADk" file in memory (LLPict_Gc.c).
 LLPict* fn_8002FD00(u8* pData, u32 uSize);

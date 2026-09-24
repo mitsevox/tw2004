@@ -6,13 +6,13 @@
 
 void fn_8002F898(u8* pSrc, u8* pDst, int nWidth, int nHeight);   // copies one plane
 void fn_8002FB98(LLPict* pPict);
+void fn_8002F56C(u8* pPlane, void* pWork, int nWidth, int nHeight);  // reorders one plane through pWork
 PictFrame* fn_800B94CC(void* pDecoder, int n);                  // the decoder's next frame, or NULL
 void fn_800B9808(void* pDecoder, PictFrame* pFrame);            // gives a frame back
 
 // ---- sweep code (not yet cleaned up) ----
 
 extern u8 lbl_801876C8[];
-extern s32 lbl_802810C0;
 void fn_80056204();
 void fn_80056208();
 void fn_8002F4FC(void);
@@ -25,13 +25,66 @@ void fn_8002F4FC(void) {
     void* t1;
     fn_80056204();
     t1 = fn_80009B34(2048, 2, 32, (const char*)lbl_801876C8, 68);
-    *(void**)((u8*)lbl_802810C0) = t1;
+    *lbl_802810C0 = t1;
 }
 
 void fn_8002F540(void) {
     fn_80056208();
-    fn_80009E70((void*)*(s32*)((u8*)lbl_802810C0));
+    fn_80009E70(*lbl_802810C0);
 }
+
+// ---- end of sweep code ----
+
+// Copies a plane of nWidth x nHeight bytes into GameCube I8 tile order: tiles of 8 x 4 bytes, each
+// row of a tile being 8 bytes of one source row.
+void fn_8002F898(u8* pSrc, u8* pDst, int nWidth, int nHeight) {
+    int i;
+    int y;
+    u32* pIn;
+
+    for (y = 0; y < nHeight; y += 4) {
+        for (i = 0; i < nWidth / 2; i++) {
+            pIn = (u32*)pSrc + ((i / 4) * 2 + (nWidth / 4) * (i % 4));
+            ((u32*)pDst)[i * 2] = pIn[0];
+            ((u32*)pDst)[i * 2 + 1] = pIn[1];
+        }
+        pSrc += nWidth * 4;
+        pDst += nWidth * 4;
+    }
+}
+
+// Makes the picture's three planes into I8 textures (U and V at half the width and height).
+void fn_8002FB98(LLPict* pPict) {
+    GXInitTexObj(&pPict->aTex[0], fn_8003020C(pPict), pPict->nWidth, pPict->nHeight, 1, 0, 0, 0);
+    GXInitTexObjLOD(&pPict->aTex[0], 0, 0, 0.0f, 0.0f, 0.0f, 0, 0, 0);
+    GXInitTexObj(&pPict->aTex[1], fn_800301F4(pPict), pPict->nWidth / 2, pPict->nHeight / 2, 1, 0, 0, 0);
+    GXInitTexObjLOD(&pPict->aTex[1], 0, 0, 0.0f, 0.0f, 0.0f, 0, 0, 0);
+    GXInitTexObj(&pPict->aTex[2], fn_800301D0(pPict), pPict->nWidth / 2, pPict->nHeight / 2, 1, 0, 0, 0);
+    GXInitTexObjLOD(&pPict->aTex[2], 0, 0, 0.0f, 0.0f, 0.0f, 0, 0, 0);
+}
+
+// Decodes a "MADk" file into a new picture and makes its textures (NULL: no file, or it did not
+// decode).
+LLPict* fn_8002FD00(u8* pData, u32 uSize) {
+    LLPict* pPict;
+
+    if (pData == NULL) {
+        return NULL;
+    }
+    pPict = PictInt_Decode((PictFile*)pData);
+    if (pPict == NULL) {
+        return NULL;
+    }
+    DCFlushRange(fn_8003020C(pPict), 1.5f * (pPict->nWidth * pPict->nHeight));
+    fn_8002F56C(fn_8003020C(pPict), *lbl_802810C0, pPict->nWidth, pPict->nHeight);
+    fn_8002F56C(fn_800301F4(pPict), *lbl_802810C0, pPict->nWidth / 2, pPict->nHeight / 2);
+    fn_8002F56C(fn_800301D0(pPict), *lbl_802810C0, pPict->nWidth / 2, pPict->nHeight / 2);
+    DCFlushRange(fn_8003020C(pPict), 1.5f * (pPict->nWidth * pPict->nHeight));
+    fn_8002FB98(pPict);
+    return pPict;
+}
+
+// ---- sweep code (not yet cleaned up) ----
 
 void fn_8002FE70(LLPict* pPict) {
     if (pPict != NULL) {
@@ -71,6 +124,16 @@ void fn_8002FF94(LLPict* pPict, PictStream* pStream) {
 }
 
 // ---- end of sweep code ----
+
+// Sizes the picture to the stream's frame and allocates its planes.
+void fn_8002FF98(LLPict* pPict, PictStream* pStream) {
+    pPict->nWidth = pStream->pFrame->nWidth;
+    pPict->nHeight = pStream->pFrame->nHeight;
+    pPict->pPixels =
+        fn_80009B34(pPict->nWidth * pPict->nHeight * 3 / 2, 1, 32, (const char*)lbl_801876C8, 346);
+    pPict->f6C = 1.0f;
+    pPict->f70 = 1.0f;
+}
 
 // ---- sweep code (not yet cleaned up) ----
 
