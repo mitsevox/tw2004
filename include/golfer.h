@@ -662,7 +662,8 @@ typedef struct TargetMarker {
     f32  f1C;                   // 0x1C
     f32  f20;                   // 0x20
     f32  f24;                   // 0x24  twice this is a size (fn_80067DAC)
-    u8   unk28[4];
+    u8   b28;                   // 0x28  the marker was on screen last frame (fn_80067DAC)
+    u8   unk29[3];
 } TargetMarker;
 LAYOUT_ASSERT(TargetMarker, 0x2C);
 

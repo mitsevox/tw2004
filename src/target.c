@@ -72,6 +72,258 @@ void fn_80067CD4(int nPlayer) {
     }
 }
 
+void fn_80012C84(int a);
+void fn_800E5118(int a, int b, int nPlayer);                       // GameMessages.c
+void fn_800E5178(int nPlayer, f32 a, f32 b, f32 c, f32 d);          // GameMessages.c
+
+// The aim marker at the target, each frame while a human lines up a shot: a sign turned to face
+// the camera, bigger the further the camera is, and its shadow; with f8 set it cycles through
+// three heights (every 0.5 / f8 frames), drawn in three shades. Passes the target's screen
+// position, the lie's height difference and the shot's share of the club's range to the HUD.
+void fn_80067DAC(int nPlayer) {
+    f32   aMarker[4][4];
+    f32   aShadow[4][4];
+    f32   aMarkerQuad[4][3];
+    f32   aUV[16] = {0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f,
+                     0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f};
+    f32   aShadowQuad[4][3];
+    f32   aY2[4];
+    f32   aY1[4];
+    f32   aY0[4];
+    f32   aFaint[4] = {1.0f, 1.0f, 1.0f, 0.125f};
+    f32   aSolid[4] = {1.0f, 1.0f, 1.0f, 0.5f};
+    f32   aLight[4] = {1.0f, 1.0f, 1.0f, 0.175f};
+    f32   aText[4] = {0.5f, 0.5f, 0.5f, 0.5f};
+    f32   vUp[4] = {0.0f, 0.0f, 1.0f, 0.0f};
+    f32   vCross[4];
+    f32   vPos[4];
+    f32   vDir[4];
+    f32   fX;
+    f32   fX1;
+    f32   fX2;
+    f32   fY;
+    f32   fCos;
+    f32   fDot;
+    f32   fCamDist;
+    f32   fRise;
+    f32   fSin;
+    f32   fShare;
+    f32   fDist;
+    f32   fTilt;
+    f32   fBob;
+    f32   fScale;
+    f32   fStep;
+    f32   fShadow;
+    f32*  pCamPos;
+    f32*  pLook;
+    View* pView;
+    void* pCamera;
+    int   nX;
+    int   nY;
+    int   nFrame;
+    int   i;
+    u8    bOnScreen;
+
+    pCamera = fn_80017004(gPlayers[nPlayer].nView[0]);
+    aMarkerQuad[0][0] = 2.0f * lbl_801D5BF0[nPlayer].f24;
+    aMarkerQuad[0][1] = 2.0f * lbl_801D5BF0[nPlayer].f24 / fn_80017028(gPlayers[nPlayer].nView[0])->f54;
+    aMarkerQuad[0][2] = -lbl_801D5BF0[nPlayer].f24;
+    aMarkerQuad[1][0] = 2.0f * lbl_801D5BF0[nPlayer].f24;
+    aMarkerQuad[1][1] = 2.0f * lbl_801D5BF0[nPlayer].f24 / fn_80017028(gPlayers[nPlayer].nView[0])->f54;
+    aMarkerQuad[1][2] = lbl_801D5BF0[nPlayer].f24;
+    aMarkerQuad[2][0] = 0.0f;
+    aMarkerQuad[2][1] = 0.0f;
+    aMarkerQuad[2][2] = -lbl_801D5BF0[nPlayer].f24;
+    aMarkerQuad[3][0] = 0.0f;
+    aMarkerQuad[3][1] = 0.0f;
+    aMarkerQuad[3][2] = lbl_801D5BF0[nPlayer].f24;
+    fDist = gPlayers[nPlayer].fDistance2;
+    fShadow = lbl_801D5BF0[nPlayer].f1C;
+    aShadowQuad[0][0] = fShadow;
+    aShadowQuad[0][1] = 0.0f;
+    aShadowQuad[0][2] = -fShadow;
+    aShadowQuad[1][0] = fShadow;
+    aShadowQuad[1][1] = 0.0f;
+    aShadowQuad[1][2] = fShadow;
+    aShadowQuad[2][0] = -fShadow;
+    aShadowQuad[2][1] = 0.0f;
+    aShadowQuad[2][2] = -fShadow;
+    aShadowQuad[3][0] = -fShadow;
+    aShadowQuad[3][1] = 0.0f;
+    aShadowQuad[3][2] = fShadow;
+    Vec_Copy(gPlayers[nPlayer].vTargetCopy, vPos);
+    if (gPlayers[nPlayer].uFlagsEF0 & 2) {
+        aShadowQuad[0][1] -= 1.0f / 9.0f;
+        aShadowQuad[1][1] -= 1.0f / 9.0f;
+        aShadowQuad[2][1] -= 1.0f / 9.0f;
+        aShadowQuad[3][1] -= 1.0f / 9.0f;
+    }
+
+    pView = fn_80017028(gPlayers[nPlayer].nView[0]);
+    pCamPos = fn_8001731C(pView);
+    pLook = fn_80017314(pView);
+    fCamDist = Vec_Distance(pCamPos, vPos);
+    fn_8006A964(pLook, pCamPos, vDir);
+    vDir[1] = 0.0f;
+    if (0.0f == vDir[0] && 0.0f == vDir[2]) {
+        return;
+    }
+    fn_800BAF04(vDir, vDir);
+    fDot = fn_8000C5FC(vUp, vDir);
+    vec4flt_CrossProduct(vDir, vUp, vCross);
+    fCos = (fDot < -1.0f) ? -1.0f : ((fDot > 1.0f) ? 1.0f : fDot);
+    fSin = fn_80009680(1.0f - fCos * fCos);
+    if (vCross[1] < 0.0f) {
+        fSin = -fSin;
+    }
+
+    // the HUD: where the target is on screen, how far above or below the ball, and the share of
+    // the club's range (1..100)
+    fn_80012C84(0);
+    fn_8006A9AC(aText);
+    fn_8006434C(pCamera, vPos, &fX, &fY, NULL);
+    fn_8006A8D4(pCamera, &fX, &fY);
+    fRise = vPos[1] - gPlayers[nPlayer].vBall[1];
+    fShare = 100.0f * (gPlayers[nPlayer].fDistance
+                       / AI_MaxDistance(nPlayer, gPlayers[nPlayer].nShotKind, gPlayers[nPlayer].nClub));
+    if (fShare < 1.0f) {
+        fShare = 1.0f;
+    }
+    if (fShare > 100.0f) {
+        fShare = 100.0f;
+    }
+    if (gPlayers[nPlayer].nShotKind != 0) {
+        if (fDist < 1.0f) {
+            fDist = 1.0f;
+        } else if (3.0f * fDist < 1.0f) {
+            fDist = 1.0f / 3.0f;
+        }
+    }
+    fCamDist /= 300.0f;
+    if (fRise > -0.015f && fRise < 0.015f) {
+        fTilt = 0.0f;
+        fStep = fTilt;
+    } else {
+        fTilt = 3.0f * fRise;
+        fStep = 36.0f * fRise;
+    }
+    fn_800E5178(nPlayer, fDist, fTilt, fStep, fShare);
+
+    fn_80012F50(0, 6, 0x7F);
+    fn_80012F18(3);
+    fn_80012F34(0);
+    fn_80035118(4, 5);
+    fn_8005CC64(lbl_80281E3C, lbl_80281E40);
+    fn_80014118(0x50);
+    fn_80012EF8();
+    fn_8001425C(1);
+    fScale = 8.0f * fCamDist + 1.0f;
+    for (i = 0; i < 4; i++) {
+        aMarker[i][2] = fScale * (fCos * aMarkerQuad[i][0]) + fScale * (fSin * aMarkerQuad[i][2]);
+        aMarker[i][0] = fScale * (-fSin * aMarkerQuad[i][0]) + fScale * (fCos * aMarkerQuad[i][2]);
+        aMarker[i][1] = fScale * aMarkerQuad[i][1];
+    }
+    for (i = 0; i < 4; i++) {
+        aMarker[i][0] = vPos[0] + aMarker[i][0];
+        aMarker[i][1] = vPos[1] + aMarker[i][1] - fScale * lbl_801D5BF0[nPlayer].f14;
+        aMarker[i][2] = vPos[2] + aMarker[i][2];
+        aMarker[i][3] = 1.0f;
+        aShadow[i][0] = vPos[0] + aShadowQuad[i][0];
+        aShadow[i][1] = vPos[1] + aShadowQuad[i][1] + lbl_801D5BF0[nPlayer].f20;
+        aShadow[i][2] = vPos[2] + aShadowQuad[i][2];
+        aShadow[i][3] = 1.0f;
+    }
+    bOnScreen = fn_8006434C(pCamera, aMarker[0], &fX1, &fY, NULL);
+    fn_8006A8D4(pCamera, &fX1, &fY);
+    bOnScreen &= fn_8006434C(pCamera, aMarker[1], &fX2, &fY, NULL);
+    fn_8006A8D4(pCamera, &fX2, &fY);
+    fX = 0.5f * (fX1 + fX2);
+
+    if (0.0f != lbl_801D5BF0[nPlayer].f8) {
+        // EA bug: steps by marker i's f8, i being 4 after the loop above, not the player's
+        lbl_801D5BF0[nPlayer].fC -= lbl_801D5BF0[i].f8;
+        if (lbl_801D5BF0[nPlayer].fC < 0.125f) {
+            lbl_801D5BF0[nPlayer].n10++;
+            if (lbl_801D5BF0[nPlayer].n10 > 2) {
+                lbl_801D5BF0[nPlayer].n10 = 0;
+            }
+            lbl_801D5BF0[nPlayer].fC = 0.5f;
+        }
+        nFrame = lbl_801D5BF0[nPlayer].n10;
+        if (nFrame == 0) {
+            fBob = 0.5f * (fScale * lbl_801D5BF0[nPlayer].f18);
+            for (i = 0; i < 4; i++) {
+                aY2[i] = aMarker[i][1];
+                aY1[i] = aMarker[i][1] - fBob;
+                aY0[i] = aY1[i] - fBob;
+            }
+        }
+        if (nFrame == 1) {
+            fBob = 0.5f * (fScale * lbl_801D5BF0[nPlayer].f18);
+            for (i = 0; i < 4; i++) {
+                aY1[i] = aMarker[i][1];
+                aY2[i] = aMarker[i][1] - fBob;
+                aY0[i] = aY2[i] - fBob;
+            }
+        }
+        if (nFrame == 2) {
+            fBob = 0.5f * (fScale * lbl_801D5BF0[nPlayer].f18);
+            for (i = 0; i < 4; i++) {
+                aY1[i] = aMarker[i][1];
+                aY0[i] = aMarker[i][1] - fBob;
+                aY2[i] = aY0[i] - fBob;
+            }
+        }
+        for (i = 0; i < 4; i++) {
+            aMarker[i][1] = aY0[i];
+        }
+        if (bOnScreen && gPlayers[nPlayer].nSurface != -1) {
+            fn_80014194(aFaint);
+            fn_8001644C(0x98, aMarker[0], NULL, aUV, 4);
+            for (i = 0; i < 4; i++) {
+                aMarker[i][1] = aY1[i];
+            }
+            fn_80014194(aLight);
+            fn_8001644C(0x98, aMarker[0], NULL, aUV, 4);
+            for (i = 0; i < 4; i++) {
+                aMarker[i][1] = aY2[i];
+            }
+            fn_80014194(aSolid);
+            fn_8001644C(0x98, aMarker[0], NULL, aUV, 4);
+        }
+    } else {
+        fBob = fScale * lbl_801D5BF0[nPlayer].f18;
+        aMarker[0][1] -= fBob;
+        aMarker[1][1] -= fBob;
+        aMarker[2][1] -= fBob;
+        aMarker[3][1] -= fBob;
+        if (bOnScreen && gPlayers[nPlayer].nSurface != -1) {
+            fn_80014194(aSolid);
+            fn_8001644C(0x98, aMarker[0], NULL, aUV, 4);
+        }
+    }
+    if (bOnScreen && gPlayers[nPlayer].nSurface != -1) {
+        fn_8005CC64(lbl_80281E34, lbl_80281E38);
+        fn_80012EF8();
+        fn_8001644C(0x98, aShadow[0], NULL, aUV, 4);
+    }
+    fn_80012F50(1, 6, 0x80);
+    fn_80012F18(3);
+    fn_80012F34(1);
+    fn_80012EF8();
+
+    nY = 416.0f * fY;
+    nX = 512.0f * fX;
+    if (nY > 285) {
+        nY = 285;
+    }
+    if (bOnScreen != lbl_801D5BF0[nPlayer].b28) {
+        fn_80062C80(gPlayers[nPlayer].nC58, bOnScreen);
+        lbl_801D5BF0[nPlayer].b28 = bOnScreen;
+    }
+    fn_800E5118(nX, nY, nPlayer);
+}
+
 // The marker's settings for the coming shot: one set for putts and shot kind 2, another for
 // everything else.
 void fn_800689D4(int nPlayer) {
@@ -593,7 +845,6 @@ void fn_80069C64(char* sz, f32 fX, f32 fY) {
 }
 
 f32  fn_8001414C(u8* p);    // GoRenderCtx_Gc.c: of the screen rectangle
-void fn_80012C84(int a);
 
 // Each frame while the ball is being placed: the bobbing marker ball and its shadow at the
 // placement point, kept inside the camera's view, and the distances to the tee, the ball and the
@@ -618,6 +869,7 @@ void fn_80069CDC(int nPlayer) {
     f32   fX;
     f32   fY;
     f32   fCos;
+    f32   fDot;
     f32   fSin;
     f32   fTeeDist;
     f32   fHoleDist;
@@ -706,13 +958,9 @@ void fn_80069CDC(int nPlayer) {
         return;
     }
     fn_800BAF04(vDir, vDir);
-    fCos = fn_8000C5FC(vUp, vDir);
+    fDot = fn_8000C5FC(vUp, vDir);
     vec4flt_CrossProduct(vDir, vUp, vCross);
-    if (fCos < -1.0f) {
-        fCos = -1.0f;
-    } else if (fCos > 1.0f) {
-        fCos = 1.0f;
-    }
+    fCos = (fDot < -1.0f) ? -1.0f : ((fDot > 1.0f) ? 1.0f : fDot);
     fSin = fn_80009680(1.0f - fCos * fCos);
     if (vCross[1] < 0.0f) {
         fSin = -fSin;
