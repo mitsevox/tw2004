@@ -110,6 +110,8 @@ typedef struct PgaStatSort {
 } PgaStatSort;
 extern PgaStatSort lbl_80281840;
 extern s32 lbl_80281848;        // the same for the score sorts: the player
+// Per simple statistic: the Calc function that works it out from a golfer's counts.
+extern u8 (*lbl_80193F88[GM_PGA_STAT_SIMPLE_COUNT])(PgaStatCounts* pCounts, f32* pfValue);
 // Per statistic: its sort comparison, fn_8011BCFC (higher is better) or fn_8011BBD8 (lower).
 extern s32 (*lbl_80193FF8[GM_PGA_STAT_COUNT])(const void* pA, const void* pB);
 extern s32 lbl_80194074[GM_PGA_STAT_COUNT];     // per statistic: GM_PgaTourSim_GetStatView

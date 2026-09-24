@@ -12,7 +12,6 @@
 
 CamLens* fn_80008370(void* pCamera);                    // the render camera's lens
 void     fn_800352BC(void);
-void     fn_80035240(int a);
 u8       fn_800635D0(int nPlayer);
 u8       fn_800B36F4(View* pView, int nPlayer, f32 fFrameTime);
 void     fn_800C73B8(f32* pA, f32* pB, f32* pOut);
@@ -1672,7 +1671,7 @@ void fn_800C1790(View* pView, int nPlayer) {
     if (lbl_80282220->b56) {
         fn_800171D8(fn_80012EF0(fn_80017004(nView)), 0.0f, 0.0f, 1.0f, 1.0f);
         fn_800352BC();
-        fn_80035240(0);
+        fn_80035240(NULL);
         fn_80013CCC(fn_8001614C());
         fn_80013EEC(fn_8001614C());
         fn_80016B9C();

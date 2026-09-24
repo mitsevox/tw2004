@@ -20,8 +20,6 @@ void  fn_800E5708(void);
 void  fn_800E572C(int n);
 void  fn_800E573C(void);
 void  fn_800E5908(int nMsg);
-void  fn_800E5D40(int n);
-void  fn_800E5D68(char* pStr);
 u8    fn_800E5D90(void);
 
 // GameMessages.c's data, defined last address first (CodeWarrior lays each section out in reverse).

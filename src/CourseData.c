@@ -17,7 +17,6 @@ s32  fn_800D2DA0(int nTee);
 s32  fn_800D2E00(int nTee);
 s32  fn_800D2E60(void);
 s32  fn_800D2EB0(void);
-s32  fn_800D2F00(int nCourse, int nTeeSet);
 u8   fn_800D3004(void);
 u8   fn_800D304C(int nHole);
 int  fn_800D30B4(int nRound);

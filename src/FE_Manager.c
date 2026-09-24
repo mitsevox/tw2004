@@ -99,7 +99,7 @@ void fn_80076E48(void) {
     lbl_801D7148.nMovieFree = 0;
     lbl_801D7148.p658 = NULL;
     fn_8009170C();
-    lbl_801D8858.n30 = 0;
+    lbl_801D8858.p30 = NULL;
 }
 
 // Free the copy of the 'BIO ' stream object's data.
@@ -289,7 +289,7 @@ void fn_8007744C(void) {
         lbl_801D8890[i].b1 = 0;
     }
     lbl_801D8858.b18 = 0;
-    lbl_801D8858.n30 = 0;
+    lbl_801D8858.p30 = NULL;
     lbl_80281ED4->uSquareHash = fn_8000BEE4("__LogoSquare");
     lbl_80281ED4->uRectHash = fn_8000BEE4("__LogoRect");
     lbl_80281ED4->b11702 = 0;

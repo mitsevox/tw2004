@@ -2,6 +2,25 @@
 // renumbers what is left and packs it into one allocation. Only partly decompiled.
 #include "game_types.h"
 #include "platform.h"
+#include "engine.h"
+
+char lbl_802819A8[8] = "";      // the folder the signature file is looked for in
+
+// Checks that the signature file "Signat.sig" is on the disc (GoEntry.c calls it at start-up);
+// without it the game stops.
+void fn_801270F0(void) {
+    char szPath[256];   // the size is not known (the frame leaves room for 256 bytes)
+    int hFile;
+
+    sprintf(szPath, "%sSignat.sig", lbl_802819A8);
+    hFile = fn_800060E0(szPath);
+    if (hFile < 0) {
+        // EA: stops the game on purpose with a write to address 0 (undefined in C; a port should
+        // abort here instead)
+        *(volatile s32*)0 = 0;
+    }
+    fn_8000633C(hFile);
+}
 
 // The bytes nCount items of nSize take, rounded up to nAlign (a power of two); 0 when there is no
 // array (p is NULL).

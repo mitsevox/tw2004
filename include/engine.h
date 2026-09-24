@@ -295,14 +295,20 @@ typedef struct RenderState {
     f32  f28;                   // 0x028  } bit 0x8, with a30. fn_80035398 sets all three from
     f32  f2C;                   // 0x02C  } lbl_802811E0
     u8   a30[4];                // 0x030  a colour: three bytes given, the fourth always 0x80
-    u8   unk34[0xFC - 0x34];
+    u8   unk34[0xBC - 0x34];
+    s32  nBC;                   // 0x0BC  } a rectangle, bit 0x200 (LLVideo.c fn_800760B0: x,
+    s32  nC0;                   // 0x0C0  } width, y, height; the movies give 0, 512, 0, 448)
+    s32  nC4;                   // 0x0C4  }
+    s32  nC8;                   // 0x0C8  }
+    u8   unkCC[0xFC - 0xCC];
     s32  nFC;                   // 0x0FC  bit 0x400
     TexBank*  p100;             // 0x100  } the texture of the next draw (fn_8005CC64: the swing
     TexEntry* p104;             // 0x104  } trail's, the logo editor's)
     struct GxTexture* pTex108;  // 0x108  or this texture (fn_8002A608)
-    u8   unk10C[0x110 - 0x10C];
+    struct LLPict* pPict10C;    // 0x10C  or this picture (LLVideo.c fn_800760D8: a movie's)
     u32  u110;                  // 0x110  which of the groups above changed
-    u32  uFlags;                // 0x114  bit 1: p100/p104 are set; bit 2: pTex108 is
+    u32  uFlags;                // 0x114  bit 1: p100/p104 are set; bit 2: pTex108 is; bit 4:
+                                //        pPict10C is
 } RenderState;
 LAYOUT_ASSERT(RenderState, 0x118);
 
@@ -375,6 +381,30 @@ void fn_800704C4(DynRenderBuffer* pBuf, const void* pPos, const void* pColour, c
 void fn_800705F0(DynRenderBuffer* pBuf, u16* pIndices, u32 nCount, u8 bRestart);  // add indices
 void fn_80070764(DynRenderBuffer* pBuf, const DynRenderDrawIn* pDraws, u16 nCount, int nPrim,
                  u8 bRestart);                                   // add draws
+
+// A shader object that draws through a dynamic rendering buffer (the hooks of rows 0 and 19 of
+// lbl_80188E88; our names). Only what those hooks read.
+typedef struct DynRenderObject {
+    u8    unk0[4];
+    DynRenderBuffer* pBuf;          // 0x04
+} DynRenderObject;
+
+// The sizes a DynRenderObject's buffer is made with (NULL: 50 vertices, 1 draw).
+typedef struct DynRenderSize {
+    s32   nMaxVerts;                // 0x00
+    s32   nMaxDraws;                // 0x04
+} DynRenderSize;
+
+// One frame's geometry handed to a DynRenderObject.
+typedef struct DynRenderFill {
+    u16   nCount;                   // 0x00  draws; with no draws, the index count
+    u16   nVerts;                   // 0x02
+    const DynRenderDrawIn* pDraws;  // 0x04  NULL: one draw of all nCount indices
+    u16*  pIndices;                 // 0x08
+    const void* pPos;               // 0x0C
+    const void* pColour;            // 0x10
+    const void* pTexCoord;          // 0x14
+} DynRenderFill;
 
 // A render surface (GoRenderSurface.c; our name, after the file): one of five 0x2C-byte slots at
 // lbl_801D3950. A slot whose n0 is not 1 owns a buffer of nSize bytes. Only what the code reads.
@@ -626,6 +656,8 @@ void fn_800A6358(void);
 void fn_800A63D0(void);
 void fn_800A6DCC(int nMusic, int a);
 void fn_800A72EC(u8 a, u8 b);
+void fn_800A746C(s32 nKind, int nTrack, int n);     // GameAudio.c: start a track
+void fn_800A74E4(s32 nKind, int nTrack);            // GameAudio.c: stop it
 void fn_800A7664(int nKind, int nMsg, int a);
 void fn_800A76E4(void);
 void fn_800A77E0(f32 f);                // } the options menu passes them 0.2 x options.a0[0], a0[4]

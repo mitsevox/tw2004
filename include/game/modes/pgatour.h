@@ -80,6 +80,9 @@ s32  fn_800EFE3C(s32 i);
 int  fn_800F009C(void);                 // the leader's score in the current tournament
 int  fn_800F018C(s32 nEvent);           // the player's own score in it (nEvent is not used)
 
+// GameModeDriverPGATour.c, as the tour simulation (PGATourSimulation.c) uses it
+void fn_800EF094(s32 a, s32 n);         // the player's prize: n, at the player's place
+
 // GameModeDriverPGATour.c, as the calendar's event details (EventInfo.c) use it
 s32  GameModeDriverPGATour_GetCourses(Tournament* p, s32* pCourses);
 void GameModeDriverPGATour_GetWinnerEarningsString(s32 i, char* pDst);

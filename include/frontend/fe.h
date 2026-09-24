@@ -54,13 +54,18 @@ extern FEState lbl_801D7148;
 typedef struct FEScreen {
     u8  b0;                     // 0x00  set by fn_80079AD4
     u8  a1[9];                  // 0x01  read by a menu message (fn_8007C7EC: 1 for index 9)
-    u8  unkA[0x2C - 0xA];
+    u8  unkA[0x18 - 0xA];
+    s32 a18[4];                 // 0x18  cleared by fn_800905A8
+    u8  unk28[0x2C - 0x28];
     u8  a2C[4];                 // 0x2C  read and cleared by menu messages
-    u8  unk30[0x38 - 0x30];
+    u8  a30[4];                 // 0x30  set to 1 by fn_800905A8; fn_8008F80C sets one
+    s32 n34;                    // 0x34  cleared by fn_800905A8
     s32 n38;                    // 0x38  a menu message reads it (fn_8007DAD4)
-    u8  unk3C[0x44 - 0x3C];
+    u8  unk3C[0x40 - 0x3C];
+    u8  b40;                    // 0x40  cleared by fn_800905A8
+    u8  unk41[0x44 - 0x41];
     f32 fFade;                  // 0x44  the fade to black before a movie, 0 to 1
-    u8  unk48;
+    u8  b48;                    // 0x48  cleared by fn_800905A8
     u8  b49;                    // 0x49  FEgolferanim.c's fn_8008EB10 tests it
     u8  unk4A[0x4C - 0x4A];
 } FEScreen;
@@ -73,7 +78,7 @@ typedef struct FE801D8858 {
     u8  unk0[0x18];
     u8  b18;                    // 0x18
     u8  unk19[0x30 - 0x19];
-    s32 n30;                    // 0x30  from fn_8002FD00 (0x8009170C's code)
+    struct LLPict* p30;         // 0x30  a picture decoded from the 'load' object (fn_800917C8)
     u8  unk34[0x38 - 0x34];
 } FE801D8858;
 LAYOUT_ASSERT(FE801D8858, 0x38);

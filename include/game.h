@@ -186,6 +186,7 @@ extern CourseData lbl_801FA2F4[NUM_COURSE_DATA];     // 0x801FA2F4
 void fn_800D29E8(void);
 int  Hole_WindDir(void);
 f32  Hole_WindSpeed(void);
+s32  fn_800D2F00(int nCourse, int nTeeSet);    // a course's par from a tee set
 s32  fn_800D2FB4(s32 nTeeSet);          // the course's par (the tee set is not used)
 u8   fn_800D3080(int nHole);
 int  fn_800D3118(int nRound, int nHole);    // a built round's course for a hole
@@ -224,6 +225,7 @@ s32  fn_800D2640(u16 nDate);            // Calendar.c
 u16  fn_800D2994(void);                 // today's date
 int  fn_800D2ABC(int nCourse, int nHole);   // a hole's par on a course
 int  fn_800D2AD8(int nHole);            // a hole's par
+s32  fn_800D3478(int nTotal, int n, int nRow);  // Earnings.c: the prize for a finishing row
 void fn_800D3548(int nPlayer, int nMoney, CourseMoneyTracking* pMoney);   // pMoney may be NULL
 int  fn_800D36E0(int nWinner, int nLoser, int nMargin, int* pPrize);
 int  fn_800D37BC(int nWinner, int nLoser, int nMargin, int* pPrize);
@@ -513,6 +515,9 @@ void fn_800E5A4C(int nMsg, u32 uFloats, void* pA, void* pB, void* pC);   // thre
 void fn_800E5B0C(int nMsg, u32 uFloats, void* pA, void* pB, void* pC, void* pD, void* pE);   // five values
 void fn_800E5C08(int nMsg, char* pStr);  // send a message with a string
 u8   fn_800E5C84(void);
+void fn_800E5CA4(int a, int b, int c, int d, int e, int g, int h, f32 f);    // message 0x42
+void fn_800E5D40(int n);                // message 89 with a value
+void fn_800E5D68(char* pStr);           // message 90 with a string
 void fn_800E5DA0(void);
 
 // ---- the game modes --------------------------------------------------------------------------
