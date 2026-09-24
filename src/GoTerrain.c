@@ -709,7 +709,6 @@ f32 fn_800351D8(u32 n, f32 fPeriod) {
 
 void fn_80013D68();
 void fn_80013D9C();
-void fn_8003526C(void);
 void fn_80035294(void);
 void fn_800352BC(void);
 void fn_80035398(void);
@@ -720,8 +719,8 @@ void fn_80035240(f32 (*pMtx)[4]) {
     fn_80013D9C(*(s32*)((u8*)lbl_80280DF0), pMtx, lbl_80280DF0);
 }
 
-void fn_8003526C(void) {
-    fn_80012EF0(*(void**)lbl_80280DF0);
+f32* fn_8003526C(void) {
+    return fn_80012EF0(*(void**)lbl_80280DF0);
 }
 
 void fn_80035294(void) {

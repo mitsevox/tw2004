@@ -75,11 +75,16 @@ typedef struct SkinDesc28 {
 LAYOUT_ASSERT(SkinDesc28, 0x18);
 
 typedef struct SkinDesc44 {
-    u8   unk0[4];
+    s32  n0;                    // 0x00  its first entry in SkinDesc.p3C
     s32  n4;                    // 0x04  the first entry in SkinDesc.p20
-    s32  n8;                    // 0x08  0: skipped
+    s32  n8;                    // 0x08  entries in SkinDesc.p3C from n0; 0: skipped
     s32  nC;                    // 0x0C  its SkinDesc.p28 entry
-    u8   unk10[0x30 - 0x10];
+    s32  n10;                   // 0x10  the p44 entries of its morph targets start here
+    s32  n14;                   // 0x14  its morph targets
+    s32  n18;                   // 0x18  the first one's number (fn_8011C850: n14 + n18 needed)
+    u8   unk1C[0x24 - 0x1C];
+    u32  u24;                   // 0x24  bit 1: has morph targets
+    u8   unk28[0x30 - 0x28];
 } SkinDesc44;
 LAYOUT_ASSERT(SkinDesc44, 0x30);
 
@@ -137,8 +142,9 @@ typedef struct SkinDesc {
     s32  n30;                   // 0x030  entries in p34
     SkinMesh* p34;              // 0x034
     s32  n38;                   // 0x038  entries in p3C
-    u8*  p3C;                   // 0x03C
-    s32  n40;                   // 0x040  bits an HwsBurn keeps (fn_801104AC)
+    s32* p3C;                   // 0x03C  SkinDesc.p34 entries, -1 none (fn_8011C8B0)
+    s32  n40;                   // 0x040  entries in p44; an HwsBurn keeps a bit per entry
+                                //        (fn_801104AC)
     SkinDesc44* p44;            // 0x044
     s32  nParts;                // 0x048
     SkinPartDef* pParts;        // 0x04C
@@ -170,19 +176,77 @@ typedef struct SkinDesc {
 } SkinDesc;
 LAYOUT_ASSERT(SkinDesc, 0x120);
 
-// What Skin.pModel points at; only what SkinPart.c reads.
-typedef struct SkinModel {
+// An entry of SkinModel.p44: its first word is an index SkinBurn.c renumbers (fn_80127140).
+typedef struct SkinModel44 {
+    s32  n0;                    // 0x0
+    s32* p4;                    // 0x4  n8 of them; fn_801272B4 numbers them 0, 1, 2...
+    s16  n8;                    // 0x8
+    u8   unkA[0x10 - 0xA];
+} SkinModel44;
+LAYOUT_ASSERT(SkinModel44, 0x10);
+
+// An entry of SkinModel.p54, one per bit of Skin.p10CC; SkinBurn.c moves them (fn_801272B4).
+typedef struct SkinModel54 {
     u8   unk0[0x14];
-    s32  n14;                   // 0x14  how many matrices Skin.p108C holds (fn_80018710)
+} SkinModel54;
+LAYOUT_ASSERT(SkinModel54, 0x14);
+
+// What Skin.pModel points at; only what SkinPart.c and SkinBurn.c read.
+typedef struct SkinModel {
+    u8   unk0[8];
+    s32  n08;                   // 0x08  its size with all its arrays once burnt (fn_801276E4)
+    s32  n0C;                   // 0x0C  entries in p3C
+    u8   unk10[4];
+    s32  n14;                   // 0x14  how many matrices Skin.p108C holds (fn_80018710); also
+                                //       the 0x20-byte entries in p34
     u8   unk18[0x34 - 0x18];
     void* p34;                  // 0x34  handed to the character's model (fn_80029A74)
-    u8   unk38[0x40 - 0x38];
-    s32  n40;                   // 0x40  bits in Skin.p10D0
-    u8   unk44[4];
+    void* p38;                  // 0x38  one 0x50-byte block
+    void* p3C;                  // 0x3C  n0C 0x50-byte blocks
+    s32  n40;                   // 0x40  bits in Skin.p10D0; also the entries in p44
+    SkinModel44* p44;           // 0x44
     SkinDesc* pDesc;            // 0x48
     u8   unk4C[4];
-    s32  n50;                   // 0x50  bits in Skin.p10CC
+    s32  n50;                   // 0x50  bits in Skin.p10CC; also the entries in p54
+    SkinModel54* p54;           // 0x54  one per bit
+    u8   unk58[0x140 - 0x58];
 } SkinModel;
+LAYOUT_ASSERT(SkinModel, 0x140);  // fn_801276E4 copies it whole
+
+// What Skin.pMorph points at (SkinMorph.c; our name): the weights of the skin's morph targets.
+typedef struct SkinMorphState {
+    s32  nMorphs;               // 0x0
+    f32* afWeights;             // 0x4  one per morph target (fn_8011CADC)
+    u32* aChanged[2];           // 0x8  bit arrays of nMorphs bits, indexed like Skin.a10A0:
+                                //      fn_8011CADC sets a changed target's bit in both,
+                                //      fn_8011CE58 sets every bit, fn_8011CB5C clears one
+} SkinMorphState;
+
+// SkinMorph.c's work area (lbl_80281880; our name): blends a mesh's morph targets into one of two
+// vertex buffers. Only what the code reads.
+typedef struct SkinMorphVert {
+    s32  aPos[4];               // 0x00  16.16 fixed point
+    s32  aNrm[4];               // 0x10  the same
+} SkinMorphVert;
+LAYOUT_ASSERT(SkinMorphVert, 0x20);
+
+typedef struct SkinMorphWork {
+    SkinMorphVert aVerts[0x800];    // 0x00000  the mesh being blended (fn_8011C068 unpacks it)
+    u8   unk10000[0x18];
+    u16  n10018;               // 0x10018  vertices in the mesh being blended (fn_8011C49C)
+    u8   pad1001A[0x10020 - 0x1001A];
+    void* p10020;               // 0x10020  } the two buffers; fn_8011C46C swaps them
+    void* p10024;               // 0x10024  }
+    SkinMesh* apTargets[64];    // 0x10028  the target meshes fn_8011C5B4 picks
+    f32  afTargets[64];         // 0x10128  and their weights
+    SkinDesc* pDesc;            // 0x10228
+    s32  nMorphs;               // 0x1022C  } SkinMorphState's (fn_8011C58C)
+    f32* afWeights;             // 0x10230  }
+    struct HwsMemBlock* pBlock;         // 0x10234  (fn_8011C5A8)
+    struct HwsOverrideTable* pTable;    // 0x10238  (fn_8011C59C)
+} SkinMorphWork;
+
+extern SkinMorphWork* lbl_80281880;
 
 // A skin (Skin.c): a character's body or one of its attachments; only what the code reads.
 typedef struct Skin {
@@ -194,12 +258,13 @@ typedef struct Skin {
                                 //         matrix (fn_800184E4: bones 0x3A, 0x48, 0x39, 0x47)
     f32  (*p1088)[4][4];        // 0x1088  } matrices fn_80018710 hands the model (fn_80029A88,
     f32  (*p108C)[4][4];        // 0x108C  } fn_80029A7C)
-    u8   unk1090[0x10A0 - 0x1090];
+    u8   unk1090[0x1098 - 0x1090];
+    struct HwsMemBlock* a1098[2];   // 0x1098  indexed like a10A0 (fn_8011CB5C)
     void* a10A0[2];             // 0x10A0  indexed by fn_800CE02C's argument; Skin.c sets [0]
     SkinChoice* aParts[4];      // 0x10A8  a choice per part, four copies (fn_800CEE04 copies one
                                 //         over another); [3] is set while lbl_80282238 is clear
     SkinChoice* aSets[4];       // 0x10B8  the same per SkinDesc.p74 set
-    u8   unk10C8[4];
+    SkinMorphState* pMorph;     // 0x10C8
     u32* p10CC;                 // 0x10CC  } bit arrays
     u32* p10D0;                 // 0x10D0  }
     u32  u10D4;                 // 0x10D4  bit 1 set by fn_80019CEC and when the choices change; bit 2
@@ -467,7 +532,31 @@ void  fn_800CEBE8(Skin** apSkins, int nSkins, u8* p, u64* aIds, int nIds);
 void  fn_800CECE0(Skin* pSkin, int nSet, int nVariant, int nOption, u8* p);
 u8    fn_800CEE90(void);
 
+// SkinPart.c, as SkinBurn.c uses it: the mesh iterator and an entry's copy.
+void  fn_800CD9EC(Skin* pSkin);
+s32   fn_800CE224(Skin* pSkin, SkinDesc14* pEntry, u8** ppOut, s32* pnOut, int nCopy);
+u8    fn_800CEEC0(SkinIter* pIter);
+void  fn_800CEEC8(SkinIter* pIter);
+SkinMesh* fn_800CEEF4(SkinIter* pIter);
+s32   fn_800CEEFC(SkinIter* pIter);
+SkinIter* fn_80113B34(u8* pBuf, SkinIterArgs* pArgs);
+void  fn_80113BAC(SkinIter* pIter);
+SkinIter* fn_80113910(u8* pBuf, SkinIterArgs* pArgs);   // hwsRender_Gc.c: another mesh iterator
+
+// SkinMorph.c: the morph targets a skin description needs.
+s32   fn_8011C850(SkinDesc* pDesc);
+
+// hwsOverride_Gc.c: a mesh table and a memory block for a skin description's morphed meshes.
+HwsMemBlock* fn_801128EC(SkinDesc* pDesc, s32 nSize);
+HwsOverrideTable* fn_80112A34(SkinDesc* pDesc, s32 nMeshes);
+void* fn_80112A80(HwsMemBlock* pBlock, HwsOverrideTable* pTable, int i, u8 bKeep);
+
+// SkinBurn.c: burns a skin (aParts and aList each end with -1).
+void  fn_80127B98(Skin* pSkin, s32* aParts, s32* aList);
+extern s32* lbl_802825A8;               // the new number of each mesh bit (fn_801271E0)
+
 // Bit n of a bit array of 32-bit words: test, set, clear.
+void  fn_8001E8A4(u32* aBits, u32 nBits);  // sets every bit of a bit array
 void  fn_8001E938(u32* aBits, u32 nBits);  // clears a bit array
 u8    fn_8001E9CC(u32* aBits, u32 n);
 void  fn_8001EA34(u32* aBits, u32 n);

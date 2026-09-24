@@ -107,7 +107,119 @@ void fn_800944F8(SD_SShaderObject_Static* pObject) {
     fn_80009E70(pSys);
 }
 
-void fn_80094534(f32 (*pMtx)[4], ParticleShape* pShape, ParticleVertex* pVerts, f32* pTimes, u32 n);
+void fn_800950CC(f32 s, f32 t);
+void fn_800950DC(int r, int g, int b, int a);
+void fn_800950F4(f32 x, f32 y, f32 z);
+void fn_800124A8(void);                                 // LLFont.c: end the primitive
+void GXBegin(int ePrim, int eFormat, u16 nVerts);
+
+// Draws n particles as camera-facing quads. Each one's position runs from v0 along v60 with time,
+// plus its own velocity's difference from v60 eased out by 1 / (1 + f50 t)^4; it is skipped when
+// it ends up behind the camera. Its size, colour and alpha run linearly with time within limits,
+// and it spins by f18 + f1C t turns.
+void fn_80094534(f32 (*pMtx)[4], ParticleShape* pShape, ParticleVertex* pVerts, f32* pTimes, u32 n) {
+    u32 i;
+    f32 t;
+    f32 fEase;
+    f32 fDiff;
+    f32 fSize;
+    f32 fRed;
+    f32 fGreen;
+    f32 fBlue;
+    f32 fAlpha;
+    f32 fFade;
+    f32 fAngle;
+    f32 fSin;
+    f32 fCos;
+    int nRed;
+    int nGreen;
+    int nBlue;
+    u8 uAlpha;
+    Vec4 v;
+    f32 m[3][4];
+
+    v.w = 1.0f;
+    m[0][2] = 0.0f;
+    m[1][2] = 0.0f;
+    m[2][0] = 0.0f;
+    m[2][1] = 0.0f;
+    m[2][2] = -1.0f;
+    for (i = 0; i < n; i++) {
+        t = *pTimes;
+        fEase = pShape->f50 * t + 1.0f;
+        fEase = fEase * fEase;
+        fEase = 1.0f / (fEase * fEase);
+        fDiff = pVerts->vC[0] * pShape->f54;
+        fDiff = fDiff - pShape->v60[0] * pShape->f54;
+        v.x = pShape->v60[0] * t + pVerts->v0[0] + fDiff - fEase * fDiff;
+        fDiff = pVerts->vC[1] * pShape->f54;
+        fDiff = fDiff - pShape->v60[1] * pShape->f54;
+        v.y = pShape->v60[1] * t + pVerts->v0[1] + fDiff - fEase * fDiff;
+        fDiff = pVerts->vC[2] * pShape->f54;
+        fDiff = fDiff - pShape->v60[2] * pShape->f54;
+        v.z = pShape->v60[2] * t + pVerts->v0[2] + fDiff - fEase * fDiff;
+        fn_800BAD60(pMtx, &v, &v);
+        if (v.z > 0.0f) {
+            fSize = pShape->f48 * t + pVerts->f20;
+            fSize = (fSize <= pShape->f4C) ? fSize : pShape->f4C;
+            fRed = pShape->v10[0] * t + pShape->v0[0];
+            if (fRed <= pShape->v20[0]) {
+                fRed = pShape->v20[0];
+            }
+            nRed = 255.0f * ((fRed < pShape->v20[0]) ? pShape->v20[0]
+                             : (fRed > pShape->v30[0]) ? pShape->v30[0] : fRed);
+            fGreen = pShape->v10[1] * t + pShape->v0[1];
+            if (fGreen <= pShape->v20[1]) {
+                fGreen = pShape->v20[1];
+            }
+            nGreen = 255.0f * ((fGreen < pShape->v20[1]) ? pShape->v20[1]
+                               : (fGreen > pShape->v30[1]) ? pShape->v30[1] : fGreen);
+            fBlue = pShape->v10[2] * t + pShape->v0[2];
+            if (fBlue <= pShape->v20[2]) {
+                fBlue = pShape->v20[2];
+            }
+            nBlue = 255.0f * ((fBlue < pShape->v20[2]) ? pShape->v20[2]
+                              : (fBlue > pShape->v30[2]) ? pShape->v30[2] : fBlue);
+            fAlpha = pShape->v10[3] * t + pShape->v0[3];
+            if (fAlpha <= pShape->v20[3]) {
+                fAlpha = pShape->v20[3];
+            }
+            uAlpha = 128.0f * ((fAlpha < pShape->v20[3]) ? pShape->v20[3]
+                               : (fAlpha > pShape->v30[3]) ? pShape->v30[3] : fAlpha);
+            fFade = 128.0f * (pShape->f44 * t + pShape->f40);
+            if (uAlpha <= fFade) {
+                fFade = uAlpha;
+            }
+            fAngle = (pVerts->f1C * t + pVerts->f18) / (2.0f * PI);
+            fSin = fn_800095F0(fAngle);
+            fCos = fn_80009638(fAngle);
+            m[0][0] = -fCos;
+            m[0][1] = fSin;
+            m[0][3] = -v.x;
+            m[1][0] = fSin;
+            m[1][1] = fCos;
+            m[1][3] = v.y;
+            m[2][3] = -v.z;
+            GXLoadPosMtxImm(m, 0);
+            GXBegin(0x80, 4, 4);                // quads, vertex format 4
+            fn_800950F4(-fSize, -fSize, 0.0f);
+            fn_800950DC((u8)nRed, (u8)nGreen, (u8)nBlue, (u8)fFade);
+            fn_800950CC(1.0f, 1.0f);
+            fn_800950F4(fSize, -fSize, 0.0f);
+            fn_800950DC((u8)nRed, (u8)nGreen, (u8)nBlue, (u8)fFade);
+            fn_800950CC(0.0f, 1.0f);
+            fn_800950F4(fSize, fSize, 0.0f);
+            fn_800950DC((u8)nRed, (u8)nGreen, (u8)nBlue, (u8)fFade);
+            fn_800950CC(0.0f, 0.0f);
+            fn_800950F4(-fSize, fSize, 0.0f);
+            fn_800950DC((u8)nRed, (u8)nGreen, (u8)nBlue, (u8)fFade);
+            fn_800950CC(1.0f, 0.0f);
+            fn_800124A8();
+        }
+        pVerts++;
+        pTimes++;
+    }
+}
 
 // The draw callback: the live particles of the buffer in use, in two runs when they wrap past the
 // end of the system's run.
@@ -302,32 +414,25 @@ void fn_80095088(SD_SShaderObject_Static* pObject, ParticleMsg* pMsg) {
     }
 }
 
-// ---- sweep code (not yet cleaned up) ----
-
-void fn_800950CC(f32 farg0, f32 farg1);
-void fn_800950DC(s32 p0, s32 p1, s32 p2, s32 p3);
-void fn_800950F4(f32 farg0, f32 farg1, f32 farg2);
-void fn_80095364(void);
-
-void fn_800950CC(f32 farg0, f32 farg1) {
-    *(f32* )0xCC008000 = farg0;
-    *(f32* )0xCC008000 = farg1;
+// The vertex writes for fn_80094534's quads, straight to the GX FIFO: a texture coordinate, a
+// colour and a position.
+void fn_800950CC(f32 s, f32 t) {
+    *(f32*)0xCC008000 = s;
+    *(f32*)0xCC008000 = t;
 }
 
-void fn_800950DC(s32 p0, s32 p1, s32 p2, s32 p3) {
-    *(volatile u8*)0xCC008000 = p0;
-    *(volatile u8*)0xCC008000 = p1;
-    *(volatile u8*)0xCC008000 = p2;
-    *(volatile u8*)0xCC008000 = p3;
+void fn_800950DC(int r, int g, int b, int a) {
+    *(volatile u8*)0xCC008000 = r;
+    *(volatile u8*)0xCC008000 = g;
+    *(volatile u8*)0xCC008000 = b;
+    *(volatile u8*)0xCC008000 = a;
 }
 
-void fn_800950F4(f32 farg0, f32 farg1, f32 farg2) {
-    *(f32* )0xCC008000 = farg0;
-    *(f32* )0xCC008000 = farg1;
-    *(f32* )0xCC008000 = farg2;
+void fn_800950F4(f32 x, f32 y, f32 z) {
+    *(f32*)0xCC008000 = x;
+    *(f32*)0xCC008000 = y;
+    *(f32*)0xCC008000 = z;
 }
-
-// ---- end of sweep code ----
 
 // Makes the main-memory heap from the arena: all of it but the top 4 MB when there is more than
 // 24 MB, else all but the top 16 KB (the arena then starts at the heap's end).

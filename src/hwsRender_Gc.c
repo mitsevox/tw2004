@@ -10,7 +10,6 @@ void fn_80036460(int n);                // Skin.c
 void PostFx_CopyScreenToBuffer(void);   // gomainloop.c
 void fn_8011EB80(void);
 void fn_80112B34(void);                 // hwsOverride_Gc.c
-void fn_800CEEC8(SkinIter* pIter);      // SkinPart.c: the iterator's next step
 void fn_80113C70(SkinIter* pIter);
 void fn_80113D28(SkinIter* pIter);
 
@@ -118,7 +117,6 @@ void fn_801138F8(s32 p0);
 void fn_80113904(s32 p0);
 void fn_80113A7C(SkinIter* pIter);
 void fn_80113B14(SkinIter* pIter);
-void fn_80113BAC(SkinIter* pIter);
 void fn_80113E54(SkinIter* pIter, void (**ppfnNext)(SkinIter* pIter));
 void fn_80113E5C(SkinIter* pIter);
 
