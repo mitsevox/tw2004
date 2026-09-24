@@ -35,7 +35,7 @@ typedef union UISWord {
 // the studio's calls, or where noted from the game's own callback.
 typedef void (*UISCommandFn)(s32 nCmd, s32 n1, s32 n2, s32 n3, s32 n4, s32 n5);  // the game's fn_8008F568
 // Returns the screen's UI file, still unfixed (the game's fn_8008F610, which ignores the group).
-typedef u32 (*UISLoadFn)(u16 uGroup, u16 uScreen);
+typedef void* (*UISLoadFn)(u16 uGroup, u16 uScreen);
 typedef void (*UISUnloadFn)(u16 uGroup, u16 uScreen, void* pData);
 typedef void (*UISTransformFn)(int nOp, void* pDesc);           // the game's fn_80093280
 typedef void (*UISScreenFn)(u16 uGroup, u16 uScreen);

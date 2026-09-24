@@ -354,7 +354,7 @@ s32 fn_80169590(UIStudio* pStudio, u16 uGroup, u16 uScreen, u8 bPush, u8 nArgs, 
 s32 fn_80169858(UIStudio* pStudio, u16 uGroup, u16 uScreen, u16 uPrevGroup, u16 uPrevScreen, u8 nArgs,
                 s32* pArgs) {
     u32 nIndex;
-    u32 uFile;
+    void* pFile;
     UISScreen* pScreen;
     u8 bFixed;
     u8 bOut;
@@ -363,8 +363,8 @@ s32 fn_80169858(UIStudio* pStudio, u16 uGroup, u16 uScreen, u16 uPrevGroup, u16 
     if (nIndex < pStudio->nScreens) {
         return Screen_BringBack(pStudio, uGroup, uScreen, nArgs, pArgs);
     }
-    uFile = pStudio->pfnLoad(uGroup, uScreen);
-    if (uFile == 0) return 0;
+    pFile = pStudio->pfnLoad(uGroup, uScreen);
+    if (pFile == NULL) return 0;
     pStudio->nScreens++;
     pScreen = &pStudio->pScreens[nIndex];
     pScreen->uGroup = uGroup;
@@ -373,7 +373,7 @@ s32 fn_80169858(UIStudio* pStudio, u16 uGroup, u16 uScreen, u16 uPrevGroup, u16 
     pScreen->uPrevScreen = uPrevScreen;
     pScreen->uMask = 0;
     pScreen->bUnloading = 0;
-    pScreen->pData = (UISScreenFile*)uFile;  // port: the load callback returns the file's address as a u32
+    pScreen->pData = pFile;
     bFixed = fn_80169DC4(pScreen->pData);
     fn_8016AEEC(pStudio, pScreen, 0, -1);
     pScreen->pData->pNodes[0].pInfo->u4 = 1;
