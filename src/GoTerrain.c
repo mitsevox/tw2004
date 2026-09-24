@@ -921,6 +921,8 @@ void fn_8003241C(Ter_ObjectDrawData* pDraw, s32* pCount, s32 nUnused, UObjMesh* 
 
 // Draws render pass nRenderPass's sorted patches, if it has any: each list (the pass a patch is
 // drawn in, 0..2) one clip method at a time, then the deferred items with the terrain's filters.
+// fake match: the (u32) casts on the clip index; with a signed index the compiler walks one pointer
+// through the lists instead of keeping the list base and a byte offset apart as EA's code does.
 void fn_80032518(int nRenderPass) {
     u8 bFirst = 1;
     u8 bAny;
@@ -931,7 +933,7 @@ void fn_80032518(int nRenderPass) {
     bAny = 0;
     for (nList = 0; nList < 3; nList++) {
         for (nClip = 0; nClip < 3; nClip++) {
-            if (lbl_801D3CB0.pSortedPatchList[nRenderPass][nList][nClip] != NULL) {
+            if (lbl_801D3CB0.pSortedPatchList[nRenderPass][nList][(u32)nClip] != NULL) {
                 bAny = 1;
                 break;
             }
@@ -953,7 +955,7 @@ void fn_80032518(int nRenderPass) {
                 }
             }
             for (nClip = 0; nClip <= 2; nClip++) {
-                if (lbl_801D3CB0.pSortedPatchList[nRenderPass][nList][nClip] != NULL) {
+                if (lbl_801D3CB0.pSortedPatchList[nRenderPass][nList][(u32)nClip] != NULL) {
                     switch (nClip) {
                     case 2:
                         fn_80035138(1);
@@ -966,8 +968,8 @@ void fn_80032518(int nRenderPass) {
                         break;
                     }
                     fn_80012EF8();
-                    for (pPatch = lbl_801D3CB0.pSortedPatchList[nRenderPass][nList][nClip]; pPatch != NULL;
-                         pPatch = pPatch->pNext[nList]) {
+                    for (pPatch = lbl_801D3CB0.pSortedPatchList[nRenderPass][nList][(u32)nClip];
+                         pPatch != NULL; pPatch = pPatch->pNext[nList]) {
                         fn_80032B7C(pPatch->pGround, nClip, nList, pPatch->n1C, pPatch->n18, pPatch->n20,
                                     &bFirst, 0, 0, pPatch->fDistance,
                                     pPatch->fDistance + 2.0f * pPatch->fBoundingRadius);
@@ -1026,7 +1028,8 @@ void fn_80032770(void) {
         fn_80012EF8();
         fn_80014118(0x70);
         for (nClip = 0; nClip <= 2; nClip++) {
-            ppHead = &lbl_801D3CB0.pSortedPatchList[0][3][nClip];
+            // fake match: an unsigned index, as in fn_80032518
+            ppHead = &lbl_801D3CB0.pSortedPatchList[0][3][(u32)nClip];
             if (*ppHead != NULL) {
                 switch (nClip) {
                 case 2:
