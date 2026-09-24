@@ -281,8 +281,8 @@ void fn_80128528(EASBTotals* pTotals, EASBProduct* pProduct) {
     pTotals->nProducts = 0;
 }
 
-// Adds one product record into the totals (fn_8012B4C0 passes 1 as n2, which is not used).
-void fn_80128580(EASBTotals* pTotals, const EASBProduct* pProduct, s32 n2) {
+// Adds one product record into the totals.
+void fn_80128580(EASBTotals* pTotals, const EASBProduct* pProduct) {
     if (pProduct->bValid) {
         pTotals->u0 = fn_80128468(pTotals->u0, pProduct->u50);
         pTotals->u4 = fn_80128468(pTotals->u4, pProduct->u54);
@@ -1541,7 +1541,7 @@ EASBErrorE fn_8012B4C0(EASBProcessE* peProcess) {
         if (eError == EASB_ERROR_NONE) {
             fn_80129B30(&product, lbl_802825B0->pBuffer, lbl_802825B0->uBufferSize);
             lbl_802825B0->anProductState[lbl_802825B0->nRecord] = 1;
-            fn_80128580(&lbl_802825B0->totals, &product, 1);
+            fn_80128580(&lbl_802825B0->totals, &product);
         } else if (eError == EASB_ERROR_SECTION_CORRUPT) {
             eError = EASB_ERROR_NONE;
             lbl_802825B0->anProductState[lbl_802825B0->nRecord] = 2;
