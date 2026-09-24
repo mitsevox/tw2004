@@ -161,8 +161,11 @@ void* fn_80020DD4(void* pClip, void* pOut, int nAlign);
 typedef struct SKABlendNode SKABlendNode;
 
 void Skalib_Shutdown(void);             // skalib.c
+void AnimLib_Free(AnimLib* pLib);       // skalib.c
+void ClipBank_Release(int nSlot);       // skalib.c
 void fn_8001F66C(void);                 // mtalib.c
 void fn_80071B94(void);                 // animblender.c
+void fn_80071F58(struct SKABlendNode** ppNode, int n);   // animblender.c: gives a blend tree back
 
 // animblender.c: whether a source under pNode plays pSrc (format 0, format 1).
 u8 fn_80073554(SKABlendNode* pNode, void* pSrc);
@@ -283,7 +286,10 @@ typedef struct Character {
                                 //        get an 'f' in front when it is 1
     CharModel* pModel;          // 0x038
     struct Skin* pSkin;         // 0x03C  its body's skin (Skin.c), the first of apSkins
-    u8    unk40[0x50 - 0x40];
+    s32   n40;                  // 0x040  how many 0x30-byte entries p44 holds (fn_8001A9F4)
+    void* p44;                  // 0x044  } freed with the character (fn_8001C0E0)
+    s32   n48;                  // 0x048  a texture bank slot (LLTexGrp.c), freed with it when >= 0
+    u8    unk4C[0x50 - 0x4C];
     u8    a50[4];               // 0x050  LLDynTex.c is given its address (fn_80019DE8)
     s32   hFile;                // 0x054  a file closed with it (fn_8001971C), -1 none
     u8    unk58[0x60 - 0x58];

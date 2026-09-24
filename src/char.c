@@ -548,6 +548,52 @@ void fn_8001BC8C(f32 fTime) {
     }
 }
 
+// Frees a character: its texture bank slot, both blend trees, its skin, library, model, buffers
+// and the rest; in game type 3 its slot's clip bank is released too.
+void fn_8001C0E0(Character* pChar) {
+    SKABlendNode* pNode;
+    int i;
+    int nSlot;
+
+    if (pChar != NULL) {
+        nSlot = pChar->nSlot;
+        if (pChar->n48 >= 0) {
+            fn_80010544(pChar->n48);
+        }
+        pNode = &pChar->blend;
+        fn_80071F58(&pNode, 0);
+        pNode = (SKABlendNode*)pChar->node3E0;  // a node without the root's nGroup
+        fn_80071F58(&pNode, 0);
+        if (pChar->pSkin != NULL) {
+            fn_80037CD8(pChar->pSkin);
+        }
+        if (pChar->pLib != NULL) {
+            AnimLib_Free(pChar->pLib);
+        }
+        fn_8002957C(pChar->pModel);
+        pChar->pModel = NULL;
+        for (i = 0; i < 4; i++) {
+            fn_80009E70(pChar->buffers[i].pBuf);
+        }
+        if (pChar->p44 != NULL) {
+            fn_80009E70(pChar->p44);
+        }
+        if (pChar->pRecords != NULL) {
+            fn_80009E70(pChar->pRecords);
+        }
+        if (fn_8001EC48(pChar)) {
+            fn_8001971C(pChar);
+        }
+        if (pChar->p17AC != NULL) {
+            fn_8010D454(pChar->p17AC);
+        }
+        fn_80009E70(pChar);
+        if (gSession.nGameType == 3) {
+            ClipBank_Release(nSlot);
+        }
+    }
+}
+
 // Add a character to the table of characters (up to five); NULL when it is full.
 Character* fn_8001C21C(Character* pChar) {
     if (lbl_80281CA8 >= 5) {

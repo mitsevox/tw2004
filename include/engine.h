@@ -273,6 +273,8 @@ typedef struct TexGrpList {
 } TexGrpList;
 LAYOUT_ASSERT(TexGrpList, 0x20);
 
+void fn_80010544(int nSlot);            // frees the bank in slot nSlot and empties the slot
+
 // ---- the renderer ----------------------------------------------------------------------------
 
 void fn_80006EDC(void);                 // LLDisp_Gc.c: set the viewport (DiscCheck.c, ScreenClear.c)
