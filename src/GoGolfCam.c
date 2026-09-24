@@ -346,7 +346,8 @@ void GolfCamera_ProcessZoomToAimCamera(View* pView, int nPlayer) {
             fAimY = fLow;
         }
         fAimY += pView->shot19C.f68;
-        fCamY = pView->script.fD8 + lbl_80281F78->f14;
+        fCamY = pView->script.fD8;
+        fCamY += lbl_80281F78->f14;
     } else {
         fAimY = 0.0f;
         fCamY = 0.0f;
