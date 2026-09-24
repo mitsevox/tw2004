@@ -522,9 +522,9 @@ f32 SW_vCalculateShotPower(int nPlayer) {
     f32     fThresh, fScale;
 
     if (Player_IsCPU(nPlayer) || gPlayers[nPlayer].bPerfect) {
-        fPower = PLAYER(nPlayer)->fPower;
+        fPower = gPlayers[nPlayer].fPower;
         fPower *= AI_PowerScale(nPlayer);
-        if (PLAYER(nPlayer)->nShotKind == SHOT_TYPE_PUTT_e && !(PLAYER(nPlayer)->uFlags & 8)) {
+        if (gPlayers[nPlayer].nShotKind == SHOT_TYPE_PUTT_e && !(gPlayers[nPlayer].uFlags & 8)) {
             fPower *= 1.05f;
             if (fPower < 0.1f) {
                 fPower = 0.1f;
@@ -532,6 +532,7 @@ f32 SW_vCalculateShotPower(int nPlayer) {
         }
         goto clamp;         // fake match: the shared clamp as a jump (without the gotos: 83.9%, not 84.9%)
     }
+    // fake match: PLAYER() from here, gPlayers[] in the block above (91.3%; one Player* local: 84.9%)
     fPower = PLAYER(nPlayer)->fPower;
     pPower = &PLAYER(nPlayer)->fPower;
     fError = fabs(PLAYER(nPlayer)->swing.fMishitAngle);
