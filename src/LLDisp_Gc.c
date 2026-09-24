@@ -330,3 +330,52 @@ void fn_80007264(f32* pGamma) {
     }
     GXSetDispCopyGamma(eGamma);
 }
+
+// ---- sweep code (not yet cleaned up) ----
+
+extern u32 lbl_80281B98;
+s32 fn_800072E0(void);
+extern u8 lbl_80281BAC;
+void AISetStreamVolLeft();
+void AISetStreamVolRight();
+void DVDCancelAll();
+void fn_800072E8(void);
+u8 fn_80007320(void);
+s32 OSEnableInterrupts();
+extern s32* lbl_80281510;
+s32 OSDisableInterrupts();
+
+s32 fn_800072E0(void) {
+    return lbl_80281B98;
+}
+
+void fn_800072E8(void) {
+    DVDCancelAll();
+    AISetStreamVolLeft(0);
+    AISetStreamVolRight(0);
+    lbl_80281BAC = 1;
+}
+
+u8 fn_80007320(void) {
+    return lbl_80281BAC;
+}
+
+void fn_80007328(void) {
+    *lbl_80281510 -= 1;
+    if ((s32) *lbl_80281510 == 0) {
+        OSEnableInterrupts();
+    }
+}
+
+void fn_80007368(void) {
+    if ((s32) *lbl_80281510 == 0) {
+        OSDisableInterrupts();
+    }
+    *lbl_80281510 += 1;
+}
+
+void fn_800073A8(void) {
+    lbl_80281B9C = 0;
+}
+
+// ---- end of sweep code ----
