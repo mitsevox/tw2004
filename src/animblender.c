@@ -11,6 +11,8 @@
 f32  fn_8001F02C(ClipBlend* pBlend, u64 uEvent);   // an event's time (by its 64-bit id)
 void fn_8001F558(void* pItem);          // mtalib.c
 void fn_800977CC(void* p);
+void fn_800293CC(int a, int b, SkelPose* pA, SkelPose* pB, SkelPose* pOut);   // blends two poses
+void fn_80036180(SkelPose1* pA, SkelPose1* pB, SkelPose1* pOut);             // the same, format 1
 
 int  fn_800723E8(SKABlendNode* pNode, SKABlendNode*** pppOldest);
 void fn_800725BC(SKABlendNode* pNode, SKABlendFn pfnBlend, f32 fWeight);
@@ -253,6 +255,50 @@ f32 fn_80072980(SKABlendNode* pA, SKABlendNode* pB, u8 bOut, f32 fTime) {
         return fabsf(2.0f * fWeight - 1.0f);
     }
     return fWeight;
+}
+
+// The blend callback: pose pNode's buffer at fTime from its children. While both play (or neither,
+// between them) and fTime is inside their overlap, their weights come from fn_80072980 and the
+// poses are blended by format; while only one plays, its pose is copied (a format 1 copy then
+// has the child's morph bits cleared).
+void fn_80072ACC(SKABlendNode* pNode, int* pn, f32 fTime) {
+    int nPlaying;
+    u8 bBetween;
+    f32 fWeight;
+    int i;
+
+    if (pNode == NULL) return;
+    if (pNode->nType != 1) return;
+    nPlaying = fn_8007286C(pNode, fTime);
+    if (nPlaying == 2 || (nPlaying == -1 && pNode->u.blend.apChild[0] != NULL &&
+                          pNode->u.blend.apChild[1] != NULL)) {
+        bBetween = nPlaying == -1;
+        if (fTime >= pNode->u.blend.apChild[0]->fEnd && fTime >= pNode->u.blend.apChild[1]->fEnd) {
+            return;
+        }
+        if (fTime <= pNode->u.blend.apChild[0]->fStart && fTime <= pNode->u.blend.apChild[1]->fStart) {
+            return;
+        }
+        fWeight = fn_80072980(pNode->u.blend.apChild[0], pNode->u.blend.apChild[1], bBetween, fTime);
+        pNode->u.blend.apChild[0]->fWeight = fWeight;
+        pNode->u.blend.apChild[1]->fWeight = 1.0f - fWeight;
+        if (pNode->nFormat == 0) {
+            fn_800293CC(1, *pn - 1, pNode->u.blend.apChild[0]->pPose, pNode->u.blend.apChild[1]->pPose,
+                        pNode->pPose);
+        } else if (pNode->nFormat == 1) {
+            fn_80036180((SkelPose1*)pNode->u.blend.apChild[0]->pPose,
+                        (SkelPose1*)pNode->u.blend.apChild[1]->pPose, (SkelPose1*)pNode->pPose);
+        }
+    } else if (nPlaying != -1) {
+        if (pNode->u.blend.apChild[nPlaying]->nFormat == 0) {
+            memcpy(pNode->pPose, pNode->u.blend.apChild[nPlaying]->pPose, sizeof(SkelPose));
+        } else if (pNode->u.blend.apChild[nPlaying]->nFormat == 1) {
+            memcpy(pNode->pPose, pNode->u.blend.apChild[nPlaying]->pPose, sizeof(SkelPose1));
+            for (i = 0; i < 3; i++) {
+                fn_8001E938(((SkelPose1*)pNode->u.blend.apChild[nPlaying]->pPose)->aBlocks[i].aBits, 20);
+            }
+        }
+    }
 }
 
 // The time of event uEvent in the first source under pNode that has it (0 when none has).
