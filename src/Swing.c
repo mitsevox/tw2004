@@ -3515,9 +3515,10 @@ void STATEFUNC_RemoveBallUpdate(int nPlayer) {
         fn_80063B98(fn_80017028(gPlayers[nPlayer].nView[0]), 0.75f, (f32*)&vOffset);
     }
     if (fn_8001DBF4(gPlayers[nPlayer].pChar)) {
-        int nBone = fn_8001EED8(gPlayers[nPlayer].pChar->pModel, 0x54);
         pBall = &gPlayers[nPlayer].ball;
-        Vec3Copy(gPlayers[nPlayer].pChar->pModel->pMatrices[nBone][3], gPlayers[nPlayer].ball.vPos);
+        Vec3Copy(gPlayers[nPlayer].pChar->pModel->pMatrices[fn_8001EED8(gPlayers[nPlayer].pChar->pModel,
+                                                                         0x54)][3],
+                 gPlayers[nPlayer].ball.vPos);
         Vec3Copy(pBall->vPos, vPos);
         vPos[1] += 30.0f;
         fGround = fn_8004D620(fn_8000C594(), vPos);

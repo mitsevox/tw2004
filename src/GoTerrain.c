@@ -281,13 +281,13 @@ void fn_80030A40(void* pHoleData, int nView) {
     lbl_801D3CB0.iCurrentViewContext = nView;
     pLens = fn_8001F004();
     lbl_801D3CB0.fFOVScale = 1.0f / fn_8001EFFC(pLens);
-    lbl_801D3CB0.xCameraReferencePos[0] = pLens->v34[0];
-    lbl_801D3CB0.xCameraReferencePos[1] = pLens->v34[1];
-    lbl_801D3CB0.xCameraReferencePos[2] = pLens->v34[2];
+    lbl_801D3CB0.xCameraReferencePos[0] = pLens->m4[3][0];
+    lbl_801D3CB0.xCameraReferencePos[1] = pLens->m4[3][1];
+    lbl_801D3CB0.xCameraReferencePos[2] = pLens->m4[3][2];
     lbl_801D3CB0.xCameraReferencePos[3] = 1.0f;
-    lbl_801D3CB0.xCameraLookVector[0] = pLens->v24[0];
-    lbl_801D3CB0.xCameraLookVector[1] = pLens->v24[1];
-    lbl_801D3CB0.xCameraLookVector[2] = pLens->v24[2];
+    lbl_801D3CB0.xCameraLookVector[0] = pLens->m4[2][0];
+    lbl_801D3CB0.xCameraLookVector[1] = pLens->m4[2][1];
+    lbl_801D3CB0.xCameraLookVector[2] = pLens->m4[2][2];
     lbl_801D3CB0.xCameraLookVector[3] = 1.0f;
     lbl_801D3CB0.fXZDistanceToClosestBallSquared = 1000000.0f;
     for (i = 0; i < gNumPlayersSetUp; i++) {
@@ -2005,13 +2005,13 @@ void fn_80034AE4(void) {
     fn_80012F50(1, 6, 1);
     fn_80014118(0x70);
     fn_80012EF8();
-    lbl_801D3CB0.xCameraReferencePos[0] = pLens->v34[0];
-    lbl_801D3CB0.xCameraReferencePos[1] = pLens->v34[1];
-    lbl_801D3CB0.xCameraReferencePos[2] = pLens->v34[2];
+    lbl_801D3CB0.xCameraReferencePos[0] = pLens->m4[3][0];
+    lbl_801D3CB0.xCameraReferencePos[1] = pLens->m4[3][1];
+    lbl_801D3CB0.xCameraReferencePos[2] = pLens->m4[3][2];
     lbl_801D3CB0.xCameraReferencePos[3] = 1.0f;
-    lbl_801D3CB0.xCameraLookVector[0] = pLens->v24[0];
-    lbl_801D3CB0.xCameraLookVector[1] = pLens->v24[1];
-    lbl_801D3CB0.xCameraLookVector[2] = pLens->v24[2];
+    lbl_801D3CB0.xCameraLookVector[0] = pLens->m4[2][0];
+    lbl_801D3CB0.xCameraLookVector[1] = pLens->m4[2][1];
+    lbl_801D3CB0.xCameraLookVector[2] = pLens->m4[2][2];
     lbl_801D3CB0.xCameraLookVector[3] = 1.0f;
     lbl_801D3CB0.fXZDistanceToClosestBallSquared = 1000000.0f;
     for (i = 0; i < gNumPlayersSetUp; i++) {

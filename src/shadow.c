@@ -592,11 +592,11 @@ void fn_800B3460(f32* pA, f32* pB, f32* pOut) {
 void fn_800B3484(CamLens* pLens, f32 (*pMtx)[4]) {
     if (pMtx == NULL) {
         // the matrix at +0x04 overlaps the v4/v24/v34 rows (camera.h)
-        fn_8000ADC0((f32 (*)[4])pLens->v4);
+        fn_8000ADC0(pLens->m4);
         fn_8000ADC0(pLens->m44);
     } else {
         fn_8000A0E8(pMtx, pLens->m44);
-        fn_8000A798(pMtx, (f32 (*)[4])pLens->v4);
+        fn_8000A798(pMtx, pLens->m4);
     }
     fn_8001728C(pLens);
 }

@@ -328,7 +328,7 @@ void fn_80098938(void) {
     if (lbl_80281F80 != NULL && lbl_80281F80->nCount > 0) {
         pMtx = pLens->m44;
         // port: the lens's 0x04..0x44 block is used as a matrix here (CamLens has v4 there)
-        fn_80013D9C(pCamera, (f32 (*)[4])pLens->v4);
+        fn_80013D9C(pCamera, pLens->m4);
         fn_80013EEC(fn_8001614C());
         fn_80016B9C();
         fn_80035118(4, 1);

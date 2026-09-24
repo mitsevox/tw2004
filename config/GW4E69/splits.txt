@@ -282,6 +282,8 @@ emotion.c:
 
 Replay.c:
 	.text       start:0x8006BED4 end:0x8006C630
+	.data       start:0x801888C0 end:0x801888D0
+	.sdata2     start:0x802838B8 end:0x802838C0
 
 gomainloop.c:
 	.text       start:0x8006C630 end:0x8006E150
@@ -362,6 +364,8 @@ GoCamera.c:
 
 GoViewport.c:
 	.text       start:0x80076A54 end:0x80076B7C
+	.data       start:0x80189490 end:0x801894A0
+	.sdata2     start:0x80283A98 end:0x80283AA8
 
 GoShaderObjectCommon_TexAnimManager_Gc.c:
 	.text       start:0x80076B7C end:0x80076E48
@@ -534,50 +538,11 @@ AudReverb.c:
 	.sbss       start:0x802820D8 end:0x802820E8
 
 startUp.c:
-	.text       start:0x800AF324 end:0x800B1AA8
+	.text       start:0x800AF324 end:0x800B2314
 	.data       start:0x8018FE98 end:0x8018FF68
 	.sdata      start:0x80281498 end:0x802814A8
 	.sbss       start:0x802820E8 end:0x80282158
 	.sdata2     start:0x80284070 end:0x802840B0
-
-unsorted/sweep_800B1AA8.c:
-	.text       start:0x800B1AA8 end:0x800B1AB0
-
-unsorted/sweep_800B1AB0.c:
-	.text       start:0x800B1AB0 end:0x800B1B18
-
-unsorted/sweep_800B1F9C.c:
-	.text       start:0x800B1F9C end:0x800B1FBC
-
-unsorted/sweep_800B1FBC.c:
-	.text       start:0x800B1FBC end:0x800B203C
-
-unsorted/sweep_800B204C.c:
-	.text       start:0x800B204C end:0x800B208C
-
-unsorted/sweep_800B208C.c:
-	.text       start:0x800B208C end:0x800B20B8
-
-unsorted/sweep_800B20B8.c:
-	.text       start:0x800B20B8 end:0x800B2150
-
-unsorted/sweep_800B2150.c:
-	.text       start:0x800B2150 end:0x800B218C
-
-unsorted/sweep_800B21D0.c:
-	.text       start:0x800B21D0 end:0x800B21F0
-
-unsorted/sweep_800B21F0.c:
-	.text       start:0x800B21F0 end:0x800B223C
-
-unsorted/sweep_800B223C.c:
-	.text       start:0x800B223C end:0x800B2250
-
-unsorted/sweep_800B2250.c:
-	.text       start:0x800B2250 end:0x800B227C
-
-unsorted/sweep_800B22D4.c:
-	.text       start:0x800B22D4 end:0x800B2314
 
 shadow.c:
 	.text       start:0x800B2314 end:0x800B34F0

@@ -182,7 +182,15 @@ LAYOUT_ASSERT(SkinChoice, 8);
 // or what Character.pChoices points at. fn_800CC1EC fills it from the body's skin or the skin from
 // it; fn_800CC408 gives the other six skins theirs; char_tex_manager.c puts its logos on the model.
 typedef struct SkinChoices {
-    u8   unk0[0x113];
+    // Three name lists of the created golfer (fe_craputils.c fn_80058560 adds, fn_80058624 removes,
+    // fn_800587A8 looks up): lists 0 and 1 hold up to 8 names with a count, list 2 one name (its
+    // count is 0 or 1).
+    s8   n0;                    // 0x000  names in a1
+    char a1[8][0x10];           // 0x001
+    s8   n81;                   // 0x081  names in a82
+    char a82[8][0x10];          // 0x082
+    s8   n102;                  // 0x102  1: sz103 is set
+    char sz103[0x10];           // 0x103
     s8   n113;                  // 0x113  set by fn_8008DD34; FEgolferanim.c passes it to the
                                 //        character (fn_8008EA44)
     SkinChoice aParts[40];      // 0x114  the body's, per part (-1 -1 throughout: not set yet)
@@ -305,6 +313,16 @@ typedef struct SaveProfile {
 } SaveProfile;
 LAYOUT_ASSERT(SaveProfile, 0x10600);
 
+// The session's record tables as the save file keeps them: a copy of gSession from aCourseRecord
+// to recC (0xF00..0x5B2C, the same layout). The replay recorder (Replay.c) keeps one too.
+typedef struct SaveRecords {
+    CourseRecord aCourseRecord[NUM_COURSE_RECORDS];    // 0x0000
+    RecordEntry recA[8][5];     // 0x41A0
+    RecordEntry recB[3][3][5];  // 0x44C0
+    RecordEntry recC[5][2][5];  // 0x4844
+} SaveRecords;
+LAYOUT_ASSERT(SaveRecords, 0x4C2C);
+
 extern SaveProfile* gpSaveData;
 extern SaveProfile* lbl_80281DF4;       // unlocks that hold for every profile (the cheat codes set them)
 extern SaveLockEntry lbl_80281DF0;
@@ -326,6 +344,7 @@ f32  GM_GetGameProgress(SaveProfile* pProfile);
 u8   fn_800D7770(int nPlayer, Award* pAward);   // mark an award won today; 1 if it was not won before
 
 // fe_craputils.c (TW06's FE_CrAP_ utilities)
+extern char lbl_80188138[];     // "NoLogoName": a user logo's name until one is given
 void FE_CrAP_InitCrAPInfo(SaveProfile* pProfile);
 u8   fn_80058304(SaveProfile* pProfile, int nBit);  // bit nBit of pProfile->u10548
 void fn_80058560(SaveProfile* pProfile, int nKind, char* pName);  // add pName to list nKind

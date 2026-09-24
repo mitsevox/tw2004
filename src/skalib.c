@@ -8,11 +8,13 @@
 #include "engine.h"
 #include "endian.h"
 #include "core/goaram.h"
+#include "game/save.h"
 
 ClipBank* ClipBank_Get(u32 nSlot);
 void  fn_80020BC8(void* pClip);                        // swaps a clip in place
 void  fn_80020F60(struct Clip* pClip, u32 uAram);
 void  fn_800269E4(struct LibOverlay* pOv, int nSlot, s32 n);
+void  fn_80026844(LibOverlay* pOv, int nSlot, int n2, int n3, int n4, int n5, char* pNames, int nNames);
 u32   Skalib_NextSlot(void);
 void  Skalib_SetBudgets(void);
 u32   AnimLib_PlanBank(u32 nSlot);
@@ -2082,4 +2084,27 @@ void Skalib_Register(void) {
 void Skalib_Unregister(void) {
     UStream_UnregisterHandler('SAL ');
     UStream_UnregisterHandler('BNK ');
+}
+
+// Applies the created golfer's three name lists (SkinChoices.a1, a82 and sz103) of player n to
+// the overlay.
+void fn_800269E4(LibOverlay* pOv, int nSlot, s32 n) {
+    fn_80026844(pOv, nSlot, 5, 2, 7, -1, gpSaveData[n].choices.a1[0], gpSaveData[n].choices.n0);
+    fn_80026844(pOv, nSlot, 5, 2, 1, -1, gpSaveData[n].choices.a82[0], gpSaveData[n].choices.n81);
+    fn_80026844(pOv, nSlot, 0, 0, 0, 0, gpSaveData[n].choices.sz103, gpSaveData[n].choices.n102);
+}
+
+// The overlay library loaded for the character in slot 0 or 1, or NULL.
+AnimLib* fn_80026AC0(Character* pChar) {
+    int i;
+    int nSlot;
+
+    for (nSlot = 0; nSlot <= 1; nSlot++) {
+        for (i = 0; i < lbl_801C6068[nSlot].nOverlays; i++) {
+            if (lbl_801C6068[nSlot].overlays[i].pChar == pChar) {
+                return lbl_801C6068[nSlot].overlays[i].pWork;
+            }
+        }
+    }
+    return NULL;
 }
