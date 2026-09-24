@@ -91,8 +91,7 @@ void fn_800981D0(int nGlow, int nPoints) {
     for (i = 0; i < nPoints; i++) {
         fBase = PI / (f32)nPoints * (f32)i + PI / 2.0f;
         fn_80012520(0x98, 4, 10);
-        j = 0;
-        do {
+        for (j = 0; j <= 4; j++) {
             fAngle = PI / 2.0f * (f32)j + fBase;
             if (j & 1) {
                 fRadius = 0.03125f;
@@ -103,8 +102,7 @@ void fn_800981D0(int nGlow, int nPoints) {
             v[1] = fRadius * fn_800095F0(fAngle);
             v[2] = 0.0f;
             fn_80097EC4(v);
-            j++;
-        } while (j <= 4);
+        }
         fn_800124A8();
     }
     _EndGlowStrip(pList);

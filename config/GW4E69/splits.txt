@@ -124,7 +124,21 @@ GoRenderCtx_Gc.c:
 	.sdata2     start:0x80282B58 end:0x80282B80
 
 streammanagerhole.c:
-	.text       start:0x800143B8 end:0x80016CB8
+	.text       start:0x800143B8 end:0x80015470
+	.bss        start:0x801A3728 end:0x801A4900
+	.sdata      start:0x80280DF8 end:0x80280E00
+
+Code80015470.c:
+	.text       start:0x80015470 end:0x80016198
+	.bss        start:0x801A4900 end:0x801B8A98
+	.sdata      start:0x80280E00 end:0x80280E08
+	.sdata2     start:0x80282B80 end:0x80282BA0
+
+Code80016198.c:
+	.text       start:0x80016198 end:0x80016CB8
+	.bss        start:0x801B8A98 end:0x801B8BA8
+	.sdata      start:0x80280E08 end:0x80280E10
+	.sdata2     start:0x80282BA0 end:0x80282BB8
 
 ViewController.c:
 	.text       start:0x80016CB8 end:0x80017320
@@ -384,6 +398,9 @@ animblender.c:
 
 GoShaderObjectCommon_ShaderObjectsData_Gc.c:
 	.text       start:0x80073878 end:0x80075280
+	.data       start:0x801893F0 end:0x8018946C
+	.sbss       start:0x80281EA0 end:0x80281EB8
+	.sdata2     start:0x80283A30 end:0x80283A50
 
 LLVideo.c:
 	.text       start:0x80075280 end:0x80076158

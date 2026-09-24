@@ -6,21 +6,23 @@
 #include "core/startup.h"
 #include "shaderdata.h"
 
-// The morph the list being built records its vertices for (a command 6 sets it), and which
-// vertex arrays the list has: texture coordinates, normals, colours.
-MorphAnim* lbl_80281EA0;
+// .sbss: defined in reverse address order (CodeWarrior lays them out last-defined-first);
+// EB3-EB5 are the vertex-array flags described with lbl_80281EA0 below.
+u8 lbl_80281EB5;
+u8 lbl_80281EB4;
+u8 lbl_80281EB3;
 // fn_800738DC's state: the texture map a palettized texture loads into (always 0), the texture
 // last set up, and which stage setup is loaded (EB2 two-texture or palettized, EB1 one texture,
 // EB0 with it the one for formats 0 and 1).
-int lbl_80281EA4;
-TexEntry* lbl_80281EA8;
-TexBank* lbl_80281EAC;
-u8 lbl_80281EB0;
-u8 lbl_80281EB1;
 u8 lbl_80281EB2;
-u8 lbl_80281EB3;
-u8 lbl_80281EB4;
-u8 lbl_80281EB5;
+u8 lbl_80281EB1;
+u8 lbl_80281EB0;
+TexBank* lbl_80281EAC;
+TexEntry* lbl_80281EA8;
+int lbl_80281EA4;
+// The morph the list being built records its vertices for (a command 6 sets it), and which
+// vertex arrays the list has: texture coordinates, normals, colours.
+MorphAnim* lbl_80281EA0;
 
 // An int's absolute value as EA wrote it here: (sign + v) ^ sign (srawi, add, xor). The
 // compiler's own abs() and IABS give xor, subf; the sign in a local puts it first in the add.
@@ -28,6 +30,12 @@ static inline int AbsAddXor(int v) {
     int nSign = v >> 31;
 
     return (nSign + v) ^ nSign;
+}
+
+// fake match: fn_80074628 reads the command's layout through this, which moves it to r31 as in
+// the original (read straight from p[1] it lands in r27). No evidence EA had such an accessor.
+static inline u16 ReadU16(u16* p, int i) {
+    return p[i];
 }
 
 int fn_80073878(TexBank* pBank, TexEntry* pTex);
@@ -67,7 +75,9 @@ void fn_800738DC(TexBank* pBank, TexEntry* pTex, u8 bFirst) {
     int nPair;
 
     if (bFirst) {
-        lbl_80281EB2 = lbl_80281EB1 = lbl_80281EB0 = 0;
+        // data order: with the .sbss defined last-first, the chain is written low address first
+        // to keep EA's store order (EB2, EB1, EB0)
+        lbl_80281EB0 = lbl_80281EB1 = lbl_80281EB2 = 0;
         // port: an address no bank or texture has, so the test below fails; only compared
         lbl_80281EAC = (TexBank*)&bFirst;
         lbl_80281EA8 = (TexEntry*)&bFirst;
@@ -301,7 +311,7 @@ u16* fn_80074628(u16* p, u16* pEnd) {
     u16 nTex2;
 
     ePrim = p[0];
-    eLayout = p[1];
+    eLayout = ReadU16(p, 1);    // fake match: see ReadU16
     nVerts = p[2];
     p += 3;
     switch (ePrim) {
@@ -579,7 +589,7 @@ void fn_80074DA8(ShaderVtxArrays* pArrays, int eType, MorphAnim* pAnim, ShaderCm
 
     bTexMtx = 0;
     lbl_80281EA0 = NULL;
-    lbl_80281EB5 = lbl_80281EB4 = lbl_80281EB3 = 0;
+    lbl_80281EB3 = lbl_80281EB4 = lbl_80281EB5 = 0;   // data order: see fn_800738DC's chain
     bFirst = 1;
     if (pCmds->nFrames > 1) {
         pAnim->b8 = 1;

@@ -265,6 +265,7 @@ void fn_801132C4(SkinMeshRefs* pRefs) {
     f32* pPosOut;
     s8* pNormalOut;
     f32 (*pMatrix)[4];
+    u16 nMatrix;
     u32 i;
     f32 (*pMatrices)[4][4];
     u32 uSize;
@@ -300,7 +301,7 @@ void fn_801132C4(SkinMeshRefs* pRefs) {
         pNormalOut = pNormalBuf;
         for (i = 0; i < pRefs->n10; pPos += 4, pNormal += 4, i++) {
             // Each position is x, y, z and the index of its matrix.
-            pMatrix = pMatrices[(u16)pPos[3]];
+            nMatrix = pPos[3];
             vPosIn.x = pPos[0] / 16384.0f;
             vPosIn.y = pPos[1] / 16384.0f;
             vPosIn.z = pPos[2] / 16384.0f;
@@ -312,6 +313,7 @@ void fn_801132C4(SkinMeshRefs* pRefs) {
             vNormalIn.y = pNormal[1] / 64.0f;
             vNormalIn.z = pNormal[2] / 64.0f;
             vNormalIn.w = 1.0f;
+            pMatrix = pMatrices[nMatrix];
             fn_800BAD60(pMatrix, &vPosIn, &vPosOut);
             fn_800BADB4(pMatrix, &vNormalIn.x, &vNormalOut.x);
             pPosOut[0] = vPosOut.x;
