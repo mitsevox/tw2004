@@ -233,8 +233,8 @@ void fn_80063CF0(View* pView, int nKind, int nPlayer) {
         if (pShot != NULL) {
             CameraScript_RecordCurrentCam(&pView->shot19C, pPos, pAt, nPlayer, &pView->script, 0);
             pView->shot19C.p40 = pShot;
-            CameraScript_InterpToNewScript(&pView->script, &pView->shot19C, nPlayer, pPos, pAt, 5, 0.0f, 100.0f,
-                                           25, 0.0f);
+            CameraScript_InterpToNewScript(&pView->script, &pView->shot19C, nPlayer, pPos, pAt, 5, 0.0f,
+                                           100.0f, 25, 0.0f);
             pView->script.nBC = 5;
             pView->script.f8C = 0.3f;
             fn_80063BF4(pView, 0.3f, vSpeed);
