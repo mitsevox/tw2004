@@ -257,6 +257,8 @@ s32  fn_8009FAD0(void);
 s32  fn_800A0A7C(s32 nPort, s32 nSlot);
 void fn_800A1BE0(void);
 void fn_800A1D4C(UStreamObject* pObject);  // the 'eagm' handler
+void fn_800A1F6C(const char* szGameCode);   // mark the 'eagm' entries whose names match
+s32  fn_800A2030(void);                     // how many 'eagm' entries are marked
 s32  fn_800A2100(s32 nPort, s32 nSlot);
 s32  fn_800A218C(s32 nPort, s32 nSlot);    // always MC_ERR_NOFILE
 s32  fn_800A2194(s32 nPort, s32 nSlot);

@@ -621,6 +621,38 @@ void fn_8009E544(char* pGameName, char* pComment, u8* pIcon, u8* pBanner) {
     }
 }
 
+// Write nLen bytes from pBuf as file pName, creating it when it is not there, set its banner and
+// icon (fn_8009E47C), then load it back (fn_8009ED34) to check it.
+s32 fn_8009E604(s32 nPort, s32 nSlot, const char* pName, void* pBuf, s32 nLen,
+                const char* pBackupName) {
+    CARDFileInfo file;
+    s32 nResult;
+    nResult = fn_8009F734(nPort, nSlot);
+    if (nResult != 0) return nResult;
+    nResult = fn_8009D0D4(nPort, nSlot);
+    if (nResult != 0) return nResult;
+    fn_8009CB9C(nPort, nSlot, nLen + 0x6000);
+    nResult = fn_8009CEF8(nPort, nSlot, pName, &file);
+    if (nResult == MC_ERR_NOFILE) {
+        nResult = fn_8009DFD8(nPort, nSlot, pName, nLen, &file);
+        if (nResult != 0) return nResult;
+    } else if (nResult != 0) {
+        return nResult;
+    }
+    nResult = fn_8009E130(nPort, nSlot, &file, pBuf, nLen, 0);
+    if (nResult != 0) {
+        fn_8009D010(nPort, nSlot, &file);
+        return nResult;
+    }
+    nResult = fn_8009E47C(nPort, nSlot, &file);
+    if (nResult != 0) return nResult;
+    nResult = fn_8009D010(nPort, nSlot, &file);
+    if (nResult != 0) return nResult;
+    nResult = fn_8009ED34(nPort, nSlot, pName, NULL);
+    if (nResult != 0) return nResult;
+    return 0;
+}
+
 // Delete file pName from the card ("EASB": the EA Sports Bio's file, by its number). Nothing to do
 // without a name; a card with an I/O error is not touched.
 s32 fn_8009E758(s32 nPort, s32 nSlot, const char* pName) {
@@ -723,6 +755,37 @@ void fn_8009EB38(UStreamObject* pObject) {
 
 // Called while waiting for the CARD library.
 void fn_8009EB40(s32 nPort, s32 nSlot) {
+}
+
+// Look at every file on the card and mark the 'eagm' entries (MC.c) whose names match the file's
+// game code; return how many are marked. Mounts the card for the look if needed.
+s32 fn_8009EB44(s32 nPort, s32 nSlot) {
+    CARDStat stat;
+    char szGameCode[5];     // size unknown (at most 8)
+    s32 nMount;
+    int i;
+    s32 nResult;
+    nMount = fn_8009D74C(nPort, nSlot);
+    if (nMount != 0 && nMount != MC_ERR_MOUNTED) return nMount;
+    nResult = fn_8009F734(nPort, nSlot);
+    if (nResult == 0) {
+        nResult = fn_8009D0D4(nPort, nSlot);
+        if (nResult == 0) {
+            for (i = 0; i < 127; i++) {
+                nResult = fn_8009E280(nPort, nSlot, i, &stat);
+                if (nResult == 0) {
+                    strncpy(szGameCode, stat.gameName, 4);
+                    szGameCode[4] = '\0';
+                    fn_800A1F6C(szGameCode);
+                }
+            }
+        }
+    }
+    if (nMount == 0) {
+        fn_8009DBAC(nPort, nSlot);
+    }
+    if (nResult == 0 || nResult == MC_ERR_NOFILE) return fn_800A2030();
+    return nResult;
 }
 
 // Make the backup the save file: when both are on the card, delete pName first; then load the
