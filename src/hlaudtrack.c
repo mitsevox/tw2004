@@ -224,7 +224,7 @@ void fn_800A9E7C(AudSource* pSource, AudTrack* pTrack, AudTrackTmpl* pTmpl, u8 n
     if (pTrack != NULL && pTrack->nState == 2) return;
     bPlaying = pTrack != NULL && pTrack->nState > 2;
     bSwitch = (pTmpl->n0 & 4) && !(pTmpl->n0 & 1);
-    bRetrigger = !((pTmpl->n0 >> 4) & 1);
+    bRetrigger = (pTmpl->n0 & 0x10) == 0;
     bResort = bPlaying;
     bAudible = fPriority > 0.0f;
     bStart = bAudible &&
