@@ -197,6 +197,11 @@ int  fn_800D31A4(int nPar);             // the number of the 18 holes with that 
 f32  fn_800D0478(int nPlayer);          // the ball's distance from the pin (yards)
 f32  fn_800D0550(int nPlayer);          // the shot's length
 int  Hole_ScoreAfterTapIn(int nPlayer); // HoleScore.c
+u8   fn_800CF158(int nPlayer);          // gpGame->pfn1F8: holing this ball takes the lead
+u8   fn_800CF450(int nPlayer);          // gpGame->pfn1FC: holing this ball wins
+s32  fn_800CFE74(int nPlayer);          // gpGame->pfn200: the lead so far
+s32  fn_800D0098(int nPlayer);          // gpGame->pfn204: the lead if this ball drops
+s32  fn_800D030C(int nPlayer);          // gpGame->pfn208: how the hole ends if it drops
 int  fn_800D0620(int nPlayer, u8 bCurrent, u8 bOnlyFlagged);   // holes under par so far
 int  fn_800D06FC(int nPlayer, u8 bCurrent, u8 bOnlyFlagged);   // two under par or better so far
 int  fn_800D07D8(int nPlayer, u8 bCurrent);   // the current run of holes under par
@@ -204,6 +209,7 @@ int  fn_800D089C(int nPlayer, u8 bCurrent);   // the current run of holes two un
 u8   fn_800D0AF4(void);                 // nobody took anything on the last hole played
 s32  fn_800BCCCC(int nPlayer);          // SitDevFile.c: gpGame->pfn208
 s32  fn_800BCCF8(int nPlayer);          // SitDevFile.c: strokes behind the leader (gpGame->pfn200)
+u8   fn_800BCD50(void);                 // SitDevFile.c: gpGame->bD4
 void fn_800D2714(u16* pDate, s32* pMonth, s32* pDay, s32* pYear);
 void fn_800D2678(u16* pDate, s32 nMonth, s32 nDay, u32 nYear);    // make a date
 void fn_800D27CC(u16* pDate, s32 nDays);        // move a date on by nDays
@@ -233,6 +239,7 @@ s32  fn_800D9984(s32 i);                // lbl_80200268[i]
 int  fn_800D782C(int nPlayer, Ball* pBall, int a, u8 bCountStroke, u8 bAll);
 int  fn_800D7B1C(int nPlayer, Ball* pBall, int a, u8 bCountStroke, u8 bAll);   // the putt record check
 s32  fn_8008AB40(void);                 // GameUICommands.c
+s32  fn_8008AC00(void);                 // GameUICommands.c: the round's holes left, the current one included
 
 // GameHoleContests.c: the longest-drive, closest-to-the-pin and hole-in-one contests
 u8   fn_800DA174(void);                 // the longest drive is played on this hole

@@ -127,6 +127,113 @@ u8 fn_800CF158(int nPlayer) {
     return 0;
 }
 
+// gpGame->pfn1FC: whether holing this ball would win (the others' balls not yet holed counting
+// one more stroke). Strokes (scoring kind 0): only on the round's last hole or with gpGame->bD4,
+// beating the best other total. Holes won (1): winning this hole puts the player more holes up
+// than are left, or halving it (beating the best by less than two) already does. Skins (2):
+// winning this hole's skin lifts the player past the best.
+u8 fn_800CF450(int nPlayer) {
+    int anTotal[4];   // one per player set up, as in fn_800CFE74
+    int i;
+    int nKind;
+    int nLeft;
+    int nMine;
+    int nBest;
+    int nOther;
+    int nMineStrokes;
+    int nBestStrokes;
+
+    nKind = fn_8008AB40();
+    if (gNumPlayersSetUp == 1) {
+        return 0;
+    }
+    nLeft = fn_8008AC00();
+    if (nKind == 0) {
+        if (nLeft != 1 && !fn_800BCD50()) {
+            return 0;
+        }
+        nBest = 1000;
+        for (i = 0; i < gNumPlayersSetUp; i++) {
+            if (!gPlayers[i].bPlayerCut) {
+                anTotal[i] = fn_800E1904(i, 0);
+                if (i != nPlayer && anTotal[i] < nBest) {
+                    nBest = anTotal[i];
+                }
+            }
+        }
+        // EA bug: nMineStrokes is never set when nPlayer is cut or not one of the players set up
+        for (i = 0; i < gNumPlayersSetUp; i++) {
+            if (!gPlayers[i].bPlayerCut) {
+                if (i == nPlayer) {
+                    nMineStrokes = anTotal[i] + (gPlayers[i].nStrokes[Game_CurHoleIndex()] + 1) -
+                                   fn_800D2B08();
+                } else {
+                    nOther = anTotal[i] + gPlayers[i].nStrokes[Game_CurHoleIndex()] - fn_800D2B08();
+                    if (gPlayers[i].ball.nLie != LIE_INCUP_e) {
+                        nOther++;
+                    }
+                    if (nOther < nBest) {
+                        nBest = nOther;
+                    }
+                }
+            }
+        }
+        return nMineStrokes < nBest;
+    } else if (nKind == 1) {
+        nBest = -1;
+        nBestStrokes = 1000;
+        for (i = 0; i < gNumPlayersSetUp; i++) {
+            if (i == nPlayer) {
+                nMine = gPlayers[i].nHolesWon;
+                nMineStrokes = gPlayers[i].nStrokes[Game_CurHoleIndex()];
+            } else {
+                if (gPlayers[i].nHolesWon > nBest) {
+                    nBest = gPlayers[i].nHolesWon;
+                }
+                nOther = gPlayers[i].nStrokes[Game_CurHoleIndex()];
+                if (gPlayers[i].ball.nLie != LIE_INCUP_e) {
+                    nOther++;
+                }
+                if (nOther < nBestStrokes) {
+                    nBestStrokes = nOther;
+                }
+            }
+        }
+        if (nMineStrokes < nBestStrokes - 1 && nMine + 1 - nBest > nLeft - 1) {
+            return 1;
+        }
+        if (nMineStrokes < nBestStrokes && nMine - nBest > nLeft - 1) {
+            return 1;
+        }
+        return 0;
+    } else if (nKind == 2) {
+        nBest = -1;
+        nBestStrokes = 1000;
+        for (i = 0; i < gNumPlayersSetUp; i++) {
+            if (i == nPlayer) {
+                nMine = gPlayers[i].n274;
+                nMineStrokes = gPlayers[i].nStrokes[Game_CurHoleIndex()];
+            } else {
+                if (gPlayers[i].n274 > nBest) {
+                    nBest = gPlayers[i].n274;
+                }
+                nOther = gPlayers[i].nStrokes[Game_CurHoleIndex()];
+                if (gPlayers[i].ball.nLie != LIE_INCUP_e) {
+                    nOther++;
+                }
+                if (nOther < nBestStrokes) {
+                    nBestStrokes = nOther;
+                }
+            }
+        }
+        if (nMineStrokes < nBestStrokes - 1 && nMine + fn_800F9254() > nBest) {
+            return 1;
+        }
+        return 0;
+    }
+    return 0;
+}
+
 // For a human player: whether Player.ballBefore passes the fn_800D782C check or, when that ball
 // is in the cup, the fn_800D7B1C putt check.
 u8 fn_800CF77C(int nPlayer) {
@@ -191,10 +298,11 @@ u32 fn_800CFD58(int nPlayer) {
     return uIds;
 }
 
+// gpGame->pfn200 (TW06: GetCurrentLead).
 // The player's lead in the round so far (strokes, holes won or skins by the scoring kind
 // fn_8008AB40): kind 0, the best other total (fn_800E1904; cut players left out) less the
 // player's; kinds 1 and 2, the player's holes won (skins) less the best of the others'.
-int fn_800CFE74(int nPlayer) {
+s32 fn_800CFE74(int nPlayer) {
     int anTotal[4];   // one per player set up; the frame has room for four
     int i;
     int nKind;
@@ -259,12 +367,13 @@ int fn_800CFFE4(int nPlayer) {
     return (nStrokes - nPar) + gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1 - fn_800D2B08();
 }
 
+// gpGame->pfn204 (TW06: GetPotentialLead).
 // The player's lead (strokes, or holes or skins by the scoring kind fn_8008AB40) once this hole's
 // ball drops, 0 when playing alone. Kind 0 (strokes): the best other round total, with a holed
 // ball's score on this hole, less the player's total with the tap-in; players who missed the cut
 // are left out. Kinds 1 and 2: the lead from fn_800BCCF8, moved by fn_800BCCCC's value: 3 no
 // change, 2 up one (kind 2: up this hole's skin), 0 down the same.
-int fn_800D0098(int nPlayer) {
+s32 fn_800D0098(int nPlayer) {
     int anTotal[4];   // one per player set up, as in fn_800CFE74
     int i;
     int nKind;
@@ -348,10 +457,11 @@ u8 fn_800D024C(int nPlayer) {
     return bFinished;
 }
 
+// gpGame->pfn208.
 // How the hole ends for the player if the ball drops now, against the best of the others (a
 // ball not yet holed counts one more stroke; in mode 21 the other side is player 2 or 0): 2 the
 // player wins it, 1 ties, 0 loses; 3 when playing alone or when holing would not end the hole.
-int fn_800D030C(int nPlayer) {
+s32 fn_800D030C(int nPlayer) {
     int i;
     int nMine;
     int nBest;

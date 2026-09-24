@@ -45,7 +45,6 @@ extern s32 lbl_80282254;
 extern s32 lbl_80191A08[39];
 extern f32 lbl_80191AA4[70];
 
-u8    fn_800CF450(int nPlayer);
 
 void  fn_800D344C(UStreamObject* pObject);
 int   fn_800584DC(int nProfile);
