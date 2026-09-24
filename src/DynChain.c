@@ -592,8 +592,9 @@ void fn_80115348(CharModel* pModel, DynChain* pChain, f32 fDelta) {
             vAxis1[2] = 0.0f;
             vAxis1[3] = 0.0f;
         }
+        fPeriod = 60.0f * FRAME_RATE * lbl_802824F8->aParams[0].aC[i];
         if (0.0f != fSpeedA) {
-            fPeriod = 60.0f * FRAME_RATE * lbl_802824F8->aParams[0].aC[i] * (1.0f / fSpeedA);
+            fPeriod = fPeriod * (1.0f / fSpeedA);
         } else {
             fPeriod = 100000000.0f;
         }
@@ -606,8 +607,8 @@ void fn_80115348(CharModel* pModel, DynChain* pChain, f32 fDelta) {
         if (0.0f != fPeriod) {
             nPeriod = fPeriod;
             fT = (f32)(pChain->n18 % nPeriod) / fPeriod;
-            fAngle = fSize * fn_800095F0(2.0f * PI * fT + PI * (2.0f * lbl_802824F8->aParams[0].a18[i])) +
-                     PI * lbl_802824F8->aParams[0].a24[i] / 180.0f;
+            fAngle = fSize * fn_800095F0(2.0f * PI * fT + PI * (2.0f * lbl_802824F8->aParams[0].a18[i]));
+            fAngle += PI * lbl_802824F8->aParams[0].a24[i] / 180.0f;
         } else {
             fAngle = 0.0f;
         }
@@ -634,8 +635,9 @@ void fn_80115348(CharModel* pModel, DynChain* pChain, f32 fDelta) {
             vAxis2[2] = 1.0f;
             vAxis2[3] = 0.0f;
         }
+        fPeriod = 60.0f * FRAME_RATE * lbl_802824F8->aParams[1].aC[i];
         if (0.0f != fSpeedA) {
-            fPeriod = 60.0f * FRAME_RATE * lbl_802824F8->aParams[1].aC[i] * (1.0f / fSpeedA);
+            fPeriod = fPeriod * (1.0f / fSpeedA);
         } else {
             fPeriod = 100000000.0f;
         }
@@ -648,8 +650,8 @@ void fn_80115348(CharModel* pModel, DynChain* pChain, f32 fDelta) {
         if (0.0f != fPeriod) {
             nPeriod = fPeriod;
             fT = (f32)(pChain->n18 % nPeriod) / fPeriod;
-            fAngle = fSize * fn_800095F0(2.0f * PI * fT + PI * (2.0f * lbl_802824F8->aParams[1].a18[i])) +
-                     PI * lbl_802824F8->aParams[1].a24[i] / 180.0f;
+            fAngle = fSize * fn_800095F0(2.0f * PI * fT + PI * (2.0f * lbl_802824F8->aParams[1].a18[i]));
+            fAngle += PI * lbl_802824F8->aParams[1].a24[i] / 180.0f;
         } else {
             fAngle = 0.0f;
         }
@@ -747,15 +749,17 @@ void fn_80115B2C(CharModel* pModel, DynChain* pChain, f32 fDelta) {
                 fSpeed = (1.0f - lbl_802824F8->f88) * fT + lbl_802824F8->f88;
                 fSize = (1.0f - lbl_802824F8->f80) * fT + lbl_802824F8->f80;
             } else {
-                fT = 1.0f;
-                if (35.0f != lbl_802824F8->nBC) {
+                if (35.0f == lbl_802824F8->nBC) {
+                    fT = 1.0f;
+                } else {
                     fT = (fStrength - lbl_802824F8->nBC) / (35.0f - lbl_802824F8->nBC);
                 }
                 // Unlike fn_80115348, both come from f8C, as 1 - f8C.
                 fSpeed = fSize = (1.0f - lbl_802824F8->f8C) * fT + 1.0f;
             }
+            fPeriod = 60.0f * FRAME_RATE * lbl_802824F8->f64;
             if (0.0f != fSpeed) {
-                fPeriod = 60.0f * FRAME_RATE * lbl_802824F8->f64 * (1.0f / fSpeed);
+                fPeriod = fPeriod * (1.0f / fSpeed);
             } else {
                 fPeriod = 100000000.0f;
             }
