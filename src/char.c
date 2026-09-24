@@ -25,6 +25,7 @@ void  fn_8001A798(void);
 void  fn_8001A7C8(void);
 Character* fn_8001A9F4(u8* pData, int a, int nPlayer, u32 uId, u8 b, void* p);
 void* fn_8001B208(u8* pData);
+void  fn_8001B58C(CharSkinSet* pSet);
 void  fn_8001B878(Character* pChar, int n);
 void  fn_8001C0E0(Character* pChar);
 Character* fn_8001C21C(Character* pChar);
@@ -384,6 +385,28 @@ void fn_8001A81C(void) {
     fn_800C9FE0();
 }
 
+// Frees the club skin sets (lbl_80280E24): each one's skins and a9C blocks, then the set. pSet is
+// not used: fn_8001C468 passes the set it found, but both are freed here.
+void fn_8001B58C(CharSkinSet* pSet) {
+    int j;
+    int i;
+
+    for (i = 0; i < 2; i++) {
+        if (lbl_80280E24[i] != NULL) {
+            for (j = 0; j < 6; j++) {
+                if (lbl_80280E24[i]->apSkins[j] != NULL) {
+                    fn_80037CD8(lbl_80280E24[i]->apSkins[j]);
+                }
+                if (lbl_80280E24[i]->a9C[j] != NULL) {
+                    fn_8001B1E8(lbl_80280E24[i]->a9C[j]);
+                }
+            }
+            fn_80009E70(lbl_80280E24[i]);
+            lbl_80280E24[i] = NULL;
+        }
+    }
+}
+
 // Advances every character's animation by fTime, except in game type 6 while fn_800E415C holds.
 void fn_8001BC8C(f32 fTime) {
     int i;
@@ -451,9 +474,35 @@ void fn_8001C350(void) {
     fn_80112CEC();
 }
 
+// Frees the club skin sets and every character made, then shuts down the animation libraries.
+void fn_8001C468(void) {
+    int i;
+
+    for (i = 0; i < 2; i++) {
+        if (lbl_80280E24[i] != NULL) {
+            fn_8001B58C(lbl_80280E24[i]);
+        }
+        lbl_80280E24[i] = NULL;
+    }
+    for (i = 0; i < lbl_80281CA8; i++) {
+        fn_8001C0E0(lbl_801B9624[i]);
+        lbl_801B9624[i] = NULL;
+    }
+    lbl_80281CA8 = 0;
+    Skalib_Shutdown();
+    fn_8001F66C();
+    fn_8002955C();
+    fn_80071B94();
+}
+
+// Frees every character of the menu's golfer slots (lbl_80281EE8).
 void fn_8001C518(void) {
-    fn_8001C0E0(lbl_80281EE8);
-    lbl_80281EE8 = NULL;
+    int i;
+
+    for (i = 0; i < CRAP_NUM_GOLFERS; i++) {
+        fn_8001C0E0(lbl_80281EE8[i]);
+        lbl_80281EE8[i] = NULL;
+    }
 }
 
 // The model id of the player's golfer.

@@ -60,7 +60,7 @@ s32 lbl_80281340 = -1;          // } the golfer and profile slot last drawn (fn_
 s32 lbl_80281344 = -1;          // }
 
 CrAPState* lbl_80281EE0;
-s32 lbl_80281EE8[CRAP_NUM_GOLFERS];     // per golfer slot: the character it starts with (none)
+Character* lbl_80281EE8[CRAP_NUM_GOLFERS];
 
 void fn_8008B00C(void);
 void fn_8008B704(void);
@@ -162,8 +162,8 @@ void fn_8008AD80(void) {
         if (nNext >= CRAP_NUM_GOLFERS) {
             nNext = 0;
         }
-        lbl_80281EE8[i] = 0;
-        lbl_80281EE0->aGolfer[i].pChar = (Character*)lbl_80281EE8[i];
+        lbl_80281EE8[i] = NULL;
+        lbl_80281EE0->aGolfer[i].pChar = lbl_80281EE8[i];
         lbl_80281EE0->aGolfer[i].n10 = i;
         lbl_80281EE0->aGolfer[i].n14 = -1;
         lbl_80281EE0->aGolfer[i].n1C = -1;

@@ -160,6 +160,10 @@ void* fn_80020DD4(void* pClip, void* pOut, int nAlign);
 
 typedef struct SKABlendNode SKABlendNode;
 
+void Skalib_Shutdown(void);             // skalib.c
+void fn_8001F66C(void);                 // mtalib.c
+void fn_80071B94(void);                 // animblender.c
+
 // animblender.c: whether a source under pNode plays pSrc (format 0, format 1).
 u8 fn_80073554(SKABlendNode* pNode, void* pSrc);
 u8 fn_80073610(SKABlendNode* pNode, void* pSrc);

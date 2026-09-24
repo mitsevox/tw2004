@@ -245,6 +245,8 @@ typedef struct CharSkinSet {
     u8   unk0[0xC];
     f32  afC[6];                // 0x0C  per club class: the club head bone's height (fn_8001C5B4)
     Skin* apSkins[6];           // 0x24
+    u8   unk3C[0x9C - 0x3C];
+    void* a9C[6];               // 0x9C  freed with fn_8001B1E8 (fn_8001B58C)
 } CharSkinSet;
 
 // A pool of seven entries characters take (fn_8001A418) and give back (fn_8001A3B0).
@@ -266,9 +268,10 @@ extern s32        lbl_80281CA8;         // how many
 extern s32        lbl_80281CAC;         // the player fn_8001D8DC last marked (-1 at start)
 extern s32        lbl_80187164[8];      // the clip key for each shot kind (fn_8001C724)
 extern s32        lbl_80280E20;         // set to 6 (4 in split screen) by fn_8001C254, 3 by fn_8001C304
-extern void*      lbl_80280E24[2];      // what fn_8001B208 makes of the 'CLB ' object: one, or one per view
-                                        // in split screen
-extern Character* lbl_80281EE8;   // a character fn_8001C37C clears and fn_8001C518 frees
+extern CharSkinSet* lbl_80280E24[2];   // what fn_8001B208 makes of the 'CLB ' object: one, or one per
+                                        // view in split screen (Character.p16D8; fn_8001B58C frees them)
+
+void  fn_80037CD8(void* pSkin);         // Skin.c: frees a skin
 
 // SkinPart.c, as FE_CrAPDB.c uses it: find a part (or set) by id, a variant by id or name, and
 // pick a part's (or set's) variant.
