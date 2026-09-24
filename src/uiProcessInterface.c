@@ -334,6 +334,7 @@ void fn_8008FDDC(FrontEnd* pFE) {
 // that name in the texture bank fn_8008FFF0 picks, kind 2 to the record of that name in pC (its
 // table noted in lbl_801D87C0.n3C).
 void fn_8008FE88(FrontEnd* pFE) {
+    u32 k;
     UIColorTable* pTable;
     UIFileEntry* pEntry;
     u64 uHash;
@@ -341,7 +342,6 @@ void fn_8008FE88(FrontEnd* pFE) {
     int nBank;
     u32 i;
     u32 j;
-    u32 k;
 
     for (i = 0; i < pFE->pFile->p8->nCount; i++) {
         pTable = pFE->pFile->p8->apTables[i];

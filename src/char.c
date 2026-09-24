@@ -793,19 +793,19 @@ void Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, in
     f32 q28[4];
     f32 q18[4];
     f32 vNormal[4];
-    f32 fDropA;
     f32 fDropB;
-    f32 fDrop;
     f32 fReach;
     f32 fLeg;
     f32 fThigh;
     f32 fShin;
+    f32 fDrop;
     f32 fDen;
     f32 fSq;
     f32 fCos;
     f32 fAngleA;
     f32 fAngleB;
     f32 fTurn;
+    f32 fDropA;
     f32 fLen;
     f32 fScale;
     Skeleton* pSkel;
@@ -954,7 +954,7 @@ void fn_800192D4(Character* pChar, f32 fAngle) {
         if (gSession.nGameType == 3 && fn_8001EDF4(pChar)) {
             fAngle += PI;
         }
-        fn_80008BB8(pChar->pModel->pBones->q0C, 0.0f, fAngle, 0.0f);
+        fn_80008BB8(0.0f, fAngle, 0.0f, pChar->pModel->pBones->q0C);
     }
 }
 
@@ -1104,6 +1104,8 @@ void fn_8001971C(Character* pChar) {
 // use (fn_800CE8C0), the texture of that name (and the one after it when it goes with it) with its
 // palette, or an empty one. Then it opens the golfer's texture file.
 void fn_80019798(Character* pChar, Skin** apSkins, int nSkins) {
+    int nExtra;
+    int nTex;
     int nTexBytes;
     int nPalBytes;
     u8* pData;
@@ -1112,9 +1114,7 @@ void fn_80019798(Character* pChar, Skin** apSkins, int nSkins) {
     TexPalette* pPalData;
     u8 bAll;
     u8 bFound;
-    int nTex;
     int nPal;
-    int nExtra;
     int nNames;
     int nOut;
     int i;

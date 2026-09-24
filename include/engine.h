@@ -155,7 +155,7 @@ void Misc_CloseModule(void);                 // drop the kept normal value (Misc
 f32  Misc_RandFuncf(int nStream);           // 0x8000B428  [0, 1)
 void fn_8000883C(f32* pA, f32* pB, f32 fT);   // quaternion slerp from a to b by fT, into b
 void fn_80008FCC(f32* pA, f32* pB, f32* pOut); // quaternion product a x b (Quaternion.c)
-void fn_80008BB8(f32* pOut, f32 fA, f32 fB, f32 fC);   // the quaternion of three (negated) angles
+void fn_80008BB8(f32 fA, f32 fB, f32 fC, f32* pOut);   // the quaternion of three (negated) angles
 void fn_8000923C(f32* pRot, f32* pOut); // a rotation vector (axis * angle) as a quaternion
 void fn_800093AC(f32 fAngle, f32* pOut); // the quaternion of a rotation by -fAngle about z
 void fn_80009410(f32 fAngle, f32* pOut); // the quaternion of a rotation by -fAngle about y
@@ -1098,7 +1098,7 @@ typedef struct UFontContext {
     f32   f0C;                    // 0x0C  1 / (f08 - f04), set by fn_80012E00_CalcGradientScale
     s32   n10;                    // 0x10  gradients on: 1 the stops in a14[0..4], 2 a14[4] to a14[5]
     UFontStop a14[6];             // 0x14
-    u32   u5C;                    // 0x5C  the colour (a GXColor's bytes) when nA4 is 0x12
+    GXColor u5C;                  // 0x5C  the colour when nA4 is 0x12
     s32   n60;                    // 0x60
     s32   n64;                    // 0x64
     s32   n68;                    // 0x68
@@ -1122,7 +1122,7 @@ typedef struct UFontContext {
     f32   fBC;                    // 0xBC
     f32   fC0;                    // 0xC0
     s32   nC4;                    // 0xC4  the shadow's nA4 (n9C bit 0x10000: drawn first, moved by fCC, fD0)
-    u32   uC8;                    // 0xC8  the shadow's u5C
+    GXColor uC8;                  // 0xC8  the shadow's u5C
     f32   fCC;                    // 0xCC
     f32   fD0;                    // 0xD0
     char* szText;                 // 0xD4  a queued string's copy of its text
