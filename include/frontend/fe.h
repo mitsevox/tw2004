@@ -337,6 +337,8 @@ void fn_8010568C(s16 nPart, int b, int i, int n, u8* pColor);  // pColor: 4 byte
 void fn_80105B4C(s16 nPart, int b, int i, char* pName);
 u8   fn_80106374(s16 nPart, int b, int i);
 u8   fn_8010651C(s16 nPart, int b, int i, char* pDst);
+void fn_8010745C(int nAsset, char* pDst);   // copy the name of an asset's category
+void fn_8010749C(int nAsset, char* pDst);   // copy an asset's name
 void fn_801060F0(int nAsset, s16 nPart, int n, s32* pnPlace);  // the asset's place in the list
                                         // of the part's offered assets that fit its entry n
 int  fn_801062C8(s16 nPart, int n);     // the asset in the first slot of aAF80 of the part that

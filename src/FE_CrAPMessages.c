@@ -677,6 +677,67 @@ void fn_80108E4C(MsgArg* pArgs, MsgArg* pResult) {
 
 // ---- end of sweep code ----
 
+// The newly unlocked assets (aB344) for the five strings pArgs[0..4]: their names when there are
+// at most five, else their categories (the fifth line "And more..." when there are more than four).
+void fn_80108E9C(MsgArg* pArgs, MsgArg* pResult) {
+    char aNames[5][64];
+    char aCategories[5][64];
+    char szCategory[64];
+    SaveProfile* pProfile = fn_80077ACC();
+    s32 nAssets = fn_80105C00();
+    int nNames = 0;
+    int nCategories = 0;
+    int i;
+    int j;
+    u8 bFound;
+
+    for (i = 0; i < 5; i++) {
+        strcpy(aNames[i], " ");
+        strcpy(aCategories[i], " ");
+    }
+    for (i = 0; i < nAssets; i++) {
+        if (fn_8001E9CC(pProfile->aB344, i) && fn_801061C8(fn_80103BC0(i))) {
+            fn_8010745C(i, szCategory);
+            if (nCategories < 5) {
+                bFound = 0;
+                for (j = 0; j < nCategories; j++) {
+                    if (strcmp(szCategory, aCategories[j]) == 0) {
+                        bFound = 1;
+                    }
+                }
+                if (!bFound) {
+                    strcpy(aCategories[nCategories], szCategory);
+                    nCategories++;
+                }
+            } else if (nCategories == 5) {
+                bFound = 0;
+                for (j = 0; j < nCategories; j++) {
+                    if (strcmp(szCategory, aCategories[j]) == 0) {
+                        bFound = 1;
+                    }
+                }
+                if (!bFound) {
+                    strcpy(aCategories[4], "And more...");
+                    nCategories++;
+                }
+            }
+            if (nNames < 5) {
+                fn_8010749C(i, aNames[nNames]);
+            }
+            nNames++;
+        }
+    }
+    if (nNames <= 5) {
+        for (i = 0; i < 5; i++) {
+            strcpy(((MsgString*)pArgs[i].p)->pStr, aNames[i]);
+        }
+    } else {
+        for (i = 0; i < 5; i++) {
+            strcpy(((MsgString*)pArgs[i].p)->pStr, aCategories[i]);
+        }
+    }
+}
+
 // Today's date: month, day and year.
 void fn_801090B4(MsgArg* pArgs, MsgArg* pResult) {
     s32 nMonth;
