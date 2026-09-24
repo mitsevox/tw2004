@@ -20,6 +20,8 @@ void fn_80119E28(int nPlayer, int nEntrant, int nRound);
 s32  fn_80119AE0(int nPlayer);
 s32  fn_8011BDF8(const void* pA, const void* pB);
 s32  fn_8011BF74(const void* pA, const void* pB);
+s32  fn_8011BCFC(const void* pA, const void* pB);
+u8   fn_80118F60(int nPlayer, int nGolfer, GM_Pga_StatTypes_t nStat);
 s32  fn_80118664(int nPlayer);
 s32  TotalEntrantHoleScores(int nEntrant);
 void fn_8011A074(int nPlayer, int nRound, int nEntrant, int nHole);
@@ -32,6 +34,9 @@ void fn_8011B094(int nGolfer);
 void CalcAllStatsIfDirty(int nPlayer);
 void CalcScoreRankingsIfDirty(int nPlayer);
 void CalcAllStats(int nPlayer);
+void CalcAllAroundScore(int nGolfer, f32* pfValue);
+void CalcTotalDriving(int nGolfer, f32* pfValue);
+void CalcBallStriking(int nGolfer, f32* pfValue);
 void fn_80117694(UStreamObject* pObject);
 
 char* GameModeDriverPGATour_GetInitialChampName(s32 i);               // a tournament's first champion
@@ -359,6 +364,27 @@ s32 GM_PgaTourSim_GetGolferIDFromStatRow(int nPlayer, GM_Pga_StatTypes_t nStat, 
     return lbl_80226870[nStat].aGolfer[nRow];
 }
 
+// Whether no other tour golfer beats the golfer's value of a statistic (ties allowed).
+u8 fn_80118F60(int nPlayer, int nGolfer, GM_Pga_StatTypes_t nStat) {
+    f32 fValue;
+    s32 i;
+
+    CalcAllStatsIfDirty(nPlayer);
+    fValue = lbl_80226870[nStat].aValue[nGolfer].fValue;
+    for (i = 0; i < PGA_NUM_GOLFERS; i++) {
+        if (lbl_80193FF8[nStat] == fn_8011BCFC) {
+            if (i != nGolfer && lbl_80226870[nStat].aValue[i].fValue > fValue) {
+                return 0;
+            }
+        } else {
+            if (i != nGolfer && lbl_80226870[nStat].aValue[i].fValue < fValue) {
+                return 0;
+            }
+        }
+    }
+    return 1;
+}
+
 s32 GM_PgaTourSim_GetStatView(GM_Pga_StatTypes_t nStat) {
     return lbl_80194074[nStat];
 }
@@ -412,6 +438,21 @@ s32 fn_8011913C(int nPlayer, int nEntrant, u8 b) {
     return nRet;
 }
 
+// The best score among the entrants still in the field other than the player (b as for
+// fn_8011937C).
+s32 fn_80119588(int nPlayer, u8 b) {
+    s32 nBest = 0x7FFFFFFF;
+    s32 nEntrants = fn_80118664(nPlayer);
+    s32 i;
+
+    for (i = 0; i < nEntrants; i++) {
+        if (!fn_8011908C(nPlayer, i) && !fn_801197A4(nPlayer, i)) {
+            nBest = (nBest <= fn_8011937C(nPlayer, i, b)) ? nBest : fn_8011937C(nPlayer, i, b);
+        }
+    }
+    return nBest;
+}
+
 u8 fn_801197A4(int nPlayer, int nEntrant) {
     return GetEntrantMCPtr(nPlayer, nEntrant)->bWasCut;
 }
@@ -419,6 +460,20 @@ u8 fn_801197A4(int nPlayer, int nEntrant) {
 s32 fn_801197CC(int nPlayer, int nRow) {
     CalcScoreRankingsIfDirty(nPlayer);
     return lbl_80223C70.aEntrant[nRow];
+}
+
+// Whether another entrant holds the same place as the entrant (a tie).
+u8 fn_80119808(int nPlayer, int nEntrant) {
+    s32 nEntrants = fn_80118664(nPlayer);
+    s32 nRank = fn_801190D8(nPlayer, nEntrant);
+    s32 i;
+
+    for (i = 0; i < nEntrants; i++) {
+        if (i != nEntrant && lbl_80223C70.aRank[i] == nRank) {
+            return 1;
+        }
+    }
+    return 0;
 }
 
 // The player's strokes on the current hole, or in the playoff.
@@ -835,6 +890,21 @@ void fn_8011AC40(int nPlayer, GM_Pga_StatTypes_t nStat) {
     }
 }
 
+// Works out a golfer's simple statistics from the counts in the player's profile, with their text.
+static inline PgaStatValue* StatValue(GM_Pga_StatTypes_t nStat, int nGolfer) {
+    return &lbl_80226870[nStat].aValue[nGolfer];
+}
+
+void fn_8011AE1C(int nPlayer, int nGolfer) {
+    s32 nStat;
+
+    for (nStat = 0; nStat < GM_PGA_STAT_SIMPLE_COUNT; nStat++) {
+        lbl_80193F88[nStat](&gpSaveData[nPlayer].tour.aStats[nGolfer], &StatValue(nStat, nGolfer)->fValue);
+        GM_PgaTourSim_GetStatValString(nStat, StatValue(nStat, nGolfer)->fValue,
+                                       StatValue(nStat, nGolfer)->szValue);
+    }
+}
+
 void CalcAllSimpleStats(int nPlayer) {
     s32 nGolfer;
 
@@ -851,6 +921,18 @@ void CalcAllSimpleRankings(int nPlayer) {
     }
 }
 
+// Works out a golfer's all-around and total driving statistics, with their text.
+void fn_8011AF60(int nGolfer) {
+    CalcAllAroundScore(nGolfer, &lbl_80226870[GM_PGA_STAT_ALLAROUND].aValue[nGolfer].fValue);
+    CalcTotalDriving(nGolfer, &lbl_80226870[GM_PGA_STAT_TOTALDRIVING].aValue[nGolfer].fValue);
+    GM_PgaTourSim_GetStatValString(GM_PGA_STAT_ALLAROUND,
+                                   lbl_80226870[GM_PGA_STAT_ALLAROUND].aValue[nGolfer].fValue,
+                                   lbl_80226870[GM_PGA_STAT_ALLAROUND].aValue[nGolfer].szValue);
+    GM_PgaTourSim_GetStatValString(GM_PGA_STAT_TOTALDRIVING,
+                                   lbl_80226870[GM_PGA_STAT_TOTALDRIVING].aValue[nGolfer].fValue,
+                                   lbl_80226870[GM_PGA_STAT_TOTALDRIVING].aValue[nGolfer].szValue);
+}
+
 void CalcAllComplex1Stats(void) {
     s32 nGolfer;
 
@@ -865,6 +947,14 @@ void CalcAllComplex1Rankings(int nPlayer) {
     for (nStat = GM_PGA_STAT_SIMPLE_COUNT; nStat < GM_PGA_STAT_COMPLEX1_COUNT; nStat++) {
         fn_8011AC40(nPlayer, nStat);
     }
+}
+
+// Works out a golfer's ball striking statistic, with its text.
+void fn_8011B094(int nGolfer) {
+    CalcBallStriking(nGolfer, &lbl_80226870[GM_PGA_STAT_BALLSTRIKING].aValue[nGolfer].fValue);
+    GM_PgaTourSim_GetStatValString(GM_PGA_STAT_BALLSTRIKING,
+                                   lbl_80226870[GM_PGA_STAT_BALLSTRIKING].aValue[nGolfer].fValue,
+                                   lbl_80226870[GM_PGA_STAT_BALLSTRIKING].aValue[nGolfer].szValue);
 }
 
 void CalcAllComplex2Stats(void) {
