@@ -13,8 +13,6 @@ void fn_80091FC0(LLPict* pPict, int nFrames, f32 fStep);
 
 // ---- sweep code (not yet cleaned up) ----
 
-extern u8 lbl_80281370;
-void fn_80091454(void);
 void fn_80091708(void);
 void fn_80006EDC();
 void fn_80006FE8();

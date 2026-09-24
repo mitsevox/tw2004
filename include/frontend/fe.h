@@ -106,6 +106,9 @@ LAYOUT_ASSERT(FE801D8890, 0x8);
 
 #define FE_NUM_801D8890 200
 extern FE801D8890 lbl_801D8890[FE_NUM_801D8890];
+// One word per lbl_801D8890 entry: nonzero sets that entry's b0 (and clears its b1) when the front
+// end is shut down in game type 3 (uiProcessInterface.c fn_80090400).
+extern u32 lbl_801D8ED0[FE_NUM_801D8890];
 
 // The profile being worked on in the menus (lbl_80281ED4 points to it; 0x11708 bytes, allocated
 // and cleared by fn_8007744C).
@@ -468,5 +471,13 @@ u8*  fn_8010FF5C(u8* pLogo, int nWidth, int nHeight);   // the logo's pixels as 
 
 extern u8 lbl_80212B60[64 * 64];        // a logo's pixels laid out as a texture (fn_8010FF5C);
                                         // 64 x 64 or 128 x 32
+
+// ---- the front end's movies (fe_movies.c) -------------------------------------------------------
+
+extern u8 lbl_80281370;         // fn_80091454 clears it; the front end's shutdown in game type 3
+                                // sets it (uiProcessInterface.c fn_80090400)
+void fn_80090B10(void);
+void fn_80091454(void);
+void fn_80091EE8(void);
 
 #endif
