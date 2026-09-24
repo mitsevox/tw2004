@@ -5,6 +5,7 @@
 #include "engine.h"
 #include "game.h"
 #include "core/card.h"
+#include "discerror.h"
 
 volatile DispSync lbl_801A2350;       // volatile: the GX and VI callbacks change it
 GXRenderModeObj lbl_801A2464;          // the video mode
@@ -17,6 +18,7 @@ void VIConfigure(GXRenderModeObj* pMode);
 void VISetNextFrameBuffer(void* pBuf);
 void VISetPostRetraceCallback(void (*pCallback)(u32 nRetrace));
 u32  VIGetNextField(void);
+int  VIGetTvFormat(void);
 void VISetBlack(int bBlack);
 void VIFlush(void);
 void VIWaitForRetrace(void);
@@ -71,6 +73,54 @@ void fn_800066E4(u8 bOnRelease, s32 nReset, s32 nCode, u8 bMenu) {
     PADRecalibrate(0x20000000);
     PADRecalibrate(0x10000000);
     OSResetSystem(nReset, nCode, bMenu);
+}
+
+// Picks the video mode: pMode if given, else the interlaced mode for the console's TV format,
+// 512 pixels wide with 16 lines of overscan (EA's name for it, in its panic message:
+// Displ_InitRenderMode).
+void fn_800067E4(GXRenderModeObj* pMode) {
+    if (pMode != NULL) {
+        lbl_801A2464 = *pMode;
+        return;
+    }
+    switch (VIGetTvFormat()) {
+    case 0:
+        lbl_801A2464 = GXNtsc480IntDf;
+        break;
+    case 1:
+        lbl_801A2464 = GXPal528IntDf;
+        break;
+    case 2:
+        lbl_801A2464 = GXMpal480IntDf;
+        break;
+    default:
+        OSPanic("LLDisp_Gc.c", 250, "Displ_InitRenderMode: Invalid TV format\n");
+        break;
+    }
+    lbl_801A2464.fbWidth = 512;
+    GXAdjustForOverscan(&lbl_801A2464, &lbl_801A2464, 0, 16);
+}
+
+// Takes the image buffer from the bottom of the arena (both buffer slots share it: YUV, two bytes a
+// pixel, rows rounded up to 16 pixels) and gives it to the disc-error screens.
+void fn_80006A98(void) {
+    void* pLo;
+    void* pBuf;
+    u32 uSize;
+
+    pLo = OSGetArenaLo();
+    OSGetArenaHi();
+    pBuf = (void*)(((uptr)pLo + 31) & ~31);
+    lbl_80281BA4[0] = pBuf;
+    lbl_801A2350.n11 = 0;
+    lbl_801A2350.n12 = 0;
+    uSize = ((lbl_801A2464.fbWidth + 15) & 0xFFF0) * lbl_801A2464.xfbHeight * 2;
+    lbl_80281BA4[1] = pBuf;
+    lbl_801A2350.nBuf = 0;
+    lbl_80281B90 = uSize;
+    OSSetArenaLo((void*)(((uptr)pBuf + uSize + 31) & ~31));
+    fn_800B694C(lbl_801A2464.fbWidth, lbl_801A2464.xfbHeight, uSize);
+    fn_800B6C0C(lbl_80281BA4[0]);
 }
 
 // Clears the frame sync: no break points queued, the GPU not waited on.

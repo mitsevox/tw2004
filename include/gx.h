@@ -41,6 +41,10 @@ typedef struct GXRenderModeObj {
     u8  vfilter[7];             // 0x32
     u8  unk39[3];
 } GXRenderModeObj;
+extern GXRenderModeObj GXNtsc480IntDf;  // the SDK's video modes
+extern GXRenderModeObj GXPal528IntDf;
+extern GXRenderModeObj GXMpal480IntDf;
+void GXAdjustForOverscan(GXRenderModeObj* pIn, GXRenderModeObj* pOut, u16 nHor, u16 nVer);
 
 // ---- the matrix library (MTX), for the matrices GX takes -------------------------------------
 
