@@ -1,7 +1,8 @@
 // GameUICommands.c (our name): the commands the menu UI can send while a round is on (session game
 // types 4 to 8; uiProcessInterface.c's fn_8008F568 routes them here). fn_80085120 fills a table of
-// 214 command functions and fn_800850E4 runs one: most answer a question about the round (a
-// player's state, the score, the wind, Battle mode's clubs, the PGA Tour event) or act on it.
+// 214 slots with 212 command functions (0 and 119 stay NULL) and fn_800850E4 runs one: most
+// answer a question about the round (a player's state, the score, the wind, Battle mode's clubs,
+// the PGA Tour event) or act on it.
 
 #include "game.h"
 #include "game/frontend.h"
@@ -1643,7 +1644,8 @@ void fn_80088428(MsgArg* pArgs, MsgArg* pResult) {
                              ((MsgString*)pArgs[2].p)->pStr, (s32*)pArgs[3].p);
 }
 
-// The contest hole: its number (-1: none), and into pArgs its par and length.
+// The round's next hole after the current one: its number (-1: none), and into pArgs its par and
+// its length from player 0's tees.
 void fn_80088474(MsgArg* pArgs, MsgArg* pResult) {
     int nHole;
     s32 nPar = 0;
@@ -2223,8 +2225,8 @@ void fn_80089A8C(MsgArg* pArgs, MsgArg* pResult) {
 void fn_80089AD0(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-// Whether the player whose turn it is may concede: nothing holds him, the hole is not over and
-// his ball is not in the cup.
+// Whether the player whose turn it is may still play: nothing holds him, the hole is not over for
+// him and his ball is not in the cup.
 void fn_80089AD4(MsgArg* pArgs, MsgArg* pResult) {
     if (fn_800E4254(lbl_80282278)) {
         pResult->i = 0;
@@ -2700,7 +2702,7 @@ void fn_8008A838(MsgArg* pArgs, MsgArg* pResult) {
 void fn_8008A86C(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-// Battle mode: whether the club stealing is over.
+// Battle mode: whether a club is to be taken: the last hole had a winner and the game goes on.
 void fn_8008A870(MsgArg* pArgs, MsgArg* pResult) {
     if (fn_800E81B4() != 0) {
         pResult->i = 1;
