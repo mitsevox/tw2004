@@ -19,6 +19,21 @@ typedef struct GXTlutObj {
 typedef struct GXColor {
     u8 r, g, b, a;
 } GXColor;
+typedef struct GXFifoObj {
+    u8 unk0[0x80];
+} GXFifoObj;                    // the command FIFO (0x80 bytes)
+
+// ---- the command FIFO -------------------------------------------------------------------------
+
+void GXGetFifoStatus(GXFifoObj* pFifo, u8* pbOverHigh, u8* pbUnderLow, u32* puCount, u8* pbCpuWrite,
+                     u8* pbGpRead, u8* pbWrapped);
+
+// ---- the viewport and projection ----------------------------------------------------------------
+
+void GXSetViewport(f32 fLeft, f32 fTop, f32 fWidth, f32 fHeight, f32 fNear, f32 fFar);
+void GXGetViewportv(f32* pViewport);    // 6 values: GXSetViewport's arguments
+void GXSetProjectionv(f32* pProj);      // 7 values: the type, then the matrix's terms
+void GXGetProjectionv(f32* pProj);
 
 // ---- what drawing writes ----------------------------------------------------------------------
 

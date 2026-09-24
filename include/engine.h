@@ -294,6 +294,8 @@ int  fn_800107C0(struct UStreamObject* pObject, TexBank* pBank, int n);   // loa
 
 void fn_80006EDC(void);                 // LLDisp_Gc.c: set the viewport (DiscCheck.c, ScreenClear.c)
 void fn_80006FE8(void);                 // LLDisp_Gc.c: end the frame (returns nothing)
+extern struct GXFifoObj* lbl_80281BA0; // LLDisp_Gc.c: the command FIFO (GXInit's)
+extern u32 lbl_80281B9C;                // LLDisp_Gc.c: the most the FIFO has held (fn_800124CC)
 extern void* lbl_80281BA4[2];           // LLDisp_Gc.c: two image buffers (DepthField.c and
                                         //       FEgolferanim.c make textures of them)
 
@@ -685,9 +687,18 @@ typedef struct UFontContext {
 
 UFontContext* fn_80012EC4(void);        // UFont.c: the current text settings
 
+// A glyph of a loaded font (0x28 bytes each, LLFont.p410; LLGlyph is our name).
+typedef struct LLGlyph {
+    u8    pad00[0x18];            // 0x00
+    f32   f18;                    // 0x18  its advance (fn_80011C90 adds them up for a string's width)
+    u8    pad1C[0x28 - 0x1C];     // 0x1C
+} LLGlyph;
+
 // A loaded font, from an 'sfn ' stream object (FO_spLoadFontFromStream). LLFont is our name.
 typedef struct LLFont {
-    u8    pad00[0x470];           // 0x00
+    u8    pad00[0xC];             // 0x00
+    LLGlyph* apGlyphs[256];       // 0x0C  by character code; NULL: the font has no such glyph
+    u8    pad40C[0x470 - 0x40C];  // 0x40C
     void* p470;                   // 0x470  freed with the font
     s32   n474;                   // 0x474
 } LLFont;
