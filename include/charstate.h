@@ -249,7 +249,7 @@ typedef struct SkinModel {
     s32  n2C;                   // 0x2C  }
     u32  u30;                   // 0x30  0x40000002 both set: already byte-swapped (fn_800377FC);
                                 //       0x80000000: offsets made pointers (fn_800364AC)
-    void* p34;                  // 0x34  handed to the character's model (fn_80029A74)
+    BonePose* p34;              // 0x34  n14 of them; handed to the character's model (fn_80029A74)
     void* p38;                  // 0x38  one 0x50-byte block
     void* p3C;                  // 0x3C  n0C 0x50-byte blocks
     s32  n40;                   // 0x40  bits in Skin.p10D0; also the entries in p44
@@ -608,7 +608,7 @@ Skin* fn_800377FC(u8* pData, u8 b);     // Skin.c: makes a skin from its file
 // Skin.c's triangles (lbl_801D4E78, 0xF0 bytes; our name, layout from fn_80035D10): per view a
 // mesh object and three vertices' positions, texture coordinates, colours and indexes.
 typedef struct SkinTris {
-    u8   aMesh[2][0x28];        // 0x00  (fn_80035C58 sets them up with fn_80036054, fn_80035CC0 frees them)
+    ShaderObject aMesh[2];      // 0x00  (fn_80035C58 sets them up with fn_80036054, fn_80035CC0 frees them)
     f32  aPos[2][3][3];         // 0x50
     f32  aUV[2][3][2];          // 0x98
     u8   aColor[2][3][4];       // 0xC8

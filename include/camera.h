@@ -170,7 +170,7 @@ typedef struct CamSequence {
     f32  f28;                   // 0x28  ... to this
     f32  f2C;                   // 0x2C  fn_8003CD6C: picked for values from this ...
     f32  f30;                   // 0x30  ... to this
-    u8   unk34[0x38 - 0x34];
+    f32  f34;                   // 0x34  its weight when several fit (fn_8003BDBC)
     f32  f38;                   // 0x38  its length
     s32  nChoices;              // 0x3C  how many shot choices p4C holds
     u32  uCourses;              // 0x40  one bit per course it is used on
@@ -398,7 +398,9 @@ typedef struct CamTuning {
     f32  f140;                  // 0x140  fn_80041EA8: its height share for a falling ball near the ground
     f32  f144;                  // 0x144  fn_800422C4: the look-at point's level share of the way a frame
     f32  f148;                  // 0x148  ... and its height's
-    u8   unk14C[0x158 - 0x14C];
+    f32  f14C;                  // 0x14C  } fn_8003B028: how fast a following camera closes the
+    f32  f150;                  // 0x150  } distance and the angle to its target, per 60th
+    f32  f154;                  // 0x154  fn_8003B028: they ease in over this much of CamScript.fCamTime
     f32  f158;                  // 0x158  fn_80041EA8: the aim eases in over this much of CamScript.f88
     f32  f15C;                  // 0x15C  CameraScript_InterpToNewScript puts it in CamScript.f88 (0 for
                                 //        the default swing camera)
@@ -408,16 +410,17 @@ typedef struct CamTuning {
     f32  f168;                  // 0x168  the ground clearance for CamScript_KeepAboveGround
     f32  f16C;                  // 0x16C  the obstruction radius around the ball for the pre-shot routine
     f32  f170;                  // 0x170  a blend for fn_80063B98 / fn_80063BF4
-    u8   unk174[0x178 - 0x174];
+    f32  f174;                  // 0x174  fn_8003A148: how softly a camera eases in under its height limit
     f32  f178;                  // 0x178
     f32  v17C[4];               // 0x17C
     f32  f18C;                  // 0x18C  fn_8003B534: the ball-flight camera closes in by this share of
                                 //        the height above the shot's f6C ...
     f32  f190;                  // 0x190  ... and backs off by this share of the height below its f68
-    u8   unk194[0x198 - 0x194];
+    f32  f194;                  // 0x194  fn_8003A148: how far a camera below its least height rises a frame
     f32  f198;                  // 0x198  fn_8003B534: the least ball speed it follows the flight at
     f32  f19C;                  // 0x19C  the steepest a camera direction may tilt (fn_8003D810, radians)
-    u8   unk1A0[0x1A8 - 0x1A0];
+    u8   unk1A0[0x1A4 - 0x1A0];
+    f32  f1A4;                  // 0x1A4  DynamicCam_ChoosePreFlightSequence: the obstruction test's slope
     f32  f1A8;                  // 0x1A8  fn_8003DCE8: how fast CamScript.fEC follows the ball's updates
                                 //        per frame
     u8   unk1AC[0x1C0 - 0x1AC];
@@ -617,7 +620,7 @@ CamShot* fn_8003A8C4(char* szName);     // the shot with this name (case ignored
 // pointer may be NULL).
 CamShot* fn_8003A950(CamSequence* pSequence, int nKind, int* pA, f32* pF1, f32* pF2, int* pB, f32* pF3,
                      int nPlayer);
-CamSequence* fn_8003BDBC(int nPlayer, int nLie, int nClass, int nKind, int a, f32 fDist);
+CamSequence* fn_8003BDBC(int nPlayer, int nLie, int nClass, int nKind, u8 a, f32 fDist);
 CamSequence* DynamicCam_ChoosePreFlightSequence(int nPlayer, int nLie, int nKind);
 // The sequence and shot named after the golfer's clip (with b, Character.p1790 first).
 u8       fn_8003C9D0(int nPlayer, u8 b, CamSequence** ppSeq, CamShot** ppShot);
