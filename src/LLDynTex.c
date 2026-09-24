@@ -89,8 +89,8 @@ void fn_8010ADA4(DynTex* pTex) {
     DynTexEntry* pOutEntry = pTex->p0;
     DynTexObj* pOutObj = pHdr->p8;
     DynTexPalette* pOutPal = pHdr->pC;
-    u8* pOut10 = pHdr->p10;
-    u8* pOut14 = pHdr->p14;
+    DynTex40* pOut10 = pHdr->p10;
+    DynTex18* pOut14 = pHdr->p14;
     DynTexEntry* pEntry;
     u32 nSrc = 0;
     u32 nDst = 0;
@@ -127,8 +127,8 @@ void fn_8010ADA4(DynTex* pTex) {
         if (bMoved) {
             memcpy(pOutObj, &pHdr->p8[i], sizeof(DynTexObj));
             memcpy(pOutPal, &pHdr->pC[i], sizeof(DynTexPalette));
-            memcpy(pOut10, pHdr->p10 + i * 0x40, 0x40);
-            memcpy(pOut14, pHdr->p14 + i * 0x18, 0x18);
+            memcpy(pOut10, &pHdr->p10[i], sizeof(DynTex40));
+            memcpy(pOut14, &pHdr->p14[i], sizeof(DynTex18));
             memcpy(pOutEntry, pEntry, sizeof(DynTexEntry));
             if (pEntry->n1C != 0) {
                 pOutObj->n3C = (s8)nKept;
@@ -137,8 +137,8 @@ void fn_8010ADA4(DynTex* pTex) {
         pOutEntry++;
         pOutObj++;
         pOutPal++;
-        pOut10 += 0x40;
-        pOut14 += 0x18;
+        pOut10++;
+        pOut14++;
         nObjs++;
         nKept++;
     }
