@@ -231,7 +231,6 @@ void fn_8008AB04(MsgArg* pArgs, MsgArg* pResult);
 
 // This file's helpers.
 u8   fn_80085BC0(int nController);
-s32  fn_8008AB4C(void);
 void fn_8008AC3C(int a, int b);
 u8   fn_8008AC40(void);
 void fn_8008AC48(int nPlayer, char* sz);
@@ -1884,7 +1883,8 @@ void fn_80088CF0(MsgArg* pArgs, MsgArg* pResult) {
             pResult->i = 0;
             return;
         }
-        pResult->i = gpSaveData[gPlayers[pArgs[0].i].nIndex].n6C - gPlayers[pArgs[0].i].money.n24;
+        // fake match: the (int) keeps CW from reusing the first gPlayers index, as the original does
+        pResult->i = gpSaveData[gPlayers[pArgs[0].i].nIndex].n6C - gPlayers[(int)pArgs[0].i].money.n24;
         return;
     case 100:
         pResult->i = (s32)fn_800D6EEC() - 1;

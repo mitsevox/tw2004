@@ -44,7 +44,6 @@ f32   fn_800351D8(u32 n, f32 fPeriod);
 void  fn_8003519C(int nRow, void* pData);   // calls row nRow's function of lbl_80188E88 with pData
 s32   fn_800318AC(const void* pA, const void* pB);
 void  fn_8003272C(int n);
-void  fn_80035154(u8 b);
 void  fn_80035170(u32 uClear, u32 uSet);
 void  fn_80035294(void);
 void  fn_800352BC(void);
@@ -69,7 +68,6 @@ void  fn_80063920(int nView, f32* pBounds);     // GoCamCont: given an object th
 u8    fn_80033308(Ter_ObjectDrawData* pDraw, u8 bForce);
 void  fn_8000ADC0(f32 (*pMtx)[4]);  // identity matrix
 void  fn_80035370(void);
-void  fn_80035098(u8 b);
 void  fn_80034CAC(int nRenderPass);
 void  fn_80034DE4(void);
 void  fn_80034F28(void* pUnused);
@@ -284,13 +282,13 @@ void fn_80030A40(void* pHoleData, int nView) {
     lbl_801D3CB0.iCurrentViewContext = nView;
     pLens = fn_8001F004();
     lbl_801D3CB0.fFOVScale = 1.0f / fn_8001EFFC(pLens);
-    lbl_801D3CB0.xCameraReferencePos[0] = pLens->v34[0];
-    lbl_801D3CB0.xCameraReferencePos[1] = pLens->v34[1];
-    lbl_801D3CB0.xCameraReferencePos[2] = pLens->v34[2];
+    lbl_801D3CB0.xCameraReferencePos[0] = pLens->m4[3][0];
+    lbl_801D3CB0.xCameraReferencePos[1] = pLens->m4[3][1];
+    lbl_801D3CB0.xCameraReferencePos[2] = pLens->m4[3][2];
     lbl_801D3CB0.xCameraReferencePos[3] = 1.0f;
-    lbl_801D3CB0.xCameraLookVector[0] = pLens->v24[0];
-    lbl_801D3CB0.xCameraLookVector[1] = pLens->v24[1];
-    lbl_801D3CB0.xCameraLookVector[2] = pLens->v24[2];
+    lbl_801D3CB0.xCameraLookVector[0] = pLens->m4[2][0];
+    lbl_801D3CB0.xCameraLookVector[1] = pLens->m4[2][1];
+    lbl_801D3CB0.xCameraLookVector[2] = pLens->m4[2][2];
     lbl_801D3CB0.xCameraLookVector[3] = 1.0f;
     lbl_801D3CB0.fXZDistanceToClosestBallSquared = 1000000.0f;
     for (i = 0; i < gNumPlayersSetUp; i++) {
@@ -2008,13 +2006,13 @@ void fn_80034AE4(void) {
     fn_80012F50(1, 6, 1);
     fn_80014118(0x70);
     fn_80012EF8();
-    lbl_801D3CB0.xCameraReferencePos[0] = pLens->v34[0];
-    lbl_801D3CB0.xCameraReferencePos[1] = pLens->v34[1];
-    lbl_801D3CB0.xCameraReferencePos[2] = pLens->v34[2];
+    lbl_801D3CB0.xCameraReferencePos[0] = pLens->m4[3][0];
+    lbl_801D3CB0.xCameraReferencePos[1] = pLens->m4[3][1];
+    lbl_801D3CB0.xCameraReferencePos[2] = pLens->m4[3][2];
     lbl_801D3CB0.xCameraReferencePos[3] = 1.0f;
-    lbl_801D3CB0.xCameraLookVector[0] = pLens->v24[0];
-    lbl_801D3CB0.xCameraLookVector[1] = pLens->v24[1];
-    lbl_801D3CB0.xCameraLookVector[2] = pLens->v24[2];
+    lbl_801D3CB0.xCameraLookVector[0] = pLens->m4[2][0];
+    lbl_801D3CB0.xCameraLookVector[1] = pLens->m4[2][1];
+    lbl_801D3CB0.xCameraLookVector[2] = pLens->m4[2][2];
     lbl_801D3CB0.xCameraLookVector[3] = 1.0f;
     lbl_801D3CB0.fXZDistanceToClosestBallSquared = 1000000.0f;
     for (i = 0; i < gNumPlayersSetUp; i++) {

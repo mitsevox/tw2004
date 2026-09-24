@@ -352,6 +352,7 @@ void fn_8011DDFC(MsgArg* pArgs, MsgArg* pResult) {
     s32 nEvent = GameModeDriverRTE_GetNextEvent();
     u16 nDate;
     u8 bSoon;
+    int bNear;
 
     if (nEvent == -1) {
         pResult->i = 0;
@@ -363,10 +364,13 @@ void fn_8011DDFC(MsgArg* pArgs, MsgArg* pResult) {
     strcpy(szStatus, "Status (?)");
     strcpy(szDate, "Start Date");
     fn_800D28DC(nDate, szDate);
-    bSoon = 0;
+    bNear = 0;
     if (nDate - fn_800D2994() < 2 && lbl_801D7148.aLoaded[0]) {
-        bSoon = 1;
+        bNear = 1;
     }
+    // fake match: worked out as an int and kept as a u8 (one clrlwi for the test and the result);
+    // the original likely returns it from an inlined u8 helper
+    bSoon = bNear;
     if (bSoon) {
         fn_800A73F0(0x19);
     }

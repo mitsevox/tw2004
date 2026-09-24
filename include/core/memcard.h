@@ -126,16 +126,6 @@ LAYOUT_ASSERT(MCOpCardName, 0xC);
 
 #define MC_BUFFER_SIZE  0x50000     // one save file image in memory
 
-// The session's record tables as the save file keeps them: a copy of gSession from aCourseRecord
-// to recC (0xF00..0x5B2C, the same layout).
-typedef struct SaveRecords {
-    CourseRecord aCourseRecord[NUM_COURSE_RECORDS];    // 0x0000
-    RecordEntry recA[8][5];     // 0x41A0
-    RecordEntry recB[3][3][5];  // 0x44C0
-    RecordEntry recC[5][2][5];  // 0x4844
-} SaveRecords;
-LAYOUT_ASSERT(SaveRecords, 0x4C2C);
-
 // The end of the saved data: a mark and a checksum of everything before it (fn_800A23BC).
 typedef struct SaveTrailer {
     char aMagic[3];             // 0x0  "@BE" (fn_800A233C also takes "@BD")
@@ -219,6 +209,7 @@ void fn_8009CD7C(void);
 // The space a save of kind nKind needs (0-2 the game's save, 3 the EA Sports Bio): compared with
 // MCCardState.nFreeBlocks. arg2 is not used.
 s32  fn_8009D1D8(s32 nPort, s32 nSlot, s32 arg2, s32 nKind);
+s32  fn_8009D390(s32 nPort, s32 nSlot);
 s32  fn_8009D3DC(s32 nPort, s32 nSlot);
 s32  fn_8009D50C(s32 nPort, s32 nSlot);     // new files an EA Sports Bio save needs (0 or 1)
 s32  fn_8009D614(s32 nPort, s32 nSlot, const char* pName);

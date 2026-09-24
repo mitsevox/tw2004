@@ -202,7 +202,7 @@ f32 fn_80093A04(s32 nLight, CamLens* pLens) {
 }
 
 f32 fn_80093A50(GoLight* pLight, CamLens* pLens) {
-    return fn_80009614(fn_8000C5FC(pLens->v24, pLight->u.point.vPos));
+    return fn_80009614(fn_8000C5FC(pLens->m4[2], pLight->u.point.vPos));
 }
 
 void BFX_vInit(void) {

@@ -186,6 +186,10 @@ typedef struct UIText {
 // fn_8008F568): each runs the handler for message nMsg of its table.
 void fn_80079E6C(int nMsg, MsgArg* pArgs, MsgArg* pResult);    // the menus (FE_MessageTable.c)
 void fn_800850E4(int nMsg, MsgArg* pArgs, MsgArg* pResult);    // a round (GameUICommands.c)
+void fn_800B1D3C(int nCmd, MsgArg* pArgs, MsgArg* pResult);    // start-up (startUp.c)
+
+extern MsgHandler lbl_801F5DA8[30];     // start-up's handlers (fn_800B1D78 fills 0..22)
+void fn_80083D88(MsgArg* pArgs, MsgArg* pResult);  // FE_MessageTable.c; start-up's command 22 too
 
 // The round's handlers (GameUICommands.c): fn_80085120 fills the table. Entries 0 and 119 stay
 // empty.

@@ -20,6 +20,7 @@ f32  fn_800728D8(SKABlendNode* pNode);
 void fn_8007325C(u8* pAnim);
 f32  fn_800732B8(f32 fTime, f32 fNow, f32 fStart, f32 fEnd);
 int  fn_800734D0(SKABlendNode* pNode);
+f32  fn_800737B4(AnimPlayer* pPlayer, f32 fT);
 
 // Create the blend tree pools: 10 of each in game types 3 and 10, else 50.
 void fn_80071AD0(void) {
@@ -320,6 +321,133 @@ f32 fn_80072CB8(SKABlendNode* pNode, u64 uEvent) {
     return fTime;
 }
 
+// Resets a player: stopped at time 0, f14 1, and its ten entries chained in order from p44.
+void fn_80072D90(AnimPlayer* pPlayer) {
+    int i;
+    AnimPlayerEntry* pPrev;
+
+    pPlayer->fTime = 0.0f;
+    pPlayer->n08 = 0;
+    pPlayer->uFlags = 0;
+    pPlayer->n00 = 0;
+    pPlayer->f14 = 1.0f;
+    pPlayer->nC = 0;
+    pPlayer->f10 = 0.0f;
+    pPlayer->n3C = 0;
+    pPlayer->n40 = 0;
+    pPlayer->p44 = &pPlayer->a48[0];
+    pPrev = NULL;
+    for (i = 0; i < 10; i++) {
+        pPlayer->a48[i].pNext = (i < 9) ? &pPlayer->a48[i + 1] : NULL;
+        pPlayer->a48[i].pPrev = pPrev;
+        pPrev = &pPlayer->a48[i];
+    }
+}
+
+// Advances a player by fT across the times of the tree under pNode: forward, or backward with
+// uFlags bit 6. At an end n08 counts the plays down (at 0 the player stops there, bit 2; with bit 8
+// it rewinds and clears itself instead); with bit 5 it turns round (bit 6 flips), else it wraps to
+// the other end and sets bit 12.
+void fn_80072ED8(AnimPlayer* pPlayer, SKABlendNode* pNode, f32 fT) {
+    f32 fStep;
+    f32 fEnd;
+    f32 fStart;
+
+    pPlayer->uFlags &= ~0x1000;
+    pPlayer->fStart = fn_800728D8(pNode);
+    pPlayer->fEnd = fn_80072938(pNode);
+    if (pPlayer->uFlags & 0x80) {
+        pPlayer->f30 -= fT;
+        if (pPlayer->f30 <= 0.0f) {
+            pPlayer->f30 = 0.0f;
+            pPlayer->uFlags &= ~0x81;
+        }
+    }
+    pPlayer->uFlags &= ~4;
+    fStep = fn_800737B4(pPlayer, fT);
+    fStart = pPlayer->fStart;
+    fEnd = pPlayer->fEnd;
+    if (pPlayer->uFlags & 1) return;
+    if (pPlayer->uFlags & 0x40) {
+        pPlayer->fTime -= fStep;
+        if (pPlayer->fTime < fStart) {
+            if (pPlayer->n08 != 0 && pPlayer->n08 > 0) {
+                pPlayer->n08--;
+            }
+            if (pPlayer->n08 == 0) {
+                pPlayer->uFlags |= 4;
+                pPlayer->fTime = fStart;
+                return;
+            }
+            if (pPlayer->uFlags & 0x20) {
+                pPlayer->fTime = fStart;
+                pPlayer->uFlags ^= 0x40;
+                pPlayer->uFlags |= 4;
+                return;
+            }
+            pPlayer->fTime = fEnd;
+            pPlayer->uFlags |= 0x1000;
+        }
+    } else {
+        pPlayer->fTime += fStep;
+        if (pPlayer->fTime > fEnd) {
+            if (pPlayer->n08 != 0 && pPlayer->n08 > 0) {
+                pPlayer->n08--;
+            }
+            if (pPlayer->n08 == 0) {
+                if (pPlayer->uFlags & 0x100) {
+                    pPlayer->fTime = 0.0f;
+                    pPlayer->uFlags &= ~0x105;
+                    pPlayer->n00 = 0;
+                    pPlayer->n08 = 1;
+                    return;
+                }
+                pPlayer->uFlags |= 4;
+                pPlayer->fTime = fEnd;
+                return;
+            }
+            if (pPlayer->uFlags & 0x20) {
+                pPlayer->fTime = fEnd;
+                pPlayer->uFlags ^= 0x40;
+                pPlayer->uFlags |= 4;
+                return;
+            }
+            pPlayer->fTime = fStart;
+            pPlayer->uFlags |= 0x1000;
+        }
+    }
+}
+
+// Sways pPlayer's time around f38: three cosines of the f34 clock (advanced by fT) make a wave
+// from 0 to 1, scaled by 0.033 or 0.3 (club 25, by the clip group) or 0.05; the player then runs
+// forward or backward (uFlags bit 6) towards that time.
+void fn_80073108(Character* pChar, int nPlayer, AnimPlayer* pPlayer, SKABlendNode* pNode, f32 fT) {
+    f32 fWave;
+    f32 fDelta;
+
+    pPlayer->f34 += fT;
+    fWave = 1.0f - (3.0f + (fn_80009638(pPlayer->f34 / 5.0f) +
+                            (fn_80009638(5.0f * pPlayer->f34) + fn_80009638(7.0f * pPlayer->f34 / 3.0f)))) /
+                       6.0f;
+    if (gPlayers[nPlayer].nClub == 25) {
+        if (pChar->blend.nGroup == 9) {
+            fWave *= 0.033f;
+        } else {
+            fWave *= 0.3f;
+        }
+    } else {
+        fWave *= 0.05f;
+    }
+    fDelta = (pPlayer->f38 - fWave) - pPlayer->fTime;
+    if (fDelta < 0.0f) {
+        fDelta = -fDelta;
+        pPlayer->uFlags |= 0x40;
+    } else {
+        pPlayer->uFlags &= ~0x40;
+    }
+    fn_80072ED8(pPlayer, pNode, fDelta);
+}
+
 // Character.anim is still declared as bytes, so these three take its address as a u8*.
 void fn_8007325C(u8* pAnim) {
     ((AnimPlayer*)pAnim)->uFlags |= 2;
@@ -341,6 +469,54 @@ f32 fn_800732B8(f32 fTime, f32 fNow, f32 fStart, f32 fEnd) {
     if (-20000.0f == fTime) return fNow;
     if (-30000.0f == fTime) return fStart;
     return fTime;
+}
+
+// Cuts the tree at pNode off at fTime: when pPlayer's time is inside it, its end (the player's
+// too) and its children's ends come down to fTime (a source's fTo in proportion) and all are
+// flagged in bC; otherwise the player goes back to 0 and pNode is freed and taken again as an
+// empty blend node of the same format and callback.
+void fn_800732F4(SKABlendNode* pNode, AnimPlayer* pPlayer, f32 fTime) {
+    s32 nFormat;
+    SKABlendFn pfnBlend;
+    SKABlendNode* pChild;
+
+    if (pPlayer->fTime < pNode->fStart || fn_8007286C(pNode, pPlayer->fTime) == -1) {
+        nFormat = pNode->nFormat;
+        pfnBlend = pNode->u.blend.pfnBlend;
+        pPlayer->fTime = 0.0f;
+        pPlayer->fEnd = 0.0f;
+        pPlayer->fStart = 0.0f;
+        fn_80071F58(&pNode, 0);
+        fn_80071C28(&pNode, 1, nFormat, pfnBlend, 1);
+        return;
+    }
+    if (pNode->fEnd > fTime) {
+        pNode->fEnd = fTime;
+        pPlayer->fEnd = fTime;
+        pChild = pNode->u.blend.apChild[0];
+        if (pChild != NULL) {
+            if (pChild->fEnd > fTime) {
+                if (pChild->nType == 0) {
+                    pChild->u.src.fTo = pChild->u.src.fFrom + (fTime - pChild->fStart) *
+                        ((pChild->u.src.fTo - pChild->u.src.fFrom) / (pChild->fEnd - pChild->fStart));
+                }
+                pNode->u.blend.apChild[0]->fEnd = fTime;
+            }
+            pNode->u.blend.apChild[0]->bC = 1;
+        }
+        pChild = pNode->u.blend.apChild[1];
+        if (pChild != NULL) {
+            if (pChild->fEnd > fTime) {
+                if (pChild->nType == 0) {
+                    pChild->u.src.fTo = pChild->u.src.fFrom + (fTime - pChild->fStart) *
+                        ((pChild->u.src.fTo - pChild->u.src.fFrom) / (pChild->fEnd - pChild->fStart));
+                }
+                pNode->u.blend.apChild[1]->fEnd = fTime;
+            }
+            pNode->u.blend.apChild[1]->bC = 1;
+        }
+    }
+    pNode->bC = 1;
 }
 
 // The tree under pNode plays other than exactly one source.
@@ -428,4 +604,34 @@ void fn_800736D8(SKABlendNode* pNode, s32 nBit) {
             }
         }
     }
+}
+
+// The player's time step fT scaled by f14, while a blend in (uFlags bit 3) or out (bit 4) runs
+// also by f28 / f24; a finished blend in clears bit 3, a finished blend out swaps bit 4 for bit 0.
+f32 fn_800737B4(AnimPlayer* pPlayer, f32 fT) {
+    f32 fStep = fT * pPlayer->f14;
+
+    if (pPlayer->uFlags & 8) {
+        pPlayer->f28 += fStep;
+        if (pPlayer->f28 >= pPlayer->f24) {
+            pPlayer->uFlags &= ~8;
+            pPlayer->f28 = 0.0f;
+            return fStep;
+        }
+        return fStep * (pPlayer->f28 / pPlayer->f24);
+    }
+    if (pPlayer->uFlags & 0x10) {
+        pPlayer->f28 -= fStep;
+        if (pPlayer->f28 < pPlayer->f2C) {
+            pPlayer->f28 = pPlayer->f2C;
+        }
+        if (pPlayer->f28 <= 0.0f) {
+            pPlayer->uFlags &= ~0x10;
+            pPlayer->uFlags |= 1;
+            pPlayer->f28 = 0.0f;
+            return fStep;
+        }
+        return fStep * (pPlayer->f28 / pPlayer->f24);
+    }
+    return fStep;
 }
