@@ -398,7 +398,9 @@ typedef struct CamTuning {
     f32  f140;                  // 0x140  fn_80041EA8: its height share for a falling ball near the ground
     f32  f144;                  // 0x144  fn_800422C4: the look-at point's level share of the way a frame
     f32  f148;                  // 0x148  ... and its height's
-    u8   unk14C[0x158 - 0x14C];
+    f32  f14C;                  // 0x14C  } fn_8003B028: how fast a following camera closes the
+    f32  f150;                  // 0x150  } distance and the angle to its target, per 60th
+    f32  f154;                  // 0x154  fn_8003B028: they ease in over this much of CamScript.fCamTime
     f32  f158;                  // 0x158  fn_80041EA8: the aim eases in over this much of CamScript.f88
     f32  f15C;                  // 0x15C  CameraScript_InterpToNewScript puts it in CamScript.f88 (0 for
                                 //        the default swing camera)

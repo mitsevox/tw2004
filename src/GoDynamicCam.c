@@ -43,6 +43,7 @@ void fn_8003B028(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32
 void fn_8003B534(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32* pCam, f32* pSub);
 void fn_8003B6D0(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32* pCam, f32* pSub);
 f32  fn_8003DBA8(f32 f);
+void fn_8003D810(f32* pDir, f32* pA, f32* pB);
 
 // Registers the handlers of the camera files ('CAMS', 'CAMV', 'CAMA').
 void fn_80039454(void) {
@@ -634,6 +635,139 @@ void fn_8003AC50(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32
         fn_800C7D14(vFrom, vTo, 1, 1, pOut, pShot->f60, pShot->f64);
     }
     fn_8003D414(pOut, pScript, pShot, nPlayer, fY);
+}
+
+// A camera that follows the ball (placement kinds 5 and 6; 6 stays level): its target is along the
+// ball's direction from DynamicCam_GetLocation's kind 0 point, by the shot's f60 (changed as in
+// fn_8003B534), moved sideways by f64. Unless fn_80043388 holds, pOut moves towards it by a share
+// of the distance and the angle between them per frame, scaled while f98 is under CamTuning.f154,
+// by f8C when nBC is 4, for a ball slower than f198 and early on the second clock (f88).
+void fn_8003B028(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32* pCam, f32* pSub,
+                 f32 f) {
+    f32 aFrom[4];
+    f32 aBallDir[4];
+    f32 aTarget[4];
+    f32 aCurOff[4];
+    f32 aCurDir[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+    f32 aTgtOff[4];
+    f32 aTgtDir[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+    f32 aNew[4];
+    f32 aNewDir[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+    f32 aAxis[4];
+    f32 aTurn[4];
+    CamShot* pCur;
+    f32 fY;
+    f32 fHi;
+    f32 fLo;
+    f32 fHeight;
+    f32 fDist;
+    f32 fFrames;
+    f32 fMove;
+    f32 fTurn;
+    f32 fEase;
+    f32 fT;
+    f32 fCurDist;
+    f32 fStep;
+    f32 fGrow;
+
+    fY = pOut[1];
+    DynamicCam_GetLocation(0, nPlayer, aFrom, pScript, pShot, pCam, pSub);
+    Vec3Copy(gPlayers[nPlayer].ball.vVel, aBallDir);
+    if (pShot->bB1 == 6) {
+        aBallDir[1] = 0.0f;
+    }
+    if (aBallDir[0] != 0.0f || aBallDir[1] != 0.0f || aBallDir[2] != 0.0f) {
+        fn_800BAF04(aBallDir, aBallDir);
+    }
+    fn_8003D810(aBallDir, pOut, aFrom);
+    if (pScript->pNextShot != NULL && pScript->pShot->bB1 == pScript->pNextShot->bB1) {
+        pCur = pScript->pShot;
+        fHi = pCur->f6C;
+        fLo = pCur->f68;
+    } else {
+        fHi = pShot->f6C;
+        fLo = pShot->f68;
+    }
+    fHeight = gPlayers[nPlayer].ball.vPos[1] - pScript->fD8;
+    if (fHeight > fHi) {
+        fDist = lbl_80281F78->f18C * (fHi - fHeight) + pShot->f60;
+    } else if (fHeight < fLo) {
+        fDist = lbl_80281F78->f190 * (fHeight - fLo) + pShot->f60;
+    } else {
+        fDist = pShot->f60;
+    }
+    fn_8000C5D4(aFrom, aBallDir, fDist, aTarget);
+    fn_8003D324(aTarget, aBallDir, pScript, pShot, nPlayer, pShot->f64, fY);
+    if (fn_80043388(pScript, pShot)) {
+        Vec3Copy(aTarget, pOut);
+        return;
+    }
+    // port: NTSC rate
+    fFrames = f / (1.0f / 59.94f);
+    fMove = lbl_80281F78->f14C * fFrames;
+    fTurn = lbl_80281F78->f150 * fFrames;
+    if (pScript->f98 < lbl_80281F78->f154) {
+        fT = (lbl_80281F78->f154 - pScript->fCamTime) / lbl_80281F78->f154;
+        fEase = (1.0f / lbl_80281F78->f14C) * (fT * fT);
+        fMove *= fEase;
+        fTurn *= fEase;
+    }
+    if (pScript->nBC == 4) {
+        fMove *= pScript->f8C;
+        fTurn *= pScript->f8C;
+    }
+    if (gPlayers[nPlayer].ball.fSpeed < lbl_80281F78->f198) {
+        fGrow = gPlayers[nPlayer].ball.fSpeed / lbl_80281F78->f198;
+        fGrow = fGrow * fGrow;
+        fGrow = fGrow * fGrow;
+        fMove *= fGrow;
+        fTurn *= fGrow;
+    }
+    if (pScript->f88 < lbl_80281F78->f158) {
+        fMove *= pScript->f88 / lbl_80281F78->f158;
+        fTurn *= pScript->f88 / lbl_80281F78->f158;
+    }
+    if (pScript->f88 < lbl_80281F78->f15C) {
+        aTarget[1] = powf(pScript->f88 / lbl_80281F78->f15C, lbl_80281F78->f160) * fFrames *
+                         (aTarget[1] - pOut[1]) +
+                     pOut[1];
+    }
+    fn_8003DC54(pOut, aFrom, aCurOff);
+    fn_8003DC54(aTarget, aFrom, aTgtOff);
+    fCurDist = (f32)fn_80009680(fn_80009744(aCurOff));
+    fStep = ((f32)fn_80009680(fn_80009744(aTgtOff)) - fCurDist) * fMove;
+    if (aCurOff[0] != 0.0f || aCurOff[1] != 0.0f || aCurOff[2] != 0.0f) {
+        fn_800BAF04(aCurOff, aCurDir);
+    } else {
+        aCurDir[0] = 0.0f;
+        aCurDir[1] = 0.0f;
+        aCurDir[2] = 0.0f;
+    }
+    if (aTgtOff[0] != 0.0f || aTgtOff[1] != 0.0f || aTgtOff[2] != 0.0f) {
+        fn_800BAF04(aTgtOff, aTgtDir);
+    } else {
+        aTgtDir[0] = 0.0f;
+        aTgtDir[1] = 0.0f;
+        aTgtDir[2] = 0.0f;
+    }
+    fTurn = fn_80009614(fn_8000C5FC(aCurDir, aTgtDir)) * fTurn;
+    vec4flt_CrossProduct(aCurDir, aTgtDir, aAxis);
+    if (aAxis[0] != 0.0f || aAxis[1] != 0.0f || aAxis[2] != 0.0f) {
+        fn_800BAF04(aAxis, aAxis);
+    }
+    fn_8001EF34(aAxis, fTurn, aAxis);
+    fn_8000923C(aAxis, aTurn);
+    aCurDir[3] = 0.0f;
+    fn_800090E4(aTurn, aCurDir, aNew);
+    if (aNew[0] != 0.0f || aNew[1] != 0.0f || aNew[2] != 0.0f) {
+        fn_800BAF04(aNew, aNewDir);
+    } else {
+        aNewDir[0] = 0.0f;
+        aNewDir[1] = 0.0f;
+        aNewDir[2] = 0.0f;
+    }
+    fn_8001EF34(aNewDir, fCurDist + fStep, aNew);
+    fn_8003DC30(aFrom, aNew, pOut);
 }
 
 // The ball-flight camera's position for the shot: from the point DynamicCam_GetLocation gives for
