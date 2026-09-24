@@ -134,13 +134,13 @@ u8 fn_800CF158(int nPlayer) {
 // winning this hole's skin lifts the player past the best.
 u8 fn_800CF450(int nPlayer) {
     int anTotal[4];   // one per player set up, as in fn_800CFE74
+    int nMineStrokes;
     int i;
     int nKind;
     int nLeft;
     int nMine;
     int nBest;
     int nOther;
-    int nMineStrokes;
     int nBestStrokes;
 
     nKind = fn_8008AB40();
