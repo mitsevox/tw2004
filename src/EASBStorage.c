@@ -189,11 +189,9 @@ EASBErrorE fn_80128200(void* pIcon, u32 uHeapID) {
         }
         if (!bRunning) {
             eCrcError = pCrc->pfnShutdown();
-            if (eCrcError != 0) {
-                eError = EASB_ERROR_UNKNOWN;
-            }
         }
-    } else {
+    }
+    if (eCrcError != 0) {
         eError = EASB_ERROR_UNKNOWN;
     }
     return eError;
