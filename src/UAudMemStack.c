@@ -4,9 +4,6 @@
 
 #include "core/audcontainers.h"
 
-void  fn_800B5A14(UAudMemStack* pStack, u8* pMem, u32 uSize, u32 nMaxBlocks, UAudMemStackBlock* pBlocks,
-                  u32 nAlign);
-void* fn_800B5AAC(UAudMemStack* pStack, u32 uSize);
 void  fn_800B5B2C(UAudMemStack* pStack, void* p);
 void  fn_800B5B80(void);
 void  fn_800B5C30(void);

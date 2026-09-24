@@ -310,6 +310,7 @@ void fn_800DB30C(int nPlayer, int nReason);
 void fn_800DBA50(int nPlayer);
 GameEffects* fn_800DAF74(void);
 void GameEffects_ResetGameEffectSettings(void);
+f32  GameEffects_GetLetterboxHeight(void);
 int  GameEffects_BallUpdatesThisFrame(int nPlayer);   // preview speed: ghost steps per frame
 void fn_800DB4E8(int nPlayer);
 void fn_800DB714(int nPlayer);

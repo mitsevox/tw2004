@@ -102,6 +102,57 @@ u32  OSGetTick(void);           // the low 32 bits of the time base
 void OSReport(const char* pFmt, ...);   // debug print (nothing in the retail build)
 void OSPanic(const char* pFile, int nLine, const char* pFmt, ...);   // print and halt
 
+// Threads wait on a queue; a mutex is owned by one thread, a semaphore counts.
+struct OSThread;
+
+typedef struct OSThreadQueue {
+    struct OSThread* pHead;     // 0x00
+    struct OSThread* pTail;     // 0x04
+} OSThreadQueue;
+LAYOUT_ASSERT(OSThreadQueue, 0x8);
+
+typedef struct OSMutexLink {
+    struct OSMutex* pNext;      // 0x00
+    struct OSMutex* pPrev;      // 0x04
+} OSMutexLink;
+LAYOUT_ASSERT(OSMutexLink, 0x8);
+
+typedef struct OSMutex {
+    OSThreadQueue    queue;     // 0x00  threads waiting for it
+    struct OSThread* pThread;   // 0x08  the owner
+    s32              nCount;    // 0x0C  how many times the owner has locked it
+    OSMutexLink      link;      // 0x10
+} OSMutex;
+LAYOUT_ASSERT(OSMutex, 0x18);
+
+typedef struct OSSemaphore {
+    s32           nCount;       // 0x00
+    OSThreadQueue queue;        // 0x04
+} OSSemaphore;
+LAYOUT_ASSERT(OSSemaphore, 0xC);
+
+void OSInitMutex(OSMutex* pMutex);
+void OSLockMutex(OSMutex* pMutex);
+void OSUnlockMutex(OSMutex* pMutex);
+void OSInitSemaphore(OSSemaphore* pSem, s32 nCount);
+s32  OSWaitSemaphore(OSSemaphore* pSem);
+s32  OSSignalSemaphore(OSSemaphore* pSem);
+
+// ---- the GameCube audio library (AX) and its effects (AXFX) ------------------------------------
+// The effects' state is only handed to the library, so its layout is left to it.
+
+typedef void (*AXAuxCallback)(void* pData, void* pContext);
+
+typedef struct AXFX_DELAY AXFX_DELAY;
+typedef struct AXFX_REVERBHI AXFX_REVERBHI;
+
+void AXRegisterAuxACallback(AXAuxCallback cb, void* pContext);
+void AXFXSetHooks(void* (*pAlloc)(u32 uSize), void (*pFree)(void* p));
+int  AXFXDelayInit(AXFX_DELAY* pDelay);         // 1: set up
+void AXFXDelayCallback(void* pData, void* pContext);
+int  AXFXReverbHiInit(AXFX_REVERBHI* pReverb);  // 1: set up
+void AXFXReverbHiCallback(void* pData, void* pContext);
+
 // ---- the GameCube DVD library -----------------------------------------------------------------
 
 // The disc's ID (the first bytes of the disc).
