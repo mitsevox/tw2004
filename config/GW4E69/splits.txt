@@ -666,6 +666,7 @@ HoleScore.c:
 
 SwingTips.c:
 	.text       start:0x800D1698 end:0x800D256C
+	.sdata2     start:0x802844C8 end:0x80284510
 
 Calendar.c:
 	.text       start:0x800D256C end:0x800D29E8

@@ -184,6 +184,12 @@ u8 fn_800D1D38(int nPlayer) {
     return 0;
 }
 
+// Which of a tip's nCount short versions to show. EA wrote the count as a parameter: with one
+// version (% 1) the compiler still divides, where a literal % 1 folds away.
+static inline u32 SwingTips_Pick(u32 nCount) {
+    return Rand_Next(0) % nCount;
+}
+
 // The tips as a swing starts, when the tips option is on and the player has a save profile (and
 // no controller in use is unplugged). Each test that passes shows its tip: the full one the
 // first time for this profile (unless b522F is set), else a random short one.
@@ -225,7 +231,7 @@ void fn_800D1DAC(int nPlayer) {
             bFull = 1;
             gpSaveData[nProfile].aTipSeen[0] = 1;
         } else {
-            fn_800E4FB0(2, (Rand_Next(0) & 1) + 0);
+            fn_800E4FB0(2, SwingTips_Pick(2) + 0);
         }
     }
     if (fn_800D16F0(nPlayer)) {
@@ -234,7 +240,7 @@ void fn_800D1DAC(int nPlayer) {
             bFull = 1;
             gpSaveData[nProfile].aTipSeen[1] = 1;
         } else {
-            fn_800E4FB0(2, (Rand_Next(0) & 3) + 2);
+            fn_800E4FB0(2, SwingTips_Pick(4) + 2);
         }
     }
     if (fn_800D17E4(nPlayer)) {
@@ -243,7 +249,7 @@ void fn_800D1DAC(int nPlayer) {
             bFull = 1;
             gpSaveData[nProfile].aTipSeen[2] = 1;
         } else {
-            fn_800E4FB0(2, (Rand_Next(0) & 1) + 6);
+            fn_800E4FB0(2, SwingTips_Pick(2) + 6);
         }
     }
     if (fn_800D18D8(nPlayer)) {
@@ -252,7 +258,7 @@ void fn_800D1DAC(int nPlayer) {
             bFull = 1;
             gpSaveData[nProfile].aTipSeen[3] = 1;
         } else {
-            fn_800E4FB0(2, Rand_Next(0) % 3 + 8);
+            fn_800E4FB0(2, SwingTips_Pick(3) + 8);
         }
     }
     if (fn_800D19F8(nPlayer)) {
@@ -261,7 +267,7 @@ void fn_800D1DAC(int nPlayer) {
             bFull = 1;
             gpSaveData[nProfile].aTipSeen[4] = 1;
         } else {
-            fn_800E4FB0(2, (Rand_Next(0) & 1) + 11);
+            fn_800E4FB0(2, SwingTips_Pick(2) + 11);
         }
     }
     if (fn_800D1A34(nPlayer)) {
@@ -270,7 +276,7 @@ void fn_800D1DAC(int nPlayer) {
             bFull = 1;
             gpSaveData[nProfile].aTipSeen[5] = 1;
         } else {
-            fn_800E4FB0(2, (Rand_Next(0) & 1) + 13);
+            fn_800E4FB0(2, SwingTips_Pick(2) + 13);
         }
     }
     if (fn_800D1A70(nPlayer)) {
@@ -279,7 +285,7 @@ void fn_800D1DAC(int nPlayer) {
             bFull = 1;
             gpSaveData[nProfile].aTipSeen[6] = 1;
         } else {
-            fn_800E4FB0(2, (Rand_Next(0) & 1) + 15);
+            fn_800E4FB0(2, SwingTips_Pick(2) + 15);
         }
     }
     if (fn_800D1AA8(nPlayer)) {
@@ -288,7 +294,7 @@ void fn_800D1DAC(int nPlayer) {
             bFull = 1;
             gpSaveData[nProfile].aTipSeen[7] = 1;
         } else {
-            fn_800E4FB0(2, (Rand_Next(0) & 1) + 17);
+            fn_800E4FB0(2, SwingTips_Pick(2) + 17);
         }
     }
     if (((u8 (*)(int))fn_800D1AE0)(nPlayer)) {   // port: EA passes an argument fn_800D1AE0 ignores
@@ -297,7 +303,7 @@ void fn_800D1DAC(int nPlayer) {
             bFull = 1;
             gpSaveData[nProfile].aTipSeen[8] = 1;
         } else {
-            fn_800E4FB0(2, Rand_Next(0) % 3 + 19);
+            fn_800E4FB0(2, SwingTips_Pick(3) + 19);
         }
     }
     if (fn_800D1B10(nPlayer)) {
@@ -306,7 +312,7 @@ void fn_800D1DAC(int nPlayer) {
             bFull = 1;
             gpSaveData[nProfile].aTipSeen[9] = 1;
         } else {
-            fn_800E4FB0(2, Rand_Next(0) % 3 + 22);
+            fn_800E4FB0(2, SwingTips_Pick(3) + 22);
         }
     }
     if (fn_800D1BA4(nPlayer)) {
@@ -315,7 +321,7 @@ void fn_800D1DAC(int nPlayer) {
             bFull = 1;
             gpSaveData[nProfile].aTipSeen[10] = 1;
         } else {
-            fn_800E4FB0(2, Rand_Next(0) % 1 + 25);
+            fn_800E4FB0(2, SwingTips_Pick(1) + 25);
         }
     }
     if (fn_800D1C38(nPlayer)) {
@@ -324,7 +330,7 @@ void fn_800D1DAC(int nPlayer) {
             bFull = 1;
             gpSaveData[nProfile].aTipSeen[11] = 1;
         } else {
-            fn_800E4FB0(2, (Rand_Next(0) & 1) + 26);
+            fn_800E4FB0(2, SwingTips_Pick(2) + 26);
         }
     }
     if (fn_800D1C9C(nPlayer)) {
@@ -333,7 +339,7 @@ void fn_800D1DAC(int nPlayer) {
             bFull = 1;
             gpSaveData[nProfile].aTipSeen[12] = 1;
         } else {
-            fn_800E4FB0(2, Rand_Next(0) % 1 + 28);
+            fn_800E4FB0(2, SwingTips_Pick(1) + 28);
         }
     }
     if (((u8 (*)(int))fn_800D1D30)(nPlayer)) {   // port: EA passes an argument fn_800D1D30 ignores
@@ -342,7 +348,7 @@ void fn_800D1DAC(int nPlayer) {
             bFull = 1;
             gpSaveData[nProfile].aTipSeen[13] = 1;
         } else {
-            fn_800E4FB0(2, Rand_Next(0) % 1 + 29);
+            fn_800E4FB0(2, SwingTips_Pick(1) + 29);
         }
     }
     if (fn_800D1D38(nPlayer)) {
@@ -351,7 +357,7 @@ void fn_800D1DAC(int nPlayer) {
             bFull = 1;
             gpSaveData[nProfile].aTipSeen[14] = 1;
         } else {
-            fn_800E4FB0(2, (Rand_Next(0) & 1) + 30);
+            fn_800E4FB0(2, SwingTips_Pick(2) + 30);
         }
     }
     if (bFull) {
