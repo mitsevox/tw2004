@@ -480,10 +480,24 @@ config.libs = [
             Object(Matching, "src/os/OSFont.c"),
             Object(Matching, "src/os/OSLink.c"),
             Object(Matching, "src/os/OSSemaphore.c"),
-            Object(Matching, "src/os/__ppc_eabi_init.c"),
-            Object(Matching, "src/gba/GBA.c"),
             Object(Matching, "src/card/CARDBios.c"),
             Object(Matching, "src/card/CARDRdwr.c"),
+        ],
+    },
+    {
+        # The GBA library (link cable). This game links its debug build: optimization level 0
+        # sized for space, no scheduling or inlining, debug info on (-sym on changes the peephole
+        # pass), asserts on (OSPanic with the source file and line).
+        "lib": "gba",
+        "mw_version": "GC/1.2.5n",
+        "cflags": [*cflags_sdk, "-opt level=0,space", "-schedule off", "-inline off", "-sym on", "-D_DEBUG"],
+        "progress_category": "sdk",
+        "objects": [
+            Object(Matching, "dolphin/gba/GBA.c"),
+            Object(Matching, "dolphin/gba/GBAGetProcessStatus.c"),
+            Object(Matching, "dolphin/gba/GBARead.c"),
+            Object(Matching, "dolphin/gba/GBAWrite.c"),
+            Object(Matching, "dolphin/gba/GBAXfer.c"),
         ],
     },
     {
@@ -766,6 +780,7 @@ config.libs = [
             Object(Matching, "dolphin/os/OSMutex.c"),
             Object(Matching, "dolphin/os/OSSync.c"),
             Object(Matching, "dolphin/os/__start.c"),
+            Object(Matching, "dolphin/os/__ppc_eabi_init.cpp"),
         ],
     },
     {

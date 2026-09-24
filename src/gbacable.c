@@ -8,11 +8,8 @@
 #include "pad.h"
 #include "core/gbacable.h"
 #include "frontend/fe.h"
+#include "core/gba.h"
 
-s32  fn_80176200(s32 nChan, u8* pStatus);  // the GBA library: read a port's status
-s32  fn_8017610C(s32 nChan, u8* pStatus);  // the GBA library: a port's status
-s32  fn_80176514(s32 nChan, u8* pDst, u8* pStatus);  // the GBA library: read a word
-s32  fn_80176668(s32 nChan, u8* pSrc, u8* pStatus);  // the GBA library: write a word
 s32  fn_80122AF0(s32 nChan);
 s32  fn_80122BCC(s32 nChan);
 s32  fn_80122E68(s32 nChan, u32* pWord);
@@ -22,7 +19,6 @@ void fn_80123ABC(s32 nChan);
 void fn_80123C2C(s32 nChan);
 void fn_80123CBC(s32 a, s32 b);
 void fn_80123E34(void);
-s32  fn_80176280(s32 nChan, u8* pOut);  // the GBA library: 2 while the port is busy
 s32  fn_80122FD8(s32 nChan);
 void fn_8012311C(s32 nChan);
 void fn_8012408C(s32 v);
@@ -94,7 +90,7 @@ s32 fn_80122AF0(s32 nChan) {
     u8* pStatus = &lbl_80260E18[nChan].uStatus;
 
     for (;;) {
-        if (fn_8017610C(nChan, pStatus) != 0) {
+        if (GBAGetStatus(nChan, pStatus) != 0) {
             return 0;
         }
         if (OSGetTick() - uStart > GBA_TIMEOUT_TICKS) {
@@ -104,7 +100,7 @@ s32 fn_80122AF0(s32 nChan) {
             break;
         }
     }
-    if (fn_80176514(nChan, (u8*)&uWord, pStatus) != 0) {
+    if (GBARead(nChan, (u8*)&uWord, pStatus) != 0) {
         return 0;
     }
     lbl_80260E18[nChan].n4C = uWord;
@@ -118,7 +114,7 @@ s32 fn_80122BCC(s32 nChan) {
     u8* pStatus = &lbl_80260E18[nChan].uStatus;
 
     for (;;) {
-        if (fn_8017610C(nChan, pStatus) != 0) {
+        if (GBAGetStatus(nChan, pStatus) != 0) {
             return 0;
         }
         if (OSGetTick() - uStart > GBA_TIMEOUT_TICKS) {
@@ -128,12 +124,12 @@ s32 fn_80122BCC(s32 nChan) {
             break;
         }
     }
-    if (fn_80176668(nChan, (u8*)lbl_8028255C, pStatus) != 0) {
+    if (GBAWrite(nChan, (u8*)lbl_8028255C, pStatus) != 0) {
         return 0;
     }
     uStart = OSGetTick();
     for (;;) {
-        if (fn_8017610C(nChan, pStatus) != 0) {
+        if (GBAGetStatus(nChan, pStatus) != 0) {
             return 0;
         }
         if (OSGetTick() - uStart > GBA_TIMEOUT_TICKS) {
@@ -151,7 +147,7 @@ s32 fn_80122CFC(s32 nChan, u32* pCmd) {
     u8* pStatus = &lbl_80260E18[nChan].uStatus;
 
     for (;;) {
-        if (fn_8017610C(nChan, pStatus) != 0) {
+        if (GBAGetStatus(nChan, pStatus) != 0) {
             OSReport("GbaWriteOnline: Failed to get status from GBA (chan=%d).\n", nChan);
             return 0;
         }
@@ -167,7 +163,7 @@ s32 fn_80122CFC(s32 nChan, u32* pCmd) {
             break;
         }
     }
-    if (fn_80176668(nChan, (u8*)pCmd, pStatus) != 0) {
+    if (GBAWrite(nChan, (u8*)pCmd, pStatus) != 0) {
         OSReport("GbaWriteOnline: Failed to write data to GBA (chan=%d).\n", nChan);
         return 0;
     }
@@ -184,7 +180,7 @@ s32 fn_80122E68(s32 nChan, u32* pWord) {
     u8* pStatus = &lbl_80260E18[nChan].uStatus;
 
     for (;;) {
-        if (fn_8017610C(nChan, pStatus) != 0) {
+        if (GBAGetStatus(nChan, pStatus) != 0) {
             OSReport("GbaReadOnline: Failed to get status from GBA (chan=%d).\n", nChan);
             return 0;
         }
@@ -200,7 +196,7 @@ s32 fn_80122E68(s32 nChan, u32* pWord) {
             break;
         }
     }
-    if (fn_80176514(nChan, (u8*)pWord, pStatus) != 0) {
+    if (GBARead(nChan, (u8*)pWord, pStatus) != 0) {
         OSReport("GbaReadOnline: Failed to read data to GBA (chan=%d).\n", nChan);
         return 0;
     }
@@ -310,7 +306,7 @@ void fn_8012311C(s32 nChan) {
 }
 
 void fn_8012332C(s32 nChan) {
-    if (fn_80176200(nChan, &lbl_80260E18[nChan].uStatus) == 0) {
+    if (GBAReset(nChan, &lbl_80260E18[nChan].uStatus) == 0) {
         if (fn_80122FD8(nChan)) {
             fn_8012311C(nChan);
         } else {
@@ -584,7 +580,7 @@ void fn_80123CBC(s32 a, s32 b) {
                 do {
                     fn_800A4BDC();
                     fn_800B7490();
-                    nErr = fn_8017610C(nChan, &pCh->uStatus);
+                    nErr = GBAGetStatus(nChan, &pCh->uStatus);
                 } while (nErr != 0 && OSGetTick() - uStart < GBA_TICKS_PER_MS * 800);
                 if (nErr == 0) {
                     pCh->n0 = 1;
@@ -643,7 +639,7 @@ void fn_80123E34(void) {
             }
             pCh->n64 = 0;
         } else {
-            if (pCh->n0 == 0 && fn_80176280(nChan, &uProc) != 2) {
+            if (pCh->n0 == 0 && GBAGetProcessStatus(nChan, &uProc) != 2) {
                 if (lbl_80281984 == -1) {
                     uStart = OSGetTick();
                     do {
@@ -672,7 +668,6 @@ void fn_80123E34(void) {
 // ---- sweep code (not yet cleaned up) ----
 
 void fn_801229F8();
-void fn_80175FB8();
 void fn_80123FF8(void);
 s32 OSGetResetButtonState();
 s32 OSResetSystem(s32, s32, s32);
@@ -721,7 +716,7 @@ void fn_80123FF8(void) {
     lbl_8028255C = DVDGetCurrentDiskID();
     lbl_80282560 = OSGetTick();
     fn_801229F8();
-    fn_80175FB8();
+    GBAInit();
 }
 
 void fn_8012402C(void) {
