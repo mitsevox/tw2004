@@ -907,7 +907,7 @@ config.libs = [
             Object(NonMatching, "fe_movies.c"),
             Object(Matching, "uiTransform.c"),
             Object(NonMatching, "goballfx.c"),
-            Object(NonMatching, "GoObjShadow.c"),
+            Object(Matching, "GoObjShadow.c"),
             Object(NonMatching, "GoShaderObject_Particle_Gc.c"),
             Object(Matching, "CharAnim.c"),
             Object(NonMatching, "GoShaderObjectCommon_MorphAnimManager_Gc.c"),
