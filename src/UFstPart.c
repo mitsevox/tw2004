@@ -18,9 +18,8 @@ f32  fn_800351D8(u32 n, f32 fPeriod);                   // GoTerrain.c
 
 void fn_80098BDC(PsEmitter* pEmitter);
 u32  fn_8009912C(PsEmitter* pEmitter, int n, f32 fStep, f32 fLiveStep);
-// Sort the list (next pointer in word n of each emitter?) by pfnCompare; not yet decompiled.
-PsEmitter* fn_80099C50(PsEmitter* pList, int n, int (*pfnCompare)(PsEmitter*, PsEmitter*));
-int  fn_80099E34(PsEmitter* pA, PsEmitter* pB);
+void* fn_80099C50(void* pList, int nLink, int (*pfnCompare)(void* pA, void* pB));
+int  fn_80099E34(void* pA, void* pB);
 void fn_80099EB4(f32* pA, f32* pB, f32* pOut);
 
 // Make the six fixed emitters, each with a 128-particle system (row 9, the particle shader).
@@ -524,6 +523,7 @@ void fn_80099BA0(Camera* pCamera) {
     lbl_801DB878[1] = pLens->v34[1];
     lbl_801DB878[2] = pLens->v34[2];
     lbl_801DB878[3] = 1.0f;
+    // port: 16 is p40's index in words; with 64-bit pointers it would be offsetof / sizeof(void*)
     lbl_80281F88 = fn_80099C50(lbl_80281F88, 16, fn_80099E34);
     for (pEmitter = lbl_80281F88; pEmitter != NULL; pEmitter = pEmitter->p40) {
         if (!(pEmitter->params.u58 & 0x80000000) && fn_80099AE4(pEmitter, pCamera)) {
@@ -532,10 +532,92 @@ void fn_80099BA0(Camera* pCamera) {
     }
 }
 
+// Sort a list whose nodes link through their word nLink, in pfnCompare's order (a node goes after
+// one it compares above 0 with): a merge sort that deals the nodes out to two queues, then merges
+// runs of 1, 2, 4... between the pairs of queues until one queue holds them all.
+void* fn_80099C50(void* pList, int nLink, int (*pfnCompare)(void* pA, void* pB)) {
+    PsSortRun aRun[4];
+    int iFrom;
+    u32 nSize;
+    int iTo;
+    PsSortRun* pA;
+    PsSortRun* pB;
+    u32 nA;
+    u32 nB;
+    PsSortRun* pOut;
+    PsSortRun* pRun;
+    int iRun;
+    void* pNode;
+
+    // Deal the nodes out to queues 0 and 1. Queue 1's head is never set: only the counts are
+    // trusted, so the first node dealt to it keeps a stale link.
+    iRun = 0;
+    aRun[1].nCount = 0;
+    aRun[0].nCount = 0;
+    aRun[0].pHead = NULL;
+    while (pList != NULL) {
+        pRun = &aRun[iRun];
+        pNode = ((void**)pList)[nLink];
+        iRun ^= 1;
+        ((void**)pList)[nLink] = pRun->pHead;
+        pRun->pHead = pList;
+        pList = pNode;
+        pRun->nCount++;
+    }
+    iFrom = 0;
+    nSize = 1;
+    while (aRun[iFrom + 1].nCount != 0) {
+        iTo = iFrom ^ 2;
+        pA = &aRun[iFrom];
+        pB = pA + 1;
+        aRun[iTo].nCount = aRun[iTo + 1].nCount = 0;
+        while (pA->nCount != 0) {
+            pOut = &aRun[iTo];
+            nB = nSize;
+            nA = nSize;
+            for (;;) {
+                if (nA == 0 || pA->nCount == 0) {
+                    if (nB == 0 || pB->nCount == 0) {
+                        break;
+                    }
+                    pRun = pB;
+                    nB--;
+                } else if (nB == 0 || pB->nCount == 0) {
+                    pRun = pA;
+                    nA--;
+                } else if (pfnCompare(pA->pHead, pB->pHead) > 0) {
+                    pRun = pB;
+                    nB--;
+                } else {
+                    pRun = pA;
+                    nA--;
+                }
+                pRun->nCount--;
+                pNode = pRun->pHead;
+                pRun->pHead = ((void**)pNode)[nLink];
+                if (pOut->nCount == 0) {
+                    pOut->pHead = pNode;
+                } else {
+                    ((void**)pOut->pTail)[nLink] = pNode;
+                }
+                pOut->pTail = pNode;
+                pOut->nCount++;
+            }
+            iTo ^= 1;
+        }
+        iFrom ^= 2;
+        nSize *= 2;
+    }
+    if (aRun[iFrom].nCount > 1) {
+        ((void**)aRun[iFrom].pTail)[nLink] = NULL;
+    }
+    return aRun[iFrom].pHead;
+}
+
 // fn_80099BA0's sort order: pB's squared distance from lbl_801DB878 minus pA's.
-int fn_80099E34(PsEmitter* pA, PsEmitter* pB) {
-    f32 fA = fn_800BB028(lbl_801DB878, pA->params.v80);
-    return fn_800BB028(lbl_801DB878, pB->params.v80) - fA;
+int fn_80099E34(void* pA, void* pB) {
+    f32 fA = fn_800BB028(lbl_801DB878, ((PsEmitter*)pA)->params.v80);
+    return fn_800BB028(lbl_801DB878, ((PsEmitter*)pB)->params.v80) - fA;
 }
 
 void fn_80099EA4(PsEmitter* pEmitter) {

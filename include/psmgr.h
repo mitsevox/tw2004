@@ -103,6 +103,13 @@ typedef struct PsEmitterRecord {
 } PsEmitterRecord;
 LAYOUT_ASSERT(PsEmitterRecord, 0xFC);
 
+// One of the four queues UFstPart.c's list sort (fn_80099C50) merges between (our name).
+typedef struct PsSortRun {
+    void* pHead;                // 0x0
+    void* pTail;                // 0x4  the last node appended
+    u32  nCount;                // 0x8  how many nodes it holds (the links past them are not cleared)
+} PsSortRun;
+
 // UFstPart.c's six fixed emitters.
 extern PsEmitter* lbl_801DB888[6];
 extern s32 lbl_80281F8C;        // UFstPart.c: the fixed emitter fn_80099758 hands out next
