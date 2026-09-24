@@ -382,6 +382,30 @@ void fn_800705F0(DynRenderBuffer* pBuf, u16* pIndices, u32 nCount, u8 bRestart);
 void fn_80070764(DynRenderBuffer* pBuf, const DynRenderDrawIn* pDraws, u16 nCount, int nPrim,
                  u8 bRestart);                                   // add draws
 
+// A shader object that draws through a dynamic rendering buffer (the hooks of rows 0 and 19 of
+// lbl_80188E88; our names). Only what those hooks read.
+typedef struct DynRenderObject {
+    u8    unk0[4];
+    DynRenderBuffer* pBuf;          // 0x04
+} DynRenderObject;
+
+// The sizes a DynRenderObject's buffer is made with (NULL: 50 vertices, 1 draw).
+typedef struct DynRenderSize {
+    s32   nMaxVerts;                // 0x00
+    s32   nMaxDraws;                // 0x04
+} DynRenderSize;
+
+// One frame's geometry handed to a DynRenderObject.
+typedef struct DynRenderFill {
+    u16   nCount;                   // 0x00  draws; with no draws, the index count
+    u16   nVerts;                   // 0x02
+    const DynRenderDrawIn* pDraws;  // 0x04  NULL: one draw of all nCount indices
+    u16*  pIndices;                 // 0x08
+    const void* pPos;               // 0x0C
+    const void* pColour;            // 0x10
+    const void* pTexCoord;          // 0x14
+} DynRenderFill;
+
 // A render surface (GoRenderSurface.c; our name, after the file): one of five 0x2C-byte slots at
 // lbl_801D3950. A slot whose n0 is not 1 owns a buffer of nSize bytes. Only what the code reads.
 typedef struct RenderSurface {
@@ -632,6 +656,8 @@ void fn_800A6358(void);
 void fn_800A63D0(void);
 void fn_800A6DCC(int nMusic, int a);
 void fn_800A72EC(u8 a, u8 b);
+void fn_800A746C(s32 nKind, int nTrack, int n);     // GameAudio.c: start a track
+void fn_800A74E4(s32 nKind, int nTrack);            // GameAudio.c: stop it
 void fn_800A7664(int nKind, int nMsg, int a);
 void fn_800A76E4(void);
 void fn_800A77E0(f32 f);                // } the options menu passes them 0.2 x options.a0[0], a0[4]
