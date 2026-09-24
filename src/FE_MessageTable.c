@@ -4587,6 +4587,17 @@ void fn_800835D4(MsgArg* pArgs, MsgArg* pResult) {
     gSession.uBag[nPlayer] = pRecord->uBagMask;
 }
 
+// Empties profile pArgs[0]'s saved round pArgs[1]: no holes, and n0 cleared.
+void fn_80083658(MsgArg* pArgs, MsgArg* pResult) {
+    int i;
+
+    for (i = 0; i < 18; i++) {
+        gpSaveData[pArgs[0].i].aSavedRound[pArgs[1].i].nHoleNum[i] = -1;
+        gpSaveData[pArgs[0].i].aSavedRound[pArgs[1].i].nCourse[i] = 0;
+    }
+    gpSaveData[pArgs[0].i].aSavedRound[pArgs[1].i].n0 = 0;
+}
+
 void fn_80083860(MsgArg* pArgs, MsgArg* pResult) {
     gpSaveData[pArgs[0].i].aSavedRound[pArgs[1].i].n0 = pArgs[2].i;
 }
