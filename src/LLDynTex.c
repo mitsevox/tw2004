@@ -578,14 +578,14 @@ s32 fn_8010BA2C(DynTex* pTex) {
             pObj->aBlocks[j].n8 += (s16)pTex->p4->n28;
         }
         if (pObj->n3C == -1) {
-            // fake match: the same wrap tests as below, written another way (82.7% -> 86.6%)
+            // Wrap modes: a set b46 bit clamps (0), a clear one repeats (1).
             GXInitTexObj(&pTexObj->tex, pTex->p4->p18 + pObj->aBlocks[0].nOffset, pObj->n38,
-                         pObj->n3A, pObj->n40, !(pObj->b46 & 1), !((pObj->b46 >> 1) & 1),
-                         pObj->n41 > 1);
+                         pObj->n3A, pObj->n40, (pObj->b46 & 1) ? 0 : 1, (pObj->b46 & 2) ? 0 : 1,
+                         pObj->n41 > 1 ? 1 : 0);
         } else {
             GXInitTexObjCI(&pTexObj->tex, pTex->p4->p18 + pObj->aBlocks[0].nOffset, pObj->n38,
-                           pObj->n3A, pObj->n40, (pObj->b46 & 1) == 0, (pObj->b46 & 2) == 0, 0,
-                           0);
+                           pObj->n3A, pObj->n40, (pObj->b46 & 1) ? 0 : 1, (pObj->b46 & 2) ? 0 : 1,
+                           0, 0);
             if (pPal != NULL) {
                 GXInitTlutObj(&pTlut->tlut, pTex->p4->p20 + pPal->nOffset, pPal->nFormat,
                               pPal->nEntries);
