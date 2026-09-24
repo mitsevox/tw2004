@@ -62,14 +62,10 @@ u8    fn_800584B4(int nProfile);
 int   fn_800D3A20(int nProfile, u8 bMessage);
 int   fn_800D3CF8(int nRating);
 u8    fn_800D4010(int nId);
-s32   fn_800D477C(int nPlayer, Ball* pBall, u8 b);
-void  fn_800D4F14(int nPlayer, u8 b);
-void  fn_800D588C(int nPlayer, u8 a, u8 bRoundOver);
 f32   fn_800D6EEC(void);
 u8    fn_800D76AC(int nPlayer, int nAward);
 int   fn_800D7DA0(int nPlayer, u8 a, u8 b, u8 c);
 u8    fn_800D8DB4(int nKind);
-s32   fn_800D9954(void);
 s32   fn_800D9E00(s32 i);
 
 // Put the working tables back to their saved copies.

@@ -54,6 +54,91 @@ u8 fn_800CF848(int nPlayer) {
     return 0;
 }
 
+// Runs the shot, putt and (outside a playoff) hole checks of Earnings.c for the player as if
+// counting (b 1) and returns the ids 0..22 they list, as a bit set.
+u32 fn_800CFD58(int nPlayer) {
+    u32 uIds = 0;
+    u32 nId;
+    int i;
+
+    fn_800D477C(nPlayer, NULL, 1);
+    for (i = 0; i < fn_800D9954(); i++) {
+        nId = fn_800D995C(i);
+        if (nId <= 22) {
+            uIds |= 1 << nId;
+        }
+    }
+    fn_800D4F14(nPlayer, 1);
+    for (i = 0; i < fn_800D9954(); i++) {
+        nId = fn_800D9970(i);
+        if (nId <= 22) {
+            uIds |= 1 << nId;
+        }
+    }
+    if (!gpGame->bD4) {
+        fn_800D588C(nPlayer, 1, 0);
+        for (i = 0; i < fn_800D9954(); i++) {
+            nId = fn_800D9984(i);
+            if (nId <= 22) {
+                uIds |= 1 << nId;
+            }
+        }
+    }
+    return uIds;
+}
+
+// The player's lead in the round so far (strokes, holes won or skins by the scoring kind
+// fn_8008AB40): kind 0, the best other total (fn_800E1904; cut players left out) less the
+// player's; kinds 1 and 2, the player's holes won (skins) less the best of the others'.
+int fn_800CFE74(int nPlayer) {
+    int anTotal[4];   // one per player set up; the frame has room for four
+    int i;
+    int nKind;
+    int nMine;
+    int nBest;
+
+    nKind = fn_8008AB40();
+    if (gNumPlayersSetUp == 1) {
+        return 0;
+    }
+    if (nKind == 0) {
+        nBest = 1000;
+        // EA bug: nMine is never set when nPlayer is cut or not one of the players set up
+        for (i = 0; i < gNumPlayersSetUp; i++) {
+            if (!gPlayers[i].bPlayerCut) {
+                anTotal[i] = fn_800E1904(i, 0);
+                if (i == nPlayer) {
+                    nMine = anTotal[i];
+                } else if (anTotal[i] < nBest) {
+                    nBest = anTotal[i];
+                }
+            }
+        }
+        return nBest - nMine;
+    } else if (nKind == 1) {
+        nBest = 0;
+        for (i = 0; i < gNumPlayersSetUp; i++) {
+            if (i == nPlayer) {
+                nMine = gPlayers[i].nHolesWon;
+            } else if (gPlayers[i].nHolesWon > nBest) {
+                nBest = gPlayers[i].nHolesWon;
+            }
+        }
+        return nMine - nBest;
+    } else if (nKind == 2) {
+        nBest = 0;
+        for (i = 0; i < gNumPlayersSetUp; i++) {
+            if (i == nPlayer) {
+                nMine = gPlayers[i].n274;
+            } else if (gPlayers[i].n274 > nBest) {
+                nBest = gPlayers[i].n274;
+            }
+        }
+        return nMine - nBest;
+    }
+    return 0;
+}
+
 // The player's score against par for the round once the tap-in on this hole drops; 0 when
 // fn_8008AB40 is set.
 int fn_800CFFE4(int nPlayer) {
@@ -76,7 +161,7 @@ int fn_800CFFE4(int nPlayer) {
 // are left out. Kinds 1 and 2: the lead from fn_800BCCF8, moved by fn_800BCCCC's value: 3 no
 // change, 2 up one (kind 2: up this hole's skin), 0 down the same.
 int fn_800D0098(int nPlayer) {
-    int anTotal[5];   // size not proven
+    int anTotal[4];   // one per player set up, as in fn_800CFE74
     int i;
     int nKind;
     int nMine;
