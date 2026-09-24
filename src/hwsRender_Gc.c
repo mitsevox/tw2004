@@ -49,7 +49,7 @@ u8 fn_80112B80(void) {
 }
 
 // The same limit for course 14's hole 11 alone: at most three players.
-int fn_80112C04(void) {
+u8 fn_80112C04(void) {
     int nHole = fn_80015464();
 
     if (Game_GetCourse() == 14 && nHole == 11 && gSession.nNumPlayers > 3) {

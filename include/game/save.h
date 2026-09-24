@@ -218,8 +218,8 @@ typedef struct SaveProfile {
                                 //          "THEKITCHENSINK" code (0x80056568) sets the first 18
     s32  n64;                   // 0x00064  money: every payout is added (fn_800D3548); a course unlocks
                                 //          when it reaches the course's price (fn_800D3A20)
-    u8   unk68[4];
-    s32  n6C;                   // 0x0006C  money: every payout is added here too (fn_800D3548)
+    s32  n68;                   // 0x00068  cleared by the profile setup (fn_80057438)
+    s32  n6C;                  // 0x0006C  money: every payout is added here too (fn_800D3548)
     u8   b70;                   // 0x00070  set when an award is won, a round is counted or a challenge
                                 //          starts; cleared when a round is set up (GameRound.c)
     u8   unk71[3];
@@ -263,8 +263,8 @@ typedef struct SaveProfile {
     u8   a5004[71];             // 0x05004  per marked hole 0..70 (fn_800E1CE8): fn_800588F4's kind 0
     u8   unk504B;
     s32  a504C[71];             // 0x0504C  the same, fn_800588F4's kind 1
-    u8   unk5168[4];
-    s32  aMedal[29];            // 0x0516C  the best medal per challenge group (0 best, 3 none)
+    s32  n5168;                 // 0x05168  set to 3 with the medals by the profile setup
+    s32  aMedal[29];           // 0x0516C  the best medal per challenge group (0 best, 3 none)
     u8   unk51E0[4];
     u16  aMedalDate[29];        // 0x051E4  the day each was earned (fn_800D2994)
     u8   unk521E[0x5220 - 0x521E];
@@ -312,6 +312,16 @@ typedef struct SaveProfile {
     u8   unk1058C[0x10600 - 0x1058C];
 } SaveProfile;
 LAYOUT_ASSERT(SaveProfile, 0x10600);
+
+// The session's record tables as the save file keeps them: a copy of gSession from aCourseRecord
+// to recC (0xF00..0x5B2C, the same layout). The replay recorder (Replay.c) keeps one too.
+typedef struct SaveRecords {
+    CourseRecord aCourseRecord[NUM_COURSE_RECORDS];    // 0x0000
+    RecordEntry recA[8][5];     // 0x41A0
+    RecordEntry recB[3][3][5];  // 0x44C0
+    RecordEntry recC[5][2][5];  // 0x4844
+} SaveRecords;
+LAYOUT_ASSERT(SaveRecords, 0x4C2C);
 
 extern SaveProfile* gpSaveData;
 extern SaveProfile* lbl_80281DF4;       // unlocks that hold for every profile (the cheat codes set them)

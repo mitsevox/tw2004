@@ -3,10 +3,11 @@
 // a slot per animation.
 
 #include "morphanim.h"
+#include "charstate.h"
+#include "golfer.h"
 
 void fn_800975B0(MorphAnim* pAnim);
 void fn_800975FC(MorphAnim* pAnim);
-int  fn_80112C04(void);   // hwsRender_Gc.c: 0 on course 14's hole 11 with four players
 
 void fn_80097208(void) {
     lbl_80281F70 = fn_80009B34(sizeof(MorphAnimMgr), 2, 32, "GoShaderObjectCommon_MorphAnimManager_Gc.c",
@@ -116,4 +117,23 @@ s32 fn_80097688(void) {
 // The frame slot nIndex's animation was last brought up to date in.
 u32 fn_80097694(u8 nIndex) {
     return lbl_80281F70->au8[nIndex];
+}
+
+// Move each recorded vertex to its position plus its morph offset scaled by fC * fWeight (the
+// offsets are s8s in 127ths), and stamp the animation's slot with this frame.
+void fn_800976A8(MorphAnim* pAnim, f32 fWeight) {
+    int i;
+    f32 fScale = (1.0f / 127.0f) * (pAnim->fC * fWeight);
+    u16* pVerts = pAnim->p10;
+    f32* pPos = pAnim->p1C;
+    f32* pBase = pAnim->p14;
+    s8* pDelta = pAnim->p18;
+
+    for (i = pAnim->nFrames - 1; i >= 0; i--) {
+        u16 nVert = pVerts[i];
+        pPos[nVert * 3 + 2] = pDelta[i * 3 + 2] * fScale + pBase[i * 3 + 2];
+        pPos[nVert * 3 + 1] = pDelta[i * 3 + 1] * fScale + pBase[i * 3 + 1];
+        pPos[nVert * 3] = pDelta[i * 3] * fScale + pBase[i * 3];
+    }
+    lbl_80281F70->au8[pAnim->nIndex] = gSession.nFrameCount;
 }

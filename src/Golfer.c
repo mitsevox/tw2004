@@ -852,7 +852,7 @@ void Caddie_Update(int nPlayer) {
 
 // Returns 0 when there is no tip for this shot, 1 when a tip is ready (the aim point in pOut), 2 when
 // it gave up.
-int Caddie_GetTip(int nPlayer, f32* pOut) {
+s8 Caddie_GetTip(int nPlayer, f32* pOut) {
     if (gPlayers[nPlayer].nShotKind != SHOT_TYPE_PUTT_e || Player_IsCPU(nPlayer) || gSession.nSplitScreen) {
         pOut[0] = 0.0f;
         pOut[1] = 0.0f;

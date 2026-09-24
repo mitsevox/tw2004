@@ -26,7 +26,6 @@ void  fn_8001A7C8(void);
 Character* fn_8001A9F4(u8* pData, int nUnused, int nSet, int nId, u8 bLook, SkinChoices* pChoices);
 CharSkinSet* fn_8001B208(u8* pData);
 Character* fn_8001942C(void);
-void  fn_80072D90(void* pAnim);                                 // animblender.c: reset a player
 s32   fn_800962F8(Character* pChar);                            // CharAnim.c
 void  fn_800184E4(Character* pChar, Skin* pSkin);
 void  fn_80018710(Character* pChar);
@@ -74,8 +73,6 @@ void  fn_800279C0(Character* pChar);                            // Skeleton.c
 void  SKEL_UpdateState(CharModel* pModel, SkelPose* pPose, u8 bTransform);   // Skeleton.c
 void  fn_80037C48(Skin* pSkin, SkelPose* pPose);                // Skin.c
 void  fn_8007260C(Character* pChar, SKABlendNode* pNode, CharModel* pModel, f32 fTime);  // animblender.c
-void  fn_80072ED8(void* pAnim, SKABlendNode* pNode, f32 fTime);                          // animblender.c
-void  fn_80073108(Character* pChar, int nPlayer, void* pAnim, SKABlendNode* pNode, f32 fTime);
 void  fn_8009622C(Character* pChar, void* pClip, u8 bKeep, f32 fOffset);                  // CharAnim.c
 void  fn_80096F0C(Character* pChar);                            // CharAnim.c
 void  fn_8000914C(f32* pQ, f32 (*m)[4]);                        // Quaternion.c: a rotation matrix
@@ -89,8 +86,6 @@ void  fn_8001EFB4(f32* pA, f32* pB, f32* pOut);
 void  fn_8001A14C(Character* pChar);
 void  fn_8001D6D8(int n);
 void  fn_8010B098(void* pModel);                                // LLDynTex.c
-void  fn_80071C28(SKABlendNode** ppNode, int a, int b, SKABlendFn pfnBlend, int c);   // animblender.c
-void  fn_800725BC(SKABlendNode* pNode, SKABlendFn pfnBlend, f32 f);                  // animblender.c
 void  fn_800958EC(AnimPlayer* pAnim, s32 n, f32 f);            // CharAnim.c
 void  fn_800094D8(f32* pQ, f32* pA, f32* pB, f32* pC);          // Quaternion.c: a rotation as angles
 void  fn_80029968(CharModel* pModel, SkelPose* pPose);          // Skeleton.c
@@ -148,9 +143,6 @@ void  fn_800106B8(u8 b);                // LLTexGrp.c
 void  fn_8008F310(void);                // uiLoadFile.c: park the UI file's data in ARAM
 void* fn_8008F354(void);                // uiLoadFile.c: the UI file's buffer
 void  fn_8008F35C(void);                // uiLoadFile.c: bring the UI file's data back
-void  fn_800720C8(Character* pChar, SKABlendNode* pNew, SKABlendNode** ppNode, f32* pBlend,
-                  SKABlendFn pfnBlend, int b);                                         // animblender.c
-void  fn_800724C0(SKABlendNode* pNode, SKABlendNode* pNew, Clip* pClip, f32 fWeight);  // animblender.c
 void  fn_800732F4(void* pNode, void* pAnim, f32 fTime);                                // CharAnim.c
 void  fn_801141F8(struct DynChain* pChain, CharModel* pModel);                         // DynChain.c
 void  fn_80035600(void);                // GoTerrain.c
@@ -489,11 +481,11 @@ void Character_UpdateAnimation(Character* pChar, int bForce, f32 fTime) {
         bC860 = 1;
     }
     if (pChar->n20 == 8 && pChar->nAnim == 8) {
-        fn_80073108(pChar, pChar->nPlayer, pChar->anim, &pChar->blend, fTime);
+        fn_80073108(pChar, pChar->nPlayer, (AnimPlayer*)pChar->anim, &pChar->blend, fTime);
     } else if (pChar->u10 & 0x100) {
-        fn_80072ED8(pChar->anim, &pChar->blend, 5.0f * fTime);
+        fn_80072ED8((AnimPlayer*)pChar->anim, &pChar->blend, 5.0f * fTime);
     } else {
-        fn_80072ED8(pChar->anim, &pChar->blend, fTime);
+        fn_80072ED8((AnimPlayer*)pChar->anim, &pChar->blend, fTime);
         if (pChar->uFlags & 0x1000) {
             pChar->uFlags &= ~0x1000;
             if (pChar->pCurClip != NULL && pChar->pCurClip->pF4 != NULL) {
@@ -1012,7 +1004,7 @@ Character* fn_8001942C(void) {
         pChar->buffers[i].pBuf = fn_80009B34(0x890, 2, 0x40, "char.c", 0x8AF);
     }
     pNode = &pChar->blend;
-    fn_80072D90(pChar->anim);
+    fn_80072D90((AnimPlayer*)pChar->anim);
     fn_80071C28(&pNode, 1, 0, fn_80072ACC, 1);
     pNode = (SKABlendNode*)pChar->node3E0;
     fn_80072D90(&pChar->anim29C);
@@ -1053,7 +1045,7 @@ Character* fn_8001942C(void) {
     pChar->n16DC = 0;
     pChar->f165C = pChar->f1660 = 1073741824.0f;
     pChar->pCurClip = NULL;
-    pChar->n178C = 0;
+    pChar->p178C = NULL;
     pChar->a6C[0] = -1;
     pChar->a64[0] = NULL;
     pChar->a6C[1] = -1;
@@ -1943,8 +1935,8 @@ void fn_8001B878(Character* pChar, int nPlayer) {
     pChar->n1654 = fn_80007D74(&sphere, fn_8001614C(), 0);
     sphere.radius = 3.0f;
     pChar->n1658 = fn_80007D74(&sphere, fn_8001614C(), 0);
-    fn_8001EFB4(pMtx[3], fn_8001F004()->v34, vDir);
-    fDist = fn_8000C5FC(fn_8001F004()->v24, vDir);
+    fn_8001EFB4(pMtx[3], fn_8001F004()->m4[3], vDir);
+    fDist = fn_8000C5FC(fn_8001F004()->m4[2], vDir);
     fLen = (f32)fn_80009680(fn_80009744(vDir));
     if (fLen < pChar->f14) {
         pChar->f14 = fLen;
@@ -2088,7 +2080,7 @@ void fn_8001BE88(Character* pChar, Clip* pClip, int bNoBlend, f32 fTime) {
     if (fn_8001EC48(pChar)) {
         fn_8001BD18(pChar, pClip);
     }
-    pChar->n178C = 0;
+    pChar->p178C = NULL;
     if (bNoBlend) {
         fn_80071F58(&pNode, 0);
         fn_80071C28(&pNode, 1, 0, fn_80072ACC, 0);

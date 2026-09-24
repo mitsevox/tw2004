@@ -316,14 +316,79 @@ void fn_80010544(int nSlot);            // frees the bank in slot nSlot and empt
 TexBank* fn_800106C4(int nSlot);        // the bank in slot nSlot
 int  fn_800107C0(struct UStreamObject* pObject, TexBank* pBank, int n);   // loads a bank: its slot
 
+// ---- disc reads (LLFileIO_Gc.c) ------------------------------------------------------------------
+
+// The SDK's open disc file (0x3C bytes); only what the game reads.
+typedef struct DVDFileInfo {
+    u8    unk0[0x18];
+    void* pAddr;                // 0x18  the running read's buffer
+    u8    unk1C[0x34 - 0x1C];
+    u32   uLength;              // 0x34  the file's size in bytes
+    void* pCallback;            // 0x38
+} DVDFileInfo;
+typedef void (*DVDCallback)(s32 nResult, DVDFileInfo* pInfo);
+s32 DVDReadAsyncPrio(DVDFileInfo* pInfo, void* pBuf, s32 nLen, s32 nOffset, DVDCallback pCallback,
+                     s32 nPrio);
+
+// An open file (lbl_8019EAD0, 32 of them, 0xC4 bytes each).
+typedef struct DiscFile {
+    DVDFileInfo info;           // 0x00
+    u8   unk3C[0xC4 - 0x3C];
+} DiscFile;
+
+// A queued read (0x24 bytes: lbl_8019E880 holds eight free ones per priority).
+typedef struct FileReq {
+    struct FileReq* pNext;      // 0x00
+    struct FileReq* pPrev;      // 0x04
+    s32   nFile;                // 0x08  the DiscFile to read from
+    void* pBuf;                 // 0x0C
+    s32   nLen;                 // 0x10
+    s32   nOffset;              // 0x14
+    void (*pfnDone)(int nBytes, int nError);    // 0x18
+    s32   n1C;                  // 0x1C
+    u8    b20;                  // 0x20
+    u8    b21;                  // 0x21
+    u8    unk22[2];
+} FileReq;
+
+// A priority's reads: a ring through the FileReqs, the list itself as its end (lbl_8019E868[2]).
+typedef struct FileQueue {
+    FileReq* pNext;             // 0x00
+    FileReq* pPrev;             // 0x04
+    s32   nCount;               // 0x08
+} FileQueue;
+
+// A priority's free FileReqs (lbl_8019E880[2]): a ring like FileQueue's, and the eight requests.
+typedef struct FileReqPool {
+    FileReq* pNext;             // 0x00
+    FileReq* pPrev;             // 0x04
+    FileReq  aReq[8];           // 0x08
+} FileReqPool;
+
 // ---- the renderer ----------------------------------------------------------------------------
 
+void fn_800066E4(u8 bOnRelease, s32 nReset, s32 nCode, u8 bMenu);  // LLDisp_Gc.c: reset the console
+                                        //       (OSResetSystem's arguments) unless a memory card is busy
 void fn_80006EDC(void);                 // LLDisp_Gc.c: set the viewport (DiscCheck.c, ScreenClear.c)
 void fn_80006FE8(void);                 // LLDisp_Gc.c: end the frame (returns nothing)
 extern struct GXFifoObj* lbl_80281BA0; // LLDisp_Gc.c: the command FIFO (GXInit's)
 extern u32 lbl_80281B9C;                // LLDisp_Gc.c: the most the FIFO has held (fn_800124CC)
 extern void* lbl_80281BA4[2];           // LLDisp_Gc.c: two image buffers (DepthField.c and
                                         //       FEgolferanim.c make textures of them)
+
+// LLDisp_Gc.c's frame sync (lbl_801A2350, our name): the FIFO break points the GPU is stopped at,
+// so the CPU knows when a frame's commands have been drawn.
+typedef struct DispSync {
+    void* aBreakPt[3];          // 0x00  a ring of FIFO write pointers
+    s8   nNext;                 // 0x0C  the next one to enable (0..2)
+    s8   b0D;                   // 0x0D
+    s8   nPending;              // 0x0E  how many are queued
+    s8   bBusy;                 // 0x0F  set while the GPU runs to a break point; fn_800070DC waits on it
+    u8   nBuf;                  // 0x10  the lbl_80281BA4 buffer the frame is copied to
+    s8   n11;                   // 0x11  counted up at each retrace with a break point hit
+    s8   n12;                   // 0x12  counted up at each jittered viewport
+    s8   bBreak;                // 0x13  the GPU reached a break point (fn_80006EC8, GX's callback)
+} DispSync;
 
 // The renderer's state (lbl_801B8980, 0x118 bytes); only what the game code writes.
 // GoTerrain.c's setters write one group of fields each and set that group's bit in u110.
@@ -687,6 +752,75 @@ typedef struct ScreenCopy {
 extern ScreenCopy* lbl_80281100;
 extern s32 lbl_80281B88;        // bit 0: the video field being drawn
 
+// ---- the depth-of-field blur (DepthField.c) -------------------------------------------------
+
+// One blur layer (0x18 bytes; our name). lbl_801D5110 holds five, set up by fn_80045660.
+typedef struct DFLayer {
+    u8   b0;                    // 0x00  set: the layer is drawn (fn_80045848)
+    u8   unk1[3];
+    f32  f4;                    // 0x04  times f14: the draw's alpha
+    f32  aColour[3];            // 0x08  the draw's red, green and blue
+    f32  f14;                   // 0x14  0..1 (fn_800457B8); 0 turns the layer off
+} DFLayer;
+LAYOUT_ASSERT(DFLayer, 0x18);
+
+// What lbl_80281110 points at (lbl_801D5188, 0x10 bytes; our name).
+typedef struct DFBuffer {
+    u8    unk0[8];
+    void* p8;                   // 0x08  the screen copy's pixels (fn_8002A624)
+    u8    unkC[4];
+} DFBuffer;
+
+extern DFLayer lbl_801D5110[5];
+extern DFBuffer* lbl_80281110;
+extern f32 lbl_80281D90;
+extern f32 lbl_80281D94;        // cleared by fn_80045660
+// DF_vDrawBufferToScreen's pass n (0..4) is shifted by lbl_80281114 * (5 - n) /
+// (lbl_8028111C * (n + 1)), drawn at depth 1 - (lbl_80281118 * n^3 + lbl_80281D90) and faded by
+// 1 / (lbl_80281120[0] * (n + 1)).
+extern f32 lbl_80281114;        // 0.011
+extern f32 lbl_80281118;        // 0.00315
+extern f32 lbl_8028111C;        // 3.13
+extern f32 lbl_80281120[2];     // 1, 0
+
+// ---- the screen effects (GoPostFx.c) ---------------------------------------------------------
+
+// Three effects per view (four views each; our names), each drawn once when set, then cleared.
+// A colour drawn over the view (fn_80038010 sets it, fn_80038438 draws it).
+typedef struct PostFxTint {
+    u8   b0;                    // 0x00  set: draw it this frame
+    u8   unk1[3];
+    f32  aColour[4];            // 0x04  fn_80014194's colour
+} PostFxTint;
+LAYOUT_ASSERT(PostFxTint, 0x14);
+
+// Set by fn_80038054, drawn by fn_80038724.
+typedef struct PostFx5090 {
+    u8   b0;                    // 0x00  set: draw it this frame
+    u8   unk1[3];
+    f32  f4;                    // 0x04  0.035 or more also calls fn_800A6070(0, 1)
+    f32  f8;                    // 0x08
+} PostFx5090;
+LAYOUT_ASSERT(PostFx5090, 0xC);
+
+// A colour fading in from a centre point towards the view's edges (fn_800380A8 sets it,
+// fn_80038A90 draws it).
+typedef struct PostFx5020 {
+    u8   b0;                    // 0x00  set: draw it this frame
+    u8   b1;                    // 0x01  set: draw the effect's screen copy under it first
+    u8   unk2[2];
+    f32  aColour[4];            // 0x04  fn_800380A8 sets the first three; [3] scales the alpha
+    f32  fX;                    // 0x14  } the centre, as fractions of the view's width and height
+    f32  fY;                    // 0x18  }
+} PostFx5020;
+LAYOUT_ASSERT(PostFx5020, 0x1C);
+
+extern f32 lbl_801D5010[4];     // per view: fn_80039358 darkens the screen by this share
+extern PostFx5020 lbl_801D5020[4];
+extern PostFx5090 lbl_801D5090[4];
+extern PostFxTint lbl_801D50C0[4];
+extern void* lbl_80281D80;      // a 256 x 224 screen copy, only in game types 4..8
+
 // ---- the file streamer (UStream.c) -----------------------------------------------------------
 
 // An object built from SHOC chunks. The header is 0x34 bytes (LoadData.c copies one with
@@ -993,6 +1127,13 @@ typedef struct TrailMeshDesc {
     u8*        pColour;         // 0x10
     f32*       pUV;             // 0x14
 } TrailMeshDesc;
+
+// A TrailMeshDesc with four more values after it (GoBreakLine.c's line: BreakLine.fAB10, fAB14,
+// fAB18 and 1 / fAB18).
+typedef struct TrailMeshDescEx {
+    TrailMeshDesc desc;         // 0x00
+    f32        af18[4];         // 0x18
+} TrailMeshDescEx;
 
 int  fn_80012FA4(void);                 // controller init
 void fn_80012EF8(void);
