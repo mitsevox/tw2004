@@ -39,6 +39,7 @@ void GXResetWriteGatherPipe(void);
 // ---- matrices --------------------------------------------------------------------------------
 
 void GXLoadPosMtxImm(f32 (*pMtx)[4], int nId);
+void GXSetClipMode(int eMode);
 void GXSetArray(int eAttr, void* pBase, u8 nStride);
 void GXClearVtxDesc(void);
 void GXSetVtxDesc(int eAttr, int eType);

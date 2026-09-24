@@ -4,6 +4,7 @@
 #include "glows.h"
 #include "gx.h"
 #include "core/startup.h"
+#include "unsorted/cull.h"
 
 void fn_80097EC4(f32* pPos);
 void fn_800124A8(void);                                 // LLFont.c: end the primitive
@@ -204,6 +205,36 @@ void fn_80098408(GlowQueued* pGlow, f32* pPos) {
     }
 }
 
+// Draws the queued glows whose n24 is bOnTop, each through pMtx, when it ends up in front (z > 0).
+void fn_800985FC(GlowQueue* pQueue, f32 (*pMtx)[4], int bOnTop) {
+    GlowQueued* pGlow;
+    int i;
+    Vec4 v;
+
+    fn_8001614C();
+    GXSetClipMode(0);
+    GXSetChanCtrl(4, 0, 0, 1, 0, 0, 2);
+    GXSetNumTevStages(1);
+    GXSetTevColorIn(0, 2, 4, 10, 15);
+    GXSetTevColorOp(0, 0, 0, 0, 1, 0);
+    GXSetTevAlphaIn(0, 1, 2, 5, 7);
+    GXSetTevAlphaOp(0, 0, 0, 1, 1, 0);
+    pGlow = pQueue->a;
+    for (i = 0; i < pQueue->nCount; i++) {
+        if (!(pGlow->n24 ^ bOnTop)) {
+            v.x = pGlow->vPos[0];
+            v.y = pGlow->vPos[1];
+            v.z = pGlow->vPos[2];
+            v.w = 1.0f;
+            fn_800BAD60(pMtx, &v, &v);
+            if (v.z > 0.0f) {
+                fn_80098408(pGlow, &v.x);
+            }
+        }
+        pGlow++;
+    }
+}
+
 void fn_80098740(void) {
     s32 i;
     lbl_801D99D0.nCount = 0;
@@ -228,7 +259,6 @@ void fn_800987D4(void) {
 
 void fn_80098844(void);
 void fn_80098848(void);
-void fn_800985FC();
 void fn_8009884C(u8* p0);
 void fn_80098884(u8* p0, u8* p1);
 void fn_800988A0(s32 p0, s32 p1, s32 p2, s32 p3);
@@ -247,7 +277,7 @@ void fn_80098848(void) {
 }
 
 void fn_8009884C(u8* p0) {
-    fn_800985FC(*(s32*)(p0 + 0x4), *(s32*)(p0 + 0xC), ((u32)__cntlzw(*(s32*)(p0 + 0x8)) >> 5));
+    fn_800985FC(*(GlowQueue**)(p0 + 0x4), *(f32 (**)[4])(p0 + 0xC), ((u32)__cntlzw(*(s32*)(p0 + 0x8)) >> 5));
 }
 
 void fn_80098884(u8* p0, u8* p1) {
