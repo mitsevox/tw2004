@@ -466,7 +466,7 @@ static inline char* UIS_PutString(char* pOut, char* pEnd, const char* sz, s32 nW
     }
     nPad = nAbs - strlen(sz);
     if (!bLeft && nPad > 0) {
-        for (i = 0; i < nPad; i++) {
+        for (i = nPad; i > 0; i--) {
             *pOut++ = ' ';
         }
         nCount = nPad;
@@ -477,7 +477,7 @@ static inline char* UIS_PutString(char* pOut, char* pEnd, const char* sz, s32 nW
         if (pOut == pEnd) break;
     }
     if (bLeft == 1 && nCount < nAbs) {
-        for (i = nAbs - nCount; i > 0; i--) {
+        for (i = nCount; i < nAbs; i++) {
             *pOut++ = ' ';
         }
     }
@@ -487,9 +487,9 @@ static inline char* UIS_PutString(char* pOut, char* pEnd, const char* sz, s32 nW
 // Formats szFormat with pArgs into pOut (nSize bytes). Returns the length written, or -1.
 // EA bug: '-' is never cleared, so every conversion after one with '-' is left-justified too.
 s32 fn_8016B844(char* pOut, s32 nSize, const char* szFormat, s32 nArgs, const UISWord* pArgs) {
-    char* pStart;
     char* pEnd;
     u8 bLeft;
+    char* pStart;
     s32 nArg;
     char c;
     u8 bUnsigned;
@@ -563,10 +563,7 @@ s32 fn_8016B844(char* pOut, s32 nSize, const char* szFormat, s32 nArgs, const UI
             case 'i':
                 nDigits = 0;
                 u = pArgs[nArg++].u;
-                bNeg = 0;
-                if (!bUnsigned && (s32)u < 0) {
-                    bNeg = 1;
-                }
+                bNeg = !bUnsigned && (s32)u < 0;
                 if (bNeg) {
                     u = -u;
                 }
@@ -582,7 +579,7 @@ s32 fn_8016B844(char* pOut, s32 nSize, const char* szFormat, s32 nArgs, const UI
                 if (bNeg) {
                     aDec[nDigits++] = '-';
                 }
-                while (nDigits-- > 0 && pOut < pEnd) {
+                while (--nDigits >= 0 && pOut < pEnd) {
                     *pOut++ = aDec[nDigits];
                 }
                 continue;
@@ -597,7 +594,7 @@ s32 fn_8016B844(char* pOut, s32 nSize, const char* szFormat, s32 nArgs, const UI
                 do {
                     c = (u & 0xF) + '0';
                     if (c > '9') {
-                        c += (bUpper ? 'A' : 'a') - '9' - 1;
+                        c += (bUpper ? 'A' - 'a' : 0) + 'a' - '9' - 1;
                     }
                     u >>= 4;
                     aHex[nDigits++] = c;
@@ -607,7 +604,7 @@ s32 fn_8016B844(char* pOut, s32 nSize, const char* szFormat, s32 nArgs, const UI
                         aHex[nDigits++] = cPad;
                     }
                 }
-                while (nDigits-- > 0 && pOut < pEnd) {
+                while (--nDigits >= 0 && pOut < pEnd) {
                     *pOut++ = aHex[nDigits];
                 }
                 continue;
